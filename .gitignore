@@ -42,7 +42,12 @@ Source/Archives/
 
 # Profiling traces (Instruments)
 Documentation/Development/GUI/Profiling/Traces/
+Quality/Profiling/GUI/Traces/
+
+# Workbench (dev/test data: SysEx files, Ableton project, MIDI Monitor)
+Workbench/
 
 # Personal notes and prompts
 TODO.md
+IA-PROMPT.md
 IA/PROMPT.md

@@ -123,6 +123,11 @@ set(PLUGIN_SOURCES
     # Loggers
     Source/Core/Loggers/MidiLogger.cpp
     Source/Core/Loggers/ApvtsLogger.cpp
+
+    # Quality - Unit Tests
+    Quality/Tests/Unit/MidiManagerTests.cpp
+    Quality/Tests/Unit/SysExEncoderTests.cpp
+    Quality/Tests/Unit/SysExParserTests.cpp
 )
 
 # ============================================================================
