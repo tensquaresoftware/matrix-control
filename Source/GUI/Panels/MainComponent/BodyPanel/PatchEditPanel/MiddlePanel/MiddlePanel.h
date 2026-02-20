@@ -4,9 +4,11 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 
 #include "GUI/Widgets/EnvelopeDisplay.h"
+#include "GUI/Widgets/ModuleHeader.h"
 #include "GUI/Widgets/PatchNameDisplay.h"
 #include "GUI/Widgets/TrackGeneratorDisplay.h"
 #include "Shared/PluginDimensions.h"
+#include "Shared/PluginDisplayNames.h"
 
 namespace tss
 {
@@ -51,6 +53,7 @@ private:
     tss::EnvelopeDisplay envelope2Display_;
     tss::EnvelopeDisplay envelope3Display_;
     tss::TrackGeneratorDisplay trackGeneratorDisplay_;
+    tss::ModuleHeader patchNameModuleHeader_;
     tss::PatchNameDisplay patchNameDisplay_;
 
     void syncTrackGeneratorDisplayFromApvts();

@@ -22,7 +22,6 @@ namespace tss
 
     private:
         inline constexpr static int kBorderThickness_ = 2;
-        inline constexpr static int kVerticalPadding_ = 15;
         inline constexpr static float kFontHeight_ = 28.0f;
 
         Skin* skin_ = nullptr;

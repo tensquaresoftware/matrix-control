@@ -28,7 +28,8 @@ namespace tss
             return;
 
         const auto bounds = getLocalBounds().toFloat();
-        const auto contentBounds = bounds.reduced(0.0f, static_cast<float>(kWidgetVerticalPadding_));
+        const auto contentBounds = bounds.withTrimmedTop(static_cast<float>(kWidgetPaddingTop_))
+            .withTrimmedBottom(static_cast<float>(kWidgetPaddingBottom_));
 
         drawBackground(g, contentBounds);
         drawBorder(g, contentBounds);
@@ -175,7 +176,10 @@ namespace tss
     void EnvelopeDisplay::regenerateCache()
     {
         const auto scale = getPixelScale();
-        const auto innerBounds = getLocalBounds().reduced(0, kWidgetVerticalPadding_).toFloat();
+        const auto innerBounds = getLocalBounds()
+            .withTrimmedTop(kWidgetPaddingTop_)
+            .withTrimmedBottom(kWidgetPaddingBottom_)
+            .toFloat();
         const int imageWidth = juce::roundToInt(innerBounds.getWidth() * scale);
         const int imageHeight = juce::roundToInt(innerBounds.getHeight() * scale);
         
@@ -359,7 +363,8 @@ namespace tss
     void EnvelopeDisplay::mouseDown(const juce::MouseEvent& e)
     {
         const auto bounds = getLocalBounds().toFloat();
-        const auto innerBounds = bounds.reduced(0.0f, static_cast<float>(kWidgetVerticalPadding_));
+        const auto innerBounds = bounds.withTrimmedTop(static_cast<float>(kWidgetPaddingTop_))
+            .withTrimmedBottom(static_cast<float>(kWidgetPaddingBottom_));
         
         draggedPointIndex_ = findPointAtPosition(e.position, innerBounds);
         
@@ -370,7 +375,8 @@ namespace tss
     void EnvelopeDisplay::mouseDrag(const juce::MouseEvent& e)
     {
         const auto bounds = getLocalBounds().toFloat();
-        const auto innerBounds = bounds.reduced(0.0f, static_cast<float>(kWidgetVerticalPadding_));
+        const auto innerBounds = bounds.withTrimmedTop(static_cast<float>(kWidgetPaddingTop_))
+            .withTrimmedBottom(static_cast<float>(kWidgetPaddingBottom_));
         const auto centerBounds = getCurveCenterBounds(innerBounds);
         
         if (draggingSustainSegment_)

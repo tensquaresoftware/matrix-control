@@ -14,7 +14,7 @@ namespace PluginDimensions
     namespace GUI
     {
         inline constexpr int kWidth = 1335;
-        inline constexpr int kHeight = 790;
+        inline constexpr int kHeight = 810; //790;
     }
 
     // ============================================================================
@@ -32,7 +32,7 @@ namespace PluginDimensions
         namespace BodyPanel
         {
             inline constexpr int kWidth = 1335;
-            inline constexpr int kHeight = 730;
+            inline constexpr int kHeight = 750; //730;
             inline constexpr int kPadding = 15;
         }
         
@@ -45,7 +45,7 @@ namespace PluginDimensions
         namespace MasterEditPanel
         {
             inline constexpr int kWidth = 160;
-            inline constexpr int kHeight = 700;
+            inline constexpr int kHeight = 720; //700;
             
             namespace ChildPanels
             {
@@ -54,24 +54,24 @@ namespace PluginDimensions
             
             namespace MidiPanel
             {
-                inline constexpr int kHeight = 245;
+                inline constexpr int kHeight = 242; //245;
             }
             
             namespace VibratoPanel
             {
-                inline constexpr int kHeight = 220;
+                inline constexpr int kHeight = 218; //220;
             }
             
             namespace MiscPanel
             {
-                inline constexpr int kHeight = 205;
+                inline constexpr int kHeight = 230; //205;
             }
         }
         
         namespace PatchEditPanel
         {
             inline constexpr int kWidth = 810;
-            inline constexpr int kHeight = 700;
+            inline constexpr int kHeight = 720; //700;
             
             namespace TopPanel
             {
@@ -88,12 +88,23 @@ namespace PluginDimensions
             namespace MiddlePanel
             {
                 inline constexpr int kWidth = 810;
-                inline constexpr int kHeight = 110;
+                inline constexpr int kHeight = 130; //110;
 
                 namespace ChildPanels
                 {
                     inline constexpr int kWidth = 150;
-                    inline constexpr int kHeight = 110;
+                    inline constexpr int kHeight = 130; //110;
+                }
+
+                namespace PatchNameSection
+                {
+                    inline constexpr int kWidth = 150;
+                    inline constexpr int kHeight = 130;
+                    inline constexpr int kPaddingTop = 8;
+                    inline constexpr int kSpacing = 12;
+                    inline constexpr int kPaddingBottom = 10;
+                    inline constexpr int kPatchNameDisplayWidth = 150;
+                    inline constexpr int kPatchNameDisplayHeight = 70;
                 }
             }
             
@@ -113,30 +124,36 @@ namespace PluginDimensions
         namespace MatrixModulationPanel
         {
             inline constexpr int kWidth = 275;
-            inline constexpr int kHeight = 325;
+            inline constexpr int kHeight = 320; //325;
         }
         
         namespace PatchManagerPanel
         {
             inline constexpr int kWidth = 275;
-            inline constexpr int kHeight = 375;
+            inline constexpr int kHeight = 400; //375;
             
             namespace BankUtilityPanel
             {
                 inline constexpr int kWidth = 275;
-                inline constexpr int kHeight = 92; //100;
+                inline constexpr int kHeight = 90; //92;
             }
             
             namespace InternalPatchesPanel
             {
                 inline constexpr int kWidth = 275;
-                inline constexpr int kHeight = 100;
+                inline constexpr int kHeight = 85; //100;
             }
             
             namespace ComputerPatchesPanel
             {
                 inline constexpr int kWidth = 275;
-                inline constexpr int kHeight = 100;
+                inline constexpr int kHeight = 85; //100;
+            }
+
+            namespace PatchMutatorPanel
+            {
+                inline constexpr int kWidth = 275;
+                inline constexpr int kHeight = 105;
             }
         }
     }
@@ -251,7 +268,7 @@ namespace PluginDimensions
             inline constexpr int kComboBox = 20;
             inline constexpr int kNumberBox = 20;
             inline constexpr int kHorizontalSeparator = 5;
-            inline constexpr int kVerticalSeparator = 700;
+            inline constexpr int kVerticalSeparator = 720; //700;
         }
     }
 } // namespace PluginDimensions

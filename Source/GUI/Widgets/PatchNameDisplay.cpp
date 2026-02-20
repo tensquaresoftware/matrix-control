@@ -32,7 +32,7 @@ namespace tss
             return;
 
         const auto bounds = getLocalBounds().toFloat();
-        const auto contentBounds = bounds.reduced(0.0f, static_cast<float>(kVerticalPadding_));
+        const auto contentBounds = bounds;
 
         drawBackground(g, contentBounds);
         drawBorder(g, contentBounds);

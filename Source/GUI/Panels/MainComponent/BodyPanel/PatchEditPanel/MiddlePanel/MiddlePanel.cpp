@@ -2,6 +2,7 @@
 
 #include "GUI/Themes/Skin.h"
 #include "Shared/PluginDescriptors.h"
+#include "Shared/PluginDisplayNames.h"
 
 
 MiddlePanel::~MiddlePanel()
@@ -17,7 +18,13 @@ MiddlePanel::MiddlePanel(tss::Skin& skin, juce::AudioProcessorValueTreeState& ap
     , envelope2Display_(skin, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kWidth, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kHeight)
     , envelope3Display_(skin, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kWidth, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kHeight)
     , trackGeneratorDisplay_(skin, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kWidth, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kHeight)
-    , patchNameDisplay_(skin, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kWidth, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kHeight)
+    , patchNameModuleHeader_(skin, PluginDescriptors::ModuleDisplayNames::kPatchName,
+                             PluginDimensions::Panels::PatchEditPanel::MiddlePanel::PatchNameSection::kWidth,
+                             PluginDimensions::Widgets::Heights::kModuleHeader,
+                             tss::ModuleHeader::ColourVariant::Blue)
+    , patchNameDisplay_(skin,
+                        PluginDimensions::Panels::PatchEditPanel::MiddlePanel::PatchNameSection::kPatchNameDisplayWidth,
+                        PluginDimensions::Panels::PatchEditPanel::MiddlePanel::PatchNameSection::kPatchNameDisplayHeight)
 {
     setOpaque(false);
     setSize(getWidth(), getHeight());
@@ -30,19 +37,27 @@ MiddlePanel::MiddlePanel(tss::Skin& skin, juce::AudioProcessorValueTreeState& ap
     addAndMakeVisible(envelope2Display_);
     addAndMakeVisible(envelope3Display_);
     addAndMakeVisible(trackGeneratorDisplay_);
+    addAndMakeVisible(patchNameModuleHeader_);
     addAndMakeVisible(patchNameDisplay_);
 }
 
 void MiddlePanel::resized()
 {
-    const auto childWidth = PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kWidth;
-    const auto childHeight = PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kHeight;
+    using namespace PluginDimensions::Panels::PatchEditPanel::MiddlePanel;
+    const auto childWidth = ChildPanels::kWidth;
+    const auto childHeight = ChildPanels::kHeight;
 
     envelope1Display_.setBounds(0, 0, childWidth, childHeight);
     envelope2Display_.setBounds(envelope1Display_.getBounds().getRight() + kSpacing, 0, childWidth, childHeight);
     envelope3Display_.setBounds(envelope2Display_.getBounds().getRight() + kSpacing, 0, childWidth, childHeight);
     trackGeneratorDisplay_.setBounds(envelope3Display_.getBounds().getRight() + kSpacing, 0, childWidth, childHeight);
-    patchNameDisplay_.setBounds(trackGeneratorDisplay_.getBounds().getRight() + kSpacing, 0, childWidth, childHeight);
+
+    const auto patchNameSectionX = trackGeneratorDisplay_.getBounds().getRight() + kSpacing;
+    const auto moduleHeaderHeight = PluginDimensions::Widgets::Heights::kModuleHeader;
+    patchNameModuleHeader_.setBounds(patchNameSectionX, PatchNameSection::kPaddingTop,
+                                    PatchNameSection::kWidth, moduleHeaderHeight);
+    patchNameDisplay_.setBounds(patchNameSectionX, PatchNameSection::kPaddingTop + moduleHeaderHeight + PatchNameSection::kSpacing,
+                               PatchNameSection::kPatchNameDisplayWidth, PatchNameSection::kPatchNameDisplayHeight);
 }
 
 void MiddlePanel::valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
@@ -235,6 +250,7 @@ void MiddlePanel::setSkin(tss::Skin& skin)
     envelope2Display_.setSkin(skin);
     envelope3Display_.setSkin(skin);
     trackGeneratorDisplay_.setSkin(skin);
+    patchNameModuleHeader_.setSkin(skin);
     patchNameDisplay_.setSkin(skin);
 }
 

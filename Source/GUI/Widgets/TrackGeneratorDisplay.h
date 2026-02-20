@@ -51,7 +51,8 @@ namespace tss
 
     private:
         inline constexpr static int kWidgetBorderThickness_ = 2;
-        inline constexpr static int kWidgetVerticalPadding_ = 15;
+        inline constexpr static int kWidgetPaddingTop_ = 12;
+        inline constexpr static int kWidgetPaddingBottom_ = 10;
         inline constexpr static float kWidgetTriangleBase_ = 10.0f;
         
         inline constexpr static int kPointMinValue_ = 0;

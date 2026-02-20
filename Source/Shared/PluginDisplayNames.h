@@ -58,6 +58,7 @@ namespace PluginDescriptors
         constexpr const char* kEnvelope3                    = "ENV 3";
         constexpr const char* kLfo1                         = "LFO 1";
         constexpr const char* kLfo2                         = "LFO 2";
+        constexpr const char* kPatchName                    = "PATCH NAME";
 
         // Patch Manager Module Display Names
         constexpr const char* kBankUtility                  = "BANK UTILITY";

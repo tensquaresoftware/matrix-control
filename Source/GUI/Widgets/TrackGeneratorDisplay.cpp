@@ -2,7 +2,6 @@
 
 #include "GUI/Themes/Skin.h"
 #include "GUI/Themes/ColourChart.h"
-#include "GUI/Themes/ColourChart.h"
 
 namespace tss
 {
@@ -30,7 +29,8 @@ namespace tss
             return;
 
         const auto bounds = getLocalBounds().toFloat();
-        const auto contentBounds = bounds.reduced(0.0f, static_cast<float>(kWidgetVerticalPadding_));
+        const auto contentBounds = bounds.withTrimmedTop(static_cast<float>(kWidgetPaddingTop_))
+            .withTrimmedBottom(static_cast<float>(kWidgetPaddingBottom_));
 
         drawBackground(g, contentBounds);
         drawBorder(g, contentBounds);
@@ -195,8 +195,10 @@ namespace tss
             return;
 
         const auto localBounds = getLocalBounds();
-        const int contentWidth = localBounds.getWidth();
-        const int contentHeight = localBounds.getHeight() - kWidgetVerticalPadding_ * 2;
+        const auto contentRect = localBounds.withTrimmedTop(kWidgetPaddingTop_)
+            .withTrimmedBottom(kWidgetPaddingBottom_);
+        const int contentWidth = contentRect.getWidth();
+        const int contentHeight = contentRect.getHeight();
 
         if (contentWidth <= 0 || contentHeight <= 0)
             return;
@@ -329,7 +331,8 @@ namespace tss
     void TrackGeneratorDisplay::mouseDown(const juce::MouseEvent& e)
     {
         const auto bounds = getLocalBounds().toFloat();
-        const auto innerBounds = bounds.reduced(0.0f, static_cast<float>(kWidgetVerticalPadding_));
+        const auto innerBounds = bounds.withTrimmedTop(static_cast<float>(kWidgetPaddingTop_))
+            .withTrimmedBottom(static_cast<float>(kWidgetPaddingBottom_));
 
         draggedPointIndex_ = findPointAtPosition(e.position, innerBounds);
     }
@@ -340,7 +343,8 @@ namespace tss
             return;
         
         const auto bounds = getLocalBounds().toFloat();
-        const auto innerBounds = bounds.reduced(0.0f, static_cast<float>(kWidgetVerticalPadding_));
+        const auto innerBounds = bounds.withTrimmedTop(static_cast<float>(kWidgetPaddingTop_))
+            .withTrimmedBottom(static_cast<float>(kWidgetPaddingBottom_));
         const auto centerBounds = getCurveCenterBounds(innerBounds);
 
         const float relativeY = e.position.y - centerBounds.getY();
