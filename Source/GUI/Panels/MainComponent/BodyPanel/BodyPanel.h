@@ -5,6 +5,7 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 
+#include "Shared/PluginDimensions.h"
 
 namespace tss
 {
@@ -28,13 +29,10 @@ public:
     void resized() override;
     void setSkin(tss::Skin& skin);
 
-    static int getHeight() { return kHeight_; }
-    static int getPadding() { return kPadding_; }
+    static int getHeight() { return PluginDimensions::Panels::BodyPanel::kHeight; }
+    static int getPadding() { return PluginDimensions::Panels::BodyPanel::kPadding; }
 
 private:
-    inline constexpr static int kHeight_ = 730;
-    inline constexpr static int kPadding_ = 15;
-
     tss::Skin* skin_;
 
     std::unique_ptr<PatchEditPanel> patchEditPanel_;

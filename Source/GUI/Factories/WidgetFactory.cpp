@@ -133,7 +133,7 @@ int WidgetFactory::getButtonWidthForWidgetId(const juce::String& widgetId) const
         widgetId == kOpenPatchFolder || widgetId == kSavePatchFile ||
         widgetId == kStorePatch)
     {
-        return PluginDimensions::Widgets::Widths::Button::kInternalPatchesUtility;
+        return PluginDimensions::Widgets::Widths::Button::kInternalPatchesMemory;
     }
     
     if (widgetId == kSavePatchAs)

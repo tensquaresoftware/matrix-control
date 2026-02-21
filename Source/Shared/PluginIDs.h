@@ -87,11 +87,11 @@ namespace ParameterGroupIds
 {
     // Patch Manager | Internal Patches Widget Group IDs
     constexpr const char* kInternalPatchesBrowser     = "internalPatchesBrowserGroup";
-    constexpr const char* kInternalPatchesUtility     = "internalPatchesUtilityGroup";
+    constexpr const char* kInternalPatchesMemory     = "internalPatchesMemoryGroup";
 
     // Patch Manager | Computer Patches Widget Group IDs
     constexpr const char* kComputerPatchesBrowser     = "computerPatchesBrowserGroup";
-    constexpr const char* kComputerPatchesUtility     = "computerPatchesUtilityGroup";
+    constexpr const char* kComputerPatchesStorage     = "computerPatchesStorageGroup";
 }
 
 // ============================================================================

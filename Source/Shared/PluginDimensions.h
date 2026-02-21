@@ -193,9 +193,9 @@ namespace PluginDimensions
             namespace GroupLabel
             {
                 inline constexpr int kInternalPatchesBrowser = 110;
-                inline constexpr int kInternalPatchesUtility = 155;
+                inline constexpr int kInternalPatchesMemory = 155;
                 inline constexpr int kComputerPatchesBrowser = 135;
-                inline constexpr int kComputerPatchesUtility = 130;
+                inline constexpr int kComputerPatchesStorage = 130;
             }
             
             namespace Label
@@ -214,8 +214,8 @@ namespace PluginDimensions
                 inline constexpr int kPaste = 20;
                 inline constexpr int kPatchManagerBankSelect = 35;
                 inline constexpr int kPatchManagerUnlockBank = 75;
-                inline constexpr int kInternalPatchesUtility = 35;
-                inline constexpr int kComputerPatchesUtility = 35;
+                inline constexpr int kInternalPatchesMemory = 35;
+                inline constexpr int kComputerPatchesStorage = 35;
                 inline constexpr int kComputerPatchesSaveAs = 50;
             }
             

@@ -40,14 +40,14 @@ void PatchManagerPanel::resized()
     int y = 0;
 
     layoutSectionHeader(bounds, y);
+
     y += PluginDimensions::Widgets::Heights::kSectionHeader;
-
     layoutBankUtilityPanel(bounds, y);
+
     y += BankUtilityPanel::getHeight();
-
     layoutInternalPatchesPanel(bounds, y);
-    y += InternalPatchesPanel::getHeight();
 
+    y += InternalPatchesPanel::getHeight();
     layoutComputerPatchesPanel(bounds, y);
 }
 

@@ -41,7 +41,6 @@ public:
     static int getHeight() { return PluginDimensions::Panels::PatchManagerPanel::InternalPatchesPanel::kHeight; }
 
 private:
-    inline constexpr static int kTopPadding_ = 5;
     inline constexpr static int kGroupLabelSpacing_ = 10;
     inline constexpr static int kSpacing_ = 5;
 
@@ -51,7 +50,7 @@ private:
     std::unique_ptr<tss::ModuleHeader> moduleHeader;
 
     std::unique_ptr<tss::GroupLabel> browserGroupLabel;
-    std::unique_ptr<tss::GroupLabel> utilityGroupLabel;
+    std::unique_ptr<tss::GroupLabel> memoryGroupLabel;
 
     std::unique_ptr<tss::Button> loadPreviousPatchButton_;
     std::unique_ptr<tss::Button> loadNextPatchButton_;
@@ -70,7 +69,7 @@ private:
     void setupLoadNextPatchButton(tss::Skin& skin, WidgetFactory& widgetFactory);
     void setupCurrentBankNumberBox(tss::Skin& skin);
     void setupCurrentPatchNumberBox(tss::Skin& skin);
-    void setupUtilityGroupLabel(tss::Skin& skin);
+    void setupMemoryGroupLabel(tss::Skin& skin);
     void setupInitPatchButton(tss::Skin& skin, WidgetFactory& widgetFactory);
     void setupCopyPatchButton(tss::Skin& skin, WidgetFactory& widgetFactory);
     void setupPastePatchButton(tss::Skin& skin, WidgetFactory& widgetFactory);
@@ -82,7 +81,7 @@ private:
     void layoutLoadNextPatchButton(int x, int y);
     void layoutCurrentBankNumberBox(int x, int y);
     void layoutCurrentPatchNumberBox(int x, int y);
-    void layoutUtilityGroupLabel(int x, int y);
+    void layoutMemoryGroupLabel(int x, int y);
     void layoutInitPatchButton(int x, int y);
     void layoutCopyPatchButton(int x, int y);
     void layoutPastePatchButton(int x, int y);

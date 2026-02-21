@@ -23,7 +23,7 @@ ComputerPatchesPanel::ComputerPatchesPanel(tss::Skin& skin, WidgetFactory& widge
     setupLoadNextPatchFileButton(skin, widgetFactory);
     setupSelectPatchFileComboBox(skin);
 
-    setupUtilityGroupLabel(skin);
+    setupStorageGroupLabel(skin);
     setupOpenPatchFolderButton(skin, widgetFactory);
     setupSavePatchFileAsButton(skin, widgetFactory);
     setupSavePatchFileButton(skin, widgetFactory);
@@ -36,7 +36,7 @@ ComputerPatchesPanel::~ComputerPatchesPanel() = default;
 void ComputerPatchesPanel::resized()
 {
     int x = 0;
-    int y = kTopPadding_;
+    int y = 0;
 
     layoutModuleHeader(x, y);
     y += PluginDimensions::Widgets::Heights::kModuleHeader;
@@ -47,8 +47,8 @@ void ComputerPatchesPanel::resized()
     layoutBrowserGroupLabel(x, y);
     x = browserGroupWidth + kGroupLabelSpacing_;
 
-    layoutUtilityGroupLabel(x, y);
-    y += groupLabelHeight + kTopPadding_;
+    layoutStorageGroupLabel(x, y);
+    y += groupLabelHeight;
 
     const auto navigationButtonWidth = PluginDimensions::Widgets::Widths::Button::kInit;
     x = 0;
@@ -61,12 +61,12 @@ void ComputerPatchesPanel::resized()
 
     layoutSelectPatchFileComboBox(x, y);
 
-    const auto utilityButtonWidth = PluginDimensions::Widgets::Widths::Button::kComputerPatchesUtility;
+    const auto storageButtonWidth = PluginDimensions::Widgets::Widths::Button::kComputerPatchesStorage;
     const auto saveAsButtonWidth = PluginDimensions::Widgets::Widths::Button::kComputerPatchesSaveAs;
     x = browserGroupWidth + kGroupLabelSpacing_;
 
     layoutOpenPatchFolderButton(x, y);
-    x += utilityButtonWidth + kSpacing_;
+    x += storageButtonWidth + kSpacing_;
 
     layoutSavePatchFileAsButton(x, y);
     x += saveAsButtonWidth + kSpacing_;
@@ -84,8 +84,8 @@ void ComputerPatchesPanel::setSkin(tss::Skin& skin)
     if (auto* browserLabel = browserGroupLabel.get())
         browserLabel->setSkin(skin);
 
-    if (auto* utilityLabel = utilityGroupLabel.get())
-        utilityLabel->setSkin(skin);
+    if (auto* storageLabel = storageGroupLabel.get())
+        storageLabel->setSkin(skin);
 
     if (auto* comboBox = selectPatchFileComboBox_.get())
         comboBox->setSkin(skin);
@@ -182,14 +182,14 @@ void ComputerPatchesPanel::setupSelectPatchFileComboBox(tss::Skin& skin)
     addAndMakeVisible(*selectPatchFileComboBox_);
 }
 
-void ComputerPatchesPanel::setupUtilityGroupLabel(tss::Skin& skin)
+void ComputerPatchesPanel::setupStorageGroupLabel(tss::Skin& skin)
 {
-    utilityGroupLabel = std::make_unique<tss::GroupLabel>(
+    storageGroupLabel = std::make_unique<tss::GroupLabel>(
         skin,
-        PluginDimensions::Widgets::Widths::GroupLabel::kComputerPatchesUtility,
+        PluginDimensions::Widgets::Widths::GroupLabel::kComputerPatchesStorage,
         PluginDimensions::Widgets::Heights::kGroupLabel,
-        PluginDescriptors::StandaloneWidgetDisplayNames::kComputerPatchesUtility);
-    addAndMakeVisible(*utilityGroupLabel);
+        PluginDescriptors::StandaloneWidgetDisplayNames::kComputerPatchesStorage);
+    addAndMakeVisible(*storageGroupLabel);
 }
 
 void ComputerPatchesPanel::setupOpenPatchFolderButton(tss::Skin& skin, WidgetFactory& widgetFactory)
@@ -282,22 +282,22 @@ void ComputerPatchesPanel::layoutSelectPatchFileComboBox(int x, int y)
         comboBox->setBounds(x, y, comboBoxWidth, buttonHeight);
 }
 
-void ComputerPatchesPanel::layoutUtilityGroupLabel(int x, int y)
+void ComputerPatchesPanel::layoutStorageGroupLabel(int x, int y)
 {
-    const auto utilityGroupWidth = PluginDimensions::Widgets::Widths::GroupLabel::kComputerPatchesUtility;
+    const auto storageGroupWidth = PluginDimensions::Widgets::Widths::GroupLabel::kComputerPatchesStorage;
     const auto groupLabelHeight = PluginDimensions::Widgets::Heights::kGroupLabel;
 
-    if (auto* utilityLabel = utilityGroupLabel.get())
-        utilityLabel->setBounds(x, y, utilityGroupWidth, groupLabelHeight);
+    if (auto* storageLabel = storageGroupLabel.get())
+        storageLabel->setBounds(x, y, storageGroupWidth, groupLabelHeight);
 }
 
 void ComputerPatchesPanel::layoutOpenPatchFolderButton(int x, int y)
 {
     const auto buttonHeight = PluginDimensions::Widgets::Heights::kButton;
-    const auto utilityButtonWidth = PluginDimensions::Widgets::Widths::Button::kComputerPatchesUtility;
+    const auto storageButtonWidth = PluginDimensions::Widgets::Widths::Button::kComputerPatchesStorage;
 
     if (auto* openButton = openPatchFolderButton_.get())
-        openButton->setBounds(x, y, utilityButtonWidth, buttonHeight);
+        openButton->setBounds(x, y, storageButtonWidth, buttonHeight);
 }
 
 void ComputerPatchesPanel::layoutSavePatchFileAsButton(int x, int y)
@@ -312,8 +312,8 @@ void ComputerPatchesPanel::layoutSavePatchFileAsButton(int x, int y)
 void ComputerPatchesPanel::layoutSavePatchFileButton(int x, int y)
 {
     const auto buttonHeight = PluginDimensions::Widgets::Heights::kButton;
-    const auto utilityButtonWidth = PluginDimensions::Widgets::Widths::Button::kComputerPatchesUtility;
+    const auto storageButtonWidth = PluginDimensions::Widgets::Widths::Button::kComputerPatchesStorage;
 
     if (auto* saveButton = savePatchFileButton_.get())
-        saveButton->setBounds(x, y, utilityButtonWidth, buttonHeight);
+        saveButton->setBounds(x, y, storageButtonWidth, buttonHeight);
 }

@@ -73,9 +73,9 @@ namespace tss
         // Scale graphics context to match physical resolution
         g.addTransform(juce::AffineTransform::scale(pixelScale));
 
-        const auto contentArea = calculateContentArea();
-        drawText(g, contentArea);
-        drawLines(g, contentArea, cachedTextWidth_);
+        const auto bounds = getLocalBounds().toFloat();
+        drawText(g, bounds);
+        drawLines(g, bounds, cachedTextWidth_);
 
         cacheValid_ = true;
     }
@@ -159,14 +159,6 @@ namespace tss
             );
             g.fillRect(line);
         }
-    }
-
-    juce::Rectangle<float> GroupLabel::calculateContentArea() const
-    {
-        auto area = getLocalBounds().toFloat();
-        area.removeFromTop(kTopAreaHeight_);
-        area.setHeight(kContentHeight_);
-        return area;
     }
 
     void GroupLabel::calculateTextWidth()

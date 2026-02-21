@@ -24,8 +24,6 @@ namespace tss
         int getHeight() const { return height_; }
 
     private:
-        inline constexpr static int kTopAreaHeight_ = 5;
-        inline constexpr static int kContentHeight_ = 20;
         inline constexpr static int kTextSpacing_ = 8;
         inline constexpr static int kLineThickness_ = 1;
         
@@ -52,7 +50,6 @@ namespace tss
         void drawLeftLine(juce::Graphics& g, const juce::Rectangle<float>& area, float centreX, float halfTextWidth, float centreY);
         void drawRightLine(juce::Graphics& g, const juce::Rectangle<float>& area, float centreX, float halfTextWidth, float centreY);
 
-        juce::Rectangle<float> calculateContentArea() const;
         void calculateTextWidth();
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(GroupLabel)

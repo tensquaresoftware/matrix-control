@@ -31,7 +31,6 @@ public:
     static int getHeight() { return PluginDimensions::Panels::PatchManagerPanel::ComputerPatchesPanel::kHeight; }
 
 private:
-    inline constexpr static int kTopPadding_ = 5;
     inline constexpr static int kGroupLabelSpacing_ = 10;
     inline constexpr static int kSpacing_ = 5;
     inline constexpr static int kSelectPatchFileEmptyId_ = 1;
@@ -42,7 +41,7 @@ private:
     std::unique_ptr<tss::ModuleHeader> moduleHeader_;
 
     std::unique_ptr<tss::GroupLabel> browserGroupLabel;
-    std::unique_ptr<tss::GroupLabel> utilityGroupLabel;
+    std::unique_ptr<tss::GroupLabel> storageGroupLabel;
 
     std::unique_ptr<tss::Button> loadPreviousPatchFileButton_;
     std::unique_ptr<tss::Button> loadNextPatchFileButton_;
@@ -57,7 +56,7 @@ private:
     void setupLoadPreviousPatchFileButton(tss::Skin& skin, WidgetFactory& widgetFactory);
     void setupLoadNextPatchFileButton(tss::Skin& skin, WidgetFactory& widgetFactory);
     void setupSelectPatchFileComboBox(tss::Skin& skin);
-    void setupUtilityGroupLabel(tss::Skin& skin);
+    void setupStorageGroupLabel(tss::Skin& skin);
     void setupOpenPatchFolderButton(tss::Skin& skin, WidgetFactory& widgetFactory);
     void setupSavePatchFileAsButton(tss::Skin& skin, WidgetFactory& widgetFactory);
     void setupSavePatchFileButton(tss::Skin& skin, WidgetFactory& widgetFactory);
@@ -67,7 +66,7 @@ private:
     void layoutLoadPreviousPatchFileButton(int x, int y);
     void layoutLoadNextPatchFileButton(int x, int y);
     void layoutSelectPatchFileComboBox(int x, int y);
-    void layoutUtilityGroupLabel(int x, int y);
+    void layoutStorageGroupLabel(int x, int y);
     void layoutOpenPatchFolderButton(int x, int y);
     void layoutSavePatchFileAsButton(int x, int y);
     void layoutSavePatchFileButton(int x, int y);

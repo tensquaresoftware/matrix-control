@@ -4,6 +4,7 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 
 #include "Core/PluginProcessor.h"
+#include "Shared/PluginDimensions.h"
 #include "Themes/Skin.h"
 #include "Panels/MainComponent/HeaderPanel/HeaderPanel.h"
 #include "Panels/MainComponent/BodyPanel/BodyPanel.h"
@@ -22,13 +23,10 @@ public:
     void resized() override;
     void mouseDown(const juce::MouseEvent& e) override;
 
-    static int getWidth() { return kWidth_; }
-    static int getHeight() { return kHeight_; }
+    static int getWidth() { return PluginDimensions::GUI::kWidth; }
+    static int getHeight() { return PluginDimensions::GUI::kHeight; }
 
 private:
-    inline constexpr static int kWidth_ = 1335;
-    inline constexpr static int kHeight_ = 790;
-
     PluginProcessor& pluginProcessor;
     
     std::unique_ptr<tss::Skin> skinBlack_;

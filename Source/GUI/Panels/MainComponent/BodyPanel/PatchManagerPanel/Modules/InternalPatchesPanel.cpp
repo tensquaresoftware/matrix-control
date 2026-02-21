@@ -24,7 +24,7 @@ InternalPatchesPanel::InternalPatchesPanel(tss::Skin& skin, WidgetFactory& widge
     setupCurrentBankNumberBox(skin);
     setupCurrentPatchNumberBox(skin);
 
-    setupUtilityGroupLabel(skin);
+    setupMemoryGroupLabel(skin);
     setupInitPatchButton(skin, widgetFactory);
     setupCopyPatchButton(skin, widgetFactory);
     setupPastePatchButton(skin, widgetFactory);
@@ -65,7 +65,7 @@ void InternalPatchesPanel::valueTreePropertyChanged(
 void InternalPatchesPanel::resized()
 {
     int x = 0;
-    int y = kTopPadding_;
+    int y = 0;
 
     layoutModuleHeader(x, y);
     y += PluginDimensions::Widgets::Heights::kModuleHeader;
@@ -76,8 +76,8 @@ void InternalPatchesPanel::resized()
     layoutBrowserGroupLabel(x, y);
     x = browserGroupWidth + kGroupLabelSpacing_;
 
-    layoutUtilityGroupLabel(x, y);
-    y += groupLabelHeight + kTopPadding_;
+    layoutMemoryGroupLabel(x, y);
+    y += groupLabelHeight;
 
     const auto navigationButtonWidth = PluginDimensions::Widgets::Widths::Button::kInit;
     x = 0;
@@ -93,17 +93,17 @@ void InternalPatchesPanel::resized()
 
     layoutCurrentPatchNumberBox(x, y);
 
-    const auto utilityButtonWidth = PluginDimensions::Widgets::Widths::Button::kInternalPatchesUtility;
+    const auto memoryButtonWidth = PluginDimensions::Widgets::Widths::Button::kInternalPatchesMemory;
     x = browserGroupWidth + kGroupLabelSpacing_;
 
     layoutInitPatchButton(x, y);
-    x += utilityButtonWidth + kSpacing_;
+    x += memoryButtonWidth + kSpacing_;
 
     layoutCopyPatchButton(x, y);
-    x += utilityButtonWidth + kSpacing_;
+    x += memoryButtonWidth + kSpacing_;
 
     layoutPastePatchButton(x, y);
-    x += utilityButtonWidth + kSpacing_;
+    x += memoryButtonWidth + kSpacing_;
 
     layoutStorePatchButton(x, y);
 }
@@ -118,8 +118,8 @@ void InternalPatchesPanel::setSkin(tss::Skin& skin)
     if (auto* browserLabel = browserGroupLabel.get())
         browserLabel->setSkin(skin);
 
-    if (auto* utilityLabel = utilityGroupLabel.get())
-        utilityLabel->setSkin(skin);
+    if (auto* memoryLabel = memoryGroupLabel.get())
+        memoryLabel->setSkin(skin);
 
     if (auto* bankNumber = currentBankNumber.get())
         bankNumber->setSkin(skin);
@@ -218,14 +218,14 @@ void InternalPatchesPanel::setupCurrentPatchNumberBox(tss::Skin& skin)
     addAndMakeVisible(*currentPatchNumber);
 }
 
-void InternalPatchesPanel::setupUtilityGroupLabel(tss::Skin& skin)
+void InternalPatchesPanel::setupMemoryGroupLabel(tss::Skin& skin)
 {
-    utilityGroupLabel = std::make_unique<tss::GroupLabel>(
+    memoryGroupLabel = std::make_unique<tss::GroupLabel>(
         skin,
-        PluginDimensions::Widgets::Widths::GroupLabel::kInternalPatchesUtility,
+        PluginDimensions::Widgets::Widths::GroupLabel::kInternalPatchesMemory,
         PluginDimensions::Widgets::Heights::kGroupLabel,
-        PluginDescriptors::StandaloneWidgetDisplayNames::kInternalPatchesUtility);
-    addAndMakeVisible(*utilityGroupLabel);
+        PluginDescriptors::StandaloneWidgetDisplayNames::kInternalPatchesMemory);
+    addAndMakeVisible(*memoryGroupLabel);
 }
 
 void InternalPatchesPanel::setupInitPatchButton(tss::Skin& skin, WidgetFactory& widgetFactory)
@@ -342,47 +342,47 @@ void InternalPatchesPanel::layoutCurrentPatchNumberBox(int x, int y)
         patchNumber->setBounds(x, y, patchNumberWidth, buttonHeight);
 }
 
-void InternalPatchesPanel::layoutUtilityGroupLabel(int x, int y)
+void InternalPatchesPanel::layoutMemoryGroupLabel(int x, int y)
 {
-    const auto utilityGroupWidth = PluginDimensions::Widgets::Widths::GroupLabel::kInternalPatchesUtility;
+    const auto memoryGroupWidth = PluginDimensions::Widgets::Widths::GroupLabel::kInternalPatchesMemory;
     const auto groupLabelHeight = PluginDimensions::Widgets::Heights::kGroupLabel;
 
-    if (auto* utilityLabel = utilityGroupLabel.get())
-        utilityLabel->setBounds(x, y, utilityGroupWidth, groupLabelHeight);
+    if (auto* memoryLabel = memoryGroupLabel.get())
+        memoryLabel->setBounds(x, y, memoryGroupWidth, groupLabelHeight);
 }
 
 void InternalPatchesPanel::layoutInitPatchButton(int x, int y)
 {
     const auto buttonHeight = PluginDimensions::Widgets::Heights::kButton;
-    const auto utilityButtonWidth = PluginDimensions::Widgets::Widths::Button::kInternalPatchesUtility;
+    const auto memoryButtonWidth = PluginDimensions::Widgets::Widths::Button::kInternalPatchesMemory;
 
     if (auto* initButton = initPatchButton_.get())
-        initButton->setBounds(x, y, utilityButtonWidth, buttonHeight);
+        initButton->setBounds(x, y, memoryButtonWidth, buttonHeight);
 }
 
 void InternalPatchesPanel::layoutCopyPatchButton(int x, int y)
 {
     const auto buttonHeight = PluginDimensions::Widgets::Heights::kButton;
-    const auto utilityButtonWidth = PluginDimensions::Widgets::Widths::Button::kInternalPatchesUtility;
+    const auto memoryButtonWidth = PluginDimensions::Widgets::Widths::Button::kInternalPatchesMemory;
 
     if (auto* copyButton = copyPatchButton_.get())
-        copyButton->setBounds(x, y, utilityButtonWidth, buttonHeight);
+        copyButton->setBounds(x, y, memoryButtonWidth, buttonHeight);
 }
 
 void InternalPatchesPanel::layoutPastePatchButton(int x, int y)
 {
     const auto buttonHeight = PluginDimensions::Widgets::Heights::kButton;
-    const auto utilityButtonWidth = PluginDimensions::Widgets::Widths::Button::kInternalPatchesUtility;
+    const auto memoryButtonWidth = PluginDimensions::Widgets::Widths::Button::kInternalPatchesMemory;
 
     if (auto* pasteButton = pastePatchButton_.get())
-        pasteButton->setBounds(x, y, utilityButtonWidth, buttonHeight);
+        pasteButton->setBounds(x, y, memoryButtonWidth, buttonHeight);
 }
 
 void InternalPatchesPanel::layoutStorePatchButton(int x, int y)
 {
     const auto buttonHeight = PluginDimensions::Widgets::Heights::kButton;
-    const auto utilityButtonWidth = PluginDimensions::Widgets::Widths::Button::kInternalPatchesUtility;
+    const auto memoryButtonWidth = PluginDimensions::Widgets::Widths::Button::kInternalPatchesMemory;
 
     if (auto* storeButton = storePatchButton_.get())
-        storeButton->setBounds(x, y, utilityButtonWidth, buttonHeight);
+        storeButton->setBounds(x, y, memoryButtonWidth, buttonHeight);
 }

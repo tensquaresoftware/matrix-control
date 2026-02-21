@@ -30,7 +30,7 @@ public:
     static int getHeight() { return PluginDimensions::Panels::PatchManagerPanel::BankUtilityPanel::kHeight; }
 
 private:
-    inline constexpr static int kTopPadding_ = 10;
+    inline constexpr static int kTopPadding_ = 5;
     inline constexpr static int kSpacing_ = 5;
 
     tss::Skin* skin_;

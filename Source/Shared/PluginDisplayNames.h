@@ -324,7 +324,7 @@ namespace PluginDescriptors
 
         // Patch Manager | Internal Patches Standalone Widget Display Names
         constexpr const char* kInternalPatchesBrowser       = "BROWSER";
-        constexpr const char* kInternalPatchesUtility       = "UTILITY";
+        constexpr const char* kInternalPatchesMemory       = "MEMORY";
 
         // Patch Manager | Internal Patches Standalone Widget Display Names
         constexpr const char* kLoadPreviousPatch            = "<";
@@ -338,7 +338,7 @@ namespace PluginDescriptors
 
         // Patch Manager | Computer Patches Standalone Widget Display Names
         constexpr const char* kComputerPatchesBrowser       = "BROWSER";
-        constexpr const char* kComputerPatchesUtility       = "UTILITY";
+        constexpr const char* kComputerPatchesStorage       = "STORAGE";
 
         // Patch Manager | Computer Patches Standalone Widget Display Names
         constexpr const char* kLoadPreviousPatchFile        = "<";
