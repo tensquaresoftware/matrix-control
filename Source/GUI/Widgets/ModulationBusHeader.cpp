@@ -1,6 +1,7 @@
 #include "ModulationBusHeader.h"
 
 #include "GUI/Themes/Skin.h"
+#include "GUI/Themes/SkinValues.h"
 #include "Shared/PluginDescriptors.h"
 
 namespace tss
@@ -18,7 +19,7 @@ namespace tss
         setSize(width, height);
         cachedTextColour_ = skin_->getModuleHeaderTextColour();
         cachedLineColour_ = getLineColour();
-        cachedFont_ = skin_->getBaseFont().withHeight(16.0f).boldened();
+        cachedFont_ = skin_->getBaseFontBold().withHeight(kModuleHeaderFontHeight);
     }
 
     void ModulationBusHeader::setSkin(tss::Skin& skin)

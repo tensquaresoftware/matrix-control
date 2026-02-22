@@ -33,7 +33,6 @@ namespace tss
         inline constexpr static int kTextLeftPadding_ = 2;
         inline constexpr static int kTextAreaHeight_ = 20;
         inline constexpr static int kLineThickness_ = 4;
-        inline constexpr static float kTextFontHeight_ = 16.0f;
 
         int width_;
         int height_;

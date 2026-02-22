@@ -32,6 +32,7 @@ namespace tss
         void setColour(SkinColourId colourId, juce::Colour colour);
 
         juce::Font getBaseFont() const;
+        juce::Font getBaseFontBold() const;
 
         // Theme-compatible API for migration
         juce::Colour getHeaderPanelBackgroundColour() const;
@@ -58,6 +59,9 @@ namespace tss
         juce::Colour getButtonTextColourHoover() const;
         juce::Colour getButtonBackgroundColourClicked() const;
         juce::Colour getButtonTextColourClicked() const;
+        juce::Colour getToggleBorderColour() const;
+        juce::Colour getToggleBackgroundColour(bool isOn) const;
+        juce::Colour getToggleTextColour(bool isOn) const;
         juce::Colour getSliderTrackColour(bool isEnabled = true) const;
         juce::Colour getSliderValueBarColour(bool isEnabled = true) const;
         juce::Colour getSliderTextColour(bool isEnabled = true) const;

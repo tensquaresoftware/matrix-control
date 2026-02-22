@@ -195,6 +195,11 @@ const std::vector<ApvtsGroupDescriptor> kAllApvtsGroups = {
         .parentId = SectionIds::kPatchManager,
         .groupId = ModuleIds::kComputerPatches,
         .displayName = ModuleDisplayNames::kComputerPatches
+    },
+    {
+        .parentId = SectionIds::kPatchManager,
+        .groupId = ModuleIds::kPatchMutator,
+        .displayName = ModuleDisplayNames::kPatchMutator
     }
 };
 
@@ -2282,6 +2287,124 @@ const std::vector<StandaloneWidgetDescriptor> kComputerPatchesWidgets = {
         .widgetId = StandaloneWidgetIds::kSavePatchFile,
         .displayName = StandaloneWidgetDisplayNames::kSavePatch,
         .parentGroupId = ModuleIds::kComputerPatches,
+        .widgetType = StandaloneWidgetType::kButton
+    }
+};
+
+// Patch Mutator Module
+const std::vector<StandaloneWidgetDescriptor> kPatchMutatorWidgets = {
+    {
+        .widgetId = StandaloneWidgetIds::kPatchMutatorAmount,
+        .displayName = StandaloneWidgetDisplayNames::kPatchMutatorAmount,
+        .parentGroupId = ModuleIds::kPatchMutator,
+        .widgetType = StandaloneWidgetType::kLabel
+    },
+    {
+        .widgetId = StandaloneWidgetIds::kPatchMutatorRandom,
+        .displayName = StandaloneWidgetDisplayNames::kPatchMutatorRandom,
+        .parentGroupId = ModuleIds::kPatchMutator,
+        .widgetType = StandaloneWidgetType::kLabel
+    },
+    {
+        .widgetId = StandaloneWidgetIds::kPatchMutatorHistory,
+        .displayName = StandaloneWidgetDisplayNames::kPatchMutatorHistory,
+        .parentGroupId = ModuleIds::kPatchMutator,
+        .widgetType = StandaloneWidgetType::kComboBox
+    },
+    {
+        .widgetId = StandaloneWidgetIds::kPatchMutatorMutate,
+        .displayName = StandaloneWidgetDisplayNames::kPatchMutatorMutate,
+        .parentGroupId = ModuleIds::kPatchMutator,
+        .widgetType = StandaloneWidgetType::kButton
+    },
+    {
+        .widgetId = StandaloneWidgetIds::kPatchMutatorRetry,
+        .displayName = StandaloneWidgetDisplayNames::kPatchMutatorRetry,
+        .parentGroupId = ModuleIds::kPatchMutator,
+        .widgetType = StandaloneWidgetType::kButton
+    },
+    {
+        .widgetId = StandaloneWidgetIds::kPatchMutatorCompare,
+        .displayName = StandaloneWidgetDisplayNames::kPatchMutatorCompare,
+        .parentGroupId = ModuleIds::kPatchMutator,
+        .widgetType = StandaloneWidgetType::kButton
+    },
+    {
+        .widgetId = StandaloneWidgetIds::kPatchMutatorDelete,
+        .displayName = StandaloneWidgetDisplayNames::kPatchMutatorDelete,
+        .parentGroupId = ModuleIds::kPatchMutator,
+        .widgetType = StandaloneWidgetType::kButton
+    },
+    {
+        .widgetId = StandaloneWidgetIds::kPatchMutatorClear,
+        .displayName = StandaloneWidgetDisplayNames::kPatchMutatorClear,
+        .parentGroupId = ModuleIds::kPatchMutator,
+        .widgetType = StandaloneWidgetType::kButton
+    },
+    {
+        .widgetId = StandaloneWidgetIds::kPatchMutatorExport,
+        .displayName = StandaloneWidgetDisplayNames::kPatchMutatorExport,
+        .parentGroupId = ModuleIds::kPatchMutator,
+        .widgetType = StandaloneWidgetType::kButton
+    },
+    {
+        .widgetId = StandaloneWidgetIds::kPatchMutatorDco1,
+        .displayName = StandaloneWidgetDisplayNames::kPatchMutatorD1,
+        .parentGroupId = ModuleIds::kPatchMutator,
+        .widgetType = StandaloneWidgetType::kButton
+    },
+    {
+        .widgetId = StandaloneWidgetIds::kPatchMutatorDco2,
+        .displayName = StandaloneWidgetDisplayNames::kPatchMutatorD2,
+        .parentGroupId = ModuleIds::kPatchMutator,
+        .widgetType = StandaloneWidgetType::kButton
+    },
+    {
+        .widgetId = StandaloneWidgetIds::kPatchMutatorVcfVca,
+        .displayName = StandaloneWidgetDisplayNames::kPatchMutatorFByA,
+        .parentGroupId = ModuleIds::kPatchMutator,
+        .widgetType = StandaloneWidgetType::kButton
+    },
+    {
+        .widgetId = StandaloneWidgetIds::kPatchMutatorFmTrack,
+        .displayName = StandaloneWidgetDisplayNames::kPatchMutatorFByT,
+        .parentGroupId = ModuleIds::kPatchMutator,
+        .widgetType = StandaloneWidgetType::kButton
+    },
+    {
+        .widgetId = StandaloneWidgetIds::kPatchMutatorRampPortamento,
+        .displayName = StandaloneWidgetDisplayNames::kPatchMutatorRByP,
+        .parentGroupId = ModuleIds::kPatchMutator,
+        .widgetType = StandaloneWidgetType::kButton
+    },
+    {
+        .widgetId = StandaloneWidgetIds::kPatchMutatorEnv1,
+        .displayName = StandaloneWidgetDisplayNames::kPatchMutatorE1,
+        .parentGroupId = ModuleIds::kPatchMutator,
+        .widgetType = StandaloneWidgetType::kButton
+    },
+    {
+        .widgetId = StandaloneWidgetIds::kPatchMutatorEnv2,
+        .displayName = StandaloneWidgetDisplayNames::kPatchMutatorE2,
+        .parentGroupId = ModuleIds::kPatchMutator,
+        .widgetType = StandaloneWidgetType::kButton
+    },
+    {
+        .widgetId = StandaloneWidgetIds::kPatchMutatorEnv3,
+        .displayName = StandaloneWidgetDisplayNames::kPatchMutatorE3,
+        .parentGroupId = ModuleIds::kPatchMutator,
+        .widgetType = StandaloneWidgetType::kButton
+    },
+    {
+        .widgetId = StandaloneWidgetIds::kPatchMutatorLfo1,
+        .displayName = StandaloneWidgetDisplayNames::kPatchMutatorL1,
+        .parentGroupId = ModuleIds::kPatchMutator,
+        .widgetType = StandaloneWidgetType::kButton
+    },
+    {
+        .widgetId = StandaloneWidgetIds::kPatchMutatorLfo2,
+        .displayName = StandaloneWidgetDisplayNames::kPatchMutatorL2,
+        .parentGroupId = ModuleIds::kPatchMutator,
         .widgetType = StandaloneWidgetType::kButton
     }
 };

@@ -3,6 +3,7 @@
 #include "Modules/BankUtilityPanel.h"
 #include "Modules/InternalPatchesPanel.h"
 #include "Modules/ComputerPatchesPanel.h"
+#include "Modules/PatchMutatorPanel.h"
 
 #include "GUI/Themes/Skin.h"
 #include "GUI/Widgets/SectionHeader.h"
@@ -22,12 +23,14 @@ PatchManagerPanel::PatchManagerPanel(tss::Skin& skin, WidgetFactory& widgetFacto
     , bankUtilityPanel_(std::make_unique<BankUtilityPanel>(skin, widgetFactory, apvts))
     , internalPatchesPanel_(std::make_unique<InternalPatchesPanel>(skin, widgetFactory, apvts))
     , computerPatchesPanel_(std::make_unique<ComputerPatchesPanel>(skin, widgetFactory, apvts))
+    , patchMutatorPanel_(std::make_unique<PatchMutatorPanel>(skin, widgetFactory, apvts))
 {
     setOpaque(false);
     addAndMakeVisible(*sectionHeader_);
     addAndMakeVisible(*bankUtilityPanel_);
     addAndMakeVisible(*internalPatchesPanel_);
     addAndMakeVisible(*computerPatchesPanel_);
+    addAndMakeVisible(*patchMutatorPanel_);
 
     setSize(getWidth(), getHeight());
 }
@@ -49,6 +52,9 @@ void PatchManagerPanel::resized()
 
     y += InternalPatchesPanel::getHeight();
     layoutComputerPatchesPanel(bounds, y);
+
+    y += ComputerPatchesPanel::getHeight();
+    layoutPatchMutatorPanel(bounds, y);
 }
 
 void PatchManagerPanel::layoutSectionHeader(const juce::Rectangle<int>& bounds, int y)
@@ -103,6 +109,19 @@ void PatchManagerPanel::layoutComputerPatchesPanel(const juce::Rectangle<int>& b
     }
 }
 
+void PatchManagerPanel::layoutPatchMutatorPanel(const juce::Rectangle<int>& bounds, int y)
+{
+    if (auto* panel = patchMutatorPanel_.get())
+    {
+        panel->setBounds(
+            bounds.getX(),
+            bounds.getY() + y,
+            PatchMutatorPanel::getWidth(),
+            PatchMutatorPanel::getHeight()
+        );
+    }
+}
+
 void PatchManagerPanel::setSkin(tss::Skin& skin)
 {
     skin_ = &skin;
@@ -117,6 +136,9 @@ void PatchManagerPanel::setSkin(tss::Skin& skin)
         panel->setSkin(skin);
 
     if (auto* panel = computerPatchesPanel_.get())
+        panel->setSkin(skin);
+
+    if (auto* panel = patchMutatorPanel_.get())
         panel->setSkin(skin);
 }
 

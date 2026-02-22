@@ -191,8 +191,8 @@ namespace tss
             return;
 
         const auto baseFont = skin_->getBaseFont();
-        const auto editorFont = baseFont.withStyle(juce::Font::bold)
-                                        .withHeight(baseFont.getHeight() + kEditorFontSizeIncrease_);
+        const auto editorFont = skin_->getBaseFontBold()
+                                    .withHeight(baseFont.getHeight() + kEditorFontSizeIncrease_);
 
         editor_ = std::make_unique<juce::TextEditor>();
         editor_->setBounds(getLocalBounds());

@@ -31,7 +31,6 @@ namespace tss
         inline constexpr static float kLineHeight_ = 12.0f;
         inline constexpr static float kLeftLineWidth_ = 20.0f;
         inline constexpr static float kTextSpacing_ = 8.0f;
-        inline constexpr static float kTextFontHeight_ = 20.0f;
 
         int width_;
         int height_;

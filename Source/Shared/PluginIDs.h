@@ -57,6 +57,7 @@ namespace ModuleIds
     constexpr const char* kBankUtility                = "bankUtilityModule";
     constexpr const char* kInternalPatches            = "internalPatchesModule";
     constexpr const char* kComputerPatches            = "computerPatchesModule";
+    constexpr const char* kPatchMutator               = "patchMutatorModule";
 }
 
 // ============================================================================
@@ -87,7 +88,7 @@ namespace ParameterGroupIds
 {
     // Patch Manager | Internal Patches Widget Group IDs
     constexpr const char* kInternalPatchesBrowser     = "internalPatchesBrowserGroup";
-    constexpr const char* kInternalPatchesMemory     = "internalPatchesMemoryGroup";
+    constexpr const char* kInternalPatchesMemory      = "internalPatchesMemoryGroup";
 
     // Patch Manager | Computer Patches Widget Group IDs
     constexpr const char* kComputerPatchesBrowser     = "computerPatchesBrowserGroup";
@@ -387,7 +388,30 @@ namespace StandaloneWidgetIds
     constexpr const char* kSelectPatchFile            = "selectPatchFile";
     constexpr const char* kOpenPatchFolder            = "openPatchFolder";
     constexpr const char* kSavePatchAs                = "savePatchAsFile";
-    constexpr const char* kSavePatchFile              = "savePatchFile";    
+    constexpr const char* kSavePatchFile              = "savePatchFile";
+
+    // Patch Manager | Patch Mutator Standalone Widgets IDs
+    constexpr const char* kPatchMutatorAmount         = "patchMutatorAmount";
+    constexpr const char* kPatchMutatorRandom         = "patchMutatorRandom";
+    constexpr const char* kPatchMutatorHistory        = "patchMutatorHistory";
+
+    constexpr const char* kPatchMutatorMutate         = "patchMutatorMutate";
+    constexpr const char* kPatchMutatorRetry          = "patchMutatorRetry";
+    constexpr const char* kPatchMutatorCompare        = "patchMutatorCompare";
+    constexpr const char* kPatchMutatorDelete         = "patchMutatorDelete";
+    constexpr const char* kPatchMutatorClear          = "patchMutatorClear";
+    constexpr const char* kPatchMutatorExport         = "patchMutatorExport";
+
+    constexpr const char* kPatchMutatorDco1           = "patchMutatorDco1";
+    constexpr const char* kPatchMutatorDco2           = "patchMutatorDco2";
+    constexpr const char* kPatchMutatorVcfVca         = "patchMutatorVcfVca";
+    constexpr const char* kPatchMutatorFmTrack        = "patchMutatorFmTrack";
+    constexpr const char* kPatchMutatorRampPortamento = "patchMutatorRampPortamento";
+    constexpr const char* kPatchMutatorEnv1           = "patchMutatorEnvelope1";
+    constexpr const char* kPatchMutatorEnv2           = "patchMutatorEnvelope2";
+    constexpr const char* kPatchMutatorEnv3           = "patchMutatorEnvelope3";
+    constexpr const char* kPatchMutatorLfo1           = "patchMutatorLfo1";
+    constexpr const char* kPatchMutatorLfo2           = "patchMutatorLfo2";
 }
 
 } // namespace PluginDescriptors

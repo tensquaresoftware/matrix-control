@@ -67,6 +67,13 @@ namespace tss
         kButtonBackgroundClicked,
         kButtonTextClicked,
         
+        // Toggle colours
+        kToggleBorder,
+        kToggleBackgroundOff,
+        kToggleTextOff,
+        kToggleBackgroundOn,
+        kToggleTextOn,
+        
         // Slider colours
         kSliderTrackEnabled,
         kSliderTrackDisabled,
@@ -131,6 +138,10 @@ namespace tss
         
         kNumColours
     };
+
+    constexpr float kBaseFontHeight = 14.0f;
+    constexpr float kModuleHeaderFontHeight = 16.0f;
+    constexpr float kSectionHeaderFontHeight = 20.0f;
 
     constexpr float kDefaultValues[] = {
         10.0f,  // kLabelFontSize

@@ -140,6 +140,22 @@ int WidgetFactory::getButtonWidthForWidgetId(const juce::String& widgetId) const
     {
         return PluginDimensions::Widgets::Widths::Button::kComputerPatchesSaveAs;
     }
+
+    if (widgetId == kPatchMutatorMutate || widgetId == kPatchMutatorRetry ||
+        widgetId == kPatchMutatorCompare)
+    {
+        return PluginDimensions::Widgets::Widths::Button::kPatchMutatorMutate;
+    }
+
+    if (widgetId == kPatchMutatorDelete)
+    {
+        return PluginDimensions::Widgets::Widths::Button::kPatchMutatorDelete;
+    }
+
+    if (widgetId == kPatchMutatorClear || widgetId == kPatchMutatorExport)
+    {
+        return PluginDimensions::Widgets::Widths::Button::kPatchMutatorClear;
+    }
     
     if (widgetId == kUnlockBank)
     {
@@ -319,6 +335,7 @@ void WidgetFactory::addPatchManagerStandaloneWidgetsToMap()
     addStandaloneWidgetsToMap(PluginDescriptors::kBankUtilityWidgets);
     addStandaloneWidgetsToMap(PluginDescriptors::kInternalPatchesWidgets);
     addStandaloneWidgetsToMap(PluginDescriptors::kComputerPatchesWidgets);
+    addStandaloneWidgetsToMap(PluginDescriptors::kPatchMutatorWidgets);
 }
 
 void WidgetFactory::addMasterEditStandaloneWidgetsToMap()

@@ -1,6 +1,9 @@
 #include "Skin.h"
 
-#include "ThemeColours.h"
+#include "SkinColours.h"
+#include "SkinValues.h"
+
+#include <PluginFontsData.h>
 
 namespace tss
 {
@@ -50,19 +53,20 @@ namespace tss
 
     juce::Font Skin::getBaseFont() const
     {
-        juce::Font font(juce::FontOptions().withHeight(14.0f));
+        const auto typeface = juce::Typeface::createSystemTypefaceFor(
+            PluginFontsData::PTSansNarrowRegular_ttf,
+            static_cast<size_t>(PluginFontsData::PTSansNarrowRegular_ttfSize)
+        );
+        return juce::Font(juce::FontOptions().withTypeface(typeface).withHeight(kBaseFontHeight));
+    }
 
-        const auto availableTypefaces = juce::Font::findAllTypefaceNames();
-        for (const auto& name : availableTypefaces)
-        {
-            if (name.containsIgnoreCase("PT Sans Narrow"))
-            {
-                font = juce::Font(juce::FontOptions(name, 14.0f, juce::Font::plain));
-                break;
-            }
-        }
-
-        return font;
+    juce::Font Skin::getBaseFontBold() const
+    {
+        const auto typeface = juce::Typeface::createSystemTypefaceFor(
+            PluginFontsData::PTSansNarrowBold_ttf,
+            static_cast<size_t>(PluginFontsData::PTSansNarrowBold_ttfSize)
+        );
+        return juce::Font(juce::FontOptions().withTypeface(typeface).withHeight(kBaseFontHeight));
     }
 
     juce::Colour Skin::getHeaderPanelBackgroundColour() const
@@ -183,6 +187,21 @@ namespace tss
     juce::Colour Skin::getButtonTextColourClicked() const
     {
         return getColour(SkinColourId::kButtonTextClicked);
+    }
+
+    juce::Colour Skin::getToggleBorderColour() const
+    {
+        return getColour(SkinColourId::kToggleBorder);
+    }
+
+    juce::Colour Skin::getToggleBackgroundColour(bool isOn) const
+    {
+        return getColour(isOn ? SkinColourId::kToggleBackgroundOn : SkinColourId::kToggleBackgroundOff);
+    }
+
+    juce::Colour Skin::getToggleTextColour(bool isOn) const
+    {
+        return getColour(isOn ? SkinColourId::kToggleTextOn : SkinColourId::kToggleTextOff);
     }
 
     juce::Colour Skin::getSliderTrackColour(bool isEnabled) const
@@ -363,7 +382,7 @@ namespace tss
 
     void Skin::initializeBlackVariantColours()
     {
-        using namespace ThemeColours;
+        using namespace SkinColours;
 
         colours_[SkinColourId::kHeaderPanelBackground] = juce::Colour(Panels::kHeaderPanelBackground.blackVariant);
         colours_[SkinColourId::kBodyPanelBackground] = juce::Colour(Panels::kBodyPanelBackground.blackVariant);
@@ -395,6 +414,12 @@ namespace tss
         colours_[SkinColourId::kButtonTextHover] = juce::Colour(Widgets::Button::kTextHoover.blackVariant);
         colours_[SkinColourId::kButtonBackgroundClicked] = juce::Colour(Widgets::Button::kBackgroundClicked.blackVariant);
         colours_[SkinColourId::kButtonTextClicked] = juce::Colour(Widgets::Button::kTextClicked.blackVariant);
+
+        colours_[SkinColourId::kToggleBorder] = juce::Colour(Widgets::Toggle::kBorder.blackVariant);
+        colours_[SkinColourId::kToggleBackgroundOff] = juce::Colour(Widgets::Toggle::kBackgroundOff.blackVariant);
+        colours_[SkinColourId::kToggleTextOff] = juce::Colour(Widgets::Toggle::kTextOff.blackVariant);
+        colours_[SkinColourId::kToggleBackgroundOn] = juce::Colour(Widgets::Toggle::kBackgroundOn.blackVariant);
+        colours_[SkinColourId::kToggleTextOn] = juce::Colour(Widgets::Toggle::kTextOn.blackVariant);
 
         colours_[SkinColourId::kSliderTrackEnabled] = juce::Colour(Widgets::Slider::kTrack.blackVariant);
         colours_[SkinColourId::kSliderTrackDisabled] = juce::Colour(Widgets::Slider::kTrackDisabled.blackVariant);
@@ -458,7 +483,7 @@ namespace tss
 
     void Skin::initializeCreamVariantColours()
     {
-        using namespace ThemeColours;
+        using namespace SkinColours;
 
         colours_[SkinColourId::kHeaderPanelBackground] = juce::Colour(Panels::kHeaderPanelBackground.creamVariant);
         colours_[SkinColourId::kBodyPanelBackground] = juce::Colour(Panels::kBodyPanelBackground.creamVariant);
@@ -490,6 +515,12 @@ namespace tss
         colours_[SkinColourId::kButtonTextHover] = juce::Colour(Widgets::Button::kTextHoover.creamVariant);
         colours_[SkinColourId::kButtonBackgroundClicked] = juce::Colour(Widgets::Button::kBackgroundClicked.creamVariant);
         colours_[SkinColourId::kButtonTextClicked] = juce::Colour(Widgets::Button::kTextClicked.creamVariant);
+
+        colours_[SkinColourId::kToggleBorder] = juce::Colour(Widgets::Toggle::kBorder.creamVariant);
+        colours_[SkinColourId::kToggleBackgroundOff] = juce::Colour(Widgets::Toggle::kBackgroundOff.creamVariant);
+        colours_[SkinColourId::kToggleTextOff] = juce::Colour(Widgets::Toggle::kTextOff.creamVariant);
+        colours_[SkinColourId::kToggleBackgroundOn] = juce::Colour(Widgets::Toggle::kBackgroundOn.creamVariant);
+        colours_[SkinColourId::kToggleTextOn] = juce::Colour(Widgets::Toggle::kTextOn.creamVariant);
 
         colours_[SkinColourId::kSliderTrackEnabled] = juce::Colour(Widgets::Slider::kTrack.creamVariant);
         colours_[SkinColourId::kSliderTrackDisabled] = juce::Colour(Widgets::Slider::kTrackDisabled.creamVariant);

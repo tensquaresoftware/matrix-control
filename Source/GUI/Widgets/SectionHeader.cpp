@@ -1,6 +1,7 @@
 #include "SectionHeader.h"
 
 #include "GUI/Themes/Skin.h"
+#include "GUI/Themes/SkinValues.h"
 
 namespace tss
 {
@@ -86,7 +87,7 @@ namespace tss
 
         cachedTextColour_ = skin_->getSectionHeaderTextColour();
         cachedLineColour_ = getLineColour();
-        cachedFont_ = skin_->getBaseFont().withHeight(kTextFontHeight_);
+        cachedFont_ = skin_->getBaseFont().withHeight(kSectionHeaderFontHeight);
     }
 
     float SectionHeader::getPixelScale() const

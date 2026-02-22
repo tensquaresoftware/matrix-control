@@ -21,7 +21,8 @@ ModulePanelConfig MiscPanel::createConfig()
         {PluginDescriptors::ParameterIds::kUnisonEnable, ModulePanelParameterType::ComboBox},
         {PluginDescriptors::ParameterIds::kVolumeInvertEnable, ModulePanelParameterType::ComboBox},
         {PluginDescriptors::ParameterIds::kBankLockEnable, ModulePanelParameterType::ComboBox},
-        {PluginDescriptors::ParameterIds::kMemoryProtectEnable, ModulePanelParameterType::ComboBox}
+        {PluginDescriptors::ParameterIds::kMemoryProtectEnable, ModulePanelParameterType::ComboBox},
+        {"", ModulePanelParameterType::None}
     };
     
     return config;

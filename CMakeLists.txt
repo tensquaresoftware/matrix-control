@@ -36,6 +36,18 @@ else()
 endif()
 
 # ============================================================================
+# BINARY DATA (Fonts)
+# ============================================================================
+
+juce_add_binary_data(PluginFonts
+    HEADER_NAME PluginFontsData.h
+    NAMESPACE PluginFontsData
+    SOURCES
+        Assets/Fonts/PTSansNarrow-Regular.ttf
+        Assets/Fonts/PTSansNarrow-Bold.ttf
+)
+
+# ============================================================================
 # SOURCE FILES
 # Add your new .cpp files here (keep them sorted alphabetically for clarity)
 # ============================================================================
@@ -92,6 +104,7 @@ set(PLUGIN_SOURCES
     Source/GUI/Panels/MainComponent/BodyPanel/PatchManagerPanel/Modules/BankUtilityPanel.cpp
     Source/GUI/Panels/MainComponent/BodyPanel/PatchManagerPanel/Modules/InternalPatchesPanel.cpp
     Source/GUI/Panels/MainComponent/BodyPanel/PatchManagerPanel/Modules/ComputerPatchesPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchManagerPanel/Modules/PatchMutatorPanel.cpp
     
     # GUI - Panels - Reusable
     Source/GUI/Panels/Reusable/BaseModulePanel.cpp
@@ -102,6 +115,7 @@ set(PLUGIN_SOURCES
     # GUI - Widgets
     Source/GUI/Widgets/Button.cpp
     Source/GUI/Widgets/ComboBox.cpp
+    Source/GUI/Widgets/Toggle.cpp
     Source/GUI/Widgets/EnvelopeDisplay.cpp
     Source/GUI/Widgets/GroupLabel.cpp
     Source/GUI/Widgets/HorizontalSeparator.cpp
@@ -179,6 +193,7 @@ target_include_directories(Matrix-Control
 
 target_link_libraries(Matrix-Control
     PRIVATE
+        PluginFonts
         juce::juce_audio_utils
         juce::juce_dsp
         juce::juce_gui_basics

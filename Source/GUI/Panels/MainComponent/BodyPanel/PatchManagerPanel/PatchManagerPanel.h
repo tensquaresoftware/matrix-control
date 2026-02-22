@@ -17,6 +17,7 @@ class WidgetFactory;
 class BankUtilityPanel;
 class InternalPatchesPanel;
 class ComputerPatchesPanel;
+class PatchMutatorPanel;
 
 class PatchManagerPanel : public juce::Component
 {
@@ -38,11 +39,13 @@ private:
     std::unique_ptr<BankUtilityPanel> bankUtilityPanel_;
     std::unique_ptr<InternalPatchesPanel> internalPatchesPanel_;
     std::unique_ptr<ComputerPatchesPanel> computerPatchesPanel_;
+    std::unique_ptr<PatchMutatorPanel> patchMutatorPanel_;
 
     void layoutSectionHeader(const juce::Rectangle<int>& bounds, int y);
     void layoutBankUtilityPanel(const juce::Rectangle<int>& bounds, int y);
     void layoutInternalPatchesPanel(const juce::Rectangle<int>& bounds, int y);
     void layoutComputerPatchesPanel(const juce::Rectangle<int>& bounds, int y);
+    void layoutPatchMutatorPanel(const juce::Rectangle<int>& bounds, int y);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PatchManagerPanel)
 };

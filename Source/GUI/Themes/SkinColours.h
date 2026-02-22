@@ -6,7 +6,7 @@
 
 namespace tss
 {
-    namespace ThemeColours
+    namespace SkinColours
     {
         struct ColourElement
         {
@@ -191,6 +191,39 @@ namespace tss
                     "ButtonTextDisabled",
                     Common::kContentDisabled,
                     Common::kContentDisabled,
+                };
+            }
+
+            namespace Toggle
+            {
+                inline constexpr ColourElement kBorder = {
+                    "ToggleBorder",
+                    ColourChart::kDarkGrey3,
+                    ColourChart::kDarkGrey4
+                };
+
+                inline constexpr ColourElement kBackgroundOff = {
+                    "ToggleBackgroundOff",
+                    ColourChart::kGreen1,
+                    ColourChart::kGreen1
+                };
+
+                inline constexpr ColourElement kTextOff = {
+                    "ToggleTextOff",
+                    ColourChart::kGreen3,
+                    ColourChart::kGreen3
+                };
+
+                inline constexpr ColourElement kBackgroundOn = {
+                    "ToggleBackgroundOn",
+                    ColourChart::kGreen2,
+                    ColourChart::kGreen2
+                };
+
+                inline constexpr ColourElement kTextOn = {
+                    "ToggleTextOn",
+                    ColourChart::kGreen4,
+                    ColourChart::kGreen4
                 };
             }
 
@@ -523,4 +556,3 @@ namespace tss
         }
     }
 }
-

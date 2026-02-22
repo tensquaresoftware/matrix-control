@@ -172,6 +172,7 @@ extern const std::array<std::vector<ChoiceParameterDescriptor>, kModulationBusCo
 extern const std::vector<StandaloneWidgetDescriptor> kBankUtilityWidgets;
 extern const std::vector<StandaloneWidgetDescriptor> kInternalPatchesWidgets;
 extern const std::vector<StandaloneWidgetDescriptor> kComputerPatchesWidgets;
+extern const std::vector<StandaloneWidgetDescriptor> kPatchMutatorWidgets;
 
 // ============================================================================
 // Helper Functions

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <juce_core/juce_core.h>
+
 // PluginDisplayNames.h
 // Central file for all plugin display names (GUI strings)
 // Contains ONLY constant string definitions - no code/logic
@@ -64,6 +66,7 @@ namespace PluginDescriptors
         constexpr const char* kBankUtility                  = "BANK UTILITY";
         constexpr const char* kInternalPatches              = "INTERNAL PATCHES";
         constexpr const char* kComputerPatches              = "COMPUTER PATCHES";
+        constexpr const char* kPatchMutator                 = "PATCH MUTATOR";
     }
 
     // ============================================================================
@@ -324,9 +327,7 @@ namespace PluginDescriptors
 
         // Patch Manager | Internal Patches Standalone Widget Display Names
         constexpr const char* kInternalPatchesBrowser       = "BROWSER";
-        constexpr const char* kInternalPatchesMemory       = "MEMORY";
-
-        // Patch Manager | Internal Patches Standalone Widget Display Names
+        constexpr const char* kInternalPatchesMemory        = "MEMORY";
         constexpr const char* kLoadPreviousPatch            = "<";
         constexpr const char* kLoadNextPatch                = ">";
         constexpr const char* kCurrentBankNumber            = "CURRENT BANK";
@@ -339,14 +340,38 @@ namespace PluginDescriptors
         // Patch Manager | Computer Patches Standalone Widget Display Names
         constexpr const char* kComputerPatchesBrowser       = "BROWSER";
         constexpr const char* kComputerPatchesStorage       = "STORAGE";
-
-        // Patch Manager | Computer Patches Standalone Widget Display Names
         constexpr const char* kLoadPreviousPatchFile        = "<";
         constexpr const char* kLoadNextPatchFile            = ">";
         constexpr const char* kSelectPatchFile              = "SELECT A PATCH";
         constexpr const char* kOpenPatchFolder              = "OPEN";
         constexpr const char* kSavePatchAsFile              = "SAVE AS";
         constexpr const char* kSavePatch                    = "SAVE";
+
+        // Patch Manager | Patch Mutator Standalone Widget Display Names
+        constexpr const char* kPatchMutatorAmount             = "AMOUNT";
+        constexpr const char* kPatchMutatorRandom             = "RANDOM";
+        constexpr const char* kPatchMutatorHistory            = "HISTORY";
+        constexpr const char* kPatchMutatorEmptyHistory       = "EMPTY";
+        
+        constexpr const char* kPatchMutatorMutate             = "MUTATE";
+        constexpr const char* kPatchMutatorRetry              = "RETRY";
+        constexpr const char* kPatchMutatorCompare            = "COMPARE";
+        const juce::String    kPatchMutatorDelete             = juce::String::fromUTF8("\xe2\x80\x94");
+
+        constexpr const char* kPatchMutatorClear              = "CLEAR";
+        constexpr const char* kPatchMutatorExport             = "EXPORT";
+
+        constexpr const char* kPatchMutatorD1                 = "D1";
+        constexpr const char* kPatchMutatorD2                 = "D2";
+        constexpr const char* kPatchMutatorFByA               = "F/A";
+        constexpr const char* kPatchMutatorFByT               = "F/T";
+        constexpr const char* kPatchMutatorRByP               = "R/P";
+        constexpr const char* kPatchMutatorE1                 = "E1";
+        constexpr const char* kPatchMutatorE2                 = "E2";
+        constexpr const char* kPatchMutatorE3                 = "E3";
+        constexpr const char* kPatchMutatorL1                 = "L1";
+        constexpr const char* kPatchMutatorL2                 = "L2";
+        constexpr const char* kPatchMutatorUnitPercent        = "%";
     }
 
     // ============================================================================

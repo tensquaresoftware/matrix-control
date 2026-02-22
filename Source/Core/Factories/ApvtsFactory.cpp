@@ -188,6 +188,7 @@ std::vector<PluginDescriptors::StandaloneWidgetDescriptor> ApvtsFactory::getAllS
     addWidgets(PluginDescriptors::kBankUtilityWidgets);
     addWidgets(PluginDescriptors::kInternalPatchesWidgets);
     addWidgets(PluginDescriptors::kComputerPatchesWidgets);
+    addWidgets(PluginDescriptors::kPatchMutatorWidgets);
     addWidgets(PluginDescriptors::kMasterEditStandaloneWidgets);
 
     return allWidgets;
