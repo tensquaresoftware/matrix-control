@@ -145,7 +145,7 @@ void InternalPatchesPanel::setupBrowserGroupLabel(tss::Skin& skin)
         skin,
         PluginDimensions::Widgets::Widths::GroupLabel::kInternalPatchesBrowser,
         PluginDimensions::Widgets::Heights::kGroupLabel,
-        PluginDescriptors::StandaloneWidgetDisplayNames::kInternalPatchesBrowser);
+        PluginDescriptors::DisplayNames::PatchManager::InternalPatches::StandaloneWidgets::kBrowser);
     addAndMakeVisible(*browserGroupLabel);
 }
 
@@ -224,7 +224,7 @@ void InternalPatchesPanel::setupMemoryGroupLabel(tss::Skin& skin)
         skin,
         PluginDimensions::Widgets::Widths::GroupLabel::kInternalPatchesMemory,
         PluginDimensions::Widgets::Heights::kGroupLabel,
-        PluginDescriptors::StandaloneWidgetDisplayNames::kInternalPatchesMemory);
+        PluginDescriptors::DisplayNames::PatchManager::InternalPatches::StandaloneWidgets::kMemory);
     addAndMakeVisible(*memoryGroupLabel);
 }
 

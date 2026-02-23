@@ -133,7 +133,7 @@ void MatrixModulationPanel::createInitAllBussesButton(tss::Skin& skin)
         skin,
         PluginDimensions::Widgets::Widths::Button::kInit,
         PluginDimensions::Widgets::Heights::kButton,
-        PluginDescriptors::StandaloneWidgetDisplayNames::kShortInitLabel);
+        PluginDescriptors::DisplayNames::ShortLabels::kInit);
     initAllBussesButton_->onClick = [this]
     {
         apvts_.state.setProperty(PluginDescriptors::StandaloneWidgetIds::kMatrixModulationInit,

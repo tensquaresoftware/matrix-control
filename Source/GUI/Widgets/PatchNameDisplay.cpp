@@ -9,7 +9,7 @@ namespace tss
         : skin_(&skin)
         , width_(width)
         , height_(height)
-        , patchName_(PluginDescriptors::StandaloneWidgetDisplayNames::kDefaultPatchName)
+        , patchName_(PluginDescriptors::DisplayNames::PatchEdit::PatchName::StandaloneWidgets::kDefaultPatchName)
     {
         setOpaque(false);
         setSize(width_, height_);

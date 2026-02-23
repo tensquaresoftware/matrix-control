@@ -9,7 +9,7 @@
 #include "GUI/Factories/WidgetFactory.h"
 #include "Shared/PluginDimensions.h"
 
-using tss::VerticalSeparator;
+using ::tss::VerticalSeparator;
 
 BodyPanel::BodyPanel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : skin_(&skin)

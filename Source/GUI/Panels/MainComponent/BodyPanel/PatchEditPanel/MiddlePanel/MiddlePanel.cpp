@@ -18,7 +18,7 @@ MiddlePanel::MiddlePanel(tss::Skin& skin, juce::AudioProcessorValueTreeState& ap
     , envelope2Display_(skin, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kWidth, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kHeight)
     , envelope3Display_(skin, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kWidth, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kHeight)
     , trackGeneratorDisplay_(skin, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kWidth, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kHeight)
-    , patchNameModuleHeader_(skin, PluginDescriptors::ModuleDisplayNames::kPatchName,
+    , patchNameModuleHeader_(skin, PluginDescriptors::DisplayNames::Module::kPatchName,
                              PluginDimensions::Panels::PatchEditPanel::MiddlePanel::PatchNameSection::kWidth,
                              PluginDimensions::Widgets::Heights::kModuleHeader,
                              tss::ModuleHeader::ColourVariant::Blue)

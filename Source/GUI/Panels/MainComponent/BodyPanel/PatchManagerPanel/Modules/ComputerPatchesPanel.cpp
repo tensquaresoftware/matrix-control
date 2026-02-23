@@ -108,7 +108,7 @@ void ComputerPatchesPanel::setupBrowserGroupLabel(tss::Skin& skin)
         skin,
         PluginDimensions::Widgets::Widths::GroupLabel::kComputerPatchesBrowser,
         PluginDimensions::Widgets::Heights::kGroupLabel,
-        PluginDescriptors::StandaloneWidgetDisplayNames::kComputerPatchesBrowser);
+        PluginDescriptors::DisplayNames::PatchManager::ComputerPatches::StandaloneWidgets::kBrowser);
     addAndMakeVisible(*browserGroupLabel);
 }
 
@@ -188,7 +188,7 @@ void ComputerPatchesPanel::setupStorageGroupLabel(tss::Skin& skin)
         skin,
         PluginDimensions::Widgets::Widths::GroupLabel::kComputerPatchesStorage,
         PluginDimensions::Widgets::Heights::kGroupLabel,
-        PluginDescriptors::StandaloneWidgetDisplayNames::kComputerPatchesStorage);
+        PluginDescriptors::DisplayNames::PatchManager::ComputerPatches::StandaloneWidgets::kStorage);
     addAndMakeVisible(*storageGroupLabel);
 }
 

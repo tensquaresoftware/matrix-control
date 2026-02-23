@@ -8,10 +8,10 @@ namespace tss
 {
     ModulationBusHeader::ModulationBusHeader(tss::Skin& skin, int width, int height, ColourVariant variant)
         : skin_(&skin)
-        , busNumberText_(PluginDescriptors::ParameterDisplayNames::kModulationBusNumber)
-        , busSourceText_(PluginDescriptors::ParameterDisplayNames::kModulationBusSource)
-        , busAmountText_(PluginDescriptors::ParameterDisplayNames::kModulationBusAmount)
-        , busDestinationText_(PluginDescriptors::ParameterDisplayNames::kModulationBusDestination)
+        , busNumberText_(PluginDescriptors::DisplayNames::MatrixModulation::Header::kBusNumber)
+        , busSourceText_(PluginDescriptors::DisplayNames::MatrixModulation::Header::kSource)
+        , busAmountText_(PluginDescriptors::DisplayNames::MatrixModulation::Header::kAmount)
+        , busDestinationText_(PluginDescriptors::DisplayNames::MatrixModulation::Header::kDestination)
         , colourVariant_(variant)
         , cachedFont_(juce::FontOptions())
     {

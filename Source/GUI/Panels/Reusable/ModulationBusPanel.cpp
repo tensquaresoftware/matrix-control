@@ -94,7 +94,7 @@ void ModulationBusPanel::createInitButton(tss::Skin& skin, int busNumber)
         skin,
         PluginDimensions::Widgets::Widths::Button::kInit,
         PluginDimensions::Widgets::Heights::kButton,
-        PluginDescriptors::StandaloneWidgetDisplayNames::kShortInitLabel);
+        PluginDescriptors::DisplayNames::ShortLabels::kInit);
     
     juce::String initBusId;
     switch (busNumber)

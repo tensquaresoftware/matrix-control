@@ -163,7 +163,7 @@ void BankUtilityPanel::setupBankSelectorLabel(tss::Skin& skin)
         skin,
         PluginDimensions::Widgets::Widths::Label::kPatchManagerBankSelector,
         PluginDimensions::Widgets::Heights::kLabel,
-        PluginDescriptors::StandaloneWidgetDisplayNames::kBankSelector);
+        PluginDescriptors::DisplayNames::PatchManager::BankUtility::StandaloneWidgets::kBankSelector);
     addAndMakeVisible(*bankSelectorLabel_);
 }
 

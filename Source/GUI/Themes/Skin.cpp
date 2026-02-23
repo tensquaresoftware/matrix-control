@@ -57,7 +57,7 @@ namespace tss
             PluginFontsData::PTSansNarrowRegular_ttf,
             static_cast<size_t>(PluginFontsData::PTSansNarrowRegular_ttfSize)
         );
-        return juce::Font(juce::FontOptions().withTypeface(typeface).withHeight(kBaseFontHeight));
+        return juce::Font(juce::FontOptions(typeface).withHeight(kBaseFontHeight));
     }
 
     juce::Font Skin::getBaseFontBold() const
@@ -66,7 +66,7 @@ namespace tss
             PluginFontsData::PTSansNarrowBold_ttf,
             static_cast<size_t>(PluginFontsData::PTSansNarrowBold_ttfSize)
         );
-        return juce::Font(juce::FontOptions().withTypeface(typeface).withHeight(kBaseFontHeight));
+        return juce::Font(juce::FontOptions(typeface).withHeight(kBaseFontHeight));
     }
 
     juce::Colour Skin::getHeaderPanelBackgroundColour() const
