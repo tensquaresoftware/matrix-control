@@ -94,21 +94,21 @@ void ModulationBusPanel::createInitButton(tss::Skin& skin, int busNumber)
         skin,
         PluginDimensions::Widgets::Widths::Button::kInit,
         PluginDimensions::Widgets::Heights::kButton,
-        PluginDescriptors::DisplayNames::ShortLabels::kInit);
+        PluginDisplayNames::ShortLabels::kInit);
     
     juce::String initBusId;
     switch (busNumber)
     {
-        case 0: initBusId = PluginDescriptors::StandaloneWidgetIds::kModulationBus0Init; break;
-        case 1: initBusId = PluginDescriptors::StandaloneWidgetIds::kModulationBus1Init; break;
-        case 2: initBusId = PluginDescriptors::StandaloneWidgetIds::kModulationBus2Init; break;
-        case 3: initBusId = PluginDescriptors::StandaloneWidgetIds::kModulationBus3Init; break;
-        case 4: initBusId = PluginDescriptors::StandaloneWidgetIds::kModulationBus4Init; break;
-        case 5: initBusId = PluginDescriptors::StandaloneWidgetIds::kModulationBus5Init; break;
-        case 6: initBusId = PluginDescriptors::StandaloneWidgetIds::kModulationBus6Init; break;
-        case 7: initBusId = PluginDescriptors::StandaloneWidgetIds::kModulationBus7Init; break;
-        case 8: initBusId = PluginDescriptors::StandaloneWidgetIds::kModulationBus8Init; break;
-        case 9: initBusId = PluginDescriptors::StandaloneWidgetIds::kModulationBus9Init; break;
+        case 0: initBusId = PluginIDs::MatrixModulationSection::ModulationBus::StandaloneWidgets::kBus0Init; break;
+        case 1: initBusId = PluginIDs::MatrixModulationSection::ModulationBus::StandaloneWidgets::kBus1Init; break;
+        case 2: initBusId = PluginIDs::MatrixModulationSection::ModulationBus::StandaloneWidgets::kBus2Init; break;
+        case 3: initBusId = PluginIDs::MatrixModulationSection::ModulationBus::StandaloneWidgets::kBus3Init; break;
+        case 4: initBusId = PluginIDs::MatrixModulationSection::ModulationBus::StandaloneWidgets::kBus4Init; break;
+        case 5: initBusId = PluginIDs::MatrixModulationSection::ModulationBus::StandaloneWidgets::kBus5Init; break;
+        case 6: initBusId = PluginIDs::MatrixModulationSection::ModulationBus::StandaloneWidgets::kBus6Init; break;
+        case 7: initBusId = PluginIDs::MatrixModulationSection::ModulationBus::StandaloneWidgets::kBus7Init; break;
+        case 8: initBusId = PluginIDs::MatrixModulationSection::ModulationBus::StandaloneWidgets::kBus8Init; break;
+        case 9: initBusId = PluginIDs::MatrixModulationSection::ModulationBus::StandaloneWidgets::kBus9Init; break;
         default: return;
     }
     

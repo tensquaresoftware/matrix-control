@@ -19,7 +19,7 @@ MatrixModulationPanel::MatrixModulationPanel(tss::Skin& skin, WidgetFactory& wid
         skin,
         PluginDimensions::Widgets::Widths::SectionHeader::kMatrixModulation,
         PluginDimensions::Widgets::Heights::kSectionHeader,
-        PluginDescriptors::getSectionDisplayName(PluginDescriptors::SectionIds::kMatrixModulation)))
+        PluginDescriptors::getSectionDisplayName(PluginIDs::MatrixModulationSection::kGroupId)))
     , modulationBusHeader_(std::make_unique<tss::ModulationBusHeader>(
         skin,
         PluginDimensions::Widgets::Widths::ModulationBusHeader::kStandard,
@@ -33,8 +33,8 @@ MatrixModulationPanel::MatrixModulationPanel(tss::Skin& skin, WidgetFactory& wid
 
     createInitAllBussesButton(skin);
 
-    modulationBuses_.reserve(PluginDescriptors::kModulationBusCount);
-    for (int busNumber = 0; busNumber < PluginDescriptors::kModulationBusCount; ++busNumber)
+    modulationBuses_.reserve(PluginIDs::MatrixModulationSection::kModulationBusCount);
+    for (int busNumber = 0; busNumber < PluginIDs::MatrixModulationSection::kModulationBusCount; ++busNumber)
     {
         const auto busNumberAsSizeT = static_cast<size_t>(busNumber);
         auto bus = std::make_unique<ModulationBusPanel>(
@@ -53,67 +53,67 @@ MatrixModulationPanel::MatrixModulationPanel(tss::Skin& skin, WidgetFactory& wid
     setSize(getWidth(), getHeight());
 }
 
-std::array<const char*, PluginDescriptors::kModulationBusCount> MatrixModulationPanel::createBusIds() const
+std::array<const char*, PluginIDs::MatrixModulationSection::kModulationBusCount> MatrixModulationPanel::createBusIds() const
 {
     return {
-        PluginDescriptors::ModulationBusIds::kModulationBus0,
-        PluginDescriptors::ModulationBusIds::kModulationBus1,
-        PluginDescriptors::ModulationBusIds::kModulationBus2,
-        PluginDescriptors::ModulationBusIds::kModulationBus3,
-        PluginDescriptors::ModulationBusIds::kModulationBus4,
-        PluginDescriptors::ModulationBusIds::kModulationBus5,
-        PluginDescriptors::ModulationBusIds::kModulationBus6,
-        PluginDescriptors::ModulationBusIds::kModulationBus7,
-        PluginDescriptors::ModulationBusIds::kModulationBus8,
-        PluginDescriptors::ModulationBusIds::kModulationBus9
+        PluginIDs::MatrixModulationSection::ModulationBus::kBus0,
+        PluginIDs::MatrixModulationSection::ModulationBus::kBus1,
+        PluginIDs::MatrixModulationSection::ModulationBus::kBus2,
+        PluginIDs::MatrixModulationSection::ModulationBus::kBus3,
+        PluginIDs::MatrixModulationSection::ModulationBus::kBus4,
+        PluginIDs::MatrixModulationSection::ModulationBus::kBus5,
+        PluginIDs::MatrixModulationSection::ModulationBus::kBus6,
+        PluginIDs::MatrixModulationSection::ModulationBus::kBus7,
+        PluginIDs::MatrixModulationSection::ModulationBus::kBus8,
+        PluginIDs::MatrixModulationSection::ModulationBus::kBus9
     };
 }
 
-std::array<const char*, PluginDescriptors::kModulationBusCount> MatrixModulationPanel::createSourceParameterIds() const
+std::array<const char*, PluginIDs::MatrixModulationSection::kModulationBusCount> MatrixModulationPanel::createSourceParameterIds() const
 {
     return {
-        PluginDescriptors::ParameterIds::kModulationBus0Source,
-        PluginDescriptors::ParameterIds::kModulationBus1Source,
-        PluginDescriptors::ParameterIds::kModulationBus2Source,
-        PluginDescriptors::ParameterIds::kModulationBus3Source,
-        PluginDescriptors::ParameterIds::kModulationBus4Source,
-        PluginDescriptors::ParameterIds::kModulationBus5Source,
-        PluginDescriptors::ParameterIds::kModulationBus6Source,
-        PluginDescriptors::ParameterIds::kModulationBus7Source,
-        PluginDescriptors::ParameterIds::kModulationBus8Source,
-        PluginDescriptors::ParameterIds::kModulationBus9Source
+        PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus0Source,
+        PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus1Source,
+        PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus2Source,
+        PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus3Source,
+        PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus4Source,
+        PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus5Source,
+        PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus6Source,
+        PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus7Source,
+        PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus8Source,
+        PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus9Source
     };
 }
 
-std::array<const char*, PluginDescriptors::kModulationBusCount> MatrixModulationPanel::createAmountParameterIds() const
+std::array<const char*, PluginIDs::MatrixModulationSection::kModulationBusCount> MatrixModulationPanel::createAmountParameterIds() const
 {
     return {
-        PluginDescriptors::ParameterIds::kModulationBus0Amount,
-        PluginDescriptors::ParameterIds::kModulationBus1Amount,
-        PluginDescriptors::ParameterIds::kModulationBus2Amount,
-        PluginDescriptors::ParameterIds::kModulationBus3Amount,
-        PluginDescriptors::ParameterIds::kModulationBus4Amount,
-        PluginDescriptors::ParameterIds::kModulationBus5Amount,
-        PluginDescriptors::ParameterIds::kModulationBus6Amount,
-        PluginDescriptors::ParameterIds::kModulationBus7Amount,
-        PluginDescriptors::ParameterIds::kModulationBus8Amount,
-        PluginDescriptors::ParameterIds::kModulationBus9Amount
+        PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus0Amount,
+        PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus1Amount,
+        PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus2Amount,
+        PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus3Amount,
+        PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus4Amount,
+        PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus5Amount,
+        PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus6Amount,
+        PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus7Amount,
+        PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus8Amount,
+        PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus9Amount
     };
 }
 
-std::array<const char*, PluginDescriptors::kModulationBusCount> MatrixModulationPanel::createDestinationParameterIds() const
+std::array<const char*, PluginIDs::MatrixModulationSection::kModulationBusCount> MatrixModulationPanel::createDestinationParameterIds() const
 {
     return {
-        PluginDescriptors::ParameterIds::kModulationBus0Destination,
-        PluginDescriptors::ParameterIds::kModulationBus1Destination,
-        PluginDescriptors::ParameterIds::kModulationBus2Destination,
-        PluginDescriptors::ParameterIds::kModulationBus3Destination,
-        PluginDescriptors::ParameterIds::kModulationBus4Destination,
-        PluginDescriptors::ParameterIds::kModulationBus5Destination,
-        PluginDescriptors::ParameterIds::kModulationBus6Destination,
-        PluginDescriptors::ParameterIds::kModulationBus7Destination,
-        PluginDescriptors::ParameterIds::kModulationBus8Destination,
-        PluginDescriptors::ParameterIds::kModulationBus9Destination
+        PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus0Destination,
+        PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus1Destination,
+        PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus2Destination,
+        PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus3Destination,
+        PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus4Destination,
+        PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus5Destination,
+        PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus6Destination,
+        PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus7Destination,
+        PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus8Destination,
+        PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus9Destination
     };
 }
 
@@ -133,10 +133,10 @@ void MatrixModulationPanel::createInitAllBussesButton(tss::Skin& skin)
         skin,
         PluginDimensions::Widgets::Widths::Button::kInit,
         PluginDimensions::Widgets::Heights::kButton,
-        PluginDescriptors::DisplayNames::ShortLabels::kInit);
+        PluginDisplayNames::ShortLabels::kInit);
     initAllBussesButton_->onClick = [this]
     {
-        apvts_.state.setProperty(PluginDescriptors::StandaloneWidgetIds::kMatrixModulationInit,
+        apvts_.state.setProperty(PluginIDs::MatrixModulationSection::StandaloneWidgets::kMatrixModulationInit,
                                 juce::Time::getCurrentTime().toMilliseconds(),
                                 nullptr);
     };

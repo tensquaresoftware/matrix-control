@@ -9,22 +9,22 @@
 ModulePanelConfig VcfVcaPanel::createConfig()
 {
     ModulePanelConfig config;
-    config.moduleId = PluginDescriptors::ModuleIds::kVcfVca;
+    config.moduleId = PluginIDs::PatchEditSection::VcfVcaModule::kGroupId;
     config.buttonSet = ModulePanelButtonSet::InitOnly;
     config.moduleType = ModulePanelModuleType::PatchEdit;
-    config.initWidgetId = PluginDescriptors::StandaloneWidgetIds::kVcfVcaInit;
+    config.initWidgetId = PluginIDs::PatchEditSection::VcfVcaModule::StandaloneWidgets::kInit;
     
     config.parameters = {
-        {PluginDescriptors::ParameterIds::kVcfBalance, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kVcfFequency, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kVcfFrequencyModByEnv1, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kVcfFrequencyModByPressure, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kVcfResonance, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kVca1Volume, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kVca1ModByVelocity, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kVca2ModByEnv2, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kVcfLevers, ModulePanelParameterType::ComboBox},
-        {PluginDescriptors::ParameterIds::kVcfKeyboardPortamento, ModulePanelParameterType::ComboBox}
+        {PluginIDs::PatchEditSection::VcfVcaModule::ParameterWidgets::kBalance, ModulePanelParameterType::Slider},
+        {PluginIDs::PatchEditSection::VcfVcaModule::ParameterWidgets::kFrequency, ModulePanelParameterType::Slider},
+        {PluginIDs::PatchEditSection::VcfVcaModule::ParameterWidgets::kFrequencyModByEnv1, ModulePanelParameterType::Slider},
+        {PluginIDs::PatchEditSection::VcfVcaModule::ParameterWidgets::kFrequencyModByPressure, ModulePanelParameterType::Slider},
+        {PluginIDs::PatchEditSection::VcfVcaModule::ParameterWidgets::kResonance, ModulePanelParameterType::Slider},
+        {PluginIDs::PatchEditSection::VcfVcaModule::ParameterWidgets::kVca1Volume, ModulePanelParameterType::Slider},
+        {PluginIDs::PatchEditSection::VcfVcaModule::ParameterWidgets::kVca1ModByVelocity, ModulePanelParameterType::Slider},
+        {PluginIDs::PatchEditSection::VcfVcaModule::ParameterWidgets::kVca2ModByEnv2, ModulePanelParameterType::Slider},
+        {PluginIDs::PatchEditSection::VcfVcaModule::ParameterWidgets::kLevers, ModulePanelParameterType::ComboBox},
+        {PluginIDs::PatchEditSection::VcfVcaModule::ParameterWidgets::kKeyboardPortamento, ModulePanelParameterType::ComboBox}
     };
     
     return config;

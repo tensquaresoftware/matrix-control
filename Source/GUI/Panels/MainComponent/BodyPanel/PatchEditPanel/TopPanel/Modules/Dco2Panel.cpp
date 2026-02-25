@@ -9,24 +9,24 @@
 ModulePanelConfig Dco2Panel::createConfig()
 {
     ModulePanelConfig config;
-    config.moduleId = PluginDescriptors::ModuleIds::kDco2;
+    config.moduleId = PluginIDs::PatchEditSection::Dco2Module::kGroupId;
     config.buttonSet = ModulePanelButtonSet::InitCopyPaste;
     config.moduleType = ModulePanelModuleType::PatchEdit;
-    config.initWidgetId = PluginDescriptors::StandaloneWidgetIds::kDco2Init;
-    config.copyWidgetId = PluginDescriptors::StandaloneWidgetIds::kDco2Copy;
-    config.pasteWidgetId = PluginDescriptors::StandaloneWidgetIds::kDco2Paste;
+    config.initWidgetId = PluginIDs::PatchEditSection::Dco2Module::StandaloneWidgets::kInit;
+    config.copyWidgetId = PluginIDs::PatchEditSection::Dco2Module::StandaloneWidgets::kCopy;
+    config.pasteWidgetId = PluginIDs::PatchEditSection::Dco2Module::StandaloneWidgets::kPaste;
     
     config.parameters = {
-        {PluginDescriptors::ParameterIds::kDco2Frequency, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kDco2FrequencyModByLfo1, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kDco2Detune, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kDco2PulseWidth, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kDco2PulseWidthModByLfo2, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kDco2WaveShape, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kDco2WaveSelect, ModulePanelParameterType::ComboBox},
-        {PluginDescriptors::ParameterIds::kDco2Levers, ModulePanelParameterType::ComboBox},
-        {PluginDescriptors::ParameterIds::kDco2KeyboardPortamento, ModulePanelParameterType::ComboBox},
-        {PluginDescriptors::ParameterIds::kDco2KeyClick, ModulePanelParameterType::ComboBox}
+        {PluginIDs::PatchEditSection::Dco2Module::ParameterWidgets::kFrequency, ModulePanelParameterType::Slider},
+        {PluginIDs::PatchEditSection::Dco2Module::ParameterWidgets::kFrequencyModByLfo1, ModulePanelParameterType::Slider},
+        {PluginIDs::PatchEditSection::Dco2Module::ParameterWidgets::kDetune, ModulePanelParameterType::Slider},
+        {PluginIDs::PatchEditSection::Dco2Module::ParameterWidgets::kPulseWidth, ModulePanelParameterType::Slider},
+        {PluginIDs::PatchEditSection::Dco2Module::ParameterWidgets::kPulseWidthModByLfo2, ModulePanelParameterType::Slider},
+        {PluginIDs::PatchEditSection::Dco2Module::ParameterWidgets::kWaveShape, ModulePanelParameterType::Slider},
+        {PluginIDs::PatchEditSection::Dco2Module::ParameterWidgets::kWaveSelect, ModulePanelParameterType::ComboBox},
+        {PluginIDs::PatchEditSection::Dco2Module::ParameterWidgets::kLevers, ModulePanelParameterType::ComboBox},
+        {PluginIDs::PatchEditSection::Dco2Module::ParameterWidgets::kKeyboardPortamento, ModulePanelParameterType::ComboBox},
+        {PluginIDs::PatchEditSection::Dco2Module::ParameterWidgets::kKeyClick, ModulePanelParameterType::ComboBox}
     };
     
     return config;

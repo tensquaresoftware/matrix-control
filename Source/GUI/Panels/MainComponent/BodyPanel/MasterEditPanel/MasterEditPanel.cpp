@@ -18,7 +18,7 @@ MasterEditPanel::MasterEditPanel(tss::Skin& skin, WidgetFactory& widgetFactory, 
         skin, 
         PluginDimensions::Widgets::Widths::SectionHeader::kMasterEdit,
         PluginDimensions::Widgets::Heights::kSectionHeader,
-        PluginDescriptors::getSectionDisplayName(PluginDescriptors::SectionIds::kMasterEdit),
+        PluginDescriptors::getSectionDisplayName(PluginIDs::MasterEditSection::kGroupId),
         tss::SectionHeader::ColourVariant::Orange))
     , midiPanel_(std::make_unique<MidiPanel>(skin, widgetFactory, apvts))
     , vibratoPanel_(std::make_unique<VibratoPanel>(skin, widgetFactory, apvts))

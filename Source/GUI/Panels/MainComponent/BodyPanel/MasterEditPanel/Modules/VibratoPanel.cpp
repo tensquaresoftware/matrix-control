@@ -9,19 +9,19 @@
 ModulePanelConfig VibratoPanel::createConfig()
 {
     ModulePanelConfig config;
-    config.moduleId = PluginDescriptors::ModuleIds::kVibrato;
+    config.moduleId = PluginIDs::MasterEditSection::VibratoModule::kGroupId;
     config.buttonSet = ModulePanelButtonSet::InitOnly;
     config.moduleType = ModulePanelModuleType::MasterEdit;
-    config.initWidgetId = PluginDescriptors::StandaloneWidgetIds::kVibratoInit;
+    config.initWidgetId = PluginIDs::MasterEditSection::VibratoModule::StandaloneWidgets::kInit;
     
     config.parameters = {
-        {PluginDescriptors::ParameterIds::kVibratoSpeed, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kVibratoWaveform, ModulePanelParameterType::ComboBox},
-        {PluginDescriptors::ParameterIds::kVibratoAmplitude, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kVibratoSpeedModSource, ModulePanelParameterType::ComboBox},
-        {PluginDescriptors::ParameterIds::kVibratoSpeedModAmount, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kVibratoAmpModSource, ModulePanelParameterType::ComboBox},
-        {PluginDescriptors::ParameterIds::kVibratoAmpModAmount, ModulePanelParameterType::Slider}
+        {PluginIDs::MasterEditSection::VibratoModule::ParameterWidgets::kSpeed, ModulePanelParameterType::Slider},
+        {PluginIDs::MasterEditSection::VibratoModule::ParameterWidgets::kWaveform, ModulePanelParameterType::ComboBox},
+        {PluginIDs::MasterEditSection::VibratoModule::ParameterWidgets::kAmplitude, ModulePanelParameterType::Slider},
+        {PluginIDs::MasterEditSection::VibratoModule::ParameterWidgets::kSpeedModSource, ModulePanelParameterType::ComboBox},
+        {PluginIDs::MasterEditSection::VibratoModule::ParameterWidgets::kSpeedModAmount, ModulePanelParameterType::Slider},
+        {PluginIDs::MasterEditSection::VibratoModule::ParameterWidgets::kAmpModSource, ModulePanelParameterType::ComboBox},
+        {PluginIDs::MasterEditSection::VibratoModule::ParameterWidgets::kAmpModAmount, ModulePanelParameterType::Slider}
     };
     
     return config;

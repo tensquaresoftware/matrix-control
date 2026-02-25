@@ -9,20 +9,20 @@
 ModulePanelConfig MidiPanel::createConfig()
 {
     ModulePanelConfig config;
-    config.moduleId = PluginDescriptors::ModuleIds::kMidi;
+    config.moduleId = PluginIDs::MasterEditSection::MidiModule::kGroupId;
     config.buttonSet = ModulePanelButtonSet::InitOnly;
     config.moduleType = ModulePanelModuleType::MasterEdit;
-    config.initWidgetId = PluginDescriptors::StandaloneWidgetIds::kMidiInit;
+    config.initWidgetId = PluginIDs::MasterEditSection::MidiModule::StandaloneWidgets::kInit;
     
     config.parameters = {
-        {PluginDescriptors::ParameterIds::kMidiChannel, ModulePanelParameterType::ComboBox},
-        {PluginDescriptors::ParameterIds::kMidiEcho, ModulePanelParameterType::ComboBox},
-        {PluginDescriptors::ParameterIds::kMidiControllers, ModulePanelParameterType::ComboBox},
-        {PluginDescriptors::ParameterIds::kMidiPatchChanges, ModulePanelParameterType::ComboBox},
-        {PluginDescriptors::ParameterIds::kMidiPedal1Select, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kMidiPedal2Select, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kMidiLever2Select, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kMidiLever3Select, ModulePanelParameterType::Slider}
+        {PluginIDs::MasterEditSection::MidiModule::ParameterWidgets::kChannel, ModulePanelParameterType::ComboBox},
+        {PluginIDs::MasterEditSection::MidiModule::ParameterWidgets::kMidiEcho, ModulePanelParameterType::ComboBox},
+        {PluginIDs::MasterEditSection::MidiModule::ParameterWidgets::kControllers, ModulePanelParameterType::ComboBox},
+        {PluginIDs::MasterEditSection::MidiModule::ParameterWidgets::kPatchChanges, ModulePanelParameterType::ComboBox},
+        {PluginIDs::MasterEditSection::MidiModule::ParameterWidgets::kPedal1Select, ModulePanelParameterType::Slider},
+        {PluginIDs::MasterEditSection::MidiModule::ParameterWidgets::kPedal2Select, ModulePanelParameterType::Slider},
+        {PluginIDs::MasterEditSection::MidiModule::ParameterWidgets::kLever2Select, ModulePanelParameterType::Slider},
+        {PluginIDs::MasterEditSection::MidiModule::ParameterWidgets::kLever3Select, ModulePanelParameterType::Slider}
     };
     
     return config;

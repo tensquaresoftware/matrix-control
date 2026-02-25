@@ -9,21 +9,21 @@
 ModulePanelConfig FmTrackPanel::createConfig()
 {
     ModulePanelConfig config;
-    config.moduleId = PluginDescriptors::ModuleIds::kFmTrack;
+    config.moduleId = PluginIDs::PatchEditSection::FmTrackModule::kGroupId;
     config.buttonSet = ModulePanelButtonSet::InitOnly;
     config.moduleType = ModulePanelModuleType::PatchEdit;
-    config.initWidgetId = PluginDescriptors::StandaloneWidgetIds::kFmTrackInit;
+    config.initWidgetId = PluginIDs::PatchEditSection::FmTrackModule::StandaloneWidgets::kInit;
     
     config.parameters = {
-        {PluginDescriptors::ParameterIds::kFmAmount, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kFmModByEnv3, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kFmModByPressure, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kTrackPoint1, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kTrackPoint2, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kTrackPoint3, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kTrackPoint4, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kTrackPoint5, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kTrackInput, ModulePanelParameterType::ComboBox},
+        {PluginIDs::PatchEditSection::FmTrackModule::ParameterWidgets::kFmAmount, ModulePanelParameterType::Slider},
+        {PluginIDs::PatchEditSection::FmTrackModule::ParameterWidgets::kFmModByEnv3, ModulePanelParameterType::Slider},
+        {PluginIDs::PatchEditSection::FmTrackModule::ParameterWidgets::kFmModByPressure, ModulePanelParameterType::Slider},
+        {PluginIDs::PatchEditSection::FmTrackModule::ParameterWidgets::kTrackPoint1, ModulePanelParameterType::Slider},
+        {PluginIDs::PatchEditSection::FmTrackModule::ParameterWidgets::kTrackPoint2, ModulePanelParameterType::Slider},
+        {PluginIDs::PatchEditSection::FmTrackModule::ParameterWidgets::kTrackPoint3, ModulePanelParameterType::Slider},
+        {PluginIDs::PatchEditSection::FmTrackModule::ParameterWidgets::kTrackPoint4, ModulePanelParameterType::Slider},
+        {PluginIDs::PatchEditSection::FmTrackModule::ParameterWidgets::kTrackPoint5, ModulePanelParameterType::Slider},
+        {PluginIDs::PatchEditSection::FmTrackModule::ParameterWidgets::kTrackInput, ModulePanelParameterType::ComboBox},
         {"", ModulePanelParameterType::None}
     };
     

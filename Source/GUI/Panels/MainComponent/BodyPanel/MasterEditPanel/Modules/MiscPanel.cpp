@@ -9,19 +9,19 @@
 ModulePanelConfig MiscPanel::createConfig()
 {
     ModulePanelConfig config;
-    config.moduleId = PluginDescriptors::ModuleIds::kMisc;
+    config.moduleId = PluginIDs::MasterEditSection::MiscModule::kGroupId;
     config.buttonSet = ModulePanelButtonSet::InitOnly;
     config.moduleType = ModulePanelModuleType::MasterEdit;
-    config.initWidgetId = PluginDescriptors::StandaloneWidgetIds::kMiscInit;
+    config.initWidgetId = PluginIDs::MasterEditSection::MiscModule::StandaloneWidgets::kInit;
     
     config.parameters = {
-        {PluginDescriptors::ParameterIds::kMasterTune, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kMasterTranspose, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kBendRange, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kUnisonEnable, ModulePanelParameterType::ComboBox},
-        {PluginDescriptors::ParameterIds::kVolumeInvertEnable, ModulePanelParameterType::ComboBox},
-        {PluginDescriptors::ParameterIds::kBankLockEnable, ModulePanelParameterType::ComboBox},
-        {PluginDescriptors::ParameterIds::kMemoryProtectEnable, ModulePanelParameterType::ComboBox},
+        {PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kMasterTune, ModulePanelParameterType::Slider},
+        {PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kMasterTranspose, ModulePanelParameterType::Slider},
+        {PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kBendRange, ModulePanelParameterType::Slider},
+        {PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kUnisonEnable, ModulePanelParameterType::ComboBox},
+        {PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kVolumeInvertEnable, ModulePanelParameterType::ComboBox},
+        {PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kBankLockEnable, ModulePanelParameterType::ComboBox},
+        {PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kMemoryProtectEnable, ModulePanelParameterType::ComboBox},
         {"", ModulePanelParameterType::None}
     };
     

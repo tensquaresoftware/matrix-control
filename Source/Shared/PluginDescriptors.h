@@ -165,8 +165,8 @@ extern const std::vector<StandaloneWidgetDescriptor> kLfo1StandaloneWidgets;
 extern const std::vector<StandaloneWidgetDescriptor> kLfo2StandaloneWidgets;
 
 // Matrix Modulation | Parameter Widgets
-extern const std::array<std::vector<IntParameterDescriptor>, kModulationBusCount> kModulationBusIntParameters;
-extern const std::array<std::vector<ChoiceParameterDescriptor>, kModulationBusCount> kModulationBusChoiceParameters;
+extern const std::array<std::vector<IntParameterDescriptor>, PluginIDs::MatrixModulationSection::kModulationBusCount> kModulationBusIntParameters;
+extern const std::array<std::vector<ChoiceParameterDescriptor>, PluginIDs::MatrixModulationSection::kModulationBusCount> kModulationBusChoiceParameters;
 
 // Patch Manager | Standalone Widgets
 extern const std::vector<StandaloneWidgetDescriptor> kBankUtilityWidgets;

@@ -16,7 +16,7 @@ ComputerPatchesPanel::ComputerPatchesPanel(tss::Skin& skin, WidgetFactory& widge
     , apvts_(apvts)
 {
     setOpaque(false);
-    setupModuleHeader(skin, widgetFactory, PluginDescriptors::ModuleIds::kComputerPatches);
+    setupModuleHeader(skin, widgetFactory, PluginIDs::PatchManagerSection::ComputerPatchesModule::kGroupId);
 
     setupBrowserGroupLabel(skin);
     setupLoadPreviousPatchFileButton(skin, widgetFactory);
@@ -108,19 +108,19 @@ void ComputerPatchesPanel::setupBrowserGroupLabel(tss::Skin& skin)
         skin,
         PluginDimensions::Widgets::Widths::GroupLabel::kComputerPatchesBrowser,
         PluginDimensions::Widgets::Heights::kGroupLabel,
-        PluginDescriptors::DisplayNames::PatchManager::ComputerPatches::StandaloneWidgets::kBrowser);
+        PluginDisplayNames::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kBrowser);
     addAndMakeVisible(*browserGroupLabel);
 }
 
 void ComputerPatchesPanel::setupLoadPreviousPatchFileButton(tss::Skin& skin, WidgetFactory& widgetFactory)
 {
     loadPreviousPatchFileButton_ = widgetFactory.createStandaloneButton(
-        PluginDescriptors::StandaloneWidgetIds::kLoadPreviousPatchFile,
+        PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kLoadPreviousPatchFile,
         skin,
         PluginDimensions::Widgets::Heights::kButton);
     loadPreviousPatchFileButton_->onClick = [this]
     {
-        apvts_.state.setProperty(PluginDescriptors::StandaloneWidgetIds::kLoadPreviousPatchFile,
+        apvts_.state.setProperty(PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kLoadPreviousPatchFile,
                                 juce::Time::getCurrentTime().toMilliseconds(),
                                 nullptr);
     };
@@ -130,12 +130,12 @@ void ComputerPatchesPanel::setupLoadPreviousPatchFileButton(tss::Skin& skin, Wid
 void ComputerPatchesPanel::setupLoadNextPatchFileButton(tss::Skin& skin, WidgetFactory& widgetFactory)
 {
     loadNextPatchFileButton_ = widgetFactory.createStandaloneButton(
-        PluginDescriptors::StandaloneWidgetIds::kLoadNextPatchFile,
+        PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kLoadNextPatchFile,
         skin,
         PluginDimensions::Widgets::Heights::kButton);
     loadNextPatchFileButton_->onClick = [this]
     {
-        apvts_.state.setProperty(PluginDescriptors::StandaloneWidgetIds::kLoadNextPatchFile,
+        apvts_.state.setProperty(PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kLoadNextPatchFile,
                                 juce::Time::getCurrentTime().toMilliseconds(),
                                 nullptr);
     };
@@ -174,7 +174,7 @@ void ComputerPatchesPanel::setupSelectPatchFileComboBox(tss::Skin& skin)
     {
         if (auto* comboBox = selectPatchFileComboBox_.get())
         {
-            apvts_.state.setProperty(PluginDescriptors::StandaloneWidgetIds::kSelectPatchFile,
+            apvts_.state.setProperty(PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSelectPatchFile,
                                     comboBox->getSelectedId(),
                                     nullptr);
         }
@@ -188,19 +188,19 @@ void ComputerPatchesPanel::setupStorageGroupLabel(tss::Skin& skin)
         skin,
         PluginDimensions::Widgets::Widths::GroupLabel::kComputerPatchesStorage,
         PluginDimensions::Widgets::Heights::kGroupLabel,
-        PluginDescriptors::DisplayNames::PatchManager::ComputerPatches::StandaloneWidgets::kStorage);
+        PluginDisplayNames::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kStorage);
     addAndMakeVisible(*storageGroupLabel);
 }
 
 void ComputerPatchesPanel::setupOpenPatchFolderButton(tss::Skin& skin, WidgetFactory& widgetFactory)
 {
     openPatchFolderButton_ = widgetFactory.createStandaloneButton(
-        PluginDescriptors::StandaloneWidgetIds::kOpenPatchFolder,
+        PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kOpenPatchFolder,
         skin,
         PluginDimensions::Widgets::Heights::kButton);
     openPatchFolderButton_->onClick = [this]
     {
-        apvts_.state.setProperty(PluginDescriptors::StandaloneWidgetIds::kOpenPatchFolder,
+        apvts_.state.setProperty(PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kOpenPatchFolder,
                                 juce::Time::getCurrentTime().toMilliseconds(),
                                 nullptr);
     };
@@ -210,12 +210,12 @@ void ComputerPatchesPanel::setupOpenPatchFolderButton(tss::Skin& skin, WidgetFac
 void ComputerPatchesPanel::setupSavePatchFileAsButton(tss::Skin& skin, WidgetFactory& widgetFactory)
 {
     savePatchFileAsButton_ = widgetFactory.createStandaloneButton(
-        PluginDescriptors::StandaloneWidgetIds::kSavePatchAs,
+        PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSavePatchAs,
         skin,
         PluginDimensions::Widgets::Heights::kButton);
     savePatchFileAsButton_->onClick = [this]
     {
-        apvts_.state.setProperty(PluginDescriptors::StandaloneWidgetIds::kSavePatchAs,
+        apvts_.state.setProperty(PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSavePatchAs,
                                 juce::Time::getCurrentTime().toMilliseconds(),
                                 nullptr);
     };
@@ -225,12 +225,12 @@ void ComputerPatchesPanel::setupSavePatchFileAsButton(tss::Skin& skin, WidgetFac
 void ComputerPatchesPanel::setupSavePatchFileButton(tss::Skin& skin, WidgetFactory& widgetFactory)
 {
     savePatchFileButton_ = widgetFactory.createStandaloneButton(
-        PluginDescriptors::StandaloneWidgetIds::kSavePatchFile,
+        PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSavePatchFile,
         skin,
         PluginDimensions::Widgets::Heights::kButton);
     savePatchFileButton_->onClick = [this]
     {
-        apvts_.state.setProperty(PluginDescriptors::StandaloneWidgetIds::kSavePatchFile,
+        apvts_.state.setProperty(PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSavePatchFile,
                                 juce::Time::getCurrentTime().toMilliseconds(),
                                 nullptr);
     };

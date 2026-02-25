@@ -407,13 +407,13 @@ void PluginProcessor::valueTreePropertyChanged(juce::ValueTree& treeWhosePropert
     );
     
     // Gestion du changement de banque (Property)
-    if (parameterId == PluginDescriptors::StandaloneWidgetIds::kCurrentBankNumber)
+    if (parameterId == PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCurrentBankNumber)
     {
         // TODO: Envoyer commande SysEx pour changer de banque
     }
     
     // Gestion du changement de patch (Property)
-    if (parameterId == PluginDescriptors::StandaloneWidgetIds::kCurrentPatchNumber)
+    if (parameterId == PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCurrentPatchNumber)
     {
         // TODO: Envoyer commande SysEx pour charger le patch
     }

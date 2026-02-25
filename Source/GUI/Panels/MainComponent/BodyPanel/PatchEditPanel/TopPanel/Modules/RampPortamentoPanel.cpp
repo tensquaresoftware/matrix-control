@@ -9,21 +9,21 @@
 ModulePanelConfig RampPortamentoPanel::createConfig()
 {
     ModulePanelConfig config;
-    config.moduleId = PluginDescriptors::ModuleIds::kRampPortamento;
+    config.moduleId = PluginIDs::PatchEditSection::RampPortamentoModule::kGroupId;
     config.buttonSet = ModulePanelButtonSet::InitOnly;
     config.moduleType = ModulePanelModuleType::PatchEdit;
-    config.initWidgetId = PluginDescriptors::StandaloneWidgetIds::kRampPortamentoInit;
+    config.initWidgetId = PluginIDs::PatchEditSection::RampPortamentoModule::StandaloneWidgets::kInit;
     
     config.parameters = {
-        {PluginDescriptors::ParameterIds::kRamp1Rate, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kRamp1Trigger, ModulePanelParameterType::ComboBox},
-        {PluginDescriptors::ParameterIds::kRamp2Rate, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kRamp2Trigger, ModulePanelParameterType::ComboBox},
-        {PluginDescriptors::ParameterIds::kPortamentoRate, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kPortamentoModByVelocity, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kPortamentoMode, ModulePanelParameterType::ComboBox},
-        {PluginDescriptors::ParameterIds::kPortamentoLegato, ModulePanelParameterType::ComboBox},
-        {PluginDescriptors::ParameterIds::kPortamentoKeyboardMode, ModulePanelParameterType::ComboBox},
+        {PluginIDs::PatchEditSection::RampPortamentoModule::ParameterWidgets::kRamp1Rate, ModulePanelParameterType::Slider},
+        {PluginIDs::PatchEditSection::RampPortamentoModule::ParameterWidgets::kRamp1Trigger, ModulePanelParameterType::ComboBox},
+        {PluginIDs::PatchEditSection::RampPortamentoModule::ParameterWidgets::kRamp2Rate, ModulePanelParameterType::Slider},
+        {PluginIDs::PatchEditSection::RampPortamentoModule::ParameterWidgets::kRamp2Trigger, ModulePanelParameterType::ComboBox},
+        {PluginIDs::PatchEditSection::RampPortamentoModule::ParameterWidgets::kPortamentoRate, ModulePanelParameterType::Slider},
+        {PluginIDs::PatchEditSection::RampPortamentoModule::ParameterWidgets::kPortamentoModByVelocity, ModulePanelParameterType::Slider},
+        {PluginIDs::PatchEditSection::RampPortamentoModule::ParameterWidgets::kPortamentoMode, ModulePanelParameterType::ComboBox},
+        {PluginIDs::PatchEditSection::RampPortamentoModule::ParameterWidgets::kPortamentoLegato, ModulePanelParameterType::ComboBox},
+        {PluginIDs::PatchEditSection::RampPortamentoModule::ParameterWidgets::kPortamentoKeyboardMode, ModulePanelParameterType::ComboBox},
         {"", ModulePanelParameterType::None}
     };
     

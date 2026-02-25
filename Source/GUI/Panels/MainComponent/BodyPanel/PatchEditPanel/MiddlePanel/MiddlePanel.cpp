@@ -18,7 +18,7 @@ MiddlePanel::MiddlePanel(tss::Skin& skin, juce::AudioProcessorValueTreeState& ap
     , envelope2Display_(skin, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kWidth, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kHeight)
     , envelope3Display_(skin, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kWidth, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kHeight)
     , trackGeneratorDisplay_(skin, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kWidth, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kHeight)
-    , patchNameModuleHeader_(skin, PluginDescriptors::DisplayNames::Module::kPatchName,
+    , patchNameModuleHeader_(skin, PluginDisplayNames::PatchEditSection::PatchNameModule::kName,
                              PluginDimensions::Panels::PatchEditPanel::MiddlePanel::PatchNameSection::kWidth,
                              PluginDimensions::Widgets::Heights::kModuleHeader,
                              tss::ModuleHeader::ColourVariant::Blue)
@@ -75,105 +75,105 @@ void MiddlePanel::valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHas
         return;
 
     const juce::String paramId = idVar.toString();
-    if (paramId == PluginDescriptors::ParameterIds::kTrackPoint1)
+    if (paramId == PluginIDs::PatchEditSection::FmTrackModule::ParameterWidgets::kTrackPoint1)
     {
         trackGeneratorDisplay_.setTrackPoint1(getTrackPointValueFromApvts(paramId), false);
         return;
     }
-    if (paramId == PluginDescriptors::ParameterIds::kTrackPoint2)
+    if (paramId == PluginIDs::PatchEditSection::FmTrackModule::ParameterWidgets::kTrackPoint2)
     {
         trackGeneratorDisplay_.setTrackPoint2(getTrackPointValueFromApvts(paramId), false);
         return;
     }
-    if (paramId == PluginDescriptors::ParameterIds::kTrackPoint3)
+    if (paramId == PluginIDs::PatchEditSection::FmTrackModule::ParameterWidgets::kTrackPoint3)
     {
         trackGeneratorDisplay_.setTrackPoint3(getTrackPointValueFromApvts(paramId), false);
         return;
     }
-    if (paramId == PluginDescriptors::ParameterIds::kTrackPoint4)
+    if (paramId == PluginIDs::PatchEditSection::FmTrackModule::ParameterWidgets::kTrackPoint4)
     {
         trackGeneratorDisplay_.setTrackPoint4(getTrackPointValueFromApvts(paramId), false);
         return;
     }
-    if (paramId == PluginDescriptors::ParameterIds::kTrackPoint5)
+    if (paramId == PluginIDs::PatchEditSection::FmTrackModule::ParameterWidgets::kTrackPoint5)
     {
         trackGeneratorDisplay_.setTrackPoint5(getTrackPointValueFromApvts(paramId), false);
         return;
     }
     
-    if (paramId == PluginDescriptors::ParameterIds::kEnv1Delay)
+    if (paramId == PluginIDs::PatchEditSection::Envelope1Module::ParameterWidgets::kDelay)
     {
         envelope1Display_.setDelay(getEnvParameterFromApvts(paramId), false);
         return;
     }
-    if (paramId == PluginDescriptors::ParameterIds::kEnv1Attack)
+    if (paramId == PluginIDs::PatchEditSection::Envelope1Module::ParameterWidgets::kAttack)
     {
         envelope1Display_.setAttack(getEnvParameterFromApvts(paramId), false);
         return;
     }
-    if (paramId == PluginDescriptors::ParameterIds::kEnv1Decay)
+    if (paramId == PluginIDs::PatchEditSection::Envelope1Module::ParameterWidgets::kDecay)
     {
         envelope1Display_.setDecay(getEnvParameterFromApvts(paramId), false);
         return;
     }
-    if (paramId == PluginDescriptors::ParameterIds::kEnv1Sustain)
+    if (paramId == PluginIDs::PatchEditSection::Envelope1Module::ParameterWidgets::kSustain)
     {
         envelope1Display_.setSustain(getEnvParameterFromApvts(paramId), false);
         return;
     }
-    if (paramId == PluginDescriptors::ParameterIds::kEnv1Release)
+    if (paramId == PluginIDs::PatchEditSection::Envelope1Module::ParameterWidgets::kRelease)
     {
         envelope1Display_.setRelease(getEnvParameterFromApvts(paramId), false);
         return;
     }
     
-    if (paramId == PluginDescriptors::ParameterIds::kEnv2Delay)
+    if (paramId == PluginIDs::PatchEditSection::Envelope2Module::ParameterWidgets::kDelay)
     {
         envelope2Display_.setDelay(getEnvParameterFromApvts(paramId), false);
         return;
     }
-    if (paramId == PluginDescriptors::ParameterIds::kEnv2Attack)
+    if (paramId == PluginIDs::PatchEditSection::Envelope2Module::ParameterWidgets::kAttack)
     {
         envelope2Display_.setAttack(getEnvParameterFromApvts(paramId), false);
         return;
     }
-    if (paramId == PluginDescriptors::ParameterIds::kEnv2Decay)
+    if (paramId == PluginIDs::PatchEditSection::Envelope2Module::ParameterWidgets::kDecay)
     {
         envelope2Display_.setDecay(getEnvParameterFromApvts(paramId), false);
         return;
     }
-    if (paramId == PluginDescriptors::ParameterIds::kEnv2Sustain)
+    if (paramId == PluginIDs::PatchEditSection::Envelope2Module::ParameterWidgets::kSustain)
     {
         envelope2Display_.setSustain(getEnvParameterFromApvts(paramId), false);
         return;
     }
-    if (paramId == PluginDescriptors::ParameterIds::kEnv2Release)
+    if (paramId == PluginIDs::PatchEditSection::Envelope2Module::ParameterWidgets::kRelease)
     {
         envelope2Display_.setRelease(getEnvParameterFromApvts(paramId), false);
         return;
     }
     
-    if (paramId == PluginDescriptors::ParameterIds::kEnv3Delay)
+    if (paramId == PluginIDs::PatchEditSection::Envelope3Module::ParameterWidgets::kDelay)
     {
         envelope3Display_.setDelay(getEnvParameterFromApvts(paramId), false);
         return;
     }
-    if (paramId == PluginDescriptors::ParameterIds::kEnv3Attack)
+    if (paramId == PluginIDs::PatchEditSection::Envelope3Module::ParameterWidgets::kAttack)
     {
         envelope3Display_.setAttack(getEnvParameterFromApvts(paramId), false);
         return;
     }
-    if (paramId == PluginDescriptors::ParameterIds::kEnv3Decay)
+    if (paramId == PluginIDs::PatchEditSection::Envelope3Module::ParameterWidgets::kDecay)
     {
         envelope3Display_.setDecay(getEnvParameterFromApvts(paramId), false);
         return;
     }
-    if (paramId == PluginDescriptors::ParameterIds::kEnv3Sustain)
+    if (paramId == PluginIDs::PatchEditSection::Envelope3Module::ParameterWidgets::kSustain)
     {
         envelope3Display_.setSustain(getEnvParameterFromApvts(paramId), false);
         return;
     }
-    if (paramId == PluginDescriptors::ParameterIds::kEnv3Release)
+    if (paramId == PluginIDs::PatchEditSection::Envelope3Module::ParameterWidgets::kRelease)
     {
         envelope3Display_.setRelease(getEnvParameterFromApvts(paramId), false);
     }
@@ -184,11 +184,11 @@ void MiddlePanel::syncTrackGeneratorDisplayFromApvts()
     if (apvts_ == nullptr)
         return;
 
-    trackGeneratorDisplay_.setTrackPoint1(getTrackPointValueFromApvts(PluginDescriptors::ParameterIds::kTrackPoint1), false);
-    trackGeneratorDisplay_.setTrackPoint2(getTrackPointValueFromApvts(PluginDescriptors::ParameterIds::kTrackPoint2), false);
-    trackGeneratorDisplay_.setTrackPoint3(getTrackPointValueFromApvts(PluginDescriptors::ParameterIds::kTrackPoint3), false);
-    trackGeneratorDisplay_.setTrackPoint4(getTrackPointValueFromApvts(PluginDescriptors::ParameterIds::kTrackPoint4), false);
-    trackGeneratorDisplay_.setTrackPoint5(getTrackPointValueFromApvts(PluginDescriptors::ParameterIds::kTrackPoint5), false);
+    trackGeneratorDisplay_.setTrackPoint1(getTrackPointValueFromApvts(PluginIDs::PatchEditSection::FmTrackModule::ParameterWidgets::kTrackPoint1), false);
+    trackGeneratorDisplay_.setTrackPoint2(getTrackPointValueFromApvts(PluginIDs::PatchEditSection::FmTrackModule::ParameterWidgets::kTrackPoint2), false);
+    trackGeneratorDisplay_.setTrackPoint3(getTrackPointValueFromApvts(PluginIDs::PatchEditSection::FmTrackModule::ParameterWidgets::kTrackPoint3), false);
+    trackGeneratorDisplay_.setTrackPoint4(getTrackPointValueFromApvts(PluginIDs::PatchEditSection::FmTrackModule::ParameterWidgets::kTrackPoint4), false);
+    trackGeneratorDisplay_.setTrackPoint5(getTrackPointValueFromApvts(PluginIDs::PatchEditSection::FmTrackModule::ParameterWidgets::kTrackPoint5), false);
 }
 
 int MiddlePanel::getTrackPointValueFromApvts(const juce::String& parameterId) const
@@ -210,23 +210,23 @@ void MiddlePanel::syncEnvelopeDisplaysFromApvts()
     if (apvts_ == nullptr)
         return;
     
-    envelope1Display_.setDelay(getEnvParameterFromApvts(PluginDescriptors::ParameterIds::kEnv1Delay), false);
-    envelope1Display_.setAttack(getEnvParameterFromApvts(PluginDescriptors::ParameterIds::kEnv1Attack), false);
-    envelope1Display_.setDecay(getEnvParameterFromApvts(PluginDescriptors::ParameterIds::kEnv1Decay), false);
-    envelope1Display_.setSustain(getEnvParameterFromApvts(PluginDescriptors::ParameterIds::kEnv1Sustain), false);
-    envelope1Display_.setRelease(getEnvParameterFromApvts(PluginDescriptors::ParameterIds::kEnv1Release), false);
+    envelope1Display_.setDelay(getEnvParameterFromApvts(PluginIDs::PatchEditSection::Envelope1Module::ParameterWidgets::kDelay), false);
+    envelope1Display_.setAttack(getEnvParameterFromApvts(PluginIDs::PatchEditSection::Envelope1Module::ParameterWidgets::kAttack), false);
+    envelope1Display_.setDecay(getEnvParameterFromApvts(PluginIDs::PatchEditSection::Envelope1Module::ParameterWidgets::kDecay), false);
+    envelope1Display_.setSustain(getEnvParameterFromApvts(PluginIDs::PatchEditSection::Envelope1Module::ParameterWidgets::kSustain), false);
+    envelope1Display_.setRelease(getEnvParameterFromApvts(PluginIDs::PatchEditSection::Envelope1Module::ParameterWidgets::kRelease), false);
     
-    envelope2Display_.setDelay(getEnvParameterFromApvts(PluginDescriptors::ParameterIds::kEnv2Delay), false);
-    envelope2Display_.setAttack(getEnvParameterFromApvts(PluginDescriptors::ParameterIds::kEnv2Attack), false);
-    envelope2Display_.setDecay(getEnvParameterFromApvts(PluginDescriptors::ParameterIds::kEnv2Decay), false);
-    envelope2Display_.setSustain(getEnvParameterFromApvts(PluginDescriptors::ParameterIds::kEnv2Sustain), false);
-    envelope2Display_.setRelease(getEnvParameterFromApvts(PluginDescriptors::ParameterIds::kEnv2Release), false);
+    envelope2Display_.setDelay(getEnvParameterFromApvts(PluginIDs::PatchEditSection::Envelope2Module::ParameterWidgets::kDelay), false);
+    envelope2Display_.setAttack(getEnvParameterFromApvts(PluginIDs::PatchEditSection::Envelope2Module::ParameterWidgets::kAttack), false);
+    envelope2Display_.setDecay(getEnvParameterFromApvts(PluginIDs::PatchEditSection::Envelope2Module::ParameterWidgets::kDecay), false);
+    envelope2Display_.setSustain(getEnvParameterFromApvts(PluginIDs::PatchEditSection::Envelope2Module::ParameterWidgets::kSustain), false);
+    envelope2Display_.setRelease(getEnvParameterFromApvts(PluginIDs::PatchEditSection::Envelope2Module::ParameterWidgets::kRelease), false);
     
-    envelope3Display_.setDelay(getEnvParameterFromApvts(PluginDescriptors::ParameterIds::kEnv3Delay), false);
-    envelope3Display_.setAttack(getEnvParameterFromApvts(PluginDescriptors::ParameterIds::kEnv3Attack), false);
-    envelope3Display_.setDecay(getEnvParameterFromApvts(PluginDescriptors::ParameterIds::kEnv3Decay), false);
-    envelope3Display_.setSustain(getEnvParameterFromApvts(PluginDescriptors::ParameterIds::kEnv3Sustain), false);
-    envelope3Display_.setRelease(getEnvParameterFromApvts(PluginDescriptors::ParameterIds::kEnv3Release), false);
+    envelope3Display_.setDelay(getEnvParameterFromApvts(PluginIDs::PatchEditSection::Envelope3Module::ParameterWidgets::kDelay), false);
+    envelope3Display_.setAttack(getEnvParameterFromApvts(PluginIDs::PatchEditSection::Envelope3Module::ParameterWidgets::kAttack), false);
+    envelope3Display_.setDecay(getEnvParameterFromApvts(PluginIDs::PatchEditSection::Envelope3Module::ParameterWidgets::kDecay), false);
+    envelope3Display_.setSustain(getEnvParameterFromApvts(PluginIDs::PatchEditSection::Envelope3Module::ParameterWidgets::kSustain), false);
+    envelope3Display_.setRelease(getEnvParameterFromApvts(PluginIDs::PatchEditSection::Envelope3Module::ParameterWidgets::kRelease), false);
 }
 
 int MiddlePanel::getEnvParameterFromApvts(const juce::String& parameterId) const

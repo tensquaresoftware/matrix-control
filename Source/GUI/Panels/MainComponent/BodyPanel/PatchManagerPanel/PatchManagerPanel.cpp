@@ -18,7 +18,7 @@ PatchManagerPanel::PatchManagerPanel(tss::Skin& skin, WidgetFactory& widgetFacto
         skin,
         PluginDimensions::Widgets::Widths::SectionHeader::kPatchManager,
         PluginDimensions::Widgets::Heights::kSectionHeader,
-        PluginDescriptors::getSectionDisplayName(PluginDescriptors::SectionIds::kPatchManager),
+        PluginDescriptors::getSectionDisplayName(PluginIDs::PatchManagerSection::kGroupId),
         tss::SectionHeader::ColourVariant::Blue))
     , bankUtilityPanel_(std::make_unique<BankUtilityPanel>(skin, widgetFactory, apvts))
     , internalPatchesPanel_(std::make_unique<InternalPatchesPanel>(skin, widgetFactory, apvts))

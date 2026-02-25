@@ -16,7 +16,7 @@ InternalPatchesPanel::InternalPatchesPanel(tss::Skin& skin, WidgetFactory& widge
     , apvts_(apvts)
 {
     setOpaque(false);
-    setupModuleHeader(skin, widgetFactory, PluginDescriptors::ModuleIds::kInternalPatches);
+    setupModuleHeader(skin, widgetFactory, PluginIDs::PatchManagerSection::InternalPatchesModule::kGroupId);
 
     setupBrowserGroupLabel(skin);
     setupLoadPreviousPatchButton(skin, widgetFactory);
@@ -47,14 +47,14 @@ void InternalPatchesPanel::valueTreePropertyChanged(
     const auto propertyName = property.toString();
     
     // Mise à jour du NumberBox depuis le Core (via Property)
-    if (propertyName == PluginDescriptors::StandaloneWidgetIds::kCurrentBankNumber)
+    if (propertyName == PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCurrentBankNumber)
     {
         const int bankNumber = treeWhosePropertyHasChanged.getProperty(property);
         if (auto* numberBox = currentBankNumber.get())
             numberBox->setValue(bankNumber);
     }
     
-    if (propertyName == PluginDescriptors::StandaloneWidgetIds::kCurrentPatchNumber)
+    if (propertyName == PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCurrentPatchNumber)
     {
         const int patchNumber = treeWhosePropertyHasChanged.getProperty(property);
         if (auto* numberBox = currentPatchNumber.get())
@@ -145,19 +145,19 @@ void InternalPatchesPanel::setupBrowserGroupLabel(tss::Skin& skin)
         skin,
         PluginDimensions::Widgets::Widths::GroupLabel::kInternalPatchesBrowser,
         PluginDimensions::Widgets::Heights::kGroupLabel,
-        PluginDescriptors::DisplayNames::PatchManager::InternalPatches::StandaloneWidgets::kBrowser);
+        PluginDisplayNames::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kBrowser);
     addAndMakeVisible(*browserGroupLabel);
 }
 
 void InternalPatchesPanel::setupLoadPreviousPatchButton(tss::Skin& skin, WidgetFactory& widgetFactory)
 {
     loadPreviousPatchButton_ = widgetFactory.createStandaloneButton(
-        PluginDescriptors::StandaloneWidgetIds::kLoadPreviousPatch,
+        PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kLoadPreviousPatch,
         skin,
         PluginDimensions::Widgets::Heights::kButton);
     loadPreviousPatchButton_->onClick = [this]
     {
-        apvts_.state.setProperty(PluginDescriptors::StandaloneWidgetIds::kLoadPreviousPatch,
+        apvts_.state.setProperty(PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kLoadPreviousPatch,
                                 juce::Time::getCurrentTime().toMilliseconds(),
                                 nullptr);
     };
@@ -167,12 +167,12 @@ void InternalPatchesPanel::setupLoadPreviousPatchButton(tss::Skin& skin, WidgetF
 void InternalPatchesPanel::setupLoadNextPatchButton(tss::Skin& skin, WidgetFactory& widgetFactory)
 {
     loadNextPatchButton_ = widgetFactory.createStandaloneButton(
-        PluginDescriptors::StandaloneWidgetIds::kLoadNextPatch,
+        PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kLoadNextPatch,
         skin,
         PluginDimensions::Widgets::Heights::kButton);
     loadNextPatchButton_->onClick = [this]
     {
-        apvts_.state.setProperty(PluginDescriptors::StandaloneWidgetIds::kLoadNextPatch,
+        apvts_.state.setProperty(PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kLoadNextPatch,
                                 juce::Time::getCurrentTime().toMilliseconds(),
                                 nullptr);
     };
@@ -205,11 +205,11 @@ void InternalPatchesPanel::setupCurrentPatchNumberBox(tss::Skin& skin)
     {
         // Éviter la boucle : ne pas setProperty si la valeur vient déjà du ValueTree
         const auto currentPropertyValue = apvts_.state.getProperty(
-            PluginDescriptors::StandaloneWidgetIds::kCurrentPatchNumber, -1);
+            PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCurrentPatchNumber, -1);
         
         if (static_cast<int>(currentPropertyValue) != newValue)
         {
-            apvts_.state.setProperty(PluginDescriptors::StandaloneWidgetIds::kCurrentPatchNumber,
+            apvts_.state.setProperty(PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCurrentPatchNumber,
                                     newValue,
                                     nullptr);
         }
@@ -224,19 +224,19 @@ void InternalPatchesPanel::setupMemoryGroupLabel(tss::Skin& skin)
         skin,
         PluginDimensions::Widgets::Widths::GroupLabel::kInternalPatchesMemory,
         PluginDimensions::Widgets::Heights::kGroupLabel,
-        PluginDescriptors::DisplayNames::PatchManager::InternalPatches::StandaloneWidgets::kMemory);
+        PluginDisplayNames::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kMemory);
     addAndMakeVisible(*memoryGroupLabel);
 }
 
 void InternalPatchesPanel::setupInitPatchButton(tss::Skin& skin, WidgetFactory& widgetFactory)
 {
     initPatchButton_ = widgetFactory.createStandaloneButton(
-        PluginDescriptors::StandaloneWidgetIds::kInitPatch,
+        PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kInitPatch,
         skin,
         PluginDimensions::Widgets::Heights::kButton);
     initPatchButton_->onClick = [this]
     {
-        apvts_.state.setProperty(PluginDescriptors::StandaloneWidgetIds::kInitPatch,
+        apvts_.state.setProperty(PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kInitPatch,
                                 juce::Time::getCurrentTime().toMilliseconds(),
                                 nullptr);
     };
@@ -246,12 +246,12 @@ void InternalPatchesPanel::setupInitPatchButton(tss::Skin& skin, WidgetFactory& 
 void InternalPatchesPanel::setupCopyPatchButton(tss::Skin& skin, WidgetFactory& widgetFactory)
 {
     copyPatchButton_ = widgetFactory.createStandaloneButton(
-        PluginDescriptors::StandaloneWidgetIds::kCopyPatch,
+        PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCopyPatch,
         skin,
         PluginDimensions::Widgets::Heights::kButton);
     copyPatchButton_->onClick = [this]
     {
-        apvts_.state.setProperty(PluginDescriptors::StandaloneWidgetIds::kCopyPatch,
+        apvts_.state.setProperty(PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCopyPatch,
                                 juce::Time::getCurrentTime().toMilliseconds(),
                                 nullptr);
     };
@@ -261,12 +261,12 @@ void InternalPatchesPanel::setupCopyPatchButton(tss::Skin& skin, WidgetFactory& 
 void InternalPatchesPanel::setupPastePatchButton(tss::Skin& skin, WidgetFactory& widgetFactory)
 {
     pastePatchButton_ = widgetFactory.createStandaloneButton(
-        PluginDescriptors::StandaloneWidgetIds::kPastePatch,
+        PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kPastePatch,
         skin,
         PluginDimensions::Widgets::Heights::kButton);
     pastePatchButton_->onClick = [this]
     {
-        apvts_.state.setProperty(PluginDescriptors::StandaloneWidgetIds::kPastePatch,
+        apvts_.state.setProperty(PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kPastePatch,
                                 juce::Time::getCurrentTime().toMilliseconds(),
                                 nullptr);
     };
@@ -276,12 +276,12 @@ void InternalPatchesPanel::setupPastePatchButton(tss::Skin& skin, WidgetFactory&
 void InternalPatchesPanel::setupStorePatchButton(tss::Skin& skin, WidgetFactory& widgetFactory)
 {
     storePatchButton_ = widgetFactory.createStandaloneButton(
-        PluginDescriptors::StandaloneWidgetIds::kStorePatch,
+        PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kStorePatch,
         skin,
         PluginDimensions::Widgets::Heights::kButton);
     storePatchButton_->onClick = [this]
     {
-        apvts_.state.setProperty(PluginDescriptors::StandaloneWidgetIds::kStorePatch,
+        apvts_.state.setProperty(PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kStorePatch,
                                 juce::Time::getCurrentTime().toMilliseconds(),
                                 nullptr);
     };

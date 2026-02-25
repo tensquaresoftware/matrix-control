@@ -9,24 +9,24 @@
 ModulePanelConfig Env2Panel::createConfig()
 {
     ModulePanelConfig config;
-    config.moduleId = PluginDescriptors::ModuleIds::kEnvelope2;
+    config.moduleId = PluginIDs::PatchEditSection::Envelope2Module::kGroupId;
     config.buttonSet = ModulePanelButtonSet::InitCopyPaste;
     config.moduleType = ModulePanelModuleType::PatchEdit;
-    config.initWidgetId = PluginDescriptors::StandaloneWidgetIds::kEnv2Init;
-    config.copyWidgetId = PluginDescriptors::StandaloneWidgetIds::kEnv2Copy;
-    config.pasteWidgetId = PluginDescriptors::StandaloneWidgetIds::kEnv2Paste;
+    config.initWidgetId = PluginIDs::PatchEditSection::Envelope2Module::StandaloneWidgets::kInit;
+    config.copyWidgetId = PluginIDs::PatchEditSection::Envelope2Module::StandaloneWidgets::kCopy;
+    config.pasteWidgetId = PluginIDs::PatchEditSection::Envelope2Module::StandaloneWidgets::kPaste;
     
     config.parameters = {
-        {PluginDescriptors::ParameterIds::kEnv2Delay, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kEnv2Attack, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kEnv2Decay, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kEnv2Sustain, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kEnv2Release, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kEnv2Amplitude, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kEnv2AmplitudeModByVelocity, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kEnv2TriggerMode, ModulePanelParameterType::ComboBox},
-        {PluginDescriptors::ParameterIds::kEnv2EnvelopeMode, ModulePanelParameterType::ComboBox},
-        {PluginDescriptors::ParameterIds::kEnv2Lfo1Trigger, ModulePanelParameterType::ComboBox}
+        {PluginIDs::PatchEditSection::Envelope2Module::ParameterWidgets::kDelay, ModulePanelParameterType::Slider},
+        {PluginIDs::PatchEditSection::Envelope2Module::ParameterWidgets::kAttack, ModulePanelParameterType::Slider},
+        {PluginIDs::PatchEditSection::Envelope2Module::ParameterWidgets::kDecay, ModulePanelParameterType::Slider},
+        {PluginIDs::PatchEditSection::Envelope2Module::ParameterWidgets::kSustain, ModulePanelParameterType::Slider},
+        {PluginIDs::PatchEditSection::Envelope2Module::ParameterWidgets::kRelease, ModulePanelParameterType::Slider},
+        {PluginIDs::PatchEditSection::Envelope2Module::ParameterWidgets::kAmplitude, ModulePanelParameterType::Slider},
+        {PluginIDs::PatchEditSection::Envelope2Module::ParameterWidgets::kAmplitudeModByVelocity, ModulePanelParameterType::Slider},
+        {PluginIDs::PatchEditSection::Envelope2Module::ParameterWidgets::kTriggerMode, ModulePanelParameterType::ComboBox},
+        {PluginIDs::PatchEditSection::Envelope2Module::ParameterWidgets::kEnvelopeMode, ModulePanelParameterType::ComboBox},
+        {PluginIDs::PatchEditSection::Envelope2Module::ParameterWidgets::kLfo1Trigger, ModulePanelParameterType::ComboBox}
     };
     
     return config;

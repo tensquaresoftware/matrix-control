@@ -9,23 +9,23 @@
 ModulePanelConfig Lfo2Panel::createConfig()
 {
     ModulePanelConfig config;
-    config.moduleId = PluginDescriptors::ModuleIds::kLfo2;
+    config.moduleId = PluginIDs::PatchEditSection::Lfo2Module::kGroupId;
     config.buttonSet = ModulePanelButtonSet::InitCopyPaste;
     config.moduleType = ModulePanelModuleType::PatchEdit;
-    config.initWidgetId = PluginDescriptors::StandaloneWidgetIds::kLfo2Init;
-    config.copyWidgetId = PluginDescriptors::StandaloneWidgetIds::kLfo2Copy;
-    config.pasteWidgetId = PluginDescriptors::StandaloneWidgetIds::kLfo2Paste;
+    config.initWidgetId = PluginIDs::PatchEditSection::Lfo2Module::StandaloneWidgets::kInit;
+    config.copyWidgetId = PluginIDs::PatchEditSection::Lfo2Module::StandaloneWidgets::kCopy;
+    config.pasteWidgetId = PluginIDs::PatchEditSection::Lfo2Module::StandaloneWidgets::kPaste;
     
     config.parameters = {
-        {PluginDescriptors::ParameterIds::kLfo2Speed, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kLfo2SpeedModByKeyboard, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kLfo2RetriggerPoint, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kLfo2Amplitude, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kLfo2AmplitudeModByRamp2, ModulePanelParameterType::Slider},
-        {PluginDescriptors::ParameterIds::kLfo2Waveform, ModulePanelParameterType::ComboBox},
-        {PluginDescriptors::ParameterIds::kLfo2TriggerMode, ModulePanelParameterType::ComboBox},
-        {PluginDescriptors::ParameterIds::kLfo2Lag, ModulePanelParameterType::ComboBox},
-        {PluginDescriptors::ParameterIds::kLfo2SampleInput, ModulePanelParameterType::ComboBox},
+        {PluginIDs::PatchEditSection::Lfo2Module::ParameterWidgets::kSpeed, ModulePanelParameterType::Slider},
+        {PluginIDs::PatchEditSection::Lfo2Module::ParameterWidgets::kSpeedModByKeyboard, ModulePanelParameterType::Slider},
+        {PluginIDs::PatchEditSection::Lfo2Module::ParameterWidgets::kRetriggerPoint, ModulePanelParameterType::Slider},
+        {PluginIDs::PatchEditSection::Lfo2Module::ParameterWidgets::kAmplitude, ModulePanelParameterType::Slider},
+        {PluginIDs::PatchEditSection::Lfo2Module::ParameterWidgets::kAmplitudeModByRamp2, ModulePanelParameterType::Slider},
+        {PluginIDs::PatchEditSection::Lfo2Module::ParameterWidgets::kWaveform, ModulePanelParameterType::ComboBox},
+        {PluginIDs::PatchEditSection::Lfo2Module::ParameterWidgets::kTriggerMode, ModulePanelParameterType::ComboBox},
+        {PluginIDs::PatchEditSection::Lfo2Module::ParameterWidgets::kLag, ModulePanelParameterType::ComboBox},
+        {PluginIDs::PatchEditSection::Lfo2Module::ParameterWidgets::kSampleInput, ModulePanelParameterType::ComboBox},
         {"", ModulePanelParameterType::None}
     };
     
