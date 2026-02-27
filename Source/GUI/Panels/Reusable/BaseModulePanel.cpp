@@ -1,6 +1,6 @@
 #include "BaseModulePanel.h"
 
-#include "GUI/Themes/Skin.h"
+#include "GUI/Skins/Skin.h"
 #include "GUI/Panels/Reusable/ModuleHeaderPanel.h"
 #include "GUI/Panels/Reusable/ParameterPanel.h"
 #include "GUI/Factories/WidgetFactory.h"

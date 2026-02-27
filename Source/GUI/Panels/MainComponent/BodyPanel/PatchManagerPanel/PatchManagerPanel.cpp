@@ -5,7 +5,7 @@
 #include "Modules/ComputerPatchesPanel.h"
 #include "Modules/PatchMutatorPanel.h"
 
-#include "GUI/Themes/Skin.h"
+#include "GUI/Skins/Skin.h"
 #include "GUI/Widgets/SectionHeader.h"
 #include "Shared/PluginDescriptors.h"
 #include "Shared/PluginHelpers.h"

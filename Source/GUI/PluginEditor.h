@@ -5,7 +5,7 @@
 
 #include "Core/PluginProcessor.h"
 #include "Shared/PluginDimensions.h"
-#include "Themes/Skin.h"
+#include "Skins/Skin.h"
 #include "Panels/MainComponent/HeaderPanel/HeaderPanel.h"
 #include "Panels/MainComponent/BodyPanel/BodyPanel.h"
 #include "Panels/MainComponent/FooterPanel/FooterPanel.h"

@@ -72,8 +72,8 @@ set(PLUGIN_SOURCES
     Source/Core/MIDI/SysEx/SysExDecoder.cpp
     Source/Core/MIDI/SysEx/SysExEncoder.cpp
     
-    # GUI - Themes
-    Source/GUI/Themes/Skin.cpp
+    # GUI - Skins
+    Source/GUI/Skins/Skin.cpp
     
     # GUI - Main Component
     Source/GUI/MainComponent.cpp

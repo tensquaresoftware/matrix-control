@@ -1,6 +1,6 @@
 #include "HorizontalSeparator.h"
 
-#include "GUI/Themes/Skin.h"
+#include "GUI/Skins/Skin.h"
 
 namespace tss
 {

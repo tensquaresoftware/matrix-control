@@ -1,6 +1,6 @@
 #include "MatrixModulationPanel.h"
 
-#include "GUI/Themes/Skin.h"
+#include "GUI/Skins/Skin.h"
 #include "GUI/Widgets/SectionHeader.h"
 #include "GUI/Widgets/ModulationBusHeader.h"
 #include "GUI/Widgets/Button.h"

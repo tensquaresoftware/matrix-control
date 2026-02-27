@@ -1,6 +1,6 @@
 #include "FooterPanel.h"
 
-#include "GUI/Themes/Skin.h"
+#include "GUI/Skins/Skin.h"
 
 const juce::Identifier FooterPanel::kMessageTextId("uiMessageText");
 const juce::Identifier FooterPanel::kMessageSeverityId("uiMessageSeverity");

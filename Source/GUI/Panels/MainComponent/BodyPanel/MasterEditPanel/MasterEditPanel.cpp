@@ -4,7 +4,7 @@
 #include "Modules/VibratoPanel.h"
 #include "Modules/MiscPanel.h"
 
-#include "GUI/Themes/Skin.h"
+#include "GUI/Skins/Skin.h"
 #include "GUI/Widgets/SectionHeader.h"
 #include "Shared/PluginDescriptors.h"
 #include "Shared/PluginHelpers.h"

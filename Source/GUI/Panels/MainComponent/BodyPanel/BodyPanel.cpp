@@ -1,6 +1,6 @@
 #include "BodyPanel.h"
 
-#include "GUI/Themes/Skin.h"
+#include "GUI/Skins/Skin.h"
 #include "GUI/Widgets/VerticalSeparator.h"
 #include "PatchEditPanel/PatchEditPanel.h"
 #include "MatrixModulationPanel/MatrixModulationPanel.h"

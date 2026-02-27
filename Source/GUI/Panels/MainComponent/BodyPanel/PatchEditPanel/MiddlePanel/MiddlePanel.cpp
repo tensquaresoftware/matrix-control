@@ -1,6 +1,6 @@
 #include "MiddlePanel.h"
 
-#include "GUI/Themes/Skin.h"
+#include "GUI/Skins/Skin.h"
 #include "Shared/PluginDescriptors.h"
 #include "Shared/PluginDisplayNames.h"
 

@@ -6,7 +6,7 @@
 #include "Modules/Lfo1Panel.h"
 #include "Modules/Lfo2Panel.h"
 
-#include "GUI/Themes/Skin.h"
+#include "GUI/Skins/Skin.h"
 #include "GUI/Factories/WidgetFactory.h"
 
 

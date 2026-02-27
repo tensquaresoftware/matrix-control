@@ -1,6 +1,6 @@
 #include "BankUtilityPanel.h"
 
-#include "GUI/Themes/Skin.h"
+#include "GUI/Skins/Skin.h"
 #include "GUI/Widgets/ModuleHeader.h"
 #include "GUI/Widgets/Label.h"
 #include "GUI/Widgets/Button.h"

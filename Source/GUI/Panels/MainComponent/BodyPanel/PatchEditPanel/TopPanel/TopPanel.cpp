@@ -6,7 +6,7 @@
 #include "Modules/FmTrackPanel.h"
 #include "Modules/RampPortamentoPanel.h"
 
-#include "GUI/Themes/Skin.h"
+#include "GUI/Skins/Skin.h"
 #include "GUI/Factories/WidgetFactory.h"
 
 

@@ -1,6 +1,6 @@
 #include "ParameterPanel.h"
 
-#include "GUI/Themes/Skin.h"
+#include "GUI/Skins/Skin.h"
 #include "GUI/Widgets/Label.h"
 #include "GUI/Widgets/Slider.h"
 #include "GUI/Widgets/ComboBox.h"

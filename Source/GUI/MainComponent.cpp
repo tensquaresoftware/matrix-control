@@ -1,7 +1,7 @@
 #include "MainComponent.h"
 
 #include "GUI/Factories/WidgetFactory.h"
-#include "GUI/Themes/Skin.h"
+#include "GUI/Skins/Skin.h"
 
 MainComponent::MainComponent(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : skin_(&skin)

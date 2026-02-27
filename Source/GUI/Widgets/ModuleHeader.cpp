@@ -1,7 +1,7 @@
 #include "ModuleHeader.h"
 
-#include "GUI/Themes/Skin.h"
-#include "GUI/Themes/SkinValues.h"
+#include "GUI/Skins/Skin.h"
+#include "GUI/Skins/SkinValues.h"
 
 namespace tss
 {

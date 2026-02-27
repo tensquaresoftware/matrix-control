@@ -2,7 +2,7 @@
 
 #include "GUI/Widgets/Label.h"
 #include "GUI/Widgets/ComboBox.h"
-#include "GUI/Themes/Skin.h"
+#include "GUI/Skins/Skin.h"
 
 HeaderPanel::HeaderPanel(tss::Skin& skin)
     : skin_(&skin)

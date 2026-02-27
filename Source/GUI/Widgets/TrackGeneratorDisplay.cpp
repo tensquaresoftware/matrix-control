@@ -1,7 +1,7 @@
 #include "TrackGeneratorDisplay.h"
 
-#include "GUI/Themes/Skin.h"
-#include "GUI/Themes/ColourChart.h"
+#include "GUI/Skins/Skin.h"
+#include "GUI/Skins/ColourChart.h"
 
 namespace tss
 {

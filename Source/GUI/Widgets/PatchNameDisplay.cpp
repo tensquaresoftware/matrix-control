@@ -1,6 +1,6 @@
 #include "PatchNameDisplay.h"
 
-#include "GUI/Themes/Skin.h"
+#include "GUI/Skins/Skin.h"
 #include "Shared/PluginDisplayNames.h"
 
 namespace tss

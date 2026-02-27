@@ -8,7 +8,7 @@
 #include "BottomPanel/Modules/Env2Panel.h"
 #include "BottomPanel/Modules/Env3Panel.h"
 
-#include "GUI/Themes/Skin.h"
+#include "GUI/Skins/Skin.h"
 #include "GUI/Widgets/SectionHeader.h"
 #include "GUI/Panels/Reusable/BaseModulePanel.h"
 #include "GUI/Panels/Reusable/ParameterPanel.h"

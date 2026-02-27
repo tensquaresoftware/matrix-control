@@ -1,6 +1,6 @@
 #include "MiscPanel.h"
 
-#include "GUI/Themes/Skin.h"
+#include "GUI/Skins/Skin.h"
 #include "GUI/Panels/Reusable/BaseModulePanel.h"
 #include "Shared/PluginDescriptors.h"
 #include "GUI/Factories/WidgetFactory.h"
