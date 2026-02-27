@@ -35,16 +35,16 @@ public:
 private:
     struct ModulationBusParameterArrays
     {
-        std::array<const char*, PluginIDs::MatrixModulationSection::kModulationBusCount> busIds;
-        std::array<const char*, PluginIDs::MatrixModulationSection::kModulationBusCount> sourceParameterIds;
-        std::array<const char*, PluginIDs::MatrixModulationSection::kModulationBusCount> amountParameterIds;
-        std::array<const char*, PluginIDs::MatrixModulationSection::kModulationBusCount> destinationParameterIds;
+        std::array<const char*, Matrix1000Limits::kModulationBusCount> busIds;
+        std::array<const char*, Matrix1000Limits::kModulationBusCount> sourceParameterIds;
+        std::array<const char*, Matrix1000Limits::kModulationBusCount> amountParameterIds;
+        std::array<const char*, Matrix1000Limits::kModulationBusCount> destinationParameterIds;
     };
 
-    std::array<const char*, PluginIDs::MatrixModulationSection::kModulationBusCount> createBusIds() const;
-    std::array<const char*, PluginIDs::MatrixModulationSection::kModulationBusCount> createSourceParameterIds() const;
-    std::array<const char*, PluginIDs::MatrixModulationSection::kModulationBusCount> createAmountParameterIds() const;
-    std::array<const char*, PluginIDs::MatrixModulationSection::kModulationBusCount> createDestinationParameterIds() const;
+    std::array<const char*, Matrix1000Limits::kModulationBusCount> createBusIds() const;
+    std::array<const char*, Matrix1000Limits::kModulationBusCount> createSourceParameterIds() const;
+    std::array<const char*, Matrix1000Limits::kModulationBusCount> createAmountParameterIds() const;
+    std::array<const char*, Matrix1000Limits::kModulationBusCount> createDestinationParameterIds() const;
     ModulationBusParameterArrays createModulationBusParameterArrays() const;
 
     void createInitAllBussesButton(tss::Skin& skin);

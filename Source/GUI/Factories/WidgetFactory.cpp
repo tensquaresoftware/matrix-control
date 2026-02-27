@@ -4,6 +4,7 @@
 #include "GUI/Widgets/ComboBox.h"
 #include "GUI/Widgets/Button.h"
 #include "Shared/PluginDescriptors.h"
+#include "Shared/PluginHelpers.h"
 #include "Shared/PluginIDs.h"
 #include "Shared/PluginDimensions.h"
 
@@ -191,7 +192,7 @@ juce::String WidgetFactory::getParameterDisplayName(const juce::String& paramete
 
 juce::String WidgetFactory::getGroupDisplayName(const juce::String& groupId) const
 {
-    return PluginDescriptors::getGroupDisplayName(groupId);
+    return PluginHelpers::getGroupDisplayName(groupId);
 }
 
 juce::String WidgetFactory::getStandaloneWidgetDisplayName(const juce::String& widgetId) const
@@ -257,6 +258,7 @@ void WidgetFactory::buildChoiceParameterMap()
 void WidgetFactory::buildStandaloneWidgetMap()
 {
     addPatchEditStandaloneWidgetsToMap();
+    addMatrixModulationStandaloneWidgetsToMap();
     addPatchManagerStandaloneWidgetsToMap();
     addMasterEditStandaloneWidgetsToMap();
 }
@@ -269,27 +271,27 @@ void WidgetFactory::addIntParametersToMap(const std::vector<PluginDescriptors::I
 
 void WidgetFactory::addPatchEditModuleIntParametersToMap()
 {
-    addIntParametersToMap(PluginDescriptors::kDco1IntParameters);
-    addIntParametersToMap(PluginDescriptors::kDco2IntParameters);
-    addIntParametersToMap(PluginDescriptors::kVcfVcaIntParameters);
-    addIntParametersToMap(PluginDescriptors::kFmTrackIntParameters);
-    addIntParametersToMap(PluginDescriptors::kRampPortamentoIntParameters);
-    addIntParametersToMap(PluginDescriptors::kEnv1IntParameters);
-    addIntParametersToMap(PluginDescriptors::kEnv2IntParameters);
-    addIntParametersToMap(PluginDescriptors::kEnv3IntParameters);
-    addIntParametersToMap(PluginDescriptors::kLfo1IntParameters);
-    addIntParametersToMap(PluginDescriptors::kLfo2IntParameters);
+    addIntParametersToMap(PluginDescriptors::PatchEditSection::Dco1Module::kIntParameters);
+    addIntParametersToMap(PluginDescriptors::PatchEditSection::Dco2Module::kIntParameters);
+    addIntParametersToMap(PluginDescriptors::PatchEditSection::VcfVcaModule::kIntParameters);
+    addIntParametersToMap(PluginDescriptors::PatchEditSection::FmTrackModule::kIntParameters);
+    addIntParametersToMap(PluginDescriptors::PatchEditSection::RampPortamentoModule::kIntParameters);
+    addIntParametersToMap(PluginDescriptors::PatchEditSection::Envelope1Module::kIntParameters);
+    addIntParametersToMap(PluginDescriptors::PatchEditSection::Envelope2Module::kIntParameters);
+    addIntParametersToMap(PluginDescriptors::PatchEditSection::Envelope3Module::kIntParameters);
+    addIntParametersToMap(PluginDescriptors::PatchEditSection::Lfo1Module::kIntParameters);
+    addIntParametersToMap(PluginDescriptors::PatchEditSection::Lfo2Module::kIntParameters);
 }
 
 void WidgetFactory::addMatrixModulationBusIntParametersToMap()
 {
-    for (int bus = 0; bus < PluginIDs::MatrixModulationSection::kModulationBusCount; ++bus)
-        addIntParametersToMap(PluginDescriptors::kModulationBusIntParameters[static_cast<size_t>(bus)]);
+    for (int bus = 0; bus < Matrix1000Limits::kModulationBusCount; ++bus)
+        addIntParametersToMap(PluginDescriptors::MatrixModulationSection::kModulationBusIntParameters[static_cast<size_t>(bus)]);
 }
 
 void WidgetFactory::addMasterEditIntParametersToMap()
 {
-    addIntParametersToMap(PluginDescriptors::kMasterEditIntParameters);
+    addIntParametersToMap(PluginDescriptors::MasterEditSection::kIntParameters);
 }
 
 void WidgetFactory::addChoiceParametersToMap(const std::vector<PluginDescriptors::ChoiceParameterDescriptor>& parameters)
@@ -300,27 +302,27 @@ void WidgetFactory::addChoiceParametersToMap(const std::vector<PluginDescriptors
 
 void WidgetFactory::addPatchEditModuleChoiceParametersToMap()
 {
-    addChoiceParametersToMap(PluginDescriptors::kDco1ChoiceParameters);
-    addChoiceParametersToMap(PluginDescriptors::kDco2ChoiceParameters);
-    addChoiceParametersToMap(PluginDescriptors::kVcfVcaChoiceParameters);
-    addChoiceParametersToMap(PluginDescriptors::kFmTrackChoiceParameters);
-    addChoiceParametersToMap(PluginDescriptors::kRampPortamentoChoiceParameters);
-    addChoiceParametersToMap(PluginDescriptors::kEnv1ChoiceParameters);
-    addChoiceParametersToMap(PluginDescriptors::kEnv2ChoiceParameters);
-    addChoiceParametersToMap(PluginDescriptors::kEnv3ChoiceParameters);
-    addChoiceParametersToMap(PluginDescriptors::kLfo1ChoiceParameters);
-    addChoiceParametersToMap(PluginDescriptors::kLfo2ChoiceParameters);
+    addChoiceParametersToMap(PluginDescriptors::PatchEditSection::Dco1Module::kChoiceParameters);
+    addChoiceParametersToMap(PluginDescriptors::PatchEditSection::Dco2Module::kChoiceParameters);
+    addChoiceParametersToMap(PluginDescriptors::PatchEditSection::VcfVcaModule::kChoiceParameters);
+    addChoiceParametersToMap(PluginDescriptors::PatchEditSection::FmTrackModule::kChoiceParameters);
+    addChoiceParametersToMap(PluginDescriptors::PatchEditSection::RampPortamentoModule::kChoiceParameters);
+    addChoiceParametersToMap(PluginDescriptors::PatchEditSection::Envelope1Module::kChoiceParameters);
+    addChoiceParametersToMap(PluginDescriptors::PatchEditSection::Envelope2Module::kChoiceParameters);
+    addChoiceParametersToMap(PluginDescriptors::PatchEditSection::Envelope3Module::kChoiceParameters);
+    addChoiceParametersToMap(PluginDescriptors::PatchEditSection::Lfo1Module::kChoiceParameters);
+    addChoiceParametersToMap(PluginDescriptors::PatchEditSection::Lfo2Module::kChoiceParameters);
 }
 
 void WidgetFactory::addMatrixModulationBusChoiceParametersToMap()
 {
-    for (int bus = 0; bus < PluginIDs::MatrixModulationSection::kModulationBusCount; ++bus)
-        addChoiceParametersToMap(PluginDescriptors::kModulationBusChoiceParameters[static_cast<size_t>(bus)]);
+    for (int bus = 0; bus < Matrix1000Limits::kModulationBusCount; ++bus)
+        addChoiceParametersToMap(PluginDescriptors::MatrixModulationSection::kModulationBusChoiceParameters[static_cast<size_t>(bus)]);
 }
 
 void WidgetFactory::addMasterEditChoiceParametersToMap()
 {
-    addChoiceParametersToMap(PluginDescriptors::kMasterEditChoiceParameters);
+    addChoiceParametersToMap(PluginDescriptors::MasterEditSection::kChoiceParameters);
 }
 
 void WidgetFactory::addStandaloneWidgetsToMap(const std::vector<PluginDescriptors::StandaloneWidgetDescriptor>& widgets)
@@ -331,28 +333,35 @@ void WidgetFactory::addStandaloneWidgetsToMap(const std::vector<PluginDescriptor
 
 void WidgetFactory::addPatchEditStandaloneWidgetsToMap()
 {
-    addStandaloneWidgetsToMap(PluginDescriptors::kDco1StandaloneWidgets);
-    addStandaloneWidgetsToMap(PluginDescriptors::kDco2StandaloneWidgets);
-    addStandaloneWidgetsToMap(PluginDescriptors::kVcfVcaStandaloneWidgets);
-    addStandaloneWidgetsToMap(PluginDescriptors::kFmTrackStandaloneWidgets);
-    addStandaloneWidgetsToMap(PluginDescriptors::kRampPortamentoStandaloneWidgets);
-    addStandaloneWidgetsToMap(PluginDescriptors::kEnv1StandaloneWidgets);
-    addStandaloneWidgetsToMap(PluginDescriptors::kEnv2StandaloneWidgets);
-    addStandaloneWidgetsToMap(PluginDescriptors::kEnv3StandaloneWidgets);
-    addStandaloneWidgetsToMap(PluginDescriptors::kLfo1StandaloneWidgets);
-    addStandaloneWidgetsToMap(PluginDescriptors::kLfo2StandaloneWidgets);
+    addStandaloneWidgetsToMap(PluginDescriptors::PatchEditSection::Dco1Module::kStandaloneWidgets);
+    addStandaloneWidgetsToMap(PluginDescriptors::PatchEditSection::Dco2Module::kStandaloneWidgets);
+    addStandaloneWidgetsToMap(PluginDescriptors::PatchEditSection::VcfVcaModule::kStandaloneWidgets);
+    addStandaloneWidgetsToMap(PluginDescriptors::PatchEditSection::FmTrackModule::kStandaloneWidgets);
+    addStandaloneWidgetsToMap(PluginDescriptors::PatchEditSection::RampPortamentoModule::kStandaloneWidgets);
+    addStandaloneWidgetsToMap(PluginDescriptors::PatchEditSection::Envelope1Module::kStandaloneWidgets);
+    addStandaloneWidgetsToMap(PluginDescriptors::PatchEditSection::Envelope2Module::kStandaloneWidgets);
+    addStandaloneWidgetsToMap(PluginDescriptors::PatchEditSection::Envelope3Module::kStandaloneWidgets);
+    addStandaloneWidgetsToMap(PluginDescriptors::PatchEditSection::Lfo1Module::kStandaloneWidgets);
+    addStandaloneWidgetsToMap(PluginDescriptors::PatchEditSection::Lfo2Module::kStandaloneWidgets);
+}
+
+void WidgetFactory::addMatrixModulationStandaloneWidgetsToMap()
+{
+    addStandaloneWidgetsToMap(PluginDescriptors::MatrixModulationSection::kStandaloneWidgets);
+    for (int bus = 0; bus < Matrix1000Limits::kModulationBusCount; ++bus)
+        addStandaloneWidgetsToMap(PluginDescriptors::MatrixModulationSection::kModulationBusStandaloneWidgets[static_cast<size_t>(bus)]);
 }
 
 void WidgetFactory::addPatchManagerStandaloneWidgetsToMap()
 {
-    addStandaloneWidgetsToMap(PluginDescriptors::kBankUtilityWidgets);
-    addStandaloneWidgetsToMap(PluginDescriptors::kInternalPatchesWidgets);
-    addStandaloneWidgetsToMap(PluginDescriptors::kComputerPatchesWidgets);
-    addStandaloneWidgetsToMap(PluginDescriptors::kPatchMutatorWidgets);
+    addStandaloneWidgetsToMap(PluginDescriptors::PatchManagerSection::BankUtilityModule::kStandaloneWidgets);
+    addStandaloneWidgetsToMap(PluginDescriptors::PatchManagerSection::InternalPatchesModule::kStandaloneWidgets);
+    addStandaloneWidgetsToMap(PluginDescriptors::PatchManagerSection::ComputerPatchesModule::kStandaloneWidgets);
+    addStandaloneWidgetsToMap(PluginDescriptors::PatchManagerSection::PatchMutatorModule::kStandaloneWidgets);
 }
 
 void WidgetFactory::addMasterEditStandaloneWidgetsToMap()
 {
-    addStandaloneWidgetsToMap(PluginDescriptors::kMasterEditStandaloneWidgets);
+    addStandaloneWidgetsToMap(PluginDescriptors::MasterEditSection::kStandaloneWidgets);
 }
 

@@ -69,6 +69,7 @@ private:
     void addMatrixModulationBusChoiceParametersToMap();
     void addMasterEditChoiceParametersToMap();
     void addPatchEditStandaloneWidgetsToMap();
+    void addMatrixModulationStandaloneWidgetsToMap();
     void addPatchManagerStandaloneWidgetsToMap();
     void addMasterEditStandaloneWidgetsToMap();
     

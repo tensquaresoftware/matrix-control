@@ -7,6 +7,8 @@
 
 #include <array>
 
+#include "Matrix1000Limits.h"
+
 namespace PluginIDs
 {
     namespace Mode
@@ -341,8 +343,7 @@ namespace PluginIDs
 
     namespace MatrixModulationSection
     {
-        constexpr const char* kGroupId    = "matrixModulationSection";
-        constexpr int kModulationBusCount = 10;
+        constexpr const char* kGroupId = "matrixModulationSection";
 
         namespace StandaloneWidgets
         {
@@ -419,6 +420,19 @@ namespace PluginIDs
                 constexpr const char* kBus9Destination = "modulationBus9Destination";
             }
         }
+
+        inline const std::array<const char*, Matrix1000Limits::kModulationBusCount> kModulationBusGroupIds = {
+            ModulationBus::kBus0,
+            ModulationBus::kBus1,
+            ModulationBus::kBus2,
+            ModulationBus::kBus3,
+            ModulationBus::kBus4,
+            ModulationBus::kBus5,
+            ModulationBus::kBus6,
+            ModulationBus::kBus7,
+            ModulationBus::kBus8,
+            ModulationBus::kBus9
+        };
     }
 
     namespace PatchManagerSection
@@ -503,29 +517,12 @@ namespace PluginIDs
                 constexpr const char* kVcfVca         = "patchMutatorVcfVca";
                 constexpr const char* kFmTrack        = "patchMutatorFmTrack";
                 constexpr const char* kRampPortamento = "patchMutatorRampPortamento";
-                constexpr const char* kEnvelope1     = "patchMutatorEnvelope1";
-                constexpr const char* kEnvelope2     = "patchMutatorEnvelope2";
-                constexpr const char* kEnvelope3     = "patchMutatorEnvelope3";
+                constexpr const char* kEnvelope1      = "patchMutatorEnvelope1";
+                constexpr const char* kEnvelope2      = "patchMutatorEnvelope2";
+                constexpr const char* kEnvelope3      = "patchMutatorEnvelope3";
                 constexpr const char* kLfo1           = "patchMutatorLfo1";
                 constexpr const char* kLfo2           = "patchMutatorLfo2";
             }
         }
     }
-
-    // ============================================================================
-    // Derived Arrays for Iteration
-    // ============================================================================
-
-    inline const std::array<const char*, MatrixModulationSection::kModulationBusCount> kModulationBusGroupIds = {
-        MatrixModulationSection::ModulationBus::kBus0,
-        MatrixModulationSection::ModulationBus::kBus1,
-        MatrixModulationSection::ModulationBus::kBus2,
-        MatrixModulationSection::ModulationBus::kBus3,
-        MatrixModulationSection::ModulationBus::kBus4,
-        MatrixModulationSection::ModulationBus::kBus5,
-        MatrixModulationSection::ModulationBus::kBus6,
-        MatrixModulationSection::ModulationBus::kBus7,
-        MatrixModulationSection::ModulationBus::kBus8,
-        MatrixModulationSection::ModulationBus::kBus9
-    };
 }

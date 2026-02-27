@@ -14,6 +14,7 @@
 #include "GUI/Panels/Reusable/ParameterPanel.h"
 #include "GUI/Widgets/Slider.h"
 #include "Shared/PluginDescriptors.h"
+#include "Shared/PluginHelpers.h"
 #include "Shared/PluginDimensions.h"
 #include "GUI/Factories/WidgetFactory.h"
 
@@ -42,7 +43,7 @@ PatchEditPanel::PatchEditPanel(tss::Skin& skin, WidgetFactory& widgetFactory, ju
         skin, 
         PluginDimensions::Widgets::Widths::SectionHeader::kPatchEdit,
         PluginDimensions::Widgets::Heights::kSectionHeader,
-        PluginDescriptors::getSectionDisplayName(PluginIDs::PatchEditSection::kGroupId)))
+        PluginHelpers::getSectionDisplayName(PluginIDs::PatchEditSection::kGroupId)))
     , topPanel_(std::make_unique<TopPanel>(skin, widgetFactory, apvts))
     , middlePanel_(std::make_unique<MiddlePanel>(skin, apvts))
     , bottomPanel_(std::make_unique<BottomPanel>(skin, widgetFactory, apvts))

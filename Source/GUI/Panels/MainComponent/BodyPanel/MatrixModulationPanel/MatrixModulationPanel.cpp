@@ -6,6 +6,7 @@
 #include "GUI/Widgets/Button.h"
 #include "GUI/Panels/Reusable/ModulationBusPanel.h"
 #include "Shared/PluginDescriptors.h"
+#include "Shared/PluginHelpers.h"
 #include "Shared/PluginDimensions.h"
 #include "GUI/Factories/WidgetFactory.h"
 
@@ -19,7 +20,7 @@ MatrixModulationPanel::MatrixModulationPanel(tss::Skin& skin, WidgetFactory& wid
         skin,
         PluginDimensions::Widgets::Widths::SectionHeader::kMatrixModulation,
         PluginDimensions::Widgets::Heights::kSectionHeader,
-        PluginDescriptors::getSectionDisplayName(PluginIDs::MatrixModulationSection::kGroupId)))
+        PluginHelpers::getSectionDisplayName(PluginIDs::MatrixModulationSection::kGroupId)))
     , modulationBusHeader_(std::make_unique<tss::ModulationBusHeader>(
         skin,
         PluginDimensions::Widgets::Widths::ModulationBusHeader::kStandard,
@@ -33,8 +34,8 @@ MatrixModulationPanel::MatrixModulationPanel(tss::Skin& skin, WidgetFactory& wid
 
     createInitAllBussesButton(skin);
 
-    modulationBuses_.reserve(PluginIDs::MatrixModulationSection::kModulationBusCount);
-    for (int busNumber = 0; busNumber < PluginIDs::MatrixModulationSection::kModulationBusCount; ++busNumber)
+    modulationBuses_.reserve(Matrix1000Limits::kModulationBusCount);
+    for (int busNumber = 0; busNumber < Matrix1000Limits::kModulationBusCount; ++busNumber)
     {
         const auto busNumberAsSizeT = static_cast<size_t>(busNumber);
         auto bus = std::make_unique<ModulationBusPanel>(
@@ -53,7 +54,7 @@ MatrixModulationPanel::MatrixModulationPanel(tss::Skin& skin, WidgetFactory& wid
     setSize(getWidth(), getHeight());
 }
 
-std::array<const char*, PluginIDs::MatrixModulationSection::kModulationBusCount> MatrixModulationPanel::createBusIds() const
+std::array<const char*, Matrix1000Limits::kModulationBusCount> MatrixModulationPanel::createBusIds() const
 {
     return {
         PluginIDs::MatrixModulationSection::ModulationBus::kBus0,
@@ -69,7 +70,7 @@ std::array<const char*, PluginIDs::MatrixModulationSection::kModulationBusCount>
     };
 }
 
-std::array<const char*, PluginIDs::MatrixModulationSection::kModulationBusCount> MatrixModulationPanel::createSourceParameterIds() const
+std::array<const char*, Matrix1000Limits::kModulationBusCount> MatrixModulationPanel::createSourceParameterIds() const
 {
     return {
         PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus0Source,
@@ -85,7 +86,7 @@ std::array<const char*, PluginIDs::MatrixModulationSection::kModulationBusCount>
     };
 }
 
-std::array<const char*, PluginIDs::MatrixModulationSection::kModulationBusCount> MatrixModulationPanel::createAmountParameterIds() const
+std::array<const char*, Matrix1000Limits::kModulationBusCount> MatrixModulationPanel::createAmountParameterIds() const
 {
     return {
         PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus0Amount,
@@ -101,7 +102,7 @@ std::array<const char*, PluginIDs::MatrixModulationSection::kModulationBusCount>
     };
 }
 
-std::array<const char*, PluginIDs::MatrixModulationSection::kModulationBusCount> MatrixModulationPanel::createDestinationParameterIds() const
+std::array<const char*, Matrix1000Limits::kModulationBusCount> MatrixModulationPanel::createDestinationParameterIds() const
 {
     return {
         PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus0Destination,

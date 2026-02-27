@@ -714,12 +714,14 @@ constexpr int kBufferSize {calculateSize(256)};
 
 Lorsque je crée des fichiers Markdown lors de plans de refactorisation, optimisations ou autres opérations planifiées, je les stocke **directement** dans :
 
-`Documentation/Development/Refactorisation/`
+`Documentation/Development/Plans/`
+
+Le dossier **Plans** doit être **compartimenté en sous-dossiers par année** : `2025`, `2026`, etc. Chaque fichier de plan est placé dans le sous-dossier de l'année correspondant à la date du plan (ex. un plan daté du 2026-02-23 → `Documentation/Development/Plans/2026/`).
 
 **⚠️ Procédure importante :**
-- Si Cursor génère automatiquement un plan dans `~/.cursor/plans/*.plan.md`, je dois **immédiatement** le copier dans `Documentation/Development/Refactorisation/` avec la convention de nommage ci-dessous
+- Si Cursor génère automatiquement un plan dans `~/.cursor/plans/*.plan.md`, je dois **immédiatement** le copier dans `Documentation/Development/Plans/<année>/` (ex. `Plans/2026/`) avec la convention de nommage ci-dessous
 - Cette copie doit être incluse dans les TODOs du plan et marquée comme terminée dès que c'est fait
-- **Dès que tous les TODOs du plan sont marqués `completed`**, je dois **copier** le fichier `.plan.md` final de `~/.cursor/plans/` vers `Documentation/Development/Refactorisation/` avec le bon nom (écrasant la copie initiale si nécessaire)
+- **Dès que tous les TODOs du plan sont marqués `completed`**, je dois **copier** le fichier `.plan.md` final de `~/.cursor/plans/` vers `Documentation/Development/Plans/<année>/` avec le bon nom (écrasant la copie initiale si nécessaire)
 - Garder les fichiers originaux dans `~/.cursor/plans/` pour ne pas perturber Cursor
 - Toujours avoir une version finale archivée dans le projet avec tous les TODOs à jour
 
@@ -732,7 +734,7 @@ Lorsque je crée des fichiers Markdown lors de plans de refactorisation, optimis
 - **Pas de mots d'arrêt** (de, la, l', the, of, etc.)
 - **Noms explicites** reflétant le contenu du document
 
-**Exemple :** `2026-02-03-Theme-To-Skin-Migration-Phase-Six-Summary.md`
+**Exemple :** `Documentation/Development/Plans/2026/2026-02-03-Theme-To-Skin-Migration-Phase-Six-Summary.md`
 
 ---
 

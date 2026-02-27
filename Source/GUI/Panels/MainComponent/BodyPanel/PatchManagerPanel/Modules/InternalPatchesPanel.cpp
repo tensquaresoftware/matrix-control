@@ -185,8 +185,8 @@ void InternalPatchesPanel::setupCurrentBankNumberBox(tss::Skin& skin)
         skin,
         PluginDimensions::Widgets::Widths::NumberBox::kPatchManagerBankNumber,
         false,
-        PluginDescriptors::Matrix1000Limits::kMinBankNumber,
-        PluginDescriptors::Matrix1000Limits::kMaxBankNumber);
+        Matrix1000Limits::kMinBankNumber,
+        Matrix1000Limits::kMaxBankNumber);
     currentBankNumber->setShowDot(true);
     addAndMakeVisible(*currentBankNumber);
 }
@@ -197,8 +197,8 @@ void InternalPatchesPanel::setupCurrentPatchNumberBox(tss::Skin& skin)
         skin,
         PluginDimensions::Widgets::Widths::NumberBox::kPatchManagerPatchNumber,
         true,
-        PluginDescriptors::Matrix1000Limits::kMinPatchNumber,
-        PluginDescriptors::Matrix1000Limits::kMaxPatchNumber);
+        Matrix1000Limits::kMinPatchNumber,
+        Matrix1000Limits::kMaxPatchNumber);
     
     // Callback pour envoyer la valeur via Property (comme les boutons)
     currentPatchNumber->setOnValueChanged([this](int newValue)

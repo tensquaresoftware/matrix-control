@@ -70,7 +70,7 @@ void ModulationBusPanel::createAmountSlider(WidgetFactory& factory, tss::Skin& s
 void ModulationBusPanel::createDestinationComboBox(int busNumber, tss::Skin& skin, const juce::String& destinationParamId, juce::AudioProcessorValueTreeState& apvts)
 {
     const auto busNumberAsSizeT = static_cast<size_t>(busNumber);
-    const auto& destinationDesc = PluginDescriptors::kModulationBusChoiceParameters[busNumberAsSizeT][1];
+    const auto& destinationDesc = PluginDescriptors::MatrixModulationSection::kModulationBusChoiceParameters[busNumberAsSizeT][1];
 
     destinationComboBox_ = std::make_unique<tss::ComboBox>(
         skin,

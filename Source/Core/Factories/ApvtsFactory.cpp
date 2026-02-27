@@ -3,6 +3,7 @@
 #include <set>
 #include <functional>
 
+#include "Shared/PluginHelpers.h"
 #include "Shared/PluginIDs.h"
 
 juce::AudioProcessorValueTreeState::ParameterLayout ApvtsFactory::createParameterLayout()
@@ -124,20 +125,20 @@ std::vector<PluginDescriptors::IntParameterDescriptor> ApvtsFactory::getAllIntPa
         allParams.insert(allParams.end(), params.begin(), params.end());
     };
 
-    addParams(PluginDescriptors::kDco1IntParameters);
-    addParams(PluginDescriptors::kDco2IntParameters);
-    addParams(PluginDescriptors::kVcfVcaIntParameters);
-    addParams(PluginDescriptors::kFmTrackIntParameters);
-    addParams(PluginDescriptors::kRampPortamentoIntParameters);
-    addParams(PluginDescriptors::kEnv1IntParameters);
-    addParams(PluginDescriptors::kEnv2IntParameters);
-    addParams(PluginDescriptors::kEnv3IntParameters);
-    addParams(PluginDescriptors::kLfo1IntParameters);
-    addParams(PluginDescriptors::kLfo2IntParameters);
+    addParams(PluginDescriptors::PatchEditSection::Dco1Module::kIntParameters);
+    addParams(PluginDescriptors::PatchEditSection::Dco2Module::kIntParameters);
+    addParams(PluginDescriptors::PatchEditSection::VcfVcaModule::kIntParameters);
+    addParams(PluginDescriptors::PatchEditSection::FmTrackModule::kIntParameters);
+    addParams(PluginDescriptors::PatchEditSection::RampPortamentoModule::kIntParameters);
+    addParams(PluginDescriptors::PatchEditSection::Envelope1Module::kIntParameters);
+    addParams(PluginDescriptors::PatchEditSection::Envelope2Module::kIntParameters);
+    addParams(PluginDescriptors::PatchEditSection::Envelope3Module::kIntParameters);
+    addParams(PluginDescriptors::PatchEditSection::Lfo1Module::kIntParameters);
+    addParams(PluginDescriptors::PatchEditSection::Lfo2Module::kIntParameters);
 
     addMatrixModulationBusIntParameters(allParams);
 
-    addParams(PluginDescriptors::kMasterEditIntParameters);
+    addParams(PluginDescriptors::MasterEditSection::kIntParameters);
 
     return allParams;
 }
@@ -151,20 +152,20 @@ std::vector<PluginDescriptors::ChoiceParameterDescriptor> ApvtsFactory::getAllCh
         allParams.insert(allParams.end(), params.begin(), params.end());
     };
 
-    addParams(PluginDescriptors::kDco1ChoiceParameters);
-    addParams(PluginDescriptors::kDco2ChoiceParameters);
-    addParams(PluginDescriptors::kVcfVcaChoiceParameters);
-    addParams(PluginDescriptors::kFmTrackChoiceParameters);
-    addParams(PluginDescriptors::kRampPortamentoChoiceParameters);
-    addParams(PluginDescriptors::kEnv1ChoiceParameters);
-    addParams(PluginDescriptors::kEnv2ChoiceParameters);
-    addParams(PluginDescriptors::kEnv3ChoiceParameters);
-    addParams(PluginDescriptors::kLfo1ChoiceParameters);
-    addParams(PluginDescriptors::kLfo2ChoiceParameters);
+    addParams(PluginDescriptors::PatchEditSection::Dco1Module::kChoiceParameters);
+    addParams(PluginDescriptors::PatchEditSection::Dco2Module::kChoiceParameters);
+    addParams(PluginDescriptors::PatchEditSection::VcfVcaModule::kChoiceParameters);
+    addParams(PluginDescriptors::PatchEditSection::FmTrackModule::kChoiceParameters);
+    addParams(PluginDescriptors::PatchEditSection::RampPortamentoModule::kChoiceParameters);
+    addParams(PluginDescriptors::PatchEditSection::Envelope1Module::kChoiceParameters);
+    addParams(PluginDescriptors::PatchEditSection::Envelope2Module::kChoiceParameters);
+    addParams(PluginDescriptors::PatchEditSection::Envelope3Module::kChoiceParameters);
+    addParams(PluginDescriptors::PatchEditSection::Lfo1Module::kChoiceParameters);
+    addParams(PluginDescriptors::PatchEditSection::Lfo2Module::kChoiceParameters);
 
     addMatrixModulationBusChoiceParameters(allParams);
 
-    addParams(PluginDescriptors::kMasterEditChoiceParameters);
+    addParams(PluginDescriptors::MasterEditSection::kChoiceParameters);
 
     return allParams;
 }
@@ -178,18 +179,21 @@ std::vector<PluginDescriptors::StandaloneWidgetDescriptor> ApvtsFactory::getAllS
         allWidgets.insert(allWidgets.end(), widgets.begin(), widgets.end());
     };
 
-    addWidgets(PluginDescriptors::kDco1StandaloneWidgets);
-    addWidgets(PluginDescriptors::kDco2StandaloneWidgets);
-    addWidgets(PluginDescriptors::kEnv1StandaloneWidgets);
-    addWidgets(PluginDescriptors::kEnv2StandaloneWidgets);
-    addWidgets(PluginDescriptors::kEnv3StandaloneWidgets);
-    addWidgets(PluginDescriptors::kLfo1StandaloneWidgets);
-    addWidgets(PluginDescriptors::kLfo2StandaloneWidgets);
-    addWidgets(PluginDescriptors::kBankUtilityWidgets);
-    addWidgets(PluginDescriptors::kInternalPatchesWidgets);
-    addWidgets(PluginDescriptors::kComputerPatchesWidgets);
-    addWidgets(PluginDescriptors::kPatchMutatorWidgets);
-    addWidgets(PluginDescriptors::kMasterEditStandaloneWidgets);
+    addWidgets(PluginDescriptors::PatchEditSection::Dco1Module::kStandaloneWidgets);
+    addWidgets(PluginDescriptors::PatchEditSection::Dco2Module::kStandaloneWidgets);
+    addWidgets(PluginDescriptors::PatchEditSection::Envelope1Module::kStandaloneWidgets);
+    addWidgets(PluginDescriptors::PatchEditSection::Envelope2Module::kStandaloneWidgets);
+    addWidgets(PluginDescriptors::PatchEditSection::Envelope3Module::kStandaloneWidgets);
+    addWidgets(PluginDescriptors::PatchEditSection::Lfo1Module::kStandaloneWidgets);
+    addWidgets(PluginDescriptors::PatchEditSection::Lfo2Module::kStandaloneWidgets);
+    addWidgets(PluginDescriptors::MatrixModulationSection::kStandaloneWidgets);
+    for (int bus = 0; bus < Matrix1000Limits::kModulationBusCount; ++bus)
+        addWidgets(PluginDescriptors::MatrixModulationSection::kModulationBusStandaloneWidgets[static_cast<size_t>(bus)]);
+    addWidgets(PluginDescriptors::PatchManagerSection::BankUtilityModule::kStandaloneWidgets);
+    addWidgets(PluginDescriptors::PatchManagerSection::InternalPatchesModule::kStandaloneWidgets);
+    addWidgets(PluginDescriptors::PatchManagerSection::ComputerPatchesModule::kStandaloneWidgets);
+    addWidgets(PluginDescriptors::PatchManagerSection::PatchMutatorModule::kStandaloneWidgets);
+    addWidgets(PluginDescriptors::MasterEditSection::kStandaloneWidgets);
 
     return allWidgets;
 }
@@ -210,7 +214,7 @@ const char* ApvtsFactory::getBusId(int busNumber)
         PluginIDs::MatrixModulationSection::ModulationBus::kBus9
     };
     
-    jassert(busNumber >= 0 && busNumber < PluginIDs::MatrixModulationSection::kModulationBusCount);
+    jassert(busNumber >= 0 && busNumber < Matrix1000Limits::kModulationBusCount);
     return busIds[busNumber];
 }
 
@@ -243,81 +247,81 @@ void ApvtsFactory::addPatchEditParameters(juce::AudioProcessorParameterGroup& pa
     addModuleParameters(
         patchEditGroup,
         PluginIDs::PatchEditSection::Dco1Module::kGroupId,
-        PluginDescriptors::getGroupDisplayName(PluginIDs::PatchEditSection::Dco1Module::kGroupId).toRawUTF8(),
-        PluginDescriptors::kDco1IntParameters,
-        PluginDescriptors::kDco1ChoiceParameters
+        PluginHelpers::getGroupDisplayName(PluginIDs::PatchEditSection::Dco1Module::kGroupId).toRawUTF8(),
+        PluginDescriptors::PatchEditSection::Dco1Module::kIntParameters,
+        PluginDescriptors::PatchEditSection::Dco1Module::kChoiceParameters
     );
     
     addModuleParameters(
         patchEditGroup,
         PluginIDs::PatchEditSection::Dco2Module::kGroupId,
-        PluginDescriptors::getGroupDisplayName(PluginIDs::PatchEditSection::Dco2Module::kGroupId).toRawUTF8(),
-        PluginDescriptors::kDco2IntParameters,
-        PluginDescriptors::kDco2ChoiceParameters
+        PluginHelpers::getGroupDisplayName(PluginIDs::PatchEditSection::Dco2Module::kGroupId).toRawUTF8(),
+        PluginDescriptors::PatchEditSection::Dco2Module::kIntParameters,
+        PluginDescriptors::PatchEditSection::Dco2Module::kChoiceParameters
     );
     
     addModuleParameters(
         patchEditGroup,
         PluginIDs::PatchEditSection::VcfVcaModule::kGroupId,
-        PluginDescriptors::getGroupDisplayName(PluginIDs::PatchEditSection::VcfVcaModule::kGroupId).toRawUTF8(),
-        PluginDescriptors::kVcfVcaIntParameters,
-        PluginDescriptors::kVcfVcaChoiceParameters
+        PluginHelpers::getGroupDisplayName(PluginIDs::PatchEditSection::VcfVcaModule::kGroupId).toRawUTF8(),
+        PluginDescriptors::PatchEditSection::VcfVcaModule::kIntParameters,
+        PluginDescriptors::PatchEditSection::VcfVcaModule::kChoiceParameters
     );
     
     addModuleParameters(
         patchEditGroup,
         PluginIDs::PatchEditSection::FmTrackModule::kGroupId,
-        PluginDescriptors::getGroupDisplayName(PluginIDs::PatchEditSection::FmTrackModule::kGroupId).toRawUTF8(),
-        PluginDescriptors::kFmTrackIntParameters,
-        PluginDescriptors::kFmTrackChoiceParameters
+        PluginHelpers::getGroupDisplayName(PluginIDs::PatchEditSection::FmTrackModule::kGroupId).toRawUTF8(),
+        PluginDescriptors::PatchEditSection::FmTrackModule::kIntParameters,
+        PluginDescriptors::PatchEditSection::FmTrackModule::kChoiceParameters
     );
     
     addModuleParameters(
         patchEditGroup,
         PluginIDs::PatchEditSection::RampPortamentoModule::kGroupId,
-        PluginDescriptors::getGroupDisplayName(PluginIDs::PatchEditSection::RampPortamentoModule::kGroupId).toRawUTF8(),
-        PluginDescriptors::kRampPortamentoIntParameters,
-        PluginDescriptors::kRampPortamentoChoiceParameters
+        PluginHelpers::getGroupDisplayName(PluginIDs::PatchEditSection::RampPortamentoModule::kGroupId).toRawUTF8(),
+        PluginDescriptors::PatchEditSection::RampPortamentoModule::kIntParameters,
+        PluginDescriptors::PatchEditSection::RampPortamentoModule::kChoiceParameters
     );
     
     addModuleParameters(
         patchEditGroup,
         PluginIDs::PatchEditSection::Envelope1Module::kGroupId,
-        PluginDescriptors::getGroupDisplayName(PluginIDs::PatchEditSection::Envelope1Module::kGroupId).toRawUTF8(),
-        PluginDescriptors::kEnv1IntParameters,
-        PluginDescriptors::kEnv1ChoiceParameters
+        PluginHelpers::getGroupDisplayName(PluginIDs::PatchEditSection::Envelope1Module::kGroupId).toRawUTF8(),
+        PluginDescriptors::PatchEditSection::Envelope1Module::kIntParameters,
+        PluginDescriptors::PatchEditSection::Envelope1Module::kChoiceParameters
     );
     
     addModuleParameters(
         patchEditGroup,
         PluginIDs::PatchEditSection::Envelope2Module::kGroupId,
-        PluginDescriptors::getGroupDisplayName(PluginIDs::PatchEditSection::Envelope2Module::kGroupId).toRawUTF8(),
-        PluginDescriptors::kEnv2IntParameters,
-        PluginDescriptors::kEnv2ChoiceParameters
+        PluginHelpers::getGroupDisplayName(PluginIDs::PatchEditSection::Envelope2Module::kGroupId).toRawUTF8(),
+        PluginDescriptors::PatchEditSection::Envelope2Module::kIntParameters,
+        PluginDescriptors::PatchEditSection::Envelope2Module::kChoiceParameters
     );
     
     addModuleParameters(
         patchEditGroup,
         PluginIDs::PatchEditSection::Envelope3Module::kGroupId,
-        PluginDescriptors::getGroupDisplayName(PluginIDs::PatchEditSection::Envelope3Module::kGroupId).toRawUTF8(),
-        PluginDescriptors::kEnv3IntParameters,
-        PluginDescriptors::kEnv3ChoiceParameters
+        PluginHelpers::getGroupDisplayName(PluginIDs::PatchEditSection::Envelope3Module::kGroupId).toRawUTF8(),
+        PluginDescriptors::PatchEditSection::Envelope3Module::kIntParameters,
+        PluginDescriptors::PatchEditSection::Envelope3Module::kChoiceParameters
     );
     
     addModuleParameters(
         patchEditGroup,
         PluginIDs::PatchEditSection::Lfo1Module::kGroupId,
-        PluginDescriptors::getGroupDisplayName(PluginIDs::PatchEditSection::Lfo1Module::kGroupId).toRawUTF8(),
-        PluginDescriptors::kLfo1IntParameters,
-        PluginDescriptors::kLfo1ChoiceParameters
+        PluginHelpers::getGroupDisplayName(PluginIDs::PatchEditSection::Lfo1Module::kGroupId).toRawUTF8(),
+        PluginDescriptors::PatchEditSection::Lfo1Module::kIntParameters,
+        PluginDescriptors::PatchEditSection::Lfo1Module::kChoiceParameters
     );
     
     addModuleParameters(
         patchEditGroup,
         PluginIDs::PatchEditSection::Lfo2Module::kGroupId,
-        PluginDescriptors::getGroupDisplayName(PluginIDs::PatchEditSection::Lfo2Module::kGroupId).toRawUTF8(),
-        PluginDescriptors::kLfo2IntParameters,
-        PluginDescriptors::kLfo2ChoiceParameters
+        PluginHelpers::getGroupDisplayName(PluginIDs::PatchEditSection::Lfo2Module::kGroupId).toRawUTF8(),
+        PluginDescriptors::PatchEditSection::Lfo2Module::kIntParameters,
+        PluginDescriptors::PatchEditSection::Lfo2Module::kChoiceParameters
     );
 }
 
@@ -331,7 +335,7 @@ void ApvtsFactory::addMasterEditParameters(juce::AudioProcessorParameterGroup& m
     std::vector<PluginDescriptors::ChoiceParameterDescriptor> vibratoChoiceParams;
     std::vector<PluginDescriptors::ChoiceParameterDescriptor> miscChoiceParams;
     
-    for (const auto& param : PluginDescriptors::kMasterEditIntParameters)
+    for (const auto& param : PluginDescriptors::MasterEditSection::kIntParameters)
     {
         if (param.parentGroupId == PluginIDs::MasterEditSection::MidiModule::kGroupId)
             midiIntParams.push_back(param);
@@ -341,7 +345,7 @@ void ApvtsFactory::addMasterEditParameters(juce::AudioProcessorParameterGroup& m
             miscIntParams.push_back(param);
     }
     
-    for (const auto& param : PluginDescriptors::kMasterEditChoiceParameters)
+    for (const auto& param : PluginDescriptors::MasterEditSection::kChoiceParameters)
     {
         if (param.parentGroupId == PluginIDs::MasterEditSection::MidiModule::kGroupId)
             midiChoiceParams.push_back(param);
@@ -354,7 +358,7 @@ void ApvtsFactory::addMasterEditParameters(juce::AudioProcessorParameterGroup& m
     addModuleParameters(
         masterEditGroup,
         PluginIDs::MasterEditSection::MidiModule::kGroupId,
-        PluginDescriptors::getGroupDisplayName(PluginIDs::MasterEditSection::MidiModule::kGroupId).toRawUTF8(),
+        PluginHelpers::getGroupDisplayName(PluginIDs::MasterEditSection::MidiModule::kGroupId).toRawUTF8(),
         midiIntParams,
         midiChoiceParams
     );
@@ -362,7 +366,7 @@ void ApvtsFactory::addMasterEditParameters(juce::AudioProcessorParameterGroup& m
     addModuleParameters(
         masterEditGroup,
         PluginIDs::MasterEditSection::VibratoModule::kGroupId,
-        PluginDescriptors::getGroupDisplayName(PluginIDs::MasterEditSection::VibratoModule::kGroupId).toRawUTF8(),
+        PluginHelpers::getGroupDisplayName(PluginIDs::MasterEditSection::VibratoModule::kGroupId).toRawUTF8(),
         vibratoIntParams,
         vibratoChoiceParams
     );
@@ -370,7 +374,7 @@ void ApvtsFactory::addMasterEditParameters(juce::AudioProcessorParameterGroup& m
     addModuleParameters(
         masterEditGroup,
         PluginIDs::MasterEditSection::MiscModule::kGroupId,
-        PluginDescriptors::getGroupDisplayName(PluginIDs::MasterEditSection::MiscModule::kGroupId).toRawUTF8(),
+        PluginHelpers::getGroupDisplayName(PluginIDs::MasterEditSection::MiscModule::kGroupId).toRawUTF8(),
         miscIntParams,
         miscChoiceParams
     );
@@ -378,21 +382,21 @@ void ApvtsFactory::addMasterEditParameters(juce::AudioProcessorParameterGroup& m
 
 void ApvtsFactory::addMatrixModulationParameters(juce::AudioProcessorParameterGroup& matrixModulationGroup)
 {
-    for (int bus = 0; bus < PluginIDs::MatrixModulationSection::kModulationBusCount; ++bus)
+    for (int bus = 0; bus < Matrix1000Limits::kModulationBusCount; ++bus)
     {
         const juce::String busId = getBusId(bus);
-        const juce::String busDisplayName = PluginDescriptors::getGroupDisplayName(busId);
+        const juce::String busDisplayName = PluginHelpers::getGroupDisplayName(busId);
         
         auto busGroup = std::make_unique<juce::AudioProcessorParameterGroup>(
             busId, busDisplayName, kSubgroupSeparator
         );
         
-        for (const auto& paramDesc : PluginDescriptors::kModulationBusIntParameters[static_cast<size_t>(bus)])
+        for (const auto& paramDesc : PluginDescriptors::MatrixModulationSection::kModulationBusIntParameters[static_cast<size_t>(bus)])
         {
             ApvtsFactory::addIntParameter(*busGroup, paramDesc);
         }
         
-        for (const auto& paramDesc : PluginDescriptors::kModulationBusChoiceParameters[static_cast<size_t>(bus)])
+        for (const auto& paramDesc : PluginDescriptors::MatrixModulationSection::kModulationBusChoiceParameters[static_cast<size_t>(bus)])
         {
             ApvtsFactory::addChoiceParameter(*busGroup, paramDesc);
         }
@@ -404,22 +408,22 @@ void ApvtsFactory::addMatrixModulationParameters(juce::AudioProcessorParameterGr
 void ApvtsFactory::addMatrixModulationBusIntParameters(
     std::vector<PluginDescriptors::IntParameterDescriptor>& allParams)
 {
-    for (int bus = 0; bus < PluginIDs::MatrixModulationSection::kModulationBusCount; ++bus)
+    for (int bus = 0; bus < Matrix1000Limits::kModulationBusCount; ++bus)
     {
         allParams.insert(allParams.end(),
-                        PluginDescriptors::kModulationBusIntParameters[static_cast<size_t>(bus)].begin(),
-                        PluginDescriptors::kModulationBusIntParameters[static_cast<size_t>(bus)].end());
+                        PluginDescriptors::MatrixModulationSection::kModulationBusIntParameters[static_cast<size_t>(bus)].begin(),
+                        PluginDescriptors::MatrixModulationSection::kModulationBusIntParameters[static_cast<size_t>(bus)].end());
     }
 }
 
 void ApvtsFactory::addMatrixModulationBusChoiceParameters(
     std::vector<PluginDescriptors::ChoiceParameterDescriptor>& allParams)
 {
-    for (int bus = 0; bus < PluginIDs::MatrixModulationSection::kModulationBusCount; ++bus)
+    for (int bus = 0; bus < Matrix1000Limits::kModulationBusCount; ++bus)
     {
         allParams.insert(allParams.end(),
-                        PluginDescriptors::kModulationBusChoiceParameters[static_cast<size_t>(bus)].begin(),
-                        PluginDescriptors::kModulationBusChoiceParameters[static_cast<size_t>(bus)].end());
+                        PluginDescriptors::MatrixModulationSection::kModulationBusChoiceParameters[static_cast<size_t>(bus)].begin(),
+                        PluginDescriptors::MatrixModulationSection::kModulationBusChoiceParameters[static_cast<size_t>(bus)].end());
     }
 }
 
