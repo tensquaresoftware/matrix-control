@@ -19,8 +19,8 @@ public:
     Dco2Panel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~Dco2Panel() override = default;
 
-    static int getWidth() { return PluginDimensions::Panels::PatchEditPanel::TopPanel::ChildPanels::kWidth; }
-    static int getHeight() { return PluginDimensions::Panels::PatchEditPanel::TopPanel::ChildPanels::kHeight; }
+    static int getWidth() { return PluginDimensions::Panels::Body::PatchEdit::Top::ChildPanels::kWidth; }
+    static int getHeight() { return PluginDimensions::Panels::Body::PatchEdit::Top::ChildPanels::kHeight; }
 
 private:
     static ModulePanelConfig createConfig();

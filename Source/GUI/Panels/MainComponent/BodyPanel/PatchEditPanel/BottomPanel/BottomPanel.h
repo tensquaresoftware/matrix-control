@@ -32,9 +32,9 @@ public:
     Env2Panel* getEnv2Panel() { return env2Panel_.get(); }
     Env3Panel* getEnv3Panel() { return env3Panel_.get(); }
 
-    static int getWidth() { return PluginDimensions::Panels::PatchEditPanel::BottomPanel::kWidth; }
-    static int getHeight() { return PluginDimensions::Panels::PatchEditPanel::BottomPanel::kHeight; }
-    static int getSpacing() { return PluginDimensions::Panels::BodyPanel::kPadding; }
+    static int getWidth() { return PluginDimensions::Panels::Body::PatchEdit::Bottom::kWidth; }
+    static int getHeight() { return PluginDimensions::Panels::Body::PatchEdit::Bottom::kHeight; }
+    static int getSpacing() { return PluginDimensions::Panels::Body::kPadding; }
 
 private:
 

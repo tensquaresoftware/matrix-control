@@ -19,8 +19,8 @@ public:
     MidiPanel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~MidiPanel() override = default;
 
-    static int getWidth() { return PluginDimensions::Panels::MasterEditPanel::ChildPanels::kWidth; }
-    static int getHeight() { return PluginDimensions::Panels::MasterEditPanel::MidiPanel::kHeight; }
+    static int getWidth() { return PluginDimensions::Panels::Body::MasterEdit::ChildPanels::kWidth; }
+    static int getHeight() { return PluginDimensions::Panels::Body::MasterEdit::Midi::kHeight; }
 
 private:
     static ModulePanelConfig createConfig();

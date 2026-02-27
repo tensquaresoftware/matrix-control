@@ -31,8 +31,8 @@ public:
     
     void sliderValueChanged(juce::Slider* slider) override;
 
-    static int getWidth() { return PluginDimensions::Panels::PatchEditPanel::kWidth; }
-    static int getHeight() { return PluginDimensions::Panels::PatchEditPanel::kHeight; }
+    static int getWidth() { return PluginDimensions::Panels::Body::PatchEdit::kWidth; }
+    static int getHeight() { return PluginDimensions::Panels::Body::PatchEdit::kHeight; }
 
 private:
     inline constexpr static int kTrackPointSliderStartIndex_ = 3;

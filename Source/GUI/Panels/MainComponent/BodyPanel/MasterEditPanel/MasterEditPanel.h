@@ -27,8 +27,8 @@ public:
     void resized() override;
     void setSkin(tss::Skin& skin);
 
-    static int getWidth() { return PluginDimensions::Panels::MasterEditPanel::kWidth; }
-    static int getHeight() { return PluginDimensions::Panels::MasterEditPanel::kHeight; }
+    static int getWidth() { return PluginDimensions::Panels::Body::MasterEdit::kWidth; }
+    static int getHeight() { return PluginDimensions::Panels::Body::MasterEdit::kHeight; }
 
 private:
     tss::Skin* skin_;

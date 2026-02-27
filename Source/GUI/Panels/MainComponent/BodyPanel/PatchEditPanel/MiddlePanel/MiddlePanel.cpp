@@ -14,17 +14,17 @@ MiddlePanel::~MiddlePanel()
 MiddlePanel::MiddlePanel(tss::Skin& skin, juce::AudioProcessorValueTreeState& apvts)
     : skin_(&skin)
     , apvts_(&apvts)
-    , envelope1Display_(skin, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kWidth, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kHeight)
-    , envelope2Display_(skin, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kWidth, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kHeight)
-    , envelope3Display_(skin, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kWidth, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kHeight)
-    , trackGeneratorDisplay_(skin, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kWidth, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kHeight)
+    , envelope1Display_(skin, PluginDimensions::Panels::Body::PatchEdit::Middle::ChildPanels::kWidth, PluginDimensions::Panels::Body::PatchEdit::Middle::ChildPanels::kHeight)
+    , envelope2Display_(skin, PluginDimensions::Panels::Body::PatchEdit::Middle::ChildPanels::kWidth, PluginDimensions::Panels::Body::PatchEdit::Middle::ChildPanels::kHeight)
+    , envelope3Display_(skin, PluginDimensions::Panels::Body::PatchEdit::Middle::ChildPanels::kWidth, PluginDimensions::Panels::Body::PatchEdit::Middle::ChildPanels::kHeight)
+    , trackGeneratorDisplay_(skin, PluginDimensions::Panels::Body::PatchEdit::Middle::ChildPanels::kWidth, PluginDimensions::Panels::Body::PatchEdit::Middle::ChildPanels::kHeight)
     , patchNameModuleHeader_(skin, PluginDisplayNames::PatchEditSection::PatchNameModule::kName,
-                             PluginDimensions::Panels::PatchEditPanel::MiddlePanel::PatchNameSection::kWidth,
+                             PluginDimensions::Panels::Body::PatchEdit::Middle::ChildPanels::kWidth,
                              PluginDimensions::Widgets::Heights::kModuleHeader,
                              tss::ModuleHeader::ColourVariant::Blue)
     , patchNameDisplay_(skin,
-                        PluginDimensions::Panels::PatchEditPanel::MiddlePanel::PatchNameSection::kPatchNameDisplayWidth,
-                        PluginDimensions::Panels::PatchEditPanel::MiddlePanel::PatchNameSection::kPatchNameDisplayHeight)
+                        PluginDimensions::Panels::Body::PatchEdit::Middle::ChildPanels::kWidth,
+                        PluginDimensions::Panels::Body::PatchEdit::Middle::kPatchNameDisplayHeight)
 {
     setOpaque(false);
     setSize(getWidth(), getHeight());
@@ -43,7 +43,7 @@ MiddlePanel::MiddlePanel(tss::Skin& skin, juce::AudioProcessorValueTreeState& ap
 
 void MiddlePanel::resized()
 {
-    using namespace PluginDimensions::Panels::PatchEditPanel::MiddlePanel;
+    using namespace PluginDimensions::Panels::Body::PatchEdit::Middle;
     const auto childWidth = ChildPanels::kWidth;
     const auto childHeight = ChildPanels::kHeight;
 
@@ -54,10 +54,12 @@ void MiddlePanel::resized()
 
     const auto patchNameSectionX = trackGeneratorDisplay_.getBounds().getRight() + kSpacing;
     const auto moduleHeaderHeight = PluginDimensions::Widgets::Heights::kModuleHeader;
-    patchNameModuleHeader_.setBounds(patchNameSectionX, PatchNameSection::kPaddingTop,
-                                    PatchNameSection::kWidth, moduleHeaderHeight);
-    patchNameDisplay_.setBounds(patchNameSectionX, PatchNameSection::kPaddingTop + moduleHeaderHeight + PatchNameSection::kSpacing,
-                               PatchNameSection::kPatchNameDisplayWidth, PatchNameSection::kPatchNameDisplayHeight);
+    patchNameModuleHeader_.setBounds(patchNameSectionX, kPatchNameSectionPaddingTop,
+                                    patchNameDisplay_.getWidth(), moduleHeaderHeight);
+    patchNameDisplay_.setBounds(patchNameSectionX,
+                               kPatchNameSectionPaddingTop + moduleHeaderHeight + kPatchNameSectionSpacing,
+                               patchNameDisplay_.getWidth(),
+                               patchNameDisplay_.getHeight());
 }
 
 void MiddlePanel::valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,

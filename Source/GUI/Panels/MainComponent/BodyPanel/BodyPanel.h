@@ -29,8 +29,8 @@ public:
     void resized() override;
     void setSkin(tss::Skin& skin);
 
-    static int getHeight() { return PluginDimensions::Panels::BodyPanel::kHeight; }
-    static int getPadding() { return PluginDimensions::Panels::BodyPanel::kPadding; }
+    static int getHeight() { return PluginDimensions::Panels::Body::kHeight; }
+    static int getPadding() { return PluginDimensions::Panels::Body::kPadding; }
 
 private:
     tss::Skin* skin_;

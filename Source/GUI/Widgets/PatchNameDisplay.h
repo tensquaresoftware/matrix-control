@@ -14,7 +14,7 @@ namespace tss
 
         void setSkin(Skin& skin);
         void setPatchName(const juce::String& patchName);
-        
+
         void paint(juce::Graphics& g) override;
 
         int getWidth() const { return width_; }

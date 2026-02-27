@@ -29,8 +29,8 @@ public:
     void resized() override;
     void setSkin(tss::Skin& skin);
 
-    static int getWidth() { return PluginDimensions::Panels::PatchManagerPanel::PatchMutatorPanel::kWidth; }
-    static int getHeight() { return PluginDimensions::Panels::PatchManagerPanel::PatchMutatorPanel::kHeight; }
+    static int getWidth() { return PluginDimensions::Panels::Body::PatchManager::PatchMutator::kWidth; }
+    static int getHeight() { return PluginDimensions::Panels::Body::PatchManager::PatchMutator::kHeight; }
 
 private:
     inline constexpr static int kSpacing_ = 5;

@@ -27,8 +27,8 @@ public:
     void resized() override;
     void setSkin(tss::Skin& skin);
 
-    static int getWidth() { return PluginDimensions::Panels::PatchManagerPanel::ComputerPatchesPanel::kWidth; }
-    static int getHeight() { return PluginDimensions::Panels::PatchManagerPanel::ComputerPatchesPanel::kHeight; }
+    static int getWidth() { return PluginDimensions::Panels::Body::PatchManager::ComputerPatches::kWidth; }
+    static int getHeight() { return PluginDimensions::Panels::Body::PatchManager::ComputerPatches::kHeight; }
 
 private:
     inline constexpr static int kGroupLabelSpacing_ = 10;

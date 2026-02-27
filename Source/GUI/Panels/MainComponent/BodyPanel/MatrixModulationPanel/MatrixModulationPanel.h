@@ -29,8 +29,8 @@ public:
     void resized() override;
     void setSkin(tss::Skin& skin);
 
-    static int getWidth() { return PluginDimensions::Panels::MatrixModulationPanel::kWidth; }
-    static int getHeight() { return PluginDimensions::Panels::MatrixModulationPanel::kHeight; }
+    static int getWidth() { return PluginDimensions::Panels::Body::MatrixModulation::kWidth; }
+    static int getHeight() { return PluginDimensions::Panels::Body::MatrixModulation::kHeight; }
 
 private:
     struct ModulationBusParameterArrays

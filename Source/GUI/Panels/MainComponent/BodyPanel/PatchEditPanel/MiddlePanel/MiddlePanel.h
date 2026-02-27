@@ -38,13 +38,15 @@ public:
     void valueTreeParentChanged(juce::ValueTree&) override {}
     void valueTreeRedirected(juce::ValueTree&) override {}
 
-    static int getWidth() { return PluginDimensions::Panels::PatchEditPanel::MiddlePanel::kWidth; }
-    static int getHeight() { return PluginDimensions::Panels::PatchEditPanel::MiddlePanel::kHeight; }
+    static int getWidth() { return PluginDimensions::Panels::Body::PatchEdit::Middle::kWidth; }
+    static int getHeight() { return PluginDimensions::Panels::Body::PatchEdit::Middle::kHeight; }
 
 private:
     inline constexpr static int kSpacing = 15;
-    inline constexpr static int kTrackPointMax = 63;
     inline constexpr static int kEnvParameterMax = 63;
+    inline constexpr static int kTrackPointMax = 63;
+    inline constexpr static int kPatchNameSectionPaddingTop = 8;
+    inline constexpr static int kPatchNameSectionSpacing = 12;
 
     tss::Skin* skin_;
     juce::AudioProcessorValueTreeState* apvts_ = nullptr;
