@@ -10,6 +10,7 @@
 
 #include <juce_core/juce_core.h>
 
+#include "Matrix1000Limits.h"
 #include "PluginIDs.h"
 #include "PluginDisplayNames.h"
 
@@ -17,168 +18,222 @@
 namespace PluginDescriptors
 {
 
-// ============================================================================
-// Constants
-// ============================================================================
+    // =================================================================================================================
+    // Constants
+    // =================================================================================================================
 
-// Used for root groups (= Plugin Master & Patch Modes) that have no parent
-constexpr const char* kNoParentId = "";
+    // Used for root groups (Master & Patch modes) that have no parent
+    constexpr const char* kNoParentId = "";
 
-// Used for modulation bus parameters that don't have a SysEx ID
-constexpr int kNoSysExId = -1;
+    // Used for modulation bus parameters, which don't have a SysEx ID
+    constexpr int kNoSysExId = -1;
 
-// Matrix-1000 Hardware Limits
-namespace Matrix1000Limits
-{
-    constexpr int kMinBankNumber = 0;
-    constexpr int kMaxBankNumber = 9;
-    constexpr int kMinPatchNumber = 0;
-    constexpr int kMaxPatchNumber = 99;
+
+    // =================================================================================================================
+    // APVTS Group Descriptors
+    // =================================================================================================================
+
+    struct ApvtsGroupDescriptor
+    {
+        juce::String parentId;     // Empty string for root groups (Master & Patch modes)
+        juce::String groupId;
+        juce::String displayName;
+    };
+
+
+    // =================================================================================================================
+    // Parameter Descriptors (APVTS + Widget Creation)
+    // =================================================================================================================
+
+    enum class ParameterType
+    {
+        kInt,   // AudioParameterInt (attached to Slider widgets)
+        kChoice // AudioParameterChoice (attached to ComboBox widgets)
+    };
+
+    struct IntParameterDescriptor
+    {
+        juce::String parameterId;
+        juce::String displayName;
+        juce::String parentGroupId;
+        int minValue;
+        int maxValue;
+        int defaultValue;
+        int sysExOffset;
+        int sysExId;
+    };
+
+    struct ChoiceParameterDescriptor
+    {
+        juce::String parameterId;
+        juce::String displayName;
+        juce::String parentGroupId;
+        juce::StringArray choices;
+        int defaultIndex;
+        int sysExOffset;
+        int sysExId;
+    };
+
+
+    // =================================================================================================================
+    // Standalone Widget Descriptors
+    // =================================================================================================================
+
+    enum class StandaloneWidgetType
+    {
+        kButton,
+        kComboBox,
+        kNumber,
+        kLabel
+    };
+
+    struct StandaloneWidgetDescriptor
+    {
+        juce::String widgetId;
+        juce::String displayName;
+        juce::String parentGroupId;
+        StandaloneWidgetType widgetType;
+    };
+
+
+    // =================================================================================================================
+    // Plugin Descriptor Collections
+    // =================================================================================================================
+
+    extern const std::vector<ApvtsGroupDescriptor> kAllApvtsGroups;
+
+    namespace MasterEditSection
+    {
+        namespace MidiModule
+        {
+            extern const std::vector<IntParameterDescriptor>     kIntParameters;
+            extern const std::vector<ChoiceParameterDescriptor>  kChoiceParameters;
+            extern const std::vector<StandaloneWidgetDescriptor> kStandaloneWidgets;
+        }
+
+        namespace VibratoModule
+        {
+            extern const std::vector<IntParameterDescriptor>     kIntParameters;
+            extern const std::vector<ChoiceParameterDescriptor>  kChoiceParameters;
+            extern const std::vector<StandaloneWidgetDescriptor> kStandaloneWidgets;
+        }
+
+        namespace MiscModule
+        {
+            extern const std::vector<IntParameterDescriptor>     kIntParameters;
+            extern const std::vector<ChoiceParameterDescriptor>  kChoiceParameters;
+            extern const std::vector<StandaloneWidgetDescriptor> kStandaloneWidgets;
+        }
+
+        extern const std::vector<IntParameterDescriptor>     kIntParameters;
+        extern const std::vector<ChoiceParameterDescriptor>  kChoiceParameters;
+        extern const std::vector<StandaloneWidgetDescriptor> kStandaloneWidgets;
+    }
+
+    namespace PatchEditSection
+    {
+        namespace Dco1Module
+        {
+            extern const std::vector<IntParameterDescriptor>     kIntParameters;
+            extern const std::vector<ChoiceParameterDescriptor>  kChoiceParameters;
+            extern const std::vector<StandaloneWidgetDescriptor> kStandaloneWidgets;
+        }
+
+        namespace Dco2Module
+        {
+            extern const std::vector<IntParameterDescriptor>     kIntParameters;
+            extern const std::vector<ChoiceParameterDescriptor>  kChoiceParameters;
+            extern const std::vector<StandaloneWidgetDescriptor> kStandaloneWidgets;
+        }
+
+        namespace VcfVcaModule
+        {
+            extern const std::vector<IntParameterDescriptor>     kIntParameters;
+            extern const std::vector<ChoiceParameterDescriptor>  kChoiceParameters;
+            extern const std::vector<StandaloneWidgetDescriptor> kStandaloneWidgets;
+        }
+
+        namespace FmTrackModule
+        {
+            extern const std::vector<IntParameterDescriptor>     kIntParameters;
+            extern const std::vector<ChoiceParameterDescriptor>  kChoiceParameters;
+            extern const std::vector<StandaloneWidgetDescriptor> kStandaloneWidgets;
+        }
+
+        namespace RampPortamentoModule
+        {
+            extern const std::vector<IntParameterDescriptor>     kIntParameters;
+            extern const std::vector<ChoiceParameterDescriptor>  kChoiceParameters;
+            extern const std::vector<StandaloneWidgetDescriptor> kStandaloneWidgets;
+        }
+
+        namespace Envelope1Module
+        {
+            extern const std::vector<IntParameterDescriptor>     kIntParameters;
+            extern const std::vector<ChoiceParameterDescriptor>  kChoiceParameters;
+            extern const std::vector<StandaloneWidgetDescriptor> kStandaloneWidgets;
+        }
+
+        namespace Envelope2Module
+        {
+            extern const std::vector<IntParameterDescriptor>     kIntParameters;
+            extern const std::vector<ChoiceParameterDescriptor>  kChoiceParameters;
+            extern const std::vector<StandaloneWidgetDescriptor> kStandaloneWidgets;
+        }
+
+        namespace Envelope3Module
+        {
+            extern const std::vector<IntParameterDescriptor>     kIntParameters;
+            extern const std::vector<ChoiceParameterDescriptor>  kChoiceParameters;
+            extern const std::vector<StandaloneWidgetDescriptor> kStandaloneWidgets;
+        }
+
+        namespace Lfo1Module
+        {
+            extern const std::vector<IntParameterDescriptor>     kIntParameters;
+            extern const std::vector<ChoiceParameterDescriptor>  kChoiceParameters;
+            extern const std::vector<StandaloneWidgetDescriptor> kStandaloneWidgets;
+        }
+
+        namespace Lfo2Module
+        {
+            extern const std::vector<IntParameterDescriptor>     kIntParameters;
+            extern const std::vector<ChoiceParameterDescriptor>  kChoiceParameters;
+            extern const std::vector<StandaloneWidgetDescriptor> kStandaloneWidgets;
+        }
+    }
+
+    namespace MatrixModulationSection
+    {
+        // Header standalone widgets
+        extern const std::vector<StandaloneWidgetDescriptor> kStandaloneWidgets;
+
+        // Buses standalone widgets (indexed by bus index 0..kModulationBusCount-1)
+        extern const std::array<std::vector<StandaloneWidgetDescriptor>, ::Matrix1000Limits::kModulationBusCount> kModulationBusStandaloneWidgets;
+        extern const std::array<std::vector<IntParameterDescriptor>, ::Matrix1000Limits::kModulationBusCount>    kModulationBusIntParameters;
+        extern const std::array<std::vector<ChoiceParameterDescriptor>, ::Matrix1000Limits::kModulationBusCount>  kModulationBusChoiceParameters;
+    }
+
+    namespace PatchManagerSection
+    {
+        namespace BankUtilityModule
+        {
+            extern const std::vector<StandaloneWidgetDescriptor> kStandaloneWidgets;
+        }
+
+        namespace InternalPatchesModule
+        {
+            extern const std::vector<StandaloneWidgetDescriptor> kStandaloneWidgets;
+        }
+
+        namespace ComputerPatchesModule
+        {
+            extern const std::vector<StandaloneWidgetDescriptor> kStandaloneWidgets;
+        }
+
+        namespace PatchMutatorModule
+        {
+            extern const std::vector<StandaloneWidgetDescriptor> kStandaloneWidgets;
+        }
+    }
 }
-
-// ============================================================================
-// APVTS Group Descriptors
-// ============================================================================
-
-struct ApvtsGroupDescriptor
-{
-    juce::String parentId;     // Empty string for root groups (= Plugin Modes)
-    juce::String groupId;
-    juce::String displayName;
-};
-
-// ============================================================================
-// Parameter Descriptors
-// ============================================================================
-
-enum class ParameterType
-{
-    kInt,   // AudioParameterInt (attached to Slider)
-    kChoice // AudioParameterChoice (attached to ComboBox)
-};
-
-struct IntParameterDescriptor
-{
-    juce::String parameterId;
-    juce::String displayName;
-    juce::String parentGroupId;
-    int minValue;
-    int maxValue;
-    int defaultValue;
-    int sysExOffset;
-    int sysExId;
-};
-
-struct ChoiceParameterDescriptor
-{
-    juce::String parameterId;
-    juce::String displayName;
-    juce::String parentGroupId;
-    juce::StringArray choices;
-    int defaultIndex;
-    int sysExOffset;
-    int sysExId;
-};
-
-// ============================================================================
-// Standalone Widget Descriptors
-// ============================================================================
-
-enum class StandaloneWidgetType
-{
-    kButton,
-    kComboBox,
-    kNumber,
-    kLabel
-};
-
-struct StandaloneWidgetDescriptor
-{
-    juce::String widgetId;
-    juce::String displayName;
-    juce::String parentGroupId;
-    StandaloneWidgetType widgetType;
-};
-
-// ============================================================================
-// Data Declarations (definitions in PluginDescriptors.cpp)
-// ============================================================================
-
-// All APVTS Groups
-extern const std::vector<ApvtsGroupDescriptor> kAllApvtsGroups;
-
-// Master Edit | Parameter & Standalone Widgets
-extern const std::vector<IntParameterDescriptor> kMasterEditIntParameters;
-extern const std::vector<ChoiceParameterDescriptor> kMasterEditChoiceParameters;
-extern const std::vector<StandaloneWidgetDescriptor> kMasterEditStandaloneWidgets;
-
-// Patch Edit | DCO 1 Parameter Widgets
-extern const std::vector<IntParameterDescriptor> kDco1IntParameters;
-extern const std::vector<ChoiceParameterDescriptor> kDco1ChoiceParameters;
-
-// Patch Edit | DCO 2 Parameter Widgets
-extern const std::vector<IntParameterDescriptor> kDco2IntParameters;
-extern const std::vector<ChoiceParameterDescriptor> kDco2ChoiceParameters;
-
-// Patch Edit | VCF/VCA Parameter Widgets
-extern const std::vector<IntParameterDescriptor> kVcfVcaIntParameters;
-extern const std::vector<ChoiceParameterDescriptor> kVcfVcaChoiceParameters;
-
-// Patch Edit | FM/TRACK Parameter Widgets
-extern const std::vector<IntParameterDescriptor> kFmTrackIntParameters;
-extern const std::vector<ChoiceParameterDescriptor> kFmTrackChoiceParameters;
-
-// Patch Edit | RAMP/PORTAMENTO Parameter Widgets
-extern const std::vector<IntParameterDescriptor> kRampPortamentoIntParameters;
-extern const std::vector<ChoiceParameterDescriptor> kRampPortamentoChoiceParameters;
-
-// Patch Edit | ENV 1 Parameter Widgets
-extern const std::vector<IntParameterDescriptor> kEnv1IntParameters;
-extern const std::vector<ChoiceParameterDescriptor> kEnv1ChoiceParameters;
-
-// Patch Edit | ENV 2 Parameter Widgets
-extern const std::vector<IntParameterDescriptor> kEnv2IntParameters;
-extern const std::vector<ChoiceParameterDescriptor> kEnv2ChoiceParameters;
-
-// Patch Edit | ENV 3 Parameter Widgets
-extern const std::vector<IntParameterDescriptor> kEnv3IntParameters;
-extern const std::vector<ChoiceParameterDescriptor> kEnv3ChoiceParameters;
-
-// Patch Edit | LFO 1 Parameter Widgets
-extern const std::vector<IntParameterDescriptor> kLfo1IntParameters;
-extern const std::vector<ChoiceParameterDescriptor> kLfo1ChoiceParameters;
-
-// Patch Edit | LFO 2 Parameter Widgets
-extern const std::vector<IntParameterDescriptor> kLfo2IntParameters;
-extern const std::vector<ChoiceParameterDescriptor> kLfo2ChoiceParameters;
-
-// Patch Edit | Standalone Widgets
-extern const std::vector<StandaloneWidgetDescriptor> kDco1StandaloneWidgets;
-extern const std::vector<StandaloneWidgetDescriptor> kDco2StandaloneWidgets;
-extern const std::vector<StandaloneWidgetDescriptor> kVcfVcaStandaloneWidgets;
-extern const std::vector<StandaloneWidgetDescriptor> kFmTrackStandaloneWidgets;
-extern const std::vector<StandaloneWidgetDescriptor> kRampPortamentoStandaloneWidgets;
-extern const std::vector<StandaloneWidgetDescriptor> kEnv1StandaloneWidgets;
-extern const std::vector<StandaloneWidgetDescriptor> kEnv2StandaloneWidgets;
-extern const std::vector<StandaloneWidgetDescriptor> kEnv3StandaloneWidgets;
-extern const std::vector<StandaloneWidgetDescriptor> kLfo1StandaloneWidgets;
-extern const std::vector<StandaloneWidgetDescriptor> kLfo2StandaloneWidgets;
-
-// Matrix Modulation | Parameter Widgets
-extern const std::array<std::vector<IntParameterDescriptor>, PluginIDs::MatrixModulationSection::kModulationBusCount> kModulationBusIntParameters;
-extern const std::array<std::vector<ChoiceParameterDescriptor>, PluginIDs::MatrixModulationSection::kModulationBusCount> kModulationBusChoiceParameters;
-
-// Patch Manager | Standalone Widgets
-extern const std::vector<StandaloneWidgetDescriptor> kBankUtilityWidgets;
-extern const std::vector<StandaloneWidgetDescriptor> kInternalPatchesWidgets;
-extern const std::vector<StandaloneWidgetDescriptor> kComputerPatchesWidgets;
-extern const std::vector<StandaloneWidgetDescriptor> kPatchMutatorWidgets;
-
-// ============================================================================
-// Helper Functions
-// ============================================================================
-
-juce::String getGroupDisplayName(const juce::String& groupId);
-juce::String getSectionDisplayName(const char* sectionId);
-
-} // namespace PluginDescriptors
