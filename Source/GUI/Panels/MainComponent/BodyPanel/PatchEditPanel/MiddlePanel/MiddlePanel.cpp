@@ -3,6 +3,7 @@
 #include "GUI/Skins/Skin.h"
 #include "Shared/PluginDescriptors.h"
 #include "Shared/PluginDisplayNames.h"
+#include "Shared/PluginDimensions.h"
 
 
 MiddlePanel::~MiddlePanel()
@@ -11,8 +12,10 @@ MiddlePanel::~MiddlePanel()
         apvts_->state.removeListener(this);
 }
 
-MiddlePanel::MiddlePanel(tss::Skin& skin, juce::AudioProcessorValueTreeState& apvts)
-    : skin_(&skin)
+MiddlePanel::MiddlePanel(tss::Skin& skin, int width, int height, juce::AudioProcessorValueTreeState& apvts)
+    : width_(width)
+    , height_(height)
+    , skin_(&skin)
     , apvts_(&apvts)
     , envelope1Display_(skin, PluginDimensions::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kWidth, PluginDimensions::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kHeight)
     , envelope2Display_(skin, PluginDimensions::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kWidth, PluginDimensions::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kHeight)
@@ -27,7 +30,7 @@ MiddlePanel::MiddlePanel(tss::Skin& skin, juce::AudioProcessorValueTreeState& ap
                         PluginDimensions::Widgets::Heights::kPatchNameDisplay)
 {
     setOpaque(false);
-    setSize(getWidth(), getHeight());
+    setSize(width_, height_);
 
     apvts_->state.addListener(this);
     syncTrackGeneratorDisplayFromApvts();

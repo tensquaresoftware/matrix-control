@@ -32,7 +32,7 @@ ModulePanelConfig Lfo2Panel::createConfig()
     return config;
 }
 
-Lfo2Panel::Lfo2Panel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
-    : BaseModulePanel(skin, widgetFactory, apvts, createConfig(), getWidth(), getHeight())
+Lfo2Panel::Lfo2Panel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+    : BaseModulePanel(skin, widgetFactory, apvts, createConfig(), width, height)
 {
 }

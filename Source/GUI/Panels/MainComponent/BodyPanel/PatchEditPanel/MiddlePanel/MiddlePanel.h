@@ -7,7 +7,6 @@
 #include "GUI/Widgets/ModuleHeader.h"
 #include "GUI/Widgets/PatchNameDisplay.h"
 #include "GUI/Widgets/TrackGeneratorDisplay.h"
-#include "Shared/PluginDimensions.h"
 #include "Shared/PluginDisplayNames.h"
 
 namespace tss
@@ -19,7 +18,7 @@ class MiddlePanel : public juce::Component,
                     public juce::ValueTree::Listener
 {
 public:
-    MiddlePanel(tss::Skin& skin, juce::AudioProcessorValueTreeState& apvts);
+    MiddlePanel(tss::Skin& skin, int width, int height, juce::AudioProcessorValueTreeState& apvts);
     ~MiddlePanel() override;
 
     void resized() override;
@@ -38,9 +37,6 @@ public:
     void valueTreeParentChanged(juce::ValueTree&) override {}
     void valueTreeRedirected(juce::ValueTree&) override {}
 
-    static int getWidth() { return PluginDimensions::Panels::Body::PatchEditSection::MiddleModules::kWidth; }
-    static int getHeight() { return PluginDimensions::Panels::Body::PatchEditSection::MiddleModules::kHeight; }
-
 private:
     inline constexpr static int kSpacing = 15;
     inline constexpr static int kEnvParameterMax = 63;
@@ -48,6 +44,8 @@ private:
     inline constexpr static int kPatchNameSectionPaddingTop = 8;
     inline constexpr static int kPatchNameSectionSpacing = 12;
 
+    int width_;
+    int height_;
     tss::Skin* skin_;
     juce::AudioProcessorValueTreeState* apvts_ = nullptr;
 

@@ -2,12 +2,13 @@
 
 #include "GUI/Factories/WidgetFactory.h"
 #include "GUI/Skins/Skin.h"
+#include "Shared/PluginDimensions.h"
 
 MainComponent::MainComponent(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : skin_(&skin)
-    , headerPanel(skin)
-    , bodyPanel(skin, widgetFactory, apvts)
-    , footerPanel(skin, apvts)
+    , headerPanel(skin, PluginDimensions::Panels::Header::kWidth, PluginDimensions::Panels::Header::kHeight)
+    , bodyPanel(skin, PluginDimensions::GUI::kWidth, PluginDimensions::Panels::Body::kHeight, widgetFactory, apvts)
+    , footerPanel(skin, PluginDimensions::Panels::Footer::kWidth, PluginDimensions::Panels::Footer::kHeight, apvts)
 {
     setOpaque(true);
     setSize(width, height);
@@ -29,10 +30,10 @@ void MainComponent::resized()
     auto y = 0;
     
     layoutHeaderPanel(bounds, y);
-    y += HeaderPanel::getHeight();
+    y += PluginDimensions::Panels::Header::kHeight;
     
     layoutBodyPanel(bounds, y);
-    y += BodyPanel::getHeight();
+    y += PluginDimensions::Panels::Body::kHeight;
     
     layoutFooterPanel(bounds, y);
 }
@@ -43,7 +44,7 @@ void MainComponent::layoutHeaderPanel(juce::Rectangle<int> bounds, int y)
         bounds.getX(),
         bounds.getY() + y,
         bounds.getWidth(),
-        HeaderPanel::getHeight()
+        PluginDimensions::Panels::Header::kHeight
     );
 }
 
@@ -53,7 +54,7 @@ void MainComponent::layoutBodyPanel(juce::Rectangle<int> bounds, int y)
         bounds.getX(),
         bounds.getY() + y,
         bounds.getWidth(),
-        BodyPanel::getHeight()
+        PluginDimensions::Panels::Body::kHeight
     );
 }
 
@@ -63,7 +64,7 @@ void MainComponent::layoutFooterPanel(juce::Rectangle<int> bounds, int y)
         bounds.getX(),
         bounds.getY() + y,
         bounds.getWidth(),
-        FooterPanel::getHeight()
+        PluginDimensions::Panels::Footer::kHeight
     );
 }
 

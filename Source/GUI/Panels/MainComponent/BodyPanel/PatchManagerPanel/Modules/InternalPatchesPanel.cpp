@@ -11,8 +11,10 @@
 #include <juce_core/juce_core.h>
 
 
-InternalPatchesPanel::InternalPatchesPanel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
-    : skin_(&skin)
+InternalPatchesPanel::InternalPatchesPanel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+    : width_(width)
+    , height_(height)
+    , skin_(&skin)
     , apvts_(apvts)
 {
     setOpaque(false);
@@ -32,7 +34,7 @@ InternalPatchesPanel::InternalPatchesPanel(tss::Skin& skin, WidgetFactory& widge
 
     apvts_.state.addListener(this);
     
-    setSize(getWidth(), getHeight());
+    setSize(width_, height_);
 }
 
 InternalPatchesPanel::~InternalPatchesPanel()

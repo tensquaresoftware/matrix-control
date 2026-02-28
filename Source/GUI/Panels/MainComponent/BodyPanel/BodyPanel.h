@@ -5,8 +5,6 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 
-#include "Shared/PluginDimensions.h"
-
 namespace tss
 {
     class Skin;
@@ -22,17 +20,25 @@ class WidgetFactory;
 class BodyPanel : public juce::Component
 {
 public:
-    BodyPanel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    BodyPanel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~BodyPanel() override;
 
     void paint(juce::Graphics&) override;
     void resized() override;
     void setSkin(tss::Skin& skin);
 
-    static int getHeight() { return PluginDimensions::Panels::Body::kHeight; }
-    static int getPadding() { return PluginDimensions::Panels::Body::kPadding; }
-
 private:
+    int width_;
+    int height_;
+    int padding_;
+    int patchEditPanelWidth_;
+    int patchEditPanelHeight_;
+    int matrixModulationPanelWidth_;
+    int matrixModulationPanelHeight_;
+    int patchManagerPanelWidth_;
+    int patchManagerPanelHeight_;
+    int masterEditPanelWidth_;
+    int masterEditPanelHeight_;
     tss::Skin* skin_;
 
     std::unique_ptr<PatchEditPanel> patchEditPanel_;

@@ -5,7 +5,7 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 
-#include "Shared/PluginDimensions.h"
+#include "GUI/Panels/Reusable/ModulationBusPanelDimensions.h"
 
 namespace tss
 {
@@ -22,9 +22,12 @@ class WidgetFactory;
 class ModulationBusPanel : public juce::Component
 {
 public:
-    ModulationBusPanel(int busNumber,
+    ModulationBusPanel(tss::Skin& skin,
+                      int width,
+                      int height,
+                      const ModulationBusPanelDimensions& dimensions,
+                      int busNumber,
                       WidgetFactory& factory,
-                      tss::Skin& skin,
                       juce::AudioProcessorValueTreeState& apvts,
                       const juce::String& sourceParamId,
                       const juce::String& amountParamId,
@@ -34,9 +37,10 @@ public:
 
     void resized() override;
     void setSkin(tss::Skin& skin);
-    static int getHeight();
+    int getHeight() const { return dimensions_.panelHeight; }
 
 private:
+    ModulationBusPanelDimensions dimensions_;
     void createBusNumberLabel(int busNumber, tss::Skin& skin);
     void createSourceComboBox(WidgetFactory& factory, tss::Skin& skin, const juce::String& sourceParamId, juce::AudioProcessorValueTreeState& apvts);
     void createAmountSlider(WidgetFactory& factory, tss::Skin& skin, const juce::String& amountParamId, juce::AudioProcessorValueTreeState& apvts);

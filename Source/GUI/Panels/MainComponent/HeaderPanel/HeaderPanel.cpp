@@ -4,8 +4,10 @@
 #include "GUI/Widgets/ComboBox.h"
 #include "GUI/Skins/Skin.h"
 
-HeaderPanel::HeaderPanel(tss::Skin& skin)
-    : skin_(&skin)
+HeaderPanel::HeaderPanel(tss::Skin& skin, int width, int height)
+    : width_(width)
+    , height_(height)
+    , skin_(&skin)
     , skinLabel_(skin, kSkinLabelWidth_, kControlHeight_, "SKIN :")
     , skinComboBox_(skin, kComboBoxWidth_, kControlHeight_, tss::ComboBox::Style::ButtonLike)
     , zoomLabel_(skin, kZoomLabelWidth_, kControlHeight_, "ZOOM :")
@@ -42,7 +44,7 @@ void HeaderPanel::resized()
 {
     const auto bounds = getLocalBounds();
     const auto spacing = getSpacing();
-    const auto controlY = (getHeight() - kControlHeight_) / 2;
+    const auto controlY = (height_ - kControlHeight_) / 2;
     
     int currentX = 15; //spacing;
     

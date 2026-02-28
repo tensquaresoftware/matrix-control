@@ -32,7 +32,7 @@ ModulePanelConfig Env2Panel::createConfig()
     return config;
 }
 
-Env2Panel::Env2Panel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
-    : BaseModulePanel(skin, widgetFactory, apvts, createConfig(), getWidth(), getHeight())
+Env2Panel::Env2Panel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+    : BaseModulePanel(skin, widgetFactory, apvts, createConfig(), width, height)
 {
 }

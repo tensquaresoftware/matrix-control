@@ -30,7 +30,7 @@ ModulePanelConfig FmTrackPanel::createConfig()
     return config;
 }
 
-FmTrackPanel::FmTrackPanel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
-    : BaseModulePanel(skin, widgetFactory, apvts, createConfig(), getWidth(), getHeight())
+FmTrackPanel::FmTrackPanel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+    : BaseModulePanel(skin, widgetFactory, apvts, createConfig(), width, height)
 {
 }

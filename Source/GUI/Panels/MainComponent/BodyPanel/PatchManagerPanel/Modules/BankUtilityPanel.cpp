@@ -10,8 +10,10 @@
 #include <juce_core/juce_core.h>
 
 
-BankUtilityPanel::BankUtilityPanel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
-    : skin_(&skin)
+BankUtilityPanel::BankUtilityPanel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+    : width_(width)
+    , height_(height)
+    , skin_(&skin)
     , apvts_(apvts)
 {
     setOpaque(false);
@@ -19,7 +21,7 @@ BankUtilityPanel::BankUtilityPanel(tss::Skin& skin, WidgetFactory& widgetFactory
     setupBankSelectorLabel(skin);
     setupSelectBankButtons(skin, widgetFactory);
 
-    setSize(getWidth(), getHeight());
+    setSize(width_, height_);
 }
 
 BankUtilityPanel::~BankUtilityPanel() = default;

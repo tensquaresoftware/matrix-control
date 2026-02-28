@@ -12,33 +12,41 @@
 
 ModulationBusPanel::~ModulationBusPanel() = default;
 
-ModulationBusPanel::ModulationBusPanel(int busNumber,
+ModulationBusPanel::ModulationBusPanel(tss::Skin& skin,
+                                      int width,
+                                      int height,
+                                      const ModulationBusPanelDimensions& dimensions,
+                                      int busNumber,
                                       WidgetFactory& factory,
-                                      tss::Skin& skin,
                                       juce::AudioProcessorValueTreeState& apvts,
                                       const juce::String& sourceParamId,
                                       const juce::String& amountParamId,
                                       const juce::String& destinationParamId,
                                       const juce::String& busId)
-    : skin_(&skin)
+    : dimensions_(dimensions)
+    , skin_(&skin)
     , apvts_(apvts)
     , busId_(busId)
 {
     setOpaque(false);
+    setSize(width, height);
     createBusNumberLabel(busNumber, skin);
     createSourceComboBox(factory, skin, sourceParamId, apvts);
     createAmountSlider(factory, skin, amountParamId, apvts);
     createDestinationComboBox(busNumber, skin, destinationParamId, apvts);
     createInitButton(skin, busNumber);
     createSeparator(skin);
+
+    layoutWidgetRow();
+    layoutSeparator(dimensions_.busNumberLabelHeight);
 }
 
 void ModulationBusPanel::createBusNumberLabel(int busNumber, tss::Skin& skin)
 {
     busNumberLabel_ = std::make_unique<tss::Label>(
         skin,
-        PluginDimensions::Widgets::Widths::Label::kModulationBusNumber,
-        PluginDimensions::Widgets::Heights::kLabel,
+        dimensions_.busNumberLabelWidth,
+        dimensions_.busNumberLabelHeight,
         juce::String(busNumber));
     addAndMakeVisible(*busNumberLabel_);
 }
@@ -48,8 +56,8 @@ void ModulationBusPanel::createSourceComboBox(WidgetFactory& factory, tss::Skin&
     sourceComboBox_ = factory.createChoiceParameterComboBox(
         sourceParamId,
         skin,
-        PluginDimensions::Widgets::Widths::ComboBox::kMatrixModulationSource,
-        PluginDimensions::Widgets::Heights::kComboBox);
+        dimensions_.sourceComboBoxWidth,
+        dimensions_.sourceComboBoxHeight);
     sourceAttachment_ = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(
         apvts,
         sourceParamId,
@@ -59,7 +67,11 @@ void ModulationBusPanel::createSourceComboBox(WidgetFactory& factory, tss::Skin&
 
 void ModulationBusPanel::createAmountSlider(WidgetFactory& factory, tss::Skin& skin, const juce::String& amountParamId, juce::AudioProcessorValueTreeState& apvts)
 {
-    amountSlider_ = factory.createIntParameterSlider(amountParamId, skin);
+    amountSlider_ = factory.createIntParameterSlider(
+        amountParamId,
+        skin,
+        dimensions_.amountSliderWidth,
+        dimensions_.amountSliderHeight);
     amountAttachment_ = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
         apvts,
         amountParamId,
@@ -74,8 +86,8 @@ void ModulationBusPanel::createDestinationComboBox(int busNumber, tss::Skin& ski
 
     destinationComboBox_ = std::make_unique<tss::ComboBox>(
         skin,
-        PluginDimensions::Widgets::Widths::ComboBox::kMatrixModulationDestination,
-        PluginDimensions::Widgets::Heights::kComboBox);
+        dimensions_.destinationComboBoxWidth,
+        dimensions_.destinationComboBoxHeight);
     for (const auto& choice : destinationDesc.choices)
     {
         destinationComboBox_->addItem(choice, destinationComboBox_->getNumItems() + 1);
@@ -92,8 +104,8 @@ void ModulationBusPanel::createInitButton(tss::Skin& skin, int busNumber)
 {
     initButton_ = std::make_unique<tss::Button>(
         skin,
-        PluginDimensions::Widgets::Widths::Button::kInit,
-        PluginDimensions::Widgets::Heights::kButton,
+        dimensions_.initButtonWidth,
+        dimensions_.initButtonHeight,
         PluginDisplayNames::ShortLabels::kInit);
     
     juce::String initBusId;
@@ -123,14 +135,14 @@ void ModulationBusPanel::createSeparator(tss::Skin& skin)
 {
     separator_ = std::make_unique<tss::HorizontalSeparator>(
         skin,
-        PluginDimensions::Widgets::Widths::HorizontalSeparator::kMatrixModulationBus,
-        PluginDimensions::Widgets::Heights::kHorizontalSeparator);
+        dimensions_.separatorWidth,
+        dimensions_.separatorHeight);
     addAndMakeVisible(*separator_);
 }
 
 void ModulationBusPanel::resized()
 {
-    const auto widgetRowHeight = PluginDimensions::Widgets::Heights::kLabel;
+    const auto widgetRowHeight = dimensions_.busNumberLabelHeight;
     int y = 0;
 
     layoutWidgetRow();
@@ -140,47 +152,33 @@ void ModulationBusPanel::resized()
 
 void ModulationBusPanel::layoutWidgetRow()
 {
-    const auto busNumberLabelWidth = PluginDimensions::Widgets::Widths::Label::kModulationBusNumber;
-    const auto busNumberLabelHeight = PluginDimensions::Widgets::Heights::kLabel;
-    const auto sourceComboBoxWidth = PluginDimensions::Widgets::Widths::ComboBox::kMatrixModulationSource;
-    const auto sourceComboBoxHeight = PluginDimensions::Widgets::Heights::kComboBox;
-    const auto amountSliderWidth = PluginDimensions::Widgets::Widths::Slider::kStandard;
-    const auto amountSliderHeight = PluginDimensions::Widgets::Heights::kSlider;
-    const auto destinationComboBoxWidth = PluginDimensions::Widgets::Widths::ComboBox::kMatrixModulationDestination;
-    const auto destinationComboBoxHeight = PluginDimensions::Widgets::Heights::kComboBox;
-    const auto initButtonWidth = PluginDimensions::Widgets::Widths::Button::kInit;
-    const auto initButtonHeight = PluginDimensions::Widgets::Heights::kButton;
     const int y = 0;
-
     int x = 0;
 
     if (auto* label = busNumberLabel_.get())
-        label->setBounds(x, y, busNumberLabelWidth, busNumberLabelHeight);
-    x += busNumberLabelWidth;
+        label->setBounds(x, y, dimensions_.busNumberLabelWidth, dimensions_.busNumberLabelHeight);
+    x += dimensions_.busNumberLabelWidth;
 
     if (auto* comboBox = sourceComboBox_.get())
-        comboBox->setBounds(x, y, sourceComboBoxWidth, sourceComboBoxHeight);
-    x += sourceComboBoxWidth + kSpacing_;
+        comboBox->setBounds(x, y, dimensions_.sourceComboBoxWidth, dimensions_.sourceComboBoxHeight);
+    x += dimensions_.sourceComboBoxWidth + kSpacing_;
 
     if (auto* slider = amountSlider_.get())
-        slider->setBounds(x, y, amountSliderWidth, amountSliderHeight);
-    x += amountSliderWidth + kSpacing_;
+        slider->setBounds(x, y, dimensions_.amountSliderWidth, dimensions_.amountSliderHeight);
+    x += dimensions_.amountSliderWidth + kSpacing_;
 
     if (auto* comboBox = destinationComboBox_.get())
-        comboBox->setBounds(x, y, destinationComboBoxWidth, destinationComboBoxHeight);
-    x += destinationComboBoxWidth + kSpacing_;
+        comboBox->setBounds(x, y, dimensions_.destinationComboBoxWidth, dimensions_.destinationComboBoxHeight);
+    x += dimensions_.destinationComboBoxWidth + kSpacing_;
 
     if (auto* button = initButton_.get())
-        button->setBounds(x, y, initButtonWidth, initButtonHeight);
+        button->setBounds(x, y, dimensions_.initButtonWidth, dimensions_.initButtonHeight);
 }
 
 void ModulationBusPanel::layoutSeparator(int y)
 {
-    const auto separatorWidth = PluginDimensions::Widgets::Widths::HorizontalSeparator::kMatrixModulationBus;
-    const auto separatorHeight = PluginDimensions::Widgets::Heights::kHorizontalSeparator;
-
     if (auto* separator = separator_.get())
-        separator->setBounds(0, y, separatorWidth, separatorHeight);
+        separator->setBounds(0, y, dimensions_.separatorWidth, dimensions_.separatorHeight);
 }
 
 void ModulationBusPanel::setSkin(tss::Skin& skin)
@@ -206,7 +204,3 @@ void ModulationBusPanel::setSkin(tss::Skin& skin)
         separator->setSkin(skin);
 }
 
-int ModulationBusPanel::getHeight()
-{
-    return PluginDimensions::Widgets::Heights::kLabel + PluginDimensions::Widgets::Heights::kHorizontalSeparator;
-}

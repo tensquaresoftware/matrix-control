@@ -12,14 +12,12 @@ class FooterPanel : public juce::Component,
                     public juce::ValueTree::Listener
 {
 public:
-    FooterPanel(tss::Skin& skin, juce::AudioProcessorValueTreeState& apvtsRef);
+    FooterPanel(tss::Skin& skin, int width, int height, juce::AudioProcessorValueTreeState& apvtsRef);
     ~FooterPanel() override;
 
     void paint(juce::Graphics&) override;
     void resized() override;
     void setSkin(tss::Skin& skin);
-
-    static int getHeight() { return kHeight_; }
 
     // ValueTree::Listener
     void valueTreePropertyChanged(juce::ValueTree& tree,
@@ -35,7 +33,8 @@ private:
         Error
     };
     
-    inline constexpr static int kHeight_ = 30;
+    int width_;
+    int height_;
     inline constexpr static int kPadding_ = 8;
     inline constexpr static int kIconSize_ = 14;
     

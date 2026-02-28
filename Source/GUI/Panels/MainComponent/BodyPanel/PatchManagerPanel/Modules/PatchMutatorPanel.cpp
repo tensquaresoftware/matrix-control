@@ -23,8 +23,10 @@ namespace
     constexpr int kToggleHeight = 20;
 }
 
-PatchMutatorPanel::PatchMutatorPanel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
-    : skin_(&skin)
+PatchMutatorPanel::PatchMutatorPanel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+    : width_(width)
+    , height_(height)
+    , skin_(&skin)
     , apvts_(apvts)
 {
     setOpaque(false);
@@ -32,7 +34,7 @@ PatchMutatorPanel::PatchMutatorPanel(tss::Skin& skin, WidgetFactory& widgetFacto
     setupAmountLine(skin, widgetFactory);
     setupRandomLine(skin, widgetFactory);
     setupHistoryLine(skin, widgetFactory);
-    setSize(getWidth(), getHeight());
+    setSize(width_, height_);
 }
 
 PatchMutatorPanel::~PatchMutatorPanel() = default;

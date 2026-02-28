@@ -8,17 +8,23 @@
 
 #include "GUI/Skins/Skin.h"
 #include "GUI/Factories/WidgetFactory.h"
+#include "Shared/PluginDimensions.h"
 
 
 TopPanel::~TopPanel() = default;
 
-TopPanel::TopPanel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
-    : skin_(&skin)
-    , dco1Panel_(std::make_unique<Dco1Panel>(skin, widgetFactory, apvts))
-    , dco2Panel_(std::make_unique<Dco2Panel>(skin, widgetFactory, apvts))
-    , vcfVcaPanel_(std::make_unique<VcfVcaPanel>(skin, widgetFactory, apvts))
-    , fmTrackPanel_(std::make_unique<FmTrackPanel>(skin, widgetFactory, apvts))
-    , rampPortamentoPanel_(std::make_unique<RampPortamentoPanel>(skin, widgetFactory, apvts))
+TopPanel::TopPanel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+    : width_(width)
+    , height_(height)
+    , childModuleWidth_(PluginDimensions::Panels::Body::PatchEditSection::TopModules::ChildModules::kWidth)
+    , childModuleHeight_(PluginDimensions::Panels::Body::PatchEditSection::TopModules::ChildModules::kHeight)
+    , spacing_(PluginDimensions::Panels::Body::kPadding)
+    , skin_(&skin)
+    , dco1Panel_(std::make_unique<Dco1Panel>(skin, childModuleWidth_, childModuleHeight_, widgetFactory, apvts))
+    , dco2Panel_(std::make_unique<Dco2Panel>(skin, childModuleWidth_, childModuleHeight_, widgetFactory, apvts))
+    , vcfVcaPanel_(std::make_unique<VcfVcaPanel>(skin, childModuleWidth_, childModuleHeight_, widgetFactory, apvts))
+    , fmTrackPanel_(std::make_unique<FmTrackPanel>(skin, childModuleWidth_, childModuleHeight_, widgetFactory, apvts))
+    , rampPortamentoPanel_(std::make_unique<RampPortamentoPanel>(skin, childModuleWidth_, childModuleHeight_, widgetFactory, apvts))
 {
     setOpaque(false);
     addAndMakeVisible(*dco1Panel_);
@@ -27,57 +33,56 @@ TopPanel::TopPanel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioPro
     addAndMakeVisible(*fmTrackPanel_);
     addAndMakeVisible(*rampPortamentoPanel_);
 
-    setSize(getWidth(), getHeight());
+    setSize(width_, height_);
 }
 
 void TopPanel::resized()
 {
     const auto bounds = getLocalBounds();
-    const auto spacing = getSpacing();
     
     const auto dco1PanelX = 0;
     const auto dco1PanelY = 0;
     dco1Panel_->setBounds(
         bounds.getX() + dco1PanelX,
         bounds.getY() + dco1PanelY,
-        Dco1Panel::getWidth(),
-        Dco1Panel::getHeight()
+        childModuleWidth_,
+        childModuleHeight_
     );
     
-    const auto dco2PanelX = dco1PanelX + Dco1Panel::getWidth() + spacing;
+    const auto dco2PanelX = dco1PanelX + childModuleWidth_ + spacing_;
     const auto dco2PanelY = 0;
     dco2Panel_->setBounds(
         bounds.getX() + dco2PanelX,
         bounds.getY() + dco2PanelY,
-        Dco2Panel::getWidth(),
-        Dco2Panel::getHeight()
+        childModuleWidth_,
+        childModuleHeight_
     );
     
-    const auto vcfVcaPanelX = dco2PanelX + Dco2Panel::getWidth() + spacing;
+    const auto vcfVcaPanelX = dco2PanelX + childModuleWidth_ + spacing_;
     const auto vcfVcaPanelY = 0;
     vcfVcaPanel_->setBounds(
         bounds.getX() + vcfVcaPanelX,
         bounds.getY() + vcfVcaPanelY,
-        VcfVcaPanel::getWidth(),
-        VcfVcaPanel::getHeight()
+        childModuleWidth_,
+        childModuleHeight_
     );
     
-    const auto fmTrackPanelX = vcfVcaPanelX + VcfVcaPanel::getWidth() + spacing;
+    const auto fmTrackPanelX = vcfVcaPanelX + childModuleWidth_ + spacing_;
     const auto fmTrackPanelY = 0;
     fmTrackPanel_->setBounds(
         bounds.getX() + fmTrackPanelX,
         bounds.getY() + fmTrackPanelY,
-        FmTrackPanel::getWidth(),
-        FmTrackPanel::getHeight()
+        childModuleWidth_,
+        childModuleHeight_
     );
     
-    const auto rampPortamentoPanelX = fmTrackPanelX + FmTrackPanel::getWidth() + spacing;
+    const auto rampPortamentoPanelX = fmTrackPanelX + childModuleWidth_ + spacing_;
     const auto rampPortamentoPanelY = 0;
     rampPortamentoPanel_->setBounds(
         bounds.getX() + rampPortamentoPanelX,
         bounds.getY() + rampPortamentoPanelY,
-        RampPortamentoPanel::getWidth(),
-        RampPortamentoPanel::getHeight()
+        childModuleWidth_,
+        childModuleHeight_
     );
 }
 

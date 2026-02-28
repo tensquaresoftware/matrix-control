@@ -5,16 +5,42 @@
 #include "GUI/Widgets/ModulationBusHeader.h"
 #include "GUI/Widgets/Button.h"
 #include "GUI/Panels/Reusable/ModulationBusPanel.h"
+#include "GUI/Panels/Reusable/ModulationBusPanelDimensions.h"
 #include "Shared/PluginDescriptors.h"
 #include "Shared/PluginHelpers.h"
 #include "Shared/PluginDimensions.h"
 #include "GUI/Factories/WidgetFactory.h"
 
+namespace
+{
+    ModulationBusPanelDimensions createModulationBusPanelDimensions()
+    {
+        ModulationBusPanelDimensions dims;
+        dims.panelWidth = PluginDimensions::Panels::Body::SharedColumn::kWidth;
+        dims.panelHeight = PluginDimensions::Widgets::Heights::kLabel + PluginDimensions::Widgets::Heights::kHorizontalSeparator;
+        dims.busNumberLabelWidth = PluginDimensions::Widgets::Widths::Label::kModulationBusNumber;
+        dims.busNumberLabelHeight = PluginDimensions::Widgets::Heights::kLabel;
+        dims.sourceComboBoxWidth = PluginDimensions::Widgets::Widths::ComboBox::kMatrixModulationSource;
+        dims.sourceComboBoxHeight = PluginDimensions::Widgets::Heights::kComboBox;
+        dims.amountSliderWidth = PluginDimensions::Widgets::Widths::Slider::kStandard;
+        dims.amountSliderHeight = PluginDimensions::Widgets::Heights::kSlider;
+        dims.destinationComboBoxWidth = PluginDimensions::Widgets::Widths::ComboBox::kMatrixModulationDestination;
+        dims.destinationComboBoxHeight = PluginDimensions::Widgets::Heights::kComboBox;
+        dims.initButtonWidth = PluginDimensions::Widgets::Widths::Button::kInit;
+        dims.initButtonHeight = PluginDimensions::Widgets::Heights::kButton;
+        dims.separatorWidth = PluginDimensions::Widgets::Widths::HorizontalSeparator::kMatrixModulationBus;
+        dims.separatorHeight = PluginDimensions::Widgets::Heights::kHorizontalSeparator;
+        return dims;
+    }
+}
 
 MatrixModulationPanel::~MatrixModulationPanel() = default;
 
-MatrixModulationPanel::MatrixModulationPanel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
-    : skin_(&skin)
+MatrixModulationPanel::MatrixModulationPanel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+    : width_(width)
+    , height_(height)
+    , modulationBusHeight_(PluginDimensions::Widgets::Heights::kLabel + PluginDimensions::Widgets::Heights::kHorizontalSeparator)
+    , skin_(&skin)
     , apvts_(apvts)
     , sectionHeader_(std::make_unique<tss::SectionHeader>(
         skin,
@@ -31,6 +57,7 @@ MatrixModulationPanel::MatrixModulationPanel(tss::Skin& skin, WidgetFactory& wid
     addAndMakeVisible(*modulationBusHeader_);
 
     const auto parameterArrays = createModulationBusParameterArrays();
+    const auto modulationBusDimensions = createModulationBusPanelDimensions();
 
     createInitAllBussesButton(skin);
 
@@ -39,9 +66,12 @@ MatrixModulationPanel::MatrixModulationPanel(tss::Skin& skin, WidgetFactory& wid
     {
         const auto busNumberAsSizeT = static_cast<size_t>(busNumber);
         auto bus = std::make_unique<ModulationBusPanel>(
+            skin,
+            width_,
+            modulationBusHeight_,
+            modulationBusDimensions,
             busNumber,
             widgetFactory,
-            skin,
             apvts_,
             parameterArrays.sourceParameterIds[busNumberAsSizeT],
             parameterArrays.amountParameterIds[busNumberAsSizeT],
@@ -51,7 +81,7 @@ MatrixModulationPanel::MatrixModulationPanel(tss::Skin& skin, WidgetFactory& wid
         modulationBuses_.push_back(std::move(bus));
     }
 
-    setSize(getWidth(), getHeight());
+    setSize(width_, height_);
 }
 
 std::array<const char*, Matrix1000Limits::kModulationBusCount> MatrixModulationPanel::createBusIds() const
@@ -158,8 +188,9 @@ void MatrixModulationPanel::resized()
     {
         const auto initAllButtonWidth = PluginDimensions::Widgets::Widths::Button::kInit;
         const auto initAllButtonHeight = PluginDimensions::Widgets::Heights::kButton;
-        const auto initAllButtonX = getWidth() - initAllButtonWidth;
-        initButton->setBounds(initAllButtonX, sectionHeader_->getHeight(), initAllButtonWidth, initAllButtonHeight);
+        const auto initAllButtonX = width_ - initAllButtonWidth;
+        const auto initAllButtonY = sectionHeader_->getHeight();
+        initButton->setBounds(initAllButtonX, initAllButtonY, initAllButtonWidth, initAllButtonHeight);
     }
 
     for (auto& bus : modulationBuses_)

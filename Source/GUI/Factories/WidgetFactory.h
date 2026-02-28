@@ -29,6 +29,12 @@ public:
     std::unique_ptr<tss::Slider> createIntParameterSlider(
         const juce::String& parameterId,
         tss::Skin& skin);
+
+    std::unique_ptr<tss::Slider> createIntParameterSlider(
+        const juce::String& parameterId,
+        tss::Skin& skin,
+        int width,
+        int height);
     
     std::unique_ptr<tss::ComboBox> createChoiceParameterComboBox(
         const juce::String& parameterId,

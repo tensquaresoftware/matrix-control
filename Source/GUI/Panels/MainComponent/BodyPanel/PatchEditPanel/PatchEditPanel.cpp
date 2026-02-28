@@ -37,16 +37,21 @@ PatchEditPanel::~PatchEditPanel()
     }
 }
 
-PatchEditPanel::PatchEditPanel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
-    : skin_(&skin)
+PatchEditPanel::PatchEditPanel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+    : width_(width)
+    , height_(height)
+    , topPanelHeight_(PluginDimensions::Panels::Body::PatchEditSection::TopModules::kHeight)
+    , middlePanelHeight_(PluginDimensions::Panels::Body::PatchEditSection::MiddleModules::kHeight)
+    , bottomPanelHeight_(PluginDimensions::Panels::Body::PatchEditSection::BottomModules::kHeight)
+    , skin_(&skin)
     , sectionHeader_(std::make_unique<tss::SectionHeader>(
-        skin, 
+        skin,
         PluginDimensions::Widgets::Widths::SectionHeader::kPatchEdit,
         PluginDimensions::Widgets::Heights::kSectionHeader,
         PluginHelpers::getSectionDisplayName(PluginIDs::PatchEditSection::kGroupId)))
-    , topPanel_(std::make_unique<TopPanel>(skin, widgetFactory, apvts))
-    , middlePanel_(std::make_unique<MiddlePanel>(skin, apvts))
-    , bottomPanel_(std::make_unique<BottomPanel>(skin, widgetFactory, apvts))
+    , topPanel_(std::make_unique<TopPanel>(skin, width, topPanelHeight_, widgetFactory, apvts))
+    , middlePanel_(std::make_unique<MiddlePanel>(skin, width, middlePanelHeight_, apvts))
+    , bottomPanel_(std::make_unique<BottomPanel>(skin, width, bottomPanelHeight_, widgetFactory, apvts))
 {
     setOpaque(false);
     addAndMakeVisible(*sectionHeader_);
@@ -57,43 +62,44 @@ PatchEditPanel::PatchEditPanel(tss::Skin& skin, WidgetFactory& widgetFactory, ju
     setupTrackPointSliderConnections();
     setupEnvelopeSliderConnections();
 
-    setSize(getWidth(), getHeight());
+    setSize(width_, height_);
 }
 
 void PatchEditPanel::resized()
 {
     const auto bounds = getLocalBounds();
+    const auto sectionHeaderHeight = PluginDimensions::Widgets::Heights::kSectionHeader;
     
     const auto sectionHeaderY = 0;
     sectionHeader_->setBounds(
         bounds.getX() + 0,
         bounds.getY() + sectionHeaderY,
         bounds.getWidth(),
-        PluginDimensions::Widgets::Heights::kSectionHeader
+        sectionHeaderHeight
     );
     
-    const auto topPanelY = sectionHeaderY + PluginDimensions::Widgets::Heights::kSectionHeader;
+    const auto topPanelY = sectionHeaderY + sectionHeaderHeight;
     topPanel_->setBounds(
         bounds.getX() + 0,
         bounds.getY() + topPanelY,
         bounds.getWidth(),
-        TopPanel::getHeight()
+        topPanelHeight_
     );
     
-    const auto middlePanelY = topPanelY + TopPanel::getHeight();
+    const auto middlePanelY = topPanelY + topPanelHeight_;
     middlePanel_->setBounds(
         bounds.getX() + 0,
         bounds.getY() + middlePanelY,
         bounds.getWidth(),
-        MiddlePanel::getHeight()
+        middlePanelHeight_
     );
     
-    const auto bottomPanelY = middlePanelY + MiddlePanel::getHeight();
+    const auto bottomPanelY = middlePanelY + middlePanelHeight_;
     bottomPanel_->setBounds(
         bounds.getX() + 0,
         bounds.getY() + bottomPanelY,
         bounds.getWidth(),
-        BottomPanel::getHeight()
+        bottomPanelHeight_
     );
 }
 

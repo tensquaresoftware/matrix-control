@@ -5,8 +5,10 @@
 const juce::Identifier FooterPanel::kMessageTextId("uiMessageText");
 const juce::Identifier FooterPanel::kMessageSeverityId("uiMessageSeverity");
 
-FooterPanel::FooterPanel(tss::Skin& skin, juce::AudioProcessorValueTreeState& apvtsRef)
-    : skin_(&skin)
+FooterPanel::FooterPanel(tss::Skin& skin, int width, int height, juce::AudioProcessorValueTreeState& apvtsRef)
+    : width_(width)
+    , height_(height)
+    , skin_(&skin)
     , apvts(apvtsRef)
 {
     setOpaque(true);

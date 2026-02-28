@@ -5,8 +5,6 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 
-#include "Shared/PluginDimensions.h"
-
 namespace tss
 {
     class Skin;
@@ -23,18 +21,17 @@ class WidgetFactory;
 class PatchMutatorPanel : public juce::Component
 {
 public:
-    PatchMutatorPanel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    PatchMutatorPanel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~PatchMutatorPanel() override;
 
     void resized() override;
     void setSkin(tss::Skin& skin);
 
-    static int getWidth() { return PluginDimensions::Panels::Body::PatchManagerSection::PatchMutatorModule::kWidth; }
-    static int getHeight() { return PluginDimensions::Panels::Body::PatchManagerSection::PatchMutatorModule::kHeight; }
-
 private:
     inline constexpr static int kSpacing_ = 5;
 
+    int width_;
+    int height_;
     tss::Skin* skin_;
     juce::AudioProcessorValueTreeState& apvts_;
 

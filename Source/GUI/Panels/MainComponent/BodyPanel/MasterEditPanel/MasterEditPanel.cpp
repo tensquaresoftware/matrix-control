@@ -13,17 +13,23 @@
 #include "GUI/Factories/WidgetFactory.h"
 
 
-MasterEditPanel::MasterEditPanel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
-    : skin_(&skin)
+MasterEditPanel::MasterEditPanel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+    : width_(width)
+    , height_(height)
+    , childModuleWidth_(PluginDimensions::Panels::Body::MasterEditSection::ChildModules::kWidth)
+    , midiPanelHeight_(PluginDimensions::Panels::Body::MasterEditSection::MidiModule::kHeight)
+    , vibratoPanelHeight_(PluginDimensions::Panels::Body::MasterEditSection::VibratoModule::kHeight)
+    , miscPanelHeight_(PluginDimensions::Panels::Body::MasterEditSection::MiscModule::kHeight)
+    , skin_(&skin)
     , sectionHeader_(std::make_unique<tss::SectionHeader>(
-        skin, 
+        skin,
         PluginDimensions::Widgets::Widths::SectionHeader::kMasterEdit,
         PluginDimensions::Widgets::Heights::kSectionHeader,
         PluginHelpers::getSectionDisplayName(PluginIDs::MasterEditSection::kGroupId),
         tss::SectionHeader::ColourVariant::Orange))
-    , midiPanel_(std::make_unique<MidiPanel>(skin, widgetFactory, apvts))
-    , vibratoPanel_(std::make_unique<VibratoPanel>(skin, widgetFactory, apvts))
-    , miscPanel_(std::make_unique<MiscPanel>(skin, widgetFactory, apvts))
+    , midiPanel_(std::make_unique<MidiPanel>(skin, childModuleWidth_, midiPanelHeight_, widgetFactory, apvts))
+    , vibratoPanel_(std::make_unique<VibratoPanel>(skin, childModuleWidth_, vibratoPanelHeight_, widgetFactory, apvts))
+    , miscPanel_(std::make_unique<MiscPanel>(skin, childModuleWidth_, miscPanelHeight_, widgetFactory, apvts))
 {
     setOpaque(false);
     addAndMakeVisible(*sectionHeader_);
@@ -31,7 +37,7 @@ MasterEditPanel::MasterEditPanel(tss::Skin& skin, WidgetFactory& widgetFactory, 
     addAndMakeVisible(*vibratoPanel_);
     addAndMakeVisible(*miscPanel_);
 
-    setSize(getWidth(), getHeight());
+    setSize(width_, height_);
 }
 
 MasterEditPanel::~MasterEditPanel() = default;
@@ -39,37 +45,38 @@ MasterEditPanel::~MasterEditPanel() = default;
 void MasterEditPanel::resized()
 {
     const auto bounds = getLocalBounds();
+    const auto sectionHeaderHeight = PluginDimensions::Widgets::Heights::kSectionHeader;
     
     const auto sectionHeaderY = 0;
     sectionHeader_->setBounds(
         bounds.getX() + 0,
         bounds.getY() + sectionHeaderY,
         bounds.getWidth(),
-        PluginDimensions::Widgets::Heights::kSectionHeader
+        sectionHeaderHeight
     );
     
-    const auto midiPanelY = sectionHeaderY + PluginDimensions::Widgets::Heights::kSectionHeader;
+    const auto midiPanelY = sectionHeaderY + sectionHeaderHeight;
     midiPanel_->setBounds(
         bounds.getX() + 0,
         bounds.getY() + midiPanelY,
-        MidiPanel::getWidth(),
-        MidiPanel::getHeight()
+        childModuleWidth_,
+        midiPanelHeight_
     );
     
-    const auto vibratoPanelY = midiPanelY + MidiPanel::getHeight();
+    const auto vibratoPanelY = midiPanelY + midiPanelHeight_;
     vibratoPanel_->setBounds(
         bounds.getX() + 0,
         bounds.getY() + vibratoPanelY,
-        VibratoPanel::getWidth(),
-        VibratoPanel::getHeight()
+        childModuleWidth_,
+        vibratoPanelHeight_
     );
     
-    const auto miscPanelY = vibratoPanelY + VibratoPanel::getHeight();
+    const auto miscPanelY = vibratoPanelY + vibratoPanelHeight_;
     miscPanel_->setBounds(
         bounds.getX() + 0,
         bounds.getY() + miscPanelY,
-        MiscPanel::getWidth(),
-        MiscPanel::getHeight()
+        childModuleWidth_,
+        miscPanelHeight_
     );
 }
 

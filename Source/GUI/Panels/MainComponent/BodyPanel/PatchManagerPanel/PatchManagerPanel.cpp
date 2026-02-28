@@ -13,18 +13,28 @@
 #include "GUI/Factories/WidgetFactory.h"
 
 
-PatchManagerPanel::PatchManagerPanel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
-    : skin_(&skin)
+PatchManagerPanel::PatchManagerPanel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+    : width_(width)
+    , height_(height)
+    , bankUtilityPanelHeight_(PluginDimensions::Panels::Body::PatchManagerSection::BankUtilityModule::kHeight)
+    , internalPatchesPanelHeight_(PluginDimensions::Panels::Body::PatchManagerSection::InternalPatchesModule::kHeight)
+    , computerPatchesPanelHeight_(PluginDimensions::Panels::Body::PatchManagerSection::ComputerPatchesModule::kHeight)
+    , patchMutatorPanelHeight_(PluginDimensions::Panels::Body::PatchManagerSection::PatchMutatorModule::kHeight)
+    , skin_(&skin)
     , sectionHeader_(std::make_unique<tss::SectionHeader>(
         skin,
         PluginDimensions::Widgets::Widths::SectionHeader::kPatchManager,
         PluginDimensions::Widgets::Heights::kSectionHeader,
         PluginHelpers::getSectionDisplayName(PluginIDs::PatchManagerSection::kGroupId),
         tss::SectionHeader::ColourVariant::Blue))
-    , bankUtilityPanel_(std::make_unique<BankUtilityPanel>(skin, widgetFactory, apvts))
-    , internalPatchesPanel_(std::make_unique<InternalPatchesPanel>(skin, widgetFactory, apvts))
-    , computerPatchesPanel_(std::make_unique<ComputerPatchesPanel>(skin, widgetFactory, apvts))
-    , patchMutatorPanel_(std::make_unique<PatchMutatorPanel>(skin, widgetFactory, apvts))
+    , bankUtilityPanel_(std::make_unique<BankUtilityPanel>(skin,
+        PluginDimensions::Panels::Body::PatchManagerSection::kWidth, bankUtilityPanelHeight_, widgetFactory, apvts))
+    , internalPatchesPanel_(std::make_unique<InternalPatchesPanel>(skin,
+        PluginDimensions::Panels::Body::PatchManagerSection::kWidth, internalPatchesPanelHeight_, widgetFactory, apvts))
+    , computerPatchesPanel_(std::make_unique<ComputerPatchesPanel>(skin,
+        PluginDimensions::Panels::Body::PatchManagerSection::kWidth, computerPatchesPanelHeight_, widgetFactory, apvts))
+    , patchMutatorPanel_(std::make_unique<PatchMutatorPanel>(skin,
+        PluginDimensions::Panels::Body::PatchManagerSection::kWidth, patchMutatorPanelHeight_, widgetFactory, apvts))
 {
     setOpaque(false);
     addAndMakeVisible(*sectionHeader_);
@@ -33,7 +43,7 @@ PatchManagerPanel::PatchManagerPanel(tss::Skin& skin, WidgetFactory& widgetFacto
     addAndMakeVisible(*computerPatchesPanel_);
     addAndMakeVisible(*patchMutatorPanel_);
 
-    setSize(getWidth(), getHeight());
+    setSize(width_, height_);
 }
 
 PatchManagerPanel::~PatchManagerPanel() = default;
@@ -41,20 +51,21 @@ PatchManagerPanel::~PatchManagerPanel() = default;
 void PatchManagerPanel::resized()
 {
     const auto bounds = getLocalBounds();
+    const auto sectionHeaderHeight = PluginDimensions::Widgets::Heights::kSectionHeader;
     int y = 0;
 
     layoutSectionHeader(bounds, y);
 
-    y += PluginDimensions::Widgets::Heights::kSectionHeader;
+    y += sectionHeaderHeight;
     layoutBankUtilityPanel(bounds, y);
 
-    y += BankUtilityPanel::getHeight();
+    y += bankUtilityPanelHeight_;
     layoutInternalPatchesPanel(bounds, y);
 
-    y += InternalPatchesPanel::getHeight();
+    y += internalPatchesPanelHeight_;
     layoutComputerPatchesPanel(bounds, y);
 
-    y += ComputerPatchesPanel::getHeight();
+    y += computerPatchesPanelHeight_;
     layoutPatchMutatorPanel(bounds, y);
 }
 
@@ -78,8 +89,8 @@ void PatchManagerPanel::layoutBankUtilityPanel(const juce::Rectangle<int>& bound
         panel->setBounds(
             bounds.getX(),
             bounds.getY() + y,
-            BankUtilityPanel::getWidth(),
-            BankUtilityPanel::getHeight()
+            width_,
+            bankUtilityPanelHeight_
         );
     }
 }
@@ -91,8 +102,8 @@ void PatchManagerPanel::layoutInternalPatchesPanel(const juce::Rectangle<int>& b
         panel->setBounds(
             bounds.getX(),
             bounds.getY() + y,
-            InternalPatchesPanel::getWidth(),
-            InternalPatchesPanel::getHeight()
+            width_,
+            internalPatchesPanelHeight_
         );
     }
 }
@@ -104,8 +115,8 @@ void PatchManagerPanel::layoutComputerPatchesPanel(const juce::Rectangle<int>& b
         panel->setBounds(
             bounds.getX(),
             bounds.getY() + y,
-            ComputerPatchesPanel::getWidth(),
-            ComputerPatchesPanel::getHeight()
+            width_,
+            computerPatchesPanelHeight_
         );
     }
 }
@@ -117,8 +128,8 @@ void PatchManagerPanel::layoutPatchMutatorPanel(const juce::Rectangle<int>& boun
         panel->setBounds(
             bounds.getX(),
             bounds.getY() + y,
-            PatchMutatorPanel::getWidth(),
-            PatchMutatorPanel::getHeight()
+            width_,
+            patchMutatorPanelHeight_
         );
     }
 }

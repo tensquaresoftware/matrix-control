@@ -7,7 +7,6 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 
 #include "Shared/PluginDescriptors.h"
-#include "Shared/PluginDimensions.h"
 #include "GUI/Panels/Reusable/ModulationBusPanel.h"
 
 namespace tss
@@ -23,14 +22,11 @@ class WidgetFactory;
 class MatrixModulationPanel : public juce::Component
 {
 public:
-    MatrixModulationPanel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    MatrixModulationPanel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~MatrixModulationPanel() override;
 
     void resized() override;
     void setSkin(tss::Skin& skin);
-
-    static int getWidth() { return PluginDimensions::Panels::Body::MatrixModulationSection::kWidth; }
-    static int getHeight() { return PluginDimensions::Panels::Body::MatrixModulationSection::kHeight; }
 
 private:
     struct ModulationBusParameterArrays
@@ -49,6 +45,9 @@ private:
 
     void createInitAllBussesButton(tss::Skin& skin);
 
+    int width_;
+    int height_;
+    int modulationBusHeight_;
     tss::Skin* skin_;
     juce::AudioProcessorValueTreeState& apvts_;
 

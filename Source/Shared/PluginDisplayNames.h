@@ -43,7 +43,7 @@ namespace PluginDisplayNames
             constexpr const char* kChannel13 = "CHANNEL 13";
             constexpr const char* kChannel14 = "CHANNEL 14";
             constexpr const char* kChannel15 = "CHANNEL 15";
-            constexpr const char* kChannel16 = "16";
+            constexpr const char* kChannel16 = "CHANNEL 16";
             constexpr const char* kMonoG1    = "MONO G1";
             constexpr const char* kMonoG2    = "MONO G2";
             constexpr const char* kMonoG3    = "MONO G3";

@@ -5,8 +5,6 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 
-#include "Shared/PluginDimensions.h"
-
 namespace tss
 {
     class Skin;
@@ -22,7 +20,7 @@ class Lfo2Panel;
 class BottomPanel : public juce::Component
 {
 public:
-    BottomPanel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    BottomPanel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~BottomPanel() override;
 
     void resized() override;
@@ -32,12 +30,12 @@ public:
     Env2Panel* getEnv2Panel() { return env2Panel_.get(); }
     Env3Panel* getEnv3Panel() { return env3Panel_.get(); }
 
-    static int getWidth() { return PluginDimensions::Panels::Body::PatchEditSection::BottomModules::kWidth; }
-    static int getHeight() { return PluginDimensions::Panels::Body::PatchEditSection::BottomModules::kHeight; }
-    static int getSpacing() { return PluginDimensions::Panels::Body::kPadding; }
-
 private:
-
+    int width_;
+    int height_;
+    int childModuleWidth_;
+    int childModuleHeight_;
+    int spacing_;
     tss::Skin* skin_;
 
     std::unique_ptr<Env1Panel> env1Panel_;

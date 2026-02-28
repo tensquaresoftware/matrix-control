@@ -5,8 +5,6 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 
-#include "Shared/PluginDimensions.h"
-
 namespace tss
 {
     class Skin;
@@ -22,7 +20,7 @@ class RampPortamentoPanel;
 class TopPanel : public juce::Component
 {
 public:
-    TopPanel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    TopPanel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~TopPanel() override;
 
     void resized() override;
@@ -30,12 +28,12 @@ public:
     
     FmTrackPanel* getFmTrackPanel() { return fmTrackPanel_.get(); }
 
-    static int getWidth() { return PluginDimensions::Panels::Body::PatchEditSection::TopModules::kWidth; }
-    static int getHeight() { return PluginDimensions::Panels::Body::PatchEditSection::TopModules::kHeight; }
-    static int getSpacing() { return PluginDimensions::Panels::Body::kPadding; }
-
 private:
-
+    int width_;
+    int height_;
+    int childModuleWidth_;
+    int childModuleHeight_;
+    int spacing_;
     tss::Skin* skin_;
 
     std::unique_ptr<Dco1Panel> dco1Panel_;

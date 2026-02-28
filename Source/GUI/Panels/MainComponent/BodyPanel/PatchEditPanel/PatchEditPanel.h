@@ -6,8 +6,6 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 
-#include "Shared/PluginDimensions.h"
-
 namespace tss
 {
     class Skin;
@@ -23,7 +21,7 @@ class PatchEditPanel : public juce::Component,
                        public juce::Slider::Listener
 {
 public:
-    PatchEditPanel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    PatchEditPanel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~PatchEditPanel() override;
 
     void resized() override;
@@ -31,15 +29,17 @@ public:
     
     void sliderValueChanged(juce::Slider* slider) override;
 
-    static int getWidth() { return PluginDimensions::Panels::Body::PatchEditSection::kWidth; }
-    static int getHeight() { return PluginDimensions::Panels::Body::PatchEditSection::kHeight; }
-
 private:
     inline constexpr static int kTrackPointSliderStartIndex_ = 3;
     inline constexpr static int kTrackPointSliderCount_ = 5;
     inline constexpr static int kEnvParamCount_ = 5;
     inline constexpr static int kEnvCount_ = 3;
     
+    int width_;
+    int height_;
+    int topPanelHeight_;
+    int middlePanelHeight_;
+    int bottomPanelHeight_;
     tss::Skin* skin_;
 
     std::unique_ptr<tss::SectionHeader> sectionHeader_;

@@ -45,16 +45,24 @@ std::unique_ptr<tss::Slider> WidgetFactory::createIntParameterSlider(
     const juce::String& parameterId,
     tss::Skin& skin)
 {
+    return createIntParameterSlider(
+        parameterId,
+        skin,
+        PluginDimensions::Widgets::Widths::Slider::kStandard,
+        PluginDimensions::Widgets::Heights::kSlider);
+}
+
+std::unique_ptr<tss::Slider> WidgetFactory::createIntParameterSlider(
+    const juce::String& parameterId,
+    tss::Skin& skin,
+    int width,
+    int height)
+{
     validator.throwIfParameterIdEmpty(parameterId);
     const auto* desc = findIntParameter(parameterId);
     validator.getIntParameterDescriptorOrThrow(desc, parameterId);
     validator.validateIntParameterValues(desc, parameterId);
-    return createSliderFromDescriptor(
-        desc,
-        skin,
-        PluginDimensions::Widgets::Widths::Slider::kStandard,
-        PluginDimensions::Widgets::Heights::kSlider
-    );
+    return createSliderFromDescriptor(desc, skin, width, height);
 }
 
 std::unique_ptr<tss::ComboBox> WidgetFactory::createChoiceParameterComboBox(

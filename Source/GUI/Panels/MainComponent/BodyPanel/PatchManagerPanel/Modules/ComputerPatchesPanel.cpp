@@ -11,8 +11,10 @@
 #include <juce_core/juce_core.h>
 
 
-ComputerPatchesPanel::ComputerPatchesPanel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
-    : skin_(&skin)
+ComputerPatchesPanel::ComputerPatchesPanel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+    : width_(width)
+    , height_(height)
+    , skin_(&skin)
     , apvts_(apvts)
 {
     setOpaque(false);
@@ -28,7 +30,7 @@ ComputerPatchesPanel::ComputerPatchesPanel(tss::Skin& skin, WidgetFactory& widge
     setupSavePatchFileAsButton(skin, widgetFactory);
     setupSavePatchFileButton(skin, widgetFactory);
 
-    setSize(getWidth(), getHeight());
+    setSize(width_, height_);
 }
 
 ComputerPatchesPanel::~ComputerPatchesPanel() = default;

@@ -30,7 +30,7 @@ ModulePanelConfig VcfVcaPanel::createConfig()
     return config;
 }
 
-VcfVcaPanel::VcfVcaPanel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
-    : BaseModulePanel(skin, widgetFactory, apvts, createConfig(), getWidth(), getHeight())
+VcfVcaPanel::VcfVcaPanel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+    : BaseModulePanel(skin, widgetFactory, apvts, createConfig(), width, height)
 {
 }

@@ -3,7 +3,6 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 
-#include "Shared/PluginDimensions.h"
 #include "GUI/Panels/Reusable/BaseModulePanel.h"
 
 namespace tss
@@ -16,11 +15,8 @@ class WidgetFactory;
 class MidiPanel : public BaseModulePanel
 {
 public:
-    MidiPanel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    MidiPanel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~MidiPanel() override = default;
-
-    static int getWidth() { return PluginDimensions::Panels::Body::MasterEditSection::ChildModules::kWidth; }
-    static int getHeight() { return PluginDimensions::Panels::Body::MasterEditSection::MidiModule::kHeight; }
 
 private:
     static ModulePanelConfig createConfig();
