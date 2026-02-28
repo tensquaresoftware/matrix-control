@@ -13,6 +13,8 @@ namespace PluginIDs
 {
     namespace Settings
     {
+        constexpr const char* kGuiZoomLevelId = "guiZoomLevelId";
+        
         namespace ZoomLevels
         {
             constexpr int k50  = 1;

@@ -32,10 +32,18 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     
     if (auto* component = mainComponent.get())
     {
-        component->setBounds(getLocalBounds());
+        component->setBounds(0, 0, getWidth(), getHeight());
     }
     
     auto& headerPanel = mainComponent->getHeaderPanel();
+    
+    const int savedZoomLevelId = pluginProcessor.getApvts().state.getProperty(
+        PluginIDs::Settings::kGuiZoomLevelId, 
+        PluginIDs::Settings::ZoomLevels::kDefault
+    );
+    const float savedScale = PluginIDs::Settings::ZoomLevels::getZoomLevel(savedZoomLevelId);
+    applyZoomLevel(savedScale);
+    headerPanel.getZoomComboBox().setSelectedId(savedZoomLevelId, juce::dontSendNotification);
     
     headerPanel.getSkinComboBox().onChange = [this, &headerPanel]
     {
@@ -45,14 +53,12 @@ PluginEditor::PluginEditor(PluginProcessor& p)
         updateSkin();
     };
     
-    headerPanel.getZoomComboBox().onChange = [&headerPanel]
+    headerPanel.getZoomComboBox().onChange = [this, &headerPanel]
     {
         const auto selectedId = headerPanel.getZoomComboBox().getSelectedId();
-        const float zoomFactor = PluginIDs::Settings::ZoomLevels::getZoomLevel(selectedId);
-        
-        // TODO: Implement zoom functionality (Phase 7)
-        // For now, just log the selected zoom factor
-        juce::ignoreUnused(zoomFactor);
+        const float scale = PluginIDs::Settings::ZoomLevels::getZoomLevel(selectedId);
+        applyZoomLevel(scale);
+        pluginProcessor.getApvts().state.setProperty(PluginIDs::Settings::kGuiZoomLevelId, selectedId, nullptr);
     };
     
     repaint();
@@ -68,7 +74,7 @@ void PluginEditor::paint(juce::Graphics& g)
 void PluginEditor::resized()
 {
     if (auto* component = mainComponent.get())
-        component->setBounds(getLocalBounds());
+        component->setBounds(0, 0, getWidth(), getHeight());
 }
 
 void PluginEditor::mouseDown(const juce::MouseEvent&)
@@ -81,5 +87,21 @@ void PluginEditor::updateSkin()
     if (auto* widget = mainComponent.get())
         widget->setSkin(*skin_);
     repaint();
+}
+
+void PluginEditor::applyZoomLevel(float scale)
+{
+    const int baseWidth = getWidth();
+    const int baseHeight = getHeight();
+    
+    setSize(juce::roundToInt(static_cast<float>(baseWidth) * scale), 
+            juce::roundToInt(static_cast<float>(baseHeight) * scale));
+    
+    if (auto* component = mainComponent.get())
+    {
+        component->setBounds(0, 0, baseWidth, baseHeight);
+        component->setTransform(juce::AffineTransform::scale(scale));
+        component->repaint();
+    }
 }
 

@@ -38,6 +38,9 @@ HeaderPanel::HeaderPanel(tss::ISkin& skin, int width, int height)
     zoomComboBox_.addItem(PluginDisplayNames::ChoiceLists::ZoomLevels::k125, PluginIDs::Settings::ZoomLevels::k125);
     zoomComboBox_.addItem(PluginDisplayNames::ChoiceLists::ZoomLevels::k150, PluginIDs::Settings::ZoomLevels::k150);
     zoomComboBox_.addItem(PluginDisplayNames::ChoiceLists::ZoomLevels::k200, PluginIDs::Settings::ZoomLevels::k200);
+    zoomComboBox_.addItem(PluginDisplayNames::ChoiceLists::ZoomLevels::k250, PluginIDs::Settings::ZoomLevels::k250);
+    zoomComboBox_.addItem(PluginDisplayNames::ChoiceLists::ZoomLevels::k300, PluginIDs::Settings::ZoomLevels::k300);
+    zoomComboBox_.addItem(PluginDisplayNames::ChoiceLists::ZoomLevels::k400, PluginIDs::Settings::ZoomLevels::k400);
     zoomComboBox_.setSelectedId(PluginIDs::Settings::ZoomLevels::k100, juce::dontSendNotification);
     addAndMakeVisible(zoomComboBox_);
 }

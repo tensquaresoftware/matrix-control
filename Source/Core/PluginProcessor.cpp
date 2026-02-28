@@ -218,6 +218,12 @@ void PluginProcessor::initializeMidiPortProperties()
     {
         apvts.state.setProperty("midiOutputPortId", juce::String(), nullptr);
     }
+    if (!apvts.state.hasProperty(PluginIDs::Settings::kGuiZoomLevelId))
+    {
+        apvts.state.setProperty(PluginIDs::Settings::kGuiZoomLevelId, 
+                                PluginIDs::Settings::ZoomLevels::kDefault, 
+                                nullptr);
+    }
 }
 
 void PluginProcessor::enableFileLoggingForSession()

@@ -13,7 +13,7 @@ This annex documents key technical choices and component specifications for the 
 ## 1. Scalability and Display
 
 - **Vector graphics only:** All components are drawn using JUCE vector primitives (Paths, Shapes, etc.).
-- **Scalable design:** The GUI responds to window resizing and user-selected zoom factor (presets: 50%, 75%, 100%, 150%, 200%).
+- **Scalable design:** The GUI responds to window resizing and user-selected zoom level (presets: 50%, 75%, 100%, 150%, 200%).
 - **High DPI support:** Retina/4K displays are natively supported by scaling all dimensions.
 
 ### ScalableComponentMixin (Utility Class)

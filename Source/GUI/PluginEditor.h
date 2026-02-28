@@ -36,6 +36,7 @@ private:
     std::unique_ptr<MainComponent> mainComponent;
     
     void updateSkin();
+    void applyZoomLevel(float scale);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginEditor)
 };
