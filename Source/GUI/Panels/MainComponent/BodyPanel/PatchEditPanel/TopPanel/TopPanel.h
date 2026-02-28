@@ -30,8 +30,8 @@ public:
     
     FmTrackPanel* getFmTrackPanel() { return fmTrackPanel_.get(); }
 
-    static int getWidth() { return PluginDimensions::Panels::Body::PatchEdit::Top::kWidth; }
-    static int getHeight() { return PluginDimensions::Panels::Body::PatchEdit::Top::kHeight; }
+    static int getWidth() { return PluginDimensions::Panels::Body::PatchEditSection::TopModules::kWidth; }
+    static int getHeight() { return PluginDimensions::Panels::Body::PatchEditSection::TopModules::kHeight; }
     static int getSpacing() { return PluginDimensions::Panels::Body::kPadding; }
 
 private:

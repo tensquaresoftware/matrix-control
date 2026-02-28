@@ -19,8 +19,8 @@ public:
     MiscPanel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~MiscPanel() override = default;
 
-    static int getWidth() { return PluginDimensions::Panels::Body::MasterEdit::ChildPanels::kWidth; }
-    static int getHeight() { return PluginDimensions::Panels::Body::MasterEdit::Misc::kHeight; }
+    static int getWidth() { return PluginDimensions::Panels::Body::MasterEditSection::ChildModules::kWidth; }
+    static int getHeight() { return PluginDimensions::Panels::Body::MasterEditSection::MiscModule::kHeight; }
 
 private:
     static ModulePanelConfig createConfig();

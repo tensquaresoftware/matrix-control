@@ -37,8 +37,8 @@ public:
     void valueTreeParentChanged(juce::ValueTree&) override {}
     void valueTreeRedirected(juce::ValueTree&) override {}
 
-    static int getWidth() { return PluginDimensions::Panels::Body::PatchManager::InternalPatches::kWidth; }
-    static int getHeight() { return PluginDimensions::Panels::Body::PatchManager::InternalPatches::kHeight; }
+    static int getWidth() { return PluginDimensions::Panels::Body::PatchManagerSection::InternalPatchesModule::kWidth; }
+    static int getHeight() { return PluginDimensions::Panels::Body::PatchManagerSection::InternalPatchesModule::kHeight; }
 
 private:
     inline constexpr static int kGroupLabelSpacing_ = 10;

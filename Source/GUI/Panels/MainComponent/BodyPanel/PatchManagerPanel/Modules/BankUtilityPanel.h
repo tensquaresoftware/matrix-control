@@ -26,8 +26,8 @@ public:
     void resized() override;
     void setSkin(tss::Skin& skin);
 
-    static int getWidth() { return PluginDimensions::Panels::Body::PatchManager::BankUtility::kWidth; }
-    static int getHeight() { return PluginDimensions::Panels::Body::PatchManager::BankUtility::kHeight; }
+    static int getWidth() { return PluginDimensions::Panels::Body::PatchManagerSection::BankUtilityModule::kWidth; }
+    static int getHeight() { return PluginDimensions::Panels::Body::PatchManagerSection::BankUtilityModule::kHeight; }
 
 private:
     inline constexpr static int kTopPadding_ = 5;

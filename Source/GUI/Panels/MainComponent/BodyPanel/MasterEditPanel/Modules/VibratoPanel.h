@@ -19,8 +19,8 @@ public:
     VibratoPanel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~VibratoPanel() override = default;
 
-    static int getWidth() { return PluginDimensions::Panels::Body::MasterEdit::ChildPanels::kWidth; }
-    static int getHeight() { return PluginDimensions::Panels::Body::MasterEdit::Vibrato::kHeight; }
+    static int getWidth() { return PluginDimensions::Panels::Body::MasterEditSection::ChildModules::kWidth; }
+    static int getHeight() { return PluginDimensions::Panels::Body::MasterEditSection::VibratoModule::kHeight; }
 
 private:
     static ModulePanelConfig createConfig();

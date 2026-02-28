@@ -14,17 +14,17 @@ MiddlePanel::~MiddlePanel()
 MiddlePanel::MiddlePanel(tss::Skin& skin, juce::AudioProcessorValueTreeState& apvts)
     : skin_(&skin)
     , apvts_(&apvts)
-    , envelope1Display_(skin, PluginDimensions::Panels::Body::PatchEdit::Middle::ChildPanels::kWidth, PluginDimensions::Panels::Body::PatchEdit::Middle::ChildPanels::kHeight)
-    , envelope2Display_(skin, PluginDimensions::Panels::Body::PatchEdit::Middle::ChildPanels::kWidth, PluginDimensions::Panels::Body::PatchEdit::Middle::ChildPanels::kHeight)
-    , envelope3Display_(skin, PluginDimensions::Panels::Body::PatchEdit::Middle::ChildPanels::kWidth, PluginDimensions::Panels::Body::PatchEdit::Middle::ChildPanels::kHeight)
-    , trackGeneratorDisplay_(skin, PluginDimensions::Panels::Body::PatchEdit::Middle::ChildPanels::kWidth, PluginDimensions::Panels::Body::PatchEdit::Middle::ChildPanels::kHeight)
+    , envelope1Display_(skin, PluginDimensions::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kWidth, PluginDimensions::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kHeight)
+    , envelope2Display_(skin, PluginDimensions::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kWidth, PluginDimensions::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kHeight)
+    , envelope3Display_(skin, PluginDimensions::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kWidth, PluginDimensions::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kHeight)
+    , trackGeneratorDisplay_(skin, PluginDimensions::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kWidth, PluginDimensions::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kHeight)
     , patchNameModuleHeader_(skin, PluginDisplayNames::PatchEditSection::PatchNameModule::kName,
-                             PluginDimensions::Panels::Body::PatchEdit::Middle::ChildPanels::kWidth,
+                             PluginDimensions::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kWidth,
                              PluginDimensions::Widgets::Heights::kModuleHeader,
                              tss::ModuleHeader::ColourVariant::Blue)
     , patchNameDisplay_(skin,
-                        PluginDimensions::Panels::Body::PatchEdit::Middle::ChildPanels::kWidth,
-                        PluginDimensions::Panels::Body::PatchEdit::Middle::kPatchNameDisplayHeight)
+                        PluginDimensions::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kWidth,
+                        PluginDimensions::Widgets::Heights::kPatchNameDisplay)
 {
     setOpaque(false);
     setSize(getWidth(), getHeight());
@@ -43,9 +43,9 @@ MiddlePanel::MiddlePanel(tss::Skin& skin, juce::AudioProcessorValueTreeState& ap
 
 void MiddlePanel::resized()
 {
-    using namespace PluginDimensions::Panels::Body::PatchEdit::Middle;
-    const auto childWidth = ChildPanels::kWidth;
-    const auto childHeight = ChildPanels::kHeight;
+    using namespace PluginDimensions::Panels::Body::PatchEditSection::MiddleModules;
+    const auto childWidth = ChildModules::kWidth;
+    const auto childHeight = ChildModules::kHeight;
 
     envelope1Display_.setBounds(0, 0, childWidth, childHeight);
     envelope2Display_.setBounds(envelope1Display_.getBounds().getRight() + kSpacing, 0, childWidth, childHeight);

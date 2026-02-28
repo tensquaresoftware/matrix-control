@@ -38,8 +38,8 @@ public:
     void valueTreeParentChanged(juce::ValueTree&) override {}
     void valueTreeRedirected(juce::ValueTree&) override {}
 
-    static int getWidth() { return PluginDimensions::Panels::Body::PatchEdit::Middle::kWidth; }
-    static int getHeight() { return PluginDimensions::Panels::Body::PatchEdit::Middle::kHeight; }
+    static int getWidth() { return PluginDimensions::Panels::Body::PatchEditSection::MiddleModules::kWidth; }
+    static int getHeight() { return PluginDimensions::Panels::Body::PatchEditSection::MiddleModules::kHeight; }
 
 private:
     inline constexpr static int kSpacing = 15;

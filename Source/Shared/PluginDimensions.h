@@ -36,33 +36,33 @@ namespace PluginDimensions
             inline constexpr int kPadding = 15;
             inline constexpr int kEffectiveHeight = kHeight - 2 * kPadding;
 
-            namespace MasterEdit
+            namespace MasterEditSection
             {
                 inline constexpr int kWidth = 160;
                 inline constexpr int kHeight = Body::kEffectiveHeight;
 
-                namespace ChildPanels
+                namespace ChildModules
                 {
-                    inline constexpr int kWidth = MasterEdit::kWidth;
+                    inline constexpr int kWidth = MasterEditSection::kWidth;
                 }
 
-                namespace Midi
+                namespace MidiModule
                 {
                     inline constexpr int kHeight = 242;
                 }
 
-                namespace Vibrato
+                namespace VibratoModule
                 {
                     inline constexpr int kHeight = 218;
                 }
 
-                namespace Misc
+                namespace MiscModule
                 {
                     inline constexpr int kHeight = 230;
                 }
             }
 
-            namespace PatchEdit
+            namespace PatchEditSection
             {
                 inline constexpr int kWidth = 810;
                 inline constexpr int kHeight = Body::kEffectiveHeight;
@@ -70,82 +70,80 @@ namespace PluginDimensions
                 inline constexpr int kModuleWidth = 150;
                 inline constexpr int kTopBottomPanelHeight = 280;
 
-                namespace Top
+                namespace TopModules
                 {
-                    inline constexpr int kWidth = PatchEdit::kWidth;
-                    inline constexpr int kHeight = PatchEdit::kTopBottomPanelHeight;
+                    inline constexpr int kWidth = PatchEditSection::kWidth;
+                    inline constexpr int kHeight = PatchEditSection::kTopBottomPanelHeight;
 
-                    namespace ChildPanels
+                    namespace ChildModules
                     {
-                        inline constexpr int kWidth = PatchEdit::kModuleWidth;
-                        inline constexpr int kHeight = Top::kHeight;
+                        inline constexpr int kWidth = PatchEditSection::kModuleWidth;
+                        inline constexpr int kHeight = TopModules::kHeight;
                     }
                 }
 
-                namespace Middle
+                namespace MiddleModules
                 {
-                    inline constexpr int kWidth = PatchEdit::kWidth;
+                    inline constexpr int kWidth = PatchEditSection::kWidth;
                     inline constexpr int kHeight = 130;
 
-                    namespace ChildPanels
+                    namespace ChildModules
                     {
-                        inline constexpr int kWidth = PatchEdit::kModuleWidth;
-                        inline constexpr int kHeight = Middle::kHeight;
+                        inline constexpr int kWidth = PatchEditSection::kModuleWidth;
+                        inline constexpr int kHeight = MiddleModules::kHeight;
                     }
-
-                    inline constexpr int kPatchNameDisplayHeight = 70;
                 }
 
-                namespace Bottom
+                namespace BottomModules
                 {
-                    inline constexpr int kWidth = PatchEdit::kWidth;
-                    inline constexpr int kHeight = PatchEdit::kTopBottomPanelHeight;
+                    inline constexpr int kWidth = PatchEditSection::kWidth;
+                    inline constexpr int kHeight = PatchEditSection::kTopBottomPanelHeight;
 
-                    namespace ChildPanels
+                    namespace ChildModules
                     {
-                        inline constexpr int kWidth = PatchEdit::kModuleWidth;
-                        inline constexpr int kHeight = Bottom::kHeight;
+                        inline constexpr int kWidth = PatchEditSection::kModuleWidth;
+                        inline constexpr int kHeight = BottomModules::kHeight;
                     }
                 }
             }
 
-            namespace MatrixModulationPatchManagerColumn
+            namespace SharedColumn
             {
                 inline constexpr int kWidth = 275;
             }
 
-            namespace MatrixModulation
+            namespace MatrixModulationSection
             {
-                inline constexpr int kWidth = Body::MatrixModulationPatchManagerColumn::kWidth;
+                inline constexpr int kWidth = Body::SharedColumn::kWidth;
                 inline constexpr int kHeight = 320;
             }
 
-            namespace PatchManager
+            namespace PatchManagerSection
             {
-                inline constexpr int kWidth = Body::MatrixModulationPatchManagerColumn::kWidth;
+                inline constexpr int kWidth = Body::SharedColumn::kWidth;
                 inline constexpr int kHeight = 400;
 
-                namespace BankUtility
+                namespace BankUtilityModule
                 {
-                    inline constexpr int kWidth = PatchManager::kWidth;
+                    inline constexpr int kWidth = PatchManagerSection::kWidth;
                     inline constexpr int kHeight = 90;
                 }
 
-                namespace InternalPatches
+                namespace InternalPatchesModule
                 {
-                    inline constexpr int kWidth = PatchManager::kWidth;
+                    inline constexpr int kWidth = PatchManagerSection::kWidth;
                     inline constexpr int kHeight = 85;
                 }
 
-                namespace ComputerPatches
+                namespace ComputerPatchesModule
                 {
-                    inline constexpr int kWidth = PatchManager::kWidth;
+                    inline constexpr int kWidth = PatchManagerSection::kWidth;
                     inline constexpr int kHeight = 85;
                 }
 
-                namespace PatchMutator
+                namespace PatchMutatorModule
                 {
-                    inline constexpr int kWidth = PatchManager::kWidth;
+                    inline constexpr int kWidth = PatchManagerSection::kWidth;
                     inline constexpr int kHeight = 105;
                 }
             }
@@ -169,22 +167,22 @@ namespace PluginDimensions
         {
             namespace SectionHeader
             {
-                inline constexpr int kMasterEdit = Panels::Body::MasterEdit::kWidth;
-                inline constexpr int kPatchEdit = Panels::Body::PatchEdit::kWidth;
-                inline constexpr int kMatrixModulation = Panels::Body::MatrixModulation::kWidth;
-                inline constexpr int kPatchManager = Panels::Body::PatchManager::kWidth;
+                inline constexpr int kMasterEdit = Panels::Body::MasterEditSection::kWidth;
+                inline constexpr int kPatchEdit = Panels::Body::PatchEditSection::kWidth;
+                inline constexpr int kMatrixModulation = Panels::Body::MatrixModulationSection::kWidth;
+                inline constexpr int kPatchManager = Panels::Body::PatchManagerSection::kWidth;
             }
 
             namespace ModuleHeader
             {
-                inline constexpr int kPatchEditModule = Panels::Body::PatchEdit::kModuleWidth;
-                inline constexpr int kMasterEditModule = Panels::Body::MasterEdit::kWidth;
-                inline constexpr int kPatchManagerModule = Panels::Body::MatrixModulationPatchManagerColumn::kWidth;
+                inline constexpr int kPatchEditModule = Panels::Body::PatchEditSection::kModuleWidth;
+                inline constexpr int kMasterEditModule = Panels::Body::MasterEditSection::kWidth;
+                inline constexpr int kPatchManagerModule = Panels::Body::SharedColumn::kWidth;
             }
 
             namespace ModulationBusHeader
             {
-                inline constexpr int kStandard = Panels::Body::MatrixModulationPatchManagerColumn::kWidth;
+                inline constexpr int kStandard = Panels::Body::SharedColumn::kWidth;
             }
             
             namespace GroupLabel
@@ -207,6 +205,7 @@ namespace PluginDimensions
             namespace Button
             {
                 inline constexpr int kHeaderPanelTheme = 70;
+                
                 inline constexpr int kInit = 20;
                 inline constexpr int kCopy = 20;
                 inline constexpr int kPaste = 20;
@@ -251,9 +250,9 @@ namespace PluginDimensions
             
             namespace HorizontalSeparator
             {
-                inline constexpr int kMasterEditModule = Panels::Body::MasterEdit::kWidth;
-                inline constexpr int kPatchEditModule = Panels::Body::PatchEdit::kModuleWidth;
-                inline constexpr int kMatrixModulationBus = Panels::Body::MatrixModulationPatchManagerColumn::kWidth;
+                inline constexpr int kMasterEditModule = Panels::Body::MasterEditSection::kWidth;
+                inline constexpr int kPatchEditModule = Panels::Body::PatchEditSection::kModuleWidth;
+                inline constexpr int kMatrixModulationBus = Panels::Body::SharedColumn::kWidth;
             }
             
             namespace VerticalSeparator
@@ -274,6 +273,7 @@ namespace PluginDimensions
             inline constexpr int kSlider = 20;
             inline constexpr int kComboBox = 20;
             inline constexpr int kNumberBox = 20;
+            inline constexpr int kPatchNameDisplay = 70;
             inline constexpr int kHorizontalSeparator = 5;
             inline constexpr int kVerticalSeparator = Panels::Body::kEffectiveHeight;
         }

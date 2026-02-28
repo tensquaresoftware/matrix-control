@@ -19,8 +19,8 @@ public:
     Env3Panel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~Env3Panel() override = default;
 
-    static int getWidth() { return PluginDimensions::Panels::Body::PatchEdit::Bottom::ChildPanels::kWidth; }
-    static int getHeight() { return PluginDimensions::Panels::Body::PatchEdit::Bottom::ChildPanels::kHeight; }
+    static int getWidth() { return PluginDimensions::Panels::Body::PatchEditSection::BottomModules::ChildModules::kWidth; }
+    static int getHeight() { return PluginDimensions::Panels::Body::PatchEditSection::BottomModules::ChildModules::kHeight; }
 
 private:
     static ModulePanelConfig createConfig();

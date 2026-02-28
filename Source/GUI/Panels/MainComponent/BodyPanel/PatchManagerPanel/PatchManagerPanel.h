@@ -28,8 +28,8 @@ public:
     void resized() override;
     void setSkin(tss::Skin& skin);
 
-    static int getWidth() { return PluginDimensions::Panels::Body::PatchManager::kWidth; }
-    static int getHeight() { return PluginDimensions::Panels::Body::PatchManager::kHeight; }
+    static int getWidth() { return PluginDimensions::Panels::Body::PatchManagerSection::kWidth; }
+    static int getHeight() { return PluginDimensions::Panels::Body::PatchManagerSection::kHeight; }
 
 private:
 
