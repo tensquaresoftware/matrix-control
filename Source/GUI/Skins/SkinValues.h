@@ -31,6 +31,7 @@ namespace tss
     {
         // Panel colours
         kHeaderPanelBackground,
+        kHeaderPanelLabelText,
         kBodyPanelBackground,
         kFooterPanelBackground,
         

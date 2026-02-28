@@ -36,6 +36,15 @@ public:
     tss::Slider* getSlider() const { return slider_.get(); }
 
 private:
+    struct ParameterPanelDimensions
+    {
+        int labelWidth;
+        int comboBoxWidth;
+        int separatorWidth;
+    };
+
+    ParameterPanelDimensions getDimensionsForModuleType(ModuleType moduleType) const;
+
     void createParameterLabel(tss::Skin& skin, WidgetFactory& factory, const juce::String& parameterId);
     void createParameterWidget(tss::Skin& skin, WidgetFactory& factory, const juce::String& parameterId, juce::AudioProcessorValueTreeState& apvts);
     void createSliderWidget(tss::Skin& skin, WidgetFactory& factory, const juce::String& parameterId, juce::AudioProcessorValueTreeState& apvts);

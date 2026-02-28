@@ -35,6 +35,7 @@ private:
     inline constexpr static int kZoomLabelWidth_ = 35;
     inline constexpr static int kComboBoxWidth_ = 50;
     inline constexpr static int kControlHeight_ = 20;
+    inline constexpr static int kLeftPadding_ = 15;
 
     tss::Skin* skin_;
 

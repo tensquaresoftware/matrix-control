@@ -74,6 +74,11 @@ namespace tss
         return getColour(SkinColourId::kHeaderPanelBackground);
     }
 
+    juce::Colour Skin::getHeaderPanelLabelTextColour() const
+    {
+        return getColour(SkinColourId::kHeaderPanelLabelText);
+    }
+
     juce::Colour Skin::getBodyPanelBackgroundColour() const
     {
         return getColour(SkinColourId::kBodyPanelBackground);
@@ -375,210 +380,111 @@ namespace tss
     void Skin::initializeDefaultColours()
     {
         if (currentVariant_ == ColourVariant::Black)
-            initializeBlackVariantColours();
+            initializeVariantColours([](const auto& el) { return el.blackVariant; });
         else
-            initializeCreamVariantColours();
+            initializeVariantColours([](const auto& el) { return el.creamVariant; });
     }
 
-    void Skin::initializeBlackVariantColours()
+    template <typename Accessor>
+    void Skin::initializeVariantColours(Accessor accessColour)
     {
         using namespace SkinColours;
 
-        colours_[SkinColourId::kHeaderPanelBackground] = juce::Colour(Panels::kHeaderPanelBackground.blackVariant);
-        colours_[SkinColourId::kBodyPanelBackground] = juce::Colour(Panels::kBodyPanelBackground.blackVariant);
-        colours_[SkinColourId::kFooterPanelBackground] = juce::Colour(Panels::kFooterPanelBackground.blackVariant);
+        colours_[SkinColourId::kHeaderPanelBackground] = juce::Colour(accessColour(Panels::kHeaderPanelBackground));
+        colours_[SkinColourId::kHeaderPanelLabelText] = juce::Colour(accessColour(Panels::kHeaderPanelLabelText));
+        colours_[SkinColourId::kBodyPanelBackground] = juce::Colour(accessColour(Panels::kBodyPanelBackground));
+        colours_[SkinColourId::kFooterPanelBackground] = juce::Colour(accessColour(Panels::kFooterPanelBackground));
 
-        colours_[SkinColourId::kSectionHeaderText] = juce::Colour(Widgets::SectionHeader::kText.blackVariant);
-        colours_[SkinColourId::kSectionHeaderLineBlue] = juce::Colour(Widgets::SectionHeader::kLineBlue.blackVariant);
-        colours_[SkinColourId::kSectionHeaderLineOrange] = juce::Colour(Widgets::SectionHeader::kLineOrange.blackVariant);
+        colours_[SkinColourId::kSectionHeaderText] = juce::Colour(accessColour(Widgets::SectionHeader::kText));
+        colours_[SkinColourId::kSectionHeaderLineBlue] = juce::Colour(accessColour(Widgets::SectionHeader::kLineBlue));
+        colours_[SkinColourId::kSectionHeaderLineOrange] = juce::Colour(accessColour(Widgets::SectionHeader::kLineOrange));
 
-        colours_[SkinColourId::kModuleHeaderText] = juce::Colour(Widgets::ModuleHeader::kText.blackVariant);
-        colours_[SkinColourId::kModuleHeaderLineBlue] = juce::Colour(Widgets::ModuleHeader::kLineBlue.blackVariant);
-        colours_[SkinColourId::kModuleHeaderLineOrange] = juce::Colour(Widgets::ModuleHeader::kLineOrange.blackVariant);
+        colours_[SkinColourId::kModuleHeaderText] = juce::Colour(accessColour(Widgets::ModuleHeader::kText));
+        colours_[SkinColourId::kModuleHeaderLineBlue] = juce::Colour(accessColour(Widgets::ModuleHeader::kLineBlue));
+        colours_[SkinColourId::kModuleHeaderLineOrange] = juce::Colour(accessColour(Widgets::ModuleHeader::kLineOrange));
 
-        colours_[SkinColourId::kGroupLabelText] = juce::Colour(Widgets::GroupLabel::kText.blackVariant);
-        colours_[SkinColourId::kGroupLabelLine] = juce::Colour(Widgets::GroupLabel::kLine.blackVariant);
+        colours_[SkinColourId::kGroupLabelText] = juce::Colour(accessColour(Widgets::GroupLabel::kText));
+        colours_[SkinColourId::kGroupLabelLine] = juce::Colour(accessColour(Widgets::GroupLabel::kLine));
 
-        colours_[SkinColourId::kLabelText] = juce::Colour(Widgets::Label::kText.blackVariant);
+        colours_[SkinColourId::kLabelText] = juce::Colour(accessColour(Widgets::Label::kText));
 
-        colours_[SkinColourId::kVerticalSeparatorLine] = juce::Colour(Widgets::VerticalSeparator::kLine.blackVariant);
-        colours_[SkinColourId::kHorizontalSeparatorLine] = juce::Colour(Widgets::HorizontalSeparator::kLine.blackVariant);
+        colours_[SkinColourId::kVerticalSeparatorLine] = juce::Colour(accessColour(Widgets::VerticalSeparator::kLine));
+        colours_[SkinColourId::kHorizontalSeparatorLine] = juce::Colour(accessColour(Widgets::HorizontalSeparator::kLine));
 
-        colours_[SkinColourId::kButtonBackgroundOff] = juce::Colour(Widgets::Button::kBackground.blackVariant);
-        colours_[SkinColourId::kButtonBorderOff] = juce::Colour(Widgets::Button::kBorder.blackVariant);
-        colours_[SkinColourId::kButtonTextOff] = juce::Colour(Widgets::Button::kText.blackVariant);
-        colours_[SkinColourId::kButtonBackgroundOn] = juce::Colour(Widgets::Button::kBackground.blackVariant);
-        colours_[SkinColourId::kButtonBorderOn] = juce::Colour(Widgets::Button::kBorder.blackVariant);
-        colours_[SkinColourId::kButtonTextOn] = juce::Colour(Widgets::Button::kText.blackVariant);
-        colours_[SkinColourId::kButtonBackgroundHover] = juce::Colour(Widgets::Button::kBackgroundHoover.blackVariant);
-        colours_[SkinColourId::kButtonTextHover] = juce::Colour(Widgets::Button::kTextHoover.blackVariant);
-        colours_[SkinColourId::kButtonBackgroundClicked] = juce::Colour(Widgets::Button::kBackgroundClicked.blackVariant);
-        colours_[SkinColourId::kButtonTextClicked] = juce::Colour(Widgets::Button::kTextClicked.blackVariant);
+        colours_[SkinColourId::kButtonBackgroundOff] = juce::Colour(accessColour(Widgets::Button::kBackground));
+        colours_[SkinColourId::kButtonBorderOff] = juce::Colour(accessColour(Widgets::Button::kBorder));
+        colours_[SkinColourId::kButtonTextOff] = juce::Colour(accessColour(Widgets::Button::kText));
+        colours_[SkinColourId::kButtonBackgroundOn] = juce::Colour(accessColour(Widgets::Button::kBackground));
+        colours_[SkinColourId::kButtonBorderOn] = juce::Colour(accessColour(Widgets::Button::kBorder));
+        colours_[SkinColourId::kButtonTextOn] = juce::Colour(accessColour(Widgets::Button::kText));
+        colours_[SkinColourId::kButtonBackgroundHover] = juce::Colour(accessColour(Widgets::Button::kBackgroundHoover));
+        colours_[SkinColourId::kButtonTextHover] = juce::Colour(accessColour(Widgets::Button::kTextHoover));
+        colours_[SkinColourId::kButtonBackgroundClicked] = juce::Colour(accessColour(Widgets::Button::kBackgroundClicked));
+        colours_[SkinColourId::kButtonTextClicked] = juce::Colour(accessColour(Widgets::Button::kTextClicked));
 
-        colours_[SkinColourId::kToggleBorder] = juce::Colour(Widgets::Toggle::kBorder.blackVariant);
-        colours_[SkinColourId::kToggleBackgroundOff] = juce::Colour(Widgets::Toggle::kBackgroundOff.blackVariant);
-        colours_[SkinColourId::kToggleTextOff] = juce::Colour(Widgets::Toggle::kTextOff.blackVariant);
-        colours_[SkinColourId::kToggleBackgroundOn] = juce::Colour(Widgets::Toggle::kBackgroundOn.blackVariant);
-        colours_[SkinColourId::kToggleTextOn] = juce::Colour(Widgets::Toggle::kTextOn.blackVariant);
+        colours_[SkinColourId::kToggleBorder] = juce::Colour(accessColour(Widgets::Toggle::kBorder));
+        colours_[SkinColourId::kToggleBackgroundOff] = juce::Colour(accessColour(Widgets::Toggle::kBackgroundOff));
+        colours_[SkinColourId::kToggleTextOff] = juce::Colour(accessColour(Widgets::Toggle::kTextOff));
+        colours_[SkinColourId::kToggleBackgroundOn] = juce::Colour(accessColour(Widgets::Toggle::kBackgroundOn));
+        colours_[SkinColourId::kToggleTextOn] = juce::Colour(accessColour(Widgets::Toggle::kTextOn));
 
-        colours_[SkinColourId::kSliderTrackEnabled] = juce::Colour(Widgets::Slider::kTrack.blackVariant);
-        colours_[SkinColourId::kSliderTrackDisabled] = juce::Colour(Widgets::Slider::kTrackDisabled.blackVariant);
-        colours_[SkinColourId::kSliderValueBarEnabled] = juce::Colour(Widgets::Slider::kValueBar.blackVariant);
-        colours_[SkinColourId::kSliderValueBarDisabled] = juce::Colour(Widgets::Slider::kValueBarDisabled.blackVariant);
-        colours_[SkinColourId::kSliderTextEnabled] = juce::Colour(Widgets::Slider::kText.blackVariant);
-        colours_[SkinColourId::kSliderTextDisabled] = juce::Colour(Widgets::Slider::kTextDisabled.blackVariant);
-        colours_[SkinColourId::kSliderFocusBorder] = juce::Colour(Widgets::Slider::kFocusBorder.blackVariant);
+        colours_[SkinColourId::kSliderTrackEnabled] = juce::Colour(accessColour(Widgets::Slider::kTrack));
+        colours_[SkinColourId::kSliderTrackDisabled] = juce::Colour(accessColour(Widgets::Slider::kTrackDisabled));
+        colours_[SkinColourId::kSliderValueBarEnabled] = juce::Colour(accessColour(Widgets::Slider::kValueBar));
+        colours_[SkinColourId::kSliderValueBarDisabled] = juce::Colour(accessColour(Widgets::Slider::kValueBarDisabled));
+        colours_[SkinColourId::kSliderTextEnabled] = juce::Colour(accessColour(Widgets::Slider::kText));
+        colours_[SkinColourId::kSliderTextDisabled] = juce::Colour(accessColour(Widgets::Slider::kTextDisabled));
+        colours_[SkinColourId::kSliderFocusBorder] = juce::Colour(accessColour(Widgets::Slider::kFocusBorder));
 
-        colours_[SkinColourId::kComboBoxBackgroundEnabled] = juce::Colour(Widgets::ComboBox::Standard::kBackground.blackVariant);
-        colours_[SkinColourId::kComboBoxBackgroundDisabled] = juce::Colour(Widgets::ComboBox::Standard::kBackgroundDisabled.blackVariant);
-        colours_[SkinColourId::kComboBoxBorderEnabled] = juce::Colour(Widgets::ComboBox::ButtonLike::kBorder.blackVariant);
-        colours_[SkinColourId::kComboBoxBorderDisabled] = juce::Colour(Widgets::ComboBox::ButtonLike::kBorderDisabled.blackVariant);
-        colours_[SkinColourId::kComboBoxFocusBorder] = juce::Colour(Widgets::ComboBox::Standard::kFocusBorder.blackVariant);
-        colours_[SkinColourId::kComboBoxTriangleEnabled] = juce::Colour(Widgets::ComboBox::Standard::kTriangle.blackVariant);
-        colours_[SkinColourId::kComboBoxTriangleDisabled] = juce::Colour(Widgets::ComboBox::Standard::kTriangleDisabled.blackVariant);
-        colours_[SkinColourId::kComboBoxTextEnabled] = juce::Colour(Widgets::ComboBox::Standard::kText.blackVariant);
-        colours_[SkinColourId::kComboBoxTextDisabled] = juce::Colour(Widgets::ComboBox::Standard::kTextDisabled.blackVariant);
-        colours_[SkinColourId::kComboBoxButtonLikeBackground] = juce::Colour(Widgets::ComboBox::ButtonLike::kBackground.blackVariant);
-        colours_[SkinColourId::kComboBoxButtonLikeBackgroundDisabled] = juce::Colour(Widgets::ComboBox::ButtonLike::kBackgroundDisabled.blackVariant);
-        colours_[SkinColourId::kComboBoxButtonLikeBorder] = juce::Colour(Widgets::ComboBox::ButtonLike::kBorder.blackVariant);
-        colours_[SkinColourId::kComboBoxButtonLikeBorderDisabled] = juce::Colour(Widgets::ComboBox::ButtonLike::kBorderDisabled.blackVariant);
-        colours_[SkinColourId::kComboBoxButtonLikeText] = juce::Colour(Widgets::ComboBox::ButtonLike::kText.blackVariant);
-        colours_[SkinColourId::kComboBoxButtonLikeTextDisabled] = juce::Colour(Widgets::ComboBox::ButtonLike::kTextDisabled.blackVariant);
-        colours_[SkinColourId::kComboBoxButtonLikeTriangle] = juce::Colour(Widgets::ComboBox::ButtonLike::kTriangle.blackVariant);
-        colours_[SkinColourId::kComboBoxButtonLikeTriangleDisabled] = juce::Colour(Widgets::ComboBox::ButtonLike::kTriangleDisabled.blackVariant);
+        colours_[SkinColourId::kComboBoxBackgroundEnabled] = juce::Colour(accessColour(Widgets::ComboBox::Standard::kBackground));
+        colours_[SkinColourId::kComboBoxBackgroundDisabled] = juce::Colour(accessColour(Widgets::ComboBox::Standard::kBackgroundDisabled));
+        colours_[SkinColourId::kComboBoxBorderEnabled] = juce::Colour(accessColour(Widgets::ComboBox::ButtonLike::kBorder));
+        colours_[SkinColourId::kComboBoxBorderDisabled] = juce::Colour(accessColour(Widgets::ComboBox::ButtonLike::kBorderDisabled));
+        colours_[SkinColourId::kComboBoxFocusBorder] = juce::Colour(accessColour(Widgets::ComboBox::Standard::kFocusBorder));
+        colours_[SkinColourId::kComboBoxTriangleEnabled] = juce::Colour(accessColour(Widgets::ComboBox::Standard::kTriangle));
+        colours_[SkinColourId::kComboBoxTriangleDisabled] = juce::Colour(accessColour(Widgets::ComboBox::Standard::kTriangleDisabled));
+        colours_[SkinColourId::kComboBoxTextEnabled] = juce::Colour(accessColour(Widgets::ComboBox::Standard::kText));
+        colours_[SkinColourId::kComboBoxTextDisabled] = juce::Colour(accessColour(Widgets::ComboBox::Standard::kTextDisabled));
+        colours_[SkinColourId::kComboBoxButtonLikeBackground] = juce::Colour(accessColour(Widgets::ComboBox::ButtonLike::kBackground));
+        colours_[SkinColourId::kComboBoxButtonLikeBackgroundDisabled] = juce::Colour(accessColour(Widgets::ComboBox::ButtonLike::kBackgroundDisabled));
+        colours_[SkinColourId::kComboBoxButtonLikeBorder] = juce::Colour(accessColour(Widgets::ComboBox::ButtonLike::kBorder));
+        colours_[SkinColourId::kComboBoxButtonLikeBorderDisabled] = juce::Colour(accessColour(Widgets::ComboBox::ButtonLike::kBorderDisabled));
+        colours_[SkinColourId::kComboBoxButtonLikeText] = juce::Colour(accessColour(Widgets::ComboBox::ButtonLike::kText));
+        colours_[SkinColourId::kComboBoxButtonLikeTextDisabled] = juce::Colour(accessColour(Widgets::ComboBox::ButtonLike::kTextDisabled));
+        colours_[SkinColourId::kComboBoxButtonLikeTriangle] = juce::Colour(accessColour(Widgets::ComboBox::ButtonLike::kTriangle));
+        colours_[SkinColourId::kComboBoxButtonLikeTriangleDisabled] = juce::Colour(accessColour(Widgets::ComboBox::ButtonLike::kTriangleDisabled));
 
-        colours_[SkinColourId::kPopupMenuBackground] = juce::Colour(Widgets::PopupMenu::Standard::kBackground.blackVariant);
-        colours_[SkinColourId::kPopupMenuBorder] = juce::Colour(Widgets::PopupMenu::Standard::kBorder.blackVariant);
-        colours_[SkinColourId::kPopupMenuSeparator] = juce::Colour(Widgets::PopupMenu::Standard::kSeparator.blackVariant);
-        colours_[SkinColourId::kPopupMenuText] = juce::Colour(Widgets::PopupMenu::Standard::kText.blackVariant);
-        colours_[SkinColourId::kPopupMenuBackgroundHover] = juce::Colour(Widgets::PopupMenu::Standard::kBackgroundHoover.blackVariant);
-        colours_[SkinColourId::kPopupMenuTextHover] = juce::Colour(Widgets::PopupMenu::Standard::kTextHoover.blackVariant);
-        colours_[SkinColourId::kPopupMenuScrollbar] = juce::Colour(Widgets::PopupMenu::ButtonLike::kScrollbar.blackVariant);
-        colours_[SkinColourId::kPopupMenuBackgroundButtonLike] = juce::Colour(Widgets::PopupMenu::ButtonLike::kBackground.blackVariant);
-        colours_[SkinColourId::kPopupMenuBorderButtonLike] = juce::Colour(Widgets::PopupMenu::ButtonLike::kBorder.blackVariant);
-        colours_[SkinColourId::kPopupMenuSeparatorButtonLike] = juce::Colour(Widgets::PopupMenu::ButtonLike::kSeparator.blackVariant);
-        colours_[SkinColourId::kPopupMenuTextButtonLike] = juce::Colour(Widgets::PopupMenu::ButtonLike::kText.blackVariant);
-        colours_[SkinColourId::kPopupMenuBackgroundHoverButtonLike] = juce::Colour(Widgets::PopupMenu::ButtonLike::kBackgroundHoover.blackVariant);
-        colours_[SkinColourId::kPopupMenuTextHoverButtonLike] = juce::Colour(Widgets::PopupMenu::ButtonLike::kTextHoover.blackVariant);
-        colours_[SkinColourId::kPopupMenuScrollbarButtonLike] = juce::Colour(Widgets::PopupMenu::ButtonLike::kScrollbar.blackVariant);
+        colours_[SkinColourId::kPopupMenuBackground] = juce::Colour(accessColour(Widgets::PopupMenu::Standard::kBackground));
+        colours_[SkinColourId::kPopupMenuBorder] = juce::Colour(accessColour(Widgets::PopupMenu::Standard::kBorder));
+        colours_[SkinColourId::kPopupMenuSeparator] = juce::Colour(accessColour(Widgets::PopupMenu::Standard::kSeparator));
+        colours_[SkinColourId::kPopupMenuText] = juce::Colour(accessColour(Widgets::PopupMenu::Standard::kText));
+        colours_[SkinColourId::kPopupMenuBackgroundHover] = juce::Colour(accessColour(Widgets::PopupMenu::Standard::kBackgroundHoover));
+        colours_[SkinColourId::kPopupMenuTextHover] = juce::Colour(accessColour(Widgets::PopupMenu::Standard::kTextHoover));
+        colours_[SkinColourId::kPopupMenuScrollbar] = juce::Colour(accessColour(Widgets::PopupMenu::ButtonLike::kScrollbar));
+        colours_[SkinColourId::kPopupMenuBackgroundButtonLike] = juce::Colour(accessColour(Widgets::PopupMenu::ButtonLike::kBackground));
+        colours_[SkinColourId::kPopupMenuBorderButtonLike] = juce::Colour(accessColour(Widgets::PopupMenu::ButtonLike::kBorder));
+        colours_[SkinColourId::kPopupMenuSeparatorButtonLike] = juce::Colour(accessColour(Widgets::PopupMenu::ButtonLike::kSeparator));
+        colours_[SkinColourId::kPopupMenuTextButtonLike] = juce::Colour(accessColour(Widgets::PopupMenu::ButtonLike::kText));
+        colours_[SkinColourId::kPopupMenuBackgroundHoverButtonLike] = juce::Colour(accessColour(Widgets::PopupMenu::ButtonLike::kBackgroundHoover));
+        colours_[SkinColourId::kPopupMenuTextHoverButtonLike] = juce::Colour(accessColour(Widgets::PopupMenu::ButtonLike::kTextHoover));
+        colours_[SkinColourId::kPopupMenuScrollbarButtonLike] = juce::Colour(accessColour(Widgets::PopupMenu::ButtonLike::kScrollbar));
 
-        colours_[SkinColourId::kNumberBoxText] = juce::Colour(Widgets::NumberBox::kText.blackVariant);
-        colours_[SkinColourId::kNumberBoxDot] = juce::Colour(Widgets::NumberBox::kDot.blackVariant);
-        colours_[SkinColourId::kNumberBoxEditorBackground] = juce::Colour(Widgets::NumberBox::kEditorBackground.blackVariant);
-        colours_[SkinColourId::kNumberBoxEditorSelectionBackground] = juce::Colour(Widgets::NumberBox::kEditorSelectionBackground.blackVariant);
-        colours_[SkinColourId::kNumberBoxEditorText] = juce::Colour(Widgets::NumberBox::kEditorText.blackVariant);
+        colours_[SkinColourId::kNumberBoxText] = juce::Colour(accessColour(Widgets::NumberBox::kText));
+        colours_[SkinColourId::kNumberBoxDot] = juce::Colour(accessColour(Widgets::NumberBox::kDot));
+        colours_[SkinColourId::kNumberBoxEditorBackground] = juce::Colour(accessColour(Widgets::NumberBox::kEditorBackground));
+        colours_[SkinColourId::kNumberBoxEditorSelectionBackground] = juce::Colour(accessColour(Widgets::NumberBox::kEditorSelectionBackground));
+        colours_[SkinColourId::kNumberBoxEditorText] = juce::Colour(accessColour(Widgets::NumberBox::kEditorText));
 
-        colours_[SkinColourId::kEnvelopeDisplayBackground] = juce::Colour(Widgets::EnvelopeDisplay::kBackground.blackVariant);
-        colours_[SkinColourId::kEnvelopeDisplayBorder] = juce::Colour(Widgets::EnvelopeDisplay::kBorder.blackVariant);
-        colours_[SkinColourId::kEnvelopeDisplayEnvelope] = juce::Colour(Widgets::EnvelopeDisplay::kEnvelope.blackVariant);
+        colours_[SkinColourId::kEnvelopeDisplayBackground] = juce::Colour(accessColour(Widgets::EnvelopeDisplay::kBackground));
+        colours_[SkinColourId::kEnvelopeDisplayBorder] = juce::Colour(accessColour(Widgets::EnvelopeDisplay::kBorder));
+        colours_[SkinColourId::kEnvelopeDisplayEnvelope] = juce::Colour(accessColour(Widgets::EnvelopeDisplay::kEnvelope));
 
-        colours_[SkinColourId::kPatchNameDisplayBackground] = juce::Colour(Widgets::PatchNameDisplay::kBackground.blackVariant);
-        colours_[SkinColourId::kPatchNameDisplayBorder] = juce::Colour(Widgets::PatchNameDisplay::kBorder.blackVariant);
-        colours_[SkinColourId::kPatchNameDisplayText] = juce::Colour(Widgets::PatchNameDisplay::kText.blackVariant);
+        colours_[SkinColourId::kPatchNameDisplayBackground] = juce::Colour(accessColour(Widgets::PatchNameDisplay::kBackground));
+        colours_[SkinColourId::kPatchNameDisplayBorder] = juce::Colour(accessColour(Widgets::PatchNameDisplay::kBorder));
+        colours_[SkinColourId::kPatchNameDisplayText] = juce::Colour(accessColour(Widgets::PatchNameDisplay::kText));
 
-        colours_[SkinColourId::kTrackGeneratorDisplayBackground] = juce::Colour(Widgets::TrackGeneratorDisplay::kBackground.blackVariant);
-        colours_[SkinColourId::kTrackGeneratorDisplayBorder] = juce::Colour(Widgets::TrackGeneratorDisplay::kBorder.blackVariant);
-        colours_[SkinColourId::kTrackGeneratorDisplayShaper] = juce::Colour(Widgets::TrackGeneratorDisplay::kShaper.blackVariant);
-    }
-
-    void Skin::initializeCreamVariantColours()
-    {
-        using namespace SkinColours;
-
-        colours_[SkinColourId::kHeaderPanelBackground] = juce::Colour(Panels::kHeaderPanelBackground.creamVariant);
-        colours_[SkinColourId::kBodyPanelBackground] = juce::Colour(Panels::kBodyPanelBackground.creamVariant);
-        colours_[SkinColourId::kFooterPanelBackground] = juce::Colour(Panels::kFooterPanelBackground.creamVariant);
-
-        colours_[SkinColourId::kSectionHeaderText] = juce::Colour(Widgets::SectionHeader::kText.creamVariant);
-        colours_[SkinColourId::kSectionHeaderLineBlue] = juce::Colour(Widgets::SectionHeader::kLineBlue.creamVariant);
-        colours_[SkinColourId::kSectionHeaderLineOrange] = juce::Colour(Widgets::SectionHeader::kLineOrange.creamVariant);
-
-        colours_[SkinColourId::kModuleHeaderText] = juce::Colour(Widgets::ModuleHeader::kText.creamVariant);
-        colours_[SkinColourId::kModuleHeaderLineBlue] = juce::Colour(Widgets::ModuleHeader::kLineBlue.creamVariant);
-        colours_[SkinColourId::kModuleHeaderLineOrange] = juce::Colour(Widgets::ModuleHeader::kLineOrange.creamVariant);
-
-        colours_[SkinColourId::kGroupLabelText] = juce::Colour(Widgets::GroupLabel::kText.creamVariant);
-        colours_[SkinColourId::kGroupLabelLine] = juce::Colour(Widgets::GroupLabel::kLine.creamVariant);
-
-        colours_[SkinColourId::kLabelText] = juce::Colour(Widgets::Label::kText.creamVariant);
-
-        colours_[SkinColourId::kVerticalSeparatorLine] = juce::Colour(Widgets::VerticalSeparator::kLine.creamVariant);
-        colours_[SkinColourId::kHorizontalSeparatorLine] = juce::Colour(Widgets::HorizontalSeparator::kLine.creamVariant);
-
-        colours_[SkinColourId::kButtonBackgroundOff] = juce::Colour(Widgets::Button::kBackground.creamVariant);
-        colours_[SkinColourId::kButtonBorderOff] = juce::Colour(Widgets::Button::kBorder.creamVariant);
-        colours_[SkinColourId::kButtonTextOff] = juce::Colour(Widgets::Button::kText.creamVariant);
-        colours_[SkinColourId::kButtonBackgroundOn] = juce::Colour(Widgets::Button::kBackground.creamVariant);
-        colours_[SkinColourId::kButtonBorderOn] = juce::Colour(Widgets::Button::kBorder.creamVariant);
-        colours_[SkinColourId::kButtonTextOn] = juce::Colour(Widgets::Button::kText.creamVariant);
-        colours_[SkinColourId::kButtonBackgroundHover] = juce::Colour(Widgets::Button::kBackgroundHoover.creamVariant);
-        colours_[SkinColourId::kButtonTextHover] = juce::Colour(Widgets::Button::kTextHoover.creamVariant);
-        colours_[SkinColourId::kButtonBackgroundClicked] = juce::Colour(Widgets::Button::kBackgroundClicked.creamVariant);
-        colours_[SkinColourId::kButtonTextClicked] = juce::Colour(Widgets::Button::kTextClicked.creamVariant);
-
-        colours_[SkinColourId::kToggleBorder] = juce::Colour(Widgets::Toggle::kBorder.creamVariant);
-        colours_[SkinColourId::kToggleBackgroundOff] = juce::Colour(Widgets::Toggle::kBackgroundOff.creamVariant);
-        colours_[SkinColourId::kToggleTextOff] = juce::Colour(Widgets::Toggle::kTextOff.creamVariant);
-        colours_[SkinColourId::kToggleBackgroundOn] = juce::Colour(Widgets::Toggle::kBackgroundOn.creamVariant);
-        colours_[SkinColourId::kToggleTextOn] = juce::Colour(Widgets::Toggle::kTextOn.creamVariant);
-
-        colours_[SkinColourId::kSliderTrackEnabled] = juce::Colour(Widgets::Slider::kTrack.creamVariant);
-        colours_[SkinColourId::kSliderTrackDisabled] = juce::Colour(Widgets::Slider::kTrackDisabled.creamVariant);
-        colours_[SkinColourId::kSliderValueBarEnabled] = juce::Colour(Widgets::Slider::kValueBar.creamVariant);
-        colours_[SkinColourId::kSliderValueBarDisabled] = juce::Colour(Widgets::Slider::kValueBarDisabled.creamVariant);
-        colours_[SkinColourId::kSliderTextEnabled] = juce::Colour(Widgets::Slider::kText.creamVariant);
-        colours_[SkinColourId::kSliderTextDisabled] = juce::Colour(Widgets::Slider::kTextDisabled.creamVariant);
-        colours_[SkinColourId::kSliderFocusBorder] = juce::Colour(Widgets::Slider::kFocusBorder.creamVariant);
-
-        colours_[SkinColourId::kComboBoxBackgroundEnabled] = juce::Colour(Widgets::ComboBox::Standard::kBackground.creamVariant);
-        colours_[SkinColourId::kComboBoxBackgroundDisabled] = juce::Colour(Widgets::ComboBox::Standard::kBackgroundDisabled.creamVariant);
-        colours_[SkinColourId::kComboBoxBorderEnabled] = juce::Colour(Widgets::ComboBox::ButtonLike::kBorder.creamVariant);
-        colours_[SkinColourId::kComboBoxBorderDisabled] = juce::Colour(Widgets::ComboBox::ButtonLike::kBorderDisabled.creamVariant);
-        colours_[SkinColourId::kComboBoxFocusBorder] = juce::Colour(Widgets::ComboBox::Standard::kFocusBorder.creamVariant);
-        colours_[SkinColourId::kComboBoxTriangleEnabled] = juce::Colour(Widgets::ComboBox::Standard::kTriangle.creamVariant);
-        colours_[SkinColourId::kComboBoxTriangleDisabled] = juce::Colour(Widgets::ComboBox::Standard::kTriangleDisabled.creamVariant);
-        colours_[SkinColourId::kComboBoxTextEnabled] = juce::Colour(Widgets::ComboBox::Standard::kText.creamVariant);
-        colours_[SkinColourId::kComboBoxTextDisabled] = juce::Colour(Widgets::ComboBox::Standard::kTextDisabled.creamVariant);
-        colours_[SkinColourId::kComboBoxButtonLikeBackground] = juce::Colour(Widgets::ComboBox::ButtonLike::kBackground.creamVariant);
-        colours_[SkinColourId::kComboBoxButtonLikeBackgroundDisabled] = juce::Colour(Widgets::ComboBox::ButtonLike::kBackgroundDisabled.creamVariant);
-        colours_[SkinColourId::kComboBoxButtonLikeBorder] = juce::Colour(Widgets::ComboBox::ButtonLike::kBorder.creamVariant);
-        colours_[SkinColourId::kComboBoxButtonLikeBorderDisabled] = juce::Colour(Widgets::ComboBox::ButtonLike::kBorderDisabled.creamVariant);
-        colours_[SkinColourId::kComboBoxButtonLikeText] = juce::Colour(Widgets::ComboBox::ButtonLike::kText.creamVariant);
-        colours_[SkinColourId::kComboBoxButtonLikeTextDisabled] = juce::Colour(Widgets::ComboBox::ButtonLike::kTextDisabled.creamVariant);
-        colours_[SkinColourId::kComboBoxButtonLikeTriangle] = juce::Colour(Widgets::ComboBox::ButtonLike::kTriangle.creamVariant);
-        colours_[SkinColourId::kComboBoxButtonLikeTriangleDisabled] = juce::Colour(Widgets::ComboBox::ButtonLike::kTriangleDisabled.creamVariant);
-
-        colours_[SkinColourId::kPopupMenuBackground] = juce::Colour(Widgets::PopupMenu::Standard::kBackground.creamVariant);
-        colours_[SkinColourId::kPopupMenuBorder] = juce::Colour(Widgets::PopupMenu::Standard::kBorder.creamVariant);
-        colours_[SkinColourId::kPopupMenuSeparator] = juce::Colour(Widgets::PopupMenu::Standard::kSeparator.creamVariant);
-        colours_[SkinColourId::kPopupMenuText] = juce::Colour(Widgets::PopupMenu::Standard::kText.creamVariant);
-        colours_[SkinColourId::kPopupMenuBackgroundHover] = juce::Colour(Widgets::PopupMenu::Standard::kBackgroundHoover.creamVariant);
-        colours_[SkinColourId::kPopupMenuTextHover] = juce::Colour(Widgets::PopupMenu::Standard::kTextHoover.creamVariant);
-        colours_[SkinColourId::kPopupMenuScrollbar] = juce::Colour(Widgets::PopupMenu::ButtonLike::kScrollbar.creamVariant);
-        colours_[SkinColourId::kPopupMenuBackgroundButtonLike] = juce::Colour(Widgets::PopupMenu::ButtonLike::kBackground.creamVariant);
-        colours_[SkinColourId::kPopupMenuBorderButtonLike] = juce::Colour(Widgets::PopupMenu::ButtonLike::kBorder.creamVariant);
-        colours_[SkinColourId::kPopupMenuSeparatorButtonLike] = juce::Colour(Widgets::PopupMenu::ButtonLike::kSeparator.creamVariant);
-        colours_[SkinColourId::kPopupMenuTextButtonLike] = juce::Colour(Widgets::PopupMenu::ButtonLike::kText.creamVariant);
-        colours_[SkinColourId::kPopupMenuBackgroundHoverButtonLike] = juce::Colour(Widgets::PopupMenu::ButtonLike::kBackgroundHoover.creamVariant);
-        colours_[SkinColourId::kPopupMenuTextHoverButtonLike] = juce::Colour(Widgets::PopupMenu::ButtonLike::kTextHoover.creamVariant);
-        colours_[SkinColourId::kPopupMenuScrollbarButtonLike] = juce::Colour(Widgets::PopupMenu::ButtonLike::kScrollbar.creamVariant);
-
-        colours_[SkinColourId::kNumberBoxText] = juce::Colour(Widgets::NumberBox::kText.creamVariant);
-        colours_[SkinColourId::kNumberBoxDot] = juce::Colour(Widgets::NumberBox::kDot.creamVariant);
-        colours_[SkinColourId::kNumberBoxEditorBackground] = juce::Colour(Widgets::NumberBox::kEditorBackground.creamVariant);
-        colours_[SkinColourId::kNumberBoxEditorSelectionBackground] = juce::Colour(Widgets::NumberBox::kEditorSelectionBackground.creamVariant);
-        colours_[SkinColourId::kNumberBoxEditorText] = juce::Colour(Widgets::NumberBox::kEditorText.creamVariant);
-
-        colours_[SkinColourId::kEnvelopeDisplayBackground] = juce::Colour(Widgets::EnvelopeDisplay::kBackground.creamVariant);
-        colours_[SkinColourId::kEnvelopeDisplayBorder] = juce::Colour(Widgets::EnvelopeDisplay::kBorder.creamVariant);
-        colours_[SkinColourId::kEnvelopeDisplayEnvelope] = juce::Colour(Widgets::EnvelopeDisplay::kEnvelope.creamVariant);
-
-        colours_[SkinColourId::kPatchNameDisplayBackground] = juce::Colour(Widgets::PatchNameDisplay::kBackground.creamVariant);
-        colours_[SkinColourId::kPatchNameDisplayBorder] = juce::Colour(Widgets::PatchNameDisplay::kBorder.creamVariant);
-        colours_[SkinColourId::kPatchNameDisplayText] = juce::Colour(Widgets::PatchNameDisplay::kText.creamVariant);
-
-        colours_[SkinColourId::kTrackGeneratorDisplayBackground] = juce::Colour(Widgets::TrackGeneratorDisplay::kBackground.creamVariant);
-        colours_[SkinColourId::kTrackGeneratorDisplayBorder] = juce::Colour(Widgets::TrackGeneratorDisplay::kBorder.creamVariant);
-        colours_[SkinColourId::kTrackGeneratorDisplayShaper] = juce::Colour(Widgets::TrackGeneratorDisplay::kShaper.creamVariant);
+        colours_[SkinColourId::kTrackGeneratorDisplayBackground] = juce::Colour(accessColour(Widgets::TrackGeneratorDisplay::kBackground));
+        colours_[SkinColourId::kTrackGeneratorDisplayBorder] = juce::Colour(accessColour(Widgets::TrackGeneratorDisplay::kBorder));
+        colours_[SkinColourId::kTrackGeneratorDisplayShaper] = juce::Colour(accessColour(Widgets::TrackGeneratorDisplay::kShaper));
     }
 }

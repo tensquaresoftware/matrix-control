@@ -39,51 +39,21 @@ TopPanel::TopPanel(tss::Skin& skin, int width, int height, WidgetFactory& widget
 void TopPanel::resized()
 {
     const auto bounds = getLocalBounds();
+    std::array<juce::Component*, 5> panels = {
+        dco1Panel_.get(), 
+        dco2Panel_.get(), 
+        vcfVcaPanel_.get(),
+        fmTrackPanel_.get(), 
+        rampPortamentoPanel_.get()
+    };
     
-    const auto dco1PanelX = 0;
-    const auto dco1PanelY = 0;
-    dco1Panel_->setBounds(
-        bounds.getX() + dco1PanelX,
-        bounds.getY() + dco1PanelY,
-        childModuleWidth_,
-        childModuleHeight_
-    );
-    
-    const auto dco2PanelX = dco1PanelX + childModuleWidth_ + spacing_;
-    const auto dco2PanelY = 0;
-    dco2Panel_->setBounds(
-        bounds.getX() + dco2PanelX,
-        bounds.getY() + dco2PanelY,
-        childModuleWidth_,
-        childModuleHeight_
-    );
-    
-    const auto vcfVcaPanelX = dco2PanelX + childModuleWidth_ + spacing_;
-    const auto vcfVcaPanelY = 0;
-    vcfVcaPanel_->setBounds(
-        bounds.getX() + vcfVcaPanelX,
-        bounds.getY() + vcfVcaPanelY,
-        childModuleWidth_,
-        childModuleHeight_
-    );
-    
-    const auto fmTrackPanelX = vcfVcaPanelX + childModuleWidth_ + spacing_;
-    const auto fmTrackPanelY = 0;
-    fmTrackPanel_->setBounds(
-        bounds.getX() + fmTrackPanelX,
-        bounds.getY() + fmTrackPanelY,
-        childModuleWidth_,
-        childModuleHeight_
-    );
-    
-    const auto rampPortamentoPanelX = fmTrackPanelX + childModuleWidth_ + spacing_;
-    const auto rampPortamentoPanelY = 0;
-    rampPortamentoPanel_->setBounds(
-        bounds.getX() + rampPortamentoPanelX,
-        bounds.getY() + rampPortamentoPanelY,
-        childModuleWidth_,
-        childModuleHeight_
-    );
+    int x = 0;
+    for (auto* panel : panels)
+    {
+        if (panel)
+            panel->setBounds(bounds.getX() + x, bounds.getY(), childModuleWidth_, childModuleHeight_);
+        x += childModuleWidth_ + spacing_;
+    }
 }
 
 void TopPanel::setSkin(tss::Skin& skin)

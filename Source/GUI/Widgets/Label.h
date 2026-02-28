@@ -6,10 +6,17 @@ namespace tss
 {
     class Skin;
 
+    enum class LabelStyle
+    {
+        Default,
+        HeaderPanel
+    };
+
     class Label : public juce::Component
     {
     public:
-        explicit Label(Skin& skin, int width, int height, const juce::String& text = juce::String());
+        explicit Label(Skin& skin, int width, int height, const juce::String& text = juce::String(),
+                      LabelStyle style = LabelStyle::Default);
         ~Label() override = default;
 
         void setSkin(Skin& skin);
@@ -30,6 +37,7 @@ namespace tss
         int width_;
         int height_;
         juce::String labelText_;
+        LabelStyle style_;
         
         // Cache optimization
         juce::Image cachedImage_;

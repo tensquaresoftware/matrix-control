@@ -88,7 +88,7 @@ std::unique_ptr<tss::Button> WidgetFactory::createStandaloneButton(
     validator.getStandaloneWidgetDescriptorOrThrow(desc, widgetId);
     validator.validateWidgetType(desc, widgetId);
     
-    const auto buttonWidth = getButtonWidthForWidgetId(widgetId);
+    const auto buttonWidth = desc->buttonWidth.value_or(PluginDimensions::Widgets::Widths::Button::kInit);
     
     return std::make_unique<tss::Button>(
         skin, 
@@ -96,95 +96,6 @@ std::unique_ptr<tss::Button> WidgetFactory::createStandaloneButton(
         height,
         desc->displayName
     );
-}
-
-int WidgetFactory::getButtonWidthForWidgetId(const juce::String& widgetId) const
-{
-    namespace Dco1Sw     = PluginIDs::PatchEditSection::Dco1Module::StandaloneWidgets;
-    namespace Dco2Sw     = PluginIDs::PatchEditSection::Dco2Module::StandaloneWidgets;
-    namespace VcfVcaSw   = PluginIDs::PatchEditSection::VcfVcaModule::StandaloneWidgets;
-    namespace FmTrackSw  = PluginIDs::PatchEditSection::FmTrackModule::StandaloneWidgets;
-    namespace RampSw     = PluginIDs::PatchEditSection::RampPortamentoModule::StandaloneWidgets;
-    namespace Env1Sw     = PluginIDs::PatchEditSection::Envelope1Module::StandaloneWidgets;
-    namespace Env2Sw     = PluginIDs::PatchEditSection::Envelope2Module::StandaloneWidgets;
-    namespace Env3Sw     = PluginIDs::PatchEditSection::Envelope3Module::StandaloneWidgets;
-    namespace Lfo1Sw     = PluginIDs::PatchEditSection::Lfo1Module::StandaloneWidgets;
-    namespace Lfo2Sw     = PluginIDs::PatchEditSection::Lfo2Module::StandaloneWidgets;
-    namespace BankSw     = PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets;
-    namespace IntPatchSw = PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets;
-    namespace CmpPatchSw = PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets;
-    namespace MutatorSw  = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets;
-    
-    if (widgetId == Dco1Sw::kInit || widgetId == Dco2Sw::kInit ||
-        widgetId == VcfVcaSw::kInit || widgetId == FmTrackSw::kInit ||
-        widgetId == RampSw::kInit || widgetId == Env1Sw::kInit ||
-        widgetId == Env2Sw::kInit || widgetId == Env3Sw::kInit ||
-        widgetId == Lfo1Sw::kInit || widgetId == Lfo2Sw::kInit ||
-        widgetId == IntPatchSw::kInitPatch)
-    {
-        return PluginDimensions::Widgets::Widths::Button::kInit;
-    }
-    
-    if (widgetId == Dco1Sw::kCopy || widgetId == Dco2Sw::kCopy ||
-        widgetId == Env1Sw::kCopy || widgetId == Env2Sw::kCopy ||
-        widgetId == Env3Sw::kCopy || widgetId == Lfo1Sw::kCopy ||
-        widgetId == Lfo2Sw::kCopy || widgetId == IntPatchSw::kCopyPatch)
-    {
-        return PluginDimensions::Widgets::Widths::Button::kCopy;
-    }
-    
-    if (widgetId == Dco1Sw::kPaste || widgetId == Dco2Sw::kPaste ||
-        widgetId == Env1Sw::kPaste || widgetId == Env2Sw::kPaste ||
-        widgetId == Env3Sw::kPaste || widgetId == Lfo1Sw::kPaste ||
-        widgetId == Lfo2Sw::kPaste || widgetId == IntPatchSw::kPastePatch)
-    {
-        return PluginDimensions::Widgets::Widths::Button::kPaste;
-    }
-    
-    if (widgetId == BankSw::kSelectBank0 || widgetId == BankSw::kSelectBank1 ||
-        widgetId == BankSw::kSelectBank2 || widgetId == BankSw::kSelectBank3 ||
-        widgetId == BankSw::kSelectBank4 || widgetId == BankSw::kSelectBank5 ||
-        widgetId == BankSw::kSelectBank6 || widgetId == BankSw::kSelectBank7 ||
-        widgetId == BankSw::kSelectBank8 || widgetId == BankSw::kSelectBank9)
-    {
-        return PluginDimensions::Widgets::Widths::Button::kPatchManagerBankSelect;
-    }
-    
-    if (widgetId == IntPatchSw::kLoadPreviousPatch || widgetId == IntPatchSw::kLoadNextPatch ||
-        widgetId == CmpPatchSw::kLoadPreviousPatchFile || widgetId == CmpPatchSw::kLoadNextPatchFile ||
-        widgetId == CmpPatchSw::kOpenPatchFolder || widgetId == CmpPatchSw::kSavePatchFile ||
-        widgetId == IntPatchSw::kStorePatch)
-    {
-        return PluginDimensions::Widgets::Widths::Button::kInternalPatchesMemory;
-    }
-    
-    if (widgetId == CmpPatchSw::kSavePatchAs)
-    {
-        return PluginDimensions::Widgets::Widths::Button::kComputerPatchesSaveAs;
-    }
-
-    if (widgetId == MutatorSw::kMutate || widgetId == MutatorSw::kRetry ||
-        widgetId == MutatorSw::kCompare)
-    {
-        return PluginDimensions::Widgets::Widths::Button::kPatchMutatorMutate;
-    }
-
-    if (widgetId == MutatorSw::kDelete)
-    {
-        return PluginDimensions::Widgets::Widths::Button::kPatchMutatorDelete;
-    }
-
-    if (widgetId == MutatorSw::kClear || widgetId == MutatorSw::kExport)
-    {
-        return PluginDimensions::Widgets::Widths::Button::kPatchMutatorClear;
-    }
-    
-    if (widgetId == BankSw::kUnlockBank)
-    {
-        return PluginDimensions::Widgets::Widths::Button::kPatchManagerUnlockBank;
-    }
-    
-    return PluginDimensions::Widgets::Widths::Button::kInit;
 }
 
 juce::String WidgetFactory::getParameterDisplayName(const juce::String& parameterId) const

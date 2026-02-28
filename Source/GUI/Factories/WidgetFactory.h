@@ -90,7 +90,5 @@ private:
     
     std::unique_ptr<tss::Slider> createSliderFromDescriptor(const PluginDescriptors::IntParameterDescriptor* desc, tss::Skin& skin, int width, int height);
     std::unique_ptr<tss::ComboBox> createComboBoxFromDescriptor(const PluginDescriptors::ChoiceParameterDescriptor* desc, tss::Skin& skin, int width, int height);
-    
-    int getButtonWidthForWidgetId(const juce::String& widgetId) const;
 };
 

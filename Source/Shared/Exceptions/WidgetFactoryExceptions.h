@@ -134,4 +134,3 @@ private:
     juce::String expectedType;
     juce::String actualType;
 };
-

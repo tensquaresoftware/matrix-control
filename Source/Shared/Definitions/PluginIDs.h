@@ -11,6 +11,20 @@
 
 namespace PluginIDs
 {
+    namespace Settings
+    {
+        namespace ZoomLevels
+        {
+            constexpr int k50  = 1;
+            constexpr int k75  = 2;
+            constexpr int k90  = 3;
+            constexpr int k100 = 4;
+            constexpr int k125 = 5;
+            constexpr int k150 = 6;
+            constexpr int k200 = 7;
+        }
+    }
+
     namespace Mode
     {
         constexpr const char* kMaster = "masterMode";

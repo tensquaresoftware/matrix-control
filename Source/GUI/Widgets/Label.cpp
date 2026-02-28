@@ -4,11 +4,12 @@
 
 namespace tss
 {
-    Label::Label(tss::Skin& skin, int width, int height, const juce::String& text)
+    Label::Label(tss::Skin& skin, int width, int height, const juce::String& text, tss::LabelStyle style)
         : skin_(&skin)
         , width_(width)
         , height_(height)
         , labelText_(text)
+        , style_(style)
         , cachedFont_(juce::FontOptions())
     {
         setOpaque(false);
@@ -93,7 +94,9 @@ namespace tss
         if (skin_ == nullptr)
             return;
 
-        cachedTextColour_ = skin_->getLabelTextColour();
+        cachedTextColour_ = (style_ == LabelStyle::HeaderPanel)
+            ? skin_->getHeaderPanelLabelTextColour()
+            : skin_->getLabelTextColour();
         cachedFont_ = skin_->getBaseFont();
     }
 

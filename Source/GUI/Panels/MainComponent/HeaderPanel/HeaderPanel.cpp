@@ -3,35 +3,39 @@
 #include "GUI/Widgets/Label.h"
 #include "GUI/Widgets/ComboBox.h"
 #include "GUI/Skins/Skin.h"
+#include "Shared/Definitions/PluginDisplayNames.h"
+#include "Shared/Definitions/PluginIDs.h"
 
 HeaderPanel::HeaderPanel(tss::Skin& skin, int width, int height)
     : width_(width)
     , height_(height)
     , skin_(&skin)
-    , skinLabel_(skin, kSkinLabelWidth_, kControlHeight_, "SKIN :")
+    , skinLabel_(skin, kSkinLabelWidth_, kControlHeight_, "SKIN :", tss::LabelStyle::HeaderPanel)
     , skinComboBox_(skin, kComboBoxWidth_, kControlHeight_, tss::ComboBox::Style::ButtonLike)
-    , zoomLabel_(skin, kZoomLabelWidth_, kControlHeight_, "ZOOM :")
+    , zoomLabel_(skin, kZoomLabelWidth_, kControlHeight_, "ZOOM :", tss::LabelStyle::HeaderPanel)
     , zoomComboBox_(skin, kComboBoxWidth_, kControlHeight_, tss::ComboBox::Style::ButtonLike)
 {
     setOpaque(true);
     
     addAndMakeVisible(skinLabel_);
     
-    skinComboBox_.addItem("BLACK", 1);
-    skinComboBox_.addItem("CREAM", 2);
-    skinComboBox_.setSelectedId(1, juce::dontSendNotification);
+    skinComboBox_.addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kBlack, 
+                         static_cast<int>(tss::Skin::SkinComboBoxItemId::kBlack));
+    skinComboBox_.addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kCream, 
+                         static_cast<int>(tss::Skin::SkinComboBoxItemId::kCream));
+    skinComboBox_.setSelectedId(static_cast<int>(tss::Skin::SkinComboBoxItemId::kBlack), juce::dontSendNotification);
     addAndMakeVisible(skinComboBox_);
     
     addAndMakeVisible(zoomLabel_);
     
-    zoomComboBox_.addItem("50%", 1);
-    zoomComboBox_.addItem("75%", 2);
-    zoomComboBox_.addItem("90%", 3);
-    zoomComboBox_.addItem("100%", 4);
-    zoomComboBox_.addItem("125%", 5);
-    zoomComboBox_.addItem("150%", 6);
-    zoomComboBox_.addItem("200%", 7);
-    zoomComboBox_.setSelectedId(4, juce::dontSendNotification);
+    zoomComboBox_.addItem(PluginDisplayNames::ChoiceLists::ZoomLevels::k50, PluginIDs::Settings::ZoomLevels::k50);
+    zoomComboBox_.addItem(PluginDisplayNames::ChoiceLists::ZoomLevels::k75, PluginIDs::Settings::ZoomLevels::k75);
+    zoomComboBox_.addItem(PluginDisplayNames::ChoiceLists::ZoomLevels::k90, PluginIDs::Settings::ZoomLevels::k90);
+    zoomComboBox_.addItem(PluginDisplayNames::ChoiceLists::ZoomLevels::k100, PluginIDs::Settings::ZoomLevels::k100);
+    zoomComboBox_.addItem(PluginDisplayNames::ChoiceLists::ZoomLevels::k125, PluginIDs::Settings::ZoomLevels::k125);
+    zoomComboBox_.addItem(PluginDisplayNames::ChoiceLists::ZoomLevels::k150, PluginIDs::Settings::ZoomLevels::k150);
+    zoomComboBox_.addItem(PluginDisplayNames::ChoiceLists::ZoomLevels::k200, PluginIDs::Settings::ZoomLevels::k200);
+    zoomComboBox_.setSelectedId(PluginIDs::Settings::ZoomLevels::k100, juce::dontSendNotification);
     addAndMakeVisible(zoomComboBox_);
 }
 
@@ -46,7 +50,7 @@ void HeaderPanel::resized()
     const auto spacing = getSpacing();
     const auto controlY = (height_ - kControlHeight_) / 2;
     
-    int currentX = 15; //spacing;
+    int currentX = kLeftPadding_;
     
     skinLabel_.setBounds(
         bounds.getX() + currentX,

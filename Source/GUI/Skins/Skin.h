@@ -5,11 +5,12 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
+#include "ISkin.h"
 #include "SkinValues.h"
 
 namespace tss
 {
-    class Skin
+    class Skin : public ISkin
     {
     public:
         enum class ColourVariant
@@ -18,24 +19,31 @@ namespace tss
             Cream
         };
 
+        enum class SkinComboBoxItemId : int
+        {
+            kBlack = 1,
+            kCream = 2
+        };
+
         explicit Skin(ColourVariant variant);
-        ~Skin() = default;
+        ~Skin() override = default;
 
         static std::unique_ptr<Skin> create(ColourVariant variant);
 
         ColourVariant getColourVariant() const { return currentVariant_; }
 
-        float getValue(SkinValueId valueId) const;
-        juce::Colour getColour(SkinColourId colourId) const;
+        float getValue(SkinValueId valueId) const override;
+        juce::Colour getColour(SkinColourId colourId) const override;
 
-        void setValue(SkinValueId valueId, float value);
-        void setColour(SkinColourId colourId, juce::Colour colour);
+        void setValue(SkinValueId valueId, float value) override;
+        void setColour(SkinColourId colourId, juce::Colour colour) override;
 
-        juce::Font getBaseFont() const;
-        juce::Font getBaseFontBold() const;
+        juce::Font getBaseFont() const override;
+        juce::Font getBaseFontBold() const override;
 
         // Theme-compatible API for migration
         juce::Colour getHeaderPanelBackgroundColour() const;
+        juce::Colour getHeaderPanelLabelTextColour() const;
         juce::Colour getBodyPanelBackgroundColour() const;
         juce::Colour getFooterPanelBackgroundColour() const;
         juce::Colour getSectionHeaderTextColour() const;
@@ -60,24 +68,24 @@ namespace tss
         juce::Colour getButtonBackgroundColourClicked() const;
         juce::Colour getButtonTextColourClicked() const;
         juce::Colour getToggleBorderColour() const;
-        juce::Colour getToggleBackgroundColour(bool isOn) const;
-        juce::Colour getToggleTextColour(bool isOn) const;
-        juce::Colour getSliderTrackColour(bool isEnabled = true) const;
-        juce::Colour getSliderValueBarColour(bool isEnabled = true) const;
-        juce::Colour getSliderTextColour(bool isEnabled = true) const;
+        juce::Colour getToggleBackgroundColour(bool isOn) const override;
+        juce::Colour getToggleTextColour(bool isOn) const override;
+        juce::Colour getSliderTrackColour(bool isEnabled = true) const override;
+        juce::Colour getSliderValueBarColour(bool isEnabled = true) const override;
+        juce::Colour getSliderTextColour(bool isEnabled = true) const override;
         juce::Colour getSliderFocusBorderColour() const;
-        juce::Colour getComboBoxBackgroundColour(bool isEnabled = true, bool isButtonLike = false) const;
-        juce::Colour getComboBoxBorderColour(bool isEnabled = true, bool isButtonLike = false) const;
-        juce::Colour getComboBoxFocusBorderColour(bool isButtonLike = false) const;
-        juce::Colour getComboBoxTriangleColour(bool isEnabled = true, bool isButtonLike = false) const;
-        juce::Colour getComboBoxTextColour(bool isEnabled = true, bool isButtonLike = false) const;
-        juce::Colour getPopupMenuBackgroundColour(bool isButtonLike = false) const;
-        juce::Colour getPopupMenuBorderColour(bool isButtonLike = false) const;
-        juce::Colour getPopupMenuSeparatorColour(bool isButtonLike = false) const;
-        juce::Colour getPopupMenuTextColour(bool isButtonLike = false) const;
-        juce::Colour getPopupMenuBackgroundHooverColour(bool isButtonLike = false) const;
-        juce::Colour getPopupMenuTextHooverColour(bool isButtonLike = false) const;
-        juce::Colour getPopupMenuScrollbarColour(bool isButtonLike = false) const;
+        juce::Colour getComboBoxBackgroundColour(bool isEnabled = true, bool isButtonLike = false) const override;
+        juce::Colour getComboBoxBorderColour(bool isEnabled = true, bool isButtonLike = false) const override;
+        juce::Colour getComboBoxFocusBorderColour(bool isButtonLike = false) const override;
+        juce::Colour getComboBoxTriangleColour(bool isEnabled = true, bool isButtonLike = false) const override;
+        juce::Colour getComboBoxTextColour(bool isEnabled = true, bool isButtonLike = false) const override;
+        juce::Colour getPopupMenuBackgroundColour(bool isButtonLike = false) const override;
+        juce::Colour getPopupMenuBorderColour(bool isButtonLike = false) const override;
+        juce::Colour getPopupMenuSeparatorColour(bool isButtonLike = false) const override;
+        juce::Colour getPopupMenuTextColour(bool isButtonLike = false) const override;
+        juce::Colour getPopupMenuBackgroundHooverColour(bool isButtonLike = false) const override;
+        juce::Colour getPopupMenuTextHooverColour(bool isButtonLike = false) const override;
+        juce::Colour getPopupMenuScrollbarColour(bool isButtonLike = false) const override;
         juce::Colour getNumberBoxTextColour() const;
         juce::Colour getNumberBoxDotColour() const;
         juce::Colour getNumberBoxEditorBackgroundColour() const;
@@ -96,8 +104,9 @@ namespace tss
     private:
         void initializeDefaultValues();
         void initializeDefaultColours();
-        void initializeBlackVariantColours();
-        void initializeCreamVariantColours();
+        
+        template <typename Accessor>
+        void initializeVariantColours(Accessor accessColour);
 
         ColourVariant currentVariant_;
         std::map<SkinValueId, float> values_;

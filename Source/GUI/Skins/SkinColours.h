@@ -32,6 +32,12 @@ namespace tss
                 ColourChart::kLightGrey1
             };
 
+            inline constexpr ColourElement kHeaderPanelLabelText = {
+                "HeaderPanelLabelText",
+                ColourChart::kDarkGrey1,
+                ColourChart::kDarkGrey1
+            };
+
             inline constexpr ColourElement kBodyPanelBackground = {
                 "BodyPanelBackground",
                 ColourChart::kDarkGrey2,
