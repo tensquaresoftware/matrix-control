@@ -183,13 +183,32 @@ namespace tss
     template <typename Accessor>
     void Skin::initializeVariantColours(Accessor accessColour)
     {
+        initializePanelColours(accessColour);
+        initializeLayoutColours(accessColour);
+        initializeButtonColours(accessColour);
+        initializeToggleColours(accessColour);
+        initializeSliderColours(accessColour);
+        initializeComboBoxColours(accessColour);
+        initializePopupMenuColours(accessColour);
+        initializeDisplayColours(accessColour);
+    }
+    
+    template <typename Accessor>
+    void Skin::initializePanelColours(Accessor accessColour)
+    {
         using namespace SkinColours;
-
+        
         colours_[SkinColourId::kHeaderPanelBackground] = juce::Colour(accessColour(Panels::kHeaderPanelBackground));
         colours_[SkinColourId::kHeaderPanelLabelText] = juce::Colour(accessColour(Panels::kHeaderPanelLabelText));
         colours_[SkinColourId::kBodyPanelBackground] = juce::Colour(accessColour(Panels::kBodyPanelBackground));
         colours_[SkinColourId::kFooterPanelBackground] = juce::Colour(accessColour(Panels::kFooterPanelBackground));
-
+    }
+    
+    template <typename Accessor>
+    void Skin::initializeLayoutColours(Accessor accessColour)
+    {
+        using namespace SkinColours;
+        
         colours_[SkinColourId::kSectionHeaderText] = juce::Colour(accessColour(Widgets::SectionHeader::kText));
         colours_[SkinColourId::kSectionHeaderLineBlue] = juce::Colour(accessColour(Widgets::SectionHeader::kLineBlue));
         colours_[SkinColourId::kSectionHeaderLineOrange] = juce::Colour(accessColour(Widgets::SectionHeader::kLineOrange));
@@ -205,7 +224,13 @@ namespace tss
 
         colours_[SkinColourId::kVerticalSeparatorLine] = juce::Colour(accessColour(Widgets::VerticalSeparator::kLine));
         colours_[SkinColourId::kHorizontalSeparatorLine] = juce::Colour(accessColour(Widgets::HorizontalSeparator::kLine));
-
+    }
+    
+    template <typename Accessor>
+    void Skin::initializeButtonColours(Accessor accessColour)
+    {
+        using namespace SkinColours;
+        
         colours_[SkinColourId::kButtonBackgroundOff] = juce::Colour(accessColour(Widgets::Button::kBackground));
         colours_[SkinColourId::kButtonBorderOff] = juce::Colour(accessColour(Widgets::Button::kBorder));
         colours_[SkinColourId::kButtonTextOff] = juce::Colour(accessColour(Widgets::Button::kText));
@@ -216,13 +241,25 @@ namespace tss
         colours_[SkinColourId::kButtonTextHover] = juce::Colour(accessColour(Widgets::Button::kTextHoover));
         colours_[SkinColourId::kButtonBackgroundClicked] = juce::Colour(accessColour(Widgets::Button::kBackgroundClicked));
         colours_[SkinColourId::kButtonTextClicked] = juce::Colour(accessColour(Widgets::Button::kTextClicked));
-
+    }
+    
+    template <typename Accessor>
+    void Skin::initializeToggleColours(Accessor accessColour)
+    {
+        using namespace SkinColours;
+        
         colours_[SkinColourId::kToggleBorder] = juce::Colour(accessColour(Widgets::Toggle::kBorder));
         colours_[SkinColourId::kToggleBackgroundOff] = juce::Colour(accessColour(Widgets::Toggle::kBackgroundOff));
         colours_[SkinColourId::kToggleTextOff] = juce::Colour(accessColour(Widgets::Toggle::kTextOff));
         colours_[SkinColourId::kToggleBackgroundOn] = juce::Colour(accessColour(Widgets::Toggle::kBackgroundOn));
         colours_[SkinColourId::kToggleTextOn] = juce::Colour(accessColour(Widgets::Toggle::kTextOn));
-
+    }
+    
+    template <typename Accessor>
+    void Skin::initializeSliderColours(Accessor accessColour)
+    {
+        using namespace SkinColours;
+        
         colours_[SkinColourId::kSliderTrackEnabled] = juce::Colour(accessColour(Widgets::Slider::kTrack));
         colours_[SkinColourId::kSliderTrackDisabled] = juce::Colour(accessColour(Widgets::Slider::kTrackDisabled));
         colours_[SkinColourId::kSliderValueBarEnabled] = juce::Colour(accessColour(Widgets::Slider::kValueBar));
@@ -230,7 +267,13 @@ namespace tss
         colours_[SkinColourId::kSliderTextEnabled] = juce::Colour(accessColour(Widgets::Slider::kText));
         colours_[SkinColourId::kSliderTextDisabled] = juce::Colour(accessColour(Widgets::Slider::kTextDisabled));
         colours_[SkinColourId::kSliderFocusBorder] = juce::Colour(accessColour(Widgets::Slider::kFocusBorder));
-
+    }
+    
+    template <typename Accessor>
+    void Skin::initializeComboBoxColours(Accessor accessColour)
+    {
+        using namespace SkinColours;
+        
         colours_[SkinColourId::kComboBoxBackgroundEnabled] = juce::Colour(accessColour(Widgets::ComboBox::Standard::kBackground));
         colours_[SkinColourId::kComboBoxBackgroundDisabled] = juce::Colour(accessColour(Widgets::ComboBox::Standard::kBackgroundDisabled));
         colours_[SkinColourId::kComboBoxBorderEnabled] = juce::Colour(accessColour(Widgets::ComboBox::ButtonLike::kBorder));
@@ -248,7 +291,13 @@ namespace tss
         colours_[SkinColourId::kComboBoxButtonLikeTextDisabled] = juce::Colour(accessColour(Widgets::ComboBox::ButtonLike::kTextDisabled));
         colours_[SkinColourId::kComboBoxButtonLikeTriangle] = juce::Colour(accessColour(Widgets::ComboBox::ButtonLike::kTriangle));
         colours_[SkinColourId::kComboBoxButtonLikeTriangleDisabled] = juce::Colour(accessColour(Widgets::ComboBox::ButtonLike::kTriangleDisabled));
-
+    }
+    
+    template <typename Accessor>
+    void Skin::initializePopupMenuColours(Accessor accessColour)
+    {
+        using namespace SkinColours;
+        
         colours_[SkinColourId::kPopupMenuBackground] = juce::Colour(accessColour(Widgets::PopupMenu::Standard::kBackground));
         colours_[SkinColourId::kPopupMenuBorder] = juce::Colour(accessColour(Widgets::PopupMenu::Standard::kBorder));
         colours_[SkinColourId::kPopupMenuSeparator] = juce::Colour(accessColour(Widgets::PopupMenu::Standard::kSeparator));
@@ -263,7 +312,13 @@ namespace tss
         colours_[SkinColourId::kPopupMenuBackgroundHoverButtonLike] = juce::Colour(accessColour(Widgets::PopupMenu::ButtonLike::kBackgroundHoover));
         colours_[SkinColourId::kPopupMenuTextHoverButtonLike] = juce::Colour(accessColour(Widgets::PopupMenu::ButtonLike::kTextHoover));
         colours_[SkinColourId::kPopupMenuScrollbarButtonLike] = juce::Colour(accessColour(Widgets::PopupMenu::ButtonLike::kScrollbar));
-
+    }
+    
+    template <typename Accessor>
+    void Skin::initializeDisplayColours(Accessor accessColour)
+    {
+        using namespace SkinColours;
+        
         colours_[SkinColourId::kNumberBoxText] = juce::Colour(accessColour(Widgets::NumberBox::kText));
         colours_[SkinColourId::kNumberBoxDot] = juce::Colour(accessColour(Widgets::NumberBox::kDot));
         colours_[SkinColourId::kNumberBoxEditorBackground] = juce::Colour(accessColour(Widgets::NumberBox::kEditorBackground));

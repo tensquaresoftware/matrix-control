@@ -61,7 +61,7 @@ void ParameterPanel::createParameterLabel(tss::ISkin& skin, WidgetFactory& facto
         skin,
         dimensions.labelWidth,
         PluginDimensions::Widgets::Heights::kLabel,
-        factory.getParameterDisplayName(parameterId));
+        factory.getParameterDisplayName(parameterId).value_or(""));
     addAndMakeVisible(*label_);
 }
 

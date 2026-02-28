@@ -73,6 +73,7 @@ private:
     void connectToggleToApvts(tss::Toggle* toggle, const char* widgetId);
 
     void layoutModuleHeader(int x, int y);
+    void layoutSliderLine(int x, int& y, tss::Label* label, tss::Slider* slider, tss::Button* button, const std::vector<tss::Toggle*>& toggles);
     void layoutAmountLine(int x, int& y);
     void layoutRandomLine(int x, int& y);
     void layoutHistoryLine(int x, int& y);

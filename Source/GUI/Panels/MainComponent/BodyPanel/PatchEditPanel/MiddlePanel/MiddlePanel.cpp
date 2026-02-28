@@ -1,6 +1,7 @@
 #include "MiddlePanel.h"
 
 #include "GUI/Skins/ISkin.h"
+#include "Shared/Definitions/ApvtsTypes.h"
 #include "GUI/Skins/SkinHelpers.h"
 #include "Shared/Definitions/PluginDescriptors.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
@@ -69,7 +70,7 @@ void MiddlePanel::resized()
 void MiddlePanel::valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
                                           const juce::Identifier& property)
 {
-    if (property != juce::Identifier("value"))
+    if (property != juce::Identifier(ApvtsTypes::kValue))
         return;
 
     const juce::String typeStr = treeWhosePropertyHasChanged.getType().toString();

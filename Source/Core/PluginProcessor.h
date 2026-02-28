@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <map>
+#include <optional>
 
 #include <juce_audio_processors/juce_audio_processors.h>
 
@@ -72,17 +73,25 @@ private:
     void disableApvtsLogging();
     
     juce::String getThreadNameForLogging() const;
+    static juce::String simplifyThreadNameForLogging(const juce::String& threadName);
     juce::String resolveParameterIdFromTree(juce::ValueTree& tree, const juce::Identifier& property) const;
+    juce::String resolveParameterIdFromValueProperty(juce::ValueTree& tree, const juce::Identifier& property) const;
+    juce::String getCanonicalParameterId(const juce::String& parameterId) const;
     juce::String findParameterIdInDirectTree(juce::ValueTree& tree) const;
     juce::String findParameterIdInParentTree(juce::ValueTree& tree) const;
     juce::String findParameterIdInChildren(juce::ValueTree& changedTree, const juce::var& newValue) const;
     
     void buildChoiceParameterMap();
-    juce::String getChoiceLabel(const juce::String& parameterId, int value) const;
+    std::optional<juce::String> getChoiceLabel(const juce::String& parameterId, int value) const;
+    juce::String getChoiceLabelForNumericValue(const juce::String& parameterId, const juce::var& newValue) const;
+    void handleBankNumberChange(const juce::String& parameterId);
+    void handlePatchNumberChange(const juce::String& parameterId);
 
     juce::AudioProcessorValueTreeState apvts;
     std::unique_ptr<MidiManager> midiManager;
     std::map<juce::String, PluginDescriptors::ChoiceParameterDescriptor> choiceParameterMap_;
+    
+    static constexpr int kThreadStopTimeoutMs_ {5000};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginProcessor)
 };

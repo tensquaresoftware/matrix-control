@@ -3,6 +3,7 @@
 #include "PluginProcessor.h"
 #include "GUI/PluginEditor.h"
 #include "MIDI/MidiManager.h"
+#include "Shared/Definitions/ApvtsTypes.h"
 #include "Loggers/MidiLogger.h"
 #include "Loggers/ApvtsLogger.h"
 #include "Factories/ApvtsFactory.h"
@@ -129,7 +130,7 @@ void PluginProcessor::stopMidiThread()
 {
     if (midiManager != nullptr && midiManager->isThreadRunning())
     {
-        midiManager->stopThread(5000);  // Wait up to 5 seconds
+        midiManager->stopThread(kThreadStopTimeoutMs_);
     }
 }
 
@@ -246,22 +247,23 @@ void PluginProcessor::disableApvtsLogging()
 juce::String PluginProcessor::getThreadNameForLogging() const
 {
     juce::String threadName;
-    
     if (juce::Thread::getCurrentThread() != nullptr)
         threadName = juce::Thread::getCurrentThread()->getThreadName();
     else if (juce::MessageManager::getInstance()->isThisTheMessageThread())
         threadName = "MessageThread";
     else
         threadName = "Unknown";
-    
-    // Simplifier les noms de threads
+    return simplifyThreadNameForLogging(threadName);
+}
+
+juce::String PluginProcessor::simplifyThreadNameForLogging(const juce::String& threadName)
+{
     if (threadName == "MessageThread")
         return "Message";
     if (threadName.startsWith("Audio"))
         return "Audio";
     if (threadName.startsWith("MIDI") || threadName.startsWith("Midi"))
         return "MIDI";
-    
     return threadName;
 }
 
@@ -270,7 +272,7 @@ juce::String PluginProcessor::findParameterIdInDirectTree(juce::ValueTree& tree)
     juce::Identifier treeType = tree.getType();
     juce::String treeTypeStr = treeType.toString();
     
-    if (treeTypeStr == "PARAM")
+    if (treeTypeStr == ApvtsTypes::kParam)
     {
         juce::var idProperty = tree.getProperty("id");
         if (idProperty.isString() && idProperty.toString().isNotEmpty())
@@ -293,7 +295,7 @@ juce::String PluginProcessor::findParameterIdInParentTree(juce::ValueTree& tree)
     juce::Identifier parentType = parentTree.getType();
     juce::String parentTypeStr = parentType.toString();
     
-    if (parentTypeStr == "PARAM" || parentTypeStr == "ROOT")
+    if (parentTypeStr == ApvtsTypes::kParam || parentTypeStr == ApvtsTypes::kRoot)
         return juce::String();
     
     juce::String parameterId = parentTypeStr;
@@ -320,14 +322,14 @@ juce::String PluginProcessor::findParameterIdInChildren(juce::ValueTree& changed
         juce::Identifier childType = child.getType();
         juce::String childTypeStr = childType.toString();
         
-        if (childTypeStr == "PARAM")
+        if (childTypeStr == ApvtsTypes::kParam)
         {
             juce::var idProperty = child.getProperty("id");
             if (idProperty.isString() && idProperty.toString().isNotEmpty())
             {
                 juce::String childParamId = idProperty.toString();
                 if (child == changedTree || 
-                    child.getChildWithProperty("value", newValue) == changedTree)
+                    child.getChildWithProperty(ApvtsTypes::kValue, newValue) == changedTree)
                 {
                     return childParamId;
                 }
@@ -345,42 +347,39 @@ juce::String PluginProcessor::findParameterIdInChildren(juce::ValueTree& changed
 juce::String PluginProcessor::resolveParameterIdFromTree(juce::ValueTree& tree, const juce::Identifier& property) const
 {
     juce::String propertyId = property.toString();
-    juce::String parameterId = propertyId;
-    
-    if (propertyId != "value")
+    if (propertyId != ApvtsTypes::kValue)
+        return propertyId;
+
+    juce::String parameterId = resolveParameterIdFromValueProperty(tree, property);
+    return getCanonicalParameterId(parameterId);
+}
+
+juce::String PluginProcessor::resolveParameterIdFromValueProperty(
+    juce::ValueTree& tree, const juce::Identifier& property) const
+{
+    juce::String parameterId = findParameterIdInDirectTree(tree);
+    if (apvts.getParameter(parameterId) != nullptr)
         return parameterId;
-    
-    parameterId = findParameterIdInDirectTree(tree);
-    auto* parameter = apvts.getParameter(parameterId);
-    
-    if (parameter != nullptr)
-    {
-        juce::String paramId = parameter->getParameterID();
-        if (paramId.isNotEmpty())
-            parameterId = paramId;
-        
-        return parameterId;
-    }
-    
+
     juce::String parentParamId = findParameterIdInParentTree(tree);
     if (parentParamId.isNotEmpty())
-    {
-        parameter = apvts.getParameter(parentParamId);
-        if (parameter != nullptr)
-        {
-            juce::String paramId = parameter->getParameterID();
-            if (paramId.isNotEmpty())
-                return paramId;
-        }
         return parentParamId;
-    }
-    
+
     juce::var newValue = tree.getProperty(property);
     juce::String childParamId = findParameterIdInChildren(tree, newValue);
     if (childParamId.isNotEmpty())
         return childParamId;
-    
+
     return parameterId;
+}
+
+juce::String PluginProcessor::getCanonicalParameterId(const juce::String& parameterId) const
+{
+    auto* parameter = apvts.getParameter(parameterId);
+    if (parameter == nullptr)
+        return parameterId;
+    juce::String canonicalId = parameter->getParameterID();
+    return canonicalId.isNotEmpty() ? canonicalId : parameterId;
 }
 
 void PluginProcessor::valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
@@ -389,15 +388,8 @@ void PluginProcessor::valueTreePropertyChanged(juce::ValueTree& treeWhosePropert
     juce::var newValue = treeWhosePropertyHasChanged.getProperty(property);
     juce::String threadName = getThreadNameForLogging();
     juce::String parameterId = resolveParameterIdFromTree(treeWhosePropertyHasChanged, property);
-    
-    // Chercher le label du choix si c'est un paramètre Choice
-    juce::String choiceLabel;
-    if (newValue.isInt() || newValue.isInt64() || newValue.isDouble())
-    {
-        int intValue = static_cast<int>(newValue);
-        choiceLabel = getChoiceLabel(parameterId, intValue);
-    }
-    
+    juce::String choiceLabel = getChoiceLabelForNumericValue(parameterId, newValue);
+
     ApvtsLogger::getInstance().logValueTreePropertyChanged(
         juce::Identifier(parameterId),
         juce::var(),
@@ -405,18 +397,34 @@ void PluginProcessor::valueTreePropertyChanged(juce::ValueTree& treeWhosePropert
         threadName,
         choiceLabel
     );
+
+    handleBankNumberChange(parameterId);
+    handlePatchNumberChange(parameterId);
+}
+
+juce::String PluginProcessor::getChoiceLabelForNumericValue(const juce::String& parameterId, const juce::var& newValue) const
+{
+    if (!newValue.isInt() && !newValue.isInt64() && !newValue.isDouble())
+        return {};
     
-    // Gestion du changement de banque (Property)
-    if (parameterId == PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCurrentBankNumber)
-    {
-        // TODO: Envoyer commande SysEx pour changer de banque
-    }
+    if (auto label = getChoiceLabel(parameterId, static_cast<int>(newValue)))
+        return *label;
     
-    // Gestion du changement de patch (Property)
-    if (parameterId == PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCurrentPatchNumber)
-    {
-        // TODO: Envoyer commande SysEx pour charger le patch
-    }
+    return {};
+}
+
+void PluginProcessor::handleBankNumberChange(const juce::String& parameterId)
+{
+    if (parameterId != PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCurrentBankNumber)
+        return;
+    juce::ignoreUnused(parameterId);
+}
+
+void PluginProcessor::handlePatchNumberChange(const juce::String& parameterId)
+{
+    if (parameterId != PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCurrentPatchNumber)
+        return;
+    juce::ignoreUnused(parameterId);
 }
 
 void PluginProcessor::valueTreeChildAdded(juce::ValueTree& parentTree,
@@ -463,16 +471,16 @@ void PluginProcessor::buildChoiceParameterMap()
     }
 }
 
-juce::String PluginProcessor::getChoiceLabel(const juce::String& parameterId, int value) const
+std::optional<juce::String> PluginProcessor::getChoiceLabel(const juce::String& parameterId, int value) const
 {
     auto it = choiceParameterMap_.find(parameterId);
     if (it == choiceParameterMap_.end())
-        return "";
+        return std::nullopt;
     
     const auto& descriptor = it->second;
     
     if (value < 0 || value >= descriptor.choices.size())
-        return "";
+        return std::nullopt;
     
     return descriptor.choices[value];
 }

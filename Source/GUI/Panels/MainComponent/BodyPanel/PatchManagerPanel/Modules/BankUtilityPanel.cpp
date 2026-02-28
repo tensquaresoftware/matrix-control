@@ -151,7 +151,7 @@ void BankUtilityPanel::setupSelectBankButtons(tss::ISkin& skin, WidgetFactory& w
         skin,
         PluginDimensions::Widgets::Widths::Button::kPatchManagerBankSelect,
         PluginDimensions::Widgets::Heights::kButton,
-        widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank0));
+        widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank0).value_or(""));
     selectBank0Button_->onClick = [this]
     {
         apvts_.state.setProperty(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank0,
@@ -164,7 +164,7 @@ void BankUtilityPanel::setupSelectBankButtons(tss::ISkin& skin, WidgetFactory& w
         skin,
         PluginDimensions::Widgets::Widths::Button::kPatchManagerBankSelect,
         PluginDimensions::Widgets::Heights::kButton,
-        widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank1));
+        widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank1).value_or(""));
     selectBank1Button_->onClick = [this]
     {
         apvts_.state.setProperty(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank1,
@@ -177,7 +177,7 @@ void BankUtilityPanel::setupSelectBankButtons(tss::ISkin& skin, WidgetFactory& w
         skin,
         PluginDimensions::Widgets::Widths::Button::kPatchManagerBankSelect,
         PluginDimensions::Widgets::Heights::kButton,
-        widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank2));
+        widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank2).value_or(""));
     selectBank2Button_->onClick = [this]
     {
         apvts_.state.setProperty(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank2,
@@ -190,7 +190,7 @@ void BankUtilityPanel::setupSelectBankButtons(tss::ISkin& skin, WidgetFactory& w
         skin,
         PluginDimensions::Widgets::Widths::Button::kPatchManagerBankSelect,
         PluginDimensions::Widgets::Heights::kButton,
-        widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank3));
+        widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank3).value_or(""));
     selectBank3Button_->onClick = [this]
     {
         apvts_.state.setProperty(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank3,
@@ -203,7 +203,7 @@ void BankUtilityPanel::setupSelectBankButtons(tss::ISkin& skin, WidgetFactory& w
         skin,
         PluginDimensions::Widgets::Widths::Button::kPatchManagerBankSelect,
         PluginDimensions::Widgets::Heights::kButton,
-        widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank4));
+        widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank4).value_or(""));
     selectBank4Button_->onClick = [this]
     {
         apvts_.state.setProperty(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank4,
@@ -216,7 +216,7 @@ void BankUtilityPanel::setupSelectBankButtons(tss::ISkin& skin, WidgetFactory& w
         skin,
         PluginDimensions::Widgets::Widths::Button::kPatchManagerUnlockBank,
         PluginDimensions::Widgets::Heights::kButton,
-        widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kUnlockBank));
+        widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kUnlockBank).value_or(""));
     unlockBankButton_->onClick = [this]
     {
         apvts_.state.setProperty(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kUnlockBank,
@@ -229,7 +229,7 @@ void BankUtilityPanel::setupSelectBankButtons(tss::ISkin& skin, WidgetFactory& w
         skin,
         PluginDimensions::Widgets::Widths::Button::kPatchManagerBankSelect,
         PluginDimensions::Widgets::Heights::kButton,
-        widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank5));
+        widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank5).value_or(""));
     selectBank5Button_->onClick = [this]
     {
         apvts_.state.setProperty(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank5,
@@ -242,7 +242,7 @@ void BankUtilityPanel::setupSelectBankButtons(tss::ISkin& skin, WidgetFactory& w
         skin,
         PluginDimensions::Widgets::Widths::Button::kPatchManagerBankSelect,
         PluginDimensions::Widgets::Heights::kButton,
-        widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank6));
+        widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank6).value_or(""));
     selectBank6Button_->onClick = [this]
     {
         apvts_.state.setProperty(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank6,
@@ -255,7 +255,7 @@ void BankUtilityPanel::setupSelectBankButtons(tss::ISkin& skin, WidgetFactory& w
         skin,
         PluginDimensions::Widgets::Widths::Button::kPatchManagerBankSelect,
         PluginDimensions::Widgets::Heights::kButton,
-        widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank7));
+        widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank7).value_or(""));
     selectBank7Button_->onClick = [this]
     {
         apvts_.state.setProperty(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank7,
@@ -268,7 +268,7 @@ void BankUtilityPanel::setupSelectBankButtons(tss::ISkin& skin, WidgetFactory& w
         skin,
         PluginDimensions::Widgets::Widths::Button::kPatchManagerBankSelect,
         PluginDimensions::Widgets::Heights::kButton,
-        widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank8));
+        widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank8).value_or(""));
     selectBank8Button_->onClick = [this]
     {
         apvts_.state.setProperty(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank8,
@@ -281,7 +281,7 @@ void BankUtilityPanel::setupSelectBankButtons(tss::ISkin& skin, WidgetFactory& w
         skin,
         PluginDimensions::Widgets::Widths::Button::kPatchManagerBankSelect,
         PluginDimensions::Widgets::Heights::kButton,
-        widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank9));
+        widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank9).value_or(""));
     selectBank9Button_->onClick = [this]
     {
         apvts_.state.setProperty(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank9,

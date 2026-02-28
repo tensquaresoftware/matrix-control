@@ -3,6 +3,7 @@
 #include <memory>
 #include <map>
 #include <vector>
+#include <optional>
 
 #include <juce_audio_processors/juce_audio_processors.h>
 
@@ -51,9 +52,9 @@ public:
     // Display Name Helper Methods
     // ============================================================================
     
-    juce::String getParameterDisplayName(const juce::String& parameterId) const;
+    std::optional<juce::String> getParameterDisplayName(const juce::String& parameterId) const;
     juce::String getGroupDisplayName(const juce::String& groupId) const;
-    juce::String getStandaloneWidgetDisplayName(const juce::String& widgetId) const;
+    std::optional<juce::String> getStandaloneWidgetDisplayName(const juce::String& widgetId) const;
 
 private:
     WidgetFactoryValidator validator;
@@ -68,16 +69,11 @@ private:
     void buildChoiceParameterMap();
     void buildStandaloneWidgetMap();
     void buildGroupMap();
-    void addPatchEditModuleIntParametersToMap();
-    void addMatrixModulationBusIntParametersToMap();
-    void addMasterEditIntParametersToMap();
-    void addPatchEditModuleChoiceParametersToMap();
-    void addMatrixModulationBusChoiceParametersToMap();
-    void addMasterEditChoiceParametersToMap();
-    void addPatchEditStandaloneWidgetsToMap();
-    void addMatrixModulationStandaloneWidgetsToMap();
-    void addPatchManagerStandaloneWidgetsToMap();
-    void addMasterEditStandaloneWidgetsToMap();
+    
+    void addAllPatchEditDescriptorsToMap();
+    void addAllMatrixModulationDescriptorsToMap();
+    void addAllPatchManagerDescriptorsToMap();
+    void addAllMasterEditDescriptorsToMap();
     
     const PluginDescriptors::IntParameterDescriptor* findIntParameter(const juce::String& parameterId) const;
     const PluginDescriptors::ChoiceParameterDescriptor* findChoiceParameter(const juce::String& parameterId) const;

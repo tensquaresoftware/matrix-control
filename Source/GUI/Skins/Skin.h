@@ -65,6 +65,30 @@ namespace tss
         
         template <typename Accessor>
         void initializeVariantColours(Accessor accessColour);
+        
+        template <typename Accessor>
+        void initializePanelColours(Accessor accessColour);
+        
+        template <typename Accessor>
+        void initializeLayoutColours(Accessor accessColour);
+        
+        template <typename Accessor>
+        void initializeButtonColours(Accessor accessColour);
+        
+        template <typename Accessor>
+        void initializeToggleColours(Accessor accessColour);
+        
+        template <typename Accessor>
+        void initializeSliderColours(Accessor accessColour);
+        
+        template <typename Accessor>
+        void initializeComboBoxColours(Accessor accessColour);
+        
+        template <typename Accessor>
+        void initializePopupMenuColours(Accessor accessColour);
+        
+        template <typename Accessor>
+        void initializeDisplayColours(Accessor accessColour);
 
         ColourVariant currentVariant_;
         std::map<SkinValueId, float> values_;

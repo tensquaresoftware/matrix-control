@@ -48,19 +48,7 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     headerPanel.getZoomComboBox().onChange = [&headerPanel]
     {
         const auto selectedId = headerPanel.getZoomComboBox().getSelectedId();
-        float zoomFactor = 1.0f;
-        
-        switch (selectedId)
-        {
-            case 1: zoomFactor = 0.5f; break;   // 50%
-            case 2: zoomFactor = 0.75f; break;  // 75%
-            case 3: zoomFactor = 0.9f; break;   // 90%
-            case 4: zoomFactor = 1.0f; break;   // 100%
-            case 5: zoomFactor = 1.25f; break;  // 125%
-            case 6: zoomFactor = 1.5f; break;   // 150%
-            case 7: zoomFactor = 2.0f; break;   // 200%
-            default: zoomFactor = 1.0f; break;
-        }
+        const float zoomFactor = PluginIDs::Settings::ZoomLevels::getZoomLevel(selectedId);
         
         // TODO: Implement zoom functionality (Phase 7)
         // For now, just log the selected zoom factor

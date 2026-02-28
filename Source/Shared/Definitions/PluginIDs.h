@@ -22,6 +22,34 @@ namespace PluginIDs
             constexpr int k125 = 5;
             constexpr int k150 = 6;
             constexpr int k200 = 7;
+            constexpr int k250 = 8;
+            constexpr int k300 = 9;
+            constexpr int k400 = 10;
+            
+            constexpr int kDefault = k100;
+            constexpr int kMin = k50;
+            constexpr int kMax = k400;
+            
+            constexpr float kFactors[] = {
+                0.0f,   // index 0 (unused, IDs start at 1)
+                0.5f,   // k50
+                0.75f,  // k75
+                0.9f,   // k90
+                1.0f,   // k100
+                1.25f,  // k125
+                1.5f,   // k150
+                2.0f,   // k200
+                2.5f,   // k250
+                3.0f,   // k300
+                4.0f    // k400
+            };
+            
+            constexpr float getZoomLevel(int zoomLevelId)
+            {
+                if (zoomLevelId >= kMin && zoomLevelId <= kMax)
+                    return kFactors[zoomLevelId];
+                return kFactors[kDefault];
+            }
         }
     }
 
@@ -168,7 +196,7 @@ namespace PluginIDs
             namespace ParameterWidgets
             {
                 constexpr const char* kBalance                = "vcfBalance";
-                constexpr const char* kFrequency              = "vcfFequency";
+                constexpr const char* kFrequency              = "vcfFrequency";
                 constexpr const char* kFrequencyModByEnv1     = "vcfFrequencyModByEnv1";
                 constexpr const char* kFrequencyModByPressure = "vcfFrequencyModByPressure";
                 constexpr const char* kResonance              = "vcfResonance";

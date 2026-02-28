@@ -234,6 +234,7 @@ namespace PluginDescriptors
 
         namespace PatchMutatorModule
         {
+            extern const std::vector<IntParameterDescriptor> kIntParameters;
             extern const std::vector<StandaloneWidgetDescriptor> kStandaloneWidgets;
         }
     }

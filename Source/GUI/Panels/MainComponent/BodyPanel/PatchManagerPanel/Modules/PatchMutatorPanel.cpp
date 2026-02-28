@@ -11,18 +11,7 @@
 #include "Shared/Definitions/PluginDescriptors.h"
 #include "Shared/Definitions/PluginDimensions.h"
 #include "GUI/Factories/WidgetFactory.h"
-
-namespace
-{
-    constexpr int kLabelWidth = 45;
-    constexpr int kLabelHeight = 20;
-    constexpr int kSliderWidth = 45;
-    constexpr int kSliderHeight = 20;
-    constexpr int kComboBoxWidth = 45;
-    constexpr int kComboBoxHeight = 20;
-    constexpr int kToggleWidth = 20;
-    constexpr int kToggleHeight = 20;
-}
+#include "Core/Factories/ApvtsFactory.h"
 
 PatchMutatorPanel::PatchMutatorPanel(tss::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : width_(width)
@@ -60,9 +49,18 @@ void PatchMutatorPanel::setupAmountLine(tss::ISkin& skin, WidgetFactory& widgetF
         PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kAmount);
     addAndMakeVisible(*amountLabel_);
 
-    amountSlider_ = std::make_unique<tss::Slider>(skin, kSliderWidth, kSliderHeight, 0.0);
-    amountSlider_->setRange(0.0, 100.0, 1.0);
-    amountSlider_->setValue(0.0);
+    const auto allIntParams = ApvtsFactory::getAllIntParameters();
+    const auto amountIt = std::find_if(allIntParams.begin(), allIntParams.end(),
+        [](const PluginDescriptors::IntParameterDescriptor& desc) {
+            return desc.parameterId == PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kAmount;
+        });
+    
+    amountSlider_ = std::make_unique<tss::Slider>(skin, PluginDimensions::Widgets::Widths::Slider::kPatchMutator, PluginDimensions::Widgets::Heights::kSlider, 0.0);
+    if (amountIt != allIntParams.end())
+    {
+        amountSlider_->setRange(static_cast<double>(amountIt->minValue), static_cast<double>(amountIt->maxValue), 1.0);
+        amountSlider_->setValue(static_cast<double>(amountIt->defaultValue));
+    }
     amountSlider_->setUnit(PluginDisplayNames::Units::kPercent);
     amountSlider_->onValueChange = [this]
     {
@@ -125,9 +123,18 @@ void PatchMutatorPanel::setupRandomLine(tss::ISkin& skin, WidgetFactory& widgetF
         PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kRandom);
     addAndMakeVisible(*randomLabel_);
 
-    randomSlider_ = std::make_unique<tss::Slider>(skin, kSliderWidth, kSliderHeight, 0.0);
-    randomSlider_->setRange(0.0, 100.0, 1.0);
-    randomSlider_->setValue(0.0);
+    const auto allIntParams = ApvtsFactory::getAllIntParameters();
+    const auto randomIt = std::find_if(allIntParams.begin(), allIntParams.end(),
+        [](const PluginDescriptors::IntParameterDescriptor& desc) {
+            return desc.parameterId == PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kRandom;
+        });
+    
+    randomSlider_ = std::make_unique<tss::Slider>(skin, PluginDimensions::Widgets::Widths::Slider::kPatchMutator, PluginDimensions::Widgets::Heights::kSlider, 0.0);
+    if (randomIt != allIntParams.end())
+    {
+        randomSlider_->setRange(static_cast<double>(randomIt->minValue), static_cast<double>(randomIt->maxValue), 1.0);
+        randomSlider_->setValue(static_cast<double>(randomIt->defaultValue));
+    }
     randomSlider_->setUnit(PluginDisplayNames::Units::kPercent);
     randomSlider_->onValueChange = [this]
     {
@@ -193,7 +200,7 @@ void PatchMutatorPanel::setupHistoryLine(tss::ISkin& skin, WidgetFactory& widget
     historyComboBox_ = std::make_unique<tss::ComboBox>(
         skin,
         PluginDimensions::Widgets::Widths::ComboBox::kPatchMutatorHistory,
-        kComboBoxHeight,
+        PluginDimensions::Widgets::Heights::kComboBox,
         tss::ComboBox::Style::Standard);
     historyComboBox_->addItem(PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEmptyHistory, 1);
     historyComboBox_->setSelectedId(1);
@@ -282,72 +289,42 @@ void PatchMutatorPanel::layoutModuleHeader(int x, int y)
         header->setBounds(x, y, width, height);
 }
 
-void PatchMutatorPanel::layoutAmountLine(int x, int& y)
+void PatchMutatorPanel::layoutSliderLine(int x, int& y, tss::Label* label, tss::Slider* slider, tss::Button* button, const std::vector<tss::Toggle*>& toggles)
 {
     const int widgetY = y;
 
-    if (auto* label = amountLabel_.get())
-        label->setBounds(x, widgetY, kLabelWidth, kLabelHeight);
-    x += kLabelWidth + kSpacing_;
+    if (label != nullptr)
+        label->setBounds(x, widgetY, PluginDimensions::Widgets::Widths::Label::kPatchMutator, PluginDimensions::Widgets::Heights::kLabel);
+    x += PluginDimensions::Widgets::Widths::Label::kPatchMutator + kSpacing_;
 
-    if (auto* slider = amountSlider_.get())
-        slider->setBounds(x, widgetY, kSliderWidth, kSliderHeight);
-    x += kSliderWidth + kSpacing_;
+    if (slider != nullptr)
+        slider->setBounds(x, widgetY, PluginDimensions::Widgets::Widths::Slider::kPatchMutator, PluginDimensions::Widgets::Heights::kSlider);
+    x += PluginDimensions::Widgets::Widths::Slider::kPatchMutator + kSpacing_;
 
-    if (auto* button = mutateButton_.get())
-        button->setBounds(x, widgetY, button->getWidth(), kLabelHeight);
-    x += mutateButton_->getWidth() + kSpacing_;
+    if (button != nullptr)
+        button->setBounds(x, widgetY, button->getWidth(), PluginDimensions::Widgets::Heights::kLabel);
+    x += button->getWidth() + kSpacing_;
 
-    if (auto* toggle = dco1Toggle_.get())
-        toggle->setBounds(x, widgetY, kToggleWidth, kToggleHeight);
-    x += kToggleWidth + kSpacing_;
-    if (auto* toggle = dco2Toggle_.get())
-        toggle->setBounds(x, widgetY, kToggleWidth, kToggleHeight);
-    x += kToggleWidth + kSpacing_;
-    if (auto* toggle = vcfVcaToggle_.get())
-        toggle->setBounds(x, widgetY, kToggleWidth, kToggleHeight);
-    x += kToggleWidth + kSpacing_;
-    if (auto* toggle = fmTrackToggle_.get())
-        toggle->setBounds(x, widgetY, kToggleWidth, kToggleHeight);
-    x += kToggleWidth + kSpacing_;
-    if (auto* toggle = rampPortamentoToggle_.get())
-        toggle->setBounds(x, widgetY, kToggleWidth, kToggleHeight);
+    for (auto* toggle : toggles)
+    {
+        if (toggle != nullptr)
+            toggle->setBounds(x, widgetY, PluginDimensions::Widgets::Widths::Toggle::kPatchMutator, PluginDimensions::Widgets::Heights::kToggle);
+        x += PluginDimensions::Widgets::Widths::Toggle::kPatchMutator + kSpacing_;
+    }
 
-    y += kLabelHeight + kSpacing_;
+    y += PluginDimensions::Widgets::Heights::kLabel + kSpacing_;
+}
+
+void PatchMutatorPanel::layoutAmountLine(int x, int& y)
+{
+    layoutSliderLine(x, y, amountLabel_.get(), amountSlider_.get(), mutateButton_.get(),
+        {dco1Toggle_.get(), dco2Toggle_.get(), vcfVcaToggle_.get(), fmTrackToggle_.get(), rampPortamentoToggle_.get()});
 }
 
 void PatchMutatorPanel::layoutRandomLine(int x, int& y)
 {
-    const int widgetY = y;
-
-    if (auto* label = randomLabel_.get())
-        label->setBounds(x, widgetY, kLabelWidth, kLabelHeight);
-    x += kLabelWidth + kSpacing_;
-
-    if (auto* slider = randomSlider_.get())
-        slider->setBounds(x, widgetY, kSliderWidth, kSliderHeight);
-    x += kSliderWidth + kSpacing_;
-
-    if (auto* button = retryButton_.get())
-        button->setBounds(x, widgetY, button->getWidth(), kLabelHeight);
-    x += retryButton_->getWidth() + kSpacing_;
-
-    if (auto* toggle = env1Toggle_.get())
-        toggle->setBounds(x, widgetY, kToggleWidth, kToggleHeight);
-    x += kToggleWidth + kSpacing_;
-    if (auto* toggle = env2Toggle_.get())
-        toggle->setBounds(x, widgetY, kToggleWidth, kToggleHeight);
-    x += kToggleWidth + kSpacing_;
-    if (auto* toggle = env3Toggle_.get())
-        toggle->setBounds(x, widgetY, kToggleWidth, kToggleHeight);
-    x += kToggleWidth + kSpacing_;
-    if (auto* toggle = lfo1Toggle_.get())
-        toggle->setBounds(x, widgetY, kToggleWidth, kToggleHeight);
-    x += kToggleWidth + kSpacing_;
-    if (auto* toggle = lfo2Toggle_.get())
-        toggle->setBounds(x, widgetY, kToggleWidth, kToggleHeight);
-
-    y += kLabelHeight + kSpacing_;
+    layoutSliderLine(x, y, randomLabel_.get(), randomSlider_.get(), retryButton_.get(),
+        {env1Toggle_.get(), env2Toggle_.get(), env3Toggle_.get(), lfo1Toggle_.get(), lfo2Toggle_.get()});
 }
 
 void PatchMutatorPanel::layoutHistoryLine(int x, int& y)
@@ -355,29 +332,29 @@ void PatchMutatorPanel::layoutHistoryLine(int x, int& y)
     const int widgetY = y;
 
     if (auto* label = historyLabel_.get())
-        label->setBounds(x, widgetY, kLabelWidth, kLabelHeight);
-    x += kLabelWidth + kSpacing_;
+        label->setBounds(x, widgetY, PluginDimensions::Widgets::Widths::Label::kPatchMutator, PluginDimensions::Widgets::Heights::kLabel);
+    x += PluginDimensions::Widgets::Widths::Label::kPatchMutator + kSpacing_;
 
     if (auto* comboBox = historyComboBox_.get())
-        comboBox->setBounds(x, widgetY, kComboBoxWidth, kComboBoxHeight);
-    x += kComboBoxWidth + kSpacing_;
+        comboBox->setBounds(x, widgetY, PluginDimensions::Widgets::Widths::ComboBox::kPatchMutatorHistory, PluginDimensions::Widgets::Heights::kComboBox);
+    x += PluginDimensions::Widgets::Widths::ComboBox::kPatchMutatorHistory + kSpacing_;
 
     if (auto* button = compareButton_.get())
-        button->setBounds(x, widgetY, button->getWidth(), kLabelHeight);
+        button->setBounds(x, widgetY, button->getWidth(), PluginDimensions::Widgets::Heights::kLabel);
     x += compareButton_->getWidth() + kSpacing_;
 
     if (auto* button = deleteButton_.get())
-        button->setBounds(x, widgetY, button->getWidth(), kLabelHeight);
+        button->setBounds(x, widgetY, button->getWidth(), PluginDimensions::Widgets::Heights::kLabel);
     x += deleteButton_->getWidth() + kSpacing_;
 
     if (auto* button = clearButton_.get())
-        button->setBounds(x, widgetY, button->getWidth(), kLabelHeight);
+        button->setBounds(x, widgetY, button->getWidth(), PluginDimensions::Widgets::Heights::kLabel);
     x += clearButton_->getWidth() + kSpacing_;
 
     if (auto* button = exportButton_.get())
-        button->setBounds(x, widgetY, button->getWidth(), kLabelHeight);
+        button->setBounds(x, widgetY, button->getWidth(), PluginDimensions::Widgets::Heights::kLabel);
 
-    y += kLabelHeight;
+    y += PluginDimensions::Widgets::Heights::kLabel;
 }
 
 void PatchMutatorPanel::setSkin(tss::ISkin& skin)
