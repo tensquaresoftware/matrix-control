@@ -5,7 +5,8 @@
 #include "Modules/ComputerPatchesPanel.h"
 #include "Modules/PatchMutatorPanel.h"
 
-#include "GUI/Skins/Skin.h"
+#include "GUI/Skins/ISkin.h"
+#include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Widgets/SectionHeader.h"
 #include "Shared/Definitions/PluginDescriptors.h"
 #include "Shared/Definitions/PluginHelpers.h"
@@ -13,7 +14,7 @@
 #include "GUI/Factories/WidgetFactory.h"
 
 
-PatchManagerPanel::PatchManagerPanel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+PatchManagerPanel::PatchManagerPanel(tss::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : width_(width)
     , height_(height)
     , bankUtilityPanelHeight_(PluginDimensions::Panels::Body::PatchManagerSection::BankUtilityModule::kHeight)
@@ -134,23 +135,14 @@ void PatchManagerPanel::layoutPatchMutatorPanel(const juce::Rectangle<int>& boun
     }
 }
 
-void PatchManagerPanel::setSkin(tss::Skin& skin)
+void PatchManagerPanel::setSkin(tss::ISkin& skin)
 {
     skin_ = &skin;
-
-    if (auto* header = sectionHeader_.get())
-        header->setSkin(skin);
-
-    if (auto* panel = bankUtilityPanel_.get())
-        panel->setSkin(skin);
-
-    if (auto* panel = internalPatchesPanel_.get())
-        panel->setSkin(skin);
-
-    if (auto* panel = computerPatchesPanel_.get())
-        panel->setSkin(skin);
-
-    if (auto* panel = patchMutatorPanel_.get())
-        panel->setSkin(skin);
+    tss::propagateSkin(skin,
+        sectionHeader_.get(),
+        bankUtilityPanel_.get(),
+        internalPatchesPanel_.get(),
+        computerPatchesPanel_.get(),
+        patchMutatorPanel_.get());
 }
 

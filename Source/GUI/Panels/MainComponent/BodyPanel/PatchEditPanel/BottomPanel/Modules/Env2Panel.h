@@ -7,7 +7,7 @@
 
 namespace tss
 {
-    class Skin;
+    class ISkin;
 }
 
 class WidgetFactory;
@@ -15,7 +15,7 @@ class WidgetFactory;
 class Env2Panel : public BaseModulePanel
 {
 public:
-    Env2Panel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    Env2Panel(tss::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~Env2Panel() override = default;
 
 private:

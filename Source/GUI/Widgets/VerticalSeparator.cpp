@@ -1,20 +1,23 @@
 #include "VerticalSeparator.h"
 
-#include "GUI/Skins/Skin.h"
+
+#include "GUI/Skins/ISkin.h"
+
+using tss::SkinColourId;
 
 namespace tss
 {
-    VerticalSeparator::VerticalSeparator(tss::Skin& skin, int width, int height)
+    VerticalSeparator::VerticalSeparator(tss::ISkin& skin, int width, int height)
         : skin_(&skin)
         , width_(width)
         , height_(height)
     {
         setOpaque(false);
         setSize(width_, height_);
-        cachedLineColour_ = skin_->getVerticalSeparatorLineColour();
+        cachedLineColour_ = skin_->getColour(SkinColourId::kVerticalSeparatorLine);
     }
 
-    void VerticalSeparator::setSkin(tss::Skin& skin)
+    void VerticalSeparator::setSkin(tss::ISkin& skin)
     {
         skin_ = &skin;
         invalidateCache();

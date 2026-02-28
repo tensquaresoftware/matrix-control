@@ -4,7 +4,7 @@
 
 namespace tss
 {
-    class Skin;
+    class ISkin;
 
     class ModuleHeader : public juce::Component
     {
@@ -15,10 +15,10 @@ namespace tss
             Orange
         };
 
-        explicit ModuleHeader(Skin& skin, const juce::String& text, int width, int height, ColourVariant variant = ColourVariant::Blue);
+        explicit ModuleHeader(ISkin& skin, const juce::String& text, int width, int height, ColourVariant variant = ColourVariant::Blue);
         ~ModuleHeader() override = default;
 
-        void setSkin(Skin& skin);
+        void setSkin(ISkin& skin);
         
         void setText(const juce::String& text);
         juce::String getText() const { return text_; }
@@ -36,7 +36,7 @@ namespace tss
 
         int width_;
         int height_;
-        Skin* skin_ = nullptr;
+        ISkin* skin_ = nullptr;
         juce::String text_;
         ColourVariant colourVariant_;
 

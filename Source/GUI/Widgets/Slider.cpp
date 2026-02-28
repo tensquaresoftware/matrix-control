@@ -1,10 +1,13 @@
 #include "Slider.h"
 
-#include "GUI/Skins/Skin.h"
+
+#include "GUI/Skins/ISkin.h"
+
+using tss::SkinColourId;
 
 namespace tss
 {
-    Slider::Slider(tss::Skin& skin, int width, int height, double defaultValue)
+    Slider::Slider(tss::ISkin& skin, int width, int height, double defaultValue)
         : juce::Slider(juce::Slider::LinearBarVertical, juce::Slider::NoTextBox)
         , skin_(&skin)
         , width_(width)
@@ -19,7 +22,7 @@ namespace tss
         updateSkinCache();
     }
 
-    void Slider::setSkin(tss::Skin& skin)
+    void Slider::setSkin(tss::ISkin& skin)
     {
         skin_ = &skin;
         invalidateCache();
@@ -110,7 +113,7 @@ namespace tss
         cachedTrackColour_ = skin_->getSliderTrackColour(enabled);
         cachedValueBarColour_ = skin_->getSliderValueBarColour(enabled);
         cachedTextColour_ = skin_->getSliderTextColour(enabled);
-        cachedFocusBorderColour_ = skin_->getSliderFocusBorderColour();
+        cachedFocusBorderColour_ = skin_->getColour(SkinColourId::kSliderFocusBorder);
         cachedFont_ = skin_->getBaseFont();
     }
 

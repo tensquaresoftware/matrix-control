@@ -11,7 +11,7 @@
 
 namespace tss
 {
-    class Skin;
+    class ISkin;
     class Slider;
     class ComboBox;
     class Button;
@@ -28,23 +28,23 @@ public:
     
     std::unique_ptr<tss::Slider> createIntParameterSlider(
         const juce::String& parameterId,
-        tss::Skin& skin);
+        tss::ISkin& skin);
 
     std::unique_ptr<tss::Slider> createIntParameterSlider(
         const juce::String& parameterId,
-        tss::Skin& skin,
+        tss::ISkin& skin,
         int width,
         int height);
     
     std::unique_ptr<tss::ComboBox> createChoiceParameterComboBox(
         const juce::String& parameterId,
-        tss::Skin& skin,
+        tss::ISkin& skin,
         int width,
         int height);
     
     std::unique_ptr<tss::Button> createStandaloneButton(
         const juce::String& widgetId,
-        tss::Skin& skin,
+        tss::ISkin& skin,
         int height);
 
     // ============================================================================
@@ -88,7 +88,7 @@ private:
     void addChoiceParametersToMap(const std::vector<PluginDescriptors::ChoiceParameterDescriptor>& parameters);
     void addStandaloneWidgetsToMap(const std::vector<PluginDescriptors::StandaloneWidgetDescriptor>& widgets);
     
-    std::unique_ptr<tss::Slider> createSliderFromDescriptor(const PluginDescriptors::IntParameterDescriptor* desc, tss::Skin& skin, int width, int height);
-    std::unique_ptr<tss::ComboBox> createComboBoxFromDescriptor(const PluginDescriptors::ChoiceParameterDescriptor* desc, tss::Skin& skin, int width, int height);
+    std::unique_ptr<tss::Slider> createSliderFromDescriptor(const PluginDescriptors::IntParameterDescriptor* desc, tss::ISkin& skin, int width, int height);
+    std::unique_ptr<tss::ComboBox> createComboBoxFromDescriptor(const PluginDescriptors::ChoiceParameterDescriptor* desc, tss::ISkin& skin, int width, int height);
 };
 

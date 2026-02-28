@@ -6,14 +6,15 @@
 #include "Modules/FmTrackPanel.h"
 #include "Modules/RampPortamentoPanel.h"
 
-#include "GUI/Skins/Skin.h"
+#include "GUI/Skins/ISkin.h"
+#include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Factories/WidgetFactory.h"
 #include "Shared/Definitions/PluginDimensions.h"
 
 
 TopPanel::~TopPanel() = default;
 
-TopPanel::TopPanel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+TopPanel::TopPanel(tss::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : width_(width)
     , height_(height)
     , childModuleWidth_(PluginDimensions::Panels::Body::PatchEditSection::TopModules::ChildModules::kWidth)
@@ -56,23 +57,14 @@ void TopPanel::resized()
     }
 }
 
-void TopPanel::setSkin(tss::Skin& skin)
+void TopPanel::setSkin(tss::ISkin& skin)
 {
     skin_ = &skin;
-
-    if (auto* panel = dco1Panel_.get())
-        panel->setSkin(skin);
-
-    if (auto* panel = dco2Panel_.get())
-        panel->setSkin(skin);
-
-    if (auto* panel = vcfVcaPanel_.get())
-        panel->setSkin(skin);
-
-    if (auto* panel = fmTrackPanel_.get())
-        panel->setSkin(skin);
-
-    if (auto* panel = rampPortamentoPanel_.get())
-        panel->setSkin(skin);
+    tss::propagateSkin(skin,
+        dco1Panel_.get(),
+        dco2Panel_.get(),
+        vcfVcaPanel_.get(),
+        fmTrackPanel_.get(),
+        rampPortamentoPanel_.get());
 }
 

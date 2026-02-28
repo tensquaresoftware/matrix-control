@@ -7,7 +7,7 @@
 
 namespace tss
 {
-    class Skin;
+    class ISkin;
     class ModuleHeader;
     class GroupLabel;
     class Button;
@@ -20,11 +20,11 @@ class InternalPatchesPanel : public juce::Component,
                              public juce::ValueTree::Listener
 {
 public:
-    InternalPatchesPanel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    InternalPatchesPanel(tss::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~InternalPatchesPanel() override;
 
     void resized() override;
-    void setSkin(tss::Skin& skin);
+    void setSkin(tss::ISkin& skin);
     
     // juce::ValueTree::Listener
     void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
@@ -41,7 +41,7 @@ private:
 
     int width_;
     int height_;
-    tss::Skin* skin_;
+    tss::ISkin* skin_;
     juce::AudioProcessorValueTreeState& apvts_;
 
     std::unique_ptr<tss::ModuleHeader> moduleHeader;
@@ -60,17 +60,17 @@ private:
     std::unique_ptr<tss::Button> pastePatchButton_;
     std::unique_ptr<tss::Button> storePatchButton_;
 
-    void setupModuleHeader(tss::Skin& skin, WidgetFactory& widgetFactory, const juce::String& moduleId);
-    void setupBrowserGroupLabel(tss::Skin& skin);
-    void setupLoadPreviousPatchButton(tss::Skin& skin, WidgetFactory& widgetFactory);
-    void setupLoadNextPatchButton(tss::Skin& skin, WidgetFactory& widgetFactory);
-    void setupCurrentBankNumberBox(tss::Skin& skin);
-    void setupCurrentPatchNumberBox(tss::Skin& skin);
-    void setupMemoryGroupLabel(tss::Skin& skin);
-    void setupInitPatchButton(tss::Skin& skin, WidgetFactory& widgetFactory);
-    void setupCopyPatchButton(tss::Skin& skin, WidgetFactory& widgetFactory);
-    void setupPastePatchButton(tss::Skin& skin, WidgetFactory& widgetFactory);
-    void setupStorePatchButton(tss::Skin& skin, WidgetFactory& widgetFactory);
+    void setupModuleHeader(tss::ISkin& skin, WidgetFactory& widgetFactory, const juce::String& moduleId);
+    void setupBrowserGroupLabel(tss::ISkin& skin);
+    void setupLoadPreviousPatchButton(tss::ISkin& skin, WidgetFactory& widgetFactory);
+    void setupLoadNextPatchButton(tss::ISkin& skin, WidgetFactory& widgetFactory);
+    void setupCurrentBankNumberBox(tss::ISkin& skin);
+    void setupCurrentPatchNumberBox(tss::ISkin& skin);
+    void setupMemoryGroupLabel(tss::ISkin& skin);
+    void setupInitPatchButton(tss::ISkin& skin, WidgetFactory& widgetFactory);
+    void setupCopyPatchButton(tss::ISkin& skin, WidgetFactory& widgetFactory);
+    void setupPastePatchButton(tss::ISkin& skin, WidgetFactory& widgetFactory);
+    void setupStorePatchButton(tss::ISkin& skin, WidgetFactory& widgetFactory);
 
     void layoutModuleHeader(int x, int y);
     void layoutBrowserGroupLabel(int x, int y);

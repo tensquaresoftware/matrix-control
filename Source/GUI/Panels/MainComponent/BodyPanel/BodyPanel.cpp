@@ -1,6 +1,8 @@
 #include "BodyPanel.h"
 
-#include "GUI/Skins/Skin.h"
+
+#include "GUI/Skins/ISkin.h"
+#include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Widgets/VerticalSeparator.h"
 #include "PatchEditPanel/PatchEditPanel.h"
 #include "MatrixModulationPanel/MatrixModulationPanel.h"
@@ -9,9 +11,11 @@
 #include "GUI/Factories/WidgetFactory.h"
 #include "Shared/Definitions/PluginDimensions.h"
 
+using tss::SkinColourId;
+
 using ::tss::VerticalSeparator;
 
-BodyPanel::BodyPanel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+BodyPanel::BodyPanel(tss::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : width_(width)
     , height_(height)
     , padding_(PluginDimensions::Panels::Body::kPadding)
@@ -58,7 +62,7 @@ BodyPanel::~BodyPanel() = default;
 void BodyPanel::paint(juce::Graphics& g)
 {
     if (skin_ != nullptr)
-        g.fillAll(skin_->getBodyPanelBackgroundColour());
+        g.fillAll(skin_->getColour(SkinColourId::kBodyPanelBackground));
 }
 
 void BodyPanel::resized()
@@ -116,26 +120,15 @@ void BodyPanel::resized()
     );
 }
 
-void BodyPanel::setSkin(tss::Skin& skin)
+void BodyPanel::setSkin(tss::ISkin& skin)
 {
     skin_ = &skin;
-
-    if (auto* panel = patchEditPanel_.get())
-        panel->setSkin(skin);
-
-    if (auto* separator = verticalSeparator1_.get())
-        separator->setSkin(skin);
-
-    if (auto* panel = matrixModulationPanel_.get())
-        panel->setSkin(skin);
-
-    if (auto* separator = verticalSeparator2_.get())
-        separator->setSkin(skin);
-
-    if (auto* panel = masterEditPanel_.get())
-        panel->setSkin(skin);
-
-    if (auto* panel = patchManagerPanel_.get())
-        panel->setSkin(skin);
+    tss::propagateSkin(skin,
+        patchEditPanel_.get(),
+        verticalSeparator1_.get(),
+        matrixModulationPanel_.get(),
+        verticalSeparator2_.get(),
+        masterEditPanel_.get(),
+        patchManagerPanel_.get());
 }
 

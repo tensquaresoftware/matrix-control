@@ -1,11 +1,14 @@
 #include "TrackGeneratorDisplay.h"
 
-#include "GUI/Skins/Skin.h"
+
+#include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/ColourChart.h"
+
+using tss::SkinColourId;
 
 namespace tss
 {
-    TrackGeneratorDisplay::TrackGeneratorDisplay(tss::Skin& skin, int width, int height)
+    TrackGeneratorDisplay::TrackGeneratorDisplay(tss::ISkin& skin, int width, int height)
         : skin_(&skin)
         , width_(width)
         , height_(height)
@@ -16,7 +19,7 @@ namespace tss
         cachedPointValues_ = pointValues_;
     }
 
-    void TrackGeneratorDisplay::setSkin(tss::Skin& skin)
+    void TrackGeneratorDisplay::setSkin(tss::ISkin& skin)
     {
         skin_ = &skin;
         updateSkinCache();
@@ -54,21 +57,21 @@ namespace tss
 
     void TrackGeneratorDisplay::drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        const auto backgroundColour = skin_->getTrackGeneratorDisplayBackgroundColour();
+        const auto backgroundColour = skin_->getColour(SkinColourId::kTrackGeneratorDisplayBackground);
         g.setColour(backgroundColour);
         g.fillRect(bounds);
     }
 
     void TrackGeneratorDisplay::drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        const auto borderColour = skin_->getTrackGeneratorDisplayBorderColour();
+        const auto borderColour = skin_->getColour(SkinColourId::kTrackGeneratorDisplayBorder);
         g.setColour(borderColour);
         g.drawRect(bounds, static_cast<float>(kWidgetBorderThickness_));
     }
 
     void TrackGeneratorDisplay::drawTriangle(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        const auto triangleColour = skin_->getTrackGeneratorDisplayBorderColour();
+        const auto triangleColour = skin_->getColour(SkinColourId::kTrackGeneratorDisplayBorder);
         const auto triangleHeight = kWidgetTriangleBase_ * std::sqrt(3.0f) * 0.5f;
         const auto centreX = std::round(bounds.getCentreX());
         const auto baseY = bounds.getY();

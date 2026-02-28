@@ -4,15 +4,15 @@
 
 namespace tss
 {
-    class Skin;
+    class ISkin;
 
     class Slider : public juce::Slider
     {
     public:
-        explicit Slider(Skin& skin, int width, int height, double defaultValue = 0.0);
+        explicit Slider(ISkin& skin, int width, int height, double defaultValue = 0.0);
         ~Slider() override = default;
 
-        void setSkin(Skin& skin);
+        void setSkin(ISkin& skin);
 
         void setUnit(const juce::String& unit);
         juce::String getUnit() const;
@@ -38,7 +38,7 @@ namespace tss
         inline constexpr static double kDragSensitivity_ = 0.5;
         inline constexpr static double kShiftKeyStep_ = 10.0;
 
-        Skin* skin_ = nullptr;
+        ISkin* skin_ = nullptr;
         
         int width_;
         int height_;

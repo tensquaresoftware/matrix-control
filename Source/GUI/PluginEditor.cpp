@@ -6,6 +6,9 @@
 #include "Panels/MainComponent/FooterPanel/FooterPanel.h"
 #include "Factories/WidgetFactory.h"
 
+using tss::SkinColourId;
+
+
 PluginEditor::PluginEditor(PluginProcessor& p)
     : AudioProcessorEditor(&p)
     , pluginProcessor(p)
@@ -71,7 +74,7 @@ PluginEditor::~PluginEditor() = default;
 
 void PluginEditor::paint(juce::Graphics& g)
 {
-    g.fillAll(skin_->getBodyPanelBackgroundColour());
+    g.fillAll(skin_->getColour(SkinColourId::kBodyPanelBackground));
 }
 
 void PluginEditor::resized()

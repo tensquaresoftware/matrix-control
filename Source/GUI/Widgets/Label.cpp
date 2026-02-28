@@ -1,10 +1,13 @@
 #include "Label.h"
 
-#include "GUI/Skins/Skin.h"
+
+#include "GUI/Skins/ISkin.h"
+
+using tss::SkinColourId;
 
 namespace tss
 {
-    Label::Label(tss::Skin& skin, int width, int height, const juce::String& text, tss::LabelStyle style)
+    Label::Label(tss::ISkin& skin, int width, int height, const juce::String& text, tss::LabelStyle style)
         : skin_(&skin)
         , width_(width)
         , height_(height)
@@ -17,7 +20,7 @@ namespace tss
         updateSkinCache();
     }
 
-    void Label::setSkin(tss::Skin& skin)
+    void Label::setSkin(tss::ISkin& skin)
     {
         skin_ = &skin;
         invalidateCache();
@@ -95,8 +98,8 @@ namespace tss
             return;
 
         cachedTextColour_ = (style_ == LabelStyle::HeaderPanel)
-            ? skin_->getHeaderPanelLabelTextColour()
-            : skin_->getLabelTextColour();
+            ? skin_->getColour(SkinColourId::kHeaderPanelLabelText)
+            : skin_->getColour(SkinColourId::kLabelText);
         cachedFont_ = skin_->getBaseFont();
     }
 

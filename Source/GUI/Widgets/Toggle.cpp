@@ -1,11 +1,14 @@
 #include "Toggle.h"
 
+
 #include "Shared/Definitions/PluginDimensions.h"
-#include "GUI/Skins/Skin.h"
+#include "GUI/Skins/ISkin.h"
+
+using tss::SkinColourId;
 
 namespace tss
 {
-    Toggle::Toggle(Skin& skin, int width, const juce::String& text)
+    Toggle::Toggle(ISkin& skin, int width, const juce::String& text)
         : juce::ToggleButton(text)
         , skin_(&skin)
         , width_(width)
@@ -14,7 +17,7 @@ namespace tss
         setSize(width_, PluginDimensions::Widgets::Heights::kToggle);
     }
 
-    void Toggle::setSkin(Skin& skin)
+    void Toggle::setSkin(ISkin& skin)
     {
         skin_ = &skin;
         repaint();
@@ -31,7 +34,7 @@ namespace tss
         g.setColour(skin_->getToggleBackgroundColour(isOn));
         g.fillRect(bounds);
 
-        g.setColour(skin_->getToggleBorderColour());
+        g.setColour(skin_->getColour(SkinColourId::kToggleBorder));
         g.drawRect(bounds, static_cast<float>(kBorderThickness_));
 
         const auto buttonText = getButtonText();

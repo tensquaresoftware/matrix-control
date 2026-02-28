@@ -6,7 +6,7 @@
 
 namespace tss
 {
-    class Skin;
+    class ISkin;
     class ComboBox;
 
     class PopupMenuBase : public juce::Component
@@ -32,7 +32,7 @@ namespace tss
         virtual void handleKeyboardNavigation(const juce::KeyPress& key) = 0;
 
         ComboBox& comboBox_;
-        Skin* skin_ = nullptr;
+        ISkin* skin_ = nullptr;
         bool isButtonLike_ = false;
         int highlightedItemIndex_ = -1;
         juce::Font cachedFont_ { juce::FontOptions() };

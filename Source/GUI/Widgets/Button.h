@@ -6,15 +6,15 @@
 
 namespace tss
 {
-    class Skin;
+    class ISkin;
 
     class Button : public juce::Button
     {
     public:
-        explicit Button(Skin& skin, int width, int height, const juce::String& text = {});
+        explicit Button(ISkin& skin, int width, int height, const juce::String& text = {});
         ~Button() override = default;
 
-        void setSkin(Skin& skin);
+        void setSkin(ISkin& skin);
         
         void paintButton(juce::Graphics& g, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override;
         void resized() override;
@@ -33,7 +33,7 @@ namespace tss
 
         inline constexpr static int kBorderThickness_ = 2;
 
-        Skin* skin_ = nullptr;
+        ISkin* skin_ = nullptr;
         int width_;
         int height_;
 

@@ -7,7 +7,7 @@
 
 namespace tss
 {
-    class Skin;
+    class ISkin;
     class Label;
     class ComboBox;
 }
@@ -15,12 +15,12 @@ namespace tss
 class HeaderPanel : public juce::Component
 {
 public:
-    HeaderPanel(tss::Skin& skin, int width, int height);
+    HeaderPanel(tss::ISkin& skin, int width, int height);
     ~HeaderPanel() override = default;
 
     void paint(juce::Graphics&) override;
     void resized() override;
-    void setSkin(tss::Skin& skin);
+    void setSkin(tss::ISkin& skin);
 
     tss::ComboBox& getSkinComboBox() { return skinComboBox_; }
     tss::ComboBox& getZoomComboBox() { return zoomComboBox_; }
@@ -37,7 +37,7 @@ private:
     inline constexpr static int kControlHeight_ = 20;
     inline constexpr static int kLeftPadding_ = 15;
 
-    tss::Skin* skin_;
+    tss::ISkin* skin_;
 
     tss::Label skinLabel_;
     tss::ComboBox skinComboBox_;

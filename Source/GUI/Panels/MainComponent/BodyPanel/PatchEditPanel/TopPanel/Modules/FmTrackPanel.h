@@ -7,7 +7,7 @@
 
 namespace tss
 {
-    class Skin;
+    class ISkin;
 }
 
 class WidgetFactory;
@@ -15,7 +15,7 @@ class WidgetFactory;
 class FmTrackPanel : public BaseModulePanel
 {
 public:
-    FmTrackPanel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    FmTrackPanel(tss::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~FmTrackPanel() override = default;
 
 private:

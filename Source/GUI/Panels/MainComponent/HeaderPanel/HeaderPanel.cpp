@@ -3,10 +3,13 @@
 #include "GUI/Widgets/Label.h"
 #include "GUI/Widgets/ComboBox.h"
 #include "GUI/Skins/Skin.h"
+#include "GUI/Skins/SkinHelpers.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginIDs.h"
 
-HeaderPanel::HeaderPanel(tss::Skin& skin, int width, int height)
+using tss::SkinColourId;
+
+HeaderPanel::HeaderPanel(tss::ISkin& skin, int width, int height)
     : width_(width)
     , height_(height)
     , skin_(&skin)
@@ -41,7 +44,7 @@ HeaderPanel::HeaderPanel(tss::Skin& skin, int width, int height)
 
 void HeaderPanel::paint(juce::Graphics& g)
 {
-    g.fillAll(skin_->getHeaderPanelBackgroundColour());
+    g.fillAll(skin_->getColour(SkinColourId::kHeaderPanelBackground));
 }
 
 void HeaderPanel::resized()
@@ -84,12 +87,9 @@ void HeaderPanel::resized()
     );
 }
 
-void HeaderPanel::setSkin(tss::Skin& skin)
+void HeaderPanel::setSkin(tss::ISkin& skin)
 {
     skin_ = &skin;
-    skinLabel_.setSkin(skin);
-    skinComboBox_.setSkin(skin);
-    zoomLabel_.setSkin(skin);
-    zoomComboBox_.setSkin(skin);
+    tss::propagateSkin(skin, &skinLabel_, &skinComboBox_, &zoomLabel_, &zoomComboBox_);
 }
 

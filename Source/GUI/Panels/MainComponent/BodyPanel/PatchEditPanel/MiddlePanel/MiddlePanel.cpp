@@ -1,6 +1,7 @@
 #include "MiddlePanel.h"
 
-#include "GUI/Skins/Skin.h"
+#include "GUI/Skins/ISkin.h"
+#include "GUI/Skins/SkinHelpers.h"
 #include "Shared/Definitions/PluginDescriptors.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginDimensions.h"
@@ -12,7 +13,7 @@ MiddlePanel::~MiddlePanel()
         apvts_->state.removeListener(this);
 }
 
-MiddlePanel::MiddlePanel(tss::Skin& skin, int width, int height, juce::AudioProcessorValueTreeState& apvts)
+MiddlePanel::MiddlePanel(tss::ISkin& skin, int width, int height, juce::AudioProcessorValueTreeState& apvts)
     : width_(width)
     , height_(height)
     , skin_(&skin)
@@ -248,14 +249,15 @@ int MiddlePanel::getEnvParameterFromApvts(const juce::String& parameterId) const
     return 0;
 }
 
-void MiddlePanel::setSkin(tss::Skin& skin)
+void MiddlePanel::setSkin(tss::ISkin& skin)
 {
     skin_ = &skin;
-    envelope1Display_.setSkin(skin);
-    envelope2Display_.setSkin(skin);
-    envelope3Display_.setSkin(skin);
-    trackGeneratorDisplay_.setSkin(skin);
-    patchNameModuleHeader_.setSkin(skin);
-    patchNameDisplay_.setSkin(skin);
+    tss::propagateSkin(skin,
+        &envelope1Display_,
+        &envelope2Display_,
+        &envelope3Display_,
+        &trackGeneratorDisplay_,
+        &patchNameModuleHeader_,
+        &patchNameDisplay_);
 }
 

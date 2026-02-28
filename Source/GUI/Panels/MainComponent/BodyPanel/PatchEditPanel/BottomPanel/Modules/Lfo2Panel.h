@@ -7,7 +7,7 @@
 
 namespace tss
 {
-    class Skin;
+    class ISkin;
 }
 
 class WidgetFactory;
@@ -15,7 +15,7 @@ class WidgetFactory;
 class Lfo2Panel : public BaseModulePanel
 {
 public:
-    Lfo2Panel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    Lfo2Panel(tss::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~Lfo2Panel() override = default;
 
 private:

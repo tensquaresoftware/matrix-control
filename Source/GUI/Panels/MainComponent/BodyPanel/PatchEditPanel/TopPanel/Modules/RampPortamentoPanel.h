@@ -7,7 +7,7 @@
 
 namespace tss
 {
-    class Skin;
+    class ISkin;
 }
 
 class WidgetFactory;
@@ -15,7 +15,7 @@ class WidgetFactory;
 class RampPortamentoPanel : public BaseModulePanel
 {
 public:
-    RampPortamentoPanel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    RampPortamentoPanel(tss::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~RampPortamentoPanel() override = default;
 
 private:

@@ -235,6 +235,11 @@ Avant de présenter du code à Guillaume, je DOIS vérifier systématiquement :
 - **Ne créer de commit que sur demande explicite**
 - Ne jamais committer de manière proactive ou automatique, même après une refactorisation réussie
 
+#### GitHub Issues
+
+- GitHub Issues : titre et description en anglais uniquement
+- Le dépôt doit rester prêt pour une collaboration avec d'autres développeurs (sauf mention spéciale contraire)
+
 #### Tags annotés
 
 Lors de la création d'un tag Git annoté, utiliser le format suivant :

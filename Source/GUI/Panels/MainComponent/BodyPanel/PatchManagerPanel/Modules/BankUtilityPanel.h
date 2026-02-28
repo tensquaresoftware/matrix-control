@@ -7,7 +7,7 @@
 
 namespace tss
 {
-    class Skin;
+    class ISkin;
     class ModuleHeader;
     class Label;
     class Button;
@@ -18,11 +18,11 @@ class WidgetFactory;
 class BankUtilityPanel : public juce::Component
 {
 public:
-    BankUtilityPanel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    BankUtilityPanel(tss::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~BankUtilityPanel() override;
 
     void resized() override;
-    void setSkin(tss::Skin& skin);
+    void setSkin(tss::ISkin& skin);
 
 private:
     inline constexpr static int kTopPadding_ = 5;
@@ -30,7 +30,7 @@ private:
 
     int width_;
     int height_;
-    tss::Skin* skin_;
+    tss::ISkin* skin_;
     juce::AudioProcessorValueTreeState& apvts_;
 
     std::unique_ptr<tss::ModuleHeader> bankUtilityModuleHeader_;
@@ -47,9 +47,9 @@ private:
     std::unique_ptr<tss::Button> selectBank8Button_;
     std::unique_ptr<tss::Button> selectBank9Button_;
 
-    void setupModuleHeader(tss::Skin& skin, WidgetFactory& widgetFactory, const juce::String& moduleId);
-    void setupBankSelectorLabel(tss::Skin& skin);
-    void setupSelectBankButtons(tss::Skin& skin, WidgetFactory& widgetFactory);
+    void setupModuleHeader(tss::ISkin& skin, WidgetFactory& widgetFactory, const juce::String& moduleId);
+    void setupBankSelectorLabel(tss::ISkin& skin);
+    void setupSelectBankButtons(tss::ISkin& skin, WidgetFactory& widgetFactory);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BankUtilityPanel)
 };

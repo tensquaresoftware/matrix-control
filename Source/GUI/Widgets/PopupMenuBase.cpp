@@ -1,7 +1,7 @@
 #include "PopupMenuBase.h"
 #include "ComboBox.h"
 
-#include "GUI/Skins/Skin.h"
+#include "GUI/Skins/ISkin.h"
 
 namespace tss
 {

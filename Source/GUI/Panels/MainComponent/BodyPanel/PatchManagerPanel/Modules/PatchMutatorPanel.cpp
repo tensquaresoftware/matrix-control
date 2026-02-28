@@ -1,6 +1,7 @@
 #include "PatchMutatorPanel.h"
 
-#include "GUI/Skins/Skin.h"
+#include "GUI/Skins/ISkin.h"
+#include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Widgets/ModuleHeader.h"
 #include "GUI/Widgets/Label.h"
 #include "GUI/Widgets/Slider.h"
@@ -23,7 +24,7 @@ namespace
     constexpr int kToggleHeight = 20;
 }
 
-PatchMutatorPanel::PatchMutatorPanel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+PatchMutatorPanel::PatchMutatorPanel(tss::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : width_(width)
     , height_(height)
     , skin_(&skin)
@@ -39,7 +40,7 @@ PatchMutatorPanel::PatchMutatorPanel(tss::Skin& skin, int width, int height, Wid
 
 PatchMutatorPanel::~PatchMutatorPanel() = default;
 
-void PatchMutatorPanel::setupModuleHeader(tss::Skin& skin, WidgetFactory& widgetFactory)
+void PatchMutatorPanel::setupModuleHeader(tss::ISkin& skin, WidgetFactory& widgetFactory)
 {
     moduleHeader_ = std::make_unique<tss::ModuleHeader>(
         skin,
@@ -50,7 +51,7 @@ void PatchMutatorPanel::setupModuleHeader(tss::Skin& skin, WidgetFactory& widget
     addAndMakeVisible(*moduleHeader_);
 }
 
-void PatchMutatorPanel::setupAmountLine(tss::Skin& skin, WidgetFactory& widgetFactory)
+void PatchMutatorPanel::setupAmountLine(tss::ISkin& skin, WidgetFactory& widgetFactory)
 {
     amountLabel_ = std::make_unique<tss::Label>(
         skin,
@@ -115,7 +116,7 @@ void PatchMutatorPanel::setupAmountLine(tss::Skin& skin, WidgetFactory& widgetFa
     addAndMakeVisible(*rampPortamentoToggle_);
 }
 
-void PatchMutatorPanel::setupRandomLine(tss::Skin& skin, WidgetFactory& widgetFactory)
+void PatchMutatorPanel::setupRandomLine(tss::ISkin& skin, WidgetFactory& widgetFactory)
 {
     randomLabel_ = std::make_unique<tss::Label>(
         skin,
@@ -180,7 +181,7 @@ void PatchMutatorPanel::setupRandomLine(tss::Skin& skin, WidgetFactory& widgetFa
     addAndMakeVisible(*lfo2Toggle_);
 }
 
-void PatchMutatorPanel::setupHistoryLine(tss::Skin& skin, WidgetFactory& widgetFactory)
+void PatchMutatorPanel::setupHistoryLine(tss::ISkin& skin, WidgetFactory& widgetFactory)
 {
     historyLabel_ = std::make_unique<tss::Label>(
         skin,
@@ -379,58 +380,32 @@ void PatchMutatorPanel::layoutHistoryLine(int x, int& y)
     y += kLabelHeight;
 }
 
-void PatchMutatorPanel::setSkin(tss::Skin& skin)
+void PatchMutatorPanel::setSkin(tss::ISkin& skin)
 {
     skin_ = &skin;
+    propagateSkinsToControlWidgets(skin);
+    propagateSkinsToToggleWidgets(skin);
+}
 
-    if (auto* header = moduleHeader_.get())
-        header->setSkin(skin);
+void PatchMutatorPanel::propagateSkinsToControlWidgets(tss::ISkin& skin)
+{
+    tss::propagateSkin(skin,
+        moduleHeader_.get(),
+        amountLabel_.get(), amountSlider_.get(),
+        randomLabel_.get(), randomSlider_.get(),
+        historyLabel_.get(), historyComboBox_.get(),
+        mutateButton_.get(), retryButton_.get(),
+        compareButton_.get(), deleteButton_.get(),
+        clearButton_.get(), exportButton_.get());
+}
 
-    if (auto* label = amountLabel_.get())
-        label->setSkin(skin);
-    if (auto* slider = amountSlider_.get())
-        slider->setSkin(skin);
-    if (auto* label = randomLabel_.get())
-        label->setSkin(skin);
-    if (auto* slider = randomSlider_.get())
-        slider->setSkin(skin);
-    if (auto* label = historyLabel_.get())
-        label->setSkin(skin);
-
-    if (auto* comboBox = historyComboBox_.get())
-        comboBox->setSkin(skin);
-
-    if (mutateButton_)
-        mutateButton_->setSkin(skin);
-    if (retryButton_)
-        retryButton_->setSkin(skin);
-    if (compareButton_)
-        compareButton_->setSkin(skin);
-    if (deleteButton_)
-        deleteButton_->setSkin(skin);
-    if (clearButton_)
-        clearButton_->setSkin(skin);
-    if (exportButton_)
-        exportButton_->setSkin(skin);
-
-    if (dco1Toggle_)
-        dco1Toggle_->setSkin(skin);
-    if (dco2Toggle_)
-        dco2Toggle_->setSkin(skin);
-    if (vcfVcaToggle_)
-        vcfVcaToggle_->setSkin(skin);
-    if (fmTrackToggle_)
-        fmTrackToggle_->setSkin(skin);
-    if (rampPortamentoToggle_)
-        rampPortamentoToggle_->setSkin(skin);
-    if (env1Toggle_)
-        env1Toggle_->setSkin(skin);
-    if (env2Toggle_)
-        env2Toggle_->setSkin(skin);
-    if (env3Toggle_)
-        env3Toggle_->setSkin(skin);
-    if (lfo1Toggle_)
-        lfo1Toggle_->setSkin(skin);
-    if (lfo2Toggle_)
-        lfo2Toggle_->setSkin(skin);
+void PatchMutatorPanel::propagateSkinsToToggleWidgets(tss::ISkin& skin)
+{
+    tss::propagateSkin(skin,
+        dco1Toggle_.get(), dco2Toggle_.get(),
+        vcfVcaToggle_.get(), fmTrackToggle_.get(),
+        rampPortamentoToggle_.get(),
+        env1Toggle_.get(), env2Toggle_.get(),
+        env3Toggle_.get(), lfo1Toggle_.get(),
+        lfo2Toggle_.get());
 }

@@ -1,6 +1,7 @@
 #include "BankUtilityPanel.h"
 
-#include "GUI/Skins/Skin.h"
+#include "GUI/Skins/ISkin.h"
+#include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Widgets/ModuleHeader.h"
 #include "GUI/Widgets/Label.h"
 #include "GUI/Widgets/Button.h"
@@ -10,7 +11,7 @@
 #include <juce_core/juce_core.h>
 
 
-BankUtilityPanel::BankUtilityPanel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+BankUtilityPanel::BankUtilityPanel(tss::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : width_(width)
     , height_(height)
     , skin_(&skin)
@@ -104,51 +105,26 @@ void BankUtilityPanel::resized()
         button->setBounds(x, y, buttonWidth, buttonHeight);
 }
 
-void BankUtilityPanel::setSkin(tss::Skin& skin)
+void BankUtilityPanel::setSkin(tss::ISkin& skin)
 {
     skin_ = &skin;
-
-    if (auto* header = bankUtilityModuleHeader_.get())
-        header->setSkin(skin);
-
-    if (auto* label = bankSelectorLabel_.get())
-        label->setSkin(skin);
-
-    if (auto* button = selectBank0Button_.get())
-        button->setSkin(skin);
-
-    if (auto* button = selectBank1Button_.get())
-        button->setSkin(skin);
-
-    if (auto* button = selectBank2Button_.get())
-        button->setSkin(skin);
-
-    if (auto* button = selectBank3Button_.get())
-        button->setSkin(skin);
-
-    if (auto* button = selectBank4Button_.get())
-        button->setSkin(skin);
-
-    if (auto* button = unlockBankButton_.get())
-        button->setSkin(skin);
-
-    if (auto* button = selectBank5Button_.get())
-        button->setSkin(skin);
-
-    if (auto* button = selectBank6Button_.get())
-        button->setSkin(skin);
-
-    if (auto* button = selectBank7Button_.get())
-        button->setSkin(skin);
-
-    if (auto* button = selectBank8Button_.get())
-        button->setSkin(skin);
-
-    if (auto* button = selectBank9Button_.get())
-        button->setSkin(skin);
+    tss::propagateSkin(skin,
+        bankUtilityModuleHeader_.get(),
+        bankSelectorLabel_.get(),
+        selectBank0Button_.get(),
+        selectBank1Button_.get(),
+        selectBank2Button_.get(),
+        selectBank3Button_.get(),
+        selectBank4Button_.get(),
+        unlockBankButton_.get(),
+        selectBank5Button_.get(),
+        selectBank6Button_.get(),
+        selectBank7Button_.get(),
+        selectBank8Button_.get(),
+        selectBank9Button_.get());
 }
 
-void BankUtilityPanel::setupModuleHeader(tss::Skin& skin, WidgetFactory& widgetFactory, const juce::String& moduleId)
+void BankUtilityPanel::setupModuleHeader(tss::ISkin& skin, WidgetFactory& widgetFactory, const juce::String& moduleId)
 {
     bankUtilityModuleHeader_ = std::make_unique<tss::ModuleHeader>(
         skin, 
@@ -159,7 +135,7 @@ void BankUtilityPanel::setupModuleHeader(tss::Skin& skin, WidgetFactory& widgetF
     addAndMakeVisible(*bankUtilityModuleHeader_);
 }
 
-void BankUtilityPanel::setupBankSelectorLabel(tss::Skin& skin)
+void BankUtilityPanel::setupBankSelectorLabel(tss::ISkin& skin)
 {
     bankSelectorLabel_ = std::make_unique<tss::Label>(
         skin,
@@ -169,7 +145,7 @@ void BankUtilityPanel::setupBankSelectorLabel(tss::Skin& skin)
     addAndMakeVisible(*bankSelectorLabel_);
 }
 
-void BankUtilityPanel::setupSelectBankButtons(tss::Skin& skin, WidgetFactory& widgetFactory)
+void BankUtilityPanel::setupSelectBankButtons(tss::ISkin& skin, WidgetFactory& widgetFactory)
 {
     selectBank0Button_ = std::make_unique<tss::Button>(
         skin,

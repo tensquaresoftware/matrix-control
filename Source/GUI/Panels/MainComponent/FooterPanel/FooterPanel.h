@@ -5,19 +5,19 @@
 
 namespace tss
 {
-    class Skin;
+    class ISkin;
 }
 
 class FooterPanel : public juce::Component,
                     public juce::ValueTree::Listener
 {
 public:
-    FooterPanel(tss::Skin& skin, int width, int height, juce::AudioProcessorValueTreeState& apvtsRef);
+    FooterPanel(tss::ISkin& skin, int width, int height, juce::AudioProcessorValueTreeState& apvtsRef);
     ~FooterPanel() override;
 
     void paint(juce::Graphics&) override;
     void resized() override;
-    void setSkin(tss::Skin& skin);
+    void setSkin(tss::ISkin& skin);
 
     // ValueTree::Listener
     void valueTreePropertyChanged(juce::ValueTree& tree,
@@ -38,7 +38,7 @@ private:
     inline constexpr static int kPadding_ = 8;
     inline constexpr static int kIconSize_ = 14;
     
-    tss::Skin* skin_;
+    tss::ISkin* skin_;
     juce::AudioProcessorValueTreeState& apvts;
     
     juce::String currentMessage;

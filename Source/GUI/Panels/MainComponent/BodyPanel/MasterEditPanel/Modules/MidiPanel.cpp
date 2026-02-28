@@ -28,7 +28,7 @@ ModulePanelConfig MidiPanel::createConfig()
     return config;
 }
 
-MidiPanel::MidiPanel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+MidiPanel::MidiPanel(tss::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : BaseModulePanel(skin, widgetFactory, apvts, createConfig(), width, height)
 {
 }

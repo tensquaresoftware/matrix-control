@@ -7,7 +7,7 @@
 
 namespace tss
 {
-    class Skin;
+    class ISkin;
     class VerticalSeparator;
 }
 
@@ -20,12 +20,12 @@ class WidgetFactory;
 class BodyPanel : public juce::Component
 {
 public:
-    BodyPanel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    BodyPanel(tss::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~BodyPanel() override;
 
     void paint(juce::Graphics&) override;
     void resized() override;
-    void setSkin(tss::Skin& skin);
+    void setSkin(tss::ISkin& skin);
 
 private:
     int width_;
@@ -39,7 +39,7 @@ private:
     int patchManagerPanelHeight_;
     int masterEditPanelWidth_;
     int masterEditPanelHeight_;
-    tss::Skin* skin_;
+    tss::ISkin* skin_;
 
     std::unique_ptr<PatchEditPanel> patchEditPanel_;
     std::unique_ptr<tss::VerticalSeparator> verticalSeparator1_;

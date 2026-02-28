@@ -30,7 +30,7 @@ ModulePanelConfig RampPortamentoPanel::createConfig()
     return config;
 }
 
-RampPortamentoPanel::RampPortamentoPanel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+RampPortamentoPanel::RampPortamentoPanel(tss::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : BaseModulePanel(skin, widgetFactory, apvts, createConfig(), width, height)
 {
 }

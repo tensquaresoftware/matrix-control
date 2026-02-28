@@ -8,7 +8,7 @@
 
 namespace tss
 {
-    class Skin;
+    class ISkin;
     class SectionHeader;
 }
 
@@ -21,11 +21,11 @@ class PatchEditPanel : public juce::Component,
                        public juce::Slider::Listener
 {
 public:
-    PatchEditPanel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    PatchEditPanel(tss::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~PatchEditPanel() override;
 
     void resized() override;
-    void setSkin(tss::Skin& skin);
+    void setSkin(tss::ISkin& skin);
     
     void sliderValueChanged(juce::Slider* slider) override;
 
@@ -40,7 +40,7 @@ private:
     int topPanelHeight_;
     int middlePanelHeight_;
     int bottomPanelHeight_;
-    tss::Skin* skin_;
+    tss::ISkin* skin_;
 
     std::unique_ptr<tss::SectionHeader> sectionHeader_;
     std::unique_ptr<TopPanel> topPanel_;

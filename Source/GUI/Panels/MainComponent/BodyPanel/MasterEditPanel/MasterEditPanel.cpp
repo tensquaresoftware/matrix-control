@@ -4,7 +4,8 @@
 #include "Modules/VibratoPanel.h"
 #include "Modules/MiscPanel.h"
 
-#include "GUI/Skins/Skin.h"
+#include "GUI/Skins/ISkin.h"
+#include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Widgets/SectionHeader.h"
 #include "Shared/Definitions/PluginDescriptors.h"
 #include "Shared/Definitions/PluginHelpers.h"
@@ -13,7 +14,7 @@
 #include "GUI/Factories/WidgetFactory.h"
 
 
-MasterEditPanel::MasterEditPanel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+MasterEditPanel::MasterEditPanel(tss::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : width_(width)
     , height_(height)
     , childModuleWidth_(PluginDimensions::Panels::Body::MasterEditSection::ChildModules::kWidth)
@@ -80,20 +81,13 @@ void MasterEditPanel::resized()
     );
 }
 
-void MasterEditPanel::setSkin(tss::Skin& skin)
+void MasterEditPanel::setSkin(tss::ISkin& skin)
 {
     skin_ = &skin;
-
-    if (auto* header = sectionHeader_.get())
-        header->setSkin(skin);
-
-    if (auto* panel = midiPanel_.get())
-        panel->setSkin(skin);
-
-    if (auto* panel = vibratoPanel_.get())
-        panel->setSkin(skin);
-
-    if (auto* panel = miscPanel_.get())
-        panel->setSkin(skin);
+    tss::propagateSkin(skin,
+        sectionHeader_.get(),
+        midiPanel_.get(),
+        vibratoPanel_.get(),
+        miscPanel_.get());
 }
 

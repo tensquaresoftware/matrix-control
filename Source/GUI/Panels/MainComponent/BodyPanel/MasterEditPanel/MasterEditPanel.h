@@ -7,7 +7,7 @@
 
 namespace tss
 {
-    class Skin;
+    class ISkin;
     class SectionHeader;
 }
 
@@ -19,11 +19,11 @@ class MiscPanel;
 class MasterEditPanel : public juce::Component
 {
 public:
-    MasterEditPanel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    MasterEditPanel(tss::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~MasterEditPanel() override;
 
     void resized() override;
-    void setSkin(tss::Skin& skin);
+    void setSkin(tss::ISkin& skin);
 
 private:
     int width_;
@@ -32,7 +32,7 @@ private:
     int midiPanelHeight_;
     int vibratoPanelHeight_;
     int miscPanelHeight_;
-    tss::Skin* skin_;
+    tss::ISkin* skin_;
 
     std::unique_ptr<tss::SectionHeader> sectionHeader_;
     std::unique_ptr<MidiPanel> midiPanel_;

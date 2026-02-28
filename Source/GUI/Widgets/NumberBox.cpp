@@ -1,12 +1,15 @@
 #include "NumberBox.h"
 
+
 #include <memory>
 
-#include "GUI/Skins/Skin.h"
+#include "GUI/Skins/ISkin.h"
+
+using tss::SkinColourId;
 
 namespace tss
 {
-    NumberBox::NumberBox(tss::Skin& skin, int width, bool editable, int minValue, int maxValue)
+    NumberBox::NumberBox(tss::ISkin& skin, int width, bool editable, int minValue, int maxValue)
         : skin_(&skin)
         , minValue_(minValue)
         , maxValue_(maxValue)
@@ -19,7 +22,7 @@ namespace tss
         updateTextWidthCache();
     }
 
-    void NumberBox::setSkin(tss::Skin& skin)
+    void NumberBox::setSkin(tss::ISkin& skin)
     {
         skin_ = &skin;
         invalidateCache();
@@ -130,10 +133,10 @@ namespace tss
         if (skin_ == nullptr)
             return;
 
-        cachedBackgroundColour_ = skin_->getButtonBackgroundColourOn();
+        cachedBackgroundColour_ = skin_->getColour(SkinColourId::kButtonBackgroundOn);
         cachedBorderColour_ = getBorderColour();
-        cachedTextColour_ = skin_->getNumberBoxTextColour();
-        cachedDotColour_ = skin_->getNumberBoxDotColour();
+        cachedTextColour_ = skin_->getColour(SkinColourId::kNumberBoxText);
+        cachedDotColour_ = skin_->getColour(SkinColourId::kNumberBoxDot);
         cachedFont_ = skin_->getBaseFont();
     }
 
@@ -172,9 +175,9 @@ namespace tss
     juce::Colour NumberBox::getBorderColour() const
     {
         if (!isEnabled())
-            return skin_->getButtonBorderColourOff();
+            return skin_->getColour(SkinColourId::kButtonBorderOff);
 
-        return skin_->getButtonBorderColourOn();
+        return skin_->getColour(SkinColourId::kButtonBorderOn);
     }
 
     juce::Point<float> NumberBox::calculateDotPosition(const juce::Rectangle<float>& bounds, float textWidth) const
@@ -200,10 +203,10 @@ namespace tss
         editor_->setFont(editorFont);
         editor_->setJustification(juce::Justification::centred);
         
-        editor_->setColour(juce::TextEditor::backgroundColourId, skin_->getNumberBoxEditorBackgroundColour());
-        editor_->setColour(juce::TextEditor::textColourId, skin_->getNumberBoxEditorTextColour());
-        editor_->setColour(juce::TextEditor::highlightColourId, skin_->getNumberBoxEditorSelectionBackgroundColour());
-        editor_->setColour(juce::TextEditor::highlightedTextColourId, skin_->getNumberBoxEditorTextColour());
+        editor_->setColour(juce::TextEditor::backgroundColourId, skin_->getColour(SkinColourId::kNumberBoxEditorBackground));
+        editor_->setColour(juce::TextEditor::textColourId, skin_->getColour(SkinColourId::kNumberBoxEditorText));
+        editor_->setColour(juce::TextEditor::highlightColourId, skin_->getColour(SkinColourId::kNumberBoxEditorSelectionBackground));
+        editor_->setColour(juce::TextEditor::highlightedTextColourId, skin_->getColour(SkinColourId::kNumberBoxEditorText));
         editor_->setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
         editor_->setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::transparentBlack);
         

@@ -32,7 +32,7 @@ ModulePanelConfig Dco1Panel::createConfig()
     return config;
 }
 
-Dco1Panel::Dco1Panel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+Dco1Panel::Dco1Panel(tss::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : BaseModulePanel(skin, widgetFactory, apvts, createConfig(), width, height)
 {
 }

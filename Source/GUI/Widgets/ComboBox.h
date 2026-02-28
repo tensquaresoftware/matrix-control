@@ -4,7 +4,7 @@
 
 namespace tss
 {
-    class Skin;
+    class ISkin;
     class PopupMenuBase;
     class MultiColumnPopupMenu;
     class ScrollablePopupMenu;
@@ -22,10 +22,10 @@ namespace tss
             ButtonLike
         };
 
-        explicit ComboBox(Skin& skin, int width, int height, Style style = Style::Standard);
+        explicit ComboBox(ISkin& skin, int width, int height, Style style = Style::Standard);
         ~ComboBox() override = default;
 
-        void setSkin(Skin& skin);
+        void setSkin(ISkin& skin);
 
         void paint(juce::Graphics& g) override;
         void resized() override;
@@ -50,7 +50,7 @@ namespace tss
         inline constexpr static int kTriangleBaseSize_ = 7;
         inline constexpr static float kTriangleHeightFactor_ = 0.8660254f;
 
-        Skin* skin_ = nullptr;
+        ISkin* skin_ = nullptr;
         int width_;
         int height_;
         Style style_;

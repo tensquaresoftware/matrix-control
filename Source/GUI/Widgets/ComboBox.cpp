@@ -2,11 +2,11 @@
 #include "MultiColumnPopupMenu.h"
 #include "ScrollablePopupMenu.h"
 
-#include "GUI/Skins/Skin.h"
+#include "GUI/Skins/ISkin.h"
 
 namespace tss
 {
-    ComboBox::ComboBox(tss::Skin& skin, int width, int height, Style style)
+    ComboBox::ComboBox(tss::ISkin& skin, int width, int height, Style style)
         : juce::ComboBox()
         , skin_(&skin)
         , width_(width)
@@ -21,7 +21,7 @@ namespace tss
         updateSkinCache();
     }
 
-    void ComboBox::setSkin(tss::Skin& skin)
+    void ComboBox::setSkin(tss::ISkin& skin)
     {
         skin_ = &skin;
         setColour(juce::ComboBox::textColourId, juce::Colours::transparentBlack);

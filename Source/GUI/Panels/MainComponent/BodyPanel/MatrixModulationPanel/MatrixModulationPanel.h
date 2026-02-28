@@ -11,7 +11,7 @@
 
 namespace tss
 {
-    class Skin;
+    class ISkin;
     class SectionHeader;
     class ModulationBusHeader;
     class Button;
@@ -22,11 +22,11 @@ class WidgetFactory;
 class MatrixModulationPanel : public juce::Component
 {
 public:
-    MatrixModulationPanel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    MatrixModulationPanel(tss::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~MatrixModulationPanel() override;
 
     void resized() override;
-    void setSkin(tss::Skin& skin);
+    void setSkin(tss::ISkin& skin);
 
 private:
     struct ModulationBusParameterArrays
@@ -43,12 +43,12 @@ private:
     std::array<const char*, Matrix1000Limits::kModulationBusCount> createDestinationParameterIds() const;
     ModulationBusParameterArrays createModulationBusParameterArrays() const;
 
-    void createInitAllBussesButton(tss::Skin& skin);
+    void createInitAllBussesButton(tss::ISkin& skin);
 
     int width_;
     int height_;
     int modulationBusHeight_;
-    tss::Skin* skin_;
+    tss::ISkin* skin_;
     juce::AudioProcessorValueTreeState& apvts_;
 
     std::unique_ptr<tss::SectionHeader> sectionHeader_;

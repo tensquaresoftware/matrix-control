@@ -7,7 +7,7 @@
 
 namespace tss
 {
-    class Skin;
+    class ISkin;
     class ModuleHeader;
     class Label;
     class Slider;
@@ -21,18 +21,18 @@ class WidgetFactory;
 class PatchMutatorPanel : public juce::Component
 {
 public:
-    PatchMutatorPanel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    PatchMutatorPanel(tss::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~PatchMutatorPanel() override;
 
     void resized() override;
-    void setSkin(tss::Skin& skin);
+    void setSkin(tss::ISkin& skin);
 
 private:
     inline constexpr static int kSpacing_ = 5;
 
     int width_;
     int height_;
-    tss::Skin* skin_;
+    tss::ISkin* skin_;
     juce::AudioProcessorValueTreeState& apvts_;
 
     std::unique_ptr<tss::ModuleHeader> moduleHeader_;
@@ -62,10 +62,13 @@ private:
     std::unique_ptr<tss::Button> clearButton_;
     std::unique_ptr<tss::Button> exportButton_;
 
-    void setupModuleHeader(tss::Skin& skin, WidgetFactory& widgetFactory);
-    void setupAmountLine(tss::Skin& skin, WidgetFactory& widgetFactory);
-    void setupRandomLine(tss::Skin& skin, WidgetFactory& widgetFactory);
-    void setupHistoryLine(tss::Skin& skin, WidgetFactory& widgetFactory);
+    void propagateSkinsToControlWidgets(tss::ISkin& skin);
+    void propagateSkinsToToggleWidgets(tss::ISkin& skin);
+
+    void setupModuleHeader(tss::ISkin& skin, WidgetFactory& widgetFactory);
+    void setupAmountLine(tss::ISkin& skin, WidgetFactory& widgetFactory);
+    void setupRandomLine(tss::ISkin& skin, WidgetFactory& widgetFactory);
+    void setupHistoryLine(tss::ISkin& skin, WidgetFactory& widgetFactory);
     void connectButtonToApvts(tss::Button* button, const char* widgetId);
     void connectToggleToApvts(tss::Toggle* toggle, const char* widgetId);
 

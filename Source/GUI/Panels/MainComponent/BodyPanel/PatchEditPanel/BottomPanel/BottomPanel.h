@@ -7,7 +7,7 @@
 
 namespace tss
 {
-    class Skin;
+    class ISkin;
 }
 
 class WidgetFactory;
@@ -20,11 +20,11 @@ class Lfo2Panel;
 class BottomPanel : public juce::Component
 {
 public:
-    BottomPanel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    BottomPanel(tss::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~BottomPanel() override;
 
     void resized() override;
-    void setSkin(tss::Skin& skin);
+    void setSkin(tss::ISkin& skin);
     
     Env1Panel* getEnv1Panel() { return env1Panel_.get(); }
     Env2Panel* getEnv2Panel() { return env2Panel_.get(); }
@@ -36,7 +36,7 @@ private:
     int childModuleWidth_;
     int childModuleHeight_;
     int spacing_;
-    tss::Skin* skin_;
+    tss::ISkin* skin_;
 
     std::unique_ptr<Env1Panel> env1Panel_;
     std::unique_ptr<Env2Panel> env2Panel_;

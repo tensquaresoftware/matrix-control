@@ -4,15 +4,15 @@
 
 namespace tss
 {
-    class Skin;
+    class ISkin;
 
     class HorizontalSeparator : public juce::Component
     {
     public:
-        HorizontalSeparator(Skin& skin, int width, int height);
+        HorizontalSeparator(ISkin& skin, int width, int height);
         ~HorizontalSeparator() override = default;
 
-        void setSkin(Skin& skin);
+        void setSkin(ISkin& skin);
 
         void paint(juce::Graphics& g) override;
         void resized() override;
@@ -23,7 +23,7 @@ namespace tss
     private:
         inline constexpr static int kLineThickness_ = 1;
 
-        Skin* skin_ = nullptr;
+        ISkin* skin_ = nullptr;
         int width_;
         int height_;
 

@@ -4,17 +4,17 @@
 
 namespace tss
 {
-    class Skin;
+    class ISkin;
 
     class NumberBox : public juce::Component
     {
     public:
         using ValueChangedCallback = std::function<void(int)>;
         
-        explicit NumberBox(Skin& skin, int width, bool editable, int minValue, int maxValue);
+        explicit NumberBox(ISkin& skin, int width, bool editable, int minValue, int maxValue);
         ~NumberBox() override = default;
 
-        void setSkin(Skin& skin);
+        void setSkin(ISkin& skin);
 
         void setValue(int newValue);
         int getValue() const { return currentValue_; }
@@ -37,7 +37,7 @@ namespace tss
         inline constexpr static float kDotXOffset_ = 3.0f;
         inline constexpr static float kEditorFontSizeIncrease_ = 4.0f;
 
-        Skin* skin_ = nullptr;
+        ISkin* skin_ = nullptr;
         int currentValue_ = 0;
         int minValue_ = 0;
         int maxValue_ = 99;

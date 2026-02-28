@@ -1,11 +1,12 @@
 #include "BaseModulePanel.h"
 
-#include "GUI/Skins/Skin.h"
+#include "GUI/Skins/ISkin.h"
+#include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Panels/Reusable/ModuleHeaderPanel.h"
 #include "GUI/Panels/Reusable/ParameterPanel.h"
 #include "GUI/Factories/WidgetFactory.h"
 
-BaseModulePanel::BaseModulePanel(tss::Skin& skin,
+BaseModulePanel::BaseModulePanel(tss::ISkin& skin,
                                  WidgetFactory& widgetFactory,
                                  juce::AudioProcessorValueTreeState& apvts,
                                  const ModulePanelConfig& config,
@@ -76,16 +77,13 @@ void BaseModulePanel::resized()
             paramPanel->setBounds(bounds.removeFromTop(paramPanel->getTotalHeight()));
 }
 
-void BaseModulePanel::setSkin(tss::Skin& skin)
+void BaseModulePanel::setSkin(tss::ISkin& skin)
 {
     skin_ = &skin;
-
-    if (auto* header = moduleHeaderPanel_.get())
-        header->setSkin(skin);
+    tss::propagateSkin(skin, moduleHeaderPanel_.get());
 
     for (auto& paramPanel : parameterPanels_)
-        if (paramPanel != nullptr)
-            paramPanel->setSkin(skin);
+        tss::propagateSkin(skin, paramPanel.get());
 }
 
 ParameterPanel* BaseModulePanel::getParameterPanelAt(size_t index)

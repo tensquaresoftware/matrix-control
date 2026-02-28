@@ -1,6 +1,7 @@
 #include "ParameterPanel.h"
 
-#include "GUI/Skins/Skin.h"
+#include "GUI/Skins/ISkin.h"
+#include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Widgets/Label.h"
 #include "GUI/Widgets/Slider.h"
 #include "GUI/Widgets/ComboBox.h"
@@ -29,7 +30,7 @@ ParameterPanel::ParameterPanelDimensions ParameterPanel::getDimensionsForModuleT
     };
 }
 
-ParameterPanel::ParameterPanel(tss::Skin& skin,
+ParameterPanel::ParameterPanel(tss::ISkin& skin,
                                 WidgetFactory& factory,
                                 const juce::String& parameterId,
                                 ParameterType type,
@@ -52,7 +53,7 @@ ParameterPanel::ParameterPanel(tss::Skin& skin,
     }
 }
 
-void ParameterPanel::createParameterLabel(tss::Skin& skin, WidgetFactory& factory, const juce::String& parameterId)
+void ParameterPanel::createParameterLabel(tss::ISkin& skin, WidgetFactory& factory, const juce::String& parameterId)
 {
     const auto dimensions = getDimensionsForModuleType(moduleType_);
 
@@ -64,7 +65,7 @@ void ParameterPanel::createParameterLabel(tss::Skin& skin, WidgetFactory& factor
     addAndMakeVisible(*label_);
 }
 
-void ParameterPanel::createParameterWidget(tss::Skin& skin, WidgetFactory& factory, const juce::String& parameterId, juce::AudioProcessorValueTreeState& apvts)
+void ParameterPanel::createParameterWidget(tss::ISkin& skin, WidgetFactory& factory, const juce::String& parameterId, juce::AudioProcessorValueTreeState& apvts)
 {
     if (parameterType_ == ParameterType::Slider)
         createSliderWidget(skin, factory, parameterId, apvts);
@@ -72,7 +73,7 @@ void ParameterPanel::createParameterWidget(tss::Skin& skin, WidgetFactory& facto
         createComboBoxWidget(skin, factory, parameterId, apvts);
 }
 
-void ParameterPanel::createSliderWidget(tss::Skin& skin, WidgetFactory& factory, const juce::String& parameterId, juce::AudioProcessorValueTreeState& apvts)
+void ParameterPanel::createSliderWidget(tss::ISkin& skin, WidgetFactory& factory, const juce::String& parameterId, juce::AudioProcessorValueTreeState& apvts)
 {
     slider_ = factory.createIntParameterSlider(parameterId, skin);
     sliderAttachment_ = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
@@ -82,7 +83,7 @@ void ParameterPanel::createSliderWidget(tss::Skin& skin, WidgetFactory& factory,
     addAndMakeVisible(*slider_);
 }
 
-void ParameterPanel::createComboBoxWidget(tss::Skin& skin, WidgetFactory& factory, const juce::String& parameterId, juce::AudioProcessorValueTreeState& apvts)
+void ParameterPanel::createComboBoxWidget(tss::ISkin& skin, WidgetFactory& factory, const juce::String& parameterId, juce::AudioProcessorValueTreeState& apvts)
 {
     const auto dimensions = getDimensionsForModuleType(moduleType_);
 
@@ -98,7 +99,7 @@ void ParameterPanel::createComboBoxWidget(tss::Skin& skin, WidgetFactory& factor
     addAndMakeVisible(*comboBox_);
 }
 
-void ParameterPanel::createSeparator(tss::Skin& skin)
+void ParameterPanel::createSeparator(tss::ISkin& skin)
 {
     const auto dimensions = getDimensionsForModuleType(moduleType_);
 
@@ -165,21 +166,14 @@ void ParameterPanel::layoutSeparator(int y)
         separator->setBounds(0, y, dimensions.separatorWidth, separatorHeight);
 }
 
-void ParameterPanel::setSkin(tss::Skin& skin)
+void ParameterPanel::setSkin(tss::ISkin& skin)
 {
     skin_ = &skin;
-
-    if (auto* label = label_.get())
-        label->setSkin(skin);
-
-    if (auto* slider = slider_.get())
-        slider->setSkin(skin);
-
-    if (auto* comboBox = comboBox_.get())
-        comboBox->setSkin(skin);
-
-    if (auto* separator = separator_.get())
-        separator->setSkin(skin);
+    tss::propagateSkin(skin,
+        label_.get(),
+        slider_.get(),
+        comboBox_.get(),
+        separator_.get());
 }
 
 int ParameterPanel::getTotalHeight() const

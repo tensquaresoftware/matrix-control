@@ -7,7 +7,7 @@
 
 namespace tss
 {
-    class Skin;
+    class ISkin;
 }
 
 class WidgetFactory;
@@ -20,11 +20,11 @@ class RampPortamentoPanel;
 class TopPanel : public juce::Component
 {
 public:
-    TopPanel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    TopPanel(tss::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~TopPanel() override;
 
     void resized() override;
-    void setSkin(tss::Skin& skin);
+    void setSkin(tss::ISkin& skin);
     
     FmTrackPanel* getFmTrackPanel() { return fmTrackPanel_.get(); }
 
@@ -34,7 +34,7 @@ private:
     int childModuleWidth_;
     int childModuleHeight_;
     int spacing_;
-    tss::Skin* skin_;
+    tss::ISkin* skin_;
 
     std::unique_ptr<Dco1Panel> dco1Panel_;
     std::unique_ptr<Dco2Panel> dco2Panel_;

@@ -1,8 +1,11 @@
 #include "MainComponent.h"
 
+
 #include "GUI/Factories/WidgetFactory.h"
 #include "GUI/Skins/Skin.h"
 #include "Shared/Definitions/PluginDimensions.h"
+
+using tss::SkinColourId;
 
 MainComponent::MainComponent(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : skin_(&skin)
@@ -21,7 +24,7 @@ MainComponent::MainComponent(tss::Skin& skin, int width, int height, WidgetFacto
 void MainComponent::paint(juce::Graphics& g)
 {
     if (skin_ != nullptr)
-        g.fillAll(skin_->getBodyPanelBackgroundColour());
+        g.fillAll(skin_->getColour(SkinColourId::kBodyPanelBackground));
 }
 
 void MainComponent::resized()

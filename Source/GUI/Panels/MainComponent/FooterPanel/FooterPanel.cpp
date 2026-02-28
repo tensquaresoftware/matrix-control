@@ -1,11 +1,15 @@
 #include "FooterPanel.h"
 
-#include "GUI/Skins/Skin.h"
+
+#include "GUI/Skins/ISkin.h"
+#include "GUI/Skins/SkinHelpers.h"
+
+using tss::SkinColourId;
 
 const juce::Identifier FooterPanel::kMessageTextId("uiMessageText");
 const juce::Identifier FooterPanel::kMessageSeverityId("uiMessageSeverity");
 
-FooterPanel::FooterPanel(tss::Skin& skin, int width, int height, juce::AudioProcessorValueTreeState& apvtsRef)
+FooterPanel::FooterPanel(tss::ISkin& skin, int width, int height, juce::AudioProcessorValueTreeState& apvtsRef)
     : width_(width)
     , height_(height)
     , skin_(&skin)
@@ -36,7 +40,7 @@ FooterPanel::~FooterPanel()
 
 void FooterPanel::paint(juce::Graphics& g)
 {
-    g.fillAll(skin_->getFooterPanelBackgroundColour());
+    g.fillAll(skin_->getColour(SkinColourId::kFooterPanelBackground));
     
     if (currentMessage.isEmpty() || currentSeverity == MessageSeverity::None)
         return;
@@ -63,7 +67,7 @@ void FooterPanel::resized()
 {
 }
 
-void FooterPanel::setSkin(tss::Skin& skin)
+void FooterPanel::setSkin(tss::ISkin& skin)
 {
     skin_ = &skin;
 }
@@ -102,7 +106,7 @@ juce::Colour FooterPanel::getSeverityColour(MessageSeverity severity) const
     switch (severity)
     {
         case MessageSeverity::None:
-            return skin_->getLabelTextColour();
+            return skin_->getColour(SkinColourId::kLabelText);
         case MessageSeverity::Info:
             return juce::Colour(0xFF808080);  // Gris
         case MessageSeverity::Success:
@@ -112,7 +116,7 @@ juce::Colour FooterPanel::getSeverityColour(MessageSeverity severity) const
         case MessageSeverity::Error:
             return juce::Colour(0xFFFF0000);  // Rouge
         default:
-            return skin_->getLabelTextColour();
+            return skin_->getColour(SkinColourId::kLabelText);
     }
 }
 

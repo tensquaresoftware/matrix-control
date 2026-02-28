@@ -1,12 +1,15 @@
 #include "ModulationBusHeader.h"
 
-#include "GUI/Skins/Skin.h"
+
+#include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinValues.h"
 #include "Shared/Definitions/PluginDescriptors.h"
 
+using tss::SkinColourId;
+
 namespace tss
 {
-    ModulationBusHeader::ModulationBusHeader(tss::Skin& skin, int width, int height, ColourVariant variant)
+    ModulationBusHeader::ModulationBusHeader(tss::ISkin& skin, int width, int height, ColourVariant variant)
         : skin_(&skin)
         , busNumberText_(PluginDisplayNames::MatrixModulationSection::Header::kBusNumber)
         , busSourceText_(PluginDisplayNames::MatrixModulationSection::Header::kSource)
@@ -17,12 +20,12 @@ namespace tss
     {
         setOpaque(false);
         setSize(width, height);
-        cachedTextColour_ = skin_->getModuleHeaderTextColour();
+        cachedTextColour_ = skin_->getColour(SkinColourId::kModuleHeaderText);
         cachedLineColour_ = getLineColour();
         cachedFont_ = skin_->getBaseFontBold().withHeight(kModuleHeaderFontHeight);
     }
 
-    void ModulationBusHeader::setSkin(tss::Skin& skin)
+    void ModulationBusHeader::setSkin(tss::ISkin& skin)
     {
         skin_ = &skin;
         invalidateCache();
@@ -153,8 +156,8 @@ namespace tss
     juce::Colour ModulationBusHeader::getLineColour() const
     {
         return (colourVariant_ == ColourVariant::Blue) 
-            ? skin_->getModuleHeaderLineColourBlue() 
-            : skin_->getModuleHeaderLineColourOrange();
+            ? skin_->getColour(SkinColourId::kModuleHeaderLineBlue) 
+            : skin_->getColour(SkinColourId::kModuleHeaderLineOrange);
     }
 }
 

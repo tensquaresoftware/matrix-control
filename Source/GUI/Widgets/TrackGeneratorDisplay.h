@@ -7,17 +7,17 @@
 
 namespace tss
 {
-    class Skin;
+    class ISkin;
 
     class TrackGeneratorDisplay : public juce::Component
     {
     public:
         using ValueChangedCallback = std::function<void(int pointIndex, int newValue)>;
         
-        explicit TrackGeneratorDisplay(Skin& skin, int width, int height);
+        explicit TrackGeneratorDisplay(ISkin& skin, int width, int height);
         ~TrackGeneratorDisplay() override = default;
 
-        void setSkin(Skin& skin);
+        void setSkin(ISkin& skin);
         
         void setTrackPoint1(int value);
         void setTrackPoint2(int value);
@@ -65,7 +65,7 @@ namespace tss
         inline constexpr static float kPointHitZoneRadius_ = 10.0f;
         
 
-        Skin* skin_ = nullptr;
+        ISkin* skin_ = nullptr;
         int width_;
         int height_;
         

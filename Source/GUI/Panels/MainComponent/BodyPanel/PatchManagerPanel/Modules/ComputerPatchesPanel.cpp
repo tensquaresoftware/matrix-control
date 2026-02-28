@@ -1,6 +1,7 @@
 #include "ComputerPatchesPanel.h"
 
-#include "GUI/Skins/Skin.h"
+#include "GUI/Skins/ISkin.h"
+#include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Widgets/ModuleHeader.h"
 #include "GUI/Widgets/GroupLabel.h"
 #include "GUI/Widgets/Button.h"
@@ -11,7 +12,7 @@
 #include <juce_core/juce_core.h>
 
 
-ComputerPatchesPanel::ComputerPatchesPanel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+ComputerPatchesPanel::ComputerPatchesPanel(tss::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : width_(width)
     , height_(height)
     , skin_(&skin)
@@ -76,24 +77,17 @@ void ComputerPatchesPanel::resized()
     layoutSavePatchFileButton(x, y);
 }
 
-void ComputerPatchesPanel::setSkin(tss::Skin& skin)
+void ComputerPatchesPanel::setSkin(tss::ISkin& skin)
 {
     skin_ = &skin;
-
-    if (auto* header = moduleHeader_.get())
-        header->setSkin(skin);
-
-    if (auto* browserLabel = browserGroupLabel.get())
-        browserLabel->setSkin(skin);
-
-    if (auto* storageLabel = storageGroupLabel.get())
-        storageLabel->setSkin(skin);
-
-    if (auto* comboBox = selectPatchFileComboBox_.get())
-        comboBox->setSkin(skin);
+    tss::propagateSkin(skin,
+        moduleHeader_.get(),
+        browserGroupLabel.get(),
+        storageGroupLabel.get(),
+        selectPatchFileComboBox_.get());
 }
 
-void ComputerPatchesPanel::setupModuleHeader(tss::Skin& skin, WidgetFactory& widgetFactory, const juce::String& moduleId)
+void ComputerPatchesPanel::setupModuleHeader(tss::ISkin& skin, WidgetFactory& widgetFactory, const juce::String& moduleId)
 {
     moduleHeader_ = std::make_unique<tss::ModuleHeader>(
         skin, 
@@ -104,7 +98,7 @@ void ComputerPatchesPanel::setupModuleHeader(tss::Skin& skin, WidgetFactory& wid
     addAndMakeVisible(*moduleHeader_);
 }
 
-void ComputerPatchesPanel::setupBrowserGroupLabel(tss::Skin& skin)
+void ComputerPatchesPanel::setupBrowserGroupLabel(tss::ISkin& skin)
 {
     browserGroupLabel = std::make_unique<tss::GroupLabel>(
         skin,
@@ -114,7 +108,7 @@ void ComputerPatchesPanel::setupBrowserGroupLabel(tss::Skin& skin)
     addAndMakeVisible(*browserGroupLabel);
 }
 
-void ComputerPatchesPanel::setupLoadPreviousPatchFileButton(tss::Skin& skin, WidgetFactory& widgetFactory)
+void ComputerPatchesPanel::setupLoadPreviousPatchFileButton(tss::ISkin& skin, WidgetFactory& widgetFactory)
 {
     loadPreviousPatchFileButton_ = widgetFactory.createStandaloneButton(
         PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kLoadPreviousPatchFile,
@@ -129,7 +123,7 @@ void ComputerPatchesPanel::setupLoadPreviousPatchFileButton(tss::Skin& skin, Wid
     addAndMakeVisible(*loadPreviousPatchFileButton_);
 }
 
-void ComputerPatchesPanel::setupLoadNextPatchFileButton(tss::Skin& skin, WidgetFactory& widgetFactory)
+void ComputerPatchesPanel::setupLoadNextPatchFileButton(tss::ISkin& skin, WidgetFactory& widgetFactory)
 {
     loadNextPatchFileButton_ = widgetFactory.createStandaloneButton(
         PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kLoadNextPatchFile,
@@ -144,7 +138,7 @@ void ComputerPatchesPanel::setupLoadNextPatchFileButton(tss::Skin& skin, WidgetF
     addAndMakeVisible(*loadNextPatchFileButton_);
 }
 
-void ComputerPatchesPanel::setupSelectPatchFileComboBox(tss::Skin& skin)
+void ComputerPatchesPanel::setupSelectPatchFileComboBox(tss::ISkin& skin)
 {
     selectPatchFileComboBox_ = std::make_unique<tss::ComboBox>(
         skin,
@@ -184,7 +178,7 @@ void ComputerPatchesPanel::setupSelectPatchFileComboBox(tss::Skin& skin)
     addAndMakeVisible(*selectPatchFileComboBox_);
 }
 
-void ComputerPatchesPanel::setupStorageGroupLabel(tss::Skin& skin)
+void ComputerPatchesPanel::setupStorageGroupLabel(tss::ISkin& skin)
 {
     storageGroupLabel = std::make_unique<tss::GroupLabel>(
         skin,
@@ -194,7 +188,7 @@ void ComputerPatchesPanel::setupStorageGroupLabel(tss::Skin& skin)
     addAndMakeVisible(*storageGroupLabel);
 }
 
-void ComputerPatchesPanel::setupOpenPatchFolderButton(tss::Skin& skin, WidgetFactory& widgetFactory)
+void ComputerPatchesPanel::setupOpenPatchFolderButton(tss::ISkin& skin, WidgetFactory& widgetFactory)
 {
     openPatchFolderButton_ = widgetFactory.createStandaloneButton(
         PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kOpenPatchFolder,
@@ -209,7 +203,7 @@ void ComputerPatchesPanel::setupOpenPatchFolderButton(tss::Skin& skin, WidgetFac
     addAndMakeVisible(*openPatchFolderButton_);
 }
 
-void ComputerPatchesPanel::setupSavePatchFileAsButton(tss::Skin& skin, WidgetFactory& widgetFactory)
+void ComputerPatchesPanel::setupSavePatchFileAsButton(tss::ISkin& skin, WidgetFactory& widgetFactory)
 {
     savePatchFileAsButton_ = widgetFactory.createStandaloneButton(
         PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSavePatchAs,
@@ -224,7 +218,7 @@ void ComputerPatchesPanel::setupSavePatchFileAsButton(tss::Skin& skin, WidgetFac
     addAndMakeVisible(*savePatchFileAsButton_);
 }
 
-void ComputerPatchesPanel::setupSavePatchFileButton(tss::Skin& skin, WidgetFactory& widgetFactory)
+void ComputerPatchesPanel::setupSavePatchFileButton(tss::ISkin& skin, WidgetFactory& widgetFactory)
 {
     savePatchFileButton_ = widgetFactory.createStandaloneButton(
         PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSavePatchFile,

@@ -27,7 +27,7 @@ ModulePanelConfig VibratoPanel::createConfig()
     return config;
 }
 
-VibratoPanel::VibratoPanel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+VibratoPanel::VibratoPanel(tss::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : BaseModulePanel(skin, widgetFactory, apvts, createConfig(), width, height)
 {
 }

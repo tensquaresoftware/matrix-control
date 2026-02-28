@@ -7,7 +7,7 @@
 
 namespace tss
 {
-    class Skin;
+    class ISkin;
     class SectionHeader;
 }
 
@@ -20,11 +20,11 @@ class PatchMutatorPanel;
 class PatchManagerPanel : public juce::Component
 {
 public:
-    PatchManagerPanel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    PatchManagerPanel(tss::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~PatchManagerPanel() override;
 
     void resized() override;
-    void setSkin(tss::Skin& skin);
+    void setSkin(tss::ISkin& skin);
 
 private:
     int width_;
@@ -33,7 +33,7 @@ private:
     int internalPatchesPanelHeight_;
     int computerPatchesPanelHeight_;
     int patchMutatorPanelHeight_;
-    tss::Skin* skin_;
+    tss::ISkin* skin_;
 
     std::unique_ptr<tss::SectionHeader> sectionHeader_;
     std::unique_ptr<BankUtilityPanel> bankUtilityPanel_;

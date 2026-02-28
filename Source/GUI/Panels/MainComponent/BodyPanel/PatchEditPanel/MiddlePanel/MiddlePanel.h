@@ -11,18 +11,18 @@
 
 namespace tss
 {
-    class Skin;
+    class ISkin;
 }
 
 class MiddlePanel : public juce::Component,
                     public juce::ValueTree::Listener
 {
 public:
-    MiddlePanel(tss::Skin& skin, int width, int height, juce::AudioProcessorValueTreeState& apvts);
+    MiddlePanel(tss::ISkin& skin, int width, int height, juce::AudioProcessorValueTreeState& apvts);
     ~MiddlePanel() override;
 
     void resized() override;
-    void setSkin(tss::Skin& skin);
+    void setSkin(tss::ISkin& skin);
     
     tss::TrackGeneratorDisplay& getTrackGeneratorDisplay() { return trackGeneratorDisplay_; }
     tss::EnvelopeDisplay& getEnvelope1Display() { return envelope1Display_; }
@@ -46,7 +46,7 @@ private:
 
     int width_;
     int height_;
-    tss::Skin* skin_;
+    tss::ISkin* skin_;
     juce::AudioProcessorValueTreeState* apvts_ = nullptr;
 
     tss::EnvelopeDisplay envelope1Display_;

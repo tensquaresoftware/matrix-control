@@ -6,17 +6,17 @@
 
 namespace tss
 {
-    class Skin;
+    class ISkin;
 
     class EnvelopeDisplay : public juce::Component
     {
     public:
         using ValueChangedCallback = std::function<void(int paramIndex, int newValue)>;
         
-        explicit EnvelopeDisplay(Skin& skin, int width, int height);
+        explicit EnvelopeDisplay(ISkin& skin, int width, int height);
         ~EnvelopeDisplay() override = default;
 
-        void setSkin(Skin& skin);
+        void setSkin(ISkin& skin);
         
         void setDelay(int value);
         void setAttack(int value);
@@ -65,7 +65,7 @@ namespace tss
         inline constexpr static float kPointHitZoneRadius_ = 10.0f;
         inline constexpr static float kSustainSegmentHitZone_ = 10.0f;
 
-        Skin* skin_ = nullptr;
+        ISkin* skin_ = nullptr;
         int width_;
         int height_;
         

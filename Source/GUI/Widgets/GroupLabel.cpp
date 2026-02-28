@@ -1,10 +1,13 @@
 #include "GroupLabel.h"
 
-#include "GUI/Skins/Skin.h"
+
+#include "GUI/Skins/ISkin.h"
+
+using tss::SkinColourId;
 
 namespace tss
 {
-    GroupLabel::GroupLabel(tss::Skin& skin, int width, int height, const juce::String& text)
+    GroupLabel::GroupLabel(tss::ISkin& skin, int width, int height, const juce::String& text)
         : skin_(&skin)
         , width_(width)
         , height_(height)
@@ -17,7 +20,7 @@ namespace tss
         calculateTextWidth();
     }
 
-    void GroupLabel::setSkin(tss::Skin& skin)
+    void GroupLabel::setSkin(tss::ISkin& skin)
     {
         skin_ = &skin;
         invalidateCache();
@@ -90,8 +93,8 @@ namespace tss
         if (skin_ == nullptr)
             return;
 
-        cachedTextColour_ = skin_->getGroupLabelTextColour();
-        cachedLineColour_ = skin_->getGroupLabelLineColour();
+        cachedTextColour_ = skin_->getColour(SkinColourId::kGroupLabelText);
+        cachedLineColour_ = skin_->getColour(SkinColourId::kGroupLabelLine);
         cachedFont_ = skin_->getBaseFont();
     }
 

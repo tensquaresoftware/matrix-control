@@ -1,11 +1,11 @@
 #include "PopupMenuRenderer.h"
 #include "ComboBox.h"
 
-#include "GUI/Skins/Skin.h"
+#include "GUI/Skins/ISkin.h"
 
 namespace tss
 {
-    PopupMenuRenderer::PopupMenuRenderer(tss::Skin& skin, bool isButtonLike)
+    PopupMenuRenderer::PopupMenuRenderer(tss::ISkin& skin, bool isButtonLike)
         : skin_(skin)
         , isButtonLike_(isButtonLike)
     {

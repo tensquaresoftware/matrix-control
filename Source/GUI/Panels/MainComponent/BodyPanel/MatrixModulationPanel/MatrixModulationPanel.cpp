@@ -1,6 +1,7 @@
 #include "MatrixModulationPanel.h"
 
-#include "GUI/Skins/Skin.h"
+#include "GUI/Skins/ISkin.h"
+#include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Widgets/SectionHeader.h"
 #include "GUI/Widgets/ModulationBusHeader.h"
 #include "GUI/Widgets/Button.h"
@@ -36,7 +37,7 @@ namespace
 
 MatrixModulationPanel::~MatrixModulationPanel() = default;
 
-MatrixModulationPanel::MatrixModulationPanel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+MatrixModulationPanel::MatrixModulationPanel(tss::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : width_(width)
     , height_(height)
     , modulationBusHeight_(PluginDimensions::Widgets::Heights::kLabel + PluginDimensions::Widgets::Heights::kHorizontalSeparator)
@@ -158,7 +159,7 @@ MatrixModulationPanel::ModulationBusParameterArrays MatrixModulationPanel::creat
     return arrays;
 }
 
-void MatrixModulationPanel::createInitAllBussesButton(tss::Skin& skin)
+void MatrixModulationPanel::createInitAllBussesButton(tss::ISkin& skin)
 {
     initAllBussesButton_ = std::make_unique<tss::Button>(
         skin,
@@ -200,23 +201,15 @@ void MatrixModulationPanel::resized()
     }
 }
 
-void MatrixModulationPanel::setSkin(tss::Skin& skin)
+void MatrixModulationPanel::setSkin(tss::ISkin& skin)
 {
     skin_ = &skin;
-
-    if (auto* header = sectionHeader_.get())
-        header->setSkin(skin);
-
-    if (auto* busHeader = modulationBusHeader_.get())
-        busHeader->setSkin(skin);
-
-    if (auto* button = initAllBussesButton_.get())
-        button->setSkin(skin);
+    tss::propagateSkin(skin,
+        sectionHeader_.get(),
+        modulationBusHeader_.get(),
+        initAllBussesButton_.get());
 
     for (auto& bus : modulationBuses_)
-    {
-        if (bus != nullptr)
-            bus->setSkin(skin);
-    }
+        tss::propagateSkin(skin, bus.get());
 }
 

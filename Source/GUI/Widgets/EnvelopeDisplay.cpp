@@ -1,11 +1,14 @@
 #include "EnvelopeDisplay.h"
 
-#include "GUI/Skins/Skin.h"
+
+#include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/ColourChart.h"
+
+using tss::SkinColourId;
 
 namespace tss
 {
-    EnvelopeDisplay::EnvelopeDisplay(tss::Skin& skin, int width, int height)
+    EnvelopeDisplay::EnvelopeDisplay(tss::ISkin& skin, int width, int height)
         : skin_(&skin)
         , width_(width)
         , height_(height)
@@ -15,7 +18,7 @@ namespace tss
         updateSkinCache();
     }
 
-    void EnvelopeDisplay::setSkin(tss::Skin& skin)
+    void EnvelopeDisplay::setSkin(tss::ISkin& skin)
     {
         skin_ = &skin;
         updateSkinCache();
@@ -45,21 +48,21 @@ namespace tss
 
     void EnvelopeDisplay::drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        const auto backgroundColour = skin_->getEnvelopeDisplayBackgroundColour();
+        const auto backgroundColour = skin_->getColour(SkinColourId::kEnvelopeDisplayBackground);
         g.setColour(backgroundColour);
         g.fillRect(bounds);
     }
 
     void EnvelopeDisplay::drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        const auto borderColour = skin_->getEnvelopeDisplayBorderColour();
+        const auto borderColour = skin_->getColour(SkinColourId::kEnvelopeDisplayBorder);
         g.setColour(borderColour);
         g.drawRect(bounds, static_cast<float>(kWidgetBorderThickness_));
     }
 
     void EnvelopeDisplay::drawTriangle(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        const auto triangleColour = skin_->getEnvelopeDisplayBorderColour();
+        const auto triangleColour = skin_->getColour(SkinColourId::kEnvelopeDisplayBorder);
         const auto triangleHeight = kWidgetTriangleBase_ * std::sqrt(3.0f) * 0.5f;
         const auto centreX = std::round(bounds.getCentreX());
         const auto baseY = bounds.getBottom();
@@ -201,7 +204,7 @@ namespace tss
         cachedDecay_ = decay_;
         cachedSustain_ = sustain_;
         cachedRelease_ = release_;
-        cachedCurveColour_ = skin_->getEnvelopeDisplayEnvelopeColour();
+        cachedCurveColour_ = skin_->getColour(SkinColourId::kEnvelopeDisplayEnvelope);
         cacheValid_ = true;
     }
     
@@ -216,7 +219,7 @@ namespace tss
         if (skin_ == nullptr)
             return;
         
-        cachedCurveColour_ = skin_->getEnvelopeDisplayEnvelopeColour();
+        cachedCurveColour_ = skin_->getColour(SkinColourId::kEnvelopeDisplayEnvelope);
     }
     
     float EnvelopeDisplay::getPixelScale() const

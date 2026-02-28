@@ -1,11 +1,14 @@
 #include "ModuleHeader.h"
 
-#include "GUI/Skins/Skin.h"
+
+#include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinValues.h"
+
+using tss::SkinColourId;
 
 namespace tss
 {
-    ModuleHeader::ModuleHeader(tss::Skin& skin, const juce::String& text, int width, int height, ColourVariant variant)
+    ModuleHeader::ModuleHeader(tss::ISkin& skin, const juce::String& text, int width, int height, ColourVariant variant)
         : width_(width)
         , height_(height)
         , skin_(&skin)
@@ -18,7 +21,7 @@ namespace tss
         updateSkinCache();
     }
 
-    void ModuleHeader::setSkin(tss::Skin& skin)
+    void ModuleHeader::setSkin(tss::ISkin& skin)
     {
         skin_ = &skin;
         invalidateCache();
@@ -93,7 +96,7 @@ namespace tss
         if (skin_ == nullptr)
             return;
 
-        cachedTextColour_ = skin_->getModuleHeaderTextColour();
+        cachedTextColour_ = skin_->getColour(SkinColourId::kModuleHeaderText);
         cachedLineColour_ = getLineColour();
         cachedFont_ = skin_->getBaseFontBold().withHeight(kModuleHeaderFontHeight);
     }
@@ -137,8 +140,8 @@ namespace tss
     juce::Colour ModuleHeader::getLineColour() const
     {
         return (colourVariant_ == ColourVariant::Blue) 
-            ? skin_->getModuleHeaderLineColourBlue() 
-            : skin_->getModuleHeaderLineColourOrange();
+            ? skin_->getColour(SkinColourId::kModuleHeaderLineBlue) 
+            : skin_->getColour(SkinColourId::kModuleHeaderLineOrange);
     }
 }
 

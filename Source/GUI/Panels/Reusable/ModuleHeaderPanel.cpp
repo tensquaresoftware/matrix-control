@@ -1,6 +1,7 @@
 #include "ModuleHeaderPanel.h"
 
-#include "GUI/Skins/Skin.h"
+#include "GUI/Skins/ISkin.h"
+#include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Widgets/ModuleHeader.h"
 #include "GUI/Widgets/Button.h"
 #include "Shared/Definitions/PluginDimensions.h"
@@ -9,7 +10,7 @@
 
 ModuleHeaderPanel::~ModuleHeaderPanel() = default;
 
-ModuleHeaderPanel::ModuleHeaderPanel(tss::Skin& skin,
+ModuleHeaderPanel::ModuleHeaderPanel(tss::ISkin& skin,
                                      WidgetFactory& factory,
                                      const juce::String& moduleId,
                                      ButtonSet buttonSet,
@@ -31,7 +32,7 @@ ModuleHeaderPanel::ModuleHeaderPanel(tss::Skin& skin,
         createCopyPasteButtons(skin, factory, copyWidgetId, pasteWidgetId);
 }
 
-void ModuleHeaderPanel::createModuleHeader(tss::Skin& skin, WidgetFactory& factory, const juce::String& moduleId)
+void ModuleHeaderPanel::createModuleHeader(tss::ISkin& skin, WidgetFactory& factory, const juce::String& moduleId)
 {
     const auto moduleHeaderWidth = (moduleType_ == ModuleType::PatchEdit)
         ? PluginDimensions::Widgets::Widths::ModuleHeader::kPatchEditModule
@@ -50,7 +51,7 @@ void ModuleHeaderPanel::createModuleHeader(tss::Skin& skin, WidgetFactory& facto
     addAndMakeVisible(*moduleHeader_);
 }
 
-void ModuleHeaderPanel::createInitButton(tss::Skin& skin, WidgetFactory& factory, const juce::String& initWidgetId)
+void ModuleHeaderPanel::createInitButton(tss::ISkin& skin, WidgetFactory& factory, const juce::String& initWidgetId)
 {
     initButton_ = factory.createStandaloneButton(initWidgetId, skin, PluginDimensions::Widgets::Heights::kButton);
     initButton_->onClick = [this, initWidgetId]
@@ -62,7 +63,7 @@ void ModuleHeaderPanel::createInitButton(tss::Skin& skin, WidgetFactory& factory
     addAndMakeVisible(*initButton_);
 }
 
-void ModuleHeaderPanel::createCopyPasteButtons(tss::Skin& skin, WidgetFactory& factory, const juce::String& copyWidgetId, const juce::String& pasteWidgetId)
+void ModuleHeaderPanel::createCopyPasteButtons(tss::ISkin& skin, WidgetFactory& factory, const juce::String& copyWidgetId, const juce::String& pasteWidgetId)
 {
     copyButton_ = factory.createStandaloneButton(copyWidgetId, skin, PluginDimensions::Widgets::Heights::kButton);
     copyButton_->onClick = [this, copyWidgetId]
@@ -135,19 +136,12 @@ void ModuleHeaderPanel::layoutInitCopyPasteButtons()
         button->setBounds(panelWidth - pasteButtonWidth - copyButtonWidth - initButtonWidth, y, initButtonWidth, buttonHeight);
 }
 
-void ModuleHeaderPanel::setSkin(tss::Skin& skin)
+void ModuleHeaderPanel::setSkin(tss::ISkin& skin)
 {
     skin_ = &skin;
-
-    if (auto* header = moduleHeader_.get())
-        header->setSkin(skin);
-
-    if (auto* button = initButton_.get())
-        button->setSkin(skin);
-
-    if (auto* button = copyButton_.get())
-        button->setSkin(skin);
-
-    if (auto* button = pasteButton_.get())
-        button->setSkin(skin);
+    tss::propagateSkin(skin,
+        moduleHeader_.get(),
+        initButton_.get(),
+        copyButton_.get(),
+        pasteButton_.get());
 }

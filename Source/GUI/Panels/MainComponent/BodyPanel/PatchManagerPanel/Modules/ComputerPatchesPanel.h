@@ -7,7 +7,7 @@
 
 namespace tss
 {
-    class Skin;
+    class ISkin;
     class ModuleHeader;
     class GroupLabel;
     class Button;
@@ -19,11 +19,11 @@ class WidgetFactory;
 class ComputerPatchesPanel : public juce::Component
 {
 public:
-    ComputerPatchesPanel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    ComputerPatchesPanel(tss::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~ComputerPatchesPanel() override;
 
     void resized() override;
-    void setSkin(tss::Skin& skin);
+    void setSkin(tss::ISkin& skin);
 
 private:
     inline constexpr static int kGroupLabelSpacing_ = 10;
@@ -32,7 +32,7 @@ private:
 
     int width_;
     int height_;
-    tss::Skin* skin_;
+    tss::ISkin* skin_;
     juce::AudioProcessorValueTreeState& apvts_;
 
     std::unique_ptr<tss::ModuleHeader> moduleHeader_;
@@ -48,15 +48,15 @@ private:
     std::unique_ptr<tss::Button> savePatchFileAsButton_;
     std::unique_ptr<tss::Button> savePatchFileButton_;
 
-    void setupModuleHeader(tss::Skin& skin, WidgetFactory& widgetFactory, const juce::String& moduleId);
-    void setupBrowserGroupLabel(tss::Skin& skin);
-    void setupLoadPreviousPatchFileButton(tss::Skin& skin, WidgetFactory& widgetFactory);
-    void setupLoadNextPatchFileButton(tss::Skin& skin, WidgetFactory& widgetFactory);
-    void setupSelectPatchFileComboBox(tss::Skin& skin);
-    void setupStorageGroupLabel(tss::Skin& skin);
-    void setupOpenPatchFolderButton(tss::Skin& skin, WidgetFactory& widgetFactory);
-    void setupSavePatchFileAsButton(tss::Skin& skin, WidgetFactory& widgetFactory);
-    void setupSavePatchFileButton(tss::Skin& skin, WidgetFactory& widgetFactory);
+    void setupModuleHeader(tss::ISkin& skin, WidgetFactory& widgetFactory, const juce::String& moduleId);
+    void setupBrowserGroupLabel(tss::ISkin& skin);
+    void setupLoadPreviousPatchFileButton(tss::ISkin& skin, WidgetFactory& widgetFactory);
+    void setupLoadNextPatchFileButton(tss::ISkin& skin, WidgetFactory& widgetFactory);
+    void setupSelectPatchFileComboBox(tss::ISkin& skin);
+    void setupStorageGroupLabel(tss::ISkin& skin);
+    void setupOpenPatchFolderButton(tss::ISkin& skin, WidgetFactory& widgetFactory);
+    void setupSavePatchFileAsButton(tss::ISkin& skin, WidgetFactory& widgetFactory);
+    void setupSavePatchFileButton(tss::ISkin& skin, WidgetFactory& widgetFactory);
 
     void layoutModuleHeader(int x, int y);
     void layoutBrowserGroupLabel(int x, int y);

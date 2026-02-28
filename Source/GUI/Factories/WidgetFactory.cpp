@@ -16,7 +16,7 @@ WidgetFactory::WidgetFactory(juce::AudioProcessorValueTreeState& inApvts)
 
 std::unique_ptr<tss::Slider> WidgetFactory::createSliderFromDescriptor(
     const PluginDescriptors::IntParameterDescriptor* desc,
-    tss::Skin& skin,
+    tss::ISkin& skin,
     int width,
     int height)
 {
@@ -28,7 +28,7 @@ std::unique_ptr<tss::Slider> WidgetFactory::createSliderFromDescriptor(
 
 std::unique_ptr<tss::ComboBox> WidgetFactory::createComboBoxFromDescriptor(
     const PluginDescriptors::ChoiceParameterDescriptor* desc,
-    tss::Skin& skin,
+    tss::ISkin& skin,
     int width,
     int height)
 {
@@ -43,7 +43,7 @@ std::unique_ptr<tss::ComboBox> WidgetFactory::createComboBoxFromDescriptor(
 
 std::unique_ptr<tss::Slider> WidgetFactory::createIntParameterSlider(
     const juce::String& parameterId,
-    tss::Skin& skin)
+    tss::ISkin& skin)
 {
     return createIntParameterSlider(
         parameterId,
@@ -54,7 +54,7 @@ std::unique_ptr<tss::Slider> WidgetFactory::createIntParameterSlider(
 
 std::unique_ptr<tss::Slider> WidgetFactory::createIntParameterSlider(
     const juce::String& parameterId,
-    tss::Skin& skin,
+    tss::ISkin& skin,
     int width,
     int height)
 {
@@ -67,7 +67,7 @@ std::unique_ptr<tss::Slider> WidgetFactory::createIntParameterSlider(
 
 std::unique_ptr<tss::ComboBox> WidgetFactory::createChoiceParameterComboBox(
     const juce::String& parameterId,
-    tss::Skin& skin,
+    tss::ISkin& skin,
     int width,
     int height)
 {
@@ -80,7 +80,7 @@ std::unique_ptr<tss::ComboBox> WidgetFactory::createChoiceParameterComboBox(
 
 std::unique_ptr<tss::Button> WidgetFactory::createStandaloneButton(
     const juce::String& widgetId,
-    tss::Skin& skin,
+    tss::ISkin& skin,
     int height)
 {
     validator.throwIfWidgetIdEmpty(widgetId);

@@ -2,6 +2,6 @@
     // Augmente l'indentation de l'explorateur de fichiers pour mieux voir l'arborescence
     "workbench.tree.indent": 16,
     "editor.rulers": [
-        { "column": 120, "color": "#555555" }
+        { "column": 120, "color": "#262626" }
     ]
 }

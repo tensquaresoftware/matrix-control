@@ -1,11 +1,14 @@
 #include "SectionHeader.h"
 
-#include "GUI/Skins/Skin.h"
+
+#include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinValues.h"
+
+using tss::SkinColourId;
 
 namespace tss
 {
-    SectionHeader::SectionHeader(tss::Skin& skin, int width, int height, const juce::String& text, ColourVariant variant)
+    SectionHeader::SectionHeader(tss::ISkin& skin, int width, int height, const juce::String& text, ColourVariant variant)
         : width_(width)
         , height_(height)
         , skin_(&skin)
@@ -19,7 +22,7 @@ namespace tss
         calculateTextWidth();
     }
 
-    void SectionHeader::setSkin(tss::Skin& skin)
+    void SectionHeader::setSkin(tss::ISkin& skin)
     {
         skin_ = &skin;
         invalidateCache();
@@ -85,7 +88,7 @@ namespace tss
         if (skin_ == nullptr)
             return;
 
-        cachedTextColour_ = skin_->getSectionHeaderTextColour();
+        cachedTextColour_ = skin_->getColour(SkinColourId::kSectionHeaderText);
         cachedLineColour_ = getLineColour();
         cachedFont_ = skin_->getBaseFont().withHeight(kSectionHeaderFontHeight);
     }
@@ -154,8 +157,8 @@ namespace tss
     juce::Colour SectionHeader::getLineColour() const
     {
         return (colourVariant_ == ColourVariant::Blue) 
-            ? skin_->getSectionHeaderLineColourBlue() 
-            : skin_->getSectionHeaderLineColourOrange();
+            ? skin_->getColour(SkinColourId::kSectionHeaderLineBlue) 
+            : skin_->getColour(SkinColourId::kSectionHeaderLineOrange);
     }
 
     void SectionHeader::calculateTextWidth()

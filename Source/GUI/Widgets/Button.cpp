@@ -1,12 +1,15 @@
 #include "Button.h"
 
+
 #include <map>
 
-#include "GUI/Skins/Skin.h"
+#include "GUI/Skins/ISkin.h"
+
+using tss::SkinColourId;
 
 namespace tss
 {
-    Button::Button(tss::Skin& skin, int width, int height, const juce::String& text)
+    Button::Button(tss::ISkin& skin, int width, int height, const juce::String& text)
         : juce::Button(text)
         , skin_(&skin)
         , width_(width)
@@ -16,7 +19,7 @@ namespace tss
         setSize(width_, height_);
     }
 
-    void Button::setSkin(tss::Skin& skin)
+    void Button::setSkin(tss::ISkin& skin)
     {
         skin_ = &skin;
         invalidateCache();
@@ -138,37 +141,37 @@ namespace tss
     juce::Colour Button::getBackgroundColour(bool enabled, bool isHighlighted, bool isDown) const
     {
         if (!enabled)
-            return skin_->getButtonBackgroundColourOff();
+            return skin_->getColour(SkinColourId::kButtonBackgroundOff);
 
         if (isDown)
-            return skin_->getButtonBackgroundColourClicked();
+            return skin_->getColour(SkinColourId::kButtonBackgroundClicked);
 
         if (isHighlighted)
-            return skin_->getButtonBackgroundColourHoover();
+            return skin_->getColour(SkinColourId::kButtonBackgroundHover);
 
-        return skin_->getButtonBackgroundColourOn();
+        return skin_->getColour(SkinColourId::kButtonBackgroundOn);
     }
 
     juce::Colour Button::getBorderColour(bool enabled) const
     {
         if (!enabled)
-            return skin_->getButtonBorderColourOff();
+            return skin_->getColour(SkinColourId::kButtonBorderOff);
 
-        return skin_->getButtonBorderColourOn();
+        return skin_->getColour(SkinColourId::kButtonBorderOn);
     }
 
     juce::Colour Button::getTextColour(bool enabled, bool isHighlighted, bool isDown) const
     {
         if (!enabled)
-            return skin_->getButtonTextColourOff();
+            return skin_->getColour(SkinColourId::kButtonTextOff);
 
         if (isDown)
-            return skin_->getButtonTextColourClicked();
+            return skin_->getColour(SkinColourId::kButtonTextClicked);
 
         if (isHighlighted)
-            return skin_->getButtonTextColourHoover();
+            return skin_->getColour(SkinColourId::kButtonTextHover);
 
-        return skin_->getButtonTextColourOn();
+        return skin_->getColour(SkinColourId::kButtonTextOn);
     }
 }
 

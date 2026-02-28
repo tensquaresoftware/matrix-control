@@ -1,6 +1,7 @@
 #include "ModulationBusPanel.h"
 
-#include "GUI/Skins/Skin.h"
+#include "GUI/Skins/ISkin.h"
+#include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Widgets/Label.h"
 #include "GUI/Widgets/ComboBox.h"
 #include "GUI/Widgets/Slider.h"
@@ -12,7 +13,7 @@
 
 ModulationBusPanel::~ModulationBusPanel() = default;
 
-ModulationBusPanel::ModulationBusPanel(tss::Skin& skin,
+ModulationBusPanel::ModulationBusPanel(tss::ISkin& skin,
                                       int width,
                                       int height,
                                       const ModulationBusPanelDimensions& dimensions,
@@ -41,7 +42,7 @@ ModulationBusPanel::ModulationBusPanel(tss::Skin& skin,
     layoutSeparator(dimensions_.busNumberLabelHeight);
 }
 
-void ModulationBusPanel::createBusNumberLabel(int busNumber, tss::Skin& skin)
+void ModulationBusPanel::createBusNumberLabel(int busNumber, tss::ISkin& skin)
 {
     busNumberLabel_ = std::make_unique<tss::Label>(
         skin,
@@ -51,7 +52,7 @@ void ModulationBusPanel::createBusNumberLabel(int busNumber, tss::Skin& skin)
     addAndMakeVisible(*busNumberLabel_);
 }
 
-void ModulationBusPanel::createSourceComboBox(WidgetFactory& factory, tss::Skin& skin, const juce::String& sourceParamId, juce::AudioProcessorValueTreeState& apvts)
+void ModulationBusPanel::createSourceComboBox(WidgetFactory& factory, tss::ISkin& skin, const juce::String& sourceParamId, juce::AudioProcessorValueTreeState& apvts)
 {
     sourceComboBox_ = factory.createChoiceParameterComboBox(
         sourceParamId,
@@ -65,7 +66,7 @@ void ModulationBusPanel::createSourceComboBox(WidgetFactory& factory, tss::Skin&
     addAndMakeVisible(*sourceComboBox_);
 }
 
-void ModulationBusPanel::createAmountSlider(WidgetFactory& factory, tss::Skin& skin, const juce::String& amountParamId, juce::AudioProcessorValueTreeState& apvts)
+void ModulationBusPanel::createAmountSlider(WidgetFactory& factory, tss::ISkin& skin, const juce::String& amountParamId, juce::AudioProcessorValueTreeState& apvts)
 {
     amountSlider_ = factory.createIntParameterSlider(
         amountParamId,
@@ -79,7 +80,7 @@ void ModulationBusPanel::createAmountSlider(WidgetFactory& factory, tss::Skin& s
     addAndMakeVisible(*amountSlider_);
 }
 
-void ModulationBusPanel::createDestinationComboBox(int busNumber, tss::Skin& skin, const juce::String& destinationParamId, juce::AudioProcessorValueTreeState& apvts)
+void ModulationBusPanel::createDestinationComboBox(int busNumber, tss::ISkin& skin, const juce::String& destinationParamId, juce::AudioProcessorValueTreeState& apvts)
 {
     const auto busNumberAsSizeT = static_cast<size_t>(busNumber);
     const auto& destinationDesc = PluginDescriptors::MatrixModulationSection::kModulationBusChoiceParameters[busNumberAsSizeT][1];
@@ -100,7 +101,7 @@ void ModulationBusPanel::createDestinationComboBox(int busNumber, tss::Skin& ski
     addAndMakeVisible(*destinationComboBox_);
 }
 
-void ModulationBusPanel::createInitButton(tss::Skin& skin, int busNumber)
+void ModulationBusPanel::createInitButton(tss::ISkin& skin, int busNumber)
 {
     initButton_ = std::make_unique<tss::Button>(
         skin,
@@ -131,7 +132,7 @@ void ModulationBusPanel::createInitButton(tss::Skin& skin, int busNumber)
     addAndMakeVisible(*initButton_);
 }
 
-void ModulationBusPanel::createSeparator(tss::Skin& skin)
+void ModulationBusPanel::createSeparator(tss::ISkin& skin)
 {
     separator_ = std::make_unique<tss::HorizontalSeparator>(
         skin,
@@ -181,26 +182,15 @@ void ModulationBusPanel::layoutSeparator(int y)
         separator->setBounds(0, y, dimensions_.separatorWidth, dimensions_.separatorHeight);
 }
 
-void ModulationBusPanel::setSkin(tss::Skin& skin)
+void ModulationBusPanel::setSkin(tss::ISkin& skin)
 {
     skin_ = &skin;
-
-    if (auto* label = busNumberLabel_.get())
-        label->setSkin(skin);
-
-    if (auto* comboBox = sourceComboBox_.get())
-        comboBox->setSkin(skin);
-
-    if (auto* slider = amountSlider_.get())
-        slider->setSkin(skin);
-
-    if (auto* comboBox = destinationComboBox_.get())
-        comboBox->setSkin(skin);
-
-    if (auto* button = initButton_.get())
-        button->setSkin(skin);
-
-    if (auto* separator = separator_.get())
-        separator->setSkin(skin);
+    tss::propagateSkin(skin,
+        busNumberLabel_.get(),
+        sourceComboBox_.get(),
+        amountSlider_.get(),
+        destinationComboBox_.get(),
+        initButton_.get(),
+        separator_.get());
 }
 

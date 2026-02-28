@@ -6,14 +6,15 @@
 #include "Modules/Lfo1Panel.h"
 #include "Modules/Lfo2Panel.h"
 
-#include "GUI/Skins/Skin.h"
+#include "GUI/Skins/ISkin.h"
+#include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Factories/WidgetFactory.h"
 #include "Shared/Definitions/PluginDimensions.h"
 
 
 BottomPanel::~BottomPanel() = default;
 
-BottomPanel::BottomPanel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+BottomPanel::BottomPanel(tss::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : width_(width)
     , height_(height)
     , childModuleWidth_(PluginDimensions::Panels::Body::PatchEditSection::BottomModules::ChildModules::kWidth)
@@ -86,23 +87,14 @@ void BottomPanel::resized()
     );
 }
 
-void BottomPanel::setSkin(tss::Skin& skin)
+void BottomPanel::setSkin(tss::ISkin& skin)
 {
     skin_ = &skin;
-
-    if (auto* panel = env1Panel_.get())
-        panel->setSkin(skin);
-
-    if (auto* panel = env2Panel_.get())
-        panel->setSkin(skin);
-
-    if (auto* panel = env3Panel_.get())
-        panel->setSkin(skin);
-
-    if (auto* panel = lfo1Panel_.get())
-        panel->setSkin(skin);
-
-    if (auto* panel = lfo2Panel_.get())
-        panel->setSkin(skin);
+    tss::propagateSkin(skin,
+        env1Panel_.get(),
+        env2Panel_.get(),
+        env3Panel_.get(),
+        lfo1Panel_.get(),
+        lfo2Panel_.get());
 }
 

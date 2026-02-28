@@ -1,11 +1,14 @@
 #include "PatchNameDisplay.h"
 
-#include "GUI/Skins/Skin.h"
+
+#include "GUI/Skins/ISkin.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
+
+using tss::SkinColourId;
 
 namespace tss
 {
-    PatchNameDisplay::PatchNameDisplay(tss::Skin& skin, int width, int height)
+    PatchNameDisplay::PatchNameDisplay(tss::ISkin& skin, int width, int height)
         : skin_(&skin)
         , width_(width)
         , height_(height)
@@ -15,7 +18,7 @@ namespace tss
         setSize(width_, height_);
     }
 
-    void PatchNameDisplay::setSkin(tss::Skin& skin)
+    void PatchNameDisplay::setSkin(tss::ISkin& skin)
     {
         skin_ = &skin;
     }
@@ -42,21 +45,21 @@ namespace tss
 
     void PatchNameDisplay::drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        const auto backgroundColour = skin_->getPatchNameDisplayBackgroundColour();
+        const auto backgroundColour = skin_->getColour(SkinColourId::kPatchNameDisplayBackground);
         g.setColour(backgroundColour);
         g.fillRect(bounds);
     }
 
     void PatchNameDisplay::drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        const auto borderColour = skin_->getPatchNameDisplayBorderColour();
+        const auto borderColour = skin_->getColour(SkinColourId::kPatchNameDisplayBorder);
         g.setColour(borderColour);
         g.drawRect(bounds, static_cast<float>(kBorderThickness_));
     }
 
     void PatchNameDisplay::drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        const auto textColour = skin_->getPatchNameDisplayTextColour();
+        const auto textColour = skin_->getColour(SkinColourId::kPatchNameDisplayText);
         const auto font = skin_->getBaseFont().withHeight(kFontHeight_);
 
         g.setColour(textColour);

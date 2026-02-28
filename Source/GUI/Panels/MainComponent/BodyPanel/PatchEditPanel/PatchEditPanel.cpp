@@ -8,7 +8,8 @@
 #include "BottomPanel/Modules/Env2Panel.h"
 #include "BottomPanel/Modules/Env3Panel.h"
 
-#include "GUI/Skins/Skin.h"
+#include "GUI/Skins/ISkin.h"
+#include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Widgets/SectionHeader.h"
 #include "GUI/Panels/Reusable/BaseModulePanel.h"
 #include "GUI/Panels/Reusable/ParameterPanel.h"
@@ -37,7 +38,7 @@ PatchEditPanel::~PatchEditPanel()
     }
 }
 
-PatchEditPanel::PatchEditPanel(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+PatchEditPanel::PatchEditPanel(tss::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : width_(width)
     , height_(height)
     , topPanelHeight_(PluginDimensions::Panels::Body::PatchEditSection::TopModules::kHeight)
@@ -103,21 +104,14 @@ void PatchEditPanel::resized()
     );
 }
 
-void PatchEditPanel::setSkin(tss::Skin& skin)
+void PatchEditPanel::setSkin(tss::ISkin& skin)
 {
     skin_ = &skin;
-
-    if (auto* header = sectionHeader_.get())
-        header->setSkin(skin);
-
-    if (auto* panel = topPanel_.get())
-        panel->setSkin(skin);
-
-    if (auto* panel = middlePanel_.get())
-        panel->setSkin(skin);
-
-    if (auto* panel = bottomPanel_.get())
-        panel->setSkin(skin);
+    tss::propagateSkin(skin,
+        sectionHeader_.get(),
+        topPanel_.get(),
+        middlePanel_.get(),
+        bottomPanel_.get());
 }
 
 void PatchEditPanel::setupTrackPointSliderConnections()

@@ -4,7 +4,7 @@
 
 namespace tss
 {
-    class Skin;
+    class ISkin;
 
     class SectionHeader : public juce::Component
     {
@@ -15,10 +15,10 @@ namespace tss
             Orange
         };
 
-        explicit SectionHeader(Skin& skin, int width, int height, const juce::String& text = juce::String(), ColourVariant variant = ColourVariant::Blue);
+        explicit SectionHeader(ISkin& skin, int width, int height, const juce::String& text = juce::String(), ColourVariant variant = ColourVariant::Blue);
         ~SectionHeader() override = default;
 
-        void setSkin(Skin& skin);
+        void setSkin(ISkin& skin);
 
         void paint(juce::Graphics& g) override;
         void resized() override;
@@ -34,7 +34,7 @@ namespace tss
 
         int width_;
         int height_;
-        Skin* skin_ = nullptr;
+        ISkin* skin_ = nullptr;
         juce::String text_;
         ColourVariant colourVariant_;
 

@@ -4,7 +4,7 @@
 
 namespace tss
 {
-    class Skin;
+    class ISkin;
 
     enum class LabelStyle
     {
@@ -15,11 +15,11 @@ namespace tss
     class Label : public juce::Component
     {
     public:
-        explicit Label(Skin& skin, int width, int height, const juce::String& text = juce::String(),
+        explicit Label(ISkin& skin, int width, int height, const juce::String& text = juce::String(),
                       LabelStyle style = LabelStyle::Default);
         ~Label() override = default;
 
-        void setSkin(Skin& skin);
+        void setSkin(ISkin& skin);
         
         void setText(const juce::String& text);
         juce::String getText() const { return labelText_; }
@@ -33,7 +33,7 @@ namespace tss
     private:
         inline constexpr static int kTextLeftPadding_ = 2;
 
-        Skin* skin_ = nullptr;
+        ISkin* skin_ = nullptr;
         int width_;
         int height_;
         juce::String labelText_;

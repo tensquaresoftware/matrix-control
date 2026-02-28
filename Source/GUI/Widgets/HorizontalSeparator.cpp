@@ -1,20 +1,23 @@
 #include "HorizontalSeparator.h"
 
-#include "GUI/Skins/Skin.h"
+
+#include "GUI/Skins/ISkin.h"
+
+using tss::SkinColourId;
 
 namespace tss
 {
-    HorizontalSeparator::HorizontalSeparator(tss::Skin& skin, int width, int height)
+    HorizontalSeparator::HorizontalSeparator(tss::ISkin& skin, int width, int height)
         : skin_(&skin)
         , width_(width)
         , height_(height)
     {
         setOpaque(false);
         setSize(width_, height_);
-        cachedLineColour_ = skin_->getHorizontalSeparatorLineColour();
+        cachedLineColour_ = skin_->getColour(SkinColourId::kHorizontalSeparatorLine);
     }
 
-    void HorizontalSeparator::setSkin(tss::Skin& skin)
+    void HorizontalSeparator::setSkin(tss::ISkin& skin)
     {
         skin_ = &skin;
         invalidateCache();
