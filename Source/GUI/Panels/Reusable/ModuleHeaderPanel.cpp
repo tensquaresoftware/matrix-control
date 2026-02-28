@@ -3,7 +3,7 @@
 #include "GUI/Skins/Skin.h"
 #include "GUI/Widgets/ModuleHeader.h"
 #include "GUI/Widgets/Button.h"
-#include "Shared/PluginDimensions.h"
+#include "Shared/Definitions/PluginDimensions.h"
 #include "GUI/Factories/WidgetFactory.h"
 
 

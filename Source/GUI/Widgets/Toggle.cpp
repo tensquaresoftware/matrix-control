@@ -1,6 +1,6 @@
 #include "Toggle.h"
 
-#include "Shared/PluginDimensions.h"
+#include "Shared/Definitions/PluginDimensions.h"
 #include "GUI/Skins/Skin.h"
 
 namespace tss

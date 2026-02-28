@@ -7,7 +7,7 @@
 #include "GUI/Widgets/ModuleHeader.h"
 #include "GUI/Widgets/PatchNameDisplay.h"
 #include "GUI/Widgets/TrackGeneratorDisplay.h"
-#include "Shared/PluginDisplayNames.h"
+#include "Shared/Definitions/PluginDisplayNames.h"
 
 namespace tss
 {

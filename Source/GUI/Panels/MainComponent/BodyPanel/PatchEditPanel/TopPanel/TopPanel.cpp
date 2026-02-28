@@ -8,7 +8,7 @@
 
 #include "GUI/Skins/Skin.h"
 #include "GUI/Factories/WidgetFactory.h"
-#include "Shared/PluginDimensions.h"
+#include "Shared/Definitions/PluginDimensions.h"
 
 
 TopPanel::~TopPanel() = default;

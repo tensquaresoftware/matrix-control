@@ -5,8 +5,8 @@
 #include "GUI/Widgets/GroupLabel.h"
 #include "GUI/Widgets/Button.h"
 #include "GUI/Widgets/NumberBox.h"
-#include "Shared/PluginDescriptors.h"
-#include "Shared/PluginDimensions.h"
+#include "Shared/Definitions/PluginDescriptors.h"
+#include "Shared/Definitions/PluginDimensions.h"
 #include "GUI/Factories/WidgetFactory.h"
 #include <juce_core/juce_core.h>
 

@@ -56,8 +56,8 @@ set(PLUGIN_SOURCES
     # Core
     Source/Core/PluginProcessor.cpp
     Source/Core/Factories/ApvtsFactory.cpp
-    Source/Shared/PluginHelpers.cpp
-    Source/Shared/PluginDescriptors.cpp
+    Source/Shared/Definitions/PluginHelpers.cpp
+    Source/Shared/Definitions/PluginDescriptors.cpp
     Source/GUI/PluginEditor.cpp
     Source/GUI/Factories/WidgetFactory.cpp
     Source/GUI/Factories/WidgetFactoryValidator.cpp

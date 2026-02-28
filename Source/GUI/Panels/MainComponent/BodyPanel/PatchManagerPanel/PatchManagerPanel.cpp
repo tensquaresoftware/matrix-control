@@ -7,9 +7,9 @@
 
 #include "GUI/Skins/Skin.h"
 #include "GUI/Widgets/SectionHeader.h"
-#include "Shared/PluginDescriptors.h"
-#include "Shared/PluginHelpers.h"
-#include "Shared/PluginDimensions.h"
+#include "Shared/Definitions/PluginDescriptors.h"
+#include "Shared/Definitions/PluginHelpers.h"
+#include "Shared/Definitions/PluginDimensions.h"
 #include "GUI/Factories/WidgetFactory.h"
 
 

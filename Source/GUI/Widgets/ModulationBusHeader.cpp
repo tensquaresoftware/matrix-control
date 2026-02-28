@@ -2,7 +2,7 @@
 
 #include "GUI/Skins/Skin.h"
 #include "GUI/Skins/SkinValues.h"
-#include "Shared/PluginDescriptors.h"
+#include "Shared/Definitions/PluginDescriptors.h"
 
 namespace tss
 {

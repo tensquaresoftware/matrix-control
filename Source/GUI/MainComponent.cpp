@@ -2,7 +2,7 @@
 
 #include "GUI/Factories/WidgetFactory.h"
 #include "GUI/Skins/Skin.h"
-#include "Shared/PluginDimensions.h"
+#include "Shared/Definitions/PluginDimensions.h"
 
 MainComponent::MainComponent(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : skin_(&skin)

@@ -1,9 +1,9 @@
 #include "MiddlePanel.h"
 
 #include "GUI/Skins/Skin.h"
-#include "Shared/PluginDescriptors.h"
-#include "Shared/PluginDisplayNames.h"
-#include "Shared/PluginDimensions.h"
+#include "Shared/Definitions/PluginDescriptors.h"
+#include "Shared/Definitions/PluginDisplayNames.h"
+#include "Shared/Definitions/PluginDimensions.h"
 
 
 MiddlePanel::~MiddlePanel()

@@ -3,8 +3,8 @@
 #include <set>
 #include <functional>
 
-#include "Shared/PluginHelpers.h"
-#include "Shared/PluginIDs.h"
+#include "Shared/Definitions/PluginHelpers.h"
+#include "Shared/Definitions/PluginIDs.h"
 
 juce::AudioProcessorValueTreeState::ParameterLayout ApvtsFactory::createParameterLayout()
 {

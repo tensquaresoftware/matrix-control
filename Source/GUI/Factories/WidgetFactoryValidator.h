@@ -2,7 +2,7 @@
 
 #include <juce_audio_processors/juce_audio_processors.h>
 
-#include "Shared/PluginDescriptors.h"
+#include "Shared/Definitions/PluginDescriptors.h"
 #include "GUI/Exceptions/WidgetFactoryExceptions.h"
 
 class WidgetFactoryValidator

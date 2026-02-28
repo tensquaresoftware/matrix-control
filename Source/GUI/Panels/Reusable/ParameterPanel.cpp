@@ -5,7 +5,7 @@
 #include "GUI/Widgets/Slider.h"
 #include "GUI/Widgets/ComboBox.h"
 #include "GUI/Widgets/HorizontalSeparator.h"
-#include "Shared/PluginDimensions.h"
+#include "Shared/Definitions/PluginDimensions.h"
 #include "GUI/Factories/WidgetFactory.h"
 
 

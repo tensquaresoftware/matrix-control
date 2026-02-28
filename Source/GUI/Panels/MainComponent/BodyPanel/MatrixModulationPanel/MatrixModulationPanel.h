@@ -6,7 +6,7 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 
-#include "Shared/PluginDescriptors.h"
+#include "Shared/Definitions/PluginDescriptors.h"
 #include "GUI/Panels/Reusable/ModulationBusPanel.h"
 
 namespace tss

@@ -3,10 +3,10 @@
 #include "GUI/Widgets/Slider.h"
 #include "GUI/Widgets/ComboBox.h"
 #include "GUI/Widgets/Button.h"
-#include "Shared/PluginDescriptors.h"
-#include "Shared/PluginHelpers.h"
-#include "Shared/PluginIDs.h"
-#include "Shared/PluginDimensions.h"
+#include "Shared/Definitions/PluginDescriptors.h"
+#include "Shared/Definitions/PluginHelpers.h"
+#include "Shared/Definitions/PluginIDs.h"
+#include "Shared/Definitions/PluginDimensions.h"
 
 WidgetFactory::WidgetFactory(juce::AudioProcessorValueTreeState& inApvts)
     : validator(inApvts)

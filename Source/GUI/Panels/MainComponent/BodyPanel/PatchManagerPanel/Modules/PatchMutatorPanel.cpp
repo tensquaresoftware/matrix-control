@@ -7,8 +7,8 @@
 #include "GUI/Widgets/Button.h"
 #include "GUI/Widgets/ComboBox.h"
 #include "GUI/Widgets/Toggle.h"
-#include "Shared/PluginDescriptors.h"
-#include "Shared/PluginDimensions.h"
+#include "Shared/Definitions/PluginDescriptors.h"
+#include "Shared/Definitions/PluginDimensions.h"
 #include "GUI/Factories/WidgetFactory.h"
 
 namespace

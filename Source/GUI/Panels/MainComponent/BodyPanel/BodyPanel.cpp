@@ -7,7 +7,7 @@
 #include "MasterEditPanel/MasterEditPanel.h"
 #include "PatchManagerPanel/PatchManagerPanel.h"
 #include "GUI/Factories/WidgetFactory.h"
-#include "Shared/PluginDimensions.h"
+#include "Shared/Definitions/PluginDimensions.h"
 
 using ::tss::VerticalSeparator;
 

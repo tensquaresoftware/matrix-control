@@ -6,7 +6,7 @@
 #include "GUI/Widgets/Slider.h"
 #include "GUI/Widgets/Button.h"
 #include "GUI/Widgets/HorizontalSeparator.h"
-#include "Shared/PluginDescriptors.h"
+#include "Shared/Definitions/PluginDescriptors.h"
 #include "GUI/Factories/WidgetFactory.h"
 
 
