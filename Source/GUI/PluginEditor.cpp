@@ -37,13 +37,13 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     
     auto& headerPanel = mainComponent->getHeaderPanel();
     
-    const int savedZoomLevelId = pluginProcessor.getApvts().state.getProperty(
-        PluginIDs::Settings::kGuiZoomLevelId, 
-        PluginIDs::Settings::ZoomLevels::kDefault
+    const int savedScaleId = pluginProcessor.getApvts().state.getProperty(
+        PluginIDs::Settings::kGuiScaleId, 
+        PluginIDs::Settings::ScaleLevels::kDefault
     );
-    const float savedScale = PluginIDs::Settings::ZoomLevels::getZoomLevel(savedZoomLevelId);
-    applyZoomLevel(savedScale);
-    headerPanel.getZoomComboBox().setSelectedId(savedZoomLevelId, juce::dontSendNotification);
+    const float savedScaleFactor = PluginIDs::Settings::ScaleLevels::getScaleFactor(savedScaleId);
+    applyGuiScale(savedScaleFactor);
+    headerPanel.getGuiScaleComboBox().setSelectedId(savedScaleId, juce::dontSendNotification);
     
     headerPanel.getSkinComboBox().onChange = [this, &headerPanel]
     {
@@ -53,12 +53,12 @@ PluginEditor::PluginEditor(PluginProcessor& p)
         updateSkin();
     };
     
-    headerPanel.getZoomComboBox().onChange = [this, &headerPanel]
+    headerPanel.getGuiScaleComboBox().onChange = [this, &headerPanel]
     {
-        const auto selectedId = headerPanel.getZoomComboBox().getSelectedId();
-        const float scale = PluginIDs::Settings::ZoomLevels::getZoomLevel(selectedId);
-        applyZoomLevel(scale);
-        pluginProcessor.getApvts().state.setProperty(PluginIDs::Settings::kGuiZoomLevelId, selectedId, nullptr);
+        const auto selectedId = headerPanel.getGuiScaleComboBox().getSelectedId();
+        const float scaleFactor = PluginIDs::Settings::ScaleLevels::getScaleFactor(selectedId);
+        applyGuiScale(scaleFactor);
+        pluginProcessor.getApvts().state.setProperty(PluginIDs::Settings::kGuiScaleId, selectedId, nullptr);
     };
     
     repaint();
@@ -89,18 +89,18 @@ void PluginEditor::updateSkin()
     repaint();
 }
 
-void PluginEditor::applyZoomLevel(float scale)
+void PluginEditor::applyGuiScale(float scaleFactor)
 {
     const int baseWidth = getWidth();
     const int baseHeight = getHeight();
     
-    setSize(juce::roundToInt(static_cast<float>(baseWidth) * scale), 
-            juce::roundToInt(static_cast<float>(baseHeight) * scale));
+    setSize(juce::roundToInt(static_cast<float>(baseWidth) * scaleFactor), 
+            juce::roundToInt(static_cast<float>(baseHeight) * scaleFactor));
     
     if (auto* component = mainComponent.get())
     {
         component->setBounds(0, 0, baseWidth, baseHeight);
-        component->setTransform(juce::AffineTransform::scale(scale));
+        component->setTransform(juce::AffineTransform::scale(scaleFactor));
         component->repaint();
     }
 }

@@ -31,7 +31,7 @@ namespace PluginDisplayNames
             constexpr const char* kCream = "CREAM";
         }
 
-        namespace ZoomLevels
+        namespace ScaleLevels
         {
             constexpr const char* k50  = "50%";
             constexpr const char* k75  = "75%";

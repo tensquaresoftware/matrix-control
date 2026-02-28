@@ -13,9 +13,9 @@ namespace PluginIDs
 {
     namespace Settings
     {
-        constexpr const char* kGuiZoomLevelId = "guiZoomLevelId";
+        constexpr const char* kGuiScaleId = "guiScaleId";
         
-        namespace ZoomLevels
+        namespace ScaleLevels
         {
             constexpr int k50  = 1;
             constexpr int k75  = 2;
@@ -32,7 +32,7 @@ namespace PluginIDs
             constexpr int kMin = k50;
             constexpr int kMax = k400;
             
-            constexpr float kFactors[] = {
+            constexpr float kScaleFactors[] = {
                 0.0f,   // index 0 (unused, IDs start at 1)
                 0.5f,   // k50
                 0.75f,  // k75
@@ -46,11 +46,11 @@ namespace PluginIDs
                 4.0f    // k400
             };
             
-            constexpr float getZoomLevel(int zoomLevelId)
+            constexpr float getScaleFactor(int scaleId)
             {
-                if (zoomLevelId >= kMin && zoomLevelId <= kMax)
-                    return kFactors[zoomLevelId];
-                return kFactors[kDefault];
+                if (scaleId >= kMin && scaleId <= kMax)
+                    return kScaleFactors[scaleId];
+                return kScaleFactors[kDefault];
             }
         }
     }

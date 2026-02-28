@@ -15,8 +15,8 @@ HeaderPanel::HeaderPanel(tss::ISkin& skin, int width, int height)
     , skin_(&skin)
     , skinLabel_(skin, kSkinLabelWidth_, kControlHeight_, "SKIN :", tss::LabelStyle::HeaderPanel)
     , skinComboBox_(skin, kComboBoxWidth_, kControlHeight_, tss::ComboBox::Style::ButtonLike)
-    , zoomLabel_(skin, kZoomLabelWidth_, kControlHeight_, "ZOOM :", tss::LabelStyle::HeaderPanel)
-    , zoomComboBox_(skin, kComboBoxWidth_, kControlHeight_, tss::ComboBox::Style::ButtonLike)
+    , guiScaleLabel_(skin, kGuiScaleLabelWidth_, kControlHeight_, "GUI :", tss::LabelStyle::HeaderPanel)
+    , guiScaleComboBox_(skin, kComboBoxWidth_, kControlHeight_, tss::ComboBox::Style::ButtonLike)
 {
     setOpaque(true);
     
@@ -29,20 +29,20 @@ HeaderPanel::HeaderPanel(tss::ISkin& skin, int width, int height)
     skinComboBox_.setSelectedId(static_cast<int>(tss::Skin::SkinComboBoxItemId::kBlack), juce::dontSendNotification);
     addAndMakeVisible(skinComboBox_);
     
-    addAndMakeVisible(zoomLabel_);
+    addAndMakeVisible(guiScaleLabel_);
     
-    zoomComboBox_.addItem(PluginDisplayNames::ChoiceLists::ZoomLevels::k50, PluginIDs::Settings::ZoomLevels::k50);
-    zoomComboBox_.addItem(PluginDisplayNames::ChoiceLists::ZoomLevels::k75, PluginIDs::Settings::ZoomLevels::k75);
-    zoomComboBox_.addItem(PluginDisplayNames::ChoiceLists::ZoomLevels::k90, PluginIDs::Settings::ZoomLevels::k90);
-    zoomComboBox_.addItem(PluginDisplayNames::ChoiceLists::ZoomLevels::k100, PluginIDs::Settings::ZoomLevels::k100);
-    zoomComboBox_.addItem(PluginDisplayNames::ChoiceLists::ZoomLevels::k125, PluginIDs::Settings::ZoomLevels::k125);
-    zoomComboBox_.addItem(PluginDisplayNames::ChoiceLists::ZoomLevels::k150, PluginIDs::Settings::ZoomLevels::k150);
-    zoomComboBox_.addItem(PluginDisplayNames::ChoiceLists::ZoomLevels::k200, PluginIDs::Settings::ZoomLevels::k200);
-    zoomComboBox_.addItem(PluginDisplayNames::ChoiceLists::ZoomLevels::k250, PluginIDs::Settings::ZoomLevels::k250);
-    zoomComboBox_.addItem(PluginDisplayNames::ChoiceLists::ZoomLevels::k300, PluginIDs::Settings::ZoomLevels::k300);
-    zoomComboBox_.addItem(PluginDisplayNames::ChoiceLists::ZoomLevels::k400, PluginIDs::Settings::ZoomLevels::k400);
-    zoomComboBox_.setSelectedId(PluginIDs::Settings::ZoomLevels::k100, juce::dontSendNotification);
-    addAndMakeVisible(zoomComboBox_);
+    guiScaleComboBox_.addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k50, PluginIDs::Settings::ScaleLevels::k50);
+    guiScaleComboBox_.addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k75, PluginIDs::Settings::ScaleLevels::k75);
+    guiScaleComboBox_.addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k90, PluginIDs::Settings::ScaleLevels::k90);
+    guiScaleComboBox_.addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k100, PluginIDs::Settings::ScaleLevels::k100);
+    guiScaleComboBox_.addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k125, PluginIDs::Settings::ScaleLevels::k125);
+    guiScaleComboBox_.addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k150, PluginIDs::Settings::ScaleLevels::k150);
+    guiScaleComboBox_.addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k200, PluginIDs::Settings::ScaleLevels::k200);
+    guiScaleComboBox_.addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k250, PluginIDs::Settings::ScaleLevels::k250);
+    guiScaleComboBox_.addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k300, PluginIDs::Settings::ScaleLevels::k300);
+    guiScaleComboBox_.addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k400, PluginIDs::Settings::ScaleLevels::k400);
+    guiScaleComboBox_.setSelectedId(PluginIDs::Settings::ScaleLevels::k100, juce::dontSendNotification);
+    addAndMakeVisible(guiScaleComboBox_);
 }
 
 void HeaderPanel::paint(juce::Graphics& g)
@@ -74,15 +74,15 @@ void HeaderPanel::resized()
     );
     currentX += kComboBoxWidth_ + spacing * 2;
     
-    zoomLabel_.setBounds(
+    guiScaleLabel_.setBounds(
         bounds.getX() + currentX,
         bounds.getY() + controlY,
-        kZoomLabelWidth_,
+        kGuiScaleLabelWidth_,
         kControlHeight_
     );
-    currentX += kZoomLabelWidth_ + spacing;
+    currentX += kGuiScaleLabelWidth_ + spacing;
     
-    zoomComboBox_.setBounds(
+    guiScaleComboBox_.setBounds(
         bounds.getX() + currentX,
         bounds.getY() + controlY,
         kComboBoxWidth_,
@@ -93,6 +93,6 @@ void HeaderPanel::resized()
 void HeaderPanel::setSkin(tss::ISkin& skin)
 {
     skin_ = &skin;
-    tss::propagateSkin(skin, &skinLabel_, &skinComboBox_, &zoomLabel_, &zoomComboBox_);
+    tss::propagateSkin(skin, &skinLabel_, &skinComboBox_, &guiScaleLabel_, &guiScaleComboBox_);
 }
 

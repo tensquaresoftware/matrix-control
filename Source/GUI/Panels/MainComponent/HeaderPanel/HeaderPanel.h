@@ -23,7 +23,7 @@ public:
     void setSkin(tss::ISkin& skin);
 
     tss::ComboBox& getSkinComboBox() { return skinComboBox_; }
-    tss::ComboBox& getZoomComboBox() { return zoomComboBox_; }
+    tss::ComboBox& getGuiScaleComboBox() { return guiScaleComboBox_; }
 
     static int getSpacing() { return kSpacing_; }
 
@@ -32,7 +32,7 @@ private:
     int height_;
     inline constexpr static int kSpacing_ = 5;
     inline constexpr static int kSkinLabelWidth_ = 30;
-    inline constexpr static int kZoomLabelWidth_ = 35;
+    inline constexpr static int kGuiScaleLabelWidth_ = 25;
     inline constexpr static int kComboBoxWidth_ = 50;
     inline constexpr static int kControlHeight_ = 20;
     inline constexpr static int kLeftPadding_ = 15;
@@ -41,8 +41,8 @@ private:
 
     tss::Label skinLabel_;
     tss::ComboBox skinComboBox_;
-    tss::Label zoomLabel_;
-    tss::ComboBox zoomComboBox_;
+    tss::Label guiScaleLabel_;
+    tss::ComboBox guiScaleComboBox_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(HeaderPanel)
 };

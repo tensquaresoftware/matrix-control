@@ -13,7 +13,7 @@ This annex documents key technical choices and component specifications for the 
 ## 1. Scalability and Display
 
 - **Vector graphics only:** All components are drawn using JUCE vector primitives (Paths, Shapes, etc.).
-- **Scalable design:** The GUI responds to window resizing and user-selected zoom level (presets: 50%, 75%, 100%, 150%, 200%).
+- **Scalable design:** The GUI responds to window resizing and user-selected GUI scale (presets: 50%, 75%, 90%, 100%, 125%, 150%, 200%, 250%, 300%, 400%).
 - **High DPI support:** Retina/4K displays are natively supported by scaling all dimensions.
 
 ### ScalableComponentMixin (Utility Class)
@@ -69,10 +69,10 @@ public:
 - All components follow the same scaling logic and theme rules.
 - LED components always visible, independent from selected tab.
 
-## 5. Theme and Zoom Management
+## 5. Theme and Scale Management
 
 - **ThemeManager:** Singleton class, exposes current theme and handles switching.
-- **Zoom control:** Exposed in GUI preferences; affects all components instantly.
+- **Scale control:** Exposed in GUI preferences; affects all components instantly via `AffineTransform::scale()`.
 
 ## 6. Implementation Recommendations
 

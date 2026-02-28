@@ -218,10 +218,18 @@ void PluginProcessor::initializeMidiPortProperties()
     {
         apvts.state.setProperty("midiOutputPortId", juce::String(), nullptr);
     }
-    if (!apvts.state.hasProperty(PluginIDs::Settings::kGuiZoomLevelId))
+    
+    if (apvts.state.hasProperty("guiZoomLevelId"))
     {
-        apvts.state.setProperty(PluginIDs::Settings::kGuiZoomLevelId, 
-                                PluginIDs::Settings::ZoomLevels::kDefault, 
+        const auto oldValue = apvts.state.getProperty("guiZoomLevelId");
+        apvts.state.setProperty(PluginIDs::Settings::kGuiScaleId, oldValue, nullptr);
+        apvts.state.removeProperty("guiZoomLevelId", nullptr);
+    }
+    
+    if (!apvts.state.hasProperty(PluginIDs::Settings::kGuiScaleId))
+    {
+        apvts.state.setProperty(PluginIDs::Settings::kGuiScaleId,
+                                PluginIDs::Settings::ScaleLevels::kDefault,
                                 nullptr);
     }
 }
