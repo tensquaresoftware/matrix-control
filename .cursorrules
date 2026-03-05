@@ -1,10 +1,16 @@
-# Instructions personnelles pour l'Agent IA Cursor
+# IDE Cursor / Instructions personnelles
 
 **Auteur** : Guillaume DUPONT  
 **Organisation** : Ten Square Software  
-**Contexte** : Développement de plugins VST/AU avec JUCE  
-**Version** : 2.0.0  
-**Date de mise à jour** : 2026-01-30
+**Contexte** : Développement de plugins VST/AU avec JUCE 8 & l'IDE Cursor  
+**Version** : 2.0.2  
+**Date de mise à jour** : 2026-03-05
+
+---
+
+## Objectif de ce document
+
+Ce fichier définit mes instructions personnelles pour l'agent IA de Cursor. Il guide l'agent dans la génération de code, de documentation, de conseils et de réponses en établissant un ensemble de règles, standards et conventions à respecter tout au long de nos sessions de développement.
 
 ---
 
@@ -743,4 +749,4 @@ Le dossier **Plans** doit être **compartimenté en sous-dossiers par année** :
 
 ---
 
-**Fin des instructions personnelles**
+*Fin de mes instructions personnelles.*
