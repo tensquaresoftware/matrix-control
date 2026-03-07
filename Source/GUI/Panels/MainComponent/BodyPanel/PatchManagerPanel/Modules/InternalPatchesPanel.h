@@ -62,29 +62,17 @@ private:
     std::unique_ptr<tss::Button> pastePatchButton_;
     std::unique_ptr<tss::Button> storePatchButton_;
 
-    void setupModuleHeader(tss::ISkin& skin, WidgetFactory& widgetFactory, const juce::String& moduleId);
-    void setupBrowserGroupLabel(tss::ISkin& skin);
+    void setupModuleHeader(WidgetFactory& widgetFactory, const juce::String& moduleId);
+    void setupBrowserGroupLabel();
     void setupLoadPreviousPatchButton(tss::ISkin& skin, WidgetFactory& widgetFactory);
     void setupLoadNextPatchButton(tss::ISkin& skin, WidgetFactory& widgetFactory);
-    void setupCurrentBankNumberBox(tss::ISkin& skin);
-    void setupCurrentPatchNumberBox(tss::ISkin& skin);
-    void setupMemoryGroupLabel(tss::ISkin& skin);
+    void setupCurrentBankNumberBox();
+    void setupCurrentPatchNumberBox();
+    void setupMemoryGroupLabel();
     void setupInitPatchButton(tss::ISkin& skin, WidgetFactory& widgetFactory);
     void setupCopyPatchButton(tss::ISkin& skin, WidgetFactory& widgetFactory);
     void setupPastePatchButton(tss::ISkin& skin, WidgetFactory& widgetFactory);
     void setupStorePatchButton(tss::ISkin& skin, WidgetFactory& widgetFactory);
-
-    void layoutModuleHeader(int x, int y);
-    void layoutBrowserGroupLabel(int x, int y);
-    void layoutLoadPreviousPatchButton(int x, int y);
-    void layoutLoadNextPatchButton(int x, int y);
-    void layoutCurrentBankNumberBox(int x, int y);
-    void layoutCurrentPatchNumberBox(int x, int y);
-    void layoutMemoryGroupLabel(int x, int y);
-    void layoutInitPatchButton(int x, int y);
-    void layoutCopyPatchButton(int x, int y);
-    void layoutPastePatchButton(int x, int y);
-    void layoutStorePatchButton(int x, int y);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(InternalPatchesPanel)
 };

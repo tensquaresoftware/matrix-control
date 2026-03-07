@@ -20,15 +20,15 @@ InternalPatchesPanel::InternalPatchesPanel(tss::ISkin& skin, int width, int heig
     , apvts_(apvts)
 {
     setOpaque(false);
-    setupModuleHeader(skin, widgetFactory, PluginIDs::PatchManagerSection::InternalPatchesModule::kGroupId);
+    setupModuleHeader(widgetFactory, PluginIDs::PatchManagerSection::InternalPatchesModule::kGroupId);
 
-    setupBrowserGroupLabel(skin);
+    setupBrowserGroupLabel();
     setupLoadPreviousPatchButton(skin, widgetFactory);
     setupLoadNextPatchButton(skin, widgetFactory);
-    setupCurrentBankNumberBox(skin);
-    setupCurrentPatchNumberBox(skin);
+    setupCurrentBankNumberBox();
+    setupCurrentPatchNumberBox();
 
-    setupMemoryGroupLabel(skin);
+    setupMemoryGroupLabel();
     setupInitPatchButton(skin, widgetFactory);
     setupCopyPatchButton(skin, widgetFactory);
     setupPastePatchButton(skin, widgetFactory);
@@ -68,61 +68,78 @@ void InternalPatchesPanel::valueTreePropertyChanged(
 
 void InternalPatchesPanel::resized()
 {
-    int x = 0;
-    int y = 0;
+    using namespace PluginDimensions::Widgets;
+    const float sf = scalingFactor_;
 
-    layoutModuleHeader(x, y);
-    y += PluginDimensions::Widgets::Heights::kModuleHeader;
+    // Dimensions (scaled)
+    const int moduleHeaderH   = juce::roundToInt(static_cast<float>(Heights::kModuleHeader) * sf);
+    const int moduleHeaderW   = juce::roundToInt(static_cast<float>(Widths::ModuleHeader::kPatchManagerModule) * sf);
+    const int groupLabelH     = juce::roundToInt(static_cast<float>(Heights::kGroupLabel) * sf);
+    const int browserGroupW   = juce::roundToInt(static_cast<float>(Widths::GroupLabel::kInternalPatchesBrowser) * sf);
+    const int memoryGroupW    = juce::roundToInt(static_cast<float>(Widths::GroupLabel::kInternalPatchesMemory) * sf);
+    const int navButtonW      = juce::roundToInt(static_cast<float>(Widths::Button::kInit) * sf);
+    const int bankNumberW     = juce::roundToInt(static_cast<float>(Widths::NumberBox::kPatchManagerBankNumber) * sf);
+    const int patchNumberW    = juce::roundToInt(static_cast<float>(Widths::NumberBox::kPatchManagerPatchNumber) * sf);
+    const int memButtonW      = juce::roundToInt(static_cast<float>(Widths::Button::kInternalPatchesMemory) * sf);
+    const int buttonH         = juce::roundToInt(static_cast<float>(Heights::kButton) * sf);
 
-    const auto browserGroupWidth = PluginDimensions::Widgets::Widths::GroupLabel::kInternalPatchesBrowser;
-    const auto groupLabelHeight = PluginDimensions::Widgets::Heights::kGroupLabel;
+    // Module header
+    if (moduleHeader)
+        moduleHeader->setBounds(0, 0, moduleHeaderW, moduleHeaderH);
 
-    layoutBrowserGroupLabel(x, y);
-    x = browserGroupWidth + kGroupLabelSpacing_;
+    // Row 1 Y: group labels
+    const int row1Y = juce::roundToInt(static_cast<float>(Heights::kModuleHeader) * sf);
 
-    layoutMemoryGroupLabel(x, y);
-    y += groupLabelHeight;
+    // Browser group label at X=0
+    if (browserGroupLabel)
+        browserGroupLabel->setBounds(0, row1Y, browserGroupW, groupLabelH);
 
-    const auto navigationButtonWidth = PluginDimensions::Widgets::Widths::Button::kInit;
-    x = 0;
+    // Memory group label at X = browserGroupWidth + kGroupLabelSpacing
+    const int memoryGroupX = juce::roundToInt(static_cast<float>(Widths::GroupLabel::kInternalPatchesBrowser + kGroupLabelSpacing_) * sf);
+    if (memoryGroupLabel)
+        memoryGroupLabel->setBounds(memoryGroupX, row1Y, memoryGroupW, groupLabelH);
 
-    layoutLoadPreviousPatchButton(x, y);
-    x += navigationButtonWidth + kSpacing_;
+    // Row 2 Y: buttons/numberboxes
+    const int row2Y = juce::roundToInt(static_cast<float>(Heights::kModuleHeader + Heights::kGroupLabel) * sf);
 
-    layoutLoadNextPatchButton(x, y);
-    x += navigationButtonWidth + kSpacing_;
+    // Browser section: nav buttons + number boxes, each X computed independently
+    const float navStep    = static_cast<float>(Widths::Button::kInit + kSpacing_) * sf;
+    const float bankNumX   = navStep * 2.0f;
+    const float patchNumX  = bankNumX + static_cast<float>(Widths::NumberBox::kPatchManagerBankNumber + kSpacing_) * sf;
 
-    layoutCurrentBankNumberBox(x, y);
-    x += PluginDimensions::Widgets::Widths::NumberBox::kPatchManagerBankNumber + kSpacing_;
-
-    layoutCurrentPatchNumberBox(x, y);
-
-    const auto memoryButtonWidth = PluginDimensions::Widgets::Widths::Button::kInternalPatchesMemory;
-    x = browserGroupWidth + kGroupLabelSpacing_;
-
-    layoutInitPatchButton(x, y);
-    x += memoryButtonWidth + kSpacing_;
-
-    layoutCopyPatchButton(x, y);
-    x += memoryButtonWidth + kSpacing_;
-
-    layoutPastePatchButton(x, y);
-    x += memoryButtonWidth + kSpacing_;
-
-    layoutStorePatchButton(x, y);
-    
     if (loadPreviousPatchButton_)
-        loadPreviousPatchButton_->setScalingFactor(scalingFactor_);
+        loadPreviousPatchButton_->setBounds(0, row2Y, navButtonW, buttonH);
     if (loadNextPatchButton_)
-        loadNextPatchButton_->setScalingFactor(scalingFactor_);
+        loadNextPatchButton_->setBounds(juce::roundToInt(navStep), row2Y, navButtonW, buttonH);
+    if (currentBankNumber)
+        currentBankNumber->setBounds(juce::roundToInt(bankNumX), row2Y, bankNumberW, buttonH);
+    if (currentPatchNumber)
+        currentPatchNumber->setBounds(juce::roundToInt(patchNumX), row2Y, patchNumberW, buttonH);
+
+    // Memory section: 4 buttons, each X computed independently from memory origin
+    const float memOriginX = static_cast<float>(Widths::GroupLabel::kInternalPatchesBrowser + kGroupLabelSpacing_) * sf;
+    const float memStep    = static_cast<float>(Widths::Button::kInternalPatchesMemory + kSpacing_) * sf;
+
     if (initPatchButton_)
-        initPatchButton_->setScalingFactor(scalingFactor_);
+        initPatchButton_->setBounds(juce::roundToInt(memOriginX), row2Y, memButtonW, buttonH);
     if (copyPatchButton_)
-        copyPatchButton_->setScalingFactor(scalingFactor_);
+        copyPatchButton_->setBounds(juce::roundToInt(memOriginX + 1.0f * memStep), row2Y, memButtonW, buttonH);
     if (pastePatchButton_)
-        pastePatchButton_->setScalingFactor(scalingFactor_);
+        pastePatchButton_->setBounds(juce::roundToInt(memOriginX + 2.0f * memStep), row2Y, memButtonW, buttonH);
     if (storePatchButton_)
-        storePatchButton_->setScalingFactor(scalingFactor_);
+        storePatchButton_->setBounds(juce::roundToInt(memOriginX + 3.0f * memStep), row2Y, memButtonW, buttonH);
+
+    if (moduleHeader)             moduleHeader->setScalingFactor(sf);
+    if (browserGroupLabel)        browserGroupLabel->setScalingFactor(sf);
+    if (memoryGroupLabel)         memoryGroupLabel->setScalingFactor(sf);
+    if (currentBankNumber)        currentBankNumber->setScalingFactor(sf);
+    if (currentPatchNumber)       currentPatchNumber->setScalingFactor(sf);
+    if (loadPreviousPatchButton_) loadPreviousPatchButton_->setScalingFactor(sf);
+    if (loadNextPatchButton_)     loadNextPatchButton_->setScalingFactor(sf);
+    if (initPatchButton_)         initPatchButton_->setScalingFactor(sf);
+    if (copyPatchButton_)         copyPatchButton_->setScalingFactor(sf);
+    if (pastePatchButton_)        pastePatchButton_->setScalingFactor(sf);
+    if (storePatchButton_)        storePatchButton_->setScalingFactor(sf);
 }
 
 void InternalPatchesPanel::setSkin(tss::ISkin& skin)
@@ -159,11 +176,10 @@ void InternalPatchesPanel::setScalingFactor(float scalingFactor)
         return;
     
     scalingFactor_ = scalingFactor;
-    resized();
     repaint();
 }
 
-void InternalPatchesPanel::setupModuleHeader(tss::ISkin& skin, WidgetFactory& widgetFactory, const juce::String& moduleId)
+void InternalPatchesPanel::setupModuleHeader(WidgetFactory& widgetFactory, const juce::String& moduleId)
 {
     moduleHeader = std::make_unique<tss::ModuleHeader>(
         widgetFactory.getGroupDisplayName(moduleId),
@@ -173,7 +189,7 @@ void InternalPatchesPanel::setupModuleHeader(tss::ISkin& skin, WidgetFactory& wi
     addAndMakeVisible(*moduleHeader);
 }
 
-void InternalPatchesPanel::setupBrowserGroupLabel(tss::ISkin& skin)
+void InternalPatchesPanel::setupBrowserGroupLabel()
 {
     browserGroupLabel = std::make_unique<tss::GroupLabel>(
         PluginDimensions::Widgets::Widths::GroupLabel::kInternalPatchesBrowser,
@@ -212,7 +228,7 @@ void InternalPatchesPanel::setupLoadNextPatchButton(tss::ISkin& skin, WidgetFact
     addAndMakeVisible(*loadNextPatchButton_);
 }
 
-void InternalPatchesPanel::setupCurrentBankNumberBox(tss::ISkin& skin)
+void InternalPatchesPanel::setupCurrentBankNumberBox()
 {
     currentBankNumber = std::make_unique<tss::NumberBox>(
         PluginDimensions::Widgets::Widths::NumberBox::kPatchManagerBankNumber,
@@ -223,7 +239,7 @@ void InternalPatchesPanel::setupCurrentBankNumberBox(tss::ISkin& skin)
     addAndMakeVisible(*currentBankNumber);
 }
 
-void InternalPatchesPanel::setupCurrentPatchNumberBox(tss::ISkin& skin)
+void InternalPatchesPanel::setupCurrentPatchNumberBox()
 {
     currentPatchNumber = std::make_unique<tss::NumberBox>(
         PluginDimensions::Widgets::Widths::NumberBox::kPatchManagerPatchNumber,
@@ -249,7 +265,7 @@ void InternalPatchesPanel::setupCurrentPatchNumberBox(tss::ISkin& skin)
     addAndMakeVisible(*currentPatchNumber);
 }
 
-void InternalPatchesPanel::setupMemoryGroupLabel(tss::ISkin&)
+void InternalPatchesPanel::setupMemoryGroupLabel()
 {
     memoryGroupLabel = std::make_unique<tss::GroupLabel>(
         PluginDimensions::Widgets::Widths::GroupLabel::kInternalPatchesMemory,
@@ -316,103 +332,4 @@ void InternalPatchesPanel::setupStorePatchButton(tss::ISkin& skin, WidgetFactory
                                 nullptr);
     };
     addAndMakeVisible(*storePatchButton_);
-}
-
-void InternalPatchesPanel::layoutModuleHeader(int x, int y)
-{
-    const auto moduleHeaderHeight = PluginDimensions::Widgets::Heights::kModuleHeader;
-    const auto moduleHeaderWidth = PluginDimensions::Widgets::Widths::ModuleHeader::kPatchManagerModule;
-
-    if (auto* header = moduleHeader.get())
-        header->setBounds(x, y, moduleHeaderWidth, moduleHeaderHeight);
-}
-
-void InternalPatchesPanel::layoutBrowserGroupLabel(int x, int y)
-{
-    const auto browserGroupWidth = PluginDimensions::Widgets::Widths::GroupLabel::kInternalPatchesBrowser;
-    const auto groupLabelHeight = PluginDimensions::Widgets::Heights::kGroupLabel;
-
-    if (auto* browserLabel = browserGroupLabel.get())
-        browserLabel->setBounds(x, y, browserGroupWidth, groupLabelHeight);
-}
-
-void InternalPatchesPanel::layoutLoadPreviousPatchButton(int x, int y)
-{
-    const auto buttonHeight = PluginDimensions::Widgets::Heights::kButton;
-    const auto navigationButtonWidth = PluginDimensions::Widgets::Widths::Button::kInit;
-
-    if (auto* prevButton = loadPreviousPatchButton_.get())
-        prevButton->setBounds(x, y, navigationButtonWidth, buttonHeight);
-}
-
-void InternalPatchesPanel::layoutLoadNextPatchButton(int x, int y)
-{
-    const auto buttonHeight = PluginDimensions::Widgets::Heights::kButton;
-    const auto navigationButtonWidth = PluginDimensions::Widgets::Widths::Button::kInit;
-
-    if (auto* nextButton = loadNextPatchButton_.get())
-        nextButton->setBounds(x, y, navigationButtonWidth, buttonHeight);
-}
-
-void InternalPatchesPanel::layoutCurrentBankNumberBox(int x, int y)
-{
-    const auto buttonHeight = PluginDimensions::Widgets::Heights::kButton;
-    const auto bankNumberWidth = PluginDimensions::Widgets::Widths::NumberBox::kPatchManagerBankNumber;
-
-    if (auto* bankNumber = currentBankNumber.get())
-        bankNumber->setBounds(x, y, bankNumberWidth, buttonHeight);
-}
-
-void InternalPatchesPanel::layoutCurrentPatchNumberBox(int x, int y)
-{
-    const auto buttonHeight = PluginDimensions::Widgets::Heights::kButton;
-    const auto patchNumberWidth = PluginDimensions::Widgets::Widths::NumberBox::kPatchManagerPatchNumber;
-
-    if (auto* patchNumber = currentPatchNumber.get())
-        patchNumber->setBounds(x, y, patchNumberWidth, buttonHeight);
-}
-
-void InternalPatchesPanel::layoutMemoryGroupLabel(int x, int y)
-{
-    const auto memoryGroupWidth = PluginDimensions::Widgets::Widths::GroupLabel::kInternalPatchesMemory;
-    const auto groupLabelHeight = PluginDimensions::Widgets::Heights::kGroupLabel;
-
-    if (auto* memoryLabel = memoryGroupLabel.get())
-        memoryLabel->setBounds(x, y, memoryGroupWidth, groupLabelHeight);
-}
-
-void InternalPatchesPanel::layoutInitPatchButton(int x, int y)
-{
-    const auto buttonHeight = PluginDimensions::Widgets::Heights::kButton;
-    const auto memoryButtonWidth = PluginDimensions::Widgets::Widths::Button::kInternalPatchesMemory;
-
-    if (auto* initButton = initPatchButton_.get())
-        initButton->setBounds(x, y, memoryButtonWidth, buttonHeight);
-}
-
-void InternalPatchesPanel::layoutCopyPatchButton(int x, int y)
-{
-    const auto buttonHeight = PluginDimensions::Widgets::Heights::kButton;
-    const auto memoryButtonWidth = PluginDimensions::Widgets::Widths::Button::kInternalPatchesMemory;
-
-    if (auto* copyButton = copyPatchButton_.get())
-        copyButton->setBounds(x, y, memoryButtonWidth, buttonHeight);
-}
-
-void InternalPatchesPanel::layoutPastePatchButton(int x, int y)
-{
-    const auto buttonHeight = PluginDimensions::Widgets::Heights::kButton;
-    const auto memoryButtonWidth = PluginDimensions::Widgets::Widths::Button::kInternalPatchesMemory;
-
-    if (auto* pasteButton = pastePatchButton_.get())
-        pasteButton->setBounds(x, y, memoryButtonWidth, buttonHeight);
-}
-
-void InternalPatchesPanel::layoutStorePatchButton(int x, int y)
-{
-    const auto buttonHeight = PluginDimensions::Widgets::Heights::kButton;
-    const auto memoryButtonWidth = PluginDimensions::Widgets::Widths::Button::kInternalPatchesMemory;
-
-    if (auto* storeButton = storePatchButton_.get())
-        storeButton->setBounds(x, y, memoryButtonWidth, buttonHeight);
 }
