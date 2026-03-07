@@ -40,17 +40,12 @@ Logs/
 # Archives
 Source/Archives/
 
-# Profiling traces (Instruments)
-Documentation/Development/GUI/Profiling/Traces/
-Quality/Profiling/GUI/Traces/
-
-# Reference/debug screenshots (UI verification, pixel measures)
+# Quality stuff
+Quality/Profiling/
 Quality/Screenshots/
+Quality/Journal/IA_Prompt.md
+Quality/Journal/Todo.md
+Quality/Journal/Notes.txt
 
 # Workbench (dev/test data: SysEx files, Ableton project, MIDI Monitor)
 Workbench/
-
-# Personal notes and prompts (Workbench/Journal/)
-Workbench/Journal/IA_Prompt.md
-Workbench/Journal/Todo.md
-Workbench/Journal/Notes.txt
