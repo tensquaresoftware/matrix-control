@@ -3,8 +3,8 @@
 **Auteur** : Guillaume DUPONT  
 **Organisation** : Ten Square Software  
 **Contexte** : Développement de plugins VST/AU avec JUCE 8 & l'IDE Cursor  
-**Version** : 2.0.2  
-**Date de mise à jour** : 2026-03-05
+**Version** : 2.0.3  
+**Date de mise à jour** : 2026-03-06
 
 ---
 
@@ -727,12 +727,12 @@ Lorsque je crée des fichiers Markdown lors de plans de refactorisation, optimis
 
 `Documentation/Development/Plans/`
 
-Le dossier **Plans** doit être **compartimenté en sous-dossiers par année** : `2025`, `2026`, etc. Chaque fichier de plan est placé dans le sous-dossier de l'année correspondant à la date du plan (ex. un plan daté du 2026-02-23 → `Documentation/Development/Plans/2026/`).
+Le dossier **Plans** doit être **compartimenté en sous-dossiers par année** : `2025`, `2026`, etc. À l’intérieur de chaque année, créer des **sous-dossiers par mois** : `01`, `02`, `03`, …, `12`. Chaque fichier de plan est placé dans le sous-dossier année puis mois correspondant à la date du plan (ex. un plan daté du 2026-02-23 → `Documentation/Development/Plans/2026/02/`).
 
 **⚠️ Procédure importante :**
-- Si Cursor génère automatiquement un plan dans `~/.cursor/plans/*.plan.md`, je dois **immédiatement** le copier dans `Documentation/Development/Plans/<année>/` (ex. `Plans/2026/`) avec la convention de nommage ci-dessous
+- Si Cursor génère automatiquement un plan dans `~/.cursor/plans/*.plan.md`, je dois **immédiatement** le copier dans `Documentation/Development/Plans/<année>/<mois>/` (ex. `Plans/2026/03/`) avec la convention de nommage ci-dessous
 - Cette copie doit être incluse dans les TODOs du plan et marquée comme terminée dès que c'est fait
-- **Dès que tous les TODOs du plan sont marqués `completed`**, je dois **copier** le fichier `.plan.md` final de `~/.cursor/plans/` vers `Documentation/Development/Plans/<année>/` avec le bon nom (écrasant la copie initiale si nécessaire)
+- **Dès que tous les TODOs du plan sont marqués `completed`**, je dois **copier** le fichier `.plan.md` final de `~/.cursor/plans/` vers `Documentation/Development/Plans/<année>/<mois>/` avec le bon nom (écrasant la copie initiale si nécessaire)
 - Garder les fichiers originaux dans `~/.cursor/plans/` pour ne pas perturber Cursor
 - Toujours avoir une version finale archivée dans le projet avec tous les TODOs à jour
 
@@ -745,7 +745,7 @@ Le dossier **Plans** doit être **compartimenté en sous-dossiers par année** :
 - **Pas de mots d'arrêt** (de, la, l', the, of, etc.)
 - **Noms explicites** reflétant le contenu du document
 
-**Exemple :** `Documentation/Development/Plans/2026/2026-02-03-Theme-To-Skin-Migration-Phase-Six-Summary.md`
+**Exemple :** `Documentation/Development/Plans/2026/02/2026-02-03-Theme-To-Skin-Migration-Phase-Six-Summary.md`
 
 ---
 

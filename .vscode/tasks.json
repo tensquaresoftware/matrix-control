@@ -6,19 +6,24 @@
             "type": "shell",
             "command": "cmake",
             "args": [
+                "-S", ".",
                 "-B", "Builds/Windows",
                 "-G", "Visual Studio 17 2022",
+                "-A", "x64",
                 "-DCMAKE_BUILD_TYPE=Debug"
             ],
             "windows": {
                 "args": [
+                    "-S", ".",
                     "-B", "Builds/Windows",
                     "-G", "Visual Studio 17 2022",
+                    "-A", "x64",
                     "-DCMAKE_BUILD_TYPE=Debug"
                 ]
             },
             "osx": {
                 "args": [
+                    "-S", ".",
                     "-B", "Builds/macOS",
                     "-G", "Ninja",
                     "-DCMAKE_BUILD_TYPE=Debug"
@@ -26,6 +31,7 @@
             },
             "linux": {
                 "args": [
+                    "-S", ".",
                     "-B", "Builds/Linux",
                     "-G", "Ninja",
                     "-DCMAKE_BUILD_TYPE=Debug"
@@ -187,6 +193,19 @@
                 ]
             },
             "group": "build"
+        },
+        {
+            "label": "Clean + Rebuild All",
+            "dependsOn": [
+                "Clean",
+                "CMake: Configure",
+                "Build: All"
+            ],
+            "dependsOrder": "sequence",
+            "group": {
+                "kind": "build"
+            },
+            "problemMatcher": []
         }
     ]
 }

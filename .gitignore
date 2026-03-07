@@ -44,10 +44,14 @@ Source/Archives/
 Documentation/Development/GUI/Profiling/Traces/
 Quality/Profiling/GUI/Traces/
 
+# Reference/debug screenshots (UI verification, pixel measures)
+Quality/Screenshots/
+
 # Workbench (dev/test data: SysEx files, Ableton project, MIDI Monitor)
 Workbench/
 
 # Personal notes and prompts
 TODO.md
 IA-PROMPT.md
+NOTES.txt
 IA/PROMPT.md
