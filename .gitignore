@@ -50,8 +50,7 @@ Quality/Screenshots/
 # Workbench (dev/test data: SysEx files, Ableton project, MIDI Monitor)
 Workbench/
 
-# Personal notes and prompts
-TODO.md
-IA-PROMPT.md
-NOTES.txt
-IA/PROMPT.md
+# Personal notes and prompts (Workbench/Journal/)
+Workbench/Journal/IA_Prompt.md
+Workbench/Journal/Todo.md
+Workbench/Journal/Notes.txt
