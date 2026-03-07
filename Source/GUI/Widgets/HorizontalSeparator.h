@@ -2,41 +2,34 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
+#include "GUI/Looks/WidgetLooks.h"
+
 namespace tss
 {
-    class ISkin;
-
     class HorizontalSeparator : public juce::Component
     {
     public:
-        HorizontalSeparator(ISkin& skin, int width, int height);
+        HorizontalSeparator(int width, int height);
         ~HorizontalSeparator() override = default;
 
-        void setSkin(ISkin& skin);
-
+        void setLook(const HorizontalSeparatorLook& look);
+        void setScalingFactor(float scalingFactor);
+        
         void paint(juce::Graphics& g) override;
-        void resized() override;
-
-        int getWidth() const { return width_; }
-        int getHeight() const { return height_; }
+        
+        static int getBaseWidth() { return kDefaultWidth_; }
+        static int getBaseHeight() { return kDefaultHeight_; }
 
     private:
-        inline constexpr static int kLineThickness_ = 1;
+        static constexpr int kDefaultWidth_ = 50;
+        static constexpr int kDefaultHeight_ = 5;
+        static constexpr int kLineThickness_ = 1;
 
-        ISkin* skin_ = nullptr;
+        HorizontalSeparatorLook look_{};
         int width_;
         int height_;
-
-        // Image cache
-        juce::Image cachedImage_;
-        bool cacheValid_ = false;
-        juce::Colour cachedLineColour_;
-
-        void regenerateCache();
-        void invalidateCache();
-        float getPixelScale() const;
+        float scalingFactor_ = 1.0f;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(HorizontalSeparator)
     };
 }
-

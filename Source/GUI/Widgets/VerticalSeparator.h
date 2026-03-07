@@ -2,17 +2,17 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
+#include "GUI/Looks/WidgetLooks.h"
+
 namespace tss
 {
-    class ISkin;
-
     class VerticalSeparator : public juce::Component
     {
     public:
-        explicit VerticalSeparator(ISkin& skin, int width, int height);
+        explicit VerticalSeparator(int width, int height);
         ~VerticalSeparator() override = default;
 
-        void setSkin(ISkin& skin);
+        void setLook(const VerticalSeparatorLook& look);
 
         void paint(juce::Graphics& g) override;
         void resized() override;
@@ -25,20 +25,10 @@ namespace tss
         inline constexpr static float kTopPadding_ = 4.0f;
         inline constexpr static float kBottomPadding_ = 2.0f;
 
-        ISkin* skin_ = nullptr;
+        VerticalSeparatorLook look_{};
         int width_;
         int height_;
-
-        // Image cache
-        juce::Image cachedImage_;
-        bool cacheValid_ = false;
-        juce::Colour cachedLineColour_;
-
-        void regenerateCache();
-        void invalidateCache();
-        float getPixelScale() const;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(VerticalSeparator)
     };
 }
-

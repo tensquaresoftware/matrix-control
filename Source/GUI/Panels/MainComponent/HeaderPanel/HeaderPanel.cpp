@@ -4,6 +4,7 @@
 #include "GUI/Widgets/ComboBox.h"
 #include "GUI/Skins/Skin.h"
 #include "GUI/Skins/SkinHelpers.h"
+#include "GUI/Looks/LookBuilders.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginIDs.h"
 
@@ -13,24 +14,18 @@ HeaderPanel::HeaderPanel(tss::ISkin& skin, int width, int height)
     : width_(width)
     , height_(height)
     , skin_(&skin)
-    , skinLabel_(skin, kSkinLabelWidth_, kControlHeight_, "SKIN :", tss::LabelStyle::HeaderPanel)
-    , skinComboBox_(skin, kComboBoxWidth_, kControlHeight_, tss::ComboBox::Style::ButtonLike)
-    , guiScaleLabel_(skin, kGuiScaleLabelWidth_, kControlHeight_, "GUI :", tss::LabelStyle::HeaderPanel)
-    , guiScaleComboBox_(skin, kComboBoxWidth_, kControlHeight_, tss::ComboBox::Style::ButtonLike)
+    , skinLabel_(kSkinLabelWidth_, kControlHeight_, "SKIN :", tss::LabelStyle::HeaderPanel)
+    , skinComboBox_(kComboBoxWidth_, kControlHeight_, tss::ComboBox::Style::ButtonLike)
+    , guiScaleLabel_(kGuiScaleLabelWidth_, kControlHeight_, "GUI :", tss::LabelStyle::HeaderPanel)
+    , guiScaleComboBox_(kComboBoxWidth_, kControlHeight_, tss::ComboBox::Style::ButtonLike)
 {
     setOpaque(true);
-    
-    addAndMakeVisible(skinLabel_);
-    
-    skinComboBox_.addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kBlack, 
-                         static_cast<int>(tss::Skin::SkinComboBoxItemId::kBlack));
-    skinComboBox_.addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kCream, 
-                         static_cast<int>(tss::Skin::SkinComboBoxItemId::kCream));
-    skinComboBox_.setSelectedId(static_cast<int>(tss::Skin::SkinComboBoxItemId::kBlack), juce::dontSendNotification);
-    addAndMakeVisible(skinComboBox_);
-    
+
+    guiScaleLabel_.setLook(tss::headerPanelLabelLookFromSkin(skin));
     addAndMakeVisible(guiScaleLabel_);
-    
+
+    guiScaleComboBox_.setLook(tss::comboBoxLookFromSkin(skin));
+    guiScaleComboBox_.setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
     guiScaleComboBox_.addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k50, PluginIDs::Settings::ScaleLevels::k50);
     guiScaleComboBox_.addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k75, PluginIDs::Settings::ScaleLevels::k75);
     guiScaleComboBox_.addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k90, PluginIDs::Settings::ScaleLevels::k90);
@@ -43,6 +38,18 @@ HeaderPanel::HeaderPanel(tss::ISkin& skin, int width, int height)
     guiScaleComboBox_.addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k400, PluginIDs::Settings::ScaleLevels::k400);
     guiScaleComboBox_.setSelectedId(PluginIDs::Settings::ScaleLevels::k100, juce::dontSendNotification);
     addAndMakeVisible(guiScaleComboBox_);
+
+    skinLabel_.setLook(tss::headerPanelLabelLookFromSkin(skin));
+    addAndMakeVisible(skinLabel_);
+
+    skinComboBox_.setLook(tss::comboBoxLookFromSkin(skin));
+    skinComboBox_.setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
+    skinComboBox_.addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kBlack,
+                         static_cast<int>(tss::Skin::SkinComboBoxItemId::kBlack));
+    skinComboBox_.addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kCream,
+                         static_cast<int>(tss::Skin::SkinComboBoxItemId::kCream));
+    skinComboBox_.setSelectedId(static_cast<int>(tss::Skin::SkinComboBoxItemId::kBlack), juce::dontSendNotification);
+    addAndMakeVisible(skinComboBox_);
 }
 
 void HeaderPanel::paint(juce::Graphics& g)
@@ -52,47 +59,73 @@ void HeaderPanel::paint(juce::Graphics& g)
 
 void HeaderPanel::resized()
 {
-    const auto bounds = getLocalBounds();
-    const auto spacing = getSpacing();
-    const auto controlY = (height_ - kControlHeight_) / 2;
+    const auto bounds = getLocalBounds().toFloat();
+    const float spacing = static_cast<float>(kSpacing_) * scalingFactor_;
+    const float controlHeight = static_cast<float>(kControlHeight_) * scalingFactor_;
+    const float scaledHeight = static_cast<float>(height_) * scalingFactor_;
+    const float controlY = (scaledHeight - controlHeight) * 0.5f;
     
-    int currentX = kLeftPadding_;
+    const float leftPadding = static_cast<float>(kLeftPadding_) * scalingFactor_;
+    const float skinLabelWidth = static_cast<float>(kSkinLabelWidth_) * scalingFactor_;
+    const float guiScaleLabelWidth = static_cast<float>(kGuiScaleLabelWidth_) * scalingFactor_;
+    const float comboBoxWidth = static_cast<float>(kComboBoxWidth_) * scalingFactor_;
     
-    skinLabel_.setBounds(
-        bounds.getX() + currentX,
-        bounds.getY() + controlY,
-        kSkinLabelWidth_,
-        kControlHeight_
-    );
-    currentX += kSkinLabelWidth_ + spacing;
-    
-    skinComboBox_.setBounds(
-        bounds.getX() + currentX,
-        bounds.getY() + controlY,
-        kComboBoxWidth_,
-        kControlHeight_
-    );
-    currentX += kComboBoxWidth_ + spacing * 2;
-    
+    float currentX = leftPadding;
+
     guiScaleLabel_.setBounds(
-        bounds.getX() + currentX,
-        bounds.getY() + controlY,
-        kGuiScaleLabelWidth_,
-        kControlHeight_
+        juce::roundToInt(bounds.getX() + currentX),
+        juce::roundToInt(bounds.getY() + controlY),
+        juce::roundToInt(guiScaleLabelWidth),
+        juce::roundToInt(controlHeight)
     );
-    currentX += kGuiScaleLabelWidth_ + spacing;
-    
+    guiScaleLabel_.setScalingFactor(scalingFactor_);
+    currentX += guiScaleLabelWidth + spacing;
+
     guiScaleComboBox_.setBounds(
-        bounds.getX() + currentX,
-        bounds.getY() + controlY,
-        kComboBoxWidth_,
-        kControlHeight_
+        juce::roundToInt(bounds.getX() + currentX),
+        juce::roundToInt(bounds.getY() + controlY),
+        juce::roundToInt(comboBoxWidth),
+        juce::roundToInt(controlHeight)
     );
+    guiScaleComboBox_.setScalingFactor(scalingFactor_);
+    currentX += comboBoxWidth + spacing * 2.0f;
+
+    skinLabel_.setBounds(
+        juce::roundToInt(bounds.getX() + currentX),
+        juce::roundToInt(bounds.getY() + controlY),
+        juce::roundToInt(skinLabelWidth),
+        juce::roundToInt(controlHeight)
+    );
+    skinLabel_.setScalingFactor(scalingFactor_);
+    currentX += skinLabelWidth + spacing;
+
+    skinComboBox_.setBounds(
+        juce::roundToInt(bounds.getX() + currentX),
+        juce::roundToInt(bounds.getY() + controlY),
+        juce::roundToInt(comboBoxWidth),
+        juce::roundToInt(controlHeight)
+    );
+    skinComboBox_.setScalingFactor(scalingFactor_);
 }
 
 void HeaderPanel::setSkin(tss::ISkin& skin)
 {
     skin_ = &skin;
-    tss::propagateSkin(skin, &skinLabel_, &skinComboBox_, &guiScaleLabel_, &guiScaleComboBox_);
+    skinLabel_.setLook(tss::headerPanelLabelLookFromSkin(skin));
+    skinComboBox_.setLook(tss::comboBoxLookFromSkin(skin));
+    skinComboBox_.setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
+    guiScaleLabel_.setLook(tss::headerPanelLabelLookFromSkin(skin));
+    guiScaleComboBox_.setLook(tss::comboBoxLookFromSkin(skin));
+    guiScaleComboBox_.setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
+}
+
+void HeaderPanel::setScalingFactor(float scalingFactor)
+{
+    if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+        return;
+    
+    scalingFactor_ = scalingFactor;
+    resized();
+    repaint();
 }
 

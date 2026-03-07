@@ -23,17 +23,19 @@ public:
     void paint(juce::Graphics&) override;
     void resized() override;
     void setSkin(tss::Skin& skin);
+    void setScalingFactor(float scalingFactor);
 
     HeaderPanel& getHeaderPanel() { return headerPanel; }
     BodyPanel& getBodyPanel() { return bodyPanel; }
     FooterPanel& getFooterPanel() { return footerPanel; }
 
 private:
-    void layoutHeaderPanel(juce::Rectangle<int> bounds, int y);
-    void layoutBodyPanel(juce::Rectangle<int> bounds, int y);
-    void layoutFooterPanel(juce::Rectangle<int> bounds, int y);
+    void layoutHeaderPanel(juce::Rectangle<int> bounds, float y);
+    void layoutBodyPanel(juce::Rectangle<int> bounds, float y);
+    void layoutFooterPanel(juce::Rectangle<int> bounds, float y);
 
     tss::Skin* skin_;
+    float scalingFactor_ = 1.0f;
 
     HeaderPanel headerPanel;
     BodyPanel bodyPanel;

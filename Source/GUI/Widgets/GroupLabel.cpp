@@ -1,29 +1,22 @@
 #include "GroupLabel.h"
 
-
-#include "GUI/Skins/ISkin.h"
-
-using tss::SkinColourId;
-
 namespace tss
 {
-    GroupLabel::GroupLabel(tss::ISkin& skin, int width, int height, const juce::String& text)
-        : skin_(&skin)
-        , width_(width)
+    GroupLabel::GroupLabel(int width, int height, const juce::String& text)
+        : width_(width)
         , height_(height)
         , labelText_(text)
-        , cachedFont_(juce::FontOptions())
     {
         setOpaque(false);
         setSize(width_, height_);
-        updateSkinCache();
         calculateTextWidth();
     }
 
-    void GroupLabel::setSkin(tss::ISkin& skin)
+    void GroupLabel::setLook(const GroupLabelLook& look)
     {
-        skin_ = &skin;
-        invalidateCache();
+        look_ = look;
+        calculateTextWidth();
+        repaint();
     }
 
     void GroupLabel::setText(const juce::String& text)
@@ -32,85 +25,29 @@ namespace tss
         {
             labelText_ = text;
             calculateTextWidth();
-            invalidateCache();
             repaint();
         }
     }
 
     void GroupLabel::paint(juce::Graphics& g)
     {
-        if (skin_ == nullptr || labelText_.isEmpty())
+        if (labelText_.isEmpty())
             return;
-
-        if (!cacheValid_)
-            regenerateCache();
-
-        if (cachedImage_.isValid())
-        {
-            g.drawImage(cachedImage_, getLocalBounds().toFloat(),
-                       juce::RectanglePlacement::stretchToFit);
-        }
-    }
-
-    void GroupLabel::resized()
-    {
-        invalidateCache();
-    }
-
-    void GroupLabel::regenerateCache()
-    {
-        const auto width = getWidth();
-        const auto height = getHeight();
-
-        if (width <= 0 || height <= 0)
-            return;
-
-        const float pixelScale = getPixelScale();
-        const int imageWidth = juce::roundToInt(width * pixelScale);
-        const int imageHeight = juce::roundToInt(height * pixelScale);
-
-        // Create HiDPI image at physical resolution
-        cachedImage_ = juce::Image(juce::Image::ARGB, imageWidth, imageHeight, true);
-        juce::Graphics g(cachedImage_);
-        
-        // Scale graphics context to match physical resolution
-        g.addTransform(juce::AffineTransform::scale(pixelScale));
 
         const auto bounds = getLocalBounds().toFloat();
         drawText(g, bounds);
         drawLines(g, bounds, cachedTextWidth_);
-
-        cacheValid_ = true;
     }
 
-    void GroupLabel::invalidateCache()
+    void GroupLabel::resized()
     {
-        cacheValid_ = false;
-    }
-
-    void GroupLabel::updateSkinCache()
-    {
-        if (skin_ == nullptr)
-            return;
-
-        cachedTextColour_ = skin_->getColour(SkinColourId::kGroupLabelText);
-        cachedLineColour_ = skin_->getColour(SkinColourId::kGroupLabelLine);
-        cachedFont_ = skin_->getBaseFont();
-    }
-
-    float GroupLabel::getPixelScale() const
-    {
-        const auto* display = juce::Desktop::getInstance()
-                                  .getDisplays()
-                                  .getDisplayForRect(getScreenBounds());
-
-        return display != nullptr ? static_cast<float>(display->scale) : 1.0f;
+        repaint();
     }
 
     void GroupLabel::drawText(juce::Graphics& g, const juce::Rectangle<float>& area)
     {
-        g.setColour(cachedTextColour_);
-        g.setFont(cachedFont_);
+        g.setColour(look_.text);
+        g.setFont(look_.font);
         g.drawText(labelText_, area, juce::Justification::centred, false);
     }
 
@@ -120,7 +57,7 @@ namespace tss
         const auto centreX = area.getCentreX();
         const auto centreY = area.getCentreY();
 
-        g.setColour(cachedLineColour_);
+        g.setColour(look_.line);
 
         drawLeftLine(g, area, centreX, halfTextWidth, centreY);
         drawRightLine(g, area, centreX, halfTextWidth, centreY);
@@ -133,13 +70,13 @@ namespace tss
 
         if (lineWidth > 0.0f)
         {
-            const auto lineThicknessHalf = kLineThickness_ * 0.5f;
-            const auto lineY = std::round(centreY - lineThicknessHalf);
+            const float lineThicknessHalf = static_cast<float>(kLineThickness_) * 0.5f;
+            const float lineY = centreY - lineThicknessHalf;
             const auto line = juce::Rectangle<float>(
                 area.getX(),
                 lineY,
                 lineWidth,
-                kLineThickness_
+                static_cast<float>(kLineThickness_)
             );
             g.fillRect(line);
         }
@@ -147,18 +84,18 @@ namespace tss
 
     void GroupLabel::drawRightLine(juce::Graphics& g, const juce::Rectangle<float>& area, float centreX, float halfTextWidth, float centreY)
     {
-        const auto lineStartX = centreX + halfTextWidth + kTextSpacing_;
-        const auto lineWidth = area.getRight() - lineStartX;
+        const float lineStartX = centreX + halfTextWidth + kTextSpacing_;
+        const float lineWidth = area.getRight() - lineStartX;
 
         if (lineWidth > 0.0f)
         {
-            const auto lineThicknessHalf = kLineThickness_ * 0.5f;
-            const auto lineY = std::round(centreY - lineThicknessHalf);
+            const float lineThicknessHalf = static_cast<float>(kLineThickness_) * 0.5f;
+            const float lineY = centreY - lineThicknessHalf;
             const auto line = juce::Rectangle<float>(
                 lineStartX,
                 lineY,
                 lineWidth,
-                kLineThickness_
+                static_cast<float>(kLineThickness_)
             );
             g.fillRect(line);
         }
@@ -166,16 +103,15 @@ namespace tss
 
     void GroupLabel::calculateTextWidth()
     {
-        if (labelText_.isEmpty() || skin_ == nullptr)
+        if (labelText_.isEmpty())
         {
             cachedTextWidth_ = 0.0f;
             return;
         }
 
         juce::GlyphArrangement glyphArrangement;
-        glyphArrangement.addLineOfText(cachedFont_, labelText_, 0.0f, 0.0f);
+        glyphArrangement.addLineOfText(look_.font, labelText_, 0.0f, 0.0f);
         const auto bounds = glyphArrangement.getBoundingBox(0, -1, true);
         cachedTextWidth_ = bounds.getWidth();
     }
 }
-

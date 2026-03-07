@@ -1,35 +1,23 @@
 #include "EnvelopeDisplay.h"
 
-
-#include "GUI/Skins/ISkin.h"
-#include "GUI/Skins/ColourChart.h"
-
-using tss::SkinColourId;
-
 namespace tss
 {
-    EnvelopeDisplay::EnvelopeDisplay(tss::ISkin& skin, int width, int height)
-        : skin_(&skin)
-        , width_(width)
+    EnvelopeDisplay::EnvelopeDisplay(int width, int height)
+        : width_(width)
         , height_(height)
     {
         setOpaque(false);
         setSize(width_, height_);
-        updateSkinCache();
     }
 
-    void EnvelopeDisplay::setSkin(tss::ISkin& skin)
+    void EnvelopeDisplay::setLook(const EnvelopeDisplayLook& look)
     {
-        skin_ = &skin;
-        updateSkinCache();
-        invalidateCache();
+        look_ = look;
+        repaint();
     }
 
     void EnvelopeDisplay::paint(juce::Graphics& g)
     {
-        if (skin_ == nullptr)
-            return;
-
         const auto bounds = getLocalBounds().toFloat();
         const auto contentBounds = bounds.withTrimmedTop(static_cast<float>(kWidgetPaddingTop_))
             .withTrimmedBottom(static_cast<float>(kWidgetPaddingBottom_));
@@ -37,40 +25,33 @@ namespace tss
         drawBackground(g, contentBounds);
         drawBorder(g, contentBounds);
         drawTriangle(g, contentBounds);
-        
-        if (!cacheValid_)
-            regenerateCache();
-        
-        const auto destRect = contentBounds.toFloat();
-        g.drawImage(cachedImage_, destRect, juce::RectanglePlacement::fillDestination);
+        drawEnvelope(g, contentBounds);
     }
 
 
     void EnvelopeDisplay::drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        const auto backgroundColour = skin_->getColour(SkinColourId::kEnvelopeDisplayBackground);
-        g.setColour(backgroundColour);
+        g.setColour(look_.background);
         g.fillRect(bounds);
     }
 
     void EnvelopeDisplay::drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        const auto borderColour = skin_->getColour(SkinColourId::kEnvelopeDisplayBorder);
-        g.setColour(borderColour);
+        g.setColour(look_.border);
         g.drawRect(bounds, static_cast<float>(kWidgetBorderThickness_));
     }
 
     void EnvelopeDisplay::drawTriangle(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        const auto triangleColour = skin_->getColour(SkinColourId::kEnvelopeDisplayBorder);
-        const auto triangleHeight = kWidgetTriangleBase_ * std::sqrt(3.0f) * 0.5f;
-        const auto centreX = std::round(bounds.getCentreX());
-        const auto baseY = bounds.getBottom();
+        const auto triangleColour = look_.border;
+        const float triangleHeight = kWidgetTriangleBase_ * std::sqrt(3.0f) * 0.5f;
+        const float centreX = bounds.getCentreX();
+        const float baseY = bounds.getBottom();
 
         juce::Path triangle;
-        triangle.addTriangle(std::round(centreX - kWidgetTriangleBase_ * 0.5f), baseY,
-                             std::round(centreX + kWidgetTriangleBase_ * 0.5f), baseY,
-                             centreX, std::round(baseY + triangleHeight));
+        triangle.addTriangle(centreX - kWidgetTriangleBase_ * 0.5f, baseY,
+                             centreX + kWidgetTriangleBase_ * 0.5f, baseY,
+                             centreX, baseY + triangleHeight);
 
         g.setColour(triangleColour);
         g.fillPath(triangle);
@@ -93,8 +74,8 @@ namespace tss
         if (delay_ != clampedValue)
         {
             delay_ = clampedValue;
-            invalidateCache();
-            
+            repaint();
+
             if (notify && onValueChanged_)
                 onValueChanged_(0, clampedValue);
         }
@@ -112,8 +93,8 @@ namespace tss
         if (attack_ != clampedValue)
         {
             attack_ = clampedValue;
-            invalidateCache();
-            
+            repaint();
+
             if (notify && onValueChanged_)
                 onValueChanged_(1, clampedValue);
         }
@@ -131,8 +112,8 @@ namespace tss
         if (decay_ != clampedValue)
         {
             decay_ = clampedValue;
-            invalidateCache();
-            
+            repaint();
+
             if (notify && onValueChanged_)
                 onValueChanged_(2, clampedValue);
         }
@@ -150,8 +131,8 @@ namespace tss
         if (sustain_ != clampedValue)
         {
             sustain_ = clampedValue;
-            invalidateCache();
-            
+            repaint();
+
             if (notify && onValueChanged_)
                 onValueChanged_(3, clampedValue);
         }
@@ -169,63 +150,13 @@ namespace tss
         if (release_ != clampedValue)
         {
             release_ = clampedValue;
-            invalidateCache();
-            
+            repaint();
+
             if (notify && onValueChanged_)
                 onValueChanged_(4, clampedValue);
         }
     }
     
-    void EnvelopeDisplay::regenerateCache()
-    {
-        const auto scale = getPixelScale();
-        const auto innerBounds = getLocalBounds()
-            .withTrimmedTop(kWidgetPaddingTop_)
-            .withTrimmedBottom(kWidgetPaddingBottom_)
-            .toFloat();
-        const int imageWidth = juce::roundToInt(innerBounds.getWidth() * scale);
-        const int imageHeight = juce::roundToInt(innerBounds.getHeight() * scale);
-        
-        if (imageWidth <= 0 || imageHeight <= 0)
-        {
-            cacheValid_ = false;
-            return;
-        }
-        
-        cachedImage_ = juce::Image(juce::Image::ARGB, imageWidth, imageHeight, true);
-        juce::Graphics g(cachedImage_);
-        g.addTransform(juce::AffineTransform::scale(scale));
-        
-        const juce::Rectangle<float> drawBounds(0.0f, 0.0f, innerBounds.getWidth(), innerBounds.getHeight());
-        drawEnvelope(g, drawBounds);
-        
-        cachedDelay_ = delay_;
-        cachedAttack_ = attack_;
-        cachedDecay_ = decay_;
-        cachedSustain_ = sustain_;
-        cachedRelease_ = release_;
-        cachedCurveColour_ = skin_->getColour(SkinColourId::kEnvelopeDisplayEnvelope);
-        cacheValid_ = true;
-    }
-    
-    void EnvelopeDisplay::invalidateCache()
-    {
-        cacheValid_ = false;
-        repaint();
-    }
-    
-    void EnvelopeDisplay::updateSkinCache()
-    {
-        if (skin_ == nullptr)
-            return;
-        
-        cachedCurveColour_ = skin_->getColour(SkinColourId::kEnvelopeDisplayEnvelope);
-    }
-    
-    float EnvelopeDisplay::getPixelScale() const
-    {
-        return static_cast<float>(juce::Desktop::getInstance().getDisplays().getPrimaryDisplay()->scale);
-    }
     
     juce::Rectangle<float> EnvelopeDisplay::getCurveCenterBounds(const juce::Rectangle<float>& innerBounds) const
     {
@@ -242,7 +173,7 @@ namespace tss
         
         const auto envelopePoints = calculateEnvelopePoints(centerBounds);
         
-        g.setColour(cachedCurveColour_);
+        g.setColour(look_.envelope);
         
         for (int i = 0; i < kCurvePointCount_ - 1; ++i)
         {
@@ -251,8 +182,8 @@ namespace tss
                       kCurveLineThickness_);
         }
         
-        const auto hollowPointFillColour = juce::Colour(ColourChart::kGreen1);
-        
+        const auto hollowPointFillColour = look_.envelope.withAlpha(0.4f);
+
         for (int i = 0; i < kCurvePointCount_; ++i)
         {
             const auto circleX = envelopePoints.points[i].x - kCurvePointRadius_;
@@ -264,12 +195,12 @@ namespace tss
                 g.setColour(hollowPointFillColour);
                 g.fillEllipse(circleX, circleY, circleDiameter, circleDiameter);
                 
-                g.setColour(cachedCurveColour_);
+                g.setColour(look_.envelope);
                 g.drawEllipse(circleX, circleY, circleDiameter, circleDiameter, kCurveLineThickness_);
             }
             else
             {
-                g.setColour(cachedCurveColour_);
+                g.setColour(look_.envelope);
                 g.fillEllipse(circleX, circleY, circleDiameter, circleDiameter);
                 g.drawEllipse(circleX, circleY, circleDiameter, circleDiameter, kCurveLineThickness_);
             }
@@ -393,7 +324,7 @@ namespace tss
             if (sustain_ != newValue)
             {
                 sustain_ = newValue;
-                invalidateCache();
+                repaint();
                 
                 if (onValueChanged_)
                     onValueChanged_(3, newValue);
@@ -417,7 +348,7 @@ namespace tss
             if (delay_ != newValue)
             {
                 delay_ = newValue;
-                invalidateCache();
+                repaint();
                 
                 if (onValueChanged_)
                     onValueChanged_(0, newValue);
@@ -433,7 +364,7 @@ namespace tss
             if (attack_ != newValue)
             {
                 attack_ = newValue;
-                invalidateCache();
+                repaint();
                 
                 if (onValueChanged_)
                     onValueChanged_(1, newValue);
@@ -449,7 +380,7 @@ namespace tss
             if (decay_ != newValue)
             {
                 decay_ = newValue;
-                invalidateCache();
+                repaint();
                 
                 if (onValueChanged_)
                     onValueChanged_(2, newValue);
@@ -465,7 +396,7 @@ namespace tss
             if (release_ != newValue)
             {
                 release_ = newValue;
-                invalidateCache();
+                repaint();
                 
                 if (onValueChanged_)
                     onValueChanged_(4, newValue);

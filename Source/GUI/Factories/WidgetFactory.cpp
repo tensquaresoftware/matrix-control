@@ -3,6 +3,7 @@
 #include "GUI/Widgets/Slider.h"
 #include "GUI/Widgets/ComboBox.h"
 #include "GUI/Widgets/Button.h"
+#include "GUI/Looks/LookBuilders.h"
 #include "Shared/Definitions/PluginDescriptors.h"
 #include "Shared/Definitions/PluginHelpers.h"
 #include "Shared/Definitions/PluginIDs.h"
@@ -20,7 +21,8 @@ std::unique_ptr<tss::Slider> WidgetFactory::createSliderFromDescriptor(
     int width,
     int height)
 {
-    auto slider = std::make_unique<tss::Slider>(skin, width, height, static_cast<double>(desc->defaultValue));
+    auto slider = std::make_unique<tss::Slider>(width, height, static_cast<double>(desc->defaultValue));
+    slider->setLook(tss::sliderLookFromSkin(skin));
     slider->setRange(static_cast<double>(desc->minValue), static_cast<double>(desc->maxValue), 1.0);
     slider->setValue(static_cast<double>(desc->defaultValue));
     return slider;
@@ -32,8 +34,10 @@ std::unique_ptr<tss::ComboBox> WidgetFactory::createComboBoxFromDescriptor(
     int width,
     int height)
 {
-    auto comboBox = std::make_unique<tss::ComboBox>(skin, width, height);
-    
+    auto comboBox = std::make_unique<tss::ComboBox>(width, height);
+    comboBox->setLook(tss::comboBoxLookFromSkin(skin));
+    comboBox->setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
+
     for (const auto& choice : desc->choices)
         comboBox->addItem(choice, comboBox->getNumItems() + 1);
     
@@ -90,12 +94,13 @@ std::unique_ptr<tss::Button> WidgetFactory::createStandaloneButton(
     
     const auto buttonWidth = desc->buttonWidth.value_or(PluginDimensions::Widgets::Widths::Button::kInit);
     
-    return std::make_unique<tss::Button>(
-        skin, 
+    auto button = std::make_unique<tss::Button>(
         buttonWidth,
         height,
         desc->displayName
     );
+    button->setLook(tss::buttonLookFromSkin(skin));
+    return button;
 }
 
 std::optional<juce::String> WidgetFactory::getParameterDisplayName(const juce::String& parameterId) const

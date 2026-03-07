@@ -19,8 +19,8 @@ namespace tss
     public:
         static PopupMenuDimensions calculateDimensions(
             const ComboBox& comboBox,
-            int contentWidth,
-            int contentHeight,
+            int popupWidth,
+            int popupHeight,
             int borderThickness);
 
     private:

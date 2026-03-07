@@ -1,31 +1,26 @@
 #include "NumberBox.h"
 
-
 #include <memory>
 
-#include "GUI/Skins/ISkin.h"
-
-using tss::SkinColourId;
+#include "GUI/Skins/ColourChart.h"
 
 namespace tss
 {
-    NumberBox::NumberBox(tss::ISkin& skin, int width, bool editable, int minValue, int maxValue)
-        : skin_(&skin)
-        , minValue_(minValue)
+    NumberBox::NumberBox(int width, bool editable, int minValue, int maxValue)
+        : minValue_(minValue)
         , maxValue_(maxValue)
         , editable_(editable)
-        , cachedFont_(juce::FontOptions())
     {
         setOpaque(true);
         setSize(width, kHeight_);
-        updateSkinCache();
         updateTextWidthCache();
     }
 
-    void NumberBox::setSkin(tss::ISkin& skin)
+    void NumberBox::setLook(const NumberBoxLook& look)
     {
-        skin_ = &skin;
-        invalidateCache();
+        look_ = look;
+        updateTextWidthCache();
+        repaint();
     }
 
     void NumberBox::setValue(int newValue)
@@ -36,7 +31,6 @@ namespace tss
         {
             currentValue_ = clampedValue;
             updateTextWidthCache();
-            invalidateCache();
             repaint();
             
             if (onValueChanged_)
@@ -54,114 +48,44 @@ namespace tss
         if (showDot_ != show)
         {
             showDot_ = show;
-            invalidateCache();
             repaint();
         }
     }
 
     void NumberBox::paint(juce::Graphics& g)
     {
-        if (skin_ == nullptr)
-            return;
+        const auto bounds = getLocalBounds().toFloat();
 
-        if (!cacheValid_)
-            regenerateCache();
-
-        if (cachedImage_.isValid())
-        {
-            g.drawImage(cachedImage_, getLocalBounds().toFloat(),
-                       juce::RectanglePlacement::stretchToFit);
-        }
-    }
-
-    void NumberBox::resized()
-    {
-        invalidateCache();
-    }
-
-    void NumberBox::regenerateCache()
-    {
-        const auto width = getWidth();
-        const auto height = getHeight();
-
-        if (width <= 0 || height <= 0)
-            return;
-
-        const float pixelScale = getPixelScale();
-        const int imageWidth = juce::roundToInt(width * pixelScale);
-        const int imageHeight = juce::roundToInt(height * pixelScale);
-
-        // Create HiDPI image at physical resolution
-        cachedImage_ = juce::Image(juce::Image::ARGB, imageWidth, imageHeight, true);
-        juce::Graphics g(cachedImage_);
-        
-        // Scale graphics context to match physical resolution
-        g.addTransform(juce::AffineTransform::scale(pixelScale));
-
-        const auto bounds = juce::Rectangle<float>(0.0f, 0.0f, 
-                                                    static_cast<float>(width), 
-                                                    static_cast<float>(height));
-
-        g.setColour(cachedBackgroundColour_);
+        g.setColour(look_.background);
         g.fillRect(bounds);
 
-        g.setColour(cachedBorderColour_);
-        g.drawRect(bounds, kBorderThickness_);
+        g.setColour(getBorderColour());
+        g.drawRect(bounds, static_cast<float>(kBorderThickness_));
 
-        g.setColour(cachedTextColour_);
-        g.setFont(cachedFont_);
+        g.setColour(look_.text);
+        g.setFont(look_.font);
         g.drawText(cachedValueText_, bounds, juce::Justification::centred, false);
 
         if (showDot_)
         {
             const auto dotPosition = calculateDotPosition(bounds, cachedTextWidth_);
-
-            g.setColour(cachedDotColour_);
+            g.setColour(look_.dot);
             g.fillEllipse(dotPosition.x, dotPosition.y, kDotRadius_ * 2.0f, kDotRadius_ * 2.0f);
         }
-
-        cacheValid_ = true;
     }
 
-    void NumberBox::invalidateCache()
+    void NumberBox::resized()
     {
-        cacheValid_ = false;
-    }
-
-    void NumberBox::updateSkinCache()
-    {
-        if (skin_ == nullptr)
-            return;
-
-        cachedBackgroundColour_ = skin_->getColour(SkinColourId::kButtonBackgroundOn);
-        cachedBorderColour_ = getBorderColour();
-        cachedTextColour_ = skin_->getColour(SkinColourId::kNumberBoxText);
-        cachedDotColour_ = skin_->getColour(SkinColourId::kNumberBoxDot);
-        cachedFont_ = skin_->getBaseFont();
+        repaint();
     }
 
     void NumberBox::updateTextWidthCache()
     {
         cachedValueText_ = juce::String(currentValue_);
-        
-        if (skin_ == nullptr)
-        {
-            cachedTextWidth_ = 0.0f;
-            return;
-        }
 
         juce::GlyphArrangement glyphArrangement;
-        glyphArrangement.addLineOfText(cachedFont_, cachedValueText_, 0.0f, 0.0f);
+        glyphArrangement.addLineOfText(look_.font, cachedValueText_, 0.0f, 0.0f);
         cachedTextWidth_ = glyphArrangement.getBoundingBox(0, -1, true).getWidth();
-    }
-
-    float NumberBox::getPixelScale() const
-    {
-        const auto* display = juce::Desktop::getInstance()
-                                  .getDisplays()
-                                  .getDisplayForRect(getScreenBounds());
-        const float displayScale = display != nullptr ? static_cast<float>(display->scale) : 1.0f;
-        return displayScale;
     }
 
     void NumberBox::mouseDoubleClick(const juce::MouseEvent&)
@@ -174,18 +98,15 @@ namespace tss
 
     juce::Colour NumberBox::getBorderColour() const
     {
-        if (!isEnabled())
-            return skin_->getColour(SkinColourId::kButtonBorderOff);
-
-        return skin_->getColour(SkinColourId::kButtonBorderOn);
+        return isEnabled() ? look_.borderOn : look_.borderOff;
     }
 
     juce::Point<float> NumberBox::calculateDotPosition(const juce::Rectangle<float>& bounds, float textWidth) const
     {
-        const auto textRight = bounds.getCentreX() + textWidth * 0.5f;
-        const auto baselineY = bounds.getCentreY() + cachedFont_.getHeight() * 0.5f - cachedFont_.getDescent();
+        const float textRight = bounds.getCentreX() + textWidth * 0.5f;
+        const float baselineY = bounds.getCentreY() + look_.font.getHeight() * 0.5f - look_.font.getDescent();
 
-        return { std::round(textRight + kDotXOffset_), std::round(baselineY - kDotRadius_) };
+        return { textRight + kDotXOffset_, baselineY - kDotRadius_ };
     }
 
     void NumberBox::showEditor()
@@ -193,22 +114,20 @@ namespace tss
         if (editor_ != nullptr)
             return;
 
-        const auto baseFont = skin_->getBaseFont();
-        const auto editorFont = skin_->getBaseFontBold()
-                                    .withHeight(baseFont.getHeight() + kEditorFontSizeIncrease_);
+        const auto editorFont = look_.font.withHeight(look_.font.getHeight() + kEditorFontSizeIncrease_);
 
         editor_ = std::make_unique<juce::TextEditor>();
         editor_->setBounds(getLocalBounds());
         editor_->setText(juce::String(currentValue_), false);
         editor_->setFont(editorFont);
         editor_->setJustification(juce::Justification::centred);
-        
-        editor_->setColour(juce::TextEditor::backgroundColourId, skin_->getColour(SkinColourId::kNumberBoxEditorBackground));
-        editor_->setColour(juce::TextEditor::textColourId, skin_->getColour(SkinColourId::kNumberBoxEditorText));
-        editor_->setColour(juce::TextEditor::highlightColourId, skin_->getColour(SkinColourId::kNumberBoxEditorSelectionBackground));
-        editor_->setColour(juce::TextEditor::highlightedTextColourId, skin_->getColour(SkinColourId::kNumberBoxEditorText));
-        editor_->setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
-        editor_->setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::transparentBlack);
+
+        editor_->setColour(juce::TextEditor::backgroundColourId, look_.editorBackground);
+        editor_->setColour(juce::TextEditor::textColourId, look_.editorText);
+        editor_->setColour(juce::TextEditor::highlightColourId, look_.editorSelectionBackground);
+        editor_->setColour(juce::TextEditor::highlightedTextColourId, look_.editorText);
+        editor_->setColour(juce::TextEditor::outlineColourId, juce::Colour(ColourChart::kTransparent));
+        editor_->setColour(juce::TextEditor::focusedOutlineColourId, juce::Colour(ColourChart::kTransparent));
         
         editor_->setBorder(juce::BorderSize<int>(0));
         editor_->setIndents(0, 0);

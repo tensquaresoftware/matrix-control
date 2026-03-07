@@ -29,45 +29,50 @@ void MainComponent::paint(juce::Graphics& g)
 
 void MainComponent::resized()
 {
-    auto bounds = getLocalBounds();
-    auto y = 0;
+    const auto bounds = getLocalBounds();
+    const float headerHeight = static_cast<float>(PluginDimensions::Panels::Header::kHeight) * scalingFactor_;
+    const float bodyHeight = static_cast<float>(PluginDimensions::Panels::Body::kHeight) * scalingFactor_;
+    float y = 0.0f;
     
     layoutHeaderPanel(bounds, y);
-    y += PluginDimensions::Panels::Header::kHeight;
+    y += headerHeight;
     
     layoutBodyPanel(bounds, y);
-    y += PluginDimensions::Panels::Body::kHeight;
+    y += bodyHeight;
     
     layoutFooterPanel(bounds, y);
 }
 
-void MainComponent::layoutHeaderPanel(juce::Rectangle<int> bounds, int y)
+void MainComponent::layoutHeaderPanel(juce::Rectangle<int> bounds, float y)
 {
+    const float height = static_cast<float>(PluginDimensions::Panels::Header::kHeight) * scalingFactor_;
     headerPanel.setBounds(
         bounds.getX(),
-        bounds.getY() + y,
+        juce::roundToInt(static_cast<float>(bounds.getY()) + y),
         bounds.getWidth(),
-        PluginDimensions::Panels::Header::kHeight
+        juce::roundToInt(height)
     );
 }
 
-void MainComponent::layoutBodyPanel(juce::Rectangle<int> bounds, int y)
+void MainComponent::layoutBodyPanel(juce::Rectangle<int> bounds, float y)
 {
+    const float height = static_cast<float>(PluginDimensions::Panels::Body::kHeight) * scalingFactor_;
     bodyPanel.setBounds(
         bounds.getX(),
-        bounds.getY() + y,
+        juce::roundToInt(static_cast<float>(bounds.getY()) + y),
         bounds.getWidth(),
-        PluginDimensions::Panels::Body::kHeight
+        juce::roundToInt(height)
     );
 }
 
-void MainComponent::layoutFooterPanel(juce::Rectangle<int> bounds, int y)
+void MainComponent::layoutFooterPanel(juce::Rectangle<int> bounds, float y)
 {
+    const float height = static_cast<float>(PluginDimensions::Panels::Footer::kHeight) * scalingFactor_;
     footerPanel.setBounds(
         bounds.getX(),
-        bounds.getY() + y,
+        juce::roundToInt(static_cast<float>(bounds.getY()) + y),
         bounds.getWidth(),
-        PluginDimensions::Panels::Footer::kHeight
+        juce::roundToInt(height)
     );
 }
 
@@ -77,5 +82,18 @@ void MainComponent::setSkin(tss::Skin& skin)
     headerPanel.setSkin(skin);
     bodyPanel.setSkin(skin);
     footerPanel.setSkin(skin);
+}
+
+void MainComponent::setScalingFactor(float scalingFactor)
+{
+    if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+        return;
+    
+    scalingFactor_ = scalingFactor;
+    headerPanel.setScalingFactor(scalingFactor_);
+    bodyPanel.setScalingFactor(scalingFactor_);
+    footerPanel.setScalingFactor(scalingFactor_);
+    resized();
+    repaint();
 }
 

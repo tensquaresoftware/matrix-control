@@ -2,23 +2,23 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
+#include "GUI/Looks/WidgetLooks.h"
+
 namespace tss
 {
-    class ISkin;
-
     class Slider : public juce::Slider
     {
     public:
-        explicit Slider(ISkin& skin, int width, int height, double defaultValue = 0.0);
+        explicit Slider(int width, int height, double defaultValue = 0.0);
         ~Slider() override = default;
 
-        void setSkin(ISkin& skin);
-
+        void setLook(const SliderLook& look);
+        void setScalingFactor(float scalingFactor);
+        
         void setUnit(const juce::String& unit);
         juce::String getUnit() const;
 
         void paint(juce::Graphics& g) override;
-        void resized() override;
 
         void mouseDown(const juce::MouseEvent& e) override;
         void mouseDrag(const juce::MouseEvent& e) override;
@@ -32,38 +32,27 @@ namespace tss
 
         int getWidth() const { return width_; }
         int getHeight() const { return height_; }
+        
+        static int getBaseWidth() { return kDefaultWidth_; }
+        static int getBaseHeight() { return kDefaultHeight_; }
 
     private:
+        inline constexpr static int kDefaultWidth_ = 50;
+        inline constexpr static int kDefaultHeight_ = 70;
         inline constexpr static int kTrackHeight_ = 16;
+        inline constexpr static float kFontSize_ = 14.0f;
         inline constexpr static double kDragSensitivity_ = 0.5;
         inline constexpr static double kShiftKeyStep_ = 10.0;
 
-        ISkin* skin_ = nullptr;
-        
+        SliderLook look_{};
         int width_;
         int height_;
+        float scalingFactor_ = 1.0f;
         double defaultValue_ = 0.0;
         double dragStartValue_ = 0.0;
         juce::Point<int> dragStartPosition_;
         juce::String unit_;
         bool hasFocus_ = false;
-        
-        // Image cache
-        juce::Image cachedImage_;
-        bool cacheValid_ = false;
-        double cachedValue_ = 0.0;
-
-        // Skin cache
-        juce::Colour cachedTrackColour_;
-        juce::Colour cachedValueBarColour_;
-        juce::Colour cachedTextColour_;
-        juce::Colour cachedFocusBorderColour_;
-        juce::Font cachedFont_;
-
-        void regenerateCache();
-        void invalidateCache();
-        void updateSkinCache();
-        float getPixelScale() const;
 
         void drawTrack(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);
         void drawValueBar(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);
@@ -82,4 +71,3 @@ namespace tss
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Slider)
     };
 }
-

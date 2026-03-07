@@ -72,6 +72,16 @@ void FooterPanel::setSkin(tss::ISkin& skin)
     skin_ = &skin;
 }
 
+void FooterPanel::setScalingFactor(float scalingFactor)
+{
+    if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+        return;
+    
+    scalingFactor_ = scalingFactor;
+    resized();
+    repaint();
+}
+
 void FooterPanel::valueTreePropertyChanged(juce::ValueTree& tree,
                                           const juce::Identifier& property)
 {

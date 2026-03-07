@@ -2,23 +2,23 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
+#include "GUI/Looks/WidgetLooks.h"
+
 namespace tss
 {
-    class ISkin;
-
     class NumberBox : public juce::Component
     {
     public:
         using ValueChangedCallback = std::function<void(int)>;
-        
-        explicit NumberBox(ISkin& skin, int width, bool editable, int minValue, int maxValue);
+
+        explicit NumberBox(int width, bool editable, int minValue, int maxValue);
         ~NumberBox() override = default;
 
-        void setSkin(ISkin& skin);
+        void setLook(const NumberBoxLook& look);
 
         void setValue(int newValue);
         int getValue() const { return currentValue_; }
-        
+
         void setOnValueChanged(ValueChangedCallback callback);
 
         void setShowDot(bool show);
@@ -37,7 +37,7 @@ namespace tss
         inline constexpr static float kDotXOffset_ = 3.0f;
         inline constexpr static float kEditorFontSizeIncrease_ = 4.0f;
 
-        ISkin* skin_ = nullptr;
+        NumberBoxLook look_{};
         int currentValue_ = 0;
         int minValue_ = 0;
         int maxValue_ = 99;
@@ -46,30 +46,14 @@ namespace tss
         std::unique_ptr<juce::TextEditor> editor_;
         ValueChangedCallback onValueChanged_;
 
-        // Image cache
-        juce::Image cachedImage_;
-        bool cacheValid_ = false;
-
-        // Skin cache
-        juce::Colour cachedBackgroundColour_;
-        juce::Colour cachedBorderColour_;
-        juce::Colour cachedTextColour_;
-        juce::Colour cachedDotColour_;
-        juce::Font cachedFont_;
-        
-        // Cached text width (expensive GlyphArrangement)
         float cachedTextWidth_ = 0.0f;
         juce::String cachedValueText_;
 
-        void regenerateCache();
-        void invalidateCache();
-        void updateSkinCache();
         void updateTextWidthCache();
-        float getPixelScale() const;
 
         juce::Colour getBorderColour() const;
         juce::Point<float> calculateDotPosition(const juce::Rectangle<float>& bounds, float textWidth) const;
-        
+
         void showEditor();
         void hideEditor();
         void handleEditorReturn();

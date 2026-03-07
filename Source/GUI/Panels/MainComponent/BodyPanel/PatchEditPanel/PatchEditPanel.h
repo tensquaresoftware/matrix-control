@@ -26,6 +26,7 @@ public:
 
     void resized() override;
     void setSkin(tss::ISkin& skin);
+    void setScalingFactor(float scalingFactor);
     
     void sliderValueChanged(juce::Slider* slider) override;
 
@@ -41,6 +42,7 @@ private:
     int middlePanelHeight_;
     int bottomPanelHeight_;
     tss::ISkin* skin_;
+    float scalingFactor_ = 1.0f;
 
     std::unique_ptr<tss::SectionHeader> sectionHeader_;
     std::unique_ptr<TopPanel> topPanel_;

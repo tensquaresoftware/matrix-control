@@ -2,10 +2,10 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
+#include "GUI/Looks/WidgetLooks.h"
+
 namespace tss
 {
-    class ISkin;
-
     class SectionHeader : public juce::Component
     {
     public:
@@ -15,10 +15,10 @@ namespace tss
             Orange
         };
 
-        explicit SectionHeader(ISkin& skin, int width, int height, const juce::String& text = juce::String(), ColourVariant variant = ColourVariant::Blue);
+        explicit SectionHeader(int width, int height, const juce::String& text = juce::String(), ColourVariant variant = ColourVariant::Blue);
         ~SectionHeader() override = default;
 
-        void setSkin(ISkin& skin);
+        void setLook(const SectionHeaderLook& look);
 
         void paint(juce::Graphics& g) override;
         void resized() override;
@@ -32,36 +32,22 @@ namespace tss
         inline constexpr static float kLeftLineWidth_ = 20.0f;
         inline constexpr static float kTextSpacing_ = 8.0f;
 
+        SectionHeaderLook look_{};
         int width_;
         int height_;
-        ISkin* skin_ = nullptr;
         juce::String text_;
         ColourVariant colourVariant_;
-
-        // Image cache
-        juce::Image cachedImage_;
-        bool cacheValid_ = false;
-
-        // Skin cache
-        juce::Colour cachedTextColour_;
-        juce::Colour cachedLineColour_;
-        juce::Font cachedFont_;
         float cachedTextWidth_ = 0.0f;
 
-        void regenerateCache();
-        void invalidateCache();
-        void updateSkinCache();
-        float getPixelScale() const;
+        void calculateTextWidth();
 
         void drawText(juce::Graphics& g, const juce::Rectangle<float>& contentArea);
         void drawLines(juce::Graphics& g, const juce::Rectangle<float>& contentArea);
         void drawLeftLine(juce::Graphics& g, const juce::Rectangle<float>& contentArea);
         void drawRightLine(juce::Graphics& g, const juce::Rectangle<float>& contentArea);
-        
+
         juce::Colour getLineColour() const;
-        void calculateTextWidth();
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SectionHeader)
     };
 }
-

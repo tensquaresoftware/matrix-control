@@ -34,7 +34,9 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     {
         component->setBounds(0, 0, getWidth(), getHeight());
     }
-    
+
+    updateSkin();
+
     auto& headerPanel = mainComponent->getHeaderPanel();
     
     const int savedScaleId = pluginProcessor.getApvts().state.getProperty(
@@ -91,16 +93,16 @@ void PluginEditor::updateSkin()
 
 void PluginEditor::applyGuiScale(float scaleFactor)
 {
-    const int baseWidth = getWidth();
-    const int baseHeight = getHeight();
+    const int baseWidth = PluginDimensions::GUI::kWidth;
+    const int baseHeight = PluginDimensions::GUI::kHeight;
     
     setSize(juce::roundToInt(static_cast<float>(baseWidth) * scaleFactor), 
             juce::roundToInt(static_cast<float>(baseHeight) * scaleFactor));
     
     if (auto* component = mainComponent.get())
     {
-        component->setBounds(0, 0, baseWidth, baseHeight);
-        component->setTransform(juce::AffineTransform::scale(scaleFactor));
+        component->setScalingFactor(scaleFactor);
+        component->setBounds(0, 0, getWidth(), getHeight());
         component->repaint();
     }
 }

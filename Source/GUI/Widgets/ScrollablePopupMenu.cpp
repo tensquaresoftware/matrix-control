@@ -2,46 +2,116 @@
 #include "ComboBox.h"
 #include "PopupMenuPositioner.h"
 
-#include "GUI/Skins/Skin.h"
+#include "GUI/Skins/ColourChart.h"
 
 namespace tss
 {
-    class ScrollablePopupMenu::ScrollableViewportLookAndFeel : public juce::LookAndFeel_V4
+    class ScrollablePopupMenu::CustomScrollBar : public juce::Component, private juce::Timer
     {
     public:
-        explicit ScrollableViewportLookAndFeel(const juce::Colour& scrollbarColour)
-            : scrollbarColour_(scrollbarColour)
+        CustomScrollBar(juce::Viewport& viewport, const juce::Colour& scrollbarColour, float thumbInset)
+            : viewport_(viewport)
+            , scrollbarColour_(scrollbarColour)
+            , thumbInset_(thumbInset)
         {
+            setRepaintsOnMouseActivity(true);
+            startTimerHz(kScrollbarRepaintHz_);
         }
 
-        void drawScrollbar(juce::Graphics& g, juce::ScrollBar& /*scrollbar*/, int x, int y, int width, int height,
-                          bool isScrollbarVertical, int thumbStartPosition, int thumbSize,
-                          bool isMouseOver, bool isMouseDown) override
+        void paint(juce::Graphics& g) override
         {
-            g.fillAll(juce::Colours::transparentBlack);
-            
-            juce::Rectangle<int> thumbBounds;
-            if (isScrollbarVertical)
-            {
-                thumbBounds = juce::Rectangle<int>(x, thumbStartPosition, width, thumbSize);
-            }
-            else
-            {
-                thumbBounds = juce::Rectangle<int>(thumbStartPosition, y, thumbSize, height);
-            }
-            
-            auto brighterColour = scrollbarColour_;
-            if (isMouseOver || isMouseDown)
-            {
-                brighterColour = scrollbarColour_.brighter(0.2f);
-            }
-            
-            g.setColour(brighterColour);
-            g.fillRect(thumbBounds.reduced(2));
+            g.fillAll(juce::Colour(ColourChart::kTransparent));
+            const auto* content = viewport_.getViewedComponent();
+            if (content == nullptr)
+                return;
+
+            const int trackHeight = getHeight();
+            const int trackWidth = getWidth();
+            const int contentHeight = content->getHeight();
+            const int viewportHeight = viewport_.getViewHeight();
+            if (contentHeight <= viewportHeight || trackHeight <= 0)
+                return;
+
+            const int viewY = viewport_.getViewPositionY();
+            const int thumbHeight = juce::jmax(kMinThumbHeightPx_, juce::roundToInt(static_cast<float>(trackHeight) * static_cast<float>(viewportHeight) / static_cast<float>(contentHeight)));
+            const int range = contentHeight - viewportHeight;
+            const int thumbY = (range > 0) ? juce::roundToInt(static_cast<float>(viewY) * static_cast<float>(trackHeight - thumbHeight) / static_cast<float>(range)) : 0;
+
+            juce::Rectangle<float> thumbBounds(0.0f, static_cast<float>(thumbY), static_cast<float>(trackWidth), static_cast<float>(thumbHeight));
+            const auto colour = (isMouseOver() || isMouseButtonDown()) ? scrollbarColour_.brighter(kThumbHighlightBrighter_) : scrollbarColour_;
+            g.setColour(colour);
+            g.fillRect(thumbBounds.reduced(thumbInset_));
+        }
+
+        void mouseDown(const juce::MouseEvent& e) override
+        {
+            if (! isEnabled())
+                return;
+            scrollToMousePosition(e.getPosition().y);
+        }
+
+        void mouseDrag(const juce::MouseEvent& e) override
+        {
+            if (! isEnabled())
+                return;
+            scrollToMousePosition(e.getPosition().y);
+        }
+
+        void mouseWheelMove(const juce::MouseEvent&, const juce::MouseWheelDetails& wheel) override
+        {
+            if (! isEnabled())
+                return;
+            const int delta = juce::roundToInt(-wheel.deltaY * static_cast<float>(viewport_.getViewHeight()) * kWheelScrollFactorScrollbar_);
+            if (delta == 0)
+                return;
+            const auto* content = viewport_.getViewedComponent();
+            if (content == nullptr)
+                return;
+            const int contentHeight = content->getHeight();
+            const int viewportHeight = viewport_.getViewHeight();
+            if (contentHeight <= viewportHeight)
+                return;
+            const int range = contentHeight - viewportHeight;
+            const int newY = juce::jlimit(0, range, viewport_.getViewPositionY() + delta);
+            viewport_.setViewPosition(0, newY);
         }
 
     private:
+        void timerCallback() override
+        {
+            repaint();
+        }
+
+        void scrollToMousePosition(int mouseY)
+        {
+            const auto* content = viewport_.getViewedComponent();
+            if (content == nullptr)
+                return;
+
+            const int trackHeight = getHeight();
+            const int contentHeight = content->getHeight();
+            const int viewportHeight = viewport_.getViewHeight();
+            if (contentHeight <= viewportHeight || trackHeight <= 0)
+                return;
+
+            const int thumbHeight = juce::jmax(kMinThumbHeightPx_, juce::roundToInt(static_cast<float>(trackHeight) * static_cast<float>(viewportHeight) / static_cast<float>(contentHeight)));
+            const int range = contentHeight - viewportHeight;
+            const int thumbRange = trackHeight - thumbHeight;
+            if (thumbRange <= 0)
+                return;
+
+            const int viewY = juce::jlimit(0, range, juce::roundToInt(static_cast<float>(mouseY - thumbHeight / 2) * static_cast<float>(range) / static_cast<float>(thumbRange)));
+            viewport_.setViewPosition(0, viewY);
+        }
+
+        inline constexpr static int kScrollbarRepaintHz_ = 20;
+        inline constexpr static int kMinThumbHeightPx_ = 20;
+        inline constexpr static float kThumbHighlightBrighter_ = 0.2f;
+        inline constexpr static float kWheelScrollFactorScrollbar_ = 0.5f;
+
+        juce::Viewport& viewport_;
         juce::Colour scrollbarColour_;
+        float thumbInset_;
     };
 
     class ScrollablePopupMenu::ScrollableContentComponent : public juce::Component
@@ -77,6 +147,15 @@ namespace tss
             }
         }
 
+        void mouseWheelMove(const juce::MouseEvent&, const juce::MouseWheelDetails& wheel) override
+        {
+            const int delta = juce::roundToInt(-wheel.deltaY * ScrollablePopupMenu::kWheelScrollFactorContent_);
+            if (delta != 0)
+            {
+                popupMenu_.scrollViewportBy(delta);
+            }
+        }
+
     private:
         ScrollablePopupMenu& popupMenu_;
     };
@@ -85,9 +164,12 @@ namespace tss
         : PopupMenuBase(comboBox, true)
     {
         const auto numItems = comboBox_.getNumItems();
-        columnWidth_ = comboBox_.getBounds().getWidth();
-        scrollableContentHeight_ = numItems * kItemHeight_;
-        
+        columnWidth_ = static_cast<float>(comboBox_.getBaseComponentWidth()) * scalingFactor_;
+        scrollableContentHeight_ = juce::roundToInt(static_cast<float>(numItems * kItemHeight_) * scalingFactor_);
+
+        const float maxScrollableHeight = static_cast<float>(kMaxScrollableHeight_) * scalingFactor_;
+        scrollbarNeeded_ = (scrollableContentHeight_ > static_cast<int>(maxScrollableHeight));
+
         setupScrollableContent();
         
         const auto selectedIndex = comboBox_.getSelectedItemIndex();
@@ -102,88 +184,87 @@ namespace tss
         
         if (viewport_ != nullptr && highlightedItemIndex_ >= 0)
         {
-            const auto itemY = highlightedItemIndex_ * kItemHeight_;
+            const auto itemY = juce::roundToInt(static_cast<float>(highlightedItemIndex_ * kItemHeight_) * scalingFactor_);
             viewport_->setViewPosition(0, itemY);
         }
     }
 
-    ScrollablePopupMenu::~ScrollablePopupMenu()
-    {
-        if (viewport_ != nullptr)
-        {
-            viewport_->setLookAndFeel(nullptr);
-        }
-    }
+    ScrollablePopupMenu::~ScrollablePopupMenu() = default;
 
     void ScrollablePopupMenu::paint(juce::Graphics& g)
     {
-        if (skin_ == nullptr)
-        {
-            return;
-        }
-
-        g.fillAll(skin_->getPopupMenuBackgroundColour(isButtonLike_));
-        
-        const auto bounds = getLocalBounds();
-        const auto borderThickness = static_cast<int>(kBorderThickness_);
-        
-        renderer_.drawBackground(g, bounds.reduced(borderThickness));
+        const auto bounds = getLocalBounds().toFloat();
+        renderer_.drawBackground(g, bounds);
         renderer_.drawBorder(g, bounds);
     }
 
     void ScrollablePopupMenu::resized()
     {
-        if (viewport_ != nullptr)
+        const int insetPx = juce::jmax(1, juce::roundToInt(kBorderThickness_ * scalingFactor_));
+        auto inner = getLocalBounds().reduced(insetPx);
+        if (viewport_ == nullptr)
+            return;
+
+        if (scrollbarNeeded_ && customScrollBar_ != nullptr)
         {
-            const auto borderThickness = static_cast<int>(kBorderThickness_);
-            const auto contentBounds = getLocalBounds().reduced(borderThickness);
-            viewport_->setBounds(contentBounds);
+            const int scrollbarThicknessPx = juce::jmax(1, juce::roundToInt(kScrollbarWidth_ * scalingFactor_));
+            viewport_->setBounds(inner.removeFromLeft(inner.getWidth() - scrollbarThicknessPx));
+            customScrollBar_->setBounds(inner);
+        }
+        else
+        {
+            viewport_->setBounds(inner);
         }
     }
 
     void ScrollablePopupMenu::setupScrollableContent()
     {
         contentComponent_ = std::make_unique<ScrollableContentComponent>(*this);
-        contentComponent_->setSize(columnWidth_, scrollableContentHeight_);
-        
+        contentComponent_->setSize(juce::roundToInt(columnWidth_), scrollableContentHeight_);
+
         viewport_ = std::make_unique<juce::Viewport>();
         viewport_->setViewedComponent(contentComponent_.get(), false);
-        viewport_->setScrollBarsShown(true, false);
-        viewport_->setScrollBarThickness(8);
-        
-        if (auto* currentSkin = skin_)
-        {
-            const auto scrollbarColour = currentSkin->getPopupMenuScrollbarColour(isButtonLike_);
-            scrollbarLookAndFeel_ = std::make_unique<ScrollableViewportLookAndFeel>(scrollbarColour);
-            viewport_->setLookAndFeel(scrollbarLookAndFeel_.get());
-        }
-        
+        viewport_->setScrollBarsShown(false, false);
+
         addAndMakeVisible(*viewport_);
+
+        if (scrollbarNeeded_)
+        {
+            const auto& popupLook = comboBox_.getPopupMenuLook();
+            const juce::Colour scrollbarColour = isButtonLike_
+                ? popupLook.scrollbarButtonLike
+                : popupLook.scrollbar;
+            const float thumbInset = std::max(1.0f, kThumbInsetBase_ * scalingFactor_);
+            customScrollBar_ = std::make_unique<CustomScrollBar>(*viewport_, scrollbarColour, thumbInset);
+            addAndMakeVisible(*customScrollBar_);
+        }
     }
 
-    juce::Rectangle<int> ScrollablePopupMenu::getItemBounds(int itemIndex) const
+    juce::Rectangle<float> ScrollablePopupMenu::getItemBounds(int itemIndex) const
     {
         if (! isValidItemIndex(itemIndex))
         {
-            return juce::Rectangle<int>();
+            return juce::Rectangle<float>();
         }
         
         if (contentComponent_ != nullptr)
         {
-            const auto y = itemIndex * kItemHeight_;
-            return juce::Rectangle<int>(0, y, contentComponent_->getWidth(), kItemHeight_);
+            const float itemHeight = static_cast<float>(kItemHeight_) * scalingFactor_;
+            const float y = static_cast<float>(itemIndex) * itemHeight;
+            return juce::Rectangle<float>(0.0f, y, columnWidth_, itemHeight);
         }
         
-        return juce::Rectangle<int>();
+        return juce::Rectangle<float>();
     }
 
     int ScrollablePopupMenu::getItemIndexAt(int x, int y) const
     {
         if (contentComponent_ != nullptr)
         {
-            if (contentComponent_->getBounds().contains(x, y))
+            if (contentComponent_->getLocalBounds().contains(x, y))
             {
-                const auto row = y / kItemHeight_;
+                const float itemHeight = static_cast<float>(kItemHeight_) * scalingFactor_;
+                const int row = static_cast<int>(static_cast<float>(y) / itemHeight);
                 if (row >= 0 && row < comboBox_.getNumItems())
                 {
                     return row;
@@ -220,6 +301,22 @@ namespace tss
         }
     }
 
+    void ScrollablePopupMenu::scrollViewportBy(int deltaPixels)
+    {
+        if (viewport_ == nullptr)
+            return;
+        const auto* content = viewport_->getViewedComponent();
+        if (content == nullptr)
+            return;
+        const int contentHeight = content->getHeight();
+        const int viewportHeight = viewport_->getViewHeight();
+        if (contentHeight <= viewportHeight)
+            return;
+        const int range = contentHeight - viewportHeight;
+        const int newY = juce::jlimit(0, range, viewport_->getViewPositionY() + deltaPixels);
+        viewport_->setViewPosition(0, newY);
+    }
+
     void ScrollablePopupMenu::scrollToHighlightedItem()
     {
         if (viewport_ == nullptr || contentComponent_ == nullptr || highlightedItemIndex_ < 0)
@@ -227,14 +324,16 @@ namespace tss
             return;
         }
 
-        const auto itemY = highlightedItemIndex_ * kItemHeight_;
+        const float itemHeight = static_cast<float>(kItemHeight_) * scalingFactor_;
+        const float itemY = static_cast<float>(highlightedItemIndex_) * itemHeight;
         const auto viewportY = viewport_->getViewPositionY();
         const auto viewportHeight = viewport_->getHeight();
 
-        const auto isItemVisible = (itemY >= viewportY && itemY + kItemHeight_ <= viewportY + viewportHeight);
+        const bool isItemVisible = (itemY >= static_cast<float>(viewportY)
+            && itemY + itemHeight <= static_cast<float>(viewportY + viewportHeight));
         if (! isItemVisible)
         {
-            const auto centeredY = juce::jmax(0, itemY - viewportHeight / 2);
+            const auto centeredY = juce::jmax(0, juce::roundToInt(itemY - static_cast<float>(viewportHeight) * 0.5f));
             viewport_->setViewPosition(0, centeredY);
         }
     }
@@ -289,12 +388,27 @@ namespace tss
         auto popupMenu = std::make_unique<ScrollablePopupMenu>(comboBox);
         auto* rawPtr = popupMenu.get();
 
-        const auto contentWidth = rawPtr->columnWidth_;
-        const auto contentHeight = juce::jmin(rawPtr->scrollableContentHeight_, kMaxScrollableHeight_);
-        const auto borderThickness = static_cast<int>(kBorderThickness_ * 2.0f);
+        const int insetPx = juce::jmax(1, juce::roundToInt(kBorderThickness_ * rawPtr->scalingFactor_));
+        const int scrollbarThicknessPx = juce::jmax(1, juce::roundToInt(kScrollbarWidth_ * rawPtr->scalingFactor_));
+
+        const float maxScrollableHeight = static_cast<float>(kMaxScrollableHeight_) * rawPtr->scalingFactor_;
+        const int viewportHeightPx = (rawPtr->scrollableContentHeight_ <= static_cast<int>(maxScrollableHeight))
+            ? rawPtr->scrollableContentHeight_
+            : juce::roundToInt(maxScrollableHeight);
+
+        const int rightMarginPx = rawPtr->scrollbarNeeded_
+            ? juce::jmax(
+                juce::roundToInt(kRightMarginFromHighlightToEdge_ * rawPtr->scalingFactor_),
+                scrollbarThicknessPx)
+            : 0;
+        const int popupWidth = juce::roundToInt(rawPtr->columnWidth_) + rightMarginPx + 2 * insetPx;
+        const int popupHeight = viewportHeightPx + 2 * insetPx;
 
         const auto dimensions = PopupMenuPositioner::calculateDimensions(
-            comboBox, contentWidth, contentHeight, borderThickness);
+            comboBox,
+            popupWidth,
+            popupHeight,
+            0);
 
         topLevelComponent->addAndMakeVisible(popupMenu.release());
 

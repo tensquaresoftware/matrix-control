@@ -25,13 +25,15 @@ namespace tss
 
         int columnCount_ = 1;
         int itemsPerColumn_ = 0;
-        int columnWidth_ = 0;
+        float columnWidth_ = 0.0f;
 
         void calculateLayout();
         int calculateColumnCount(int totalItems) const;
         int calculateItemsPerColumn(int totalItems, int columnCount) const;
-        
-        juce::Rectangle<int> getItemBounds(int itemIndex) const;
+        float getSeparatorWidth() const { return 1.0f * scalingFactor_; }
+        float getActualColumnWidth(float contentWidth) const;
+
+        juce::Rectangle<float> getItemBounds(int itemIndex) const;
         int getItemIndexAt(int x, int y) const;
         int getColumnFromX(int x) const;
         int getRowFromY(int y) const;

@@ -81,6 +81,9 @@ set(PLUGIN_SOURCES
     # GUI - Skins
     Source/GUI/Skins/Skin.cpp
     
+    # GUI - Looks
+    Source/GUI/Looks/LookBuilders.cpp
+    
     # GUI - Main Component
     Source/GUI/MainComponent.cpp
     

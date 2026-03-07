@@ -8,6 +8,7 @@
 #include "BottomPanel/Modules/Env2Panel.h"
 #include "BottomPanel/Modules/Env3Panel.h"
 
+#include "GUI/Looks/LookBuilders.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Widgets/SectionHeader.h"
@@ -46,7 +47,6 @@ PatchEditPanel::PatchEditPanel(tss::ISkin& skin, int width, int height, WidgetFa
     , bottomPanelHeight_(PluginDimensions::Panels::Body::PatchEditSection::BottomModules::kHeight)
     , skin_(&skin)
     , sectionHeader_(std::make_unique<tss::SectionHeader>(
-        skin,
         PluginDimensions::Widgets::Widths::SectionHeader::kPatchEdit,
         PluginDimensions::Widgets::Heights::kSectionHeader,
         PluginHelpers::getSectionDisplayName(PluginIDs::PatchEditSection::kGroupId)))
@@ -107,11 +107,21 @@ void PatchEditPanel::resized()
 void PatchEditPanel::setSkin(tss::ISkin& skin)
 {
     skin_ = &skin;
+    sectionHeader_->setLook(tss::sectionHeaderLookFromSkin(skin));
     tss::propagateSkin(skin,
-        sectionHeader_.get(),
         topPanel_.get(),
         middlePanel_.get(),
         bottomPanel_.get());
+}
+
+void PatchEditPanel::setScalingFactor(float scalingFactor)
+{
+    if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+        return;
+    
+    scalingFactor_ = scalingFactor;
+    resized();
+    repaint();
 }
 
 void PatchEditPanel::setupTrackPointSliderConnections()

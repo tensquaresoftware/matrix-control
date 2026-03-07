@@ -2,6 +2,7 @@
 
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
+#include "GUI/Looks/LookBuilders.h"
 #include "GUI/Widgets/ModuleHeader.h"
 #include "GUI/Widgets/GroupLabel.h"
 #include "GUI/Widgets/Button.h"
@@ -75,22 +76,61 @@ void ComputerPatchesPanel::resized()
     x += saveAsButtonWidth + kSpacing_;
 
     layoutSavePatchFileButton(x, y);
+    
+    if (loadPreviousPatchFileButton_)
+        loadPreviousPatchFileButton_->setScalingFactor(scalingFactor_);
+    if (loadNextPatchFileButton_)
+        loadNextPatchFileButton_->setScalingFactor(scalingFactor_);
+    if (selectPatchFileComboBox_)
+        selectPatchFileComboBox_->setScalingFactor(scalingFactor_);
+    if (openPatchFolderButton_)
+        openPatchFolderButton_->setScalingFactor(scalingFactor_);
+    if (savePatchFileAsButton_)
+        savePatchFileAsButton_->setScalingFactor(scalingFactor_);
+    if (savePatchFileButton_)
+        savePatchFileButton_->setScalingFactor(scalingFactor_);
 }
 
 void ComputerPatchesPanel::setSkin(tss::ISkin& skin)
 {
     skin_ = &skin;
-    tss::propagateSkin(skin,
-        moduleHeader_.get(),
-        browserGroupLabel.get(),
-        storageGroupLabel.get(),
-        selectPatchFileComboBox_.get());
+    if (moduleHeader_)
+        moduleHeader_->setLook(tss::moduleHeaderLookFromSkin(skin));
+    if (browserGroupLabel)
+        browserGroupLabel->setLook(tss::groupLabelLookFromSkin(skin));
+    if (storageGroupLabel)
+        storageGroupLabel->setLook(tss::groupLabelLookFromSkin(skin));
+
+    if (selectPatchFileComboBox_)
+    {
+        selectPatchFileComboBox_->setLook(tss::comboBoxLookFromSkin(skin));
+        selectPatchFileComboBox_->setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
+    }
+    if (loadPreviousPatchFileButton_)
+        loadPreviousPatchFileButton_->setLook(tss::buttonLookFromSkin(skin));
+    if (loadNextPatchFileButton_)
+        loadNextPatchFileButton_->setLook(tss::buttonLookFromSkin(skin));
+    if (openPatchFolderButton_)
+        openPatchFolderButton_->setLook(tss::buttonLookFromSkin(skin));
+    if (savePatchFileAsButton_)
+        savePatchFileAsButton_->setLook(tss::buttonLookFromSkin(skin));
+    if (savePatchFileButton_)
+        savePatchFileButton_->setLook(tss::buttonLookFromSkin(skin));
 }
 
-void ComputerPatchesPanel::setupModuleHeader(tss::ISkin& skin, WidgetFactory& widgetFactory, const juce::String& moduleId)
+void ComputerPatchesPanel::setScalingFactor(float scalingFactor)
+{
+    if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+        return;
+    
+    scalingFactor_ = scalingFactor;
+    resized();
+    repaint();
+}
+
+void ComputerPatchesPanel::setupModuleHeader(tss::ISkin&, WidgetFactory& widgetFactory, const juce::String& moduleId)
 {
     moduleHeader_ = std::make_unique<tss::ModuleHeader>(
-        skin, 
         widgetFactory.getGroupDisplayName(moduleId),
         PluginDimensions::Widgets::Widths::ModuleHeader::kPatchManagerModule,
         PluginDimensions::Widgets::Heights::kModuleHeader,
@@ -98,10 +138,9 @@ void ComputerPatchesPanel::setupModuleHeader(tss::ISkin& skin, WidgetFactory& wi
     addAndMakeVisible(*moduleHeader_);
 }
 
-void ComputerPatchesPanel::setupBrowserGroupLabel(tss::ISkin& skin)
+void ComputerPatchesPanel::setupBrowserGroupLabel(tss::ISkin&)
 {
     browserGroupLabel = std::make_unique<tss::GroupLabel>(
-        skin,
         PluginDimensions::Widgets::Widths::GroupLabel::kComputerPatchesBrowser,
         PluginDimensions::Widgets::Heights::kGroupLabel,
         PluginDisplayNames::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kBrowser);
@@ -141,11 +180,12 @@ void ComputerPatchesPanel::setupLoadNextPatchFileButton(tss::ISkin& skin, Widget
 void ComputerPatchesPanel::setupSelectPatchFileComboBox(tss::ISkin& skin)
 {
     selectPatchFileComboBox_ = std::make_unique<tss::ComboBox>(
-        skin,
         PluginDimensions::Widgets::Widths::ComboBox::kPatchManagerComputerPatches,
         PluginDimensions::Widgets::Heights::kButton,
         tss::ComboBox::Style::ButtonLike);
-    
+    selectPatchFileComboBox_->setLook(tss::comboBoxLookFromSkin(skin));
+    selectPatchFileComboBox_->setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
+
     const juce::StringArray patchNames = {
         "TOTOHORN", "1000STRG", "MOOOG_B", "EZYBRASS", "SYNTH",
         "MIBES", "CHUNK", "MINDSEAR", "CASTILLO", "DESTROY+",
@@ -178,10 +218,9 @@ void ComputerPatchesPanel::setupSelectPatchFileComboBox(tss::ISkin& skin)
     addAndMakeVisible(*selectPatchFileComboBox_);
 }
 
-void ComputerPatchesPanel::setupStorageGroupLabel(tss::ISkin& skin)
+void ComputerPatchesPanel::setupStorageGroupLabel(tss::ISkin&)
 {
     storageGroupLabel = std::make_unique<tss::GroupLabel>(
-        skin,
         PluginDimensions::Widgets::Widths::GroupLabel::kComputerPatchesStorage,
         PluginDimensions::Widgets::Heights::kGroupLabel,
         PluginDisplayNames::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kStorage);

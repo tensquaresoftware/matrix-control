@@ -1,51 +1,38 @@
 #pragma once
 
-#include <map>
-
 #include <juce_gui_basics/juce_gui_basics.h>
+
+#include "GUI/Looks/WidgetLooks.h"
 
 namespace tss
 {
-    class ISkin;
-
     class Button : public juce::Button
     {
     public:
-        explicit Button(ISkin& skin, int width, int height, const juce::String& text = {});
+        explicit Button(int width, int height, const juce::String& text = {});
         ~Button() override = default;
 
-        void setSkin(ISkin& skin);
+        void setLook(const ButtonLook& look);
+        void setScalingFactor(float scalingFactor);
         
         void paintButton(juce::Graphics& g, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override;
-        void resized() override;
 
         int getWidth() const { return width_; }
         int getHeight() const { return height_; }
+        
+        static int getBaseWidth() { return kDefaultWidth_; }
+        static int getBaseHeight() { return kDefaultHeight_; }
 
     private:
-        enum class ButtonState
-        {
-            Normal,
-            Hover,
-            Pressed,
-            Disabled
-        };
-
+        inline constexpr static int kDefaultWidth_ = 50;
+        inline constexpr static int kDefaultHeight_ = 20;
         inline constexpr static int kBorderThickness_ = 2;
+        inline constexpr static float kFontSize_ = 14.0f;
 
-        ISkin* skin_ = nullptr;
+        ButtonLook look_{};
         int width_;
         int height_;
-
-        std::map<ButtonState, juce::Image> cachedImages_;
-        bool cacheValid_ = false;
-
-        void regenerateCache();
-        void invalidateCache();
-        float getPixelScale() const;
-        
-        ButtonState getCurrentState(bool enabled, bool isHighlighted, bool isDown) const;
-        void renderButtonState(juce::Graphics& g, ButtonState state);
+        float scalingFactor_ = 1.0f;
 
         juce::Colour getBackgroundColour(bool enabled, bool isHighlighted, bool isDown) const;
         juce::Colour getBorderColour(bool enabled) const;
@@ -54,4 +41,3 @@ namespace tss
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Button)
     };
 }
-

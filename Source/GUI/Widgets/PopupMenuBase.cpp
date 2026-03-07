@@ -1,6 +1,7 @@
 #include "PopupMenuBase.h"
 #include "ComboBox.h"
 
+#include "GUI/Looks/LookBuilders.h"
 #include "GUI/Skins/ISkin.h"
 
 namespace tss
@@ -8,18 +9,15 @@ namespace tss
     PopupMenuBase::PopupMenuBase(ComboBox& comboBox, bool isButtonLike)
         : comboBox_(comboBox)
         , isButtonLike_(isButtonLike)
-        , renderer_(*comboBox.skin_, isButtonLike)
+        , scalingFactor_(comboBox.getScalingFactor())
+        , cachedFont_(juce::FontOptions("PT Sans Narrow", kFontSize_ * scalingFactor_, juce::Font::plain))
+        , renderer_(isButtonLike, scalingFactor_)
     {
+        renderer_.setLook(comboBox_.getPopupMenuLook());
         setWantsKeyboardFocus(true);
         setAlwaysOnTop(true);
         setInterceptsMouseClicks(true, true);
         setOpaque(true);
-        
-        skin_ = comboBox_.skin_;
-        if (auto* currentSkin = skin_)
-        {
-            cachedFont_ = currentSkin->getBaseFont();
-        }
     }
 
     PopupMenuBase::~PopupMenuBase() = default;

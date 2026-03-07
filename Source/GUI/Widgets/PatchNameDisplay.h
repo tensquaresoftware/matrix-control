@@ -2,17 +2,17 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
+#include "GUI/Looks/WidgetLooks.h"
+
 namespace tss
 {
-    class ISkin;
-
     class PatchNameDisplay : public juce::Component
     {
     public:
-        explicit PatchNameDisplay(ISkin& skin, int width, int height);
+        explicit PatchNameDisplay(int width, int height);
         ~PatchNameDisplay() override = default;
 
-        void setSkin(ISkin& skin);
+        void setLook(const PatchNameDisplayLook& look);
         void setPatchName(const juce::String& patchName);
 
         void paint(juce::Graphics& g) override;
@@ -24,7 +24,7 @@ namespace tss
         inline constexpr static int kBorderThickness_ = 2;
         inline constexpr static float kFontHeight_ = 28.0f;
 
-        ISkin* skin_ = nullptr;
+        PatchNameDisplayLook look_{};
         int width_;
         int height_;
         juce::String patchName_;

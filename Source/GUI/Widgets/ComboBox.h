@@ -2,16 +2,13 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
-namespace tss
-{
-    class ISkin;
-    class PopupMenuBase;
-    class MultiColumnPopupMenu;
-    class ScrollablePopupMenu;
-}
+#include "GUI/Looks/WidgetLooks.h"
 
 namespace tss
 {
+    class PopupMenuBase;
+    class MultiColumnPopupMenu;
+    class ScrollablePopupMenu;
 
     class ComboBox : public juce::ComboBox
     {
@@ -22,13 +19,14 @@ namespace tss
             ButtonLike
         };
 
-        explicit ComboBox(ISkin& skin, int width, int height, Style style = Style::Standard);
+        explicit ComboBox(int width, int height, Style style = Style::Standard);
         ~ComboBox() override = default;
 
-        void setSkin(ISkin& skin);
-
+        void setLook(const ComboBoxLook& look);
+        void setPopupMenuLook(const PopupMenuLook& look);
+        void setScalingFactor(float scalingFactor);
+        
         void paint(juce::Graphics& g) override;
-        void resized() override;
         void showPopup() override;
 
         void mouseDown(const juce::MouseEvent& e) override;
@@ -36,11 +34,18 @@ namespace tss
         void focusGained(juce::Component::FocusChangeType cause) override;
         void focusLost(juce::Component::FocusChangeType cause) override;
 
-        int getWidth() const { return width_; }
-        int getHeight() const { return height_; }
+        float getScalingFactor() const { return scalingFactor_; }
+        const PopupMenuLook& getPopupMenuLook() const { return popupLook_; }
+        int getBaseComponentWidth() const { return width_; }
+        int getBaseComponentHeight() const { return height_; }
+        
+        static int getBaseWidth() { return kDefaultWidth_; }
+        static int getBaseHeight() { return kDefaultHeight_; }
         static constexpr int getVerticalMargin() { return kVerticalMargin_; }
 
     private:
+        inline constexpr static int kDefaultWidth_ = 100;
+        inline constexpr static int kDefaultHeight_ = 20;
         inline constexpr static int kVerticalMargin_ = 4;
         inline constexpr static int kBackgroundHeight_ = 16;
         inline constexpr static int kLeftPadding_ = 4;
@@ -49,30 +54,16 @@ namespace tss
         inline constexpr static int kBorderThicknessButtonLike_ = 2;
         inline constexpr static int kTriangleBaseSize_ = 7;
         inline constexpr static float kTriangleHeightFactor_ = 0.8660254f;
+        inline constexpr static float kFontSize_ = 14.0f;
 
-        ISkin* skin_ = nullptr;
+        ComboBoxLook look_{};
+        PopupMenuLook popupLook_{};
         int width_;
         int height_;
         Style style_;
         bool isPopupOpen_ = false;
         bool hasFocus_ = false;
-        
-        // Image cache
-        juce::Image cachedImage_;
-        bool cacheValid_ = false;
-        int cachedSelectedIndex_ = -1;
-
-        // Skin cache
-        juce::Colour cachedBackgroundColour_;
-        juce::Colour cachedTextColour_;
-        juce::Colour cachedBorderColour_;
-        juce::Colour cachedFocusBorderColour_;
-        juce::Font cachedFont_;
-
-        void regenerateCache();
-        void invalidateCache();
-        void updateSkinCache();
-        float getPixelScale() const;
+        float scalingFactor_ = 1.0f;
 
         void drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);
         void drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);
@@ -84,8 +75,11 @@ namespace tss
 
         juce::String getSelectedItemText() const;
         juce::Colour getTextColourForCurrentStyle(bool enabled) const;
+        juce::Colour getTriangleColourForCurrentStyle(bool enabled) const;
+        juce::Colour getBackgroundColourForCurrentStyle(bool enabled) const;
+        juce::Colour getBorderColourForCurrentStyle(bool enabled) const;
+        juce::Colour getFocusBorderColourForCurrentStyle() const;
         juce::Rectangle<float> calculateTextBounds(const juce::Rectangle<float>& bounds) const;
-        void drawTextInBounds(juce::Graphics& g, const juce::String& text, const juce::Rectangle<float>& textBounds, const juce::Colour& textColour) const;
 
         bool canShowPopup() const;
         void showPopupAsynchronously();

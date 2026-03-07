@@ -4,20 +4,20 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
+#include "GUI/Looks/WidgetLooks.h"
+
 namespace tss
 {
-    class ISkin;
-
     class EnvelopeDisplay : public juce::Component
     {
     public:
         using ValueChangedCallback = std::function<void(int paramIndex, int newValue)>;
-        
-        explicit EnvelopeDisplay(ISkin& skin, int width, int height);
+
+        explicit EnvelopeDisplay(int width, int height);
         ~EnvelopeDisplay() override = default;
 
-        void setSkin(ISkin& skin);
-        
+        void setLook(const EnvelopeDisplayLook& look);
+
         void setDelay(int value);
         void setAttack(int value);
         void setDecay(int value);
@@ -65,39 +65,24 @@ namespace tss
         inline constexpr static float kPointHitZoneRadius_ = 10.0f;
         inline constexpr static float kSustainSegmentHitZone_ = 10.0f;
 
-        ISkin* skin_ = nullptr;
+        EnvelopeDisplayLook look_{};
         int width_;
         int height_;
-        
+
         int delay_ {0};
         int attack_ {0};
         int decay_ {10};
         int sustain_ {50};
         int release_ {10};
-        
+
         int draggedPointIndex_ = -1;
         bool draggingSustainSegment_ = false;
-        
-        juce::Image cachedImage_;
-        bool cacheValid_ = false;
-        int cachedDelay_ {-1};
-        int cachedAttack_ {-1};
-        int cachedDecay_ {-1};
-        int cachedSustain_ {-1};
-        int cachedRelease_ {-1};
-        
-        juce::Colour cachedCurveColour_;
-        
+
         ValueChangedCallback onValueChanged_;
 
         void drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawTriangle(juce::Graphics& g, const juce::Rectangle<float>& bounds);
-        
-        void regenerateCache();
-        void invalidateCache();
-        void updateSkinCache();
-        float getPixelScale() const;
         
         juce::Rectangle<float> getCurveCenterBounds(const juce::Rectangle<float>& innerBounds) const;
         void drawEnvelope(juce::Graphics& g, const juce::Rectangle<float>& innerBounds);

@@ -2,6 +2,7 @@
 
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
+#include "GUI/Looks/LookBuilders.h"
 #include "GUI/Widgets/Label.h"
 #include "GUI/Widgets/ComboBox.h"
 #include "GUI/Widgets/Slider.h"
@@ -45,10 +46,10 @@ ModulationBusPanel::ModulationBusPanel(tss::ISkin& skin,
 void ModulationBusPanel::createBusNumberLabel(int busNumber, tss::ISkin& skin)
 {
     busNumberLabel_ = std::make_unique<tss::Label>(
-        skin,
         dimensions_.busNumberLabelWidth,
         dimensions_.busNumberLabelHeight,
         juce::String(busNumber));
+    busNumberLabel_->setLook(tss::labelLookFromSkin(skin));
     addAndMakeVisible(*busNumberLabel_);
 }
 
@@ -86,9 +87,10 @@ void ModulationBusPanel::createDestinationComboBox(int busNumber, tss::ISkin& sk
     const auto& destinationDesc = PluginDescriptors::MatrixModulationSection::kModulationBusChoiceParameters[busNumberAsSizeT][1];
 
     destinationComboBox_ = std::make_unique<tss::ComboBox>(
-        skin,
         dimensions_.destinationComboBoxWidth,
         dimensions_.destinationComboBoxHeight);
+    destinationComboBox_->setLook(tss::comboBoxLookFromSkin(skin));
+    destinationComboBox_->setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
     for (const auto& choice : destinationDesc.choices)
     {
         destinationComboBox_->addItem(choice, destinationComboBox_->getNumItems() + 1);
@@ -104,10 +106,10 @@ void ModulationBusPanel::createDestinationComboBox(int busNumber, tss::ISkin& sk
 void ModulationBusPanel::createInitButton(tss::ISkin& skin, int busNumber)
 {
     initButton_ = std::make_unique<tss::Button>(
-        skin,
         dimensions_.initButtonWidth,
         dimensions_.initButtonHeight,
         PluginDisplayNames::ShortLabels::kInit);
+    initButton_->setLook(tss::buttonLookFromSkin(skin));
     
     juce::String initBusId;
     switch (busNumber)
@@ -135,9 +137,9 @@ void ModulationBusPanel::createInitButton(tss::ISkin& skin, int busNumber)
 void ModulationBusPanel::createSeparator(tss::ISkin& skin)
 {
     separator_ = std::make_unique<tss::HorizontalSeparator>(
-        skin,
         dimensions_.separatorWidth,
         dimensions_.separatorHeight);
+    separator_->setLook(tss::horizontalSeparatorLookFromSkin(skin));
     addAndMakeVisible(*separator_);
 }
 
@@ -149,6 +151,19 @@ void ModulationBusPanel::resized()
     layoutWidgetRow();
     y += widgetRowHeight;
     layoutSeparator(y);
+    
+    if (busNumberLabel_)
+        busNumberLabel_->setScalingFactor(scalingFactor_);
+    if (sourceComboBox_)
+        sourceComboBox_->setScalingFactor(scalingFactor_);
+    if (amountSlider_)
+        amountSlider_->setScalingFactor(scalingFactor_);
+    if (destinationComboBox_)
+        destinationComboBox_->setScalingFactor(scalingFactor_);
+    if (initButton_)
+        initButton_->setScalingFactor(scalingFactor_);
+    if (separator_)
+        separator_->setScalingFactor(scalingFactor_);
 }
 
 void ModulationBusPanel::layoutWidgetRow()
@@ -185,12 +200,33 @@ void ModulationBusPanel::layoutSeparator(int y)
 void ModulationBusPanel::setSkin(tss::ISkin& skin)
 {
     skin_ = &skin;
-    tss::propagateSkin(skin,
-        busNumberLabel_.get(),
-        sourceComboBox_.get(),
-        amountSlider_.get(),
-        destinationComboBox_.get(),
-        initButton_.get(),
-        separator_.get());
+    if (busNumberLabel_)
+        busNumberLabel_->setLook(tss::labelLookFromSkin(skin));
+    if (sourceComboBox_)
+    {
+        sourceComboBox_->setLook(tss::comboBoxLookFromSkin(skin));
+        sourceComboBox_->setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
+    }
+    if (amountSlider_)
+        amountSlider_->setLook(tss::sliderLookFromSkin(skin));
+    if (destinationComboBox_)
+    {
+        destinationComboBox_->setLook(tss::comboBoxLookFromSkin(skin));
+        destinationComboBox_->setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
+    }
+    if (initButton_)
+        initButton_->setLook(tss::buttonLookFromSkin(skin));
+    if (separator_)
+        separator_->setLook(tss::horizontalSeparatorLookFromSkin(skin));
+}
+
+void ModulationBusPanel::setScalingFactor(float scalingFactor)
+{
+    if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+        return;
+    
+    scalingFactor_ = scalingFactor;
+    resized();
+    repaint();
 }
 

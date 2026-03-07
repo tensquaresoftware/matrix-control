@@ -1,37 +1,37 @@
 #include "Slider.h"
 
-
-#include "GUI/Skins/ISkin.h"
-
-using tss::SkinColourId;
-
 namespace tss
 {
-    Slider::Slider(tss::ISkin& skin, int width, int height, double defaultValue)
+    Slider::Slider(int width, int height, double defaultValue)
         : juce::Slider(juce::Slider::LinearBarVertical, juce::Slider::NoTextBox)
-        , skin_(&skin)
         , width_(width)
         , height_(height)
         , defaultValue_(defaultValue)
-        , cachedFont_(juce::FontOptions())
     {
         setOpaque(false);
         setSize(width_, height_);
         setWantsKeyboardFocus(true);
         setInterceptsMouseClicks(true, false);
-        updateSkinCache();
     }
 
-    void Slider::setSkin(tss::ISkin& skin)
+    void Slider::setLook(const SliderLook& look)
     {
-        skin_ = &skin;
-        invalidateCache();
+        look_ = look;
+        repaint();
+    }
+
+    void Slider::setScalingFactor(float scalingFactor)
+    {
+        if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+            return;
+        
+        scalingFactor_ = scalingFactor;
+        repaint();
     }
 
     void Slider::setUnit(const juce::String& unit)
     {
         unit_ = unit;
-        invalidateCache();
         repaint();
     }
 
@@ -42,50 +42,9 @@ namespace tss
 
     void Slider::paint(juce::Graphics& g)
     {
-        if (skin_ == nullptr)
-            return;
-
-        // Invalidate cache if value changed (Slider is dynamic)
-        if (!juce::approximatelyEqual(getValue(), cachedValue_))
-            invalidateCache();
-
-        if (!cacheValid_)
-            regenerateCache();
-
-        if (cachedImage_.isValid())
-        {
-            g.drawImage(cachedImage_, getLocalBounds().toFloat(),
-                       juce::RectanglePlacement::stretchToFit);
-        }
-    }
-
-    void Slider::resized()
-    {
-        invalidateCache();
-    }
-
-    void Slider::regenerateCache()
-    {
-        const auto width = getWidth();
-        const auto height = getHeight();
-
-        if (width <= 0 || height <= 0)
-            return;
-
-        const float pixelScale = getPixelScale();
-        const int imageWidth = juce::roundToInt(width * pixelScale);
-        const int imageHeight = juce::roundToInt(height * pixelScale);
-
-        // Create HiDPI image at physical resolution
-        cachedImage_ = juce::Image(juce::Image::ARGB, imageWidth, imageHeight, true);
-        juce::Graphics g(cachedImage_);
-        
-        // Scale graphics context to match physical resolution
-        g.addTransform(juce::AffineTransform::scale(pixelScale));
-
         const auto bounds = juce::Rectangle<float>(0.0f, 0.0f, 
-                                                    static_cast<float>(width), 
-                                                    static_cast<float>(height));
+                                                    static_cast<float>(getWidth()), 
+                                                    static_cast<float>(getHeight()));
         const auto enabled = isEnabled();
         const auto trackBounds = calculateTrackBounds(bounds);
         const auto valueBarBounds = calculateValueBarBounds(trackBounds, enabled);
@@ -94,48 +53,18 @@ namespace tss
         drawValueBar(g, valueBarBounds, enabled);
         drawText(g, bounds, enabled);
         drawFocusBorderIfNeeded(g, trackBounds, hasFocus_);
-
-        cachedValue_ = getValue();
-        cacheValid_ = true;
-    }
-
-    void Slider::invalidateCache()
-    {
-        cacheValid_ = false;
-    }
-
-    void Slider::updateSkinCache()
-    {
-        if (skin_ == nullptr)
-            return;
-
-        const bool enabled = isEnabled();
-        cachedTrackColour_ = skin_->getSliderTrackColour(enabled);
-        cachedValueBarColour_ = skin_->getSliderValueBarColour(enabled);
-        cachedTextColour_ = skin_->getSliderTextColour(enabled);
-        cachedFocusBorderColour_ = skin_->getColour(SkinColourId::kSliderFocusBorder);
-        cachedFont_ = skin_->getBaseFont();
-    }
-
-    float Slider::getPixelScale() const
-    {
-        const auto* display = juce::Desktop::getInstance()
-                                  .getDisplays()
-                                  .getDisplayForRect(getScreenBounds());
-        const float displayScale = display != nullptr ? static_cast<float>(display->scale) : 1.0f;
-        return displayScale;
     }
 
     juce::Rectangle<float> Slider::calculateTrackBounds(const juce::Rectangle<float>& bounds) const
     {
-        const auto trackHeight = static_cast<float>(kTrackHeight_);
+        const auto trackHeight = static_cast<float>(kTrackHeight_) * scalingFactor_;
         const auto trackY = (bounds.getHeight() - trackHeight) * 0.5f;
         return juce::Rectangle<float>(bounds.getX(), bounds.getY() + trackY, bounds.getWidth(), trackHeight);
     }
 
     juce::Rectangle<float> Slider::calculateValueBarBounds(const juce::Rectangle<float>& trackBounds, bool enabled) const
     {
-        if (!enabled)
+        if (! enabled)
             return juce::Rectangle<float>();
 
         const auto range = getRange();
@@ -144,7 +73,8 @@ namespace tss
         if (rangeLength <= 0.0)
             return juce::Rectangle<float>();
 
-        const auto valueBarArea = trackBounds.reduced(1.0f);
+        const float reduction = std::max(1.0f, 1.0f * scalingFactor_);
+        const auto valueBarArea = trackBounds.reduced(reduction);
         const auto value = getValue();
         auto normalizedValue = static_cast<float>((value - range.getStart()) / rangeLength);
         normalizedValue = juce::jlimit(0.0f, 1.0f, normalizedValue);
@@ -153,46 +83,46 @@ namespace tss
         return juce::Rectangle<float>(valueBarArea.getX(), valueBarArea.getY(), valueBarWidth, valueBarArea.getHeight());
     }
 
-
     void Slider::drawFocusBorderIfNeeded(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool hasFocus)
     {
         if (hasFocus)
         {
-            g.setColour(cachedFocusBorderColour_);
-            g.drawRect(bounds, 1.0f);
+            const float borderThickness = std::max(1.0f, 1.0f * scalingFactor_);
+            g.setColour(look_.focusBorder);
+            g.drawRect(bounds, borderThickness);
         }
     }
 
-    void Slider::drawTrack(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool /*enabled*/)
+    void Slider::drawTrack(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled)
     {
-        g.setColour(cachedTrackColour_);
+        g.setColour(enabled ? look_.trackEnabled : look_.trackDisabled);
         g.fillRect(bounds);
     }
 
-    void Slider::drawValueBar(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool /*enabled*/)
+    void Slider::drawValueBar(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled)
     {
         if (bounds.isEmpty())
             return;
 
-        g.setColour(cachedValueBarColour_);
+        g.setColour(enabled ? look_.valueBarEnabled : look_.valueBarDisabled);
         g.fillRect(bounds);
     }
 
-    void Slider::drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool /*enabled*/)
+    void Slider::drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled)
     {
         auto valueText = juce::String(static_cast<int>(std::round(getValue())));
         
         if (unit_.isNotEmpty())
             valueText += " " + unit_;
 
-        g.setColour(cachedTextColour_);
-        g.setFont(cachedFont_);
+        g.setColour(enabled ? look_.textEnabled : look_.textDisabled);
+        g.setFont(look_.font.withHeight(kFontSize_ * scalingFactor_));
         g.drawText(valueText, bounds, juce::Justification::centred, false);
     }
 
     void Slider::mouseDown(const juce::MouseEvent& e)
     {
-        if (!isEnabled())
+        if (! isEnabled())
             return;
         
         grabKeyboardFocus();
@@ -202,7 +132,7 @@ namespace tss
 
     void Slider::mouseDrag(const juce::MouseEvent& e)
     {
-        if (!isEnabled())
+        if (! isEnabled())
             return;
         
         const auto dragDistance = dragStartPosition_.y - e.getPosition().y;
@@ -216,12 +146,11 @@ namespace tss
 
     void Slider::mouseUp(const juce::MouseEvent&)
     {
-        // Focus is handled by focusGained/focusLost callbacks
     }
 
     void Slider::mouseDoubleClick(const juce::MouseEvent&)
     {
-        if (!isEnabled())
+        if (! isEnabled())
             return;
         
         resetToDefaultValue();
@@ -237,7 +166,6 @@ namespace tss
         if (isEnabled())
         {
             hasFocus_ = true;
-            invalidateCache();
             repaint();
         }
     }
@@ -245,13 +173,12 @@ namespace tss
     void Slider::focusLost(juce::Component::FocusChangeType)
     {
         hasFocus_ = false;
-        invalidateCache();
         repaint();
     }
 
     bool Slider::keyPressed(const juce::KeyPress& key)
     {
-        if (!isEnabled() || !hasKeyboardFocus(true))
+        if (! isEnabled() || ! hasKeyboardFocus(true))
             return false;
         
         if (key == juce::KeyPress::returnKey)
@@ -283,16 +210,9 @@ namespace tss
     double Slider::calculateStepForRange(double rangeLength, bool isShiftPressed) const
     {
         if (isShiftPressed)
-        {
-            return kShiftKeyStep_;
-        }
+            return rangeLength / kShiftKeyStep_;
         
-        if (rangeLength <= 100.0)
-        {
-            return 1.0;
-        }
-        
-        return rangeLength / 100.0;
+        return 1.0;
     }
 
     bool Slider::isIncrementKey(int keyCode) const
@@ -307,11 +227,10 @@ namespace tss
 
     void Slider::updateValueWithStep(double step, bool increment)
     {
-        const auto range = getRange();
         const auto currentValue = getValue();
+        const auto range = getRange();
         auto newValue = increment ? currentValue + step : currentValue - step;
         newValue = juce::jlimit(range.getStart(), range.getEnd(), newValue);
         setValue(newValue, juce::sendNotificationSync);
     }
 }
-

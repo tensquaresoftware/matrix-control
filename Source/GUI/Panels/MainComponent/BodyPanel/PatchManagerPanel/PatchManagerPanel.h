@@ -25,6 +25,7 @@ public:
 
     void resized() override;
     void setSkin(tss::ISkin& skin);
+    void setScalingFactor(float scalingFactor);
 
 private:
     int width_;
@@ -34,6 +35,7 @@ private:
     int computerPatchesPanelHeight_;
     int patchMutatorPanelHeight_;
     tss::ISkin* skin_;
+    float scalingFactor_ = 1.0f;
 
     std::unique_ptr<tss::SectionHeader> sectionHeader_;
     std::unique_ptr<BankUtilityPanel> bankUtilityPanel_;

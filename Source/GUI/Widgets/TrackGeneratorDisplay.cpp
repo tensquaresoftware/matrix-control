@@ -1,36 +1,23 @@
 #include "TrackGeneratorDisplay.h"
 
-
-#include "GUI/Skins/ISkin.h"
-#include "GUI/Skins/ColourChart.h"
-
-using tss::SkinColourId;
-
 namespace tss
 {
-    TrackGeneratorDisplay::TrackGeneratorDisplay(tss::ISkin& skin, int width, int height)
-        : skin_(&skin)
-        , width_(width)
+    TrackGeneratorDisplay::TrackGeneratorDisplay(int width, int height)
+        : width_(width)
         , height_(height)
     {
         setOpaque(false);
         setSize(width_, height_);
-        updateSkinCache();
-        cachedPointValues_ = pointValues_;
     }
 
-    void TrackGeneratorDisplay::setSkin(tss::ISkin& skin)
+    void TrackGeneratorDisplay::setLook(const TrackGeneratorDisplayLook& look)
     {
-        skin_ = &skin;
-        updateSkinCache();
-        invalidateCache();
+        look_ = look;
+        repaint();
     }
 
     void TrackGeneratorDisplay::paint(juce::Graphics& g)
     {
-        if (skin_ == nullptr)
-            return;
-
         const auto bounds = getLocalBounds().toFloat();
         const auto contentBounds = bounds.withTrimmedTop(static_cast<float>(kWidgetPaddingTop_))
             .withTrimmedBottom(static_cast<float>(kWidgetPaddingBottom_));
@@ -38,48 +25,38 @@ namespace tss
         drawBackground(g, contentBounds);
         drawBorder(g, contentBounds);
         drawTriangle(g, contentBounds);
-        
-        if (!cacheValid_)
-            regenerateCache();
-
-        if (cachedImage_.isValid())
-        {
-            const auto destRect = contentBounds.toFloat();
-            g.drawImage(cachedImage_, destRect, juce::RectanglePlacement::fillDestination);
-        }
+        drawCurve(g, contentBounds);
     }
 
     void TrackGeneratorDisplay::resized()
     {
-        invalidateCache();
+        repaint();
     }
 
 
     void TrackGeneratorDisplay::drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        const auto backgroundColour = skin_->getColour(SkinColourId::kTrackGeneratorDisplayBackground);
-        g.setColour(backgroundColour);
+        g.setColour(look_.background);
         g.fillRect(bounds);
     }
 
     void TrackGeneratorDisplay::drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        const auto borderColour = skin_->getColour(SkinColourId::kTrackGeneratorDisplayBorder);
-        g.setColour(borderColour);
+        g.setColour(look_.border);
         g.drawRect(bounds, static_cast<float>(kWidgetBorderThickness_));
     }
 
     void TrackGeneratorDisplay::drawTriangle(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        const auto triangleColour = skin_->getColour(SkinColourId::kTrackGeneratorDisplayBorder);
-        const auto triangleHeight = kWidgetTriangleBase_ * std::sqrt(3.0f) * 0.5f;
-        const auto centreX = std::round(bounds.getCentreX());
-        const auto baseY = bounds.getY();
+        const auto triangleColour = look_.border;
+        const float triangleHeight = kWidgetTriangleBase_ * std::sqrt(3.0f) * 0.5f;
+        const float centreX = bounds.getCentreX();
+        const float baseY = bounds.getY();
 
         juce::Path triangle;
-        triangle.addTriangle(std::round(centreX - kWidgetTriangleBase_ * 0.5f), baseY,
-                             std::round(centreX + kWidgetTriangleBase_ * 0.5f), baseY,
-                             centreX, std::round(baseY - triangleHeight));
+        triangle.addTriangle(centreX - kWidgetTriangleBase_ * 0.5f, baseY,
+                             centreX + kWidgetTriangleBase_ * 0.5f, baseY,
+                             centreX, baseY - triangleHeight);
 
         g.setColour(triangleColour);
         g.fillPath(triangle);
@@ -102,8 +79,8 @@ namespace tss
         if (pointValues_[0] != clampedValue)
         {
             pointValues_[0] = clampedValue;
-            invalidateCache();
-            
+            repaint();
+
             if (notify && onValueChanged_)
                 onValueChanged_(0, clampedValue);
         }
@@ -121,8 +98,8 @@ namespace tss
         if (pointValues_[1] != clampedValue)
         {
             pointValues_[1] = clampedValue;
-            invalidateCache();
-            
+            repaint();
+
             if (notify && onValueChanged_)
                 onValueChanged_(1, clampedValue);
         }
@@ -140,8 +117,8 @@ namespace tss
         if (pointValues_[2] != clampedValue)
         {
             pointValues_[2] = clampedValue;
-            invalidateCache();
-            
+            repaint();
+
             if (notify && onValueChanged_)
                 onValueChanged_(2, clampedValue);
         }
@@ -159,8 +136,8 @@ namespace tss
         if (pointValues_[3] != clampedValue)
         {
             pointValues_[3] = clampedValue;
-            invalidateCache();
-            
+            repaint();
+
             if (notify && onValueChanged_)
                 onValueChanged_(3, clampedValue);
         }
@@ -178,79 +155,13 @@ namespace tss
         if (pointValues_[4] != clampedValue)
         {
             pointValues_[4] = clampedValue;
-            invalidateCache();
-            
+            repaint();
+
             if (notify && onValueChanged_)
                 onValueChanged_(4, clampedValue);
         }
     }
     
-    float TrackGeneratorDisplay::getPixelScale() const
-    {
-        if (auto* display = juce::Desktop::getInstance().getDisplays().getPrimaryDisplay())
-            return static_cast<float>(display->scale);
-        return 1.0f;
-    }
-    
-    void TrackGeneratorDisplay::regenerateCache()
-    {
-        if (skin_ == nullptr)
-            return;
-
-        const auto localBounds = getLocalBounds();
-        const auto contentRect = localBounds.withTrimmedTop(kWidgetPaddingTop_)
-            .withTrimmedBottom(kWidgetPaddingBottom_);
-        const int contentWidth = contentRect.getWidth();
-        const int contentHeight = contentRect.getHeight();
-
-        if (contentWidth <= 0 || contentHeight <= 0)
-            return;
-
-        bool valuesChanged = false;
-        for (size_t i = 0; i < kCurvePointCount_; ++i)
-        {
-            if (cachedPointValues_[i] != pointValues_[i])
-            {
-                valuesChanged = true;
-                break;
-            }
-        }
-
-        if (!valuesChanged && cacheValid_)
-            return;
-
-        const float scale = getPixelScale();
-        const int cacheWidth = juce::roundToInt(static_cast<float>(contentWidth) * scale);
-        const int cacheHeight = juce::roundToInt(static_cast<float>(contentHeight) * scale);
-
-        cachedImage_ = juce::Image(juce::Image::ARGB, cacheWidth, cacheHeight, true);
-
-        juce::Graphics g(cachedImage_);
-        g.addTransform(juce::AffineTransform::scale(scale));
-
-        const auto innerBounds = juce::Rectangle<float>(0.0f, 0.0f,
-                                                        static_cast<float>(contentWidth),
-                                                        static_cast<float>(contentHeight));
-
-        drawCurve(g, innerBounds);
-
-        cachedPointValues_ = pointValues_;
-        cacheValid_ = true;
-    }
-    
-    void TrackGeneratorDisplay::invalidateCache()
-    {
-        cacheValid_ = false;
-        repaint();
-    }
-    
-    void TrackGeneratorDisplay::updateSkinCache()
-    {
-        if (skin_ == nullptr)
-            return;
-        
-        cachedCurveColour_ = juce::Colour(ColourChart::kGreen4);
-    }
     
     void TrackGeneratorDisplay::drawCurve(juce::Graphics& g, const juce::Rectangle<float>& innerBounds)
     {
@@ -259,7 +170,7 @@ namespace tss
         if (centerBounds.getWidth() <= 0.0f || centerBounds.getHeight() <= 0.0f)
             return;
 
-        g.setColour(cachedCurveColour_);
+        g.setColour(look_.curve);
 
         for (int i = 0; i < kCurvePointCount_; ++i)
         {
@@ -272,8 +183,8 @@ namespace tss
             }
         }
         
-        const auto hollowPointFillColour = juce::Colour(ColourChart::kGreen1);
-        
+        const auto hollowPointFillColour = look_.curve.withAlpha(0.4f);
+
         for (int i = 0; i < kCurvePointCount_; ++i)
         {
             const auto p = calculatePointPosition(i, centerBounds);
@@ -282,7 +193,7 @@ namespace tss
             g.fillEllipse(p.x - kCurvePointRadius_, p.y - kCurvePointRadius_,
                          kCurvePointRadius_ * 2.0f, kCurvePointRadius_ * 2.0f);
             
-            g.setColour(cachedCurveColour_);
+            g.setColour(look_.curve);
             g.drawEllipse(p.x - kCurvePointRadius_, p.y - kCurvePointRadius_,
                          kCurvePointRadius_ * 2.0f, kCurvePointRadius_ * 2.0f,
                          kCurveLineThickness_);
@@ -360,8 +271,8 @@ namespace tss
         if (pointValues_[index] != newValue)
         {
             pointValues_[index] = newValue;
-            invalidateCache();
-            
+            repaint();
+
             if (onValueChanged_)
                 onValueChanged_(draggedPointIndex_, newValue);
         }

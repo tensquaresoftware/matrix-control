@@ -31,6 +31,7 @@ public:
 
     void resized() override;
     void setSkin(tss::ISkin& skin);
+    void setScalingFactor(float scalingFactor);
     int getTotalHeight() const;
 
     tss::Slider* getSlider() const { return slider_.get(); }
@@ -58,6 +59,7 @@ private:
     tss::ISkin* skin_;
     ParameterType parameterType_;
     ModuleType moduleType_;
+    float scalingFactor_ = 1.0f;
 
     std::unique_ptr<tss::Label> label_;
     std::unique_ptr<tss::Slider> slider_;

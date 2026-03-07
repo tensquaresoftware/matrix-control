@@ -5,6 +5,7 @@
 #include "Modules/ComputerPatchesPanel.h"
 #include "Modules/PatchMutatorPanel.h"
 
+#include "GUI/Looks/LookBuilders.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Widgets/SectionHeader.h"
@@ -23,7 +24,6 @@ PatchManagerPanel::PatchManagerPanel(tss::ISkin& skin, int width, int height, Wi
     , patchMutatorPanelHeight_(PluginDimensions::Panels::Body::PatchManagerSection::PatchMutatorModule::kHeight)
     , skin_(&skin)
     , sectionHeader_(std::make_unique<tss::SectionHeader>(
-        skin,
         PluginDimensions::Widgets::Widths::SectionHeader::kPatchManager,
         PluginDimensions::Widgets::Heights::kSectionHeader,
         PluginHelpers::getSectionDisplayName(PluginIDs::PatchManagerSection::kGroupId),
@@ -138,11 +138,31 @@ void PatchManagerPanel::layoutPatchMutatorPanel(const juce::Rectangle<int>& boun
 void PatchManagerPanel::setSkin(tss::ISkin& skin)
 {
     skin_ = &skin;
+    sectionHeader_->setLook(tss::sectionHeaderLookFromSkin(skin));
     tss::propagateSkin(skin,
-        sectionHeader_.get(),
         bankUtilityPanel_.get(),
         internalPatchesPanel_.get(),
         computerPatchesPanel_.get(),
         patchMutatorPanel_.get());
+}
+
+void PatchManagerPanel::setScalingFactor(float scalingFactor)
+{
+    if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+        return;
+    
+    scalingFactor_ = scalingFactor;
+    
+    if (bankUtilityPanel_)
+        bankUtilityPanel_->setScalingFactor(scalingFactor_);
+    if (internalPatchesPanel_)
+        internalPatchesPanel_->setScalingFactor(scalingFactor_);
+    if (computerPatchesPanel_)
+        computerPatchesPanel_->setScalingFactor(scalingFactor_);
+    if (patchMutatorPanel_)
+        patchMutatorPanel_->setScalingFactor(scalingFactor_);
+    
+    resized();
+    repaint();
 }
 

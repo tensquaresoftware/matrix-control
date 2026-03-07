@@ -2,10 +2,10 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
+#include "GUI/Looks/WidgetLooks.h"
+
 namespace tss
 {
-    class ISkin;
-
     enum class LabelStyle
     {
         Default,
@@ -15,42 +15,34 @@ namespace tss
     class Label : public juce::Component
     {
     public:
-        explicit Label(ISkin& skin, int width, int height, const juce::String& text = juce::String(),
+        explicit Label(int width, int height, const juce::String& text = juce::String(),
                       LabelStyle style = LabelStyle::Default);
         ~Label() override = default;
-
-        void setSkin(ISkin& skin);
+        
+        void setLook(const LabelLook& look);
+        void setScalingFactor(float scalingFactor);
         
         void setText(const juce::String& text);
         juce::String getText() const { return labelText_; }
 
         void paint(juce::Graphics& g) override;
-        void resized() override;
-
-        int getWidth() const { return width_; }
-        int getHeight() const { return height_; }
+        
+        static int getBaseWidth() { return kDefaultWidth_; }
+        static int getBaseHeight() { return kDefaultHeight_; }
 
     private:
-        inline constexpr static int kTextLeftPadding_ = 2;
+        static constexpr int kDefaultWidth_ = 50;
+        static constexpr int kDefaultHeight_ = 20;
+        static constexpr int kTextLeftPadding_ = 2;
+        static constexpr float kFontSize_ = 14.0f;
 
-        ISkin* skin_ = nullptr;
+        LabelLook look_{};
         int width_;
         int height_;
         juce::String labelText_;
         LabelStyle style_;
-        
-        // Cache optimization
-        juce::Image cachedImage_;
-        bool cacheValid_ {false};
-        juce::Colour cachedTextColour_;
-        juce::Font cachedFont_;
-        
-        void regenerateCache();
-        void invalidateCache();
-        void updateSkinCache();
-        float getPixelScale() const;
+        float scalingFactor_ = 1.0f;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Label)
     };
 }
-

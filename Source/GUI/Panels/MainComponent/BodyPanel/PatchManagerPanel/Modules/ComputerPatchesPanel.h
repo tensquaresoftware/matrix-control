@@ -24,6 +24,7 @@ public:
 
     void resized() override;
     void setSkin(tss::ISkin& skin);
+    void setScalingFactor(float scalingFactor);
 
 private:
     inline constexpr static int kGroupLabelSpacing_ = 10;
@@ -33,6 +34,7 @@ private:
     int width_;
     int height_;
     tss::ISkin* skin_;
+    float scalingFactor_ = 1.0f;
     juce::AudioProcessorValueTreeState& apvts_;
 
     std::unique_ptr<tss::ModuleHeader> moduleHeader_;

@@ -1,33 +1,40 @@
 #include "PopupMenuRenderer.h"
 #include "ComboBox.h"
 
-#include "GUI/Skins/ISkin.h"
-
 namespace tss
 {
-    PopupMenuRenderer::PopupMenuRenderer(tss::ISkin& skin, bool isButtonLike)
-        : skin_(skin)
-        , isButtonLike_(isButtonLike)
+    PopupMenuRenderer::PopupMenuRenderer(bool isButtonLike, float scalingFactor)
+        : isButtonLike_(isButtonLike)
+        , scalingFactor_(scalingFactor)
     {
     }
 
-    void PopupMenuRenderer::drawBackground(juce::Graphics& g, const juce::Rectangle<int>& bounds) const
+    void PopupMenuRenderer::setLook(const PopupMenuLook& look)
     {
-        const auto backgroundColour = skin_.getPopupMenuBackgroundColour(isButtonLike_);
+        look_ = look;
+    }
+
+    void PopupMenuRenderer::drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds) const
+    {
+        const auto backgroundColour = isButtonLike_ 
+            ? look_.backgroundButtonLike
+            : look_.background;
         g.setColour(backgroundColour);
         g.fillRect(bounds);
     }
 
-    void PopupMenuRenderer::drawBorder(juce::Graphics& g, const juce::Rectangle<int>& bounds) const
+    void PopupMenuRenderer::drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds) const
     {
-        constexpr float kBorderThickness = 1.0f;
-        const auto borderColour = skin_.getPopupMenuBorderColour(isButtonLike_);
+        const float kBorderThickness = std::max(1.0f, 1.0f * scalingFactor_);
+        const auto borderColour = isButtonLike_ 
+            ? look_.borderButtonLike
+            : look_.border;
         g.setColour(borderColour);
-        g.drawRect(bounds.toFloat(), kBorderThickness);
+        g.drawRect(bounds, kBorderThickness);
     }
 
     void PopupMenuRenderer::drawItem(juce::Graphics& g, const ComboBox& comboBox, int itemIndex,
-                                    const juce::Rectangle<int>& itemBounds, int highlightedItemIndex,
+                                    const juce::Rectangle<float>& itemBounds, int highlightedItemIndex,
                                     const juce::Font& font) const
     {
         const auto isHighlighted = (highlightedItemIndex == itemIndex);
@@ -35,22 +42,29 @@ namespace tss
         
         if (isHighlighted && isActive)
         {
-            const auto hooverBackgroundColour = skin_.getPopupMenuBackgroundHooverColour(isButtonLike_);
-            const auto hooverBounds = itemBounds.reduced(1);
+            const auto hooverBackgroundColour = isButtonLike_ 
+                ? look_.backgroundHoverButtonLike
+                : look_.backgroundHover;
+            const float gap = getHighlightGap();
+            const auto hooverBoundsFloat = itemBounds.reduced(gap);
             g.setColour(hooverBackgroundColour);
-            g.fillRect(hooverBounds);
+            g.fillRect(hooverBoundsFloat);
             
-            const auto hooverTextColour = skin_.getPopupMenuTextHooverColour(isButtonLike_);
+            const auto hooverTextColour = isButtonLike_ 
+                ? look_.textHoverButtonLike
+                : look_.textHover;
             g.setColour(hooverTextColour);
             g.setFont(font);
             
-            auto textBounds = itemBounds;
-            textBounds.removeFromLeft(kTextLeftPadding_);
+            const float textPadding = static_cast<float>(kTextLeftPadding_) * scalingFactor_;
+            const auto textBounds = itemBounds.withTrimmedLeft(textPadding);
             g.drawText(comboBox.getItemText(itemIndex), textBounds, juce::Justification::centredLeft, false);
         }
         else
         {
-            auto textColour = skin_.getPopupMenuTextColour(isButtonLike_);
+            auto textColour = isButtonLike_ 
+                ? look_.textButtonLike
+                : look_.text;
             if (! isActive)
             {
                 textColour = textColour.withAlpha(0.5f);
@@ -59,27 +73,31 @@ namespace tss
             g.setColour(textColour);
             g.setFont(font);
             
-            auto textBounds = itemBounds;
-            textBounds.removeFromLeft(kTextLeftPadding_);
+            const float textPadding = static_cast<float>(kTextLeftPadding_) * scalingFactor_;
+            const auto textBounds = itemBounds.withTrimmedLeft(textPadding);
             g.drawText(comboBox.getItemText(itemIndex), textBounds, juce::Justification::centredLeft, false);
         }
     }
 
-    void PopupMenuRenderer::drawVerticalSeparators(juce::Graphics& g, const juce::Rectangle<int>& contentBounds,
-                                                  int columnCount, int columnWidth, int separatorWidth) const
+    void PopupMenuRenderer::drawVerticalSeparators(juce::Graphics& g, const juce::Rectangle<float>& contentBounds,
+                                                  int columnCount, float actualColumnWidth, float separatorWidth) const
     {
         if (columnCount <= 1)
-        {
             return;
-        }
         
-        const auto separatorColour = skin_.getPopupMenuSeparatorColour(isButtonLike_);
+        const auto separatorColour = isButtonLike_ 
+            ? look_.separatorButtonLike
+            : look_.separator;
         g.setColour(separatorColour);
+        
+        const float contentX = contentBounds.getX();
+        const float contentY = contentBounds.getY();
+        const float contentHeight = contentBounds.getHeight();
         
         for (int i = 1; i < columnCount; ++i)
         {
-            const auto separatorX = contentBounds.getX() + i * columnWidth + (i - 1) * separatorWidth;
-            g.fillRect(separatorX, contentBounds.getY(), separatorWidth, contentBounds.getHeight());
+            const float separatorX = contentX + static_cast<float>(i) * actualColumnWidth + static_cast<float>(i - 1) * separatorWidth;
+            g.fillRect(juce::Rectangle<float>(separatorX, contentY, separatorWidth, contentHeight));
         }
     }
 }

@@ -1,47 +1,39 @@
 #include "Toggle.h"
 
-
 #include "Shared/Definitions/PluginDimensions.h"
-#include "GUI/Skins/ISkin.h"
-
-using tss::SkinColourId;
 
 namespace tss
 {
-    Toggle::Toggle(ISkin& skin, int width, const juce::String& text)
+    Toggle::Toggle(int width, const juce::String& text)
         : juce::ToggleButton(text)
-        , skin_(&skin)
         , width_(width)
     {
         setOpaque(true);
         setSize(width_, PluginDimensions::Widgets::Heights::kToggle);
     }
 
-    void Toggle::setSkin(ISkin& skin)
+    void Toggle::setLook(const ToggleLook& look)
     {
-        skin_ = &skin;
+        look_ = look;
         repaint();
     }
 
     void Toggle::paintButton(juce::Graphics& g, bool /*shouldDrawButtonAsHighlighted*/, bool /*shouldDrawButtonAsDown*/)
     {
-        if (skin_ == nullptr)
-            return;
-
         const auto bounds = getLocalBounds().toFloat();
         const bool isOn = getToggleState();
 
-        g.setColour(skin_->getToggleBackgroundColour(isOn));
+        g.setColour(isOn ? look_.backgroundOn : look_.backgroundOff);
         g.fillRect(bounds);
 
-        g.setColour(skin_->getColour(SkinColourId::kToggleBorder));
+        g.setColour(look_.border);
         g.drawRect(bounds, static_cast<float>(kBorderThickness_));
 
         const auto buttonText = getButtonText();
         if (!buttonText.isEmpty())
         {
-            g.setColour(skin_->getToggleTextColour(isOn));
-            g.setFont(skin_->getBaseFont());
+            g.setColour(isOn ? look_.textOn : look_.textOff);
+            g.setFont(look_.font);
             g.drawText(buttonText, bounds, juce::Justification::centred, false);
         }
     }

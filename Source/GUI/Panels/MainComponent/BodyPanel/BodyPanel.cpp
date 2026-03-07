@@ -1,6 +1,6 @@
 #include "BodyPanel.h"
 
-
+#include "GUI/Looks/LookBuilders.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Widgets/VerticalSeparator.h"
@@ -34,7 +34,6 @@ BodyPanel::BodyPanel(tss::ISkin& skin, int width, int height, WidgetFactory& wid
     addAndMakeVisible(*patchEditPanel_);
 
     verticalSeparator1_ = std::make_unique<VerticalSeparator>(
-        skin,
         PluginDimensions::Widgets::Widths::VerticalSeparator::kStandard,
         PluginDimensions::Widgets::Heights::kVerticalSeparator
     );
@@ -47,7 +46,6 @@ BodyPanel::BodyPanel(tss::ISkin& skin, int width, int height, WidgetFactory& wid
     addAndMakeVisible(*patchManagerPanel_);
 
     verticalSeparator2_ = std::make_unique<VerticalSeparator>(
-        skin,
         PluginDimensions::Widgets::Widths::VerticalSeparator::kStandard,
         PluginDimensions::Widgets::Heights::kVerticalSeparator
     );
@@ -123,12 +121,32 @@ void BodyPanel::resized()
 void BodyPanel::setSkin(tss::ISkin& skin)
 {
     skin_ = &skin;
+    verticalSeparator1_->setLook(tss::verticalSeparatorLookFromSkin(skin));
+    verticalSeparator2_->setLook(tss::verticalSeparatorLookFromSkin(skin));
     tss::propagateSkin(skin,
         patchEditPanel_.get(),
-        verticalSeparator1_.get(),
         matrixModulationPanel_.get(),
-        verticalSeparator2_.get(),
         masterEditPanel_.get(),
         patchManagerPanel_.get());
+}
+
+void BodyPanel::setScalingFactor(float scalingFactor)
+{
+    if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+        return;
+    
+    scalingFactor_ = scalingFactor;
+    
+    if (patchEditPanel_)
+        patchEditPanel_->setScalingFactor(scalingFactor_);
+    if (matrixModulationPanel_)
+        matrixModulationPanel_->setScalingFactor(scalingFactor_);
+    if (patchManagerPanel_)
+        patchManagerPanel_->setScalingFactor(scalingFactor_);
+    if (masterEditPanel_)
+        masterEditPanel_->setScalingFactor(scalingFactor_);
+    
+    resized();
+    repaint();
 }
 

@@ -2,10 +2,10 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
+#include "GUI/Looks/WidgetLooks.h"
+
 namespace tss
 {
-    class ISkin;
-
     class ModuleHeader : public juce::Component
     {
     public:
@@ -15,11 +15,11 @@ namespace tss
             Orange
         };
 
-        explicit ModuleHeader(ISkin& skin, const juce::String& text, int width, int height, ColourVariant variant = ColourVariant::Blue);
+        explicit ModuleHeader(const juce::String& text, int width, int height, ColourVariant variant = ColourVariant::Blue);
         ~ModuleHeader() override = default;
 
-        void setSkin(ISkin& skin);
-        
+        void setLook(const ModuleHeaderLook& look);
+
         void setText(const juce::String& text);
         juce::String getText() const { return text_; }
 
@@ -34,32 +34,17 @@ namespace tss
         inline constexpr static int kTextAreaHeight_ = 20;
         inline constexpr static int kLineThickness_ = 4;
 
+        ModuleHeaderLook look_{};
         int width_;
         int height_;
-        ISkin* skin_ = nullptr;
         juce::String text_;
         ColourVariant colourVariant_;
 
-        // Image cache
-        juce::Image cachedImage_;
-        bool cacheValid_ = false;
-
-        // Skin cache
-        juce::Colour cachedTextColour_;
-        juce::Colour cachedLineColour_;
-        juce::Font cachedFont_;
-
-        void regenerateCache();
-        void invalidateCache();
-        void updateSkinCache();
-        float getPixelScale() const;
-
         void drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawLine(juce::Graphics& g, const juce::Rectangle<float>& bounds);
-        
+
         juce::Colour getLineColour() const;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ModuleHeader)
     };
 }
-

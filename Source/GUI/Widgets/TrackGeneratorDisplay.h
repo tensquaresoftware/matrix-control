@@ -5,20 +5,20 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
+#include "GUI/Looks/WidgetLooks.h"
+
 namespace tss
 {
-    class ISkin;
-
     class TrackGeneratorDisplay : public juce::Component
     {
     public:
         using ValueChangedCallback = std::function<void(int pointIndex, int newValue)>;
-        
-        explicit TrackGeneratorDisplay(ISkin& skin, int width, int height);
+
+        explicit TrackGeneratorDisplay(int width, int height);
         ~TrackGeneratorDisplay() override = default;
 
-        void setSkin(ISkin& skin);
-        
+        void setLook(const TrackGeneratorDisplayLook& look);
+
         void setTrackPoint1(int value);
         void setTrackPoint2(int value);
         void setTrackPoint3(int value);
@@ -63,31 +63,19 @@ namespace tss
         inline constexpr static float kCurvePointRadius_ = 3.0f;
         inline constexpr static float kCurveLineThickness_ = 1.0f;
         inline constexpr static float kPointHitZoneRadius_ = 10.0f;
-        
 
-        ISkin* skin_ = nullptr;
+        TrackGeneratorDisplayLook look_{};
         int width_;
         int height_;
-        
+
         std::array<int, kCurvePointCount_> pointValues_ {0, 15, 31, 47, 63};
         int draggedPointIndex_ = -1;
-        
-        juce::Image cachedImage_;
-        bool cacheValid_ = false;
-        std::array<int, kCurvePointCount_> cachedPointValues_;
-        
-        juce::Colour cachedCurveColour_;
-        
+
         ValueChangedCallback onValueChanged_;
 
         void drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawTriangle(juce::Graphics& g, const juce::Rectangle<float>& bounds);
-        
-        void regenerateCache();
-        void invalidateCache();
-        void updateSkinCache();
-        float getPixelScale() const;
         
         juce::Rectangle<float> getCurveCenterBounds(const juce::Rectangle<float>& innerBounds) const;
         void drawCurve(juce::Graphics& g, const juce::Rectangle<float>& innerBounds);

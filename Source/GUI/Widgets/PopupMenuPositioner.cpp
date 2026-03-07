@@ -5,13 +5,10 @@ namespace tss
 {
     PopupMenuDimensions PopupMenuPositioner::calculateDimensions(
         const ComboBox& comboBox,
-        int contentWidth,
-        int contentHeight,
-        int borderThickness)
+        int popupWidth,
+        int popupHeight,
+        int /* borderThickness */)
     {
-        const auto popupWidth = contentWidth + borderThickness;
-        const auto popupHeight = contentHeight + borderThickness;
-
         auto* topLevelComponent = comboBox.getTopLevelComponent();
         if (topLevelComponent == nullptr)
         {

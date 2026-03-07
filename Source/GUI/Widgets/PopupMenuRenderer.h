@@ -2,28 +2,33 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
+#include "GUI/Looks/WidgetLooks.h"
+
 namespace tss
 {
-    class ISkin;
     class ComboBox;
 
     class PopupMenuRenderer
     {
     public:
-        PopupMenuRenderer(ISkin& skin, bool isButtonLike);
+        PopupMenuRenderer(bool isButtonLike, float scalingFactor);
 
-        void drawBackground(juce::Graphics& g, const juce::Rectangle<int>& bounds) const;
-        void drawBorder(juce::Graphics& g, const juce::Rectangle<int>& bounds) const;
+        void setLook(const PopupMenuLook& look);
+
+        void drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds) const;
+        void drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds) const;
         void drawItem(juce::Graphics& g, const ComboBox& comboBox, int itemIndex, 
-                     const juce::Rectangle<int>& itemBounds, int highlightedItemIndex, 
+                     const juce::Rectangle<float>& itemBounds, int highlightedItemIndex, 
                      const juce::Font& font) const;
-        void drawVerticalSeparators(juce::Graphics& g, const juce::Rectangle<int>& contentBounds,
-                                   int columnCount, int columnWidth, int separatorWidth) const;
+        void drawVerticalSeparators(juce::Graphics& g, const juce::Rectangle<float>& contentBounds,
+                                   int columnCount, float actualColumnWidth, float separatorWidth) const;
 
     private:
         inline constexpr static int kTextLeftPadding_ = 3;
+        float getHighlightGap() const { return juce::jmax(1.0f, 1.0f * scalingFactor_); }
 
-        ISkin& skin_;
+        PopupMenuLook look_{};
         bool isButtonLike_;
+        float scalingFactor_;
     };
 }

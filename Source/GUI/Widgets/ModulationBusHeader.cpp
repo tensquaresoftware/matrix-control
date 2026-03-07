@@ -1,95 +1,37 @@
 #include "ModulationBusHeader.h"
 
-
-#include "GUI/Skins/ISkin.h"
-#include "GUI/Skins/SkinValues.h"
 #include "Shared/Definitions/PluginDescriptors.h"
-
-using tss::SkinColourId;
 
 namespace tss
 {
-    ModulationBusHeader::ModulationBusHeader(tss::ISkin& skin, int width, int height, ColourVariant variant)
-        : skin_(&skin)
-        , busNumberText_(PluginDisplayNames::MatrixModulationSection::Header::kBusNumber)
+    ModulationBusHeader::ModulationBusHeader(int width, int height, ColourVariant variant)
+        : busNumberText_(PluginDisplayNames::MatrixModulationSection::Header::kBusNumber)
         , busSourceText_(PluginDisplayNames::MatrixModulationSection::Header::kSource)
         , busAmountText_(PluginDisplayNames::MatrixModulationSection::Header::kAmount)
         , busDestinationText_(PluginDisplayNames::MatrixModulationSection::Header::kDestination)
         , colourVariant_(variant)
-        , cachedFont_(juce::FontOptions())
     {
         setOpaque(false);
         setSize(width, height);
-        cachedTextColour_ = skin_->getColour(SkinColourId::kModuleHeaderText);
-        cachedLineColour_ = getLineColour();
-        cachedFont_ = skin_->getBaseFontBold().withHeight(kModuleHeaderFontHeight);
     }
 
-    void ModulationBusHeader::setSkin(tss::ISkin& skin)
+    void ModulationBusHeader::setLook(const ModulationBusHeaderLook& look)
     {
-        skin_ = &skin;
-        invalidateCache();
+        look_ = look;
+        repaint();
     }
 
     void ModulationBusHeader::paint(juce::Graphics& g)
     {
-        if (skin_ == nullptr)
-            return;
-
-        if (!cacheValid_)
-            regenerateCache();
-
-        if (cachedImage_.isValid())
-        {
-            g.drawImage(cachedImage_, getLocalBounds().toFloat(),
-                       juce::RectanglePlacement::stretchToFit);
-        }
+        const auto bounds = getLocalBounds().toFloat();
+        drawText(g, bounds);
+        drawLine(g, bounds);
     }
 
     void ModulationBusHeader::resized()
     {
-        invalidateCache();
+        repaint();
     }
-
-    void ModulationBusHeader::regenerateCache()
-    {
-        const auto width = getWidth();
-        const auto height = getHeight();
-
-        if (width <= 0 || height <= 0)
-            return;
-
-        const float pixelScale = getPixelScale();
-        const int imageWidth = juce::roundToInt(width * pixelScale);
-        const int imageHeight = juce::roundToInt(height * pixelScale);
-
-        cachedImage_ = juce::Image(juce::Image::ARGB, imageWidth, imageHeight, true);
-        juce::Graphics g(cachedImage_);
-        g.addTransform(juce::AffineTransform::scale(pixelScale));
-
-        auto bounds = juce::Rectangle<float>(0.0f, 0.0f, 
-                                              static_cast<float>(width), 
-                                              static_cast<float>(height));
-
-        drawText(g, bounds);
-        drawLine(g, bounds);
-
-        cacheValid_ = true;
-    }
-
-    void ModulationBusHeader::invalidateCache()
-    {
-        cacheValid_ = false;
-    }
-
-    float ModulationBusHeader::getPixelScale() const
-    {
-        const auto* display = juce::Desktop::getInstance()
-                                  .getDisplays()
-                                  .getDisplayForRect(getScreenBounds());
-        return display != nullptr ? static_cast<float>(display->scale) : 1.0f;
-    }
-
 
     void ModulationBusHeader::drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
@@ -100,8 +42,8 @@ namespace tss
         auto x = textArea.getX();
         auto y = textArea.getY();
 
-        g.setColour(cachedTextColour_);
-        g.setFont(cachedFont_);
+        g.setColour(look_.text);
+        g.setFont(look_.font);
 
         drawBusNumberText(g, x, y);
         x += kBusNumberTextWidth_;
@@ -117,47 +59,44 @@ namespace tss
 
     void ModulationBusHeader::drawBusNumberText(juce::Graphics& g, float x, float y)
     {
-        auto busNumberBounds = juce::Rectangle<float>(x, y, kBusNumberTextWidth_, kTextAreaHeight_);
+        auto busNumberBounds = juce::Rectangle<float>(x, y, static_cast<float>(kBusNumberTextWidth_), static_cast<float>(kTextAreaHeight_));
         g.drawText(busNumberText_, busNumberBounds, juce::Justification::centredLeft, false);
     }
 
     void ModulationBusHeader::drawBusSourceText(juce::Graphics& g, float x, float y)
     {
-        auto busSourceBounds = juce::Rectangle<float>(x, y, kBusSourceTextWidth_, kTextAreaHeight_);
+        auto busSourceBounds = juce::Rectangle<float>(x, y, static_cast<float>(kBusSourceTextWidth_), static_cast<float>(kTextAreaHeight_));
         g.drawText(busSourceText_, busSourceBounds, juce::Justification::centredLeft, false);
     }
 
     void ModulationBusHeader::drawBusAmountText(juce::Graphics& g, float x, float y)
     {
-        auto busAmountBounds = juce::Rectangle<float>(x, y, kBusAmountTextWidth_, kTextAreaHeight_);
+        auto busAmountBounds = juce::Rectangle<float>(x, y, static_cast<float>(kBusAmountTextWidth_), static_cast<float>(kTextAreaHeight_));
         g.drawText(busAmountText_, busAmountBounds, juce::Justification::centredLeft, false);
     }
 
     void ModulationBusHeader::drawBusDestinationText(juce::Graphics& g, float x, float y)
     {
-        auto busDestinationBounds = juce::Rectangle<float>(x, y, kBusDestinationTextWidth_, kTextAreaHeight_);
+        auto busDestinationBounds = juce::Rectangle<float>(x, y, static_cast<float>(kBusDestinationTextWidth_), static_cast<float>(kTextAreaHeight_));
         g.drawText(busDestinationText_, busDestinationBounds, juce::Justification::centredLeft, false);
     }
 
     void ModulationBusHeader::drawLine(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        auto lineThickness = kLineThickness_;
-        auto lineAreaHeight = bounds.getHeight() - kTextAreaHeight_;
-        auto verticalOffset = kTextAreaHeight_ + (lineAreaHeight - lineThickness) / 2.0f;
+        const auto lineThickness = static_cast<float>(kLineThickness_);
+        const auto lineAreaHeight = bounds.getHeight() - kTextAreaHeight_;
+        const auto verticalOffset = kTextAreaHeight_ + (lineAreaHeight - lineThickness) / 2.0f;
         
         auto lineBounds = bounds;
         lineBounds.setHeight(lineThickness);
         lineBounds.translate(0.0f, verticalOffset);
 
-        g.setColour(cachedLineColour_);
+        g.setColour(getLineColour());
         g.fillRect(lineBounds);
     }
 
     juce::Colour ModulationBusHeader::getLineColour() const
     {
-        return (colourVariant_ == ColourVariant::Blue) 
-            ? skin_->getColour(SkinColourId::kModuleHeaderLineBlue) 
-            : skin_->getColour(SkinColourId::kModuleHeaderLineOrange);
+        return (colourVariant_ == ColourVariant::Blue) ? look_.lineBlue : look_.lineOrange;
     }
 }
-

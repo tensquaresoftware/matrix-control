@@ -19,24 +19,31 @@ namespace tss
         void handleKeyboardNavigation(const juce::KeyPress& key) override;
 
     private:
-        class ScrollableViewportLookAndFeel;
         class ScrollableContentComponent;
+        class CustomScrollBar;
 
         inline constexpr static int kMaxScrollableHeight_ = 300;
+        inline constexpr static float kScrollbarWidth_ = 8.0f;
+        inline constexpr static float kRightMarginFromHighlightToEdge_ = 8.0f;
+        inline constexpr static float kWheelScrollFactorContent_ = 100.0f;
+        inline constexpr static float kThumbInsetBase_ = 2.0f;
 
-        int columnWidth_ = 0;
+        float columnWidth_ = 0.0f;
         int scrollableContentHeight_ = 0;
-        
+        bool scrollbarNeeded_ = false;
+
         std::unique_ptr<juce::Viewport> viewport_;
         std::unique_ptr<ScrollableContentComponent> contentComponent_;
-        std::unique_ptr<ScrollableViewportLookAndFeel> scrollbarLookAndFeel_;
+        std::unique_ptr<CustomScrollBar> customScrollBar_;
 
         void setupScrollableContent();
         
-        juce::Rectangle<int> getItemBounds(int itemIndex) const;
+        juce::Rectangle<float> getItemBounds(int itemIndex) const;
         int getItemIndexAt(int x, int y) const;
         
         void drawItems(juce::Graphics& g);
+
+        void scrollViewportBy(int deltaPixels);
         
         void navigateUp();
         void navigateDown();

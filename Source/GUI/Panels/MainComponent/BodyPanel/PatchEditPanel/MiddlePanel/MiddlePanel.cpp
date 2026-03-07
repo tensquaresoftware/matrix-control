@@ -1,8 +1,8 @@
 #include "MiddlePanel.h"
 
+#include "GUI/Looks/LookBuilders.h"
 #include "GUI/Skins/ISkin.h"
 #include "Shared/Definitions/ApvtsTypes.h"
-#include "GUI/Skins/SkinHelpers.h"
 #include "Shared/Definitions/PluginDescriptors.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginDimensions.h"
@@ -19,16 +19,15 @@ MiddlePanel::MiddlePanel(tss::ISkin& skin, int width, int height, juce::AudioPro
     , height_(height)
     , skin_(&skin)
     , apvts_(&apvts)
-    , envelope1Display_(skin, PluginDimensions::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kWidth, PluginDimensions::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kHeight)
-    , envelope2Display_(skin, PluginDimensions::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kWidth, PluginDimensions::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kHeight)
-    , envelope3Display_(skin, PluginDimensions::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kWidth, PluginDimensions::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kHeight)
-    , trackGeneratorDisplay_(skin, PluginDimensions::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kWidth, PluginDimensions::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kHeight)
-    , patchNameModuleHeader_(skin, PluginDisplayNames::PatchEditSection::PatchNameModule::kName,
+    , envelope1Display_(PluginDimensions::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kWidth, PluginDimensions::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kHeight)
+    , envelope2Display_(PluginDimensions::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kWidth, PluginDimensions::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kHeight)
+    , envelope3Display_(PluginDimensions::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kWidth, PluginDimensions::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kHeight)
+    , trackGeneratorDisplay_(PluginDimensions::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kWidth, PluginDimensions::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kHeight)
+    , patchNameModuleHeader_(PluginDisplayNames::PatchEditSection::PatchNameModule::kName,
                              PluginDimensions::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kWidth,
                              PluginDimensions::Widgets::Heights::kModuleHeader,
                              tss::ModuleHeader::ColourVariant::Blue)
-    , patchNameDisplay_(skin,
-                        PluginDimensions::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kWidth,
+    , patchNameDisplay_(PluginDimensions::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kWidth,
                         PluginDimensions::Widgets::Heights::kPatchNameDisplay)
 {
     setOpaque(false);
@@ -253,12 +252,12 @@ int MiddlePanel::getEnvParameterFromApvts(const juce::String& parameterId) const
 void MiddlePanel::setSkin(tss::ISkin& skin)
 {
     skin_ = &skin;
-    tss::propagateSkin(skin,
-        &envelope1Display_,
-        &envelope2Display_,
-        &envelope3Display_,
-        &trackGeneratorDisplay_,
-        &patchNameModuleHeader_,
-        &patchNameDisplay_);
+    const auto envelopeLook = tss::envelopeDisplayLookFromSkin(skin);
+    envelope1Display_.setLook(envelopeLook);
+    envelope2Display_.setLook(envelopeLook);
+    envelope3Display_.setLook(envelopeLook);
+    trackGeneratorDisplay_.setLook(tss::trackGeneratorDisplayLookFromSkin(skin));
+    patchNameModuleHeader_.setLook(tss::moduleHeaderLookFromSkin(skin));
+    patchNameDisplay_.setLook(tss::patchNameDisplayLookFromSkin(skin));
 }
 

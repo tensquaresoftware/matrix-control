@@ -2,6 +2,7 @@
 
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
+#include "GUI/Looks/LookBuilders.h"
 #include "GUI/Widgets/Label.h"
 #include "GUI/Widgets/Slider.h"
 #include "GUI/Widgets/ComboBox.h"
@@ -58,10 +59,10 @@ void ParameterPanel::createParameterLabel(tss::ISkin& skin, WidgetFactory& facto
     const auto dimensions = getDimensionsForModuleType(moduleType_);
 
     label_ = std::make_unique<tss::Label>(
-        skin,
         dimensions.labelWidth,
         PluginDimensions::Widgets::Heights::kLabel,
         factory.getParameterDisplayName(parameterId).value_or(""));
+    label_->setLook(tss::labelLookFromSkin(skin));
     addAndMakeVisible(*label_);
 }
 
@@ -104,9 +105,9 @@ void ParameterPanel::createSeparator(tss::ISkin& skin)
     const auto dimensions = getDimensionsForModuleType(moduleType_);
 
     separator_ = std::make_unique<tss::HorizontalSeparator>(
-        skin,
         dimensions.separatorWidth,
         PluginDimensions::Widgets::Heights::kHorizontalSeparator);
+    separator_->setLook(tss::horizontalSeparatorLookFromSkin(skin));
     addAndMakeVisible(*separator_);
 }
 
@@ -127,6 +128,15 @@ void ParameterPanel::resized()
         y += labelHeight;
         layoutSeparator(y);
     }
+    
+    if (label_)
+        label_->setScalingFactor(scalingFactor_);
+    if (slider_)
+        slider_->setScalingFactor(scalingFactor_);
+    if (comboBox_)
+        comboBox_->setScalingFactor(scalingFactor_);
+    if (separator_)
+        separator_->setScalingFactor(scalingFactor_);
 }
 
 void ParameterPanel::layoutParameterLabel(int y)
@@ -169,11 +179,27 @@ void ParameterPanel::layoutSeparator(int y)
 void ParameterPanel::setSkin(tss::ISkin& skin)
 {
     skin_ = &skin;
-    tss::propagateSkin(skin,
-        label_.get(),
-        slider_.get(),
-        comboBox_.get(),
-        separator_.get());
+    if (label_)
+        label_->setLook(tss::labelLookFromSkin(skin));
+    if (slider_)
+        slider_->setLook(tss::sliderLookFromSkin(skin));
+    if (comboBox_)
+    {
+        comboBox_->setLook(tss::comboBoxLookFromSkin(skin));
+        comboBox_->setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
+    }
+    if (separator_)
+        separator_->setLook(tss::horizontalSeparatorLookFromSkin(skin));
+}
+
+void ParameterPanel::setScalingFactor(float scalingFactor)
+{
+    if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+        return;
+    
+    scalingFactor_ = scalingFactor;
+    resized();
+    repaint();
 }
 
 int ParameterPanel::getTotalHeight() const

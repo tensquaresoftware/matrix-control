@@ -2,6 +2,7 @@
 
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
+#include "GUI/Looks/LookBuilders.h"
 #include "GUI/Widgets/ModuleHeader.h"
 #include "GUI/Widgets/Button.h"
 #include "Shared/Definitions/PluginDimensions.h"
@@ -32,7 +33,7 @@ ModuleHeaderPanel::ModuleHeaderPanel(tss::ISkin& skin,
         createCopyPasteButtons(skin, factory, copyWidgetId, pasteWidgetId);
 }
 
-void ModuleHeaderPanel::createModuleHeader(tss::ISkin& skin, WidgetFactory& factory, const juce::String& moduleId)
+void ModuleHeaderPanel::createModuleHeader(tss::ISkin&, WidgetFactory& factory, const juce::String& moduleId)
 {
     const auto moduleHeaderWidth = (moduleType_ == ModuleType::PatchEdit)
         ? PluginDimensions::Widgets::Widths::ModuleHeader::kPatchEditModule
@@ -43,7 +44,6 @@ void ModuleHeaderPanel::createModuleHeader(tss::ISkin& skin, WidgetFactory& fact
         : tss::ModuleHeader::ColourVariant::Orange;
 
     moduleHeader_ = std::make_unique<tss::ModuleHeader>(
-        skin,
         factory.getGroupDisplayName(moduleId),
         moduleHeaderWidth,
         PluginDimensions::Widgets::Heights::kModuleHeader,
@@ -92,6 +92,13 @@ void ModuleHeaderPanel::resized()
         layoutInitCopyPasteButtons();
     else
         layoutInitOnlyButtons();
+    
+    if (initButton_)
+        initButton_->setScalingFactor(scalingFactor_);
+    if (copyButton_)
+        copyButton_->setScalingFactor(scalingFactor_);
+    if (pasteButton_)
+        pasteButton_->setScalingFactor(scalingFactor_);
 }
 
 void ModuleHeaderPanel::layoutModuleHeader()
@@ -139,9 +146,22 @@ void ModuleHeaderPanel::layoutInitCopyPasteButtons()
 void ModuleHeaderPanel::setSkin(tss::ISkin& skin)
 {
     skin_ = &skin;
-    tss::propagateSkin(skin,
-        moduleHeader_.get(),
-        initButton_.get(),
-        copyButton_.get(),
-        pasteButton_.get());
+    if (moduleHeader_)
+        moduleHeader_->setLook(tss::moduleHeaderLookFromSkin(skin));
+    if (initButton_)
+        initButton_->setLook(tss::buttonLookFromSkin(skin));
+    if (copyButton_)
+        copyButton_->setLook(tss::buttonLookFromSkin(skin));
+    if (pasteButton_)
+        pasteButton_->setLook(tss::buttonLookFromSkin(skin));
+}
+
+void ModuleHeaderPanel::setScalingFactor(float scalingFactor)
+{
+    if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+        return;
+    
+    scalingFactor_ = scalingFactor;
+    resized();
+    repaint();
 }

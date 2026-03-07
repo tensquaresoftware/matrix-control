@@ -1,30 +1,21 @@
 #include "ModuleHeader.h"
 
-
-#include "GUI/Skins/ISkin.h"
-#include "GUI/Skins/SkinValues.h"
-
-using tss::SkinColourId;
-
 namespace tss
 {
-    ModuleHeader::ModuleHeader(tss::ISkin& skin, const juce::String& text, int width, int height, ColourVariant variant)
+    ModuleHeader::ModuleHeader(const juce::String& text, int width, int height, ColourVariant variant)
         : width_(width)
         , height_(height)
-        , skin_(&skin)
         , text_(text)
         , colourVariant_(variant)
-        , cachedFont_(juce::FontOptions())
     {
         setOpaque(false);
         setSize(width_, height_);
-        updateSkinCache();
     }
 
-    void ModuleHeader::setSkin(tss::ISkin& skin)
+    void ModuleHeader::setLook(const ModuleHeaderLook& look)
     {
-        skin_ = &skin;
-        invalidateCache();
+        look_ = look;
+        repaint();
     }
 
     void ModuleHeader::setText(const juce::String& text)
@@ -32,82 +23,23 @@ namespace tss
         if (text_ != text)
         {
             text_ = text;
-            invalidateCache();
             repaint();
         }
     }
 
     void ModuleHeader::paint(juce::Graphics& g)
     {
-        if (skin_ == nullptr || text_.isEmpty())
+        if (text_.isEmpty())
             return;
 
-        if (!cacheValid_)
-            regenerateCache();
-
-        if (cachedImage_.isValid())
-        {
-            g.drawImage(cachedImage_, getLocalBounds().toFloat(),
-                       juce::RectanglePlacement::stretchToFit);
-        }
+        const auto bounds = getLocalBounds().toFloat();
+        drawText(g, bounds);
+        drawLine(g, bounds);
     }
 
     void ModuleHeader::resized()
     {
-        invalidateCache();
-    }
-
-    void ModuleHeader::regenerateCache()
-    {
-        const auto width = getWidth();
-        const auto height = getHeight();
-
-        if (width <= 0 || height <= 0)
-            return;
-
-        const float pixelScale = getPixelScale();
-        const int imageWidth = juce::roundToInt(width * pixelScale);
-        const int imageHeight = juce::roundToInt(height * pixelScale);
-
-        // Create HiDPI image at physical resolution
-        cachedImage_ = juce::Image(juce::Image::ARGB, imageWidth, imageHeight, true);
-        juce::Graphics g(cachedImage_);
-        
-        // Scale graphics context to match physical resolution
-        g.addTransform(juce::AffineTransform::scale(pixelScale));
-
-        const auto bounds = juce::Rectangle<float>(0.0f, 0.0f, 
-                                                    static_cast<float>(width), 
-                                                    static_cast<float>(height));
-
-        drawText(g, bounds);
-        drawLine(g, bounds);
-
-        cacheValid_ = true;
-    }
-
-    void ModuleHeader::invalidateCache()
-    {
-        cacheValid_ = false;
-    }
-
-    void ModuleHeader::updateSkinCache()
-    {
-        if (skin_ == nullptr)
-            return;
-
-        cachedTextColour_ = skin_->getColour(SkinColourId::kModuleHeaderText);
-        cachedLineColour_ = getLineColour();
-        cachedFont_ = skin_->getBaseFontBold().withHeight(kModuleHeaderFontHeight);
-    }
-
-    float ModuleHeader::getPixelScale() const
-    {
-        const auto* display = juce::Desktop::getInstance()
-                                  .getDisplays()
-                                  .getDisplayForRect(getScreenBounds());
-        const float displayScale = display != nullptr ? static_cast<float>(display->scale) : 1.0f;
-        return displayScale;
+        repaint();
     }
 
     void ModuleHeader::drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds)
@@ -119,8 +51,8 @@ namespace tss
         textBounds.setHeight(kTextAreaHeight_);
         textBounds.removeFromLeft(kTextLeftPadding_);
 
-        g.setColour(cachedTextColour_);
-        g.setFont(cachedFont_);
+        g.setColour(look_.text);
+        g.setFont(look_.font);
         g.drawText(text_, textBounds, juce::Justification::centredLeft, false);
     }
 
@@ -128,20 +60,17 @@ namespace tss
     {
         const auto lineAreaHeight = bounds.getHeight() - kTextAreaHeight_;
         const auto verticalOffset = kTextAreaHeight_ + (lineAreaHeight - kLineThickness_) * 0.5f;
-        
+
         auto lineBounds = bounds;
         lineBounds.setHeight(kLineThickness_);
         lineBounds.translate(0.0f, verticalOffset);
 
-        g.setColour(cachedLineColour_);
+        g.setColour(getLineColour());
         g.fillRect(lineBounds);
     }
 
     juce::Colour ModuleHeader::getLineColour() const
     {
-        return (colourVariant_ == ColourVariant::Blue) 
-            ? skin_->getColour(SkinColourId::kModuleHeaderLineBlue) 
-            : skin_->getColour(SkinColourId::kModuleHeaderLineOrange);
+        return (colourVariant_ == ColourVariant::Blue) ? look_.lineBlue : look_.lineOrange;
     }
 }
-

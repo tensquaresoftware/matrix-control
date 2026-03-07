@@ -2,6 +2,7 @@
 
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
+#include "GUI/Looks/LookBuilders.h"
 #include "GUI/Widgets/SectionHeader.h"
 #include "GUI/Widgets/ModulationBusHeader.h"
 #include "GUI/Widgets/Button.h"
@@ -44,12 +45,10 @@ MatrixModulationPanel::MatrixModulationPanel(tss::ISkin& skin, int width, int he
     , skin_(&skin)
     , apvts_(apvts)
     , sectionHeader_(std::make_unique<tss::SectionHeader>(
-        skin,
         PluginDimensions::Widgets::Widths::SectionHeader::kMatrixModulation,
         PluginDimensions::Widgets::Heights::kSectionHeader,
         PluginHelpers::getSectionDisplayName(PluginIDs::MatrixModulationSection::kGroupId)))
     , modulationBusHeader_(std::make_unique<tss::ModulationBusHeader>(
-        skin,
         PluginDimensions::Widgets::Widths::ModulationBusHeader::kStandard,
         PluginDimensions::Widgets::Heights::kModulationBusHeader))
 {
@@ -162,10 +161,10 @@ MatrixModulationPanel::ModulationBusParameterArrays MatrixModulationPanel::creat
 void MatrixModulationPanel::createInitAllBussesButton(tss::ISkin& skin)
 {
     initAllBussesButton_ = std::make_unique<tss::Button>(
-        skin,
         PluginDimensions::Widgets::Widths::Button::kInit,
         PluginDimensions::Widgets::Heights::kButton,
         PluginDisplayNames::ShortLabels::kInit);
+    initAllBussesButton_->setLook(tss::buttonLookFromSkin(skin));
     initAllBussesButton_->onClick = [this]
     {
         apvts_.state.setProperty(PluginIDs::MatrixModulationSection::StandaloneWidgets::kMatrixModulationInit,
@@ -204,12 +203,33 @@ void MatrixModulationPanel::resized()
 void MatrixModulationPanel::setSkin(tss::ISkin& skin)
 {
     skin_ = &skin;
-    tss::propagateSkin(skin,
-        sectionHeader_.get(),
-        modulationBusHeader_.get(),
-        initAllBussesButton_.get());
+    sectionHeader_->setLook(tss::sectionHeaderLookFromSkin(skin));
+    modulationBusHeader_->setLook(tss::modulationBusHeaderLookFromSkin(skin));
+
+    if (initAllBussesButton_)
+        initAllBussesButton_->setLook(tss::buttonLookFromSkin(skin));
 
     for (auto& bus : modulationBuses_)
         tss::propagateSkin(skin, bus.get());
+}
+
+void MatrixModulationPanel::setScalingFactor(float scalingFactor)
+{
+    if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+        return;
+    
+    scalingFactor_ = scalingFactor;
+    
+    if (initAllBussesButton_)
+        initAllBussesButton_->setScalingFactor(scalingFactor_);
+    
+    for (auto& bus : modulationBuses_)
+    {
+        if (bus)
+            bus->setScalingFactor(scalingFactor_);
+    }
+    
+    resized();
+    repaint();
 }
 

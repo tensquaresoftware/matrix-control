@@ -2,6 +2,7 @@
 
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
+#include "GUI/Looks/LookBuilders.h"
 #include "GUI/Widgets/ModuleHeader.h"
 #include "GUI/Widgets/GroupLabel.h"
 #include "GUI/Widgets/Button.h"
@@ -109,23 +110,62 @@ void InternalPatchesPanel::resized()
     x += memoryButtonWidth + kSpacing_;
 
     layoutStorePatchButton(x, y);
+    
+    if (loadPreviousPatchButton_)
+        loadPreviousPatchButton_->setScalingFactor(scalingFactor_);
+    if (loadNextPatchButton_)
+        loadNextPatchButton_->setScalingFactor(scalingFactor_);
+    if (initPatchButton_)
+        initPatchButton_->setScalingFactor(scalingFactor_);
+    if (copyPatchButton_)
+        copyPatchButton_->setScalingFactor(scalingFactor_);
+    if (pastePatchButton_)
+        pastePatchButton_->setScalingFactor(scalingFactor_);
+    if (storePatchButton_)
+        storePatchButton_->setScalingFactor(scalingFactor_);
 }
 
 void InternalPatchesPanel::setSkin(tss::ISkin& skin)
 {
     skin_ = &skin;
-    tss::propagateSkin(skin,
-        moduleHeader.get(),
-        browserGroupLabel.get(),
-        memoryGroupLabel.get(),
-        currentBankNumber.get(),
-        currentPatchNumber.get());
+    if (moduleHeader)
+        moduleHeader->setLook(tss::moduleHeaderLookFromSkin(skin));
+    if (browserGroupLabel)
+        browserGroupLabel->setLook(tss::groupLabelLookFromSkin(skin));
+    if (memoryGroupLabel)
+        memoryGroupLabel->setLook(tss::groupLabelLookFromSkin(skin));
+    if (currentBankNumber)
+        currentBankNumber->setLook(tss::numberBoxLookFromSkin(skin));
+    if (currentPatchNumber)
+        currentPatchNumber->setLook(tss::numberBoxLookFromSkin(skin));
+
+    if (loadPreviousPatchButton_)
+        loadPreviousPatchButton_->setLook(tss::buttonLookFromSkin(skin));
+    if (loadNextPatchButton_)
+        loadNextPatchButton_->setLook(tss::buttonLookFromSkin(skin));
+    if (initPatchButton_)
+        initPatchButton_->setLook(tss::buttonLookFromSkin(skin));
+    if (copyPatchButton_)
+        copyPatchButton_->setLook(tss::buttonLookFromSkin(skin));
+    if (pastePatchButton_)
+        pastePatchButton_->setLook(tss::buttonLookFromSkin(skin));
+    if (storePatchButton_)
+        storePatchButton_->setLook(tss::buttonLookFromSkin(skin));
+}
+
+void InternalPatchesPanel::setScalingFactor(float scalingFactor)
+{
+    if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+        return;
+    
+    scalingFactor_ = scalingFactor;
+    resized();
+    repaint();
 }
 
 void InternalPatchesPanel::setupModuleHeader(tss::ISkin& skin, WidgetFactory& widgetFactory, const juce::String& moduleId)
 {
     moduleHeader = std::make_unique<tss::ModuleHeader>(
-        skin, 
         widgetFactory.getGroupDisplayName(moduleId),
         PluginDimensions::Widgets::Widths::ModuleHeader::kPatchManagerModule,
         PluginDimensions::Widgets::Heights::kModuleHeader,
@@ -136,7 +176,6 @@ void InternalPatchesPanel::setupModuleHeader(tss::ISkin& skin, WidgetFactory& wi
 void InternalPatchesPanel::setupBrowserGroupLabel(tss::ISkin& skin)
 {
     browserGroupLabel = std::make_unique<tss::GroupLabel>(
-        skin,
         PluginDimensions::Widgets::Widths::GroupLabel::kInternalPatchesBrowser,
         PluginDimensions::Widgets::Heights::kGroupLabel,
         PluginDisplayNames::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kBrowser);
@@ -176,7 +215,6 @@ void InternalPatchesPanel::setupLoadNextPatchButton(tss::ISkin& skin, WidgetFact
 void InternalPatchesPanel::setupCurrentBankNumberBox(tss::ISkin& skin)
 {
     currentBankNumber = std::make_unique<tss::NumberBox>(
-        skin,
         PluginDimensions::Widgets::Widths::NumberBox::kPatchManagerBankNumber,
         false,
         Matrix1000Limits::kMinBankNumber,
@@ -188,7 +226,6 @@ void InternalPatchesPanel::setupCurrentBankNumberBox(tss::ISkin& skin)
 void InternalPatchesPanel::setupCurrentPatchNumberBox(tss::ISkin& skin)
 {
     currentPatchNumber = std::make_unique<tss::NumberBox>(
-        skin,
         PluginDimensions::Widgets::Widths::NumberBox::kPatchManagerPatchNumber,
         true,
         Matrix1000Limits::kMinPatchNumber,
@@ -212,10 +249,9 @@ void InternalPatchesPanel::setupCurrentPatchNumberBox(tss::ISkin& skin)
     addAndMakeVisible(*currentPatchNumber);
 }
 
-void InternalPatchesPanel::setupMemoryGroupLabel(tss::ISkin& skin)
+void InternalPatchesPanel::setupMemoryGroupLabel(tss::ISkin&)
 {
     memoryGroupLabel = std::make_unique<tss::GroupLabel>(
-        skin,
         PluginDimensions::Widgets::Widths::GroupLabel::kInternalPatchesMemory,
         PluginDimensions::Widgets::Heights::kGroupLabel,
         PluginDisplayNames::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kMemory);

@@ -4,6 +4,7 @@
 #include "Modules/VibratoPanel.h"
 #include "Modules/MiscPanel.h"
 
+#include "GUI/Looks/LookBuilders.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Widgets/SectionHeader.h"
@@ -23,7 +24,6 @@ MasterEditPanel::MasterEditPanel(tss::ISkin& skin, int width, int height, Widget
     , miscPanelHeight_(PluginDimensions::Panels::Body::MasterEditSection::MiscModule::kHeight)
     , skin_(&skin)
     , sectionHeader_(std::make_unique<tss::SectionHeader>(
-        skin,
         PluginDimensions::Widgets::Widths::SectionHeader::kMasterEdit,
         PluginDimensions::Widgets::Heights::kSectionHeader,
         PluginHelpers::getSectionDisplayName(PluginIDs::MasterEditSection::kGroupId),
@@ -84,10 +84,20 @@ void MasterEditPanel::resized()
 void MasterEditPanel::setSkin(tss::ISkin& skin)
 {
     skin_ = &skin;
+    sectionHeader_->setLook(tss::sectionHeaderLookFromSkin(skin));
     tss::propagateSkin(skin,
-        sectionHeader_.get(),
         midiPanel_.get(),
         vibratoPanel_.get(),
         miscPanel_.get());
+}
+
+void MasterEditPanel::setScalingFactor(float scalingFactor)
+{
+    if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+        return;
+    
+    scalingFactor_ = scalingFactor;
+    resized();
+    repaint();
 }
 

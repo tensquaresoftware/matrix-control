@@ -14,8 +14,8 @@ namespace tss::SkinColours
 
         inline constexpr ColourElement kHeaderPanelLabelText = {
             "HeaderPanelLabelText",
-            ColourChart::kDarkGrey1,
-            ColourChart::kDarkGrey1
+            ColourChart::kDarkGrey2,
+            ColourChart::kDarkGrey2
         };
 
         inline constexpr ColourElement kBodyPanelBackground = {

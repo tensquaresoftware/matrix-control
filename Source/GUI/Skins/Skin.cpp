@@ -38,7 +38,7 @@ namespace tss
         if (it != colours_.end())
             return it->second;
 
-        return juce::Colours::white;
+        return juce::Colour(ColourChart::kWhite);
     }
 
     void Skin::setValue(SkinValueId valueId, float value)
