@@ -46,39 +46,25 @@ MasterEditPanel::~MasterEditPanel() = default;
 void MasterEditPanel::resized()
 {
     const auto bounds = getLocalBounds();
-    const auto sectionHeaderHeight = PluginDimensions::Widgets::Heights::kSectionHeader;
-    
-    const auto sectionHeaderY = 0;
-    sectionHeader_->setBounds(
-        bounds.getX() + 0,
-        bounds.getY() + sectionHeaderY,
-        bounds.getWidth(),
-        sectionHeaderHeight
-    );
-    
-    const auto midiPanelY = sectionHeaderY + sectionHeaderHeight;
-    midiPanel_->setBounds(
-        bounds.getX() + 0,
-        bounds.getY() + midiPanelY,
-        childModuleWidth_,
-        midiPanelHeight_
-    );
-    
-    const auto vibratoPanelY = midiPanelY + midiPanelHeight_;
-    vibratoPanel_->setBounds(
-        bounds.getX() + 0,
-        bounds.getY() + vibratoPanelY,
-        childModuleWidth_,
-        vibratoPanelHeight_
-    );
-    
-    const auto miscPanelY = vibratoPanelY + vibratoPanelHeight_;
-    miscPanel_->setBounds(
-        bounds.getX() + 0,
-        bounds.getY() + miscPanelY,
-        childModuleWidth_,
-        miscPanelHeight_
-    );
+    const float sf = scalingFactor_;
+
+    const int sectionHeaderHeight = juce::roundToInt(static_cast<float>(PluginDimensions::Widgets::Heights::kSectionHeader) * sf);
+    const int childWidth          = juce::roundToInt(static_cast<float>(childModuleWidth_) * sf);
+    const int midiPanelHeight     = juce::roundToInt(static_cast<float>(midiPanelHeight_) * sf);
+    const int vibratoPanelHeight  = juce::roundToInt(static_cast<float>(vibratoPanelHeight_) * sf);
+    const int miscPanelHeight     = juce::roundToInt(static_cast<float>(miscPanelHeight_) * sf);
+
+    // Y positions computed independently from float origin to avoid rounding accumulation.
+    const float originY = static_cast<float>(bounds.getY());
+    const int sectionHeaderY = bounds.getY();
+    const int midiPanelY     = juce::roundToInt(originY + static_cast<float>(PluginDimensions::Widgets::Heights::kSectionHeader) * sf);
+    const int vibratoPanelY  = juce::roundToInt(originY + static_cast<float>(PluginDimensions::Widgets::Heights::kSectionHeader + midiPanelHeight_) * sf);
+    const int miscPanelY     = juce::roundToInt(originY + static_cast<float>(PluginDimensions::Widgets::Heights::kSectionHeader + midiPanelHeight_ + vibratoPanelHeight_) * sf);
+
+    sectionHeader_->setBounds(bounds.getX(), sectionHeaderY, bounds.getWidth(), sectionHeaderHeight);
+    midiPanel_->setBounds(bounds.getX(), midiPanelY, childWidth, midiPanelHeight);
+    vibratoPanel_->setBounds(bounds.getX(), vibratoPanelY, childWidth, vibratoPanelHeight);
+    miscPanel_->setBounds(bounds.getX(), miscPanelY, childWidth, miscPanelHeight);
 }
 
 void MasterEditPanel::setSkin(tss::ISkin& skin)
@@ -97,6 +83,16 @@ void MasterEditPanel::setScalingFactor(float scalingFactor)
         return;
     
     scalingFactor_ = scalingFactor;
+    
+    if (sectionHeader_)
+        sectionHeader_->setScalingFactor(scalingFactor_);
+    if (midiPanel_)
+        midiPanel_->setScalingFactor(scalingFactor_);
+    if (vibratoPanel_)
+        vibratoPanel_->setScalingFactor(scalingFactor_);
+    if (miscPanel_)
+        miscPanel_->setScalingFactor(scalingFactor_);
+    
     resized();
     repaint();
 }

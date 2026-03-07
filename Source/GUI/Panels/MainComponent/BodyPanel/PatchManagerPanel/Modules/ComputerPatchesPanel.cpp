@@ -39,56 +39,68 @@ ComputerPatchesPanel::~ComputerPatchesPanel() = default;
 
 void ComputerPatchesPanel::resized()
 {
-    int x = 0;
-    int y = 0;
+    using namespace PluginDimensions::Widgets;
+    const float sf = scalingFactor_;
 
-    layoutModuleHeader(x, y);
-    y += PluginDimensions::Widgets::Heights::kModuleHeader;
+    // Dimensions (scaled)
+    const int moduleHeaderH    = juce::roundToInt(static_cast<float>(Heights::kModuleHeader) * sf);
+    const int moduleHeaderW    = juce::roundToInt(static_cast<float>(Widths::ModuleHeader::kPatchManagerModule) * sf);
+    const int groupLabelH      = juce::roundToInt(static_cast<float>(Heights::kGroupLabel) * sf);
+    const int browserGroupW    = juce::roundToInt(static_cast<float>(Widths::GroupLabel::kComputerPatchesBrowser) * sf);
+    const int storageGroupW    = juce::roundToInt(static_cast<float>(Widths::GroupLabel::kComputerPatchesStorage) * sf);
+    const int navButtonW       = juce::roundToInt(static_cast<float>(Widths::Button::kInit) * sf);
+    const int comboBoxW        = juce::roundToInt(static_cast<float>(Widths::ComboBox::kPatchManagerComputerPatches) * sf);
+    const int storageButtonW   = juce::roundToInt(static_cast<float>(Widths::Button::kComputerPatchesStorage) * sf);
+    const int saveAsButtonW    = juce::roundToInt(static_cast<float>(Widths::Button::kComputerPatchesSaveAs) * sf);
+    const int buttonH          = juce::roundToInt(static_cast<float>(Heights::kButton) * sf);
 
-    const auto browserGroupWidth = PluginDimensions::Widgets::Widths::GroupLabel::kComputerPatchesBrowser;
-    const auto groupLabelHeight = PluginDimensions::Widgets::Heights::kGroupLabel;
+    // Module header
+    if (moduleHeader_)
+        moduleHeader_->setBounds(0, 0, moduleHeaderW, moduleHeaderH);
 
-    layoutBrowserGroupLabel(x, y);
-    x = browserGroupWidth + kGroupLabelSpacing_;
+    // Row 1 Y: group labels (computed independently)
+    const int row1Y = juce::roundToInt(static_cast<float>(Heights::kModuleHeader) * sf);
 
-    layoutStorageGroupLabel(x, y);
-    y += groupLabelHeight;
+    if (browserGroupLabel)
+        browserGroupLabel->setBounds(0, row1Y, browserGroupW, groupLabelH);
 
-    const auto navigationButtonWidth = PluginDimensions::Widgets::Widths::Button::kInit;
-    x = 0;
+    const int storageGroupX = juce::roundToInt(static_cast<float>(Widths::GroupLabel::kComputerPatchesBrowser + kGroupLabelSpacing_) * sf);
+    if (storageGroupLabel)
+        storageGroupLabel->setBounds(storageGroupX, row1Y, storageGroupW, groupLabelH);
 
-    layoutLoadPreviousPatchFileButton(x, y);
-    x += navigationButtonWidth + kSpacing_;
+    // Row 2 Y: widgets (computed independently)
+    const int row2Y = juce::roundToInt(static_cast<float>(Heights::kModuleHeader + Heights::kGroupLabel) * sf);
 
-    layoutLoadNextPatchFileButton(x, y);
-    x += navigationButtonWidth + kSpacing_;
-
-    layoutSelectPatchFileComboBox(x, y);
-
-    const auto storageButtonWidth = PluginDimensions::Widgets::Widths::Button::kComputerPatchesStorage;
-    const auto saveAsButtonWidth = PluginDimensions::Widgets::Widths::Button::kComputerPatchesSaveAs;
-    x = browserGroupWidth + kGroupLabelSpacing_;
-
-    layoutOpenPatchFolderButton(x, y);
-    x += storageButtonWidth + kSpacing_;
-
-    layoutSavePatchFileAsButton(x, y);
-    x += saveAsButtonWidth + kSpacing_;
-
-    layoutSavePatchFileButton(x, y);
-    
+    // Browser section: nav buttons + combobox
+    const float navStep = static_cast<float>(Widths::Button::kInit + kSpacing_) * sf;
     if (loadPreviousPatchFileButton_)
-        loadPreviousPatchFileButton_->setScalingFactor(scalingFactor_);
+        loadPreviousPatchFileButton_->setBounds(0, row2Y, navButtonW, buttonH);
     if (loadNextPatchFileButton_)
-        loadNextPatchFileButton_->setScalingFactor(scalingFactor_);
+        loadNextPatchFileButton_->setBounds(juce::roundToInt(navStep), row2Y, navButtonW, buttonH);
     if (selectPatchFileComboBox_)
-        selectPatchFileComboBox_->setScalingFactor(scalingFactor_);
+        selectPatchFileComboBox_->setBounds(juce::roundToInt(navStep * 2.0f), row2Y, comboBoxW, buttonH);
+
+    // Storage section: open + save-as + save
+    const float storageOriginX = static_cast<float>(Widths::GroupLabel::kComputerPatchesBrowser + kGroupLabelSpacing_) * sf;
+    const float openStep       = static_cast<float>(Widths::Button::kComputerPatchesStorage + kSpacing_) * sf;
+    const float saveAsStep     = static_cast<float>(Widths::Button::kComputerPatchesSaveAs + kSpacing_) * sf;
+
     if (openPatchFolderButton_)
-        openPatchFolderButton_->setScalingFactor(scalingFactor_);
+        openPatchFolderButton_->setBounds(juce::roundToInt(storageOriginX), row2Y, storageButtonW, buttonH);
     if (savePatchFileAsButton_)
-        savePatchFileAsButton_->setScalingFactor(scalingFactor_);
+        savePatchFileAsButton_->setBounds(juce::roundToInt(storageOriginX + openStep), row2Y, saveAsButtonW, buttonH);
     if (savePatchFileButton_)
-        savePatchFileButton_->setScalingFactor(scalingFactor_);
+        savePatchFileButton_->setBounds(juce::roundToInt(storageOriginX + openStep + saveAsStep), row2Y, storageButtonW, buttonH);
+
+    if (moduleHeader_)                  moduleHeader_->setScalingFactor(sf);
+    if (browserGroupLabel)              browserGroupLabel->setScalingFactor(sf);
+    if (storageGroupLabel)              storageGroupLabel->setScalingFactor(sf);
+    if (loadPreviousPatchFileButton_)   loadPreviousPatchFileButton_->setScalingFactor(sf);
+    if (loadNextPatchFileButton_)       loadNextPatchFileButton_->setScalingFactor(sf);
+    if (selectPatchFileComboBox_)       selectPatchFileComboBox_->setScalingFactor(sf);
+    if (openPatchFolderButton_)         openPatchFolderButton_->setScalingFactor(sf);
+    if (savePatchFileAsButton_)         savePatchFileAsButton_->setScalingFactor(sf);
+    if (savePatchFileButton_)           savePatchFileButton_->setScalingFactor(sf);
 }
 
 void ComputerPatchesPanel::setSkin(tss::ISkin& skin)
@@ -124,7 +136,6 @@ void ComputerPatchesPanel::setScalingFactor(float scalingFactor)
         return;
     
     scalingFactor_ = scalingFactor;
-    resized();
     repaint();
 }
 
@@ -270,85 +281,4 @@ void ComputerPatchesPanel::setupSavePatchFileButton(tss::ISkin& skin, WidgetFact
                                 nullptr);
     };
     addAndMakeVisible(*savePatchFileButton_);
-}
-
-void ComputerPatchesPanel::layoutModuleHeader(int x, int y)
-{
-    const auto moduleHeaderHeight = PluginDimensions::Widgets::Heights::kModuleHeader;
-    const auto moduleHeaderWidth = PluginDimensions::Widgets::Widths::ModuleHeader::kPatchManagerModule;
-
-    if (auto* header = moduleHeader_.get())
-        header->setBounds(x, y, moduleHeaderWidth, moduleHeaderHeight);
-}
-
-void ComputerPatchesPanel::layoutBrowserGroupLabel(int x, int y)
-{
-    const auto browserGroupWidth = PluginDimensions::Widgets::Widths::GroupLabel::kComputerPatchesBrowser;
-    const auto groupLabelHeight = PluginDimensions::Widgets::Heights::kGroupLabel;
-
-    if (auto* browserLabel = browserGroupLabel.get())
-        browserLabel->setBounds(x, y, browserGroupWidth, groupLabelHeight);
-}
-
-void ComputerPatchesPanel::layoutLoadPreviousPatchFileButton(int x, int y)
-{
-    const auto buttonHeight = PluginDimensions::Widgets::Heights::kButton;
-    const auto navigationButtonWidth = PluginDimensions::Widgets::Widths::Button::kInit;
-
-    if (auto* prevButton = loadPreviousPatchFileButton_.get())
-        prevButton->setBounds(x, y, navigationButtonWidth, buttonHeight);
-}
-
-void ComputerPatchesPanel::layoutLoadNextPatchFileButton(int x, int y)
-{
-    const auto buttonHeight = PluginDimensions::Widgets::Heights::kButton;
-    const auto navigationButtonWidth = PluginDimensions::Widgets::Widths::Button::kInit;
-
-    if (auto* nextButton = loadNextPatchFileButton_.get())
-        nextButton->setBounds(x, y, navigationButtonWidth, buttonHeight);
-}
-
-void ComputerPatchesPanel::layoutSelectPatchFileComboBox(int x, int y)
-{
-    const auto buttonHeight = PluginDimensions::Widgets::Heights::kButton;
-    const auto comboBoxWidth = PluginDimensions::Widgets::Widths::ComboBox::kPatchManagerComputerPatches;
-
-    if (auto* comboBox = selectPatchFileComboBox_.get())
-        comboBox->setBounds(x, y, comboBoxWidth, buttonHeight);
-}
-
-void ComputerPatchesPanel::layoutStorageGroupLabel(int x, int y)
-{
-    const auto storageGroupWidth = PluginDimensions::Widgets::Widths::GroupLabel::kComputerPatchesStorage;
-    const auto groupLabelHeight = PluginDimensions::Widgets::Heights::kGroupLabel;
-
-    if (auto* storageLabel = storageGroupLabel.get())
-        storageLabel->setBounds(x, y, storageGroupWidth, groupLabelHeight);
-}
-
-void ComputerPatchesPanel::layoutOpenPatchFolderButton(int x, int y)
-{
-    const auto buttonHeight = PluginDimensions::Widgets::Heights::kButton;
-    const auto storageButtonWidth = PluginDimensions::Widgets::Widths::Button::kComputerPatchesStorage;
-
-    if (auto* openButton = openPatchFolderButton_.get())
-        openButton->setBounds(x, y, storageButtonWidth, buttonHeight);
-}
-
-void ComputerPatchesPanel::layoutSavePatchFileAsButton(int x, int y)
-{
-    const auto buttonHeight = PluginDimensions::Widgets::Heights::kButton;
-    const auto saveAsButtonWidth = PluginDimensions::Widgets::Widths::Button::kComputerPatchesSaveAs;
-
-    if (auto* saveAsButton = savePatchFileAsButton_.get())
-        saveAsButton->setBounds(x, y, saveAsButtonWidth, buttonHeight);
-}
-
-void ComputerPatchesPanel::layoutSavePatchFileButton(int x, int y)
-{
-    const auto buttonHeight = PluginDimensions::Widgets::Heights::kButton;
-    const auto storageButtonWidth = PluginDimensions::Widgets::Widths::Button::kComputerPatchesStorage;
-
-    if (auto* saveButton = savePatchFileButton_.get())
-        saveButton->setBounds(x, y, storageButtonWidth, buttonHeight);
 }

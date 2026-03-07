@@ -18,6 +18,15 @@ namespace tss
         repaint();
     }
 
+    void ModuleHeader::setScalingFactor(float scalingFactor)
+    {
+        if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+            return;
+        
+        scalingFactor_ = scalingFactor;
+        repaint();
+    }
+
     void ModuleHeader::setText(const juce::String& text)
     {
         if (text_ != text)
@@ -47,22 +56,27 @@ namespace tss
         if (text_.isEmpty())
             return;
 
+        const float textAreaHeight = static_cast<float>(kTextAreaHeight_) * scalingFactor_;
+        const float textLeftPadding = static_cast<float>(kTextLeftPadding_) * scalingFactor_;
+        
         auto textBounds = bounds;
-        textBounds.setHeight(kTextAreaHeight_);
-        textBounds.removeFromLeft(kTextLeftPadding_);
+        textBounds.setHeight(textAreaHeight);
+        textBounds.removeFromLeft(textLeftPadding);
 
         g.setColour(look_.text);
-        g.setFont(look_.font);
+        g.setFont(look_.font.withHeight(look_.font.getHeight() * scalingFactor_));
         g.drawText(text_, textBounds, juce::Justification::centredLeft, false);
     }
 
     void ModuleHeader::drawLine(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        const auto lineAreaHeight = bounds.getHeight() - kTextAreaHeight_;
-        const auto verticalOffset = kTextAreaHeight_ + (lineAreaHeight - kLineThickness_) * 0.5f;
+        const float textAreaHeight = static_cast<float>(kTextAreaHeight_) * scalingFactor_;
+        const float lineThickness = std::max(1.0f, static_cast<float>(kLineThickness_) * scalingFactor_);
+        const auto lineAreaHeight = bounds.getHeight() - textAreaHeight;
+        const auto verticalOffset = textAreaHeight + (lineAreaHeight - lineThickness) * 0.5f;
 
         auto lineBounds = bounds;
-        lineBounds.setHeight(kLineThickness_);
+        lineBounds.setHeight(lineThickness);
         lineBounds.translate(0.0f, verticalOffset);
 
         g.setColour(getLineColour());

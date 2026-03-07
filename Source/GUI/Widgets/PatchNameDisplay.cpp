@@ -19,6 +19,15 @@ namespace tss
         repaint();
     }
 
+    void PatchNameDisplay::setScalingFactor(float scalingFactor)
+    {
+        if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+            return;
+        
+        scalingFactor_ = scalingFactor;
+        repaint();
+    }
+
     void PatchNameDisplay::setPatchName(const juce::String& patchName)
     {
         patchName_ = patchName;
@@ -42,13 +51,13 @@ namespace tss
     void PatchNameDisplay::drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
         g.setColour(look_.border);
-        g.drawRect(bounds, static_cast<float>(kBorderThickness_));
+        g.drawRect(bounds, std::max(1.0f, static_cast<float>(kBorderThickness_) * scalingFactor_));
     }
 
     void PatchNameDisplay::drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
         g.setColour(look_.text);
-        g.setFont(look_.font.withHeight(kFontHeight_));
+        g.setFont(look_.font.withHeight(kFontHeight_ * scalingFactor_));
         g.drawText(patchName_, bounds, juce::Justification::centred, false);
     }
 }

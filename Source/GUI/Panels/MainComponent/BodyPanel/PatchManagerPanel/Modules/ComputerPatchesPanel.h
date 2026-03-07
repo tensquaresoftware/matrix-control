@@ -60,15 +60,5 @@ private:
     void setupSavePatchFileAsButton(tss::ISkin& skin, WidgetFactory& widgetFactory);
     void setupSavePatchFileButton(tss::ISkin& skin, WidgetFactory& widgetFactory);
 
-    void layoutModuleHeader(int x, int y);
-    void layoutBrowserGroupLabel(int x, int y);
-    void layoutLoadPreviousPatchFileButton(int x, int y);
-    void layoutLoadNextPatchFileButton(int x, int y);
-    void layoutSelectPatchFileComboBox(int x, int y);
-    void layoutStorageGroupLabel(int x, int y);
-    void layoutOpenPatchFolderButton(int x, int y);
-    void layoutSavePatchFileAsButton(int x, int y);
-    void layoutSavePatchFileButton(int x, int y);
-
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ComputerPatchesPanel)
 };

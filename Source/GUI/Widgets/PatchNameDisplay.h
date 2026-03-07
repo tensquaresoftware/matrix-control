@@ -13,6 +13,7 @@ namespace tss
         ~PatchNameDisplay() override = default;
 
         void setLook(const PatchNameDisplayLook& look);
+        void setScalingFactor(float scalingFactor);
         void setPatchName(const juce::String& patchName);
 
         void paint(juce::Graphics& g) override;
@@ -28,6 +29,7 @@ namespace tss
         int width_;
         int height_;
         juce::String patchName_;
+        float scalingFactor_ = 1.0f;
 
         void drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds);

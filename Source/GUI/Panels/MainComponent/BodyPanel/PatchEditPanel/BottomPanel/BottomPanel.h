@@ -25,6 +25,7 @@ public:
 
     void resized() override;
     void setSkin(tss::ISkin& skin);
+    void setScalingFactor(float scalingFactor);
     
     Env1Panel* getEnv1Panel() { return env1Panel_.get(); }
     Env2Panel* getEnv2Panel() { return env2Panel_.get(); }
@@ -37,6 +38,7 @@ private:
     int childModuleHeight_;
     int spacing_;
     tss::ISkin* skin_;
+    float scalingFactor_ = 1.0f;
 
     std::unique_ptr<Env1Panel> env1Panel_;
     std::unique_ptr<Env2Panel> env2Panel_;

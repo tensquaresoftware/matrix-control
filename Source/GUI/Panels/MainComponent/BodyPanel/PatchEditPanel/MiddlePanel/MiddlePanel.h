@@ -23,6 +23,7 @@ public:
 
     void resized() override;
     void setSkin(tss::ISkin& skin);
+    void setScalingFactor(float scalingFactor);
     
     tss::TrackGeneratorDisplay& getTrackGeneratorDisplay() { return trackGeneratorDisplay_; }
     tss::EnvelopeDisplay& getEnvelope1Display() { return envelope1Display_; }
@@ -48,6 +49,7 @@ private:
     int height_;
     tss::ISkin* skin_;
     juce::AudioProcessorValueTreeState* apvts_ = nullptr;
+    float scalingFactor_ = 1.0f;
 
     tss::EnvelopeDisplay envelope1Display_;
     tss::EnvelopeDisplay envelope2Display_;

@@ -70,11 +70,19 @@ void BaseModulePanel::resized()
     auto bounds = getLocalBounds();
 
     if (auto* header = moduleHeaderPanel_.get())
-        header->setBounds(bounds.removeFromTop(header->getHeight()));
+    {
+        const int headerHeight = juce::roundToInt(static_cast<float>(ModuleHeaderPanel::getHeight()) * scalingFactor_);
+        header->setBounds(bounds.removeFromTop(headerHeight));
+    }
 
     for (auto& paramPanel : parameterPanels_)
+    {
         if (paramPanel != nullptr)
-            paramPanel->setBounds(bounds.removeFromTop(paramPanel->getTotalHeight()));
+        {
+            const int panelHeight = juce::roundToInt(static_cast<float>(paramPanel->getTotalHeight()) * scalingFactor_);
+            paramPanel->setBounds(bounds.removeFromTop(panelHeight));
+        }
+    }
 }
 
 void BaseModulePanel::setSkin(tss::ISkin& skin)
@@ -84,6 +92,26 @@ void BaseModulePanel::setSkin(tss::ISkin& skin)
 
     for (auto& paramPanel : parameterPanels_)
         tss::propagateSkin(skin, paramPanel.get());
+}
+
+void BaseModulePanel::setScalingFactor(float scalingFactor)
+{
+    if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+        return;
+    
+    scalingFactor_ = scalingFactor;
+    
+    if (moduleHeaderPanel_)
+        moduleHeaderPanel_->setScalingFactor(scalingFactor_);
+    
+    for (auto& paramPanel : parameterPanels_)
+    {
+        if (paramPanel)
+            paramPanel->setScalingFactor(scalingFactor_);
+    }
+    
+    resized();
+    repaint();
 }
 
 ParameterPanel* BaseModulePanel::getParameterPanelAt(size_t index)

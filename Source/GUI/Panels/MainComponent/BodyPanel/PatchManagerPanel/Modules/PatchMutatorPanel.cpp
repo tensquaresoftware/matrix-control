@@ -262,117 +262,122 @@ void PatchMutatorPanel::connectToggleToApvts(tss::Toggle* toggle, const char* wi
 
 void PatchMutatorPanel::resized()
 {
-    int x = 0;
-    int y = 0;
+    const float sf = scalingFactor_;
 
-    layoutModuleHeader(x, y);
-    y += PluginDimensions::Widgets::Heights::kModuleHeader + kSpacing_;
-
-    layoutAmountLine(x, y);
-    layoutRandomLine(x, y);
-    layoutHistoryLine(x, y);
-    
-    if (amountLabel_)
-        amountLabel_->setScalingFactor(scalingFactor_);
-    if (amountSlider_)
-        amountSlider_->setScalingFactor(scalingFactor_);
-    if (mutateButton_)
-        mutateButton_->setScalingFactor(scalingFactor_);
-    if (randomLabel_)
-        randomLabel_->setScalingFactor(scalingFactor_);
-    if (randomSlider_)
-        randomSlider_->setScalingFactor(scalingFactor_);
-    if (retryButton_)
-        retryButton_->setScalingFactor(scalingFactor_);
-    if (historyLabel_)
-        historyLabel_->setScalingFactor(scalingFactor_);
-    if (historyComboBox_)
-        historyComboBox_->setScalingFactor(scalingFactor_);
-    if (compareButton_)
-        compareButton_->setScalingFactor(scalingFactor_);
-    if (deleteButton_)
-        deleteButton_->setScalingFactor(scalingFactor_);
-    if (clearButton_)
-        clearButton_->setScalingFactor(scalingFactor_);
-    if (exportButton_)
-        exportButton_->setScalingFactor(scalingFactor_);
-}
-
-void PatchMutatorPanel::layoutModuleHeader(int x, int y)
-{
-    const auto width = PluginDimensions::Widgets::Widths::ModuleHeader::kPatchManagerModule;
-    const auto height = PluginDimensions::Widgets::Heights::kModuleHeader;
+    const int moduleHeaderW = juce::roundToInt(static_cast<float>(PluginDimensions::Widgets::Widths::ModuleHeader::kPatchManagerModule) * sf);
+    const int moduleHeaderH = juce::roundToInt(static_cast<float>(PluginDimensions::Widgets::Heights::kModuleHeader) * sf);
 
     if (auto* header = moduleHeader_.get())
-        header->setBounds(x, y, width, height);
+        header->setBounds(0, 0, moduleHeaderW, moduleHeaderH);
+
+    // Y positions for the 3 lines, computed independently from float origin
+    const int row0Y = juce::roundToInt(static_cast<float>(PluginDimensions::Widgets::Heights::kModuleHeader + kSpacing_) * sf);
+    const int row1Y = juce::roundToInt(static_cast<float>(PluginDimensions::Widgets::Heights::kModuleHeader + kSpacing_ + PluginDimensions::Widgets::Heights::kLabel + kSpacing_) * sf);
+    const int row2Y = juce::roundToInt(static_cast<float>(PluginDimensions::Widgets::Heights::kModuleHeader + kSpacing_ + (PluginDimensions::Widgets::Heights::kLabel + kSpacing_) * 2) * sf);
+
+    layoutSliderLine(0, row0Y, amountLabel_.get(), amountSlider_.get(), mutateButton_.get(),
+        {dco1Toggle_.get(), dco2Toggle_.get(), vcfVcaToggle_.get(), fmTrackToggle_.get(), rampPortamentoToggle_.get()});
+    layoutSliderLine(0, row1Y, randomLabel_.get(), randomSlider_.get(), retryButton_.get(),
+        {env1Toggle_.get(), env2Toggle_.get(), env3Toggle_.get(), lfo1Toggle_.get(), lfo2Toggle_.get()});
+    layoutHistoryLine(0, row2Y);
+
+    if (moduleHeader_)            moduleHeader_->setScalingFactor(sf);
+    if (amountLabel_)             amountLabel_->setScalingFactor(sf);
+    if (amountSlider_)            amountSlider_->setScalingFactor(sf);
+    if (mutateButton_)            mutateButton_->setScalingFactor(sf);
+    if (randomLabel_)             randomLabel_->setScalingFactor(sf);
+    if (randomSlider_)            randomSlider_->setScalingFactor(sf);
+    if (retryButton_)             retryButton_->setScalingFactor(sf);
+    if (historyLabel_)            historyLabel_->setScalingFactor(sf);
+    if (historyComboBox_)         historyComboBox_->setScalingFactor(sf);
+    if (compareButton_)           compareButton_->setScalingFactor(sf);
+    if (deleteButton_)            deleteButton_->setScalingFactor(sf);
+    if (clearButton_)             clearButton_->setScalingFactor(sf);
+    if (exportButton_)            exportButton_->setScalingFactor(sf);
+    if (dco1Toggle_)              dco1Toggle_->setScalingFactor(sf);
+    if (dco2Toggle_)              dco2Toggle_->setScalingFactor(sf);
+    if (vcfVcaToggle_)            vcfVcaToggle_->setScalingFactor(sf);
+    if (fmTrackToggle_)           fmTrackToggle_->setScalingFactor(sf);
+    if (rampPortamentoToggle_)    rampPortamentoToggle_->setScalingFactor(sf);
+    if (env1Toggle_)              env1Toggle_->setScalingFactor(sf);
+    if (env2Toggle_)              env2Toggle_->setScalingFactor(sf);
+    if (env3Toggle_)              env3Toggle_->setScalingFactor(sf);
+    if (lfo1Toggle_)              lfo1Toggle_->setScalingFactor(sf);
+    if (lfo2Toggle_)              lfo2Toggle_->setScalingFactor(sf);
 }
 
-void PatchMutatorPanel::layoutSliderLine(int x, int& y, tss::Label* label, tss::Slider* slider, tss::Button* button, const std::vector<tss::Toggle*>& toggles)
+void PatchMutatorPanel::layoutSliderLine(int x, int y, tss::Label* label, tss::Slider* slider, tss::Button* button, const std::vector<tss::Toggle*>& toggles)
 {
-    const int widgetY = y;
+    using namespace PluginDimensions::Widgets;
+    const float sf = scalingFactor_;
+
+    const int labelW      = juce::roundToInt(static_cast<float>(Widths::Label::kPatchMutator) * sf);
+    const int labelH      = juce::roundToInt(static_cast<float>(Heights::kLabel) * sf);
+    const int sliderW     = juce::roundToInt(static_cast<float>(Widths::Slider::kPatchMutator) * sf);
+    const int sliderH     = juce::roundToInt(static_cast<float>(Heights::kSlider) * sf);
+    const int buttonW     = juce::roundToInt(static_cast<float>(Widths::Button::kPatchMutatorMutate) * sf);
+    const int toggleW     = juce::roundToInt(static_cast<float>(Widths::Toggle::kPatchMutator) * sf);
+    const int toggleH     = juce::roundToInt(static_cast<float>(Heights::kToggle) * sf);
+
+    // Offsets computed in float to avoid accumulation
+    const float labelStep  = static_cast<float>(Widths::Label::kPatchMutator + kSpacing_) * sf;
+    const float sliderStep = static_cast<float>(Widths::Slider::kPatchMutator + kSpacing_) * sf;
+    const float buttonStep = static_cast<float>(Widths::Button::kPatchMutatorMutate + kSpacing_) * sf;
+    const float toggleStep = static_cast<float>(Widths::Toggle::kPatchMutator + kSpacing_) * sf;
+
+    const float originX = static_cast<float>(x);
 
     if (label != nullptr)
-        label->setBounds(x, widgetY, PluginDimensions::Widgets::Widths::Label::kPatchMutator, PluginDimensions::Widgets::Heights::kLabel);
-    x += PluginDimensions::Widgets::Widths::Label::kPatchMutator + kSpacing_;
+        label->setBounds(x, y, labelW, labelH);
 
     if (slider != nullptr)
-        slider->setBounds(x, widgetY, PluginDimensions::Widgets::Widths::Slider::kPatchMutator, PluginDimensions::Widgets::Heights::kSlider);
-    x += PluginDimensions::Widgets::Widths::Slider::kPatchMutator + kSpacing_;
+        slider->setBounds(juce::roundToInt(originX + labelStep), y, sliderW, sliderH);
 
     if (button != nullptr)
-        button->setBounds(x, widgetY, button->getWidth(), PluginDimensions::Widgets::Heights::kLabel);
-    x += button->getWidth() + kSpacing_;
+        button->setBounds(juce::roundToInt(originX + labelStep + sliderStep), y, buttonW, labelH);
 
-    for (auto* toggle : toggles)
+    const float toggleOriginX = originX + labelStep + sliderStep + buttonStep;
+    for (int i = 0; i < static_cast<int>(toggles.size()); ++i)
     {
-        if (toggle != nullptr)
-            toggle->setBounds(x, widgetY, PluginDimensions::Widgets::Widths::Toggle::kPatchMutator, PluginDimensions::Widgets::Heights::kToggle);
-        x += PluginDimensions::Widgets::Widths::Toggle::kPatchMutator + kSpacing_;
+        if (toggles[static_cast<size_t>(i)] != nullptr)
+            toggles[static_cast<size_t>(i)]->setBounds(juce::roundToInt(toggleOriginX + static_cast<float>(i) * toggleStep), y, toggleW, toggleH);
     }
-
-    y += PluginDimensions::Widgets::Heights::kLabel + kSpacing_;
 }
 
-void PatchMutatorPanel::layoutAmountLine(int x, int& y)
+void PatchMutatorPanel::layoutHistoryLine(int x, int y)
 {
-    layoutSliderLine(x, y, amountLabel_.get(), amountSlider_.get(), mutateButton_.get(),
-        {dco1Toggle_.get(), dco2Toggle_.get(), vcfVcaToggle_.get(), fmTrackToggle_.get(), rampPortamentoToggle_.get()});
-}
+    using namespace PluginDimensions::Widgets;
+    const float sf = scalingFactor_;
 
-void PatchMutatorPanel::layoutRandomLine(int x, int& y)
-{
-    layoutSliderLine(x, y, randomLabel_.get(), randomSlider_.get(), retryButton_.get(),
-        {env1Toggle_.get(), env2Toggle_.get(), env3Toggle_.get(), lfo1Toggle_.get(), lfo2Toggle_.get()});
-}
+    const int labelW      = juce::roundToInt(static_cast<float>(Widths::Label::kPatchMutator) * sf);
+    const int labelH      = juce::roundToInt(static_cast<float>(Heights::kLabel) * sf);
+    const int comboBoxW   = juce::roundToInt(static_cast<float>(Widths::ComboBox::kPatchMutatorHistory) * sf);
+    const int comboBoxH   = juce::roundToInt(static_cast<float>(Heights::kComboBox) * sf);
+    const int compareW    = juce::roundToInt(static_cast<float>(Widths::Button::kPatchMutatorCompare) * sf);
+    const int deleteW     = juce::roundToInt(static_cast<float>(Widths::Button::kPatchMutatorDelete) * sf);
+    const int clearW      = juce::roundToInt(static_cast<float>(Widths::Button::kPatchMutatorClear) * sf);
+    const int exportW     = juce::roundToInt(static_cast<float>(Widths::Button::kPatchMutatorExport) * sf);
 
-void PatchMutatorPanel::layoutHistoryLine(int x, int& y)
-{
-    const int widgetY = y;
+    // X positions computed independently from float origin
+    const float originX     = static_cast<float>(x);
+    const float labelStep   = static_cast<float>(Widths::Label::kPatchMutator + kSpacing_) * sf;
+    const float comboStep   = static_cast<float>(Widths::ComboBox::kPatchMutatorHistory + kSpacing_) * sf;
+    const float compareStep = static_cast<float>(Widths::Button::kPatchMutatorCompare + kSpacing_) * sf;
+    const float deleteStep  = static_cast<float>(Widths::Button::kPatchMutatorDelete + kSpacing_) * sf;
+    const float clearStep   = static_cast<float>(Widths::Button::kPatchMutatorClear + kSpacing_) * sf;
 
     if (auto* label = historyLabel_.get())
-        label->setBounds(x, widgetY, PluginDimensions::Widgets::Widths::Label::kPatchMutator, PluginDimensions::Widgets::Heights::kLabel);
-    x += PluginDimensions::Widgets::Widths::Label::kPatchMutator + kSpacing_;
-
+        label->setBounds(x, y, labelW, labelH);
     if (auto* comboBox = historyComboBox_.get())
-        comboBox->setBounds(x, widgetY, PluginDimensions::Widgets::Widths::ComboBox::kPatchMutatorHistory, PluginDimensions::Widgets::Heights::kComboBox);
-    x += PluginDimensions::Widgets::Widths::ComboBox::kPatchMutatorHistory + kSpacing_;
-
+        comboBox->setBounds(juce::roundToInt(originX + labelStep), y, comboBoxW, comboBoxH);
     if (auto* button = compareButton_.get())
-        button->setBounds(x, widgetY, button->getWidth(), PluginDimensions::Widgets::Heights::kLabel);
-    x += compareButton_->getWidth() + kSpacing_;
-
+        button->setBounds(juce::roundToInt(originX + labelStep + comboStep), y, compareW, labelH);
     if (auto* button = deleteButton_.get())
-        button->setBounds(x, widgetY, button->getWidth(), PluginDimensions::Widgets::Heights::kLabel);
-    x += deleteButton_->getWidth() + kSpacing_;
-
+        button->setBounds(juce::roundToInt(originX + labelStep + comboStep + compareStep), y, deleteW, labelH);
     if (auto* button = clearButton_.get())
-        button->setBounds(x, widgetY, button->getWidth(), PluginDimensions::Widgets::Heights::kLabel);
-    x += clearButton_->getWidth() + kSpacing_;
-
+        button->setBounds(juce::roundToInt(originX + labelStep + comboStep + compareStep + deleteStep), y, clearW, labelH);
     if (auto* button = exportButton_.get())
-        button->setBounds(x, widgetY, button->getWidth(), PluginDimensions::Widgets::Heights::kLabel);
-
-    y += PluginDimensions::Widgets::Heights::kLabel;
+        button->setBounds(juce::roundToInt(originX + labelStep + comboStep + compareStep + deleteStep + clearStep), y, exportW, labelH);
 }
 
 void PatchMutatorPanel::setSkin(tss::ISkin& skin)
@@ -388,7 +393,6 @@ void PatchMutatorPanel::setScalingFactor(float scalingFactor)
         return;
     
     scalingFactor_ = scalingFactor;
-    resized();
     repaint();
 }
 

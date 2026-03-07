@@ -145,13 +145,14 @@ void ModulationBusPanel::createSeparator(tss::ISkin& skin)
 
 void ModulationBusPanel::resized()
 {
-    const auto widgetRowHeight = dimensions_.busNumberLabelHeight;
+    const int widgetRowHeight = juce::roundToInt(
+        static_cast<float>(dimensions_.busNumberLabelHeight) * scalingFactor_);
     int y = 0;
 
     layoutWidgetRow();
     y += widgetRowHeight;
     layoutSeparator(y);
-    
+
     if (busNumberLabel_)
         busNumberLabel_->setScalingFactor(scalingFactor_);
     if (sourceComboBox_)
@@ -168,33 +169,41 @@ void ModulationBusPanel::resized()
 
 void ModulationBusPanel::layoutWidgetRow()
 {
+    const float sf = scalingFactor_;
     const int y = 0;
-    int x = 0;
 
-    if (auto* label = busNumberLabel_.get())
-        label->setBounds(x, y, dimensions_.busNumberLabelWidth, dimensions_.busNumberLabelHeight);
-    x += dimensions_.busNumberLabelWidth;
+    const int labelW  = juce::roundToInt(static_cast<float>(dimensions_.busNumberLabelWidth) * sf);
+    const int labelH  = juce::roundToInt(static_cast<float>(dimensions_.busNumberLabelHeight) * sf);
+    const int sourceW = juce::roundToInt(static_cast<float>(dimensions_.sourceComboBoxWidth) * sf);
+    const int sourceH = juce::roundToInt(static_cast<float>(dimensions_.sourceComboBoxHeight) * sf);
+    const int amountW = juce::roundToInt(static_cast<float>(dimensions_.amountSliderWidth) * sf);
+    const int amountH = juce::roundToInt(static_cast<float>(dimensions_.amountSliderHeight) * sf);
+    const int destW   = juce::roundToInt(static_cast<float>(dimensions_.destinationComboBoxWidth) * sf);
+    const int destH   = juce::roundToInt(static_cast<float>(dimensions_.destinationComboBoxHeight) * sf);
+    const int initW   = juce::roundToInt(static_cast<float>(dimensions_.initButtonWidth) * sf);
+    const int initH   = juce::roundToInt(static_cast<float>(dimensions_.initButtonHeight) * sf);
 
-    if (auto* comboBox = sourceComboBox_.get())
-        comboBox->setBounds(x, y, dimensions_.sourceComboBoxWidth, dimensions_.sourceComboBoxHeight);
-    x += dimensions_.sourceComboBoxWidth + kSpacing_;
+    // X positions computed independently from float origin to avoid rounding accumulation.
+    // Label has no spacing before source (they abut directly).
+    const float sourceX = static_cast<float>(dimensions_.busNumberLabelWidth) * sf;
+    const float amountX = sourceX + static_cast<float>(dimensions_.sourceComboBoxWidth + kSpacing_) * sf;
+    const float destX   = amountX + static_cast<float>(dimensions_.amountSliderWidth + kSpacing_) * sf;
+    const float initX   = destX   + static_cast<float>(dimensions_.destinationComboBoxWidth + kSpacing_) * sf;
 
-    if (auto* slider = amountSlider_.get())
-        slider->setBounds(x, y, dimensions_.amountSliderWidth, dimensions_.amountSliderHeight);
-    x += dimensions_.amountSliderWidth + kSpacing_;
-
-    if (auto* comboBox = destinationComboBox_.get())
-        comboBox->setBounds(x, y, dimensions_.destinationComboBoxWidth, dimensions_.destinationComboBoxHeight);
-    x += dimensions_.destinationComboBoxWidth + kSpacing_;
-
-    if (auto* button = initButton_.get())
-        button->setBounds(x, y, dimensions_.initButtonWidth, dimensions_.initButtonHeight);
+    if (auto* label   = busNumberLabel_.get())     label->setBounds(0, y, labelW, labelH);
+    if (auto* combo   = sourceComboBox_.get())     combo->setBounds(juce::roundToInt(sourceX), y, sourceW, sourceH);
+    if (auto* slider  = amountSlider_.get())       slider->setBounds(juce::roundToInt(amountX), y, amountW, amountH);
+    if (auto* combo   = destinationComboBox_.get()) combo->setBounds(juce::roundToInt(destX), y, destW, destH);
+    if (auto* button  = initButton_.get())         button->setBounds(juce::roundToInt(initX), y, initW, initH);
 }
 
 void ModulationBusPanel::layoutSeparator(int y)
 {
+    const int sepW = juce::roundToInt(static_cast<float>(dimensions_.separatorWidth) * scalingFactor_);
+    const int sepH = juce::roundToInt(static_cast<float>(dimensions_.separatorHeight) * scalingFactor_);
+
     if (auto* separator = separator_.get())
-        separator->setBounds(0, y, dimensions_.separatorWidth, dimensions_.separatorHeight);
+        separator->setBounds(0, y, sepW, sepH);
 }
 
 void ModulationBusPanel::setSkin(tss::ISkin& skin)
@@ -226,7 +235,6 @@ void ModulationBusPanel::setScalingFactor(float scalingFactor)
         return;
     
     scalingFactor_ = scalingFactor;
-    resized();
     repaint();
 }
 

@@ -16,11 +16,20 @@ namespace tss
         repaint();
     }
 
+    void EnvelopeDisplay::setScalingFactor(float scalingFactor)
+    {
+        if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+            return;
+        
+        scalingFactor_ = scalingFactor;
+        repaint();
+    }
+
     void EnvelopeDisplay::paint(juce::Graphics& g)
     {
         const auto bounds = getLocalBounds().toFloat();
-        const auto contentBounds = bounds.withTrimmedTop(static_cast<float>(kWidgetPaddingTop_))
-            .withTrimmedBottom(static_cast<float>(kWidgetPaddingBottom_));
+        const auto contentBounds = bounds.withTrimmedTop(static_cast<float>(kWidgetPaddingTop_) * scalingFactor_)
+            .withTrimmedBottom(static_cast<float>(kWidgetPaddingBottom_) * scalingFactor_);
 
         drawBackground(g, contentBounds);
         drawBorder(g, contentBounds);
@@ -38,19 +47,20 @@ namespace tss
     void EnvelopeDisplay::drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
         g.setColour(look_.border);
-        g.drawRect(bounds, static_cast<float>(kWidgetBorderThickness_));
+        g.drawRect(bounds, std::max(1.0f, static_cast<float>(kWidgetBorderThickness_) * scalingFactor_));
     }
 
     void EnvelopeDisplay::drawTriangle(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
         const auto triangleColour = look_.border;
-        const float triangleHeight = kWidgetTriangleBase_ * std::sqrt(3.0f) * 0.5f;
+        const float triangleBase = kWidgetTriangleBase_ * scalingFactor_;
+        const float triangleHeight = triangleBase * std::sqrt(3.0f) * 0.5f;
         const float centreX = bounds.getCentreX();
         const float baseY = bounds.getBottom();
 
         juce::Path triangle;
-        triangle.addTriangle(centreX - kWidgetTriangleBase_ * 0.5f, baseY,
-                             centreX + kWidgetTriangleBase_ * 0.5f, baseY,
+        triangle.addTriangle(centreX - triangleBase * 0.5f, baseY,
+                             centreX + triangleBase * 0.5f, baseY,
                              centreX, baseY + triangleHeight);
 
         g.setColour(triangleColour);
@@ -160,7 +170,7 @@ namespace tss
     
     juce::Rectangle<float> EnvelopeDisplay::getCurveCenterBounds(const juce::Rectangle<float>& innerBounds) const
     {
-        const float totalPadding = kCurvePadding_ + static_cast<float>(kWidgetBorderThickness_);
+        const float totalPadding = (kCurvePadding_ + static_cast<float>(kWidgetBorderThickness_)) * scalingFactor_;
         return innerBounds.reduced(totalPadding);
     }
     
@@ -173,22 +183,25 @@ namespace tss
         
         const auto envelopePoints = calculateEnvelopePoints(centerBounds);
         
+        const float lineThickness = std::max(1.0f, kCurveLineThickness_ * scalingFactor_);
+        
         g.setColour(look_.envelope);
         
         for (int i = 0; i < kCurvePointCount_ - 1; ++i)
         {
             g.drawLine(envelopePoints.points[i].x, envelopePoints.points[i].y,
                       envelopePoints.points[i + 1].x, envelopePoints.points[i + 1].y,
-                      kCurveLineThickness_);
+                      lineThickness);
         }
         
         const auto hollowPointFillColour = look_.envelope.withAlpha(0.4f);
+        const float pointRadius = kCurvePointRadius_ * scalingFactor_;
 
         for (int i = 0; i < kCurvePointCount_; ++i)
         {
-            const auto circleX = envelopePoints.points[i].x - kCurvePointRadius_;
-            const auto circleY = envelopePoints.points[i].y - kCurvePointRadius_;
-            const auto circleDiameter = kCurvePointRadius_ * 2.0f;
+            const auto circleX = envelopePoints.points[i].x - pointRadius;
+            const auto circleY = envelopePoints.points[i].y - pointRadius;
+            const auto circleDiameter = pointRadius * 2.0f;
             
             if (i == 1 || i == 2 || i == 3 || i == 5)
             {
@@ -196,13 +209,13 @@ namespace tss
                 g.fillEllipse(circleX, circleY, circleDiameter, circleDiameter);
                 
                 g.setColour(look_.envelope);
-                g.drawEllipse(circleX, circleY, circleDiameter, circleDiameter, kCurveLineThickness_);
+                g.drawEllipse(circleX, circleY, circleDiameter, circleDiameter, lineThickness);
             }
             else
             {
                 g.setColour(look_.envelope);
                 g.fillEllipse(circleX, circleY, circleDiameter, circleDiameter);
-                g.drawEllipse(circleX, circleY, circleDiameter, circleDiameter, kCurveLineThickness_);
+                g.drawEllipse(circleX, circleY, circleDiameter, circleDiameter, lineThickness);
             }
         }
     }
@@ -216,19 +229,20 @@ namespace tss
         
         const float delayWidth = (static_cast<float>(delay_) / static_cast<float>(kPointMaxValue_)) * result.segmentMaxWidth;
         
+        const float minSegmentWidth = kMinCurveSegmentWidth_ * scalingFactor_;
         float attackWidth = (static_cast<float>(attack_) / static_cast<float>(kPointMaxValue_)) * result.segmentMaxWidth;
         if (attack_ == 0)
-            attackWidth = kMinCurveSegmentWidth_;
+            attackWidth = minSegmentWidth;
         
         float decayWidth = (static_cast<float>(decay_) / static_cast<float>(kPointMaxValue_)) * result.segmentMaxWidth;
         if (decay_ == 0)
-            decayWidth = kMinCurveSegmentWidth_;
+            decayWidth = minSegmentWidth;
         
         const float sustainWidth = result.segmentMaxWidth;
         
         float releaseWidth = (static_cast<float>(release_) / static_cast<float>(kPointMaxValue_)) * result.segmentMaxWidth;
         if (release_ == 0)
-            releaseWidth = kMinCurveSegmentWidth_;
+            releaseWidth = minSegmentWidth;
         
         const float sustainNormalized = static_cast<float>(sustain_) / static_cast<float>(kPointMaxValue_);
         const float ySustain = centerBounds.getBottom() - (centerBounds.getHeight() * sustainNormalized);
@@ -262,6 +276,7 @@ namespace tss
         const auto centerBounds = getCurveCenterBounds(innerBounds);
         const auto envelopePoints = calculateEnvelopePoints(centerBounds);
         
+        const float hitZoneRadius = kPointHitZoneRadius_ * scalingFactor_;
         const int editablePoints[] = {1, 2, 3, 5};
         
         for (int editableIndex : editablePoints)
@@ -269,7 +284,7 @@ namespace tss
             const auto pointPos = envelopePoints.points[editableIndex];
             const float distance = position.getDistanceFrom(pointPos);
             
-            if (distance <= kPointHitZoneRadius_)
+            if (distance <= hitZoneRadius)
                 return editableIndex;
         }
         
@@ -281,13 +296,14 @@ namespace tss
         const auto centerBounds = getCurveCenterBounds(innerBounds);
         const auto envelopePoints = calculateEnvelopePoints(centerBounds);
         
+        const float sustainHitZone = kSustainSegmentHitZone_ * scalingFactor_;
         const auto& point3 = envelopePoints.points[3];
         const auto& point4 = envelopePoints.points[4];
         
         if (position.x >= point3.x && position.x <= point4.x)
         {
             const float distanceFromSegment = std::abs(position.y - point3.y);
-            if (distanceFromSegment <= kSustainSegmentHitZone_)
+            if (distanceFromSegment <= sustainHitZone)
                 return true;
         }
         
@@ -297,8 +313,8 @@ namespace tss
     void EnvelopeDisplay::mouseDown(const juce::MouseEvent& e)
     {
         const auto bounds = getLocalBounds().toFloat();
-        const auto innerBounds = bounds.withTrimmedTop(static_cast<float>(kWidgetPaddingTop_))
-            .withTrimmedBottom(static_cast<float>(kWidgetPaddingBottom_));
+        const auto innerBounds = bounds.withTrimmedTop(static_cast<float>(kWidgetPaddingTop_) * scalingFactor_)
+            .withTrimmedBottom(static_cast<float>(kWidgetPaddingBottom_) * scalingFactor_);
         
         draggedPointIndex_ = findPointAtPosition(e.position, innerBounds);
         
@@ -309,8 +325,8 @@ namespace tss
     void EnvelopeDisplay::mouseDrag(const juce::MouseEvent& e)
     {
         const auto bounds = getLocalBounds().toFloat();
-        const auto innerBounds = bounds.withTrimmedTop(static_cast<float>(kWidgetPaddingTop_))
-            .withTrimmedBottom(static_cast<float>(kWidgetPaddingBottom_));
+        const auto innerBounds = bounds.withTrimmedTop(static_cast<float>(kWidgetPaddingTop_) * scalingFactor_)
+            .withTrimmedBottom(static_cast<float>(kWidgetPaddingBottom_) * scalingFactor_);
         const auto centerBounds = getCurveCenterBounds(innerBounds);
         
         if (draggingSustainSegment_)

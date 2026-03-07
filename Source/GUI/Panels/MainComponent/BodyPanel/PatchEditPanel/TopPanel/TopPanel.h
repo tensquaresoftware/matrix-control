@@ -25,6 +25,7 @@ public:
 
     void resized() override;
     void setSkin(tss::ISkin& skin);
+    void setScalingFactor(float scalingFactor);
     
     FmTrackPanel* getFmTrackPanel() { return fmTrackPanel_.get(); }
 
@@ -35,6 +36,7 @@ private:
     int childModuleHeight_;
     int spacing_;
     tss::ISkin* skin_;
+    float scalingFactor_ = 1.0f;
 
     std::unique_ptr<Dco1Panel> dco1Panel_;
     std::unique_ptr<Dco2Panel> dco2Panel_;

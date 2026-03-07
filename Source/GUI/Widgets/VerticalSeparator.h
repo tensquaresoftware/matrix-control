@@ -13,6 +13,7 @@ namespace tss
         ~VerticalSeparator() override = default;
 
         void setLook(const VerticalSeparatorLook& look);
+        void setScalingFactor(float scalingFactor);
 
         void paint(juce::Graphics& g) override;
         void resized() override;
@@ -28,6 +29,7 @@ namespace tss
         VerticalSeparatorLook look_{};
         int width_;
         int height_;
+        float scalingFactor_ = 1.0f;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(VerticalSeparator)
     };

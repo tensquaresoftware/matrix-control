@@ -23,16 +23,14 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     setWantsKeyboardFocus(false);
     setInterceptsMouseClicks(true, true);
     
-    setSize(getWidth(), getHeight());
-    
-    const auto editorWidth = getWidth();
-    const auto editorHeight = getHeight();
+    const auto editorWidth = PluginDimensions::GUI::kWidth;
+    const auto editorHeight = PluginDimensions::GUI::kHeight;
     mainComponent = std::make_unique<MainComponent>(*skin_, editorWidth, editorHeight, *widgetFactory, pluginProcessor.getApvts());
     addAndMakeVisible(*mainComponent);
     
     if (auto* component = mainComponent.get())
     {
-        component->setBounds(0, 0, getWidth(), getHeight());
+        component->setBounds(getLocalBounds());
     }
 
     updateSkin();
@@ -76,7 +74,7 @@ void PluginEditor::paint(juce::Graphics& g)
 void PluginEditor::resized()
 {
     if (auto* component = mainComponent.get())
-        component->setBounds(0, 0, getWidth(), getHeight());
+        component->setBounds(getLocalBounds());
 }
 
 void PluginEditor::mouseDown(const juce::MouseEvent&)
@@ -93,17 +91,15 @@ void PluginEditor::updateSkin()
 
 void PluginEditor::applyGuiScale(float scaleFactor)
 {
+    if (auto* component = mainComponent.get())
+    {
+        component->setScalingFactor(scaleFactor);
+    }
+    
     const int baseWidth = PluginDimensions::GUI::kWidth;
     const int baseHeight = PluginDimensions::GUI::kHeight;
     
     setSize(juce::roundToInt(static_cast<float>(baseWidth) * scaleFactor), 
             juce::roundToInt(static_cast<float>(baseHeight) * scaleFactor));
-    
-    if (auto* component = mainComponent.get())
-    {
-        component->setScalingFactor(scaleFactor);
-        component->setBounds(0, 0, getWidth(), getHeight());
-        component->repaint();
-    }
 }
 

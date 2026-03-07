@@ -12,6 +12,7 @@ namespace tss
         explicit Toggle(int width, const juce::String& text = {});
 
         void setLook(const ToggleLook& look);
+        void setScalingFactor(float scalingFactor);
         void paintButton(juce::Graphics& g, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override;
 
     private:
@@ -19,6 +20,7 @@ namespace tss
 
         ToggleLook look_{};
         int width_;
+        float scalingFactor_ = 1.0f;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Toggle)
     };

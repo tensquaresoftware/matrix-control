@@ -194,7 +194,9 @@ namespace tss
     void ScrollablePopupMenu::paint(juce::Graphics& g)
     {
         const auto bounds = getLocalBounds().toFloat();
-        renderer_.drawBackground(g, bounds);
+        const float borderThickness = std::max(1.0f, kBorderThickness_ * scalingFactor_);
+        const auto contentBounds = bounds.reduced(borderThickness);
+        renderer_.drawBackground(g, contentBounds);
         renderer_.drawBorder(g, bounds);
     }
 

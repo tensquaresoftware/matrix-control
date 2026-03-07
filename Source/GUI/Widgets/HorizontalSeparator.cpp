@@ -27,9 +27,7 @@ namespace tss
 
     void HorizontalSeparator::paint(juce::Graphics& g)
     {
-        const auto bounds = juce::Rectangle<float>(0.0f, 0.0f, 
-                                                    static_cast<float>(getWidth()), 
-                                                    static_cast<float>(getHeight()));
+        const auto bounds = getLocalBounds().toFloat();
         const auto lineY = bounds.getCentreY();
         const float lineThickness = std::max(1.0f, static_cast<float>(kLineThickness_) * scalingFactor_);
         

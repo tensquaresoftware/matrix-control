@@ -125,7 +125,6 @@ void HeaderPanel::setScalingFactor(float scalingFactor)
         return;
     
     scalingFactor_ = scalingFactor;
-    resized();
     repaint();
 }
 

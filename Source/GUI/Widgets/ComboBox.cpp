@@ -40,9 +40,7 @@ namespace tss
 
     void ComboBox::paint(juce::Graphics& g)
     {
-        const auto bounds = juce::Rectangle<float>(0.0f, 0.0f, 
-                                                    static_cast<float>(getWidth()), 
-                                                    static_cast<float>(getHeight()));
+        const auto bounds = getLocalBounds().toFloat();
         const auto enabled = isEnabled();
         const auto hasFocus = hasFocus_ || isPopupOpen_;
         const auto backgroundBounds = calculateBackgroundBounds(bounds);
@@ -63,7 +61,7 @@ namespace tss
     {
         if (style_ == Style::ButtonLike)
         {
-            const float thickness = static_cast<float>(kBorderThicknessButtonLike_) * scalingFactor_;
+            const float thickness = std::max(1.0f, static_cast<float>(kBorderThicknessButtonLike_) * scalingFactor_);
             g.setColour(getBorderColourForCurrentStyle(enabled));
             g.drawRect(bounds, thickness);
             return;
@@ -71,7 +69,7 @@ namespace tss
 
         if (hasFocus)
         {
-            const float thickness = static_cast<float>(kBorderThickness_) * scalingFactor_;
+            const float thickness = std::max(1.0f, static_cast<float>(kBorderThickness_) * scalingFactor_);
             g.setColour(getFocusBorderColourForCurrentStyle());
             g.drawRect(backgroundBounds, thickness);
         }

@@ -93,7 +93,6 @@ void MainComponent::setScalingFactor(float scalingFactor)
     headerPanel.setScalingFactor(scalingFactor_);
     bodyPanel.setScalingFactor(scalingFactor_);
     footerPanel.setScalingFactor(scalingFactor_);
-    resized();
     repaint();
 }
 

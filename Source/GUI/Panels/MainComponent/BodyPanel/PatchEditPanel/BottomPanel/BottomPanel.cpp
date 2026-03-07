@@ -41,50 +41,21 @@ void BottomPanel::resized()
 {
     const auto bounds = getLocalBounds();
     
-    const auto env1PanelX = 0;
-    const auto env1PanelY = 0;
-    env1Panel_->setBounds(
-        bounds.getX() + env1PanelX,
-        bounds.getY() + env1PanelY,
-        childModuleWidth_,
-        childModuleHeight_
-    );
-    
-    const auto env2PanelX = env1PanelX + childModuleWidth_ + spacing_;
-    const auto env2PanelY = 0;
-    env2Panel_->setBounds(
-        bounds.getX() + env2PanelX,
-        bounds.getY() + env2PanelY,
-        childModuleWidth_,
-        childModuleHeight_
-    );
-    
-    const auto env3PanelX = env2PanelX + childModuleWidth_ + spacing_;
-    const auto env3PanelY = 0;
-    env3Panel_->setBounds(
-        bounds.getX() + env3PanelX,
-        bounds.getY() + env3PanelY,
-        childModuleWidth_,
-        childModuleHeight_
-    );
-    
-    const auto lfo1PanelX = env3PanelX + childModuleWidth_ + spacing_;
-    const auto lfo1PanelY = 0;
-    lfo1Panel_->setBounds(
-        bounds.getX() + lfo1PanelX,
-        bounds.getY() + lfo1PanelY,
-        childModuleWidth_,
-        childModuleHeight_
-    );
-    
-    const auto lfo2PanelX = lfo1PanelX + childModuleWidth_ + spacing_;
-    const auto lfo2PanelY = 0;
-    lfo2Panel_->setBounds(
-        bounds.getX() + lfo2PanelX,
-        bounds.getY() + lfo2PanelY,
-        childModuleWidth_,
-        childModuleHeight_
-    );
+    const int childWidth = juce::roundToInt(static_cast<float>(childModuleWidth_) * scalingFactor_);
+    const int childHeight = juce::roundToInt(static_cast<float>(childModuleHeight_) * scalingFactor_);
+    const float childStep = static_cast<float>(childModuleWidth_ + spacing_) * scalingFactor_;
+
+    const int x0 = bounds.getX() + juce::roundToInt(0.0f * childStep);
+    const int x1 = bounds.getX() + juce::roundToInt(1.0f * childStep);
+    const int x2 = bounds.getX() + juce::roundToInt(2.0f * childStep);
+    const int x3 = bounds.getX() + juce::roundToInt(3.0f * childStep);
+    const int x4 = bounds.getX() + juce::roundToInt(4.0f * childStep);
+
+    env1Panel_->setBounds(x0, bounds.getY(), childWidth, childHeight);
+    env2Panel_->setBounds(x1, bounds.getY(), childWidth, childHeight);
+    env3Panel_->setBounds(x2, bounds.getY(), childWidth, childHeight);
+    lfo1Panel_->setBounds(x3, bounds.getY(), childWidth, childHeight);
+    lfo2Panel_->setBounds(x4, bounds.getY(), bounds.getRight() - x4, childHeight);
 }
 
 void BottomPanel::setSkin(tss::ISkin& skin)
@@ -96,5 +67,27 @@ void BottomPanel::setSkin(tss::ISkin& skin)
         env3Panel_.get(),
         lfo1Panel_.get(),
         lfo2Panel_.get());
+}
+
+void BottomPanel::setScalingFactor(float scalingFactor)
+{
+    if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+        return;
+    
+    scalingFactor_ = scalingFactor;
+    
+    if (env1Panel_)
+        env1Panel_->setScalingFactor(scalingFactor_);
+    if (env2Panel_)
+        env2Panel_->setScalingFactor(scalingFactor_);
+    if (env3Panel_)
+        env3Panel_->setScalingFactor(scalingFactor_);
+    if (lfo1Panel_)
+        lfo1Panel_->setScalingFactor(scalingFactor_);
+    if (lfo2Panel_)
+        lfo2Panel_->setScalingFactor(scalingFactor_);
+    
+    resized();
+    repaint();
 }
 

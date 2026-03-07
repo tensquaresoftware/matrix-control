@@ -23,6 +23,15 @@ namespace tss
         repaint();
     }
 
+    void NumberBox::setScalingFactor(float scalingFactor)
+    {
+        if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+            return;
+
+        scalingFactor_ = scalingFactor;
+        repaint();
+    }
+
     void NumberBox::setValue(int newValue)
     {
         const int clampedValue = juce::jlimit(minValue_, maxValue_, newValue);
@@ -55,22 +64,24 @@ namespace tss
     void NumberBox::paint(juce::Graphics& g)
     {
         const auto bounds = getLocalBounds().toFloat();
+        const float borderThickness = std::max(1.0f, static_cast<float>(kBorderThickness_) * scalingFactor_);
 
         g.setColour(look_.background);
         g.fillRect(bounds);
 
         g.setColour(getBorderColour());
-        g.drawRect(bounds, static_cast<float>(kBorderThickness_));
+        g.drawRect(bounds, borderThickness);
 
         g.setColour(look_.text);
-        g.setFont(look_.font);
+        g.setFont(look_.font.withHeight(look_.font.getHeight() * scalingFactor_));
         g.drawText(cachedValueText_, bounds, juce::Justification::centred, false);
 
         if (showDot_)
         {
             const auto dotPosition = calculateDotPosition(bounds, cachedTextWidth_);
             g.setColour(look_.dot);
-            g.fillEllipse(dotPosition.x, dotPosition.y, kDotRadius_ * 2.0f, kDotRadius_ * 2.0f);
+            const float dotRadius = kDotRadius_ * scalingFactor_;
+            g.fillEllipse(dotPosition.x, dotPosition.y, dotRadius * 2.0f, dotRadius * 2.0f);
         }
     }
 

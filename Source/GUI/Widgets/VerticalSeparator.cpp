@@ -16,16 +16,26 @@ namespace tss
         repaint();
     }
 
+    void VerticalSeparator::setScalingFactor(float scalingFactor)
+    {
+        if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+            return;
+        
+        scalingFactor_ = scalingFactor;
+        repaint();
+    }
+
     void VerticalSeparator::paint(juce::Graphics& g)
     {
         const auto bounds = getLocalBounds().toFloat();
-        const auto lineX = bounds.getCentreX() - kLineWidth_ * 0.5f;
+        const float lineWidth = std::max(1.0f, kLineWidth_ * scalingFactor_);
+        const auto lineX = bounds.getCentreX() - lineWidth * 0.5f;
 
         auto line = bounds;
-        line.removeFromTop(kTopPadding_);
-        line.removeFromBottom(kBottomPadding_);
+        line.removeFromTop(kTopPadding_ * scalingFactor_);
+        line.removeFromBottom(kBottomPadding_ * scalingFactor_);
         line.setX(lineX);
-        line.setWidth(kLineWidth_);
+        line.setWidth(lineWidth);
 
         g.setColour(look_.line);
         g.fillRect(line);

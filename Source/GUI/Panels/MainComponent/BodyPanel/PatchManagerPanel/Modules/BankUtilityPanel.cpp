@@ -30,105 +30,82 @@ BankUtilityPanel::~BankUtilityPanel() = default;
 
 void BankUtilityPanel::resized()
 {
-    const auto moduleHeaderHeight = PluginDimensions::Widgets::Heights::kModuleHeader;
-    const auto moduleHeaderWidth = PluginDimensions::Widgets::Widths::ModuleHeader::kPatchManagerModule;
-    const auto labelWidth = PluginDimensions::Widgets::Widths::Label::kPatchManagerBankSelector;
-    const auto labelHeight = PluginDimensions::Widgets::Heights::kLabel;
-    const auto buttonWidth = PluginDimensions::Widgets::Widths::Button::kPatchManagerBankSelect;
-    const auto buttonHeight = PluginDimensions::Widgets::Heights::kButton;
+    using namespace PluginDimensions::Widgets;
+    const float sf = scalingFactor_;
 
-    int y = 0;
+    const int moduleHeaderHeight  = juce::roundToInt(static_cast<float>(Heights::kModuleHeader) * sf);
+    const int moduleHeaderWidth   = juce::roundToInt(static_cast<float>(Widths::ModuleHeader::kPatchManagerModule) * sf);
+    const int labelWidth          = juce::roundToInt(static_cast<float>(Widths::Label::kPatchManagerBankSelector) * sf);
+    const int labelHeight         = juce::roundToInt(static_cast<float>(Heights::kLabel) * sf);
+    const int buttonWidth         = juce::roundToInt(static_cast<float>(Widths::Button::kPatchManagerBankSelect) * sf);
+    const int buttonHeight        = juce::roundToInt(static_cast<float>(Heights::kButton) * sf);
+    const int unlockButtonWidth   = juce::roundToInt(static_cast<float>(Widths::Button::kPatchManagerUnlockBank) * sf);
 
     if (auto* header = bankUtilityModuleHeader_.get())
-        header->setBounds(0, y, moduleHeaderWidth, moduleHeaderHeight);
+        header->setBounds(0, 0, moduleHeaderWidth, moduleHeaderHeight);
 
-    y = moduleHeaderHeight + kTopPadding_;
+    // Row 1 Y (computed from float to avoid accumulation with row2 Y)
+    const int row1Y = juce::roundToInt(static_cast<float>(Heights::kModuleHeader + kTopPadding_) * sf);
 
     if (auto* label = bankSelectorLabel_.get())
-        label->setBounds(0, y, labelWidth, labelHeight);
+        label->setBounds(0, row1Y, labelWidth, labelHeight);
 
-    int x = labelWidth + kSpacing_;
+    // Row 1 X positions: each computed independently from float origin
+    const float row1OriginX = static_cast<float>(Widths::Label::kPatchManagerBankSelector + kSpacing_) * sf;
+    const float bankButtonStep = static_cast<float>(Widths::Button::kPatchManagerBankSelect + kSpacing_) * sf;
 
-    if (auto* button = selectBank0Button_.get())
-        button->setBounds(x, y, buttonWidth, buttonHeight);
+    auto setBankButtonBounds = [&](tss::Button* btn, int index, int y)
+    {
+        if (btn)
+        {
+            const int x = juce::roundToInt(row1OriginX + static_cast<float>(index) * bankButtonStep);
+            btn->setBounds(x, y, buttonWidth, buttonHeight);
+        }
+    };
 
-    x += buttonWidth + kSpacing_;
+    setBankButtonBounds(selectBank0Button_.get(), 0, row1Y);
+    setBankButtonBounds(selectBank1Button_.get(), 1, row1Y);
+    setBankButtonBounds(selectBank2Button_.get(), 2, row1Y);
+    setBankButtonBounds(selectBank3Button_.get(), 3, row1Y);
+    setBankButtonBounds(selectBank4Button_.get(), 4, row1Y);
 
-    if (auto* button = selectBank1Button_.get())
-        button->setBounds(x, y, buttonWidth, buttonHeight);
-
-    x += buttonWidth + kSpacing_;
-
-    if (auto* button = selectBank2Button_.get())
-        button->setBounds(x, y, buttonWidth, buttonHeight);
-
-    x += buttonWidth + kSpacing_;
-
-    if (auto* button = selectBank3Button_.get())
-        button->setBounds(x, y, buttonWidth, buttonHeight);
-
-    x += buttonWidth + kSpacing_;
-
-    if (auto* button = selectBank4Button_.get())
-        button->setBounds(x, y, buttonWidth, buttonHeight);
-
-    y = moduleHeaderHeight + kTopPadding_ + buttonHeight + kSpacing_;
-    x = 0;
-
-    const auto unlockButtonWidth = PluginDimensions::Widgets::Widths::Button::kPatchManagerUnlockBank;
+    // Row 2 Y (computed independently from float origin)
+    const int row2Y = juce::roundToInt(static_cast<float>(Heights::kModuleHeader + kTopPadding_ + Heights::kButton + kSpacing_) * sf);
 
     if (auto* button = unlockBankButton_.get())
-        button->setBounds(x, y, unlockButtonWidth, buttonHeight);
+        button->setBounds(0, row2Y, unlockButtonWidth, buttonHeight);
 
-    x += unlockButtonWidth + kSpacing_;
+    // Row 2 X positions: banks 5-9, after unlock button
+    const float row2OriginX = static_cast<float>(Widths::Button::kPatchManagerUnlockBank + kSpacing_) * sf;
 
-    if (auto* button = selectBank5Button_.get())
-        button->setBounds(x, y, buttonWidth, buttonHeight);
+    auto setBankButtonBoundsRow2 = [&](tss::Button* btn, int index, int y)
+    {
+        if (btn)
+        {
+            const int x = juce::roundToInt(row2OriginX + static_cast<float>(index) * bankButtonStep);
+            btn->setBounds(x, y, buttonWidth, buttonHeight);
+        }
+    };
 
-    x += buttonWidth + kSpacing_;
+    setBankButtonBoundsRow2(selectBank5Button_.get(), 0, row2Y);
+    setBankButtonBoundsRow2(selectBank6Button_.get(), 1, row2Y);
+    setBankButtonBoundsRow2(selectBank7Button_.get(), 2, row2Y);
+    setBankButtonBoundsRow2(selectBank8Button_.get(), 3, row2Y);
+    setBankButtonBoundsRow2(selectBank9Button_.get(), 4, row2Y);
 
-    if (auto* button = selectBank6Button_.get())
-        button->setBounds(x, y, buttonWidth, buttonHeight);
-
-    x += buttonWidth + kSpacing_;
-
-    if (auto* button = selectBank7Button_.get())
-        button->setBounds(x, y, buttonWidth, buttonHeight);
-
-    x += buttonWidth + kSpacing_;
-
-    if (auto* button = selectBank8Button_.get())
-        button->setBounds(x, y, buttonWidth, buttonHeight);
-
-    x += buttonWidth + kSpacing_;
-
-    if (auto* button = selectBank9Button_.get())
-        button->setBounds(x, y, buttonWidth, buttonHeight);
-    
-    if (bankSelectorLabel_)
-        bankSelectorLabel_->setScalingFactor(scalingFactor_);
-    if (unlockBankButton_)
-        unlockBankButton_->setScalingFactor(scalingFactor_);
-    if (selectBank0Button_)
-        selectBank0Button_->setScalingFactor(scalingFactor_);
-    if (selectBank1Button_)
-        selectBank1Button_->setScalingFactor(scalingFactor_);
-    if (selectBank2Button_)
-        selectBank2Button_->setScalingFactor(scalingFactor_);
-    if (selectBank3Button_)
-        selectBank3Button_->setScalingFactor(scalingFactor_);
-    if (selectBank4Button_)
-        selectBank4Button_->setScalingFactor(scalingFactor_);
-    if (selectBank5Button_)
-        selectBank5Button_->setScalingFactor(scalingFactor_);
-    if (selectBank6Button_)
-        selectBank6Button_->setScalingFactor(scalingFactor_);
-    if (selectBank7Button_)
-        selectBank7Button_->setScalingFactor(scalingFactor_);
-    if (selectBank8Button_)
-        selectBank8Button_->setScalingFactor(scalingFactor_);
-    if (selectBank9Button_)
-        selectBank9Button_->setScalingFactor(scalingFactor_);
+    if (bankSelectorLabel_)      bankSelectorLabel_->setScalingFactor(sf);
+    if (bankUtilityModuleHeader_) bankUtilityModuleHeader_->setScalingFactor(sf);
+    if (unlockBankButton_)       unlockBankButton_->setScalingFactor(sf);
+    if (selectBank0Button_)      selectBank0Button_->setScalingFactor(sf);
+    if (selectBank1Button_)      selectBank1Button_->setScalingFactor(sf);
+    if (selectBank2Button_)      selectBank2Button_->setScalingFactor(sf);
+    if (selectBank3Button_)      selectBank3Button_->setScalingFactor(sf);
+    if (selectBank4Button_)      selectBank4Button_->setScalingFactor(sf);
+    if (selectBank5Button_)      selectBank5Button_->setScalingFactor(sf);
+    if (selectBank6Button_)      selectBank6Button_->setScalingFactor(sf);
+    if (selectBank7Button_)      selectBank7Button_->setScalingFactor(sf);
+    if (selectBank8Button_)      selectBank8Button_->setScalingFactor(sf);
+    if (selectBank9Button_)      selectBank9Button_->setScalingFactor(sf);
 }
 
 void BankUtilityPanel::setSkin(tss::ISkin& skin)
@@ -169,7 +146,6 @@ void BankUtilityPanel::setScalingFactor(float scalingFactor)
         return;
     
     scalingFactor_ = scalingFactor;
-    resized();
     repaint();
 }
 

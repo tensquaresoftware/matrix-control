@@ -179,24 +179,37 @@ void MatrixModulationPanel::resized()
     auto bounds = getLocalBounds();
 
     if (auto* header = sectionHeader_.get())
-        header->setBounds(bounds.removeFromTop(header->getHeight()));
+    {
+        const int headerHeight = juce::roundToInt(
+            static_cast<float>(PluginDimensions::Widgets::Heights::kSectionHeader) * scalingFactor_);
+        header->setBounds(bounds.removeFromTop(headerHeight));
+    }
 
     if (auto* busHeader = modulationBusHeader_.get())
-        busHeader->setBounds(bounds.removeFromTop(busHeader->getHeight()));
+    {
+        const int busHeaderHeight = juce::roundToInt(
+            static_cast<float>(PluginDimensions::Widgets::Heights::kModulationBusHeader) * scalingFactor_);
+        busHeader->setBounds(bounds.removeFromTop(busHeaderHeight));
+    }
 
     if (auto* initButton = initAllBussesButton_.get())
     {
-        const auto initAllButtonWidth = PluginDimensions::Widgets::Widths::Button::kInit;
-        const auto initAllButtonHeight = PluginDimensions::Widgets::Heights::kButton;
-        const auto initAllButtonX = width_ - initAllButtonWidth;
-        const auto initAllButtonY = sectionHeader_->getHeight();
-        initButton->setBounds(initAllButtonX, initAllButtonY, initAllButtonWidth, initAllButtonHeight);
+        const int initAllButtonWidth = juce::roundToInt(
+            static_cast<float>(PluginDimensions::Widgets::Widths::Button::kInit) * scalingFactor_);
+        const int initAllButtonHeight = juce::roundToInt(
+            static_cast<float>(PluginDimensions::Widgets::Heights::kButton) * scalingFactor_);
+        const int sectionHeaderHeight = juce::roundToInt(
+            static_cast<float>(PluginDimensions::Widgets::Heights::kSectionHeader) * scalingFactor_);
+        const int initAllButtonX = juce::roundToInt(static_cast<float>(width_) * scalingFactor_) - initAllButtonWidth;
+        initButton->setBounds(initAllButtonX, sectionHeaderHeight, initAllButtonWidth, initAllButtonHeight);
     }
+
+    const int busHeight = juce::roundToInt(static_cast<float>(modulationBusHeight_) * scalingFactor_);
 
     for (auto& bus : modulationBuses_)
     {
         if (bus != nullptr)
-            bus->setBounds(bounds.removeFromTop(bus->getHeight()));
+            bus->setBounds(bounds.removeFromTop(busHeight));
     }
 }
 
@@ -220,6 +233,10 @@ void MatrixModulationPanel::setScalingFactor(float scalingFactor)
     
     scalingFactor_ = scalingFactor;
     
+    if (sectionHeader_)
+        sectionHeader_->setScalingFactor(scalingFactor_);
+    if (modulationBusHeader_)
+        modulationBusHeader_->setScalingFactor(scalingFactor_);
     if (initAllBussesButton_)
         initAllBussesButton_->setScalingFactor(scalingFactor_);
     

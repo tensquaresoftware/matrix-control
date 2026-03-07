@@ -20,13 +20,23 @@ namespace tss
         repaint();
     }
 
+    void SectionHeader::setScalingFactor(float scalingFactor)
+    {
+        if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+            return;
+        
+        scalingFactor_ = scalingFactor;
+        calculateTextWidth();
+        repaint();
+    }
+
     void SectionHeader::paint(juce::Graphics& g)
     {
         if (text_.isEmpty())
             return;
 
         auto contentArea = getLocalBounds().toFloat();
-        contentArea.setHeight(kContentHeight_);
+        contentArea.setHeight(kContentHeight_ * scalingFactor_);
 
         drawText(g, contentArea);
         drawLines(g, contentArea);
@@ -45,8 +55,9 @@ namespace tss
             return;
         }
 
+        const auto scaledFont = look_.font.withHeight(look_.font.getHeight() * scalingFactor_);
         juce::GlyphArrangement glyphArrangement;
-        glyphArrangement.addLineOfText(look_.font, text_, 0.0f, 0.0f);
+        glyphArrangement.addLineOfText(scaledFont, text_, 0.0f, 0.0f);
         cachedTextWidth_ = glyphArrangement.getBoundingBox(0, -1, true).getWidth();
     }
 
@@ -55,12 +66,15 @@ namespace tss
         if (text_.isEmpty())
             return;
 
+        const float leftLineWidth = kLeftLineWidth_ * scalingFactor_;
+        const float textSpacing = kTextSpacing_ * scalingFactor_;
+        
         auto textBounds = contentArea;
-        textBounds.removeFromLeft(kLeftLineWidth_ + kTextSpacing_);
+        textBounds.removeFromLeft(leftLineWidth + textSpacing);
         textBounds.setWidth(cachedTextWidth_);
 
         g.setColour(look_.text);
-        g.setFont(look_.font);
+        g.setFont(look_.font.withHeight(look_.font.getHeight() * scalingFactor_));
         g.drawText(text_, textBounds, juce::Justification::topLeft, false);
     }
 
@@ -74,11 +88,12 @@ namespace tss
 
     void SectionHeader::drawLeftLine(juce::Graphics& g, const juce::Rectangle<float>& contentArea)
     {
-        const auto verticalOffset = (contentArea.getHeight() - kLineHeight_) * 0.5f;
+        const float lineHeight = std::max(1.0f, kLineHeight_ * scalingFactor_);
+        const auto verticalOffset = (contentArea.getHeight() - lineHeight) * 0.5f;
         
         auto line = contentArea;
-        line.setWidth(kLeftLineWidth_);
-        line.setHeight(kLineHeight_);
+        line.setWidth(kLeftLineWidth_ * scalingFactor_);
+        line.setHeight(lineHeight);
         line.translate(0.0f, verticalOffset);
         
         g.fillRect(line);
@@ -86,16 +101,19 @@ namespace tss
 
     void SectionHeader::drawRightLine(juce::Graphics& g, const juce::Rectangle<float>& contentArea)
     {
-        const auto lineStartX = kLeftLineWidth_ + kTextSpacing_ + cachedTextWidth_ + kTextSpacing_;
+        const float leftLineWidth = kLeftLineWidth_ * scalingFactor_;
+        const float textSpacing = kTextSpacing_ * scalingFactor_;
+        const float lineHeight = std::max(1.0f, kLineHeight_ * scalingFactor_);
+        const auto lineStartX = leftLineWidth + textSpacing + cachedTextWidth_ + textSpacing;
         const auto remainingWidth = contentArea.getWidth() - lineStartX;
 
         if (remainingWidth > 0.0f)
         {
-            const auto verticalOffset = (contentArea.getHeight() - kLineHeight_) * 0.5f;
+            const auto verticalOffset = (contentArea.getHeight() - lineHeight) * 0.5f;
             
             auto line = contentArea;
             line.removeFromLeft(lineStartX);
-            line.setHeight(kLineHeight_);
+            line.setHeight(lineHeight);
             line.translate(0.0f, verticalOffset);
             
             g.fillRect(line);

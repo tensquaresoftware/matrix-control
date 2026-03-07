@@ -2,7 +2,6 @@
 #include "ComboBox.h"
 
 #include "GUI/Looks/LookBuilders.h"
-#include "GUI/Skins/ISkin.h"
 
 namespace tss
 {

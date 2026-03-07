@@ -92,7 +92,9 @@ void ModuleHeaderPanel::resized()
         layoutInitCopyPasteButtons();
     else
         layoutInitOnlyButtons();
-    
+
+    if (moduleHeader_)
+        moduleHeader_->setScalingFactor(scalingFactor_);
     if (initButton_)
         initButton_->setScalingFactor(scalingFactor_);
     if (copyButton_)
@@ -103,44 +105,54 @@ void ModuleHeaderPanel::resized()
 
 void ModuleHeaderPanel::layoutModuleHeader()
 {
-    const auto moduleHeaderWidth = (moduleType_ == ModuleType::PatchEdit)
+    const int baseWidth = (moduleType_ == ModuleType::PatchEdit)
         ? PluginDimensions::Widgets::Widths::ModuleHeader::kPatchEditModule
         : PluginDimensions::Widgets::Widths::ModuleHeader::kMasterEditModule;
-    const auto moduleHeaderHeight = PluginDimensions::Widgets::Heights::kModuleHeader;
-    const int y = 0;
+    const int moduleHeaderWidth = juce::roundToInt(static_cast<float>(baseWidth) * scalingFactor_);
+    const int moduleHeaderHeight = juce::roundToInt(
+        static_cast<float>(PluginDimensions::Widgets::Heights::kModuleHeader) * scalingFactor_);
 
     if (auto* header = moduleHeader_.get())
-        header->setBounds(0, y, moduleHeaderWidth, moduleHeaderHeight);
+        header->setBounds(0, 0, moduleHeaderWidth, moduleHeaderHeight);
 }
 
 void ModuleHeaderPanel::layoutInitOnlyButtons()
 {
-    const auto initButtonWidth = PluginDimensions::Widgets::Widths::Button::kInit;
-    const auto buttonHeight = PluginDimensions::Widgets::Heights::kButton;
-    const auto panelWidth = getWidth();
-    const int y = 0;
+    const int initButtonWidth = juce::roundToInt(
+        static_cast<float>(PluginDimensions::Widgets::Widths::Button::kInit) * scalingFactor_);
+    const int buttonHeight = juce::roundToInt(
+        static_cast<float>(PluginDimensions::Widgets::Heights::kButton) * scalingFactor_);
+    const int panelWidth = getWidth();
 
     if (auto* button = initButton_.get())
-        button->setBounds(panelWidth - initButtonWidth, y, initButtonWidth, buttonHeight);
+        button->setBounds(panelWidth - initButtonWidth, 0, initButtonWidth, buttonHeight);
 }
 
 void ModuleHeaderPanel::layoutInitCopyPasteButtons()
 {
-    const auto initButtonWidth = PluginDimensions::Widgets::Widths::Button::kInit;
-    const auto copyButtonWidth = PluginDimensions::Widgets::Widths::Button::kCopy;
-    const auto pasteButtonWidth = PluginDimensions::Widgets::Widths::Button::kPaste;
-    const auto buttonHeight = PluginDimensions::Widgets::Heights::kButton;
-    const auto panelWidth = getWidth();
-    const int y = 0;
+    const float sf = scalingFactor_;
+    const int buttonHeight = juce::roundToInt(static_cast<float>(PluginDimensions::Widgets::Heights::kButton) * sf);
+    const int panelWidth = getWidth();
+
+    // X positions computed from right edge independently to avoid rounding accumulation
+    const float pasteW  = static_cast<float>(PluginDimensions::Widgets::Widths::Button::kPaste) * sf;
+    const float copyW   = static_cast<float>(PluginDimensions::Widgets::Widths::Button::kCopy) * sf;
+    const float initW   = static_cast<float>(PluginDimensions::Widgets::Widths::Button::kInit) * sf;
+
+    const int pasteButtonWidth = juce::roundToInt(pasteW);
+    const int copyButtonWidth  = juce::roundToInt(copyW);
+    const int initButtonWidth  = juce::roundToInt(initW);
+
+    const int pasteX = panelWidth - juce::roundToInt(pasteW);
+    const int copyX  = panelWidth - juce::roundToInt(pasteW + copyW);
+    const int initX  = panelWidth - juce::roundToInt(pasteW + copyW + initW);
 
     if (auto* button = pasteButton_.get())
-        button->setBounds(panelWidth - pasteButtonWidth, y, pasteButtonWidth, buttonHeight);
-
+        button->setBounds(pasteX, 0, pasteButtonWidth, buttonHeight);
     if (auto* button = copyButton_.get())
-        button->setBounds(panelWidth - pasteButtonWidth - copyButtonWidth, y, copyButtonWidth, buttonHeight);
-
+        button->setBounds(copyX, 0, copyButtonWidth, buttonHeight);
     if (auto* button = initButton_.get())
-        button->setBounds(panelWidth - pasteButtonWidth - copyButtonWidth - initButtonWidth, y, initButtonWidth, buttonHeight);
+        button->setBounds(initX, 0, initButtonWidth, buttonHeight);
 }
 
 void ModuleHeaderPanel::setSkin(tss::ISkin& skin)
@@ -162,6 +174,5 @@ void ModuleHeaderPanel::setScalingFactor(float scalingFactor)
         return;
     
     scalingFactor_ = scalingFactor;
-    resized();
     repaint();
 }

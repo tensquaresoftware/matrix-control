@@ -19,6 +19,7 @@ namespace tss
         ~SectionHeader() override = default;
 
         void setLook(const SectionHeaderLook& look);
+        void setScalingFactor(float scalingFactor);
 
         void paint(juce::Graphics& g) override;
         void resized() override;
@@ -38,6 +39,7 @@ namespace tss
         juce::String text_;
         ColourVariant colourVariant_;
         float cachedTextWidth_ = 0.0f;
+        float scalingFactor_ = 1.0f;
 
         void calculateTextWidth();
 

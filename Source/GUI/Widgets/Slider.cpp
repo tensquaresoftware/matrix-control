@@ -42,9 +42,7 @@ namespace tss
 
     void Slider::paint(juce::Graphics& g)
     {
-        const auto bounds = juce::Rectangle<float>(0.0f, 0.0f, 
-                                                    static_cast<float>(getWidth()), 
-                                                    static_cast<float>(getHeight()));
+        const auto bounds = getLocalBounds().toFloat();
         const auto enabled = isEnabled();
         const auto trackBounds = calculateTrackBounds(bounds);
         const auto valueBarBounds = calculateValueBarBounds(trackBounds, enabled);

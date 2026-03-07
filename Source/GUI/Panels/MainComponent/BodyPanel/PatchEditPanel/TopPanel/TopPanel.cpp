@@ -48,12 +48,21 @@ void TopPanel::resized()
         rampPortamentoPanel_.get()
     };
     
-    int x = 0;
+    const int childWidth = juce::roundToInt(static_cast<float>(childModuleWidth_) * scalingFactor_);
+    const int childHeight = juce::roundToInt(static_cast<float>(childModuleHeight_) * scalingFactor_);
+    const float childStep = static_cast<float>(childModuleWidth_ + spacing_) * scalingFactor_;
+    const int lastIndex = static_cast<int>(panels.size()) - 1;
+
+    int i = 0;
     for (auto* panel : panels)
     {
         if (panel)
-            panel->setBounds(bounds.getX() + x, bounds.getY(), childModuleWidth_, childModuleHeight_);
-        x += childModuleWidth_ + spacing_;
+        {
+            const int x = juce::roundToInt(static_cast<float>(i) * childStep);
+            const int w = (i == lastIndex) ? (bounds.getWidth() - x) : childWidth;
+            panel->setBounds(bounds.getX() + x, bounds.getY(), w, childHeight);
+        }
+        ++i;
     }
 }
 
@@ -66,5 +75,27 @@ void TopPanel::setSkin(tss::ISkin& skin)
         vcfVcaPanel_.get(),
         fmTrackPanel_.get(),
         rampPortamentoPanel_.get());
+}
+
+void TopPanel::setScalingFactor(float scalingFactor)
+{
+    if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+        return;
+    
+    scalingFactor_ = scalingFactor;
+    
+    if (dco1Panel_)
+        dco1Panel_->setScalingFactor(scalingFactor_);
+    if (dco2Panel_)
+        dco2Panel_->setScalingFactor(scalingFactor_);
+    if (vcfVcaPanel_)
+        vcfVcaPanel_->setScalingFactor(scalingFactor_);
+    if (fmTrackPanel_)
+        fmTrackPanel_->setScalingFactor(scalingFactor_);
+    if (rampPortamentoPanel_)
+        rampPortamentoPanel_->setScalingFactor(scalingFactor_);
+    
+    resized();
+    repaint();
 }
 

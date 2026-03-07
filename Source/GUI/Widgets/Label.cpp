@@ -41,9 +41,7 @@ namespace tss
         if (labelText_.isEmpty())
             return;
 
-        auto textBounds = juce::Rectangle<float>(0.0f, 0.0f, 
-                                                   static_cast<float>(getWidth()), 
-                                                   static_cast<float>(getHeight()));
+        auto textBounds = getLocalBounds().toFloat();
         const float padding = static_cast<float>(kTextLeftPadding_) * scalingFactor_;
         textBounds.removeFromLeft(padding);
 

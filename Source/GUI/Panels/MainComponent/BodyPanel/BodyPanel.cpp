@@ -66,56 +66,39 @@ void BodyPanel::paint(juce::Graphics& g)
 void BodyPanel::resized()
 {
     const auto bounds = getLocalBounds();
-    
-    const auto patchEditPanelX = padding_;
-    const auto patchEditPanelY = padding_;
-    patchEditPanel_->setBounds(
-        bounds.getX() + patchEditPanelX,
-        bounds.getY() + patchEditPanelY,
-        patchEditPanelWidth_,
-        patchEditPanelHeight_
-    );
-    
-    const auto verticalSeparator1X = patchEditPanelX + patchEditPanelWidth_;
-    const auto verticalSeparator1Y = padding_;
-    verticalSeparator1_->setTopLeftPosition(
-        bounds.getX() + verticalSeparator1X,
-        bounds.getY() + verticalSeparator1Y
-    );
-    
-    const auto matrixModulationPanelX = verticalSeparator1X + verticalSeparator1_->getWidth();
-    const auto matrixModulationPanelY = padding_;
-    matrixModulationPanel_->setBounds(
-        bounds.getX() + matrixModulationPanelX,
-        bounds.getY() + matrixModulationPanelY,
-        matrixModulationPanelWidth_,
-        matrixModulationPanelHeight_
-    );
-    
-    const auto patchManagerPanelX = matrixModulationPanelX;
-    const auto patchManagerPanelY = matrixModulationPanelY + matrixModulationPanelHeight_;
-    patchManagerPanel_->setBounds(
-        bounds.getX() + patchManagerPanelX,
-        bounds.getY() + patchManagerPanelY,
-        patchManagerPanelWidth_,
-        patchManagerPanelHeight_
-    );
-    
-    const auto verticalSeparator2X = matrixModulationPanelX + matrixModulationPanelWidth_;
-    const auto verticalSeparator2Y = padding_;
-    verticalSeparator2_->setTopLeftPosition(
-        bounds.getX() + verticalSeparator2X,
-        bounds.getY() + verticalSeparator2Y
-    );
-    
-    const auto masterEditPanelX = verticalSeparator2X + verticalSeparator2_->getWidth();
-    const auto masterEditPanelY = padding_;
-    masterEditPanel_->setBounds(
-        bounds.getX() + masterEditPanelX,
-        bounds.getY() + masterEditPanelY,
-        masterEditPanelWidth_,
-        masterEditPanelHeight_
-    );
+    const float sf = scalingFactor_;
+
+    const int padding              = juce::roundToInt(static_cast<float>(padding_) * sf);
+    const int patchEditPanelWidth  = juce::roundToInt(static_cast<float>(patchEditPanelWidth_) * sf);
+    const int patchEditPanelHeight = juce::roundToInt(static_cast<float>(patchEditPanelHeight_) * sf);
+    const int matrixW              = juce::roundToInt(static_cast<float>(matrixModulationPanelWidth_) * sf);
+    const int matrixH              = juce::roundToInt(static_cast<float>(matrixModulationPanelHeight_) * sf);
+    const int patchManagerW        = juce::roundToInt(static_cast<float>(patchManagerPanelWidth_) * sf);
+    const int patchManagerH        = juce::roundToInt(static_cast<float>(patchManagerPanelHeight_) * sf);
+    const int masterEditW          = juce::roundToInt(static_cast<float>(masterEditPanelWidth_) * sf);
+    const int masterEditH          = juce::roundToInt(static_cast<float>(masterEditPanelHeight_) * sf);
+    const int separatorW           = juce::roundToInt(static_cast<float>(PluginDimensions::Widgets::Widths::VerticalSeparator::kStandard) * sf);
+    const int separatorH           = juce::roundToInt(static_cast<float>(PluginDimensions::Widgets::Heights::kVerticalSeparator) * sf);
+
+    // All X positions computed independently from float origin to avoid rounding accumulation.
+    const float originX = static_cast<float>(bounds.getX() + padding);
+    const int patchEditX        = bounds.getX() + padding;
+    const int separator1X       = juce::roundToInt(originX + static_cast<float>(patchEditPanelWidth_) * sf);
+    const int matrixX           = juce::roundToInt(originX + static_cast<float>(patchEditPanelWidth_ + PluginDimensions::Widgets::Widths::VerticalSeparator::kStandard) * sf);
+    const int separator2X       = juce::roundToInt(originX + static_cast<float>(patchEditPanelWidth_ + PluginDimensions::Widgets::Widths::VerticalSeparator::kStandard + matrixModulationPanelWidth_) * sf);
+    const int masterEditX       = juce::roundToInt(originX + static_cast<float>(patchEditPanelWidth_ + PluginDimensions::Widgets::Widths::VerticalSeparator::kStandard + matrixModulationPanelWidth_ + PluginDimensions::Widgets::Widths::VerticalSeparator::kStandard) * sf);
+
+    // Y positions computed independently from float origin.
+    const float originY = static_cast<float>(bounds.getY() + padding);
+    const int topY          = bounds.getY() + padding;
+    const int patchManagerY = juce::roundToInt(originY + static_cast<float>(matrixModulationPanelHeight_) * sf);
+
+    patchEditPanel_->setBounds(patchEditX, topY, patchEditPanelWidth, patchEditPanelHeight);
+    verticalSeparator1_->setBounds(separator1X, topY, separatorW, separatorH);
+    matrixModulationPanel_->setBounds(matrixX, topY, matrixW, matrixH);
+    patchManagerPanel_->setBounds(matrixX, patchManagerY, patchManagerW, patchManagerH);
+    verticalSeparator2_->setBounds(separator2X, topY, separatorW, separatorH);
+    masterEditPanel_->setBounds(masterEditX, topY, masterEditW, masterEditH);
 }
 
 void BodyPanel::setSkin(tss::ISkin& skin)
@@ -137,6 +120,10 @@ void BodyPanel::setScalingFactor(float scalingFactor)
     
     scalingFactor_ = scalingFactor;
     
+    if (verticalSeparator1_)
+        verticalSeparator1_->setScalingFactor(scalingFactor_);
+    if (verticalSeparator2_)
+        verticalSeparator2_->setScalingFactor(scalingFactor_);
     if (patchEditPanel_)
         patchEditPanel_->setScalingFactor(scalingFactor_);
     if (matrixModulationPanel_)

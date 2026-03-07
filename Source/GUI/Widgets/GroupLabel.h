@@ -13,6 +13,7 @@ namespace tss
         ~GroupLabel() override = default;
 
         void setLook(const GroupLabelLook& look);
+        void setScalingFactor(float scalingFactor);
 
         void setText(const juce::String& text);
         juce::String getText() const { return labelText_; }
@@ -30,6 +31,7 @@ namespace tss
         GroupLabelLook look_{};
         int width_;
         int height_;
+        float scalingFactor_ = 1.0f;
         juce::String labelText_;
         float cachedTextWidth_ {0.0f};
 
@@ -37,8 +39,8 @@ namespace tss
 
         void drawText(juce::Graphics& g, const juce::Rectangle<float>& area);
         void drawLines(juce::Graphics& g, const juce::Rectangle<float>& area, float textWidth);
-        void drawLeftLine(juce::Graphics& g, const juce::Rectangle<float>& area, float centreX, float halfTextWidth, float centreY);
-        void drawRightLine(juce::Graphics& g, const juce::Rectangle<float>& area, float centreX, float halfTextWidth, float centreY);
+        void drawLeftLine(juce::Graphics& g, const juce::Rectangle<float>& area, float centreX, float halfTextWidth, float centreY, float lineThickness, float textSpacing);
+        void drawRightLine(juce::Graphics& g, const juce::Rectangle<float>& area, float centreX, float halfTextWidth, float centreY, float lineThickness, float textSpacing);
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(GroupLabel)
     };

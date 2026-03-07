@@ -48,22 +48,28 @@ MiddlePanel::MiddlePanel(tss::ISkin& skin, int width, int height, juce::AudioPro
 void MiddlePanel::resized()
 {
     using namespace PluginDimensions::Panels::Body::PatchEditSection::MiddleModules;
-    const auto childWidth = ChildModules::kWidth;
-    const auto childHeight = ChildModules::kHeight;
+    const int childWidth = juce::roundToInt(static_cast<float>(ChildModules::kWidth) * scalingFactor_);
+    const int childHeight = juce::roundToInt(static_cast<float>(ChildModules::kHeight) * scalingFactor_);
+    const float childStep = static_cast<float>(ChildModules::kWidth + kSpacing) * scalingFactor_;
+    const int paddingTop = juce::roundToInt(static_cast<float>(kPatchNameSectionPaddingTop) * scalingFactor_);
+    const int moduleHeaderHeight = juce::roundToInt(static_cast<float>(PluginDimensions::Widgets::Heights::kModuleHeader) * scalingFactor_);
 
     envelope1Display_.setBounds(0, 0, childWidth, childHeight);
-    envelope2Display_.setBounds(envelope1Display_.getBounds().getRight() + kSpacing, 0, childWidth, childHeight);
-    envelope3Display_.setBounds(envelope2Display_.getBounds().getRight() + kSpacing, 0, childWidth, childHeight);
-    trackGeneratorDisplay_.setBounds(envelope3Display_.getBounds().getRight() + kSpacing, 0, childWidth, childHeight);
+    envelope2Display_.setBounds(juce::roundToInt(1.0f * childStep), 0, childWidth, childHeight);
+    envelope3Display_.setBounds(juce::roundToInt(2.0f * childStep), 0, childWidth, childHeight);
+    trackGeneratorDisplay_.setBounds(juce::roundToInt(3.0f * childStep), 0, childWidth, childHeight);
 
-    const auto patchNameSectionX = trackGeneratorDisplay_.getBounds().getRight() + kSpacing;
-    const auto moduleHeaderHeight = PluginDimensions::Widgets::Heights::kModuleHeader;
-    patchNameModuleHeader_.setBounds(patchNameSectionX, kPatchNameSectionPaddingTop,
-                                    patchNameDisplay_.getWidth(), moduleHeaderHeight);
+    const int patchNameSectionX = juce::roundToInt(4.0f * childStep);
+    const int patchNameSectionW = getWidth() - patchNameSectionX;
+    patchNameModuleHeader_.setBounds(patchNameSectionX, paddingTop,
+                                    patchNameSectionW, moduleHeaderHeight);
+
+    // Y of patchNameDisplay computed independently to avoid rounding accumulation
+    const int patchNameDisplayY = juce::roundToInt(static_cast<float>(kPatchNameSectionPaddingTop + PluginDimensions::Widgets::Heights::kModuleHeader + kPatchNameSectionSpacing) * scalingFactor_);
     patchNameDisplay_.setBounds(patchNameSectionX,
-                               kPatchNameSectionPaddingTop + moduleHeaderHeight + kPatchNameSectionSpacing,
-                               patchNameDisplay_.getWidth(),
-                               patchNameDisplay_.getHeight());
+                               patchNameDisplayY,
+                               patchNameSectionW,
+                               juce::roundToInt(static_cast<float>(PluginDimensions::Widgets::Heights::kPatchNameDisplay) * scalingFactor_));
 }
 
 void MiddlePanel::valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
@@ -259,5 +265,23 @@ void MiddlePanel::setSkin(tss::ISkin& skin)
     trackGeneratorDisplay_.setLook(tss::trackGeneratorDisplayLookFromSkin(skin));
     patchNameModuleHeader_.setLook(tss::moduleHeaderLookFromSkin(skin));
     patchNameDisplay_.setLook(tss::patchNameDisplayLookFromSkin(skin));
+}
+
+void MiddlePanel::setScalingFactor(float scalingFactor)
+{
+    if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+        return;
+    
+    scalingFactor_ = scalingFactor;
+    
+    envelope1Display_.setScalingFactor(scalingFactor_);
+    envelope2Display_.setScalingFactor(scalingFactor_);
+    envelope3Display_.setScalingFactor(scalingFactor_);
+    trackGeneratorDisplay_.setScalingFactor(scalingFactor_);
+    patchNameModuleHeader_.setScalingFactor(scalingFactor_);
+    patchNameDisplay_.setScalingFactor(scalingFactor_);
+    
+    resized();
+    repaint();
 }
 

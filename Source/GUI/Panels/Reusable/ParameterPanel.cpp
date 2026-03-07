@@ -113,7 +113,7 @@ void ParameterPanel::createSeparator(tss::ISkin& skin)
 
 void ParameterPanel::resized()
 {
-    const auto labelHeight = PluginDimensions::Widgets::Heights::kLabel;
+    const int labelHeight = juce::roundToInt(static_cast<float>(PluginDimensions::Widgets::Heights::kLabel) * scalingFactor_);
 
     if (parameterType_ == ParameterType::None)
     {
@@ -128,7 +128,7 @@ void ParameterPanel::resized()
         y += labelHeight;
         layoutSeparator(y);
     }
-    
+
     if (label_)
         label_->setScalingFactor(scalingFactor_);
     if (slider_)
@@ -142,38 +142,42 @@ void ParameterPanel::resized()
 void ParameterPanel::layoutParameterLabel(int y)
 {
     const auto dimensions = getDimensionsForModuleType(moduleType_);
-    const auto labelHeight = PluginDimensions::Widgets::Heights::kLabel;
+    const int labelWidth = juce::roundToInt(static_cast<float>(dimensions.labelWidth) * scalingFactor_);
+    const int labelHeight = juce::roundToInt(static_cast<float>(PluginDimensions::Widgets::Heights::kLabel) * scalingFactor_);
 
     if (auto* label = label_.get())
-        label->setBounds(0, y, dimensions.labelWidth, labelHeight);
+        label->setBounds(0, y, labelWidth, labelHeight);
 }
 
 void ParameterPanel::layoutParameterWidget(int y)
 {
     const auto dimensions = getDimensionsForModuleType(moduleType_);
-    const auto sliderWidth = PluginDimensions::Widgets::Widths::Slider::kStandard;
-    const auto sliderHeight = PluginDimensions::Widgets::Heights::kSlider;
-    const auto comboBoxHeight = PluginDimensions::Widgets::Heights::kComboBox;
+    const int labelWidth = juce::roundToInt(static_cast<float>(dimensions.labelWidth) * scalingFactor_);
+    const int sliderWidth = juce::roundToInt(static_cast<float>(PluginDimensions::Widgets::Widths::Slider::kStandard) * scalingFactor_);
+    const int sliderHeight = juce::roundToInt(static_cast<float>(PluginDimensions::Widgets::Heights::kSlider) * scalingFactor_);
+    const int comboBoxWidth = juce::roundToInt(static_cast<float>(dimensions.comboBoxWidth) * scalingFactor_);
+    const int comboBoxHeight = juce::roundToInt(static_cast<float>(PluginDimensions::Widgets::Heights::kComboBox) * scalingFactor_);
 
     if (parameterType_ == ParameterType::Slider)
     {
         if (auto* slider = slider_.get())
-            slider->setBounds(dimensions.labelWidth, y, sliderWidth, sliderHeight);
+            slider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
     }
     else
     {
         if (auto* comboBox = comboBox_.get())
-            comboBox->setBounds(dimensions.labelWidth, y, dimensions.comboBoxWidth, comboBoxHeight);
+            comboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
     }
 }
 
 void ParameterPanel::layoutSeparator(int y)
 {
     const auto dimensions = getDimensionsForModuleType(moduleType_);
-    const auto separatorHeight = PluginDimensions::Widgets::Heights::kHorizontalSeparator;
+    const int separatorWidth = juce::roundToInt(static_cast<float>(dimensions.separatorWidth) * scalingFactor_);
+    const int separatorHeight = juce::roundToInt(static_cast<float>(PluginDimensions::Widgets::Heights::kHorizontalSeparator) * scalingFactor_);
 
     if (auto* separator = separator_.get())
-        separator->setBounds(0, y, dimensions.separatorWidth, separatorHeight);
+        separator->setBounds(0, y, separatorWidth, separatorHeight);
 }
 
 void ParameterPanel::setSkin(tss::ISkin& skin)
@@ -198,7 +202,6 @@ void ParameterPanel::setScalingFactor(float scalingFactor)
         return;
     
     scalingFactor_ = scalingFactor;
-    resized();
     repaint();
 }
 

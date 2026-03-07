@@ -16,11 +16,20 @@ namespace tss
         repaint();
     }
 
+    void TrackGeneratorDisplay::setScalingFactor(float scalingFactor)
+    {
+        if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+            return;
+        
+        scalingFactor_ = scalingFactor;
+        repaint();
+    }
+
     void TrackGeneratorDisplay::paint(juce::Graphics& g)
     {
         const auto bounds = getLocalBounds().toFloat();
-        const auto contentBounds = bounds.withTrimmedTop(static_cast<float>(kWidgetPaddingTop_))
-            .withTrimmedBottom(static_cast<float>(kWidgetPaddingBottom_));
+        const auto contentBounds = bounds.withTrimmedTop(static_cast<float>(kWidgetPaddingTop_) * scalingFactor_)
+            .withTrimmedBottom(static_cast<float>(kWidgetPaddingBottom_) * scalingFactor_);
 
         drawBackground(g, contentBounds);
         drawBorder(g, contentBounds);
@@ -43,19 +52,20 @@ namespace tss
     void TrackGeneratorDisplay::drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
         g.setColour(look_.border);
-        g.drawRect(bounds, static_cast<float>(kWidgetBorderThickness_));
+        g.drawRect(bounds, std::max(1.0f, static_cast<float>(kWidgetBorderThickness_) * scalingFactor_));
     }
 
     void TrackGeneratorDisplay::drawTriangle(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
         const auto triangleColour = look_.border;
-        const float triangleHeight = kWidgetTriangleBase_ * std::sqrt(3.0f) * 0.5f;
+        const float triangleBase = kWidgetTriangleBase_ * scalingFactor_;
+        const float triangleHeight = triangleBase * std::sqrt(3.0f) * 0.5f;
         const float centreX = bounds.getCentreX();
         const float baseY = bounds.getY();
 
         juce::Path triangle;
-        triangle.addTriangle(centreX - kWidgetTriangleBase_ * 0.5f, baseY,
-                             centreX + kWidgetTriangleBase_ * 0.5f, baseY,
+        triangle.addTriangle(centreX - triangleBase * 0.5f, baseY,
+                             centreX + triangleBase * 0.5f, baseY,
                              centreX, baseY - triangleHeight);
 
         g.setColour(triangleColour);
@@ -170,6 +180,8 @@ namespace tss
         if (centerBounds.getWidth() <= 0.0f || centerBounds.getHeight() <= 0.0f)
             return;
 
+        const float lineThickness = std::max(1.0f, kCurveLineThickness_ * scalingFactor_);
+        
         g.setColour(look_.curve);
 
         for (int i = 0; i < kCurvePointCount_; ++i)
@@ -179,30 +191,31 @@ namespace tss
             if (i < kCurvePointCount_ - 1)
             {
                 const auto p2 = calculatePointPosition(i + 1, centerBounds);
-                g.drawLine(p.x, p.y, p2.x, p2.y, kCurveLineThickness_);
+                g.drawLine(p.x, p.y, p2.x, p2.y, lineThickness);
             }
         }
         
         const auto hollowPointFillColour = look_.curve.withAlpha(0.4f);
+        const float pointRadius = kCurvePointRadius_ * scalingFactor_;
 
         for (int i = 0; i < kCurvePointCount_; ++i)
         {
             const auto p = calculatePointPosition(i, centerBounds);
             
             g.setColour(hollowPointFillColour);
-            g.fillEllipse(p.x - kCurvePointRadius_, p.y - kCurvePointRadius_,
-                         kCurvePointRadius_ * 2.0f, kCurvePointRadius_ * 2.0f);
+            g.fillEllipse(p.x - pointRadius, p.y - pointRadius,
+                         pointRadius * 2.0f, pointRadius * 2.0f);
             
             g.setColour(look_.curve);
-            g.drawEllipse(p.x - kCurvePointRadius_, p.y - kCurvePointRadius_,
-                         kCurvePointRadius_ * 2.0f, kCurvePointRadius_ * 2.0f,
-                         kCurveLineThickness_);
+            g.drawEllipse(p.x - pointRadius, p.y - pointRadius,
+                         pointRadius * 2.0f, pointRadius * 2.0f,
+                         lineThickness);
         }
     }
     
     juce::Rectangle<float> TrackGeneratorDisplay::getCurveCenterBounds(const juce::Rectangle<float>& innerBounds) const
     {
-        const float totalPadding = kCurvePadding_ + static_cast<float>(kWidgetBorderThickness_);
+        const float totalPadding = (kCurvePadding_ + static_cast<float>(kWidgetBorderThickness_)) * scalingFactor_;
         return innerBounds.reduced(totalPadding);
     }
 
@@ -229,13 +242,14 @@ namespace tss
                                                     const juce::Rectangle<float>& innerBounds) const
     {
         const auto centerBounds = getCurveCenterBounds(innerBounds);
+        const float hitZoneRadius = kPointHitZoneRadius_ * scalingFactor_;
 
         for (int i = 0; i < kCurvePointCount_; ++i)
         {
             const auto pointPos = calculatePointPosition(i, centerBounds);
             const float distance = position.getDistanceFrom(pointPos);
             
-            if (distance <= kPointHitZoneRadius_)
+            if (distance <= hitZoneRadius)
                 return i;
         }
         
@@ -245,8 +259,8 @@ namespace tss
     void TrackGeneratorDisplay::mouseDown(const juce::MouseEvent& e)
     {
         const auto bounds = getLocalBounds().toFloat();
-        const auto innerBounds = bounds.withTrimmedTop(static_cast<float>(kWidgetPaddingTop_))
-            .withTrimmedBottom(static_cast<float>(kWidgetPaddingBottom_));
+        const auto innerBounds = bounds.withTrimmedTop(static_cast<float>(kWidgetPaddingTop_) * scalingFactor_)
+            .withTrimmedBottom(static_cast<float>(kWidgetPaddingBottom_) * scalingFactor_);
 
         draggedPointIndex_ = findPointAtPosition(e.position, innerBounds);
     }
@@ -257,8 +271,8 @@ namespace tss
             return;
         
         const auto bounds = getLocalBounds().toFloat();
-        const auto innerBounds = bounds.withTrimmedTop(static_cast<float>(kWidgetPaddingTop_))
-            .withTrimmedBottom(static_cast<float>(kWidgetPaddingBottom_));
+        const auto innerBounds = bounds.withTrimmedTop(static_cast<float>(kWidgetPaddingTop_) * scalingFactor_)
+            .withTrimmedBottom(static_cast<float>(kWidgetPaddingBottom_) * scalingFactor_);
         const auto centerBounds = getCurveCenterBounds(innerBounds);
 
         const float relativeY = e.position.y - centerBounds.getY();

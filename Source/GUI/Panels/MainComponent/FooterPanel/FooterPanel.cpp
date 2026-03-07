@@ -45,21 +45,21 @@ void FooterPanel::paint(juce::Graphics& g)
     if (currentMessage.isEmpty() || currentSeverity == MessageSeverity::None)
         return;
     
-    auto bounds = getLocalBounds().reduced(kPadding_);
+    const int padding = juce::jmax(1, juce::roundToInt(static_cast<float>(kPadding_) * scalingFactor_));
+    const int iconSize = juce::jmax(1, juce::roundToInt(static_cast<float>(kIconSize_) * scalingFactor_));
     
-    // Couleur du texte selon la sévérité
+    auto bounds = getLocalBounds().reduced(padding);
+    
     g.setColour(getSeverityColour(currentSeverity));
-    g.setFont(skin_->getBaseFont());
+    g.setFont(skin_->getBaseFont().withHeight(skin_->getBaseFont().getHeight() * scalingFactor_));
     
-    // Icône (optionnel)
     const juce::String icon = getSeverityIcon(currentSeverity);
     if (icon.isNotEmpty())
     {
-        const auto iconBounds = bounds.removeFromLeft(kIconSize_ + kPadding_);
+        const auto iconBounds = bounds.removeFromLeft(iconSize + padding);
         g.drawText(icon, iconBounds, juce::Justification::centredLeft);
     }
     
-    // Message
     g.drawText(currentMessage, bounds, juce::Justification::centredLeft);
 }
 
@@ -78,7 +78,6 @@ void FooterPanel::setScalingFactor(float scalingFactor)
         return;
     
     scalingFactor_ = scalingFactor;
-    resized();
     repaint();
 }
 
