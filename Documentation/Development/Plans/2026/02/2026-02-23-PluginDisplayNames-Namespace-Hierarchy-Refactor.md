@@ -12,10 +12,10 @@ todos:
     content: Mettre à jour les fichiers GUI (ModulationBusHeader, panels PatchManager, MatrixModulation, ModulationBusPanel, PatchNameDisplay, MiddlePanel, panels modules)
     status: completed
   - id: verify-build-and-grep
-    content: Compiler le projet et vérifier qu'il ne reste aucun ancien chemin (grep ParameterDisplayNames::, StandaloneWidgetDisplayNames::)
+    content: Compiler le projet et vérifier qu’il ne reste aucun ancien chemin (grep ParameterDisplayNames::, StandaloneWidgetDisplayNames::)
     status: completed
   - id: archive-plan
-    content: Copier le plan final dans Documentation/Development/Plans/2026/ sous le nom 2026-02-23-PluginDisplayNames-Namespace-Hierarchy-Refactor.md
+    content: Copier le plan final dans Documentation/Development/Plans/ sous le nom 2026-02-23-PluginDisplayNames-Namespace-Hierarchy-Refactor.md
     status: completed
 isProject: false
 ---
@@ -25,7 +25,7 @@ isProject: false
 ## Objectifs
 
 - Supprimer la répétition des préfixes (kMidiX, kDco1X, kVibratoX, etc.) en portant le contexte dans la hiérarchie des namespaces.
-- Regrouper par module : ParameterWidgets et StandaloneWidgets d'un même module sous le même namespace (Section → Module → ParameterWidgets / StandaloneWidgets).
+- Regrouper par module : ParameterWidgets et StandaloneWidgets d’un même module sous le même namespace (Section → Module → ParameterWidgets / StandaloneWidgets).
 - Restructurer ChoiceLists en sous-namespaces (Sync, WaveSelect, OnOff, MidiChannel, Source, Destination, etc.).
 - Conserver le namespace racine `PluginDescriptors` et ne pas modifier [PluginDescriptors.h](Source/Shared/PluginDescriptors.h).
 
@@ -33,7 +33,7 @@ isProject: false
 
 - [Source/Shared/PluginDisplayNames.h](Source/Shared/PluginDisplayNames.h) : réécriture de la structure des namespaces et des constantes.
 
-## Ce qui reste inchangé (au même niveau qu'aujourd'hui)
+## Ce qui reste inchangé (au même niveau qu’aujourd’hui)
 
 Sous `namespace PluginDescriptors` :
 
@@ -84,7 +84,7 @@ MasterEdit::
 
 ### 4. Section MatrixModulation
 
-- Pas de découpage en "modules" comme MasterEdit/PatchEdit. Un namespace par ex. `MatrixModulation::Header` pour les libellés d'en-tête : kBusNumber ("#"), kSource ("SOURCE"), kDestination ("DESTINATION"), kAmount ("AMOUNT"). Les bus 0–9 restent dans `ModulationBusDisplayNames` (inchangé).
+- Pas de découpage en “modules” comme MasterEdit/PatchEdit. Un namespace par ex. `MatrixModulation::Header` pour les libellés d’en-tête : kBusNumber ("#"), kSource ("SOURCE"), kDestination ("DESTINATION"), kAmount ("AMOUNT"). Les bus 0–9 restent dans `ModulationBusDisplayNames` (inchangé).
 
 ### 5. Section PatchManager → Module → StandaloneWidgets uniquement
 
@@ -97,7 +97,7 @@ Pour éviter les conflits de noms entre InternalPatches et ComputerPatches (ex. 
 
 ### 6. ChoiceLists : sous-namespaces
 
-Conserver `namespace ChoiceLists` à la racine de PluginDescriptors, avec des sous-namespaces (noms courts pour les symboles à l'intérieur) :
+Conserver `namespace ChoiceLists` à la racine de PluginDescriptors, avec des sous-namespaces (noms courts pour les symboles à l’intérieur) :
 
 - **Sync** : kOff, kSoft, kMedium, kHard
 - **WaveSelect** : kOff, kPulse, kWave, kBoth, kNoise
@@ -138,26 +138,26 @@ Usage après refactor : `ChoiceLists::Sync::kOff`, `ChoiceLists::OnOff::kOn`, `C
 
 Les références à ModeDisplayNames, SectionDisplayNames, ModuleDisplayNames et ModulationBusDisplayNames restent inchangées (mêmes noms de namespace et de constantes).
 
-## Ordre d'exécution recommandé
+## Ordre d’exécution recommandé
 
 1. Réécrire [PluginDisplayNames.h](Source/Shared/PluginDisplayNames.h) avec la nouvelle hiérarchie (ShortLabels, MasterEdit, PatchEdit, MatrixModulation, PatchManager, ChoiceLists en sous-namespaces). Vérifier que le projet compile après cette étape ne sera pas possible tant que les appels ne sont pas mis à jour ; donc soit faire en une fois, soit ajouter des alias temporaires (déconseillé pour la maintenance).
 2. Mettre à jour [PluginDescriptors.cpp](Source/Shared/PluginDescriptors.cpp) en masse : remplacer chaque ancien chemin par le nouveau (ParameterDisplayNames::kMidiChannel → MasterEdit::Midi::ParameterWidgets::kChannel, ChoiceLists::kSyncOff → ChoiceLists::Sync::kOff, etc.).
 3. Mettre à jour les fichiers GUI un par un (ModulationBusHeader, PatchMutatorPanel, BankUtilityPanel, InternalPatchesPanel, ComputerPatchesPanel, MatrixModulationPanel, ModulationBusPanel, PatchNameDisplay, MiddlePanel, puis chaque module panel Dco1, Dco2, VcfVca, FmTrack, RampPortamento, Env1/2/3, Lfo1/2, Midi, Vibrato, Misc).
-4. Compilation complète et vérification (recherche globale de ParameterDisplayNames:: et StandaloneWidgetDisplayNames:: pour s'assurer qu'il ne reste aucun ancien chemin).
-5. Archiver le plan : copier le fichier de plan final dans `Documentation/Development/Plans/2026/` avec le nom `2026-02-23-PluginDisplayNames-Namespace-Hierarchy-Refactor.md` (convention .cursorrules §9.2).
+4. Compilation complète et vérification (recherche globale de ParameterDisplayNames:: et StandaloneWidgetDisplayNames:: pour s’assurer qu’il ne reste aucun ancien chemin).
+5. Archiver le plan : copier le fichier de plan final dans `Documentation/Development/Plans/` avec le nom `2026-02-23-PluginDisplayNames-Namespace-Hierarchy-Refactor.md` (convention .cursorrules §9.2).
 
 ## Convention de nommage (rappel)
 
 - Namespaces en PascalCase (MasterEdit, PatchEdit, Midi, Dco1, ParameterWidgets, StandaloneWidgets).
 - Constantes avec préfixe k (kChannel, kInit, kOff, kOn).
-- Pas de magic numbers ; valeurs littérales des chaînes inchangées (texte affiché à l'utilisateur).
+- Pas de magic numbers ; valeurs littérales des chaînes inchangées (texte affiché à l’utilisateur).
 
-## Risques et points d'attention
+## Risques et points d’attention
 
-- **Typo existante** : dans l'actuel PluginDisplayNames.h, `kVcfFequency` (ligne 150) — à corriger en `kVcfFrequency` dans VcfVca::ParameterWidgets si tu en profites pour uniformiser.
+- **Typo existante** : dans l’actuel PluginDisplayNames.h, `kVcfFequency` (ligne 150) — à corriger en `kVcfFrequency` dans VcfVca::ParameterWidgets si tu en profites pour uniformiser.
 - **kPatchMutatorDelete** : actuellement `const juce::String` (UTF-8). À conserver avec le même type dans PatchManager::PatchMutator::StandaloneWidgets.
 - Vérifier que tous les usages de `ParameterDisplayNames` et `StandaloneWidgetDisplayNames` sont bien recensés (grep sur tout le dépôt) avant de supprimer les anciens namespaces.
 
 ---
 
-Une fois ce plan validé et l'implémentation terminée, le fichier de plan devra être déplacé/renommé dans `Documentation/Development/Plans/2026/` en `2026-02-23-PluginDisplayNames-Namespace-Hierarchy-Refactor.md` conformément à tes cursorrules.
+Une fois ce plan validé et l’implémentation terminée, le fichier de plan devra être déplacé/renommé dans `Documentation/Development/Plans/` en `2026-02-23-PluginDisplayNames-Namespace-Hierarchy-Refactor.md` conformément à tes cursorrules.
