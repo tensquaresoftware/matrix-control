@@ -16,12 +16,12 @@ namespace tss
         repaint();
     }
 
-    void HorizontalSeparator::setScalingFactor(float scalingFactor)
+    void HorizontalSeparator::setDisplayScale(float displayScale)
     {
-        if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+        if (juce::approximatelyEqual(displayScale_, displayScale))
             return;
         
-        scalingFactor_ = scalingFactor;
+        displayScale_ = displayScale;
         repaint();
     }
 
@@ -30,7 +30,7 @@ namespace tss
         const auto bounds = getLocalBounds().toFloat();
         const float h = juce::jmax(1.0f, bounds.getHeight());
         const float lineY = bounds.getY() + h * 0.5f;
-        const float lineThickness = std::max(1.0f, static_cast<float>(kLineThickness_) * scalingFactor_);
+        const float lineThickness = std::max(1.0f, static_cast<float>(kLineThickness_) * displayScale_);
         
         g.setColour(look_.line);
         g.drawLine(bounds.getX(), lineY, bounds.getRight(), lineY, lineThickness);

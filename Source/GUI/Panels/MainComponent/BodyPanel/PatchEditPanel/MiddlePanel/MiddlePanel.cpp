@@ -49,7 +49,7 @@ MiddlePanel::MiddlePanel(tss::ISkin& skin, int width, int height, juce::AudioPro
 void MiddlePanel::resized()
 {
     using namespace PluginDimensions::Panels::Body::PatchEditSection::MiddleModules;
-    const float sf = scalingFactor_;
+    const float sf = displayScale_;
     const int childWidth = tss::ScaledLayout::scaledInt(static_cast<float>(ChildModules::kWidth), sf);
     const int childHeight = tss::ScaledLayout::scaledInt(static_cast<float>(ChildModules::kHeight), sf);
     const float childStep = static_cast<float>(ChildModules::kWidth + kSpacing) * sf;
@@ -271,19 +271,19 @@ void MiddlePanel::setSkin(tss::ISkin& skin)
     patchNameDisplay_.setLook(tss::patchNameDisplayLookFromSkin(skin));
 }
 
-void MiddlePanel::setScalingFactor(float scalingFactor)
+void MiddlePanel::setDisplayScale(float displayScale)
 {
-    if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+    if (juce::approximatelyEqual(displayScale_, displayScale))
         return;
     
-    scalingFactor_ = scalingFactor;
+    displayScale_ = displayScale;
     
-    envelope1Display_.setScalingFactor(scalingFactor_);
-    envelope2Display_.setScalingFactor(scalingFactor_);
-    envelope3Display_.setScalingFactor(scalingFactor_);
-    trackGeneratorDisplay_.setScalingFactor(scalingFactor_);
-    patchNameModuleHeader_.setScalingFactor(scalingFactor_);
-    patchNameDisplay_.setScalingFactor(scalingFactor_);
+    envelope1Display_.setDisplayScale(displayScale_);
+    envelope2Display_.setDisplayScale(displayScale_);
+    envelope3Display_.setDisplayScale(displayScale_);
+    trackGeneratorDisplay_.setDisplayScale(displayScale_);
+    patchNameModuleHeader_.setDisplayScale(displayScale_);
+    patchNameDisplay_.setDisplayScale(displayScale_);
     
     resized();
     repaint();

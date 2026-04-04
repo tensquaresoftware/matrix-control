@@ -179,7 +179,7 @@ void MatrixModulationPanel::resized()
 {
     auto bounds = getLocalBounds();
 
-    const float sf = scalingFactor_;
+    const float sf = displayScale_;
 
     if (auto* header = sectionHeader_.get())
     {
@@ -213,7 +213,7 @@ void MatrixModulationPanel::resized()
         return;
 
     const auto busHeights = tss::ScaledLayout::distributeFixedDesignRowsWithRemainderOnLast(
-        bounds.getHeight(), busCount, modulationBusHeight_, scalingFactor_);
+        bounds.getHeight(), busCount, modulationBusHeight_, displayScale_);
 
     for (size_t i = 0; i < busCount; ++i)
     {
@@ -235,24 +235,24 @@ void MatrixModulationPanel::setSkin(tss::ISkin& skin)
         tss::propagateSkin(skin, bus.get());
 }
 
-void MatrixModulationPanel::setScalingFactor(float scalingFactor)
+void MatrixModulationPanel::setDisplayScale(float displayScale)
 {
-    if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+    if (juce::approximatelyEqual(displayScale_, displayScale))
         return;
     
-    scalingFactor_ = scalingFactor;
+    displayScale_ = displayScale;
     
     if (sectionHeader_)
-        sectionHeader_->setScalingFactor(scalingFactor_);
+        sectionHeader_->setDisplayScale(displayScale_);
     if (modulationBusHeader_)
-        modulationBusHeader_->setScalingFactor(scalingFactor_);
+        modulationBusHeader_->setDisplayScale(displayScale_);
     if (initAllBussesButton_)
-        initAllBussesButton_->setScalingFactor(scalingFactor_);
+        initAllBussesButton_->setDisplayScale(displayScale_);
     
     for (auto& bus : modulationBuses_)
     {
         if (bus)
-            bus->setScalingFactor(scalingFactor_);
+            bus->setDisplayScale(displayScale_);
     }
     
     resized();

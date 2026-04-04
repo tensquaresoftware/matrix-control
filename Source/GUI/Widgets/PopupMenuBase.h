@@ -35,7 +35,7 @@ namespace tss
         ComboBox& comboBox_;
         bool isButtonLike_ = false;
         int highlightedItemIndex_ = -1;
-        float scalingFactor_ = 1.0f;
+        float displayScale_ = 1.0f;
         juce::Font cachedFont_;
         PopupMenuRenderer renderer_;
 

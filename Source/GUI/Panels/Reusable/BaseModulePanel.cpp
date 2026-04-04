@@ -73,7 +73,7 @@ void BaseModulePanel::resized()
 
     if (auto* header = moduleHeaderPanel_.get())
     {
-        const int headerHeight = tss::ScaledLayout::scaledInt(static_cast<float>(ModuleHeaderPanel::getHeight()), scalingFactor_);
+        const int headerHeight = tss::ScaledLayout::scaledInt(static_cast<float>(ModuleHeaderPanel::getHeight()), displayScale_);
         header->setBounds(bounds.removeFromTop(headerHeight));
     }
 
@@ -83,7 +83,7 @@ void BaseModulePanel::resized()
 
     const int designRowTotal = PluginDimensions::Widgets::Heights::kLabel + PluginDimensions::Widgets::Heights::kHorizontalSeparator;
     const auto rowHeights = tss::ScaledLayout::distributeFixedDesignRowsWithRemainderAtBottom(
-        bounds.getHeight(), paramCount, designRowTotal, scalingFactor_);
+        bounds.getHeight(), paramCount, designRowTotal, displayScale_);
 
     int y = bounds.getY();
     for (size_t i = 0; i < paramCount; ++i)
@@ -103,20 +103,20 @@ void BaseModulePanel::setSkin(tss::ISkin& skin)
         tss::propagateSkin(skin, paramPanel.get());
 }
 
-void BaseModulePanel::setScalingFactor(float scalingFactor)
+void BaseModulePanel::setDisplayScale(float displayScale)
 {
-    if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+    if (juce::approximatelyEqual(displayScale_, displayScale))
         return;
     
-    scalingFactor_ = scalingFactor;
+    displayScale_ = displayScale;
     
     if (moduleHeaderPanel_)
-        moduleHeaderPanel_->setScalingFactor(scalingFactor_);
+        moduleHeaderPanel_->setDisplayScale(displayScale_);
     
     for (auto& paramPanel : parameterPanels_)
     {
         if (paramPanel)
-            paramPanel->setScalingFactor(scalingFactor_);
+            paramPanel->setDisplayScale(displayScale_);
     }
     
     resized();

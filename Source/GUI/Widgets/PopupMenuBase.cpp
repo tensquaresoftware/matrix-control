@@ -8,9 +8,9 @@ namespace tss
     PopupMenuBase::PopupMenuBase(ComboBox& comboBox, bool isButtonLike)
         : comboBox_(comboBox)
         , isButtonLike_(isButtonLike)
-        , scalingFactor_(comboBox.getScalingFactor())
-        , cachedFont_(juce::FontOptions("PT Sans Narrow", kFontSize_ * scalingFactor_, juce::Font::plain))
-        , renderer_(isButtonLike, scalingFactor_)
+        , displayScale_(comboBox.getDisplayScale())
+        , cachedFont_(juce::FontOptions("PT Sans Narrow", kFontSize_ * displayScale_, juce::Font::plain))
+        , renderer_(isButtonLike, displayScale_)
     {
         renderer_.setLook(comboBox_.getPopupMenuLook());
         setWantsKeyboardFocus(true);

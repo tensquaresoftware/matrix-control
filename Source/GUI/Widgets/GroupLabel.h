@@ -13,7 +13,7 @@ namespace tss
         ~GroupLabel() override = default;
 
         void setLook(const GroupLabelLook& look);
-        void setScalingFactor(float scalingFactor);
+        void setDisplayScale(float displayScale);
 
         void setText(const juce::String& text);
         juce::String getText() const { return labelText_; }
@@ -31,7 +31,7 @@ namespace tss
         GroupLabelLook look_{};
         int width_;
         int height_;
-        float scalingFactor_ = 1.0f;
+        float displayScale_ = 1.0f;
         juce::String labelText_;
         float cachedTextWidth_ {0.0f};
 

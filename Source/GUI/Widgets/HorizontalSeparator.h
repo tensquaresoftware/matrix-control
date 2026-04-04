@@ -13,7 +13,7 @@ namespace tss
         ~HorizontalSeparator() override = default;
 
         void setLook(const HorizontalSeparatorLook& look);
-        void setScalingFactor(float scalingFactor);
+        void setDisplayScale(float displayScale);
         
         void paint(juce::Graphics& g) override;
         
@@ -28,7 +28,7 @@ namespace tss
         HorizontalSeparatorLook look_{};
         int width_;
         int height_;
-        float scalingFactor_ = 1.0f;
+        float displayScale_ = 1.0f;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(HorizontalSeparator)
     };

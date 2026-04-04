@@ -23,7 +23,7 @@ public:
 
     void resized() override;
     void setSkin(tss::ISkin& skin);
-    void setScalingFactor(float scalingFactor);
+    void setDisplayScale(float displayScale);
     
     tss::TrackGeneratorDisplay& getTrackGeneratorDisplay() { return trackGeneratorDisplay_; }
     tss::EnvelopeDisplay& getEnvelope1Display() { return envelope1Display_; }
@@ -39,7 +39,7 @@ public:
     void valueTreeRedirected(juce::ValueTree&) override {}
 
 private:
-    inline constexpr static int kSpacing = 15;
+    inline constexpr static int kSpacing = 16;
     inline constexpr static int kEnvParameterMax = 63;
     inline constexpr static int kTrackPointMax = 63;
     inline constexpr static int kPatchNameSectionPaddingTop = 8;
@@ -49,7 +49,7 @@ private:
     int height_;
     tss::ISkin* skin_;
     juce::AudioProcessorValueTreeState* apvts_ = nullptr;
-    float scalingFactor_ = 1.0f;
+    float displayScale_ = 1.0f;
 
     tss::EnvelopeDisplay envelope1Display_;
     tss::EnvelopeDisplay envelope2Display_;

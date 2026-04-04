@@ -55,7 +55,7 @@ PatchManagerPanel::~PatchManagerPanel() = default;
 void PatchManagerPanel::resized()
 {
     const auto bounds = getLocalBounds();
-    const float sf = scalingFactor_;
+    const float sf = displayScale_;
     const int panelWidth = tss::ScaledLayout::scaledInt(static_cast<float>(width_), sf);
 
     const int sectionHeaderHeight = tss::ScaledLayout::scaledInt(
@@ -105,23 +105,23 @@ void PatchManagerPanel::setSkin(tss::ISkin& skin)
         patchMutatorPanel_.get());
 }
 
-void PatchManagerPanel::setScalingFactor(float scalingFactor)
+void PatchManagerPanel::setDisplayScale(float displayScale)
 {
-    if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+    if (juce::approximatelyEqual(displayScale_, displayScale))
         return;
     
-    scalingFactor_ = scalingFactor;
+    displayScale_ = displayScale;
     
     if (sectionHeader_)
-        sectionHeader_->setScalingFactor(scalingFactor_);
+        sectionHeader_->setDisplayScale(displayScale_);
     if (bankUtilityPanel_)
-        bankUtilityPanel_->setScalingFactor(scalingFactor_);
+        bankUtilityPanel_->setDisplayScale(displayScale_);
     if (internalPatchesPanel_)
-        internalPatchesPanel_->setScalingFactor(scalingFactor_);
+        internalPatchesPanel_->setDisplayScale(displayScale_);
     if (computerPatchesPanel_)
-        computerPatchesPanel_->setScalingFactor(scalingFactor_);
+        computerPatchesPanel_->setDisplayScale(displayScale_);
     if (patchMutatorPanel_)
-        patchMutatorPanel_->setScalingFactor(scalingFactor_);
+        patchMutatorPanel_->setDisplayScale(displayScale_);
     
     resized();
     repaint();

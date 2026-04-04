@@ -30,7 +30,7 @@ namespace tss
         void calculateLayout();
         int calculateColumnCount(int totalItems) const;
         int calculateItemsPerColumn(int totalItems, int columnCount) const;
-        float getSeparatorWidth() const { return 1.0f * scalingFactor_; }
+        float getSeparatorWidth() const { return 1.0f * displayScale_; }
         float getActualColumnWidth(float contentWidth) const;
 
         juce::Rectangle<float> getItemBounds(int itemIndex) const;

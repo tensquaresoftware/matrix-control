@@ -145,7 +145,7 @@ void ModulationBusPanel::createSeparator(tss::ISkin& skin)
 
 void ModulationBusPanel::resized()
 {
-    const float sf = scalingFactor_;
+    const float sf = displayScale_;
     const int h = getHeight();
     const int labelH = tss::ScaledLayout::scaledInt(static_cast<float>(dimensions_.busNumberLabelHeight), sf);
     const int sourceH = tss::ScaledLayout::scaledInt(static_cast<float>(dimensions_.sourceComboBoxHeight), sf);
@@ -160,22 +160,22 @@ void ModulationBusPanel::resized()
     layoutSeparator(ySep, sepH);
 
     if (busNumberLabel_)
-        busNumberLabel_->setScalingFactor(scalingFactor_);
+        busNumberLabel_->setDisplayScale(displayScale_);
     if (sourceComboBox_)
-        sourceComboBox_->setScalingFactor(scalingFactor_);
+        sourceComboBox_->setDisplayScale(displayScale_);
     if (amountSlider_)
-        amountSlider_->setScalingFactor(scalingFactor_);
+        amountSlider_->setDisplayScale(displayScale_);
     if (destinationComboBox_)
-        destinationComboBox_->setScalingFactor(scalingFactor_);
+        destinationComboBox_->setDisplayScale(displayScale_);
     if (initButton_)
-        initButton_->setScalingFactor(scalingFactor_);
+        initButton_->setDisplayScale(displayScale_);
     if (separator_)
-        separator_->setScalingFactor(scalingFactor_);
+        separator_->setDisplayScale(displayScale_);
 }
 
 void ModulationBusPanel::layoutWidgetRow()
 {
-    const float sf = scalingFactor_;
+    const float sf = displayScale_;
     const int y = 0;
 
     const int labelW  = tss::ScaledLayout::scaledInt(static_cast<float>(dimensions_.busNumberLabelWidth), sf);
@@ -205,7 +205,7 @@ void ModulationBusPanel::layoutWidgetRow()
 
 void ModulationBusPanel::layoutSeparator(int yTop, int separatorHeight)
 {
-    const int sepW = tss::ScaledLayout::scaledInt(static_cast<float>(dimensions_.separatorWidth), scalingFactor_);
+    const int sepW = tss::ScaledLayout::scaledInt(static_cast<float>(dimensions_.separatorWidth), displayScale_);
 
     if (auto* separator = separator_.get())
         separator->setBounds(0, yTop, sepW, separatorHeight);
@@ -234,12 +234,12 @@ void ModulationBusPanel::setSkin(tss::ISkin& skin)
         separator_->setLook(tss::horizontalSeparatorLookFromSkin(skin));
 }
 
-void ModulationBusPanel::setScalingFactor(float scalingFactor)
+void ModulationBusPanel::setDisplayScale(float displayScale)
 {
-    if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+    if (juce::approximatelyEqual(displayScale_, displayScale))
         return;
     
-    scalingFactor_ = scalingFactor;
+    displayScale_ = displayScale;
     resized();
     repaint();
 }

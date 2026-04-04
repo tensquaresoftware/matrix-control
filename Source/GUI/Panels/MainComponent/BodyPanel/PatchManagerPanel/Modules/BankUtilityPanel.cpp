@@ -31,7 +31,7 @@ BankUtilityPanel::~BankUtilityPanel() = default;
 void BankUtilityPanel::resized()
 {
     using namespace PluginDimensions::Widgets;
-    const float sf = scalingFactor_;
+    const float sf = displayScale_;
 
     const int moduleHeaderHeight  = juce::roundToInt(static_cast<float>(Heights::kModuleHeader) * sf);
     const int moduleHeaderWidth   = juce::roundToInt(static_cast<float>(Widths::ModuleHeader::kPatchManagerModule) * sf);
@@ -93,19 +93,19 @@ void BankUtilityPanel::resized()
     setBankButtonBoundsRow2(selectBank8Button_.get(), 3, row2Y);
     setBankButtonBoundsRow2(selectBank9Button_.get(), 4, row2Y);
 
-    if (bankSelectorLabel_)      bankSelectorLabel_->setScalingFactor(sf);
-    if (bankUtilityModuleHeader_) bankUtilityModuleHeader_->setScalingFactor(sf);
-    if (unlockBankButton_)       unlockBankButton_->setScalingFactor(sf);
-    if (selectBank0Button_)      selectBank0Button_->setScalingFactor(sf);
-    if (selectBank1Button_)      selectBank1Button_->setScalingFactor(sf);
-    if (selectBank2Button_)      selectBank2Button_->setScalingFactor(sf);
-    if (selectBank3Button_)      selectBank3Button_->setScalingFactor(sf);
-    if (selectBank4Button_)      selectBank4Button_->setScalingFactor(sf);
-    if (selectBank5Button_)      selectBank5Button_->setScalingFactor(sf);
-    if (selectBank6Button_)      selectBank6Button_->setScalingFactor(sf);
-    if (selectBank7Button_)      selectBank7Button_->setScalingFactor(sf);
-    if (selectBank8Button_)      selectBank8Button_->setScalingFactor(sf);
-    if (selectBank9Button_)      selectBank9Button_->setScalingFactor(sf);
+    if (bankSelectorLabel_)      bankSelectorLabel_->setDisplayScale(sf);
+    if (bankUtilityModuleHeader_) bankUtilityModuleHeader_->setDisplayScale(sf);
+    if (unlockBankButton_)       unlockBankButton_->setDisplayScale(sf);
+    if (selectBank0Button_)      selectBank0Button_->setDisplayScale(sf);
+    if (selectBank1Button_)      selectBank1Button_->setDisplayScale(sf);
+    if (selectBank2Button_)      selectBank2Button_->setDisplayScale(sf);
+    if (selectBank3Button_)      selectBank3Button_->setDisplayScale(sf);
+    if (selectBank4Button_)      selectBank4Button_->setDisplayScale(sf);
+    if (selectBank5Button_)      selectBank5Button_->setDisplayScale(sf);
+    if (selectBank6Button_)      selectBank6Button_->setDisplayScale(sf);
+    if (selectBank7Button_)      selectBank7Button_->setDisplayScale(sf);
+    if (selectBank8Button_)      selectBank8Button_->setDisplayScale(sf);
+    if (selectBank9Button_)      selectBank9Button_->setDisplayScale(sf);
 }
 
 void BankUtilityPanel::setSkin(tss::ISkin& skin)
@@ -140,12 +140,12 @@ void BankUtilityPanel::setSkin(tss::ISkin& skin)
         selectBank9Button_->setLook(tss::buttonLookFromSkin(skin));
 }
 
-void BankUtilityPanel::setScalingFactor(float scalingFactor)
+void BankUtilityPanel::setDisplayScale(float displayScale)
 {
-    if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+    if (juce::approximatelyEqual(displayScale_, displayScale))
         return;
     
-    scalingFactor_ = scalingFactor;
+    displayScale_ = displayScale;
     repaint();
 }
 

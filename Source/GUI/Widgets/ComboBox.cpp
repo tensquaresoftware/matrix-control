@@ -29,20 +29,12 @@ namespace tss
         popupLook_ = look;
     }
 
-    void ComboBox::setScalingFactor(float scalingFactor)
+    void ComboBox::setDisplayScale(float displayScale)
     {
-        if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+        if (juce::approximatelyEqual(displayScale_, displayScale))
             return;
         
-        scalingFactor_ = scalingFactor;
-        repaint();
-    }
-
-    void ComboBox::setCustomDisplayText(std::optional<juce::String> text)
-    {
-        if (customDisplayText_ == text)
-            return;
-        customDisplayText_ = text;
+        displayScale_ = displayScale;
         repaint();
     }
 
@@ -69,7 +61,7 @@ namespace tss
     {
         if (style_ == Style::ButtonLike)
         {
-            const float thickness = std::max(1.0f, static_cast<float>(kBorderThicknessButtonLike_) * scalingFactor_);
+            const float thickness = std::max(1.0f, static_cast<float>(kBorderThicknessButtonLike_) * displayScale_);
             g.setColour(getBorderColourForCurrentStyle(enabled));
             g.drawRect(bounds, thickness);
             return;
@@ -77,7 +69,7 @@ namespace tss
 
         if (hasFocus)
         {
-            const float thickness = std::max(1.0f, static_cast<float>(kBorderThickness_) * scalingFactor_);
+            const float thickness = std::max(1.0f, static_cast<float>(kBorderThickness_) * displayScale_);
             g.setColour(getFocusBorderColourForCurrentStyle());
             g.drawRect(backgroundBounds, thickness);
         }
@@ -90,15 +82,12 @@ namespace tss
         const auto textBounds = calculateTextBounds(bounds);
 
         g.setColour(textColour);
-        g.setFont(look_.font.withHeight(kFontSize_ * scalingFactor_));
+        g.setFont(look_.font.withHeight(kFontSize_ * displayScale_));
         g.drawText(text, textBounds, juce::Justification::centredLeft, false);
     }
 
     juce::String ComboBox::getSelectedItemText() const
     {
-        if (customDisplayText_.has_value())
-            return *customDisplayText_;
-
         const auto selectedIndex = getSelectedItemIndex();
         if (selectedIndex >= 0)
             return getItemText(selectedIndex);
@@ -146,9 +135,9 @@ namespace tss
     juce::Rectangle<float> ComboBox::calculateTextBounds(const juce::Rectangle<float>& bounds) const
     {
         auto textBounds = bounds;
-        const float leftPad = static_cast<float>(kLeftPadding_) * scalingFactor_;
-        const float triangleSpace = static_cast<float>(kTriangleBaseSize_) * scalingFactor_;
-        const float rightPad = static_cast<float>(kRightPadding_) * scalingFactor_;
+        const float leftPad = static_cast<float>(kLeftPadding_) * displayScale_;
+        const float triangleSpace = static_cast<float>(kTriangleBaseSize_) * displayScale_;
+        const float rightPad = static_cast<float>(kRightPadding_) * displayScale_;
         
         textBounds.removeFromLeft(leftPad);
         textBounds.removeFromRight(triangleSpace);
@@ -161,9 +150,9 @@ namespace tss
         const auto triangleColour = getTriangleColourForCurrentStyle(enabled);
         g.setColour(triangleColour);
 
-        const float triangleBaseSize = static_cast<float>(kTriangleBaseSize_) * scalingFactor_;
+        const float triangleBaseSize = static_cast<float>(kTriangleBaseSize_) * displayScale_;
         const float triangleHeight = triangleBaseSize * kTriangleHeightFactor_;
-        const float rightPad = static_cast<float>(kRightPadding_) * scalingFactor_;
+        const float rightPad = static_cast<float>(kRightPadding_) * displayScale_;
         const float triangleX = bounds.getRight() - triangleBaseSize - rightPad;
         const float triangleY = bounds.getCentreY() - triangleHeight * 0.5f;
 
@@ -190,7 +179,7 @@ namespace tss
         if (style_ == Style::ButtonLike)
             return bounds;
         
-        const auto backgroundHeight = static_cast<float>(kBackgroundHeight_) * scalingFactor_;
+        const auto backgroundHeight = static_cast<float>(kBackgroundHeight_) * displayScale_;
         const auto backgroundY = (bounds.getHeight() - backgroundHeight) * 0.5f;
         return juce::Rectangle<float>(bounds.getX(), bounds.getY() + backgroundY, bounds.getWidth(), backgroundHeight);
     }

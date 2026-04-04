@@ -1,7 +1,5 @@
 #pragma once
 
-#include <optional>
-
 #include <juce_gui_basics/juce_gui_basics.h>
 
 #include "GUI/Looks/WidgetLooks.h"
@@ -26,9 +24,8 @@ namespace tss
 
         void setLook(const ComboBoxLook& look);
         void setPopupMenuLook(const PopupMenuLook& look);
-        void setScalingFactor(float scalingFactor);
-        void setCustomDisplayText(std::optional<juce::String> text);
-        
+        void setDisplayScale(float displayScale);
+
         void paint(juce::Graphics& g) override;
         void showPopup() override;
 
@@ -37,7 +34,7 @@ namespace tss
         void focusGained(juce::Component::FocusChangeType cause) override;
         void focusLost(juce::Component::FocusChangeType cause) override;
 
-        float getScalingFactor() const { return scalingFactor_; }
+        float getDisplayScale() const { return displayScale_; }
         const PopupMenuLook& getPopupMenuLook() const { return popupLook_; }
         int getBaseComponentWidth() const { return width_; }
         int getBaseComponentHeight() const { return height_; }
@@ -66,8 +63,7 @@ namespace tss
         Style style_;
         bool isPopupOpen_ = false;
         bool hasFocus_ = false;
-        float scalingFactor_ = 1.0f;
-        std::optional<juce::String> customDisplayText_;
+        float displayScale_ = 1.0f;
 
         void drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);
         void drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);

@@ -15,14 +15,11 @@
 
 class WidgetFactory;
 
-// High-frequency Timer polls editor width so layout scale tracks live resize smoothly.
-// (AsyncUpdater coalesced too aggressively and made corner-drag scaling feel stepped.)
-class PluginEditor : public juce::AudioProcessorEditor,
-                    private juce::Timer
+class PluginEditor : public juce::AudioProcessorEditor
 {
 public:
     explicit PluginEditor(PluginProcessor&);
-    ~PluginEditor() override;
+    ~PluginEditor() override = default;
 
     void paint(juce::Graphics&) override;
     void resized() override;
@@ -33,21 +30,16 @@ public:
 
 private:
     PluginProcessor& pluginProcessor;
-    
+
     std::unique_ptr<tss::Skin> skinBlack_;
     std::unique_ptr<tss::Skin> skinCream_;
     tss::Skin* skin_ = nullptr;
     std::unique_ptr<WidgetFactory> widgetFactory;
     std::unique_ptr<MainComponent> mainComponent;
-    std::unique_ptr<juce::ResizableCornerComponent> resizeCorner_;
 
-    void layoutResizeCorner();
     void updateSkin();
-    void applyGuiScale(float scaleFactor);
-    void syncLayoutScaleFromEditor();
-    void timerCallback() override;
-
-    int lastSyncedEditorWidth_ = -1;
+    void applyDisplayScale(float displayScale);
+    void syncDisplayScaleFromEditor();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginEditor)
 };

@@ -262,7 +262,7 @@ void PatchMutatorPanel::connectToggleToApvts(tss::Toggle* toggle, const char* wi
 
 void PatchMutatorPanel::resized()
 {
-    const float sf = scalingFactor_;
+    const float sf = displayScale_;
 
     const int moduleHeaderW = juce::roundToInt(static_cast<float>(PluginDimensions::Widgets::Widths::ModuleHeader::kPatchManagerModule) * sf);
     const int moduleHeaderH = juce::roundToInt(static_cast<float>(PluginDimensions::Widgets::Heights::kModuleHeader) * sf);
@@ -281,35 +281,35 @@ void PatchMutatorPanel::resized()
         {env1Toggle_.get(), env2Toggle_.get(), env3Toggle_.get(), lfo1Toggle_.get(), lfo2Toggle_.get()});
     layoutHistoryLine(0, row2Y);
 
-    if (moduleHeader_)            moduleHeader_->setScalingFactor(sf);
-    if (amountLabel_)             amountLabel_->setScalingFactor(sf);
-    if (amountSlider_)            amountSlider_->setScalingFactor(sf);
-    if (mutateButton_)            mutateButton_->setScalingFactor(sf);
-    if (randomLabel_)             randomLabel_->setScalingFactor(sf);
-    if (randomSlider_)            randomSlider_->setScalingFactor(sf);
-    if (retryButton_)             retryButton_->setScalingFactor(sf);
-    if (historyLabel_)            historyLabel_->setScalingFactor(sf);
-    if (historyComboBox_)         historyComboBox_->setScalingFactor(sf);
-    if (compareButton_)           compareButton_->setScalingFactor(sf);
-    if (deleteButton_)            deleteButton_->setScalingFactor(sf);
-    if (clearButton_)             clearButton_->setScalingFactor(sf);
-    if (exportButton_)            exportButton_->setScalingFactor(sf);
-    if (dco1Toggle_)              dco1Toggle_->setScalingFactor(sf);
-    if (dco2Toggle_)              dco2Toggle_->setScalingFactor(sf);
-    if (vcfVcaToggle_)            vcfVcaToggle_->setScalingFactor(sf);
-    if (fmTrackToggle_)           fmTrackToggle_->setScalingFactor(sf);
-    if (rampPortamentoToggle_)    rampPortamentoToggle_->setScalingFactor(sf);
-    if (env1Toggle_)              env1Toggle_->setScalingFactor(sf);
-    if (env2Toggle_)              env2Toggle_->setScalingFactor(sf);
-    if (env3Toggle_)              env3Toggle_->setScalingFactor(sf);
-    if (lfo1Toggle_)              lfo1Toggle_->setScalingFactor(sf);
-    if (lfo2Toggle_)              lfo2Toggle_->setScalingFactor(sf);
+    if (moduleHeader_)            moduleHeader_->setDisplayScale(sf);
+    if (amountLabel_)             amountLabel_->setDisplayScale(sf);
+    if (amountSlider_)            amountSlider_->setDisplayScale(sf);
+    if (mutateButton_)            mutateButton_->setDisplayScale(sf);
+    if (randomLabel_)             randomLabel_->setDisplayScale(sf);
+    if (randomSlider_)            randomSlider_->setDisplayScale(sf);
+    if (retryButton_)             retryButton_->setDisplayScale(sf);
+    if (historyLabel_)            historyLabel_->setDisplayScale(sf);
+    if (historyComboBox_)         historyComboBox_->setDisplayScale(sf);
+    if (compareButton_)           compareButton_->setDisplayScale(sf);
+    if (deleteButton_)            deleteButton_->setDisplayScale(sf);
+    if (clearButton_)             clearButton_->setDisplayScale(sf);
+    if (exportButton_)            exportButton_->setDisplayScale(sf);
+    if (dco1Toggle_)              dco1Toggle_->setDisplayScale(sf);
+    if (dco2Toggle_)              dco2Toggle_->setDisplayScale(sf);
+    if (vcfVcaToggle_)            vcfVcaToggle_->setDisplayScale(sf);
+    if (fmTrackToggle_)           fmTrackToggle_->setDisplayScale(sf);
+    if (rampPortamentoToggle_)    rampPortamentoToggle_->setDisplayScale(sf);
+    if (env1Toggle_)              env1Toggle_->setDisplayScale(sf);
+    if (env2Toggle_)              env2Toggle_->setDisplayScale(sf);
+    if (env3Toggle_)              env3Toggle_->setDisplayScale(sf);
+    if (lfo1Toggle_)              lfo1Toggle_->setDisplayScale(sf);
+    if (lfo2Toggle_)              lfo2Toggle_->setDisplayScale(sf);
 }
 
 void PatchMutatorPanel::layoutSliderLine(int x, int y, tss::Label* label, tss::Slider* slider, tss::Button* button, const std::vector<tss::Toggle*>& toggles)
 {
     using namespace PluginDimensions::Widgets;
-    const float sf = scalingFactor_;
+    const float sf = displayScale_;
 
     const int labelW      = juce::roundToInt(static_cast<float>(Widths::Label::kPatchMutator) * sf);
     const int labelH      = juce::roundToInt(static_cast<float>(Heights::kLabel) * sf);
@@ -347,7 +347,7 @@ void PatchMutatorPanel::layoutSliderLine(int x, int y, tss::Label* label, tss::S
 void PatchMutatorPanel::layoutHistoryLine(int x, int y)
 {
     using namespace PluginDimensions::Widgets;
-    const float sf = scalingFactor_;
+    const float sf = displayScale_;
 
     const int labelW      = juce::roundToInt(static_cast<float>(Widths::Label::kPatchMutator) * sf);
     const int labelH      = juce::roundToInt(static_cast<float>(Heights::kLabel) * sf);
@@ -387,12 +387,12 @@ void PatchMutatorPanel::setSkin(tss::ISkin& skin)
     propagateSkinsToToggleWidgets(skin);
 }
 
-void PatchMutatorPanel::setScalingFactor(float scalingFactor)
+void PatchMutatorPanel::setDisplayScale(float displayScale)
 {
-    if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+    if (juce::approximatelyEqual(displayScale_, displayScale))
         return;
     
-    scalingFactor_ = scalingFactor;
+    displayScale_ = displayScale;
     repaint();
 }
 

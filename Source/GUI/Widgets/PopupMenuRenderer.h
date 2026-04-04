@@ -11,7 +11,7 @@ namespace tss
     class PopupMenuRenderer
     {
     public:
-        PopupMenuRenderer(bool isButtonLike, float scalingFactor);
+        PopupMenuRenderer(bool isButtonLike, float displayScale);
 
         void setLook(const PopupMenuLook& look);
 
@@ -25,10 +25,10 @@ namespace tss
 
     private:
         inline constexpr static int kTextLeftPadding_ = 3;
-        float getHighlightGap() const { return juce::jmax(1.0f, 1.0f * scalingFactor_); }
+        float getHighlightGap() const { return juce::jmax(1.0f, 1.0f * displayScale_); }
 
         PopupMenuLook look_{};
         bool isButtonLike_;
-        float scalingFactor_;
+        float displayScale_;
     };
 }

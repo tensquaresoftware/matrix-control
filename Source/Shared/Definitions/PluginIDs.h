@@ -14,43 +14,57 @@ namespace PluginIDs
     namespace Settings
     {
         constexpr const char* kGuiScaleId = "guiScaleId";
-        
+        constexpr const char* kGuiScaleSchemaId = "guiScaleSchema";
+
         namespace ScaleLevels
         {
             constexpr int k50  = 1;
             constexpr int k75  = 2;
-            constexpr int k90  = 3;
-            constexpr int k100 = 4;
-            constexpr int k125 = 5;
-            constexpr int k150 = 6;
-            constexpr int k200 = 7;
-            constexpr int k250 = 8;
-            constexpr int k300 = 9;
-            constexpr int k400 = 10;
-            
+            constexpr int k100 = 3;
+            constexpr int k125 = 4;
+            constexpr int k150 = 5;
+            constexpr int k200 = 6;
+
             constexpr int kDefault = k100;
             constexpr int kMin = k50;
-            constexpr int kMax = k400;
-            
-            constexpr float kScaleFactors[] = {
-                0.0f,   // index 0 (unused, IDs start at 1)
-                0.5f,   // k50
-                0.75f,  // k75
-                0.9f,   // k90
-                1.0f,   // k100
-                1.25f,  // k125
-                1.5f,   // k150
-                2.0f,   // k200
-                2.5f,   // k250
-                3.0f,   // k300
-                4.0f    // k400
+            constexpr int kMax = k200;
+
+            constexpr float kDisplayScales[] = {
+                0.0f,
+                0.5f,
+                0.75f,
+                1.0f,
+                1.25f,
+                1.5f,
+                2.0f
             };
-            
-            constexpr float getScaleFactor(int scaleId)
+
+            constexpr float getDisplayScale(int scaleId)
             {
                 if (scaleId >= kMin && scaleId <= kMax)
-                    return kScaleFactors[scaleId];
-                return kScaleFactors[kDefault];
+                    return kDisplayScales[scaleId];
+                return kDisplayScales[kDefault];
+            }
+
+            /** Maps legacy combo item IDs (1..10, pre v0.0.66) to current IDs (1..6). */
+            constexpr int migrateFromLegacyScaleId(int legacyId)
+            {
+                switch (legacyId)
+                {
+                    case 1: return k50;
+                    case 2: return k75;
+                    case 3: return k100;
+                    case 4: return k100;
+                    case 5: return k125;
+                    case 6: return k150;
+                    case 7:
+                    case 8:
+                    case 9:
+                    case 10:
+                        return k200;
+                    default:
+                        return kDefault;
+                }
             }
         }
     }

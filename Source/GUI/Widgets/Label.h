@@ -20,7 +20,7 @@ namespace tss
         ~Label() override = default;
         
         void setLook(const LabelLook& look);
-        void setScalingFactor(float scalingFactor);
+        void setDisplayScale(float displayScale);
         
         void setText(const juce::String& text);
         juce::String getText() const { return labelText_; }
@@ -41,7 +41,7 @@ namespace tss
         int height_;
         juce::String labelText_;
         LabelStyle style_;
-        float scalingFactor_ = 1.0f;
+        float displayScale_ = 1.0f;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Label)
     };

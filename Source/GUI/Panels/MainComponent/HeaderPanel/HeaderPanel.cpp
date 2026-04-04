@@ -28,14 +28,10 @@ HeaderPanel::HeaderPanel(tss::ISkin& skin, int width, int height)
     guiScaleComboBox_.setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
     guiScaleComboBox_.addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k50, PluginIDs::Settings::ScaleLevels::k50);
     guiScaleComboBox_.addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k75, PluginIDs::Settings::ScaleLevels::k75);
-    guiScaleComboBox_.addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k90, PluginIDs::Settings::ScaleLevels::k90);
     guiScaleComboBox_.addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k100, PluginIDs::Settings::ScaleLevels::k100);
     guiScaleComboBox_.addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k125, PluginIDs::Settings::ScaleLevels::k125);
     guiScaleComboBox_.addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k150, PluginIDs::Settings::ScaleLevels::k150);
     guiScaleComboBox_.addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k200, PluginIDs::Settings::ScaleLevels::k200);
-    guiScaleComboBox_.addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k250, PluginIDs::Settings::ScaleLevels::k250);
-    guiScaleComboBox_.addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k300, PluginIDs::Settings::ScaleLevels::k300);
-    guiScaleComboBox_.addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k400, PluginIDs::Settings::ScaleLevels::k400);
     guiScaleComboBox_.setSelectedId(PluginIDs::Settings::ScaleLevels::k100, juce::dontSendNotification);
     addAndMakeVisible(guiScaleComboBox_);
 
@@ -60,7 +56,7 @@ void HeaderPanel::paint(juce::Graphics& g)
 void HeaderPanel::resized()
 {
     const auto bounds = getLocalBounds();
-    const float sf = scalingFactor_;
+    const float sf = displayScale_;
     const float spacing = static_cast<float>(kSpacing_) * sf;
     const float controlHeight = static_cast<float>(kControlHeight_) * sf;
     const float scaledHeight = static_cast<float>(height_) * sf;
@@ -86,16 +82,16 @@ void HeaderPanel::resized()
     const int h = juce::roundToInt(controlHeight);
 
     guiScaleLabel_.setBounds(guiScaleLabelX, y, juce::roundToInt(guiScaleLabelWidth), h);
-    guiScaleLabel_.setScalingFactor(scalingFactor_);
+    guiScaleLabel_.setDisplayScale(displayScale_);
 
     guiScaleComboBox_.setBounds(guiScaleComboBoxX, y, juce::roundToInt(comboBoxWidth), h);
-    guiScaleComboBox_.setScalingFactor(scalingFactor_);
+    guiScaleComboBox_.setDisplayScale(displayScale_);
 
     skinLabel_.setBounds(skinLabelX, y, juce::roundToInt(skinLabelWidth), h);
-    skinLabel_.setScalingFactor(scalingFactor_);
+    skinLabel_.setDisplayScale(displayScale_);
 
     skinComboBox_.setBounds(skinComboBoxX, y, juce::roundToInt(comboBoxWidth), h);
-    skinComboBox_.setScalingFactor(scalingFactor_);
+    skinComboBox_.setDisplayScale(displayScale_);
 }
 
 void HeaderPanel::setSkin(tss::ISkin& skin)
@@ -109,17 +105,12 @@ void HeaderPanel::setSkin(tss::ISkin& skin)
     guiScaleComboBox_.setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
 }
 
-void HeaderPanel::setScalingFactor(float scalingFactor)
+void HeaderPanel::setDisplayScale(float displayScale)
 {
-    if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+    if (juce::approximatelyEqual(displayScale_, displayScale))
         return;
     
-    scalingFactor_ = scalingFactor;
+    displayScale_ = displayScale;
     repaint();
-}
-
-void HeaderPanel::setGuiScaleDisplayText(std::optional<juce::String> text)
-{
-    guiScaleComboBox_.setCustomDisplayText(text);
 }
 

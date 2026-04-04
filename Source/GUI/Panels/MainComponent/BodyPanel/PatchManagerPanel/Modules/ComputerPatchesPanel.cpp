@@ -40,7 +40,7 @@ ComputerPatchesPanel::~ComputerPatchesPanel() = default;
 void ComputerPatchesPanel::resized()
 {
     using namespace PluginDimensions::Widgets;
-    const float sf = scalingFactor_;
+    const float sf = displayScale_;
 
     // Dimensions (scaled)
     const int moduleHeaderH    = juce::roundToInt(static_cast<float>(Heights::kModuleHeader) * sf);
@@ -92,15 +92,15 @@ void ComputerPatchesPanel::resized()
     if (savePatchFileButton_)
         savePatchFileButton_->setBounds(juce::roundToInt(storageOriginX + openStep + saveAsStep), row2Y, storageButtonW, buttonH);
 
-    if (moduleHeader_)                  moduleHeader_->setScalingFactor(sf);
-    if (browserGroupLabel)              browserGroupLabel->setScalingFactor(sf);
-    if (storageGroupLabel)              storageGroupLabel->setScalingFactor(sf);
-    if (loadPreviousPatchFileButton_)   loadPreviousPatchFileButton_->setScalingFactor(sf);
-    if (loadNextPatchFileButton_)       loadNextPatchFileButton_->setScalingFactor(sf);
-    if (selectPatchFileComboBox_)       selectPatchFileComboBox_->setScalingFactor(sf);
-    if (openPatchFolderButton_)         openPatchFolderButton_->setScalingFactor(sf);
-    if (savePatchFileAsButton_)         savePatchFileAsButton_->setScalingFactor(sf);
-    if (savePatchFileButton_)           savePatchFileButton_->setScalingFactor(sf);
+    if (moduleHeader_)                  moduleHeader_->setDisplayScale(sf);
+    if (browserGroupLabel)              browserGroupLabel->setDisplayScale(sf);
+    if (storageGroupLabel)              storageGroupLabel->setDisplayScale(sf);
+    if (loadPreviousPatchFileButton_)   loadPreviousPatchFileButton_->setDisplayScale(sf);
+    if (loadNextPatchFileButton_)       loadNextPatchFileButton_->setDisplayScale(sf);
+    if (selectPatchFileComboBox_)       selectPatchFileComboBox_->setDisplayScale(sf);
+    if (openPatchFolderButton_)         openPatchFolderButton_->setDisplayScale(sf);
+    if (savePatchFileAsButton_)         savePatchFileAsButton_->setDisplayScale(sf);
+    if (savePatchFileButton_)           savePatchFileButton_->setDisplayScale(sf);
 }
 
 void ComputerPatchesPanel::setSkin(tss::ISkin& skin)
@@ -130,12 +130,12 @@ void ComputerPatchesPanel::setSkin(tss::ISkin& skin)
         savePatchFileButton_->setLook(tss::buttonLookFromSkin(skin));
 }
 
-void ComputerPatchesPanel::setScalingFactor(float scalingFactor)
+void ComputerPatchesPanel::setDisplayScale(float displayScale)
 {
-    if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+    if (juce::approximatelyEqual(displayScale_, displayScale))
         return;
     
-    scalingFactor_ = scalingFactor;
+    displayScale_ = displayScale;
     repaint();
 }
 

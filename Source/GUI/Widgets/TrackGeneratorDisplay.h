@@ -18,7 +18,7 @@ namespace tss
         ~TrackGeneratorDisplay() override = default;
 
         void setLook(const TrackGeneratorDisplayLook& look);
-        void setScalingFactor(float scalingFactor);
+        void setDisplayScale(float displayScale);
 
         void setTrackPoint1(int value);
         void setTrackPoint2(int value);
@@ -68,7 +68,7 @@ namespace tss
         TrackGeneratorDisplayLook look_{};
         int width_;
         int height_;
-        float scalingFactor_ = 1.0f;
+        float displayScale_ = 1.0f;
 
         std::array<int, kCurvePointCount_> pointValues_ {0, 15, 31, 47, 63};
         int draggedPointIndex_ = -1;

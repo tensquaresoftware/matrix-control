@@ -18,12 +18,12 @@ namespace tss
         repaint();
     }
 
-    void Toggle::setScalingFactor(float scalingFactor)
+    void Toggle::setDisplayScale(float displayScale)
     {
-        if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+        if (juce::approximatelyEqual(displayScale_, displayScale))
             return;
 
-        scalingFactor_ = scalingFactor;
+        displayScale_ = displayScale;
         repaint();
     }
 
@@ -31,7 +31,7 @@ namespace tss
     {
         const auto bounds = getLocalBounds().toFloat();
         const bool isOn = getToggleState();
-        const float borderThickness = std::max(1.0f, static_cast<float>(kBorderThickness_) * scalingFactor_);
+        const float borderThickness = std::max(1.0f, static_cast<float>(kBorderThickness_) * displayScale_);
 
         g.setColour(isOn ? look_.backgroundOn : look_.backgroundOff);
         g.fillRect(bounds);
@@ -43,7 +43,7 @@ namespace tss
         if (!buttonText.isEmpty())
         {
             g.setColour(isOn ? look_.textOn : look_.textOff);
-            g.setFont(look_.font.withHeight(look_.font.getHeight() * scalingFactor_));
+            g.setFont(look_.font.withHeight(look_.font.getHeight() * displayScale_));
             g.drawText(buttonText, bounds, juce::Justification::centred, false);
         }
     }

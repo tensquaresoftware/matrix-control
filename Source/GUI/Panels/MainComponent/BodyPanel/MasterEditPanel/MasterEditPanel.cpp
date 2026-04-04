@@ -49,7 +49,7 @@ MasterEditPanel::~MasterEditPanel() = default;
 void MasterEditPanel::resized()
 {
     const auto bounds = getLocalBounds();
-    const float sf = scalingFactor_;
+    const float sf = displayScale_;
 
     const int sectionHeaderHeight = tss::ScaledLayout::scaledInt(
         static_cast<float>(PluginDimensions::Widgets::Heights::kSectionHeader), sf);
@@ -80,21 +80,21 @@ void MasterEditPanel::setSkin(tss::ISkin& skin)
         miscPanel_.get());
 }
 
-void MasterEditPanel::setScalingFactor(float scalingFactor)
+void MasterEditPanel::setDisplayScale(float displayScale)
 {
-    if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+    if (juce::approximatelyEqual(displayScale_, displayScale))
         return;
     
-    scalingFactor_ = scalingFactor;
+    displayScale_ = displayScale;
     
     if (sectionHeader_)
-        sectionHeader_->setScalingFactor(scalingFactor_);
+        sectionHeader_->setDisplayScale(displayScale_);
     if (midiPanel_)
-        midiPanel_->setScalingFactor(scalingFactor_);
+        midiPanel_->setDisplayScale(displayScale_);
     if (vibratoPanel_)
-        vibratoPanel_->setScalingFactor(scalingFactor_);
+        vibratoPanel_->setDisplayScale(displayScale_);
     if (miscPanel_)
-        miscPanel_->setScalingFactor(scalingFactor_);
+        miscPanel_->setDisplayScale(displayScale_);
     
     resized();
     repaint();

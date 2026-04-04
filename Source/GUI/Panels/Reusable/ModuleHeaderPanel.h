@@ -35,7 +35,7 @@ public:
 
     void resized() override;
     void setSkin(tss::ISkin& skin);
-    void setScalingFactor(float scalingFactor);
+    void setDisplayScale(float displayScale);
     static int getHeight() { return PluginDimensions::Widgets::Heights::kModuleHeader; }
 
 private:
@@ -50,7 +50,7 @@ private:
     tss::ISkin* skin_;
     ButtonSet buttonSet_;
     ModuleType moduleType_;
-    float scalingFactor_ = 1.0f;
+    float displayScale_ = 1.0f;
 
     std::unique_ptr<tss::ModuleHeader> moduleHeader_;
     std::unique_ptr<tss::Button> initButton_;

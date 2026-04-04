@@ -45,13 +45,13 @@ void FooterPanel::paint(juce::Graphics& g)
     if (currentMessage.isEmpty() || currentSeverity == MessageSeverity::None)
         return;
     
-    const int padding = juce::jmax(1, juce::roundToInt(static_cast<float>(kPadding_) * scalingFactor_));
-    const int iconSize = juce::jmax(1, juce::roundToInt(static_cast<float>(kIconSize_) * scalingFactor_));
+    const int padding = juce::jmax(1, juce::roundToInt(static_cast<float>(kPadding_) * displayScale_));
+    const int iconSize = juce::jmax(1, juce::roundToInt(static_cast<float>(kIconSize_) * displayScale_));
     
     auto bounds = getLocalBounds().reduced(padding);
     
     g.setColour(getSeverityColour(currentSeverity));
-    g.setFont(skin_->getBaseFont().withHeight(skin_->getBaseFont().getHeight() * scalingFactor_));
+    g.setFont(skin_->getBaseFont().withHeight(skin_->getBaseFont().getHeight() * displayScale_));
     
     const juce::String icon = getSeverityIcon(currentSeverity);
     if (icon.isNotEmpty())
@@ -72,12 +72,12 @@ void FooterPanel::setSkin(tss::ISkin& skin)
     skin_ = &skin;
 }
 
-void FooterPanel::setScalingFactor(float scalingFactor)
+void FooterPanel::setDisplayScale(float displayScale)
 {
-    if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+    if (juce::approximatelyEqual(displayScale_, displayScale))
         return;
     
-    scalingFactor_ = scalingFactor;
+    displayScale_ = displayScale;
     repaint();
 }
 

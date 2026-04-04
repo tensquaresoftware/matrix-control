@@ -1,8 +1,8 @@
 #pragma once
 
 // ScaledLayout.h
-// Helpers for consistent integer bounds from design pixels and layout scale.
-// Convention: scaledInt uses roundToInt(designPx * layoutScale).
+// Helpers for consistent integer bounds from design pixels and UI display scale.
+// Convention: scaledInt uses roundToInt(designPx * displayScale).
 
 #include <juce_core/juce_core.h>
 
@@ -12,7 +12,7 @@ namespace tss
 {
 namespace ScaledLayout
 {
-    inline float layoutScaleFromEditorBounds(int editorWidth, int designWidth)
+    inline float displayScaleFromEditorBounds(int editorWidth, int designWidth)
     {
         if (designWidth <= 0)
             return 1.0f;
@@ -20,9 +20,9 @@ namespace ScaledLayout
         return static_cast<float>(editorWidth) / static_cast<float>(designWidth);
     }
 
-    inline int scaledInt(float designPixels, float layoutScale)
+    inline int scaledInt(float designPixels, float displayScale)
     {
-        return juce::roundToInt(designPixels * layoutScale);
+        return juce::roundToInt(designPixels * displayScale);
     }
 
     /** Split totalHeight into count integer row heights that sum exactly; adjacent rows differ by at most 1 px. */
@@ -46,7 +46,7 @@ namespace ScaledLayout
     }
 
     /**
-     * Rows 0..n-2 use scaledInt(designRowHeight, layoutScale); last row absorbs the remainder (sum == totalHeight).
+     * Rows 0..n-2 use scaledInt(designRowHeight, displayScale); last row absorbs the remainder (sum == totalHeight).
      * Matches mockup alignment when paired sections share the same design row height (e.g. ParameterPanel vs ModulationBusPanel).
      * Falls back to equalSplitHeights only when the last row would be < 1 px (cannot place n rows with fixed heads).
      */
@@ -54,7 +54,7 @@ namespace ScaledLayout
         int totalHeight,
         size_t rowCount,
         int designRowHeight,
-        float layoutScale)
+        float displayScale)
     {
         if (rowCount == 0)
             return {};
@@ -62,7 +62,7 @@ namespace ScaledLayout
             return { totalHeight };
 
         jassert(totalHeight >= 0);
-        const int hRow = scaledInt(static_cast<float>(designRowHeight), layoutScale);
+        const int hRow = scaledInt(static_cast<float>(designRowHeight), displayScale);
         const int fixedPart = static_cast<int>(rowCount - 1) * hRow;
         const int lastHeight = totalHeight - fixedPart;
         if (lastHeight < 1)
@@ -84,13 +84,13 @@ namespace ScaledLayout
         int totalHeight,
         size_t rowCount,
         int designRowHeight,
-        float layoutScale)
+        float displayScale)
     {
         if (rowCount == 0)
             return {};
 
         jassert(totalHeight >= 0);
-        const int hRow = scaledInt(static_cast<float>(designRowHeight), layoutScale);
+        const int hRow = scaledInt(static_cast<float>(designRowHeight), displayScale);
         const int fixedTotal = static_cast<int>(rowCount) * hRow;
 
         if (totalHeight < fixedTotal)
@@ -110,7 +110,7 @@ namespace ScaledLayout
     inline std::vector<int> distributeHeights(
         int totalHeight,
         const std::vector<int>& designHeights,
-        float layoutScale,
+        float displayScale,
         size_t flexibleIndex)
     {
         jassert(!designHeights.empty());
@@ -124,7 +124,7 @@ namespace ScaledLayout
             if (i == flexibleIndex)
                 continue;
 
-            const int h = scaledInt(static_cast<float>(designHeights[i]), layoutScale);
+            const int h = scaledInt(static_cast<float>(designHeights[i]), displayScale);
             out[i] = h;
             fixedSum += h;
         }
@@ -138,7 +138,7 @@ namespace ScaledLayout
     inline std::vector<int> distributeWidths(
         int totalWidth,
         const std::vector<int>& designWidths,
-        float layoutScale,
+        float displayScale,
         size_t flexibleIndex)
     {
         jassert(!designWidths.empty());
@@ -152,7 +152,7 @@ namespace ScaledLayout
             if (i == flexibleIndex)
                 continue;
 
-            const int w = scaledInt(static_cast<float>(designWidths[i]), layoutScale);
+            const int w = scaledInt(static_cast<float>(designWidths[i]), displayScale);
             out[i] = w;
             fixedSum += w;
         }

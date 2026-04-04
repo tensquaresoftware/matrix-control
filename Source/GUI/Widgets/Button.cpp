@@ -17,12 +17,12 @@ namespace tss
         repaint();
     }
 
-    void Button::setScalingFactor(float scalingFactor)
+    void Button::setDisplayScale(float displayScale)
     {
-        if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+        if (juce::approximatelyEqual(displayScale_, displayScale))
             return;
         
-        scalingFactor_ = scalingFactor;
+        displayScale_ = displayScale;
         repaint();
     }
 
@@ -31,7 +31,7 @@ namespace tss
         const auto bounds = getLocalBounds().toFloat();
         const auto buttonText = getButtonText();
         const bool enabled = isEnabled();
-        const float borderThickness = std::max(1.0f, static_cast<float>(kBorderThickness_) * scalingFactor_);
+        const float borderThickness = std::max(1.0f, static_cast<float>(kBorderThickness_) * displayScale_);
 
         g.setColour(getBackgroundColour(enabled, shouldDrawButtonAsHighlighted, shouldDrawButtonAsDown));
         g.fillRect(bounds);
@@ -42,7 +42,7 @@ namespace tss
         if (! buttonText.isEmpty())
         {
             g.setColour(getTextColour(enabled, shouldDrawButtonAsHighlighted, shouldDrawButtonAsDown));
-            g.setFont(look_.font.withHeight(kFontSize_ * scalingFactor_));
+            g.setFont(look_.font.withHeight(kFontSize_ * displayScale_));
             g.drawText(buttonText, bounds, juce::Justification::centred, false);
         }
     }

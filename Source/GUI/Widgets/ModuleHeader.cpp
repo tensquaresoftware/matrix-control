@@ -18,12 +18,12 @@ namespace tss
         repaint();
     }
 
-    void ModuleHeader::setScalingFactor(float scalingFactor)
+    void ModuleHeader::setDisplayScale(float displayScale)
     {
-        if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+        if (juce::approximatelyEqual(displayScale_, displayScale))
             return;
         
-        scalingFactor_ = scalingFactor;
+        displayScale_ = displayScale;
         repaint();
     }
 
@@ -56,22 +56,22 @@ namespace tss
         if (text_.isEmpty())
             return;
 
-        const float textAreaHeight = static_cast<float>(kTextAreaHeight_) * scalingFactor_;
-        const float textLeftPadding = static_cast<float>(kTextLeftPadding_) * scalingFactor_;
+        const float textAreaHeight = static_cast<float>(kTextAreaHeight_) * displayScale_;
+        const float textLeftPadding = static_cast<float>(kTextLeftPadding_) * displayScale_;
         
         auto textBounds = bounds;
         textBounds.setHeight(textAreaHeight);
         textBounds.removeFromLeft(textLeftPadding);
 
         g.setColour(look_.text);
-        g.setFont(look_.font.withHeight(look_.font.getHeight() * scalingFactor_));
+        g.setFont(look_.font.withHeight(look_.font.getHeight() * displayScale_));
         g.drawText(text_, textBounds, juce::Justification::centredLeft, false);
     }
 
     void ModuleHeader::drawLine(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        const float textAreaHeight = static_cast<float>(kTextAreaHeight_) * scalingFactor_;
-        const float lineThickness = std::max(1.0f, static_cast<float>(kLineThickness_) * scalingFactor_);
+        const float textAreaHeight = static_cast<float>(kTextAreaHeight_) * displayScale_;
+        const float lineThickness = std::max(1.0f, static_cast<float>(kLineThickness_) * displayScale_);
         const auto lineAreaHeight = bounds.getHeight() - textAreaHeight;
         const auto verticalOffset = textAreaHeight + (lineAreaHeight - lineThickness) * 0.5f;
 

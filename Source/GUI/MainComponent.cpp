@@ -32,7 +32,7 @@ void MainComponent::paint(juce::Graphics& g)
 void MainComponent::resized()
 {
     const auto bounds = getLocalBounds();
-    const float sf = scalingFactor_;
+    const float sf = uiDisplayScale_;
 
     const std::vector<int> designHeights {
         PluginDimensions::Panels::Header::kHeight,
@@ -58,15 +58,15 @@ void MainComponent::setSkin(tss::Skin& skin)
     footerPanel.setSkin(skin);
 }
 
-void MainComponent::setScalingFactor(float scalingFactor)
+void MainComponent::setDisplayScale(float displayScale)
 {
-    if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+    if (juce::approximatelyEqual(uiDisplayScale_, displayScale))
         return;
     
-    scalingFactor_ = scalingFactor;
-    headerPanel.setScalingFactor(scalingFactor_);
-    bodyPanel.setScalingFactor(scalingFactor_);
-    footerPanel.setScalingFactor(scalingFactor_);
+    uiDisplayScale_ = displayScale;
+    headerPanel.setDisplayScale(uiDisplayScale_);
+    bodyPanel.setDisplayScale(uiDisplayScale_);
+    footerPanel.setDisplayScale(uiDisplayScale_);
     resized();
     repaint();
 }

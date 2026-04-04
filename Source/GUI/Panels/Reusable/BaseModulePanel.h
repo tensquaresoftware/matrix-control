@@ -50,7 +50,7 @@ public:
 
     void resized() override;
     void setSkin(tss::ISkin& skin);
-    void setScalingFactor(float scalingFactor);
+    void setDisplayScale(float displayScale);
     
     ParameterPanel* getParameterPanelAt(size_t index);
 
@@ -58,7 +58,7 @@ protected:
     tss::ISkin* skin_;
     juce::AudioProcessorValueTreeState& apvts_;
     ModulePanelModuleType moduleType_;
-    float scalingFactor_ = 1.0f;
+    float displayScale_ = 1.0f;
 
     std::unique_ptr<ModuleHeaderPanel> moduleHeaderPanel_;
     std::vector<std::unique_ptr<ParameterPanel>> parameterPanels_;

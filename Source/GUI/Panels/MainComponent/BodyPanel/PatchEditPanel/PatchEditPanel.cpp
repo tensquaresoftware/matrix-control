@@ -72,7 +72,7 @@ PatchEditPanel::PatchEditPanel(tss::ISkin& skin, int width, int height, WidgetFa
 void PatchEditPanel::resized()
 {
     const auto bounds = getLocalBounds();
-    const float sf = scalingFactor_;
+    const float sf = displayScale_;
 
     const std::vector<int> designHeights {
         PluginDimensions::Widgets::Heights::kSectionHeader,
@@ -102,21 +102,21 @@ void PatchEditPanel::setSkin(tss::ISkin& skin)
         bottomPanel_.get());
 }
 
-void PatchEditPanel::setScalingFactor(float scalingFactor)
+void PatchEditPanel::setDisplayScale(float displayScale)
 {
-    if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+    if (juce::approximatelyEqual(displayScale_, displayScale))
         return;
     
-    scalingFactor_ = scalingFactor;
+    displayScale_ = displayScale;
     
     if (sectionHeader_)
-        sectionHeader_->setScalingFactor(scalingFactor_);
+        sectionHeader_->setDisplayScale(displayScale_);
     if (topPanel_)
-        topPanel_->setScalingFactor(scalingFactor_);
+        topPanel_->setDisplayScale(displayScale_);
     if (middlePanel_)
-        middlePanel_->setScalingFactor(scalingFactor_);
+        middlePanel_->setDisplayScale(displayScale_);
     if (bottomPanel_)
-        bottomPanel_->setScalingFactor(scalingFactor_);
+        bottomPanel_->setDisplayScale(displayScale_);
     
     resized();
     repaint();

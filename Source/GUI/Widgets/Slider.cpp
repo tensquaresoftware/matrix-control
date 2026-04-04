@@ -20,12 +20,12 @@ namespace tss
         repaint();
     }
 
-    void Slider::setScalingFactor(float scalingFactor)
+    void Slider::setDisplayScale(float displayScale)
     {
-        if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+        if (juce::approximatelyEqual(displayScale_, displayScale))
             return;
         
-        scalingFactor_ = scalingFactor;
+        displayScale_ = displayScale;
         repaint();
     }
 
@@ -55,7 +55,7 @@ namespace tss
 
     juce::Rectangle<float> Slider::calculateTrackBounds(const juce::Rectangle<float>& bounds) const
     {
-        const auto trackHeight = static_cast<float>(kTrackHeight_) * scalingFactor_;
+        const auto trackHeight = static_cast<float>(kTrackHeight_) * displayScale_;
         const auto trackY = (bounds.getHeight() - trackHeight) * 0.5f;
         return juce::Rectangle<float>(bounds.getX(), bounds.getY() + trackY, bounds.getWidth(), trackHeight);
     }
@@ -71,7 +71,7 @@ namespace tss
         if (rangeLength <= 0.0)
             return juce::Rectangle<float>();
 
-        const float reduction = std::max(1.0f, 1.0f * scalingFactor_);
+        const float reduction = std::max(1.0f, 1.0f * displayScale_);
         const auto valueBarArea = trackBounds.reduced(reduction);
         const auto value = getValue();
         auto normalizedValue = static_cast<float>((value - range.getStart()) / rangeLength);
@@ -85,7 +85,7 @@ namespace tss
     {
         if (hasFocus)
         {
-            const float borderThickness = std::max(1.0f, 1.0f * scalingFactor_);
+            const float borderThickness = std::max(1.0f, 1.0f * displayScale_);
             g.setColour(look_.focusBorder);
             g.drawRect(bounds, borderThickness);
         }
@@ -114,7 +114,7 @@ namespace tss
             valueText += " " + unit_;
 
         g.setColour(enabled ? look_.textEnabled : look_.textDisabled);
-        g.setFont(look_.font.withHeight(kFontSize_ * scalingFactor_));
+        g.setFont(look_.font.withHeight(kFontSize_ * displayScale_));
         g.drawText(valueText, bounds, juce::Justification::centred, false);
     }
 

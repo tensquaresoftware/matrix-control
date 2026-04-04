@@ -26,7 +26,7 @@ public:
     void paint(juce::Graphics&) override;
     void resized() override;
     void setSkin(tss::ISkin& skin);
-    void setScalingFactor(float scalingFactor);
+    void setDisplayScale(float displayScale);
 
 private:
     int width_;
@@ -41,7 +41,7 @@ private:
     int masterEditPanelWidth_;
     int masterEditPanelHeight_;
     tss::ISkin* skin_;
-    float scalingFactor_ = 1.0f;
+    float displayScale_ = 1.0f;
 
     std::unique_ptr<PatchEditPanel> patchEditPanel_;
     std::unique_ptr<tss::VerticalSeparator> verticalSeparator1_;

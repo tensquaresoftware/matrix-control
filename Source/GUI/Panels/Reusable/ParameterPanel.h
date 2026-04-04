@@ -31,7 +31,7 @@ public:
 
     void resized() override;
     void setSkin(tss::ISkin& skin);
-    void setScalingFactor(float scalingFactor);
+    void setDisplayScale(float displayScale);
     int getTotalHeight() const;
 
     tss::Slider* getSlider() const { return slider_.get(); }
@@ -55,12 +55,12 @@ private:
     void layoutParameterLabel(int y);
     void layoutParameterWidget(int y);
     void layoutSeparator(int yTop, int separatorHeight);
-    void applyChildScalingFactors();
+    void applyChildDisplayScales();
 
     tss::ISkin* skin_;
     ParameterType parameterType_;
     ModuleType moduleType_;
-    float scalingFactor_ = 1.0f;
+    float displayScale_ = 1.0f;
 
     std::unique_ptr<tss::Label> label_;
     std::unique_ptr<tss::Slider> slider_;

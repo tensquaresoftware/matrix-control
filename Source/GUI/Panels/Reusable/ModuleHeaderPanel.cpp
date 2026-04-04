@@ -94,13 +94,13 @@ void ModuleHeaderPanel::resized()
         layoutInitOnlyButtons();
 
     if (moduleHeader_)
-        moduleHeader_->setScalingFactor(scalingFactor_);
+        moduleHeader_->setDisplayScale(displayScale_);
     if (initButton_)
-        initButton_->setScalingFactor(scalingFactor_);
+        initButton_->setDisplayScale(displayScale_);
     if (copyButton_)
-        copyButton_->setScalingFactor(scalingFactor_);
+        copyButton_->setDisplayScale(displayScale_);
     if (pasteButton_)
-        pasteButton_->setScalingFactor(scalingFactor_);
+        pasteButton_->setDisplayScale(displayScale_);
 }
 
 void ModuleHeaderPanel::layoutModuleHeader()
@@ -108,9 +108,9 @@ void ModuleHeaderPanel::layoutModuleHeader()
     const int baseWidth = (moduleType_ == ModuleType::PatchEdit)
         ? PluginDimensions::Widgets::Widths::ModuleHeader::kPatchEditModule
         : PluginDimensions::Widgets::Widths::ModuleHeader::kMasterEditModule;
-    const int moduleHeaderWidth = juce::roundToInt(static_cast<float>(baseWidth) * scalingFactor_);
+    const int moduleHeaderWidth = juce::roundToInt(static_cast<float>(baseWidth) * displayScale_);
     const int moduleHeaderHeight = juce::roundToInt(
-        static_cast<float>(PluginDimensions::Widgets::Heights::kModuleHeader) * scalingFactor_);
+        static_cast<float>(PluginDimensions::Widgets::Heights::kModuleHeader) * displayScale_);
 
     if (auto* header = moduleHeader_.get())
         header->setBounds(0, 0, moduleHeaderWidth, moduleHeaderHeight);
@@ -119,9 +119,9 @@ void ModuleHeaderPanel::layoutModuleHeader()
 void ModuleHeaderPanel::layoutInitOnlyButtons()
 {
     const int initButtonWidth = juce::roundToInt(
-        static_cast<float>(PluginDimensions::Widgets::Widths::Button::kInit) * scalingFactor_);
+        static_cast<float>(PluginDimensions::Widgets::Widths::Button::kInit) * displayScale_);
     const int buttonHeight = juce::roundToInt(
-        static_cast<float>(PluginDimensions::Widgets::Heights::kButton) * scalingFactor_);
+        static_cast<float>(PluginDimensions::Widgets::Heights::kButton) * displayScale_);
     const int panelWidth = getWidth();
 
     if (auto* button = initButton_.get())
@@ -130,7 +130,7 @@ void ModuleHeaderPanel::layoutInitOnlyButtons()
 
 void ModuleHeaderPanel::layoutInitCopyPasteButtons()
 {
-    const float sf = scalingFactor_;
+    const float sf = displayScale_;
     const int buttonHeight = juce::roundToInt(static_cast<float>(PluginDimensions::Widgets::Heights::kButton) * sf);
     const int panelWidth = getWidth();
 
@@ -168,11 +168,11 @@ void ModuleHeaderPanel::setSkin(tss::ISkin& skin)
         pasteButton_->setLook(tss::buttonLookFromSkin(skin));
 }
 
-void ModuleHeaderPanel::setScalingFactor(float scalingFactor)
+void ModuleHeaderPanel::setDisplayScale(float displayScale)
 {
-    if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+    if (juce::approximatelyEqual(displayScale_, displayScale))
         return;
     
-    scalingFactor_ = scalingFactor;
+    displayScale_ = displayScale;
     repaint();
 }

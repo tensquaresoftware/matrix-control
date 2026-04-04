@@ -18,12 +18,12 @@ namespace tss
         repaint();
     }
 
-    void Label::setScalingFactor(float scalingFactor)
+    void Label::setDisplayScale(float displayScale)
     {
-        if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+        if (juce::approximatelyEqual(displayScale_, displayScale))
             return;
         
-        scalingFactor_ = scalingFactor;
+        displayScale_ = displayScale;
         repaint();
     }
 
@@ -42,11 +42,11 @@ namespace tss
             return;
 
         auto textBounds = getLocalBounds().toFloat();
-        const float padding = static_cast<float>(kTextLeftPadding_) * scalingFactor_;
+        const float padding = static_cast<float>(kTextLeftPadding_) * displayScale_;
         textBounds.removeFromLeft(padding);
 
         g.setColour(look_.text);
-        g.setFont(look_.font.withHeight(kFontSize_ * scalingFactor_));
+        g.setFont(look_.font.withHeight(kFontSize_ * displayScale_));
         g.drawText(labelText_, textBounds, juce::Justification::centredLeft, false);
     }
 }

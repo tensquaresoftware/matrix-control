@@ -19,7 +19,7 @@ BottomPanel::BottomPanel(tss::ISkin& skin, int width, int height, WidgetFactory&
     , height_(height)
     , childModuleWidth_(PluginDimensions::Panels::Body::PatchEditSection::BottomModules::ChildModules::kWidth)
     , childModuleHeight_(PluginDimensions::Panels::Body::PatchEditSection::BottomModules::ChildModules::kHeight)
-    , spacing_(PluginDimensions::Panels::Body::kPadding)
+    , spacing_(PluginDimensions::Panels::Body::PatchEditSection::kInterModuleGap)
     , skin_(&skin)
     , env1Panel_(std::make_unique<Env1Panel>(skin, childModuleWidth_, childModuleHeight_, widgetFactory, apvts))
     , env2Panel_(std::make_unique<Env2Panel>(skin, childModuleWidth_, childModuleHeight_, widgetFactory, apvts))
@@ -41,9 +41,9 @@ void BottomPanel::resized()
 {
     const auto bounds = getLocalBounds();
     
-    const int childWidth = juce::roundToInt(static_cast<float>(childModuleWidth_) * scalingFactor_);
-    const int childHeight = juce::roundToInt(static_cast<float>(childModuleHeight_) * scalingFactor_);
-    const float childStep = static_cast<float>(childModuleWidth_ + spacing_) * scalingFactor_;
+    const int childWidth = juce::roundToInt(static_cast<float>(childModuleWidth_) * displayScale_);
+    const int childHeight = juce::roundToInt(static_cast<float>(childModuleHeight_) * displayScale_);
+    const float childStep = static_cast<float>(childModuleWidth_ + spacing_) * displayScale_;
 
     const int x0 = bounds.getX() + juce::roundToInt(0.0f * childStep);
     const int x1 = bounds.getX() + juce::roundToInt(1.0f * childStep);
@@ -69,23 +69,23 @@ void BottomPanel::setSkin(tss::ISkin& skin)
         lfo2Panel_.get());
 }
 
-void BottomPanel::setScalingFactor(float scalingFactor)
+void BottomPanel::setDisplayScale(float displayScale)
 {
-    if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+    if (juce::approximatelyEqual(displayScale_, displayScale))
         return;
     
-    scalingFactor_ = scalingFactor;
+    displayScale_ = displayScale;
     
     if (env1Panel_)
-        env1Panel_->setScalingFactor(scalingFactor_);
+        env1Panel_->setDisplayScale(displayScale_);
     if (env2Panel_)
-        env2Panel_->setScalingFactor(scalingFactor_);
+        env2Panel_->setDisplayScale(displayScale_);
     if (env3Panel_)
-        env3Panel_->setScalingFactor(scalingFactor_);
+        env3Panel_->setDisplayScale(displayScale_);
     if (lfo1Panel_)
-        lfo1Panel_->setScalingFactor(scalingFactor_);
+        lfo1Panel_->setDisplayScale(displayScale_);
     if (lfo2Panel_)
-        lfo2Panel_->setScalingFactor(scalingFactor_);
+        lfo2Panel_->setDisplayScale(displayScale_);
     
     resized();
     repaint();

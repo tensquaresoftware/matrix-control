@@ -35,14 +35,10 @@ namespace PluginDisplayNames
         {
             constexpr const char* k50  = "50%";
             constexpr const char* k75  = "75%";
-            constexpr const char* k90  = "90%";
             constexpr const char* k100 = "100%";
             constexpr const char* k125 = "125%";
             constexpr const char* k150 = "150%";
             constexpr const char* k200 = "200%";
-            constexpr const char* k250 = "250%";
-            constexpr const char* k300 = "300%";
-            constexpr const char* k400 = "400%";
         }
 
         namespace MidiChannel

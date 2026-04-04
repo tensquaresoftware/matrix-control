@@ -37,7 +37,7 @@ public:
 
     void resized() override;
     void setSkin(tss::ISkin& skin);
-    void setScalingFactor(float scalingFactor);
+    void setDisplayScale(float displayScale);
     int getHeight() const { return dimensions_.panelHeight; }
 
 private:
@@ -55,7 +55,7 @@ private:
     inline constexpr static int kSpacing_ = 5;
 
     tss::ISkin* skin_;
-    float scalingFactor_ = 1.0f;
+    float displayScale_ = 1.0f;
 
     std::unique_ptr<tss::Label> busNumberLabel_;
     std::unique_ptr<tss::ComboBox> sourceComboBox_;

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <optional>
-
 #include <juce_gui_basics/juce_gui_basics.h>
 
 #include "GUI/Widgets/Label.h"
@@ -23,8 +21,7 @@ public:
     void paint(juce::Graphics&) override;
     void resized() override;
     void setSkin(tss::ISkin& skin);
-    void setScalingFactor(float scalingFactor);
-    void setGuiScaleDisplayText(std::optional<juce::String> text);
+    void setDisplayScale(float displayScale);
 
     tss::ComboBox& getSkinComboBox() { return skinComboBox_; }
     tss::ComboBox& getGuiScaleComboBox() { return guiScaleComboBox_; }
@@ -42,7 +39,7 @@ private:
     inline constexpr static int kLeftPadding_ = 15;
 
     tss::ISkin* skin_;
-    float scalingFactor_ = 1.0f;
+    float displayScale_ = 1.0f;
 
     tss::Label skinLabel_;
     tss::ComboBox skinComboBox_;

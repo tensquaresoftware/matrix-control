@@ -19,7 +19,7 @@ TopPanel::TopPanel(tss::ISkin& skin, int width, int height, WidgetFactory& widge
     , height_(height)
     , childModuleWidth_(PluginDimensions::Panels::Body::PatchEditSection::TopModules::ChildModules::kWidth)
     , childModuleHeight_(PluginDimensions::Panels::Body::PatchEditSection::TopModules::ChildModules::kHeight)
-    , spacing_(PluginDimensions::Panels::Body::kPadding)
+    , spacing_(PluginDimensions::Panels::Body::PatchEditSection::kInterModuleGap)
     , skin_(&skin)
     , dco1Panel_(std::make_unique<Dco1Panel>(skin, childModuleWidth_, childModuleHeight_, widgetFactory, apvts))
     , dco2Panel_(std::make_unique<Dco2Panel>(skin, childModuleWidth_, childModuleHeight_, widgetFactory, apvts))
@@ -48,9 +48,9 @@ void TopPanel::resized()
         rampPortamentoPanel_.get()
     };
     
-    const int childWidth = juce::roundToInt(static_cast<float>(childModuleWidth_) * scalingFactor_);
-    const int childHeight = juce::roundToInt(static_cast<float>(childModuleHeight_) * scalingFactor_);
-    const float childStep = static_cast<float>(childModuleWidth_ + spacing_) * scalingFactor_;
+    const int childWidth = juce::roundToInt(static_cast<float>(childModuleWidth_) * displayScale_);
+    const int childHeight = juce::roundToInt(static_cast<float>(childModuleHeight_) * displayScale_);
+    const float childStep = static_cast<float>(childModuleWidth_ + spacing_) * displayScale_;
     const int lastIndex = static_cast<int>(panels.size()) - 1;
 
     int i = 0;
@@ -77,23 +77,23 @@ void TopPanel::setSkin(tss::ISkin& skin)
         rampPortamentoPanel_.get());
 }
 
-void TopPanel::setScalingFactor(float scalingFactor)
+void TopPanel::setDisplayScale(float displayScale)
 {
-    if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+    if (juce::approximatelyEqual(displayScale_, displayScale))
         return;
     
-    scalingFactor_ = scalingFactor;
+    displayScale_ = displayScale;
     
     if (dco1Panel_)
-        dco1Panel_->setScalingFactor(scalingFactor_);
+        dco1Panel_->setDisplayScale(displayScale_);
     if (dco2Panel_)
-        dco2Panel_->setScalingFactor(scalingFactor_);
+        dco2Panel_->setDisplayScale(displayScale_);
     if (vcfVcaPanel_)
-        vcfVcaPanel_->setScalingFactor(scalingFactor_);
+        vcfVcaPanel_->setDisplayScale(displayScale_);
     if (fmTrackPanel_)
-        fmTrackPanel_->setScalingFactor(scalingFactor_);
+        fmTrackPanel_->setDisplayScale(displayScale_);
     if (rampPortamentoPanel_)
-        rampPortamentoPanel_->setScalingFactor(scalingFactor_);
+        rampPortamentoPanel_->setDisplayScale(displayScale_);
     
     resized();
     repaint();

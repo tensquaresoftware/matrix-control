@@ -13,7 +13,7 @@ namespace tss
         ~Button() override = default;
 
         void setLook(const ButtonLook& look);
-        void setScalingFactor(float scalingFactor);
+        void setDisplayScale(float displayScale);
         
         void paintButton(juce::Graphics& g, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override;
 
@@ -32,7 +32,7 @@ namespace tss
         ButtonLook look_{};
         int width_;
         int height_;
-        float scalingFactor_ = 1.0f;
+        float displayScale_ = 1.0f;
 
         juce::Colour getBackgroundColour(bool enabled, bool isHighlighted, bool isDown) const;
         juce::Colour getBorderColour(bool enabled) const;

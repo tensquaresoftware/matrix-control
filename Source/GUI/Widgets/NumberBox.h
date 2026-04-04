@@ -15,7 +15,7 @@ namespace tss
         ~NumberBox() override = default;
 
         void setLook(const NumberBoxLook& look);
-        void setScalingFactor(float scalingFactor);
+        void setDisplayScale(float displayScale);
 
         void setValue(int newValue);
         int getValue() const { return currentValue_; }
@@ -44,7 +44,7 @@ namespace tss
         int maxValue_ = 99;
         bool editable_ = false;
         bool showDot_ = false;
-        float scalingFactor_ = 1.0f;
+        float displayScale_ = 1.0f;
         std::unique_ptr<juce::TextEditor> editor_;
         ValueChangedCallback onValueChanged_;
 

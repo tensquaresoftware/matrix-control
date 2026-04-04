@@ -18,7 +18,7 @@ public:
     void paint(juce::Graphics&) override;
     void resized() override;
     void setSkin(tss::ISkin& skin);
-    void setScalingFactor(float scalingFactor);
+    void setDisplayScale(float displayScale);
 
     // ValueTree::Listener
     void valueTreePropertyChanged(juce::ValueTree& tree,
@@ -40,7 +40,7 @@ private:
     inline constexpr static int kIconSize_ = 14;
     
     tss::ISkin* skin_;
-    float scalingFactor_ = 1.0f;
+    float displayScale_ = 1.0f;
     juce::AudioProcessorValueTreeState& apvts;
     
     juce::String currentMessage;

@@ -69,7 +69,7 @@ void BodyPanel::paint(juce::Graphics& g)
 void BodyPanel::resized()
 {
     const auto bounds = getLocalBounds();
-    const float sf = scalingFactor_;
+    const float sf = displayScale_;
 
     const int padding              = tss::ScaledLayout::scaledInt(static_cast<float>(padding_), sf);
     const int patchEditPanelWidth  = tss::ScaledLayout::scaledInt(static_cast<float>(patchEditPanelWidth_), sf);
@@ -120,25 +120,25 @@ void BodyPanel::setSkin(tss::ISkin& skin)
         patchManagerPanel_.get());
 }
 
-void BodyPanel::setScalingFactor(float scalingFactor)
+void BodyPanel::setDisplayScale(float displayScale)
 {
-    if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+    if (juce::approximatelyEqual(displayScale_, displayScale))
         return;
     
-    scalingFactor_ = scalingFactor;
+    displayScale_ = displayScale;
     
     if (verticalSeparator1_)
-        verticalSeparator1_->setScalingFactor(scalingFactor_);
+        verticalSeparator1_->setDisplayScale(displayScale_);
     if (verticalSeparator2_)
-        verticalSeparator2_->setScalingFactor(scalingFactor_);
+        verticalSeparator2_->setDisplayScale(displayScale_);
     if (patchEditPanel_)
-        patchEditPanel_->setScalingFactor(scalingFactor_);
+        patchEditPanel_->setDisplayScale(displayScale_);
     if (matrixModulationPanel_)
-        matrixModulationPanel_->setScalingFactor(scalingFactor_);
+        matrixModulationPanel_->setDisplayScale(displayScale_);
     if (patchManagerPanel_)
-        patchManagerPanel_->setScalingFactor(scalingFactor_);
+        patchManagerPanel_->setDisplayScale(displayScale_);
     if (masterEditPanel_)
-        masterEditPanel_->setScalingFactor(scalingFactor_);
+        masterEditPanel_->setDisplayScale(displayScale_);
     
     resized();
     repaint();

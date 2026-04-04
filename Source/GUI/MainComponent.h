@@ -23,7 +23,7 @@ public:
     void paint(juce::Graphics&) override;
     void resized() override;
     void setSkin(tss::Skin& skin);
-    void setScalingFactor(float scalingFactor);
+    void setDisplayScale(float displayScale);
 
     HeaderPanel& getHeaderPanel() { return headerPanel; }
     BodyPanel& getBodyPanel() { return bodyPanel; }
@@ -31,7 +31,7 @@ public:
 
 private:
     tss::Skin* skin_;
-    float scalingFactor_ = 1.0f;
+    float uiDisplayScale_ = 1.0f;
 
     HeaderPanel headerPanel;
     BodyPanel bodyPanel;

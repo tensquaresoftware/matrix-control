@@ -16,24 +16,24 @@ namespace tss
         repaint();
     }
 
-    void VerticalSeparator::setScalingFactor(float scalingFactor)
+    void VerticalSeparator::setDisplayScale(float displayScale)
     {
-        if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+        if (juce::approximatelyEqual(displayScale_, displayScale))
             return;
         
-        scalingFactor_ = scalingFactor;
+        displayScale_ = displayScale;
         repaint();
     }
 
     void VerticalSeparator::paint(juce::Graphics& g)
     {
         const auto bounds = getLocalBounds().toFloat();
-        const float lineWidth = std::max(1.0f, kLineWidth_ * scalingFactor_);
+        const float lineWidth = std::max(1.0f, kLineWidth_ * displayScale_);
         const auto lineX = bounds.getCentreX() - lineWidth * 0.5f;
 
         auto line = bounds;
-        line.removeFromTop(kTopPadding_ * scalingFactor_);
-        line.removeFromBottom(kBottomPadding_ * scalingFactor_);
+        line.removeFromTop(kTopPadding_ * displayScale_);
+        line.removeFromBottom(kBottomPadding_ * displayScale_);
         line.setX(lineX);
         line.setWidth(lineWidth);
 

@@ -114,7 +114,7 @@ void ParameterPanel::createSeparator(tss::ISkin& skin)
 
 void ParameterPanel::resized()
 {
-    const float sf = scalingFactor_;
+    const float sf = displayScale_;
     const int h = getHeight();
     const int labelH = tss::ScaledLayout::scaledInt(static_cast<float>(PluginDimensions::Widgets::Heights::kLabel), sf);
     const int sepH = juce::jmax(1, tss::ScaledLayout::scaledInt(
@@ -125,7 +125,7 @@ void ParameterPanel::resized()
         const int rowContentH = labelH;
         const int ySep = juce::jmin(rowContentH, juce::jmax(0, h - sepH));
         layoutSeparator(ySep, sepH);
-        applyChildScalingFactors();
+        applyChildDisplayScales();
         return;
     }
 
@@ -138,14 +138,14 @@ void ParameterPanel::resized()
     layoutParameterLabel(0);
     layoutParameterWidget(0);
     layoutSeparator(ySep, sepH);
-    applyChildScalingFactors();
+    applyChildDisplayScales();
 }
 
 void ParameterPanel::layoutParameterLabel(int y)
 {
     const auto dimensions = getDimensionsForModuleType(moduleType_);
-    const int labelWidth = tss::ScaledLayout::scaledInt(static_cast<float>(dimensions.labelWidth), scalingFactor_);
-    const int labelHeight = tss::ScaledLayout::scaledInt(static_cast<float>(PluginDimensions::Widgets::Heights::kLabel), scalingFactor_);
+    const int labelWidth = tss::ScaledLayout::scaledInt(static_cast<float>(dimensions.labelWidth), displayScale_);
+    const int labelHeight = tss::ScaledLayout::scaledInt(static_cast<float>(PluginDimensions::Widgets::Heights::kLabel), displayScale_);
 
     if (auto* label = label_.get())
         label->setBounds(0, y, labelWidth, labelHeight);
@@ -154,11 +154,11 @@ void ParameterPanel::layoutParameterLabel(int y)
 void ParameterPanel::layoutParameterWidget(int y)
 {
     const auto dimensions = getDimensionsForModuleType(moduleType_);
-    const int labelWidth = tss::ScaledLayout::scaledInt(static_cast<float>(dimensions.labelWidth), scalingFactor_);
-    const int sliderWidth = tss::ScaledLayout::scaledInt(static_cast<float>(PluginDimensions::Widgets::Widths::Slider::kStandard), scalingFactor_);
-    const int sliderHeight = tss::ScaledLayout::scaledInt(static_cast<float>(PluginDimensions::Widgets::Heights::kSlider), scalingFactor_);
-    const int comboBoxWidth = tss::ScaledLayout::scaledInt(static_cast<float>(dimensions.comboBoxWidth), scalingFactor_);
-    const int comboBoxHeight = tss::ScaledLayout::scaledInt(static_cast<float>(PluginDimensions::Widgets::Heights::kComboBox), scalingFactor_);
+    const int labelWidth = tss::ScaledLayout::scaledInt(static_cast<float>(dimensions.labelWidth), displayScale_);
+    const int sliderWidth = tss::ScaledLayout::scaledInt(static_cast<float>(PluginDimensions::Widgets::Widths::Slider::kStandard), displayScale_);
+    const int sliderHeight = tss::ScaledLayout::scaledInt(static_cast<float>(PluginDimensions::Widgets::Heights::kSlider), displayScale_);
+    const int comboBoxWidth = tss::ScaledLayout::scaledInt(static_cast<float>(dimensions.comboBoxWidth), displayScale_);
+    const int comboBoxHeight = tss::ScaledLayout::scaledInt(static_cast<float>(PluginDimensions::Widgets::Heights::kComboBox), displayScale_);
 
     if (parameterType_ == ParameterType::Slider)
     {
@@ -175,22 +175,22 @@ void ParameterPanel::layoutParameterWidget(int y)
 void ParameterPanel::layoutSeparator(int yTop, int separatorHeight)
 {
     const auto dimensions = getDimensionsForModuleType(moduleType_);
-    const int separatorWidth = tss::ScaledLayout::scaledInt(static_cast<float>(dimensions.separatorWidth), scalingFactor_);
+    const int separatorWidth = tss::ScaledLayout::scaledInt(static_cast<float>(dimensions.separatorWidth), displayScale_);
 
     if (auto* separator = separator_.get())
         separator->setBounds(0, yTop, separatorWidth, separatorHeight);
 }
 
-void ParameterPanel::applyChildScalingFactors()
+void ParameterPanel::applyChildDisplayScales()
 {
     if (label_)
-        label_->setScalingFactor(scalingFactor_);
+        label_->setDisplayScale(displayScale_);
     if (slider_)
-        slider_->setScalingFactor(scalingFactor_);
+        slider_->setDisplayScale(displayScale_);
     if (comboBox_)
-        comboBox_->setScalingFactor(scalingFactor_);
+        comboBox_->setDisplayScale(displayScale_);
     if (separator_)
-        separator_->setScalingFactor(scalingFactor_);
+        separator_->setDisplayScale(displayScale_);
 }
 
 void ParameterPanel::setSkin(tss::ISkin& skin)
@@ -209,12 +209,12 @@ void ParameterPanel::setSkin(tss::ISkin& skin)
         separator_->setLook(tss::horizontalSeparatorLookFromSkin(skin));
 }
 
-void ParameterPanel::setScalingFactor(float scalingFactor)
+void ParameterPanel::setDisplayScale(float displayScale)
 {
-    if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+    if (juce::approximatelyEqual(displayScale_, displayScale))
         return;
     
-    scalingFactor_ = scalingFactor;
+    displayScale_ = displayScale;
     resized();
     repaint();
 }

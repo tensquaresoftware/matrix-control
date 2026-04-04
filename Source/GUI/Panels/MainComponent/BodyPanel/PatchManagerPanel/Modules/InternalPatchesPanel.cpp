@@ -69,7 +69,7 @@ void InternalPatchesPanel::valueTreePropertyChanged(
 void InternalPatchesPanel::resized()
 {
     using namespace PluginDimensions::Widgets;
-    const float sf = scalingFactor_;
+    const float sf = displayScale_;
 
     // Dimensions (scaled)
     const int moduleHeaderH   = juce::roundToInt(static_cast<float>(Heights::kModuleHeader) * sf);
@@ -129,17 +129,17 @@ void InternalPatchesPanel::resized()
     if (storePatchButton_)
         storePatchButton_->setBounds(juce::roundToInt(memOriginX + 3.0f * memStep), row2Y, memButtonW, buttonH);
 
-    if (moduleHeader)             moduleHeader->setScalingFactor(sf);
-    if (browserGroupLabel)        browserGroupLabel->setScalingFactor(sf);
-    if (memoryGroupLabel)         memoryGroupLabel->setScalingFactor(sf);
-    if (currentBankNumber)        currentBankNumber->setScalingFactor(sf);
-    if (currentPatchNumber)       currentPatchNumber->setScalingFactor(sf);
-    if (loadPreviousPatchButton_) loadPreviousPatchButton_->setScalingFactor(sf);
-    if (loadNextPatchButton_)     loadNextPatchButton_->setScalingFactor(sf);
-    if (initPatchButton_)         initPatchButton_->setScalingFactor(sf);
-    if (copyPatchButton_)         copyPatchButton_->setScalingFactor(sf);
-    if (pastePatchButton_)        pastePatchButton_->setScalingFactor(sf);
-    if (storePatchButton_)        storePatchButton_->setScalingFactor(sf);
+    if (moduleHeader)             moduleHeader->setDisplayScale(sf);
+    if (browserGroupLabel)        browserGroupLabel->setDisplayScale(sf);
+    if (memoryGroupLabel)         memoryGroupLabel->setDisplayScale(sf);
+    if (currentBankNumber)        currentBankNumber->setDisplayScale(sf);
+    if (currentPatchNumber)       currentPatchNumber->setDisplayScale(sf);
+    if (loadPreviousPatchButton_) loadPreviousPatchButton_->setDisplayScale(sf);
+    if (loadNextPatchButton_)     loadNextPatchButton_->setDisplayScale(sf);
+    if (initPatchButton_)         initPatchButton_->setDisplayScale(sf);
+    if (copyPatchButton_)         copyPatchButton_->setDisplayScale(sf);
+    if (pastePatchButton_)        pastePatchButton_->setDisplayScale(sf);
+    if (storePatchButton_)        storePatchButton_->setDisplayScale(sf);
 }
 
 void InternalPatchesPanel::setSkin(tss::ISkin& skin)
@@ -170,12 +170,12 @@ void InternalPatchesPanel::setSkin(tss::ISkin& skin)
         storePatchButton_->setLook(tss::buttonLookFromSkin(skin));
 }
 
-void InternalPatchesPanel::setScalingFactor(float scalingFactor)
+void InternalPatchesPanel::setDisplayScale(float displayScale)
 {
-    if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+    if (juce::approximatelyEqual(displayScale_, displayScale))
         return;
     
-    scalingFactor_ = scalingFactor;
+    displayScale_ = displayScale;
     repaint();
 }
 

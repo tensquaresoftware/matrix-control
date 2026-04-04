@@ -17,7 +17,7 @@ namespace tss
         ~EnvelopeDisplay() override = default;
 
         void setLook(const EnvelopeDisplayLook& look);
-        void setScalingFactor(float scalingFactor);
+        void setDisplayScale(float displayScale);
 
         void setDelay(int value);
         void setAttack(int value);
@@ -69,7 +69,7 @@ namespace tss
         EnvelopeDisplayLook look_{};
         int width_;
         int height_;
-        float scalingFactor_ = 1.0f;
+        float displayScale_ = 1.0f;
 
         int delay_ {0};
         int attack_ {0};

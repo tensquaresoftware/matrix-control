@@ -13,7 +13,7 @@ namespace tss
         ~Slider() override = default;
 
         void setLook(const SliderLook& look);
-        void setScalingFactor(float scalingFactor);
+        void setDisplayScale(float displayScale);
         
         void setUnit(const juce::String& unit);
         juce::String getUnit() const;
@@ -47,7 +47,7 @@ namespace tss
         SliderLook look_{};
         int width_;
         int height_;
-        float scalingFactor_ = 1.0f;
+        float displayScale_ = 1.0f;
         double defaultValue_ = 0.0;
         double dragStartValue_ = 0.0;
         juce::Point<int> dragStartPosition_;

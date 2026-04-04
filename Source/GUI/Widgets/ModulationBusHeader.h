@@ -19,7 +19,7 @@ namespace tss
         ~ModulationBusHeader() override = default;
 
         void setLook(const ModulationBusHeaderLook& look);
-        void setScalingFactor(float scalingFactor);
+        void setDisplayScale(float displayScale);
 
         void paint(juce::Graphics& g) override;
         void resized() override;
@@ -43,7 +43,7 @@ namespace tss
         juce::String busDestinationText_;
         ColourVariant colourVariant_;
         int height_;
-        float scalingFactor_ = 1.0f;
+        float displayScale_ = 1.0f;
 
         void drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawLine(juce::Graphics& g, const juce::Rectangle<float>& bounds);

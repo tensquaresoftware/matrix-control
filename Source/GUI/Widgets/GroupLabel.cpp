@@ -19,12 +19,12 @@ namespace tss
         repaint();
     }
 
-    void GroupLabel::setScalingFactor(float scalingFactor)
+    void GroupLabel::setDisplayScale(float displayScale)
     {
-        if (juce::approximatelyEqual(scalingFactor_, scalingFactor))
+        if (juce::approximatelyEqual(displayScale_, displayScale))
             return;
 
-        scalingFactor_ = scalingFactor;
+        displayScale_ = displayScale;
         calculateTextWidth();
         repaint();
     }
@@ -57,7 +57,7 @@ namespace tss
     void GroupLabel::drawText(juce::Graphics& g, const juce::Rectangle<float>& area)
     {
         g.setColour(look_.text);
-        g.setFont(look_.font.withHeight(look_.font.getHeight() * scalingFactor_));
+        g.setFont(look_.font.withHeight(look_.font.getHeight() * displayScale_));
         g.drawText(labelText_, area, juce::Justification::centred, false);
     }
 
@@ -66,8 +66,8 @@ namespace tss
         const auto halfTextWidth = textWidth * 0.5f;
         const auto centreX = area.getCentreX();
         const auto centreY = area.getCentreY();
-        const float lineThickness = std::max(1.0f, static_cast<float>(kLineThickness_) * scalingFactor_);
-        const float textSpacing = static_cast<float>(kTextSpacing_) * scalingFactor_;
+        const float lineThickness = std::max(1.0f, static_cast<float>(kLineThickness_) * displayScale_);
+        const float textSpacing = static_cast<float>(kTextSpacing_) * displayScale_;
 
         g.setColour(look_.line);
 
@@ -107,7 +107,7 @@ namespace tss
             return;
         }
 
-        const auto scaledFont = look_.font.withHeight(look_.font.getHeight() * scalingFactor_);
+        const auto scaledFont = look_.font.withHeight(look_.font.getHeight() * displayScale_);
         juce::GlyphArrangement glyphArrangement;
         glyphArrangement.addLineOfText(scaledFont, labelText_, 0.0f, 0.0f);
         const auto bounds = glyphArrangement.getBoundingBox(0, -1, true);

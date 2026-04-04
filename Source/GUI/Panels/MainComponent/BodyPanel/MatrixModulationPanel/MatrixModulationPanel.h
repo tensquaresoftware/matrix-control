@@ -27,7 +27,7 @@ public:
 
     void resized() override;
     void setSkin(tss::ISkin& skin);
-    void setScalingFactor(float scalingFactor);
+    void setDisplayScale(float displayScale);
 
 private:
     struct ModulationBusParameterArrays
@@ -50,7 +50,7 @@ private:
     int height_;
     int modulationBusHeight_;
     tss::ISkin* skin_;
-    float scalingFactor_ = 1.0f;
+    float displayScale_ = 1.0f;
     juce::AudioProcessorValueTreeState& apvts_;
 
     std::unique_ptr<tss::SectionHeader> sectionHeader_;

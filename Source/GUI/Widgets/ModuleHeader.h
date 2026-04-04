@@ -19,7 +19,7 @@ namespace tss
         ~ModuleHeader() override = default;
 
         void setLook(const ModuleHeaderLook& look);
-        void setScalingFactor(float scalingFactor);
+        void setDisplayScale(float displayScale);
 
         void setText(const juce::String& text);
         juce::String getText() const { return text_; }
@@ -40,7 +40,7 @@ namespace tss
         int height_;
         juce::String text_;
         ColourVariant colourVariant_;
-        float scalingFactor_ = 1.0f;
+        float displayScale_ = 1.0f;
 
         void drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawLine(juce::Graphics& g, const juce::Rectangle<float>& bounds);
