@@ -1,5 +1,8 @@
 #include "MasterEditPanel.h"
 
+#include <vector>
+
+#include "GUI/Layout/ScaledLayout.h"
 #include "Modules/MidiPanel.h"
 #include "Modules/VibratoPanel.h"
 #include "Modules/MiscPanel.h"
@@ -48,23 +51,23 @@ void MasterEditPanel::resized()
     const auto bounds = getLocalBounds();
     const float sf = scalingFactor_;
 
-    const int sectionHeaderHeight = juce::roundToInt(static_cast<float>(PluginDimensions::Widgets::Heights::kSectionHeader) * sf);
-    const int childWidth          = juce::roundToInt(static_cast<float>(childModuleWidth_) * sf);
-    const int midiPanelHeight     = juce::roundToInt(static_cast<float>(midiPanelHeight_) * sf);
-    const int vibratoPanelHeight  = juce::roundToInt(static_cast<float>(vibratoPanelHeight_) * sf);
-    const int miscPanelHeight     = juce::roundToInt(static_cast<float>(miscPanelHeight_) * sf);
+    const int sectionHeaderHeight = tss::ScaledLayout::scaledInt(
+        static_cast<float>(PluginDimensions::Widgets::Heights::kSectionHeader), sf);
+    const int childWidth = tss::ScaledLayout::scaledInt(static_cast<float>(childModuleWidth_), sf);
 
-    // Y positions computed independently from float origin to avoid rounding accumulation.
-    const float originY = static_cast<float>(bounds.getY());
-    const int sectionHeaderY = bounds.getY();
-    const int midiPanelY     = juce::roundToInt(originY + static_cast<float>(PluginDimensions::Widgets::Heights::kSectionHeader) * sf);
-    const int vibratoPanelY  = juce::roundToInt(originY + static_cast<float>(PluginDimensions::Widgets::Heights::kSectionHeader + midiPanelHeight_) * sf);
-    const int miscPanelY     = juce::roundToInt(originY + static_cast<float>(PluginDimensions::Widgets::Heights::kSectionHeader + midiPanelHeight_ + vibratoPanelHeight_) * sf);
+    const int contentTop = bounds.getY() + sectionHeaderHeight;
+    const int contentHeight = bounds.getHeight() - sectionHeaderHeight;
+    const std::vector<int> moduleDesignHeights { midiPanelHeight_, vibratoPanelHeight_, miscPanelHeight_ };
+    const auto moduleHeights = tss::ScaledLayout::distributeHeights(contentHeight, moduleDesignHeights, sf, 2);
 
-    sectionHeader_->setBounds(bounds.getX(), sectionHeaderY, bounds.getWidth(), sectionHeaderHeight);
-    midiPanel_->setBounds(bounds.getX(), midiPanelY, childWidth, midiPanelHeight);
-    vibratoPanel_->setBounds(bounds.getX(), vibratoPanelY, childWidth, vibratoPanelHeight);
-    miscPanel_->setBounds(bounds.getX(), miscPanelY, childWidth, miscPanelHeight);
+    sectionHeader_->setBounds(bounds.getX(), bounds.getY(), bounds.getWidth(), sectionHeaderHeight);
+
+    int y = contentTop;
+    midiPanel_->setBounds(bounds.getX(), y, childWidth, moduleHeights[0]);
+    y += moduleHeights[0];
+    vibratoPanel_->setBounds(bounds.getX(), y, childWidth, moduleHeights[1]);
+    y += moduleHeights[1];
+    miscPanel_->setBounds(bounds.getX(), y, childWidth, moduleHeights[2]);
 }
 
 void MasterEditPanel::setSkin(tss::ISkin& skin)

@@ -1,5 +1,6 @@
 #include "MatrixModulationPanel.h"
 
+#include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Looks/LookBuilders.h"
@@ -178,38 +179,46 @@ void MatrixModulationPanel::resized()
 {
     auto bounds = getLocalBounds();
 
+    const float sf = scalingFactor_;
+
     if (auto* header = sectionHeader_.get())
     {
-        const int headerHeight = juce::roundToInt(
-            static_cast<float>(PluginDimensions::Widgets::Heights::kSectionHeader) * scalingFactor_);
+        const int headerHeight = tss::ScaledLayout::scaledInt(
+            static_cast<float>(PluginDimensions::Widgets::Heights::kSectionHeader), sf);
         header->setBounds(bounds.removeFromTop(headerHeight));
     }
 
     if (auto* busHeader = modulationBusHeader_.get())
     {
-        const int busHeaderHeight = juce::roundToInt(
-            static_cast<float>(PluginDimensions::Widgets::Heights::kModulationBusHeader) * scalingFactor_);
+        const int busHeaderHeight = tss::ScaledLayout::scaledInt(
+            static_cast<float>(PluginDimensions::Widgets::Heights::kModulationBusHeader), sf);
         busHeader->setBounds(bounds.removeFromTop(busHeaderHeight));
     }
 
     if (auto* initButton = initAllBussesButton_.get())
     {
-        const int initAllButtonWidth = juce::roundToInt(
-            static_cast<float>(PluginDimensions::Widgets::Widths::Button::kInit) * scalingFactor_);
-        const int initAllButtonHeight = juce::roundToInt(
-            static_cast<float>(PluginDimensions::Widgets::Heights::kButton) * scalingFactor_);
-        const int sectionHeaderHeight = juce::roundToInt(
-            static_cast<float>(PluginDimensions::Widgets::Heights::kSectionHeader) * scalingFactor_);
-        const int initAllButtonX = juce::roundToInt(static_cast<float>(width_) * scalingFactor_) - initAllButtonWidth;
+        const int initAllButtonWidth = tss::ScaledLayout::scaledInt(
+            static_cast<float>(PluginDimensions::Widgets::Widths::Button::kInit), sf);
+        const int initAllButtonHeight = tss::ScaledLayout::scaledInt(
+            static_cast<float>(PluginDimensions::Widgets::Heights::kButton), sf);
+        const int sectionHeaderHeight = tss::ScaledLayout::scaledInt(
+            static_cast<float>(PluginDimensions::Widgets::Heights::kSectionHeader), sf);
+        const int scaledPanelWidth = tss::ScaledLayout::scaledInt(static_cast<float>(width_), sf);
+        const int initAllButtonX = scaledPanelWidth - initAllButtonWidth;
         initButton->setBounds(initAllButtonX, sectionHeaderHeight, initAllButtonWidth, initAllButtonHeight);
     }
 
-    const int busHeight = juce::roundToInt(static_cast<float>(modulationBusHeight_) * scalingFactor_);
+    const size_t busCount = modulationBuses_.size();
+    if (busCount == 0)
+        return;
 
-    for (auto& bus : modulationBuses_)
+    const auto busHeights = tss::ScaledLayout::distributeFixedDesignRowsWithRemainderOnLast(
+        bounds.getHeight(), busCount, modulationBusHeight_, scalingFactor_);
+
+    for (size_t i = 0; i < busCount; ++i)
     {
-        if (bus != nullptr)
-            bus->setBounds(bounds.removeFromTop(busHeight));
+        if (auto* bus = modulationBuses_[i].get())
+            bus->setBounds(bounds.removeFromTop(busHeights[i]));
     }
 }
 

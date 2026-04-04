@@ -1,10 +1,12 @@
 #include "BaseModulePanel.h"
 
+#include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Panels/Reusable/ModuleHeaderPanel.h"
 #include "GUI/Panels/Reusable/ParameterPanel.h"
 #include "GUI/Factories/WidgetFactory.h"
+#include "Shared/Definitions/PluginDimensions.h"
 
 BaseModulePanel::BaseModulePanel(tss::ISkin& skin,
                                  WidgetFactory& widgetFactory,
@@ -71,17 +73,24 @@ void BaseModulePanel::resized()
 
     if (auto* header = moduleHeaderPanel_.get())
     {
-        const int headerHeight = juce::roundToInt(static_cast<float>(ModuleHeaderPanel::getHeight()) * scalingFactor_);
+        const int headerHeight = tss::ScaledLayout::scaledInt(static_cast<float>(ModuleHeaderPanel::getHeight()), scalingFactor_);
         header->setBounds(bounds.removeFromTop(headerHeight));
     }
 
-    for (auto& paramPanel : parameterPanels_)
+    const size_t paramCount = parameterPanels_.size();
+    if (paramCount == 0)
+        return;
+
+    const int designRowTotal = PluginDimensions::Widgets::Heights::kLabel + PluginDimensions::Widgets::Heights::kHorizontalSeparator;
+    const auto rowHeights = tss::ScaledLayout::distributeFixedDesignRowsWithRemainderAtBottom(
+        bounds.getHeight(), paramCount, designRowTotal, scalingFactor_);
+
+    int y = bounds.getY();
+    for (size_t i = 0; i < paramCount; ++i)
     {
-        if (paramPanel != nullptr)
-        {
-            const int panelHeight = juce::roundToInt(static_cast<float>(paramPanel->getTotalHeight()) * scalingFactor_);
-            paramPanel->setBounds(bounds.removeFromTop(panelHeight));
-        }
+        if (auto* panel = parameterPanels_[i].get())
+            panel->setBounds(bounds.getX(), y, bounds.getWidth(), rowHeights[i]);
+        y += rowHeights[i];
     }
 }
 

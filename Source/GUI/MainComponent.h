@@ -30,10 +30,6 @@ public:
     FooterPanel& getFooterPanel() { return footerPanel; }
 
 private:
-    void layoutHeaderPanel(juce::Rectangle<int> bounds, float y);
-    void layoutBodyPanel(juce::Rectangle<int> bounds, float y);
-    void layoutFooterPanel(juce::Rectangle<int> bounds, float y);
-
     tss::Skin* skin_;
     float scalingFactor_ = 1.0f;
 

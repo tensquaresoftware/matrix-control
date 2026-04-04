@@ -1,5 +1,6 @@
 #include "MiddlePanel.h"
 
+#include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Looks/LookBuilders.h"
 #include "GUI/Skins/ISkin.h"
 #include "Shared/Definitions/ApvtsTypes.h"
@@ -48,11 +49,13 @@ MiddlePanel::MiddlePanel(tss::ISkin& skin, int width, int height, juce::AudioPro
 void MiddlePanel::resized()
 {
     using namespace PluginDimensions::Panels::Body::PatchEditSection::MiddleModules;
-    const int childWidth = juce::roundToInt(static_cast<float>(ChildModules::kWidth) * scalingFactor_);
-    const int childHeight = juce::roundToInt(static_cast<float>(ChildModules::kHeight) * scalingFactor_);
-    const float childStep = static_cast<float>(ChildModules::kWidth + kSpacing) * scalingFactor_;
-    const int paddingTop = juce::roundToInt(static_cast<float>(kPatchNameSectionPaddingTop) * scalingFactor_);
-    const int moduleHeaderHeight = juce::roundToInt(static_cast<float>(PluginDimensions::Widgets::Heights::kModuleHeader) * scalingFactor_);
+    const float sf = scalingFactor_;
+    const int childWidth = tss::ScaledLayout::scaledInt(static_cast<float>(ChildModules::kWidth), sf);
+    const int childHeight = tss::ScaledLayout::scaledInt(static_cast<float>(ChildModules::kHeight), sf);
+    const float childStep = static_cast<float>(ChildModules::kWidth + kSpacing) * sf;
+    const int paddingTop = tss::ScaledLayout::scaledInt(static_cast<float>(kPatchNameSectionPaddingTop), sf);
+    const int moduleHeaderHeight = tss::ScaledLayout::scaledInt(
+        static_cast<float>(PluginDimensions::Widgets::Heights::kModuleHeader), sf);
 
     envelope1Display_.setBounds(0, 0, childWidth, childHeight);
     envelope2Display_.setBounds(juce::roundToInt(1.0f * childStep), 0, childWidth, childHeight);
@@ -64,12 +67,13 @@ void MiddlePanel::resized()
     patchNameModuleHeader_.setBounds(patchNameSectionX, paddingTop,
                                     patchNameSectionW, moduleHeaderHeight);
 
-    // Y of patchNameDisplay computed independently to avoid rounding accumulation
-    const int patchNameDisplayY = juce::roundToInt(static_cast<float>(kPatchNameSectionPaddingTop + PluginDimensions::Widgets::Heights::kModuleHeader + kPatchNameSectionSpacing) * scalingFactor_);
-    patchNameDisplay_.setBounds(patchNameSectionX,
-                               patchNameDisplayY,
-                               patchNameSectionW,
-                               juce::roundToInt(static_cast<float>(PluginDimensions::Widgets::Heights::kPatchNameDisplay) * scalingFactor_));
+    const int patchNameDisplayY = tss::ScaledLayout::scaledInt(
+        static_cast<float>(kPatchNameSectionPaddingTop + PluginDimensions::Widgets::Heights::kModuleHeader + kPatchNameSectionSpacing), sf);
+    patchNameDisplay_.setBounds(
+        patchNameSectionX,
+        patchNameDisplayY,
+        patchNameSectionW,
+        tss::ScaledLayout::scaledInt(static_cast<float>(PluginDimensions::Widgets::Heights::kPatchNameDisplay), sf));
 }
 
 void MiddlePanel::valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,

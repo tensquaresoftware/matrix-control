@@ -11,6 +11,7 @@ namespace PluginDimensions
     {
         inline constexpr int kWidth = 1335;
         inline constexpr int kHeight = 810;
+        inline constexpr int kResizeCornerSize = 10;
     }
     
     namespace Panels

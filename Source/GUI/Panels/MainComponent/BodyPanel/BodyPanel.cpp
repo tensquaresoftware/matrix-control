@@ -1,5 +1,8 @@
 #include "BodyPanel.h"
 
+#include <vector>
+
+#include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Looks/LookBuilders.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
@@ -68,17 +71,23 @@ void BodyPanel::resized()
     const auto bounds = getLocalBounds();
     const float sf = scalingFactor_;
 
-    const int padding              = juce::roundToInt(static_cast<float>(padding_) * sf);
-    const int patchEditPanelWidth  = juce::roundToInt(static_cast<float>(patchEditPanelWidth_) * sf);
-    const int patchEditPanelHeight = juce::roundToInt(static_cast<float>(patchEditPanelHeight_) * sf);
-    const int matrixW              = juce::roundToInt(static_cast<float>(matrixModulationPanelWidth_) * sf);
-    const int matrixH              = juce::roundToInt(static_cast<float>(matrixModulationPanelHeight_) * sf);
-    const int patchManagerW        = juce::roundToInt(static_cast<float>(patchManagerPanelWidth_) * sf);
-    const int patchManagerH        = juce::roundToInt(static_cast<float>(patchManagerPanelHeight_) * sf);
-    const int masterEditW          = juce::roundToInt(static_cast<float>(masterEditPanelWidth_) * sf);
-    const int masterEditH          = juce::roundToInt(static_cast<float>(masterEditPanelHeight_) * sf);
-    const int separatorW           = juce::roundToInt(static_cast<float>(PluginDimensions::Widgets::Widths::VerticalSeparator::kStandard) * sf);
-    const int separatorH           = juce::roundToInt(static_cast<float>(PluginDimensions::Widgets::Heights::kVerticalSeparator) * sf);
+    const int padding              = tss::ScaledLayout::scaledInt(static_cast<float>(padding_), sf);
+    const int patchEditPanelWidth  = tss::ScaledLayout::scaledInt(static_cast<float>(patchEditPanelWidth_), sf);
+    const int patchEditPanelHeight = tss::ScaledLayout::scaledInt(static_cast<float>(patchEditPanelHeight_), sf);
+    const int matrixW              = tss::ScaledLayout::scaledInt(static_cast<float>(matrixModulationPanelWidth_), sf);
+    const int patchManagerW        = tss::ScaledLayout::scaledInt(static_cast<float>(patchManagerPanelWidth_), sf);
+    const int masterEditW          = tss::ScaledLayout::scaledInt(static_cast<float>(masterEditPanelWidth_), sf);
+    const int masterEditH          = tss::ScaledLayout::scaledInt(static_cast<float>(masterEditPanelHeight_), sf);
+    const int separatorW           = tss::ScaledLayout::scaledInt(
+        static_cast<float>(PluginDimensions::Widgets::Widths::VerticalSeparator::kStandard), sf);
+    const int separatorH           = tss::ScaledLayout::scaledInt(
+        static_cast<float>(PluginDimensions::Widgets::Heights::kVerticalSeparator), sf);
+
+    const int contentHeight = bounds.getHeight() - 2 * padding;
+    const std::vector<int> columnDesignHeights { matrixModulationPanelHeight_, patchManagerPanelHeight_ };
+    const auto columnHeights = tss::ScaledLayout::distributeHeights(contentHeight, columnDesignHeights, sf, 1);
+    const int matrixH = columnHeights[0];
+    const int patchManagerH = columnHeights[1];
 
     // All X positions computed independently from float origin to avoid rounding accumulation.
     const float originX = static_cast<float>(bounds.getX() + padding);
@@ -88,10 +97,8 @@ void BodyPanel::resized()
     const int separator2X       = juce::roundToInt(originX + static_cast<float>(patchEditPanelWidth_ + PluginDimensions::Widgets::Widths::VerticalSeparator::kStandard + matrixModulationPanelWidth_) * sf);
     const int masterEditX       = juce::roundToInt(originX + static_cast<float>(patchEditPanelWidth_ + PluginDimensions::Widgets::Widths::VerticalSeparator::kStandard + matrixModulationPanelWidth_ + PluginDimensions::Widgets::Widths::VerticalSeparator::kStandard) * sf);
 
-    // Y positions computed independently from float origin.
-    const float originY = static_cast<float>(bounds.getY() + padding);
-    const int topY          = bounds.getY() + padding;
-    const int patchManagerY = juce::roundToInt(originY + static_cast<float>(matrixModulationPanelHeight_) * sf);
+    const int topY = bounds.getY() + padding;
+    const int patchManagerY = topY + matrixH;
 
     patchEditPanel_->setBounds(patchEditX, topY, patchEditPanelWidth, patchEditPanelHeight);
     verticalSeparator1_->setBounds(separator1X, topY, separatorW, separatorH);

@@ -1,5 +1,6 @@
 #include "ModulationBusPanel.h"
 
+#include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Looks/LookBuilders.h"
@@ -39,8 +40,7 @@ ModulationBusPanel::ModulationBusPanel(tss::ISkin& skin,
     createInitButton(skin, busNumber);
     createSeparator(skin);
 
-    layoutWidgetRow();
-    layoutSeparator(dimensions_.busNumberLabelHeight);
+    resized();
 }
 
 void ModulationBusPanel::createBusNumberLabel(int busNumber, tss::ISkin& skin)
@@ -145,13 +145,19 @@ void ModulationBusPanel::createSeparator(tss::ISkin& skin)
 
 void ModulationBusPanel::resized()
 {
-    const int widgetRowHeight = juce::roundToInt(
-        static_cast<float>(dimensions_.busNumberLabelHeight) * scalingFactor_);
-    int y = 0;
+    const float sf = scalingFactor_;
+    const int h = getHeight();
+    const int labelH = tss::ScaledLayout::scaledInt(static_cast<float>(dimensions_.busNumberLabelHeight), sf);
+    const int sourceH = tss::ScaledLayout::scaledInt(static_cast<float>(dimensions_.sourceComboBoxHeight), sf);
+    const int amountH = tss::ScaledLayout::scaledInt(static_cast<float>(dimensions_.amountSliderHeight), sf);
+    const int destH = tss::ScaledLayout::scaledInt(static_cast<float>(dimensions_.destinationComboBoxHeight), sf);
+    const int initH = tss::ScaledLayout::scaledInt(static_cast<float>(dimensions_.initButtonHeight), sf);
+    const int rowH = juce::jmax(labelH, juce::jmax(sourceH, juce::jmax(amountH, juce::jmax(destH, initH))));
+    const int sepH = juce::jmax(1, tss::ScaledLayout::scaledInt(static_cast<float>(dimensions_.separatorHeight), sf));
+    const int ySep = juce::jmin(rowH, juce::jmax(0, h - sepH));
 
     layoutWidgetRow();
-    y += widgetRowHeight;
-    layoutSeparator(y);
+    layoutSeparator(ySep, sepH);
 
     if (busNumberLabel_)
         busNumberLabel_->setScalingFactor(scalingFactor_);
@@ -172,16 +178,16 @@ void ModulationBusPanel::layoutWidgetRow()
     const float sf = scalingFactor_;
     const int y = 0;
 
-    const int labelW  = juce::roundToInt(static_cast<float>(dimensions_.busNumberLabelWidth) * sf);
-    const int labelH  = juce::roundToInt(static_cast<float>(dimensions_.busNumberLabelHeight) * sf);
-    const int sourceW = juce::roundToInt(static_cast<float>(dimensions_.sourceComboBoxWidth) * sf);
-    const int sourceH = juce::roundToInt(static_cast<float>(dimensions_.sourceComboBoxHeight) * sf);
-    const int amountW = juce::roundToInt(static_cast<float>(dimensions_.amountSliderWidth) * sf);
-    const int amountH = juce::roundToInt(static_cast<float>(dimensions_.amountSliderHeight) * sf);
-    const int destW   = juce::roundToInt(static_cast<float>(dimensions_.destinationComboBoxWidth) * sf);
-    const int destH   = juce::roundToInt(static_cast<float>(dimensions_.destinationComboBoxHeight) * sf);
-    const int initW   = juce::roundToInt(static_cast<float>(dimensions_.initButtonWidth) * sf);
-    const int initH   = juce::roundToInt(static_cast<float>(dimensions_.initButtonHeight) * sf);
+    const int labelW  = tss::ScaledLayout::scaledInt(static_cast<float>(dimensions_.busNumberLabelWidth), sf);
+    const int labelH  = tss::ScaledLayout::scaledInt(static_cast<float>(dimensions_.busNumberLabelHeight), sf);
+    const int sourceW = tss::ScaledLayout::scaledInt(static_cast<float>(dimensions_.sourceComboBoxWidth), sf);
+    const int sourceH = tss::ScaledLayout::scaledInt(static_cast<float>(dimensions_.sourceComboBoxHeight), sf);
+    const int amountW = tss::ScaledLayout::scaledInt(static_cast<float>(dimensions_.amountSliderWidth), sf);
+    const int amountH = tss::ScaledLayout::scaledInt(static_cast<float>(dimensions_.amountSliderHeight), sf);
+    const int destW   = tss::ScaledLayout::scaledInt(static_cast<float>(dimensions_.destinationComboBoxWidth), sf);
+    const int destH   = tss::ScaledLayout::scaledInt(static_cast<float>(dimensions_.destinationComboBoxHeight), sf);
+    const int initW   = tss::ScaledLayout::scaledInt(static_cast<float>(dimensions_.initButtonWidth), sf);
+    const int initH   = tss::ScaledLayout::scaledInt(static_cast<float>(dimensions_.initButtonHeight), sf);
 
     // X positions computed independently from float origin to avoid rounding accumulation.
     // Label has no spacing before source (they abut directly).
@@ -197,13 +203,12 @@ void ModulationBusPanel::layoutWidgetRow()
     if (auto* button  = initButton_.get())         button->setBounds(juce::roundToInt(initX), y, initW, initH);
 }
 
-void ModulationBusPanel::layoutSeparator(int y)
+void ModulationBusPanel::layoutSeparator(int yTop, int separatorHeight)
 {
-    const int sepW = juce::roundToInt(static_cast<float>(dimensions_.separatorWidth) * scalingFactor_);
-    const int sepH = juce::roundToInt(static_cast<float>(dimensions_.separatorHeight) * scalingFactor_);
+    const int sepW = tss::ScaledLayout::scaledInt(static_cast<float>(dimensions_.separatorWidth), scalingFactor_);
 
     if (auto* separator = separator_.get())
-        separator->setBounds(0, y, sepW, sepH);
+        separator->setBounds(0, yTop, sepW, separatorHeight);
 }
 
 void ModulationBusPanel::setSkin(tss::ISkin& skin)
@@ -235,6 +240,7 @@ void ModulationBusPanel::setScalingFactor(float scalingFactor)
         return;
     
     scalingFactor_ = scalingFactor;
+    resized();
     repaint();
 }
 

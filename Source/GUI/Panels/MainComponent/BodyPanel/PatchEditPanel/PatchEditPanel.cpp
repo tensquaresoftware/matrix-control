@@ -1,5 +1,8 @@
 #include "PatchEditPanel.h"
 
+#include <vector>
+
+#include "GUI/Layout/ScaledLayout.h"
 #include "TopPanel/TopPanel.h"
 #include "TopPanel/Modules/FmTrackPanel.h"
 #include "MiddlePanel/MiddlePanel.h"
@@ -71,22 +74,22 @@ void PatchEditPanel::resized()
     const auto bounds = getLocalBounds();
     const float sf = scalingFactor_;
 
-    const int sectionHeaderHeight = juce::roundToInt(static_cast<float>(PluginDimensions::Widgets::Heights::kSectionHeader) * sf);
-    const int topPanelHeight      = juce::roundToInt(static_cast<float>(topPanelHeight_) * sf);
-    const int middlePanelHeight   = juce::roundToInt(static_cast<float>(middlePanelHeight_) * sf);
-    const int bottomPanelHeight   = juce::roundToInt(static_cast<float>(bottomPanelHeight_) * sf);
+    const std::vector<int> designHeights {
+        PluginDimensions::Widgets::Heights::kSectionHeader,
+        topPanelHeight_,
+        middlePanelHeight_,
+        bottomPanelHeight_
+    };
+    const auto heights = tss::ScaledLayout::distributeHeights(bounds.getHeight(), designHeights, sf, 3);
 
-    // Y positions computed independently from float origin to avoid rounding accumulation.
-    const float originY = static_cast<float>(bounds.getY());
-    const int sectionHeaderY = bounds.getY();
-    const int topPanelY      = juce::roundToInt(originY + static_cast<float>(PluginDimensions::Widgets::Heights::kSectionHeader) * sf);
-    const int middlePanelY   = juce::roundToInt(originY + static_cast<float>(PluginDimensions::Widgets::Heights::kSectionHeader + topPanelHeight_) * sf);
-    const int bottomPanelY   = juce::roundToInt(originY + static_cast<float>(PluginDimensions::Widgets::Heights::kSectionHeader + topPanelHeight_ + middlePanelHeight_) * sf);
-
-    sectionHeader_->setBounds(bounds.getX(), sectionHeaderY, bounds.getWidth(), sectionHeaderHeight);
-    topPanel_->setBounds(bounds.getX(), topPanelY, bounds.getWidth(), topPanelHeight);
-    middlePanel_->setBounds(bounds.getX(), middlePanelY, bounds.getWidth(), middlePanelHeight);
-    bottomPanel_->setBounds(bounds.getX(), bottomPanelY, bounds.getWidth(), bottomPanelHeight);
+    int y = bounds.getY();
+    sectionHeader_->setBounds(bounds.getX(), y, bounds.getWidth(), heights[0]);
+    y += heights[0];
+    topPanel_->setBounds(bounds.getX(), y, bounds.getWidth(), heights[1]);
+    y += heights[1];
+    middlePanel_->setBounds(bounds.getX(), y, bounds.getWidth(), heights[2]);
+    y += heights[2];
+    bottomPanel_->setBounds(bounds.getX(), y, bounds.getWidth(), heights[3]);
 }
 
 void PatchEditPanel::setSkin(tss::ISkin& skin)

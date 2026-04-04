@@ -54,7 +54,8 @@ private:
 
     void layoutParameterLabel(int y);
     void layoutParameterWidget(int y);
-    void layoutSeparator(int y);
+    void layoutSeparator(int yTop, int separatorHeight);
+    void applyChildScalingFactors();
 
     tss::ISkin* skin_;
     ParameterType parameterType_;

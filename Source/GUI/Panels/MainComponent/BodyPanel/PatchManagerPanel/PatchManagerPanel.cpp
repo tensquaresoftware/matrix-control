@@ -1,5 +1,8 @@
 #include "PatchManagerPanel.h"
 
+#include <vector>
+
+#include "GUI/Layout/ScaledLayout.h"
 #include "Modules/BankUtilityPanel.h"
 #include "Modules/InternalPatchesPanel.h"
 #include "Modules/ComputerPatchesPanel.h"
@@ -53,32 +56,42 @@ void PatchManagerPanel::resized()
 {
     const auto bounds = getLocalBounds();
     const float sf = scalingFactor_;
-    const float originY = static_cast<float>(bounds.getY());
-    const int panelWidth = juce::roundToInt(static_cast<float>(width_) * sf);
+    const int panelWidth = tss::ScaledLayout::scaledInt(static_cast<float>(width_), sf);
 
-    const int sectionHeaderHeight    = juce::roundToInt(static_cast<float>(PluginDimensions::Widgets::Heights::kSectionHeader) * sf);
-    const int bankUtilityHeight      = juce::roundToInt(static_cast<float>(bankUtilityPanelHeight_) * sf);
-    const int internalPatchesHeight  = juce::roundToInt(static_cast<float>(internalPatchesPanelHeight_) * sf);
-    const int computerPatchesHeight  = juce::roundToInt(static_cast<float>(computerPatchesPanelHeight_) * sf);
-    const int patchMutatorHeight     = juce::roundToInt(static_cast<float>(patchMutatorPanelHeight_) * sf);
+    const int sectionHeaderHeight = tss::ScaledLayout::scaledInt(
+        static_cast<float>(PluginDimensions::Widgets::Heights::kSectionHeader), sf);
+    const int contentTop = bounds.getY() + sectionHeaderHeight;
+    const int contentHeight = bounds.getHeight() - sectionHeaderHeight;
 
-    // Y positions computed independently from float origin to avoid rounding accumulation.
-    const int sectionHeaderY   = bounds.getY();
-    const int bankUtilityY     = juce::roundToInt(originY + static_cast<float>(PluginDimensions::Widgets::Heights::kSectionHeader) * sf);
-    const int internalY        = juce::roundToInt(originY + static_cast<float>(PluginDimensions::Widgets::Heights::kSectionHeader + bankUtilityPanelHeight_) * sf);
-    const int computerY        = juce::roundToInt(originY + static_cast<float>(PluginDimensions::Widgets::Heights::kSectionHeader + bankUtilityPanelHeight_ + internalPatchesPanelHeight_) * sf);
-    const int patchMutatorY    = juce::roundToInt(originY + static_cast<float>(PluginDimensions::Widgets::Heights::kSectionHeader + bankUtilityPanelHeight_ + internalPatchesPanelHeight_ + computerPatchesPanelHeight_) * sf);
+    const std::vector<int> moduleDesignHeights {
+        bankUtilityPanelHeight_,
+        internalPatchesPanelHeight_,
+        computerPatchesPanelHeight_,
+        patchMutatorPanelHeight_
+    };
+    const auto moduleHeights = tss::ScaledLayout::distributeHeights(contentHeight, moduleDesignHeights, sf, 3);
 
     if (auto* header = sectionHeader_.get())
-        header->setBounds(bounds.getX(), sectionHeaderY, bounds.getWidth(), sectionHeaderHeight);
+        header->setBounds(bounds.getX(), bounds.getY(), bounds.getWidth(), sectionHeaderHeight);
+
+    int y = contentTop;
     if (auto* panel = bankUtilityPanel_.get())
-        panel->setBounds(bounds.getX(), bankUtilityY, panelWidth, bankUtilityHeight);
+    {
+        panel->setBounds(bounds.getX(), y, panelWidth, moduleHeights[0]);
+        y += moduleHeights[0];
+    }
     if (auto* panel = internalPatchesPanel_.get())
-        panel->setBounds(bounds.getX(), internalY, panelWidth, internalPatchesHeight);
+    {
+        panel->setBounds(bounds.getX(), y, panelWidth, moduleHeights[1]);
+        y += moduleHeights[1];
+    }
     if (auto* panel = computerPatchesPanel_.get())
-        panel->setBounds(bounds.getX(), computerY, panelWidth, computerPatchesHeight);
+    {
+        panel->setBounds(bounds.getX(), y, panelWidth, moduleHeights[2]);
+        y += moduleHeights[2];
+    }
     if (auto* panel = patchMutatorPanel_.get())
-        panel->setBounds(bounds.getX(), patchMutatorY, panelWidth, patchMutatorHeight);
+        panel->setBounds(bounds.getX(), y, panelWidth, moduleHeights[3]);
 }
 
 void PatchManagerPanel::setSkin(tss::ISkin& skin)

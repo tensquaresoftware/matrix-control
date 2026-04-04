@@ -50,7 +50,7 @@ private:
     void createSeparator(tss::ISkin& skin);
 
     void layoutWidgetRow();
-    void layoutSeparator(int y);
+    void layoutSeparator(int yTop, int separatorHeight);
 
     inline constexpr static int kSpacing_ = 5;
 

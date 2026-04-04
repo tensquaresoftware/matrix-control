@@ -59,52 +59,42 @@ void HeaderPanel::paint(juce::Graphics& g)
 
 void HeaderPanel::resized()
 {
-    const auto bounds = getLocalBounds().toFloat();
-    const float spacing = static_cast<float>(kSpacing_) * scalingFactor_;
-    const float controlHeight = static_cast<float>(kControlHeight_) * scalingFactor_;
-    const float scaledHeight = static_cast<float>(height_) * scalingFactor_;
+    const auto bounds = getLocalBounds();
+    const float sf = scalingFactor_;
+    const float spacing = static_cast<float>(kSpacing_) * sf;
+    const float controlHeight = static_cast<float>(kControlHeight_) * sf;
+    const float scaledHeight = static_cast<float>(height_) * sf;
     const float controlY = (scaledHeight - controlHeight) * 0.5f;
-    
-    const float leftPadding = static_cast<float>(kLeftPadding_) * scalingFactor_;
-    const float skinLabelWidth = static_cast<float>(kSkinLabelWidth_) * scalingFactor_;
-    const float guiScaleLabelWidth = static_cast<float>(kGuiScaleLabelWidth_) * scalingFactor_;
-    const float comboBoxWidth = static_cast<float>(kComboBoxWidth_) * scalingFactor_;
-    
-    float currentX = leftPadding;
 
-    guiScaleLabel_.setBounds(
-        juce::roundToInt(bounds.getX() + currentX),
-        juce::roundToInt(bounds.getY() + controlY),
-        juce::roundToInt(guiScaleLabelWidth),
-        juce::roundToInt(controlHeight)
-    );
+    const float leftPadding = static_cast<float>(kLeftPadding_) * sf;
+    const float guiScaleLabelWidth = static_cast<float>(kGuiScaleLabelWidth_) * sf;
+    const float comboBoxWidth = static_cast<float>(kComboBoxWidth_) * sf;
+    const float skinLabelWidth = static_cast<float>(kSkinLabelWidth_) * sf;
+
+    const float originX = static_cast<float>(bounds.getX()) + leftPadding;
+    const float x0 = originX;
+    const float x1 = originX + guiScaleLabelWidth + spacing;
+    const float x2 = originX + guiScaleLabelWidth + spacing + comboBoxWidth + spacing * 2.0f;
+    const float x3 = originX + guiScaleLabelWidth + spacing + comboBoxWidth + spacing * 2.0f + skinLabelWidth + spacing;
+
+    const int guiScaleLabelX = juce::roundToInt(x0);
+    const int guiScaleComboBoxX = juce::roundToInt(x1);
+    const int skinLabelX = juce::roundToInt(x2);
+    const int skinComboBoxX = juce::roundToInt(x3);
+
+    const int y = juce::roundToInt(static_cast<float>(bounds.getY()) + controlY);
+    const int h = juce::roundToInt(controlHeight);
+
+    guiScaleLabel_.setBounds(guiScaleLabelX, y, juce::roundToInt(guiScaleLabelWidth), h);
     guiScaleLabel_.setScalingFactor(scalingFactor_);
-    currentX += guiScaleLabelWidth + spacing;
 
-    guiScaleComboBox_.setBounds(
-        juce::roundToInt(bounds.getX() + currentX),
-        juce::roundToInt(bounds.getY() + controlY),
-        juce::roundToInt(comboBoxWidth),
-        juce::roundToInt(controlHeight)
-    );
+    guiScaleComboBox_.setBounds(guiScaleComboBoxX, y, juce::roundToInt(comboBoxWidth), h);
     guiScaleComboBox_.setScalingFactor(scalingFactor_);
-    currentX += comboBoxWidth + spacing * 2.0f;
 
-    skinLabel_.setBounds(
-        juce::roundToInt(bounds.getX() + currentX),
-        juce::roundToInt(bounds.getY() + controlY),
-        juce::roundToInt(skinLabelWidth),
-        juce::roundToInt(controlHeight)
-    );
+    skinLabel_.setBounds(skinLabelX, y, juce::roundToInt(skinLabelWidth), h);
     skinLabel_.setScalingFactor(scalingFactor_);
-    currentX += skinLabelWidth + spacing;
 
-    skinComboBox_.setBounds(
-        juce::roundToInt(bounds.getX() + currentX),
-        juce::roundToInt(bounds.getY() + controlY),
-        juce::roundToInt(comboBoxWidth),
-        juce::roundToInt(controlHeight)
-    );
+    skinComboBox_.setBounds(skinComboBoxX, y, juce::roundToInt(comboBoxWidth), h);
     skinComboBox_.setScalingFactor(scalingFactor_);
 }
 
@@ -126,5 +116,10 @@ void HeaderPanel::setScalingFactor(float scalingFactor)
     
     scalingFactor_ = scalingFactor;
     repaint();
+}
+
+void HeaderPanel::setGuiScaleDisplayText(std::optional<juce::String> text)
+{
+    guiScaleComboBox_.setCustomDisplayText(text);
 }
 

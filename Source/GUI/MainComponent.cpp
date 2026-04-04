@@ -1,7 +1,9 @@
 #include "MainComponent.h"
 
+#include <vector>
 
 #include "GUI/Factories/WidgetFactory.h"
+#include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Skins/Skin.h"
 #include "Shared/Definitions/PluginDimensions.h"
 
@@ -30,50 +32,22 @@ void MainComponent::paint(juce::Graphics& g)
 void MainComponent::resized()
 {
     const auto bounds = getLocalBounds();
-    const float headerHeight = static_cast<float>(PluginDimensions::Panels::Header::kHeight) * scalingFactor_;
-    const float bodyHeight = static_cast<float>(PluginDimensions::Panels::Body::kHeight) * scalingFactor_;
-    float y = 0.0f;
-    
-    layoutHeaderPanel(bounds, y);
-    y += headerHeight;
-    
-    layoutBodyPanel(bounds, y);
-    y += bodyHeight;
-    
-    layoutFooterPanel(bounds, y);
-}
+    const float sf = scalingFactor_;
 
-void MainComponent::layoutHeaderPanel(juce::Rectangle<int> bounds, float y)
-{
-    const float height = static_cast<float>(PluginDimensions::Panels::Header::kHeight) * scalingFactor_;
-    headerPanel.setBounds(
-        bounds.getX(),
-        juce::roundToInt(static_cast<float>(bounds.getY()) + y),
-        bounds.getWidth(),
-        juce::roundToInt(height)
-    );
-}
+    const std::vector<int> designHeights {
+        PluginDimensions::Panels::Header::kHeight,
+        PluginDimensions::Panels::Body::kHeight,
+        PluginDimensions::Panels::Footer::kHeight
+    };
+    const auto heights = tss::ScaledLayout::distributeHeights(bounds.getHeight(), designHeights, sf, 2);
+    const int headerHeight = heights[0];
+    const int bodyHeight = heights[1];
+    const int footerHeight = heights[2];
+    const int footerY = headerHeight + bodyHeight;
 
-void MainComponent::layoutBodyPanel(juce::Rectangle<int> bounds, float y)
-{
-    const float height = static_cast<float>(PluginDimensions::Panels::Body::kHeight) * scalingFactor_;
-    bodyPanel.setBounds(
-        bounds.getX(),
-        juce::roundToInt(static_cast<float>(bounds.getY()) + y),
-        bounds.getWidth(),
-        juce::roundToInt(height)
-    );
-}
-
-void MainComponent::layoutFooterPanel(juce::Rectangle<int> bounds, float y)
-{
-    const float height = static_cast<float>(PluginDimensions::Panels::Footer::kHeight) * scalingFactor_;
-    footerPanel.setBounds(
-        bounds.getX(),
-        juce::roundToInt(static_cast<float>(bounds.getY()) + y),
-        bounds.getWidth(),
-        juce::roundToInt(height)
-    );
+    headerPanel.setBounds(bounds.getX(), bounds.getY(), bounds.getWidth(), headerHeight);
+    bodyPanel.setBounds(bounds.getX(), bounds.getY() + headerHeight, bounds.getWidth(), bodyHeight);
+    footerPanel.setBounds(bounds.getX(), bounds.getY() + footerY, bounds.getWidth(), footerHeight);
 }
 
 void MainComponent::setSkin(tss::Skin& skin)
@@ -93,6 +67,7 @@ void MainComponent::setScalingFactor(float scalingFactor)
     headerPanel.setScalingFactor(scalingFactor_);
     bodyPanel.setScalingFactor(scalingFactor_);
     footerPanel.setScalingFactor(scalingFactor_);
+    resized();
     repaint();
 }
 

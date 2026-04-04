@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include <juce_gui_basics/juce_gui_basics.h>
 
 #include "GUI/Looks/WidgetLooks.h"
@@ -25,6 +27,7 @@ namespace tss
         void setLook(const ComboBoxLook& look);
         void setPopupMenuLook(const PopupMenuLook& look);
         void setScalingFactor(float scalingFactor);
+        void setCustomDisplayText(std::optional<juce::String> text);
         
         void paint(juce::Graphics& g) override;
         void showPopup() override;
@@ -64,6 +67,7 @@ namespace tss
         bool isPopupOpen_ = false;
         bool hasFocus_ = false;
         float scalingFactor_ = 1.0f;
+        std::optional<juce::String> customDisplayText_;
 
         void drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);
         void drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);

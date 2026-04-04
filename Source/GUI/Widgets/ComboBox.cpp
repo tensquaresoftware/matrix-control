@@ -38,6 +38,14 @@ namespace tss
         repaint();
     }
 
+    void ComboBox::setCustomDisplayText(std::optional<juce::String> text)
+    {
+        if (customDisplayText_ == text)
+            return;
+        customDisplayText_ = text;
+        repaint();
+    }
+
     void ComboBox::paint(juce::Graphics& g)
     {
         const auto bounds = getLocalBounds().toFloat();
@@ -88,10 +96,13 @@ namespace tss
 
     juce::String ComboBox::getSelectedItemText() const
     {
+        if (customDisplayText_.has_value())
+            return *customDisplayText_;
+
         const auto selectedIndex = getSelectedItemIndex();
         if (selectedIndex >= 0)
             return getItemText(selectedIndex);
-        
+
         return juce::String();
     }
 

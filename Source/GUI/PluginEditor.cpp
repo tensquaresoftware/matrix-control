@@ -1,4 +1,7 @@
+#include <optional>
+
 #include "Core/PluginProcessor.h"
+#include "GUI/Layout/ScaledLayout.h"
 #include "PluginEditor.h"
 #include "Skins/Skin.h"
 #include "Panels/MainComponent/HeaderPanel/HeaderPanel.h"
@@ -44,6 +47,23 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     const float savedScaleFactor = PluginIDs::Settings::ScaleLevels::getScaleFactor(savedScaleId);
     applyGuiScale(savedScaleFactor);
     headerPanel.getGuiScaleComboBox().setSelectedId(savedScaleId, juce::dontSendNotification);
+
+    setResizable(true, false);
+    const int baseWidth = PluginDimensions::GUI::kWidth;
+    const int baseHeight = PluginDimensions::GUI::kHeight;
+    constexpr float kMinScaleFactor = 0.5f;
+    constexpr float kMaxScaleFactor = 4.0f;
+    setResizeLimits(
+        juce::roundToInt(static_cast<float>(baseWidth) * kMinScaleFactor),
+        juce::roundToInt(static_cast<float>(baseHeight) * kMinScaleFactor),
+        juce::roundToInt(static_cast<float>(baseWidth) * kMaxScaleFactor),
+        juce::roundToInt(static_cast<float>(baseHeight) * kMaxScaleFactor));
+    getConstrainer()->setFixedAspectRatio(
+        static_cast<double>(baseWidth) / static_cast<double>(baseHeight));
+
+    resizeCorner_ = std::make_unique<juce::ResizableCornerComponent>(this, getConstrainer());
+    addAndMakeVisible(*resizeCorner_);
+    resizeCorner_->setAlwaysOnTop(true);
     
     headerPanel.getSkinComboBox().onChange = [this, &headerPanel]
     {
@@ -58,13 +78,22 @@ PluginEditor::PluginEditor(PluginProcessor& p)
         const auto selectedId = headerPanel.getGuiScaleComboBox().getSelectedId();
         const float scaleFactor = PluginIDs::Settings::ScaleLevels::getScaleFactor(selectedId);
         applyGuiScale(scaleFactor);
+        headerPanel.setGuiScaleDisplayText(std::nullopt);
         pluginProcessor.getApvts().state.setProperty(PluginIDs::Settings::kGuiScaleId, selectedId, nullptr);
     };
     
+    lastSyncedEditorWidth_ = getWidth();
+    syncLayoutScaleFromEditor();
+    startTimerHz(120);
+
+    layoutResizeCorner();
     repaint();
 }
 
-PluginEditor::~PluginEditor() = default;
+PluginEditor::~PluginEditor()
+{
+    stopTimer();
+}
 
 void PluginEditor::paint(juce::Graphics& g)
 {
@@ -73,8 +102,82 @@ void PluginEditor::paint(juce::Graphics& g)
 
 void PluginEditor::resized()
 {
-    if (auto* component = mainComponent.get())
-        component->setBounds(getLocalBounds());
+    const int baseWidth = PluginDimensions::GUI::kWidth;
+    if (baseWidth <= 0)
+        return;
+
+    if (auto* comp = mainComponent.get())
+        comp->setBounds(getLocalBounds());
+
+    layoutResizeCorner();
+}
+
+void PluginEditor::layoutResizeCorner()
+{
+    if (resizeCorner_ == nullptr)
+        return;
+
+    bool hidden = false;
+    if (auto* peer = getPeer())
+        hidden = peer->isFullScreen() || peer->isKioskMode();
+
+    resizeCorner_->setVisible(!hidden);
+
+    if (hidden)
+        return;
+
+    const int s = PluginDimensions::GUI::kResizeCornerSize;
+    resizeCorner_->setBounds(getWidth() - s, getHeight() - s, s, s);
+}
+
+void PluginEditor::timerCallback()
+{
+    const int w = getWidth();
+    if (w == lastSyncedEditorWidth_)
+        return;
+
+    lastSyncedEditorWidth_ = w;
+    syncLayoutScaleFromEditor();
+}
+
+void PluginEditor::syncLayoutScaleFromEditor()
+{
+    const int baseWidth = PluginDimensions::GUI::kWidth;
+    if (baseWidth <= 0)
+        return;
+
+    // Layout and preset matching use editor pixel size vs design width only.
+    // Host display scaling (getTransform) is not folded into layoutScale here.
+    const float layoutScale = tss::ScaledLayout::layoutScaleFromEditorBounds(getWidth(), baseWidth);
+
+    if (auto* comp = mainComponent.get())
+        comp->setScalingFactor(layoutScale);
+
+    auto& headerPanel = mainComponent->getHeaderPanel();
+
+    int matchingScaleId = 0;
+    const int layoutPercentRounded = juce::roundToInt(layoutScale * 100.0f);
+    for (int id = PluginIDs::Settings::ScaleLevels::kMin; id <= PluginIDs::Settings::ScaleLevels::kMax; ++id)
+    {
+        const int presetPercentRounded = juce::roundToInt(
+            PluginIDs::Settings::ScaleLevels::getScaleFactor(id) * 100.0f);
+        if (layoutPercentRounded == presetPercentRounded)
+        {
+            matchingScaleId = id;
+            break;
+        }
+    }
+
+    if (matchingScaleId != 0)
+    {
+        headerPanel.setGuiScaleDisplayText(std::nullopt);
+        headerPanel.getGuiScaleComboBox().setSelectedId(matchingScaleId, juce::dontSendNotification);
+    }
+    else
+    {
+        headerPanel.setGuiScaleDisplayText(
+            juce::String::formatted("%.2f%%", layoutScale * 100.0f));
+    }
 }
 
 void PluginEditor::mouseDown(const juce::MouseEvent&)
@@ -91,15 +194,10 @@ void PluginEditor::updateSkin()
 
 void PluginEditor::applyGuiScale(float scaleFactor)
 {
-    if (auto* component = mainComponent.get())
-    {
-        component->setScalingFactor(scaleFactor);
-    }
-    
     const int baseWidth = PluginDimensions::GUI::kWidth;
     const int baseHeight = PluginDimensions::GUI::kHeight;
-    
-    setSize(juce::roundToInt(static_cast<float>(baseWidth) * scaleFactor), 
+
+    setSize(juce::roundToInt(static_cast<float>(baseWidth) * scaleFactor),
             juce::roundToInt(static_cast<float>(baseHeight) * scaleFactor));
 }
 
