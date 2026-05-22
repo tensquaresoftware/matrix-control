@@ -6,7 +6,7 @@
 
 #include <array>
 
-#include "PluginDimensions.h"
+#include "PluginDesignDimensions.h"
 #include "PluginDisplayNames.h"
 #include "PluginHelpers.h"
 #include "PluginIDs.h"
@@ -205,7 +205,7 @@ namespace PluginDescriptors
             .displayName = PluginDisplayNames::MasterEditSection::MidiModule::StandaloneWidgets::kInit,
             .parentGroupId = PluginIDs::MasterEditSection::MidiModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDimensions::Widgets::Widths::Button::kInit
+            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kInit
         }
     };
 
@@ -337,7 +337,7 @@ namespace PluginDescriptors
             .displayName = PluginDisplayNames::MasterEditSection::VibratoModule::StandaloneWidgets::kInit,
             .parentGroupId = PluginIDs::MasterEditSection::VibratoModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDimensions::Widgets::Widths::Button::kInit
+            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kInit
         }
     };
 
@@ -439,7 +439,7 @@ namespace PluginDescriptors
             .displayName = PluginDisplayNames::MasterEditSection::MiscModule::StandaloneWidgets::kInit,
             .parentGroupId = PluginIDs::MasterEditSection::MiscModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDimensions::Widgets::Widths::Button::kInit
+            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kInit
         }
     };
 

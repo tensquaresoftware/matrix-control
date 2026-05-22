@@ -11,11 +11,11 @@ namespace tss
     public:
         using ValueChangedCallback = std::function<void(int)>;
 
-        explicit NumberBox(int width, bool editable, int minValue, int maxValue);
+        explicit NumberBox(int width, int height, const NumberBoxLook& look, bool editable, int minValue, int maxValue);
         ~NumberBox() override = default;
 
         void setLook(const NumberBoxLook& look);
-        void setDisplayScale(float displayScale);
+        void setUiScale(float uiScale);
 
         void setValue(int newValue);
         int getValue() const { return currentValue_; }
@@ -29,22 +29,23 @@ namespace tss
         void resized() override;
         void mouseDoubleClick(const juce::MouseEvent& e) override;
 
-        static constexpr int getHeight() { return kHeight_; }
+        int getHeight() const { return height_; }
 
     private:
-        inline constexpr static int kHeight_ = 20;
+        inline constexpr static int kDefaultHeight_ = 20;
         inline constexpr static int kBorderThickness_ = 2;
         inline constexpr static float kDotRadius_ = 1.5f;
         inline constexpr static float kDotXOffset_ = 3.0f;
         inline constexpr static float kEditorFontSizeIncrease_ = 4.0f;
 
         NumberBoxLook look_{};
+        int height_ {kDefaultHeight_};
         int currentValue_ = 0;
         int minValue_ = 0;
         int maxValue_ = 99;
         bool editable_ = false;
         bool showDot_ = false;
-        float displayScale_ = 1.0f;
+        float uiScale_ = 1.0f;
         std::unique_ptr<juce::TextEditor> editor_;
         ValueChangedCallback onValueChanged_;
 

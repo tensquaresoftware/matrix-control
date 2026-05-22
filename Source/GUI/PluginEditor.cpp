@@ -3,10 +3,8 @@
 #include "Core/PluginProcessor.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "Skins/Skin.h"
-#include "Panels/MainComponent/HeaderPanel/HeaderPanel.h"
-#include "Panels/MainComponent/BodyPanel/BodyPanel.h"
-#include "Panels/MainComponent/FooterPanel/FooterPanel.h"
 #include "Factories/WidgetFactory.h"
+#include "Shared/Definitions/PluginIDs.h"
 
 using tss::SkinColourId;
 
@@ -19,30 +17,33 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     skinCream_ = tss::Skin::create(tss::Skin::ColourVariant::Cream);
     skin_ = skinBlack_.get();
 
-    widgetFactory = std::make_unique<WidgetFactory>(pluginProcessor.getApvts());
+    widgetFactory_ = std::make_unique<WidgetFactory>(pluginProcessor.getApvts());
 
     setOpaque(true);
     setWantsKeyboardFocus(false);
     setInterceptsMouseClicks(true, true);
 
-    const auto editorWidth = PluginDimensions::GUI::kWidth;
-    const auto editorHeight = PluginDimensions::GUI::kHeight;
-    mainComponent = std::make_unique<MainComponent>(*skin_, editorWidth, editorHeight, *widgetFactory, pluginProcessor.getApvts());
-    addAndMakeVisible(*mainComponent);
+    const auto editorWidth = PluginDesignDimensions::GUI::kWidth;
+    const auto editorHeight = PluginDesignDimensions::GUI::kHeight;
 
-    if (auto* component = mainComponent.get())
-        component->setBounds(getLocalBounds());
+    mainComponent_ = std::make_unique<MainComponent>(
+        *skin_, editorWidth, editorHeight, *widgetFactory_, pluginProcessor.getApvts());
+    addAndMakeVisible(*mainComponent_);
+
+    testComponent_ = std::make_unique<TestComponent>(*skin_, pluginProcessor.getApvts().state, editorWidth, editorHeight);
+    addChildComponent(*testComponent_);
+    testComponent_->setVisible(false);
 
     updateSkin();
 
-    auto& headerPanel = mainComponent->getHeaderPanel();
+    auto& headerPanel = mainComponent_->getHeaderPanel();
 
     const int savedScaleId = pluginProcessor.getApvts().state.getProperty(
         PluginIDs::Settings::kGuiScaleId,
         PluginIDs::Settings::ScaleLevels::kDefault);
-    const float savedDisplayScale = PluginIDs::Settings::ScaleLevels::getDisplayScale(savedScaleId);
-    applyDisplayScale(savedDisplayScale);
-    headerPanel.getGuiScaleComboBox().setSelectedId(savedScaleId, juce::dontSendNotification);
+    const float savedUiScale = PluginIDs::Settings::ScaleLevels::getUiScale(savedScaleId);
+    applyUiScale(savedUiScale);
+    headerPanel.getUiScaleComboBox().setSelectedId(savedScaleId, juce::dontSendNotification);
 
     setResizable(false, false);
 
@@ -54,15 +55,21 @@ PluginEditor::PluginEditor(PluginProcessor& p)
         updateSkin();
     };
 
-    headerPanel.getGuiScaleComboBox().onChange = [this, &headerPanel]
+    headerPanel.getUiScaleComboBox().onChange = [this, &headerPanel]
     {
-        const auto selectedId = headerPanel.getGuiScaleComboBox().getSelectedId();
-        const float displayScale = PluginIDs::Settings::ScaleLevels::getDisplayScale(selectedId);
-        applyDisplayScale(displayScale);
+        const auto selectedId = headerPanel.getUiScaleComboBox().getSelectedId();
+        const float uiScale = PluginIDs::Settings::ScaleLevels::getUiScale(selectedId);
+        applyUiScale(uiScale);
         pluginProcessor.getApvts().state.setProperty(PluginIDs::Settings::kGuiScaleId, selectedId, nullptr);
     };
 
-    syncDisplayScaleFromEditor();
+    headerPanel.getUiElementsButton().onClick = [this, &headerPanel]
+    {
+        setUiElementsTestVisible(headerPanel.getUiElementsButton().getToggleState());
+    };
+
+    syncUiScaleFromEditor();
+    layoutUiElementsTestComponent();
     repaint();
 }
 
@@ -73,36 +80,36 @@ void PluginEditor::paint(juce::Graphics& g)
 
 void PluginEditor::resized()
 {
-    const int baseWidth = PluginDimensions::GUI::kWidth;
+    const int baseWidth = PluginDesignDimensions::GUI::kWidth;
     if (baseWidth <= 0)
         return;
 
-    if (auto* comp = mainComponent.get())
+    if (auto* comp = mainComponent_.get())
         comp->setBounds(getLocalBounds());
 
-    syncDisplayScaleFromEditor();
+    layoutUiElementsTestComponent();
+    syncUiScaleFromEditor();
 }
 
-void PluginEditor::syncDisplayScaleFromEditor()
+void PluginEditor::syncUiScaleFromEditor()
 {
-    const int baseWidth = PluginDimensions::GUI::kWidth;
+    const int baseWidth = PluginDesignDimensions::GUI::kWidth;
     if (baseWidth <= 0)
         return;
 
-    // UI display scale from editor width vs design width. Host HiDPI (Component::setScaleFactor) is separate.
-    const float displayScale = tss::ScaledLayout::displayScaleFromEditorBounds(getWidth(), baseWidth);
+    const float uiScale = tss::ScaledLayout::uiScaleFromEditorBounds(getWidth(), baseWidth);
 
-    if (auto* comp = mainComponent.get())
-        comp->setDisplayScale(displayScale);
+    if (auto* comp = mainComponent_.get())
+        comp->setUiScale(uiScale);
 
-    auto& headerPanel = mainComponent->getHeaderPanel();
+    auto& headerPanel = mainComponent_->getHeaderPanel();
 
     int matchingScaleId = 0;
-    const int layoutPercentRounded = juce::roundToInt(displayScale * 100.0f);
+    const int layoutPercentRounded = juce::roundToInt(uiScale * 100.0f);
     for (int id = PluginIDs::Settings::ScaleLevels::kMin; id <= PluginIDs::Settings::ScaleLevels::kMax; ++id)
     {
         const int presetPercentRounded = juce::roundToInt(
-            PluginIDs::Settings::ScaleLevels::getDisplayScale(id) * 100.0f);
+            PluginIDs::Settings::ScaleLevels::getUiScale(id) * 100.0f);
         if (layoutPercentRounded == presetPercentRounded)
         {
             matchingScaleId = id;
@@ -111,7 +118,7 @@ void PluginEditor::syncDisplayScaleFromEditor()
     }
 
     if (matchingScaleId != 0)
-        headerPanel.getGuiScaleComboBox().setSelectedId(matchingScaleId, juce::dontSendNotification);
+        headerPanel.getUiScaleComboBox().setSelectedId(matchingScaleId, juce::dontSendNotification);
 }
 
 void PluginEditor::mouseDown(const juce::MouseEvent&)
@@ -121,16 +128,46 @@ void PluginEditor::mouseDown(const juce::MouseEvent&)
 
 void PluginEditor::updateSkin()
 {
-    if (auto* widget = mainComponent.get())
+    if (auto* widget = mainComponent_.get())
         widget->setSkin(*skin_);
+
     repaint();
 }
 
-void PluginEditor::applyDisplayScale(float displayScale)
+void PluginEditor::applyUiScale(float uiScale)
 {
-    const int baseWidth = PluginDimensions::GUI::kWidth;
-    const int baseHeight = PluginDimensions::GUI::kHeight;
+    const int baseWidth = PluginDesignDimensions::GUI::kWidth;
+    const int baseHeight = PluginDesignDimensions::GUI::kHeight;
 
-    setSize(juce::roundToInt(static_cast<float>(baseWidth) * displayScale),
-            juce::roundToInt(static_cast<float>(baseHeight) * displayScale));
+    setSize(juce::roundToInt(static_cast<float>(baseWidth) * uiScale),
+            juce::roundToInt(static_cast<float>(baseHeight) * uiScale));
+}
+
+void PluginEditor::setUiElementsTestVisible(bool visible)
+{
+    if (uiElementsTestVisible_ == visible)
+        return;
+
+    uiElementsTestVisible_ = visible;
+
+    if (auto* main = mainComponent_.get())
+        main->setUiElementsTestVisible(visible);
+
+    if (auto* test = testComponent_.get())
+    {
+        test->setVisible(visible);
+        if (visible)
+            test->toFront(false);
+    }
+
+    layoutUiElementsTestComponent();
+    repaint();
+}
+
+void PluginEditor::layoutUiElementsTestComponent()
+{
+    if (!uiElementsTestVisible_ || mainComponent_ == nullptr || testComponent_ == nullptr)
+        return;
+
+    testComponent_->setBounds(mainComponent_->getUiElementsTestAreaBounds());
 }

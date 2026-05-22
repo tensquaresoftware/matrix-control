@@ -232,15 +232,6 @@ void PluginProcessor::initializeMidiPortProperties()
                                 PluginIDs::Settings::ScaleLevels::kDefault,
                                 nullptr);
     }
-
-    if (!apvts.state.hasProperty(PluginIDs::Settings::kGuiScaleSchemaId))
-    {
-        const auto legacyVar = apvts.state.getProperty(PluginIDs::Settings::kGuiScaleId);
-        const int legacyId = legacyVar.isInt() ? static_cast<int>(legacyVar) : PluginIDs::Settings::ScaleLevels::kDefault;
-        const int migratedId = PluginIDs::Settings::ScaleLevels::migrateFromLegacyScaleId(legacyId);
-        apvts.state.setProperty(PluginIDs::Settings::kGuiScaleId, migratedId, nullptr);
-        apvts.state.setProperty(PluginIDs::Settings::kGuiScaleSchemaId, 1, nullptr);
-    }
 }
 
 void PluginProcessor::enableFileLoggingForSession()

@@ -15,12 +15,13 @@ namespace tss
     class Label : public juce::Component
     {
     public:
-        explicit Label(int width, int height, const juce::String& text = juce::String(),
-                      LabelStyle style = LabelStyle::Default);
+        explicit Label(int width, int height, const LabelLook& look,
+                       const juce::String& text = juce::String(),
+                       LabelStyle style = LabelStyle::Default);
         ~Label() override = default;
         
         void setLook(const LabelLook& look);
-        void setDisplayScale(float displayScale);
+        void setUiScale(float uiScale);
         
         void setText(const juce::String& text);
         juce::String getText() const { return labelText_; }
@@ -34,14 +35,13 @@ namespace tss
         static constexpr int kDefaultWidth_ = 50;
         static constexpr int kDefaultHeight_ = 20;
         static constexpr int kTextLeftPadding_ = 2;
-        static constexpr float kFontSize_ = 14.0f;
 
         LabelLook look_{};
         int width_;
         int height_;
         juce::String labelText_;
         LabelStyle style_;
-        float displayScale_ = 1.0f;
+        float uiScale_ = 1.0f;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Label)
     };

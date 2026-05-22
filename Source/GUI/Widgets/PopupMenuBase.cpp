@@ -1,16 +1,15 @@
 #include "PopupMenuBase.h"
 #include "ComboBox.h"
 
-#include "GUI/Looks/LookBuilders.h"
-
 namespace tss
 {
     PopupMenuBase::PopupMenuBase(ComboBox& comboBox, bool isButtonLike)
         : comboBox_(comboBox)
         , isButtonLike_(isButtonLike)
-        , displayScale_(comboBox.getDisplayScale())
-        , cachedFont_(juce::FontOptions("PT Sans Narrow", kFontSize_ * displayScale_, juce::Font::plain))
-        , renderer_(isButtonLike, displayScale_)
+        , uiScale_(comboBox.getUiScale())
+        , cachedFont_(comboBox.getPopupMenuLook().font
+                        .withHeight(comboBox.getPopupMenuLook().font.getHeight() * uiScale_))
+        , renderer_(isButtonLike, uiScale_)
     {
         renderer_.setLook(comboBox_.getPopupMenuLook());
         setWantsKeyboardFocus(true);

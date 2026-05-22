@@ -14,11 +14,11 @@ namespace tss
     public:
         using ValueChangedCallback = std::function<void(int pointIndex, int newValue)>;
 
-        explicit TrackGeneratorDisplay(int width, int height);
+        explicit TrackGeneratorDisplay(int width, int height, const TrackGeneratorDisplayLook& look);
         ~TrackGeneratorDisplay() override = default;
 
         void setLook(const TrackGeneratorDisplayLook& look);
-        void setDisplayScale(float displayScale);
+        void setUiScale(float uiScale);
 
         void setTrackPoint1(int value);
         void setTrackPoint2(int value);
@@ -68,7 +68,7 @@ namespace tss
         TrackGeneratorDisplayLook look_{};
         int width_;
         int height_;
-        float displayScale_ = 1.0f;
+        float uiScale_ = 1.0f;
 
         std::array<int, kCurvePointCount_> pointValues_ {0, 15, 31, 47, 63};
         int draggedPointIndex_ = -1;

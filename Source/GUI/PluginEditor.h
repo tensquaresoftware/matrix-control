@@ -6,12 +6,10 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 
 #include "Core/PluginProcessor.h"
-#include "Shared/Definitions/PluginDimensions.h"
-#include "Skins/Skin.h"
-#include "Panels/MainComponent/HeaderPanel/HeaderPanel.h"
-#include "Panels/MainComponent/BodyPanel/BodyPanel.h"
-#include "Panels/MainComponent/FooterPanel/FooterPanel.h"
 #include "MainComponent.h"
+#include "Shared/Definitions/PluginDesignDimensions.h"
+#include "Skins/Skin.h"
+#include "Tests/TestComponent.h"
 
 class WidgetFactory;
 
@@ -25,8 +23,8 @@ public:
     void resized() override;
     void mouseDown(const juce::MouseEvent& e) override;
 
-    static int getDesignWidth() { return PluginDimensions::GUI::kWidth; }
-    static int getDesignHeight() { return PluginDimensions::GUI::kHeight; }
+    static int getDesignWidth() { return PluginDesignDimensions::GUI::kWidth; }
+    static int getDesignHeight() { return PluginDesignDimensions::GUI::kHeight; }
 
 private:
     PluginProcessor& pluginProcessor;
@@ -34,12 +32,16 @@ private:
     std::unique_ptr<tss::Skin> skinBlack_;
     std::unique_ptr<tss::Skin> skinCream_;
     tss::Skin* skin_ = nullptr;
-    std::unique_ptr<WidgetFactory> widgetFactory;
-    std::unique_ptr<MainComponent> mainComponent;
+    std::unique_ptr<WidgetFactory> widgetFactory_;
+    std::unique_ptr<MainComponent> mainComponent_;
+    std::unique_ptr<TestComponent> testComponent_;
+    bool uiElementsTestVisible_ = false;
 
     void updateSkin();
-    void applyDisplayScale(float displayScale);
-    void syncDisplayScaleFromEditor();
+    void applyUiScale(float uiScale);
+    void syncUiScaleFromEditor();
+    void setUiElementsTestVisible(bool visible);
+    void layoutUiElementsTestComponent();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginEditor)
 };

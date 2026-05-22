@@ -13,9 +13,9 @@ namespace tss
 }
 
 class WidgetFactory;
-class TopPanel;
-class MiddlePanel;
-class BottomPanel;
+class PatchEditTopModulesPanel;
+class PatchEditDisplaysPanel;
+class PatchEditBottomModulesPanel;
 
 class PatchEditPanel : public juce::Component,
                        public juce::Slider::Listener
@@ -26,7 +26,7 @@ public:
 
     void resized() override;
     void setSkin(tss::ISkin& skin);
-    void setDisplayScale(float displayScale);
+    void setUiScale(float uiScale);
     
     void sliderValueChanged(juce::Slider* slider) override;
 
@@ -42,12 +42,12 @@ private:
     int middlePanelHeight_;
     int bottomPanelHeight_;
     tss::ISkin* skin_;
-    float displayScale_ = 1.0f;
+    float uiScale_ = 1.0f;
 
     std::unique_ptr<tss::SectionHeader> sectionHeader_;
-    std::unique_ptr<TopPanel> topPanel_;
-    std::unique_ptr<MiddlePanel> middlePanel_;
-    std::unique_ptr<BottomPanel> bottomPanel_;
+    std::unique_ptr<PatchEditTopModulesPanel> patchEditTopModulesPanel_;
+    std::unique_ptr<PatchEditDisplaysPanel> patchEditDisplaysPanel_;
+    std::unique_ptr<PatchEditBottomModulesPanel> patchEditBottomModulesPanel_;
     
     std::array<juce::Slider*, kTrackPointSliderCount_> trackPointSliders_ {nullptr, nullptr, nullptr, nullptr, nullptr};
     std::array<std::array<juce::Slider*, kEnvParamCount_>, kEnvCount_> envSliders_ 

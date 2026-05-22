@@ -1,35 +1,25 @@
 #include "Skin.h"
 
 #include "SkinColours.h"
-#include "SkinValues.h"
 
 #include <PluginFontsData.h>
 
 namespace tss
 {
+    namespace
+    {
+        constexpr float kSkinBaseFontHeight_ = 14.0f;
+    }
+
     Skin::Skin(ColourVariant variant)
         : currentVariant_(variant)
     {
-        initializeDefaultValues();
         initializeDefaultColours();
     }
 
     std::unique_ptr<Skin> Skin::create(ColourVariant variant)
     {
         return std::make_unique<Skin>(variant);
-    }
-
-    float Skin::getValue(SkinValueId valueId) const
-    {
-        const auto it = values_.find(valueId);
-        if (it != values_.end())
-            return it->second;
-
-        const int index = static_cast<int>(valueId);
-        if (index >= 0 && index < static_cast<int>(SkinValueId::kNumValues))
-            return kDefaultValues[index];
-
-        return 0.0f;
     }
 
     juce::Colour Skin::getColour(SkinColourId colourId) const
@@ -39,11 +29,6 @@ namespace tss
             return it->second;
 
         return juce::Colour(ColourChart::kWhite);
-    }
-
-    void Skin::setValue(SkinValueId valueId, float value)
-    {
-        values_[valueId] = value;
     }
 
     void Skin::setColour(SkinColourId colourId, juce::Colour colour)
@@ -57,7 +42,7 @@ namespace tss
             PluginFontsData::PTSansNarrowRegular_ttf,
             static_cast<size_t>(PluginFontsData::PTSansNarrowRegular_ttfSize)
         );
-        return juce::Font(juce::FontOptions(typeface).withHeight(kBaseFontHeight));
+        return juce::Font(juce::FontOptions(typeface).withHeight(kSkinBaseFontHeight_));
     }
 
     juce::Font Skin::getBaseFontBold() const
@@ -66,7 +51,7 @@ namespace tss
             PluginFontsData::PTSansNarrowBold_ttf,
             static_cast<size_t>(PluginFontsData::PTSansNarrowBold_ttfSize)
         );
-        return juce::Font(juce::FontOptions(typeface).withHeight(kBaseFontHeight));
+        return juce::Font(juce::FontOptions(typeface).withHeight(kSkinBaseFontHeight_));
     }
 
     juce::Colour Skin::getToggleBackgroundColour(bool isOn) const
@@ -162,14 +147,6 @@ namespace tss
     juce::Colour Skin::getPopupMenuScrollbarColour(bool isButtonLike) const
     {
         return getColour(isButtonLike ? SkinColourId::kPopupMenuScrollbarButtonLike : SkinColourId::kPopupMenuScrollbar);
-    }
-
-    void Skin::initializeDefaultValues()
-    {
-        for (int i = 0; i < static_cast<int>(SkinValueId::kNumValues); ++i)
-        {
-            values_[static_cast<SkinValueId>(i)] = kDefaultValues[i];
-        }
     }
 
     void Skin::initializeDefaultColours()

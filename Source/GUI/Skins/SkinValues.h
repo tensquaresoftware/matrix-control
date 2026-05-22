@@ -4,29 +4,6 @@
 
 namespace tss
 {
-    enum class SkinValueId
-    {
-        kLabelFontSize,
-        kLabelPadding,
-        kGroupLabelFontSize,
-        kSliderWidth,
-        kSliderHeight,
-        kSliderTrackHeight,
-        kButtonWidth,
-        kButtonHeight,
-        kComboBoxWidth,
-        kComboBoxHeight,
-        kNumberBoxWidth,
-        kNumberBoxHeight,
-        kWidgetRoundedCorner,
-        kSeparatorThickness,
-        kHeaderHeight,
-        kFooterHeight,
-        kModulePanelPadding,
-        
-        kNumValues
-    };
-
     enum class SkinColourId
     {
         // Panel colours
@@ -140,30 +117,4 @@ namespace tss
         kNumColours
     };
 
-    constexpr float kBaseFontHeight = 14.0f;
-    constexpr float kModuleHeaderFontHeight = 16.0f;
-    constexpr float kSectionHeaderFontHeight = 20.0f;
-
-    constexpr float kDefaultValues[] = {
-        10.0f,  // kLabelFontSize
-        2.0f,   // kLabelPadding
-        11.0f,  // kGroupLabelFontSize
-        50.0f,  // kSliderWidth
-        70.0f,  // kSliderHeight
-        16.0f,  // kSliderTrackHeight
-        50.0f,  // kButtonWidth
-        20.0f,  // kButtonHeight
-        100.0f, // kComboBoxWidth
-        20.0f,  // kComboBoxHeight
-        50.0f,  // kNumberBoxWidth
-        20.0f,  // kNumberBoxHeight
-        2.0f,   // kWidgetRoundedCorner
-        1.0f,   // kSeparatorThickness
-        40.0f,  // kHeaderHeight
-        30.0f,  // kFooterHeight
-        10.0f,  // kModulePanelPadding
-    };
-
-    static_assert(sizeof(kDefaultValues) / sizeof(float) == static_cast<int>(SkinValueId::kNumValues),
-                  "kDefaultValues array size must match SkinValueId enum count");
 }

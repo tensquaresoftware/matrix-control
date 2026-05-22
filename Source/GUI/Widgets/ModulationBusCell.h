@@ -1,0 +1,75 @@
+#pragma once
+
+#include <memory>
+
+#include <juce_gui_basics/juce_gui_basics.h>
+#include <juce_audio_processors/juce_audio_processors.h>
+
+#include "GUI/Widgets/ModulationBusCellDimensions.h"
+
+namespace tss
+{
+    class ISkin;
+    class Label;
+    class ComboBox;
+    class Slider;
+    class Button;
+    class HorizontalSeparator;
+}
+
+class WidgetFactory;
+
+class ModulationBusCell : public juce::Component
+{
+public:
+    ModulationBusCell(tss::ISkin& skin,
+                      int width,
+                      int height,
+                      const ModulationBusCellDimensions& dimensions,
+                      int busNumber,
+                      WidgetFactory& factory,
+                      juce::AudioProcessorValueTreeState& apvts,
+                      const juce::String& sourceParamId,
+                      const juce::String& amountParamId,
+                      const juce::String& destinationParamId,
+                      const juce::String& busId);
+    ~ModulationBusCell() override;
+
+    void resized() override;
+    void setSkin(tss::ISkin& skin);
+    void setUiScale(float uiScale);
+    int getHeight() const { return dimensions_.panelHeight; }
+
+private:
+    ModulationBusCellDimensions dimensions_;
+    void createBusNumberLabel(int busNumber, tss::ISkin& skin);
+    void createSourceComboBox(WidgetFactory& factory, tss::ISkin& skin, const juce::String& sourceParamId, juce::AudioProcessorValueTreeState& apvts);
+    void createAmountSlider(WidgetFactory& factory, tss::ISkin& skin, const juce::String& amountParamId, juce::AudioProcessorValueTreeState& apvts);
+    void createDestinationComboBox(int busNumber, tss::ISkin& skin, const juce::String& destinationParamId, juce::AudioProcessorValueTreeState& apvts);
+    void createInitButton(tss::ISkin& skin, int busNumber);
+    void createSeparator(tss::ISkin& skin);
+
+    void layoutWidgetRow();
+    void layoutSeparator(int yTop, int separatorHeight);
+
+    inline constexpr static int kGap_ = 5;
+
+    tss::ISkin* skin_;
+    float uiScale_ = 1.0f;
+
+    std::unique_ptr<tss::Label> busNumberLabel_;
+    std::unique_ptr<tss::ComboBox> sourceComboBox_;
+    std::unique_ptr<tss::Slider> amountSlider_;
+    std::unique_ptr<tss::ComboBox> destinationComboBox_;
+    std::unique_ptr<tss::Button> initButton_;
+    std::unique_ptr<tss::HorizontalSeparator> separator_;
+
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> sourceAttachment_;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> amountAttachment_;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> destinationAttachment_;
+
+    juce::AudioProcessorValueTreeState& apvts_;
+    juce::String busId_;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ModulationBusCell)
+};

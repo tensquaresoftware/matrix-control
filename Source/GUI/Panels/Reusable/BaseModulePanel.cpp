@@ -3,10 +3,10 @@
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
-#include "GUI/Panels/Reusable/ModuleHeaderPanel.h"
-#include "GUI/Panels/Reusable/ParameterPanel.h"
+#include "GUI/Widgets/ModuleHeader.h"
+#include "GUI/Widgets/ParameterCell.h"
 #include "GUI/Factories/WidgetFactory.h"
-#include "Shared/Definitions/PluginDimensions.h"
+#include "Shared/Definitions/PluginDesignDimensions.h"
 
 BaseModulePanel::BaseModulePanel(tss::ISkin& skin,
                                  WidgetFactory& widgetFactory,
@@ -20,46 +20,48 @@ BaseModulePanel::BaseModulePanel(tss::ISkin& skin,
 {
     setOpaque(false);
     
-    ModuleHeaderPanel::ButtonSet buttonSet = (config.buttonSet == ModulePanelButtonSet::InitCopyPaste)
-        ? ModuleHeaderPanel::ButtonSet::InitCopyPaste
-        : ModuleHeaderPanel::ButtonSet::InitOnly;
+    const auto buttonSet = (config.buttonSet == ModulePanelButtonSet::InitCopyPaste)
+        ? tss::ModuleHeader::ButtonSet::InitCopyPaste
+        : tss::ModuleHeader::ButtonSet::InitOnly;
     
-    ModuleHeaderPanel::ModuleType moduleType = (config.moduleType == ModulePanelModuleType::PatchEdit)
-        ? ModuleHeaderPanel::ModuleType::PatchEdit
-        : ModuleHeaderPanel::ModuleType::MasterEdit;
+    const auto columnLayout = (config.moduleType == ModulePanelModuleType::PatchEdit)
+        ? tss::ModuleHeader::ColumnLayout::PatchEdit
+        : tss::ModuleHeader::ColumnLayout::MasterEdit;
     
-    moduleHeaderPanel_ = std::make_unique<ModuleHeaderPanel>(
+    const tss::ModuleHeader::WithActionsSpec spec {
         skin,
         widgetFactory,
+        apvts,
         config.moduleId,
+        columnLayout,
         buttonSet,
-        moduleType,
-        apvts_,
         config.initWidgetId,
         config.copyWidgetId,
-        config.pasteWidgetId);
-    addAndMakeVisible(*moduleHeaderPanel_);
+        config.pasteWidgetId
+    };
+    moduleHeader_ = std::make_unique<tss::ModuleHeader>(spec);
+    addAndMakeVisible(*moduleHeader_);
 
     for (const auto& paramConfig : config.parameters)
     {
-        ParameterPanel::ParameterType paramType = ParameterPanel::ParameterType::None;
+        ParameterCell::ParameterType paramType = ParameterCell::ParameterType::None;
         if (paramConfig.parameterType == ModulePanelParameterType::Slider)
-            paramType = ParameterPanel::ParameterType::Slider;
+            paramType = ParameterCell::ParameterType::Slider;
         else if (paramConfig.parameterType == ModulePanelParameterType::ComboBox)
-            paramType = ParameterPanel::ParameterType::ComboBox;
-        
-        ParameterPanel::ModuleType modType = (config.moduleType == ModulePanelModuleType::PatchEdit)
-            ? ParameterPanel::ModuleType::PatchEdit
-            : ParameterPanel::ModuleType::MasterEdit;
-        
-        parameterPanels_.push_back(std::make_unique<ParameterPanel>(
+            paramType = ParameterCell::ParameterType::ComboBox;
+
+        ParameterCell::ModuleType modType = (config.moduleType == ModulePanelModuleType::PatchEdit)
+            ? ParameterCell::ModuleType::PatchEdit
+            : ParameterCell::ModuleType::MasterEdit;
+
+        parameterCells_.push_back(std::make_unique<ParameterCell>(
             skin,
             widgetFactory,
             paramConfig.parameterId,
             paramType,
             modType,
             apvts_));
-        addAndMakeVisible(*parameterPanels_.back());
+        addAndMakeVisible(*parameterCells_.back());
     }
 
     setSize(width, height);
@@ -71,25 +73,26 @@ void BaseModulePanel::resized()
 {
     auto bounds = getLocalBounds();
 
-    if (auto* header = moduleHeaderPanel_.get())
+    if (auto* header = moduleHeader_.get())
     {
-        const int headerHeight = tss::ScaledLayout::scaledInt(static_cast<float>(ModuleHeaderPanel::getHeight()), displayScale_);
+        const int headerHeight = tss::ScaledLayout::scaledInt(
+            static_cast<float>(tss::ModuleHeader::getDesignHeight()), uiScale_);
         header->setBounds(bounds.removeFromTop(headerHeight));
     }
 
-    const size_t paramCount = parameterPanels_.size();
+    const size_t paramCount = parameterCells_.size();
     if (paramCount == 0)
         return;
 
-    const int designRowTotal = PluginDimensions::Widgets::Heights::kLabel + PluginDimensions::Widgets::Heights::kHorizontalSeparator;
+    const int designRowTotal = PluginDesignDimensions::Widgets::Heights::kLabel + PluginDesignDimensions::Widgets::Heights::kHorizontalSeparator;
     const auto rowHeights = tss::ScaledLayout::distributeFixedDesignRowsWithRemainderAtBottom(
-        bounds.getHeight(), paramCount, designRowTotal, displayScale_);
+        bounds.getHeight(), paramCount, designRowTotal, uiScale_);
 
     int y = bounds.getY();
     for (size_t i = 0; i < paramCount; ++i)
     {
-        if (auto* panel = parameterPanels_[i].get())
-            panel->setBounds(bounds.getX(), y, bounds.getWidth(), rowHeights[i]);
+        if (auto* cell = parameterCells_[i].get())
+            cell->setBounds(bounds.getX(), y, bounds.getWidth(), rowHeights[i]);
         y += rowHeights[i];
     }
 }
@@ -97,36 +100,36 @@ void BaseModulePanel::resized()
 void BaseModulePanel::setSkin(tss::ISkin& skin)
 {
     skin_ = &skin;
-    tss::propagateSkin(skin, moduleHeaderPanel_.get());
+    tss::propagateSkin(skin, moduleHeader_.get());
 
-    for (auto& paramPanel : parameterPanels_)
-        tss::propagateSkin(skin, paramPanel.get());
+    for (auto& cell : parameterCells_)
+        tss::propagateSkin(skin, cell.get());
 }
 
-void BaseModulePanel::setDisplayScale(float displayScale)
+void BaseModulePanel::setUiScale(float uiScale)
 {
-    if (juce::approximatelyEqual(displayScale_, displayScale))
+    if (juce::approximatelyEqual(uiScale_, uiScale))
         return;
     
-    displayScale_ = displayScale;
+    uiScale_ = uiScale;
     
-    if (moduleHeaderPanel_)
-        moduleHeaderPanel_->setDisplayScale(displayScale_);
+    if (moduleHeader_)
+        moduleHeader_->setUiScale(uiScale_);
     
-    for (auto& paramPanel : parameterPanels_)
+    for (auto& cell : parameterCells_)
     {
-        if (paramPanel)
-            paramPanel->setDisplayScale(displayScale_);
+        if (cell)
+            cell->setUiScale(uiScale_);
     }
     
     resized();
     repaint();
 }
 
-ParameterPanel* BaseModulePanel::getParameterPanelAt(size_t index)
+ParameterCell* BaseModulePanel::getParameterCellAt(size_t index)
 {
-    if (index >= parameterPanels_.size())
+    if (index >= parameterCells_.size())
         return nullptr;
-    
-    return parameterPanels_[index].get();
+
+    return parameterCells_[index].get();
 }

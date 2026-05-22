@@ -19,12 +19,12 @@ namespace tss
             ButtonLike
         };
 
-        explicit ComboBox(int width, int height, Style style = Style::Standard);
+        explicit ComboBox(int width, int height, const ComboBoxLook& look, Style style = Style::Standard);
         ~ComboBox() override = default;
 
         void setLook(const ComboBoxLook& look);
         void setPopupMenuLook(const PopupMenuLook& look);
-        void setDisplayScale(float displayScale);
+        void setUiScale(float uiScale);
 
         void paint(juce::Graphics& g) override;
         void showPopup() override;
@@ -34,7 +34,7 @@ namespace tss
         void focusGained(juce::Component::FocusChangeType cause) override;
         void focusLost(juce::Component::FocusChangeType cause) override;
 
-        float getDisplayScale() const { return displayScale_; }
+        float getUiScale() const { return uiScale_; }
         const PopupMenuLook& getPopupMenuLook() const { return popupLook_; }
         int getBaseComponentWidth() const { return width_; }
         int getBaseComponentHeight() const { return height_; }
@@ -54,7 +54,6 @@ namespace tss
         inline constexpr static int kBorderThicknessButtonLike_ = 2;
         inline constexpr static int kTriangleBaseSize_ = 7;
         inline constexpr static float kTriangleHeightFactor_ = 0.8660254f;
-        inline constexpr static float kFontSize_ = 14.0f;
 
         ComboBoxLook look_{};
         PopupMenuLook popupLook_{};
@@ -63,7 +62,7 @@ namespace tss
         Style style_;
         bool isPopupOpen_ = false;
         bool hasFocus_ = false;
-        float displayScale_ = 1.0f;
+        float uiScale_ = 1.0f;
 
         void drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);
         void drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);

@@ -3,24 +3,24 @@
 #include <vector>
 
 #include "GUI/Layout/ScaledLayout.h"
-#include "TopPanel/TopPanel.h"
-#include "TopPanel/Modules/FmTrackPanel.h"
-#include "MiddlePanel/MiddlePanel.h"
-#include "BottomPanel/BottomPanel.h"
-#include "BottomPanel/Modules/Env1Panel.h"
-#include "BottomPanel/Modules/Env2Panel.h"
-#include "BottomPanel/Modules/Env3Panel.h"
+#include "PatchEditTopModulesPanel/PatchEditTopModulesPanel.h"
+#include "PatchEditTopModulesPanel/Modules/FmTrackPanel.h"
+#include "PatchEditDisplaysPanel/PatchEditDisplaysPanel.h"
+#include "PatchEditBottomModulesPanel/PatchEditBottomModulesPanel.h"
+#include "PatchEditBottomModulesPanel/Modules/Env1Panel.h"
+#include "PatchEditBottomModulesPanel/Modules/Env2Panel.h"
+#include "PatchEditBottomModulesPanel/Modules/Env3Panel.h"
 
 #include "GUI/Looks/LookBuilders.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Widgets/SectionHeader.h"
 #include "GUI/Panels/Reusable/BaseModulePanel.h"
-#include "GUI/Panels/Reusable/ParameterPanel.h"
+#include "GUI/Widgets/ParameterCell.h"
 #include "GUI/Widgets/Slider.h"
 #include "Shared/Definitions/PluginDescriptors.h"
 #include "Shared/Definitions/PluginHelpers.h"
-#include "Shared/Definitions/PluginDimensions.h"
+#include "Shared/Definitions/PluginDesignDimensions.h"
 #include "GUI/Factories/WidgetFactory.h"
 
 
@@ -45,23 +45,24 @@ PatchEditPanel::~PatchEditPanel()
 PatchEditPanel::PatchEditPanel(tss::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : width_(width)
     , height_(height)
-    , topPanelHeight_(PluginDimensions::Panels::Body::PatchEditSection::TopModules::kHeight)
-    , middlePanelHeight_(PluginDimensions::Panels::Body::PatchEditSection::MiddleModules::kHeight)
-    , bottomPanelHeight_(PluginDimensions::Panels::Body::PatchEditSection::BottomModules::kHeight)
+    , topPanelHeight_(PluginDesignDimensions::Panels::Body::PatchEditSection::TopModules::kHeight)
+    , middlePanelHeight_(PluginDesignDimensions::Panels::Body::PatchEditSection::MiddleModules::kHeight)
+    , bottomPanelHeight_(PluginDesignDimensions::Panels::Body::PatchEditSection::BottomModules::kHeight)
     , skin_(&skin)
     , sectionHeader_(std::make_unique<tss::SectionHeader>(
-        PluginDimensions::Widgets::Widths::SectionHeader::kPatchEdit,
-        PluginDimensions::Widgets::Heights::kSectionHeader,
+        PluginDesignDimensions::Widgets::Widths::SectionHeader::kPatchEdit,
+        PluginDesignDimensions::Widgets::Heights::kSectionHeader,
+        tss::sectionHeaderLookFromSkin(skin),
         PluginHelpers::getSectionDisplayName(PluginIDs::PatchEditSection::kGroupId)))
-    , topPanel_(std::make_unique<TopPanel>(skin, width, topPanelHeight_, widgetFactory, apvts))
-    , middlePanel_(std::make_unique<MiddlePanel>(skin, width, middlePanelHeight_, apvts))
-    , bottomPanel_(std::make_unique<BottomPanel>(skin, width, bottomPanelHeight_, widgetFactory, apvts))
+    , patchEditTopModulesPanel_(std::make_unique<PatchEditTopModulesPanel>(skin, width, topPanelHeight_, widgetFactory, apvts))
+    , patchEditDisplaysPanel_(std::make_unique<PatchEditDisplaysPanel>(skin, width, middlePanelHeight_, apvts))
+    , patchEditBottomModulesPanel_(std::make_unique<PatchEditBottomModulesPanel>(skin, width, bottomPanelHeight_, widgetFactory, apvts))
 {
     setOpaque(false);
     addAndMakeVisible(*sectionHeader_);
-    addAndMakeVisible(*topPanel_);
-    addAndMakeVisible(*middlePanel_);
-    addAndMakeVisible(*bottomPanel_);
+    addAndMakeVisible(*patchEditTopModulesPanel_);
+    addAndMakeVisible(*patchEditDisplaysPanel_);
+    addAndMakeVisible(*patchEditBottomModulesPanel_);
 
     setupTrackPointSliderConnections();
     setupEnvelopeSliderConnections();
@@ -72,10 +73,10 @@ PatchEditPanel::PatchEditPanel(tss::ISkin& skin, int width, int height, WidgetFa
 void PatchEditPanel::resized()
 {
     const auto bounds = getLocalBounds();
-    const float sf = displayScale_;
+    const float sf = uiScale_;
 
     const std::vector<int> designHeights {
-        PluginDimensions::Widgets::Heights::kSectionHeader,
+        PluginDesignDimensions::Widgets::Heights::kSectionHeader,
         topPanelHeight_,
         middlePanelHeight_,
         bottomPanelHeight_
@@ -85,11 +86,11 @@ void PatchEditPanel::resized()
     int y = bounds.getY();
     sectionHeader_->setBounds(bounds.getX(), y, bounds.getWidth(), heights[0]);
     y += heights[0];
-    topPanel_->setBounds(bounds.getX(), y, bounds.getWidth(), heights[1]);
+    patchEditTopModulesPanel_->setBounds(bounds.getX(), y, bounds.getWidth(), heights[1]);
     y += heights[1];
-    middlePanel_->setBounds(bounds.getX(), y, bounds.getWidth(), heights[2]);
+    patchEditDisplaysPanel_->setBounds(bounds.getX(), y, bounds.getWidth(), heights[2]);
     y += heights[2];
-    bottomPanel_->setBounds(bounds.getX(), y, bounds.getWidth(), heights[3]);
+    patchEditBottomModulesPanel_->setBounds(bounds.getX(), y, bounds.getWidth(), heights[3]);
 }
 
 void PatchEditPanel::setSkin(tss::ISkin& skin)
@@ -97,26 +98,26 @@ void PatchEditPanel::setSkin(tss::ISkin& skin)
     skin_ = &skin;
     sectionHeader_->setLook(tss::sectionHeaderLookFromSkin(skin));
     tss::propagateSkin(skin,
-        topPanel_.get(),
-        middlePanel_.get(),
-        bottomPanel_.get());
+        patchEditTopModulesPanel_.get(),
+        patchEditDisplaysPanel_.get(),
+        patchEditBottomModulesPanel_.get());
 }
 
-void PatchEditPanel::setDisplayScale(float displayScale)
+void PatchEditPanel::setUiScale(float uiScale)
 {
-    if (juce::approximatelyEqual(displayScale_, displayScale))
+    if (juce::approximatelyEqual(uiScale_, uiScale))
         return;
     
-    displayScale_ = displayScale;
+    uiScale_ = uiScale;
     
     if (sectionHeader_)
-        sectionHeader_->setDisplayScale(displayScale_);
-    if (topPanel_)
-        topPanel_->setDisplayScale(displayScale_);
-    if (middlePanel_)
-        middlePanel_->setDisplayScale(displayScale_);
-    if (bottomPanel_)
-        bottomPanel_->setDisplayScale(displayScale_);
+        sectionHeader_->setUiScale(uiScale_);
+    if (patchEditTopModulesPanel_)
+        patchEditTopModulesPanel_->setUiScale(uiScale_);
+    if (patchEditDisplaysPanel_)
+        patchEditDisplaysPanel_->setUiScale(uiScale_);
+    if (patchEditBottomModulesPanel_)
+        patchEditBottomModulesPanel_->setUiScale(uiScale_);
     
     resized();
     repaint();
@@ -124,10 +125,10 @@ void PatchEditPanel::setDisplayScale(float displayScale)
 
 void PatchEditPanel::setupTrackPointSliderConnections()
 {
-    if (topPanel_ == nullptr || middlePanel_ == nullptr)
+    if (patchEditTopModulesPanel_ == nullptr || patchEditDisplaysPanel_ == nullptr)
         return;
-    
-    auto* fmTrackPanel = topPanel_->getFmTrackPanel();
+
+    auto* fmTrackPanel = patchEditTopModulesPanel_->getFmTrackPanel();
     if (fmTrackPanel == nullptr)
         return;
     
@@ -135,9 +136,9 @@ void PatchEditPanel::setupTrackPointSliderConnections()
     {
         const size_t parameterPanelIndex = static_cast<size_t>(kTrackPointSliderStartIndex_ + i);
         
-        if (auto* paramPanel = fmTrackPanel->getParameterPanelAt(parameterPanelIndex))
+        if (auto* paramCell = fmTrackPanel->getParameterCellAt(parameterPanelIndex))
         {
-            if (auto* slider = paramPanel->getSlider())
+            if (auto* slider = paramCell->getSlider())
             {
                 trackPointSliders_[static_cast<size_t>(i)] = slider;
                 slider->addListener(this);
@@ -145,7 +146,7 @@ void PatchEditPanel::setupTrackPointSliderConnections()
         }
     }
     
-    middlePanel_->getTrackGeneratorDisplay().setOnValueChanged([this](int pointIndex, int newValue)
+    patchEditDisplaysPanel_->getTrackGeneratorDisplay().setOnValueChanged([this](int pointIndex, int newValue)
     {
         if (pointIndex < 0 || pointIndex >= kTrackPointSliderCount_)
             return;
@@ -157,12 +158,12 @@ void PatchEditPanel::setupTrackPointSliderConnections()
 
 void PatchEditPanel::setupEnvelopeSliderConnections()
 {
-    if (bottomPanel_ == nullptr || middlePanel_ == nullptr)
+    if (patchEditBottomModulesPanel_ == nullptr || patchEditDisplaysPanel_ == nullptr)
         return;
-    
-    auto* env1Panel = bottomPanel_->getEnv1Panel();
-    auto* env2Panel = bottomPanel_->getEnv2Panel();
-    auto* env3Panel = bottomPanel_->getEnv3Panel();
+
+    auto* env1Panel = patchEditBottomModulesPanel_->getEnv1Panel();
+    auto* env2Panel = patchEditBottomModulesPanel_->getEnv2Panel();
+    auto* env3Panel = patchEditBottomModulesPanel_->getEnv3Panel();
     
     if (env1Panel == nullptr || env2Panel == nullptr || env3Panel == nullptr)
         return;
@@ -173,9 +174,9 @@ void PatchEditPanel::setupEnvelopeSliderConnections()
     {
         for (int paramIndex = 0; paramIndex < kEnvParamCount_; ++paramIndex)
         {
-            if (auto* paramPanel = envPanels[envIndex]->getParameterPanelAt(static_cast<size_t>(paramIndex)))
+            if (auto* paramCell = envPanels[envIndex]->getParameterCellAt(static_cast<size_t>(paramIndex)))
             {
-                if (auto* slider = paramPanel->getSlider())
+                if (auto* slider = paramCell->getSlider())
                 {
                     envSliders_[static_cast<size_t>(envIndex)][static_cast<size_t>(paramIndex)] = slider;
                     slider->addListener(this);
@@ -184,7 +185,7 @@ void PatchEditPanel::setupEnvelopeSliderConnections()
         }
     }
     
-    middlePanel_->getEnvelope1Display().setOnValueChanged([this](int paramIndex, int newValue)
+    patchEditDisplaysPanel_->getEnvelope1Display().setOnValueChanged([this](int paramIndex, int newValue)
     {
         if (paramIndex < 0 || paramIndex >= kEnvParamCount_)
             return;
@@ -193,7 +194,7 @@ void PatchEditPanel::setupEnvelopeSliderConnections()
             slider->setValue(static_cast<double>(newValue), juce::sendNotificationSync);
     });
     
-    middlePanel_->getEnvelope2Display().setOnValueChanged([this](int paramIndex, int newValue)
+    patchEditDisplaysPanel_->getEnvelope2Display().setOnValueChanged([this](int paramIndex, int newValue)
     {
         if (paramIndex < 0 || paramIndex >= kEnvParamCount_)
             return;
@@ -202,7 +203,7 @@ void PatchEditPanel::setupEnvelopeSliderConnections()
             slider->setValue(static_cast<double>(newValue), juce::sendNotificationSync);
     });
     
-    middlePanel_->getEnvelope3Display().setOnValueChanged([this](int paramIndex, int newValue)
+    patchEditDisplaysPanel_->getEnvelope3Display().setOnValueChanged([this](int paramIndex, int newValue)
     {
         if (paramIndex < 0 || paramIndex >= kEnvParamCount_)
             return;
@@ -214,15 +215,15 @@ void PatchEditPanel::setupEnvelopeSliderConnections()
 
 void PatchEditPanel::sliderValueChanged(juce::Slider* slider)
 {
-    if (middlePanel_ == nullptr)
+    if (patchEditDisplaysPanel_ == nullptr)
         return;
-    
+
     for (size_t i = 0; i < trackPointSliders_.size(); ++i)
     {
         if (trackPointSliders_[i] == slider)
         {
             const int value = static_cast<int>(slider->getValue());
-            auto& display = middlePanel_->getTrackGeneratorDisplay();
+            auto& display = patchEditDisplaysPanel_->getTrackGeneratorDisplay();
             
             switch (static_cast<int>(i))
             {
@@ -248,11 +249,11 @@ void PatchEditPanel::sliderValueChanged(juce::Slider* slider)
                 
                 tss::EnvelopeDisplay* display = nullptr;
                 if (envIndex == 0)
-                    display = &middlePanel_->getEnvelope1Display();
+                    display = &patchEditDisplaysPanel_->getEnvelope1Display();
                 else if (envIndex == 1)
-                    display = &middlePanel_->getEnvelope2Display();
+                    display = &patchEditDisplaysPanel_->getEnvelope2Display();
                 else if (envIndex == 2)
-                    display = &middlePanel_->getEnvelope3Display();
+                    display = &patchEditDisplaysPanel_->getEnvelope3Display();
                 
                 if (display == nullptr)
                     return;

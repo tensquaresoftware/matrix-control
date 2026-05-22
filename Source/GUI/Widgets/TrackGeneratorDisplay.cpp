@@ -2,8 +2,9 @@
 
 namespace tss
 {
-    TrackGeneratorDisplay::TrackGeneratorDisplay(int width, int height)
-        : width_(width)
+    TrackGeneratorDisplay::TrackGeneratorDisplay(int width, int height, const TrackGeneratorDisplayLook& look)
+        : look_(look)
+        , width_(width)
         , height_(height)
     {
         setOpaque(false);
@@ -16,20 +17,20 @@ namespace tss
         repaint();
     }
 
-    void TrackGeneratorDisplay::setDisplayScale(float displayScale)
+    void TrackGeneratorDisplay::setUiScale(float uiScale)
     {
-        if (juce::approximatelyEqual(displayScale_, displayScale))
+        if (juce::approximatelyEqual(uiScale_, uiScale))
             return;
         
-        displayScale_ = displayScale;
+        uiScale_ = uiScale;
         repaint();
     }
 
     void TrackGeneratorDisplay::paint(juce::Graphics& g)
     {
         const auto bounds = getLocalBounds().toFloat();
-        const auto contentBounds = bounds.withTrimmedTop(static_cast<float>(kWidgetPaddingTop_) * displayScale_)
-            .withTrimmedBottom(static_cast<float>(kWidgetPaddingBottom_) * displayScale_);
+        const auto contentBounds = bounds.withTrimmedTop(static_cast<float>(kWidgetPaddingTop_) * uiScale_)
+            .withTrimmedBottom(static_cast<float>(kWidgetPaddingBottom_) * uiScale_);
 
         drawBackground(g, contentBounds);
         drawBorder(g, contentBounds);
@@ -52,13 +53,13 @@ namespace tss
     void TrackGeneratorDisplay::drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
         g.setColour(look_.border);
-        g.drawRect(bounds, std::max(1.0f, static_cast<float>(kWidgetBorderThickness_) * displayScale_));
+        g.drawRect(bounds, std::max(1.0f, static_cast<float>(kWidgetBorderThickness_) * uiScale_));
     }
 
     void TrackGeneratorDisplay::drawTriangle(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
         const auto triangleColour = look_.border;
-        const float triangleBase = kWidgetTriangleBase_ * displayScale_;
+        const float triangleBase = kWidgetTriangleBase_ * uiScale_;
         const float triangleHeight = triangleBase * std::sqrt(3.0f) * 0.5f;
         const float centreX = bounds.getCentreX();
         const float baseY = bounds.getY();
@@ -180,7 +181,7 @@ namespace tss
         if (centerBounds.getWidth() <= 0.0f || centerBounds.getHeight() <= 0.0f)
             return;
 
-        const float lineThickness = std::max(1.0f, kCurveLineThickness_ * displayScale_);
+        const float lineThickness = std::max(1.0f, kCurveLineThickness_ * uiScale_);
         
         g.setColour(look_.curve);
 
@@ -196,7 +197,7 @@ namespace tss
         }
         
         const auto hollowPointFillColour = look_.curve.withAlpha(0.4f);
-        const float pointRadius = kCurvePointRadius_ * displayScale_;
+        const float pointRadius = kCurvePointRadius_ * uiScale_;
 
         for (int i = 0; i < kCurvePointCount_; ++i)
         {
@@ -215,7 +216,7 @@ namespace tss
     
     juce::Rectangle<float> TrackGeneratorDisplay::getCurveCenterBounds(const juce::Rectangle<float>& innerBounds) const
     {
-        const float totalPadding = (kCurvePadding_ + static_cast<float>(kWidgetBorderThickness_)) * displayScale_;
+        const float totalPadding = (kCurvePadding_ + static_cast<float>(kWidgetBorderThickness_)) * uiScale_;
         return innerBounds.reduced(totalPadding);
     }
 
@@ -242,7 +243,7 @@ namespace tss
                                                     const juce::Rectangle<float>& innerBounds) const
     {
         const auto centerBounds = getCurveCenterBounds(innerBounds);
-        const float hitZoneRadius = kPointHitZoneRadius_ * displayScale_;
+        const float hitZoneRadius = kPointHitZoneRadius_ * uiScale_;
 
         for (int i = 0; i < kCurvePointCount_; ++i)
         {
@@ -259,8 +260,8 @@ namespace tss
     void TrackGeneratorDisplay::mouseDown(const juce::MouseEvent& e)
     {
         const auto bounds = getLocalBounds().toFloat();
-        const auto innerBounds = bounds.withTrimmedTop(static_cast<float>(kWidgetPaddingTop_) * displayScale_)
-            .withTrimmedBottom(static_cast<float>(kWidgetPaddingBottom_) * displayScale_);
+        const auto innerBounds = bounds.withTrimmedTop(static_cast<float>(kWidgetPaddingTop_) * uiScale_)
+            .withTrimmedBottom(static_cast<float>(kWidgetPaddingBottom_) * uiScale_);
 
         draggedPointIndex_ = findPointAtPosition(e.position, innerBounds);
     }
@@ -271,8 +272,8 @@ namespace tss
             return;
         
         const auto bounds = getLocalBounds().toFloat();
-        const auto innerBounds = bounds.withTrimmedTop(static_cast<float>(kWidgetPaddingTop_) * displayScale_)
-            .withTrimmedBottom(static_cast<float>(kWidgetPaddingBottom_) * displayScale_);
+        const auto innerBounds = bounds.withTrimmedTop(static_cast<float>(kWidgetPaddingTop_) * uiScale_)
+            .withTrimmedBottom(static_cast<float>(kWidgetPaddingBottom_) * uiScale_);
         const auto centerBounds = getCurveCenterBounds(innerBounds);
 
         const float relativeY = e.position.y - centerBounds.getY();

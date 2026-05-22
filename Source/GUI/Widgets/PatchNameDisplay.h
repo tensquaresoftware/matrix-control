@@ -9,11 +9,11 @@ namespace tss
     class PatchNameDisplay : public juce::Component
     {
     public:
-        explicit PatchNameDisplay(int width, int height);
+        explicit PatchNameDisplay(int width, int height, const PatchNameDisplayLook& look);
         ~PatchNameDisplay() override = default;
 
         void setLook(const PatchNameDisplayLook& look);
-        void setDisplayScale(float displayScale);
+        void setUiScale(float uiScale);
         void setPatchName(const juce::String& patchName);
 
         void paint(juce::Graphics& g) override;
@@ -23,13 +23,12 @@ namespace tss
 
     private:
         inline constexpr static int kBorderThickness_ = 2;
-        inline constexpr static float kFontHeight_ = 28.0f;
 
         PatchNameDisplayLook look_{};
         int width_;
         int height_;
         juce::String patchName_;
-        float displayScale_ = 1.0f;
+        float uiScale_ = 1.0f;
 
         void drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds);

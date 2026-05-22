@@ -1,18 +1,15 @@
 #include "BodyPanel.h"
 
-#include <vector>
-
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Looks/LookBuilders.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Widgets/VerticalSeparator.h"
 #include "PatchEditPanel/PatchEditPanel.h"
-#include "MatrixModulationPanel/MatrixModulationPanel.h"
 #include "MasterEditPanel/MasterEditPanel.h"
-#include "PatchManagerPanel/PatchManagerPanel.h"
+#include "SharedPanel/SharedPanel.h"
 #include "GUI/Factories/WidgetFactory.h"
-#include "Shared/Definitions/PluginDimensions.h"
+#include "Shared/Definitions/PluginDesignDimensions.h"
 
 using tss::SkinColourId;
 
@@ -21,15 +18,11 @@ using ::tss::VerticalSeparator;
 BodyPanel::BodyPanel(tss::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : width_(width)
     , height_(height)
-    , padding_(PluginDimensions::Panels::Body::kPadding)
-    , patchEditPanelWidth_(PluginDimensions::Panels::Body::PatchEditSection::kWidth)
-    , patchEditPanelHeight_(PluginDimensions::Panels::Body::PatchEditSection::kHeight)
-    , matrixModulationPanelWidth_(PluginDimensions::Panels::Body::MatrixModulationSection::kWidth)
-    , matrixModulationPanelHeight_(PluginDimensions::Panels::Body::MatrixModulationSection::kHeight)
-    , patchManagerPanelWidth_(PluginDimensions::Panels::Body::PatchManagerSection::kWidth)
-    , patchManagerPanelHeight_(PluginDimensions::Panels::Body::PatchManagerSection::kHeight)
-    , masterEditPanelWidth_(PluginDimensions::Panels::Body::MasterEditSection::kWidth)
-    , masterEditPanelHeight_(PluginDimensions::Panels::Body::MasterEditSection::kHeight)
+    , padding_(PluginDesignDimensions::Panels::Body::kPadding)
+    , patchEditPanelWidth_(PluginDesignDimensions::Panels::Body::PatchEditSection::kWidth)
+    , patchEditPanelHeight_(PluginDesignDimensions::Panels::Body::PatchEditSection::kHeight)
+    , masterEditPanelWidth_(PluginDesignDimensions::Panels::Body::MasterEditSection::kWidth)
+    , masterEditPanelHeight_(PluginDesignDimensions::Panels::Body::MasterEditSection::kHeight)
     , skin_(&skin)
 {
     setOpaque(true);
@@ -37,21 +30,22 @@ BodyPanel::BodyPanel(tss::ISkin& skin, int width, int height, WidgetFactory& wid
     addAndMakeVisible(*patchEditPanel_);
 
     verticalSeparator1_ = std::make_unique<VerticalSeparator>(
-        PluginDimensions::Widgets::Widths::VerticalSeparator::kStandard,
-        PluginDimensions::Widgets::Heights::kVerticalSeparator
-    );
+        PluginDesignDimensions::Widgets::Widths::VerticalSeparator::kStandard,
+        PluginDesignDimensions::Widgets::Heights::kVerticalSeparator,
+        tss::verticalSeparatorLookFromSkin(skin));
     addAndMakeVisible(*verticalSeparator1_);
 
-    matrixModulationPanel_ = std::make_unique<MatrixModulationPanel>(skin, matrixModulationPanelWidth_, matrixModulationPanelHeight_, widgetFactory, apvts);
-    addAndMakeVisible(*matrixModulationPanel_);
-
-    patchManagerPanel_ = std::make_unique<PatchManagerPanel>(skin, patchManagerPanelWidth_, patchManagerPanelHeight_, widgetFactory, apvts);
-    addAndMakeVisible(*patchManagerPanel_);
+    sharedPanel_ = std::make_unique<SharedPanel>(
+        skin,
+        PluginDesignDimensions::Panels::Body::SharedColumn::kWidth,
+        widgetFactory,
+        apvts);
+    addAndMakeVisible(*sharedPanel_);
 
     verticalSeparator2_ = std::make_unique<VerticalSeparator>(
-        PluginDimensions::Widgets::Widths::VerticalSeparator::kStandard,
-        PluginDimensions::Widgets::Heights::kVerticalSeparator
-    );
+        PluginDesignDimensions::Widgets::Widths::VerticalSeparator::kStandard,
+        PluginDesignDimensions::Widgets::Heights::kVerticalSeparator,
+        tss::verticalSeparatorLookFromSkin(skin));
     addAndMakeVisible(*verticalSeparator2_);
 
     masterEditPanel_ = std::make_unique<MasterEditPanel>(skin, masterEditPanelWidth_, masterEditPanelHeight_, widgetFactory, apvts);
@@ -69,41 +63,35 @@ void BodyPanel::paint(juce::Graphics& g)
 void BodyPanel::resized()
 {
     const auto bounds = getLocalBounds();
-    const float sf = displayScale_;
+    const float sf = uiScale_;
 
     const int padding              = tss::ScaledLayout::scaledInt(static_cast<float>(padding_), sf);
     const int patchEditPanelWidth  = tss::ScaledLayout::scaledInt(static_cast<float>(patchEditPanelWidth_), sf);
     const int patchEditPanelHeight = tss::ScaledLayout::scaledInt(static_cast<float>(patchEditPanelHeight_), sf);
-    const int matrixW              = tss::ScaledLayout::scaledInt(static_cast<float>(matrixModulationPanelWidth_), sf);
-    const int patchManagerW        = tss::ScaledLayout::scaledInt(static_cast<float>(patchManagerPanelWidth_), sf);
+    const int sharedColumnW        = tss::ScaledLayout::scaledInt(
+        static_cast<float>(PluginDesignDimensions::Panels::Body::SharedColumn::kWidth), sf);
     const int masterEditW          = tss::ScaledLayout::scaledInt(static_cast<float>(masterEditPanelWidth_), sf);
     const int masterEditH          = tss::ScaledLayout::scaledInt(static_cast<float>(masterEditPanelHeight_), sf);
     const int separatorW           = tss::ScaledLayout::scaledInt(
-        static_cast<float>(PluginDimensions::Widgets::Widths::VerticalSeparator::kStandard), sf);
+        static_cast<float>(PluginDesignDimensions::Widgets::Widths::VerticalSeparator::kStandard), sf);
     const int separatorH           = tss::ScaledLayout::scaledInt(
-        static_cast<float>(PluginDimensions::Widgets::Heights::kVerticalSeparator), sf);
+        static_cast<float>(PluginDesignDimensions::Widgets::Heights::kVerticalSeparator), sf);
 
     const int contentHeight = bounds.getHeight() - 2 * padding;
-    const std::vector<int> columnDesignHeights { matrixModulationPanelHeight_, patchManagerPanelHeight_ };
-    const auto columnHeights = tss::ScaledLayout::distributeHeights(contentHeight, columnDesignHeights, sf, 1);
-    const int matrixH = columnHeights[0];
-    const int patchManagerH = columnHeights[1];
 
     // All X positions computed independently from float origin to avoid rounding accumulation.
     const float originX = static_cast<float>(bounds.getX() + padding);
     const int patchEditX        = bounds.getX() + padding;
     const int separator1X       = juce::roundToInt(originX + static_cast<float>(patchEditPanelWidth_) * sf);
-    const int matrixX           = juce::roundToInt(originX + static_cast<float>(patchEditPanelWidth_ + PluginDimensions::Widgets::Widths::VerticalSeparator::kStandard) * sf);
-    const int separator2X       = juce::roundToInt(originX + static_cast<float>(patchEditPanelWidth_ + PluginDimensions::Widgets::Widths::VerticalSeparator::kStandard + matrixModulationPanelWidth_) * sf);
-    const int masterEditX       = juce::roundToInt(originX + static_cast<float>(patchEditPanelWidth_ + PluginDimensions::Widgets::Widths::VerticalSeparator::kStandard + matrixModulationPanelWidth_ + PluginDimensions::Widgets::Widths::VerticalSeparator::kStandard) * sf);
+    const int sharedColumnX       = juce::roundToInt(originX + static_cast<float>(patchEditPanelWidth_ + PluginDesignDimensions::Widgets::Widths::VerticalSeparator::kStandard) * sf);
+    const int separator2X       = juce::roundToInt(originX + static_cast<float>(patchEditPanelWidth_ + PluginDesignDimensions::Widgets::Widths::VerticalSeparator::kStandard + PluginDesignDimensions::Panels::Body::SharedColumn::kWidth) * sf);
+    const int masterEditX       = juce::roundToInt(originX + static_cast<float>(patchEditPanelWidth_ + PluginDesignDimensions::Widgets::Widths::VerticalSeparator::kStandard + PluginDesignDimensions::Panels::Body::SharedColumn::kWidth + PluginDesignDimensions::Widgets::Widths::VerticalSeparator::kStandard) * sf);
 
     const int topY = bounds.getY() + padding;
-    const int patchManagerY = topY + matrixH;
 
     patchEditPanel_->setBounds(patchEditX, topY, patchEditPanelWidth, patchEditPanelHeight);
     verticalSeparator1_->setBounds(separator1X, topY, separatorW, separatorH);
-    matrixModulationPanel_->setBounds(matrixX, topY, matrixW, matrixH);
-    patchManagerPanel_->setBounds(matrixX, patchManagerY, patchManagerW, patchManagerH);
+    sharedPanel_->setBounds(sharedColumnX, topY, sharedColumnW, contentHeight);
     verticalSeparator2_->setBounds(separator2X, topY, separatorW, separatorH);
     masterEditPanel_->setBounds(masterEditX, topY, masterEditW, masterEditH);
 }
@@ -115,30 +103,27 @@ void BodyPanel::setSkin(tss::ISkin& skin)
     verticalSeparator2_->setLook(tss::verticalSeparatorLookFromSkin(skin));
     tss::propagateSkin(skin,
         patchEditPanel_.get(),
-        matrixModulationPanel_.get(),
-        masterEditPanel_.get(),
-        patchManagerPanel_.get());
+        sharedPanel_.get(),
+        masterEditPanel_.get());
 }
 
-void BodyPanel::setDisplayScale(float displayScale)
+void BodyPanel::setUiScale(float uiScale)
 {
-    if (juce::approximatelyEqual(displayScale_, displayScale))
+    if (juce::approximatelyEqual(uiScale_, uiScale))
         return;
     
-    displayScale_ = displayScale;
+    uiScale_ = uiScale;
     
     if (verticalSeparator1_)
-        verticalSeparator1_->setDisplayScale(displayScale_);
+        verticalSeparator1_->setUiScale(uiScale_);
     if (verticalSeparator2_)
-        verticalSeparator2_->setDisplayScale(displayScale_);
+        verticalSeparator2_->setUiScale(uiScale_);
     if (patchEditPanel_)
-        patchEditPanel_->setDisplayScale(displayScale_);
-    if (matrixModulationPanel_)
-        matrixModulationPanel_->setDisplayScale(displayScale_);
-    if (patchManagerPanel_)
-        patchManagerPanel_->setDisplayScale(displayScale_);
+        patchEditPanel_->setUiScale(uiScale_);
+    if (sharedPanel_)
+        sharedPanel_->setUiScale(uiScale_);
     if (masterEditPanel_)
-        masterEditPanel_->setDisplayScale(displayScale_);
+        masterEditPanel_->setUiScale(uiScale_);
     
     resized();
     repaint();

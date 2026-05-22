@@ -2,8 +2,9 @@
 
 namespace tss
 {
-    VerticalSeparator::VerticalSeparator(int width, int height)
-        : width_(width)
+    VerticalSeparator::VerticalSeparator(int width, int height, const VerticalSeparatorLook& look)
+        : look_(look)
+        , width_(width)
         , height_(height)
     {
         setOpaque(false);
@@ -16,24 +17,24 @@ namespace tss
         repaint();
     }
 
-    void VerticalSeparator::setDisplayScale(float displayScale)
+    void VerticalSeparator::setUiScale(float uiScale)
     {
-        if (juce::approximatelyEqual(displayScale_, displayScale))
+        if (juce::approximatelyEqual(uiScale_, uiScale))
             return;
         
-        displayScale_ = displayScale;
+        uiScale_ = uiScale;
         repaint();
     }
 
     void VerticalSeparator::paint(juce::Graphics& g)
     {
         const auto bounds = getLocalBounds().toFloat();
-        const float lineWidth = std::max(1.0f, kLineWidth_ * displayScale_);
+        const float lineWidth = std::max(1.0f, kLineWidth_ * uiScale_);
         const auto lineX = bounds.getCentreX() - lineWidth * 0.5f;
 
         auto line = bounds;
-        line.removeFromTop(kTopPadding_ * displayScale_);
-        line.removeFromBottom(kBottomPadding_ * displayScale_);
+        line.removeFromTop(kTopPadding_ * uiScale_);
+        line.removeFromBottom(kBottomPadding_ * uiScale_);
         line.setX(lineX);
         line.setWidth(lineWidth);
 

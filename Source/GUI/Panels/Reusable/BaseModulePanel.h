@@ -12,8 +12,12 @@ namespace tss
 }
 
 class WidgetFactory;
-class ModuleHeaderPanel;
-class ParameterPanel;
+class ParameterCell;
+
+namespace tss
+{
+    class ModuleHeader;
+}
 
 enum class ModulePanelButtonSet { InitCopyPaste, InitOnly };
 enum class ModulePanelModuleType { PatchEdit, MasterEdit };
@@ -50,18 +54,18 @@ public:
 
     void resized() override;
     void setSkin(tss::ISkin& skin);
-    void setDisplayScale(float displayScale);
+    void setUiScale(float uiScale);
     
-    ParameterPanel* getParameterPanelAt(size_t index);
+    ParameterCell* getParameterCellAt(size_t index);
 
 protected:
     tss::ISkin* skin_;
     juce::AudioProcessorValueTreeState& apvts_;
     ModulePanelModuleType moduleType_;
-    float displayScale_ = 1.0f;
+    float uiScale_ = 1.0f;
 
-    std::unique_ptr<ModuleHeaderPanel> moduleHeaderPanel_;
-    std::vector<std::unique_ptr<ParameterPanel>> parameterPanels_;
+    std::unique_ptr<tss::ModuleHeader> moduleHeader_;
+    std::vector<std::unique_ptr<ParameterCell>> parameterCells_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BaseModulePanel)
 };

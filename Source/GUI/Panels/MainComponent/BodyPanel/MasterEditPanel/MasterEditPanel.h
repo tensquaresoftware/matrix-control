@@ -24,7 +24,7 @@ public:
 
     void resized() override;
     void setSkin(tss::ISkin& skin);
-    void setDisplayScale(float displayScale);
+    void setUiScale(float uiScale);
 
 private:
     int width_;
@@ -34,7 +34,7 @@ private:
     int vibratoPanelHeight_;
     int miscPanelHeight_;
     tss::ISkin* skin_;
-    float displayScale_ = 1.0f;
+    float uiScale_ = 1.0f;
 
     std::unique_ptr<tss::SectionHeader> sectionHeader_;
     std::unique_ptr<MidiPanel> midiPanel_;

@@ -11,6 +11,13 @@ namespace PluginDisplayNames
 {
     constexpr const char* kPluginName = "MATRIX-CONTROL";
 
+    namespace HeaderPanel
+    {
+        constexpr const char* kSkinLabel = "SKIN :";
+        constexpr const char* kUiScaleLabel = "SCALE :";
+        constexpr const char* kUiElementsButton = "UI Elements";
+    }
+
     namespace Units
     {
         constexpr const char* kPercent = "%";
@@ -38,6 +45,7 @@ namespace PluginDisplayNames
             constexpr const char* k100 = "100%";
             constexpr const char* k125 = "125%";
             constexpr const char* k150 = "150%";
+            constexpr const char* k175 = "175%";
             constexpr const char* k200 = "200%";
         }
 
@@ -437,7 +445,7 @@ namespace PluginDisplayNames
                 constexpr const char* kRamp1Rate               = "RAMP 1 RATE";
                 constexpr const char* kRamp2Rate               = "RAMP 2 RATE";
                 constexpr const char* kPortamentoRate          = "PORTAMENTO RATE";
-                constexpr const char* kPortamentoModByVelocity = "PORT < VELOCITY";
+                constexpr const char* kPortamentoModByVelocity = "PORTA < VELOCITY";
                 constexpr const char* kRamp1Trigger            = "RAMP 1 TRIGGER";
                 constexpr const char* kRamp2Trigger            = "RAMP 2 TRIGGER";
                 constexpr const char* kPortamentoMode          = "PORTA MODE";

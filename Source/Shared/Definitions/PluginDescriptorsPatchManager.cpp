@@ -4,7 +4,7 @@
 
 #include "PluginDescriptors.h"
 
-#include "PluginDimensions.h"
+#include "PluginDesignDimensions.h"
 #include "PluginDisplayNames.h"
 #include "PluginHelpers.h"
 #include "PluginIDs.h"
@@ -23,77 +23,77 @@ namespace PluginDescriptors
             .displayName = PluginDisplayNames::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kUnlockBank,
             .parentGroupId = PluginIDs::PatchManagerSection::BankUtilityModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDimensions::Widgets::Widths::Button::kPatchManagerUnlockBank
+            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kPatchManagerUnlockBank
         },
         {
             .widgetId = PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank0,
             .displayName = PluginDisplayNames::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank0,
             .parentGroupId = PluginIDs::PatchManagerSection::BankUtilityModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDimensions::Widgets::Widths::Button::kPatchManagerBankSelect
+            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kPatchManagerBankSelect
         },
         {
             .widgetId = PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank1,
             .displayName = PluginDisplayNames::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank1,
             .parentGroupId = PluginIDs::PatchManagerSection::BankUtilityModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDimensions::Widgets::Widths::Button::kPatchManagerBankSelect
+            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kPatchManagerBankSelect
         },
         {
             .widgetId = PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank2,
             .displayName = PluginDisplayNames::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank2,
             .parentGroupId = PluginIDs::PatchManagerSection::BankUtilityModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDimensions::Widgets::Widths::Button::kPatchManagerBankSelect
+            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kPatchManagerBankSelect
         },
         {
             .widgetId = PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank3,
             .displayName = PluginDisplayNames::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank3,
             .parentGroupId = PluginIDs::PatchManagerSection::BankUtilityModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDimensions::Widgets::Widths::Button::kPatchManagerBankSelect
+            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kPatchManagerBankSelect
         },
         {
             .widgetId = PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank4,
             .displayName = PluginDisplayNames::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank4,
             .parentGroupId = PluginIDs::PatchManagerSection::BankUtilityModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDimensions::Widgets::Widths::Button::kPatchManagerBankSelect
+            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kPatchManagerBankSelect
         },
         {
             .widgetId = PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank5,
             .displayName = PluginDisplayNames::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank5,
             .parentGroupId = PluginIDs::PatchManagerSection::BankUtilityModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDimensions::Widgets::Widths::Button::kPatchManagerBankSelect
+            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kPatchManagerBankSelect
         },
         {
             .widgetId = PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank6,
             .displayName = PluginDisplayNames::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank6,
             .parentGroupId = PluginIDs::PatchManagerSection::BankUtilityModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDimensions::Widgets::Widths::Button::kPatchManagerBankSelect
+            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kPatchManagerBankSelect
         },
         {
             .widgetId = PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank7,
             .displayName = PluginDisplayNames::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank7,
             .parentGroupId = PluginIDs::PatchManagerSection::BankUtilityModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDimensions::Widgets::Widths::Button::kPatchManagerBankSelect
+            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kPatchManagerBankSelect
         },
         {
             .widgetId = PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank8,
             .displayName = PluginDisplayNames::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank8,
             .parentGroupId = PluginIDs::PatchManagerSection::BankUtilityModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDimensions::Widgets::Widths::Button::kPatchManagerBankSelect
+            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kPatchManagerBankSelect
         },
         {
             .widgetId = PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank9,
             .displayName = PluginDisplayNames::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank9,
             .parentGroupId = PluginIDs::PatchManagerSection::BankUtilityModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDimensions::Widgets::Widths::Button::kPatchManagerBankSelect
+            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kPatchManagerBankSelect
         }
     };
 
@@ -109,14 +109,14 @@ namespace PluginDescriptors
             .displayName = PluginDisplayNames::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kLoadPreviousPatch,
             .parentGroupId = PluginIDs::PatchManagerSection::InternalPatchesModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDimensions::Widgets::Widths::Button::kInternalPatchesMemory
+            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kInternalPatchesMemory
         },
         {
             .widgetId = PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kLoadNextPatch,
             .displayName = PluginDisplayNames::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kLoadNextPatch,
             .parentGroupId = PluginIDs::PatchManagerSection::InternalPatchesModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDimensions::Widgets::Widths::Button::kInternalPatchesMemory
+            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kInternalPatchesMemory
         },
         {
             .widgetId = PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCurrentBankNumber,
@@ -135,28 +135,28 @@ namespace PluginDescriptors
             .displayName = PluginDisplayNames::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kInitPatch,
             .parentGroupId = PluginIDs::PatchManagerSection::InternalPatchesModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDimensions::Widgets::Widths::Button::kInit
+            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kInit
         },
         {
             .widgetId = PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCopyPatch,
             .displayName = PluginDisplayNames::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCopyPatch,
             .parentGroupId = PluginIDs::PatchManagerSection::InternalPatchesModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDimensions::Widgets::Widths::Button::kCopy
+            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kCopy
         },
         {
             .widgetId = PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kPastePatch,
             .displayName = PluginDisplayNames::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kPastePatch,
             .parentGroupId = PluginIDs::PatchManagerSection::InternalPatchesModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDimensions::Widgets::Widths::Button::kPaste
+            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kPaste
         },
         {
             .widgetId = PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kStorePatch,
             .displayName = PluginDisplayNames::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kStorePatch,
             .parentGroupId = PluginIDs::PatchManagerSection::InternalPatchesModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDimensions::Widgets::Widths::Button::kInternalPatchesMemory
+            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kInternalPatchesMemory
         }
     };
 
@@ -172,14 +172,14 @@ namespace PluginDescriptors
             .displayName = PluginDisplayNames::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kLoadPreviousPatchFile,
             .parentGroupId = PluginIDs::PatchManagerSection::ComputerPatchesModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDimensions::Widgets::Widths::Button::kInternalPatchesMemory
+            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kInternalPatchesMemory
         },
         {
             .widgetId = PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kLoadNextPatchFile,
             .displayName = PluginDisplayNames::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kLoadNextPatchFile,
             .parentGroupId = PluginIDs::PatchManagerSection::ComputerPatchesModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDimensions::Widgets::Widths::Button::kInternalPatchesMemory
+            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kInternalPatchesMemory
         },
         {
             .widgetId = PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSelectPatchFile,
@@ -192,21 +192,21 @@ namespace PluginDescriptors
             .displayName = PluginDisplayNames::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kOpenPatchFolder,
             .parentGroupId = PluginIDs::PatchManagerSection::ComputerPatchesModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDimensions::Widgets::Widths::Button::kInternalPatchesMemory
+            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kInternalPatchesMemory
         },
         {
             .widgetId = PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSavePatchAs,
             .displayName = PluginDisplayNames::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSavePatchAsFile,
             .parentGroupId = PluginIDs::PatchManagerSection::ComputerPatchesModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDimensions::Widgets::Widths::Button::kComputerPatchesSaveAs
+            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kComputerPatchesSaveAs
         },
         {
             .widgetId = PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSavePatchFile,
             .displayName = PluginDisplayNames::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSavePatchFile,
             .parentGroupId = PluginIDs::PatchManagerSection::ComputerPatchesModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDimensions::Widgets::Widths::Button::kInternalPatchesMemory
+            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kInternalPatchesMemory
         }
     };
 
@@ -240,112 +240,112 @@ namespace PluginDescriptors
             .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kMutate,
             .parentGroupId = PluginIDs::PatchManagerSection::PatchMutatorModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDimensions::Widgets::Widths::Button::kPatchMutatorMutate
+            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kPatchMutatorMutate
         },
         {
             .widgetId = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kRetry,
             .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kRetry,
             .parentGroupId = PluginIDs::PatchManagerSection::PatchMutatorModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDimensions::Widgets::Widths::Button::kPatchMutatorMutate
+            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kPatchMutatorMutate
         },
         {
             .widgetId = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kCompare,
             .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kCompare,
             .parentGroupId = PluginIDs::PatchManagerSection::PatchMutatorModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDimensions::Widgets::Widths::Button::kPatchMutatorMutate
+            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kPatchMutatorMutate
         },
         {
             .widgetId = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kDelete,
             .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kDelete,
             .parentGroupId = PluginIDs::PatchManagerSection::PatchMutatorModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDimensions::Widgets::Widths::Button::kPatchMutatorDelete
+            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kPatchMutatorDelete
         },
         {
             .widgetId = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kClear,
             .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kClear,
             .parentGroupId = PluginIDs::PatchManagerSection::PatchMutatorModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDimensions::Widgets::Widths::Button::kPatchMutatorClear
+            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kPatchMutatorClear
         },
         {
             .widgetId = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kExport,
             .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kExport,
             .parentGroupId = PluginIDs::PatchManagerSection::PatchMutatorModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDimensions::Widgets::Widths::Button::kPatchMutatorClear
+            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kPatchMutatorClear
         },
         {
             .widgetId = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kDco1,
             .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kDco1,
             .parentGroupId = PluginIDs::PatchManagerSection::PatchMutatorModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDimensions::Widgets::Widths::Button::kInit
+            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kInit
         },
         {
             .widgetId = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kDco2,
             .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kDco2,
             .parentGroupId = PluginIDs::PatchManagerSection::PatchMutatorModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDimensions::Widgets::Widths::Button::kInit
+            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kInit
         },
         {
             .widgetId = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kVcfVca,
             .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kVcfVca,
             .parentGroupId = PluginIDs::PatchManagerSection::PatchMutatorModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDimensions::Widgets::Widths::Button::kInit
+            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kInit
         },
         {
             .widgetId = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kFmTrack,
             .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kFmTrack,
             .parentGroupId = PluginIDs::PatchManagerSection::PatchMutatorModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDimensions::Widgets::Widths::Button::kInit
+            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kInit
         },
         {
             .widgetId = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kRampPortamento,
             .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kRampPortamento,
             .parentGroupId = PluginIDs::PatchManagerSection::PatchMutatorModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDimensions::Widgets::Widths::Button::kInit
+            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kInit
         },
         {
             .widgetId = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnvelope1,
             .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnvelope1,
             .parentGroupId = PluginIDs::PatchManagerSection::PatchMutatorModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDimensions::Widgets::Widths::Button::kInit
+            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kInit
         },
         {
             .widgetId = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnvelope2,
             .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnvelope2,
             .parentGroupId = PluginIDs::PatchManagerSection::PatchMutatorModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDimensions::Widgets::Widths::Button::kInit
+            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kInit
         },
         {
             .widgetId = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnvelope3,
             .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnvelope3,
             .parentGroupId = PluginIDs::PatchManagerSection::PatchMutatorModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDimensions::Widgets::Widths::Button::kInit
+            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kInit
         },
         {
             .widgetId = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kLfo1,
             .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kLfo1,
             .parentGroupId = PluginIDs::PatchManagerSection::PatchMutatorModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDimensions::Widgets::Widths::Button::kInit
+            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kInit
         },
         {
             .widgetId = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kLfo2,
             .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kLfo2,
             .parentGroupId = PluginIDs::PatchManagerSection::PatchMutatorModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDimensions::Widgets::Widths::Button::kInit
+            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kInit
         }
     };
 

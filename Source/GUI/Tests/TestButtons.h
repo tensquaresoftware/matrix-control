@@ -1,0 +1,40 @@
+#pragma once
+
+#include <memory>
+#include <vector>
+
+#include <juce_gui_basics/juce_gui_basics.h>
+
+namespace tss
+{
+    class ISkin;
+}
+
+class TestButtons : public juce::Component
+{
+public:
+    explicit TestButtons(tss::ISkin& skin);
+    ~TestButtons() override;
+
+    void resized() override;
+
+private:
+    class ButtonScalePanel;
+
+    inline constexpr static int kGap_ = 12;
+    inline constexpr static int kMainButtonWidth_ = 48;
+    inline constexpr static int kMainButtonHeight_ = 20;
+    inline constexpr static int kSmallButtonSize_ = 20;
+    inline constexpr static int kBigButtonWidth_ = 120;
+    inline constexpr static int kBigButtonHeight_ = 48;
+    inline constexpr static int kScaleLabelHeight_ = 20;
+    inline constexpr static int kPanelGapMultiplier_ = 2;
+    inline constexpr static float kLargeTextFontHeight_ = 28.0f;
+
+    std::vector<std::unique_ptr<ButtonScalePanel>> columnPanels_;
+
+    void createColumnPanels(tss::ISkin& skin);
+    void layoutColumnPanels();
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TestButtons)
+};

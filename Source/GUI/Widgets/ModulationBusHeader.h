@@ -15,11 +15,12 @@ namespace tss
             Orange
         };
 
-        explicit ModulationBusHeader(int width, int height, ColourVariant variant = ColourVariant::Blue);
+        explicit ModulationBusHeader(int width, int height, const ModulationBusHeaderLook& look,
+                                     ColourVariant variant = ColourVariant::Blue);
         ~ModulationBusHeader() override = default;
 
         void setLook(const ModulationBusHeaderLook& look);
-        void setDisplayScale(float displayScale);
+        void setUiScale(float uiScale);
 
         void paint(juce::Graphics& g) override;
         void resized() override;
@@ -43,7 +44,7 @@ namespace tss
         juce::String busDestinationText_;
         ColourVariant colourVariant_;
         int height_;
-        float displayScale_ = 1.0f;
+        float uiScale_ = 1.0f;
 
         void drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawLine(juce::Graphics& g, const juce::Rectangle<float>& bounds);

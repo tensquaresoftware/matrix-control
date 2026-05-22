@@ -6,8 +6,9 @@
 
 namespace tss
 {
-    ComboBox::ComboBox(int width, int height, Style style)
+    ComboBox::ComboBox(int width, int height, const ComboBoxLook& look, Style style)
         : juce::ComboBox()
+        , look_(look)
         , width_(width)
         , height_(height)
         , style_(style)
@@ -29,12 +30,12 @@ namespace tss
         popupLook_ = look;
     }
 
-    void ComboBox::setDisplayScale(float displayScale)
+    void ComboBox::setUiScale(float uiScale)
     {
-        if (juce::approximatelyEqual(displayScale_, displayScale))
+        if (juce::approximatelyEqual(uiScale_, uiScale))
             return;
         
-        displayScale_ = displayScale;
+        uiScale_ = uiScale;
         repaint();
     }
 
@@ -61,7 +62,7 @@ namespace tss
     {
         if (style_ == Style::ButtonLike)
         {
-            const float thickness = std::max(1.0f, static_cast<float>(kBorderThicknessButtonLike_) * displayScale_);
+            const float thickness = std::max(1.0f, static_cast<float>(kBorderThicknessButtonLike_) * uiScale_);
             g.setColour(getBorderColourForCurrentStyle(enabled));
             g.drawRect(bounds, thickness);
             return;
@@ -69,7 +70,7 @@ namespace tss
 
         if (hasFocus)
         {
-            const float thickness = std::max(1.0f, static_cast<float>(kBorderThickness_) * displayScale_);
+            const float thickness = std::max(1.0f, static_cast<float>(kBorderThickness_) * uiScale_);
             g.setColour(getFocusBorderColourForCurrentStyle());
             g.drawRect(backgroundBounds, thickness);
         }
@@ -82,7 +83,7 @@ namespace tss
         const auto textBounds = calculateTextBounds(bounds);
 
         g.setColour(textColour);
-        g.setFont(look_.font.withHeight(kFontSize_ * displayScale_));
+        g.setFont(look_.font.withHeight(look_.font.getHeight() * uiScale_));
         g.drawText(text, textBounds, juce::Justification::centredLeft, false);
     }
 
@@ -135,9 +136,9 @@ namespace tss
     juce::Rectangle<float> ComboBox::calculateTextBounds(const juce::Rectangle<float>& bounds) const
     {
         auto textBounds = bounds;
-        const float leftPad = static_cast<float>(kLeftPadding_) * displayScale_;
-        const float triangleSpace = static_cast<float>(kTriangleBaseSize_) * displayScale_;
-        const float rightPad = static_cast<float>(kRightPadding_) * displayScale_;
+        const float leftPad = static_cast<float>(kLeftPadding_) * uiScale_;
+        const float triangleSpace = static_cast<float>(kTriangleBaseSize_) * uiScale_;
+        const float rightPad = static_cast<float>(kRightPadding_) * uiScale_;
         
         textBounds.removeFromLeft(leftPad);
         textBounds.removeFromRight(triangleSpace);
@@ -150,9 +151,9 @@ namespace tss
         const auto triangleColour = getTriangleColourForCurrentStyle(enabled);
         g.setColour(triangleColour);
 
-        const float triangleBaseSize = static_cast<float>(kTriangleBaseSize_) * displayScale_;
+        const float triangleBaseSize = static_cast<float>(kTriangleBaseSize_) * uiScale_;
         const float triangleHeight = triangleBaseSize * kTriangleHeightFactor_;
-        const float rightPad = static_cast<float>(kRightPadding_) * displayScale_;
+        const float rightPad = static_cast<float>(kRightPadding_) * uiScale_;
         const float triangleX = bounds.getRight() - triangleBaseSize - rightPad;
         const float triangleY = bounds.getCentreY() - triangleHeight * 0.5f;
 
@@ -179,7 +180,7 @@ namespace tss
         if (style_ == Style::ButtonLike)
             return bounds;
         
-        const auto backgroundHeight = static_cast<float>(kBackgroundHeight_) * displayScale_;
+        const auto backgroundHeight = static_cast<float>(kBackgroundHeight_) * uiScale_;
         const auto backgroundY = (bounds.getHeight() - backgroundHeight) * 0.5f;
         return juce::Rectangle<float>(bounds.getX(), bounds.getY() + backgroundY, bounds.getWidth(), backgroundHeight);
     }

@@ -3,9 +3,9 @@
 
 namespace tss
 {
-    PopupMenuRenderer::PopupMenuRenderer(bool isButtonLike, float displayScale)
+    PopupMenuRenderer::PopupMenuRenderer(bool isButtonLike, float uiScale)
         : isButtonLike_(isButtonLike)
-        , displayScale_(displayScale)
+        , uiScale_(uiScale)
     {
     }
 
@@ -25,7 +25,7 @@ namespace tss
 
     void PopupMenuRenderer::drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds) const
     {
-        const float kBorderThickness = std::max(1.0f, 1.0f * displayScale_);
+        const float kBorderThickness = std::max(1.0f, 1.0f * uiScale_);
         const auto borderColour = isButtonLike_ 
             ? look_.borderButtonLike
             : look_.border;
@@ -56,7 +56,7 @@ namespace tss
             g.setColour(hooverTextColour);
             g.setFont(font);
             
-            const float textPadding = static_cast<float>(kTextLeftPadding_) * displayScale_;
+            const float textPadding = static_cast<float>(kTextLeftPadding_) * uiScale_;
             const auto textBounds = itemBounds.withTrimmedLeft(textPadding);
             g.drawText(comboBox.getItemText(itemIndex), textBounds, juce::Justification::centredLeft, false);
         }
@@ -73,7 +73,7 @@ namespace tss
             g.setColour(textColour);
             g.setFont(font);
             
-            const float textPadding = static_cast<float>(kTextLeftPadding_) * displayScale_;
+            const float textPadding = static_cast<float>(kTextLeftPadding_) * uiScale_;
             const auto textBounds = itemBounds.withTrimmedLeft(textPadding);
             g.drawText(comboBox.getItemText(itemIndex), textBounds, juce::Justification::centredLeft, false);
         }

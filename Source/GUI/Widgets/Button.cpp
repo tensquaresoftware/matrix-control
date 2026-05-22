@@ -1,9 +1,12 @@
 #include "Button.h"
 
+#include "GUI/Layout/ScaledDrawing.h"
+
 namespace tss
 {
-    Button::Button(int width, int height, const juce::String& text)
+    Button::Button(int width, int height, const ButtonLook& look, const juce::String& text)
         : juce::Button(text)
+        , look_(look)
         , width_(width)
         , height_(height)
     {
@@ -17,12 +20,12 @@ namespace tss
         repaint();
     }
 
-    void Button::setDisplayScale(float displayScale)
+    void Button::setUiScale(float uiScale)
     {
-        if (juce::approximatelyEqual(displayScale_, displayScale))
+        if (juce::approximatelyEqual(uiScale_, uiScale))
             return;
         
-        displayScale_ = displayScale;
+        uiScale_ = uiScale;
         repaint();
     }
 
@@ -31,7 +34,12 @@ namespace tss
         const auto bounds = getLocalBounds().toFloat();
         const auto buttonText = getButtonText();
         const bool enabled = isEnabled();
-        const float borderThickness = std::max(1.0f, static_cast<float>(kBorderThickness_) * displayScale_);
+        const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
+        const float borderThickness = ScaledDrawing::snappedStrokeThicknessFromDesign(
+            static_cast<float>(kBorderThickness_),
+            uiScale_,
+            systemDisplayScale,
+            ScaledDrawing::StrokeSnapPolicy::kFloor);
 
         g.setColour(getBackgroundColour(enabled, shouldDrawButtonAsHighlighted, shouldDrawButtonAsDown));
         g.fillRect(bounds);
@@ -42,7 +50,7 @@ namespace tss
         if (! buttonText.isEmpty())
         {
             g.setColour(getTextColour(enabled, shouldDrawButtonAsHighlighted, shouldDrawButtonAsDown));
-            g.setFont(look_.font.withHeight(kFontSize_ * displayScale_));
+            g.setFont(look_.font.withHeight(look_.font.getHeight() * uiScale_));
             g.drawText(buttonText, bounds, juce::Justification::centred, false);
         }
     }

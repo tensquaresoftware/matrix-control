@@ -2,8 +2,9 @@
 
 namespace tss
 {
-    Label::Label(int width, int height, const juce::String& text, tss::LabelStyle style)
-        : width_(width)
+    Label::Label(int width, int height, const LabelLook& look, const juce::String& text, tss::LabelStyle style)
+        : look_(look)
+        , width_(width)
         , height_(height)
         , labelText_(text)
         , style_(style)
@@ -18,12 +19,12 @@ namespace tss
         repaint();
     }
 
-    void Label::setDisplayScale(float displayScale)
+    void Label::setUiScale(float uiScale)
     {
-        if (juce::approximatelyEqual(displayScale_, displayScale))
+        if (juce::approximatelyEqual(uiScale_, uiScale))
             return;
         
-        displayScale_ = displayScale;
+        uiScale_ = uiScale;
         repaint();
     }
 
@@ -42,11 +43,11 @@ namespace tss
             return;
 
         auto textBounds = getLocalBounds().toFloat();
-        const float padding = static_cast<float>(kTextLeftPadding_) * displayScale_;
+        const float padding = static_cast<float>(kTextLeftPadding_) * uiScale_;
         textBounds.removeFromLeft(padding);
 
         g.setColour(look_.text);
-        g.setFont(look_.font.withHeight(kFontSize_ * displayScale_));
+        g.setFont(look_.font.withHeight(look_.font.getHeight() * uiScale_));
         g.drawText(labelText_, textBounds, juce::Justification::centredLeft, false);
     }
 }

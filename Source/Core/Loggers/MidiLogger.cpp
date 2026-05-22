@@ -3,6 +3,11 @@
 #include "MidiLogger.h"
 
 #include "Core/MIDI/SysEx/SysExConstants.h"
+
+#if !defined(MATRIX_CONTROL_PROJECT_ROOT)
+#error "MATRIX_CONTROL_PROJECT_ROOT must be defined by CMake (project root) so default log paths resolve to Logs/MIDI."
+#endif
+
 #include "Core/MIDI/SysEx/SysExParser.h"
 
 MidiLogger& MidiLogger::getInstance()
@@ -19,7 +24,10 @@ void MidiLogger::setLogLevel(LogLevel level)
 
 juce::File MidiLogger::getDefaultLogDirectory() const
 {
-    juce::File logDir(kLogDirectoryPath);
+    juce::File logDir = juce::File(juce::String(MATRIX_CONTROL_PROJECT_ROOT))
+        .getChildFile("Logs")
+        .getChildFile("MIDI");
+
     createLogDirectoryIfNeeded(logDir);
     return logDir;
 }
@@ -96,7 +104,13 @@ void MidiLogger::setLogToFile(bool enabled, const juce::File& filePath)
     std::lock_guard<std::mutex> lock(logMutex);
     
     closeExistingLogFile();
-    
+
+#if !MIDI_LOGGER_ENABLED
+    juce::ignoreUnused(filePath);
+    logToFile = false;
+    return;
+#endif
+
     logToFile = enabled;
     if (enabled)
     {
@@ -500,11 +514,13 @@ void MidiLogger::writeLog(const juce::String& formattedMessage)
         std::cout << formattedMessage.toRawUTF8() << std::endl;
     }
     
+#if MIDI_LOGGER_ENABLED
     if (logToFile && fileStream && fileStream->is_open())
     {
         *fileStream << formattedMessage.toRawUTF8() << std::endl;
         fileStream->flush();
     }
+#endif
 }
 
 void MidiLogger::writeLogRaw(const juce::String& message)
@@ -516,11 +532,13 @@ void MidiLogger::writeLogRaw(const juce::String& message)
         std::cout << message.toRawUTF8() << std::endl;
     }
     
+#if MIDI_LOGGER_ENABLED
     if (logToFile && fileStream && fileStream->is_open())
     {
         *fileStream << message.toRawUTF8() << std::endl;
         fileStream->flush();
     }
+#endif
 }
 
 juce::String MidiLogger::buildTimestampString() const

@@ -6,7 +6,6 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 
 #include "ISkin.h"
-#include "SkinValues.h"
 
 namespace tss
 {
@@ -32,10 +31,8 @@ namespace tss
 
         ColourVariant getColourVariant() const { return currentVariant_; }
 
-        float getValue(SkinValueId valueId) const override;
         juce::Colour getColour(SkinColourId colourId) const override;
 
-        void setValue(SkinValueId valueId, float value) override;
         void setColour(SkinColourId colourId, juce::Colour colour) override;
 
         juce::Font getBaseFont() const override;
@@ -60,7 +57,6 @@ namespace tss
         juce::Colour getPopupMenuScrollbarColour(bool isButtonLike = false) const override;
 
     private:
-        void initializeDefaultValues();
         void initializeDefaultColours();
         
         template <typename Accessor>
@@ -91,7 +87,6 @@ namespace tss
         void initializeDisplayColours(Accessor accessColour);
 
         ColourVariant currentVariant_;
-        std::map<SkinValueId, float> values_;
         std::map<SkinColourId, juce::Colour> colours_;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Skin)

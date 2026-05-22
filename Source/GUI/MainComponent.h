@@ -23,15 +23,20 @@ public:
     void paint(juce::Graphics&) override;
     void resized() override;
     void setSkin(tss::Skin& skin);
-    void setDisplayScale(float displayScale);
+    void setUiScale(float uiScale);
 
     HeaderPanel& getHeaderPanel() { return headerPanel; }
     BodyPanel& getBodyPanel() { return bodyPanel; }
     FooterPanel& getFooterPanel() { return footerPanel; }
 
+    void setUiElementsTestVisible(bool visible);
+    juce::Rectangle<int> getUiElementsTestAreaBounds() const;
+
 private:
     tss::Skin* skin_;
-    float uiDisplayScale_ = 1.0f;
+    float uiScale_ = 1.0f;
+    bool uiElementsTestVisible_ = false;
+    int uiElementsTestAreaY_ = 0;
 
     HeaderPanel headerPanel;
     BodyPanel bodyPanel;

@@ -9,11 +9,11 @@ namespace tss
     class GroupLabel : public juce::Component
     {
     public:
-        explicit GroupLabel(int width, int height, const juce::String& text = juce::String());
+        explicit GroupLabel(int width, int height, const GroupLabelLook& look, const juce::String& text = juce::String());
         ~GroupLabel() override = default;
 
         void setLook(const GroupLabelLook& look);
-        void setDisplayScale(float displayScale);
+        void setUiScale(float uiScale);
 
         void setText(const juce::String& text);
         juce::String getText() const { return labelText_; }
@@ -31,7 +31,7 @@ namespace tss
         GroupLabelLook look_{};
         int width_;
         int height_;
-        float displayScale_ = 1.0f;
+        float uiScale_ = 1.0f;
         juce::String labelText_;
         float cachedTextWidth_ {0.0f};
 

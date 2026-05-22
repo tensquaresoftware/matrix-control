@@ -6,13 +6,15 @@
 
 namespace tss
 {
-    NumberBox::NumberBox(int width, bool editable, int minValue, int maxValue)
-        : minValue_(minValue)
+    NumberBox::NumberBox(int width, int height, const NumberBoxLook& look, bool editable, int minValue, int maxValue)
+        : look_(look)
+        , height_(height)
+        , minValue_(minValue)
         , maxValue_(maxValue)
         , editable_(editable)
     {
         setOpaque(true);
-        setSize(width, kHeight_);
+        setSize(width, height_);
         updateTextWidthCache();
     }
 
@@ -23,12 +25,12 @@ namespace tss
         repaint();
     }
 
-    void NumberBox::setDisplayScale(float displayScale)
+    void NumberBox::setUiScale(float uiScale)
     {
-        if (juce::approximatelyEqual(displayScale_, displayScale))
+        if (juce::approximatelyEqual(uiScale_, uiScale))
             return;
 
-        displayScale_ = displayScale;
+        uiScale_ = uiScale;
         repaint();
     }
 
@@ -64,7 +66,7 @@ namespace tss
     void NumberBox::paint(juce::Graphics& g)
     {
         const auto bounds = getLocalBounds().toFloat();
-        const float borderThickness = std::max(1.0f, static_cast<float>(kBorderThickness_) * displayScale_);
+        const float borderThickness = std::max(1.0f, static_cast<float>(kBorderThickness_) * uiScale_);
 
         g.setColour(look_.background);
         g.fillRect(bounds);
@@ -73,14 +75,14 @@ namespace tss
         g.drawRect(bounds, borderThickness);
 
         g.setColour(look_.text);
-        g.setFont(look_.font.withHeight(look_.font.getHeight() * displayScale_));
+        g.setFont(look_.font.withHeight(look_.font.getHeight() * uiScale_));
         g.drawText(cachedValueText_, bounds, juce::Justification::centred, false);
 
         if (showDot_)
         {
             const auto dotPosition = calculateDotPosition(bounds, cachedTextWidth_);
             g.setColour(look_.dot);
-            const float dotRadius = kDotRadius_ * displayScale_;
+            const float dotRadius = kDotRadius_ * uiScale_;
             g.fillEllipse(dotPosition.x, dotPosition.y, dotRadius * 2.0f, dotRadius * 2.0f);
         }
     }

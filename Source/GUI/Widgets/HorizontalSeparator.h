@@ -9,11 +9,11 @@ namespace tss
     class HorizontalSeparator : public juce::Component
     {
     public:
-        HorizontalSeparator(int width, int height);
+        HorizontalSeparator(int width, int height, const HorizontalSeparatorLook& look);
         ~HorizontalSeparator() override = default;
 
         void setLook(const HorizontalSeparatorLook& look);
-        void setDisplayScale(float displayScale);
+        void setUiScale(float uiScale);
         
         void paint(juce::Graphics& g) override;
         
@@ -28,7 +28,7 @@ namespace tss
         HorizontalSeparatorLook look_{};
         int width_;
         int height_;
-        float displayScale_ = 1.0f;
+        float uiScale_ = 1.0f;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(HorizontalSeparator)
     };

@@ -83,9 +83,13 @@ set(PLUGIN_SOURCES
     
     # GUI - Looks
     Source/GUI/Looks/LookBuilders.cpp
+    Source/GUI/Looks/TypographyStyles.cpp
     
     # GUI - Main Component
     Source/GUI/MainComponent.cpp
+    Source/GUI/Tests/TestButtons.cpp
+    Source/GUI/Tests/TestComponent.cpp
+    Source/GUI/Tests/TestSliders.cpp
     
     # GUI - Panels
     Source/GUI/Panels/MainComponent/FooterPanel/FooterPanel.cpp
@@ -95,32 +99,30 @@ set(PLUGIN_SOURCES
     Source/GUI/Panels/MainComponent/BodyPanel/MasterEditPanel/Modules/MidiPanel.cpp
     Source/GUI/Panels/MainComponent/BodyPanel/MasterEditPanel/Modules/MiscPanel.cpp
     Source/GUI/Panels/MainComponent/BodyPanel/MasterEditPanel/Modules/VibratoPanel.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/MatrixModulationPanel/MatrixModulationPanel.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/BottomPanel/BottomPanel.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/BottomPanel/Modules/Env1Panel.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/BottomPanel/Modules/Env2Panel.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/BottomPanel/Modules/Env3Panel.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/BottomPanel/Modules/Lfo1Panel.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/BottomPanel/Modules/Lfo2Panel.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/MiddlePanel/MiddlePanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/SharedPanel/MatrixModulationPanel/MatrixModulationPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditBottomModulesPanel/PatchEditBottomModulesPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditBottomModulesPanel/Modules/Env1Panel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditBottomModulesPanel/Modules/Env2Panel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditBottomModulesPanel/Modules/Env3Panel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditBottomModulesPanel/Modules/Lfo1Panel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditBottomModulesPanel/Modules/Lfo2Panel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditDisplaysPanel/PatchEditDisplaysPanel.cpp
     Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditPanel.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/TopPanel/TopPanel.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/TopPanel/Modules/Dco1Panel.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/TopPanel/Modules/Dco2Panel.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/TopPanel/Modules/FmTrackPanel.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/TopPanel/Modules/RampPortamentoPanel.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/TopPanel/Modules/VcfVcaPanel.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/PatchManagerPanel/PatchManagerPanel.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/PatchManagerPanel/Modules/BankUtilityPanel.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/PatchManagerPanel/Modules/InternalPatchesPanel.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/PatchManagerPanel/Modules/ComputerPatchesPanel.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/PatchManagerPanel/Modules/PatchMutatorPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditTopModulesPanel/PatchEditTopModulesPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditTopModulesPanel/Modules/Dco1Panel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditTopModulesPanel/Modules/Dco2Panel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditTopModulesPanel/Modules/FmTrackPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditTopModulesPanel/Modules/RampPortamentoPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditTopModulesPanel/Modules/VcfVcaPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/PatchManagerPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/Modules/BankUtilityPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/Modules/ComputerPatchesPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/Modules/InternalPatchesPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/Modules/PatchMutatorPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/SharedPanel/SharedPanel.cpp
     
     # GUI - Panels - Reusable
     Source/GUI/Panels/Reusable/BaseModulePanel.cpp
-    Source/GUI/Panels/Reusable/ModuleHeaderPanel.cpp
-    Source/GUI/Panels/Reusable/ParameterPanel.cpp
-    Source/GUI/Panels/Reusable/ModulationBusPanel.cpp
     
     # GUI - Widgets
     Source/GUI/Widgets/Button.cpp
@@ -130,10 +132,12 @@ set(PLUGIN_SOURCES
     Source/GUI/Widgets/GroupLabel.cpp
     Source/GUI/Widgets/HorizontalSeparator.cpp
     Source/GUI/Widgets/Label.cpp
+    Source/GUI/Widgets/ModulationBusCell.cpp
     Source/GUI/Widgets/ModulationBusHeader.cpp
     Source/GUI/Widgets/ModuleHeader.cpp
     Source/GUI/Widgets/MultiColumnPopupMenu.cpp
     Source/GUI/Widgets/NumberBox.cpp
+    Source/GUI/Widgets/ParameterCell.cpp
     Source/GUI/Widgets/PatchNameDisplay.cpp
     Source/GUI/Widgets/PopupMenuBase.cpp
     Source/GUI/Widgets/PopupMenuPositioner.cpp
@@ -214,6 +218,8 @@ target_link_libraries(Matrix-Control
 )
 
 target_compile_definitions(Matrix-Control
+    PRIVATE
+        MATRIX_CONTROL_PROJECT_ROOT="${CMAKE_CURRENT_SOURCE_DIR}"
     PUBLIC
         JUCE_WEB_BROWSER=0
         JUCE_USE_CURL=0

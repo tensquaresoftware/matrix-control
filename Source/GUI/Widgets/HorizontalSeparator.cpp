@@ -2,8 +2,9 @@
 
 namespace tss
 {
-    HorizontalSeparator::HorizontalSeparator(int width, int height)
-        : width_(width)
+    HorizontalSeparator::HorizontalSeparator(int width, int height, const HorizontalSeparatorLook& look)
+        : look_(look)
+        , width_(width)
         , height_(height)
     {
         setOpaque(false);
@@ -16,12 +17,12 @@ namespace tss
         repaint();
     }
 
-    void HorizontalSeparator::setDisplayScale(float displayScale)
+    void HorizontalSeparator::setUiScale(float uiScale)
     {
-        if (juce::approximatelyEqual(displayScale_, displayScale))
+        if (juce::approximatelyEqual(uiScale_, uiScale))
             return;
         
-        displayScale_ = displayScale;
+        uiScale_ = uiScale;
         repaint();
     }
 
@@ -30,7 +31,7 @@ namespace tss
         const auto bounds = getLocalBounds().toFloat();
         const float h = juce::jmax(1.0f, bounds.getHeight());
         const float lineY = bounds.getY() + h * 0.5f;
-        const float lineThickness = std::max(1.0f, static_cast<float>(kLineThickness_) * displayScale_);
+        const float lineThickness = std::max(1.0f, static_cast<float>(kLineThickness_) * uiScale_);
         
         g.setColour(look_.line);
         g.drawLine(bounds.getX(), lineY, bounds.getRight(), lineY, lineThickness);

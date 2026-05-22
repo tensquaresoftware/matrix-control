@@ -7,7 +7,7 @@
 #include "Shared/Definitions/PluginDescriptors.h"
 #include "Shared/Definitions/PluginHelpers.h"
 #include "Shared/Definitions/PluginIDs.h"
-#include "Shared/Definitions/PluginDimensions.h"
+#include "Shared/Definitions/PluginDesignDimensions.h"
 
 WidgetFactory::WidgetFactory(juce::AudioProcessorValueTreeState& inApvts)
     : validator(inApvts)
@@ -21,8 +21,11 @@ std::unique_ptr<tss::Slider> WidgetFactory::createSliderFromDescriptor(
     int width,
     int height)
 {
-    auto slider = std::make_unique<tss::Slider>(width, height, static_cast<double>(desc->defaultValue));
-    slider->setLook(tss::sliderLookFromSkin(skin));
+    auto slider = std::make_unique<tss::Slider>(
+        width,
+        height,
+        tss::sliderLookFromSkin(skin),
+        static_cast<double>(desc->defaultValue));
     slider->setRange(static_cast<double>(desc->minValue), static_cast<double>(desc->maxValue), 1.0);
     slider->setValue(static_cast<double>(desc->defaultValue));
     return slider;
@@ -34,8 +37,7 @@ std::unique_ptr<tss::ComboBox> WidgetFactory::createComboBoxFromDescriptor(
     int width,
     int height)
 {
-    auto comboBox = std::make_unique<tss::ComboBox>(width, height);
-    comboBox->setLook(tss::comboBoxLookFromSkin(skin));
+    auto comboBox = std::make_unique<tss::ComboBox>(width, height, tss::comboBoxLookFromSkin(skin));
     comboBox->setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
 
     for (const auto& choice : desc->choices)
@@ -52,8 +54,8 @@ std::unique_ptr<tss::Slider> WidgetFactory::createIntParameterSlider(
     return createIntParameterSlider(
         parameterId,
         skin,
-        PluginDimensions::Widgets::Widths::Slider::kStandard,
-        PluginDimensions::Widgets::Heights::kSlider);
+        PluginDesignDimensions::Widgets::Widths::Slider::kStandard,
+        PluginDesignDimensions::Widgets::Heights::kSlider);
 }
 
 std::unique_ptr<tss::Slider> WidgetFactory::createIntParameterSlider(
@@ -92,14 +94,13 @@ std::unique_ptr<tss::Button> WidgetFactory::createStandaloneButton(
     validator.getStandaloneWidgetDescriptorOrThrow(desc, widgetId);
     validator.validateWidgetType(desc, widgetId);
     
-    const auto buttonWidth = desc->buttonWidth.value_or(PluginDimensions::Widgets::Widths::Button::kInit);
+    const auto buttonWidth = desc->buttonWidth.value_or(PluginDesignDimensions::Widgets::Widths::Button::kInit);
     
     auto button = std::make_unique<tss::Button>(
         buttonWidth,
         height,
-        desc->displayName
-    );
-    button->setLook(tss::buttonLookFromSkin(skin));
+        tss::buttonLookFromSkin(skin),
+        desc->displayName);
     return button;
 }
 

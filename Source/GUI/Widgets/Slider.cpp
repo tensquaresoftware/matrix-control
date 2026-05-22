@@ -1,9 +1,12 @@
 #include "Slider.h"
 
+#include "GUI/Layout/ScaledDrawing.h"
+
 namespace tss
 {
-    Slider::Slider(int width, int height, double defaultValue)
+    Slider::Slider(int width, int height, const SliderLook& look, double defaultValue)
         : juce::Slider(juce::Slider::LinearBarVertical, juce::Slider::NoTextBox)
+        , look_(look)
         , width_(width)
         , height_(height)
         , defaultValue_(defaultValue)
@@ -20,12 +23,12 @@ namespace tss
         repaint();
     }
 
-    void Slider::setDisplayScale(float displayScale)
+    void Slider::setUiScale(float uiScale)
     {
-        if (juce::approximatelyEqual(displayScale_, displayScale))
+        if (juce::approximatelyEqual(uiScale_, uiScale))
             return;
-        
-        displayScale_ = displayScale;
+
+        uiScale_ = uiScale;
         repaint();
     }
 
@@ -42,56 +45,70 @@ namespace tss
 
     void Slider::paint(juce::Graphics& g)
     {
-        const auto bounds = getLocalBounds().toFloat();
-        const auto enabled = isEnabled();
-        const auto trackBounds = calculateTrackBounds(bounds);
-        const auto valueBarBounds = calculateValueBarBounds(trackBounds, enabled);
+        const bool enabled = isEnabled();
+        const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
+        const int insetPerSide = ScaledDrawing::logicalInsetPixelsFromDesign(
+            static_cast<float>(kValueBarPadding_),
+            uiScale_,
+            systemDisplayScale);
 
-        drawTrack(g, trackBounds, enabled);
+        const auto trackBoundsInt = getLocalBounds();
+        const auto trackBoundsFloat = trackBoundsInt.toFloat();
+
+        drawTrack(g, trackBoundsInt, enabled);
+
+        const auto valueBarBounds = calculateValueBarBounds(trackBoundsInt, insetPerSide, enabled);
         drawValueBar(g, valueBarBounds, enabled);
-        drawText(g, bounds, enabled);
-        drawFocusBorderIfNeeded(g, trackBounds, hasFocus_);
+
+        drawText(g, trackBoundsFloat, enabled);
+        drawFocusBorderIfNeeded(g, trackBoundsFloat, hasFocus_);
     }
 
-    juce::Rectangle<float> Slider::calculateTrackBounds(const juce::Rectangle<float>& bounds) const
-    {
-        const auto trackHeight = static_cast<float>(kTrackHeight_) * displayScale_;
-        const auto trackY = (bounds.getHeight() - trackHeight) * 0.5f;
-        return juce::Rectangle<float>(bounds.getX(), bounds.getY() + trackY, bounds.getWidth(), trackHeight);
-    }
-
-    juce::Rectangle<float> Slider::calculateValueBarBounds(const juce::Rectangle<float>& trackBounds, bool enabled) const
+    juce::Rectangle<float> Slider::calculateValueBarBounds(const juce::Rectangle<int>& trackBoundsInt, int insetPerSide, bool enabled) const
     {
         if (! enabled)
-            return juce::Rectangle<float>();
+            return {};
 
         const auto range = getRange();
         const auto rangeLength = range.getLength();
-        
-        if (rangeLength <= 0.0)
-            return juce::Rectangle<float>();
 
-        const float reduction = std::max(1.0f, 1.0f * displayScale_);
-        const auto valueBarArea = trackBounds.reduced(reduction);
+        if (rangeLength <= 0.0)
+            return {};
+
+        auto valueBarArea = trackBoundsInt.reduced(insetPerSide);
+
+        if (valueBarArea.isEmpty())
+            return {};
+
         const auto value = getValue();
         auto normalizedValue = static_cast<float>((value - range.getStart()) / rangeLength);
         normalizedValue = juce::jlimit(0.0f, 1.0f, normalizedValue);
-        const auto valueBarWidth = valueBarArea.getWidth() * normalizedValue;
-        
-        return juce::Rectangle<float>(valueBarArea.getX(), valueBarArea.getY(), valueBarWidth, valueBarArea.getHeight());
+        const int widthFull = valueBarArea.getWidth();
+        const int valueBarWidth = juce::jmax(0, juce::roundToInt(static_cast<float>(widthFull) * normalizedValue));
+
+        return juce::Rectangle<float>(
+            static_cast<float>(valueBarArea.getX()),
+            static_cast<float>(valueBarArea.getY()),
+            static_cast<float>(valueBarWidth),
+            static_cast<float>(valueBarArea.getHeight()));
     }
 
     void Slider::drawFocusBorderIfNeeded(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool hasFocus)
     {
         if (hasFocus)
         {
-            const float borderThickness = std::max(1.0f, 1.0f * displayScale_);
+            const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
+            const float borderThickness = ScaledDrawing::snappedStrokeThicknessFromDesign(
+                kFocusBorderThickness_,
+                uiScale_,
+                systemDisplayScale,
+                ScaledDrawing::StrokeSnapPolicy::kFloor);
             g.setColour(look_.focusBorder);
             g.drawRect(bounds, borderThickness);
         }
     }
 
-    void Slider::drawTrack(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled)
+    void Slider::drawTrack(juce::Graphics& g, const juce::Rectangle<int>& bounds, bool enabled)
     {
         g.setColour(enabled ? look_.trackEnabled : look_.trackDisabled);
         g.fillRect(bounds);
@@ -109,12 +126,12 @@ namespace tss
     void Slider::drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled)
     {
         auto valueText = juce::String(static_cast<int>(std::round(getValue())));
-        
+
         if (unit_.isNotEmpty())
             valueText += " " + unit_;
 
         g.setColour(enabled ? look_.textEnabled : look_.textDisabled);
-        g.setFont(look_.font.withHeight(kFontSize_ * displayScale_));
+        g.setFont(look_.font.withHeight(look_.font.getHeight() * uiScale_));
         g.drawText(valueText, bounds, juce::Justification::centred, false);
     }
 
@@ -122,7 +139,7 @@ namespace tss
     {
         if (! isEnabled())
             return;
-        
+
         grabKeyboardFocus();
         dragStartValue_ = getValue();
         dragStartPosition_ = e.getPosition();
@@ -132,13 +149,13 @@ namespace tss
     {
         if (! isEnabled())
             return;
-        
+
         const auto dragDistance = dragStartPosition_.y - e.getPosition().y;
         const auto valueDelta = dragDistance * kDragSensitivity_;
         const auto range = getRange();
         auto newValue = dragStartValue_ + valueDelta;
         newValue = juce::jlimit(range.getStart(), range.getEnd(), newValue);
-        
+
         setValue(newValue, juce::sendNotificationSync);
     }
 
@@ -150,7 +167,7 @@ namespace tss
     {
         if (! isEnabled())
             return;
-        
+
         resetToDefaultValue();
     }
 
@@ -178,30 +195,30 @@ namespace tss
     {
         if (! isEnabled() || ! hasKeyboardFocus(true))
             return false;
-        
+
         if (key == juce::KeyPress::returnKey)
         {
             resetToDefaultValue();
             return true;
         }
-        
+
         const auto range = getRange();
         const auto rangeLength = range.getLength();
         const bool isShiftPressed = key.getModifiers().isShiftDown();
         const auto step = calculateStepForRange(rangeLength, isShiftPressed);
-        
+
         if (isIncrementKey(key.getKeyCode()))
         {
             updateValueWithStep(step, true);
             return true;
         }
-        
+
         if (isDecrementKey(key.getKeyCode()))
         {
             updateValueWithStep(step, false);
             return true;
         }
-        
+
         return false;
     }
 
@@ -209,7 +226,7 @@ namespace tss
     {
         if (isShiftPressed)
             return rangeLength / kShiftKeyStep_;
-        
+
         return 1.0;
     }
 

@@ -2,8 +2,9 @@
 
 namespace tss
 {
-    GroupLabel::GroupLabel(int width, int height, const juce::String& text)
-        : width_(width)
+    GroupLabel::GroupLabel(int width, int height, const GroupLabelLook& look, const juce::String& text)
+        : look_(look)
+        , width_(width)
         , height_(height)
         , labelText_(text)
     {
@@ -19,12 +20,12 @@ namespace tss
         repaint();
     }
 
-    void GroupLabel::setDisplayScale(float displayScale)
+    void GroupLabel::setUiScale(float uiScale)
     {
-        if (juce::approximatelyEqual(displayScale_, displayScale))
+        if (juce::approximatelyEqual(uiScale_, uiScale))
             return;
 
-        displayScale_ = displayScale;
+        uiScale_ = uiScale;
         calculateTextWidth();
         repaint();
     }
@@ -57,7 +58,7 @@ namespace tss
     void GroupLabel::drawText(juce::Graphics& g, const juce::Rectangle<float>& area)
     {
         g.setColour(look_.text);
-        g.setFont(look_.font.withHeight(look_.font.getHeight() * displayScale_));
+        g.setFont(look_.font.withHeight(look_.font.getHeight() * uiScale_));
         g.drawText(labelText_, area, juce::Justification::centred, false);
     }
 
@@ -66,8 +67,8 @@ namespace tss
         const auto halfTextWidth = textWidth * 0.5f;
         const auto centreX = area.getCentreX();
         const auto centreY = area.getCentreY();
-        const float lineThickness = std::max(1.0f, static_cast<float>(kLineThickness_) * displayScale_);
-        const float textSpacing = static_cast<float>(kTextSpacing_) * displayScale_;
+        const float lineThickness = std::max(1.0f, static_cast<float>(kLineThickness_) * uiScale_);
+        const float textSpacing = static_cast<float>(kTextSpacing_) * uiScale_;
 
         g.setColour(look_.line);
 
@@ -107,7 +108,7 @@ namespace tss
             return;
         }
 
-        const auto scaledFont = look_.font.withHeight(look_.font.getHeight() * displayScale_);
+        const auto scaledFont = look_.font.withHeight(look_.font.getHeight() * uiScale_);
         juce::GlyphArrangement glyphArrangement;
         glyphArrangement.addLineOfText(scaledFont, labelText_, 0.0f, 0.0f);
         const auto bounds = glyphArrangement.getBoundingBox(0, -1, true);

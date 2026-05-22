@@ -2,8 +2,9 @@
 
 namespace tss
 {
-    SectionHeader::SectionHeader(int width, int height, const juce::String& text, ColourVariant variant)
-        : width_(width)
+    SectionHeader::SectionHeader(int width, int height, const SectionHeaderLook& look, const juce::String& text, ColourVariant variant)
+        : look_(look)
+        , width_(width)
         , height_(height)
         , text_(text)
         , colourVariant_(variant)
@@ -20,12 +21,12 @@ namespace tss
         repaint();
     }
 
-    void SectionHeader::setDisplayScale(float displayScale)
+    void SectionHeader::setUiScale(float uiScale)
     {
-        if (juce::approximatelyEqual(displayScale_, displayScale))
+        if (juce::approximatelyEqual(uiScale_, uiScale))
             return;
         
-        displayScale_ = displayScale;
+        uiScale_ = uiScale;
         calculateTextWidth();
         repaint();
     }
@@ -36,7 +37,7 @@ namespace tss
             return;
 
         auto contentArea = getLocalBounds().toFloat();
-        contentArea.setHeight(kContentHeight_ * displayScale_);
+        contentArea.setHeight(kContentHeight_ * uiScale_);
 
         drawText(g, contentArea);
         drawLines(g, contentArea);
@@ -55,7 +56,7 @@ namespace tss
             return;
         }
 
-        const auto scaledFont = look_.font.withHeight(look_.font.getHeight() * displayScale_);
+        const auto scaledFont = look_.font.withHeight(look_.font.getHeight() * uiScale_);
         juce::GlyphArrangement glyphArrangement;
         glyphArrangement.addLineOfText(scaledFont, text_, 0.0f, 0.0f);
         cachedTextWidth_ = glyphArrangement.getBoundingBox(0, -1, true).getWidth();
@@ -66,15 +67,15 @@ namespace tss
         if (text_.isEmpty())
             return;
 
-        const float leftLineWidth = kLeftLineWidth_ * displayScale_;
-        const float textSpacing = kTextSpacing_ * displayScale_;
+        const float leftLineWidth = kLeftLineWidth_ * uiScale_;
+        const float textSpacing = kTextSpacing_ * uiScale_;
         
         auto textBounds = contentArea;
         textBounds.removeFromLeft(leftLineWidth + textSpacing);
         textBounds.setWidth(cachedTextWidth_);
 
         g.setColour(look_.text);
-        g.setFont(look_.font.withHeight(look_.font.getHeight() * displayScale_));
+        g.setFont(look_.font.withHeight(look_.font.getHeight() * uiScale_));
         g.drawText(text_, textBounds, juce::Justification::topLeft, false);
     }
 
@@ -88,11 +89,11 @@ namespace tss
 
     void SectionHeader::drawLeftLine(juce::Graphics& g, const juce::Rectangle<float>& contentArea)
     {
-        const float lineHeight = std::max(1.0f, kLineHeight_ * displayScale_);
+        const float lineHeight = std::max(1.0f, kLineHeight_ * uiScale_);
         const auto verticalOffset = (contentArea.getHeight() - lineHeight) * 0.5f;
         
         auto line = contentArea;
-        line.setWidth(kLeftLineWidth_ * displayScale_);
+        line.setWidth(kLeftLineWidth_ * uiScale_);
         line.setHeight(lineHeight);
         line.translate(0.0f, verticalOffset);
         
@@ -101,9 +102,9 @@ namespace tss
 
     void SectionHeader::drawRightLine(juce::Graphics& g, const juce::Rectangle<float>& contentArea)
     {
-        const float leftLineWidth = kLeftLineWidth_ * displayScale_;
-        const float textSpacing = kTextSpacing_ * displayScale_;
-        const float lineHeight = std::max(1.0f, kLineHeight_ * displayScale_);
+        const float leftLineWidth = kLeftLineWidth_ * uiScale_;
+        const float textSpacing = kTextSpacing_ * uiScale_;
+        const float lineHeight = std::max(1.0f, kLineHeight_ * uiScale_);
         const auto lineStartX = leftLineWidth + textSpacing + cachedTextWidth_ + textSpacing;
         const auto remainingWidth = contentArea.getWidth() - lineStartX;
 

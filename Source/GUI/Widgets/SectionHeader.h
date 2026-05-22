@@ -15,11 +15,12 @@ namespace tss
             Orange
         };
 
-        explicit SectionHeader(int width, int height, const juce::String& text = juce::String(), ColourVariant variant = ColourVariant::Blue);
+        explicit SectionHeader(int width, int height, const SectionHeaderLook& look,
+                               const juce::String& text = juce::String(), ColourVariant variant = ColourVariant::Blue);
         ~SectionHeader() override = default;
 
         void setLook(const SectionHeaderLook& look);
-        void setDisplayScale(float displayScale);
+        void setUiScale(float uiScale);
 
         void paint(juce::Graphics& g) override;
         void resized() override;
@@ -39,7 +40,7 @@ namespace tss
         juce::String text_;
         ColourVariant colourVariant_;
         float cachedTextWidth_ = 0.0f;
-        float displayScale_ = 1.0f;
+        float uiScale_ = 1.0f;
 
         void calculateTextWidth();
 

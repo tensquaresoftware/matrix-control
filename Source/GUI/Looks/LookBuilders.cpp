@@ -1,10 +1,20 @@
 #include "LookBuilders.h"
 
+#include "GUI/Looks/TypographyStyles.h"
 #include "GUI/Skins/ISkin.h"
-#include "GUI/Skins/SkinValues.h"
 
 namespace tss
 {
+    namespace
+    {
+        juce::Font resolvedTypographyFont(const ISkin& skin, TypographyStyleId styleId)
+        {
+            const auto style = getTypographyStyle(styleId);
+            const auto baseFont = style.useBoldFont ? skin.getBaseFontBold() : skin.getBaseFont();
+            return baseFont.withHeight(style.fontHeight);
+        }
+    }
+
     ButtonLook buttonLookFromSkin(const ISkin& skin)
     {
         ButtonLook look;
@@ -18,7 +28,7 @@ namespace tss
         look.textOn = skin.getColour(SkinColourId::kButtonTextOn);
         look.textHover = skin.getColour(SkinColourId::kButtonTextHover);
         look.textClicked = skin.getColour(SkinColourId::kButtonTextClicked);
-        look.font = skin.getBaseFont();
+        look.font = resolvedTypographyFont(skin, TypographyStyleId::kDefault);
         return look;
     }
 
@@ -32,7 +42,7 @@ namespace tss
         look.textEnabled = skin.getSliderTextColour(true);
         look.textDisabled = skin.getSliderTextColour(false);
         look.focusBorder = skin.getColour(SkinColourId::kSliderFocusBorder);
-        look.font = skin.getBaseFont();
+        look.font = resolvedTypographyFont(skin, TypographyStyleId::kDefault);
         return look;
     }
 
@@ -40,7 +50,7 @@ namespace tss
     {
         LabelLook look;
         look.text = skin.getColour(SkinColourId::kLabelText);
-        look.font = skin.getBaseFont();
+        look.font = resolvedTypographyFont(skin, TypographyStyleId::kDefault);
         return look;
     }
 
@@ -48,7 +58,7 @@ namespace tss
     {
         LabelLook look;
         look.text = skin.getColour(SkinColourId::kHeaderPanelLabelText);
-        look.font = skin.getBaseFont();
+        look.font = resolvedTypographyFont(skin, TypographyStyleId::kDefault);
         return look;
     }
 
@@ -81,7 +91,7 @@ namespace tss
         look.buttonLikeTriangle = skin.getComboBoxTriangleColour(true, true);
         look.buttonLikeTriangleDisabled = skin.getComboBoxTriangleColour(false, true);
         
-        look.font = skin.getBaseFont();
+        look.font = resolvedTypographyFont(skin, TypographyStyleId::kDefault);
         return look;
     }
 
@@ -104,7 +114,7 @@ namespace tss
         look.textHoverButtonLike = skin.getPopupMenuTextHooverColour(true);
         look.scrollbarButtonLike = skin.getPopupMenuScrollbarColour(true);
         
-        look.font = skin.getBaseFont();
+        look.font = resolvedTypographyFont(skin, TypographyStyleId::kDefault);
         return look;
     }
 
@@ -132,7 +142,7 @@ namespace tss
         look.background = skin.getColour(SkinColourId::kPatchNameDisplayBackground);
         look.border = skin.getColour(SkinColourId::kPatchNameDisplayBorder);
         look.text = skin.getColour(SkinColourId::kPatchNameDisplayText);
-        look.font = skin.getBaseFont();
+        look.font = resolvedTypographyFont(skin, TypographyStyleId::kPatchName);
         return look;
     }
 
@@ -141,7 +151,7 @@ namespace tss
         GroupLabelLook look;
         look.text = skin.getColour(SkinColourId::kGroupLabelText);
         look.line = skin.getColour(SkinColourId::kGroupLabelLine);
-        look.font = skin.getBaseFont();
+        look.font = resolvedTypographyFont(skin, TypographyStyleId::kDefault);
         return look;
     }
 
@@ -160,7 +170,7 @@ namespace tss
         look.backgroundOn = skin.getToggleBackgroundColour(true);
         look.textOff = skin.getToggleTextColour(false);
         look.textOn = skin.getToggleTextColour(true);
-        look.font = skin.getBaseFont();
+        look.font = resolvedTypographyFont(skin, TypographyStyleId::kDefault);
         return look;
     }
 
@@ -175,7 +185,7 @@ namespace tss
         look.editorBackground = skin.getColour(SkinColourId::kNumberBoxEditorBackground);
         look.editorText = skin.getColour(SkinColourId::kNumberBoxEditorText);
         look.editorSelectionBackground = skin.getColour(SkinColourId::kNumberBoxEditorSelectionBackground);
-        look.font = skin.getBaseFont();
+        look.font = resolvedTypographyFont(skin, TypographyStyleId::kDefault);
         return look;
     }
 
@@ -185,7 +195,7 @@ namespace tss
         look.text = skin.getColour(SkinColourId::kSectionHeaderText);
         look.lineBlue = skin.getColour(SkinColourId::kSectionHeaderLineBlue);
         look.lineOrange = skin.getColour(SkinColourId::kSectionHeaderLineOrange);
-        look.font = skin.getBaseFont().withHeight(kSectionHeaderFontHeight);
+        look.font = resolvedTypographyFont(skin, TypographyStyleId::kSectionHeader);
         return look;
     }
 
@@ -195,7 +205,7 @@ namespace tss
         look.text = skin.getColour(SkinColourId::kModuleHeaderText);
         look.lineBlue = skin.getColour(SkinColourId::kModuleHeaderLineBlue);
         look.lineOrange = skin.getColour(SkinColourId::kModuleHeaderLineOrange);
-        look.font = skin.getBaseFontBold().withHeight(kModuleHeaderFontHeight);
+        look.font = resolvedTypographyFont(skin, TypographyStyleId::kModuleHeader);
         return look;
     }
 
@@ -205,7 +215,7 @@ namespace tss
         look.text = skin.getColour(SkinColourId::kModuleHeaderText);
         look.lineBlue = skin.getColour(SkinColourId::kModuleHeaderLineBlue);
         look.lineOrange = skin.getColour(SkinColourId::kModuleHeaderLineOrange);
-        look.font = skin.getBaseFontBold().withHeight(kModuleHeaderFontHeight);
+        look.font = resolvedTypographyFont(skin, TypographyStyleId::kModuleHeader);
         return look;
     }
 }

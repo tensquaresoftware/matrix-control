@@ -13,11 +13,11 @@ namespace tss
     public:
         using ValueChangedCallback = std::function<void(int paramIndex, int newValue)>;
 
-        explicit EnvelopeDisplay(int width, int height);
+        explicit EnvelopeDisplay(int width, int height, const EnvelopeDisplayLook& look);
         ~EnvelopeDisplay() override = default;
 
         void setLook(const EnvelopeDisplayLook& look);
-        void setDisplayScale(float displayScale);
+        void setUiScale(float uiScale);
 
         void setDelay(int value);
         void setAttack(int value);
@@ -41,9 +41,9 @@ namespace tss
         
         void paint(juce::Graphics& g) override;
         
+        void mouseUp(const juce::MouseEvent& e) override;
         void mouseDown(const juce::MouseEvent& e) override;
         void mouseDrag(const juce::MouseEvent& e) override;
-        void mouseUp(const juce::MouseEvent& e) override;
 
         int getWidth() const { return width_; }
         int getHeight() const { return height_; }
@@ -69,7 +69,7 @@ namespace tss
         EnvelopeDisplayLook look_{};
         int width_;
         int height_;
-        float displayScale_ = 1.0f;
+        float uiScale_ = 1.0f;
 
         int delay_ {0};
         int attack_ {0};

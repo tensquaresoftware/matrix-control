@@ -4,8 +4,9 @@
 
 namespace tss
 {
-    PatchNameDisplay::PatchNameDisplay(int width, int height)
-        : width_(width)
+    PatchNameDisplay::PatchNameDisplay(int width, int height, const PatchNameDisplayLook& look)
+        : look_(look)
+        , width_(width)
         , height_(height)
         , patchName_(PluginDisplayNames::PatchEditSection::PatchNameModule::StandaloneWidgets::kDefaultPatchName)
     {
@@ -19,12 +20,12 @@ namespace tss
         repaint();
     }
 
-    void PatchNameDisplay::setDisplayScale(float displayScale)
+    void PatchNameDisplay::setUiScale(float uiScale)
     {
-        if (juce::approximatelyEqual(displayScale_, displayScale))
+        if (juce::approximatelyEqual(uiScale_, uiScale))
             return;
         
-        displayScale_ = displayScale;
+        uiScale_ = uiScale;
         repaint();
     }
 
@@ -51,13 +52,13 @@ namespace tss
     void PatchNameDisplay::drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
         g.setColour(look_.border);
-        g.drawRect(bounds, std::max(1.0f, static_cast<float>(kBorderThickness_) * displayScale_));
+        g.drawRect(bounds, std::max(1.0f, static_cast<float>(kBorderThickness_) * uiScale_));
     }
 
     void PatchNameDisplay::drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
         g.setColour(look_.text);
-        g.setFont(look_.font.withHeight(kFontHeight_ * displayScale_));
+        g.setFont(look_.font.withHeight(look_.font.getHeight() * uiScale_));
         g.drawText(patchName_, bounds, juce::Justification::centred, false);
     }
 }

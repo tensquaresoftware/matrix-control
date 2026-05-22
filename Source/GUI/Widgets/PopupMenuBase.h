@@ -17,7 +17,6 @@ namespace tss
         inline constexpr static int kItemHeight_ = 20;
         inline constexpr static float kBorderThickness_ = 1.0f;
         inline constexpr static float kHighlightGap_ = 1.0f;
-        inline constexpr static float kFontSize_ = 14.0f;
 
         PopupMenuBase(ComboBox& comboBox, bool isButtonLike);
 
@@ -35,7 +34,7 @@ namespace tss
         ComboBox& comboBox_;
         bool isButtonLike_ = false;
         int highlightedItemIndex_ = -1;
-        float displayScale_ = 1.0f;
+        float uiScale_ = 1.0f;
         juce::Font cachedFont_;
         PopupMenuRenderer renderer_;
 

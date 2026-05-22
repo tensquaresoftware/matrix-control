@@ -5,6 +5,10 @@
 
 #include <juce_core/juce_core.h>
 
+#if !defined(MATRIX_CONTROL_PROJECT_ROOT)
+#error "MATRIX_CONTROL_PROJECT_ROOT must be defined by CMake (project root) so default log paths resolve to Logs/APVTS."
+#endif
+
 ApvtsLogger& ApvtsLogger::getInstance()
 {
     static ApvtsLogger instance;
@@ -19,7 +23,10 @@ void ApvtsLogger::setLogLevel(LogLevel level)
 
 juce::File ApvtsLogger::getDefaultLogDirectory() const
 {
-    juce::File logDir(kLogDirectoryPath);
+    juce::File logDir = juce::File(juce::String(MATRIX_CONTROL_PROJECT_ROOT))
+        .getChildFile("Logs")
+        .getChildFile("APVTS");
+
     createLogDirectoryIfNeeded(logDir);
     return logDir;
 }
@@ -96,7 +103,13 @@ void ApvtsLogger::setLogToFile(bool enabled, const juce::File& filePath)
     std::lock_guard<std::mutex> lock(logMutex);
     
     closeExistingLogFile();
-    
+
+#if !APVTS_LOGGER_ENABLED
+    juce::ignoreUnused(filePath);
+    logToFile = false;
+    return;
+#endif
+
     logToFile = enabled;
     if (enabled)
     {
@@ -546,11 +559,13 @@ void ApvtsLogger::writeLog(const juce::String& formattedMessage)
         std::cout << formattedMessage.toRawUTF8() << std::endl;
     }
     
+#if APVTS_LOGGER_ENABLED
     if (logToFile && fileStream && fileStream->is_open())
     {
         *fileStream << formattedMessage.toRawUTF8() << std::endl;
         fileStream->flush();
     }
+#endif
 }
 
 juce::String ApvtsLogger::buildTimestampString() const

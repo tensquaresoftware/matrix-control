@@ -9,11 +9,11 @@ namespace tss
     class VerticalSeparator : public juce::Component
     {
     public:
-        explicit VerticalSeparator(int width, int height);
+        explicit VerticalSeparator(int width, int height, const VerticalSeparatorLook& look);
         ~VerticalSeparator() override = default;
 
         void setLook(const VerticalSeparatorLook& look);
-        void setDisplayScale(float displayScale);
+        void setUiScale(float uiScale);
 
         void paint(juce::Graphics& g) override;
         void resized() override;
@@ -29,7 +29,7 @@ namespace tss
         VerticalSeparatorLook look_{};
         int width_;
         int height_;
-        float displayScale_ = 1.0f;
+        float uiScale_ = 1.0f;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(VerticalSeparator)
     };

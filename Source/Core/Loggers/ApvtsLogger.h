@@ -1,5 +1,10 @@
 #pragma once
 
+// 1: allow log files under <project>/Logs/APVTS (MATRIX_CONTROL_PROJECT_ROOT from CMake). 0: no file output.
+#ifndef APVTS_LOGGER_ENABLED
+#define APVTS_LOGGER_ENABLED 1
+#endif
+
 #include <fstream>
 #include <memory>
 #include <mutex>
@@ -52,7 +57,6 @@ public:
     void logDebug(const juce::String& debugMessage);
     
 private:
-    static constexpr const char* kLogDirectoryPath = "/Volumes/Guillaume/Dev/Projects/MAO/Plugins/Matrix-Control/Logs/APVTS";
     static constexpr const char* kLogFilenamePrefix = "apvts-log";
     
     static constexpr int kMinLogLineWidth = 60;

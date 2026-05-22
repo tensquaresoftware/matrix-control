@@ -9,10 +9,10 @@ namespace tss
     class Toggle : public juce::ToggleButton
     {
     public:
-        explicit Toggle(int width, const juce::String& text = {});
+        explicit Toggle(int width, int height, const ToggleLook& look, const juce::String& text = {});
 
         void setLook(const ToggleLook& look);
-        void setDisplayScale(float displayScale);
+        void setUiScale(float uiScale);
         void paintButton(juce::Graphics& g, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override;
 
     private:
@@ -20,7 +20,8 @@ namespace tss
 
         ToggleLook look_{};
         int width_;
-        float displayScale_ = 1.0f;
+        int height_;
+        float uiScale_ = 1.0f;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Toggle)
     };

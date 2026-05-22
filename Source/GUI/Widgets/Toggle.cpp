@@ -1,15 +1,15 @@
 #include "Toggle.h"
 
-#include "Shared/Definitions/PluginDimensions.h"
-
 namespace tss
 {
-    Toggle::Toggle(int width, const juce::String& text)
+    Toggle::Toggle(int width, int height, const ToggleLook& look, const juce::String& text)
         : juce::ToggleButton(text)
+        , look_(look)
         , width_(width)
+        , height_(height)
     {
         setOpaque(true);
-        setSize(width_, PluginDimensions::Widgets::Heights::kToggle);
+        setSize(width_, height_);
     }
 
     void Toggle::setLook(const ToggleLook& look)
@@ -18,12 +18,12 @@ namespace tss
         repaint();
     }
 
-    void Toggle::setDisplayScale(float displayScale)
+    void Toggle::setUiScale(float uiScale)
     {
-        if (juce::approximatelyEqual(displayScale_, displayScale))
+        if (juce::approximatelyEqual(uiScale_, uiScale))
             return;
 
-        displayScale_ = displayScale;
+        uiScale_ = uiScale;
         repaint();
     }
 
@@ -31,7 +31,7 @@ namespace tss
     {
         const auto bounds = getLocalBounds().toFloat();
         const bool isOn = getToggleState();
-        const float borderThickness = std::max(1.0f, static_cast<float>(kBorderThickness_) * displayScale_);
+        const float borderThickness = std::max(1.0f, static_cast<float>(kBorderThickness_) * uiScale_);
 
         g.setColour(isOn ? look_.backgroundOn : look_.backgroundOff);
         g.fillRect(bounds);
@@ -43,7 +43,7 @@ namespace tss
         if (!buttonText.isEmpty())
         {
             g.setColour(isOn ? look_.textOn : look_.textOff);
-            g.setFont(look_.font.withHeight(look_.font.getHeight() * displayScale_));
+            g.setFont(look_.font.withHeight(look_.font.getHeight() * uiScale_));
             g.drawText(buttonText, bounds, juce::Justification::centred, false);
         }
     }

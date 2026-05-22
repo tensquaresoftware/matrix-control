@@ -5,15 +5,15 @@
 #include "GUI/Factories/WidgetFactory.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Skins/Skin.h"
-#include "Shared/Definitions/PluginDimensions.h"
+#include "Shared/Definitions/PluginDesignDimensions.h"
 
 using tss::SkinColourId;
 
 MainComponent::MainComponent(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : skin_(&skin)
-    , headerPanel(skin, PluginDimensions::Panels::Header::kWidth, PluginDimensions::Panels::Header::kHeight)
-    , bodyPanel(skin, PluginDimensions::GUI::kWidth, PluginDimensions::Panels::Body::kHeight, widgetFactory, apvts)
-    , footerPanel(skin, PluginDimensions::Panels::Footer::kWidth, PluginDimensions::Panels::Footer::kHeight, apvts)
+    , headerPanel(skin, PluginDesignDimensions::Panels::Header::kWidth, PluginDesignDimensions::Panels::Header::kHeight)
+    , bodyPanel(skin, PluginDesignDimensions::GUI::kWidth, PluginDesignDimensions::Panels::Body::kHeight, widgetFactory, apvts)
+    , footerPanel(skin, PluginDesignDimensions::Panels::Footer::kWidth, PluginDesignDimensions::Panels::Footer::kHeight, apvts)
 {
     setOpaque(true);
     setSize(width, height);
@@ -32,12 +32,12 @@ void MainComponent::paint(juce::Graphics& g)
 void MainComponent::resized()
 {
     const auto bounds = getLocalBounds();
-    const float sf = uiDisplayScale_;
+    const float sf = uiScale_;
 
     const std::vector<int> designHeights {
-        PluginDimensions::Panels::Header::kHeight,
-        PluginDimensions::Panels::Body::kHeight,
-        PluginDimensions::Panels::Footer::kHeight
+        PluginDesignDimensions::Panels::Header::kHeight,
+        PluginDesignDimensions::Panels::Body::kHeight,
+        PluginDesignDimensions::Panels::Footer::kHeight
     };
     const auto heights = tss::ScaledLayout::distributeHeights(bounds.getHeight(), designHeights, sf, 2);
     const int headerHeight = heights[0];
@@ -46,8 +46,34 @@ void MainComponent::resized()
     const int footerY = headerHeight + bodyHeight;
 
     headerPanel.setBounds(bounds.getX(), bounds.getY(), bounds.getWidth(), headerHeight);
+    uiElementsTestAreaY_ = headerHeight;
+
+    if (uiElementsTestVisible_)
+    {
+        bodyPanel.setVisible(false);
+        footerPanel.setVisible(false);
+        return;
+    }
+
+    bodyPanel.setVisible(true);
+    footerPanel.setVisible(true);
     bodyPanel.setBounds(bounds.getX(), bounds.getY() + headerHeight, bounds.getWidth(), bodyHeight);
     footerPanel.setBounds(bounds.getX(), bounds.getY() + footerY, bounds.getWidth(), footerHeight);
+}
+
+void MainComponent::setUiElementsTestVisible(bool visible)
+{
+    if (uiElementsTestVisible_ == visible)
+        return;
+
+    uiElementsTestVisible_ = visible;
+    resized();
+}
+
+juce::Rectangle<int> MainComponent::getUiElementsTestAreaBounds() const
+{
+    const auto bounds = getLocalBounds();
+    return bounds.withTrimmedTop(uiElementsTestAreaY_);
 }
 
 void MainComponent::setSkin(tss::Skin& skin)
@@ -58,15 +84,15 @@ void MainComponent::setSkin(tss::Skin& skin)
     footerPanel.setSkin(skin);
 }
 
-void MainComponent::setDisplayScale(float displayScale)
+void MainComponent::setUiScale(float uiScale)
 {
-    if (juce::approximatelyEqual(uiDisplayScale_, displayScale))
+    if (juce::approximatelyEqual(uiScale_, uiScale))
         return;
     
-    uiDisplayScale_ = displayScale;
-    headerPanel.setDisplayScale(uiDisplayScale_);
-    bodyPanel.setDisplayScale(uiDisplayScale_);
-    footerPanel.setDisplayScale(uiDisplayScale_);
+    uiScale_ = uiScale;
+    headerPanel.setUiScale(uiScale_);
+    bodyPanel.setUiScale(uiScale_);
+    footerPanel.setUiScale(uiScale_);
     resized();
     repaint();
 }

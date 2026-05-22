@@ -1,9 +1,8 @@
 #pragma once
 
 // PluginIDs.h
-// Central file for all plugin IDs (unique identifiers)
-// Contains ONLY constant string definitions - no code/logic
-// Single source of truth for all plugin IDs
+// Central file for all plugin IDs (unique identifiers) and small constexpr helpers.
+// Most entries are string IDs; Settings::ScaleLevels also defines UI scale factors (float[] + lookup).
 
 #include <array>
 
@@ -14,57 +13,38 @@ namespace PluginIDs
     namespace Settings
     {
         constexpr const char* kGuiScaleId = "guiScaleId";
-        constexpr const char* kGuiScaleSchemaId = "guiScaleSchema";
+        constexpr const char* kTestWidgetId = "testWidgetId";
 
         namespace ScaleLevels
         {
-            constexpr int k50  = 1;
-            constexpr int k75  = 2;
-            constexpr int k100 = 3;
-            constexpr int k125 = 4;
-            constexpr int k150 = 5;
-            constexpr int k200 = 6;
+            constexpr int k50   = 1;
+            constexpr int k75   = 2;
+            constexpr int k100  = 3;
+            constexpr int k125  = 4;
+            constexpr int k150  = 5;
+            constexpr int k175  = 6;
+            constexpr int k200  = 7;
 
             constexpr int kDefault = k100;
             constexpr int kMin = k50;
             constexpr int kMax = k200;
 
-            constexpr float kDisplayScales[] = {
+            constexpr float kUiScales[] = {
                 0.0f,
                 0.5f,
                 0.75f,
                 1.0f,
                 1.25f,
                 1.5f,
+                1.75f,
                 2.0f
             };
 
-            constexpr float getDisplayScale(int scaleId)
+            constexpr float getUiScale(int scaleId)
             {
                 if (scaleId >= kMin && scaleId <= kMax)
-                    return kDisplayScales[scaleId];
-                return kDisplayScales[kDefault];
-            }
-
-            /** Maps legacy combo item IDs (1..10, pre v0.0.66) to current IDs (1..6). */
-            constexpr int migrateFromLegacyScaleId(int legacyId)
-            {
-                switch (legacyId)
-                {
-                    case 1: return k50;
-                    case 2: return k75;
-                    case 3: return k100;
-                    case 4: return k100;
-                    case 5: return k125;
-                    case 6: return k150;
-                    case 7:
-                    case 8:
-                    case 9:
-                    case 10:
-                        return k200;
-                    default:
-                        return kDefault;
-                }
+                    return kUiScales[scaleId];
+                return kUiScales[kDefault];
             }
         }
     }
