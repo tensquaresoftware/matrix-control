@@ -1,0 +1,1229 @@
+
+<!DOCTYPE html>
+
+<head>
+    <title>Matrix-1000 Editor version 1.0.2 by TenSquare on maxforlive.com</title>
+    <meta charset="UTF-8" />
+    <meta name="description" content="The Free Library of Max for Live Devices" />
+    <meta name="keywords" content="Ableton, Cycling 74, Max, Max/MSP, Max for Live" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="/css/styles.css?v=1.0.1" />
+    <script type='text/javascript' src="/global.js"></script>
+</head>
+
+<body>
+    <!-- HEADER -->
+    <header>
+    <!-- <div class="divider"></div> -->
+    <div class="wide-internal-header">
+        <div class="header-top">
+            <nav>
+                <ul class='header-navigation-start'>
+                    <li><a href="/index.php" id="headertitle">Max for Live</a></li>
+                    <li><a href="/library/index.php">Library</a></li>
+                    <li><a href="/help.php">Help</a></li>
+                                    </ul>
+            </nav>
+
+            <form class='search-form' name="form1" method="get" action="/library/index.php" enctype="multipart/form-data">
+                <input type="hidden" name="by" value="any">
+                <button class='search-icon-container'>
+                    <svg viewbox="0 0 15 15" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M10 6.5C10 8.433 8.433 10 6.5 10C4.567 10 3 8.433 3 6.5C3 4.567 4.567 3 6.5 3C8.433 3 10 4.567 10 6.5ZM9.30884 10.0159C8.53901 10.6318 7.56251 11 6.5 11C4.01472 11 2 8.98528 2 6.5C2 4.01472 4.01472 2 6.5 2C8.98528 2 11 4.01472 11 6.5C11 7.56251 10.6318 8.53901 10.0159 9.30884L12.8536 12.1464L12.1464 12.8536L9.30884 10.0159Z" fill="black"/>
+                    </svg>
+                </button>
+                <input type="text" placeholder="Search" name="q" size="40">	
+            </form>
+            
+            <nav>
+                <ul class='header-navigation-end'>
+                                    <li><a href="/login.php" class="">Log in or register</a></li>
+                                </ul>
+            </nav>      
+        </div>
+
+        <nav class="category-navigation">
+            <a class='device-type-pill' href="/library/index.php?type=instrument" class="thumb">Instruments</a>
+            <a class='device-type-pill' href="/library/index.php?type=audio" class="thumb">Audio Effects</a>
+            <a class='device-type-pill' href="/library/index.php?type=midi" class="thumb">MIDI Effects</a>
+            <a class='device-type-pill' href="/library/index.php?type=midi-generators" class="thumb">MIDI Generators</a>
+            <a class='device-type-pill' href="/library/index.php?type=midi-transformations" class="thumb">MIDI Transformations</a>
+        </nav>
+    </div>
+
+    <div class="narrow-internal-header">
+        <div class="top-row">
+            <a href="/index.php" id="headertitle">Max for Live</a>
+            <input type="checkbox" id='header-toggle' style="display:none">
+            <label for="header-toggle" class='header-hamburger'>
+                <svg class='icon icon-hamburger' width="30px" height="30px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M4 18L20 18"  />
+                    <path d="M4 12L20 12"  />
+                    <path d="M4 6L20 6" />
+                </svg>
+                <svg class="icon icon-x" width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M4 4L20 20"  />
+                    <path d="M20 4L4 20"  />
+                </svg>
+            </label>
+        </div>
+
+        <form id='searchbar' class='search-form' name="form1" method="get" action="/library/index.php" enctype="multipart/form-data">
+            <input type="hidden" name="by" value="any">
+            <button class='search-icon-container'>
+                <svg viewbox="0 0 15 15" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M10 6.5C10 8.433 8.433 10 6.5 10C4.567 10 3 8.433 3 6.5C3 4.567 4.567 3 6.5 3C8.433 3 10 4.567 10 6.5ZM9.30884 10.0159C8.53901 10.6318 7.56251 11 6.5 11C4.01472 11 2 8.98528 2 6.5C2 4.01472 4.01472 2 6.5 2C8.98528 2 11 4.01472 11 6.5C11 7.56251 10.6318 8.53901 10.0159 9.30884L12.8536 12.1464L12.1464 12.8536L9.30884 10.0159Z" fill="black"/>
+                </svg>
+            </button>
+            <input type="text" placeholder="Search" name="q" size="40">	
+        </form>
+
+        <nav class="category-navigation">
+            <div class="categories">
+                <a class='device-type-pill' href="/library/index.php?type=audio" class="thumb">Audio Effects</a>
+                <a class='device-type-pill' href="/library/index.php?type=instrument" class="thumb">Instruments</a>
+                <a class='device-type-pill' href="/library/index.php?type=midi" class="thumb">MIDI Effects</a>
+                <a class='device-type-pill' href="/library/index.php?type=midi-generators" class="thumb">MIDI Generators</a>
+                <a class='device-type-pill' href="/library/index.php?type=midi-transformations" class="thumb">MIDI Transformations</a>
+            </div>
+        </nav>
+
+        <div class="narrow-divider"></div>
+
+        <nav class='user-interactions'>
+            <ul>
+                <li><a href="/library/index.php?tag=all">Library</a></li>
+                <li><a href="/help.php">Help</a></li>
+
+                                <li><a href="/login.php" class="">Log in or register</a></li>
+                            </ul>
+        </nav>  
+    </div>
+</header>
+
+<script>
+    const hamburger = document.querySelector('.header-hamburger');
+    const narrowContainer = document.querySelector('.narrow-internal-header');
+    const headerToggle = document.getElementById('header-toggle');
+
+    const updateHeaderExpansion = () => {
+        if (headerToggle.checked) {
+            document.body.classList.add('no-scroll');
+        } else {
+            document.body.classList.remove('no-scroll');
+        }
+        
+        const narrowInternalHeader = document.querySelector('.narrow-internal-header');
+        narrowInternalHeader.style.height = headerToggle.checked ? '100vh' : 'auto';
+        Array.from(narrowInternalHeader.children).forEach(child => {
+            if (!Array.from(child.classList).includes('top-row')) {
+                child.style.visibility = headerToggle.checked ? 'visible' : 'hidden'
+                child.style.display =  headerToggle.checked ? 'flex' : 'none'
+            }
+        });
+    }
+
+    headerToggle.addEventListener('change', updateHeaderExpansion);
+
+    window.addEventListener('resize', () => {
+        if (window.innerWidth >= 1100) {
+            headerToggle.checked = false
+            document.body.classList.remove('no-scroll')
+        } else {
+            updateHeaderExpansion()
+        }
+    });
+
+
+</script>
+
+<style>
+    .no-scroll {
+        overflow: hidden;
+        height: 100%;
+    }
+
+    .header-hamburger .icon-x {
+        display: none;
+    }
+
+    #header-toggle:checked ~ .header-hamburger .icon-hamburger {
+        display: none;
+    }
+
+    #header-toggle:checked ~ .header-hamburger .icon-x {
+        display: block;
+    }
+
+    .header-hamburger {
+        background: none;
+        border: none;
+        outline: none;
+    }
+
+    .header-hamburger:hover {
+        cursor: pointer;
+    }
+
+    .header-hamburger svg path {
+        stroke: white;
+        stroke-width: 2;
+        stroke-linecap: round
+    }
+
+    header {
+        position: sticky;
+        top: 0;
+        z-index: 99;
+        align-items: center;
+        width: 100%;
+        margin-bottom: 1em;
+        background-color: #232323;
+        display: flex;
+        flex-direction: column;
+    }
+
+    header .wide-internal-header {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        max-width: 100%;
+        margin: 0 auto;
+        padding-left: 1em;
+        padding-right: 1em;
+    }
+
+    header .narrow-internal-header {
+        position: relative;
+        width: 100%;
+        display: none;
+        visibility: hidden;
+        flex-direction: column;
+        gap: 1em;
+        padding: 1em;
+    }
+
+    header .narrow-internal-header :not(.top-row):not(.narrow-divider) {
+        max-width: 386px;
+    }
+
+    .narrow-internal-header .top-row {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .narrow-internal-header .top-row svg {
+        vertical-align: middle;
+    }
+
+    .narrow-internal-header .search-form {
+        margin-top: 4em;
+        margin-bottom: 1em;
+    }
+
+    .narrow-internal-header .user-interactions a {
+        color: white;
+        font-size: 0.8rem;
+    }
+    
+    .category-navigation {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        height: 60px;
+    }
+
+    .device-type-pill {
+        display: flex;
+        background-color: #424242;
+        border-radius: 0.25rem;
+        font-size: 0.75rem;
+        height: 30px;
+        padding: 1rem 0.8125rem !important;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .categories {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 1em;
+    }
+
+    @media screen and (max-width: 1100px) {
+        header {
+            position: sticky;
+            z-index: 4;
+        }
+
+        header .wide-internal-header {
+            display: none;
+            visibility: hidden;
+        }
+
+        header .narrow-internal-header {
+            display: flex;
+            visibility: visible;
+        }
+
+        .category-navigation {
+            flex-direction: column;
+            height: auto;
+            justify-content: flex-start;
+            align-items: flex-start;
+            padding-top: 1em;
+        }
+    }
+
+    .category-navigation a{
+        color: #f5f5f5 !important;
+        font-size: 0.8rem !important;
+    }
+    .header-notice-wrapper {
+        display: flex;
+        background-color: #FBFFA7;
+        color: #000000;
+        width: 100%;
+        margin: 0;
+    }
+
+    .header-notice {
+        margin: 0 auto;
+        max-width: 1200px;
+        width: 100%;
+        font-size: 0.75rem;
+        font-weight: 500;
+        padding: 0 1em;
+        align-self: center;
+        justify-self: center;
+        text-align: center;
+    }
+
+    .header-notice a {
+        color: #FF5F00;
+    }
+
+    .divider {
+        position: absolute;
+        top: 60px;
+        height: 1px;
+        border-bottom: 1px solid #303030;
+        width: 100%;
+    }
+
+    .header-top {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0;
+        white-space: nowrap;
+        background-color: #232323;
+    }
+
+    .header-top nav {
+        flex-grow: 1;
+        max-height: 60px;
+        flex-basis: 0;
+    }
+
+    .header-top a, .header-top a:hover, .header-top a:visited, .header-top a:active {
+        font-size: 0.9rem;
+        color: #ffffff !important;
+    }
+
+    .header-top ul {
+        height: 45px;
+    }
+
+    .header-navigation-start, .header-navigation-end {
+        display: flex;
+        list-style: none;
+        gap: 1.5em;
+        margin: 0;
+
+    }
+
+    .wide-internal-header .header-navigation-start {
+        flex-direction: row;
+        justify-content: flex-start;
+    }
+
+    .wide-internal-header .header-navigation-end {
+        flex-direction: row;
+        justify-content: flex-end;
+    }
+
+    .narrow-internal-header .header-navigation-start {
+        flex-direction: column;
+    }
+
+    .narrow-internal-header .narrow-divider {
+        height: 1px;
+        border-bottom: 1px solid #303030;
+        width: 100%;
+        padding-top: 2em;
+    }
+
+    .header-navigation li {
+        margin-bottom: 0em;
+    }
+
+    #headertitle {
+        background-image: url(/images/m4l-web-icon.svg);
+        background-size: contain;
+        background-repeat: no-repeat;
+        display: block;
+        /* margin: 0 auto; */
+        text-indent: -9999px;
+        width: 110px;
+        height: 30px;
+    }
+
+    .search-form {
+        padding: 0;
+        margin: 0;
+        height: 1.8em;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        font-size: 1rem;
+    }
+
+    .search-form input {
+        height: 100%;
+        width: 100%;
+        border: none;
+        outline: none;
+        padding: 0 0.5em;
+        color: #f5f5f5;
+        background-color: #424242;
+        border-top-right-radius: 0.25rem;
+        border-bottom-right-radius: 0.25rem;
+    }
+
+    .search-form input:hover {
+        color: #f5f5f5;
+        background-color: #424242;
+    }
+
+    .search-icon-container {
+        border-top-left-radius: 0.25rem;
+        border-bottom-left-radius: 0.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        width: 34px;
+        background: #424242;
+        outline: none;
+        border: none;
+    }
+
+    .search-icon-container svg {
+        height: 100%;
+        width: 100%;
+        fill: none;
+        stroke: #7D7D7D;
+    }
+
+    .search-icon-container:hover {
+        cursor: pointer;
+    }
+
+    .narrow-internal-header > *:not(.top-row) {
+        visibility: hidden;
+        display: none;
+    }
+</style>
+    <div class='central-area'>
+        <!-- CONTENT -->
+        <main id="page">
+            <h1>Device Details</h1>
+
+
+
+<!-- IMG Start--->
+<div class='device-img-container'>
+   <a href="/images/screenshots/?ss=Matrix-1000 Editor - Patch Edit.png&id=6806">
+      <img
+      onerror="this.onerror=null; this.src='/images/noDeviceScreenshot.png'; this.parentNode.href='/images/noDeviceScreenshot.png';"
+      src="/images/screenshots/?ss=Matrix-1000 Editor - Patch Edit.png&id=6806" 
+      >
+   </a>
+</div>
+<br class="clearboth"/>
+<!-- IMG End--->
+
+<!-- Start Post -->
+<h2>Overview</h2>
+<table width="100%" cellpadding="8" cellspacing="2" border="0">
+   <tr valign="top">
+      <td bgcolor="#EFEEEE" width="20%" align="right">Name | Version:</td>
+      <td bgcolor="#EFEEEE">Matrix-1000 Editor 1.0.2</td>
+   </tr>
+   <tr>
+      <td bgcolor="#EFEEEE" width="20%" align="right">Author:</td>
+      <td bgcolor="#EFEEEE"><a href="/profile/user/TenSquare">TenSquare</a></td>
+   </tr>
+   <tr>
+      <td bgcolor="#EFEEEE" width="20%" align="right">Device Type:</td>
+      <td bgcolor="#EFEEEE">MIDI Effect</td>
+   </tr>
+   <tr valign="top">
+      <td bgcolor="#EFEEEE" width="20%" align="right">Description:</td>
+      <td bgcolor="#EFEEEE">Hello and thank you for your interest in the Matrix-1000 Editor, a Max for Live device specially designed to program your Oberheim Matrix-1000 synthesizer.<br />
+<br />
+The Matrix-1000 Editor is a very powerful, ergonomic and intuitive MIDI editor. Real software remote control tailor-made for the legendary Matrix-1000, it is used directly in the music production software Ableton Live (ableton.com).<br />
+<br />
+Thanks to this Max for Live MIDI editor, you will rediscover all the sound creation potential of your Matrix-1000, and it is really huge! Indeed, although this rack synthesizer is not directly editable on the front, it contains practically the same engine of synthesis as the equally legendary Oberheim Matrix-6 and Matrix-6R !<br />
+<br />
+With the Matrix-1000 Editor, you can finally access all of your Matrix-1000&#039;s settings with just a few mouse clicks. You&#039;ll be able to do so much more with advanced new features designed to make sound design easier.<br />
+<br />
+Have fun ! :)</td>
+      
+   </tr>
+</table>
+      
+<br class="clearboth" />
+<h2>Details</h2>
+<table width="100%" cellpadding="8" cellspacing="2" border="0">
+   <tr>
+      <td bgcolor="#EFEEEE" width="20%" align="right">Live Version Used:</td>
+      <td bgcolor="#EFEEEE">12.2.5</td>
+   </tr>
+   <tr>
+      <td bgcolor="#EFEEEE" width="20%" align="right">Max Version Used:</td>
+      <td bgcolor="#EFEEEE">8.6.5</td>
+   </tr>
+   <tr>
+      <td bgcolor="#EFEEEE" width="20%" align="right">Date Added:</td>
+      <td bgcolor="#EFEEEE">Dec 21 2020 20:23:26</td>
+   </tr>
+   <tr>
+      <td bgcolor="#EFEEEE" width="20%" align="right">Date Last Updated:</td>
+      <td bgcolor="#EFEEEE">Oct 12 2025 15:03:41</td>
+   </tr>
+   <tr>
+      <td bgcolor="#EFEEEE" width="20%" align="right">Downloads:</td>
+      <td bgcolor="#EFEEEE">1</td>
+   </tr>
+
+<!-- Device URL -->
+   <tr>
+      <td bgcolor="#EFEEEE" width="20%" align="right">
+         Website:
+               </td>
+      <td bgcolor="#EFEEEE">
+         <a href="https://drive.google.com/file/d/1DzS5Jm2-ewripikI_qzTkhzsdYuaSd_O/view?usp=sharing" target="_new">https://drive.google.com/file/d/1DzS5Jm2-ewripikI_qzTkhzsdYuaSd_O/view?usp=sharing</a>
+      </td>
+   </tr>
+<!-- License -->
+<tr>
+   <td bgcolor="#EFEEEE" width="20%" align="right">
+      <a href="http://creativecommons.org/about/licenses/" target="_new">&#9432;</a> License:</td>
+   <td bgcolor="#EFEEEE">None</td>
+</tr>
+
+<!-- Device Rating -->
+      <tr>
+         <td bgcolor="#EFEEEE">
+            Average Rating
+            (4)            <br/>
+            <h4><a href="/login.php">Log in to rate this device</a></h4>
+         </td>
+         <td bgcolor="#EFEEEE">
+            5   
+         </td>
+      </tr>
+</table>
+
+
+<br class="clearboth" />    
+
+
+
+
+<br class="clearboth" />
+
+<!-- End Post -->
+<br class="clearboth" />
+<a name="Comments"></a><h2>Comments</h2>
+         <div class="comments">
+         <div class='device-comment'>What can I say apart from wow! Beautifully laid out and implemented! I&#039;ve used quite a few Matrix-1000 editors and this one is so well presented and intuitive to use, looks like I finally have a go-to editor at last. Thanks.</div>
+         <div class="postMeta">
+         Posted on December 22 2020 by <a href="/profile/user/brobinson69">brobinson69</a> | 
+         <a href="mailto:info@maxforlive.com?subject=maxforlive.com Inappropriate Comment&body=Inappropriate comment for device: /library/device.php?id=6806#16143">Report Issue</a>
+         </div></div>
+         <div class="comments">
+         <div class='device-comment'>Thank you for your message and your very positive feedback, it&#039;s a pleasure ! :) Have you tried it yet ? Is everything working well ? Are you on Mac or PC ?</div>
+         <div class="postMeta">
+         Posted on December 22 2020 by <a href="/profile/user/TenSquare">TenSquare</a> | 
+         <a href="mailto:info@maxforlive.com?subject=maxforlive.com Inappropriate Comment&body=Inappropriate comment for device: /library/device.php?id=6806#16145">Report Issue</a>
+         </div></div>
+         <div class="comments">
+         <div class='device-comment'>hi. it looks marvelous to be honest and i am eager to make it work on my windows, but unfortunately i have been having issues.<br />
+seems like it finds an error loading the names of the parameters, which appear to be named all (live.comment) and no midi signal is coming out of the channel at all. not if i alter the parameters nor if i try to send a midi signal.<br />
+<br />
+on the Max Console i receive these errors:<br />
+<br />
+live.comment: live.comment: no such object<br />
+live.comment: live.comment: no such object<br />
+live.comment: live.comment: no such object<br />
+js: m1k.core.js: Javascript ReferenceError: ParameterInfoProvider is not defined, line 90<br />
+js: error calling function init [m1k.core.js]<br />
+<br />
+the live.comment is repeated per parameter name that was missing<br />
+<br />
+am i doing something wrong?<br />
+<br />
+thanks in advance for your work and for sharing!</div>
+         <div class="postMeta">
+         Posted on December 30 2020 by <a href="/profile/user/LorenzoDeSilva">LorenzoDeSilva</a> | 
+         <a href="mailto:info@maxforlive.com?subject=maxforlive.com Inappropriate Comment&body=Inappropriate comment for device: /library/device.php?id=6806#16178">Report Issue</a>
+         </div></div>
+         <div class="comments">
+         <div class='device-comment'>Hi Lorenzo,<br />
+What are the versions of your Ableton Live and Max softwares ? As explained in my user manual, you need will Live 10.1.30 and Max 8.1.8 to make the device work correctly.<br />
+Someone on Facebook has encountered exactly the same issue because he was using a previous Live version, I think it works for him now.<br />
+Cheers,<br />
+Guillaume</div>
+         <div class="postMeta">
+         Posted on December 30 2020 by <a href="/profile/user/TenSquare">TenSquare</a> | 
+         <a href="mailto:info@maxforlive.com?subject=maxforlive.com Inappropriate Comment&body=Inappropriate comment for device: /library/device.php?id=6806#16183">Report Issue</a>
+         </div></div>
+         <div class="comments">
+         <div class='device-comment'>Just got a Matrix 1000. AMAZING device you did Guillaume. Thank you so much for sharing!</div>
+         <div class="postMeta">
+         Posted on February 23 2022 by <a href="/profile/user/elliotEtag">elliotEtag</a> | 
+         <a href="mailto:info@maxforlive.com?subject=maxforlive.com Inappropriate Comment&body=Inappropriate comment for device: /library/device.php?id=6806#18967">Report Issue</a>
+         </div></div>
+         <div class="comments">
+         <div class='device-comment'>Hi Elliot,<br />
+I&#039;m really happy that you like my MIDI editor for the Matrix 1000. :)<br />
+I hope you&#039;ll use it to create lots of new sounds and fully explore the potential of your synth, it&#039;s one hell of a machine!<br />
+Were you able to successfully operate the device in Ableton Live? Was my documentation useful to you ? What versions of Live and Max are you using?<br />
+Have fun ! ;)<br />
+All the best from France.<br />
+Guillaume</div>
+         <div class="postMeta">
+         Posted on February 24 2022 by <a href="/profile/user/TenSquare">TenSquare</a> | 
+         <a href="mailto:info@maxforlive.com?subject=maxforlive.com Inappropriate Comment&body=Inappropriate comment for device: /library/device.php?id=6806#18971">Report Issue</a>
+         </div></div>
+         <div class="comments">
+         <div class='device-comment'>Hi Guillaume, <br />
+<br />
+I am sorry for the late reply, I just saw your message :) <br />
+<br />
+Yes it&#039;s a hell of a synth, so many parameters I am actually overwhelmed, will need some time to tame it :)<br />
+<br />
+I am using Live 11 and Max 8 (last versions released for both) on Mac OSX Monterey (Apple Silicon but running Live with Rosetta). Everything is working properly (at least I couldn&#039;t find any issue). <br />
+<br />
+My Matrix 1000 has the original firmware 1.11 so the feedback is relatively slow, this makes it half fun to sweep parameters. <br />
+I am waiting for the TaunTek firmware which should fix those sysex lags. <br />
+<br />
+I didn&#039;t use the documentation since I am used to midi and audio routing but I quickly red it now and it seemed very clear, really kind of you to share all this hard work, and for free!<br />
+<br />
+All the best from Germany! (I am French too hehe)<br />
+Elliot<br />
+</div>
+         <div class="postMeta">
+         Posted on March 04 2022 by <a href="/profile/user/elliotEtag">elliotEtag</a> | 
+         <a href="mailto:info@maxforlive.com?subject=maxforlive.com Inappropriate Comment&body=Inappropriate comment for device: /library/device.php?id=6806#19017">Report Issue</a>
+         </div></div>
+         <div class="comments">
+         <div class='device-comment'>Hi Elliot,<br />
+The world is small ! :)<br />
+I&#039;m really happy to know that my device works well under macOS Monterey and the latest versions of Max and Ableton Live. A good point !<br />
+I myself had started the development of the Matrix-1000 Editor via the original Oberheim EPROM v1.11. It&#039;s true that the processing of SysEx messages is a little slow... I then equipped the synth with the TaunTek EPROM, it was night and day! You should feel quite a difference when you receive yours, it&#039;s much smoother, especially on the filter movements! Thank you for your positive comment on my documentation, I took pains ;)<br />
+Have fun !<br />
+Musically,<br />
+Guillaume</div>
+         <div class="postMeta">
+         Posted on March 07 2022 by <a href="/profile/user/TenSquare">TenSquare</a> | 
+         <a href="mailto:info@maxforlive.com?subject=maxforlive.com Inappropriate Comment&body=Inappropriate comment for device: /library/device.php?id=6806#19031">Report Issue</a>
+         </div></div>
+         <div class="comments">
+         <div class='device-comment'>i am still downloading it but i loved you from the first moment i saw the user manual for the editor<br />
+<br />
+thank you!<br />
+<br />
+i&#039;ll let you know my feedback, i am on win 10 ableton 10</div>
+         <div class="postMeta">
+         Posted on March 16 2022 by <a href="/profile/user/LorenzoDeSilva">LorenzoDeSilva</a> | 
+         <a href="mailto:info@maxforlive.com?subject=maxforlive.com Inappropriate Comment&body=Inappropriate comment for device: /library/device.php?id=6806#19088">Report Issue</a>
+         </div></div>
+         <div class="comments">
+         <div class='device-comment'>Hi Lorenzo,<br />
+Thank you for your comment. I have made a special effort to write my user documentation, I hope it will help you to make my device work with your Matrix-1000 under Live 10 &amp; Windows 10. Let me know when you&#039;re done :)<br />
+Have fun !<br />
+Guillaume</div>
+         <div class="postMeta">
+         Posted on March 16 2022 by <a href="/profile/user/TenSquare">TenSquare</a> | 
+         <a href="mailto:info@maxforlive.com?subject=maxforlive.com Inappropriate Comment&body=Inappropriate comment for device: /library/device.php?id=6806#19090">Report Issue</a>
+         </div></div>
+         <div class="comments">
+         <div class='device-comment'>Hello Guillaume,<br />
+Merci pour cet &eacute;diteur du matrix 1000 !<br />
+Malheureusement impossible d&#039;avoir l&#039;affichage correct, j&#039;ai pourtant utilis&eacute; les polices du dossier d&#039;installation et sont bien install&eacute;es dans le livre de police (mac osX)<br />
+As tu d&eacute;j&agrave; eu des retours de probl&egrave;mes similaire ?<br />
+<br />
+Merci,<br />
+Victor</div>
+         <div class="postMeta">
+         Posted on March 17 2022 by <a href="/profile/user/papoi">papoi</a> | 
+         <a href="mailto:info@maxforlive.com?subject=maxforlive.com Inappropriate Comment&body=Inappropriate comment for device: /library/device.php?id=6806#19095">Report Issue</a>
+         </div></div>
+         <div class="comments">
+         <div class='device-comment'>Hello Guillaume, J&#039;ai r&eacute;ussi &agrave; le faire fonctionner. Je n&#039;avais juste pas la bonne version de max, il a juste fallu la mettre &agrave; jour !<br />
+Merci, h&acirc;te de pouvoir essayer ton app !<br />
+</div>
+         <div class="postMeta">
+         Posted on March 17 2022 by <a href="/profile/user/papoi">papoi</a> | 
+         <a href="mailto:info@maxforlive.com?subject=maxforlive.com Inappropriate Comment&body=Inappropriate comment for device: /library/device.php?id=6806#19096">Report Issue</a>
+         </div></div>
+         <div class="comments">
+         <div class='device-comment'>Hello Victor,<br />
+Je suis ravi que tu aies finalement r&eacute;ussi &agrave; faire fonctionner mon device dans ton setup. Juste pour savoir, tu utilisais quelle version de Max pr&eacute;c&eacute;demment ?<br />
+Amuse-toi bien, et n&#039;h&eacute;sites pas &agrave; donner ton retour d&#039;exp&eacute;rience utilisateur ici ! ;)<br />
+Guillaume<br />
+- - -<br />
+Hello Victor,<br />
+I&#039;m glad you finally got my device working in your setup. Just to know, which version of Max did you use previously ?<br />
+Have fun, and don&#039;t hesitate to give your user experience feedback here! ;)<br />
+Guillaume</div>
+         <div class="postMeta">
+         Posted on March 18 2022 by <a href="/profile/user/TenSquare">TenSquare</a> | 
+         <a href="mailto:info@maxforlive.com?subject=maxforlive.com Inappropriate Comment&body=Inappropriate comment for device: /library/device.php?id=6806#19099">Report Issue</a>
+         </div></div>
+         <div class="comments">
+         <div class='device-comment'>Hello dear users!<br />
+Would you be motivated to make a short video to show us how you program your Oberheim Matrix-1000 with my Max for Live editor, post it on YouTube and give us the link here?<br />
+Thank you all so much for your positive feedback and encouragement!<br />
+Good kisses from France.<br />
+Guillaume</div>
+         <div class="postMeta">
+         Posted on March 19 2022 by <a href="/profile/user/TenSquare">TenSquare</a> | 
+         <a href="mailto:info@maxforlive.com?subject=maxforlive.com Inappropriate Comment&body=Inappropriate comment for device: /library/device.php?id=6806#19109">Report Issue</a>
+         </div></div>
+         <div class="comments">
+         <div class='device-comment'>Hello Guillaume, j&#039;&eacute;tais en d&eacute;placement pendant 3 semaines. Je viens de voir ton msg, je vais essayer de trouver l&#039;ancienne installation de max pour r&eacute;pondre &agrave; ta question car je n&#039;ai malheureusement aucune id&eacute;e.<br />
+<br />
+En 1&egrave;res impressions, jai &eacute;t&eacute; bluff&eacute; par la r&eacute;activit&eacute; des filtres, dco, ADSR.<br />
+Pour les modulations cela m&#039;a sembl&eacute; un peu moins bien.<br />
+<br />
+J&#039;ai voulu m&#039;y remettre aujourdhui, mais malheureusement pour une raison que je n&#039;explique pas cela ne fonctionne plus.<br />
+Le device de max envoie bien de l&#039;info midi (mon matrix 1000 r&eacute;agit, les valeurs changent sur l&#039;&eacute;cran d&#039;affichage) en revanche je n&#039;ai aucune sortie audio du matrix. Celle ci revient bien quand j&#039;enl&egrave;ve le matrix-1000 editor de ma piste. Je comprend pas pourquoi j&#039;ai subitement ce probl&egrave;me.<br />
+<br />
+Concernant la vid&eacute;o sur youtube je pense que c&#039;est tjrs un plus !<br />
+<br />
+cheers !<br />
+</div>
+         <div class="postMeta">
+         Posted on April 14 2022 by <a href="/profile/user/papoi">papoi</a> | 
+         <a href="mailto:info@maxforlive.com?subject=maxforlive.com Inappropriate Comment&body=Inappropriate comment for device: /library/device.php?id=6806#19218">Report Issue</a>
+         </div></div>
+         <div class="comments">
+         <div class='device-comment'>I&#039;m not sure how active this project is, but, I have been trying to get it to work in Ableton 11.  I have my project set up 100% exactly as depicted in the instruction manual, and I am able to audition my matrix via a usb midi keyboard, I can change the patch via the patch edit (select patch) but that&#039;s it. i can&#039;t alter the paramters (i have protect memory set to off), and I can&#039;t change ANY of the master parameters.<br />
+<br />
+When I load the master editor, my midi interface should receive information, but it receives nothing.  I know that the matrix can send info because when i set echo to ON and send midi notes, it sends the echo back.  <br />
+<br />
+It&#039;s neat to be able to set my patch in ableton, but that&#039;s all I can do, change from patch 000 to patch 493 or whatever, but nothing else.<br />
+<br />
+Has anyone had this problem before? <br />
+<br />
+</div>
+         <div class="postMeta">
+         Posted on August 18 2022 by <a href="/profile/user/Slorrin">Slorrin</a> | 
+         <a href="mailto:info@maxforlive.com?subject=maxforlive.com Inappropriate Comment&body=Inappropriate comment for device: /library/device.php?id=6806#19842">Report Issue</a>
+         </div></div>
+         <div class="comments">
+         <div class='device-comment'>Hi Slorrin,<br />
+Looks like SysEx messages are not getting through and only program changes are taken into account.<br />
+What version of Live and Max are you using?<br />
+What MIDI interface do you use?<br />
+Guillaume</div>
+         <div class="postMeta">
+         Posted on August 19 2022 by <a href="/profile/user/TenSquare">TenSquare</a> | 
+         <a href="mailto:info@maxforlive.com?subject=maxforlive.com Inappropriate Comment&body=Inappropriate comment for device: /library/device.php?id=6806#19845">Report Issue</a>
+         </div></div>
+         <div class="comments">
+         <div class='device-comment'>Hi, <br />
+<br />
+I have the same issue, i can send program changes or edit parameters from the editor to the m1000 OK.<br />
+But the editor does not seem to receive any sysex data as described by Slorrin.<br />
+Using Ableton Suite 11.2 - Windows with a Midisport 4x4.<br />
+<br />
+Editor looks awesome tho, hope i can get it to work somehow....cheers!</div>
+         <div class="postMeta">
+         Posted on October 09 2022 by <a href="/profile/user/stiebz">stiebz</a> | 
+         <a href="mailto:info@maxforlive.com?subject=maxforlive.com Inappropriate Comment&body=Inappropriate comment for device: /library/device.php?id=6806#20110">Report Issue</a>
+         </div></div>
+         <div class="comments">
+         <div class='device-comment'>OK, turns out that if you switch the midi out with the midi thru it doesnt work...Turns also out that im an idiot.<br />
+<br />
+If i now select the patch from the editor it works fine. <br />
+<br />
+Looks awesome - thanks for the great effort put in this!!!</div>
+         <div class="postMeta">
+         Posted on October 09 2022 by <a href="/profile/user/stiebz">stiebz</a> | 
+         <a href="mailto:info@maxforlive.com?subject=maxforlive.com Inappropriate Comment&body=Inappropriate comment for device: /library/device.php?id=6806#20112">Report Issue</a>
+         </div></div>
+         <div class="comments">
+         <div class='device-comment'>Hi Stiebz,<br />
+I&#039;m glad you finally got my Matrix-1000 Editor to work with Live 11.2 and your MIDI interface. :)<br />
+Have fun !<br />
+Guillaume</div>
+         <div class="postMeta">
+         Posted on October 09 2022 by <a href="/profile/user/TenSquare">TenSquare</a> | 
+         <a href="mailto:info@maxforlive.com?subject=maxforlive.com Inappropriate Comment&body=Inappropriate comment for device: /library/device.php?id=6806#20113">Report Issue</a>
+         </div></div>
+         <div class="comments">
+         <div class='device-comment'>Hi,<br />
+I&#039;ve got it working, and it looks great thanks!<br />
+<br />
+However, I am only able to change Banks, and not Programs via the Internal Patches Browser.<br />
+<br />
+Do you know why this is happening, and how to solve the issue?<br />
+<br />
+</div>
+         <div class="postMeta">
+         Posted on November 05 2022 by <a href="/profile/user/pramster">pramster</a> | 
+         <a href="mailto:info@maxforlive.com?subject=maxforlive.com Inappropriate Comment&body=Inappropriate comment for device: /library/device.php?id=6806#20290">Report Issue</a>
+         </div></div>
+         <div class="comments">
+         <div class='device-comment'>Hi Pramster,<br />
+That&#039;s a bit strange...<br />
+Are you able to edit the Matrix parameters values ?<br />
+Can you make a test and try to send a program change to the Matrix, starting from an empty Ableton Live set and using a simple MIDI track and a MIDI clip. You can set the program change number in the Clip window, it will be sent when you launch the clip.<br />
+Let me know.<br />
+Guillaume</div>
+         <div class="postMeta">
+         Posted on November 06 2022 by <a href="/profile/user/TenSquare">TenSquare</a> | 
+         <a href="mailto:info@maxforlive.com?subject=maxforlive.com Inappropriate Comment&body=Inappropriate comment for device: /library/device.php?id=6806#20297">Report Issue</a>
+         </div></div>
+         <div class="comments">
+         <div class='device-comment'>Thx a mil Guillaume! Works fine here (firmware 1.2). <br />
+Just wondering if midi mapping the parameters would be possible? And also play with ableton automation on parameters. I tried to edit the device: changed every live.numbox so Parameter Visibility is set to Automated and Stored. While I can now midi map the parameters, it only affect visually the numbox and sends nothing to the ob matrix 1k. Any hints on that?<br />
+Best,<br />
+Edouard</div>
+         <div class="postMeta">
+         Posted on December 03 2022 by <a href="/profile/user/lenfantdo">lenfantdo</a> | 
+         <a href="mailto:info@maxforlive.com?subject=maxforlive.com Inappropriate Comment&body=Inappropriate comment for device: /library/device.php?id=6806#20488">Report Issue</a>
+         </div></div>
+         <div class="comments">
+         <div class='device-comment'>Hello Edouard,<br />
+Thank you very much for your very positive feedback, it&#039;s a pleasure! :)<br />
+The issue you&#039;re talking about is exactly why I disabled the ability to automate my editor settings in Live. This is a limitation of Max when used with JS, up to version 8.3.1 I believe. I reported this to the development team at Cycling &#039;74, they have since fixed it. So you should be able to automate my editor settings in Live and send the corresponding SysEx commands to the Matrix-1000 provided you install Max version 8.3.2 or higher ;)<br />
+Musically,<br />
+Guillaume</div>
+         <div class="postMeta">
+         Posted on December 04 2022 by <a href="/profile/user/TenSquare">TenSquare</a> | 
+         <a href="mailto:info@maxforlive.com?subject=maxforlive.com Inappropriate Comment&body=Inappropriate comment for device: /library/device.php?id=6806#20492">Report Issue</a>
+         </div></div>
+         <div class="comments">
+         <div class='device-comment'>Hey Guillaume,<br />
+<br />
+What an incredible M4L device, thank you so much!<br />
+<br />
+I read Edouard&#039;s points about Lane Automation; this would be a &#039;game changer&#039; for me on this plug in too if it was indeed possible (I&#039;d also probably do away with my Patch Editor hardware...). That said, I do not have the knowledge to understand which parameters to change (i.e the live.numbox parts) in M4L to make this a possibility. I&#039;ve changed up to 8.5.2 within Live, for reference.<br />
+<br />
+Are there any plans to update the plug to enable labnel automation. If not, would you be able to point me in the right direction to make these changes as a test?<br />
+<br />
+Many thanks,<br />
+<br />
+Kris </div>
+         <div class="postMeta">
+         Posted on February 15 2023 by <a href="/profile/user/FourCandles">FourCandles</a> | 
+         <a href="mailto:info@maxforlive.com?subject=maxforlive.com Inappropriate Comment&body=Inappropriate comment for device: /library/device.php?id=6806#20972">Report Issue</a>
+         </div></div>
+         <div class="comments">
+         <div class='device-comment'>Hi Kris,<br />
+<br />
+Thank you very much for your interest and your very positive feedback regarding my Matrix-1000 Editor, I really appreciate it ! :)<br />
+<br />
+I&#039;m starting to get a few requests for an update to my device so that we can automate the editor settings in Ableton Live. I promised a few people that I will try to find the time to do this update.<br />
+<br />
+In principle, it&#039;s not very complicated, but I still have to redo complete tests with the Matrix-1000, in order to be certain that the device works as expected...<br />
+<br />
+For the moment it&#039;s a bit complicated for me because I have just moved into my new place of life, but I will get back to developing my MIDI editor soon !<br />
+<br />
+All the best from France.<br />
+<br />
+Guillaume</div>
+         <div class="postMeta">
+         Posted on February 15 2023 by <a href="/profile/user/TenSquare">TenSquare</a> | 
+         <a href="mailto:info@maxforlive.com?subject=maxforlive.com Inappropriate Comment&body=Inappropriate comment for device: /library/device.php?id=6806#20979">Report Issue</a>
+         </div></div>
+         <div class="comments">
+         <div class='device-comment'>Hey Guillaume,<br />
+<br />
+Wishing you happiness in your new home! <br />
+<br />
+Many thanks for getting back so fast and I look forward to the updates :) <br />
+<br />
+Kris</div>
+         <div class="postMeta">
+         Posted on February 17 2023 by <a href="/profile/user/FourCandles">FourCandles</a> | 
+         <a href="mailto:info@maxforlive.com?subject=maxforlive.com Inappropriate Comment&body=Inappropriate comment for device: /library/device.php?id=6806#20996">Report Issue</a>
+         </div></div>
+         <div class="comments">
+         <div class='device-comment'>Salut et merci pour ton travail, j&#039;attends d&#039;installer le nouveau live ( je suis sous live 9...) pour essayer ton &eacute;diteur. Est-ce qu&#039;il y a fonction al&eacute;atoire qui param&egrave;tre al&eacute;atoirement les param&egrave;tres du matrix ? </div>
+         <div class="postMeta">
+         Posted on December 10 2023 by <a href="/profile/user/cosmiczulu">cosmiczulu</a> | 
+         <a href="mailto:info@maxforlive.com?subject=maxforlive.com Inappropriate Comment&body=Inappropriate comment for device: /library/device.php?id=6806#22943">Report Issue</a>
+         </div></div>
+         <div class="comments">
+         <div class='device-comment'>Salut, merci beaucoup pour ton editeur ! je vais enfin pouvoir m&#039;amuser apr&egrave;s des ann&eacute;es bloqu&eacute; sur les patch internes ! J&#039;ai tout install&eacute;, &ccedil;a fonctionne super, par contre je n&#039;arrive par &agrave; mapper les param&egrave;tres de l&#039;editeur pour les controller avec mon push. est ce qu&#039;il y a une astuce pour y parvenir ? merci encore ! :))</div>
+         <div class="postMeta">
+         Posted on December 28 2023 by <a href="/profile/user/cosmiczulu">cosmiczulu</a> | 
+         <a href="mailto:info@maxforlive.com?subject=maxforlive.com Inappropriate Comment&body=Inappropriate comment for device: /library/device.php?id=6806#23055">Report Issue</a>
+         </div></div>
+         <div class="comments">
+         <div class='device-comment'>This is the best editor yet! I can confirm it works on the Matrix-6 as well. I&#039;m using the tauntek 2.15 firmware and it runs amazingly with this editor! Thank you so much for making this! </div>
+         <div class="postMeta">
+         Posted on January 11 2024 by <a href="/profile/user/sensationfc">sensationfc</a> | 
+         <a href="mailto:info@maxforlive.com?subject=maxforlive.com Inappropriate Comment&body=Inappropriate comment for device: /library/device.php?id=6806#23151">Report Issue</a>
+         </div></div>
+         <div class="comments">
+         <div class='device-comment'>+1 on the ability to map the parameters to midi controller. <br />
+Fabulous job, well done!</div>
+         <div class="postMeta">
+         Posted on February 23 2024 by <a href="/profile/user/mouldyminge">mouldyminge</a> | 
+         <a href="mailto:info@maxforlive.com?subject=maxforlive.com Inappropriate Comment&body=Inappropriate comment for device: /library/device.php?id=6806#23559">Report Issue</a>
+         </div></div>
+         <div class="comments">
+         <div class='device-comment'>Hello everyone !<br />
+<br />
+Many of you have asked me to implement parameter automation in Ableton Live for my Matrix-1000 Editor. After more than a year of absence in the comments of this page (and I apologize for that), here is a v1.0.1 update of my device allowing to automate the synth parameters in Live.<br />
+<br />
+I was able to do some fairly conclusive quick tests but not the complete tests that I would have liked to do, because I no longer really have the time or energy to complete this project. I am counting on your cooperation to report any bugs to me. ;)<br />
+<br />
+Please keep in mind that the Matrix-1000 is not very responsive to incoming SysEx messages, except for about twenty parameters optimized using the TaunTek EPROM :<br />
+<br />
+http://tauntek.com/Matrix1000Firmware.htm<br />
+<br />
+If you notice audio glitches when automating certain parameters in Live, this is probably normal and unfortunately I won&#039;t be able to really improve things given the response time of the machine...<br />
+<br />
+Hoping that this update, long awaited by all, gives you satisfaction ! :)<br />
+<br />
+All the best from France.<br />
+<br />
+Guillaume</div>
+         <div class="postMeta">
+         Posted on February 25 2024 by <a href="/profile/user/TenSquare">TenSquare</a> | 
+         <a href="mailto:info@maxforlive.com?subject=maxforlive.com Inappropriate Comment&body=Inappropriate comment for device: /library/device.php?id=6806#23581">Report Issue</a>
+         </div></div>
+         <div class="comments">
+         <div class='device-comment'>HI Guillaume,<br />
+<br />
+Could you tell me if there is a way to alter the parameter appearing in Push? <br />
+I would like to reorder them a little and add the filter section that is somehow missing (page 4 seem to be broken)<br />
+There usually is a live.bank object in the .amxd file but I could not locate it.<br />
+Maybe you have a tip for me so I can improve the Push parameter layout?<br />
+<br />
+Thank you for this device!</div>
+         <div class="postMeta">
+         Posted on September 11 2024 by <a href="/profile/user/elliotEtag">elliotEtag</a> | 
+         <a href="mailto:info@maxforlive.com?subject=maxforlive.com Inappropriate Comment&body=Inappropriate comment for device: /library/device.php?id=6806#24731">Report Issue</a>
+         </div></div>
+         <div class="comments">
+         <div class='device-comment'>Hi Guillaume!<br />
+<br />
+Just leaving a report, current Matrix-1000 Editor seems it does not save Computer patches.<br />
+<br />
+Both [SAVE AS] and [SAVE] does not create file at all, and adding .m1kp extension manually doesn&#039;t work too.<br />
+<br />
+In Max Console, both actions gives back the message &#039;[undefined] bad number&#039;.<br />
+<br />
+I&#039;m running the editor in Live 11.3.35 with Max 8.5.8 and everything else works brilliantly.<br />
+<br />
+Many thanks,</div>
+         <div class="postMeta">
+         Posted on April 08 2025 by <a href="/profile/user/exhilarationism">exhilarationism</a> | 
+         <a href="mailto:info@maxforlive.com?subject=maxforlive.com Inappropriate Comment&body=Inappropriate comment for device: /library/device.php?id=6806#25767">Report Issue</a>
+         </div></div>
+         <div class="comments">
+         <div class='device-comment'>Is it necessary to have the Tauntek eprom? At the moment the Editor can only receive the parameter data. It does not send parameter data, only the patch change.</div>
+         <div class="postMeta">
+         Posted on July 02 2025 by <a href="/profile/user/ericlemoyne">ericlemoyne</a> | 
+         <a href="mailto:info@maxforlive.com?subject=maxforlive.com Inappropriate Comment&body=Inappropriate comment for device: /library/device.php?id=6806#26164">Report Issue</a>
+         </div></div>
+         <div class="comments">
+         <div class='device-comment'>Hi guys!<br />
+Indeed, my editor&#039;s parameters are not currently supported by Ableton Push or traditional MIDI controllers. It would be interesting to implement this, but as you&#039;ve probably gathered, I don&#039;t have the time right now to dedicate myself to this project again...<br />
+Really sorry about the bug with saving patches to the computer; something must have happened with the newer versions of Live and/or Max for Live, as it worked fine before. I&#039;ll try to find a time this summer to look into it, but unfortunately, I can&#039;t promise anything.<br />
+Theoretically, my editor should be able to work with the original Matrix-1000 EPROM, but I highly recommend using a modified Tauntek EPROM, as the synth is much more responsive to incoming SysEx messages with this version!<br />
+All the best from France !<br />
+Guillaume</div>
+         <div class="postMeta">
+         Posted on July 03 2025 by <a href="/profile/user/TenSquare">TenSquare</a> | 
+         <a href="mailto:info@maxforlive.com?subject=maxforlive.com Inappropriate Comment&body=Inappropriate comment for device: /library/device.php?id=6806#26175">Report Issue</a>
+         </div></div>
+         <div class="comments">
+         <div class='device-comment'>Hi Chris,<br />
+<br />
+Thank you very much for your very positive feedback about my Matrix-1000 Editor. :)<br />
+<br />
+I must say I&#039;m very surprised by the behavior of my device in your setup. It&#039;s still strange that it mutes your Matrix-1000, since the device only sends SysEx messages to the synth.<br />
+<br />
+I know my device hasn&#039;t been working as well as it used to since the Max 9 update (especially in terms of file management), but I&#039;m having trouble understanding why it would mute your Matrix audio output...<br />
+<br />
+Does your synth have a Tauntek EPROM?<br />
+(See this page: http://tauntek.com/Matrix1000Firmware.htm)<br />
+<br />
+Have you tried resetting your Matrix-1000 by pressing and holding the [Enter] key on the front panel while powering up the unit?<br />
+<br />
+What type of MIDI interface are you using to connect the synth to Live?<br />
+<br />
+Since you&#039;re working on macOS like me, perhaps you could monitor the MIDI messages sent to your Matrix-1000 to make sure my device isn&#039;t saturating the synth with SysEx messages that it wouldn&#039;t be able to process, which could possibly cause this strange sound cutout.<br />
+<br />
+You can monitor the SysEx messages coming out of your MIDI interface using the free MIDI Monitor app (https://www.snoize.com/MIDIMonitor/).<br />
+<br />
+Let me know!<br />
+<br />
+Guillaume</div>
+         <div class="postMeta">
+         Posted on September 18 2025 by <a href="/profile/user/TenSquare">TenSquare</a> | 
+         <a href="mailto:info@maxforlive.com?subject=maxforlive.com Inappropriate Comment&body=Inappropriate comment for device: /library/device.php?id=6806#26581">Report Issue</a>
+         </div></div>
+         <div class="comments">
+         <div class='device-comment'>Hey there !<br />
+very good editor thank you, the only problem might be how the patches are dealt with Max, got some problems here and there but all manageable<br />
+<br />
+my only concern is about the save feature on the computer, got hard times trying to resolve this with AI because I dont know much with Max and coding but the most i could do is having files created but with wrong hexadecimal numbers in it<br />
+<br />
+savin patches on the computer and calling them is great cuz then i can keep the original patches on the synth<br />
+<br />
+Hope you&#039;ll be able to do something soon :D :D</div>
+         <div class="postMeta">
+         Posted on October 02 2025 by <a href="/profile/user/diosolip">diosolip</a> | 
+         <a href="mailto:info@maxforlive.com?subject=maxforlive.com Inappropriate Comment&body=Inappropriate comment for device: /library/device.php?id=6806#26624">Report Issue</a>
+         </div></div>
+         <div class="comments">
+         <div class='device-comment'>Hey - Congrats to the Editor - its working great.<br />
+One little thing though - I&acute;m using it also to midi map my roto-control to map Ableton Macros to the parameters.<br />
+All working fine, except the VCF Envelope is not enabled to be mapped. Any chance to get this fixed?<br />
+<br />
+thank you :)<br />
+</div>
+         <div class="postMeta">
+         Posted on October 10 2025 by <a href="/profile/user/maekm">maekm</a> | 
+         <a href="mailto:info@maxforlive.com?subject=maxforlive.com Inappropriate Comment&body=Inappropriate comment for device: /library/device.php?id=6806#26649">Report Issue</a>
+         </div></div>
+         <div class="comments">
+         <div class='device-comment'>Hi diosolip,<br />
+<br />
+I&#039;m indeed aware of this problem with saving Matrix-1000 patches as files on my computer. This bug was apparently introduced with the Max 9 update, and I&#039;m having a little trouble understanding where it&#039;s coming from.<br />
+<br />
+My MIDI editor is also experiencing other technical issues, such as sending duplicate, triple, or even quadruple SysEx messages...<br />
+<br />
+Rather than spend time trying to fix all these bugs, I&#039;ve decided to start my project from scratch. I&#039;m currently working on developing a new version of this MIDI editor, compatible with the Matrix-1000, Matrix-6, and Matrix-6R models. I plan to offer it as a VST/AU plugin, so it can be used in most DAWs on the market.<br />
+<br />
+It&#039;ll probably take some time, as it&#039;s not my main activity (I&#039;m an instructional designer at an Ableton-certified training center), but I think the wait should be worth it.<br />
+<br />
+Thanks for your feedback!<br />
+<br />
+Guillaume</div>
+         <div class="postMeta">
+         Posted on October 11 2025 by <a href="/profile/user/TenSquare">TenSquare</a> | 
+         <a href="mailto:info@maxforlive.com?subject=maxforlive.com Inappropriate Comment&body=Inappropriate comment for device: /library/device.php?id=6806#26656">Report Issue</a>
+         </div></div>
+         <div class="comments">
+         <div class='device-comment'>Hi maekm,<br />
+<br />
+Thanks for pointing out this bug in my device&#039;s automatable settings. I was careless; there are so many details to check!<br />
+<br />
+I just updated; this bug is relatively easy to fix. I&#039;m uploading version 1.0.2, but I haven&#039;t had time to test it with my Matrix-1000! I hope I don&#039;t introduce any new bugs!<br />
+<br />
+Thanks for your feedback.<br />
+<br />
+Guillaume</div>
+         <div class="postMeta">
+         Posted on October 11 2025 by <a href="/profile/user/TenSquare">TenSquare</a> | 
+         <a href="mailto:info@maxforlive.com?subject=maxforlive.com Inappropriate Comment&body=Inappropriate comment for device: /library/device.php?id=6806#26657">Report Issue</a>
+         </div></div>
+         <div class="comments">
+         <div class='device-comment'>Hey Guillaume<br />
+<br />
+Wow, thank you - that was fast!<br />
+Much appreciated.<br />
+<br />
+</div>
+         <div class="postMeta">
+         Posted on October 11 2025 by <a href="/profile/user/maekm">maekm</a> | 
+         <a href="mailto:info@maxforlive.com?subject=maxforlive.com Inappropriate Comment&body=Inappropriate comment for device: /library/device.php?id=6806#26658">Report Issue</a>
+         </div></div>
+         <div class="comments">
+         <div class='device-comment'>Hi Guillaume,<br />
+<br />
+Your editor is fantastic, I installed a Tauntek EPROM in the M1000 and it works perfect!<br />
+<br />
+I&#039;ve tried to insert a mira.frame in your m1K.patchView and tried to use it from an iPad. It works but the texts and envelope graphics are not visible. Unfortunately it makes no sense to control it from the iPad without any text.<br />
+Probably mira can be implemented in your editor in a better way. Perhaps you are interested in add this option in a future update? Or maybe you can help me to fix this text+graphic issue. Thank you very much! &nbsp;</div>
+         <div class="postMeta">
+         Posted on December 28 2025 by <a href="/profile/user/Edgardmd">Edgardmd</a> | 
+         <a href="mailto:info@maxforlive.com?subject=maxforlive.com Inappropriate Comment&body=Inappropriate comment for device: /library/device.php?id=6806#27008">Report Issue</a>
+         </div></div>
+         <div class="comments">
+         <div class='device-comment'>Hi Edgard,<br />
+<br />
+Thank you for your very positive feedback on my MIDI editor for the Matrix-1000. :)<br />
+<br />
+I wasn&#039;t familiar with Mira and I didn&#039;t even know it was possible to do this kind of video mirroring to an iPad with Max.<br />
+<br />
+I just took a look at the online documentation, and it says this:<br />
+<br />
+&quot;Mira.frame defines a rectangle in the Max patcher that will be mirrored on connected iPad devices. Any Mira-supported objects that fall within the rectangle will be visible on the iPad.&quot;<br />
+<br />
+Perhaps some of the objects I use in my Matrix-1000 Editor aren&#039;t compatible with Mira? Here is the list:<br />
+<br />
+- Labels: live.comment<br />
+- Buttons: panel (background) + live.text<br />
+- Sliders: live.numbox<br />
+- ComboBoxes: live.menu<br />
+- Envelopes: &quot;function&quot; object + custom device (m1k.displayEnvelope)<br />
+- Track Generator: &quot;function&quot; object + custom device (m1k.displayTrack)<br />
+<br />
+When you say that the text isn&#039;t displaying on the iPad, are you referring to all text (labels, buttons, sliders, comboboxes, etc.) or just labels? Perhaps objects of type live.comment are ignored by Mira because of their &quot;comment&quot; connotation? If it&#039;s only these texts, I suggest you try replacing all the live.comment objects with another type, perhaps a more basic one native to Max.<br />
+<br />
+Unfortunately, I won&#039;t be able to continue developing and maintaining my Matrix-1000 Editor because I&#039;m completely reworking it as a VST/AU plugin. It&#039;s an ambitious new project that will require a significant amount of time and effort, and I&#039;ll be working on it in my free time (as I have a day job at an Ableton-certified training center). My plugin will be very similar to the Matrix-1000 Editor, retaining the entire Patch editing section, and I&#039;ll incorporate the essential functions of the Master section into the same window as the Patch section. I also plan to add new features, such as a proper patch manager (with tags, etc.) and a random patch generator (similar to Absynth Mutate).<br />
+<br />
+Stay tuned! :)<br />
+<br />
+All the best from France.<br />
+<br />
+Guillaume</div>
+         <div class="postMeta">
+         Posted on December 28 2025 by <a href="/profile/user/TenSquare">TenSquare</a> | 
+         <a href="mailto:info@maxforlive.com?subject=maxforlive.com Inappropriate Comment&body=Inappropriate comment for device: /library/device.php?id=6806#27012">Report Issue</a>
+         </div></div>
+         <div class="comments">
+         <div class='device-comment'>&quot;My plugin will be very similar to the Matrix-1000 Editor...&quot;<br />
+<br />
+Awesome, please keep us updated now and then - can&#039;t wait!<br />
+<br />
+   Rob (age 50, Netherlands)</div>
+         <div class="postMeta">
+         Posted on January 22 2026 by <a href="/profile/user/RobS">RobS</a> | 
+         <a href="mailto:info@maxforlive.com?subject=maxforlive.com Inappropriate Comment&body=Inappropriate comment for device: /library/device.php?id=6806#27155">Report Issue</a>
+         </div></div>
+         <div class="comments">
+         <div class='device-comment'>Hi Rob,<br />
+<br />
+Thanks for your encouragement. :)<br />
+<br />
+I&#039;ve made good progress since starting the project last summer. I&#039;ve almost finished the graphical interface for my plugin. I still have a few objects to design (envelope displays, etc.) and some performance issues to address, but thanks to AI support, I&#039;m making relatively quick progress despite the limited time I can dedicate to it.<br />
+<br />
+I plan to tackle the core of the plugin soon, given that I&#039;ve already developed some fairly functional MIDI basics (receiving bytes, formatting and validating received SysEx messages, sending SysEx messages to the synthesizer, etc.).<br />
+<br />
+There&#039;s still a lot of work to be done before the first functional tests; I think it will take months...<br />
+<br />
+To be continued !<br />
+All the best from France.<br />
+Guillaume</div>
+         <div class="postMeta">
+         Posted on January 26 2026 by <a href="/profile/user/TenSquare">TenSquare</a> | 
+         <a href="mailto:info@maxforlive.com?subject=maxforlive.com Inappropriate Comment&body=Inappropriate comment for device: /library/device.php?id=6806#27166">Report Issue</a>
+         </div></div><a name="LastComments"></a><p><a href="/login.php">Login</a> to comment on this device.</p>
+
+<a href="/library/index.php?tag=all">Browse the full library</a>
+
+        </main>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+  <nav>
+    <ul class="footer-navigation">
+      <li><a href="https://cycling74.com">&copy; 2026 Cycling '74</a></li>
+      <li><a href="/terms.php">Terms and Conditions</a></li>
+      <li><a href="/privacy-policy.php">Privacy Policy</a></li>
+      <li><a href="https://ableton.com">Go to Ableton.com</a></li>
+    </ul>
+  </nav>
+</footer>
+
+<style>
+
+:root {
+  --footer-height: 45px;
+}
+
+footer {
+  width: 100%;
+  padding: 0;
+  height: var(--footer-height);
+}
+
+footer nav {
+  max-width: 1200px;
+  padding: 0;
+  margin: 0 auto;
+  height: var(--footer-height);
+  display: grid;
+  place-content: center;
+}
+
+footer, footer nav {
+  background-color: #232323;
+}
+
+.footer-navigation {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 2em;
+  margin: 0;
+  padding: 0;
+}
+
+.footer-navigation a {
+  font-size: 0.8rem;
+  color: #ffffff !important;
+}
+
+.footer-navigation li {
+  margin-bottom: 0em;
+}
+
+@media screen and (max-width: 768px) {
+  footer nav {
+    height: auto;
+  }
+  .footer-navigation {
+    flex-direction: column;
+    gap: 1em;
+  }
+}
+
+</style></body>
+
+<div id="cookie-consent">
+    <div class="cookie-consent-desc">
+        <strong>This website uses cookies.</strong>
+        <br />
+        Clicking “Accept” means you consent to your data being processed and you’ll let us use cookies and other technologies to process your personal information to personalize and enhance your experience.
+        Click “Close” to deny consent and continue with technically required cookies that are essential for the website to function.
+    </div>
+    <div class="cookie-consent-actions">
+        <a href="/privacy-policy.php">Privacy Policy</a>
+        <button id='cookie-consent-close'>Close</button>
+        <button id='cookie-consent-accept'>Accept</button>
+    </div>
+</div>
+</html>
+
+ 
