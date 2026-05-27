@@ -12,6 +12,7 @@ namespace tss
     {
     public:
         using ValueChangedCallback = std::function<void(int paramIndex, int newValue)>;
+        using EditGestureCallback = std::function<void(int paramIndex)>;
 
         explicit EnvelopeDisplay(int width, int height, const EnvelopeDisplayLook& look);
         ~EnvelopeDisplay() override = default;
@@ -38,6 +39,8 @@ namespace tss
         int getRelease() const { return release_; }
         
         void setOnValueChanged(ValueChangedCallback callback);
+        void setOnEditGestureBegin(EditGestureCallback callback);
+        void setOnEditGestureEnd(std::function<void()> callback);
         
         void paint(juce::Graphics& g) override;
         
@@ -81,6 +84,9 @@ namespace tss
         bool draggingSustainSegment_ = false;
 
         ValueChangedCallback onValueChanged_;
+        EditGestureCallback onEditGestureBegin_;
+        std::function<void()> onEditGestureEnd_;
+        bool editGestureActive_ = false;
 
         void drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds);

@@ -13,6 +13,7 @@ namespace tss
     {
     public:
         using ValueChangedCallback = std::function<void(int pointIndex, int newValue)>;
+        using EditGestureCallback = std::function<void(int pointIndex)>;
 
         explicit TrackGeneratorDisplay(int width, int height, const TrackGeneratorDisplayLook& look);
         ~TrackGeneratorDisplay() override = default;
@@ -39,6 +40,8 @@ namespace tss
         int getTrackPoint5() const { return pointValues_[4]; }
         
         void setOnValueChanged(ValueChangedCallback callback);
+        void setOnEditGestureBegin(EditGestureCallback callback);
+        void setOnEditGestureEnd(std::function<void()> callback);
         
         void paint(juce::Graphics& g) override;
         void resized() override;
@@ -74,6 +77,9 @@ namespace tss
         int draggedPointIndex_ = -1;
 
         ValueChangedCallback onValueChanged_;
+        EditGestureCallback onEditGestureBegin_;
+        std::function<void()> onEditGestureEnd_;
+        bool editGestureActive_ = false;
 
         void drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds);

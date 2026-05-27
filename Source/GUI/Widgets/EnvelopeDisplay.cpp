@@ -72,6 +72,16 @@ namespace tss
     {
         onValueChanged_ = std::move(callback);
     }
+
+    void EnvelopeDisplay::setOnEditGestureBegin(EditGestureCallback callback)
+    {
+        onEditGestureBegin_ = std::move(callback);
+    }
+
+    void EnvelopeDisplay::setOnEditGestureEnd(std::function<void()> callback)
+    {
+        onEditGestureEnd_ = std::move(callback);
+    }
     
     void EnvelopeDisplay::setDelay(int value)
     {
@@ -318,9 +328,32 @@ namespace tss
             .withTrimmedBottom(static_cast<float>(kWidgetPaddingBottom_) * uiScale_);
         
         draggedPointIndex_ = findPointAtPosition(e.position, innerBounds);
-        
+        draggingSustainSegment_ = false;
+
         if (draggedPointIndex_ < 0)
             draggingSustainSegment_ = findSustainSegmentAtPosition(e.position, innerBounds);
+
+        if (!onEditGestureBegin_)
+            return;
+
+        if (draggingSustainSegment_)
+        {
+            onEditGestureBegin_(3);
+            editGestureActive_ = true;
+            return;
+        }
+
+        if (draggedPointIndex_ < 0)
+            return;
+
+        const int paramIndexByPoint[] = { -1, 0, 1, 2, -1, 4 };
+        const int paramIndex = paramIndexByPoint[draggedPointIndex_];
+
+        if (paramIndex >= 0)
+        {
+            onEditGestureBegin_(paramIndex);
+            editGestureActive_ = true;
+        }
     }
     
     void EnvelopeDisplay::mouseDrag(const juce::MouseEvent& e)
@@ -425,5 +458,10 @@ namespace tss
     {
         draggedPointIndex_ = -1;
         draggingSustainSegment_ = false;
+
+        if (editGestureActive_ && onEditGestureEnd_)
+            onEditGestureEnd_();
+
+        editGestureActive_ = false;
     }
 }

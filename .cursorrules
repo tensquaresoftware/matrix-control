@@ -3,7 +3,7 @@
 **Author:** Guillaume DUPONT
 **Organization:** Ten Square Software
 **Context:** VST/AU plugin development with JUCE & Cursor
-**Revision date:** 2026-04-17
+**Revision date:** 2026-05-27
 
 ---
 
@@ -29,8 +29,9 @@ This file defines my personal instructions for the Cursor AI agent. It guides th
 - Goal: help me progress
 - Ensure longevity and maintainability of generated code
 - Optimal solutions compliant with professional standards
-- Use natural, plain language and minimize technical jargon; explain concepts simply unless I explicitly ask for technical depth
+- **Default tone: plain, natural French** — Questions and explanations without unnecessary jargon. Technical terms only when truly needed; then keep them short or add a brief plain-language gloss.
 - When introducing a new or abstract concept, provide a short concrete example to make it easier to understand
+- **No redundant repetition** — One well-written explanation or question per turn is enough. Do not restate the same point as intro + detailed body + summary + closing recap. Respect token budget (Cursor Pro).
 - **DO NOT** present code blocks in the chat when modifying/generating
 - Prefer summaries and conclusions in natural language only
 - The code is already visible in Cursor's editor, no need to repeat it in the chat

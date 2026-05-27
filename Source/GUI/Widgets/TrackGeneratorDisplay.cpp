@@ -77,6 +77,16 @@ namespace tss
     {
         onValueChanged_ = std::move(callback);
     }
+
+    void TrackGeneratorDisplay::setOnEditGestureBegin(EditGestureCallback callback)
+    {
+        onEditGestureBegin_ = std::move(callback);
+    }
+
+    void TrackGeneratorDisplay::setOnEditGestureEnd(std::function<void()> callback)
+    {
+        onEditGestureEnd_ = std::move(callback);
+    }
     
     void TrackGeneratorDisplay::setTrackPoint1(int value)
     {
@@ -264,6 +274,12 @@ namespace tss
             .withTrimmedBottom(static_cast<float>(kWidgetPaddingBottom_) * uiScale_);
 
         draggedPointIndex_ = findPointAtPosition(e.position, innerBounds);
+
+        if (draggedPointIndex_ >= 0 && onEditGestureBegin_)
+        {
+            onEditGestureBegin_(draggedPointIndex_);
+            editGestureActive_ = true;
+        }
     }
     
     void TrackGeneratorDisplay::mouseDrag(const juce::MouseEvent& e)
@@ -296,5 +312,10 @@ namespace tss
     void TrackGeneratorDisplay::mouseUp(const juce::MouseEvent&)
     {
         draggedPointIndex_ = -1;
+
+        if (editGestureActive_ && onEditGestureEnd_)
+            onEditGestureEnd_();
+
+        editGestureActive_ = false;
     }
 }
