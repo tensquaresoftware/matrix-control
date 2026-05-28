@@ -1,5 +1,7 @@
 # Build artifacts
+# P-001 target: builds/macos|windows|linux — keep Builds/ until migration
 build/
+builds/
 Builds/
 *.o
 *.obj
@@ -34,18 +36,16 @@ cmake_install.cmake
 # Tools
 Tools/
 
-# Logs
+# Runtime logs
 Logs/
 
-# Archives
+# Source archives (legacy snapshots — not for release)
 Source/Archives/
 
-# Quality stuff
-Quality/Profiling/
-Quality/Screenshots/
-Quality/Journal/IA_Prompt.md
-Quality/Journal/Todo.md
-Quality/Journal/Notes.txt
+# Personal workspace (never version: docs, mockups, TestLab, profiling, etc.)
+_local/
 
-# Workbench (dev/test data: SysEx files, Ableton project, MIDI Monitor)
+# Legacy root folders — ignore if recreated before P-001 migration
+Documentation/
+Quality/
 Workbench/
