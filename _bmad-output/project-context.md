@@ -2,7 +2,7 @@
 
 **Purpose:** Implementation constitution for BMad agents working on this repository.  
 **Baseline code tag:** `v0.0.66-alpha-pre-bmad`  
-**Last updated:** 2026-05-23  
+**Last updated:** 2026-05-27  
 **Author:** Guillaume DUPONT / Ten Square Software
 
 ---
@@ -24,7 +24,7 @@ This is a **brownfield** project. Do **not** restart from scratch. Extend and re
 |---|---|
 | Language | C++17 minimum |
 | Framework | JUCE 8.0.12 (`/Applications/JUCE`) |
-| Build | CMake, outputs under `Builds/` (`macOS/`, `Windows/`, `Linux/`) — never `build/` at root |
+| Build | CMake, outputs under `builds/` (`macos/`, `windows/`, `linux/`) — gitignored; never `build/` at root alone |
 | Compiler (macOS) | Xcode 26 |
 | Plugin formats | AU, VST3, Standalone |
 | Target synth | Oberheim Matrix-1000 (SysEx) |
@@ -32,7 +32,9 @@ This is a **brownfield** project. Do **not** restart from scratch. Extend and re
 
 ---
 
-## Repository Layout (Do Not Reorganize)
+## Repository Layout
+
+**Current layout (baseline `v0.0.66-alpha-pre-bmad`):**
 
 ```
 Matrix-Control/
@@ -49,7 +51,31 @@ Matrix-Control/
 └── Builds/                  # CMake build trees (gitignored)
 ```
 
-**Never** move `Source/` to `src/` or flatten the module hierarchy without explicit approval.
+### Planned migration (P-001 — see PRD decision log)
+
+Guillaume plans to **realign the project tree** with professional JUCE open-source conventions (folder/file naming, public vs private artifacts). This is **not started yet**.
+
+**Target root layout (validated draft):**
+
+| Path | Role | Git |
+|---|---|---|
+| `src/` | Application code | versioned |
+| `assets/` | Public assets (fonts, README screenshots) | versioned |
+| `docs/` | Public documentation (`.md`, kebab-case filenames) | versioned |
+| `tests/` | Unit tests | versioned |
+| `builds/macos/`, `builds/windows/`, `builds/linux/` | CMake output trees | **gitignored** |
+| `_bmad/`, `_bmad-output/` | BMad tooling and artifacts | versioned |
+| `_local/` | Personal workspace (ex-`Quality/`, `Workbench/`) | **gitignored** |
+
+References: no Oberheim manual PDFs in git — Markdown + external links only.
+
+**Until the target layout is documented and approved:**
+
+- Do **not** reorganize `Source/`, `Documentation/`, or `Quality/` ad hoc during feature work.
+- Do **not** commit `_local/` contents (journal, mockups, workbench data).
+- During **`bmad-create-architecture`**, capture the **full directory map** and migration steps; update this section when frozen.
+
+**Hard rule until P-001 is executed:** do not rename or flatten `Source/` → `src/` without an explicit approved migration plan and CMake updates.
 
 ---
 
