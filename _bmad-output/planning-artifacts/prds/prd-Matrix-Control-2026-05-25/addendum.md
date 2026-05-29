@@ -3,8 +3,8 @@ organization: Ten Square Software
 project: Matrix-Control
 title: PRD Addendum
 author: BMad Agent
-status: draft
-version: "0.3"
+status: final
+version: "1.0"
 sources:
   - prd.md
   - .decision-log.md
@@ -419,4 +419,4 @@ Amount, Random, module toggles = APVTS prefs (persisted). History = session-only
 
 ---
 
-*Addendum v0.3 — supports PRD v0.3 (Patch Mutator spec 2026-05-29); Architecture may extend without duplicating FR narrative.*
+*Addendum v1.0 — supports PRD v1.0 final (2026-05-29); Architecture may extend without duplicating FR narrative.*

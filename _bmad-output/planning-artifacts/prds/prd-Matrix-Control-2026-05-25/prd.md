@@ -3,8 +3,8 @@ organization: Ten Square Software
 project: Matrix-Control
 title: Product Requirements Document
 author: BMad Agent
-status: draft
-version: "0.3"
+status: final
+version: "1.0"
 sources:
   - ../../briefs/brief-Matrix-Control-2026-05-22/brief.md
   - .decision-log.md
@@ -20,11 +20,11 @@ updated: 2026-05-29
 
 This PRD defines **what** Matrix-Control v1 must do for musicians and contributors. It is written for the product owner, future collaborators, and downstream BMad workflows (UX, Architecture, Epics).
 
-**Sources:** Product brief v0.3, Phase 0 brownfield decision log (D-001–D-088), Oberheim reference docs (`_bmad-output/reference-docs/oberheim/`), Patch Mutator brainstorming (2026-05-29, D-082–D-087), and `addendum.md` for technical detail that does not belong in the FR narrative.
+**Sources:** Product brief v0.3, Phase 0 brownfield decision log (D-001–D-089), Oberheim reference docs (`_bmad-output/reference-docs/oberheim/`), Patch Mutator brainstorming (2026-05-29, D-082–D-087), and `addendum.md` for technical detail that does not belong in the FR narrative.
 
 **Structure:** Glossary-anchored vocabulary; features grouped with globally numbered FRs; assumptions tagged inline and indexed in §9.
 
-**Status:** Draft **v0.3** — PO review integrated (2026-05-29); Patch Mutator spec integrated (2026-05-29). Ready for Finalize reviewer gate.
+**Status:** **Final v1.0** — finalized 2026-05-29 (`bmad-prd` Finalize: decision-log audit, input reconciliation, rubric review `review-rubric.md`). Open questions §9 deferred to Architecture or owner input; safe for UX / Architecture / Epics.
 
 ---
 
@@ -629,4 +629,4 @@ macOS (AU + VST3 + Standalone), Windows (VST3 + Standalone), Linux (VST3 + Stand
 
 ---
 
-*End of PRD draft v0.3 — status `draft`. Finalize after reviewer gate and open-question triage per `bmad-prd` workflow.*
+*End of PRD v1.0 — status `final`. Next: `bmad-create-architecture`, `bmad-ux`, or `bmad-create-epics-and-stories`.*
