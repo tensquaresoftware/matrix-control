@@ -3,8 +3,8 @@ organization: Ten Square Software
 project: Matrix-Control
 title: Architecture Decision Document
 author: BMad Agent
-status: draft
-version: "0.3"
+status: complete
+version: "1.0"
 sources:
   - ../../prds/prd-Matrix-Control-2026-05-25/prd.md
   - ../../prds/prd-Matrix-Control-2026-05-25/addendum.md
@@ -13,7 +13,9 @@ sources:
   - ../../../reference-docs/oberheim/index.md
 created: 2026-05-29
 updated: 2026-05-29
-stepsCompleted: [1, 2, 3, 4, 5, 6]
+stepsCompleted: [1, 2, 3, 4, 5, 6, 7, 8]
+lastStep: 8
+completedAt: 2026-05-29
 inputDocuments:
   - prd-Matrix-Control-2026-05-25/prd.md
   - prd-Matrix-Control-2026-05-25/addendum.md
@@ -25,7 +27,7 @@ workflowType: architecture
 
 # Architecture Decision Document
 
-_Brownfield JUCE 8 plugin — extends existing descriptor-driven GUI and partial Core MIDI stack. Builds collaboratively; steps 5–8 (patterns, structure detail, validation, handoff) pending._
+_Brownfield JUCE 8 plugin — extends existing descriptor-driven GUI and partial Core MIDI stack. Architecture v1.0 complete (steps 1–8)._
 
 ---
 
@@ -240,8 +242,8 @@ Epics E1–E2 are **sequential gate**; E7 can start in parallel once handler int
 1. **MutationAlgorithm** — Amount/Random curves, per-parameter jitter rules, module toggle mask
 2. **SysExDelayProfile** — string matching rules for Tauntek/Gligli/Nordcore vs stock
 3. **Matrix Mod bus opcode** — 0x0B vs 0x06 block (PRD open question #3)
-4. **APVTS property catalog** — full list for Patch Manager + Mutator mirrors
-5. **P-001 tree migration** — defer until architecture v1.0 stable
+4. **APVTS property catalog** — full list for Patch Manager + Mutator mirrors (E6/E7 stories)
+5. ~~**P-001 tree migration**~~ — **documented** AD-9/AD-10; execute Epic E0
 
 ---
 
@@ -576,11 +578,155 @@ Execute in order; one thematic commit per bullet recommended:
 
 ---
 
-## Next Workflow Steps
+## Architecture Validation Results (Step 7)
 
-- **Step 7:** Architecture validation against PRD FR checklist
-- **Step 8:** Handoff → `bmad-create-epics-and-stories` (E0–E10)
+### Coherence Validation ✅
+
+**Decision Compatibility:** AD-1–AD-10 align with brownfield baseline (JUCE 8.0.12, C++17, CMake). Composition root (AD-2), unified queue (AD-3), and APVTS routing (AD-4) are mutually consistent — no direct MIDI from audio thread, no GUI→SysEx shortcuts. P-001 target tree (AD-9) matches implementation patterns (Step 5) and epic order (D-058). AD-10 (`ProjectPaths`) resolves the logger absolute-path conflict without contradicting D-094 (logs gitignored).
+
+**Pattern Consistency:** Naming, folder layout, APVTS taxonomy, and anti-patterns in Step 5 reinforce AD-1–AD-8. Epic E0 checklist references the same paths as the rename map. Mutator two-level store (AD-6) matches FR-54–FR-60 and D-082–D-087.
+
+**Structure Alignment:** FR→component map, epic→directory map, and service placement table cover all PRD feature areas. Boundaries GUI→Core→Shared are explicit. E0 before E1 prevents new files landing in obsolete `Source/` paths.
+
+### Requirements Coverage Validation ✅
+
+**Epic Coverage:** E0–E10 each map to concrete `src/` locations. D-058 critical path (E1→E2→…) preserved. E0 unblocks all subsequent epics.
+
+**Functional Requirements Coverage:** FR-1–FR-60 mapped in § FR → Component Mapping and Step 6 structure table. No orphan PRD section. Gaps are **algorithm/opcode detail**, not missing owners:
+
+| Deferred detail | PRD ref | Architecture owner |
+|---|---|---|
+| Mutation Amount/Random rules | FR-30, §9 #7 | `MutationAlgorithm` — E6 story |
+| Matrix Mod bus opcode | §9 #3 | SysEx dispatch — E2 spike on hardware |
+| SysEx automation throttle curves | §9 #2 | `SysExDelayProfile` — E2 + SM-1 |
+| INIT hardcoded defaults | §9 #4 | `InitDefaults` — E3 (non-blocking) |
+| M-6 Device ID member bytes | §9 #6 | `DeviceTypeRegistry` — E8 + hardware |
+
+**Non-Functional Requirements Coverage:**
+
+| NFR | Architectural support |
+|---|---|
+| NFR-1 CI tests | AD-8, `tests/` layout, E1–E7 test targets |
+| NFR-2 SysEx reliability | AD-3 queue + delay profile; SM-1 gate |
+| NFR-3 Thread safety | AD-3, patterns § MIDI queue-only outbound |
+| NFR-4 Descriptor SSOT | AD-4, anti-patterns, FR-49 |
+| NFR-5 Clean Code limits | project-context + Step 5 reference |
+| NFR-6 Documentation | `docs/` target, Oberheim refs in `_bmad-output` |
+| NFR-7 Release logging | D-041, D-094; Settings opt-in framed in E0/E7 |
+| NFR-8 Platforms | Brownfield CMake; builds/{macos,windows,linux} |
+
+### Implementation Readiness Validation ✅
+
+**Decision Completeness:** AD-1–AD-10 documented. Technology stack and versions stated in context + AD-8. Seven PRD §9 items explicitly routed to epics — acceptable for v1.0 architecture (not blocking epics/stories).
+
+**Structure Completeness:** Target tree, rename map, E0 checklist (10 steps), service paths, and integration diagram are specific enough for agent implementation.
+
+**Pattern Completeness:** Conflict points, naming, APVTS classes, error→footer, Mutator naming, and anti-patterns cover primary agent divergence risks. APVTS property ID catalog remains a **story-level** deliverable (Important gap).
+
+### Gap Analysis Results
+
+**Critical Gaps:** None — no missing architectural owner for any FR block; open items are implementation spikes or owner input, not structural holes.
+
+**Important Gaps:**
+
+1. **APVTS property catalog** — Mutator/PM mirror property IDs not enumerated (E6/E7 stories)
+2. **MutationAlgorithm** — PRD §9 #7; define in E6 before MUTATE ships
+3. **SysExDelayProfile matching rules** — EPROM string detection (E2)
+4. **Matrix Mod opcode** — confirm on hardware before E2 locks encoder (PRD §9 #3)
+
+**Nice-to-Have Gaps:**
+
+- Optional `docs/development/architecture/` public mirror of key ADs
+- DAW-specific automation throttle tuning notes post-SM-1
+- ENV shape clipboard scope (PRD §9 #5) — v1.x
+
+### Validation Issues Addressed
+
+- **Logger absolute paths (D-093):** AD-10 + E0 checklist step 5
+- **Logs in git (D-094):** Confirmed gitignore; documented in P-001 rename map
+- **P-001 timing:** Documented now, execute E0 before E1 (was listed as “defer” — updated in § Open Architecture Items)
+
+### Architecture Completeness Checklist
+
+**Requirements Analysis**
+
+- [x] Project context thoroughly analyzed
+- [x] Scale and complexity assessed
+- [x] Technical constraints identified
+- [x] Cross-cutting concerns mapped
+
+**Architectural Decisions**
+
+- [x] Critical decisions documented with versions
+- [x] Technology stack fully specified
+- [x] Integration patterns defined
+- [x] Performance considerations addressed (queue, thread boundaries, no audio alloc)
+
+**Implementation Patterns**
+
+- [x] Naming conventions established
+- [x] Structure patterns defined
+- [x] Communication patterns specified
+- [x] Process patterns documented
+
+**Project Structure**
+
+- [x] Complete directory structure defined
+- [x] Component boundaries established
+- [x] Integration points mapped
+- [x] Requirements to structure mapping complete
+
+### Architecture Readiness Assessment
+
+**Overall Status:** **READY WITH MINOR GAPS**
+
+**Confidence Level:** **High** for epic sequencing and Core/GUI boundaries; **medium** on Mutator algorithm and Matrix Mod opcode until E2/E6 hardware/spike stories close PRD §9 items.
+
+**Key Strengths:**
+
+- Brownfield inventory explicit — no false greenfield
+- Unified MIDI queue + ActionDispatcher hub prevent the two highest-risk integration failures
+- Mutator history model fully specified at architecture level (M/R, EXPORT, DEFRAG)
+- P-001 + AD-10 + D-094 give E0 a executable checklist
+
+**Areas for Future Enhancement:**
+
+- APVTS property catalog as living appendix
+- MutationAlgorithm tuning after user testing
+- Public architecture mirror under `docs/` (optional)
+
+### Implementation Handoff
+
+**AI Agent Guidelines:**
+
+- Follow AD-1–AD-10 and Step 5 patterns exactly
+- Execute **Epic E0** before creating new Core files under target paths
+- Never bypass `MidiOutboundQueue` or `ActionDispatcher`
+- Refer to PRD v1.0 + this document + `project-context.md` for conflicts
+
+**First Implementation Priority:** **Epic E0 — P-001 migration** (tree renames, `ProjectPaths`, logger fix, CMake/`tests/`/`builds/`), then **Epic E1 — PatchModel**.
+
+**Next workflow:** `bmad-create-epics-and-stories` (E0–E10).
 
 ---
 
-*Architecture draft v0.3 — steps 1–6 complete (2026-05-29). P-001 + AD-10 documented; execution = Epic E0.*
+## Workflow Completion (Step 8)
+
+Architecture workflow **complete** — 2026-05-29.
+
+| Deliverable | Location |
+|---|---|
+| Architecture v1.0 | This document |
+| Decision log | `prds/.../.decision-log.md` (D-088–D-094) |
+| Agent rules | `_bmad-output/project-context.md` |
+
+**Recommended next steps for Guillaume:**
+
+1. **`bmad-create-epics-and-stories`** — shard E0–E10 into implementable stories
+2. **`bmad-sprint-planning`** — after stories exist
+3. **Epic E0 execution** — first code PR (migration + `ProjectPaths`)
+4. **`bmad-ux`** — parallel if UI specs needed before E7 panel rewire
+
+---
+
+*Architecture v1.0 — workflow complete (2026-05-29).*
