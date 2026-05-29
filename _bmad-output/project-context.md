@@ -88,6 +88,7 @@ Matrix-Control/
 │   ├── GUI/                 # Presentation: widgets, panels, looks, skins, layout
 │   └── Shared/Definitions/  # Descriptors, IDs, display names, design dimensions
 ├── Assets/                  # Public assets (fonts, README screenshots)
+├── Logs/                    # Runtime logs (gitignored) — path bug: see AD-10 / D-093
 ├── Documentation/           # Public project knowledge (specs, architecture, GUI guides)
 ├── Documentation/Development/Plans/  # Legacy pre-BMad plans — archive, do not delete
 ├── _bmad-output/            # BMad active artifacts (PRD, epics, stories, this file)
@@ -106,6 +107,7 @@ Guillaume plans to **realign the project tree** with professional JUCE open-sour
 |---|---|---|
 | `src/` | Application code | versioned |
 | `assets/` | Public assets (fonts, README screenshots) | versioned |
+| `logs/` | Runtime logs (`logs/midi/`, `logs/apvts/`) | **gitignored** |
 | `docs/` | Public documentation (`.md`, kebab-case filenames) | versioned |
 | `tests/` | Unit tests | versioned |
 | `builds/macos/`, `builds/windows/`, `builds/linux/` | CMake output trees | **gitignored** |
@@ -115,13 +117,17 @@ Guillaume plans to **realign the project tree** with professional JUCE open-sour
 
 References: no Oberheim manual PDFs in git — Markdown + external links only.
 
-**Until the target layout is documented and approved:**
+**Until P-001 (Epic E0) is executed:**
 
 - Do **not** reorganize `Source/`, `Documentation/`, or `Quality/` ad hoc during feature work.
 - Do **not** commit `_local/` contents (journal, mockups, workbench data).
-- During **`bmad-create-architecture`**, capture the **full directory map** and migration steps; update this section when frozen.
+- New Core services (E1+) should use **target paths** documented in `architecture/.../architecture.md` § Project Structure — execute P-001 before adding those files.
 
-**Hard rule until P-001 is executed:** do not rename or flatten `Source/` → `src/` without an explicit approved migration plan and CMake updates.
+**Full target tree, rename map, E0 checklist, and runtime path fix (AD-10):** `_bmad-output/planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/architecture.md` (AD-9, AD-10, step 6).
+
+**Known brownfield issue (fixed in E0):** `ApvtsLogger` / `MidiLogger` use CMake-baked absolute `MATRIX_CONTROL_PROJECT_ROOT` — logs stay at old disk location after repo move until reconfigure. E0 introduces `ProjectPaths` runtime discovery (D-093).
+
+**Hard rule until P-001 Epic E0 completes:** do not rename `Source/` → `src/` without the approved migration checklist and CMake updates.
 
 ---
 
