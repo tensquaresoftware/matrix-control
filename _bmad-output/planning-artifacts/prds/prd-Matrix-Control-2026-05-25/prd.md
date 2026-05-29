@@ -4,7 +4,7 @@ project: Matrix-Control
 title: Product Requirements Document
 author: BMad Agent
 status: draft
-version: "0.2"
+version: "0.3"
 sources:
   - ../../briefs/brief-Matrix-Control-2026-05-22/brief.md
   - .decision-log.md
@@ -20,11 +20,11 @@ updated: 2026-05-29
 
 This PRD defines **what** Matrix-Control v1 must do for musicians and contributors. It is written for the product owner, future collaborators, and downstream BMad workflows (UX, Architecture, Epics).
 
-**Sources:** Product brief v0.3, Phase 0 brownfield decision log (D-001–D-080), Oberheim reference docs (`_bmad-output/reference-docs/oberheim/`), and `addendum.md` for technical detail that does not belong in the FR narrative.
+**Sources:** Product brief v0.3, Phase 0 brownfield decision log (D-001–D-088), Oberheim reference docs (`_bmad-output/reference-docs/oberheim/`), Patch Mutator brainstorming (2026-05-29, D-082–D-087), and `addendum.md` for technical detail that does not belong in the FR narrative.
 
 **Structure:** Glossary-anchored vocabulary; features grouped with globally numbered FRs; assumptions tagged inline and indexed in §9.
 
-**Status:** Draft **v0.2** — PO review integrated (2026-05-29). Patch Mutator detailed FRs remain **pending** dedicated brainstorming (D-059).
+**Status:** Draft **v0.3** — PO review integrated (2026-05-29); Patch Mutator spec integrated (2026-05-29). Ready for Finalize reviewer gate.
 
 ---
 
@@ -70,9 +70,9 @@ Alex edits PATCH and MASTER parameters, uses Internal Patches STORE on bank 0, l
 
 Alex opens a folder of factory `.syx` files via Computer Patches OPEN. Invalid files are counted and reported in the footer; valid files populate the combobox. They Save As with a sanitized 8-character filename injected into the patch SysEx name. On reload, reconciliation policy from Settings resolves filename vs internal name without modal friction.
 
-**UJ-4. Alex explores Patch Mutator variations.** *(Detailed flow TBD — brainstorming pending.)*
+**UJ-4. Alex explores Patch Mutator variations.**
 
-Alex loads a patch, enables module toggles, adjusts Amount/Random, and presses MUTATE. The mutated patch is sent to the synth immediately; history accumulates in-session. COMPARE toggles against the pre-mutation snapshot. EXPORT writes selected history entries to disk on explicit user action.
+Alex loads a patch from the synth. The **History M** combobox shows `<EMPTY>`; **History R** is disabled. Alex enables DCO and ENV toggles, sets Amount and Random, and presses **MUTATE** — **M00** appears in History M (sorted numerically), patch name shows `M00`, and full patch SysEx reaches the synth. Alex adjusts Random and presses **RETRY** on the same root — **R00** appears under History R; the sound restarts from the pre-M00 state with a new random draw. Alex selects **M02** in History M and **R01** in History R, then **MUTATE** again — **M03** is appended (other roots unchanged). **COMPARE** toggles the initial pre-mutation snapshot (blinking label, History combos grayed). **EXPORT** writes `Initial.syx` plus folders `M00/` … each containing `Mxx.syx` and `Mxx-Ryy.syx` files. When slot numbering is exhausted, a modal offers **Defrag** or **Cancel**; manual **Defrag** is also available in Settings.
 
 ---
 
@@ -88,6 +88,9 @@ Alex loads a patch, enables module toggles, adjusts Amount/Random, and presses M
 - **PATCH EDIT** — Ten synthesis modules (96 parameters) plus interactive displays and patch name.
 - **MASTER EDIT** — Three modules (MIDI, Vibrato, Misc; 22 parameters).
 - **PATCH MANAGER** — Bank Utility, Internal Patches, Computer Patches, Patch Mutator.
+- **Mutation root (Mi)** — Root mutation entry in Patch Mutator history; displayed and named **M00–M99** (Matrix-style 0-based numbering).
+- **Mutation retry (Mi-Rj)** — Retry entry under root **Mi**; named **Mxx-Ryy** (max 7 characters); **R00–R99** per root.
+- **Initial snapshot** — Packed patch captured at load (before any MUTATE); auditioned via COMPARE; exported as `Initial.syx`; not a History combobox entry.
 - **Property (APVTS)** — Non-automatable ValueTree state (Patch Manager buttons, toggles, enabled flags, skin, scale, ports).
 - **StandaloneWidget** — UI control backed by APVTS property, not `AudioParameter`.
 - **Descriptor** — Entry in `PluginDescriptors` defining parameters, widgets, SysEx offsets.
@@ -341,29 +344,89 @@ When a valid folder is loaded and the combobox lists `.syx` files, **Previous Pa
 
 ### 4.9 PATCH MANAGER — Patch Mutator
 
-**Description:** Absynth-inspired mutation workflow with Amount/Random, module toggles, MUTATE/RETRY, session HISTORY, COMPARE, DELETE, CLEAR, EXPORT. UI exists; **algorithm and edge-case FRs pending brainstorming** (D-059). Realizes UJ-4 at high level.
+**Description:** Absynth-inspired mutation workflow: Amount/Random, ten module toggles, **MUTATE**, **RETRY**, two-level session **History** (M + R comboboxes), **COMPARE**, **DELETE**, **CLEAR**, **EXPORT**, and **Defrag** (Settings + limit modal). Realizes UJ-4. Algorithm and UX per brainstorming 2026-05-29 (D-082–D-087; addendum § Patch Mutator).
 
-#### FR-30: Mutate sends full patch SysEx
+#### FR-30: Full patch SysEx on mutation actions
 
-Each successful MUTATE or RETRY immediately sends a complete patch SysEx to the synth (opcode 0x01), not per-parameter edits.
+Each successful **MUTATE**, **RETRY**, and History selection audition sends a **complete** patch SysEx (opcode 0x01), not per-parameter Remote Parameter Edit.
 
 #### FR-31: Session-only history
 
-Mutator history entries exist only for the current session; cleared on new patch load from synth or file; not persisted in plugin state.
+Mutator history (all Mi and Mi-Rj entries plus internal parent snapshots) exists only for the current session. History is **cleared** on new patch load from synth or `.syx` file; not persisted in plugin state. Amount/Random/toggles persist separately (FR-34).
 
 #### FR-32: Compare mode
 
-COMPARE toggles audition of the pre-mutation snapshot vs current selection; re-toggle restores selected mutation; no synth bank STORE during compare.
+**COMPARE** toggles audition of the **initial snapshot** (patch as loaded, before any MUTATE). Active compare: label blinks (UX spec), **History M** and **History R** grayed, no synth bank STORE. Re-toggle exits compare and restores the previously selected History entry; PATCH NAME follows.
 
-#### FR-33: Manual export
+**Consequences (testable):**
+- COMPARE disabled when History is empty (no mutations yet).
 
-EXPORT prompts for folder and writes one `.syx` per history entry (plus `Initial.syx` per brainstorming consensus); no auto-export on each mutation.
+#### FR-33: Manual export layout
+
+**EXPORT** prompts for a destination folder and writes:
+
+- **`Initial.syx`** at export root (initial snapshot).
+- One subfolder per root **`Mxx/`** containing **`Mxx.syx`** (root mutation) and **`Mxx-Ryy.syx`** for each retry (self-describing filenames if moved outside folder structure).
+
+Patch name bytes in each file match display names (`M05`, `M05-R02`, etc.). No auto-export on each mutation (D-027).
 
 #### FR-34: Recipe persistence
 
-Amount, Random sliders and module enable toggles persist across sessions via APVTS properties.
+Amount, Random sliders and module enable toggles persist across sessions via APVTS properties, independent of mutation History.
 
-**Notes:** `[NOTE FOR PM]` Detailed FRs for MUTATE-from-non-terminal history, RETRY parent-state, naming (M1…M99 vs MUTATE00), slot limits, and combobox debounce — **deferred to `bmad-brainstorming` session** before PRD finalize.
+#### FR-54: Two-level History comboboxes
+
+**History M** lists root mutations **M00–M99** sorted **numerically ascending** (not creation-order insertion). Sentinel **`<EMPTY>`** when no roots exist.
+
+**History R** lists retries for the selected root: sentinel **`—`** (root only, audition **Mi**), then **R00–R99** for that **Mi**. Disabled or empty when History M is `<EMPTY>`.
+
+Changing **M** updates **R** for that root. No `<` `>` navigation buttons (D-026).
+
+#### FR-55: MUTATE semantics
+
+**MUTATE** mutates from the **currently auditioned** patch: selected **Mi** alone, or **Mi-Rj** if an R entry is selected.
+
+Creates a **new root** assigned the next index **`max(existing Mi) + 1`** in **00–99**, preserving **gaps** from prior DELETE operations. Display re-sorts History M numerically. Other existing roots are **never** removed or reordered by MUTATE.
+
+**Consequences (testable):**
+- First mutation names **M00** (not M01).
+- PATCH NAME and packed buffer name bytes updated to **`Mxx`**.
+- Disabled when all **100** root slots **M00–M99** are allocated.
+
+#### FR-56: RETRY semantics
+
+**RETRY** applies to the selected History entry (root **Mi** or **Mi-Rj**). Generates a new retry **Mi-R(j+1)** under the **same root Mi**, assigned **`max(existing R for Mi) + 1`**, preserving gaps.
+
+Mutation input = **`parentSnapshot`** stored for the selected entry (parameter state immediately **before** that entry was created) — **not** cumulative from the selected result. Existing retries are **never** deleted.
+
+**Consequences (testable):**
+- First retry of **M05** names **M05-R00**.
+- PATCH NAME shows **`Mxx-Ryy`** (max 7 characters).
+- Disabled when History empty; disabled when **100** retries **R00–R99** exist for the current **Mi**.
+
+#### FR-57: History selection audition
+
+Selecting an entry in **History M** or **History R** sends full patch SysEx after a **debounce** (same pattern as Computer Patches combobox — FR-52) to avoid SysEx spam on rapid scrolling.
+
+#### FR-58: DELETE and CLEAR
+
+**DELETE** removes the selected entry. Deleting root **Mi** **cascades** all **Mi-R*** for that root (footer notice). Deleting **Mi-Rj** removes only that retry; number gaps remain.
+
+After DELETE: selection moves to the previous list entry, or History becomes empty (COMPARE disabled; audition initial snapshot).
+
+**CLEAR** purges all History; History M = `<EMPTY>`; COMPARE disabled.
+
+#### FR-59: Defrag (renumber history)
+
+When **MUTATE** or **RETRY** cannot allocate the next index (**M00–M99** or **R00–R99** full due to gap exhaustion), the system shows a **modal**: explains numbering limit, offers **Defrag** or **Cancel**.
+
+**Defrag** renumbers existing roots contiguously **M00…** and retries per root **R00…**, updates patch names, preserves logical entry content; **number gaps are lost**. Footer confirms completion.
+
+**Manual Defrag:** Settings page exposes **Defrag mutation history** (same engine, confirmation required). Disabled when History empty. Not shown on main Patch Mutator panel (space + safety — D-087).
+
+#### FR-60: Mutator enabled states
+
+**RETRY** enabled when History is non-empty. **MUTATE** enabled when a root **Mi** is selected (with or without **R**). **EXPORT** enabled when History is non-empty. **DELETE** enabled when an entry is selected. Limit and Defrag cases produce footer messages when actions are blocked.
 
 ---
 
@@ -403,7 +466,7 @@ Header exposes MIDI From, MIDI To, Keyboard From, Audio From, Input Gain, peak l
 
 #### FR-40: Settings page
 
-Settings consolidates skin (if not moved to logo popup), UI scale (if not moved), Computer Patches reconciliation policy, **unsaved patch edit warning policy**, Master file/library/init actions, INIT template paths, optional logging opt-in (NFR), and future power-user options.
+Settings consolidates skin (if not moved to logo popup), UI scale (if not moved), Computer Patches reconciliation policy, **unsaved patch edit warning policy**, **Defrag mutation history** (FR-59), Master file/library/init actions, INIT template paths, optional logging opt-in (NFR), and future power-user options.
 
 #### FR-41: Logo popup layout *(if Figma approved — D-014a)*
 
@@ -472,7 +535,7 @@ Core maintains packed buffers synced with APVTS via descriptor-driven mappers; n
 
 ### 6.1 In Scope
 
-Full ambitious v1 per brief § Scope: virtual instrument dual-role, PATCH + MASTER + MATRIX MOD (incl. bus reorder FR-50) + full PATCH MANAGER (Mutator algorithm subject to brainstorming completion), module I/C/P, type-aware clipboard, automation with throttling, device diagnostics (multi-model Device Inquiry), Black/Cream skins, UI scale 50–200%, user manual EN/FR, MIT open source, official DAW test matrix.
+Full ambitious v1 per brief § Scope: virtual instrument dual-role, PATCH + MASTER + MATRIX MOD (incl. bus reorder FR-50) + full PATCH MANAGER incl. **Patch Mutator** (FR-30–FR-34, FR-54–FR-60), module I/C/P, type-aware clipboard, automation with throttling, device diagnostics (multi-model Device Inquiry), Black/Cream skins, UI scale 50–200%, user manual EN/FR, MIT open source, official DAW test matrix.
 
 ### 6.2 Out of Scope for v1
 
@@ -499,6 +562,7 @@ Full ambitious v1 per brief § Scope: virtual instrument dual-role, PATCH + MAST
 - **SM-4:** Computer patch Save/Load reliability (M4L pain point closed). Validates FR-25–FR-29, FR-52, UJ-3.
 - **SM-5:** Beta tester positive feedback (Jeremy Bernstein + M4L community). Validates overall UX.
 - **SM-6:** CI Core unit tests green on macOS for SysEx round-trip, PatchModel packing, ClipboardService, ActionDispatcher routing mocks. Validates NFR-1.
+- **SM-7:** Patch Mutator exploratory session — MUTATE/RETRY chains, COMPARE, EXPORT folder layout, Defrag at limit. Validates FR-30–FR-34, FR-54–FR-60, UJ-4.
 
 **Counter-metrics (do not optimize)**
 
@@ -545,13 +609,13 @@ macOS (AU + VST3 + Standalone), Windows (VST3 + Standalone), Linux (VST3 + Stand
 
 ## 9. Open Questions
 
-1. **Patch Mutator** — Final FR set after `bmad-brainstorming` (MUTATE non-terminal, RETRY semantics, history naming, slot limits).
-2. **Header logo popup** — Figma approval for D-014a vs inline Skin/Scale combos.
-3. **SysEx automation throttle** — Exact ms curves under heavy DAW automation per EPROM profile (Architecture + hardware test).
-4. **Matrix bus SysEx opcode** — Confirm 0x0B vs block 0x06 at implementation on Matrix-1000; verify Matrix-6/6R support (D-044).
-5. **INIT hardcoded defaults** — Owner to supply reference values for `InitDefaults` (non-blocking).
-6. **ENV shape copy** — v1 vs v1.x after Figma (D-061).
-7. **Matrix-6/6R Device ID member bytes** — Confirm `<memb-lo>` / `<memb-hi>` on hardware; not in community M-6 doc (D-079).
+1. **Header logo popup** — Figma approval for D-014a vs inline Skin/Scale combos.
+2. **SysEx automation throttle** — Exact ms curves under heavy DAW automation per EPROM profile (Architecture + hardware test).
+3. **Matrix bus SysEx opcode** — Confirm 0x0B vs block 0x06 at implementation on Matrix-1000; verify Matrix-6/6R support (D-044).
+4. **INIT hardcoded defaults** — Owner to supply reference values for `InitDefaults` (non-blocking).
+5. **ENV shape copy** — v1 vs v1.x after Figma (D-061).
+6. **Matrix-6/6R Device ID member bytes** — Confirm `<memb-lo>` / `<memb-hi>` on hardware; not in community M-6 doc (D-079).
+7. **Patch Mutator algorithm** — Amount/Random curve and per-module mutation rules (Architecture + `PatchMutatorEngine`; UX/naming/history resolved D-082–D-087).
 
 ---
 
@@ -561,8 +625,8 @@ macOS (AU + VST3 + Standalone), Windows (VST3 + Standalone), Linux (VST3 + Stand
 - `[ASSUMPTION]` Tauntek EPROM recommended but stock firmware supported with documented automation limits.
 - `[ASSUMPTION]` Primary owner test platform: Ableton Live 12 Suite on macOS Tahoe.
 - `[ASSUMPTION]` SysEx inter-message baseline **10 ms** for Matrix-1000 (Oberheim official); Matrix-6/6R community spec cites **20 ms** — Architecture validates per `deviceType`.
-- `[ASSUMPTION]` Patch Mutator high-level FRs (FR-30–FR-34) sufficient for Architecture start; detailed FRs added post-brainstorming without restructuring Core epics 1–5 (D-058).
+- `[ASSUMPTION]` Patch Mutator **history UX and naming** specified in FR-54–FR-60; mutation **algorithm** (Amount/Random application) defined in Architecture / Core epic 6.
 
 ---
 
-*End of PRD draft v0.2 — status `draft`. Finalize after decision-log audit, input reconciliation, reviewer gate, and open-question triage per `bmad-prd` workflow.*
+*End of PRD draft v0.3 — status `draft`. Finalize after reviewer gate and open-question triage per `bmad-prd` workflow.*

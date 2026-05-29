@@ -4,7 +4,7 @@ project: Matrix-Control
 title: PRD Addendum
 author: BMad Agent
 status: draft
-version: "0.2"
+version: "0.3"
 sources:
   - prd.md
   - .decision-log.md
@@ -210,7 +210,7 @@ Init templates loaded via **InitTemplateLoader** — not Computer Patches combob
 3. InitDefaults + InitTemplateLoader
 4. PatchFileService
 5. ClipboardService
-6. PatchMutatorEngine **last** (brainstorming before detailed FR finalize)
+6. PatchMutatorEngine **last** (spec FR-54–FR-60 complete — D-088)
 
 ---
 
@@ -225,7 +225,7 @@ Init templates loaded via **InitTemplateLoader** — not Computer Patches combob
 
 ## Automated testing priorities (D-047)
 
-**High (CI unit):** SysEx round-trip, checksum, `.syx` validation, PatchModel/MasterModel packing, ClipboardService, ApvtsValidator, WidgetFactoryValidator, ActionDispatcher routing mock, InitDefaults, queue rate logic, prefs temp files.
+**High (CI unit):** SysEx round-trip, checksum, `.syx` validation, PatchModel/MasterModel packing, ClipboardService, ApvtsValidator, WidgetFactoryValidator, ActionDispatcher routing mock, InitDefaults, queue rate logic, prefs temp files, **PatchMutatorEngine** history/MUTATE/RETRY/Defrag logic (mocked parent snapshots).
 
 **Low (manual):** Skin rendering, UI scale visual audit, widget paint.
 
@@ -334,4 +334,89 @@ APVTS exposes **Int** and **Choice** parameters. Each descriptor defines:
 
 ---
 
-*Addendum v0.2 — supports PRD v0.2 (PO review 2026-05-29); Architecture may extend without duplicating FR narrative.*
+## Patch Mutator (D-082 – D-087, FR-30–FR-34, FR-54–FR-60)
+
+**Reference:** `_local/documentation/development/plans/2026/02/2026-02-10-patch-mutator-brainstorming.md` + BMad session 2026-05-29.
+
+### UI — two-level History
+
+| Widget | Content | Notes |
+|---|---|---|
+| **History M** | `<EMPTY>` or **M00–M99** | Sorted **numerically ascending** |
+| **History R** | `—` (root **Mi** only) or **R00–R99** for selected **Mi** | Updates when **M** changes |
+
+No `<` `>` buttons (D-026). PATCH NAME field displays **`Mxx`** or **`Mxx-Ryy`**.
+
+### Data model (per entry)
+
+| Field | Purpose |
+|---|---|
+| `result` | 134-byte packed patch after mutation |
+| `parentSnapshot` | Buffer state **immediately before** this entry was created (RETRY source) |
+| `rootIndex` | 0–99 |
+| `retryIndex` | −1 = root only; 0–99 = retry |
+
+**Initial snapshot** (COMPARE / `Initial.syx`) stored separately — **not** in History combos.
+
+### MUTATE (FR-55)
+
+- Input: auditioned **Mi** or **Mi-Rj** (`result` of selection).
+- Output: new root **`max(Mi)+1`**, gaps preserved; other roots untouched.
+- First root = **M00**.
+
+### RETRY (FR-56)
+
+- Input: **`parentSnapshot`** of selected entry (Absynth semantics — no cumulative drift).
+- Output: new **`Mi-R(max(R)+1)`** under same **Mi**; first retry = **R00**.
+- Never deletes existing entries.
+
+### DELETE / CLEAR (FR-58)
+
+- DELETE **Mi** → cascade all **Mi-R***.
+- DELETE **Mi-Rj** → single entry; gaps remain.
+- CLEAR → full purge.
+
+### Limits
+
+| Scope | Range | Max count |
+|---|---|---|
+| Roots | M00–M99 | 100 |
+| Retries per Mi | R00–R99 | 100 |
+| Patch name | `Mxx-Ryy` | 7 chars (8 max Matrix) |
+
+### Defrag (FR-59, D-087)
+
+**Trigger:** `max+1` cannot allocate (gaps exhausted) on MUTATE or RETRY → modal **Defrag / Cancel**.
+
+**Manual:** Settings → **Defrag mutation history** (confirmation; disabled if empty).
+
+**Action:** Renumber roots M00… contiguous; renumber each Mi’s retries R00… contiguous; update name bytes; **gaps lost**; footer summary.
+
+### EXPORT (FR-33)
+
+```text
+ExportFolder/
+  Initial.syx
+  M00/
+    M00.syx
+    M00-R00.syx
+    M00-R01.syx
+  M05/
+    M05.syx
+    M05-R00.syx
+```
+
+Filenames always **self-describing** (`M05-R02.syx`, not `R02.syx`).
+
+### SysEx & debounce
+
+- MUTATE, RETRY, History selection → full patch SysEx 0x01.
+- Combobox selection debounce — same policy as Computer Patches (FR-52).
+
+### Recipe vs History
+
+Amount, Random, module toggles = APVTS prefs (persisted). History = session-only (cleared on patch load).
+
+---
+
+*Addendum v0.3 — supports PRD v0.3 (Patch Mutator spec 2026-05-29); Architecture may extend without duplicating FR narrative.*
