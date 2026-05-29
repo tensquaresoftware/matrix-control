@@ -7,6 +7,7 @@ version: "1.0"
 sources:
   - planning-artifacts/briefs/brief-Matrix-Control-2026-05-22/brief.md
   - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/prd.md
+  - planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/architecture.md
   - reference-docs/oberheim/index.md
 created: 2026-05-23
 updated: 2026-05-29
