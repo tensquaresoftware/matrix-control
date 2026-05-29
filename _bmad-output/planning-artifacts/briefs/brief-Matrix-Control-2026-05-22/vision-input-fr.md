@@ -1,3 +1,12 @@
+---
+organization: Ten Square Software
+project: Matrix-Control
+title: Vision Input (French)
+author: Guillaume DUPONT
+language: fr
+created: 2026-05-22
+---
+
 1. Vision
 
 Mes utilisateurs disent : Wow ! Voilà un éditeur MIDI qui en a sous le capot et qui va véritablement donner une nouvelle vie à mon Matrix-1000 ! (ou mon Matrix-6/6R, censé avoir la même architecture et compatible en principe au niveau des messages SysEx). Moi qui pensait que le Matrix-1000 était une simple boite à presets avec ses 1000 sons, c'est en fait un vrai synthé programmable bourré de possibilités, et je redécouvre la bête grâce au Matrix-Control ! Non seulement le Matrix-Control fonctionne dans mon DAW habituel en tant que plugin, mais il peut aussi fonctionner en mode standalone et cerise sur le gâteau, je peux l'installer sous macOS, Windows et Linux ! Que demander de plus ?

@@ -1,8 +1,18 @@
-# Brownfield Inventory for PRD — Matrix-Control
+---
+organization: Ten Square Software
+project: Matrix-Control
+title: Brownfield Inventory for PRD
+author: BMad Agent
+sources:
+  - brief.md
+created: 2026-05-23
+updated: 2026-05-23
+---
+
+# Brownfield Inventory for PRD
 
 **Purpose:** Help the product owner decide what to keep, consolidate, or rework before PRD Update.  
 **Baseline tag:** `v0.0.66-alpha-pre-bmad`  
-**Generated:** 2026-05-23  
 **Revised:** 2026-05-23 — M4L cross-reference removed (obsolete)
 
 **Companion documents:**

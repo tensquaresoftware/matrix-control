@@ -1,9 +1,53 @@
-# Matrix-Control — Project Context
+---
+organization: Ten Square Software
+project: Matrix-Control
+title: Project Context
+author: BMad Agent
+version: "1.0"
+sources:
+  - planning-artifacts/briefs/brief-Matrix-Control-2026-05-22/brief.md
+  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/prd.md
+  - reference-docs/oberheim/index.md
+created: 2026-05-23
+updated: 2026-05-29
+---
+
+# Project Context
 
 **Purpose:** Implementation constitution for BMad agents working on this repository.  
 **Baseline code tag:** `v0.0.66-alpha-pre-bmad`  
-**Last updated:** 2026-05-27  
-**Author:** Guillaume DUPONT / Ten Square Software
+**Last updated:** 2026-05-29
+
+---
+
+## BMad Document Metadata
+
+Every Markdown artifact under `_bmad-output/` MUST open with YAML frontmatter in this order:
+
+1. `organization` — `Ten Square Software`
+2. `project` — `Matrix-Control`
+3. `title` — document type only; do **not** repeat the project name (already in `project`). Same rule for the H1 heading.
+4. `author` — `BMad Agent` for agent-authored artifacts; owner name for user source inputs (e.g. vision inputs)
+5. **Remaining fields** (omit when not applicable), in this order:
+   - `status` — workflow state (`draft`, `ready`, `final`, or a descriptive phase label for decision logs)
+   - `version` — see **Versioning tiers** below; omit when not applicable
+   - `sources` — relative paths to upstream or companion documents (BMad traceability convention)
+   - other domain-specific keys (e.g. `language`, `baseline_tag`, `target_release`)
+   - `created` — ISO date `YYYY-MM-DD`
+   - `updated` — ISO date `YYYY-MM-DD` (always last when present)
+
+### Versioning tiers
+
+Document `version` labels a **content milestone** for humans and downstream workflows. Git remains the technical source of truth — bump `version` only on **significant** contractual changes, not on every edit.
+
+| Tier | Documents | Rule |
+|---|---|---|
+| **Deliverables** | `brief.md`, `prd.md`, future UX / architecture / SPEC | Own semver: `0.x` while drafting, `1.0` when finalized (`status: final`), then increment on major revisions |
+| **Companion** | `addendum.md` (PRD or brief) | Same `version` as the parent deliverable |
+| **Living constitution** | `project-context.md` | Own semver; bump major on breaking convention changes |
+| **Process / audit** | `.decision-log.md`, kickoff prompts, inventories, vision inputs | **No** `version` — use `created` / `updated` and chronological entries |
+
+When finalizing a PRD (`bmad-prd` Finalize), set `version: "1.0"` alongside `status: final`.
 
 ---
 
@@ -65,6 +109,7 @@ Guillaume plans to **realign the project tree** with professional JUCE open-sour
 | `tests/` | Unit tests | versioned |
 | `builds/macos/`, `builds/windows/`, `builds/linux/` | CMake output trees | **gitignored** |
 | `_bmad/`, `_bmad-output/` | BMad tooling and artifacts | versioned |
+| `_bmad-output/reference-docs/oberheim/` | Archived Oberheim MIDI/SysEx references (M-1000 official transcription + M-6/6R complement) | versioned |
 | `_local/` | Personal workspace (ex-`Quality/`, `Workbench/`) | **gitignored** |
 
 References: no Oberheim manual PDFs in git — Markdown + external links only.

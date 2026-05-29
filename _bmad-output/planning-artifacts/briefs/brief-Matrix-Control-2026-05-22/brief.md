@@ -1,15 +1,22 @@
 ---
-title: "Product Brief: Matrix-Control"
+organization: Ten Square Software
+project: Matrix-Control
+title: Product Brief
+author: BMad Agent
 status: ready
-created: 2026-05-22
-updated: 2026-05-23
+version: "0.3"
+sources:
+  - vision-input-fr.md
+  - addendum.md
+  - .decision-log.md
 baseline_tag: v0.0.66-alpha-pre-bmad
 language: en
 target_release: "Christmas 2026 (aspirational)"
-version: "0.3"
+created: 2026-05-22
+updated: 2026-05-23
 ---
 
-# Product Brief: Matrix-Control
+# Product Brief
 
 ## Executive Summary
 

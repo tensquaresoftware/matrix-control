@@ -1,4 +1,17 @@
-# Addendum — Matrix-Control Product Brief
+---
+organization: Ten Square Software
+project: Matrix-Control
+title: Product Brief Addendum
+author: BMad Agent
+version: "0.3"
+sources:
+  - brief.md
+  - vision-input-fr.md
+created: 2026-05-22
+updated: 2026-05-23
+---
+
+# Product Brief Addendum
 
 **Purpose:** Depth that supports PRD/architecture but does not belong in the 1–2 page brief.
 

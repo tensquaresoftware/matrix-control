@@ -1,7 +1,17 @@
-# PRD Kickoff Prompt — Matrix-Control
+---
+organization: Ten Square Software
+project: Matrix-Control
+title: PRD Kickoff Prompt
+author: BMad Agent
+sources:
+  - brief.md
+  - brownfield-inventory-for-prd.md
+created: 2026-05-23
+---
+
+# PRD Kickoff Prompt
 
 **Purpose:** Paste this message (or reference this file) when starting a new chat with `@bmad-prd`.  
-**Created:** 2026-05-23  
 **Companion artifacts:** `brief.md` v0.3, `brownfield-inventory-for-prd.md`
 
 ---
