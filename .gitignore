@@ -1,14 +1,13 @@
-# Build artifacts
-# P-001 target: builds/macos|windows|linux — keep Builds/ until migration
-build/
-builds/
+# Build artifacts (platform-specific)
 Builds/
+build/
 *.o
 *.obj
 
 # IDE
 .vscode/.cmaketools.json
 .vscode/c_cpp_properties.json
+.idea/
 .DS_Store
 
 # Cache directories
@@ -19,10 +18,20 @@ Builds/
 *.xcworkspace
 DerivedData/
 
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.vcxproj.user
+*.sln
+
 # CMake
 CMakeCache.txt
 CMakeFiles/
 cmake_install.cmake
+compile_commands.json
+install_manifest.txt
+Makefile
 
 # Binaries
 *.app
@@ -32,19 +41,31 @@ cmake_install.cmake
 *.dll
 *.dylib
 *.so
+*.a
+*.lib
 
-# Tools
-Tools/
+# Debug symbols
+*.pdb
+*.dSYM
 
-# Runtime logs (P-001: logs/ target; keep Logs/ during transition — D-094)
-logs/
+# Runtime logs (project-relative Logs/ at repo root)
 Logs/
+logs/
 
-# Personal workspace (never version: docs, mockups, TestLab, profiling, archives, etc.)
+# Personal workspace (never version)
 _local/
 
-# Legacy root folders — ignore if recreated before P-001 migration completes
-Documentation/
+# Legacy root folders — ignore if recreated (lowercase P-001 leftovers)
 Quality/
 Workbench/
-Tests/
+src/
+assets/
+tests/
+builds/
+docs/
+
+# Temporary files
+*.log
+*~
+*.bak
+*.swp

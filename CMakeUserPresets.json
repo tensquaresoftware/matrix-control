@@ -2,22 +2,10 @@
   "version": 4,
   "configurePresets": [
     {
-      "name": "default",
-      "displayName": "Default (Auto-detect platform)",
-      "hidden": true,
+      "name": "default-macos-arm64",
+      "displayName": "macOS Apple Silicon (Ninja) - Native on Apple Silicon",
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/Builds/macOS",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_OSX_ARCHITECTURES": "arm64",
-        "JUCE_DIR": "${env:JUCE_DIR}"
-      }
-    },
-    {
-      "name": "default-macos",
-      "displayName": "macOS (Ninja)",
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/Builds/macOS",
+      "binaryDir": "${sourceDir}/Builds/macOS/ARM",
       "condition": {
         "type": "equals",
         "lhs": "${hostSystemName}",
@@ -26,12 +14,60 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_OSX_ARCHITECTURES": "arm64",
-        "JUCE_DIR": "${env:JUCE_DIR}"
+        "JUCE_DIR": "$env{JUCE_DIR}"
+      }
+    },
+    {
+      "name": "default-macos-x86_64",
+      "displayName": "macOS Intel (Ninja) - Native on Mac Intel",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/Builds/macOS/Intel",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_OSX_ARCHITECTURES": "x86_64",
+        "JUCE_DIR": "$env{JUCE_DIR}"
+      }
+    },
+    {
+      "name": "default-macos-x86_64-rosetta",
+      "displayName": "macOS Intel-Rosetta (Ninja) - x86_64 on Apple Silicon",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/Builds/macOS/Intel-Rosetta",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_OSX_ARCHITECTURES": "x86_64",
+        "JUCE_DIR": "$env{JUCE_DIR}"
+      }
+    },
+    {
+      "name": "default-macos-universal",
+      "displayName": "macOS Universal (Ninja) - Apple Silicon + Intel",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/Builds/macOS/Universal",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_OSX_ARCHITECTURES": "arm64;x86_64",
+        "JUCE_DIR": "$env{JUCE_DIR}"
       }
     },
     {
       "name": "default-windows",
-      "displayName": "Windows (Visual Studio 2022)",
+      "displayName": "Windows x64 (Visual Studio 2022) - Native on x64",
       "generator": "Visual Studio 17 2022",
       "binaryDir": "${sourceDir}/Builds/Windows",
       "condition": {
@@ -45,12 +81,12 @@
       },
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "JUCE_DIR": "${env:JUCE_DIR}"
+        "JUCE_DIR": "$env{JUCE_DIR}"
       }
     },
     {
       "name": "default-linux",
-      "displayName": "Linux (Ninja)",
+      "displayName": "Linux x64 (Ninja) - Native on x86_64",
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/Builds/Linux",
       "condition": {
@@ -60,19 +96,29 @@
       },
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "JUCE_DIR": "${env:JUCE_DIR}"
+        "JUCE_DIR": "$env{JUCE_DIR}"
       }
     }
   ],
   "buildPresets": [
     {
-      "name": "default",
-      "configurePreset": "default",
+      "name": "default-macos-arm64",
+      "configurePreset": "default-macos-arm64",
       "configuration": "Debug"
     },
     {
-      "name": "default-macos",
-      "configurePreset": "default-macos",
+      "name": "default-macos-x86_64",
+      "configurePreset": "default-macos-x86_64",
+      "configuration": "Debug"
+    },
+    {
+      "name": "default-macos-x86_64-rosetta",
+      "configurePreset": "default-macos-x86_64-rosetta",
+      "configuration": "Debug"
+    },
+    {
+      "name": "default-macos-universal",
+      "configurePreset": "default-macos-universal",
       "configuration": "Debug"
     },
     {

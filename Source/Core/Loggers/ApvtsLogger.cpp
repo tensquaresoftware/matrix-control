@@ -96,46 +96,52 @@ void ApvtsLogger::closeExistingLogFile()
 
 void ApvtsLogger::setLogToFile(bool enabled, const juce::File& filePath)
 {
-    std::lock_guard<std::mutex> lock(logMutex);
-    
-    closeExistingLogFile();
+    bool shouldEmitFallbackWarning = false;
+
+    {
+        std::lock_guard<std::mutex> lock(logMutex);
+
+        closeExistingLogFile();
 
 #if !APVTS_LOGGER_ENABLED
-    juce::ignoreUnused(filePath);
-    logToFile = false;
-    return;
+        juce::ignoreUnused(filePath);
+        logToFile = false;
+        return;
 #endif
 
-    logToFile = enabled;
-    if (enabled)
-    {
-        static std::once_flag fallbackWarningFlag;
-        std::call_once(fallbackWarningFlag, [this]()
+        logToFile = enabled;
+        if (enabled)
         {
-            if (ProjectPaths::isUsingFallbackRoot())
-                logWarning(ProjectPaths::getFallbackRootWarning());
-        });
+            static std::once_flag fallbackWarningFlag;
+            std::call_once(fallbackWarningFlag, [&shouldEmitFallbackWarning]()
+            {
+                shouldEmitFallbackWarning = ProjectPaths::isUsingFallbackRoot();
+            });
 
-        logFile = determineLogFilePath(filePath);
-        ensureLogDirectoryExists(logFile);
-        
-        if (!logToFile)
-        {
-            return;
-        }
-        
-        openNewLogFile();
-        
-        if (fileStream && fileStream->is_open())
-        {
-            writeSessionStartedHeader();
-        }
-        else
-        {
-            logToFile = false;
-            fileStream.reset();
+            logFile = determineLogFilePath(filePath);
+            ensureLogDirectoryExists(logFile);
+
+            if (!logToFile)
+            {
+                return;
+            }
+
+            openNewLogFile();
+
+            if (fileStream && fileStream->is_open())
+            {
+                writeSessionStartedHeader();
+            }
+            else
+            {
+                logToFile = false;
+                fileStream.reset();
+            }
         }
     }
+
+    if (shouldEmitFallbackWarning)
+        logWarning(ProjectPaths::getFallbackRootWarning());
 }
 
 void ApvtsLogger::writeSessionEndedFooter()

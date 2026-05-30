@@ -1,8 +1,0 @@
-CompileFlags:
-  Add: [-std=c++17, -Wno-c++17-extensions]
-
-Diagnostics:
-  Suppress:
-    - inline-variable-c17
-    - c++17-extensions
-  UnusedIncludes: None

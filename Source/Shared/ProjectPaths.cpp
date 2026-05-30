@@ -8,9 +8,9 @@ namespace
     constexpr const char* kEnvVarProjectRoot { "MATRIX_CONTROL_PROJECT_ROOT" };
     constexpr const char* kCompanyFolderName { "Ten Square Software" };
     constexpr const char* kProductFolderName { "Matrix-Control" };
-    constexpr const char* kLogsFolderName { "logs" };
-    constexpr const char* kMidiLogsFolderName { "midi" };
-    constexpr const char* kApvtsLogsFolderName { "apvts" };
+    constexpr const char* kLogsFolderName { "Logs" };
+    constexpr const char* kMidiLogsFolderName { "MIDI" };
+    constexpr const char* kApvtsLogsFolderName { "APVTS" };
 
     struct RootCache
     {

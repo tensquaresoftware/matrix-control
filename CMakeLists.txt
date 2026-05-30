@@ -1,9 +1,36 @@
+# JUCE audio plugin project (CMake). Do not remove cmake_minimum_required / project() order.
 cmake_minimum_required(VERSION 3.22)
+
+# IDE: compile_commands.json (Ninja / Makefile generators). Set before project() so generation picks it up.
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Platform-specific configuration
 if(APPLE)
-    # Force arm64 for Apple Silicon (macOS only)
-    set(CMAKE_OSX_ARCHITECTURES "arm64" CACHE STRING "Build architectures for macOS")
+    # Real host arch (uname -m): reliable on Apple Silicon even when CMake runs under Rosetta
+    execute_process(COMMAND uname -m OUTPUT_VARIABLE HOST_ARCH OUTPUT_STRIP_TRAILING_WHITESPACE)
+    # Architecture is set per-preset in CMakeUserPresets.json (arm64 for Apple Silicon, x86_64 for Intel)
+    if(NOT CMAKE_OSX_ARCHITECTURES)
+        set(CMAKE_OSX_ARCHITECTURES "arm64" CACHE STRING "Build architectures for macOS (arm64 or x86_64)")
+    endif()
+    # Preset vs host consistency: avoid wrong preset for the current machine
+    # - Apple Silicon: reject "macOS Intel" (native); use "macOS Intel-Rosetta"
+    # - Mac Intel: reject "macOS Intel-Rosetta" and "macOS Apple Silicon" (ARM); use "macOS Intel" (native)
+    if(HOST_ARCH STREQUAL "arm64")
+        # Rosetta builds use .../Intel-Rosetta, so they do not match .../Intel/?$ at end of path.
+        if(CMAKE_BINARY_DIR MATCHES "Builds/macOS/Intel/?$")
+            message(FATAL_ERROR
+                "On Apple Silicon, do not use the 'macOS Intel' preset (default-macos-x86_64; meant for native Mac Intel). Use 'macOS Intel-Rosetta' instead (preset default-macos-x86_64-rosetta): in Cursor select that preset. To list all presets: cmake --list-presets.")
+        endif()
+    elseif(HOST_ARCH STREQUAL "x86_64" OR HOST_ARCH STREQUAL "i386")
+        if(CMAKE_BINARY_DIR MATCHES "Intel-Rosetta")
+            message(FATAL_ERROR
+                "On Mac Intel, do not use the 'macOS Intel-Rosetta' preset (default-macos-x86_64-rosetta; meant for Apple Silicon). Use 'macOS Intel' instead (preset default-macos-x86_64): in Cursor select that preset. To list all presets: cmake --list-presets.")
+        endif()
+        if(CMAKE_BINARY_DIR MATCHES "Builds/macOS/ARM/?$")
+            message(FATAL_ERROR
+                "On Mac Intel, do not use the 'macOS Apple Silicon' preset (default-macos-arm64). Use 'macOS Intel' instead (preset default-macos-x86_64): in Cursor select that preset. To list all presets: cmake --list-presets.")
+        endif()
+    endif()
     # Use Ninja generator on macOS if not specified
     if(NOT CMAKE_GENERATOR)
         find_program(NINJA_EXE ninja)
@@ -20,20 +47,38 @@ endif()
 
 project(Matrix-Control VERSION 0.0.18)
 
-# C++ Standard configuration
+# Plugin copy configuration (edit project-configuration.cmake to customize)
+include(project-configuration.cmake)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Generate compile_commands.json for IDE support (clangd, etc.)
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
-# Reference JUCE from environment variable
-if(DEFINED ENV{JUCE_DIR})
-    add_subdirectory($ENV{JUCE_DIR} "${CMAKE_BINARY_DIR}/JUCE")
-else()
-    message(FATAL_ERROR "JUCE_DIR environment variable not set. Please set it to your JUCE installation path.")
+# Reference JUCE: priority cache (preset/-D), then ENV, then platform default
+# Portable logic - works on any platform regardless of where the project was generated
+set(JUCE_DIR_CANDIDATE "")
+if(DEFINED JUCE_DIR AND NOT JUCE_DIR STREQUAL "" AND EXISTS "${JUCE_DIR}")
+    set(JUCE_DIR_CANDIDATE "${JUCE_DIR}")
+elseif(DEFINED ENV{JUCE_DIR} AND NOT "$ENV{JUCE_DIR}" STREQUAL "")
+    set(JUCE_DIR_CANDIDATE "$ENV{JUCE_DIR}")
+elseif(APPLE AND EXISTS "/Applications/JUCE")
+    set(JUCE_DIR_CANDIDATE "/Applications/JUCE")
+elseif(WIN32 AND EXISTS "C:/Program Files/JUCE")
+    set(JUCE_DIR_CANDIDATE "C:/Program Files/JUCE")
+elseif(UNIX AND EXISTS "/usr/local/JUCE")
+    set(JUCE_DIR_CANDIDATE "/usr/local/JUCE")
 endif()
+
+if(JUCE_DIR_CANDIDATE STREQUAL "")
+    message(FATAL_ERROR "JUCE not found. Set JUCE_DIR (e.g. export JUCE_DIR=/Applications/JUCE) or use -DJUCE_DIR=/path/to/JUCE")
+endif()
+
+set(JUCE_DIR "${JUCE_DIR_CANDIDATE}" CACHE PATH "Path to JUCE installation" FORCE)
+
+if(NOT EXISTS "${JUCE_DIR}")
+    message(FATAL_ERROR "JUCE not found at ${JUCE_DIR}. Check JUCE_DIR path.")
+endif()
+
+add_subdirectory(${JUCE_DIR} "${CMAKE_BINARY_DIR}/JUCE")
 
 # ============================================================================
 # BINARY DATA (Fonts)
@@ -43,8 +88,8 @@ juce_add_binary_data(PluginFonts
     HEADER_NAME PluginFontsData.h
     NAMESPACE PluginFontsData
     SOURCES
-        assets/Fonts/PTSansNarrow-Regular.ttf
-        assets/Fonts/PTSansNarrow-Bold.ttf
+        Assets/Fonts/PTSansNarrow-Regular.ttf
+        Assets/Fonts/PTSansNarrow-Bold.ttf
 )
 
 # ============================================================================
@@ -54,113 +99,111 @@ juce_add_binary_data(PluginFonts
 
 set(PLUGIN_SOURCES
     # Core
-    src/Core/PluginProcessor.cpp
-    src/Core/Factories/ApvtsFactory.cpp
-    src/Core/Factories/ApvtsValidator.cpp
-    src/Core/Factories/ApvtsLayoutBuilder.cpp
-    src/Shared/Definitions/PluginHelpers.cpp
-    src/Shared/Definitions/PluginDescriptors.cpp
-    src/Shared/Definitions/PluginDescriptorsMasterEdit.cpp
-    src/Shared/Definitions/PluginDescriptorsPatchEdit.cpp
-    src/Shared/Definitions/PluginDescriptorsMatrixModulation.cpp
-    src/Shared/Definitions/PluginDescriptorsPatchManager.cpp
-    src/GUI/PluginEditor.cpp
-    src/GUI/Factories/WidgetFactory.cpp
-    src/GUI/Factories/WidgetFactoryValidator.cpp
+    Source/Core/PluginProcessor.cpp
+    Source/Core/Factories/ApvtsFactory.cpp
+    Source/Core/Factories/ApvtsValidator.cpp
+    Source/Core/Factories/ApvtsLayoutBuilder.cpp
+    Source/Shared/Definitions/PluginHelpers.cpp
+    Source/Shared/Definitions/PluginDescriptors.cpp
+    Source/Shared/Definitions/PluginDescriptorsMasterEdit.cpp
+    Source/Shared/Definitions/PluginDescriptorsPatchEdit.cpp
+    Source/Shared/Definitions/PluginDescriptorsMatrixModulation.cpp
+    Source/Shared/Definitions/PluginDescriptorsPatchManager.cpp
+    Source/GUI/PluginEditor.cpp
+    Source/GUI/Factories/WidgetFactory.cpp
+    Source/GUI/Factories/WidgetFactoryValidator.cpp
     
     # Core - MIDI Communication Layer
-    src/Core/MIDI/Ports/MidiInputPort.cpp
-    src/Core/MIDI/Ports/MidiOutputPort.cpp
-    src/Core/MIDI/Transport/MidiSender.cpp
-    src/Core/MIDI/Transport/MidiReceiver.cpp
-    src/Core/MIDI/MidiManager.cpp
-    src/Core/MIDI/SysEx/SysExParser.cpp
-    src/Core/MIDI/SysEx/SysExDecoder.cpp
-    src/Core/MIDI/SysEx/SysExEncoder.cpp
+    Source/Core/MIDI/Ports/MidiInputPort.cpp
+    Source/Core/MIDI/Ports/MidiOutputPort.cpp
+    Source/Core/MIDI/Transport/MidiSender.cpp
+    Source/Core/MIDI/Transport/MidiReceiver.cpp
+    Source/Core/MIDI/MidiManager.cpp
+    Source/Core/MIDI/SysEx/SysExParser.cpp
+    Source/Core/MIDI/SysEx/SysExDecoder.cpp
+    Source/Core/MIDI/SysEx/SysExEncoder.cpp
     
     # GUI - Skins
-    src/GUI/Skins/Skin.cpp
+    Source/GUI/Skins/Skin.cpp
     
     # GUI - Looks
-    src/GUI/Looks/LookBuilders.cpp
-    src/GUI/Looks/TypographyStyles.cpp
+    Source/GUI/Looks/LookBuilders.cpp
+    Source/GUI/Looks/TypographyStyles.cpp
     
     # GUI - Main Component
-    src/GUI/MainComponent.cpp
-    src/GUI/Tests/TestButtons.cpp
-    src/GUI/Tests/TestComponent.cpp
-    src/GUI/Tests/TestSliders.cpp
+    Source/GUI/MainComponent.cpp
+    Source/GUI/Tests/TestButtons.cpp
+    Source/GUI/Tests/TestComponent.cpp
+    Source/GUI/Tests/TestSliders.cpp
     
     # GUI - Panels
-    src/GUI/Panels/MainComponent/FooterPanel/FooterPanel.cpp
-    src/GUI/Panels/MainComponent/HeaderPanel/HeaderPanel.cpp
-    src/GUI/Panels/MainComponent/BodyPanel/BodyPanel.cpp
-    src/GUI/Panels/MainComponent/BodyPanel/MasterEditPanel/MasterEditPanel.cpp
-    src/GUI/Panels/MainComponent/BodyPanel/MasterEditPanel/Modules/MidiPanel.cpp
-    src/GUI/Panels/MainComponent/BodyPanel/MasterEditPanel/Modules/MiscPanel.cpp
-    src/GUI/Panels/MainComponent/BodyPanel/MasterEditPanel/Modules/VibratoPanel.cpp
-    src/GUI/Panels/MainComponent/BodyPanel/SharedPanel/MatrixModulationPanel/MatrixModulationPanel.cpp
-    src/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditBottomModulesPanel/PatchEditBottomModulesPanel.cpp
-    src/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditBottomModulesPanel/Modules/Env1Panel.cpp
-    src/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditBottomModulesPanel/Modules/Env2Panel.cpp
-    src/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditBottomModulesPanel/Modules/Env3Panel.cpp
-    src/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditBottomModulesPanel/Modules/Lfo1Panel.cpp
-    src/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditBottomModulesPanel/Modules/Lfo2Panel.cpp
-    src/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditDisplaysPanel/InteractiveDisplayApvtsSync.cpp
-    src/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditDisplaysPanel/PatchEditDisplaysPanel.cpp
-    src/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditPanel.cpp
-    src/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditTopModulesPanel/PatchEditTopModulesPanel.cpp
-    src/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditTopModulesPanel/Modules/Dco1Panel.cpp
-    src/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditTopModulesPanel/Modules/Dco2Panel.cpp
-    src/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditTopModulesPanel/Modules/FmTrackPanel.cpp
-    src/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditTopModulesPanel/Modules/RampPortamentoPanel.cpp
-    src/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditTopModulesPanel/Modules/VcfVcaPanel.cpp
-    src/GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/PatchManagerPanel.cpp
-    src/GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/Modules/BankUtilityPanel.cpp
-    src/GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/Modules/ComputerPatchesPanel.cpp
-    src/GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/Modules/InternalPatchesPanel.cpp
-    src/GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/Modules/PatchMutatorPanel.cpp
-    src/GUI/Panels/MainComponent/BodyPanel/SharedPanel/SharedPanel.cpp
+    Source/GUI/Panels/MainComponent/FooterPanel/FooterPanel.cpp
+    Source/GUI/Panels/MainComponent/HeaderPanel/HeaderPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/BodyPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/MasterEditPanel/MasterEditPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/MasterEditPanel/Modules/MidiPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/MasterEditPanel/Modules/MiscPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/MasterEditPanel/Modules/VibratoPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/SharedPanel/MatrixModulationPanel/MatrixModulationPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditBottomModulesPanel/PatchEditBottomModulesPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditBottomModulesPanel/Modules/Env1Panel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditBottomModulesPanel/Modules/Env2Panel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditBottomModulesPanel/Modules/Env3Panel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditBottomModulesPanel/Modules/Lfo1Panel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditBottomModulesPanel/Modules/Lfo2Panel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditDisplaysPanel/InteractiveDisplayApvtsSync.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditDisplaysPanel/PatchEditDisplaysPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditTopModulesPanel/PatchEditTopModulesPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditTopModulesPanel/Modules/Dco1Panel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditTopModulesPanel/Modules/Dco2Panel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditTopModulesPanel/Modules/FmTrackPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditTopModulesPanel/Modules/RampPortamentoPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditTopModulesPanel/Modules/VcfVcaPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/PatchManagerPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/Modules/BankUtilityPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/Modules/ComputerPatchesPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/Modules/InternalPatchesPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/Modules/PatchMutatorPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/SharedPanel/SharedPanel.cpp
     
     # GUI - Panels - Reusable
-    src/GUI/Panels/Reusable/BaseModulePanel.cpp
+    Source/GUI/Panels/Reusable/BaseModulePanel.cpp
     
     # GUI - Widgets
-    src/GUI/Widgets/Button.cpp
-    src/GUI/Widgets/ComboBox.cpp
-    src/GUI/Widgets/Toggle.cpp
-    src/GUI/Widgets/EnvelopeDisplay.cpp
-    src/GUI/Widgets/GroupLabel.cpp
-    src/GUI/Widgets/HorizontalSeparator.cpp
-    src/GUI/Widgets/Label.cpp
-    src/GUI/Widgets/ModulationBusCell.cpp
-    src/GUI/Widgets/ModulationBusHeader.cpp
-    src/GUI/Widgets/ModuleHeader.cpp
-    src/GUI/Widgets/MultiColumnPopupMenu.cpp
-    src/GUI/Widgets/NumberBox.cpp
-    src/GUI/Widgets/ParameterCell.cpp
-    src/GUI/Widgets/PatchNameDisplay.cpp
-    src/GUI/Widgets/PopupMenuBase.cpp
-    src/GUI/Widgets/PopupMenuPositioner.cpp
-    src/GUI/Widgets/PopupMenuRenderer.cpp
-    src/GUI/Widgets/ScrollablePopupMenu.cpp
-    src/GUI/Widgets/SectionHeader.cpp
-    src/GUI/Widgets/Slider.cpp
-    src/GUI/Widgets/TrackGeneratorDisplay.cpp
-    src/GUI/Widgets/VerticalSeparator.cpp
+    Source/GUI/Widgets/Button.cpp
+    Source/GUI/Widgets/ComboBox.cpp
+    Source/GUI/Widgets/Toggle.cpp
+    Source/GUI/Widgets/EnvelopeDisplay.cpp
+    Source/GUI/Widgets/GroupLabel.cpp
+    Source/GUI/Widgets/HorizontalSeparator.cpp
+    Source/GUI/Widgets/Label.cpp
+    Source/GUI/Widgets/ModulationBusCell.cpp
+    Source/GUI/Widgets/ModulationBusHeader.cpp
+    Source/GUI/Widgets/ModuleHeader.cpp
+    Source/GUI/Widgets/MultiColumnPopupMenu.cpp
+    Source/GUI/Widgets/NumberBox.cpp
+    Source/GUI/Widgets/ParameterCell.cpp
+    Source/GUI/Widgets/PatchNameDisplay.cpp
+    Source/GUI/Widgets/PopupMenuBase.cpp
+    Source/GUI/Widgets/PopupMenuPositioner.cpp
+    Source/GUI/Widgets/PopupMenuRenderer.cpp
+    Source/GUI/Widgets/ScrollablePopupMenu.cpp
+    Source/GUI/Widgets/SectionHeader.cpp
+    Source/GUI/Widgets/Slider.cpp
+    Source/GUI/Widgets/TrackGeneratorDisplay.cpp
+    Source/GUI/Widgets/VerticalSeparator.cpp
     
     # Shared
-    src/Shared/ProjectPaths.cpp
+    Source/Shared/ProjectPaths.cpp
 
     # Loggers
-    src/Core/Loggers/MidiLogger.cpp
-    src/Core/Loggers/ApvtsLogger.cpp
-
-    # Unit Tests
-    tests/unit/MidiManagerTests.cpp
-    tests/unit/SysExEncoderTests.cpp
-    tests/unit/SysExParserTests.cpp
+    Source/Core/Loggers/MidiLogger.cpp
+    Source/Core/Loggers/ApvtsLogger.cpp
 )
+
+# Unit tests live under Tests/Unit/ — not linked into AU/VST3/Standalone (static juce::UnitTest
+# registrars crash some hosts). A dedicated test runner target can be added later.
 
 # ============================================================================
 # PLUGIN CONFIGURATION
@@ -176,11 +219,10 @@ if(NOT APPLE)
     string(STRIP "${PLUGIN_FORMATS_LIST}" PLUGIN_FORMATS_LIST)
 endif()
 
-# Platform-specific COPY_PLUGIN_AFTER_BUILD setting
-if(APPLE)
-    set(COPY_PLUGIN_AFTER_BUILD_VALUE TRUE)
-else()
+if(WIN32)
     set(COPY_PLUGIN_AFTER_BUILD_VALUE FALSE)
+else()
+    set(COPY_PLUGIN_AFTER_BUILD_VALUE ${COPY_TO_SYSTEM_FOLDERS})
 endif()
 
 juce_add_plugin(Matrix-Control
@@ -203,10 +245,9 @@ juce_add_plugin(Matrix-Control
 
 target_sources(Matrix-Control PRIVATE ${PLUGIN_SOURCES})
 
-# Add src directory as include directory to eliminate relative paths
 target_include_directories(Matrix-Control
     PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src
+        ${CMAKE_CURRENT_SOURCE_DIR}/Source
 )
 
 target_link_libraries(Matrix-Control
@@ -229,49 +270,144 @@ target_compile_definitions(Matrix-Control
         JUCE_REPORT_APP_USAGE=0
 )
 
-# ============================================================================
-# CUSTOM VST3 INSTALLATION (Windows)
-# Copy VST3 plugin to custom folder after build for easy testing
-# ============================================================================
-#
-# CONFIGURATION:
-# ------------
-# To customize the VST3 installation folder, modify the default value below
-# or override it when configuring CMake:
-#   cmake .. -DCUSTOM_VST3_FOLDER="your/custom/path"
-#
-# Examples:
-#   - Personal folder: "C:/Users/YourName/VST3"
-#   - Custom location: "D:/MyPlugins/VST3"
-#   - Standard location (requires admin): "C:/Program Files/Common Files/VST3"
-#
-# Note: Using a personal folder avoids requiring administrator privileges.
-#       Configure your DAW to scan this custom folder for VST3 plugins.
-#
-# ============================================================================
+# =============================================================================
+# COPY TO CENTRAL ARTEFACTS FOLDER
+# When COPY_TO_ARTEFACTS_DIR is ON, copies build outputs to a central custom folder.
+# Paths: ARTEFACTS_DIR_WINDOWS, ARTEFACTS_DIR_MACOS, ARTEFACTS_DIR_LINUX (injected from generator-configuration.py).
+# Structure: {ARTEFACTS_DIR}/{OS}/{arch}/{format}/
+# - macOS: ARM/, Intel/, Intel-Rosetta/, Universal/
+# - Windows/Linux: no arch subfolder
+# Formats: VST3/, AU/ (macOS only), Standalone/. CLAP/ (Linux, future).
+# Intel = x86_64 native (Mac Intel). Intel-Rosetta = x86_64 cross-compiled on Apple Silicon.
+# Only copies formats selected for the project.
+# =============================================================================
 
-if(WIN32)
-    # Define custom VST3 folder (can be overridden via CMake cache)
-    if(NOT DEFINED CUSTOM_VST3_FOLDER)
-        set(CUSTOM_VST3_FOLDER "C:/Users/YourName/VST3" CACHE PATH "Custom VST3 installation folder")
+if(COPY_TO_ARTEFACTS_DIR)
+    # Determine base artefacts directory for current OS
+    if(APPLE)
+        set(ARTEFACTS_DIR_BASE "${ARTEFACTS_DIR_MACOS}")
+    elseif(WIN32)
+        set(ARTEFACTS_DIR_BASE "${ARTEFACTS_DIR_WINDOWS}")
+    else()
+        set(ARTEFACTS_DIR_BASE "${ARTEFACTS_DIR_LINUX}")
+    endif()
+
+    # Determine architecture subfolder (macOS only)
+    if(APPLE)
+        set(ARCH_LIST ${CMAKE_OSX_ARCHITECTURES})
+        list(FIND ARCH_LIST "arm64" IDX_ARM64)
+        list(FIND ARCH_LIST "x86_64" IDX_X86_64)
+        if(NOT IDX_ARM64 EQUAL -1 AND NOT IDX_X86_64 EQUAL -1)
+            set(PLUGIN_ARCH_SUBFOLDER "Universal")
+        elseif(NOT IDX_ARM64 EQUAL -1)
+            set(PLUGIN_ARCH_SUBFOLDER "ARM")
+        elseif(NOT IDX_X86_64 EQUAL -1)
+            if(HOST_ARCH STREQUAL "arm64")
+                set(PLUGIN_ARCH_SUBFOLDER "Intel-Rosetta")
+            else()
+                set(PLUGIN_ARCH_SUBFOLDER "Intel")
+            endif()
+        else()
+            set(PLUGIN_ARCH_SUBFOLDER "ARM")
+        endif()
+        set(ARTEFACTS_DEST "${ARTEFACTS_DIR_BASE}/macOS/${PLUGIN_ARCH_SUBFOLDER}")
+    elseif(WIN32)
+        set(ARTEFACTS_DEST "${ARTEFACTS_DIR_BASE}/Windows")
+    else()
+        set(ARTEFACTS_DEST "${ARTEFACTS_DIR_BASE}/Linux")
+    endif()
+
+    message(STATUS "Build artefacts will be copied to: ${ARTEFACTS_DEST}")
+endif()
+
+# Create custom target that copies all artefacts after build
+if(COPY_TO_ARTEFACTS_DIR)
+    set(ALL_PLUGIN_TARGETS)
+    set(COPY_COMMANDS)
+    
+    # VST3
+    if(PLUGIN_FORMATS_LIST MATCHES "VST3")
+        list(APPEND ALL_PLUGIN_TARGETS "Matrix-Control_VST3")
+        set(VST3_SOURCE_DIR "${CMAKE_BINARY_DIR}/Matrix-Control_artefacts/$<CONFIG>/VST3/Matrix-Control.vst3")
+        set(VST3_DEST_DIR "${ARTEFACTS_DEST}/VST3/Matrix-Control.vst3")
+        list(APPEND COPY_COMMANDS
+            COMMAND ${CMAKE_COMMAND} -E echo "Copying VST3 to ${ARTEFACTS_DEST}/VST3/"
+            COMMAND ${CMAKE_COMMAND} -E make_directory "${ARTEFACTS_DEST}/VST3"
+            COMMAND ${CMAKE_COMMAND} -E remove_directory "${VST3_DEST_DIR}"
+            COMMAND ${CMAKE_COMMAND} -E copy_directory "${VST3_SOURCE_DIR}" "${VST3_DEST_DIR}"
+        )
     endif()
     
-    # VST3 target name (JUCE appends _VST3)
-    set(VST3_TARGET_NAME "Matrix-Control_VST3")
+    # Standalone
+    if(PLUGIN_FORMATS_LIST MATCHES "Standalone")
+        list(APPEND ALL_PLUGIN_TARGETS "Matrix-Control_Standalone")
+        if(APPLE)
+            set(STANDALONE_SOURCE "${CMAKE_BINARY_DIR}/Matrix-Control_artefacts/$<CONFIG>/Standalone/Matrix-Control.app")
+            set(STANDALONE_DEST_DIR "${ARTEFACTS_DEST}/Standalone/Matrix-Control.app")
+            list(APPEND COPY_COMMANDS
+                COMMAND ${CMAKE_COMMAND} -E echo "Copying Standalone to ${ARTEFACTS_DEST}/Standalone/"
+                COMMAND ${CMAKE_COMMAND} -E make_directory "${ARTEFACTS_DEST}/Standalone"
+                COMMAND ${CMAKE_COMMAND} -E remove_directory "${STANDALONE_DEST_DIR}"
+                COMMAND ${CMAKE_COMMAND} -E copy_directory "${STANDALONE_SOURCE}" "${STANDALONE_DEST_DIR}"
+            )
+        elseif(WIN32)
+            set(STANDALONE_SOURCE "${CMAKE_BINARY_DIR}/Matrix-Control_artefacts/$<CONFIG>/Standalone/Matrix-Control.exe")
+            set(STANDALONE_DEST "${ARTEFACTS_DEST}/Standalone/Matrix-Control.exe")
+            list(APPEND COPY_COMMANDS
+                COMMAND ${CMAKE_COMMAND} -E echo "Copying Standalone to ${ARTEFACTS_DEST}/Standalone/"
+                COMMAND ${CMAKE_COMMAND} -E make_directory "${ARTEFACTS_DEST}/Standalone"
+                COMMAND ${CMAKE_COMMAND} -E copy "${STANDALONE_SOURCE}" "${STANDALONE_DEST}"
+            )
+        else()
+            set(STANDALONE_SOURCE "${CMAKE_BINARY_DIR}/Matrix-Control_artefacts/$<CONFIG>/Standalone/Matrix-Control")
+            set(STANDALONE_DEST "${ARTEFACTS_DEST}/Standalone/Matrix-Control")
+            list(APPEND COPY_COMMANDS
+                COMMAND ${CMAKE_COMMAND} -E echo "Copying Standalone to ${ARTEFACTS_DEST}/Standalone/"
+                COMMAND ${CMAKE_COMMAND} -E make_directory "${ARTEFACTS_DEST}/Standalone"
+                COMMAND ${CMAKE_COMMAND} -E copy "${STANDALONE_SOURCE}" "${STANDALONE_DEST}"
+            )
+        endif()
+    endif()
     
-    # Path where JUCE generates the VST3 bundle (using generator expression for CONFIG)
-    set(VST3_SOURCE_DIR "${CMAKE_BINARY_DIR}/Matrix-Control_artefacts/$<CONFIG>/VST3/Matrix-Control.vst3")
-    set(VST3_DEST_DIR "${CUSTOM_VST3_FOLDER}/Matrix-Control.vst3")
+    # AU (macOS only)
+    if(APPLE AND PLUGIN_FORMATS_LIST MATCHES "AU")
+        list(APPEND ALL_PLUGIN_TARGETS "Matrix-Control_AU")
+        set(AU_SOURCE_DIR "${CMAKE_BINARY_DIR}/Matrix-Control_artefacts/$<CONFIG>/AU/Matrix-Control.component")
+        set(AU_DEST_DIR "${ARTEFACTS_DEST}/AU/Matrix-Control.component")
+        list(APPEND COPY_COMMANDS
+            COMMAND ${CMAKE_COMMAND} -E echo "Copying AU to ${ARTEFACTS_DEST}/AU/"
+            COMMAND ${CMAKE_COMMAND} -E make_directory "${ARTEFACTS_DEST}/AU"
+            COMMAND ${CMAKE_COMMAND} -E remove_directory "${AU_DEST_DIR}"
+            COMMAND ${CMAKE_COMMAND} -E copy_directory "${AU_SOURCE_DIR}" "${AU_DEST_DIR}"
+        )
+    endif()
     
-    # Add custom command to copy VST3 plugin after build
-    add_custom_command(TARGET ${VST3_TARGET_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E echo "Copying VST3 plugin to custom folder: ${CUSTOM_VST3_FOLDER}"
-        COMMAND ${CMAKE_COMMAND} -E make_directory "${CUSTOM_VST3_FOLDER}"
-        COMMAND ${CMAKE_COMMAND} -E remove_directory "${VST3_DEST_DIR}"
-        COMMAND ${CMAKE_COMMAND} -E copy_directory "${VST3_SOURCE_DIR}" "${VST3_DEST_DIR}"
-        COMMENT "Installing VST3 plugin to custom folder"
+    # Create the custom target with all copy commands
+    add_custom_target(CopyToArtefactsDir ALL
+        ${COPY_COMMANDS}
+        DEPENDS ${ALL_PLUGIN_TARGETS}
+        COMMENT "Copying all plugin artefacts to ${ARTEFACTS_DEST}"
         VERBATIM
     )
-    
-    message(STATUS "VST3 plugin will be copied to: ${CUSTOM_VST3_FOLDER}")
+endif()
+
+# =============================================================================
+# COPY TO SYSTEM FOLDERS (Windows only - global folder, UAC elevation)
+# On Windows, we copy to C:\Program Files\Common Files\VST3\ (Ableton/DAW standard).
+# Copy runs elevated via PowerShell (UAC prompt); if user cancels, build still succeeds.
+# macOS and Linux use JUCE's built-in copy.
+# =============================================================================
+if(WIN32 AND COPY_TO_SYSTEM_FOLDERS AND PLUGIN_FORMATS_LIST MATCHES "VST3")
+    set(VST3_SYSTEM_DEST "C:/Program Files/Common Files/VST3")
+    set(VST3_ELEVATED_SCRIPT "${CMAKE_SOURCE_DIR}/CMake/CopyVst3Elevated.ps1")
+    set(VST3_SOURCE_PATH "${CMAKE_BINARY_DIR}/Matrix-Control_artefacts/$<CONFIG>/VST3/Matrix-Control.vst3")
+    set(VST3_ARGS_FILE "${CMAKE_BINARY_DIR}/vst3_copy_args.txt")
+    add_custom_target(CopyVST3ToSystemFolder ALL
+        COMMAND ${CMAKE_COMMAND} -E echo "Copying VST3 to ${VST3_SYSTEM_DEST} (UAC may prompt for admin rights)..."
+        COMMAND PowerShell -NoProfile -ExecutionPolicy Bypass -Command "Set-Content -LiteralPath '${VST3_ARGS_FILE}' -Value '${VST3_SOURCE_PATH}','${VST3_SYSTEM_DEST}' -Encoding UTF8"
+        COMMAND PowerShell -NoProfile -ExecutionPolicy Bypass -Command "Start-Process PowerShell -Verb RunAs -Wait -ArgumentList '-NoProfile','-ExecutionPolicy','Bypass','-File','${VST3_ELEVATED_SCRIPT}','-ArgsFile','${VST3_ARGS_FILE}'; exit 0"
+        DEPENDS Matrix-Control_VST3
+        COMMENT "Copying VST3 to ${VST3_SYSTEM_DEST} (elevated)"
+        VERBATIM
+    )
 endif()
