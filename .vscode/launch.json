@@ -8,6 +8,9 @@
             "program": "${workspaceFolder}/${command:cmake.buildDirectory}/Matrix-Control_artefacts/${command:cmake.buildType}/Standalone/Matrix-Control.app/Contents/MacOS/Matrix-Control",
             "args": [],
             "cwd": "${workspaceFolder}",
+            "env": {
+                "MATRIX_CONTROL_PROJECT_ROOT": "${workspaceFolder}"
+            },
             "preLaunchTask": "Build: Standalone",
             "osx": {
                 "type": "lldb",
@@ -42,6 +45,9 @@
             "program": "/Applications/Logic Pro.app/Contents/MacOS/Logic Pro",
             "args": [],
             "cwd": "${workspaceFolder}",
+            "env": {
+                "MATRIX_CONTROL_PROJECT_ROOT": "${workspaceFolder}"
+            },
             "preLaunchTask": "Build: AU",
             "osx": {
                 "type": "lldb"
@@ -54,6 +60,9 @@
             "program": "/Applications/REAPER.app/Contents/MacOS/REAPER",
             "args": [],
             "cwd": "${workspaceFolder}",
+            "env": {
+                "MATRIX_CONTROL_PROJECT_ROOT": "${workspaceFolder}"
+            },
             "preLaunchTask": "Build: VST3",
             "osx": {
                 "type": "lldb"
@@ -71,6 +80,9 @@
             "program": "/Applications/Ableton Live 12 Suite.app/Contents/MacOS/Live",
             "args": [],
             "cwd": "${workspaceFolder}",
+            "env": {
+                "MATRIX_CONTROL_PROJECT_ROOT": "${workspaceFolder}"
+            },
             "preLaunchTask": "Build: AU",
             "osx": {
                 "type": "lldb"

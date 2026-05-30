@@ -71,6 +71,7 @@ private:
     void closeLogFileForSession();
     void enableApvtsLogging();
     void disableApvtsLogging();
+    void ensureDevelopmentLoggingStarted();
     
     juce::String getThreadNameForLogging() const;
     static juce::String simplifyThreadNameForLogging(const juce::String& threadName);
@@ -90,6 +91,7 @@ private:
     juce::AudioProcessorValueTreeState apvts;
     std::unique_ptr<MidiManager> midiManager;
     std::map<juce::String, PluginDescriptors::ChoiceParameterDescriptor> choiceParameterMap_;
+    bool developmentLoggingStarted_ { false };
     
     static constexpr int kThreadStopTimeoutMs_ {5000};
 

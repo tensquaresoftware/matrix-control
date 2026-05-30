@@ -7,6 +7,7 @@
 #include "Loggers/MidiLogger.h"
 #include "Loggers/ApvtsLogger.h"
 #include "Factories/ApvtsFactory.h"
+#include "Shared/ProjectPaths.h"
 
 namespace
 {
@@ -18,7 +19,10 @@ namespace
     bool shouldUseDevelopmentLogging()
     {
 #if JUCE_DEBUG
-        return isStandaloneWrapper();
+        if (isStandaloneWrapper())
+            return true;
+
+        return !ProjectPaths::isUsingFallbackRoot();
 #else
         return false;
 #endif
@@ -41,6 +45,7 @@ PluginProcessor::PluginProcessor()
     buildChoiceParameterMap();
     initializeMidiPortProperties();
     apvts.state.addListener(this);
+    ensureDevelopmentLoggingStarted();
 }
 
 PluginProcessor::~PluginProcessor()
@@ -116,10 +121,7 @@ void PluginProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
     juce::ignoreUnused(sampleRate, samplesPerBlock);
 
     if (shouldUseDevelopmentLogging())
-    {
-        enableFileLoggingForSession();
-        enableApvtsLogging();
-    }
+        ensureDevelopmentLoggingStarted();
 
     startMidiThread();
 }
@@ -140,6 +142,7 @@ void PluginProcessor::releaseResources()
     {
         disableApvtsLogging();
         closeLogFileForSession();
+        developmentLoggingStarted_ = false;
     }
 }
 
@@ -250,6 +253,16 @@ void PluginProcessor::initializeMidiPortProperties()
                                 PluginIDs::Settings::ScaleLevels::kDefault,
                                 nullptr);
     }
+}
+
+void PluginProcessor::ensureDevelopmentLoggingStarted()
+{
+    if (!shouldUseDevelopmentLogging() || developmentLoggingStarted_)
+        return;
+
+    developmentLoggingStarted_ = true;
+    enableFileLoggingForSession();
+    enableApvtsLogging();
 }
 
 void PluginProcessor::enableFileLoggingForSession()
