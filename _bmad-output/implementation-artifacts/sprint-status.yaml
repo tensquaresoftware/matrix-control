@@ -46,7 +46,7 @@ development_status:
   epic-0: in-progress
   0-1-gitignore-and-root-directory-renames: done
   0-2-documentation-and-tests-migration: done
-  0-3-projectpaths-and-logger-runtime-root-ad-10: backlog
+  0-3-projectpaths-and-logger-runtime-root-ad-10: done
   0-4-cmake-and-tooling-path-updates: backlog
   0-5-migration-validation-and-p-001-sign-off: backlog
   epic-0-retrospective: optional

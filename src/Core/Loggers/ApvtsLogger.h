@@ -1,6 +1,6 @@
 #pragma once
 
-// 1: allow log files under <project>/Logs/APVTS (MATRIX_CONTROL_PROJECT_ROOT from CMake). 0: no file output.
+// 1: allow log files under <project>/logs/apvts/ (ProjectPaths runtime root). 0: no file output.
 #ifndef APVTS_LOGGER_ENABLED
 #define APVTS_LOGGER_ENABLED 1
 #endif

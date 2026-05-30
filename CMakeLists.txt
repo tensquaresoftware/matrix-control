@@ -149,6 +149,9 @@ set(PLUGIN_SOURCES
     src/GUI/Widgets/TrackGeneratorDisplay.cpp
     src/GUI/Widgets/VerticalSeparator.cpp
     
+    # Shared
+    src/Shared/ProjectPaths.cpp
+
     # Loggers
     src/Core/Loggers/MidiLogger.cpp
     src/Core/Loggers/ApvtsLogger.cpp
@@ -219,8 +222,6 @@ target_link_libraries(Matrix-Control
 )
 
 target_compile_definitions(Matrix-Control
-    PRIVATE
-        MATRIX_CONTROL_PROJECT_ROOT="${CMAKE_CURRENT_SOURCE_DIR}"
     PUBLIC
         JUCE_WEB_BROWSER=0
         JUCE_USE_CURL=0

@@ -3,12 +3,10 @@
 #include "MidiLogger.h"
 
 #include "Core/MIDI/SysEx/SysExConstants.h"
-
-#if !defined(MATRIX_CONTROL_PROJECT_ROOT)
-#error "MATRIX_CONTROL_PROJECT_ROOT must be defined by CMake (project root) so default log paths resolve to Logs/MIDI."
-#endif
-
 #include "Core/MIDI/SysEx/SysExParser.h"
+#include "Shared/ProjectPaths.h"
+
+#include <mutex>
 
 MidiLogger& MidiLogger::getInstance()
 {
@@ -24,10 +22,7 @@ void MidiLogger::setLogLevel(LogLevel level)
 
 juce::File MidiLogger::getDefaultLogDirectory() const
 {
-    juce::File logDir = juce::File(juce::String(MATRIX_CONTROL_PROJECT_ROOT))
-        .getChildFile("Logs")
-        .getChildFile("MIDI");
-
+    juce::File logDir = ProjectPaths::getLogsDirectory(ProjectPaths::LogCategory::kMidi);
     createLogDirectoryIfNeeded(logDir);
     return logDir;
 }
@@ -114,6 +109,13 @@ void MidiLogger::setLogToFile(bool enabled, const juce::File& filePath)
     logToFile = enabled;
     if (enabled)
     {
+        static std::once_flag fallbackWarningFlag;
+        std::call_once(fallbackWarningFlag, [this]()
+        {
+            if (ProjectPaths::isUsingFallbackRoot())
+                logWarning(ProjectPaths::getFallbackRootWarning());
+        });
+
         logFile = determineLogFilePath(filePath);
         ensureLogDirectoryExists(logFile);
         

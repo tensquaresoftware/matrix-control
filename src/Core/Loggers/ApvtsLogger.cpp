@@ -3,11 +3,10 @@
 
 #include "ApvtsLogger.h"
 
-#include <juce_core/juce_core.h>
+#include "Shared/ProjectPaths.h"
 
-#if !defined(MATRIX_CONTROL_PROJECT_ROOT)
-#error "MATRIX_CONTROL_PROJECT_ROOT must be defined by CMake (project root) so default log paths resolve to Logs/APVTS."
-#endif
+#include <juce_core/juce_core.h>
+#include <mutex>
 
 ApvtsLogger& ApvtsLogger::getInstance()
 {
@@ -23,10 +22,7 @@ void ApvtsLogger::setLogLevel(LogLevel level)
 
 juce::File ApvtsLogger::getDefaultLogDirectory() const
 {
-    juce::File logDir = juce::File(juce::String(MATRIX_CONTROL_PROJECT_ROOT))
-        .getChildFile("Logs")
-        .getChildFile("APVTS");
-
+    juce::File logDir = ProjectPaths::getLogsDirectory(ProjectPaths::LogCategory::kApvts);
     createLogDirectoryIfNeeded(logDir);
     return logDir;
 }
@@ -113,6 +109,13 @@ void ApvtsLogger::setLogToFile(bool enabled, const juce::File& filePath)
     logToFile = enabled;
     if (enabled)
     {
+        static std::once_flag fallbackWarningFlag;
+        std::call_once(fallbackWarningFlag, [this]()
+        {
+            if (ProjectPaths::isUsingFallbackRoot())
+                logWarning(ProjectPaths::getFallbackRootWarning());
+        });
+
         logFile = determineLogFilePath(filePath);
         ensureLogDirectoryExists(logFile);
         
