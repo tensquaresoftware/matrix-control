@@ -43,8 +43,8 @@ juce_add_binary_data(PluginFonts
     HEADER_NAME PluginFontsData.h
     NAMESPACE PluginFontsData
     SOURCES
-        Assets/Fonts/PTSansNarrow-Regular.ttf
-        Assets/Fonts/PTSansNarrow-Bold.ttf
+        assets/Fonts/PTSansNarrow-Regular.ttf
+        assets/Fonts/PTSansNarrow-Bold.ttf
 )
 
 # ============================================================================
@@ -54,104 +54,104 @@ juce_add_binary_data(PluginFonts
 
 set(PLUGIN_SOURCES
     # Core
-    Source/Core/PluginProcessor.cpp
-    Source/Core/Factories/ApvtsFactory.cpp
-    Source/Core/Factories/ApvtsValidator.cpp
-    Source/Core/Factories/ApvtsLayoutBuilder.cpp
-    Source/Shared/Definitions/PluginHelpers.cpp
-    Source/Shared/Definitions/PluginDescriptors.cpp
-    Source/Shared/Definitions/PluginDescriptorsMasterEdit.cpp
-    Source/Shared/Definitions/PluginDescriptorsPatchEdit.cpp
-    Source/Shared/Definitions/PluginDescriptorsMatrixModulation.cpp
-    Source/Shared/Definitions/PluginDescriptorsPatchManager.cpp
-    Source/GUI/PluginEditor.cpp
-    Source/GUI/Factories/WidgetFactory.cpp
-    Source/GUI/Factories/WidgetFactoryValidator.cpp
+    src/Core/PluginProcessor.cpp
+    src/Core/Factories/ApvtsFactory.cpp
+    src/Core/Factories/ApvtsValidator.cpp
+    src/Core/Factories/ApvtsLayoutBuilder.cpp
+    src/Shared/Definitions/PluginHelpers.cpp
+    src/Shared/Definitions/PluginDescriptors.cpp
+    src/Shared/Definitions/PluginDescriptorsMasterEdit.cpp
+    src/Shared/Definitions/PluginDescriptorsPatchEdit.cpp
+    src/Shared/Definitions/PluginDescriptorsMatrixModulation.cpp
+    src/Shared/Definitions/PluginDescriptorsPatchManager.cpp
+    src/GUI/PluginEditor.cpp
+    src/GUI/Factories/WidgetFactory.cpp
+    src/GUI/Factories/WidgetFactoryValidator.cpp
     
     # Core - MIDI Communication Layer
-    Source/Core/MIDI/Ports/MidiInputPort.cpp
-    Source/Core/MIDI/Ports/MidiOutputPort.cpp
-    Source/Core/MIDI/Transport/MidiSender.cpp
-    Source/Core/MIDI/Transport/MidiReceiver.cpp
-    Source/Core/MIDI/MidiManager.cpp
-    Source/Core/MIDI/SysEx/SysExParser.cpp
-    Source/Core/MIDI/SysEx/SysExDecoder.cpp
-    Source/Core/MIDI/SysEx/SysExEncoder.cpp
+    src/Core/MIDI/Ports/MidiInputPort.cpp
+    src/Core/MIDI/Ports/MidiOutputPort.cpp
+    src/Core/MIDI/Transport/MidiSender.cpp
+    src/Core/MIDI/Transport/MidiReceiver.cpp
+    src/Core/MIDI/MidiManager.cpp
+    src/Core/MIDI/SysEx/SysExParser.cpp
+    src/Core/MIDI/SysEx/SysExDecoder.cpp
+    src/Core/MIDI/SysEx/SysExEncoder.cpp
     
     # GUI - Skins
-    Source/GUI/Skins/Skin.cpp
+    src/GUI/Skins/Skin.cpp
     
     # GUI - Looks
-    Source/GUI/Looks/LookBuilders.cpp
-    Source/GUI/Looks/TypographyStyles.cpp
+    src/GUI/Looks/LookBuilders.cpp
+    src/GUI/Looks/TypographyStyles.cpp
     
     # GUI - Main Component
-    Source/GUI/MainComponent.cpp
-    Source/GUI/Tests/TestButtons.cpp
-    Source/GUI/Tests/TestComponent.cpp
-    Source/GUI/Tests/TestSliders.cpp
+    src/GUI/MainComponent.cpp
+    src/GUI/Tests/TestButtons.cpp
+    src/GUI/Tests/TestComponent.cpp
+    src/GUI/Tests/TestSliders.cpp
     
     # GUI - Panels
-    Source/GUI/Panels/MainComponent/FooterPanel/FooterPanel.cpp
-    Source/GUI/Panels/MainComponent/HeaderPanel/HeaderPanel.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/BodyPanel.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/MasterEditPanel/MasterEditPanel.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/MasterEditPanel/Modules/MidiPanel.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/MasterEditPanel/Modules/MiscPanel.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/MasterEditPanel/Modules/VibratoPanel.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/SharedPanel/MatrixModulationPanel/MatrixModulationPanel.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditBottomModulesPanel/PatchEditBottomModulesPanel.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditBottomModulesPanel/Modules/Env1Panel.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditBottomModulesPanel/Modules/Env2Panel.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditBottomModulesPanel/Modules/Env3Panel.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditBottomModulesPanel/Modules/Lfo1Panel.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditBottomModulesPanel/Modules/Lfo2Panel.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditDisplaysPanel/InteractiveDisplayApvtsSync.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditDisplaysPanel/PatchEditDisplaysPanel.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditPanel.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditTopModulesPanel/PatchEditTopModulesPanel.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditTopModulesPanel/Modules/Dco1Panel.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditTopModulesPanel/Modules/Dco2Panel.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditTopModulesPanel/Modules/FmTrackPanel.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditTopModulesPanel/Modules/RampPortamentoPanel.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditTopModulesPanel/Modules/VcfVcaPanel.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/PatchManagerPanel.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/Modules/BankUtilityPanel.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/Modules/ComputerPatchesPanel.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/Modules/InternalPatchesPanel.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/Modules/PatchMutatorPanel.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/SharedPanel/SharedPanel.cpp
+    src/GUI/Panels/MainComponent/FooterPanel/FooterPanel.cpp
+    src/GUI/Panels/MainComponent/HeaderPanel/HeaderPanel.cpp
+    src/GUI/Panels/MainComponent/BodyPanel/BodyPanel.cpp
+    src/GUI/Panels/MainComponent/BodyPanel/MasterEditPanel/MasterEditPanel.cpp
+    src/GUI/Panels/MainComponent/BodyPanel/MasterEditPanel/Modules/MidiPanel.cpp
+    src/GUI/Panels/MainComponent/BodyPanel/MasterEditPanel/Modules/MiscPanel.cpp
+    src/GUI/Panels/MainComponent/BodyPanel/MasterEditPanel/Modules/VibratoPanel.cpp
+    src/GUI/Panels/MainComponent/BodyPanel/SharedPanel/MatrixModulationPanel/MatrixModulationPanel.cpp
+    src/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditBottomModulesPanel/PatchEditBottomModulesPanel.cpp
+    src/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditBottomModulesPanel/Modules/Env1Panel.cpp
+    src/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditBottomModulesPanel/Modules/Env2Panel.cpp
+    src/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditBottomModulesPanel/Modules/Env3Panel.cpp
+    src/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditBottomModulesPanel/Modules/Lfo1Panel.cpp
+    src/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditBottomModulesPanel/Modules/Lfo2Panel.cpp
+    src/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditDisplaysPanel/InteractiveDisplayApvtsSync.cpp
+    src/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditDisplaysPanel/PatchEditDisplaysPanel.cpp
+    src/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditPanel.cpp
+    src/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditTopModulesPanel/PatchEditTopModulesPanel.cpp
+    src/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditTopModulesPanel/Modules/Dco1Panel.cpp
+    src/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditTopModulesPanel/Modules/Dco2Panel.cpp
+    src/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditTopModulesPanel/Modules/FmTrackPanel.cpp
+    src/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditTopModulesPanel/Modules/RampPortamentoPanel.cpp
+    src/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditTopModulesPanel/Modules/VcfVcaPanel.cpp
+    src/GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/PatchManagerPanel.cpp
+    src/GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/Modules/BankUtilityPanel.cpp
+    src/GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/Modules/ComputerPatchesPanel.cpp
+    src/GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/Modules/InternalPatchesPanel.cpp
+    src/GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/Modules/PatchMutatorPanel.cpp
+    src/GUI/Panels/MainComponent/BodyPanel/SharedPanel/SharedPanel.cpp
     
     # GUI - Panels - Reusable
-    Source/GUI/Panels/Reusable/BaseModulePanel.cpp
+    src/GUI/Panels/Reusable/BaseModulePanel.cpp
     
     # GUI - Widgets
-    Source/GUI/Widgets/Button.cpp
-    Source/GUI/Widgets/ComboBox.cpp
-    Source/GUI/Widgets/Toggle.cpp
-    Source/GUI/Widgets/EnvelopeDisplay.cpp
-    Source/GUI/Widgets/GroupLabel.cpp
-    Source/GUI/Widgets/HorizontalSeparator.cpp
-    Source/GUI/Widgets/Label.cpp
-    Source/GUI/Widgets/ModulationBusCell.cpp
-    Source/GUI/Widgets/ModulationBusHeader.cpp
-    Source/GUI/Widgets/ModuleHeader.cpp
-    Source/GUI/Widgets/MultiColumnPopupMenu.cpp
-    Source/GUI/Widgets/NumberBox.cpp
-    Source/GUI/Widgets/ParameterCell.cpp
-    Source/GUI/Widgets/PatchNameDisplay.cpp
-    Source/GUI/Widgets/PopupMenuBase.cpp
-    Source/GUI/Widgets/PopupMenuPositioner.cpp
-    Source/GUI/Widgets/PopupMenuRenderer.cpp
-    Source/GUI/Widgets/ScrollablePopupMenu.cpp
-    Source/GUI/Widgets/SectionHeader.cpp
-    Source/GUI/Widgets/Slider.cpp
-    Source/GUI/Widgets/TrackGeneratorDisplay.cpp
-    Source/GUI/Widgets/VerticalSeparator.cpp
+    src/GUI/Widgets/Button.cpp
+    src/GUI/Widgets/ComboBox.cpp
+    src/GUI/Widgets/Toggle.cpp
+    src/GUI/Widgets/EnvelopeDisplay.cpp
+    src/GUI/Widgets/GroupLabel.cpp
+    src/GUI/Widgets/HorizontalSeparator.cpp
+    src/GUI/Widgets/Label.cpp
+    src/GUI/Widgets/ModulationBusCell.cpp
+    src/GUI/Widgets/ModulationBusHeader.cpp
+    src/GUI/Widgets/ModuleHeader.cpp
+    src/GUI/Widgets/MultiColumnPopupMenu.cpp
+    src/GUI/Widgets/NumberBox.cpp
+    src/GUI/Widgets/ParameterCell.cpp
+    src/GUI/Widgets/PatchNameDisplay.cpp
+    src/GUI/Widgets/PopupMenuBase.cpp
+    src/GUI/Widgets/PopupMenuPositioner.cpp
+    src/GUI/Widgets/PopupMenuRenderer.cpp
+    src/GUI/Widgets/ScrollablePopupMenu.cpp
+    src/GUI/Widgets/SectionHeader.cpp
+    src/GUI/Widgets/Slider.cpp
+    src/GUI/Widgets/TrackGeneratorDisplay.cpp
+    src/GUI/Widgets/VerticalSeparator.cpp
     
     # Loggers
-    Source/Core/Loggers/MidiLogger.cpp
-    Source/Core/Loggers/ApvtsLogger.cpp
+    src/Core/Loggers/MidiLogger.cpp
+    src/Core/Loggers/ApvtsLogger.cpp
 
     # Unit Tests
     Tests/Unit/MidiManagerTests.cpp
@@ -200,10 +200,10 @@ juce_add_plugin(Matrix-Control
 
 target_sources(Matrix-Control PRIVATE ${PLUGIN_SOURCES})
 
-# Add Source directory as include directory to eliminate relative paths
+# Add src directory as include directory to eliminate relative paths
 target_include_directories(Matrix-Control
     PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/Source
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
 target_link_libraries(Matrix-Control

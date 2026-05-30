@@ -1,6 +1,6 @@
 # Matrix-Control
 
-![Matrix-Control GUI](https://raw.githubusercontent.com/tensquaresoftware/Matrix-Control/main/Assets/Screenshots/Matrix-Control-GUI-WIP.png)
+![Matrix-Control GUI](https://raw.githubusercontent.com/tensquaresoftware/Matrix-Control/main/assets/Screenshots/Matrix-Control-GUI-WIP.png)
 
 [![Status: Work in Progress](https://img.shields.io/badge/Status-Work%20in%20Progress-FFA500?style=for-the-badge)](https://github.com/tensquaresoftware/Matrix-Control)
 [![Language: C++](https://img.shields.io/badge/Language-C%2B%2B-00599C?style=for-the-badge&logo=c%2B%2B&logoColor=white)](https://github.com/tensquaresoftware/Matrix-Control)
@@ -195,7 +195,7 @@ Press `F5` in Cursor to start debugging.
 Matrix-Control uses **PT Sans Narrow** (Regular and Bold) for its user interface. These fonts are licensed under the [SIL Open Font License (OFL) 1.1](https://openfontlicense.org).
 
 - **Copyright:** © 2010, [ParaType Ltd.](https://www.paratype.com/public), with Reserved Font Names "PT Sans" and "ParaType".
-- **License:** [OFL 1.1](https://scripts.sil.org/OFL) — free for use, modification, and redistribution. Full license text is available in `Assets/Fonts/OFL.txt`.
+- **License:** [OFL 1.1](https://scripts.sil.org/OFL) — free for use, modification, and redistribution. Full license text is available in `assets/Fonts/OFL.txt`.
 
 ---
 

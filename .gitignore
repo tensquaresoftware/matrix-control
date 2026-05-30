@@ -36,11 +36,12 @@ cmake_install.cmake
 # Tools
 Tools/
 
-# Runtime logs
+# Runtime logs (P-001: logs/ target; keep Logs/ during transition — D-094)
+logs/
 Logs/
 
-# Source archives (legacy snapshots — not for release)
-Source/Archives/
+# Legacy source archives (not for release)
+src/Archives/
 
 # Personal workspace (never version: docs, mockups, TestLab, profiling, etc.)
 _local/

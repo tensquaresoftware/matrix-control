@@ -1,5 +1,5 @@
 # generated: 2026-05-29
-# last_updated: 2026-05-29
+# last_updated: 2026-05-30
 # project: Matrix-Control
 # project_key: NOKEY
 # tracking_system: file-system
@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-05-29
-last_updated: 2026-05-29
+last_updated: 2026-05-30
 project: Matrix-Control
 project_key: NOKEY
 tracking_system: file-system
@@ -43,8 +43,8 @@ story_location: _bmad-output/implementation-artifacts
 
 development_status:
 
-  epic-0: backlog
-  0-1-gitignore-and-root-directory-renames: backlog
+  epic-0: in-progress
+  0-1-gitignore-and-root-directory-renames: done
   0-2-documentation-and-tests-migration: backlog
   0-3-projectpaths-and-logger-runtime-root-ad-10: backlog
   0-4-cmake-and-tooling-path-updates: backlog
