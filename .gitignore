@@ -40,13 +40,11 @@ Tools/
 logs/
 Logs/
 
-# Legacy source archives (not for release)
-src/Archives/
-
-# Personal workspace (never version: docs, mockups, TestLab, profiling, etc.)
+# Personal workspace (never version: docs, mockups, TestLab, profiling, archives, etc.)
 _local/
 
-# Legacy root folders — ignore if recreated before P-001 migration
+# Legacy root folders — ignore if recreated before P-001 migration completes
 Documentation/
 Quality/
 Workbench/
+Tests/

@@ -154,9 +154,9 @@ set(PLUGIN_SOURCES
     src/Core/Loggers/ApvtsLogger.cpp
 
     # Unit Tests
-    Tests/Unit/MidiManagerTests.cpp
-    Tests/Unit/SysExEncoderTests.cpp
-    Tests/Unit/SysExParserTests.cpp
+    tests/unit/MidiManagerTests.cpp
+    tests/unit/SysExEncoderTests.cpp
+    tests/unit/SysExParserTests.cpp
 )
 
 # ============================================================================
