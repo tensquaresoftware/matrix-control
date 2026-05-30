@@ -6,35 +6,45 @@
             "type": "shell",
             "command": "cmake",
             "args": [
-                "-S", ".",
-                "-B", "Builds/Windows",
-                "-G", "Visual Studio 17 2022",
-                "-A", "x64",
-                "-DCMAKE_BUILD_TYPE=Debug"
+                "--preset", "default-macos-arm64"
             ],
-            "windows": {
-                "args": [
-                    "-S", ".",
-                    "-B", "Builds/Windows",
-                    "-G", "Visual Studio 17 2022",
-                    "-A", "x64",
-                    "-DCMAKE_BUILD_TYPE=Debug"
-                ]
-            },
             "osx": {
                 "args": [
-                    "-S", ".",
-                    "-B", "Builds/macOS",
-                    "-G", "Ninja",
-                    "-DCMAKE_BUILD_TYPE=Debug"
+                    "--preset", "default-macos-arm64"
+                ]
+            },
+            "windows": {
+                "args": [
+                    "--preset", "default-windows"
                 ]
             },
             "linux": {
                 "args": [
-                    "-S", ".",
-                    "-B", "Builds/Linux",
-                    "-G", "Ninja",
-                    "-DCMAKE_BUILD_TYPE=Debug"
+                    "--preset", "default-linux"
+                ]
+            },
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "CMake: Configure if needed",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "-c",
+                "test -d \"${command:cmake.buildDirectory}\" || cmake --preset default-macos-arm64"
+            ],
+            "windows": {
+                "command": "powershell",
+                "args": [
+                    "-Command",
+                    "if (-not (Test-Path '${command:cmake.buildDirectory}')) { cmake --preset default-windows }"
+                ]
+            },
+            "linux": {
+                "args": [
+                    "-c",
+                    "test -d \"${command:cmake.buildDirectory}\" || cmake --preset default-linux"
                 ]
             },
             "group": "build",
@@ -43,135 +53,56 @@
         {
             "label": "Build: Standalone",
             "type": "shell",
+            "dependsOn": ["CMake: Configure if needed"],
             "command": "cmake",
             "args": [
-                "--build", "Builds/Windows",
+                "--build", "${command:cmake.buildDirectory}",
                 "--target", "Matrix-Control_Standalone",
-                "--config", "Debug"
+                "--config", "${command:cmake.buildType}"
             ],
-            "windows": {
-                "args": [
-                    "--build", "Builds/Windows",
-                    "--target", "Matrix-Control_Standalone",
-                    "--config", "Debug"
-                ]
-            },
-            "osx": {
-                "args": [
-                    "--build", "Builds/macOS",
-                    "--target", "Matrix-Control_Standalone",
-                    "--config", "Debug"
-                ]
-            },
-            "linux": {
-                "args": [
-                    "--build", "Builds/Linux",
-                    "--target", "Matrix-Control_Standalone",
-                    "--config", "Debug"
-                ]
-            },
             "group": "build",
-            "problemMatcher": [
-                "$gcc",
-                "$msCompile"
-            ]
+            "problemMatcher": []
         },
         {
             "label": "Build: AU",
             "type": "shell",
+            "dependsOn": ["CMake: Configure if needed"],
             "command": "cmake",
             "args": [
-                "--build", "Builds/macOS",
+                "--build", "${command:cmake.buildDirectory}",
                 "--target", "Matrix-Control_AU",
-                "--config", "Debug"
+                "--config", "${command:cmake.buildType}"
             ],
-            "osx": {
-                "args": [
-                    "--build", "Builds/macOS",
-                    "--target", "Matrix-Control_AU",
-                    "--config", "Debug"
-                ]
-            },
             "group": "build",
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "options": {
-                "statusbar": {
-                    "hide": true
-                }
-            }
+            "problemMatcher": []
         },
         {
             "label": "Build: VST3",
             "type": "shell",
+            "dependsOn": ["CMake: Configure if needed"],
             "command": "cmake",
             "args": [
-                "--build", "Builds/Windows",
+                "--build", "${command:cmake.buildDirectory}",
                 "--target", "Matrix-Control_VST3",
-                "--config", "Debug"
+                "--config", "${command:cmake.buildType}"
             ],
-            "windows": {
-                "args": [
-                    "--build", "Builds/Windows",
-                    "--target", "Matrix-Control_VST3",
-                    "--config", "Debug"
-                ]
-            },
-            "osx": {
-                "args": [
-                    "--build", "Builds/macOS",
-                    "--target", "Matrix-Control_VST3",
-                    "--config", "Debug"
-                ]
-            },
-            "linux": {
-                "args": [
-                    "--build", "Builds/Linux",
-                    "--target", "Matrix-Control_VST3",
-                    "--config", "Debug"
-                ]
-            },
             "group": "build",
-            "problemMatcher": [
-                "$gcc",
-                "$msCompile"
-            ]
+            "problemMatcher": []
         },
         {
             "label": "Build: All",
             "type": "shell",
+            "dependsOn": ["CMake: Configure if needed"],
             "command": "cmake",
             "args": [
-                "--build", "Builds/Windows",
-                "--config", "Debug"
+                "--build", "${command:cmake.buildDirectory}",
+                "--config", "${command:cmake.buildType}"
             ],
-            "windows": {
-                "args": [
-                    "--build", "Builds/Windows",
-                    "--config", "Debug"
-                ]
-            },
-            "osx": {
-                "args": [
-                    "--build", "Builds/macOS",
-                    "--config", "Debug"
-                ]
-            },
-            "linux": {
-                "args": [
-                    "--build", "Builds/Linux",
-                    "--config", "Debug"
-                ]
-            },
             "group": {
                 "kind": "build",
                 "isDefault": true
             },
-            "problemMatcher": [
-                "$gcc",
-                "$msCompile"
-            ]
+            "problemMatcher": []
         },
         {
             "label": "Clean",
@@ -185,11 +116,6 @@
                 "args": [
                     "-Command",
                     "Remove-Item -Recurse -Force Builds -ErrorAction SilentlyContinue"
-                ]
-            },
-            "linux": {
-                "args": [
-                    "-rf", "Builds"
                 ]
             },
             "group": "build"

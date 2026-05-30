@@ -8,6 +8,23 @@
 #include "Loggers/ApvtsLogger.h"
 #include "Factories/ApvtsFactory.h"
 
+namespace
+{
+    bool isStandaloneWrapper()
+    {
+        return juce::PluginHostType::getPluginLoadedAs() == juce::AudioProcessor::wrapperType_Standalone;
+    }
+
+    bool shouldUseDevelopmentLogging()
+    {
+#if JUCE_DEBUG
+        return isStandaloneWrapper();
+#else
+        return false;
+#endif
+    }
+}
+
 PluginProcessor::PluginProcessor()
     : AudioProcessor(BusesProperties()
 #if !JucePlugin_IsMidiEffect
@@ -24,10 +41,6 @@ PluginProcessor::PluginProcessor()
     buildChoiceParameterMap();
     initializeMidiPortProperties();
     apvts.state.addListener(this);
-    
-#if JUCE_DEBUG
-    enableApvtsLogging();
-#endif
 }
 
 PluginProcessor::~PluginProcessor()
@@ -101,11 +114,13 @@ void PluginProcessor::changeProgramName(int index, const juce::String& newName)
 void PluginProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
     juce::ignoreUnused(sampleRate, samplesPerBlock);
-    
-#if JUCE_DEBUG
-    enableFileLoggingForSession();
-    enableApvtsLogging();
-#endif
+
+    if (shouldUseDevelopmentLogging())
+    {
+        enableFileLoggingForSession();
+        enableApvtsLogging();
+    }
+
     startMidiThread();
 }
 
@@ -120,10 +135,12 @@ void PluginProcessor::startMidiThread()
 void PluginProcessor::releaseResources()
 {
     stopMidiThread();
-#if JUCE_DEBUG
-    disableApvtsLogging();
-    closeLogFileForSession();
-#endif
+
+    if (shouldUseDevelopmentLogging())
+    {
+        disableApvtsLogging();
+        closeLogFileForSession();
+    }
 }
 
 void PluginProcessor::stopMidiThread()
@@ -162,7 +179,9 @@ void PluginProcessor::setStateInformation(const void* data, int sizeInBytes)
         if (xmlState->hasTagName(apvts.state.getType()))
         {
             apvts.replaceState(juce::ValueTree::fromXml(*xmlState));
-            ApvtsLogger::getInstance().logStateLoaded("DAW state");
+
+            if (shouldUseDevelopmentLogging())
+                ApvtsLogger::getInstance().logStateLoaded("DAW state");
         }
     }
 }
@@ -204,7 +223,6 @@ void PluginProcessor::validatePluginDescriptorsAtStartup()
         {
             DBG("  ERROR: " + error);
         }
-        jassertfalse;
     }
 }
 
@@ -404,13 +422,16 @@ void PluginProcessor::valueTreePropertyChanged(juce::ValueTree& treeWhosePropert
     juce::String parameterId = resolveParameterIdFromTree(treeWhosePropertyHasChanged, property);
     juce::String choiceLabel = getChoiceLabelForNumericValue(parameterId, newValue);
 
-    ApvtsLogger::getInstance().logValueTreePropertyChanged(
-        juce::Identifier(parameterId),
-        juce::var(),
-        newValue,
-        threadName,
-        choiceLabel
-    );
+    if (shouldUseDevelopmentLogging())
+    {
+        ApvtsLogger::getInstance().logValueTreePropertyChanged(
+            juce::Identifier(parameterId),
+            juce::var(),
+            newValue,
+            threadName,
+            choiceLabel
+        );
+    }
 
     handleBankNumberChange(parameterId);
     handlePatchNumberChange(parameterId);
@@ -445,7 +466,9 @@ void PluginProcessor::valueTreeChildAdded(juce::ValueTree& parentTree,
                                          juce::ValueTree& childWhichHasBeenAdded)
 {
     juce::ignoreUnused(parentTree, childWhichHasBeenAdded);
-    ApvtsLogger::getInstance().logDebug("ValueTree child added: " + childWhichHasBeenAdded.getType().toString());
+
+    if (shouldUseDevelopmentLogging())
+        ApvtsLogger::getInstance().logDebug("ValueTree child added: " + childWhichHasBeenAdded.getType().toString());
 }
 
 void PluginProcessor::valueTreeChildRemoved(juce::ValueTree& parentTree,
@@ -453,26 +476,34 @@ void PluginProcessor::valueTreeChildRemoved(juce::ValueTree& parentTree,
                                            int indexFromWhichChildWasRemoved)
 {
     juce::ignoreUnused(parentTree, childWhichHasBeenRemoved, indexFromWhichChildWasRemoved);
-    ApvtsLogger::getInstance().logDebug("ValueTree child removed: " + childWhichHasBeenRemoved.getType().toString());
+
+    if (shouldUseDevelopmentLogging())
+        ApvtsLogger::getInstance().logDebug("ValueTree child removed: " + childWhichHasBeenRemoved.getType().toString());
 }
 
 void PluginProcessor::valueTreeChildOrderChanged(juce::ValueTree& parentTreeWhoseChildrenHaveChanged,
                                                 int oldIndex, int newIndex)
 {
     juce::ignoreUnused(parentTreeWhoseChildrenHaveChanged, oldIndex, newIndex);
-    ApvtsLogger::getInstance().logDebug("ValueTree child order changed");
+
+    if (shouldUseDevelopmentLogging())
+        ApvtsLogger::getInstance().logDebug("ValueTree child order changed");
 }
 
 void PluginProcessor::valueTreeParentChanged(juce::ValueTree& treeWhoseParentHasChanged)
 {
     juce::ignoreUnused(treeWhoseParentHasChanged);
-    ApvtsLogger::getInstance().logDebug("ValueTree parent changed");
+
+    if (shouldUseDevelopmentLogging())
+        ApvtsLogger::getInstance().logDebug("ValueTree parent changed");
 }
 
 void PluginProcessor::valueTreeRedirected(juce::ValueTree& treeWhichHasBeenChanged)
 {
     juce::ignoreUnused(treeWhichHasBeenChanged);
-    ApvtsLogger::getInstance().logStateReplaced();
+
+    if (shouldUseDevelopmentLogging())
+        ApvtsLogger::getInstance().logStateReplaced();
 }
 
 void PluginProcessor::buildChoiceParameterMap()

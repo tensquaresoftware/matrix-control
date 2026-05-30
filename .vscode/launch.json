@@ -5,23 +5,34 @@
             "name": "Debug: Standalone",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/Builds/macOS/Matrix-Control_artefacts/Debug/Standalone/Matrix-Control.app/Contents/MacOS/Matrix-Control",
+            "program": "${workspaceFolder}/${command:cmake.buildDirectory}/Matrix-Control_artefacts/${command:cmake.buildType}/Standalone/Matrix-Control.app/Contents/MacOS/Matrix-Control",
             "args": [],
             "cwd": "${workspaceFolder}",
             "preLaunchTask": "Build: Standalone",
             "osx": {
                 "type": "lldb",
-                "program": "${workspaceFolder}/Builds/macOS/Matrix-Control_artefacts/Debug/Standalone/Matrix-Control.app/Contents/MacOS/Matrix-Control"
+                "program": "${workspaceFolder}/${command:cmake.buildDirectory}/Matrix-Control_artefacts/${command:cmake.buildType}/Standalone/Matrix-Control.app/Contents/MacOS/Matrix-Control"
             },
             "windows": {
                 "type": "cppvsdbg",
-                "program": "${workspaceFolder}/Builds/Windows/Matrix-Control_artefacts/Debug/Standalone/Matrix-Control.exe",
+                "program": "${workspaceFolder}/${command:cmake.buildDirectory}/Matrix-Control_artefacts/${command:cmake.buildType}/Standalone/Matrix-Control.exe",
                 "MIMode": "windows"
             },
             "linux": {
                 "type": "cppdbg",
-                "program": "${workspaceFolder}/Builds/Linux/Matrix-Control_artefacts/Debug/Standalone/Matrix-Control",
-                "MIMode": "gdb"
+                "request": "launch",
+                "program": "${workspaceFolder}/${command:cmake.buildDirectory}/Matrix-Control_artefacts/${command:cmake.buildType}/Standalone/Matrix-Control",
+                "args": [],
+                "cwd": "${workspaceFolder}",
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ],
+                "preLaunchTask": "Build: Standalone"
             }
         },
         {

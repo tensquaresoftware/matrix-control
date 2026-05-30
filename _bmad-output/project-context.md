@@ -10,14 +10,14 @@ sources:
   - planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/architecture.md
   - reference-docs/oberheim/index.md
 created: 2026-05-23
-updated: 2026-05-29
+updated: 2026-05-30
 ---
 
 # Project Context
 
 **Purpose:** Implementation constitution for BMad agents working on this repository.  
 **Baseline code tag:** `v0.0.66-alpha-pre-bmad`  
-**Last updated:** 2026-05-29
+**Last updated:** 2026-05-30
 
 ---
 
@@ -69,7 +69,7 @@ This is a **brownfield** project. Do **not** restart from scratch. Extend and re
 |---|---|
 | Language | C++17 minimum |
 | Framework | JUCE 8.0.12 (`/Applications/JUCE`) |
-| Build | CMake, outputs under `builds/` (`macos/`, `windows/`, `linux/`) — gitignored; never `build/` at root alone |
+| Build | CMake presets; outputs under `Builds/` (`macOS/ARM`, `macOS/Intel`, `Windows`, `Linux`) — gitignored |
 | Compiler (macOS) | Xcode 26 |
 | Plugin formats | AU, VST3, Standalone |
 | Target synth | Oberheim Matrix-1000 (SysEx) |
@@ -79,55 +79,39 @@ This is a **brownfield** project. Do **not** restart from scratch. Extend and re
 
 ## Repository Layout
 
-**Current layout (baseline `v0.0.66-alpha-pre-bmad`):**
+**Current layout (JUCE project generator v2 — 2026-05-30):**
 
 ```
 Matrix-Control/
-├── Source/                  # Application code (JUCE convention — keep capital S)
+├── Source/                  # Application code (include root for "Core/...", "GUI/...")
 │   ├── Core/                # Business logic, MIDI, APVTS factories — NO GUI deps
 │   ├── GUI/                 # Presentation: widgets, panels, looks, skins, layout
-│   └── Shared/Definitions/  # Descriptors, IDs, display names, design dimensions
+│   └── Shared/              # ProjectPaths, Definitions/
 ├── Assets/                  # Public assets (fonts, README screenshots)
-├── Logs/                    # Runtime logs (gitignored) — path bug: see AD-10 / D-093
-├── Documentation/           # Public project knowledge (specs, architecture, GUI guides)
-├── Documentation/Development/Plans/  # Legacy pre-BMad plans — archive, do not delete
-├── _bmad-output/            # BMad active artifacts (PRD, epics, stories, this file)
-├── Quality/                 # Private working files (mockups, journal) — not public docs
-├── Workbench/               # Dev test data (SysEx, Ableton Live projects)
-└── Builds/                  # CMake build trees (gitignored)
+├── Tests/Unit/              # Unit tests (JUCE UnitTest — wired in Tests/CMakeLists.txt)
+├── Documentation/           # Public project knowledge (.md, kebab-case filenames)
+├── Logs/                    # Runtime logs (gitignored) — MIDI/, APVTS/ via ProjectPaths
+├── Builds/                  # CMake preset output trees (gitignored)
+├── _bmad/, _bmad-output/    # BMad tooling and artifacts
+└── _local/                  # Personal workspace (gitignored)
 ```
-
-### Planned migration (P-001 — see PRD decision log)
-
-Guillaume plans to **realign the project tree** with professional JUCE open-source conventions (folder/file naming, public vs private artifacts). This is **not started yet**.
-
-**Target root layout (validated draft):**
 
 | Path | Role | Git |
 |---|---|---|
-| `src/` | Application code | versioned |
-| `assets/` | Public assets (fonts, README screenshots) | versioned |
-| `logs/` | Runtime logs (`logs/midi/`, `logs/apvts/`) | **gitignored** |
-| `docs/` | Public documentation (`.md`, kebab-case filenames) | versioned |
-| `tests/` | Unit tests | versioned |
-| `builds/macos/`, `builds/windows/`, `builds/linux/` | CMake output trees | **gitignored** |
-| `_bmad/`, `_bmad-output/` | BMad tooling and artifacts | versioned |
-| `_bmad-output/reference-docs/oberheim/` | Archived Oberheim MIDI/SysEx references (M-1000 official transcription + M-6/6R complement) | versioned |
-| `_local/` | Personal workspace (ex-`Quality/`, `Workbench/`) | **gitignored** |
+| `Source/` | Application code | versioned |
+| `Assets/` | Public assets | versioned |
+| `Tests/` | Unit tests | versioned |
+| `Documentation/` | Public documentation | versioned |
+| `Logs/` | Runtime logs (`MIDI/`, `APVTS/`) | **gitignored** |
+| `Builds/` | CMake outputs (`macOS/ARM`, etc.) | **gitignored** |
+| `_bmad/`, `_bmad-output/` | BMad artifacts | versioned |
+| `_local/` | Personal workspace | **gitignored** |
 
-References: no Oberheim manual PDFs in git — Markdown + external links only.
+**Tooling:** `CMakeUserPresets.json`, `project-configuration.cmake` (no `configure-platform.py`). IDE: CMake Tools + `clangd` disabled; `compile_commands.json` copied to repo root on configure.
 
-**Until P-001 (Epic E0) is executed:**
+**Runtime paths (AD-10):** `ProjectPaths` discovers repo root (`.matrix-control-root`, `CMakeLists.txt` token, walk-up from executable/CWD). Loggers write under `{root}/logs/`.
 
-- Do **not** reorganize `Source/`, `Documentation/`, or `Quality/` ad hoc during feature work.
-- Do **not** commit `_local/` contents (journal, mockups, workbench data).
-- New Core services (E1+) should use **target paths** documented in `architecture/.../architecture.md` § Project Structure — execute P-001 before adding those files.
-
-**Full target tree, rename map, E0 checklist, and runtime path fix (AD-10):** `_bmad-output/planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/architecture.md` (AD-9, AD-10, step 6).
-
-**Known brownfield issue (fixed in E0):** `ApvtsLogger` / `MidiLogger` use CMake-baked absolute `MATRIX_CONTROL_PROJECT_ROOT` — logs stay at old disk location after repo move until reconfigure. E0 introduces `ProjectPaths` runtime discovery (D-093).
-
-**Hard rule until P-001 Epic E0 completes:** do not rename `Source/` → `src/` without the approved migration checklist and CMake updates.
+**Do not** reintroduce lowercase root folders (`src/`, `builds/`) or legacy generator scripts without an explicit architecture decision.
 
 ---
 
