@@ -11,6 +11,8 @@ namespace
     constexpr const char* kLogsFolderName { "Logs" };
     constexpr const char* kMidiLogsFolderName { "MIDI" };
     constexpr const char* kApvtsLogsFolderName { "APVTS" };
+    constexpr const char* kMacOsSystemPlugInsPath { "/Library/Audio/Plug-Ins/" };
+    constexpr int kMaxWalkUpDepth { 32 };
 
     struct RootCache
     {
@@ -40,11 +42,17 @@ namespace
         return cmakeFile.loadFileAsString().contains(kProjectNameToken);
     }
 
+    bool isSystemInstalledPluginPath(const juce::File& file)
+    {
+        const auto path = file.getFullPathName();
+        return path.contains(kMacOsSystemPlugInsPath);
+    }
+
     juce::File findRootFromStartDirectory(const juce::File& startDirectory)
     {
         juce::File current = startDirectory;
 
-        while (current != juce::File())
+        for (int depth = 0; depth < kMaxWalkUpDepth && current != juce::File(); ++depth)
         {
             if (directoryContainsProjectMarker(current))
                 return current;
@@ -77,11 +85,13 @@ namespace
 
     juce::Array<juce::File> collectWalkUpRoots()
     {
-        const juce::Array<juce::File> startPoints
-        {
-            juce::File::getSpecialLocation(juce::File::currentExecutableFile).getParentDirectory(),
-            juce::File::getCurrentWorkingDirectory()
-        };
+        juce::Array<juce::File> startPoints;
+        const auto executableFile = juce::File::getSpecialLocation(juce::File::currentExecutableFile);
+
+        if (!isSystemInstalledPluginPath(executableFile))
+            startPoints.add(executableFile.getParentDirectory());
+
+        startPoints.add(juce::File::getCurrentWorkingDirectory());
 
         juce::Array<juce::File> discoveredRoots;
 

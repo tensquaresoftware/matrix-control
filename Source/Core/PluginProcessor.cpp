@@ -45,7 +45,6 @@ PluginProcessor::PluginProcessor()
     buildChoiceParameterMap();
     initializeMidiPortProperties();
     apvts.state.addListener(this);
-    ensureDevelopmentLoggingStarted();
 }
 
 PluginProcessor::~PluginProcessor()

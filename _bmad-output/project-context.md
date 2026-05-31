@@ -3,21 +3,21 @@ organization: Ten Square Software
 project: Matrix-Control
 title: Project Context
 author: BMad Agent
-version: "1.0"
+version: "1.1"
 sources:
   - planning-artifacts/briefs/brief-Matrix-Control-2026-05-22/brief.md
   - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/prd.md
   - planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/architecture.md
   - reference-docs/oberheim/index.md
 created: 2026-05-23
-updated: 2026-05-30
+updated: 2026-05-31
 ---
 
 # Project Context
 
 **Purpose:** Implementation constitution for BMad agents working on this repository.  
 **Baseline code tag:** `v0.0.66-alpha-pre-bmad`  
-**Last updated:** 2026-05-30
+**Last updated:** 2026-05-31 (P-001 sign-off — Story 0.5)
 
 ---
 
@@ -109,7 +109,7 @@ Matrix-Control/
 
 **Tooling:** `CMakeUserPresets.json`, `project-configuration.cmake` (no `configure-platform.py`). IDE: CMake Tools + `clangd` disabled; `compile_commands.json` copied to repo root on configure.
 
-**Runtime paths (AD-10):** `ProjectPaths` discovers repo root (`.matrix-control-root`, `CMakeLists.txt` token, walk-up from executable/CWD). Loggers write under `{root}/logs/`.
+**Runtime paths (AD-10):** `ProjectPaths` discovers repo root (`.matrix-control-root`, `CMakeLists.txt` token, walk-up from executable/CWD with depth cap). Loggers write under `{root}/Logs/MIDI/` and `{root}/Logs/APVTS/`. Executables under `/Library/Audio/Plug-Ins/` skip walk-up (fallback or `MATRIX_CONTROL_PROJECT_ROOT` env for dev).
 
 **Do not** reintroduce lowercase root folders (`src/`, `builds/`) or legacy generator scripts without an explicit architecture decision.
 
