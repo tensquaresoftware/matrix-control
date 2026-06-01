@@ -11,6 +11,6 @@ project_knowledge: "{project-root}/Documentation"
 # Core Configuration Values
 user_name: Guillaume
 project_name: Matrix-Control
-communication_language: English
+communication_language: French
 document_output_language: English
 output_folder: _bmad-output
