@@ -19,16 +19,16 @@ if(APPLE)
         # Rosetta builds use .../Intel-Rosetta, so they do not match .../Intel/?$ at end of path.
         if(CMAKE_BINARY_DIR MATCHES "Builds/macOS/Intel/?$")
             message(FATAL_ERROR
-                "On Apple Silicon, do not use the 'macOS Intel' preset (default-macos-x86_64; meant for native Mac Intel). Use 'macOS Intel-Rosetta' instead (preset default-macos-x86_64-rosetta): in Cursor select that preset. To list all presets: cmake --list-presets.")
+                "On Apple Silicon, do not use the 'macOS Intel' preset (default-macos-x86_64; meant for native Mac Intel). Use 'macOS Intel-Rosetta' instead (preset default-macos-x86_64-rosetta): in your IDE select that preset. To list all presets: cmake --list-presets.")
         endif()
     elseif(HOST_ARCH STREQUAL "x86_64" OR HOST_ARCH STREQUAL "i386")
         if(CMAKE_BINARY_DIR MATCHES "Intel-Rosetta")
             message(FATAL_ERROR
-                "On Mac Intel, do not use the 'macOS Intel-Rosetta' preset (default-macos-x86_64-rosetta; meant for Apple Silicon). Use 'macOS Intel' instead (preset default-macos-x86_64): in Cursor select that preset. To list all presets: cmake --list-presets.")
+                "On Mac Intel, do not use the 'macOS Intel-Rosetta' preset (default-macos-x86_64-rosetta; meant for Apple Silicon). Use 'macOS Intel' instead (preset default-macos-x86_64): in your IDE select that preset. To list all presets: cmake --list-presets.")
         endif()
         if(CMAKE_BINARY_DIR MATCHES "Builds/macOS/ARM/?$")
             message(FATAL_ERROR
-                "On Mac Intel, do not use the 'macOS Apple Silicon' preset (default-macos-arm64). Use 'macOS Intel' instead (preset default-macos-x86_64): in Cursor select that preset. To list all presets: cmake --list-presets.")
+                "On Mac Intel, do not use the 'macOS Apple Silicon' preset (default-macos-arm64). Use 'macOS Intel' instead (preset default-macos-x86_64): in your IDE select that preset. To list all presets: cmake --list-presets.")
         endif()
     endif()
     # Use Ninja generator on macOS if not specified

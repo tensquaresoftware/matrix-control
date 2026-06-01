@@ -1,10 +1,9 @@
 # Matrix-Control — Project Instructions
 
-Personal coding, communication and Git conventions live in `.cursorrules`
-(single source of truth, shared with Cursor). They are imported below so they
-apply to Claude Code as well.
+Personal coding, communication and Git conventions live in `CONVENTIONS.md`
+(single source of truth). They are imported below so they apply to every session.
 
-@.cursorrules
+@CONVENTIONS.md
 
 ## Claude Code specifics
 

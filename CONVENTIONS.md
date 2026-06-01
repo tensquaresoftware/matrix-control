@@ -1,15 +1,15 @@
-# Cursor / Personal Instructions
+# Personal Instructions
 
 **Author:** Guillaume DUPONT
 **Organization:** Ten Square Software
-**Context:** VST/AU plugin development with JUCE & Cursor
-**Revision date:** 2026-05-27
+**Context:** VST/AU plugin development with JUCE (Claude Code)
+**Revision date:** 2026-06-02
 
 ---
 
 ## Purpose of this document
 
-This file defines my personal instructions for the Cursor AI agent. It guides the agent in code generation, documentation, advice, and responses by establishing a set of rules, standards, and conventions to follow throughout our development sessions.
+This file defines my personal instructions for the AI coding agent. It guides the agent in code generation, documentation, advice, and responses by establishing a set of rules, standards, and conventions to follow throughout our development sessions.
 
 ---
 
@@ -31,10 +31,10 @@ This file defines my personal instructions for the Cursor AI agent. It guides th
 - Optimal solutions compliant with professional standards
 - **Default tone: plain, natural French** — Questions and explanations without unnecessary jargon. Technical terms only when truly needed; then keep them short or add a brief plain-language gloss.
 - When introducing a new or abstract concept, provide a short concrete example to make it easier to understand
-- **No redundant repetition** — One well-written explanation or question per turn is enough. Do not restate the same point as intro + detailed body + summary + closing recap. Respect token budget (Cursor Pro).
-- **DO NOT** present code blocks in the chat when modifying/generating
+- **No redundant repetition** — One well-written explanation or question per turn is enough. Do not restate the same point as intro + detailed body + summary + closing recap. Respect the token budget.
+- **DO NOT** paste full code blocks in the chat when modifying/generating
 - Prefer summaries and conclusions in natural language only
-- The code is already visible in Cursor's editor, no need to repeat it in the chat
+- The diffs are already shown by the tool, no need to repeat the code in the chat
 
 ---
 
@@ -207,7 +207,7 @@ Before presenting code to Guillaume, I MUST systematically verify:
 ### 5.1 System & Tools
 
 - **Platform:** MacBook Pro M5 with macOS Tahoe
-- **IDE:** Cursor (with monthly Agent AI subscription)
+- **IDE / AI agent:** VS Code + Claude Code
 - **Compiler:** Xcode 26
 - **Build system:** CMake
 - **Build directory:** `Builds/` (subfolders `macOS/`, `Windows/`, `Linux/`) — do not use `build/` at root
@@ -749,11 +749,8 @@ When I create Markdown files for refactoring plans, optimizations, or other plan
 The **Plans** folder must be **compartmentalized into subfolders by year**: `2025`, `2026`, etc. Inside each year, create **subfolders by month**: `01`, `02`, `03`, …, `12`. Each plan file is placed in the year then month subfolder corresponding to the plan date (e.g. a plan dated 2026-02-23 → `Documentation/Development/Plans/2026/02/`).
 
 **⚠️ Important procedure:**
-- If Cursor automatically generates a plan in `~/.cursor/plans/*.plan.md`, I must **immediately** copy it to `Documentation/Development/Plans/<year>/<month>/` (e.g. `Plans/2026/03/`) with the naming convention below
-- This copy must be included in the plan TODOs and marked as done as soon as it's done
-- **As soon as all plan TODOs are marked `completed`**, I must **copy** the final `.plan.md` file from `~/.cursor/plans/` to `Documentation/Development/Plans/<year>/<month>/` with the correct name (overwriting the initial copy if necessary)
-- Keep original files in `~/.cursor/plans/` so as not to disturb Cursor
-- Always have a final archived version in the project with all TODOs up to date
+- Any plan or design document I produce must be saved under `Documentation/Development/Plans/<year>/<month>/` with the naming convention below
+- Keep the archived plan up to date: when all of its TODOs are marked `completed`, update the saved file so it reflects the final state
 
 ### 9.2 Naming convention
 
