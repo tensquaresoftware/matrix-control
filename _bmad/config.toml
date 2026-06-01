@@ -11,13 +11,14 @@
 # ─────────────────────────────────────────────────────────────────
 
 [core]
+project_name = "Matrix-Control"
 document_output_language = "English"
 output_folder = "_bmad-output"
 
 [modules.bmm]
 planning_artifacts = "{project-root}/_bmad-output/planning-artifacts"
 implementation_artifacts = "{project-root}/_bmad-output/implementation-artifacts"
-project_knowledge = "Documentation"
+project_knowledge = "{project-root}/Documentation"
 
 [agents.bmad-agent-analyst]
 module = "bmm"

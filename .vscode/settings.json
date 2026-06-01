@@ -27,6 +27,11 @@
     "cmake.saveBeforeBuild": true,
     "cmake.clearOutputBeforeBuild": true,
     "cmake.configurePreset": "default-macos-arm64",
+    "cmake.debugConfig": {
+        "cwd": "${workspaceFolder}"
+    },
+    "terminal.integrated.enablePersistentSessions": false,
+    "terminal.integrated.cwd": "${workspaceFolder}",
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
     "clangd.enable": false,
     "files.associations": {
