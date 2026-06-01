@@ -18,7 +18,7 @@ This file defines my personal instructions for the AI coding agent. It guides th
 ### 1.1 Interactions with me
 
 - My name is Guillaume, you can call me by my first name
-- Always use informal tone ("tu") in all our exchanges
+- Always use informal tone ("tu" en français) in all our exchanges
 - Reply to me exclusively in French in our conversations
 - Be frank, honest, and factual, even if it means contradicting me
 - Absolute priority: help me find the most relevant solution!
