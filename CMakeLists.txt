@@ -202,8 +202,53 @@ set(PLUGIN_SOURCES
     Source/Core/Loggers/ApvtsLogger.cpp
 )
 
-# Unit tests live under Tests/Unit/ — not linked into AU/VST3/Standalone (static juce::UnitTest
-# registrars crash some hosts). A dedicated test runner target can be added later.
+# ============================================================================
+# UNIT TEST RUNNER (console app)
+# Unit tests use juce::UnitTest and must NOT be linked into AU/VST3/Standalone
+# (static UnitTest registrars crash some hosts). They build into a dedicated
+# console target instead. Enable with -DMATRIX_BUILD_TESTS=ON, then:
+#   cmake --build <buildDir> --target Matrix-Control_Tests
+#   "<buildDir>/Matrix-Control_Tests_artefacts/<config>/Matrix-Control Tests"
+# Only Core sources under test are compiled here — no GUI, no plugin target.
+# ============================================================================
+option(MATRIX_BUILD_TESTS "Build the Matrix-Control unit test runner" OFF)
+
+if(MATRIX_BUILD_TESTS)
+    juce_add_console_app(Matrix-Control_Tests PRODUCT_NAME "Matrix-Control Tests")
+
+    target_sources(Matrix-Control_Tests PRIVATE
+        Tests/TestMain.cpp
+        Tests/Unit/MidiManagerTests.cpp
+        Tests/Unit/PatchModelTests.cpp
+        Tests/Unit/SysExEncoderTests.cpp
+        Tests/Unit/SysExParserTests.cpp
+
+        Source/Core/Models/PatchModel.cpp
+        Source/Core/MIDI/SysEx/SysExParser.cpp
+        Source/Core/MIDI/SysEx/SysExDecoder.cpp
+        Source/Core/MIDI/SysEx/SysExEncoder.cpp
+        Source/Core/Loggers/MidiLogger.cpp
+        Source/Shared/ProjectPaths.cpp
+    )
+
+    target_include_directories(Matrix-Control_Tests PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/Source
+    )
+
+    target_compile_definitions(Matrix-Control_Tests PRIVATE
+        JUCE_WEB_BROWSER=0
+        JUCE_USE_CURL=0
+        JUCE_STANDALONE_APPLICATION=1
+        MATRIX_TEST_FIXTURES_DIR="${CMAKE_CURRENT_SOURCE_DIR}/Tests/Fixtures"
+    )
+
+    target_link_libraries(Matrix-Control_Tests PRIVATE
+        juce::juce_audio_processors
+        juce::juce_core
+        juce::juce_recommended_config_flags
+        juce::juce_recommended_warning_flags
+    )
+endif()
 
 # ============================================================================
 # PLUGIN CONFIGURATION

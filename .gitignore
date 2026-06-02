@@ -67,6 +67,11 @@ tests/
 builds/
 docs/
 
+# Keep the canonical, versioned Tests/ directory: on case-insensitive filesystems
+# (macOS) the lowercase "tests/" rule above also matches "Tests/", so re-include it.
+# Nested lowercase "tests/" folders (e.g. inside tooling) stay ignored.
+!/Tests/
+
 # Temporary files
 *.log
 *~
