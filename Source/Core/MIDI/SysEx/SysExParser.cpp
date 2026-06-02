@@ -37,13 +37,13 @@ SysExParser::ValidationResult SysExParser::validateSysEx(const juce::MemoryBlock
 
 bool SysExParser::validateStructure(const juce::MemoryBlock& sysEx) const
 {
-    if (sysEx.getSize() < SysExConstants::kMinSysExLength)
+    if (sysEx.getSize() < SysExConstants::kMinSysExEnvelopeLength)
     {
         return false;
     }
 
     const auto* data = static_cast<const juce::uint8*>(sysEx.getData());
-    
+
     if (data[0] != SysExConstants::kSysExStart)
     {
         return false;

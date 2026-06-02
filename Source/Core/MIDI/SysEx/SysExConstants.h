@@ -47,6 +47,9 @@ namespace SysExConstants
     // Minimum SysEx message length (header + checksum + EOX)
     constexpr size_t kMinSysExLength = 7;  // F0 10 06 <opcode> <data...> <checksum> F7
 
+    // Minimum SysEx envelope length: just the F0 start and F7 end delimiters
+    constexpr size_t kMinSysExEnvelopeLength = 2;  // F0 <...> F7
+
     // Timeout values
     constexpr int kDefaultTimeoutMs = 2000;  // 2 seconds timeout for MIDI operations
     constexpr int kMinSysExDelayMs = 10;     // Minimum delay between SysEx messages
