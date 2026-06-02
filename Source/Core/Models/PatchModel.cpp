@@ -16,35 +16,38 @@ namespace Core
         constexpr juce::juce_wchar kNamePadChar = ' ';
     }
 
+    size_t PatchModel::safeOffset(int sysExOffset) noexcept
+    {
+        jassert(sysExOffset >= 0 && static_cast<size_t>(sysExOffset) < kBufferSize);
+        return static_cast<size_t>(sysExOffset);
+    }
+
     void PatchModel::loadFrom(const juce::uint8* packedData) noexcept
     {
+        jassert(packedData != nullptr);
         std::memcpy(buffer_.data(), packedData, kBufferSize);
     }
 
     int PatchModel::getValue(const PluginDescriptors::IntParameterDescriptor& descriptor) const
     {
-        const auto offset = static_cast<size_t>(descriptor.sysExOffset);
-        return decodeField(buffer_[offset], descriptor.minValue, descriptor.maxValue);
+        return decodeField(buffer_[safeOffset(descriptor.sysExOffset)], descriptor.minValue, descriptor.maxValue);
     }
 
     void PatchModel::setValue(const PluginDescriptors::IntParameterDescriptor& descriptor, int value)
     {
-        const auto offset = static_cast<size_t>(descriptor.sysExOffset);
-        buffer_[offset] = encodeField(value, descriptor.minValue, descriptor.maxValue);
+        buffer_[safeOffset(descriptor.sysExOffset)] = encodeField(value, descriptor.minValue, descriptor.maxValue);
     }
 
     int PatchModel::getChoiceIndex(const PluginDescriptors::ChoiceParameterDescriptor& descriptor) const
     {
-        const auto offset = static_cast<size_t>(descriptor.sysExOffset);
         const int lastIndex = juce::jmax(0, descriptor.choices.size() - 1);
-        return juce::jlimit(0, lastIndex, static_cast<int>(buffer_[offset]));
+        return juce::jlimit(0, lastIndex, static_cast<int>(buffer_[safeOffset(descriptor.sysExOffset)]));
     }
 
     void PatchModel::setChoiceIndex(const PluginDescriptors::ChoiceParameterDescriptor& descriptor, int index)
     {
-        const auto offset = static_cast<size_t>(descriptor.sysExOffset);
         const int lastIndex = juce::jmax(0, descriptor.choices.size() - 1);
-        buffer_[offset] = static_cast<juce::uint8>(juce::jlimit(0, lastIndex, index));
+        buffer_[safeOffset(descriptor.sysExOffset)] = static_cast<juce::uint8>(juce::jlimit(0, lastIndex, index));
     }
 
     juce::String PatchModel::getName() const
@@ -58,9 +61,10 @@ namespace Core
 
     void PatchModel::setName(const juce::String& name)
     {
+        const juce::String upper = name.toUpperCase();
         for (int i = 0; i < kNameLength; ++i)
         {
-            const juce::juce_wchar character = i < name.length() ? name[i] : kNamePadChar;
+            const juce::juce_wchar character = i < upper.length() ? upper[i] : kNamePadChar;
             buffer_[static_cast<size_t>(i)] = static_cast<juce::uint8>(character) & kSevenBitMask;
         }
     }
@@ -74,7 +78,7 @@ namespace Core
         return position + 1;
     }
 
-    int PatchModel::decodeField(juce::uint8 raw, int minValue, int maxValue)
+    int PatchModel::decodeField(juce::uint8 raw, int minValue, int maxValue) noexcept
     {
         if (! isSignedField(minValue))
             return juce::jlimit(minValue, maxValue, static_cast<int>(raw));
@@ -88,7 +92,7 @@ namespace Core
         return juce::jlimit(minValue, maxValue, value);
     }
 
-    juce::uint8 PatchModel::encodeField(int value, int minValue, int maxValue)
+    juce::uint8 PatchModel::encodeField(int value, int minValue, int maxValue) noexcept
     {
         // Signed fields are stored as 8-bit two's complement (the synth sign-extends
         // bit 6 into bit 7), so the plain cast reproduces the synth's canonical byte.

@@ -2,13 +2,13 @@
 story_key: 1-1-patchmodel-packed-buffer
 epic: 1
 story: 1
-status: review
+status: done
 baseline_commit: 3813b56
 ---
 
 # Story 1.1: PatchModel Packed Buffer
 
-Status: review
+Status: done
 
 <!-- Ultimate context engine analysis completed — comprehensive developer guide created -->
 
@@ -145,6 +145,17 @@ claude-opus-4-8 (Claude Code, dev-story workflow)
 - **`.gitignore` fix:** the stale lowercase `tests/` entry matched the canonical versioned `Tests/` directory on case-insensitive macOS, which would have blocked committing the fixtures (AC #6). Kept the legacy entry but added an anchored re-include `!/Tests/` so the root `Tests/` is versioned while nested lowercase `tests/` folders (tooling) stay ignored.
 - ⚠️ **Pre-existing parser bug surfaced by the new runner — fixed by a separate task, NOT part of this story.** `SysExParserTests` → "Oberheim manufacturer ID validation" failed deterministically at first: `validateStructure` required `kMinSysExLength` (7) bytes, so the 6-byte wrong-manufacturer message was rejected with the misleading "missing F0 or F7" before the manufacturer check ran. This was flagged via a spawned task; that task (run separately) fixed it by adding `kMinSysExEnvelopeLength = 2` and relaxing `validateStructure` to the envelope check. Those edits to `Source/Core/MIDI/SysEx/SysExConstants.h` and `SysExParser.cpp` landed in the **same working tree** and show as modified — **they belong to the parser task, not Story 1.1**, and should be committed/reviewed separately. With them compiled in, the manufacturer test passes for the right reason ("Invalid Manufacturer ID or Device ID") and the full suite exits 0; PatchModel's 8 cases pass deterministically.
 - Clean Code self-review: `PatchModel` class ~50 h + ~110 cpp lines; every method ≤ ~12 lines, ≤ 3 params, named bit-mask constants (no magic numbers), `Core ↛ GUI` respected (only `juce_core` + descriptor structs). Type stays copyable (rule of zero) for later snapshot/clipboard use.
+
+### Review Findings
+
+- [x] [Review][Patch] **setName must fold to uppercase before storing** — Matrix charset is uppercase-only (6-bit, no lowercase). `setName` currently silently mangles lowercase input (`"abc"` → `getName()` = `"!\"#"`). Fix: call `name.toUpperCase()` before the loop. [Source/Core/Models/PatchModel.cpp:60-67]
+- [x] [Review][Patch] **`loadFrom(nullptr)` is UB despite `noexcept`** — added `jassert(packedData != nullptr)` before `std::memcpy`. [Source/Core/Models/PatchModel.cpp:21]
+- [x] [Review][Patch] **`sysExOffset` not bounds-checked → OOB on bad/negative descriptors** — extracted `safeOffset(int)` private helper with `jassert`; used in `getValue`, `setValue`, `getChoiceIndex`, `setChoiceIndex`. [Source/Core/Models/PatchModel.cpp]
+- [x] [Review][Patch] **Positional aggregate init in tests is brittle** — replaced with C++20 designated initializers (`.minValue`, `.maxValue`, `.sysExOffset`, `.choices`) in all inline descriptor constructions. [Tests/Unit/PatchModelTests.cpp]
+- [x] [Review][Patch] **`decodeField`/`encodeField` not marked `noexcept`** — added `noexcept` to both definitions and declarations. [Source/Core/Models/PatchModel.h, PatchModel.cpp]
+- [x] [Review][Patch] **`runNameCodec` test is uppercase-only** — added `"synthbas"→"SYNTHBAS"` and `"Hi There!"→"HI THERE"` sub-cases. [Tests/Unit/PatchModelTests.cpp]
+- [x] [Review][Defer] **`signBitPosition` undefined for `maxValue ≤ 0` or non-`2^n−1` ranges** [Source/Core/Models/PatchModel.cpp:53-58] — deferred, latent; `jlimit` safety net covers it, no current descriptor triggers it
+- [x] [Review][Defer] **`getChoiceIndex` silently clamps stale/corrupt buffer bytes** — no current descriptor with empty `choices`; defensive clamping acceptable [Source/Core/Models/PatchModel.cpp:40]
 
 ### Change Log
 

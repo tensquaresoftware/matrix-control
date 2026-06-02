@@ -34,15 +34,18 @@ namespace Core
         int getChoiceIndex(const PluginDescriptors::ChoiceParameterDescriptor& descriptor) const;
         void setChoiceIndex(const PluginDescriptors::ChoiceParameterDescriptor& descriptor, int index);
 
-        // Patch name (bytes 0-7, Matrix 6-bit ASCII charset). Limited to kNameLength characters.
+        // Patch name (bytes 0-7, Matrix 6-bit ASCII charset, uppercase only). Limited to
+        // kNameLength characters; longer input is truncated, shorter is space-padded.
+        // setName folds the input to uppercase — the Matrix display has no lowercase.
         juce::String getName() const;
         void setName(const juce::String& name);
 
     private:
         static bool isSignedField(int minValue) noexcept { return minValue < 0; }
+        static size_t safeOffset(int sysExOffset) noexcept;
         static int signBitPosition(int maxValue) noexcept;
-        static int decodeField(juce::uint8 raw, int minValue, int maxValue);
-        static juce::uint8 encodeField(int value, int minValue, int maxValue);
+        static int decodeField(juce::uint8 raw, int minValue, int maxValue) noexcept;
+        static juce::uint8 encodeField(int value, int minValue, int maxValue) noexcept;
         static juce::juce_wchar decodeNameChar(juce::uint8 raw) noexcept;
 
         std::array<juce::uint8, kBufferSize> buffer_ {};

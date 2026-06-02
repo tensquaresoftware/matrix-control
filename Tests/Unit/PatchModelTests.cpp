@@ -90,6 +90,13 @@ private:
 
         model.setName("HI");
         expectEquals(model.getName(), juce::String("HI"));
+
+        // Matrix display charset is uppercase-only: setName folds input to uppercase.
+        model.setName("synthbas");
+        expectEquals(model.getName(), juce::String("SYNTHBAS"));
+
+        model.setName("Hi There!");
+        expectEquals(model.getName(), juce::String("HI THERE"));
     }
 
     void runSignedFieldCodec()
@@ -101,7 +108,7 @@ private:
         // Signed fields are stored as 8-bit two's complement (synth sign-extends bit 6
         // into bit 7), so negative values set bit 7 — see byte-value assertions below.
         const PluginDescriptors::IntParameterDescriptor signed7 {
-            "p", "d", "g", -63, 63, 0, 86, 1
+            .minValue = -63, .maxValue = 63, .sysExOffset = 86
         };
         model.setValue(signed7, -63);
         expectEquals(model.getValue(signed7), -63);
@@ -113,7 +120,7 @@ private:
         expectEquals(static_cast<int>(model.data()[86]), 0xFF);
 
         const PluginDescriptors::IntParameterDescriptor signed6 {
-            "p", "d", "g", -31, 31, 0, 19, 12
+            .minValue = -31, .maxValue = 31, .sysExOffset = 19
         };
         model.setValue(signed6, -31);
         expectEquals(model.getValue(signed6), -31);
@@ -122,7 +129,7 @@ private:
         expectEquals(model.getValue(signed6), 31);
 
         const PluginDescriptors::IntParameterDescriptor unsigned7 {
-            "p", "d", "g", 0, 127, 0, 26, 21
+            .minValue = 0, .maxValue = 127, .sysExOffset = 26
         };
         model.setValue(unsigned7, 127);
         expectEquals(model.getValue(unsigned7), 127);
@@ -149,7 +156,7 @@ private:
         model.loadFrom(decoded);
 
         const PluginDescriptors::IntParameterDescriptor vcfFreqByEnv1 {
-            "p", "d", "g", -63, 63, 0, 90, 22
+            .minValue = -63, .maxValue = 63, .sysExOffset = 90
         };
         expectEquals(static_cast<int>(model.data()[90]), 212);
         expectEquals(model.getValue(vcfFreqByEnv1), -44);
@@ -164,7 +171,7 @@ private:
 
         Core::PatchModel model;
         const PluginDescriptors::ChoiceParameterDescriptor choice {
-            "p", "d", "g", { "A", "B", "C", "D" }, 0, 8, 48
+            .choices = { "A", "B", "C", "D" }, .sysExOffset = 8
         };
 
         model.setChoiceIndex(choice, 2);
