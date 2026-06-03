@@ -1,6 +1,8 @@
 #include <juce_audio_devices/juce_audio_devices.h>
 
 #include "PluginProcessor.h"
+#include "Core/Models/ApvtsPatchMapper.h"
+#include "Core/Models/PatchModel.h"
 #include "GUI/PluginEditor.h"
 #include "MIDI/MidiManager.h"
 #include "Shared/Definitions/ApvtsTypes.h"
@@ -40,9 +42,12 @@ PluginProcessor::PluginProcessor()
     )
     , apvts(*this, nullptr, "PARAMETERS", createParameterLayout())
     , midiManager(std::make_unique<MidiManager>(apvts))
+    , patchModel_{ std::make_unique<Core::PatchModel>() }
+    , apvtsPatchMapper_{ std::make_unique<Core::ApvtsPatchMapper>(apvts, *patchModel_) }
 {
     validatePluginDescriptorsAtStartup();
     buildChoiceParameterMap();
+    buildPatchParameterIdSet();
     initializeMidiPortProperties();
     apvts.state.addListener(this);
 }
@@ -445,6 +450,9 @@ void PluginProcessor::valueTreePropertyChanged(juce::ValueTree& treeWhosePropert
         );
     }
 
+    if (patchParameterIds_.count(parameterId) > 0)
+        apvtsPatchMapper_->apvtsToBuffer();
+
     handleBankNumberChange(parameterId);
     handlePatchNumberChange(parameterId);
 }
@@ -516,6 +524,15 @@ void PluginProcessor::valueTreeRedirected(juce::ValueTree& treeWhichHasBeenChang
 
     if (shouldUseDevelopmentLogging())
         ApvtsLogger::getInstance().logStateReplaced();
+}
+
+void PluginProcessor::buildPatchParameterIdSet()
+{
+    for (const auto& d : Core::ApvtsPatchMapper::buildIntDescriptors())
+        patchParameterIds_.insert(d.parameterId);
+
+    for (const auto& d : Core::ApvtsPatchMapper::buildChoiceDescriptors())
+        patchParameterIds_.insert(d.parameterId);
 }
 
 void PluginProcessor::buildChoiceParameterMap()

@@ -2,13 +2,13 @@
 story_key: 1-2-mastermodel-packed-buffer
 epic: 1
 story: 2
-status: review
+status: done
 baseline_commit: d66508a
 ---
 
 # Story 1.2: MasterModel Packed Buffer
 
-Status: review
+Status: done
 
 <!-- Ultimate context engine analysis completed — comprehensive developer guide created -->
 
@@ -50,6 +50,12 @@ So that master (Global Parameters) SysEx serialization is accurate (FR-49).
   - [x] Signed-field codec: synthetic `IntParameterDescriptor`s for the signed master fields — assert value round-trip **and** on-wire byte (−1→`0xFF`, −31→`0xE1`, −63→`0xC1`, +max) mirroring `PatchModelTests::runSignedFieldCodec`
   - [x] Choice-field store/clamp on a representative master choice descriptor (On/Off)
 - [x] **Self-review against Clean Code limits** before marking done (AC: #4, #7) — zero duplication between the two models (both delegate to `PackedFieldCodec`), both classes ≤ 200 lines, codec extraction left `PatchModel` green
+
+### Review Findings
+
+- [x] [Review][Patch] Missing signed-field tests: Master Transpose (±24, byte 34) and Vibrato Amp Mod Amount (±63, byte 7) [Tests/Unit/MasterModelTests.cpp:runSignedFieldCodec]
+- [x] [Review][Defer] `safeOffset` has no release-mode bounds guard (jassert+ignoreUnused only) [Source/Core/Models/PackedFieldCodec.cpp:22] — deferred, pre-existing pattern from PatchModel; descriptor offsets are static constants
+- [x] [Review][Defer] `choices.size() - 1` size_t underflow when choices is empty [Source/Core/Models/MasterModel.cpp:30] — deferred, pre-existing in PatchModel (Story 1.1), all real descriptors have ≥ 1 choice
 
 ## Dev Notes
 

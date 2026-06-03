@@ -101,6 +101,9 @@ set(PLUGIN_SOURCES
     # Core
     Source/Core/PluginProcessor.cpp
     Source/Core/Factories/ApvtsFactory.cpp
+    Source/Core/Models/ApvtsPatchMapper.cpp
+    Source/Core/Models/PackedFieldCodec.cpp
+    Source/Core/Models/PatchModel.cpp
     Source/Core/Factories/ApvtsValidator.cpp
     Source/Core/Factories/ApvtsLayoutBuilder.cpp
     Source/Shared/Definitions/PluginHelpers.cpp
@@ -218,12 +221,14 @@ if(MATRIX_BUILD_TESTS)
 
     target_sources(Matrix-Control_Tests PRIVATE
         Tests/TestMain.cpp
+        Tests/Unit/ApvtsPatchMapperTests.cpp
         Tests/Unit/MasterModelTests.cpp
         Tests/Unit/MidiManagerTests.cpp
         Tests/Unit/PatchModelTests.cpp
         Tests/Unit/SysExEncoderTests.cpp
         Tests/Unit/SysExParserTests.cpp
 
+        Source/Core/Models/ApvtsPatchMapper.cpp
         Source/Core/Models/MasterModel.cpp
         Source/Core/Models/PackedFieldCodec.cpp
         Source/Core/Models/PatchModel.cpp
@@ -231,6 +236,9 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/MIDI/SysEx/SysExDecoder.cpp
         Source/Core/MIDI/SysEx/SysExEncoder.cpp
         Source/Core/Loggers/MidiLogger.cpp
+        Source/Shared/Definitions/PluginDescriptors.cpp
+        Source/Shared/Definitions/PluginDescriptorsPatchEdit.cpp
+        Source/Shared/Definitions/PluginHelpers.cpp
         Source/Shared/ProjectPaths.cpp
     )
 

@@ -1,0 +1,10 @@
+{
+  "hooks": {
+    "SessionStart": [{
+      "hooks": [{
+        "type": "agent",
+        "prompt": "Activate caveman mode by running /caveman to enable response compression."
+      }]
+    }]
+  }
+}

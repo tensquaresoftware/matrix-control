@@ -89,6 +89,30 @@ private:
         model.setValue(speedModAmount, 63);
         expectEquals(model.getValue(speedModAmount), 63);
 
+        // Vibrato Amp Mod Amount: 7-bit signed, byte 7 (range +/-63).
+        const PluginDescriptors::IntParameterDescriptor ampModAmount {
+            .minValue = -63, .maxValue = 63, .sysExOffset = 7
+        };
+        model.setValue(ampModAmount, -63);
+        expectEquals(model.getValue(ampModAmount), -63);
+        expectEquals(static_cast<int>(model.data()[7]), 0xC1);
+        model.setValue(ampModAmount, 63);
+        expectEquals(model.getValue(ampModAmount), 63);
+
+        // Master Transpose: 6-bit signed, byte 34 (range -24..24). Same sign-bit width
+        // as Master Tune (signBitPosition(24) = 5) but different clamp range.
+        const PluginDescriptors::IntParameterDescriptor masterTranspose {
+            .minValue = -24, .maxValue = 24, .sysExOffset = 34
+        };
+        model.setValue(masterTranspose, -24);
+        expectEquals(model.getValue(masterTranspose), -24);
+        expectEquals(static_cast<int>(model.data()[34]), 0xE8);
+        model.setValue(masterTranspose, 24);
+        expectEquals(model.getValue(masterTranspose), 24);
+        model.setValue(masterTranspose, -1);
+        expectEquals(model.getValue(masterTranspose), -1);
+        expectEquals(static_cast<int>(model.data()[34]), 0xFF);
+
         // Unsigned field: Vibrato Speed, byte 1 (range 0..63).
         const PluginDescriptors::IntParameterDescriptor vibratoSpeed {
             .minValue = 0, .maxValue = 63, .sysExOffset = 1

@@ -3,12 +3,15 @@
 #include <memory>
 #include <map>
 #include <optional>
+#include <unordered_set>
 
 #include <juce_audio_processors/juce_audio_processors.h>
 
 #include "Shared/Definitions/PluginDescriptors.h"
 
 class MidiManager;
+
+namespace Core { class PatchModel; class ApvtsPatchMapper; }
 
 class PluginProcessor : public juce::AudioProcessor, public juce::ValueTree::Listener
 {
@@ -47,6 +50,12 @@ public:
 
     MidiManager& getMidiManager() noexcept { return *midiManager; }
     const MidiManager& getMidiManager() const noexcept { return *midiManager; }
+
+    Core::PatchModel& getPatchModel() noexcept { return *patchModel_; }
+    const Core::PatchModel& getPatchModel() const noexcept { return *patchModel_; }
+
+    Core::ApvtsPatchMapper& getApvtsPatchMapper() noexcept { return *apvtsPatchMapper_; }
+    const Core::ApvtsPatchMapper& getApvtsPatchMapper() const noexcept { return *apvtsPatchMapper_; }
 
     void setMidiInputPort(const juce::String& deviceId);
     void setMidiOutputPort(const juce::String& deviceId);
@@ -87,10 +96,14 @@ private:
     juce::String getChoiceLabelForNumericValue(const juce::String& parameterId, const juce::var& newValue) const;
     void handleBankNumberChange(const juce::String& parameterId);
     void handlePatchNumberChange(const juce::String& parameterId);
+    void buildPatchParameterIdSet();
 
     juce::AudioProcessorValueTreeState apvts;
     std::unique_ptr<MidiManager> midiManager;
+    std::unique_ptr<Core::PatchModel> patchModel_;
+    std::unique_ptr<Core::ApvtsPatchMapper> apvtsPatchMapper_;
     std::map<juce::String, PluginDescriptors::ChoiceParameterDescriptor> choiceParameterMap_;
+    std::unordered_set<juce::String> patchParameterIds_;
     bool developmentLoggingStarted_ { false };
     
     static constexpr int kThreadStopTimeoutMs_ {5000};
