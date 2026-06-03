@@ -218,11 +218,14 @@ if(MATRIX_BUILD_TESTS)
 
     target_sources(Matrix-Control_Tests PRIVATE
         Tests/TestMain.cpp
+        Tests/Unit/MasterModelTests.cpp
         Tests/Unit/MidiManagerTests.cpp
         Tests/Unit/PatchModelTests.cpp
         Tests/Unit/SysExEncoderTests.cpp
         Tests/Unit/SysExParserTests.cpp
 
+        Source/Core/Models/MasterModel.cpp
+        Source/Core/Models/PackedFieldCodec.cpp
         Source/Core/Models/PatchModel.cpp
         Source/Core/MIDI/SysEx/SysExParser.cpp
         Source/Core/MIDI/SysEx/SysExDecoder.cpp

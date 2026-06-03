@@ -10,17 +10,17 @@
 namespace Core
 {
 
-    // In-memory representation of the Oberheim Matrix-1000 134-byte packed single-patch
-    // buffer. Parameter values are read and written by descriptor byte offset, so the
-    // SysEx byte layout lives only in PluginDescriptors. Nibble packing, checksum and
-    // SysEx framing remain the responsibility of SysExEncoder / SysExDecoder.
-    class PatchModel
+    // In-memory representation of the Oberheim Matrix-1000 172-byte packed master
+    // ("Global Parameters") buffer. Parameter values are read and written by descriptor
+    // byte offset, so the SysEx byte layout lives only in PluginDescriptors. Unlike
+    // PatchModel there is no name field. Nibble packing, checksum and SysEx framing
+    // remain the responsibility of SysExEncoder / SysExDecoder.
+    class MasterModel
     {
     public:
-        static constexpr size_t kBufferSize = SysExConstants::kPatchPackedDataSize; // 134
-        static constexpr int kNameLength = 8;                                       // bytes 0-7
+        static constexpr size_t kBufferSize = SysExConstants::kMasterPackedDataSize; // 172
 
-        PatchModel() = default;
+        MasterModel() = default;
 
         // Raw packed-buffer access for interop with SysExEncoder / SysExDecoder.
         const juce::uint8* data() const noexcept { return buffer_.data(); }
@@ -31,18 +31,14 @@ namespace Core
         int getValue(const PluginDescriptors::IntParameterDescriptor& descriptor) const;
         void setValue(const PluginDescriptors::IntParameterDescriptor& descriptor, int value);
 
+        // The MIDI Basic Channel choice descriptor spans bytes 11/12/35 on the synth but
+        // carries a single sysExOffset (11); this touches byte 11 only. Full Omni/Mono
+        // composition is owned by ApvtsMasterMapper (Story 1.4); the 172-byte buffer
+        // round-trip preserves all three bytes regardless.
         int getChoiceIndex(const PluginDescriptors::ChoiceParameterDescriptor& descriptor) const;
         void setChoiceIndex(const PluginDescriptors::ChoiceParameterDescriptor& descriptor, int index);
 
-        // Patch name (bytes 0-7, Matrix 6-bit ASCII charset, uppercase only). Limited to
-        // kNameLength characters; longer input is truncated, shorter is space-padded.
-        // setName folds the input to uppercase — the Matrix display has no lowercase.
-        juce::String getName() const;
-        void setName(const juce::String& name);
-
     private:
-        static juce::juce_wchar decodeNameChar(juce::uint8 raw) noexcept;
-
         std::array<juce::uint8, kBufferSize> buffer_ {};
     };
 
