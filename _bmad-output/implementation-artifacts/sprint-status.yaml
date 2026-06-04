@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-05-29
-last_updated: 2026-06-04  # story 1-5 done
+last_updated: 2026-06-04  # stories 1-5, 2-1 done; sprint aligned with main
 project: Matrix-Control
 project_key: NOKEY
 tracking_system: file-system
@@ -59,7 +59,7 @@ development_status:
   1-5-patch-name-bytes-0-7-sync: done
   epic-1-retrospective: optional
   epic-2: in-progress
-  2-1-midioutboundqueue-core: backlog
+  2-1-midioutboundqueue-core: done
   2-2-sysexdelayprofile-and-inter-message-delay: done
   2-3-instrument-path-and-editor-path-producers: backlog
   2-4-apvts-patch-parameter-to-sysex-0x06: backlog
