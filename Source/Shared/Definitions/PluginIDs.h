@@ -377,6 +377,11 @@ namespace PluginIDs
                 constexpr const char* kSampleInput         = "lfo2SampleInput";
             }
         }
+
+        namespace PatchNameModule
+        {
+            constexpr const char* kPatchName = "patchName";
+        }
     }
 
     namespace MatrixModulationSection

@@ -104,6 +104,7 @@ set(PLUGIN_SOURCES
     Source/Core/Models/ApvtsMasterMapper.cpp
     Source/Core/Models/ApvtsPatchMapper.cpp
     Source/Core/Models/MasterModel.cpp
+    Source/Core/Models/PatchNameSyncer.cpp
     Source/Core/Models/PackedFieldCodec.cpp
     Source/Core/Models/PatchModel.cpp
     Source/Core/Factories/ApvtsValidator.cpp
@@ -227,6 +228,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/TestMain.cpp
         Tests/Unit/ApvtsMasterMapperTests.cpp
         Tests/Unit/ApvtsPatchMapperTests.cpp
+        Tests/Unit/PatchNameSyncerTests.cpp
         Tests/Unit/MasterModelTests.cpp
         Tests/Unit/MidiManagerTests.cpp
         Tests/Unit/PatchModelTests.cpp
@@ -238,6 +240,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/Models/ApvtsMasterMapper.cpp
         Source/Core/Models/ApvtsPatchMapper.cpp
         Source/Core/Models/MasterModel.cpp
+        Source/Core/Models/PatchNameSyncer.cpp
         Source/Core/Models/PackedFieldCodec.cpp
         Source/Core/Models/PatchModel.cpp
         Source/Core/MIDI/Queue/SysExDelayProfile.cpp

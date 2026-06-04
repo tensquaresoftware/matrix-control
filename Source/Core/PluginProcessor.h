@@ -11,7 +11,7 @@
 
 class MidiManager;
 
-namespace Core { class PatchModel; class ApvtsPatchMapper; class MasterModel; class ApvtsMasterMapper; }
+namespace Core { class PatchModel; class ApvtsPatchMapper; class MasterModel; class ApvtsMasterMapper; class PatchNameSyncer; }
 
 class PluginProcessor : public juce::AudioProcessor, public juce::ValueTree::Listener
 {
@@ -63,6 +63,9 @@ public:
     Core::ApvtsMasterMapper& getApvtsMasterMapper() noexcept { return *apvtsMasterMapper_; }
     const Core::ApvtsMasterMapper& getApvtsMasterMapper() const noexcept { return *apvtsMasterMapper_; }
 
+    Core::PatchNameSyncer& getPatchNameSyncer() noexcept { return *patchNameSyncer_; }
+    const Core::PatchNameSyncer& getPatchNameSyncer() const noexcept { return *patchNameSyncer_; }
+
     void setMidiInputPort(const juce::String& deviceId);
     void setMidiOutputPort(const juce::String& deviceId);
 
@@ -82,6 +85,7 @@ private:
     static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
     void validatePluginDescriptorsAtStartup();
     void initializeMidiPortProperties();
+    void initializePatchNameProperty();
     void enableFileLoggingForSession();
     void closeLogFileForSession();
     void enableApvtsLogging();
@@ -111,6 +115,7 @@ private:
     std::unique_ptr<Core::ApvtsPatchMapper> apvtsPatchMapper_;
     std::unique_ptr<Core::MasterModel> masterModel_;
     std::unique_ptr<Core::ApvtsMasterMapper> apvtsMasterMapper_;
+    std::unique_ptr<Core::PatchNameSyncer> patchNameSyncer_;
     std::map<juce::String, PluginDescriptors::ChoiceParameterDescriptor> choiceParameterMap_;
     std::unordered_set<juce::String> patchParameterIds_;
     std::unordered_set<juce::String> masterParameterIds_;

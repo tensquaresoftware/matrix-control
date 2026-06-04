@@ -5,6 +5,8 @@
 #include "Core/Models/ApvtsPatchMapper.h"
 #include "Core/Models/MasterModel.h"
 #include "Core/Models/PatchModel.h"
+#include "Core/Models/PatchNameSyncer.h"
+#include "Shared/Definitions/PluginDisplayNames.h"
 #include "GUI/PluginEditor.h"
 #include "MIDI/MidiManager.h"
 #include "Shared/Definitions/ApvtsTypes.h"
@@ -48,12 +50,14 @@ PluginProcessor::PluginProcessor()
     , apvtsPatchMapper_{ std::make_unique<Core::ApvtsPatchMapper>(apvts, *patchModel_) }
     , masterModel_{ std::make_unique<Core::MasterModel>() }
     , apvtsMasterMapper_{ std::make_unique<Core::ApvtsMasterMapper>(apvts, *masterModel_) }
+    , patchNameSyncer_{ std::make_unique<Core::PatchNameSyncer>(apvts, *patchModel_) }
 {
     validatePluginDescriptorsAtStartup();
     buildChoiceParameterMap();
     buildPatchParameterIdSet();
     buildMasterParameterIdSet();
     initializeMidiPortProperties();
+    initializePatchNameProperty();
     apvts.state.addListener(this);
 }
 
@@ -264,6 +268,15 @@ void PluginProcessor::initializeMidiPortProperties()
     }
 }
 
+void PluginProcessor::initializePatchNameProperty()
+{
+    using namespace PluginIDs::PatchEditSection::PatchNameModule;
+    using namespace PluginDisplayNames::PatchEditSection::PatchNameModule::StandaloneWidgets;
+
+    if (!apvts.state.hasProperty(kPatchName))
+        apvts.state.setProperty(kPatchName, juce::String(kDefaultPatchName), nullptr);
+}
+
 void PluginProcessor::ensureDevelopmentLoggingStarted()
 {
     if (!shouldUseDevelopmentLogging() || developmentLoggingStarted_)
@@ -461,6 +474,9 @@ void PluginProcessor::valueTreePropertyChanged(juce::ValueTree& treeWhosePropert
     if (masterParameterIds_.count(parameterId) > 0)
         apvtsMasterMapper_->apvtsToBuffer();
 
+    if (parameterId == PluginIDs::PatchEditSection::PatchNameModule::kPatchName)
+        patchNameSyncer_->apvtsToBuffer();
+
     handleBankNumberChange(parameterId);
     handlePatchNumberChange(parameterId);
 }
@@ -535,6 +551,7 @@ void PluginProcessor::valueTreeRedirected(juce::ValueTree& treeWhichHasBeenChang
 
     apvtsPatchMapper_->apvtsToBuffer();
     apvtsMasterMapper_->apvtsToBuffer();
+    patchNameSyncer_->apvtsToBuffer();
 }
 
 void PluginProcessor::buildPatchParameterIdSet()
