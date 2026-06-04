@@ -11,7 +11,16 @@
 
 class MidiManager;
 
-namespace Core { class PatchModel; class ApvtsPatchMapper; class MasterModel; class ApvtsMasterMapper; class PatchNameSyncer; }
+namespace Core
+{
+    class PatchModel;
+    class ApvtsPatchMapper;
+    class MasterModel;
+    class ApvtsMasterMapper;
+    class PatchNameSyncer;
+    class MidiOutboundQueue;
+    class InstrumentMidiForwarder;
+}
 
 class PluginProcessor : public juce::AudioProcessor, public juce::ValueTree::Listener
 {
@@ -110,6 +119,8 @@ private:
     void buildMasterParameterIdSet();
 
     juce::AudioProcessorValueTreeState apvts;
+    std::unique_ptr<Core::MidiOutboundQueue> outboundQueue_;
+    std::unique_ptr<Core::InstrumentMidiForwarder> instrumentForwarder_;
     std::unique_ptr<MidiManager> midiManager;
     std::unique_ptr<Core::PatchModel> patchModel_;
     std::unique_ptr<Core::ApvtsPatchMapper> apvtsPatchMapper_;

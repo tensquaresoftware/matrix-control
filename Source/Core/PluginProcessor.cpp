@@ -1,6 +1,8 @@
 #include <juce_audio_devices/juce_audio_devices.h>
 
 #include "PluginProcessor.h"
+#include "Core/Audio/InstrumentMidiForwarder.h"
+#include "Core/MIDI/Queue/MidiOutboundQueue.h"
 #include "Core/Models/ApvtsMasterMapper.h"
 #include "Core/Models/ApvtsPatchMapper.h"
 #include "Core/Models/MasterModel.h"
@@ -45,7 +47,9 @@ PluginProcessor::PluginProcessor()
 #endif
     )
     , apvts(*this, nullptr, "PARAMETERS", createParameterLayout())
-    , midiManager(std::make_unique<MidiManager>(apvts))
+    , outboundQueue_{ std::make_unique<Core::MidiOutboundQueue>() }
+    , instrumentForwarder_{ std::make_unique<Core::InstrumentMidiForwarder>() }
+    , midiManager(std::make_unique<MidiManager>(apvts, *outboundQueue_))
     , patchModel_{ std::make_unique<Core::PatchModel>() }
     , apvtsPatchMapper_{ std::make_unique<Core::ApvtsPatchMapper>(apvts, *patchModel_) }
     , masterModel_{ std::make_unique<Core::MasterModel>() }
@@ -171,7 +175,18 @@ void PluginProcessor::processBlock(juce::AudioBuffer<float>& audioBuffer,
                                    juce::MidiBuffer& midiMessages)
 {
     juce::ignoreUnused(audioBuffer);
-    juce::ignoreUnused(midiMessages);
+
+    // Plugin (DAW): non-empty host MIDI buffer implies track armed (D-056).
+    // Standalone: keyboardFromEnabled until Keyboard From UI (Epic 7/8).
+    const bool instrumentPathEnabled = isStandaloneWrapper()
+        ? [&]
+        {
+            const auto property = apvts.state.getProperty("keyboardFromEnabled", false);
+            return property.isBool() && static_cast<bool>(property);
+        }()
+        : (midiMessages.getNumEvents() > 0);
+
+    instrumentForwarder_->forward(midiMessages, instrumentPathEnabled, *outboundQueue_);
 }
 
 juce::AudioProcessorEditor* PluginProcessor::createEditor()
@@ -251,6 +266,11 @@ void PluginProcessor::initializeMidiPortProperties()
     if (!apvts.state.hasProperty("midiOutputPortId"))
     {
         apvts.state.setProperty("midiOutputPortId", juce::String(), nullptr);
+    }
+
+    if (!apvts.state.hasProperty("keyboardFromEnabled"))
+    {
+        apvts.state.setProperty("keyboardFromEnabled", false, nullptr);
     }
     
     if (apvts.state.hasProperty("guiZoomLevelId"))

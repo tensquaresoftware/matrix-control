@@ -3,7 +3,8 @@
 #include "Core/Loggers/MidiLogger.h"
 #include "Core/MIDI/Queue/SysExDelayProfile.h"
 
-MidiManager::MidiManager(juce::AudioProcessorValueTreeState& apvtsRef)
+MidiManager::MidiManager(juce::AudioProcessorValueTreeState& apvtsRef,
+                         Core::MidiOutboundQueue& outboundQueueRef)
     : juce::Thread("MidiManager")
     , apvts(apvtsRef)
     , inputMidiPort(std::make_unique<MidiInputPort>())
@@ -13,6 +14,8 @@ MidiManager::MidiManager(juce::AudioProcessorValueTreeState& apvtsRef)
     , sysExParser(std::make_unique<SysExParser>())
     , sysExDecoder(std::make_unique<SysExDecoder>(*sysExParser))
     , sysExEncoder(std::make_unique<SysExEncoder>())
+    , outboundQueue_(outboundQueueRef)
+    , editorPath_(outboundQueue_)
     , sysExDelay_(Core::SysExDelayProfile::stockDefault())
 {
     apvts.state.setProperty("deviceDetected", false, nullptr);
@@ -126,11 +129,7 @@ void MidiManager::sendPatch(juce::uint8 patchNumber, const juce::uint8* packedDa
     try
     {
         auto sysExMessage = sysExEncoder->encodePatchSysEx(patchNumber, packedData);
-        sendSysExWithDelay(sysExMessage, "Patch #" + juce::String(patchNumber));
-    }
-    catch (const MidiConnectionException& e)
-    {
-        updateErrorState(e.getMessage(), "Connection");
+        editorPath_.enqueueSysEx(sysExMessage);
     }
     catch (const std::exception& e)
     {
@@ -149,11 +148,7 @@ void MidiManager::sendMaster(juce::uint8 version, const juce::uint8* packedData)
     try
     {
         auto sysExMessage = sysExEncoder->encodeMasterSysEx(version, packedData);
-        sendSysExWithDelay(sysExMessage, "Master parameters");
-    }
-    catch (const MidiConnectionException& e)
-    {
-        updateErrorState(e.getMessage(), "Connection");
+        editorPath_.enqueueSysEx(sysExMessage);
     }
     catch (const std::exception& e)
     {
@@ -165,12 +160,12 @@ void MidiManager::sendProgramChange(int programNumber, int channel)
 {
     try
     {
-        midiSender->sendProgramChange(programNumber, channel);
-        MidiLogger::getInstance().logProgramChange(static_cast<juce::uint8>(programNumber), "SENT");
+        editorPath_.enqueueProgramChange(programNumber, channel);
+        MidiLogger::getInstance().logProgramChange(static_cast<juce::uint8>(programNumber), "QUEUED");
     }
-    catch (const MidiConnectionException& e)
+    catch (const std::exception& e)
     {
-        updateErrorState(e.getMessage(), "Connection");
+        updateErrorState(e.what(), "ProgramChange");
     }
 }
 
