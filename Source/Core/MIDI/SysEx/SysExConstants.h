@@ -52,7 +52,8 @@ namespace SysExConstants
 
     // Timeout values
     constexpr int kDefaultTimeoutMs = 2000;  // 2 seconds timeout for MIDI operations
-    constexpr int kMinSysExDelayMs = 10;     // Minimum delay between SysEx messages
+    // Legacy stock M-1000 inter-SysEx gap; prefer Core::SysExDelayProfile (Story 2.2).
+    constexpr int kMinSysExDelayMs = 10;
     constexpr int kMidiInputStopDelayMs = 100;  // Delay after stopping MIDI input callbacks before closing port
 
     // Device Inquiry (Universal SysEx)

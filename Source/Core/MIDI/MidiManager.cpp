@@ -1,8 +1,7 @@
-#include <thread>
-
 #include "MidiManager.h"
 
 #include "Core/Loggers/MidiLogger.h"
+#include "Core/MIDI/Queue/SysExDelayProfile.h"
 
 MidiManager::MidiManager(juce::AudioProcessorValueTreeState& apvtsRef)
     : juce::Thread("MidiManager")
@@ -14,6 +13,7 @@ MidiManager::MidiManager(juce::AudioProcessorValueTreeState& apvtsRef)
     , sysExParser(std::make_unique<SysExParser>())
     , sysExDecoder(std::make_unique<SysExDecoder>(*sysExParser))
     , sysExEncoder(std::make_unique<SysExEncoder>())
+    , sysExDelay_(Core::SysExDelayProfile::stockDefault())
 {
     apvts.state.setProperty("deviceDetected", false, nullptr);
     apvts.state.setProperty("deviceVersion", juce::String(), nullptr);
@@ -176,9 +176,10 @@ void MidiManager::sendProgramChange(int programNumber, int channel)
 
 void MidiManager::sendSysExWithDelay(const juce::MemoryBlock& sysExMessage, const juce::String& description)
 {
+    sysExDelay_.waitUntilReady();
     midiSender->sendSysEx(sysExMessage);
     MidiLogger::getInstance().logSysExSent(sysExMessage, description);
-    std::this_thread::sleep_for(std::chrono::milliseconds(SysExConstants::kMinSysExDelayMs));
+    sysExDelay_.recordSysExSent(static_cast<juce::int64>(juce::Time::getMillisecondCounterHiRes()));
 }
 
 std::vector<juce::uint8> MidiManager::requestCurrentPatch()
@@ -206,6 +207,7 @@ bool MidiManager::performDeviceInquiry()
         
         if (response.getSize() == 0)
         {
+            sysExDelay_.setProfile(Core::SysExDelayProfile::stockDefault());
             updateDeviceStatus(false);
             updateErrorState("Timeout waiting for Device ID response", "Timeout");
             return false;
@@ -217,11 +219,13 @@ bool MidiManager::performDeviceInquiry()
         
         if (deviceInfo.isValid)
         {
+            sysExDelay_.setProfile(Core::SysExDelayProfile::fromDeviceInquiry(deviceInfo));
             updateDeviceStatus(true, deviceInfo.version);
             return true;
         }
         else
         {
+            sysExDelay_.setProfile(Core::SysExDelayProfile::stockDefault());
             updateDeviceStatus(false);
             updateErrorState("Connected device is not a Matrix-1000", "Device");
             return false;
@@ -229,12 +233,14 @@ bool MidiManager::performDeviceInquiry()
     }
     catch (const MidiConnectionException& e)
     {
+        sysExDelay_.setProfile(Core::SysExDelayProfile::stockDefault());
         updateDeviceStatus(false);
         updateErrorState(e.getMessage(), "Connection");
         return false;
     }
     catch (const std::exception& e)
     {
+        sysExDelay_.setProfile(Core::SysExDelayProfile::stockDefault());
         updateDeviceStatus(false);
         updateErrorState(e.what(), "SysEx");
         return false;
