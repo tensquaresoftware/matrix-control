@@ -2,13 +2,13 @@
 story_key: 1-3-apvtspatchmapper-round-trip
 epic: 1
 story: 3
-status: review
+status: done
 baseline_commit: cc2936b
 ---
 
 # Story 1.3: ApvtsPatchMapper Round-Trip
 
-Status: review
+Status: done
 
 ## Story
 
@@ -237,6 +237,17 @@ claude-sonnet-4-6
 - Tests/Unit/ApvtsPatchMapperTests.cpp (new)
 - CMakeLists.txt (modified)
 
+### Review Findings
+
+- [x] [Review][Defer] `apvtsToBuffer()` O(n) full-buffer syncs per parameter change [PluginProcessor.cpp:459] — deferred, pre-existing design intent; batching belongs in future performance story
+- [x] [Review][Defer] Silent null skip in `syncIntToBuffer`/`syncChoiceToBuffer` without assertion or log [ApvtsPatchMapper.cpp:36-38] — deferred, pre-existing guard pattern correct for synthetic-descriptor tests
+- [x] [Review][Defer] Thread safety — concurrent `bufferToApvts()` / `apvtsToBuffer()` unguarded [ApvtsPatchMapper.cpp] — deferred, explicitly scoped to future threading story per spec
+- [x] [Review][Defer] `memset` in Test C bypasses `PatchModel` public API [ApvtsPatchMapperTests.cpp:190] — deferred, acceptable direct-buffer pattern in test context
+- [x] [Review][Defer] Descriptor vectors built twice at startup (mapper ctor + `buildPatchParameterIdSet`) [PluginProcessor.cpp:526-534] — deferred, startup-only negligible cost
+- [x] [Review][Defer] Hardcoded `intDescs[0]` / `intDescs[2]` indices in tests A/B fragile to descriptor reordering [ApvtsPatchMapperTests.cpp:132-134] — deferred, documented in comments + confirmed correct by ECH; same pattern as Story 1.4
+- [x] [Review][Defer] Public `bufferToApvts()` could create APVTS feedback loop if called without guard [ApvtsPatchMapper.h:22] — deferred, not called in current code; concern for Story 2.4 caller sites
+
 ## Change Log
 
+- 2026-06-04: Code review complete — 0 patches, 0 decisions, 7 deferred, 4 dismissed. Story → done.
 - 2026-06-03: Implemented `Core::ApvtsPatchMapper` (AC #1-3, #5); wired into `PluginProcessor` with `valueTreePropertyChanged` trigger (AC #4); added `ApvtsPatchMapperTests` covering APVTS→buffer, buffer→APVTS, and reference round-trip with Patch 71.syx (AC #6); updated CMakeLists.txt for both test and plugin targets (AC #7). All 24 tests pass.

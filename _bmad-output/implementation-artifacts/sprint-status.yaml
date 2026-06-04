@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-05-29
-last_updated: 2026-06-04  # story 1-4 done
+last_updated: 2026-06-04  # story 1-3 review done
 project: Matrix-Control
 project_key: NOKEY
 tracking_system: file-system
@@ -54,7 +54,7 @@ development_status:
   epic-1: in-progress
   1-1-patchmodel-packed-buffer: done
   1-2-mastermodel-packed-buffer: done
-  1-3-apvtspatchmapper-round-trip: review
+  1-3-apvtspatchmapper-round-trip: done
   1-4-apvtsmastermapper-round-trip: done
   1-5-patch-name-bytes-0-7-sync: backlog
   epic-1-retrospective: optional
