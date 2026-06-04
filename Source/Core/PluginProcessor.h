@@ -11,7 +11,7 @@
 
 class MidiManager;
 
-namespace Core { class PatchModel; class ApvtsPatchMapper; }
+namespace Core { class PatchModel; class ApvtsPatchMapper; class MasterModel; class ApvtsMasterMapper; }
 
 class PluginProcessor : public juce::AudioProcessor, public juce::ValueTree::Listener
 {
@@ -57,6 +57,12 @@ public:
     Core::ApvtsPatchMapper& getApvtsPatchMapper() noexcept { return *apvtsPatchMapper_; }
     const Core::ApvtsPatchMapper& getApvtsPatchMapper() const noexcept { return *apvtsPatchMapper_; }
 
+    Core::MasterModel& getMasterModel() noexcept { return *masterModel_; }
+    const Core::MasterModel& getMasterModel() const noexcept { return *masterModel_; }
+
+    Core::ApvtsMasterMapper& getApvtsMasterMapper() noexcept { return *apvtsMasterMapper_; }
+    const Core::ApvtsMasterMapper& getApvtsMasterMapper() const noexcept { return *apvtsMasterMapper_; }
+
     void setMidiInputPort(const juce::String& deviceId);
     void setMidiOutputPort(const juce::String& deviceId);
 
@@ -97,13 +103,18 @@ private:
     void handleBankNumberChange(const juce::String& parameterId);
     void handlePatchNumberChange(const juce::String& parameterId);
     void buildPatchParameterIdSet();
+    void buildMasterParameterIdSet();
 
     juce::AudioProcessorValueTreeState apvts;
     std::unique_ptr<MidiManager> midiManager;
     std::unique_ptr<Core::PatchModel> patchModel_;
     std::unique_ptr<Core::ApvtsPatchMapper> apvtsPatchMapper_;
+    std::unique_ptr<Core::MasterModel> masterModel_;
+    std::unique_ptr<Core::ApvtsMasterMapper> apvtsMasterMapper_;
     std::map<juce::String, PluginDescriptors::ChoiceParameterDescriptor> choiceParameterMap_;
     std::unordered_set<juce::String> patchParameterIds_;
+    std::unordered_set<juce::String> masterParameterIds_;
+    bool isSyncingBufferToApvts_ { false };
     bool developmentLoggingStarted_ { false };
     
     static constexpr int kThreadStopTimeoutMs_ {5000};

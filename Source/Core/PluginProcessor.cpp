@@ -1,7 +1,9 @@
 #include <juce_audio_devices/juce_audio_devices.h>
 
 #include "PluginProcessor.h"
+#include "Core/Models/ApvtsMasterMapper.h"
 #include "Core/Models/ApvtsPatchMapper.h"
+#include "Core/Models/MasterModel.h"
 #include "Core/Models/PatchModel.h"
 #include "GUI/PluginEditor.h"
 #include "MIDI/MidiManager.h"
@@ -44,10 +46,13 @@ PluginProcessor::PluginProcessor()
     , midiManager(std::make_unique<MidiManager>(apvts))
     , patchModel_{ std::make_unique<Core::PatchModel>() }
     , apvtsPatchMapper_{ std::make_unique<Core::ApvtsPatchMapper>(apvts, *patchModel_) }
+    , masterModel_{ std::make_unique<Core::MasterModel>() }
+    , apvtsMasterMapper_{ std::make_unique<Core::ApvtsMasterMapper>(apvts, *masterModel_) }
 {
     validatePluginDescriptorsAtStartup();
     buildChoiceParameterMap();
     buildPatchParameterIdSet();
+    buildMasterParameterIdSet();
     initializeMidiPortProperties();
     apvts.state.addListener(this);
 }
@@ -450,8 +455,14 @@ void PluginProcessor::valueTreePropertyChanged(juce::ValueTree& treeWhosePropert
         );
     }
 
-    if (patchParameterIds_.count(parameterId) > 0)
-        apvtsPatchMapper_->apvtsToBuffer();
+    if (!isSyncingBufferToApvts_)
+    {
+        if (patchParameterIds_.count(parameterId) > 0)
+            apvtsPatchMapper_->apvtsToBuffer();
+
+        if (masterParameterIds_.count(parameterId) > 0)
+            apvtsMasterMapper_->apvtsToBuffer();
+    }
 
     handleBankNumberChange(parameterId);
     handlePatchNumberChange(parameterId);
@@ -524,6 +535,9 @@ void PluginProcessor::valueTreeRedirected(juce::ValueTree& treeWhichHasBeenChang
 
     if (shouldUseDevelopmentLogging())
         ApvtsLogger::getInstance().logStateReplaced();
+
+    apvtsPatchMapper_->apvtsToBuffer();
+    apvtsMasterMapper_->apvtsToBuffer();
 }
 
 void PluginProcessor::buildPatchParameterIdSet()
@@ -533,6 +547,15 @@ void PluginProcessor::buildPatchParameterIdSet()
 
     for (const auto& d : Core::ApvtsPatchMapper::buildChoiceDescriptors())
         patchParameterIds_.insert(d.parameterId);
+}
+
+void PluginProcessor::buildMasterParameterIdSet()
+{
+    for (const auto& d : Core::ApvtsMasterMapper::buildIntDescriptors())
+        masterParameterIds_.insert(d.parameterId);
+
+    for (const auto& d : Core::ApvtsMasterMapper::buildChoiceDescriptors())
+        masterParameterIds_.insert(d.parameterId);
 }
 
 void PluginProcessor::buildChoiceParameterMap()
