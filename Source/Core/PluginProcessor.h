@@ -114,7 +114,6 @@ private:
     std::map<juce::String, PluginDescriptors::ChoiceParameterDescriptor> choiceParameterMap_;
     std::unordered_set<juce::String> patchParameterIds_;
     std::unordered_set<juce::String> masterParameterIds_;
-    bool isSyncingBufferToApvts_ { false };
     bool developmentLoggingStarted_ { false };
     
     static constexpr int kThreadStopTimeoutMs_ {5000};

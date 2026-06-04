@@ -1,5 +1,9 @@
 # Deferred Work
 
+## Deferred from: code review of 1-4-apvtsmastermapper-round-trip (2026-06-04)
+
+- **Hardcoded vector indices in tests** (`Tests/Unit/ApvtsMasterMapperTests.cpp:130`) — `intDescs[0]` / `intDescs[2]` rely on `buildIntDescriptors()` returning a stable order; tests pass and document expected index-to-parameter mapping; revisit with `std::find_if` if descriptor order ever changes.
+
 ## Deferred from: code review of 1-2-mastermodel-packed-buffer (2026-06-03)
 
 - **`safeOffset` no release-mode bounds guard** (`Source/Core/Models/PackedFieldCodec.cpp:22`) — debug-only jassert mirrors the original PatchModel pattern; descriptor offsets are compile-time constants so the risk is low; revisit if runtime-provided offsets are ever introduced.

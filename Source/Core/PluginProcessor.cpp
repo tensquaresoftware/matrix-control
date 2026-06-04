@@ -455,14 +455,11 @@ void PluginProcessor::valueTreePropertyChanged(juce::ValueTree& treeWhosePropert
         );
     }
 
-    if (!isSyncingBufferToApvts_)
-    {
-        if (patchParameterIds_.count(parameterId) > 0)
-            apvtsPatchMapper_->apvtsToBuffer();
+    if (patchParameterIds_.count(parameterId) > 0)
+        apvtsPatchMapper_->apvtsToBuffer();
 
-        if (masterParameterIds_.count(parameterId) > 0)
-            apvtsMasterMapper_->apvtsToBuffer();
-    }
+    if (masterParameterIds_.count(parameterId) > 0)
+        apvtsMasterMapper_->apvtsToBuffer();
 
     handleBankNumberChange(parameterId);
     handlePatchNumberChange(parameterId);

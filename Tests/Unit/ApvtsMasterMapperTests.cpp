@@ -101,7 +101,7 @@ private:
 
         for (const auto& d : allDescs)
         {
-            if (result.size() >= 3) break;
+            if (result.size() >= 3u) break;
             const auto val = static_cast<int>(decoded[static_cast<size_t>(d.sysExOffset)]);
             if (val > 0 && val >= d.minValue && val <= d.maxValue)
                 result.push_back(d);

@@ -2,13 +2,13 @@
 story_key: 1-4-apvtsmastermapper-round-trip
 epic: 1
 story: 4
-status: review
+status: done
 baseline_commit: 110a37f058c13efb63f54c178aa9a3540ad49284
 ---
 
 # Story 1.4: ApvtsMasterMapper Round-Trip
 
-Status: review
+Status: done
 
 ## Story
 
@@ -112,6 +112,12 @@ claude-sonnet-4-6
 - Source/Core/PluginProcessor.cpp (modified)
 - Tests/Unit/ApvtsMasterMapperTests.cpp (new)
 - CMakeLists.txt (modified)
+
+### Review Findings
+
+- [x] [Review][Patch] `isSyncingBufferToApvts_` never set to `true` — removed dead flag and guard; no current call site for `bufferToApvts()`; reintroduce with `ScopedValueSetter` when wired. [Source/Core/PluginProcessor.cpp:458 / Source/Core/PluginProcessor.h:117]
+- [x] [Review][Patch] Signed/unsigned comparison `result.size() >= 3` in `findRoundTripDescriptors` — fixed to `3u`. [Tests/Unit/ApvtsMasterMapperTests.cpp:104]
+- [x] [Review][Defer] Hardcoded vector indices `intDescs[0]`, `intDescs[2]` in tests — fragile if descriptor order changes [Tests/Unit/ApvtsMasterMapperTests.cpp:130] — deferred, minor fragility, tests pass and document expected mapping
 
 ## Change Log
 
