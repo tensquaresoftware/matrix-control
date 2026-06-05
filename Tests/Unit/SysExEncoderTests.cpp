@@ -91,6 +91,38 @@ public:
             expect(data[5] == signedPackedByte);
         }
 
+        beginTest("Matrix Mod Bus Edit (0x0B) encoding");
+        {
+            const juce::uint8 bus = 3;
+            const juce::uint8 source = 5;
+            const juce::uint8 amount = 43;
+            const juce::uint8 destination = 12;
+            auto message = encoder.encodeMatrixModBusEdit(bus, source, amount, destination);
+
+            expectEquals(static_cast<int>(message.getSize()),
+                         static_cast<int>(SysExConstants::kMatrixModBusMessageLength));
+
+            const auto* data = static_cast<const juce::uint8*>(message.getData());
+            expect(data[0] == SysExConstants::kSysExStart);
+            expect(data[1] == SysExConstants::kManufacturerIdOberheim);
+            expect(data[2] == SysExConstants::kDeviceIdMatrix1000);
+            expect(data[3] == SysExConstants::Opcode::kRemoteParameterEditMatrix);
+            expect(data[4] == bus);
+            expect(data[5] == source);
+            expect(data[6] == amount);
+            expect(data[7] == destination);
+            expect(data[8] == SysExConstants::kSysExEnd);
+        }
+
+        beginTest("Matrix Mod Bus Edit (0x0B) — signed amount above 127 passed through");
+        {
+            const juce::uint8 signedPackedByte = 251;
+            auto message = encoder.encodeMatrixModBusEdit(0, 1, signedPackedByte, 2);
+
+            const auto* data = static_cast<const juce::uint8*>(message.getData());
+            expect(data[6] == signedPackedByte);
+        }
+
         beginTest("Unpack bytes to nibbles");
         {
             juce::uint8 packedBytes[] = { 0x12, 0x34, 0x56 };

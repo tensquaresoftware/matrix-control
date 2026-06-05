@@ -1,6 +1,7 @@
 #include "ApvtsPatchMapper.h"
 
 #include "Core/Models/PatchModel.h"
+#include "Shared/Definitions/Matrix1000Limits.h"
 #include "Shared/Definitions/PluginDescriptors.h"
 
 namespace Core
@@ -81,6 +82,10 @@ std::vector<PluginDescriptors::IntParameterDescriptor> ApvtsPatchMapper::buildIn
     add(Lfo1Module::kIntParameters);
     add(Lfo2Module::kIntParameters);
 
+    using namespace PluginDescriptors::MatrixModulationSection;
+    for (int bus = 0; bus < Matrix1000Limits::kModulationBusCount; ++bus)
+        add(kModulationBusIntParameters[static_cast<size_t>(bus)]);
+
     return result;
 }
 
@@ -104,6 +109,10 @@ std::vector<PluginDescriptors::ChoiceParameterDescriptor> ApvtsPatchMapper::buil
     add(Envelope3Module::kChoiceParameters);
     add(Lfo1Module::kChoiceParameters);
     add(Lfo2Module::kChoiceParameters);
+
+    using namespace PluginDescriptors::MatrixModulationSection;
+    for (int bus = 0; bus < Matrix1000Limits::kModulationBusCount; ++bus)
+        add(kModulationBusChoiceParameters[static_cast<size_t>(bus)]);
 
     return result;
 }

@@ -33,6 +33,10 @@ public:
     void sendMaster(juce::uint8 version, const juce::uint8* packedData);
     void sendProgramChange(int programNumber, int channel = 1);
     void enqueueRemoteParameterEdit(int parameterNumber, juce::uint8 packedValue);
+    void enqueueMatrixModBusEdit(juce::uint8 bus,
+                                 juce::uint8 source,
+                                 juce::uint8 amount,
+                                 juce::uint8 destination);
 
     std::vector<juce::uint8> requestCurrentPatch();
     std::vector<juce::uint8> requestMasterData();

@@ -2,6 +2,7 @@
 
 #include "Core/Loggers/MidiLogger.h"
 #include "Core/MIDI/Queue/SysExDelayProfile.h"
+#include "Shared/Definitions/Matrix1000Limits.h"
 
 MidiManager::MidiManager(juce::AudioProcessorValueTreeState& apvtsRef,
                          Core::MidiOutboundQueue& outboundQueueRef)
@@ -177,6 +178,18 @@ void MidiManager::enqueueRemoteParameterEdit(int parameterNumber, juce::uint8 pa
     auto sysExMessage = sysExEncoder->encodeRemoteParameterEdit(
         static_cast<juce::uint8>(parameterNumber),
         packedValue);
+    editorPath_.enqueueSysEx(sysExMessage);
+}
+
+void MidiManager::enqueueMatrixModBusEdit(juce::uint8 bus,
+                                          juce::uint8 source,
+                                          juce::uint8 amount,
+                                          juce::uint8 destination)
+{
+    if (bus >= static_cast<juce::uint8>(Matrix1000Limits::kModulationBusCount))
+        return;
+
+    auto sysExMessage = sysExEncoder->encodeMatrixModBusEdit(bus, source, amount, destination);
     editorPath_.enqueueSysEx(sysExMessage);
 }
 

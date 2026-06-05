@@ -39,6 +39,7 @@ namespace SysExConstants
     constexpr size_t kPatchMessageLength = 275;  // 134 packed bytes = 268 nibbles + 5 header + 1 checksum + 1 EOX
     constexpr size_t kMasterMessageLength = 351;  // 172 packed bytes = 344 nibbles + 5 header + 1 checksum + 1 EOX
     constexpr size_t kSplitPatchMessageLength = 36 + 5 + 1 + 1;  // 36 bytes + header + checksum + EOX
+    constexpr size_t kMatrixModBusMessageLength = 9;  // F0 10 06 0B <bus> <source> <amount> <destination> F7
 
     // Packed data sizes (before unpacking to nibbles)
     constexpr size_t kPatchPackedDataSize = 134;

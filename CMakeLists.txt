@@ -127,6 +127,7 @@ set(PLUGIN_SOURCES
     Source/Core/MIDI/Transport/MidiReceiver.cpp
     Source/Core/MIDI/EditorPath.cpp
     Source/Core/MIDI/MasterParameterSysExDispatcher.cpp
+    Source/Core/MIDI/MatrixModBusParameterSysExDispatcher.cpp
     Source/Core/MIDI/PatchParameterSysExDispatcher.cpp
     Source/Core/MIDI/MidiManager.cpp
     Source/Core/MIDI/Queue/MidiOutboundQueue.cpp
@@ -239,6 +240,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/PatchModelTests.cpp
         Tests/Unit/SysExEncoderTests.cpp
         Tests/Unit/MasterParameterSysExDispatcherTests.cpp
+        Tests/Unit/MatrixModBusParameterSysExDispatcherTests.cpp
         Tests/Unit/PatchParameterSysExDispatcherTests.cpp
         Tests/Unit/EditorPathTests.cpp
         Tests/Unit/InstrumentMidiForwarderTests.cpp
@@ -256,6 +258,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/Audio/InstrumentMidiForwarder.cpp
         Source/Core/MIDI/EditorPath.cpp
         Source/Core/MIDI/MasterParameterSysExDispatcher.cpp
+        Source/Core/MIDI/MatrixModBusParameterSysExDispatcher.cpp
         Source/Core/MIDI/PatchParameterSysExDispatcher.cpp
         Source/Core/MIDI/Queue/MidiOutboundQueue.cpp
         Source/Core/MIDI/Queue/SysExDelayProfile.cpp
@@ -265,6 +268,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/MIDI/SysEx/SysExEncoder.cpp
         Source/Core/Loggers/MidiLogger.cpp
         Source/Shared/Definitions/PluginDescriptors.cpp
+        Source/Shared/Definitions/PluginDescriptorsMatrixModulation.cpp
         Source/Shared/Definitions/PluginDescriptorsPatchEdit.cpp
         Source/Shared/Definitions/PluginHelpers.cpp
         Source/Shared/ProjectPaths.cpp

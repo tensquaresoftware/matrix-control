@@ -17,6 +17,10 @@ public:
     static juce::MemoryBlock encodeDeviceInquiry();
     juce::MemoryBlock encodeRequestMessage(juce::uint8 requestType, juce::uint8 patchNumber = 0) const;
     juce::MemoryBlock encodeRemoteParameterEdit(juce::uint8 parameterNumber, juce::uint8 value) const;
+    juce::MemoryBlock encodeMatrixModBusEdit(juce::uint8 bus,
+                                             juce::uint8 source,
+                                             juce::uint8 amount,
+                                             juce::uint8 destination) const;
     static size_t unpackBytes(const juce::uint8* bytes, size_t numBytes, juce::uint8* output);
     static juce::uint8 calculateChecksum(const juce::uint8* data, size_t length);
 

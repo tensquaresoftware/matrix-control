@@ -9,7 +9,10 @@
 #include "Core/Models/PatchModel.h"
 #include "Core/Models/PatchNameSyncer.h"
 #include "Core/MIDI/MasterParameterSysExDispatcher.h"
+#include "Core/MIDI/MatrixModBusParameterSysExDispatcher.h"
 #include "Core/MIDI/PatchParameterSysExDispatcher.h"
+#include "Shared/Definitions/Matrix1000Limits.h"
+#include "Shared/Definitions/PluginDescriptors.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 #include "GUI/PluginEditor.h"
 #include "MIDI/MidiManager.h"
@@ -72,10 +75,18 @@ PluginProcessor::PluginProcessor()
             midiManager->sendMaster(0x03, packedData);
         });
 
+    matrixModBusParameterSysExDispatcher_ = std::make_unique<Core::MatrixModBusParameterSysExDispatcher>(
+        *patchModel_,
+        [this](juce::uint8 bus, juce::uint8 source, juce::uint8 amount, juce::uint8 destination)
+        {
+            midiManager->enqueueMatrixModBusEdit(bus, source, amount, destination);
+        });
+
     validatePluginDescriptorsAtStartup();
     buildChoiceParameterMap();
     buildPatchParameterIdSet();
     buildMasterParameterIdSet();
+    buildMatrixModParameterIdSet();
     initializeMidiPortProperties();
     initializePatchNameProperty();
     apvts.state.addListener(this);
@@ -507,7 +518,11 @@ void PluginProcessor::valueTreePropertyChanged(juce::ValueTree& treeWhosePropert
     if (patchParameterIds_.count(parameterId) > 0)
     {
         apvtsPatchMapper_->apvtsToBuffer();
-        patchParameterSysExDispatcher_->dispatch(parameterId);
+
+        if (matrixModParameterIds_.count(parameterId) > 0)
+            matrixModBusParameterSysExDispatcher_->dispatch(parameterId);
+        else
+            patchParameterSysExDispatcher_->dispatch(parameterId);
     }
 
     if (masterParameterIds_.count(parameterId) > 0)
@@ -612,6 +627,20 @@ void PluginProcessor::buildMasterParameterIdSet()
 
     for (const auto& d : Core::ApvtsMasterMapper::buildChoiceDescriptors())
         masterParameterIds_.insert(d.parameterId);
+}
+
+void PluginProcessor::buildMatrixModParameterIdSet()
+{
+    using namespace PluginDescriptors::MatrixModulationSection;
+
+    for (int bus = 0; bus < Matrix1000Limits::kModulationBusCount; ++bus)
+    {
+        for (const auto& d : kModulationBusIntParameters[static_cast<size_t>(bus)])
+            matrixModParameterIds_.insert(d.parameterId);
+
+        for (const auto& d : kModulationBusChoiceParameters[static_cast<size_t>(bus)])
+            matrixModParameterIds_.insert(d.parameterId);
+    }
 }
 
 void PluginProcessor::buildChoiceParameterMap()

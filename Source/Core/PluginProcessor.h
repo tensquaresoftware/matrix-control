@@ -19,6 +19,7 @@ namespace Core
     class ApvtsMasterMapper;
     class PatchNameSyncer;
     class MasterParameterSysExDispatcher;
+    class MatrixModBusParameterSysExDispatcher;
     class PatchParameterSysExDispatcher;
     class MidiOutboundQueue;
     class InstrumentMidiForwarder;
@@ -119,6 +120,7 @@ private:
     void handlePatchNumberChange(const juce::String& parameterId);
     void buildPatchParameterIdSet();
     void buildMasterParameterIdSet();
+    void buildMatrixModParameterIdSet();
 
     juce::AudioProcessorValueTreeState apvts;
     std::unique_ptr<Core::MidiOutboundQueue> outboundQueue_;
@@ -131,9 +133,11 @@ private:
     std::unique_ptr<Core::PatchNameSyncer> patchNameSyncer_;
     std::unique_ptr<Core::PatchParameterSysExDispatcher> patchParameterSysExDispatcher_;
     std::unique_ptr<Core::MasterParameterSysExDispatcher> masterParameterSysExDispatcher_;
+    std::unique_ptr<Core::MatrixModBusParameterSysExDispatcher> matrixModBusParameterSysExDispatcher_;
     std::map<juce::String, PluginDescriptors::ChoiceParameterDescriptor> choiceParameterMap_;
     std::unordered_set<juce::String> patchParameterIds_;
     std::unordered_set<juce::String> masterParameterIds_;
+    std::unordered_set<juce::String> matrixModParameterIds_;
     bool developmentLoggingStarted_ { false };
     
     static constexpr int kThreadStopTimeoutMs_ {5000};

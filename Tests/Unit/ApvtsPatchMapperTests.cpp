@@ -11,7 +11,9 @@
 #include "Core/MIDI/SysEx/SysExParser.h"
 #include "Core/Models/ApvtsPatchMapper.h"
 #include "Core/Models/PatchModel.h"
+#include "Shared/Definitions/Matrix1000Limits.h"
 #include "Shared/Definitions/PluginDescriptors.h"
+#include "Shared/Definitions/PluginIDs.h"
 
 // Minimal AudioProcessor subclass for testing APVTS operations without pulling
 // in GUI headers or plugin host infrastructure.
@@ -54,6 +56,7 @@ public:
     {
         runApvtsToBuffer();
         runBufferToApvts();
+        runMatrixModBus0ApvtsToBuffer();
         runReferenceRoundTrip();
     }
 
@@ -167,6 +170,44 @@ private:
         expectEquals(juce::roundToInt(proc.apvts.getRawParameterValue(freq.parameterId)->load()), 35);
         expectEquals(juce::roundToInt(proc.apvts.getRawParameterValue(pw.parameterId)->load()),   50);
         expectEquals(juce::roundToInt(proc.apvts.getRawParameterValue(sync.parameterId)->load()), 3);
+    }
+
+    void runMatrixModBus0ApvtsToBuffer()
+    {
+        beginTest("APVTS -> buffer: Matrix Mod bus 0 bytes 104–106");
+
+        using namespace PluginDescriptors::MatrixModulationSection;
+
+        const auto& amountDesc = kModulationBusIntParameters[0][0];
+        const auto& sourceDesc = kModulationBusChoiceParameters[0][0];
+        const auto& destinationDesc = kModulationBusChoiceParameters[0][1];
+
+        juce::AudioProcessorValueTreeState::ParameterLayout layout;
+        layout.add(std::make_unique<juce::AudioParameterInt>(
+            juce::ParameterID(amountDesc.parameterId, 1), amountDesc.displayName,
+            amountDesc.minValue, amountDesc.maxValue, amountDesc.defaultValue));
+        layout.add(std::make_unique<juce::AudioParameterChoice>(
+            juce::ParameterID(sourceDesc.parameterId, 1), sourceDesc.displayName,
+            sourceDesc.choices, sourceDesc.defaultIndex));
+        layout.add(std::make_unique<juce::AudioParameterChoice>(
+            juce::ParameterID(destinationDesc.parameterId, 1), destinationDesc.displayName,
+            destinationDesc.choices, destinationDesc.defaultIndex));
+
+        TestAudioProcessor proc(std::move(layout));
+        Core::PatchModel model;
+        Core::ApvtsPatchMapper mapper(proc.apvts, model);
+
+        *proc.apvts.getRawParameterValue(sourceDesc.parameterId) = 4.0f;
+        *proc.apvts.getRawParameterValue(amountDesc.parameterId) = -15.0f;
+        *proc.apvts.getRawParameterValue(destinationDesc.parameterId) = 9.0f;
+        mapper.apvtsToBuffer();
+
+        expectEquals(model.getChoiceIndex(sourceDesc), 4);
+        expectEquals(model.getValue(amountDesc), -15);
+        expectEquals(model.getChoiceIndex(destinationDesc), 9);
+        expectEquals(static_cast<int>(model.data()[104]), 4);
+        expectEquals(static_cast<int>(model.data()[105]), static_cast<int>(static_cast<juce::uint8>(-15)));
+        expectEquals(static_cast<int>(model.data()[106]), 9);
     }
 
     void runReferenceRoundTrip()

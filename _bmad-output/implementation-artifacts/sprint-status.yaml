@@ -1,5 +1,5 @@
 # generated: 2026-05-29
-# last_updated: 2026-06-04 (Story 2.4 done — code review)
+# last_updated: 2026-06-05 (Story 2.6 done)
 # project: Matrix-Control
 # project_key: NOKEY
 # tracking_system: file-system
@@ -64,7 +64,7 @@ development_status:
   2-3-instrument-path-and-editor-path-producers: done
   2-4-apvts-patch-parameter-to-sysex-0x06: done
   2-5-apvts-master-parameter-to-full-master-sysex-0x03: done
-  2-6-matrix-mod-bus-parameter-sysex: backlog
+  2-6-matrix-mod-bus-parameter-sysex: done
   2-7-audio-passthrough-and-peak-indicator: backlog
   2-8-activity-leds-on-queue-traffic: backlog
   2-9-wire-midimanager-queue-consumer: backlog
