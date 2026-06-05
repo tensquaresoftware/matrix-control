@@ -2,6 +2,7 @@
 
 #include "PluginProcessor.h"
 #include "Core/Audio/InstrumentMidiForwarder.h"
+#include "Core/MIDI/KeyboardFromMidiInput.h"
 #include "Core/MIDI/Queue/MidiOutboundQueue.h"
 #include "Core/Models/ApvtsMasterMapper.h"
 #include "Core/Models/ApvtsPatchMapper.h"
@@ -54,6 +55,7 @@ PluginProcessor::PluginProcessor()
     , apvts(*this, nullptr, "PARAMETERS", createParameterLayout())
     , outboundQueue_{ std::make_unique<Core::MidiOutboundQueue>() }
     , instrumentForwarder_{ std::make_unique<Core::InstrumentMidiForwarder>() }
+    , keyboardFromMidiInput_{ std::make_unique<Core::KeyboardFromMidiInput>(*outboundQueue_) }
     , midiManager(std::make_unique<MidiManager>(apvts, *outboundQueue_))
     , patchModel_{ std::make_unique<Core::PatchModel>() }
     , apvtsPatchMapper_{ std::make_unique<Core::ApvtsPatchMapper>(apvts, *patchModel_) }
@@ -266,6 +268,36 @@ void PluginProcessor::setMidiOutputPort(const juce::String& deviceId)
     }
 }
 
+bool PluginProcessor::isStandalone() const
+{
+    return isStandaloneWrapper();
+}
+
+bool PluginProcessor::setKeyboardFromPort(const juce::String& deviceId)
+{
+    if (!isStandaloneWrapper() || keyboardFromMidiInput_ == nullptr)
+        return false;
+
+    if (deviceId.isEmpty())
+    {
+        keyboardFromMidiInput_->closePort();
+        apvts.state.setProperty("keyboardFromEnabled", false, nullptr);
+        apvts.state.setProperty("keyboardFromPortId", juce::String(), nullptr);
+        return true;
+    }
+
+    if (!keyboardFromMidiInput_->setPort(deviceId))
+    {
+        apvts.state.setProperty("keyboardFromEnabled", false, nullptr);
+        apvts.state.setProperty("keyboardFromPortId", juce::String(), nullptr);
+        return false;
+    }
+
+    apvts.state.setProperty("keyboardFromEnabled", true, nullptr);
+    apvts.state.setProperty("keyboardFromPortId", deviceId, nullptr);
+    return true;
+}
+
 juce::AudioProcessorValueTreeState::ParameterLayout PluginProcessor::createParameterLayout()
 {
     return ApvtsFactory::createParameterLayout();
@@ -298,6 +330,11 @@ void PluginProcessor::initializeMidiPortProperties()
     if (!apvts.state.hasProperty("keyboardFromEnabled"))
     {
         apvts.state.setProperty("keyboardFromEnabled", false, nullptr);
+    }
+
+    if (!apvts.state.hasProperty("keyboardFromPortId"))
+    {
+        apvts.state.setProperty("keyboardFromPortId", juce::String(), nullptr);
     }
     
     if (apvts.state.hasProperty("guiZoomLevelId"))

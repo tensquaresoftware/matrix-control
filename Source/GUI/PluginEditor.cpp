@@ -45,6 +45,24 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     applyUiScale(savedUiScale);
     headerPanel.getUiScaleComboBox().setSelectedId(savedScaleId, juce::dontSendNotification);
 
+    headerPanel.setPluginMode(!pluginProcessor.isStandalone());
+    headerPanel.refreshPortLists();
+
+    const auto savedMidiInputPortId = pluginProcessor.getApvts().state.getProperty("midiInputPortId", juce::String()).toString();
+    headerPanel.selectMidiFromPort(savedMidiInputPortId);
+    pluginProcessor.setMidiInputPort(headerPanel.getSelectedMidiFromPortIdentifier());
+
+    const auto savedMidiOutputPortId = pluginProcessor.getApvts().state.getProperty("midiOutputPortId", juce::String()).toString();
+    headerPanel.selectMidiToPort(savedMidiOutputPortId);
+    pluginProcessor.setMidiOutputPort(headerPanel.getSelectedMidiToPortIdentifier());
+
+    if (pluginProcessor.isStandalone())
+    {
+        const auto savedKeyboardFromPortId = pluginProcessor.getApvts().state.getProperty("keyboardFromPortId", juce::String()).toString();
+        headerPanel.selectKeyboardFromPort(savedKeyboardFromPortId);
+        pluginProcessor.setKeyboardFromPort(headerPanel.getSelectedKeyboardFromPortIdentifier());
+    }
+
     setResizable(false, false);
 
     headerPanel.getSkinComboBox().onChange = [this, &headerPanel]
@@ -66,6 +84,32 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     headerPanel.getUiElementsButton().onClick = [this, &headerPanel]
     {
         setUiElementsTestVisible(headerPanel.getUiElementsButton().getToggleState());
+    };
+
+    headerPanel.getMidiFromComboBox().onChange = [this, &headerPanel]
+    {
+        pluginProcessor.setMidiInputPort(headerPanel.getSelectedMidiFromPortIdentifier());
+    };
+
+    headerPanel.getMidiToComboBox().onChange = [this, &headerPanel]
+    {
+        pluginProcessor.setMidiOutputPort(headerPanel.getSelectedMidiToPortIdentifier());
+    };
+
+    headerPanel.getKeyboardFromComboBox().onChange = [this, &headerPanel]
+    {
+        if (!pluginProcessor.isStandalone())
+            return;
+
+        const auto previousPortId = pluginProcessor.getApvts().state.getProperty("keyboardFromPortId", juce::String()).toString();
+        const auto selectedPortId = headerPanel.getSelectedKeyboardFromPortIdentifier();
+
+        if (pluginProcessor.setKeyboardFromPort(selectedPortId))
+            return;
+
+        headerPanel.selectKeyboardFromPort(previousPortId);
+        if (previousPortId.isNotEmpty())
+            pluginProcessor.setKeyboardFromPort(previousPortId);
     };
 
     syncUiScaleFromEditor();

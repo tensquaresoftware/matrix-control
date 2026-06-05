@@ -23,6 +23,7 @@ namespace Core
     class PatchParameterSysExDispatcher;
     class MidiOutboundQueue;
     class InstrumentMidiForwarder;
+    class KeyboardFromMidiInput;
 }
 
 class PluginProcessor : public juce::AudioProcessor, public juce::ValueTree::Listener
@@ -80,6 +81,9 @@ public:
 
     void setMidiInputPort(const juce::String& deviceId);
     void setMidiOutputPort(const juce::String& deviceId);
+    bool setKeyboardFromPort(const juce::String& deviceId);
+
+    bool isStandalone() const;
 
     void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
                                  const juce::Identifier& property) override;
@@ -125,6 +129,7 @@ private:
     juce::AudioProcessorValueTreeState apvts;
     std::unique_ptr<Core::MidiOutboundQueue> outboundQueue_;
     std::unique_ptr<Core::InstrumentMidiForwarder> instrumentForwarder_;
+    std::unique_ptr<Core::KeyboardFromMidiInput> keyboardFromMidiInput_;
     std::unique_ptr<MidiManager> midiManager;
     std::unique_ptr<Core::PatchModel> patchModel_;
     std::unique_ptr<Core::ApvtsPatchMapper> apvtsPatchMapper_;

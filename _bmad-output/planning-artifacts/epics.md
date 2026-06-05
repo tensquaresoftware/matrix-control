@@ -569,6 +569,20 @@ So that the brownfield transport stack sends through `MidiSender` (AD-3).
 **Then** `MidiManager` dequeues and sends via `MidiSender` only
 **And** brownfield direct-send paths in editor/instrument producers are removed or redirected to queue
 
+### Story 2.9b: Header Routing Controls (UAT Slice)
+
+As a sound designer validating the Epic 2 MIDI stack,
+I want MIDI From, MIDI To, and Keyboard From combos wired in HeaderPanel,
+So that I can configure hardware routing for manual UAT without waiting for Story 7.8 (partial FR-39).
+
+**Acceptance Criteria:**
+
+**Given** Story 2.9 done (queue consumer draining outbound traffic)
+**When** user selects MIDI From / MIDI To in the header
+**Then** `PluginProcessor::setMidiInputPort` / `setMidiOutputPort` open the chosen devices and persist `midiInputPortId` / `midiOutputPortId`
+**And** Keyboard From is grayed with **HOST** in plugin mode; standalone selects a keyboard port with minimal Core forwarder to the unified queue
+**And** Audio From, Input Gain, peak, and activity LEDs remain Stories 2.7 / 2.8; full shell polish remains Story 7.8
+
 ### Story 2.10: Matrix Mod Bus Reorder SysEx
 
 As a sound designer,

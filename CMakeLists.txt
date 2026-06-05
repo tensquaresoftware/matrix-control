@@ -101,6 +101,7 @@ set(PLUGIN_SOURCES
     # Core
     Source/Core/PluginProcessor.cpp
     Source/Core/Audio/InstrumentMidiForwarder.cpp
+    Source/Core/MIDI/KeyboardFromMidiInput.cpp
     Source/Core/Factories/ApvtsFactory.cpp
     Source/Core/Models/ApvtsMasterMapper.cpp
     Source/Core/Models/ApvtsPatchMapper.cpp
@@ -244,6 +245,8 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/PatchParameterSysExDispatcherTests.cpp
         Tests/Unit/EditorPathTests.cpp
         Tests/Unit/InstrumentMidiForwarderTests.cpp
+        Tests/Unit/KeyboardFromMidiInputTests.cpp
+        Tests/Unit/MidiPortRoutingPropertyTests.cpp
         Tests/Unit/MidiOutboundQueueTests.cpp
         Tests/Unit/SysExDelayProfileTests.cpp
         Tests/Unit/SysExInterMessageDelayTests.cpp
@@ -256,6 +259,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/Models/PatchNameSyncer.cpp
         Source/Core/Models/PackedFieldCodec.cpp
         Source/Core/Audio/InstrumentMidiForwarder.cpp
+        Source/Core/MIDI/KeyboardFromMidiInput.cpp
         Source/Core/MIDI/EditorPath.cpp
         Source/Core/MIDI/MidiManager.cpp
         Source/Core/MIDI/MasterParameterSysExDispatcher.cpp

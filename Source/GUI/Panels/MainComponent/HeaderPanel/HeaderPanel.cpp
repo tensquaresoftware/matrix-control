@@ -1,5 +1,7 @@
 #include "HeaderPanel.h"
 
+#include <juce_audio_devices/juce_audio_devices.h>
+
 #include "GUI/Widgets/Label.h"
 #include "GUI/Widgets/ComboBox.h"
 #include "GUI/Skins/Skin.h"
@@ -10,17 +12,65 @@
 
 using tss::SkinColourId;
 
+namespace
+{
+    int findItemIdForPortIdentifier(const std::vector<juce::String>& identifiers,
+                                    const juce::String& deviceId)
+    {
+        if (deviceId.isEmpty())
+            return HeaderPanel::kPortSentinelItemId;
+
+        for (size_t i = 0; i < identifiers.size(); ++i)
+        {
+            if (identifiers[i] == deviceId)
+                return static_cast<int>(i + 1);
+        }
+
+        return HeaderPanel::kPortSentinelItemId;
+    }
+
+    juce::String getPortIdentifierForItemId(const std::vector<juce::String>& identifiers, int itemId)
+    {
+        if (itemId <= HeaderPanel::kPortSentinelItemId)
+            return {};
+
+        const auto index = static_cast<size_t>(itemId - 1);
+        if (index >= identifiers.size())
+            return {};
+
+        return identifiers[index];
+    }
+}
+
 HeaderPanel::HeaderPanel(tss::ISkin& skin, int width, int height)
     : width_(width)
     , height_(height)
     , skin_(&skin)
+    , midiFromLabel_(kMidiFromLabelWidth_, kControlHeight_, tss::headerPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kMidiFromLabel, tss::LabelStyle::HeaderPanel)
+    , midiFromComboBox_(kMidiPortComboBoxWidth_, kControlHeight_, tss::comboBoxLookFromSkin(skin), tss::ComboBox::Style::ButtonLike)
+    , midiToLabel_(kMidiToLabelWidth_, kControlHeight_, tss::headerPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kMidiToLabel, tss::LabelStyle::HeaderPanel)
+    , midiToComboBox_(kMidiPortComboBoxWidth_, kControlHeight_, tss::comboBoxLookFromSkin(skin), tss::ComboBox::Style::ButtonLike)
+    , keyboardFromLabel_(kKeyboardFromLabelWidth_, kControlHeight_, tss::headerPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kKeyboardFromLabel, tss::LabelStyle::HeaderPanel)
+    , keyboardFromComboBox_(kMidiPortComboBoxWidth_, kControlHeight_, tss::comboBoxLookFromSkin(skin), tss::ComboBox::Style::ButtonLike)
     , skinLabel_(kSkinLabelWidth_, kControlHeight_, tss::headerPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kSkinLabel, tss::LabelStyle::HeaderPanel)
-    , skinComboBox_(kComboBoxWidth_, kControlHeight_, tss::comboBoxLookFromSkin(skin), tss::ComboBox::Style::ButtonLike)
+    , skinComboBox_(kSkinComboBoxWidth_, kControlHeight_, tss::comboBoxLookFromSkin(skin), tss::ComboBox::Style::ButtonLike)
     , uiScaleLabel_(kUiScaleLabelWidth_, kControlHeight_, tss::headerPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kUiScaleLabel, tss::LabelStyle::HeaderPanel)
-    , uiScaleComboBox_(kComboBoxWidth_, kControlHeight_, tss::comboBoxLookFromSkin(skin), tss::ComboBox::Style::ButtonLike)
+    , uiScaleComboBox_(kScaleComboBoxWidth_, kControlHeight_, tss::comboBoxLookFromSkin(skin), tss::ComboBox::Style::ButtonLike)
     , uiElementsButton_(kUiElementsButtonWidth_, kControlHeight_, tss::buttonLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kUiElementsButton)
 {
     setOpaque(true);
+
+    addAndMakeVisible(midiFromLabel_);
+    midiFromComboBox_.setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
+    addAndMakeVisible(midiFromComboBox_);
+
+    addAndMakeVisible(midiToLabel_);
+    midiToComboBox_.setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
+    addAndMakeVisible(midiToComboBox_);
+
+    addAndMakeVisible(keyboardFromLabel_);
+    keyboardFromComboBox_.setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
+    addAndMakeVisible(keyboardFromComboBox_);
 
     addAndMakeVisible(uiScaleLabel_);
 
@@ -47,6 +97,8 @@ HeaderPanel::HeaderPanel(tss::ISkin& skin, int width, int height)
 
     uiElementsButton_.setClickingTogglesState(true);
     addAndMakeVisible(uiElementsButton_);
+
+    populateMidiPortLists();
 }
 
 void HeaderPanel::paint(juce::Graphics& g)
@@ -64,47 +116,55 @@ void HeaderPanel::resized()
     const float controlY = (scaledHeight - controlHeight) * 0.5f;
 
     const float leftPadding = static_cast<float>(kLeftPadding_) * sf;
+    const float midiFromLabelWidth = static_cast<float>(kMidiFromLabelWidth_) * sf;
+    const float midiToLabelWidth = static_cast<float>(kMidiToLabelWidth_) * sf;
+    const float keyboardFromLabelWidth = static_cast<float>(kKeyboardFromLabelWidth_) * sf;
+    const float midiPortComboWidth = static_cast<float>(kMidiPortComboBoxWidth_) * sf;
     const float uiScaleLabelWidth = static_cast<float>(kUiScaleLabelWidth_) * sf;
-    const float comboBoxWidth = static_cast<float>(kComboBoxWidth_) * sf;
+    const float scaleComboWidth = static_cast<float>(kScaleComboBoxWidth_) * sf;
     const float skinLabelWidth = static_cast<float>(kSkinLabelWidth_) * sf;
+    const float skinComboWidth = static_cast<float>(kSkinComboBoxWidth_) * sf;
     const float uiElementsButtonWidth = static_cast<float>(kUiElementsButtonWidth_) * sf;
     const float rightPadding = static_cast<float>(kRightPadding_) * sf;
 
-    const float originX = static_cast<float>(bounds.getX()) + leftPadding;
-    const float x0 = originX;
-    const float x1 = originX + uiScaleLabelWidth + gap;
-    const float x2 = originX + uiScaleLabelWidth + gap + comboBoxWidth + gap * 2.0f;
-    const float x3 = originX + uiScaleLabelWidth + gap + comboBoxWidth + gap * 2.0f + skinLabelWidth + gap;
-    const float uiElementsButtonX = static_cast<float>(bounds.getRight()) - rightPadding - uiElementsButtonWidth;
-
-    const int uiScaleLabelX = juce::roundToInt(x0);
-    const int uiScaleComboBoxX = juce::roundToInt(x1);
-    const int skinLabelX = juce::roundToInt(x2);
-    const int skinComboBoxX = juce::roundToInt(x3);
-    const int uiElementsButtonBoundsX = juce::roundToInt(uiElementsButtonX);
-
+    float x = static_cast<float>(bounds.getX()) + leftPadding;
     const int y = juce::roundToInt(static_cast<float>(bounds.getY()) + controlY);
     const int h = juce::roundToInt(controlHeight);
 
-    uiScaleLabel_.setBounds(uiScaleLabelX, y, juce::roundToInt(uiScaleLabelWidth), h);
-    uiScaleLabel_.setUiScale(uiScale_);
+    auto placeLabelAndCombo = [&](tss::Label& label, float labelWidth, tss::ComboBox& combo, float comboWidth)
+    {
+        label.setBounds(juce::roundToInt(x), y, juce::roundToInt(labelWidth), h);
+        label.setUiScale(uiScale_);
+        x += labelWidth + gap;
 
-    uiScaleComboBox_.setBounds(uiScaleComboBoxX, y, juce::roundToInt(comboBoxWidth), h);
-    uiScaleComboBox_.setUiScale(uiScale_);
+        combo.setBounds(juce::roundToInt(x), y, juce::roundToInt(comboWidth), h);
+        combo.setUiScale(uiScale_);
+        x += comboWidth + gap * 2.0f;
+    };
 
-    skinLabel_.setBounds(skinLabelX, y, juce::roundToInt(skinLabelWidth), h);
-    skinLabel_.setUiScale(uiScale_);
+    placeLabelAndCombo(midiFromLabel_, midiFromLabelWidth, midiFromComboBox_, midiPortComboWidth);
+    placeLabelAndCombo(midiToLabel_, midiToLabelWidth, midiToComboBox_, midiPortComboWidth);
+    placeLabelAndCombo(keyboardFromLabel_, keyboardFromLabelWidth, keyboardFromComboBox_, midiPortComboWidth);
+    placeLabelAndCombo(uiScaleLabel_, uiScaleLabelWidth, uiScaleComboBox_, scaleComboWidth);
+    placeLabelAndCombo(skinLabel_, skinLabelWidth, skinComboBox_, skinComboWidth);
 
-    skinComboBox_.setBounds(skinComboBoxX, y, juce::roundToInt(comboBoxWidth), h);
-    skinComboBox_.setUiScale(uiScale_);
-
-    uiElementsButton_.setBounds(uiElementsButtonBoundsX, y, juce::roundToInt(uiElementsButtonWidth), h);
+    const float uiElementsButtonX = static_cast<float>(bounds.getRight()) - rightPadding - uiElementsButtonWidth;
+    uiElementsButton_.setBounds(juce::roundToInt(uiElementsButtonX), y, juce::roundToInt(uiElementsButtonWidth), h);
     uiElementsButton_.setUiScale(uiScale_);
 }
 
 void HeaderPanel::setSkin(tss::ISkin& skin)
 {
     skin_ = &skin;
+    midiFromLabel_.setLook(tss::headerPanelLabelLookFromSkin(skin));
+    midiFromComboBox_.setLook(tss::comboBoxLookFromSkin(skin));
+    midiFromComboBox_.setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
+    midiToLabel_.setLook(tss::headerPanelLabelLookFromSkin(skin));
+    midiToComboBox_.setLook(tss::comboBoxLookFromSkin(skin));
+    midiToComboBox_.setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
+    keyboardFromLabel_.setLook(tss::headerPanelLabelLookFromSkin(skin));
+    keyboardFromComboBox_.setLook(tss::comboBoxLookFromSkin(skin));
+    keyboardFromComboBox_.setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
     skinLabel_.setLook(tss::headerPanelLabelLookFromSkin(skin));
     skinComboBox_.setLook(tss::comboBoxLookFromSkin(skin));
     skinComboBox_.setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
@@ -120,5 +180,136 @@ void HeaderPanel::setUiScale(float uiScale)
         return;
 
     uiScale_ = uiScale;
+    resized();
     repaint();
+}
+
+void HeaderPanel::setPluginMode(bool isPlugin)
+{
+    isPluginMode_ = isPlugin;
+
+    if (isPluginMode_)
+        configurePluginModeKeyboardFrom();
+    else
+        configureStandaloneKeyboardFrom();
+}
+
+void HeaderPanel::populateMidiPortLists()
+{
+    populateInputPortCombo(midiFromComboBox_, midiFromPortIdentifiers_);
+    populateOutputPortCombo(midiToComboBox_, midiToPortIdentifiers_);
+
+    if (isPluginMode_)
+        configurePluginModeKeyboardFrom();
+    else
+        configureStandaloneKeyboardFrom();
+}
+
+void HeaderPanel::populateInputPortCombo(tss::ComboBox& combo, std::vector<juce::String>& identifiers)
+{
+    const juce::String previousIdentifier = getPortIdentifierForItemId(identifiers, combo.getSelectedId());
+
+    combo.clear(juce::dontSendNotification);
+    identifiers.clear();
+
+    combo.addItem(PluginDisplayNames::HeaderPanel::kPortNoneSentinel, kPortSentinelItemId);
+
+    const auto devices = juce::MidiInput::getAvailableDevices();
+    for (int i = 0; i < devices.size(); ++i)
+    {
+        const auto& device = devices.getReference(i);
+        const int itemId = i + 1;
+        combo.addItem(device.name, itemId);
+        identifiers.push_back(device.identifier);
+    }
+
+    combo.setSelectedId(findItemIdForPortIdentifier(identifiers, previousIdentifier),
+                        juce::dontSendNotification);
+}
+
+void HeaderPanel::populateOutputPortCombo(tss::ComboBox& combo, std::vector<juce::String>& identifiers)
+{
+    const juce::String previousIdentifier = getPortIdentifierForItemId(identifiers, combo.getSelectedId());
+
+    combo.clear(juce::dontSendNotification);
+    identifiers.clear();
+
+    combo.addItem(PluginDisplayNames::HeaderPanel::kPortNoneSentinel, kPortSentinelItemId);
+
+    const auto devices = juce::MidiOutput::getAvailableDevices();
+    for (int i = 0; i < devices.size(); ++i)
+    {
+        const auto& device = devices.getReference(i);
+        const int itemId = i + 1;
+        combo.addItem(device.name, itemId);
+        identifiers.push_back(device.identifier);
+    }
+
+    combo.setSelectedId(findItemIdForPortIdentifier(identifiers, previousIdentifier),
+                        juce::dontSendNotification);
+}
+
+void HeaderPanel::configurePluginModeKeyboardFrom()
+{
+    keyboardFromComboBox_.clear(juce::dontSendNotification);
+    keyboardFromComboBox_.addItem(PluginDisplayNames::HeaderPanel::kHostDisplay, 1);
+    keyboardFromComboBox_.setSelectedId(1, juce::dontSendNotification);
+    keyboardFromComboBox_.setEnabled(false);
+}
+
+void HeaderPanel::configureStandaloneKeyboardFrom()
+{
+    keyboardFromComboBox_.setEnabled(true);
+    populateInputPortCombo(keyboardFromComboBox_, keyboardFromPortIdentifiers_);
+}
+
+juce::String HeaderPanel::getSelectedMidiFromPortIdentifier() const
+{
+    return getSelectedPortIdentifier(midiFromComboBox_, midiFromPortIdentifiers_);
+}
+
+juce::String HeaderPanel::getSelectedMidiToPortIdentifier() const
+{
+    return getSelectedPortIdentifier(midiToComboBox_, midiToPortIdentifiers_);
+}
+
+juce::String HeaderPanel::getSelectedKeyboardFromPortIdentifier() const
+{
+    if (isPluginMode_)
+        return {};
+
+    return getSelectedPortIdentifier(keyboardFromComboBox_, keyboardFromPortIdentifiers_);
+}
+
+void HeaderPanel::selectMidiFromPort(const juce::String& deviceId)
+{
+    midiFromComboBox_.setSelectedId(findItemIdForIdentifier(midiFromPortIdentifiers_, deviceId),
+                                    juce::dontSendNotification);
+}
+
+void HeaderPanel::selectMidiToPort(const juce::String& deviceId)
+{
+    midiToComboBox_.setSelectedId(findItemIdForIdentifier(midiToPortIdentifiers_, deviceId),
+                                  juce::dontSendNotification);
+}
+
+void HeaderPanel::selectKeyboardFromPort(const juce::String& deviceId)
+{
+    if (isPluginMode_)
+        return;
+
+    keyboardFromComboBox_.setSelectedId(findItemIdForIdentifier(keyboardFromPortIdentifiers_, deviceId),
+                                        juce::dontSendNotification);
+}
+
+int HeaderPanel::findItemIdForIdentifier(const std::vector<juce::String>& identifiers,
+                                         const juce::String& deviceId) const
+{
+    return findItemIdForPortIdentifier(identifiers, deviceId);
+}
+
+juce::String HeaderPanel::getSelectedPortIdentifier(const tss::ComboBox& combo,
+                                                    const std::vector<juce::String>& identifiers) const
+{
+    return getPortIdentifierForItemId(identifiers, combo.getSelectedId());
 }

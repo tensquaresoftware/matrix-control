@@ -1,5 +1,13 @@
 # Deferred Work
 
+## Deferred from: code review of 2-9b-header-routing-controls-uat-slice (2026-06-05)
+
+- **Combo/backend mismatch si `MidiManager::set*Port` échoue** (`PluginProcessor.cpp:249-268`) — pattern brownfield pre-existing ; combo avance, APVTS inchangé jusqu’au prochain succès.
+- **Double forwarding host buffer en standalone** (`PluginProcessor.cpp:210-218`) — AC #7 assume buffer hôte vide ; edge case host injectant MIDI en standalone.
+- **MIDI FROM + KEYBOARD FROM même device** (`HeaderPanel` / `PluginProcessor`) — deux `juce::MidiInput` sur un identifiant ; pas de garde UI dans scope UAT slice.
+- **`setStateInformation` sans resync ports/combos** (`PluginProcessor.cpp:233-246`) — restore ports uniquement au ctor `PluginEditor` ; reload session complète OK.
+- **Thread safety `keyboardFromEnabled` message/audio** (`PluginProcessor.cpp:213-214`) — `juce::var` lu audio thread, écrit message thread ; pre-existing story 2.3.
+
 ## Deferred from: code review of 2-9-wire-midimanager-queue-consumer (2026-06-05)
 
 - **RPC + consumer concurrent `sysExDelay_` / `MidiSender` access** (`MidiManager.cpp:223,275,351`) — brownfield threading; story completion notes accept timestamp-only gate; `MidiSender` not thread-safe if inquiry runs concurrent with consumer; no call-site refactor in scope.
