@@ -1,12 +1,34 @@
 #include "PluginEditor.h"
 
+#include "Core/Audio/AudioPassthroughProcessor.h"
 #include "Core/PluginProcessor.h"
 #include "GUI/Layout/ScaledLayout.h"
+#include "GUI/Panels/MainComponent/HeaderPanel/HeaderPanel.h"
 #include "Skins/Skin.h"
 #include "Factories/WidgetFactory.h"
 #include "Shared/Definitions/PluginIDs.h"
 
 using tss::SkinColourId;
+
+class PluginEditor::PeakRefreshTimer : private juce::Timer
+{
+public:
+    PeakRefreshTimer(PluginProcessor& processor, HeaderPanel& headerPanel)
+        : processor_(processor)
+        , headerPanel_(headerPanel)
+    {
+        startTimerHz(30);
+    }
+
+private:
+    void timerCallback() override
+    {
+        headerPanel_.getPeakIndicator().setLevel(processor_.getAudioPassthroughProcessor().getPeakLevel());
+    }
+
+    PluginProcessor& processor_;
+    HeaderPanel& headerPanel_;
+};
 
 
 PluginEditor::PluginEditor(PluginProcessor& p)
@@ -48,6 +70,16 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     headerPanel.setPluginMode(!pluginProcessor.isStandalone());
     headerPanel.refreshPortLists();
 
+    if (pluginProcessor.isStandalone())
+    {
+        headerPanel.populateAudioFromComboForStandalone(pluginProcessor.getStandaloneAudioInputNames(),
+                                                        pluginProcessor.getStandaloneAudioInputIds());
+    }
+    else
+    {
+        headerPanel.populateAudioFromComboForPlugin();
+    }
+
     const auto savedMidiInputPortId = pluginProcessor.getApvts().state.getProperty("midiInputPortId", juce::String()).toString();
     headerPanel.selectMidiFromPort(savedMidiInputPortId);
     pluginProcessor.setMidiInputPort(headerPanel.getSelectedMidiFromPortIdentifier());
@@ -61,7 +93,23 @@ PluginEditor::PluginEditor(PluginProcessor& p)
         const auto savedKeyboardFromPortId = pluginProcessor.getApvts().state.getProperty("keyboardFromPortId", juce::String()).toString();
         headerPanel.selectKeyboardFromPort(savedKeyboardFromPortId);
         pluginProcessor.setKeyboardFromPort(headerPanel.getSelectedKeyboardFromPortIdentifier());
+
+        const auto savedAudioFromSourceId = pluginProcessor.getApvts().state.getProperty("audioFromSourceId", juce::String()).toString();
+        headerPanel.selectAudioFromSourceId(savedAudioFromSourceId);
+        pluginProcessor.setAudioFromSourceId(headerPanel.getSelectedAudioFromSourceId());
     }
+    else
+    {
+        const int savedAudioFromChannelMode = static_cast<int>(
+            pluginProcessor.getApvts().state.getProperty("audioFromChannelMode", 0));
+        headerPanel.selectAudioFromChannelMode(savedAudioFromChannelMode);
+        pluginProcessor.setAudioFromChannelMode(headerPanel.getSelectedAudioFromChannelMode());
+    }
+
+    const float savedInputGainDb = static_cast<float>(
+        pluginProcessor.getApvts().state.getProperty("inputGainDb", 0.0f));
+    headerPanel.getInputGainSlider().setValue(savedInputGainDb, juce::dontSendNotification);
+    pluginProcessor.setInputGainDb(savedInputGainDb);
 
     setResizable(false, false);
 
@@ -111,6 +159,21 @@ PluginEditor::PluginEditor(PluginProcessor& p)
         if (previousPortId.isNotEmpty())
             pluginProcessor.setKeyboardFromPort(previousPortId);
     };
+
+    headerPanel.getInputGainSlider().onValueChange = [this, &headerPanel]
+    {
+        pluginProcessor.setInputGainDb(static_cast<float>(headerPanel.getInputGainSlider().getValue()));
+    };
+
+    headerPanel.getAudioFromComboBox().onChange = [this, &headerPanel]
+    {
+        if (pluginProcessor.isStandalone())
+            pluginProcessor.setAudioFromSourceId(headerPanel.getSelectedAudioFromSourceId());
+        else
+            pluginProcessor.setAudioFromChannelMode(headerPanel.getSelectedAudioFromChannelMode());
+    };
+
+    peakRefreshTimer_ = std::make_unique<PeakRefreshTimer>(pluginProcessor, headerPanel);
 
     syncUiScaleFromEditor();
     layoutUiElementsTestComponent();

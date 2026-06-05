@@ -16,6 +16,11 @@ namespace PluginDisplayNames
         constexpr const char* kMidiFromLabel = "MIDI FROM :";
         constexpr const char* kMidiToLabel = "MIDI TO :";
         constexpr const char* kKeyboardFromLabel = "KEYBOARD FROM :";
+        constexpr const char* kAudioFromLabel = "AUDIO FROM :";
+        constexpr const char* kInputGainLabel = "INPUT GAIN :";
+        constexpr const char* kAudioFromStereo = "STEREO";
+        constexpr const char* kAudioFromMonoLeft = "MONO L";
+        constexpr const char* kAudioFromMonoRight = "MONO R";
         constexpr const char* kHostDisplay = "HOST";
         constexpr const char* kPortNoneSentinel = "\xe2\x80\x94";
         constexpr const char* kSkinLabel = "SKIN :";

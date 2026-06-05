@@ -100,7 +100,10 @@ juce_add_binary_data(PluginFonts
 set(PLUGIN_SOURCES
     # Core
     Source/Core/PluginProcessor.cpp
+    Source/Core/Audio/AudioPassthroughProcessor.cpp
     Source/Core/Audio/InstrumentMidiForwarder.cpp
+    Source/Core/Audio/StandaloneAudioInputRouter.cpp
+    Source/Core/Audio/StandaloneAudioInputRouterStubs.cpp
     Source/Core/MIDI/KeyboardFromMidiInput.cpp
     Source/Core/Factories/ApvtsFactory.cpp
     Source/Core/Models/ApvtsMasterMapper.cpp
@@ -199,6 +202,7 @@ set(PLUGIN_SOURCES
     Source/GUI/Widgets/MultiColumnPopupMenu.cpp
     Source/GUI/Widgets/NumberBox.cpp
     Source/GUI/Widgets/ParameterCell.cpp
+    Source/GUI/Widgets/PeakIndicator.cpp
     Source/GUI/Widgets/PatchNameDisplay.cpp
     Source/GUI/Widgets/PopupMenuBase.cpp
     Source/GUI/Widgets/PopupMenuPositioner.cpp
@@ -244,6 +248,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/MatrixModBusParameterSysExDispatcherTests.cpp
         Tests/Unit/PatchParameterSysExDispatcherTests.cpp
         Tests/Unit/EditorPathTests.cpp
+        Tests/Unit/AudioPassthroughProcessorTests.cpp
         Tests/Unit/InstrumentMidiForwarderTests.cpp
         Tests/Unit/KeyboardFromMidiInputTests.cpp
         Tests/Unit/MidiPortRoutingPropertyTests.cpp
@@ -258,6 +263,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/Models/PatchModel.cpp
         Source/Core/Models/PatchNameSyncer.cpp
         Source/Core/Models/PackedFieldCodec.cpp
+        Source/Core/Audio/AudioPassthroughProcessor.cpp
         Source/Core/Audio/InstrumentMidiForwarder.cpp
         Source/Core/MIDI/KeyboardFromMidiInput.cpp
         Source/Core/MIDI/EditorPath.cpp
@@ -331,17 +337,21 @@ juce_add_plugin(Matrix-Control
     FORMATS ${PLUGIN_FORMATS_LIST}
     PRODUCT_NAME "Matrix-Control"
 	PLUGIN_NAME "Matrix-Control"
-    IS_SYNTH FALSE
+    IS_SYNTH TRUE
     NEEDS_MIDI_INPUT TRUE
     NEEDS_MIDI_OUTPUT TRUE
     IS_MIDI_EFFECT FALSE
     EDITOR_WANTS_KEYBOARD_FOCUS FALSE
     COPY_PLUGIN_AFTER_BUILD ${COPY_PLUGIN_AFTER_BUILD_VALUE}
-    VST3_CATEGORIES Fx
-    AU_MAIN_TYPE kAudioUnitType_Effect
+    VST3_CATEGORIES Instrument
+    AU_MAIN_TYPE kAudioUnitType_MusicDevice
 )
 
 target_sources(Matrix-Control PRIVATE ${PLUGIN_SOURCES})
+
+target_sources(Matrix-Control_Standalone PRIVATE
+    Source/Core/Audio/StandaloneAudioInputRouterStandalone.cpp
+)
 
 target_include_directories(Matrix-Control
     PRIVATE

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <memory>
 #include <map>
 #include <optional>
@@ -24,6 +25,7 @@ namespace Core
     class MidiOutboundQueue;
     class InstrumentMidiForwarder;
     class KeyboardFromMidiInput;
+    class AudioPassthroughProcessor;
 }
 
 class PluginProcessor : public juce::AudioProcessor, public juce::ValueTree::Listener
@@ -83,6 +85,15 @@ public:
     void setMidiOutputPort(const juce::String& deviceId);
     bool setKeyboardFromPort(const juce::String& deviceId);
 
+    void setInputGainDb(float gainDb);
+    void setAudioFromChannelMode(int mode);
+    void setAudioFromSourceId(const juce::String& sourceId);
+    juce::StringArray getStandaloneAudioInputNames() const;
+    juce::StringArray getStandaloneAudioInputIds() const;
+
+    Core::AudioPassthroughProcessor& getAudioPassthroughProcessor() noexcept { return *audioPassthroughProcessor_; }
+    const Core::AudioPassthroughProcessor& getAudioPassthroughProcessor() const noexcept { return *audioPassthroughProcessor_; }
+
     bool isStandalone() const;
 
     void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
@@ -101,7 +112,12 @@ private:
     static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
     void validatePluginDescriptorsAtStartup();
     void initializeMidiPortProperties();
+    void initializeAudioProperties();
     void initializePatchNameProperty();
+    bool getInstrumentPathEnabled(const juce::MidiBuffer& midiMessages) const;
+    void refreshAudioPassthroughLayout(double sampleRate);
+    void syncAudioRuntimeFromState();
+    static float dbToLinearGain(float gainDb) noexcept;
     void enableFileLoggingForSession();
     void closeLogFileForSession();
     void enableApvtsLogging();
@@ -129,7 +145,10 @@ private:
     juce::AudioProcessorValueTreeState apvts;
     std::unique_ptr<Core::MidiOutboundQueue> outboundQueue_;
     std::unique_ptr<Core::InstrumentMidiForwarder> instrumentForwarder_;
+    std::unique_ptr<Core::AudioPassthroughProcessor> audioPassthroughProcessor_;
     std::unique_ptr<Core::KeyboardFromMidiInput> keyboardFromMidiInput_;
+    std::atomic<float> inputGainLinear_{ 1.0f };
+    double audioPassthroughSampleRate_ { 44100.0 };
     std::unique_ptr<MidiManager> midiManager;
     std::unique_ptr<Core::PatchModel> patchModel_;
     std::unique_ptr<Core::ApvtsPatchMapper> apvtsPatchMapper_;

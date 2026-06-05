@@ -1,5 +1,13 @@
 # Deferred Work
 
+## Deferred from: code review of 2-7-audio-passthrough-and-peak-indicator (2026-06-05)
+
+- **Standalone audio-from combo not refreshed on device change** (`PluginEditor.cpp:73-77`) — follow-up UX; spec lists channels at editor open only.
+- **Weak symbols (`__attribute__((weak))`) not portable to MSVC** (`StandaloneAudioInputRouterStubs.cpp:5-15`) — Windows build follow-up; macOS verified.
+- **Standalone `audioFromSourceId` uses unstable numeric channel indices** (`StandaloneAudioInputRouterStandalone.cpp:35-36`) — device-change edge case; channel names as IDs optional hardening.
+- **`getInstrumentPathEnabled` reads `apvts.state` on audio thread (standalone)** (`PluginProcessor.cpp:321-324`) — pre-existing pattern extracted from `processBlock`; atomic cache deferred to Epic 7/8.
+- **Redundant `setAudioFromSourceId` / `setInputGainDb` on startup** (`PluginProcessor.cpp:386-388`, `PluginEditor.cpp:97-112`) — harmless duplication between ctor init and editor restore.
+
 ## Deferred from: code review of 2-9b-header-routing-controls-uat-slice (2026-06-05)
 
 - **Combo/backend mismatch si `MidiManager::set*Port` échoue** (`PluginProcessor.cpp:249-268`) — pattern brownfield pre-existing ; combo avance, APVTS inchangé jusqu’au prochain succès.

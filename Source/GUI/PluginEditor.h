@@ -12,6 +12,7 @@
 #include "Tests/TestComponent.h"
 
 class WidgetFactory;
+class HeaderPanel;
 
 class PluginEditor : public juce::AudioProcessorEditor
 {
@@ -27,6 +28,8 @@ public:
     static int getDesignHeight() { return PluginDesignDimensions::GUI::kHeight; }
 
 private:
+    class PeakRefreshTimer;
+
     PluginProcessor& pluginProcessor;
 
     std::unique_ptr<tss::Skin> skinBlack_;
@@ -36,6 +39,7 @@ private:
     std::unique_ptr<MainComponent> mainComponent_;
     std::unique_ptr<TestComponent> testComponent_;
     bool uiElementsTestVisible_ = false;
+    std::unique_ptr<PeakRefreshTimer> peakRefreshTimer_;
 
     void updateSkin();
     void applyUiScale(float uiScale);

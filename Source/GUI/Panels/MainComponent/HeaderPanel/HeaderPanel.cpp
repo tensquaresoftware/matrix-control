@@ -52,6 +52,11 @@ HeaderPanel::HeaderPanel(tss::ISkin& skin, int width, int height)
     , midiToComboBox_(kMidiPortComboBoxWidth_, kControlHeight_, tss::comboBoxLookFromSkin(skin), tss::ComboBox::Style::ButtonLike)
     , keyboardFromLabel_(kKeyboardFromLabelWidth_, kControlHeight_, tss::headerPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kKeyboardFromLabel, tss::LabelStyle::HeaderPanel)
     , keyboardFromComboBox_(kMidiPortComboBoxWidth_, kControlHeight_, tss::comboBoxLookFromSkin(skin), tss::ComboBox::Style::ButtonLike)
+    , audioFromLabel_(kAudioFromLabelWidth_, kControlHeight_, tss::headerPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kAudioFromLabel, tss::LabelStyle::HeaderPanel)
+    , audioFromComboBox_(kAudioFromComboBoxWidth_, kControlHeight_, tss::comboBoxLookFromSkin(skin), tss::ComboBox::Style::ButtonLike)
+    , inputGainLabel_(kInputGainLabelWidth_, kControlHeight_, tss::headerPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kInputGainLabel, tss::LabelStyle::HeaderPanel)
+    , inputGainSlider_(kInputGainSliderWidth_, kControlHeight_, tss::sliderLookFromSkin(skin), 0.0)
+    , peakIndicator_(kPeakIndicatorWidth_, kControlHeight_)
     , skinLabel_(kSkinLabelWidth_, kControlHeight_, tss::headerPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kSkinLabel, tss::LabelStyle::HeaderPanel)
     , skinComboBox_(kSkinComboBoxWidth_, kControlHeight_, tss::comboBoxLookFromSkin(skin), tss::ComboBox::Style::ButtonLike)
     , uiScaleLabel_(kUiScaleLabelWidth_, kControlHeight_, tss::headerPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kUiScaleLabel, tss::LabelStyle::HeaderPanel)
@@ -71,6 +76,17 @@ HeaderPanel::HeaderPanel(tss::ISkin& skin, int width, int height)
     addAndMakeVisible(keyboardFromLabel_);
     keyboardFromComboBox_.setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
     addAndMakeVisible(keyboardFromComboBox_);
+
+    addAndMakeVisible(audioFromLabel_);
+    audioFromComboBox_.setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
+    addAndMakeVisible(audioFromComboBox_);
+
+    addAndMakeVisible(inputGainLabel_);
+    inputGainSlider_.setRange(-24.0, 12.0, 0.1);
+    addAndMakeVisible(inputGainSlider_);
+
+    peakIndicator_.setSkin(skin);
+    addAndMakeVisible(peakIndicator_);
 
     addAndMakeVisible(uiScaleLabel_);
 
@@ -99,6 +115,7 @@ HeaderPanel::HeaderPanel(tss::ISkin& skin, int width, int height)
     addAndMakeVisible(uiElementsButton_);
 
     populateMidiPortLists();
+    populateAudioFromComboForPlugin();
 }
 
 void HeaderPanel::paint(juce::Graphics& g)
@@ -119,7 +136,12 @@ void HeaderPanel::resized()
     const float midiFromLabelWidth = static_cast<float>(kMidiFromLabelWidth_) * sf;
     const float midiToLabelWidth = static_cast<float>(kMidiToLabelWidth_) * sf;
     const float keyboardFromLabelWidth = static_cast<float>(kKeyboardFromLabelWidth_) * sf;
+    const float audioFromLabelWidth = static_cast<float>(kAudioFromLabelWidth_) * sf;
+    const float inputGainLabelWidth = static_cast<float>(kInputGainLabelWidth_) * sf;
     const float midiPortComboWidth = static_cast<float>(kMidiPortComboBoxWidth_) * sf;
+    const float audioFromComboWidth = static_cast<float>(kAudioFromComboBoxWidth_) * sf;
+    const float inputGainSliderWidth = static_cast<float>(kInputGainSliderWidth_) * sf;
+    const float peakIndicatorWidth = static_cast<float>(kPeakIndicatorWidth_) * sf;
     const float uiScaleLabelWidth = static_cast<float>(kUiScaleLabelWidth_) * sf;
     const float scaleComboWidth = static_cast<float>(kScaleComboBoxWidth_) * sf;
     const float skinLabelWidth = static_cast<float>(kSkinLabelWidth_) * sf;
@@ -145,6 +167,20 @@ void HeaderPanel::resized()
     placeLabelAndCombo(midiFromLabel_, midiFromLabelWidth, midiFromComboBox_, midiPortComboWidth);
     placeLabelAndCombo(midiToLabel_, midiToLabelWidth, midiToComboBox_, midiPortComboWidth);
     placeLabelAndCombo(keyboardFromLabel_, keyboardFromLabelWidth, keyboardFromComboBox_, midiPortComboWidth);
+    placeLabelAndCombo(audioFromLabel_, audioFromLabelWidth, audioFromComboBox_, audioFromComboWidth);
+
+    inputGainLabel_.setBounds(juce::roundToInt(x), y, juce::roundToInt(inputGainLabelWidth), h);
+    inputGainLabel_.setUiScale(uiScale_);
+    x += inputGainLabelWidth + gap;
+
+    inputGainSlider_.setBounds(juce::roundToInt(x), y, juce::roundToInt(inputGainSliderWidth), h);
+    inputGainSlider_.setUiScale(uiScale_);
+    x += inputGainSliderWidth + gap;
+
+    peakIndicator_.setBounds(juce::roundToInt(x), y, juce::roundToInt(peakIndicatorWidth), h);
+    peakIndicator_.setUiScale(uiScale_);
+    x += peakIndicatorWidth + gap * 2.0f;
+
     placeLabelAndCombo(uiScaleLabel_, uiScaleLabelWidth, uiScaleComboBox_, scaleComboWidth);
     placeLabelAndCombo(skinLabel_, skinLabelWidth, skinComboBox_, skinComboWidth);
 
@@ -165,6 +201,12 @@ void HeaderPanel::setSkin(tss::ISkin& skin)
     keyboardFromLabel_.setLook(tss::headerPanelLabelLookFromSkin(skin));
     keyboardFromComboBox_.setLook(tss::comboBoxLookFromSkin(skin));
     keyboardFromComboBox_.setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
+    audioFromLabel_.setLook(tss::headerPanelLabelLookFromSkin(skin));
+    audioFromComboBox_.setLook(tss::comboBoxLookFromSkin(skin));
+    audioFromComboBox_.setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
+    inputGainLabel_.setLook(tss::headerPanelLabelLookFromSkin(skin));
+    inputGainSlider_.setLook(tss::sliderLookFromSkin(skin));
+    peakIndicator_.setSkin(skin);
     skinLabel_.setLook(tss::headerPanelLabelLookFromSkin(skin));
     skinComboBox_.setLook(tss::comboBoxLookFromSkin(skin));
     skinComboBox_.setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
@@ -189,9 +231,14 @@ void HeaderPanel::setPluginMode(bool isPlugin)
     isPluginMode_ = isPlugin;
 
     if (isPluginMode_)
+    {
         configurePluginModeKeyboardFrom();
+        configurePluginModeAudioFrom();
+    }
     else
+    {
         configureStandaloneKeyboardFrom();
+    }
 }
 
 void HeaderPanel::populateMidiPortLists()
@@ -312,4 +359,88 @@ juce::String HeaderPanel::getSelectedPortIdentifier(const tss::ComboBox& combo,
                                                     const std::vector<juce::String>& identifiers) const
 {
     return getPortIdentifierForItemId(identifiers, combo.getSelectedId());
+}
+
+void HeaderPanel::populateAudioFromComboForPlugin()
+{
+    configurePluginModeAudioFrom();
+}
+
+void HeaderPanel::populateAudioFromComboForStandalone(const juce::StringArray& channelNames,
+                                                       const juce::StringArray& channelIds)
+{
+    configureStandaloneAudioFrom(channelNames, channelIds);
+}
+
+void HeaderPanel::configurePluginModeAudioFrom()
+{
+    const int previousMode = getSelectedAudioFromChannelMode();
+
+    audioFromComboBox_.clear(juce::dontSendNotification);
+    audioFromSourceIdentifiers_.clear();
+
+    audioFromComboBox_.addItem(PluginDisplayNames::HeaderPanel::kAudioFromStereo, 1);
+    audioFromComboBox_.addItem(PluginDisplayNames::HeaderPanel::kAudioFromMonoLeft, 2);
+    audioFromComboBox_.addItem(PluginDisplayNames::HeaderPanel::kAudioFromMonoRight, 3);
+
+    selectAudioFromChannelMode(previousMode);
+}
+
+void HeaderPanel::configureStandaloneAudioFrom(const juce::StringArray& channelNames,
+                                                const juce::StringArray& channelIds)
+{
+    const auto previousSourceId = getSelectedAudioFromSourceId();
+
+    audioFromComboBox_.clear(juce::dontSendNotification);
+    audioFromSourceIdentifiers_.clear();
+
+    const int count = juce::jmin(channelNames.size(), channelIds.size());
+
+    for (int i = 0; i < count; ++i)
+    {
+        const int itemId = i + 1;
+        audioFromComboBox_.addItem(channelNames[i], itemId);
+        audioFromSourceIdentifiers_.push_back(channelIds[i]);
+    }
+
+    if (count == 0)
+    {
+        audioFromComboBox_.addItem(PluginDisplayNames::HeaderPanel::kPortNoneSentinel, kPortSentinelItemId);
+        audioFromComboBox_.setSelectedId(kPortSentinelItemId, juce::dontSendNotification);
+        return;
+    }
+
+    selectAudioFromSourceId(previousSourceId);
+}
+
+int HeaderPanel::getSelectedAudioFromChannelMode() const
+{
+    if (!isPluginMode_)
+        return 0;
+
+    const int selectedId = audioFromComboBox_.getSelectedId();
+    return juce::jmax(0, selectedId - 1);
+}
+
+juce::String HeaderPanel::getSelectedAudioFromSourceId() const
+{
+    if (isPluginMode_)
+        return {};
+
+    return getSelectedPortIdentifier(audioFromComboBox_, audioFromSourceIdentifiers_);
+}
+
+void HeaderPanel::selectAudioFromChannelMode(int mode)
+{
+    const int itemId = juce::jlimit(1, 3, mode + 1);
+    audioFromComboBox_.setSelectedId(itemId, juce::dontSendNotification);
+}
+
+void HeaderPanel::selectAudioFromSourceId(const juce::String& sourceId)
+{
+    if (isPluginMode_)
+        return;
+
+    audioFromComboBox_.setSelectedId(findItemIdForIdentifier(audioFromSourceIdentifiers_, sourceId),
+                                     juce::dontSendNotification);
 }

@@ -6,6 +6,8 @@
 #include "GUI/Widgets/Button.h"
 #include "GUI/Widgets/ComboBox.h"
 #include "GUI/Widgets/Label.h"
+#include "GUI/Widgets/PeakIndicator.h"
+#include "GUI/Widgets/Slider.h"
 
 namespace tss
 {
@@ -31,9 +33,18 @@ public:
     void populateMidiPortLists();
     void refreshPortLists() { populateMidiPortLists(); }
 
+    void populateAudioFromComboForPlugin();
+    void populateAudioFromComboForStandalone(const juce::StringArray& channelNames,
+                                              const juce::StringArray& channelIds);
+
     juce::String getSelectedMidiFromPortIdentifier() const;
     juce::String getSelectedMidiToPortIdentifier() const;
     juce::String getSelectedKeyboardFromPortIdentifier() const;
+    int getSelectedAudioFromChannelMode() const;
+    juce::String getSelectedAudioFromSourceId() const;
+
+    void selectAudioFromChannelMode(int mode);
+    void selectAudioFromSourceId(const juce::String& sourceId);
 
     void selectMidiFromPort(const juce::String& deviceId);
     void selectMidiToPort(const juce::String& deviceId);
@@ -45,6 +56,9 @@ public:
     tss::ComboBox& getSkinComboBox() { return skinComboBox_; }
     tss::ComboBox& getUiScaleComboBox() { return uiScaleComboBox_; }
     tss::Button& getUiElementsButton() { return uiElementsButton_; }
+    tss::ComboBox& getAudioFromComboBox() { return audioFromComboBox_; }
+    tss::Slider& getInputGainSlider() { return inputGainSlider_; }
+    tss::PeakIndicator& getPeakIndicator() { return peakIndicator_; }
 
     static int getGap() { return kGap_; }
 
@@ -53,6 +67,9 @@ private:
     void populateOutputPortCombo(tss::ComboBox& combo, std::vector<juce::String>& identifiers);
     void configurePluginModeKeyboardFrom();
     void configureStandaloneKeyboardFrom();
+    void configurePluginModeAudioFrom();
+    void configureStandaloneAudioFrom(const juce::StringArray& channelNames,
+                                      const juce::StringArray& channelIds);
     int findItemIdForIdentifier(const std::vector<juce::String>& identifiers,
                                 const juce::String& deviceId) const;
     juce::String getSelectedPortIdentifier(const tss::ComboBox& combo,
@@ -63,7 +80,12 @@ private:
     inline constexpr static int kMidiFromLabelWidth_ = 72;
     inline constexpr static int kMidiToLabelWidth_ = 56;
     inline constexpr static int kKeyboardFromLabelWidth_ = 108;
+    inline constexpr static int kAudioFromLabelWidth_ = 88;
+    inline constexpr static int kInputGainLabelWidth_ = 88;
     inline constexpr static int kMidiPortComboBoxWidth_ = 96;
+    inline constexpr static int kAudioFromComboBoxWidth_ = 72;
+    inline constexpr static int kInputGainSliderWidth_ = 64;
+    inline constexpr static int kPeakIndicatorWidth_ = 8;
     inline constexpr static int kSkinLabelWidth_ = 30;
     inline constexpr static int kUiScaleLabelWidth_ = 35;
     inline constexpr static int kScaleComboBoxWidth_ = 50;
@@ -84,6 +106,11 @@ private:
     tss::ComboBox midiToComboBox_;
     tss::Label keyboardFromLabel_;
     tss::ComboBox keyboardFromComboBox_;
+    tss::Label audioFromLabel_;
+    tss::ComboBox audioFromComboBox_;
+    tss::Label inputGainLabel_;
+    tss::Slider inputGainSlider_;
+    tss::PeakIndicator peakIndicator_;
     tss::Label skinLabel_;
     tss::ComboBox skinComboBox_;
     tss::Label uiScaleLabel_;
@@ -93,6 +120,7 @@ private:
     std::vector<juce::String> midiFromPortIdentifiers_;
     std::vector<juce::String> midiToPortIdentifiers_;
     std::vector<juce::String> keyboardFromPortIdentifiers_;
+    std::vector<juce::String> audioFromSourceIdentifiers_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(HeaderPanel)
 };

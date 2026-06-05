@@ -1,7 +1,12 @@
+#include <cmath>
+
 #include <juce_audio_devices/juce_audio_devices.h>
 
 #include "PluginProcessor.h"
+#include "Core/Audio/AudioPassthroughProcessor.h"
 #include "Core/Audio/InstrumentMidiForwarder.h"
+#include "Core/Audio/StandaloneAudioInputRouter.h"
+
 #include "Core/MIDI/KeyboardFromMidiInput.h"
 #include "Core/MIDI/Queue/MidiOutboundQueue.h"
 #include "Core/Models/ApvtsMasterMapper.h"
@@ -46,15 +51,14 @@ namespace
 PluginProcessor::PluginProcessor()
     : AudioProcessor(BusesProperties()
 #if !JucePlugin_IsMidiEffect
-#if !JucePlugin_IsSynth
-                         .withInput("Input", juce::AudioChannelSet::stereo(), true)
-#endif
+                         .withInput("Audio From", juce::AudioChannelSet::stereo(), true)
                          .withOutput("Output", juce::AudioChannelSet::stereo(), true)
 #endif
     )
     , apvts(*this, nullptr, "PARAMETERS", createParameterLayout())
     , outboundQueue_{ std::make_unique<Core::MidiOutboundQueue>() }
     , instrumentForwarder_{ std::make_unique<Core::InstrumentMidiForwarder>() }
+    , audioPassthroughProcessor_{ std::make_unique<Core::AudioPassthroughProcessor>() }
     , keyboardFromMidiInput_{ std::make_unique<Core::KeyboardFromMidiInput>(*outboundQueue_) }
     , midiManager(std::make_unique<MidiManager>(apvts, *outboundQueue_))
     , patchModel_{ std::make_unique<Core::PatchModel>() }
@@ -90,6 +94,7 @@ PluginProcessor::PluginProcessor()
     buildMasterParameterIdSet();
     buildMatrixModParameterIdSet();
     initializeMidiPortProperties();
+    initializeAudioProperties();
     initializePatchNameProperty();
     apvts.state.addListener(this);
 }
@@ -164,7 +169,9 @@ void PluginProcessor::changeProgramName(int index, const juce::String& newName)
 
 void PluginProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
-    juce::ignoreUnused(sampleRate, samplesPerBlock);
+    juce::ignoreUnused(samplesPerBlock);
+    audioPassthroughSampleRate_ = sampleRate > 0.0 ? sampleRate : 44100.0;
+    refreshAudioPassthroughLayout(audioPassthroughSampleRate_);
 
     if (shouldUseDevelopmentLogging())
         ensureDevelopmentLoggingStarted();
@@ -203,19 +210,13 @@ void PluginProcessor::stopMidiThread()
 void PluginProcessor::processBlock(juce::AudioBuffer<float>& audioBuffer,
                                    juce::MidiBuffer& midiMessages)
 {
-    juce::ignoreUnused(audioBuffer);
+    instrumentForwarder_->forward(midiMessages, getInstrumentPathEnabled(midiMessages), *outboundQueue_);
 
-    // Plugin (DAW): non-empty host MIDI buffer implies track armed (D-056).
-    // Standalone: keyboardFromEnabled until Keyboard From UI (Epic 7/8).
-    const bool instrumentPathEnabled = isStandaloneWrapper()
-        ? [&]
-        {
-            const auto property = apvts.state.getProperty("keyboardFromEnabled", false);
-            return property.isBool() && static_cast<bool>(property);
-        }()
-        : (midiMessages.getNumEvents() > 0);
-
-    instrumentForwarder_->forward(midiMessages, instrumentPathEnabled, *outboundQueue_);
+    const bool inputEnabled = getBus(true, 0) != nullptr && getBus(true, 0)->isEnabled();
+    audioPassthroughProcessor_->updateChannelLayout(getMainBusNumInputChannels(),
+                                                    getMainBusNumOutputChannels(),
+                                                    inputEnabled);
+    audioPassthroughProcessor_->process(audioBuffer, inputGainLinear_.load(std::memory_order_relaxed));
 }
 
 juce::AudioProcessorEditor* PluginProcessor::createEditor()
@@ -239,6 +240,7 @@ void PluginProcessor::setStateInformation(const void* data, int sizeInBytes)
         if (xmlState->hasTagName(apvts.state.getType()))
         {
             apvts.replaceState(juce::ValueTree::fromXml(*xmlState));
+            syncAudioRuntimeFromState();
 
             if (shouldUseDevelopmentLogging())
                 ApvtsLogger::getInstance().logStateLoaded("DAW state");
@@ -314,6 +316,105 @@ void PluginProcessor::validatePluginDescriptorsAtStartup()
             DBG("  ERROR: " + error);
         }
     }
+}
+
+float PluginProcessor::dbToLinearGain(float gainDb) noexcept
+{
+    return std::pow(10.0f, gainDb / 20.0f);
+}
+
+bool PluginProcessor::getInstrumentPathEnabled(const juce::MidiBuffer& midiMessages) const
+{
+    if (isStandaloneWrapper())
+    {
+        const auto property = apvts.state.getProperty("keyboardFromEnabled", false);
+        return property.isBool() && static_cast<bool>(property);
+    }
+
+    return midiMessages.getNumEvents() > 0;
+}
+
+void PluginProcessor::refreshAudioPassthroughLayout(double sampleRate)
+{
+    const bool inputEnabled = getBus(true, 0) != nullptr && getBus(true, 0)->isEnabled();
+    audioPassthroughProcessor_->prepare(getMainBusNumInputChannels(),
+                                        getMainBusNumOutputChannels(),
+                                        inputEnabled,
+                                        sampleRate);
+}
+
+void PluginProcessor::syncAudioRuntimeFromState()
+{
+    const auto gainDb = static_cast<float>(apvts.state.getProperty("inputGainDb", 0.0f));
+    const float sanitizedDb = std::isfinite(gainDb) ? gainDb : 0.0f;
+    const float clampedDb = juce::jlimit(-24.0f, 12.0f, sanitizedDb);
+    inputGainLinear_.store(dbToLinearGain(clampedDb), std::memory_order_relaxed);
+
+    const int channelMode = static_cast<int>(apvts.state.getProperty("audioFromChannelMode", 0));
+    audioPassthroughProcessor_->setChannelMode(
+        static_cast<Core::AudioFromChannelMode>(juce::jlimit(0, 2, channelMode)));
+
+    if (isStandaloneWrapper())
+    {
+        const auto sourceId = apvts.state.getProperty("audioFromSourceId", juce::String()).toString();
+        if (sourceId.isNotEmpty())
+            Core::StandaloneAudioInputRouter::applySourceId(sourceId);
+    }
+}
+
+void PluginProcessor::setInputGainDb(float gainDb)
+{
+    if (!std::isfinite(gainDb))
+        gainDb = 0.0f;
+
+    const float clampedDb = juce::jlimit(-24.0f, 12.0f, gainDb);
+    inputGainLinear_.store(dbToLinearGain(clampedDb), std::memory_order_relaxed);
+    apvts.state.setProperty("inputGainDb", clampedDb, nullptr);
+}
+
+void PluginProcessor::setAudioFromChannelMode(int mode)
+{
+    const int clampedMode = juce::jlimit(0, 2, mode);
+    audioPassthroughProcessor_->setChannelMode(static_cast<Core::AudioFromChannelMode>(clampedMode));
+    apvts.state.setProperty("audioFromChannelMode", clampedMode, nullptr);
+}
+
+void PluginProcessor::setAudioFromSourceId(const juce::String& sourceId)
+{
+    Core::StandaloneAudioInputRouter::applySourceId(sourceId);
+    apvts.state.setProperty("audioFromSourceId", sourceId, nullptr);
+}
+
+juce::StringArray PluginProcessor::getStandaloneAudioInputNames() const
+{
+    return Core::StandaloneAudioInputRouter::getInputChannelNames();
+}
+
+juce::StringArray PluginProcessor::getStandaloneAudioInputIds() const
+{
+    return Core::StandaloneAudioInputRouter::getInputChannelIds();
+}
+
+void PluginProcessor::initializeAudioProperties()
+{
+    if (!apvts.state.hasProperty("inputGainDb"))
+        apvts.state.setProperty("inputGainDb", 0.0f, nullptr);
+
+    if (!apvts.state.hasProperty("audioFromChannelMode"))
+        apvts.state.setProperty("audioFromChannelMode", 0, nullptr);
+
+    if (!apvts.state.hasProperty("audioFromSourceId"))
+        apvts.state.setProperty("audioFromSourceId", juce::String(), nullptr);
+
+    const auto savedGainDb = static_cast<float>(apvts.state.getProperty("inputGainDb", 0.0f));
+    setInputGainDb(savedGainDb);
+
+    const auto savedChannelMode = static_cast<int>(apvts.state.getProperty("audioFromChannelMode", 0));
+    setAudioFromChannelMode(savedChannelMode);
+
+    const auto savedSourceId = apvts.state.getProperty("audioFromSourceId", juce::String()).toString();
+    if (savedSourceId.isNotEmpty())
+        setAudioFromSourceId(savedSourceId);
 }
 
 void PluginProcessor::initializeMidiPortProperties()
@@ -646,6 +747,7 @@ void PluginProcessor::valueTreeRedirected(juce::ValueTree& treeWhichHasBeenChang
     apvtsPatchMapper_->apvtsToBuffer();
     apvtsMasterMapper_->apvtsToBuffer();
     patchNameSyncer_->apvtsToBuffer();
+    syncAudioRuntimeFromState();
 }
 
 void PluginProcessor::buildPatchParameterIdSet()
