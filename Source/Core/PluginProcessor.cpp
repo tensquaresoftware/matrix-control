@@ -8,6 +8,7 @@
 #include "Core/Models/MasterModel.h"
 #include "Core/Models/PatchModel.h"
 #include "Core/Models/PatchNameSyncer.h"
+#include "Core/MIDI/PatchParameterSysExDispatcher.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 #include "GUI/PluginEditor.h"
 #include "MIDI/MidiManager.h"
@@ -56,6 +57,13 @@ PluginProcessor::PluginProcessor()
     , apvtsMasterMapper_{ std::make_unique<Core::ApvtsMasterMapper>(apvts, *masterModel_) }
     , patchNameSyncer_{ std::make_unique<Core::PatchNameSyncer>(apvts, *patchModel_) }
 {
+    patchParameterSysExDispatcher_ = std::make_unique<Core::PatchParameterSysExDispatcher>(
+        *patchModel_,
+        [this](int parameterNumber, juce::uint8 packedValue)
+        {
+            midiManager->enqueueRemoteParameterEdit(parameterNumber, packedValue);
+        });
+
     validatePluginDescriptorsAtStartup();
     buildChoiceParameterMap();
     buildPatchParameterIdSet();
@@ -489,7 +497,10 @@ void PluginProcessor::valueTreePropertyChanged(juce::ValueTree& treeWhosePropert
     }
 
     if (patchParameterIds_.count(parameterId) > 0)
+    {
         apvtsPatchMapper_->apvtsToBuffer();
+        patchParameterSysExDispatcher_->dispatch(parameterId);
+    }
 
     if (masterParameterIds_.count(parameterId) > 0)
         apvtsMasterMapper_->apvtsToBuffer();

@@ -32,6 +32,7 @@ public:
     void sendPatch(juce::uint8 patchNumber, const juce::uint8* packedData);
     void sendMaster(juce::uint8 version, const juce::uint8* packedData);
     void sendProgramChange(int programNumber, int channel = 1);
+    void enqueueRemoteParameterEdit(int parameterNumber, juce::uint8 packedValue);
 
     std::vector<juce::uint8> requestCurrentPatch();
     std::vector<juce::uint8> requestMasterData();

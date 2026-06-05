@@ -169,6 +169,17 @@ void MidiManager::sendProgramChange(int programNumber, int channel)
     }
 }
 
+void MidiManager::enqueueRemoteParameterEdit(int parameterNumber, juce::uint8 packedValue)
+{
+    if (parameterNumber < 0 || parameterNumber > 127)
+        return;
+
+    auto sysExMessage = sysExEncoder->encodeRemoteParameterEdit(
+        static_cast<juce::uint8>(parameterNumber),
+        packedValue);
+    editorPath_.enqueueSysEx(sysExMessage);
+}
+
 void MidiManager::sendSysExWithDelay(const juce::MemoryBlock& sysExMessage, const juce::String& description)
 {
     sysExDelay_.waitUntilReady();

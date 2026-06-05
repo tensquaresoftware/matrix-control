@@ -55,6 +55,42 @@ public:
             expect(checksum == 0x0F, "Checksum should be sum & 0x7F (1+2+3+4+5=15=0x0F)");
         }
         
+        beginTest("Remote Parameter Edit (0x06) encoding");
+        {
+            const juce::uint8 param = 12;
+            const juce::uint8 value = 37;
+            auto message = encoder.encodeRemoteParameterEdit(param, value);
+
+            expectEquals(static_cast<int>(message.getSize()), 7);
+
+            const auto* data = static_cast<const juce::uint8*>(message.getData());
+            expect(data[0] == SysExConstants::kSysExStart);
+            expect(data[1] == SysExConstants::kManufacturerIdOberheim);
+            expect(data[2] == SysExConstants::kDeviceIdMatrix1000);
+            expect(data[3] == SysExConstants::Opcode::kRemoteParameterEdit);
+            expect(data[4] == param);
+            expect(data[5] == value);
+            expect(data[6] == SysExConstants::kSysExEnd);
+        }
+
+        beginTest("Remote Parameter Edit (0x06) — parameter number masked to 7 bits");
+        {
+            const juce::uint8 paramWithHighBit = 200;
+            auto message = encoder.encodeRemoteParameterEdit(paramWithHighBit, 0);
+
+            const auto* data = static_cast<const juce::uint8*>(message.getData());
+            expect(data[4] == static_cast<juce::uint8>(paramWithHighBit & 0x7F));
+        }
+
+        beginTest("Remote Parameter Edit (0x06) — packed value above 127 passed through");
+        {
+            const juce::uint8 signedPackedByte = 251;
+            auto message = encoder.encodeRemoteParameterEdit(1, signedPackedByte);
+
+            const auto* data = static_cast<const juce::uint8*>(message.getData());
+            expect(data[5] == signedPackedByte);
+        }
+
         beginTest("Unpack bytes to nibbles");
         {
             juce::uint8 packedBytes[] = { 0x12, 0x34, 0x56 };

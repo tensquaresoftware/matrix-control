@@ -18,6 +18,7 @@ namespace Core
     class MasterModel;
     class ApvtsMasterMapper;
     class PatchNameSyncer;
+    class PatchParameterSysExDispatcher;
     class MidiOutboundQueue;
     class InstrumentMidiForwarder;
 }
@@ -127,6 +128,7 @@ private:
     std::unique_ptr<Core::MasterModel> masterModel_;
     std::unique_ptr<Core::ApvtsMasterMapper> apvtsMasterMapper_;
     std::unique_ptr<Core::PatchNameSyncer> patchNameSyncer_;
+    std::unique_ptr<Core::PatchParameterSysExDispatcher> patchParameterSysExDispatcher_;
     std::map<juce::String, PluginDescriptors::ChoiceParameterDescriptor> choiceParameterMap_;
     std::unordered_set<juce::String> patchParameterIds_;
     std::unordered_set<juce::String> masterParameterIds_;

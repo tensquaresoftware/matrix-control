@@ -126,6 +126,7 @@ set(PLUGIN_SOURCES
     Source/Core/MIDI/Transport/MidiSender.cpp
     Source/Core/MIDI/Transport/MidiReceiver.cpp
     Source/Core/MIDI/EditorPath.cpp
+    Source/Core/MIDI/PatchParameterSysExDispatcher.cpp
     Source/Core/MIDI/MidiManager.cpp
     Source/Core/MIDI/Queue/MidiOutboundQueue.cpp
     Source/Core/MIDI/Queue/SysExDelayProfile.cpp
@@ -236,6 +237,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/MidiManagerTests.cpp
         Tests/Unit/PatchModelTests.cpp
         Tests/Unit/SysExEncoderTests.cpp
+        Tests/Unit/PatchParameterSysExDispatcherTests.cpp
         Tests/Unit/EditorPathTests.cpp
         Tests/Unit/InstrumentMidiForwarderTests.cpp
         Tests/Unit/MidiOutboundQueueTests.cpp
@@ -246,11 +248,12 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/Models/ApvtsMasterMapper.cpp
         Source/Core/Models/ApvtsPatchMapper.cpp
         Source/Core/Models/MasterModel.cpp
+        Source/Core/Models/PatchModel.cpp
         Source/Core/Models/PatchNameSyncer.cpp
         Source/Core/Models/PackedFieldCodec.cpp
-        Source/Core/Models/PatchModel.cpp
         Source/Core/Audio/InstrumentMidiForwarder.cpp
         Source/Core/MIDI/EditorPath.cpp
+        Source/Core/MIDI/PatchParameterSysExDispatcher.cpp
         Source/Core/MIDI/Queue/MidiOutboundQueue.cpp
         Source/Core/MIDI/Queue/SysExDelayProfile.cpp
         Source/Core/MIDI/Queue/SysExInterMessageDelay.cpp

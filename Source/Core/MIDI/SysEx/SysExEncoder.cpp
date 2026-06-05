@@ -54,6 +54,23 @@ juce::MemoryBlock SysExEncoder::encodeRequestMessage(juce::uint8 requestType, ju
     return message;
 }
 
+juce::MemoryBlock SysExEncoder::encodeRemoteParameterEdit(juce::uint8 parameterNumber, juce::uint8 value) const
+{
+    const juce::uint8 message[] {
+        SysExConstants::kSysExStart,
+        SysExConstants::kManufacturerIdOberheim,
+        SysExConstants::kDeviceIdMatrix1000,
+        SysExConstants::Opcode::kRemoteParameterEdit,
+        static_cast<juce::uint8>(parameterNumber & 0x7F),
+        value,
+        SysExConstants::kSysExEnd
+    };
+
+    juce::MemoryBlock block;
+    block.append(message, sizeof(message));
+    return block;
+}
+
 size_t SysExEncoder::unpackBytes(const juce::uint8* bytes, size_t numBytes, juce::uint8* output)
 {
     for (size_t i = 0; i < numBytes; ++i)
