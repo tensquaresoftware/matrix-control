@@ -1,5 +1,13 @@
 # Deferred Work
 
+## Deferred from: code review of 2-9-wire-midimanager-queue-consumer (2026-06-05)
+
+- **RPC + consumer concurrent `sysExDelay_` / `MidiSender` access** (`MidiManager.cpp:223,275,351`) — brownfield threading; story completion notes accept timestamp-only gate; `MidiSender` not thread-safe if inquiry runs concurrent with consumer; no call-site refactor in scope.
+- **AC #8c strict `millisUntilNextAllowed` assertion absent** (`MidiManagerTests.cpp:113-133`) — gate-sharing test verifies drain-without-hang only; strict timing deferred to `SysExInterMessageDelayTests` per dev notes.
+- **`stopThread` during blocking `waitUntilReady`** (`MidiManager.cpp:351`) — consumer may block on inter-SysEx sleep; teardown races possible; same pattern as existing `PluginProcessor` lifecycle.
+- **No test for `MidiConnectionException` → `updateErrorState` in consumer** (`MidiManagerTests.cpp`) — catch branch unverified; no-output guard prevents throw in current tests.
+- **Drain tests assert queue empty, not bytes on wire** (`MidiManagerTests.cpp`) — no spy on `sendMidiMessage`/`sendSysEx`; hardware validation deferred to Story 2.9b smoke.
+
 ## Deferred from: code review of 2-6-matrix-mod-bus-parameter-sysex (2026-06-05)
 
 - **`readPackedByte` silent zero on invalid offset** (`MatrixModBusParameterSysExDispatcher.cpp:44-47`) — same `PackedFieldCodec::safeOffset` pattern as `PatchParameterSysExDispatcher`; descriptor offsets are stable.

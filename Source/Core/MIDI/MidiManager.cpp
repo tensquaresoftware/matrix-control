@@ -220,7 +220,7 @@ bool MidiManager::performDeviceInquiry()
     try
     {
         auto inquiryMessage = SysExEncoder::encodeDeviceInquiry();
-        midiSender->sendSysEx(inquiryMessage);
+        sendSysExWithDelay(inquiryMessage, "Device Inquiry");
 
         auto response = midiReceiver->waitForSysExResponse(SysExConstants::kDefaultTimeoutMs);
         
@@ -272,7 +272,7 @@ std::vector<juce::uint8> MidiManager::requestSysExData(juce::uint8 requestType, 
     try
     {
         auto requestMessage = sysExEncoder->encodeRequestMessage(requestType, 0);
-        midiSender->sendSysEx(requestMessage);
+        sendSysExWithDelay(requestMessage, requestDescription + " request");
 
         auto response = midiReceiver->waitForSysExResponse(SysExConstants::kDefaultTimeoutMs);
         
@@ -322,7 +322,44 @@ void MidiManager::run()
 {
     while (!threadShouldExit())
     {
-        wait(SysExConstants::kMinSysExDelayMs);
+        if (auto msg = outboundQueue_.dequeue())
+        {
+            dispatchOutboundMessage(*msg);
+            continue;
+        }
+
+        wait(1);
+    }
+}
+
+void MidiManager::dispatchOutboundMessage(const Core::MidiOutboundQueue::Message& msg)
+{
+    if (!midiSender->isOutputAvailable())
+    {
+        wait(1);
+        return;
+    }
+
+    try
+    {
+        if (msg.category == Core::MidiOutboundQueue::MessageCategory::kRealtime)
+        {
+            midiSender->sendMidiMessage(msg.midiMessage);
+            return;
+        }
+
+        if (msg.sysExData.getSize() == 0)
+            return;
+
+        sendSysExWithDelay(msg.sysExData, "QUEUED");
+    }
+    catch (const MidiConnectionException& e)
+    {
+        updateErrorState(e.getMessage(), "Connection");
+    }
+    catch (const std::exception& e)
+    {
+        updateErrorState(e.what(), "MIDI");
     }
 }
 

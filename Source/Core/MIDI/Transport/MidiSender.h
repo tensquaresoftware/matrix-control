@@ -14,6 +14,7 @@ public:
     void setMidiOutput(juce::MidiOutput* output) noexcept;
 
     void sendSysEx(const juce::MemoryBlock& sysExData);
+    void sendMidiMessage(const juce::MidiMessage& message);
     void sendProgramChange(int programNumber, int channel = 1);
     void sendNoteOn(juce::uint8 noteNumber, juce::uint8 velocity, int channel = 1);
     void sendNoteOff(juce::uint8 noteNumber, juce::uint8 velocity = 64, int channel = 1);

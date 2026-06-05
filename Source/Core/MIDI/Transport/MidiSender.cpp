@@ -23,6 +23,12 @@ void MidiSender::sendSysEx(const juce::MemoryBlock& sysExData)
     MidiLogger::getInstance().logSysExSent(sysExData);
 }
 
+void MidiSender::sendMidiMessage(const juce::MidiMessage& message)
+{
+    ensureOutputAvailable();
+    midiOutput->sendMessageNow(message);
+}
+
 void MidiSender::sendProgramChange(int programNumber, int channel)
 {
     ensureOutputAvailable();

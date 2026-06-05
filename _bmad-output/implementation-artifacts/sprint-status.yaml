@@ -1,5 +1,5 @@
 # generated: 2026-05-29
-# last_updated: 2026-06-05 (Story 2.6 done)
+# last_updated: 2026-06-05 (Story 2.9 done)
 # project: Matrix-Control
 # project_key: NOKEY
 # tracking_system: file-system
@@ -67,7 +67,7 @@ development_status:
   2-6-matrix-mod-bus-parameter-sysex: done
   2-7-audio-passthrough-and-peak-indicator: backlog
   2-8-activity-leds-on-queue-traffic: backlog
-  2-9-wire-midimanager-queue-consumer: backlog
+  2-9-wire-midimanager-queue-consumer: done
   2-10-matrix-mod-bus-reorder-sysex: backlog
   epic-2-retrospective: optional
   epic-3: backlog

@@ -257,9 +257,14 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/Models/PackedFieldCodec.cpp
         Source/Core/Audio/InstrumentMidiForwarder.cpp
         Source/Core/MIDI/EditorPath.cpp
+        Source/Core/MIDI/MidiManager.cpp
         Source/Core/MIDI/MasterParameterSysExDispatcher.cpp
         Source/Core/MIDI/MatrixModBusParameterSysExDispatcher.cpp
         Source/Core/MIDI/PatchParameterSysExDispatcher.cpp
+        Source/Core/MIDI/Ports/MidiInputPort.cpp
+        Source/Core/MIDI/Ports/MidiOutputPort.cpp
+        Source/Core/MIDI/Transport/MidiReceiver.cpp
+        Source/Core/MIDI/Transport/MidiSender.cpp
         Source/Core/MIDI/Queue/MidiOutboundQueue.cpp
         Source/Core/MIDI/Queue/SysExDelayProfile.cpp
         Source/Core/MIDI/Queue/SysExInterMessageDelay.cpp
@@ -287,6 +292,7 @@ if(MATRIX_BUILD_TESTS)
 
     target_link_libraries(Matrix-Control_Tests PRIVATE
         juce::juce_audio_processors
+        juce::juce_audio_devices
         juce::juce_core
         juce::juce_recommended_config_flags
         juce::juce_recommended_warning_flags

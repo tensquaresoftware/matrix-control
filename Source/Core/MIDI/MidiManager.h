@@ -63,6 +63,7 @@ private:
     void handleIncomingSysEx(const juce::MemoryBlock& sysEx);
     
     void stopMidiInputCallbacks();
+    void dispatchOutboundMessage(const Core::MidiOutboundQueue::Message& msg);
     void sendSysExWithDelay(const juce::MemoryBlock& sysExMessage, const juce::String& description);
     std::vector<juce::uint8> requestSysExData(juce::uint8 requestType, size_t expectedPackedSize, 
                                          const juce::String& requestDescription);
