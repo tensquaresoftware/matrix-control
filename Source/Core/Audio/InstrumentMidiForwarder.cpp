@@ -12,7 +12,8 @@ namespace Core
 
     void InstrumentMidiForwarder::forward(const juce::MidiBuffer& midiMessages,
                                             bool instrumentPathEnabled,
-                                            MidiOutboundQueue& queue) const
+                                            MidiOutboundQueue& queue,
+                                            MidiActivityTracker& tracker) const
     {
         if (!instrumentPathEnabled)
             return;
@@ -21,7 +22,10 @@ namespace Core
         {
             const auto message = metadata.getMessage();
             if (isAllowedInstrumentMessage(message))
+            {
                 queue.enqueueRealtime(message);
+                tracker.notifyActivity(MidiActivityTracker::Path::kInstrument);
+            }
         }
     }
 }

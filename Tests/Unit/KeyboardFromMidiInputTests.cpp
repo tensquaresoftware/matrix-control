@@ -1,6 +1,7 @@
 #include <juce_core/juce_core.h>
 
 #include "Core/MIDI/KeyboardFromMidiInput.h"
+#include "Core/MIDI/MidiActivityTracker.h"
 #include "Core/MIDI/Queue/MidiOutboundQueue.h"
 
 class KeyboardFromMidiInputTests : public juce::UnitTest
@@ -22,7 +23,8 @@ private:
         beginTest("No port open after empty setPort");
 
         Core::MidiOutboundQueue queue;
-        Core::KeyboardFromMidiInput input(queue);
+        Core::MidiActivityTracker tracker;
+        Core::KeyboardFromMidiInput input(queue, tracker);
 
         expect(!input.isPortOpen());
         expect(input.setPort({}));
@@ -35,7 +37,8 @@ private:
         beginTest("Note, CC, and pitch bend enqueued when processed");
 
         Core::MidiOutboundQueue queue;
-        Core::KeyboardFromMidiInput input(queue);
+        Core::MidiActivityTracker tracker;
+        Core::KeyboardFromMidiInput input(queue, tracker);
 
         input.processIncomingMessage(juce::MidiMessage::noteOn(1, 60, 0.8f));
         input.processIncomingMessage(juce::MidiMessage::controllerEvent(1, 7, 100));
@@ -61,7 +64,8 @@ private:
         beginTest("Program change and SysEx stripped — only note dequeued");
 
         Core::MidiOutboundQueue queue;
-        Core::KeyboardFromMidiInput input(queue);
+        Core::MidiActivityTracker tracker;
+        Core::KeyboardFromMidiInput input(queue, tracker);
 
         input.processIncomingMessage(juce::MidiMessage::programChange(1, 42));
         input.processIncomingMessage(juce::MidiMessage::noteOn(1, 60, 0.8f));
@@ -83,7 +87,8 @@ private:
         beginTest("Channel pressure and aftertouch stripped — only note dequeued");
 
         Core::MidiOutboundQueue queue;
-        Core::KeyboardFromMidiInput input(queue);
+        Core::MidiActivityTracker tracker;
+        Core::KeyboardFromMidiInput input(queue, tracker);
 
         input.processIncomingMessage(juce::MidiMessage::channelPressureChange(1, 80));
         input.processIncomingMessage(juce::MidiMessage::aftertouchChange(1, 60, 90));

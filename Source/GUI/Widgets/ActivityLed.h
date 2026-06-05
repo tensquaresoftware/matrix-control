@@ -8,12 +8,12 @@ namespace tss
 {
     class ISkin;
 
-    /// Solid vertical peak fill (D-071) — not a continuous VU meter.
-    class PeakIndicator : public juce::Component
+    /// Square activity LED with pulse + decay level (UX-DR3).
+    class ActivityLed : public juce::Component
     {
     public:
-        PeakIndicator(int width, int height);
-        ~PeakIndicator() override = default;
+        ActivityLed(int width, int height);
+        ~ActivityLed() override = default;
 
         void paint(juce::Graphics& g) override;
         void setSkin(ISkin& skin);
@@ -30,6 +30,6 @@ namespace tss
         float uiScale_ = 1.0f;
         float level_ = 0.0f;
 
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PeakIndicator)
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ActivityLed)
     };
 }

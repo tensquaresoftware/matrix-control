@@ -1,4 +1,4 @@
-#include "PeakIndicator.h"
+#include "ActivityLed.h"
 
 #include "GUI/Layout/ScaledDrawing.h"
 #include "GUI/Looks/LookBuilders.h"
@@ -6,14 +6,14 @@
 
 namespace tss
 {
-    PeakIndicator::PeakIndicator(int width, int height)
+    ActivityLed::ActivityLed(int width, int height)
         : width_(width)
         , height_(height)
     {
         setOpaque(false);
     }
 
-    void PeakIndicator::paint(juce::Graphics& g)
+    void ActivityLed::paint(juce::Graphics& g)
     {
         if (skin_ == nullptr)
             return;
@@ -33,27 +33,26 @@ namespace tss
         g.fillRect(innerBounds);
 
         const float clampedLevel = juce::jlimit(0.0f, 1.0f, level_);
-        const float fillHeight = innerBounds.getHeight() * clampedLevel;
-        const auto fillBounds = juce::Rectangle<float>(innerBounds.getX(),
-                                                       innerBounds.getBottom() - fillHeight,
-                                                       innerBounds.getWidth(),
-                                                       fillHeight);
 
-        g.setColour(look_.textEnabled);
-        g.fillRect(fillBounds);
+        if (clampedLevel > 0.0f)
+        {
+            const auto activeColour = look_.textEnabled.withAlpha(clampedLevel);
+            g.setColour(activeColour);
+            g.fillRect(innerBounds);
+        }
 
         g.setColour(look_.trackEnabled);
         g.drawRect(bounds, borderThickness);
     }
 
-    void PeakIndicator::setSkin(ISkin& skin)
+    void ActivityLed::setSkin(ISkin& skin)
     {
         skin_ = &skin;
         look_ = sliderLookFromSkin(skin);
         repaint();
     }
 
-    void PeakIndicator::setUiScale(float uiScale)
+    void ActivityLed::setUiScale(float uiScale)
     {
         if (juce::approximatelyEqual(uiScale_, uiScale))
             return;
@@ -62,7 +61,7 @@ namespace tss
         repaint();
     }
 
-    void PeakIndicator::setLevel(float normalisedLevel)
+    void ActivityLed::setLevel(float normalisedLevel)
     {
         const float clamped = juce::jlimit(0.0f, 1.0f, normalisedLevel);
 

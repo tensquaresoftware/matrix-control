@@ -3,6 +3,7 @@
 #include <juce_core/juce_core.h>
 
 #include "Core/MIDI/EditorPath.h"
+#include "Core/MIDI/MidiActivityTracker.h"
 #include "Core/MIDI/MasterParameterSysExDispatcher.h"
 #include "Core/MIDI/Queue/MidiOutboundQueue.h"
 #include "Core/MIDI/SysEx/SysExConstants.h"
@@ -57,6 +58,7 @@ private:
 
         Core::MasterModel model;
         Core::MidiOutboundQueue queue;
+        Core::MidiActivityTracker tracker;
         SysExEncoder encoder;
 
         constexpr juce::uint8 kMasterVersion = 0x03;
@@ -73,7 +75,7 @@ private:
             model,
             [&](const juce::uint8* packedData)
             {
-                Core::EditorPath editorPath(queue);
+                Core::EditorPath editorPath(queue, tracker);
                 editorPath.enqueueSysEx(encoder.encodeMasterSysEx(kMasterVersion, packedData));
             });
 
@@ -94,6 +96,7 @@ private:
 
         Core::MasterModel model;
         Core::MidiOutboundQueue queue;
+        Core::MidiActivityTracker tracker;
         SysExEncoder encoder;
 
         constexpr juce::uint8 kMasterVersion = 0x03;
@@ -110,7 +113,7 @@ private:
             model,
             [&](const juce::uint8* packedData)
             {
-                Core::EditorPath editorPath(queue);
+                Core::EditorPath editorPath(queue, tracker);
                 editorPath.enqueueSysEx(encoder.encodeMasterSysEx(kMasterVersion, packedData));
             });
 
@@ -128,13 +131,14 @@ private:
 
         Core::MasterModel model;
         Core::MidiOutboundQueue queue;
+        Core::MidiActivityTracker tracker;
 
         Core::MasterParameterSysExDispatcher dispatcher(
             model,
             [&](const juce::uint8* packedData)
             {
                 juce::ignoreUnused(packedData);
-                Core::EditorPath editorPath(queue);
+                Core::EditorPath editorPath(queue, tracker);
                 editorPath.enqueueSysEx(juce::MemoryBlock());
             });
 

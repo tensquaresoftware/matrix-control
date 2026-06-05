@@ -1,6 +1,7 @@
 #include "PluginEditor.h"
 
 #include "Core/Audio/AudioPassthroughProcessor.h"
+#include "Core/MIDI/MidiActivityTracker.h"
 #include "Core/PluginProcessor.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Panels/MainComponent/HeaderPanel/HeaderPanel.h"
@@ -10,10 +11,10 @@
 
 using tss::SkinColourId;
 
-class PluginEditor::PeakRefreshTimer : private juce::Timer
+class PluginEditor::HeaderRefreshTimer : private juce::Timer
 {
 public:
-    PeakRefreshTimer(PluginProcessor& processor, HeaderPanel& headerPanel)
+    HeaderRefreshTimer(PluginProcessor& processor, HeaderPanel& headerPanel)
         : processor_(processor)
         , headerPanel_(headerPanel)
     {
@@ -24,6 +25,14 @@ private:
     void timerCallback() override
     {
         headerPanel_.getPeakIndicator().setLevel(processor_.getAudioPassthroughProcessor().getPeakLevel());
+
+        const auto& tracker = processor_.getMidiActivityTracker();
+        headerPanel_.getInstrumentActivityLed().setLevel(
+            tracker.getActivityLevel(Core::MidiActivityTracker::Path::kInstrument));
+        headerPanel_.getEditorActivityLed().setLevel(
+            tracker.getActivityLevel(Core::MidiActivityTracker::Path::kEditor));
+        headerPanel_.getMidiToActivityLed().setLevel(
+            tracker.getActivityLevel(Core::MidiActivityTracker::Path::kOutbound));
     }
 
     PluginProcessor& processor_;
@@ -173,7 +182,7 @@ PluginEditor::PluginEditor(PluginProcessor& p)
             pluginProcessor.setAudioFromChannelMode(headerPanel.getSelectedAudioFromChannelMode());
     };
 
-    peakRefreshTimer_ = std::make_unique<PeakRefreshTimer>(pluginProcessor, headerPanel);
+    headerRefreshTimer_ = std::make_unique<HeaderRefreshTimer>(pluginProcessor, headerPanel);
 
     syncUiScaleFromEditor();
     layoutUiElementsTestComponent();

@@ -132,8 +132,9 @@ set(PLUGIN_SOURCES
     Source/Core/MIDI/EditorPath.cpp
     Source/Core/MIDI/MasterParameterSysExDispatcher.cpp
     Source/Core/MIDI/MatrixModBusParameterSysExDispatcher.cpp
-    Source/Core/MIDI/PatchParameterSysExDispatcher.cpp
+    Source/Core/MIDI/MidiActivityTracker.cpp
     Source/Core/MIDI/MidiManager.cpp
+    Source/Core/MIDI/PatchParameterSysExDispatcher.cpp
     Source/Core/MIDI/Queue/MidiOutboundQueue.cpp
     Source/Core/MIDI/Queue/SysExDelayProfile.cpp
     Source/Core/MIDI/Queue/SysExInterMessageDelay.cpp
@@ -202,6 +203,7 @@ set(PLUGIN_SOURCES
     Source/GUI/Widgets/MultiColumnPopupMenu.cpp
     Source/GUI/Widgets/NumberBox.cpp
     Source/GUI/Widgets/ParameterCell.cpp
+    Source/GUI/Widgets/ActivityLed.cpp
     Source/GUI/Widgets/PeakIndicator.cpp
     Source/GUI/Widgets/PatchNameDisplay.cpp
     Source/GUI/Widgets/PopupMenuBase.cpp
@@ -241,6 +243,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/ApvtsPatchMapperTests.cpp
         Tests/Unit/PatchNameSyncerTests.cpp
         Tests/Unit/MasterModelTests.cpp
+        Tests/Unit/MidiActivityTrackerTests.cpp
         Tests/Unit/MidiManagerTests.cpp
         Tests/Unit/PatchModelTests.cpp
         Tests/Unit/SysExEncoderTests.cpp
@@ -267,6 +270,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/Audio/InstrumentMidiForwarder.cpp
         Source/Core/MIDI/KeyboardFromMidiInput.cpp
         Source/Core/MIDI/EditorPath.cpp
+        Source/Core/MIDI/MidiActivityTracker.cpp
         Source/Core/MIDI/MidiManager.cpp
         Source/Core/MIDI/MasterParameterSysExDispatcher.cpp
         Source/Core/MIDI/MatrixModBusParameterSysExDispatcher.cpp

@@ -7,6 +7,7 @@
 #include "GUI/Skins/Skin.h"
 #include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Looks/LookBuilders.h"
+#include "Shared/Definitions/PluginAudioConstants.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginIDs.h"
 
@@ -47,13 +48,16 @@ HeaderPanel::HeaderPanel(tss::ISkin& skin, int width, int height)
     , height_(height)
     , skin_(&skin)
     , midiFromLabel_(kMidiFromLabelWidth_, kControlHeight_, tss::headerPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kMidiFromLabel, tss::LabelStyle::HeaderPanel)
-    , midiFromComboBox_(kMidiPortComboBoxWidth_, kControlHeight_, tss::comboBoxLookFromSkin(skin), tss::ComboBox::Style::ButtonLike)
+    , midiFromComboBox_(kPortComboBoxWidth_, kControlHeight_, tss::comboBoxLookFromSkin(skin), tss::ComboBox::Style::ButtonLike)
+    , editorActivityLed_(kActivityLedSize_, kActivityLedSize_)
     , midiToLabel_(kMidiToLabelWidth_, kControlHeight_, tss::headerPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kMidiToLabel, tss::LabelStyle::HeaderPanel)
-    , midiToComboBox_(kMidiPortComboBoxWidth_, kControlHeight_, tss::comboBoxLookFromSkin(skin), tss::ComboBox::Style::ButtonLike)
+    , midiToComboBox_(kPortComboBoxWidth_, kControlHeight_, tss::comboBoxLookFromSkin(skin), tss::ComboBox::Style::ButtonLike)
+    , midiToActivityLed_(kActivityLedSize_, kActivityLedSize_)
     , keyboardFromLabel_(kKeyboardFromLabelWidth_, kControlHeight_, tss::headerPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kKeyboardFromLabel, tss::LabelStyle::HeaderPanel)
-    , keyboardFromComboBox_(kMidiPortComboBoxWidth_, kControlHeight_, tss::comboBoxLookFromSkin(skin), tss::ComboBox::Style::ButtonLike)
+    , keyboardFromComboBox_(kPortComboBoxWidth_, kControlHeight_, tss::comboBoxLookFromSkin(skin), tss::ComboBox::Style::ButtonLike)
+    , instrumentActivityLed_(kActivityLedSize_, kActivityLedSize_)
     , audioFromLabel_(kAudioFromLabelWidth_, kControlHeight_, tss::headerPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kAudioFromLabel, tss::LabelStyle::HeaderPanel)
-    , audioFromComboBox_(kAudioFromComboBoxWidth_, kControlHeight_, tss::comboBoxLookFromSkin(skin), tss::ComboBox::Style::ButtonLike)
+    , audioFromComboBox_(kPortComboBoxWidth_, kControlHeight_, tss::comboBoxLookFromSkin(skin), tss::ComboBox::Style::ButtonLike)
     , inputGainLabel_(kInputGainLabelWidth_, kControlHeight_, tss::headerPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kInputGainLabel, tss::LabelStyle::HeaderPanel)
     , inputGainSlider_(kInputGainSliderWidth_, kControlHeight_, tss::sliderLookFromSkin(skin), 0.0)
     , peakIndicator_(kPeakIndicatorWidth_, kControlHeight_)
@@ -68,21 +72,30 @@ HeaderPanel::HeaderPanel(tss::ISkin& skin, int width, int height)
     addAndMakeVisible(midiFromLabel_);
     midiFromComboBox_.setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
     addAndMakeVisible(midiFromComboBox_);
+    editorActivityLed_.setSkin(skin);
+    addAndMakeVisible(editorActivityLed_);
 
     addAndMakeVisible(midiToLabel_);
     midiToComboBox_.setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
     addAndMakeVisible(midiToComboBox_);
+    midiToActivityLed_.setSkin(skin);
+    addAndMakeVisible(midiToActivityLed_);
 
     addAndMakeVisible(keyboardFromLabel_);
     keyboardFromComboBox_.setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
     addAndMakeVisible(keyboardFromComboBox_);
+    instrumentActivityLed_.setSkin(skin);
+    addAndMakeVisible(instrumentActivityLed_);
 
     addAndMakeVisible(audioFromLabel_);
     audioFromComboBox_.setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
     addAndMakeVisible(audioFromComboBox_);
 
     addAndMakeVisible(inputGainLabel_);
-    inputGainSlider_.setRange(-24.0, 12.0, 0.1);
+    inputGainSlider_.setRange(PluginAudioConstants::kMinInputGainDb,
+                              PluginAudioConstants::kMaxInputGainDb,
+                              0.1);
+    inputGainSlider_.setUnit("dB");
     addAndMakeVisible(inputGainSlider_);
 
     peakIndicator_.setSkin(skin);
@@ -128,20 +141,20 @@ void HeaderPanel::resized()
     const auto bounds = getLocalBounds();
     const float sf = uiScale_;
     const float gap = static_cast<float>(kGap_) * sf;
+    const float packetExternalGap = static_cast<float>(kPacketExternalGap_) * sf;
     const float controlHeight = static_cast<float>(kControlHeight_) * sf;
     const float scaledHeight = static_cast<float>(height_) * sf;
     const float controlY = (scaledHeight - controlHeight) * 0.5f;
 
-    const float leftPadding = static_cast<float>(kLeftPadding_) * sf;
     const float midiFromLabelWidth = static_cast<float>(kMidiFromLabelWidth_) * sf;
     const float midiToLabelWidth = static_cast<float>(kMidiToLabelWidth_) * sf;
     const float keyboardFromLabelWidth = static_cast<float>(kKeyboardFromLabelWidth_) * sf;
     const float audioFromLabelWidth = static_cast<float>(kAudioFromLabelWidth_) * sf;
     const float inputGainLabelWidth = static_cast<float>(kInputGainLabelWidth_) * sf;
-    const float midiPortComboWidth = static_cast<float>(kMidiPortComboBoxWidth_) * sf;
-    const float audioFromComboWidth = static_cast<float>(kAudioFromComboBoxWidth_) * sf;
+    const float portComboWidth = static_cast<float>(kPortComboBoxWidth_) * sf;
     const float inputGainSliderWidth = static_cast<float>(kInputGainSliderWidth_) * sf;
     const float peakIndicatorWidth = static_cast<float>(kPeakIndicatorWidth_) * sf;
+    const float activityLedSize = static_cast<float>(kActivityLedSize_) * sf;
     const float uiScaleLabelWidth = static_cast<float>(kUiScaleLabelWidth_) * sf;
     const float scaleComboWidth = static_cast<float>(kScaleComboBoxWidth_) * sf;
     const float skinLabelWidth = static_cast<float>(kSkinLabelWidth_) * sf;
@@ -149,11 +162,78 @@ void HeaderPanel::resized()
     const float uiElementsButtonWidth = static_cast<float>(kUiElementsButtonWidth_) * sf;
     const float rightPadding = static_cast<float>(kRightPadding_) * sf;
 
-    float x = static_cast<float>(bounds.getX()) + leftPadding;
+    float x = static_cast<float>(bounds.getX()) + gap;
     const int y = juce::roundToInt(static_cast<float>(bounds.getY()) + controlY);
     const int h = juce::roundToInt(controlHeight);
+    const int activityLedY = juce::roundToInt(static_cast<float>(bounds.getY()) + controlY
+                                              + (controlHeight - activityLedSize) * 0.5f);
+    const int activityLedH = juce::roundToInt(activityLedSize);
 
-    auto placeLabelAndCombo = [&](tss::Label& label, float labelWidth, tss::ComboBox& combo, float comboWidth)
+    auto placePacketLabel = [&](tss::Label& label, float labelWidth)
+    {
+        label.setBounds(juce::roundToInt(x), y, juce::roundToInt(labelWidth), h);
+        label.setUiScale(uiScale_);
+        x += labelWidth + gap;
+    };
+
+    auto placePacketCombo = [&](tss::ComboBox& combo, float comboWidth)
+    {
+        combo.setBounds(juce::roundToInt(x), y, juce::roundToInt(comboWidth), h);
+        combo.setUiScale(uiScale_);
+        x += comboWidth + gap;
+    };
+
+    auto placePacketActivityLed = [&](tss::ActivityLed& led)
+    {
+        led.setBounds(juce::roundToInt(x), activityLedY, juce::roundToInt(activityLedSize), activityLedH);
+        led.setUiScale(uiScale_);
+        x += activityLedSize + gap;
+    };
+
+    auto placePacketSlider = [&](tss::Slider& slider, float sliderWidth)
+    {
+        slider.setBounds(juce::roundToInt(x), y, juce::roundToInt(sliderWidth), h);
+        slider.setUiScale(uiScale_);
+        x += sliderWidth + gap;
+    };
+
+    auto placePacketPeak = [&](tss::PeakIndicator& peak)
+    {
+        peak.setBounds(juce::roundToInt(x), y, juce::roundToInt(peakIndicatorWidth), h);
+        peak.setUiScale(uiScale_);
+        x += peakIndicatorWidth + gap;
+    };
+
+    auto endPacket = [&]()
+    {
+        x += packetExternalGap - gap;
+    };
+
+    placePacketLabel(midiFromLabel_, midiFromLabelWidth);
+    placePacketCombo(midiFromComboBox_, portComboWidth);
+    placePacketActivityLed(editorActivityLed_);
+    endPacket();
+
+    placePacketLabel(midiToLabel_, midiToLabelWidth);
+    placePacketCombo(midiToComboBox_, portComboWidth);
+    placePacketActivityLed(midiToActivityLed_);
+    endPacket();
+
+    placePacketLabel(keyboardFromLabel_, keyboardFromLabelWidth);
+    placePacketCombo(keyboardFromComboBox_, portComboWidth);
+    placePacketActivityLed(instrumentActivityLed_);
+    endPacket();
+
+    placePacketLabel(audioFromLabel_, audioFromLabelWidth);
+    placePacketCombo(audioFromComboBox_, portComboWidth);
+    endPacket();
+
+    placePacketLabel(inputGainLabel_, inputGainLabelWidth);
+    placePacketSlider(inputGainSlider_, inputGainSliderWidth);
+    placePacketPeak(peakIndicator_);
+    endPacket();
+
+    auto placeRightClusterLabelAndCombo = [&](tss::Label& label, float labelWidth, tss::ComboBox& combo, float comboWidth)
     {
         label.setBounds(juce::roundToInt(x), y, juce::roundToInt(labelWidth), h);
         label.setUiScale(uiScale_);
@@ -161,28 +241,11 @@ void HeaderPanel::resized()
 
         combo.setBounds(juce::roundToInt(x), y, juce::roundToInt(comboWidth), h);
         combo.setUiScale(uiScale_);
-        x += comboWidth + gap * 2.0f;
+        x += comboWidth + packetExternalGap;
     };
 
-    placeLabelAndCombo(midiFromLabel_, midiFromLabelWidth, midiFromComboBox_, midiPortComboWidth);
-    placeLabelAndCombo(midiToLabel_, midiToLabelWidth, midiToComboBox_, midiPortComboWidth);
-    placeLabelAndCombo(keyboardFromLabel_, keyboardFromLabelWidth, keyboardFromComboBox_, midiPortComboWidth);
-    placeLabelAndCombo(audioFromLabel_, audioFromLabelWidth, audioFromComboBox_, audioFromComboWidth);
-
-    inputGainLabel_.setBounds(juce::roundToInt(x), y, juce::roundToInt(inputGainLabelWidth), h);
-    inputGainLabel_.setUiScale(uiScale_);
-    x += inputGainLabelWidth + gap;
-
-    inputGainSlider_.setBounds(juce::roundToInt(x), y, juce::roundToInt(inputGainSliderWidth), h);
-    inputGainSlider_.setUiScale(uiScale_);
-    x += inputGainSliderWidth + gap;
-
-    peakIndicator_.setBounds(juce::roundToInt(x), y, juce::roundToInt(peakIndicatorWidth), h);
-    peakIndicator_.setUiScale(uiScale_);
-    x += peakIndicatorWidth + gap * 2.0f;
-
-    placeLabelAndCombo(uiScaleLabel_, uiScaleLabelWidth, uiScaleComboBox_, scaleComboWidth);
-    placeLabelAndCombo(skinLabel_, skinLabelWidth, skinComboBox_, skinComboWidth);
+    placeRightClusterLabelAndCombo(uiScaleLabel_, uiScaleLabelWidth, uiScaleComboBox_, scaleComboWidth);
+    placeRightClusterLabelAndCombo(skinLabel_, skinLabelWidth, skinComboBox_, skinComboWidth);
 
     const float uiElementsButtonX = static_cast<float>(bounds.getRight()) - rightPadding - uiElementsButtonWidth;
     uiElementsButton_.setBounds(juce::roundToInt(uiElementsButtonX), y, juce::roundToInt(uiElementsButtonWidth), h);
@@ -207,6 +270,9 @@ void HeaderPanel::setSkin(tss::ISkin& skin)
     inputGainLabel_.setLook(tss::headerPanelLabelLookFromSkin(skin));
     inputGainSlider_.setLook(tss::sliderLookFromSkin(skin));
     peakIndicator_.setSkin(skin);
+    editorActivityLed_.setSkin(skin);
+    midiToActivityLed_.setSkin(skin);
+    instrumentActivityLed_.setSkin(skin);
     skinLabel_.setLook(tss::headerPanelLabelLookFromSkin(skin));
     skinComboBox_.setLook(tss::comboBoxLookFromSkin(skin));
     skinComboBox_.setPopupMenuLook(tss::popupMenuLookFromSkin(skin));

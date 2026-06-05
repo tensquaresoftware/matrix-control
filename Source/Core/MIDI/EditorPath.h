@@ -3,6 +3,7 @@
 #include <juce_audio_basics/juce_audio_basics.h>
 
 #include "Core/MIDI/Queue/MidiOutboundQueue.h"
+#include "Core/MIDI/MidiActivityTracker.h"
 
 namespace Core
 {
@@ -11,12 +12,13 @@ namespace Core
     class EditorPath
     {
     public:
-        explicit EditorPath(MidiOutboundQueue& queue) noexcept;
+        explicit EditorPath(MidiOutboundQueue& queue, MidiActivityTracker& tracker) noexcept;
 
         void enqueueSysEx(juce::MemoryBlock sysEx);
         void enqueueProgramChange(int programNumber, int channel = 1);
 
     private:
         MidiOutboundQueue& queue_;
+        MidiActivityTracker& tracker_;
     };
 }

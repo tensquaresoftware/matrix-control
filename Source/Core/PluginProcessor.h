@@ -26,6 +26,7 @@ namespace Core
     class InstrumentMidiForwarder;
     class KeyboardFromMidiInput;
     class AudioPassthroughProcessor;
+    class MidiActivityTracker;
 }
 
 class PluginProcessor : public juce::AudioProcessor, public juce::ValueTree::Listener
@@ -94,6 +95,9 @@ public:
     Core::AudioPassthroughProcessor& getAudioPassthroughProcessor() noexcept { return *audioPassthroughProcessor_; }
     const Core::AudioPassthroughProcessor& getAudioPassthroughProcessor() const noexcept { return *audioPassthroughProcessor_; }
 
+    Core::MidiActivityTracker& getMidiActivityTracker() noexcept { return *midiActivityTracker_; }
+    const Core::MidiActivityTracker& getMidiActivityTracker() const noexcept { return *midiActivityTracker_; }
+
     bool isStandalone() const;
 
     void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
@@ -143,6 +147,7 @@ private:
     void buildMatrixModParameterIdSet();
 
     juce::AudioProcessorValueTreeState apvts;
+    std::unique_ptr<Core::MidiActivityTracker> midiActivityTracker_;
     std::unique_ptr<Core::MidiOutboundQueue> outboundQueue_;
     std::unique_ptr<Core::InstrumentMidiForwarder> instrumentForwarder_;
     std::unique_ptr<Core::AudioPassthroughProcessor> audioPassthroughProcessor_;

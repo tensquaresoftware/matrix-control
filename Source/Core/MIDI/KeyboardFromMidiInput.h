@@ -5,6 +5,7 @@
 #include <juce_audio_devices/juce_audio_devices.h>
 
 #include "Core/MIDI/Queue/MidiOutboundQueue.h"
+#include "Core/MIDI/MidiActivityTracker.h"
 
 namespace Core
 {
@@ -14,7 +15,7 @@ namespace Core
     class KeyboardFromMidiInput : public juce::MidiInputCallback
     {
     public:
-        explicit KeyboardFromMidiInput(MidiOutboundQueue& queue);
+        explicit KeyboardFromMidiInput(MidiOutboundQueue& queue, MidiActivityTracker& tracker);
         ~KeyboardFromMidiInput() override;
 
         bool setPort(const juce::String& deviceId);
@@ -28,6 +29,7 @@ namespace Core
 
     private:
         MidiOutboundQueue& queue_;
+        MidiActivityTracker& tracker_;
         std::unique_ptr<juce::MidiInput> midiInput_;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(KeyboardFromMidiInput)

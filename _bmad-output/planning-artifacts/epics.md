@@ -596,6 +596,22 @@ So that permuted Source/Amount/Destination values reach the synth (FR-50, SysEx 
 **Then** SysEx updates all affected bus rows without renumbering indices 0–9
 **And** inactive buses (NONE/0%/NONE) can be permuted like active rows
 
+### Story 2.11: Header Panel Layout and Widget Styling
+
+As a performer,
+I want the header routing controls laid out with consistent gaps and correctly styled audio/MIDI indicators,
+So that I can read port selection, activity, and input level at a glance (FR-8, FR-9, FR-39 polish).
+
+**Acceptance Criteria:**
+
+**Given** Stories 2.7, 2.8, and 2.9b (routing cluster present in `HeaderPanel`)
+**When** the header is laid out at any UI scale
+**Then** the left routing row uses `kGap_` (5 px design) from the left edge, `kGap_` between elements within a logical packet, and `2×kGap_` between packets (MIDI FROM → MIDI TO → KEYBOARD FROM → AUDIO FROM → INPUT GAIN)
+**And** Editor, Instrument, and new outbound activity LEDs sit immediately to the right of the MIDI FROM, KEYBOARD FROM, and MIDI TO combos respectively (`kGap_` spacing); INSTRUMENT/EDITOR text labels are removed
+**And** port combos are 96×20; input gain slider is 60×20 (−∞…+12 dB, unit `dB`); peak indicator is 12×20; activity LEDs are 12×12 squares with slider-matched border and colours
+**And** `MidiActivityTracker::Path::kOutbound` drives the MIDI TO LED from successful `MidiManager` dispatch
+**And** full FR-41 shell polish remains Story 7.8
+
 ---
 
 ## Epic 3: Init Templates & Module Defaults
@@ -1223,9 +1239,9 @@ All **60 FRs** (FR-1–FR-60) mapped in § FR Coverage Map and addressed by at l
 
 ### Story Quality Validation ✅
 
-- **63 stories** — each with Given/When/Then AC and FR references.
+- **64 stories** — each with Given/When/Then AC and FR references.
 - **No forward within-epic dependencies** detected (e.g. Epic 6: 6.1 spec before 6.4 MUTATE).
-- **Scope:** sized for single dev-agent sessions (Epic 2 split into 10 stories intentionally).
+- **Scope:** sized for single dev-agent sessions (Epic 2: 2.1–2.11 plus 2.9b UAT slice).
 
 ### Epic Structure Validation ✅
 

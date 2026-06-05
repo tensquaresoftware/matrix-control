@@ -2,6 +2,7 @@
 
 #include "Core/Audio/InstrumentMidiForwarder.h"
 #include "Core/MIDI/EditorPath.h"
+#include "Core/MIDI/MidiActivityTracker.h"
 #include "Core/MIDI/Queue/MidiOutboundQueue.h"
 
 class EditorPathTests : public juce::UnitTest
@@ -14,6 +15,7 @@ public:
         testEnqueueSysExCategory();
         testEnqueueProgramChangeRealtime();
         testEditorEnqueueWhileInstrumentPathDisabled();
+        testTrackerNotifiedOnEnqueue();
     }
 
 private:
@@ -22,7 +24,8 @@ private:
         beginTest("EditorPath SysEx — dequeue returns kSysEx");
 
         Core::MidiOutboundQueue queue;
-        Core::EditorPath editorPath(queue);
+        Core::MidiActivityTracker tracker;
+        Core::EditorPath editorPath(queue, tracker);
         juce::MemoryBlock sysEx { "\xf0\x41\xf7", 3 };
 
         editorPath.enqueueSysEx(sysEx);
@@ -39,7 +42,8 @@ private:
         beginTest("EditorPath program change — dequeue returns kRealtime");
 
         Core::MidiOutboundQueue queue;
-        Core::EditorPath editorPath(queue);
+        Core::MidiActivityTracker tracker;
+        Core::EditorPath editorPath(queue, tracker);
 
         editorPath.enqueueProgramChange(42, 1);
 
@@ -57,12 +61,13 @@ private:
         beginTest("Editor enqueue works while instrument path disabled");
 
         Core::MidiOutboundQueue queue;
+        Core::MidiActivityTracker tracker;
         Core::InstrumentMidiForwarder forwarder;
-        Core::EditorPath editorPath(queue);
+        Core::EditorPath editorPath(queue, tracker);
 
         juce::MidiBuffer buffer;
         buffer.addEvent(juce::MidiMessage::noteOn(1, 60, 0.8f), 0);
-        forwarder.forward(buffer, false, queue);
+        forwarder.forward(buffer, false, queue, tracker);
         expect(queue.isEmpty());
 
         editorPath.enqueueProgramChange(7, 1);
@@ -71,6 +76,20 @@ private:
         expect(msg.has_value());
         expect(msg->midiMessage.isProgramChange());
         expect(queue.isEmpty());
+    }
+
+    void testTrackerNotifiedOnEnqueue()
+    {
+        beginTest("Activity tracker notified on editor enqueue");
+
+        Core::MidiOutboundQueue queue;
+        Core::MidiActivityTracker tracker;
+        Core::EditorPath editorPath(queue, tracker);
+
+        editorPath.enqueueProgramChange(3, 1);
+
+        expectEquals(tracker.getActivityLevel(Core::MidiActivityTracker::Path::kEditor), 1.0f);
+        expectEquals(tracker.getActivityLevel(Core::MidiActivityTracker::Path::kInstrument), 0.0f);
     }
 };
 

@@ -3,6 +3,7 @@
 #include <juce_core/juce_core.h>
 
 #include "Core/MIDI/EditorPath.h"
+#include "Core/MIDI/MidiActivityTracker.h"
 #include "Core/MIDI/PatchParameterSysExDispatcher.h"
 #include "Core/Models/ApvtsPatchMapper.h"
 #include "Core/Models/PackedFieldCodec.h"
@@ -63,6 +64,7 @@ private:
 
         Core::PatchModel model;
         Core::MidiOutboundQueue queue;
+        Core::MidiActivityTracker tracker;
         SysExEncoder encoder;
 
         const auto intDescs = Core::ApvtsPatchMapper::buildIntDescriptors();
@@ -78,7 +80,7 @@ private:
             model,
             [&](int parameterNumber, juce::uint8 packedValue)
             {
-                Core::EditorPath editorPath(queue);
+                Core::EditorPath editorPath(queue, tracker);
                 editorPath.enqueueSysEx(encoder.encodeRemoteParameterEdit(
                     static_cast<juce::uint8>(parameterNumber),
                     packedValue));
@@ -98,6 +100,7 @@ private:
 
         Core::PatchModel model;
         Core::MidiOutboundQueue queue;
+        Core::MidiActivityTracker tracker;
         SysExEncoder encoder;
 
         const auto intDescs = Core::ApvtsPatchMapper::buildIntDescriptors();
@@ -114,7 +117,7 @@ private:
             model,
             [&](int parameterNumber, juce::uint8 packedValue)
             {
-                Core::EditorPath editorPath(queue);
+                Core::EditorPath editorPath(queue, tracker);
                 editorPath.enqueueSysEx(encoder.encodeRemoteParameterEdit(
                     static_cast<juce::uint8>(parameterNumber),
                     packedValue));
@@ -144,6 +147,7 @@ private:
 
         Core::PatchModel model;
         Core::MidiOutboundQueue queue;
+        Core::MidiActivityTracker tracker;
         SysExEncoder encoder;
 
         model.setChoiceIndex(*desc, 2);
@@ -152,7 +156,7 @@ private:
             model,
             [&](int parameterNumber, juce::uint8 packedValue)
             {
-                Core::EditorPath editorPath(queue);
+                Core::EditorPath editorPath(queue, tracker);
                 editorPath.enqueueSysEx(encoder.encodeRemoteParameterEdit(
                     static_cast<juce::uint8>(parameterNumber),
                     packedValue));

@@ -1,6 +1,7 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_core/juce_core.h>
 
+#include "Core/MIDI/MidiActivityTracker.h"
 #include "Core/MIDI/MidiManager.h"
 #include "Core/MIDI/Queue/MidiOutboundQueue.h"
 
@@ -79,8 +80,9 @@ private:
         beginTest("Enqueue realtime — consumer drains queue (no output port)");
 
         Core::MidiOutboundQueue queue;
+        Core::MidiActivityTracker tracker;
         MinimalAudioProcessor proc;
-        MidiManager manager(proc.apvts, queue);
+        MidiManager manager(proc.apvts, queue, tracker);
 
         manager.startThread();
         manager.sendProgramChange(42, 1);
@@ -95,8 +97,9 @@ private:
         beginTest("Enqueue SysEx — consumer drains queue (no output port)");
 
         Core::MidiOutboundQueue queue;
+        Core::MidiActivityTracker tracker;
         MinimalAudioProcessor proc;
-        MidiManager manager(proc.apvts, queue);
+        MidiManager manager(proc.apvts, queue, tracker);
 
         manager.startThread();
         manager.enqueueRemoteParameterEdit(10, 64);
@@ -111,8 +114,9 @@ private:
         beginTest("Queued SysEx gate sharing (sendSysExWithDelay) — two SysEx drain without hang");
 
         Core::MidiOutboundQueue queue;
+        Core::MidiActivityTracker tracker;
         MinimalAudioProcessor proc;
-        MidiManager manager(proc.apvts, queue);
+        MidiManager manager(proc.apvts, queue, tracker);
 
         const auto outputId = firstAvailableOutputDeviceId();
         if (outputId.isNotEmpty())
@@ -135,8 +139,9 @@ private:
         beginTest("No output port — enqueue + drain does not throw");
 
         Core::MidiOutboundQueue queue;
+        Core::MidiActivityTracker tracker;
         MinimalAudioProcessor proc;
-        MidiManager manager(proc.apvts, queue);
+        MidiManager manager(proc.apvts, queue, tracker);
 
         manager.startThread();
 
@@ -161,8 +166,9 @@ private:
         beginTest("Empty SysEx payload — dequeued and skipped without sendSysExWithDelay");
 
         Core::MidiOutboundQueue queue;
+        Core::MidiActivityTracker tracker;
         MinimalAudioProcessor proc;
-        MidiManager manager(proc.apvts, queue);
+        MidiManager manager(proc.apvts, queue, tracker);
 
         manager.startThread();
         queue.enqueueSysEx(juce::MemoryBlock());

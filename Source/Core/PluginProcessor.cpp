@@ -8,6 +8,7 @@
 #include "Core/Audio/StandaloneAudioInputRouter.h"
 
 #include "Core/MIDI/KeyboardFromMidiInput.h"
+#include "Core/MIDI/MidiActivityTracker.h"
 #include "Core/MIDI/Queue/MidiOutboundQueue.h"
 #include "Core/Models/ApvtsMasterMapper.h"
 #include "Core/Models/ApvtsPatchMapper.h"
@@ -17,6 +18,7 @@
 #include "Core/MIDI/MasterParameterSysExDispatcher.h"
 #include "Core/MIDI/MatrixModBusParameterSysExDispatcher.h"
 #include "Core/MIDI/PatchParameterSysExDispatcher.h"
+#include "Shared/Definitions/PluginAudioConstants.h"
 #include "Shared/Definitions/Matrix1000Limits.h"
 #include "Shared/Definitions/PluginDescriptors.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
@@ -56,11 +58,12 @@ PluginProcessor::PluginProcessor()
 #endif
     )
     , apvts(*this, nullptr, "PARAMETERS", createParameterLayout())
+    , midiActivityTracker_{ std::make_unique<Core::MidiActivityTracker>() }
     , outboundQueue_{ std::make_unique<Core::MidiOutboundQueue>() }
     , instrumentForwarder_{ std::make_unique<Core::InstrumentMidiForwarder>() }
     , audioPassthroughProcessor_{ std::make_unique<Core::AudioPassthroughProcessor>() }
-    , keyboardFromMidiInput_{ std::make_unique<Core::KeyboardFromMidiInput>(*outboundQueue_) }
-    , midiManager(std::make_unique<MidiManager>(apvts, *outboundQueue_))
+    , keyboardFromMidiInput_{ std::make_unique<Core::KeyboardFromMidiInput>(*outboundQueue_, *midiActivityTracker_) }
+    , midiManager(std::make_unique<MidiManager>(apvts, *outboundQueue_, *midiActivityTracker_))
     , patchModel_{ std::make_unique<Core::PatchModel>() }
     , apvtsPatchMapper_{ std::make_unique<Core::ApvtsPatchMapper>(apvts, *patchModel_) }
     , masterModel_{ std::make_unique<Core::MasterModel>() }
@@ -210,7 +213,7 @@ void PluginProcessor::stopMidiThread()
 void PluginProcessor::processBlock(juce::AudioBuffer<float>& audioBuffer,
                                    juce::MidiBuffer& midiMessages)
 {
-    instrumentForwarder_->forward(midiMessages, getInstrumentPathEnabled(midiMessages), *outboundQueue_);
+    instrumentForwarder_->forward(midiMessages, getInstrumentPathEnabled(midiMessages), *outboundQueue_, *midiActivityTracker_);
 
     const bool inputEnabled = getBus(true, 0) != nullptr && getBus(true, 0)->isEnabled();
     audioPassthroughProcessor_->updateChannelLayout(getMainBusNumInputChannels(),
@@ -320,6 +323,9 @@ void PluginProcessor::validatePluginDescriptorsAtStartup()
 
 float PluginProcessor::dbToLinearGain(float gainDb) noexcept
 {
+    if (gainDb <= PluginAudioConstants::kMinInputGainDb)
+        return 0.0f;
+
     return std::pow(10.0f, gainDb / 20.0f);
 }
 
@@ -347,7 +353,9 @@ void PluginProcessor::syncAudioRuntimeFromState()
 {
     const auto gainDb = static_cast<float>(apvts.state.getProperty("inputGainDb", 0.0f));
     const float sanitizedDb = std::isfinite(gainDb) ? gainDb : 0.0f;
-    const float clampedDb = juce::jlimit(-24.0f, 12.0f, sanitizedDb);
+    const float clampedDb = juce::jlimit(PluginAudioConstants::kMinInputGainDb,
+                                         PluginAudioConstants::kMaxInputGainDb,
+                                         sanitizedDb);
     inputGainLinear_.store(dbToLinearGain(clampedDb), std::memory_order_relaxed);
 
     const int channelMode = static_cast<int>(apvts.state.getProperty("audioFromChannelMode", 0));
@@ -367,7 +375,9 @@ void PluginProcessor::setInputGainDb(float gainDb)
     if (!std::isfinite(gainDb))
         gainDb = 0.0f;
 
-    const float clampedDb = juce::jlimit(-24.0f, 12.0f, gainDb);
+    const float clampedDb = juce::jlimit(PluginAudioConstants::kMinInputGainDb,
+                                         PluginAudioConstants::kMaxInputGainDb,
+                                         gainDb);
     inputGainLinear_.store(dbToLinearGain(clampedDb), std::memory_order_relaxed);
     apvts.state.setProperty("inputGainDb", clampedDb, nullptr);
 }

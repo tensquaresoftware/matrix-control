@@ -2,6 +2,7 @@
 #include <juce_core/juce_core.h>
 
 #include "Core/MIDI/KeyboardFromMidiInput.h"
+#include "Core/MIDI/MidiActivityTracker.h"
 #include "Core/MIDI/MidiManager.h"
 #include "Core/MIDI/Queue/MidiOutboundQueue.h"
 
@@ -104,7 +105,8 @@ private:
 
         MinimalAudioProcessor processor;
         Core::MidiOutboundQueue queue;
-        MidiManager midiManager(processor.apvts, queue);
+        Core::MidiActivityTracker tracker;
+        MidiManager midiManager(processor.apvts, queue, tracker);
 
         processor.apvts.state.setProperty("midiInputPortId", "stale-input-id", nullptr);
         setMidiInputPortLikeProcessor(processor.apvts, midiManager, {});
@@ -118,7 +120,8 @@ private:
 
         MinimalAudioProcessor processor;
         Core::MidiOutboundQueue queue;
-        MidiManager midiManager(processor.apvts, queue);
+        Core::MidiActivityTracker tracker;
+        MidiManager midiManager(processor.apvts, queue, tracker);
 
         const juce::String staleId { "matrix-control-nonexistent-input-port" };
         processor.apvts.state.setProperty("midiInputPortId", staleId, nullptr);
@@ -133,7 +136,8 @@ private:
 
         MinimalAudioProcessor processor;
         Core::MidiOutboundQueue queue;
-        MidiManager midiManager(processor.apvts, queue);
+        Core::MidiActivityTracker tracker;
+        MidiManager midiManager(processor.apvts, queue, tracker);
 
         processor.apvts.state.setProperty("midiOutputPortId", "stale-output-id", nullptr);
         setMidiOutputPortLikeProcessor(processor.apvts, midiManager, {});
@@ -147,7 +151,8 @@ private:
 
         MinimalAudioProcessor processor;
         Core::MidiOutboundQueue queue;
-        MidiManager midiManager(processor.apvts, queue);
+        Core::MidiActivityTracker tracker;
+        MidiManager midiManager(processor.apvts, queue, tracker);
 
         const juce::String staleId { "matrix-control-nonexistent-output-port" };
         processor.apvts.state.setProperty("midiOutputPortId", staleId, nullptr);
@@ -161,7 +166,8 @@ private:
         beginTest("setKeyboardFromPort empty — clears keyboardFromEnabled and keyboardFromPortId");
 
         Core::MidiOutboundQueue queue;
-        Core::KeyboardFromMidiInput keyboardFrom(queue);
+        Core::MidiActivityTracker tracker;
+        Core::KeyboardFromMidiInput keyboardFrom(queue, tracker);
         juce::ValueTree state { "TEST" };
 
         state.setProperty("keyboardFromEnabled", true, nullptr);
@@ -178,7 +184,8 @@ private:
         beginTest("setKeyboardFromPort invalid id — clears properties and returns false");
 
         Core::MidiOutboundQueue queue;
-        Core::KeyboardFromMidiInput keyboardFrom(queue);
+        Core::MidiActivityTracker tracker;
+        Core::KeyboardFromMidiInput keyboardFrom(queue, tracker);
         juce::ValueTree state { "TEST" };
 
         state.setProperty("keyboardFromEnabled", true, nullptr);
@@ -204,7 +211,8 @@ private:
         const auto deviceId = devices.getReference(0).identifier;
 
         Core::MidiOutboundQueue queue;
-        Core::KeyboardFromMidiInput keyboardFrom(queue);
+        Core::MidiActivityTracker tracker;
+        Core::KeyboardFromMidiInput keyboardFrom(queue, tracker);
         juce::ValueTree state { "TEST" };
 
         expect(setKeyboardFromPortLikeProcessor(state, keyboardFrom, deviceId));

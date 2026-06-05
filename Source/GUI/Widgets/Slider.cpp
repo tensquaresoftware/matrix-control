@@ -125,7 +125,12 @@ namespace tss
 
     void Slider::drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled)
     {
-        auto valueText = juce::String(static_cast<int>(std::round(getValue())));
+        juce::String valueText;
+
+        if (unit_ == "dB" && juce::approximatelyEqual(getValue(), getMinimum()))
+            valueText = "-inf";
+        else
+            valueText = juce::String(static_cast<int>(std::round(getValue())));
 
         if (unit_.isNotEmpty())
             valueText += " " + unit_;

@@ -10,8 +10,9 @@ namespace Core
         }
     }
 
-    KeyboardFromMidiInput::KeyboardFromMidiInput(MidiOutboundQueue& queue)
+    KeyboardFromMidiInput::KeyboardFromMidiInput(MidiOutboundQueue& queue, MidiActivityTracker& tracker)
         : queue_(queue)
+        , tracker_(tracker)
     {
     }
 
@@ -61,7 +62,10 @@ namespace Core
     void KeyboardFromMidiInput::processIncomingMessage(const juce::MidiMessage& message)
     {
         if (isAllowedInstrumentMessage(message))
+        {
             queue_.enqueueRealtime(message);
+            tracker_.notifyActivity(MidiActivityTracker::Path::kInstrument);
+        }
     }
 
     void KeyboardFromMidiInput::handleIncomingMidiMessage(juce::MidiInput* source,

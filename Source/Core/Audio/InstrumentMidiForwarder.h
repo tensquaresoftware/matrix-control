@@ -3,6 +3,7 @@
 #include <juce_audio_basics/juce_audio_basics.h>
 
 #include "Core/MIDI/Queue/MidiOutboundQueue.h"
+#include "Core/MIDI/MidiActivityTracker.h"
 
 namespace Core
 {
@@ -15,6 +16,7 @@ namespace Core
     public:
         void forward(const juce::MidiBuffer& midiMessages,
                      bool instrumentPathEnabled,
-                     MidiOutboundQueue& queue) const;
+                     MidiOutboundQueue& queue,
+                     MidiActivityTracker& tracker) const;
     };
 }

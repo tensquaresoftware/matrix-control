@@ -16,6 +16,7 @@
 #include "Exceptions/Exceptions.h"
 #include "SysEx/SysExConstants.h"
 #include "Core/MIDI/EditorPath.h"
+#include "Core/MIDI/MidiActivityTracker.h"
 #include "Core/MIDI/Queue/MidiOutboundQueue.h"
 #include "Core/MIDI/Queue/SysExInterMessageDelay.h"
 
@@ -23,7 +24,8 @@ class MidiManager : public juce::Thread
 {
 public:
     explicit MidiManager(juce::AudioProcessorValueTreeState& apvtsRef,
-                         Core::MidiOutboundQueue& outboundQueueRef);
+                         Core::MidiOutboundQueue& outboundQueueRef,
+                         Core::MidiActivityTracker& activityTrackerRef);
     ~MidiManager() override;
 
     bool setMidiInputPort(const juce::String& deviceId);
@@ -55,6 +57,7 @@ private:
     std::unique_ptr<SysExDecoder> sysExDecoder;
     std::unique_ptr<SysExEncoder> sysExEncoder;
     Core::MidiOutboundQueue& outboundQueue_;
+    Core::MidiActivityTracker& activityTracker_;
     Core::EditorPath editorPath_;
     Core::SysExInterMessageDelay sysExDelay_;
 

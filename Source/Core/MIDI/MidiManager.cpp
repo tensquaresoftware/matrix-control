@@ -4,8 +4,24 @@
 #include "Core/MIDI/Queue/SysExDelayProfile.h"
 #include "Shared/Definitions/Matrix1000Limits.h"
 
+namespace
+{
+    Core::MidiActivityTracker::Path pathForOutboundMessage(
+        const Core::MidiOutboundQueue::Message& msg) noexcept
+    {
+        if (msg.category == Core::MidiOutboundQueue::MessageCategory::kSysEx)
+            return Core::MidiActivityTracker::Path::kEditor;
+
+        if (msg.midiMessage.isProgramChange())
+            return Core::MidiActivityTracker::Path::kEditor;
+
+        return Core::MidiActivityTracker::Path::kInstrument;
+    }
+}
+
 MidiManager::MidiManager(juce::AudioProcessorValueTreeState& apvtsRef,
-                         Core::MidiOutboundQueue& outboundQueueRef)
+                         Core::MidiOutboundQueue& outboundQueueRef,
+                         Core::MidiActivityTracker& activityTrackerRef)
     : juce::Thread("MidiManager")
     , apvts(apvtsRef)
     , inputMidiPort(std::make_unique<MidiInputPort>())
@@ -16,7 +32,8 @@ MidiManager::MidiManager(juce::AudioProcessorValueTreeState& apvtsRef,
     , sysExDecoder(std::make_unique<SysExDecoder>(*sysExParser))
     , sysExEncoder(std::make_unique<SysExEncoder>())
     , outboundQueue_(outboundQueueRef)
-    , editorPath_(outboundQueue_)
+    , activityTracker_(activityTrackerRef)
+    , editorPath_(outboundQueueRef, activityTrackerRef)
     , sysExDelay_(Core::SysExDelayProfile::stockDefault())
 {
     apvts.state.setProperty("deviceDetected", false, nullptr);
@@ -345,6 +362,8 @@ void MidiManager::dispatchOutboundMessage(const Core::MidiOutboundQueue::Message
         if (msg.category == Core::MidiOutboundQueue::MessageCategory::kRealtime)
         {
             midiSender->sendMidiMessage(msg.midiMessage);
+            activityTracker_.notifyActivity(pathForOutboundMessage(msg));
+            activityTracker_.notifyActivity(Core::MidiActivityTracker::Path::kOutbound);
             return;
         }
 
@@ -352,6 +371,8 @@ void MidiManager::dispatchOutboundMessage(const Core::MidiOutboundQueue::Message
             return;
 
         sendSysExWithDelay(msg.sysExData, "QUEUED");
+        activityTracker_.notifyActivity(pathForOutboundMessage(msg));
+        activityTracker_.notifyActivity(Core::MidiActivityTracker::Path::kOutbound);
     }
     catch (const MidiConnectionException& e)
     {

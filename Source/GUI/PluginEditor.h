@@ -28,7 +28,7 @@ public:
     static int getDesignHeight() { return PluginDesignDimensions::GUI::kHeight; }
 
 private:
-    class PeakRefreshTimer;
+    class HeaderRefreshTimer;
 
     PluginProcessor& pluginProcessor;
 
@@ -39,7 +39,7 @@ private:
     std::unique_ptr<MainComponent> mainComponent_;
     std::unique_ptr<TestComponent> testComponent_;
     bool uiElementsTestVisible_ = false;
-    std::unique_ptr<PeakRefreshTimer> peakRefreshTimer_;
+    std::unique_ptr<HeaderRefreshTimer> headerRefreshTimer_;
 
     void updateSkin();
     void applyUiScale(float uiScale);

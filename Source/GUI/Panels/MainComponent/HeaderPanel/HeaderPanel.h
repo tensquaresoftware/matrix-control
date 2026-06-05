@@ -3,6 +3,7 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <vector>
 
+#include "GUI/Widgets/ActivityLed.h"
 #include "GUI/Widgets/Button.h"
 #include "GUI/Widgets/ComboBox.h"
 #include "GUI/Widgets/Label.h"
@@ -59,6 +60,9 @@ public:
     tss::ComboBox& getAudioFromComboBox() { return audioFromComboBox_; }
     tss::Slider& getInputGainSlider() { return inputGainSlider_; }
     tss::PeakIndicator& getPeakIndicator() { return peakIndicator_; }
+    tss::ActivityLed& getInstrumentActivityLed() { return instrumentActivityLed_; }
+    tss::ActivityLed& getEditorActivityLed() { return editorActivityLed_; }
+    tss::ActivityLed& getMidiToActivityLed() { return midiToActivityLed_; }
 
     static int getGap() { return kGap_; }
 
@@ -82,17 +86,17 @@ private:
     inline constexpr static int kKeyboardFromLabelWidth_ = 108;
     inline constexpr static int kAudioFromLabelWidth_ = 88;
     inline constexpr static int kInputGainLabelWidth_ = 88;
-    inline constexpr static int kMidiPortComboBoxWidth_ = 96;
-    inline constexpr static int kAudioFromComboBoxWidth_ = 72;
-    inline constexpr static int kInputGainSliderWidth_ = 64;
-    inline constexpr static int kPeakIndicatorWidth_ = 8;
+    inline constexpr static int kPortComboBoxWidth_ = 96;
+    inline constexpr static int kInputGainSliderWidth_ = 60;
+    inline constexpr static int kPeakIndicatorWidth_ = 12;
+    inline constexpr static int kActivityLedSize_ = 12;
     inline constexpr static int kSkinLabelWidth_ = 30;
     inline constexpr static int kUiScaleLabelWidth_ = 35;
     inline constexpr static int kScaleComboBoxWidth_ = 50;
     inline constexpr static int kSkinComboBoxWidth_ = 50;
     inline constexpr static int kGap_ = 5;
+    inline constexpr static int kPacketExternalGap_ = kGap_ * 2;
     inline constexpr static int kControlHeight_ = 20;
-    inline constexpr static int kLeftPadding_ = 15;
     inline constexpr static int kRightPadding_ = 15;
     inline constexpr static int kUiElementsButtonWidth_ = 88;
 
@@ -102,10 +106,13 @@ private:
 
     tss::Label midiFromLabel_;
     tss::ComboBox midiFromComboBox_;
+    tss::ActivityLed editorActivityLed_;
     tss::Label midiToLabel_;
     tss::ComboBox midiToComboBox_;
+    tss::ActivityLed midiToActivityLed_;
     tss::Label keyboardFromLabel_;
     tss::ComboBox keyboardFromComboBox_;
+    tss::ActivityLed instrumentActivityLed_;
     tss::Label audioFromLabel_;
     tss::ComboBox audioFromComboBox_;
     tss::Label inputGainLabel_;

@@ -1,5 +1,18 @@
 # Deferred Work
 
+## Deferred from: code review of 2-11-header-panel-layout-and-widget-styling (2026-06-05)
+
+- **Slider `-inf` display keyed on `unit_ == "dB"`** (`Slider.cpp:127`) — only header gain slider uses dB unit today; flag or per-slider opt-in when a second dB slider is added.
+- **Optional `MidiManager::dispatchOutboundMessage` outbound-notify test** (`MidiManagerTests.cpp`) — AC 7.2 optional; producer + `MidiActivityTrackerTests` cover main paths.
+- **Clock step-back guard in `computeLevelFromTimestamp`** (`MidiActivityTracker.cpp:11`) — inherited from Story 2.8; extremely rare on monotonic hi-res counter.
+
+## Deferred from: code review of 2-8-activity-leds-on-queue-traffic (2026-06-05)
+
+- **`memory_order_relaxed` on activity atomics** — matches `AudioPassthroughProcessor` peak pattern (Story 2.7); acquire/release optional hardening deferred.
+- **`ActivityLed` unused `width_`/`height_`/`uiScale_`** — mirrors `PeakIndicator` prior art; cleanup deferred to Story 7.8 header polish.
+- **No unit test for `MidiManager::dispatchOutboundMessage` tracker notify** — optional coverage; producer + EditorPath tests cover main paths.
+- **Clock step-backward guard in `computeLevelFromTimestamp`** — extremely rare on monotonic hi-res counter; low priority.
+
 ## Deferred from: code review of 2-7-audio-passthrough-and-peak-indicator (2026-06-05)
 
 - **Standalone audio-from combo not refreshed on device change** (`PluginEditor.cpp:73-77`) — follow-up UX; spec lists channels at editor open only.

@@ -3,6 +3,7 @@
 #include <juce_core/juce_core.h>
 
 #include "Core/MIDI/EditorPath.h"
+#include "Core/MIDI/MidiActivityTracker.h"
 #include "Core/MIDI/MatrixModBusParameterSysExDispatcher.h"
 #include "Core/MIDI/Queue/MidiOutboundQueue.h"
 #include "Core/MIDI/SysEx/SysExConstants.h"
@@ -69,6 +70,7 @@ private:
 
         Core::PatchModel model;
         Core::MidiOutboundQueue queue;
+        Core::MidiActivityTracker tracker;
         SysExEncoder encoder;
 
         configureBus0(model, 5, -20, 12);
@@ -88,7 +90,7 @@ private:
             model,
             [&](juce::uint8 bus, juce::uint8 source, juce::uint8 amount, juce::uint8 destination)
             {
-                Core::EditorPath editorPath(queue);
+                Core::EditorPath editorPath(queue, tracker);
                 editorPath.enqueueSysEx(encoder.encodeMatrixModBusEdit(bus, source, amount, destination));
             });
 
@@ -119,6 +121,7 @@ private:
 
         Core::PatchModel model;
         Core::MidiOutboundQueue queue;
+        Core::MidiActivityTracker tracker;
         SysExEncoder encoder;
 
         const auto& intParams = kModulationBusIntParameters[3];
@@ -132,7 +135,7 @@ private:
             model,
             [&](juce::uint8 bus, juce::uint8 source, juce::uint8 amount, juce::uint8 destination)
             {
-                Core::EditorPath editorPath(queue);
+                Core::EditorPath editorPath(queue, tracker);
                 editorPath.enqueueSysEx(encoder.encodeMatrixModBusEdit(bus, source, amount, destination));
             });
 
