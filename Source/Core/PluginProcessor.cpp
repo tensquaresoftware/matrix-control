@@ -8,6 +8,7 @@
 #include "Core/Models/MasterModel.h"
 #include "Core/Models/PatchModel.h"
 #include "Core/Models/PatchNameSyncer.h"
+#include "Core/MIDI/MasterParameterSysExDispatcher.h"
 #include "Core/MIDI/PatchParameterSysExDispatcher.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 #include "GUI/PluginEditor.h"
@@ -62,6 +63,13 @@ PluginProcessor::PluginProcessor()
         [this](int parameterNumber, juce::uint8 packedValue)
         {
             midiManager->enqueueRemoteParameterEdit(parameterNumber, packedValue);
+        });
+
+    masterParameterSysExDispatcher_ = std::make_unique<Core::MasterParameterSysExDispatcher>(
+        *masterModel_,
+        [this](const juce::uint8* packedData)
+        {
+            midiManager->sendMaster(0x03, packedData);
         });
 
     validatePluginDescriptorsAtStartup();
@@ -503,7 +511,10 @@ void PluginProcessor::valueTreePropertyChanged(juce::ValueTree& treeWhosePropert
     }
 
     if (masterParameterIds_.count(parameterId) > 0)
+    {
         apvtsMasterMapper_->apvtsToBuffer();
+        masterParameterSysExDispatcher_->dispatch(parameterId);
+    }
 
     if (parameterId == PluginIDs::PatchEditSection::PatchNameModule::kPatchName)
         patchNameSyncer_->apvtsToBuffer();
