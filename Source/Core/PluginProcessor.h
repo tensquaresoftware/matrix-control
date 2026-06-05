@@ -89,8 +89,8 @@ public:
     void setInputGainDb(float gainDb);
     void setAudioFromChannelMode(int mode);
     void setAudioFromSourceId(const juce::String& sourceId);
-    juce::StringArray getStandaloneAudioInputNames() const;
-    juce::StringArray getStandaloneAudioInputIds() const;
+    juce::StringArray getAudioInputSourceNames() const;
+    juce::StringArray getAudioInputSourceIds() const;
 
     Core::AudioPassthroughProcessor& getAudioPassthroughProcessor() noexcept { return *audioPassthroughProcessor_; }
     const Core::AudioPassthroughProcessor& getAudioPassthroughProcessor() const noexcept { return *audioPassthroughProcessor_; }

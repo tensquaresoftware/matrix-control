@@ -34,17 +34,14 @@ public:
     void populateMidiPortLists();
     void refreshPortLists() { populateMidiPortLists(); }
 
-    void populateAudioFromComboForPlugin();
-    void populateAudioFromComboForStandalone(const juce::StringArray& channelNames,
-                                              const juce::StringArray& channelIds);
+    void populateAudioFromCombo(const juce::StringArray& channelNames,
+                                const juce::StringArray& channelIds);
 
     juce::String getSelectedMidiFromPortIdentifier() const;
     juce::String getSelectedMidiToPortIdentifier() const;
     juce::String getSelectedKeyboardFromPortIdentifier() const;
-    int getSelectedAudioFromChannelMode() const;
     juce::String getSelectedAudioFromSourceId() const;
 
-    void selectAudioFromChannelMode(int mode);
     void selectAudioFromSourceId(const juce::String& sourceId);
 
     void selectMidiFromPort(const juce::String& deviceId);
@@ -71,9 +68,8 @@ private:
     void populateOutputPortCombo(tss::ComboBox& combo, std::vector<juce::String>& identifiers);
     void configurePluginModeKeyboardFrom();
     void configureStandaloneKeyboardFrom();
-    void configurePluginModeAudioFrom();
-    void configureStandaloneAudioFrom(const juce::StringArray& channelNames,
-                                      const juce::StringArray& channelIds);
+    void configureAudioFromCombo(const juce::StringArray& channelNames,
+                                 const juce::StringArray& channelIds);
     int findItemIdForIdentifier(const std::vector<juce::String>& identifiers,
                                 const juce::String& deviceId) const;
     juce::String getSelectedPortIdentifier(const tss::ComboBox& combo,
@@ -81,7 +77,7 @@ private:
 
     int width_;
     int height_;
-    inline constexpr static int kMidiFromLabelWidth_ = 56;
+    inline constexpr static int kEditorMidiFromLabelWidth_ = 88;
     inline constexpr static int kMidiToLabelWidth_ = 40;
     inline constexpr static int kKeyboardFromLabelWidth_ = 82;
     inline constexpr static int kAudioFromLabelWidth_ = 64;

@@ -4,6 +4,7 @@
 
 #include "PluginProcessor.h"
 #include "Core/Audio/AudioPassthroughProcessor.h"
+#include "Core/Audio/AudioInputSourceCatalog.h"
 #include "Core/Audio/InstrumentMidiForwarder.h"
 #include "Core/Audio/StandaloneAudioInputRouter.h"
 
@@ -358,15 +359,21 @@ void PluginProcessor::syncAudioRuntimeFromState()
                                          sanitizedDb);
     inputGainLinear_.store(dbToLinearGain(clampedDb), std::memory_order_relaxed);
 
-    const int channelMode = static_cast<int>(apvts.state.getProperty("audioFromChannelMode", 0));
-    audioPassthroughProcessor_->setChannelMode(
-        static_cast<Core::AudioFromChannelMode>(juce::jlimit(0, 2, channelMode)));
+    const auto sourceId = apvts.state.getProperty("audioFromSourceId", juce::String()).toString();
 
-    if (isStandaloneWrapper())
+    if (sourceId.isNotEmpty())
     {
-        const auto sourceId = apvts.state.getProperty("audioFromSourceId", juce::String()).toString();
-        if (sourceId.isNotEmpty())
+        const int channelMode = Core::AudioInputSourceCatalog::channelModeForSourceId(sourceId);
+        audioPassthroughProcessor_->setChannelMode(static_cast<Core::AudioFromChannelMode>(channelMode));
+
+        if (isStandaloneWrapper())
             Core::StandaloneAudioInputRouter::applySourceId(sourceId);
+    }
+    else
+    {
+        const int channelMode = static_cast<int>(apvts.state.getProperty("audioFromChannelMode", 0));
+        audioPassthroughProcessor_->setChannelMode(
+            static_cast<Core::AudioFromChannelMode>(juce::jlimit(0, 2, channelMode)));
     }
 }
 
@@ -391,18 +398,36 @@ void PluginProcessor::setAudioFromChannelMode(int mode)
 
 void PluginProcessor::setAudioFromSourceId(const juce::String& sourceId)
 {
-    Core::StandaloneAudioInputRouter::applySourceId(sourceId);
     apvts.state.setProperty("audioFromSourceId", sourceId, nullptr);
+
+    const int channelMode = Core::AudioInputSourceCatalog::channelModeForSourceId(sourceId);
+    audioPassthroughProcessor_->setChannelMode(static_cast<Core::AudioFromChannelMode>(channelMode));
+    apvts.state.setProperty("audioFromChannelMode", channelMode, nullptr);
+
+    if (isStandaloneWrapper())
+        Core::StandaloneAudioInputRouter::applySourceId(sourceId);
 }
 
-juce::StringArray PluginProcessor::getStandaloneAudioInputNames() const
+juce::StringArray PluginProcessor::getAudioInputSourceNames() const
 {
-    return Core::StandaloneAudioInputRouter::getInputChannelNames();
+    juce::StringArray names;
+    const auto entries = Core::AudioInputSourceCatalog::buildForProcessor(isStandaloneWrapper());
+
+    for (const auto& entry : entries)
+        names.add(entry.displayName);
+
+    return names;
 }
 
-juce::StringArray PluginProcessor::getStandaloneAudioInputIds() const
+juce::StringArray PluginProcessor::getAudioInputSourceIds() const
 {
-    return Core::StandaloneAudioInputRouter::getInputChannelIds();
+    juce::StringArray ids;
+    const auto entries = Core::AudioInputSourceCatalog::buildForProcessor(isStandaloneWrapper());
+
+    for (const auto& entry : entries)
+        ids.add(entry.sourceId);
+
+    return ids;
 }
 
 void PluginProcessor::initializeAudioProperties()
@@ -419,10 +444,21 @@ void PluginProcessor::initializeAudioProperties()
     const auto savedGainDb = static_cast<float>(apvts.state.getProperty("inputGainDb", 0.0f));
     setInputGainDb(savedGainDb);
 
-    const auto savedChannelMode = static_cast<int>(apvts.state.getProperty("audioFromChannelMode", 0));
-    setAudioFromChannelMode(savedChannelMode);
+    auto savedSourceId = apvts.state.getProperty("audioFromSourceId", juce::String()).toString();
 
-    const auto savedSourceId = apvts.state.getProperty("audioFromSourceId", juce::String()).toString();
+    if (savedSourceId.isEmpty())
+    {
+        const auto savedChannelMode = static_cast<int>(apvts.state.getProperty("audioFromChannelMode", 0));
+
+        switch (savedChannelMode)
+        {
+            case 1: savedSourceId = "mono:0"; break;
+            case 2: savedSourceId = "mono:1"; break;
+            case 0:
+            default: savedSourceId = "stereo:0"; break;
+        }
+    }
+
     if (savedSourceId.isNotEmpty())
         setAudioFromSourceId(savedSourceId);
 }

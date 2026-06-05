@@ -101,6 +101,7 @@ set(PLUGIN_SOURCES
     # Core
     Source/Core/PluginProcessor.cpp
     Source/Core/Audio/AudioPassthroughProcessor.cpp
+    Source/Core/Audio/AudioInputSourceCatalog.cpp
     Source/Core/Audio/InstrumentMidiForwarder.cpp
     Source/Core/Audio/StandaloneAudioInputRouter.cpp
     Source/Core/Audio/StandaloneAudioInputRouterStubs.cpp

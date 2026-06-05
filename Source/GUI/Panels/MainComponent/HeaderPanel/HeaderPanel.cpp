@@ -47,7 +47,7 @@ HeaderPanel::HeaderPanel(tss::ISkin& skin, int width, int height)
     : width_(width)
     , height_(height)
     , skin_(&skin)
-    , midiFromLabel_(kMidiFromLabelWidth_, kControlHeight_, tss::headerPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kMidiFromLabel, tss::LabelStyle::HeaderPanel)
+    , midiFromLabel_(kEditorMidiFromLabelWidth_, kControlHeight_, tss::headerPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kEditorMidiFromLabel, tss::LabelStyle::HeaderPanel)
     , midiFromComboBox_(kPortComboBoxWidth_, kControlHeight_, tss::comboBoxLookFromSkin(skin), tss::ComboBox::Style::ButtonLike)
     , editorActivityLed_(kActivityLedSize_, kActivityLedSize_)
     , midiToLabel_(kMidiToLabelWidth_, kControlHeight_, tss::headerPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kMidiToLabel, tss::LabelStyle::HeaderPanel)
@@ -128,7 +128,6 @@ HeaderPanel::HeaderPanel(tss::ISkin& skin, int width, int height)
     addAndMakeVisible(uiElementsButton_);
 
     populateMidiPortLists();
-    populateAudioFromComboForPlugin();
 }
 
 void HeaderPanel::paint(juce::Graphics& g)
@@ -146,7 +145,7 @@ void HeaderPanel::resized()
     const float scaledHeight = static_cast<float>(height_) * sf;
     const float controlY = (scaledHeight - controlHeight) * 0.5f;
 
-    const float midiFromLabelWidth = static_cast<float>(kMidiFromLabelWidth_) * sf;
+    const float editorMidiFromLabelWidth = static_cast<float>(kEditorMidiFromLabelWidth_) * sf;
     const float midiToLabelWidth = static_cast<float>(kMidiToLabelWidth_) * sf;
     const float keyboardFromLabelWidth = static_cast<float>(kKeyboardFromLabelWidth_) * sf;
     const float audioFromLabelWidth = static_cast<float>(kAudioFromLabelWidth_) * sf;
@@ -210,19 +209,19 @@ void HeaderPanel::resized()
         x += packetExternalGap - gap;
     };
 
+    placePacketActivityLed(instrumentActivityLed_);
+    placePacketLabel(keyboardFromLabel_, keyboardFromLabelWidth);
+    placePacketCombo(keyboardFromComboBox_, portComboWidth);
+    endPacket();
+
     placePacketActivityLed(editorActivityLed_);
-    placePacketLabel(midiFromLabel_, midiFromLabelWidth);
+    placePacketLabel(midiFromLabel_, editorMidiFromLabelWidth);
     placePacketCombo(midiFromComboBox_, portComboWidth);
     endPacket();
 
     placePacketActivityLed(midiToActivityLed_);
     placePacketLabel(midiToLabel_, midiToLabelWidth);
     placePacketCombo(midiToComboBox_, portComboWidth);
-    endPacket();
-
-    placePacketActivityLed(instrumentActivityLed_);
-    placePacketLabel(keyboardFromLabel_, keyboardFromLabelWidth);
-    placePacketCombo(keyboardFromComboBox_, portComboWidth);
     endPacket();
 
     placePacketLabel(audioFromLabel_, audioFromLabelWidth);
@@ -300,7 +299,6 @@ void HeaderPanel::setPluginMode(bool isPlugin)
     if (isPluginMode_)
     {
         configurePluginModeKeyboardFrom();
-        configurePluginModeAudioFrom();
     }
     else
     {
@@ -428,33 +426,14 @@ juce::String HeaderPanel::getSelectedPortIdentifier(const tss::ComboBox& combo,
     return getPortIdentifierForItemId(identifiers, combo.getSelectedId());
 }
 
-void HeaderPanel::populateAudioFromComboForPlugin()
+void HeaderPanel::populateAudioFromCombo(const juce::StringArray& channelNames,
+                                          const juce::StringArray& channelIds)
 {
-    configurePluginModeAudioFrom();
+    configureAudioFromCombo(channelNames, channelIds);
 }
 
-void HeaderPanel::populateAudioFromComboForStandalone(const juce::StringArray& channelNames,
-                                                       const juce::StringArray& channelIds)
-{
-    configureStandaloneAudioFrom(channelNames, channelIds);
-}
-
-void HeaderPanel::configurePluginModeAudioFrom()
-{
-    const int previousMode = getSelectedAudioFromChannelMode();
-
-    audioFromComboBox_.clear(juce::dontSendNotification);
-    audioFromSourceIdentifiers_.clear();
-
-    audioFromComboBox_.addItem(PluginDisplayNames::HeaderPanel::kAudioFromStereo, 1);
-    audioFromComboBox_.addItem(PluginDisplayNames::HeaderPanel::kAudioFromMonoLeft, 2);
-    audioFromComboBox_.addItem(PluginDisplayNames::HeaderPanel::kAudioFromMonoRight, 3);
-
-    selectAudioFromChannelMode(previousMode);
-}
-
-void HeaderPanel::configureStandaloneAudioFrom(const juce::StringArray& channelNames,
-                                                const juce::StringArray& channelIds)
+void HeaderPanel::configureAudioFromCombo(const juce::StringArray& channelNames,
+                                           const juce::StringArray& channelIds)
 {
     const auto previousSourceId = getSelectedAudioFromSourceId();
 
@@ -480,34 +459,13 @@ void HeaderPanel::configureStandaloneAudioFrom(const juce::StringArray& channelN
     selectAudioFromSourceId(previousSourceId);
 }
 
-int HeaderPanel::getSelectedAudioFromChannelMode() const
-{
-    if (!isPluginMode_)
-        return 0;
-
-    const int selectedId = audioFromComboBox_.getSelectedId();
-    return juce::jmax(0, selectedId - 1);
-}
-
 juce::String HeaderPanel::getSelectedAudioFromSourceId() const
 {
-    if (isPluginMode_)
-        return {};
-
     return getSelectedPortIdentifier(audioFromComboBox_, audioFromSourceIdentifiers_);
-}
-
-void HeaderPanel::selectAudioFromChannelMode(int mode)
-{
-    const int itemId = juce::jlimit(1, 3, mode + 1);
-    audioFromComboBox_.setSelectedId(itemId, juce::dontSendNotification);
 }
 
 void HeaderPanel::selectAudioFromSourceId(const juce::String& sourceId)
 {
-    if (isPluginMode_)
-        return;
-
     audioFromComboBox_.setSelectedId(findItemIdForIdentifier(audioFromSourceIdentifiers_, sourceId),
                                      juce::dontSendNotification);
 }

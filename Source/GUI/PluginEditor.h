@@ -14,11 +14,12 @@
 class WidgetFactory;
 class HeaderPanel;
 
-class PluginEditor : public juce::AudioProcessorEditor
+class PluginEditor : public juce::AudioProcessorEditor,
+                     private juce::ChangeListener
 {
 public:
     explicit PluginEditor(PluginProcessor&);
-    ~PluginEditor() override = default;
+    ~PluginEditor() override;
 
     void paint(juce::Graphics&) override;
     void resized() override;
@@ -29,6 +30,11 @@ public:
 
 private:
     class HeaderRefreshTimer;
+
+    void refreshAudioFromCombo();
+    void attachStandaloneAudioDeviceListener();
+    void detachStandaloneAudioDeviceListener();
+    void changeListenerCallback(juce::ChangeBroadcaster* source) override;
 
     PluginProcessor& pluginProcessor;
 
