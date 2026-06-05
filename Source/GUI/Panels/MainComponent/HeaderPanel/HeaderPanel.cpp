@@ -160,9 +160,10 @@ void HeaderPanel::resized()
     const float skinLabelWidth = static_cast<float>(kSkinLabelWidth_) * sf;
     const float skinComboWidth = static_cast<float>(kSkinComboBoxWidth_) * sf;
     const float uiElementsButtonWidth = static_cast<float>(kUiElementsButtonWidth_) * sf;
+    const float leftPadding = static_cast<float>(kLeftPadding_) * sf;
     const float rightPadding = static_cast<float>(kRightPadding_) * sf;
 
-    float x = static_cast<float>(bounds.getX()) + gap;
+    float x = static_cast<float>(bounds.getX()) + leftPadding;
     const int y = juce::roundToInt(static_cast<float>(bounds.getY()) + controlY);
     const int h = juce::roundToInt(controlHeight);
     const int activityLedY = juce::roundToInt(static_cast<float>(bounds.getY()) + controlY
@@ -209,19 +210,19 @@ void HeaderPanel::resized()
         x += packetExternalGap - gap;
     };
 
+    placePacketActivityLed(editorActivityLed_);
     placePacketLabel(midiFromLabel_, midiFromLabelWidth);
     placePacketCombo(midiFromComboBox_, portComboWidth);
-    placePacketActivityLed(editorActivityLed_);
     endPacket();
 
+    placePacketActivityLed(midiToActivityLed_);
     placePacketLabel(midiToLabel_, midiToLabelWidth);
     placePacketCombo(midiToComboBox_, portComboWidth);
-    placePacketActivityLed(midiToActivityLed_);
     endPacket();
 
+    placePacketActivityLed(instrumentActivityLed_);
     placePacketLabel(keyboardFromLabel_, keyboardFromLabelWidth);
     placePacketCombo(keyboardFromComboBox_, portComboWidth);
-    placePacketActivityLed(instrumentActivityLed_);
     endPacket();
 
     placePacketLabel(audioFromLabel_, audioFromLabelWidth);

@@ -89,7 +89,7 @@ namespace tss
         ColumnLayout columnLayout_ = ColumnLayout::PatchEdit;
         ButtonSet buttonSet_ = ButtonSet::None;
 
-        inline constexpr static int kTextLeftPadding_ = 2;
+        inline constexpr static int kTextLeftPadding_ = 0;
         inline constexpr static int kTextAreaHeight_ = 20;
         inline constexpr static int kLineThickness_ = 4;
 

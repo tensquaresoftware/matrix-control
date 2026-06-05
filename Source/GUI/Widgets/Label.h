@@ -34,7 +34,7 @@ namespace tss
     private:
         static constexpr int kDefaultWidth_ = 50;
         static constexpr int kDefaultHeight_ = 20;
-        static constexpr int kTextLeftPadding_ = 2;
+        static constexpr int kTextLeftPadding_ = 0;
 
         LabelLook look_{};
         int width_;

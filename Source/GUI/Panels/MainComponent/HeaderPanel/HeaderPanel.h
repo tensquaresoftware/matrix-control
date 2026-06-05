@@ -81,11 +81,11 @@ private:
 
     int width_;
     int height_;
-    inline constexpr static int kMidiFromLabelWidth_ = 72;
-    inline constexpr static int kMidiToLabelWidth_ = 56;
-    inline constexpr static int kKeyboardFromLabelWidth_ = 108;
-    inline constexpr static int kAudioFromLabelWidth_ = 88;
-    inline constexpr static int kInputGainLabelWidth_ = 88;
+    inline constexpr static int kMidiFromLabelWidth_ = 56;
+    inline constexpr static int kMidiToLabelWidth_ = 40;
+    inline constexpr static int kKeyboardFromLabelWidth_ = 82;
+    inline constexpr static int kAudioFromLabelWidth_ = 64;
+    inline constexpr static int kInputGainLabelWidth_ = 58;
     inline constexpr static int kPortComboBoxWidth_ = 96;
     inline constexpr static int kInputGainSliderWidth_ = 60;
     inline constexpr static int kPeakIndicatorWidth_ = 12;
@@ -94,10 +94,11 @@ private:
     inline constexpr static int kUiScaleLabelWidth_ = 35;
     inline constexpr static int kScaleComboBoxWidth_ = 50;
     inline constexpr static int kSkinComboBoxWidth_ = 50;
-    inline constexpr static int kGap_ = 5;
-    inline constexpr static int kPacketExternalGap_ = kGap_ * 2;
+    inline constexpr static int kGap_ = 4;
+    inline constexpr static int kPacketExternalGap_ = kGap_ * 4;
     inline constexpr static int kControlHeight_ = 20;
-    inline constexpr static int kRightPadding_ = 15;
+    inline constexpr static int kLeftPadding_ = 12;
+    inline constexpr static int kRightPadding_ = 12;
     inline constexpr static int kUiElementsButtonWidth_ = 88;
 
     tss::ISkin* skin_;
