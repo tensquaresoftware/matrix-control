@@ -13,6 +13,7 @@ namespace PluginIDs
     namespace Settings
     {
         constexpr const char* kGuiScaleId = "guiScaleId";
+        constexpr const char* kHardwareLatencyMsId = "hardwareLatencyMs";
         constexpr const char* kTestWidgetId = "testWidgetId";
 
         namespace ScaleLevels

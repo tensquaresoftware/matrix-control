@@ -18,6 +18,7 @@ namespace PluginDisplayNames
         constexpr const char* kKeyboardFromLabel = "KEYBOARD FROM :";
         constexpr const char* kAudioFromLabel = "AUDIO FROM :";
         constexpr const char* kInputGainLabel = "INPUT GAIN :";
+        constexpr const char* kHardwareLatencyLabel = "HARDWARE LATENCY :";
         constexpr const char* kAudioFromStereo = "STEREO";
         constexpr const char* kAudioFromMonoLeft = "MONO L";
         constexpr const char* kAudioFromMonoRight = "MONO R";

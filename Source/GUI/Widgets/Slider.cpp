@@ -1,20 +1,44 @@
 #include "Slider.h"
 
+#include <cmath>
+
 #include "GUI/Layout/ScaledDrawing.h"
 
 namespace tss
 {
-    Slider::Slider(int width, int height, const SliderLook& look, double defaultValue)
+    Slider::Slider(int width, int height, const SliderLook& look, const SliderConfig& config)
         : juce::Slider(juce::Slider::LinearBarVertical, juce::Slider::NoTextBox)
         , look_(look)
         , width_(width)
         , height_(height)
-        , defaultValue_(defaultValue)
+        , defaultValue_(config.defaultValue)
+        , step_(config.step > 0.0 ? config.step : 1.0)
+        , valueDecimalPlaces_(countDecimalPlacesForStep(step_))
+        , unit_(config.unit)
+        , minimumDisplayText_(config.minimumDisplayText)
     {
         setOpaque(false);
         setSize(width_, height_);
         setWantsKeyboardFocus(true);
         setInterceptsMouseClicks(true, false);
+        setRange(config.minValue, config.maxValue, step_);
+        setValue(defaultValue_, juce::dontSendNotification);
+    }
+
+    int Slider::countDecimalPlacesForStep(double step)
+    {
+        if (step <= 0.0 || juce::approximatelyEqual(step, std::round(step)))
+            return 0;
+
+        for (int places = 1; places <= 6; ++places)
+        {
+            const double scaled = step * std::pow(10.0, static_cast<double>(places));
+
+            if (juce::approximatelyEqual(scaled, std::round(scaled)))
+                return places;
+        }
+
+        return 2;
     }
 
     void Slider::setLook(const SliderLook& look)
@@ -29,12 +53,6 @@ namespace tss
             return;
 
         uiScale_ = uiScale;
-        repaint();
-    }
-
-    void Slider::setUnit(const juce::String& unit)
-    {
-        unit_ = unit;
         repaint();
     }
 
@@ -127,8 +145,10 @@ namespace tss
     {
         juce::String valueText;
 
-        if (unit_ == "dB" && juce::approximatelyEqual(getValue(), getMinimum()))
-            valueText = "-inf";
+        if (minimumDisplayText_.isNotEmpty() && juce::approximatelyEqual(getValue(), getMinimum()))
+            valueText = minimumDisplayText_;
+        else if (valueDecimalPlaces_ > 0)
+            valueText = juce::String(getValue(), valueDecimalPlaces_);
         else
             valueText = juce::String(static_cast<int>(std::round(getValue())));
 
@@ -157,9 +177,10 @@ namespace tss
 
         const auto dragDistance = dragStartPosition_.y - e.getPosition().y;
         const auto valueDelta = dragDistance * kDragSensitivity_;
-        const auto range = getRange();
+        const auto range = getNormalisableRange();
         auto newValue = dragStartValue_ + valueDelta;
-        newValue = juce::jlimit(range.getStart(), range.getEnd(), newValue);
+        newValue = juce::jlimit(range.start, range.end, newValue);
+        newValue = range.snapToLegalValue(newValue);
 
         setValue(newValue, juce::sendNotificationSync);
     }
@@ -207,10 +228,8 @@ namespace tss
             return true;
         }
 
-        const auto range = getRange();
-        const auto rangeLength = range.getLength();
         const bool isShiftPressed = key.getModifiers().isShiftDown();
-        const auto step = calculateStepForRange(rangeLength, isShiftPressed);
+        const auto step = calculateStep(isShiftPressed);
 
         if (isIncrementKey(key.getKeyCode()))
         {
@@ -227,12 +246,9 @@ namespace tss
         return false;
     }
 
-    double Slider::calculateStepForRange(double rangeLength, bool isShiftPressed) const
+    double Slider::calculateStep(bool isShiftPressed) const
     {
-        if (isShiftPressed)
-            return rangeLength / kShiftKeyStep_;
-
-        return 1.0;
+        return isShiftPressed ? step_ * kShiftStepMultiplier_ : step_;
     }
 
     bool Slider::isIncrementKey(int keyCode) const
@@ -248,9 +264,10 @@ namespace tss
     void Slider::updateValueWithStep(double step, bool increment)
     {
         const auto currentValue = getValue();
-        const auto range = getRange();
+        const auto range = getNormalisableRange();
         auto newValue = increment ? currentValue + step : currentValue - step;
-        newValue = juce::jlimit(range.getStart(), range.getEnd(), newValue);
+        newValue = juce::jlimit(range.start, range.end, newValue);
+        newValue = range.snapToLegalValue(newValue);
         setValue(newValue, juce::sendNotificationSync);
     }
 }

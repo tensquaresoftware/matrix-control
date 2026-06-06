@@ -1,5 +1,12 @@
 # Deferred Work
 
+## Deferred from: code review of r-2-hardware-latency-gui (2026-06-06)
+
+- **Standalone header layout overlap (HW LATENCY + SCALE/SKIN vs UI ELEMENTS)** (`HeaderPanel.cpp`) — superseded by planned SETTINGS window story (Epic 7.7+); header interim layout accepted until then.
+- **Redundant `setHardwareLatencyMs` + `updateHostDisplay` on editor open** (`PluginEditor.cpp:130-132`) — idempotent host refresh; no functional bug.
+- **Sample-rate fallback 44100 before first `prepareToPlay`** (`PluginProcessor.cpp:512-518`) — corrected on prepare; same pattern as audio passthrough.
+- **No automated APVTS round-trip test for `hardwareLatencyMs`** — mirrors existing `inputGainDb` test gap.
+
 ## Deferred from: code review of 2-11-header-panel-layout-and-widget-styling (2026-06-05)
 
 - **Slider `-inf` display keyed on `unit_ == "dB"`** (`Slider.cpp:127`) — only header gain slider uses dB unit today; flag or per-slider opt-in when a second dB slider is added.

@@ -127,6 +127,10 @@ PluginEditor::PluginEditor(PluginProcessor& p)
         pluginProcessor.setInputGainDb(savedInputGainDb);
     }
 
+    const float savedHardwareLatencyMs = pluginProcessor.getHardwareLatencyMs();
+    headerPanel.getHardwareLatencySlider().setValue(savedHardwareLatencyMs, juce::dontSendNotification);
+    pluginProcessor.setHardwareLatencyMs(savedHardwareLatencyMs);
+
     setResizable(false, false);
 
     headerPanel.getSkinComboBox().onChange = [this, &headerPanel]
@@ -182,6 +186,11 @@ PluginEditor::PluginEditor(PluginProcessor& p)
             return;
 
         pluginProcessor.setInputGainDb(static_cast<float>(headerPanel.getInputGainSlider().getValue()));
+    };
+
+    headerPanel.getHardwareLatencySlider().onValueChange = [this, &headerPanel]
+    {
+        pluginProcessor.setHardwareLatencyMs(static_cast<float>(headerPanel.getHardwareLatencySlider().getValue()));
     };
 
     headerPanel.getAudioFromComboBox().onChange = [this, &headerPanel]

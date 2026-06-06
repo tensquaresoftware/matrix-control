@@ -25,9 +25,13 @@ std::unique_ptr<tss::Slider> WidgetFactory::createSliderFromDescriptor(
         width,
         height,
         tss::sliderLookFromSkin(skin),
-        static_cast<double>(desc->defaultValue));
-    slider->setRange(static_cast<double>(desc->minValue), static_cast<double>(desc->maxValue), 1.0);
-    slider->setValue(static_cast<double>(desc->defaultValue));
+        tss::SliderConfig{
+            static_cast<double>(desc->minValue),
+            static_cast<double>(desc->maxValue),
+            static_cast<double>(desc->defaultValue),
+            1.0,
+            {},
+            {}});
     return slider;
 }
 

@@ -6,18 +6,27 @@
 
 namespace tss
 {
+    struct SliderConfig
+    {
+        double minValue = 0.0;
+        double maxValue = 100.0;
+        double defaultValue = 0.0;
+        double step = 1.0;
+        juce::String unit;
+        juce::String minimumDisplayText;
+    };
+
     /** Linear bar slider. Width and height are design dimensions; \p look carries full widget styling
         including the complete \p SliderLook::font (family, weight, height) as for \p Button. */
     class Slider : public juce::Slider
     {
     public:
-        explicit Slider(int width, int height, const SliderLook& look, double defaultValue = 0.0);
+        Slider(int width, int height, const SliderLook& look, const SliderConfig& config);
         ~Slider() override = default;
 
         void setLook(const SliderLook& look);
         void setUiScale(float uiScale);
 
-        void setUnit(const juce::String& unit);
         juce::String getUnit() const;
 
         void paint(juce::Graphics& g) override;
@@ -36,16 +45,19 @@ namespace tss
         inline constexpr static int kValueBarPadding_ = 1;
         inline constexpr static float kFocusBorderThickness_ = 1.0f;
         inline constexpr static double kDragSensitivity_ = 0.5;
-        inline constexpr static double kShiftKeyStep_ = 10.0;
+        inline constexpr static double kShiftStepMultiplier_ = 10.0;
 
         SliderLook look_{};
         int width_;
         int height_;
         float uiScale_ = 1.0f;
         double defaultValue_ = 0.0;
+        double step_ = 1.0;
+        int valueDecimalPlaces_ = 0;
         double dragStartValue_ = 0.0;
         juce::Point<int> dragStartPosition_;
         juce::String unit_;
+        juce::String minimumDisplayText_;
         bool hasFocus_ = false;
 
         void drawTrack(juce::Graphics& g, const juce::Rectangle<int>& bounds, bool enabled);
@@ -55,7 +67,8 @@ namespace tss
 
         juce::Rectangle<float> calculateValueBarBounds(const juce::Rectangle<int>& trackBoundsInt, int insetPerSide, bool enabled) const;
 
-        double calculateStepForRange(double rangeLength, bool isShiftPressed) const;
+        static int countDecimalPlacesForStep(double step);
+        double calculateStep(bool isShiftPressed) const;
         bool isIncrementKey(int keyCode) const;
         bool isDecrementKey(int keyCode) const;
         void updateValueWithStep(double step, bool increment);

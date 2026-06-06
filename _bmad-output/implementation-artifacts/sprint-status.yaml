@@ -1,5 +1,5 @@
 # generated: 2026-05-29
-# last_updated: 2026-06-06 (Story R-1 ready-for-dev)
+# last_updated: 2026-06-06 (Story R-2 done; Story 7.7 ready-for-dev)
 # project: Matrix-Control
 # project_key: NOKEY
 # tracking_system: file-system
@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-05-29
-last_updated: 2026-06-06 (Story R-1 ready-for-dev)
+last_updated: 2026-06-06 (Story R-2 done; Story 7.7 ready-for-dev)
 project: Matrix-Control
 project_key: NOKEY
 tracking_system: file-system
@@ -74,7 +74,7 @@ development_status:
   epic-2-retrospective: optional
   epic-r: in-progress
   r-1-remove-plugin-audio-input-bus: done
-  r-2-hardware-latency-gui: backlog
+  r-2-hardware-latency-gui: done
   r-3-midi-port-open-error-feedback: backlog
   r-4-midioutboundqueue-mpsc-audit: backlog
   r-5-windows-midi-multi-client-docs: backlog
@@ -112,14 +112,14 @@ development_status:
   6-12-recipe-persistence-and-action-enabled-states: backlog
   6-13-clear-history-on-patch-load: backlog
   epic-6-retrospective: optional
-  epic-7: backlog
+  epic-7: in-progress
   7-1-actiondispatcher-and-handler-interfaces: backlog
   7-2-moduleactionhandler-i-c-p-and-matrix-mod-init: backlog
   7-3-patchmanageractionhandler-bank-and-internal: backlog
   7-4-mutatoractionhandler: backlog
   7-5-bank-utility-ui-wiring: backlog
   7-6-internal-patches-panel-wiring: backlog
-  7-7-settings-page-consolidation: backlog
+  7-7-settings-page-consolidation: ready-for-dev
   7-8-header-footer-shell-and-persistence: backlog
   7-9-matrix-mod-bus-reorder-ux-handler: backlog
   epic-7-retrospective: optional

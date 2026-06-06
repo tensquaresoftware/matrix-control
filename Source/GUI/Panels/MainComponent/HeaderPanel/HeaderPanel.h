@@ -56,6 +56,7 @@ public:
     tss::Button& getUiElementsButton() { return uiElementsButton_; }
     tss::ComboBox& getAudioFromComboBox() { return audioFromComboBox_; }
     tss::Slider& getInputGainSlider() { return inputGainSlider_; }
+    tss::Slider& getHardwareLatencySlider() { return hardwareLatencySlider_; }
     tss::PeakIndicator& getPeakIndicator() { return peakIndicator_; }
     tss::ActivityLed& getInstrumentActivityLed() { return instrumentActivityLed_; }
     tss::ActivityLed& getEditorActivityLed() { return editorActivityLed_; }
@@ -82,8 +83,10 @@ private:
     inline constexpr static int kKeyboardFromLabelWidth_ = 82;
     inline constexpr static int kAudioFromLabelWidth_ = 64;
     inline constexpr static int kInputGainLabelWidth_ = 58;
+    inline constexpr static int kHardwareLatencyLabelWidth_ = 96;
     inline constexpr static int kPortComboBoxWidth_ = 96;
     inline constexpr static int kInputGainSliderWidth_ = 60;
+    inline constexpr static int kHardwareLatencySliderWidth_ = 60;
     inline constexpr static int kPeakIndicatorWidth_ = 12;
     inline constexpr static int kActivityLedSize_ = 12;
     inline constexpr static int kSkinLabelWidth_ = 30;
@@ -114,6 +117,8 @@ private:
     tss::ComboBox audioFromComboBox_;
     tss::Label inputGainLabel_;
     tss::Slider inputGainSlider_;
+    tss::Label hardwareLatencyLabel_;
+    tss::Slider hardwareLatencySlider_;
     tss::PeakIndicator peakIndicator_;
     tss::Label skinLabel_;
     tss::ComboBox skinComboBox_;

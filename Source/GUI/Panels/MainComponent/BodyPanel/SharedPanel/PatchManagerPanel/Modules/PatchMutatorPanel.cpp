@@ -60,13 +60,12 @@ void PatchMutatorPanel::setupAmountLine(tss::ISkin& skin, WidgetFactory& widgetF
         PluginDesignDimensions::Widgets::Widths::Slider::kPatchMutator,
         PluginDesignDimensions::Widgets::Heights::kSlider,
         tss::sliderLookFromSkin(skin),
-        0.0);
-    if (amountIt != allIntParams.end())
-    {
-        amountSlider_->setRange(static_cast<double>(amountIt->minValue), static_cast<double>(amountIt->maxValue), 1.0);
-        amountSlider_->setValue(static_cast<double>(amountIt->defaultValue));
-    }
-    amountSlider_->setUnit(PluginDisplayNames::Units::kPercent);
+        tss::SliderConfig{
+            amountIt != allIntParams.end() ? static_cast<double>(amountIt->minValue) : 0.0,
+            amountIt != allIntParams.end() ? static_cast<double>(amountIt->maxValue) : 100.0,
+            amountIt != allIntParams.end() ? static_cast<double>(amountIt->defaultValue) : 0.0,
+            1.0,
+            PluginDisplayNames::Units::kPercent});
     amountSlider_->onValueChange = [this]
     {
         apvts_.state.setProperty(
@@ -143,13 +142,12 @@ void PatchMutatorPanel::setupRandomLine(tss::ISkin& skin, WidgetFactory& widgetF
         PluginDesignDimensions::Widgets::Widths::Slider::kPatchMutator,
         PluginDesignDimensions::Widgets::Heights::kSlider,
         tss::sliderLookFromSkin(skin),
-        0.0);
-    if (randomIt != allIntParams.end())
-    {
-        randomSlider_->setRange(static_cast<double>(randomIt->minValue), static_cast<double>(randomIt->maxValue), 1.0);
-        randomSlider_->setValue(static_cast<double>(randomIt->defaultValue));
-    }
-    randomSlider_->setUnit(PluginDisplayNames::Units::kPercent);
+        tss::SliderConfig{
+            randomIt != allIntParams.end() ? static_cast<double>(randomIt->minValue) : 0.0,
+            randomIt != allIntParams.end() ? static_cast<double>(randomIt->maxValue) : 100.0,
+            randomIt != allIntParams.end() ? static_cast<double>(randomIt->defaultValue) : 0.0,
+            1.0,
+            PluginDisplayNames::Units::kPercent});
     randomSlider_->onValueChange = [this]
     {
         apvts_.state.setProperty(

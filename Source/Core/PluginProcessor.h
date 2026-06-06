@@ -88,6 +88,8 @@ public:
     bool setKeyboardFromPort(const juce::String& deviceId);
 
     void setInputGainDb(float gainDb);
+    void setHardwareLatencyMs(float latencyMs);
+    float getHardwareLatencyMs() const;
     void setAudioFromChannelMode(int mode);
     void setAudioFromSourceId(const juce::String& sourceId);
     void syncAudioPassthroughFromSourceId(const juce::String& sourceId);
@@ -120,6 +122,9 @@ private:
     void validatePluginDescriptorsAtStartup();
     void initializeMidiPortProperties();
     void initializeAudioProperties();
+    void initializeHardwareLatencyProperty();
+    void syncHardwareLatencyFromState();
+    void applyHardwareLatencyToHost();
     void initializePatchNameProperty();
     bool getInstrumentPathEnabled(const juce::MidiBuffer& midiMessages) const;
     void ensureAudioInputBusEnabled();

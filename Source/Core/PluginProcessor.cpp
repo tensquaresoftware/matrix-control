@@ -5,6 +5,7 @@
 #include "PluginProcessor.h"
 #include "Core/Audio/AudioPassthroughProcessor.h"
 #include "Core/Audio/AudioInputSourceCatalog.h"
+#include "Core/Audio/HardwareLatency.h"
 #include "Core/Audio/InstrumentMidiForwarder.h"
 #include "Core/Audio/StandaloneAudioInputRouter.h"
 
@@ -23,6 +24,7 @@
 #include "Shared/Definitions/Matrix1000Limits.h"
 #include "Shared/Definitions/PluginDescriptors.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
+#include "Shared/Definitions/PluginIDs.h"
 #include "GUI/PluginEditor.h"
 #include "MIDI/MidiManager.h"
 #include "Shared/Definitions/ApvtsTypes.h"
@@ -113,6 +115,7 @@ PluginProcessor::PluginProcessor()
     buildMatrixModParameterIdSet();
     initializeMidiPortProperties();
     initializeAudioProperties();
+    initializeHardwareLatencyProperty();
     initializePatchNameProperty();
     apvts.state.addListener(this);
     startMidiThread();
@@ -197,6 +200,7 @@ void PluginProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 
     audioPassthroughSampleRate_ = sampleRate > 0.0 ? sampleRate : 44100.0;
     refreshAudioPassthroughLayout(audioPassthroughSampleRate_);
+    applyHardwareLatencyToHost();
 
     if (shouldUseDevelopmentLogging())
         ensureDevelopmentLoggingStarted();
@@ -325,6 +329,7 @@ void PluginProcessor::setStateInformation(const void* data, int sizeInBytes)
         {
             apvts.replaceState(juce::ValueTree::fromXml(*xmlState));
             syncAudioRuntimeFromState();
+            syncHardwareLatencyFromState();
 
             if (shouldUseDevelopmentLogging())
                 ApvtsLogger::getInstance().logStateLoaded("DAW state");
@@ -470,6 +475,47 @@ void PluginProcessor::setInputGainDb(float gainDb)
                                          gainDb);
     inputGainLinear_.store(dbToLinearGain(clampedDb), std::memory_order_relaxed);
     apvts.state.setProperty("inputGainDb", clampedDb, nullptr);
+}
+
+void PluginProcessor::setHardwareLatencyMs(float latencyMs)
+{
+    const float quantizedMs = Core::HardwareLatency::quantizeMs(latencyMs);
+    apvts.state.setProperty(PluginIDs::Settings::kHardwareLatencyMsId, quantizedMs, nullptr);
+    applyHardwareLatencyToHost();
+}
+
+float PluginProcessor::getHardwareLatencyMs() const
+{
+    const auto property = apvts.state.getProperty(PluginIDs::Settings::kHardwareLatencyMsId, 0.0f);
+    return Core::HardwareLatency::quantizeMs(static_cast<float>(property));
+}
+
+void PluginProcessor::initializeHardwareLatencyProperty()
+{
+    if (!apvts.state.hasProperty(PluginIDs::Settings::kHardwareLatencyMsId))
+        apvts.state.setProperty(PluginIDs::Settings::kHardwareLatencyMsId, Core::HardwareLatency::kMinMs, nullptr);
+
+    syncHardwareLatencyFromState();
+}
+
+void PluginProcessor::syncHardwareLatencyFromState()
+{
+    const auto property = apvts.state.getProperty(PluginIDs::Settings::kHardwareLatencyMsId, Core::HardwareLatency::kMinMs);
+    const float quantizedMs = Core::HardwareLatency::quantizeMs(static_cast<float>(property));
+
+    if (! juce::approximatelyEqual(static_cast<float>(property), quantizedMs))
+        apvts.state.setProperty(PluginIDs::Settings::kHardwareLatencyMsId, quantizedMs, nullptr);
+
+    applyHardwareLatencyToHost();
+}
+
+void PluginProcessor::applyHardwareLatencyToHost()
+{
+    const double sampleRate = audioPassthroughSampleRate_ > 0.0 ? audioPassthroughSampleRate_ : 44100.0;
+    const float latencyMs = getHardwareLatencyMs();
+    const int latencySamples = Core::HardwareLatency::msToSamples(latencyMs, sampleRate);
+    setLatencySamples(latencySamples);
+    updateHostDisplay();
 }
 
 void PluginProcessor::setAudioFromChannelMode(int mode)

@@ -61,22 +61,17 @@ public:
             scaleLabelText);
         addAndMakeVisible(*scaleLabel_);
 
-        firstSlider_ = createSlider(dimensions_.topSliderWidth, dimensions_.topSliderHeight, sliderLook, 50.0);
-        firstSlider_->setRange(0.0, 100.0, 1.0);
-        firstSlider_->setValue(50.0, juce::dontSendNotification);
-        firstSlider_->setUnit("%");
+        firstSlider_ = createSlider(dimensions_.topSliderWidth, dimensions_.topSliderHeight, sliderLook,
+                                    tss::SliderConfig{ 0.0, 100.0, 50.0, 1.0, "%" });
 
-        secondSlider_ = createSlider(dimensions_.topSliderWidth, dimensions_.topSliderHeight, sliderLook, 0.0);
-        secondSlider_->setRange(-63.0, 63.0, 1.0);
-        secondSlider_->setValue(0.0, juce::dontSendNotification);
+        secondSlider_ = createSlider(dimensions_.topSliderWidth, dimensions_.topSliderHeight, sliderLook,
+                                     tss::SliderConfig{ -63.0, 63.0, 0.0, 1.0 });
 
-        thirdSlider_ = createSlider(dimensions_.bottomSliderWidth, dimensions_.bottomSliderHeight, sliderLook, 63.0);
-        thirdSlider_->setRange(0.0, 127.0, 1.0);
-        thirdSlider_->setValue(63.0, juce::dontSendNotification);
+        thirdSlider_ = createSlider(dimensions_.bottomSliderWidth, dimensions_.bottomSliderHeight, sliderLook,
+                                    tss::SliderConfig{ 0.0, 127.0, 63.0, 1.0 });
 
-        fourthSlider_ = createSlider(dimensions_.bottomSliderWidth, dimensions_.bottomSliderHeight, sliderLookBoldLarge, 63.0);
-        fourthSlider_->setRange(0.0, 127.0, 1.0);
-        fourthSlider_->setValue(63.0, juce::dontSendNotification);
+        fourthSlider_ = createSlider(dimensions_.bottomSliderWidth, dimensions_.bottomSliderHeight, sliderLookBoldLarge,
+                                     tss::SliderConfig{ 0.0, 127.0, 63.0, 1.0 });
     }
 
     int getScaledColumnWidth() const
@@ -126,9 +121,9 @@ private:
     std::unique_ptr<tss::Slider> createSlider(int width,
                                               int height,
                                               const tss::SliderLook& look,
-                                              double defaultValue)
+                                              const tss::SliderConfig& config)
     {
-        auto slider = std::make_unique<tss::Slider>(width, height, look, defaultValue);
+        auto slider = std::make_unique<tss::Slider>(width, height, look, config);
         slider->setUiScale(scale_);
         addAndMakeVisible(*slider);
         return slider;

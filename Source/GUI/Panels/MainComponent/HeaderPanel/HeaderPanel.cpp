@@ -8,6 +8,7 @@
 #include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Looks/LookBuilders.h"
 #include "Shared/Definitions/PluginAudioConstants.h"
+#include "Core/Audio/HardwareLatency.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginIDs.h"
 
@@ -59,7 +60,22 @@ HeaderPanel::HeaderPanel(tss::ISkin& skin, int width, int height)
     , audioFromLabel_(kAudioFromLabelWidth_, kControlHeight_, tss::headerPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kAudioFromLabel, tss::LabelStyle::HeaderPanel)
     , audioFromComboBox_(kPortComboBoxWidth_, kControlHeight_, tss::comboBoxLookFromSkin(skin), tss::ComboBox::Style::ButtonLike)
     , inputGainLabel_(kInputGainLabelWidth_, kControlHeight_, tss::headerPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kInputGainLabel, tss::LabelStyle::HeaderPanel)
-    , inputGainSlider_(kInputGainSliderWidth_, kControlHeight_, tss::sliderLookFromSkin(skin), 0.0)
+    , inputGainSlider_(kInputGainSliderWidth_, kControlHeight_, tss::sliderLookFromSkin(skin),
+                       tss::SliderConfig{
+                           PluginAudioConstants::kMinInputGainDb,
+                           PluginAudioConstants::kMaxInputGainDb,
+                           0.0,
+                           1.0,
+                           "dB",
+                           "-inf"})
+    , hardwareLatencyLabel_(kHardwareLatencyLabelWidth_, kControlHeight_, tss::headerPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kHardwareLatencyLabel, tss::LabelStyle::HeaderPanel)
+    , hardwareLatencySlider_(kHardwareLatencySliderWidth_, kControlHeight_, tss::sliderLookFromSkin(skin),
+                               tss::SliderConfig{
+                                   Core::HardwareLatency::kMinMs,
+                                   Core::HardwareLatency::kMaxMs,
+                                   Core::HardwareLatency::kMinMs,
+                                   Core::HardwareLatency::kStepMs,
+                                   "ms"})
     , peakIndicator_(kPeakIndicatorWidth_, kControlHeight_)
     , skinLabel_(kSkinLabelWidth_, kControlHeight_, tss::headerPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kSkinLabel, tss::LabelStyle::HeaderPanel)
     , skinComboBox_(kSkinComboBoxWidth_, kControlHeight_, tss::comboBoxLookFromSkin(skin), tss::ComboBox::Style::ButtonLike)
@@ -92,11 +108,10 @@ HeaderPanel::HeaderPanel(tss::ISkin& skin, int width, int height)
     addAndMakeVisible(audioFromComboBox_);
 
     addAndMakeVisible(inputGainLabel_);
-    inputGainSlider_.setRange(PluginAudioConstants::kMinInputGainDb,
-                              PluginAudioConstants::kMaxInputGainDb,
-                              0.1);
-    inputGainSlider_.setUnit("dB");
     addAndMakeVisible(inputGainSlider_);
+
+    addAndMakeVisible(hardwareLatencyLabel_);
+    addAndMakeVisible(hardwareLatencySlider_);
 
     peakIndicator_.setSkin(skin);
     addAndMakeVisible(peakIndicator_);
@@ -152,6 +167,8 @@ void HeaderPanel::resized()
     const float inputGainLabelWidth = static_cast<float>(kInputGainLabelWidth_) * sf;
     const float portComboWidth = static_cast<float>(kPortComboBoxWidth_) * sf;
     const float inputGainSliderWidth = static_cast<float>(kInputGainSliderWidth_) * sf;
+    const float hardwareLatencyLabelWidth = static_cast<float>(kHardwareLatencyLabelWidth_) * sf;
+    const float hardwareLatencySliderWidth = static_cast<float>(kHardwareLatencySliderWidth_) * sf;
     const float peakIndicatorWidth = static_cast<float>(kPeakIndicatorWidth_) * sf;
     const float activityLedSize = static_cast<float>(kActivityLedSize_) * sf;
     const float uiScaleLabelWidth = static_cast<float>(kUiScaleLabelWidth_) * sf;
@@ -247,6 +264,18 @@ void HeaderPanel::resized()
         x += comboWidth + packetExternalGap;
     };
 
+    auto placeRightClusterLabelAndSlider = [&](tss::Label& label, float labelWidth, tss::Slider& slider, float sliderWidth)
+    {
+        label.setBounds(juce::roundToInt(x), y, juce::roundToInt(labelWidth), h);
+        label.setUiScale(uiScale_);
+        x += labelWidth + gap;
+
+        slider.setBounds(juce::roundToInt(x), y, juce::roundToInt(sliderWidth), h);
+        slider.setUiScale(uiScale_);
+        x += sliderWidth + packetExternalGap;
+    };
+
+    placeRightClusterLabelAndSlider(hardwareLatencyLabel_, hardwareLatencyLabelWidth, hardwareLatencySlider_, hardwareLatencySliderWidth);
     placeRightClusterLabelAndCombo(uiScaleLabel_, uiScaleLabelWidth, uiScaleComboBox_, scaleComboWidth);
     placeRightClusterLabelAndCombo(skinLabel_, skinLabelWidth, skinComboBox_, skinComboWidth);
 
@@ -272,6 +301,8 @@ void HeaderPanel::setSkin(tss::ISkin& skin)
     audioFromComboBox_.setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
     inputGainLabel_.setLook(tss::headerPanelLabelLookFromSkin(skin));
     inputGainSlider_.setLook(tss::sliderLookFromSkin(skin));
+    hardwareLatencyLabel_.setLook(tss::headerPanelLabelLookFromSkin(skin));
+    hardwareLatencySlider_.setLook(tss::sliderLookFromSkin(skin));
     peakIndicator_.setSkin(skin);
     editorActivityLed_.setSkin(skin);
     midiToActivityLed_.setSkin(skin);
