@@ -4,14 +4,14 @@ project: Matrix-Control
 title: Product Requirements Document
 author: BMad Agent
 status: final
-version: "1.0"
+version: "1.1"
 sources:
   - ../../briefs/brief-Matrix-Control-2026-05-22/brief.md
   - .decision-log.md
   - addendum.md
   - ../../reference-docs/oberheim/index.md
 created: 2026-05-25
-updated: 2026-05-29
+updated: 2026-06-06
 ---
 
 # Product Requirements Document
@@ -24,7 +24,7 @@ This PRD defines **what** Matrix-Control v1 must do for musicians and contributo
 
 **Structure:** Glossary-anchored vocabulary; features grouped with globally numbered FRs; assumptions tagged inline and indexed in §9.
 
-**Status:** **Final v1.0** — finalized 2026-05-29 (`bmad-prd` Finalize: decision-log audit, input reconciliation, rubric review `review-rubric.md`). Open questions §9 deferred to Architecture or owner input; safe for UX / Architecture / Epics.
+**Status:** **Final v1.1** — revised 2026-06-06 (Sprint Change Proposal: AD-11 / D-055-R — hosted plugin audio bus removed; standalone passthrough unchanged). Prior finalize 2026-05-29 (`review-rubric.md`). Open questions §9 deferred to Architecture or owner input.
 
 ---
 
@@ -32,7 +32,7 @@ This PRD defines **what** Matrix-Control v1 must do for musicians and contributo
 
 Matrix-Control is a cross-platform JUCE **virtual instrument** and standalone application that gives Oberheim Matrix-1000 owners full, intuitive, real-time control over every synthesis parameter — from any major DAW or as a standalone editor.
 
-It combines **two roles in one plugin**: play the hardware (MIDI notes/CC in, synth audio out) and **always-on bidirectional patch editing** (SysEx independent of track arming). One DAW track replaces the Ableton Live External Instrument + separate editor workflow that frustrated users of the original Max for Live editor.
+It combines **two roles in one product**: play the hardware (MIDI notes/CC when the instrument track is armed) and **always-on bidirectional patch editing** (SysEx independent of track arming). One **instrument track** hosts Matrix-Control for MIDI editing and performance; a **separate audio track** monitors the synth hardware return — the standard cross-DAW pattern for external instruments. Standalone mode provides integrated audio input selection via `AudioDeviceManager`. This replaces the Ableton Live External Instrument + separate Max for Live editor workflow that frustrated users of the original editor.
 
 The product promise is professional craftsmanship and **trust**: users must edit for hours without the Matrix-1000 hanging because the editor flooded it with MIDI. Everything else — pixel UI, Patch Manager, Mutator, open-source quality — serves that reliability.
 
@@ -45,7 +45,7 @@ Matrix-Control v1 ships **free (MIT)** with aspirational release Christmas 2026.
 ### 2.1 Jobs To Be Done
 
 - **Program deeply** — Understand and sculpt the Matrix-1000 without a front panel or a frustrating third-party editor.
-- **Play and edit on one track** — Sequence notes/CC and automate patch parameters in the same DAW track without routing confusion.
+- **Play and edit on one instrument track** — Sequence notes/CC and automate patch parameters on the Matrix-Control instrument track; synth audio monitored on a separate DAW audio track.
 - **Manage patches** — Navigate internal banks, store to RAM, maintain a computer `.syx` library, explore variations via Patch Mutator.
 - **Trust the tool** — Long sessions without synth hangs; clear feedback when MIDI fails.
 - **Learn from the repo** *(secondary)* — JUCE developers study Clean Architecture, descriptors, tests, and docs.
@@ -60,7 +60,7 @@ Matrix-Control v1 ships **free (MIT)** with aspirational release Christmas 2026.
 
 **UJ-1. Alex sets up Ableton Live with one Matrix-1000 track.**
 
-Alex owns a Matrix-1000 and Live 12 Suite. They insert Matrix-Control on a MIDI track, set **MIDI From** / **MIDI To** to their interface ports, route the synth audio output into the plugin input bus, and arm the track. Device Inquiry succeeds; the UI unlocks. They play a clip — notes reach the synth; audio returns through the plugin. They disarm the track and tweak envelope segments — SysEx still flows; the editor LED activity confirms editing continues.
+Alex owns a Matrix-1000 and Live 12 Suite. They create an instrument track with Matrix-Control, configure **MIDI From** / **MIDI To** to their interface ports, and arm the track. They add an **audio track** monitoring their interface input connected to the Matrix-1000 output. Device Inquiry succeeds; the UI unlocks. They play a clip — notes reach the synth; audio is heard on the audio track. They disarm the instrument track and tweak envelope segments — SysEx still flows; the editor LED activity confirms editing continues.
 
 **UJ-2. Alex completes a four-hour programming session.**
 
@@ -84,7 +84,7 @@ Alex loads a patch from the synth. The **History M** combobox shows `<EMPTY>`; *
 - **MIDI From** — Input port receiving SysEx from the synth return.
 - **MIDI To** — Output port to connected Oberheim synth MIDI In (Matrix-1000, Matrix-6, or Matrix-6R).
 - **Keyboard From** — Standalone: master keyboard port. Plugin: grayed, displays **Host**.
-- **Audio From** — Standalone: physical interface input via device manager. Plugin: host-routed input bus (mono or stereo per detected device — see FR-4).
+- **Audio From** — **Standalone only:** physical interface input via `AudioDeviceManager` and channel ComboBox. **Hidden in hosted plugin mode** (see FR-4, AD-11).
 - **PATCH EDIT** — Ten synthesis modules (96 parameters) plus interactive displays and patch name.
 - **MASTER EDIT** — Three modules (MIDI, Vibrato, Misc; 22 parameters).
 - **PATCH MANAGER** — Bank Utility, Internal Patches, Computer Patches, Patch Mutator.
@@ -142,13 +142,26 @@ The system persists plugin preferences (MIDI port IDs, skin, UI scale, Computer 
 
 #### FR-4: Virtual instrument plugin category
 
-The product registers as a virtual instrument (AU Music Device, VST3 Instrument, `IS_SYNTH TRUE`) with MIDI input, MIDI output, audio input (Audio From), and stereo audio output.
+The product registers as a virtual instrument (AU Music Device, VST3 Instrument, `IS_SYNTH TRUE`) with MIDI input, MIDI output, and stereo audio output.
 
-**Audio input bus layout:** after Device Inquiry, the plugin exposes a **mono** input bus when a Matrix-1000 is detected and a **stereo** input bus when a Matrix-6 or Matrix-6R is detected (host may offer mono/stereo channel routing per DAW conventions).
+**Hosted plugin:** no audio input bus. Synth audio return is managed on a **separate DAW audio track**.
+
+**Standalone:** audio input via `AudioDeviceManager`; after Device Inquiry, **mono** channel selection for Matrix-1000 and **stereo** for Matrix-6 or Matrix-6R (FR-46 device-type rules apply to channel layout guidance).
 
 **Consequences (testable):**
 - Instantiates as instrument in Ableton Live 12, Reason 12, GarageBand 10 without manual MIDI-effect workarounds.
-- Bus layout updates when `deviceType` changes after port reconfiguration.
+- Standalone input channel layout guidance updates when `deviceType` changes after port reconfiguration.
+
+#### FR-4b: Hardware Latency
+
+User can set **Hardware Latency** (0–100 ms, 0.1 ms step) representing analog round-trip delay: DAW → MIDI → synth → DAC/ADC → separate audio track (hosted) or physical monitor path (standalone).
+
+**Consequences (testable):**
+- Value converted to samples and reported to the host via `AudioProcessor::reportLatency()` (plugin delay compensation when recording external synth audio).
+- Value persisted in `apvts.state` across sessions.
+- User manual documents typical values (interface + Matrix-1000 analog path).
+
+**Notes:** Primary use case is **hosted plugin** two-track workflow (FR-4, UJ-1). Control exposed in UI per FR-40 (Settings Plugin section when consolidated; interim header placement acceptable).
 
 #### FR-5: Instrument path forwarding
 
@@ -174,11 +187,13 @@ All MIDI To traffic passes through a single queue where **realtime messages (Not
 
 #### FR-8: Audio passthrough
 
-Synth audio routed to the plugin input bus (hosted) or selected physical input (standalone) passes to the plugin output with user-adjustable Input Gain and a **peak level indicator** (not a continuous level meter).
+**Standalone:** synth audio from the selected physical input passes to the plugin output with user-adjustable Input Gain and a **peak level indicator** (not a continuous level meter).
+
+**Hosted plugin:** audio output bus is silent. Input Gain and peak indicator are **standalone-only** UI controls (AD-11).
 
 **Consequences (testable):**
 - Peak indicator uses a **solid fill colour** matching the envelope curve colour from the active skin/Look (same RGB as EnvelopeDisplay curves).
-- Gain adjustment affects output level without blocking audio thread.
+- Gain adjustment affects output level without blocking audio thread (standalone only).
 
 #### FR-9: Activity LEDs
 
@@ -462,11 +477,11 @@ See FR-17; PATCH Init requires no confirmation.
 
 #### FR-39: Header routing controls
 
-Header exposes MIDI From, MIDI To, Keyboard From, Audio From, Input Gain, peak level indicator, and Instrument/Editor activity LEDs — **not** firmware or device identity (see FR-53).
+Header exposes MIDI From, MIDI To, Keyboard From, and Instrument/Editor activity LEDs in all build contexts. **Audio From**, **Input Gain**, and **peak level indicator** are exposed in **standalone only** (hidden in hosted plugin mode — AD-11). Firmware and device identity are **not** in the header (see FR-53).
 
 #### FR-40: Settings page
 
-Settings consolidates skin (if not moved to logo popup), UI scale (if not moved), Computer Patches reconciliation policy, **unsaved patch edit warning policy**, **Defrag mutation history** (FR-59), Master file/library/init actions, INIT template paths, optional logging opt-in (NFR), and future power-user options.
+Settings consolidates skin (if not moved to logo popup), UI scale (if not moved), **Hardware Latency** (FR-4b), Computer Patches reconciliation policy, **unsaved patch edit warning policy**, **Defrag mutation history** (FR-59), Master file/library/init actions, INIT template paths, optional logging opt-in (NFR), and future power-user options.
 
 #### FR-41: Logo popup layout *(if Figma approved — D-014a)*
 
@@ -554,7 +569,7 @@ Full ambitious v1 per brief § Scope: virtual instrument dual-role, PATCH + MAST
 **Primary**
 
 - **SM-1:** 4-hour continuous hardware editing session without synth hang attributable to plugin SysEx flooding. Validates FR-7, FR-10, FR-48.
-- **SM-2:** Single-track Live workflow — play + edit with track disarmed for SysEx. Validates FR-5, FR-6, UJ-1.
+- **SM-2:** Instrument-track Live workflow — play + edit with instrument track disarmed for SysEx; synth audio on separate audio track. Validates FR-5, FR-6, UJ-1.
 - **SM-3:** Complete Matrix-1000 PATCH + MASTER bidirectional editing. Validates FR-10, FR-16.
 
 **Secondary**
@@ -629,4 +644,4 @@ macOS (AU + VST3 + Standalone), Windows (VST3 + Standalone), Linux (VST3 + Stand
 
 ---
 
-*End of PRD v1.0 — status `final`. Next: `bmad-create-architecture`, `bmad-ux`, or `bmad-create-epics-and-stories`.*
+*End of PRD v1.1 — status `final`. Next: `bmad-ux` (header conditional layout), `bmad-create-story` Epic R, or `bmad-dev-story` R-1.*

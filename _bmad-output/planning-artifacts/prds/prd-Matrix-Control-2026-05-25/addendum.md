@@ -297,19 +297,30 @@ APVTS exposes **Int** and **Choice** parameters. Each descriptor defines:
 - **Not** a continuous VU/level meter — a **peak hold / clip-style indicator** in header.
 - **Fill colour:** solid RGB matching **EnvelopeDisplay curve colour** from active Skin/Look (same token or LookBuilder constant).
 - Input Gain remains user-adjustable; indicator reflects post-gain peak on audio input bus.
+- **Standalone only** — hidden in hosted plugin mode (AD-11, D-055-R).
 
 ---
 
-## Audio input bus layout (D-070, FR-4)
+## Audio input bus layout (D-070, FR-4, AD-11)
 
-| `deviceType` | Plugin input bus | Rationale |
+| Context | Input bus | Channel layout (after Device Inquiry) |
 |---|---|---|
-| Matrix-1000 | **Mono** | Mono audio out on hardware |
-| Matrix-6 / Matrix-6R | **Stereo** | Master byte 57 Stereo Output (M-6 ref) |
+| **Hosted plugin** | **None** | Synth return on separate DAW audio track |
+| **Standalone** | Enabled via `AudioDeviceManager` | Matrix-1000: **mono**; Matrix-6/6R: **stereo** |
 
-- Bus layout changes when `deviceType` updates after port reconfiguration / Device Inquiry.
-- Standalone: physical input selection via `AudioDeviceManager` follows same mono/stereo expectation per detected device.
-- Host routing (e.g. Live External Instrument mono/stereo channel) is user/DAW responsibility.
+- Standalone channel layout guidance updates when `deviceType` changes after port reconfiguration / Device Inquiry.
+- Hosted plugin: stereo output bus only; `AudioPassthroughProcessor` silent (no input read).
+- **Supersedes** D-055 hosted-plugin input bus rationale (see D-055-R).
+
+---
+
+## Hardware Latency (FR-4b, Epic R)
+
+- Models **analog round-trip** only — not MIDI port buffer size or host audio buffer.
+- **Range:** 0–100 ms, 0.1 ms step; stored as `hardwareLatencyMs` (or equivalent) on `apvts.state`.
+- **Host reporting:** `setLatencySamples()` from ms × sample rate; call `updateHostDisplay()` on change.
+- **Typical values:** document in user manual (USB interface latency + Matrix-1000 DAC/ADC path); owner supplies table at doc time.
+- **UI:** Settings Plugin tab when Story 7.7 consolidated; header interim per R-2 until relocation.
 
 ---
 
