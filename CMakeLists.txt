@@ -161,6 +161,8 @@ set(PLUGIN_SOURCES
     # GUI - Panels
     Source/GUI/Panels/MainComponent/FooterPanel/FooterPanel.cpp
     Source/GUI/Panels/MainComponent/HeaderPanel/HeaderPanel.cpp
+    Source/GUI/Settings/SettingsPanel.cpp
+    Source/GUI/Settings/SettingsWindow.cpp
     Source/GUI/Panels/MainComponent/BodyPanel/BodyPanel.cpp
     Source/GUI/Panels/MainComponent/BodyPanel/MasterEditPanel/MasterEditPanel.cpp
     Source/GUI/Panels/MainComponent/BodyPanel/MasterEditPanel/Modules/MidiPanel.cpp

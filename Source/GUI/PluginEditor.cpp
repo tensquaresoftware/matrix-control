@@ -6,6 +6,8 @@
 #include "Core/PluginProcessor.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Panels/MainComponent/HeaderPanel/HeaderPanel.h"
+#include "GUI/Settings/SettingsPanel.h"
+#include "GUI/Settings/SettingsWindow.h"
 #include "Skins/Skin.h"
 #include "Factories/WidgetFactory.h"
 #include "Shared/Definitions/PluginIDs.h"
@@ -39,8 +41,11 @@ private:
                 }
             }
 
-            headerPanel_.getPeakIndicator().setLevel(
-                processor_.getAudioPassthroughProcessor().getPeakLevel());
+            if (auto* panel = owner_.getSettingsPanelIfOpen())
+            {
+                panel->getPeakIndicator().setLevel(
+                    processor_.getAudioPassthroughProcessor().getPeakLevel());
+            }
         }
 
         const auto& tracker = processor_.getMidiActivityTracker();
@@ -93,13 +98,9 @@ PluginEditor::PluginEditor(PluginProcessor& p)
         PluginIDs::Settings::ScaleLevels::kDefault);
     const float savedUiScale = PluginIDs::Settings::ScaleLevels::getUiScale(savedScaleId);
     applyUiScale(savedUiScale);
-    headerPanel.getUiScaleComboBox().setSelectedId(savedScaleId, juce::dontSendNotification);
 
     headerPanel.setPluginMode(!pluginProcessor.isStandalone());
     headerPanel.refreshPortLists();
-
-    if (pluginProcessor.isStandalone())
-        refreshAudioFromCombo();
 
     const auto savedMidiInputPortId = pluginProcessor.getApvts().state.getProperty("midiInputPortId", juce::String()).toString();
     headerPanel.selectMidiFromPort(savedMidiInputPortId);
@@ -118,35 +119,25 @@ PluginEditor::PluginEditor(PluginProcessor& p)
         pluginProcessor.setKeyboardFromPort(headerPanel.getSelectedKeyboardFromPortIdentifier());
 
         const auto savedAudioFromSourceId = pluginProcessor.getApvts().state.getProperty("audioFromSourceId", juce::String()).toString();
-        headerPanel.selectAudioFromSourceId(savedAudioFromSourceId);
-        pluginProcessor.setAudioFromSourceId(headerPanel.getSelectedAudioFromSourceId());
+        if (savedAudioFromSourceId.isNotEmpty())
+            pluginProcessor.setAudioFromSourceId(savedAudioFromSourceId);
 
         const float savedInputGainDb = static_cast<float>(
             pluginProcessor.getApvts().state.getProperty("inputGainDb", 0.0f));
-        headerPanel.getInputGainSlider().setValue(savedInputGainDb, juce::dontSendNotification);
         pluginProcessor.setInputGainDb(savedInputGainDb);
     }
 
     const float savedHardwareLatencyMs = pluginProcessor.getHardwareLatencyMs();
-    headerPanel.getHardwareLatencySlider().setValue(savedHardwareLatencyMs, juce::dontSendNotification);
     pluginProcessor.setHardwareLatencyMs(savedHardwareLatencyMs);
 
     setResizable(false, false);
 
-    headerPanel.getSkinComboBox().onChange = [this, &headerPanel]
+    headerPanel.getSettingsButton().onClick = [this]
     {
-        const auto selectedId = headerPanel.getSkinComboBox().getSelectedId();
-
-        skin_ = (selectedId == 1) ? skinBlack_.get() : skinCream_.get();
-        updateSkin();
-    };
-
-    headerPanel.getUiScaleComboBox().onChange = [this, &headerPanel]
-    {
-        const auto selectedId = headerPanel.getUiScaleComboBox().getSelectedId();
-        const float uiScale = PluginIDs::Settings::ScaleLevels::getUiScale(selectedId);
-        applyUiScale(uiScale);
-        pluginProcessor.getApvts().state.setProperty(PluginIDs::Settings::kGuiScaleId, selectedId, nullptr);
+        if (settingsWindow_ != nullptr && settingsWindow_->isVisible())
+            closeSettingsWindow();
+        else
+            openSettingsWindow();
     };
 
     headerPanel.getUiElementsButton().onClick = [this, &headerPanel]
@@ -180,27 +171,6 @@ PluginEditor::PluginEditor(PluginProcessor& p)
             pluginProcessor.setKeyboardFromPort(previousPortId);
     };
 
-    headerPanel.getInputGainSlider().onValueChange = [this, &headerPanel]
-    {
-        if (!pluginProcessor.isStandalone())
-            return;
-
-        pluginProcessor.setInputGainDb(static_cast<float>(headerPanel.getInputGainSlider().getValue()));
-    };
-
-    headerPanel.getHardwareLatencySlider().onValueChange = [this, &headerPanel]
-    {
-        pluginProcessor.setHardwareLatencyMs(static_cast<float>(headerPanel.getHardwareLatencySlider().getValue()));
-    };
-
-    headerPanel.getAudioFromComboBox().onChange = [this, &headerPanel]
-    {
-        if (!pluginProcessor.isStandalone())
-            return;
-
-        pluginProcessor.setAudioFromSourceId(headerPanel.getSelectedAudioFromSourceId());
-    };
-
     headerRefreshTimer_ = std::make_unique<HeaderRefreshTimer>(pluginProcessor, headerPanel, *this);
     attachStandaloneAudioDeviceListener();
 
@@ -223,6 +193,9 @@ void PluginEditor::resized()
     if (auto* comp = mainComponent_.get())
         comp->setBounds(getLocalBounds());
 
+    if (settingsWindow_ != nullptr && settingsWindow_->isVisible())
+        settingsWindow_->setBounds(getLocalBounds());
+
     layoutUiElementsTestComponent();
     syncUiScaleFromEditor();
 }
@@ -238,23 +211,41 @@ void PluginEditor::syncUiScaleFromEditor()
     if (auto* comp = mainComponent_.get())
         comp->setUiScale(uiScale);
 
-    auto& headerPanel = mainComponent_->getHeaderPanel();
+    syncSettingsUiScaleCombo(uiScale);
 
-    int matchingScaleId = 0;
-    const int layoutPercentRounded = juce::roundToInt(uiScale * 100.0f);
-    for (int id = PluginIDs::Settings::ScaleLevels::kMin; id <= PluginIDs::Settings::ScaleLevels::kMax; ++id)
+    if (settingsWindow_ != nullptr && settingsWindow_->isVisible())
+        updateSettingsWindowLayout(uiScale);
+}
+
+void PluginEditor::updateSettingsWindowLayout(float uiScale)
+{
+    if (settingsWindow_ == nullptr)
+        return;
+
+    settingsWindow_->setUiScale(uiScale);
+    settingsWindow_->setBounds(getLocalBounds());
+}
+
+void PluginEditor::syncSettingsUiScaleCombo(float uiScale)
+{
+    if (auto* panel = getSettingsPanelIfOpen())
     {
-        const int presetPercentRounded = juce::roundToInt(
-            PluginIDs::Settings::ScaleLevels::getUiScale(id) * 100.0f);
-        if (layoutPercentRounded == presetPercentRounded)
+        int matchingScaleId = 0;
+        const int layoutPercentRounded = juce::roundToInt(uiScale * 100.0f);
+        for (int id = PluginIDs::Settings::ScaleLevels::kMin; id <= PluginIDs::Settings::ScaleLevels::kMax; ++id)
         {
-            matchingScaleId = id;
-            break;
+            const int presetPercentRounded = juce::roundToInt(
+                PluginIDs::Settings::ScaleLevels::getUiScale(id) * 100.0f);
+            if (layoutPercentRounded == presetPercentRounded)
+            {
+                matchingScaleId = id;
+                break;
+            }
         }
-    }
 
-    if (matchingScaleId != 0)
-        headerPanel.getUiScaleComboBox().setSelectedId(matchingScaleId, juce::dontSendNotification);
+        if (matchingScaleId != 0)
+            panel->getUiScaleComboBox().setSelectedId(matchingScaleId, juce::dontSendNotification);
+    }
 }
 
 void PluginEditor::mouseDown(const juce::MouseEvent&)
@@ -266,6 +257,9 @@ void PluginEditor::updateSkin()
 {
     if (auto* widget = mainComponent_.get())
         widget->setSkin(*skin_);
+
+    if (settingsWindow_ != nullptr)
+        settingsWindow_->setSkin(*skin_);
 
     repaint();
 }
@@ -311,25 +305,153 @@ void PluginEditor::layoutUiElementsTestComponent()
 PluginEditor::~PluginEditor()
 {
     detachStandaloneAudioDeviceListener();
+    closeSettingsWindow();
+}
+
+SettingsPanel* PluginEditor::getSettingsPanelIfOpen()
+{
+    if (settingsWindow_ == nullptr || !settingsWindow_->isVisible())
+        return nullptr;
+
+    return &settingsWindow_->getSettingsPanel();
+}
+
+void PluginEditor::openSettingsWindow()
+{
+    if (settingsWindow_ == nullptr)
+    {
+        const bool isPluginMode = !pluginProcessor.isStandalone();
+        settingsWindow_ = std::make_unique<SettingsWindow>(
+            *skin_,
+            isPluginMode,
+            [this](SettingsPanel& panel)
+            {
+                wireSettingsPanel(panel);
+                restoreSettingsPanelFromState(panel);
+            },
+            [this] { closeSettingsWindow(); });
+        addChildComponent(*settingsWindow_);
+    }
+    else
+    {
+        settingsWindow_->setSkin(*skin_);
+        restoreSettingsPanelFromState(settingsWindow_->getSettingsPanel());
+    }
+
+    const int baseWidth = PluginDesignDimensions::GUI::kWidth;
+    const float uiScale = (baseWidth > 0)
+        ? tss::ScaledLayout::uiScaleFromEditorBounds(getWidth(), baseWidth)
+        : 1.0f;
+    updateSettingsWindowLayout(uiScale);
+
+    settingsWindow_->setVisible(true);
+    settingsWindow_->toFront(true);
+    settingsWindow_->grabKeyboardFocus();
+}
+
+void PluginEditor::closeSettingsWindow()
+{
+    if (settingsWindow_ != nullptr)
+        settingsWindow_->setVisible(false);
+}
+
+void PluginEditor::restoreSettingsPanelFromState(SettingsPanel& panel)
+{
+    const int savedScaleId = pluginProcessor.getApvts().state.getProperty(
+        PluginIDs::Settings::kGuiScaleId,
+        PluginIDs::Settings::ScaleLevels::kDefault);
+    panel.getUiScaleComboBox().setSelectedId(savedScaleId, juce::dontSendNotification);
+
+    const auto skinVariant = skin_->getColourVariant();
+    const int skinId = (skinVariant == tss::Skin::ColourVariant::Black)
+        ? static_cast<int>(tss::Skin::SkinComboBoxItemId::kBlack)
+        : static_cast<int>(tss::Skin::SkinComboBoxItemId::kCream);
+    panel.getSkinComboBox().setSelectedId(skinId, juce::dontSendNotification);
+
+    panel.getHardwareLatencySlider().setValue(pluginProcessor.getHardwareLatencyMs(), juce::dontSendNotification);
+
+    if (pluginProcessor.isStandalone())
+    {
+        refreshAudioFromCombo();
+
+        const auto savedAudioFromSourceId = pluginProcessor.getApvts().state.getProperty("audioFromSourceId", juce::String()).toString();
+        panel.selectAudioFromSourceId(savedAudioFromSourceId);
+
+        const float savedInputGainDb = static_cast<float>(
+            pluginProcessor.getApvts().state.getProperty("inputGainDb", 0.0f));
+        panel.getInputGainSlider().setValue(savedInputGainDb, juce::dontSendNotification);
+    }
+}
+
+void PluginEditor::wireSettingsPanel(SettingsPanel& panel)
+{
+    panel.getSkinComboBox().onChange = [this, &panel]
+    {
+        const auto selectedId = panel.getSkinComboBox().getSelectedId();
+        skin_ = (selectedId == static_cast<int>(tss::Skin::SkinComboBoxItemId::kBlack))
+            ? skinBlack_.get()
+            : skinCream_.get();
+        updateSkin();
+    };
+
+    panel.getUiScaleComboBox().onChange = [this, &panel]
+    {
+        const auto selectedId = panel.getUiScaleComboBox().getSelectedId();
+        const float uiScale = PluginIDs::Settings::ScaleLevels::getUiScale(selectedId);
+        applyUiScale(uiScale);
+        updateSettingsWindowLayout(uiScale);
+        pluginProcessor.getApvts().state.setProperty(PluginIDs::Settings::kGuiScaleId, selectedId, nullptr);
+    };
+
+    panel.getHardwareLatencySlider().onValueChange = [this, &panel]
+    {
+        pluginProcessor.setHardwareLatencyMs(static_cast<float>(panel.getHardwareLatencySlider().getValue()));
+    };
+
+    panel.getInputGainSlider().onValueChange = [this, &panel]
+    {
+        if (!pluginProcessor.isStandalone())
+            return;
+
+        pluginProcessor.setInputGainDb(static_cast<float>(panel.getInputGainSlider().getValue()));
+    };
+
+    panel.getAudioFromComboBox().onChange = [this, &panel]
+    {
+        if (!pluginProcessor.isStandalone())
+            return;
+
+        pluginProcessor.setAudioFromSourceId(panel.getSelectedAudioFromSourceId());
+    };
 }
 
 void PluginEditor::refreshAudioFromCombo()
 {
-    if (!pluginProcessor.isStandalone() || mainComponent_ == nullptr)
+    if (!pluginProcessor.isStandalone())
         return;
 
-    auto& headerPanel = mainComponent_->getHeaderPanel();
-    const auto previousSourceId = headerPanel.getSelectedAudioFromSourceId();
     const auto names = pluginProcessor.getAudioInputSourceNames();
     const auto ids = pluginProcessor.getAudioInputSourceIds();
 
     if (names.isEmpty() && ids.isEmpty())
         return;
 
-    headerPanel.populateAudioFromCombo(names, ids);
-    headerPanel.selectAudioFromSourceId(previousSourceId);
+    juce::String previousSourceId;
 
-    const auto selectedSourceId = headerPanel.getSelectedAudioFromSourceId();
+    if (auto* panel = getSettingsPanelIfOpen())
+        previousSourceId = panel->getSelectedAudioFromSourceId();
+    else
+        previousSourceId = pluginProcessor.getApvts().state.getProperty("audioFromSourceId", juce::String()).toString();
+
+    if (auto* panel = getSettingsPanelIfOpen())
+    {
+        panel->populateAudioFromCombo(names, ids);
+        panel->selectAudioFromSourceId(previousSourceId);
+    }
+
+    const auto selectedSourceId = previousSourceId.isNotEmpty()
+        ? previousSourceId
+        : (ids.isEmpty() ? juce::String() : ids[0]);
 
     if (selectedSourceId.isNotEmpty())
     {
@@ -337,7 +459,6 @@ void PluginEditor::refreshAudioFromCombo()
     }
     else if (!ids.isEmpty())
     {
-        headerPanel.selectAudioFromSourceId(ids[0]);
         pluginProcessor.setAudioFromSourceId(ids[0]);
     }
 }

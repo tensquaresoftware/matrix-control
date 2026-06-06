@@ -12,7 +12,7 @@ This is **not** the plugin’s internal buffer latency. The hosted plugin has no
 
 ## Where to set it
 
-In the header bar, adjust **HARDWARE LATENCY :** (0.0–100.0 ms, 0.1 ms steps). The value is saved in the plugin session state and restored with your project.
+Open **Settings** from the header (**SETTINGS** button) and adjust **HARDWARE LATENCY :** (0.0–100.0 ms, 0.1 ms steps). The value is saved in the plugin session state and restored with your project.
 
 ## Typical starting values
 

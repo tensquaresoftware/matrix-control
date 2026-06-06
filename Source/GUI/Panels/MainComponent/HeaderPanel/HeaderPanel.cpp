@@ -7,10 +7,7 @@
 #include "GUI/Skins/Skin.h"
 #include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Looks/LookBuilders.h"
-#include "Shared/Definitions/PluginAudioConstants.h"
-#include "Core/Audio/HardwareLatency.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
-#include "Shared/Definitions/PluginIDs.h"
 
 using tss::SkinColourId;
 
@@ -57,30 +54,7 @@ HeaderPanel::HeaderPanel(tss::ISkin& skin, int width, int height)
     , keyboardFromLabel_(kKeyboardFromLabelWidth_, kControlHeight_, tss::headerPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kKeyboardFromLabel, tss::LabelStyle::HeaderPanel)
     , keyboardFromComboBox_(kPortComboBoxWidth_, kControlHeight_, tss::comboBoxLookFromSkin(skin), tss::ComboBox::Style::ButtonLike)
     , instrumentActivityLed_(kActivityLedSize_, kActivityLedSize_)
-    , audioFromLabel_(kAudioFromLabelWidth_, kControlHeight_, tss::headerPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kAudioFromLabel, tss::LabelStyle::HeaderPanel)
-    , audioFromComboBox_(kPortComboBoxWidth_, kControlHeight_, tss::comboBoxLookFromSkin(skin), tss::ComboBox::Style::ButtonLike)
-    , inputGainLabel_(kInputGainLabelWidth_, kControlHeight_, tss::headerPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kInputGainLabel, tss::LabelStyle::HeaderPanel)
-    , inputGainSlider_(kInputGainSliderWidth_, kControlHeight_, tss::sliderLookFromSkin(skin),
-                       tss::SliderConfig{
-                           PluginAudioConstants::kMinInputGainDb,
-                           PluginAudioConstants::kMaxInputGainDb,
-                           0.0,
-                           1.0,
-                           "dB",
-                           "-inf"})
-    , hardwareLatencyLabel_(kHardwareLatencyLabelWidth_, kControlHeight_, tss::headerPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kHardwareLatencyLabel, tss::LabelStyle::HeaderPanel)
-    , hardwareLatencySlider_(kHardwareLatencySliderWidth_, kControlHeight_, tss::sliderLookFromSkin(skin),
-                               tss::SliderConfig{
-                                   Core::HardwareLatency::kMinMs,
-                                   Core::HardwareLatency::kMaxMs,
-                                   Core::HardwareLatency::kMinMs,
-                                   Core::HardwareLatency::kStepMs,
-                                   "ms"})
-    , peakIndicator_(kPeakIndicatorWidth_, kControlHeight_)
-    , skinLabel_(kSkinLabelWidth_, kControlHeight_, tss::headerPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kSkinLabel, tss::LabelStyle::HeaderPanel)
-    , skinComboBox_(kSkinComboBoxWidth_, kControlHeight_, tss::comboBoxLookFromSkin(skin), tss::ComboBox::Style::ButtonLike)
-    , uiScaleLabel_(kUiScaleLabelWidth_, kControlHeight_, tss::headerPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kUiScaleLabel, tss::LabelStyle::HeaderPanel)
-    , uiScaleComboBox_(kScaleComboBoxWidth_, kControlHeight_, tss::comboBoxLookFromSkin(skin), tss::ComboBox::Style::ButtonLike)
+    , settingsButton_(kSettingsButtonWidth_, kControlHeight_, tss::buttonLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kSettingsButton)
     , uiElementsButton_(kUiElementsButtonWidth_, kControlHeight_, tss::buttonLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kUiElementsButton)
 {
     setOpaque(true);
@@ -103,42 +77,7 @@ HeaderPanel::HeaderPanel(tss::ISkin& skin, int width, int height)
     instrumentActivityLed_.setSkin(skin);
     addAndMakeVisible(instrumentActivityLed_);
 
-    addAndMakeVisible(audioFromLabel_);
-    audioFromComboBox_.setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
-    addAndMakeVisible(audioFromComboBox_);
-
-    addAndMakeVisible(inputGainLabel_);
-    addAndMakeVisible(inputGainSlider_);
-
-    addAndMakeVisible(hardwareLatencyLabel_);
-    addAndMakeVisible(hardwareLatencySlider_);
-
-    peakIndicator_.setSkin(skin);
-    addAndMakeVisible(peakIndicator_);
-
-    addAndMakeVisible(uiScaleLabel_);
-
-    uiScaleComboBox_.setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
-    uiScaleComboBox_.addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k50, PluginIDs::Settings::ScaleLevels::k50);
-    uiScaleComboBox_.addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k75, PluginIDs::Settings::ScaleLevels::k75);
-    uiScaleComboBox_.addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k100, PluginIDs::Settings::ScaleLevels::k100);
-    uiScaleComboBox_.addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k125, PluginIDs::Settings::ScaleLevels::k125);
-    uiScaleComboBox_.addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k150, PluginIDs::Settings::ScaleLevels::k150);
-    uiScaleComboBox_.addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k175, PluginIDs::Settings::ScaleLevels::k175);
-    uiScaleComboBox_.addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k200, PluginIDs::Settings::ScaleLevels::k200);
-    uiScaleComboBox_.setSelectedId(PluginIDs::Settings::ScaleLevels::k100, juce::dontSendNotification);
-    addAndMakeVisible(uiScaleComboBox_);
-
-    addAndMakeVisible(skinLabel_);
-
-    skinComboBox_.setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
-    skinComboBox_.addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kBlack,
-                         static_cast<int>(tss::Skin::SkinComboBoxItemId::kBlack));
-    skinComboBox_.addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kCream,
-                         static_cast<int>(tss::Skin::SkinComboBoxItemId::kCream));
-    skinComboBox_.setSelectedId(static_cast<int>(tss::Skin::SkinComboBoxItemId::kBlack), juce::dontSendNotification);
-    addAndMakeVisible(skinComboBox_);
-
+    addAndMakeVisible(settingsButton_);
     uiElementsButton_.setClickingTogglesState(true);
     addAndMakeVisible(uiElementsButton_);
 
@@ -163,18 +102,9 @@ void HeaderPanel::resized()
     const float editorMidiFromLabelWidth = static_cast<float>(kEditorMidiFromLabelWidth_) * sf;
     const float midiToLabelWidth = static_cast<float>(kMidiToLabelWidth_) * sf;
     const float keyboardFromLabelWidth = static_cast<float>(kKeyboardFromLabelWidth_) * sf;
-    const float audioFromLabelWidth = static_cast<float>(kAudioFromLabelWidth_) * sf;
-    const float inputGainLabelWidth = static_cast<float>(kInputGainLabelWidth_) * sf;
     const float portComboWidth = static_cast<float>(kPortComboBoxWidth_) * sf;
-    const float inputGainSliderWidth = static_cast<float>(kInputGainSliderWidth_) * sf;
-    const float hardwareLatencyLabelWidth = static_cast<float>(kHardwareLatencyLabelWidth_) * sf;
-    const float hardwareLatencySliderWidth = static_cast<float>(kHardwareLatencySliderWidth_) * sf;
-    const float peakIndicatorWidth = static_cast<float>(kPeakIndicatorWidth_) * sf;
     const float activityLedSize = static_cast<float>(kActivityLedSize_) * sf;
-    const float uiScaleLabelWidth = static_cast<float>(kUiScaleLabelWidth_) * sf;
-    const float scaleComboWidth = static_cast<float>(kScaleComboBoxWidth_) * sf;
-    const float skinLabelWidth = static_cast<float>(kSkinLabelWidth_) * sf;
-    const float skinComboWidth = static_cast<float>(kSkinComboBoxWidth_) * sf;
+    const float settingsButtonWidth = static_cast<float>(kSettingsButtonWidth_) * sf;
     const float uiElementsButtonWidth = static_cast<float>(kUiElementsButtonWidth_) * sf;
     const float leftPadding = static_cast<float>(kLeftPadding_) * sf;
     const float rightPadding = static_cast<float>(kRightPadding_) * sf;
@@ -207,20 +137,6 @@ void HeaderPanel::resized()
         x += activityLedSize + gap;
     };
 
-    auto placePacketSlider = [&](tss::Slider& slider, float sliderWidth)
-    {
-        slider.setBounds(juce::roundToInt(x), y, juce::roundToInt(sliderWidth), h);
-        slider.setUiScale(uiScale_);
-        x += sliderWidth + gap;
-    };
-
-    auto placePacketPeak = [&](tss::PeakIndicator& peak)
-    {
-        peak.setBounds(juce::roundToInt(x), y, juce::roundToInt(peakIndicatorWidth), h);
-        peak.setUiScale(uiScale_);
-        x += peakIndicatorWidth + gap;
-    };
-
     auto endPacket = [&]()
     {
         x += packetExternalGap - gap;
@@ -241,45 +157,13 @@ void HeaderPanel::resized()
     placePacketCombo(midiToComboBox_, portComboWidth);
     endPacket();
 
-    if (!isPluginMode_)
-    {
-        placePacketLabel(audioFromLabel_, audioFromLabelWidth);
-        placePacketCombo(audioFromComboBox_, portComboWidth);
-        endPacket();
-
-        placePacketLabel(inputGainLabel_, inputGainLabelWidth);
-        placePacketSlider(inputGainSlider_, inputGainSliderWidth);
-        placePacketPeak(peakIndicator_);
-        endPacket();
-    }
-
-    auto placeRightClusterLabelAndCombo = [&](tss::Label& label, float labelWidth, tss::ComboBox& combo, float comboWidth)
-    {
-        label.setBounds(juce::roundToInt(x), y, juce::roundToInt(labelWidth), h);
-        label.setUiScale(uiScale_);
-        x += labelWidth + gap;
-
-        combo.setBounds(juce::roundToInt(x), y, juce::roundToInt(comboWidth), h);
-        combo.setUiScale(uiScale_);
-        x += comboWidth + packetExternalGap;
-    };
-
-    auto placeRightClusterLabelAndSlider = [&](tss::Label& label, float labelWidth, tss::Slider& slider, float sliderWidth)
-    {
-        label.setBounds(juce::roundToInt(x), y, juce::roundToInt(labelWidth), h);
-        label.setUiScale(uiScale_);
-        x += labelWidth + gap;
-
-        slider.setBounds(juce::roundToInt(x), y, juce::roundToInt(sliderWidth), h);
-        slider.setUiScale(uiScale_);
-        x += sliderWidth + packetExternalGap;
-    };
-
-    placeRightClusterLabelAndSlider(hardwareLatencyLabel_, hardwareLatencyLabelWidth, hardwareLatencySlider_, hardwareLatencySliderWidth);
-    placeRightClusterLabelAndCombo(uiScaleLabel_, uiScaleLabelWidth, uiScaleComboBox_, scaleComboWidth);
-    placeRightClusterLabelAndCombo(skinLabel_, skinLabelWidth, skinComboBox_, skinComboWidth);
-
+    const float rightClusterGap = gap * 2.0f;
     const float uiElementsButtonX = static_cast<float>(bounds.getRight()) - rightPadding - uiElementsButtonWidth;
+    const float settingsButtonX = uiElementsButtonX - rightClusterGap - settingsButtonWidth;
+
+    settingsButton_.setBounds(juce::roundToInt(settingsButtonX), y, juce::roundToInt(settingsButtonWidth), h);
+    settingsButton_.setUiScale(uiScale_);
+
     uiElementsButton_.setBounds(juce::roundToInt(uiElementsButtonX), y, juce::roundToInt(uiElementsButtonWidth), h);
     uiElementsButton_.setUiScale(uiScale_);
 }
@@ -296,23 +180,10 @@ void HeaderPanel::setSkin(tss::ISkin& skin)
     keyboardFromLabel_.setLook(tss::headerPanelLabelLookFromSkin(skin));
     keyboardFromComboBox_.setLook(tss::comboBoxLookFromSkin(skin));
     keyboardFromComboBox_.setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
-    audioFromLabel_.setLook(tss::headerPanelLabelLookFromSkin(skin));
-    audioFromComboBox_.setLook(tss::comboBoxLookFromSkin(skin));
-    audioFromComboBox_.setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
-    inputGainLabel_.setLook(tss::headerPanelLabelLookFromSkin(skin));
-    inputGainSlider_.setLook(tss::sliderLookFromSkin(skin));
-    hardwareLatencyLabel_.setLook(tss::headerPanelLabelLookFromSkin(skin));
-    hardwareLatencySlider_.setLook(tss::sliderLookFromSkin(skin));
-    peakIndicator_.setSkin(skin);
     editorActivityLed_.setSkin(skin);
     midiToActivityLed_.setSkin(skin);
     instrumentActivityLed_.setSkin(skin);
-    skinLabel_.setLook(tss::headerPanelLabelLookFromSkin(skin));
-    skinComboBox_.setLook(tss::comboBoxLookFromSkin(skin));
-    skinComboBox_.setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
-    uiScaleLabel_.setLook(tss::headerPanelLabelLookFromSkin(skin));
-    uiScaleComboBox_.setLook(tss::comboBoxLookFromSkin(skin));
-    uiScaleComboBox_.setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
+    settingsButton_.setLook(tss::buttonLookFromSkin(skin));
     uiElementsButton_.setLook(tss::buttonLookFromSkin(skin));
 }
 
@@ -329,22 +200,11 @@ void HeaderPanel::setUiScale(float uiScale)
 void HeaderPanel::setPluginMode(bool isPlugin)
 {
     isPluginMode_ = isPlugin;
-    const bool showAudioControls = !isPluginMode_;
-
-    audioFromLabel_.setVisible(showAudioControls);
-    audioFromComboBox_.setVisible(showAudioControls);
-    inputGainLabel_.setVisible(showAudioControls);
-    inputGainSlider_.setVisible(showAudioControls);
-    peakIndicator_.setVisible(showAudioControls);
 
     if (isPluginMode_)
-    {
         configurePluginModeKeyboardFrom();
-    }
     else
-    {
         configureStandaloneKeyboardFrom();
-    }
 
     resized();
 }
@@ -467,48 +327,4 @@ juce::String HeaderPanel::getSelectedPortIdentifier(const tss::ComboBox& combo,
                                                     const std::vector<juce::String>& identifiers) const
 {
     return getPortIdentifierForItemId(identifiers, combo.getSelectedId());
-}
-
-void HeaderPanel::populateAudioFromCombo(const juce::StringArray& channelNames,
-                                          const juce::StringArray& channelIds)
-{
-    configureAudioFromCombo(channelNames, channelIds);
-}
-
-void HeaderPanel::configureAudioFromCombo(const juce::StringArray& channelNames,
-                                           const juce::StringArray& channelIds)
-{
-    const auto previousSourceId = getSelectedAudioFromSourceId();
-
-    audioFromComboBox_.clear(juce::dontSendNotification);
-    audioFromSourceIdentifiers_.clear();
-
-    const int count = juce::jmin(channelNames.size(), channelIds.size());
-
-    for (int i = 0; i < count; ++i)
-    {
-        const int itemId = i + 1;
-        audioFromComboBox_.addItem(channelNames[i], itemId);
-        audioFromSourceIdentifiers_.push_back(channelIds[i]);
-    }
-
-    if (count == 0)
-    {
-        audioFromComboBox_.addItem(PluginDisplayNames::HeaderPanel::kPortNoneSentinel, kPortSentinelItemId);
-        audioFromComboBox_.setSelectedId(kPortSentinelItemId, juce::dontSendNotification);
-        return;
-    }
-
-    selectAudioFromSourceId(previousSourceId);
-}
-
-juce::String HeaderPanel::getSelectedAudioFromSourceId() const
-{
-    return getSelectedPortIdentifier(audioFromComboBox_, audioFromSourceIdentifiers_);
-}
-
-void HeaderPanel::selectAudioFromSourceId(const juce::String& sourceId)
-{
-    audioFromComboBox_.setSelectedId(findItemIdForIdentifier(audioFromSourceIdentifiers_, sourceId),
-                                     juce::dontSendNotification);
 }

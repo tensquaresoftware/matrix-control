@@ -16,17 +16,25 @@ namespace PluginDisplayNames
         constexpr const char* kEditorMidiFromLabel = "EDITOR MIDI FROM :";
         constexpr const char* kMidiToLabel = "MIDI TO :";
         constexpr const char* kKeyboardFromLabel = "KEYBOARD FROM :";
-        constexpr const char* kAudioFromLabel = "AUDIO FROM :";
-        constexpr const char* kInputGainLabel = "INPUT GAIN :";
-        constexpr const char* kHardwareLatencyLabel = "HARDWARE LATENCY :";
-        constexpr const char* kAudioFromStereo = "STEREO";
-        constexpr const char* kAudioFromMonoLeft = "MONO L";
-        constexpr const char* kAudioFromMonoRight = "MONO R";
         constexpr const char* kHostDisplay = "HOST";
         constexpr const char* kPortNoneSentinel = "\xe2\x80\x94";
-        constexpr const char* kSkinLabel = "SKIN :";
-        constexpr const char* kUiScaleLabel = "SCALE :";
+        constexpr const char* kSettingsButton = "SETTINGS";
         constexpr const char* kUiElementsButton = "UI Elements";
+    }
+
+    namespace Settings
+    {
+        const juce::String kWindowTitle = juce::String::fromUTF8("MATRIX-CONTROL \xe2\x80\x94 SETTINGS");
+        constexpr const char* kSkinLabel = "SKIN :";
+        constexpr const char* kUiScaleLabel = "UI SCALE :";
+        constexpr const char* kHardwareLatencyLabel = "HARDWARE LATENCY :";
+        constexpr const char* kAudioFromLabel = "AUDIO FROM :";
+        constexpr const char* kInputGainLabel = "INPUT GAIN :";
+        constexpr const char* kMasterOperationsSection = "MASTER OPERATIONS";
+        constexpr const char* kPoliciesSection = "POLICIES";
+        constexpr const char* kDefragSection = "DEFRAG";
+        constexpr const char* kLoggingSection = "LOGGING";
+        constexpr const char* kComingSoon = "Coming soon";
     }
 
     namespace Units

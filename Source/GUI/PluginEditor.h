@@ -13,6 +13,8 @@
 
 class WidgetFactory;
 class HeaderPanel;
+class SettingsPanel;
+class SettingsWindow;
 
 class PluginEditor : public juce::AudioProcessorEditor,
                      private juce::ChangeListener
@@ -36,6 +38,14 @@ private:
     void detachStandaloneAudioDeviceListener();
     void changeListenerCallback(juce::ChangeBroadcaster* source) override;
 
+    void openSettingsWindow();
+    void closeSettingsWindow();
+    SettingsPanel* getSettingsPanelIfOpen();
+    void wireSettingsPanel(SettingsPanel& panel);
+    void restoreSettingsPanelFromState(SettingsPanel& panel);
+    void syncSettingsUiScaleCombo(float uiScale);
+    void updateSettingsWindowLayout(float uiScale);
+
     PluginProcessor& pluginProcessor;
 
     std::unique_ptr<tss::Skin> skinBlack_;
@@ -44,6 +54,7 @@ private:
     std::unique_ptr<WidgetFactory> widgetFactory_;
     std::unique_ptr<MainComponent> mainComponent_;
     std::unique_ptr<TestComponent> testComponent_;
+    std::unique_ptr<SettingsWindow> settingsWindow_;
     bool uiElementsTestVisible_ = false;
     std::unique_ptr<HeaderRefreshTimer> headerRefreshTimer_;
 
