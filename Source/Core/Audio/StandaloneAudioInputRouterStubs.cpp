@@ -12,11 +12,6 @@ namespace Core::StandaloneAudioInputRouterDetail
         return {};
     }
 
-    __attribute__((weak)) void applySourceId(const juce::String& sourceId)
-    {
-        juce::ignoreUnused(sourceId);
-    }
-
     __attribute__((weak)) std::vector<Core::AudioInputSourceEntry> getCatalogEntries()
     {
         return {};
@@ -30,5 +25,9 @@ namespace Core::StandaloneAudioInputRouterDetail
     __attribute__((weak)) void removeAudioDeviceChangeListener(juce::ChangeListener& listener)
     {
         juce::ignoreUnused(listener);
+    }
+
+    __attribute__((weak)) void enableInputMonitoring()
+    {
     }
 }

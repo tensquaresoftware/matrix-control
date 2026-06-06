@@ -75,10 +75,11 @@ namespace Core
         peakDisplay_.store(juce::jlimit(0.0f, 1.0f, peakHold_), std::memory_order_relaxed);
     }
 
-    void AudioPassthroughProcessor::process(juce::AudioBuffer<float>& buffer, float gainLinear) noexcept
+    void AudioPassthroughProcessor::process(const juce::AudioBuffer<float>& input,
+                                            juce::AudioBuffer<float>& output,
+                                            float gainLinear) noexcept
     {
-        const int numSamples = buffer.getNumSamples();
-        const int numBufferChannels = buffer.getNumChannels();
+        const int numSamples = juce::jmin(input.getNumSamples(), output.getNumSamples());
 
         if (numSamples <= 0)
         {
@@ -94,55 +95,49 @@ namespace Core
         if (!std::isfinite(gainLinear))
             gainLinear = 0.0f;
 
-        const int numChannelsToProcess = juce::jmin(numOutputChannels_, numBufferChannels);
+        const int numInputChannelsAvailable = juce::jmin(numInputChannels_, input.getNumChannels());
+        const int numOutputChannelsToProcess = juce::jmin(numOutputChannels_, output.getNumChannels());
 
-        if (!inputBusEnabled_ || numInputChannels_ <= 0)
+        if (!inputBusEnabled_ || numInputChannelsAvailable <= 0)
         {
-            for (int channel = 0; channel < numChannelsToProcess; ++channel)
-                buffer.clear(channel, 0, numSamples);
+            for (int channel = 0; channel < output.getNumChannels(); ++channel)
+                output.clear(channel, 0, numSamples);
 
             updatePeakBallistics(0.0f, numSamples);
             return;
         }
 
-        for (int outputChannel = 0; outputChannel < numChannelsToProcess; ++outputChannel)
+        float blockPeak = 0.0f;
+
+        for (int outputChannel = 0; outputChannel < numOutputChannelsToProcess; ++outputChannel)
         {
             const int sourceChannel = mapSourceChannel(outputChannel);
 
-            if (sourceChannel < 0 || sourceChannel >= numBufferChannels)
+            if (sourceChannel < 0 || sourceChannel >= numInputChannelsAvailable)
             {
-                buffer.clear(outputChannel, 0, numSamples);
+                output.clear(outputChannel, 0, numSamples);
                 continue;
             }
 
-            if (sourceChannel != outputChannel)
-                buffer.copyFrom(outputChannel, 0, buffer, sourceChannel, 0, numSamples);
-        }
-
-        float blockPeak = 0.0f;
-
-        for (int outputChannel = 0; outputChannel < numChannelsToProcess; ++outputChannel)
-        {
-            const int sourceChannel = mapSourceChannel(outputChannel);
-
-            if (sourceChannel < 0)
-                continue;
-
-            auto* channelData = buffer.getWritePointer(outputChannel);
+            const float* inputData = input.getReadPointer(sourceChannel);
+            float* outputData = output.getWritePointer(outputChannel);
 
             for (int sample = 0; sample < numSamples; ++sample)
             {
-                const float scaled = channelData[sample] * gainLinear;
+                const float scaled = inputData[sample] * gainLinear;
 
                 if (!std::isfinite(scaled))
-                    channelData[sample] = 0.0f;
+                    outputData[sample] = 0.0f;
                 else
                 {
-                    channelData[sample] = scaled;
+                    outputData[sample] = scaled;
                     blockPeak = std::max(blockPeak, std::abs(scaled));
                 }
             }
         }
+
+        for (int channel = numOutputChannelsToProcess; channel < output.getNumChannels(); ++channel)
+            output.clear(channel, 0, numSamples);
 
         updatePeakBallistics(blockPeak, numSamples);
     }

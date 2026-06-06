@@ -14,9 +14,9 @@ namespace Core
     public:
         static juce::StringArray getInputChannelNames();
         static juce::StringArray getInputChannelIds();
-        static void applySourceId(const juce::String& sourceId);
         static std::vector<AudioInputSourceEntry> getCatalogEntries();
         static void addAudioDeviceChangeListener(juce::ChangeListener& listener);
         static void removeAudioDeviceChangeListener(juce::ChangeListener& listener);
+        static void enableInputMonitoring();
     };
 }

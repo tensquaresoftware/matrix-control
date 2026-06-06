@@ -16,7 +16,8 @@ namespace Core
         {
             kInstrument,
             kEditor,
-            kOutbound
+            kOutbound,
+            kMidiFromInbound
         };
 
         void notifyActivity(Path path) noexcept;
@@ -33,5 +34,6 @@ namespace Core
         std::atomic<juce::int64> instrumentLastNotifyMs_{ 0 };
         std::atomic<juce::int64> editorLastNotifyMs_{ 0 };
         std::atomic<juce::int64> outboundLastNotifyMs_{ 0 };
+        std::atomic<juce::int64> midiFromInboundLastNotifyMs_{ 0 };
     };
 }

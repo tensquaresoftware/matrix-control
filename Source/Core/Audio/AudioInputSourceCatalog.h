@@ -19,7 +19,10 @@ namespace Core
         static std::vector<AudioInputSourceEntry> buildForProcessor(bool isStandalone);
         static std::vector<AudioInputSourceEntry> buildEntriesForDevice(const juce::String& deviceName,
                                                                           int numInputChannels);
-
+        static std::vector<AudioInputSourceEntry> buildEntriesForActiveChannels(
+            const juce::String& deviceName,
+            const juce::BigInteger& activeInputChannels,
+            int numInputChannels);
         static int channelModeForSourceId(const juce::String& sourceId) noexcept;
     };
 }

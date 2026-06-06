@@ -25,7 +25,9 @@ namespace Core
         void prepare(int numInputChannels, int numOutputChannels, bool inputBusEnabled, double sampleRate) noexcept;
         void updateChannelLayout(int numInputChannels, int numOutputChannels, bool inputBusEnabled) noexcept;
         void setChannelMode(AudioFromChannelMode mode) noexcept;
-        void process(juce::AudioBuffer<float>& buffer, float gainLinear) noexcept;
+        void process(const juce::AudioBuffer<float>& input,
+                     juce::AudioBuffer<float>& output,
+                     float gainLinear) noexcept;
         float getPeakLevel() const noexcept { return peakDisplay_.load(std::memory_order_relaxed); }
 
     private:

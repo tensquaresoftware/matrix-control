@@ -12,6 +12,7 @@ public:
         testNotifySetsLevelToOne();
         testPathsAreIndependent();
         testOutboundPathIsIndependent();
+        testMidiFromInboundPathIsIndependent();
         testHoldThenDecayTowardZero();
         testRapidRenotifyExtendsHold();
     }
@@ -51,6 +52,19 @@ private:
         expectEquals(tracker.getActivityLevel(Core::MidiActivityTracker::Path::kOutbound), 1.0f);
         expectEquals(tracker.getActivityLevel(Core::MidiActivityTracker::Path::kInstrument), 0.0f);
         expectEquals(tracker.getActivityLevel(Core::MidiActivityTracker::Path::kEditor), 0.0f);
+    }
+
+    void testMidiFromInboundPathIsIndependent()
+    {
+        beginTest("Midi-from inbound path is independent of other paths");
+
+        Core::MidiActivityTracker tracker;
+        tracker.notifyActivity(Core::MidiActivityTracker::Path::kMidiFromInbound);
+
+        expectEquals(tracker.getActivityLevel(Core::MidiActivityTracker::Path::kMidiFromInbound), 1.0f);
+        expectEquals(tracker.getActivityLevel(Core::MidiActivityTracker::Path::kInstrument), 0.0f);
+        expectEquals(tracker.getActivityLevel(Core::MidiActivityTracker::Path::kEditor), 0.0f);
+        expectEquals(tracker.getActivityLevel(Core::MidiActivityTracker::Path::kOutbound), 0.0f);
     }
 
     void testHoldThenDecayTowardZero()

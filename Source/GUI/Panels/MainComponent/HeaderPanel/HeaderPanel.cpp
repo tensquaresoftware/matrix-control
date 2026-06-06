@@ -224,14 +224,17 @@ void HeaderPanel::resized()
     placePacketCombo(midiToComboBox_, portComboWidth);
     endPacket();
 
-    placePacketLabel(audioFromLabel_, audioFromLabelWidth);
-    placePacketCombo(audioFromComboBox_, portComboWidth);
-    endPacket();
+    if (!isPluginMode_)
+    {
+        placePacketLabel(audioFromLabel_, audioFromLabelWidth);
+        placePacketCombo(audioFromComboBox_, portComboWidth);
+        endPacket();
 
-    placePacketLabel(inputGainLabel_, inputGainLabelWidth);
-    placePacketSlider(inputGainSlider_, inputGainSliderWidth);
-    placePacketPeak(peakIndicator_);
-    endPacket();
+        placePacketLabel(inputGainLabel_, inputGainLabelWidth);
+        placePacketSlider(inputGainSlider_, inputGainSliderWidth);
+        placePacketPeak(peakIndicator_);
+        endPacket();
+    }
 
     auto placeRightClusterLabelAndCombo = [&](tss::Label& label, float labelWidth, tss::ComboBox& combo, float comboWidth)
     {
@@ -295,6 +298,13 @@ void HeaderPanel::setUiScale(float uiScale)
 void HeaderPanel::setPluginMode(bool isPlugin)
 {
     isPluginMode_ = isPlugin;
+    const bool showAudioControls = !isPluginMode_;
+
+    audioFromLabel_.setVisible(showAudioControls);
+    audioFromComboBox_.setVisible(showAudioControls);
+    inputGainLabel_.setVisible(showAudioControls);
+    inputGainSlider_.setVisible(showAudioControls);
+    peakIndicator_.setVisible(showAudioControls);
 
     if (isPluginMode_)
     {
@@ -304,6 +314,8 @@ void HeaderPanel::setPluginMode(bool isPlugin)
     {
         configureStandaloneKeyboardFrom();
     }
+
+    resized();
 }
 
 void HeaderPanel::populateMidiPortLists()

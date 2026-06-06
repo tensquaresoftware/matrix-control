@@ -2,6 +2,7 @@
 
 #include <juce_audio_devices/juce_audio_devices.h>
 #include "Core/Audio/StandaloneAudioInputRouter.h"
+#include "Shared/Definitions/PluginDisplayNames.h"
 
 namespace
 {
@@ -45,6 +46,37 @@ namespace
 
         for (int firstChannel = 0; firstChannel + 1 < numInputChannels; firstChannel += 2)
         {
+            AudioInputSourceEntry entry;
+            entry.displayName = formatStereoDisplayName(deviceName, firstChannel);
+            entry.sourceId = makeStereoSourceId(firstChannel);
+            entries.push_back(std::move(entry));
+        }
+    }
+
+    void appendEntriesForActiveChannels(const juce::String& deviceName,
+                                        const juce::BigInteger& activeInputChannels,
+                                        int numInputChannels,
+                                        std::vector<AudioInputSourceEntry>& entries)
+    {
+        if (deviceName.isEmpty() || numInputChannels <= 0)
+            return;
+
+        for (int channel = 0; channel < numInputChannels; ++channel)
+        {
+            if (!activeInputChannels[channel])
+                continue;
+
+            AudioInputSourceEntry entry;
+            entry.displayName = formatMonoDisplayName(deviceName, channel);
+            entry.sourceId = makeMonoSourceId(channel);
+            entries.push_back(std::move(entry));
+        }
+
+        for (int firstChannel = 0; firstChannel + 1 < numInputChannels; ++firstChannel)
+        {
+            if (!activeInputChannels[firstChannel] || !activeInputChannels[firstChannel + 1])
+                continue;
+
             AudioInputSourceEntry entry;
             entry.displayName = formatStereoDisplayName(deviceName, firstChannel);
             entry.sourceId = makeStereoSourceId(firstChannel);
@@ -98,17 +130,27 @@ namespace Core
         return entries;
     }
 
+    std::vector<AudioInputSourceEntry> AudioInputSourceCatalog::buildEntriesForActiveChannels(
+        const juce::String& deviceName,
+        const juce::BigInteger& activeInputChannels,
+        int numInputChannels)
+    {
+        std::vector<AudioInputSourceEntry> entries;
+        appendEntriesForActiveChannels(deviceName, activeInputChannels, numInputChannels, entries);
+        return entries;
+    }
+
     std::vector<AudioInputSourceEntry> AudioInputSourceCatalog::buildForProcessor(bool isStandalone)
     {
-        if (isStandalone)
-        {
-            auto entries = StandaloneAudioInputRouter::getCatalogEntries();
+        if (!isStandalone)
+            return {};
 
-            if (!entries.empty())
-                return entries;
-        }
+        auto entries = StandaloneAudioInputRouter::getCatalogEntries();
 
-        return buildFromSystemScan();
+        if (!entries.empty())
+            return entries;
+
+        return {};
     }
 
     int AudioInputSourceCatalog::channelModeForSourceId(const juce::String& sourceId) noexcept

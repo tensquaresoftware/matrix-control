@@ -26,24 +26,28 @@ public:
 private:
     void timerCallback() override
     {
-        if (processor_.isStandalone() && audioFromRefreshAttempts_ < 60)
+        if (processor_.isStandalone())
         {
-            const auto names = processor_.getAudioInputSourceNames();
-
-            if (names.isEmpty())
+            if (audioFromRefreshAttempts_ < 60)
             {
-                ++audioFromRefreshAttempts_;
-                owner_.refreshAudioFromCombo();
-            }
-        }
+                const auto names = processor_.getAudioInputSourceNames();
 
-        headerPanel_.getPeakIndicator().setLevel(processor_.getAudioPassthroughProcessor().getPeakLevel());
+                if (names.isEmpty())
+                {
+                    ++audioFromRefreshAttempts_;
+                    owner_.refreshAudioFromCombo();
+                }
+            }
+
+            headerPanel_.getPeakIndicator().setLevel(
+                processor_.getAudioPassthroughProcessor().getPeakLevel());
+        }
 
         const auto& tracker = processor_.getMidiActivityTracker();
         headerPanel_.getInstrumentActivityLed().setLevel(
             tracker.getActivityLevel(Core::MidiActivityTracker::Path::kInstrument));
         headerPanel_.getEditorActivityLed().setLevel(
-            tracker.getActivityLevel(Core::MidiActivityTracker::Path::kEditor));
+            tracker.getActivityLevel(Core::MidiActivityTracker::Path::kMidiFromInbound));
         headerPanel_.getMidiToActivityLed().setLevel(
             tracker.getActivityLevel(Core::MidiActivityTracker::Path::kOutbound));
     }
@@ -93,31 +97,35 @@ PluginEditor::PluginEditor(PluginProcessor& p)
 
     headerPanel.setPluginMode(!pluginProcessor.isStandalone());
     headerPanel.refreshPortLists();
-    refreshAudioFromCombo();
+
+    if (pluginProcessor.isStandalone())
+        refreshAudioFromCombo();
 
     const auto savedMidiInputPortId = pluginProcessor.getApvts().state.getProperty("midiInputPortId", juce::String()).toString();
     headerPanel.selectMidiFromPort(savedMidiInputPortId);
-    pluginProcessor.setMidiInputPort(headerPanel.getSelectedMidiFromPortIdentifier());
+    pluginProcessor.setMidiInputPort(savedMidiInputPortId);
 
     const auto savedMidiOutputPortId = pluginProcessor.getApvts().state.getProperty("midiOutputPortId", juce::String()).toString();
     headerPanel.selectMidiToPort(savedMidiOutputPortId);
-    pluginProcessor.setMidiOutputPort(headerPanel.getSelectedMidiToPortIdentifier());
+    pluginProcessor.setMidiOutputPort(savedMidiOutputPortId);
 
     if (pluginProcessor.isStandalone())
     {
+        Core::StandaloneAudioInputRouter::enableInputMonitoring();
+
         const auto savedKeyboardFromPortId = pluginProcessor.getApvts().state.getProperty("keyboardFromPortId", juce::String()).toString();
         headerPanel.selectKeyboardFromPort(savedKeyboardFromPortId);
         pluginProcessor.setKeyboardFromPort(headerPanel.getSelectedKeyboardFromPortIdentifier());
+
+        const auto savedAudioFromSourceId = pluginProcessor.getApvts().state.getProperty("audioFromSourceId", juce::String()).toString();
+        headerPanel.selectAudioFromSourceId(savedAudioFromSourceId);
+        pluginProcessor.setAudioFromSourceId(headerPanel.getSelectedAudioFromSourceId());
+
+        const float savedInputGainDb = static_cast<float>(
+            pluginProcessor.getApvts().state.getProperty("inputGainDb", 0.0f));
+        headerPanel.getInputGainSlider().setValue(savedInputGainDb, juce::dontSendNotification);
+        pluginProcessor.setInputGainDb(savedInputGainDb);
     }
-
-    const auto savedAudioFromSourceId = pluginProcessor.getApvts().state.getProperty("audioFromSourceId", juce::String()).toString();
-    headerPanel.selectAudioFromSourceId(savedAudioFromSourceId);
-    pluginProcessor.setAudioFromSourceId(headerPanel.getSelectedAudioFromSourceId());
-
-    const float savedInputGainDb = static_cast<float>(
-        pluginProcessor.getApvts().state.getProperty("inputGainDb", 0.0f));
-    headerPanel.getInputGainSlider().setValue(savedInputGainDb, juce::dontSendNotification);
-    pluginProcessor.setInputGainDb(savedInputGainDb);
 
     setResizable(false, false);
 
@@ -170,11 +178,17 @@ PluginEditor::PluginEditor(PluginProcessor& p)
 
     headerPanel.getInputGainSlider().onValueChange = [this, &headerPanel]
     {
+        if (!pluginProcessor.isStandalone())
+            return;
+
         pluginProcessor.setInputGainDb(static_cast<float>(headerPanel.getInputGainSlider().getValue()));
     };
 
     headerPanel.getAudioFromComboBox().onChange = [this, &headerPanel]
     {
+        if (!pluginProcessor.isStandalone())
+            return;
+
         pluginProcessor.setAudioFromSourceId(headerPanel.getSelectedAudioFromSourceId());
     };
 
@@ -292,7 +306,7 @@ PluginEditor::~PluginEditor()
 
 void PluginEditor::refreshAudioFromCombo()
 {
-    if (mainComponent_ == nullptr)
+    if (!pluginProcessor.isStandalone() || mainComponent_ == nullptr)
         return;
 
     auto& headerPanel = mainComponent_->getHeaderPanel();
@@ -306,10 +320,16 @@ void PluginEditor::refreshAudioFromCombo()
     headerPanel.populateAudioFromCombo(names, ids);
     headerPanel.selectAudioFromSourceId(previousSourceId);
 
-    if (headerPanel.getSelectedAudioFromSourceId().isEmpty() && !ids.isEmpty())
+    const auto selectedSourceId = headerPanel.getSelectedAudioFromSourceId();
+
+    if (selectedSourceId.isNotEmpty())
+    {
+        pluginProcessor.syncAudioPassthroughFromSourceId(selectedSourceId);
+    }
+    else if (!ids.isEmpty())
     {
         headerPanel.selectAudioFromSourceId(ids[0]);
-        pluginProcessor.setAudioFromSourceId(headerPanel.getSelectedAudioFromSourceId());
+        pluginProcessor.setAudioFromSourceId(ids[0]);
     }
 }
 
@@ -329,4 +349,7 @@ void PluginEditor::detachStandaloneAudioDeviceListener()
 void PluginEditor::changeListenerCallback(juce::ChangeBroadcaster*)
 {
     refreshAudioFromCombo();
+
+    if (pluginProcessor.isStandalone())
+        Core::StandaloneAudioInputRouter::enableInputMonitoring();
 }

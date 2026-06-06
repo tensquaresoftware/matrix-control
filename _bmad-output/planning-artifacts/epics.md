@@ -23,11 +23,12 @@ This document provides the complete epic and story breakdown for Matrix-Control,
 FR-1: Device Inquiry at connection — Universal Device Inquiry on port configure; parse Device ID; set `deviceDetected`, `deviceType`, `deviceVersion`; footer firmware display.
 FR-2: UI lock without synth — When `deviceDetected=false`, disable editing actions; footer guidance; no outbound MIDI; re-inquiry on port change.
 FR-3: Startup persistence policy — Persist plugin prefs (ports, skin, scale, folders, Mutator recipe, INIT paths, warning policy); do not restore patch params when device connected; do not restore Mutator history.
-FR-4: Virtual instrument plugin category — AU/VST3/Standalone instrument with MIDI in/out, audio in/out; mono input bus for M-1000, stereo for M-6/6R after inquiry.
+FR-4: Virtual instrument plugin category — AU/VST3/Standalone instrument with MIDI in/out and stereo audio output. **Hosted plugin:** no audio input bus; synth return on separate DAW audio track (AD-11). **Standalone:** physical input via AudioDeviceManager; mono channel layout for M-1000, stereo for M-6/6R after inquiry.
+FR-4b: Hardware Latency — User sets analog round-trip delay (ms); value reported via `reportLatency()` and persisted in apvts.state (Epic R).
 FR-5: Instrument path forwarding — When armed/active keyboard, enqueue Note/CC/PB to MIDI To; strip Program Change and SysEx from instrument path.
 FR-6: Editor path always-on — SysEx and Program Change for editing via dedicated thread and unified queue regardless of track arming.
 FR-7: Unified outbound queue — Single queue; realtime messages before SysEx; inter-SysEx delay enforced; audio thread never blocks on MIDI I/O.
-FR-8: Audio passthrough — Input to output with user Input Gain and peak indicator (solid fill matching envelope curve colour from active skin).
+FR-8: Audio passthrough — **Standalone:** physical input to output with Input Gain and peak indicator (solid fill matching envelope curve colour). **Hosted plugin:** silent output; Input Gain and peak standalone-only (AD-11).
 FR-9: Activity LEDs — Header Instrument and Editor indicators driven by unified queue traffic.
 FR-10: Parameter editing — PATCH Int/Choice via APVTS and custom widgets; descriptor-driven ranges; Remote Parameter Edit SysEx; DAW automation with FR-7 throttling.
 FR-11: Interactive envelope displays — Bidirectional EnvelopeDisplay; direct APVTS writes from curve drag; no Display→Slider bridge; three modules consistent.
@@ -68,7 +69,7 @@ FR-35: Module copy/paste — Type-aware clipboard; Paste enabled only on compati
 FR-36: Patch init sources — PATCH Init from `PatchInit.syx` or hardcoded; MASTER from `MasterInit.syx` or hardcoded.
 FR-37: Init template separation — Init templates via InitTemplateLoader; not via Computer Patches combobox.
 FR-38: Master init confirmation — See FR-17.
-FR-39: Header routing controls — MIDI From/To, Keyboard From, Audio From, Input Gain, peak, activity LEDs (not device identity).
+FR-39: Header routing controls — MIDI From/To, Keyboard From, activity LEDs always; Audio From, Input Gain, peak **standalone only** (AD-11); not device identity.
 FR-40: Settings page — Skin, scale, reconciliation policy, unsaved warning, Defrag, Master file actions, INIT paths, logging opt-in.
 FR-41: Logo popup layout — Clickable logo opens Skin + UI Scale popup if Figma approved (D-014a).
 FR-42: Skin persistence — Black and Cream skins v1; choice persists via APVTS.
@@ -100,6 +101,7 @@ NFR-8: Platforms & formats — macOS AU+VST3+Standalone; Windows/Linux VST3+Stan
 - **Runtime project paths (AD-10, D-093):** Replace CMake-baked `MATRIX_CONTROL_PROJECT_ROOT` with `ProjectPaths` runtime discovery; logs under `{root}/logs/midi/` and `logs/apvts/`.
 - **Logs not versioned (D-094):** Runtime log files gitignored; never commit `logs/`.
 - **MIDI queue (AD-3):** InstrumentMidiForwarder + EditorPath producers; MidiManager consumer; realtime before SysEx; SysExDelayProfile from inquiry.
+- **Audio bus by host context (AD-11):** Hosted plugin = no input bus, silent output; standalone = passthrough + gain + peak. Epic R implements revision (Sprint Change Proposal 2026-06-06).
 - **APVTS→SysEx routing (AD-4):** PATCH 0x06; MASTER 0x03; Matrix Mod block (opcode TBD §9); full buffer 0x01 for STORE/load/Mutator.
 - **ActionDispatcher handlers (AD-5):** ModuleActionHandler, PatchManagerActionHandler, MutatorActionHandler; debounced History selection.
 - **PatchMutatorEngine (AD-6):** MutationHistoryStore two-level M/R; MutationNaming; HistoryDefragService; MutationAlgorithm spec deferred to E6 story (PRD §9 #7).
@@ -128,11 +130,12 @@ UX-DR8: ScaledLayout per UI scale preset without global AffineTransform blur (im
 FR-1: Epic 8 — Device Inquiry at connection
 FR-2: Epic 8 — UI lock without synth
 FR-3: Epic 7 — Startup persistence policy (prefs; wired with Settings/header stories)
-FR-4: Epic 8 — Virtual instrument plugin category & audio bus layout
+FR-4: Epic 8 + Epic R — Virtual instrument plugin category & audio bus layout (AD-11)
+FR-4b: Epic R — Hardware Latency GUI + reportLatency()
 FR-5: Epic 2 — Instrument path forwarding
 FR-6: Epic 2 — Editor path always-on
 FR-7: Epic 2 — Unified outbound queue
-FR-8: Epic 2 — Audio passthrough & peak indicator
+FR-8: Epic 2 + Epic R — Audio passthrough & peak indicator (standalone; AD-11 revision via R-1)
 FR-9: Epic 2 — Activity LEDs on unified queue
 FR-10: Epic 2 — PATCH parameter editing → SysEx (requires Epic 1 model)
 FR-11: Epic 10 — Interactive envelope displays (Display↔APVTS direct)
@@ -216,7 +219,19 @@ Users edit PATCH/MASTER/Matrix Mod parameters and hear changes on the synth reli
 
 **FRs covered:** FR-5, FR-6, FR-7, FR-8, FR-9, FR-10, FR-14, FR-16, FR-48, FR-50 (SysEx side)
 
-**Depends on:** Epic 1 · **Unblocks:** Epics 3–7 (editing paths)
+**Depends on:** Epic 1 · **Unblocks:** Epic R, Epics 3–7 (editing paths)
+
+---
+
+### Epic R: Architectural Revision (Audio/MIDI Host Model)
+
+Align hosted plugin audio/MIDI model with VST3/AU constraints (Option D); add Hardware Latency, MIDI port error feedback, and queue MPSC validation. **Sprint Change Proposal 2026-06-06 — approved.**
+
+**FRs covered:** FR-4 (revision), FR-4b, FR-8 (revision), FR-39 (conditional header), NFR-3 (R-4)
+
+**Depends on:** Epic 2 (stories 2.7–2.11 done) · **Unblocks:** Epic 3 (R-4 before E3 recommended)
+
+**Story order:** R-1 → R-4 → R-2 → R-3 → R-5 (2.10 may proceed after R-1)
 
 ---
 
@@ -543,6 +558,8 @@ So that I can monitor input level in the plugin (FR-8, UX-DR3 partial).
 **Then** output reflects user Input Gain without blocking the audio thread
 **And** peak indicator uses solid fill colour matching envelope curve colour from active skin
 
+**Revision note (Sprint Change Proposal 2026-06-06):** Scope narrows to **standalone** passthrough after Story R-1 (AD-11). Hosted plugin = silent output only.
+
 ### Story 2.8: Activity LEDs on Queue Traffic
 
 As a performer,
@@ -583,6 +600,8 @@ So that I can configure hardware routing for manual UAT without waiting for Stor
 **And** Keyboard From is grayed with **HOST** in plugin mode; standalone selects a keyboard port with minimal Core forwarder to the unified queue
 **And** Audio From, Input Gain, peak, and activity LEDs remain Stories 2.7 / 2.8; full shell polish remains Story 7.8
 
+**Revision note (Sprint Change Proposal 2026-06-06):** Audio From / Input Gain / peak **standalone only** after Story R-1.
+
 ### Story 2.10: Matrix Mod Bus Reorder SysEx
 
 As a sound designer,
@@ -612,6 +631,84 @@ So that I can read port selection, activity, and input level at a glance (FR-8, 
 **And** `MidiActivityTracker::Path::kOutbound` drives the MIDI TO LED from successful `MidiManager` dispatch
 **And** full FR-41 shell polish remains Story 7.8
 
+**Revision note (Sprint Change Proposal 2026-06-06):** AUDIO FROM packet and peak indicator visible **standalone only** after Story R-1 (AD-11).
+
+---
+
+## Epic R: Architectural Revision (Audio/MIDI Host Model)
+
+### Story R-1: Remove Plugin Audio Input Bus
+
+As an Ableton/Logic/Cubase user,
+I want Matrix-Control to behave as a standard MIDI instrument without routing synth audio through the plugin,
+So that my DAW routing is natural and unambiguous (AD-11, Option R-A).
+
+**Acceptance Criteria:**
+
+**Given** Stories 2.7, 2.9b, and 2.11 complete
+**When** the plugin loads in a hosted VST3/AU context
+**Then** `BusesProperties` declares no audio input bus and stereo silent output
+**And** standalone retains input bus + `StandaloneAudioInputRouter` passthrough
+**And** `AudioPassthroughProcessor::process()` in plugin mode clears output without reading input
+**And** HeaderPanel hides Audio From, Input Gain, and PeakIndicator in plugin mode
+**And** Activity LEDs (Story 2.8) remain primary MIDI feedback in plugin mode
+**And** unit tests and VST3 + Standalone builds pass
+
+### Story R-2: Hardware Latency GUI
+
+As a user recording Matrix-1000 audio in my DAW,
+I want to set Hardware Latency (ms) in Matrix-Control,
+So that my DAW can compensate for analog round-trip delay (FR-4b).
+
+**Acceptance Criteria:**
+
+**Given** Story R-1 or parallel
+**When** user sets Hardware Latency (0–100 ms, 0.1 ms step)
+**Then** value is converted to samples and exposed via `reportLatency()`
+**And** value persists in `apvts.state`
+**And** user docs include typical values table
+
+### Story R-3: MIDI Port Open Error Feedback
+
+As a Windows user sharing MIDI ports with my DAW,
+I want clear GUI feedback when port open fails,
+So that I can diagnose exclusive-access conflicts.
+
+**Acceptance Criteria:**
+
+**Given** `MidiInputPort` or `MidiOutputPort` open is attempted
+**When** open fails
+**Then** footer `uiMessageText` names the port and suggests likely cause (Windows exclusive access)
+**And** `MidiLogger` records the error
+**And** unit test: mock port failure → footer message asserted
+
+### Story R-4: MidiOutboundQueue MPSC Audit
+
+As a developer,
+I want documented MPSC contract on `MidiOutboundQueue`,
+So that concurrent producers (audio + message threads) are safe before Epic 3.
+
+**Acceptance Criteria:**
+
+**Given** Stories 2.1–2.9 complete
+**When** queue contract is reviewed
+**Then** `MidiOutboundQueue.h` documents producer/consumer contract (MPSC or fix applied)
+**And** stress test: dual producer threads + single consumer without data loss
+**And** findings logged in code comment
+
+### Story R-5: Windows MIDI Multi-Client Documentation
+
+As a Windows user,
+I want setup documentation for MIDI port conflicts,
+So that I can use loopMIDI or rtpMIDI when winMM blocks shared access.
+
+**Acceptance Criteria:**
+
+**Given** Story R-3 complete
+**When** user reads Windows MIDI setup guide in `Documentation/`
+**Then** guide explains winMM exclusive-access limitation and recommends loopMIDI 1.0.16+ (or verified alternative)
+**And** in-app error message (R-3) links to guide
+
 ---
 
 ## Epic 3: Init Templates & Module Defaults
@@ -626,7 +723,7 @@ So that INIT always works offline (FR-36, PRD §9 #4).
 
 **Acceptance Criteria:**
 
-**Given** Epic 2 complete
+**Given** Epic R complete (R-4 recommended before E3)
 **When** `InitDefaults` is queried for patch or master
 **Then** hardcoded buffers match owner-supplied reference values or documented placeholders pending owner input
 **And** unit tests verify buffer sizes 134/172
@@ -1133,14 +1230,15 @@ So that I am guided to fix connection (FR-2).
 ### Story 8.4: Virtual Instrument Registration and Bus Layout
 
 As a user,
-I want the plugin as AU/VST3 instrument with correct audio input bus,
-So that Live/Reason/GarageBand host it without MIDI-effect workarounds (FR-4, FR-46).
+I want the plugin as AU/VST3 instrument with correct bus layout per host context,
+So that Live/Reason/GarageBand host it without MIDI-effect workarounds (FR-4, FR-46, AD-11).
 
 **Acceptance Criteria:**
 
-**Given** Story 8.1
+**Given** Story 8.1 and Story R-1
 **When** plugin loads and device type is known
-**Then** AU Music Device / VST3 Instrument with mono input for M-1000 and stereo for M-6/6R; bus updates on type change
+**Then** hosted VST3/AU: Music Device / Instrument with **stereo output only** (no input bus)
+**And** standalone: input channel layout follows device type (mono M-1000, stereo M-6/6R) via `StandaloneAudioInputRouter`
 **And** M-6/6R grays entire MASTER EDIT section (FR-46)
 
 ---

@@ -67,17 +67,18 @@ public:
 
     void runTest() override
     {
-        testRealtimeDrainWithoutOutput();
-        testSysExDrainWithoutOutput();
+        testRealtimeRetainedWithoutOutput();
+        testSysExRetainedWithoutOutput();
         testQueuedSysExGateSharingTwoMessagesDrain();
         testNoOutputPortDoesNotThrow();
+        testRealtimeDispatchesAfterOutputPortOpened();
         testEmptySysExPayloadSkipped();
     }
 
 private:
-    void testRealtimeDrainWithoutOutput()
+    void testRealtimeRetainedWithoutOutput()
     {
-        beginTest("Enqueue realtime — consumer drains queue (no output port)");
+        beginTest("Enqueue realtime — queue retained when no output port");
 
         Core::MidiOutboundQueue queue;
         Core::MidiActivityTracker tracker;
@@ -87,14 +88,15 @@ private:
         manager.startThread();
         manager.sendProgramChange(42, 1);
 
-        expect(waitForQueueEmpty(queue, 2000), "Realtime message should be dequeued");
+        juce::Thread::sleep(50);
+        expect(!queue.isEmpty(), "Realtime message should remain queued without output port");
         manager.stopThread(2000);
         expect(!manager.isThreadRunning(), "MIDI thread should stop cleanly");
     }
 
-    void testSysExDrainWithoutOutput()
+    void testSysExRetainedWithoutOutput()
     {
-        beginTest("Enqueue SysEx — consumer drains queue (no output port)");
+        beginTest("Enqueue SysEx — queue retained when no output port");
 
         Core::MidiOutboundQueue queue;
         Core::MidiActivityTracker tracker;
@@ -104,7 +106,8 @@ private:
         manager.startThread();
         manager.enqueueRemoteParameterEdit(10, 64);
 
-        expect(waitForQueueEmpty(queue, 2000), "SysEx message should be dequeued");
+        juce::Thread::sleep(50);
+        expect(!queue.isEmpty(), "SysEx message should remain queued without output port");
         manager.stopThread(2000);
         expect(!manager.isThreadRunning(), "MIDI thread should stop cleanly");
     }
@@ -136,7 +139,7 @@ private:
 
     void testNoOutputPortDoesNotThrow()
     {
-        beginTest("No output port — enqueue + drain does not throw");
+        beginTest("No output port — enqueue does not throw and retains messages");
 
         Core::MidiOutboundQueue queue;
         Core::MidiActivityTracker tracker;
@@ -150,14 +153,45 @@ private:
         {
             manager.sendProgramChange(7, 1);
             manager.enqueueRemoteParameterEdit(5, 32);
-            expect(waitForQueueEmpty(queue, 2000), "Queue should empty when output unavailable");
+            juce::Thread::sleep(50);
+            expect(!queue.isEmpty(), "Queue should retain messages when output unavailable");
         }
         catch (...)
         {
             threw = true;
         }
 
-        expect(!threw, "Drain with no output port must not throw");
+        expect(!threw, "Enqueue with no output port must not throw");
+        manager.stopThread(2000);
+    }
+
+    void testRealtimeDispatchesAfterOutputPortOpened()
+    {
+        beginTest("Realtime message dispatches after output port becomes available");
+
+        const auto outputId = firstAvailableOutputDeviceId();
+        if (outputId.isEmpty())
+        {
+            logMessage("Skipped — no MIDI output device available");
+            return;
+        }
+
+        Core::MidiOutboundQueue queue;
+        Core::MidiActivityTracker tracker;
+        MinimalAudioProcessor proc;
+        MidiManager manager(proc.apvts, queue, tracker);
+
+        manager.startThread();
+        queue.enqueueRealtime(juce::MidiMessage::noteOn(1, 60, static_cast<juce::uint8>(100)));
+
+        juce::Thread::sleep(50);
+        expect(!queue.isEmpty(), "Message should wait until output port is opened");
+
+        expect(manager.setMidiOutputPort(outputId), "Output port should open");
+        expect(waitForQueueEmpty(queue, 2000), "Message should dispatch after output port opens");
+        expect(tracker.getActivityLevel(Core::MidiActivityTracker::Path::kOutbound) > 0.0f,
+               "Outbound activity should be recorded after successful send");
+
         manager.stopThread(2000);
     }
 
@@ -170,10 +204,14 @@ private:
         MinimalAudioProcessor proc;
         MidiManager manager(proc.apvts, queue, tracker);
 
+        const auto outputId = firstAvailableOutputDeviceId();
+        if (outputId.isNotEmpty())
+            manager.setMidiOutputPort(outputId);
+
         manager.startThread();
         queue.enqueueSysEx(juce::MemoryBlock());
 
-        expect(waitForQueueEmpty(queue, 2000), "Empty SysEx should still be dequeued");
+        expect(waitForQueueEmpty(queue, 2000), "Empty SysEx should still be dequeued when output is available");
         manager.stopThread(2000);
     }
 };

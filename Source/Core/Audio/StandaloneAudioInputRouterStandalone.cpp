@@ -10,31 +10,19 @@ namespace Core::StandaloneAudioInputRouterDetail
 {
     namespace
     {
-        int parseChannelIndex(const juce::String& sourceId)
-        {
-            if (sourceId.startsWith("mono:") || sourceId.startsWith("stereo:"))
-                return sourceId.fromFirstOccurrenceOf(":", false, false).getIntValue();
-
-            if (sourceId.isNotEmpty() && sourceId.containsOnly("0123456789"))
-                return sourceId.getIntValue();
-
-            return -1;
-        }
-
-        bool isStereoSourceId(const juce::String& sourceId)
-        {
-            return sourceId.startsWith("stereo:");
-        }
-
         std::vector<Core::AudioInputSourceEntry> buildActiveDeviceCatalogEntries()
         {
             if (auto* holder = juce::StandalonePluginHolder::getInstance())
             {
                 if (auto* device = holder->deviceManager.getCurrentAudioDevice())
                 {
-                    return Core::AudioInputSourceCatalog::buildEntriesForDevice(
+                    const auto setup = holder->deviceManager.getAudioDeviceSetup();
+                    const int numChannels = device->getInputChannelNames().size();
+
+                    return Core::AudioInputSourceCatalog::buildEntriesForActiveChannels(
                         device->getName(),
-                        device->getInputChannelNames().size());
+                        setup.inputChannels,
+                        numChannels);
                 }
             }
 
@@ -67,34 +55,6 @@ namespace Core::StandaloneAudioInputRouterDetail
         return buildActiveDeviceCatalogEntries();
     }
 
-    void applySourceId(const juce::String& sourceId)
-    {
-        if (auto* holder = juce::StandalonePluginHolder::getInstance())
-        {
-            if (auto* device = holder->deviceManager.getCurrentAudioDevice())
-            {
-                auto setup = holder->deviceManager.getAudioDeviceSetup();
-                setup.inputChannels.clear();
-
-                if (sourceId.isNotEmpty())
-                {
-                    const int channelIndex = parseChannelIndex(sourceId);
-                    const int numChannels = device->getInputChannelNames().size();
-
-                    if (channelIndex >= 0 && channelIndex < numChannels)
-                    {
-                        setup.inputChannels.setBit(channelIndex);
-
-                        if (isStereoSourceId(sourceId) && channelIndex + 1 < numChannels)
-                            setup.inputChannels.setBit(channelIndex + 1);
-                    }
-                }
-
-                holder->deviceManager.setAudioDeviceSetup(setup, true);
-            }
-        }
-    }
-
     void addAudioDeviceChangeListener(juce::ChangeListener& listener)
     {
         if (auto* holder = juce::StandalonePluginHolder::getInstance())
@@ -105,5 +65,11 @@ namespace Core::StandaloneAudioInputRouterDetail
     {
         if (auto* holder = juce::StandalonePluginHolder::getInstance())
             holder->deviceManager.removeChangeListener(&listener);
+    }
+
+    void enableInputMonitoring()
+    {
+        if (auto* holder = juce::StandalonePluginHolder::getInstance())
+            holder->getMuteInputValue().setValue(false);
     }
 }

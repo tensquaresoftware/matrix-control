@@ -38,6 +38,7 @@ public:
     void prepareToPlay(double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
     void processBlock(juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
+    bool isBusesLayoutSupported(const BusesLayout& layouts) const override;
 
     juce::AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override { return true; }
@@ -89,6 +90,7 @@ public:
     void setInputGainDb(float gainDb);
     void setAudioFromChannelMode(int mode);
     void setAudioFromSourceId(const juce::String& sourceId);
+    void syncAudioPassthroughFromSourceId(const juce::String& sourceId);
     juce::StringArray getAudioInputSourceNames() const;
     juce::StringArray getAudioInputSourceIds() const;
 
@@ -113,12 +115,16 @@ public:
     void valueTreeRedirected(juce::ValueTree& treeWhichHasBeenChanged) override;
 
 private:
+    static BusesProperties makeBusesProperties();
     static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
     void validatePluginDescriptorsAtStartup();
     void initializeMidiPortProperties();
     void initializeAudioProperties();
     void initializePatchNameProperty();
     bool getInstrumentPathEnabled(const juce::MidiBuffer& midiMessages) const;
+    void ensureAudioInputBusEnabled();
+    int getAudioFromInputChannelCount() const noexcept;
+    int getMainOutputChannelCount() const noexcept;
     void refreshAudioPassthroughLayout(double sampleRate);
     void syncAudioRuntimeFromState();
     static float dbToLinearGain(float gainDb) noexcept;

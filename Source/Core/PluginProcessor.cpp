@@ -51,13 +51,27 @@ namespace
     }
 }
 
-PluginProcessor::PluginProcessor()
-    : AudioProcessor(BusesProperties()
 #if !JucePlugin_IsMidiEffect
-                         .withInput("Audio From", juce::AudioChannelSet::stereo(), true)
-                         .withOutput("Output", juce::AudioChannelSet::stereo(), true)
+juce::AudioProcessor::BusesProperties PluginProcessor::makeBusesProperties()
+{
+    auto properties = BusesProperties()
+                          .withOutput("Output", juce::AudioChannelSet::stereo(), true);
+
+    if (isStandaloneWrapper())
+        return properties.withInput("Audio From", juce::AudioChannelSet::stereo(), true);
+
+    return properties;
+}
 #endif
-    )
+
+PluginProcessor::PluginProcessor()
+    : AudioProcessor(
+#if JucePlugin_IsMidiEffect
+          BusesProperties()
+#else
+          makeBusesProperties()
+#endif
+      )
     , apvts(*this, nullptr, "PARAMETERS", createParameterLayout())
     , midiActivityTracker_{ std::make_unique<Core::MidiActivityTracker>() }
     , outboundQueue_{ std::make_unique<Core::MidiOutboundQueue>() }
@@ -101,6 +115,7 @@ PluginProcessor::PluginProcessor()
     initializeAudioProperties();
     initializePatchNameProperty();
     apvts.state.addListener(this);
+    startMidiThread();
 }
 
 PluginProcessor::~PluginProcessor()
@@ -174,6 +189,12 @@ void PluginProcessor::changeProgramName(int index, const juce::String& newName)
 void PluginProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
     juce::ignoreUnused(samplesPerBlock);
+    ensureAudioInputBusEnabled();
+    syncAudioRuntimeFromState();
+
+    if (isStandaloneWrapper())
+        Core::StandaloneAudioInputRouter::enableInputMonitoring();
+
     audioPassthroughSampleRate_ = sampleRate > 0.0 ? sampleRate : 44100.0;
     refreshAudioPassthroughLayout(audioPassthroughSampleRate_);
 
@@ -181,6 +202,60 @@ void PluginProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
         ensureDevelopmentLoggingStarted();
 
     startMidiThread();
+}
+
+bool PluginProcessor::isBusesLayoutSupported(const BusesLayout& layouts) const
+{
+#if JucePlugin_IsMidiEffect
+    juce::ignoreUnused(layouts);
+    return true;
+#else
+    if (layouts.outputBuses.isEmpty())
+        return false;
+
+    const auto& outputLayout = layouts.getChannelSet(false, 0);
+
+    if (outputLayout != juce::AudioChannelSet::stereo()
+        && outputLayout != juce::AudioChannelSet::mono())
+    {
+        return false;
+    }
+
+    if (layouts.inputBuses.isEmpty())
+        return true;
+
+    const auto& inputLayout = layouts.getChannelSet(true, 0);
+
+    if (inputLayout.isDisabled())
+        return true;
+
+    return inputLayout == juce::AudioChannelSet::stereo()
+        || inputLayout == juce::AudioChannelSet::mono();
+#endif
+}
+
+void PluginProcessor::ensureAudioInputBusEnabled()
+{
+    if (getBusCount(true) <= 0)
+        return;
+
+    enableAllBuses();
+}
+
+int PluginProcessor::getAudioFromInputChannelCount() const noexcept
+{
+    if (getBusCount(true) <= 0)
+        return 0;
+
+    return getChannelCountOfBus(true, 0);
+}
+
+int PluginProcessor::getMainOutputChannelCount() const noexcept
+{
+    if (getBusCount(false) <= 0)
+        return 0;
+
+    return getChannelCountOfBus(false, 0);
 }
 
 void PluginProcessor::startMidiThread()
@@ -193,8 +268,6 @@ void PluginProcessor::startMidiThread()
 
 void PluginProcessor::releaseResources()
 {
-    stopMidiThread();
-
     if (shouldUseDevelopmentLogging())
     {
         disableApvtsLogging();
@@ -216,11 +289,18 @@ void PluginProcessor::processBlock(juce::AudioBuffer<float>& audioBuffer,
 {
     instrumentForwarder_->forward(midiMessages, getInstrumentPathEnabled(midiMessages), *outboundQueue_, *midiActivityTracker_);
 
-    const bool inputEnabled = getBus(true, 0) != nullptr && getBus(true, 0)->isEnabled();
-    audioPassthroughProcessor_->updateChannelLayout(getMainBusNumInputChannels(),
-                                                    getMainBusNumOutputChannels(),
+    auto inputBusBuffer = getBusBuffer(audioBuffer, true, 0);
+    auto outputBusBuffer = getBusBuffer(audioBuffer, false, 0);
+
+    const bool inputEnabled = getTotalNumInputChannels() > 0
+                              && inputBusBuffer.getNumChannels() > 0;
+
+    audioPassthroughProcessor_->updateChannelLayout(inputBusBuffer.getNumChannels(),
+                                                    outputBusBuffer.getNumChannels(),
                                                     inputEnabled);
-    audioPassthroughProcessor_->process(audioBuffer, inputGainLinear_.load(std::memory_order_relaxed));
+    audioPassthroughProcessor_->process(inputBusBuffer,
+                                        outputBusBuffer,
+                                        inputGainLinear_.load(std::memory_order_relaxed));
 }
 
 juce::AudioProcessorEditor* PluginProcessor::createEditor()
@@ -343,9 +423,10 @@ bool PluginProcessor::getInstrumentPathEnabled(const juce::MidiBuffer& midiMessa
 
 void PluginProcessor::refreshAudioPassthroughLayout(double sampleRate)
 {
-    const bool inputEnabled = getBus(true, 0) != nullptr && getBus(true, 0)->isEnabled();
-    audioPassthroughProcessor_->prepare(getMainBusNumInputChannels(),
-                                        getMainBusNumOutputChannels(),
+    const bool inputEnabled = getTotalNumInputChannels() > 0
+                              && getAudioFromInputChannelCount() > 0;
+    audioPassthroughProcessor_->prepare(getAudioFromInputChannelCount(),
+                                        getMainOutputChannelCount(),
                                         inputEnabled,
                                         sampleRate);
 }
@@ -363,11 +444,7 @@ void PluginProcessor::syncAudioRuntimeFromState()
 
     if (sourceId.isNotEmpty())
     {
-        const int channelMode = Core::AudioInputSourceCatalog::channelModeForSourceId(sourceId);
-        audioPassthroughProcessor_->setChannelMode(static_cast<Core::AudioFromChannelMode>(channelMode));
-
-        if (isStandaloneWrapper())
-            Core::StandaloneAudioInputRouter::applySourceId(sourceId);
+        syncAudioPassthroughFromSourceId(sourceId);
     }
     else
     {
@@ -375,6 +452,12 @@ void PluginProcessor::syncAudioRuntimeFromState()
         audioPassthroughProcessor_->setChannelMode(
             static_cast<Core::AudioFromChannelMode>(juce::jlimit(0, 2, channelMode)));
     }
+}
+
+void PluginProcessor::syncAudioPassthroughFromSourceId(const juce::String& sourceId)
+{
+    const int channelMode = Core::AudioInputSourceCatalog::channelModeForSourceId(sourceId);
+    audioPassthroughProcessor_->setChannelMode(static_cast<Core::AudioFromChannelMode>(channelMode));
 }
 
 void PluginProcessor::setInputGainDb(float gainDb)
@@ -405,7 +488,7 @@ void PluginProcessor::setAudioFromSourceId(const juce::String& sourceId)
     apvts.state.setProperty("audioFromChannelMode", channelMode, nullptr);
 
     if (isStandaloneWrapper())
-        Core::StandaloneAudioInputRouter::applySourceId(sourceId);
+        Core::StandaloneAudioInputRouter::enableInputMonitoring();
 }
 
 juce::StringArray PluginProcessor::getAudioInputSourceNames() const

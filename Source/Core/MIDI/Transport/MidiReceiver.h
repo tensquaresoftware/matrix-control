@@ -9,6 +9,7 @@
 #include <juce_core/juce_core.h>
 
 #include "Core/MIDI/Exceptions/Exceptions.h"
+#include "Core/MIDI/MidiActivityTracker.h"
 #include "Core/MIDI/SysEx/SysExConstants.h"
 
 class MidiReceiver : public juce::MidiInputCallback
@@ -17,6 +18,7 @@ public:
     MidiReceiver();
     ~MidiReceiver() override;
 
+    void setActivityTracker(Core::MidiActivityTracker* tracker) noexcept;
     void setMidiInput(juce::MidiInput* midiInput);
     void handleIncomingMidiMessage(juce::MidiInput* source,
                                    const juce::MidiMessage& message) override;
@@ -25,6 +27,7 @@ public:
     bool isInputAvailable() const noexcept;
 
 private:
+    Core::MidiActivityTracker* activityTracker_ { nullptr };
     juce::MidiInput* midiInput;
     std::atomic<bool> isDestroying;
     

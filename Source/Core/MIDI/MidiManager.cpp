@@ -36,6 +36,9 @@ MidiManager::MidiManager(juce::AudioProcessorValueTreeState& apvtsRef,
     , editorPath_(outboundQueueRef, activityTrackerRef)
     , sysExDelay_(Core::SysExDelayProfile::stockDefault())
 {
+    if (midiReceiver != nullptr)
+        midiReceiver->setActivityTracker(&activityTrackerRef);
+
     apvts.state.setProperty("deviceDetected", false, nullptr);
     apvts.state.setProperty("deviceVersion", juce::String(), nullptr);
     apvts.state.setProperty("lastError", juce::String(), nullptr);
@@ -339,6 +342,12 @@ void MidiManager::run()
 {
     while (!threadShouldExit())
     {
+        if (!midiSender->isOutputAvailable())
+        {
+            wait(5);
+            continue;
+        }
+
         if (auto msg = outboundQueue_.dequeue())
         {
             dispatchOutboundMessage(*msg);
@@ -351,12 +360,6 @@ void MidiManager::run()
 
 void MidiManager::dispatchOutboundMessage(const Core::MidiOutboundQueue::Message& msg)
 {
-    if (!midiSender->isOutputAvailable())
-    {
-        wait(1);
-        return;
-    }
-
     try
     {
         if (msg.category == Core::MidiOutboundQueue::MessageCategory::kRealtime)

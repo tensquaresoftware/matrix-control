@@ -12,6 +12,11 @@ MidiReceiver::MidiReceiver()
 {
 }
 
+void MidiReceiver::setActivityTracker(Core::MidiActivityTracker* tracker) noexcept
+{
+    activityTracker_ = tracker;
+}
+
 MidiReceiver::~MidiReceiver()
 {
     // Mark as destroying to prevent callbacks from accessing members
@@ -49,6 +54,9 @@ void MidiReceiver::handleIncomingMidiMessage(juce::MidiInput* source,
     {
         return;
     }
+
+    if (activityTracker_ != nullptr)
+        activityTracker_->notifyActivity(Core::MidiActivityTracker::Path::kMidiFromInbound);
 
     // Log all incoming MIDI messages for debugging
     MidiLogger::getInstance().logInfo("MIDI message received: " + 

@@ -141,6 +141,23 @@ Construction order follows D-058 critical path; handlers receive references, not
 - Dequeue realtime before SysEx
 - Inter-SysEx delay from `SysExDelayProfile` (stock vs optimised EPROM — Device Inquiry string match TBD in impl)
 - Never call `MidiOutput` from audio thread
+- **Future consideration (R-C):** Direct `sendMessageNow()` from `processBlock()` for notes/CC may improve sample-accurate timing. Requires explicit AD revision and hardware play-testing. v1 retains queue path (R-D — Sprint Change Proposal 2026-06-06).
+
+### AD-11 — Audio bus layout by host context
+
+**Approved:** Sprint Change Proposal 2026-06-06 (supersedes D-055 hosted-plugin input bus rationale).
+
+| Context | Input bus | Output bus | `AudioPassthroughProcessor` |
+|---|---|---|---|
+| Hosted plugin (VST3/AU) | **None** | Stereo (silent) | No-op; output cleared |
+| Standalone | Stereo (optional enable) | Stereo | Passthrough + gain + peak |
+
+Detection: `juce::JUCEApplicationBase::isStandaloneApp()` or equivalent build flag.
+
+Mono vs stereo **input channel selection** (M-1000 vs M-6/6R) applies to **standalone** only (`DeviceTypeRegistry`, Epic 8). Hosted plugin: user monitors synth audio on a **separate DAW audio track** (Option D).
+
+**Standalone:** `StandaloneAudioInputRouter` + `AudioDeviceManager` — unchanged.  
+**Hosted:** `BusesProperties` declares output only; header Audio From / Input Gain / peak hidden in plugin mode.
 
 ### AD-4 — APVTS change → SysEx routing
 
@@ -206,7 +223,7 @@ No hardware in CI; SM-1 remains manual.
 | PRD section | Primary Core owner | GUI touchpoints |
 |---|---|---|
 | §4.1 Device (FR-1–3) | `MidiManager`, `DeviceTypeRegistry` | Header ports, footer identity |
-| §4.2 Dual-role (FR-4–9) | `InstrumentMidiForwarder`, `AudioPassthroughProcessor`, queue | Header routing, LEDs, peak |
+| §4.2 Dual-role (FR-4–9) | `InstrumentMidiForwarder`, `AudioPassthroughProcessor` (standalone), queue | Header routing, LEDs; peak standalone-only (AD-11) |
 | §4.3 PATCH (FR-10–13) | Mappers + SysEx dispatch | PatchEditPanel, displays |
 | §4.4 Matrix Mod (FR-14–15, 50) | SysEx dispatch + bus reorder service | MatrixModPanel |
 | §4.5 MASTER (FR-16–18) | MasterModel + dispatch | MasterEditPanel, Settings |
@@ -582,7 +599,7 @@ Execute in order; one thematic commit per bullet recommended:
 
 ### Coherence Validation ✅
 
-**Decision Compatibility:** AD-1–AD-10 align with brownfield baseline (JUCE 8.0.12, C++17, CMake). Composition root (AD-2), unified queue (AD-3), and APVTS routing (AD-4) are mutually consistent — no direct MIDI from audio thread, no GUI→SysEx shortcuts. P-001 target tree (AD-9) matches implementation patterns (Step 5) and epic order (D-058). AD-10 (`ProjectPaths`) resolves the logger absolute-path conflict without contradicting D-094 (logs gitignored).
+**Decision Compatibility:** AD-1–AD-11 align with brownfield baseline (JUCE 8.0.12, C++17, CMake). Composition root (AD-2), unified queue (AD-3), and APVTS routing (AD-4) are mutually consistent — no direct MIDI from audio thread, no GUI→SysEx shortcuts. P-001 target tree (AD-9) matches implementation patterns (Step 5) and epic order (D-058). AD-10 (`ProjectPaths`) resolves the logger absolute-path conflict without contradicting D-094 (logs gitignored).
 
 **Pattern Consistency:** Naming, folder layout, APVTS taxonomy, and anti-patterns in Step 5 reinforce AD-1–AD-8. Epic E0 checklist references the same paths as the rename map. Mutator two-level store (AD-6) matches FR-54–FR-60 and D-082–D-087.
 
