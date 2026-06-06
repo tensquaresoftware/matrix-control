@@ -136,6 +136,7 @@ set(PLUGIN_SOURCES
     Source/Core/MIDI/MatrixModBusParameterSysExDispatcher.cpp
     Source/Core/MIDI/MidiActivityTracker.cpp
     Source/Core/MIDI/MidiManager.cpp
+    Source/Core/MIDI/MidiPortOpenFeedback.cpp
     Source/Core/MIDI/PatchParameterSysExDispatcher.cpp
     Source/Core/MIDI/Queue/MidiOutboundQueue.cpp
     Source/Core/MIDI/Queue/SysExDelayProfile.cpp
@@ -257,6 +258,8 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/HardwareLatencyTests.cpp
         Tests/Unit/InstrumentMidiForwarderTests.cpp
         Tests/Unit/KeyboardFromMidiInputTests.cpp
+        Tests/Unit/MidiPortOpenFeedbackTests.cpp
+        Tests/Unit/MidiPortOpenFailurePropagationTests.cpp
         Tests/Unit/MidiPortRoutingPropertyTests.cpp
         Tests/Unit/MidiOutboundQueueTests.cpp
         Tests/Unit/SysExDelayProfileTests.cpp
@@ -276,6 +279,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/MIDI/EditorPath.cpp
         Source/Core/MIDI/MidiActivityTracker.cpp
         Source/Core/MIDI/MidiManager.cpp
+        Source/Core/MIDI/MidiPortOpenFeedback.cpp
         Source/Core/MIDI/MasterParameterSysExDispatcher.cpp
         Source/Core/MIDI/MatrixModBusParameterSysExDispatcher.cpp
         Source/Core/MIDI/PatchParameterSysExDispatcher.cpp

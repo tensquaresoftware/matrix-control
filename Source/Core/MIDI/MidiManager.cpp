@@ -1,6 +1,8 @@
 #include "MidiManager.h"
 
+#include "Core/Exceptions/ExceptionPropagator.h"
 #include "Core/Loggers/MidiLogger.h"
+#include "Core/MIDI/MidiPortOpenFeedback.h"
 #include "Core/MIDI/Queue/SysExDelayProfile.h"
 #include "Shared/Definitions/Matrix1000Limits.h"
 
@@ -16,6 +18,21 @@ namespace
             return Core::MidiActivityTracker::Path::kEditor;
 
         return Core::MidiActivityTracker::Path::kInstrument;
+    }
+
+    void reportPortOpenFailure(juce::AudioProcessorValueTreeState& apvts,
+                               bool isInput,
+                               const Core::MidiPortOpenResult& result,
+                               const juce::String& deviceId)
+    {
+        Core::MidiPortOpenFeedback::logOpenFailure(isInput,
+                                                   result.portDisplayName,
+                                                   deviceId,
+                                                   result.failureReason);
+        Core::MidiPortOpenFeedback::propagateOpenFailure(apvts,
+                                                        isInput,
+                                                        result.portDisplayName,
+                                                        result.failureReason);
     }
 }
 
@@ -85,14 +102,16 @@ bool MidiManager::setMidiInputPort(const juce::String& deviceId)
         midiReceiver->setMidiInput(nullptr);
     }
 
-    if (inputMidiPort->openPort(deviceId, midiReceiver.get()))
+    const auto openResult = inputMidiPort->openPort(deviceId, midiReceiver.get());
+    if (openResult.succeeded())
     {
         midiReceiver->setMidiInput(inputMidiPort->getMidiInput());
+        ExceptionPropagator::clearMessage(apvts);
         MidiLogger::getInstance().logInfo("MIDI input port successfully set");
         return true;
     }
 
-    MidiLogger::getInstance().logError("Failed to set MIDI input port");
+    reportPortOpenFailure(apvts, true, openResult, deviceId);
     return false;
 }
 
@@ -129,13 +148,16 @@ bool MidiManager::setMidiOutputPort(const juce::String& deviceId)
         midiSender->setMidiOutput(nullptr);
     }
 
-    if (outputMidiPort->openPort(deviceId))
+    const auto openResult = outputMidiPort->openPort(deviceId);
+    if (openResult.succeeded())
     {
         midiSender->setMidiOutput(outputMidiPort->getMidiOutput());
+        ExceptionPropagator::clearMessage(apvts);
         MidiLogger::getInstance().logInfo("MIDI output port successfully set");
         return true;
     }
-    MidiLogger::getInstance().logError("Failed to set MIDI output port");
+
+    reportPortOpenFailure(apvts, false, openResult, deviceId);
     return false;
 }
 

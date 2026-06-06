@@ -11,38 +11,40 @@ MidiOutputPort::~MidiOutputPort()
     closePort();
 }
 
-bool MidiOutputPort::openPort(const juce::String& deviceId)
+Core::MidiPortOpenResult MidiOutputPort::openPort(const juce::String& deviceId)
 {
+    Core::MidiPortOpenResult result;
     closePort();
 
     if (deviceId.isEmpty())
     {
         MidiLogger::getInstance().logWarning("MidiOutputPort::openPort: empty device ID");
-        return false;
+        result.failureReason = Core::MidiPortOpenFailureReason::kNotFound;
+        return result;
     }
 
-    auto devices = juce::MidiOutput::getAvailableDevices();
+    const auto devices = juce::MidiOutput::getAvailableDevices();
     for (const auto& device : devices)
     {
-        if (device.identifier == deviceId)
+        if (device.identifier != deviceId)
+            continue;
+
+        result.portDisplayName = device.name;
+        midiOutput = juce::MidiOutput::openDevice(device.identifier);
+        if (midiOutput != nullptr)
         {
-            midiOutput = juce::MidiOutput::openDevice(device.identifier);
-            if (midiOutput != nullptr)
-            {
-                portIsOpen = true;
-                MidiLogger::getInstance().logInfo("MIDI output port opened: [" + device.name + "]");
-                return true;
-            }
-            else
-            {
-                MidiLogger::getInstance().logError("Failed to open MIDI output device: [" + device.name + "]");
-            }
-            break;
+            portIsOpen = true;
+            MidiLogger::getInstance().logInfo("MIDI output port opened: [" + device.name + "]");
+            return result;
         }
+
+        result.failureReason = Core::MidiPortOpenFailureReason::kOpenRejected;
+        return result;
     }
 
-    MidiLogger::getInstance().logError("MIDI output device not found: " + deviceId);
-    return false;
+    result.portDisplayName = deviceId;
+    result.failureReason = Core::MidiPortOpenFailureReason::kNotFound;
+    return result;
 }
 
 void MidiOutputPort::closePort()
@@ -64,4 +66,3 @@ juce::MidiOutput* MidiOutputPort::getMidiOutput() const noexcept
 {
     return midiOutput.get();
 }
-

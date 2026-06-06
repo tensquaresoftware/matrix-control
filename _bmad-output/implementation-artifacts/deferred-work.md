@@ -1,5 +1,10 @@
 # Deferred Work
 
+## Deferred from: code review of r-3-midi-port-open-error-feedback (2026-06-06)
+
+- **`MidiPortOpenResult` types colocated in `MidiPortOpenFeedback.h`** — pulls `juce_audio_processors` into port headers; extract to `MidiPortOpenResult.h` if port layer grows.
+- **No end-to-end `kOpenRejected` propagation test** — formatter branch covered; OS-level open rejection not mockable without harness.
+
 ## Deferred from: code review of r-2-hardware-latency-gui (2026-06-06)
 
 - **Standalone header layout overlap (HW LATENCY + SCALE/SKIN vs UI ELEMENTS)** (`HeaderPanel.cpp`) — superseded by planned SETTINGS window story (Epic 7.7+); header interim layout accepted until then.

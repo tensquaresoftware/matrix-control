@@ -14,42 +14,44 @@ MidiInputPort::~MidiInputPort()
     closePort();
 }
 
-bool MidiInputPort::openPort(const juce::String& deviceId, juce::MidiInputCallback* callback)
+Core::MidiPortOpenResult MidiInputPort::openPort(const juce::String& deviceId,
+                                                 juce::MidiInputCallback* callback)
 {
+    Core::MidiPortOpenResult result;
     closePort();
 
     if (deviceId.isEmpty())
     {
         MidiLogger::getInstance().logWarning("MidiInputPort::openPort: empty device ID");
-        return false;
+        result.failureReason = Core::MidiPortOpenFailureReason::kNotFound;
+        return result;
     }
 
-    auto devices = juce::MidiInput::getAvailableDevices();
+    const auto devices = juce::MidiInput::getAvailableDevices();
     for (const auto& device : devices)
     {
-        if (device.identifier == deviceId)
+        if (device.identifier != deviceId)
+            continue;
+
+        result.portDisplayName = device.name;
+        midiInput = juce::MidiInput::openDevice(device.identifier, callback);
+        if (midiInput != nullptr)
         {
-            midiInput = juce::MidiInput::openDevice(device.identifier, callback);
-            if (midiInput != nullptr)
-            {
-                if (callback != nullptr)
-                {
-                    midiInput->start();
-                }
-                portIsOpen = true;
-                MidiLogger::getInstance().logInfo("MIDI input port opened: [" + device.name + "]");
-                return true;
-            }
-            else
-            {
-                MidiLogger::getInstance().logError("Failed to open MIDI input device: [" + device.name + "]");
-            }
-            break;
+            if (callback != nullptr)
+                midiInput->start();
+
+            portIsOpen = true;
+            MidiLogger::getInstance().logInfo("MIDI input port opened: [" + device.name + "]");
+            return result;
         }
+
+        result.failureReason = Core::MidiPortOpenFailureReason::kOpenRejected;
+        return result;
     }
 
-    MidiLogger::getInstance().logError("MIDI input device not found: " + deviceId);
-    return false;
+    result.portDisplayName = deviceId;
+    result.failureReason = Core::MidiPortOpenFailureReason::kNotFound;
+    return result;
 }
 
 void MidiInputPort::closePort()
@@ -57,7 +59,6 @@ void MidiInputPort::closePort()
     if (midiInput != nullptr)
     {
         midiInput->stop();
-        // Give time for any in-flight callbacks to complete
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
         MidiLogger::getInstance().logInfo("MIDI input port closed");
         midiInput.reset();
@@ -74,4 +75,3 @@ juce::MidiInput* MidiInputPort::getMidiInput() const noexcept
 {
     return midiInput.get();
 }
-
