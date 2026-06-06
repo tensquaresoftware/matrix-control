@@ -3,6 +3,29 @@
 #include "Core/Exceptions/ExceptionPropagator.h"
 #include "Core/Loggers/MidiLogger.h"
 #include "Shared/Exceptions/WidgetFactoryExceptions.h"
+#include "Shared/ProjectPaths.h"
+
+#if JUCE_WINDOWS
+namespace
+{
+constexpr const char* kWindowsMidiSetupDocRelativePath = "Documentation/windows-midi-multi-client.md";
+
+juce::String windowsMidiSetupDocSuffix()
+{
+    juce::String suffix = " See ";
+    suffix += kWindowsMidiSetupDocRelativePath;
+    suffix += " for setup help.";
+
+    const juce::File docFile = ProjectPaths::getProjectRoot()
+                                   .getChildFile(kWindowsMidiSetupDocRelativePath);
+
+    if (docFile.existsAsFile())
+        suffix += " (" + docFile.getFullPathName() + ")";
+
+    return suffix;
+}
+}
+#endif
 
 namespace Core::MidiPortOpenFeedback
 {
@@ -45,6 +68,9 @@ juce::String formatFooterMessage(bool isInput,
 #endif
 
         message += ").";
+#if JUCE_WINDOWS
+        message += windowsMidiSetupDocSuffix();
+#endif
         return message;
     }
 

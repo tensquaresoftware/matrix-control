@@ -62,8 +62,10 @@ private:
 
 #if JUCE_WINDOWS
         expect(message.contains("loopMIDI"));
+        expect(message.contains("Documentation/windows-midi-multi-client.md"));
 #else
         expect(message.contains("Try closing other applications"));
+        expect(!message.contains("Documentation/windows-midi-multi-client.md"));
 #endif
     }
 };
