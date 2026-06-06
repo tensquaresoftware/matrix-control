@@ -85,6 +85,12 @@ PluginEditor::PluginEditor(PluginProcessor& p)
         *skin_, editorWidth, editorHeight, *widgetFactory_, pluginProcessor.getApvts());
     addAndMakeVisible(*mainComponent_);
 
+    mainComponent_->setBusReorderHandler(
+        [this](int fromBus, int toBus)
+        {
+            pluginProcessor.swapMatrixModBusContents(fromBus, toBus);
+        });
+
     testComponent_ = std::make_unique<TestComponent>(*skin_, pluginProcessor.getApvts().state, editorWidth, editorHeight);
     addChildComponent(*testComponent_);
     testComponent_->setVisible(false);

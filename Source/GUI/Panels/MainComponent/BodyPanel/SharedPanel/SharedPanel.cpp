@@ -33,6 +33,12 @@ SharedPanel::SharedPanel(tss::ISkin& skin, int width, WidgetFactory& widgetFacto
 
 SharedPanel::~SharedPanel() = default;
 
+void SharedPanel::setBusReorderHandler(BusReorderHandler handler)
+{
+    if (matrixModulationPanel_ != nullptr)
+        matrixModulationPanel_->setBusReorderHandler(std::move(handler));
+}
+
 void SharedPanel::resized()
 {
     const auto bounds = getLocalBounds();

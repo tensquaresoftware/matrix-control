@@ -121,7 +121,7 @@ development_status:
   7-6-internal-patches-panel-wiring: backlog
   7-7-settings-page-consolidation: review
   7-8-header-footer-shell-and-persistence: backlog
-  7-9-matrix-mod-bus-reorder-ux-handler: backlog
+  7-9-matrix-mod-bus-reorder-ux-handler: done
   epic-7-retrospective: optional
   epic-8: backlog
   8-1-devicetyperegistry-and-member-byte-fix: backlog

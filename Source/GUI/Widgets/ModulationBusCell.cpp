@@ -27,7 +27,8 @@ ModulationBusCell::ModulationBusCell(tss::ISkin& skin,
                                       const juce::String& amountParamId,
                                       const juce::String& destinationParamId,
                                       const juce::String& busId)
-    : dimensions_(dimensions)
+    : busNumber_(busNumber)
+    , dimensions_(dimensions)
     , skin_(&skin)
     , apvts_(apvts)
     , busId_(busId)
@@ -51,6 +52,7 @@ void ModulationBusCell::createBusNumberLabel(int busNumber, tss::ISkin& skin)
         dimensions_.busNumberLabelHeight,
         tss::labelLookFromSkin(skin),
         juce::String(busNumber));
+    busNumberLabel_->setInterceptsMouseClicks(false, false);
     addAndMakeVisible(*busNumberLabel_);
 }
 
@@ -142,6 +144,111 @@ void ModulationBusCell::createSeparator(tss::ISkin& skin)
         dimensions_.separatorHeight,
         tss::horizontalSeparatorLookFromSkin(skin));
     addAndMakeVisible(*separator_);
+}
+
+void ModulationBusCell::setReorderDragCallbacks(ReorderDragBeginFn onBegin,
+                                                ReorderDragMoveFn onMove,
+                                                ReorderDragEndFn onEnd)
+{
+    onReorderDragBegin_ = std::move(onBegin);
+    onReorderDragMove_ = std::move(onMove);
+    onReorderDragEnd_ = std::move(onEnd);
+}
+
+void ModulationBusCell::setDropTargetHighlighted(bool highlighted)
+{
+    if (dropTargetHighlighted_ == highlighted)
+        return;
+
+    dropTargetHighlighted_ = highlighted;
+    repaint();
+}
+
+void ModulationBusCell::setDragSourceHighlighted(bool highlighted)
+{
+    if (dragSourceHighlighted_ == highlighted)
+        return;
+
+    dragSourceHighlighted_ = highlighted;
+    repaint();
+}
+
+void ModulationBusCell::paint(juce::Graphics& g)
+{
+    if (!dropTargetHighlighted_ && !dragSourceHighlighted_)
+        return;
+
+    auto bounds = getLocalBounds().toFloat();
+    const juce::Colour highlightColour = dragSourceHighlighted_
+        ? juce::Colours::white.withAlpha(0.12f)
+        : juce::Colours::white.withAlpha(0.20f);
+    g.setColour(highlightColour);
+    g.fillRect(bounds);
+}
+
+void ModulationBusCell::mouseDown(const juce::MouseEvent& e)
+{
+    if (!isBusNumberLabelHit(e.getPosition()))
+        return;
+
+    reorderDragPending_ = true;
+    reorderDragActive_ = false;
+    dragStartPosition_ = e.getPosition();
+}
+
+void ModulationBusCell::mouseDrag(const juce::MouseEvent& e)
+{
+    if (!reorderDragPending_ && !reorderDragActive_)
+        return;
+
+    if (!reorderDragActive_
+        && e.getPosition().toFloat().getDistanceFrom(dragStartPosition_.toFloat()) < kReorderDragThresholdPx_)
+    {
+        return;
+    }
+
+    if (!reorderDragActive_)
+    {
+        reorderDragActive_ = true;
+        if (onReorderDragBegin_)
+            onReorderDragBegin_(busNumber_);
+    }
+
+    if (onReorderDragMove_)
+        onReorderDragMove_(toPanelPosition(e.getPosition()));
+}
+
+void ModulationBusCell::mouseUp(const juce::MouseEvent& e)
+{
+    finishReorderDrag(e.getPosition());
+}
+
+void ModulationBusCell::finishReorderDrag(juce::Point<int> localPosition)
+{
+    if (reorderDragActive_)
+    {
+        if (onReorderDragEnd_)
+            onReorderDragEnd_(toPanelPosition(localPosition));
+    }
+
+    reorderDragPending_ = false;
+    reorderDragActive_ = false;
+}
+
+bool ModulationBusCell::isBusNumberLabelHit(juce::Point<int> localPosition) const
+{
+    if (busNumberLabel_ == nullptr)
+        return false;
+
+    return busNumberLabel_->getBounds().contains(localPosition);
+}
+
+juce::Point<int> ModulationBusCell::toPanelPosition(juce::Point<int> localPosition) const
+{
+    if (auto* panel = getParentComponent())
+        return panel->getLocalPoint(this, localPosition);
+
+    return localPosition;
 }
 
 void ModulationBusCell::resized()

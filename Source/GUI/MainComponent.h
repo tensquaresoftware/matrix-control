@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 
@@ -28,6 +30,10 @@ public:
     HeaderPanel& getHeaderPanel() { return headerPanel; }
     BodyPanel& getBodyPanel() { return bodyPanel; }
     FooterPanel& getFooterPanel() { return footerPanel; }
+
+    using BusReorderHandler = std::function<void(int fromBus, int toBus)>;
+
+    void setBusReorderHandler(BusReorderHandler handler);
 
     void setUiElementsTestVisible(bool visible);
     juce::Rectangle<int> getUiElementsTestAreaBounds() const;

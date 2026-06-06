@@ -81,10 +81,105 @@ MatrixModulationPanel::MatrixModulationPanel(tss::ISkin& skin, int width, int he
             parameterArrays.destinationParameterIds[busNumberAsSizeT],
             parameterArrays.busIds[busNumberAsSizeT]);
         addAndMakeVisible(*bus);
+        bus->setReorderDragCallbacks(
+            [this](int sourceBus) { beginBusReorderDrag(sourceBus); },
+            [this](juce::Point<int> positionInPanel) { updateBusReorderDrag(positionInPanel); },
+            [this](juce::Point<int> positionInPanel) { finishBusReorderDrag(positionInPanel); });
         modulationBuses_.push_back(std::move(bus));
     }
 
     setSize(width_, height_);
+}
+
+void MatrixModulationPanel::setBusReorderHandler(BusReorderHandler handler)
+{
+    busReorderHandler_ = std::move(handler);
+}
+
+void MatrixModulationPanel::beginBusReorderDrag(int sourceBus)
+{
+    dragSourceBus_ = sourceBus;
+    dropTargetBus_.reset();
+    setDropTargetBus(std::nullopt);
+
+    if (sourceBus >= 0 && sourceBus < static_cast<int>(modulationBuses_.size()))
+        modulationBuses_[static_cast<size_t>(sourceBus)]->setDragSourceHighlighted(true);
+
+    setMouseCursor(juce::MouseCursor::DraggingHandCursor);
+}
+
+void MatrixModulationPanel::updateBusReorderDrag(juce::Point<int> positionInPanel)
+{
+    const int hoverBus = findBusIndexAtPanelPosition(positionInPanel);
+    setDropTargetBus(hoverBus >= 0 ? std::optional<int>(hoverBus) : std::nullopt);
+}
+
+void MatrixModulationPanel::finishBusReorderDrag(juce::Point<int> positionInPanel)
+{
+    const int targetBus = findBusIndexAtPanelPosition(positionInPanel);
+
+    if (dragSourceBus_.has_value()
+        && targetBus >= 0
+        && targetBus != dragSourceBus_.value()
+        && busReorderHandler_)
+    {
+        busReorderHandler_(dragSourceBus_.value(), targetBus);
+    }
+
+    clearBusReorderDragState();
+}
+
+void MatrixModulationPanel::clearBusReorderDragState()
+{
+    for (auto& bus : modulationBuses_)
+    {
+        if (bus != nullptr)
+        {
+            bus->setDragSourceHighlighted(false);
+            bus->setDropTargetHighlighted(false);
+        }
+    }
+
+    dragSourceBus_.reset();
+    dropTargetBus_.reset();
+    setMouseCursor(juce::MouseCursor::NormalCursor);
+}
+
+int MatrixModulationPanel::findBusIndexAtPanelPosition(juce::Point<int> positionInPanel) const
+{
+    for (int busIndex = 0; busIndex < static_cast<int>(modulationBuses_.size()); ++busIndex)
+    {
+        if (auto* bus = modulationBuses_[static_cast<size_t>(busIndex)].get())
+        {
+            if (bus->getBounds().contains(positionInPanel))
+                return busIndex;
+        }
+    }
+
+    return -1;
+}
+
+void MatrixModulationPanel::setDropTargetBus(std::optional<int> busIndex)
+{
+    if (dropTargetBus_ == busIndex)
+        return;
+
+    if (dropTargetBus_.has_value())
+    {
+        const auto previousIndex = static_cast<size_t>(*dropTargetBus_);
+        if (previousIndex < modulationBuses_.size() && modulationBuses_[previousIndex] != nullptr)
+            modulationBuses_[previousIndex]->setDropTargetHighlighted(false);
+    }
+
+    dropTargetBus_ = busIndex;
+
+    if (dropTargetBus_.has_value()
+        && dropTargetBus_.value() != dragSourceBus_
+        && dropTargetBus_.value() >= 0
+        && dropTargetBus_.value() < static_cast<int>(modulationBuses_.size()))
+    {
+        modulationBuses_[static_cast<size_t>(*dropTargetBus_)]->setDropTargetHighlighted(true);
+    }
 }
 
 std::array<const char*, Matrix1000Limits::kModulationBusCount> MatrixModulationPanel::createBusIds() const

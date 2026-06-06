@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <memory>
 
 #include <juce_gui_basics/juce_gui_basics.h>
@@ -23,6 +24,10 @@ public:
     void resized() override;
     void setSkin(tss::ISkin& skin);
     void setUiScale(float uiScale);
+
+    using BusReorderHandler = std::function<void(int fromBus, int toBus)>;
+
+    void setBusReorderHandler(BusReorderHandler handler);
 
 private:
     int width_;

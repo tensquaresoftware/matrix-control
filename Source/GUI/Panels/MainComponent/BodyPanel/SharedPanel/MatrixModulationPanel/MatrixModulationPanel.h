@@ -1,6 +1,8 @@
 #pragma once
 
+#include <functional>
 #include <memory>
+#include <optional>
 #include <vector>
 
 #include <juce_gui_basics/juce_gui_basics.h>
@@ -29,7 +31,21 @@ public:
     void setSkin(tss::ISkin& skin);
     void setUiScale(float uiScale);
 
+    using BusReorderHandler = std::function<void(int fromBus, int toBus)>;
+
+    void setBusReorderHandler(BusReorderHandler handler);
+
 private:
+    void beginBusReorderDrag(int sourceBus);
+    void updateBusReorderDrag(juce::Point<int> positionInPanel);
+    void finishBusReorderDrag(juce::Point<int> positionInPanel);
+    void clearBusReorderDragState();
+    int findBusIndexAtPanelPosition(juce::Point<int> positionInPanel) const;
+    void setDropTargetBus(std::optional<int> busIndex);
+
+    std::optional<int> dragSourceBus_;
+    std::optional<int> dropTargetBus_;
+    BusReorderHandler busReorderHandler_;
     struct ModulationBusParameterArrays
     {
         std::array<const char*, Matrix1000Limits::kModulationBusCount> busIds;

@@ -27,6 +27,10 @@ public:
     void setSkin(tss::ISkin& skin);
     void setUiScale(float uiScale);
 
+    using BusReorderHandler = std::function<void(int fromBus, int toBus)>;
+
+    void setBusReorderHandler(BusReorderHandler handler);
+
 private:
     int width_;
     int height_;

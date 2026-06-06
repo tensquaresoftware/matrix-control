@@ -129,3 +129,8 @@ void BodyPanel::setUiScale(float uiScale)
     repaint();
 }
 
+void BodyPanel::setBusReorderHandler(BusReorderHandler handler)
+{
+    if (sharedPanel_ != nullptr)
+        sharedPanel_->setBusReorderHandler(std::move(handler));
+}

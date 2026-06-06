@@ -97,3 +97,7 @@ void MainComponent::setUiScale(float uiScale)
     repaint();
 }
 
+void MainComponent::setBusReorderHandler(BusReorderHandler handler)
+{
+    bodyPanel.setBusReorderHandler(std::move(handler));
+}
