@@ -33,6 +33,20 @@ void ApvtsPatchMapper::bufferToApvts()
         pushChoiceToApvts(d);
 }
 
+void ApvtsPatchMapper::pushBusToApvts(int busIndex)
+{
+    jassert(busIndex >= 0 && busIndex < Matrix1000Limits::kModulationBusCount);
+
+    using namespace PluginDescriptors::MatrixModulationSection;
+
+    const auto& intParams = kModulationBusIntParameters[static_cast<size_t>(busIndex)];
+    const auto& choiceParams = kModulationBusChoiceParameters[static_cast<size_t>(busIndex)];
+
+    pushIntToApvts(intParams[0]);
+    pushChoiceToApvts(choiceParams[0]);
+    pushChoiceToApvts(choiceParams[1]);
+}
+
 void ApvtsPatchMapper::syncIntToBuffer(const PluginDescriptors::IntParameterDescriptor& d)
 {
     auto* rawValue = apvts_.getRawParameterValue(d.parameterId);

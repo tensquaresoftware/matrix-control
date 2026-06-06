@@ -21,6 +21,7 @@ namespace Core
     class PatchNameSyncer;
     class MasterParameterSysExDispatcher;
     class MatrixModBusParameterSysExDispatcher;
+    class MatrixModBusReorderService;
     class PatchParameterSysExDispatcher;
     class MidiOutboundQueue;
     class InstrumentMidiForwarder;
@@ -95,6 +96,8 @@ public:
     void syncAudioPassthroughFromSourceId(const juce::String& sourceId);
     juce::StringArray getAudioInputSourceNames() const;
     juce::StringArray getAudioInputSourceIds() const;
+
+    void swapMatrixModBusContents(int fromBus, int toBus);
 
     Core::AudioPassthroughProcessor& getAudioPassthroughProcessor() noexcept { return *audioPassthroughProcessor_; }
     const Core::AudioPassthroughProcessor& getAudioPassthroughProcessor() const noexcept { return *audioPassthroughProcessor_; }
@@ -174,10 +177,12 @@ private:
     std::unique_ptr<Core::PatchParameterSysExDispatcher> patchParameterSysExDispatcher_;
     std::unique_ptr<Core::MasterParameterSysExDispatcher> masterParameterSysExDispatcher_;
     std::unique_ptr<Core::MatrixModBusParameterSysExDispatcher> matrixModBusParameterSysExDispatcher_;
+    std::unique_ptr<Core::MatrixModBusReorderService> matrixModBusReorderService_;
     std::map<juce::String, PluginDescriptors::ChoiceParameterDescriptor> choiceParameterMap_;
     std::unordered_set<juce::String> patchParameterIds_;
     std::unordered_set<juce::String> masterParameterIds_;
     std::unordered_set<juce::String> matrixModParameterIds_;
+    bool suppressMatrixModParameterSysEx_ { false };
     bool developmentLoggingStarted_ { false };
     
     static constexpr int kThreadStopTimeoutMs_ {5000};

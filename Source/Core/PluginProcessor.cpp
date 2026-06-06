@@ -19,6 +19,7 @@
 #include "Core/Models/PatchNameSyncer.h"
 #include "Core/MIDI/MasterParameterSysExDispatcher.h"
 #include "Core/MIDI/MatrixModBusParameterSysExDispatcher.h"
+#include "Core/MIDI/MatrixModBusReorderService.h"
 #include "Core/MIDI/PatchParameterSysExDispatcher.h"
 #include "Shared/Definitions/PluginAudioConstants.h"
 #include "Shared/Definitions/Matrix1000Limits.h"
@@ -107,6 +108,11 @@ PluginProcessor::PluginProcessor()
         {
             midiManager->enqueueMatrixModBusEdit(bus, source, amount, destination);
         });
+
+    matrixModBusReorderService_ = std::make_unique<Core::MatrixModBusReorderService>(
+        *patchModel_,
+        *apvtsPatchMapper_,
+        *matrixModBusParameterSysExDispatcher_);
 
     validatePluginDescriptorsAtStartup();
     buildChoiceParameterMap();
@@ -387,6 +393,16 @@ bool PluginProcessor::setKeyboardFromPort(const juce::String& deviceId)
     apvts.state.setProperty("keyboardFromEnabled", true, nullptr);
     apvts.state.setProperty("keyboardFromPortId", deviceId, nullptr);
     return true;
+}
+
+void PluginProcessor::swapMatrixModBusContents(int fromBus, int toBus)
+{
+    if (matrixModBusReorderService_ == nullptr)
+        return;
+
+    suppressMatrixModParameterSysEx_ = true;
+    matrixModBusReorderService_->swapBusContents(fromBus, toBus);
+    suppressMatrixModParameterSysEx_ = false;
 }
 
 juce::AudioProcessorValueTreeState::ParameterLayout PluginProcessor::createParameterLayout()
@@ -830,10 +846,16 @@ void PluginProcessor::valueTreePropertyChanged(juce::ValueTree& treeWhosePropert
 
     if (patchParameterIds_.count(parameterId) > 0)
     {
-        apvtsPatchMapper_->apvtsToBuffer();
+        const bool isMatrixModParam = matrixModParameterIds_.count(parameterId) > 0;
 
-        if (matrixModParameterIds_.count(parameterId) > 0)
-            matrixModBusParameterSysExDispatcher_->dispatch(parameterId);
+        if (!isMatrixModParam || !suppressMatrixModParameterSysEx_)
+            apvtsPatchMapper_->apvtsToBuffer();
+
+        if (isMatrixModParam)
+        {
+            if (!suppressMatrixModParameterSysEx_)
+                matrixModBusParameterSysExDispatcher_->dispatch(parameterId);
+        }
         else
             patchParameterSysExDispatcher_->dispatch(parameterId);
     }

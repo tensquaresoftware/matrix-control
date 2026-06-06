@@ -1,5 +1,9 @@
 # Deferred Work
 
+## Deferred from: code review of 2-10-matrix-mod-bus-reorder-sysex (2026-06-06)
+
+- **`suppressMatrixModParameterSysEx_` bool vs nested counter** (`PluginProcessor.h:185`) — story spec recommends bool; nested multi-swap reentrancy out of scope for message-thread v1.
+
 ## Deferred from: code review of r-3-midi-port-open-error-feedback (2026-06-06)
 
 - **`MidiPortOpenResult` types colocated in `MidiPortOpenFeedback.h`** — pulls `juce_audio_processors` into port headers; extract to `MidiPortOpenResult.h` if port layer grows.

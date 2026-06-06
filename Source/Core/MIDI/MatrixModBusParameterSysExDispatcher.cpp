@@ -19,14 +19,18 @@ MatrixModBusParameterSysExDispatcher::MatrixModBusParameterSysExDispatcher(
 
 void MatrixModBusParameterSysExDispatcher::dispatch(const juce::String& parameterId) const
 {
-    if (enqueueMatrixModBusEdit_ == nullptr)
-        return;
-
     const auto busIt = parameterIdToBus_.find(parameterId);
     if (busIt == parameterIdToBus_.end())
         return;
 
-    const int busIndex = busIt->second;
+    dispatchBus(busIt->second);
+}
+
+void MatrixModBusParameterSysExDispatcher::dispatchBus(int busIndex) const
+{
+    if (enqueueMatrixModBusEdit_ == nullptr)
+        return;
+
     jassert(busIndex >= 0 && busIndex < Matrix1000Limits::kModulationBusCount);
 
     using namespace PluginDescriptors::MatrixModulationSection;

@@ -25,6 +25,8 @@ namespace Core
 
         void dispatch(const juce::String& parameterId) const;
 
+        void dispatchBus(int busIndex) const;
+
     private:
         static std::unordered_map<juce::String, int> buildParameterIdToBusMap();
 

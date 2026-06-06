@@ -134,6 +134,7 @@ set(PLUGIN_SOURCES
     Source/Core/MIDI/EditorPath.cpp
     Source/Core/MIDI/MasterParameterSysExDispatcher.cpp
     Source/Core/MIDI/MatrixModBusParameterSysExDispatcher.cpp
+    Source/Core/MIDI/MatrixModBusReorderService.cpp
     Source/Core/MIDI/MidiActivityTracker.cpp
     Source/Core/MIDI/MidiManager.cpp
     Source/Core/MIDI/MidiPortOpenFeedback.cpp
@@ -254,6 +255,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/SysExEncoderTests.cpp
         Tests/Unit/MasterParameterSysExDispatcherTests.cpp
         Tests/Unit/MatrixModBusParameterSysExDispatcherTests.cpp
+        Tests/Unit/MatrixModBusReorderServiceTests.cpp
         Tests/Unit/PatchParameterSysExDispatcherTests.cpp
         Tests/Unit/EditorPathTests.cpp
         Tests/Unit/AudioPassthroughProcessorTests.cpp
@@ -284,6 +286,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/MIDI/MidiPortOpenFeedback.cpp
         Source/Core/MIDI/MasterParameterSysExDispatcher.cpp
         Source/Core/MIDI/MatrixModBusParameterSysExDispatcher.cpp
+        Source/Core/MIDI/MatrixModBusReorderService.cpp
         Source/Core/MIDI/PatchParameterSysExDispatcher.cpp
         Source/Core/MIDI/Ports/MidiInputPort.cpp
         Source/Core/MIDI/Ports/MidiOutputPort.cpp

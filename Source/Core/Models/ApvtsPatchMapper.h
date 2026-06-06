@@ -20,6 +20,10 @@ namespace Core
         // Message thread only — see JUCE AudioProcessor::setValueNotifyingHost.
         void bufferToApvts();
 
+        // Push one Matrix Mod bus (source, amount, destination) from PatchModel to APVTS.
+        // Caller must suppress Matrix Mod SysEx dispatch when used during bulk reorder (Story 2.10).
+        void pushBusToApvts(int busIndex);
+
         static std::vector<PluginDescriptors::IntParameterDescriptor> buildIntDescriptors();
         static std::vector<PluginDescriptors::ChoiceParameterDescriptor> buildChoiceDescriptors();
 

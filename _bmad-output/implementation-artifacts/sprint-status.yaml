@@ -1,5 +1,5 @@
 # generated: 2026-05-29
-# last_updated: 2026-06-06 (Story R-5 done; Epic R done)
+# last_updated: 2026-06-06 (Story 2-10 done)
 # project: Matrix-Control
 # project_key: NOKEY
 # tracking_system: file-system
@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-05-29
-last_updated: 2026-06-06 (Story 7-7 review)
+last_updated: 2026-06-06 (Story 2-10 done)
 project: Matrix-Control
 project_key: NOKEY
 tracking_system: file-system
@@ -69,7 +69,7 @@ development_status:
   2-8-activity-leds-on-queue-traffic: done
   2-9-wire-midimanager-queue-consumer: done
   2-9b-header-routing-controls-uat-slice: done
-  2-10-matrix-mod-bus-reorder-sysex: backlog
+  2-10-matrix-mod-bus-reorder-sysex: done
   2-11-header-panel-layout-and-widget-styling: done
   epic-2-retrospective: optional
   epic-r: done
