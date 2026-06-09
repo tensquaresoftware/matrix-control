@@ -12,9 +12,9 @@ namespace PluginIDs
 {
     namespace Settings
     {
-        constexpr const char* kGuiScaleId = "guiScaleId";
-        constexpr const char* kHardwareLatencyMsId = "hardwareLatencyMs";
-        constexpr const char* kTestWidgetId = "testWidgetId";
+        constexpr const char* kGuiScale = "settingsGuiScale";
+        constexpr const char* kHardwareLatencyMs = "settingsHardwareLatencyMs";
+        constexpr const char* kTestWidget = "settingsTestWidget";
 
         namespace ScaleLevels
         {
@@ -114,13 +114,13 @@ namespace PluginIDs
 
             namespace ParameterWidgets
             {
-                constexpr const char* kMasterTune          = "masterTune";
-                constexpr const char* kMasterTranspose     = "masterTranspose";
-                constexpr const char* kBendRange           = "bendRange";
-                constexpr const char* kUnisonEnable        = "unisonEnable";
-                constexpr const char* kVolumeInvertEnable  = "volumeInvertEnable";
-                constexpr const char* kBankLockEnable      = "bankLockEnable";
-                constexpr const char* kMemoryProtectEnable = "memoryProtectEnable";
+                constexpr const char* kMasterTune          = "miscMasterTune";
+                constexpr const char* kMasterTranspose     = "miscMasterTranspose";
+                constexpr const char* kBendRange           = "miscBendRange";
+                constexpr const char* kUnisonEnable        = "miscUnisonEnable";
+                constexpr const char* kVolumeInvertEnable  = "miscVolumeInvertEnable";
+                constexpr const char* kBankLockEnable      = "miscBankLockEnable";
+                constexpr const char* kMemoryProtectEnable = "miscMemoryProtectEnable";
             }
         }
     }
@@ -192,16 +192,16 @@ namespace PluginIDs
 
             namespace ParameterWidgets
             {
-                constexpr const char* kBalance                = "vcfBalance";
-                constexpr const char* kFrequency              = "vcfFrequency";
-                constexpr const char* kFrequencyModByEnv1     = "vcfFrequencyModByEnv1";
-                constexpr const char* kFrequencyModByPressure = "vcfFrequencyModByPressure";
-                constexpr const char* kResonance              = "vcfResonance";
-                constexpr const char* kVca1Volume             = "vca1Volume";
-                constexpr const char* kVca1ModByVelocity      = "vca1ModByVelocity";
-                constexpr const char* kVca2ModByEnv2          = "vca2ModByEnv2";
-                constexpr const char* kLevers                 = "vcfLevers";
-                constexpr const char* kKeyboardPortamento     = "vcfKeyboardPortamento";
+                constexpr const char* kBalance                = "vcfVcaBalance";
+                constexpr const char* kFrequency              = "vcfVcaFrequency";
+                constexpr const char* kFrequencyModByEnv1     = "vcfVcaFrequencyModByEnv1";
+                constexpr const char* kFrequencyModByPressure = "vcfVcaFrequencyModByPressure";
+                constexpr const char* kResonance              = "vcfVcaResonance";
+                constexpr const char* kVca1Volume             = "vcfVcaVca1Volume";
+                constexpr const char* kVca1ModByVelocity      = "vcfVcaVca1ModByVelocity";
+                constexpr const char* kVca2ModByEnv2          = "vcfVcaVca2ModByEnv2";
+                constexpr const char* kLevers                 = "vcfVcaLevers";
+                constexpr const char* kKeyboardPortamento     = "vcfVcaKeyboardPortamento";
             }
         }
 
@@ -216,15 +216,15 @@ namespace PluginIDs
 
             namespace ParameterWidgets
             {
-                constexpr const char* kFmAmount        = "fmAmount";
-                constexpr const char* kFmModByEnv3     = "fmModByEnv3";
-                constexpr const char* kFmModByPressure = "fmModByPressure";
-                constexpr const char* kTrackPoint1     = "trackPoint1";
-                constexpr const char* kTrackPoint2     = "trackPoint2";
-                constexpr const char* kTrackPoint3     = "trackPoint3";
-                constexpr const char* kTrackPoint4     = "trackPoint4";
-                constexpr const char* kTrackPoint5     = "trackPoint5";
-                constexpr const char* kTrackInput      = "trackInput";
+                constexpr const char* kFmAmount        = "fmTrackFmAmount";
+                constexpr const char* kFmModByEnv3     = "fmTrackFmModByEnv3";
+                constexpr const char* kFmModByPressure = "fmTrackFmModByPressure";
+                constexpr const char* kTrackPoint1     = "fmTrackPoint1";
+                constexpr const char* kTrackPoint2     = "fmTrackPoint2";
+                constexpr const char* kTrackPoint3     = "fmTrackPoint3";
+                constexpr const char* kTrackPoint4     = "fmTrackPoint4";
+                constexpr const char* kTrackPoint5     = "fmTrackPoint5";
+                constexpr const char* kTrackInput      = "fmTrackInput";
             }
         }
 
@@ -239,15 +239,15 @@ namespace PluginIDs
 
             namespace ParameterWidgets
             {
-                constexpr const char* kRamp1Rate               = "ramp1Rate";
-                constexpr const char* kRamp2Rate               = "ramp2Rate";
-                constexpr const char* kPortamentoRate          = "portamentoRate";
-                constexpr const char* kPortamentoModByVelocity = "portamentoModByVelocity";
-                constexpr const char* kRamp1Trigger            = "ramp1Trigger";
-                constexpr const char* kRamp2Trigger            = "ramp2Trigger";
-                constexpr const char* kPortamentoMode          = "portamentoMode";
-                constexpr const char* kPortamentoLegato        = "portamentoLegato";
-                constexpr const char* kPortamentoKeyboardMode  = "portamentoKeyboardMode";
+                constexpr const char* kRamp1Rate               = "rampPortamentoRamp1Rate";
+                constexpr const char* kRamp2Rate               = "rampPortamentoRamp2Rate";
+                constexpr const char* kPortamentoRate          = "rampPortamentoPortamentoRate";
+                constexpr const char* kPortamentoModByVelocity = "rampPortamentoPortamentoModByVelocity";
+                constexpr const char* kRamp1Trigger            = "rampPortamentoRamp1Trigger";
+                constexpr const char* kRamp2Trigger            = "rampPortamentoRamp2Trigger";
+                constexpr const char* kPortamentoMode          = "rampPortamentoPortamentoMode";
+                constexpr const char* kPortamentoLegato        = "rampPortamentoPortamentoLegato";
+                constexpr const char* kPortamentoKeyboardMode  = "rampPortamentoPortamentoKeyboardMode";
             }
         }
 
@@ -381,7 +381,7 @@ namespace PluginIDs
 
         namespace PatchNameModule
         {
-            constexpr const char* kPatchName = "patchName";
+            constexpr const char* kPatchName = "patchEditPatchName";
         }
     }
 
@@ -489,17 +489,17 @@ namespace PluginIDs
 
             namespace StandaloneWidgets
             {
-                constexpr const char* kUnlockBank  = "unlockBank";
-                constexpr const char* kSelectBank0 = "selectBank0";
-                constexpr const char* kSelectBank1 = "selectBank1";
-                constexpr const char* kSelectBank2 = "selectBank2";
-                constexpr const char* kSelectBank3 = "selectBank3";
-                constexpr const char* kSelectBank4 = "selectBank4";
-                constexpr const char* kSelectBank5 = "selectBank5";
-                constexpr const char* kSelectBank6 = "selectBank6";
-                constexpr const char* kSelectBank7 = "selectBank7";
-                constexpr const char* kSelectBank8 = "selectBank8";
-                constexpr const char* kSelectBank9 = "selectBank9";
+                constexpr const char* kLockBank    = "bankUtilityLockBank";
+                constexpr const char* kSelectBank0 = "bankUtilitySelectBank0";
+                constexpr const char* kSelectBank1 = "bankUtilitySelectBank1";
+                constexpr const char* kSelectBank2 = "bankUtilitySelectBank2";
+                constexpr const char* kSelectBank3 = "bankUtilitySelectBank3";
+                constexpr const char* kSelectBank4 = "bankUtilitySelectBank4";
+                constexpr const char* kSelectBank5 = "bankUtilitySelectBank5";
+                constexpr const char* kSelectBank6 = "bankUtilitySelectBank6";
+                constexpr const char* kSelectBank7 = "bankUtilitySelectBank7";
+                constexpr const char* kSelectBank8 = "bankUtilitySelectBank8";
+                constexpr const char* kSelectBank9 = "bankUtilitySelectBank9";
             }
         }
 
@@ -511,14 +511,14 @@ namespace PluginIDs
 
             namespace StandaloneWidgets
             {
-                constexpr const char* kLoadPreviousPatch  = "loadPreviousPatch";
-                constexpr const char* kLoadNextPatch      = "loadNextPatch";
-                constexpr const char* kCurrentBankNumber  = "currentBankNumber";
-                constexpr const char* kCurrentPatchNumber = "currentPatchNumber";
-                constexpr const char* kInitPatch          = "initPatch";
-                constexpr const char* kCopyPatch          = "copyPatch";
-                constexpr const char* kPastePatch         = "pastePatch";
-                constexpr const char* kStorePatch         = "storePatch";
+                constexpr const char* kLoadPreviousPatch  = "internalPatchesLoadPrevious";
+                constexpr const char* kLoadNextPatch      = "internalPatchesLoadNext";
+                constexpr const char* kCurrentBankNumber  = "internalPatchesCurrentBankNumber";
+                constexpr const char* kCurrentPatchNumber = "internalPatchesCurrentPatchNumber";
+                constexpr const char* kInitPatch          = "internalPatchesInit";
+                constexpr const char* kCopyPatch          = "internalPatchesCopy";
+                constexpr const char* kPastePatch         = "internalPatchesPaste";
+                constexpr const char* kStorePatch         = "internalPatchesStore";
             }
         }
 
@@ -530,12 +530,12 @@ namespace PluginIDs
 
             namespace StandaloneWidgets
             {
-                constexpr const char* kLoadPreviousPatchFile = "loadPreviousPatchFile";
-                constexpr const char* kLoadNextPatchFile     = "loadNextPatchFile";
-                constexpr const char* kSelectPatchFile       = "selectPatchFile";
-                constexpr const char* kOpenPatchFolder       = "openPatchFolder";
-                constexpr const char* kSavePatchAs           = "savePatchAsFile";
-                constexpr const char* kSavePatchFile         = "savePatchFile";
+                constexpr const char* kLoadPreviousPatchFile = "computerPatchesLoadPrevious";
+                constexpr const char* kLoadNextPatchFile     = "computerPatchesLoadNext";
+                constexpr const char* kSelectPatchFile       = "computerPatchesSelectPatch";
+                constexpr const char* kOpenPatchFolder       = "computerPatchesOpenFolder";
+                constexpr const char* kSavePatchAs           = "computerPatchesSaveAs";
+                constexpr const char* kSavePatchFile         = "computerPatchesSave";
             }
         }
 
@@ -556,16 +556,16 @@ namespace PluginIDs
                 constexpr const char* kClear          = "patchMutatorClear";
                 constexpr const char* kExport         = "patchMutatorExport";
 
-                constexpr const char* kDco1           = "patchMutatorDco1";
-                constexpr const char* kDco2           = "patchMutatorDco2";
-                constexpr const char* kVcfVca         = "patchMutatorVcfVca";
-                constexpr const char* kFmTrack        = "patchMutatorFmTrack";
-                constexpr const char* kRampPortamento = "patchMutatorRampPortamento";
-                constexpr const char* kEnvelope1      = "patchMutatorEnvelope1";
-                constexpr const char* kEnvelope2      = "patchMutatorEnvelope2";
-                constexpr const char* kEnvelope3      = "patchMutatorEnvelope3";
-                constexpr const char* kLfo1           = "patchMutatorLfo1";
-                constexpr const char* kLfo2           = "patchMutatorLfo2";
+                constexpr const char* kEnableDco1           = "patchMutatorEnableDco1";
+                constexpr const char* kEnableDco2           = "patchMutatorEnableDco2";
+                constexpr const char* kEnableVcfVca         = "patchMutatorEnableVcfVca";
+                constexpr const char* kEnableFmTrack        = "patchMutatorEnableFmTrack";
+                constexpr const char* kEnableRampPortamento = "patchMutatorEnableRampPortamento";
+                constexpr const char* kEnableEnvelope1      = "patchMutatorEnableEnvelope1";
+                constexpr const char* kEnableEnvelope2      = "patchMutatorEnableEnvelope2";
+                constexpr const char* kEnableEnvelope3      = "patchMutatorEnableEnvelope3";
+                constexpr const char* kEnableLfo1           = "patchMutatorEnableLfo1";
+                constexpr const char* kEnableLfo2           = "patchMutatorEnableLfo2";
             }
         }
     }

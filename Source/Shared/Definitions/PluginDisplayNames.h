@@ -670,7 +670,7 @@ namespace PluginDisplayNames
             namespace StandaloneWidgets
             {
                 constexpr const char* kBankSelector = "BANK SELECTOR";
-                constexpr const char* kUnlockBank   = "UNLOCK";
+                constexpr const char* kLockBank     = "BANK LOCK";
                 constexpr const char* kSelectBank0  = "0";
                 constexpr const char* kSelectBank1  = "1";
                 constexpr const char* kSelectBank2  = "2";
@@ -738,16 +738,16 @@ namespace PluginDisplayNames
                 constexpr const char* kClear          = "CLEAR";
                 constexpr const char* kExport         = "EXPORT";
 
-                constexpr const char* kDco1           = "D1";
-                constexpr const char* kDco2           = "D2";
-                constexpr const char* kVcfVca         = "F/A";
-                constexpr const char* kFmTrack        = "F/T";
-                constexpr const char* kRampPortamento = "R/P";
-                constexpr const char* kEnvelope1      = "E1";
-                constexpr const char* kEnvelope2      = "E2";
-                constexpr const char* kEnvelope3      = "E3";
-                constexpr const char* kLfo1           = "L1";
-                constexpr const char* kLfo2           = "L2";
+                constexpr const char* kEnableDco1           = "D1";
+                constexpr const char* kEnableDco2           = "D2";
+                constexpr const char* kEnableVcfVca         = "F/A";
+                constexpr const char* kEnableFmTrack        = "F/T";
+                constexpr const char* kEnableRampPortamento = "R/P";
+                constexpr const char* kEnableEnvelope1      = "E1";
+                constexpr const char* kEnableEnvelope2      = "E2";
+                constexpr const char* kEnableEnvelope3      = "E3";
+                constexpr const char* kEnableLfo1           = "L1";
+                constexpr const char* kEnableLfo2           = "L2";
             }
         }
     } 

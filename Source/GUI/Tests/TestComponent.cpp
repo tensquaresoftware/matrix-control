@@ -102,7 +102,7 @@ void TestComponent::populateWidgetSelector()
 void TestComponent::restorePersistedWidgetSelection()
 {
     const int defaultSelectionId = getDefaultWidgetSelectionId();
-    const int savedSelectionId = static_cast<int>(settingsState_.getProperty(PluginIDs::Settings::kTestWidgetId, defaultSelectionId));
+    const int savedSelectionId = static_cast<int>(settingsState_.getProperty(PluginIDs::Settings::kTestWidget, defaultSelectionId));
     const int boundedSelectionId = juce::jlimit(kFirstComboItemId_, kLastComboItemId_, savedSelectionId);
 
     widgetSelector_.setSelectedId(boundedSelectionId, juce::dontSendNotification);
@@ -113,7 +113,7 @@ void TestComponent::persistWidgetSelection(int selectedId)
     if (selectedId == 0)
         return;
 
-    settingsState_.setProperty(PluginIDs::Settings::kTestWidgetId, selectedId, nullptr);
+    settingsState_.setProperty(PluginIDs::Settings::kTestWidget, selectedId, nullptr);
 }
 
 void TestComponent::updateVisibleTests()

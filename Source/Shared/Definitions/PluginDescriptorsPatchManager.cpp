@@ -19,8 +19,8 @@ namespace PluginDescriptors
     // Standalone Widgets ----------------------------------------------------------------------------------------------
     const std::vector<StandaloneWidgetDescriptor> PatchManagerSection::BankUtilityModule::kStandaloneWidgets = {
         {
-            .widgetId = PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kUnlockBank,
-            .displayName = PluginDisplayNames::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kUnlockBank,
+            .widgetId = PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kLockBank,
+            .displayName = PluginDisplayNames::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kLockBank,
             .parentGroupId = PluginIDs::PatchManagerSection::BankUtilityModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
             .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kPatchManagerUnlockBank
@@ -278,71 +278,71 @@ namespace PluginDescriptors
             .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kPatchMutatorClear
         },
         {
-            .widgetId = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kDco1,
-            .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kDco1,
+            .widgetId = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableDco1,
+            .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableDco1,
             .parentGroupId = PluginIDs::PatchManagerSection::PatchMutatorModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
             .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kInit
         },
         {
-            .widgetId = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kDco2,
-            .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kDco2,
+            .widgetId = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableDco2,
+            .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableDco2,
             .parentGroupId = PluginIDs::PatchManagerSection::PatchMutatorModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
             .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kInit
         },
         {
-            .widgetId = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kVcfVca,
-            .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kVcfVca,
+            .widgetId = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableVcfVca,
+            .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableVcfVca,
             .parentGroupId = PluginIDs::PatchManagerSection::PatchMutatorModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
             .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kInit
         },
         {
-            .widgetId = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kFmTrack,
-            .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kFmTrack,
+            .widgetId = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableFmTrack,
+            .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableFmTrack,
             .parentGroupId = PluginIDs::PatchManagerSection::PatchMutatorModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
             .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kInit
         },
         {
-            .widgetId = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kRampPortamento,
-            .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kRampPortamento,
+            .widgetId = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableRampPortamento,
+            .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableRampPortamento,
             .parentGroupId = PluginIDs::PatchManagerSection::PatchMutatorModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
             .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kInit
         },
         {
-            .widgetId = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnvelope1,
-            .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnvelope1,
+            .widgetId = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableEnvelope1,
+            .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableEnvelope1,
             .parentGroupId = PluginIDs::PatchManagerSection::PatchMutatorModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
             .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kInit
         },
         {
-            .widgetId = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnvelope2,
-            .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnvelope2,
+            .widgetId = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableEnvelope2,
+            .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableEnvelope2,
             .parentGroupId = PluginIDs::PatchManagerSection::PatchMutatorModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
             .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kInit
         },
         {
-            .widgetId = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnvelope3,
-            .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnvelope3,
+            .widgetId = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableEnvelope3,
+            .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableEnvelope3,
             .parentGroupId = PluginIDs::PatchManagerSection::PatchMutatorModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
             .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kInit
         },
         {
-            .widgetId = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kLfo1,
-            .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kLfo1,
+            .widgetId = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableLfo1,
+            .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableLfo1,
             .parentGroupId = PluginIDs::PatchManagerSection::PatchMutatorModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
             .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kInit
         },
         {
-            .widgetId = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kLfo2,
-            .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kLfo2,
+            .widgetId = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableLfo2,
+            .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableLfo2,
             .parentGroupId = PluginIDs::PatchManagerSection::PatchMutatorModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
             .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kInit

@@ -496,31 +496,31 @@ void PluginProcessor::setInputGainDb(float gainDb)
 void PluginProcessor::setHardwareLatencyMs(float latencyMs)
 {
     const float quantizedMs = Core::HardwareLatency::quantizeMs(latencyMs);
-    apvts.state.setProperty(PluginIDs::Settings::kHardwareLatencyMsId, quantizedMs, nullptr);
+    apvts.state.setProperty(PluginIDs::Settings::kHardwareLatencyMs, quantizedMs, nullptr);
     applyHardwareLatencyToHost();
 }
 
 float PluginProcessor::getHardwareLatencyMs() const
 {
-    const auto property = apvts.state.getProperty(PluginIDs::Settings::kHardwareLatencyMsId, 0.0f);
+    const auto property = apvts.state.getProperty(PluginIDs::Settings::kHardwareLatencyMs, 0.0f);
     return Core::HardwareLatency::quantizeMs(static_cast<float>(property));
 }
 
 void PluginProcessor::initializeHardwareLatencyProperty()
 {
-    if (!apvts.state.hasProperty(PluginIDs::Settings::kHardwareLatencyMsId))
-        apvts.state.setProperty(PluginIDs::Settings::kHardwareLatencyMsId, Core::HardwareLatency::kMinMs, nullptr);
+    if (!apvts.state.hasProperty(PluginIDs::Settings::kHardwareLatencyMs))
+        apvts.state.setProperty(PluginIDs::Settings::kHardwareLatencyMs, Core::HardwareLatency::kMinMs, nullptr);
 
     syncHardwareLatencyFromState();
 }
 
 void PluginProcessor::syncHardwareLatencyFromState()
 {
-    const auto property = apvts.state.getProperty(PluginIDs::Settings::kHardwareLatencyMsId, Core::HardwareLatency::kMinMs);
+    const auto property = apvts.state.getProperty(PluginIDs::Settings::kHardwareLatencyMs, Core::HardwareLatency::kMinMs);
     const float quantizedMs = Core::HardwareLatency::quantizeMs(static_cast<float>(property));
 
     if (! juce::approximatelyEqual(static_cast<float>(property), quantizedMs))
-        apvts.state.setProperty(PluginIDs::Settings::kHardwareLatencyMsId, quantizedMs, nullptr);
+        apvts.state.setProperty(PluginIDs::Settings::kHardwareLatencyMs, quantizedMs, nullptr);
 
     applyHardwareLatencyToHost();
 }
@@ -632,13 +632,13 @@ void PluginProcessor::initializeMidiPortProperties()
     if (apvts.state.hasProperty("guiZoomLevelId"))
     {
         const auto oldValue = apvts.state.getProperty("guiZoomLevelId");
-        apvts.state.setProperty(PluginIDs::Settings::kGuiScaleId, oldValue, nullptr);
+        apvts.state.setProperty(PluginIDs::Settings::kGuiScale, oldValue, nullptr);
         apvts.state.removeProperty("guiZoomLevelId", nullptr);
     }
     
-    if (!apvts.state.hasProperty(PluginIDs::Settings::kGuiScaleId))
+    if (!apvts.state.hasProperty(PluginIDs::Settings::kGuiScale))
     {
-        apvts.state.setProperty(PluginIDs::Settings::kGuiScaleId,
+        apvts.state.setProperty(PluginIDs::Settings::kGuiScale,
                                 PluginIDs::Settings::ScaleLevels::kDefault,
                                 nullptr);
     }

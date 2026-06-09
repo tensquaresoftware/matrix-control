@@ -86,40 +86,40 @@ void PatchMutatorPanel::setupAmountLine(tss::ISkin& skin, WidgetFactory& widgetF
         PluginDesignDimensions::Widgets::Widths::Toggle::kPatchMutator,
         PluginDesignDimensions::Widgets::Heights::kToggle,
         tss::toggleLookFromSkin(skin),
-        PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kDco1);
-    connectToggleToApvts(dco1Toggle_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kDco1);
+        PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableDco1);
+    connectToggleToApvts(dco1Toggle_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableDco1);
     addAndMakeVisible(*dco1Toggle_);
 
     dco2Toggle_ = std::make_unique<tss::Toggle>(
         PluginDesignDimensions::Widgets::Widths::Toggle::kPatchMutator,
         PluginDesignDimensions::Widgets::Heights::kToggle,
         tss::toggleLookFromSkin(skin),
-        PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kDco2);
-    connectToggleToApvts(dco2Toggle_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kDco2);
+        PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableDco2);
+    connectToggleToApvts(dco2Toggle_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableDco2);
     addAndMakeVisible(*dco2Toggle_);
 
     vcfVcaToggle_ = std::make_unique<tss::Toggle>(
         PluginDesignDimensions::Widgets::Widths::Toggle::kPatchMutator,
         PluginDesignDimensions::Widgets::Heights::kToggle,
         tss::toggleLookFromSkin(skin),
-        PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kVcfVca);
-    connectToggleToApvts(vcfVcaToggle_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kVcfVca);
+        PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableVcfVca);
+    connectToggleToApvts(vcfVcaToggle_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableVcfVca);
     addAndMakeVisible(*vcfVcaToggle_);
 
     fmTrackToggle_ = std::make_unique<tss::Toggle>(
         PluginDesignDimensions::Widgets::Widths::Toggle::kPatchMutator,
         PluginDesignDimensions::Widgets::Heights::kToggle,
         tss::toggleLookFromSkin(skin),
-        PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kFmTrack);
-    connectToggleToApvts(fmTrackToggle_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kFmTrack);
+        PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableFmTrack);
+    connectToggleToApvts(fmTrackToggle_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableFmTrack);
     addAndMakeVisible(*fmTrackToggle_);
 
     rampPortamentoToggle_ = std::make_unique<tss::Toggle>(
         PluginDesignDimensions::Widgets::Widths::Toggle::kPatchMutator,
         PluginDesignDimensions::Widgets::Heights::kToggle,
         tss::toggleLookFromSkin(skin),
-        PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kRampPortamento);
-    connectToggleToApvts(rampPortamentoToggle_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kRampPortamento);
+        PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableRampPortamento);
+    connectToggleToApvts(rampPortamentoToggle_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableRampPortamento);
     addAndMakeVisible(*rampPortamentoToggle_);
 }
 
@@ -168,40 +168,40 @@ void PatchMutatorPanel::setupRandomLine(tss::ISkin& skin, WidgetFactory& widgetF
         PluginDesignDimensions::Widgets::Widths::Toggle::kPatchMutator,
         PluginDesignDimensions::Widgets::Heights::kToggle,
         tss::toggleLookFromSkin(skin),
-        PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnvelope1);
-    connectToggleToApvts(env1Toggle_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnvelope1);
+        PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableEnvelope1);
+    connectToggleToApvts(env1Toggle_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableEnvelope1);
     addAndMakeVisible(*env1Toggle_);
 
     env2Toggle_ = std::make_unique<tss::Toggle>(
         PluginDesignDimensions::Widgets::Widths::Toggle::kPatchMutator,
         PluginDesignDimensions::Widgets::Heights::kToggle,
         tss::toggleLookFromSkin(skin),
-        PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnvelope2);
-    connectToggleToApvts(env2Toggle_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnvelope2);
+        PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableEnvelope2);
+    connectToggleToApvts(env2Toggle_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableEnvelope2);
     addAndMakeVisible(*env2Toggle_);
 
     env3Toggle_ = std::make_unique<tss::Toggle>(
         PluginDesignDimensions::Widgets::Widths::Toggle::kPatchMutator,
         PluginDesignDimensions::Widgets::Heights::kToggle,
         tss::toggleLookFromSkin(skin),
-        PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnvelope3);
-    connectToggleToApvts(env3Toggle_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnvelope3);
+        PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableEnvelope3);
+    connectToggleToApvts(env3Toggle_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableEnvelope3);
     addAndMakeVisible(*env3Toggle_);
 
     lfo1Toggle_ = std::make_unique<tss::Toggle>(
         PluginDesignDimensions::Widgets::Widths::Toggle::kPatchMutator,
         PluginDesignDimensions::Widgets::Heights::kToggle,
         tss::toggleLookFromSkin(skin),
-        PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kLfo1);
-    connectToggleToApvts(lfo1Toggle_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kLfo1);
+        PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableLfo1);
+    connectToggleToApvts(lfo1Toggle_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableLfo1);
     addAndMakeVisible(*lfo1Toggle_);
 
     lfo2Toggle_ = std::make_unique<tss::Toggle>(
         PluginDesignDimensions::Widgets::Widths::Toggle::kPatchMutator,
         PluginDesignDimensions::Widgets::Heights::kToggle,
         tss::toggleLookFromSkin(skin),
-        PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kLfo2);
-    connectToggleToApvts(lfo2Toggle_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kLfo2);
+        PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableLfo2);
+    connectToggleToApvts(lfo2Toggle_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableLfo2);
     addAndMakeVisible(*lfo2Toggle_);
 }
 

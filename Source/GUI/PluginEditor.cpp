@@ -100,7 +100,7 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     auto& headerPanel = mainComponent_->getHeaderPanel();
 
     const int savedScaleId = pluginProcessor.getApvts().state.getProperty(
-        PluginIDs::Settings::kGuiScaleId,
+        PluginIDs::Settings::kGuiScale,
         PluginIDs::Settings::ScaleLevels::kDefault);
     const float savedUiScale = PluginIDs::Settings::ScaleLevels::getUiScale(savedScaleId);
     applyUiScale(savedUiScale);
@@ -364,7 +364,7 @@ void PluginEditor::closeSettingsWindow()
 void PluginEditor::restoreSettingsPanelFromState(SettingsPanel& panel)
 {
     const int savedScaleId = pluginProcessor.getApvts().state.getProperty(
-        PluginIDs::Settings::kGuiScaleId,
+        PluginIDs::Settings::kGuiScale,
         PluginIDs::Settings::ScaleLevels::kDefault);
     panel.getUiScaleComboBox().setSelectedId(savedScaleId, juce::dontSendNotification);
 
@@ -406,7 +406,7 @@ void PluginEditor::wireSettingsPanel(SettingsPanel& panel)
         const float uiScale = PluginIDs::Settings::ScaleLevels::getUiScale(selectedId);
         applyUiScale(uiScale);
         updateSettingsWindowLayout(uiScale);
-        pluginProcessor.getApvts().state.setProperty(PluginIDs::Settings::kGuiScaleId, selectedId, nullptr);
+        pluginProcessor.getApvts().state.setProperty(PluginIDs::Settings::kGuiScale, selectedId, nullptr);
     };
 
     panel.getHardwareLatencySlider().onValueChange = [this, &panel]

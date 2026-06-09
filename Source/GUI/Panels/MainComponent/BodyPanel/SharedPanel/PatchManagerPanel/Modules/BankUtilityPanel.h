@@ -37,7 +37,7 @@ private:
 
     std::unique_ptr<tss::ModuleHeader> bankUtilityModuleHeader_;
     std::unique_ptr<tss::Label> bankSelectorLabel_;
-    std::unique_ptr<tss::Button> unlockBankButton_;
+    std::unique_ptr<tss::Button> lockBankButton_;
     std::unique_ptr<tss::Button> selectBank0Button_;
     std::unique_ptr<tss::Button> selectBank1Button_;
     std::unique_ptr<tss::Button> selectBank2Button_;
