@@ -3,7 +3,7 @@ organization: Ten Square Software
 project: Matrix-Control
 title: Story U-0 — Figma Intake & Design* Reconciliation
 author: BMad Agent
-status: review
+status: done
 baseline_commit: 1fbd9cec1d0253fceb3582b2951f56c7d6321e06
 sources:
   - planning-artifacts/epic-ui-scale-audit-pixel-perfect-layout.md
@@ -17,7 +17,7 @@ updated: 2026-06-09
 
 # Story U-0: Figma Intake & Design* Reconciliation
 
-Status: review
+Status: done
 
 <!-- Prerequisite: U-IDs recommended (harmonized widget IDs for registry keys in U-0b). Blocks U-0b and all layout audit stories U-2…U-9. Does NOT wire Factory injection — compile-time plan only. -->
 
@@ -179,16 +179,15 @@ Current `PluginDesignDimensions.h` structure → target file:
 | GUI root (MainComponent) | 1300 × 792 | 1300 × 792 | keep |
 | Body inner width stack | 808 + 24 + 268 + 24 + 152 | 808 + 24 + 268 + 24 + 152 | keep |
 | Patch Edit column | 808 × 704 | 808 × 704 | keep |
-| Shared column stack | 704 (304 + 400) | 704 (304 + 400) | keep |
-| PatchMutatorModule content | 100 | 100 | keep |
-| PatchMutatorModule total (+16 closure) | 116 | 100 (note: « il faut que ça rentre ») | keep brownfield closure — TBD in U-8 audit |
-| SharedPanel inter-panel gap | 24 | 24 (flag: may adapt post Patch Manager) | keep |
-| Bank/Internal/Computer module height | 84 each | 84 each | keep |
+| Shared column stack (design) | 704 (sans gaps explicites) | **700** (304 + 12 + 384) | change — gaps 12 px + 8 px inter-modules dans Design* ; 4 px d'écart vs Patch Edit documenté |
+| PatchMutatorModule | 100 (+16 closure brownfield) | 100 | keep — plus de +16 px |
+| Bank / Internal / Computer modules | 84 chacun | **76** chacun | change — formules Recipes (ModuleHeader + lignes + gap 4) |
+| PatchManagerSection | 400 (stack sans gaps) | **384** | change — inclut 3 × gap 8 px entre modules |
+| SharedColumn gap Matrix ↔ Patch Manager | 24 (mockup historique) | **12** (`Spacing::kLarge`) | change — runtime U-8 pour alignement |
 | Modulation bus row width | 268 | 268 | keep |
 | Parameter row width | 152 (92+60) | 152 (92+60) | keep |
-| HeaderPanel height | 32 | 32 | keep |
-| FooterPanel height | 32 | 32 | keep |
-| `kPatchManagerUnlockBank` width | 76 px | 76 px | keep value; comment aligned to `bankUtilityLockBank` (U-IDs) |
+| HeaderPanel / FooterPanel height | 32 | 32 | keep |
+| Bouton lock bank width | 76 px | 76 px | keep (`bankUtilityLockBank`) |
 
 ## Dev Agent Record
 
@@ -203,26 +202,37 @@ Claude (Cursor Agent)
 
 ### Completion Notes List
 
-- **Namespace choice:** `tss::design` with nested `Spacing`, `Atoms`, `Recipes`, `Panels`, `GUI`, `PanelWidgets` mirroring Figma reading order (atoms → recipes → panels).
-- **Option A shim:** `PluginDesignDimensions.h` now includes `DesignLegacyCompat.h` which aliases every legacy symbol to `tss::design`. No consumer include changes required.
-- **WidgetFactory:** unchanged — continues to include shim via `PluginDesignDimensions.h` (Option A).
-- **static_assert:** all 14 legacy checks ported to `DesignChecks.h` with identical message strings (story cited 12; monolith had 14).
-- **grep AC6:** Design* files reference `tss::design` only; `PluginDesignDimensions` appears in shim + ~25 allowed consumers (panels, Factory, Descriptors).
-- **Zone tables:** standalone `u-0-zone-dimension-tables.md`; linked from epic file § Dimension tables post U-0.
+- **Namespace :** `TSS::Design` (`Spacing`, `Atoms`, `Recipes`, `Panels`, `GUI`, `PanelWidgets`).
+- **Migration :** Option B — monolithe `PluginDesignDimensions.h` supprimé ; includes migrés vers `GUI/Layout/Design/Design.h`.
+- **Garde-fous :** 22 `static_assert` dans `DesignChecks.h` (12 hérités + invariants Patch Manager / SharedColumn).
+- **grep :** `PluginDesignDimensions` → 0 dans `Source/`.
+- **Patch Manager modules :** Bank / Internal / Computer = **76 px** ; Mutator = **100 px** ; section = **384 px** ; colonne partagée = **700 px**.
+- **BankUtilityPanel :** layout aligné sur `Recipes::PatchManagerModule::kRowGap` (4 px) — hauteur contenu = 76 px @ 100 %.
+- **Tables zones :** `u-0-zone-dimension-tables.md` resynchronisé depuis `Design*.h`.
+- **Dette documentée (stories suivantes) :** gaps runtime SharedPanel / PatchManagerPanel → U-8 ; Descriptors incluent `Design.h` → U-0b.
 
 ### File List
 
-- `Source/GUI/Layout/Design/DesignAtoms.h` (new)
-- `Source/GUI/Layout/Design/DesignRecipes.h` (new)
-- `Source/GUI/Layout/Design/DesignPanels.h` (new)
-- `Source/GUI/Layout/Design/DesignChecks.h` (new)
-- `Source/GUI/Layout/Design/DesignLegacyCompat.h` (new)
-- `Source/Shared/Definitions/PluginDesignDimensions.h` (shim — was monolith)
-- `_bmad-output/implementation-artifacts/u-0-zone-dimension-tables.md` (new)
-- `_bmad-output/implementation-artifacts/u-0-figma-intake-and-design-reconciliation.md` (updated)
-- `_bmad-output/planning-artifacts/epic-ui-scale-audit-pixel-perfect-layout.md` (link added)
-- `_bmad-output/implementation-artifacts/sprint-status.yaml` (updated)
+- `Source/GUI/Layout/Design/DesignAtoms.h`
+- `Source/GUI/Layout/Design/DesignRecipes.h`
+- `Source/GUI/Layout/Design/DesignPanels.h`
+- `Source/GUI/Layout/Design/DesignChecks.h`
+- `Source/GUI/Layout/Design/Design.h`
+- `_bmad-output/implementation-artifacts/u-0-zone-dimension-tables.md`
+- `_local/Documents/Notes/figma-mockup.md` (hauteurs Patch Manager 76/100, stack 700)
+- `_bmad-output/project-context.md` (chemin SSOT dimensions)
+- `Source/GUI/Panels/.../BankUtilityPanel.h/.cpp` (alignement espacements design)
 
 ## Change Log
 
-- 2026-06-09: Story U-0 implemented — M2+ Design* split under `Source/GUI/Layout/Design/`, Option A compatibility shim, Figma delta table, zone dimension tables for U-2…U-9.
+- 2026-06-09: Story U-0 — split Design* sous `Source/GUI/Layout/Design/`, Option B, namespace `TSS::Design`.
+- 2026-06-09: Post-review — doc resynchronisée ; `BankUtilityPanel` aligné sur gap 4 px ; `figma-mockup.md` modules 76 px.
+- 2026-06-09: Code review clôturée — merge approuvé ; dette U-8 (gaps runtime) et U-0b (Descriptors) documentée.
+
+### Review Findings
+
+- [x] [Review][Defer] Gaps runtime SharedPanel / PatchManagerPanel — U-8
+- [x] [Review][Defer] Descriptors `#include Design.h` — U-0b
+- [x] [Review][Defer] `kGap_ = 5` résiduel (Internal/Computer/Mutator, ModulationBusCell) — U-7/U-8
+- [x] [Review] Bank Utility 76 px — confirmé ; alignement `PatchManagerModule::kRowGap` (rejet retour 84 px)
+- [x] [Review] Documentation resynchronisée (story, delta, zone tables, project-context)
