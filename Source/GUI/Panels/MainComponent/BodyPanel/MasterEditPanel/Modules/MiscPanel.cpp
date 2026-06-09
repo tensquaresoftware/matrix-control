@@ -28,7 +28,7 @@ ModulePanelConfig MiscPanel::createConfig()
     return config;
 }
 
-MiscPanel::MiscPanel(tss::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+MiscPanel::MiscPanel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : BaseModulePanel(skin, widgetFactory, apvts, createConfig(), width, height)
 {
 }

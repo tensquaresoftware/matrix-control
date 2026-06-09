@@ -5,7 +5,7 @@
 #include "ISkinColours.h"
 #include "ISkinFonts.h"
 
-namespace tss
+namespace TSS
 {
     class ISkin : public ISkinColours, public ISkinFonts
     {

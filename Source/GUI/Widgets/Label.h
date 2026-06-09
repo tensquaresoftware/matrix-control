@@ -4,7 +4,7 @@
 
 #include "GUI/Looks/WidgetLooks.h"
 
-namespace tss
+namespace TSS
 {
     enum class LabelStyle
     {

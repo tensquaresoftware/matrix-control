@@ -49,8 +49,8 @@ class TestButtons::ButtonScalePanel : public juce::Component
 public:
     ButtonScalePanel(float scale,
                      const juce::String& scaleLabelText,
-                     const tss::ButtonLook& buttonLook,
-                     const tss::LabelLook& labelLook,
+                     const TSS::ButtonLook& buttonLook,
+                     const TSS::LabelLook& labelLook,
                      const ButtonSetDimensions& dimensions)
         : scale_(scale)
         , dimensions_(dimensions)
@@ -58,7 +58,7 @@ public:
         auto largeTextButtonLook = buttonLook;
         largeTextButtonLook.font = largeTextButtonLook.font.withHeight(dimensions_.largeTextFontHeight);
 
-        scaleLabel_ = std::make_unique<tss::Label>(
+        scaleLabel_ = std::make_unique<TSS::Label>(
             dimensions_.bigButtonWidth,
             dimensions_.scaleLabelHeight,
             labelLook,
@@ -121,12 +121,12 @@ public:
     }
 
 private:
-    std::unique_ptr<tss::Button> createButton(int width,
+    std::unique_ptr<TSS::Button> createButton(int width,
                                               int height,
-                                              const tss::ButtonLook& look,
+                                              const TSS::ButtonLook& look,
                                               const juce::String& text)
     {
-        auto button = std::make_unique<tss::Button>(width, height, look, text);
+        auto button = std::make_unique<TSS::Button>(width, height, look, text);
         button->setUiScale(scale_);
         addAndMakeVisible(*button);
         return button;
@@ -134,16 +134,16 @@ private:
 
     float scale_ { 1.0f };
     ButtonSetDimensions dimensions_ {};
-    std::unique_ptr<tss::Label> scaleLabel_;
-    std::unique_ptr<tss::Button> mainButton_;
-    std::unique_ptr<tss::Button> initButton_;
-    std::unique_ptr<tss::Button> copyButton_;
-    std::unique_ptr<tss::Button> pasteButton_;
-    std::unique_ptr<tss::Button> bigButton_;
-    std::unique_ptr<tss::Button> bigTextButton_;
+    std::unique_ptr<TSS::Label> scaleLabel_;
+    std::unique_ptr<TSS::Button> mainButton_;
+    std::unique_ptr<TSS::Button> initButton_;
+    std::unique_ptr<TSS::Button> copyButton_;
+    std::unique_ptr<TSS::Button> pasteButton_;
+    std::unique_ptr<TSS::Button> bigButton_;
+    std::unique_ptr<TSS::Button> bigTextButton_;
 };
 
-TestButtons::TestButtons(tss::ISkin& skin)
+TestButtons::TestButtons(TSS::ISkin& skin)
 {
     createColumnPanels(skin);
     layoutColumnPanels();
@@ -156,7 +156,7 @@ void TestButtons::resized()
     layoutColumnPanels();
 }
 
-void TestButtons::createColumnPanels(tss::ISkin& skin)
+void TestButtons::createColumnPanels(TSS::ISkin& skin)
 {
     const ButtonSetDimensions dimensions
     {
@@ -170,8 +170,8 @@ void TestButtons::createColumnPanels(tss::ISkin& skin)
         kLargeTextFontHeight_
     };
 
-    const auto buttonLook = tss::buttonLookFromSkin(skin);
-    const auto labelLook = tss::labelLookFromSkin(skin);
+    const auto buttonLook = TSS::buttonLookFromSkin(skin);
+    const auto labelLook = TSS::labelLookFromSkin(skin);
 
     columnPanels_.clear();
     columnPanels_.reserve(kColumnSpecs_.size());

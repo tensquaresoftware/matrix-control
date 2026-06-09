@@ -4,7 +4,7 @@
 
 #include <PluginFontsData.h>
 
-namespace tss
+namespace TSS
 {
     namespace
     {

@@ -4,7 +4,7 @@
 #include "GUI/Looks/LookBuilders.h"
 #include "GUI/Skins/Skin.h"
 
-namespace tss
+namespace TSS
 {
     ActivityLed::ActivityLed(int width, int height)
         : width_(width)

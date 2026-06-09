@@ -7,7 +7,7 @@
 
 #include "Core/PluginProcessor.h"
 #include "MainComponent.h"
-#include "Shared/Definitions/PluginDesignDimensions.h"
+#include "GUI/Layout/Design/Design.h"
 #include "Skins/Skin.h"
 #include "Tests/TestComponent.h"
 
@@ -27,8 +27,8 @@ public:
     void resized() override;
     void mouseDown(const juce::MouseEvent& e) override;
 
-    static int getDesignWidth() { return PluginDesignDimensions::GUI::kWidth; }
-    static int getDesignHeight() { return PluginDesignDimensions::GUI::kHeight; }
+    static int getDesignWidth() { return TSS::Design::GUI::kWidth; }
+    static int getDesignHeight() { return TSS::Design::GUI::kHeight; }
 
 private:
     class HeaderRefreshTimer;
@@ -48,9 +48,9 @@ private:
 
     PluginProcessor& pluginProcessor;
 
-    std::unique_ptr<tss::Skin> skinBlack_;
-    std::unique_ptr<tss::Skin> skinCream_;
-    tss::Skin* skin_ = nullptr;
+    std::unique_ptr<TSS::Skin> skinBlack_;
+    std::unique_ptr<TSS::Skin> skinCream_;
+    TSS::Skin* skin_ = nullptr;
     std::unique_ptr<WidgetFactory> widgetFactory_;
     std::unique_ptr<MainComponent> mainComponent_;
     std::unique_ptr<TestComponent> testComponent_;

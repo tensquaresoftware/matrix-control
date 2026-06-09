@@ -4,7 +4,7 @@
 
 #include "PopupMenuRenderer.h"
 
-namespace tss
+namespace TSS
 {
     class ComboBox;
 

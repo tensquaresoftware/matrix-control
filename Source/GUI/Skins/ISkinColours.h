@@ -4,7 +4,7 @@
 
 #include "SkinValues.h"
 
-namespace tss
+namespace TSS
 {
     class ISkinColours
     {

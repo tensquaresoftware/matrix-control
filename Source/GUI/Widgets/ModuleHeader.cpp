@@ -4,9 +4,9 @@
 #include "GUI/Looks/LookBuilders.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Widgets/Button.h"
-#include "Shared/Definitions/PluginDesignDimensions.h"
+#include "GUI/Layout/Design/Design.h"
 
-namespace tss
+namespace TSS
 {
     namespace
     {
@@ -19,7 +19,7 @@ namespace tss
 
         int titleBandWidthForLayout(ModuleHeader::ColumnLayout layout)
         {
-            using namespace PluginDesignDimensions::Widgets::Widths::ModuleHeader;
+            using namespace TSS::Design::PanelWidgets::Widths::ModuleHeader;
             return (layout == ModuleHeader::ColumnLayout::PatchEdit) ? kPatchEditModule : kMasterEditModule;
         }
     }
@@ -60,7 +60,7 @@ namespace tss
 
     int ModuleHeader::getDesignHeight() noexcept
     {
-        return PluginDesignDimensions::Widgets::Heights::kModuleHeader;
+        return TSS::Design::Atoms::Heights::kModuleHeader;
     }
 
     int ModuleHeader::getTitleBandWidthDesign() const
@@ -149,7 +149,7 @@ namespace tss
         initButton_ = spec.widgetFactory.createStandaloneButton(
             spec.initWidgetId,
             spec.skin,
-            PluginDesignDimensions::Widgets::Heights::kButton);
+            TSS::Design::Atoms::Heights::kButton);
         initButton_->onClick = [this, id = spec.initWidgetId]
         {
             apvts_->state.setProperty(id, juce::Time::getCurrentTime().toMilliseconds(), nullptr);
@@ -162,7 +162,7 @@ namespace tss
         copyButton_ = spec.widgetFactory.createStandaloneButton(
             spec.copyWidgetId,
             spec.skin,
-            PluginDesignDimensions::Widgets::Heights::kButton);
+            TSS::Design::Atoms::Heights::kButton);
         copyButton_->onClick = [this, id = spec.copyWidgetId]
         {
             apvts_->state.setProperty(id, juce::Time::getCurrentTime().toMilliseconds(), nullptr);
@@ -172,7 +172,7 @@ namespace tss
         pasteButton_ = spec.widgetFactory.createStandaloneButton(
             spec.pasteWidgetId,
             spec.skin,
-            PluginDesignDimensions::Widgets::Heights::kButton);
+            TSS::Design::Atoms::Heights::kButton);
         pasteButton_->onClick = [this, id = spec.pasteWidgetId]
         {
             apvts_->state.setProperty(id, juce::Time::getCurrentTime().toMilliseconds(), nullptr);
@@ -183,9 +183,9 @@ namespace tss
     void ModuleHeader::layoutInitOnlyButtons()
     {
         const int initButtonWidth = juce::roundToInt(
-            static_cast<float>(PluginDesignDimensions::Widgets::Widths::Button::kInit) * uiScale_);
+            static_cast<float>(TSS::Design::Atoms::Widths::Button::kInit) * uiScale_);
         const int buttonHeight = juce::roundToInt(
-            static_cast<float>(PluginDesignDimensions::Widgets::Heights::kButton) * uiScale_);
+            static_cast<float>(TSS::Design::Atoms::Heights::kButton) * uiScale_);
         const int panelWidth = getWidth();
 
         if (auto* button = initButton_.get())
@@ -196,12 +196,12 @@ namespace tss
     {
         const float sf = uiScale_;
         const int buttonHeight = juce::roundToInt(
-            static_cast<float>(PluginDesignDimensions::Widgets::Heights::kButton) * sf);
+            static_cast<float>(TSS::Design::Atoms::Heights::kButton) * sf);
         const int panelWidth = getWidth();
 
-        const float pasteW = static_cast<float>(PluginDesignDimensions::Widgets::Widths::Button::kPaste) * sf;
-        const float copyW = static_cast<float>(PluginDesignDimensions::Widgets::Widths::Button::kCopy) * sf;
-        const float initW = static_cast<float>(PluginDesignDimensions::Widgets::Widths::Button::kInit) * sf;
+        const float pasteW = static_cast<float>(TSS::Design::Atoms::Widths::Button::kPaste) * sf;
+        const float copyW = static_cast<float>(TSS::Design::Atoms::Widths::Button::kCopy) * sf;
+        const float initW = static_cast<float>(TSS::Design::Atoms::Widths::Button::kInit) * sf;
 
         const int pasteButtonWidth = juce::roundToInt(pasteW);
         const int copyButtonWidth = juce::roundToInt(copyW);

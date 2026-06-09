@@ -5,7 +5,7 @@
 
 #include "GUI/Panels/Reusable/BaseModulePanel.h"
 
-namespace tss
+namespace TSS
 {
     class ISkin;
 }
@@ -15,7 +15,7 @@ class WidgetFactory;
 class Env3Panel : public BaseModulePanel
 {
 public:
-    Env3Panel(tss::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    Env3Panel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~Env3Panel() override = default;
 
 private:

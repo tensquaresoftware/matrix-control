@@ -5,7 +5,7 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 
-namespace tss
+namespace TSS
 {
     class ISkin;
     class ModuleHeader;
@@ -21,11 +21,11 @@ class WidgetFactory;
 class PatchMutatorPanel : public juce::Component
 {
 public:
-    PatchMutatorPanel(tss::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    PatchMutatorPanel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~PatchMutatorPanel() override;
 
     void resized() override;
-    void setSkin(tss::ISkin& skin);
+    void setSkin(TSS::ISkin& skin);
     void setUiScale(float uiScale);
 
 private:
@@ -33,48 +33,48 @@ private:
 
     int width_;
     int height_;
-    tss::ISkin* skin_;
+    TSS::ISkin* skin_;
     float uiScale_ = 1.0f;
     juce::AudioProcessorValueTreeState& apvts_;
 
-    std::unique_ptr<tss::ModuleHeader> moduleHeader_;
+    std::unique_ptr<TSS::ModuleHeader> moduleHeader_;
 
-    std::unique_ptr<tss::Label> amountLabel_;
-    std::unique_ptr<tss::Slider> amountSlider_;
-    std::unique_ptr<tss::Button> mutateButton_;
-    std::unique_ptr<tss::Toggle> dco1Toggle_;
-    std::unique_ptr<tss::Toggle> dco2Toggle_;
-    std::unique_ptr<tss::Toggle> vcfVcaToggle_;
-    std::unique_ptr<tss::Toggle> fmTrackToggle_;
-    std::unique_ptr<tss::Toggle> rampPortamentoToggle_;
+    std::unique_ptr<TSS::Label> amountLabel_;
+    std::unique_ptr<TSS::Slider> amountSlider_;
+    std::unique_ptr<TSS::Button> mutateButton_;
+    std::unique_ptr<TSS::Toggle> dco1Toggle_;
+    std::unique_ptr<TSS::Toggle> dco2Toggle_;
+    std::unique_ptr<TSS::Toggle> vcfVcaToggle_;
+    std::unique_ptr<TSS::Toggle> fmTrackToggle_;
+    std::unique_ptr<TSS::Toggle> rampPortamentoToggle_;
 
-    std::unique_ptr<tss::Label> randomLabel_;
-    std::unique_ptr<tss::Slider> randomSlider_;
-    std::unique_ptr<tss::Button> retryButton_;
-    std::unique_ptr<tss::Toggle> env1Toggle_;
-    std::unique_ptr<tss::Toggle> env2Toggle_;
-    std::unique_ptr<tss::Toggle> env3Toggle_;
-    std::unique_ptr<tss::Toggle> lfo1Toggle_;
-    std::unique_ptr<tss::Toggle> lfo2Toggle_;
+    std::unique_ptr<TSS::Label> randomLabel_;
+    std::unique_ptr<TSS::Slider> randomSlider_;
+    std::unique_ptr<TSS::Button> retryButton_;
+    std::unique_ptr<TSS::Toggle> env1Toggle_;
+    std::unique_ptr<TSS::Toggle> env2Toggle_;
+    std::unique_ptr<TSS::Toggle> env3Toggle_;
+    std::unique_ptr<TSS::Toggle> lfo1Toggle_;
+    std::unique_ptr<TSS::Toggle> lfo2Toggle_;
 
-    std::unique_ptr<tss::Label> historyLabel_;
-    std::unique_ptr<tss::ComboBox> historyComboBox_;
-    std::unique_ptr<tss::Button> compareButton_;
-    std::unique_ptr<tss::Button> deleteButton_;
-    std::unique_ptr<tss::Button> clearButton_;
-    std::unique_ptr<tss::Button> exportButton_;
+    std::unique_ptr<TSS::Label> historyLabel_;
+    std::unique_ptr<TSS::ComboBox> historyComboBox_;
+    std::unique_ptr<TSS::Button> compareButton_;
+    std::unique_ptr<TSS::Button> deleteButton_;
+    std::unique_ptr<TSS::Button> clearButton_;
+    std::unique_ptr<TSS::Button> exportButton_;
 
-    void propagateSkinsToControlWidgets(tss::ISkin& skin);
-    void propagateSkinsToToggleWidgets(tss::ISkin& skin);
+    void propagateSkinsToControlWidgets(TSS::ISkin& skin);
+    void propagateSkinsToToggleWidgets(TSS::ISkin& skin);
 
-    void setupModuleHeader(tss::ISkin& skin, WidgetFactory& widgetFactory);
-    void setupAmountLine(tss::ISkin& skin, WidgetFactory& widgetFactory);
-    void setupRandomLine(tss::ISkin& skin, WidgetFactory& widgetFactory);
-    void setupHistoryLine(tss::ISkin& skin, WidgetFactory& widgetFactory);
-    void connectButtonToApvts(tss::Button* button, const char* widgetId);
-    void connectToggleToApvts(tss::Toggle* toggle, const char* widgetId);
+    void setupModuleHeader(TSS::ISkin& skin, WidgetFactory& widgetFactory);
+    void setupAmountLine(TSS::ISkin& skin, WidgetFactory& widgetFactory);
+    void setupRandomLine(TSS::ISkin& skin, WidgetFactory& widgetFactory);
+    void setupHistoryLine(TSS::ISkin& skin, WidgetFactory& widgetFactory);
+    void connectButtonToApvts(TSS::Button* button, const char* widgetId);
+    void connectToggleToApvts(TSS::Toggle* toggle, const char* widgetId);
 
-    void layoutSliderLine(int x, int y, tss::Label* label, tss::Slider* slider, tss::Button* button, const std::vector<tss::Toggle*>& toggles);
+    void layoutSliderLine(int x, int y, TSS::Label* label, TSS::Slider* slider, TSS::Button* button, const std::vector<TSS::Toggle*>& toggles);
     void layoutHistoryLine(int x, int y);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PatchMutatorPanel)

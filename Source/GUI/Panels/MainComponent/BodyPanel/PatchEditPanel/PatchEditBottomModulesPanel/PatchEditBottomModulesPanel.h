@@ -5,7 +5,7 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 
-namespace tss
+namespace TSS
 {
     class ISkin;
 }
@@ -20,11 +20,11 @@ class Lfo2Panel;
 class PatchEditBottomModulesPanel : public juce::Component
 {
 public:
-    PatchEditBottomModulesPanel(tss::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    PatchEditBottomModulesPanel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~PatchEditBottomModulesPanel() override;
 
     void resized() override;
-    void setSkin(tss::ISkin& skin);
+    void setSkin(TSS::ISkin& skin);
     void setUiScale(float uiScale);
     
     Env1Panel* getEnv1Panel() { return env1Panel_.get(); }
@@ -37,7 +37,7 @@ private:
     int childModuleWidth_;
     int childModuleHeight_;
     int gap_;
-    tss::ISkin* skin_;
+    TSS::ISkin* skin_;
     float uiScale_ = 1.0f;
 
     std::unique_ptr<Env1Panel> env1Panel_;

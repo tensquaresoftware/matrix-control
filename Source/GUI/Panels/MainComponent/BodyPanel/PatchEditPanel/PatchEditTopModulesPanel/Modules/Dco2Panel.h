@@ -5,7 +5,7 @@
 
 #include "GUI/Panels/Reusable/BaseModulePanel.h"
 
-namespace tss
+namespace TSS
 {
     class ISkin;
 }
@@ -15,7 +15,7 @@ class WidgetFactory;
 class Dco2Panel : public BaseModulePanel
 {
 public:
-    Dco2Panel(tss::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    Dco2Panel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~Dco2Panel() override = default;
 
 private:

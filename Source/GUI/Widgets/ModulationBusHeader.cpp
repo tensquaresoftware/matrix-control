@@ -2,7 +2,7 @@
 
 #include "Shared/Definitions/PluginDescriptors.h"
 
-namespace tss
+namespace TSS
 {
     ModulationBusHeader::ModulationBusHeader(int width, int height, const ModulationBusHeaderLook& look, ColourVariant variant)
         : look_(look)

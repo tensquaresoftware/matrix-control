@@ -1,8 +1,8 @@
 #include "Label.h"
 
-namespace tss
+namespace TSS
 {
-    Label::Label(int width, int height, const LabelLook& look, const juce::String& text, tss::LabelStyle style)
+    Label::Label(int width, int height, const LabelLook& look, const juce::String& text, TSS::LabelStyle style)
         : look_(look)
         , width_(width)
         , height_(height)

@@ -2,7 +2,7 @@
 
 #include "PopupMenuBase.h"
 
-namespace tss
+namespace TSS
 {
     class ScrollablePopupMenu : public PopupMenuBase
     {

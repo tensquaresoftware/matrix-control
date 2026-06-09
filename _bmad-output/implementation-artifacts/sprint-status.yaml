@@ -1,5 +1,5 @@
 # generated: 2026-05-29
-# last_updated: 2026-06-09 (U-IDs code review complete → done)
+# last_updated: 2026-06-09 (U-0 Design* split complete → review)
 # project: Matrix-Control
 # project_key: NOKEY
 # tracking_system: file-system
@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-05-29
-last_updated: 2026-06-09 (U-IDs code review complete → done)
+last_updated: 2026-06-09 (U-0 Design* split complete → review)
 project: Matrix-Control
 project_key: NOKEY
 tracking_system: file-system
@@ -140,7 +140,7 @@ development_status:
   epic-10-retrospective: optional
   epic-u: in-progress
   u-ids-widget-id-harmonization: done
-  u-0-figma-intake-and-design-reconciliation: ready-for-dev
+  u-0-figma-intake-and-design-reconciliation: review
   u-0b-factory-dimension-registry-and-descriptor-decoupling: ready-for-dev
   u-1-testcomponent-enrichment-d-064: backlog
   u-2-transversal-widgets-scale-audit: backlog

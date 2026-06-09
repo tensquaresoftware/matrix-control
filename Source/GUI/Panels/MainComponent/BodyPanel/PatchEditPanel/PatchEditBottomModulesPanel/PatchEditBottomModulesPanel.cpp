@@ -9,17 +9,17 @@
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Factories/WidgetFactory.h"
-#include "Shared/Definitions/PluginDesignDimensions.h"
+#include "GUI/Layout/Design/Design.h"
 
 
 PatchEditBottomModulesPanel::~PatchEditBottomModulesPanel() = default;
 
-PatchEditBottomModulesPanel::PatchEditBottomModulesPanel(tss::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+PatchEditBottomModulesPanel::PatchEditBottomModulesPanel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : width_(width)
     , height_(height)
-    , childModuleWidth_(PluginDesignDimensions::Panels::Body::PatchEditSection::BottomModules::ChildModules::kWidth)
-    , childModuleHeight_(PluginDesignDimensions::Panels::Body::PatchEditSection::BottomModules::ChildModules::kHeight)
-    , gap_(PluginDesignDimensions::Panels::Body::PatchEditSection::kInterModuleGap)
+    , childModuleWidth_(TSS::Design::Panels::Body::PatchEditSection::BottomModules::ChildModules::kWidth)
+    , childModuleHeight_(TSS::Design::Panels::Body::PatchEditSection::BottomModules::ChildModules::kHeight)
+    , gap_(TSS::Design::Panels::Body::PatchEditSection::kInterModuleGap)
     , skin_(&skin)
     , env1Panel_(std::make_unique<Env1Panel>(skin, childModuleWidth_, childModuleHeight_, widgetFactory, apvts))
     , env2Panel_(std::make_unique<Env2Panel>(skin, childModuleWidth_, childModuleHeight_, widgetFactory, apvts))
@@ -58,10 +58,10 @@ void PatchEditBottomModulesPanel::resized()
     lfo2Panel_->setBounds(x4, bounds.getY(), bounds.getRight() - x4, childHeight);
 }
 
-void PatchEditBottomModulesPanel::setSkin(tss::ISkin& skin)
+void PatchEditBottomModulesPanel::setSkin(TSS::ISkin& skin)
 {
     skin_ = &skin;
-    tss::propagateSkin(skin,
+    TSS::propagateSkin(skin,
         env1Panel_.get(),
         env2Panel_.get(),
         env3Panel_.get(),

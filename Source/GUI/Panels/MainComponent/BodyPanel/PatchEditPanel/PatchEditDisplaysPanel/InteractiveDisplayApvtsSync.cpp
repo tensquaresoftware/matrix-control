@@ -83,10 +83,10 @@ private:
 };
 
 InteractiveDisplayApvtsSync::InteractiveDisplayApvtsSync(juce::AudioProcessorValueTreeState& apvts,
-                                                         tss::EnvelopeDisplay& envelope1,
-                                                         tss::EnvelopeDisplay& envelope2,
-                                                         tss::EnvelopeDisplay& envelope3,
-                                                         tss::TrackGeneratorDisplay& trackGenerator)
+                                                         TSS::EnvelopeDisplay& envelope1,
+                                                         TSS::EnvelopeDisplay& envelope2,
+                                                         TSS::EnvelopeDisplay& envelope3,
+                                                         TSS::TrackGeneratorDisplay& trackGenerator)
     : apvts_(apvts)
     , envelope1_(envelope1)
     , envelope2_(envelope2)
@@ -160,7 +160,7 @@ void InteractiveDisplayApvtsSync::connectSliderFastPaths(PatchEditTopModulesPane
     envPanels[1] = bottomModulesPanel.getEnv2Panel();
     envPanels[2] = bottomModulesPanel.getEnv3Panel();
 
-    tss::EnvelopeDisplay* envelopeDisplays[] { &envelope1_, &envelope2_, &envelope3_ };
+    TSS::EnvelopeDisplay* envelopeDisplays[] { &envelope1_, &envelope2_, &envelope3_ };
     const EnvelopeBindings* envelopeBindings[] { &kEnvelope1Bindings, &kEnvelope2Bindings, &kEnvelope3Bindings };
 
     for (int envIndex = 0; envIndex < 3; ++envIndex)
@@ -229,7 +229,7 @@ void InteractiveDisplayApvtsSync::connectDisplayCallbacks()
 }
 
 void InteractiveDisplayApvtsSync::connectEnvelopeDisplay(
-    tss::EnvelopeDisplay& display,
+    TSS::EnvelopeDisplay& display,
     const EnvelopeParameterBinding* bindings,
     int bindingCount)
 {
@@ -280,8 +280,8 @@ void InteractiveDisplayApvtsSync::connectTrackGeneratorDisplay()
 }
 
 void InteractiveDisplayApvtsSync::connectEnvelopeSlider(
-    tss::Slider& slider,
-    tss::EnvelopeDisplay& display,
+    TSS::Slider& slider,
+    TSS::EnvelopeDisplay& display,
     int paramIndex,
     const juce::String& parameterId)
 {
@@ -306,7 +306,7 @@ void InteractiveDisplayApvtsSync::connectEnvelopeSlider(
 }
 
 void InteractiveDisplayApvtsSync::connectTrackPointSlider(
-    tss::Slider& slider,
+    TSS::Slider& slider,
     int pointIndex,
     const juce::String& parameterId)
 {
@@ -372,7 +372,7 @@ void InteractiveDisplayApvtsSync::updateSliderUi(const juce::String& parameterId
 }
 
 void InteractiveDisplayApvtsSync::registerSliderForParameter(
-    tss::Slider& slider,
+    TSS::Slider& slider,
     const juce::String& parameterId)
 {
     slidersByParameterId_[parameterId] = &slider;
@@ -399,7 +399,7 @@ void InteractiveDisplayApvtsSync::endParameterGesture()
 }
 
 void InteractiveDisplayApvtsSync::applyEnvelopeDisplayValue(
-    tss::EnvelopeDisplay& display,
+    TSS::EnvelopeDisplay& display,
     int paramIndex,
     int value)
 {

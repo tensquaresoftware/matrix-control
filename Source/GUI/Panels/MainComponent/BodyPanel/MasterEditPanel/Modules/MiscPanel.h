@@ -5,7 +5,7 @@
 
 #include "GUI/Panels/Reusable/BaseModulePanel.h"
 
-namespace tss
+namespace TSS
 {
     class ISkin;
 }
@@ -15,7 +15,7 @@ class WidgetFactory;
 class MiscPanel : public BaseModulePanel
 {
 public:
-    MiscPanel(tss::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    MiscPanel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~MiscPanel() override = default;
 
 private:

@@ -1,6 +1,6 @@
 #include "Toggle.h"
 
-namespace tss
+namespace TSS
 {
     Toggle::Toggle(int width, int height, const ToggleLook& look, const juce::String& text)
         : juce::ToggleButton(text)

@@ -1,6 +1,6 @@
 #include "HorizontalSeparator.h"
 
-namespace tss
+namespace TSS
 {
     HorizontalSeparator::HorizontalSeparator(int width, int height, const HorizontalSeparatorLook& look)
         : look_(look)

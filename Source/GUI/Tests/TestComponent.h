@@ -7,7 +7,7 @@
 
 #include "GUI/Widgets/Label.h"
 
-namespace tss
+namespace TSS
 {
     class ISkin;
 }
@@ -18,7 +18,7 @@ class TestSliders;
 class TestComponent : public juce::Component
 {
 public:
-    TestComponent(tss::ISkin& skin, juce::ValueTree& settingsState, int width, int height);
+    TestComponent(TSS::ISkin& skin, juce::ValueTree& settingsState, int width, int height);
     ~TestComponent() override;
 
     void paint(juce::Graphics& g) override;
@@ -49,9 +49,9 @@ private:
     inline constexpr static int kWidgetSelectorWidth_ = 176;
     inline constexpr static int kWidgetSelectorHeight_ = 24;
 
-    tss::ISkin& skin_;
+    TSS::ISkin& skin_;
     juce::ValueTree& settingsState_;
-    std::unique_ptr<tss::Label> widgetLabel_;
+    std::unique_ptr<TSS::Label> widgetLabel_;
     juce::ComboBox widgetSelector_;
     std::unique_ptr<TestButtons> testButtons_;
     std::unique_ptr<TestSliders> testSliders_;

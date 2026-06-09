@@ -8,7 +8,7 @@
 #include "GUI/Widgets/PeakIndicator.h"
 #include "GUI/Widgets/Slider.h"
 
-namespace tss
+namespace TSS
 {
     class ISkin;
 }
@@ -19,13 +19,13 @@ public:
     static constexpr int kDesignWidth = 480;
     static constexpr int kDesignHeight = 320;
 
-    SettingsPanel(tss::ISkin& skin, bool isPluginMode);
+    SettingsPanel(TSS::ISkin& skin, bool isPluginMode);
     ~SettingsPanel() override = default;
 
     void paint(juce::Graphics& g) override;
     void resized() override;
 
-    void setSkin(tss::ISkin& skin);
+    void setSkin(TSS::ISkin& skin);
     void setUiScale(float uiScale);
     void setPluginMode(bool isPluginMode);
 
@@ -34,12 +34,12 @@ public:
     juce::String getSelectedAudioFromSourceId() const;
     void selectAudioFromSourceId(const juce::String& sourceId);
 
-    tss::ComboBox& getSkinComboBox() { return skinComboBox_; }
-    tss::ComboBox& getUiScaleComboBox() { return uiScaleComboBox_; }
-    tss::Slider& getHardwareLatencySlider() { return hardwareLatencySlider_; }
-    tss::ComboBox& getAudioFromComboBox() { return audioFromComboBox_; }
-    tss::Slider& getInputGainSlider() { return inputGainSlider_; }
-    tss::PeakIndicator& getPeakIndicator() { return peakIndicator_; }
+    TSS::ComboBox& getSkinComboBox() { return skinComboBox_; }
+    TSS::ComboBox& getUiScaleComboBox() { return uiScaleComboBox_; }
+    TSS::Slider& getHardwareLatencySlider() { return hardwareLatencySlider_; }
+    TSS::ComboBox& getAudioFromComboBox() { return audioFromComboBox_; }
+    TSS::Slider& getInputGainSlider() { return inputGainSlider_; }
+    TSS::PeakIndicator& getPeakIndicator() { return peakIndicator_; }
 
 private:
     void updateModeSpecificVisibility();
@@ -56,35 +56,35 @@ private:
     inline constexpr static int kAudioFromComboWidth_ = 160;
     inline constexpr static int kPeakIndicatorWidth_ = 12;
 
-    tss::ISkin* skin_;
+    TSS::ISkin* skin_;
     float uiScale_ = 1.0f;
     bool isPluginMode_ = false;
 
-    tss::Label skinLabel_;
-    tss::ComboBox skinComboBox_;
-    tss::Label uiScaleLabel_;
-    tss::ComboBox uiScaleComboBox_;
-    tss::Label hardwareLatencyLabel_;
-    tss::Slider hardwareLatencySlider_;
-    tss::Label audioFromLabel_;
-    tss::ComboBox audioFromComboBox_;
-    tss::Label inputGainLabel_;
-    tss::Slider inputGainSlider_;
-    tss::PeakIndicator peakIndicator_;
-    tss::Label masterOpsLabel_;
-    tss::Label masterOpsPlaceholder_;
-    tss::Label policiesLabel_;
-    tss::Label policiesPlaceholder_;
-    tss::Label defragLabel_;
-    tss::Label defragPlaceholder_;
-    tss::Label loggingLabel_;
-    tss::Label loggingPlaceholder_;
+    TSS::Label skinLabel_;
+    TSS::ComboBox skinComboBox_;
+    TSS::Label uiScaleLabel_;
+    TSS::ComboBox uiScaleComboBox_;
+    TSS::Label hardwareLatencyLabel_;
+    TSS::Slider hardwareLatencySlider_;
+    TSS::Label audioFromLabel_;
+    TSS::ComboBox audioFromComboBox_;
+    TSS::Label inputGainLabel_;
+    TSS::Slider inputGainSlider_;
+    TSS::PeakIndicator peakIndicator_;
+    TSS::Label masterOpsLabel_;
+    TSS::Label masterOpsPlaceholder_;
+    TSS::Label policiesLabel_;
+    TSS::Label policiesPlaceholder_;
+    TSS::Label defragLabel_;
+    TSS::Label defragPlaceholder_;
+    TSS::Label loggingLabel_;
+    TSS::Label loggingPlaceholder_;
 
     std::vector<juce::String> audioFromSourceIdentifiers_;
 
     int findItemIdForIdentifier(const std::vector<juce::String>& identifiers,
                                 const juce::String& deviceId) const;
-    juce::String getSelectedPortIdentifier(const tss::ComboBox& combo,
+    juce::String getSelectedPortIdentifier(const TSS::ComboBox& combo,
                                            const std::vector<juce::String>& identifiers) const;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SettingsPanel)

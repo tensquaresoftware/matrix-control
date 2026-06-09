@@ -2,7 +2,7 @@
 
 #include "ISkin.h"
 
-namespace tss
+namespace TSS
 {
     template <typename... T>
     void propagateSkin(ISkin& skin, T*... components)

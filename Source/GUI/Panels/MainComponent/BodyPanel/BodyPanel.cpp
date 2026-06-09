@@ -9,20 +9,20 @@
 #include "MasterEditPanel/MasterEditPanel.h"
 #include "SharedPanel/SharedPanel.h"
 #include "GUI/Factories/WidgetFactory.h"
-#include "Shared/Definitions/PluginDesignDimensions.h"
+#include "GUI/Layout/Design/Design.h"
 
-using tss::SkinColourId;
+using TSS::SkinColourId;
 
-using ::tss::VerticalSeparator;
+using ::TSS::VerticalSeparator;
 
-BodyPanel::BodyPanel(tss::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+BodyPanel::BodyPanel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : width_(width)
     , height_(height)
-    , padding_(PluginDesignDimensions::Panels::Body::kPadding)
-    , patchEditPanelWidth_(PluginDesignDimensions::Panels::Body::PatchEditSection::kWidth)
-    , patchEditPanelHeight_(PluginDesignDimensions::Panels::Body::PatchEditSection::kHeight)
-    , masterEditPanelWidth_(PluginDesignDimensions::Panels::Body::MasterEditSection::kWidth)
-    , masterEditPanelHeight_(PluginDesignDimensions::Panels::Body::MasterEditSection::kHeight)
+    , padding_(TSS::Design::Panels::Body::kPadding)
+    , patchEditPanelWidth_(TSS::Design::Panels::Body::PatchEditSection::kWidth)
+    , patchEditPanelHeight_(TSS::Design::Panels::Body::PatchEditSection::kHeight)
+    , masterEditPanelWidth_(TSS::Design::Panels::Body::MasterEditSection::kWidth)
+    , masterEditPanelHeight_(TSS::Design::Panels::Body::MasterEditSection::kHeight)
     , skin_(&skin)
 {
     setOpaque(true);
@@ -30,22 +30,22 @@ BodyPanel::BodyPanel(tss::ISkin& skin, int width, int height, WidgetFactory& wid
     addAndMakeVisible(*patchEditPanel_);
 
     verticalSeparator1_ = std::make_unique<VerticalSeparator>(
-        PluginDesignDimensions::Widgets::Widths::VerticalSeparator::kStandard,
-        PluginDesignDimensions::Widgets::Heights::kVerticalSeparator,
-        tss::verticalSeparatorLookFromSkin(skin));
+        TSS::Design::Atoms::Widths::VerticalSeparator::kStandard,
+        TSS::Design::PanelWidgets::Heights::kVerticalSeparator,
+        TSS::verticalSeparatorLookFromSkin(skin));
     addAndMakeVisible(*verticalSeparator1_);
 
     sharedPanel_ = std::make_unique<SharedPanel>(
         skin,
-        PluginDesignDimensions::Panels::Body::SharedColumn::kWidth,
+        TSS::Design::Panels::Body::SharedColumn::kWidth,
         widgetFactory,
         apvts);
     addAndMakeVisible(*sharedPanel_);
 
     verticalSeparator2_ = std::make_unique<VerticalSeparator>(
-        PluginDesignDimensions::Widgets::Widths::VerticalSeparator::kStandard,
-        PluginDesignDimensions::Widgets::Heights::kVerticalSeparator,
-        tss::verticalSeparatorLookFromSkin(skin));
+        TSS::Design::Atoms::Widths::VerticalSeparator::kStandard,
+        TSS::Design::PanelWidgets::Heights::kVerticalSeparator,
+        TSS::verticalSeparatorLookFromSkin(skin));
     addAndMakeVisible(*verticalSeparator2_);
 
     masterEditPanel_ = std::make_unique<MasterEditPanel>(skin, masterEditPanelWidth_, masterEditPanelHeight_, widgetFactory, apvts);
@@ -65,17 +65,17 @@ void BodyPanel::resized()
     const auto bounds = getLocalBounds();
     const float sf = uiScale_;
 
-    const int padding              = tss::ScaledLayout::scaledInt(static_cast<float>(padding_), sf);
-    const int patchEditPanelWidth  = tss::ScaledLayout::scaledInt(static_cast<float>(patchEditPanelWidth_), sf);
-    const int patchEditPanelHeight = tss::ScaledLayout::scaledInt(static_cast<float>(patchEditPanelHeight_), sf);
-    const int sharedColumnW        = tss::ScaledLayout::scaledInt(
-        static_cast<float>(PluginDesignDimensions::Panels::Body::SharedColumn::kWidth), sf);
-    const int masterEditW          = tss::ScaledLayout::scaledInt(static_cast<float>(masterEditPanelWidth_), sf);
-    const int masterEditH          = tss::ScaledLayout::scaledInt(static_cast<float>(masterEditPanelHeight_), sf);
-    const int separatorW           = tss::ScaledLayout::scaledInt(
-        static_cast<float>(PluginDesignDimensions::Widgets::Widths::VerticalSeparator::kStandard), sf);
-    const int separatorH           = tss::ScaledLayout::scaledInt(
-        static_cast<float>(PluginDesignDimensions::Widgets::Heights::kVerticalSeparator), sf);
+    const int padding              = TSS::ScaledLayout::scaledInt(static_cast<float>(padding_), sf);
+    const int patchEditPanelWidth  = TSS::ScaledLayout::scaledInt(static_cast<float>(patchEditPanelWidth_), sf);
+    const int patchEditPanelHeight = TSS::ScaledLayout::scaledInt(static_cast<float>(patchEditPanelHeight_), sf);
+    const int sharedColumnW        = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(TSS::Design::Panels::Body::SharedColumn::kWidth), sf);
+    const int masterEditW          = TSS::ScaledLayout::scaledInt(static_cast<float>(masterEditPanelWidth_), sf);
+    const int masterEditH          = TSS::ScaledLayout::scaledInt(static_cast<float>(masterEditPanelHeight_), sf);
+    const int separatorW           = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(TSS::Design::Atoms::Widths::VerticalSeparator::kStandard), sf);
+    const int separatorH           = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(TSS::Design::PanelWidgets::Heights::kVerticalSeparator), sf);
 
     const int contentHeight = bounds.getHeight() - 2 * padding;
 
@@ -83,9 +83,9 @@ void BodyPanel::resized()
     const float originX = static_cast<float>(bounds.getX() + padding);
     const int patchEditX        = bounds.getX() + padding;
     const int separator1X       = juce::roundToInt(originX + static_cast<float>(patchEditPanelWidth_) * sf);
-    const int sharedColumnX       = juce::roundToInt(originX + static_cast<float>(patchEditPanelWidth_ + PluginDesignDimensions::Widgets::Widths::VerticalSeparator::kStandard) * sf);
-    const int separator2X       = juce::roundToInt(originX + static_cast<float>(patchEditPanelWidth_ + PluginDesignDimensions::Widgets::Widths::VerticalSeparator::kStandard + PluginDesignDimensions::Panels::Body::SharedColumn::kWidth) * sf);
-    const int masterEditX       = juce::roundToInt(originX + static_cast<float>(patchEditPanelWidth_ + PluginDesignDimensions::Widgets::Widths::VerticalSeparator::kStandard + PluginDesignDimensions::Panels::Body::SharedColumn::kWidth + PluginDesignDimensions::Widgets::Widths::VerticalSeparator::kStandard) * sf);
+    const int sharedColumnX       = juce::roundToInt(originX + static_cast<float>(patchEditPanelWidth_ + TSS::Design::Atoms::Widths::VerticalSeparator::kStandard) * sf);
+    const int separator2X       = juce::roundToInt(originX + static_cast<float>(patchEditPanelWidth_ + TSS::Design::Atoms::Widths::VerticalSeparator::kStandard + TSS::Design::Panels::Body::SharedColumn::kWidth) * sf);
+    const int masterEditX       = juce::roundToInt(originX + static_cast<float>(patchEditPanelWidth_ + TSS::Design::Atoms::Widths::VerticalSeparator::kStandard + TSS::Design::Panels::Body::SharedColumn::kWidth + TSS::Design::Atoms::Widths::VerticalSeparator::kStandard) * sf);
 
     const int topY = bounds.getY() + padding;
 
@@ -96,12 +96,12 @@ void BodyPanel::resized()
     masterEditPanel_->setBounds(masterEditX, topY, masterEditW, masterEditH);
 }
 
-void BodyPanel::setSkin(tss::ISkin& skin)
+void BodyPanel::setSkin(TSS::ISkin& skin)
 {
     skin_ = &skin;
-    verticalSeparator1_->setLook(tss::verticalSeparatorLookFromSkin(skin));
-    verticalSeparator2_->setLook(tss::verticalSeparatorLookFromSkin(skin));
-    tss::propagateSkin(skin,
+    verticalSeparator1_->setLook(TSS::verticalSeparatorLookFromSkin(skin));
+    verticalSeparator2_->setLook(TSS::verticalSeparatorLookFromSkin(skin));
+    TSS::propagateSkin(skin,
         patchEditPanel_.get(),
         sharedPanel_.get(),
         masterEditPanel_.get());

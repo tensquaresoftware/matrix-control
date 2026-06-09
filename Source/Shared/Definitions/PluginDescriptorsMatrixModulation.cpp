@@ -6,7 +6,7 @@
 
 #include <array>
 
-#include "PluginDesignDimensions.h"
+#include "GUI/Layout/Design/Design.h"
 #include "PluginDisplayNames.h"
 #include "PluginHelpers.h"
 #include "PluginIDs.h"
@@ -25,7 +25,7 @@ namespace PluginDescriptors
             .displayName = PluginDisplayNames::MatrixModulationSection::Header::StandaloneWidgets::kInit,
             .parentGroupId = PluginIDs::MatrixModulationSection::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kInit
+            .buttonWidth = TSS::Design::Atoms::Widths::Button::kInit
         }
     };
 
@@ -88,7 +88,7 @@ namespace PluginDescriptors
             .displayName = PluginDisplayNames::MatrixModulationSection::ModulationBus::StandaloneWidgets::kInitBus0,
             .parentGroupId = PluginIDs::MatrixModulationSection::ModulationBus::kBus0,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kInit } };
+            .buttonWidth = TSS::Design::Atoms::Widths::Button::kInit } };
 
         // Int Parameters ----------------------------------------------------------------------------------------------
         const std::vector<IntParameterDescriptor> bus0Int = { {
@@ -132,7 +132,7 @@ namespace PluginDescriptors
             .displayName = PluginDisplayNames::MatrixModulationSection::ModulationBus::StandaloneWidgets::kInitBus1,
             .parentGroupId = PluginIDs::MatrixModulationSection::ModulationBus::kBus1,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kInit } };
+            .buttonWidth = TSS::Design::Atoms::Widths::Button::kInit } };
 
         // Int Parameters ----------------------------------------------------------------------------------------------
         const std::vector<IntParameterDescriptor> bus1Int = { {
@@ -176,7 +176,7 @@ namespace PluginDescriptors
             .displayName = PluginDisplayNames::MatrixModulationSection::ModulationBus::StandaloneWidgets::kInitBus2,
             .parentGroupId = PluginIDs::MatrixModulationSection::ModulationBus::kBus2,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kInit } };
+            .buttonWidth = TSS::Design::Atoms::Widths::Button::kInit } };
 
         // Int Parameters ----------------------------------------------------------------------------------------------
         const std::vector<IntParameterDescriptor> bus2Int = { {
@@ -220,7 +220,7 @@ namespace PluginDescriptors
             .displayName = PluginDisplayNames::MatrixModulationSection::ModulationBus::StandaloneWidgets::kInitBus3,
             .parentGroupId = PluginIDs::MatrixModulationSection::ModulationBus::kBus3,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kInit } };
+            .buttonWidth = TSS::Design::Atoms::Widths::Button::kInit } };
 
         // Int Parameters ----------------------------------------------------------------------------------------------
         const std::vector<IntParameterDescriptor> bus3Int = { {
@@ -264,7 +264,7 @@ namespace PluginDescriptors
             .displayName = PluginDisplayNames::MatrixModulationSection::ModulationBus::StandaloneWidgets::kInitBus4,
             .parentGroupId = PluginIDs::MatrixModulationSection::ModulationBus::kBus4,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kInit } };
+            .buttonWidth = TSS::Design::Atoms::Widths::Button::kInit } };
 
         // Int Parameters ----------------------------------------------------------------------------------------------
         const std::vector<IntParameterDescriptor> bus4Int = { {
@@ -308,7 +308,7 @@ namespace PluginDescriptors
             .displayName = PluginDisplayNames::MatrixModulationSection::ModulationBus::StandaloneWidgets::kInitBus5,
             .parentGroupId = PluginIDs::MatrixModulationSection::ModulationBus::kBus5,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kInit } };
+            .buttonWidth = TSS::Design::Atoms::Widths::Button::kInit } };
 
         // Int Parameters ----------------------------------------------------------------------------------------------
         const std::vector<IntParameterDescriptor> bus5Int = { {
@@ -352,7 +352,7 @@ namespace PluginDescriptors
             .displayName = PluginDisplayNames::MatrixModulationSection::ModulationBus::StandaloneWidgets::kInitBus6,
             .parentGroupId = PluginIDs::MatrixModulationSection::ModulationBus::kBus6,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kInit } };
+            .buttonWidth = TSS::Design::Atoms::Widths::Button::kInit } };
 
         // Int Parameters ----------------------------------------------------------------------------------------------
         const std::vector<IntParameterDescriptor> bus6Int = { {
@@ -396,7 +396,7 @@ namespace PluginDescriptors
             .displayName = PluginDisplayNames::MatrixModulationSection::ModulationBus::StandaloneWidgets::kInitBus7,
             .parentGroupId = PluginIDs::MatrixModulationSection::ModulationBus::kBus7,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kInit } };
+            .buttonWidth = TSS::Design::Atoms::Widths::Button::kInit } };
 
         // Int Parameters ----------------------------------------------------------------------------------------------
         const std::vector<IntParameterDescriptor> bus7Int = { {
@@ -440,7 +440,7 @@ namespace PluginDescriptors
             .displayName = PluginDisplayNames::MatrixModulationSection::ModulationBus::StandaloneWidgets::kInitBus8,
             .parentGroupId = PluginIDs::MatrixModulationSection::ModulationBus::kBus8,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kInit } };
+            .buttonWidth = TSS::Design::Atoms::Widths::Button::kInit } };
 
         // Int Parameters ----------------------------------------------------------------------------------------------
         const std::vector<IntParameterDescriptor> bus8Int = { {
@@ -484,7 +484,7 @@ namespace PluginDescriptors
             .displayName = PluginDisplayNames::MatrixModulationSection::ModulationBus::StandaloneWidgets::kInitBus9,
             .parentGroupId = PluginIDs::MatrixModulationSection::ModulationBus::kBus9,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = PluginDesignDimensions::Widgets::Widths::Button::kInit } };
+            .buttonWidth = TSS::Design::Atoms::Widths::Button::kInit } };
 
         // Int Parameters ----------------------------------------------------------------------------------------------
         const std::vector<IntParameterDescriptor> bus9Int = { {

@@ -7,7 +7,7 @@
 
 #include "ISkin.h"
 
-namespace tss
+namespace TSS
 {
     class Skin : public ISkin
     {

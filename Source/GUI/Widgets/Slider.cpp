@@ -4,7 +4,7 @@
 
 #include "GUI/Layout/ScaledDrawing.h"
 
-namespace tss
+namespace TSS
 {
     Slider::Slider(int width, int height, const SliderLook& look, const SliderConfig& config)
         : juce::Slider(juce::Slider::LinearBarVertical, juce::Slider::NoTextBox)

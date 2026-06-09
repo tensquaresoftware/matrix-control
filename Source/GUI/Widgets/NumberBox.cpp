@@ -4,7 +4,7 @@
 
 #include "GUI/Skins/ColourChart.h"
 
-namespace tss
+namespace TSS
 {
     NumberBox::NumberBox(int width, int height, const NumberBoxLook& look, bool editable, int minValue, int maxValue)
         : look_(look)

@@ -5,15 +5,15 @@
 #include "GUI/Factories/WidgetFactory.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Skins/Skin.h"
-#include "Shared/Definitions/PluginDesignDimensions.h"
+#include "GUI/Layout/Design/Design.h"
 
-using tss::SkinColourId;
+using TSS::SkinColourId;
 
-MainComponent::MainComponent(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+MainComponent::MainComponent(TSS::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : skin_(&skin)
-    , headerPanel(skin, PluginDesignDimensions::Panels::Header::kWidth, PluginDesignDimensions::Panels::Header::kHeight)
-    , bodyPanel(skin, PluginDesignDimensions::GUI::kWidth, PluginDesignDimensions::Panels::Body::kHeight, widgetFactory, apvts)
-    , footerPanel(skin, PluginDesignDimensions::Panels::Footer::kWidth, PluginDesignDimensions::Panels::Footer::kHeight, apvts)
+    , headerPanel(skin, TSS::Design::Panels::Header::kWidth, TSS::Design::Panels::Header::kHeight)
+    , bodyPanel(skin, TSS::Design::GUI::kWidth, TSS::Design::Panels::Body::kHeight, widgetFactory, apvts)
+    , footerPanel(skin, TSS::Design::Panels::Footer::kWidth, TSS::Design::Panels::Footer::kHeight, apvts)
 {
     setOpaque(true);
     setSize(width, height);
@@ -35,11 +35,11 @@ void MainComponent::resized()
     const float sf = uiScale_;
 
     const std::vector<int> designHeights {
-        PluginDesignDimensions::Panels::Header::kHeight,
-        PluginDesignDimensions::Panels::Body::kHeight,
-        PluginDesignDimensions::Panels::Footer::kHeight
+        TSS::Design::Panels::Header::kHeight,
+        TSS::Design::Panels::Body::kHeight,
+        TSS::Design::Panels::Footer::kHeight
     };
-    const auto heights = tss::ScaledLayout::distributeHeights(bounds.getHeight(), designHeights, sf, 2);
+    const auto heights = TSS::ScaledLayout::distributeHeights(bounds.getHeight(), designHeights, sf, 2);
     const int headerHeight = heights[0];
     const int bodyHeight = heights[1];
     const int footerHeight = heights[2];
@@ -76,7 +76,7 @@ juce::Rectangle<int> MainComponent::getUiElementsTestAreaBounds() const
     return bounds.withTrimmedTop(uiElementsTestAreaY_);
 }
 
-void MainComponent::setSkin(tss::Skin& skin)
+void MainComponent::setSkin(TSS::Skin& skin)
 {
     skin_ = &skin;
     headerPanel.setSkin(skin);

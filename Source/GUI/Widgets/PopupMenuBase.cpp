@@ -1,7 +1,7 @@
 #include "PopupMenuBase.h"
 #include "ComboBox.h"
 
-namespace tss
+namespace TSS
 {
     PopupMenuBase::PopupMenuBase(ComboBox& comboBox, bool isButtonLike)
         : comboBox_(comboBox)

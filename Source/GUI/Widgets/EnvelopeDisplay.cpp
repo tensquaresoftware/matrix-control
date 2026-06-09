@@ -1,6 +1,6 @@
 #include "EnvelopeDisplay.h"
 
-namespace tss
+namespace TSS
 {
     EnvelopeDisplay::EnvelopeDisplay(int width, int height, const EnvelopeDisplayLook& look)
         : look_(look)

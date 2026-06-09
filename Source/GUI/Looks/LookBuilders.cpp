@@ -3,7 +3,7 @@
 #include "GUI/Looks/TypographyStyles.h"
 #include "GUI/Skins/ISkin.h"
 
-namespace tss
+namespace TSS
 {
     namespace
     {

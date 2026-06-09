@@ -12,7 +12,7 @@
 #include "Factories/WidgetFactory.h"
 #include "Shared/Definitions/PluginIDs.h"
 
-using tss::SkinColourId;
+using TSS::SkinColourId;
 
 class PluginEditor::HeaderRefreshTimer : private juce::Timer
 {
@@ -68,8 +68,8 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     : AudioProcessorEditor(&p)
     , pluginProcessor(p)
 {
-    skinBlack_ = tss::Skin::create(tss::Skin::ColourVariant::Black);
-    skinCream_ = tss::Skin::create(tss::Skin::ColourVariant::Cream);
+    skinBlack_ = TSS::Skin::create(TSS::Skin::ColourVariant::Black);
+    skinCream_ = TSS::Skin::create(TSS::Skin::ColourVariant::Cream);
     skin_ = skinBlack_.get();
 
     widgetFactory_ = std::make_unique<WidgetFactory>(pluginProcessor.getApvts());
@@ -78,8 +78,8 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     setWantsKeyboardFocus(false);
     setInterceptsMouseClicks(true, true);
 
-    const auto editorWidth = PluginDesignDimensions::GUI::kWidth;
-    const auto editorHeight = PluginDesignDimensions::GUI::kHeight;
+    const auto editorWidth = TSS::Design::GUI::kWidth;
+    const auto editorHeight = TSS::Design::GUI::kHeight;
 
     mainComponent_ = std::make_unique<MainComponent>(
         *skin_, editorWidth, editorHeight, *widgetFactory_, pluginProcessor.getApvts());
@@ -192,7 +192,7 @@ void PluginEditor::paint(juce::Graphics& g)
 
 void PluginEditor::resized()
 {
-    const int baseWidth = PluginDesignDimensions::GUI::kWidth;
+    const int baseWidth = TSS::Design::GUI::kWidth;
     if (baseWidth <= 0)
         return;
 
@@ -208,11 +208,11 @@ void PluginEditor::resized()
 
 void PluginEditor::syncUiScaleFromEditor()
 {
-    const int baseWidth = PluginDesignDimensions::GUI::kWidth;
+    const int baseWidth = TSS::Design::GUI::kWidth;
     if (baseWidth <= 0)
         return;
 
-    const float uiScale = tss::ScaledLayout::uiScaleFromEditorBounds(getWidth(), baseWidth);
+    const float uiScale = TSS::ScaledLayout::uiScaleFromEditorBounds(getWidth(), baseWidth);
 
     if (auto* comp = mainComponent_.get())
         comp->setUiScale(uiScale);
@@ -272,8 +272,8 @@ void PluginEditor::updateSkin()
 
 void PluginEditor::applyUiScale(float uiScale)
 {
-    const int baseWidth = PluginDesignDimensions::GUI::kWidth;
-    const int baseHeight = PluginDesignDimensions::GUI::kHeight;
+    const int baseWidth = TSS::Design::GUI::kWidth;
+    const int baseHeight = TSS::Design::GUI::kHeight;
 
     setSize(juce::roundToInt(static_cast<float>(baseWidth) * uiScale),
             juce::roundToInt(static_cast<float>(baseHeight) * uiScale));
@@ -344,9 +344,9 @@ void PluginEditor::openSettingsWindow()
         restoreSettingsPanelFromState(settingsWindow_->getSettingsPanel());
     }
 
-    const int baseWidth = PluginDesignDimensions::GUI::kWidth;
+    const int baseWidth = TSS::Design::GUI::kWidth;
     const float uiScale = (baseWidth > 0)
-        ? tss::ScaledLayout::uiScaleFromEditorBounds(getWidth(), baseWidth)
+        ? TSS::ScaledLayout::uiScaleFromEditorBounds(getWidth(), baseWidth)
         : 1.0f;
     updateSettingsWindowLayout(uiScale);
 
@@ -369,9 +369,9 @@ void PluginEditor::restoreSettingsPanelFromState(SettingsPanel& panel)
     panel.getUiScaleComboBox().setSelectedId(savedScaleId, juce::dontSendNotification);
 
     const auto skinVariant = skin_->getColourVariant();
-    const int skinId = (skinVariant == tss::Skin::ColourVariant::Black)
-        ? static_cast<int>(tss::Skin::SkinComboBoxItemId::kBlack)
-        : static_cast<int>(tss::Skin::SkinComboBoxItemId::kCream);
+    const int skinId = (skinVariant == TSS::Skin::ColourVariant::Black)
+        ? static_cast<int>(TSS::Skin::SkinComboBoxItemId::kBlack)
+        : static_cast<int>(TSS::Skin::SkinComboBoxItemId::kCream);
     panel.getSkinComboBox().setSelectedId(skinId, juce::dontSendNotification);
 
     panel.getHardwareLatencySlider().setValue(pluginProcessor.getHardwareLatencyMs(), juce::dontSendNotification);
@@ -394,7 +394,7 @@ void PluginEditor::wireSettingsPanel(SettingsPanel& panel)
     panel.getSkinComboBox().onChange = [this, &panel]
     {
         const auto selectedId = panel.getSkinComboBox().getSelectedId();
-        skin_ = (selectedId == static_cast<int>(tss::Skin::SkinComboBoxItemId::kBlack))
+        skin_ = (selectedId == static_cast<int>(TSS::Skin::SkinComboBoxItemId::kBlack))
             ? skinBlack_.get()
             : skinCream_.get();
         updateSkin();

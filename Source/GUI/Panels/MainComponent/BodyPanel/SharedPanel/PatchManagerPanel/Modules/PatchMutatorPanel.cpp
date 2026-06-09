@@ -10,11 +10,11 @@
 #include "GUI/Widgets/ComboBox.h"
 #include "GUI/Widgets/Toggle.h"
 #include "Shared/Definitions/PluginDescriptors.h"
-#include "Shared/Definitions/PluginDesignDimensions.h"
+#include "GUI/Layout/Design/Design.h"
 #include "GUI/Factories/WidgetFactory.h"
 #include "Core/Factories/ApvtsFactory.h"
 
-PatchMutatorPanel::PatchMutatorPanel(tss::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+PatchMutatorPanel::PatchMutatorPanel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : width_(width)
     , height_(height)
     , skin_(&skin)
@@ -30,23 +30,23 @@ PatchMutatorPanel::PatchMutatorPanel(tss::ISkin& skin, int width, int height, Wi
 
 PatchMutatorPanel::~PatchMutatorPanel() = default;
 
-void PatchMutatorPanel::setupModuleHeader(tss::ISkin& skin, WidgetFactory& widgetFactory)
+void PatchMutatorPanel::setupModuleHeader(TSS::ISkin& skin, WidgetFactory& widgetFactory)
 {
-    moduleHeader_ = std::make_unique<tss::ModuleHeader>(
-        PluginDesignDimensions::Widgets::Widths::ModuleHeader::kPatchManagerModule,
-        PluginDesignDimensions::Widgets::Heights::kModuleHeader,
-        tss::moduleHeaderLookFromSkin(skin),
-        tss::ModuleHeader::ColourVariant::Blue,
+    moduleHeader_ = std::make_unique<TSS::ModuleHeader>(
+        TSS::Design::PanelWidgets::Widths::ModuleHeader::kPatchManagerModule,
+        TSS::Design::Atoms::Heights::kModuleHeader,
+        TSS::moduleHeaderLookFromSkin(skin),
+        TSS::ModuleHeader::ColourVariant::Blue,
         widgetFactory.getGroupDisplayName(PluginIDs::PatchManagerSection::PatchMutatorModule::kGroupId));
     addAndMakeVisible(*moduleHeader_);
 }
 
-void PatchMutatorPanel::setupAmountLine(tss::ISkin& skin, WidgetFactory& widgetFactory)
+void PatchMutatorPanel::setupAmountLine(TSS::ISkin& skin, WidgetFactory& widgetFactory)
 {
-    amountLabel_ = std::make_unique<tss::Label>(
-        PluginDesignDimensions::Widgets::Widths::Label::kPatchMutator,
-        PluginDesignDimensions::Widgets::Heights::kLabel,
-        tss::labelLookFromSkin(skin),
+    amountLabel_ = std::make_unique<TSS::Label>(
+        TSS::Design::Atoms::Widths::Label::kPatchMutator,
+        TSS::Design::Atoms::Heights::kLabel,
+        TSS::labelLookFromSkin(skin),
         PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kAmount);
     addAndMakeVisible(*amountLabel_);
 
@@ -56,11 +56,11 @@ void PatchMutatorPanel::setupAmountLine(tss::ISkin& skin, WidgetFactory& widgetF
             return desc.parameterId == PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kAmount;
         });
     
-    amountSlider_ = std::make_unique<tss::Slider>(
-        PluginDesignDimensions::Widgets::Widths::Slider::kPatchMutator,
-        PluginDesignDimensions::Widgets::Heights::kSlider,
-        tss::sliderLookFromSkin(skin),
-        tss::SliderConfig{
+    amountSlider_ = std::make_unique<TSS::Slider>(
+        TSS::Design::Atoms::Widths::Slider::kPatchMutator,
+        TSS::Design::Atoms::Heights::kSlider,
+        TSS::sliderLookFromSkin(skin),
+        TSS::SliderConfig{
             amountIt != allIntParams.end() ? static_cast<double>(amountIt->minValue) : 0.0,
             amountIt != allIntParams.end() ? static_cast<double>(amountIt->maxValue) : 100.0,
             amountIt != allIntParams.end() ? static_cast<double>(amountIt->defaultValue) : 0.0,
@@ -78,57 +78,57 @@ void PatchMutatorPanel::setupAmountLine(tss::ISkin& skin, WidgetFactory& widgetF
     mutateButton_ = widgetFactory.createStandaloneButton(
         PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kMutate,
         skin,
-        PluginDesignDimensions::Widgets::Heights::kButton);
+        TSS::Design::Atoms::Heights::kButton);
     connectButtonToApvts(mutateButton_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kMutate);
     addAndMakeVisible(*mutateButton_);
 
-    dco1Toggle_ = std::make_unique<tss::Toggle>(
-        PluginDesignDimensions::Widgets::Widths::Toggle::kPatchMutator,
-        PluginDesignDimensions::Widgets::Heights::kToggle,
-        tss::toggleLookFromSkin(skin),
+    dco1Toggle_ = std::make_unique<TSS::Toggle>(
+        TSS::Design::Atoms::Widths::Toggle::kPatchMutator,
+        TSS::Design::Atoms::Heights::kToggle,
+        TSS::toggleLookFromSkin(skin),
         PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableDco1);
     connectToggleToApvts(dco1Toggle_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableDco1);
     addAndMakeVisible(*dco1Toggle_);
 
-    dco2Toggle_ = std::make_unique<tss::Toggle>(
-        PluginDesignDimensions::Widgets::Widths::Toggle::kPatchMutator,
-        PluginDesignDimensions::Widgets::Heights::kToggle,
-        tss::toggleLookFromSkin(skin),
+    dco2Toggle_ = std::make_unique<TSS::Toggle>(
+        TSS::Design::Atoms::Widths::Toggle::kPatchMutator,
+        TSS::Design::Atoms::Heights::kToggle,
+        TSS::toggleLookFromSkin(skin),
         PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableDco2);
     connectToggleToApvts(dco2Toggle_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableDco2);
     addAndMakeVisible(*dco2Toggle_);
 
-    vcfVcaToggle_ = std::make_unique<tss::Toggle>(
-        PluginDesignDimensions::Widgets::Widths::Toggle::kPatchMutator,
-        PluginDesignDimensions::Widgets::Heights::kToggle,
-        tss::toggleLookFromSkin(skin),
+    vcfVcaToggle_ = std::make_unique<TSS::Toggle>(
+        TSS::Design::Atoms::Widths::Toggle::kPatchMutator,
+        TSS::Design::Atoms::Heights::kToggle,
+        TSS::toggleLookFromSkin(skin),
         PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableVcfVca);
     connectToggleToApvts(vcfVcaToggle_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableVcfVca);
     addAndMakeVisible(*vcfVcaToggle_);
 
-    fmTrackToggle_ = std::make_unique<tss::Toggle>(
-        PluginDesignDimensions::Widgets::Widths::Toggle::kPatchMutator,
-        PluginDesignDimensions::Widgets::Heights::kToggle,
-        tss::toggleLookFromSkin(skin),
+    fmTrackToggle_ = std::make_unique<TSS::Toggle>(
+        TSS::Design::Atoms::Widths::Toggle::kPatchMutator,
+        TSS::Design::Atoms::Heights::kToggle,
+        TSS::toggleLookFromSkin(skin),
         PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableFmTrack);
     connectToggleToApvts(fmTrackToggle_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableFmTrack);
     addAndMakeVisible(*fmTrackToggle_);
 
-    rampPortamentoToggle_ = std::make_unique<tss::Toggle>(
-        PluginDesignDimensions::Widgets::Widths::Toggle::kPatchMutator,
-        PluginDesignDimensions::Widgets::Heights::kToggle,
-        tss::toggleLookFromSkin(skin),
+    rampPortamentoToggle_ = std::make_unique<TSS::Toggle>(
+        TSS::Design::Atoms::Widths::Toggle::kPatchMutator,
+        TSS::Design::Atoms::Heights::kToggle,
+        TSS::toggleLookFromSkin(skin),
         PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableRampPortamento);
     connectToggleToApvts(rampPortamentoToggle_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableRampPortamento);
     addAndMakeVisible(*rampPortamentoToggle_);
 }
 
-void PatchMutatorPanel::setupRandomLine(tss::ISkin& skin, WidgetFactory& widgetFactory)
+void PatchMutatorPanel::setupRandomLine(TSS::ISkin& skin, WidgetFactory& widgetFactory)
 {
-    randomLabel_ = std::make_unique<tss::Label>(
-        PluginDesignDimensions::Widgets::Widths::Label::kPatchMutator,
-        PluginDesignDimensions::Widgets::Heights::kLabel,
-        tss::labelLookFromSkin(skin),
+    randomLabel_ = std::make_unique<TSS::Label>(
+        TSS::Design::Atoms::Widths::Label::kPatchMutator,
+        TSS::Design::Atoms::Heights::kLabel,
+        TSS::labelLookFromSkin(skin),
         PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kRandom);
     addAndMakeVisible(*randomLabel_);
 
@@ -138,11 +138,11 @@ void PatchMutatorPanel::setupRandomLine(tss::ISkin& skin, WidgetFactory& widgetF
             return desc.parameterId == PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kRandom;
         });
     
-    randomSlider_ = std::make_unique<tss::Slider>(
-        PluginDesignDimensions::Widgets::Widths::Slider::kPatchMutator,
-        PluginDesignDimensions::Widgets::Heights::kSlider,
-        tss::sliderLookFromSkin(skin),
-        tss::SliderConfig{
+    randomSlider_ = std::make_unique<TSS::Slider>(
+        TSS::Design::Atoms::Widths::Slider::kPatchMutator,
+        TSS::Design::Atoms::Heights::kSlider,
+        TSS::sliderLookFromSkin(skin),
+        TSS::SliderConfig{
             randomIt != allIntParams.end() ? static_cast<double>(randomIt->minValue) : 0.0,
             randomIt != allIntParams.end() ? static_cast<double>(randomIt->maxValue) : 100.0,
             randomIt != allIntParams.end() ? static_cast<double>(randomIt->defaultValue) : 0.0,
@@ -160,66 +160,66 @@ void PatchMutatorPanel::setupRandomLine(tss::ISkin& skin, WidgetFactory& widgetF
     retryButton_ = widgetFactory.createStandaloneButton(
         PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kRetry,
         skin,
-        PluginDesignDimensions::Widgets::Heights::kButton);
+        TSS::Design::Atoms::Heights::kButton);
     connectButtonToApvts(retryButton_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kRetry);
     addAndMakeVisible(*retryButton_);
 
-    env1Toggle_ = std::make_unique<tss::Toggle>(
-        PluginDesignDimensions::Widgets::Widths::Toggle::kPatchMutator,
-        PluginDesignDimensions::Widgets::Heights::kToggle,
-        tss::toggleLookFromSkin(skin),
+    env1Toggle_ = std::make_unique<TSS::Toggle>(
+        TSS::Design::Atoms::Widths::Toggle::kPatchMutator,
+        TSS::Design::Atoms::Heights::kToggle,
+        TSS::toggleLookFromSkin(skin),
         PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableEnvelope1);
     connectToggleToApvts(env1Toggle_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableEnvelope1);
     addAndMakeVisible(*env1Toggle_);
 
-    env2Toggle_ = std::make_unique<tss::Toggle>(
-        PluginDesignDimensions::Widgets::Widths::Toggle::kPatchMutator,
-        PluginDesignDimensions::Widgets::Heights::kToggle,
-        tss::toggleLookFromSkin(skin),
+    env2Toggle_ = std::make_unique<TSS::Toggle>(
+        TSS::Design::Atoms::Widths::Toggle::kPatchMutator,
+        TSS::Design::Atoms::Heights::kToggle,
+        TSS::toggleLookFromSkin(skin),
         PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableEnvelope2);
     connectToggleToApvts(env2Toggle_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableEnvelope2);
     addAndMakeVisible(*env2Toggle_);
 
-    env3Toggle_ = std::make_unique<tss::Toggle>(
-        PluginDesignDimensions::Widgets::Widths::Toggle::kPatchMutator,
-        PluginDesignDimensions::Widgets::Heights::kToggle,
-        tss::toggleLookFromSkin(skin),
+    env3Toggle_ = std::make_unique<TSS::Toggle>(
+        TSS::Design::Atoms::Widths::Toggle::kPatchMutator,
+        TSS::Design::Atoms::Heights::kToggle,
+        TSS::toggleLookFromSkin(skin),
         PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableEnvelope3);
     connectToggleToApvts(env3Toggle_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableEnvelope3);
     addAndMakeVisible(*env3Toggle_);
 
-    lfo1Toggle_ = std::make_unique<tss::Toggle>(
-        PluginDesignDimensions::Widgets::Widths::Toggle::kPatchMutator,
-        PluginDesignDimensions::Widgets::Heights::kToggle,
-        tss::toggleLookFromSkin(skin),
+    lfo1Toggle_ = std::make_unique<TSS::Toggle>(
+        TSS::Design::Atoms::Widths::Toggle::kPatchMutator,
+        TSS::Design::Atoms::Heights::kToggle,
+        TSS::toggleLookFromSkin(skin),
         PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableLfo1);
     connectToggleToApvts(lfo1Toggle_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableLfo1);
     addAndMakeVisible(*lfo1Toggle_);
 
-    lfo2Toggle_ = std::make_unique<tss::Toggle>(
-        PluginDesignDimensions::Widgets::Widths::Toggle::kPatchMutator,
-        PluginDesignDimensions::Widgets::Heights::kToggle,
-        tss::toggleLookFromSkin(skin),
+    lfo2Toggle_ = std::make_unique<TSS::Toggle>(
+        TSS::Design::Atoms::Widths::Toggle::kPatchMutator,
+        TSS::Design::Atoms::Heights::kToggle,
+        TSS::toggleLookFromSkin(skin),
         PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableLfo2);
     connectToggleToApvts(lfo2Toggle_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableLfo2);
     addAndMakeVisible(*lfo2Toggle_);
 }
 
-void PatchMutatorPanel::setupHistoryLine(tss::ISkin& skin, WidgetFactory& widgetFactory)
+void PatchMutatorPanel::setupHistoryLine(TSS::ISkin& skin, WidgetFactory& widgetFactory)
 {
-    historyLabel_ = std::make_unique<tss::Label>(
-        PluginDesignDimensions::Widgets::Widths::Label::kPatchMutator,
-        PluginDesignDimensions::Widgets::Heights::kLabel,
-        tss::labelLookFromSkin(skin),
+    historyLabel_ = std::make_unique<TSS::Label>(
+        TSS::Design::Atoms::Widths::Label::kPatchMutator,
+        TSS::Design::Atoms::Heights::kLabel,
+        TSS::labelLookFromSkin(skin),
         PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kHistory);
     addAndMakeVisible(*historyLabel_);
 
-    historyComboBox_ = std::make_unique<tss::ComboBox>(
-        PluginDesignDimensions::Widgets::Widths::ComboBox::kPatchMutatorHistory,
-        PluginDesignDimensions::Widgets::Heights::kComboBox,
-        tss::comboBoxLookFromSkin(skin),
-        tss::ComboBox::Style::Standard);
-    historyComboBox_->setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
+    historyComboBox_ = std::make_unique<TSS::ComboBox>(
+        TSS::Design::Atoms::Widths::ComboBox::kPatchMutatorHistory,
+        TSS::Design::Atoms::Heights::kComboBox,
+        TSS::comboBoxLookFromSkin(skin),
+        TSS::ComboBox::Style::Standard);
+    historyComboBox_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
     historyComboBox_->addItem(PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEmptyHistory, 1);
     historyComboBox_->setSelectedId(1);
     historyComboBox_->onChange = [this]
@@ -237,33 +237,33 @@ void PatchMutatorPanel::setupHistoryLine(tss::ISkin& skin, WidgetFactory& widget
     compareButton_ = widgetFactory.createStandaloneButton(
         PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kCompare,
         skin,
-        PluginDesignDimensions::Widgets::Heights::kButton);
+        TSS::Design::Atoms::Heights::kButton);
     connectButtonToApvts(compareButton_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kCompare);
     addAndMakeVisible(*compareButton_);
 
     deleteButton_ = widgetFactory.createStandaloneButton(
         PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kDelete,
         skin,
-        PluginDesignDimensions::Widgets::Heights::kButton);
+        TSS::Design::Atoms::Heights::kButton);
     connectButtonToApvts(deleteButton_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kDelete);
     addAndMakeVisible(*deleteButton_);
 
     clearButton_ = widgetFactory.createStandaloneButton(
         PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kClear,
         skin,
-        PluginDesignDimensions::Widgets::Heights::kButton);
+        TSS::Design::Atoms::Heights::kButton);
     connectButtonToApvts(clearButton_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kClear);
     addAndMakeVisible(*clearButton_);
 
     exportButton_ = widgetFactory.createStandaloneButton(
         PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kExport,
         skin,
-        PluginDesignDimensions::Widgets::Heights::kButton);
+        TSS::Design::Atoms::Heights::kButton);
     connectButtonToApvts(exportButton_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kExport);
     addAndMakeVisible(*exportButton_);
 }
 
-void PatchMutatorPanel::connectButtonToApvts(tss::Button* button, const char* widgetId)
+void PatchMutatorPanel::connectButtonToApvts(TSS::Button* button, const char* widgetId)
 {
     if (button != nullptr)
     {
@@ -274,7 +274,7 @@ void PatchMutatorPanel::connectButtonToApvts(tss::Button* button, const char* wi
     }
 }
 
-void PatchMutatorPanel::connectToggleToApvts(tss::Toggle* toggle, const char* widgetId)
+void PatchMutatorPanel::connectToggleToApvts(TSS::Toggle* toggle, const char* widgetId)
 {
     if (toggle != nullptr)
     {
@@ -289,16 +289,16 @@ void PatchMutatorPanel::resized()
 {
     const float sf = uiScale_;
 
-    const int moduleHeaderW = juce::roundToInt(static_cast<float>(PluginDesignDimensions::Widgets::Widths::ModuleHeader::kPatchManagerModule) * sf);
-    const int moduleHeaderH = juce::roundToInt(static_cast<float>(PluginDesignDimensions::Widgets::Heights::kModuleHeader) * sf);
+    const int moduleHeaderW = juce::roundToInt(static_cast<float>(TSS::Design::PanelWidgets::Widths::ModuleHeader::kPatchManagerModule) * sf);
+    const int moduleHeaderH = juce::roundToInt(static_cast<float>(TSS::Design::Atoms::Heights::kModuleHeader) * sf);
 
     if (auto* header = moduleHeader_.get())
         header->setBounds(0, 0, moduleHeaderW, moduleHeaderH);
 
     // Y positions for the 3 lines, computed independently from float origin
-    const int row0Y = juce::roundToInt(static_cast<float>(PluginDesignDimensions::Widgets::Heights::kModuleHeader + kGap_) * sf);
-    const int row1Y = juce::roundToInt(static_cast<float>(PluginDesignDimensions::Widgets::Heights::kModuleHeader + kGap_ + PluginDesignDimensions::Widgets::Heights::kLabel + kGap_) * sf);
-    const int row2Y = juce::roundToInt(static_cast<float>(PluginDesignDimensions::Widgets::Heights::kModuleHeader + kGap_ + (PluginDesignDimensions::Widgets::Heights::kLabel + kGap_) * 2) * sf);
+    const int row0Y = juce::roundToInt(static_cast<float>(TSS::Design::Atoms::Heights::kModuleHeader + kGap_) * sf);
+    const int row1Y = juce::roundToInt(static_cast<float>(TSS::Design::Atoms::Heights::kModuleHeader + kGap_ + TSS::Design::Atoms::Heights::kLabel + kGap_) * sf);
+    const int row2Y = juce::roundToInt(static_cast<float>(TSS::Design::Atoms::Heights::kModuleHeader + kGap_ + (TSS::Design::Atoms::Heights::kLabel + kGap_) * 2) * sf);
 
     layoutSliderLine(0, row0Y, amountLabel_.get(), amountSlider_.get(), mutateButton_.get(),
         {dco1Toggle_.get(), dco2Toggle_.get(), vcfVcaToggle_.get(), fmTrackToggle_.get(), rampPortamentoToggle_.get()});
@@ -331,9 +331,9 @@ void PatchMutatorPanel::resized()
     if (lfo2Toggle_)              lfo2Toggle_->setUiScale(sf);
 }
 
-void PatchMutatorPanel::layoutSliderLine(int x, int y, tss::Label* label, tss::Slider* slider, tss::Button* button, const std::vector<tss::Toggle*>& toggles)
+void PatchMutatorPanel::layoutSliderLine(int x, int y, TSS::Label* label, TSS::Slider* slider, TSS::Button* button, const std::vector<TSS::Toggle*>& toggles)
 {
-    using namespace PluginDesignDimensions::Widgets;
+    using namespace TSS::Design::Atoms;
     const float sf = uiScale_;
 
     const int labelW      = juce::roundToInt(static_cast<float>(Widths::Label::kPatchMutator) * sf);
@@ -371,7 +371,7 @@ void PatchMutatorPanel::layoutSliderLine(int x, int y, tss::Label* label, tss::S
 
 void PatchMutatorPanel::layoutHistoryLine(int x, int y)
 {
-    using namespace PluginDesignDimensions::Widgets;
+    using namespace TSS::Design::Atoms;
     const float sf = uiScale_;
 
     const int labelW      = juce::roundToInt(static_cast<float>(Widths::Label::kPatchMutator) * sf);
@@ -405,7 +405,7 @@ void PatchMutatorPanel::layoutHistoryLine(int x, int y)
         button->setBounds(juce::roundToInt(originX + labelStep + comboStep + compareStep + deleteStep + clearStep), y, exportW, labelH);
 }
 
-void PatchMutatorPanel::setSkin(tss::ISkin& skin)
+void PatchMutatorPanel::setSkin(TSS::ISkin& skin)
 {
     skin_ = &skin;
     propagateSkinsToControlWidgets(skin);
@@ -421,43 +421,43 @@ void PatchMutatorPanel::setUiScale(float uiScale)
     repaint();
 }
 
-void PatchMutatorPanel::propagateSkinsToControlWidgets(tss::ISkin& skin)
+void PatchMutatorPanel::propagateSkinsToControlWidgets(TSS::ISkin& skin)
 {
     if (moduleHeader_)
-        moduleHeader_->setLook(tss::moduleHeaderLookFromSkin(skin));
+        moduleHeader_->setLook(TSS::moduleHeaderLookFromSkin(skin));
 
     if (amountLabel_)
-        amountLabel_->setLook(tss::labelLookFromSkin(skin));
+        amountLabel_->setLook(TSS::labelLookFromSkin(skin));
     if (amountSlider_)
-        amountSlider_->setLook(tss::sliderLookFromSkin(skin));
+        amountSlider_->setLook(TSS::sliderLookFromSkin(skin));
     if (randomLabel_)
-        randomLabel_->setLook(tss::labelLookFromSkin(skin));
+        randomLabel_->setLook(TSS::labelLookFromSkin(skin));
     if (randomSlider_)
-        randomSlider_->setLook(tss::sliderLookFromSkin(skin));
+        randomSlider_->setLook(TSS::sliderLookFromSkin(skin));
     if (historyLabel_)
-        historyLabel_->setLook(tss::labelLookFromSkin(skin));
+        historyLabel_->setLook(TSS::labelLookFromSkin(skin));
     if (historyComboBox_)
     {
-        historyComboBox_->setLook(tss::comboBoxLookFromSkin(skin));
-        historyComboBox_->setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
+        historyComboBox_->setLook(TSS::comboBoxLookFromSkin(skin));
+        historyComboBox_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
     }
     if (mutateButton_)
-        mutateButton_->setLook(tss::buttonLookFromSkin(skin));
+        mutateButton_->setLook(TSS::buttonLookFromSkin(skin));
     if (retryButton_)
-        retryButton_->setLook(tss::buttonLookFromSkin(skin));
+        retryButton_->setLook(TSS::buttonLookFromSkin(skin));
     if (compareButton_)
-        compareButton_->setLook(tss::buttonLookFromSkin(skin));
+        compareButton_->setLook(TSS::buttonLookFromSkin(skin));
     if (deleteButton_)
-        deleteButton_->setLook(tss::buttonLookFromSkin(skin));
+        deleteButton_->setLook(TSS::buttonLookFromSkin(skin));
     if (clearButton_)
-        clearButton_->setLook(tss::buttonLookFromSkin(skin));
+        clearButton_->setLook(TSS::buttonLookFromSkin(skin));
     if (exportButton_)
-        exportButton_->setLook(tss::buttonLookFromSkin(skin));
+        exportButton_->setLook(TSS::buttonLookFromSkin(skin));
 }
 
-void PatchMutatorPanel::propagateSkinsToToggleWidgets(tss::ISkin& skin)
+void PatchMutatorPanel::propagateSkinsToToggleWidgets(TSS::ISkin& skin)
 {
-    const auto toggleLook = tss::toggleLookFromSkin(skin);
+    const auto toggleLook = TSS::toggleLookFromSkin(skin);
     if (dco1Toggle_)
         dco1Toggle_->setLook(toggleLook);
     if (dco2Toggle_)

@@ -10,7 +10,7 @@
 #include "Shared/Definitions/PluginDescriptors.h"
 #include "WidgetFactoryValidator.h"
 
-namespace tss
+namespace TSS
 {
     class ISkin;
     class Slider;
@@ -27,25 +27,25 @@ public:
     // Widget Creation Methods
     // ============================================================================
     
-    std::unique_ptr<tss::Slider> createIntParameterSlider(
+    std::unique_ptr<TSS::Slider> createIntParameterSlider(
         const juce::String& parameterId,
-        tss::ISkin& skin);
+        TSS::ISkin& skin);
 
-    std::unique_ptr<tss::Slider> createIntParameterSlider(
+    std::unique_ptr<TSS::Slider> createIntParameterSlider(
         const juce::String& parameterId,
-        tss::ISkin& skin,
+        TSS::ISkin& skin,
         int width,
         int height);
     
-    std::unique_ptr<tss::ComboBox> createChoiceParameterComboBox(
+    std::unique_ptr<TSS::ComboBox> createChoiceParameterComboBox(
         const juce::String& parameterId,
-        tss::ISkin& skin,
+        TSS::ISkin& skin,
         int width,
         int height);
     
-    std::unique_ptr<tss::Button> createStandaloneButton(
+    std::unique_ptr<TSS::Button> createStandaloneButton(
         const juce::String& widgetId,
-        tss::ISkin& skin,
+        TSS::ISkin& skin,
         int height);
 
     // ============================================================================
@@ -84,7 +84,7 @@ private:
     void addChoiceParametersToMap(const std::vector<PluginDescriptors::ChoiceParameterDescriptor>& parameters);
     void addStandaloneWidgetsToMap(const std::vector<PluginDescriptors::StandaloneWidgetDescriptor>& widgets);
     
-    std::unique_ptr<tss::Slider> createSliderFromDescriptor(const PluginDescriptors::IntParameterDescriptor* desc, tss::ISkin& skin, int width, int height);
-    std::unique_ptr<tss::ComboBox> createComboBoxFromDescriptor(const PluginDescriptors::ChoiceParameterDescriptor* desc, tss::ISkin& skin, int width, int height);
+    std::unique_ptr<TSS::Slider> createSliderFromDescriptor(const PluginDescriptors::IntParameterDescriptor* desc, TSS::ISkin& skin, int width, int height);
+    std::unique_ptr<TSS::ComboBox> createComboBoxFromDescriptor(const PluginDescriptors::ChoiceParameterDescriptor* desc, TSS::ISkin& skin, int width, int height);
 };
 

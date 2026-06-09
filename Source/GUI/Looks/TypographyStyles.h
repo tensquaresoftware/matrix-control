@@ -2,7 +2,7 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
-namespace tss
+namespace TSS
 {
     enum class TypographyStyleId
     {

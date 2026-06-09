@@ -5,7 +5,7 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 
-namespace tss
+namespace TSS
 {
     class ISkin;
     class SectionHeader;
@@ -19,11 +19,11 @@ class MiscPanel;
 class MasterEditPanel : public juce::Component
 {
 public:
-    MasterEditPanel(tss::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    MasterEditPanel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~MasterEditPanel() override;
 
     void resized() override;
-    void setSkin(tss::ISkin& skin);
+    void setSkin(TSS::ISkin& skin);
     void setUiScale(float uiScale);
 
 private:
@@ -33,10 +33,10 @@ private:
     int midiPanelHeight_;
     int vibratoPanelHeight_;
     int miscPanelHeight_;
-    tss::ISkin* skin_;
+    TSS::ISkin* skin_;
     float uiScale_ = 1.0f;
 
-    std::unique_ptr<tss::SectionHeader> sectionHeader_;
+    std::unique_ptr<TSS::SectionHeader> sectionHeader_;
     std::unique_ptr<MidiPanel> midiPanel_;
     std::unique_ptr<VibratoPanel> vibratoPanel_;
     std::unique_ptr<MiscPanel> miscPanel_;

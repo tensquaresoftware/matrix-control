@@ -5,7 +5,7 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
-namespace tss
+namespace TSS
 {
     class ISkin;
 }
@@ -13,7 +13,7 @@ namespace tss
 class TestSliders : public juce::Component
 {
 public:
-    explicit TestSliders(tss::ISkin& skin);
+    explicit TestSliders(TSS::ISkin& skin);
     ~TestSliders() override;
 
     void resized() override;
@@ -34,7 +34,7 @@ private:
 
     std::vector<std::unique_ptr<SliderScalePanel>> columnPanels_;
 
-    void createColumnPanels(tss::ISkin& skin);
+    void createColumnPanels(TSS::ISkin& skin);
     void layoutColumnPanels();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TestSliders)

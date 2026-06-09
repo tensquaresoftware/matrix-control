@@ -9,7 +9,7 @@
 
 class WidgetFactory;
 
-namespace tss
+namespace TSS
 {
     class ISkin;
     class Button;

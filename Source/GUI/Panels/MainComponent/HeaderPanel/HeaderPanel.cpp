@@ -9,7 +9,7 @@
 #include "GUI/Looks/LookBuilders.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 
-using tss::SkinColourId;
+using TSS::SkinColourId;
 
 namespace
 {
@@ -41,38 +41,38 @@ namespace
     }
 }
 
-HeaderPanel::HeaderPanel(tss::ISkin& skin, int width, int height)
+HeaderPanel::HeaderPanel(TSS::ISkin& skin, int width, int height)
     : width_(width)
     , height_(height)
     , skin_(&skin)
-    , midiFromLabel_(kEditorMidiFromLabelWidth_, kControlHeight_, tss::headerPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kEditorMidiFromLabel, tss::LabelStyle::HeaderPanel)
-    , midiFromComboBox_(kPortComboBoxWidth_, kControlHeight_, tss::comboBoxLookFromSkin(skin), tss::ComboBox::Style::ButtonLike)
+    , midiFromLabel_(kEditorMidiFromLabelWidth_, kControlHeight_, TSS::headerPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kEditorMidiFromLabel, TSS::LabelStyle::HeaderPanel)
+    , midiFromComboBox_(kPortComboBoxWidth_, kControlHeight_, TSS::comboBoxLookFromSkin(skin), TSS::ComboBox::Style::ButtonLike)
     , editorActivityLed_(kActivityLedSize_, kActivityLedSize_)
-    , midiToLabel_(kMidiToLabelWidth_, kControlHeight_, tss::headerPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kMidiToLabel, tss::LabelStyle::HeaderPanel)
-    , midiToComboBox_(kPortComboBoxWidth_, kControlHeight_, tss::comboBoxLookFromSkin(skin), tss::ComboBox::Style::ButtonLike)
+    , midiToLabel_(kMidiToLabelWidth_, kControlHeight_, TSS::headerPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kMidiToLabel, TSS::LabelStyle::HeaderPanel)
+    , midiToComboBox_(kPortComboBoxWidth_, kControlHeight_, TSS::comboBoxLookFromSkin(skin), TSS::ComboBox::Style::ButtonLike)
     , midiToActivityLed_(kActivityLedSize_, kActivityLedSize_)
-    , keyboardFromLabel_(kKeyboardFromLabelWidth_, kControlHeight_, tss::headerPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kKeyboardFromLabel, tss::LabelStyle::HeaderPanel)
-    , keyboardFromComboBox_(kPortComboBoxWidth_, kControlHeight_, tss::comboBoxLookFromSkin(skin), tss::ComboBox::Style::ButtonLike)
+    , keyboardFromLabel_(kKeyboardFromLabelWidth_, kControlHeight_, TSS::headerPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kKeyboardFromLabel, TSS::LabelStyle::HeaderPanel)
+    , keyboardFromComboBox_(kPortComboBoxWidth_, kControlHeight_, TSS::comboBoxLookFromSkin(skin), TSS::ComboBox::Style::ButtonLike)
     , instrumentActivityLed_(kActivityLedSize_, kActivityLedSize_)
-    , settingsButton_(kSettingsButtonWidth_, kControlHeight_, tss::buttonLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kSettingsButton)
-    , uiElementsButton_(kUiElementsButtonWidth_, kControlHeight_, tss::buttonLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kUiElementsButton)
+    , settingsButton_(kSettingsButtonWidth_, kControlHeight_, TSS::buttonLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kSettingsButton)
+    , uiElementsButton_(kUiElementsButtonWidth_, kControlHeight_, TSS::buttonLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kUiElementsButton)
 {
     setOpaque(true);
 
     addAndMakeVisible(midiFromLabel_);
-    midiFromComboBox_.setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
+    midiFromComboBox_.setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
     addAndMakeVisible(midiFromComboBox_);
     editorActivityLed_.setSkin(skin);
     addAndMakeVisible(editorActivityLed_);
 
     addAndMakeVisible(midiToLabel_);
-    midiToComboBox_.setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
+    midiToComboBox_.setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
     addAndMakeVisible(midiToComboBox_);
     midiToActivityLed_.setSkin(skin);
     addAndMakeVisible(midiToActivityLed_);
 
     addAndMakeVisible(keyboardFromLabel_);
-    keyboardFromComboBox_.setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
+    keyboardFromComboBox_.setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
     addAndMakeVisible(keyboardFromComboBox_);
     instrumentActivityLed_.setSkin(skin);
     addAndMakeVisible(instrumentActivityLed_);
@@ -116,21 +116,21 @@ void HeaderPanel::resized()
                                               + (controlHeight - activityLedSize) * 0.5f);
     const int activityLedH = juce::roundToInt(activityLedSize);
 
-    auto placePacketLabel = [&](tss::Label& label, float labelWidth)
+    auto placePacketLabel = [&](TSS::Label& label, float labelWidth)
     {
         label.setBounds(juce::roundToInt(x), y, juce::roundToInt(labelWidth), h);
         label.setUiScale(uiScale_);
         x += labelWidth + gap;
     };
 
-    auto placePacketCombo = [&](tss::ComboBox& combo, float comboWidth)
+    auto placePacketCombo = [&](TSS::ComboBox& combo, float comboWidth)
     {
         combo.setBounds(juce::roundToInt(x), y, juce::roundToInt(comboWidth), h);
         combo.setUiScale(uiScale_);
         x += comboWidth + gap;
     };
 
-    auto placePacketActivityLed = [&](tss::ActivityLed& led)
+    auto placePacketActivityLed = [&](TSS::ActivityLed& led)
     {
         led.setBounds(juce::roundToInt(x), activityLedY, juce::roundToInt(activityLedSize), activityLedH);
         led.setUiScale(uiScale_);
@@ -168,23 +168,23 @@ void HeaderPanel::resized()
     uiElementsButton_.setUiScale(uiScale_);
 }
 
-void HeaderPanel::setSkin(tss::ISkin& skin)
+void HeaderPanel::setSkin(TSS::ISkin& skin)
 {
     skin_ = &skin;
-    midiFromLabel_.setLook(tss::headerPanelLabelLookFromSkin(skin));
-    midiFromComboBox_.setLook(tss::comboBoxLookFromSkin(skin));
-    midiFromComboBox_.setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
-    midiToLabel_.setLook(tss::headerPanelLabelLookFromSkin(skin));
-    midiToComboBox_.setLook(tss::comboBoxLookFromSkin(skin));
-    midiToComboBox_.setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
-    keyboardFromLabel_.setLook(tss::headerPanelLabelLookFromSkin(skin));
-    keyboardFromComboBox_.setLook(tss::comboBoxLookFromSkin(skin));
-    keyboardFromComboBox_.setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
+    midiFromLabel_.setLook(TSS::headerPanelLabelLookFromSkin(skin));
+    midiFromComboBox_.setLook(TSS::comboBoxLookFromSkin(skin));
+    midiFromComboBox_.setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
+    midiToLabel_.setLook(TSS::headerPanelLabelLookFromSkin(skin));
+    midiToComboBox_.setLook(TSS::comboBoxLookFromSkin(skin));
+    midiToComboBox_.setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
+    keyboardFromLabel_.setLook(TSS::headerPanelLabelLookFromSkin(skin));
+    keyboardFromComboBox_.setLook(TSS::comboBoxLookFromSkin(skin));
+    keyboardFromComboBox_.setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
     editorActivityLed_.setSkin(skin);
     midiToActivityLed_.setSkin(skin);
     instrumentActivityLed_.setSkin(skin);
-    settingsButton_.setLook(tss::buttonLookFromSkin(skin));
-    uiElementsButton_.setLook(tss::buttonLookFromSkin(skin));
+    settingsButton_.setLook(TSS::buttonLookFromSkin(skin));
+    uiElementsButton_.setLook(TSS::buttonLookFromSkin(skin));
 }
 
 void HeaderPanel::setUiScale(float uiScale)
@@ -220,7 +220,7 @@ void HeaderPanel::populateMidiPortLists()
         configureStandaloneKeyboardFrom();
 }
 
-void HeaderPanel::populateInputPortCombo(tss::ComboBox& combo, std::vector<juce::String>& identifiers)
+void HeaderPanel::populateInputPortCombo(TSS::ComboBox& combo, std::vector<juce::String>& identifiers)
 {
     const juce::String previousIdentifier = getPortIdentifierForItemId(identifiers, combo.getSelectedId());
 
@@ -242,7 +242,7 @@ void HeaderPanel::populateInputPortCombo(tss::ComboBox& combo, std::vector<juce:
                         juce::dontSendNotification);
 }
 
-void HeaderPanel::populateOutputPortCombo(tss::ComboBox& combo, std::vector<juce::String>& identifiers)
+void HeaderPanel::populateOutputPortCombo(TSS::ComboBox& combo, std::vector<juce::String>& identifiers)
 {
     const juce::String previousIdentifier = getPortIdentifierForItemId(identifiers, combo.getSelectedId());
 
@@ -323,7 +323,7 @@ int HeaderPanel::findItemIdForIdentifier(const std::vector<juce::String>& identi
     return findItemIdForPortIdentifier(identifiers, deviceId);
 }
 
-juce::String HeaderPanel::getSelectedPortIdentifier(const tss::ComboBox& combo,
+juce::String HeaderPanel::getSelectedPortIdentifier(const TSS::ComboBox& combo,
                                                     const std::vector<juce::String>& identifiers) const
 {
     return getPortIdentifierForItemId(identifiers, combo.getSelectedId());

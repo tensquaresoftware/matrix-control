@@ -9,7 +9,7 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_gui_basics/juce_gui_basics.h>
 
-namespace tss
+namespace TSS
 {
     class EnvelopeDisplay;
     class Slider;
@@ -23,10 +23,10 @@ class InteractiveDisplayApvtsSync : private juce::AudioProcessorValueTreeState::
 {
 public:
     InteractiveDisplayApvtsSync(juce::AudioProcessorValueTreeState& apvts,
-                                tss::EnvelopeDisplay& envelope1,
-                                tss::EnvelopeDisplay& envelope2,
-                                tss::EnvelopeDisplay& envelope3,
-                                tss::TrackGeneratorDisplay& trackGenerator);
+                                TSS::EnvelopeDisplay& envelope1,
+                                TSS::EnvelopeDisplay& envelope2,
+                                TSS::EnvelopeDisplay& envelope3,
+                                TSS::TrackGeneratorDisplay& trackGenerator);
     ~InteractiveDisplayApvtsSync() override;
 
     void syncAllFromApvts();
@@ -48,17 +48,17 @@ private:
     class SliderToDisplayListener;
 
     juce::AudioProcessorValueTreeState& apvts_;
-    tss::EnvelopeDisplay& envelope1_;
-    tss::EnvelopeDisplay& envelope2_;
-    tss::EnvelopeDisplay& envelope3_;
-    tss::TrackGeneratorDisplay& trackGenerator_;
+    TSS::EnvelopeDisplay& envelope1_;
+    TSS::EnvelopeDisplay& envelope2_;
+    TSS::EnvelopeDisplay& envelope3_;
+    TSS::TrackGeneratorDisplay& trackGenerator_;
     juce::AudioProcessorParameter* activeGestureParameter_ {nullptr};
     std::vector<juce::String> listenedParameterIds_;
     std::vector<std::unique_ptr<SliderToDisplayListener>> sliderListeners_;
-    std::map<juce::String, tss::Slider*> slidersByParameterId_;
+    std::map<juce::String, TSS::Slider*> slidersByParameterId_;
 
     void connectDisplayCallbacks();
-    void connectEnvelopeDisplay(tss::EnvelopeDisplay& display,
+    void connectEnvelopeDisplay(TSS::EnvelopeDisplay& display,
                                 const EnvelopeParameterBinding* bindings,
                                 int bindingCount);
     void connectTrackGeneratorDisplay();
@@ -67,19 +67,19 @@ private:
     int readIntParameter(const juce::String& parameterId) const;
     void writeIntParameter(const juce::String& parameterId, int value);
     void updateSliderUi(const juce::String& parameterId, int value);
-    void registerSliderForParameter(tss::Slider& slider, const juce::String& parameterId);
+    void registerSliderForParameter(TSS::Slider& slider, const juce::String& parameterId);
     void beginParameterGesture(const juce::String& parameterId);
     void endParameterGesture();
 
     bool applyApvtsChange(const juce::String& parameterId);
-    void applyEnvelopeDisplayValue(tss::EnvelopeDisplay& display, int paramIndex, int value);
+    void applyEnvelopeDisplayValue(TSS::EnvelopeDisplay& display, int paramIndex, int value);
     void applyTrackPointDisplayValue(int pointIndex, int value);
 
-    void connectEnvelopeSlider(tss::Slider& slider,
-                               tss::EnvelopeDisplay& display,
+    void connectEnvelopeSlider(TSS::Slider& slider,
+                               TSS::EnvelopeDisplay& display,
                                int paramIndex,
                                const juce::String& parameterId);
-    void connectTrackPointSlider(tss::Slider& slider, int pointIndex, const juce::String& parameterId);
+    void connectTrackPointSlider(TSS::Slider& slider, int pointIndex, const juce::String& parameterId);
 
     void parameterChanged(const juce::String& parameterId, float newValue) override;
 

@@ -6,9 +6,9 @@
 #include "GUI/Widgets/ModuleHeader.h"
 #include "GUI/Widgets/ParameterCell.h"
 #include "GUI/Factories/WidgetFactory.h"
-#include "Shared/Definitions/PluginDesignDimensions.h"
+#include "GUI/Layout/Design/Design.h"
 
-BaseModulePanel::BaseModulePanel(tss::ISkin& skin,
+BaseModulePanel::BaseModulePanel(TSS::ISkin& skin,
                                  WidgetFactory& widgetFactory,
                                  juce::AudioProcessorValueTreeState& apvts,
                                  const ModulePanelConfig& config,
@@ -21,14 +21,14 @@ BaseModulePanel::BaseModulePanel(tss::ISkin& skin,
     setOpaque(false);
     
     const auto buttonSet = (config.buttonSet == ModulePanelButtonSet::InitCopyPaste)
-        ? tss::ModuleHeader::ButtonSet::InitCopyPaste
-        : tss::ModuleHeader::ButtonSet::InitOnly;
+        ? TSS::ModuleHeader::ButtonSet::InitCopyPaste
+        : TSS::ModuleHeader::ButtonSet::InitOnly;
     
     const auto columnLayout = (config.moduleType == ModulePanelModuleType::PatchEdit)
-        ? tss::ModuleHeader::ColumnLayout::PatchEdit
-        : tss::ModuleHeader::ColumnLayout::MasterEdit;
+        ? TSS::ModuleHeader::ColumnLayout::PatchEdit
+        : TSS::ModuleHeader::ColumnLayout::MasterEdit;
     
-    const tss::ModuleHeader::WithActionsSpec spec {
+    const TSS::ModuleHeader::WithActionsSpec spec {
         skin,
         widgetFactory,
         apvts,
@@ -39,7 +39,7 @@ BaseModulePanel::BaseModulePanel(tss::ISkin& skin,
         config.copyWidgetId,
         config.pasteWidgetId
     };
-    moduleHeader_ = std::make_unique<tss::ModuleHeader>(spec);
+    moduleHeader_ = std::make_unique<TSS::ModuleHeader>(spec);
     addAndMakeVisible(*moduleHeader_);
 
     for (const auto& paramConfig : config.parameters)
@@ -75,8 +75,8 @@ void BaseModulePanel::resized()
 
     if (auto* header = moduleHeader_.get())
     {
-        const int headerHeight = tss::ScaledLayout::scaledInt(
-            static_cast<float>(tss::ModuleHeader::getDesignHeight()), uiScale_);
+        const int headerHeight = TSS::ScaledLayout::scaledInt(
+            static_cast<float>(TSS::ModuleHeader::getDesignHeight()), uiScale_);
         header->setBounds(bounds.removeFromTop(headerHeight));
     }
 
@@ -84,8 +84,8 @@ void BaseModulePanel::resized()
     if (paramCount == 0)
         return;
 
-    const int designRowTotal = PluginDesignDimensions::Widgets::Heights::kLabel + PluginDesignDimensions::Widgets::Heights::kHorizontalSeparator;
-    const auto rowHeights = tss::ScaledLayout::distributeFixedDesignRowsWithRemainderAtBottom(
+    const int designRowTotal = TSS::Design::Recipes::ParameterCell::kHeight;
+    const auto rowHeights = TSS::ScaledLayout::distributeFixedDesignRowsWithRemainderAtBottom(
         bounds.getHeight(), paramCount, designRowTotal, uiScale_);
 
     int y = bounds.getY();
@@ -97,13 +97,13 @@ void BaseModulePanel::resized()
     }
 }
 
-void BaseModulePanel::setSkin(tss::ISkin& skin)
+void BaseModulePanel::setSkin(TSS::ISkin& skin)
 {
     skin_ = &skin;
-    tss::propagateSkin(skin, moduleHeader_.get());
+    TSS::propagateSkin(skin, moduleHeader_.get());
 
     for (auto& cell : parameterCells_)
-        tss::propagateSkin(skin, cell.get());
+        TSS::propagateSkin(skin, cell.get());
 }
 
 void BaseModulePanel::setUiScale(float uiScale)

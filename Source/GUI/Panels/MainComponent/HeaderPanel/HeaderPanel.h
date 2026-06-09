@@ -8,7 +8,7 @@
 #include "GUI/Widgets/ComboBox.h"
 #include "GUI/Widgets/Label.h"
 
-namespace tss
+namespace TSS
 {
     class ISkin;
     class Label;
@@ -20,12 +20,12 @@ class HeaderPanel : public juce::Component
 public:
     static constexpr int kPortSentinelItemId = 0;
 
-    HeaderPanel(tss::ISkin& skin, int width, int height);
+    HeaderPanel(TSS::ISkin& skin, int width, int height);
     ~HeaderPanel() override = default;
 
     void paint(juce::Graphics&) override;
     void resized() override;
-    void setSkin(tss::ISkin& skin);
+    void setSkin(TSS::ISkin& skin);
     void setUiScale(float uiScale);
     void setPluginMode(bool isPlugin);
 
@@ -40,25 +40,25 @@ public:
     void selectMidiToPort(const juce::String& deviceId);
     void selectKeyboardFromPort(const juce::String& deviceId);
 
-    tss::ComboBox& getMidiFromComboBox() { return midiFromComboBox_; }
-    tss::ComboBox& getMidiToComboBox() { return midiToComboBox_; }
-    tss::ComboBox& getKeyboardFromComboBox() { return keyboardFromComboBox_; }
-    tss::Button& getSettingsButton() { return settingsButton_; }
-    tss::Button& getUiElementsButton() { return uiElementsButton_; }
-    tss::ActivityLed& getInstrumentActivityLed() { return instrumentActivityLed_; }
-    tss::ActivityLed& getEditorActivityLed() { return editorActivityLed_; }
-    tss::ActivityLed& getMidiToActivityLed() { return midiToActivityLed_; }
+    TSS::ComboBox& getMidiFromComboBox() { return midiFromComboBox_; }
+    TSS::ComboBox& getMidiToComboBox() { return midiToComboBox_; }
+    TSS::ComboBox& getKeyboardFromComboBox() { return keyboardFromComboBox_; }
+    TSS::Button& getSettingsButton() { return settingsButton_; }
+    TSS::Button& getUiElementsButton() { return uiElementsButton_; }
+    TSS::ActivityLed& getInstrumentActivityLed() { return instrumentActivityLed_; }
+    TSS::ActivityLed& getEditorActivityLed() { return editorActivityLed_; }
+    TSS::ActivityLed& getMidiToActivityLed() { return midiToActivityLed_; }
 
     static int getGap() { return kGap_; }
 
 private:
-    void populateInputPortCombo(tss::ComboBox& combo, std::vector<juce::String>& identifiers);
-    void populateOutputPortCombo(tss::ComboBox& combo, std::vector<juce::String>& identifiers);
+    void populateInputPortCombo(TSS::ComboBox& combo, std::vector<juce::String>& identifiers);
+    void populateOutputPortCombo(TSS::ComboBox& combo, std::vector<juce::String>& identifiers);
     void configurePluginModeKeyboardFrom();
     void configureStandaloneKeyboardFrom();
     int findItemIdForIdentifier(const std::vector<juce::String>& identifiers,
                                 const juce::String& deviceId) const;
-    juce::String getSelectedPortIdentifier(const tss::ComboBox& combo,
+    juce::String getSelectedPortIdentifier(const TSS::ComboBox& combo,
                                            const std::vector<juce::String>& identifiers) const;
 
     int width_;
@@ -76,21 +76,21 @@ private:
     inline constexpr static int kSettingsButtonWidth_ = 72;
     inline constexpr static int kUiElementsButtonWidth_ = 88;
 
-    tss::ISkin* skin_;
+    TSS::ISkin* skin_;
     float uiScale_ = 1.0f;
     bool isPluginMode_ = false;
 
-    tss::Label midiFromLabel_;
-    tss::ComboBox midiFromComboBox_;
-    tss::ActivityLed editorActivityLed_;
-    tss::Label midiToLabel_;
-    tss::ComboBox midiToComboBox_;
-    tss::ActivityLed midiToActivityLed_;
-    tss::Label keyboardFromLabel_;
-    tss::ComboBox keyboardFromComboBox_;
-    tss::ActivityLed instrumentActivityLed_;
-    tss::Button settingsButton_;
-    tss::Button uiElementsButton_;
+    TSS::Label midiFromLabel_;
+    TSS::ComboBox midiFromComboBox_;
+    TSS::ActivityLed editorActivityLed_;
+    TSS::Label midiToLabel_;
+    TSS::ComboBox midiToComboBox_;
+    TSS::ActivityLed midiToActivityLed_;
+    TSS::Label keyboardFromLabel_;
+    TSS::ComboBox keyboardFromComboBox_;
+    TSS::ActivityLed instrumentActivityLed_;
+    TSS::Button settingsButton_;
+    TSS::Button uiElementsButton_;
 
     std::vector<juce::String> midiFromPortIdentifiers_;
     std::vector<juce::String> midiToPortIdentifiers_;

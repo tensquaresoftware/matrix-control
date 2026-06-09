@@ -5,7 +5,7 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
-namespace tss
+namespace TSS
 {
     class ISkin;
 }
@@ -16,13 +16,13 @@ class SettingsCloseButton : public juce::Button
 {
 public:
     SettingsCloseButton();
-    void setSkin(tss::ISkin& skin);
+    void setSkin(TSS::ISkin& skin);
     void setUiScale(float uiScale);
 
     void paintButton(juce::Graphics& g, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override;
 
 private:
-    tss::ISkin* skin_ = nullptr;
+    TSS::ISkin* skin_ = nullptr;
     float uiScale_ = 1.0f;
     juce::Path crossShape_;
 
@@ -32,7 +32,7 @@ private:
 class SettingsWindow : public juce::Component
 {
 public:
-    SettingsWindow(tss::ISkin& skin,
+    SettingsWindow(TSS::ISkin& skin,
                    bool isPluginMode,
                    std::function<void(SettingsPanel&)> onPanelReady,
                    std::function<void()> onCloseRequested);
@@ -40,7 +40,7 @@ public:
 
     SettingsPanel& getSettingsPanel() { return *settingsPanel_; }
 
-    void setSkin(tss::ISkin& skin);
+    void setSkin(TSS::ISkin& skin);
     void setUiScale(float uiScale);
 
     void paint(juce::Graphics& g) override;
@@ -52,7 +52,7 @@ private:
     juce::Rectangle<int> getDialogBounds() const;
 
     std::function<void()> onCloseRequested_;
-    tss::ISkin* skin_;
+    TSS::ISkin* skin_;
     float uiScale_ = 1.0f;
 
     SettingsCloseButton closeButton_;

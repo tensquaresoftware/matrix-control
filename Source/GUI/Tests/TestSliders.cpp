@@ -47,14 +47,14 @@ class TestSliders::SliderScalePanel : public juce::Component
 public:
     SliderScalePanel(float scale,
                      const juce::String& scaleLabelText,
-                     const tss::SliderLook& sliderLook,
-                     const tss::SliderLook& sliderLookBoldLarge,
-                     const tss::LabelLook& labelLook,
+                     const TSS::SliderLook& sliderLook,
+                     const TSS::SliderLook& sliderLookBoldLarge,
+                     const TSS::LabelLook& labelLook,
                      const SliderSetDimensions& dimensions)
         : scale_(scale)
         , dimensions_(dimensions)
     {
-        scaleLabel_ = std::make_unique<tss::Label>(
+        scaleLabel_ = std::make_unique<TSS::Label>(
             dimensions_.bottomSliderWidth,
             dimensions_.scaleLabelHeight,
             labelLook,
@@ -62,16 +62,16 @@ public:
         addAndMakeVisible(*scaleLabel_);
 
         firstSlider_ = createSlider(dimensions_.topSliderWidth, dimensions_.topSliderHeight, sliderLook,
-                                    tss::SliderConfig{ 0.0, 100.0, 50.0, 1.0, "%" });
+                                    TSS::SliderConfig{ 0.0, 100.0, 50.0, 1.0, "%" });
 
         secondSlider_ = createSlider(dimensions_.topSliderWidth, dimensions_.topSliderHeight, sliderLook,
-                                     tss::SliderConfig{ -63.0, 63.0, 0.0, 1.0 });
+                                     TSS::SliderConfig{ -63.0, 63.0, 0.0, 1.0 });
 
         thirdSlider_ = createSlider(dimensions_.bottomSliderWidth, dimensions_.bottomSliderHeight, sliderLook,
-                                    tss::SliderConfig{ 0.0, 127.0, 63.0, 1.0 });
+                                    TSS::SliderConfig{ 0.0, 127.0, 63.0, 1.0 });
 
         fourthSlider_ = createSlider(dimensions_.bottomSliderWidth, dimensions_.bottomSliderHeight, sliderLookBoldLarge,
-                                     tss::SliderConfig{ 0.0, 127.0, 63.0, 1.0 });
+                                     TSS::SliderConfig{ 0.0, 127.0, 63.0, 1.0 });
     }
 
     int getScaledColumnWidth() const
@@ -118,12 +118,12 @@ public:
     }
 
 private:
-    std::unique_ptr<tss::Slider> createSlider(int width,
+    std::unique_ptr<TSS::Slider> createSlider(int width,
                                               int height,
-                                              const tss::SliderLook& look,
-                                              const tss::SliderConfig& config)
+                                              const TSS::SliderLook& look,
+                                              const TSS::SliderConfig& config)
     {
-        auto slider = std::make_unique<tss::Slider>(width, height, look, config);
+        auto slider = std::make_unique<TSS::Slider>(width, height, look, config);
         slider->setUiScale(scale_);
         addAndMakeVisible(*slider);
         return slider;
@@ -131,14 +131,14 @@ private:
 
     float scale_ { 1.0f };
     SliderSetDimensions dimensions_ {};
-    std::unique_ptr<tss::Label> scaleLabel_;
-    std::unique_ptr<tss::Slider> firstSlider_;
-    std::unique_ptr<tss::Slider> secondSlider_;
-    std::unique_ptr<tss::Slider> thirdSlider_;
-    std::unique_ptr<tss::Slider> fourthSlider_;
+    std::unique_ptr<TSS::Label> scaleLabel_;
+    std::unique_ptr<TSS::Slider> firstSlider_;
+    std::unique_ptr<TSS::Slider> secondSlider_;
+    std::unique_ptr<TSS::Slider> thirdSlider_;
+    std::unique_ptr<TSS::Slider> fourthSlider_;
 };
 
-TestSliders::TestSliders(tss::ISkin& skin)
+TestSliders::TestSliders(TSS::ISkin& skin)
 {
     createColumnPanels(skin);
     layoutColumnPanels();
@@ -151,7 +151,7 @@ void TestSliders::resized()
     layoutColumnPanels();
 }
 
-void TestSliders::createColumnPanels(tss::ISkin& skin)
+void TestSliders::createColumnPanels(TSS::ISkin& skin)
 {
     const SliderSetDimensions dimensions
     {
@@ -163,10 +163,10 @@ void TestSliders::createColumnPanels(tss::ISkin& skin)
         kScaleLabelHeight_
     };
 
-    const auto sliderLook = tss::sliderLookFromSkin(skin);
+    const auto sliderLook = TSS::sliderLookFromSkin(skin);
     auto sliderLookBoldLarge = sliderLook;
     sliderLookBoldLarge.font = skin.getBaseFontBold().withHeight(kBoldLargeSliderFontHeight_);
-    const auto labelLook = tss::labelLookFromSkin(skin);
+    const auto labelLook = TSS::labelLookFromSkin(skin);
 
     columnPanels_.clear();
     columnPanels_.reserve(kColumnSpecs_.size());

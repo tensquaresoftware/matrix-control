@@ -1,6 +1,6 @@
 #include "GroupLabel.h"
 
-namespace tss
+namespace TSS
 {
     GroupLabel::GroupLabel(int width, int height, const GroupLabelLook& look, const juce::String& text)
         : look_(look)

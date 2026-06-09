@@ -8,7 +8,7 @@
 
 #include <vector>
 
-namespace tss
+namespace TSS
 {
 namespace ScaledLayout
 {

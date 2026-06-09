@@ -4,12 +4,12 @@
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
 
-using tss::SkinColourId;
+using TSS::SkinColourId;
 
 const juce::Identifier FooterPanel::kMessageTextId("uiMessageText");
 const juce::Identifier FooterPanel::kMessageSeverityId("uiMessageSeverity");
 
-FooterPanel::FooterPanel(tss::ISkin& skin, int width, int height, juce::AudioProcessorValueTreeState& apvtsRef)
+FooterPanel::FooterPanel(TSS::ISkin& skin, int width, int height, juce::AudioProcessorValueTreeState& apvtsRef)
     : width_(width)
     , height_(height)
     , skin_(&skin)
@@ -67,7 +67,7 @@ void FooterPanel::resized()
 {
 }
 
-void FooterPanel::setSkin(tss::ISkin& skin)
+void FooterPanel::setSkin(TSS::ISkin& skin)
 {
     skin_ = &skin;
 }

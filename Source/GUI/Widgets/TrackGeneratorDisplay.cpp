@@ -1,6 +1,6 @@
 #include "TrackGeneratorDisplay.h"
 
-namespace tss
+namespace TSS
 {
     TrackGeneratorDisplay::TrackGeneratorDisplay(int width, int height, const TrackGeneratorDisplayLook& look)
         : look_(look)

@@ -4,7 +4,7 @@
 
 #include "GUI/Looks/WidgetLooks.h"
 
-namespace tss
+namespace TSS
 {
     class NumberBox : public juce::Component
     {

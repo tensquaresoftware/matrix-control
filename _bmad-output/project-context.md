@@ -10,7 +10,7 @@ sources:
   - planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/architecture.md
   - reference-docs/oberheim/index.md
 created: 2026-05-23
-updated: 2026-05-31
+updated: 2026-06-08
 ---
 
 # Project Context
@@ -210,9 +210,41 @@ Do not route editor SysEx through `processBlock()` midiBuffer.
 | Function parameters | 3 (use a struct if more) |
 | Cyclomatic complexity | < 5 |
 | Indentation nesting | 2 levels max |
-| Code duplication | Zero tolerance — extract at 3 similar lines |
+| Code duplication | WET OK once — extract when stable (see §6.16) |
 
 If a limit is exceeded, **stop and refactor** before continuing.
+
+---
+
+## Design Principles (Agent Priorities)
+
+> Full reference: `Documentation/Development/principes-dev-qualite.md` — `CONVENTIONS.md` §6.16
+
+| Principle | Rule |
+|---|---|
+| **KISS** | Simplest design that works for the current story |
+| **YAGNI** | No speculative features or abstractions |
+| **ETC** | Every choice should make the next change easier |
+| **WET → DRY** | Duplicate once OK; factorize confirmed stable duplication |
+| **Boy Scout** | Leave touched code cleaner than found |
+| **CQS** | Mutators do not return queried state |
+
+**When principles conflict:** correctness & thread-safety > KISS/YAGNI > SOLID > premature DRY.
+
+---
+
+## Matrix-Control Domain Contracts
+
+Apply these to SysEx, MIDI, and Core logic (see Oberheim reference docs):
+
+| Principle | Application |
+|---|---|
+| **PI** (Persistence Ignorance) | `Source/Core/` has no GUI or file-format knowledge beyond abstractions |
+| **Idempotency** | Repeated SysEx or sync operations must not corrupt state |
+| **Backward compatibility** | Public IDs, descriptor keys, preset formats — evolve without breaking clients |
+| **Postel's law** | Tolerant parsing of incoming SysEx; strict emission of outgoing messages |
+| **DbC** (lightweight) | Explicit preconditions: checksum, patch number range, message length |
+| **Fail-fast** | Reject invalid input early with clear errors — never silent corruption |
 
 ---
 
@@ -224,7 +256,7 @@ If a limit is exceeded, **stop and refactor** before continuing.
 - Methods/variables: `lowerCamelCase`
 - Private members/constants: `underscoreSuffix_` (e.g. `apvts_`, `kWidth_`)
 - Enums: `PascalCase` type, `k` prefix on values (`ParameterType::kInt`)
-- Namespaces: `PascalCase` (`Core`, `GUI`, `PluginDescriptors`, `tss`)
+- Namespaces: `PascalCase` (`Core`, `GUI`, `PluginDescriptors`, `TSS`)
 
 ### Style
 
@@ -240,7 +272,7 @@ If a limit is exceeded, **stop and refactor** before continuing.
 ### JUCE specifics
 
 - Processor: `PluginProcessor`, Editor: `PluginEditor`.
-- Avoid deprecated JUCE APIs (see `.cursorrules` section 8.2).
+- Avoid deprecated JUCE APIs (see `CONVENTIONS.md` section 8.2).
 - No allocations in `paint()` or `processBlock()`.
 - Pass JUCE value types (`String`, `Colour`, `Rectangle`, etc.) by value.
 
@@ -280,10 +312,17 @@ BMad planning artifacts live in `_bmad-output/planning-artifacts/`. Promote vali
 
 ## Testing Strategy (Target State)
 
-- **Unit tests:** Core business classes (SysEx parser, patch model, parameter mapping) — not GUI components.
-- **Framework:** Catch2 or Google Test (to be confirmed in architecture epic).
-- **No tests in audio thread or paint paths.**
-- GUI validation: manual via `TestComponent` harness until visual regression tooling exists.
+> Agent rules: `.cursor/rules/core-testing.mdc` — full detail: `CONVENTIONS.md` §8.5
+
+- **TDD preferred** for `Source/Core/` — Red → Green → Refactor
+- **AAA structure** mandatory in every unit test
+- **F.I.R.S.T.** quality bar — reject slow, coupled, or manual-verification tests
+- **Test pyramid:** many unit tests (`Tests/Unit/`), some integration, few/no automated GUI
+- **Scope:** Core business classes (SysEx parser, patch model, parameter mapping) — **not** GUI components
+- **Framework:** JUCE `UnitTest` (current) — Catch2/GTest acceptable if migrated in architecture epic
+- **Fixtures:** `Tests/Fixtures/` for `.syx` binaries
+- **No tests** in audio thread or `paint()` paths
+- GUI validation: manual via Standalone / `TestComponent` harness
 
 ---
 
@@ -323,7 +362,8 @@ BMad planning artifacts live in `_bmad-output/planning-artifacts/`. Promote vali
 
 ## Key Reference Files (Read Before Implementing)
 
-- `.cursorrules` — full coding standards (authoritative for style disputes)
+- `CONVENTIONS.md` — full coding standards (authoritative for style disputes); Cursor summary in `.cursor/rules/`
+- `Documentation/Development/principes-dev-qualite.md` — complete design principles reference
 - `Source/Shared/Definitions/PluginDescriptors.h`
 - `Source/GUI/Factories/WidgetFactory.h`
 - `Source/GUI/Layout/ScaledLayout.h`

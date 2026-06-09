@@ -2,7 +2,7 @@
 
 #include "WidgetLooks.h"
 
-namespace tss
+namespace TSS
 {
     class ISkin;
     

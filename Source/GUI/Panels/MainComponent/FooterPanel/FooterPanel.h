@@ -3,7 +3,7 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 
-namespace tss
+namespace TSS
 {
     class ISkin;
 }
@@ -12,12 +12,12 @@ class FooterPanel : public juce::Component,
                     public juce::ValueTree::Listener
 {
 public:
-    FooterPanel(tss::ISkin& skin, int width, int height, juce::AudioProcessorValueTreeState& apvtsRef);
+    FooterPanel(TSS::ISkin& skin, int width, int height, juce::AudioProcessorValueTreeState& apvtsRef);
     ~FooterPanel() override;
 
     void paint(juce::Graphics&) override;
     void resized() override;
-    void setSkin(tss::ISkin& skin);
+    void setSkin(TSS::ISkin& skin);
     void setUiScale(float uiScale);
 
     // ValueTree::Listener
@@ -39,7 +39,7 @@ private:
     inline constexpr static int kPadding_ = 8;
     inline constexpr static int kIconSize_ = 14;
     
-    tss::ISkin* skin_;
+    TSS::ISkin* skin_;
     float uiScale_ = 1.0f;
     juce::AudioProcessorValueTreeState& apvts;
     

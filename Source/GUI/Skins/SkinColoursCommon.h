@@ -4,7 +4,7 @@
 
 #include "ColourChart.h"
 
-namespace tss::SkinColours
+namespace TSS::SkinColours
 {
     struct ColourElement
     {

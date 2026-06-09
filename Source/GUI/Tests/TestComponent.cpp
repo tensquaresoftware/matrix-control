@@ -14,7 +14,7 @@ namespace
     constexpr int kLastComboItemId_ = 12;
 }
 
-TestComponent::TestComponent(tss::ISkin& skin, juce::ValueTree& settingsState, int width, int height)
+TestComponent::TestComponent(TSS::ISkin& skin, juce::ValueTree& settingsState, int width, int height)
     : skin_(skin)
     , settingsState_(settingsState)
 {
@@ -60,12 +60,12 @@ void TestComponent::resized()
 
 void TestComponent::createHeaderControls()
 {
-    const auto labelLook = tss::labelLookFromSkin(skin_);
+    const auto labelLook = TSS::labelLookFromSkin(skin_);
 
     const int rawLabelWidth = juce::roundToInt(juce::TextLayout::getStringWidth(labelLook.font, "WIDGET :")) + kGap_;
     widgetLabelWidth_ = alignToMultipleOf4(rawLabelWidth);
 
-    widgetLabel_ = std::make_unique<tss::Label>(
+    widgetLabel_ = std::make_unique<TSS::Label>(
         widgetLabelWidth_,
         kWidgetLabelHeight_,
         labelLook,

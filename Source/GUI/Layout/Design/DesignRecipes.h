@@ -1,0 +1,98 @@
+#pragma once
+
+#include "DesignAtoms.h"
+#include "Shared/Definitions/Matrix1000Limits.h"
+
+// DesignRecipes.h
+// Lego assembly formulas on atoms.
+
+namespace TSS::Design
+{
+    namespace Recipes
+    {
+        // ParameterCell widget: Label + Control (row 1) + HorizontalSeparator (row 2).
+        namespace ParameterCell
+        {
+            inline constexpr int kWidth = Atoms::Widths::ParameterCell::kLabel + Atoms::Widths::ParameterCell::kControl;
+            inline constexpr int kHeight = Atoms::Heights::kLabel + Atoms::Heights::kHorizontalSeparator;
+        }
+
+        // PatchNameModule: ModuleHeader "PATCH NAME" + PatchNameDisplay.
+        namespace PatchNameModule
+        {
+            inline constexpr int kTopPadding = Spacing::kMedium;
+            inline constexpr int kModuleHeaderToDisplayGap = Spacing::kStandard;
+            inline constexpr int kBottomPadding = Spacing::kLarge;
+            inline constexpr int kWidth = ParameterCell::kWidth;
+            inline constexpr int kHeight = kTopPadding + Atoms::Heights::kModuleHeader + kModuleHeaderToDisplayGap
+                + Atoms::Heights::kPatchNameDisplay + kBottomPadding;
+        }
+
+        // ModulationBusCell widget: bus controls (row 1) + HorizontalSeparator (row 2).
+        namespace ModulationBusCell
+        {
+            inline constexpr int kWidth = Atoms::Widths::Label::kModulationBusNumber
+                + Atoms::Widths::ComboBox::kMatrixModulationSource + Atoms::Widths::ParameterCell::kControl
+                + Atoms::Widths::ComboBox::kMatrixModulationDestination + Atoms::Widths::Button::kInit
+                + 4 * Atoms::Widths::ModulationBusCell::kInterControlGap;
+            inline constexpr int kHeight = Atoms::Heights::kLabel + Atoms::Heights::kHorizontalSeparator;
+        }
+
+        namespace PatchEditModule
+        {
+            inline constexpr int kWidth = ParameterCell::kWidth;
+            inline constexpr int kHeight = Atoms::Heights::kModuleHeader
+                + Matrix1000Limits::kParameterCellCount * ParameterCell::kHeight;
+        }
+
+        namespace Slider
+        {
+            inline constexpr int kStandard = Atoms::Widths::ParameterCell::kControl;
+        }
+
+        namespace ComboBox
+        {
+            inline constexpr int kMasterEditModule = Atoms::Widths::ParameterCell::kControl;
+            inline constexpr int kPatchEditModule = Atoms::Widths::ParameterCell::kControl;
+        }
+
+        namespace Label
+        {
+            inline constexpr int kPatchEditModule = Atoms::Widths::ParameterCell::kLabel;
+            inline constexpr int kMasterEditModule = Atoms::Widths::ParameterCell::kLabel;
+        }
+
+        namespace PatchManagerModule
+        {
+            inline constexpr int kContentRowHeight = Atoms::Heights::kButton;
+            inline constexpr int kRowGap = Spacing::kStandard;
+        }
+
+        namespace BankUtilityModule
+        {
+            inline constexpr int kContentRowCount = 2;
+            inline constexpr int kHeight = Atoms::Heights::kModuleHeader + kContentRowCount * PatchManagerModule::kContentRowHeight
+                + (kContentRowCount - 1) * PatchManagerModule::kRowGap;
+        }
+
+        namespace InternalPatchesModule
+        {
+            inline constexpr int kHeight = Atoms::Heights::kModuleHeader + Atoms::Heights::kGroupLabel
+                + PatchManagerModule::kRowGap + PatchManagerModule::kContentRowHeight;
+        }
+
+        namespace ComputerPatchesModule
+        {
+            inline constexpr int kHeight = Atoms::Heights::kModuleHeader + Atoms::Heights::kGroupLabel
+                + PatchManagerModule::kRowGap + PatchManagerModule::kContentRowHeight;
+        }
+
+        // No HorizontalSeparator after the last content row (Figma — saves 4 px vs Patch/Master columns).
+        namespace PatchMutatorModule
+        {
+            inline constexpr int kContentRowCount = 3;
+            inline constexpr int kHeight = Atoms::Heights::kModuleHeader + kContentRowCount * PatchManagerModule::kContentRowHeight
+                + (kContentRowCount - 1) * PatchManagerModule::kRowGap;
+        }
+    }
+}

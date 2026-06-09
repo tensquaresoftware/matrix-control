@@ -7,7 +7,7 @@
 #include "Shared/Definitions/PluginDescriptors.h"
 #include "Shared/Definitions/PluginHelpers.h"
 #include "Shared/Definitions/PluginIDs.h"
-#include "Shared/Definitions/PluginDesignDimensions.h"
+#include "GUI/Layout/Design/Design.h"
 
 WidgetFactory::WidgetFactory(juce::AudioProcessorValueTreeState& inApvts)
     : validator(inApvts)
@@ -15,17 +15,17 @@ WidgetFactory::WidgetFactory(juce::AudioProcessorValueTreeState& inApvts)
     buildSearchMaps();
 }
 
-std::unique_ptr<tss::Slider> WidgetFactory::createSliderFromDescriptor(
+std::unique_ptr<TSS::Slider> WidgetFactory::createSliderFromDescriptor(
     const PluginDescriptors::IntParameterDescriptor* desc,
-    tss::ISkin& skin,
+    TSS::ISkin& skin,
     int width,
     int height)
 {
-    auto slider = std::make_unique<tss::Slider>(
+    auto slider = std::make_unique<TSS::Slider>(
         width,
         height,
-        tss::sliderLookFromSkin(skin),
-        tss::SliderConfig{
+        TSS::sliderLookFromSkin(skin),
+        TSS::SliderConfig{
             static_cast<double>(desc->minValue),
             static_cast<double>(desc->maxValue),
             static_cast<double>(desc->defaultValue),
@@ -35,14 +35,14 @@ std::unique_ptr<tss::Slider> WidgetFactory::createSliderFromDescriptor(
     return slider;
 }
 
-std::unique_ptr<tss::ComboBox> WidgetFactory::createComboBoxFromDescriptor(
+std::unique_ptr<TSS::ComboBox> WidgetFactory::createComboBoxFromDescriptor(
     const PluginDescriptors::ChoiceParameterDescriptor* desc,
-    tss::ISkin& skin,
+    TSS::ISkin& skin,
     int width,
     int height)
 {
-    auto comboBox = std::make_unique<tss::ComboBox>(width, height, tss::comboBoxLookFromSkin(skin));
-    comboBox->setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
+    auto comboBox = std::make_unique<TSS::ComboBox>(width, height, TSS::comboBoxLookFromSkin(skin));
+    comboBox->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
 
     for (const auto& choice : desc->choices)
         comboBox->addItem(choice, comboBox->getNumItems() + 1);
@@ -51,20 +51,20 @@ std::unique_ptr<tss::ComboBox> WidgetFactory::createComboBoxFromDescriptor(
     return comboBox;
 }
 
-std::unique_ptr<tss::Slider> WidgetFactory::createIntParameterSlider(
+std::unique_ptr<TSS::Slider> WidgetFactory::createIntParameterSlider(
     const juce::String& parameterId,
-    tss::ISkin& skin)
+    TSS::ISkin& skin)
 {
     return createIntParameterSlider(
         parameterId,
         skin,
-        PluginDesignDimensions::Widgets::Widths::Slider::kStandard,
-        PluginDesignDimensions::Widgets::Heights::kSlider);
+        TSS::Design::Recipes::Slider::kStandard,
+        TSS::Design::Atoms::Heights::kSlider);
 }
 
-std::unique_ptr<tss::Slider> WidgetFactory::createIntParameterSlider(
+std::unique_ptr<TSS::Slider> WidgetFactory::createIntParameterSlider(
     const juce::String& parameterId,
-    tss::ISkin& skin,
+    TSS::ISkin& skin,
     int width,
     int height)
 {
@@ -75,9 +75,9 @@ std::unique_ptr<tss::Slider> WidgetFactory::createIntParameterSlider(
     return createSliderFromDescriptor(desc, skin, width, height);
 }
 
-std::unique_ptr<tss::ComboBox> WidgetFactory::createChoiceParameterComboBox(
+std::unique_ptr<TSS::ComboBox> WidgetFactory::createChoiceParameterComboBox(
     const juce::String& parameterId,
-    tss::ISkin& skin,
+    TSS::ISkin& skin,
     int width,
     int height)
 {
@@ -88,9 +88,9 @@ std::unique_ptr<tss::ComboBox> WidgetFactory::createChoiceParameterComboBox(
     return createComboBoxFromDescriptor(desc, skin, width, height);
 }
 
-std::unique_ptr<tss::Button> WidgetFactory::createStandaloneButton(
+std::unique_ptr<TSS::Button> WidgetFactory::createStandaloneButton(
     const juce::String& widgetId,
-    tss::ISkin& skin,
+    TSS::ISkin& skin,
     int height)
 {
     validator.throwIfWidgetIdEmpty(widgetId);
@@ -98,12 +98,12 @@ std::unique_ptr<tss::Button> WidgetFactory::createStandaloneButton(
     validator.getStandaloneWidgetDescriptorOrThrow(desc, widgetId);
     validator.validateWidgetType(desc, widgetId);
     
-    const auto buttonWidth = desc->buttonWidth.value_or(PluginDesignDimensions::Widgets::Widths::Button::kInit);
+    const auto buttonWidth = desc->buttonWidth.value_or(TSS::Design::Atoms::Widths::Button::kInit);
     
-    auto button = std::make_unique<tss::Button>(
+    auto button = std::make_unique<TSS::Button>(
         buttonWidth,
         height,
-        tss::buttonLookFromSkin(skin),
+        TSS::buttonLookFromSkin(skin),
         desc->displayName);
     return button;
 }

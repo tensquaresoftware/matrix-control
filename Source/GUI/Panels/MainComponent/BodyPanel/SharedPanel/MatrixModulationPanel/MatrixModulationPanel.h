@@ -11,7 +11,7 @@
 #include "Shared/Definitions/PluginDescriptors.h"
 #include "GUI/Widgets/ModulationBusCell.h"
 
-namespace tss
+namespace TSS
 {
     class ISkin;
     class SectionHeader;
@@ -24,11 +24,11 @@ class WidgetFactory;
 class MatrixModulationPanel : public juce::Component
 {
 public:
-    MatrixModulationPanel(tss::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    MatrixModulationPanel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~MatrixModulationPanel() override;
 
     void resized() override;
-    void setSkin(tss::ISkin& skin);
+    void setSkin(TSS::ISkin& skin);
     void setUiScale(float uiScale);
 
     using BusReorderHandler = std::function<void(int fromBus, int toBus)>;
@@ -60,18 +60,18 @@ private:
     std::array<const char*, Matrix1000Limits::kModulationBusCount> createDestinationParameterIds() const;
     ModulationBusParameterArrays createModulationBusParameterArrays() const;
 
-    void createInitAllBussesButton(tss::ISkin& skin);
+    void createInitAllBussesButton(TSS::ISkin& skin);
 
     int width_;
     int height_;
     int modulationBusHeight_;
-    tss::ISkin* skin_;
+    TSS::ISkin* skin_;
     float uiScale_ = 1.0f;
     juce::AudioProcessorValueTreeState& apvts_;
 
-    std::unique_ptr<tss::SectionHeader> sectionHeader_;
-    std::unique_ptr<tss::ModulationBusHeader> modulationBusHeader_;
-    std::unique_ptr<tss::Button> initAllBussesButton_;
+    std::unique_ptr<TSS::SectionHeader> sectionHeader_;
+    std::unique_ptr<TSS::ModulationBusHeader> modulationBusHeader_;
+    std::unique_ptr<TSS::Button> initAllBussesButton_;
     std::vector<std::unique_ptr<ModulationBusCell>> modulationBuses_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MatrixModulationPanel)

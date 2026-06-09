@@ -4,7 +4,7 @@
 
 #include "GUI/Skins/ColourChart.h"
 
-namespace tss
+namespace TSS
 {
     class ScrollablePopupMenu::CustomScrollBar : public juce::Component, private juce::Timer
     {

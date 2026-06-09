@@ -7,12 +7,12 @@
 #include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Panels/MainComponent/BodyPanel/SharedPanel/MatrixModulationPanel/MatrixModulationPanel.h"
 #include "GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/PatchManagerPanel.h"
-#include "Shared/Definitions/PluginDesignDimensions.h"
+#include "GUI/Layout/Design/Design.h"
 
-SharedPanel::SharedPanel(tss::ISkin& skin, int width, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+SharedPanel::SharedPanel(TSS::ISkin& skin, int width, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : width_(width)
-    , matrixModulationPanelHeight_(PluginDesignDimensions::Panels::Body::MatrixModulationSection::kHeight)
-    , patchManagerPanelHeight_(PluginDesignDimensions::Panels::Body::PatchManagerSection::kHeight)
+    , matrixModulationPanelHeight_(TSS::Design::Panels::Body::MatrixModulationSection::kHeight)
+    , patchManagerPanelHeight_(TSS::Design::Panels::Body::PatchManagerSection::kHeight)
 {
     matrixModulationPanel_ = std::make_unique<MatrixModulationPanel>(
         skin,
@@ -43,10 +43,10 @@ void SharedPanel::resized()
 {
     const auto bounds = getLocalBounds();
     const float sf = uiScale_;
-    const int w = tss::ScaledLayout::scaledInt(static_cast<float>(width_), sf);
+    const int w = TSS::ScaledLayout::scaledInt(static_cast<float>(width_), sf);
     const int contentHeight = bounds.getHeight();
     const std::vector<int> columnDesignHeights { matrixModulationPanelHeight_, patchManagerPanelHeight_ };
-    const auto columnHeights = tss::ScaledLayout::distributeHeights(contentHeight, columnDesignHeights, sf, 1);
+    const auto columnHeights = TSS::ScaledLayout::distributeHeights(contentHeight, columnDesignHeights, sf, 1);
     const int matrixH = columnHeights[0];
     const int patchManagerH = columnHeights[1];
     const int x = bounds.getX();
@@ -57,9 +57,9 @@ void SharedPanel::resized()
     patchManagerPanel_->setBounds(x, y, w, patchManagerH);
 }
 
-void SharedPanel::setSkin(tss::ISkin& skin)
+void SharedPanel::setSkin(TSS::ISkin& skin)
 {
-    tss::propagateSkin(skin, matrixModulationPanel_.get(), patchManagerPanel_.get());
+    TSS::propagateSkin(skin, matrixModulationPanel_.get(), patchManagerPanel_.get());
 }
 
 void SharedPanel::setUiScale(float uiScale)

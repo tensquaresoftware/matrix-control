@@ -1,6 +1,6 @@
 #include "TypographyStyles.h"
 
-namespace tss
+namespace TSS
 {
     namespace
     {

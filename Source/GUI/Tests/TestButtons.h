@@ -5,7 +5,7 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
-namespace tss
+namespace TSS
 {
     class ISkin;
 }
@@ -13,7 +13,7 @@ namespace tss
 class TestButtons : public juce::Component
 {
 public:
-    explicit TestButtons(tss::ISkin& skin);
+    explicit TestButtons(TSS::ISkin& skin);
     ~TestButtons() override;
 
     void resized() override;
@@ -33,7 +33,7 @@ private:
 
     std::vector<std::unique_ptr<ButtonScalePanel>> columnPanels_;
 
-    void createColumnPanels(tss::ISkin& skin);
+    void createColumnPanels(TSS::ISkin& skin);
     void layoutColumnPanels();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TestButtons)

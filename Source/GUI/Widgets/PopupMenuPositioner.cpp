@@ -1,7 +1,7 @@
 #include "PopupMenuPositioner.h"
 #include "ComboBox.h"
 
-namespace tss
+namespace TSS
 {
     PopupMenuDimensions PopupMenuPositioner::calculateDimensions(
         const ComboBox& comboBox,

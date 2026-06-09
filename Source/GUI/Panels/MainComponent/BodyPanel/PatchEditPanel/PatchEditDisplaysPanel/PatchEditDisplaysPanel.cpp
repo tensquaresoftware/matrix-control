@@ -6,36 +6,36 @@
 #include "GUI/Looks/LookBuilders.h"
 #include "GUI/Skins/ISkin.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
-#include "Shared/Definitions/PluginDesignDimensions.h"
+#include "GUI/Layout/Design/Design.h"
 
 
 PatchEditDisplaysPanel::~PatchEditDisplaysPanel() = default;
 
-PatchEditDisplaysPanel::PatchEditDisplaysPanel(tss::ISkin& skin, int width, int height, juce::AudioProcessorValueTreeState& apvts)
+PatchEditDisplaysPanel::PatchEditDisplaysPanel(TSS::ISkin& skin, int width, int height, juce::AudioProcessorValueTreeState& apvts)
     : width_(width)
     , height_(height)
     , skin_(&skin)
     , apvts_(&apvts)
-    , envelope1Display_(PluginDesignDimensions::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kWidth,
-                         PluginDesignDimensions::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kHeight,
-                         tss::envelopeDisplayLookFromSkin(skin))
-    , envelope2Display_(PluginDesignDimensions::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kWidth,
-                         PluginDesignDimensions::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kHeight,
-                         tss::envelopeDisplayLookFromSkin(skin))
-    , envelope3Display_(PluginDesignDimensions::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kWidth,
-                         PluginDesignDimensions::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kHeight,
-                         tss::envelopeDisplayLookFromSkin(skin))
-    , trackGeneratorDisplay_(PluginDesignDimensions::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kWidth,
-                             PluginDesignDimensions::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kHeight,
-                             tss::trackGeneratorDisplayLookFromSkin(skin))
-    , patchNameModuleHeader_(PluginDesignDimensions::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kWidth,
-                             PluginDesignDimensions::Widgets::Heights::kModuleHeader,
-                             tss::moduleHeaderLookFromSkin(skin),
-                             tss::ModuleHeader::ColourVariant::Blue,
+    , envelope1Display_(TSS::Design::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kWidth,
+                         TSS::Design::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kHeight,
+                         TSS::envelopeDisplayLookFromSkin(skin))
+    , envelope2Display_(TSS::Design::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kWidth,
+                         TSS::Design::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kHeight,
+                         TSS::envelopeDisplayLookFromSkin(skin))
+    , envelope3Display_(TSS::Design::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kWidth,
+                         TSS::Design::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kHeight,
+                         TSS::envelopeDisplayLookFromSkin(skin))
+    , trackGeneratorDisplay_(TSS::Design::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kWidth,
+                             TSS::Design::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kHeight,
+                             TSS::trackGeneratorDisplayLookFromSkin(skin))
+    , patchNameModuleHeader_(TSS::Design::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kWidth,
+                             TSS::Design::Atoms::Heights::kModuleHeader,
+                             TSS::moduleHeaderLookFromSkin(skin),
+                             TSS::ModuleHeader::ColourVariant::Blue,
                              PluginDisplayNames::PatchEditSection::PatchNameModule::kName)
-    , patchNameDisplay_(PluginDesignDimensions::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kWidth,
-                        PluginDesignDimensions::Widgets::Heights::kPatchNameDisplay,
-                        tss::patchNameDisplayLookFromSkin(skin))
+    , patchNameDisplay_(TSS::Design::Panels::Body::PatchEditSection::MiddleModules::ChildModules::kWidth,
+                        TSS::Design::Atoms::Heights::kPatchNameDisplay,
+                        TSS::patchNameDisplayLookFromSkin(skin))
     , apvtsSync_(std::make_unique<InteractiveDisplayApvtsSync>(
         apvts,
         envelope1Display_,
@@ -65,16 +65,16 @@ void PatchEditDisplaysPanel::connectSliderFastPaths(PatchEditTopModulesPanel& to
 
 void PatchEditDisplaysPanel::resized()
 {
-    namespace PES = PluginDesignDimensions::Panels::Body::PatchEditSection;
+    namespace PES = TSS::Design::Panels::Body::PatchEditSection;
     namespace PEM = PES::MiddleModules;
     const float sf = uiScale_;
-    const int childWidth = tss::ScaledLayout::scaledInt(static_cast<float>(PEM::ChildModules::kWidth), sf);
-    const int childHeight = tss::ScaledLayout::scaledInt(static_cast<float>(PEM::ChildModules::kHeight), sf);
+    const int childWidth = TSS::ScaledLayout::scaledInt(static_cast<float>(PEM::ChildModules::kWidth), sf);
+    const int childHeight = TSS::ScaledLayout::scaledInt(static_cast<float>(PEM::ChildModules::kHeight), sf);
     const float childStep = static_cast<float>(PEM::ChildModules::kWidth + PES::kInterModuleGap) * sf;
-    const int paddingTop = tss::ScaledLayout::scaledInt(
-        static_cast<float>(PEM::PatchNameColumn::kTopPadding), sf);
-    const int moduleHeaderHeight = tss::ScaledLayout::scaledInt(
-        static_cast<float>(PluginDesignDimensions::Widgets::Heights::kModuleHeader), sf);
+    const int paddingTop = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(PEM::PatchNameModule::kTopPadding), sf);
+    const int moduleHeaderHeight = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(TSS::Design::Atoms::Heights::kModuleHeader), sf);
 
     envelope1Display_.setBounds(0, 0, childWidth, childHeight);
     envelope2Display_.setBounds(juce::roundToInt(1.0f * childStep), 0, childWidth, childHeight);
@@ -86,27 +86,27 @@ void PatchEditDisplaysPanel::resized()
     patchNameModuleHeader_.setBounds(patchNameSectionX, paddingTop,
                                     patchNameSectionW, moduleHeaderHeight);
 
-    const int patchNameDisplayY = tss::ScaledLayout::scaledInt(
-        static_cast<float>(PEM::PatchNameColumn::kTopPadding + PluginDesignDimensions::Widgets::Heights::kModuleHeader
-            + PEM::PatchNameColumn::kModuleHeaderToDisplayGap),
+    const int patchNameDisplayY = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(PEM::PatchNameModule::kTopPadding + TSS::Design::Atoms::Heights::kModuleHeader
+            + PEM::PatchNameModule::kModuleHeaderToDisplayGap),
         sf);
     patchNameDisplay_.setBounds(
         patchNameSectionX,
         patchNameDisplayY,
         patchNameSectionW,
-        tss::ScaledLayout::scaledInt(static_cast<float>(PluginDesignDimensions::Widgets::Heights::kPatchNameDisplay), sf));
+        TSS::ScaledLayout::scaledInt(static_cast<float>(TSS::Design::Atoms::Heights::kPatchNameDisplay), sf));
 }
 
-void PatchEditDisplaysPanel::setSkin(tss::ISkin& skin)
+void PatchEditDisplaysPanel::setSkin(TSS::ISkin& skin)
 {
     skin_ = &skin;
-    const auto envelopeLook = tss::envelopeDisplayLookFromSkin(skin);
+    const auto envelopeLook = TSS::envelopeDisplayLookFromSkin(skin);
     envelope1Display_.setLook(envelopeLook);
     envelope2Display_.setLook(envelopeLook);
     envelope3Display_.setLook(envelopeLook);
-    trackGeneratorDisplay_.setLook(tss::trackGeneratorDisplayLookFromSkin(skin));
-    patchNameModuleHeader_.setLook(tss::moduleHeaderLookFromSkin(skin));
-    patchNameDisplay_.setLook(tss::patchNameDisplayLookFromSkin(skin));
+    trackGeneratorDisplay_.setLook(TSS::trackGeneratorDisplayLookFromSkin(skin));
+    patchNameModuleHeader_.setLook(TSS::moduleHeaderLookFromSkin(skin));
+    patchNameDisplay_.setLook(TSS::patchNameDisplayLookFromSkin(skin));
 }
 
 void PatchEditDisplaysPanel::setUiScale(float uiScale)

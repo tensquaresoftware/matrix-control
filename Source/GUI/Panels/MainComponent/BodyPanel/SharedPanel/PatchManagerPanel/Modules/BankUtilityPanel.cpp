@@ -7,12 +7,12 @@
 #include "GUI/Widgets/Label.h"
 #include "GUI/Widgets/Button.h"
 #include "Shared/Definitions/PluginDescriptors.h"
-#include "Shared/Definitions/PluginDesignDimensions.h"
+#include "GUI/Layout/Design/Design.h"
 #include "GUI/Factories/WidgetFactory.h"
 #include <juce_core/juce_core.h>
 
 
-BankUtilityPanel::BankUtilityPanel(tss::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+BankUtilityPanel::BankUtilityPanel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : width_(width)
     , height_(height)
     , skin_(&skin)
@@ -30,16 +30,16 @@ BankUtilityPanel::~BankUtilityPanel() = default;
 
 void BankUtilityPanel::resized()
 {
-    using namespace PluginDesignDimensions::Widgets;
+    using namespace TSS::Design::Atoms;
     const float sf = uiScale_;
 
     const int moduleHeaderHeight  = juce::roundToInt(static_cast<float>(Heights::kModuleHeader) * sf);
-    const int moduleHeaderWidth   = juce::roundToInt(static_cast<float>(Widths::ModuleHeader::kPatchManagerModule) * sf);
+    const int moduleHeaderWidth   = juce::roundToInt(static_cast<float>(TSS::Design::PanelWidgets::Widths::ModuleHeader::kPatchManagerModule) * sf);
     const int labelWidth          = juce::roundToInt(static_cast<float>(Widths::Label::kPatchManagerBankSelector) * sf);
     const int labelHeight         = juce::roundToInt(static_cast<float>(Heights::kLabel) * sf);
     const int buttonWidth         = juce::roundToInt(static_cast<float>(Widths::Button::kPatchManagerBankSelect) * sf);
     const int buttonHeight        = juce::roundToInt(static_cast<float>(Heights::kButton) * sf);
-    const int unlockButtonWidth   = juce::roundToInt(static_cast<float>(Widths::Button::kPatchManagerUnlockBank) * sf);
+    const int lockButtonWidth   = juce::roundToInt(static_cast<float>(Widths::Button::kPatchManagerLockBank) * sf);
 
     if (auto* header = bankUtilityModuleHeader_.get())
         header->setBounds(0, 0, moduleHeaderWidth, moduleHeaderHeight);
@@ -54,7 +54,7 @@ void BankUtilityPanel::resized()
     const float row1OriginX = static_cast<float>(Widths::Label::kPatchManagerBankSelector + kGap_) * sf;
     const float bankButtonStep = static_cast<float>(Widths::Button::kPatchManagerBankSelect + kGap_) * sf;
 
-    auto setBankButtonBounds = [&](tss::Button* btn, int index, int y)
+    auto setBankButtonBounds = [&](TSS::Button* btn, int index, int y)
     {
         if (btn)
         {
@@ -73,12 +73,12 @@ void BankUtilityPanel::resized()
     const int row2Y = juce::roundToInt(static_cast<float>(Heights::kModuleHeader + kTopPadding_ + Heights::kButton + kGap_) * sf);
 
     if (auto* button = lockBankButton_.get())
-        button->setBounds(0, row2Y, unlockButtonWidth, buttonHeight);
+        button->setBounds(0, row2Y, lockButtonWidth, buttonHeight);
 
     // Row 2 X positions: banks 5-9, after unlock button
-    const float row2OriginX = static_cast<float>(Widths::Button::kPatchManagerUnlockBank + kGap_) * sf;
+    const float row2OriginX = static_cast<float>(Widths::Button::kPatchManagerLockBank + kGap_) * sf;
 
-    auto setBankButtonBoundsRow2 = [&](tss::Button* btn, int index, int y)
+    auto setBankButtonBoundsRow2 = [&](TSS::Button* btn, int index, int y)
     {
         if (btn)
         {
@@ -108,36 +108,36 @@ void BankUtilityPanel::resized()
     if (selectBank9Button_)      selectBank9Button_->setUiScale(sf);
 }
 
-void BankUtilityPanel::setSkin(tss::ISkin& skin)
+void BankUtilityPanel::setSkin(TSS::ISkin& skin)
 {
     skin_ = &skin;
     if (bankUtilityModuleHeader_)
-        bankUtilityModuleHeader_->setLook(tss::moduleHeaderLookFromSkin(skin));
+        bankUtilityModuleHeader_->setLook(TSS::moduleHeaderLookFromSkin(skin));
 
     if (bankSelectorLabel_)
-        bankSelectorLabel_->setLook(tss::labelLookFromSkin(skin));
+        bankSelectorLabel_->setLook(TSS::labelLookFromSkin(skin));
     if (selectBank0Button_)
-        selectBank0Button_->setLook(tss::buttonLookFromSkin(skin));
+        selectBank0Button_->setLook(TSS::buttonLookFromSkin(skin));
     if (selectBank1Button_)
-        selectBank1Button_->setLook(tss::buttonLookFromSkin(skin));
+        selectBank1Button_->setLook(TSS::buttonLookFromSkin(skin));
     if (selectBank2Button_)
-        selectBank2Button_->setLook(tss::buttonLookFromSkin(skin));
+        selectBank2Button_->setLook(TSS::buttonLookFromSkin(skin));
     if (selectBank3Button_)
-        selectBank3Button_->setLook(tss::buttonLookFromSkin(skin));
+        selectBank3Button_->setLook(TSS::buttonLookFromSkin(skin));
     if (selectBank4Button_)
-        selectBank4Button_->setLook(tss::buttonLookFromSkin(skin));
+        selectBank4Button_->setLook(TSS::buttonLookFromSkin(skin));
     if (lockBankButton_)
-        lockBankButton_->setLook(tss::buttonLookFromSkin(skin));
+        lockBankButton_->setLook(TSS::buttonLookFromSkin(skin));
     if (selectBank5Button_)
-        selectBank5Button_->setLook(tss::buttonLookFromSkin(skin));
+        selectBank5Button_->setLook(TSS::buttonLookFromSkin(skin));
     if (selectBank6Button_)
-        selectBank6Button_->setLook(tss::buttonLookFromSkin(skin));
+        selectBank6Button_->setLook(TSS::buttonLookFromSkin(skin));
     if (selectBank7Button_)
-        selectBank7Button_->setLook(tss::buttonLookFromSkin(skin));
+        selectBank7Button_->setLook(TSS::buttonLookFromSkin(skin));
     if (selectBank8Button_)
-        selectBank8Button_->setLook(tss::buttonLookFromSkin(skin));
+        selectBank8Button_->setLook(TSS::buttonLookFromSkin(skin));
     if (selectBank9Button_)
-        selectBank9Button_->setLook(tss::buttonLookFromSkin(skin));
+        selectBank9Button_->setLook(TSS::buttonLookFromSkin(skin));
 }
 
 void BankUtilityPanel::setUiScale(float uiScale)
@@ -149,33 +149,33 @@ void BankUtilityPanel::setUiScale(float uiScale)
     repaint();
 }
 
-void BankUtilityPanel::setupModuleHeader(tss::ISkin& skin, WidgetFactory& widgetFactory, const juce::String& moduleId)
+void BankUtilityPanel::setupModuleHeader(TSS::ISkin& skin, WidgetFactory& widgetFactory, const juce::String& moduleId)
 {
-    bankUtilityModuleHeader_ = std::make_unique<tss::ModuleHeader>(
-        PluginDesignDimensions::Widgets::Widths::ModuleHeader::kPatchManagerModule,
-        PluginDesignDimensions::Widgets::Heights::kModuleHeader,
-        tss::moduleHeaderLookFromSkin(skin),
-        tss::ModuleHeader::ColourVariant::Blue,
+    bankUtilityModuleHeader_ = std::make_unique<TSS::ModuleHeader>(
+        TSS::Design::PanelWidgets::Widths::ModuleHeader::kPatchManagerModule,
+        TSS::Design::Atoms::Heights::kModuleHeader,
+        TSS::moduleHeaderLookFromSkin(skin),
+        TSS::ModuleHeader::ColourVariant::Blue,
         widgetFactory.getGroupDisplayName(moduleId));
     addAndMakeVisible(*bankUtilityModuleHeader_);
 }
 
-void BankUtilityPanel::setupBankSelectorLabel(tss::ISkin& skin)
+void BankUtilityPanel::setupBankSelectorLabel(TSS::ISkin& skin)
 {
-    bankSelectorLabel_ = std::make_unique<tss::Label>(
-        PluginDesignDimensions::Widgets::Widths::Label::kPatchManagerBankSelector,
-        PluginDesignDimensions::Widgets::Heights::kLabel,
-        tss::labelLookFromSkin(skin),
+    bankSelectorLabel_ = std::make_unique<TSS::Label>(
+        TSS::Design::Atoms::Widths::Label::kPatchManagerBankSelector,
+        TSS::Design::Atoms::Heights::kLabel,
+        TSS::labelLookFromSkin(skin),
         PluginDisplayNames::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kBankSelector);
     addAndMakeVisible(*bankSelectorLabel_);
 }
 
-void BankUtilityPanel::setupSelectBankButtons(tss::ISkin& skin, WidgetFactory& widgetFactory)
+void BankUtilityPanel::setupSelectBankButtons(TSS::ISkin& skin, WidgetFactory& widgetFactory)
 {
-    selectBank0Button_     = std::make_unique<tss::Button>(
-        PluginDesignDimensions::Widgets::Widths::Button::kPatchManagerBankSelect,
-        PluginDesignDimensions::Widgets::Heights::kButton,
-        tss::buttonLookFromSkin(skin),
+    selectBank0Button_     = std::make_unique<TSS::Button>(
+        TSS::Design::Atoms::Widths::Button::kPatchManagerBankSelect,
+        TSS::Design::Atoms::Heights::kButton,
+        TSS::buttonLookFromSkin(skin),
         widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank0).value_or(""));
     selectBank0Button_->onClick = [this]
     {
@@ -185,10 +185,10 @@ void BankUtilityPanel::setupSelectBankButtons(tss::ISkin& skin, WidgetFactory& w
     };
     addAndMakeVisible(*selectBank0Button_);
 
-    selectBank1Button_     = std::make_unique<tss::Button>(
-        PluginDesignDimensions::Widgets::Widths::Button::kPatchManagerBankSelect,
-        PluginDesignDimensions::Widgets::Heights::kButton,
-        tss::buttonLookFromSkin(skin),
+    selectBank1Button_     = std::make_unique<TSS::Button>(
+        TSS::Design::Atoms::Widths::Button::kPatchManagerBankSelect,
+        TSS::Design::Atoms::Heights::kButton,
+        TSS::buttonLookFromSkin(skin),
         widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank1).value_or(""));
     selectBank1Button_->onClick = [this]
     {
@@ -198,10 +198,10 @@ void BankUtilityPanel::setupSelectBankButtons(tss::ISkin& skin, WidgetFactory& w
     };
     addAndMakeVisible(*selectBank1Button_);
 
-    selectBank2Button_     = std::make_unique<tss::Button>(
-        PluginDesignDimensions::Widgets::Widths::Button::kPatchManagerBankSelect,
-        PluginDesignDimensions::Widgets::Heights::kButton,
-        tss::buttonLookFromSkin(skin),
+    selectBank2Button_     = std::make_unique<TSS::Button>(
+        TSS::Design::Atoms::Widths::Button::kPatchManagerBankSelect,
+        TSS::Design::Atoms::Heights::kButton,
+        TSS::buttonLookFromSkin(skin),
         widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank2).value_or(""));
     selectBank2Button_->onClick = [this]
     {
@@ -211,10 +211,10 @@ void BankUtilityPanel::setupSelectBankButtons(tss::ISkin& skin, WidgetFactory& w
     };
     addAndMakeVisible(*selectBank2Button_);
 
-    selectBank3Button_     = std::make_unique<tss::Button>(
-        PluginDesignDimensions::Widgets::Widths::Button::kPatchManagerBankSelect,
-        PluginDesignDimensions::Widgets::Heights::kButton,
-        tss::buttonLookFromSkin(skin),
+    selectBank3Button_     = std::make_unique<TSS::Button>(
+        TSS::Design::Atoms::Widths::Button::kPatchManagerBankSelect,
+        TSS::Design::Atoms::Heights::kButton,
+        TSS::buttonLookFromSkin(skin),
         widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank3).value_or(""));
     selectBank3Button_->onClick = [this]
     {
@@ -224,10 +224,10 @@ void BankUtilityPanel::setupSelectBankButtons(tss::ISkin& skin, WidgetFactory& w
     };
     addAndMakeVisible(*selectBank3Button_);
 
-    selectBank4Button_     = std::make_unique<tss::Button>(
-        PluginDesignDimensions::Widgets::Widths::Button::kPatchManagerBankSelect,
-        PluginDesignDimensions::Widgets::Heights::kButton,
-        tss::buttonLookFromSkin(skin),
+    selectBank4Button_     = std::make_unique<TSS::Button>(
+        TSS::Design::Atoms::Widths::Button::kPatchManagerBankSelect,
+        TSS::Design::Atoms::Heights::kButton,
+        TSS::buttonLookFromSkin(skin),
         widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank4).value_or(""));
     selectBank4Button_->onClick = [this]
     {
@@ -237,10 +237,10 @@ void BankUtilityPanel::setupSelectBankButtons(tss::ISkin& skin, WidgetFactory& w
     };
     addAndMakeVisible(*selectBank4Button_);
 
-    lockBankButton_ = std::make_unique<tss::Button>(
-        PluginDesignDimensions::Widgets::Widths::Button::kPatchManagerUnlockBank,
-        PluginDesignDimensions::Widgets::Heights::kButton,
-        tss::buttonLookFromSkin(skin),
+    lockBankButton_ = std::make_unique<TSS::Button>(
+        TSS::Design::Atoms::Widths::Button::kPatchManagerLockBank,
+        TSS::Design::Atoms::Heights::kButton,
+        TSS::buttonLookFromSkin(skin),
         widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kLockBank).value_or(""));
     lockBankButton_->onClick = [this]
     {
@@ -250,10 +250,10 @@ void BankUtilityPanel::setupSelectBankButtons(tss::ISkin& skin, WidgetFactory& w
     };
     addAndMakeVisible(*lockBankButton_);
 
-    selectBank5Button_     = std::make_unique<tss::Button>(
-        PluginDesignDimensions::Widgets::Widths::Button::kPatchManagerBankSelect,
-        PluginDesignDimensions::Widgets::Heights::kButton,
-        tss::buttonLookFromSkin(skin),
+    selectBank5Button_     = std::make_unique<TSS::Button>(
+        TSS::Design::Atoms::Widths::Button::kPatchManagerBankSelect,
+        TSS::Design::Atoms::Heights::kButton,
+        TSS::buttonLookFromSkin(skin),
         widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank5).value_or(""));
     selectBank5Button_->onClick = [this]
     {
@@ -263,10 +263,10 @@ void BankUtilityPanel::setupSelectBankButtons(tss::ISkin& skin, WidgetFactory& w
     };
     addAndMakeVisible(*selectBank5Button_);
 
-    selectBank6Button_     = std::make_unique<tss::Button>(
-        PluginDesignDimensions::Widgets::Widths::Button::kPatchManagerBankSelect,
-        PluginDesignDimensions::Widgets::Heights::kButton,
-        tss::buttonLookFromSkin(skin),
+    selectBank6Button_     = std::make_unique<TSS::Button>(
+        TSS::Design::Atoms::Widths::Button::kPatchManagerBankSelect,
+        TSS::Design::Atoms::Heights::kButton,
+        TSS::buttonLookFromSkin(skin),
         widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank6).value_or(""));
     selectBank6Button_->onClick = [this]
     {
@@ -276,10 +276,10 @@ void BankUtilityPanel::setupSelectBankButtons(tss::ISkin& skin, WidgetFactory& w
     };
     addAndMakeVisible(*selectBank6Button_);
 
-    selectBank7Button_     = std::make_unique<tss::Button>(
-        PluginDesignDimensions::Widgets::Widths::Button::kPatchManagerBankSelect,
-        PluginDesignDimensions::Widgets::Heights::kButton,
-        tss::buttonLookFromSkin(skin),
+    selectBank7Button_     = std::make_unique<TSS::Button>(
+        TSS::Design::Atoms::Widths::Button::kPatchManagerBankSelect,
+        TSS::Design::Atoms::Heights::kButton,
+        TSS::buttonLookFromSkin(skin),
         widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank7).value_or(""));
     selectBank7Button_->onClick = [this]
     {
@@ -289,10 +289,10 @@ void BankUtilityPanel::setupSelectBankButtons(tss::ISkin& skin, WidgetFactory& w
     };
     addAndMakeVisible(*selectBank7Button_);
 
-    selectBank8Button_     = std::make_unique<tss::Button>(
-        PluginDesignDimensions::Widgets::Widths::Button::kPatchManagerBankSelect,
-        PluginDesignDimensions::Widgets::Heights::kButton,
-        tss::buttonLookFromSkin(skin),
+    selectBank8Button_     = std::make_unique<TSS::Button>(
+        TSS::Design::Atoms::Widths::Button::kPatchManagerBankSelect,
+        TSS::Design::Atoms::Heights::kButton,
+        TSS::buttonLookFromSkin(skin),
         widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank8).value_or(""));
     selectBank8Button_->onClick = [this]
     {
@@ -302,10 +302,10 @@ void BankUtilityPanel::setupSelectBankButtons(tss::ISkin& skin, WidgetFactory& w
     };
     addAndMakeVisible(*selectBank8Button_);
 
-    selectBank9Button_     = std::make_unique<tss::Button>(
-        PluginDesignDimensions::Widgets::Widths::Button::kPatchManagerBankSelect,
-        PluginDesignDimensions::Widgets::Heights::kButton,
-        tss::buttonLookFromSkin(skin),
+    selectBank9Button_     = std::make_unique<TSS::Button>(
+        TSS::Design::Atoms::Widths::Button::kPatchManagerBankSelect,
+        TSS::Design::Atoms::Heights::kButton,
+        TSS::buttonLookFromSkin(skin),
         widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank9).value_or(""));
     selectBank9Button_->onClick = [this]
     {

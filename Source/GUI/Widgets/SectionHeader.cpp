@@ -1,6 +1,6 @@
 #include "SectionHeader.h"
 
-namespace tss
+namespace TSS
 {
     SectionHeader::SectionHeader(int width, int height, const SectionHeaderLook& look, const juce::String& text, ColourVariant variant)
         : look_(look)

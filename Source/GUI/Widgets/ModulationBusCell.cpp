@@ -16,7 +16,7 @@
 
 ModulationBusCell::~ModulationBusCell() = default;
 
-ModulationBusCell::ModulationBusCell(tss::ISkin& skin,
+ModulationBusCell::ModulationBusCell(TSS::ISkin& skin,
                                       int width,
                                       int height,
                                       const ModulationBusCellDimensions& dimensions,
@@ -45,18 +45,18 @@ ModulationBusCell::ModulationBusCell(tss::ISkin& skin,
     resized();
 }
 
-void ModulationBusCell::createBusNumberLabel(int busNumber, tss::ISkin& skin)
+void ModulationBusCell::createBusNumberLabel(int busNumber, TSS::ISkin& skin)
 {
-    busNumberLabel_ = std::make_unique<tss::Label>(
+    busNumberLabel_ = std::make_unique<TSS::Label>(
         dimensions_.busNumberLabelWidth,
         dimensions_.busNumberLabelHeight,
-        tss::labelLookFromSkin(skin),
+        TSS::labelLookFromSkin(skin),
         juce::String(busNumber));
     busNumberLabel_->setInterceptsMouseClicks(false, false);
     addAndMakeVisible(*busNumberLabel_);
 }
 
-void ModulationBusCell::createSourceComboBox(WidgetFactory& factory, tss::ISkin& skin, const juce::String& sourceParamId, juce::AudioProcessorValueTreeState& apvts)
+void ModulationBusCell::createSourceComboBox(WidgetFactory& factory, TSS::ISkin& skin, const juce::String& sourceParamId, juce::AudioProcessorValueTreeState& apvts)
 {
     sourceComboBox_ = factory.createChoiceParameterComboBox(
         sourceParamId,
@@ -70,7 +70,7 @@ void ModulationBusCell::createSourceComboBox(WidgetFactory& factory, tss::ISkin&
     addAndMakeVisible(*sourceComboBox_);
 }
 
-void ModulationBusCell::createAmountSlider(WidgetFactory& factory, tss::ISkin& skin, const juce::String& amountParamId, juce::AudioProcessorValueTreeState& apvts)
+void ModulationBusCell::createAmountSlider(WidgetFactory& factory, TSS::ISkin& skin, const juce::String& amountParamId, juce::AudioProcessorValueTreeState& apvts)
 {
     amountSlider_ = factory.createIntParameterSlider(
         amountParamId,
@@ -84,16 +84,16 @@ void ModulationBusCell::createAmountSlider(WidgetFactory& factory, tss::ISkin& s
     addAndMakeVisible(*amountSlider_);
 }
 
-void ModulationBusCell::createDestinationComboBox(int busNumber, tss::ISkin& skin, const juce::String& destinationParamId, juce::AudioProcessorValueTreeState& apvts)
+void ModulationBusCell::createDestinationComboBox(int busNumber, TSS::ISkin& skin, const juce::String& destinationParamId, juce::AudioProcessorValueTreeState& apvts)
 {
     const auto busNumberAsSizeT = static_cast<size_t>(busNumber);
     const auto& destinationDesc = PluginDescriptors::MatrixModulationSection::kModulationBusChoiceParameters[busNumberAsSizeT][1];
 
-    destinationComboBox_ = std::make_unique<tss::ComboBox>(
+    destinationComboBox_ = std::make_unique<TSS::ComboBox>(
         dimensions_.destinationComboBoxWidth,
         dimensions_.destinationComboBoxHeight,
-        tss::comboBoxLookFromSkin(skin));
-    destinationComboBox_->setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
+        TSS::comboBoxLookFromSkin(skin));
+    destinationComboBox_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
     for (const auto& choice : destinationDesc.choices)
     {
         destinationComboBox_->addItem(choice, destinationComboBox_->getNumItems() + 1);
@@ -106,12 +106,12 @@ void ModulationBusCell::createDestinationComboBox(int busNumber, tss::ISkin& ski
     addAndMakeVisible(*destinationComboBox_);
 }
 
-void ModulationBusCell::createInitButton(tss::ISkin& skin, int busNumber)
+void ModulationBusCell::createInitButton(TSS::ISkin& skin, int busNumber)
 {
-    initButton_ = std::make_unique<tss::Button>(
+    initButton_ = std::make_unique<TSS::Button>(
         dimensions_.initButtonWidth,
         dimensions_.initButtonHeight,
-        tss::buttonLookFromSkin(skin),
+        TSS::buttonLookFromSkin(skin),
         PluginDisplayNames::ShortLabels::kInit);
     
     juce::String initBusId;
@@ -137,12 +137,12 @@ void ModulationBusCell::createInitButton(tss::ISkin& skin, int busNumber)
     addAndMakeVisible(*initButton_);
 }
 
-void ModulationBusCell::createSeparator(tss::ISkin& skin)
+void ModulationBusCell::createSeparator(TSS::ISkin& skin)
 {
-    separator_ = std::make_unique<tss::HorizontalSeparator>(
+    separator_ = std::make_unique<TSS::HorizontalSeparator>(
         dimensions_.separatorWidth,
         dimensions_.separatorHeight,
-        tss::horizontalSeparatorLookFromSkin(skin));
+        TSS::horizontalSeparatorLookFromSkin(skin));
     addAndMakeVisible(*separator_);
 }
 
@@ -255,13 +255,13 @@ void ModulationBusCell::resized()
 {
     const float sf = uiScale_;
     const int h = getHeight();
-    const int labelH = tss::ScaledLayout::scaledInt(static_cast<float>(dimensions_.busNumberLabelHeight), sf);
-    const int sourceH = tss::ScaledLayout::scaledInt(static_cast<float>(dimensions_.sourceComboBoxHeight), sf);
-    const int amountH = tss::ScaledLayout::scaledInt(static_cast<float>(dimensions_.amountSliderHeight), sf);
-    const int destH = tss::ScaledLayout::scaledInt(static_cast<float>(dimensions_.destinationComboBoxHeight), sf);
-    const int initH = tss::ScaledLayout::scaledInt(static_cast<float>(dimensions_.initButtonHeight), sf);
+    const int labelH = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions_.busNumberLabelHeight), sf);
+    const int sourceH = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions_.sourceComboBoxHeight), sf);
+    const int amountH = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions_.amountSliderHeight), sf);
+    const int destH = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions_.destinationComboBoxHeight), sf);
+    const int initH = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions_.initButtonHeight), sf);
     const int rowH = juce::jmax(labelH, juce::jmax(sourceH, juce::jmax(amountH, juce::jmax(destH, initH))));
-    const int sepH = juce::jmax(1, tss::ScaledLayout::scaledInt(static_cast<float>(dimensions_.separatorHeight), sf));
+    const int sepH = juce::jmax(1, TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions_.separatorHeight), sf));
     const int ySep = juce::jmin(rowH, juce::jmax(0, h - sepH));
 
     layoutWidgetRow();
@@ -286,16 +286,16 @@ void ModulationBusCell::layoutWidgetRow()
     const float sf = uiScale_;
     const int y = 0;
 
-    const int labelW  = tss::ScaledLayout::scaledInt(static_cast<float>(dimensions_.busNumberLabelWidth), sf);
-    const int labelH  = tss::ScaledLayout::scaledInt(static_cast<float>(dimensions_.busNumberLabelHeight), sf);
-    const int sourceW = tss::ScaledLayout::scaledInt(static_cast<float>(dimensions_.sourceComboBoxWidth), sf);
-    const int sourceH = tss::ScaledLayout::scaledInt(static_cast<float>(dimensions_.sourceComboBoxHeight), sf);
-    const int amountW = tss::ScaledLayout::scaledInt(static_cast<float>(dimensions_.amountSliderWidth), sf);
-    const int amountH = tss::ScaledLayout::scaledInt(static_cast<float>(dimensions_.amountSliderHeight), sf);
-    const int destW   = tss::ScaledLayout::scaledInt(static_cast<float>(dimensions_.destinationComboBoxWidth), sf);
-    const int destH   = tss::ScaledLayout::scaledInt(static_cast<float>(dimensions_.destinationComboBoxHeight), sf);
-    const int initW   = tss::ScaledLayout::scaledInt(static_cast<float>(dimensions_.initButtonWidth), sf);
-    const int initH   = tss::ScaledLayout::scaledInt(static_cast<float>(dimensions_.initButtonHeight), sf);
+    const int labelW  = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions_.busNumberLabelWidth), sf);
+    const int labelH  = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions_.busNumberLabelHeight), sf);
+    const int sourceW = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions_.sourceComboBoxWidth), sf);
+    const int sourceH = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions_.sourceComboBoxHeight), sf);
+    const int amountW = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions_.amountSliderWidth), sf);
+    const int amountH = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions_.amountSliderHeight), sf);
+    const int destW   = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions_.destinationComboBoxWidth), sf);
+    const int destH   = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions_.destinationComboBoxHeight), sf);
+    const int initW   = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions_.initButtonWidth), sf);
+    const int initH   = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions_.initButtonHeight), sf);
 
     const float sourceX = static_cast<float>(dimensions_.busNumberLabelWidth) * sf;
     const float amountX = sourceX + static_cast<float>(dimensions_.sourceComboBoxWidth + kGap_) * sf;
@@ -311,33 +311,33 @@ void ModulationBusCell::layoutWidgetRow()
 
 void ModulationBusCell::layoutSeparator(int yTop, int separatorHeight)
 {
-    const int sepW = tss::ScaledLayout::scaledInt(static_cast<float>(dimensions_.separatorWidth), uiScale_);
+    const int sepW = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions_.separatorWidth), uiScale_);
 
     if (auto* separator = separator_.get())
         separator->setBounds(0, yTop, sepW, separatorHeight);
 }
 
-void ModulationBusCell::setSkin(tss::ISkin& skin)
+void ModulationBusCell::setSkin(TSS::ISkin& skin)
 {
     skin_ = &skin;
     if (busNumberLabel_)
-        busNumberLabel_->setLook(tss::labelLookFromSkin(skin));
+        busNumberLabel_->setLook(TSS::labelLookFromSkin(skin));
     if (sourceComboBox_)
     {
-        sourceComboBox_->setLook(tss::comboBoxLookFromSkin(skin));
-        sourceComboBox_->setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
+        sourceComboBox_->setLook(TSS::comboBoxLookFromSkin(skin));
+        sourceComboBox_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
     }
     if (amountSlider_)
-        amountSlider_->setLook(tss::sliderLookFromSkin(skin));
+        amountSlider_->setLook(TSS::sliderLookFromSkin(skin));
     if (destinationComboBox_)
     {
-        destinationComboBox_->setLook(tss::comboBoxLookFromSkin(skin));
-        destinationComboBox_->setPopupMenuLook(tss::popupMenuLookFromSkin(skin));
+        destinationComboBox_->setLook(TSS::comboBoxLookFromSkin(skin));
+        destinationComboBox_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
     }
     if (initButton_)
-        initButton_->setLook(tss::buttonLookFromSkin(skin));
+        initButton_->setLook(TSS::buttonLookFromSkin(skin));
     if (separator_)
-        separator_->setLook(tss::horizontalSeparatorLookFromSkin(skin));
+        separator_->setLook(TSS::horizontalSeparatorLookFromSkin(skin));
 }
 
 void ModulationBusCell::setUiScale(float uiScale)

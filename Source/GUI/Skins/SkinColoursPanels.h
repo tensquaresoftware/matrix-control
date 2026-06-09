@@ -2,7 +2,7 @@
 
 #include "SkinColoursCommon.h"
 
-namespace tss::SkinColours
+namespace TSS::SkinColours
 {
     namespace Panels
     {

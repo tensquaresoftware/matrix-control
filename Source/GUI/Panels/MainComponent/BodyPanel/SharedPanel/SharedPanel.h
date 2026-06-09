@@ -6,7 +6,7 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 
-namespace tss
+namespace TSS
 {
     class ISkin;
 }
@@ -18,11 +18,11 @@ class WidgetFactory;
 class SharedPanel : public juce::Component
 {
 public:
-    SharedPanel(tss::ISkin& skin, int width, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    SharedPanel(TSS::ISkin& skin, int width, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~SharedPanel() override;
 
     void resized() override;
-    void setSkin(tss::ISkin& skin);
+    void setSkin(TSS::ISkin& skin);
     void setUiScale(float uiScale);
 
     using BusReorderHandler = std::function<void(int fromBus, int toBus)>;

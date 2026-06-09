@@ -2,7 +2,7 @@
 #include "ComboBox.h"
 #include "PopupMenuPositioner.h"
 
-namespace tss
+namespace TSS
 {
     MultiColumnPopupMenu::MultiColumnPopupMenu(ComboBox& comboBox)
         : PopupMenuBase(comboBox, false)

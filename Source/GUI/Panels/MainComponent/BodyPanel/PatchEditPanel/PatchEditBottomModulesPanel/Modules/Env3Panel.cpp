@@ -32,7 +32,7 @@ ModulePanelConfig Env3Panel::createConfig()
     return config;
 }
 
-Env3Panel::Env3Panel(tss::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+Env3Panel::Env3Panel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : BaseModulePanel(skin, widgetFactory, apvts, createConfig(), width, height)
 {
 }

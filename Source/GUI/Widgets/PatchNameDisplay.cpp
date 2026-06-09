@@ -2,7 +2,7 @@
 
 #include "Shared/Definitions/PluginDisplayNames.h"
 
-namespace tss
+namespace TSS
 {
     PatchNameDisplay::PatchNameDisplay(int width, int height, const PatchNameDisplayLook& look)
         : look_(look)

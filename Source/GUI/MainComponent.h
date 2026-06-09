@@ -9,7 +9,7 @@
 #include "Panels/MainComponent/BodyPanel/BodyPanel.h"
 #include "Panels/MainComponent/FooterPanel/FooterPanel.h"
 
-namespace tss
+namespace TSS
 {
     class Skin;
 }
@@ -19,12 +19,12 @@ class WidgetFactory;
 class MainComponent : public juce::Component
 {
 public:
-    MainComponent(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    MainComponent(TSS::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~MainComponent() override = default;
 
     void paint(juce::Graphics&) override;
     void resized() override;
-    void setSkin(tss::Skin& skin);
+    void setSkin(TSS::Skin& skin);
     void setUiScale(float uiScale);
 
     HeaderPanel& getHeaderPanel() { return headerPanel; }
@@ -39,7 +39,7 @@ public:
     juce::Rectangle<int> getUiElementsTestAreaBounds() const;
 
 private:
-    tss::Skin* skin_;
+    TSS::Skin* skin_;
     float uiScale_ = 1.0f;
     bool uiElementsTestVisible_ = false;
     int uiElementsTestAreaY_ = 0;

@@ -4,7 +4,7 @@
 
 #include "GUI/Skins/ColourChart.h"
 
-namespace tss
+namespace TSS
 {
     ComboBox::ComboBox(int width, int height, const ComboBoxLook& look, Style style)
         : juce::ComboBox()

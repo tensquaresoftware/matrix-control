@@ -4,7 +4,7 @@
 #include "GUI/Skins/Skin.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 
-using tss::SkinColourId;
+using TSS::SkinColourId;
 
 namespace
 {
@@ -28,7 +28,7 @@ SettingsCloseButton::SettingsCloseButton()
     setMouseCursor(juce::MouseCursor::PointingHandCursor);
 }
 
-void SettingsCloseButton::setSkin(tss::ISkin& skin)
+void SettingsCloseButton::setSkin(TSS::ISkin& skin)
 {
     skin_ = &skin;
     repaint();
@@ -65,7 +65,7 @@ void SettingsCloseButton::paintButton(juce::Graphics& g,
     g.fillPath(crossShape_, crossShape_.getTransformToScaleToFit(reducedRect, true));
 }
 
-SettingsWindow::SettingsWindow(tss::ISkin& skin,
+SettingsWindow::SettingsWindow(TSS::ISkin& skin,
                                bool isPluginMode,
                                std::function<void(SettingsPanel&)> onPanelReady,
                                std::function<void()> onCloseRequested)
@@ -91,7 +91,7 @@ SettingsWindow::SettingsWindow(tss::ISkin& skin,
         onPanelReady(*settingsPanel_);
 }
 
-void SettingsWindow::setSkin(tss::ISkin& skin)
+void SettingsWindow::setSkin(TSS::ISkin& skin)
 {
     skin_ = &skin;
     closeButton_.setSkin(skin);

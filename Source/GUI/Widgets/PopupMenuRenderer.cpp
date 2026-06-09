@@ -1,7 +1,7 @@
 #include "PopupMenuRenderer.h"
 #include "ComboBox.h"
 
-namespace tss
+namespace TSS
 {
     PopupMenuRenderer::PopupMenuRenderer(bool isButtonLike, float uiScale)
         : isButtonLike_(isButtonLike)

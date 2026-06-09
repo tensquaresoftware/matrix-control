@@ -2,7 +2,7 @@
 
 #include "GUI/Layout/ScaledDrawing.h"
 
-namespace tss
+namespace TSS
 {
     Button::Button(int width, int height, const ButtonLook& look, const juce::String& text)
         : juce::Button(text)

@@ -1,6 +1,6 @@
 #include "VerticalSeparator.h"
 
-namespace tss
+namespace TSS
 {
     VerticalSeparator::VerticalSeparator(int width, int height, const VerticalSeparatorLook& look)
         : look_(look)
