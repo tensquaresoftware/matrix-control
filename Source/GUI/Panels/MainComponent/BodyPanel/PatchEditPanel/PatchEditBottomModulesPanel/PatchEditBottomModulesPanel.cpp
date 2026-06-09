@@ -9,23 +9,27 @@
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Factories/WidgetFactory.h"
-#include "GUI/Layout/Design/Design.h"
 
 
 PatchEditBottomModulesPanel::~PatchEditBottomModulesPanel() = default;
 
-PatchEditBottomModulesPanel::PatchEditBottomModulesPanel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
-    : width_(width)
+PatchEditBottomModulesPanel::PatchEditBottomModulesPanel(TSS::ISkin& skin,
+                                                         const PatchEditModulesRowDimensions& rowDims,
+                                                         int width,
+                                                         int height,
+                                                         const ParameterCellDimensions& parameterCellDims,
+                                                         const ModuleHeaderDimensions& moduleHeaderDims,
+                                                         WidgetFactory& widgetFactory,
+                                                         juce::AudioProcessorValueTreeState& apvts)
+    : rowDims_(rowDims)
+    , width_(width)
     , height_(height)
-    , childModuleWidth_(TSS::Design::Panels::Body::PatchEditSection::BottomModules::ChildModules::kWidth)
-    , childModuleHeight_(TSS::Design::Panels::Body::PatchEditSection::BottomModules::ChildModules::kHeight)
-    , gap_(TSS::Design::Panels::Body::PatchEditSection::kInterModuleGap)
     , skin_(&skin)
-    , env1Panel_(std::make_unique<Env1Panel>(skin, childModuleWidth_, childModuleHeight_, widgetFactory, apvts))
-    , env2Panel_(std::make_unique<Env2Panel>(skin, childModuleWidth_, childModuleHeight_, widgetFactory, apvts))
-    , env3Panel_(std::make_unique<Env3Panel>(skin, childModuleWidth_, childModuleHeight_, widgetFactory, apvts))
-    , lfo1Panel_(std::make_unique<Lfo1Panel>(skin, childModuleWidth_, childModuleHeight_, widgetFactory, apvts))
-    , lfo2Panel_(std::make_unique<Lfo2Panel>(skin, childModuleWidth_, childModuleHeight_, widgetFactory, apvts))
+    , env1Panel_(std::make_unique<Env1Panel>(skin, rowDims_.childModuleWidth, rowDims_.childModuleHeight, widgetFactory, apvts, moduleHeaderDims, parameterCellDims))
+    , env2Panel_(std::make_unique<Env2Panel>(skin, rowDims_.childModuleWidth, rowDims_.childModuleHeight, widgetFactory, apvts, moduleHeaderDims, parameterCellDims))
+    , env3Panel_(std::make_unique<Env3Panel>(skin, rowDims_.childModuleWidth, rowDims_.childModuleHeight, widgetFactory, apvts, moduleHeaderDims, parameterCellDims))
+    , lfo1Panel_(std::make_unique<Lfo1Panel>(skin, rowDims_.childModuleWidth, rowDims_.childModuleHeight, widgetFactory, apvts, moduleHeaderDims, parameterCellDims))
+    , lfo2Panel_(std::make_unique<Lfo2Panel>(skin, rowDims_.childModuleWidth, rowDims_.childModuleHeight, widgetFactory, apvts, moduleHeaderDims, parameterCellDims))
 {
     setOpaque(false);
     addAndMakeVisible(*env1Panel_);
@@ -41,9 +45,9 @@ void PatchEditBottomModulesPanel::resized()
 {
     const auto bounds = getLocalBounds();
     
-    const int childWidth = juce::roundToInt(static_cast<float>(childModuleWidth_) * uiScale_);
-    const int childHeight = juce::roundToInt(static_cast<float>(childModuleHeight_) * uiScale_);
-    const float childStep = static_cast<float>(childModuleWidth_ + gap_) * uiScale_;
+    const int childWidth = juce::roundToInt(static_cast<float>(rowDims_.childModuleWidth) * uiScale_);
+    const int childHeight = juce::roundToInt(static_cast<float>(rowDims_.childModuleHeight) * uiScale_);
+    const float childStep = static_cast<float>(rowDims_.childModuleWidth + rowDims_.interModuleGap) * uiScale_;
 
     const int x0 = bounds.getX() + juce::roundToInt(0.0f * childStep);
     const int x1 = bounds.getX() + juce::roundToInt(1.0f * childStep);
@@ -90,4 +94,3 @@ void PatchEditBottomModulesPanel::setUiScale(float uiScale)
     resized();
     repaint();
 }
-

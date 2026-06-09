@@ -5,6 +5,8 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 
+#include "GUI/Layout/PanelDimensions.h"
+
 namespace TSS
 {
     class ISkin;
@@ -18,7 +20,7 @@ class WidgetFactory;
 class BankUtilityPanel : public juce::Component
 {
 public:
-    BankUtilityPanel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    BankUtilityPanel(TSS::ISkin& skin, const BankUtilityPanelDimensions& dims, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~BankUtilityPanel() override;
 
     void resized() override;
@@ -26,11 +28,7 @@ public:
     void setUiScale(float uiScale);
 
 private:
-    inline constexpr static int kTopPadding_ = 5;
-    inline constexpr static int kGap_ = 5;
-
-    int width_;
-    int height_;
+    BankUtilityPanelDimensions dims_;
     TSS::ISkin* skin_;
     float uiScale_ = 1.0f;
     juce::AudioProcessorValueTreeState& apvts_;

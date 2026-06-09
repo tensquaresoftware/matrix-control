@@ -5,6 +5,9 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 
+#include "GUI/Layout/PanelDimensions.h"
+#include "GUI/Layout/WidgetDimensions.h"
+
 namespace TSS
 {
     class ISkin;
@@ -19,7 +22,12 @@ class PatchEditBottomModulesPanel;
 class PatchEditPanel : public juce::Component
 {
 public:
-    PatchEditPanel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    PatchEditPanel(TSS::ISkin& skin,
+                   const PatchEditPanelDimensions& dims,
+                   const ParameterCellDimensions& parameterCellDims,
+                   const ModuleHeaderDimensions& moduleHeaderDims,
+                   WidgetFactory& widgetFactory,
+                   juce::AudioProcessorValueTreeState& apvts);
     ~PatchEditPanel() override;
 
     void resized() override;
@@ -27,11 +35,7 @@ public:
     void setUiScale(float uiScale);
 
 private:
-    int width_;
-    int height_;
-    int topPanelHeight_;
-    int middlePanelHeight_;
-    int bottomPanelHeight_;
+    PatchEditPanelDimensions dims_;
     TSS::ISkin* skin_;
     float uiScale_ = 1.0f;
 

@@ -13,28 +13,22 @@
 #include "GUI/Widgets/SectionHeader.h"
 #include "Shared/Definitions/PluginDescriptors.h"
 #include "Shared/Definitions/PluginHelpers.h"
-#include "GUI/Layout/Design/Design.h"
 #include "Shared/Definitions/PluginIDs.h"
 #include "GUI/Factories/WidgetFactory.h"
 
 
-MasterEditPanel::MasterEditPanel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
-    : width_(width)
-    , height_(height)
-    , childModuleWidth_(TSS::Design::Panels::Body::MasterEditSection::ChildModules::kWidth)
-    , midiPanelHeight_(TSS::Design::Panels::Body::MasterEditSection::MidiModule::kHeight)
-    , vibratoPanelHeight_(TSS::Design::Panels::Body::MasterEditSection::VibratoModule::kHeight)
-    , miscPanelHeight_(TSS::Design::Panels::Body::MasterEditSection::MiscModule::kHeight)
+MasterEditPanel::MasterEditPanel(TSS::ISkin& skin, const MasterEditPanelDimensions& dims, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+    : dims_(dims)
     , skin_(&skin)
     , sectionHeader_(std::make_unique<TSS::SectionHeader>(
-        TSS::Design::PanelWidgets::Widths::SectionHeader::kMasterEdit,
-        TSS::Design::Atoms::Heights::kSectionHeader,
+        dims_.sectionHeaderWidth,
+        dims_.sectionHeaderHeight,
         TSS::sectionHeaderLookFromSkin(skin),
         PluginHelpers::getSectionDisplayName(PluginIDs::MasterEditSection::kGroupId),
         TSS::SectionHeader::ColourVariant::Orange))
-    , midiPanel_(std::make_unique<MidiPanel>(skin, childModuleWidth_, midiPanelHeight_, widgetFactory, apvts))
-    , vibratoPanel_(std::make_unique<VibratoPanel>(skin, childModuleWidth_, vibratoPanelHeight_, widgetFactory, apvts))
-    , miscPanel_(std::make_unique<MiscPanel>(skin, childModuleWidth_, miscPanelHeight_, widgetFactory, apvts))
+    , midiPanel_(std::make_unique<MidiPanel>(skin, dims_.childModuleWidth, dims_.midiPanelHeight, widgetFactory, apvts, dims_.moduleHeader, dims_.parameterCell))
+    , vibratoPanel_(std::make_unique<VibratoPanel>(skin, dims_.childModuleWidth, dims_.vibratoPanelHeight, widgetFactory, apvts, dims_.moduleHeader, dims_.parameterCell))
+    , miscPanel_(std::make_unique<MiscPanel>(skin, dims_.childModuleWidth, dims_.miscPanelHeight, widgetFactory, apvts, dims_.moduleHeader, dims_.parameterCell))
 {
     setOpaque(false);
     addAndMakeVisible(*sectionHeader_);
@@ -42,7 +36,7 @@ MasterEditPanel::MasterEditPanel(TSS::ISkin& skin, int width, int height, Widget
     addAndMakeVisible(*vibratoPanel_);
     addAndMakeVisible(*miscPanel_);
 
-    setSize(width_, height_);
+    setSize(dims_.width, dims_.height);
 }
 
 MasterEditPanel::~MasterEditPanel() = default;
@@ -53,12 +47,12 @@ void MasterEditPanel::resized()
     const float sf = uiScale_;
 
     const int sectionHeaderHeight = TSS::ScaledLayout::scaledInt(
-        static_cast<float>(TSS::Design::Atoms::Heights::kSectionHeader), sf);
-    const int childWidth = TSS::ScaledLayout::scaledInt(static_cast<float>(childModuleWidth_), sf);
+        static_cast<float>(dims_.sectionHeaderHeight), sf);
+    const int childWidth = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.childModuleWidth), sf);
 
     const int contentTop = bounds.getY() + sectionHeaderHeight;
     const int contentHeight = bounds.getHeight() - sectionHeaderHeight;
-    const std::vector<int> moduleDesignHeights { midiPanelHeight_, vibratoPanelHeight_, miscPanelHeight_ };
+    const std::vector<int> moduleDesignHeights { dims_.midiPanelHeight, dims_.vibratoPanelHeight, dims_.miscPanelHeight };
     const auto moduleHeights = TSS::ScaledLayout::distributeHeights(contentHeight, moduleDesignHeights, sf, 2);
 
     sectionHeader_->setBounds(bounds.getX(), bounds.getY(), bounds.getWidth(), sectionHeaderHeight);
@@ -100,4 +94,3 @@ void MasterEditPanel::setUiScale(float uiScale)
     resized();
     repaint();
 }
-

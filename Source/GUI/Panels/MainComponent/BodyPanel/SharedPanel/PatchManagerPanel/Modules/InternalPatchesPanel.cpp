@@ -8,14 +8,12 @@
 #include "GUI/Widgets/Button.h"
 #include "GUI/Widgets/NumberBox.h"
 #include "Shared/Definitions/PluginDescriptors.h"
-#include "GUI/Layout/Design/Design.h"
 #include "GUI/Factories/WidgetFactory.h"
 #include <juce_core/juce_core.h>
 
 
-InternalPatchesPanel::InternalPatchesPanel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
-    : width_(width)
-    , height_(height)
+InternalPatchesPanel::InternalPatchesPanel(TSS::ISkin& skin, const InternalPatchesPanelDimensions& dims, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+    : dims_(dims)
     , skin_(&skin)
     , apvts_(apvts)
 {
@@ -36,7 +34,7 @@ InternalPatchesPanel::InternalPatchesPanel(TSS::ISkin& skin, int width, int heig
 
     apvts_.state.addListener(this);
     
-    setSize(width_, height_);
+    setSize(dims_.width, dims_.height);
 }
 
 InternalPatchesPanel::~InternalPatchesPanel()
@@ -68,44 +66,43 @@ void InternalPatchesPanel::valueTreePropertyChanged(
 
 void InternalPatchesPanel::resized()
 {
-    using namespace TSS::Design::Atoms;
     const float sf = uiScale_;
 
     // Dimensions (scaled)
-    const int moduleHeaderH   = juce::roundToInt(static_cast<float>(Heights::kModuleHeader) * sf);
-    const int moduleHeaderW   = juce::roundToInt(static_cast<float>(TSS::Design::PanelWidgets::Widths::ModuleHeader::kPatchManagerModule) * sf);
-    const int groupLabelH     = juce::roundToInt(static_cast<float>(Heights::kGroupLabel) * sf);
-    const int browserGroupW   = juce::roundToInt(static_cast<float>(Widths::GroupLabel::kInternalPatchesBrowser) * sf);
-    const int memoryGroupW    = juce::roundToInt(static_cast<float>(Widths::GroupLabel::kInternalPatchesMemory) * sf);
-    const int navButtonW      = juce::roundToInt(static_cast<float>(Widths::Button::kInit) * sf);
-    const int bankNumberW     = juce::roundToInt(static_cast<float>(Widths::NumberBox::kPatchManagerBankNumber) * sf);
-    const int patchNumberW    = juce::roundToInt(static_cast<float>(Widths::NumberBox::kPatchManagerPatchNumber) * sf);
-    const int memButtonW      = juce::roundToInt(static_cast<float>(Widths::Button::kInternalPatchesInit) * sf);
-    const int buttonH         = juce::roundToInt(static_cast<float>(Heights::kButton) * sf);
+    const int moduleHeaderH   = juce::roundToInt(static_cast<float>(dims_.moduleHeader.height) * sf);
+    const int moduleHeaderW   = juce::roundToInt(static_cast<float>(dims_.moduleHeader.patchManagerTitleBandWidth) * sf);
+    const int groupLabelH     = juce::roundToInt(static_cast<float>(dims_.groupLabels.height) * sf);
+    const int browserGroupW   = juce::roundToInt(static_cast<float>(dims_.groupLabels.internalPatchesBrowserWidth) * sf);
+    const int memoryGroupW    = juce::roundToInt(static_cast<float>(dims_.groupLabels.internalPatchesMemoryWidth) * sf);
+    const int navButtonW      = juce::roundToInt(static_cast<float>(dims_.buttons.initWidth) * sf);
+    const int bankNumberW     = juce::roundToInt(static_cast<float>(dims_.numberBoxes.bankNumberWidth) * sf);
+    const int patchNumberW    = juce::roundToInt(static_cast<float>(dims_.numberBoxes.patchNumberWidth) * sf);
+    const int memButtonW      = juce::roundToInt(static_cast<float>(dims_.buttons.internalPatchesInitWidth) * sf);
+    const int buttonH         = juce::roundToInt(static_cast<float>(dims_.buttons.height) * sf);
 
     // Module header
     if (moduleHeader)
         moduleHeader->setBounds(0, 0, moduleHeaderW, moduleHeaderH);
 
     // Row 1 Y: group labels
-    const int row1Y = juce::roundToInt(static_cast<float>(Heights::kModuleHeader) * sf);
+    const int row1Y = juce::roundToInt(static_cast<float>(dims_.moduleHeader.height) * sf);
 
     // Browser group label at X=0
     if (browserGroupLabel)
         browserGroupLabel->setBounds(0, row1Y, browserGroupW, groupLabelH);
 
     // Memory group label at X = browserGroupWidth + kGroupLabelGap
-    const int memoryGroupX = juce::roundToInt(static_cast<float>(Widths::GroupLabel::kInternalPatchesBrowser + kGroupLabelGap_) * sf);
+    const int memoryGroupX = juce::roundToInt(static_cast<float>(dims_.groupLabels.internalPatchesBrowserWidth + kGroupLabelGap_) * sf);
     if (memoryGroupLabel)
         memoryGroupLabel->setBounds(memoryGroupX, row1Y, memoryGroupW, groupLabelH);
 
     // Row 2 Y: buttons/numberboxes
-    const int row2Y = juce::roundToInt(static_cast<float>(Heights::kModuleHeader + Heights::kGroupLabel) * sf);
+    const int row2Y = juce::roundToInt(static_cast<float>(dims_.moduleHeader.height + dims_.groupLabels.height) * sf);
 
     // Browser section: nav buttons + number boxes, each X computed independently
-    const float navStep    = static_cast<float>(Widths::Button::kInit + kGap_) * sf;
+    const float navStep    = static_cast<float>(dims_.buttons.initWidth + kGap_) * sf;
     const float bankNumX   = navStep * 2.0f;
-    const float patchNumX  = bankNumX + static_cast<float>(Widths::NumberBox::kPatchManagerBankNumber + kGap_) * sf;
+    const float patchNumX  = bankNumX + static_cast<float>(dims_.numberBoxes.bankNumberWidth + kGap_) * sf;
 
     if (loadPreviousPatchButton_)
         loadPreviousPatchButton_->setBounds(0, row2Y, navButtonW, buttonH);
@@ -117,8 +114,8 @@ void InternalPatchesPanel::resized()
         currentPatchNumber->setBounds(juce::roundToInt(patchNumX), row2Y, patchNumberW, buttonH);
 
     // Memory section: 4 buttons, each X computed independently from memory origin
-    const float memOriginX = static_cast<float>(Widths::GroupLabel::kInternalPatchesBrowser + kGroupLabelGap_) * sf;
-    const float memStep    = static_cast<float>(Widths::Button::kInternalPatchesInit + kGap_) * sf;
+    const float memOriginX = static_cast<float>(dims_.groupLabels.internalPatchesBrowserWidth + kGroupLabelGap_) * sf;
+    const float memStep    = static_cast<float>(dims_.buttons.internalPatchesInitWidth + kGap_) * sf;
 
     if (initPatchButton_)
         initPatchButton_->setBounds(juce::roundToInt(memOriginX), row2Y, memButtonW, buttonH);
@@ -182,8 +179,8 @@ void InternalPatchesPanel::setUiScale(float uiScale)
 void InternalPatchesPanel::setupModuleHeader(TSS::ISkin& skin, WidgetFactory& widgetFactory, const juce::String& moduleId)
 {
     moduleHeader = std::make_unique<TSS::ModuleHeader>(
-        TSS::Design::PanelWidgets::Widths::ModuleHeader::kPatchManagerModule,
-        TSS::Design::Atoms::Heights::kModuleHeader,
+        dims_.moduleHeader.patchManagerTitleBandWidth,
+        dims_.moduleHeader.height,
         TSS::moduleHeaderLookFromSkin(skin),
         TSS::ModuleHeader::ColourVariant::Blue,
         widgetFactory.getGroupDisplayName(moduleId));
@@ -193,8 +190,8 @@ void InternalPatchesPanel::setupModuleHeader(TSS::ISkin& skin, WidgetFactory& wi
 void InternalPatchesPanel::setupBrowserGroupLabel(TSS::ISkin& skin)
 {
     browserGroupLabel = std::make_unique<TSS::GroupLabel>(
-        TSS::Design::Atoms::Widths::GroupLabel::kInternalPatchesBrowser,
-        TSS::Design::Atoms::Heights::kGroupLabel,
+        dims_.groupLabels.internalPatchesBrowserWidth,
+        dims_.groupLabels.height,
         TSS::groupLabelLookFromSkin(skin),
         PluginDisplayNames::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kBrowser);
     addAndMakeVisible(*browserGroupLabel);
@@ -205,7 +202,7 @@ void InternalPatchesPanel::setupLoadPreviousPatchButton(TSS::ISkin& skin, Widget
     loadPreviousPatchButton_ = widgetFactory.createStandaloneButton(
         PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kLoadPreviousPatch,
         skin,
-        TSS::Design::Atoms::Heights::kButton);
+        dims_.buttons.height);
     loadPreviousPatchButton_->onClick = [this]
     {
         apvts_.state.setProperty(PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kLoadPreviousPatch,
@@ -220,7 +217,7 @@ void InternalPatchesPanel::setupLoadNextPatchButton(TSS::ISkin& skin, WidgetFact
     loadNextPatchButton_ = widgetFactory.createStandaloneButton(
         PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kLoadNextPatch,
         skin,
-        TSS::Design::Atoms::Heights::kButton);
+        dims_.buttons.height);
     loadNextPatchButton_->onClick = [this]
     {
         apvts_.state.setProperty(PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kLoadNextPatch,
@@ -233,8 +230,8 @@ void InternalPatchesPanel::setupLoadNextPatchButton(TSS::ISkin& skin, WidgetFact
 void InternalPatchesPanel::setupCurrentBankNumberBox(TSS::ISkin& skin)
 {
     currentBankNumber = std::make_unique<TSS::NumberBox>(
-        TSS::Design::Atoms::Widths::NumberBox::kPatchManagerBankNumber,
-        TSS::Design::Atoms::Heights::kNumberBox,
+        dims_.numberBoxes.bankNumberWidth,
+        dims_.numberBoxes.height,
         TSS::numberBoxLookFromSkin(skin),
         false,
         Matrix1000Limits::kMinBankNumber,
@@ -246,8 +243,8 @@ void InternalPatchesPanel::setupCurrentBankNumberBox(TSS::ISkin& skin)
 void InternalPatchesPanel::setupCurrentPatchNumberBox(TSS::ISkin& skin)
 {
     currentPatchNumber = std::make_unique<TSS::NumberBox>(
-        TSS::Design::Atoms::Widths::NumberBox::kPatchManagerPatchNumber,
-        TSS::Design::Atoms::Heights::kNumberBox,
+        dims_.numberBoxes.patchNumberWidth,
+        dims_.numberBoxes.height,
         TSS::numberBoxLookFromSkin(skin),
         true,
         Matrix1000Limits::kMinPatchNumber,
@@ -274,8 +271,8 @@ void InternalPatchesPanel::setupCurrentPatchNumberBox(TSS::ISkin& skin)
 void InternalPatchesPanel::setupMemoryGroupLabel(TSS::ISkin& skin)
 {
     memoryGroupLabel = std::make_unique<TSS::GroupLabel>(
-        TSS::Design::Atoms::Widths::GroupLabel::kInternalPatchesMemory,
-        TSS::Design::Atoms::Heights::kGroupLabel,
+        dims_.groupLabels.internalPatchesMemoryWidth,
+        dims_.groupLabels.height,
         TSS::groupLabelLookFromSkin(skin),
         PluginDisplayNames::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kMemory);
     addAndMakeVisible(*memoryGroupLabel);
@@ -286,7 +283,7 @@ void InternalPatchesPanel::setupInitPatchButton(TSS::ISkin& skin, WidgetFactory&
     initPatchButton_ = widgetFactory.createStandaloneButton(
         PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kInitPatch,
         skin,
-        TSS::Design::Atoms::Heights::kButton);
+        dims_.buttons.height);
     initPatchButton_->onClick = [this]
     {
         apvts_.state.setProperty(PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kInitPatch,
@@ -301,7 +298,7 @@ void InternalPatchesPanel::setupCopyPatchButton(TSS::ISkin& skin, WidgetFactory&
     copyPatchButton_ = widgetFactory.createStandaloneButton(
         PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCopyPatch,
         skin,
-        TSS::Design::Atoms::Heights::kButton);
+        dims_.buttons.height);
     copyPatchButton_->onClick = [this]
     {
         apvts_.state.setProperty(PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCopyPatch,
@@ -316,7 +313,7 @@ void InternalPatchesPanel::setupPastePatchButton(TSS::ISkin& skin, WidgetFactory
     pastePatchButton_ = widgetFactory.createStandaloneButton(
         PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kPastePatch,
         skin,
-        TSS::Design::Atoms::Heights::kButton);
+        dims_.buttons.height);
     pastePatchButton_->onClick = [this]
     {
         apvts_.state.setProperty(PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kPastePatch,
@@ -331,7 +328,7 @@ void InternalPatchesPanel::setupStorePatchButton(TSS::ISkin& skin, WidgetFactory
     storePatchButton_ = widgetFactory.createStandaloneButton(
         PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kStorePatch,
         skin,
-        TSS::Design::Atoms::Heights::kButton);
+        dims_.buttons.height);
     storePatchButton_->onClick = [this]
     {
         apvts_.state.setProperty(PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kStorePatch,

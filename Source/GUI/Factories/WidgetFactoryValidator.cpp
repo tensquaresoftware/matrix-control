@@ -1,6 +1,7 @@
 #include "WidgetFactoryValidator.h"
 
 #include "Core/Exceptions/ExceptionPropagator.h"
+#include "GUI/Layout/WidgetDimensionRegistry.h"
 
 WidgetFactoryValidator::WidgetFactoryValidator(juce::AudioProcessorValueTreeState& inApvts)
     : apvts(inApvts)
@@ -141,6 +142,18 @@ void WidgetFactoryValidator::validateWidgetType(
         ExceptionPropagator::propagateToApvts(apvts, exception);
         throw exception;
     }
+}
+
+int WidgetFactoryValidator::resolveStandaloneButtonWidthOrThrow(const juce::String& inWidgetId) const
+{
+    const auto width = WidgetDimensionRegistry::resolveStandaloneButtonWidth(inWidgetId);
+    if (!width.has_value())
+    {
+        InvalidParameterException exception(inWidgetId, "No resolvable button width for widget ID");
+        ExceptionPropagator::propagateToApvts(apvts, exception);
+        throw exception;
+    }
+    return *width;
 }
 
 juce::String WidgetFactoryValidator::getWidgetTypeString(PluginDescriptors::StandaloneWidgetType inWidgetType) const

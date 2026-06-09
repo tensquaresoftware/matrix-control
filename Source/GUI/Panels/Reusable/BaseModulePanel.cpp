@@ -6,17 +6,20 @@
 #include "GUI/Widgets/ModuleHeader.h"
 #include "GUI/Widgets/ParameterCell.h"
 #include "GUI/Factories/WidgetFactory.h"
-#include "GUI/Layout/Design/Design.h"
 
 BaseModulePanel::BaseModulePanel(TSS::ISkin& skin,
                                  WidgetFactory& widgetFactory,
                                  juce::AudioProcessorValueTreeState& apvts,
                                  const ModulePanelConfig& config,
                                  int width,
-                                 int height)
+                                 int height,
+                                 const ModuleHeaderDimensions& moduleHeaderDims,
+                                 const ParameterCellDimensions& parameterCellDims)
     : skin_(&skin)
     , apvts_(apvts)
     , moduleType_(config.moduleType)
+    , moduleHeaderDims_(moduleHeaderDims)
+    , parameterCellDims_(parameterCellDims)
 {
     setOpaque(false);
     
@@ -32,6 +35,7 @@ BaseModulePanel::BaseModulePanel(TSS::ISkin& skin,
         skin,
         widgetFactory,
         apvts,
+        moduleHeaderDims,
         config.moduleId,
         columnLayout,
         buttonSet,
@@ -60,7 +64,8 @@ BaseModulePanel::BaseModulePanel(TSS::ISkin& skin,
             paramConfig.parameterId,
             paramType,
             modType,
-            apvts_));
+            apvts_,
+            parameterCellDims));
         addAndMakeVisible(*parameterCells_.back());
     }
 
@@ -76,7 +81,7 @@ void BaseModulePanel::resized()
     if (auto* header = moduleHeader_.get())
     {
         const int headerHeight = TSS::ScaledLayout::scaledInt(
-            static_cast<float>(TSS::ModuleHeader::getDesignHeight()), uiScale_);
+            static_cast<float>(moduleHeaderDims_.height), uiScale_);
         header->setBounds(bounds.removeFromTop(headerHeight));
     }
 
@@ -84,7 +89,7 @@ void BaseModulePanel::resized()
     if (paramCount == 0)
         return;
 
-    const int designRowTotal = TSS::Design::Recipes::ParameterCell::kHeight;
+    const int designRowTotal = parameterCellDims_.rowHeight;
     const auto rowHeights = TSS::ScaledLayout::distributeFixedDesignRowsWithRemainderAtBottom(
         bounds.getHeight(), paramCount, designRowTotal, uiScale_);
 

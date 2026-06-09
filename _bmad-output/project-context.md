@@ -133,7 +133,8 @@ Core ↛ GUI   (strict — Core must never include GUI headers)
 | Synth hierarchy (Master/Patch, modules, parameters, SysEx) | `Source/Shared/Definitions/PluginDescriptors*.cpp/.h` | **Never** duplicate descriptor data elsewhere |
 | Parameter/group string IDs | `Source/Shared/Definitions/PluginIDs.h` | APVTS identifiers only here |
 | UI display strings | `Source/Shared/Definitions/PluginDisplayNames.h` | All user-visible labels here |
-| GUI design dimensions (100% reference) | `Source/Shared/Definitions/PluginDesignDimensions.h` | Design-time sizes; runtime scaling via helpers |
+| GUI design dimensions (100% reference) | `Source/GUI/Layout/Design/Design.h` (Atoms, Recipes, Panels, Checks) | Design-time SSOT; runtime values injected via `DimensionFactory` / `WidgetDimensionRegistry` |
+| Runtime GUI dimensions | `Source/GUI/Layout/WidgetDimensions.h`, `PanelDimensions.h` | Built once by Factory from Design*; panels/widgets must not include Design headers |
 | APVTS + widget construction | `Source/GUI/Factories/WidgetFactory.cpp/.h` | Factory builds UI and APVTS in parallel from descriptors |
 
 ### WidgetFactory pattern

@@ -13,27 +13,29 @@
 #include "GUI/Widgets/SectionHeader.h"
 #include "Shared/Definitions/PluginHelpers.h"
 #include "Shared/Definitions/PluginIDs.h"
-#include "GUI/Layout/Design/Design.h"
 #include "GUI/Factories/WidgetFactory.h"
 
 
 PatchEditPanel::~PatchEditPanel() = default;
 
-PatchEditPanel::PatchEditPanel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
-    : width_(width)
-    , height_(height)
-    , topPanelHeight_(TSS::Design::Panels::Body::PatchEditSection::TopModules::kHeight)
-    , middlePanelHeight_(TSS::Design::Panels::Body::PatchEditSection::MiddleModules::kHeight)
-    , bottomPanelHeight_(TSS::Design::Panels::Body::PatchEditSection::BottomModules::kHeight)
+PatchEditPanel::PatchEditPanel(TSS::ISkin& skin,
+                               const PatchEditPanelDimensions& dims,
+                               const ParameterCellDimensions& parameterCellDims,
+                               const ModuleHeaderDimensions& moduleHeaderDims,
+                               WidgetFactory& widgetFactory,
+                               juce::AudioProcessorValueTreeState& apvts)
+    : dims_(dims)
     , skin_(&skin)
     , sectionHeader_(std::make_unique<TSS::SectionHeader>(
-        TSS::Design::PanelWidgets::Widths::SectionHeader::kPatchEdit,
-        TSS::Design::Atoms::Heights::kSectionHeader,
+        dims_.sectionHeaderWidth,
+        dims_.sectionHeaderHeight,
         TSS::sectionHeaderLookFromSkin(skin),
         PluginHelpers::getSectionDisplayName(PluginIDs::PatchEditSection::kGroupId)))
-    , patchEditTopModulesPanel_(std::make_unique<PatchEditTopModulesPanel>(skin, width, topPanelHeight_, widgetFactory, apvts))
-    , patchEditDisplaysPanel_(std::make_unique<PatchEditDisplaysPanel>(skin, width, middlePanelHeight_, apvts))
-    , patchEditBottomModulesPanel_(std::make_unique<PatchEditBottomModulesPanel>(skin, width, bottomPanelHeight_, widgetFactory, apvts))
+    , patchEditTopModulesPanel_(std::make_unique<PatchEditTopModulesPanel>(
+        skin, dims_.topModules, dims_.width, dims_.topHeight, parameterCellDims, moduleHeaderDims, widgetFactory, apvts))
+    , patchEditDisplaysPanel_(std::make_unique<PatchEditDisplaysPanel>(skin, dims_.displays, apvts))
+    , patchEditBottomModulesPanel_(std::make_unique<PatchEditBottomModulesPanel>(
+        skin, dims_.bottomModules, dims_.width, dims_.bottomHeight, parameterCellDims, moduleHeaderDims, widgetFactory, apvts))
 {
     setOpaque(false);
     addAndMakeVisible(*sectionHeader_);
@@ -46,7 +48,7 @@ PatchEditPanel::PatchEditPanel(TSS::ISkin& skin, int width, int height, WidgetFa
         patchEditDisplaysPanel_->connectSliderFastPaths(*patchEditTopModulesPanel_, *patchEditBottomModulesPanel_);
     }
 
-    setSize(width_, height_);
+    setSize(dims_.width, dims_.height);
 }
 
 void PatchEditPanel::resized()
@@ -55,10 +57,10 @@ void PatchEditPanel::resized()
     const float sf = uiScale_;
 
     const std::vector<int> designHeights {
-        TSS::Design::Atoms::Heights::kSectionHeader,
-        topPanelHeight_,
-        middlePanelHeight_,
-        bottomPanelHeight_
+        dims_.sectionHeaderHeight,
+        dims_.topHeight,
+        dims_.middleHeight,
+        dims_.bottomHeight
     };
     const auto heights = TSS::ScaledLayout::distributeHeights(bounds.getHeight(), designHeights, sf, 3);
 

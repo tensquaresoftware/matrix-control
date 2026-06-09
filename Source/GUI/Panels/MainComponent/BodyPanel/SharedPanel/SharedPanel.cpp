@@ -7,25 +7,20 @@
 #include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Panels/MainComponent/BodyPanel/SharedPanel/MatrixModulationPanel/MatrixModulationPanel.h"
 #include "GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/PatchManagerPanel.h"
-#include "GUI/Layout/Design/Design.h"
 
-SharedPanel::SharedPanel(TSS::ISkin& skin, int width, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
-    : width_(width)
-    , matrixModulationPanelHeight_(TSS::Design::Panels::Body::MatrixModulationSection::kHeight)
-    , patchManagerPanelHeight_(TSS::Design::Panels::Body::PatchManagerSection::kHeight)
+SharedPanel::SharedPanel(TSS::ISkin& skin, const SharedPanelDimensions& dims, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+    : dims_(dims)
 {
     matrixModulationPanel_ = std::make_unique<MatrixModulationPanel>(
         skin,
-        width_,
-        matrixModulationPanelHeight_,
+        dims_.matrixModulation,
         widgetFactory,
         apvts);
     addAndMakeVisible(*matrixModulationPanel_);
 
     patchManagerPanel_ = std::make_unique<PatchManagerPanel>(
         skin,
-        width_,
-        patchManagerPanelHeight_,
+        dims_.patchManager,
         widgetFactory,
         apvts);
     addAndMakeVisible(*patchManagerPanel_);
@@ -43,9 +38,9 @@ void SharedPanel::resized()
 {
     const auto bounds = getLocalBounds();
     const float sf = uiScale_;
-    const int w = TSS::ScaledLayout::scaledInt(static_cast<float>(width_), sf);
+    const int w = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.width), sf);
     const int contentHeight = bounds.getHeight();
-    const std::vector<int> columnDesignHeights { matrixModulationPanelHeight_, patchManagerPanelHeight_ };
+    const std::vector<int> columnDesignHeights { dims_.matrixModulationHeight, dims_.patchManagerHeight };
     const auto columnHeights = TSS::ScaledLayout::distributeHeights(contentHeight, columnDesignHeights, sf, 1);
     const int matrixH = columnHeights[0];
     const int patchManagerH = columnHeights[1];

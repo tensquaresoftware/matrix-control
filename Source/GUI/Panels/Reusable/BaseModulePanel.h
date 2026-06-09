@@ -6,6 +6,8 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 
+#include "GUI/Layout/WidgetDimensions.h"
+
 namespace TSS
 {
     class ISkin;
@@ -49,7 +51,9 @@ public:
                     juce::AudioProcessorValueTreeState& apvts,
                     const ModulePanelConfig& config,
                     int width,
-                    int height);
+                    int height,
+                    const ModuleHeaderDimensions& moduleHeaderDims,
+                    const ParameterCellDimensions& parameterCellDims);
     ~BaseModulePanel() override;
 
     void resized() override;
@@ -62,6 +66,8 @@ protected:
     TSS::ISkin* skin_;
     juce::AudioProcessorValueTreeState& apvts_;
     ModulePanelModuleType moduleType_;
+    ModuleHeaderDimensions moduleHeaderDims_;
+    ParameterCellDimensions parameterCellDims_;
     float uiScale_ = 1.0f;
 
     std::unique_ptr<TSS::ModuleHeader> moduleHeader_;

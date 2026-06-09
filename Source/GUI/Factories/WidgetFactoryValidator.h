@@ -37,6 +37,8 @@ public:
         const PluginDescriptors::StandaloneWidgetDescriptor* inDescriptor,
         const juce::String& inWidgetId) const;
 
+    int resolveStandaloneButtonWidthOrThrow(const juce::String& inWidgetId) const;
+
 private:
     juce::AudioProcessorValueTreeState& apvts;
     

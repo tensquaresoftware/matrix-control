@@ -8,6 +8,7 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 
+#include "GUI/Layout/PanelDimensions.h"
 #include "Shared/Definitions/PluginDescriptors.h"
 #include "GUI/Widgets/ModulationBusCell.h"
 
@@ -24,7 +25,7 @@ class WidgetFactory;
 class MatrixModulationPanel : public juce::Component
 {
 public:
-    MatrixModulationPanel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    MatrixModulationPanel(TSS::ISkin& skin, const MatrixModulationPanelDimensions& dims, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~MatrixModulationPanel() override;
 
     void resized() override;
@@ -62,9 +63,7 @@ private:
 
     void createInitAllBussesButton(TSS::ISkin& skin);
 
-    int width_;
-    int height_;
-    int modulationBusHeight_;
+    MatrixModulationPanelDimensions dims_;
     TSS::ISkin* skin_;
     float uiScale_ = 1.0f;
     juce::AudioProcessorValueTreeState& apvts_;
@@ -76,4 +75,3 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MatrixModulationPanel)
 };
-

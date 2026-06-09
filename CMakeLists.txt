@@ -124,7 +124,9 @@ set(PLUGIN_SOURCES
     Source/Shared/Definitions/PluginDescriptorsPatchManager.cpp
     Source/GUI/PluginEditor.cpp
     Source/GUI/Factories/WidgetFactory.cpp
+    Source/GUI/Factories/DimensionFactory.cpp
     Source/GUI/Factories/WidgetFactoryValidator.cpp
+    Source/GUI/Layout/WidgetDimensionRegistry.cpp
     
     # Core - MIDI Communication Layer
     Source/Core/MIDI/Ports/MidiInputPort.cpp
@@ -269,7 +271,10 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/SysExDelayProfileTests.cpp
         Tests/Unit/SysExInterMessageDelayTests.cpp
         Tests/Unit/SysExParserTests.cpp
+        Tests/Unit/WidgetDimensionRegistryTests.cpp
 
+        Source/GUI/Layout/WidgetDimensionRegistry.cpp
+        Source/Shared/Definitions/PluginDescriptorsPatchManager.cpp
         Source/Core/Models/ApvtsMasterMapper.cpp
         Source/Core/Models/ApvtsPatchMapper.cpp
         Source/Core/Models/MasterModel.cpp

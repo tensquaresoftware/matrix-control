@@ -1,5 +1,7 @@
 #include "WidgetFactory.h"
 
+#include "DimensionFactory.h"
+#include "GUI/Layout/WidgetDimensionRegistry.h"
 #include "GUI/Widgets/Slider.h"
 #include "GUI/Widgets/ComboBox.h"
 #include "GUI/Widgets/Button.h"
@@ -98,14 +100,24 @@ std::unique_ptr<TSS::Button> WidgetFactory::createStandaloneButton(
     validator.getStandaloneWidgetDescriptorOrThrow(desc, widgetId);
     validator.validateWidgetType(desc, widgetId);
     
-    const auto buttonWidth = desc->buttonWidth.value_or(TSS::Design::Atoms::Widths::Button::kInit);
-    
+    const auto buttonWidth = validator.resolveStandaloneButtonWidthOrThrow(widgetId);
+
     auto button = std::make_unique<TSS::Button>(
         buttonWidth,
         height,
         TSS::buttonLookFromSkin(skin),
         desc->displayName);
     return button;
+}
+
+PluginEditorDimensions WidgetFactory::getRootGuiDimensions()
+{
+    return DimensionFactory::buildPluginEditorDimensions();
+}
+
+GuiLayoutDimensions WidgetFactory::buildGuiLayoutDimensions()
+{
+    return DimensionFactory::buildGuiLayoutDimensions();
 }
 
 std::optional<juce::String> WidgetFactory::getParameterDisplayName(const juce::String& parameterId) const

@@ -10,13 +10,11 @@
 #include "GUI/Widgets/ComboBox.h"
 #include "GUI/Widgets/Toggle.h"
 #include "Shared/Definitions/PluginDescriptors.h"
-#include "GUI/Layout/Design/Design.h"
 #include "GUI/Factories/WidgetFactory.h"
 #include "Core/Factories/ApvtsFactory.h"
 
-PatchMutatorPanel::PatchMutatorPanel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
-    : width_(width)
-    , height_(height)
+PatchMutatorPanel::PatchMutatorPanel(TSS::ISkin& skin, const PatchMutatorPanelDimensions& dims, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+    : dims_(dims)
     , skin_(&skin)
     , apvts_(apvts)
 {
@@ -25,7 +23,7 @@ PatchMutatorPanel::PatchMutatorPanel(TSS::ISkin& skin, int width, int height, Wi
     setupAmountLine(skin, widgetFactory);
     setupRandomLine(skin, widgetFactory);
     setupHistoryLine(skin, widgetFactory);
-    setSize(width_, height_);
+    setSize(dims_.width, dims_.height);
 }
 
 PatchMutatorPanel::~PatchMutatorPanel() = default;
@@ -33,8 +31,8 @@ PatchMutatorPanel::~PatchMutatorPanel() = default;
 void PatchMutatorPanel::setupModuleHeader(TSS::ISkin& skin, WidgetFactory& widgetFactory)
 {
     moduleHeader_ = std::make_unique<TSS::ModuleHeader>(
-        TSS::Design::PanelWidgets::Widths::ModuleHeader::kPatchManagerModule,
-        TSS::Design::Atoms::Heights::kModuleHeader,
+        dims_.moduleHeader.patchManagerTitleBandWidth,
+        dims_.moduleHeader.height,
         TSS::moduleHeaderLookFromSkin(skin),
         TSS::ModuleHeader::ColourVariant::Blue,
         widgetFactory.getGroupDisplayName(PluginIDs::PatchManagerSection::PatchMutatorModule::kGroupId));
@@ -44,8 +42,8 @@ void PatchMutatorPanel::setupModuleHeader(TSS::ISkin& skin, WidgetFactory& widge
 void PatchMutatorPanel::setupAmountLine(TSS::ISkin& skin, WidgetFactory& widgetFactory)
 {
     amountLabel_ = std::make_unique<TSS::Label>(
-        TSS::Design::Atoms::Widths::Label::kPatchMutator,
-        TSS::Design::Atoms::Heights::kLabel,
+        dims_.labels.patchMutatorWidth,
+        dims_.labels.height,
         TSS::labelLookFromSkin(skin),
         PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kAmount);
     addAndMakeVisible(*amountLabel_);
@@ -57,8 +55,8 @@ void PatchMutatorPanel::setupAmountLine(TSS::ISkin& skin, WidgetFactory& widgetF
         });
     
     amountSlider_ = std::make_unique<TSS::Slider>(
-        TSS::Design::Atoms::Widths::Slider::kPatchMutator,
-        TSS::Design::Atoms::Heights::kSlider,
+        dims_.sliders.patchMutatorWidth,
+        dims_.sliders.standardHeight,
         TSS::sliderLookFromSkin(skin),
         TSS::SliderConfig{
             amountIt != allIntParams.end() ? static_cast<double>(amountIt->minValue) : 0.0,
@@ -78,45 +76,45 @@ void PatchMutatorPanel::setupAmountLine(TSS::ISkin& skin, WidgetFactory& widgetF
     mutateButton_ = widgetFactory.createStandaloneButton(
         PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kMutate,
         skin,
-        TSS::Design::Atoms::Heights::kButton);
+        dims_.buttons.height);
     connectButtonToApvts(mutateButton_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kMutate);
     addAndMakeVisible(*mutateButton_);
 
     dco1Toggle_ = std::make_unique<TSS::Toggle>(
-        TSS::Design::Atoms::Widths::Toggle::kPatchMutator,
-        TSS::Design::Atoms::Heights::kToggle,
+        dims_.toggles.patchMutatorWidth,
+        dims_.toggles.height,
         TSS::toggleLookFromSkin(skin),
         PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableDco1);
     connectToggleToApvts(dco1Toggle_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableDco1);
     addAndMakeVisible(*dco1Toggle_);
 
     dco2Toggle_ = std::make_unique<TSS::Toggle>(
-        TSS::Design::Atoms::Widths::Toggle::kPatchMutator,
-        TSS::Design::Atoms::Heights::kToggle,
+        dims_.toggles.patchMutatorWidth,
+        dims_.toggles.height,
         TSS::toggleLookFromSkin(skin),
         PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableDco2);
     connectToggleToApvts(dco2Toggle_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableDco2);
     addAndMakeVisible(*dco2Toggle_);
 
     vcfVcaToggle_ = std::make_unique<TSS::Toggle>(
-        TSS::Design::Atoms::Widths::Toggle::kPatchMutator,
-        TSS::Design::Atoms::Heights::kToggle,
+        dims_.toggles.patchMutatorWidth,
+        dims_.toggles.height,
         TSS::toggleLookFromSkin(skin),
         PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableVcfVca);
     connectToggleToApvts(vcfVcaToggle_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableVcfVca);
     addAndMakeVisible(*vcfVcaToggle_);
 
     fmTrackToggle_ = std::make_unique<TSS::Toggle>(
-        TSS::Design::Atoms::Widths::Toggle::kPatchMutator,
-        TSS::Design::Atoms::Heights::kToggle,
+        dims_.toggles.patchMutatorWidth,
+        dims_.toggles.height,
         TSS::toggleLookFromSkin(skin),
         PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableFmTrack);
     connectToggleToApvts(fmTrackToggle_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableFmTrack);
     addAndMakeVisible(*fmTrackToggle_);
 
     rampPortamentoToggle_ = std::make_unique<TSS::Toggle>(
-        TSS::Design::Atoms::Widths::Toggle::kPatchMutator,
-        TSS::Design::Atoms::Heights::kToggle,
+        dims_.toggles.patchMutatorWidth,
+        dims_.toggles.height,
         TSS::toggleLookFromSkin(skin),
         PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableRampPortamento);
     connectToggleToApvts(rampPortamentoToggle_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableRampPortamento);
@@ -126,8 +124,8 @@ void PatchMutatorPanel::setupAmountLine(TSS::ISkin& skin, WidgetFactory& widgetF
 void PatchMutatorPanel::setupRandomLine(TSS::ISkin& skin, WidgetFactory& widgetFactory)
 {
     randomLabel_ = std::make_unique<TSS::Label>(
-        TSS::Design::Atoms::Widths::Label::kPatchMutator,
-        TSS::Design::Atoms::Heights::kLabel,
+        dims_.labels.patchMutatorWidth,
+        dims_.labels.height,
         TSS::labelLookFromSkin(skin),
         PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kRandom);
     addAndMakeVisible(*randomLabel_);
@@ -139,8 +137,8 @@ void PatchMutatorPanel::setupRandomLine(TSS::ISkin& skin, WidgetFactory& widgetF
         });
     
     randomSlider_ = std::make_unique<TSS::Slider>(
-        TSS::Design::Atoms::Widths::Slider::kPatchMutator,
-        TSS::Design::Atoms::Heights::kSlider,
+        dims_.sliders.patchMutatorWidth,
+        dims_.sliders.standardHeight,
         TSS::sliderLookFromSkin(skin),
         TSS::SliderConfig{
             randomIt != allIntParams.end() ? static_cast<double>(randomIt->minValue) : 0.0,
@@ -160,45 +158,45 @@ void PatchMutatorPanel::setupRandomLine(TSS::ISkin& skin, WidgetFactory& widgetF
     retryButton_ = widgetFactory.createStandaloneButton(
         PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kRetry,
         skin,
-        TSS::Design::Atoms::Heights::kButton);
+        dims_.buttons.height);
     connectButtonToApvts(retryButton_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kRetry);
     addAndMakeVisible(*retryButton_);
 
     env1Toggle_ = std::make_unique<TSS::Toggle>(
-        TSS::Design::Atoms::Widths::Toggle::kPatchMutator,
-        TSS::Design::Atoms::Heights::kToggle,
+        dims_.toggles.patchMutatorWidth,
+        dims_.toggles.height,
         TSS::toggleLookFromSkin(skin),
         PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableEnvelope1);
     connectToggleToApvts(env1Toggle_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableEnvelope1);
     addAndMakeVisible(*env1Toggle_);
 
     env2Toggle_ = std::make_unique<TSS::Toggle>(
-        TSS::Design::Atoms::Widths::Toggle::kPatchMutator,
-        TSS::Design::Atoms::Heights::kToggle,
+        dims_.toggles.patchMutatorWidth,
+        dims_.toggles.height,
         TSS::toggleLookFromSkin(skin),
         PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableEnvelope2);
     connectToggleToApvts(env2Toggle_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableEnvelope2);
     addAndMakeVisible(*env2Toggle_);
 
     env3Toggle_ = std::make_unique<TSS::Toggle>(
-        TSS::Design::Atoms::Widths::Toggle::kPatchMutator,
-        TSS::Design::Atoms::Heights::kToggle,
+        dims_.toggles.patchMutatorWidth,
+        dims_.toggles.height,
         TSS::toggleLookFromSkin(skin),
         PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableEnvelope3);
     connectToggleToApvts(env3Toggle_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableEnvelope3);
     addAndMakeVisible(*env3Toggle_);
 
     lfo1Toggle_ = std::make_unique<TSS::Toggle>(
-        TSS::Design::Atoms::Widths::Toggle::kPatchMutator,
-        TSS::Design::Atoms::Heights::kToggle,
+        dims_.toggles.patchMutatorWidth,
+        dims_.toggles.height,
         TSS::toggleLookFromSkin(skin),
         PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableLfo1);
     connectToggleToApvts(lfo1Toggle_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableLfo1);
     addAndMakeVisible(*lfo1Toggle_);
 
     lfo2Toggle_ = std::make_unique<TSS::Toggle>(
-        TSS::Design::Atoms::Widths::Toggle::kPatchMutator,
-        TSS::Design::Atoms::Heights::kToggle,
+        dims_.toggles.patchMutatorWidth,
+        dims_.toggles.height,
         TSS::toggleLookFromSkin(skin),
         PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableLfo2);
     connectToggleToApvts(lfo2Toggle_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableLfo2);
@@ -208,15 +206,15 @@ void PatchMutatorPanel::setupRandomLine(TSS::ISkin& skin, WidgetFactory& widgetF
 void PatchMutatorPanel::setupHistoryLine(TSS::ISkin& skin, WidgetFactory& widgetFactory)
 {
     historyLabel_ = std::make_unique<TSS::Label>(
-        TSS::Design::Atoms::Widths::Label::kPatchMutator,
-        TSS::Design::Atoms::Heights::kLabel,
+        dims_.labels.patchMutatorWidth,
+        dims_.labels.height,
         TSS::labelLookFromSkin(skin),
         PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kHistory);
     addAndMakeVisible(*historyLabel_);
 
     historyComboBox_ = std::make_unique<TSS::ComboBox>(
-        TSS::Design::Atoms::Widths::ComboBox::kPatchMutatorHistory,
-        TSS::Design::Atoms::Heights::kComboBox,
+        dims_.comboBoxes.patchMutatorHistoryWidth,
+        dims_.comboBoxes.standardHeight,
         TSS::comboBoxLookFromSkin(skin),
         TSS::ComboBox::Style::Standard);
     historyComboBox_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
@@ -237,28 +235,28 @@ void PatchMutatorPanel::setupHistoryLine(TSS::ISkin& skin, WidgetFactory& widget
     compareButton_ = widgetFactory.createStandaloneButton(
         PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kCompare,
         skin,
-        TSS::Design::Atoms::Heights::kButton);
+        dims_.buttons.height);
     connectButtonToApvts(compareButton_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kCompare);
     addAndMakeVisible(*compareButton_);
 
     deleteButton_ = widgetFactory.createStandaloneButton(
         PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kDelete,
         skin,
-        TSS::Design::Atoms::Heights::kButton);
+        dims_.buttons.height);
     connectButtonToApvts(deleteButton_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kDelete);
     addAndMakeVisible(*deleteButton_);
 
     clearButton_ = widgetFactory.createStandaloneButton(
         PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kClear,
         skin,
-        TSS::Design::Atoms::Heights::kButton);
+        dims_.buttons.height);
     connectButtonToApvts(clearButton_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kClear);
     addAndMakeVisible(*clearButton_);
 
     exportButton_ = widgetFactory.createStandaloneButton(
         PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kExport,
         skin,
-        TSS::Design::Atoms::Heights::kButton);
+        dims_.buttons.height);
     connectButtonToApvts(exportButton_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kExport);
     addAndMakeVisible(*exportButton_);
 }
@@ -289,16 +287,16 @@ void PatchMutatorPanel::resized()
 {
     const float sf = uiScale_;
 
-    const int moduleHeaderW = juce::roundToInt(static_cast<float>(TSS::Design::PanelWidgets::Widths::ModuleHeader::kPatchManagerModule) * sf);
-    const int moduleHeaderH = juce::roundToInt(static_cast<float>(TSS::Design::Atoms::Heights::kModuleHeader) * sf);
+    const int moduleHeaderW = juce::roundToInt(static_cast<float>(dims_.moduleHeader.patchManagerTitleBandWidth) * sf);
+    const int moduleHeaderH = juce::roundToInt(static_cast<float>(dims_.moduleHeader.height) * sf);
 
     if (auto* header = moduleHeader_.get())
         header->setBounds(0, 0, moduleHeaderW, moduleHeaderH);
 
     // Y positions for the 3 lines, computed independently from float origin
-    const int row0Y = juce::roundToInt(static_cast<float>(TSS::Design::Atoms::Heights::kModuleHeader + kGap_) * sf);
-    const int row1Y = juce::roundToInt(static_cast<float>(TSS::Design::Atoms::Heights::kModuleHeader + kGap_ + TSS::Design::Atoms::Heights::kLabel + kGap_) * sf);
-    const int row2Y = juce::roundToInt(static_cast<float>(TSS::Design::Atoms::Heights::kModuleHeader + kGap_ + (TSS::Design::Atoms::Heights::kLabel + kGap_) * 2) * sf);
+    const int row0Y = juce::roundToInt(static_cast<float>(dims_.moduleHeader.height + kGap_) * sf);
+    const int row1Y = juce::roundToInt(static_cast<float>(dims_.moduleHeader.height + kGap_ + dims_.labels.height + kGap_) * sf);
+    const int row2Y = juce::roundToInt(static_cast<float>(dims_.moduleHeader.height + kGap_ + (dims_.labels.height + kGap_) * 2) * sf);
 
     layoutSliderLine(0, row0Y, amountLabel_.get(), amountSlider_.get(), mutateButton_.get(),
         {dco1Toggle_.get(), dco2Toggle_.get(), vcfVcaToggle_.get(), fmTrackToggle_.get(), rampPortamentoToggle_.get()});
@@ -333,22 +331,21 @@ void PatchMutatorPanel::resized()
 
 void PatchMutatorPanel::layoutSliderLine(int x, int y, TSS::Label* label, TSS::Slider* slider, TSS::Button* button, const std::vector<TSS::Toggle*>& toggles)
 {
-    using namespace TSS::Design::Atoms;
     const float sf = uiScale_;
 
-    const int labelW      = juce::roundToInt(static_cast<float>(Widths::Label::kPatchMutator) * sf);
-    const int labelH      = juce::roundToInt(static_cast<float>(Heights::kLabel) * sf);
-    const int sliderW     = juce::roundToInt(static_cast<float>(Widths::Slider::kPatchMutator) * sf);
-    const int sliderH     = juce::roundToInt(static_cast<float>(Heights::kSlider) * sf);
-    const int buttonW     = juce::roundToInt(static_cast<float>(Widths::Button::kPatchMutatorMutate) * sf);
-    const int toggleW     = juce::roundToInt(static_cast<float>(Widths::Toggle::kPatchMutator) * sf);
-    const int toggleH     = juce::roundToInt(static_cast<float>(Heights::kToggle) * sf);
+    const int labelW      = juce::roundToInt(static_cast<float>(dims_.labels.patchMutatorWidth) * sf);
+    const int labelH      = juce::roundToInt(static_cast<float>(dims_.labels.height) * sf);
+    const int sliderW     = juce::roundToInt(static_cast<float>(dims_.sliders.patchMutatorWidth) * sf);
+    const int sliderH     = juce::roundToInt(static_cast<float>(dims_.sliders.standardHeight) * sf);
+    const int buttonW     = juce::roundToInt(static_cast<float>(dims_.buttons.patchMutatorMutateWidth) * sf);
+    const int toggleW     = juce::roundToInt(static_cast<float>(dims_.toggles.patchMutatorWidth) * sf);
+    const int toggleH     = juce::roundToInt(static_cast<float>(dims_.toggles.height) * sf);
 
     // Offsets computed in float to avoid accumulation
-    const float labelStep  = static_cast<float>(Widths::Label::kPatchMutator + kGap_) * sf;
-    const float sliderStep = static_cast<float>(Widths::Slider::kPatchMutator + kGap_) * sf;
-    const float buttonStep = static_cast<float>(Widths::Button::kPatchMutatorMutate + kGap_) * sf;
-    const float toggleStep = static_cast<float>(Widths::Toggle::kPatchMutator + kGap_) * sf;
+    const float labelStep  = static_cast<float>(dims_.labels.patchMutatorWidth + kGap_) * sf;
+    const float sliderStep = static_cast<float>(dims_.sliders.patchMutatorWidth + kGap_) * sf;
+    const float buttonStep = static_cast<float>(dims_.buttons.patchMutatorMutateWidth + kGap_) * sf;
+    const float toggleStep = static_cast<float>(dims_.toggles.patchMutatorWidth + kGap_) * sf;
 
     const float originX = static_cast<float>(x);
 
@@ -371,25 +368,24 @@ void PatchMutatorPanel::layoutSliderLine(int x, int y, TSS::Label* label, TSS::S
 
 void PatchMutatorPanel::layoutHistoryLine(int x, int y)
 {
-    using namespace TSS::Design::Atoms;
     const float sf = uiScale_;
 
-    const int labelW      = juce::roundToInt(static_cast<float>(Widths::Label::kPatchMutator) * sf);
-    const int labelH      = juce::roundToInt(static_cast<float>(Heights::kLabel) * sf);
-    const int comboBoxW   = juce::roundToInt(static_cast<float>(Widths::ComboBox::kPatchMutatorHistory) * sf);
-    const int comboBoxH   = juce::roundToInt(static_cast<float>(Heights::kComboBox) * sf);
-    const int compareW    = juce::roundToInt(static_cast<float>(Widths::Button::kPatchMutatorCompare) * sf);
-    const int deleteW     = juce::roundToInt(static_cast<float>(Widths::Button::kPatchMutatorDelete) * sf);
-    const int clearW      = juce::roundToInt(static_cast<float>(Widths::Button::kPatchMutatorClear) * sf);
-    const int exportW     = juce::roundToInt(static_cast<float>(Widths::Button::kPatchMutatorExport) * sf);
+    const int labelW      = juce::roundToInt(static_cast<float>(dims_.labels.patchMutatorWidth) * sf);
+    const int labelH      = juce::roundToInt(static_cast<float>(dims_.labels.height) * sf);
+    const int comboBoxW   = juce::roundToInt(static_cast<float>(dims_.comboBoxes.patchMutatorHistoryWidth) * sf);
+    const int comboBoxH   = juce::roundToInt(static_cast<float>(dims_.comboBoxes.standardHeight) * sf);
+    const int compareW    = juce::roundToInt(static_cast<float>(dims_.buttons.patchMutatorCompareWidth) * sf);
+    const int deleteW     = juce::roundToInt(static_cast<float>(dims_.buttons.patchMutatorDeleteWidth) * sf);
+    const int clearW      = juce::roundToInt(static_cast<float>(dims_.buttons.patchMutatorClearWidth) * sf);
+    const int exportW     = juce::roundToInt(static_cast<float>(dims_.buttons.patchMutatorExportWidth) * sf);
 
     // X positions computed independently from float origin
     const float originX     = static_cast<float>(x);
-    const float labelStep   = static_cast<float>(Widths::Label::kPatchMutator + kGap_) * sf;
-    const float comboStep   = static_cast<float>(Widths::ComboBox::kPatchMutatorHistory + kGap_) * sf;
-    const float compareStep = static_cast<float>(Widths::Button::kPatchMutatorCompare + kGap_) * sf;
-    const float deleteStep  = static_cast<float>(Widths::Button::kPatchMutatorDelete + kGap_) * sf;
-    const float clearStep   = static_cast<float>(Widths::Button::kPatchMutatorClear + kGap_) * sf;
+    const float labelStep   = static_cast<float>(dims_.labels.patchMutatorWidth + kGap_) * sf;
+    const float comboStep   = static_cast<float>(dims_.comboBoxes.patchMutatorHistoryWidth + kGap_) * sf;
+    const float compareStep = static_cast<float>(dims_.buttons.patchMutatorCompareWidth + kGap_) * sf;
+    const float deleteStep  = static_cast<float>(dims_.buttons.patchMutatorDeleteWidth + kGap_) * sf;
+    const float clearStep   = static_cast<float>(dims_.buttons.patchMutatorClearWidth + kGap_) * sf;
 
     if (auto* label = historyLabel_.get())
         label->setBounds(x, y, labelW, labelH);

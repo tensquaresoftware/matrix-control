@@ -5,6 +5,8 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 
+#include "GUI/Layout/PanelDimensions.h"
+
 namespace TSS
 {
     class ISkin;
@@ -20,7 +22,7 @@ class InternalPatchesPanel : public juce::Component,
                              public juce::ValueTree::Listener
 {
 public:
-    InternalPatchesPanel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    InternalPatchesPanel(TSS::ISkin& skin, const InternalPatchesPanelDimensions& dims, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~InternalPatchesPanel() override;
 
     void resized() override;
@@ -40,8 +42,7 @@ private:
     inline constexpr static int kGroupLabelGap_ = 10;
     inline constexpr static int kGap_ = 5;
 
-    int width_;
-    int height_;
+    InternalPatchesPanelDimensions dims_;
     TSS::ISkin* skin_;
     float uiScale_ = 1.0f;
     juce::AudioProcessorValueTreeState& apvts_;

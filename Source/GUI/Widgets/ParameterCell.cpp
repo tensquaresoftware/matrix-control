@@ -8,39 +8,22 @@
 #include "GUI/Widgets/Slider.h"
 #include "GUI/Widgets/ComboBox.h"
 #include "GUI/Widgets/HorizontalSeparator.h"
-#include "GUI/Layout/Design/Design.h"
 #include "GUI/Factories/WidgetFactory.h"
 
 
 ParameterCell::~ParameterCell() = default;
-
-ParameterCell::ParameterCellDimensions ParameterCell::getDimensionsForModuleType(ModuleType moduleType) const
-{
-    if (moduleType == ModuleType::PatchEdit)
-    {
-        return {
-            TSS::Design::Recipes::Label::kPatchEditModule,
-            TSS::Design::Recipes::ComboBox::kPatchEditModule,
-            TSS::Design::PanelWidgets::Widths::HorizontalSeparator::kPatchEditModule
-        };
-    }
-
-    return {
-        TSS::Design::Recipes::Label::kMasterEditModule,
-        TSS::Design::Recipes::ComboBox::kMasterEditModule,
-        TSS::Design::PanelWidgets::Widths::HorizontalSeparator::kMasterEditModule
-    };
-}
 
 ParameterCell::ParameterCell(TSS::ISkin& skin,
                              WidgetFactory& factory,
                              const juce::String& parameterId,
                              ParameterType type,
                              ModuleType moduleType,
-                             juce::AudioProcessorValueTreeState& apvts)
+                             juce::AudioProcessorValueTreeState& apvts,
+                             const ParameterCellDimensions& dimensions)
     : skin_(&skin)
     , parameterType_(type)
     , moduleType_(moduleType)
+    , dimensions_(dimensions)
 {
     setOpaque(false);
     if (type == ParameterType::None)
@@ -57,11 +40,9 @@ ParameterCell::ParameterCell(TSS::ISkin& skin,
 
 void ParameterCell::createParameterLabel(TSS::ISkin& skin, WidgetFactory& factory, const juce::String& parameterId)
 {
-    const auto dimensions = getDimensionsForModuleType(moduleType_);
-
     label_ = std::make_unique<TSS::Label>(
-        dimensions.labelWidth,
-        TSS::Design::Atoms::Heights::kLabel,
+        dimensions_.labelWidth,
+        dimensions_.labelHeight,
         TSS::labelLookFromSkin(skin),
         factory.getParameterDisplayName(parameterId).value_or(""));
     addAndMakeVisible(*label_);
@@ -77,7 +58,11 @@ void ParameterCell::createParameterWidget(TSS::ISkin& skin, WidgetFactory& facto
 
 void ParameterCell::createSliderWidget(TSS::ISkin& skin, WidgetFactory& factory, const juce::String& parameterId, juce::AudioProcessorValueTreeState& apvts)
 {
-    slider_ = factory.createIntParameterSlider(parameterId, skin);
+    slider_ = factory.createIntParameterSlider(
+        parameterId,
+        skin,
+        dimensions_.controlWidth,
+        dimensions_.sliderHeight);
     sliderAttachment_ = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
         apvts,
         parameterId,
@@ -87,13 +72,11 @@ void ParameterCell::createSliderWidget(TSS::ISkin& skin, WidgetFactory& factory,
 
 void ParameterCell::createComboBoxWidget(TSS::ISkin& skin, WidgetFactory& factory, const juce::String& parameterId, juce::AudioProcessorValueTreeState& apvts)
 {
-    const auto dimensions = getDimensionsForModuleType(moduleType_);
-
     comboBox_ = factory.createChoiceParameterComboBox(
         parameterId,
         skin,
-        dimensions.comboBoxWidth,
-        TSS::Design::Atoms::Heights::kComboBox);
+        dimensions_.controlWidth,
+        dimensions_.comboBoxHeight);
     comboBoxAttachment_ = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(
         apvts,
         parameterId,
@@ -103,11 +86,9 @@ void ParameterCell::createComboBoxWidget(TSS::ISkin& skin, WidgetFactory& factor
 
 void ParameterCell::createSeparator(TSS::ISkin& skin)
 {
-    const auto dimensions = getDimensionsForModuleType(moduleType_);
-
     separator_ = std::make_unique<TSS::HorizontalSeparator>(
-        dimensions.separatorWidth,
-        TSS::Design::Atoms::Heights::kHorizontalSeparator,
+        dimensions_.separatorWidth,
+        dimensions_.horizontalSeparatorHeight,
         TSS::horizontalSeparatorLookFromSkin(skin));
     addAndMakeVisible(*separator_);
 }
@@ -116,9 +97,9 @@ void ParameterCell::resized()
 {
     const float sf = uiScale_;
     const int h = getHeight();
-    const int labelH = TSS::ScaledLayout::scaledInt(static_cast<float>(TSS::Design::Atoms::Heights::kLabel), sf);
+    const int labelH = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions_.labelHeight), sf);
     const int sepH = juce::jmax(1, TSS::ScaledLayout::scaledInt(
-        static_cast<float>(TSS::Design::Atoms::Heights::kHorizontalSeparator), sf));
+        static_cast<float>(dimensions_.horizontalSeparatorHeight), sf));
 
     if (parameterType_ == ParameterType::None)
     {
@@ -130,8 +111,8 @@ void ParameterCell::resized()
     }
 
     const int widgetH = (parameterType_ == ParameterType::Slider)
-        ? TSS::ScaledLayout::scaledInt(static_cast<float>(TSS::Design::Atoms::Heights::kSlider), sf)
-        : TSS::ScaledLayout::scaledInt(static_cast<float>(TSS::Design::Atoms::Heights::kComboBox), sf);
+        ? TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions_.sliderHeight), sf)
+        : TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions_.comboBoxHeight), sf);
     const int rowContentH = juce::jmax(labelH, widgetH);
     const int ySep = juce::jmin(rowContentH, juce::jmax(0, h - sepH));
 
@@ -143,9 +124,8 @@ void ParameterCell::resized()
 
 void ParameterCell::layoutParameterLabel(int y)
 {
-    const auto dimensions = getDimensionsForModuleType(moduleType_);
-    const int labelWidth = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions.labelWidth), uiScale_);
-    const int labelHeight = TSS::ScaledLayout::scaledInt(static_cast<float>(TSS::Design::Atoms::Heights::kLabel), uiScale_);
+    const int labelWidth = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions_.labelWidth), uiScale_);
+    const int labelHeight = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions_.labelHeight), uiScale_);
 
     if (auto* label = label_.get())
         label->setBounds(0, y, labelWidth, labelHeight);
@@ -153,12 +133,11 @@ void ParameterCell::layoutParameterLabel(int y)
 
 void ParameterCell::layoutParameterWidget(int y)
 {
-    const auto dimensions = getDimensionsForModuleType(moduleType_);
-    const int labelWidth = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions.labelWidth), uiScale_);
-    const int sliderWidth = TSS::ScaledLayout::scaledInt(static_cast<float>(TSS::Design::Recipes::Slider::kStandard), uiScale_);
-    const int sliderHeight = TSS::ScaledLayout::scaledInt(static_cast<float>(TSS::Design::Atoms::Heights::kSlider), uiScale_);
-    const int comboBoxWidth = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions.comboBoxWidth), uiScale_);
-    const int comboBoxHeight = TSS::ScaledLayout::scaledInt(static_cast<float>(TSS::Design::Atoms::Heights::kComboBox), uiScale_);
+    const int labelWidth = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions_.labelWidth), uiScale_);
+    const int sliderWidth = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions_.controlWidth), uiScale_);
+    const int sliderHeight = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions_.sliderHeight), uiScale_);
+    const int comboBoxWidth = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions_.controlWidth), uiScale_);
+    const int comboBoxHeight = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions_.comboBoxHeight), uiScale_);
 
     if (parameterType_ == ParameterType::Slider)
     {
@@ -174,8 +153,7 @@ void ParameterCell::layoutParameterWidget(int y)
 
 void ParameterCell::layoutSeparator(int yTop, int separatorHeight)
 {
-    const auto dimensions = getDimensionsForModuleType(moduleType_);
-    const int separatorWidth = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions.separatorWidth), uiScale_);
+    const int separatorWidth = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions_.separatorWidth), uiScale_);
 
     if (auto* separator = separator_.get())
         separator->setBounds(0, yTop, separatorWidth, separatorHeight);
@@ -221,5 +199,5 @@ void ParameterCell::setUiScale(float uiScale)
 
 int ParameterCell::getTotalHeight() const
 {
-    return TSS::Design::Recipes::ParameterCell::kHeight;
+    return dimensions_.rowHeight;
 }

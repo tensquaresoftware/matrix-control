@@ -8,51 +8,24 @@
 #include "GUI/Widgets/ModulationBusHeader.h"
 #include "GUI/Widgets/Button.h"
 #include "GUI/Widgets/ModulationBusCell.h"
-#include "GUI/Widgets/ModulationBusCellDimensions.h"
 #include "Shared/Definitions/PluginDescriptors.h"
 #include "Shared/Definitions/PluginHelpers.h"
-#include "GUI/Layout/Design/Design.h"
 #include "GUI/Factories/WidgetFactory.h"
-
-namespace
-{
-    ModulationBusCellDimensions createModulationBusCellDimensions()
-    {
-        ModulationBusCellDimensions dims;
-        dims.panelWidth = TSS::Design::Panels::Body::SharedColumn::kWidth;
-        dims.panelHeight = TSS::Design::Recipes::ModulationBusCell::kHeight;
-        dims.busNumberLabelWidth = TSS::Design::Atoms::Widths::Label::kModulationBusNumber;
-        dims.busNumberLabelHeight = TSS::Design::Atoms::Heights::kLabel;
-        dims.sourceComboBoxWidth = TSS::Design::Atoms::Widths::ComboBox::kMatrixModulationSource;
-        dims.sourceComboBoxHeight = TSS::Design::Atoms::Heights::kComboBox;
-        dims.amountSliderWidth = TSS::Design::Recipes::Slider::kStandard;
-        dims.amountSliderHeight = TSS::Design::Atoms::Heights::kSlider;
-        dims.destinationComboBoxWidth = TSS::Design::Atoms::Widths::ComboBox::kMatrixModulationDestination;
-        dims.destinationComboBoxHeight = TSS::Design::Atoms::Heights::kComboBox;
-        dims.initButtonWidth = TSS::Design::Atoms::Widths::Button::kInit;
-        dims.initButtonHeight = TSS::Design::Atoms::Heights::kButton;
-        dims.separatorWidth = TSS::Design::PanelWidgets::Widths::HorizontalSeparator::kMatrixModulationBus;
-        dims.separatorHeight = TSS::Design::Atoms::Heights::kHorizontalSeparator;
-        return dims;
-    }
-}
 
 MatrixModulationPanel::~MatrixModulationPanel() = default;
 
-MatrixModulationPanel::MatrixModulationPanel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
-    : width_(width)
-    , height_(height)
-    , modulationBusHeight_(TSS::Design::Atoms::Heights::kLabel + TSS::Design::Atoms::Heights::kHorizontalSeparator)
+MatrixModulationPanel::MatrixModulationPanel(TSS::ISkin& skin, const MatrixModulationPanelDimensions& dims, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+    : dims_(dims)
     , skin_(&skin)
     , apvts_(apvts)
     , sectionHeader_(std::make_unique<TSS::SectionHeader>(
-        TSS::Design::PanelWidgets::Widths::SectionHeader::kMatrixModulation,
-        TSS::Design::Atoms::Heights::kSectionHeader,
+        dims_.sectionHeaderWidth,
+        dims_.sectionHeaderHeight,
         TSS::sectionHeaderLookFromSkin(skin),
         PluginHelpers::getSectionDisplayName(PluginIDs::MatrixModulationSection::kGroupId)))
     , modulationBusHeader_(std::make_unique<TSS::ModulationBusHeader>(
-        TSS::Design::PanelWidgets::Widths::ModulationBusHeader::kStandard,
-        TSS::Design::Atoms::Heights::kModulationBusHeader,
+        dims_.busHeaderWidth,
+        dims_.busHeaderHeight,
         TSS::modulationBusHeaderLookFromSkin(skin)))
 {
     setOpaque(false);
@@ -60,7 +33,6 @@ MatrixModulationPanel::MatrixModulationPanel(TSS::ISkin& skin, int width, int he
     addAndMakeVisible(*modulationBusHeader_);
 
     const auto parameterArrays = createModulationBusParameterArrays();
-    const auto modulationBusDimensions = createModulationBusCellDimensions();
 
     createInitAllBussesButton(skin);
 
@@ -70,9 +42,9 @@ MatrixModulationPanel::MatrixModulationPanel(TSS::ISkin& skin, int width, int he
         const auto busNumberAsSizeT = static_cast<size_t>(busNumber);
         auto bus = std::make_unique<ModulationBusCell>(
             skin,
-            width_,
-            modulationBusHeight_,
-            modulationBusDimensions,
+            dims_.width,
+            dims_.modulationBusRowHeight,
+            dims_.busCell,
             busNumber,
             widgetFactory,
             apvts_,
@@ -88,7 +60,7 @@ MatrixModulationPanel::MatrixModulationPanel(TSS::ISkin& skin, int width, int he
         modulationBuses_.push_back(std::move(bus));
     }
 
-    setSize(width_, height_);
+    setSize(dims_.width, dims_.height);
 }
 
 void MatrixModulationPanel::setBusReorderHandler(BusReorderHandler handler)
@@ -259,8 +231,8 @@ MatrixModulationPanel::ModulationBusParameterArrays MatrixModulationPanel::creat
 void MatrixModulationPanel::createInitAllBussesButton(TSS::ISkin& skin)
 {
     initAllBussesButton_ = std::make_unique<TSS::Button>(
-        TSS::Design::Atoms::Widths::Button::kInit,
-        TSS::Design::Atoms::Heights::kButton,
+        dims_.busCell.initButtonWidth,
+        dims_.busCell.initButtonHeight,
         TSS::buttonLookFromSkin(skin),
         PluginDisplayNames::ShortLabels::kInit);
     initAllBussesButton_->onClick = [this]
@@ -281,26 +253,26 @@ void MatrixModulationPanel::resized()
     if (auto* header = sectionHeader_.get())
     {
         const int headerHeight = TSS::ScaledLayout::scaledInt(
-            static_cast<float>(TSS::Design::Atoms::Heights::kSectionHeader), sf);
+            static_cast<float>(dims_.sectionHeaderHeight), sf);
         header->setBounds(bounds.removeFromTop(headerHeight));
     }
 
     if (auto* busHeader = modulationBusHeader_.get())
     {
         const int busHeaderHeight = TSS::ScaledLayout::scaledInt(
-            static_cast<float>(TSS::Design::Atoms::Heights::kModulationBusHeader), sf);
+            static_cast<float>(dims_.busHeaderHeight), sf);
         busHeader->setBounds(bounds.removeFromTop(busHeaderHeight));
     }
 
     if (auto* initButton = initAllBussesButton_.get())
     {
         const int initAllButtonWidth = TSS::ScaledLayout::scaledInt(
-            static_cast<float>(TSS::Design::Atoms::Widths::Button::kInit), sf);
+            static_cast<float>(dims_.busCell.initButtonWidth), sf);
         const int initAllButtonHeight = TSS::ScaledLayout::scaledInt(
-            static_cast<float>(TSS::Design::Atoms::Heights::kButton), sf);
+            static_cast<float>(dims_.busCell.initButtonHeight), sf);
         const int sectionHeaderHeight = TSS::ScaledLayout::scaledInt(
-            static_cast<float>(TSS::Design::Atoms::Heights::kSectionHeader), sf);
-        const int scaledPanelWidth = TSS::ScaledLayout::scaledInt(static_cast<float>(width_), sf);
+            static_cast<float>(dims_.sectionHeaderHeight), sf);
+        const int scaledPanelWidth = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.width), sf);
         const int initAllButtonX = scaledPanelWidth - initAllButtonWidth;
         initButton->setBounds(initAllButtonX, sectionHeaderHeight, initAllButtonWidth, initAllButtonHeight);
     }
@@ -310,7 +282,7 @@ void MatrixModulationPanel::resized()
         return;
 
     const auto busHeights = TSS::ScaledLayout::distributeFixedDesignRowsWithRemainderOnLast(
-        bounds.getHeight(), busCount, modulationBusHeight_, uiScale_);
+        bounds.getHeight(), busCount, dims_.modulationBusRowHeight, uiScale_);
 
     for (size_t i = 0; i < busCount; ++i)
     {
@@ -355,4 +327,3 @@ void MatrixModulationPanel::setUiScale(float uiScale)
     resized();
     repaint();
 }
-

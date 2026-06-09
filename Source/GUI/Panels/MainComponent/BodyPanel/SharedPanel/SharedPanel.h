@@ -6,6 +6,8 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 
+#include "GUI/Layout/PanelDimensions.h"
+
 namespace TSS
 {
     class ISkin;
@@ -18,7 +20,7 @@ class WidgetFactory;
 class SharedPanel : public juce::Component
 {
 public:
-    SharedPanel(TSS::ISkin& skin, int width, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    SharedPanel(TSS::ISkin& skin, const SharedPanelDimensions& dims, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~SharedPanel() override;
 
     void resized() override;
@@ -30,9 +32,7 @@ public:
     void setBusReorderHandler(BusReorderHandler handler);
 
 private:
-    int width_;
-    int matrixModulationPanelHeight_;
-    int patchManagerPanelHeight_;
+    SharedPanelDimensions dims_;
     float uiScale_ = 1.0f;
 
     std::unique_ptr<MatrixModulationPanel> matrixModulationPanel_;

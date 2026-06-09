@@ -5,6 +5,8 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 
+#include "GUI/Layout/PanelDimensions.h"
+
 namespace TSS
 {
     class ISkin;
@@ -20,7 +22,7 @@ class PatchMutatorPanel;
 class PatchManagerPanel : public juce::Component
 {
 public:
-    PatchManagerPanel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    PatchManagerPanel(TSS::ISkin& skin, const PatchManagerPanelDimensions& dims, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~PatchManagerPanel() override;
 
     void resized() override;
@@ -28,12 +30,7 @@ public:
     void setUiScale(float uiScale);
 
 private:
-    int width_;
-    int height_;
-    int bankUtilityPanelHeight_;
-    int internalPatchesPanelHeight_;
-    int computerPatchesPanelHeight_;
-    int patchMutatorPanelHeight_;
+    PatchManagerPanelDimensions dims_;
     TSS::ISkin* skin_;
     float uiScale_ = 1.0f;
 
@@ -45,4 +42,3 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PatchManagerPanel)
 };
-

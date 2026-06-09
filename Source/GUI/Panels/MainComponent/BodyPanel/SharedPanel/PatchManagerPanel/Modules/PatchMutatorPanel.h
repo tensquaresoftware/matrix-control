@@ -5,6 +5,8 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 
+#include "GUI/Layout/PanelDimensions.h"
+
 namespace TSS
 {
     class ISkin;
@@ -21,7 +23,7 @@ class WidgetFactory;
 class PatchMutatorPanel : public juce::Component
 {
 public:
-    PatchMutatorPanel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    PatchMutatorPanel(TSS::ISkin& skin, const PatchMutatorPanelDimensions& dims, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~PatchMutatorPanel() override;
 
     void resized() override;
@@ -31,8 +33,7 @@ public:
 private:
     inline constexpr static int kGap_ = 5;
 
-    int width_;
-    int height_;
+    PatchMutatorPanelDimensions dims_;
     TSS::ISkin* skin_;
     float uiScale_ = 1.0f;
     juce::AudioProcessorValueTreeState& apvts_;

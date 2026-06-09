@@ -4,7 +4,6 @@
 #include "GUI/Looks/LookBuilders.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Widgets/Button.h"
-#include "GUI/Layout/Design/Design.h"
 
 namespace TSS
 {
@@ -17,10 +16,11 @@ namespace TSS
                 : ModuleHeader::ColourVariant::Orange;
         }
 
-        int titleBandWidthForLayout(ModuleHeader::ColumnLayout layout)
+        int titleBandWidthForLayout(ModuleHeader::ColumnLayout layout, const ModuleHeaderDimensions& dimensions)
         {
-            using namespace TSS::Design::PanelWidgets::Widths::ModuleHeader;
-            return (layout == ModuleHeader::ColumnLayout::PatchEdit) ? kPatchEditModule : kMasterEditModule;
+            return (layout == ModuleHeader::ColumnLayout::PatchEdit)
+                ? dimensions.patchEditTitleBandWidth
+                : dimensions.masterEditTitleBandWidth;
         }
     }
 
@@ -43,7 +43,8 @@ namespace TSS
         , columnLayout_(spec.columnLayout)
         , buttonSet_(spec.buttonSet)
         , look_(moduleHeaderLookFromSkin(spec.skin))
-        , titleBandWidthDesign_(titleBandWidthForLayout(spec.columnLayout))
+        , dimensions_(spec.dimensions)
+        , titleBandWidthDesign_(titleBandWidthForLayout(spec.columnLayout, spec.dimensions))
         , text_(spec.widgetFactory.getGroupDisplayName(spec.moduleId))
         , colourVariant_(colourVariantForLayout(spec.columnLayout))
         , apvts_(&spec.apvts)
@@ -57,11 +58,6 @@ namespace TSS
     }
 
     ModuleHeader::~ModuleHeader() = default;
-
-    int ModuleHeader::getDesignHeight() noexcept
-    {
-        return TSS::Design::Atoms::Heights::kModuleHeader;
-    }
 
     int ModuleHeader::getTitleBandWidthDesign() const
     {
@@ -149,7 +145,7 @@ namespace TSS
         initButton_ = spec.widgetFactory.createStandaloneButton(
             spec.initWidgetId,
             spec.skin,
-            TSS::Design::Atoms::Heights::kButton);
+            dimensions_.buttonHeight);
         initButton_->onClick = [this, id = spec.initWidgetId]
         {
             apvts_->state.setProperty(id, juce::Time::getCurrentTime().toMilliseconds(), nullptr);
@@ -162,7 +158,7 @@ namespace TSS
         copyButton_ = spec.widgetFactory.createStandaloneButton(
             spec.copyWidgetId,
             spec.skin,
-            TSS::Design::Atoms::Heights::kButton);
+            dimensions_.buttonHeight);
         copyButton_->onClick = [this, id = spec.copyWidgetId]
         {
             apvts_->state.setProperty(id, juce::Time::getCurrentTime().toMilliseconds(), nullptr);
@@ -172,7 +168,7 @@ namespace TSS
         pasteButton_ = spec.widgetFactory.createStandaloneButton(
             spec.pasteWidgetId,
             spec.skin,
-            TSS::Design::Atoms::Heights::kButton);
+            dimensions_.buttonHeight);
         pasteButton_->onClick = [this, id = spec.pasteWidgetId]
         {
             apvts_->state.setProperty(id, juce::Time::getCurrentTime().toMilliseconds(), nullptr);
@@ -183,9 +179,9 @@ namespace TSS
     void ModuleHeader::layoutInitOnlyButtons()
     {
         const int initButtonWidth = juce::roundToInt(
-            static_cast<float>(TSS::Design::Atoms::Widths::Button::kInit) * uiScale_);
+            static_cast<float>(dimensions_.initWidth) * uiScale_);
         const int buttonHeight = juce::roundToInt(
-            static_cast<float>(TSS::Design::Atoms::Heights::kButton) * uiScale_);
+            static_cast<float>(dimensions_.buttonHeight) * uiScale_);
         const int panelWidth = getWidth();
 
         if (auto* button = initButton_.get())
@@ -196,12 +192,12 @@ namespace TSS
     {
         const float sf = uiScale_;
         const int buttonHeight = juce::roundToInt(
-            static_cast<float>(TSS::Design::Atoms::Heights::kButton) * sf);
+            static_cast<float>(dimensions_.buttonHeight) * sf);
         const int panelWidth = getWidth();
 
-        const float pasteW = static_cast<float>(TSS::Design::Atoms::Widths::Button::kPaste) * sf;
-        const float copyW = static_cast<float>(TSS::Design::Atoms::Widths::Button::kCopy) * sf;
-        const float initW = static_cast<float>(TSS::Design::Atoms::Widths::Button::kInit) * sf;
+        const float pasteW = static_cast<float>(dimensions_.pasteWidth) * sf;
+        const float copyW = static_cast<float>(dimensions_.copyWidth) * sf;
+        const float initW = static_cast<float>(dimensions_.initWidth) * sf;
 
         const int pasteButtonWidth = juce::roundToInt(pasteW);
         const int copyButtonWidth = juce::roundToInt(copyW);

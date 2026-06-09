@@ -5,6 +5,8 @@
 
 #include "GUI/Panels/Reusable/BaseModulePanel.h"
 
+#include "GUI/Layout/WidgetDimensions.h"
+
 namespace TSS
 {
     class ISkin;
@@ -15,7 +17,8 @@ class WidgetFactory;
 class FmTrackPanel : public BaseModulePanel
 {
 public:
-    FmTrackPanel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    FmTrackPanel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts,
+          const ModuleHeaderDimensions& moduleHeaderDims, const ParameterCellDimensions& parameterCellDims);
     ~FmTrackPanel() override = default;
 
 private:

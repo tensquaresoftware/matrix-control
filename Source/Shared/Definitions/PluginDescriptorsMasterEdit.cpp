@@ -4,7 +4,6 @@
 
 #include "PluginDescriptors.h"
 
-#include "GUI/Layout/Design/Design.h"
 #include "PluginDisplayNames.h"
 #include "PluginHelpers.h"
 #include "PluginIDs.h"
@@ -22,7 +21,6 @@ namespace PluginDescriptors
             .displayName = PluginDisplayNames::MasterEditSection::MidiModule::StandaloneWidgets::kInit,
             .parentGroupId = PluginIDs::MasterEditSection::MidiModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = TSS::Design::Atoms::Widths::Button::kInit
         }
     };
 
@@ -154,7 +152,6 @@ namespace PluginDescriptors
             .displayName = PluginDisplayNames::MasterEditSection::VibratoModule::StandaloneWidgets::kInit,
             .parentGroupId = PluginIDs::MasterEditSection::VibratoModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = TSS::Design::Atoms::Widths::Button::kInit
         }
     };
 
@@ -256,7 +253,6 @@ namespace PluginDescriptors
             .displayName = PluginDisplayNames::MasterEditSection::MiscModule::StandaloneWidgets::kInit,
             .parentGroupId = PluginIDs::MasterEditSection::MiscModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = TSS::Design::Atoms::Widths::Button::kInit
         }
     };
 

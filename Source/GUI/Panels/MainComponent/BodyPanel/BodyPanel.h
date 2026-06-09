@@ -5,6 +5,8 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 
+#include "GUI/Layout/PanelDimensions.h"
+
 namespace TSS
 {
     class ISkin;
@@ -19,7 +21,7 @@ class WidgetFactory;
 class BodyPanel : public juce::Component
 {
 public:
-    BodyPanel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    BodyPanel(TSS::ISkin& skin, const GuiLayoutDimensions& layoutDimensions, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~BodyPanel() override;
 
     void paint(juce::Graphics&) override;
@@ -32,13 +34,7 @@ public:
     void setBusReorderHandler(BusReorderHandler handler);
 
 private:
-    int width_;
-    int height_;
-    int padding_;
-    int patchEditPanelWidth_;
-    int patchEditPanelHeight_;
-    int masterEditPanelWidth_;
-    int masterEditPanelHeight_;
+    BodyPanelDimensions dims_;
     TSS::ISkin* skin_;
     float uiScale_ = 1.0f;
 
@@ -50,4 +46,3 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BodyPanel)
 };
-

@@ -5,6 +5,7 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_gui_basics/juce_gui_basics.h>
 
+#include "GUI/Layout/PanelDimensions.h"
 #include "GUI/Widgets/EnvelopeDisplay.h"
 #include "GUI/Widgets/ModuleHeader.h"
 #include "GUI/Widgets/PatchNameDisplay.h"
@@ -23,7 +24,7 @@ class PatchEditTopModulesPanel;
 class PatchEditDisplaysPanel : public juce::Component
 {
 public:
-    PatchEditDisplaysPanel(TSS::ISkin& skin, int width, int height, juce::AudioProcessorValueTreeState& apvts);
+    PatchEditDisplaysPanel(TSS::ISkin& skin, const PatchEditDisplaysPanelDimensions& dims, juce::AudioProcessorValueTreeState& apvts);
     ~PatchEditDisplaysPanel() override;
 
     void resized() override;
@@ -33,8 +34,7 @@ public:
                                 PatchEditBottomModulesPanel& bottomModulesPanel);
 
 private:
-    int width_;
-    int height_;
+    PatchEditDisplaysPanelDimensions dims_;
     TSS::ISkin* skin_;
     juce::AudioProcessorValueTreeState* apvts_ = nullptr;
     float uiScale_ = 1.0f;

@@ -5,6 +5,8 @@
 
 #include "GUI/Panels/Reusable/BaseModulePanel.h"
 
+#include "GUI/Layout/WidgetDimensions.h"
+
 namespace TSS
 {
     class ISkin;
@@ -15,7 +17,8 @@ class WidgetFactory;
 class RampPortamentoPanel : public BaseModulePanel
 {
 public:
-    RampPortamentoPanel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    RampPortamentoPanel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts,
+          const ModuleHeaderDimensions& moduleHeaderDims, const ParameterCellDimensions& parameterCellDims);
     ~RampPortamentoPanel() override = default;
 
 private:

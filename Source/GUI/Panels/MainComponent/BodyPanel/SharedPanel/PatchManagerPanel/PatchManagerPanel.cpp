@@ -14,32 +14,22 @@
 #include "GUI/Widgets/SectionHeader.h"
 #include "Shared/Definitions/PluginDescriptors.h"
 #include "Shared/Definitions/PluginHelpers.h"
-#include "GUI/Layout/Design/Design.h"
 #include "GUI/Factories/WidgetFactory.h"
 
 
-PatchManagerPanel::PatchManagerPanel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
-    : width_(width)
-    , height_(height)
-    , bankUtilityPanelHeight_(TSS::Design::Panels::Body::PatchManagerSection::BankUtilityModule::kHeight)
-    , internalPatchesPanelHeight_(TSS::Design::Panels::Body::PatchManagerSection::InternalPatchesModule::kHeight)
-    , computerPatchesPanelHeight_(TSS::Design::Panels::Body::PatchManagerSection::ComputerPatchesModule::kHeight)
-    , patchMutatorPanelHeight_(TSS::Design::Panels::Body::PatchManagerSection::PatchMutatorModule::kHeight)
+PatchManagerPanel::PatchManagerPanel(TSS::ISkin& skin, const PatchManagerPanelDimensions& dims, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+    : dims_(dims)
     , skin_(&skin)
     , sectionHeader_(std::make_unique<TSS::SectionHeader>(
-        TSS::Design::PanelWidgets::Widths::SectionHeader::kPatchManager,
-        TSS::Design::Atoms::Heights::kSectionHeader,
+        dims_.sectionHeaderWidth,
+        dims_.sectionHeaderHeight,
         TSS::sectionHeaderLookFromSkin(skin),
         PluginHelpers::getSectionDisplayName(PluginIDs::PatchManagerSection::kGroupId),
         TSS::SectionHeader::ColourVariant::Blue))
-    , bankUtilityPanel_(std::make_unique<BankUtilityPanel>(skin,
-        TSS::Design::Panels::Body::PatchManagerSection::kWidth, bankUtilityPanelHeight_, widgetFactory, apvts))
-    , internalPatchesPanel_(std::make_unique<InternalPatchesPanel>(skin,
-        TSS::Design::Panels::Body::PatchManagerSection::kWidth, internalPatchesPanelHeight_, widgetFactory, apvts))
-    , computerPatchesPanel_(std::make_unique<ComputerPatchesPanel>(skin,
-        TSS::Design::Panels::Body::PatchManagerSection::kWidth, computerPatchesPanelHeight_, widgetFactory, apvts))
-    , patchMutatorPanel_(std::make_unique<PatchMutatorPanel>(skin,
-        TSS::Design::Panels::Body::PatchManagerSection::kWidth, patchMutatorPanelHeight_, widgetFactory, apvts))
+    , bankUtilityPanel_(std::make_unique<BankUtilityPanel>(skin, dims_.bankUtility, widgetFactory, apvts))
+    , internalPatchesPanel_(std::make_unique<InternalPatchesPanel>(skin, dims_.internalPatches, widgetFactory, apvts))
+    , computerPatchesPanel_(std::make_unique<ComputerPatchesPanel>(skin, dims_.computerPatches, widgetFactory, apvts))
+    , patchMutatorPanel_(std::make_unique<PatchMutatorPanel>(skin, dims_.patchMutator, widgetFactory, apvts))
 {
     setOpaque(false);
     addAndMakeVisible(*sectionHeader_);
@@ -48,7 +38,7 @@ PatchManagerPanel::PatchManagerPanel(TSS::ISkin& skin, int width, int height, Wi
     addAndMakeVisible(*computerPatchesPanel_);
     addAndMakeVisible(*patchMutatorPanel_);
 
-    setSize(width_, height_);
+    setSize(dims_.width, dims_.height);
 }
 
 PatchManagerPanel::~PatchManagerPanel() = default;
@@ -57,18 +47,18 @@ void PatchManagerPanel::resized()
 {
     const auto bounds = getLocalBounds();
     const float sf = uiScale_;
-    const int panelWidth = TSS::ScaledLayout::scaledInt(static_cast<float>(width_), sf);
+    const int panelWidth = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.width), sf);
 
     const int sectionHeaderHeight = TSS::ScaledLayout::scaledInt(
-        static_cast<float>(TSS::Design::Atoms::Heights::kSectionHeader), sf);
+        static_cast<float>(dims_.sectionHeaderHeight), sf);
     const int contentTop = bounds.getY() + sectionHeaderHeight;
     const int contentHeight = bounds.getHeight() - sectionHeaderHeight;
 
     const std::vector<int> moduleDesignHeights {
-        bankUtilityPanelHeight_,
-        internalPatchesPanelHeight_,
-        computerPatchesPanelHeight_,
-        patchMutatorPanelHeight_
+        dims_.bankUtilityHeight,
+        dims_.internalPatchesHeight,
+        dims_.computerPatchesHeight,
+        dims_.patchMutatorHeight
     };
     const auto moduleHeights = TSS::ScaledLayout::distributeHeights(contentHeight, moduleDesignHeights, sf, 3);
 
@@ -127,4 +117,3 @@ void PatchManagerPanel::setUiScale(float uiScale)
     resized();
     repaint();
 }
-

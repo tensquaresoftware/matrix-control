@@ -5,6 +5,7 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 
+#include "GUI/Layout/PanelDimensions.h"
 #include "Panels/MainComponent/HeaderPanel/HeaderPanel.h"
 #include "Panels/MainComponent/BodyPanel/BodyPanel.h"
 #include "Panels/MainComponent/FooterPanel/FooterPanel.h"
@@ -19,7 +20,7 @@ class WidgetFactory;
 class MainComponent : public juce::Component
 {
 public:
-    MainComponent(TSS::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    MainComponent(TSS::Skin& skin, const GuiLayoutDimensions& layoutDimensions, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~MainComponent() override = default;
 
     void paint(juce::Graphics&) override;
@@ -40,6 +41,7 @@ public:
 
 private:
     TSS::Skin* skin_;
+    GuiLayoutDimensions layoutDimensions_;
     float uiScale_ = 1.0f;
     bool uiElementsTestVisible_ = false;
     int uiElementsTestAreaY_ = 0;
@@ -50,4 +52,3 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };
-

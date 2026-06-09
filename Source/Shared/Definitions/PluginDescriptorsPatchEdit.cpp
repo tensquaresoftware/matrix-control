@@ -4,7 +4,6 @@
 
 #include "PluginDescriptors.h"
 
-#include "GUI/Layout/Design/Design.h"
 #include "PluginDisplayNames.h"
 #include "PluginHelpers.h"
 #include "PluginIDs.h"
@@ -23,21 +22,18 @@ namespace PluginDescriptors
             .displayName = PluginDisplayNames::PatchEditSection::Dco1Module::StandaloneWidgets::kInit,
             .parentGroupId = PluginIDs::PatchEditSection::Dco1Module::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = TSS::Design::Atoms::Widths::Button::kInit
         },
         {
             .widgetId = PluginIDs::PatchEditSection::Dco1Module::StandaloneWidgets::kCopy,
             .displayName = PluginDisplayNames::PatchEditSection::Dco1Module::StandaloneWidgets::kCopy,
             .parentGroupId = PluginIDs::PatchEditSection::Dco1Module::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = TSS::Design::Atoms::Widths::Button::kCopy
         },
         {
             .widgetId = PluginIDs::PatchEditSection::Dco1Module::StandaloneWidgets::kPaste,
             .displayName = PluginDisplayNames::PatchEditSection::Dco1Module::StandaloneWidgets::kPaste,
             .parentGroupId = PluginIDs::PatchEditSection::Dco1Module::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = TSS::Design::Atoms::Widths::Button::kPaste
         }
     };
 
@@ -171,21 +167,18 @@ namespace PluginDescriptors
             .displayName = PluginDisplayNames::PatchEditSection::Dco2Module::StandaloneWidgets::kInit,
             .parentGroupId = PluginIDs::PatchEditSection::Dco2Module::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = TSS::Design::Atoms::Widths::Button::kInit
         },
         {
             .widgetId = PluginIDs::PatchEditSection::Dco2Module::StandaloneWidgets::kCopy,
             .displayName = PluginDisplayNames::PatchEditSection::Dco2Module::StandaloneWidgets::kCopy,
             .parentGroupId = PluginIDs::PatchEditSection::Dco2Module::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = TSS::Design::Atoms::Widths::Button::kCopy
         },
         {
             .widgetId = PluginIDs::PatchEditSection::Dco2Module::StandaloneWidgets::kPaste,
             .displayName = PluginDisplayNames::PatchEditSection::Dco2Module::StandaloneWidgets::kPaste,
             .parentGroupId = PluginIDs::PatchEditSection::Dco2Module::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = TSS::Design::Atoms::Widths::Button::kPaste
         }
     };
 
@@ -317,7 +310,6 @@ namespace PluginDescriptors
             .displayName = PluginDisplayNames::PatchEditSection::VcfVcaModule::StandaloneWidgets::kInit,
             .parentGroupId = PluginIDs::PatchEditSection::VcfVcaModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = TSS::Design::Atoms::Widths::Button::kInit
         }
     };
 
@@ -444,7 +436,6 @@ namespace PluginDescriptors
             .displayName = PluginDisplayNames::PatchEditSection::FmTrackModule::StandaloneWidgets::kInit,
             .parentGroupId = PluginIDs::PatchEditSection::FmTrackModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = TSS::Design::Atoms::Widths::Button::kInit
         }
     };
 
@@ -563,7 +554,6 @@ namespace PluginDescriptors
             .displayName = PluginDisplayNames::PatchEditSection::RampPortamentoModule::StandaloneWidgets::kInit,
             .parentGroupId = PluginIDs::PatchEditSection::RampPortamentoModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = TSS::Design::Atoms::Widths::Button::kInit
         }
     };
 
@@ -687,21 +677,18 @@ namespace PluginDescriptors
             .displayName = PluginDisplayNames::PatchEditSection::Envelope1Module::StandaloneWidgets::kInit,
             .parentGroupId = PluginIDs::PatchEditSection::Envelope1Module::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = TSS::Design::Atoms::Widths::Button::kInit
         },
         {
             .widgetId = PluginIDs::PatchEditSection::Envelope1Module::StandaloneWidgets::kCopy,
             .displayName = PluginDisplayNames::PatchEditSection::Envelope1Module::StandaloneWidgets::kCopy,
             .parentGroupId = PluginIDs::PatchEditSection::Envelope1Module::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = TSS::Design::Atoms::Widths::Button::kCopy
         },
         {
             .widgetId = PluginIDs::PatchEditSection::Envelope1Module::StandaloneWidgets::kPaste,
             .displayName = PluginDisplayNames::PatchEditSection::Envelope1Module::StandaloneWidgets::kPaste,
             .parentGroupId = PluginIDs::PatchEditSection::Envelope1Module::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = TSS::Design::Atoms::Widths::Button::kPaste
         }
     };
 
@@ -837,21 +824,18 @@ namespace PluginDescriptors
             .displayName = PluginDisplayNames::PatchEditSection::Envelope2Module::StandaloneWidgets::kInit,
             .parentGroupId = PluginIDs::PatchEditSection::Envelope2Module::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = TSS::Design::Atoms::Widths::Button::kInit
         },
         {
             .widgetId = PluginIDs::PatchEditSection::Envelope2Module::StandaloneWidgets::kCopy,
             .displayName = PluginDisplayNames::PatchEditSection::Envelope2Module::StandaloneWidgets::kCopy,
             .parentGroupId = PluginIDs::PatchEditSection::Envelope2Module::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = TSS::Design::Atoms::Widths::Button::kCopy
         },
         {
             .widgetId = PluginIDs::PatchEditSection::Envelope2Module::StandaloneWidgets::kPaste,
             .displayName = PluginDisplayNames::PatchEditSection::Envelope2Module::StandaloneWidgets::kPaste,
             .parentGroupId = PluginIDs::PatchEditSection::Envelope2Module::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = TSS::Design::Atoms::Widths::Button::kPaste
         }
     };
 
@@ -987,21 +971,18 @@ namespace PluginDescriptors
             .displayName = PluginDisplayNames::PatchEditSection::Envelope3Module::StandaloneWidgets::kInit,
             .parentGroupId = PluginIDs::PatchEditSection::Envelope3Module::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = TSS::Design::Atoms::Widths::Button::kInit
         },
         {
             .widgetId = PluginIDs::PatchEditSection::Envelope3Module::StandaloneWidgets::kCopy,
             .displayName = PluginDisplayNames::PatchEditSection::Envelope3Module::StandaloneWidgets::kCopy,
             .parentGroupId = PluginIDs::PatchEditSection::Envelope3Module::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = TSS::Design::Atoms::Widths::Button::kCopy
         },
         {
             .widgetId = PluginIDs::PatchEditSection::Envelope3Module::StandaloneWidgets::kPaste,
             .displayName = PluginDisplayNames::PatchEditSection::Envelope3Module::StandaloneWidgets::kPaste,
             .parentGroupId = PluginIDs::PatchEditSection::Envelope3Module::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = TSS::Design::Atoms::Widths::Button::kPaste
         }
     };
 
@@ -1137,21 +1118,18 @@ namespace PluginDescriptors
             .displayName = PluginDisplayNames::PatchEditSection::Lfo1Module::StandaloneWidgets::kInit,
             .parentGroupId = PluginIDs::PatchEditSection::Lfo1Module::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = TSS::Design::Atoms::Widths::Button::kInit
         },
         {
             .widgetId = PluginIDs::PatchEditSection::Lfo1Module::StandaloneWidgets::kCopy,
             .displayName = PluginDisplayNames::PatchEditSection::Lfo1Module::StandaloneWidgets::kCopy,
             .parentGroupId = PluginIDs::PatchEditSection::Lfo1Module::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = TSS::Design::Atoms::Widths::Button::kCopy
         },
         {
             .widgetId = PluginIDs::PatchEditSection::Lfo1Module::StandaloneWidgets::kPaste,
             .displayName = PluginDisplayNames::PatchEditSection::Lfo1Module::StandaloneWidgets::kPaste,
             .parentGroupId = PluginIDs::PatchEditSection::Lfo1Module::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = TSS::Design::Atoms::Widths::Button::kPaste
         }
     };
 
@@ -1295,21 +1273,18 @@ namespace PluginDescriptors
             .displayName = PluginDisplayNames::PatchEditSection::Lfo2Module::StandaloneWidgets::kInit,
             .parentGroupId = PluginIDs::PatchEditSection::Lfo2Module::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = TSS::Design::Atoms::Widths::Button::kInit
         },
         {
             .widgetId = PluginIDs::PatchEditSection::Lfo2Module::StandaloneWidgets::kCopy,
             .displayName = PluginDisplayNames::PatchEditSection::Lfo2Module::StandaloneWidgets::kCopy,
             .parentGroupId = PluginIDs::PatchEditSection::Lfo2Module::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = TSS::Design::Atoms::Widths::Button::kCopy
         },
         {
             .widgetId = PluginIDs::PatchEditSection::Lfo2Module::StandaloneWidgets::kPaste,
             .displayName = PluginDisplayNames::PatchEditSection::Lfo2Module::StandaloneWidgets::kPaste,
             .parentGroupId = PluginIDs::PatchEditSection::Lfo2Module::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
-            .buttonWidth = TSS::Design::Atoms::Widths::Button::kPaste
         }
     };
 

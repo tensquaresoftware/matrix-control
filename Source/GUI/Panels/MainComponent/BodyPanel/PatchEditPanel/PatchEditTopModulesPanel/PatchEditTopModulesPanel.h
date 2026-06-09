@@ -5,6 +5,9 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 
+#include "GUI/Layout/PanelDimensions.h"
+#include "GUI/Layout/WidgetDimensions.h"
+
 namespace TSS
 {
     class ISkin;
@@ -20,7 +23,14 @@ class RampPortamentoPanel;
 class PatchEditTopModulesPanel : public juce::Component
 {
 public:
-    PatchEditTopModulesPanel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    PatchEditTopModulesPanel(TSS::ISkin& skin,
+                             const PatchEditModulesRowDimensions& rowDims,
+                             int width,
+                             int height,
+                             const ParameterCellDimensions& parameterCellDims,
+                             const ModuleHeaderDimensions& moduleHeaderDims,
+                             WidgetFactory& widgetFactory,
+                             juce::AudioProcessorValueTreeState& apvts);
     ~PatchEditTopModulesPanel() override;
 
     void resized() override;
@@ -30,11 +40,9 @@ public:
     FmTrackPanel* getFmTrackPanel() { return fmTrackPanel_.get(); }
 
 private:
+    PatchEditModulesRowDimensions rowDims_;
     int width_;
     int height_;
-    int childModuleWidth_;
-    int childModuleHeight_;
-    int gap_;
     TSS::ISkin* skin_;
     float uiScale_ = 1.0f;
 
@@ -46,4 +54,3 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PatchEditTopModulesPanel)
 };
-

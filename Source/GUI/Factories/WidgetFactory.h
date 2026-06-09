@@ -7,6 +7,7 @@
 
 #include <juce_audio_processors/juce_audio_processors.h>
 
+#include "GUI/Layout/PanelDimensions.h"
 #include "Shared/Definitions/PluginDescriptors.h"
 #include "WidgetFactoryValidator.h"
 
@@ -47,6 +48,9 @@ public:
         const juce::String& widgetId,
         TSS::ISkin& skin,
         int height);
+
+    static PluginEditorDimensions getRootGuiDimensions();
+    static GuiLayoutDimensions buildGuiLayoutDimensions();
 
     // ============================================================================
     // Display Name Helper Methods

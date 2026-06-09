@@ -5,18 +5,18 @@
 #include "GUI/Factories/WidgetFactory.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Skins/Skin.h"
-#include "GUI/Layout/Design/Design.h"
 
 using TSS::SkinColourId;
 
-MainComponent::MainComponent(TSS::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+MainComponent::MainComponent(TSS::Skin& skin, const GuiLayoutDimensions& layoutDimensions, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : skin_(&skin)
-    , headerPanel(skin, TSS::Design::Panels::Header::kWidth, TSS::Design::Panels::Header::kHeight)
-    , bodyPanel(skin, TSS::Design::GUI::kWidth, TSS::Design::Panels::Body::kHeight, widgetFactory, apvts)
-    , footerPanel(skin, TSS::Design::Panels::Footer::kWidth, TSS::Design::Panels::Footer::kHeight, apvts)
+    , layoutDimensions_(layoutDimensions)
+    , headerPanel(skin, layoutDimensions_.header.width, layoutDimensions_.header.height)
+    , bodyPanel(skin, layoutDimensions_, widgetFactory, apvts)
+    , footerPanel(skin, layoutDimensions_.footer.width, layoutDimensions_.footer.height, apvts)
 {
     setOpaque(true);
-    setSize(width, height);
+    setSize(layoutDimensions_.editor.width, layoutDimensions_.editor.height);
     
     addAndMakeVisible(headerPanel);
     addAndMakeVisible(bodyPanel);
@@ -35,9 +35,9 @@ void MainComponent::resized()
     const float sf = uiScale_;
 
     const std::vector<int> designHeights {
-        TSS::Design::Panels::Header::kHeight,
-        TSS::Design::Panels::Body::kHeight,
-        TSS::Design::Panels::Footer::kHeight
+        layoutDimensions_.header.height,
+        layoutDimensions_.body.height,
+        layoutDimensions_.footer.height
     };
     const auto heights = TSS::ScaledLayout::distributeHeights(bounds.getHeight(), designHeights, sf, 2);
     const int headerHeight = heights[0];

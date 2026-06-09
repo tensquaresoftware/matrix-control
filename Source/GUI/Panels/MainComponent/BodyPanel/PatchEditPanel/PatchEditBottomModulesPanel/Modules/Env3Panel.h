@@ -5,6 +5,8 @@
 
 #include "GUI/Panels/Reusable/BaseModulePanel.h"
 
+#include "GUI/Layout/WidgetDimensions.h"
+
 namespace TSS
 {
     class ISkin;
@@ -15,7 +17,8 @@ class WidgetFactory;
 class Env3Panel : public BaseModulePanel
 {
 public:
-    Env3Panel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    Env3Panel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts,
+          const ModuleHeaderDimensions& moduleHeaderDims, const ParameterCellDimensions& parameterCellDims);
     ~Env3Panel() override = default;
 
 private:

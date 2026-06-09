@@ -93,7 +93,6 @@ namespace PluginDescriptors
         juce::String displayName;
         juce::String parentGroupId;
         StandaloneWidgetType widgetType;
-        std::optional<int> buttonWidth;
     };
 
 

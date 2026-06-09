@@ -73,16 +73,17 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     skin_ = skinBlack_.get();
 
     widgetFactory_ = std::make_unique<WidgetFactory>(pluginProcessor.getApvts());
+    layoutDimensions_ = WidgetFactory::buildGuiLayoutDimensions();
 
     setOpaque(true);
     setWantsKeyboardFocus(false);
     setInterceptsMouseClicks(true, true);
 
-    const auto editorWidth = TSS::Design::GUI::kWidth;
-    const auto editorHeight = TSS::Design::GUI::kHeight;
+    const auto editorWidth = layoutDimensions_.editor.width;
+    const auto editorHeight = layoutDimensions_.editor.height;
 
     mainComponent_ = std::make_unique<MainComponent>(
-        *skin_, editorWidth, editorHeight, *widgetFactory_, pluginProcessor.getApvts());
+        *skin_, layoutDimensions_, *widgetFactory_, pluginProcessor.getApvts());
     addAndMakeVisible(*mainComponent_);
 
     mainComponent_->setBusReorderHandler(
@@ -192,7 +193,7 @@ void PluginEditor::paint(juce::Graphics& g)
 
 void PluginEditor::resized()
 {
-    const int baseWidth = TSS::Design::GUI::kWidth;
+    const int baseWidth = layoutDimensions_.editor.width;
     if (baseWidth <= 0)
         return;
 
@@ -208,7 +209,7 @@ void PluginEditor::resized()
 
 void PluginEditor::syncUiScaleFromEditor()
 {
-    const int baseWidth = TSS::Design::GUI::kWidth;
+    const int baseWidth = layoutDimensions_.editor.width;
     if (baseWidth <= 0)
         return;
 
@@ -272,8 +273,8 @@ void PluginEditor::updateSkin()
 
 void PluginEditor::applyUiScale(float uiScale)
 {
-    const int baseWidth = TSS::Design::GUI::kWidth;
-    const int baseHeight = TSS::Design::GUI::kHeight;
+    const int baseWidth = layoutDimensions_.editor.width;
+    const int baseHeight = layoutDimensions_.editor.height;
 
     setSize(juce::roundToInt(static_cast<float>(baseWidth) * uiScale),
             juce::roundToInt(static_cast<float>(baseHeight) * uiScale));
@@ -344,7 +345,7 @@ void PluginEditor::openSettingsWindow()
         restoreSettingsPanelFromState(settingsWindow_->getSettingsPanel());
     }
 
-    const int baseWidth = TSS::Design::GUI::kWidth;
+    const int baseWidth = layoutDimensions_.editor.width;
     const float uiScale = (baseWidth > 0)
         ? TSS::ScaledLayout::uiScaleFromEditorBounds(getWidth(), baseWidth)
         : 1.0f;

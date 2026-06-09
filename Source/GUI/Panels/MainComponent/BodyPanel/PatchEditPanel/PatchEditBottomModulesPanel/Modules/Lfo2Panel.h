@@ -5,6 +5,8 @@
 
 #include "GUI/Panels/Reusable/BaseModulePanel.h"
 
+#include "GUI/Layout/WidgetDimensions.h"
+
 namespace TSS
 {
     class ISkin;
@@ -15,7 +17,8 @@ class WidgetFactory;
 class Lfo2Panel : public BaseModulePanel
 {
 public:
-    Lfo2Panel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    Lfo2Panel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts,
+          const ModuleHeaderDimensions& moduleHeaderDims, const ParameterCellDimensions& parameterCellDims);
     ~Lfo2Panel() override = default;
 
 private:

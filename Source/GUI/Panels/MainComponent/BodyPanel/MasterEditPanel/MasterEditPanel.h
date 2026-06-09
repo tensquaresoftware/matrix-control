@@ -5,6 +5,8 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 
+#include "GUI/Layout/PanelDimensions.h"
+
 namespace TSS
 {
     class ISkin;
@@ -19,7 +21,7 @@ class MiscPanel;
 class MasterEditPanel : public juce::Component
 {
 public:
-    MasterEditPanel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    MasterEditPanel(TSS::ISkin& skin, const MasterEditPanelDimensions& dims, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~MasterEditPanel() override;
 
     void resized() override;
@@ -27,12 +29,7 @@ public:
     void setUiScale(float uiScale);
 
 private:
-    int width_;
-    int height_;
-    int childModuleWidth_;
-    int midiPanelHeight_;
-    int vibratoPanelHeight_;
-    int miscPanelHeight_;
+    MasterEditPanelDimensions dims_;
     TSS::ISkin* skin_;
     float uiScale_ = 1.0f;
 
@@ -43,4 +40,3 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MasterEditPanel)
 };
-

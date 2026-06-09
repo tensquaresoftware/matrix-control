@@ -5,6 +5,7 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 
+#include "GUI/Layout/WidgetDimensions.h"
 #include "GUI/Looks/WidgetLooks.h"
 
 class WidgetFactory;
@@ -41,6 +42,7 @@ namespace TSS
             ISkin& skin;
             WidgetFactory& widgetFactory;
             juce::AudioProcessorValueTreeState& apvts;
+            const ModuleHeaderDimensions& dimensions;
             juce::String moduleId;
             ColumnLayout columnLayout;
             ButtonSet buttonSet;
@@ -59,8 +61,6 @@ namespace TSS
         void setLook(const ModuleHeaderLook& look);
         void setSkin(ISkin& skin);
         void setUiScale(float uiScale);
-
-        static int getDesignHeight() noexcept;
 
         void setText(const juce::String& text);
         juce::String getText() const { return text_; }
@@ -94,6 +94,7 @@ namespace TSS
         inline constexpr static int kLineThickness_ = 4;
 
         ModuleHeaderLook look_{};
+        ModuleHeaderDimensions dimensions_{};
         int width_ = 0;
         int height_ = 0;
         int titleBandWidthDesign_ = 0;

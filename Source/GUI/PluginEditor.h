@@ -7,7 +7,7 @@
 
 #include "Core/PluginProcessor.h"
 #include "MainComponent.h"
-#include "GUI/Layout/Design/Design.h"
+#include "GUI/Layout/PanelDimensions.h"
 #include "Skins/Skin.h"
 #include "Tests/TestComponent.h"
 
@@ -26,9 +26,6 @@ public:
     void paint(juce::Graphics&) override;
     void resized() override;
     void mouseDown(const juce::MouseEvent& e) override;
-
-    static int getDesignWidth() { return TSS::Design::GUI::kWidth; }
-    static int getDesignHeight() { return TSS::Design::GUI::kHeight; }
 
 private:
     class HeaderRefreshTimer;
@@ -52,6 +49,7 @@ private:
     std::unique_ptr<TSS::Skin> skinCream_;
     TSS::Skin* skin_ = nullptr;
     std::unique_ptr<WidgetFactory> widgetFactory_;
+    GuiLayoutDimensions layoutDimensions_;
     std::unique_ptr<MainComponent> mainComponent_;
     std::unique_ptr<TestComponent> testComponent_;
     std::unique_ptr<SettingsWindow> settingsWindow_;

@@ -8,14 +8,12 @@
 #include "GUI/Widgets/Button.h"
 #include "GUI/Widgets/ComboBox.h"
 #include "Shared/Definitions/PluginDescriptors.h"
-#include "GUI/Layout/Design/Design.h"
 #include "GUI/Factories/WidgetFactory.h"
 #include <juce_core/juce_core.h>
 
 
-ComputerPatchesPanel::ComputerPatchesPanel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
-    : width_(width)
-    , height_(height)
+ComputerPatchesPanel::ComputerPatchesPanel(TSS::ISkin& skin, const ComputerPatchesPanelDimensions& dims, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+    : dims_(dims)
     , skin_(&skin)
     , apvts_(apvts)
 {
@@ -32,48 +30,47 @@ ComputerPatchesPanel::ComputerPatchesPanel(TSS::ISkin& skin, int width, int heig
     setupSavePatchFileAsButton(skin, widgetFactory);
     setupSavePatchFileButton(skin, widgetFactory);
 
-    setSize(width_, height_);
+    setSize(dims_.width, dims_.height);
 }
 
 ComputerPatchesPanel::~ComputerPatchesPanel() = default;
 
 void ComputerPatchesPanel::resized()
 {
-    using namespace TSS::Design::Atoms;
     const float sf = uiScale_;
 
     // Dimensions (scaled)
-    const int moduleHeaderH    = juce::roundToInt(static_cast<float>(Heights::kModuleHeader) * sf);
-    const int moduleHeaderW    = juce::roundToInt(static_cast<float>(TSS::Design::PanelWidgets::Widths::ModuleHeader::kPatchManagerModule) * sf);
-    const int groupLabelH      = juce::roundToInt(static_cast<float>(Heights::kGroupLabel) * sf);
-    const int browserGroupW    = juce::roundToInt(static_cast<float>(Widths::GroupLabel::kComputerPatchesBrowser) * sf);
-    const int storageGroupW    = juce::roundToInt(static_cast<float>(Widths::GroupLabel::kComputerPatchesStorage) * sf);
-    const int navButtonW       = juce::roundToInt(static_cast<float>(Widths::Button::kInit) * sf);
-    const int comboBoxW        = juce::roundToInt(static_cast<float>(Widths::ComboBox::kPatchManagerComputerPatches) * sf);
-    const int loadButtonW      = juce::roundToInt(static_cast<float>(Widths::Button::kComputerPatchesLoad) * sf);
-    const int saveButtonW      = juce::roundToInt(static_cast<float>(Widths::Button::kComputerPatchesSave) * sf);
-    const int saveAsButtonW    = juce::roundToInt(static_cast<float>(Widths::Button::kComputerPatchesSaveAs) * sf);
-    const int buttonH          = juce::roundToInt(static_cast<float>(Heights::kButton) * sf);
+    const int moduleHeaderH    = juce::roundToInt(static_cast<float>(dims_.moduleHeader.height) * sf);
+    const int moduleHeaderW    = juce::roundToInt(static_cast<float>(dims_.moduleHeader.patchManagerTitleBandWidth) * sf);
+    const int groupLabelH      = juce::roundToInt(static_cast<float>(dims_.groupLabels.height) * sf);
+    const int browserGroupW    = juce::roundToInt(static_cast<float>(dims_.groupLabels.computerPatchesBrowserWidth) * sf);
+    const int storageGroupW    = juce::roundToInt(static_cast<float>(dims_.groupLabels.computerPatchesStorageWidth) * sf);
+    const int navButtonW       = juce::roundToInt(static_cast<float>(dims_.buttons.initWidth) * sf);
+    const int comboBoxW        = juce::roundToInt(static_cast<float>(dims_.comboBoxes.patchManagerComputerPatchesWidth) * sf);
+    const int loadButtonW      = juce::roundToInt(static_cast<float>(dims_.buttons.computerPatchesLoadWidth) * sf);
+    const int saveButtonW      = juce::roundToInt(static_cast<float>(dims_.buttons.computerPatchesSaveWidth) * sf);
+    const int saveAsButtonW    = juce::roundToInt(static_cast<float>(dims_.buttons.computerPatchesSaveAsWidth) * sf);
+    const int buttonH          = juce::roundToInt(static_cast<float>(dims_.buttons.height) * sf);
 
     // Module header
     if (moduleHeader_)
         moduleHeader_->setBounds(0, 0, moduleHeaderW, moduleHeaderH);
 
     // Row 1 Y: group labels (computed independently)
-    const int row1Y = juce::roundToInt(static_cast<float>(Heights::kModuleHeader) * sf);
+    const int row1Y = juce::roundToInt(static_cast<float>(dims_.moduleHeader.height) * sf);
 
     if (browserGroupLabel)
         browserGroupLabel->setBounds(0, row1Y, browserGroupW, groupLabelH);
 
-    const int storageGroupX = juce::roundToInt(static_cast<float>(Widths::GroupLabel::kComputerPatchesBrowser + kGroupLabelGap_) * sf);
+    const int storageGroupX = juce::roundToInt(static_cast<float>(dims_.groupLabels.computerPatchesBrowserWidth + kGroupLabelGap_) * sf);
     if (storageGroupLabel)
         storageGroupLabel->setBounds(storageGroupX, row1Y, storageGroupW, groupLabelH);
 
     // Row 2 Y: widgets (computed independently)
-    const int row2Y = juce::roundToInt(static_cast<float>(Heights::kModuleHeader + Heights::kGroupLabel) * sf);
+    const int row2Y = juce::roundToInt(static_cast<float>(dims_.moduleHeader.height + dims_.groupLabels.height) * sf);
 
     // Browser section: nav buttons + combobox
-    const float navStep = static_cast<float>(Widths::Button::kInit + kGap_) * sf;
+    const float navStep = static_cast<float>(dims_.buttons.initWidth + kGap_) * sf;
     if (loadPreviousPatchFileButton_)
         loadPreviousPatchFileButton_->setBounds(0, row2Y, navButtonW, buttonH);
     if (loadNextPatchFileButton_)
@@ -82,9 +79,9 @@ void ComputerPatchesPanel::resized()
         selectPatchFileComboBox_->setBounds(juce::roundToInt(navStep * 2.0f), row2Y, comboBoxW, buttonH);
 
     // Storage section: open + save-as + save
-    const float storageOriginX = static_cast<float>(Widths::GroupLabel::kComputerPatchesBrowser + kGroupLabelGap_) * sf;
-    const float openStep       = static_cast<float>(Widths::Button::kComputerPatchesLoad + kGap_) * sf;
-    const float saveAsStep     = static_cast<float>(Widths::Button::kComputerPatchesSaveAs + kGap_) * sf;
+    const float storageOriginX = static_cast<float>(dims_.groupLabels.computerPatchesBrowserWidth + kGroupLabelGap_) * sf;
+    const float openStep       = static_cast<float>(dims_.buttons.computerPatchesLoadWidth + kGap_) * sf;
+    const float saveAsStep     = static_cast<float>(dims_.buttons.computerPatchesSaveAsWidth + kGap_) * sf;
 
     if (openPatchFolderButton_)
         openPatchFolderButton_->setBounds(juce::roundToInt(storageOriginX), row2Y, loadButtonW, buttonH);
@@ -143,8 +140,8 @@ void ComputerPatchesPanel::setUiScale(float uiScale)
 void ComputerPatchesPanel::setupModuleHeader(TSS::ISkin& skin, WidgetFactory& widgetFactory, const juce::String& moduleId)
 {
     moduleHeader_ = std::make_unique<TSS::ModuleHeader>(
-        TSS::Design::PanelWidgets::Widths::ModuleHeader::kPatchManagerModule,
-        TSS::Design::Atoms::Heights::kModuleHeader,
+        dims_.moduleHeader.patchManagerTitleBandWidth,
+        dims_.moduleHeader.height,
         TSS::moduleHeaderLookFromSkin(skin),
         TSS::ModuleHeader::ColourVariant::Blue,
         widgetFactory.getGroupDisplayName(moduleId));
@@ -154,8 +151,8 @@ void ComputerPatchesPanel::setupModuleHeader(TSS::ISkin& skin, WidgetFactory& wi
 void ComputerPatchesPanel::setupBrowserGroupLabel(TSS::ISkin& skin)
 {
     browserGroupLabel = std::make_unique<TSS::GroupLabel>(
-        TSS::Design::Atoms::Widths::GroupLabel::kComputerPatchesBrowser,
-        TSS::Design::Atoms::Heights::kGroupLabel,
+        dims_.groupLabels.computerPatchesBrowserWidth,
+        dims_.groupLabels.height,
         TSS::groupLabelLookFromSkin(skin),
         PluginDisplayNames::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kBrowser);
     addAndMakeVisible(*browserGroupLabel);
@@ -166,7 +163,7 @@ void ComputerPatchesPanel::setupLoadPreviousPatchFileButton(TSS::ISkin& skin, Wi
     loadPreviousPatchFileButton_ = widgetFactory.createStandaloneButton(
         PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kLoadPreviousPatchFile,
         skin,
-        TSS::Design::Atoms::Heights::kButton);
+        dims_.buttons.height);
     loadPreviousPatchFileButton_->onClick = [this]
     {
         apvts_.state.setProperty(PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kLoadPreviousPatchFile,
@@ -181,7 +178,7 @@ void ComputerPatchesPanel::setupLoadNextPatchFileButton(TSS::ISkin& skin, Widget
     loadNextPatchFileButton_ = widgetFactory.createStandaloneButton(
         PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kLoadNextPatchFile,
         skin,
-        TSS::Design::Atoms::Heights::kButton);
+        dims_.buttons.height);
     loadNextPatchFileButton_->onClick = [this]
     {
         apvts_.state.setProperty(PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kLoadNextPatchFile,
@@ -194,8 +191,8 @@ void ComputerPatchesPanel::setupLoadNextPatchFileButton(TSS::ISkin& skin, Widget
 void ComputerPatchesPanel::setupSelectPatchFileComboBox(TSS::ISkin& skin)
 {
     selectPatchFileComboBox_ = std::make_unique<TSS::ComboBox>(
-        TSS::Design::Atoms::Widths::ComboBox::kPatchManagerComputerPatches,
-        TSS::Design::Atoms::Heights::kButton,
+        dims_.comboBoxes.patchManagerComputerPatchesWidth,
+        dims_.buttons.height,
         TSS::comboBoxLookFromSkin(skin),
         TSS::ComboBox::Style::ButtonLike);
     selectPatchFileComboBox_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
@@ -235,8 +232,8 @@ void ComputerPatchesPanel::setupSelectPatchFileComboBox(TSS::ISkin& skin)
 void ComputerPatchesPanel::setupStorageGroupLabel(TSS::ISkin& skin)
 {
     storageGroupLabel = std::make_unique<TSS::GroupLabel>(
-        TSS::Design::Atoms::Widths::GroupLabel::kComputerPatchesStorage,
-        TSS::Design::Atoms::Heights::kGroupLabel,
+        dims_.groupLabels.computerPatchesStorageWidth,
+        dims_.groupLabels.height,
         TSS::groupLabelLookFromSkin(skin),
         PluginDisplayNames::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kStorage);
     addAndMakeVisible(*storageGroupLabel);
@@ -247,7 +244,7 @@ void ComputerPatchesPanel::setupOpenPatchFolderButton(TSS::ISkin& skin, WidgetFa
     openPatchFolderButton_ = widgetFactory.createStandaloneButton(
         PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kOpenPatchFolder,
         skin,
-        TSS::Design::Atoms::Heights::kButton);
+        dims_.buttons.height);
     openPatchFolderButton_->onClick = [this]
     {
         apvts_.state.setProperty(PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kOpenPatchFolder,
@@ -262,7 +259,7 @@ void ComputerPatchesPanel::setupSavePatchFileAsButton(TSS::ISkin& skin, WidgetFa
     savePatchFileAsButton_ = widgetFactory.createStandaloneButton(
         PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSavePatchAs,
         skin,
-        TSS::Design::Atoms::Heights::kButton);
+        dims_.buttons.height);
     savePatchFileAsButton_->onClick = [this]
     {
         apvts_.state.setProperty(PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSavePatchAs,
@@ -277,7 +274,7 @@ void ComputerPatchesPanel::setupSavePatchFileButton(TSS::ISkin& skin, WidgetFact
     savePatchFileButton_ = widgetFactory.createStandaloneButton(
         PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSavePatchFile,
         skin,
-        TSS::Design::Atoms::Heights::kButton);
+        dims_.buttons.height);
     savePatchFileButton_->onClick = [this]
     {
         apvts_.state.setProperty(PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSavePatchFile,

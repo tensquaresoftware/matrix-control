@@ -4,6 +4,8 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 
+#include "GUI/Layout/WidgetDimensions.h"
+
 namespace TSS
 {
     class ISkin;
@@ -26,7 +28,8 @@ public:
                   const juce::String& parameterId,
                   ParameterType type,
                   ModuleType moduleType,
-                  juce::AudioProcessorValueTreeState& apvts);
+                  juce::AudioProcessorValueTreeState& apvts,
+                  const ParameterCellDimensions& dimensions);
     ~ParameterCell() override;
 
     void resized() override;
@@ -37,15 +40,6 @@ public:
     TSS::Slider* getSlider() const { return slider_.get(); }
 
 private:
-    struct ParameterCellDimensions
-    {
-        int labelWidth;
-        int comboBoxWidth;
-        int separatorWidth;
-    };
-
-    ParameterCellDimensions getDimensionsForModuleType(ModuleType moduleType) const;
-
     void createParameterLabel(TSS::ISkin& skin, WidgetFactory& factory, const juce::String& parameterId);
     void createParameterWidget(TSS::ISkin& skin, WidgetFactory& factory, const juce::String& parameterId, juce::AudioProcessorValueTreeState& apvts);
     void createSliderWidget(TSS::ISkin& skin, WidgetFactory& factory, const juce::String& parameterId, juce::AudioProcessorValueTreeState& apvts);
@@ -60,6 +54,7 @@ private:
     TSS::ISkin* skin_;
     ParameterType parameterType_;
     ModuleType moduleType_;
+    ParameterCellDimensions dimensions_;
     float uiScale_ = 1.0f;
 
     std::unique_ptr<TSS::Label> label_;

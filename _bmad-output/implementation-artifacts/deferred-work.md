@@ -1,5 +1,13 @@
 # Deferred Work
 
+## Deferred from: code review of u-0b-factory-dimension-registry-and-descriptor-decoupling (2026-06-09)
+
+- **`patchMutatorEnable*` descriptor type vs registry width** — Descriptors typed `kButton`, UI uses `TSS::Toggle`; registry returns `kInit` for guard only. Proper fix: add `kToggle` descriptor type (future taxonomy story).
+- **`WidgetFactory` default slider overload still reads `Design*`** (`WidgetFactory.cpp:63-64`) — AC 2.1 permits unchanged overload; slider dimension registry migration deferred.
+- **Dual Design* read paths (DimensionFactory + WidgetDimensionRegistry)** — Path A architecture; registry reads `DesignAtoms` by design; runtime struct unification deferred.
+- **Suffix/prefix registry rules fragile** (`WidgetDimensionRegistry.cpp`) — accepted Path A trade-off; explicit map expansion when ID taxonomy changes.
+- **No `DimensionFactory` unit tests** — AC 7 requires registry guard only; dimension struct coherence tests deferred.
+
 ## Deferred from: code review of 2-10-matrix-mod-bus-reorder-sysex (2026-06-06)
 
 - **`suppressMatrixModParameterSysEx_` bool vs nested counter** (`PluginProcessor.h:185`) — story spec recommends bool; nested multi-swap reentrancy out of scope for message-thread v1.

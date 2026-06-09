@@ -5,6 +5,8 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 
+#include "GUI/Layout/PanelDimensions.h"
+
 namespace TSS
 {
     class ISkin;
@@ -19,7 +21,7 @@ class WidgetFactory;
 class ComputerPatchesPanel : public juce::Component
 {
 public:
-    ComputerPatchesPanel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    ComputerPatchesPanel(TSS::ISkin& skin, const ComputerPatchesPanelDimensions& dims, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~ComputerPatchesPanel() override;
 
     void resized() override;
@@ -31,8 +33,7 @@ private:
     inline constexpr static int kGap_ = 5;
     inline constexpr static int kSelectPatchFileEmptyId_ = 1;
 
-    int width_;
-    int height_;
+    ComputerPatchesPanelDimensions dims_;
     TSS::ISkin* skin_;
     float uiScale_ = 1.0f;
     juce::AudioProcessorValueTreeState& apvts_;

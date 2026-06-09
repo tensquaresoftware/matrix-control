@@ -10,7 +10,8 @@ namespace TSS::Design
 {
     namespace Recipes
     {
-        // ParameterCell widget: Label + Control (row 1) + HorizontalSeparator (row 2).
+        // Figma-only ParameterCore (no C++ class): Label + Slider/Combo on one row (152 x 16).
+        // ParameterCell = ParameterCore + HorizontalSeparator (152 x 24).
         namespace ParameterCell
         {
             inline constexpr int kWidth = Atoms::Widths::ParameterCell::kLabel + Atoms::Widths::ParameterCell::kControl;
@@ -28,7 +29,8 @@ namespace TSS::Design
                 + Atoms::Heights::kPatchNameDisplay + kBottomPadding;
         }
 
-        // ModulationBusCell widget: bus controls (row 1) + HorizontalSeparator (row 2).
+        // Figma-only ModulationBusCore (no C++ class): Label.W8 + combos + slider + Init + 4 x gap (268 x 16).
+        // ModulationBusCell = ModulationBusCore + HorizontalSeparator (268 x 24).
         namespace ModulationBusCell
         {
             inline constexpr int kWidth = Atoms::Widths::Label::kModulationBusNumber
