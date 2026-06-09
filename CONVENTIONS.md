@@ -2,8 +2,8 @@
 
 **Author:** Guillaume DUPONT
 **Organization:** Ten Square Software
-**Context:** VST/AU plugin development with JUCE (Claude Code)
-**Revision date:** 2026-06-02
+**Context:** VST/AU plugin development with JUCE (Cursor + Claude Code)
+**Revision date:** 2026-06-08
 
 ---
 
@@ -20,18 +20,21 @@ This file defines my personal instructions for the AI coding agent. It guides th
 - My name is Guillaume, you can call me by my first name
 - Always use informal tone ("tu" en français) in all our exchanges
 - Reply to me exclusively in French in our conversations
+- **Plain French, no anglicisms or management jargon** — Avoid "trade-off", "ledger", "workflow", "pain point", "scope", "deliverable", etc. Prefer French terms: "compromis", "fichier source de vérité", "découplage", "formule", "garde-fou à la compilation", "déroulement", "point de friction"
+- **Complete sentences** — No telegraphic prose or chat abbreviations (fn, impl, req/res, etc.)
+- Keep **English only for project identifiers**: class names, file names, symbols, APIs, error messages (e.g. `Factory`, `static_assert`, `removeFromTop`)
 - Be frank, honest, and factual, even if it means contradicting me
 - Absolute priority: help me find the most relevant solution!
 
 ### 1.2 Structure of responses
 
-- Clear and didactic structure
-- Goal: help me progress
+- Goal: help me progress with clear, proportionate answers — not essays
 - Ensure longevity and maintainability of generated code
 - Optimal solutions compliant with professional standards
 - **Default tone: plain, natural French** — Questions and explanations without unnecessary jargon. Technical terms only when truly needed; then keep them short or add a brief plain-language gloss.
 - When introducing a new or abstract concept, provide a short concrete example to make it easier to understand
-- **No redundant repetition** — One well-written explanation or question per turn is enough. Do not restate the same point as intro + detailed body + summary + closing recap. Respect the token budget.
+- **No redundant repetition** — One well-written explanation or question per turn is enough. Do not restate the same point as intro + detailed body + summary + closing recap. Do not rephrase the same idea under multiple angles in one message. No filler openers ("Bien sûr !", "Excellente question !") or forced follow-up lists. Respect the token budget.
+- **Response length proportional to the question** — A simple question deserves a short answer
 - **DO NOT** paste full code blocks in the chat when modifying/generating
 - Prefer summaries and conclusions in natural language only
 - The diffs are already shown by the tool, no need to repeat the code in the chat
@@ -49,9 +52,11 @@ This file defines my personal instructions for the AI coding agent. It guides th
 #### Phase 1: DESIGN (mandatory before touching code)
 
 - Identify responsibilities (Single Responsibility Principle)
-- Detect potential duplication (Don't Repeat Yourself)
-- Choose appropriate abstractions (interfaces, base classes)
-- Plan classes/functions with explicit names
+- Detect potential duplication (Don't Repeat Yourself — see §3.1 and §6.16 for WET nuance)
+- Choose appropriate abstractions (interfaces, base classes) — **only what the current need requires (YAGNI)**
+- Prefer the **simplest design that works (KISS)** over speculative generality
+- Ask: **Does this choice make future changes easier (ETC — Easy to Change)?**
+- Plan classes/functions with explicit, intention-revealing names
 - Estimate method sizes (target: < 15 lines)
 - Ask myself: "Would Uncle Bob be proud of this design?"
 - Mentally sketch the architecture (dependencies, hierarchy)
@@ -61,7 +66,7 @@ This file defines my personal instructions for the AI coding agent. It guides th
 - Write code strictly following the Phase 1 design
 - Respect quantifiable limits (see dedicated section below)
 - If a method exceeds 15 lines → **STOP** and extract helpers IMMEDIATELY
-- If I detect duplication (even 3 lines) → **STOP** and factorize IMMEDIATELY
+- If I detect duplication (even 3 lines) → evaluate: is it **stable and meaningful**? If yes → extract; if first occurrence → **WET is OK** (see §6.16)
 - If a class exceeds 200 lines → **STOP** and re-evaluate the design (SRP likely violated)
 - Name each function to reveal its intent (no vague `doStuff()` or `process()`)
 
@@ -114,10 +119,12 @@ These limits are **HARD LIMITS**, not suggestions:
 - No `if` nested in `for` nested in `if`
 - **Solution:** early returns, function extraction, guard clauses
 
-#### Code duplication: zero tolerance
+#### Code duplication: extract when stable — WET before premature abstraction
 
-- Even 3 similar lines = mandatory extraction into common function
-- Use helpers, templates, or utility functions
+- **First occurrence (WET):** duplicating once is acceptable — do not abstract prematurely
+- **Second stable occurrence:** evaluate whether extraction improves clarity (ETC)
+- **Third similar occurrence** or confirmed stable duplication → **mandatory extraction** into a common function
+- Use helpers, templates, or utility functions — but only when duplication is real, not imagined
 
 ### 3.2 Procedure when I exceed a limit
 
@@ -131,7 +138,7 @@ These limits are **HARD LIMITS**, not suggestions:
 ### 3.3 Warning signs - Indicators of bad design
 
 - I tell myself "this function is a bit long but it's fine" → ❌ **NO**, refactor
-- I see similar code elsewhere → ❌ **NO**, factorize immediately
+- I see similar code elsewhere → evaluate stability; factorize when duplication is confirmed, not on first copy
 - I can't find a good name for the function → Sign it does too many things
 - I need a comment to explain → Code is not clear enough, rename/refactor
 - I add a comment like "// Part 1", "// Part 2" → Each part = separate function
@@ -163,8 +170,8 @@ Before presenting code to Guillaume, I MUST systematically verify:
   - If NO: extract immediately
 - [ ] All names are explicit and reveal intent?
   - `calculateTotalPrice()` not `calc()`, `isUserLoggedIn()` not `check()`
-- [ ] No code duplication (not even 3 similar lines)?
-  - If NO: factorize into common function
+- [ ] No code duplication beyond WET tolerance (see §3.1)?
+  - If stable duplication exists: factorize into common function
 - [ ] Single level of abstraction per function?
   - No mix of high-level calls + low-level manipulations
 - [ ] No explanatory comments needed?
@@ -193,7 +200,17 @@ Before presenting code to Guillaume, I MUST systematically verify:
 - [ ] Is the structure logical and predictable?
 - [ ] Are there no "surprises" or hidden side effects?
 
-### 4.5 Golden rule
+### 4.5 Design Principles Check ✓
+
+- [ ] **KISS:** Is this the simplest design that satisfies the current requirement?
+- [ ] **YAGNI:** Did I avoid features, abstractions, or parameters not needed now?
+- [ ] **ETC:** Does this design make the next likely change easier, not harder?
+- [ ] **Boy Scout Rule:** Is the touched code at least slightly cleaner than before?
+- [ ] **CQS:** Do mutating functions avoid returning queried state (and vice versa)?
+
+> Full reference: `Documentation/Development/principes-dev-qualite.md` and §6.16
+
+### 4.6 Golden rule
 
 > ❌ **If ONE ✗ → I do NOT present the code**
 >
@@ -207,7 +224,7 @@ Before presenting code to Guillaume, I MUST systematically verify:
 ### 5.1 System & Tools
 
 - **Platform:** MacBook Pro M5 with macOS Tahoe
-- **IDE / AI agent:** VS Code + Claude Code
+- **IDE / AI agent:** Cursor Pro+ (project rules in `.cursor/rules/`)
 - **Compiler:** Xcode 26
 - **Build system:** CMake
 - **Build directory:** `Builds/` (subfolders `macOS/`, `Windows/`, `Linux/`) — do not use `build/` at root
@@ -391,6 +408,7 @@ Prefer inline methods in header only if they are short (< 5 lines)
 ### 6.11 SOLID & Clean Code principles
 
 > Reference: Robert C. Martin / Uncle Bob - Clean Code & Clean Architecture
+> Simplicity and pragmatism: see §6.16 (KISS, YAGNI, WET/DRY, ETC, Boy Scout, CQS)
 
 - Readable and human-understandable code
 - Names ALWAYS explicit (no cryptic abbreviations)
@@ -437,6 +455,52 @@ Prefer inline methods in header only if they are short (< 5 lines)
 - Prefer move constructors and move assignment operators
 - Mark `noexcept` when appropriate (optimizations, move constraints)
 - Example: `void setData(juce::MemoryBlock&& data) { data_ = std::move(data); }`
+
+### 6.16 Design principles (agent priorities)
+
+> Full human reference: `Documentation/Development/principes-dev-qualite.md`
+> These principles complement SOLID and Clean Code — they resolve tensions between purity and pragmatism.
+
+#### Simplicity & change (apply in Phase 1 DESIGN)
+
+| Principle | Rule for the agent |
+|---|---|
+| **KISS** | Prefer the simplest design that meets the current requirement and respects §3 limits |
+| **YAGNI** | Do not implement features, abstractions, hooks, or parameters for hypothetical future needs |
+| **ETC** (Easy to Change) | Every design choice should make the next likely change easier, not harder |
+| **Boy Scout Rule** | Leave every touched file slightly cleaner than found (without scope creep) |
+
+#### Duplication (balance with §3.1)
+
+| Principle | Rule for the agent |
+|---|---|
+| **DRY** | Each piece of knowledge has one authoritative representation — but only after duplication is confirmed |
+| **WET** | Duplicating once is acceptable; abstract only when duplication is **stable**, **meaningful**, and **confirmed** |
+
+#### Structure (already partially covered — explicit names)
+
+| Principle | Rule for the agent |
+|---|---|
+| **SoC** | Separation of Concerns — GUI, Core, MIDI, state, rendering: distinct modules |
+| **LoD** | Law of Demeter — no `a.getB().getC().doX()` chains; talk to immediate collaborators |
+| **HC / LC** | High Cohesion within a class; Loose Coupling between modules |
+| **PI** | Persistence Ignorance — `Source/Core/` must not know GUI or persistence details |
+| **Intention-revealing names** | Names reveal *why*, not *how* — already mandatory elsewhere |
+
+#### Functions & contracts
+
+| Principle | Rule for the agent |
+|---|---|
+| **CQS** | Command Query Separation — a function either mutates state or returns information, not both |
+| **Fail-fast** | Detect invalid preconditions early (`jassert`, guards, explicit errors) — never fail silently |
+| **DbC** (lightweight) | Document and enforce preconditions for SysEx, patch ranges, checksums, MIDI contracts |
+
+#### Priority when principles conflict
+
+1. **Correctness & thread-safety** (audio thread, SysEx reliability)
+2. **KISS + YAGNI + ETC** over speculative abstraction
+3. **SOLID + §3 limits** over cleverness
+4. **DRY** after confirmed duplication — not before
 
 ---
 
@@ -723,11 +787,67 @@ constexpr int kBufferSize {calculateSize(256)};
 
 ### 8.5 Unit Tests
 
-- Write tests for business classes (not for GUI components)
-- Use a test framework (e.g. Catch2, Google Test)
-- One test = one responsibility, explicit name
-- Isolated tests, no dependencies between tests
-- Example: `TEST_CASE("SysExParser validates checksum correctly")`
+> Target: make Matrix-Control a reference repo — Core business logic must be test-covered.
+> Full testing rules: §8.5 and `.cursor/rules/core-testing.mdc`.
+
+#### Scope
+
+- **Write tests for Core business classes** — SysEx, patch model, MIDI routing, parameter mapping
+- **Do NOT write unit tests for GUI components** — manual / harness validation instead
+- **No tests in audio thread or `paint()` paths**
+
+#### Method — TDD for Core (preferred)
+
+When implementing or changing `Source/Core/` logic:
+
+1. **Red** — write or update a failing test that expresses the requirement
+2. **Green** — implement the minimum code to pass
+3. **Refactor** — apply §3 limits and §6.16 principles while keeping tests green
+
+If Guillaume requests a spike or urgent fix, tests may follow immediately after — but never skip them for stable Core logic.
+
+#### Test structure — AAA (mandatory)
+
+Every unit test follows **Arrange / Act / Assert**:
+
+```cpp
+// Arrange — setup inputs and dependencies
+// Act     — call the function under test
+// Assert  — verify outcome (expect / ASSERT)
+```
+
+Keep each section visible; one logical assertion focus per test case when possible.
+
+#### Test quality — F.I.R.S.T.
+
+| Letter | Requirement |
+|---|---|
+| **F**ast | Unit tests run in milliseconds — no hardware, no sleep, no I/O |
+| **I**ndependent | No shared mutable state between tests; order must not matter |
+| **R**epeatable | Same result on every run, every machine |
+| **S**elf-validating | Pass or fail automatically — no manual inspection |
+| **T**imely | Written with or before the production code (TDD on Core) |
+
+#### Test pyramid
+
+| Layer | Volume | Matrix-Control focus |
+|---|---|---|
+| **Unit** | Many | `Tests/Unit/` — parsers, models, dispatchers, mappers |
+| **Integration** | Some | MIDI queue + dispatcher chains, APVTS mappers (when needed) |
+| **E2E / GUI** | Few | Manual via Standalone / `TestComponent` — no automated GUI suite yet |
+
+Prefer many fast unit tests over a few slow integration tests.
+
+#### Naming & organization
+
+- One test class or `TEST_CASE` = one behavior under test
+- Test names state **expected behavior**: `validateStructure_rejectsIncompletePatchMessage`
+- Register new tests in `Tests/CMakeLists.txt`
+- Use fixtures under `Tests/Fixtures/` for SysEx binary files — do not embed large blobs inline
+
+#### Example
+
+`TEST_CASE("SysExParser validates checksum correctly")` — see `Tests/Unit/SysExParserTests.cpp`
 
 ### 8.6 Complexity
 
