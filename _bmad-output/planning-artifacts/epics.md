@@ -315,9 +315,25 @@ Users drag envelope curves and track generator points that write APVTS directly 
 
 ---
 
-**Implementation sequence (D-058):** E0 → E1 → E2 → E3 → E4 → E5 → E6 → E7 → E8 → E9 → E10
+### Epic U: UI Scale Audit & Pixel-Perfect Layout
 
-**Total:** 11 epics · **60/60 FRs mapped**
+Users see a Figma-faithful interface at every UI Scale preset (50–200%) — crisp layout via `ScaledLayout` / `ScaledDrawing` / compile-time `Design*` plan (Factory-injected `*Dimensions`) on all prod panels and widgets, with harmonized widget IDs, debug `TestComponent` enrichment, and a release gate when audit is complete.
+
+**FRs covered:** FR-43 (geometry & validation only), UX-DR8
+
+**Decisions:** D-013, D-062, D-063, D-064 (D-065 debug-only note)
+
+**Depends on:** Epic 2 Story 2.11 (header left cluster frozen) · **Parallel with:** Epics 3–6 Core · **Blocks:** v1 UI craftsmanship release gate · **Does not duplicate:** Story 7.8 (shell/persistence), Epic 2 header stories done
+
+**Sequence (Epic U):** U-IDs → U-0 → U-0b → U-2…U-9 → U-10 · U-1 parallel with U-0/U-0b
+
+**Full spec:** `planning-artifacts/epic-ui-scale-audit-pixel-perfect-layout.md` (v1.1) · **ID inventory:** `implementation-artifacts/u-ids-widget-id-harmonization-inventory.md`
+
+---
+
+**Implementation sequence (D-058):** E0 → E1 → E2 → E3 → E4 → E5 → E6 → E7 → E8 → E9 → E10 · **Parallel track:** Epic U (GUI scale audit)
+
+**Total:** 12 epics (incl. Epic U) · **66 stories** · Epic U = layout audit overlay (FR-43 geometry) · Epic U stories: U-IDs, U-0, U-0b, U-1…U-10
 
 ---
 
@@ -1320,6 +1336,183 @@ So that track editing is interactive (FR-12, UX-DR2).
 
 ---
 
+## Epic U: UI Scale Audit & Pixel-Perfect Layout
+
+Exhaustive prod UI scale audit per Figma ÷4 grid. **Canonical document:** `epic-ui-scale-audit-pixel-perfect-layout.md` (v1.1).
+
+**Prerequisite track:** U-IDs (widget ID harmonization) → U-0 (`Design*` SSOT) → U-0b (Factory injection) before layout audits U-2…U-9.
+
+### Story U-IDs: Widget ID Harmonization
+
+As a maintainer,
+I want all widget and parameter IDs to follow a single module-scoped naming convention,
+So that Shared descriptors stay pixel-free and the Factory registry stays maintainable.
+
+**Acceptance Criteria:**
+
+**Given** `implementation-artifacts/u-ids-widget-id-harmonization-inventory.md` (75 renames)
+**When** Story U-IDs merges
+**Then** `PluginIDs.h`, `PluginDisplayNames.h`, and `PluginDescriptors*` reflect the inventory ; zero grep hits on old ID strings
+**And** `bankUtilityLockBank` / `miscBankLockEnable` replace unlock/bank-lock IDs per epic spec
+
+### Story U.0: Figma Intake & Design* Reconciliation
+
+As a product owner,
+I want Figma mockup dimensions captured in the compile-time design plan,
+So that every panel and widget audit has authoritative 100% reference values.
+
+**Acceptance Criteria:**
+
+**Given** `_local/Documents/Notes/figma-mockup.md`
+**When** Story U.0 merges
+**Then** `DesignAtoms.h`, `DesignRecipes.h`, `DesignPanels.h`, `DesignChecks.h` under `Source/GUI/Layout/Design/` replace monolithic `PluginDesignDimensions.h`
+**And** per-zone dimension tables feed U.2–U.9 UAT checklists
+
+### Story U.0b: Factory Dimension Registry & Descriptor Decoupling
+
+As a developer,
+I want the Factory to be the sole consumer of the design plan,
+So that widgets and panels stay generic and Descriptors contain no pixel fields.
+
+**Acceptance Criteria:**
+
+**Given** U.0 Design* headers and U-IDs complete
+**When** Story U.0b merges
+**Then** `WidgetDimensions.h` / `PanelDimensions.h` + Factory injection are in place ; `buttonWidth` removed from Descriptors
+**And** `WidgetDimensionRegistry` + `PluginEditorDimensions` via Factory ; no Design includes in panels/widgets
+
+### Story U.1: TestComponent Enrichment (D-064)
+
+As a developer,
+I want TestComponent to showcase every custom widget at all UI scale presets,
+So that I can validate widgets in isolation before prod panel sign-off.
+
+**Acceptance Criteria:**
+
+**Given** `JUCE_DEBUG` build
+**When** TestComponent is shown
+**Then** all custom widget types are testable at presets 50–200%
+**And** release build excludes sandbox sources (prep for U.10)
+
+### Story U.2: Transversal Widgets Scale Audit
+
+As a performer,
+I want every custom widget to respect design dimensions at all UI scale presets,
+So that controls look crisp inside any panel (UX-DR8).
+
+**Acceptance Criteria:**
+
+**Given** U.0b complete (Factory-injected dimensions)
+**When** each widget in `Source/GUI/Widgets/` is reviewed
+**Then** `ScaledLayout` + `ScaledDrawing` used consistently ; widgets do not include Design headers
+**And** manual UAT passes at all seven presets
+
+### Story U.3: Header Right Cluster Layout & Sign-Off
+
+As a performer,
+I want the header SCALE/SKIN/UI Elements cluster verified against Figma,
+So that the bar matches mockup without reopening Epic 2 routing work.
+
+**Acceptance Criteria:**
+
+**Given** Story 2.11 frozen (regression only)
+**When** header is audited at all presets
+**Then** right cluster layout matches Figma ÷4
+**And** FR-41 layout slots documented — popup behaviour remains Story 7.8
+
+### Story U.4: Footer Panel Layout Audit
+
+As a user,
+I want footer zones and padding aligned to Figma at every UI scale,
+So that messages read clearly.
+
+**Acceptance Criteria:**
+
+**Given** U.0 footer dimensions
+**When** `FooterPanel` resizes at each preset
+**Then** scaled padding/gaps match design
+**And** manual UAT checklist completed
+
+### Story U.5: Body Shell — Padding, Separators & Column Gaps
+
+As a sound designer,
+I want body columns and separators positioned per Figma,
+So that the three-column grid aligns at every scale.
+
+**Acceptance Criteria:**
+
+**Given** U.0 shell dimensions
+**When** `BodyPanel` lays out at each preset
+**Then** column widths and separator heights match Design GUI stack ; originX float workaround removed
+**And** manual UAT 50–200%
+
+### Story U.6: Patch Edit Panels Layout Audit
+
+As a sound designer,
+I want PATCH EDIT sub-panels pixel-aligned to Figma,
+So that the main editing area matches the mockup.
+
+**Acceptance Criteria:**
+
+**Given** U.0 Patch Edit dimensions
+**When** top/middle/bottom panels resize at each preset
+**Then** module grid and display band match design stack
+**And** manual UAT per sub-panel
+
+### Story U.7: Matrix Modulation Panel Layout Audit
+
+As a sound designer,
+I want ten modulation bus rows aligned to Figma,
+So that Matrix Mod reads as a scalable grid.
+
+**Acceptance Criteria:**
+
+**Given** U.0 Matrix Mod dimensions
+**When** `MatrixModulationPanel` resizes at each preset
+**Then** row geometry matches `ModulationBusRow` SSOT
+**And** manual UAT 50–200%
+
+### Story U.8: Patch Manager Panels Layout Audit
+
+As a sound designer,
+I want all four Patch Manager modules aligned to Figma,
+So that the manager column matches mockup density.
+
+**Acceptance Criteria:**
+
+**Given** U.0 Patch Manager dimensions
+**When** four module panels resize at each preset
+**Then** module height stack matches `PatchManagerSection`
+**And** manual UAT per module
+
+### Story U.9: Master Edit Panel Layout Audit
+
+As a sound designer,
+I want master modules stacked per Figma,
+So that MASTER EDIT column height matches PATCH EDIT.
+
+**Acceptance Criteria:**
+
+**Given** U.0 Master Edit dimensions
+**When** `MasterEditPanel` resizes at each preset
+**Then** three-module stack matches design
+**And** manual UAT 50–200%
+
+### Story U.10: Release Gate — Prod Audit Sign-Off & D-062/D-063
+
+As a product owner,
+I want documented sign-off and release-safe sandbox policy,
+So that v1 ships without debug UI clutter.
+
+**Acceptance Criteria:**
+
+**Given** U.2–U.9 UAT sheets signed
+**When** Release build is produced
+**Then** TestComponent excluded from release; debug retains sandbox
+**And** D-062 criterion met with owner sign-off
+
+---
+
 ## Final Validation (Step 4)
 
 **Validated:** 2026-05-29 · **Workflow status:** complete
@@ -1337,7 +1530,7 @@ All **60 FRs** (FR-1–FR-60) mapped in § FR Coverage Map and addressed by at l
 
 ### Story Quality Validation ✅
 
-- **64 stories** — each with Given/When/Then AC and FR references.
+- **66 stories** — each with Given/When/Then AC and FR references (Epic U: U-IDs, U-0, U-0b added v1.1).
 - **No forward within-epic dependencies** detected (e.g. Epic 6: 6.1 spec before 6.4 MUTATE).
 - **Scope:** sized for single dev-agent sessions (Epic 2: 2.1–2.11 plus 2.9b UAT slice).
 

@@ -476,7 +476,7 @@ Reusable checklist — copy into each story implementation artifact:
 
 ## Dimension tables post U-0
 
-Per-zone reference tables (design px @ 100 %, `tss::design` symbol paths, UAT story mapping): [`implementation-artifacts/u-0-zone-dimension-tables.md`](../implementation-artifacts/u-0-zone-dimension-tables.md).
+Per-zone reference tables (design px @ 100 %, `TSS::Design` symbol paths, UAT story mapping): [`implementation-artifacts/u-0-zone-dimension-tables.md`](../implementation-artifacts/u-0-zone-dimension-tables.md).
 
 ---
 
