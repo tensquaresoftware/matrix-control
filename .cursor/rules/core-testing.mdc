@@ -1,0 +1,49 @@
+---
+description: TDD, AAA, F.I.R.S.T. et pyramide des tests pour Core et Tests/
+globs: "{Source/Core/**,Tests/**}"
+alwaysApply: false
+---
+
+# Tests Core — Matrix-Control
+
+Source complète : `CONVENTIONS.md` §8.5.
+
+## Périmètre
+
+- **Tester** : `Source/Core/` — SysEx, patch model, MIDI, mappers, dispatchers
+- **Ne pas tester** : composants GUI, `paint()`, thread audio
+- Enregistrer tout nouveau fichier dans `Tests/CMakeLists.txt`
+
+## Méthode — TDD préféré sur Core
+
+1. **Red** — test qui exprime le comportement attendu (échoue)
+2. **Green** — code minimal pour passer
+3. **Refactor** — respecter §3 et §6.16, tests toujours verts
+
+Spike urgent : tests Core **immédiatement après**, jamais omis pour une logique stable.
+
+## Structure AAA (obligatoire)
+
+```cpp
+// Arrange — entrées, fixtures, dépendances
+// Act     — appel de la fonction testée
+// Assert  — expect / ASSERT sur le résultat
+```
+
+Un test = un comportement. Nom explicite : `validateStructure_rejectsIncompletePatchMessage`.
+
+## Qualité F.I.R.S.T.
+
+- **Fast** — millisecondes, pas de hardware ni sleep
+- **Independent** — pas d'état partagé mutable entre tests
+- **Repeatable** — même résultat partout
+- **Self-validating** — pass/fail automatique
+- **Timely** — avec ou avant le code de production
+
+## Pyramide
+
+- **Beaucoup** d'unitaires (`Tests/Unit/`)
+- **Quelques** intégrations (chaînes MIDI/dispatcher si pertinent)
+- **Peu** d'E2E — GUI validée manuellement (Standalone / harness)
+
+Fixtures binaires : `Tests/Fixtures/` — pas de gros blobs inline.

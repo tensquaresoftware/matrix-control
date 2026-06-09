@@ -1,0 +1,42 @@
+---
+description: Environnement Matrix-Control, Git, BMad, fichiers de référence
+alwaysApply: true
+---
+
+# Matrix-Control — Contexte projet
+
+Source complète : `CONVENTIONS.md` §5–§6.2, §9. Constitution BMad : `_bmad-output/project-context.md`.
+
+## Environnement
+
+- macOS Tahoe, Xcode 26, CMake, **JUCE 8.0.12** (`/Applications/JUCE`)
+- Builds dans `Builds/` (`macOS/`, `Windows/`, `Linux/`) — **pas** `build/` à la racine
+- IDE / agent : **Cursor Pro+**
+
+## Git
+
+- Commits **uniquement sur demande explicite** de Guillaume — jamais de commit proactif
+- Messages de commit en **anglais** : ligne impérative + puces des changements significatifs
+- Issues GitHub : titre et description en anglais
+
+## BMad Method
+
+- Skills sous `.claude/skills/`
+- État du sprint : `_bmad-output/implementation-artifacts/sprint-status.yaml`
+- Plans archivés : `Documentation/Development/Plans/<année>/<mois>/` (nom `YYYY-MM-DD-Titre-En-Anglais.md`)
+
+## Fichiers clés (lire avant d'implémenter)
+
+- `CONVENTIONS.md` — standards complets (autoritaire pour litiges de style)
+- `Documentation/Development/principes-dev-qualite.md` — référence complète des principes de design
+- `Source/Shared/Definitions/PluginDescriptors.h`
+- `Source/GUI/Factories/WidgetFactory.h`
+- `Source/GUI/Layout/ScaledLayout.h`
+- `CMakeLists.txt` — enregistrement des sources
+
+## Interdits fréquents (rappel)
+
+- Pas de texte français dans le code source
+- Pas de scaling global AffineTransform sur l'UI principale
+- Pas de dépendance GUI dans `Source/Core/`
+- Ne pas réécrire / disperser les données de `PluginDescriptors`
