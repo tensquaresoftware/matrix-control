@@ -22,8 +22,6 @@ namespace TSS
         class ScrollableContentComponent;
         class CustomScrollBar;
 
-        inline constexpr static int kMaxScrollableHeight_ = 300;
-        inline constexpr static float kScrollbarWidth_ = 8.0f;
         inline constexpr static float kRightMarginFromHighlightToEdge_ = 8.0f;
         inline constexpr static float kWheelScrollFactorContent_ = 100.0f;
         inline constexpr static float kThumbInsetBase_ = 2.0f;

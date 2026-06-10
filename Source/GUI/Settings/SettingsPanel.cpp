@@ -42,7 +42,8 @@ SettingsPanel::SettingsPanel(TSS::ISkin& skin, bool isPluginMode)
                                  Core::HardwareLatency::kMaxMs,
                                  Core::HardwareLatency::kMinMs,
                                  Core::HardwareLatency::kStepMs,
-                                 "ms"})
+                                 "ms",
+                                 {}})
     , audioFromLabel_(kLabelWidth_, kControlHeight_, TSS::labelLookFromSkin(skin), PluginDisplayNames::Settings::kAudioFromLabel)
     , audioFromComboBox_(kAudioFromComboWidth_, kControlHeight_, TSS::comboBoxLookFromSkin(skin), TSS::ComboBox::Style::ButtonLike)
     , inputGainLabel_(kLabelWidth_, kControlHeight_, TSS::labelLookFromSkin(skin), PluginDisplayNames::Settings::kInputGainLabel)

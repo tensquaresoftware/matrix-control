@@ -31,8 +31,6 @@ public:
     void setUiScale(float uiScale);
 
 private:
-    inline constexpr static int kGap_ = 5;
-
     PatchMutatorPanelDimensions dims_;
     TSS::ISkin* skin_;
     float uiScale_ = 1.0f;
@@ -75,7 +73,8 @@ private:
     void connectButtonToApvts(TSS::Button* button, const char* widgetId);
     void connectToggleToApvts(TSS::Toggle* toggle, const char* widgetId);
 
-    void layoutSliderLine(int x, int y, TSS::Label* label, TSS::Slider* slider, TSS::Button* button, const std::vector<TSS::Toggle*>& toggles);
+    void layoutSliderLine(int x, int y, TSS::Label* label, TSS::Slider* slider, TSS::Button* button,
+                          const std::vector<TSS::Toggle*>& toggles, int actionButtonWidth);
     void layoutHistoryLine(int x, int y);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PatchMutatorPanel)

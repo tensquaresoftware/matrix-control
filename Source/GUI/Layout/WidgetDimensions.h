@@ -23,6 +23,7 @@ struct ButtonDimensions
     int computerPatchesSaveAsWidth;
 
     int patchMutatorMutateWidth;
+    int patchMutatorRetryWidth;
     int patchMutatorCompareWidth;
     int patchMutatorDeleteWidth;
     int patchMutatorClearWidth;
@@ -36,6 +37,17 @@ struct SliderDimensions
     int patchMutatorWidth;
 };
 
+struct PopupMenuLayoutDimensions
+{
+    int itemHeight;
+    int verticalMargin;
+    int scrollbarWidth;
+    int minThumbHeight;
+    int maxScrollHeight;
+    int borderThickness;
+    int textLeftPadding;
+};
+
 struct ComboBoxDimensions
 {
     int standardHeight;
@@ -43,6 +55,7 @@ struct ComboBoxDimensions
     int matrixModulationDestinationWidth;
     int patchManagerComputerPatchesWidth;
     int patchMutatorHistoryWidth;
+    PopupMenuLayoutDimensions popup;
 };
 
 struct ParameterCellDimensions
@@ -67,6 +80,18 @@ struct ModuleHeaderDimensions
     int initWidth;
     int copyWidth;
     int pasteWidth;
+    int textLeftPadding;
+    int textAreaHeight;
+    int lineThickness;
+};
+
+struct ModulationBusHeaderDimensions
+{
+    int busNumberTextWidth;
+    int busSourceTextWidth;
+    int busAmountTextWidth;
+    int busDestinationTextWidth;
+    int interControlGap;
 };
 
 struct ModulationBusCellDimensions
@@ -85,6 +110,8 @@ struct ModulationBusCellDimensions
     int initButtonHeight;
     int separatorWidth;
     int separatorHeight;
+    int interControlGap;
+    int reorderDragThreshold;
 };
 
 struct SeparatorDimensions
@@ -92,12 +119,25 @@ struct SeparatorDimensions
     int verticalStandardWidth;
     int verticalStandardHeight;
     int horizontalHeight;
+    int verticalLineWidth;
+    int verticalTopPadding;
+    int verticalBottomPadding;
 };
 
 struct DisplayBandDimensions
 {
     int width;
     int height;
+    int borderThickness;
+    int paddingTop;
+    int paddingBottom;
+    int triangleBase;
+    int curvePadding;
+    int curvePointRadius;
+    int curveLineThickness;
+    int minCurveSegmentWidth;
+    int pointHitZoneRadius;
+    int sustainSegmentHitZone;
 };
 
 struct PatchNameDisplayDimensions
@@ -106,6 +146,7 @@ struct PatchNameDisplayDimensions
     int height;
     int topPadding;
     int moduleHeaderToDisplayGap;
+    int bottomPadding;
 };
 
 struct GroupLabelDimensions
@@ -127,7 +168,7 @@ struct NumberBoxDimensions
 struct LabelDimensions
 {
     int modulationBusNumberWidth;
-    int patchManagerBankSelectorWidth;
+    int patchManagerSelectBankWidth;
     int patchMutatorWidth;
     int height;
 };
@@ -138,8 +179,15 @@ struct ToggleDimensions
     int height;
 };
 
+struct IndicatorDimensions
+{
+    int size;
+    float borderThicknessDesign;
+};
+
 struct PatchManagerModuleLayoutDimensions
 {
     int contentRowHeight;
-    int rowGap;
+    int interControlGap;
+    int columnGap;
 };

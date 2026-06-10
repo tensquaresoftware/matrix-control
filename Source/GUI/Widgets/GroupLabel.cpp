@@ -1,5 +1,7 @@
 #include "GroupLabel.h"
 
+#include "GUI/Layout/ScaledDrawing.h"
+
 namespace TSS
 {
     GroupLabel::GroupLabel(int width, int height, const GroupLabelLook& look, const juce::String& text)
@@ -67,7 +69,12 @@ namespace TSS
         const auto halfTextWidth = textWidth * 0.5f;
         const auto centreX = area.getCentreX();
         const auto centreY = area.getCentreY();
-        const float lineThickness = std::max(1.0f, static_cast<float>(kLineThickness_) * uiScale_);
+        const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
+        const float lineThickness = ScaledDrawing::snappedStrokeThicknessFromDesign(
+            static_cast<float>(kLineThickness_),
+            uiScale_,
+            systemDisplayScale,
+            ScaledDrawing::StrokeSnapPolicy::kRound);
         const float textSpacing = static_cast<float>(kTextSpacing_) * uiScale_;
 
         g.setColour(look_.line);

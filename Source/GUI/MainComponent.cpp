@@ -1,7 +1,5 @@
 #include "MainComponent.h"
 
-#include <vector>
-
 #include "GUI/Factories/WidgetFactory.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Skins/Skin.h"
@@ -34,15 +32,9 @@ void MainComponent::resized()
     const auto bounds = getLocalBounds();
     const float sf = uiScale_;
 
-    const std::vector<int> designHeights {
-        layoutDimensions_.header.height,
-        layoutDimensions_.body.height,
-        layoutDimensions_.footer.height
-    };
-    const auto heights = TSS::ScaledLayout::distributeHeights(bounds.getHeight(), designHeights, sf, 2);
-    const int headerHeight = heights[0];
-    const int bodyHeight = heights[1];
-    const int footerHeight = heights[2];
+    const int headerHeight = TSS::ScaledLayout::scaledInt(static_cast<float>(layoutDimensions_.header.height), sf);
+    const int bodyHeight = TSS::ScaledLayout::scaledInt(static_cast<float>(layoutDimensions_.body.height), sf);
+    const int footerHeight = TSS::ScaledLayout::scaledInt(static_cast<float>(layoutDimensions_.footer.height), sf);
     const int footerY = headerHeight + bodyHeight;
 
     headerPanel.setBounds(bounds.getX(), bounds.getY(), bounds.getWidth(), headerHeight);

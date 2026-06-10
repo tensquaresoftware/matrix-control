@@ -26,7 +26,8 @@ BodyPanel::BodyPanel(TSS::ISkin& skin, const GuiLayoutDimensions& layoutDimensio
     verticalSeparator1_ = std::make_unique<VerticalSeparator>(
         dims_.separators.verticalStandardWidth,
         dims_.separators.verticalStandardHeight,
-        TSS::verticalSeparatorLookFromSkin(skin));
+        TSS::verticalSeparatorLookFromSkin(skin),
+        dims_.separators);
     addAndMakeVisible(*verticalSeparator1_);
 
     sharedPanel_ = std::make_unique<SharedPanel>(skin, dims_.shared, widgetFactory, apvts);
@@ -35,7 +36,8 @@ BodyPanel::BodyPanel(TSS::ISkin& skin, const GuiLayoutDimensions& layoutDimensio
     verticalSeparator2_ = std::make_unique<VerticalSeparator>(
         dims_.separators.verticalStandardWidth,
         dims_.separators.verticalStandardHeight,
-        TSS::verticalSeparatorLookFromSkin(skin));
+        TSS::verticalSeparatorLookFromSkin(skin),
+        dims_.separators);
     addAndMakeVisible(*verticalSeparator2_);
 
     masterEditPanel_ = std::make_unique<MasterEditPanel>(skin, dims_.masterEdit, widgetFactory, apvts);
@@ -64,7 +66,7 @@ void BodyPanel::resized()
     const int separatorW           = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.separators.verticalStandardWidth), sf);
     const int separatorH           = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.separators.verticalStandardHeight), sf);
 
-    const int contentHeight = bounds.getHeight() - 2 * padding;
+    const int sharedColumnHeight = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.sharedColumnHeight), sf);
 
     const float originX = static_cast<float>(bounds.getX() + padding);
     const int patchEditX        = bounds.getX() + padding;
@@ -77,7 +79,7 @@ void BodyPanel::resized()
 
     patchEditPanel_->setBounds(patchEditX, topY, patchEditPanelWidth, patchEditPanelHeight);
     verticalSeparator1_->setBounds(separator1X, topY, separatorW, separatorH);
-    sharedPanel_->setBounds(sharedColumnX, topY, sharedColumnW, contentHeight);
+    sharedPanel_->setBounds(sharedColumnX, topY, sharedColumnW, sharedColumnHeight);
     verticalSeparator2_->setBounds(separator2X, topY, separatorW, separatorH);
     masterEditPanel_->setBounds(masterEditX, topY, masterEditW, masterEditH);
 }

@@ -14,7 +14,6 @@ namespace TSS
         virtual ~PopupMenuBase() override;
 
     protected:
-        inline constexpr static int kItemHeight_ = 20;
         inline constexpr static float kBorderThickness_ = 1.0f;
         inline constexpr static float kHighlightGap_ = 1.0f;
 
@@ -37,6 +36,9 @@ namespace TSS
         float uiScale_ = 1.0f;
         juce::Font cachedFont_;
         PopupMenuRenderer renderer_;
+
+        int getItemHeightDesign() const;
+        float getBorderThicknessDesign() const;
 
     private:
         void closePopup();

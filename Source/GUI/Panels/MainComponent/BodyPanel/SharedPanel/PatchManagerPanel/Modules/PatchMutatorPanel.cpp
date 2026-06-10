@@ -35,7 +35,8 @@ void PatchMutatorPanel::setupModuleHeader(TSS::ISkin& skin, WidgetFactory& widge
         dims_.moduleHeader.height,
         TSS::moduleHeaderLookFromSkin(skin),
         TSS::ModuleHeader::ColourVariant::Blue,
-        widgetFactory.getGroupDisplayName(PluginIDs::PatchManagerSection::PatchMutatorModule::kGroupId));
+        widgetFactory.getGroupDisplayName(PluginIDs::PatchManagerSection::PatchMutatorModule::kGroupId),
+        dims_.moduleHeader);
     addAndMakeVisible(*moduleHeader_);
 }
 
@@ -63,7 +64,8 @@ void PatchMutatorPanel::setupAmountLine(TSS::ISkin& skin, WidgetFactory& widgetF
             amountIt != allIntParams.end() ? static_cast<double>(amountIt->maxValue) : 100.0,
             amountIt != allIntParams.end() ? static_cast<double>(amountIt->defaultValue) : 0.0,
             1.0,
-            PluginDisplayNames::Units::kPercent});
+            PluginDisplayNames::Units::kPercent,
+            {}});
     amountSlider_->onValueChange = [this]
     {
         apvts_.state.setProperty(
@@ -145,7 +147,8 @@ void PatchMutatorPanel::setupRandomLine(TSS::ISkin& skin, WidgetFactory& widgetF
             randomIt != allIntParams.end() ? static_cast<double>(randomIt->maxValue) : 100.0,
             randomIt != allIntParams.end() ? static_cast<double>(randomIt->defaultValue) : 0.0,
             1.0,
-            PluginDisplayNames::Units::kPercent});
+            PluginDisplayNames::Units::kPercent,
+            {}});
     randomSlider_->onValueChange = [this]
     {
         apvts_.state.setProperty(
@@ -293,15 +296,20 @@ void PatchMutatorPanel::resized()
     if (auto* header = moduleHeader_.get())
         header->setBounds(0, 0, moduleHeaderW, moduleHeaderH);
 
-    // Y positions for the 3 lines, computed independently from float origin
-    const int row0Y = juce::roundToInt(static_cast<float>(dims_.moduleHeader.height + kGap_) * sf);
-    const int row1Y = juce::roundToInt(static_cast<float>(dims_.moduleHeader.height + kGap_ + dims_.labels.height + kGap_) * sf);
-    const int row2Y = juce::roundToInt(static_cast<float>(dims_.moduleHeader.height + kGap_ + (dims_.labels.height + kGap_) * 2) * sf);
+    const int contentRowH = juce::roundToInt(static_cast<float>(dims_.layout.contentRowHeight) * sf);
+    const int rowGap = juce::roundToInt(static_cast<float>(dims_.layout.interControlGap) * sf);
+    const int rowStep = contentRowH + rowGap;
+
+    const int row0Y = juce::roundToInt(static_cast<float>(dims_.moduleHeader.height) * sf);
+    const int row1Y = row0Y + rowStep;
+    const int row2Y = row1Y + rowStep;
 
     layoutSliderLine(0, row0Y, amountLabel_.get(), amountSlider_.get(), mutateButton_.get(),
-        {dco1Toggle_.get(), dco2Toggle_.get(), vcfVcaToggle_.get(), fmTrackToggle_.get(), rampPortamentoToggle_.get()});
+        {dco1Toggle_.get(), dco2Toggle_.get(), vcfVcaToggle_.get(), fmTrackToggle_.get(), rampPortamentoToggle_.get()},
+        dims_.buttons.patchMutatorMutateWidth);
     layoutSliderLine(0, row1Y, randomLabel_.get(), randomSlider_.get(), retryButton_.get(),
-        {env1Toggle_.get(), env2Toggle_.get(), env3Toggle_.get(), lfo1Toggle_.get(), lfo2Toggle_.get()});
+        {env1Toggle_.get(), env2Toggle_.get(), env3Toggle_.get(), lfo1Toggle_.get(), lfo2Toggle_.get()},
+        dims_.buttons.patchMutatorRetryWidth);
     layoutHistoryLine(0, row2Y);
 
     if (moduleHeader_)            moduleHeader_->setUiScale(sf);
@@ -329,7 +337,8 @@ void PatchMutatorPanel::resized()
     if (lfo2Toggle_)              lfo2Toggle_->setUiScale(sf);
 }
 
-void PatchMutatorPanel::layoutSliderLine(int x, int y, TSS::Label* label, TSS::Slider* slider, TSS::Button* button, const std::vector<TSS::Toggle*>& toggles)
+void PatchMutatorPanel::layoutSliderLine(int x, int y, TSS::Label* label, TSS::Slider* slider, TSS::Button* button,
+                                         const std::vector<TSS::Toggle*>& toggles, int actionButtonWidth)
 {
     const float sf = uiScale_;
 
@@ -337,26 +346,31 @@ void PatchMutatorPanel::layoutSliderLine(int x, int y, TSS::Label* label, TSS::S
     const int labelH      = juce::roundToInt(static_cast<float>(dims_.labels.height) * sf);
     const int sliderW     = juce::roundToInt(static_cast<float>(dims_.sliders.patchMutatorWidth) * sf);
     const int sliderH     = juce::roundToInt(static_cast<float>(dims_.sliders.standardHeight) * sf);
-    const int buttonW     = juce::roundToInt(static_cast<float>(dims_.buttons.patchMutatorMutateWidth) * sf);
+    const int buttonW     = juce::roundToInt(static_cast<float>(actionButtonWidth) * sf);
+    const int buttonH     = juce::roundToInt(static_cast<float>(dims_.buttons.height) * sf);
     const int toggleW     = juce::roundToInt(static_cast<float>(dims_.toggles.patchMutatorWidth) * sf);
     const int toggleH     = juce::roundToInt(static_cast<float>(dims_.toggles.height) * sf);
+    const int controlGap  = dims_.layout.interControlGap;
 
-    // Offsets computed in float to avoid accumulation
-    const float labelStep  = static_cast<float>(dims_.labels.patchMutatorWidth + kGap_) * sf;
-    const float sliderStep = static_cast<float>(dims_.sliders.patchMutatorWidth + kGap_) * sf;
-    const float buttonStep = static_cast<float>(dims_.buttons.patchMutatorMutateWidth + kGap_) * sf;
-    const float toggleStep = static_cast<float>(dims_.toggles.patchMutatorWidth + kGap_) * sf;
+    const float labelStep  = static_cast<float>(dims_.labels.patchMutatorWidth + controlGap) * sf;
+    const float sliderStep = static_cast<float>(dims_.sliders.patchMutatorWidth + controlGap) * sf;
+    const float buttonStep = static_cast<float>(actionButtonWidth + controlGap) * sf;
+    const float toggleStep = static_cast<float>(dims_.toggles.patchMutatorWidth + controlGap) * sf;
+
+    const int rowH          = juce::roundToInt(static_cast<float>(dims_.layout.contentRowHeight) * sf);
+    const int labelY        = y + (rowH - labelH) / 2;
+    const int sliderY       = y + (rowH - sliderH) / 2;
 
     const float originX = static_cast<float>(x);
 
     if (label != nullptr)
-        label->setBounds(x, y, labelW, labelH);
+        label->setBounds(x, labelY, labelW, labelH);
 
     if (slider != nullptr)
-        slider->setBounds(juce::roundToInt(originX + labelStep), y, sliderW, sliderH);
+        slider->setBounds(juce::roundToInt(originX + labelStep), sliderY, sliderW, sliderH);
 
     if (button != nullptr)
-        button->setBounds(juce::roundToInt(originX + labelStep + sliderStep), y, buttonW, labelH);
+        button->setBounds(juce::roundToInt(originX + labelStep + sliderStep), y, buttonW, buttonH);
 
     const float toggleOriginX = originX + labelStep + sliderStep + buttonStep;
     for (int i = 0; i < static_cast<int>(toggles.size()); ++i)
@@ -374,31 +388,35 @@ void PatchMutatorPanel::layoutHistoryLine(int x, int y)
     const int labelH      = juce::roundToInt(static_cast<float>(dims_.labels.height) * sf);
     const int comboBoxW   = juce::roundToInt(static_cast<float>(dims_.comboBoxes.patchMutatorHistoryWidth) * sf);
     const int comboBoxH   = juce::roundToInt(static_cast<float>(dims_.comboBoxes.standardHeight) * sf);
+    const int rowH          = juce::roundToInt(static_cast<float>(dims_.layout.contentRowHeight) * sf);
+    const int labelY        = y + (rowH - labelH) / 2;
+    const int comboBoxY     = y + (rowH - comboBoxH) / 2;
+    const int buttonH       = juce::roundToInt(static_cast<float>(dims_.buttons.height) * sf);
     const int compareW    = juce::roundToInt(static_cast<float>(dims_.buttons.patchMutatorCompareWidth) * sf);
     const int deleteW     = juce::roundToInt(static_cast<float>(dims_.buttons.patchMutatorDeleteWidth) * sf);
     const int clearW      = juce::roundToInt(static_cast<float>(dims_.buttons.patchMutatorClearWidth) * sf);
     const int exportW     = juce::roundToInt(static_cast<float>(dims_.buttons.patchMutatorExportWidth) * sf);
+    const int controlGap  = dims_.layout.interControlGap;
 
-    // X positions computed independently from float origin
     const float originX     = static_cast<float>(x);
-    const float labelStep   = static_cast<float>(dims_.labels.patchMutatorWidth + kGap_) * sf;
-    const float comboStep   = static_cast<float>(dims_.comboBoxes.patchMutatorHistoryWidth + kGap_) * sf;
-    const float compareStep = static_cast<float>(dims_.buttons.patchMutatorCompareWidth + kGap_) * sf;
-    const float deleteStep  = static_cast<float>(dims_.buttons.patchMutatorDeleteWidth + kGap_) * sf;
-    const float clearStep   = static_cast<float>(dims_.buttons.patchMutatorClearWidth + kGap_) * sf;
+    const float labelStep   = static_cast<float>(dims_.labels.patchMutatorWidth + controlGap) * sf;
+    const float comboStep   = static_cast<float>(dims_.comboBoxes.patchMutatorHistoryWidth + controlGap) * sf;
+    const float compareStep = static_cast<float>(dims_.buttons.patchMutatorCompareWidth + controlGap) * sf;
+    const float deleteStep  = static_cast<float>(dims_.buttons.patchMutatorDeleteWidth + controlGap) * sf;
+    const float clearStep   = static_cast<float>(dims_.buttons.patchMutatorClearWidth + controlGap) * sf;
 
     if (auto* label = historyLabel_.get())
-        label->setBounds(x, y, labelW, labelH);
+        label->setBounds(x, labelY, labelW, labelH);
     if (auto* comboBox = historyComboBox_.get())
-        comboBox->setBounds(juce::roundToInt(originX + labelStep), y, comboBoxW, comboBoxH);
+        comboBox->setBounds(juce::roundToInt(originX + labelStep), comboBoxY, comboBoxW, comboBoxH);
     if (auto* button = compareButton_.get())
-        button->setBounds(juce::roundToInt(originX + labelStep + comboStep), y, compareW, labelH);
+        button->setBounds(juce::roundToInt(originX + labelStep + comboStep), y, compareW, buttonH);
     if (auto* button = deleteButton_.get())
-        button->setBounds(juce::roundToInt(originX + labelStep + comboStep + compareStep), y, deleteW, labelH);
+        button->setBounds(juce::roundToInt(originX + labelStep + comboStep + compareStep), y, deleteW, buttonH);
     if (auto* button = clearButton_.get())
-        button->setBounds(juce::roundToInt(originX + labelStep + comboStep + compareStep + deleteStep), y, clearW, labelH);
+        button->setBounds(juce::roundToInt(originX + labelStep + comboStep + compareStep + deleteStep), y, clearW, buttonH);
     if (auto* button = exportButton_.get())
-        button->setBounds(juce::roundToInt(originX + labelStep + comboStep + compareStep + deleteStep + clearStep), y, exportW, labelH);
+        button->setBounds(juce::roundToInt(originX + labelStep + comboStep + compareStep + deleteStep + clearStep), y, exportW, buttonH);
 }
 
 void PatchMutatorPanel::setSkin(TSS::ISkin& skin)

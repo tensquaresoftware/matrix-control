@@ -2,6 +2,7 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
+#include "GUI/Layout/WidgetDimensions.h"
 #include "GUI/Looks/WidgetLooks.h"
 
 namespace TSS
@@ -15,7 +16,8 @@ namespace TSS
             Orange
         };
 
-        explicit ModulationBusHeader(int width, int height, const ModulationBusHeaderLook& look,
+        explicit ModulationBusHeader(int width, int height, const ModulationBusHeaderDimensions& dimensions,
+                                     const ModulationBusHeaderLook& look,
                                      ColourVariant variant = ColourVariant::Blue);
         ~ModulationBusHeader() override = default;
 
@@ -28,15 +30,11 @@ namespace TSS
         int getHeight() const { return height_; }
 
     private:
-        inline constexpr static int kBusNumberTextWidth_ = 15;
-        inline constexpr static int kBusSourceTextWidth_ = 65;
-        inline constexpr static int kBusAmountTextWidth_ = 65;
-        inline constexpr static int kBusDestinationTextWidth_ = 110;
+        static constexpr int kTextLeftPadding = 0;
+        static constexpr int kTextAreaHeight = 20;
+        static constexpr int kLineThickness = 4;
 
-        inline constexpr static int kTextLeftPadding_ = 2;
-        inline constexpr static int kTextAreaHeight_ = 20;
-        inline constexpr static int kLineThickness_ = 4;
-
+        ModulationBusHeaderDimensions dimensions_;
         ModulationBusHeaderLook look_{};
         juce::String busNumberText_;
         juce::String busSourceText_;

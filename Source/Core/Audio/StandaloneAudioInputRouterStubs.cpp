@@ -1,4 +1,4 @@
-#include "Core/Audio/StandaloneAudioInputRouter.h"
+#include "Core/Audio/StandaloneAudioInputRouterDetail.h"
 
 namespace Core::StandaloneAudioInputRouterDetail
 {

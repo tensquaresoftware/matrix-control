@@ -43,7 +43,7 @@ public:
     void mouseUp(const juce::MouseEvent& e) override;
     void setSkin(TSS::ISkin& skin);
     void setUiScale(float uiScale);
-    int getHeight() const { return dimensions_.panelHeight; }
+    int getDesignPanelHeight() const { return dimensions_.panelHeight; }
     int getBusNumber() const noexcept { return busNumber_; }
 
     using ReorderDragBeginFn = std::function<void(int busNumber)>;
@@ -71,7 +71,6 @@ private:
     ReorderDragMoveFn onReorderDragMove_;
     ReorderDragEndFn onReorderDragEnd_;
 
-    inline constexpr static float kReorderDragThresholdPx_ = 4.0f;
     ModulationBusCellDimensions dimensions_;
     void createBusNumberLabel(int busNumber, TSS::ISkin& skin);
     void createSourceComboBox(WidgetFactory& factory, TSS::ISkin& skin, const juce::String& sourceParamId, juce::AudioProcessorValueTreeState& apvts);
@@ -82,8 +81,6 @@ private:
 
     void layoutWidgetRow();
     void layoutSeparator(int yTop, int separatorHeight);
-
-    inline constexpr static int kGap_ = 5;
 
     TSS::ISkin* skin_;
     float uiScale_ = 1.0f;

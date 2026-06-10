@@ -1,11 +1,14 @@
 #include "ModulationBusHeader.h"
 
+#include "GUI/Layout/ScaledDrawing.h"
 #include "Shared/Definitions/PluginDescriptors.h"
 
 namespace TSS
 {
-    ModulationBusHeader::ModulationBusHeader(int width, int height, const ModulationBusHeaderLook& look, ColourVariant variant)
-        : look_(look)
+    ModulationBusHeader::ModulationBusHeader(int width, int height, const ModulationBusHeaderDimensions& dimensions,
+                                             const ModulationBusHeaderLook& look, ColourVariant variant)
+        : dimensions_(dimensions)
+        , look_(look)
         , busNumberText_(PluginDisplayNames::MatrixModulationSection::Header::kBusNumber)
         , busSourceText_(PluginDisplayNames::MatrixModulationSection::Header::kSource)
         , busAmountText_(PluginDisplayNames::MatrixModulationSection::Header::kAmount)
@@ -46,8 +49,9 @@ namespace TSS
 
     void ModulationBusHeader::drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        const float textAreaHeight = static_cast<float>(kTextAreaHeight_) * uiScale_;
-        const float textLeftPadding = static_cast<float>(kTextLeftPadding_) * uiScale_;
+        const float textAreaHeight = static_cast<float>(kTextAreaHeight) * uiScale_;
+        const float textLeftPadding = static_cast<float>(kTextLeftPadding) * uiScale_;
+        const float gap = static_cast<float>(dimensions_.interControlGap) * uiScale_;
         
         auto textArea = bounds;
         textArea.setHeight(textAreaHeight);
@@ -60,51 +64,56 @@ namespace TSS
         g.setFont(look_.font.withHeight(look_.font.getHeight() * uiScale_));
 
         drawBusNumberText(g, x, y);
-        x += static_cast<float>(kBusNumberTextWidth_) * uiScale_;
+        x += static_cast<float>(dimensions_.busNumberTextWidth) * uiScale_ + gap;
 
         drawBusSourceText(g, x, y);
-        x += static_cast<float>(kBusSourceTextWidth_) * uiScale_;
+        x += static_cast<float>(dimensions_.busSourceTextWidth) * uiScale_ + gap;
 
         drawBusAmountText(g, x, y);
-        x += static_cast<float>(kBusAmountTextWidth_) * uiScale_;
+        x += static_cast<float>(dimensions_.busAmountTextWidth) * uiScale_ + gap;
 
         drawBusDestinationText(g, x, y);
     }
 
     void ModulationBusHeader::drawBusNumberText(juce::Graphics& g, float x, float y)
     {
-        const float textAreaHeight = static_cast<float>(kTextAreaHeight_) * uiScale_;
-        auto busNumberBounds = juce::Rectangle<float>(x, y, static_cast<float>(kBusNumberTextWidth_) * uiScale_, textAreaHeight);
+        const float textAreaHeight = static_cast<float>(kTextAreaHeight) * uiScale_;
+        auto busNumberBounds = juce::Rectangle<float>(x, y, static_cast<float>(dimensions_.busNumberTextWidth) * uiScale_, textAreaHeight);
         g.drawText(busNumberText_, busNumberBounds, juce::Justification::centredLeft, false);
     }
 
     void ModulationBusHeader::drawBusSourceText(juce::Graphics& g, float x, float y)
     {
-        const float textAreaHeight = static_cast<float>(kTextAreaHeight_) * uiScale_;
-        auto busSourceBounds = juce::Rectangle<float>(x, y, static_cast<float>(kBusSourceTextWidth_) * uiScale_, textAreaHeight);
+        const float textAreaHeight = static_cast<float>(kTextAreaHeight) * uiScale_;
+        auto busSourceBounds = juce::Rectangle<float>(x, y, static_cast<float>(dimensions_.busSourceTextWidth) * uiScale_, textAreaHeight);
         g.drawText(busSourceText_, busSourceBounds, juce::Justification::centredLeft, false);
     }
 
     void ModulationBusHeader::drawBusAmountText(juce::Graphics& g, float x, float y)
     {
-        const float textAreaHeight = static_cast<float>(kTextAreaHeight_) * uiScale_;
-        auto busAmountBounds = juce::Rectangle<float>(x, y, static_cast<float>(kBusAmountTextWidth_) * uiScale_, textAreaHeight);
+        const float textAreaHeight = static_cast<float>(kTextAreaHeight) * uiScale_;
+        auto busAmountBounds = juce::Rectangle<float>(x, y, static_cast<float>(dimensions_.busAmountTextWidth) * uiScale_, textAreaHeight);
         g.drawText(busAmountText_, busAmountBounds, juce::Justification::centredLeft, false);
     }
 
     void ModulationBusHeader::drawBusDestinationText(juce::Graphics& g, float x, float y)
     {
-        const float textAreaHeight = static_cast<float>(kTextAreaHeight_) * uiScale_;
-        auto busDestinationBounds = juce::Rectangle<float>(x, y, static_cast<float>(kBusDestinationTextWidth_) * uiScale_, textAreaHeight);
+        const float textAreaHeight = static_cast<float>(kTextAreaHeight) * uiScale_;
+        auto busDestinationBounds = juce::Rectangle<float>(x, y, static_cast<float>(dimensions_.busDestinationTextWidth) * uiScale_, textAreaHeight);
         g.drawText(busDestinationText_, busDestinationBounds, juce::Justification::centredLeft, false);
     }
 
     void ModulationBusHeader::drawLine(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        const float lineThickness = std::max(1.0f, static_cast<float>(kLineThickness_) * uiScale_);
-        const float textAreaHeight = static_cast<float>(kTextAreaHeight_) * uiScale_;
+        const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
+        const float lineThickness = ScaledDrawing::snappedStrokeThicknessFromDesign(
+            static_cast<float>(kLineThickness),
+            uiScale_,
+            systemDisplayScale,
+            ScaledDrawing::StrokeSnapPolicy::kRound);
+        const float textAreaHeight = static_cast<float>(kTextAreaHeight) * uiScale_;
         const auto lineAreaHeight = bounds.getHeight() - textAreaHeight;
-        const auto verticalOffset = textAreaHeight + (lineAreaHeight - lineThickness) / 2.0f;
+        const auto verticalOffset = textAreaHeight + (lineAreaHeight - lineThickness) * 0.5f;
         
         auto lineBounds = bounds;
         lineBounds.setHeight(lineThickness);

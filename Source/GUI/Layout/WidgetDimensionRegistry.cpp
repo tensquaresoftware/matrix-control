@@ -40,9 +40,11 @@ std::optional<int> WidgetDimensionRegistry::resolveStandaloneButtonWidth(const j
     if (widgetId == PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSavePatchFile)
         return BW::kComputerPatchesSave;
 
-    if (widgetId == PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kMutate
-        || widgetId == PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kRetry)
+    if (widgetId == PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kMutate)
         return BW::kPatchMutatorMutate;
+
+    if (widgetId == PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kRetry)
+        return BW::kPatchMutatorRetry;
 
     if (widgetId == PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kCompare)
         return BW::kPatchMutatorCompare;

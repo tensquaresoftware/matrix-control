@@ -26,6 +26,7 @@ namespace
             .computerPatchesSaveWidth = BW::kComputerPatchesSave,
             .computerPatchesSaveAsWidth = BW::kComputerPatchesSaveAs,
             .patchMutatorMutateWidth = BW::kPatchMutatorMutate,
+            .patchMutatorRetryWidth = BW::kPatchMutatorRetry,
             .patchMutatorCompareWidth = BW::kPatchMutatorCompare,
             .patchMutatorDeleteWidth = BW::kPatchMutatorDelete,
             .patchMutatorClearWidth = BW::kPatchMutatorClear,
@@ -61,6 +62,19 @@ namespace
         };
     }
 
+    PopupMenuLayoutDimensions buildPopupMenuLayoutDimensions()
+    {
+        return {
+            .itemHeight = Atoms::Widths::PopupMenu::kItemHeight,
+            .verticalMargin = Atoms::Widths::PopupMenu::kVerticalMargin,
+            .scrollbarWidth = Atoms::Widths::PopupMenu::kScrollbarWidth,
+            .minThumbHeight = Atoms::Widths::PopupMenu::kMinThumbHeight,
+            .maxScrollHeight = Atoms::Widths::PopupMenu::kMaxScrollHeight,
+            .borderThickness = Atoms::Widths::PopupMenu::kBorderThickness,
+            .textLeftPadding = Atoms::Widths::PopupMenu::kTextLeftPadding,
+        };
+    }
+
     ModuleHeaderDimensions buildPatchEditModuleHeaderDimensions(const ButtonDimensions& buttons)
     {
         return {
@@ -72,6 +86,38 @@ namespace
             .initWidth = buttons.initWidth,
             .copyWidth = buttons.copyWidth,
             .pasteWidth = buttons.pasteWidth,
+            .textLeftPadding = Atoms::Widths::ModuleHeader::kTextLeftPadding,
+            .textAreaHeight = Atoms::Widths::ModuleHeader::kTextAreaHeight,
+            .lineThickness = Atoms::Widths::ModuleHeader::kLineThickness,
+        };
+    }
+
+    ModulationBusHeaderDimensions buildModulationBusHeaderDimensions()
+    {
+        return {
+            .busNumberTextWidth = Atoms::Widths::ModulationBusHeader::kBusNumberTextWidth,
+            .busSourceTextWidth = Atoms::Widths::ModulationBusHeader::kBusSourceTextWidth,
+            .busAmountTextWidth = Atoms::Widths::ModulationBusHeader::kBusAmountTextWidth,
+            .busDestinationTextWidth = Atoms::Widths::ModulationBusHeader::kBusDestinationTextWidth,
+            .interControlGap = Atoms::Widths::ModulationBus::kInterControlGap,
+        };
+    }
+
+    DisplayBandDimensions buildDisplayBandDimensions(int width, int height, bool includeSustainHitZone)
+    {
+        return {
+            .width = width,
+            .height = height,
+            .borderThickness = Atoms::Widths::DisplayBand::kBorderThickness,
+            .paddingTop = Atoms::Widths::DisplayBand::kPaddingTop,
+            .paddingBottom = Atoms::Widths::DisplayBand::kPaddingBottom,
+            .triangleBase = Atoms::Widths::DisplayBand::kTriangleBase,
+            .curvePadding = Atoms::Widths::DisplayBand::kCurvePadding,
+            .curvePointRadius = Atoms::Widths::DisplayBand::kCurvePointRadius,
+            .curveLineThickness = Atoms::Widths::DisplayBand::kCurveLineThickness,
+            .minCurveSegmentWidth = Atoms::Widths::DisplayBand::kMinCurveSegmentWidth,
+            .pointHitZoneRadius = Atoms::Widths::DisplayBand::kPointHitZoneRadius,
+            .sustainSegmentHitZone = includeSustainHitZone ? Atoms::Widths::DisplayBand::kSustainSegmentHitZone : 0,
         };
     }
 
@@ -89,9 +135,11 @@ namespace
             .destinationComboBoxWidth = Atoms::Widths::ComboBox::kMatrixModulationDestination,
             .destinationComboBoxHeight = Atoms::Heights::kComboBox,
             .initButtonWidth = buttons.initWidth,
-            .initButtonHeight = buttons.height,
+            .initButtonHeight = Atoms::Heights::kLabel,
             .separatorWidth = Recipes::ModulationBusCell::kWidth,
             .separatorHeight = Atoms::Heights::kHorizontalSeparator,
+            .interControlGap = Atoms::Widths::ModulationBus::kInterControlGap,
+            .reorderDragThreshold = Atoms::Widths::ModulationBusCell::kReorderDragThreshold,
         };
     }
 
@@ -99,7 +147,8 @@ namespace
     {
         return {
             .contentRowHeight = Recipes::PatchManagerModule::kContentRowHeight,
-            .rowGap = Recipes::PatchManagerModule::kRowGap,
+            .interControlGap = Recipes::PatchManagerModule::kInterControlGap,
+            .columnGap = Recipes::PatchManagerModule::kColumnGap,
         };
     }
 
@@ -112,7 +161,7 @@ namespace
             .moduleHeader = moduleHeader,
             .bankSelectorLabel = {
                 .modulationBusNumberWidth = Atoms::Widths::Label::kModulationBusNumber,
-                .patchManagerBankSelectorWidth = Atoms::Widths::Label::kPatchManagerBankSelector,
+                .patchManagerSelectBankWidth = Atoms::Widths::Label::kPatchManagerSelectBank,
                 .patchMutatorWidth = Atoms::Widths::Label::kPatchMutator,
                 .height = Atoms::Heights::kLabel,
             },
@@ -165,6 +214,7 @@ namespace
                 .matrixModulationDestinationWidth = Atoms::Widths::ComboBox::kMatrixModulationDestination,
                 .patchManagerComputerPatchesWidth = Atoms::Widths::ComboBox::kPatchManagerComputerPatches,
                 .patchMutatorHistoryWidth = Atoms::Widths::ComboBox::kPatchMutatorHistory,
+                .popup = buildPopupMenuLayoutDimensions(),
             },
             .buttons = buttons,
             .layout = buildPatchManagerModuleLayout(),
@@ -180,7 +230,7 @@ namespace
             .moduleHeader = moduleHeader,
             .labels = {
                 .modulationBusNumberWidth = Atoms::Widths::Label::kModulationBusNumber,
-                .patchManagerBankSelectorWidth = Atoms::Widths::Label::kPatchManagerBankSelector,
+                .patchManagerSelectBankWidth = Atoms::Widths::Label::kPatchManagerSelectBank,
                 .patchMutatorWidth = Atoms::Widths::Label::kPatchMutator,
                 .height = Atoms::Heights::kLabel,
             },
@@ -199,6 +249,7 @@ namespace
                 .matrixModulationDestinationWidth = Atoms::Widths::ComboBox::kMatrixModulationDestination,
                 .patchManagerComputerPatchesWidth = Atoms::Widths::ComboBox::kPatchManagerComputerPatches,
                 .patchMutatorHistoryWidth = Atoms::Widths::ComboBox::kPatchMutatorHistory,
+                .popup = buildPopupMenuLayoutDimensions(),
             },
             .buttons = buttons,
             .layout = buildPatchManagerModuleLayout(),
@@ -249,6 +300,7 @@ GuiLayoutDimensions DimensionFactory::buildGuiLayoutDimensions()
         .height = PMS::kHeight,
         .sectionHeaderWidth = PanelWidgets::Widths::SectionHeader::kPatchManager,
         .sectionHeaderHeight = Atoms::Heights::kSectionHeader,
+        .moduleStackGap = PMS::kModuleStackGap,
         .bankUtilityHeight = PMS::BankUtilityModule::kHeight,
         .internalPatchesHeight = PMS::InternalPatchesModule::kHeight,
         .computerPatchesHeight = PMS::ComputerPatchesModule::kHeight,
@@ -268,32 +320,38 @@ GuiLayoutDimensions DimensionFactory::buildGuiLayoutDimensions()
         .sectionHeaderHeight = Atoms::Heights::kSectionHeader,
         .busHeaderWidth = PanelWidgets::Widths::ModulationBusHeader::kStandard,
         .busHeaderHeight = Atoms::Heights::kModulationBusHeader,
+        .initAllButtonWidth = Atoms::Widths::Button::kInit,
+        .initAllButtonHeight = Atoms::Heights::kButton,
+        .busHeader = buildModulationBusHeaderDimensions(),
         .busCell = busCell,
     };
 
     SharedPanelDimensions shared {
         .width = Panels::Body::SharedColumn::kWidth,
+        .height = Panels::Body::SharedColumn::kSharedPanelHeight,
+        .verticalStackGap = Panels::Body::SharedColumn::kVerticalStackGap,
         .matrixModulationHeight = MMS::kHeight,
         .patchManagerHeight = PMS::kHeight,
         .matrixModulation = std::move(matrixModulation),
         .patchManager = std::move(patchManager),
     };
 
+    const int childBandWidth = PES::MiddleModules::ChildModules::kWidth;
+    const int childBandHeight = PES::MiddleModules::ChildModules::kHeight;
     PatchEditDisplaysPanelDimensions displays {
         .width = PES::MiddleModules::kWidth,
         .height = PES::MiddleModules::kHeight,
-        .childBand = {
-            .width = PES::MiddleModules::ChildModules::kWidth,
-            .height = PES::MiddleModules::ChildModules::kHeight,
-        },
+        .childBand = buildDisplayBandDimensions(childBandWidth, childBandHeight, true),
+        .trackGeneratorBand = buildDisplayBandDimensions(childBandWidth, childBandHeight, false),
         .patchName = {
             .width = PES::MiddleModules::ChildModules::kWidth,
             .height = Atoms::Heights::kPatchNameDisplay,
             .topPadding = Recipes::PatchNameModule::kTopPadding,
             .moduleHeaderToDisplayGap = Recipes::PatchNameModule::kModuleHeaderToDisplayGap,
+            .bottomPadding = Recipes::PatchNameModule::kBottomPadding,
         },
+        .moduleHeader = patchEditModuleHeader,
         .interModuleGap = PES::kInterModuleGap,
-        .moduleHeaderHeight = Atoms::Heights::kModuleHeader,
     };
 
     PatchEditModulesRowDimensions modulesRow {
@@ -319,6 +377,7 @@ GuiLayoutDimensions DimensionFactory::buildGuiLayoutDimensions()
         .width = MES::kWidth,
         .height = MES::kHeight,
         .childModuleWidth = MES::ChildModules::kWidth,
+        .interModuleGap = MES::kInterModuleGap,
         .midiPanelHeight = MES::MidiModule::kHeight,
         .vibratoPanelHeight = MES::VibratoModule::kHeight,
         .miscPanelHeight = MES::MiscModule::kHeight,
@@ -337,10 +396,14 @@ GuiLayoutDimensions DimensionFactory::buildGuiLayoutDimensions()
         .masterEditWidth = MES::kWidth,
         .masterEditHeight = MES::kHeight,
         .sharedColumnWidth = Panels::Body::SharedColumn::kWidth,
+        .sharedColumnHeight = Panels::Body::SharedColumn::kSharedPanelHeight,
         .separators = {
             .verticalStandardWidth = Atoms::Widths::VerticalSeparator::kStandard,
             .verticalStandardHeight = PanelWidgets::Heights::kVerticalSeparator,
             .horizontalHeight = Atoms::Heights::kHorizontalSeparator,
+            .verticalLineWidth = Atoms::Widths::VerticalSeparator::kLineWidth,
+            .verticalTopPadding = Atoms::Widths::VerticalSeparator::kTopPadding,
+            .verticalBottomPadding = Atoms::Widths::VerticalSeparator::kBottomPadding,
         },
         .patchEdit = std::move(patchEdit),
         .shared = std::move(shared),
@@ -356,5 +419,10 @@ GuiLayoutDimensions DimensionFactory::buildGuiLayoutDimensions()
         .masterEditParameterCell = masterEditParameterCell,
         .patchEditModuleHeader = patchEditModuleHeader,
         .masterEditModuleHeader = masterEditModuleHeader,
+        .popupMenu = buildPopupMenuLayoutDimensions(),
+        .activityLed = {
+            .size = Atoms::Widths::Indicator::kActivityLedSize,
+            .borderThicknessDesign = 2.0f,
+        },
     };
 }

@@ -1,7 +1,5 @@
 #include "SharedPanel.h"
 
-#include <vector>
-
 #include "GUI/Factories/WidgetFactory.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Skins/SkinHelpers.h"
@@ -39,16 +37,14 @@ void SharedPanel::resized()
     const auto bounds = getLocalBounds();
     const float sf = uiScale_;
     const int w = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.width), sf);
-    const int contentHeight = bounds.getHeight();
-    const std::vector<int> columnDesignHeights { dims_.matrixModulationHeight, dims_.patchManagerHeight };
-    const auto columnHeights = TSS::ScaledLayout::distributeHeights(contentHeight, columnDesignHeights, sf, 1);
-    const int matrixH = columnHeights[0];
-    const int patchManagerH = columnHeights[1];
+    const int matrixH = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.matrixModulationHeight), sf);
+    const int stackGap = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.verticalStackGap), sf);
+    const int patchManagerH = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.patchManagerHeight), sf);
     const int x = bounds.getX();
     int y = bounds.getY();
 
     matrixModulationPanel_->setBounds(x, y, w, matrixH);
-    y += matrixH;
+    y += matrixH + stackGap;
     patchManagerPanel_->setBounds(x, y, w, patchManagerH);
 }
 

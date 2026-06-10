@@ -11,6 +11,7 @@ namespace TSS
         , height_(height)
     {
         setOpaque(false);
+        setSize(width_, height_);
     }
 
     void PeakIndicator::paint(juce::Graphics& g)

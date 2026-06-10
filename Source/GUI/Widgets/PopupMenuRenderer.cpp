@@ -1,6 +1,8 @@
 #include "PopupMenuRenderer.h"
 #include "ComboBox.h"
 
+#include "GUI/Layout/ScaledDrawing.h"
+
 namespace TSS
 {
     PopupMenuRenderer::PopupMenuRenderer(bool isButtonLike, float uiScale)
@@ -23,14 +25,19 @@ namespace TSS
         g.fillRect(bounds);
     }
 
-    void PopupMenuRenderer::drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds) const
+    void PopupMenuRenderer::drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds, float systemDisplayScale) const
     {
-        const float kBorderThickness = std::max(1.0f, 1.0f * uiScale_);
-        const auto borderColour = isButtonLike_ 
+        const auto& popupLayout = ComboBox::getPopupLayoutDimensions();
+        const float borderThickness = ScaledDrawing::snappedStrokeThicknessFromDesign(
+            static_cast<float>(popupLayout.borderThickness),
+            uiScale_,
+            systemDisplayScale,
+            ScaledDrawing::StrokeSnapPolicy::kRound);
+        const auto borderColour = isButtonLike_
             ? look_.borderButtonLike
             : look_.border;
         g.setColour(borderColour);
-        g.drawRect(bounds, kBorderThickness);
+        g.drawRect(bounds, borderThickness);
     }
 
     void PopupMenuRenderer::drawItem(juce::Graphics& g, const ComboBox& comboBox, int itemIndex,
@@ -56,7 +63,7 @@ namespace TSS
             g.setColour(hooverTextColour);
             g.setFont(font);
             
-            const float textPadding = static_cast<float>(kTextLeftPadding_) * uiScale_;
+            const float textPadding = static_cast<float>(ComboBox::getPopupLayoutDimensions().textLeftPadding) * uiScale_;
             const auto textBounds = itemBounds.withTrimmedLeft(textPadding);
             g.drawText(comboBox.getItemText(itemIndex), textBounds, juce::Justification::centredLeft, false);
         }
@@ -73,7 +80,7 @@ namespace TSS
             g.setColour(textColour);
             g.setFont(font);
             
-            const float textPadding = static_cast<float>(kTextLeftPadding_) * uiScale_;
+            const float textPadding = static_cast<float>(ComboBox::getPopupLayoutDimensions().textLeftPadding) * uiScale_;
             const auto textBounds = itemBounds.withTrimmedLeft(textPadding);
             g.drawText(comboBox.getItemText(itemIndex), textBounds, juce::Justification::centredLeft, false);
         }

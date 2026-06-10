@@ -39,9 +39,6 @@ public:
     void valueTreeRedirected(juce::ValueTree&) override {}
 
 private:
-    inline constexpr static int kGroupLabelGap_ = 10;
-    inline constexpr static int kGap_ = 5;
-
     InternalPatchesPanelDimensions dims_;
     TSS::ISkin* skin_;
     float uiScale_ = 1.0f;

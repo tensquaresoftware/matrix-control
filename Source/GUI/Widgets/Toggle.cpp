@@ -1,5 +1,7 @@
 #include "Toggle.h"
 
+#include "GUI/Layout/ScaledDrawing.h"
+
 namespace TSS
 {
     Toggle::Toggle(int width, int height, const ToggleLook& look, const juce::String& text)
@@ -31,7 +33,12 @@ namespace TSS
     {
         const auto bounds = getLocalBounds().toFloat();
         const bool isOn = getToggleState();
-        const float borderThickness = std::max(1.0f, static_cast<float>(kBorderThickness_) * uiScale_);
+        const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
+        const float borderThickness = ScaledDrawing::snappedStrokeThicknessFromDesign(
+            static_cast<float>(kBorderThickness_),
+            uiScale_,
+            systemDisplayScale,
+            ScaledDrawing::StrokeSnapPolicy::kRound);
 
         g.setColour(isOn ? look_.backgroundOn : look_.backgroundOff);
         g.fillRect(bounds);

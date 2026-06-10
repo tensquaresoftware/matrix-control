@@ -2,6 +2,7 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
+#include "GUI/Layout/WidgetDimensions.h"
 #include "GUI/Looks/WidgetLooks.h"
 
 namespace TSS
@@ -41,13 +42,15 @@ namespace TSS
         
         static int getBaseWidth() { return kDefaultWidth_; }
         static int getBaseHeight() { return kDefaultHeight_; }
-        static constexpr int getVerticalMargin() { return kVerticalMargin_; }
+
+        static void setPopupLayoutDimensions(const PopupMenuLayoutDimensions& dimensions);
+        static const PopupMenuLayoutDimensions& getPopupLayoutDimensions();
+
+        int getScaledVerticalMargin() const;
 
     private:
         inline constexpr static int kDefaultWidth_ = 100;
         inline constexpr static int kDefaultHeight_ = 20;
-        inline constexpr static int kVerticalMargin_ = 4;
-        inline constexpr static int kBackgroundHeight_ = 16;
         inline constexpr static int kLeftPadding_ = 4;
         inline constexpr static int kRightPadding_ = 4;
         inline constexpr static int kBorderThickness_ = 1;
@@ -63,6 +66,8 @@ namespace TSS
         bool isPopupOpen_ = false;
         bool hasFocus_ = false;
         float uiScale_ = 1.0f;
+
+        static PopupMenuLayoutDimensions popupLayoutDimensions_;
 
         void drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);
         void drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);

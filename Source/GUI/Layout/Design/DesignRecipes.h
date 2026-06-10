@@ -36,7 +36,7 @@ namespace TSS::Design
             inline constexpr int kWidth = Atoms::Widths::Label::kModulationBusNumber
                 + Atoms::Widths::ComboBox::kMatrixModulationSource + Atoms::Widths::ParameterCell::kControl
                 + Atoms::Widths::ComboBox::kMatrixModulationDestination + Atoms::Widths::Button::kInit
-                + 4 * Atoms::Widths::ModulationBusCell::kInterControlGap;
+                + 4 * Atoms::Widths::ModulationBus::kInterControlGap;
             inline constexpr int kHeight = Atoms::Heights::kLabel + Atoms::Heights::kHorizontalSeparator;
         }
 
@@ -67,26 +67,28 @@ namespace TSS::Design
         namespace PatchManagerModule
         {
             inline constexpr int kContentRowHeight = Atoms::Heights::kButton;
-            inline constexpr int kRowGap = Spacing::kStandard;
+            inline constexpr int kInterControlGap = Spacing::kStandard;
+            inline constexpr int kColumnGap = Spacing::kMedium;
+            inline constexpr int kShortControlVerticalInset = (kContentRowHeight - Atoms::Heights::kLabel) / 2;
         }
 
         namespace BankUtilityModule
         {
             inline constexpr int kContentRowCount = 2;
             inline constexpr int kHeight = Atoms::Heights::kModuleHeader + kContentRowCount * PatchManagerModule::kContentRowHeight
-                + (kContentRowCount - 1) * PatchManagerModule::kRowGap;
+                + (kContentRowCount - 1) * PatchManagerModule::kInterControlGap;
         }
 
         namespace InternalPatchesModule
         {
             inline constexpr int kHeight = Atoms::Heights::kModuleHeader + Atoms::Heights::kGroupLabel
-                + PatchManagerModule::kRowGap + PatchManagerModule::kContentRowHeight;
+                + PatchManagerModule::kContentRowHeight;
         }
 
         namespace ComputerPatchesModule
         {
             inline constexpr int kHeight = Atoms::Heights::kModuleHeader + Atoms::Heights::kGroupLabel
-                + PatchManagerModule::kRowGap + PatchManagerModule::kContentRowHeight;
+                + PatchManagerModule::kContentRowHeight;
         }
 
         // No HorizontalSeparator after the last content row (Figma — saves 4 px vs Patch/Master columns).
@@ -94,7 +96,7 @@ namespace TSS::Design
         {
             inline constexpr int kContentRowCount = 3;
             inline constexpr int kHeight = Atoms::Heights::kModuleHeader + kContentRowCount * PatchManagerModule::kContentRowHeight
-                + (kContentRowCount - 1) * PatchManagerModule::kRowGap;
+                + (kContentRowCount - 1) * PatchManagerModule::kInterControlGap;
         }
     }
 }

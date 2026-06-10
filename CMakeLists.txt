@@ -178,7 +178,8 @@ set(PLUGIN_SOURCES
     Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditBottomModulesPanel/Modules/Env3Panel.cpp
     Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditBottomModulesPanel/Modules/Lfo1Panel.cpp
     Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditBottomModulesPanel/Modules/Lfo2Panel.cpp
-    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditDisplaysPanel/InteractiveDisplayApvtsSync.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditDisplaysPanel/Modules/InteractiveDisplayApvtsSync.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditDisplaysPanel/Modules/PatchNameDisplayPanel.cpp
     Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditDisplaysPanel/PatchEditDisplaysPanel.cpp
     Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditPanel.cpp
     Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditTopModulesPanel/PatchEditTopModulesPanel.cpp
@@ -399,6 +400,17 @@ target_compile_definitions(Matrix-Control
         JUCE_VST3_CAN_REPLACE_VST2=0
         JUCE_REPORT_APP_USAGE=0
 )
+
+# JUCE VST3 manifest helper uses deprecated std::wstring_convert from the VST3 SDK.
+if(TARGET Matrix-Control_vst3_helper)
+    target_compile_options(Matrix-Control_vst3_helper PRIVATE -Wno-deprecated-declarations)
+endif()
+
+# JUCE links optional ARA/LV2 stub objects with no symbols into the shared-code static library.
+if(APPLE)
+    set_target_properties(Matrix-Control PROPERTIES
+        XCODE_ATTRIBUTE_OTHER_LIBTOOLFLAGS "-no_warning_for_no_symbols")
+endif()
 
 # =============================================================================
 # COPY TO CENTRAL ARTEFACTS FOLDER

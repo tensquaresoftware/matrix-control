@@ -16,7 +16,7 @@ namespace TSS
         void setLook(const PopupMenuLook& look);
 
         void drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds) const;
-        void drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds) const;
+        void drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds, float systemDisplayScale) const;
         void drawItem(juce::Graphics& g, const ComboBox& comboBox, int itemIndex, 
                      const juce::Rectangle<float>& itemBounds, int highlightedItemIndex, 
                      const juce::Font& font) const;

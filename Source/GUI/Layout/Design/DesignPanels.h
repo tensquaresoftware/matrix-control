@@ -161,7 +161,9 @@ namespace TSS::Design
 
             namespace SharedColumn
             {
-                inline constexpr int kHeight = MatrixModulationSection::kHeight + kVerticalStackGap + PatchManagerSection::kHeight;
+                inline constexpr int kSharedPanelHeight = MatrixModulationSection::kHeight + kVerticalStackGap
+                    + PatchManagerSection::kHeight;
+                inline constexpr int kHeight = kSharedPanelHeight;
             }
 
             inline constexpr int kEffectiveHeight = PatchEditSection::kHeight;

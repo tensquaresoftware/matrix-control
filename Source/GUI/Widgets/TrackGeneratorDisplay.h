@@ -5,6 +5,7 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
+#include "GUI/Layout/WidgetDimensions.h"
 #include "GUI/Looks/WidgetLooks.h"
 
 namespace TSS
@@ -15,7 +16,7 @@ namespace TSS
         using ValueChangedCallback = std::function<void(int pointIndex, int newValue)>;
         using EditGestureCallback = std::function<void(int pointIndex)>;
 
-        explicit TrackGeneratorDisplay(int width, int height, const TrackGeneratorDisplayLook& look);
+        explicit TrackGeneratorDisplay(const DisplayBandDimensions& dimensions, const TrackGeneratorDisplayLook& look);
         ~TrackGeneratorDisplay() override = default;
 
         void setLook(const TrackGeneratorDisplayLook& look);
@@ -54,20 +55,12 @@ namespace TSS
         int getHeight() const { return height_; }
 
     private:
-        inline constexpr static int kWidgetBorderThickness_ = 2;
-        inline constexpr static int kWidgetPaddingTop_ = 12;
-        inline constexpr static int kWidgetPaddingBottom_ = 10;
-        inline constexpr static float kWidgetTriangleBase_ = 10.0f;
-        
         inline constexpr static int kPointMinValue_ = 0;
         inline constexpr static int kPointMaxValue_ = 63;
         
         inline constexpr static int kCurvePointCount_ = 5;
-        inline constexpr static float kCurvePadding_ = 5.0f;
-        inline constexpr static float kCurvePointRadius_ = 3.0f;
-        inline constexpr static float kCurveLineThickness_ = 1.0f;
-        inline constexpr static float kPointHitZoneRadius_ = 10.0f;
 
+        DisplayBandDimensions dimensions_;
         TrackGeneratorDisplayLook look_{};
         int width_;
         int height_;

@@ -1,5 +1,6 @@
 #include "PatchNameDisplay.h"
 
+#include "GUI/Layout/ScaledDrawing.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 
 namespace TSS
@@ -52,7 +53,13 @@ namespace TSS
     void PatchNameDisplay::drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
         g.setColour(look_.border);
-        g.drawRect(bounds, std::max(1.0f, static_cast<float>(kBorderThickness_) * uiScale_));
+        const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
+        const float borderThickness = ScaledDrawing::snappedStrokeThicknessFromDesign(
+            static_cast<float>(kBorderThickness_),
+            uiScale_,
+            systemDisplayScale,
+            ScaledDrawing::StrokeSnapPolicy::kRound);
+        g.drawRect(bounds, borderThickness);
     }
 
     void PatchNameDisplay::drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds)

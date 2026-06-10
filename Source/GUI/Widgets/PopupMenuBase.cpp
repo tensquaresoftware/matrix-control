@@ -20,6 +20,16 @@ namespace TSS
 
     PopupMenuBase::~PopupMenuBase() = default;
 
+    int PopupMenuBase::getItemHeightDesign() const
+    {
+        return ComboBox::getPopupLayoutDimensions().itemHeight;
+    }
+
+    float PopupMenuBase::getBorderThicknessDesign() const
+    {
+        return static_cast<float>(ComboBox::getPopupLayoutDimensions().borderThickness);
+    }
+
     void PopupMenuBase::mouseExit(const juce::MouseEvent&)
     {
         updateHighlightedItem(-1);

@@ -29,8 +29,6 @@ public:
     void setUiScale(float uiScale);
 
 private:
-    inline constexpr static int kGroupLabelGap_ = 10;
-    inline constexpr static int kGap_ = 5;
     inline constexpr static int kSelectPatchFileEmptyId_ = 1;
 
     ComputerPatchesPanelDimensions dims_;

@@ -29,11 +29,11 @@ BankUtilityPanel::~BankUtilityPanel() = default;
 void BankUtilityPanel::resized()
 {
     const float sf = uiScale_;
-    const float rowGapDesign = static_cast<float>(dims_.layout.rowGap);
+    const float rowGapDesign = static_cast<float>(dims_.layout.interControlGap);
 
     const int moduleHeaderHeight  = juce::roundToInt(static_cast<float>(dims_.moduleHeader.height) * sf);
     const int moduleHeaderWidth   = juce::roundToInt(static_cast<float>(dims_.moduleHeader.patchManagerTitleBandWidth) * sf);
-    const int labelWidth          = juce::roundToInt(static_cast<float>(dims_.bankSelectorLabel.patchManagerBankSelectorWidth) * sf);
+    const int labelWidth          = juce::roundToInt(static_cast<float>(dims_.bankSelectorLabel.patchManagerSelectBankWidth) * sf);
     const int labelHeight         = juce::roundToInt(static_cast<float>(dims_.bankSelectorLabel.height) * sf);
     const int buttonWidth         = juce::roundToInt(static_cast<float>(dims_.buttons.patchManagerBankSelectWidth) * sf);
     const int buttonHeight        = juce::roundToInt(static_cast<float>(dims_.buttons.height) * sf);
@@ -45,11 +45,14 @@ void BankUtilityPanel::resized()
     // Row 1 Y — directly under ModuleHeader (Recipes::BankUtilityModule::kHeight = 76 @ 100 %)
     const int row1Y = juce::roundToInt(static_cast<float>(dims_.moduleHeader.height) * sf);
 
+    const int rowH = juce::roundToInt(static_cast<float>(dims_.layout.contentRowHeight) * sf);
+    const int shortControlY = row1Y + (rowH - labelHeight) / 2;
+
     if (auto* label = bankSelectorLabel_.get())
-        label->setBounds(0, row1Y, labelWidth, labelHeight);
+        label->setBounds(0, shortControlY, labelWidth, labelHeight);
 
     // Row 1 X positions: each computed independently from float origin
-    const float row1OriginX = static_cast<float>(dims_.bankSelectorLabel.patchManagerBankSelectorWidth) * sf
+    const float row1OriginX = static_cast<float>(dims_.bankSelectorLabel.patchManagerSelectBankWidth) * sf
         + rowGapDesign * sf;
     const float bankButtonStep = static_cast<float>(dims_.buttons.patchManagerBankSelectWidth) * sf
         + rowGapDesign * sf;
@@ -158,17 +161,19 @@ void BankUtilityPanel::setupModuleHeader(TSS::ISkin& skin, WidgetFactory& widget
         dims_.moduleHeader.height,
         TSS::moduleHeaderLookFromSkin(skin),
         TSS::ModuleHeader::ColourVariant::Blue,
-        widgetFactory.getGroupDisplayName(moduleId));
+        widgetFactory.getGroupDisplayName(moduleId),
+        dims_.moduleHeader);
     addAndMakeVisible(*bankUtilityModuleHeader_);
 }
 
 void BankUtilityPanel::setupBankSelectorLabel(TSS::ISkin& skin)
 {
     bankSelectorLabel_ = std::make_unique<TSS::Label>(
-        dims_.bankSelectorLabel.patchManagerBankSelectorWidth,
+        dims_.bankSelectorLabel.patchManagerSelectBankWidth,
         dims_.bankSelectorLabel.height,
         TSS::labelLookFromSkin(skin),
-        PluginDisplayNames::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kBankSelector);
+        PluginDisplayNames::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kBankSelector,
+        TSS::LabelStyle::Centered);
     addAndMakeVisible(*bankSelectorLabel_);
 }
 

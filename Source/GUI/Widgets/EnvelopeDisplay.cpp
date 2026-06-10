@@ -1,11 +1,14 @@
 #include "EnvelopeDisplay.h"
 
+#include "GUI/Layout/ScaledDrawing.h"
+
 namespace TSS
 {
-    EnvelopeDisplay::EnvelopeDisplay(int width, int height, const EnvelopeDisplayLook& look)
-        : look_(look)
-        , width_(width)
-        , height_(height)
+    EnvelopeDisplay::EnvelopeDisplay(const DisplayBandDimensions& dimensions, const EnvelopeDisplayLook& look)
+        : dimensions_(dimensions)
+        , look_(look)
+        , width_(dimensions.width)
+        , height_(dimensions.height)
     {
         setOpaque(false);
         setSize(width_, height_);
@@ -29,8 +32,8 @@ namespace TSS
     void EnvelopeDisplay::paint(juce::Graphics& g)
     {
         const auto bounds = getLocalBounds().toFloat();
-        const auto contentBounds = bounds.withTrimmedTop(static_cast<float>(kWidgetPaddingTop_) * uiScale_)
-            .withTrimmedBottom(static_cast<float>(kWidgetPaddingBottom_) * uiScale_);
+        const auto contentBounds = bounds.withTrimmedTop(static_cast<float>(dimensions_.paddingTop) * uiScale_)
+            .withTrimmedBottom(static_cast<float>(dimensions_.paddingBottom) * uiScale_);
 
         drawBackground(g, contentBounds);
         drawBorder(g, contentBounds);
@@ -48,13 +51,19 @@ namespace TSS
     void EnvelopeDisplay::drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
         g.setColour(look_.border);
-        g.drawRect(bounds, std::max(1.0f, static_cast<float>(kWidgetBorderThickness_) * uiScale_));
+        const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
+        const float borderThickness = ScaledDrawing::snappedStrokeThicknessFromDesign(
+            static_cast<float>(dimensions_.borderThickness),
+            uiScale_,
+            systemDisplayScale,
+            ScaledDrawing::StrokeSnapPolicy::kRound);
+        g.drawRect(bounds, borderThickness);
     }
 
     void EnvelopeDisplay::drawTriangle(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
         const auto triangleColour = look_.border;
-        const float triangleBase = kWidgetTriangleBase_ * uiScale_;
+        const float triangleBase = static_cast<float>(dimensions_.triangleBase) * uiScale_;
         const float triangleHeight = triangleBase * std::sqrt(3.0f) * 0.5f;
         const float centreX = bounds.getCentreX();
         const float baseY = bounds.getBottom();
@@ -181,7 +190,7 @@ namespace TSS
     
     juce::Rectangle<float> EnvelopeDisplay::getCurveCenterBounds(const juce::Rectangle<float>& innerBounds) const
     {
-        const float totalPadding = (kCurvePadding_ + static_cast<float>(kWidgetBorderThickness_)) * uiScale_;
+        const float totalPadding = (static_cast<float>(dimensions_.curvePadding) + static_cast<float>(dimensions_.borderThickness)) * uiScale_;
         return innerBounds.reduced(totalPadding);
     }
     
@@ -194,7 +203,7 @@ namespace TSS
         
         const auto envelopePoints = calculateEnvelopePoints(centerBounds);
         
-        const float lineThickness = std::max(1.0f, kCurveLineThickness_ * uiScale_);
+        const float lineThickness = std::max(1.0f, static_cast<float>(dimensions_.curveLineThickness) * uiScale_);
         
         g.setColour(look_.envelope);
         
@@ -206,7 +215,7 @@ namespace TSS
         }
         
         const auto hollowPointFillColour = look_.envelope.withAlpha(0.4f);
-        const float pointRadius = kCurvePointRadius_ * uiScale_;
+        const float pointRadius = static_cast<float>(dimensions_.curvePointRadius) * uiScale_;
 
         for (int i = 0; i < kCurvePointCount_; ++i)
         {
@@ -240,7 +249,7 @@ namespace TSS
         
         const float delayWidth = (static_cast<float>(delay_) / static_cast<float>(kPointMaxValue_)) * result.segmentMaxWidth;
         
-        const float minSegmentWidth = kMinCurveSegmentWidth_ * uiScale_;
+        const float minSegmentWidth = static_cast<float>(dimensions_.minCurveSegmentWidth) * uiScale_;
         float attackWidth = (static_cast<float>(attack_) / static_cast<float>(kPointMaxValue_)) * result.segmentMaxWidth;
         if (attack_ == 0)
             attackWidth = minSegmentWidth;
@@ -287,7 +296,7 @@ namespace TSS
         const auto centerBounds = getCurveCenterBounds(innerBounds);
         const auto envelopePoints = calculateEnvelopePoints(centerBounds);
         
-        const float hitZoneRadius = kPointHitZoneRadius_ * uiScale_;
+        const float hitZoneRadius = static_cast<float>(dimensions_.pointHitZoneRadius) * uiScale_;
         const int editablePoints[] = {1, 2, 3, 5};
         
         for (int editableIndex : editablePoints)
@@ -307,7 +316,7 @@ namespace TSS
         const auto centerBounds = getCurveCenterBounds(innerBounds);
         const auto envelopePoints = calculateEnvelopePoints(centerBounds);
         
-        const float sustainHitZone = kSustainSegmentHitZone_ * uiScale_;
+        const float sustainHitZone = static_cast<float>(dimensions_.sustainSegmentHitZone) * uiScale_;
         const auto& point3 = envelopePoints.points[3];
         const auto& point4 = envelopePoints.points[4];
         
@@ -324,8 +333,8 @@ namespace TSS
     void EnvelopeDisplay::mouseDown(const juce::MouseEvent& e)
     {
         const auto bounds = getLocalBounds().toFloat();
-        const auto innerBounds = bounds.withTrimmedTop(static_cast<float>(kWidgetPaddingTop_) * uiScale_)
-            .withTrimmedBottom(static_cast<float>(kWidgetPaddingBottom_) * uiScale_);
+        const auto innerBounds = bounds.withTrimmedTop(static_cast<float>(dimensions_.paddingTop) * uiScale_)
+            .withTrimmedBottom(static_cast<float>(dimensions_.paddingBottom) * uiScale_);
         
         draggedPointIndex_ = findPointAtPosition(e.position, innerBounds);
         draggingSustainSegment_ = false;
@@ -359,8 +368,8 @@ namespace TSS
     void EnvelopeDisplay::mouseDrag(const juce::MouseEvent& e)
     {
         const auto bounds = getLocalBounds().toFloat();
-        const auto innerBounds = bounds.withTrimmedTop(static_cast<float>(kWidgetPaddingTop_) * uiScale_)
-            .withTrimmedBottom(static_cast<float>(kWidgetPaddingBottom_) * uiScale_);
+        const auto innerBounds = bounds.withTrimmedTop(static_cast<float>(dimensions_.paddingTop) * uiScale_)
+            .withTrimmedBottom(static_cast<float>(dimensions_.paddingBottom) * uiScale_);
         const auto centerBounds = getCurveCenterBounds(innerBounds);
         
         if (draggingSustainSegment_)

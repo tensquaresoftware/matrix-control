@@ -197,7 +197,7 @@ void ParameterCell::setUiScale(float uiScale)
     repaint();
 }
 
-int ParameterCell::getTotalHeight() const
+int ParameterCell::getDesignRowHeight() const
 {
     return dimensions_.rowHeight;
 }

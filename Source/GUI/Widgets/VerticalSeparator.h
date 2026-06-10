@@ -2,6 +2,7 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
+#include "GUI/Layout/WidgetDimensions.h"
 #include "GUI/Looks/WidgetLooks.h"
 
 namespace TSS
@@ -9,7 +10,8 @@ namespace TSS
     class VerticalSeparator : public juce::Component
     {
     public:
-        explicit VerticalSeparator(int width, int height, const VerticalSeparatorLook& look);
+        explicit VerticalSeparator(int width, int height, const VerticalSeparatorLook& look,
+                                   const SeparatorDimensions& dimensions);
         ~VerticalSeparator() override = default;
 
         void setLook(const VerticalSeparatorLook& look);
@@ -22,10 +24,7 @@ namespace TSS
         int getHeight() const { return height_; }
 
     private:
-        inline constexpr static float kLineWidth_ = 4.0f;
-        inline constexpr static float kTopPadding_ = 4.0f;
-        inline constexpr static float kBottomPadding_ = 2.0f;
-
+        SeparatorDimensions dimensions_;
         VerticalSeparatorLook look_{};
         int width_;
         int height_;

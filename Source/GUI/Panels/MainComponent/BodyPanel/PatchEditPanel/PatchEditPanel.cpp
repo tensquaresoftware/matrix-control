@@ -1,7 +1,5 @@
 #include "PatchEditPanel.h"
 
-#include <vector>
-
 #include "PatchEditTopModulesPanel/PatchEditTopModulesPanel.h"
 #include "PatchEditDisplaysPanel/PatchEditDisplaysPanel.h"
 #include "PatchEditBottomModulesPanel/PatchEditBottomModulesPanel.h"
@@ -56,22 +54,19 @@ void PatchEditPanel::resized()
     const auto bounds = getLocalBounds();
     const float sf = uiScale_;
 
-    const std::vector<int> designHeights {
-        dims_.sectionHeaderHeight,
-        dims_.topHeight,
-        dims_.middleHeight,
-        dims_.bottomHeight
-    };
-    const auto heights = TSS::ScaledLayout::distributeHeights(bounds.getHeight(), designHeights, sf, 3);
+    const int sectionHeaderHeight = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.sectionHeaderHeight), sf);
+    const int topHeight = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.topHeight), sf);
+    const int middleHeight = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.middleHeight), sf);
+    const int bottomHeight = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.bottomHeight), sf);
 
     int y = bounds.getY();
-    sectionHeader_->setBounds(bounds.getX(), y, bounds.getWidth(), heights[0]);
-    y += heights[0];
-    patchEditTopModulesPanel_->setBounds(bounds.getX(), y, bounds.getWidth(), heights[1]);
-    y += heights[1];
-    patchEditDisplaysPanel_->setBounds(bounds.getX(), y, bounds.getWidth(), heights[2]);
-    y += heights[2];
-    patchEditBottomModulesPanel_->setBounds(bounds.getX(), y, bounds.getWidth(), heights[3]);
+    sectionHeader_->setBounds(bounds.getX(), y, bounds.getWidth(), sectionHeaderHeight);
+    y += sectionHeaderHeight;
+    patchEditTopModulesPanel_->setBounds(bounds.getX(), y, bounds.getWidth(), topHeight);
+    y += topHeight;
+    patchEditDisplaysPanel_->setBounds(bounds.getX(), y, bounds.getWidth(), middleHeight);
+    y += middleHeight;
+    patchEditBottomModulesPanel_->setBounds(bounds.getX(), y, bounds.getWidth(), bottomHeight);
 }
 
 void PatchEditPanel::setSkin(TSS::ISkin& skin)

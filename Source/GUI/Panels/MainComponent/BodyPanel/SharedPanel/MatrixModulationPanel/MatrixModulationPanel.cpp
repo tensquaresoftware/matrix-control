@@ -26,6 +26,7 @@ MatrixModulationPanel::MatrixModulationPanel(TSS::ISkin& skin, const MatrixModul
     , modulationBusHeader_(std::make_unique<TSS::ModulationBusHeader>(
         dims_.busHeaderWidth,
         dims_.busHeaderHeight,
+        dims_.busHeader,
         TSS::modulationBusHeaderLookFromSkin(skin)))
 {
     setOpaque(false);
@@ -231,8 +232,8 @@ MatrixModulationPanel::ModulationBusParameterArrays MatrixModulationPanel::creat
 void MatrixModulationPanel::createInitAllBussesButton(TSS::ISkin& skin)
 {
     initAllBussesButton_ = std::make_unique<TSS::Button>(
-        dims_.busCell.initButtonWidth,
-        dims_.busCell.initButtonHeight,
+        dims_.initAllButtonWidth,
+        dims_.initAllButtonHeight,
         TSS::buttonLookFromSkin(skin),
         PluginDisplayNames::ShortLabels::kInit);
     initAllBussesButton_->onClick = [this]
@@ -267,9 +268,9 @@ void MatrixModulationPanel::resized()
     if (auto* initButton = initAllBussesButton_.get())
     {
         const int initAllButtonWidth = TSS::ScaledLayout::scaledInt(
-            static_cast<float>(dims_.busCell.initButtonWidth), sf);
+            static_cast<float>(dims_.initAllButtonWidth), sf);
         const int initAllButtonHeight = TSS::ScaledLayout::scaledInt(
-            static_cast<float>(dims_.busCell.initButtonHeight), sf);
+            static_cast<float>(dims_.initAllButtonHeight), sf);
         const int sectionHeaderHeight = TSS::ScaledLayout::scaledInt(
             static_cast<float>(dims_.sectionHeaderHeight), sf);
         const int scaledPanelWidth = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.width), sf);
@@ -277,17 +278,13 @@ void MatrixModulationPanel::resized()
         initButton->setBounds(initAllButtonX, sectionHeaderHeight, initAllButtonWidth, initAllButtonHeight);
     }
 
-    const size_t busCount = modulationBuses_.size();
-    if (busCount == 0)
-        return;
+    const int busRowHeight = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(dims_.modulationBusRowHeight), sf);
 
-    const auto busHeights = TSS::ScaledLayout::distributeFixedDesignRowsWithRemainderOnLast(
-        bounds.getHeight(), busCount, dims_.modulationBusRowHeight, uiScale_);
-
-    for (size_t i = 0; i < busCount; ++i)
+    for (auto& bus : modulationBuses_)
     {
-        if (auto* bus = modulationBuses_[i].get())
-            bus->setBounds(bounds.removeFromTop(busHeights[i]));
+        if (bus != nullptr)
+            bus->setBounds(bounds.removeFromTop(busRowHeight));
     }
 }
 

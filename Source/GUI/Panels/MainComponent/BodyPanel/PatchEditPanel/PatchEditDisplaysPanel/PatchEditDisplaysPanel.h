@@ -7,10 +7,7 @@
 
 #include "GUI/Layout/PanelDimensions.h"
 #include "GUI/Widgets/EnvelopeDisplay.h"
-#include "GUI/Widgets/ModuleHeader.h"
-#include "GUI/Widgets/PatchNameDisplay.h"
 #include "GUI/Widgets/TrackGeneratorDisplay.h"
-#include "Shared/Definitions/PluginDisplayNames.h"
 
 namespace TSS
 {
@@ -20,6 +17,7 @@ namespace TSS
 class InteractiveDisplayApvtsSync;
 class PatchEditBottomModulesPanel;
 class PatchEditTopModulesPanel;
+class PatchNameDisplayPanel;
 
 class PatchEditDisplaysPanel : public juce::Component
 {
@@ -43,8 +41,7 @@ private:
     TSS::EnvelopeDisplay envelope2Display_;
     TSS::EnvelopeDisplay envelope3Display_;
     TSS::TrackGeneratorDisplay trackGeneratorDisplay_;
-    TSS::ModuleHeader patchNameModuleHeader_;
-    TSS::PatchNameDisplay patchNameDisplay_;
+    std::unique_ptr<PatchNameDisplayPanel> patchNameDisplayPanel_;
     std::unique_ptr<InteractiveDisplayApvtsSync> apvtsSync_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PatchEditDisplaysPanel)

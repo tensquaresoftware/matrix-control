@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include "GUI/Layout/ScaledDrawing.h"
 #include "GUI/Skins/ColourChart.h"
 
 namespace TSS
@@ -31,6 +32,7 @@ namespace TSS
             return;
 
         uiScale_ = uiScale;
+        updateTextWidthCache();
         repaint();
     }
 
@@ -66,7 +68,12 @@ namespace TSS
     void NumberBox::paint(juce::Graphics& g)
     {
         const auto bounds = getLocalBounds().toFloat();
-        const float borderThickness = std::max(1.0f, static_cast<float>(kBorderThickness_) * uiScale_);
+        const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
+        const float borderThickness = ScaledDrawing::snappedStrokeThicknessFromDesign(
+            static_cast<float>(kBorderThickness_),
+            uiScale_,
+            systemDisplayScale,
+            ScaledDrawing::StrokeSnapPolicy::kRound);
 
         g.setColour(look_.background);
         g.fillRect(bounds);
@@ -97,7 +104,8 @@ namespace TSS
         cachedValueText_ = juce::String(currentValue_);
 
         juce::GlyphArrangement glyphArrangement;
-        glyphArrangement.addLineOfText(look_.font, cachedValueText_, 0.0f, 0.0f);
+        const auto scaledFont = look_.font.withHeight(look_.font.getHeight() * uiScale_);
+        glyphArrangement.addLineOfText(scaledFont, cachedValueText_, 0.0f, 0.0f);
         cachedTextWidth_ = glyphArrangement.getBoundingBox(0, -1, true).getWidth();
     }
 
@@ -119,7 +127,9 @@ namespace TSS
         const float textRight = bounds.getCentreX() + textWidth * 0.5f;
         const float baselineY = bounds.getCentreY() + look_.font.getHeight() * 0.5f - look_.font.getDescent();
 
-        return { textRight + kDotXOffset_, baselineY - kDotRadius_ };
+        const float dotXOffset = kDotXOffset_ * uiScale_;
+        const float dotRadius = kDotRadius_ * uiScale_;
+        return { textRight + dotXOffset, baselineY - dotRadius };
     }
 
     void NumberBox::showEditor()

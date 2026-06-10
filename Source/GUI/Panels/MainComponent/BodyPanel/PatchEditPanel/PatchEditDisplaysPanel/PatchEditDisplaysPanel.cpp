@@ -1,12 +1,11 @@
 #include "PatchEditDisplaysPanel.h"
 
-#include "InteractiveDisplayApvtsSync.h"
+#include "Modules/InteractiveDisplayApvtsSync.h"
+#include "Modules/PatchNameDisplayPanel.h"
 
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Looks/LookBuilders.h"
 #include "GUI/Skins/ISkin.h"
-#include "Shared/Definitions/PluginDisplayNames.h"
-
 
 PatchEditDisplaysPanel::~PatchEditDisplaysPanel() = default;
 
@@ -14,16 +13,16 @@ PatchEditDisplaysPanel::PatchEditDisplaysPanel(TSS::ISkin& skin, const PatchEdit
     : dims_(dims)
     , skin_(&skin)
     , apvts_(&apvts)
-    , envelope1Display_(dims_.childBand.width, dims_.childBand.height, TSS::envelopeDisplayLookFromSkin(skin))
-    , envelope2Display_(dims_.childBand.width, dims_.childBand.height, TSS::envelopeDisplayLookFromSkin(skin))
-    , envelope3Display_(dims_.childBand.width, dims_.childBand.height, TSS::envelopeDisplayLookFromSkin(skin))
-    , trackGeneratorDisplay_(dims_.childBand.width, dims_.childBand.height, TSS::trackGeneratorDisplayLookFromSkin(skin))
-    , patchNameModuleHeader_(dims_.childBand.width,
-                             dims_.moduleHeaderHeight,
-                             TSS::moduleHeaderLookFromSkin(skin),
-                             TSS::ModuleHeader::ColourVariant::Blue,
-                             PluginDisplayNames::PatchEditSection::PatchNameModule::kName)
-    , patchNameDisplay_(dims_.childBand.width, dims_.patchName.height, TSS::patchNameDisplayLookFromSkin(skin))
+    , envelope1Display_(dims_.childBand, TSS::envelopeDisplayLookFromSkin(skin))
+    , envelope2Display_(dims_.childBand, TSS::envelopeDisplayLookFromSkin(skin))
+    , envelope3Display_(dims_.childBand, TSS::envelopeDisplayLookFromSkin(skin))
+    , trackGeneratorDisplay_(dims_.trackGeneratorBand, TSS::trackGeneratorDisplayLookFromSkin(skin))
+    , patchNameDisplayPanel_(std::make_unique<PatchNameDisplayPanel>(
+          skin,
+          dims_.patchName.width,
+          dims_.childBand.height,
+          dims_.patchName,
+          dims_.moduleHeader))
     , apvtsSync_(std::make_unique<InteractiveDisplayApvtsSync>(
         apvts,
         envelope1Display_,
@@ -40,8 +39,7 @@ PatchEditDisplaysPanel::PatchEditDisplaysPanel(TSS::ISkin& skin, const PatchEdit
     addAndMakeVisible(envelope2Display_);
     addAndMakeVisible(envelope3Display_);
     addAndMakeVisible(trackGeneratorDisplay_);
-    addAndMakeVisible(patchNameModuleHeader_);
-    addAndMakeVisible(patchNameDisplay_);
+    addAndMakeVisible(*patchNameDisplayPanel_);
 }
 
 void PatchEditDisplaysPanel::connectSliderFastPaths(PatchEditTopModulesPanel& topModulesPanel,
@@ -57,8 +55,6 @@ void PatchEditDisplaysPanel::resized()
     const int childWidth = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.childBand.width), sf);
     const int childHeight = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.childBand.height), sf);
     const float childStep = static_cast<float>(dims_.childBand.width + dims_.interModuleGap) * sf;
-    const int paddingTop = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.patchName.topPadding), sf);
-    const int moduleHeaderHeight = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.moduleHeaderHeight), sf);
 
     envelope1Display_.setBounds(0, 0, childWidth, childHeight);
     envelope2Display_.setBounds(juce::roundToInt(1.0f * childStep), 0, childWidth, childHeight);
@@ -67,18 +63,10 @@ void PatchEditDisplaysPanel::resized()
 
     const int patchNameSectionX = juce::roundToInt(4.0f * childStep);
     const int patchNameSectionW = getWidth() - patchNameSectionX;
-    patchNameModuleHeader_.setBounds(patchNameSectionX, paddingTop,
-                                    patchNameSectionW, moduleHeaderHeight);
+    const int patchNameSectionH = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.childBand.height), sf);
 
-    const int patchNameDisplayY = TSS::ScaledLayout::scaledInt(
-        static_cast<float>(dims_.patchName.topPadding + dims_.moduleHeaderHeight
-            + dims_.patchName.moduleHeaderToDisplayGap),
-        sf);
-    patchNameDisplay_.setBounds(
-        patchNameSectionX,
-        patchNameDisplayY,
-        patchNameSectionW,
-        TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.patchName.height), sf));
+    if (patchNameDisplayPanel_ != nullptr)
+        patchNameDisplayPanel_->setBounds(patchNameSectionX, 0, patchNameSectionW, patchNameSectionH);
 }
 
 void PatchEditDisplaysPanel::setSkin(TSS::ISkin& skin)
@@ -89,8 +77,8 @@ void PatchEditDisplaysPanel::setSkin(TSS::ISkin& skin)
     envelope2Display_.setLook(envelopeLook);
     envelope3Display_.setLook(envelopeLook);
     trackGeneratorDisplay_.setLook(TSS::trackGeneratorDisplayLookFromSkin(skin));
-    patchNameModuleHeader_.setLook(TSS::moduleHeaderLookFromSkin(skin));
-    patchNameDisplay_.setLook(TSS::patchNameDisplayLookFromSkin(skin));
+    if (patchNameDisplayPanel_ != nullptr)
+        patchNameDisplayPanel_->setSkin(skin);
 }
 
 void PatchEditDisplaysPanel::setUiScale(float uiScale)
@@ -104,8 +92,8 @@ void PatchEditDisplaysPanel::setUiScale(float uiScale)
     envelope2Display_.setUiScale(uiScale_);
     envelope3Display_.setUiScale(uiScale_);
     trackGeneratorDisplay_.setUiScale(uiScale_);
-    patchNameModuleHeader_.setUiScale(uiScale_);
-    patchNameDisplay_.setUiScale(uiScale_);
+    if (patchNameDisplayPanel_ != nullptr)
+        patchNameDisplayPanel_->setUiScale(uiScale_);
     
     resized();
     repaint();

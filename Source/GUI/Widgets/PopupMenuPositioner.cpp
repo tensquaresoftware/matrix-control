@@ -16,7 +16,7 @@ namespace TSS
         }
 
         const auto topLevelScreenBounds = topLevelComponent->getScreenBounds();
-        const auto verticalMargin = ComboBox::getVerticalMargin();
+        const auto verticalMargin = comboBox.getScaledVerticalMargin();
 
         auto initialPosition = calculateInitialPosition(comboBox, verticalMargin);
         auto adjustedPosition = adjustPositionToFitScreen(

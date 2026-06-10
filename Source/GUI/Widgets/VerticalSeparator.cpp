@@ -1,9 +1,13 @@
 #include "VerticalSeparator.h"
 
+#include "GUI/Layout/ScaledDrawing.h"
+
 namespace TSS
 {
-    VerticalSeparator::VerticalSeparator(int width, int height, const VerticalSeparatorLook& look)
-        : look_(look)
+    VerticalSeparator::VerticalSeparator(int width, int height, const VerticalSeparatorLook& look,
+                                         const SeparatorDimensions& dimensions)
+        : dimensions_(dimensions)
+        , look_(look)
         , width_(width)
         , height_(height)
     {
@@ -29,12 +33,17 @@ namespace TSS
     void VerticalSeparator::paint(juce::Graphics& g)
     {
         const auto bounds = getLocalBounds().toFloat();
-        const float lineWidth = std::max(1.0f, kLineWidth_ * uiScale_);
+        const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
+        const float lineWidth = ScaledDrawing::snappedStrokeThicknessFromDesign(
+            static_cast<float>(dimensions_.verticalLineWidth),
+            uiScale_,
+            systemDisplayScale,
+            ScaledDrawing::StrokeSnapPolicy::kRound);
         const auto lineX = bounds.getCentreX() - lineWidth * 0.5f;
 
         auto line = bounds;
-        line.removeFromTop(kTopPadding_ * uiScale_);
-        line.removeFromBottom(kBottomPadding_ * uiScale_);
+        line.removeFromTop(static_cast<float>(dimensions_.verticalTopPadding) * uiScale_);
+        line.removeFromBottom(static_cast<float>(dimensions_.verticalBottomPadding) * uiScale_);
         line.setX(lineX);
         line.setWidth(lineWidth);
 

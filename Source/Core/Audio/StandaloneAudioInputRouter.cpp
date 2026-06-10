@@ -1,14 +1,5 @@
 #include "Core/Audio/StandaloneAudioInputRouter.h"
-
-namespace Core::StandaloneAudioInputRouterDetail
-{
-    juce::StringArray getInputChannelNames();
-    juce::StringArray getInputChannelIds();
-    std::vector<Core::AudioInputSourceEntry> getCatalogEntries();
-    void addAudioDeviceChangeListener(juce::ChangeListener& listener);
-    void removeAudioDeviceChangeListener(juce::ChangeListener& listener);
-    void enableInputMonitoring();
-}
+#include "Core/Audio/StandaloneAudioInputRouterDetail.h"
 
 namespace Core
 {

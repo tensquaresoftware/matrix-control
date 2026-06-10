@@ -2,6 +2,8 @@
 #include "ComboBox.h"
 #include "PopupMenuPositioner.h"
 
+#include "GUI/Layout/ScaledDrawing.h"
+
 namespace TSS
 {
     MultiColumnPopupMenu::MultiColumnPopupMenu(ComboBox& comboBox)
@@ -24,7 +26,12 @@ namespace TSS
     {
         const auto bounds = getLocalBounds().toFloat();
         renderer_.drawBackground(g, bounds);
-        const float borderThickness = kBorderThickness_ * uiScale_;
+        const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
+        const float borderThickness = ScaledDrawing::snappedStrokeThicknessFromDesign(
+            getBorderThicknessDesign(),
+            uiScale_,
+            systemDisplayScale,
+            ScaledDrawing::StrokeSnapPolicy::kRound);
         const auto contentBounds = bounds.reduced(borderThickness);
         drawItems(g);
         
@@ -35,7 +42,7 @@ namespace TSS
             renderer_.drawVerticalSeparators(g, contentBounds, columnCount_, actualColumnWidth, separatorWidth);
         }
         
-        renderer_.drawBorder(g, bounds);
+        renderer_.drawBorder(g, bounds, systemDisplayScale);
     }
 
     void MultiColumnPopupMenu::mouseMove(const juce::MouseEvent& e)
@@ -98,9 +105,14 @@ namespace TSS
             return juce::Rectangle<float>();
         }
         
-        const float borderThickness = kBorderThickness_ * uiScale_;
+        const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
+        const float borderThickness = ScaledDrawing::snappedStrokeThicknessFromDesign(
+            getBorderThicknessDesign(),
+            uiScale_,
+            systemDisplayScale,
+            ScaledDrawing::StrokeSnapPolicy::kRound);
         const auto contentBounds = getLocalBounds().toFloat().reduced(borderThickness);
-        const float itemHeight = static_cast<float>(kItemHeight_) * uiScale_;
+        const float itemHeight = static_cast<float>(getItemHeightDesign()) * uiScale_;
         
         if (columnCount_ == 1)
         {
@@ -121,7 +133,12 @@ namespace TSS
 
     int MultiColumnPopupMenu::getItemIndexAt(int x, int y) const
     {
-        const float borderThickness = kBorderThickness_ * uiScale_;
+        const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
+        const float borderThickness = ScaledDrawing::snappedStrokeThicknessFromDesign(
+            getBorderThicknessDesign(),
+            uiScale_,
+            systemDisplayScale,
+            ScaledDrawing::StrokeSnapPolicy::kRound);
         const auto contentBounds = getLocalBounds().toFloat().reduced(borderThickness);
         
         if (! contentBounds.contains(static_cast<float>(x), static_cast<float>(y)))
@@ -152,7 +169,12 @@ namespace TSS
             return 0;
         }
         
-        const float borderThickness = kBorderThickness_ * uiScale_;
+        const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
+        const float borderThickness = ScaledDrawing::snappedStrokeThicknessFromDesign(
+            getBorderThicknessDesign(),
+            uiScale_,
+            systemDisplayScale,
+            ScaledDrawing::StrokeSnapPolicy::kRound);
         const float contentWidth = getLocalBounds().toFloat().reduced(borderThickness).getWidth();
         const float separatorWidth = getSeparatorWidth();
         const float actualColumnWidth = getActualColumnWidth(contentWidth);
@@ -177,7 +199,7 @@ namespace TSS
     
     int MultiColumnPopupMenu::getRowFromY(int y) const
     {
-        const float itemHeight = static_cast<float>(kItemHeight_) * uiScale_;
+        const float itemHeight = static_cast<float>(getItemHeightDesign()) * uiScale_;
         return static_cast<int>(static_cast<float>(y) / itemHeight);
     }
 
@@ -327,11 +349,11 @@ namespace TSS
         auto popupMenu = std::make_unique<MultiColumnPopupMenu>(comboBox);
         auto* rawPtr = popupMenu.get();
 
-        const float itemHeight = static_cast<float>(kItemHeight_) * rawPtr->uiScale_;
+        const float itemHeight = static_cast<float>(rawPtr->getItemHeightDesign()) * rawPtr->uiScale_;
         const float separatorWidth = 1.0f * rawPtr->uiScale_;
         const float contentWidth = static_cast<float>(rawPtr->columnCount_) * rawPtr->columnWidth_ + static_cast<float>(rawPtr->columnCount_ - 1) * separatorWidth;
         const float contentHeight = static_cast<float>(rawPtr->itemsPerColumn_) * itemHeight;
-        const float borderThickness = kBorderThickness_ * 2.0f * rawPtr->uiScale_;
+        const float borderThickness = rawPtr->getBorderThicknessDesign() * 2.0f * rawPtr->uiScale_;
 
         const auto dimensions = PopupMenuPositioner::calculateDimensions(
             comboBox,

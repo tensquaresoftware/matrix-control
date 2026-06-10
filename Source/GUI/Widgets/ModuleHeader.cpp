@@ -1,6 +1,8 @@
 #include "ModuleHeader.h"
 
 #include "GUI/Factories/WidgetFactory.h"
+#include "GUI/Layout/ScaledDrawing.h"
+#include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Looks/LookBuilders.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Widgets/Button.h"
@@ -24,11 +26,13 @@ namespace TSS
         }
     }
 
-    ModuleHeader::ModuleHeader(int width, int height, const ModuleHeaderLook& look, ColourVariant variant, const juce::String& text)
+    ModuleHeader::ModuleHeader(int width, int height, const ModuleHeaderLook& look, ColourVariant variant,
+                               const juce::String& text, const ModuleHeaderDimensions& dimensions)
         : presentation_(Presentation::TitleOnly)
         , columnLayout_(ColumnLayout::PatchEdit)
         , buttonSet_(ButtonSet::None)
         , look_(look)
+        , dimensions_(dimensions)
         , width_(width)
         , height_(height)
         , text_(text)
@@ -75,7 +79,7 @@ namespace TSS
             return full;
 
         const float tw = static_cast<float>(
-            juce::roundToInt(static_cast<float>(getTitleBandWidthDesign()) * uiScale_));
+            ScaledLayout::scaledInt(static_cast<float>(getTitleBandWidthDesign()), uiScale_));
         full.setWidth(juce::jmin(tw, full.getWidth()));
         return full;
     }
@@ -178,10 +182,9 @@ namespace TSS
 
     void ModuleHeader::layoutInitOnlyButtons()
     {
-        const int initButtonWidth = juce::roundToInt(
-            static_cast<float>(dimensions_.initWidth) * uiScale_);
-        const int buttonHeight = juce::roundToInt(
-            static_cast<float>(dimensions_.buttonHeight) * uiScale_);
+        const float sf = uiScale_;
+        const int initButtonWidth = ScaledLayout::scaledInt(static_cast<float>(dimensions_.initWidth), sf);
+        const int buttonHeight = ScaledLayout::scaledInt(static_cast<float>(dimensions_.buttonHeight), sf);
         const int panelWidth = getWidth();
 
         if (auto* button = initButton_.get())
@@ -191,21 +194,18 @@ namespace TSS
     void ModuleHeader::layoutInitCopyPasteButtons()
     {
         const float sf = uiScale_;
-        const int buttonHeight = juce::roundToInt(
-            static_cast<float>(dimensions_.buttonHeight) * sf);
+        const int buttonHeight = ScaledLayout::scaledInt(static_cast<float>(dimensions_.buttonHeight), sf);
         const int panelWidth = getWidth();
 
-        const float pasteW = static_cast<float>(dimensions_.pasteWidth) * sf;
-        const float copyW = static_cast<float>(dimensions_.copyWidth) * sf;
-        const float initW = static_cast<float>(dimensions_.initWidth) * sf;
+        const int pasteButtonWidth = ScaledLayout::scaledInt(static_cast<float>(dimensions_.pasteWidth), sf);
+        const int copyButtonWidth = ScaledLayout::scaledInt(static_cast<float>(dimensions_.copyWidth), sf);
+        const int initButtonWidth = ScaledLayout::scaledInt(static_cast<float>(dimensions_.initWidth), sf);
 
-        const int pasteButtonWidth = juce::roundToInt(pasteW);
-        const int copyButtonWidth = juce::roundToInt(copyW);
-        const int initButtonWidth = juce::roundToInt(initW);
-
-        const int pasteX = panelWidth - juce::roundToInt(pasteW);
-        const int copyX = panelWidth - juce::roundToInt(pasteW + copyW);
-        const int initX = panelWidth - juce::roundToInt(pasteW + copyW + initW);
+        const int pasteX = panelWidth - ScaledLayout::scaledInt(static_cast<float>(dimensions_.pasteWidth), sf);
+        const int copyX = panelWidth - ScaledLayout::scaledInt(
+            static_cast<float>(dimensions_.pasteWidth + dimensions_.copyWidth), sf);
+        const int initX = panelWidth - ScaledLayout::scaledInt(
+            static_cast<float>(dimensions_.pasteWidth + dimensions_.copyWidth + dimensions_.initWidth), sf);
 
         if (auto* button = pasteButton_.get())
             button->setBounds(pasteX, 0, pasteButtonWidth, buttonHeight);
@@ -231,8 +231,8 @@ namespace TSS
         if (text_.isEmpty())
             return;
 
-        const float textAreaHeight = static_cast<float>(kTextAreaHeight_) * uiScale_;
-        const float textLeftPadding = static_cast<float>(kTextLeftPadding_) * uiScale_;
+        const float textAreaHeight = static_cast<float>(dimensions_.textAreaHeight) * uiScale_;
+        const float textLeftPadding = static_cast<float>(dimensions_.textLeftPadding) * uiScale_;
 
         auto textBounds = bounds;
         textBounds.setHeight(textAreaHeight);
@@ -245,8 +245,13 @@ namespace TSS
 
     void ModuleHeader::drawLine(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        const float textAreaHeight = static_cast<float>(kTextAreaHeight_) * uiScale_;
-        const float lineThickness = std::max(1.0f, static_cast<float>(kLineThickness_) * uiScale_);
+        const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
+        const float textAreaHeight = static_cast<float>(dimensions_.textAreaHeight) * uiScale_;
+        const float lineThickness = ScaledDrawing::snappedStrokeThicknessFromDesign(
+            static_cast<float>(dimensions_.lineThickness),
+            uiScale_,
+            systemDisplayScale,
+            ScaledDrawing::StrokeSnapPolicy::kRound);
         const auto lineAreaHeight = bounds.getHeight() - textAreaHeight;
         const auto verticalOffset = textAreaHeight + (lineAreaHeight - lineThickness) * 0.5f;
 

@@ -669,7 +669,7 @@ namespace PluginDisplayNames
 
             namespace StandaloneWidgets
             {
-                constexpr const char* kBankSelector = "BANK SELECTOR";
+                constexpr const char* kBankSelector = "SELECT BANK";
                 constexpr const char* kLockBank     = "BANK LOCK";
                 constexpr const char* kSelectBank0  = "0";
                 constexpr const char* kSelectBank1  = "1";

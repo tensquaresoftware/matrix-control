@@ -9,7 +9,8 @@ namespace TSS
     enum class LabelStyle
     {
         Default,
-        HeaderPanel
+        HeaderPanel,
+        Centered
     };
 
     class Label : public juce::Component

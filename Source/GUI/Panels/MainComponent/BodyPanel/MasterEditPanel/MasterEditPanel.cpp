@@ -1,12 +1,10 @@
 #include "MasterEditPanel.h"
 
-#include <vector>
-
-#include "GUI/Layout/ScaledLayout.h"
 #include "Modules/MidiPanel.h"
 #include "Modules/VibratoPanel.h"
 #include "Modules/MiscPanel.h"
 
+#include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Looks/LookBuilders.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
@@ -49,20 +47,19 @@ void MasterEditPanel::resized()
     const int sectionHeaderHeight = TSS::ScaledLayout::scaledInt(
         static_cast<float>(dims_.sectionHeaderHeight), sf);
     const int childWidth = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.childModuleWidth), sf);
-
-    const int contentTop = bounds.getY() + sectionHeaderHeight;
-    const int contentHeight = bounds.getHeight() - sectionHeaderHeight;
-    const std::vector<int> moduleDesignHeights { dims_.midiPanelHeight, dims_.vibratoPanelHeight, dims_.miscPanelHeight };
-    const auto moduleHeights = TSS::ScaledLayout::distributeHeights(contentHeight, moduleDesignHeights, sf, 2);
+    const int midiH = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.midiPanelHeight), sf);
+    const int vibratoH = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.vibratoPanelHeight), sf);
+    const int miscH = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.miscPanelHeight), sf);
+    const int interModuleGap = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.interModuleGap), sf);
 
     sectionHeader_->setBounds(bounds.getX(), bounds.getY(), bounds.getWidth(), sectionHeaderHeight);
 
-    int y = contentTop;
-    midiPanel_->setBounds(bounds.getX(), y, childWidth, moduleHeights[0]);
-    y += moduleHeights[0];
-    vibratoPanel_->setBounds(bounds.getX(), y, childWidth, moduleHeights[1]);
-    y += moduleHeights[1];
-    miscPanel_->setBounds(bounds.getX(), y, childWidth, moduleHeights[2]);
+    int y = bounds.getY() + sectionHeaderHeight;
+    midiPanel_->setBounds(bounds.getX(), y, childWidth, midiH);
+    y += midiH + interModuleGap;
+    vibratoPanel_->setBounds(bounds.getX(), y, childWidth, vibratoH);
+    y += vibratoH + interModuleGap;
+    miscPanel_->setBounds(bounds.getX(), y, childWidth, miscH);
 }
 
 void MasterEditPanel::setSkin(TSS::ISkin& skin)

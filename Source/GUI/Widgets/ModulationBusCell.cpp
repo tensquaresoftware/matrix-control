@@ -202,7 +202,8 @@ void ModulationBusCell::mouseDrag(const juce::MouseEvent& e)
         return;
 
     if (!reorderDragActive_
-        && e.getPosition().toFloat().getDistanceFrom(dragStartPosition_.toFloat()) < kReorderDragThresholdPx_)
+        && e.getPosition().toFloat().getDistanceFrom(dragStartPosition_.toFloat())
+            < static_cast<float>(dimensions_.reorderDragThreshold) * uiScale_)
     {
         return;
     }
@@ -297,10 +298,12 @@ void ModulationBusCell::layoutWidgetRow()
     const int initW   = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions_.initButtonWidth), sf);
     const int initH   = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions_.initButtonHeight), sf);
 
-    const float sourceX = static_cast<float>(dimensions_.busNumberLabelWidth) * sf;
-    const float amountX = sourceX + static_cast<float>(dimensions_.sourceComboBoxWidth + kGap_) * sf;
-    const float destX   = amountX + static_cast<float>(dimensions_.amountSliderWidth + kGap_) * sf;
-    const float initX   = destX   + static_cast<float>(dimensions_.destinationComboBoxWidth + kGap_) * sf;
+    const float gap = static_cast<float>(dimensions_.interControlGap) * sf;
+    const float sourceX = (static_cast<float>(dimensions_.busNumberLabelWidth)
+        + static_cast<float>(dimensions_.interControlGap)) * sf;
+    const float amountX = sourceX + static_cast<float>(dimensions_.sourceComboBoxWidth) * sf + gap;
+    const float destX   = amountX + static_cast<float>(dimensions_.amountSliderWidth) * sf + gap;
+    const float initX   = destX   + static_cast<float>(dimensions_.destinationComboBoxWidth) * sf + gap;
 
     if (auto* label   = busNumberLabel_.get())     label->setBounds(0, y, labelW, labelH);
     if (auto* combo   = sourceComboBox_.get())     combo->setBounds(juce::roundToInt(sourceX), y, sourceW, sourceH);

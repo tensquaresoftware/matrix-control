@@ -35,7 +35,7 @@ public:
     void resized() override;
     void setSkin(TSS::ISkin& skin);
     void setUiScale(float uiScale);
-    int getTotalHeight() const;
+    int getDesignRowHeight() const;
 
     TSS::Slider* getSlider() const { return slider_.get(); }
 

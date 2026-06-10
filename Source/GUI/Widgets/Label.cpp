@@ -43,11 +43,19 @@ namespace TSS
             return;
 
         auto textBounds = getLocalBounds().toFloat();
-        const float padding = static_cast<float>(kTextLeftPadding_) * uiScale_;
-        textBounds.removeFromLeft(padding);
+
+        const auto justification = style_ == LabelStyle::Centered
+            ? juce::Justification::centred
+            : juce::Justification::centredLeft;
+
+        if (style_ != LabelStyle::Centered)
+        {
+            const float padding = static_cast<float>(kTextLeftPadding_) * uiScale_;
+            textBounds.removeFromLeft(padding);
+        }
 
         g.setColour(look_.text);
         g.setFont(look_.font.withHeight(look_.font.getHeight() * uiScale_));
-        g.drawText(labelText_, textBounds, juce::Justification::centredLeft, false);
+        g.drawText(labelText_, textBounds, justification, false);
     }
 }

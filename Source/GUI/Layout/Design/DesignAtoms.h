@@ -25,7 +25,7 @@ namespace TSS::Design
             inline constexpr int kButton = 20;
             inline constexpr int kToggle = 20;
             inline constexpr int kNumberBox = 20;
-            inline constexpr int kGroupLabel = 20;
+            inline constexpr int kGroupLabel = 24;
 
             inline constexpr int kSectionHeader = 32;
             inline constexpr int kModuleHeader = 32;
@@ -38,11 +38,6 @@ namespace TSS::Design
 
         namespace Widths
         {
-            namespace VerticalSeparator
-            {
-                inline constexpr int kStandard = 24;
-            }
-
             namespace ParameterCell
             {
                 inline constexpr int kLabel = 92;
@@ -58,7 +53,7 @@ namespace TSS::Design
                 inline constexpr int kPaste = 20;
 
                 inline constexpr int kPatchManagerBankSelect = 36;
-                inline constexpr int kPatchManagerLockBank = 76;
+                inline constexpr int kPatchManagerLockBank = 68;
 
                 inline constexpr int kInternalPatchesInit = 36;
                 inline constexpr int kInternalPatchesCopy = 36;
@@ -66,11 +61,12 @@ namespace TSS::Design
                 inline constexpr int kInternalPatchesStore = 36;
 
                 inline constexpr int kComputerPatchesLoad = 36;
+                inline constexpr int kComputerPatchesSaveAs = 44;
                 inline constexpr int kComputerPatchesSave = 36;
-                inline constexpr int kComputerPatchesSaveAs = 48;
 
-                inline constexpr int kPatchMutatorMutate = 48;
-                inline constexpr int kPatchMutatorCompare = 48;
+                inline constexpr int kPatchMutatorMutate = 52;
+                inline constexpr int kPatchMutatorRetry = 52;
+                inline constexpr int kPatchMutatorCompare = 52;
                 inline constexpr int kPatchMutatorDelete = 20;
                 inline constexpr int kPatchMutatorClear = 44;
                 inline constexpr int kPatchMutatorExport = 44;
@@ -83,15 +79,15 @@ namespace TSS::Design
 
             namespace Slider
             {
-                inline constexpr int kPatchMutator = 44;
+                inline constexpr int kPatchMutator = 48;
             }
 
             namespace ComboBox
             {
-                inline constexpr int kMatrixModulationDestination = 104;
                 inline constexpr int kMatrixModulationSource = 60;
-                inline constexpr int kPatchManagerComputerPatches = 84;
-                inline constexpr int kPatchMutatorHistory = 44;
+                inline constexpr int kMatrixModulationDestination = 104;
+                inline constexpr int kPatchManagerComputerPatches = 88;
+                inline constexpr int kPatchMutatorHistory = 48;
             }
 
             namespace NumberBox
@@ -103,21 +99,80 @@ namespace TSS::Design
             namespace Label
             {
                 inline constexpr int kModulationBusNumber = 8;
-                inline constexpr int kPatchManagerBankSelector = 76;
-                inline constexpr int kPatchMutator = 44;
+                inline constexpr int kPatchManagerSelectBank = 68;
+                inline constexpr int kPatchMutator = 40;
             }
 
             namespace GroupLabel
             {
-                inline constexpr int kInternalPatchesBrowser = 108;
+                inline constexpr int kInternalPatchesBrowser = 104;
                 inline constexpr int kInternalPatchesMemory = 156;
                 inline constexpr int kComputerPatchesBrowser = 136;
-                inline constexpr int kComputerPatchesStorage = 128;
+                inline constexpr int kComputerPatchesStorage = 124;
+            }
+
+            namespace ModulationBus
+            {
+                inline constexpr int kInterControlGap = 4;
             }
 
             namespace ModulationBusCell
             {
-                inline constexpr int kInterControlGap = Spacing::kStandard;
+                inline constexpr int kReorderDragThreshold = 4;
+            }
+
+            namespace ModulationBusHeader
+            {
+                inline constexpr int kBusNumberTextWidth = 8;
+                inline constexpr int kBusSourceTextWidth = 60;
+                inline constexpr int kBusAmountTextWidth = 60;
+                inline constexpr int kBusDestinationTextWidth = 104;
+            }
+
+            namespace PopupMenu
+            {
+                inline constexpr int kItemHeight = 20;
+                inline constexpr int kVerticalMargin = Spacing::kStandard;
+                inline constexpr int kScrollbarWidth = 8;
+                inline constexpr int kMinThumbHeight = 20;
+                inline constexpr int kMaxScrollHeight = 300;
+                inline constexpr int kBorderThickness = 1;
+                inline constexpr int kTextLeftPadding = 3;
+            }
+
+            namespace DisplayBand
+            {
+                inline constexpr int kBorderThickness = 2;
+                inline constexpr int kPaddingTop = 12;
+                inline constexpr int kPaddingBottom = 12;
+                inline constexpr int kInnerHeight = 104;
+                inline constexpr int kTriangleBase = 10;
+                inline constexpr int kCurvePadding = 5;
+                inline constexpr int kCurvePointRadius = 3;
+                inline constexpr int kCurveLineThickness = 1;
+                inline constexpr int kMinCurveSegmentWidth = 1;
+                inline constexpr int kPointHitZoneRadius = 10;
+                inline constexpr int kSustainSegmentHitZone = 10;
+            }
+
+            namespace ModuleHeader
+            {
+                inline constexpr int kTextLeftPadding = 0;
+                inline constexpr int kTextAreaHeight = 20;
+                inline constexpr int kLineThickness = 4;
+            }
+
+            namespace VerticalSeparator
+            {
+                inline constexpr int kStandard = 24;
+                inline constexpr int kLineWidth = 4;
+                inline constexpr int kTopPadding = 4;
+                inline constexpr int kBottomPadding = 2;
+            }
+
+            namespace Indicator
+            {
+                inline constexpr int kActivityLedSize = 12;
             }
         }
     }

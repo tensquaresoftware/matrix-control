@@ -52,7 +52,7 @@ namespace TSS
         };
 
         explicit ModuleHeader(int width, int height, const ModuleHeaderLook& look, ColourVariant variant,
-                              const juce::String& text);
+                              const juce::String& text, const ModuleHeaderDimensions& dimensions);
 
         explicit ModuleHeader(const WithActionsSpec& spec);
 
@@ -88,10 +88,6 @@ namespace TSS
         Presentation presentation_ = Presentation::TitleOnly;
         ColumnLayout columnLayout_ = ColumnLayout::PatchEdit;
         ButtonSet buttonSet_ = ButtonSet::None;
-
-        inline constexpr static int kTextLeftPadding_ = 0;
-        inline constexpr static int kTextAreaHeight_ = 20;
-        inline constexpr static int kLineThickness_ = 4;
 
         ModuleHeaderLook look_{};
         ModuleHeaderDimensions dimensions_{};

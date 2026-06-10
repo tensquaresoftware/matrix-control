@@ -1,13 +1,11 @@
 #include "PatchManagerPanel.h"
 
-#include <vector>
-
-#include "GUI/Layout/ScaledLayout.h"
 #include "Modules/BankUtilityPanel.h"
 #include "Modules/InternalPatchesPanel.h"
 #include "Modules/ComputerPatchesPanel.h"
 #include "Modules/PatchMutatorPanel.h"
 
+#include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Looks/LookBuilders.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
@@ -48,41 +46,36 @@ void PatchManagerPanel::resized()
     const auto bounds = getLocalBounds();
     const float sf = uiScale_;
     const int panelWidth = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.width), sf);
-
     const int sectionHeaderHeight = TSS::ScaledLayout::scaledInt(
         static_cast<float>(dims_.sectionHeaderHeight), sf);
-    const int contentTop = bounds.getY() + sectionHeaderHeight;
-    const int contentHeight = bounds.getHeight() - sectionHeaderHeight;
-
-    const std::vector<int> moduleDesignHeights {
-        dims_.bankUtilityHeight,
-        dims_.internalPatchesHeight,
-        dims_.computerPatchesHeight,
-        dims_.patchMutatorHeight
-    };
-    const auto moduleHeights = TSS::ScaledLayout::distributeHeights(contentHeight, moduleDesignHeights, sf, 3);
+    const int moduleStackGap = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.moduleStackGap), sf);
+    const int bankUtilityH = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.bankUtilityHeight), sf);
+    const int internalPatchesH = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.internalPatchesHeight), sf);
+    const int computerPatchesH = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.computerPatchesHeight), sf);
+    const int patchMutatorH = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.patchMutatorHeight), sf);
 
     if (auto* header = sectionHeader_.get())
         header->setBounds(bounds.getX(), bounds.getY(), bounds.getWidth(), sectionHeaderHeight);
 
-    int y = contentTop;
+    int y = bounds.getY() + sectionHeaderHeight;
+
     if (auto* panel = bankUtilityPanel_.get())
     {
-        panel->setBounds(bounds.getX(), y, panelWidth, moduleHeights[0]);
-        y += moduleHeights[0];
+        panel->setBounds(bounds.getX(), y, panelWidth, bankUtilityH);
+        y += bankUtilityH + moduleStackGap;
     }
     if (auto* panel = internalPatchesPanel_.get())
     {
-        panel->setBounds(bounds.getX(), y, panelWidth, moduleHeights[1]);
-        y += moduleHeights[1];
+        panel->setBounds(bounds.getX(), y, panelWidth, internalPatchesH);
+        y += internalPatchesH + moduleStackGap;
     }
     if (auto* panel = computerPatchesPanel_.get())
     {
-        panel->setBounds(bounds.getX(), y, panelWidth, moduleHeights[2]);
-        y += moduleHeights[2];
+        panel->setBounds(bounds.getX(), y, panelWidth, computerPatchesH);
+        y += computerPatchesH + moduleStackGap;
     }
     if (auto* panel = patchMutatorPanel_.get())
-        panel->setBounds(bounds.getX(), y, panelWidth, moduleHeights[3]);
+        panel->setBounds(bounds.getX(), y, panelWidth, patchMutatorH);
 }
 
 void PatchManagerPanel::setSkin(TSS::ISkin& skin)

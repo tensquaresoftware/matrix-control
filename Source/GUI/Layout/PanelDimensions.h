@@ -36,9 +36,10 @@ struct PatchEditDisplaysPanelDimensions
     int width;
     int height;
     DisplayBandDimensions childBand;
+    DisplayBandDimensions trackGeneratorBand;
     PatchNameDisplayDimensions patchName;
+    ModuleHeaderDimensions moduleHeader;
     int interModuleGap;
-    int moduleHeaderHeight;
 };
 
 struct PatchEditPanelDimensions
@@ -64,6 +65,9 @@ struct MatrixModulationPanelDimensions
     int sectionHeaderHeight;
     int busHeaderWidth;
     int busHeaderHeight;
+    int initAllButtonWidth;
+    int initAllButtonHeight;
+    ModulationBusHeaderDimensions busHeader;
     ModulationBusCellDimensions busCell;
 };
 
@@ -118,6 +122,7 @@ struct PatchManagerPanelDimensions
     int height;
     int sectionHeaderWidth;
     int sectionHeaderHeight;
+    int moduleStackGap;
     int bankUtilityHeight;
     int internalPatchesHeight;
     int computerPatchesHeight;
@@ -131,6 +136,8 @@ struct PatchManagerPanelDimensions
 struct SharedPanelDimensions
 {
     int width;
+    int height;
+    int verticalStackGap;
     int matrixModulationHeight;
     int patchManagerHeight;
     MatrixModulationPanelDimensions matrixModulation;
@@ -142,6 +149,7 @@ struct MasterEditPanelDimensions
     int width;
     int height;
     int childModuleWidth;
+    int interModuleGap;
     int midiPanelHeight;
     int vibratoPanelHeight;
     int miscPanelHeight;
@@ -161,6 +169,7 @@ struct BodyPanelDimensions
     int masterEditWidth;
     int masterEditHeight;
     int sharedColumnWidth;
+    int sharedColumnHeight;
     SeparatorDimensions separators;
     PatchEditPanelDimensions patchEdit;
     SharedPanelDimensions shared;
@@ -177,4 +186,6 @@ struct GuiLayoutDimensions
     ParameterCellDimensions masterEditParameterCell;
     ModuleHeaderDimensions patchEditModuleHeader;
     ModuleHeaderDimensions masterEditModuleHeader;
+    PopupMenuLayoutDimensions popupMenu;
+    IndicatorDimensions activityLed;
 };

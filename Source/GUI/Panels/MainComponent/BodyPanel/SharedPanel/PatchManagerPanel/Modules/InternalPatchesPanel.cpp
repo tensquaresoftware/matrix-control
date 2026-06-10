@@ -92,7 +92,8 @@ void InternalPatchesPanel::resized()
         browserGroupLabel->setBounds(0, row1Y, browserGroupW, groupLabelH);
 
     // Memory group label at X = browserGroupWidth + kGroupLabelGap
-    const int memoryGroupX = juce::roundToInt(static_cast<float>(dims_.groupLabels.internalPatchesBrowserWidth + kGroupLabelGap_) * sf);
+    const int memoryGroupX = juce::roundToInt(
+        static_cast<float>(dims_.groupLabels.internalPatchesBrowserWidth + dims_.layout.columnGap) * sf);
     if (memoryGroupLabel)
         memoryGroupLabel->setBounds(memoryGroupX, row1Y, memoryGroupW, groupLabelH);
 
@@ -100,9 +101,9 @@ void InternalPatchesPanel::resized()
     const int row2Y = juce::roundToInt(static_cast<float>(dims_.moduleHeader.height + dims_.groupLabels.height) * sf);
 
     // Browser section: nav buttons + number boxes, each X computed independently
-    const float navStep    = static_cast<float>(dims_.buttons.initWidth + kGap_) * sf;
+    const float navStep    = static_cast<float>(dims_.buttons.initWidth + dims_.layout.interControlGap) * sf;
     const float bankNumX   = navStep * 2.0f;
-    const float patchNumX  = bankNumX + static_cast<float>(dims_.numberBoxes.bankNumberWidth + kGap_) * sf;
+    const float patchNumX  = bankNumX + static_cast<float>(dims_.numberBoxes.bankNumberWidth + dims_.layout.interControlGap) * sf;
 
     if (loadPreviousPatchButton_)
         loadPreviousPatchButton_->setBounds(0, row2Y, navButtonW, buttonH);
@@ -114,8 +115,8 @@ void InternalPatchesPanel::resized()
         currentPatchNumber->setBounds(juce::roundToInt(patchNumX), row2Y, patchNumberW, buttonH);
 
     // Memory section: 4 buttons, each X computed independently from memory origin
-    const float memOriginX = static_cast<float>(dims_.groupLabels.internalPatchesBrowserWidth + kGroupLabelGap_) * sf;
-    const float memStep    = static_cast<float>(dims_.buttons.internalPatchesInitWidth + kGap_) * sf;
+    const float memOriginX = static_cast<float>(dims_.groupLabels.internalPatchesBrowserWidth + dims_.layout.columnGap) * sf;
+    const float memStep    = static_cast<float>(dims_.buttons.internalPatchesInitWidth + dims_.layout.interControlGap) * sf;
 
     if (initPatchButton_)
         initPatchButton_->setBounds(juce::roundToInt(memOriginX), row2Y, memButtonW, buttonH);
@@ -183,7 +184,8 @@ void InternalPatchesPanel::setupModuleHeader(TSS::ISkin& skin, WidgetFactory& wi
         dims_.moduleHeader.height,
         TSS::moduleHeaderLookFromSkin(skin),
         TSS::ModuleHeader::ColourVariant::Blue,
-        widgetFactory.getGroupDisplayName(moduleId));
+        widgetFactory.getGroupDisplayName(moduleId),
+        dims_.moduleHeader);
     addAndMakeVisible(*moduleHeader);
 }
 

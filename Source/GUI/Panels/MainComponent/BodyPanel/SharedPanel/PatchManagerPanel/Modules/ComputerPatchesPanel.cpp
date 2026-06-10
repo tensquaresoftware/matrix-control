@@ -62,7 +62,8 @@ void ComputerPatchesPanel::resized()
     if (browserGroupLabel)
         browserGroupLabel->setBounds(0, row1Y, browserGroupW, groupLabelH);
 
-    const int storageGroupX = juce::roundToInt(static_cast<float>(dims_.groupLabels.computerPatchesBrowserWidth + kGroupLabelGap_) * sf);
+    const int storageGroupX = juce::roundToInt(
+        static_cast<float>(dims_.groupLabels.computerPatchesBrowserWidth + dims_.layout.columnGap) * sf);
     if (storageGroupLabel)
         storageGroupLabel->setBounds(storageGroupX, row1Y, storageGroupW, groupLabelH);
 
@@ -70,7 +71,7 @@ void ComputerPatchesPanel::resized()
     const int row2Y = juce::roundToInt(static_cast<float>(dims_.moduleHeader.height + dims_.groupLabels.height) * sf);
 
     // Browser section: nav buttons + combobox
-    const float navStep = static_cast<float>(dims_.buttons.initWidth + kGap_) * sf;
+    const float navStep = static_cast<float>(dims_.buttons.initWidth + dims_.layout.interControlGap) * sf;
     if (loadPreviousPatchFileButton_)
         loadPreviousPatchFileButton_->setBounds(0, row2Y, navButtonW, buttonH);
     if (loadNextPatchFileButton_)
@@ -79,9 +80,9 @@ void ComputerPatchesPanel::resized()
         selectPatchFileComboBox_->setBounds(juce::roundToInt(navStep * 2.0f), row2Y, comboBoxW, buttonH);
 
     // Storage section: open + save-as + save
-    const float storageOriginX = static_cast<float>(dims_.groupLabels.computerPatchesBrowserWidth + kGroupLabelGap_) * sf;
-    const float openStep       = static_cast<float>(dims_.buttons.computerPatchesLoadWidth + kGap_) * sf;
-    const float saveAsStep     = static_cast<float>(dims_.buttons.computerPatchesSaveAsWidth + kGap_) * sf;
+    const float storageOriginX = static_cast<float>(dims_.groupLabels.computerPatchesBrowserWidth + dims_.layout.columnGap) * sf;
+    const float openStep       = static_cast<float>(dims_.buttons.computerPatchesLoadWidth + dims_.layout.interControlGap) * sf;
+    const float saveAsStep     = static_cast<float>(dims_.buttons.computerPatchesSaveAsWidth + dims_.layout.interControlGap) * sf;
 
     if (openPatchFolderButton_)
         openPatchFolderButton_->setBounds(juce::roundToInt(storageOriginX), row2Y, loadButtonW, buttonH);
@@ -144,7 +145,8 @@ void ComputerPatchesPanel::setupModuleHeader(TSS::ISkin& skin, WidgetFactory& wi
         dims_.moduleHeader.height,
         TSS::moduleHeaderLookFromSkin(skin),
         TSS::ModuleHeader::ColourVariant::Blue,
-        widgetFactory.getGroupDisplayName(moduleId));
+        widgetFactory.getGroupDisplayName(moduleId),
+        dims_.moduleHeader);
     addAndMakeVisible(*moduleHeader_);
 }
 

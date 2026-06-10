@@ -128,7 +128,7 @@ namespace
                           "mutate");
         expectButtonWidth(test,
                           PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kRetry,
-                          BW::kPatchMutatorMutate,
+                          BW::kPatchMutatorRetry,
                           "retry");
         expectButtonWidth(test,
                           PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kCompare,

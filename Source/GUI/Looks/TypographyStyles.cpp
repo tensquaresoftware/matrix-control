@@ -22,7 +22,7 @@ namespace TSS
                 return TypographyStyle { TypographyHeights::kSmall_, false };
 
             case TypographyStyleId::kModuleHeader:
-                return TypographyStyle { TypographyHeights::kModuleHeader_, true };
+                return TypographyStyle { TypographyHeights::kModuleHeader_, false };
 
             case TypographyStyleId::kSectionHeader:
                 return TypographyStyle { TypographyHeights::kSectionHeader_, false };

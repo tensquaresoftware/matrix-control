@@ -2,10 +2,43 @@
 #include "MultiColumnPopupMenu.h"
 #include "ScrollablePopupMenu.h"
 
+#include "GUI/Layout/ScaledDrawing.h"
 #include "GUI/Skins/ColourChart.h"
 
 namespace TSS
 {
+    namespace
+    {
+        PopupMenuLayoutDimensions defaultPopupLayoutDimensions()
+        {
+            return {
+                .itemHeight = 20,
+                .verticalMargin = 4,
+                .scrollbarWidth = 8,
+                .minThumbHeight = 20,
+                .maxScrollHeight = 300,
+                .borderThickness = 1,
+                .textLeftPadding = 3,
+            };
+        }
+    }
+
+    PopupMenuLayoutDimensions ComboBox::popupLayoutDimensions_ = defaultPopupLayoutDimensions();
+
+    void ComboBox::setPopupLayoutDimensions(const PopupMenuLayoutDimensions& dimensions)
+    {
+        popupLayoutDimensions_ = dimensions;
+    }
+
+    const PopupMenuLayoutDimensions& ComboBox::getPopupLayoutDimensions()
+    {
+        return popupLayoutDimensions_;
+    }
+
+    int ComboBox::getScaledVerticalMargin() const
+    {
+        return juce::roundToInt(static_cast<float>(popupLayoutDimensions_.verticalMargin) * uiScale_);
+    }
     ComboBox::ComboBox(int width, int height, const ComboBoxLook& look, Style style)
         : juce::ComboBox()
         , look_(look)
@@ -60,9 +93,15 @@ namespace TSS
 
     void ComboBox::drawBorderIfNeeded(juce::Graphics& g, const juce::Rectangle<float>& bounds, const juce::Rectangle<float>& backgroundBounds, bool enabled, bool hasFocus)
     {
+        const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
+
         if (style_ == Style::ButtonLike)
         {
-            const float thickness = std::max(1.0f, static_cast<float>(kBorderThicknessButtonLike_) * uiScale_);
+            const float thickness = ScaledDrawing::snappedStrokeThicknessFromDesign(
+                static_cast<float>(kBorderThicknessButtonLike_),
+                uiScale_,
+                systemDisplayScale,
+                ScaledDrawing::StrokeSnapPolicy::kRound);
             g.setColour(getBorderColourForCurrentStyle(enabled));
             g.drawRect(bounds, thickness);
             return;
@@ -70,7 +109,11 @@ namespace TSS
 
         if (hasFocus)
         {
-            const float thickness = std::max(1.0f, static_cast<float>(kBorderThickness_) * uiScale_);
+            const float thickness = ScaledDrawing::snappedStrokeThicknessFromDesign(
+                static_cast<float>(kBorderThickness_),
+                uiScale_,
+                systemDisplayScale,
+                ScaledDrawing::StrokeSnapPolicy::kRound);
             g.setColour(getFocusBorderColourForCurrentStyle());
             g.drawRect(backgroundBounds, thickness);
         }
@@ -177,12 +220,7 @@ namespace TSS
 
     juce::Rectangle<float> ComboBox::calculateBackgroundBounds(const juce::Rectangle<float>& bounds) const
     {
-        if (style_ == Style::ButtonLike)
-            return bounds;
-        
-        const auto backgroundHeight = static_cast<float>(kBackgroundHeight_) * uiScale_;
-        const auto backgroundY = (bounds.getHeight() - backgroundHeight) * 0.5f;
-        return juce::Rectangle<float>(bounds.getX(), bounds.getY() + backgroundY, bounds.getWidth(), backgroundHeight);
+        return bounds;
     }
 
     void ComboBox::showPopup()

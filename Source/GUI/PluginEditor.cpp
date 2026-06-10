@@ -5,6 +5,7 @@
 #include "Core/MIDI/MidiActivityTracker.h"
 #include "Core/PluginProcessor.h"
 #include "GUI/Layout/ScaledLayout.h"
+#include "GUI/Widgets/ComboBox.h"
 #include "GUI/Panels/MainComponent/HeaderPanel/HeaderPanel.h"
 #include "GUI/Settings/SettingsPanel.h"
 #include "GUI/Settings/SettingsWindow.h"
@@ -74,6 +75,7 @@ PluginEditor::PluginEditor(PluginProcessor& p)
 
     widgetFactory_ = std::make_unique<WidgetFactory>(pluginProcessor.getApvts());
     layoutDimensions_ = WidgetFactory::buildGuiLayoutDimensions();
+    TSS::ComboBox::setPopupLayoutDimensions(layoutDimensions_.popupMenu);
 
     setOpaque(true);
     setWantsKeyboardFocus(false);
