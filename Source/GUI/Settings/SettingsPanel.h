@@ -43,7 +43,7 @@ private:
     void updateModeSpecificVisibility();
     void layoutContent(juce::Rectangle<int> bounds);
 
-    static constexpr int kPortSentinelItemId = 0;
+    static constexpr int kPortSentinelItemId = 1;
     inline constexpr static int kPadding_ = 16;
     inline constexpr static int kGap_ = 8;
     inline constexpr static int kRowGap_ = 12;

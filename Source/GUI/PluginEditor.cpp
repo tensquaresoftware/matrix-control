@@ -127,7 +127,7 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     const auto savedMidiOutputPortId = pluginProcessor.getApvts().state.getProperty("midiOutputPortId", juce::String()).toString();
     headerPanel.selectMidiToPort(savedMidiOutputPortId);
 
-    pluginProcessor.syncMidiPortsFromState();
+    pluginProcessor.restoreMidiPortsForHost();
 
     if (pluginProcessor.isStandalone())
     {
@@ -165,12 +165,28 @@ PluginEditor::PluginEditor(PluginProcessor& p)
 
     headerPanel.getMidiFromComboBox().onChange = [this, &headerPanel]
     {
-        pluginProcessor.setMidiInputPort(headerPanel.getSelectedMidiFromPortIdentifier());
+        const auto previousPortId = pluginProcessor.getApvts().state.getProperty("midiInputPortId", juce::String()).toString();
+        const auto selectedPortId = headerPanel.getSelectedMidiFromPortIdentifier();
+
+        if (pluginProcessor.setMidiInputPort(selectedPortId))
+            return;
+
+        headerPanel.selectMidiFromPort(previousPortId);
+        if (previousPortId.isNotEmpty())
+            pluginProcessor.setMidiInputPort(previousPortId);
     };
 
     headerPanel.getMidiToComboBox().onChange = [this, &headerPanel]
     {
-        pluginProcessor.setMidiOutputPort(headerPanel.getSelectedMidiToPortIdentifier());
+        const auto previousPortId = pluginProcessor.getApvts().state.getProperty("midiOutputPortId", juce::String()).toString();
+        const auto selectedPortId = headerPanel.getSelectedMidiToPortIdentifier();
+
+        if (pluginProcessor.setMidiOutputPort(selectedPortId))
+            return;
+
+        headerPanel.selectMidiToPort(previousPortId);
+        if (previousPortId.isNotEmpty())
+            pluginProcessor.setMidiOutputPort(previousPortId);
     };
 
     headerPanel.getKeyboardFromComboBox().onChange = [this, &headerPanel]

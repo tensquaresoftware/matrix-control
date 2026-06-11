@@ -1,4 +1,5 @@
 #include <cmath>
+#include <functional>
 
 #include <juce_audio_devices/juce_audio_devices.h>
 
@@ -39,6 +40,60 @@ namespace
     bool isStandaloneWrapper()
     {
         return juce::PluginHostType::getPluginLoadedAs() == juce::AudioProcessor::wrapperType_Standalone;
+    }
+
+    bool isVst3Wrapper()
+    {
+        return juce::PluginHostType::getPluginLoadedAs() == juce::AudioProcessor::wrapperType_VST3;
+    }
+
+    void runSyncOnMessageThread(std::function<void()> task)
+    {
+        if (juce::MessageManager::existsAndIsCurrentThread())
+        {
+            task();
+            return;
+        }
+
+        juce::MessageManager::callAsync(std::move(task));
+    }
+
+    bool isMidiInputDeviceAvailable(const juce::String& deviceId)
+    {
+        if (deviceId.isEmpty())
+            return false;
+
+        for (const auto& device : juce::MidiInput::getAvailableDevices())
+        {
+            if (device.identifier == deviceId)
+                return true;
+        }
+
+        return false;
+    }
+
+    bool isMidiOutputDeviceAvailable(const juce::String& deviceId)
+    {
+        if (deviceId.isEmpty())
+            return false;
+
+        for (const auto& device : juce::MidiOutput::getAvailableDevices())
+        {
+            if (device.identifier == deviceId)
+                return true;
+        }
+
+        return false;
+    }
+
+    juce::String sanitizePersistedMidiInputPortId(const juce::String& deviceId)
+    {
+        return isMidiInputDeviceAvailable(deviceId) ? deviceId : juce::String();
+    }
+
+    juce::String sanitizePersistedMidiOutputPortId(const juce::String& deviceId)
+    {
+        return isMidiOutputDeviceAvailable(deviceId) ? deviceId : juce::String();
     }
 
     bool shouldUseDevelopmentLogging()
@@ -124,12 +179,57 @@ PluginProcessor::PluginProcessor()
     initializeHardwareLatencyProperty();
     initializePatchNameProperty();
     apvts.state.addListener(this);
+    deferredMidiPortSyncTimer_ = std::make_unique<DeferredMidiPortSyncTimer>(*this);
     startMidiThread();
 }
 
 PluginProcessor::~PluginProcessor()
 {
+    deferredMidiPortSyncTimer_.reset();
     apvts.state.removeListener(this);
+}
+
+PluginProcessor::DeferredMidiPortSyncTimer::DeferredMidiPortSyncTimer(PluginProcessor& processorIn)
+    : processor(processorIn)
+{
+}
+
+void PluginProcessor::DeferredMidiPortSyncTimer::startRetrySeries()
+{
+    stopTimer();
+    attemptIndex_ = 0;
+    scheduleNextAttempt();
+}
+
+int PluginProcessor::DeferredMidiPortSyncTimer::delayMsForAttempt(int attemptIndex)
+{
+    if (isVst3Wrapper())
+    {
+        constexpr int vstDelaysMs[] = { 400, 1200, 3000, 6000 };
+        return vstDelaysMs[juce::jmin(attemptIndex, kMaxAttempts_ - 1)];
+    }
+
+    constexpr int pluginDelaysMs[] = { 300, 800, 2000, 2000 };
+    return pluginDelaysMs[juce::jmin(attemptIndex, kMaxAttempts_ - 1)];
+}
+
+void PluginProcessor::DeferredMidiPortSyncTimer::scheduleNextAttempt()
+{
+    startTimer(delayMsForAttempt(attemptIndex_));
+}
+
+void PluginProcessor::DeferredMidiPortSyncTimer::timerCallback()
+{
+    stopTimer();
+
+    const bool isLastAttempt = attemptIndex_ >= kMaxAttempts_ - 1;
+    processor.syncMidiPortsFromStateImpl(isLastAttempt);
+
+    if (!processor.arePersistedMidiPortsOpen() && !isLastAttempt)
+    {
+        ++attemptIndex_;
+        scheduleNextAttempt();
+    }
 }
 
 const juce::String PluginProcessor::getName() const
@@ -212,6 +312,9 @@ void PluginProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
         ensureDevelopmentLoggingStarted();
 
     startMidiThread();
+
+    if (!isStandaloneWrapper() && !arePersistedMidiPortsOpen())
+        restoreMidiPortsForHost();
 }
 
 bool PluginProcessor::isBusesLayoutSupported(const BusesLayout& layouts) const
@@ -336,7 +439,8 @@ void PluginProcessor::setStateInformation(const void* data, int sizeInBytes)
             apvts.replaceState(juce::ValueTree::fromXml(*xmlState));
             syncAudioRuntimeFromState();
             syncHardwareLatencyFromState();
-            syncMidiPortsFromState();
+            syncMidiPortsFromState(false);
+            scheduleDeferredMidiPortSyncForPluginHost();
 
             if (shouldUseDevelopmentLogging())
                 ApvtsLogger::getInstance().logStateLoaded("DAW state");
@@ -344,28 +448,34 @@ void PluginProcessor::setStateInformation(const void* data, int sizeInBytes)
     }
 }
 
-void PluginProcessor::setMidiInputPort(const juce::String& deviceId)
+bool PluginProcessor::setMidiInputPort(const juce::String& deviceId)
 {
-    if (midiManager != nullptr)
+    if (midiManager == nullptr)
+        return false;
+
+    if (midiManager->setMidiInputPort(deviceId))
     {
-        if (midiManager->setMidiInputPort(deviceId))
-        {
-            apvts.state.setProperty("midiInputPortId", deviceId, nullptr);
-            notifyNonParameterStateChanged();
-        }
+        apvts.state.setProperty("midiInputPortId", deviceId, nullptr);
+        notifyNonParameterStateChanged();
+        return true;
     }
+
+    return false;
 }
 
-void PluginProcessor::setMidiOutputPort(const juce::String& deviceId)
+bool PluginProcessor::setMidiOutputPort(const juce::String& deviceId)
 {
-    if (midiManager != nullptr)
+    if (midiManager == nullptr)
+        return false;
+
+    if (midiManager->setMidiOutputPort(deviceId))
     {
-        if (midiManager->setMidiOutputPort(deviceId))
-        {
-            apvts.state.setProperty("midiOutputPortId", deviceId, nullptr);
-            notifyNonParameterStateChanged();
-        }
+        apvts.state.setProperty("midiOutputPortId", deviceId, nullptr);
+        notifyNonParameterStateChanged();
+        return true;
     }
+
+    return false;
 }
 
 bool PluginProcessor::isStandalone() const
@@ -560,16 +670,88 @@ void PluginProcessor::syncHardwareLatencyFromState()
     applyHardwareLatencyToHost();
 }
 
-void PluginProcessor::syncMidiPortsFromState()
+void PluginProcessor::syncMidiPortsFromStateImpl(bool reportOpenFailures)
 {
     if (midiManager == nullptr)
         return;
 
+    auto inputPortId = apvts.state.getProperty("midiInputPortId", juce::String()).toString();
+    const auto sanitizedInputPortId = sanitizePersistedMidiInputPortId(inputPortId);
+
+    if (sanitizedInputPortId != inputPortId)
+        apvts.state.setProperty("midiInputPortId", sanitizedInputPortId, nullptr);
+
+    midiManager->setMidiInputPort(sanitizedInputPortId, reportOpenFailures);
+
+    auto outputPortId = apvts.state.getProperty("midiOutputPortId", juce::String()).toString();
+    const auto sanitizedOutputPortId = sanitizePersistedMidiOutputPortId(outputPortId);
+
+    if (sanitizedOutputPortId != outputPortId)
+        apvts.state.setProperty("midiOutputPortId", sanitizedOutputPortId, nullptr);
+
+    midiManager->setMidiOutputPort(sanitizedOutputPortId, reportOpenFailures);
+}
+
+void PluginProcessor::syncMidiPortsFromState(bool reportOpenFailures)
+{
+    if (midiManager == nullptr)
+        return;
+
+    if (isStandaloneWrapper())
+    {
+        syncMidiPortsFromStateImpl(reportOpenFailures);
+        return;
+    }
+
+    runSyncOnMessageThread([this, reportOpenFailures]()
+    {
+        syncMidiPortsFromStateImpl(reportOpenFailures);
+    });
+}
+
+bool PluginProcessor::arePersistedMidiPortsOpen() const
+{
+    if (midiManager == nullptr)
+        return true;
+
     const auto inputPortId = apvts.state.getProperty("midiInputPortId", juce::String()).toString();
-    midiManager->setMidiInputPort(inputPortId);
+    if (inputPortId.isNotEmpty() && !midiManager->isInputPortOpenWithDevice(inputPortId))
+        return false;
 
     const auto outputPortId = apvts.state.getProperty("midiOutputPortId", juce::String()).toString();
-    midiManager->setMidiOutputPort(outputPortId);
+    if (outputPortId.isNotEmpty() && !midiManager->isOutputPortOpenWithDevice(outputPortId))
+        return false;
+
+    return true;
+}
+
+void PluginProcessor::restoreMidiPortsForHost()
+{
+    if (isStandaloneWrapper())
+    {
+        syncMidiPortsFromStateImpl(true);
+        return;
+    }
+
+    runSyncOnMessageThread([this]()
+    {
+        syncMidiPortsFromStateImpl(false);
+
+        if (!arePersistedMidiPortsOpen())
+            scheduleDeferredMidiPortSyncForPluginHost();
+    });
+}
+
+void PluginProcessor::scheduleDeferredMidiPortSyncForPluginHost()
+{
+    if (isStandaloneWrapper() || deferredMidiPortSyncTimer_ == nullptr)
+        return;
+
+    runSyncOnMessageThread([this]()
+    {
+        if (deferredMidiPortSyncTimer_ != nullptr)
+            deferredMidiPortSyncTimer_->startRetrySeries();
+    });
 }
 
 void PluginProcessor::applyHardwareLatencyToHost()

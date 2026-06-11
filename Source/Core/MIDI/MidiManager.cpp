@@ -23,16 +23,20 @@ namespace
     void reportPortOpenFailure(juce::AudioProcessorValueTreeState& apvts,
                                bool isInput,
                                const Core::MidiPortOpenResult& result,
-                               const juce::String& deviceId)
+                               const juce::String& deviceId,
+                               bool reportOpenFailure)
     {
         Core::MidiPortOpenFeedback::logOpenFailure(isInput,
                                                    result.portDisplayName,
                                                    deviceId,
                                                    result.failureReason);
-        Core::MidiPortOpenFeedback::propagateOpenFailure(apvts,
-                                                        isInput,
-                                                        result.portDisplayName,
-                                                        result.failureReason);
+        if (reportOpenFailure)
+        {
+            Core::MidiPortOpenFeedback::propagateOpenFailure(apvts,
+                                                            isInput,
+                                                            result.portDisplayName,
+                                                            result.failureReason);
+        }
     }
 }
 
@@ -76,12 +80,22 @@ MidiManager::~MidiManager()
     }
 }
 
-bool MidiManager::setMidiInputPort(const juce::String& deviceId)
+bool MidiManager::setMidiInputPort(const juce::String& deviceId, bool reportOpenFailure)
 {
     if (deviceId.isEmpty())
     {
         MidiLogger::getInstance().logInfo("Clearing MIDI input port selection");
         stopMidiInputCallbacks();
+        ExceptionPropagator::clearMessage(apvts);
+        return true;
+    }
+
+    if (inputMidiPort != nullptr && inputMidiPort->isOpenWithDevice(deviceId))
+    {
+        if (midiReceiver != nullptr)
+            midiReceiver->setMidiInput(inputMidiPort->getMidiInput());
+
+        ExceptionPropagator::clearMessage(apvts);
         return true;
     }
 
@@ -111,11 +125,11 @@ bool MidiManager::setMidiInputPort(const juce::String& deviceId)
         return true;
     }
 
-    reportPortOpenFailure(apvts, true, openResult, deviceId);
+    reportPortOpenFailure(apvts, true, openResult, deviceId, reportOpenFailure);
     return false;
 }
 
-bool MidiManager::setMidiOutputPort(const juce::String& deviceId)
+bool MidiManager::setMidiOutputPort(const juce::String& deviceId, bool reportOpenFailure)
 {
     if (deviceId.isEmpty())
     {
@@ -128,6 +142,16 @@ bool MidiManager::setMidiOutputPort(const juce::String& deviceId)
         {
             outputMidiPort->closePort();
         }
+        ExceptionPropagator::clearMessage(apvts);
+        return true;
+    }
+
+    if (outputMidiPort != nullptr && outputMidiPort->isOpenWithDevice(deviceId))
+    {
+        if (midiSender != nullptr)
+            midiSender->setMidiOutput(outputMidiPort->getMidiOutput());
+
+        ExceptionPropagator::clearMessage(apvts);
         return true;
     }
 
@@ -157,8 +181,18 @@ bool MidiManager::setMidiOutputPort(const juce::String& deviceId)
         return true;
     }
 
-    reportPortOpenFailure(apvts, false, openResult, deviceId);
+    reportPortOpenFailure(apvts, false, openResult, deviceId, reportOpenFailure);
     return false;
+}
+
+bool MidiManager::isInputPortOpenWithDevice(const juce::String& deviceId) const
+{
+    return inputMidiPort != nullptr && inputMidiPort->isOpenWithDevice(deviceId);
+}
+
+bool MidiManager::isOutputPortOpenWithDevice(const juce::String& deviceId) const
+{
+    return outputMidiPort != nullptr && outputMidiPort->isOpenWithDevice(deviceId);
 }
 
 void MidiManager::sendPatch(juce::uint8 patchNumber, const juce::uint8* packedData)

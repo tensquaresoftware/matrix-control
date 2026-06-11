@@ -25,7 +25,7 @@ namespace
         for (size_t i = 0; i < identifiers.size(); ++i)
         {
             if (identifiers[i] == deviceId)
-                return static_cast<int>(i + 1);
+                return static_cast<int>(i) + HeaderPanel::kFirstDeviceItemId;
         }
 
         return HeaderPanel::kPortSentinelItemId;
@@ -33,10 +33,10 @@ namespace
 
     juce::String getPortIdentifierForItemId(const std::vector<juce::String>& identifiers, int itemId)
     {
-        if (itemId <= HeaderPanel::kPortSentinelItemId)
+        if (itemId < HeaderPanel::kFirstDeviceItemId)
             return {};
 
-        const auto index = static_cast<size_t>(itemId - 1);
+        const auto index = static_cast<size_t>(itemId - HeaderPanel::kFirstDeviceItemId);
         if (index >= identifiers.size())
             return {};
 
@@ -291,13 +291,13 @@ void HeaderPanel::populateInputPortCombo(TSS::ComboBox& combo, std::vector<juce:
     combo.clear(juce::dontSendNotification);
     identifiers.clear();
 
-    combo.addItem(PluginDisplayNames::HeaderPanel::kPortNoneSentinel, kPortSentinelItemId);
+    combo.addItem(PluginDisplayNames::HeaderPanel::kNoInputSentinel, kPortSentinelItemId);
 
     const auto devices = juce::MidiInput::getAvailableDevices();
     for (int i = 0; i < devices.size(); ++i)
     {
         const auto& device = devices.getReference(i);
-        const int itemId = i + 1;
+        const int itemId = i + kFirstDeviceItemId;
         combo.addItem(device.name, itemId);
         identifiers.push_back(device.identifier);
     }
@@ -313,13 +313,13 @@ void HeaderPanel::populateOutputPortCombo(TSS::ComboBox& combo, std::vector<juce
     combo.clear(juce::dontSendNotification);
     identifiers.clear();
 
-    combo.addItem(PluginDisplayNames::HeaderPanel::kPortNoneSentinel, kPortSentinelItemId);
+    combo.addItem(PluginDisplayNames::HeaderPanel::kNoOutputSentinel, kPortSentinelItemId);
 
     const auto devices = juce::MidiOutput::getAvailableDevices();
     for (int i = 0; i < devices.size(); ++i)
     {
         const auto& device = devices.getReference(i);
-        const int itemId = i + 1;
+        const int itemId = i + kFirstDeviceItemId;
         combo.addItem(device.name, itemId);
         identifiers.push_back(device.identifier);
     }

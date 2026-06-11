@@ -1,5 +1,10 @@
 #include "Core/MIDI/KeyboardFromMidiInput.h"
 
+#include <chrono>
+#include <thread>
+
+#include "Core/MIDI/SysEx/SysExConstants.h"
+
 namespace Core
 {
     namespace
@@ -50,6 +55,8 @@ namespace Core
         if (midiInput_ != nullptr)
         {
             midiInput_->stop();
+            std::this_thread::sleep_for(
+                std::chrono::milliseconds(SysExConstants::kMidiInputStopDelayMs));
             midiInput_.reset();
         }
     }

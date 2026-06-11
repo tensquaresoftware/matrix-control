@@ -84,8 +84,8 @@ public:
     Core::PatchNameSyncer& getPatchNameSyncer() noexcept { return *patchNameSyncer_; }
     const Core::PatchNameSyncer& getPatchNameSyncer() const noexcept { return *patchNameSyncer_; }
 
-    void setMidiInputPort(const juce::String& deviceId);
-    void setMidiOutputPort(const juce::String& deviceId);
+    bool setMidiInputPort(const juce::String& deviceId);
+    bool setMidiOutputPort(const juce::String& deviceId);
     bool setKeyboardFromPort(const juce::String& deviceId);
 
     void setInputGainDb(float gainDb);
@@ -96,7 +96,8 @@ public:
     int getSkinVariantId() const;
     void setSkinVariantId(int skinVariantId);
     void syncHardwareLatencyFromState();
-    void syncMidiPortsFromState();
+    void syncMidiPortsFromState(bool reportOpenFailures = true);
+    void restoreMidiPortsForHost();
     void setAudioFromChannelMode(int mode);
     void setAudioFromSourceId(const juce::String& sourceId);
     void syncAudioPassthroughFromSourceId(const juce::String& sourceId);
@@ -126,6 +127,23 @@ public:
     void valueTreeRedirected(juce::ValueTree& treeWhichHasBeenChanged) override;
 
 private:
+    struct DeferredMidiPortSyncTimer final : juce::Timer
+    {
+        explicit DeferredMidiPortSyncTimer(PluginProcessor& processorIn);
+
+        void startRetrySeries();
+
+    private:
+        static constexpr int kMaxAttempts_ = 4;
+
+        void timerCallback() override;
+        void scheduleNextAttempt();
+        static int delayMsForAttempt(int attemptIndex);
+
+        PluginProcessor& processor;
+        int attemptIndex_ = 0;
+    };
+
     static BusesProperties makeBusesProperties();
     static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
     void validatePluginDescriptorsAtStartup();
@@ -134,6 +152,9 @@ private:
     void initializeHardwareLatencyProperty();
     void applyHardwareLatencyToHost();
     void notifyNonParameterStateChanged();
+    void scheduleDeferredMidiPortSyncForPluginHost();
+    void syncMidiPortsFromStateImpl(bool reportOpenFailures);
+    bool arePersistedMidiPortsOpen() const;
     void initializePatchNameProperty();
     bool getInstrumentPathEnabled(const juce::MidiBuffer& midiMessages) const;
     void ensureAudioInputBusEnabled();
@@ -190,6 +211,7 @@ private:
     std::unordered_set<juce::String> matrixModParameterIds_;
     bool suppressMatrixModParameterSysEx_ { false };
     bool developmentLoggingStarted_ { false };
+    std::unique_ptr<DeferredMidiPortSyncTimer> deferredMidiPortSyncTimer_;
     
     static constexpr int kThreadStopTimeoutMs_ {5000};
 

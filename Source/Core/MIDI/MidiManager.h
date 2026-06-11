@@ -28,8 +28,11 @@ public:
                          Core::MidiActivityTracker& activityTrackerRef);
     ~MidiManager() override;
 
-    bool setMidiInputPort(const juce::String& deviceId);
-    bool setMidiOutputPort(const juce::String& deviceId);
+    bool setMidiInputPort(const juce::String& deviceId, bool reportOpenFailure = true);
+    bool setMidiOutputPort(const juce::String& deviceId, bool reportOpenFailure = true);
+
+    bool isInputPortOpenWithDevice(const juce::String& deviceId) const;
+    bool isOutputPortOpenWithDevice(const juce::String& deviceId) const;
 
     void sendPatch(juce::uint8 patchNumber, const juce::uint8* packedData);
     void sendMaster(juce::uint8 version, const juce::uint8* packedData);

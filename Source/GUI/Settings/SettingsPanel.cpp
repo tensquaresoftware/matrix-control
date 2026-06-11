@@ -240,7 +240,7 @@ void SettingsPanel::populateAudioFromCombo(const juce::StringArray& channelNames
 
     if (count == 0)
     {
-        audioFromComboBox_.addItem(PluginDisplayNames::HeaderPanel::kPortNoneSentinel, kPortSentinelItemId);
+        audioFromComboBox_.addItem(PluginDisplayNames::HeaderPanel::kNoInputSentinel, kPortSentinelItemId);
         audioFromComboBox_.setSelectedId(kPortSentinelItemId, juce::dontSendNotification);
         return;
     }
@@ -269,7 +269,7 @@ juce::String SettingsPanel::getSelectedPortIdentifier(const TSS::ComboBox& combo
                                                       const std::vector<juce::String>& identifiers) const
 {
     const int itemId = combo.getSelectedId();
-    if (itemId <= kPortSentinelItemId)
+    if (itemId < 1)
         return {};
 
     const auto index = static_cast<size_t>(itemId - 1);

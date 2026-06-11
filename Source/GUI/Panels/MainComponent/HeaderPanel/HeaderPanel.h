@@ -25,7 +25,8 @@ namespace TSS
 class HeaderPanel : public juce::Component
 {
 public:
-    static constexpr int kPortSentinelItemId = 0;
+    static constexpr int kPortSentinelItemId = 1;
+    static constexpr int kFirstDeviceItemId = 2;
 
     HeaderPanel(TSS::ISkin& skin, int width, int height);
     ~HeaderPanel() override = default;

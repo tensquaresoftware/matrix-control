@@ -18,14 +18,29 @@ Core::MidiPortOpenResult MidiInputPort::openPort(const juce::String& deviceId,
                                                  juce::MidiInputCallback* callback)
 {
     Core::MidiPortOpenResult result;
-    closePort();
-
     if (deviceId.isEmpty())
     {
         MidiLogger::getInstance().logWarning("MidiInputPort::openPort: empty device ID");
         result.failureReason = Core::MidiPortOpenFailureReason::kNotFound;
         return result;
     }
+
+    if (isOpenWithDevice(deviceId) && midiInput != nullptr)
+    {
+        const auto devices = juce::MidiInput::getAvailableDevices();
+        for (const auto& device : devices)
+        {
+            if (device.identifier == deviceId)
+            {
+                result.portDisplayName = device.name;
+                break;
+            }
+        }
+
+        return result;
+    }
+
+    closePort();
 
     const auto devices = juce::MidiInput::getAvailableDevices();
     for (const auto& device : devices)
@@ -41,6 +56,7 @@ Core::MidiPortOpenResult MidiInputPort::openPort(const juce::String& deviceId,
                 midiInput->start();
 
             portIsOpen = true;
+            openDeviceId_ = deviceId;
             MidiLogger::getInstance().logInfo("MIDI input port opened: [" + device.name + "]");
             return result;
         }
@@ -64,6 +80,17 @@ void MidiInputPort::closePort()
         midiInput.reset();
     }
     portIsOpen = false;
+    openDeviceId_.clear();
+}
+
+bool MidiInputPort::isOpenWithDevice(const juce::String& deviceId) const noexcept
+{
+    return portIsOpen && midiInput != nullptr && openDeviceId_ == deviceId;
+}
+
+juce::String MidiInputPort::getOpenDeviceId() const noexcept
+{
+    return openDeviceId_;
 }
 
 bool MidiInputPort::isOpen() const noexcept

@@ -16,11 +16,14 @@ public:
                                       juce::MidiInputCallback* callback = nullptr);
     void closePort();
     bool isOpen() const noexcept;
+    bool isOpenWithDevice(const juce::String& deviceId) const noexcept;
+    juce::String getOpenDeviceId() const noexcept;
     juce::MidiInput* getMidiInput() const noexcept;
 
 private:
     std::unique_ptr<juce::MidiInput> midiInput;
     bool portIsOpen;
+    juce::String openDeviceId_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MidiInputPort)
 };
