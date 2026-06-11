@@ -21,8 +21,7 @@ Source complète : `CONVENTIONS.md` §5–§6.2, §9. Constitution BMad : `_bmad
 
 ## BMad Method
 
-- Skills sous `.claude/skills/`
-- État du sprint : `_bmad-output/implementation-artifacts/sprint-status.yaml`
+- Artefacts BMad : `_bmad-output/` (`project-context.md`, stories, `sprint-status.yaml`) — pas de skills versionnés dans le dépôt
 - Plans archivés : `Documentation/Development/Plans/<année>/<mois>/` (nom `YYYY-MM-DD-Titre-En-Anglais.md`)
 
 ## Fichiers clés (lire avant d'implémenter)
