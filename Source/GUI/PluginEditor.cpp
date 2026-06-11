@@ -113,6 +113,9 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     const float savedUiScale = PluginIDs::Settings::ScaleLevels::getUiScale(savedScaleId);
     applyUiScale(savedUiScale);
 
+    restoreHeaderPanelFromState(headerPanel);
+    wireHeaderPanel(headerPanel);
+
     headerPanel.setPluginMode(!pluginProcessor.isStandalone());
     headerPanel.refreshPortLists();
 
@@ -225,24 +228,7 @@ void PluginEditor::syncUiScaleFromEditor()
     if (auto* comp = mainComponent_.get())
         comp->setUiScale(uiScale);
 
-    syncSettingsUiScaleCombo(uiScale);
-
-    if (settingsWindow_ != nullptr && settingsWindow_->isVisible())
-        updateSettingsWindowLayout(uiScale);
-}
-
-void PluginEditor::updateSettingsWindowLayout(float uiScale)
-{
-    if (settingsWindow_ == nullptr)
-        return;
-
-    settingsWindow_->setUiScale(uiScale);
-    settingsWindow_->setBounds(getLocalBounds());
-}
-
-void PluginEditor::syncSettingsUiScaleCombo(float uiScale)
-{
-    if (auto* panel = getSettingsPanelIfOpen())
+    if (auto* comp = mainComponent_.get())
     {
         int matchingScaleId = 0;
         const int layoutPercentRounded = juce::roundToInt(uiScale * 100.0f);
@@ -258,8 +244,73 @@ void PluginEditor::syncSettingsUiScaleCombo(float uiScale)
         }
 
         if (matchingScaleId != 0)
-            panel->getUiScaleComboBox().setSelectedId(matchingScaleId, juce::dontSendNotification);
+            comp->getHeaderPanel().setCurrentUiScaleId(matchingScaleId);
     }
+
+    if (settingsWindow_ != nullptr && settingsWindow_->isVisible())
+        updateSettingsWindowLayout(uiScale);
+}
+
+void PluginEditor::updateSettingsWindowLayout(float uiScale)
+{
+    if (settingsWindow_ == nullptr)
+        return;
+
+    settingsWindow_->setUiScale(uiScale);
+    settingsWindow_->setBounds(getLocalBounds());
+}
+
+void PluginEditor::applySkinFromItemId(int skinItemId)
+{
+    skin_ = (skinItemId == static_cast<int>(TSS::Skin::SkinComboBoxItemId::kBlack))
+        ? skinBlack_.get()
+        : skinCream_.get();
+    updateSkin();
+
+    if (auto* comp = mainComponent_.get())
+        comp->getHeaderPanel().setCurrentSkinItemId(skinItemId);
+}
+
+void PluginEditor::applyUiScaleFromItemId(int scaleId)
+{
+    const float uiScale = PluginIDs::Settings::ScaleLevels::getUiScale(scaleId);
+    applyUiScale(uiScale);
+    updateSettingsWindowLayout(uiScale);
+    pluginProcessor.getApvts().state.setProperty(PluginIDs::Settings::kGuiScale, scaleId, nullptr);
+
+    if (auto* comp = mainComponent_.get())
+        comp->getHeaderPanel().setCurrentUiScaleId(scaleId);
+}
+
+void PluginEditor::wireHeaderPanel(HeaderPanel& headerPanel)
+{
+    headerPanel.onSkinSelected = [this](int skinItemId)
+    {
+        applySkinFromItemId(skinItemId);
+    };
+
+    headerPanel.onUiScaleSelected = [this](int scaleId)
+    {
+        applyUiScaleFromItemId(scaleId);
+    };
+
+    headerPanel.onUiScaleReset = [this]
+    {
+        applyUiScaleFromItemId(PluginIDs::Settings::ScaleLevels::k100);
+    };
+}
+
+void PluginEditor::restoreHeaderPanelFromState(HeaderPanel& headerPanel)
+{
+    const int savedScaleId = pluginProcessor.getApvts().state.getProperty(
+        PluginIDs::Settings::kGuiScale,
+        PluginIDs::Settings::ScaleLevels::kDefault);
+    headerPanel.setCurrentUiScaleId(savedScaleId);
+
+    const int skinId = (skin_->getColourVariant() == TSS::Skin::ColourVariant::Black)
+        ? static_cast<int>(TSS::Skin::SkinComboBoxItemId::kBlack)
+        : static_cast<int>(TSS::Skin::SkinComboBoxItemId::kCream);
+    headerPanel.setCurrentSkinItemId(skinId);
 }
 
 void PluginEditor::mouseDown(const juce::MouseEvent&)
@@ -374,17 +425,6 @@ void PluginEditor::closeSettingsWindow()
 
 void PluginEditor::restoreSettingsPanelFromState(SettingsPanel& panel)
 {
-    const int savedScaleId = pluginProcessor.getApvts().state.getProperty(
-        PluginIDs::Settings::kGuiScale,
-        PluginIDs::Settings::ScaleLevels::kDefault);
-    panel.getUiScaleComboBox().setSelectedId(savedScaleId, juce::dontSendNotification);
-
-    const auto skinVariant = skin_->getColourVariant();
-    const int skinId = (skinVariant == TSS::Skin::ColourVariant::Black)
-        ? static_cast<int>(TSS::Skin::SkinComboBoxItemId::kBlack)
-        : static_cast<int>(TSS::Skin::SkinComboBoxItemId::kCream);
-    panel.getSkinComboBox().setSelectedId(skinId, juce::dontSendNotification);
-
     panel.getHardwareLatencySlider().setValue(pluginProcessor.getHardwareLatencyMs(), juce::dontSendNotification);
 
     if (pluginProcessor.isStandalone())
@@ -402,24 +442,6 @@ void PluginEditor::restoreSettingsPanelFromState(SettingsPanel& panel)
 
 void PluginEditor::wireSettingsPanel(SettingsPanel& panel)
 {
-    panel.getSkinComboBox().onChange = [this, &panel]
-    {
-        const auto selectedId = panel.getSkinComboBox().getSelectedId();
-        skin_ = (selectedId == static_cast<int>(TSS::Skin::SkinComboBoxItemId::kBlack))
-            ? skinBlack_.get()
-            : skinCream_.get();
-        updateSkin();
-    };
-
-    panel.getUiScaleComboBox().onChange = [this, &panel]
-    {
-        const auto selectedId = panel.getUiScaleComboBox().getSelectedId();
-        const float uiScale = PluginIDs::Settings::ScaleLevels::getUiScale(selectedId);
-        applyUiScale(uiScale);
-        updateSettingsWindowLayout(uiScale);
-        pluginProcessor.getApvts().state.setProperty(PluginIDs::Settings::kGuiScale, selectedId, nullptr);
-    };
-
     panel.getHardwareLatencySlider().onValueChange = [this, &panel]
     {
         pluginProcessor.setHardwareLatencyMs(static_cast<float>(panel.getHardwareLatencySlider().getValue()));

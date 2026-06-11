@@ -90,6 +90,7 @@ juce_add_binary_data(PluginFonts
     SOURCES
         Assets/Fonts/PTSansNarrow-Regular.ttf
         Assets/Fonts/PTSansNarrow-Bold.ttf
+        Assets/Fonts/Orbitron.ttf
 )
 
 # ============================================================================
@@ -224,6 +225,8 @@ set(PLUGIN_SOURCES
     Source/GUI/Widgets/GroupLabel.cpp
     Source/GUI/Widgets/HorizontalSeparator.cpp
     Source/GUI/Widgets/Label.cpp
+    Source/GUI/Widgets/Logo.cpp
+    Source/GUI/Widgets/HeaderLogoPopupMenu.cpp
     Source/GUI/Widgets/ModulationBusCell.cpp
     Source/GUI/Widgets/ModulationBusHeader.cpp
     Source/GUI/Widgets/ModuleHeader.cpp

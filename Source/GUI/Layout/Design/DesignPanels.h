@@ -169,9 +169,17 @@ namespace TSS::Design
             inline constexpr int kEffectiveHeight = PatchEditSection::kHeight;
         }
 
+        inline constexpr int kPanelEdgeBorderThickness = 4;
+
         namespace Header
         {
-            inline constexpr int kHeight = 32;
+            inline constexpr int kHeight = 40;
+            inline constexpr int kLogoFontHeight = 20;
+            inline constexpr int kLogoGapAfter = 48;
+            inline constexpr int kLogoExtraWidth = 8;
+            inline constexpr int kLogoPopupColumnWidth = 56;
+            inline constexpr int kUiTestsButtonWidth = 72;
+            inline constexpr int kSettingsButtonWidth = 72;
         }
 
         namespace Footer

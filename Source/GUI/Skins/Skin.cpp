@@ -9,6 +9,7 @@ namespace TSS
     namespace
     {
         constexpr float kSkinBaseFontHeight_ = 14.0f;
+        constexpr float kBrandFontHeight_ = 20.0f;
     }
 
     Skin::Skin(ColourVariant variant)
@@ -52,6 +53,15 @@ namespace TSS
             static_cast<size_t>(PluginFontsData::PTSansNarrowBold_ttfSize)
         );
         return juce::Font(juce::FontOptions(typeface).withHeight(kSkinBaseFontHeight_));
+    }
+
+    juce::Font Skin::getBrandFontBold() const
+    {
+        const auto typeface = juce::Typeface::createSystemTypefaceFor(
+            PluginFontsData::Orbitron_ttf,
+            static_cast<size_t>(PluginFontsData::Orbitron_ttfSize)
+        );
+        return juce::Font(juce::FontOptions(typeface).withHeight(kBrandFontHeight_)).boldened();
     }
 
     juce::Colour Skin::getToggleBackgroundColour(bool isOn) const
@@ -176,7 +186,6 @@ namespace TSS
         using namespace SkinColours;
         
         colours_[SkinColourId::kHeaderPanelBackground] = juce::Colour(accessColour(Panels::kHeaderPanelBackground));
-        colours_[SkinColourId::kHeaderPanelLabelText] = juce::Colour(accessColour(Panels::kHeaderPanelLabelText));
         colours_[SkinColourId::kBodyPanelBackground] = juce::Colour(accessColour(Panels::kBodyPanelBackground));
         colours_[SkinColourId::kFooterPanelBackground] = juce::Colour(accessColour(Panels::kFooterPanelBackground));
     }

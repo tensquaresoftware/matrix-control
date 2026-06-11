@@ -39,9 +39,13 @@ private:
     void closeSettingsWindow();
     SettingsPanel* getSettingsPanelIfOpen();
     void wireSettingsPanel(SettingsPanel& panel);
+    void wireHeaderPanel(HeaderPanel& headerPanel);
     void restoreSettingsPanelFromState(SettingsPanel& panel);
-    void syncSettingsUiScaleCombo(float uiScale);
+    void restoreHeaderPanelFromState(HeaderPanel& headerPanel);
     void updateSettingsWindowLayout(float uiScale);
+
+    void applySkinFromItemId(int skinItemId);
+    void applyUiScaleFromItemId(int scaleId);
 
     PluginProcessor& pluginProcessor;
 

@@ -17,7 +17,7 @@ class SettingsPanel : public juce::Component
 {
 public:
     static constexpr int kDesignWidth = 480;
-    static constexpr int kDesignHeight = 320;
+    static constexpr int kDesignHeight = 244;
 
     SettingsPanel(TSS::ISkin& skin, bool isPluginMode);
     ~SettingsPanel() override = default;
@@ -34,8 +34,6 @@ public:
     juce::String getSelectedAudioFromSourceId() const;
     void selectAudioFromSourceId(const juce::String& sourceId);
 
-    TSS::ComboBox& getSkinComboBox() { return skinComboBox_; }
-    TSS::ComboBox& getUiScaleComboBox() { return uiScaleComboBox_; }
     TSS::Slider& getHardwareLatencySlider() { return hardwareLatencySlider_; }
     TSS::ComboBox& getAudioFromComboBox() { return audioFromComboBox_; }
     TSS::Slider& getInputGainSlider() { return inputGainSlider_; }
@@ -60,10 +58,6 @@ private:
     float uiScale_ = 1.0f;
     bool isPluginMode_ = false;
 
-    TSS::Label skinLabel_;
-    TSS::ComboBox skinComboBox_;
-    TSS::Label uiScaleLabel_;
-    TSS::ComboBox uiScaleComboBox_;
     TSS::Label hardwareLatencyLabel_;
     TSS::Slider hardwareLatencySlider_;
     TSS::Label audioFromLabel_;

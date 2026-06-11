@@ -54,14 +54,6 @@ namespace TSS
         return look;
     }
 
-    LabelLook headerPanelLabelLookFromSkin(const ISkin& skin)
-    {
-        LabelLook look;
-        look.text = skin.getColour(SkinColourId::kHeaderPanelLabelText);
-        look.font = resolvedTypographyFont(skin, TypographyStyleId::kDefault);
-        return look;
-    }
-
     HorizontalSeparatorLook horizontalSeparatorLookFromSkin(const ISkin& skin)
     {
         HorizontalSeparatorLook look;

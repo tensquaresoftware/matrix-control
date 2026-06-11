@@ -4,8 +4,11 @@
 
 #include "GUI/Widgets/Label.h"
 #include "GUI/Widgets/ComboBox.h"
+#include "GUI/Widgets/HeaderLogoPopupMenu.h"
 #include "GUI/Skins/Skin.h"
 #include "GUI/Skins/SkinHelpers.h"
+#include "GUI/Layout/Design/DesignPanels.h"
+#include "GUI/Layout/ScaledDrawing.h"
 #include "GUI/Looks/LookBuilders.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 
@@ -45,13 +48,13 @@ HeaderPanel::HeaderPanel(TSS::ISkin& skin, int width, int height)
     : width_(width)
     , height_(height)
     , skin_(&skin)
-    , midiFromLabel_(kEditorMidiFromLabelWidth_, kControlHeight_, TSS::headerPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kEditorMidiFromLabel, TSS::LabelStyle::HeaderPanel)
+    , midiFromLabel_(kEditorMidiFromLabelWidth_, kControlHeight_, TSS::labelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kEditorMidiFromLabel)
     , midiFromComboBox_(kPortComboBoxWidth_, kControlHeight_, TSS::comboBoxLookFromSkin(skin), TSS::ComboBox::Style::ButtonLike)
     , editorActivityLed_(kLedSize_, kLedSize_)
-    , midiToLabel_(kMidiToLabelWidth_, kControlHeight_, TSS::headerPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kMidiToLabel, TSS::LabelStyle::HeaderPanel)
+    , midiToLabel_(kMidiToLabelWidth_, kControlHeight_, TSS::labelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kMidiToLabel)
     , midiToComboBox_(kPortComboBoxWidth_, kControlHeight_, TSS::comboBoxLookFromSkin(skin), TSS::ComboBox::Style::ButtonLike)
     , midiToActivityLed_(kLedSize_, kLedSize_)
-    , keyboardFromLabel_(kKeyboardFromLabelWidth_, kControlHeight_, TSS::headerPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kKeyboardFromLabel, TSS::LabelStyle::HeaderPanel)
+    , keyboardFromLabel_(kKeyboardFromLabelWidth_, kControlHeight_, TSS::labelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kKeyboardFromLabel)
     , keyboardFromComboBox_(kPortComboBoxWidth_, kControlHeight_, TSS::comboBoxLookFromSkin(skin), TSS::ComboBox::Style::ButtonLike)
     , instrumentActivityLed_(kLedSize_, kLedSize_)
     , settingsButton_(kSettingsButtonWidth_, kControlHeight_, TSS::buttonLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kSettingsButton)
@@ -59,6 +62,14 @@ HeaderPanel::HeaderPanel(TSS::ISkin& skin, int width, int height)
 {
     setOpaque(true);
 
+    logo_.setSkin(skin);
+    logo_.onPopupRequested = [this] { showLogoPopup(); };
+    logo_.onUiScaleReset = [this]
+    {
+        if (onUiScaleReset)
+            onUiScaleReset();
+    };
+    addAndMakeVisible(logo_);
     addAndMakeVisible(midiFromLabel_);
     midiFromComboBox_.setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
     addAndMakeVisible(midiFromComboBox_);
@@ -87,6 +98,17 @@ HeaderPanel::HeaderPanel(TSS::ISkin& skin, int width, int height)
 void HeaderPanel::paint(juce::Graphics& g)
 {
     g.fillAll(skin_->getColour(SkinColourId::kHeaderPanelBackground));
+
+    const float systemDisplayScale = TSS::ScaledDrawing::systemDisplayScaleForComponent(*this);
+    const float borderThickness = TSS::ScaledDrawing::snappedStrokeThicknessFromDesign(
+        static_cast<float>(TSS::Design::Panels::kPanelEdgeBorderThickness),
+        uiScale_,
+        systemDisplayScale,
+        TSS::ScaledDrawing::StrokeSnapPolicy::kRound);
+
+    auto borderLine = getLocalBounds().toFloat().removeFromBottom(borderThickness);
+    g.setColour(skin_->getColour(SkinColourId::kVerticalSeparatorLine));
+    g.fillRect(borderLine);
 }
 
 void HeaderPanel::resized()
@@ -107,9 +129,16 @@ void HeaderPanel::resized()
     const float settingsButtonWidth = static_cast<float>(kSettingsButtonWidth_) * sf;
     const float uiElementsButtonWidth = static_cast<float>(kUiElementsButtonWidth_) * sf;
     const float leftPadding = static_cast<float>(kLeftPadding_) * sf;
+    const float logoGapAfter = static_cast<float>(TSS::Design::Panels::Header::kLogoGapAfter) * sf;
     const float rightPadding = static_cast<float>(kRightPadding_) * sf;
 
-    float x = static_cast<float>(bounds.getX()) + leftPadding;
+    logo_.setUiScale(uiScale_);
+    const int logoWidth = logo_.getPreferredWidth();
+    const int logoHeight = bounds.getHeight();
+    const int logoX = juce::roundToInt(static_cast<float>(bounds.getX()) + leftPadding);
+    logo_.setBounds(logoX, bounds.getY(), logoWidth, logoHeight);
+
+    float x = static_cast<float>(logoX + logoWidth) + logoGapAfter;
     const int y = juce::roundToInt(static_cast<float>(bounds.getY()) + controlY);
     const int h = juce::roundToInt(controlHeight);
     const int ledY = juce::roundToInt(static_cast<float>(bounds.getY()) + controlY
@@ -158,26 +187,27 @@ void HeaderPanel::resized()
     endPacket();
 
     const float rightClusterGap = gap * 2.0f;
-    const float uiElementsButtonX = static_cast<float>(bounds.getRight()) - rightPadding - uiElementsButtonWidth;
-    const float settingsButtonX = uiElementsButtonX - rightClusterGap - settingsButtonWidth;
-
-    settingsButton_.setBounds(juce::roundToInt(settingsButtonX), y, juce::roundToInt(settingsButtonWidth), h);
-    settingsButton_.setUiScale(uiScale_);
+    const float settingsButtonX = static_cast<float>(bounds.getRight()) - rightPadding - settingsButtonWidth;
+    const float uiElementsButtonX = settingsButtonX - rightClusterGap - uiElementsButtonWidth;
 
     uiElementsButton_.setBounds(juce::roundToInt(uiElementsButtonX), y, juce::roundToInt(uiElementsButtonWidth), h);
     uiElementsButton_.setUiScale(uiScale_);
+
+    settingsButton_.setBounds(juce::roundToInt(settingsButtonX), y, juce::roundToInt(settingsButtonWidth), h);
+    settingsButton_.setUiScale(uiScale_);
 }
 
 void HeaderPanel::setSkin(TSS::ISkin& skin)
 {
     skin_ = &skin;
-    midiFromLabel_.setLook(TSS::headerPanelLabelLookFromSkin(skin));
+    logo_.setSkin(skin);
+    midiFromLabel_.setLook(TSS::labelLookFromSkin(skin));
     midiFromComboBox_.setLook(TSS::comboBoxLookFromSkin(skin));
     midiFromComboBox_.setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
-    midiToLabel_.setLook(TSS::headerPanelLabelLookFromSkin(skin));
+    midiToLabel_.setLook(TSS::labelLookFromSkin(skin));
     midiToComboBox_.setLook(TSS::comboBoxLookFromSkin(skin));
     midiToComboBox_.setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
-    keyboardFromLabel_.setLook(TSS::headerPanelLabelLookFromSkin(skin));
+    keyboardFromLabel_.setLook(TSS::labelLookFromSkin(skin));
     keyboardFromComboBox_.setLook(TSS::comboBoxLookFromSkin(skin));
     keyboardFromComboBox_.setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
     editorActivityLed_.setSkin(skin);
@@ -185,6 +215,31 @@ void HeaderPanel::setSkin(TSS::ISkin& skin)
     instrumentActivityLed_.setSkin(skin);
     settingsButton_.setLook(TSS::buttonLookFromSkin(skin));
     uiElementsButton_.setLook(TSS::buttonLookFromSkin(skin));
+}
+
+void HeaderPanel::showLogoPopup()
+{
+    if (skin_ == nullptr)
+        return;
+
+    TSS::HeaderLogoPopupMenu::show(
+        logo_,
+        *skin_,
+        uiScale_,
+        currentSkinItemId_,
+        currentUiScaleId_,
+        [this](int skinItemId)
+        {
+            currentSkinItemId_ = skinItemId;
+            if (onSkinSelected)
+                onSkinSelected(skinItemId);
+        },
+        [this](int scaleId)
+        {
+            currentUiScaleId_ = scaleId;
+            if (onUiScaleSelected)
+                onUiScaleSelected(scaleId);
+        });
 }
 
 void HeaderPanel::setUiScale(float uiScale)

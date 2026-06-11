@@ -1,12 +1,19 @@
 #pragma once
 
-#include <juce_gui_basics/juce_gui_basics.h>
+#include <functional>
 #include <vector>
+
+#include <juce_gui_basics/juce_gui_basics.h>
 
 #include "GUI/Widgets/Led.h"
 #include "GUI/Widgets/Button.h"
 #include "GUI/Widgets/ComboBox.h"
 #include "GUI/Widgets/Label.h"
+#include "GUI/Widgets/Logo.h"
+
+#include "GUI/Layout/Design/DesignPanels.h"
+#include "GUI/Skins/Skin.h"
+#include "Shared/Definitions/PluginIDs.h"
 
 namespace TSS
 {
@@ -32,6 +39,13 @@ public:
     void populateMidiPortLists();
     void refreshPortLists() { populateMidiPortLists(); }
 
+    void setCurrentSkinItemId(int skinItemId) { currentSkinItemId_ = skinItemId; }
+    void setCurrentUiScaleId(int scaleId) { currentUiScaleId_ = scaleId; }
+
+    std::function<void(int skinItemId)> onSkinSelected;
+    std::function<void(int scaleId)> onUiScaleSelected;
+    std::function<void()> onUiScaleReset;
+
     juce::String getSelectedMidiFromPortIdentifier() const;
     juce::String getSelectedMidiToPortIdentifier() const;
     juce::String getSelectedKeyboardFromPortIdentifier() const;
@@ -52,6 +66,8 @@ public:
     static int getGap() { return kGap_; }
 
 private:
+    void showLogoPopup();
+
     void populateInputPortCombo(TSS::ComboBox& combo, std::vector<juce::String>& identifiers);
     void populateOutputPortCombo(TSS::ComboBox& combo, std::vector<juce::String>& identifiers);
     void configurePluginModeKeyboardFrom();
@@ -65,21 +81,24 @@ private:
     int height_;
     inline constexpr static int kEditorMidiFromLabelWidth_ = 88;
     inline constexpr static int kMidiToLabelWidth_ = 40;
-    inline constexpr static int kKeyboardFromLabelWidth_ = 82;
-    inline constexpr static int kPortComboBoxWidth_ = 96;
+    inline constexpr static int kKeyboardFromLabelWidth_ = 84;
+    inline constexpr static int kPortComboBoxWidth_ = 112;
     inline constexpr static int kLedSize_ = 12;
     inline constexpr static int kGap_ = 4;
     inline constexpr static int kPacketExternalGap_ = kGap_ * 4;
     inline constexpr static int kControlHeight_ = 20;
     inline constexpr static int kLeftPadding_ = 12;
     inline constexpr static int kRightPadding_ = 12;
-    inline constexpr static int kSettingsButtonWidth_ = 72;
-    inline constexpr static int kUiElementsButtonWidth_ = 88;
+        inline constexpr static int kSettingsButtonWidth_ = TSS::Design::Panels::Header::kSettingsButtonWidth;
+        inline constexpr static int kUiElementsButtonWidth_ = TSS::Design::Panels::Header::kUiTestsButtonWidth;
 
     TSS::ISkin* skin_;
     float uiScale_ = 1.0f;
     bool isPluginMode_ = false;
+    int currentSkinItemId_ = static_cast<int>(TSS::Skin::SkinComboBoxItemId::kBlack);
+    int currentUiScaleId_ = PluginIDs::Settings::ScaleLevels::kDefault;
 
+    TSS::Logo logo_;
     TSS::Label midiFromLabel_;
     TSS::ComboBox midiFromComboBox_;
     TSS::Led editorActivityLed_;

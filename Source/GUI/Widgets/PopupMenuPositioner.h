@@ -23,13 +23,19 @@ namespace TSS
             int popupHeight,
             int borderThickness);
 
+        static PopupMenuDimensions calculateDimensions(
+            const juce::Component& anchor,
+            int popupWidth,
+            int popupHeight,
+            int verticalMargin);
+
     private:
         static juce::Point<int> calculateInitialPosition(
-            const ComboBox& comboBox,
+            const juce::Component& anchor,
             int verticalMargin);
 
         static juce::Point<int> adjustPositionToFitScreen(
-            const ComboBox& comboBox,
+            const juce::Component& anchor,
             juce::Point<int> desiredPosition,
             int popupWidth,
             int popupHeight,
@@ -37,13 +43,13 @@ namespace TSS
             int verticalMargin);
 
         static int adjustXPosition(
-            const ComboBox& comboBox,
+            const juce::Component& anchor,
             int desiredX,
             int popupWidth,
             const juce::Rectangle<int>& screenBounds);
 
         static int adjustYPosition(
-            const ComboBox& comboBox,
+            const juce::Component& anchor,
             int desiredY,
             int popupHeight,
             const juce::Rectangle<int>& screenBounds,

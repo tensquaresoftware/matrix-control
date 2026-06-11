@@ -8,8 +8,8 @@
 namespace TSS::Design
 {
     static_assert(GUI::kWidth == 1300, "MainComponent width");
-    static_assert(GUI::kHeight == 792, "MainComponent height");
-    static_assert(Panels::Header::kHeight == 32, "HeaderPanel height");
+    static_assert(GUI::kHeight == 800, "MainComponent height");
+    static_assert(Panels::Header::kHeight == 40, "HeaderPanel height");
     static_assert(Panels::Body::kHeight == 728, "BodyPanel height");
     static_assert(Panels::Footer::kHeight == 32, "FooterPanel height");
 

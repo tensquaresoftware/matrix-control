@@ -11,5 +11,6 @@ namespace TSS
 
         virtual juce::Font getBaseFont() const = 0;
         virtual juce::Font getBaseFontBold() const = 0;
+        virtual juce::Font getBrandFontBold() const = 0;
     };
 }

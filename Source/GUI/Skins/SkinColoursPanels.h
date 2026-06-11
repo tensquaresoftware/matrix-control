@@ -8,14 +8,8 @@ namespace TSS::SkinColours
     {
         inline constexpr ColourElement kHeaderPanelBackground = {
             "HeaderPanelBackground",
-            ColourChart::kLightGrey1,
-            ColourChart::kLightGrey1
-        };
-
-        inline constexpr ColourElement kHeaderPanelLabelText = {
-            "HeaderPanelLabelText",
-            ColourChart::kDarkGrey2,
-            ColourChart::kDarkGrey2
+            ColourChart::kDarkGrey1,
+            ColourChart::kDarkGrey1
         };
 
         inline constexpr ColourElement kBodyPanelBackground = {
@@ -26,8 +20,8 @@ namespace TSS::SkinColours
 
         inline constexpr ColourElement kFooterPanelBackground = {
             "FooterPanelBackground",
-            ColourChart::kLightGrey1,
-            ColourChart::kLightGrey1
+            ColourChart::kDarkGrey1,
+            ColourChart::kDarkGrey1
         };
     }
 }

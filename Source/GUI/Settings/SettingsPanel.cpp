@@ -1,10 +1,10 @@
 #include "SettingsPanel.h"
 
 #include "GUI/Looks/LookBuilders.h"
-#include "GUI/Skins/Skin.h"
+#include "GUI/Skins/ISkin.h"
+#include "GUI/Skins/SkinValues.h"
 #include "Shared/Definitions/PluginAudioConstants.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
-#include "Shared/Definitions/PluginIDs.h"
 #include "Core/Audio/HardwareLatency.h"
 
 using TSS::SkinColourId;
@@ -31,10 +31,6 @@ namespace
 SettingsPanel::SettingsPanel(TSS::ISkin& skin, bool isPluginMode)
     : skin_(&skin)
     , isPluginMode_(isPluginMode)
-    , skinLabel_(kLabelWidth_, kControlHeight_, TSS::labelLookFromSkin(skin), PluginDisplayNames::Settings::kSkinLabel)
-    , skinComboBox_(kComboWidth_, kControlHeight_, TSS::comboBoxLookFromSkin(skin), TSS::ComboBox::Style::ButtonLike)
-    , uiScaleLabel_(kLabelWidth_, kControlHeight_, TSS::labelLookFromSkin(skin), PluginDisplayNames::Settings::kUiScaleLabel)
-    , uiScaleComboBox_(kComboWidth_, kControlHeight_, TSS::comboBoxLookFromSkin(skin), TSS::ComboBox::Style::ButtonLike)
     , hardwareLatencyLabel_(kLabelWidth_, kControlHeight_, TSS::labelLookFromSkin(skin), PluginDisplayNames::Settings::kHardwareLatencyLabel)
     , hardwareLatencySlider_(kSliderWidth_, kControlHeight_, TSS::sliderLookFromSkin(skin),
                              TSS::SliderConfig{
@@ -66,27 +62,6 @@ SettingsPanel::SettingsPanel(TSS::ISkin& skin, bool isPluginMode)
     , loggingPlaceholder_(kComboWidth_ * 2, kControlHeight_, TSS::labelLookFromSkin(skin), PluginDisplayNames::Settings::kComingSoon)
 {
     setOpaque(true);
-
-    addAndMakeVisible(skinLabel_);
-    skinComboBox_.setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
-    skinComboBox_.addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kBlack,
-                          static_cast<int>(TSS::Skin::SkinComboBoxItemId::kBlack));
-    skinComboBox_.addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kCream,
-                          static_cast<int>(TSS::Skin::SkinComboBoxItemId::kCream));
-    skinComboBox_.setSelectedId(static_cast<int>(TSS::Skin::SkinComboBoxItemId::kBlack), juce::dontSendNotification);
-    addAndMakeVisible(skinComboBox_);
-
-    addAndMakeVisible(uiScaleLabel_);
-    uiScaleComboBox_.setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
-    uiScaleComboBox_.addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k50, PluginIDs::Settings::ScaleLevels::k50);
-    uiScaleComboBox_.addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k75, PluginIDs::Settings::ScaleLevels::k75);
-    uiScaleComboBox_.addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k100, PluginIDs::Settings::ScaleLevels::k100);
-    uiScaleComboBox_.addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k125, PluginIDs::Settings::ScaleLevels::k125);
-    uiScaleComboBox_.addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k150, PluginIDs::Settings::ScaleLevels::k150);
-    uiScaleComboBox_.addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k175, PluginIDs::Settings::ScaleLevels::k175);
-    uiScaleComboBox_.addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k200, PluginIDs::Settings::ScaleLevels::k200);
-    uiScaleComboBox_.setSelectedId(PluginIDs::Settings::ScaleLevels::k100, juce::dontSendNotification);
-    addAndMakeVisible(uiScaleComboBox_);
 
     addAndMakeVisible(hardwareLatencyLabel_);
     addAndMakeVisible(hardwareLatencySlider_);
@@ -128,7 +103,6 @@ void SettingsPanel::layoutContent(juce::Rectangle<int> bounds)
     const int rowGap = juce::roundToInt(static_cast<float>(kRowGap_) * uiScale_);
     const int gap = juce::roundToInt(static_cast<float>(kGap_) * uiScale_);
     const int labelWidth = juce::roundToInt(static_cast<float>(kLabelWidth_) * uiScale_);
-    const int comboWidth = juce::roundToInt(static_cast<float>(kComboWidth_) * uiScale_);
     const int sliderWidth = juce::roundToInt(static_cast<float>(kSliderWidth_) * uiScale_);
     const int controlHeight = juce::roundToInt(static_cast<float>(kControlHeight_) * uiScale_);
     const int audioComboWidth = juce::roundToInt(static_cast<float>(kAudioFromComboWidth_) * uiScale_);
@@ -158,10 +132,6 @@ void SettingsPanel::layoutContent(juce::Rectangle<int> bounds)
         placeholder.setUiScale(uiScale_);
         bounds.removeFromTop(rowGap);
     };
-
-    layoutRow(skinLabel_, skinComboBox_, comboWidth);
-    layoutRow(uiScaleLabel_, uiScaleComboBox_, comboWidth);
-    bounds.removeFromTop(rowGap);
 
     if (isPluginMode_)
     {
@@ -195,8 +165,6 @@ void SettingsPanel::setSkin(TSS::ISkin& skin)
     skin_ = &skin;
 
     const auto labelLook = TSS::labelLookFromSkin(skin);
-    skinLabel_.setLook(labelLook);
-    uiScaleLabel_.setLook(labelLook);
     hardwareLatencyLabel_.setLook(labelLook);
     audioFromLabel_.setLook(labelLook);
     inputGainLabel_.setLook(labelLook);
@@ -211,10 +179,6 @@ void SettingsPanel::setSkin(TSS::ISkin& skin)
 
     const auto comboLook = TSS::comboBoxLookFromSkin(skin);
     const auto popupLook = TSS::popupMenuLookFromSkin(skin);
-    skinComboBox_.setLook(comboLook);
-    skinComboBox_.setPopupMenuLook(popupLook);
-    uiScaleComboBox_.setLook(comboLook);
-    uiScaleComboBox_.setPopupMenuLook(popupLook);
     audioFromComboBox_.setLook(comboLook);
     audioFromComboBox_.setPopupMenuLook(popupLook);
 

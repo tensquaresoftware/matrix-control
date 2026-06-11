@@ -19,7 +19,9 @@ namespace PluginDisplayNames
         constexpr const char* kHostDisplay = "HOST";
         constexpr const char* kPortNoneSentinel = "\xe2\x80\x94";
         constexpr const char* kSettingsButton = "SETTINGS";
-        constexpr const char* kUiElementsButton = "UI Elements";
+        constexpr const char* kUiElementsButton = "UI TESTS";
+        constexpr const char* kLogoSkinSection = "SKIN";
+        constexpr const char* kLogoUiScaleSection = "UI SCALE";
     }
 
     namespace Settings

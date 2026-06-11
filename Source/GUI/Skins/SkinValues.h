@@ -8,7 +8,6 @@ namespace TSS
     {
         // Panel colours
         kHeaderPanelBackground,
-        kHeaderPanelLabelText,
         kBodyPanelBackground,
         kFooterPanelBackground,
         

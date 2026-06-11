@@ -37,6 +37,7 @@ namespace TSS
 
         juce::Font getBaseFont() const override;
         juce::Font getBaseFontBold() const override;
+        juce::Font getBrandFontBold() const override;
 
         juce::Colour getToggleBackgroundColour(bool isOn) const override;
         juce::Colour getToggleTextColour(bool isOn) const override;
