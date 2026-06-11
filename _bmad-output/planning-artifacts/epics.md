@@ -77,7 +77,7 @@ FR-43: UI scale — Presets 50–200%; ScaledLayout recalculation; no global Aff
 FR-44: Footer messaging — Non-blocking `uiMessageText` via ExceptionPropagator; grayed-click footer feedback.
 FR-53: Footer device identity — Footer right zone shows device type and firmware from FR-1; hidden when not detected.
 FR-45: Graying rules — LEGATO PORTA, ROM, device gating, Keyboard From plugin, Mutator/compare, Paste incompatibility.
-FR-46: Matrix-6 PATCH-only mode — M-6/6R: MASTER EDIT grayed; PATCH/Matrix Mod/PM active.
+FR-46: Matrix-6 PATCH-only mode — M-6/6R: MASTER EDIT grayed; PATCH/Matrix Mod/PM active; BANK UTILITY disabled; internal navigation 00–99 only (no bank concept).
 FR-47: ActionDispatcher hub — StandaloneWidget timestamps → ActionDispatcher → Module/PatchManager/Mutator handlers; panels setProperty only.
 FR-48: APVTS parameter → SysEx — Processor/services listen and enqueue SysEx without manual widget resync.
 FR-49: PatchModel / MasterModel — Packed 134/172 B buffers synced via descriptor mappers; no parallel offset tables.
@@ -1256,6 +1256,19 @@ So that Live/Reason/GarageBand host it without MIDI-effect workarounds (FR-4, FR
 **Then** hosted VST3/AU: Music Device / Instrument with **stereo output only** (no input bus)
 **And** standalone: input channel layout follows device type (mono M-1000, stereo M-6/6R) via `StandaloneAudioInputRouter`
 **And** M-6/6R grays entire MASTER EDIT section (FR-46)
+
+### Story 8.5: Matrix-6/6R Patch Memory Limits
+
+As a Matrix-6 or Matrix-6R owner,
+I want PATCH MANAGER to use 100-patch memory semantics without banks,
+So that navigation and STORE match my synth hardware (FR-46 extension, Story 8.5).
+
+**Acceptance Criteria:**
+
+**Given** Stories 8.1–8.2 (`deviceType` known) and `Matrix6Or6RLimits.h` added
+**When** Matrix-6 or Matrix-6R is detected
+**Then** `DeviceMemoryLimits` (or `DeviceTypeRegistry` helper) resolves patch/bank bounds from `Matrix6Or6RLimits` vs `Matrix1000Limits`; BANK UTILITY grayed; Internal Patches navigates 00–99 with cyclic wrap only; no Set Bank `0x0A` SysEx; FR-23 ROM gating applies to Matrix-1000 only
+**And** Matrix-1000 FR-19–FR-24 behaviour unchanged; unit tests cover limit resolution
 
 ---
 

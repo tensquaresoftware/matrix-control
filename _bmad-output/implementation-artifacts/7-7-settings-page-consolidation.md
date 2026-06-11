@@ -3,7 +3,7 @@ organization: Ten Square Software
 project: Matrix-Control
 title: Story 7.7 — Settings Page Consolidation
 author: BMad Agent
-status: review
+status: done
 baseline_commit: 114bd7c979ca7e967ea8262cf20f37922ad5eae1
 sources:
   - planning-artifacts/epics.md
@@ -13,12 +13,12 @@ sources:
   - implementation-artifacts/deferred-work.md
   - project-context.md
 created: 2026-06-06
-updated: 2026-06-06
+updated: 2026-06-12
 ---
 
 # Story 7.7: Settings Page Consolidation
 
-Status: review
+Status: done
 
 <!-- FR-40 (partial Phase A), FR-4b relocation, FR-18/FR-59/NFR-7 Phase B. Spawned from R-2 code review — header layout overlap + Guillaume decision for dedicated Settings window with tabs. -->
 
@@ -186,3 +186,4 @@ Composer (Cursor)
 
 - 2026-06-06: Story created (ready-for-dev) — Phase A from R-2 review + Guillaume Settings window decision; Phase B FR-40 scope deferred.
 - 2026-06-06: Phase A implemented — Settings window shell, header migration, build/tests green; status → review.
+- 2026-06-12: Story closed — Phase A accepted; Phase B remains deferred to Stories 3.2, 4.5, 6.10; status → done.

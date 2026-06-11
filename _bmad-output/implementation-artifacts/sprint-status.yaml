@@ -1,5 +1,5 @@
 # generated: 2026-05-29
-# last_updated: 2026-06-11 (U-2b implementation complete — review, pending manual UAT)
+# last_updated: 2026-06-12 (Story 7-7 closed — done)
 # project: Matrix-Control
 # project_key: NOKEY
 # tracking_system: file-system
@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-05-29
-last_updated: 2026-06-11 (U-2b implementation complete — review, pending manual UAT)
+last_updated: 2026-06-12 (Story 7-7 closed — done)
 project: Matrix-Control
 project_key: NOKEY
 tracking_system: file-system
@@ -119,7 +119,7 @@ development_status:
   7-4-mutatoractionhandler: backlog
   7-5-bank-utility-ui-wiring: backlog
   7-6-internal-patches-panel-wiring: backlog
-  7-7-settings-page-consolidation: review
+  7-7-settings-page-consolidation: done
   7-8-header-footer-shell-and-persistence: backlog
   7-9-matrix-mod-bus-reorder-ux-handler: done
   epic-7-retrospective: optional
@@ -128,6 +128,7 @@ development_status:
   8-2-device-inquiry-and-footer-identity: backlog
   8-3-ui-lock-without-synth: backlog
   8-4-virtual-instrument-registration-and-bus-layout: backlog
+  8-5-matrix-6-6r-patch-memory-limits: ready-for-dev
   epic-8-retrospective: optional
   epic-9: backlog
   9-1-dirtypatchtracker: backlog
