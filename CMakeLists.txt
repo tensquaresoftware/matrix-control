@@ -157,9 +157,27 @@ set(PLUGIN_SOURCES
     
     # GUI - Main Component
     Source/GUI/MainComponent.cpp
+    Source/GUI/Tests/TestActivityLeds.cpp
     Source/GUI/Tests/TestButtons.cpp
+    Source/GUI/Tests/TestComboBoxes.cpp
     Source/GUI/Tests/TestComponent.cpp
+    Source/GUI/Tests/TestEnvelopeDisplays.cpp
+    Source/GUI/Tests/TestGroupLabels.cpp
+    Source/GUI/Tests/TestHorizontalSeparators.cpp
+    Source/GUI/Tests/TestLabels.cpp
+    Source/GUI/Tests/TestModulationBusCells.cpp
+    Source/GUI/Tests/TestModulationBusHeaders.cpp
+    Source/GUI/Tests/TestModuleHeaders.cpp
+    Source/GUI/Tests/TestNumberBoxes.cpp
+    Source/GUI/Tests/TestParameterCells.cpp
+    Source/GUI/Tests/TestPatchNameDisplays.cpp
+    Source/GUI/Tests/TestPeakIndicators.cpp
+    Source/GUI/Tests/TestPopupMenus.cpp
+    Source/GUI/Tests/TestSectionHeaders.cpp
     Source/GUI/Tests/TestSliders.cpp
+    Source/GUI/Tests/TestToggles.cpp
+    Source/GUI/Tests/TestTrackGeneratorDisplays.cpp
+    Source/GUI/Tests/TestVerticalSeparators.cpp
     
     # GUI - Panels
     Source/GUI/Panels/MainComponent/FooterPanel/FooterPanel.cpp

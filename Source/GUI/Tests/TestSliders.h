@@ -16,7 +16,10 @@ public:
     explicit TestSliders(TSS::ISkin& skin);
     ~TestSliders() override;
 
+    void setSkin(TSS::ISkin& skin);
     void resized() override;
+    int getPreferredWidth() const;
+    int getPreferredHeight() const;
 
 private:
     class SliderScalePanel;
@@ -32,6 +35,7 @@ private:
     inline constexpr static int kBottomSliderHeight_ = 48;
     inline constexpr static float kBoldLargeSliderFontHeight_ = 32.0f;
 
+    TSS::ISkin* skin_ = nullptr;
     std::vector<std::unique_ptr<SliderScalePanel>> columnPanels_;
 
     void createColumnPanels(TSS::ISkin& skin);

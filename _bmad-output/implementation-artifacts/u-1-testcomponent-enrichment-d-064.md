@@ -3,7 +3,7 @@ organization: Ten Square Software
 project: Matrix-Control
 title: Story U-1 — TestComponent Enrichment (D-064)
 author: BMad Agent
-status: ready-for-dev
+status: review
 baseline_commit: 5a4c988
 sources:
   - planning-artifacts/epic-ui-scale-audit-pixel-perfect-layout.md
@@ -20,7 +20,7 @@ updated: 2026-06-10
 
 # Story U.1: TestComponent Enrichment (D-064)
 
-Status: ready-for-dev
+Status: review
 
 <!-- Debug sandbox (D-064). Parallel with U-2b — helps hairline UAT but does not block it. Release exclusion = U-10 (D-063). -->
 
@@ -198,15 +198,42 @@ Update `kLastComboItemId_` in `TestComponent.cpp` when selector grows.
 
 ### Agent Model Used
 
-(pending)
+claude-4.6-sonnet-medium-thinking (Cursor Agent)
 
 ### Completion Notes List
 
-(pending)
+- Added `TestScaleColumns.h` shared helpers (7 column specs, `scaledSize`, row width).
+- `TestComponent` now wraps test pages in a horizontal `juce::Viewport`, routes all 20 selector entries, and propagates skin via `setSkin()` (wired from `PluginEditor::updateSkin()`).
+- Created 18 new `TestXxx` pages following the `TestButtons`/`TestSliders` 7-column pattern; dimensions from `DimensionFactory` / `WidgetFactory` (no `Design*` in test code).
+- Composites (`TestParameterCells`, `TestModulationBusCells`) use editor APVTS + `WidgetFactory`.
+- `cmake --build Builds/macOS` — BUILD SUCCEEDED (Debug, after reconfigure).
 
 ### File List
 
-(pending — expect `Source/GUI/Tests/Test*.cpp` additions + `TestComponent` + `CMakeLists.txt`)
+- `Source/GUI/Tests/TestScaleColumns.h` (new)
+- `Source/GUI/Tests/TestActivityLeds.{h,cpp}` (new)
+- `Source/GUI/Tests/TestComboBoxes.{h,cpp}` (new)
+- `Source/GUI/Tests/TestEnvelopeDisplays.{h,cpp}` (new)
+- `Source/GUI/Tests/TestGroupLabels.{h,cpp}` (new)
+- `Source/GUI/Tests/TestHorizontalSeparators.{h,cpp}` (new)
+- `Source/GUI/Tests/TestLabels.{h,cpp}` (new)
+- `Source/GUI/Tests/TestModulationBusCells.{h,cpp}` (new)
+- `Source/GUI/Tests/TestModulationBusHeaders.{h,cpp}` (new)
+- `Source/GUI/Tests/TestModuleHeaders.{h,cpp}` (new)
+- `Source/GUI/Tests/TestNumberBoxes.{h,cpp}` (new)
+- `Source/GUI/Tests/TestParameterCells.{h,cpp}` (new)
+- `Source/GUI/Tests/TestPatchNameDisplays.{h,cpp}` (new)
+- `Source/GUI/Tests/TestPeakIndicators.{h,cpp}` (new)
+- `Source/GUI/Tests/TestPopupMenus.{h,cpp}` (new)
+- `Source/GUI/Tests/TestSectionHeaders.{h,cpp}` (new)
+- `Source/GUI/Tests/TestToggles.{h,cpp}` (new)
+- `Source/GUI/Tests/TestTrackGeneratorDisplays.{h,cpp}` (new)
+- `Source/GUI/Tests/TestVerticalSeparators.{h,cpp}` (new)
+- `Source/GUI/Tests/TestButtons.{h,cpp}` (updated: `setSkin`, preferred size, shared columns)
+- `Source/GUI/Tests/TestSliders.{h,cpp}` (updated)
+- `Source/GUI/Tests/TestComponent.{h,cpp}` (updated: viewport, router, 20 pages)
+- `Source/GUI/PluginEditor.cpp` (updated: APVTS injection, `setSkin`)
+- `CMakeLists.txt` (updated: 18 new test sources)
 
 ### Review Findings
 

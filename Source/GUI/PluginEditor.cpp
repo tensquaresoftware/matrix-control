@@ -94,7 +94,12 @@ PluginEditor::PluginEditor(PluginProcessor& p)
             pluginProcessor.swapMatrixModBusContents(fromBus, toBus);
         });
 
-    testComponent_ = std::make_unique<TestComponent>(*skin_, pluginProcessor.getApvts().state, editorWidth, editorHeight);
+    testComponent_ = std::make_unique<TestComponent>(
+        *skin_,
+        pluginProcessor.getApvts(),
+        pluginProcessor.getApvts().state,
+        editorWidth,
+        editorHeight);
     addChildComponent(*testComponent_);
     testComponent_->setVisible(false);
 
@@ -269,6 +274,9 @@ void PluginEditor::updateSkin()
 
     if (settingsWindow_ != nullptr)
         settingsWindow_->setSkin(*skin_);
+
+    if (testComponent_ != nullptr)
+        testComponent_->setSkin(*skin_);
 
     repaint();
 }

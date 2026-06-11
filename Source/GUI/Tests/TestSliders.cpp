@@ -4,6 +4,7 @@
 
 #include "GUI/Looks/LookBuilders.h"
 #include "GUI/Skins/ISkin.h"
+#include "GUI/Tests/TestScaleColumns.h"
 #include "GUI/Widgets/Label.h"
 #include "GUI/Widgets/Slider.h"
 
@@ -18,28 +19,6 @@ namespace
         int bottomSliderHeight;
         int scaleLabelHeight;
     };
-
-    struct ColumnSpec
-    {
-        float scale;
-        const char* label;
-    };
-
-    int scaledSize(int value, float scale)
-    {
-        return juce::roundToInt(static_cast<float>(value) * scale);
-    }
-
-    constexpr auto kColumnSpecs_ = std::array<ColumnSpec, 7>
-    {{
-        { 0.5f, "50%" },
-        { 0.75f, "75%" },
-        { 1.0f, "100%" },
-        { 1.25f, "125%" },
-        { 1.5f, "150%" },
-        { 1.75f, "175%" },
-        { 2.0f, "200%" }
-    }};
 }
 
 class TestSliders::SliderScalePanel : public juce::Component
@@ -76,13 +55,13 @@ public:
 
     int getScaledColumnWidth() const
     {
-        return scaledSize(dimensions_.bottomSliderWidth, scale_);
+        return TestScaleColumns::scaledSize(dimensions_.bottomSliderWidth, scale_);
     }
 
     int getPreferredHeight() const
     {
-        const int scaledTopSliderHeight = scaledSize(dimensions_.topSliderHeight, scale_);
-        const int scaledBottomSliderHeight = scaledSize(dimensions_.bottomSliderHeight, scale_);
+        const int scaledTopSliderHeight = TestScaleColumns::scaledSize(dimensions_.topSliderHeight, scale_);
+        const int scaledBottomSliderHeight = TestScaleColumns::scaledSize(dimensions_.bottomSliderHeight, scale_);
         const int labelToSlidersGap = dimensions_.gap;
 
         const int rowGap = dimensions_.gap;
@@ -98,11 +77,11 @@ public:
 
     void resized() override
     {
-        const int scaledGap = scaledSize(dimensions_.gap, scale_);
-        const int scaledTopSliderWidth = scaledSize(dimensions_.topSliderWidth, scale_);
-        const int scaledTopSliderHeight = scaledSize(dimensions_.topSliderHeight, scale_);
-        const int scaledBottomSliderWidth = scaledSize(dimensions_.bottomSliderWidth, scale_);
-        const int scaledBottomSliderHeight = scaledSize(dimensions_.bottomSliderHeight, scale_);
+        const int scaledGap = TestScaleColumns::scaledSize(dimensions_.gap, scale_);
+        const int scaledTopSliderWidth = TestScaleColumns::scaledSize(dimensions_.topSliderWidth, scale_);
+        const int scaledTopSliderHeight = TestScaleColumns::scaledSize(dimensions_.topSliderHeight, scale_);
+        const int scaledBottomSliderWidth = TestScaleColumns::scaledSize(dimensions_.bottomSliderWidth, scale_);
+        const int scaledBottomSliderHeight = TestScaleColumns::scaledSize(dimensions_.bottomSliderHeight, scale_);
 
         const int labelY = 0;
         const int slidersStartY = dimensions_.scaleLabelHeight + dimensions_.gap;
@@ -140,15 +119,37 @@ private:
 
 TestSliders::TestSliders(TSS::ISkin& skin)
 {
-    createColumnPanels(skin);
-    layoutColumnPanels();
+    setSkin(skin);
 }
 
 TestSliders::~TestSliders() = default;
 
+void TestSliders::setSkin(TSS::ISkin& skin)
+{
+    skin_ = &skin;
+    createColumnPanels(skin);
+    layoutColumnPanels();
+}
+
 void TestSliders::resized()
 {
     layoutColumnPanels();
+}
+
+int TestSliders::getPreferredWidth() const
+{
+    const int panelGap = kGap_ * kPanelGapMultiplier_;
+    return TestScaleColumns::sumPanelRowWidth(columnPanels_, panelGap,
+        [](const std::unique_ptr<SliderScalePanel>& panel) { return panel->getScaledColumnWidth(); }) + (2 * kPadding_);
+}
+
+int TestSliders::getPreferredHeight() const
+{
+    int maxHeight = 0;
+    for (const auto& panel : columnPanels_)
+        maxHeight = juce::jmax(maxHeight, panel->getPreferredHeight());
+
+    return maxHeight + (2 * kPadding_);
 }
 
 void TestSliders::createColumnPanels(TSS::ISkin& skin)
@@ -169,9 +170,10 @@ void TestSliders::createColumnPanels(TSS::ISkin& skin)
     const auto labelLook = TSS::labelLookFromSkin(skin);
 
     columnPanels_.clear();
-    columnPanels_.reserve(kColumnSpecs_.size());
+    removeAllChildren();
+    columnPanels_.reserve(TestScaleColumns::kSpecs.size());
 
-    for (const auto& spec : kColumnSpecs_)
+    for (const auto& spec : TestScaleColumns::kSpecs)
     {
         auto panel = std::make_unique<SliderScalePanel>(
             spec.scale,

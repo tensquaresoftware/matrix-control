@@ -16,7 +16,10 @@ public:
     explicit TestButtons(TSS::ISkin& skin);
     ~TestButtons() override;
 
+    void setSkin(TSS::ISkin& skin);
     void resized() override;
+    int getPreferredWidth() const;
+    int getPreferredHeight() const;
 
 private:
     class ButtonScalePanel;
@@ -31,6 +34,7 @@ private:
     inline constexpr static int kPanelGapMultiplier_ = 2;
     inline constexpr static float kLargeTextFontHeight_ = 28.0f;
 
+    TSS::ISkin* skin_ = nullptr;
     std::vector<std::unique_ptr<ButtonScalePanel>> columnPanels_;
 
     void createColumnPanels(TSS::ISkin& skin);

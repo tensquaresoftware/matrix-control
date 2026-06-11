@@ -71,6 +71,7 @@ docs/
 # (macOS) the lowercase "tests/" rule above also matches "Tests/", so re-include it.
 # Nested lowercase "tests/" folders (e.g. inside tooling) stay ignored.
 !/Tests/
+!/Source/GUI/Tests/
 
 # Temporary files
 *.log

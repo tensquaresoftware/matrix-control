@@ -4,6 +4,7 @@
 
 #include "GUI/Looks/LookBuilders.h"
 #include "GUI/Skins/ISkin.h"
+#include "GUI/Tests/TestScaleColumns.h"
 #include "GUI/Widgets/Button.h"
 #include "GUI/Widgets/Label.h"
 
@@ -20,28 +21,6 @@ namespace
         int scaleLabelHeight;
         float largeTextFontHeight;
     };
-
-    struct ColumnSpec
-    {
-        float scale;
-        const char* label;
-    };
-
-    int scaledSize(int value, float scale)
-    {
-        return juce::roundToInt(static_cast<float>(value) * scale);
-    }
-
-    constexpr auto kColumnSpecs_ = std::array<ColumnSpec, 7>
-    {{
-        { 0.5f, "50%" },
-        { 0.75f, "75%" },
-        { 1.0f, "100%" },
-        { 1.25f, "125%" },
-        { 1.5f, "150%" },
-        { 1.75f, "175%" },
-        { 2.0f, "200%" }
-    }};
 }
 
 class TestButtons::ButtonScalePanel : public juce::Component
@@ -75,14 +54,14 @@ public:
 
     int getScaledColumnWidth() const
     {
-        return scaledSize(dimensions_.bigButtonWidth, scale_);
+        return TestScaleColumns::scaledSize(dimensions_.bigButtonWidth, scale_);
     }
 
     int getPreferredHeight() const
     {
-        const int scaledGap = scaledSize(dimensions_.gap, scale_);
-        const int scaledMainButtonHeight = scaledSize(dimensions_.mainButtonHeight, scale_);
-        const int scaledBigButtonHeight = scaledSize(dimensions_.bigButtonHeight, scale_);
+        const int scaledGap = TestScaleColumns::scaledSize(dimensions_.gap, scale_);
+        const int scaledMainButtonHeight = TestScaleColumns::scaledSize(dimensions_.mainButtonHeight, scale_);
+        const int scaledBigButtonHeight = TestScaleColumns::scaledSize(dimensions_.bigButtonHeight, scale_);
         const int labelToButtonsGap = dimensions_.gap;
 
         return dimensions_.scaleLabelHeight
@@ -96,12 +75,12 @@ public:
 
     void resized() override
     {
-        const int scaledGap = scaledSize(dimensions_.gap, scale_);
-        const int scaledMainButtonWidth = scaledSize(dimensions_.mainButtonWidth, scale_);
-        const int scaledMainButtonHeight = scaledSize(dimensions_.mainButtonHeight, scale_);
-        const int scaledSmallButtonSize = scaledSize(dimensions_.smallButtonSize, scale_);
-        const int scaledBigButtonWidth = scaledSize(dimensions_.bigButtonWidth, scale_);
-        const int scaledBigButtonHeight = scaledSize(dimensions_.bigButtonHeight, scale_);
+        const int scaledGap = TestScaleColumns::scaledSize(dimensions_.gap, scale_);
+        const int scaledMainButtonWidth = TestScaleColumns::scaledSize(dimensions_.mainButtonWidth, scale_);
+        const int scaledMainButtonHeight = TestScaleColumns::scaledSize(dimensions_.mainButtonHeight, scale_);
+        const int scaledSmallButtonSize = TestScaleColumns::scaledSize(dimensions_.smallButtonSize, scale_);
+        const int scaledBigButtonWidth = TestScaleColumns::scaledSize(dimensions_.bigButtonWidth, scale_);
+        const int scaledBigButtonHeight = TestScaleColumns::scaledSize(dimensions_.bigButtonHeight, scale_);
 
         const int labelY = 0;
         const int buttonsStartY = dimensions_.scaleLabelHeight + dimensions_.gap;
@@ -145,15 +124,37 @@ private:
 
 TestButtons::TestButtons(TSS::ISkin& skin)
 {
-    createColumnPanels(skin);
-    layoutColumnPanels();
+    setSkin(skin);
 }
 
 TestButtons::~TestButtons() = default;
 
+void TestButtons::setSkin(TSS::ISkin& skin)
+{
+    skin_ = &skin;
+    createColumnPanels(skin);
+    layoutColumnPanels();
+}
+
 void TestButtons::resized()
 {
     layoutColumnPanels();
+}
+
+int TestButtons::getPreferredWidth() const
+{
+    const int panelGap = kGap_ * kPanelGapMultiplier_;
+    return TestScaleColumns::sumPanelRowWidth(columnPanels_, panelGap,
+        [](const std::unique_ptr<ButtonScalePanel>& panel) { return panel->getScaledColumnWidth(); });
+}
+
+int TestButtons::getPreferredHeight() const
+{
+    int maxHeight = 0;
+    for (const auto& panel : columnPanels_)
+        maxHeight = juce::jmax(maxHeight, panel->getPreferredHeight());
+
+    return maxHeight;
 }
 
 void TestButtons::createColumnPanels(TSS::ISkin& skin)
@@ -174,9 +175,10 @@ void TestButtons::createColumnPanels(TSS::ISkin& skin)
     const auto labelLook = TSS::labelLookFromSkin(skin);
 
     columnPanels_.clear();
-    columnPanels_.reserve(kColumnSpecs_.size());
+    removeAllChildren();
+    columnPanels_.reserve(TestScaleColumns::kSpecs.size());
 
-    for (const auto& spec : kColumnSpecs_)
+    for (const auto& spec : TestScaleColumns::kSpecs)
     {
         auto panel = std::make_unique<ButtonScalePanel>(
             spec.scale,
