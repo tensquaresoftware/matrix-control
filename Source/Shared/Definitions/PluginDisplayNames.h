@@ -14,29 +14,29 @@ namespace PluginDisplayNames
     namespace HeaderPanel
     {
         constexpr const char* kEditorMidiFromLabel = "EDITOR MIDI FROM :";
-        constexpr const char* kMidiToLabel = "MIDI TO :";
-        constexpr const char* kKeyboardFromLabel = "KEYBOARD FROM :";
-        constexpr const char* kNoInputSentinel = "NO INPUT";
-        constexpr const char* kNoOutputSentinel = "NO OUTPUT";
-        constexpr const char* kSettingsButton = "SETTINGS";
-        constexpr const char* kUiElementsButton = "UI TESTS";
-        constexpr const char* kLogoSkinSection = "SKIN";
-        constexpr const char* kLogoUiScaleSection = "UI SCALE";
+        constexpr const char* kMidiToLabel         = "MIDI TO :";
+        constexpr const char* kKeyboardFromLabel   = "KEYBOARD FROM :";
+        constexpr const char* kNoInputSentinel     = "NO INPUT";
+        constexpr const char* kNoOutputSentinel    = "NO OUTPUT";
+        constexpr const char* kSettingsButton      = "SETTINGS";
+        constexpr const char* kUiElementsButton    = "UI TESTS";
+        constexpr const char* kLogoSkinSection     = "SKIN";
+        constexpr const char* kLogoUiScaleSection  = "UI SCALE";
     }
 
     namespace Settings
     {
-        const juce::String kWindowTitle = "SETTINGS";
-        constexpr const char* kSkinLabel = "SKIN :";
-        constexpr const char* kUiScaleLabel = "UI SCALE :";
-        constexpr const char* kHardwareLatencyLabel = "HARDWARE LATENCY :";
-        constexpr const char* kAudioFromLabel = "AUDIO FROM :";
-        constexpr const char* kInputGainLabel = "INPUT GAIN :";
+        const juce::String kWindowTitle                = "SETTINGS";
+        constexpr const char* kSkinLabel               = "SKIN :";
+        constexpr const char* kUiScaleLabel            = "UI SCALE :";
+        constexpr const char* kHardwareLatencyLabel    = "HARDWARE LATENCY :";
+        constexpr const char* kAudioFromLabel          = "AUDIO FROM :";
+        constexpr const char* kInputGainLabel          = "INPUT GAIN :";
         constexpr const char* kMasterOperationsSection = "MASTER OPERATIONS";
-        constexpr const char* kPoliciesSection = "POLICIES";
-        constexpr const char* kDefragSection = "DEFRAG";
-        constexpr const char* kLoggingSection = "LOGGING";
-        constexpr const char* kComingSoon = "Coming soon";
+        constexpr const char* kPoliciesSection         = "POLICIES";
+        constexpr const char* kDefragSection           = "DEFRAG";
+        constexpr const char* kLoggingSection          = "LOGGING";
+        constexpr const char* kComingSoon              = "Coming soon...";
     }
 
     namespace Units
