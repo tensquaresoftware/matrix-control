@@ -16,7 +16,6 @@ namespace PluginDisplayNames
         constexpr const char* kEditorMidiFromLabel = "EDITOR MIDI FROM :";
         constexpr const char* kMidiToLabel = "MIDI TO :";
         constexpr const char* kKeyboardFromLabel = "KEYBOARD FROM :";
-        constexpr const char* kHostDisplay = "HOST";
         constexpr const char* kPortNoneSentinel = "\xe2\x80\x94";
         constexpr const char* kSettingsButton = "SETTINGS";
         constexpr const char* kUiElementsButton = "UI TESTS";
@@ -26,7 +25,7 @@ namespace PluginDisplayNames
 
     namespace Settings
     {
-        const juce::String kWindowTitle = juce::String::fromUTF8("MATRIX-CONTROL \xe2\x80\x94 SETTINGS");
+        const juce::String kWindowTitle = "SETTINGS";
         constexpr const char* kSkinLabel = "SKIN :";
         constexpr const char* kUiScaleLabel = "UI SCALE :";
         constexpr const char* kHardwareLatencyLabel = "HARDWARE LATENCY :";

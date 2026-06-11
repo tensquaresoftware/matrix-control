@@ -171,10 +171,13 @@ void HeaderPanel::resized()
         x += packetExternalGap - gap;
     };
 
-    placePacketLed(instrumentActivityLed_);
-    placePacketLabel(keyboardFromLabel_, keyboardFromLabelWidth);
-    placePacketCombo(keyboardFromComboBox_, portComboWidth);
-    endPacket();
+    if (!isPluginMode_)
+    {
+        placePacketLed(instrumentActivityLed_);
+        placePacketLabel(keyboardFromLabel_, keyboardFromLabelWidth);
+        placePacketCombo(keyboardFromComboBox_, portComboWidth);
+        endPacket();
+    }
 
     placePacketLed(editorActivityLed_);
     placePacketLabel(midiFromLabel_, editorMidiFromLabelWidth);
@@ -255,13 +258,21 @@ void HeaderPanel::setUiScale(float uiScale)
 void HeaderPanel::setPluginMode(bool isPlugin)
 {
     isPluginMode_ = isPlugin;
+    updateKeyboardFromVisibility();
 
-    if (isPluginMode_)
-        configurePluginModeKeyboardFrom();
-    else
+    if (!isPluginMode_)
         configureStandaloneKeyboardFrom();
 
     resized();
+}
+
+void HeaderPanel::updateKeyboardFromVisibility()
+{
+    const bool showKeyboardFrom = !isPluginMode_;
+
+    instrumentActivityLed_.setVisible(showKeyboardFrom);
+    keyboardFromLabel_.setVisible(showKeyboardFrom);
+    keyboardFromComboBox_.setVisible(showKeyboardFrom);
 }
 
 void HeaderPanel::populateMidiPortLists()
@@ -269,9 +280,7 @@ void HeaderPanel::populateMidiPortLists()
     populateInputPortCombo(midiFromComboBox_, midiFromPortIdentifiers_);
     populateOutputPortCombo(midiToComboBox_, midiToPortIdentifiers_);
 
-    if (isPluginMode_)
-        configurePluginModeKeyboardFrom();
-    else
+    if (!isPluginMode_)
         configureStandaloneKeyboardFrom();
 }
 
@@ -319,17 +328,8 @@ void HeaderPanel::populateOutputPortCombo(TSS::ComboBox& combo, std::vector<juce
                         juce::dontSendNotification);
 }
 
-void HeaderPanel::configurePluginModeKeyboardFrom()
-{
-    keyboardFromComboBox_.clear(juce::dontSendNotification);
-    keyboardFromComboBox_.addItem(PluginDisplayNames::HeaderPanel::kHostDisplay, 1);
-    keyboardFromComboBox_.setSelectedId(1, juce::dontSendNotification);
-    keyboardFromComboBox_.setEnabled(false);
-}
-
 void HeaderPanel::configureStandaloneKeyboardFrom()
 {
-    keyboardFromComboBox_.setEnabled(true);
     populateInputPortCombo(keyboardFromComboBox_, keyboardFromPortIdentifiers_);
 }
 

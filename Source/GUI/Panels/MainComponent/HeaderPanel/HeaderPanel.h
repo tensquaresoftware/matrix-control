@@ -70,7 +70,7 @@ private:
 
     void populateInputPortCombo(TSS::ComboBox& combo, std::vector<juce::String>& identifiers);
     void populateOutputPortCombo(TSS::ComboBox& combo, std::vector<juce::String>& identifiers);
-    void configurePluginModeKeyboardFrom();
+    void updateKeyboardFromVisibility();
     void configureStandaloneKeyboardFrom();
     int findItemIdForIdentifier(const std::vector<juce::String>& identifiers,
                                 const juce::String& deviceId) const;
