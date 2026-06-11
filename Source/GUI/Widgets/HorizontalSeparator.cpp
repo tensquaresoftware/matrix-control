@@ -1,5 +1,7 @@
 #include "HorizontalSeparator.h"
 
+#include "GUI/Layout/ScaledDrawing.h"
+
 namespace TSS
 {
     HorizontalSeparator::HorizontalSeparator(int width, int height, const HorizontalSeparatorLook& look)
@@ -29,11 +31,18 @@ namespace TSS
     void HorizontalSeparator::paint(juce::Graphics& g)
     {
         const auto bounds = getLocalBounds().toFloat();
-        const float h = juce::jmax(1.0f, bounds.getHeight());
-        const float lineY = bounds.getY() + h * 0.5f;
-        const float lineThickness = std::max(1.0f, static_cast<float>(kLineThickness_) * uiScale_);
-        
+        const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
+        const float lineThickness = ScaledDrawing::snappedStrokeThicknessFromDesign(
+            static_cast<float>(kLineThickness_),
+            uiScale_,
+            systemDisplayScale,
+            ScaledDrawing::StrokeSnapPolicy::kRound);
+
+        auto line = bounds;
+        line.setHeight(lineThickness);
+        line.setY(bounds.getCentreY() - lineThickness * 0.5f);
+
         g.setColour(look_.line);
-        g.drawLine(bounds.getX(), lineY, bounds.getRight(), lineY, lineThickness);
+        g.fillRect(line);
     }
 }

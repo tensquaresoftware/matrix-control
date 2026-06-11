@@ -46,8 +46,8 @@ namespace TSS
 
         void drawText(juce::Graphics& g, const juce::Rectangle<float>& contentArea);
         void drawLines(juce::Graphics& g, const juce::Rectangle<float>& contentArea);
-        void drawLeftLine(juce::Graphics& g, const juce::Rectangle<float>& contentArea);
-        void drawRightLine(juce::Graphics& g, const juce::Rectangle<float>& contentArea);
+        void drawLeftLine(juce::Graphics& g, const juce::Rectangle<float>& contentArea, float lineThickness);
+        void drawRightLine(juce::Graphics& g, const juce::Rectangle<float>& contentArea, float lineThickness);
 
         juce::Colour getLineColour() const;
 

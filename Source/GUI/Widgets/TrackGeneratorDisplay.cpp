@@ -200,8 +200,13 @@ namespace TSS
         if (centerBounds.getWidth() <= 0.0f || centerBounds.getHeight() <= 0.0f)
             return;
 
-        const float lineThickness = std::max(1.0f, static_cast<float>(dimensions_.curveLineThickness) * uiScale_);
-        
+        const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
+        const float lineThickness = ScaledDrawing::snappedStrokeThicknessFromDesign(
+            static_cast<float>(dimensions_.curveLineThickness),
+            uiScale_,
+            systemDisplayScale,
+            ScaledDrawing::StrokeSnapPolicy::kRound);
+
         g.setColour(look_.curve);
 
         for (int i = 0; i < kCurvePointCount_; ++i)

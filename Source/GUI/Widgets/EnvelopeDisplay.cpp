@@ -203,8 +203,13 @@ namespace TSS
         
         const auto envelopePoints = calculateEnvelopePoints(centerBounds);
         
-        const float lineThickness = std::max(1.0f, static_cast<float>(dimensions_.curveLineThickness) * uiScale_);
-        
+        const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
+        const float lineThickness = ScaledDrawing::snappedStrokeThicknessFromDesign(
+            static_cast<float>(dimensions_.curveLineThickness),
+            uiScale_,
+            systemDisplayScale,
+            ScaledDrawing::StrokeSnapPolicy::kRound);
+
         g.setColour(look_.envelope);
         
         for (int i = 0; i < kCurvePointCount_ - 1; ++i)

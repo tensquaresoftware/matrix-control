@@ -215,7 +215,13 @@ namespace TSS
 
     void ScrollablePopupMenu::resized()
     {
-        const int insetPx = juce::jmax(1, juce::roundToInt(getBorderThicknessDesign() * uiScale_));
+        const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
+        const float borderThickness = ScaledDrawing::snappedStrokeThicknessFromDesign(
+            getBorderThicknessDesign(),
+            uiScale_,
+            systemDisplayScale,
+            ScaledDrawing::StrokeSnapPolicy::kRound);
+        const int insetPx = juce::roundToInt(borderThickness);
         auto inner = getLocalBounds().reduced(insetPx);
         if (viewport_ == nullptr)
             return;
@@ -250,7 +256,11 @@ namespace TSS
             const juce::Colour scrollbarColour = isButtonLike_
                 ? popupLook.scrollbarButtonLike
                 : popupLook.scrollbar;
-            const float thumbInset = std::max(1.0f, kThumbInsetBase_ * uiScale_);
+            const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
+            const float thumbInset = static_cast<float>(ScaledDrawing::logicalInsetPixelsFromDesign(
+                kThumbInsetBase_,
+                uiScale_,
+                systemDisplayScale));
             customScrollBar_ = std::make_unique<CustomScrollBar>(
                 *viewport_,
                 scrollbarColour,
@@ -410,7 +420,13 @@ namespace TSS
         auto* rawPtr = popupMenu.get();
 
         const auto& popupLayout = ComboBox::getPopupLayoutDimensions();
-        const int insetPx = juce::jmax(1, juce::roundToInt(rawPtr->getBorderThicknessDesign() * rawPtr->uiScale_));
+        const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(comboBox);
+        const float borderThickness = ScaledDrawing::snappedStrokeThicknessFromDesign(
+            rawPtr->getBorderThicknessDesign(),
+            rawPtr->uiScale_,
+            systemDisplayScale,
+            ScaledDrawing::StrokeSnapPolicy::kRound);
+        const int insetPx = juce::roundToInt(borderThickness);
         const int scrollbarThicknessPx = juce::jmax(1, juce::roundToInt(
             static_cast<float>(popupLayout.scrollbarWidth) * rawPtr->uiScale_));
         const float maxScrollableHeight = static_cast<float>(popupLayout.maxScrollHeight) * rawPtr->uiScale_;

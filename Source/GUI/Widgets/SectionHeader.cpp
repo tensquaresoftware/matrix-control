@@ -1,5 +1,7 @@
 #include "SectionHeader.h"
 
+#include "GUI/Layout/ScaledDrawing.h"
+
 namespace TSS
 {
     SectionHeader::SectionHeader(int width, int height, const SectionHeaderLook& look, const juce::String& text, ColourVariant variant)
@@ -81,42 +83,43 @@ namespace TSS
 
     void SectionHeader::drawLines(juce::Graphics& g, const juce::Rectangle<float>& contentArea)
     {
+        const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
+        const float lineThickness = ScaledDrawing::snappedStrokeThicknessFromDesign(
+            kLineHeight_,
+            uiScale_,
+            systemDisplayScale,
+            ScaledDrawing::StrokeSnapPolicy::kRound);
+
         g.setColour(getLineColour());
 
-        drawLeftLine(g, contentArea);
-        drawRightLine(g, contentArea);
+        drawLeftLine(g, contentArea, lineThickness);
+        drawRightLine(g, contentArea, lineThickness);
     }
 
-    void SectionHeader::drawLeftLine(juce::Graphics& g, const juce::Rectangle<float>& contentArea)
+    void SectionHeader::drawLeftLine(juce::Graphics& g, const juce::Rectangle<float>& contentArea, float lineThickness)
     {
-        const float lineHeight = std::max(1.0f, kLineHeight_ * uiScale_);
-        const auto verticalOffset = (contentArea.getHeight() - lineHeight) * 0.5f;
-        
         auto line = contentArea;
         line.setWidth(kLeftLineWidth_ * uiScale_);
-        line.setHeight(lineHeight);
-        line.translate(0.0f, verticalOffset);
-        
+        line.setHeight(lineThickness);
+        line.setY(contentArea.getCentreY() - lineThickness * 0.5f);
+
         g.fillRect(line);
     }
 
-    void SectionHeader::drawRightLine(juce::Graphics& g, const juce::Rectangle<float>& contentArea)
+    void SectionHeader::drawRightLine(juce::Graphics& g, const juce::Rectangle<float>& contentArea, float lineThickness)
     {
         const float leftLineWidth = kLeftLineWidth_ * uiScale_;
         const float textSpacing = kTextSpacing_ * uiScale_;
-        const float lineHeight = std::max(1.0f, kLineHeight_ * uiScale_);
         const auto lineStartX = leftLineWidth + textSpacing + cachedTextWidth_ + textSpacing;
         const auto remainingWidth = contentArea.getWidth() - lineStartX;
 
         if (remainingWidth > 0.0f)
         {
-            const auto verticalOffset = (contentArea.getHeight() - lineHeight) * 0.5f;
-            
             auto line = contentArea;
             line.removeFromLeft(lineStartX);
-            line.setHeight(lineHeight);
-            line.translate(0.0f, verticalOffset);
-            
+            line.setHeight(lineThickness);
+            line.setY(contentArea.getCentreY() - lineThickness * 0.5f);
+
             g.fillRect(line);
         }
     }
