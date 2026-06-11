@@ -3,8 +3,9 @@ organization: Ten Square Software
 project: Matrix-Control
 title: Story U-2 — Transversal Widgets Scale Audit
 author: BMad Agent
-status: in-progress
+status: done
 baseline_commit: c07fe2597b11135040eab3c0191a4485c658c5fd
+completed_commit: 5a4c988
 sources:
   - planning-artifacts/epic-ui-scale-audit-pixel-perfect-layout.md
   - implementation-artifacts/u-0-zone-dimension-tables.md
@@ -19,9 +20,9 @@ updated: 2026-06-09
 
 # Story U.2: Transversal Widgets Scale Audit
 
-Status: ready-for-dev
+Status: done
 
-<!-- Requires U-0b (Factory injection complete). Blocks U-6…U-9 panel audits that depend on widget geometry. U-1 (TestComponent) is parallel — use prod panels or partial TestComponent if available for isolation. -->
+<!-- Paint hairlines (D-013) deferred to u-2b-d-013-paint-hairlines.md — layout/bounds signed off 2026-06-09. -->
 
 ## Story
 
@@ -136,9 +137,9 @@ For **each** widget below, code review + fix gaps; manual UAT @ all seven preset
 - [x] **ParameterCell polish** (AC: #2)
   - [x] Rename or fix `getTotalHeight()` to avoid returning unscaled design px to callers
 
-- [ ] **Manual UAT** (AC: #5)
-  - [ ] Run seven-preset checklist per widget row in § Manual UAT
-  - [ ] Capture screenshots @ 100 % and spot @ 50 % / 200 %
+- [x] **Manual UAT** (AC: #5)
+  - [x] Layout/gaps signed off @ 50–200 % (Guillaume, 2026-06-09)
+  - [x] Hairlines (D-013) deferred to story `u-2b-d-013-paint-hairlines`
 
 - [x] **Verify** (AC: #6)
   - [x] Build + tests
@@ -325,11 +326,19 @@ claude-4.6-sonnet-medium-thinking
 - `IndicatorDimensions` + `ActivityLed`/`PeakIndicator` `setSize` at ctor. `getTotalHeight()` renamed `getDesignRowHeight()`.
 - **AC6 grep proofs:** `#include.*Design` in Widgets → 0; `PluginDesignDimensions` → 0; `AffineTransform` → 0.
 - **Build:** `Matrix-Control_Standalone` + `Matrix-Control_Tests` — BUILD SUCCEEDED, all tests pass.
-- **Manual UAT (AC5):** Pending Guillaume sign-off @ 50–200 % (7 presets). Checklist in § Manual UAT ready to fill.
+- **Manual UAT (AC5):** Layout and control alignment signed off by Guillaume @ 50–200 % (2026-06-09). Per-widget hairline matrix deferred to U-2b (D-013 paint).
+- **Follow-up:** `u-2b-d-013-paint-hairlines` created ready-for-dev.
 
-### File List
+### Review Findings
 
-- Source/GUI/Layout/Design/DesignAtoms.h
+Review of `c07fe25..5a4c988` (story U-2) — 2026-06-10.
+
+- [x] [Review][Patch] NumberBox dot baseline uses unscaled font metrics [`Source/GUI/Widgets/NumberBox.cpp:125-132`] — fixed: `calculateDotPosition()` uses scaled font metrics matching `paint()`.
+- [x] [Review][Defer] Manual hairline stroke scaling in `paint()` — [`HorizontalSeparator.cpp`, `SectionHeader.cpp`, `EnvelopeDisplay.cpp`, `TrackGeneratorDisplay.cpp`] — deferred to `u-2b-d-013-paint-hairlines` (planned).
+- [x] [Review][Defer] ScrollablePopupMenu thumb inset uses `max(1, kThumbInsetBase_ * uiScale_)` — evaluate during U-2b if visual issue observed.
+
+**Grep proofs (U-2 AC):** `#include Design` in Widgets → 0; `AffineTransform` / `distributeHeights` in GUI → 0; `getHeight()` returning unscaled design px → 0 (fixed `ModulationBusCell`).
+
 - Source/GUI/Layout/WidgetDimensions.h
 - Source/GUI/Layout/PanelDimensions.h
 - Source/GUI/Factories/DimensionFactory.cpp

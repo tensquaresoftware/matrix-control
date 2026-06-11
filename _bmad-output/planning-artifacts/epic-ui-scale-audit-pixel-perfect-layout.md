@@ -276,7 +276,27 @@ So that controls look crisp and aligned inside any panel (D-013, UX-DR8).
 
 **Brownfield files (minimum):** `Button`, `Slider`, `ComboBox`, `NumberBox`, `Toggle`, `Label`, `GroupLabel`, `ParameterCell`, `ModuleHeader`, `ModulationBusCell`, `ModulationBusHeader`, `SectionHeader`, separators, `ActivityLed`, `PeakIndicator`, `PatchNameDisplay`, `EnvelopeDisplay`, `TrackGeneratorDisplay`.
 
-**Out of scope:** panel-level placement (U-6…U-9).
+**Out of scope:** panel-level placement (U-6…U-9). Paint hairlines (D-013) follow-up: **Story U-2b**.
+
+---
+
+## Story U-2b: D-013 Paint Hairlines Compliance
+
+As a performer,
+I want every hairline and decorative stroke in custom widgets to stay crisp and centred at all UI scale presets,
+So that separators and header rules match D-013 (1 physical px @ 50–150 %, 2 px @ 200 % on Retina).
+
+**Acceptance Criteria:**
+
+**Given** Story U-2 layout/bounds scaling complete
+**When** each widget `paint()` path using 1 px design strokes is reviewed
+**Then** hairlines use `ScaledDrawing::snappedStrokeThicknessFromDesign` (not manual `* uiScale_`)
+**And** HorizontalSeparator and SectionHeader migrated; display curve strokes aligned
+**And** manual UAT hairline checklist passes @ 50–200 %
+
+**Brownfield priority:** `HorizontalSeparator`, `SectionHeader`, `EnvelopeDisplay`, `TrackGeneratorDisplay`.
+
+**Out of scope:** panel placement (U-5…U-9).
 
 ---
 

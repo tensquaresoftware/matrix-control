@@ -124,8 +124,9 @@ namespace TSS
 
     juce::Point<float> NumberBox::calculateDotPosition(const juce::Rectangle<float>& bounds, float textWidth) const
     {
+        const auto scaledFont = look_.font.withHeight(look_.font.getHeight() * uiScale_);
         const float textRight = bounds.getCentreX() + textWidth * 0.5f;
-        const float baselineY = bounds.getCentreY() + look_.font.getHeight() * 0.5f - look_.font.getDescent();
+        const float baselineY = bounds.getCentreY() + scaledFont.getHeight() * 0.5f - scaledFont.getDescent();
 
         const float dotXOffset = kDotXOffset_ * uiScale_;
         const float dotRadius = kDotRadius_ * uiScale_;
