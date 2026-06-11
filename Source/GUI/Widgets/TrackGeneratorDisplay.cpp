@@ -220,21 +220,19 @@ namespace TSS
             }
         }
         
-        const auto hollowPointFillColour = look_.curve.withAlpha(0.4f);
-        const float pointRadius = static_cast<float>(dimensions_.curvePointRadius) * uiScale_;
+        const float pointHalfSize = static_cast<float>(dimensions_.curvePointRadius) * uiScale_;
+        const float pointSize = pointHalfSize * 2.0f;
+
+        g.setColour(look_.curve);
 
         for (int i = 0; i < kCurvePointCount_; ++i)
         {
             const auto p = calculatePointPosition(i, centerBounds);
-            
-            g.setColour(hollowPointFillColour);
-            g.fillEllipse(p.x - pointRadius, p.y - pointRadius,
-                         pointRadius * 2.0f, pointRadius * 2.0f);
-            
-            g.setColour(look_.curve);
-            g.drawEllipse(p.x - pointRadius, p.y - pointRadius,
-                         pointRadius * 2.0f, pointRadius * 2.0f,
-                         lineThickness);
+
+            g.fillRect(p.x - pointHalfSize,
+                       p.y - pointHalfSize,
+                       pointSize,
+                       pointSize);
         }
     }
     

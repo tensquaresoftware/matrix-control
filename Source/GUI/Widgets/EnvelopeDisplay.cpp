@@ -219,29 +219,17 @@ namespace TSS
                       lineThickness);
         }
         
-        const auto hollowPointFillColour = look_.envelope.withAlpha(0.4f);
-        const float pointRadius = static_cast<float>(dimensions_.curvePointRadius) * uiScale_;
+        const float pointHalfSize = static_cast<float>(dimensions_.curvePointRadius) * uiScale_;
+        const float pointSize = pointHalfSize * 2.0f;
+
+        g.setColour(look_.envelope);
 
         for (int i = 0; i < kCurvePointCount_; ++i)
         {
-            const auto circleX = envelopePoints.points[i].x - pointRadius;
-            const auto circleY = envelopePoints.points[i].y - pointRadius;
-            const auto circleDiameter = pointRadius * 2.0f;
-            
-            if (i == 1 || i == 2 || i == 3 || i == 5)
-            {
-                g.setColour(hollowPointFillColour);
-                g.fillEllipse(circleX, circleY, circleDiameter, circleDiameter);
-                
-                g.setColour(look_.envelope);
-                g.drawEllipse(circleX, circleY, circleDiameter, circleDiameter, lineThickness);
-            }
-            else
-            {
-                g.setColour(look_.envelope);
-                g.fillEllipse(circleX, circleY, circleDiameter, circleDiameter);
-                g.drawEllipse(circleX, circleY, circleDiameter, circleDiameter, lineThickness);
-            }
+            g.fillRect(envelopePoints.points[i].x - pointHalfSize,
+                       envelopePoints.points[i].y - pointHalfSize,
+                       pointSize,
+                       pointSize);
         }
     }
     
