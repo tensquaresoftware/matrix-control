@@ -1,5 +1,5 @@
 # generated: 2026-05-29
-# last_updated: 2026-06-10 (U-1 story ready-for-dev; U-2 done; U-2b ready-for-dev)
+# last_updated: 2026-06-11 (U-2b implementation complete — review, pending manual UAT)
 # project: Matrix-Control
 # project_key: NOKEY
 # tracking_system: file-system
@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-05-29
-last_updated: 2026-06-10 (U-1 story ready-for-dev; U-2 done; U-2b ready-for-dev)
+last_updated: 2026-06-11 (U-2b implementation complete — review, pending manual UAT)
 project: Matrix-Control
 project_key: NOKEY
 tracking_system: file-system
@@ -144,7 +144,7 @@ development_status:
   u-0b-factory-dimension-registry-and-descriptor-decoupling: done
   u-1-testcomponent-enrichment-d-064: review
   u-2-transversal-widgets-scale-audit: done
-  u-2b-d-013-paint-hairlines: ready-for-dev
+  u-2b-d-013-paint-hairlines: review
   u-3-header-right-cluster-layout-and-sign-off: backlog
   u-4-footer-panel-layout-audit: backlog
   u-5-body-shell-padding-separators-and-column-gaps: backlog

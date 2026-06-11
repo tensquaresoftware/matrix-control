@@ -3,7 +3,7 @@ organization: Ten Square Software
 project: Matrix-Control
 title: Story U-2b — D-013 Paint Hairlines Compliance
 author: BMad Agent
-status: ready-for-dev
+status: review
 baseline_commit: 5a4c9887
 parent_story: u-2-transversal-widgets-scale-audit
 sources:
@@ -18,7 +18,7 @@ updated: 2026-06-10
 
 # Story U.2b: D-013 Paint Hairlines Compliance
 
-Status: ready-for-dev
+Status: review
 
 <!-- Follow-up to U-2. Layout/bounds scaling is signed off (Guillaume, 2026-06-09). This story covers paint()-time stroke/hairline policy only. -->
 
@@ -80,37 +80,37 @@ Fill hairline row @ 50, 75, 100, 125, 150, 175, 200 %:
 
 ### AC 6 — Verify
 
-- [ ] `cmake --build Builds/macOS` — BUILD SUCCEEDED
-- [ ] Unit tests pass (`Matrix-Control_Tests`)
-- [ ] Grep proofs in Completion Notes
+- [x] `cmake --build Builds/macOS` — BUILD SUCCEEDED
+- [x] Unit tests pass (`Matrix-Control_Tests`) — 1 pre-existing MIDI activity failure unrelated to GUI
+- [x] Grep proofs in Completion Notes
 
 ## Tasks / Subtasks
 
 - [x] **NumberBox dot baseline** (from U-2 code review) — `calculateDotPosition()` uses scaled font metrics
 
-- [ ] **Inventory** (AC: #1)
-  - [ ] Run grep commands from AC 1; list any remaining manual stroke scaling in `paint()`
-  - [ ] Record results in Completion Notes
+- [x] **Inventory** (AC: #1)
+  - [x] Run grep commands from AC 1; list any remaining manual stroke scaling in `paint()`
+  - [x] Record results in Completion Notes
 
-- [ ] **HorizontalSeparator** (AC: #2, #3)
-  - [ ] Migrate `paint()` to ScaledDrawing + centred `fillRect`
-  - [ ] Keep `kLineThickness_ = 1` design constant
+- [x] **HorizontalSeparator** (AC: #2, #3)
+  - [x] Migrate `paint()` to ScaledDrawing + centred `fillRect`
+  - [x] Keep `kLineThickness_ = 1` design constant
 
-- [ ] **SectionHeader** (AC: #2, #3)
-  - [ ] Replace manual line height scaling with ScaledDrawing
-  - [ ] Preserve left/right line geometry relative to cached text width
+- [x] **SectionHeader** (AC: #2, #3)
+  - [x] Replace manual line height scaling with ScaledDrawing
+  - [x] Preserve left/right line geometry relative to cached text width
 
-- [ ] **Display curve strokes** (AC: #2)
-  - [ ] EnvelopeDisplay + TrackGeneratorDisplay: ScaledDrawing for `curveLineThickness`
-  - [ ] Do not change hit-zone math in this story
+- [x] **Display curve strokes** (AC: #2)
+  - [x] EnvelopeDisplay + TrackGeneratorDisplay: ScaledDrawing for `curveLineThickness`
+  - [x] Do not change hit-zone math in this story
 
-- [ ] **Popup border inset** (AC: #2) — only if grep shows inconsistency
-  - [ ] ScrollablePopupMenu: align inset with ScaledDrawing policy
+- [x] **Popup border inset** (AC: #2) — only if grep shows inconsistency
+  - [x] ScrollablePopupMenu: align inset with ScaledDrawing policy
 
 - [ ] **Manual UAT** (AC: #5)
   - [ ] Guillaume sign-off @ 7 presets (focus 50 / 150 / 200 %)
 
-- [ ] **Verify** (AC: #6)
+- [x] **Verify** (AC: #6)
 
 ## Dev Notes
 
@@ -176,15 +176,31 @@ Review U-2 implementation before coding: commit `5a4c988` (*Adopt fixed design-p
 
 ### Agent Model Used
 
-(pending)
+Claude (Cursor Agent)
 
 ### Completion Notes List
 
-(pending)
+**AC1 grep proofs (2026-06-11):**
+- `grep 'std::max(1.0f.*uiScale_' Source/GUI/Widgets/` → **0 hits** (was 5: HorizontalSeparator, SectionHeader×2, EnvelopeDisplay, TrackGeneratorDisplay, ScrollablePopupMenu thumb)
+- `grep 'snappedStrokeThicknessFromDesign' Source/GUI/Widgets/HorizontalSeparator.cpp` → **1 hit** (line 35)
+
+**Migrations:**
+- `HorizontalSeparator`: `drawLine` → centred `fillRect` + `snappedStrokeThicknessFromDesign` (`kRound`)
+- `SectionHeader`: shared `lineThickness` in `drawLines`, centred via `setY(centreY - thickness/2)` (JUCE `Rectangle<float>` has no `setCentreY`)
+- `EnvelopeDisplay` / `TrackGeneratorDisplay`: curve stroke via `snappedStrokeThicknessFromDesign` (`kRound`); `drawLine` retained for polyline
+- `ScrollablePopupMenu`: border inset in `resized()` + `show()` aligned with `paint()`; thumb inset via `logicalInsetPixelsFromDesign`
+
+**Build:** `cmake --build Builds/macOS` — BUILD SUCCEEDED
+**Tests:** 1 pre-existing failure in MIDI activity recording (unrelated to this story)
 
 ### File List
 
-(pending)
+- Source/GUI/Widgets/HorizontalSeparator.cpp
+- Source/GUI/Widgets/SectionHeader.cpp
+- Source/GUI/Widgets/SectionHeader.h
+- Source/GUI/Widgets/EnvelopeDisplay.cpp
+- Source/GUI/Widgets/TrackGeneratorDisplay.cpp
+- Source/GUI/Widgets/ScrollablePopupMenu.cpp
 
 ### Review Findings
 
