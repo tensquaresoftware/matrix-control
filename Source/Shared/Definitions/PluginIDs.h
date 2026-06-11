@@ -13,8 +13,16 @@ namespace PluginIDs
     namespace Settings
     {
         constexpr const char* kGuiScale = "settingsGuiScale";
+        constexpr const char* kSkinVariant = "settingsSkinVariant";
         constexpr const char* kHardwareLatencyMs = "settingsHardwareLatencyMs";
         constexpr const char* kTestWidget = "settingsTestWidget";
+
+        namespace SkinVariants
+        {
+            constexpr int kBlack = 1;
+            constexpr int kCream = 2;
+            constexpr int kDefault = kBlack;
+        }
 
         namespace ScaleLevels
         {

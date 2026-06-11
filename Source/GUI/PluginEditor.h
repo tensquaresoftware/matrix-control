@@ -44,8 +44,8 @@ private:
     void restoreHeaderPanelFromState(HeaderPanel& headerPanel);
     void updateSettingsWindowLayout(float uiScale);
 
-    void applySkinFromItemId(int skinItemId);
-    void applyUiScaleFromItemId(int scaleId);
+    void applySkinFromItemId(int skinItemId, bool persistToState = true);
+    void applyUiScaleFromItemId(int scaleId, bool persistToState = true);
 
     PluginProcessor& pluginProcessor;
 

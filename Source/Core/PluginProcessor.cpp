@@ -336,6 +336,7 @@ void PluginProcessor::setStateInformation(const void* data, int sizeInBytes)
             apvts.replaceState(juce::ValueTree::fromXml(*xmlState));
             syncAudioRuntimeFromState();
             syncHardwareLatencyFromState();
+            syncMidiPortsFromState();
 
             if (shouldUseDevelopmentLogging())
                 ApvtsLogger::getInstance().logStateLoaded("DAW state");
@@ -350,6 +351,7 @@ void PluginProcessor::setMidiInputPort(const juce::String& deviceId)
         if (midiManager->setMidiInputPort(deviceId))
         {
             apvts.state.setProperty("midiInputPortId", deviceId, nullptr);
+            notifyNonParameterStateChanged();
         }
     }
 }
@@ -361,6 +363,7 @@ void PluginProcessor::setMidiOutputPort(const juce::String& deviceId)
         if (midiManager->setMidiOutputPort(deviceId))
         {
             apvts.state.setProperty("midiOutputPortId", deviceId, nullptr);
+            notifyNonParameterStateChanged();
         }
     }
 }
@@ -498,12 +501,44 @@ void PluginProcessor::setHardwareLatencyMs(float latencyMs)
     const float quantizedMs = Core::HardwareLatency::quantizeMs(latencyMs);
     apvts.state.setProperty(PluginIDs::Settings::kHardwareLatencyMs, quantizedMs, nullptr);
     applyHardwareLatencyToHost();
+    notifyNonParameterStateChanged();
 }
 
 float PluginProcessor::getHardwareLatencyMs() const
 {
     const auto property = apvts.state.getProperty(PluginIDs::Settings::kHardwareLatencyMs, 0.0f);
     return Core::HardwareLatency::quantizeMs(static_cast<float>(property));
+}
+
+int PluginProcessor::getGuiScaleId() const
+{
+    return static_cast<int>(apvts.state.getProperty(
+        PluginIDs::Settings::kGuiScale,
+        PluginIDs::Settings::ScaleLevels::kDefault));
+}
+
+void PluginProcessor::setGuiScaleId(int scaleId)
+{
+    apvts.state.setProperty(PluginIDs::Settings::kGuiScale, scaleId, nullptr);
+    notifyNonParameterStateChanged();
+}
+
+int PluginProcessor::getSkinVariantId() const
+{
+    return static_cast<int>(apvts.state.getProperty(
+        PluginIDs::Settings::kSkinVariant,
+        PluginIDs::Settings::SkinVariants::kDefault));
+}
+
+void PluginProcessor::setSkinVariantId(int skinVariantId)
+{
+    apvts.state.setProperty(PluginIDs::Settings::kSkinVariant, skinVariantId, nullptr);
+    notifyNonParameterStateChanged();
+}
+
+void PluginProcessor::notifyNonParameterStateChanged()
+{
+    updateHostDisplay(juce::AudioProcessorListener::ChangeDetails().withNonParameterStateChanged(true));
 }
 
 void PluginProcessor::initializeHardwareLatencyProperty()
@@ -523,6 +558,18 @@ void PluginProcessor::syncHardwareLatencyFromState()
         apvts.state.setProperty(PluginIDs::Settings::kHardwareLatencyMs, quantizedMs, nullptr);
 
     applyHardwareLatencyToHost();
+}
+
+void PluginProcessor::syncMidiPortsFromState()
+{
+    if (midiManager == nullptr)
+        return;
+
+    const auto inputPortId = apvts.state.getProperty("midiInputPortId", juce::String()).toString();
+    midiManager->setMidiInputPort(inputPortId);
+
+    const auto outputPortId = apvts.state.getProperty("midiOutputPortId", juce::String()).toString();
+    midiManager->setMidiOutputPort(outputPortId);
 }
 
 void PluginProcessor::applyHardwareLatencyToHost()
@@ -640,6 +687,13 @@ void PluginProcessor::initializeMidiPortProperties()
     {
         apvts.state.setProperty(PluginIDs::Settings::kGuiScale,
                                 PluginIDs::Settings::ScaleLevels::kDefault,
+                                nullptr);
+    }
+
+    if (!apvts.state.hasProperty(PluginIDs::Settings::kSkinVariant))
+    {
+        apvts.state.setProperty(PluginIDs::Settings::kSkinVariant,
+                                PluginIDs::Settings::SkinVariants::kDefault,
                                 nullptr);
     }
 }

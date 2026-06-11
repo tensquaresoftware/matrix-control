@@ -91,6 +91,12 @@ public:
     void setInputGainDb(float gainDb);
     void setHardwareLatencyMs(float latencyMs);
     float getHardwareLatencyMs() const;
+    int getGuiScaleId() const;
+    void setGuiScaleId(int scaleId);
+    int getSkinVariantId() const;
+    void setSkinVariantId(int skinVariantId);
+    void syncHardwareLatencyFromState();
+    void syncMidiPortsFromState();
     void setAudioFromChannelMode(int mode);
     void setAudioFromSourceId(const juce::String& sourceId);
     void syncAudioPassthroughFromSourceId(const juce::String& sourceId);
@@ -126,8 +132,8 @@ private:
     void initializeMidiPortProperties();
     void initializeAudioProperties();
     void initializeHardwareLatencyProperty();
-    void syncHardwareLatencyFromState();
     void applyHardwareLatencyToHost();
+    void notifyNonParameterStateChanged();
     void initializePatchNameProperty();
     bool getInstrumentPathEnabled(const juce::MidiBuffer& midiMessages) const;
     void ensureAudioInputBusEnabled();
