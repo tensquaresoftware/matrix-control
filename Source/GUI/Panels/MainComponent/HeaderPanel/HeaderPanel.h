@@ -3,7 +3,7 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <vector>
 
-#include "GUI/Widgets/ActivityLed.h"
+#include "GUI/Widgets/Led.h"
 #include "GUI/Widgets/Button.h"
 #include "GUI/Widgets/ComboBox.h"
 #include "GUI/Widgets/Label.h"
@@ -45,9 +45,9 @@ public:
     TSS::ComboBox& getKeyboardFromComboBox() { return keyboardFromComboBox_; }
     TSS::Button& getSettingsButton() { return settingsButton_; }
     TSS::Button& getUiElementsButton() { return uiElementsButton_; }
-    TSS::ActivityLed& getInstrumentActivityLed() { return instrumentActivityLed_; }
-    TSS::ActivityLed& getEditorActivityLed() { return editorActivityLed_; }
-    TSS::ActivityLed& getMidiToActivityLed() { return midiToActivityLed_; }
+    TSS::Led& getInstrumentActivityLed() { return instrumentActivityLed_; }
+    TSS::Led& getEditorActivityLed() { return editorActivityLed_; }
+    TSS::Led& getMidiToActivityLed() { return midiToActivityLed_; }
 
     static int getGap() { return kGap_; }
 
@@ -67,7 +67,7 @@ private:
     inline constexpr static int kMidiToLabelWidth_ = 40;
     inline constexpr static int kKeyboardFromLabelWidth_ = 82;
     inline constexpr static int kPortComboBoxWidth_ = 96;
-    inline constexpr static int kActivityLedSize_ = 12;
+    inline constexpr static int kLedSize_ = 12;
     inline constexpr static int kGap_ = 4;
     inline constexpr static int kPacketExternalGap_ = kGap_ * 4;
     inline constexpr static int kControlHeight_ = 20;
@@ -82,13 +82,13 @@ private:
 
     TSS::Label midiFromLabel_;
     TSS::ComboBox midiFromComboBox_;
-    TSS::ActivityLed editorActivityLed_;
+    TSS::Led editorActivityLed_;
     TSS::Label midiToLabel_;
     TSS::ComboBox midiToComboBox_;
-    TSS::ActivityLed midiToActivityLed_;
+    TSS::Led midiToActivityLed_;
     TSS::Label keyboardFromLabel_;
     TSS::ComboBox keyboardFromComboBox_;
-    TSS::ActivityLed instrumentActivityLed_;
+    TSS::Led instrumentActivityLed_;
     TSS::Button settingsButton_;
     TSS::Button uiElementsButton_;
 

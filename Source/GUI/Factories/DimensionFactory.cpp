@@ -421,7 +421,7 @@ GuiLayoutDimensions DimensionFactory::buildGuiLayoutDimensions()
         .masterEditModuleHeader = masterEditModuleHeader,
         .popupMenu = buildPopupMenuLayoutDimensions(),
         .activityLed = {
-            .size = Atoms::Widths::Indicator::kActivityLedSize,
+            .size = Atoms::Widths::Indicator::kLedSize,
             .borderThicknessDesign = 2.0f,
         },
     };

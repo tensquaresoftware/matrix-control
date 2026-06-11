@@ -172,7 +172,7 @@ namespace TSS::Design
 
             namespace Indicator
             {
-                inline constexpr int kActivityLedSize = 12;
+                inline constexpr int kLedSize = 12;
             }
         }
     }

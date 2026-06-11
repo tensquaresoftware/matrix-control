@@ -11,6 +11,7 @@ namespace TSS
 }
 
 class TestActivityLeds : public juce::Component
+    , private juce::Timer
 {
 public:
     explicit TestActivityLeds(TSS::ISkin& skin, int ledSize);
@@ -18,6 +19,7 @@ public:
 
     void setSkin(TSS::ISkin& skin);
     void resized() override;
+    void visibilityChanged() override;
     int getPreferredWidth() const;
     int getPreferredHeight() const;
 
@@ -26,10 +28,14 @@ private:
 
     TSS::ISkin* skin_ = nullptr;
     int ledSize_ = 0;
+    int msUntilNextPulse_ = 0;
     std::vector<std::unique_ptr<ActivityLedScalePanel>> columnPanels_;
 
     void rebuildPanels();
     void layoutColumnPanels();
+    void pulseAllLeds();
+    void tickAllLedsDecay();
+    void timerCallback() override;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TestActivityLeds)
 };

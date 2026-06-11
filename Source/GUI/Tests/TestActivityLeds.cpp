@@ -2,7 +2,7 @@
 
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Tests/TestScaleColumns.h"
-#include "GUI/Widgets/ActivityLed.h"
+#include "GUI/Widgets/Led.h"
 #include "GUI/Widgets/Label.h"
 #include "GUI/Looks/LookBuilders.h"
 
@@ -64,10 +64,22 @@ public:
         ledOn_->setSkin(skin);
     }
 
-private:
-    std::unique_ptr<TSS::ActivityLed> createLed(TSS::ISkin& skin, float level)
+    void pulseLeds()
     {
-        auto led = std::make_unique<TSS::ActivityLed>(ledSize_, ledSize_);
+        ledOff_->setLevel(1.0f);
+        ledOn_->setLevel(1.0f);
+    }
+
+    void tickLedDecay()
+    {
+        ledOff_->setLevel(0.0f);
+        ledOn_->setLevel(0.0f);
+    }
+
+private:
+    std::unique_ptr<TSS::Led> createLed(TSS::ISkin& skin, float level)
+    {
+        auto led = std::make_unique<TSS::Led>(ledSize_, ledSize_);
         led->setSkin(skin);
         led->setUiScale(scale_);
         led->setLevel(level);
@@ -78,17 +90,28 @@ private:
     float scale_ { 1.0f };
     int ledSize_ = 0;
     std::unique_ptr<TSS::Label> scaleLabel_;
-    std::unique_ptr<TSS::ActivityLed> ledOff_;
-    std::unique_ptr<TSS::ActivityLed> ledOn_;
+    std::unique_ptr<TSS::Led> ledOff_;
+    std::unique_ptr<TSS::Led> ledOn_;
 };
+
+namespace
+{
+    constexpr int kAnimationTimerHz_ = 30;
+    constexpr int kPulseIntervalMs_ = 1000;
+    constexpr int kTimerIntervalMs_ = 1000 / kAnimationTimerHz_;
+}
 
 TestActivityLeds::TestActivityLeds(TSS::ISkin& skin, int ledSize)
     : ledSize_(ledSize)
+    , msUntilNextPulse_(kPulseIntervalMs_)
 {
     setSkin(skin);
 }
 
-TestActivityLeds::~TestActivityLeds() = default;
+TestActivityLeds::~TestActivityLeds()
+{
+    stopTimer();
+}
 
 void TestActivityLeds::setSkin(TSS::ISkin& skin)
 {
@@ -99,6 +122,14 @@ void TestActivityLeds::setSkin(TSS::ISkin& skin)
 void TestActivityLeds::resized()
 {
     layoutColumnPanels();
+}
+
+void TestActivityLeds::visibilityChanged()
+{
+    if (isVisible())
+        startTimerHz(kAnimationTimerHz_);
+    else
+        stopTimer();
 }
 
 int TestActivityLeds::getPreferredWidth() const
@@ -154,4 +185,30 @@ void TestActivityLeds::layoutColumnPanels()
         panel->setBounds(nextColumnX, 0, columnWidth, panel->getPreferredHeight());
         nextColumnX += columnWidth + panelGap;
     }
+}
+
+void TestActivityLeds::pulseAllLeds()
+{
+    for (auto& panel : columnPanels_)
+        panel->pulseLeds();
+}
+
+void TestActivityLeds::tickAllLedsDecay()
+{
+    for (auto& panel : columnPanels_)
+        panel->tickLedDecay();
+}
+
+void TestActivityLeds::timerCallback()
+{
+    msUntilNextPulse_ -= kTimerIntervalMs_;
+
+    if (msUntilNextPulse_ <= 0)
+    {
+        msUntilNextPulse_ = kPulseIntervalMs_;
+        pulseAllLeds();
+        return;
+    }
+
+    tickAllLedsDecay();
 }

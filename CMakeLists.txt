@@ -230,7 +230,7 @@ set(PLUGIN_SOURCES
     Source/GUI/Widgets/MultiColumnPopupMenu.cpp
     Source/GUI/Widgets/NumberBox.cpp
     Source/GUI/Widgets/ParameterCell.cpp
-    Source/GUI/Widgets/ActivityLed.cpp
+    Source/GUI/Widgets/Led.cpp
     Source/GUI/Widgets/PeakIndicator.cpp
     Source/GUI/Widgets/PatchNameDisplay.cpp
     Source/GUI/Widgets/PopupMenuBase.cpp

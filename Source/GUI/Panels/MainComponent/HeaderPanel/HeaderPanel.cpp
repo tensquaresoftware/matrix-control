@@ -47,13 +47,13 @@ HeaderPanel::HeaderPanel(TSS::ISkin& skin, int width, int height)
     , skin_(&skin)
     , midiFromLabel_(kEditorMidiFromLabelWidth_, kControlHeight_, TSS::headerPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kEditorMidiFromLabel, TSS::LabelStyle::HeaderPanel)
     , midiFromComboBox_(kPortComboBoxWidth_, kControlHeight_, TSS::comboBoxLookFromSkin(skin), TSS::ComboBox::Style::ButtonLike)
-    , editorActivityLed_(kActivityLedSize_, kActivityLedSize_)
+    , editorActivityLed_(kLedSize_, kLedSize_)
     , midiToLabel_(kMidiToLabelWidth_, kControlHeight_, TSS::headerPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kMidiToLabel, TSS::LabelStyle::HeaderPanel)
     , midiToComboBox_(kPortComboBoxWidth_, kControlHeight_, TSS::comboBoxLookFromSkin(skin), TSS::ComboBox::Style::ButtonLike)
-    , midiToActivityLed_(kActivityLedSize_, kActivityLedSize_)
+    , midiToActivityLed_(kLedSize_, kLedSize_)
     , keyboardFromLabel_(kKeyboardFromLabelWidth_, kControlHeight_, TSS::headerPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kKeyboardFromLabel, TSS::LabelStyle::HeaderPanel)
     , keyboardFromComboBox_(kPortComboBoxWidth_, kControlHeight_, TSS::comboBoxLookFromSkin(skin), TSS::ComboBox::Style::ButtonLike)
-    , instrumentActivityLed_(kActivityLedSize_, kActivityLedSize_)
+    , instrumentActivityLed_(kLedSize_, kLedSize_)
     , settingsButton_(kSettingsButtonWidth_, kControlHeight_, TSS::buttonLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kSettingsButton)
     , uiElementsButton_(kUiElementsButtonWidth_, kControlHeight_, TSS::buttonLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kUiElementsButton)
 {
@@ -103,7 +103,7 @@ void HeaderPanel::resized()
     const float midiToLabelWidth = static_cast<float>(kMidiToLabelWidth_) * sf;
     const float keyboardFromLabelWidth = static_cast<float>(kKeyboardFromLabelWidth_) * sf;
     const float portComboWidth = static_cast<float>(kPortComboBoxWidth_) * sf;
-    const float activityLedSize = static_cast<float>(kActivityLedSize_) * sf;
+    const float ledSize = static_cast<float>(kLedSize_) * sf;
     const float settingsButtonWidth = static_cast<float>(kSettingsButtonWidth_) * sf;
     const float uiElementsButtonWidth = static_cast<float>(kUiElementsButtonWidth_) * sf;
     const float leftPadding = static_cast<float>(kLeftPadding_) * sf;
@@ -112,9 +112,9 @@ void HeaderPanel::resized()
     float x = static_cast<float>(bounds.getX()) + leftPadding;
     const int y = juce::roundToInt(static_cast<float>(bounds.getY()) + controlY);
     const int h = juce::roundToInt(controlHeight);
-    const int activityLedY = juce::roundToInt(static_cast<float>(bounds.getY()) + controlY
-                                              + (controlHeight - activityLedSize) * 0.5f);
-    const int activityLedH = juce::roundToInt(activityLedSize);
+    const int ledY = juce::roundToInt(static_cast<float>(bounds.getY()) + controlY
+                                      + (controlHeight - ledSize) * 0.5f);
+    const int ledH = juce::roundToInt(ledSize);
 
     auto placePacketLabel = [&](TSS::Label& label, float labelWidth)
     {
@@ -130,11 +130,11 @@ void HeaderPanel::resized()
         x += comboWidth + gap;
     };
 
-    auto placePacketActivityLed = [&](TSS::ActivityLed& led)
+    auto placePacketLed = [&](TSS::Led& led)
     {
-        led.setBounds(juce::roundToInt(x), activityLedY, juce::roundToInt(activityLedSize), activityLedH);
+        led.setBounds(juce::roundToInt(x), ledY, juce::roundToInt(ledSize), ledH);
         led.setUiScale(uiScale_);
-        x += activityLedSize + gap;
+        x += ledSize + gap;
     };
 
     auto endPacket = [&]()
@@ -142,17 +142,17 @@ void HeaderPanel::resized()
         x += packetExternalGap - gap;
     };
 
-    placePacketActivityLed(instrumentActivityLed_);
+    placePacketLed(instrumentActivityLed_);
     placePacketLabel(keyboardFromLabel_, keyboardFromLabelWidth);
     placePacketCombo(keyboardFromComboBox_, portComboWidth);
     endPacket();
 
-    placePacketActivityLed(editorActivityLed_);
+    placePacketLed(editorActivityLed_);
     placePacketLabel(midiFromLabel_, editorMidiFromLabelWidth);
     placePacketCombo(midiFromComboBox_, portComboWidth);
     endPacket();
 
-    placePacketActivityLed(midiToActivityLed_);
+    placePacketLed(midiToActivityLed_);
     placePacketLabel(midiToLabel_, midiToLabelWidth);
     placePacketCombo(midiToComboBox_, portComboWidth);
     endPacket();

@@ -73,6 +73,20 @@ public:
         levelHigh_->setSkin(skin);
     }
 
+    void triggerPeak()
+    {
+        levelLow_->setLevel(1.0f);
+        levelMid_->setLevel(1.0f);
+        levelHigh_->setLevel(1.0f);
+    }
+
+    void restoreDemoLevels()
+    {
+        levelLow_->setLevel(0.25f);
+        levelMid_->setLevel(0.5f);
+        levelHigh_->setLevel(1.0f);
+    }
+
 private:
     std::unique_ptr<TSS::PeakIndicator> createIndicator(TSS::ISkin& skin, float level)
     {
@@ -93,14 +107,26 @@ private:
     std::unique_ptr<TSS::PeakIndicator> levelHigh_;
 };
 
+namespace
+{
+    constexpr int kAnimationTimerHz_ = 30;
+    constexpr int kPulseIntervalMs_ = 1000;
+    constexpr int kPeakHoldMs_ = 150;
+    constexpr int kTimerIntervalMs_ = 1000 / kAnimationTimerHz_;
+}
+
 TestPeakIndicators::TestPeakIndicators(TSS::ISkin& skin, int indicatorWidth, int indicatorHeight)
     : indicatorWidth_(indicatorWidth)
     , indicatorHeight_(indicatorHeight)
+    , msUntilNextPulse_(kPulseIntervalMs_)
 {
     setSkin(skin);
 }
 
-TestPeakIndicators::~TestPeakIndicators() = default;
+TestPeakIndicators::~TestPeakIndicators()
+{
+    stopTimer();
+}
 
 void TestPeakIndicators::setSkin(TSS::ISkin& skin)
 {
@@ -111,6 +137,14 @@ void TestPeakIndicators::setSkin(TSS::ISkin& skin)
 void TestPeakIndicators::resized()
 {
     layoutColumnPanels();
+}
+
+void TestPeakIndicators::visibilityChanged()
+{
+    if (isVisible())
+        startTimerHz(kAnimationTimerHz_);
+    else
+        stopTimer();
 }
 
 int TestPeakIndicators::getPreferredWidth() const
@@ -166,5 +200,39 @@ void TestPeakIndicators::layoutColumnPanels()
         const int columnWidth = panel->getScaledColumnWidth();
         panel->setBounds(nextColumnX, 0, columnWidth, panel->getPreferredHeight());
         nextColumnX += columnWidth + panelGap;
+    }
+}
+
+void TestPeakIndicators::triggerPeakOnAllIndicators()
+{
+    for (auto& panel : columnPanels_)
+        panel->triggerPeak();
+}
+
+void TestPeakIndicators::restoreAllIndicatorLevels()
+{
+    for (auto& panel : columnPanels_)
+        panel->restoreDemoLevels();
+}
+
+void TestPeakIndicators::timerCallback()
+{
+    if (peakHoldRemainingMs_ > 0)
+    {
+        peakHoldRemainingMs_ -= kTimerIntervalMs_;
+
+        if (peakHoldRemainingMs_ <= 0)
+            restoreAllIndicatorLevels();
+
+        return;
+    }
+
+    msUntilNextPulse_ -= kTimerIntervalMs_;
+
+    if (msUntilNextPulse_ <= 0)
+    {
+        msUntilNextPulse_ = kPulseIntervalMs_;
+        triggerPeakOnAllIndicators();
+        peakHoldRemainingMs_ = kPeakHoldMs_;
     }
 }

@@ -293,7 +293,7 @@ void TestComponent::populateWidgetSelector()
     widgetSelector_.addItem("PatchNameDisplay", static_cast<int>(TestWidgetType::PatchNameDisplay));
     widgetSelector_.addItem("HorizontalSeparator", static_cast<int>(TestWidgetType::HorizontalSeparator));
     widgetSelector_.addItem("VerticalSeparator", static_cast<int>(TestWidgetType::VerticalSeparator));
-    widgetSelector_.addItem("ActivityLed", static_cast<int>(TestWidgetType::ActivityLed));
+    widgetSelector_.addItem("Led", static_cast<int>(TestWidgetType::ActivityLed));
     widgetSelector_.addItem("PeakIndicator", static_cast<int>(TestWidgetType::PeakIndicator));
     widgetSelector_.addItem("ParameterCell", static_cast<int>(TestWidgetType::ParameterCell));
     widgetSelector_.addItem("ModulationBusCell", static_cast<int>(TestWidgetType::ModulationBusCell));
