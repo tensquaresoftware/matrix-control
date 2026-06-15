@@ -30,22 +30,17 @@ namespace TSS
             ScaledDrawing::StrokeSnapPolicy::kFloor);
         const float maxBorder = juce::jmin(bounds.getWidth(), bounds.getHeight()) * 0.49f;
         const float safeBorder = juce::jmin(borderThickness, maxBorder);
-        const auto innerBounds = bounds.reduced(safeBorder).toNearestInt();
+        const auto innerBounds = bounds.reduced(safeBorder);
 
         g.setColour(buttonLook_.backgroundOff);
-        g.fillRect(innerBounds);
+        g.fillRect(bounds);
 
         const float clampedLevel = juce::jlimit(0.0f, 1.0f, displayedLevel_);
 
         if (clampedLevel > 0.0f)
         {
-            const int fillHeightPx = juce::jlimit(1,
-                                                  innerBounds.getHeight(),
-                                                  juce::roundToInt(static_cast<float>(innerBounds.getHeight()) * clampedLevel));
-            const auto fillBounds = juce::Rectangle<int>(innerBounds.getX(),
-                                                           innerBounds.getBottom() - fillHeightPx,
-                                                           innerBounds.getWidth(),
-                                                           fillHeightPx);
+            auto fillBounds = innerBounds;
+            fillBounds.removeFromTop(innerBounds.getHeight() * (1.0f - clampedLevel));
 
             g.setColour(sliderLook_.textEnabled);
             g.fillRect(fillBounds);
