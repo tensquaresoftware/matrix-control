@@ -16,6 +16,8 @@ namespace TSS
         , valueDecimalPlaces_(countDecimalPlacesForStep(step_))
         , unit_(config.unit)
         , minimumDisplayText_(config.minimumDisplayText)
+        , normalizedFill_(std::move(config.normalizedFill))
+        , formatValue_(std::move(config.formatValue))
     {
         setOpaque(false);
         setSize(width_, height_);
@@ -99,7 +101,17 @@ namespace TSS
             return {};
 
         const auto value = getValue();
-        auto normalizedValue = static_cast<float>((value - range.getStart()) / rangeLength);
+        float normalizedValue = 0.0f;
+
+        if (normalizedFill_)
+        {
+            normalizedValue = normalizedFill_(value);
+        }
+        else
+        {
+            normalizedValue = static_cast<float>((value - range.getStart()) / rangeLength);
+        }
+
         normalizedValue = juce::jlimit(0.0f, 1.0f, normalizedValue);
         const int widthFull = valueBarArea.getWidth();
         const int valueBarWidth = juce::jmax(0, juce::roundToInt(static_cast<float>(widthFull) * normalizedValue));
@@ -145,14 +157,18 @@ namespace TSS
     {
         juce::String valueText;
 
-        if (minimumDisplayText_.isNotEmpty() && juce::approximatelyEqual(getValue(), getMinimum()))
+        if (formatValue_)
+        {
+            valueText = formatValue_(getValue());
+        }
+        else if (minimumDisplayText_.isNotEmpty() && juce::approximatelyEqual(getValue(), getMinimum()))
             valueText = minimumDisplayText_;
         else if (valueDecimalPlaces_ > 0)
             valueText = juce::String(getValue(), valueDecimalPlaces_);
         else
             valueText = juce::String(static_cast<int>(std::round(getValue())));
 
-        if (unit_.isNotEmpty())
+        if (! formatValue_ && unit_.isNotEmpty())
             valueText += " " + unit_;
 
         g.setColour(enabled ? look_.textEnabled : look_.textDisabled);

@@ -10,6 +10,7 @@
 #include "GUI/Layout/Design/DesignPanels.h"
 #include "GUI/Layout/ScaledDrawing.h"
 #include "GUI/Looks/LookBuilders.h"
+#include "Shared/Definitions/PluginAudioConstants.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 
 using TSS::SkinColourId;
@@ -42,6 +43,22 @@ namespace
 
         return identifiers[index];
     }
+
+    float inputGainNormalizedFill(double value)
+    {
+        return PluginAudioConstants::inputGainIndexToNormalizedFill(static_cast<int>(std::round(value)));
+    }
+
+    juce::String inputGainFormatValue(double value)
+    {
+        const int index = static_cast<int>(std::round(value));
+
+        if (index <= PluginAudioConstants::kInputGainSilenceIndex)
+            return "-" + juce::String::charToString(static_cast<juce::juce_wchar>(0x221E)) + " dB";
+
+        const auto db = PluginAudioConstants::inputGainIndexToDb(index);
+        return juce::String(static_cast<int>(std::round(db))) + " dB";
+    }
 }
 
 HeaderPanel::HeaderPanel(TSS::ISkin& skin, int width, int height)
@@ -57,8 +74,20 @@ HeaderPanel::HeaderPanel(TSS::ISkin& skin, int width, int height)
     , keyboardFromLabel_(kKeyboardFromLabelWidth_, kControlHeight_, TSS::labelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kKeyboardFromLabel)
     , keyboardFromComboBox_(kPortComboBoxWidth_, kControlHeight_, TSS::comboBoxLookFromSkin(skin), TSS::ComboBox::Style::ButtonLike)
     , instrumentActivityLed_(kLedSize_, kLedSize_)
-    , settingsButton_(kSettingsButtonWidth_, kControlHeight_, TSS::buttonLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kSettingsButton)
-    , uiElementsButton_(kUiElementsButtonWidth_, kControlHeight_, TSS::buttonLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kUiElementsButton)
+    , audioFromLabel_(kAudioFromLabelWidth_, kControlHeight_, TSS::labelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kAudioFromLabel)
+    , audioFromComboBox_(kPortComboBoxWidth_, kControlHeight_, TSS::comboBoxLookFromSkin(skin), TSS::ComboBox::Style::ButtonLike)
+    , inputGainLabel_(kInputGainLabelWidth_, kControlHeight_, TSS::labelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kInputGainLabel)
+    , inputGainSlider_(kInputGainSliderWidth_, kControlHeight_, TSS::sliderLookFromSkin(skin),
+                       TSS::SliderConfig{
+                           static_cast<double>(PluginAudioConstants::kInputGainSilenceIndex),
+                           static_cast<double>(PluginAudioConstants::kInputGainMaxIndex),
+                           static_cast<double>(PluginAudioConstants::kInputGainDefaultIndex),
+                           1.0,
+                           {},
+                           {},
+                           inputGainNormalizedFill,
+                           inputGainFormatValue})
+    , peakIndicator_(kPeakIndicatorWidth_, kControlHeight_)
 {
     setOpaque(true);
 
@@ -88,9 +117,13 @@ HeaderPanel::HeaderPanel(TSS::ISkin& skin, int width, int height)
     instrumentActivityLed_.setSkin(skin);
     addAndMakeVisible(instrumentActivityLed_);
 
-    addAndMakeVisible(settingsButton_);
-    uiElementsButton_.setClickingTogglesState(true);
-    addAndMakeVisible(uiElementsButton_);
+    audioFromComboBox_.setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
+    addAndMakeVisible(audioFromLabel_);
+    addAndMakeVisible(audioFromComboBox_);
+    addAndMakeVisible(inputGainLabel_);
+    addAndMakeVisible(inputGainSlider_);
+    peakIndicator_.setSkin(skin);
+    addAndMakeVisible(peakIndicator_);
 
     populateMidiPortLists();
 }
@@ -118,19 +151,23 @@ void HeaderPanel::resized()
     const float gap = static_cast<float>(kGap_) * sf;
     const float packetExternalGap = static_cast<float>(kPacketExternalGap_) * sf;
     const float controlHeight = static_cast<float>(kControlHeight_) * sf;
-    const float scaledHeight = static_cast<float>(height_) * sf;
-    const float controlY = (scaledHeight - controlHeight) * 0.5f;
+    const int panelHeight = bounds.getHeight();
+    const int controlHeightPx = juce::roundToInt(controlHeight);
+    const int controlY = bounds.getY() + (panelHeight - controlHeightPx) / 2;
 
     const float editorMidiFromLabelWidth = static_cast<float>(kEditorMidiFromLabelWidth_) * sf;
     const float midiToLabelWidth = static_cast<float>(kMidiToLabelWidth_) * sf;
     const float keyboardFromLabelWidth = static_cast<float>(kKeyboardFromLabelWidth_) * sf;
+    const float audioFromLabelWidth = static_cast<float>(kAudioFromLabelWidth_) * sf;
+    const float inputGainLabelWidth = static_cast<float>(kInputGainLabelWidth_) * sf;
     const float portComboWidth = static_cast<float>(kPortComboBoxWidth_) * sf;
+    const float inputGainSliderWidth = static_cast<float>(kInputGainSliderWidth_) * sf;
+    const float peakIndicatorWidth = static_cast<float>(kPeakIndicatorWidth_) * sf;
     const float ledSize = static_cast<float>(kLedSize_) * sf;
-    const float settingsButtonWidth = static_cast<float>(kSettingsButtonWidth_) * sf;
-    const float uiElementsButtonWidth = static_cast<float>(kUiElementsButtonWidth_) * sf;
+    const int ledSizePx = juce::roundToInt(ledSize);
+    const int ledY = bounds.getY() + (panelHeight - ledSizePx) / 2;
     const float leftPadding = static_cast<float>(kLeftPadding_) * sf;
     const float logoGapAfter = static_cast<float>(TSS::Design::Panels::Header::kLogoGapAfter) * sf;
-    const float rightPadding = static_cast<float>(kRightPadding_) * sf;
 
     logo_.setUiScale(uiScale_);
     const int logoWidth = logo_.getPreferredWidth();
@@ -139,11 +176,9 @@ void HeaderPanel::resized()
     logo_.setBounds(logoX, bounds.getY(), logoWidth, logoHeight);
 
     float x = static_cast<float>(logoX + logoWidth) + logoGapAfter;
-    const int y = juce::roundToInt(static_cast<float>(bounds.getY()) + controlY);
-    const int h = juce::roundToInt(controlHeight);
-    const int ledY = juce::roundToInt(static_cast<float>(bounds.getY()) + controlY
-                                      + (controlHeight - ledSize) * 0.5f);
-    const int ledH = juce::roundToInt(ledSize);
+    const int y = controlY;
+    const int h = controlHeightPx;
+    const int ledH = ledSizePx;
 
     auto placePacketLabel = [&](TSS::Label& label, float labelWidth)
     {
@@ -164,6 +199,20 @@ void HeaderPanel::resized()
         led.setBounds(juce::roundToInt(x), ledY, juce::roundToInt(ledSize), ledH);
         led.setUiScale(uiScale_);
         x += ledSize + gap;
+    };
+
+    auto placePacketSlider = [&](TSS::Slider& slider, float sliderWidth)
+    {
+        slider.setBounds(juce::roundToInt(x), y, juce::roundToInt(sliderWidth), h);
+        slider.setUiScale(uiScale_);
+        x += sliderWidth + gap;
+    };
+
+    auto placePacketPeak = [&](TSS::PeakIndicator& peak)
+    {
+        peak.setBounds(juce::roundToInt(x), y, juce::roundToInt(peakIndicatorWidth), h);
+        peak.setUiScale(uiScale_);
+        x += peakIndicatorWidth + gap;
     };
 
     auto endPacket = [&]()
@@ -189,15 +238,17 @@ void HeaderPanel::resized()
     placePacketCombo(midiToComboBox_, portComboWidth);
     endPacket();
 
-    const float rightClusterGap = gap * 2.0f;
-    const float settingsButtonX = static_cast<float>(bounds.getRight()) - rightPadding - settingsButtonWidth;
-    const float uiElementsButtonX = settingsButtonX - rightClusterGap - uiElementsButtonWidth;
+    if (!isPluginMode_)
+    {
+        placePacketLabel(audioFromLabel_, audioFromLabelWidth);
+        placePacketCombo(audioFromComboBox_, portComboWidth);
+        endPacket();
 
-    uiElementsButton_.setBounds(juce::roundToInt(uiElementsButtonX), y, juce::roundToInt(uiElementsButtonWidth), h);
-    uiElementsButton_.setUiScale(uiScale_);
-
-    settingsButton_.setBounds(juce::roundToInt(settingsButtonX), y, juce::roundToInt(settingsButtonWidth), h);
-    settingsButton_.setUiScale(uiScale_);
+        placePacketLabel(inputGainLabel_, inputGainLabelWidth);
+        placePacketSlider(inputGainSlider_, inputGainSliderWidth);
+        placePacketPeak(peakIndicator_);
+        endPacket();
+    }
 }
 
 void HeaderPanel::setSkin(TSS::ISkin& skin)
@@ -216,8 +267,12 @@ void HeaderPanel::setSkin(TSS::ISkin& skin)
     editorActivityLed_.setSkin(skin);
     midiToActivityLed_.setSkin(skin);
     instrumentActivityLed_.setSkin(skin);
-    settingsButton_.setLook(TSS::buttonLookFromSkin(skin));
-    uiElementsButton_.setLook(TSS::buttonLookFromSkin(skin));
+    audioFromLabel_.setLook(TSS::labelLookFromSkin(skin));
+    audioFromComboBox_.setLook(TSS::comboBoxLookFromSkin(skin));
+    audioFromComboBox_.setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
+    inputGainLabel_.setLook(TSS::labelLookFromSkin(skin));
+    inputGainSlider_.setLook(TSS::sliderLookFromSkin(skin));
+    peakIndicator_.setSkin(skin);
 }
 
 void HeaderPanel::showLogoPopup()
@@ -242,6 +297,11 @@ void HeaderPanel::showLogoPopup()
             currentUiScaleId_ = scaleId;
             if (onUiScaleSelected)
                 onUiScaleSelected(scaleId);
+        },
+        [this]
+        {
+            if (onSettingsRequested)
+                onSettingsRequested();
         });
 }
 
@@ -259,11 +319,23 @@ void HeaderPanel::setPluginMode(bool isPlugin)
 {
     isPluginMode_ = isPlugin;
     updateKeyboardFromVisibility();
+    updateAudioControlsVisibility();
 
     if (!isPluginMode_)
         configureStandaloneKeyboardFrom();
 
     resized();
+}
+
+void HeaderPanel::updateAudioControlsVisibility()
+{
+    const bool showAudioControls = !isPluginMode_;
+
+    audioFromLabel_.setVisible(showAudioControls);
+    audioFromComboBox_.setVisible(showAudioControls);
+    inputGainLabel_.setVisible(showAudioControls);
+    inputGainSlider_.setVisible(showAudioControls);
+    peakIndicator_.setVisible(showAudioControls);
 }
 
 void HeaderPanel::updateKeyboardFromVisibility()
@@ -382,4 +454,67 @@ juce::String HeaderPanel::getSelectedPortIdentifier(const TSS::ComboBox& combo,
                                                     const std::vector<juce::String>& identifiers) const
 {
     return getPortIdentifierForItemId(identifiers, combo.getSelectedId());
+}
+
+void HeaderPanel::populateAudioFromCombo(const juce::StringArray& channelNames,
+                                         const juce::StringArray& channelIds)
+{
+    const auto previousSourceId = getSelectedAudioFromSourceId();
+
+    audioFromComboBox_.clear(juce::dontSendNotification);
+    audioFromSourceIdentifiers_.clear();
+
+    const int count = juce::jmin(channelNames.size(), channelIds.size());
+
+    for (int i = 0; i < count; ++i)
+    {
+        const int itemId = i + 1;
+        audioFromComboBox_.addItem(channelNames[i], itemId);
+        audioFromSourceIdentifiers_.push_back(channelIds[i]);
+    }
+
+    if (count == 0)
+    {
+        audioFromComboBox_.addItem(PluginDisplayNames::HeaderPanel::kNoInputSentinel, kPortSentinelItemId);
+        audioFromComboBox_.setSelectedId(kPortSentinelItemId, juce::dontSendNotification);
+        return;
+    }
+
+    selectAudioFromSourceId(previousSourceId);
+}
+
+juce::String HeaderPanel::getSelectedAudioFromSourceId() const
+{
+    const int itemId = audioFromComboBox_.getSelectedId();
+    if (itemId < 1)
+        return {};
+
+    const auto index = static_cast<size_t>(itemId - 1);
+    if (index >= audioFromSourceIdentifiers_.size())
+        return {};
+
+    return audioFromSourceIdentifiers_[index];
+}
+
+void HeaderPanel::selectAudioFromSourceId(const juce::String& sourceId)
+{
+    if (sourceId.isEmpty())
+    {
+        audioFromComboBox_.setSelectedId(kPortSentinelItemId, juce::dontSendNotification);
+        return;
+    }
+
+    for (size_t i = 0; i < audioFromSourceIdentifiers_.size(); ++i)
+    {
+        if (audioFromSourceIdentifiers_[i] == sourceId)
+        {
+            audioFromComboBox_.setSelectedId(static_cast<int>(i + 1), juce::dontSendNotification);
+            return;
+        }
+    }
+
+    if (! audioFromSourceIdentifiers_.empty())
+        audioFromComboBox_.setSelectedId(1, juce::dontSendNotification);
+    else
+        audioFromComboBox_.setSelectedId(kPortSentinelItemId, juce::dontSendNotification);
 }

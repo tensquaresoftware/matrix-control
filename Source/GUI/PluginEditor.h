@@ -26,11 +26,12 @@ public:
     void paint(juce::Graphics&) override;
     void resized() override;
     void mouseDown(const juce::MouseEvent& e) override;
+    bool keyPressed(const juce::KeyPress& key) override;
 
 private:
     class HeaderRefreshTimer;
 
-    void refreshAudioFromCombo();
+    void refreshAudioFromCombo(HeaderPanel* headerOverride = nullptr);
     void attachStandaloneAudioDeviceListener();
     void detachStandaloneAudioDeviceListener();
     void changeListenerCallback(juce::ChangeBroadcaster* source) override;

@@ -159,20 +159,21 @@ namespace Core
             return 0;
 
         if (sourceId.startsWith("mono:"))
-        {
-            const int channelIndex = sourceId.fromFirstOccurrenceOf(":", false, false).getIntValue();
-
-            if (channelIndex <= 0)
-                return 1;
-
-            if (channelIndex == 1)
-                return 2;
-
             return 1;
-        }
 
         if (sourceId.isNotEmpty() && sourceId.containsOnly("0123456789"))
-            return sourceId.getIntValue() <= 0 ? 1 : 2;
+            return 1;
+
+        return 0;
+    }
+
+    int AudioInputSourceCatalog::monoChannelIndexForSourceId(const juce::String& sourceId) noexcept
+    {
+        if (sourceId.startsWith("mono:"))
+            return juce::jmax(0, sourceId.fromFirstOccurrenceOf(":", false, false).getIntValue());
+
+        if (sourceId.isNotEmpty() && sourceId.containsOnly("0123456789"))
+            return juce::jmax(0, sourceId.getIntValue());
 
         return 0;
     }

@@ -24,5 +24,6 @@ namespace Core
             const juce::BigInteger& activeInputChannels,
             int numInputChannels);
         static int channelModeForSourceId(const juce::String& sourceId) noexcept;
+        static int monoChannelIndexForSourceId(const juce::String& sourceId) noexcept;
     };
 }

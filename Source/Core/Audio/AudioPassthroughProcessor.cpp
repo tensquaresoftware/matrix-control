@@ -28,6 +28,11 @@ namespace Core
         channelMode_.store(static_cast<int>(mode), std::memory_order_relaxed);
     }
 
+    void AudioPassthroughProcessor::setMonoSourceChannelIndex(int channelIndex) noexcept
+    {
+        monoSourceChannelIndex_.store(juce::jmax(0, channelIndex), std::memory_order_relaxed);
+    }
+
     int AudioPassthroughProcessor::mapSourceChannel(int outputChannel) const noexcept
     {
         const auto mode = static_cast<AudioFromChannelMode>(channelMode_.load(std::memory_order_relaxed));
@@ -38,10 +43,11 @@ namespace Core
         switch (mode)
         {
             case AudioFromChannelMode::kMonoLeft:
-                return 0;
-
             case AudioFromChannelMode::kMonoRight:
-                return numInputChannels_ > 1 ? 1 : 0;
+            {
+                const int channelIndex = monoSourceChannelIndex_.load(std::memory_order_relaxed);
+                return channelIndex < numInputChannels_ ? channelIndex : -1;
+            }
 
             case AudioFromChannelMode::kStereo:
             default:
@@ -109,29 +115,69 @@ namespace Core
 
         float blockPeak = 0.0f;
 
-        for (int outputChannel = 0; outputChannel < numOutputChannelsToProcess; ++outputChannel)
+        const auto mode = static_cast<AudioFromChannelMode>(channelMode_.load(std::memory_order_relaxed));
+        const bool duplicateMonoToAllOutputs = mode == AudioFromChannelMode::kMonoLeft
+                                            || mode == AudioFromChannelMode::kMonoRight;
+
+        if (duplicateMonoToAllOutputs)
         {
-            const int sourceChannel = mapSourceChannel(outputChannel);
+            const int sourceChannel = monoSourceChannelIndex_.load(std::memory_order_relaxed);
 
             if (sourceChannel < 0 || sourceChannel >= numInputChannelsAvailable)
             {
-                output.clear(outputChannel, 0, numSamples);
-                continue;
+                for (int channel = 0; channel < output.getNumChannels(); ++channel)
+                    output.clear(channel, 0, numSamples);
             }
-
-            const float* inputData = input.getReadPointer(sourceChannel);
-            float* outputData = output.getWritePointer(outputChannel);
-
-            for (int sample = 0; sample < numSamples; ++sample)
+            else
             {
-                const float scaled = inputData[sample] * gainLinear;
+                const float* inputData = input.getReadPointer(sourceChannel);
 
-                if (!std::isfinite(scaled))
-                    outputData[sample] = 0.0f;
-                else
+                for (int sample = 0; sample < numSamples; ++sample)
                 {
-                    outputData[sample] = scaled;
-                    blockPeak = std::max(blockPeak, std::abs(scaled));
+                    const float raw = inputData[sample];
+                    float scaled = 0.0f;
+
+                    if (std::isfinite(raw))
+                    {
+                        scaled = raw * gainLinear;
+
+                        if (! std::isfinite(scaled))
+                            scaled = 0.0f;
+                        else
+                            blockPeak = std::max(blockPeak, std::abs(scaled));
+                    }
+
+                    for (int outputChannel = 0; outputChannel < numOutputChannelsToProcess; ++outputChannel)
+                        output.getWritePointer(outputChannel)[sample] = scaled;
+                }
+            }
+        }
+        else
+        {
+            for (int outputChannel = 0; outputChannel < numOutputChannelsToProcess; ++outputChannel)
+            {
+                const int sourceChannel = mapSourceChannel(outputChannel);
+
+                if (sourceChannel < 0 || sourceChannel >= numInputChannelsAvailable)
+                {
+                    output.clear(outputChannel, 0, numSamples);
+                    continue;
+                }
+
+                const float* inputData = input.getReadPointer(sourceChannel);
+                float* outputData = output.getWritePointer(outputChannel);
+
+                for (int sample = 0; sample < numSamples; ++sample)
+                {
+                    const float scaled = inputData[sample] * gainLinear;
+
+                    if (!std::isfinite(scaled))
+                        outputData[sample] = 0.0f;
+                    else
+                    {
+                        outputData[sample] = scaled;
+                        blockPeak = std::max(blockPeak, std::abs(scaled));
+                    }
                 }
             }
         }

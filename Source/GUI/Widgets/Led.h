@@ -22,7 +22,7 @@ namespace TSS
 
     private:
         inline constexpr static float kBorderThicknessDesign_ = 2.0f;
-        inline constexpr static juce::int64 kReleaseTimeMs_ = 400;
+        inline constexpr static juce::int64 kReleaseTimeMs_ = 200;
 
         ISkin* skin_ = nullptr;
         ButtonLook buttonLook_{};

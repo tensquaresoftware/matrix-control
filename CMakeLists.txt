@@ -161,6 +161,7 @@ set(PLUGIN_SOURCES
     Source/GUI/Tests/TestActivityLeds.cpp
     Source/GUI/Tests/TestButtons.cpp
     Source/GUI/Tests/TestComboBoxes.cpp
+    Source/GUI/Tests/TestColourPickerButton.cpp
     Source/GUI/Tests/TestComponent.cpp
     Source/GUI/Tests/TestEnvelopeDisplays.cpp
     Source/GUI/Tests/TestGroupLabels.cpp
@@ -179,6 +180,7 @@ set(PLUGIN_SOURCES
     Source/GUI/Tests/TestToggles.cpp
     Source/GUI/Tests/TestTrackGeneratorDisplays.cpp
     Source/GUI/Tests/TestVerticalSeparators.cpp
+    Source/GUI/Tests/TestVisualDebug.cpp
     
     # GUI - Panels
     Source/GUI/Panels/MainComponent/FooterPanel/FooterPanel.cpp
@@ -408,6 +410,7 @@ target_link_libraries(Matrix-Control
         juce::juce_audio_utils
         juce::juce_dsp
         juce::juce_gui_basics
+        juce::juce_gui_extra
     PUBLIC
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags
@@ -421,11 +424,6 @@ target_compile_definitions(Matrix-Control
         JUCE_VST3_CAN_REPLACE_VST2=0
         JUCE_REPORT_APP_USAGE=0
 )
-
-# JUCE VST3 manifest helper uses deprecated std::wstring_convert from the VST3 SDK.
-if(TARGET Matrix-Control_vst3_helper)
-    target_compile_options(Matrix-Control_vst3_helper PRIVATE -Wno-deprecated-declarations)
-endif()
 
 # JUCE links optional ARA/LV2 stub objects with no symbols into the shared-code static library.
 if(APPLE)

@@ -538,7 +538,7 @@ void PluginProcessor::validatePluginDescriptorsAtStartup()
 
 float PluginProcessor::dbToLinearGain(float gainDb) noexcept
 {
-    if (gainDb <= PluginAudioConstants::kMinInputGainDb)
+    if (gainDb <= PluginAudioConstants::kSilenceInputGainDb)
         return 0.0f;
 
     return std::pow(10.0f, gainDb / 20.0f);
@@ -569,10 +569,8 @@ void PluginProcessor::syncAudioRuntimeFromState()
 {
     const auto gainDb = static_cast<float>(apvts.state.getProperty("inputGainDb", 0.0f));
     const float sanitizedDb = std::isfinite(gainDb) ? gainDb : 0.0f;
-    const float clampedDb = juce::jlimit(PluginAudioConstants::kMinInputGainDb,
-                                         PluginAudioConstants::kMaxInputGainDb,
-                                         sanitizedDb);
-    inputGainLinear_.store(dbToLinearGain(clampedDb), std::memory_order_relaxed);
+    const float snappedDb = PluginAudioConstants::snapInputGainDb(sanitizedDb);
+    inputGainLinear_.store(dbToLinearGain(snappedDb), std::memory_order_relaxed);
 
     const auto sourceId = apvts.state.getProperty("audioFromSourceId", juce::String()).toString();
 
@@ -592,18 +590,15 @@ void PluginProcessor::syncAudioPassthroughFromSourceId(const juce::String& sourc
 {
     const int channelMode = Core::AudioInputSourceCatalog::channelModeForSourceId(sourceId);
     audioPassthroughProcessor_->setChannelMode(static_cast<Core::AudioFromChannelMode>(channelMode));
+    audioPassthroughProcessor_->setMonoSourceChannelIndex(
+        Core::AudioInputSourceCatalog::monoChannelIndexForSourceId(sourceId));
 }
 
 void PluginProcessor::setInputGainDb(float gainDb)
 {
-    if (!std::isfinite(gainDb))
-        gainDb = 0.0f;
-
-    const float clampedDb = juce::jlimit(PluginAudioConstants::kMinInputGainDb,
-                                         PluginAudioConstants::kMaxInputGainDb,
-                                         gainDb);
-    inputGainLinear_.store(dbToLinearGain(clampedDb), std::memory_order_relaxed);
-    apvts.state.setProperty("inputGainDb", clampedDb, nullptr);
+    const float snappedDb = PluginAudioConstants::snapInputGainDb(gainDb);
+    inputGainLinear_.store(dbToLinearGain(snappedDb), std::memory_order_relaxed);
+    apvts.state.setProperty("inputGainDb", snappedDb, nullptr);
 }
 
 void PluginProcessor::setHardwareLatencyMs(float latencyMs)
@@ -773,9 +768,9 @@ void PluginProcessor::setAudioFromChannelMode(int mode)
 void PluginProcessor::setAudioFromSourceId(const juce::String& sourceId)
 {
     apvts.state.setProperty("audioFromSourceId", sourceId, nullptr);
+    syncAudioPassthroughFromSourceId(sourceId);
 
     const int channelMode = Core::AudioInputSourceCatalog::channelModeForSourceId(sourceId);
-    audioPassthroughProcessor_->setChannelMode(static_cast<Core::AudioFromChannelMode>(channelMode));
     apvts.state.setProperty("audioFromChannelMode", channelMode, nullptr);
 
     if (isStandaloneWrapper())

@@ -23,7 +23,8 @@ namespace TSS
                             int currentSkinItemId,
                             int currentUiScaleId,
                             std::function<void(int skinItemId)> onSkinSelected,
-                            std::function<void(int scaleId)> onUiScaleSelected);
+                            std::function<void(int scaleId)> onUiScaleSelected,
+                            std::function<void()> onSettingsRequested);
         ~HeaderLogoPopupMenu() override;
 
         void paint(juce::Graphics& g) override;
@@ -39,14 +40,18 @@ namespace TSS
                          int currentSkinItemId,
                          int currentUiScaleId,
                          std::function<void(int skinItemId)> onSkinSelected,
-                         std::function<void(int scaleId)> onUiScaleSelected);
+                         std::function<void(int scaleId)> onUiScaleSelected,
+                         std::function<void()> onSettingsRequested);
 
     private:
         enum class ItemKind
         {
             SectionHeader,
             Skin,
-            UiScale
+            UiScale,
+            Settings,
+            Spacer,
+            HorizontalRule
         };
 
         struct MenuItem
@@ -70,6 +75,7 @@ namespace TSS
 
         std::function<void(int skinItemId)> onSkinSelected_;
         std::function<void(int scaleId)> onUiScaleSelected_;
+        std::function<void()> onSettingsRequested_;
 
         PopupMenuLook look_{};
         std::unique_ptr<PopupMenuRenderer> renderer_;

@@ -13,6 +13,7 @@ public:
         testGainScaling();
         testMonoLeftDuplicatesLeftToBothOutputs();
         testMonoRightDuplicatesRightToBothOutputs();
+        testMonoDuplicatePreservesBalanceWhenInputOutputAlias();
         testSeparateInputOutputBusBuffers();
         testPeakTracksMaxSample();
         testPeakHoldRetainsLevelBriefly();
@@ -94,6 +95,7 @@ private:
         Core::AudioPassthroughProcessor processor;
         processor.prepare(2, 2, true, 44100.0);
         processor.setChannelMode(Core::AudioFromChannelMode::kMonoRight);
+        processor.setMonoSourceChannelIndex(1);
 
         juce::AudioBuffer<float> input(2, 2);
         juce::AudioBuffer<float> output(2, 2);
@@ -105,6 +107,28 @@ private:
 
         expectEquals(output.getSample(0, 0), 0.5f);
         expectEquals(output.getSample(1, 0), 0.5f);
+    }
+
+    void testMonoDuplicatePreservesBalanceWhenInputOutputAlias()
+    {
+        beginTest("MONO duplicate keeps L/R balance when input and output alias in-place");
+
+        Core::AudioPassthroughProcessor processor;
+        processor.prepare(2, 2, true, 44100.0);
+        processor.setChannelMode(Core::AudioFromChannelMode::kMonoLeft);
+
+        juce::AudioBuffer<float> processBlockBuffer(2, 4);
+        processBlockBuffer.clear();
+        processBlockBuffer.setSample(0, 0, 0.8f);
+        processBlockBuffer.setSample(1, 0, 0.0f);
+
+        juce::AudioBuffer<float> input(processBlockBuffer.getArrayOfWritePointers(), 2, 4);
+        juce::AudioBuffer<float> output(processBlockBuffer.getArrayOfWritePointers(), 2, 4);
+
+        processor.process(input, output, 0.5f);
+
+        expectEquals(output.getSample(0, 0), 0.4f);
+        expectEquals(output.getSample(1, 0), 0.4f);
     }
 
     void testSeparateInputOutputBusBuffers()

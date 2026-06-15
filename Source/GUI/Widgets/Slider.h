@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include <juce_gui_basics/juce_gui_basics.h>
 
 #include "GUI/Looks/WidgetLooks.h"
@@ -14,6 +16,8 @@ namespace TSS
         double step = 1.0;
         juce::String unit;
         juce::String minimumDisplayText;
+        std::function<float(double)> normalizedFill;
+        std::function<juce::String(double)> formatValue;
     };
 
     /** Linear bar slider. Width and height are design dimensions; \p look carries full widget styling
@@ -58,6 +62,8 @@ namespace TSS
         juce::Point<int> dragStartPosition_;
         juce::String unit_;
         juce::String minimumDisplayText_;
+        std::function<float(double)> normalizedFill_;
+        std::function<juce::String(double)> formatValue_;
         bool hasFocus_ = false;
 
         void drawTrack(juce::Graphics& g, const juce::Rectangle<int>& bounds, bool enabled);

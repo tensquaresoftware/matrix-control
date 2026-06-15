@@ -19,12 +19,14 @@ namespace TSS
                                              int currentSkinItemId,
                                              int currentUiScaleId,
                                              std::function<void(int skinItemId)> onSkinSelected,
-                                             std::function<void(int scaleId)> onUiScaleSelected)
+                                             std::function<void(int scaleId)> onUiScaleSelected,
+                                             std::function<void()> onSettingsRequested)
         : uiScale_(uiScale)
         , currentSkinItemId_(currentSkinItemId)
         , currentUiScaleId_(currentUiScaleId)
         , onSkinSelected_(std::move(onSkinSelected))
         , onUiScaleSelected_(std::move(onUiScaleSelected))
+        , onSettingsRequested_(std::move(onSettingsRequested))
         , look_(popupMenuLookFromSkin(skin))
         , renderer_(std::make_unique<PopupMenuRenderer>(true, uiScale_))
         , cachedFont_(look_.font.withHeight(look_.font.getHeight() * uiScale_))
@@ -43,24 +45,30 @@ namespace TSS
     {
         items_.clear();
 
-        items_.push_back({ ItemKind::SectionHeader, 0, PluginDisplayNames::HeaderPanel::kLogoSkinSection, 0, 0 });
+        items_.push_back({ ItemKind::SectionHeader, 0, PluginDisplayNames::HeaderPanel::kLogoUiScaleSection, 0, 0 });
+        items_.push_back({ ItemKind::UiScale, PluginIDs::Settings::ScaleLevels::k50, PluginDisplayNames::ChoiceLists::ScaleLevels::k50, 0, 1 });
+        items_.push_back({ ItemKind::UiScale, PluginIDs::Settings::ScaleLevels::k75, PluginDisplayNames::ChoiceLists::ScaleLevels::k75, 0, 2 });
+        items_.push_back({ ItemKind::UiScale, PluginIDs::Settings::ScaleLevels::k100, PluginDisplayNames::ChoiceLists::ScaleLevels::k100, 0, 3 });
+        items_.push_back({ ItemKind::UiScale, PluginIDs::Settings::ScaleLevels::k125, PluginDisplayNames::ChoiceLists::ScaleLevels::k125, 0, 4 });
+        items_.push_back({ ItemKind::UiScale, PluginIDs::Settings::ScaleLevels::k150, PluginDisplayNames::ChoiceLists::ScaleLevels::k150, 0, 5 });
+        items_.push_back({ ItemKind::UiScale, PluginIDs::Settings::ScaleLevels::k175, PluginDisplayNames::ChoiceLists::ScaleLevels::k175, 0, 6 });
+        items_.push_back({ ItemKind::UiScale, PluginIDs::Settings::ScaleLevels::k200, PluginDisplayNames::ChoiceLists::ScaleLevels::k200, 0, 7 });
+
+        items_.push_back({ ItemKind::SectionHeader, 0, PluginDisplayNames::HeaderPanel::kLogoSkinSection, 1, 0 });
         items_.push_back({ ItemKind::Skin,
                            static_cast<int>(Skin::SkinComboBoxItemId::kBlack),
                            PluginDisplayNames::ChoiceLists::SkinVariants::kBlack,
-                           0, 1 });
+                           1, 1 });
         items_.push_back({ ItemKind::Skin,
                            static_cast<int>(Skin::SkinComboBoxItemId::kCream),
                            PluginDisplayNames::ChoiceLists::SkinVariants::kCream,
-                           0, 2 });
-
-        items_.push_back({ ItemKind::SectionHeader, 0, PluginDisplayNames::HeaderPanel::kLogoUiScaleSection, 1, 0 });
-        items_.push_back({ ItemKind::UiScale, PluginIDs::Settings::ScaleLevels::k50, PluginDisplayNames::ChoiceLists::ScaleLevels::k50, 1, 1 });
-        items_.push_back({ ItemKind::UiScale, PluginIDs::Settings::ScaleLevels::k75, PluginDisplayNames::ChoiceLists::ScaleLevels::k75, 1, 2 });
-        items_.push_back({ ItemKind::UiScale, PluginIDs::Settings::ScaleLevels::k100, PluginDisplayNames::ChoiceLists::ScaleLevels::k100, 1, 3 });
-        items_.push_back({ ItemKind::UiScale, PluginIDs::Settings::ScaleLevels::k125, PluginDisplayNames::ChoiceLists::ScaleLevels::k125, 1, 4 });
-        items_.push_back({ ItemKind::UiScale, PluginIDs::Settings::ScaleLevels::k150, PluginDisplayNames::ChoiceLists::ScaleLevels::k150, 1, 5 });
-        items_.push_back({ ItemKind::UiScale, PluginIDs::Settings::ScaleLevels::k175, PluginDisplayNames::ChoiceLists::ScaleLevels::k175, 1, 6 });
-        items_.push_back({ ItemKind::UiScale, PluginIDs::Settings::ScaleLevels::k200, PluginDisplayNames::ChoiceLists::ScaleLevels::k200, 1, 7 });
+                           1, 2 });
+        items_.push_back({ ItemKind::Spacer, 0, {}, 1, 3 });
+        items_.push_back({ ItemKind::HorizontalRule, 0, {}, 1, 4 });
+        items_.push_back({ ItemKind::Settings,
+                           0,
+                           PluginDisplayNames::HeaderPanel::kSettingsButton,
+                           1, 5 });
     }
 
     int HeaderLogoPopupMenu::getItemHeightPx() const
@@ -124,7 +132,8 @@ namespace TSS
         if (! juce::isPositiveAndBelow(flatIndex, static_cast<int>(items_.size())))
             return false;
 
-        return items_[static_cast<size_t>(flatIndex)].kind != ItemKind::SectionHeader;
+        const auto kind = items_[static_cast<size_t>(flatIndex)].kind;
+        return kind == ItemKind::Skin || kind == ItemKind::UiScale || kind == ItemKind::Settings;
     }
 
     bool HeaderLogoPopupMenu::isCurrentSelection(int flatIndex) const
@@ -133,6 +142,9 @@ namespace TSS
             return false;
 
         const auto& item = items_[static_cast<size_t>(flatIndex)];
+        if (item.kind == ItemKind::Settings)
+            return false;
+
         if (item.kind == ItemKind::Skin)
             return item.valueId == currentSkinItemId_;
 
@@ -167,6 +179,11 @@ namespace TSS
             if (onUiScaleSelected_)
                 onUiScaleSelected_(item.valueId);
         }
+        else if (item.kind == ItemKind::Settings)
+        {
+            if (onSettingsRequested_)
+                onSettingsRequested_();
+        }
 
         closePopup();
     }
@@ -191,11 +208,28 @@ namespace TSS
 
         const float textPadding = static_cast<float>(ComboBox::getPopupLayoutDimensions().textLeftPadding) * uiScale_;
         const float highlightGap = juce::jmax(1.0f, kHighlightGap_ * uiScale_);
+        const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
+        const float ruleThickness = ScaledDrawing::snappedStrokeThicknessFromDesign(
+            static_cast<float>(ComboBox::getPopupLayoutDimensions().borderThickness),
+            uiScale_,
+            systemDisplayScale,
+            ScaledDrawing::StrokeSnapPolicy::kRound);
 
         for (int i = 0; i < static_cast<int>(items_.size()); ++i)
         {
             const auto& item = items_[static_cast<size_t>(i)];
             const auto itemBounds = getItemBounds(i);
+
+            if (item.kind == ItemKind::Spacer)
+                continue;
+
+            if (item.kind == ItemKind::HorizontalRule)
+            {
+                g.setColour(look_.borderButtonLike);
+                g.fillRect(itemBounds.withSizeKeepingCentre(itemBounds.getWidth(), ruleThickness));
+                continue;
+            }
+
             const bool isHighlighted = highlightedFlatIndex_ == i;
             const bool isSelected = isCurrentSelection(i);
             const bool isSectionHeader = item.kind == ItemKind::SectionHeader;
@@ -278,7 +312,8 @@ namespace TSS
                                   int currentSkinItemId,
                                   int currentUiScaleId,
                                   std::function<void(int skinItemId)> onSkinSelected,
-                                  std::function<void(int scaleId)> onUiScaleSelected)
+                                  std::function<void(int scaleId)> onUiScaleSelected,
+                                  std::function<void()> onSettingsRequested)
     {
         auto* topLevelComponent = logo.getTopLevelComponent();
         if (topLevelComponent == nullptr)
@@ -290,7 +325,8 @@ namespace TSS
             currentSkinItemId,
             currentUiScaleId,
             std::move(onSkinSelected),
-            std::move(onUiScaleSelected));
+            std::move(onUiScaleSelected),
+            std::move(onSettingsRequested));
         auto* rawPtr = popupMenu.get();
 
         const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(logo);

@@ -12,6 +12,7 @@
 #include "Skins/Skin.h"
 #include "Factories/WidgetFactory.h"
 #include "Shared/Definitions/PluginIDs.h"
+#include "Shared/Definitions/PluginAudioConstants.h"
 
 using TSS::SkinColourId;
 
@@ -42,11 +43,8 @@ private:
                 }
             }
 
-            if (auto* panel = owner_.getSettingsPanelIfOpen())
-            {
-                panel->getPeakIndicator().setLevel(
-                    processor_.getAudioPassthroughProcessor().getPeakLevel());
-            }
+            headerPanel_.getPeakIndicator().setLevel(
+                processor_.getAudioPassthroughProcessor().getPeakLevel());
         }
 
         const auto& tracker = processor_.getMidiActivityTracker();
@@ -137,31 +135,25 @@ PluginEditor::PluginEditor(PluginProcessor& p)
         headerPanel.selectKeyboardFromPort(savedKeyboardFromPortId);
         pluginProcessor.setKeyboardFromPort(headerPanel.getSelectedKeyboardFromPortIdentifier());
 
+        refreshAudioFromCombo(&headerPanel);
+
         const auto savedAudioFromSourceId = pluginProcessor.getApvts().state.getProperty("audioFromSourceId", juce::String()).toString();
         if (savedAudioFromSourceId.isNotEmpty())
+        {
+            headerPanel.selectAudioFromSourceId(savedAudioFromSourceId);
             pluginProcessor.setAudioFromSourceId(savedAudioFromSourceId);
+        }
 
         const float savedInputGainDb = static_cast<float>(
             pluginProcessor.getApvts().state.getProperty("inputGainDb", 0.0f));
-        pluginProcessor.setInputGainDb(savedInputGainDb);
+        const int gainIndex = PluginAudioConstants::inputGainDbToIndex(savedInputGainDb);
+        headerPanel.getInputGainSlider().setValue(gainIndex, juce::dontSendNotification);
+        pluginProcessor.setInputGainDb(PluginAudioConstants::inputGainIndexToDb(gainIndex));
     }
 
     pluginProcessor.syncHardwareLatencyFromState();
 
     setResizable(false, false);
-
-    headerPanel.getSettingsButton().onClick = [this]
-    {
-        if (settingsWindow_ != nullptr && settingsWindow_->isVisible())
-            closeSettingsWindow();
-        else
-            openSettingsWindow();
-    };
-
-    headerPanel.getUiElementsButton().onClick = [this, &headerPanel]
-    {
-        setUiElementsTestVisible(headerPanel.getUiElementsButton().getToggleState());
-    };
 
     headerPanel.getMidiFromComboBox().onChange = [this, &headerPanel]
     {
@@ -203,6 +195,23 @@ PluginEditor::PluginEditor(PluginProcessor& p)
         headerPanel.selectKeyboardFromPort(previousPortId);
         if (previousPortId.isNotEmpty())
             pluginProcessor.setKeyboardFromPort(previousPortId);
+    };
+
+    headerPanel.getInputGainSlider().onValueChange = [this, &headerPanel]
+    {
+        if (!pluginProcessor.isStandalone())
+            return;
+
+        const int index = static_cast<int>(std::round(headerPanel.getInputGainSlider().getValue()));
+        pluginProcessor.setInputGainDb(PluginAudioConstants::inputGainIndexToDb(index));
+    };
+
+    headerPanel.getAudioFromComboBox().onChange = [this, &headerPanel]
+    {
+        if (!pluginProcessor.isStandalone())
+            return;
+
+        pluginProcessor.setAudioFromSourceId(headerPanel.getSelectedAudioFromSourceId());
     };
 
     headerRefreshTimer_ = std::make_unique<HeaderRefreshTimer>(pluginProcessor, headerPanel, *this);
@@ -320,6 +329,14 @@ void PluginEditor::wireHeaderPanel(HeaderPanel& headerPanel)
     {
         applyUiScaleFromItemId(PluginIDs::Settings::ScaleLevels::k100, true);
     };
+
+    headerPanel.onSettingsRequested = [this]
+    {
+        if (settingsWindow_ != nullptr && settingsWindow_->isVisible())
+            closeSettingsWindow();
+        else
+            openSettingsWindow();
+    };
 }
 
 void PluginEditor::restoreHeaderPanelFromState(HeaderPanel& headerPanel)
@@ -328,9 +345,31 @@ void PluginEditor::restoreHeaderPanelFromState(HeaderPanel& headerPanel)
     headerPanel.setCurrentSkinItemId(pluginProcessor.getSkinVariantId());
 }
 
-void PluginEditor::mouseDown(const juce::MouseEvent&)
+void PluginEditor::mouseDown(const juce::MouseEvent& event)
 {
+    if (uiElementsTestVisible_
+        && testComponent_ != nullptr
+        && testComponent_->isVisible()
+        && testComponent_->getBounds().contains(event.getPosition()))
+    {
+        testComponent_->grabKeyboardFocus();
+        return;
+    }
+
     unfocusAllComponents();
+}
+
+bool PluginEditor::keyPressed(const juce::KeyPress& key)
+{
+    if (uiElementsTestVisible_
+        && testComponent_ != nullptr
+        && testComponent_->isVisible()
+        && testComponent_->keyPressed(key))
+    {
+        return true;
+    }
+
+    return juce::AudioProcessorEditor::keyPressed(key);
 }
 
 void PluginEditor::updateSkin()
@@ -370,7 +409,10 @@ void PluginEditor::setUiElementsTestVisible(bool visible)
     {
         test->setVisible(visible);
         if (visible)
+        {
             test->toFront(false);
+            test->grabKeyboardFocus();
+        }
     }
 
     layoutUiElementsTestComponent();
@@ -410,7 +452,6 @@ void PluginEditor::openSettingsWindow()
             [this](SettingsPanel& panel)
             {
                 wireSettingsPanel(panel);
-                restoreSettingsPanelFromState(panel);
             },
             [this] { closeSettingsWindow(); });
         addChildComponent(*settingsWindow_);
@@ -418,7 +459,6 @@ void PluginEditor::openSettingsWindow()
     else
     {
         settingsWindow_->setSkin(*skin_);
-        restoreSettingsPanelFromState(settingsWindow_->getSettingsPanel());
     }
 
     const int baseWidth = layoutDimensions_.editor.width;
@@ -428,6 +468,7 @@ void PluginEditor::openSettingsWindow()
     updateSettingsWindowLayout(uiScale);
 
     settingsWindow_->setVisible(true);
+    restoreSettingsPanelFromState(settingsWindow_->getSettingsPanel());
     settingsWindow_->toFront(true);
     settingsWindow_->grabKeyboardFocus();
 }
@@ -440,19 +481,10 @@ void PluginEditor::closeSettingsWindow()
 
 void PluginEditor::restoreSettingsPanelFromState(SettingsPanel& panel)
 {
-    panel.getHardwareLatencySlider().setValue(pluginProcessor.getHardwareLatencyMs(), juce::dontSendNotification);
+    if (!pluginProcessor.isStandalone())
+        panel.getHardwareLatencySlider().setValue(pluginProcessor.getHardwareLatencyMs(), juce::dontSendNotification);
 
-    if (pluginProcessor.isStandalone())
-    {
-        refreshAudioFromCombo();
-
-        const auto savedAudioFromSourceId = pluginProcessor.getApvts().state.getProperty("audioFromSourceId", juce::String()).toString();
-        panel.selectAudioFromSourceId(savedAudioFromSourceId);
-
-        const float savedInputGainDb = static_cast<float>(
-            pluginProcessor.getApvts().state.getProperty("inputGainDb", 0.0f));
-        panel.getInputGainSlider().setValue(savedInputGainDb, juce::dontSendNotification);
-    }
+    panel.getUiElementsButton().setToggleState(uiElementsTestVisible_, juce::dontSendNotification);
 }
 
 void PluginEditor::wireSettingsPanel(SettingsPanel& panel)
@@ -462,24 +494,13 @@ void PluginEditor::wireSettingsPanel(SettingsPanel& panel)
         pluginProcessor.setHardwareLatencyMs(static_cast<float>(panel.getHardwareLatencySlider().getValue()));
     };
 
-    panel.getInputGainSlider().onValueChange = [this, &panel]
+    panel.getUiElementsButton().onClick = [this, &panel]
     {
-        if (!pluginProcessor.isStandalone())
-            return;
-
-        pluginProcessor.setInputGainDb(static_cast<float>(panel.getInputGainSlider().getValue()));
-    };
-
-    panel.getAudioFromComboBox().onChange = [this, &panel]
-    {
-        if (!pluginProcessor.isStandalone())
-            return;
-
-        pluginProcessor.setAudioFromSourceId(panel.getSelectedAudioFromSourceId());
+        setUiElementsTestVisible(panel.getUiElementsButton().getToggleState());
     };
 }
 
-void PluginEditor::refreshAudioFromCombo()
+void PluginEditor::refreshAudioFromCombo(HeaderPanel* headerOverride)
 {
     if (!pluginProcessor.isStandalone())
         return;
@@ -487,34 +508,37 @@ void PluginEditor::refreshAudioFromCombo()
     const auto names = pluginProcessor.getAudioInputSourceNames();
     const auto ids = pluginProcessor.getAudioInputSourceIds();
 
-    if (names.isEmpty() && ids.isEmpty())
+    auto* header = headerOverride;
+
+    if (header == nullptr && mainComponent_ != nullptr)
+        header = &mainComponent_->getHeaderPanel();
+
+    juce::String sourceIdToRestore = pluginProcessor.getApvts().state.getProperty(
+        "audioFromSourceId", juce::String()).toString();
+
+    if (header != nullptr)
+    {
+        if (sourceIdToRestore.isEmpty())
+            sourceIdToRestore = header->getSelectedAudioFromSourceId();
+
+        header->populateAudioFromCombo(names, ids);
+        header->selectAudioFromSourceId(sourceIdToRestore);
+
+        const auto effectiveSourceId = header->getSelectedAudioFromSourceId();
+
+        if (effectiveSourceId.isNotEmpty())
+            pluginProcessor.setAudioFromSourceId(effectiveSourceId);
+        else if (! ids.isEmpty())
+            pluginProcessor.setAudioFromSourceId(ids[0]);
+
         return;
-
-    juce::String previousSourceId;
-
-    if (auto* panel = getSettingsPanelIfOpen())
-        previousSourceId = panel->getSelectedAudioFromSourceId();
-    else
-        previousSourceId = pluginProcessor.getApvts().state.getProperty("audioFromSourceId", juce::String()).toString();
-
-    if (auto* panel = getSettingsPanelIfOpen())
-    {
-        panel->populateAudioFromCombo(names, ids);
-        panel->selectAudioFromSourceId(previousSourceId);
     }
 
-    const auto selectedSourceId = previousSourceId.isNotEmpty()
-        ? previousSourceId
-        : (ids.isEmpty() ? juce::String() : ids[0]);
+    if (sourceIdToRestore.isEmpty() && ! ids.isEmpty())
+        sourceIdToRestore = ids[0];
 
-    if (selectedSourceId.isNotEmpty())
-    {
-        pluginProcessor.syncAudioPassthroughFromSourceId(selectedSourceId);
-    }
-    else if (!ids.isEmpty())
-    {
-        pluginProcessor.setAudioFromSourceId(ids[0]);
-    }
+    if (sourceIdToRestore.isNotEmpty())
+        pluginProcessor.setAudioFromSourceId(sourceIdToRestore);
 }
 
 void PluginEditor::attachStandaloneAudioDeviceListener()
