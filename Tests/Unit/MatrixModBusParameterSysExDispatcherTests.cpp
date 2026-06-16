@@ -23,6 +23,7 @@ public:
         testSourceAmountDestinationProduceIdenticalMessage();
         testBus3UsesBusByte3();
         testUnknownParameterNoEnqueue();
+        testBusIndexForParameterId();
     }
 
 private:
@@ -163,6 +164,21 @@ private:
 
         dispatcher.dispatch("notAMatrixModParameter");
         expect(queue.isEmpty());
+    }
+
+    void testBusIndexForParameterId()
+    {
+        beginTest("busIndexForParameterId — maps Matrix Mod parameter to bus index");
+
+        Core::PatchModel model;
+        Core::MatrixModBusParameterSysExDispatcher dispatcher(
+            model,
+            [](juce::uint8, juce::uint8, juce::uint8, juce::uint8) {});
+
+        expectEquals(dispatcher.busIndexForParameterId(
+                         PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus2Amount),
+                     2);
+        expectEquals(dispatcher.busIndexForParameterId("notAMatrixModParameter"), -1);
     }
 };
 

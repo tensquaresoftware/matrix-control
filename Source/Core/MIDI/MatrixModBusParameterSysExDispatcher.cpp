@@ -45,6 +45,15 @@ void MatrixModBusParameterSysExDispatcher::dispatchBus(int busIndex) const
     enqueueMatrixModBusEdit_(static_cast<juce::uint8>(busIndex), source, amount, destination);
 }
 
+int MatrixModBusParameterSysExDispatcher::busIndexForParameterId(const juce::String& parameterId) const
+{
+    const auto busIt = parameterIdToBus_.find(parameterId);
+    if (busIt == parameterIdToBus_.end())
+        return -1;
+
+    return busIt->second;
+}
+
 juce::uint8 MatrixModBusParameterSysExDispatcher::readPackedByte(int sysExOffset) const noexcept
 {
     const size_t offset = PackedFieldCodec::safeOffset(sysExOffset, PatchModel::kBufferSize);

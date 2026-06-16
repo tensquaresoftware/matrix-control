@@ -60,6 +60,8 @@ MidiManager::MidiManager(juce::AudioProcessorValueTreeState& apvtsRef,
     if (midiReceiver != nullptr)
         midiReceiver->setActivityTracker(&activityTrackerRef);
 
+    outboundQueue_.setWakeConsumerCallback([this] { wakeConsumer(); });
+
     apvts.state.setProperty("deviceDetected", false, nullptr);
     apvts.state.setProperty("deviceVersion", juce::String(), nullptr);
     apvts.state.setProperty("lastError", juce::String(), nullptr);
@@ -178,6 +180,7 @@ bool MidiManager::setMidiOutputPort(const juce::String& deviceId, bool reportOpe
         midiSender->setMidiOutput(outputMidiPort->getMidiOutput());
         ExceptionPropagator::clearMessage(apvts);
         MidiLogger::getInstance().logInfo("MIDI output port successfully set");
+        wakeConsumer();
         return true;
     }
 
@@ -394,52 +397,127 @@ std::vector<juce::uint8> MidiManager::requestSysExData(juce::uint8 requestType, 
     }
 }
 
+void MidiManager::wakeConsumer() noexcept
+{
+    notify();
+}
+
+bool MidiManager::canSendSysExNow() const noexcept
+{
+    const auto nowMs = static_cast<juce::int64>(juce::Time::getMillisecondCounterHiRes());
+    return sysExDelay_.millisUntilNextAllowed(nowMs) == 0;
+}
+
+void MidiManager::sendQueuedSysEx(const juce::MemoryBlock& sysExMessage, const juce::String& description)
+{
+    midiSender->sendSysEx(sysExMessage);
+    MidiLogger::getInstance().logSysExSent(sysExMessage, description);
+    sysExDelay_.recordSysExSent(static_cast<juce::int64>(juce::Time::getMillisecondCounterHiRes()));
+}
+
+void MidiManager::dispatchRealtimeMessage(const Core::MidiOutboundQueue::Message& msg)
+{
+    midiSender->sendMidiMessage(msg.midiMessage);
+    activityTracker_.notifyActivity(pathForOutboundMessage(msg));
+    activityTracker_.notifyActivity(Core::MidiActivityTracker::Path::kOutbound);
+}
+
+bool MidiManager::processOutboundQueue()
+{
+    bool didWork = false;
+
+    while (true)
+    {
+        auto msg = outboundQueue_.dequeue();
+        if (!msg.has_value())
+            break;
+
+        didWork = true;
+
+        try
+        {
+            if (msg->category == Core::MidiOutboundQueue::MessageCategory::kRealtime)
+            {
+                dispatchRealtimeMessage(*msg);
+                continue;
+            }
+
+            if (msg->sysExData.getSize() == 0)
+                continue;
+
+            if (pendingSysEx_.has_value())
+            {
+                outboundQueue_.enqueueSysEx(std::move(msg->sysExData));
+                break;
+            }
+
+            if (canSendSysExNow())
+            {
+                sendQueuedSysEx(msg->sysExData, "QUEUED");
+                activityTracker_.notifyActivity(pathForOutboundMessage(*msg));
+                activityTracker_.notifyActivity(Core::MidiActivityTracker::Path::kOutbound);
+                continue;
+            }
+
+            pendingSysEx_ = std::move(*msg);
+            break;
+        }
+        catch (const MidiConnectionException& e)
+        {
+            updateErrorState(e.getMessage(), "Connection");
+            break;
+        }
+        catch (const std::exception& e)
+        {
+            updateErrorState(e.what(), "MIDI");
+            break;
+        }
+    }
+
+    if (pendingSysEx_.has_value() && canSendSysExNow())
+    {
+        try
+        {
+            sendQueuedSysEx(pendingSysEx_->sysExData, "QUEUED");
+            activityTracker_.notifyActivity(pathForOutboundMessage(*pendingSysEx_));
+            activityTracker_.notifyActivity(Core::MidiActivityTracker::Path::kOutbound);
+            pendingSysEx_.reset();
+            didWork = true;
+        }
+        catch (const MidiConnectionException& e)
+        {
+            updateErrorState(e.getMessage(), "Connection");
+        }
+        catch (const std::exception& e)
+        {
+            updateErrorState(e.what(), "MIDI");
+        }
+    }
+
+    return didWork;
+}
+
 void MidiManager::run()
 {
     while (!threadShouldExit())
     {
         if (!midiSender->isOutputAvailable())
         {
-            wait(5);
+            wait(1);
             continue;
         }
 
-        if (auto msg = outboundQueue_.dequeue())
-        {
-            dispatchOutboundMessage(*msg);
+        if (processOutboundQueue())
             continue;
-        }
 
-        wait(1);
-    }
-}
-
-void MidiManager::dispatchOutboundMessage(const Core::MidiOutboundQueue::Message& msg)
-{
-    try
-    {
-        if (msg.category == Core::MidiOutboundQueue::MessageCategory::kRealtime)
+        int sleepMs = 1;
+        if (pendingSysEx_.has_value())
         {
-            midiSender->sendMidiMessage(msg.midiMessage);
-            activityTracker_.notifyActivity(pathForOutboundMessage(msg));
-            activityTracker_.notifyActivity(Core::MidiActivityTracker::Path::kOutbound);
-            return;
+            const auto nowMs = static_cast<juce::int64>(juce::Time::getMillisecondCounterHiRes());
+            sleepMs = juce::jmax(1, sysExDelay_.millisUntilNextAllowed(nowMs));
         }
 
-        if (msg.sysExData.getSize() == 0)
-            return;
-
-        sendSysExWithDelay(msg.sysExData, "QUEUED");
-        activityTracker_.notifyActivity(pathForOutboundMessage(msg));
-        activityTracker_.notifyActivity(Core::MidiActivityTracker::Path::kOutbound);
-    }
-    catch (const MidiConnectionException& e)
-    {
-        updateErrorState(e.getMessage(), "Connection");
-    }
-    catch (const std::exception& e)
-    {
-        updateErrorState(e.what(), "MIDI");
+        wait(sleepMs);
     }
 }
 

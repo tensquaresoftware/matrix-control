@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <atomic>
+#include <optional>
 
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_core/juce_core.h>
@@ -69,8 +70,14 @@ private:
     void handleIncomingSysEx(const juce::MemoryBlock& sysEx);
     
     void stopMidiInputCallbacks();
-    void dispatchOutboundMessage(const Core::MidiOutboundQueue::Message& msg);
+    void wakeConsumer() noexcept;
+    bool processOutboundQueue();
+    bool canSendSysExNow() const noexcept;
+    void sendQueuedSysEx(const juce::MemoryBlock& sysExMessage, const juce::String& description);
+    void dispatchRealtimeMessage(const Core::MidiOutboundQueue::Message& msg);
     void sendSysExWithDelay(const juce::MemoryBlock& sysExMessage, const juce::String& description);
+
+    std::optional<Core::MidiOutboundQueue::Message> pendingSysEx_;
     std::vector<juce::uint8> requestSysExData(juce::uint8 requestType, size_t expectedPackedSize, 
                                          const juce::String& requestDescription);
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <mutex>
 #include <optional>
 #include <queue>
@@ -43,7 +44,11 @@ namespace Core
             juce::MemoryBlock sysExData;
         };
 
+        using WakeConsumerFn = std::function<void()>;
+
         MidiOutboundQueue() = default;
+
+        void setWakeConsumerCallback(WakeConsumerFn callback);
 
         void enqueueRealtime(juce::MidiMessage message);
         void enqueueSysEx(juce::MemoryBlock sysEx);
@@ -52,9 +57,12 @@ namespace Core
         bool isEmpty() const noexcept;
 
     private:
+        void wakeConsumerIfNeeded();
+
         std::queue<juce::MidiMessage> realtimeQueue_;
         std::queue<juce::MemoryBlock> sysExQueue_;
         mutable std::mutex queueMutex_;
+        WakeConsumerFn wakeConsumer_;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MidiOutboundQueue)
     };

@@ -164,6 +164,9 @@ PluginProcessor::PluginProcessor()
             midiManager->enqueueMatrixModBusEdit(bus, source, amount, destination);
         });
 
+    matrixModSysExCoalesceTimer_ = std::make_unique<MatrixModSysExCoalesceTimer>(
+        *matrixModBusParameterSysExDispatcher_);
+
     matrixModBusReorderService_ = std::make_unique<Core::MatrixModBusReorderService>(
         *patchModel_,
         *apvtsPatchMapper_,
@@ -1085,7 +1088,7 @@ void PluginProcessor::valueTreePropertyChanged(juce::ValueTree& treeWhosePropert
         if (isMatrixModParam)
         {
             if (!suppressMatrixModParameterSysEx_)
-                matrixModBusParameterSysExDispatcher_->dispatch(parameterId);
+                matrixModSysExCoalesceTimer_->noteParameterChanged(parameterId);
         }
         else
             patchParameterSysExDispatcher_->dispatch(parameterId);

@@ -73,6 +73,7 @@ public:
         testNoOutputPortDoesNotThrow();
         testRealtimeDispatchesAfterOutputPortOpened();
         testEmptySysExPayloadSkipped();
+        testRealtimeNotStarvedDuringSysExGate();
     }
 
 private:
@@ -212,6 +213,44 @@ private:
         queue.enqueueSysEx(juce::MemoryBlock());
 
         expect(waitForQueueEmpty(queue, 2000), "Empty SysEx should still be dequeued when output is available");
+        manager.stopThread(2000);
+    }
+
+    void testRealtimeNotStarvedDuringSysExGate()
+    {
+        beginTest("Realtime MIDI drains while SysEx inter-message gate is active");
+
+        const auto outputId = firstAvailableOutputDeviceId();
+        if (outputId.isEmpty())
+        {
+            logMessage("Skipped — no MIDI output device available");
+            return;
+        }
+
+        Core::MidiOutboundQueue queue;
+        Core::MidiActivityTracker tracker;
+        MinimalAudioProcessor proc;
+        MidiManager manager(proc.apvts, queue, tracker);
+
+        manager.setMidiOutputPort(outputId);
+        manager.startThread();
+
+        constexpr int kRealtimeBurstCount = 50;
+        manager.enqueueRemoteParameterEdit(1, 10);
+
+        for (int i = 0; i < kRealtimeBurstCount; ++i)
+            queue.enqueueRealtime(juce::MidiMessage::noteOff(1, static_cast<int>(i % 128)));
+
+        manager.enqueueRemoteParameterEdit(2, 20);
+
+        const auto startMs = juce::Time::getMillisecondCounter();
+        expect(waitForQueueEmpty(queue, 3000),
+               "Realtime burst should not be blocked by SysEx inter-message gate");
+        const auto elapsedMs = juce::Time::getMillisecondCounter() - startMs;
+
+        expect(elapsedMs < 500,
+               "Draining realtime during SysEx gate should complete well under gate*N blocking");
+
         manager.stopThread(2000);
     }
 };

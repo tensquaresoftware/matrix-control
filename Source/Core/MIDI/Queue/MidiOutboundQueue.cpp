@@ -2,16 +2,42 @@
 
 namespace Core
 {
-    void MidiOutboundQueue::enqueueRealtime(juce::MidiMessage message)
+    void MidiOutboundQueue::setWakeConsumerCallback(WakeConsumerFn callback)
     {
         std::lock_guard<std::mutex> lock(queueMutex_);
-        realtimeQueue_.push(std::move(message));
+        wakeConsumer_ = std::move(callback);
+    }
+
+    void MidiOutboundQueue::wakeConsumerIfNeeded()
+    {
+        WakeConsumerFn callback;
+        {
+            std::lock_guard<std::mutex> lock(queueMutex_);
+            callback = wakeConsumer_;
+        }
+
+        if (callback != nullptr)
+            callback();
+    }
+
+    void MidiOutboundQueue::enqueueRealtime(juce::MidiMessage message)
+    {
+        {
+            std::lock_guard<std::mutex> lock(queueMutex_);
+            realtimeQueue_.push(std::move(message));
+        }
+
+        wakeConsumerIfNeeded();
     }
 
     void MidiOutboundQueue::enqueueSysEx(juce::MemoryBlock sysEx)
     {
-        std::lock_guard<std::mutex> lock(queueMutex_);
-        sysExQueue_.push(std::move(sysEx));
+        {
+            std::lock_guard<std::mutex> lock(queueMutex_);
+            sysExQueue_.push(std::move(sysEx));
+        }
+
+        wakeConsumerIfNeeded();
     }
 
     std::optional<MidiOutboundQueue::Message> MidiOutboundQueue::dequeue()

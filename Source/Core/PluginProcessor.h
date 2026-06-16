@@ -1,6 +1,7 @@
 #pragma once
 
 #include <atomic>
+#include <bitset>
 #include <memory>
 #include <map>
 #include <optional>
@@ -8,6 +9,8 @@
 
 #include <juce_audio_processors/juce_audio_processors.h>
 
+#include "Core/MIDI/MatrixModBusParameterSysExDispatcher.h"
+#include "Shared/Definitions/Matrix1000Limits.h"
 #include "Shared/Definitions/PluginDescriptors.h"
 
 class MidiManager;
@@ -144,6 +147,46 @@ private:
         int attemptIndex_ = 0;
     };
 
+    struct MatrixModSysExCoalesceTimer final : juce::Timer
+    {
+        static constexpr int kCoalesceDelayMs = 10;
+
+        explicit MatrixModSysExCoalesceTimer(Core::MatrixModBusParameterSysExDispatcher& dispatcherIn) noexcept
+            : dispatcher_(dispatcherIn)
+        {
+        }
+
+        void noteParameterChanged(const juce::String& parameterId)
+        {
+            const int busIndex = dispatcher_.busIndexForParameterId(parameterId);
+            if (busIndex < 0)
+                return;
+
+            pendingBuses_.set(static_cast<size_t>(busIndex));
+
+            if (!isTimerRunning())
+                startTimer(kCoalesceDelayMs);
+        }
+
+    private:
+        void timerCallback() override
+        {
+            stopTimer();
+
+            for (int bus = 0; bus < Matrix1000Limits::kModulationBusCount; ++bus)
+            {
+                if (!pendingBuses_.test(static_cast<size_t>(bus)))
+                    continue;
+
+                pendingBuses_.reset(static_cast<size_t>(bus));
+                dispatcher_.dispatchBus(bus);
+            }
+        }
+
+        Core::MatrixModBusParameterSysExDispatcher& dispatcher_;
+        std::bitset<Matrix1000Limits::kModulationBusCount> pendingBuses_;
+    };
+
     static BusesProperties makeBusesProperties();
     static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
     void validatePluginDescriptorsAtStartup();
@@ -204,6 +247,7 @@ private:
     std::unique_ptr<Core::PatchParameterSysExDispatcher> patchParameterSysExDispatcher_;
     std::unique_ptr<Core::MasterParameterSysExDispatcher> masterParameterSysExDispatcher_;
     std::unique_ptr<Core::MatrixModBusParameterSysExDispatcher> matrixModBusParameterSysExDispatcher_;
+    std::unique_ptr<MatrixModSysExCoalesceTimer> matrixModSysExCoalesceTimer_;
     std::unique_ptr<Core::MatrixModBusReorderService> matrixModBusReorderService_;
     std::map<juce::String, PluginDescriptors::ChoiceParameterDescriptor> choiceParameterMap_;
     std::unordered_set<juce::String> patchParameterIds_;
