@@ -2,7 +2,6 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
-#include "GUI/Widgets/Button.h"
 #include "GUI/Widgets/Label.h"
 #include "GUI/Widgets/Slider.h"
 
@@ -15,7 +14,7 @@ class SettingsPanel : public juce::Component
 {
 public:
     static constexpr int kDesignWidth = 240;
-    static constexpr int kDesignHeight = 220;
+    static constexpr int kDesignHeight = 188;
 
     SettingsPanel(TSS::ISkin& skin, bool isPluginMode);
     ~SettingsPanel() override = default;
@@ -28,7 +27,6 @@ public:
     void setPluginMode(bool isPluginMode);
 
     TSS::Slider& getHardwareLatencySlider() { return hardwareLatencySlider_; }
-    TSS::Button& getUiElementsButton() { return uiElementsButton_; }
 
 private:
     void updateModeSpecificVisibility();
@@ -56,7 +54,6 @@ private:
     TSS::Label defragPlaceholder_;
     TSS::Label loggingLabel_;
     TSS::Label loggingPlaceholder_;
-    TSS::Button uiElementsButton_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SettingsPanel)
 };

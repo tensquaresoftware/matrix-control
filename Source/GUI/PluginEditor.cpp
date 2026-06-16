@@ -337,6 +337,11 @@ void PluginEditor::wireHeaderPanel(HeaderPanel& headerPanel)
         else
             openSettingsWindow();
     };
+
+    headerPanel.onUiTestsToggleRequested = [this]
+    {
+        setUiElementsTestVisible(!uiElementsTestVisible_);
+    };
 }
 
 void PluginEditor::restoreHeaderPanelFromState(HeaderPanel& headerPanel)
@@ -483,8 +488,6 @@ void PluginEditor::restoreSettingsPanelFromState(SettingsPanel& panel)
 {
     if (!pluginProcessor.isStandalone())
         panel.getHardwareLatencySlider().setValue(pluginProcessor.getHardwareLatencyMs(), juce::dontSendNotification);
-
-    panel.getUiElementsButton().setToggleState(uiElementsTestVisible_, juce::dontSendNotification);
 }
 
 void PluginEditor::wireSettingsPanel(SettingsPanel& panel)
@@ -492,11 +495,6 @@ void PluginEditor::wireSettingsPanel(SettingsPanel& panel)
     panel.getHardwareLatencySlider().onValueChange = [this, &panel]
     {
         pluginProcessor.setHardwareLatencyMs(static_cast<float>(panel.getHardwareLatencySlider().getValue()));
-    };
-
-    panel.getUiElementsButton().onClick = [this, &panel]
-    {
-        setUiElementsTestVisible(panel.getUiElementsButton().getToggleState());
     };
 }
 

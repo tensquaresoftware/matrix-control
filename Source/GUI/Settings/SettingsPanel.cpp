@@ -28,7 +28,6 @@ SettingsPanel::SettingsPanel(TSS::ISkin& skin, bool isPluginMode)
     , defragPlaceholder_(kContentWidth_ - kLabelWidth_ - kGap_, kControlHeight_, TSS::labelLookFromSkin(skin), PluginDisplayNames::Settings::kComingSoon)
     , loggingLabel_(kLabelWidth_, kControlHeight_, TSS::labelLookFromSkin(skin), PluginDisplayNames::Settings::kLoggingSection)
     , loggingPlaceholder_(kContentWidth_ - kLabelWidth_ - kGap_, kControlHeight_, TSS::labelLookFromSkin(skin), PluginDisplayNames::Settings::kComingSoon)
-    , uiElementsButton_(kContentWidth_, kControlHeight_, TSS::buttonLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kUiElementsButton)
 {
     setOpaque(true);
 
@@ -43,9 +42,6 @@ SettingsPanel::SettingsPanel(TSS::ISkin& skin, bool isPluginMode)
     addAndMakeVisible(defragPlaceholder_);
     addAndMakeVisible(loggingLabel_);
     addAndMakeVisible(loggingPlaceholder_);
-
-    uiElementsButton_.setClickingTogglesState(true);
-    addAndMakeVisible(uiElementsButton_);
 
     setPluginMode(isPluginMode);
 }
@@ -103,10 +99,6 @@ void SettingsPanel::layoutContent(juce::Rectangle<int> bounds)
     layoutPlaceholderRow(policiesLabel_, policiesPlaceholder_);
     layoutPlaceholderRow(defragLabel_, defragPlaceholder_);
     layoutPlaceholderRow(loggingLabel_, loggingPlaceholder_);
-
-    bounds.removeFromTop(rowGap);
-    uiElementsButton_.setBounds(bounds.removeFromBottom(controlHeight));
-    uiElementsButton_.setUiScale(uiScale_);
 }
 
 void SettingsPanel::setSkin(TSS::ISkin& skin)
@@ -125,7 +117,6 @@ void SettingsPanel::setSkin(TSS::ISkin& skin)
     loggingPlaceholder_.setLook(labelLook);
 
     hardwareLatencySlider_.setLook(TSS::sliderLookFromSkin(skin));
-    uiElementsButton_.setLook(TSS::buttonLookFromSkin(skin));
 
     repaint();
 }

@@ -48,6 +48,7 @@ public:
     std::function<void(int scaleId)> onUiScaleSelected;
     std::function<void()> onUiScaleReset;
     std::function<void()> onSettingsRequested;
+    std::function<void()> onUiTestsToggleRequested;
 
     juce::String getSelectedMidiFromPortIdentifier() const;
     juce::String getSelectedMidiToPortIdentifier() const;

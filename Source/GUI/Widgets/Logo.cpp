@@ -73,6 +73,20 @@ namespace TSS
         if (e.getNumberOfClicks() > 1)
             return;
 
+        if (e.mods.isShiftDown() && e.mods.isCtrlDown())
+        {
+            if (onUiTestsToggleRequested)
+                onUiTestsToggleRequested();
+            return;
+        }
+
+        if (e.mods.isShiftDown())
+        {
+            if (onSettingsRequested)
+                onSettingsRequested();
+            return;
+        }
+
         startTimer(200);
     }
 

@@ -22,6 +22,8 @@ namespace TSS
         int getPreferredWidth() const;
 
         std::function<void()> onPopupRequested;
+        std::function<void()> onSettingsRequested;
+        std::function<void()> onUiTestsToggleRequested;
         std::function<void()> onUiScaleReset;
 
         void paint(juce::Graphics& g) override;

@@ -21,7 +21,6 @@ namespace PluginDisplayNames
         constexpr const char* kNoInputSentinel     = "NO INPUT";
         constexpr const char* kNoOutputSentinel    = "NO OUTPUT";
         constexpr const char* kSettingsButton      = "SETTINGS";
-        constexpr const char* kUiElementsButton    = "UI TESTS";
         constexpr const char* kLogoSkinSection     = "SKIN";
         constexpr const char* kLogoUiScaleSection  = "UI SCALE";
     }

@@ -93,6 +93,16 @@ HeaderPanel::HeaderPanel(TSS::ISkin& skin, int width, int height)
 
     logo_.setSkin(skin);
     logo_.onPopupRequested = [this] { showLogoPopup(); };
+    logo_.onSettingsRequested = [this]
+    {
+        if (onSettingsRequested)
+            onSettingsRequested();
+    };
+    logo_.onUiTestsToggleRequested = [this]
+    {
+        if (onUiTestsToggleRequested)
+            onUiTestsToggleRequested();
+    };
     logo_.onUiScaleReset = [this]
     {
         if (onUiScaleReset)
