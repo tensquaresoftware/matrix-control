@@ -7,7 +7,9 @@
 
 namespace Core
 {
-    /// Ephemeral MIDI activity levels for instrument vs editor outbound paths (FR-9).
+    /// Ephemeral MIDI activity edges for instrument vs editor outbound paths (FR-9).
+    /// Returns a short pulse after each notify so the ~30 Hz UI poll can catch it.
+    /// Visual hold/decay is owned by Led (kReleaseTimeMs_).
     /// Writers: any producer/consumer thread (lock-free atomics). Readers: message thread only.
     class MidiActivityTracker
     {
@@ -23,13 +25,12 @@ namespace Core
         void notifyActivity(Path path) noexcept;
         float getActivityLevel(Path path) const noexcept;
 
-        /// Test seam — decay math with explicit timestamps (message-thread reads only).
+        /// Test seam — pulse math with explicit timestamps (message-thread reads only).
         static float computeLevelFromTimestamp(juce::int64 lastNotifyMs, juce::int64 nowMs) noexcept;
 
     private:
-        inline constexpr static juce::int64 kActivityHoldMs_ = 150;
-        inline constexpr static juce::int64 kActivityDecayMs_ = 350;
-        inline constexpr static float kDecayExponent_ = 5.0f;
+        /// Coalesces bursts between UI polls; not a visual hold constant.
+        inline constexpr static juce::int64 kActivityPulseMs_ = 34;
 
         std::atomic<juce::int64> instrumentLastNotifyMs_{ 0 };
         std::atomic<juce::int64> editorLastNotifyMs_{ 0 };

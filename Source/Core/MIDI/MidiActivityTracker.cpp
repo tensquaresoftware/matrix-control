@@ -10,17 +10,10 @@ namespace Core
 
         const juce::int64 elapsed = nowMs - lastNotifyMs;
 
-        if (elapsed <= kActivityHoldMs_)
+        if (elapsed <= kActivityPulseMs_)
             return 1.0f;
 
-        const juce::int64 decayElapsed = elapsed - kActivityHoldMs_;
-
-        if (decayElapsed >= kActivityDecayMs_)
-            return 0.0f;
-
-        const float decayRatio = static_cast<float>(decayElapsed)
-                                 / static_cast<float>(kActivityDecayMs_);
-        return std::exp(-decayRatio * kDecayExponent_);
+        return 0.0f;
     }
 
     void MidiActivityTracker::notifyActivity(Path path) noexcept
