@@ -1,39 +1,34 @@
 #include "Env1Panel.h"
 
 #include "GUI/Skins/Skin.h"
-#include "GUI/Panels/Reusable/BaseModulePanel.h"
-#include "Shared/Definitions/PluginDescriptors.h"
+#include "GUI/Panels/Reusable/ModulePanelConfigBuilder.h"
+#include "Shared/Definitions/PluginIDs.h"
 #include "GUI/Factories/WidgetFactory.h"
 
 
-ModulePanelConfig Env1Panel::createConfig()
+ModulePanelLayout Env1Panel::createLayout()
 {
-    ModulePanelConfig config;
-    config.moduleId = PluginIDs::PatchEditSection::Envelope1Module::kGroupId;
-    config.buttonSet = ModulePanelButtonSet::InitCopyPaste;
-    config.moduleType = ModulePanelModuleType::PatchEdit;
-    config.initWidgetId = PluginIDs::PatchEditSection::Envelope1Module::StandaloneWidgets::kInit;
-    config.copyWidgetId = PluginIDs::PatchEditSection::Envelope1Module::StandaloneWidgets::kCopy;
-    config.pasteWidgetId = PluginIDs::PatchEditSection::Envelope1Module::StandaloneWidgets::kPaste;
-    
-    config.parameters = {
-        {PluginIDs::PatchEditSection::Envelope1Module::ParameterWidgets::kDelay, ModulePanelParameterType::Slider},
-        {PluginIDs::PatchEditSection::Envelope1Module::ParameterWidgets::kAttack, ModulePanelParameterType::Slider},
-        {PluginIDs::PatchEditSection::Envelope1Module::ParameterWidgets::kDecay, ModulePanelParameterType::Slider},
-        {PluginIDs::PatchEditSection::Envelope1Module::ParameterWidgets::kSustain, ModulePanelParameterType::Slider},
-        {PluginIDs::PatchEditSection::Envelope1Module::ParameterWidgets::kRelease, ModulePanelParameterType::Slider},
-        {PluginIDs::PatchEditSection::Envelope1Module::ParameterWidgets::kAmplitude, ModulePanelParameterType::Slider},
-        {PluginIDs::PatchEditSection::Envelope1Module::ParameterWidgets::kAmplitudeModByVelocity, ModulePanelParameterType::Slider},
-        {PluginIDs::PatchEditSection::Envelope1Module::ParameterWidgets::kTriggerMode, ModulePanelParameterType::ComboBox},
-        {PluginIDs::PatchEditSection::Envelope1Module::ParameterWidgets::kEnvelopeMode, ModulePanelParameterType::ComboBox},
-        {PluginIDs::PatchEditSection::Envelope1Module::ParameterWidgets::kLfo1Trigger, ModulePanelParameterType::ComboBox}
-    };
-    
-    return config;
+    return makePatchEditModuleLayout(
+        PluginIDs::PatchEditSection::Envelope1Module::kGroupId,
+        PluginIDs::PatchEditSection::Envelope1Module::StandaloneWidgets::kInit,
+        PluginIDs::PatchEditSection::Envelope1Module::StandaloneWidgets::kCopy,
+        PluginIDs::PatchEditSection::Envelope1Module::StandaloneWidgets::kPaste,
+        {
+            PluginIDs::PatchEditSection::Envelope1Module::ParameterWidgets::kDelay,
+            PluginIDs::PatchEditSection::Envelope1Module::ParameterWidgets::kAttack,
+            PluginIDs::PatchEditSection::Envelope1Module::ParameterWidgets::kDecay,
+            PluginIDs::PatchEditSection::Envelope1Module::ParameterWidgets::kSustain,
+            PluginIDs::PatchEditSection::Envelope1Module::ParameterWidgets::kRelease,
+            PluginIDs::PatchEditSection::Envelope1Module::ParameterWidgets::kAmplitude,
+            PluginIDs::PatchEditSection::Envelope1Module::ParameterWidgets::kAmplitudeModByVelocity,
+            PluginIDs::PatchEditSection::Envelope1Module::ParameterWidgets::kTriggerMode,
+            PluginIDs::PatchEditSection::Envelope1Module::ParameterWidgets::kEnvelopeMode,
+            PluginIDs::PatchEditSection::Envelope1Module::ParameterWidgets::kLfo1Trigger
+        });
 }
 
 Env1Panel::Env1Panel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts,
                          const ModuleHeaderDimensions& moduleHeaderDims, const ParameterCellDimensions& parameterCellDims)
-    : BaseModulePanel(skin, widgetFactory, apvts, createConfig(), width, height, moduleHeaderDims, parameterCellDims)
+    : BaseModulePanel(skin, widgetFactory, apvts, createLayout(), width, height, moduleHeaderDims, parameterCellDims)
 {
 }

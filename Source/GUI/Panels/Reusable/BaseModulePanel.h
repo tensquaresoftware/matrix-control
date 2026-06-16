@@ -7,6 +7,7 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 
 #include "GUI/Layout/WidgetDimensions.h"
+#include "GUI/Panels/Reusable/ModulePanelConfigBuilder.h"
 
 namespace TSS
 {
@@ -21,35 +22,13 @@ namespace TSS
     class ModuleHeader;
 }
 
-enum class ModulePanelButtonSet { InitCopyPaste, InitOnly };
-enum class ModulePanelModuleType { PatchEdit, MasterEdit };
-enum class ModulePanelParameterType { Slider, ComboBox, None };
-
-struct ModulePanelConfig
-{
-    juce::String moduleId;
-    ModulePanelButtonSet buttonSet;
-    ModulePanelModuleType moduleType;
-    juce::String initWidgetId;
-    juce::String copyWidgetId;
-    juce::String pasteWidgetId;
-    
-    struct ParameterConfig
-    {
-        juce::String parameterId;
-        ModulePanelParameterType parameterType;
-    };
-    
-    std::vector<ParameterConfig> parameters;
-};
-
 class BaseModulePanel : public juce::Component
 {
 public:
     BaseModulePanel(TSS::ISkin& skin,
                     WidgetFactory& widgetFactory,
                     juce::AudioProcessorValueTreeState& apvts,
-                    const ModulePanelConfig& config,
+                    const ModulePanelLayout& layout,
                     int width,
                     int height,
                     const ModuleHeaderDimensions& moduleHeaderDims,

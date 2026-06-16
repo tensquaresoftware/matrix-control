@@ -1,40 +1,34 @@
 #include "Dco1Panel.h"
 
 #include "GUI/Skins/Skin.h"
-#include "GUI/Panels/Reusable/BaseModulePanel.h"
-#include "Shared/Definitions/PluginDescriptors.h"
+#include "GUI/Panels/Reusable/ModulePanelConfigBuilder.h"
+#include "Shared/Definitions/PluginIDs.h"
 #include "GUI/Factories/WidgetFactory.h"
 
 
-ModulePanelConfig Dco1Panel::createConfig()
+ModulePanelLayout Dco1Panel::createLayout()
 {
-    ModulePanelConfig config;
-    config.moduleId = PluginIDs::PatchEditSection::Dco1Module::kGroupId;
-    config.buttonSet = ModulePanelButtonSet::InitCopyPaste;
-    config.moduleType = ModulePanelModuleType::PatchEdit;
-    config.initWidgetId = PluginIDs::PatchEditSection::Dco1Module::StandaloneWidgets::kInit;
-    config.copyWidgetId = PluginIDs::PatchEditSection::Dco1Module::StandaloneWidgets::kCopy;
-    config.pasteWidgetId = PluginIDs::PatchEditSection::Dco1Module::StandaloneWidgets::kPaste;
-    
-    config.parameters = {
-        {PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kFrequency, ModulePanelParameterType::Slider},
-        {PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kFrequencyModByLfo1, ModulePanelParameterType::Slider},
-        {PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kSync, ModulePanelParameterType::ComboBox},
-        {PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kPulseWidth, ModulePanelParameterType::Slider},
-        {PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kPulseWidthModByLfo2, ModulePanelParameterType::Slider},
-        {PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kWaveShape, ModulePanelParameterType::Slider},
-        {PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kWaveSelect, ModulePanelParameterType::ComboBox},
-        {PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kLevers, ModulePanelParameterType::ComboBox},
-        {PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kKeyboardPortamento, ModulePanelParameterType::ComboBox},
-        {PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kKeyClick, ModulePanelParameterType::ComboBox}
-    };
-    
-    return config;
+    return makePatchEditModuleLayout(
+        PluginIDs::PatchEditSection::Dco1Module::kGroupId,
+        PluginIDs::PatchEditSection::Dco1Module::StandaloneWidgets::kInit,
+        PluginIDs::PatchEditSection::Dco1Module::StandaloneWidgets::kCopy,
+        PluginIDs::PatchEditSection::Dco1Module::StandaloneWidgets::kPaste,
+        {
+            PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kFrequency,
+            PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kFrequencyModByLfo1,
+            PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kSync,
+            PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kPulseWidth,
+            PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kPulseWidthModByLfo2,
+            PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kWaveShape,
+            PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kWaveSelect,
+            PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kLevers,
+            PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kKeyboardPortamento,
+            PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kKeyClick
+        });
 }
 
 Dco1Panel::Dco1Panel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts,
                          const ModuleHeaderDimensions& moduleHeaderDims, const ParameterCellDimensions& parameterCellDims)
-    : BaseModulePanel(skin, widgetFactory, apvts, createConfig(), width, height, moduleHeaderDims, parameterCellDims)
+    : BaseModulePanel(skin, widgetFactory, apvts, createLayout(), width, height, moduleHeaderDims, parameterCellDims)
 {
 }
-

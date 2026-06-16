@@ -1,37 +1,32 @@
 #include "RampPortamentoPanel.h"
 
 #include "GUI/Skins/Skin.h"
-#include "GUI/Panels/Reusable/BaseModulePanel.h"
-#include "Shared/Definitions/PluginDescriptors.h"
+#include "GUI/Panels/Reusable/ModulePanelConfigBuilder.h"
+#include "Shared/Definitions/PluginIDs.h"
 #include "GUI/Factories/WidgetFactory.h"
 
 
-ModulePanelConfig RampPortamentoPanel::createConfig()
+ModulePanelLayout RampPortamentoPanel::createLayout()
 {
-    ModulePanelConfig config;
-    config.moduleId = PluginIDs::PatchEditSection::RampPortamentoModule::kGroupId;
-    config.buttonSet = ModulePanelButtonSet::InitOnly;
-    config.moduleType = ModulePanelModuleType::PatchEdit;
-    config.initWidgetId = PluginIDs::PatchEditSection::RampPortamentoModule::StandaloneWidgets::kInit;
-    
-    config.parameters = {
-        {PluginIDs::PatchEditSection::RampPortamentoModule::ParameterWidgets::kRamp1Rate, ModulePanelParameterType::Slider},
-        {PluginIDs::PatchEditSection::RampPortamentoModule::ParameterWidgets::kRamp1Trigger, ModulePanelParameterType::ComboBox},
-        {PluginIDs::PatchEditSection::RampPortamentoModule::ParameterWidgets::kRamp2Rate, ModulePanelParameterType::Slider},
-        {PluginIDs::PatchEditSection::RampPortamentoModule::ParameterWidgets::kRamp2Trigger, ModulePanelParameterType::ComboBox},
-        {PluginIDs::PatchEditSection::RampPortamentoModule::ParameterWidgets::kPortamentoRate, ModulePanelParameterType::Slider},
-        {PluginIDs::PatchEditSection::RampPortamentoModule::ParameterWidgets::kPortamentoModByVelocity, ModulePanelParameterType::Slider},
-        {PluginIDs::PatchEditSection::RampPortamentoModule::ParameterWidgets::kPortamentoMode, ModulePanelParameterType::ComboBox},
-        {PluginIDs::PatchEditSection::RampPortamentoModule::ParameterWidgets::kPortamentoLegato, ModulePanelParameterType::ComboBox},
-        {PluginIDs::PatchEditSection::RampPortamentoModule::ParameterWidgets::kPortamentoKeyboardMode, ModulePanelParameterType::ComboBox},
-        {"", ModulePanelParameterType::None}
-    };
-    
-    return config;
+    return makePatchEditInitOnlyModuleLayout(
+        PluginIDs::PatchEditSection::RampPortamentoModule::kGroupId,
+        PluginIDs::PatchEditSection::RampPortamentoModule::StandaloneWidgets::kInit,
+        {
+            PluginIDs::PatchEditSection::RampPortamentoModule::ParameterWidgets::kRamp1Rate,
+            PluginIDs::PatchEditSection::RampPortamentoModule::ParameterWidgets::kRamp1Trigger,
+            PluginIDs::PatchEditSection::RampPortamentoModule::ParameterWidgets::kRamp2Rate,
+            PluginIDs::PatchEditSection::RampPortamentoModule::ParameterWidgets::kRamp2Trigger,
+            PluginIDs::PatchEditSection::RampPortamentoModule::ParameterWidgets::kPortamentoRate,
+            PluginIDs::PatchEditSection::RampPortamentoModule::ParameterWidgets::kPortamentoModByVelocity,
+            PluginIDs::PatchEditSection::RampPortamentoModule::ParameterWidgets::kPortamentoMode,
+            PluginIDs::PatchEditSection::RampPortamentoModule::ParameterWidgets::kPortamentoLegato,
+            PluginIDs::PatchEditSection::RampPortamentoModule::ParameterWidgets::kPortamentoKeyboardMode,
+            ""
+        });
 }
 
 RampPortamentoPanel::RampPortamentoPanel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts,
                          const ModuleHeaderDimensions& moduleHeaderDims, const ParameterCellDimensions& parameterCellDims)
-    : BaseModulePanel(skin, widgetFactory, apvts, createConfig(), width, height, moduleHeaderDims, parameterCellDims)
+    : BaseModulePanel(skin, widgetFactory, apvts, createLayout(), width, height, moduleHeaderDims, parameterCellDims)
 {
 }

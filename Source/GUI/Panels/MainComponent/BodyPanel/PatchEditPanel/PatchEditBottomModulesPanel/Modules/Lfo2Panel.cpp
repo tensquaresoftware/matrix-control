@@ -1,39 +1,34 @@
 #include "Lfo2Panel.h"
 
 #include "GUI/Skins/Skin.h"
-#include "GUI/Panels/Reusable/BaseModulePanel.h"
-#include "Shared/Definitions/PluginDescriptors.h"
+#include "GUI/Panels/Reusable/ModulePanelConfigBuilder.h"
+#include "Shared/Definitions/PluginIDs.h"
 #include "GUI/Factories/WidgetFactory.h"
 
 
-ModulePanelConfig Lfo2Panel::createConfig()
+ModulePanelLayout Lfo2Panel::createLayout()
 {
-    ModulePanelConfig config;
-    config.moduleId = PluginIDs::PatchEditSection::Lfo2Module::kGroupId;
-    config.buttonSet = ModulePanelButtonSet::InitCopyPaste;
-    config.moduleType = ModulePanelModuleType::PatchEdit;
-    config.initWidgetId = PluginIDs::PatchEditSection::Lfo2Module::StandaloneWidgets::kInit;
-    config.copyWidgetId = PluginIDs::PatchEditSection::Lfo2Module::StandaloneWidgets::kCopy;
-    config.pasteWidgetId = PluginIDs::PatchEditSection::Lfo2Module::StandaloneWidgets::kPaste;
-    
-    config.parameters = {
-        {PluginIDs::PatchEditSection::Lfo2Module::ParameterWidgets::kSpeed, ModulePanelParameterType::Slider},
-        {PluginIDs::PatchEditSection::Lfo2Module::ParameterWidgets::kSpeedModByKeyboard, ModulePanelParameterType::Slider},
-        {PluginIDs::PatchEditSection::Lfo2Module::ParameterWidgets::kRetriggerPoint, ModulePanelParameterType::Slider},
-        {PluginIDs::PatchEditSection::Lfo2Module::ParameterWidgets::kAmplitude, ModulePanelParameterType::Slider},
-        {PluginIDs::PatchEditSection::Lfo2Module::ParameterWidgets::kAmplitudeModByRamp2, ModulePanelParameterType::Slider},
-        {PluginIDs::PatchEditSection::Lfo2Module::ParameterWidgets::kWaveform, ModulePanelParameterType::ComboBox},
-        {PluginIDs::PatchEditSection::Lfo2Module::ParameterWidgets::kTriggerMode, ModulePanelParameterType::ComboBox},
-        {PluginIDs::PatchEditSection::Lfo2Module::ParameterWidgets::kLag, ModulePanelParameterType::ComboBox},
-        {PluginIDs::PatchEditSection::Lfo2Module::ParameterWidgets::kSampleInput, ModulePanelParameterType::ComboBox},
-        {"", ModulePanelParameterType::None}
-    };
-    
-    return config;
+    return makePatchEditModuleLayout(
+        PluginIDs::PatchEditSection::Lfo2Module::kGroupId,
+        PluginIDs::PatchEditSection::Lfo2Module::StandaloneWidgets::kInit,
+        PluginIDs::PatchEditSection::Lfo2Module::StandaloneWidgets::kCopy,
+        PluginIDs::PatchEditSection::Lfo2Module::StandaloneWidgets::kPaste,
+        {
+            PluginIDs::PatchEditSection::Lfo2Module::ParameterWidgets::kSpeed,
+            PluginIDs::PatchEditSection::Lfo2Module::ParameterWidgets::kSpeedModByKeyboard,
+            PluginIDs::PatchEditSection::Lfo2Module::ParameterWidgets::kRetriggerPoint,
+            PluginIDs::PatchEditSection::Lfo2Module::ParameterWidgets::kAmplitude,
+            PluginIDs::PatchEditSection::Lfo2Module::ParameterWidgets::kAmplitudeModByRamp2,
+            PluginIDs::PatchEditSection::Lfo2Module::ParameterWidgets::kWaveform,
+            PluginIDs::PatchEditSection::Lfo2Module::ParameterWidgets::kTriggerMode,
+            PluginIDs::PatchEditSection::Lfo2Module::ParameterWidgets::kLag,
+            PluginIDs::PatchEditSection::Lfo2Module::ParameterWidgets::kSampleInput,
+            ""
+        });
 }
 
 Lfo2Panel::Lfo2Panel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts,
                          const ModuleHeaderDimensions& moduleHeaderDims, const ParameterCellDimensions& parameterCellDims)
-    : BaseModulePanel(skin, widgetFactory, apvts, createConfig(), width, height, moduleHeaderDims, parameterCellDims)
+    : BaseModulePanel(skin, widgetFactory, apvts, createLayout(), width, height, moduleHeaderDims, parameterCellDims)
 {
 }

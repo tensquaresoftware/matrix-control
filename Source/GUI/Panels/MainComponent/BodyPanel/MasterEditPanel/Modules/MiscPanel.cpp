@@ -1,35 +1,30 @@
 #include "MiscPanel.h"
 
 #include "GUI/Skins/Skin.h"
-#include "GUI/Panels/Reusable/BaseModulePanel.h"
-#include "Shared/Definitions/PluginDescriptors.h"
+#include "GUI/Panels/Reusable/ModulePanelConfigBuilder.h"
+#include "Shared/Definitions/PluginIDs.h"
 #include "GUI/Factories/WidgetFactory.h"
 
 
-ModulePanelConfig MiscPanel::createConfig()
+ModulePanelLayout MiscPanel::createLayout()
 {
-    ModulePanelConfig config;
-    config.moduleId = PluginIDs::MasterEditSection::MiscModule::kGroupId;
-    config.buttonSet = ModulePanelButtonSet::InitOnly;
-    config.moduleType = ModulePanelModuleType::MasterEdit;
-    config.initWidgetId = PluginIDs::MasterEditSection::MiscModule::StandaloneWidgets::kInit;
-    
-    config.parameters = {
-        {PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kMasterTune, ModulePanelParameterType::Slider},
-        {PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kMasterTranspose, ModulePanelParameterType::Slider},
-        {PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kBendRange, ModulePanelParameterType::Slider},
-        {PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kUnisonEnable, ModulePanelParameterType::ComboBox},
-        {PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kVolumeInvertEnable, ModulePanelParameterType::ComboBox},
-        {PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kBankLockEnable, ModulePanelParameterType::ComboBox},
-        {PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kMemoryProtectEnable, ModulePanelParameterType::ComboBox},
-        {"", ModulePanelParameterType::None}
-    };
-    
-    return config;
+    return makeMasterEditModuleLayout(
+        PluginIDs::MasterEditSection::MiscModule::kGroupId,
+        PluginIDs::MasterEditSection::MiscModule::StandaloneWidgets::kInit,
+        {
+            PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kMasterTune,
+            PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kMasterTranspose,
+            PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kBendRange,
+            PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kUnisonEnable,
+            PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kVolumeInvertEnable,
+            PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kBankLockEnable,
+            PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kMemoryProtectEnable,
+            ""
+        });
 }
 
 MiscPanel::MiscPanel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts,
                          const ModuleHeaderDimensions& moduleHeaderDims, const ParameterCellDimensions& parameterCellDims)
-    : BaseModulePanel(skin, widgetFactory, apvts, createConfig(), width, height, moduleHeaderDims, parameterCellDims)
+    : BaseModulePanel(skin, widgetFactory, apvts, createLayout(), width, height, moduleHeaderDims, parameterCellDims)
 {
 }

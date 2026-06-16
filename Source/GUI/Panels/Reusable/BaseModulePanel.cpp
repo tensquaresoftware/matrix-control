@@ -1,6 +1,7 @@
 #include "BaseModulePanel.h"
 
 #include "GUI/Layout/ScaledLayout.h"
+#include "GUI/Panels/Reusable/ModulePanelConfigBuilder.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Widgets/ModuleHeader.h"
@@ -10,17 +11,19 @@
 BaseModulePanel::BaseModulePanel(TSS::ISkin& skin,
                                  WidgetFactory& widgetFactory,
                                  juce::AudioProcessorValueTreeState& apvts,
-                                 const ModulePanelConfig& config,
+                                 const ModulePanelLayout& layout,
                                  int width,
                                  int height,
                                  const ModuleHeaderDimensions& moduleHeaderDims,
                                  const ParameterCellDimensions& parameterCellDims)
     : skin_(&skin)
     , apvts_(apvts)
-    , moduleType_(config.moduleType)
+    , moduleType_(layout.moduleType)
     , moduleHeaderDims_(moduleHeaderDims)
     , parameterCellDims_(parameterCellDims)
 {
+    const auto config = buildModulePanelConfig(layout);
+
     setOpaque(false);
     
     const auto buttonSet = (config.buttonSet == ModulePanelButtonSet::InitCopyPaste)
@@ -48,11 +51,7 @@ BaseModulePanel::BaseModulePanel(TSS::ISkin& skin,
 
     for (const auto& paramConfig : config.parameters)
     {
-        ParameterCell::ParameterType paramType = ParameterCell::ParameterType::None;
-        if (paramConfig.parameterType == ModulePanelParameterType::Slider)
-            paramType = ParameterCell::ParameterType::Slider;
-        else if (paramConfig.parameterType == ModulePanelParameterType::ComboBox)
-            paramType = ParameterCell::ParameterType::ComboBox;
+        const auto paramType = paramConfig.parameterType;
 
         ParameterCell::ModuleType modType = (config.moduleType == ModulePanelModuleType::PatchEdit)
             ? ParameterCell::ModuleType::PatchEdit

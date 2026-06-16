@@ -1,34 +1,29 @@
 #include "VibratoPanel.h"
 
 #include "GUI/Skins/Skin.h"
-#include "GUI/Panels/Reusable/BaseModulePanel.h"
-#include "Shared/Definitions/PluginDescriptors.h"
+#include "GUI/Panels/Reusable/ModulePanelConfigBuilder.h"
+#include "Shared/Definitions/PluginIDs.h"
 #include "GUI/Factories/WidgetFactory.h"
 
 
-ModulePanelConfig VibratoPanel::createConfig()
+ModulePanelLayout VibratoPanel::createLayout()
 {
-    ModulePanelConfig config;
-    config.moduleId = PluginIDs::MasterEditSection::VibratoModule::kGroupId;
-    config.buttonSet = ModulePanelButtonSet::InitOnly;
-    config.moduleType = ModulePanelModuleType::MasterEdit;
-    config.initWidgetId = PluginIDs::MasterEditSection::VibratoModule::StandaloneWidgets::kInit;
-    
-    config.parameters = {
-        {PluginIDs::MasterEditSection::VibratoModule::ParameterWidgets::kSpeed, ModulePanelParameterType::Slider},
-        {PluginIDs::MasterEditSection::VibratoModule::ParameterWidgets::kWaveform, ModulePanelParameterType::ComboBox},
-        {PluginIDs::MasterEditSection::VibratoModule::ParameterWidgets::kAmplitude, ModulePanelParameterType::Slider},
-        {PluginIDs::MasterEditSection::VibratoModule::ParameterWidgets::kSpeedModSource, ModulePanelParameterType::ComboBox},
-        {PluginIDs::MasterEditSection::VibratoModule::ParameterWidgets::kSpeedModAmount, ModulePanelParameterType::Slider},
-        {PluginIDs::MasterEditSection::VibratoModule::ParameterWidgets::kAmpModSource, ModulePanelParameterType::ComboBox},
-        {PluginIDs::MasterEditSection::VibratoModule::ParameterWidgets::kAmpModAmount, ModulePanelParameterType::Slider}
-    };
-    
-    return config;
+    return makeMasterEditModuleLayout(
+        PluginIDs::MasterEditSection::VibratoModule::kGroupId,
+        PluginIDs::MasterEditSection::VibratoModule::StandaloneWidgets::kInit,
+        {
+            PluginIDs::MasterEditSection::VibratoModule::ParameterWidgets::kSpeed,
+            PluginIDs::MasterEditSection::VibratoModule::ParameterWidgets::kWaveform,
+            PluginIDs::MasterEditSection::VibratoModule::ParameterWidgets::kAmplitude,
+            PluginIDs::MasterEditSection::VibratoModule::ParameterWidgets::kSpeedModSource,
+            PluginIDs::MasterEditSection::VibratoModule::ParameterWidgets::kSpeedModAmount,
+            PluginIDs::MasterEditSection::VibratoModule::ParameterWidgets::kAmpModSource,
+            PluginIDs::MasterEditSection::VibratoModule::ParameterWidgets::kAmpModAmount
+        });
 }
 
 VibratoPanel::VibratoPanel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts,
                          const ModuleHeaderDimensions& moduleHeaderDims, const ParameterCellDimensions& parameterCellDims)
-    : BaseModulePanel(skin, widgetFactory, apvts, createConfig(), width, height, moduleHeaderDims, parameterCellDims)
+    : BaseModulePanel(skin, widgetFactory, apvts, createLayout(), width, height, moduleHeaderDims, parameterCellDims)
 {
 }

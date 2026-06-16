@@ -22,7 +22,7 @@ public:
     ~Env3Panel() override = default;
 
 private:
-    static ModulePanelConfig createConfig();
+    static ModulePanelLayout createLayout();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Env3Panel)
 };

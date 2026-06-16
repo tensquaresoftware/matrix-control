@@ -225,6 +225,7 @@ set(PLUGIN_SOURCES
     
     # GUI - Panels - Reusable
     Source/GUI/Panels/Reusable/BaseModulePanel.cpp
+    Source/GUI/Panels/Reusable/ModulePanelConfigBuilder.cpp
     
     # GUI - Widgets
     Source/GUI/Widgets/Button.cpp
@@ -304,8 +305,10 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/SysExInterMessageDelayTests.cpp
         Tests/Unit/SysExParserTests.cpp
         Tests/Unit/WidgetDimensionRegistryTests.cpp
+        Tests/Unit/ModulePanelConfigBuilderTests.cpp
 
         Source/GUI/Layout/WidgetDimensionRegistry.cpp
+        Source/GUI/Panels/Reusable/ModulePanelConfigBuilder.cpp
         Source/Shared/Definitions/PluginDescriptorsPatchManager.cpp
         Source/Core/Models/ApvtsMasterMapper.cpp
         Source/Core/Models/ApvtsPatchMapper.cpp
@@ -362,6 +365,7 @@ if(MATRIX_BUILD_TESTS)
         juce::juce_audio_processors
         juce::juce_audio_devices
         juce::juce_core
+        juce::juce_gui_basics
         juce::juce_recommended_config_flags
         juce::juce_recommended_warning_flags
     )

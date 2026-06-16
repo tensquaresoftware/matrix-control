@@ -144,6 +144,18 @@ std::optional<juce::String> WidgetFactory::getStandaloneWidgetDisplayName(const 
     return std::nullopt;
 }
 
+std::optional<WidgetFactory::ParameterWidgetKind> WidgetFactory::resolveParameterWidgetKind(
+    const juce::String& parameterId) const
+{
+    const auto kind = PluginHelpers::resolveParameterWidgetKind(parameterId);
+    if (! kind.has_value())
+        return std::nullopt;
+
+    return (*kind == PluginHelpers::ParameterWidgetKind::Slider)
+        ? ParameterWidgetKind::Slider
+        : ParameterWidgetKind::ComboBox;
+}
+
 const PluginDescriptors::IntParameterDescriptor* WidgetFactory::findIntParameter(const juce::String& parameterId) const
 {
     auto it = intParameterMap.find(parameterId);
