@@ -75,11 +75,11 @@ En **application standalone** : tu choisis ton clavier USB dans **KEYBOARD FROM*
 
 Ouvre-la avec le bouton **SETTINGS**.
 
-| Réglage | Plugin (Live) | Standalone |
-|---|---|---|
-| Skin, taille de l’interface | Oui | Oui |
-| **HARDWARE LATENCY** (délai matériel) | Oui — pour compenser le temps que met le son du Matrix à revenir dans le DAW | Non affiché |
-| **AUDIO FROM**, **INPUT GAIN**, barre de niveau | Non affiché — le son du Matrix passe par le routage audio de Live | Oui — écoute directe du Matrix dans l’app |
+| Réglage | Plugin (Live) | Standalone | Résultat | Notes |
+|---|---|---|---|---|
+| Skin, taille de l’interface | Oui | Oui | ✅ |  |
+| **HARDWARE LATENCY** (délai matériel) | Oui — pour compenser le temps que met le son du Matrix à revenir dans le DAW | Non affiché | ✅ | Le réglage semble surtout retarder le son du Matrix-1000 : est-ce l'effet recherché ? |
+| **AUDIO FROM**, **INPUT GAIN**, barre de niveau | Non affiché — le son du Matrix passe par le routage audio de Live | Oui — écoute directe du Matrix dans l’app | ✅ |  |
 
 > **Important (Epic R, story R-1)** : en plugin, Matrix-Control **ne transporte plus l’audio** du Matrix. Tu routes l’audio du synthé comme d’habitude dans Live (piste audio ou monitoring d’entrée). Les tests audio de ce guide concernent **uniquement le standalone**.
 
@@ -95,9 +95,9 @@ Ouvre-la avec le bouton **SETTINGS**.
 
 | ID | Ce que tu fais | Succès si | Résultat | Notes |
 |:---|:---|:---|:---:|:---|
-| PRE-1 | Vérifie câbles MIDI et audio, Matrix allumé | Tout est branché, Matrix prêt | | |
-| PRE-2 | Joue **Do central (C3)** avec la config MIDI ci-dessus | Tu entends le Matrix | | |
-| PRE-3 | Ouvre **SETTINGS** → vérifie que la fenêtre s’affiche et se ferme | Pas de plantage | | |
+| PRE-1 | Vérifie câbles MIDI et audio, Matrix allumé | Tout est branché, Matrix prêt | ✅ | |
+| PRE-2 | Joue **Do central (C3)** avec la config MIDI ci-dessus | Tu entends le Matrix | ✅ | |
+| PRE-3 | Ouvre **SETTINGS** → vérifie que la fenêtre s’affiche et se ferme | Pas de plantage | ✅ | |
 
 ---
 
@@ -114,9 +114,9 @@ Ouvre-la avec le bouton **SETTINGS**.
 
 | ID | Ce que tu fais | Succès si | Résultat | Notes |
 |:---|:---|:---|:---:|:---|
-| A-VST3-1 | Piste armée : joue **C3** | Son Matrix audible ; voyant près de **KEYBOARD FROM** et voyant près de **MIDI TO** clignotent | | |
-| A-VST3-2 | Désarme la piste, rejoue **C3** | Pas de nouvelle note sur le Matrix ; voyant clavier éteint | | |
-| A-VST3-3 | Réarme : bouge la **molette de modulation** (CC1) | Le Matrix réagit (ex. vibrato/tremolo selon le patch) | | |
+| A-VST3-1 | Piste armée : joue **C3** | Son Matrix audible ; voyant près de **KEYBOARD FROM** et voyant près de **MIDI TO** clignotent | ✅ | |
+| A-VST3-2 | Désarme la piste, rejoue **C3** | Pas de nouvelle note sur le Matrix ; voyant clavier éteint | ✅ | |
+| A-VST3-3 | Réarme : bouge la **molette de modulation** (CC1) | Le Matrix réagit (ex. vibrato/tremolo selon le patch) | ✅ | |
 
 ### A2 — Éditer le patch depuis l’interface
 
@@ -124,20 +124,20 @@ Ouvre la section **PATCH EDIT**.
 
 | ID | Ce que tu fais | Succès si | Résultat | Notes |
 |:---|:---|:---|:---:|:---|
-| A-VST3-4 | **DCO 1 → FREQUENCY** : monte d’environ 2 crans | Le timbre change en moins d’une seconde ; voyant près de **MIDI TO** clignote | | |
-| A-VST3-5 | Pendant que tu joues, continue à modifier des paramètres | Jeu et édition simultanés sans coupure ni blocage | | |
+| A-VST3-4 | **DCO 1 → FREQUENCY** : monte d’environ 2 crans | Le timbre change en moins d’une seconde ; voyant près de **MIDI TO** clignote | ✅ | Il y a un comme un petit lag lors de la première édition sur un slider, ensuite le Matrix-Control est réactif. |
+| A-VST3-5 | Pendant que tu joues, continue à modifier des paramètres | Jeu et édition simultanés sans coupure ni blocage | ✅ | |
 
 ### A3 — Éditer le Master
 
 | ID | Ce que tu fais | Succès si | Résultat | Notes |
 |:---|:---|:---|:---:|:---|
-| A-VST3-6 | **MASTER EDIT → MISC → MASTER TUNE** : modifie la valeur | La hauteur globale du Matrix change | | |
+| A-VST3-6 | **MASTER EDIT → MISC → MASTER TUNE** : modifie la valeur | La hauteur globale du Matrix change | ✅ | |
 
 ### A4 — Matrix Mod
 
 | ID | Ce que tu fais | Succès si | Résultat | Notes |
 |:---|:---|:---|:---:|:---|
-| A-VST3-7 | **MATRIX MOD**, bus **0** : mets par ex. **LFO 1 → VCF FREQ** avec un amount audible | La modulation est audible sur le son | | |
+| A-VST3-7 | **MATRIX MOD**, bus **0** : mets par ex. **LFO 1 → VCF FREQ** avec un amount audible | La modulation est audible sur le son | ✅Certaines notes jouées pendant l'édition de la matrice de modulation sont parfaois restées coincées, comme si les messages Note Off n'avaient pas été reçus ou pris en compte par le Matrix-1000 |  |
 
 ### A5 — Réordonner les bus Matrix Mod (stories 2-10, 7-9)
 
@@ -145,15 +145,15 @@ Prépare deux bus avec des modulations **clairement différentes** (ex. bus 0 et
 
 | ID | Ce que tu fais | Succès si | Résultat | Notes |
 |:---|:---|:---|:---:|:---|
-| A-VST3-8 | Clique sur le **numéro** d’un bus, maintiens, glisse sur un autre bus, relâche | Les contenus des deux bus **échangent** (source, amount, destination) ; le son du Matrix reflète le changement ; voyant **MIDI TO** clignote | | |
-| A-VST3-9 | Les numéros de bus **0 à 9** à gauche n’ont pas bougé | Seul le contenu a été permuté, pas les numéros affichés | | |
+| A-VST3-8 | Clique sur le **numéro** d’un bus, maintiens, glisse sur un autre bus, relâche | Les contenus des deux bus **échangent** (source, amount, destination) ; le son du Matrix reflète le changement ; voyant **MIDI TO** clignote | ✅ | |
+| A-VST3-9 | Les numéros de bus **0 à 9** à gauche n’ont pas bougé | Seul le contenu a été permuté, pas les numéros affichés | ✅ | |
 
 ### A6 — SETTINGS et sauvegarde du Set
 
 | ID | Ce que tu fais | Succès si | Résultat | Notes |
 |:---|:---|:---|:---:|:---|
-| A-VST3-10 | **SETTINGS** : règle **HARDWARE LATENCY** (ex. 10 ms), ferme SETTINGS | La valeur reste affichée si tu rouvres SETTINGS | | Story R-2 |
-| A-VST3-11 | Sauvegarde le Set, ferme Live, rouvre le Set | **MIDI TO**, **EDITOR MIDI FROM** et **HARDWARE LATENCY** sont retrouvés ; le jeu et l’édition fonctionnent encore | | |
+| A-VST3-10 | **SETTINGS** : règle **HARDWARE LATENCY** (ex. 10 ms), ferme SETTINGS | La valeur reste affichée si tu rouvres SETTINGS | ✅ | Story R-2 |
+| A-VST3-11 | Sauvegarde le Set, ferme Live, rouvre le Set | **MIDI TO**, **EDITOR MIDI FROM** et **HARDWARE LATENCY** sont retrouvés ; le jeu et l’édition fonctionnent encore | ✅ | |
 
 ---
 
@@ -163,9 +163,9 @@ Reprends la **Session A** avec le plugin **AU**. Si un test échoue en AU mais p
 
 | ID | Ce que tu fais | Succès si | Résultat | Notes |
 |:---|:---|:---|:---:|:---|
-| B-AU-1 | Tests A-VST3-1 à A-VST3-9 en AU | Même comportement qu’en VST3 | | |
-| B-AU-2 | Test A-VST3-11 en AU | Ports MIDI et latency restaurés après rechargement | | |
-| B-AU-3 | Compare les noms de ports MIDI VST3 vs AU | Mêmes ports disponibles (libellés équivalents) | | |
+| B-AU-1 | Tests A-VST3-1 à A-VST3-9 en AU | Même comportement qu’en VST3 | ✅ | Même remarque concernant les notes MIDI "coincées" lors de l'édition de la matrice de modulation et le petit lag lors de la première édition d'un slider. |
+| B-AU-2 | Test A-VST3-11 en AU | Ports MIDI et latency restaurés après rechargement | ✅ | |
+| B-AU-3 | Compare les noms de ports MIDI VST3 vs AU | Mêmes ports disponibles (libellés équivalents) | ✅ | |
 
 ---
 
@@ -184,27 +184,27 @@ Reprends la **Session A** avec le plugin **AU**. Si un test échoue en AU mais p
 
 | ID | Ce que tu fais | Succès si | Résultat | Notes |
 |:---|:---|:---|:---:|:---|
-| C-1 | Joue **C3** | Son Matrix ; voyants **KEYBOARD FROM** et **MIDI TO** clignotent | | |
-| C-2 | Mets **KEYBOARD FROM** sur « — » (aucun) | Plus de notes vers le Matrix | | |
-| C-3 | Resélectionne le clavier | Le jeu refonctionne | | |
-| C-4 | Modifie **DCO 1 → FREQUENCY** | Timbre change ; voyant **MIDI TO** clignote | | |
-| C-5 | Échange deux bus Matrix Mod par glisser-déposer sur le numéro | Même résultat qu’en A-VST3-8/9 | | |
+| C-1 | Joue **C3** | Son Matrix ; voyants **KEYBOARD FROM** et **MIDI TO** clignotent | ✅ | |
+| C-2 | Mets **KEYBOARD FROM** sur « — » (aucun) | Plus de notes vers le Matrix | ✅ | |
+| C-3 | Resélectionne le clavier | Le jeu refonctionne | ✅ | |
+| C-4 | Modifie **DCO 1 → FREQUENCY** | Timbre change ; voyant **MIDI TO** clignote | ✅ | Même remarque concernant le petit lag lors de la première édition d'un slider. |
+| C-5 | Échange deux bus Matrix Mod par glisser-déposer sur le numéro | Même résultat qu’en A-VST3-8/9 | ✅ | Phénomène de notes coupées pendant le glisser-déposer, pas de notes coincées à priori dans ce test. |
 
 ### C2 — Audio (standalone uniquement, stories 2-7, 7-7)
 
 | ID | Ce que tu fais | Succès si | Résultat | Notes |
 |:---|:---|:---|:---:|:---|
-| C-6 | Joue une note tenue : écoute la sortie de l’app | Tu entends le Matrix ; la barre de niveau dans SETTINGS monte | | |
-| C-7 | **INPUT GAIN** à +6 dB | Volume plus fort ; barre plus haute | | |
-| C-8 | **INPUT GAIN** à −24 dB | Volume plus faible ; barre plus basse | | |
-| C-9 | Silence après une note | La barre redescend en 1 à 2 secondes | | |
+| C-6 | Joue une note tenue : écoute la sortie de l’app | Tu entends le Matrix ; la barre de niveau dans SETTINGS monte | ✅ | Le crête-mètre a été replacé dans le HeaderPanel. Il a tendance à bagotter alors que le niveau e signal est très stable (sawtooth), il faudrait sans doute lisser un peu sur une fenetre temporelle courte. |
+| C-7 | **INPUT GAIN** à +6 dB | Volume plus fort ; barre plus haute | ✅ | |
+| C-8 | **INPUT GAIN** à −24 dB | Volume plus faible ; barre plus basse | ✅ | |
+| C-9 | Silence après une note | La barre redescend en 1 à 2 secondes | ✅ | |
 
 ### C3 — Persistance standalone
 
 | ID | Ce que tu fais | Succès si | Résultat | Notes |
 |:---|:---|:---|:---:|:---|
-| C-10 | Quitte l’app après avoir réglé ports, gain et **AUDIO FROM** | — | | |
-| C-11 | Relance l’app | Tous les réglages sont retrouvés ; jeu et édition OK | | |
+| C-10 | Quitte l’app après avoir réglé ports, gain et **AUDIO FROM** | — | ✅ | |
+| C-11 | Relance l’app | Tous les réglages sont retrouvés ; jeu et édition OK | ✅ | |
 
 ---
 
@@ -212,9 +212,9 @@ Reprends la **Session A** avec le plugin **AU**. Si un test échoue en AU mais p
 
 | ID | Ce que tu fais | Succès si | Résultat | Notes |
 |:---|:---|:---|:---:|:---|
-| NR-1 | Édite le patch pendant 5 min en jouant | Pas de freeze, pas de latence qui dérive | | |
-| NR-2 | **EDITOR MIDI FROM** sur « — », modifie un paramètre | Le son change quand même (l’envoi utilise **MIDI TO**) | | |
-| NR-3 | **MIDI TO** sur « — », modifie un paramètre | Pas de changement sonore, mais l’app ne plante pas | | |
+| NR-1 | Édite le patch pendant 5 min en jouant | Pas de freeze, pas de latence qui dérive | ✅ | |
+| NR-2 | **EDITOR MIDI FROM** sur « — », modifie un paramètre | Le son change quand même (l’envoi utilise **MIDI TO**) | ✅ | |
+| NR-3 | **MIDI TO** sur « — », modifie un paramètre | Pas de changement sonore, mais l’app ne plante pas | ✅ | |
 
 ---
 
@@ -265,14 +265,16 @@ Coche mentalement chaque ligne avant de valider l’epic.
 
 | Champ | Valeur |
 |:---|:---|
-| Date | |
-| Version / build testée | |
-| Live (version) | |
-| Interface audio | |
-| Entrée audio Matrix (standalone) | ex. entrée 1 |
-| Ports MT4 (**EDITOR MIDI FROM** / **MIDI TO**) | |
+| Date | 2026-06-16 |
+| Version / build testée | Inconnu (il faudrait implémenter ce numéro dans un ABOUT...) |
+| Live (version) | Ableton Live Suite v12.4.2 |
+| Ordinateur | MacBook Pro M5 14" (fin 2025) / RAM 24 Go / SSD 1 To |
+| Système d'exploitation | macOS Tahoe 26.5.1 |
+| Interface audio | Focusrite Scarlett 6i6 USB (2nd Gen) |
+| Entrée audio Matrix (standalone) | Entrée 1 sur port Jack |
+| Ports MT4 (**EDITOR MIDI FROM** / **MIDI TO**) | In 1 / Out 1 |
 | Tests ❌ (IDs) | ex. `A-VST3-4, C-6` |
-| Écarts AU vs VST3 | |
+| Écarts AU vs VST3 | Aucun constaté |
 | Epic 2 validé (G1–G9) | ✅ ou ❌ |
 
 ---
