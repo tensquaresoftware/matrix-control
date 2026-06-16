@@ -22,7 +22,7 @@ private:
         beginTest("clampMs bounds non-finite input");
 
         expectEquals(Core::HardwareLatency::clampMs(-5.0f), Core::HardwareLatency::kMinMs);
-        expectEquals(Core::HardwareLatency::clampMs(150.0f), Core::HardwareLatency::kMaxMs);
+        expectEquals(Core::HardwareLatency::clampMs(250.0f), Core::HardwareLatency::kMaxMs);
         expectEquals(Core::HardwareLatency::clampMs(12.3f), 12.3f);
         expectEquals(Core::HardwareLatency::clampMs(std::numeric_limits<float>::quiet_NaN()),
                      Core::HardwareLatency::kMinMs);
@@ -36,7 +36,7 @@ private:
         expectEquals(Core::HardwareLatency::quantizeMs(0.05f), 0.1f);
         expectWithinAbsoluteError(Core::HardwareLatency::quantizeMs(12.34f), 12.3f, 0.001f);
         expectWithinAbsoluteError(Core::HardwareLatency::quantizeMs(12.36f), 12.4f, 0.001f);
-        expectEquals(Core::HardwareLatency::quantizeMs(100.04f), Core::HardwareLatency::kMaxMs);
+        expectEquals(Core::HardwareLatency::quantizeMs(200.04f), Core::HardwareLatency::kMaxMs);
     }
 
     void testMsToSamples()
@@ -49,6 +49,7 @@ private:
         expectEquals(Core::HardwareLatency::msToSamples(10.0f, 48000.0), 480);
         expectEquals(Core::HardwareLatency::msToSamples(25.0f, 96000.0), 2400);
         expectEquals(Core::HardwareLatency::msToSamples(100.0f, 44100.0), 4410);
+        expectEquals(Core::HardwareLatency::msToSamples(200.0f, 44100.0), 8820);
         expectEquals(Core::HardwareLatency::msToSamples(1.0f, 0.0), 0);
     }
 };
