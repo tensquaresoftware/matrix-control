@@ -21,7 +21,9 @@ Source complète : `CONVENTIONS.md` §5–§6.2, §9. Constitution BMad : `_bmad
 
 ## BMad Method
 
-- Artefacts BMad : `_bmad-output/` (`project-context.md`, stories, `sprint-status.yaml`) — pas de skills versionnés dans le dépôt
+- **Versionné** : `_bmad/` (config installer), `_bmad/custom/config.toml` (politique d’équipe), `_bmad-output/` (`project-context.md`, stories, `sprint-status.yaml`)
+- **Local / gitignored** : `.agents/` (cache skills Cursor, régénéré par l’installer BMad), `_bmad/custom/config.user.toml` (override perso)
+- **Pas de skills versionnés** dans le dépôt — après clone, relancer l’installer BMad (cible Cursor) pour recréer `.agents/`
 - Plans archivés : `Documentation/Development/Plans/<année>/<mois>/` (nom `YYYY-MM-DD-Titre-En-Anglais.md`)
 
 ## Fichiers clés (lire avant d'implémenter)

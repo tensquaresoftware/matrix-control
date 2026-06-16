@@ -3,7 +3,7 @@ organization: Ten Square Software
 project: Matrix-Control
 title: Project Context
 author: BMad Agent
-version: "1.2"
+version: "1.3"
 sources:
   - planning-artifacts/briefs/brief-Matrix-Control-2026-05-22/brief.md
   - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/prd.md
@@ -18,7 +18,7 @@ updated: 2026-06-16
 
 **Purpose:** Implementation constitution for BMad agents working on this repository.  
 **Baseline code tag:** `v0.0.66-alpha-pre-bmad`  
-**Last updated:** 2026-06-16 (agent language policy)
+**Last updated:** 2026-06-16 (BMad tooling hygiene — `.agents/` gitignored)
 
 ---
 
@@ -40,6 +40,20 @@ Authoritative detail: `CONVENTIONS.md` §1. Cursor rule: `.cursor/rules/communic
 - `_bmad/custom/config.user.toml` — personal override (gitignored)
 
 Skills and agents MUST use `{communication_language}` for chat and `{document_output_language}` for generated documents — do not invert these roles.
+
+---
+
+## BMad Tooling Layout (Cursor)
+
+| Path | Role | Git |
+|---|---|---|
+| `_bmad/` | Installer-managed BMad modules and config | **versioned** |
+| `_bmad/custom/config.toml` | Team policy overrides (e.g. language) | **versioned** |
+| `_bmad/custom/config.user.toml` | Personal overrides | **gitignored** |
+| `_bmad-output/` | PRD, architecture, epics, stories, sprint status | **versioned** |
+| `.agents/` | Cursor skill cache copied by BMad installer | **gitignored** |
+
+**After clone:** run the BMad installer with Cursor as the IDE target so `.agents/skills/` is regenerated locally. Do not commit `.agents/` — it is a machine-local cache, not project source.
 
 ---
 
@@ -114,7 +128,8 @@ Matrix-Control/
 ├── Documentation/           # Public project knowledge (.md, kebab-case filenames)
 ├── Logs/                    # Runtime logs (gitignored) — MIDI/, APVTS/ via ProjectPaths
 ├── Builds/                  # CMake preset output trees (gitignored)
-├── _bmad/, _bmad-output/    # BMad tooling and artifacts
+├── _bmad/, _bmad-output/    # BMad tooling and artifacts (versioned)
+├── .agents/                 # Cursor skill cache (gitignored — BMad installer)
 └── _local/                  # Personal workspace (gitignored)
 ```
 
@@ -127,6 +142,7 @@ Matrix-Control/
 | `Logs/` | Runtime logs (`MIDI/`, `APVTS/`) | **gitignored** |
 | `Builds/` | CMake outputs (`macOS/ARM`, etc.) | **gitignored** |
 | `_bmad/`, `_bmad-output/` | BMad artifacts | versioned |
+| `.agents/` | Cursor skill cache (BMad installer) | **gitignored** |
 | `_local/` | Personal workspace | **gitignored** |
 
 **Tooling:** `CMakeUserPresets.json`, `project-configuration.cmake` (no `configure-platform.py`). IDE: CMake Tools + `clangd` disabled; `compile_commands.json` copied to repo root on configure.

@@ -9,3 +9,4 @@ Public project documentation lives under `Documentation/`. Active BMad planning 
 | `Documentation/windows-midi-multi-client.md` | Windows WinMM exclusive access; loopMIDI / rtpMIDI setup |
 | `_bmad-output/` | BMad PRD, architecture, epics, stories |
 | `_bmad-output/reference-docs/` | Oberheim MIDI/SysEx reference transcriptions |
+| `.agents/` | Local Cursor skill cache (gitignored; regenerate via BMad installer) |
