@@ -9,6 +9,7 @@
 #include "GUI/Panels/MainComponent/HeaderPanel/HeaderPanel.h"
 #include "GUI/Settings/SettingsPanel.h"
 #include "GUI/Settings/SettingsWindow.h"
+#include "GUI/About/AboutWindow.h"
 #include "Skins/Skin.h"
 #include "Factories/WidgetFactory.h"
 #include "Shared/Definitions/PluginIDs.h"
@@ -239,6 +240,9 @@ void PluginEditor::resized()
     if (settingsWindow_ != nullptr && settingsWindow_->isVisible())
         settingsWindow_->setBounds(getLocalBounds());
 
+    if (aboutWindow_ != nullptr && aboutWindow_->isVisible())
+        aboutWindow_->setBounds(getLocalBounds());
+
     layoutUiElementsTestComponent();
     syncUiScaleFromEditor();
 }
@@ -275,6 +279,9 @@ void PluginEditor::syncUiScaleFromEditor()
 
     if (settingsWindow_ != nullptr && settingsWindow_->isVisible())
         updateSettingsWindowLayout(uiScale);
+
+    if (aboutWindow_ != nullptr && aboutWindow_->isVisible())
+        updateAboutWindowLayout(uiScale);
 }
 
 void PluginEditor::updateSettingsWindowLayout(float uiScale)
@@ -284,6 +291,15 @@ void PluginEditor::updateSettingsWindowLayout(float uiScale)
 
     settingsWindow_->setUiScale(uiScale);
     settingsWindow_->setBounds(getLocalBounds());
+}
+
+void PluginEditor::updateAboutWindowLayout(float uiScale)
+{
+    if (aboutWindow_ == nullptr)
+        return;
+
+    aboutWindow_->setUiScale(uiScale);
+    aboutWindow_->setBounds(getLocalBounds());
 }
 
 void PluginEditor::applySkinFromItemId(int skinItemId, bool persistToState)
@@ -305,6 +321,7 @@ void PluginEditor::applyUiScaleFromItemId(int scaleId, bool persistToState)
     const float uiScale = PluginIDs::Settings::ScaleLevels::getUiScale(scaleId);
     applyUiScale(uiScale);
     updateSettingsWindowLayout(uiScale);
+    updateAboutWindowLayout(uiScale);
 
     if (persistToState)
         pluginProcessor.setGuiScaleId(scaleId);
@@ -336,6 +353,14 @@ void PluginEditor::wireHeaderPanel(HeaderPanel& headerPanel)
             closeSettingsWindow();
         else
             openSettingsWindow();
+    };
+
+    headerPanel.onAboutRequested = [this]
+    {
+        if (aboutWindow_ != nullptr && aboutWindow_->isVisible())
+            closeAboutWindow();
+        else
+            openAboutWindow();
     };
 
     headerPanel.onUiTestsToggleRequested = [this]
@@ -384,6 +409,9 @@ void PluginEditor::updateSkin()
 
     if (settingsWindow_ != nullptr)
         settingsWindow_->setSkin(*skin_);
+
+    if (aboutWindow_ != nullptr)
+        aboutWindow_->setSkin(*skin_);
 
     if (testComponent_ != nullptr)
         testComponent_->setSkin(*skin_);
@@ -436,6 +464,7 @@ PluginEditor::~PluginEditor()
 {
     detachStandaloneAudioDeviceListener();
     closeSettingsWindow();
+    closeAboutWindow();
 }
 
 SettingsPanel* PluginEditor::getSettingsPanelIfOpen()
@@ -482,6 +511,37 @@ void PluginEditor::closeSettingsWindow()
 {
     if (settingsWindow_ != nullptr)
         settingsWindow_->setVisible(false);
+}
+
+void PluginEditor::openAboutWindow()
+{
+    if (aboutWindow_ == nullptr)
+    {
+        aboutWindow_ = std::make_unique<AboutWindow>(
+            *skin_,
+            [this] { closeAboutWindow(); });
+        addChildComponent(*aboutWindow_);
+    }
+    else
+    {
+        aboutWindow_->setSkin(*skin_);
+    }
+
+    const int baseWidth = layoutDimensions_.editor.width;
+    const float uiScale = (baseWidth > 0)
+        ? TSS::ScaledLayout::uiScaleFromEditorBounds(getWidth(), baseWidth)
+        : 1.0f;
+    updateAboutWindowLayout(uiScale);
+
+    aboutWindow_->setVisible(true);
+    aboutWindow_->toFront(true);
+    aboutWindow_->grabKeyboardFocus();
+}
+
+void PluginEditor::closeAboutWindow()
+{
+    if (aboutWindow_ != nullptr)
+        aboutWindow_->setVisible(false);
 }
 
 void PluginEditor::restoreSettingsPanelFromState(SettingsPanel& panel)

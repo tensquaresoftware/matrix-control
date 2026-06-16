@@ -10,12 +10,12 @@ namespace TSS
     class ISkin;
 }
 
-class SettingsPanel;
+class AboutPanel;
 
-class SettingsCloseButton : public juce::Button
+class AboutCloseButton : public juce::Button
 {
 public:
-    SettingsCloseButton();
+    AboutCloseButton();
     void setSkin(TSS::ISkin& skin);
     void setUiScale(float uiScale);
 
@@ -26,19 +26,14 @@ private:
     float uiScale_ = 1.0f;
     juce::Path crossShape_;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SettingsCloseButton)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AboutCloseButton)
 };
 
-class SettingsWindow : public juce::Component
+class AboutWindow : public juce::Component
 {
 public:
-    SettingsWindow(TSS::ISkin& skin,
-                   bool isPluginMode,
-                   std::function<void(SettingsPanel&)> onPanelReady,
-                   std::function<void()> onCloseRequested);
-    ~SettingsWindow() override = default;
-
-    SettingsPanel& getSettingsPanel() { return *settingsPanel_; }
+    AboutWindow(TSS::ISkin& skin, std::function<void()> onCloseRequested);
+    ~AboutWindow() override;
 
     void setSkin(TSS::ISkin& skin);
     void setUiScale(float uiScale);
@@ -56,11 +51,11 @@ private:
     TSS::ISkin* skin_;
     float uiScale_ = 1.0f;
 
-    SettingsCloseButton closeButton_;
-    std::unique_ptr<SettingsPanel> settingsPanel_;
+    AboutCloseButton closeButton_;
+    std::unique_ptr<AboutPanel> aboutPanel_;
 
     inline constexpr static int kTitleBarHeight_ = 28;
     inline constexpr static int kBorderThickness_ = 4;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SettingsWindow)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AboutWindow)
 };

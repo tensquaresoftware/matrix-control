@@ -20,13 +20,15 @@ namespace TSS
                                              int currentUiScaleId,
                                              std::function<void(int skinItemId)> onSkinSelected,
                                              std::function<void(int scaleId)> onUiScaleSelected,
-                                             std::function<void()> onSettingsRequested)
+                                             std::function<void()> onSettingsRequested,
+                                             std::function<void()> onAboutRequested)
         : uiScale_(uiScale)
         , currentSkinItemId_(currentSkinItemId)
         , currentUiScaleId_(currentUiScaleId)
         , onSkinSelected_(std::move(onSkinSelected))
         , onUiScaleSelected_(std::move(onUiScaleSelected))
         , onSettingsRequested_(std::move(onSettingsRequested))
+        , onAboutRequested_(std::move(onAboutRequested))
         , look_(popupMenuLookFromSkin(skin))
         , renderer_(std::make_unique<PopupMenuRenderer>(true, uiScale_))
         , cachedFont_(look_.font.withHeight(look_.font.getHeight() * uiScale_))
@@ -69,6 +71,10 @@ namespace TSS
                            0,
                            PluginDisplayNames::HeaderPanel::kSettingsButton,
                            1, 5 });
+        items_.push_back({ ItemKind::About,
+                           0,
+                           PluginDisplayNames::HeaderPanel::kAboutButton,
+                           1, 6 });
     }
 
     int HeaderLogoPopupMenu::getItemHeightPx() const
@@ -133,7 +139,7 @@ namespace TSS
             return false;
 
         const auto kind = items_[static_cast<size_t>(flatIndex)].kind;
-        return kind == ItemKind::Skin || kind == ItemKind::UiScale || kind == ItemKind::Settings;
+        return kind == ItemKind::Skin || kind == ItemKind::UiScale || kind == ItemKind::Settings || kind == ItemKind::About;
     }
 
     bool HeaderLogoPopupMenu::isCurrentSelection(int flatIndex) const
@@ -142,7 +148,7 @@ namespace TSS
             return false;
 
         const auto& item = items_[static_cast<size_t>(flatIndex)];
-        if (item.kind == ItemKind::Settings)
+        if (item.kind == ItemKind::Settings || item.kind == ItemKind::About)
             return false;
 
         if (item.kind == ItemKind::Skin)
@@ -183,6 +189,11 @@ namespace TSS
         {
             if (onSettingsRequested_)
                 onSettingsRequested_();
+        }
+        else if (item.kind == ItemKind::About)
+        {
+            if (onAboutRequested_)
+                onAboutRequested_();
         }
 
         closePopup();
@@ -313,7 +324,8 @@ namespace TSS
                                   int currentUiScaleId,
                                   std::function<void(int skinItemId)> onSkinSelected,
                                   std::function<void(int scaleId)> onUiScaleSelected,
-                                  std::function<void()> onSettingsRequested)
+                                  std::function<void()> onSettingsRequested,
+                                  std::function<void()> onAboutRequested)
     {
         auto* topLevelComponent = logo.getTopLevelComponent();
         if (topLevelComponent == nullptr)
@@ -326,7 +338,8 @@ namespace TSS
             currentUiScaleId,
             std::move(onSkinSelected),
             std::move(onUiScaleSelected),
-            std::move(onSettingsRequested));
+            std::move(onSettingsRequested),
+            std::move(onAboutRequested));
         auto* rawPtr = popupMenu.get();
 
         const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(logo);

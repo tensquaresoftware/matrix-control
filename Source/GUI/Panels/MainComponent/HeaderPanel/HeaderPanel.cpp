@@ -312,6 +312,11 @@ void HeaderPanel::showLogoPopup()
         {
             if (onSettingsRequested)
                 onSettingsRequested();
+        },
+        [this]
+        {
+            if (onAboutRequested)
+                onAboutRequested();
         });
 }
 

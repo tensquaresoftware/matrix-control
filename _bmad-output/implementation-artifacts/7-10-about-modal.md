@@ -3,8 +3,8 @@ organization: Ten Square Software
 project: Matrix-Control
 title: Story 7.10 — About Modal (Logo Popup)
 author: BMad Agent
-status: ready-for-dev
-baseline_commit: HEAD
+status: review
+baseline_commit: 384673a4bfae0f11b401acaa28428f7ea2d650db
 sources:
   - planning-artifacts/epics.md
   - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/prd.md
@@ -18,7 +18,7 @@ updated: 2026-06-16
 
 # Story 7.10: About Modal (Logo Popup)
 
-Status: ready-for-dev
+Status: review
 
 <!-- Extends FR-41 logo popup (D-014a). Complements Story 7.7 Settings window — About is read-only product info. -->
 
@@ -82,28 +82,28 @@ so that I can see product version, authorship, and links without hunting in the 
 
 ## Tasks / Subtasks
 
-- [ ] **Display names + design** (AC: #1–3)
-  - [ ] `kSettingsButton` → `"SETTINGS..."` ; add `kAboutButton` = `"ABOUT..."`
-  - [ ] Bump `kLogoPopupColumnWidth` to 80 (or measured minimum ÷4)
-  - [ ] Adjust `buildItems()` row indices for ABOUT below SETTINGS
+- [x] **Display names + design** (AC: #1–3)
+  - [x] `kSettingsButton` → `"SETTINGS..."` ; add `kAboutButton` = `"ABOUT..."`
+  - [x] Bump `kLogoPopupColumnWidth` to 80 (or measured minimum ÷4)
+  - [x] Adjust `buildItems()` row indices for ABOUT below SETTINGS
 
-- [ ] **HeaderLogoPopupMenu wiring** (AC: #2)
-  - [ ] `ItemKind::About`, `onAboutRequested_` callback
-  - [ ] `HeaderLogoPopupMenu::show(...)` + `Logo` / `HeaderPanel` pass-through
-  - [ ] `PluginEditor` or `HeaderPanel` opens About modal
+- [x] **HeaderLogoPopupMenu wiring** (AC: #2)
+  - [x] `ItemKind::About`, `onAboutRequested_` callback
+  - [x] `HeaderLogoPopupMenu::show(...)` + `Logo` / `HeaderPanel` pass-through
+  - [x] `PluginEditor` or `HeaderPanel` opens About modal
 
-- [ ] **PluginVersion SSOT** (AC: #6)
-  - [ ] CMake: `MATRIX_CONTROL_PRERELEASE_SUFFIX`, `MATRIX_CONTROL_BUILD_DATE`
-  - [ ] `PluginVersion.h` — `getVersionString()`, `getReleaseDateString()`
+- [x] **PluginVersion SSOT** (AC: #6)
+  - [x] CMake: `MATRIX_CONTROL_PRERELEASE_SUFFIX`, `MATRIX_CONTROL_BUILD_DATE`
+  - [x] `PluginVersion.h` — `getVersionString()`, `getReleaseDateString()`
 
-- [ ] **AboutWindow + AboutPanel** (AC: #4–5)
-  - [ ] New `Source/GUI/About/AboutWindow.{h,cpp}` + `AboutPanel.{h,cpp}` (mirror Settings structure)
-  - [ ] Static text constants in `PluginDisplayNames::About` namespace
-  - [ ] Clickable URLs
+- [x] **AboutWindow + AboutPanel** (AC: #4–5)
+  - [x] New `Source/GUI/About/AboutWindow.{h,cpp}` + `AboutPanel.{h,cpp}` (mirror Settings structure)
+  - [x] Static text constants in `PluginDisplayNames::About` namespace
+  - [x] Clickable URLs
 
-- [ ] **CMake + tests** (AC: #7–8)
-  - [ ] Add new `.cpp` to `PLUGIN_SOURCES` + test target
-  - [ ] `PluginVersionTests.cpp` optional
+- [x] **CMake + tests** (AC: #7–8)
+  - [x] Add new `.cpp` to `PLUGIN_SOURCES` + test target
+  - [x] `PluginVersionTests.cpp` optional
 
 ## Dev Notes
 
@@ -161,12 +161,38 @@ Column 0 (SCALE)     | Column 1 (SKIN)
 
 ### Agent Model Used
 
-<!-- filled on implementation -->
+Composer (Cursor)
 
 ### Completion Notes
 
-<!-- filled on implementation -->
+- Logo popup: `SETTINGS...` + `ABOUT...` entries; column width 80 design px; `ItemKind::About` wired through `HeaderPanel` → `PluginEditor`.
+- `AboutWindow` / `AboutPanel` mirror Settings modal shell (X, Escape, click-outside dismiss). Settings also gained click-outside for parity.
+- Version SSOT: `PluginVersion::getVersionString()` → `0.0.18-alpha`; `getReleaseDateString()` → CMake configure date (`MATRIX_CONTROL_BUILD_DATE`, UTC).
+- **Version bump policy:** edit `project(Matrix-Control VERSION …)` in `CMakeLists.txt`; set `MATRIX_CONTROL_PRERELEASE_SUFFIX` to `alpha` / `beta` / `""` (release) via CMake cache.
+- Build: `Matrix-Control` + `Matrix-Control_Tests` pass on macOS ARM. Manual: open About from logo popup, verify links and version line.
 
 ### File List
 
-<!-- filled on implementation -->
+- `CMakeLists.txt`
+- `Source/Shared/Definitions/PluginDisplayNames.h`
+- `Source/Shared/Definitions/PluginVersion.h`
+- `Source/Shared/Definitions/PluginVersion.cpp`
+- `Source/GUI/Layout/Design/DesignPanels.h`
+- `Source/GUI/Widgets/HeaderLogoPopupMenu.h`
+- `Source/GUI/Widgets/HeaderLogoPopupMenu.cpp`
+- `Source/GUI/Panels/MainComponent/HeaderPanel/HeaderPanel.h`
+- `Source/GUI/Panels/MainComponent/HeaderPanel/HeaderPanel.cpp`
+- `Source/GUI/About/AboutPanel.h`
+- `Source/GUI/About/AboutPanel.cpp`
+- `Source/GUI/About/AboutWindow.h`
+- `Source/GUI/About/AboutWindow.cpp`
+- `Source/GUI/Settings/SettingsWindow.h`
+- `Source/GUI/Settings/SettingsWindow.cpp`
+- `Source/GUI/PluginEditor.h`
+- `Source/GUI/PluginEditor.cpp`
+- `Tests/Unit/PluginVersionTests.cpp`
+- `_bmad-output/implementation-artifacts/sprint-status.yaml`
+
+### Change Log
+
+- 2026-06-16: Story 7.10 — About modal from logo popup, PluginVersion SSOT, unit tests.

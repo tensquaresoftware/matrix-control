@@ -3,21 +3,43 @@ organization: Ten Square Software
 project: Matrix-Control
 title: Project Context
 author: BMad Agent
-version: "1.1"
+version: "1.2"
 sources:
   - planning-artifacts/briefs/brief-Matrix-Control-2026-05-22/brief.md
   - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/prd.md
   - planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/architecture.md
   - reference-docs/oberheim/index.md
+  - CONVENTIONS.md
 created: 2026-05-23
-updated: 2026-06-08
+updated: 2026-06-16
 ---
 
 # Project Context
 
 **Purpose:** Implementation constitution for BMad agents working on this repository.  
 **Baseline code tag:** `v0.0.66-alpha-pre-bmad`  
-**Last updated:** 2026-05-31 (P-001 sign-off — Story 0.5)
+**Last updated:** 2026-06-16 (agent language policy)
+
+---
+
+## Agent Communication & Language
+
+Authoritative detail: `CONVENTIONS.md` §1. Cursor rule: `.cursor/rules/communication-fr.md`.
+
+| Channel | Language | Rule |
+|---|---|---|
+| **Chat with Guillaume** (Cursor, BMad workflows, all agents) | **French** | Informal *tu*; plain French; complete sentences; no unnecessary anglicisms. Project identifiers stay in English when citing code. |
+| **BMad artifacts** (`_bmad-output/`, stories, PRD, architecture, sprint status, etc.) | **English** | Unless Guillaume explicitly requests another language for a specific document. |
+| **Source code, comments, commits, GitHub issues** | **English** | No French in `Source/` or public `Documentation/`. |
+| **Development plans** (`Documentation/Development/Plans/…`) | **English** | `YYYY-MM-DD-Title-In-English.md` naming. |
+
+**BMad config (SSOT for workflow variables):**
+
+- `_bmad/bmm/config.yaml` — `communication_language: French`, `document_output_language: English`
+- `_bmad/custom/config.toml` — team override (committed)
+- `_bmad/custom/config.user.toml` — personal override (gitignored)
+
+Skills and agents MUST use `{communication_language}` for chat and `{document_output_language}` for generated documents — do not invert these roles.
 
 ---
 

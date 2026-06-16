@@ -15,6 +15,7 @@ class WidgetFactory;
 class HeaderPanel;
 class SettingsPanel;
 class SettingsWindow;
+class AboutWindow;
 
 class PluginEditor : public juce::AudioProcessorEditor,
                      private juce::ChangeListener
@@ -38,12 +39,15 @@ private:
 
     void openSettingsWindow();
     void closeSettingsWindow();
+    void openAboutWindow();
+    void closeAboutWindow();
     SettingsPanel* getSettingsPanelIfOpen();
     void wireSettingsPanel(SettingsPanel& panel);
     void wireHeaderPanel(HeaderPanel& headerPanel);
     void restoreSettingsPanelFromState(SettingsPanel& panel);
     void restoreHeaderPanelFromState(HeaderPanel& headerPanel);
     void updateSettingsWindowLayout(float uiScale);
+    void updateAboutWindowLayout(float uiScale);
 
     void applySkinFromItemId(int skinItemId, bool persistToState = true);
     void applyUiScaleFromItemId(int scaleId, bool persistToState = true);
@@ -58,6 +62,7 @@ private:
     std::unique_ptr<MainComponent> mainComponent_;
     std::unique_ptr<TestComponent> testComponent_;
     std::unique_ptr<SettingsWindow> settingsWindow_;
+    std::unique_ptr<AboutWindow> aboutWindow_;
     bool uiElementsTestVisible_ = false;
     std::unique_ptr<HeaderRefreshTimer> headerRefreshTimer_;
 

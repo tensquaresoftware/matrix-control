@@ -1,6 +1,6 @@
-#include "SettingsWindow.h"
+#include "AboutWindow.h"
 
-#include "SettingsPanel.h"
+#include "AboutPanel.h"
 #include "GUI/Skins/Skin.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 
@@ -21,28 +21,28 @@ namespace
     }
 }
 
-SettingsCloseButton::SettingsCloseButton()
+AboutCloseButton::AboutCloseButton()
     : juce::Button("close")
     , crossShape_(makeCloseCrossShape())
 {
     setMouseCursor(juce::MouseCursor::PointingHandCursor);
 }
 
-void SettingsCloseButton::setSkin(TSS::ISkin& skin)
+void AboutCloseButton::setSkin(TSS::ISkin& skin)
 {
     skin_ = &skin;
     repaint();
 }
 
-void SettingsCloseButton::setUiScale(float uiScale)
+void AboutCloseButton::setUiScale(float uiScale)
 {
     uiScale_ = uiScale;
     repaint();
 }
 
-void SettingsCloseButton::paintButton(juce::Graphics& g,
-                                      bool shouldDrawButtonAsHighlighted,
-                                      bool shouldDrawButtonAsDown)
+void AboutCloseButton::paintButton(juce::Graphics& g,
+                                   bool shouldDrawButtonAsHighlighted,
+                                   bool shouldDrawButtonAsDown)
 {
     const auto titleBarBackground = skin_ != nullptr
         ? skin_->getColour(SkinColourId::kHeaderPanelBackground)
@@ -65,10 +65,7 @@ void SettingsCloseButton::paintButton(juce::Graphics& g,
     g.fillPath(crossShape_, crossShape_.getTransformToScaleToFit(reducedRect, true));
 }
 
-SettingsWindow::SettingsWindow(TSS::ISkin& skin,
-                               bool isPluginMode,
-                               std::function<void(SettingsPanel&)> onPanelReady,
-                               std::function<void()> onCloseRequested)
+AboutWindow::AboutWindow(TSS::ISkin& skin, std::function<void()> onCloseRequested)
     : onCloseRequested_(std::move(onCloseRequested))
     , skin_(&skin)
 {
@@ -84,50 +81,49 @@ SettingsWindow::SettingsWindow(TSS::ISkin& skin,
     closeButton_.setSkin(skin);
     addAndMakeVisible(closeButton_);
 
-    settingsPanel_ = std::make_unique<SettingsPanel>(skin, isPluginMode);
-    addAndMakeVisible(*settingsPanel_);
-
-    if (onPanelReady)
-        onPanelReady(*settingsPanel_);
+    aboutPanel_ = std::make_unique<AboutPanel>(skin);
+    addAndMakeVisible(*aboutPanel_);
 }
 
-void SettingsWindow::setSkin(TSS::ISkin& skin)
+AboutWindow::~AboutWindow() = default;
+
+void AboutWindow::setSkin(TSS::ISkin& skin)
 {
     skin_ = &skin;
     closeButton_.setSkin(skin);
-    settingsPanel_->setSkin(skin);
+    aboutPanel_->setSkin(skin);
     repaint();
 }
 
-void SettingsWindow::setUiScale(float uiScale)
+void AboutWindow::setUiScale(float uiScale)
 {
     if (juce::approximatelyEqual(uiScale_, uiScale))
         return;
 
     uiScale_ = uiScale;
     closeButton_.setUiScale(uiScale);
-    settingsPanel_->setUiScale(uiScale);
+    aboutPanel_->setUiScale(uiScale);
     resized();
     repaint();
 }
 
-int SettingsWindow::getBorderThickness() const
+int AboutWindow::getBorderThickness() const
 {
     return juce::roundToInt(static_cast<float>(kBorderThickness_) * uiScale_);
 }
 
-juce::Rectangle<int> SettingsWindow::getDialogBounds() const
+juce::Rectangle<int> AboutWindow::getDialogBounds() const
 {
     const int border = getBorderThickness();
-    const int dialogWidth = juce::roundToInt(static_cast<float>(SettingsPanel::kDesignWidth) * uiScale_) + border * 2;
-    const int dialogHeight = juce::roundToInt(static_cast<float>(SettingsPanel::kDesignHeight) * uiScale_)
+    const int dialogWidth = juce::roundToInt(static_cast<float>(AboutPanel::kDesignWidth) * uiScale_) + border * 2;
+    const int dialogHeight = juce::roundToInt(static_cast<float>(AboutPanel::kDesignHeight) * uiScale_)
                              + juce::roundToInt(static_cast<float>(kTitleBarHeight_) * uiScale_)
                              + border * 2;
 
     return getLocalBounds().withSizeKeepingCentre(dialogWidth, dialogHeight);
 }
 
-void SettingsWindow::paint(juce::Graphics& g)
+void AboutWindow::paint(juce::Graphics& g)
 {
     g.fillAll(skin_->getColour(SkinColourId::kBodyPanelBackground).withAlpha(0.85f));
 
@@ -147,13 +143,13 @@ void SettingsWindow::paint(juce::Graphics& g)
 
     g.setColour(skin_->getColour(SkinColourId::kLabelText));
     g.setFont(skin_->getBaseFontBold().withHeight(skin_->getBaseFontBold().getHeight() * uiScale_));
-    g.drawText(PluginDisplayNames::Settings::kWindowTitle,
+    g.drawText(PluginDisplayNames::About::kWindowTitle,
                titleBar,
                juce::Justification::centred,
                false);
 }
 
-void SettingsWindow::resized()
+void AboutWindow::resized()
 {
     auto inner = getDialogBounds().reduced(getBorderThickness());
     const int titleBarHeight = juce::roundToInt(static_cast<float>(kTitleBarHeight_) * uiScale_);
@@ -161,16 +157,16 @@ void SettingsWindow::resized()
 
     auto titleBar = inner.removeFromTop(titleBarHeight);
     closeButton_.setBounds(titleBar.removeFromRight(closeButtonWidth));
-    settingsPanel_->setBounds(inner);
+    aboutPanel_->setBounds(inner);
 }
 
-void SettingsWindow::mouseDown(const juce::MouseEvent& e)
+void AboutWindow::mouseDown(const juce::MouseEvent& e)
 {
     if (! getDialogBounds().contains(e.getPosition()) && onCloseRequested_)
         onCloseRequested_();
 }
 
-bool SettingsWindow::keyPressed(const juce::KeyPress& key)
+bool AboutWindow::keyPressed(const juce::KeyPress& key)
 {
     if (key == juce::KeyPress::escapeKey)
     {

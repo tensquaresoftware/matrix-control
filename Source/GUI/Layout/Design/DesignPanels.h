@@ -177,7 +177,7 @@ namespace TSS::Design
             inline constexpr int kLogoFontHeight = 20;
             inline constexpr int kLogoGapAfter = 32;
             inline constexpr int kLogoExtraWidth = 8;
-            inline constexpr int kLogoPopupColumnWidth = 56;
+            inline constexpr int kLogoPopupColumnWidth = 80;
             inline constexpr int kSettingsButtonWidth = 72;
         }
 

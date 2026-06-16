@@ -20,9 +20,32 @@ namespace PluginDisplayNames
         constexpr const char* kInputGainLabel      = "INPUT GAIN :";
         constexpr const char* kNoInputSentinel     = "NO INPUT";
         constexpr const char* kNoOutputSentinel    = "NO OUTPUT";
-        constexpr const char* kSettingsButton      = "SETTINGS";
+        constexpr const char* kSettingsButton      = "SETTINGS...";
+        constexpr const char* kAboutButton         = "ABOUT...";
         constexpr const char* kLogoSkinSection     = "SKIN";
         constexpr const char* kLogoUiScaleSection  = "UI SCALE";
+    }
+
+    namespace About
+    {
+        const juce::String kWindowTitle              = "ABOUT";
+        constexpr const char* kProductTitle          = "MATRIX-CONTROL";
+        constexpr const char* kTagline               = "Modern SysEx MIDI editor for the Oberheim Matrix-1000/6/6R synthesizers.";
+        constexpr const char* kOrganizationLabel     = "Organization";
+        constexpr const char* kOrganizationValue     = "Ten Square Software";
+        constexpr const char* kAuthorLabel           = "Author";
+        constexpr const char* kAuthorValue           = "Guillaume DUPONT";
+        constexpr const char* kEmailLabel            = "Email";
+        constexpr const char* kEmailDisplay          = "tensquaresoftware@gmail.com";
+        constexpr const char* kEmailUrl              = "mailto:tensquaresoftware@gmail.com";
+        constexpr const char* kGitHubLabel           = "GitHub";
+        constexpr const char* kGitHubDisplay         = "github.com/tensquaresoftware/Matrix-Control";
+        constexpr const char* kGitHubUrl             = "https://github.com/tensquaresoftware/Matrix-Control";
+        constexpr const char* kLinkedInLabel         = "LinkedIn";
+        constexpr const char* kLinkedInDisplay       = "in/guillaumedupontmontpellier/";
+        constexpr const char* kLinkedInUrl           = "https://www.linkedin.com/in/guillaumedupontmontpellier/";
+        constexpr const char* kVersionLabel          = "Version";
+        constexpr const char* kReleaseDateLabel      = "Release date";
     }
 
     namespace Settings

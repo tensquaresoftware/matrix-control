@@ -47,6 +47,10 @@ endif()
 
 project(Matrix-Control VERSION 0.0.18)
 
+string(TIMESTAMP MATRIX_CONTROL_BUILD_DATE "%Y-%m-%d" UTC)
+set(MATRIX_CONTROL_PRERELEASE_SUFFIX "alpha"
+    CACHE STRING "Pre-release suffix appended to version (empty string for release builds)")
+
 # Plugin copy configuration (edit project-configuration.cmake to customize)
 include(project-configuration.cmake)
 
@@ -118,12 +122,15 @@ set(PLUGIN_SOURCES
     Source/Core/Factories/ApvtsValidator.cpp
     Source/Core/Factories/ApvtsLayoutBuilder.cpp
     Source/Shared/Definitions/PluginHelpers.cpp
+    Source/Shared/Definitions/PluginVersion.cpp
     Source/Shared/Definitions/PluginDescriptors.cpp
     Source/Shared/Definitions/PluginDescriptorsMasterEdit.cpp
     Source/Shared/Definitions/PluginDescriptorsPatchEdit.cpp
     Source/Shared/Definitions/PluginDescriptorsMatrixModulation.cpp
     Source/Shared/Definitions/PluginDescriptorsPatchManager.cpp
     Source/GUI/PluginEditor.cpp
+    Source/GUI/About/AboutPanel.cpp
+    Source/GUI/About/AboutWindow.cpp
     Source/GUI/Factories/WidgetFactory.cpp
     Source/GUI/Factories/DimensionFactory.cpp
     Source/GUI/Factories/WidgetFactoryValidator.cpp
@@ -273,6 +280,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/TestMain.cpp
         Tests/Unit/ApvtsMasterMapperTests.cpp
         Tests/Unit/ApvtsPatchMapperTests.cpp
+        Tests/Unit/PluginVersionTests.cpp
         Tests/Unit/PatchNameSyncerTests.cpp
         Tests/Unit/MasterModelTests.cpp
         Tests/Unit/MidiActivityTrackerTests.cpp
@@ -332,6 +340,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Shared/Definitions/PluginDescriptorsMatrixModulation.cpp
         Source/Shared/Definitions/PluginDescriptorsPatchEdit.cpp
         Source/Shared/Definitions/PluginHelpers.cpp
+        Source/Shared/Definitions/PluginVersion.cpp
         Source/Shared/ProjectPaths.cpp
     )
 
@@ -344,6 +353,9 @@ if(MATRIX_BUILD_TESTS)
         JUCE_USE_CURL=0
         JUCE_STANDALONE_APPLICATION=1
         MATRIX_TEST_FIXTURES_DIR="${CMAKE_CURRENT_SOURCE_DIR}/Tests/Fixtures"
+        MATRIX_CONTROL_PROJECT_VERSION="${PROJECT_VERSION}"
+        MATRIX_CONTROL_PRERELEASE_SUFFIX="${MATRIX_CONTROL_PRERELEASE_SUFFIX}"
+        MATRIX_CONTROL_BUILD_DATE="${MATRIX_CONTROL_BUILD_DATE}"
     )
 
     target_link_libraries(Matrix-Control_Tests PRIVATE
@@ -423,6 +435,10 @@ target_compile_definitions(Matrix-Control
         JUCE_USE_CURL=0
         JUCE_VST3_CAN_REPLACE_VST2=0
         JUCE_REPORT_APP_USAGE=0
+    PRIVATE
+        MATRIX_CONTROL_PROJECT_VERSION="${PROJECT_VERSION}"
+        MATRIX_CONTROL_PRERELEASE_SUFFIX="${MATRIX_CONTROL_PRERELEASE_SUFFIX}"
+        MATRIX_CONTROL_BUILD_DATE="${MATRIX_CONTROL_BUILD_DATE}"
 )
 
 # JUCE links optional ARA/LV2 stub objects with no symbols into the shared-code static library.
