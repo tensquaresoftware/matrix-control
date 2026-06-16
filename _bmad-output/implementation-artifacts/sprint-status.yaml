@@ -1,5 +1,5 @@
 # generated: 2026-05-29
-# last_updated: 2026-06-12 (Story 7-7 closed — done)
+# last_updated: 2026-06-16 (Story 7-10 About modal + UAT bug passation)
 # project: Matrix-Control
 # project_key: NOKEY
 # tracking_system: file-system
@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-05-29
-last_updated: 2026-06-12 (Story 7-7 closed — done)
+last_updated: 2026-06-16 (Story 7-10 About modal + UAT bug passation)
 project: Matrix-Control
 project_key: NOKEY
 tracking_system: file-system
@@ -122,6 +122,7 @@ development_status:
   7-7-settings-page-consolidation: done
   7-8-header-footer-shell-and-persistence: backlog
   7-9-matrix-mod-bus-reorder-ux-handler: done
+  7-10-about-modal: ready-for-dev
   epic-7-retrospective: optional
   epic-8: backlog
   8-1-devicetyperegistry-and-member-byte-fix: backlog

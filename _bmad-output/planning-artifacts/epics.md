@@ -1198,6 +1198,19 @@ So that I can reorganize active buses visually (FR-50 UX side, UX-DR5).
 **Then** handler permutes Source/Amount/Destination values between rows and invokes Core reorder SysEx
 **And** bus indices 0–9 remain fixed in UI
 
+### Story 7.10: About Modal (Logo Popup)
+
+As a Matrix-Control user,
+I want an About dialog from the logo popup menu,
+So that I can see version, authorship, and project links (FR-41 partial, UAT traceability).
+
+**Acceptance Criteria:**
+
+**Given** Story 7.7 Settings window pattern
+**When** user opens logo popup and chooses **ABOUT...**
+**Then** a read-only modal shows product info, version (`0.0.x-alpha` until 1.0.0 release), and release date
+**And** logo popup entry reads **SETTINGS...** ; both menu columns are wide enough not to truncate labels
+
 ---
 
 ## Epic 8: Synth Connection & Instrument Role
