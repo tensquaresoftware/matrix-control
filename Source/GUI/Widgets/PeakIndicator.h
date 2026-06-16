@@ -8,7 +8,7 @@ namespace TSS
 {
     class ISkin;
 
-    /// Solid vertical peak fill (D-071) — not a continuous VU meter.
+    /// Solid vertical peak fill (D-071). Visual release is governed solely by kReleaseTimeMs_.
     class PeakIndicator : public juce::Component,
                           private juce::Timer
     {
@@ -23,7 +23,8 @@ namespace TSS
 
     private:
         inline constexpr static float kBorderThicknessDesign_ = 2.0f;
-        inline constexpr static juce::int64 kReleaseTimeMs_ = 600;
+        inline constexpr static juce::int64 kReleaseTimeMs_ = 300;
+        inline constexpr static float kReleaseCurveExponent_ = 3.0f;
         inline constexpr static int kAnimationHz_ = 60;
 
         ISkin* skin_ = nullptr;

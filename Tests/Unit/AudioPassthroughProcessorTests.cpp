@@ -16,7 +16,7 @@ public:
         testMonoDuplicatePreservesBalanceWhenInputOutputAlias();
         testSeparateInputOutputBusBuffers();
         testPeakTracksMaxSample();
-        testPeakHoldRetainsLevelBriefly();
+        testPeakFollowsCurrentBlock();
         testSilenceProducesZeroPeak();
         testDisabledInputBusClearsOutput();
         testZeroInputChannelsClearsOutput();
@@ -154,9 +154,9 @@ private:
         expectEquals(input.getSample(0, 0), 0.75f);
     }
 
-    void testPeakHoldRetainsLevelBriefly()
+    void testPeakFollowsCurrentBlock()
     {
-        beginTest("Peak hold retains level during brief silence");
+        beginTest("Peak level follows the current block without hold");
 
         Core::AudioPassthroughProcessor processor;
         processor.prepare(1, 1, true, 44100.0);
@@ -170,13 +170,14 @@ private:
         processor.process(loudInput, loudOutput, 1.0f);
         expect(processor.getPeakLevel() > 0.85f);
 
-        juce::AudioBuffer<float> silentInput(1, 64);
-        juce::AudioBuffer<float> silentOutput(1, 64);
-        silentInput.clear();
-        silentOutput.clear();
-        processor.process(silentInput, silentOutput, 1.0f);
+        juce::AudioBuffer<float> quietInput(1, 64);
+        juce::AudioBuffer<float> quietOutput(1, 64);
+        quietInput.clear();
+        quietOutput.clear();
+        quietInput.setSample(0, 0, 0.2f);
+        processor.process(quietInput, quietOutput, 1.0f);
 
-        expect(processor.getPeakLevel() > 0.85f);
+        expectEquals(processor.getPeakLevel(), 0.2f);
     }
 
     void testZeroLengthBlockIsSafe()
@@ -225,7 +226,7 @@ private:
 
     void testSilenceProducesZeroPeak()
     {
-        beginTest("Silence decays peak toward zero");
+        beginTest("Silence produces zero peak on the next block");
 
         Core::AudioPassthroughProcessor processor;
         processor.prepare(2, 2, true, 44100.0);
@@ -243,11 +244,9 @@ private:
         juce::AudioBuffer<float> silentOutput(2, 512);
         silentInput.clear();
         silentOutput.clear();
+        processor.process(silentInput, silentOutput, 1.0f);
 
-        for (int i = 0; i < 600; ++i)
-            processor.process(silentInput, silentOutput, 1.0f);
-
-        expect(processor.getPeakLevel() < 0.02f);
+        expectEquals(processor.getPeakLevel(), 0.0f);
     }
 
     void testZeroInputChannelsClearsOutput()

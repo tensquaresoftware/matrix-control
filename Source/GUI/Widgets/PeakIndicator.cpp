@@ -78,7 +78,7 @@ namespace TSS
             return;
 
         const float decayRatio = static_cast<float>(elapsed) / static_cast<float>(kReleaseTimeMs_);
-        displayedLevel_ *= std::exp(-decayRatio * 5.0f);
+        displayedLevel_ *= std::exp(-decayRatio * kReleaseCurveExponent_);
     }
 
     void PeakIndicator::updateBallistics(juce::int64 nowMs, float normalisedLevel)
@@ -87,10 +87,8 @@ namespace TSS
 
         const float clamped = juce::jlimit(0.0f, 1.0f, normalisedLevel);
 
-        if (clamped > lastInputLevel_)
-            displayedLevel_ = juce::jmax(displayedLevel_, clamped);
-
         lastInputLevel_ = clamped;
+        displayedLevel_ = juce::jmax(clamped, displayedLevel_);
         lastUpdateMs_ = nowMs;
     }
 
@@ -106,6 +104,7 @@ namespace TSS
         const float levelBefore = displayedLevel_;
 
         advanceRelease(nowMs);
+        displayedLevel_ = juce::jmax(lastInputLevel_, displayedLevel_);
         lastUpdateMs_ = nowMs;
 
         if (displayedLevel_ < 0.001f)

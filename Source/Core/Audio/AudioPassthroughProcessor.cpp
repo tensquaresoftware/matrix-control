@@ -8,9 +8,7 @@ namespace Core
                                             double sampleRate) noexcept
     {
         updateChannelLayout(numInputChannels, numOutputChannels, inputBusEnabled);
-        sampleRate_ = sampleRate > 0.0 ? sampleRate : 44100.0;
-        peakHold_ = 0.0f;
-        peakHoldSamplesRemaining_ = 0;
+        juce::ignoreUnused(sampleRate);
         peakDisplay_.store(0.0f, std::memory_order_relaxed);
     }
 
@@ -55,30 +53,12 @@ namespace Core
         }
     }
 
-    void AudioPassthroughProcessor::updatePeakBallistics(float blockPeak, int numSamples) noexcept
+    void AudioPassthroughProcessor::updatePeakLevel(float blockPeak) noexcept
     {
         if (!std::isfinite(blockPeak) || blockPeak < 0.0f)
             blockPeak = 0.0f;
 
-        const int holdSamples = juce::roundToInt(static_cast<float>(sampleRate_) * kPeakHoldSeconds);
-
-        if (blockPeak >= peakHold_)
-        {
-            peakHold_ = blockPeak;
-            peakHoldSamplesRemaining_ = holdSamples;
-        }
-        else if (peakHoldSamplesRemaining_ > 0)
-        {
-            peakHoldSamplesRemaining_ = std::max(0, peakHoldSamplesRemaining_ - numSamples);
-        }
-        else if (peakHold_ > 0.0f && kPeakDecaySeconds > 0.0f)
-        {
-            const float decayPerSample = std::exp(-1.0f / (static_cast<float>(sampleRate_) * kPeakDecaySeconds));
-            const float decay = std::pow(decayPerSample, static_cast<float>(juce::jmax(1, numSamples)));
-            peakHold_ *= decay;
-        }
-
-        peakDisplay_.store(juce::jlimit(0.0f, 1.0f, peakHold_), std::memory_order_relaxed);
+        peakDisplay_.store(juce::jlimit(0.0f, 1.0f, blockPeak), std::memory_order_relaxed);
     }
 
     void AudioPassthroughProcessor::process(const juce::AudioBuffer<float>& input,
@@ -90,7 +70,7 @@ namespace Core
         if (numSamples <= 0)
         {
             if (numOutputChannels_ > 0)
-                updatePeakBallistics(0.0f, 0);
+                updatePeakLevel(0.0f);
 
             return;
         }
@@ -109,7 +89,7 @@ namespace Core
             for (int channel = 0; channel < output.getNumChannels(); ++channel)
                 output.clear(channel, 0, numSamples);
 
-            updatePeakBallistics(0.0f, numSamples);
+            updatePeakLevel(0.0f);
             return;
         }
 
@@ -185,6 +165,6 @@ namespace Core
         for (int channel = numOutputChannelsToProcess; channel < output.getNumChannels(); ++channel)
             output.clear(channel, 0, numSamples);
 
-        updatePeakBallistics(blockPeak, numSamples);
+        updatePeakLevel(blockPeak);
     }
 }

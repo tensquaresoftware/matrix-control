@@ -15,13 +15,11 @@ namespace Core
     };
 
     /// Copies/mixes plugin input bus → output bus with gain and peak metering (FR-8).
+    /// Publishes instantaneous post-gain block peak; visual release lives in PeakIndicator.
     /// Must only be called from the audio thread (processBlock).
     class AudioPassthroughProcessor
     {
     public:
-        static constexpr float kPeakHoldSeconds = 1.0f;
-        static constexpr float kPeakDecaySeconds = 1.0f;
-
         void prepare(int numInputChannels, int numOutputChannels, bool inputBusEnabled, double sampleRate) noexcept;
         void updateChannelLayout(int numInputChannels, int numOutputChannels, bool inputBusEnabled) noexcept;
         void setChannelMode(AudioFromChannelMode mode) noexcept;
@@ -33,7 +31,7 @@ namespace Core
 
     private:
         int mapSourceChannel(int outputChannel) const noexcept;
-        void updatePeakBallistics(float blockPeak, int numSamples) noexcept;
+        void updatePeakLevel(float blockPeak) noexcept;
 
         std::atomic<float> peakDisplay_{ 0.0f };
         std::atomic<int> channelMode_{ static_cast<int>(AudioFromChannelMode::kStereo) };
@@ -42,8 +40,5 @@ namespace Core
         int numInputChannels_ { 0 };
         int numOutputChannels_ { 0 };
         bool inputBusEnabled_ { false };
-        double sampleRate_ { 44100.0 };
-        float peakHold_ { 0.0f };
-        int peakHoldSamplesRemaining_ { 0 };
     };
 }
