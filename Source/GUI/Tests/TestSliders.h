@@ -24,9 +24,7 @@ public:
 private:
     class SliderScalePanel;
 
-    inline constexpr static int kPadding_ = 12;
     inline constexpr static int kGap_ = 12;
-    inline constexpr static int kPanelGapMultiplier_ = 1;
     inline constexpr static int kScaleLabelHeight_ = 20;
 
     inline constexpr static int kTopSliderWidth_ = 60;

@@ -23,7 +23,7 @@ public:
         , popupLook_(popupLook)
     {
         scaleLabel_ = std::make_unique<TSS::Label>(
-            comboWidth_,
+            TestScaleColumns::kScaleLabelColumnDesignWidth,
             TestScaleColumns::kScaleLabelHeight,
             labelLook,
             scaleLabelText);
@@ -35,7 +35,7 @@ public:
 
     int getScaledColumnWidth() const
     {
-        return TestScaleColumns::scaledSize(comboWidth_, scale_);
+        return TestScaleColumns::scaledSize(TestScaleColumns::kScaleLabelColumnDesignWidth, scale_);
     }
 
     int getPreferredHeight() const
@@ -52,15 +52,16 @@ public:
 
     void resized() override
     {
-        const int scaledWidth = TestScaleColumns::scaledSize(comboWidth_, scale_);
-        const int scaledHeight = TestScaleColumns::scaledSize(comboHeight_, scale_);
+        const int scaledColumnWidth = TestScaleColumns::scaledSize(TestScaleColumns::kScaleLabelColumnDesignWidth, scale_);
+        const int scaledComboWidth = TestScaleColumns::scaledSize(comboWidth_, scale_);
+        const int scaledComboHeight = TestScaleColumns::scaledSize(comboHeight_, scale_);
         const int rowGap = TestScaleColumns::kGap;
         const int firstComboY = TestScaleColumns::kScaleLabelHeight + rowGap;
-        const int secondComboY = firstComboY + scaledHeight + rowGap;
+        const int secondComboY = firstComboY + scaledComboHeight + rowGap;
 
-        scaleLabel_->setBounds(0, 0, scaledWidth, TestScaleColumns::kScaleLabelHeight);
-        standardCombo_->setBounds(0, firstComboY, scaledWidth, scaledHeight);
-        buttonLikeCombo_->setBounds(0, secondComboY, scaledWidth, scaledHeight);
+        scaleLabel_->setBounds(0, 0, scaledColumnWidth, TestScaleColumns::kScaleLabelHeight);
+        standardCombo_->setBounds(0, firstComboY, scaledComboWidth, scaledComboHeight);
+        buttonLikeCombo_->setBounds(0, secondComboY, scaledComboWidth, scaledComboHeight);
     }
 
 private:

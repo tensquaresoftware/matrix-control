@@ -30,13 +30,24 @@ namespace TestScaleColumns
         { 2.0f, "200%" }
     }};
 
-    inline constexpr float kScaleFactorSum = 0.5f + 0.75f + 1.0f + 1.25f + 1.5f + 1.75f + 2.0f;
+    namespace detail
+    {
+        constexpr float sumScaleFactors()
+        {
+            float sum = 0.0f;
+            for (const auto& spec : kSpecs)
+                sum += spec.scale;
+            return sum;
+        }
+    }
+
+    inline constexpr float kScaleFactorSum = detail::sumScaleFactors();
 
     inline int bandWidthForTestRow(int availableRowWidth)
     {
         const int panelGap = kGap * kPanelGapMultiplier;
         const int gapTotal = (static_cast<int>(kSpecs.size()) - 1) * panelGap;
-        return juce::roundToInt(static_cast<float>(availableRowWidth - gapTotal) / kScaleFactorSum);
+        return juce::jmax(0, juce::roundToInt(static_cast<float>(availableRowWidth - gapTotal) / kScaleFactorSum));
     }
 
     inline int scaledSize(int value, float scale)

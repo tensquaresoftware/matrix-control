@@ -67,13 +67,12 @@ public:
     void pulseLeds()
     {
         ledOff_->setLevel(1.0f);
-        ledOn_->setLevel(1.0f);
     }
 
     void tickLedDecay()
     {
         ledOff_->setLevel(0.0f);
-        ledOn_->setLevel(0.0f);
+        ledOn_->setLevel(1.0f);
     }
 
 private:

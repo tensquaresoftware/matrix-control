@@ -31,6 +31,7 @@
 #include "GUI/Tests/TestTrackGeneratorDisplays.h"
 #include "GUI/Tests/TestVerticalSeparators.h"
 #include "GUI/Widgets/ComboBox.h"
+#include "GUI/Widgets/Label.h"
 #include "Shared/Definitions/PluginIDs.h"
 
 namespace
@@ -103,14 +104,14 @@ TestComponent::TestComponent(TSS::ISkin& skin,
 
     testContentHost_ = std::make_unique<TestContentHost>();
     testViewport_.setViewedComponent(testContentHost_.get(), false);
-    testViewport_.setScrollBarsShown(true, true);
+    testViewport_.setScrollBarsShown(true, false);
     addAndMakeVisible(testViewport_);
 
     createTestPages(apvts);
 
     restorePersistedWidgetSelection();
-    updateVisibleTests();
     setSize(width, height);
+    updateVisibleTests();
 }
 
 TestComponent::~TestComponent() = default;
@@ -160,6 +161,10 @@ void TestComponent::setSkin(TSS::ISkin& skin)
     if (testPopupMenus_ != nullptr)
         testPopupMenus_->setSkin(skin);
 
+    updateWidgetLabelLook();
+    gridColourPicker_.repaint();
+    boundsColourPicker_.repaint();
+
     layoutTestContentHost();
 }
 
@@ -181,11 +186,8 @@ void TestComponent::resized()
 
 void TestComponent::createHeaderControls()
 {
-    widgetLabel_.setText("WIDGET :", juce::dontSendNotification);
-    widgetLabel_.setJustificationType(juce::Justification::centredRight);
-    widgetLabel_.setColour(juce::Label::textColourId, juce::Colours::white);
-    widgetLabel_.setMinimumHorizontalScale(1.0f);
-    addAndMakeVisible(widgetLabel_);
+    updateWidgetLabelLook();
+    addAndMakeVisible(*widgetLabel_);
 
     widgetSelector_.setName("ButtonStyle");
     populateWidgetSelector();
@@ -253,29 +255,55 @@ void TestComponent::createVisualDebugControls()
     addAndMakeVisible(boundsColourPicker_);
 }
 
+void TestComponent::updateWidgetLabelLook()
+{
+    if (skin_ == nullptr)
+        return;
+
+    const auto labelLook = TSS::labelLookFromSkin(*skin_);
+
+    if (widgetLabel_ == nullptr)
+        widgetLabel_ = std::make_unique<TSS::Label>(widgetLabelWidth_, kDebugControlHeight_, labelLook, "WIDGET :");
+    else
+        widgetLabel_->setLook(labelLook);
+}
+
 void TestComponent::layoutHeaderControls(int topRowHeight)
 {
     const int controlY = kPadding_ + (topRowHeight - kDebugControlHeight_) / 2;
     const int selectorY = kPadding_ + (topRowHeight - kWidgetSelectorHeight_) / 2;
-    const auto headerFont = juce::Font { gridToggle_.withDefaultMetrics(
-        juce::FontOptions { static_cast<float>(kDebugControlHeight_) * 0.6f }) };
 
-    widgetLabel_.setFont(headerFont);
-
-    const int rawLabelWidth = juce::roundToInt(
-        juce::GlyphArrangement::getStringWidth(headerFont, "WIDGET :")) + kGap_;
+    const int rawLabelWidth = (skin_ != nullptr)
+        ? juce::roundToInt(juce::GlyphArrangement::getStringWidth(
+            TSS::labelLookFromSkin(*skin_).font,
+            "WIDGET :")) + kGap_
+        : kGap_;
     widgetLabelWidth_ = juce::jmax(4, alignToMultipleOf4(rawLabelWidth) - kWidgetLabelWidthReduction_ + kWidgetLabelExtraWidth_);
 
     int x = kPadding_;
+    const int maxX = getWidth() - kPadding_;
 
-    if (widgetLabel_.isVisible())
+    if (widgetLabel_ != nullptr && widgetLabel_->isVisible())
     {
-        widgetLabel_.setBounds(x, controlY, widgetLabelWidth_, kDebugControlHeight_);
+        widgetLabel_->setBounds(x, controlY, widgetLabelWidth_, kDebugControlHeight_);
         x += widgetLabelWidth_ + kGap_;
     }
 
     widgetSelector_.setBounds(x, selectorY, kWidgetSelectorWidth_, kWidgetSelectorHeight_);
     x += kWidgetSelectorWidth_ + kDebugSectionLeadingGap_;
+
+    const int debugControlsWidth = kGridToggleWidth_ + kDebugControlGap_ + kGridSizeSelectorWidth_ + kDebugControlGap_
+        + kColourPickerSize_ + kDebugSectionLeadingGap_ + kBoundsToggleWidth_ + kDebugControlGap_ + kColourPickerSize_;
+    const bool showDebugControls = x + debugControlsWidth <= maxX;
+
+    gridToggle_.setVisible(showDebugControls);
+    gridSizeSelector_.setVisible(showDebugControls);
+    gridColourPicker_.setVisible(showDebugControls);
+    boundsToggle_.setVisible(showDebugControls);
+    boundsColourPicker_.setVisible(showDebugControls);
+
+    if (!showDebugControls)
+        return;
 
     gridToggle_.setBounds(x, controlY, kGridToggleWidth_, kDebugControlHeight_);
     x += kGridToggleWidth_ + kDebugControlGap_;
@@ -289,7 +317,8 @@ void TestComponent::layoutHeaderControls(int topRowHeight)
     boundsToggle_.setBounds(x, controlY, kBoundsToggleWidth_, kDebugControlHeight_);
     x += kBoundsToggleWidth_ + kDebugControlGap_;
 
-    boundsColourPicker_.setBounds(x, controlY, kColourPickerSize_, kColourPickerSize_);
+    if (x + kColourPickerSize_ <= maxX)
+        boundsColourPicker_.setBounds(x, controlY, kColourPickerSize_, kColourPickerSize_);
 }
 
 bool TestComponent::keyPressed(const juce::KeyPress& key)
@@ -357,10 +386,23 @@ void TestComponent::applyContentZoom()
     if (testContentHost_ == nullptr || baseContentWidth_ <= 0 || baseContentHeight_ <= 0)
         return;
 
-    testContentHost_->setTransform(juce::AffineTransform::scale(contentZoom_));
-    testContentHost_->setSize(
-        juce::roundToInt(static_cast<float>(baseContentWidth_) * contentZoom_),
-        juce::roundToInt(static_cast<float>(baseContentHeight_) * contentZoom_));
+    testContentHost_->setTransform(juce::AffineTransform());
+
+    const int zoomedWidth = juce::jmax(1, juce::roundToInt(static_cast<float>(baseContentWidth_) * contentZoom_));
+    const int zoomedHeight = juce::jmax(1, juce::roundToInt(static_cast<float>(baseContentHeight_) * contentZoom_));
+    testContentHost_->setSize(zoomedWidth, zoomedHeight);
+
+    for (auto* child : testContentHost_->getChildren())
+    {
+        if (child == nullptr || !child->isVisible())
+            continue;
+
+        const int childWidth = juce::jmax(1, juce::roundToInt(static_cast<float>(baseContentWidth_) * contentZoom_));
+        const int childHeight = juce::jmax(1, juce::roundToInt(static_cast<float>(baseContentHeight_) * contentZoom_));
+        child->setBounds(0, 0, childWidth, childHeight);
+        break;
+    }
+
     repaintVisualDebugLayers();
 }
 
@@ -629,8 +671,10 @@ void TestComponent::layoutTestContentHost()
 
         contentWidth = juce::jmax(contentWidth, page.preferredWidth());
         contentHeight = juce::jmax(contentHeight, page.preferredHeight());
-        page.component->setBounds(0, 0, page.preferredWidth(), page.preferredHeight());
-        page.component->resized();
+
+        const int zoomedWidth = juce::jmax(1, juce::roundToInt(static_cast<float>(page.preferredWidth()) * contentZoom_));
+        const int zoomedHeight = juce::jmax(1, juce::roundToInt(static_cast<float>(page.preferredHeight()) * contentZoom_));
+        page.component->setBounds(0, 0, zoomedWidth, zoomedHeight);
     }
 
     if (contentWidth == 0 || contentHeight == 0)
@@ -642,8 +686,10 @@ void TestComponent::layoutTestContentHost()
 
             contentWidth = page.preferredWidth();
             contentHeight = page.preferredHeight();
-            page.component->setBounds(0, 0, contentWidth, contentHeight);
-            page.component->resized();
+
+            const int zoomedWidth = juce::jmax(1, juce::roundToInt(static_cast<float>(contentWidth) * contentZoom_));
+            const int zoomedHeight = juce::jmax(1, juce::roundToInt(static_cast<float>(contentHeight) * contentZoom_));
+            page.component->setBounds(0, 0, zoomedWidth, zoomedHeight);
             break;
         }
     }

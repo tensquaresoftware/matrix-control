@@ -3,7 +3,7 @@ organization: Ten Square Software
 project: Matrix-Control
 title: Story U-1 — TestComponent Enrichment (D-064)
 author: BMad Agent
-status: review
+status: done
 baseline_commit: 5a4c988
 sources:
   - planning-artifacts/epic-ui-scale-audit-pixel-perfect-layout.md
@@ -15,12 +15,12 @@ sources:
   - Source/GUI/Tests/TestSliders.cpp
   - CONVENTIONS.md
 created: 2026-06-10
-updated: 2026-06-10
+updated: 2026-06-16
 ---
 
 # Story U.1: TestComponent Enrichment (D-064)
 
-Status: review
+Status: done
 
 <!-- Debug sandbox (D-064). Parallel with U-2b — helps hairline UAT but does not block it. Release exclusion = U-10 (D-063). -->
 
@@ -96,9 +96,9 @@ Update `kLastComboItemId_` in `TestComponent.cpp` when selector grows.
 
 ### AC 6 — Build & debug scope
 
-- [ ] `cmake --build Builds/macOS` — BUILD SUCCEEDED (Debug)
-- [ ] Manual smoke: open UI Elements → each selector entry shows 7 columns without crash
-- [ ] **No** requirement to exclude Test sources from release in this story (U-10 / D-063)
+- [x] `cmake --build Builds/macOS` — BUILD SUCCEEDED (Debug)
+- [x] Manual smoke: open UI Elements → each selector entry shows 7 columns without crash
+- [x] **No** requirement to exclude Test sources from release in this story (U-10 / D-063)
 
 ### AC 7 — Out of scope (explicit)
 
@@ -113,42 +113,42 @@ Update `kLastComboItemId_` in `TestComponent.cpp` when selector grows.
 
 ### Phase A — Infrastructure
 
-- [ ] **Shared scale constants** (AC: #1) — optional `TestScaleColumns.h` with `kColumnSpecs_` if duplication across 3+ files becomes painful (YAGNI until then)
-- [ ] **Viewport** (AC: #4) — wrap test content area below widget selector
-- [ ] **TestComponent router** (AC: #2) — generalize `updateVisibleTests()` for all `TestXxx` children
+- [x] **Shared scale constants** (AC: #1) — `TestScaleColumns.h`
+- [x] **Viewport** (AC: #4) — wrap test content area below widget selector
+- [x] **TestComponent router** (AC: #2) — generalize `updateVisibleTests()` for all `TestXxx` children
 
 ### Phase B — Simple atomics (mirror Button/Slider effort)
 
-- [ ] `TestToggles` — INIT / on-off states
-- [ ] `TestLabels` — default + centred (`LabelStyle::Centered` sample)
-- [ ] `TestComboBoxes` — standard + button-like style if applicable
-- [ ] `TestNumberBoxes` — value + editable dot variant
+- [x] `TestToggles` — INIT / on-off states
+- [x] `TestLabels` — default + centred (`LabelStyle::Centered` sample)
+- [x] `TestComboBoxes` — standard + button-like style if applicable
+- [x] `TestNumberBoxes` — value + editable dot variant
 
 ### Phase C — Headers & separators
 
-- [ ] `TestGroupLabels`
-- [ ] `TestModuleHeaders` — blue + orange variants
-- [ ] `TestSectionHeaders` — blue + orange variants
-- [ ] `TestHorizontalSeparators` — **priority for U-2b UAT**
-- [ ] `TestVerticalSeparators`
+- [x] `TestGroupLabels`
+- [x] `TestModuleHeaders` — blue + orange variants
+- [x] `TestSectionHeaders` — blue + orange variants
+- [x] `TestHorizontalSeparators` — **priority for U-2b UAT**
+- [x] `TestVerticalSeparators`
 
 ### Phase D — Indicators & displays
 
-- [ ] `TestActivityLeds` / `TestPeakIndicators`
-- [ ] `TestPatchNameDisplays`
-- [ ] `TestEnvelopeDisplays` / `TestTrackGeneratorDisplays` — static preview values OK (no APVTS drag required)
+- [x] `TestActivityLeds` / `TestPeakIndicators`
+- [x] `TestPatchNameDisplays`
+- [x] `TestEnvelopeDisplays` / `TestTrackGeneratorDisplays` — static preview values OK (no APVTS drag required)
 
 ### Phase E — Composites & popups
 
-- [ ] `TestParameterCells` — slider row + combobox row
-- [ ] `TestModulationBusHeaders` + `TestModulationBusCells`
-- [ ] `TestPopupMenus` — ComboBox with open popup per column
-- [ ] Extend `populateWidgetSelector()` for AC 3 widgets
+- [x] `TestParameterCells` — slider row + combobox row
+- [x] `TestModulationBusHeaders` + `TestModulationBusCells`
+- [x] `TestPopupMenus` — ComboBox with open popup per column
+- [x] Extend `populateWidgetSelector()` for AC 3 widgets
 
 ### Phase F — Verify
 
-- [ ] Build + manual smoke (AC: #6)
-- [ ] Update `TestComponent` enum `TestWidgetType` ids consistently (no gaps if reordering)
+- [x] Build + manual smoke (AC: #6)
+- [x] Update `TestComponent` enum `TestWidgetType` ids consistently (no gaps if reordering)
 
 ## Dev Notes
 
@@ -207,6 +207,8 @@ claude-4.6-sonnet-medium-thinking (Cursor Agent)
 - Created 18 new `TestXxx` pages following the `TestButtons`/`TestSliders` 7-column pattern; dimensions from `DimensionFactory` / `WidgetFactory` (no `Design*` in test code).
 - Composites (`TestParameterCells`, `TestModulationBusCells`) use editor APVTS + `WidgetFactory`.
 - `cmake --build Builds/macOS` — BUILD SUCCEEDED (Debug, after reconfigure).
+- Manual UAT smoke (2026-06-16): all 20 selector pages, 7 columns each, skin toggle, viewport scroll — **OK** (Guillaume).
+- Code review (2026-06-16): 14 patches applied across groups 1–4; group 5 clean.
 
 ### File List
 
@@ -237,4 +239,61 @@ claude-4.6-sonnet-medium-thinking (Cursor Agent)
 
 ### Review Findings
 
-(pending)
+#### Group 1 — Infrastructure (2026-06-16)
+
+- [x] [Review][Patch] **Replace content-zoom AffineTransform with bounds-based rescaling** — Decision: **B** (keep Cmd++/−/0 zoom; remove `setTransform`; rescale `testContentHost_` size and child preferred dimensions instead). [`TestComponent.cpp:applyContentZoom`]
+
+- [x] [Review][Patch] **Clamp `bandWidthForTestRow` to non-negative** [`TestScaleColumns.h:39`]
+- [x] [Review][Patch] **Guard debug header row against horizontal overflow** [`TestComponent.cpp:layoutHeaderControls`]
+- [x] [Review][Patch] **Remove redundant `resized()` after `setBounds()`** [`TestComponent.cpp:layoutTestContentHost`]
+- [x] [Review][Patch] **Viewport: horizontal scroll only (`setScrollBarsShown(true, false)`)** [`TestComponent.cpp` ctor]
+- [x] [Review][Patch] **Restore skin-aware label for widget selector header** [`TestComponent.cpp:createHeaderControls`]
+- [x] [Review][Patch] **Propagate `setSkin()` to `TestColourPickerButton` debug controls** [`TestComponent.cpp:setSkin`]
+- [x] [Review][Patch] **Derive `kScaleFactorSum` from `kSpecs` at compile time** [`TestScaleColumns.h`]
+- [x] [Review][Patch] **Defer `layoutTestContentHost` until component has bounds** [`TestComponent.cpp` ctor — viewport height 0 on first pass]
+
+- [x] [Review][Defer] **CMake `TIMESTAMP` build date frozen at configure time** [`CMakeLists.txt`] — deferred, bundled non-U-1 change (versioning story)
+- [x] [Review][Defer] **`MATRIX_CONTROL_PRERELEASE_SUFFIX` defaults to `"alpha"`** [`CMakeLists.txt`] — deferred, bundled non-U-1 change
+- [x] [Review][Defer] **`juce_gui_basics` added to unit test target** [`CMakeLists.txt`] — deferred, headless CI risk from bundled CMake changes
+- [x] [Review][Defer] **`restoreSettingsPanelFromState` skips HW latency in standalone** [`PluginEditor.cpp`] — deferred, settings consolidation story scope
+- [x] [Review][Defer] **`refreshAudioFromCombo` fallback without populated header** [`PluginEditor.cpp`] — deferred, header-panel story scope
+- [x] [Review][Defer] **VST3 helper `-Wno-deprecated-declarations` removal** [`CMakeLists.txt`] — deferred, unrelated build hygiene
+- [x] [Review][Defer] **`juce_gui_extra` linked without documented rationale** [`CMakeLists.txt`] — deferred, About/popup story scope
+- [x] [Review][Defer] **`std::function` heap alloc on every `layoutTestContentHost` pass** [`TestComponent.cpp`] — deferred, perf optimization not blocking UAT
+
+#### Group 2 — Atomics (2026-06-16)
+
+- [x] [Review][Patch] **TestSliders — remove spurious `kPadding_` from preferred size and layout** [`TestSliders.cpp`] — `getPreferredWidth/Height` add `2*kPadding_` but reference `TestButtons` does not; `layoutColumnPanels` offsets columns at `(kPadding_, kPadding_)` vs `(0, 0)`
+- [x] [Review][Patch] **TestComboBoxes — scale label/column width must use `kScaleLabelColumnDesignWidth`** [`TestComboBoxes.cpp`] — uses `comboWidth_` for scale label and `getScaledColumnWidth`, inconsistent with all other atomics
+- [x] [Review][Patch] **TestButtons/TestSliders — migrate panel gap to `TestScaleColumns` constants** [`TestButtons.cpp`, `TestSliders.cpp`] — `panelGap` still uses private `kGap_ * kPanelGapMultiplier_` in width/layout queries
+
+- [x] [Review][Defer] **TestLabels/TestComboBoxes dimensions via `getBaseWidth/Height()` not Factory** — AC 1.4 borderline; static widget accessors are acceptable when no injected struct is required
+- [x] [Review][Defer] **AC 2 selector wiring** — verified in Group 1 (`TestComponent` router diff)
+- [x] [Review][Defer] **Duplicated `layoutColumnPanels` across six files** — accepted brownfield pattern until shared helper is needed (YAGNI per story)
+- [x] [Review][Defer] **`labelLook` not stored as member in Toggle/NumberBox panels** — minor future skin-refresh risk; `rebuildPanels()` recreates today
+
+#### Group 3 — Headers & Separators (2026-06-16)
+
+- [x] [Review][Patch] **TestHorizontalSeparators — column width must be at least `kScaleLabelColumnDesignWidth`** [`TestHorizontalSeparators.cpp`] — scale label and `getScaledColumnWidth` use `separatorWidth_` only; when width &lt; 56 the "50%" label clips at low scales (same class of bug fixed in Group 2 ComboBoxes)
+
+- [x] [Review][Defer] **TestVerticalSeparators separator wider than column** — `verticalStandardWidth` (24) &lt; `kScaleLabelColumnDesignWidth` (56); no overflow with current Factory dims
+- [x] [Review][Defer] **`scaleLabel_` missing `setUiScale(scale_)`** — cross-cutting pattern; reference `TestButtons`/`TestSliders` also omit; defer unless global scale-label pass is scheduled
+- [x] [Review][Defer] **`columnPanels_.clear()` before `removeAllChildren()`** — matches established rebuild pattern across all `TestXxx` pages; `unique_ptr` destruction removes children safely
+
+#### Group 4 — Indicators & Displays (2026-06-16)
+
+- [x] [Review][Patch] **`TestActivityLeds::tickLedDecay()` zeros both LEDs — destroys on/off contrast** [`TestActivityLeds.cpp`] — timer sets `ledOn_` to 0 every non-pulse frame; violates Phase D « on/off states per column ». Fix: pulse only `ledOff_`; `tickLedDecay` restores `ledOff_=0`, `ledOn_=1`
+
+- [x] [Review][Defer] **Selector label « Led » vs « ActivityLed »** [`TestComponent.cpp`] — advisory AC 2 naming; widget renamed in prod (`ActivityLed` → `Led`)
+- [x] [Review][Defer] **`TestPeakIndicators` column width vs indicator width** — `indicatorWidth_` = `activityLed.size` (&lt; 56); no overflow with Factory dims
+- [x] [Review][Defer] **Timer interval integer truncation (1000/30)** — cosmetic timing drift in demo animation
+- [x] [Review][Defer] **Inner panel `setSkin()` not called from parent `setSkin()`** — `rebuildPanels()` recreates widgets; dead but harmless
+- [x] [Review][Defer] **Zero-dimension constructor guards** — Factory always supplies positive dims
+
+#### Group 5 — Composites & Popups (2026-06-16)
+
+- [x] [Review][Defer] **Dead inner-panel `setSkin()` on ParameterCell/ModulationBusCell** — outer `rebuildPanels()` recreates; same pattern as Group 4
+- [x] [Review][Defer] **All 7 ModulationBusCell columns bind to bus 0 APVTS** — intentional for scale UAT; one bus row at seven UI scales
+- [x] [Review][Defer] **All 7 ParameterCell columns share Dco1 Frequency/WaveSelect** — intentional scale-comparison sandbox
+- [x] [Review][Defer] **`TestPopupMenus` placeholder item strings** — sufficient for popup layout smoke per AC 3
+- [x] [Review][Defer] **`layoutColumnPanels()` at end of `rebuildPanels()` before bounds** — harmless; `resized()` relayouts

@@ -8,6 +8,7 @@
 
 #include "GUI/Layout/PanelDimensions.h"
 #include "GUI/Tests/TestColourPickerButton.h"
+#include "GUI/Widgets/Label.h"
 
 namespace TSS
 {
@@ -101,7 +102,7 @@ private:
     juce::ValueTree& settingsState_;
     GuiLayoutDimensions layoutDimensions_;
     std::unique_ptr<WidgetFactory> widgetFactory_;
-    juce::Label widgetLabel_;
+    std::unique_ptr<TSS::Label> widgetLabel_;
     juce::ComboBox widgetSelector_;
     juce::ToggleButton gridToggle_;
     juce::ComboBox gridSizeSelector_;
@@ -138,6 +139,7 @@ private:
     void createHeaderControls();
     void createVisualDebugControls();
     void layoutHeaderControls(int topRowHeight);
+    void updateWidgetLabelLook();
     void repaintVisualDebugLayers();
     void createTestPages(juce::AudioProcessorValueTreeState& apvts);
     void populateWidgetSelector();

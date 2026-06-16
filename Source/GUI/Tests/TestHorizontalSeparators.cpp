@@ -18,10 +18,11 @@ public:
         : scale_(scale)
         , separatorWidth_(separatorWidth)
         , separatorHeight_(separatorHeight)
+        , columnLabelDesignWidth_(juce::jmax(separatorWidth, TestScaleColumns::kScaleLabelColumnDesignWidth))
         , separatorLook_(separatorLook)
     {
         scaleLabel_ = std::make_unique<TSS::Label>(
-            separatorWidth_,
+            columnLabelDesignWidth_,
             TestScaleColumns::kScaleLabelHeight,
             labelLook,
             scaleLabelText);
@@ -34,7 +35,7 @@ public:
 
     int getScaledColumnWidth() const
     {
-        return TestScaleColumns::scaledSize(separatorWidth_, scale_);
+        return TestScaleColumns::scaledSize(columnLabelDesignWidth_, scale_);
     }
 
     int getPreferredHeight() const
@@ -47,19 +48,21 @@ public:
 
     void resized() override
     {
-        const int scaledWidth = TestScaleColumns::scaledSize(separatorWidth_, scale_);
-        const int scaledHeight = TestScaleColumns::scaledSize(separatorHeight_, scale_);
+        const int scaledColumnWidth = TestScaleColumns::scaledSize(columnLabelDesignWidth_, scale_);
+        const int scaledSeparatorWidth = TestScaleColumns::scaledSize(separatorWidth_, scale_);
+        const int scaledSeparatorHeight = TestScaleColumns::scaledSize(separatorHeight_, scale_);
         const int rowGap = TestScaleColumns::kGap;
         const int separatorY = TestScaleColumns::kScaleLabelHeight + rowGap;
 
-        scaleLabel_->setBounds(0, 0, scaledWidth, TestScaleColumns::kScaleLabelHeight);
-        separator_->setBounds(0, separatorY, scaledWidth, scaledHeight);
+        scaleLabel_->setBounds(0, 0, scaledColumnWidth, TestScaleColumns::kScaleLabelHeight);
+        separator_->setBounds(0, separatorY, scaledSeparatorWidth, scaledSeparatorHeight);
     }
 
 private:
     float scale_ { 1.0f };
     int separatorWidth_ = 0;
     int separatorHeight_ = 0;
+    int columnLabelDesignWidth_ = 0;
     TSS::HorizontalSeparatorLook separatorLook_ {};
     std::unique_ptr<TSS::Label> scaleLabel_;
     std::unique_ptr<TSS::HorizontalSeparator> separator_;

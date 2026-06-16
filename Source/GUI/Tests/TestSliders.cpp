@@ -138,9 +138,9 @@ void TestSliders::resized()
 
 int TestSliders::getPreferredWidth() const
 {
-    const int panelGap = kGap_ * kPanelGapMultiplier_;
+    const int panelGap = TestScaleColumns::kGap * TestScaleColumns::kPanelGapMultiplier;
     return TestScaleColumns::sumPanelRowWidth(columnPanels_, panelGap,
-        [](const std::unique_ptr<SliderScalePanel>& panel) { return panel->getScaledColumnWidth(); }) + (2 * kPadding_);
+        [](const std::unique_ptr<SliderScalePanel>& panel) { return panel->getScaledColumnWidth(); });
 }
 
 int TestSliders::getPreferredHeight() const
@@ -149,7 +149,7 @@ int TestSliders::getPreferredHeight() const
     for (const auto& panel : columnPanels_)
         maxHeight = juce::jmax(maxHeight, panel->getPreferredHeight());
 
-    return maxHeight + (2 * kPadding_);
+    return maxHeight;
 }
 
 void TestSliders::createColumnPanels(TSS::ISkin& skin)
@@ -189,13 +189,13 @@ void TestSliders::createColumnPanels(TSS::ISkin& skin)
 
 void TestSliders::layoutColumnPanels()
 {
-    const int panelGap = kGap_ * kPanelGapMultiplier_;
-    int nextColumnX = kPadding_;
+    const int panelGap = TestScaleColumns::kGap * TestScaleColumns::kPanelGapMultiplier;
+    int nextColumnX = 0;
 
     for (auto& panel : columnPanels_)
     {
         const int columnWidth = panel->getScaledColumnWidth();
-        panel->setBounds(nextColumnX, kPadding_, columnWidth, panel->getPreferredHeight());
+        panel->setBounds(nextColumnX, 0, columnWidth, panel->getPreferredHeight());
         nextColumnX += columnWidth + panelGap;
     }
 }

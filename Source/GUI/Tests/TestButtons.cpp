@@ -143,7 +143,7 @@ void TestButtons::resized()
 
 int TestButtons::getPreferredWidth() const
 {
-    const int panelGap = kGap_ * kPanelGapMultiplier_;
+    const int panelGap = TestScaleColumns::kGap * TestScaleColumns::kPanelGapMultiplier;
     return TestScaleColumns::sumPanelRowWidth(columnPanels_, panelGap,
         [](const std::unique_ptr<ButtonScalePanel>& panel) { return panel->getScaledColumnWidth(); });
 }
@@ -193,7 +193,7 @@ void TestButtons::createColumnPanels(TSS::ISkin& skin)
 
 void TestButtons::layoutColumnPanels()
 {
-    const int panelGap = kGap_ * kPanelGapMultiplier_;
+    const int panelGap = TestScaleColumns::kGap * TestScaleColumns::kPanelGapMultiplier;
     int nextColumnX = 0;
 
     for (auto& panel : columnPanels_)
