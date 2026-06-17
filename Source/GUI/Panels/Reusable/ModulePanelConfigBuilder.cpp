@@ -51,7 +51,10 @@ ModulePanelConfig buildModulePanelConfig(const ModulePanelLayout& layout)
 
         const auto widgetKind = PluginHelpers::resolveParameterWidgetKind(parameterId);
         if (! widgetKind.has_value())
+        {
+            jassertfalse;
             throw ParameterNotFoundException(parameterId);
+        }
 
         const auto parameterType = (*widgetKind == PluginHelpers::ParameterWidgetKind::Slider)
             ? ParameterCell::ParameterType::Slider

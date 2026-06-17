@@ -309,6 +309,7 @@ if(MATRIX_BUILD_TESTS)
 
         Source/GUI/Layout/WidgetDimensionRegistry.cpp
         Source/GUI/Panels/Reusable/ModulePanelConfigBuilder.cpp
+        Tests/Unit/MigratedModulePanelLayouts.cpp
         Source/Shared/Definitions/PluginDescriptorsPatchManager.cpp
         Source/Core/Models/ApvtsMasterMapper.cpp
         Source/Core/Models/ApvtsPatchMapper.cpp
@@ -349,6 +350,7 @@ if(MATRIX_BUILD_TESTS)
 
     target_include_directories(Matrix-Control_Tests PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/Source
+        ${CMAKE_CURRENT_SOURCE_DIR}/Tests/Unit
     )
 
     target_compile_definitions(Matrix-Control_Tests PRIVATE

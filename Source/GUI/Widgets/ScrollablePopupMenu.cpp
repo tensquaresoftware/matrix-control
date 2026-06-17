@@ -207,7 +207,7 @@ namespace TSS
             getBorderThicknessDesign(),
             uiScale_,
             systemDisplayScale,
-            ScaledDrawing::StrokeSnapPolicy::kRound);
+            ScaledDrawing::StrokeSnapPolicy::kFloor);
         const auto contentBounds = bounds.reduced(borderThickness);
         renderer_.drawBackground(g, contentBounds);
         renderer_.drawBorder(g, bounds, systemDisplayScale);
@@ -220,7 +220,7 @@ namespace TSS
             getBorderThicknessDesign(),
             uiScale_,
             systemDisplayScale,
-            ScaledDrawing::StrokeSnapPolicy::kRound);
+            ScaledDrawing::StrokeSnapPolicy::kFloor);
         const int insetPx = juce::roundToInt(borderThickness);
         auto inner = getLocalBounds().reduced(insetPx);
         if (viewport_ == nullptr)
@@ -425,7 +425,7 @@ namespace TSS
             rawPtr->getBorderThicknessDesign(),
             rawPtr->uiScale_,
             systemDisplayScale,
-            ScaledDrawing::StrokeSnapPolicy::kRound);
+            ScaledDrawing::StrokeSnapPolicy::kFloor);
         const int insetPx = juce::roundToInt(borderThickness);
         const int scrollbarThicknessPx = juce::jmax(1, juce::roundToInt(
             static_cast<float>(popupLayout.scrollbarWidth) * rawPtr->uiScale_));

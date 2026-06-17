@@ -1,68 +1,48 @@
 #include <juce_core/juce_core.h>
 
+#include "MigratedModulePanelLayouts.h"
 #include "GUI/Panels/Reusable/ModulePanelConfigBuilder.h"
 #include "Shared/Definitions/PluginDescriptors.h"
 #include "Shared/Definitions/PluginHelpers.h"
 #include "Shared/Definitions/PluginIDs.h"
+#include "Shared/Exceptions/WidgetFactoryExceptions.h"
 
 namespace
 {
-    void expectDescriptorListsResolve(juce::UnitTest& test)
+    void expectAllMigratedPanelLayoutsResolve(juce::UnitTest& test)
     {
-        const std::vector<const std::vector<PluginDescriptors::IntParameterDescriptor>*> intLists = {
-            &PluginDescriptors::PatchEditSection::Dco1Module::kIntParameters,
-            &PluginDescriptors::PatchEditSection::Dco2Module::kIntParameters,
-            &PluginDescriptors::MasterEditSection::MidiModule::kIntParameters
-        };
+        const auto layouts = MigratedModulePanelLayouts::all();
+        test.expect(layouts.size() == 13, "Expected 13 migrated module panel layouts");
 
-        for (const auto* parameters : intLists)
+        for (const auto& [panelName, layout] : layouts)
         {
-            for (const auto& param : *parameters)
+            for (const auto& parameterId : layout.orderedParameterIds)
             {
-                const auto kind = PluginHelpers::resolveParameterWidgetKind(param.parameterId);
-                test.expect(kind == PluginHelpers::ParameterWidgetKind::Slider,
-                            "Int descriptor should resolve to Slider: " + param.parameterId);
-            }
-        }
+                if (parameterId.isEmpty())
+                    continue;
 
-        const std::vector<const std::vector<PluginDescriptors::ChoiceParameterDescriptor>*> choiceLists = {
-            &PluginDescriptors::PatchEditSection::Dco1Module::kChoiceParameters,
-            &PluginDescriptors::PatchEditSection::RampPortamentoModule::kChoiceParameters,
-            &PluginDescriptors::MasterEditSection::MidiModule::kChoiceParameters
-        };
-
-        for (const auto* parameters : choiceLists)
-        {
-            for (const auto& param : *parameters)
-            {
-                const auto kind = PluginHelpers::resolveParameterWidgetKind(param.parameterId);
-                test.expect(kind == PluginHelpers::ParameterWidgetKind::ComboBox,
-                            "Choice descriptor should resolve to ComboBox: " + param.parameterId);
+                const auto kind = PluginHelpers::resolveParameterWidgetKind(parameterId);
+                test.expect(kind.has_value(),
+                            juce::String(panelName) + " parameter should resolve: " + parameterId);
             }
+
+            const auto config = buildModulePanelConfig(layout);
+            test.expect(config.parameters.size() == layout.orderedParameterIds.size(),
+                        juce::String(panelName) + " config row count should match layout");
         }
     }
 
-    void expectDco1LayoutBuilds(juce::UnitTest& test)
+    void expectDescriptorKindSpotChecks(juce::UnitTest& test)
     {
-        const auto layout = makePatchEditModuleLayout(
-            PluginIDs::PatchEditSection::Dco1Module::kGroupId,
-            PluginIDs::PatchEditSection::Dco1Module::StandaloneWidgets::kInit,
-            PluginIDs::PatchEditSection::Dco1Module::StandaloneWidgets::kCopy,
-            PluginIDs::PatchEditSection::Dco1Module::StandaloneWidgets::kPaste,
-            {
-                PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kFrequency,
-                PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kSync
-            });
+        const auto sliderKind = PluginHelpers::resolveParameterWidgetKind(
+            PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kFrequency);
+        test.expect(sliderKind == PluginHelpers::ParameterWidgetKind::Slider,
+                    "Int descriptor should resolve to Slider");
 
-        const auto config = buildModulePanelConfig(layout);
-        test.expect(config.parameters.size() == 2, "Dco1 sample layout should have two parameter rows");
-        if (config.parameters.size() >= 2)
-        {
-            test.expect(config.parameters[0].parameterType == ParameterCell::ParameterType::Slider,
-                        "Frequency should resolve to Slider");
-            test.expect(config.parameters[1].parameterType == ParameterCell::ParameterType::ComboBox,
-                        "Sync should resolve to ComboBox");
-        }
+        const auto comboKind = PluginHelpers::resolveParameterWidgetKind(
+            PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kSync);
+        test.expect(comboKind == PluginHelpers::ParameterWidgetKind::ComboBox,
+                    "Choice descriptor should resolve to ComboBox");
     }
 
     void expectSeparatorRow(juce::UnitTest& test)
@@ -82,6 +62,65 @@ namespace
             test.expect(config.parameters[1].parameterType == ParameterCell::ParameterType::None,
                         "Empty ID should map to separator row");
     }
+
+    void expectUnknownParameterIdThrows(juce::UnitTest& test)
+    {
+        const auto layout = makePatchEditInitOnlyModuleLayout(
+            PluginIDs::PatchEditSection::Dco1Module::kGroupId,
+            PluginIDs::PatchEditSection::Dco1Module::StandaloneWidgets::kInit,
+            { "nonexistent.parameter.id" });
+
+        bool threw = false;
+        try
+        {
+            buildModulePanelConfig(layout);
+        }
+        catch (const ParameterNotFoundException&)
+        {
+            threw = true;
+        }
+
+        test.expect(threw, "Unknown parameter ID should throw ParameterNotFoundException");
+    }
+
+    void expectNoDescriptorIdCollisions(juce::UnitTest& test)
+    {
+        const std::vector<const std::vector<PluginDescriptors::IntParameterDescriptor>*> intLists = {
+            &PluginDescriptors::PatchEditSection::Dco1Module::kIntParameters,
+            &PluginDescriptors::PatchEditSection::Dco2Module::kIntParameters,
+            &PluginDescriptors::PatchEditSection::VcfVcaModule::kIntParameters,
+            &PluginDescriptors::PatchEditSection::FmTrackModule::kIntParameters,
+            &PluginDescriptors::PatchEditSection::RampPortamentoModule::kIntParameters,
+            &PluginDescriptors::PatchEditSection::Envelope1Module::kIntParameters,
+            &PluginDescriptors::PatchEditSection::Envelope2Module::kIntParameters,
+            &PluginDescriptors::PatchEditSection::Envelope3Module::kIntParameters,
+            &PluginDescriptors::PatchEditSection::Lfo1Module::kIntParameters,
+            &PluginDescriptors::PatchEditSection::Lfo2Module::kIntParameters,
+            &PluginDescriptors::MasterEditSection::MidiModule::kIntParameters,
+            &PluginDescriptors::MasterEditSection::VibratoModule::kIntParameters,
+            &PluginDescriptors::MasterEditSection::MiscModule::kIntParameters
+        };
+
+        for (const auto* parameters : intLists)
+        {
+            for (const auto& param : *parameters)
+            {
+                bool threw = false;
+                try
+                {
+                    PluginHelpers::resolveParameterWidgetKind(param.parameterId);
+                }
+                catch (const InvalidParameterException&)
+                {
+                    threw = true;
+                }
+
+                test.expect(! threw,
+                            "Descriptor ID should not exist in both int and choice collections: "
+                                + param.parameterId);
+            }
+        }
+    }
 }
 
 class ModulePanelConfigBuilderTests final : public juce::UnitTest
@@ -94,14 +133,20 @@ public:
 
     void runTest() override
     {
-        beginTest("Descriptor parameter IDs resolve via PluginHelpers");
-        expectDescriptorListsResolve(*this);
+        beginTest("All migrated panel layouts resolve via PluginHelpers");
+        expectAllMigratedPanelLayoutsResolve(*this);
 
-        beginTest("buildModulePanelConfig maps descriptor kinds to parameter cells");
-        expectDco1LayoutBuilds(*this);
+        beginTest("Descriptor kinds spot-check Slider vs ComboBox");
+        expectDescriptorKindSpotChecks(*this);
 
         beginTest("Empty parameter ID maps to separator row");
         expectSeparatorRow(*this);
+
+        beginTest("Unknown parameter ID throws ParameterNotFoundException");
+        expectUnknownParameterIdThrows(*this);
+
+        beginTest("No int/choice descriptor ID collisions");
+        expectNoDescriptorIdCollisions(*this);
     }
 };
 

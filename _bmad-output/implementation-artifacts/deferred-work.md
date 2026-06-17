@@ -1,5 +1,18 @@
 # Deferred Work
 
+## Deferred from: code review of u-11-module-panel-config-dedup (2026-06-17)
+
+- **O(n) linear descriptor scan at panel construction** (`PluginHelpers.cpp:63-124`) — factory hash maps exist but builder uses PluginHelpers scan; negligible at 13-panel init unless resolution path (A) adopted.
+- **`PluginHelpers::resolveParameterWidgetKind` exceeds Clean Code limits** (`PluginHelpers.cpp:63-124`) — ~60 lines, high cyclomatic complexity; accepted per code-review decision B (2026-06-17); optional future hygiene refactor.
+
+## Deferred from: code review of u-2b-d-013-paint-hairlines (2026-06-17)
+
+- **`MultiColumnPopupMenu` manual border calc** (`MultiColumnPopupMenu.cpp`) — bypasses `snappedStrokeThicknessFromDesign`; out of U-2b AC 2 scope.
+- **ScrollablePopupMenu thumb inset baked at ctor** (`ScrollablePopupMenu.cpp:259-263`) — `logicalInsetPixelsFromDesign` uses `displayScale` 1.0 before component is on-screen; needs CustomScrollBar refresh API; cosmetic Retina thumb inset.
+- **EnvelopeDisplay / TrackGeneratorDisplay zero-bounds mid-drag** — division-by-zero risk if host resizes during gesture; pre-existing, not introduced by hairline migration.
+- **SectionHeader contentArea height vs component height at high uiScale** — pre-existing layout scaling (U-2), not paint hairline scope.
+- **`systemDisplayScaleForComponent` in paint() per frame** — established pattern across compliant widgets; perf optimization deferred.
+
 ## Deferred from: code review of u-1-testcomponent-enrichment-d-064 (2026-06-16) — Group 1 Infrastructure
 
 - **CMake `TIMESTAMP` build date frozen at configure time** (`CMakeLists.txt`) — bundled versioning change, not U-1 scope.

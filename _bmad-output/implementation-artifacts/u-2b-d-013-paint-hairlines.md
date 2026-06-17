@@ -3,7 +3,7 @@ organization: Ten Square Software
 project: Matrix-Control
 title: Story U-2b — D-013 Paint Hairlines Compliance
 author: BMad Agent
-status: review
+status: done
 baseline_commit: 5a4c9887
 parent_story: u-2-transversal-widgets-scale-audit
 sources:
@@ -13,12 +13,12 @@ sources:
   - Source/GUI/Layout/ScaledDrawing.h
   - CONVENTIONS.md
 created: 2026-06-10
-updated: 2026-06-10
+updated: 2026-06-17
 ---
 
 # Story U.2b: D-013 Paint Hairlines Compliance
 
-Status: review
+Status: done
 
 <!-- Follow-up to U-2. Layout/bounds scaling is signed off (Guillaume, 2026-06-09). This story covers paint()-time stroke/hairline policy only. -->
 
@@ -68,13 +68,13 @@ Fill hairline row @ 50, 75, 100, 125, 150, 175, 200 %:
 
 | Widget | 50 | 75 | 100 | 125 | 150 | 175 | 200 | Notes |
 |--------|:--:|:--:|:---:|:---:|:---:|:---:|:---:|-------|
-| HorizontalSeparator | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | |
-| VerticalSeparator | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | regression |
-| SectionHeader | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | |
-| GroupLabel | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | regression |
-| ModuleHeader | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | regression |
-| ParameterCell separator | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | via HorizontalSeparator |
-| ModulationBusCell separator | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | via HorizontalSeparator |
+| HorizontalSeparator | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | |
+| VerticalSeparator | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | regression |
+| SectionHeader | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | |
+| GroupLabel | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | regression |
+| ModuleHeader | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | regression |
+| ParameterCell separator | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | via HorizontalSeparator |
+| ModulationBusCell separator | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | via HorizontalSeparator |
 
 **Pass criteria:** no visibly thick/blurry hairlines; 200 % shows 2 px physical stroke on Retina; no vertical drift vs controls above.
 
@@ -107,8 +107,8 @@ Fill hairline row @ 50, 75, 100, 125, 150, 175, 200 %:
 - [x] **Popup border inset** (AC: #2) — only if grep shows inconsistency
   - [x] ScrollablePopupMenu: align inset with ScaledDrawing policy
 
-- [ ] **Manual UAT** (AC: #5)
-  - [ ] Guillaume sign-off @ 7 presets (focus 50 / 150 / 200 %)
+- [x] **Manual UAT** (AC: #5)
+  - [x] Guillaume sign-off @ 7 presets (focus 50 / 150 / 200 %)
 
 - [x] **Verify** (AC: #6)
 
@@ -193,6 +193,8 @@ Claude (Cursor Agent)
 **Build:** `cmake --build Builds/macOS` — BUILD SUCCEEDED
 **Tests:** 1 pre-existing failure in MIDI activity recording (unrelated to this story)
 
+**Manual UAT (2026-06-17):** Guillaume sign-off @ 50, 75, 100, 125, 150, 175, 200 % — D-013 hairlines pass (no thick/blurry strokes; 2 px physical @ 200 % Retina).
+
 ### File List
 
 - Source/GUI/Widgets/HorizontalSeparator.cpp
@@ -204,4 +206,10 @@ Claude (Cursor Agent)
 
 ### Review Findings
 
-(pending — populate after code review of U-2)
+- [x] [Review][Patch] ScrollablePopupMenu border uses `kRound` instead of `kFloor` (AC 4) [`ScrollablePopupMenu.cpp:210,223,428`] — fixed in code review
+
+- [x] [Review][Defer] `MultiColumnPopupMenu` manual border calc bypasses ScaledDrawing [`MultiColumnPopupMenu.cpp`] — deferred, pre-existing, out of AC 2 scope
+- [x] [Review][Defer] ScrollablePopupMenu thumb inset baked at ctor with `displayScale` fallback 1.0 [`ScrollablePopupMenu.cpp:259-263`] — deferred, needs CustomScrollBar API to refresh; cosmetic on Retina
+- [x] [Review][Defer] EnvelopeDisplay / TrackGeneratorDisplay drag handlers lack zero-bounds guard mid-gesture — deferred, pre-existing, out of story scope
+- [x] [Review][Defer] SectionHeader `contentArea` height can exceed component height at high uiScale — deferred, pre-existing layout (U-2)
+- [x] [Review][Defer] `systemDisplayScaleForComponent` in `paint()` per frame — deferred, established pattern (VerticalSeparator, Button)

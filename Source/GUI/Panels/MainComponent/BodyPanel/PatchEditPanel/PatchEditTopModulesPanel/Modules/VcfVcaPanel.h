@@ -21,8 +21,9 @@ public:
           const ModuleHeaderDimensions& moduleHeaderDims, const ParameterCellDimensions& parameterCellDims);
     ~VcfVcaPanel() override = default;
 
-private:
     static ModulePanelLayout createLayout();
+
+private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(VcfVcaPanel)
 };

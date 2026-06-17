@@ -22,8 +22,6 @@ namespace TSS
 class WidgetFactory
 {
 public:
-    enum class ParameterWidgetKind { Slider, ComboBox };
-
     explicit WidgetFactory(juce::AudioProcessorValueTreeState& inApvts);
 
     // ============================================================================
@@ -61,8 +59,6 @@ public:
     std::optional<juce::String> getParameterDisplayName(const juce::String& parameterId) const;
     juce::String getGroupDisplayName(const juce::String& groupId) const;
     std::optional<juce::String> getStandaloneWidgetDisplayName(const juce::String& widgetId) const;
-
-    std::optional<ParameterWidgetKind> resolveParameterWidgetKind(const juce::String& parameterId) const;
 
 private:
     WidgetFactoryValidator validator;
