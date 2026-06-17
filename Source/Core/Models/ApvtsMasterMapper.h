@@ -20,6 +20,8 @@ namespace Core
         // Message thread only — see JUCE AudioProcessor::setValueNotifyingHost.
         void bufferToApvts();
 
+        void pushModuleToApvts(const juce::String& moduleGroupId);
+
         static std::vector<PluginDescriptors::IntParameterDescriptor> buildIntDescriptors();
         static std::vector<PluginDescriptors::ChoiceParameterDescriptor> buildChoiceDescriptors();
 

@@ -9,6 +9,7 @@
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Widgets/SectionHeader.h"
+#include "GUI/Widgets/ModuleHeader.h"
 #include "Shared/Definitions/PluginDescriptors.h"
 #include "Shared/Definitions/PluginHelpers.h"
 #include "Shared/Definitions/PluginIDs.h"
@@ -70,6 +71,16 @@ void MasterEditPanel::setSkin(TSS::ISkin& skin)
         midiPanel_.get(),
         vibratoPanel_.get(),
         miscPanel_.get());
+}
+
+void MasterEditPanel::setInitConfirmationGate(TSS::ModuleHeader::InitConfirmationGate gate)
+{
+    if (midiPanel_)
+        midiPanel_->setInitConfirmationGate(gate);
+    if (vibratoPanel_)
+        vibratoPanel_->setInitConfirmationGate(gate);
+    if (miscPanel_)
+        miscPanel_->setInitConfirmationGate(gate);
 }
 
 void MasterEditPanel::setUiScale(float uiScale)

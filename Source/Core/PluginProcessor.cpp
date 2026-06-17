@@ -21,7 +21,9 @@
 #include "Core/MIDI/MasterParameterSysExDispatcher.h"
 #include "Core/MIDI/MatrixModBusParameterSysExDispatcher.h"
 #include "Core/Init/InitTemplateLoader.h"
+#include "Core/Init/MasterModuleInitService.h"
 #include "Core/Init/MatrixModInitService.h"
+#include "Core/Exceptions/ExceptionPropagator.h"
 #include "Core/MIDI/MatrixModBusReorderService.h"
 #include "Core/MIDI/PatchParameterSysExDispatcher.h"
 #include "Core/MIDI/SysEx/SysExDecoder.h"
@@ -184,6 +186,15 @@ PluginProcessor::PluginProcessor()
     sysExParser_ = std::make_unique<SysExParser>();
     sysExDecoder_ = std::make_unique<SysExDecoder>(*sysExParser_);
     initTemplateLoader_ = std::make_unique<Core::InitTemplateLoader>(*sysExDecoder_);
+    masterModuleInitService_ = std::make_unique<Core::MasterModuleInitService>(
+        *masterModel_,
+        *apvtsMasterMapper_,
+        *initTemplateLoader_,
+        *masterParameterSysExDispatcher_,
+        [this]()
+        {
+            return juce::File(apvts.state.getProperty(PluginIDs::Settings::kInitTemplatesFolderPath).toString());
+        });
 
     validatePluginDescriptorsAtStartup();
     buildChoiceParameterMap();
@@ -1116,8 +1127,11 @@ void PluginProcessor::valueTreePropertyChanged(juce::ValueTree& treeWhosePropert
 
     if (masterParameterIds_.count(parameterId) > 0)
     {
-        apvtsMasterMapper_->apvtsToBuffer();
-        masterParameterSysExDispatcher_->dispatch(parameterId);
+        if (!suppressMasterParameterSysEx_)
+            apvtsMasterMapper_->apvtsToBuffer();
+
+        if (!suppressMasterParameterSysEx_)
+            masterParameterSysExDispatcher_->dispatch(parameterId);
     }
 
     if (parameterId == PluginIDs::PatchEditSection::PatchNameModule::kPatchName)
@@ -1126,6 +1140,7 @@ void PluginProcessor::valueTreePropertyChanged(juce::ValueTree& treeWhosePropert
     handleBankNumberChange(parameterId);
     handlePatchNumberChange(parameterId);
     handleMatrixModInitPropertyChange(parameterId);
+    handleMasterModuleInitPropertyChange(parameterId);
 }
 
 juce::String PluginProcessor::getChoiceLabelForNumericValue(const juce::String& parameterId, const juce::var& newValue) const
@@ -1192,6 +1207,48 @@ void PluginProcessor::handleMatrixModInitPropertyChange(const juce::String& prop
         matrixModInitService_->initBus(busIndex);
 
     suppressMatrixModParameterSysEx_ = false;
+}
+
+void PluginProcessor::propagateInitTemplateFooterMessage(const Core::InitTemplateLoadResult& result)
+{
+    if (result.infoMessage.isEmpty())
+    {
+        ExceptionPropagator::clearMessage(apvts);
+        return;
+    }
+
+    apvts.state.setProperty("uiMessageText", result.infoMessage, nullptr);
+
+    const auto severity = (result.fallbackReason == Core::InitTemplateFallbackReason::kFileInvalid)
+        ? juce::String("warning")
+        : juce::String("info");
+    apvts.state.setProperty("uiMessageSeverity", severity, nullptr);
+}
+
+void PluginProcessor::handleMasterModuleInitPropertyChange(const juce::String& propertyId)
+{
+    using namespace PluginIDs::MasterEditSection;
+
+    if (masterModuleInitService_ == nullptr)
+        return;
+
+    std::optional<Core::MasterModuleKind> moduleKind;
+
+    if (propertyId == MidiModule::StandaloneWidgets::kInit)
+        moduleKind = Core::MasterModuleKind::kMidi;
+    else if (propertyId == VibratoModule::StandaloneWidgets::kInit)
+        moduleKind = Core::MasterModuleKind::kVibrato;
+    else if (propertyId == MiscModule::StandaloneWidgets::kInit)
+        moduleKind = Core::MasterModuleKind::kMisc;
+
+    if (!moduleKind.has_value())
+        return;
+
+    suppressMasterParameterSysEx_ = true;
+    const auto result = masterModuleInitService_->initModule(*moduleKind);
+    suppressMasterParameterSysEx_ = false;
+
+    propagateInitTemplateFooterMessage(result);
 }
 
 void PluginProcessor::valueTreeChildAdded(juce::ValueTree& parentTree,

@@ -16,6 +16,7 @@ class HeaderPanel;
 class SettingsPanel;
 class SettingsWindow;
 class AboutWindow;
+class MasterInitConfirmDialog;
 
 class PluginEditor : public juce::AudioProcessorEditor,
                      private juce::ChangeListener
@@ -41,6 +42,8 @@ private:
     void closeSettingsWindow();
     void openAboutWindow();
     void closeAboutWindow();
+    void openMasterInitConfirmDialog(const juce::String& moduleDisplayName, std::function<void()> onConfirm);
+    void closeMasterInitConfirmDialog();
     SettingsPanel* getSettingsPanelIfOpen();
     void wireSettingsPanel(SettingsPanel& panel);
     void wireHeaderPanel(HeaderPanel& headerPanel);
@@ -48,6 +51,7 @@ private:
     void restoreHeaderPanelFromState(HeaderPanel& headerPanel);
     void updateSettingsWindowLayout(float uiScale);
     void updateAboutWindowLayout(float uiScale);
+    void updateMasterInitConfirmDialogLayout(float uiScale);
 
     void applySkinFromItemId(int skinItemId, bool persistToState = true);
     void applyUiScaleFromItemId(int scaleId, bool persistToState = true);
@@ -63,6 +67,7 @@ private:
     std::unique_ptr<TestComponent> testComponent_;
     std::unique_ptr<SettingsWindow> settingsWindow_;
     std::unique_ptr<AboutWindow> aboutWindow_;
+    std::unique_ptr<MasterInitConfirmDialog> masterInitConfirmDialog_;
     bool uiElementsTestVisible_ = false;
     std::unique_ptr<HeaderRefreshTimer> headerRefreshTimer_;
 

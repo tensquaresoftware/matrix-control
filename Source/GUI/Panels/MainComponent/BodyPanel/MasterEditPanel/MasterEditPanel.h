@@ -6,6 +6,7 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 
 #include "GUI/Layout/PanelDimensions.h"
+#include "GUI/Widgets/ModuleHeader.h"
 
 namespace TSS
 {
@@ -27,6 +28,8 @@ public:
     void resized() override;
     void setSkin(TSS::ISkin& skin);
     void setUiScale(float uiScale);
+
+    void setInitConfirmationGate(TSS::ModuleHeader::InitConfirmationGate gate);
 
 private:
     MasterEditPanelDimensions dims_;

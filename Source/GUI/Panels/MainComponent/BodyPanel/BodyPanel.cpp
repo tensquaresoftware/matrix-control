@@ -5,6 +5,7 @@
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Widgets/VerticalSeparator.h"
+#include "GUI/Widgets/ModuleHeader.h"
 #include "PatchEditPanel/PatchEditPanel.h"
 #include "MasterEditPanel/MasterEditPanel.h"
 #include "SharedPanel/SharedPanel.h"
@@ -121,4 +122,10 @@ void BodyPanel::setBusReorderHandler(BusReorderHandler handler)
 {
     if (sharedPanel_ != nullptr)
         sharedPanel_->setBusReorderHandler(std::move(handler));
+}
+
+void BodyPanel::setMasterInitConfirmationGate(TSS::ModuleHeader::InitConfirmationGate gate)
+{
+    if (masterEditPanel_ != nullptr)
+        masterEditPanel_->setInitConfirmationGate(std::move(gate));
 }

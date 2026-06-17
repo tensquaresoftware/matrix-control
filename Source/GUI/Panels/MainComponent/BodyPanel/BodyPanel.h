@@ -6,6 +6,7 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 
 #include "GUI/Layout/PanelDimensions.h"
+#include "GUI/Widgets/ModuleHeader.h"
 
 namespace TSS
 {
@@ -32,6 +33,8 @@ public:
     using BusReorderHandler = std::function<void(int fromBus, int toBus)>;
 
     void setBusReorderHandler(BusReorderHandler handler);
+
+    void setMasterInitConfirmationGate(TSS::ModuleHeader::InitConfirmationGate gate);
 
 private:
     BodyPanelDimensions dims_;

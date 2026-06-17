@@ -114,6 +114,7 @@ set(PLUGIN_SOURCES
     Source/Core/MIDI/KeyboardFromMidiInput.cpp
     Source/Core/Init/InitDefaults.cpp
     Source/Core/Init/InitTemplateLoader.cpp
+    Source/Core/Init/MasterModuleInitService.cpp
     Source/Core/Init/MatrixModInitService.cpp
     Source/Core/Factories/ApvtsFactory.cpp
     Source/Core/Models/ApvtsMasterMapper.cpp
@@ -134,6 +135,7 @@ set(PLUGIN_SOURCES
     Source/GUI/PluginEditor.cpp
     Source/GUI/About/AboutPanel.cpp
     Source/GUI/About/AboutWindow.cpp
+    Source/GUI/Dialogs/MasterInitConfirmDialog.cpp
     Source/GUI/Factories/WidgetFactory.cpp
     Source/GUI/Factories/DimensionFactory.cpp
     Source/GUI/Factories/WidgetFactoryValidator.cpp
@@ -296,6 +298,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/MasterParameterSysExDispatcherTests.cpp
         Tests/Unit/MatrixModBusParameterSysExDispatcherTests.cpp
         Tests/Unit/MatrixModBusReorderServiceTests.cpp
+        Tests/Unit/MasterModuleInitServiceTests.cpp
         Tests/Unit/MatrixModInitServiceTests.cpp
         Tests/Unit/PatchParameterSysExDispatcherTests.cpp
         Tests/Unit/EditorPathTests.cpp
@@ -319,6 +322,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Shared/Definitions/PluginDescriptorsPatchManager.cpp
         Source/Core/Init/InitDefaults.cpp
         Source/Core/Init/InitTemplateLoader.cpp
+        Source/Core/Init/MasterModuleInitService.cpp
         Source/Core/Init/MatrixModInitService.cpp
         Source/Core/Models/ApvtsMasterMapper.cpp
         Source/Core/Models/ApvtsPatchMapper.cpp

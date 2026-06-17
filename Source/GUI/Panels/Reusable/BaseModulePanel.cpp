@@ -44,7 +44,9 @@ BaseModulePanel::BaseModulePanel(TSS::ISkin& skin,
         buttonSet,
         config.initWidgetId,
         config.copyWidgetId,
-        config.pasteWidgetId
+        config.pasteWidgetId,
+        config.moduleType == ModulePanelModuleType::MasterEdit,
+        initConfirmationGate_
     };
     moduleHeader_ = std::make_unique<TSS::ModuleHeader>(spec);
     addAndMakeVisible(*moduleHeader_);
@@ -127,6 +129,13 @@ void BaseModulePanel::setUiScale(float uiScale)
     
     resized();
     repaint();
+}
+
+void BaseModulePanel::setInitConfirmationGate(TSS::ModuleHeader::InitConfirmationGate gate)
+{
+    initConfirmationGate_ = std::move(gate);
+    if (moduleHeader_)
+        moduleHeader_->setInitConfirmationGate(initConfirmationGate_);
 }
 
 ParameterCell* BaseModulePanel::getParameterCellAt(size_t index)

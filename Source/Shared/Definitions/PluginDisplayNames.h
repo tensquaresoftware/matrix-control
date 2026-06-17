@@ -63,6 +63,18 @@ namespace PluginDisplayNames
         constexpr const char* kComingSoon              = "Coming soon...";
     }
 
+    namespace Dialogs
+    {
+        namespace MasterInitConfirm
+        {
+            constexpr const char* kTitle = "Reset master module?";
+            constexpr const char* kBodyTemplate =
+                "This will reset all parameters in the {MODULE} module to init defaults and send a full master SysEx to the synth. Other master modules will not be changed.";
+            constexpr const char* kConfirm = "Reset";
+            constexpr const char* kCancel  = "Cancel";
+        }
+    }
+
     namespace Units
     {
         constexpr const char* kPercent = "%";

@@ -29,6 +29,8 @@ namespace Core
     class MatrixModBusReorderService;
     class MatrixModInitService;
     class InitTemplateLoader;
+    struct InitTemplateLoadResult;
+    class MasterModuleInitService;
     class PatchParameterSysExDispatcher;
     class MidiOutboundQueue;
     class InstrumentMidiForwarder;
@@ -232,6 +234,8 @@ private:
     void handleBankNumberChange(const juce::String& parameterId);
     void handlePatchNumberChange(const juce::String& parameterId);
     void handleMatrixModInitPropertyChange(const juce::String& propertyId);
+    void handleMasterModuleInitPropertyChange(const juce::String& propertyId);
+    void propagateInitTemplateFooterMessage(const Core::InitTemplateLoadResult& result);
     int parseMatrixModBusInitIndex(const juce::String& propertyId) const;
     void buildPatchParameterIdSet();
     void buildMasterParameterIdSet();
@@ -260,11 +264,13 @@ private:
     std::unique_ptr<SysExParser> sysExParser_;
     std::unique_ptr<SysExDecoder> sysExDecoder_;
     std::unique_ptr<Core::InitTemplateLoader> initTemplateLoader_;
+    std::unique_ptr<Core::MasterModuleInitService> masterModuleInitService_;
     std::map<juce::String, PluginDescriptors::ChoiceParameterDescriptor> choiceParameterMap_;
     std::unordered_set<juce::String> patchParameterIds_;
     std::unordered_set<juce::String> masterParameterIds_;
     std::unordered_set<juce::String> matrixModParameterIds_;
     bool suppressMatrixModParameterSysEx_ { false };
+    bool suppressMasterParameterSysEx_ { false };
     bool developmentLoggingStarted_ { false };
     std::unique_ptr<DeferredMidiPortSyncTimer> deferredMidiPortSyncTimer_;
     

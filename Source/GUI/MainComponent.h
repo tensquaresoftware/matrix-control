@@ -9,6 +9,7 @@
 #include "Panels/MainComponent/HeaderPanel/HeaderPanel.h"
 #include "Panels/MainComponent/BodyPanel/BodyPanel.h"
 #include "Panels/MainComponent/FooterPanel/FooterPanel.h"
+#include "GUI/Widgets/ModuleHeader.h"
 
 namespace TSS
 {
@@ -35,6 +36,8 @@ public:
     using BusReorderHandler = std::function<void(int fromBus, int toBus)>;
 
     void setBusReorderHandler(BusReorderHandler handler);
+
+    void setMasterInitConfirmationGate(TSS::ModuleHeader::InitConfirmationGate gate);
 
     void setUiElementsTestVisible(bool visible);
     juce::Rectangle<int> getUiElementsTestAreaBounds() const;

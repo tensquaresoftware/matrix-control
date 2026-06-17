@@ -8,6 +8,7 @@
 
 #include "GUI/Layout/WidgetDimensions.h"
 #include "GUI/Panels/Reusable/ModulePanelConfigBuilder.h"
+#include "GUI/Widgets/ModuleHeader.h"
 
 namespace TSS
 {
@@ -39,9 +40,12 @@ public:
     void setSkin(TSS::ISkin& skin);
     void setUiScale(float uiScale);
     
+    void setInitConfirmationGate(TSS::ModuleHeader::InitConfirmationGate gate);
+
     ParameterCell* getParameterCellAt(size_t index);
 
 protected:
+    TSS::ModuleHeader::InitConfirmationGate initConfirmationGate_;
     TSS::ISkin* skin_;
     juce::AudioProcessorValueTreeState& apvts_;
     ModulePanelModuleType moduleType_;

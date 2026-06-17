@@ -93,3 +93,8 @@ void MainComponent::setBusReorderHandler(BusReorderHandler handler)
 {
     bodyPanel.setBusReorderHandler(std::move(handler));
 }
+
+void MainComponent::setMasterInitConfirmationGate(TSS::ModuleHeader::InitConfirmationGate gate)
+{
+    bodyPanel.setMasterInitConfirmationGate(std::move(gate));
+}

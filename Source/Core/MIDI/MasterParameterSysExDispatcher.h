@@ -20,6 +20,7 @@ namespace Core
         MasterParameterSysExDispatcher(const MasterModel& masterModel, EnqueueMasterFn enqueueMaster);
 
         void dispatch(const juce::String& parameterId) const;
+        void dispatchFull() const;
 
     private:
         static std::unordered_set<juce::String> buildMasterParameterIdSet();

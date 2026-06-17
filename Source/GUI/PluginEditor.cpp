@@ -10,6 +10,7 @@
 #include "GUI/Settings/SettingsPanel.h"
 #include "GUI/Settings/SettingsWindow.h"
 #include "GUI/About/AboutWindow.h"
+#include "GUI/Dialogs/MasterInitConfirmDialog.h"
 #include "Skins/Skin.h"
 #include "Factories/WidgetFactory.h"
 #include "Shared/Definitions/PluginIDs.h"
@@ -95,6 +96,14 @@ PluginEditor::PluginEditor(PluginProcessor& p)
         [this](int fromBus, int toBus)
         {
             pluginProcessor.swapMatrixModBusContents(fromBus, toBus);
+        });
+
+    mainComponent_->setMasterInitConfirmationGate(
+        [this](const juce::String& /*initPropertyId*/,
+               const juce::String& moduleDisplayName,
+               std::function<void()> onConfirmed)
+        {
+            openMasterInitConfirmDialog(moduleDisplayName, std::move(onConfirmed));
         });
 
     testComponent_ = std::make_unique<TestComponent>(
@@ -282,6 +291,9 @@ void PluginEditor::syncUiScaleFromEditor()
 
     if (aboutWindow_ != nullptr && aboutWindow_->isVisible())
         updateAboutWindowLayout(uiScale);
+
+    if (masterInitConfirmDialog_ != nullptr && masterInitConfirmDialog_->isVisible())
+        updateMasterInitConfirmDialogLayout(uiScale);
 }
 
 void PluginEditor::updateSettingsWindowLayout(float uiScale)
@@ -300,6 +312,15 @@ void PluginEditor::updateAboutWindowLayout(float uiScale)
 
     aboutWindow_->setUiScale(uiScale);
     aboutWindow_->setBounds(getLocalBounds());
+}
+
+void PluginEditor::updateMasterInitConfirmDialogLayout(float uiScale)
+{
+    if (masterInitConfirmDialog_ == nullptr)
+        return;
+
+    masterInitConfirmDialog_->setUiScale(uiScale);
+    masterInitConfirmDialog_->setBounds(getLocalBounds());
 }
 
 void PluginEditor::applySkinFromItemId(int skinItemId, bool persistToState)
@@ -546,6 +567,43 @@ void PluginEditor::closeAboutWindow()
 {
     if (aboutWindow_ != nullptr)
         aboutWindow_->setVisible(false);
+}
+
+void PluginEditor::openMasterInitConfirmDialog(const juce::String& moduleDisplayName,
+                                               std::function<void()> onConfirm)
+{
+    closeSettingsWindow();
+    closeAboutWindow();
+
+    if (masterInitConfirmDialog_ == nullptr)
+    {
+        masterInitConfirmDialog_ = std::make_unique<MasterInitConfirmDialog>(
+            *skin_,
+            [this] { closeMasterInitConfirmDialog(); });
+        addChildComponent(*masterInitConfirmDialog_);
+    }
+    else
+    {
+        masterInitConfirmDialog_->setSkin(*skin_);
+    }
+
+    masterInitConfirmDialog_->prepareForShow(moduleDisplayName, std::move(onConfirm));
+
+    const int baseWidth = layoutDimensions_.editor.width;
+    const float uiScale = (baseWidth > 0)
+        ? TSS::ScaledLayout::uiScaleFromEditorBounds(getWidth(), baseWidth)
+        : 1.0f;
+    updateMasterInitConfirmDialogLayout(uiScale);
+
+    masterInitConfirmDialog_->setVisible(true);
+    masterInitConfirmDialog_->toFront(true);
+    masterInitConfirmDialog_->grabKeyboardFocus();
+}
+
+void PluginEditor::closeMasterInitConfirmDialog()
+{
+    if (masterInitConfirmDialog_ != nullptr)
+        masterInitConfirmDialog_->setVisible(false);
 }
 
 void PluginEditor::restoreSettingsPanelFromState(SettingsPanel& panel)

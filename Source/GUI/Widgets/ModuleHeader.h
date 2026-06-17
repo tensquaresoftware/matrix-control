@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <memory>
 
 #include <juce_gui_basics/juce_gui_basics.h>
@@ -37,6 +38,10 @@ namespace TSS
             MasterEdit
         };
 
+        using InitConfirmationGate = std::function<void(const juce::String& initPropertyId,
+                                                        const juce::String& moduleDisplayName,
+                                                        std::function<void()> onConfirmed)>;
+
         struct WithActionsSpec
         {
             ISkin& skin;
@@ -49,6 +54,8 @@ namespace TSS
             juce::String initWidgetId;
             juce::String copyWidgetId;
             juce::String pasteWidgetId;
+            bool requireInitConfirmation = false;
+            InitConfirmationGate initConfirmationGate;
         };
 
         explicit ModuleHeader(int width, int height, const ModuleHeaderLook& look, ColourVariant variant,
@@ -61,6 +68,8 @@ namespace TSS
         void setLook(const ModuleHeaderLook& look);
         void setSkin(ISkin& skin);
         void setUiScale(float uiScale);
+
+        void setInitConfirmationGate(InitConfirmationGate gate);
 
         void setText(const juce::String& text);
         juce::String getText() const { return text_; }
@@ -80,6 +89,7 @@ namespace TSS
 
         void createInitButton(const WithActionsSpec& spec);
         void createCopyPasteButtons(const WithActionsSpec& spec);
+        void wireInitButtonOnClick();
 
         void layoutInitOnlyButtons();
         void layoutInitCopyPasteButtons();
@@ -99,6 +109,9 @@ namespace TSS
         float uiScale_ = 1.0f;
 
         juce::AudioProcessorValueTreeState* apvts_ = nullptr;
+        bool requireInitConfirmation_ = false;
+        InitConfirmationGate initConfirmationGate_;
+        juce::String initWidgetId_;
 
         std::unique_ptr<Button> initButton_;
         std::unique_ptr<Button> copyButton_;

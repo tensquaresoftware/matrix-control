@@ -25,6 +25,12 @@ void MasterParameterSysExDispatcher::dispatch(const juce::String& parameterId) c
     enqueueMaster_(masterModel_.data());
 }
 
+void MasterParameterSysExDispatcher::dispatchFull() const
+{
+    if (enqueueMaster_ != nullptr)
+        enqueueMaster_(masterModel_.data());
+}
+
 std::unordered_set<juce::String> MasterParameterSysExDispatcher::buildMasterParameterIdSet()
 {
     std::unordered_set<juce::String> ids;

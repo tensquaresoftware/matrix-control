@@ -52,6 +52,9 @@ namespace TSS
         , text_(spec.widgetFactory.getGroupDisplayName(spec.moduleId))
         , colourVariant_(colourVariantForLayout(spec.columnLayout))
         , apvts_(&spec.apvts)
+        , requireInitConfirmation_(spec.requireInitConfirmation)
+        , initConfirmationGate_(std::move(spec.initConfirmationGate))
+        , initWidgetId_(spec.initWidgetId)
     {
         setOpaque(false);
         jassert(spec.buttonSet == ButtonSet::InitOnly || spec.buttonSet == ButtonSet::InitCopyPaste);
@@ -144,17 +147,39 @@ namespace TSS
         repaint();
     }
 
+    void ModuleHeader::setInitConfirmationGate(InitConfirmationGate gate)
+    {
+        initConfirmationGate_ = std::move(gate);
+        wireInitButtonOnClick();
+    }
+
     void ModuleHeader::createInitButton(const WithActionsSpec& spec)
     {
         initButton_ = spec.widgetFactory.createStandaloneButton(
             spec.initWidgetId,
             spec.skin,
             dimensions_.buttonHeight);
-        initButton_->onClick = [this, id = spec.initWidgetId]
-        {
-            apvts_->state.setProperty(id, juce::Time::getCurrentTime().toMilliseconds(), nullptr);
-        };
+        wireInitButtonOnClick();
         addAndMakeVisible(*initButton_);
+    }
+
+    void ModuleHeader::wireInitButtonOnClick()
+    {
+        if (!initButton_)
+            return;
+
+        initButton_->onClick = [this]
+        {
+            const auto stampProperty = [this]
+            {
+                apvts_->state.setProperty(initWidgetId_, juce::Time::getCurrentTime().toMilliseconds(), nullptr);
+            };
+
+            if (requireInitConfirmation_ && initConfirmationGate_)
+                initConfirmationGate_(initWidgetId_, text_, stampProperty);
+            else if (!requireInitConfirmation_)
+                stampProperty();
+        };
     }
 
     void ModuleHeader::createCopyPasteButtons(const WithActionsSpec& spec)
