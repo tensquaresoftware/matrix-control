@@ -15,6 +15,7 @@ namespace PluginIDs
         constexpr const char* kGuiScale = "settingsGuiScale";
         constexpr const char* kSkinVariant = "settingsSkinVariant";
         constexpr const char* kHardwareLatencyMs = "settingsHardwareLatencyMs";
+        constexpr const char* kInitTemplatesFolderPath = "settingsInitTemplatesFolderPath";
         constexpr const char* kTestWidget = "settingsTestWidget";
 
         namespace SkinVariants

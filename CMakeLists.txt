@@ -113,6 +113,7 @@ set(PLUGIN_SOURCES
     Source/Core/Audio/StandaloneAudioInputRouterStubs.cpp
     Source/Core/MIDI/KeyboardFromMidiInput.cpp
     Source/Core/Init/InitDefaults.cpp
+    Source/Core/Init/InitTemplateLoader.cpp
     Source/Core/Init/MatrixModInitService.cpp
     Source/Core/Factories/ApvtsFactory.cpp
     Source/Core/Models/ApvtsMasterMapper.cpp
@@ -283,6 +284,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/TestMain.cpp
         Tests/Unit/ApvtsMasterMapperTests.cpp
         Tests/Unit/InitDefaultsTests.cpp
+        Tests/Unit/InitTemplateLoaderTests.cpp
         Tests/Unit/ApvtsPatchMapperTests.cpp
         Tests/Unit/PluginVersionTests.cpp
         Tests/Unit/PatchNameSyncerTests.cpp
@@ -316,6 +318,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/MigratedModulePanelLayouts.cpp
         Source/Shared/Definitions/PluginDescriptorsPatchManager.cpp
         Source/Core/Init/InitDefaults.cpp
+        Source/Core/Init/InitTemplateLoader.cpp
         Source/Core/Init/MatrixModInitService.cpp
         Source/Core/Models/ApvtsMasterMapper.cpp
         Source/Core/Models/ApvtsPatchMapper.cpp

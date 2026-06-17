@@ -14,6 +14,8 @@
 #include "Shared/Definitions/PluginDescriptors.h"
 
 class MidiManager;
+class SysExDecoder;
+class SysExParser;
 
 namespace Core
 {
@@ -26,6 +28,7 @@ namespace Core
     class MatrixModBusParameterSysExDispatcher;
     class MatrixModBusReorderService;
     class MatrixModInitService;
+    class InitTemplateLoader;
     class PatchParameterSysExDispatcher;
     class MidiOutboundQueue;
     class InstrumentMidiForwarder;
@@ -194,6 +197,7 @@ private:
     void initializeMidiPortProperties();
     void initializeAudioProperties();
     void initializeHardwareLatencyProperty();
+    void initializeInitTemplatesFolderProperty();
     void applyHardwareLatencyToHost();
     void notifyNonParameterStateChanged();
     void scheduleDeferredMidiPortSyncForPluginHost();
@@ -253,6 +257,9 @@ private:
     std::unique_ptr<MatrixModSysExCoalesceTimer> matrixModSysExCoalesceTimer_;
     std::unique_ptr<Core::MatrixModBusReorderService> matrixModBusReorderService_;
     std::unique_ptr<Core::MatrixModInitService> matrixModInitService_;
+    std::unique_ptr<SysExParser> sysExParser_;
+    std::unique_ptr<SysExDecoder> sysExDecoder_;
+    std::unique_ptr<Core::InitTemplateLoader> initTemplateLoader_;
     std::map<juce::String, PluginDescriptors::ChoiceParameterDescriptor> choiceParameterMap_;
     std::unordered_set<juce::String> patchParameterIds_;
     std::unordered_set<juce::String> masterParameterIds_;

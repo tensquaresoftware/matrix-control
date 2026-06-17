@@ -1,5 +1,5 @@
 # generated: 2026-05-29
-# last_updated: 2026-06-18 (Story 3.1 → done)
+# last_updated: 2026-06-18 (Story 3.2 → done)
 # project: Matrix-Control
 # project_key: NOKEY
 # tracking_system: file-system
@@ -81,7 +81,7 @@ development_status:
   epic-r-retrospective: optional
   epic-3: in-progress
   3-1-initdefaults-hardcoded-buffers: done
-  3-2-inittemplateloader-for-patchinit-and-masterinit: backlog
+  3-2-inittemplateloader-for-patchinit-and-masterinit: done
   3-3-matrix-mod-init-defaults: done
   3-4-master-module-init-confirmation-path: backlog
   epic-3-retrospective: optional

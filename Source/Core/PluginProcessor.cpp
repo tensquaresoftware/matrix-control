@@ -20,9 +20,12 @@
 #include "Core/Models/PatchNameSyncer.h"
 #include "Core/MIDI/MasterParameterSysExDispatcher.h"
 #include "Core/MIDI/MatrixModBusParameterSysExDispatcher.h"
+#include "Core/Init/InitTemplateLoader.h"
 #include "Core/Init/MatrixModInitService.h"
 #include "Core/MIDI/MatrixModBusReorderService.h"
 #include "Core/MIDI/PatchParameterSysExDispatcher.h"
+#include "Core/MIDI/SysEx/SysExDecoder.h"
+#include "Core/MIDI/SysEx/SysExParser.h"
 #include "Shared/Definitions/PluginAudioConstants.h"
 #include "Shared/Definitions/Matrix1000Limits.h"
 #include "Shared/Definitions/PluginDescriptors.h"
@@ -178,6 +181,10 @@ PluginProcessor::PluginProcessor()
         *apvtsPatchMapper_,
         *matrixModBusParameterSysExDispatcher_);
 
+    sysExParser_ = std::make_unique<SysExParser>();
+    sysExDecoder_ = std::make_unique<SysExDecoder>(*sysExParser_);
+    initTemplateLoader_ = std::make_unique<Core::InitTemplateLoader>(*sysExDecoder_);
+
     validatePluginDescriptorsAtStartup();
     buildChoiceParameterMap();
     buildPatchParameterIdSet();
@@ -186,6 +193,7 @@ PluginProcessor::PluginProcessor()
     initializeMidiPortProperties();
     initializeAudioProperties();
     initializeHardwareLatencyProperty();
+    initializeInitTemplatesFolderProperty();
     initializePatchNameProperty();
     apvts.state.addListener(this);
     deferredMidiPortSyncTimer_ = std::make_unique<DeferredMidiPortSyncTimer>(*this);
@@ -661,6 +669,12 @@ void PluginProcessor::initializeHardwareLatencyProperty()
         apvts.state.setProperty(PluginIDs::Settings::kHardwareLatencyMs, Core::HardwareLatency::kMinMs, nullptr);
 
     syncHardwareLatencyFromState();
+}
+
+void PluginProcessor::initializeInitTemplatesFolderProperty()
+{
+    if (!apvts.state.hasProperty(PluginIDs::Settings::kInitTemplatesFolderPath))
+        apvts.state.setProperty(PluginIDs::Settings::kInitTemplatesFolderPath, juce::String(), nullptr);
 }
 
 void PluginProcessor::syncHardwareLatencyFromState()
