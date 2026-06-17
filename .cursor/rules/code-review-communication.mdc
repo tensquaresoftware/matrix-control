@@ -1,0 +1,45 @@
+---
+description: Plain French communication during code reviews (BMad, Bugbot, adversarial review)
+alwaysApply: true
+---
+
+# Code review — communication with Guillaume
+
+During any **code review** (`bmad-code-review`, Bugbot, adversarial review, or an explicit review request):
+
+## Language and tone
+
+- Respond **in French**.
+- Use **simple, accessible language** — no unnecessary jargon or unexplained technical English.
+- Briefly define any unavoidable technical term on first use (e.g. « APVTS = stockage des paramètres du plugin »).
+
+## Required structure before details
+
+1. **En bref** — one sentence on what is being reviewed (what changed, why it matters).
+2. **Verdict** — counts by category in French:
+   - **Décision à prendre** — architectural or intent choice; Guillaume must decide
+   - **Correction à appliquer** — clear bug or gap with an obvious fix
+   - **À reporter** — out of scope or pre-existing debt
+3. For **each finding**:
+   - **Ce qui est en jeu** — user impact or risk
+   - **Le problème** — concrete description (file/line when useful)
+   - **Ce qu'il faut faire** — action or numbered options
+   - **Si on ne fait rien** — consequence of ignoring it
+
+## BMad workflow terms → French (user-facing)
+
+Do not expose internal jargon without translation:
+
+| Internal | Say to Guillaume |
+|----------|------------------|
+| `decision-needed` | décision à prendre |
+| `patch` | correction à appliquer |
+| `defer` | à reporter |
+| `dismiss` | sans action |
+| Blind Hunter | analyse du diff |
+| Edge Case Hunter | cas limites |
+| Acceptance Auditor | conformité à la spec |
+
+## Bugbot and subagents
+
+Subagents may output English or dense technical prose. **Always reformulate** findings in plain French before presenting them. The summary table may keep `file:line` in the Location column.

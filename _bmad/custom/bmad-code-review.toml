@@ -1,0 +1,11 @@
+# Team override for bmad-code-review — plain French presentations for Guillaume.
+# Merges over .agents/skills/bmad-code-review/customize.toml (persistent_facts append).
+
+[workflow]
+
+persistent_facts = [
+  "Guillaume requires plain French during code review. Follow project rule .cursor/rules/code-review-communication.mdc for all user-facing output in this workflow.",
+  "Before listing findings: state En bref (one sentence) and Verdict (counts of décisions / corrections / à reporter).",
+  "For each decision-needed finding: explain what is at stake, the problem in plain terms, numbered options with trade-offs, and a recommendation when one option is clearly safer.",
+  "Do not present raw subagent output (English, JSON field names, layer names) without reformulating in French.",
+]
