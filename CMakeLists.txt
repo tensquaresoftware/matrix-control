@@ -112,6 +112,7 @@ set(PLUGIN_SOURCES
     Source/Core/Audio/StandaloneAudioInputRouter.cpp
     Source/Core/Audio/StandaloneAudioInputRouterStubs.cpp
     Source/Core/MIDI/KeyboardFromMidiInput.cpp
+    Source/Core/Init/InitDefaults.cpp
     Source/Core/Init/MatrixModInitService.cpp
     Source/Core/Factories/ApvtsFactory.cpp
     Source/Core/Models/ApvtsMasterMapper.cpp
@@ -281,6 +282,7 @@ if(MATRIX_BUILD_TESTS)
     target_sources(Matrix-Control_Tests PRIVATE
         Tests/TestMain.cpp
         Tests/Unit/ApvtsMasterMapperTests.cpp
+        Tests/Unit/InitDefaultsTests.cpp
         Tests/Unit/ApvtsPatchMapperTests.cpp
         Tests/Unit/PluginVersionTests.cpp
         Tests/Unit/PatchNameSyncerTests.cpp
@@ -313,6 +315,7 @@ if(MATRIX_BUILD_TESTS)
         Source/GUI/Panels/Reusable/ModulePanelConfigBuilder.cpp
         Tests/Unit/MigratedModulePanelLayouts.cpp
         Source/Shared/Definitions/PluginDescriptorsPatchManager.cpp
+        Source/Core/Init/InitDefaults.cpp
         Source/Core/Init/MatrixModInitService.cpp
         Source/Core/Models/ApvtsMasterMapper.cpp
         Source/Core/Models/ApvtsPatchMapper.cpp
@@ -371,6 +374,45 @@ if(MATRIX_BUILD_TESTS)
         juce::juce_audio_devices
         juce::juce_core
         juce::juce_gui_basics
+        juce::juce_recommended_config_flags
+        juce::juce_recommended_warning_flags
+    )
+
+    # Dev tool: regenerate Tests/Fixtures/Init/PatchInit.syx and MasterInit.syx from descriptor defaults.
+    juce_add_console_app(GenerateInitFixtures PRODUCT_NAME "GenerateInitFixtures")
+
+    target_sources(GenerateInitFixtures PRIVATE
+        Tests/Tools/GenerateInitFixtures.cpp
+        Source/Core/Factories/ApvtsLayoutBuilder.cpp
+        Source/Core/Models/ApvtsMasterMapper.cpp
+        Source/Core/Models/ApvtsPatchMapper.cpp
+        Source/Core/Models/MasterModel.cpp
+        Source/Core/Models/PatchModel.cpp
+        Source/Core/Models/PackedFieldCodec.cpp
+        Source/Core/MIDI/SysEx/SysExEncoder.cpp
+        Source/Core/MIDI/SysEx/SysExParser.cpp
+        Source/Core/Loggers/MidiLogger.cpp
+        Source/Shared/Definitions/PluginDescriptors.cpp
+        Source/Shared/Definitions/PluginDescriptorsPatchEdit.cpp
+        Source/Shared/Definitions/PluginDescriptorsMatrixModulation.cpp
+        Source/Shared/Definitions/PluginDescriptorsPatchManager.cpp
+        Source/Shared/Definitions/PluginHelpers.cpp
+        Source/Shared/ProjectPaths.cpp
+    )
+
+    target_include_directories(GenerateInitFixtures PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/Source
+    )
+
+    target_compile_definitions(GenerateInitFixtures PRIVATE
+        JUCE_WEB_BROWSER=0
+        JUCE_USE_CURL=0
+        JUCE_STANDALONE_APPLICATION=1
+    )
+
+    target_link_libraries(GenerateInitFixtures PRIVATE
+        juce::juce_audio_processors
+        juce::juce_core
         juce::juce_recommended_config_flags
         juce::juce_recommended_warning_flags
     )
