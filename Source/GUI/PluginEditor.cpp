@@ -477,6 +477,8 @@ SettingsPanel* PluginEditor::getSettingsPanelIfOpen()
 
 void PluginEditor::openSettingsWindow()
 {
+    closeAboutWindow();
+
     if (settingsWindow_ == nullptr)
     {
         const bool isPluginMode = !pluginProcessor.isStandalone();
@@ -515,6 +517,8 @@ void PluginEditor::closeSettingsWindow()
 
 void PluginEditor::openAboutWindow()
 {
+    closeSettingsWindow();
+
     if (aboutWindow_ == nullptr)
     {
         aboutWindow_ = std::make_unique<AboutWindow>(

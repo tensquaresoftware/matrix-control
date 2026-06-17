@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include <juce_gui_basics/juce_gui_basics.h>
 
 namespace TSS
@@ -18,9 +20,11 @@ public:
 
     void paint(juce::Graphics& g) override;
     void resized() override;
+    bool keyPressed(const juce::KeyPress& key) override;
 
     void setSkin(TSS::ISkin& skin);
     void setUiScale(float uiScale);
+    void setOnEscapePressed(std::function<void()> callback);
 
 private:
     struct SpecGridLayout
@@ -37,6 +41,7 @@ private:
     juce::String getSpecLabel(int rowIndex) const;
     juce::String getSpecValue(int rowIndex) const;
     void layoutHyperlinkButtons();
+    void refreshHyperlinkAppearance();
 
     inline constexpr static int kPadding_ = 8;
     inline constexpr static int kTitleHeight_ = 28;
@@ -49,6 +54,7 @@ private:
 
     TSS::ISkin* skin_;
     float uiScale_ = 1.0f;
+    std::function<void()> onEscapePressed_;
 
     juce::HyperlinkButton emailLink_;
     juce::HyperlinkButton githubLink_;

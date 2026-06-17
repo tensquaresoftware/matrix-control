@@ -161,6 +161,7 @@ Exemples : `bankUtilityLockBank`, `internalPatchesInit`, `miscBankLockEnable`, `
 | **U-5** | Body shell — padding, separators, column gaps | Shell |
 | **U-6** | Patch Edit panels layout audit | Patch Edit |
 | **U-7** | Matrix Modulation panel layout audit | Matrix Mod |
+| **U-7b** | Matrix Mod reorder drag colours | Matrix Mod |
 | **U-8** | Patch Manager panels layout audit | Patch Manager |
 | **U-9** | Master Edit panel layout audit | Master Edit |
 | **U-10** | Release gate — prod audit sign-off & D-062/D-063 | Gate |
@@ -392,7 +393,25 @@ So that Matrix Mod reads as a tight, scalable grid (brownfield §4.5).
 **And** section header + bus header heights match design stack
 **And** manual UAT 50–200 % on full 10-row panel
 
-**Out of scope:** bus reorder UX (7.9 done / SysEx 2.10), init SysEx (3.3).
+**Out of scope:** bus reorder UX (7.9 done / SysEx 2.10), init SysEx (3.3). Drag highlight colours follow-up: **Story U-7b**.
+
+---
+
+## Story U-7b: Matrix Mod Reorder Drag Colours
+
+As a sound designer,
+I want the Matrix Mod bus reorder drag to show a gray placeholder at the source row and a red-tinted highlight on the hovered drop-target row,
+So that origin vs destination are visually distinct during drag without aggressive full-saturation red (FR-50 / UX-DR5 refinement).
+
+**Acceptance Criteria:**
+
+**Given** Story 7.9 reorder drag UX complete
+**When** user drags a bus number label
+**Then** source row keeps subtle gray placeholder overlay; hovered drop-target row uses `ColourChart::kRed` with tunable alpha (`constexpr` in `ModulationBusCell.cpp`)
+**And** panel drag state machine and SysEx path unchanged
+**And** manual UAT @ 50 / 100 / 200 %
+
+**Out of scope:** row layout (U-7), floating drag ghost, skin tokens, Core/SysEx.
 
 ---
 

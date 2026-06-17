@@ -3,7 +3,7 @@ organization: Ten Square Software
 project: Matrix-Control
 title: Story 7.10 — About Modal (Logo Popup)
 author: BMad Agent
-status: review
+status: done
 baseline_commit: 384673a4bfae0f11b401acaa28428f7ea2d650db
 sources:
   - planning-artifacts/epics.md
@@ -18,7 +18,7 @@ updated: 2026-06-16
 
 # Story 7.10: About Modal (Logo Popup)
 
-Status: review
+Status: done
 
 <!-- Extends FR-41 logo popup (D-014a). Complements Story 7.7 Settings window — About is read-only product info. -->
 
@@ -195,4 +195,16 @@ Composer (Cursor)
 
 ### Change Log
 
-- 2026-06-16: Story 7.10 — About modal from logo popup, PluginVersion SSOT, unit tests.
+- 2026-06-16: Code review — mutual modal exclusion, Escape from hyperlink focus, hyperlink skin refresh.
+
+### Review Findings
+
+- [x] [Review][Decision] AC5 layout — two-column grid accepted over spec bullet/colon block; semantic content matches, visual format documented as intentional deviation (Guillaume, 2026-06-16).
+- [x] [Review][Patch] Settings and About modals can stack [Source/GUI/PluginEditor.cpp:358,478] — fixed: mutual exclusion on open.
+- [x] [Review][Patch] Escape may not close About when a HyperlinkButton holds focus [Source/GUI/About/AboutWindow.cpp:555] — fixed: AboutPanel forwards Escape from child focus.
+- [x] [Review][Patch] Hyperlink colours not refreshed on skin change [Source/GUI/About/AboutPanel.cpp:302] — fixed: refreshHyperlinkAppearance() in setSkin().
+- [x] [Review][Defer] Unrelated `ModulePanelConfigBuilder` changes bundled in same commit range [CMakeLists.txt] — deferred, pre-existing / separate story (`u-11-module-panel-config-dedup`)
+- [x] [Review][Defer] No automated About UI tests (Escape, click-outside, menu wiring) [Source/GUI/About/] — deferred, pre-existing — AC8 accepts manual link verification
+- [x] [Review][Defer] Build clean claim not evidenced in diff [AC7] — deferred, pre-existing — verify at merge/CI
+- [x] [Review][Defer] Fixed `kDesignHeight` may clip if fonts or localized strings grow [Source/GUI/About/AboutPanel.h:336] — deferred, pre-existing — English-only v1 per out-of-scope
+- [x] [Review][Defer] `baseWidth <= 0` scale fallback skips `updateAboutWindowLayout` [Source/GUI/PluginEditor.cpp:531] — deferred, pre-existing — same pattern as Settings window

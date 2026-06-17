@@ -1,5 +1,24 @@
 # Deferred Work
 
+## Deferred from: code review of u-1-testcomponent-enrichment-d-064 (2026-06-16) — Group 1 Infrastructure
+
+- **CMake `TIMESTAMP` build date frozen at configure time** (`CMakeLists.txt`) — bundled versioning change, not U-1 scope.
+- **`MATRIX_CONTROL_PRERELEASE_SUFFIX` defaults to `"alpha"`** (`CMakeLists.txt`) — release-build footgun from bundled CMake changes.
+- **`juce_gui_basics` added to unit test target** (`CMakeLists.txt`) — headless CI risk; unrelated to TestComponent sandbox.
+- **`restoreSettingsPanelFromState` skips HW latency in standalone** (`PluginEditor.cpp`) — settings consolidation story scope.
+- **`refreshAudioFromCombo` fallback without populated header** (`PluginEditor.cpp`) — header-panel story scope.
+- **VST3 helper `-Wno-deprecated-declarations` removal** (`CMakeLists.txt`) — unrelated build hygiene.
+- **`juce_gui_extra` linked without documented rationale** (`CMakeLists.txt`) — About/popup story scope.
+- **`std::function` heap alloc on every `layoutTestContentHost` pass** (`TestComponent.cpp`) — perf optimization, not blocking UAT.
+
+## Deferred from: code review of 7-10-about-modal (2026-06-16)
+
+- **Unrelated `ModulePanelConfigBuilder` changes bundled in same commit range** (`CMakeLists.txt`) — separate story `u-11-module-panel-config-dedup`; split for cleaner review boundaries.
+- **No automated About UI tests** (Escape, click-outside, menu wiring) — AC8 accepts manual link verification for v1.
+- **Build clean claim not evidenced in diff** (AC7) — verify at merge/CI.
+- **Fixed `kDesignHeight` may clip if fonts or localized strings grow** (`AboutPanel.h`) — English-only v1 per story out-of-scope.
+- **`baseWidth <= 0` scale fallback skips `updateAboutWindowLayout`** (`PluginEditor.cpp`) — same pattern as Settings window.
+
 ## Deferred from: code review of u-0b-factory-dimension-registry-and-descriptor-decoupling (2026-06-09)
 
 - **`patchMutatorEnable*` descriptor type vs registry width** — Descriptors typed `kButton`, UI uses `TSS::Toggle`; registry returns `kInit` for guard only. Proper fix: add `kToggle` descriptor type (future taxonomy story).

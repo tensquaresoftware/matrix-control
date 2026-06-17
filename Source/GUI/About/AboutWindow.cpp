@@ -82,6 +82,11 @@ AboutWindow::AboutWindow(TSS::ISkin& skin, std::function<void()> onCloseRequeste
     addAndMakeVisible(closeButton_);
 
     aboutPanel_ = std::make_unique<AboutPanel>(skin);
+    aboutPanel_->setOnEscapePressed([this]
+    {
+        if (onCloseRequested_)
+            onCloseRequested_();
+    });
     addAndMakeVisible(*aboutPanel_);
 }
 

@@ -55,6 +55,23 @@ AboutPanel::AboutPanel(TSS::ISkin& skin)
     addAndMakeVisible(linkedInLink_);
 }
 
+void AboutPanel::setOnEscapePressed(std::function<void()> callback)
+{
+    onEscapePressed_ = std::move(callback);
+}
+
+void AboutPanel::refreshHyperlinkAppearance()
+{
+    configureHyperlink(emailLink_, PluginDisplayNames::About::kEmailDisplay,
+                       juce::URL(PluginDisplayNames::About::kEmailUrl));
+    configureHyperlink(githubLink_, PluginDisplayNames::About::kGitHubDisplay,
+                       juce::URL(PluginDisplayNames::About::kGitHubUrl));
+    configureHyperlink(linkedInLink_, PluginDisplayNames::About::kLinkedInDisplay,
+                       juce::URL(PluginDisplayNames::About::kLinkedInUrl));
+
+    layoutHyperlinkButtons();
+}
+
 juce::String AboutPanel::getSpecLabel(int rowIndex) const
 {
     switch (rowIndex)
@@ -199,9 +216,21 @@ void AboutPanel::resized()
     layoutHyperlinkButtons();
 }
 
+bool AboutPanel::keyPressed(const juce::KeyPress& key)
+{
+    if (key == juce::KeyPress::escapeKey && onEscapePressed_)
+    {
+        onEscapePressed_();
+        return true;
+    }
+
+    return Component::keyPressed(key);
+}
+
 void AboutPanel::setSkin(TSS::ISkin& skin)
 {
     skin_ = &skin;
+    refreshHyperlinkAppearance();
     repaint();
 }
 

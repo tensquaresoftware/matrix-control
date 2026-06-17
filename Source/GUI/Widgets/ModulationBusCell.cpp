@@ -1,6 +1,7 @@
 #include "ModulationBusCell.h"
 
 #include "GUI/Layout/ScaledLayout.h"
+#include "GUI/Skins/ColourChart.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Looks/LookBuilders.h"
@@ -13,6 +14,11 @@
 #include "Shared/Definitions/PluginDisplayNames.h"
 #include "GUI/Factories/WidgetFactory.h"
 
+namespace
+{
+constexpr float kReorderDragSourcePlaceholderAlpha = 0.12f;
+constexpr float kReorderDropTargetRedAlpha         = 0.25f;
+}
 
 ModulationBusCell::~ModulationBusCell() = default;
 
@@ -178,10 +184,10 @@ void ModulationBusCell::paint(juce::Graphics& g)
     if (!dropTargetHighlighted_ && !dragSourceHighlighted_)
         return;
 
-    auto bounds = getLocalBounds().toFloat();
+    const auto bounds = getLocalBounds().toFloat();
     const juce::Colour highlightColour = dragSourceHighlighted_
-        ? juce::Colours::white.withAlpha(0.12f)
-        : juce::Colours::white.withAlpha(0.20f);
+        ? juce::Colours::white.withAlpha(kReorderDragSourcePlaceholderAlpha)
+        : juce::Colour(ColourChart::kRed).withAlpha(kReorderDropTargetRedAlpha);
     g.setColour(highlightColour);
     g.fillRect(bounds);
 }
