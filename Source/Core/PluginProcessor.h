@@ -25,6 +25,7 @@ namespace Core
     class MasterParameterSysExDispatcher;
     class MatrixModBusParameterSysExDispatcher;
     class MatrixModBusReorderService;
+    class MatrixModInitService;
     class PatchParameterSysExDispatcher;
     class MidiOutboundQueue;
     class InstrumentMidiForwarder;
@@ -226,6 +227,8 @@ private:
     juce::String getChoiceLabelForNumericValue(const juce::String& parameterId, const juce::var& newValue) const;
     void handleBankNumberChange(const juce::String& parameterId);
     void handlePatchNumberChange(const juce::String& parameterId);
+    void handleMatrixModInitPropertyChange(const juce::String& propertyId);
+    int parseMatrixModBusInitIndex(const juce::String& propertyId) const;
     void buildPatchParameterIdSet();
     void buildMasterParameterIdSet();
     void buildMatrixModParameterIdSet();
@@ -249,6 +252,7 @@ private:
     std::unique_ptr<Core::MatrixModBusParameterSysExDispatcher> matrixModBusParameterSysExDispatcher_;
     std::unique_ptr<MatrixModSysExCoalesceTimer> matrixModSysExCoalesceTimer_;
     std::unique_ptr<Core::MatrixModBusReorderService> matrixModBusReorderService_;
+    std::unique_ptr<Core::MatrixModInitService> matrixModInitService_;
     std::map<juce::String, PluginDescriptors::ChoiceParameterDescriptor> choiceParameterMap_;
     std::unordered_set<juce::String> patchParameterIds_;
     std::unordered_set<juce::String> masterParameterIds_;

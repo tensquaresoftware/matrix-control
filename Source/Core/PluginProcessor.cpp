@@ -20,6 +20,7 @@
 #include "Core/Models/PatchNameSyncer.h"
 #include "Core/MIDI/MasterParameterSysExDispatcher.h"
 #include "Core/MIDI/MatrixModBusParameterSysExDispatcher.h"
+#include "Core/Init/MatrixModInitService.h"
 #include "Core/MIDI/MatrixModBusReorderService.h"
 #include "Core/MIDI/PatchParameterSysExDispatcher.h"
 #include "Shared/Definitions/PluginAudioConstants.h"
@@ -168,6 +169,11 @@ PluginProcessor::PluginProcessor()
         *matrixModBusParameterSysExDispatcher_);
 
     matrixModBusReorderService_ = std::make_unique<Core::MatrixModBusReorderService>(
+        *patchModel_,
+        *apvtsPatchMapper_,
+        *matrixModBusParameterSysExDispatcher_);
+
+    matrixModInitService_ = std::make_unique<Core::MatrixModInitService>(
         *patchModel_,
         *apvtsPatchMapper_,
         *matrixModBusParameterSysExDispatcher_);
@@ -1105,6 +1111,7 @@ void PluginProcessor::valueTreePropertyChanged(juce::ValueTree& treeWhosePropert
 
     handleBankNumberChange(parameterId);
     handlePatchNumberChange(parameterId);
+    handleMatrixModInitPropertyChange(parameterId);
 }
 
 juce::String PluginProcessor::getChoiceLabelForNumericValue(const juce::String& parameterId, const juce::var& newValue) const
@@ -1130,6 +1137,47 @@ void PluginProcessor::handlePatchNumberChange(const juce::String& parameterId)
     if (parameterId != PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCurrentPatchNumber)
         return;
     juce::ignoreUnused(parameterId);
+}
+
+int PluginProcessor::parseMatrixModBusInitIndex(const juce::String& propertyId) const
+{
+    using namespace PluginIDs::MatrixModulationSection::ModulationBus::StandaloneWidgets;
+
+    if (propertyId == kBus0Init) return 0;
+    if (propertyId == kBus1Init) return 1;
+    if (propertyId == kBus2Init) return 2;
+    if (propertyId == kBus3Init) return 3;
+    if (propertyId == kBus4Init) return 4;
+    if (propertyId == kBus5Init) return 5;
+    if (propertyId == kBus6Init) return 6;
+    if (propertyId == kBus7Init) return 7;
+    if (propertyId == kBus8Init) return 8;
+    if (propertyId == kBus9Init) return 9;
+
+    return -1;
+}
+
+void PluginProcessor::handleMatrixModInitPropertyChange(const juce::String& propertyId)
+{
+    using namespace PluginIDs::MatrixModulationSection;
+
+    if (matrixModInitService_ == nullptr)
+        return;
+
+    const int busIndex = parseMatrixModBusInitIndex(propertyId);
+    const bool isSectionInit = propertyId == StandaloneWidgets::kMatrixModulationInit;
+
+    if (!isSectionInit && busIndex < 0)
+        return;
+
+    suppressMatrixModParameterSysEx_ = true;
+
+    if (isSectionInit)
+        matrixModInitService_->initAllBuses();
+    else
+        matrixModInitService_->initBus(busIndex);
+
+    suppressMatrixModParameterSysEx_ = false;
 }
 
 void PluginProcessor::valueTreeChildAdded(juce::ValueTree& parentTree,

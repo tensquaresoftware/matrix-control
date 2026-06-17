@@ -1,5 +1,12 @@
 # Deferred Work
 
+## Deferred from: code review of 3-3-matrix-mod-init-defaults (2026-06-17)
+
+- **Suppress flag without RAII** (`PluginProcessor.cpp:1286-1293`) — Same set/restore pattern as `swapMatrixModBusContents`; cross-cutting hygiene if scope guard is introduced later.
+- **Hardcoded if-chain `parseMatrixModBusInitIndex`** — Mirrors `parseBankButtonIndex`; safe while `kModulationBusCount == 10`; revisit if bus count becomes variant-specific.
+- **`sendProgramChange` in `handlePatchNumberChange`** — Bundled from patch-manager / 8-5 work in the same `PluginProcessor` diff, not 3-3 AC scope.
+- **`"deviceDetected"` string literal** — Bundled device-type reconciliation; name constant when 8-5 / device work is finalized.
+
 ## Deferred from: code review of u-11-module-panel-config-dedup (2026-06-17)
 
 - **O(n) linear descriptor scan at panel construction** (`PluginHelpers.cpp:63-124`) — factory hash maps exist but builder uses PluginHelpers scan; negligible at 13-panel init unless resolution path (A) adopted.
