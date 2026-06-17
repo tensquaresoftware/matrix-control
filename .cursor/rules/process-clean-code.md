@@ -5,7 +5,7 @@ alwaysApply: true
 
 # Process & Clean Code
 
-Sources : `CONVENTIONS.md` §2–§4, §6.16 — référence complète : `Documentation/Development/principes-dev-qualite.md`.
+Sources: `CONVENTIONS.md` §2–§4, §6.16 — full reference: `Documentation/Development/software-development-quality-principles.md`.
 
 ## Avant tout code — 3 phases obligatoires
 

@@ -257,7 +257,7 @@ If a limit is exceeded, **stop and refactor** before continuing.
 
 ## Design Principles (Agent Priorities)
 
-> Full reference: `Documentation/Development/principes-dev-qualite.md` — `CONVENTIONS.md` §6.16
+> Full reference: `Documentation/Development/software-development-quality-principles.md` — `CONVENTIONS.md` §6.16
 
 | Principle | Rule |
 |---|---|
@@ -402,7 +402,7 @@ BMad planning artifacts live in `_bmad-output/planning-artifacts/`. Promote vali
 ## Key Reference Files (Read Before Implementing)
 
 - `CONVENTIONS.md` — full coding standards (authoritative for style disputes); Cursor summary in `.cursor/rules/`
-- `Documentation/Development/principes-dev-qualite.md` — complete design principles reference
+- `Documentation/Development/software-development-quality-principles.md` — complete design principles reference
 - `Source/Shared/Definitions/PluginDescriptors.h`
 - `Source/GUI/Factories/WidgetFactory.h`
 - `Source/GUI/Layout/ScaledLayout.h`

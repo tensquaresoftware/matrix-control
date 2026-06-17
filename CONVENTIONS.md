@@ -208,7 +208,7 @@ Before presenting code to Guillaume, I MUST systematically verify:
 - [ ] **Boy Scout Rule:** Is the touched code at least slightly cleaner than before?
 - [ ] **CQS:** Do mutating functions avoid returning queried state (and vice versa)?
 
-> Full reference: `Documentation/Development/principes-dev-qualite.md` and §6.16
+> Full reference: `Documentation/Development/software-development-quality-principles.md` and §6.16
 
 ### 4.6 Golden rule
 
@@ -458,7 +458,7 @@ Prefer inline methods in header only if they are short (< 5 lines)
 
 ### 6.16 Design principles (agent priorities)
 
-> Full human reference: `Documentation/Development/principes-dev-qualite.md`
+> Full human reference: `Documentation/Development/software-development-quality-principles.md`
 > These principles complement SOLID and Clean Code — they resolve tensions between purity and pragmatism.
 
 #### Simplicity & change (apply in Phase 1 DESIGN)
