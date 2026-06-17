@@ -72,11 +72,11 @@ DeviceIdInfo SysExDecoder::decodeDeviceId(const juce::MemoryBlock& sysEx) const
 
     extractDeviceInformation(data, info);
     extractDeviceVersion(data, sysEx.getSize(), info);
-    validateMatrix1000Device(info);
+    validateMatrixFamilyDevice(info);
 
     if (info.isValid)
     {
-        MidiLogger::getInstance().logInfo("Device ID decoded: Matrix-1000, version: " + info.version);
+        MidiLogger::getInstance().logInfo("Device ID decoded: Matrix family, version: " + info.version);
     }
     else
     {
@@ -191,12 +191,23 @@ void SysExDecoder::extractDeviceVersion(const juce::uint8* data, size_t messageS
     }
 }
 
-void SysExDecoder::validateMatrix1000Device(DeviceIdInfo& info) const
+void SysExDecoder::validateMatrixFamilyDevice(DeviceIdInfo& info) const
 {
-    info.isValid = (info.manufacturerId == SysExConstants::DeviceInquiry::kExpectedManufacturer &&
-                    info.familyLow == SysExConstants::DeviceInquiry::kExpectedFamily &&
-                    info.memberLow == SysExConstants::DeviceInquiry::kExpectedMemberLow &&
-                    info.memberHigh == SysExConstants::DeviceInquiry::kExpectedMemberHigh);
+    const bool manufacturerMatches =
+        info.manufacturerId == SysExConstants::DeviceInquiry::kExpectedManufacturer;
+    const bool familyMatches =
+        info.familyLow == SysExConstants::DeviceInquiry::kExpectedFamily;
+
+    const bool memberMatchesMatrix1000 =
+        info.memberLow == SysExConstants::DeviceInquiry::kExpectedMemberLow
+        && info.memberHigh == SysExConstants::DeviceInquiry::kExpectedMemberHigh;
+
+    const bool memberMatchesMatrix6 =
+        info.memberLow == SysExConstants::DeviceInquiry::kMatrix6MemberLow
+        && info.memberHigh == SysExConstants::DeviceInquiry::kMatrix6MemberHigh;
+
+    info.isValid = manufacturerMatches && familyMatches
+        && (memberMatchesMatrix1000 || memberMatchesMatrix6);
 }
 
 size_t SysExDecoder::getChecksumIndex(size_t totalSize) const

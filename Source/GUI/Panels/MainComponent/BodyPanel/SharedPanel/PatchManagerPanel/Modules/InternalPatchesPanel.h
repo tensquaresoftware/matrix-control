@@ -6,6 +6,7 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 
 #include "GUI/Layout/PanelDimensions.h"
+#include "Core/Services/DeviceMemoryLimits.h"
 
 namespace TSS
 {
@@ -71,6 +72,12 @@ private:
     void setupCopyPatchButton(TSS::ISkin& skin, WidgetFactory& widgetFactory);
     void setupPastePatchButton(TSS::ISkin& skin, WidgetFactory& widgetFactory);
     void setupStorePatchButton(TSS::ISkin& skin, WidgetFactory& widgetFactory);
+
+    void refreshDeviceLimits();
+    void applyPatchNumberRange(const Core::DeviceMemoryLimits& limits);
+    void updatePasteStoreEnabled(const Core::DeviceMemoryLimits& limits, int currentBank);
+
+    bool bankNumberVisible_ = true;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(InternalPatchesPanel)
 };

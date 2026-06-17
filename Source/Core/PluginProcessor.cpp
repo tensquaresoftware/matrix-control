@@ -28,8 +28,11 @@
 #include "Core/MIDI/PatchParameterSysExDispatcher.h"
 #include "Core/MIDI/SysEx/SysExDecoder.h"
 #include "Core/MIDI/SysEx/SysExParser.h"
+#include "Core/Services/DeviceMemoryLimits.h"
+#include "Core/Services/DeviceTypeRegistry.h"
 #include "Shared/Definitions/PluginAudioConstants.h"
 #include "Shared/Definitions/Matrix1000Limits.h"
+#include "Shared/Definitions/MatrixDeviceTypes.h"
 #include "Shared/Definitions/PluginDescriptors.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginIDs.h"
@@ -1139,8 +1142,16 @@ void PluginProcessor::valueTreePropertyChanged(juce::ValueTree& treeWhosePropert
 
     handleBankNumberChange(parameterId);
     handlePatchNumberChange(parameterId);
+    handlePatchManagerPropertyChange(parameterId);
     handleMatrixModInitPropertyChange(parameterId);
     handleMasterModuleInitPropertyChange(parameterId);
+
+    const auto propertyName = property.toString();
+    if (propertyName == MatrixDeviceTypes::kApvtsPropertyName
+        || propertyName == "deviceDetected")
+    {
+        reconcilePatchManagerCoordinatesForDeviceType();
+    }
 }
 
 juce::String PluginProcessor::getChoiceLabelForNumericValue(const juce::String& parameterId, const juce::var& newValue) const
@@ -1158,14 +1169,109 @@ void PluginProcessor::handleBankNumberChange(const juce::String& parameterId)
 {
     if (parameterId != PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCurrentBankNumber)
         return;
-    juce::ignoreUnused(parameterId);
+
+    const auto limits = getResolvedDeviceMemoryLimits();
+    const int bankNumber = static_cast<int>(apvts.state.getProperty(parameterId, 0));
+
+    if (!limits.hasBankConcept())
+    {
+        if (bankNumber != 0)
+            apvts.state.setProperty(parameterId, 0, nullptr);
+        return;
+    }
+
+    if (bankNumber < limits.minBankNumber() || bankNumber > limits.maxBankNumber())
+    {
+        apvts.state.setProperty(parameterId,
+                                juce::jlimit(limits.minBankNumber(),
+                                             limits.maxBankNumber(),
+                                             bankNumber),
+                                nullptr);
+    }
 }
 
 void PluginProcessor::handlePatchNumberChange(const juce::String& parameterId)
 {
     if (parameterId != PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCurrentPatchNumber)
         return;
-    juce::ignoreUnused(parameterId);
+
+    const auto limits = getResolvedDeviceMemoryLimits();
+    const int patchNumber = static_cast<int>(apvts.state.getProperty(parameterId, 0));
+    const int clampedPatch = juce::jlimit(limits.minPatchNumber(), limits.maxPatchNumber(), patchNumber);
+
+    if (clampedPatch != patchNumber)
+    {
+        apvts.state.setProperty(parameterId, clampedPatch, nullptr);
+        return;
+    }
+
+    if (midiManager != nullptr)
+        midiManager->sendProgramChange(clampedPatch);
+}
+
+Core::DeviceMemoryLimits PluginProcessor::getResolvedDeviceMemoryLimits() const
+{
+    const auto deviceType = Core::DeviceTypeRegistry::fromApvtsProperty(
+        apvts.state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
+    return Core::DeviceMemoryLimits::resolve(deviceType);
+}
+
+void PluginProcessor::reconcilePatchManagerCoordinatesForDeviceType()
+{
+    const auto limits = getResolvedDeviceMemoryLimits();
+
+    using namespace PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets;
+
+    const int bankNumber = static_cast<int>(apvts.state.getProperty(kCurrentBankNumber, 0));
+
+    if (!limits.hasBankConcept())
+    {
+        if (bankNumber != 0)
+            apvts.state.setProperty(kCurrentBankNumber, 0, nullptr);
+    }
+    else
+    {
+        const int clampedBank = juce::jlimit(limits.minBankNumber(),
+                                             limits.maxBankNumber(),
+                                             bankNumber);
+        if (clampedBank != bankNumber)
+            apvts.state.setProperty(kCurrentBankNumber, clampedBank, nullptr);
+    }
+
+    const int patchNumber = static_cast<int>(apvts.state.getProperty(kCurrentPatchNumber, 0));
+    const int clampedPatch = juce::jlimit(limits.minPatchNumber(), limits.maxPatchNumber(), patchNumber);
+    if (clampedPatch != patchNumber)
+        apvts.state.setProperty(kCurrentPatchNumber, clampedPatch, nullptr);
+}
+
+void PluginProcessor::applyPatchCoordinates(const Core::PatchCoordinates& coordinates)
+{
+    apvts.state.setProperty(
+        PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCurrentBankNumber,
+        coordinates.bank,
+        nullptr);
+    apvts.state.setProperty(
+        PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCurrentPatchNumber,
+        coordinates.patch,
+        nullptr);
+}
+
+int PluginProcessor::parseBankButtonIndex(const juce::String& propertyId) const
+{
+    using namespace PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets;
+
+    if (propertyId == kSelectBank0) return 0;
+    if (propertyId == kSelectBank1) return 1;
+    if (propertyId == kSelectBank2) return 2;
+    if (propertyId == kSelectBank3) return 3;
+    if (propertyId == kSelectBank4) return 4;
+    if (propertyId == kSelectBank5) return 5;
+    if (propertyId == kSelectBank6) return 6;
+    if (propertyId == kSelectBank7) return 7;
+    if (propertyId == kSelectBank8) return 8;
+    if (propertyId == kSelectBank9) return 9;
+
+    return -1;
 }
 
 int PluginProcessor::parseMatrixModBusInitIndex(const juce::String& propertyId) const
@@ -1249,6 +1355,61 @@ void PluginProcessor::handleMasterModuleInitPropertyChange(const juce::String& p
     suppressMasterParameterSysEx_ = false;
 
     propagateInitTemplateFooterMessage(result);
+}
+
+void PluginProcessor::handlePatchManagerPropertyChange(const juce::String& propertyId)
+{
+    using namespace PluginIDs::PatchManagerSection;
+
+    const auto limits = getResolvedDeviceMemoryLimits();
+
+    if (propertyId == InternalPatchesModule::StandaloneWidgets::kLoadPreviousPatch
+        || propertyId == InternalPatchesModule::StandaloneWidgets::kLoadNextPatch)
+    {
+        const bool isNext = propertyId == InternalPatchesModule::StandaloneWidgets::kLoadNextPatch;
+        const int direction = isNext ? 1 : -1;
+
+        Core::PatchCoordinates current;
+        current.bank = static_cast<int>(apvts.state.getProperty(
+            InternalPatchesModule::StandaloneWidgets::kCurrentBankNumber,
+            limits.minBankNumber()));
+        current.patch = static_cast<int>(apvts.state.getProperty(
+            InternalPatchesModule::StandaloneWidgets::kCurrentPatchNumber,
+            limits.minPatchNumber()));
+
+        const bool bankLocked = static_cast<bool>(apvts.state.getProperty(
+            BankUtilityModule::StateProperties::kBankLock,
+            false));
+
+        const auto nextCoordinates = limits.advancePatch(current, direction, bankLocked);
+        applyPatchCoordinates(nextCoordinates);
+        return;
+    }
+
+    if (!limits.hasBankConcept())
+    {
+        if (parseBankButtonIndex(propertyId) >= 0
+            || propertyId == BankUtilityModule::StandaloneWidgets::kLockBank)
+        {
+            return;
+        }
+    }
+
+    const int bankIndex = parseBankButtonIndex(propertyId);
+    if (bankIndex >= 0)
+    {
+        apvts.state.setProperty(BankUtilityModule::StateProperties::kSelectedBank, bankIndex, nullptr);
+        apvts.state.setProperty(InternalPatchesModule::StandaloneWidgets::kCurrentBankNumber, bankIndex, nullptr);
+        return;
+    }
+
+    if (propertyId == BankUtilityModule::StandaloneWidgets::kLockBank)
+    {
+        const bool currentLock = static_cast<bool>(apvts.state.getProperty(
+            BankUtilityModule::StateProperties::kBankLock,
+            false));
+        apvts.state.setProperty(BankUtilityModule::StateProperties::kBankLock, !currentLock, nullptr);
+    }
 }
 
 void PluginProcessor::valueTreeChildAdded(juce::ValueTree& parentTree,

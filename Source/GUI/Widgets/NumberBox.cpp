@@ -36,6 +36,13 @@ namespace TSS
         repaint();
     }
 
+    void NumberBox::setRange(int minValue, int maxValue)
+    {
+        minValue_ = minValue;
+        maxValue_ = maxValue;
+        setValue(currentValue_);
+    }
+
     void NumberBox::setValue(int newValue)
     {
         const int clampedValue = juce::jlimit(minValue_, maxValue_, newValue);

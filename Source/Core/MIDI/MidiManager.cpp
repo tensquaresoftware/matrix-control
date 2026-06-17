@@ -4,7 +4,9 @@
 #include "Core/Loggers/MidiLogger.h"
 #include "Core/MIDI/MidiPortOpenFeedback.h"
 #include "Core/MIDI/Queue/SysExDelayProfile.h"
-#include "Shared/Definitions/Matrix1000Limits.h"
+#include "Core/Services/DeviceTypeRegistry.h"
+#include "Shared/Definitions/PluginIDs.h"
+#include "Shared/Definitions/MatrixDeviceTypes.h"
 
 namespace
 {
@@ -63,7 +65,16 @@ MidiManager::MidiManager(juce::AudioProcessorValueTreeState& apvtsRef,
     outboundQueue_.setWakeConsumerCallback([this] { wakeConsumer(); });
 
     apvts.state.setProperty("deviceDetected", false, nullptr);
+    apvts.state.setProperty(MatrixDeviceTypes::kApvtsPropertyName,
+                            MatrixDeviceTypes::toApvtsString(MatrixDeviceTypes::Type::kUnknown),
+                            nullptr);
     apvts.state.setProperty("deviceVersion", juce::String(), nullptr);
+    apvts.state.setProperty(PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties::kSelectedBank,
+                            Matrix1000Limits::kMinBankNumber,
+                            nullptr);
+    apvts.state.setProperty(PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties::kBankLock,
+                            false,
+                            nullptr);
     apvts.state.setProperty("lastError", juce::String(), nullptr);
     apvts.state.setProperty("errorType", juce::String(), nullptr);
     apvts.state.setProperty("lastPatchLoaded", juce::String(), nullptr);
@@ -317,15 +328,16 @@ bool MidiManager::performDeviceInquiry()
         
         if (deviceInfo.isValid)
         {
+            const auto deviceType = Core::DeviceTypeRegistry::fromDeviceInquiry(deviceInfo);
             sysExDelay_.setProfile(Core::SysExDelayProfile::fromDeviceInquiry(deviceInfo));
-            updateDeviceStatus(true, deviceInfo.version);
+            updateDeviceStatus(true, deviceInfo.version, deviceType);
             return true;
         }
         else
         {
             sysExDelay_.setProfile(Core::SysExDelayProfile::stockDefault());
             updateDeviceStatus(false);
-            updateErrorState("Connected device is not a Matrix-1000", "Device");
+            updateErrorState("Connected device is not a supported Oberheim Matrix synth", "Device");
             return false;
         }
     }
@@ -529,18 +541,28 @@ void MidiManager::updateErrorState(const juce::String& errorMessage, const juce:
     MidiLogger::getInstance().logError(errorMessage);
 }
 
-void MidiManager::updateDeviceStatus(bool detected, const juce::String& version)
+void MidiManager::updateDeviceStatus(bool detected,
+                                     const juce::String& version,
+                                     MatrixDeviceTypes::Type deviceType)
 {
     apvts.state.setProperty("deviceDetected", detected, nullptr);
     apvts.state.setProperty("deviceVersion", version, nullptr);
-    
+
     if (detected)
     {
-        MidiLogger::getInstance().logInfo("Matrix-1000 detected. Version: " + version);
+        apvts.state.setProperty(MatrixDeviceTypes::kApvtsPropertyName,
+                                MatrixDeviceTypes::toApvtsString(deviceType),
+                                nullptr);
+        MidiLogger::getInstance().logInfo(
+            "Matrix synth detected (" + MatrixDeviceTypes::toApvtsString(deviceType)
+            + "). Version: " + version);
     }
     else
     {
-        MidiLogger::getInstance().logWarning("Matrix-1000 not detected");
+        apvts.state.setProperty(MatrixDeviceTypes::kApvtsPropertyName,
+                                MatrixDeviceTypes::toApvtsString(MatrixDeviceTypes::Type::kUnknown),
+                                nullptr);
+        MidiLogger::getInstance().logWarning("Matrix synth not detected");
     }
 }
 

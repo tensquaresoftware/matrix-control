@@ -43,7 +43,7 @@ private:
     bool validateDeviceInquiryStructure(const juce::uint8* data) const;
     void extractDeviceInformation(const juce::uint8* data, DeviceIdInfo& info) const;
     void extractDeviceVersion(const juce::uint8* data, size_t messageSize, DeviceIdInfo& info) const;
-    void validateMatrix1000Device(DeviceIdInfo& info) const;
+    void validateMatrixFamilyDevice(DeviceIdInfo& info) const;
     size_t getChecksumIndex(size_t totalSize) const;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SysExDecoder)

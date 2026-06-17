@@ -7,6 +7,8 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_core/juce_core.h>
 
+#include "Shared/Definitions/MatrixDeviceTypes.h"
+
 #include "Ports/MidiInputPort.h"
 #include "Ports/MidiOutputPort.h"
 #include "Transport/MidiSender.h"
@@ -66,7 +68,9 @@ private:
     Core::SysExInterMessageDelay sysExDelay_;
 
     void updateErrorState(const juce::String& errorMessage, const juce::String& errorType);
-    void updateDeviceStatus(bool detected, const juce::String& version = {});
+    void updateDeviceStatus(bool detected,
+                            const juce::String& version = {},
+                            MatrixDeviceTypes::Type deviceType = MatrixDeviceTypes::Type::kUnknown);
     void handleIncomingSysEx(const juce::MemoryBlock& sysEx);
     
     void stopMidiInputCallbacks();

@@ -496,6 +496,12 @@ namespace PluginIDs
         {
             constexpr const char* kGroupId = "bankUtilityModule";
 
+            namespace StateProperties
+            {
+                constexpr const char* kSelectedBank = "patchManagerSelectedBank";
+                constexpr const char* kBankLock = "patchManagerBankLock";
+            }
+
             namespace StandaloneWidgets
             {
                 constexpr const char* kLockBank    = "bankUtilityLockBank";

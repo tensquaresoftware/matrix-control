@@ -20,6 +20,8 @@ namespace TSS
         void setValue(int newValue);
         int getValue() const { return currentValue_; }
 
+        void setRange(int minValue, int maxValue);
+
         void setOnValueChanged(ValueChangedCallback callback);
 
         void setShowDot(bool show);

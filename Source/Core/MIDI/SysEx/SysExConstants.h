@@ -76,8 +76,11 @@ namespace SysExConstants
         // Member: 0x10 0x02 (Matrix-1000)
         constexpr juce::uint8 kExpectedManufacturer = 0x10;
         constexpr juce::uint8 kExpectedFamily = 0x06;
-        constexpr juce::uint8 kExpectedMemberLow = 0x00;
-        constexpr juce::uint8 kExpectedMemberHigh = 0x02;
+        // Member: 0x02 0x00 (Matrix-1000); 0x01 0x00 provisional (Matrix-6/6R)
+        constexpr juce::uint8 kExpectedMemberLow = 0x02;
+        constexpr juce::uint8 kExpectedMemberHigh = 0x00;
+        constexpr juce::uint8 kMatrix6MemberLow = 0x01;
+        constexpr juce::uint8 kMatrix6MemberHigh = 0x00;
     }
 }
 

@@ -9,6 +9,8 @@
 
 #include <juce_audio_processors/juce_audio_processors.h>
 
+#include "Core/Services/DeviceMemoryLimits.h"
+
 #include "Core/MIDI/MatrixModBusParameterSysExDispatcher.h"
 #include "Shared/Definitions/Matrix1000Limits.h"
 #include "Shared/Definitions/PluginDescriptors.h"
@@ -28,9 +30,9 @@ namespace Core
     class MatrixModBusParameterSysExDispatcher;
     class MatrixModBusReorderService;
     class MatrixModInitService;
+    class MasterModuleInitService;
     class InitTemplateLoader;
     struct InitTemplateLoadResult;
-    class MasterModuleInitService;
     class PatchParameterSysExDispatcher;
     class MidiOutboundQueue;
     class InstrumentMidiForwarder;
@@ -233,10 +235,15 @@ private:
     juce::String getChoiceLabelForNumericValue(const juce::String& parameterId, const juce::var& newValue) const;
     void handleBankNumberChange(const juce::String& parameterId);
     void handlePatchNumberChange(const juce::String& parameterId);
+    void handlePatchManagerPropertyChange(const juce::String& propertyId);
     void handleMatrixModInitPropertyChange(const juce::String& propertyId);
     void handleMasterModuleInitPropertyChange(const juce::String& propertyId);
     void propagateInitTemplateFooterMessage(const Core::InitTemplateLoadResult& result);
     int parseMatrixModBusInitIndex(const juce::String& propertyId) const;
+    Core::DeviceMemoryLimits getResolvedDeviceMemoryLimits() const;
+    void reconcilePatchManagerCoordinatesForDeviceType();
+    void applyPatchCoordinates(const Core::PatchCoordinates& coordinates);
+    int parseBankButtonIndex(const juce::String& propertyId) const;
     void buildPatchParameterIdSet();
     void buildMasterParameterIdSet();
     void buildMatrixModParameterIdSet();

@@ -704,6 +704,8 @@ namespace PluginDisplayNames
         namespace BankUtilityModule
         {
             constexpr const char* kName = "BANK UTILITY";
+            constexpr const char* kMatrix1000OnlyFooterMessage =
+                "Bank selection is available on Matrix-1000 only.";
 
             namespace StandaloneWidgets
             {

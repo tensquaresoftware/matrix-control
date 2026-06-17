@@ -17,7 +17,8 @@ namespace TSS
 
 class WidgetFactory;
 
-class BankUtilityPanel : public juce::Component
+class BankUtilityPanel : public juce::Component,
+                         public juce::ValueTree::Listener
 {
 public:
     BankUtilityPanel(TSS::ISkin& skin, const BankUtilityPanelDimensions& dims, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
@@ -27,11 +28,22 @@ public:
     void setSkin(TSS::ISkin& skin);
     void setUiScale(float uiScale);
 
+    void mouseDown(const juce::MouseEvent& event) override;
+
+    void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
+                                 const juce::Identifier& property) override;
+    void valueTreeChildAdded(juce::ValueTree&, juce::ValueTree&) override {}
+    void valueTreeChildRemoved(juce::ValueTree&, juce::ValueTree&, int) override {}
+    void valueTreeChildOrderChanged(juce::ValueTree&, int, int) override {}
+    void valueTreeParentChanged(juce::ValueTree&) override {}
+    void valueTreeRedirected(juce::ValueTree&) override {}
+
 private:
     BankUtilityPanelDimensions dims_;
     TSS::ISkin* skin_;
     float uiScale_ = 1.0f;
     juce::AudioProcessorValueTreeState& apvts_;
+    bool bankUtilityGrayed_ = false;
 
     std::unique_ptr<TSS::ModuleHeader> bankUtilityModuleHeader_;
     std::unique_ptr<TSS::Label> bankSelectorLabel_;
@@ -50,6 +62,11 @@ private:
     void setupModuleHeader(TSS::ISkin& skin, WidgetFactory& widgetFactory, const juce::String& moduleId);
     void setupBankSelectorLabel(TSS::ISkin& skin);
     void setupSelectBankButtons(TSS::ISkin& skin, WidgetFactory& widgetFactory);
+
+    void refreshDeviceGating();
+    void setBankUtilityGrayed(bool grayed);
+    void showMatrix1000OnlyFooterMessage();
+    void styleBankButton(TSS::Button* button, bool grayed);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BankUtilityPanel)
 };

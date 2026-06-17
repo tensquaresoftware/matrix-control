@@ -1,5 +1,13 @@
 # Deferred Work
 
+## Deferred from: code review of 3-4-master-module-init-confirmation-path (2026-06-18)
+
+- **Flag suppress sans RAII** (`PluginProcessor.cpp:1347-1349`) — même set/restore que story 3.3 ; ScopeGuard si refactor transversal.
+- **Init re-déclenché au chargement preset** — propriétés `midiInit`/`vibratoInit`/`miscInit` (timestamps) sérialisées dans `copyState` ; pattern identique Matrix Mod init 3.3.
+- **Pas de tests GUI Cancel/Confirm** — FR-17 couvert manuellement (SM-1) ; pas de harness GUI automatisé v1.
+- **`handleMasterModuleInitPropertyChange` > 15 lignes** — hygiène Clean Code, non bloquant AC.
+- **`kMatrix1000OnlyFooterMessage` dans le même diff** — hunk story 8.5 ; découper au commit.
+
 ## Deferred from: code review of 3-3-matrix-mod-init-defaults (2026-06-17)
 
 - **Suppress flag without RAII** (`PluginProcessor.cpp:1286-1293`) — Same set/restore pattern as `swapMatrixModBusContents`; cross-cutting hygiene if scope guard is introduced later.

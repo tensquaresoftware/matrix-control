@@ -1,5 +1,7 @@
 #include "InternalPatchesPanel.h"
 
+#include "Core/Services/DeviceMemoryLimits.h"
+#include "Core/Services/DeviceTypeRegistry.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Looks/LookBuilders.h"
@@ -7,6 +9,8 @@
 #include "GUI/Widgets/GroupLabel.h"
 #include "GUI/Widgets/Button.h"
 #include "GUI/Widgets/NumberBox.h"
+#include "Shared/Definitions/Matrix1000Limits.h"
+#include "Shared/Definitions/MatrixDeviceTypes.h"
 #include "Shared/Definitions/PluginDescriptors.h"
 #include "GUI/Factories/WidgetFactory.h"
 #include <juce_core/juce_core.h>
@@ -33,6 +37,7 @@ InternalPatchesPanel::InternalPatchesPanel(TSS::ISkin& skin, const InternalPatch
     setupStorePatchButton(skin, widgetFactory);
 
     apvts_.state.addListener(this);
+    refreshDeviceLimits();
     
     setSize(dims_.width, dims_.height);
 }
@@ -48,7 +53,7 @@ void InternalPatchesPanel::valueTreePropertyChanged(
 {
     const auto propertyName = property.toString();
     
-    // Mise à jour du NumberBox depuis le Core (via Property)
+    // Sync NumberBox from Core state (via APVTS property)
     if (propertyName == PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCurrentBankNumber)
     {
         const int bankNumber = treeWhosePropertyHasChanged.getProperty(property);
@@ -61,6 +66,13 @@ void InternalPatchesPanel::valueTreePropertyChanged(
         const int patchNumber = treeWhosePropertyHasChanged.getProperty(property);
         if (auto* numberBox = currentPatchNumber.get())
             numberBox->setValue(patchNumber);
+    }
+
+    if (propertyName == MatrixDeviceTypes::kApvtsPropertyName
+        || propertyName == "deviceDetected"
+        || propertyName == PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCurrentBankNumber)
+    {
+        refreshDeviceLimits();
     }
 }
 
@@ -103,13 +115,15 @@ void InternalPatchesPanel::resized()
     // Browser section: nav buttons + number boxes, each X computed independently
     const float navStep    = static_cast<float>(dims_.buttons.initWidth + dims_.layout.interControlGap) * sf;
     const float bankNumX   = navStep * 2.0f;
-    const float patchNumX  = bankNumX + static_cast<float>(dims_.numberBoxes.bankNumberWidth + dims_.layout.interControlGap) * sf;
+    const float patchNumX  = bankNumberVisible_
+        ? bankNumX + static_cast<float>(dims_.numberBoxes.bankNumberWidth + dims_.layout.interControlGap) * sf
+        : bankNumX;
 
     if (loadPreviousPatchButton_)
         loadPreviousPatchButton_->setBounds(0, row2Y, navButtonW, buttonH);
     if (loadNextPatchButton_)
         loadNextPatchButton_->setBounds(juce::roundToInt(navStep), row2Y, navButtonW, buttonH);
-    if (currentBankNumber)
+    if (currentBankNumber && bankNumberVisible_)
         currentBankNumber->setBounds(juce::roundToInt(bankNumX), row2Y, bankNumberW, buttonH);
     if (currentPatchNumber)
         currentPatchNumber->setBounds(juce::roundToInt(patchNumX), row2Y, patchNumberW, buttonH);
@@ -175,6 +189,43 @@ void InternalPatchesPanel::setUiScale(float uiScale)
     
     uiScale_ = uiScale;
     repaint();
+}
+
+void InternalPatchesPanel::refreshDeviceLimits()
+{
+    const auto deviceType = Core::DeviceTypeRegistry::fromApvtsProperty(
+        apvts_.state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
+    const auto limits = Core::DeviceMemoryLimits::resolve(deviceType);
+
+    bankNumberVisible_ = limits.hasBankConcept();
+    if (currentBankNumber)
+        currentBankNumber->setVisible(bankNumberVisible_);
+
+    applyPatchNumberRange(limits);
+
+    const int currentBank = static_cast<int>(apvts_.state.getProperty(
+        PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCurrentBankNumber,
+        Matrix1000Limits::kMinBankNumber));
+    updatePasteStoreEnabled(limits, currentBank);
+
+    resized();
+}
+
+void InternalPatchesPanel::applyPatchNumberRange(const Core::DeviceMemoryLimits& limits)
+{
+    if (currentPatchNumber)
+        currentPatchNumber->setRange(limits.minPatchNumber(), limits.maxPatchNumber());
+}
+
+void InternalPatchesPanel::updatePasteStoreEnabled(const Core::DeviceMemoryLimits& limits, int currentBank)
+{
+    const bool allowPasteStore = limits.isPasteStoreAllowed(currentBank);
+
+    if (pastePatchButton_)
+        pastePatchButton_->setEnabled(allowPasteStore);
+
+    if (storePatchButton_)
+        storePatchButton_->setEnabled(allowPasteStore);
 }
 
 void InternalPatchesPanel::setupModuleHeader(TSS::ISkin& skin, WidgetFactory& widgetFactory, const juce::String& moduleId)
@@ -252,10 +303,10 @@ void InternalPatchesPanel::setupCurrentPatchNumberBox(TSS::ISkin& skin)
         Matrix1000Limits::kMinPatchNumber,
         Matrix1000Limits::kMaxPatchNumber);
     
-    // Callback pour envoyer la valeur via Property (comme les boutons)
+    // Push value to APVTS via property (same pattern as buttons)
     currentPatchNumber->setOnValueChanged([this](int newValue)
     {
-        // Éviter la boucle : ne pas setProperty si la valeur vient déjà du ValueTree
+        // Avoid feedback loop when the value already came from the ValueTree
         const auto currentPropertyValue = apvts_.state.getProperty(
             PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCurrentPatchNumber, -1);
         
