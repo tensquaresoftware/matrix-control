@@ -46,7 +46,7 @@ namespace Core
         if (handleMasterModuleInit(propertyId)) return;
         if (handleClipboardCopy(propertyId)) return;
         if (handleClipboardPaste(propertyId)) return;
-        handlePatchModuleInit(propertyId);
+        if (handlePatchModuleInit(propertyId)) return;
     }
 
     bool ModuleActionHandler::handleMatrixModInit(const juce::String& propertyId)

@@ -3,7 +3,7 @@ organization: Ten Square Software
 project: Matrix-Control
 title: Story 7.2 — ModuleActionHandler I C P and Matrix Mod Init
 author: BMad Agent
-status: in-progress
+status: done
 baseline_commit: 0c7a3c2
 sources:
   - planning-artifacts/epics.md
@@ -26,7 +26,7 @@ updated: 2026-06-18
 
 # Story 7.2: ModuleActionHandler I C P and Matrix Mod Init
 
-Status: in-progress
+Status: done
 
 <!-- Ultimate context engine analysis completed — comprehensive developer guide created -->
 
@@ -113,6 +113,12 @@ so that PATCH/MASTER headers and Matrix Modulation section actions work end-to-e
 - [x] [Review][Defer] AC #6 partial — module paste routing still uses `endsWith("Paste")` after explicit matrix-mod branch (mitigated by `patchModuleKindFromWidgetId` filter). [ModuleActionHandler.cpp:182] — deferred, align with future explicit Paste ID set
 - [x] [Review][Defer] Suppress flags cleared only on happy path (no RAII) — same pattern as Story 7.1 master/matrix init handlers. [ModuleActionHandler.cpp] — deferred, pre-existing
 - [x] [Review][Defer] `dispatchModule` rebuilds descriptor vectors on every call. [PatchParameterSysExDispatcher.cpp:19] — deferred, perf micro-optimization
+
+- [x] [Review][Patch] `handleAction` omits `if` guard on last handler — `handlePatchModuleInit(propertyId)` called without `if (...) return;`, unlike the four handlers above. [ModuleActionHandler.cpp:49]
+
+- [x] [Review][Defer] `PatchModuleInitService.h` pulls in `ClipboardService.h` only for `PatchModuleKind` enum type — Init subsystem coupled to clipboard Services header; extract shared type when layering is next touched. [PatchModuleInitService.h:9]
+
+- [x] [Review][Defer] `moduleGroupIdFromPatchModuleKind` lives on `PatchModuleInitService` but is invoked from paste routing in `handleClipboardPaste` — paste handler depends on init service for non-init mapping; relocate alongside paste ID map when Copy/Paste split debt is addressed. [ModuleActionHandler.cpp:195]
 
 ## Dev Notes
 

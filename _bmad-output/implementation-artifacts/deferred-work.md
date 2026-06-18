@@ -9,6 +9,8 @@
 - **AC #6 partial — `endsWith("Paste")` for module paste routing** (`ModuleActionHandler.cpp:182`) — mitigated by explicit matrix-mod branch + `patchModuleKindFromWidgetId`; replace with explicit Paste ID set when Copy/Paste split debt is addressed.
 - **Suppress flags without RAII on exception path** (`ModuleActionHandler.cpp`) — same pattern as 7.1 master/matrix init; ScopeGuard transversal (see 7-1 deferred item).
 - **`dispatchModule` rebuilds descriptor vectors each call** (`PatchParameterSysExDispatcher.cpp:19`) — perf micro-optimization; cache or reuse filtered module descriptors if profiling warrants.
+- **`PatchModuleInitService.h` includes `ClipboardService.h` for `PatchModuleKind`** (`PatchModuleInitService.h:9`) — Init subsystem coupled to clipboard Services header; extract shared type when layering is next touched.
+- **`moduleGroupIdFromPatchModuleKind` on init service used by paste handler** (`ModuleActionHandler.cpp:195`) — paste routing depends on `PatchModuleInitService` for non-init mapping; relocate with Copy/Paste split debt.
 
 ## Deferred from: code review of 7-1-actiondispatcher-and-handler-interfaces (2026-06-18)
 
