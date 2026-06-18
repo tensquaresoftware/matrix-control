@@ -1,5 +1,5 @@
 # generated: 2026-05-29
-# last_updated: 2026-06-18 (Story 3.4 → done)
+# last_updated: 2026-06-18 (Epic 3 → done)
 # project: Matrix-Control
 # project_key: NOKEY
 # tracking_system: file-system
@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-05-29
-last_updated: 2026-06-17 (Story 3.4 → ready-for-dev)
+last_updated: 2026-06-18 (Epic 3 → done)
 project: Matrix-Control
 project_key: NOKEY
 tracking_system: file-system
@@ -79,7 +79,7 @@ development_status:
   r-4-midioutboundqueue-mpsc-audit: done
   r-5-windows-midi-multi-client-docs: done
   epic-r-retrospective: optional
-  epic-3: in-progress
+  epic-3: done
   3-1-initdefaults-hardcoded-buffers: done
   3-2-inittemplateloader-for-patchinit-and-masterinit: done
   3-3-matrix-mod-init-defaults: done
