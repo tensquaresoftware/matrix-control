@@ -8,7 +8,7 @@ version: "1.0"
 sources:
   - https://github.com/bmad-code-org/bmad-method
 created: 2026-06-17
-updated: 2026-06-17
+updated: 2026-06-18
 ---
 
 # BMad Method — Development Cycle Quick Reference
@@ -110,7 +110,7 @@ See the **Phase 4** diagram for the DS → CR → UAT order in the story loop.
 | Term | Meaning |
 |------|---------|
 | **CR** | *Code Review* — adversarial code review; sends back to dev if issues remain. |
-| **Adversarial review (AR)** | Systematic critical review; built into CR for code, also available for documents. |
+| **AR** | *Adversarial review* — Systematic critical review; built into CR for code, also available for documents. |
 | **ECH** | *Edge Case Hunter* — complementary review targeting edge cases and missed branches. |
 | **CK** | *Checkpoint* — guided human review of a change (commit, branch, PR). |
 | **QA** | Generated automated tests (`/bmad-qa-generate-e2e-tests`) — complements, does not replace, UAT. |
@@ -198,6 +198,8 @@ DS (develop + tests)
     ↓
 CR (code review)
     ↓
+Commit & Push (when code review done)
+    ↓
 UAT (user acceptance, when required by the story)
     ↓
   ┌─ issues → back to DS
@@ -216,6 +218,43 @@ UAT (user acceptance, when required by the story)
 | QA | QA Automation | `/bmad-qa-generate-e2e-tests` | Automated test generation *(not a review)* |
 
 **Typical invocation**: `/bmad-dev-story` or “implement the next story in the sprint”.
+
+### Git — when to commit and push
+
+BMad does not commit for you. Request commits explicitly when you are ready. The story loop maps to Git as follows:
+
+| Step | Commit? | Why |
+|------|---------|-----|
+| **`create-story`** | Optional, separate | BMad artifacts only (story file + `sprint-status.yaml`). No application code. Commit the spec alone only if you want a locked spec trace before coding. |
+| **`dev-story` (during)** | **No** | `/bmad-dev-story` records `baseline_commit` at start — the diff reference for code review. Mid-story commits break that baseline and mix stories. |
+| **`dev-story` (end → `review`)** | Possible, not ideal | Code and tests are green, but review often requests fixes or scope splits. Committing here usually means a follow-up fixup commit. |
+| **`code-review` (end → `done`)** | **Yes — best time** | Review has filtered scope, flagged out-of-story hunks, and validated ACs. One coherent unit: code + tests + story file + `sprint-status.yaml`. |
+
+**Recommended flow (one story):**
+
+```
+create-story  →  ready-for-dev        (no required commit)
+dev-story     →  in-progress → review (no commit yet)
+code-review   →  review → done        (apply review fixes if any)
+commit        →  code + tests + story + sprint-status
+push          →  optional: backup, CI, or PR
+```
+
+**Why wait until after review:** past reviews on this project flagged fixtures not committed, hunks from other epics bundled in the same diff, and out-of-scope changes to split at commit time. Review prepares the commit as much as it validates the code.
+
+**Push timing:**
+
+| Situation | Push |
+|-----------|------|
+| Solo work, no PR | With the final commit when the story is `done` |
+| Feature branch + PR | After the final commit, then open the PR |
+| Intermediate backup | Push to a WIP branch if needed — not the nominal BMad flow |
+
+**`baseline_commit` hygiene:** ideally the previous story is already committed (`done`) before starting `/bmad-dev-story`, so the review diff covers one intent only.
+
+**Commit message** (project convention): English, imperative summary line + bullet list of significant changes.
+
+**Exception — two commits:** (1) story spec after `create-story`, then (2) implementation after `done`; or an early commit at `review` for PR feedback, expecting a second commit for review fixes. For solo story-by-story work, **one post-review commit** is the best clarity/effort ratio.
 
 ---
 
@@ -293,7 +332,8 @@ Workflows without a dedicated persona (code review, sprint planning, investigate
 2. **`project-context.md`** and the project conventions file: read automatically by agents — keep them up to date.
 3. **`sprint-status.yaml`**: sprint state; update after each story.
 4. **Artifacts in English**, chat in your preferred language — configure in `_bmad/bmm/config.yaml`.
-5. **No automatic commits**: request them explicitly when you are ready.
+5. **No automatic commits**: request them explicitly when you are ready — ideally **once per story, after code review** (see [Git — when to commit and push](#git--when-to-commit-and-push) in Phase 4).
+6. **Different LLM for code review**: run `/bmad-code-review` in a fresh conversation, preferably with a different model than `/bmad-dev-story`.
 
 ---
 
@@ -316,6 +356,6 @@ Workflows without a dedicated persona (code review, sprint planning, investigate
 
 ---
 
-*BMad Method quick reference — updated 2026-06-17*
+*BMad Method quick reference — updated 2026-06-18*
 
 > **Note:** menu code `SP` means *Sprint Planning* in this guide; the `/bmad-spec` skill also uses `SP` for *Spec* — different context, command `/bmad-spec`.
