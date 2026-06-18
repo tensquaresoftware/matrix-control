@@ -127,6 +127,11 @@ set(PLUGIN_SOURCES
     Source/Core/Services/ClipboardPasteEnabledResolver.cpp
     Source/Core/Services/DeviceMemoryLimits.cpp
     Source/Core/Services/DeviceTypeRegistry.cpp
+    Source/Core/Actions/ActionDispatcher.cpp
+    Source/Core/Actions/ActionPropertyRegistry.cpp
+    Source/Core/Actions/ModuleActionHandler.cpp
+    Source/Core/Actions/PatchManagerActionHandler.cpp
+    Source/Core/Actions/MutatorActionHandler.cpp
     Source/Core/Factories/ApvtsValidator.cpp
     Source/Core/Factories/ApvtsLayoutBuilder.cpp
     Source/Shared/Definitions/PluginHelpers.cpp
@@ -322,6 +327,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/SysExParserTests.cpp
         Tests/Unit/WidgetDimensionRegistryTests.cpp
         Tests/Unit/ModulePanelConfigBuilderTests.cpp
+        Tests/Unit/ActionDispatcherTests.cpp
 
         Source/GUI/Layout/WidgetDimensionRegistry.cpp
         Source/GUI/Panels/Reusable/ModulePanelConfigBuilder.cpp
@@ -339,6 +345,11 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/Services/ClipboardPasteEnabledResolver.cpp
         Source/Core/Services/DeviceMemoryLimits.cpp
         Source/Core/Services/DeviceTypeRegistry.cpp
+        Source/Core/Actions/ActionDispatcher.cpp
+        Source/Core/Actions/ActionPropertyRegistry.cpp
+        Source/Core/Actions/ModuleActionHandler.cpp
+        Source/Core/Actions/PatchManagerActionHandler.cpp
+        Source/Core/Actions/MutatorActionHandler.cpp
         Source/Core/Models/PatchNameSyncer.cpp
         Source/Core/Models/PackedFieldCodec.cpp
         Source/Core/Audio/AudioPassthroughProcessor.cpp

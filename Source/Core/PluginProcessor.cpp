@@ -4,6 +4,12 @@
 #include <juce_audio_devices/juce_audio_devices.h>
 
 #include "PluginProcessor.h"
+#include "Core/Actions/ActionDispatcher.h"
+#include "Core/Actions/ActionExecutionHooks.h"
+#include "Core/Actions/ActionPropertyRegistry.h"
+#include "Core/Actions/ModuleActionHandler.h"
+#include "Core/Actions/MutatorActionHandler.h"
+#include "Core/Actions/PatchManagerActionHandler.h"
 #include "Core/Audio/AudioPassthroughProcessor.h"
 #include "Core/Audio/AudioInputSourceCatalog.h"
 #include "Core/Audio/HardwareLatency.h"
@@ -201,6 +207,32 @@ PluginProcessor::PluginProcessor()
         {
             return juce::File(apvts.state.getProperty(PluginIDs::Settings::kInitTemplatesFolderPath).toString());
         });
+
+    const Core::ActionExecutionHooks actionHooks{
+        [this](bool suppress) { suppressMatrixModParameterSysEx_ = suppress; },
+        [this](bool suppress) { suppressMasterParameterSysEx_ = suppress; }
+    };
+
+    moduleActionHandler_ = std::make_unique<Core::ModuleActionHandler>(
+        apvts,
+        patchModel_.get(),
+        apvtsPatchMapper_.get(),
+        clipboardService_.get(),
+        matrixModInitService_.get(),
+        masterModuleInitService_.get(),
+        [this]() { refreshClipboardPasteEnabledProperties(); },
+        actionHooks);
+
+    patchManagerActionHandler_ = std::make_unique<Core::PatchManagerActionHandler>(
+        apvts,
+        [this]() { return getResolvedDeviceMemoryLimits(); });
+
+    mutatorActionHandler_ = std::make_unique<Core::MutatorActionHandler>();
+
+    actionDispatcher_ = std::make_unique<Core::ActionDispatcher>(
+        *moduleActionHandler_,
+        *patchManagerActionHandler_,
+        *mutatorActionHandler_);
 
     validatePluginDescriptorsAtStartup();
     buildChoiceParameterMap();
@@ -1147,10 +1179,9 @@ void PluginProcessor::valueTreePropertyChanged(juce::ValueTree& treeWhosePropert
 
     handleBankNumberChange(parameterId);
     handlePatchNumberChange(parameterId);
-    handlePatchManagerPropertyChange(parameterId);
-    handleMatrixModInitPropertyChange(parameterId);
-    handleMasterModuleInitPropertyChange(parameterId);
-    handleClipboardCopyPropertyChange(parameterId);
+
+    if (Core::ActionPropertyRegistry::isActionProperty(parameterId))
+        actionDispatcher_->onActionPropertyChanged(parameterId, newValue);
 
     const auto propertyName = property.toString();
     if (propertyName == MatrixDeviceTypes::kApvtsPropertyName
@@ -1250,119 +1281,6 @@ void PluginProcessor::reconcilePatchManagerCoordinatesForDeviceType()
         apvts.state.setProperty(kCurrentPatchNumber, clampedPatch, nullptr);
 }
 
-void PluginProcessor::applyPatchCoordinates(const Core::PatchCoordinates& coordinates)
-{
-    apvts.state.setProperty(
-        PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCurrentBankNumber,
-        coordinates.bank,
-        nullptr);
-    apvts.state.setProperty(
-        PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCurrentPatchNumber,
-        coordinates.patch,
-        nullptr);
-}
-
-int PluginProcessor::parseBankButtonIndex(const juce::String& propertyId) const
-{
-    using namespace PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets;
-
-    if (propertyId == kSelectBank0) return 0;
-    if (propertyId == kSelectBank1) return 1;
-    if (propertyId == kSelectBank2) return 2;
-    if (propertyId == kSelectBank3) return 3;
-    if (propertyId == kSelectBank4) return 4;
-    if (propertyId == kSelectBank5) return 5;
-    if (propertyId == kSelectBank6) return 6;
-    if (propertyId == kSelectBank7) return 7;
-    if (propertyId == kSelectBank8) return 8;
-    if (propertyId == kSelectBank9) return 9;
-
-    return -1;
-}
-
-int PluginProcessor::parseMatrixModBusInitIndex(const juce::String& propertyId) const
-{
-    using namespace PluginIDs::MatrixModulationSection::ModulationBus::StandaloneWidgets;
-
-    if (propertyId == kBus0Init) return 0;
-    if (propertyId == kBus1Init) return 1;
-    if (propertyId == kBus2Init) return 2;
-    if (propertyId == kBus3Init) return 3;
-    if (propertyId == kBus4Init) return 4;
-    if (propertyId == kBus5Init) return 5;
-    if (propertyId == kBus6Init) return 6;
-    if (propertyId == kBus7Init) return 7;
-    if (propertyId == kBus8Init) return 8;
-    if (propertyId == kBus9Init) return 9;
-
-    return -1;
-}
-
-void PluginProcessor::handleMatrixModInitPropertyChange(const juce::String& propertyId)
-{
-    using namespace PluginIDs::MatrixModulationSection;
-
-    if (matrixModInitService_ == nullptr)
-        return;
-
-    const int busIndex = parseMatrixModBusInitIndex(propertyId);
-    const bool isSectionInit = propertyId == StandaloneWidgets::kMatrixModulationInit;
-
-    if (!isSectionInit && busIndex < 0)
-        return;
-
-    suppressMatrixModParameterSysEx_ = true;
-
-    if (isSectionInit)
-        matrixModInitService_->initAllBuses();
-    else
-        matrixModInitService_->initBus(busIndex);
-
-    suppressMatrixModParameterSysEx_ = false;
-}
-
-void PluginProcessor::propagateInitTemplateFooterMessage(const Core::InitTemplateLoadResult& result)
-{
-    if (result.infoMessage.isEmpty())
-    {
-        ExceptionPropagator::clearMessage(apvts);
-        return;
-    }
-
-    apvts.state.setProperty("uiMessageText", result.infoMessage, nullptr);
-
-    const auto severity = (result.fallbackReason == Core::InitTemplateFallbackReason::kFileInvalid)
-        ? juce::String("warning")
-        : juce::String("info");
-    apvts.state.setProperty("uiMessageSeverity", severity, nullptr);
-}
-
-void PluginProcessor::handleMasterModuleInitPropertyChange(const juce::String& propertyId)
-{
-    using namespace PluginIDs::MasterEditSection;
-
-    if (masterModuleInitService_ == nullptr)
-        return;
-
-    std::optional<Core::MasterModuleKind> moduleKind;
-
-    if (propertyId == MidiModule::StandaloneWidgets::kInit)
-        moduleKind = Core::MasterModuleKind::kMidi;
-    else if (propertyId == VibratoModule::StandaloneWidgets::kInit)
-        moduleKind = Core::MasterModuleKind::kVibrato;
-    else if (propertyId == MiscModule::StandaloneWidgets::kInit)
-        moduleKind = Core::MasterModuleKind::kMisc;
-
-    if (!moduleKind.has_value())
-        return;
-
-    suppressMasterParameterSysEx_ = true;
-    const auto result = masterModuleInitService_->initModule(*moduleKind);
-    suppressMasterParameterSysEx_ = false;
-
-    propagateInitTemplateFooterMessage(result);
-}
-
 void PluginProcessor::initializeClipboardPasteEnabledProperties()
 {
     namespace PatchEdit = PluginIDs::PatchEditSection;
@@ -1408,97 +1326,6 @@ void PluginProcessor::refreshClipboardPasteEnabledProperties()
     apvts.state.setProperty(PatchEdit::Lfo2Module::StandaloneWidgets::kPasteEnabled, state.lfo2, nullptr);
     apvts.state.setProperty(InternalPatches::kPastePatchEnabled, state.internalPatches, nullptr);
     apvts.state.setProperty(MatrixMod::kMatrixModulationPasteEnabled, state.matrixModulation, nullptr);
-}
-
-void PluginProcessor::handleClipboardCopyPropertyChange(const juce::String& propertyId)
-{
-    if (clipboardService_ == nullptr || patchModel_ == nullptr || apvtsPatchMapper_ == nullptr)
-        return;
-
-    namespace InternalPatches = PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets;
-    namespace MatrixMod = PluginIDs::MatrixModulationSection::StandaloneWidgets;
-
-    if (propertyId == InternalPatches::kCopyPatch)
-    {
-        apvtsPatchMapper_->apvtsToBuffer();
-        clipboardService_->copyFullPatch(*patchModel_);
-        refreshClipboardPasteEnabledProperties();
-        return;
-    }
-
-    if (propertyId == MatrixMod::kMatrixModulationCopy)
-    {
-        apvtsPatchMapper_->apvtsToBuffer();
-        clipboardService_->copyMatrixModulation(*patchModel_);
-        refreshClipboardPasteEnabledProperties();
-        return;
-    }
-
-    const auto moduleKind = Core::patchModuleKindFromWidgetId(propertyId);
-    if (!moduleKind.has_value())
-        return;
-
-    if (propertyId.endsWith("Copy"))
-    {
-        apvtsPatchMapper_->apvtsToBuffer();
-        clipboardService_->copyModule(*moduleKind, *patchModel_);
-        refreshClipboardPasteEnabledProperties();
-    }
-}
-
-void PluginProcessor::handlePatchManagerPropertyChange(const juce::String& propertyId)
-{
-    using namespace PluginIDs::PatchManagerSection;
-
-    const auto limits = getResolvedDeviceMemoryLimits();
-
-    if (propertyId == InternalPatchesModule::StandaloneWidgets::kLoadPreviousPatch
-        || propertyId == InternalPatchesModule::StandaloneWidgets::kLoadNextPatch)
-    {
-        const bool isNext = propertyId == InternalPatchesModule::StandaloneWidgets::kLoadNextPatch;
-        const int direction = isNext ? 1 : -1;
-
-        Core::PatchCoordinates current;
-        current.bank = static_cast<int>(apvts.state.getProperty(
-            InternalPatchesModule::StandaloneWidgets::kCurrentBankNumber,
-            limits.minBankNumber()));
-        current.patch = static_cast<int>(apvts.state.getProperty(
-            InternalPatchesModule::StandaloneWidgets::kCurrentPatchNumber,
-            limits.minPatchNumber()));
-
-        const bool bankLocked = static_cast<bool>(apvts.state.getProperty(
-            BankUtilityModule::StateProperties::kBankLock,
-            false));
-
-        const auto nextCoordinates = limits.advancePatch(current, direction, bankLocked);
-        applyPatchCoordinates(nextCoordinates);
-        return;
-    }
-
-    if (!limits.hasBankConcept())
-    {
-        if (parseBankButtonIndex(propertyId) >= 0
-            || propertyId == BankUtilityModule::StandaloneWidgets::kLockBank)
-        {
-            return;
-        }
-    }
-
-    const int bankIndex = parseBankButtonIndex(propertyId);
-    if (bankIndex >= 0)
-    {
-        apvts.state.setProperty(BankUtilityModule::StateProperties::kSelectedBank, bankIndex, nullptr);
-        apvts.state.setProperty(InternalPatchesModule::StandaloneWidgets::kCurrentBankNumber, bankIndex, nullptr);
-        return;
-    }
-
-    if (propertyId == BankUtilityModule::StandaloneWidgets::kLockBank)
-    {
-        const bool currentLock = static_cast<bool>(apvts.state.getProperty(
-            BankUtilityModule::StateProperties::kBankLock,
-            false));
-        apvts.state.setProperty(BankUtilityModule::StateProperties::kBankLock, !currentLock, nullptr);
-    }
 }
 
 void PluginProcessor::valueTreeChildAdded(juce::ValueTree& parentTree,

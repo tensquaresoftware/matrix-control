@@ -40,6 +40,10 @@ namespace Core
     class AudioPassthroughProcessor;
     class MidiActivityTracker;
     class ClipboardService;
+    class ActionDispatcher;
+    class ModuleActionHandler;
+    class PatchManagerActionHandler;
+    class MutatorActionHandler;
 }
 
 class PluginProcessor : public juce::AudioProcessor, public juce::ValueTree::Listener
@@ -236,18 +240,10 @@ private:
     juce::String getChoiceLabelForNumericValue(const juce::String& parameterId, const juce::var& newValue) const;
     void handleBankNumberChange(const juce::String& parameterId);
     void handlePatchNumberChange(const juce::String& parameterId);
-    void handlePatchManagerPropertyChange(const juce::String& propertyId);
-    void handleMatrixModInitPropertyChange(const juce::String& propertyId);
-    void handleMasterModuleInitPropertyChange(const juce::String& propertyId);
-    void handleClipboardCopyPropertyChange(const juce::String& propertyId);
     void initializeClipboardPasteEnabledProperties();
     void refreshClipboardPasteEnabledProperties();
-    void propagateInitTemplateFooterMessage(const Core::InitTemplateLoadResult& result);
-    int parseMatrixModBusInitIndex(const juce::String& propertyId) const;
     Core::DeviceMemoryLimits getResolvedDeviceMemoryLimits() const;
     void reconcilePatchManagerCoordinatesForDeviceType();
-    void applyPatchCoordinates(const Core::PatchCoordinates& coordinates);
-    int parseBankButtonIndex(const juce::String& propertyId) const;
     void buildPatchParameterIdSet();
     void buildMasterParameterIdSet();
     void buildMatrixModParameterIdSet();
@@ -277,6 +273,10 @@ private:
     std::unique_ptr<Core::InitTemplateLoader> initTemplateLoader_;
     std::unique_ptr<Core::MasterModuleInitService> masterModuleInitService_;
     std::unique_ptr<Core::ClipboardService> clipboardService_;
+    std::unique_ptr<Core::ModuleActionHandler> moduleActionHandler_;
+    std::unique_ptr<Core::PatchManagerActionHandler> patchManagerActionHandler_;
+    std::unique_ptr<Core::MutatorActionHandler> mutatorActionHandler_;
+    std::unique_ptr<Core::ActionDispatcher> actionDispatcher_;
     std::map<juce::String, PluginDescriptors::ChoiceParameterDescriptor> choiceParameterMap_;
     std::unordered_set<juce::String> patchParameterIds_;
     std::unordered_set<juce::String> masterParameterIds_;

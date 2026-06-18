@@ -1,5 +1,13 @@
 # Deferred Work
 
+## Deferred from: code review of 7-1-actiondispatcher-and-handler-interfaces (2026-06-18)
+
+- **Flags SysEx suppress sans RAII en cas d’exception** (`ModuleActionHandler.cpp:59-68,90-96`) — code migré depuis `PluginProcessor` ; même dette que stories 3-3/3-4 ; ScopeGuard transversal recommandé.
+- **Sélection banque sans clamp aux limites device** (`PatchManagerActionHandler.cpp:70-73`) — comportement brownfield préservé ; clamp via `jlimit(limits.minBankNumber(), limits.maxBankNumber(), bankIndex)` si UI Matrix-1000 expose des boutons hors plage.
+- **`ModuleActionHandler::handleAction` enchaîne trois sous-handlers** (`ModuleActionHandler.cpp:33-37`) — pattern hérité du processor ; dispatch ciblé par `propertyId` en 7.2+.
+- **Garde `endsWith("Init")` trop large pour stubs patch Init** (`ModuleActionHandler.cpp:42-43`) — remplacer par liste explicite des IDs PatchEdit Init en story 7.2.
+- **Chaînes brutes `uiMessageText` / `uiMessageSeverity`** (`ModuleActionHandler.cpp:148,153`) — migré tel quel ; utiliser constantes `ExceptionPropagator` lors d’un refactor footer.
+
 ## Deferred from: code review of 5-3-matrix-modulation-section-i-c-p-gui (2026-06-18)
 
 - **`valueTreePropertyChanged` without root-tree guard** (`MatrixModulationPanel.cpp:35-41`) — same pattern as `ModuleHeader.cpp`; add `treeWhosePropertyHasChanged != state_` if child trees ever carry colliding property IDs.
