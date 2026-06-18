@@ -10,12 +10,62 @@
 #include "GUI/Widgets/ModulationBusCell.h"
 #include "Shared/Definitions/PluginDescriptors.h"
 #include "Shared/Definitions/PluginHelpers.h"
+#include "Shared/Definitions/PluginIDs.h"
 #include "GUI/Factories/WidgetFactory.h"
+
+class MatrixModulationPanel::PasteEnabledPropertyListener : public juce::ValueTree::Listener
+{
+public:
+    PasteEnabledPropertyListener(juce::ValueTree state,
+                                 const juce::String& propertyId,
+                                 TSS::Button& pasteButton)
+        : state_(std::move(state))
+        , propertyId_(propertyId)
+        , pasteButton_(pasteButton)
+    {
+        state_.addListener(this);
+        syncFromState();
+    }
+
+    ~PasteEnabledPropertyListener() override
+    {
+        state_.removeListener(this);
+    }
+
+    void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
+                                  const juce::Identifier& property) override
+    {
+        if (property.toString() != propertyId_)
+            return;
+
+        pasteButton_.setEnabled(static_cast<bool>(treeWhosePropertyHasChanged.getProperty(property, false)));
+    }
+
+    void valueTreeChildAdded(juce::ValueTree&, juce::ValueTree&) override {}
+    void valueTreeChildRemoved(juce::ValueTree&, juce::ValueTree&, int) override {}
+    void valueTreeChildOrderChanged(juce::ValueTree&, int, int) override {}
+    void valueTreeParentChanged(juce::ValueTree&) override {}
+    void valueTreeRedirected(juce::ValueTree&) override
+    {
+        syncFromState();
+    }
+
+private:
+    void syncFromState()
+    {
+        pasteButton_.setEnabled(static_cast<bool>(state_.getProperty(propertyId_, false)));
+    }
+
+    juce::ValueTree state_;
+    juce::String propertyId_;
+    TSS::Button& pasteButton_;
+};
 
 MatrixModulationPanel::~MatrixModulationPanel() = default;
 
 MatrixModulationPanel::MatrixModulationPanel(TSS::ISkin& skin, const MatrixModulationPanelDimensions& dims, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
-    : dims_(dims)
+    : widgetFactory_(widgetFactory)
+    , dims_(dims)
     , skin_(&skin)
     , apvts_(apvts)
     , sectionHeader_(std::make_unique<TSS::SectionHeader>(
@@ -35,7 +85,7 @@ MatrixModulationPanel::MatrixModulationPanel(TSS::ISkin& skin, const MatrixModul
 
     const auto parameterArrays = createModulationBusParameterArrays();
 
-    createInitAllBussesButton(skin);
+    createSectionActionButtons(skin);
 
     modulationBuses_.reserve(Matrix1000Limits::kModulationBusCount);
     for (int busNumber = 0; busNumber < Matrix1000Limits::kModulationBusCount; ++busNumber)
@@ -229,20 +279,85 @@ MatrixModulationPanel::ModulationBusParameterArrays MatrixModulationPanel::creat
     return arrays;
 }
 
-void MatrixModulationPanel::createInitAllBussesButton(TSS::ISkin& skin)
+void MatrixModulationPanel::createSectionActionButtons(TSS::ISkin& skin)
 {
-    initAllBussesButton_ = std::make_unique<TSS::Button>(
-        dims_.initAllButtonWidth,
-        dims_.initAllButtonHeight,
-        TSS::buttonLookFromSkin(skin),
-        PluginDisplayNames::ShortLabels::kInit);
-    initAllBussesButton_->onClick = [this]
+    initButton_ = widgetFactory_.createStandaloneButton(
+        PluginIDs::MatrixModulationSection::StandaloneWidgets::kMatrixModulationInit,
+        skin,
+        dims_.buttonHeight);
+    initButton_->onClick = [this]
     {
-        apvts_.state.setProperty(PluginIDs::MatrixModulationSection::StandaloneWidgets::kMatrixModulationInit,
-                                juce::Time::getCurrentTime().toMilliseconds(),
-                                nullptr);
+        apvts_.state.setProperty(
+            PluginIDs::MatrixModulationSection::StandaloneWidgets::kMatrixModulationInit,
+            juce::Time::getCurrentTime().toMilliseconds(),
+            nullptr);
     };
-    addAndMakeVisible(*initAllBussesButton_);
+    addAndMakeVisible(*initButton_);
+
+    copyButton_ = widgetFactory_.createStandaloneButton(
+        PluginIDs::MatrixModulationSection::StandaloneWidgets::kMatrixModulationCopy,
+        skin,
+        dims_.buttonHeight);
+    copyButton_->onClick = [this]
+    {
+        apvts_.state.setProperty(
+            PluginIDs::MatrixModulationSection::StandaloneWidgets::kMatrixModulationCopy,
+            juce::Time::getCurrentTime().toMilliseconds(),
+            nullptr);
+    };
+    addAndMakeVisible(*copyButton_);
+
+    pasteButton_ = widgetFactory_.createStandaloneButton(
+        PluginIDs::MatrixModulationSection::StandaloneWidgets::kMatrixModulationPaste,
+        skin,
+        dims_.buttonHeight);
+    pasteButton_->onClick = [this]
+    {
+        apvts_.state.setProperty(
+            PluginIDs::MatrixModulationSection::StandaloneWidgets::kMatrixModulationPaste,
+            juce::Time::getCurrentTime().toMilliseconds(),
+            nullptr);
+    };
+    addAndMakeVisible(*pasteButton_);
+
+    attachPasteEnabledListener();
+}
+
+void MatrixModulationPanel::attachPasteEnabledListener()
+{
+    if (pasteButton_ == nullptr)
+        return;
+
+    pasteEnabledListener_ = std::make_unique<PasteEnabledPropertyListener>(
+        apvts_.state,
+        PluginIDs::MatrixModulationSection::StandaloneWidgets::kMatrixModulationPasteEnabled,
+        *pasteButton_);
+}
+
+void MatrixModulationPanel::layoutSectionActionButtons()
+{
+    const float sf = uiScale_;
+    const int buttonHeight = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.buttonHeight), sf);
+    const int scaledPanelWidth = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.width), sf);
+    const int sectionHeaderHeight = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(dims_.sectionHeaderHeight), sf);
+
+    const int pasteButtonWidth = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.pasteWidth), sf);
+    const int copyButtonWidth = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.copyWidth), sf);
+    const int initButtonWidth = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.initWidth), sf);
+
+    const int pasteX = scaledPanelWidth - pasteButtonWidth;
+    const int copyX = scaledPanelWidth - TSS::ScaledLayout::scaledInt(
+        static_cast<float>(dims_.pasteWidth + dims_.copyWidth), sf);
+    const int initX = scaledPanelWidth - TSS::ScaledLayout::scaledInt(
+        static_cast<float>(dims_.pasteWidth + dims_.copyWidth + dims_.initWidth), sf);
+
+    if (auto* button = pasteButton_.get())
+        button->setBounds(pasteX, sectionHeaderHeight, pasteButtonWidth, buttonHeight);
+    if (auto* button = copyButton_.get())
+        button->setBounds(copyX, sectionHeaderHeight, copyButtonWidth, buttonHeight);
+    if (auto* button = initButton_.get())
+        button->setBounds(initX, sectionHeaderHeight, initButtonWidth, buttonHeight);
 }
 
 void MatrixModulationPanel::resized()
@@ -265,18 +380,7 @@ void MatrixModulationPanel::resized()
         busHeader->setBounds(bounds.removeFromTop(busHeaderHeight));
     }
 
-    if (auto* initButton = initAllBussesButton_.get())
-    {
-        const int initAllButtonWidth = TSS::ScaledLayout::scaledInt(
-            static_cast<float>(dims_.initAllButtonWidth), sf);
-        const int initAllButtonHeight = TSS::ScaledLayout::scaledInt(
-            static_cast<float>(dims_.initAllButtonHeight), sf);
-        const int sectionHeaderHeight = TSS::ScaledLayout::scaledInt(
-            static_cast<float>(dims_.sectionHeaderHeight), sf);
-        const int scaledPanelWidth = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.width), sf);
-        const int initAllButtonX = scaledPanelWidth - initAllButtonWidth;
-        initButton->setBounds(initAllButtonX, sectionHeaderHeight, initAllButtonWidth, initAllButtonHeight);
-    }
+    layoutSectionActionButtons();
 
     const int busRowHeight = TSS::ScaledLayout::scaledInt(
         static_cast<float>(dims_.modulationBusRowHeight), sf);
@@ -294,8 +398,13 @@ void MatrixModulationPanel::setSkin(TSS::ISkin& skin)
     sectionHeader_->setLook(TSS::sectionHeaderLookFromSkin(skin));
     modulationBusHeader_->setLook(TSS::modulationBusHeaderLookFromSkin(skin));
 
-    if (initAllBussesButton_)
-        initAllBussesButton_->setLook(TSS::buttonLookFromSkin(skin));
+    const auto buttonLook = TSS::buttonLookFromSkin(skin);
+    if (initButton_)
+        initButton_->setLook(buttonLook);
+    if (copyButton_)
+        copyButton_->setLook(buttonLook);
+    if (pasteButton_)
+        pasteButton_->setLook(buttonLook);
 
     for (auto& bus : modulationBuses_)
         TSS::propagateSkin(skin, bus.get());
@@ -312,8 +421,12 @@ void MatrixModulationPanel::setUiScale(float uiScale)
         sectionHeader_->setUiScale(uiScale_);
     if (modulationBusHeader_)
         modulationBusHeader_->setUiScale(uiScale_);
-    if (initAllBussesButton_)
-        initAllBussesButton_->setUiScale(uiScale_);
+    if (initButton_)
+        initButton_->setUiScale(uiScale_);
+    if (copyButton_)
+        copyButton_->setUiScale(uiScale_);
+    if (pasteButton_)
+        pasteButton_->setUiScale(uiScale_);
     
     for (auto& bus : modulationBuses_)
     {

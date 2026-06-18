@@ -126,7 +126,7 @@ namespace TSS::Design
                 inline constexpr int kBusNumberTextWidth = 8;
                 inline constexpr int kBusSourceTextWidth = 60;
                 inline constexpr int kBusAmountTextWidth = 60;
-                inline constexpr int kBusDestinationTextWidth = 104;
+                inline constexpr int kBusDestinationTextWidth = 68;
             }
 
             namespace PopupMenu

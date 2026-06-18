@@ -24,6 +24,18 @@ namespace PluginDescriptors
             .displayName = PluginDisplayNames::MatrixModulationSection::Header::StandaloneWidgets::kInit,
             .parentGroupId = PluginIDs::MatrixModulationSection::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
+        },
+        {
+            .widgetId = PluginIDs::MatrixModulationSection::StandaloneWidgets::kMatrixModulationCopy,
+            .displayName = PluginDisplayNames::MatrixModulationSection::Header::StandaloneWidgets::kCopy,
+            .parentGroupId = PluginIDs::MatrixModulationSection::kGroupId,
+            .widgetType = StandaloneWidgetType::kButton,
+        },
+        {
+            .widgetId = PluginIDs::MatrixModulationSection::StandaloneWidgets::kMatrixModulationPaste,
+            .displayName = PluginDisplayNames::MatrixModulationSection::Header::StandaloneWidgets::kPaste,
+            .parentGroupId = PluginIDs::MatrixModulationSection::kGroupId,
+            .widgetType = StandaloneWidgetType::kButton,
         }
     };
 

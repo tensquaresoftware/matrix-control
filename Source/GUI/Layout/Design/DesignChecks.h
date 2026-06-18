@@ -20,6 +20,9 @@ namespace TSS::Design
 
     static_assert(Recipes::ModulationBusCell::kWidth == 268, "Modulation bus cell width");
     static_assert(Recipes::ModulationBusCell::kHeight == 24, "Modulation bus cell height");
+    static_assert(Atoms::Widths::ModulationBusHeader::kBusDestinationTextWidth
+            + 3 * Atoms::Widths::Button::kInit == 128,
+        "Matrix mod section header action column (D-095)");
 
     static_assert(Recipes::BankUtilityModule::kHeight == 76, "Bank utility module height");
     static_assert(Recipes::InternalPatchesModule::kHeight == 76, "Internal patches module height");

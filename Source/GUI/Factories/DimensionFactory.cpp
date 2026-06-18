@@ -320,8 +320,10 @@ GuiLayoutDimensions DimensionFactory::buildGuiLayoutDimensions()
         .sectionHeaderHeight = Atoms::Heights::kSectionHeader,
         .busHeaderWidth = PanelWidgets::Widths::ModulationBusHeader::kStandard,
         .busHeaderHeight = Atoms::Heights::kModulationBusHeader,
-        .initAllButtonWidth = Atoms::Widths::Button::kInit,
-        .initAllButtonHeight = Atoms::Heights::kButton,
+        .initWidth = buttons.initWidth,
+        .copyWidth = buttons.copyWidth,
+        .pasteWidth = buttons.pasteWidth,
+        .buttonHeight = buttons.height,
         .busHeader = buildModulationBusHeaderDimensions(),
         .busCell = busCell,
     };

@@ -664,7 +664,9 @@ namespace PluginDisplayNames
 
             namespace StandaloneWidgets
             {
-                constexpr const char* kInit = ShortLabels::kInit;
+                constexpr const char* kInit  = ShortLabels::kInit;
+                constexpr const char* kCopy  = ShortLabels::kCopy;
+                constexpr const char* kPaste = ShortLabels::kPaste;
             }
         }
 

@@ -37,6 +37,8 @@ public:
     void setBusReorderHandler(BusReorderHandler handler);
 
 private:
+    class PasteEnabledPropertyListener;
+
     void beginBusReorderDrag(int sourceBus);
     void updateBusReorderDrag(juce::Point<int> positionInPanel);
     void finishBusReorderDrag(juce::Point<int> positionInPanel);
@@ -61,8 +63,11 @@ private:
     std::array<const char*, Matrix1000Limits::kModulationBusCount> createDestinationParameterIds() const;
     ModulationBusParameterArrays createModulationBusParameterArrays() const;
 
-    void createInitAllBussesButton(TSS::ISkin& skin);
+    void createSectionActionButtons(TSS::ISkin& skin);
+    void layoutSectionActionButtons();
+    void attachPasteEnabledListener();
 
+    WidgetFactory& widgetFactory_;
     MatrixModulationPanelDimensions dims_;
     TSS::ISkin* skin_;
     float uiScale_ = 1.0f;
@@ -70,7 +75,10 @@ private:
 
     std::unique_ptr<TSS::SectionHeader> sectionHeader_;
     std::unique_ptr<TSS::ModulationBusHeader> modulationBusHeader_;
-    std::unique_ptr<TSS::Button> initAllBussesButton_;
+    std::unique_ptr<TSS::Button> initButton_;
+    std::unique_ptr<TSS::Button> copyButton_;
+    std::unique_ptr<TSS::Button> pasteButton_;
+    std::unique_ptr<PasteEnabledPropertyListener> pasteEnabledListener_;
     std::vector<std::unique_ptr<ModulationBusCell>> modulationBuses_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MatrixModulationPanel)

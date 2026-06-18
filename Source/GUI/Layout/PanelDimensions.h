@@ -65,8 +65,10 @@ struct MatrixModulationPanelDimensions
     int sectionHeaderHeight;
     int busHeaderWidth;
     int busHeaderHeight;
-    int initAllButtonWidth;
-    int initAllButtonHeight;
+    int initWidth;
+    int copyWidth;
+    int pasteWidth;
+    int buttonHeight;
     ModulationBusHeaderDimensions busHeader;
     ModulationBusCellDimensions busCell;
 };

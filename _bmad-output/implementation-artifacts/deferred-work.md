@@ -1,5 +1,11 @@
 # Deferred Work
 
+## Deferred from: code review of 5-3-matrix-modulation-section-i-c-p-gui (2026-06-18)
+
+- **`valueTreePropertyChanged` without root-tree guard** (`MatrixModulationPanel.cpp:35-41`) — same pattern as `ModuleHeader.cpp`; add `treeWhosePropertyHasChanged != state_` if child trees ever carry colliding property IDs.
+- **Millisecond timestamp collision on rapid clicks** (`MatrixModulationPanel.cpp:288-319`) — project-wide APVTS trigger pattern; use counter or `Time::getHighResolutionTicks()` if automation reports dropped actions.
+- **±1 px button gap at non-integer UI scales** (`MatrixModulationPanel.cpp:349-353`) — same `scaledInt` add-then-round vs round-then-add drift as `ModuleHeader::layoutInitCopyPasteButtons`; cosmetic only.
+
 ## Deferred from: code review of 5-2-module-copy-paste-enable-and-gray-rules (2026-06-18)
 
 - **`patchModuleKindFromWidgetId` maps Paste widget IDs too** (`ClipboardPasteEnabledResolver.cpp`, `PluginProcessor.cpp`) — `endsWith("Copy")` guard prevents false copy today; Story 7.2 must split Copy vs Paste handlers before reusing this lookup.
