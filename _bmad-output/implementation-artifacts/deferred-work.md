@@ -1,5 +1,12 @@
 # Deferred Work
 
+## Deferred from: code review of 5-1-clipboardservice-compatibility-matrix (2026-06-18)
+
+- **`pasteModule` returns true when all params skipped** — implicit UX per spec; no partial-paste feedback in v1; revisit if Story 7.2 needs paste-outcome granularity.
+- **Cross-module paste uses `displayName` matching** — same pattern as Epic 3 init services; relies on PluginDisplayNames SSOT invariant.
+- **No thread-safety contract on ClipboardService** — message-thread assumption aligned with other Core services until Story 7.2 wiring.
+- **`ClipboardService.cpp` exceeds 200-line self-review target** — 467 lines with anonymous-namespace helpers; optional split if file grows in 7.2.
+
 ## Deferred from: code review of 3-4-master-module-init-confirmation-path (2026-06-18)
 
 - **Flag suppress sans RAII** (`PluginProcessor.cpp:1347-1349`) — même set/restore que story 3.3 ; ScopeGuard si refactor transversal.

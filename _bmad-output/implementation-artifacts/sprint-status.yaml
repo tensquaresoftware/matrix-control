@@ -1,5 +1,5 @@
 # generated: 2026-05-29
-# last_updated: 2026-06-18 (Epic 3 → done)
+# last_updated: 2026-06-18 (Story 5.1 → done)
 # project: Matrix-Control
 # project_key: NOKEY
 # tracking_system: file-system
@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-05-29
-last_updated: 2026-06-18 (Epic 3 → done)
+last_updated: 2026-06-18 (Story 5.1 → done)
 project: Matrix-Control
 project_key: NOKEY
 tracking_system: file-system
@@ -93,9 +93,10 @@ development_status:
   4-5-import-name-reconciliation: backlog
   4-6-previous-and-next-file-navigation: backlog
   epic-4-retrospective: optional
-  epic-5: backlog
-  5-1-clipboardservice-compatibility-matrix: backlog
+  epic-5: in-progress
+  5-1-clipboardservice-compatibility-matrix: done
   5-2-module-copy-paste-enable-and-gray-rules: backlog
+  5-3-matrix-modulation-section-i-c-p-gui: backlog
   epic-5-retrospective: optional
   epic-6: backlog
   6-1-mutationalgorithm-specification: backlog
