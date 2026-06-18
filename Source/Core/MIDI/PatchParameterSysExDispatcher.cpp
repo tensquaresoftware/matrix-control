@@ -16,6 +16,21 @@ PatchParameterSysExDispatcher::PatchParameterSysExDispatcher(const PatchModel& p
     jassert(enqueueRemoteEdit_ != nullptr);
 }
 
+void PatchParameterSysExDispatcher::dispatchModule(const juce::String& moduleGroupId) const
+{
+    for (const auto& d : ApvtsPatchMapper::buildIntDescriptors())
+    {
+        if (d.parentGroupId == moduleGroupId && d.sysExId != PluginDescriptors::kNoSysExId)
+            dispatch(d.parameterId);
+    }
+
+    for (const auto& d : ApvtsPatchMapper::buildChoiceDescriptors())
+    {
+        if (d.parentGroupId == moduleGroupId && d.sysExId != PluginDescriptors::kNoSysExId)
+            dispatch(d.parameterId);
+    }
+}
+
 void PatchParameterSysExDispatcher::dispatch(const juce::String& parameterId) const
 {
     if (enqueueRemoteEdit_ == nullptr)

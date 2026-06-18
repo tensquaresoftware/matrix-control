@@ -13,8 +13,11 @@ namespace Core
 {
     class ApvtsPatchMapper;
     class ClipboardService;
+    class MatrixModBusParameterSysExDispatcher;
     class MatrixModInitService;
     class PatchModel;
+    class PatchModuleInitService;
+    class PatchParameterSysExDispatcher;
 
     class ModuleActionHandler final : public IActionHandler
     {
@@ -27,15 +30,20 @@ namespace Core
                             ClipboardService* clipboardService,
                             MatrixModInitService* matrixModInitService,
                             MasterModuleInitService* masterModuleInitService,
+                            PatchModuleInitService* patchModuleInitService,
+                            PatchParameterSysExDispatcher* patchParameterSysExDispatcher,
+                            MatrixModBusParameterSysExDispatcher* matrixModBusParameterSysExDispatcher,
                             RefreshPasteMirrorsCallback refreshPasteMirrors,
                             ActionExecutionHooks hooks);
 
         void handleAction(const juce::String& propertyId, const juce::var& newValue) override;
 
     private:
-        void handleMatrixModInit(const juce::String& propertyId);
-        void handleMasterModuleInit(const juce::String& propertyId);
-        void handleClipboardCopy(const juce::String& propertyId);
+        bool handleMatrixModInit(const juce::String& propertyId);
+        bool handleMasterModuleInit(const juce::String& propertyId);
+        bool handleClipboardCopy(const juce::String& propertyId);
+        bool handleClipboardPaste(const juce::String& propertyId);
+        bool handlePatchModuleInit(const juce::String& propertyId);
         void propagateInitTemplateFooterMessage(const InitTemplateLoadResult& result);
         int parseMatrixModBusInitIndex(const juce::String& propertyId) const;
 
@@ -45,6 +53,9 @@ namespace Core
         ClipboardService* clipboardService_;
         MatrixModInitService* matrixModInitService_;
         MasterModuleInitService* masterModuleInitService_;
+        PatchModuleInitService* patchModuleInitService_;
+        PatchParameterSysExDispatcher* patchParameterSysExDispatcher_;
+        MatrixModBusParameterSysExDispatcher* matrixModBusParameterSysExDispatcher_;
         RefreshPasteMirrorsCallback refreshPasteMirrors_;
         ActionExecutionHooks hooks_;
     };

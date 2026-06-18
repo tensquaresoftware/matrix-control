@@ -31,6 +31,7 @@ namespace Core
     class MatrixModBusReorderService;
     class MatrixModInitService;
     class MasterModuleInitService;
+    class PatchModuleInitService;
     class InitTemplateLoader;
     struct InitTemplateLoadResult;
     class PatchParameterSysExDispatcher;
@@ -272,6 +273,7 @@ private:
     std::unique_ptr<SysExDecoder> sysExDecoder_;
     std::unique_ptr<Core::InitTemplateLoader> initTemplateLoader_;
     std::unique_ptr<Core::MasterModuleInitService> masterModuleInitService_;
+    std::unique_ptr<Core::PatchModuleInitService> patchModuleInitService_;
     std::unique_ptr<Core::ClipboardService> clipboardService_;
     std::unique_ptr<Core::ModuleActionHandler> moduleActionHandler_;
     std::unique_ptr<Core::PatchManagerActionHandler> patchManagerActionHandler_;
@@ -283,6 +285,7 @@ private:
     std::unordered_set<juce::String> matrixModParameterIds_;
     bool suppressMatrixModParameterSysEx_ { false };
     bool suppressMasterParameterSysEx_ { false };
+    bool suppressPatchParameterSysEx_ { false };
     bool developmentLoggingStarted_ { false };
     std::unique_ptr<DeferredMidiPortSyncTimer> deferredMidiPortSyncTimer_;
     

@@ -115,6 +115,7 @@ set(PLUGIN_SOURCES
     Source/Core/Init/InitDefaults.cpp
     Source/Core/Init/InitTemplateLoader.cpp
     Source/Core/Init/MasterModuleInitService.cpp
+    Source/Core/Init/PatchModuleInitService.cpp
     Source/Core/Init/MatrixModInitService.cpp
     Source/Core/Factories/ApvtsFactory.cpp
     Source/Core/Models/ApvtsMasterMapper.cpp
@@ -311,6 +312,8 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/MatrixModBusParameterSysExDispatcherTests.cpp
         Tests/Unit/MatrixModBusReorderServiceTests.cpp
         Tests/Unit/MasterModuleInitServiceTests.cpp
+        Tests/Unit/PatchModuleInitServiceTests.cpp
+        Tests/Unit/ModuleActionHandlerTests.cpp
         Tests/Unit/MatrixModInitServiceTests.cpp
         Tests/Unit/PatchParameterSysExDispatcherTests.cpp
         Tests/Unit/EditorPathTests.cpp
@@ -336,6 +339,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/Init/InitDefaults.cpp
         Source/Core/Init/InitTemplateLoader.cpp
         Source/Core/Init/MasterModuleInitService.cpp
+        Source/Core/Init/PatchModuleInitService.cpp
         Source/Core/Init/MatrixModInitService.cpp
         Source/Core/Models/ApvtsMasterMapper.cpp
         Source/Core/Models/ApvtsPatchMapper.cpp

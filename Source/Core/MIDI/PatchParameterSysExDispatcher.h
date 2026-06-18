@@ -21,6 +21,7 @@ namespace Core
         PatchParameterSysExDispatcher(const PatchModel& patchModel, EnqueueRemoteEditFn enqueueRemoteEdit);
 
         void dispatch(const juce::String& parameterId) const;
+        void dispatchModule(const juce::String& moduleGroupId) const;
 
     private:
         static std::unordered_map<juce::String, PluginDescriptors::IntParameterDescriptor> buildIntMap();

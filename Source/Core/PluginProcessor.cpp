@@ -28,6 +28,7 @@
 #include "Core/MIDI/MatrixModBusParameterSysExDispatcher.h"
 #include "Core/Init/InitTemplateLoader.h"
 #include "Core/Init/MasterModuleInitService.h"
+#include "Core/Init/PatchModuleInitService.h"
 #include "Core/Init/MatrixModInitService.h"
 #include "Core/Exceptions/ExceptionPropagator.h"
 #include "Core/MIDI/MatrixModBusReorderService.h"
@@ -208,9 +209,20 @@ PluginProcessor::PluginProcessor()
             return juce::File(apvts.state.getProperty(PluginIDs::Settings::kInitTemplatesFolderPath).toString());
         });
 
+    patchModuleInitService_ = std::make_unique<Core::PatchModuleInitService>(
+        *patchModel_,
+        *apvtsPatchMapper_,
+        *initTemplateLoader_,
+        *patchParameterSysExDispatcher_,
+        [this]()
+        {
+            return juce::File(apvts.state.getProperty(PluginIDs::Settings::kInitTemplatesFolderPath).toString());
+        });
+
     const Core::ActionExecutionHooks actionHooks{
         [this](bool suppress) { suppressMatrixModParameterSysEx_ = suppress; },
-        [this](bool suppress) { suppressMasterParameterSysEx_ = suppress; }
+        [this](bool suppress) { suppressMasterParameterSysEx_ = suppress; },
+        [this](bool suppress) { suppressPatchParameterSysEx_ = suppress; }
     };
 
     moduleActionHandler_ = std::make_unique<Core::ModuleActionHandler>(
@@ -220,6 +232,9 @@ PluginProcessor::PluginProcessor()
         clipboardService_.get(),
         matrixModInitService_.get(),
         masterModuleInitService_.get(),
+        patchModuleInitService_.get(),
+        patchParameterSysExDispatcher_.get(),
+        matrixModBusParameterSysExDispatcher_.get(),
         [this]() { refreshClipboardPasteEnabledProperties(); },
         actionHooks);
 
@@ -1153,16 +1168,22 @@ void PluginProcessor::valueTreePropertyChanged(juce::ValueTree& treeWhosePropert
     {
         const bool isMatrixModParam = matrixModParameterIds_.count(parameterId) > 0;
 
-        if (!isMatrixModParam || !suppressMatrixModParameterSysEx_)
-            apvtsPatchMapper_->apvtsToBuffer();
-
         if (isMatrixModParam)
         {
+            if (!suppressMatrixModParameterSysEx_)
+                apvtsPatchMapper_->apvtsToBuffer();
+
             if (!suppressMatrixModParameterSysEx_)
                 matrixModSysExCoalesceTimer_->noteParameterChanged(parameterId);
         }
         else
-            patchParameterSysExDispatcher_->dispatch(parameterId);
+        {
+            if (!suppressPatchParameterSysEx_)
+                apvtsPatchMapper_->apvtsToBuffer();
+
+            if (!suppressPatchParameterSysEx_)
+                patchParameterSysExDispatcher_->dispatch(parameterId);
+        }
     }
 
     if (masterParameterIds_.count(parameterId) > 0)

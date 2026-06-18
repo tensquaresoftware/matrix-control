@@ -1,5 +1,15 @@
 # Deferred Work
 
+## Deferred from: code review of 7-2-moduleactionhandler-i-c-p-and-matrix-mod-init (2026-06-18)
+
+- **AC #8 — suppress-hook order not asserted in unit tests** (`ModuleActionHandlerTests.cpp`) — flags recorded but never expected true-during-push / false-before-dispatch.
+- **AC #8 — PATCH init not exercised through `ModuleActionHandler`** (`ModuleActionHandlerTests.cpp:96`) — harness passes `patchModuleInitService_ == nullptr`; init routing, suppress wrap, footer untested at handler level.
+- **AC #8 — matrix-mod paste test incomplete vs spec matrix** (`ModuleActionHandlerTests.cpp:215`) — 10× `dispatchBus` only; no `pushBusToApvts` count or bytes 0–103 isolation.
+- **AC #8 — footer propagation untested at handler level** — `PatchModuleInitServiceTests` covers service fallback; no APVTS `uiMessageText` / `uiMessageSeverity` assertion via handler.
+- **AC #6 partial — `endsWith("Paste")` for module paste routing** (`ModuleActionHandler.cpp:182`) — mitigated by explicit matrix-mod branch + `patchModuleKindFromWidgetId`; replace with explicit Paste ID set when Copy/Paste split debt is addressed.
+- **Suppress flags without RAII on exception path** (`ModuleActionHandler.cpp`) — same pattern as 7.1 master/matrix init; ScopeGuard transversal (see 7-1 deferred item).
+- **`dispatchModule` rebuilds descriptor vectors each call** (`PatchParameterSysExDispatcher.cpp:19`) — perf micro-optimization; cache or reuse filtered module descriptors if profiling warrants.
+
 ## Deferred from: code review of 7-1-actiondispatcher-and-handler-interfaces (2026-06-18)
 
 - **Flags SysEx suppress sans RAII en cas d’exception** (`ModuleActionHandler.cpp:59-68,90-96`) — code migré depuis `PluginProcessor` ; même dette que stories 3-3/3-4 ; ScopeGuard transversal recommandé.

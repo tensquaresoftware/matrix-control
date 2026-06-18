@@ -2,10 +2,14 @@
 
 #include "Core/Exceptions/ExceptionPropagator.h"
 #include "Core/Init/MatrixModInitService.h"
+#include "Core/Init/PatchModuleInitService.h"
+#include "Core/MIDI/MatrixModBusParameterSysExDispatcher.h"
+#include "Core/MIDI/PatchParameterSysExDispatcher.h"
 #include "Core/Models/ApvtsPatchMapper.h"
 #include "Core/Models/PatchModel.h"
 #include "Core/Services/ClipboardPasteEnabledResolver.h"
 #include "Core/Services/ClipboardService.h"
+#include "Shared/Definitions/Matrix1000Limits.h"
 #include "Shared/Definitions/PluginIDs.h"
 
 namespace Core
@@ -17,6 +21,9 @@ namespace Core
                                              ClipboardService* clipboardService,
                                              MatrixModInitService* matrixModInitService,
                                              MasterModuleInitService* masterModuleInitService,
+                                             PatchModuleInitService* patchModuleInitService,
+                                             PatchParameterSysExDispatcher* patchParameterSysExDispatcher,
+                                             MatrixModBusParameterSysExDispatcher* matrixModBusParameterSysExDispatcher,
                                              RefreshPasteMirrorsCallback refreshPasteMirrors,
                                              ActionExecutionHooks hooks)
         : apvts_(apvts)
@@ -25,6 +32,9 @@ namespace Core
         , clipboardService_(clipboardService)
         , matrixModInitService_(matrixModInitService)
         , masterModuleInitService_(masterModuleInitService)
+        , patchModuleInitService_(patchModuleInitService)
+        , patchParameterSysExDispatcher_(patchParameterSysExDispatcher)
+        , matrixModBusParameterSysExDispatcher_(matrixModBusParameterSysExDispatcher)
         , refreshPasteMirrors_(std::move(refreshPasteMirrors))
         , hooks_(std::move(hooks))
     {
@@ -32,29 +42,25 @@ namespace Core
 
     void ModuleActionHandler::handleAction(const juce::String& propertyId, const juce::var&)
     {
-        handleMatrixModInit(propertyId);
-        handleMasterModuleInit(propertyId);
-        handleClipboardCopy(propertyId);
-
-        if (propertyId.endsWith("Paste"))
-            return; // Story 7.2
-
-        if (propertyId.endsWith("Init"))
-            return; // Patch module init — Story 7.2
+        if (handleMatrixModInit(propertyId)) return;
+        if (handleMasterModuleInit(propertyId)) return;
+        if (handleClipboardCopy(propertyId)) return;
+        if (handleClipboardPaste(propertyId)) return;
+        handlePatchModuleInit(propertyId);
     }
 
-    void ModuleActionHandler::handleMatrixModInit(const juce::String& propertyId)
+    bool ModuleActionHandler::handleMatrixModInit(const juce::String& propertyId)
     {
         using namespace PluginIDs::MatrixModulationSection;
 
         if (matrixModInitService_ == nullptr)
-            return;
+            return false;
 
         const int busIndex = parseMatrixModBusInitIndex(propertyId);
         const bool isSectionInit = propertyId == StandaloneWidgets::kMatrixModulationInit;
 
         if (!isSectionInit && busIndex < 0)
-            return;
+            return false;
 
         if (hooks_.setSuppressMatrixModSysEx)
             hooks_.setSuppressMatrixModSysEx(true);
@@ -66,14 +72,16 @@ namespace Core
 
         if (hooks_.setSuppressMatrixModSysEx)
             hooks_.setSuppressMatrixModSysEx(false);
+
+        return true;
     }
 
-    void ModuleActionHandler::handleMasterModuleInit(const juce::String& propertyId)
+    bool ModuleActionHandler::handleMasterModuleInit(const juce::String& propertyId)
     {
         using namespace PluginIDs::MasterEditSection;
 
         if (masterModuleInitService_ == nullptr)
-            return;
+            return false;
 
         std::optional<MasterModuleKind> moduleKind;
 
@@ -85,7 +93,7 @@ namespace Core
             moduleKind = MasterModuleKind::kMisc;
 
         if (!moduleKind.has_value())
-            return;
+            return false;
 
         if (hooks_.setSuppressMasterSysEx)
             hooks_.setSuppressMasterSysEx(true);
@@ -96,12 +104,13 @@ namespace Core
             hooks_.setSuppressMasterSysEx(false);
 
         propagateInitTemplateFooterMessage(result);
+        return true;
     }
 
-    void ModuleActionHandler::handleClipboardCopy(const juce::String& propertyId)
+    bool ModuleActionHandler::handleClipboardCopy(const juce::String& propertyId)
     {
         if (clipboardService_ == nullptr || patchModel_ == nullptr || apvtsPatchMapper_ == nullptr)
-            return;
+            return false;
 
         namespace InternalPatches = PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets;
         namespace MatrixMod = PluginIDs::MatrixModulationSection::StandaloneWidgets;
@@ -112,7 +121,7 @@ namespace Core
             clipboardService_->copyFullPatch(*patchModel_);
             if (refreshPasteMirrors_)
                 refreshPasteMirrors_();
-            return;
+            return true;
         }
 
         if (propertyId == MatrixMod::kMatrixModulationCopy)
@@ -121,20 +130,105 @@ namespace Core
             clipboardService_->copyMatrixModulation(*patchModel_);
             if (refreshPasteMirrors_)
                 refreshPasteMirrors_();
-            return;
+            return true;
         }
+
+        if (!propertyId.endsWith("Copy"))
+            return false;
 
         const auto moduleKind = patchModuleKindFromWidgetId(propertyId);
         if (!moduleKind.has_value())
-            return;
+            return false;
 
-        if (propertyId.endsWith("Copy"))
+        apvtsPatchMapper_->apvtsToBuffer();
+        clipboardService_->copyModule(*moduleKind, *patchModel_);
+        if (refreshPasteMirrors_)
+            refreshPasteMirrors_();
+        return true;
+    }
+
+    bool ModuleActionHandler::handleClipboardPaste(const juce::String& propertyId)
+    {
+        if (clipboardService_ == nullptr || patchModel_ == nullptr || apvtsPatchMapper_ == nullptr)
+            return false;
+
+        namespace MatrixMod = PluginIDs::MatrixModulationSection::StandaloneWidgets;
+
+        if (propertyId == MatrixMod::kMatrixModulationPaste)
         {
-            apvtsPatchMapper_->apvtsToBuffer();
-            clipboardService_->copyModule(*moduleKind, *patchModel_);
-            if (refreshPasteMirrors_)
-                refreshPasteMirrors_();
+            if (!clipboardService_->canPasteMatrixModulation())
+                return true;
+
+            clipboardService_->pasteMatrixModulation(*patchModel_);
+
+            if (hooks_.setSuppressMatrixModSysEx)
+                hooks_.setSuppressMatrixModSysEx(true);
+
+            for (int bus = 0; bus < Matrix1000Limits::kModulationBusCount; ++bus)
+                apvtsPatchMapper_->pushBusToApvts(bus);
+
+            if (hooks_.setSuppressMatrixModSysEx)
+                hooks_.setSuppressMatrixModSysEx(false);
+
+            if (matrixModBusParameterSysExDispatcher_ != nullptr)
+            {
+                for (int bus = 0; bus < Matrix1000Limits::kModulationBusCount; ++bus)
+                    matrixModBusParameterSysExDispatcher_->dispatchBus(bus);
+            }
+
+            return true;
         }
+
+        if (!propertyId.endsWith("Paste"))
+            return false;
+
+        const auto moduleKind = patchModuleKindFromWidgetId(propertyId);
+        if (!moduleKind.has_value())
+            return false;
+
+        if (!clipboardService_->canPasteModule(*moduleKind))
+            return true;
+
+        if (!clipboardService_->pasteModule(*moduleKind, *patchModel_))
+            return true;
+
+        const auto moduleGroupId = PatchModuleInitService::moduleGroupIdFromPatchModuleKind(*moduleKind);
+        if (moduleGroupId.isEmpty())
+            return true;
+
+        if (hooks_.setSuppressPatchSysEx)
+            hooks_.setSuppressPatchSysEx(true);
+
+        apvtsPatchMapper_->pushModuleToApvts(moduleGroupId);
+
+        if (hooks_.setSuppressPatchSysEx)
+            hooks_.setSuppressPatchSysEx(false);
+
+        if (patchParameterSysExDispatcher_ != nullptr)
+            patchParameterSysExDispatcher_->dispatchModule(moduleGroupId);
+
+        return true;
+    }
+
+    bool ModuleActionHandler::handlePatchModuleInit(const juce::String& propertyId)
+    {
+        if (patchModuleInitService_ == nullptr)
+            return false;
+
+        const auto moduleGroupId = PatchModuleInitService::moduleGroupIdFromInitPropertyId(propertyId);
+        if (moduleGroupId.isEmpty())
+            return false;
+
+        if (hooks_.setSuppressPatchSysEx)
+            hooks_.setSuppressPatchSysEx(true);
+
+        const auto result = patchModuleInitService_->initModule(moduleGroupId);
+
+        if (hooks_.setSuppressPatchSysEx)
+            hooks_.setSuppressPatchSysEx(false);
+
+        propagateInitTemplateFooterMessage(result);
+        return true;
     }
 
     void ModuleActionHandler::propagateInitTemplateFooterMessage(const InitTemplateLoadResult& result)

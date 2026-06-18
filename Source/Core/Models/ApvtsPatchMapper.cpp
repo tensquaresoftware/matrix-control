@@ -47,6 +47,21 @@ void ApvtsPatchMapper::pushBusToApvts(int busIndex)
     pushChoiceToApvts(choiceParams[1]);
 }
 
+void ApvtsPatchMapper::pushModuleToApvts(const juce::String& moduleGroupId)
+{
+    for (const auto& d : intDescriptors_)
+    {
+        if (d.parentGroupId == moduleGroupId)
+            pushIntToApvts(d);
+    }
+
+    for (const auto& d : choiceDescriptors_)
+    {
+        if (d.parentGroupId == moduleGroupId)
+            pushChoiceToApvts(d);
+    }
+}
+
 void ApvtsPatchMapper::syncIntToBuffer(const PluginDescriptors::IntParameterDescriptor& d)
 {
     auto* rawValue = apvts_.getRawParameterValue(d.parameterId);

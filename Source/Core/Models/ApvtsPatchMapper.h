@@ -24,6 +24,10 @@ namespace Core
         // Caller must suppress Matrix Mod SysEx dispatch when used during bulk reorder (Story 2.10).
         void pushBusToApvts(int busIndex);
 
+        // Push all int/choice params belonging to one Patch Edit module from PatchModel to APVTS.
+        // Caller must suppress PATCH parameter SysEx dispatch during bulk push (Story 7.2).
+        void pushModuleToApvts(const juce::String& moduleGroupId);
+
         static std::vector<PluginDescriptors::IntParameterDescriptor> buildIntDescriptors();
         static std::vector<PluginDescriptors::ChoiceParameterDescriptor> buildChoiceDescriptors();
 

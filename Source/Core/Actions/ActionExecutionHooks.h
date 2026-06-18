@@ -9,6 +9,7 @@ namespace Core
     {
         std::function<void(bool)> setSuppressMatrixModSysEx;
         std::function<void(bool)> setSuppressMasterSysEx;
+        std::function<void(bool)> setSuppressPatchSysEx;
     };
 
 } // namespace Core
