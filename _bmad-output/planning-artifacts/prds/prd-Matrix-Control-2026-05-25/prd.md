@@ -451,11 +451,13 @@ When **MUTATE** or **RETRY** cannot allocate the next index (**M00–M99** or **
 
 #### FR-35: Module copy/paste
 
-Module Copy always enabled; Paste enabled only on modules compatible with the last Copy source. Last Copy (module or full patch) defines clipboard mode.
+Module Copy always enabled; Paste enabled only on targets compatible with the last Copy source. Last Copy (module, full patch, or matrix modulation) defines clipboard mode.
 
 **Consequences (testable):**
 - Full-patch Copy grays all PATCH EDIT Paste buttons; Internal Patches Paste remains active.
-- Compatibility matrix per addendum § Clipboard (ENV full interchange; DCO/LFO partial rules).
+- **Matrix Modulation Copy** grays all PATCH EDIT and MASTER module Paste buttons; only Matrix Modulation Paste remains active.
+- Compatibility matrix per addendum § Clipboard (ENV full interchange; DCO/LFO partial rules; **Matrix Modulation full-matrix interchange**).
+- Matrix Modulation clipboard snapshot: all 10 buses (source + amount + destination per bus); excludes patch name and all other PATCH parameters.
 
 #### FR-36: Patch init sources
 

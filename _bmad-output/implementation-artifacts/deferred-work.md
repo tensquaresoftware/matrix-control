@@ -1,5 +1,16 @@
 # Deferred Work
 
+## Deferred from: code review of 5-2-module-copy-paste-enable-and-gray-rules (2026-06-18)
+
+- **`patchModuleKindFromWidgetId` maps Paste widget IDs too** (`ClipboardPasteEnabledResolver.cpp`, `PluginProcessor.cpp`) — `endsWith("Copy")` guard prevents false copy today; Story 7.2 must split Copy vs Paste handlers before reusing this lookup.
+- **`refreshDeviceLimits()` on clipboard property change** (`InternalPatchesPanel.cpp:324`) — correct button state but unnecessary ROM re-read; narrow to `updatePasteStoreEnabled` when limits unchanged.
+- **Duplicated `*PasteEnabled` property ID lists** (`PluginProcessor.cpp`) — `initializeClipboardPasteEnabledProperties` and `refreshClipboardPasteEnabledProperties` maintain separate arrays; single SSOT table would reduce drift risk.
+- **MASTER module `*PasteEnabled` properties** — FR-35 matrix-mod graying includes MASTER Paste buttons; no MASTER C/P widgets exist yet (InitOnly layout); wire when MASTER headers get C/P in Epic 7.
+
+## Deferred from: Story 5.2 smoke test — Button disabled paint fix (2026-06-18)
+
+- **`BankUtilityPanel` alpha graying vs `Button` disabled colours** (`BankUtilityPanel.cpp:69-107`) — Story 8.5 introduced `setBankUtilityGrayed`: buttons stay **`setEnabled(true)`** + `setAlpha(0.5f)` so clicks still reach `onClick` and show the Matrix-1000-only footer (8-5 review: « Footer unreachable on grayed bank buttons »). Story 5.2 fixed `TSS::Button` to paint skin `*Disabled` colours when `setEnabled(false)` — Paste graying now uses that path. **Follow-up:** replace alpha hack with a shared « visually disabled but clickable » API on `Button` (or apply disabled look without disabling hit-testing); align `GroupLabel` / `ModuleHeader` alpha in the same panel. **Candidate story:** bundle into `u-8-patch-manager-panels-layout-audit` or a small Epic U hygiene story after 5.2 review.
+
 ## Deferred from: code review of 5-1-clipboardservice-compatibility-matrix (2026-06-18)
 
 - **`pasteModule` returns true when all params skipped** — implicit UX per spec; no partial-paste feedback in v1; revisit if Story 7.2 needs paste-outcome granularity.

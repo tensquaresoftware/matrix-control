@@ -13,6 +13,7 @@ ModulePanelLayout Dco2Panel::createLayout()
         PluginIDs::PatchEditSection::Dco2Module::StandaloneWidgets::kInit,
         PluginIDs::PatchEditSection::Dco2Module::StandaloneWidgets::kCopy,
         PluginIDs::PatchEditSection::Dco2Module::StandaloneWidgets::kPaste,
+        PluginIDs::PatchEditSection::Dco2Module::StandaloneWidgets::kPasteEnabled,
         {
             PluginIDs::PatchEditSection::Dco2Module::ParameterWidgets::kFrequency,
             PluginIDs::PatchEditSection::Dco2Module::ParameterWidgets::kFrequencyModByLfo1,

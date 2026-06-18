@@ -16,6 +16,9 @@ namespace TSS
         juce::Colour textOn{};
         juce::Colour textHover{};
         juce::Colour textClicked{};
+        juce::Colour backgroundDisabled{};
+        juce::Colour borderDisabled{};
+        juce::Colour textDisabled{};
         juce::Font font{juce::FontOptions{}};
     };
 

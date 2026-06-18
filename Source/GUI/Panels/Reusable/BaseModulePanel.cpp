@@ -45,6 +45,7 @@ BaseModulePanel::BaseModulePanel(TSS::ISkin& skin,
         config.initWidgetId,
         config.copyWidgetId,
         config.pasteWidgetId,
+        config.pasteEnabledPropertyId,
         config.moduleType == ModulePanelModuleType::MasterEdit,
         initConfirmationGate_
     };

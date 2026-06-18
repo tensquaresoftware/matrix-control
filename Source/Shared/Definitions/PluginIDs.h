@@ -144,9 +144,10 @@ namespace PluginIDs
 
             namespace StandaloneWidgets
             {
-                constexpr const char* kInit  = "dco1Init";
-                constexpr const char* kCopy  = "dco1Copy";
-                constexpr const char* kPaste = "dco1Paste";
+                constexpr const char* kInit         = "dco1Init";
+                constexpr const char* kCopy         = "dco1Copy";
+                constexpr const char* kPaste        = "dco1Paste";
+                constexpr const char* kPasteEnabled = "dco1PasteEnabled";
             }
 
             namespace ParameterWidgets
@@ -170,9 +171,10 @@ namespace PluginIDs
 
             namespace StandaloneWidgets
             {
-                constexpr const char* kInit  = "dco2Init";
-                constexpr const char* kCopy  = "dco2Copy";
-                constexpr const char* kPaste = "dco2Paste";
+                constexpr const char* kInit         = "dco2Init";
+                constexpr const char* kCopy         = "dco2Copy";
+                constexpr const char* kPaste        = "dco2Paste";
+                constexpr const char* kPasteEnabled = "dco2PasteEnabled";
             }
 
             namespace ParameterWidgets
@@ -266,9 +268,10 @@ namespace PluginIDs
 
             namespace StandaloneWidgets
             {
-                constexpr const char* kInit  = "env1Init";
-                constexpr const char* kCopy  = "env1Copy";
-                constexpr const char* kPaste = "env1Paste";
+                constexpr const char* kInit         = "env1Init";
+                constexpr const char* kCopy         = "env1Copy";
+                constexpr const char* kPaste        = "env1Paste";
+                constexpr const char* kPasteEnabled = "env1PasteEnabled";
             }
 
             namespace ParameterWidgets
@@ -292,9 +295,10 @@ namespace PluginIDs
 
             namespace StandaloneWidgets
             {
-                constexpr const char* kInit  = "env2Init";
-                constexpr const char* kCopy  = "env2Copy";
-                constexpr const char* kPaste = "env2Paste";
+                constexpr const char* kInit         = "env2Init";
+                constexpr const char* kCopy         = "env2Copy";
+                constexpr const char* kPaste        = "env2Paste";
+                constexpr const char* kPasteEnabled = "env2PasteEnabled";
             }
 
             namespace ParameterWidgets
@@ -318,9 +322,10 @@ namespace PluginIDs
 
             namespace StandaloneWidgets
             {
-                constexpr const char* kInit  = "env3Init";
-                constexpr const char* kCopy  = "env3Copy";
-                constexpr const char* kPaste = "env3Paste";
+                constexpr const char* kInit         = "env3Init";
+                constexpr const char* kCopy         = "env3Copy";
+                constexpr const char* kPaste        = "env3Paste";
+                constexpr const char* kPasteEnabled = "env3PasteEnabled";
             }
 
             namespace ParameterWidgets
@@ -344,9 +349,10 @@ namespace PluginIDs
 
             namespace StandaloneWidgets
             {
-                constexpr const char* kInit  = "lfo1Init";
-                constexpr const char* kCopy  = "lfo1Copy";
-                constexpr const char* kPaste = "lfo1Paste";
+                constexpr const char* kInit         = "lfo1Init";
+                constexpr const char* kCopy         = "lfo1Copy";
+                constexpr const char* kPaste        = "lfo1Paste";
+                constexpr const char* kPasteEnabled = "lfo1PasteEnabled";
             }
 
             namespace ParameterWidgets
@@ -369,9 +375,10 @@ namespace PluginIDs
 
             namespace StandaloneWidgets
             {
-                constexpr const char* kInit  = "lfo2Init";
-                constexpr const char* kCopy  = "lfo2Copy";
-                constexpr const char* kPaste = "lfo2Paste";
+                constexpr const char* kInit         = "lfo2Init";
+                constexpr const char* kCopy         = "lfo2Copy";
+                constexpr const char* kPaste        = "lfo2Paste";
+                constexpr const char* kPasteEnabled = "lfo2PasteEnabled";
             }
 
             namespace ParameterWidgets
@@ -400,7 +407,10 @@ namespace PluginIDs
 
         namespace StandaloneWidgets
         {
-            constexpr const char* kMatrixModulationInit = "matrixModulationInit";
+            constexpr const char* kMatrixModulationInit         = "matrixModulationInit";
+            constexpr const char* kMatrixModulationCopy         = "matrixModulationCopy";
+            constexpr const char* kMatrixModulationPaste        = "matrixModulationPaste";
+            constexpr const char* kMatrixModulationPasteEnabled = "matrixModulationPasteEnabled";
         }
 
         namespace ModulationBus
@@ -533,6 +543,7 @@ namespace PluginIDs
                 constexpr const char* kInitPatch          = "internalPatchesInit";
                 constexpr const char* kCopyPatch          = "internalPatchesCopy";
                 constexpr const char* kPastePatch         = "internalPatchesPaste";
+                constexpr const char* kPastePatchEnabled  = "internalPatchesPasteEnabled";
                 constexpr const char* kStorePatch         = "internalPatchesStore";
             }
         }

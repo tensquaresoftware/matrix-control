@@ -133,6 +133,7 @@ Keep SRP split: `MidiInputPort`, `MidiOutputPort`, `MidiSender`, `MidiReceiver`,
 
 - **Module clipboard:** last module Copy wins; Paste on compatible modules only.
 - **Patch clipboard:** Internal Patches Copy grays all PATCH EDIT Paste buttons.
+- **Matrix Modulation clipboard:** Matrix Modulation section Copy grays all PATCH EDIT and MASTER module Paste buttons; only Matrix Modulation Paste remains active. Last Copy defines mode until replaced.
 
 ### Module pairs
 
@@ -141,6 +142,12 @@ Keep SRP split: `MidiInputPort`, `MidiOutputPort`, `MidiSender`, `MidiReceiver`,
 | ENV 1 ↔ 2 ↔ 3 | Full parameter copy |
 | DCO 1 ↔ 2 | Partial: skip SYNC/DETUNE cross-mapping; WAVE SELECT only OFF/PULSE/WAVE/BOTH; KEYBD/PORTA only KEYBD and PORTA (not OFF from DCO2→DCO1) |
 | LFO 1 ↔ 2 | Partial: SPEED<PRESSURE ↔ SPEED<KEYBD; AMP<RAMP1 ↔ AMP<RAMP2; remaining compatible params copy normally |
+
+### Matrix Modulation (section-level)
+
+| Scope | Rule |
+|---|---|
+| Matrix Modulation section | Full copy/paste of all 10 buses (source + amount + destination per bus). Snapshot = PatchModel bytes 104–133 only. Paste target: Matrix Modulation section header only. No cross-compatibility with module or patch clipboard modes. |
 
 No footer explanation — document in user manual EN/FR.
 

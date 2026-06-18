@@ -18,6 +18,7 @@ struct ModulePanelLayout
     juce::String initWidgetId;
     juce::String copyWidgetId;
     juce::String pasteWidgetId;
+    juce::String pasteEnabledPropertyId;
     std::vector<juce::String> orderedParameterIds;
 };
 
@@ -29,6 +30,7 @@ struct ModulePanelConfig
     juce::String initWidgetId;
     juce::String copyWidgetId;
     juce::String pasteWidgetId;
+    juce::String pasteEnabledPropertyId;
 
     struct ParameterConfig
     {
@@ -46,6 +48,7 @@ ModulePanelLayout makePatchEditModuleLayout(
     const juce::String& initId,
     const juce::String& copyId,
     const juce::String& pasteId,
+    const juce::String& pasteEnabledId,
     std::initializer_list<const char*> orderedParameterIds);
 
 ModulePanelLayout makePatchEditInitOnlyModuleLayout(

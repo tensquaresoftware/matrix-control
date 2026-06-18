@@ -37,6 +37,9 @@ InternalPatchesPanel::InternalPatchesPanel(TSS::ISkin& skin, const InternalPatch
     setupStorePatchButton(skin, widgetFactory);
 
     apvts_.state.addListener(this);
+    clipboardPasteEnabled_ = static_cast<bool>(apvts_.state.getProperty(
+        PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kPastePatchEnabled,
+        false));
     refreshDeviceLimits();
     
     setSize(dims_.width, dims_.height);
@@ -74,6 +77,20 @@ void InternalPatchesPanel::valueTreePropertyChanged(
     {
         refreshDeviceLimits();
     }
+
+    if (propertyName == PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kPastePatchEnabled)
+    {
+        clipboardPasteEnabled_ = static_cast<bool>(treeWhosePropertyHasChanged.getProperty(property, false));
+        refreshDeviceLimits();
+    }
+}
+
+void InternalPatchesPanel::valueTreeRedirected(juce::ValueTree&)
+{
+    clipboardPasteEnabled_ = static_cast<bool>(apvts_.state.getProperty(
+        PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kPastePatchEnabled,
+        false));
+    refreshDeviceLimits();
 }
 
 void InternalPatchesPanel::resized()
@@ -222,7 +239,7 @@ void InternalPatchesPanel::updatePasteStoreEnabled(const Core::DeviceMemoryLimit
     const bool allowPasteStore = limits.isPasteStoreAllowed(currentBank);
 
     if (pastePatchButton_)
-        pastePatchButton_->setEnabled(allowPasteStore);
+        pastePatchButton_->setEnabled(allowPasteStore && clipboardPasteEnabled_);
 
     if (storePatchButton_)
         storePatchButton_->setEnabled(allowPasteStore);

@@ -28,6 +28,9 @@ namespace TSS
         look.textOn = skin.getColour(SkinColourId::kButtonTextOn);
         look.textHover = skin.getColour(SkinColourId::kButtonTextHover);
         look.textClicked = skin.getColour(SkinColourId::kButtonTextClicked);
+        look.backgroundDisabled = skin.getColour(SkinColourId::kButtonBackgroundDisabled);
+        look.borderDisabled = skin.getColour(SkinColourId::kButtonBorderDisabled);
+        look.textDisabled = skin.getColour(SkinColourId::kButtonTextDisabled);
         look.font = resolvedTypographyFont(skin, TypographyStyleId::kDefault);
         return look;
     }

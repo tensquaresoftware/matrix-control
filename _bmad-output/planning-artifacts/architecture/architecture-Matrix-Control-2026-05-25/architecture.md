@@ -120,7 +120,7 @@ Core services **must not** include GUI headers. GUI reads state via APVTS proper
 | `PatchFileService` | Computer Patches scan/load/save/export |
 | `InitTemplateLoader` | `PatchInit.syx` / `MasterInit.syx` |
 | `InitDefaults` | Hardcoded fallback buffers |
-| `ClipboardService` | Type-aware module/patch clipboard |
+| `ClipboardService` | Type-aware module/patch/matrix-modulation clipboard |
 | `PatchMutatorEngine` | Mutation algo + history store |
 | `DirtyPatchTracker` | FR-51 unsaved snapshot compare |
 | `DeviceTypeRegistry` | Maps Inquiry member bytes → `deviceType`; bus layout |
@@ -174,7 +174,7 @@ Mono vs stereo **input channel selection** (M-1000 vs M-6/6R) applies to **stand
 
 | Handler | Actions |
 |---|---|
-| `ModuleActionHandler` | Module I/C/P, Matrix Mod section/bus init |
+| `ModuleActionHandler` | Module I/C/P, Matrix Modulation section I/C/P, per-bus Matrix Mod init |
 | `PatchManagerActionHandler` | Bank, Internal, Computer Patches |
 | `MutatorActionHandler` | MUTATE, RETRY, DELETE, CLEAR, EXPORT, COMPARE toggle, Defrag (Settings) |
 
@@ -225,11 +225,11 @@ No hardware in CI; SM-1 remains manual.
 | §4.1 Device (FR-1–3) | `MidiManager`, `DeviceTypeRegistry` | Header ports, footer identity |
 | §4.2 Dual-role (FR-4–9) | `InstrumentMidiForwarder`, `AudioPassthroughProcessor` (standalone), queue | Header routing, LEDs; peak standalone-only (AD-11) |
 | §4.3 PATCH (FR-10–13) | Mappers + SysEx dispatch | PatchEditPanel, displays |
-| §4.4 Matrix Mod (FR-14–15, 50) | SysEx dispatch + bus reorder service | MatrixModPanel |
+| §4.4 Matrix Mod (FR-14–15, 50) | SysEx dispatch + bus reorder service + `MatrixModInitService` | MatrixModPanel (`ModulationBusHeader` I/C/P, per-bus init) |
 | §4.5 MASTER (FR-16–18) | MasterModel + dispatch | MasterEditPanel, Settings |
 | §4.6–4.8 Patch Manager (FR-19–29, 51–52) | `PatchFileService`, `DirtyPatchTracker`, handlers | PM panels |
 | §4.9 Mutator (FR-30–34, 54–60) | `PatchMutatorEngine` | PatchMutatorPanel |
-| §4.10 I/C/P (FR-35–38) | `ClipboardService`, Init loaders | Module headers |
+| §4.10 I/C/P (FR-35–38) | `ClipboardService`, Init loaders | Module headers (PATCH/MASTER); Matrix Modulation section header I/C/P |
 | §4.11–13 Shell (FR-39–49) | Settings, `ActionDispatcher`, models | Header, Footer, Settings |
 
 ---

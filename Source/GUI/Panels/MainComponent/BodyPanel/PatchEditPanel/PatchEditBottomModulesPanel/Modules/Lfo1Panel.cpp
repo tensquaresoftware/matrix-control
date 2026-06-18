@@ -13,6 +13,7 @@ ModulePanelLayout Lfo1Panel::createLayout()
         PluginIDs::PatchEditSection::Lfo1Module::StandaloneWidgets::kInit,
         PluginIDs::PatchEditSection::Lfo1Module::StandaloneWidgets::kCopy,
         PluginIDs::PatchEditSection::Lfo1Module::StandaloneWidgets::kPaste,
+        PluginIDs::PatchEditSection::Lfo1Module::StandaloneWidgets::kPasteEnabled,
         {
             PluginIDs::PatchEditSection::Lfo1Module::ParameterWidgets::kSpeed,
             PluginIDs::PatchEditSection::Lfo1Module::ParameterWidgets::kSpeedModByPressure,

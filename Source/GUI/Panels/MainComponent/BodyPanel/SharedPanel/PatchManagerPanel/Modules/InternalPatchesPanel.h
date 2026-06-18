@@ -37,7 +37,7 @@ public:
     void valueTreeChildRemoved(juce::ValueTree&, juce::ValueTree&, int) override {}
     void valueTreeChildOrderChanged(juce::ValueTree&, int, int) override {}
     void valueTreeParentChanged(juce::ValueTree&) override {}
-    void valueTreeRedirected(juce::ValueTree&) override {}
+    void valueTreeRedirected(juce::ValueTree&) override;
 
 private:
     InternalPatchesPanelDimensions dims_;
@@ -78,6 +78,7 @@ private:
     void updatePasteStoreEnabled(const Core::DeviceMemoryLimits& limits, int currentBank);
 
     bool bankNumberVisible_ = true;
+    bool clipboardPasteEnabled_ = false;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(InternalPatchesPanel)
 };

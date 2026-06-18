@@ -43,6 +43,9 @@ namespace TSS
         kButtonTextHover,
         kButtonBackgroundClicked,
         kButtonTextClicked,
+        kButtonBackgroundDisabled,
+        kButtonBorderDisabled,
+        kButtonTextDisabled,
         
         // Toggle colours
         kToggleBorder,

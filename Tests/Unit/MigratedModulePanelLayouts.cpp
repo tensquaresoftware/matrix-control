@@ -15,6 +15,7 @@ namespace MigratedModulePanelLayouts
                   PluginIDs::PatchEditSection::Dco1Module::StandaloneWidgets::kInit,
                   PluginIDs::PatchEditSection::Dco1Module::StandaloneWidgets::kCopy,
                   PluginIDs::PatchEditSection::Dco1Module::StandaloneWidgets::kPaste,
+                  PluginIDs::PatchEditSection::Dco1Module::StandaloneWidgets::kPasteEnabled,
                   {
                       PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kFrequency,
                       PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kFrequencyModByLfo1,
@@ -33,6 +34,7 @@ namespace MigratedModulePanelLayouts
                   PluginIDs::PatchEditSection::Dco2Module::StandaloneWidgets::kInit,
                   PluginIDs::PatchEditSection::Dco2Module::StandaloneWidgets::kCopy,
                   PluginIDs::PatchEditSection::Dco2Module::StandaloneWidgets::kPaste,
+                  PluginIDs::PatchEditSection::Dco2Module::StandaloneWidgets::kPasteEnabled,
                   {
                       PluginIDs::PatchEditSection::Dco2Module::ParameterWidgets::kFrequency,
                       PluginIDs::PatchEditSection::Dco2Module::ParameterWidgets::kFrequencyModByLfo1,
@@ -99,6 +101,7 @@ namespace MigratedModulePanelLayouts
                   PluginIDs::PatchEditSection::Envelope1Module::StandaloneWidgets::kInit,
                   PluginIDs::PatchEditSection::Envelope1Module::StandaloneWidgets::kCopy,
                   PluginIDs::PatchEditSection::Envelope1Module::StandaloneWidgets::kPaste,
+                  PluginIDs::PatchEditSection::Envelope1Module::StandaloneWidgets::kPasteEnabled,
                   {
                       PluginIDs::PatchEditSection::Envelope1Module::ParameterWidgets::kDelay,
                       PluginIDs::PatchEditSection::Envelope1Module::ParameterWidgets::kAttack,
@@ -117,6 +120,7 @@ namespace MigratedModulePanelLayouts
                   PluginIDs::PatchEditSection::Envelope2Module::StandaloneWidgets::kInit,
                   PluginIDs::PatchEditSection::Envelope2Module::StandaloneWidgets::kCopy,
                   PluginIDs::PatchEditSection::Envelope2Module::StandaloneWidgets::kPaste,
+                  PluginIDs::PatchEditSection::Envelope2Module::StandaloneWidgets::kPasteEnabled,
                   {
                       PluginIDs::PatchEditSection::Envelope2Module::ParameterWidgets::kDelay,
                       PluginIDs::PatchEditSection::Envelope2Module::ParameterWidgets::kAttack,
@@ -135,6 +139,7 @@ namespace MigratedModulePanelLayouts
                   PluginIDs::PatchEditSection::Envelope3Module::StandaloneWidgets::kInit,
                   PluginIDs::PatchEditSection::Envelope3Module::StandaloneWidgets::kCopy,
                   PluginIDs::PatchEditSection::Envelope3Module::StandaloneWidgets::kPaste,
+                  PluginIDs::PatchEditSection::Envelope3Module::StandaloneWidgets::kPasteEnabled,
                   {
                       PluginIDs::PatchEditSection::Envelope3Module::ParameterWidgets::kDelay,
                       PluginIDs::PatchEditSection::Envelope3Module::ParameterWidgets::kAttack,
@@ -153,6 +158,7 @@ namespace MigratedModulePanelLayouts
                   PluginIDs::PatchEditSection::Lfo1Module::StandaloneWidgets::kInit,
                   PluginIDs::PatchEditSection::Lfo1Module::StandaloneWidgets::kCopy,
                   PluginIDs::PatchEditSection::Lfo1Module::StandaloneWidgets::kPaste,
+                  PluginIDs::PatchEditSection::Lfo1Module::StandaloneWidgets::kPasteEnabled,
                   {
                       PluginIDs::PatchEditSection::Lfo1Module::ParameterWidgets::kSpeed,
                       PluginIDs::PatchEditSection::Lfo1Module::ParameterWidgets::kSpeedModByPressure,
@@ -171,6 +177,7 @@ namespace MigratedModulePanelLayouts
                   PluginIDs::PatchEditSection::Lfo2Module::StandaloneWidgets::kInit,
                   PluginIDs::PatchEditSection::Lfo2Module::StandaloneWidgets::kCopy,
                   PluginIDs::PatchEditSection::Lfo2Module::StandaloneWidgets::kPaste,
+                  PluginIDs::PatchEditSection::Lfo2Module::StandaloneWidgets::kPasteEnabled,
                   {
                       PluginIDs::PatchEditSection::Lfo2Module::ParameterWidgets::kSpeed,
                       PluginIDs::PatchEditSection::Lfo2Module::ParameterWidgets::kSpeedModByKeyboard,

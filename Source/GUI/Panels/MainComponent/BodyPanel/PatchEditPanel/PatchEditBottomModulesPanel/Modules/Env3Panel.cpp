@@ -13,6 +13,7 @@ ModulePanelLayout Env3Panel::createLayout()
         PluginIDs::PatchEditSection::Envelope3Module::StandaloneWidgets::kInit,
         PluginIDs::PatchEditSection::Envelope3Module::StandaloneWidgets::kCopy,
         PluginIDs::PatchEditSection::Envelope3Module::StandaloneWidgets::kPaste,
+        PluginIDs::PatchEditSection::Envelope3Module::StandaloneWidgets::kPasteEnabled,
         {
             PluginIDs::PatchEditSection::Envelope3Module::ParameterWidgets::kDelay,
             PluginIDs::PatchEditSection::Envelope3Module::ParameterWidgets::kAttack,

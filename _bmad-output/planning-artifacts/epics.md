@@ -871,7 +871,7 @@ So that I can audition files quickly (FR-52).
 
 ## Epic 5: Type-Aware Module Clipboard
 
-Module and patch clipboard with compatibility rules.
+Module, patch, and matrix-modulation clipboard with compatibility rules.
 
 ### Story 5.1: ClipboardService Compatibility Matrix
 
@@ -882,9 +882,10 @@ So that invalid pastes are prevented (FR-35, addendum § Clipboard).
 **Acceptance Criteria:**
 
 **Given** Epic 3 complete
-**When** `ClipboardService` stores a module or full patch snapshot
-**Then** compatibility matrix matches addendum (ENV full interchange; DCO/LFO partial rules)
-**And** unit tests cover matrix cases
+**When** `ClipboardService` stores a module, full patch, or matrix-modulation snapshot
+**Then** compatibility matrix matches addendum (ENV full interchange; DCO/LFO partial rules; matrix-modulation full 10-bus snapshot)
+**And** matrix-modulation snapshot captures PatchModel bytes 104–133 (source + amount + destination × 10 buses)
+**And** unit tests cover matrix cases including matrix-modulation mode
 
 ### Story 5.2: Module Copy Paste Enable and Gray Rules
 
@@ -895,9 +896,25 @@ So that UI reflects clipboard state (FR-35).
 **Acceptance Criteria:**
 
 **Given** Story 5.1
-**When** user copies a module or full patch
-**Then** Paste buttons gray per FR-35 rules (full-patch copy grays PATCH EDIT paste; Internal Patches paste remains when applicable)
+**When** user copies a module, full patch, or matrix modulation
+**Then** Paste buttons gray per FR-35 rules (full-patch copy grays PATCH EDIT paste; Internal Patches paste remains when applicable; matrix-modulation copy grays all PATCH EDIT and MASTER module Paste buttons — only Matrix Modulation Paste remains active)
 **And** last copy defines clipboard mode until replaced
+
+### Story 5.3: Matrix Modulation Section I/C/P GUI
+
+As a sound designer,
+I want Init/Copy/Paste buttons in the Matrix Modulation section header,
+So that I can reset, copy, or paste the full 10-bus matrix between patches (FR-35).
+
+**Acceptance Criteria:**
+
+**Given** Stories 5.1–5.2 and existing Matrix Mod Init (Epic 3.3)
+**When** the Matrix Modulation panel is displayed
+**Then** the section header exposes I/C/P buttons (20×20) to the right of the ModulationBusHeader DESTINATION label
+**And** DESTINATION header label width is 68 px with zero gap before the I button (68 + 0 + 60 = 128 px column alignment preserved)
+**And** bus-row DESTINATION combo width remains 104 px unchanged
+**And** `PluginIDs`, `PluginDisplayNames`, and `PluginDescriptors` register Copy/Paste standalone widgets adjacent to the existing Init entry (not appended at file end)
+**And** Copy/Paste APVTS properties follow the `matrixModulationInit` naming pattern (`matrixModulationCopy`, `matrixModulationPaste`)
 
 ---
 
@@ -1097,14 +1114,15 @@ So that GUI panels only call `setProperty` with timestamps (FR-47, AD-5).
 ### Story 7.2: ModuleActionHandler I C P and Matrix Mod Init
 
 As a sound designer,
-I want module I/C/P and Matrix Mod inits to run through Core,
-So that PATCH/MASTER headers and Matrix Mod actions work (FR-35, FR-15, FR-36 integration).
+I want module I/C/P and Matrix Mod section actions to run through Core,
+So that PATCH/MASTER headers and Matrix Modulation section actions work (FR-35, FR-15, FR-36 integration).
 
 **Acceptance Criteria:**
 
-**Given** Stories 5.1–5.2, 3.3–3.4, and 7.1
-**When** user triggers module I/C/P or Matrix Mod init from panel
-**Then** handler invokes `ClipboardService`, `InitTemplateLoader`, or Matrix Mod init services
+**Given** Stories 5.1–5.3, 3.3–3.4, and 7.1
+**When** user triggers module I/C/P, Matrix Modulation section I/C/P, or per-bus Matrix Mod init from panel
+**Then** handler invokes `ClipboardService` (module copy/paste, matrix-modulation copy/paste), `InitTemplateLoader`, or `MatrixModInitService` as appropriate
+**And** matrix-modulation paste writes all 10 buses to `PatchModel` and APVTS, then enqueues SysEx via existing `MatrixModBusParameterSysExDispatcher` (same suppress/coalesce pattern as init/reorder)
 **And** no SysEx in GUI code paths
 
 ### Story 7.3: PatchManagerActionHandler Bank and Internal

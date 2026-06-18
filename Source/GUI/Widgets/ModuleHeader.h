@@ -54,6 +54,7 @@ namespace TSS
             juce::String initWidgetId;
             juce::String copyWidgetId;
             juce::String pasteWidgetId;
+            juce::String pasteEnabledPropertyId;
             bool requireInitConfirmation = false;
             InitConfirmationGate initConfirmationGate;
         };
@@ -94,6 +95,9 @@ namespace TSS
         void layoutInitOnlyButtons();
         void layoutInitCopyPasteButtons();
         void applyButtonLooksFromSkin(ISkin& skin);
+        void attachPasteEnabledListener(const WithActionsSpec& spec);
+
+        class PasteEnabledPropertyListener;
 
         Presentation presentation_ = Presentation::TitleOnly;
         ColumnLayout columnLayout_ = ColumnLayout::PatchEdit;
@@ -112,10 +116,12 @@ namespace TSS
         bool requireInitConfirmation_ = false;
         InitConfirmationGate initConfirmationGate_;
         juce::String initWidgetId_;
+        juce::String pasteEnabledPropertyId_;
 
         std::unique_ptr<Button> initButton_;
         std::unique_ptr<Button> copyButton_;
         std::unique_ptr<Button> pasteButton_;
+        std::unique_ptr<PasteEnabledPropertyListener> pasteEnabledListener_;
 
         void drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawLine(juce::Graphics& g, const juce::Rectangle<float>& bounds);

@@ -39,6 +39,7 @@ namespace Core
     class KeyboardFromMidiInput;
     class AudioPassthroughProcessor;
     class MidiActivityTracker;
+    class ClipboardService;
 }
 
 class PluginProcessor : public juce::AudioProcessor, public juce::ValueTree::Listener
@@ -238,6 +239,9 @@ private:
     void handlePatchManagerPropertyChange(const juce::String& propertyId);
     void handleMatrixModInitPropertyChange(const juce::String& propertyId);
     void handleMasterModuleInitPropertyChange(const juce::String& propertyId);
+    void handleClipboardCopyPropertyChange(const juce::String& propertyId);
+    void initializeClipboardPasteEnabledProperties();
+    void refreshClipboardPasteEnabledProperties();
     void propagateInitTemplateFooterMessage(const Core::InitTemplateLoadResult& result);
     int parseMatrixModBusInitIndex(const juce::String& propertyId) const;
     Core::DeviceMemoryLimits getResolvedDeviceMemoryLimits() const;
@@ -272,6 +276,7 @@ private:
     std::unique_ptr<SysExDecoder> sysExDecoder_;
     std::unique_ptr<Core::InitTemplateLoader> initTemplateLoader_;
     std::unique_ptr<Core::MasterModuleInitService> masterModuleInitService_;
+    std::unique_ptr<Core::ClipboardService> clipboardService_;
     std::map<juce::String, PluginDescriptors::ChoiceParameterDescriptor> choiceParameterMap_;
     std::unordered_set<juce::String> patchParameterIds_;
     std::unordered_set<juce::String> masterParameterIds_;

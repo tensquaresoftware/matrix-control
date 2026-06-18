@@ -9,6 +9,54 @@
 
 namespace TSS
 {
+    class ModuleHeader::PasteEnabledPropertyListener : public juce::ValueTree::Listener
+    {
+    public:
+        PasteEnabledPropertyListener(juce::ValueTree state,
+                                     const juce::String& propertyId,
+                                     Button& pasteButton)
+            : state_(std::move(state))
+            , propertyId_(propertyId)
+            , pasteButton_(pasteButton)
+        {
+            state_.addListener(this);
+            syncFromState();
+        }
+
+        ~PasteEnabledPropertyListener() override
+        {
+            state_.removeListener(this);
+        }
+
+        void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
+                                      const juce::Identifier& property) override
+        {
+            if (property.toString() != propertyId_)
+                return;
+
+            pasteButton_.setEnabled(static_cast<bool>(treeWhosePropertyHasChanged.getProperty(property, false)));
+        }
+
+        void valueTreeChildAdded(juce::ValueTree&, juce::ValueTree&) override {}
+        void valueTreeChildRemoved(juce::ValueTree&, juce::ValueTree&, int) override {}
+        void valueTreeChildOrderChanged(juce::ValueTree&, int, int) override {}
+        void valueTreeParentChanged(juce::ValueTree&) override {}
+        void valueTreeRedirected(juce::ValueTree&) override
+        {
+            syncFromState();
+        }
+
+    private:
+        void syncFromState()
+        {
+            pasteButton_.setEnabled(static_cast<bool>(state_.getProperty(propertyId_, false)));
+        }
+
+        juce::ValueTree state_;
+        juce::String propertyId_;
+        Button& pasteButton_;
+    };
+
     namespace
     {
         ModuleHeader::ColourVariant colourVariantForLayout(ModuleHeader::ColumnLayout layout)
@@ -55,13 +103,17 @@ namespace TSS
         , requireInitConfirmation_(spec.requireInitConfirmation)
         , initConfirmationGate_(std::move(spec.initConfirmationGate))
         , initWidgetId_(spec.initWidgetId)
+        , pasteEnabledPropertyId_(spec.pasteEnabledPropertyId)
     {
         setOpaque(false);
         jassert(spec.buttonSet == ButtonSet::InitOnly || spec.buttonSet == ButtonSet::InitCopyPaste);
 
         createInitButton(spec);
         if (spec.buttonSet == ButtonSet::InitCopyPaste)
+        {
             createCopyPasteButtons(spec);
+            attachPasteEnabledListener(spec);
+        }
     }
 
     ModuleHeader::~ModuleHeader() = default;
@@ -180,6 +232,17 @@ namespace TSS
             else if (!requireInitConfirmation_)
                 stampProperty();
         };
+    }
+
+    void ModuleHeader::attachPasteEnabledListener(const WithActionsSpec& spec)
+    {
+        if (pasteEnabledPropertyId_.isEmpty() || pasteButton_ == nullptr)
+            return;
+
+        pasteEnabledListener_ = std::make_unique<PasteEnabledPropertyListener>(
+            spec.apvts.state,
+            pasteEnabledPropertyId_,
+            *pasteButton_);
     }
 
     void ModuleHeader::createCopyPasteButtons(const WithActionsSpec& spec)

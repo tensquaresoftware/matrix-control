@@ -227,6 +227,9 @@ namespace TSS
         colours_[SkinColourId::kButtonTextHover] = juce::Colour(accessColour(Widgets::Button::kTextHoover));
         colours_[SkinColourId::kButtonBackgroundClicked] = juce::Colour(accessColour(Widgets::Button::kBackgroundClicked));
         colours_[SkinColourId::kButtonTextClicked] = juce::Colour(accessColour(Widgets::Button::kTextClicked));
+        colours_[SkinColourId::kButtonBackgroundDisabled] = juce::Colour(accessColour(Widgets::Button::kBackgroundDisabled));
+        colours_[SkinColourId::kButtonBorderDisabled] = juce::Colour(accessColour(Widgets::Button::kBorderDisabled));
+        colours_[SkinColourId::kButtonTextDisabled] = juce::Colour(accessColour(Widgets::Button::kTextDisabled));
     }
     
     template <typename Accessor>

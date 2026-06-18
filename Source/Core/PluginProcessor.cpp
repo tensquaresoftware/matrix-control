@@ -28,6 +28,8 @@
 #include "Core/MIDI/PatchParameterSysExDispatcher.h"
 #include "Core/MIDI/SysEx/SysExDecoder.h"
 #include "Core/MIDI/SysEx/SysExParser.h"
+#include "Core/Services/ClipboardPasteEnabledResolver.h"
+#include "Core/Services/ClipboardService.h"
 #include "Core/Services/DeviceMemoryLimits.h"
 #include "Core/Services/DeviceTypeRegistry.h"
 #include "Shared/Definitions/PluginAudioConstants.h"
@@ -151,6 +153,7 @@ PluginProcessor::PluginProcessor()
     , masterModel_{ std::make_unique<Core::MasterModel>() }
     , apvtsMasterMapper_{ std::make_unique<Core::ApvtsMasterMapper>(apvts, *masterModel_) }
     , patchNameSyncer_{ std::make_unique<Core::PatchNameSyncer>(apvts, *patchModel_) }
+    , clipboardService_{ std::make_unique<Core::ClipboardService>() }
 {
     patchParameterSysExDispatcher_ = std::make_unique<Core::PatchParameterSysExDispatcher>(
         *patchModel_,
@@ -209,9 +212,11 @@ PluginProcessor::PluginProcessor()
     initializeHardwareLatencyProperty();
     initializeInitTemplatesFolderProperty();
     initializePatchNameProperty();
+    initializeClipboardPasteEnabledProperties();
     apvts.state.addListener(this);
     deferredMidiPortSyncTimer_ = std::make_unique<DeferredMidiPortSyncTimer>(*this);
     startMidiThread();
+    refreshClipboardPasteEnabledProperties();
 }
 
 PluginProcessor::~PluginProcessor()
@@ -1145,6 +1150,7 @@ void PluginProcessor::valueTreePropertyChanged(juce::ValueTree& treeWhosePropert
     handlePatchManagerPropertyChange(parameterId);
     handleMatrixModInitPropertyChange(parameterId);
     handleMasterModuleInitPropertyChange(parameterId);
+    handleClipboardCopyPropertyChange(parameterId);
 
     const auto propertyName = property.toString();
     if (propertyName == MatrixDeviceTypes::kApvtsPropertyName
@@ -1357,6 +1363,89 @@ void PluginProcessor::handleMasterModuleInitPropertyChange(const juce::String& p
     propagateInitTemplateFooterMessage(result);
 }
 
+void PluginProcessor::initializeClipboardPasteEnabledProperties()
+{
+    namespace PatchEdit = PluginIDs::PatchEditSection;
+    namespace InternalPatches = PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets;
+    namespace MatrixMod = PluginIDs::MatrixModulationSection::StandaloneWidgets;
+
+    const char* pasteEnabledIds[] = {
+        PatchEdit::Dco1Module::StandaloneWidgets::kPasteEnabled,
+        PatchEdit::Dco2Module::StandaloneWidgets::kPasteEnabled,
+        PatchEdit::Envelope1Module::StandaloneWidgets::kPasteEnabled,
+        PatchEdit::Envelope2Module::StandaloneWidgets::kPasteEnabled,
+        PatchEdit::Envelope3Module::StandaloneWidgets::kPasteEnabled,
+        PatchEdit::Lfo1Module::StandaloneWidgets::kPasteEnabled,
+        PatchEdit::Lfo2Module::StandaloneWidgets::kPasteEnabled,
+        InternalPatches::kPastePatchEnabled,
+        MatrixMod::kMatrixModulationPasteEnabled
+    };
+
+    for (const auto* propertyId : pasteEnabledIds)
+    {
+        if (!apvts.state.hasProperty(propertyId))
+            apvts.state.setProperty(propertyId, false, nullptr);
+    }
+}
+
+void PluginProcessor::refreshClipboardPasteEnabledProperties()
+{
+    if (clipboardService_ == nullptr)
+        return;
+
+    namespace PatchEdit = PluginIDs::PatchEditSection;
+    namespace InternalPatches = PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets;
+    namespace MatrixMod = PluginIDs::MatrixModulationSection::StandaloneWidgets;
+
+    const auto state = Core::resolvePasteEnabled(*clipboardService_);
+
+    apvts.state.setProperty(PatchEdit::Dco1Module::StandaloneWidgets::kPasteEnabled, state.dco1, nullptr);
+    apvts.state.setProperty(PatchEdit::Dco2Module::StandaloneWidgets::kPasteEnabled, state.dco2, nullptr);
+    apvts.state.setProperty(PatchEdit::Envelope1Module::StandaloneWidgets::kPasteEnabled, state.env1, nullptr);
+    apvts.state.setProperty(PatchEdit::Envelope2Module::StandaloneWidgets::kPasteEnabled, state.env2, nullptr);
+    apvts.state.setProperty(PatchEdit::Envelope3Module::StandaloneWidgets::kPasteEnabled, state.env3, nullptr);
+    apvts.state.setProperty(PatchEdit::Lfo1Module::StandaloneWidgets::kPasteEnabled, state.lfo1, nullptr);
+    apvts.state.setProperty(PatchEdit::Lfo2Module::StandaloneWidgets::kPasteEnabled, state.lfo2, nullptr);
+    apvts.state.setProperty(InternalPatches::kPastePatchEnabled, state.internalPatches, nullptr);
+    apvts.state.setProperty(MatrixMod::kMatrixModulationPasteEnabled, state.matrixModulation, nullptr);
+}
+
+void PluginProcessor::handleClipboardCopyPropertyChange(const juce::String& propertyId)
+{
+    if (clipboardService_ == nullptr || patchModel_ == nullptr || apvtsPatchMapper_ == nullptr)
+        return;
+
+    namespace InternalPatches = PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets;
+    namespace MatrixMod = PluginIDs::MatrixModulationSection::StandaloneWidgets;
+
+    if (propertyId == InternalPatches::kCopyPatch)
+    {
+        apvtsPatchMapper_->apvtsToBuffer();
+        clipboardService_->copyFullPatch(*patchModel_);
+        refreshClipboardPasteEnabledProperties();
+        return;
+    }
+
+    if (propertyId == MatrixMod::kMatrixModulationCopy)
+    {
+        apvtsPatchMapper_->apvtsToBuffer();
+        clipboardService_->copyMatrixModulation(*patchModel_);
+        refreshClipboardPasteEnabledProperties();
+        return;
+    }
+
+    const auto moduleKind = Core::patchModuleKindFromWidgetId(propertyId);
+    if (!moduleKind.has_value())
+        return;
+
+    if (propertyId.endsWith("Copy"))
+    {
+        apvtsPatchMapper_->apvtsToBuffer();
+        clipboardService_->copyModule(*moduleKind, *patchModel_);
+        refreshClipboardPasteEnabledProperties();
+    }
+}
+
 void PluginProcessor::handlePatchManagerPropertyChange(const juce::String& propertyId)
 {
     using namespace PluginIDs::PatchManagerSection;
@@ -1459,6 +1548,7 @@ void PluginProcessor::valueTreeRedirected(juce::ValueTree& treeWhichHasBeenChang
     apvtsMasterMapper_->apvtsToBuffer();
     patchNameSyncer_->apvtsToBuffer();
     syncAudioRuntimeFromState();
+    refreshClipboardPasteEnabledProperties();
 }
 
 void PluginProcessor::buildPatchParameterIdSet()

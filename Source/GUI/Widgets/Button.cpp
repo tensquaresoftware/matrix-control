@@ -58,7 +58,7 @@ namespace TSS
     juce::Colour Button::getBackgroundColour(bool enabled, bool isHighlighted, bool isDown) const
     {
         if (! enabled)
-            return look_.backgroundOff;
+            return look_.backgroundDisabled;
         
         if (isDown)
             return look_.backgroundClicked;
@@ -69,15 +69,18 @@ namespace TSS
         return getToggleState() ? look_.backgroundOn : look_.backgroundOff;
     }
 
-    juce::Colour Button::getBorderColour(bool /* enabled */) const
+    juce::Colour Button::getBorderColour(bool enabled) const
     {
+        if (! enabled)
+            return look_.borderDisabled;
+
         return getToggleState() ? look_.borderOn : look_.borderOff;
     }
 
     juce::Colour Button::getTextColour(bool enabled, bool isHighlighted, bool isDown) const
     {
         if (! enabled)
-            return look_.textOff;
+            return look_.textDisabled;
         
         if (isDown)
             return look_.textClicked;
