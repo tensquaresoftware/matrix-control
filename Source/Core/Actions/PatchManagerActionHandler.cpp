@@ -30,6 +30,27 @@ namespace
         if (hooks.setSuppressMatrixModSysEx)
             hooks.setSuppressMatrixModSysEx(suppress);
     }
+
+    void flushDeferredApvtsParameterSync(juce::AudioProcessorValueTreeState& apvts)
+    {
+        // setValueNotifyingHost queues ValueTree sync on APVTS's internal timer; copyState() forces flush (public API).
+        (void) apvts.copyState();
+    }
+
+    void pushPatchModelToApvtsWithSuppress(juce::AudioProcessorValueTreeState& apvts,
+                                           Core::ActionExecutionHooks& hooks,
+                                           Core::ApvtsPatchMapper& mapper,
+                                           Core::PatchNameSyncer* patchNameSyncer)
+    {
+        setPatchLoadSuppressHooks(hooks, true);
+        mapper.bufferToApvts();
+
+        if (patchNameSyncer != nullptr)
+            patchNameSyncer->bufferToApvts();
+
+        flushDeferredApvtsParameterSync(apvts);
+        setPatchLoadSuppressHooks(hooks, false);
+    }
 }
 
 namespace Core
@@ -227,17 +248,7 @@ namespace Core
 
         const auto result = patchInitService_->initFullPatch();
 
-        if (hooks_.setSuppressPatchSysEx)
-            hooks_.setSuppressPatchSysEx(true);
-        if (hooks_.setSuppressMatrixModSysEx)
-            hooks_.setSuppressMatrixModSysEx(true);
-
-        apvtsPatchMapper_->bufferToApvts();
-
-        if (hooks_.setSuppressPatchSysEx)
-            hooks_.setSuppressPatchSysEx(false);
-        if (hooks_.setSuppressMatrixModSysEx)
-            hooks_.setSuppressMatrixModSysEx(false);
+        pushPatchModelToApvtsWithSuppress(apvts_, hooks_, *apvtsPatchMapper_, nullptr);
 
         InitTemplateFooter::propagateMessage(apvts_, result);
     }
@@ -261,17 +272,7 @@ namespace Core
         apvtsPatchMapper_->apvtsToBuffer();
         clipboardService_->pasteFullPatch(*patchModel_);
 
-        if (hooks_.setSuppressPatchSysEx)
-            hooks_.setSuppressPatchSysEx(true);
-        if (hooks_.setSuppressMatrixModSysEx)
-            hooks_.setSuppressMatrixModSysEx(true);
-
-        apvtsPatchMapper_->bufferToApvts();
-
-        if (hooks_.setSuppressPatchSysEx)
-            hooks_.setSuppressPatchSysEx(false);
-        if (hooks_.setSuppressMatrixModSysEx)
-            hooks_.setSuppressMatrixModSysEx(false);
+        pushPatchModelToApvtsWithSuppress(apvts_, hooks_, *apvtsPatchMapper_, nullptr);
 
         if (midiManager_ != nullptr)
             midiManager_->sendPatch(static_cast<juce::uint8>(getCurrentPatch(limits)), patchModel_->data());
@@ -518,10 +519,7 @@ namespace Core
 
     void PatchManagerActionHandler::syncLoadedPatchToApvts()
     {
-        setPatchLoadSuppressHooks(hooks_, true);
-        apvtsPatchMapper_->bufferToApvts();
-        patchNameSyncer_->bufferToApvts();
-        setPatchLoadSuppressHooks(hooks_, false);
+        pushPatchModelToApvtsWithSuppress(apvts_, hooks_, *apvtsPatchMapper_, patchNameSyncer_);
     }
 
     void PatchManagerActionHandler::applyLoadedPatchToApvtsAndSynth(const DeviceMemoryLimits& limits)

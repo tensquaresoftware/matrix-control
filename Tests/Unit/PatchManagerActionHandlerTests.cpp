@@ -156,6 +156,8 @@ public:
         testBankSelectMatrix6NoSetBank();
         testNavigationWrapsAcrossBanks();
         testNavigationLockedWithinBankNoSetBank();
+        testColdStart_firstNavigation_sendsSetBank();
+        testNavigationStaleSyncedBank_sendsSetBankOnFirstClick();
         testUnlockBankSends0CHOnly();
         testBankSelectSetsBanksLockedTrue();
         testUnlockBankMatrix6NoOp();
@@ -257,7 +259,7 @@ private:
                           nullptr })
         {
             initializePatchManagerState(proc.apvts.state, 0, 0, false);
-            patchSelectionMidiSync.resetLastSyncedBank(0);
+            patchSelectionMidiSync.clearSyncedBankState();
         }
     };
 
@@ -461,6 +463,39 @@ private:
         expect(static_cast<bool>(harness.proc.apvts.state.getProperty(BankUtility::StateProperties::kBanksLocked)));
         const auto queued = scanQueue(harness.queue);
         expect(!queued.setBank);
+    }
+
+    void testColdStart_firstNavigation_sendsSetBank()
+    {
+        beginTest("coldStart_firstNavigation_sendsSetBank");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, 0, 0, false);
+
+        harness.handler.handleAction(InternalPatches::kLoadNextPatch, juce::var());
+
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentBankNumber)), 0);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentPatchNumber)), 1);
+        const auto queued = scanQueue(harness.queue);
+        expect(queued.setBank);
+        expectEquals(queued.setBankValue, 0);
+    }
+
+    void testNavigationStaleSyncedBank_sendsSetBankOnFirstClick()
+    {
+        beginTest("navigation_staleSyncedBank_sendsSetBankOnFirstClick");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, 9, 93, false);
+        harness.patchSelectionMidiSync.resetLastSyncedBank(0);
+
+        harness.handler.handleAction(InternalPatches::kLoadNextPatch, juce::var());
+
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentBankNumber)), 9);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentPatchNumber)), 94);
+        const auto queued = scanQueue(harness.queue);
+        expect(queued.setBank);
+        expectEquals(queued.setBankValue, 9);
     }
 
     void testUnlockBankMatrix6NoOp()

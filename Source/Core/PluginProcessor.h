@@ -266,6 +266,7 @@ private:
     void refreshClipboardPasteEnabledProperties();
     Core::DeviceMemoryLimits getResolvedDeviceMemoryLimits() const;
     void reconcilePatchManagerCoordinatesForDeviceType();
+    void resetInternalPatchCoordinatesToDefaults();
     void buildPatchParameterIdSet();
     void buildMasterParameterIdSet();
     void buildMatrixModParameterIdSet();

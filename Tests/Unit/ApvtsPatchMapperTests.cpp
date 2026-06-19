@@ -11,6 +11,7 @@
 #include "Core/MIDI/SysEx/SysExParser.h"
 #include "Core/Models/ApvtsPatchMapper.h"
 #include "Core/Models/PatchModel.h"
+#include "Shared/Definitions/ApvtsTypes.h"
 #include "Shared/Definitions/Matrix1000Limits.h"
 #include "Shared/Definitions/PluginDescriptors.h"
 #include "Shared/Definitions/PluginIDs.h"
@@ -57,6 +58,7 @@ public:
         runApvtsToBuffer();
         runBufferToApvts();
         runMatrixModBus0ApvtsToBuffer();
+        runBulkPushFlushBeforeSuppressRelease();
         runReferenceRoundTrip();
     }
 
@@ -208,6 +210,75 @@ private:
         expectEquals(static_cast<int>(model.data()[104]), 4);
         expectEquals(static_cast<int>(model.data()[105]), static_cast<int>(static_cast<juce::uint8>(-15)));
         expectEquals(static_cast<int>(model.data()[106]), 9);
+    }
+
+    void runBulkPushFlushBeforeSuppressRelease()
+    {
+        beginTest("bufferToApvts: flush before suppress release prevents deferred listener dispatch");
+
+        const auto intDescs = Core::ApvtsPatchMapper::buildIntDescriptors();
+        const auto& freq = intDescs[0];
+
+        juce::AudioProcessorValueTreeState::ParameterLayout layout;
+        layout.add(std::make_unique<juce::AudioParameterInt>(
+            juce::ParameterID(freq.parameterId, 1), freq.displayName,
+            freq.minValue, freq.maxValue, freq.defaultValue));
+
+        TestAudioProcessor proc(std::move(layout));
+        Core::PatchModel model;
+        Core::ApvtsPatchMapper mapper(proc.apvts, model);
+
+        model.setValue(freq, 42);
+
+        int dispatchCount = 0;
+        bool suppressPatchParameterSysEx = false;
+
+        struct SuppressListener final : juce::ValueTree::Listener
+        {
+            SuppressListener(juce::AudioProcessorValueTreeState& apvtsIn,
+                             const juce::String& watchedId,
+                             bool& suppressIn,
+                             int& dispatchCountIn)
+                : apvts(apvtsIn)
+                , watchedParameterId(watchedId)
+                , suppress(suppressIn)
+                , dispatchCount(dispatchCountIn)
+            {
+                apvts.state.addListener(this);
+            }
+
+            ~SuppressListener() override { apvts.state.removeListener(this); }
+
+            void valueTreePropertyChanged(juce::ValueTree& tree, const juce::Identifier& property) override
+            {
+                juce::String parameterId = property.toString();
+                if (parameterId == ApvtsTypes::kValue)
+                {
+                    const juce::var idProperty = tree.getProperty("id");
+                    if (idProperty.isString())
+                        parameterId = idProperty.toString();
+                }
+
+                if (parameterId != watchedParameterId)
+                    return;
+
+                if (!suppress)
+                    ++dispatchCount;
+            }
+
+            juce::AudioProcessorValueTreeState& apvts;
+            juce::String watchedParameterId;
+            bool& suppress;
+            int& dispatchCount;
+        };
+
+        SuppressListener listener(proc.apvts, freq.parameterId, suppressPatchParameterSysEx, dispatchCount);
+
+        suppressPatchParameterSysEx = true;
+        mapper.bufferToApvts();
+        (void) proc.apvts.copyState();
+        suppressPatchParameterSysEx = false;
+        expectEquals(dispatchCount, 0);
     }
 
     void runReferenceRoundTrip()

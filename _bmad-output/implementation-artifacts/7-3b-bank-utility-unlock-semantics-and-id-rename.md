@@ -344,6 +344,7 @@ Auto (Cursor Agent)
 - 2026-06-19: Story 7-3b created — UNLOCK semantics fix + full ID rename developer guide (Correct Course D-022-R1).
 - 2026-06-19: Code review — `syncSelection` Set Bank on bank change only; tests Matrix-6 + locked navigation; duplicate MIDI suppress hook.
 - 2026-06-19: **Manual UAT (Guillaume, Matrix-1000):** smoke 7-3b validated — blocks A/B/C pass; D4/D5 clarified; hardware lock after UNLOCK+STORE confirmed on synth display.
+- 2026-06-19: **Startup policy (post-UAT):** Internal Patches always reset to bank 0 / patch 00 on instance start and after APVTS restore (standalone + DAW); no MIDI until user navigates. `clearSyncedBankState()` replaces session `resetLastSyncedBank` at boot. Spec: `spec-internal-patch-startup-coordinates.md`.
 
 ### Review Findings
 

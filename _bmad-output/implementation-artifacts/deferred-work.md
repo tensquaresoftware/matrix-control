@@ -1,5 +1,10 @@
 # Deferred Work
 
+## Deferred from: Internal Patches startup policy (2026-06-19)
+
+- **Persist bank/patch in session for display-only recall** — rejected; hardware state unknown at launch. Policy: always 0/00. See `spec-internal-patch-startup-coordinates.md`.
+- **Read current bank/patch from Matrix-1000 at startup** — no reliable SysEx query in v1; would supersede 0/00 policy if added later.
+
 ## Deferred from: code review of 4-6-previous-and-next-file-navigation (2026-06-19)
 
 - **Appel direct `handleLoadSelectedPatchFile` quand id inchangé (N==1)** (`PatchManagerActionHandler.cpp:165-166`) — déviation documentée du libellé tâche « advance only » ; justifiée par le no-op JUCE `setProperty` ; conforme AC#3.

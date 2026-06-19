@@ -21,6 +21,11 @@ namespace Core
         hasLastSyncedBank_ = true;
     }
 
+    void PatchSelectionMidiSync::clearSyncedBankState() noexcept
+    {
+        hasLastSyncedBank_ = false;
+    }
+
     bool PatchSelectionMidiSync::syncSelection(int bank,
                                                int patch,
                                                const DeviceMemoryLimits& limits,

@@ -232,9 +232,6 @@ PluginProcessor::PluginProcessor()
         });
 
     patchSelectionMidiSync_ = std::make_unique<Core::PatchSelectionMidiSync>(midiManager.get());
-    patchSelectionMidiSync_->resetLastSyncedBank(static_cast<int>(apvts.state.getProperty(
-        PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCurrentBankNumber,
-        0)));
 
     const Core::ActionExecutionHooks actionHooks{
         [this](bool suppress) { suppressMatrixModParameterSysEx_ = suppress; },
@@ -317,6 +314,7 @@ PluginProcessor::PluginProcessor()
     deferredMidiPortSyncTimer_ = std::make_unique<DeferredMidiPortSyncTimer>(*this);
     startMidiThread();
     refreshClipboardPasteEnabledProperties();
+    resetInternalPatchCoordinatesToDefaults();
 }
 
 PluginProcessor::~PluginProcessor()
@@ -580,6 +578,8 @@ void PluginProcessor::setStateInformation(const void* data, int sizeInBytes)
 
             if (patchManagerActionHandler_ != nullptr)
                 patchManagerActionHandler_->rescanPersistedComputerPatchesFolder();
+
+            resetInternalPatchCoordinatesToDefaults();
 
             if (shouldUseDevelopmentLogging())
                 ApvtsLogger::getInstance().logStateLoaded("DAW state");
@@ -1416,12 +1416,24 @@ void PluginProcessor::reconcilePatchManagerCoordinatesForDeviceType()
         apvts.state.setProperty(kCurrentPatchNumber, clampedPatch, nullptr);
 
     if (patchSelectionMidiSync_ != nullptr)
-    {
-        const int syncedBank = limits.hasBankConcept()
-                                   ? static_cast<int>(apvts.state.getProperty(kCurrentBankNumber, limits.minBankNumber()))
-                                   : 0;
-        patchSelectionMidiSync_->resetLastSyncedBank(syncedBank);
-    }
+        patchSelectionMidiSync_->clearSyncedBankState();
+}
+
+void PluginProcessor::resetInternalPatchCoordinatesToDefaults()
+{
+    using namespace PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets;
+
+    const auto limits = getResolvedDeviceMemoryLimits();
+    const int defaultBank = limits.hasBankConcept() ? limits.minBankNumber() : 0;
+    const int defaultPatch = limits.minPatchNumber();
+
+    suppressPatchSelectionMidiSync_ = true;
+    apvts.state.setProperty(kCurrentBankNumber, defaultBank, nullptr);
+    apvts.state.setProperty(kCurrentPatchNumber, defaultPatch, nullptr);
+    suppressPatchSelectionMidiSync_ = false;
+
+    if (patchSelectionMidiSync_ != nullptr)
+        patchSelectionMidiSync_->clearSyncedBankState();
 }
 
 void PluginProcessor::initializeClipboardPasteEnabledProperties()

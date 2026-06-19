@@ -19,6 +19,7 @@ namespace Core
         void sendUnlockBank(const DeviceMemoryLimits& limits);
 
         void resetLastSyncedBank(int bank) noexcept;
+        void clearSyncedBankState() noexcept;
 
     private:
         MidiManager* midiManager_ = nullptr;
