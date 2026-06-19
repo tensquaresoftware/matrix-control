@@ -87,7 +87,8 @@ namespace TSS::Design
                 inline constexpr int kMatrixModulationSource = 60;
                 inline constexpr int kMatrixModulationDestination = 104;
                 inline constexpr int kPatchManagerComputerPatches = 88;
-                inline constexpr int kPatchMutatorHistory = 48;
+                inline constexpr int kPatchMutatorHistoryM = 24;
+                inline constexpr int kPatchMutatorHistoryR = 24;
             }
 
             namespace NumberBox

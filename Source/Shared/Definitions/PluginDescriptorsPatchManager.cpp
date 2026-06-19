@@ -207,8 +207,14 @@ namespace PluginDescriptors
             .widgetType = StandaloneWidgetType::kLabel
         },
         {
-            .widgetId = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kHistory,
-            .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kHistory,
+            .widgetId = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kHistoryM,
+            .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kHistoryM,
+            .parentGroupId = PluginIDs::PatchManagerSection::PatchMutatorModule::kGroupId,
+            .widgetType = StandaloneWidgetType::kComboBox
+        },
+        {
+            .widgetId = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kHistoryR,
+            .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kHistoryR,
             .parentGroupId = PluginIDs::PatchManagerSection::PatchMutatorModule::kGroupId,
             .widgetType = StandaloneWidgetType::kComboBox
         },

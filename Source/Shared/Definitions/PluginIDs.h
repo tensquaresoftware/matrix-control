@@ -585,11 +585,22 @@ namespace PluginIDs
         {
             constexpr const char* kGroupId = "patchMutatorModule";
 
+            namespace StateProperties
+            {
+                constexpr const char* kHistoryMList  = "patchMutatorHistoryMList";
+                constexpr const char* kHistoryRList  = "patchMutatorHistoryRList";
+                constexpr const char* kSelectedM   = "patchMutatorSelectedM";
+                constexpr const char* kSelectedR   = "patchMutatorSelectedR";
+                constexpr const char* kCompareActive = "patchMutatorCompareActive";
+                constexpr int kSelectedRRootOnly = -1; // matches Core::MutationHistoryStore::kRootOnly
+            }
+
             namespace StandaloneWidgets
             {
                 constexpr const char* kAmount         = "patchMutatorAmount";
                 constexpr const char* kRandom         = "patchMutatorRandom";
-                constexpr const char* kHistory        = "patchMutatorHistory";
+                constexpr const char* kHistoryM       = "patchMutatorHistoryM";
+                constexpr const char* kHistoryR       = "patchMutatorHistoryR";
 
                 constexpr const char* kMutate         = "patchMutatorMutate";
                 constexpr const char* kRetry          = "patchMutatorRetry";

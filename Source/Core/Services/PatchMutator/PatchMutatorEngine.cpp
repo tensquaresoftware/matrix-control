@@ -8,10 +8,12 @@
 #include "Core/Models/PatchNameSyncer.h"
 #include "Core/Services/PatchMutator/MutationNaming.h"
 #include "Shared/Definitions/PluginIDs.h"
+#include "Shared/Definitions/PluginDisplayNames.h"
 
 namespace
 {
     namespace PatchMutator = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets;
+    namespace MutatorState = PluginIDs::PatchManagerSection::PatchMutatorModule::StateProperties;
 
     constexpr const char* kNoOpRecipeFooterMessage = "Set Amount and Random above 0 to mutate.";
     constexpr const char* kNoMutationChangeFooterMessage =
@@ -33,6 +35,17 @@ namespace
     void flushDeferredApvtsParameterSync(juce::AudioProcessorValueTreeState& apvts)
     {
         (void) apvts.copyState();
+    }
+
+    // Pipe-separated root/retry labels — e.g. "M00|M02|M05", "—|R00|R02".
+    juce::String joinLabels(const juce::StringArray& labels)
+    {
+        return labels.joinIntoString("|");
+    }
+
+    juce::String historyRootSentinelLabel()
+    {
+        return PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kHistoryRootSentinel;
     }
 
     int readPatchMutatorPercent(juce::AudioProcessorValueTreeState& apvts,
@@ -86,6 +99,8 @@ PatchMutatorEngine::PatchMutatorEngine(PatchModel* patchModel,
 
 MutatorActionResult PatchMutatorEngine::mutate()
 {
+    applySelectionFromApvts();
+
     if (historyStore_.isRootSlotsFull() || historyStore_.isRootIndexExhausted())
     {
         MutatorActionResult result;
@@ -146,6 +161,10 @@ MutatorActionResult PatchMutatorEngine::mutate()
 
     pushResultToEditorAndSynth(working);
 
+    selectedRootIndex_ = rootIndex;
+    selectedRetryIndex_ = MutationHistoryStore::kRootOnly;
+    syncHistoryUiProperties(apvts_);
+
     MutatorActionResult result;
     result.success = true;
     return result;
@@ -153,6 +172,8 @@ MutatorActionResult PatchMutatorEngine::mutate()
 
 MutatorActionResult PatchMutatorEngine::retry()
 {
+    applySelectionFromApvts();
+
     if (historyStore_.isEmpty())
     {
         MutatorActionResult result;
@@ -240,6 +261,9 @@ MutatorActionResult PatchMutatorEngine::retry()
 
     pushResultToEditorAndSynth(working);
 
+    selectedRetryIndex_ = retryIndex;
+    syncHistoryUiProperties(apvts_);
+
     MutatorActionResult result;
     result.success = true;
     return result;
@@ -279,8 +303,86 @@ void PatchMutatorEngine::auditionSelectedHistoryEntry()
 {
 }
 
-void PatchMutatorEngine::syncHistoryUiProperties(juce::AudioProcessorValueTreeState&)
+void PatchMutatorEngine::syncHistoryUiProperties(juce::AudioProcessorValueTreeState& apvts)
 {
+    auto& state = apvts.state;
+
+    if (! state.hasProperty(MutatorState::kCompareActive))
+        state.setProperty(MutatorState::kCompareActive, false, nullptr);
+
+    // Story 7.4: call syncHistoryUiProperties when kSelectedM changes so kHistoryRList
+    // rebuilds for the new root (panel writes properties only — AD-5).
+    if (state.hasProperty(MutatorState::kSelectedM))
+    {
+        const int apvtsM = static_cast<int>(state.getProperty(MutatorState::kSelectedM, -1));
+        if (apvtsM != selectedRootIndex_)
+            applySelectionFromApvts();
+    }
+
+    const auto roots = historyStore_.getSortedRootIndices();
+    if (roots.isEmpty())
+    {
+        state.setProperty(MutatorState::kHistoryMList, juce::String(), nullptr);
+        state.setProperty(MutatorState::kHistoryRList, juce::String(), nullptr);
+        state.setProperty(MutatorState::kSelectedM, -1, nullptr);
+        state.setProperty(MutatorState::kSelectedR, MutationHistoryStore::kRootOnly, nullptr);
+        selectedRootIndex_ = -1;
+        selectedRetryIndex_ = MutationHistoryStore::kRootOnly;
+        return;
+    }
+
+    juce::StringArray mLabels;
+    for (const int rootIndex : roots)
+        mLabels.add(MutationNaming::formatRootLabel(rootIndex));
+    state.setProperty(MutatorState::kHistoryMList, joinLabels(mLabels), nullptr);
+
+    int m = selectedRootIndex_;
+    if (m < 0 || ! historyStore_.hasRoot(m))
+        m = roots.getLast();
+
+    selectedRootIndex_ = m;
+
+    const auto retries = historyStore_.getSortedRetryIndices(m);
+    if (selectedRetryIndex_ != MutationHistoryStore::kRootOnly
+        && ! historyStore_.hasRetry(m, selectedRetryIndex_))
+    {
+        selectedRetryIndex_ = MutationHistoryStore::kRootOnly;
+    }
+
+    juce::StringArray rLabels;
+    rLabels.add(historyRootSentinelLabel());
+    for (const int retryIndex : retries)
+        rLabels.add(MutationNaming::formatRetryLabel(retryIndex));
+    state.setProperty(MutatorState::kHistoryRList, joinLabels(rLabels), nullptr);
+    state.setProperty(MutatorState::kSelectedM, m, nullptr);
+    state.setProperty(MutatorState::kSelectedR, selectedRetryIndex_, nullptr);
+}
+
+void PatchMutatorEngine::applySelectionFromApvts()
+{
+    const auto& state = apvts_.state;
+    if (! state.hasProperty(MutatorState::kSelectedM))
+        return;
+
+    const int m = static_cast<int>(state.getProperty(MutatorState::kSelectedM, -1));
+    const int r = static_cast<int>(state.getProperty(MutatorState::kSelectedR,
+                                                     MutationHistoryStore::kRootOnly));
+
+    if (m < 0 || ! historyStore_.hasRoot(m))
+    {
+        selectedRootIndex_ = -1;
+        selectedRetryIndex_ = MutationHistoryStore::kRootOnly;
+        return;
+    }
+
+    selectedRootIndex_ = m;
+
+    if (r == MutationHistoryStore::kRootOnly)
+        selectedRetryIndex_ = MutationHistoryStore::kRootOnly;
+    else if (historyStore_.hasRetry(m, r))
+        selectedRetryIndex_ = r;
+    else
+        selectedRetryIndex_ = MutationHistoryStore::kRootOnly;
 }
 
 void PatchMutatorEngine::refreshActionEnabledMirrors(juce::AudioProcessorValueTreeState&)
@@ -323,8 +425,10 @@ MutationRecipe PatchMutatorEngine::buildRecipeFromApvts() const
     return recipe;
 }
 
-PatchModel PatchMutatorEngine::resolveAuditionBuffer() const
+PatchModel PatchMutatorEngine::resolveAuditionBuffer()
 {
+    applySelectionFromApvts();
+
     if (historyStore_.isEmpty())
         return *patchModel_;
 

@@ -10,8 +10,17 @@
 #include "GUI/Widgets/ComboBox.h"
 #include "GUI/Widgets/Toggle.h"
 #include "Shared/Definitions/PluginDescriptors.h"
+#include "Shared/Definitions/PluginDisplayNames.h"
+#include "Shared/Definitions/PluginIDs.h"
 #include "GUI/Factories/WidgetFactory.h"
 #include "Core/Factories/ApvtsFactory.h"
+
+namespace
+{
+    namespace MutatorDisplayNames = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets;
+    namespace MutatorIds = PluginIDs::PatchManagerSection::PatchMutatorModule;
+    namespace MutatorState = MutatorIds::StateProperties;
+}
 
 PatchMutatorPanel::PatchMutatorPanel(TSS::ISkin& skin, const PatchMutatorPanelDimensions& dims, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : dims_(dims)
@@ -23,10 +32,21 @@ PatchMutatorPanel::PatchMutatorPanel(TSS::ISkin& skin, const PatchMutatorPanelDi
     setupAmountLine(skin, widgetFactory);
     setupRandomLine(skin, widgetFactory);
     setupHistoryLine(skin, widgetFactory);
+
+    if (! apvts_.state.hasProperty(MutatorState::kCompareActive))
+        apvts_.state.setProperty(MutatorState::kCompareActive, false, nullptr);
+
+    apvts_.state.addListener(this);
+    refreshHistoryMComboBox();
+    refreshHistoryRComboBox();
+
     setSize(dims_.width, dims_.height);
 }
 
-PatchMutatorPanel::~PatchMutatorPanel() = default;
+PatchMutatorPanel::~PatchMutatorPanel()
+{
+    apvts_.state.removeListener(this);
+}
 
 void PatchMutatorPanel::setupModuleHeader(TSS::ISkin& skin, WidgetFactory& widgetFactory)
 {
@@ -216,28 +236,53 @@ void PatchMutatorPanel::setupHistoryLine(TSS::ISkin& skin, WidgetFactory& widget
         dims_.labels.patchMutatorWidth,
         dims_.labels.height,
         TSS::labelLookFromSkin(skin),
-        PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kHistory);
+        MutatorDisplayNames::kHistory);
     addAndMakeVisible(*historyLabel_);
 
-    historyComboBox_ = std::make_unique<TSS::ComboBox>(
-        dims_.comboBoxes.patchMutatorHistoryWidth,
+    historyMComboBox_ = std::make_unique<TSS::ComboBox>(
+        dims_.comboBoxes.patchMutatorHistoryMWidth,
         dims_.comboBoxes.standardHeight,
         TSS::comboBoxLookFromSkin(skin),
         TSS::ComboBox::Style::Standard);
-    historyComboBox_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
-    historyComboBox_->addItem(PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEmptyHistory, 1);
-    historyComboBox_->setSelectedId(1);
-    historyComboBox_->onChange = [this]
+    historyMComboBox_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
+    historyMComboBox_->setTextWhenNothingSelected(MutatorDisplayNames::kEmptyHistorySentinel);
+    historyMComboBox_->onChange = [this]
     {
-        if (auto* comboBox = historyComboBox_.get())
-        {
-            apvts_.state.setProperty(
-                PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kHistory,
-                comboBox->getSelectedId(),
-                nullptr);
-        }
+        if (historyMComboBox_ == nullptr)
+            return;
+
+        const int selectedId = historyMComboBox_->getSelectedId();
+        if (selectedId <= 0 || selectedId > historyMRootIndices_.size())
+            return;
+
+        const int rootIndex = historyMRootIndices_[selectedId - 1];
+        apvts_.state.setProperty(MutatorState::kSelectedM, rootIndex, nullptr);
+        apvts_.state.setProperty(MutatorState::kSelectedR,
+                                 MutatorState::kSelectedRRootOnly,
+                                 nullptr);
     };
-    addAndMakeVisible(*historyComboBox_);
+    addAndMakeVisible(*historyMComboBox_);
+
+    historyRComboBox_ = std::make_unique<TSS::ComboBox>(
+        dims_.comboBoxes.patchMutatorHistoryRWidth,
+        dims_.comboBoxes.standardHeight,
+        TSS::comboBoxLookFromSkin(skin),
+        TSS::ComboBox::Style::Standard);
+    historyRComboBox_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
+    historyRComboBox_->onChange = [this]
+    {
+        if (historyRComboBox_ == nullptr)
+            return;
+
+        const int selectedId = historyRComboBox_->getSelectedId();
+        if (selectedId <= 0 || selectedId > historyRRetryIndices_.size())
+            return;
+
+        apvts_.state.setProperty(MutatorState::kSelectedR,
+                                 historyRRetryIndices_[selectedId - 1],
+                                 nullptr);
+    };
+    addAndMakeVisible(*historyRComboBox_);
 
     compareButton_ = widgetFactory.createStandaloneButton(
         PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kCompare,
@@ -266,6 +311,143 @@ void PatchMutatorPanel::setupHistoryLine(TSS::ISkin& skin, WidgetFactory& widget
         dims_.buttons.height);
     connectButtonToApvts(exportButton_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kExport);
     addAndMakeVisible(*exportButton_);
+}
+
+void PatchMutatorPanel::valueTreePropertyChanged(juce::ValueTree&,
+                                               const juce::Identifier& property)
+{
+    const auto name = property.toString();
+    if (name == MutatorState::kHistoryMList || name == MutatorState::kSelectedM)
+        refreshHistoryMComboBox();
+    if (name == MutatorState::kHistoryRList || name == MutatorState::kSelectedM
+        || name == MutatorState::kSelectedR)
+    {
+        refreshHistoryRComboBox();
+    }
+}
+
+void PatchMutatorPanel::valueTreeRedirected(juce::ValueTree&)
+{
+    refreshHistoryMComboBox();
+    refreshHistoryRComboBox();
+}
+
+juce::StringArray PatchMutatorPanel::parsePipeSeparatedList(const juce::String& encodedList)
+{
+    if (encodedList.isEmpty())
+        return {};
+
+    return juce::StringArray::fromTokens(encodedList, "|", "");
+}
+
+void PatchMutatorPanel::refreshHistoryMComboBox()
+{
+    if (historyMComboBox_ == nullptr)
+        return;
+
+    const auto mList = parsePipeSeparatedList(apvts_.state.getProperty(MutatorState::kHistoryMList).toString());
+    historyMComboBox_->clear(juce::dontSendNotification);
+    historyMRootIndices_.clear();
+
+    if (mList.isEmpty())
+    {
+        historyMComboBox_->setTextWhenNothingSelected(MutatorDisplayNames::kEmptyHistorySentinel);
+        historyMComboBox_->setSelectedId(0, juce::dontSendNotification);
+        historyMComboBox_->setEnabled(false);
+        if (historyRComboBox_ != nullptr)
+        {
+            historyRComboBox_->clear(juce::dontSendNotification);
+            historyRComboBox_->setSelectedId(0, juce::dontSendNotification);
+            historyRComboBox_->setEnabled(false);
+        }
+        return;
+    }
+
+    const auto selectedM = static_cast<int>(apvts_.state.getProperty(MutatorState::kSelectedM, -1));
+    for (int i = 0; i < mList.size(); ++i)
+    {
+        const auto label = mList[i];
+        const int rootIndex = label.substring(1, 3).getIntValue();
+        historyMRootIndices_.add(rootIndex);
+        historyMComboBox_->addItem(label, i + 1);
+    }
+
+    historyMComboBox_->setEnabled(true);
+    syncHistoryMSelectionFromApvts();
+}
+
+void PatchMutatorPanel::refreshHistoryRComboBox()
+{
+    if (historyRComboBox_ == nullptr || historyMComboBox_ == nullptr)
+        return;
+
+    const auto mList = parsePipeSeparatedList(apvts_.state.getProperty(MutatorState::kHistoryMList).toString());
+    if (mList.isEmpty())
+    {
+        historyRComboBox_->clear(juce::dontSendNotification);
+        historyRComboBox_->setSelectedId(0, juce::dontSendNotification);
+        historyRComboBox_->setEnabled(false);
+        return;
+    }
+
+    const auto rList = parsePipeSeparatedList(apvts_.state.getProperty(MutatorState::kHistoryRList).toString());
+    historyRComboBox_->clear(juce::dontSendNotification);
+    historyRRetryIndices_.clear();
+
+    for (int i = 0; i < rList.size(); ++i)
+    {
+        const int retryIndex = i == 0
+                                   ? MutatorState::kSelectedRRootOnly
+                                   : rList[i].substring(1, 3).getIntValue();
+        historyRRetryIndices_.add(retryIndex);
+        historyRComboBox_->addItem(rList[i], i + 1);
+    }
+
+    historyRComboBox_->setEnabled(true);
+    syncHistoryRSelectionFromApvts();
+}
+
+void PatchMutatorPanel::syncHistoryMSelectionFromApvts()
+{
+    if (historyMComboBox_ == nullptr)
+        return;
+
+    const int selectedM = static_cast<int>(apvts_.state.getProperty(MutatorState::kSelectedM, -1));
+    if (selectedM < 0)
+    {
+        historyMComboBox_->setSelectedId(0, juce::dontSendNotification);
+        return;
+    }
+
+    for (int i = 0; i < historyMRootIndices_.size(); ++i)
+    {
+        if (historyMRootIndices_[i] == selectedM)
+        {
+            historyMComboBox_->setSelectedId(i + 1, juce::dontSendNotification);
+            return;
+        }
+    }
+
+    historyMComboBox_->setSelectedId(0, juce::dontSendNotification);
+}
+
+void PatchMutatorPanel::syncHistoryRSelectionFromApvts()
+{
+    if (historyRComboBox_ == nullptr)
+        return;
+
+    const int selectedR = static_cast<int>(apvts_.state.getProperty(MutatorState::kSelectedR,
+                                                                    MutatorState::kSelectedRRootOnly));
+    for (int i = 0; i < historyRRetryIndices_.size(); ++i)
+    {
+        if (historyRRetryIndices_[i] == selectedR)
+        {
+            historyRComboBox_->setSelectedId(i + 1, juce::dontSendNotification);
+            return;
+        }
+    }
+
+    historyRComboBox_->setSelectedId(0, juce::dontSendNotification);
 }
 
 void PatchMutatorPanel::connectButtonToApvts(TSS::Button* button, const char* widgetId)
@@ -324,7 +506,8 @@ void PatchMutatorPanel::resized()
     if (randomSlider_)            randomSlider_->setUiScale(sf);
     if (retryButton_)             retryButton_->setUiScale(sf);
     if (historyLabel_)            historyLabel_->setUiScale(sf);
-    if (historyComboBox_)         historyComboBox_->setUiScale(sf);
+    if (historyMComboBox_)        historyMComboBox_->setUiScale(sf);
+    if (historyRComboBox_)        historyRComboBox_->setUiScale(sf);
     if (compareButton_)           compareButton_->setUiScale(sf);
     if (deleteButton_)            deleteButton_->setUiScale(sf);
     if (clearButton_)             clearButton_->setUiScale(sf);
@@ -390,7 +573,8 @@ void PatchMutatorPanel::layoutHistoryLine(int x, int y)
 
     const int labelW      = juce::roundToInt(static_cast<float>(dims_.labels.patchMutatorWidth) * sf);
     const int labelH      = juce::roundToInt(static_cast<float>(dims_.labels.height) * sf);
-    const int comboBoxW   = juce::roundToInt(static_cast<float>(dims_.comboBoxes.patchMutatorHistoryWidth) * sf);
+    const int comboBoxMW = juce::roundToInt(static_cast<float>(dims_.comboBoxes.patchMutatorHistoryMWidth) * sf);
+    const int comboBoxRW = juce::roundToInt(static_cast<float>(dims_.comboBoxes.patchMutatorHistoryRWidth) * sf);
     const int comboBoxH   = juce::roundToInt(static_cast<float>(dims_.comboBoxes.standardHeight) * sf);
     const int rowH          = juce::roundToInt(static_cast<float>(dims_.layout.contentRowHeight) * sf);
     const int labelY        = y + (rowH - labelH) / 2;
@@ -404,23 +588,26 @@ void PatchMutatorPanel::layoutHistoryLine(int x, int y)
 
     const float originX     = static_cast<float>(x);
     const float labelStep   = static_cast<float>(dims_.labels.patchMutatorWidth + controlGap) * sf;
-    const float comboStep   = static_cast<float>(dims_.comboBoxes.patchMutatorHistoryWidth + controlGap) * sf;
+    const float comboMStep  = static_cast<float>(dims_.comboBoxes.patchMutatorHistoryMWidth + controlGap) * sf;
+    const float comboRStep  = static_cast<float>(dims_.comboBoxes.patchMutatorHistoryRWidth + controlGap) * sf;
     const float compareStep = static_cast<float>(dims_.buttons.patchMutatorCompareWidth + controlGap) * sf;
     const float deleteStep  = static_cast<float>(dims_.buttons.patchMutatorDeleteWidth + controlGap) * sf;
     const float clearStep   = static_cast<float>(dims_.buttons.patchMutatorClearWidth + controlGap) * sf;
 
     if (auto* label = historyLabel_.get())
         label->setBounds(x, labelY, labelW, labelH);
-    if (auto* comboBox = historyComboBox_.get())
-        comboBox->setBounds(juce::roundToInt(originX + labelStep), comboBoxY, comboBoxW, comboBoxH);
+    if (auto* comboBox = historyMComboBox_.get())
+        comboBox->setBounds(juce::roundToInt(originX + labelStep), comboBoxY, comboBoxMW, comboBoxH);
+    if (auto* comboBox = historyRComboBox_.get())
+        comboBox->setBounds(juce::roundToInt(originX + labelStep + comboMStep), comboBoxY, comboBoxRW, comboBoxH);
     if (auto* button = compareButton_.get())
-        button->setBounds(juce::roundToInt(originX + labelStep + comboStep), y, compareW, buttonH);
+        button->setBounds(juce::roundToInt(originX + labelStep + comboMStep + comboRStep), y, compareW, buttonH);
     if (auto* button = deleteButton_.get())
-        button->setBounds(juce::roundToInt(originX + labelStep + comboStep + compareStep), y, deleteW, buttonH);
+        button->setBounds(juce::roundToInt(originX + labelStep + comboMStep + comboRStep + compareStep), y, deleteW, buttonH);
     if (auto* button = clearButton_.get())
-        button->setBounds(juce::roundToInt(originX + labelStep + comboStep + compareStep + deleteStep), y, clearW, buttonH);
+        button->setBounds(juce::roundToInt(originX + labelStep + comboMStep + comboRStep + compareStep + deleteStep), y, clearW, buttonH);
     if (auto* button = exportButton_.get())
-        button->setBounds(juce::roundToInt(originX + labelStep + comboStep + compareStep + deleteStep + clearStep), y, exportW, buttonH);
+        button->setBounds(juce::roundToInt(originX + labelStep + comboMStep + comboRStep + compareStep + deleteStep + clearStep), y, exportW, buttonH);
 }
 
 void PatchMutatorPanel::setSkin(TSS::ISkin& skin)
@@ -454,10 +641,15 @@ void PatchMutatorPanel::propagateSkinsToControlWidgets(TSS::ISkin& skin)
         randomSlider_->setLook(TSS::sliderLookFromSkin(skin));
     if (historyLabel_)
         historyLabel_->setLook(TSS::labelLookFromSkin(skin));
-    if (historyComboBox_)
+    if (historyMComboBox_)
     {
-        historyComboBox_->setLook(TSS::comboBoxLookFromSkin(skin));
-        historyComboBox_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
+        historyMComboBox_->setLook(TSS::comboBoxLookFromSkin(skin));
+        historyMComboBox_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
+    }
+    if (historyRComboBox_)
+    {
+        historyRComboBox_->setLook(TSS::comboBoxLookFromSkin(skin));
+        historyRComboBox_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
     }
     if (mutateButton_)
         mutateButton_->setLook(TSS::buttonLookFromSkin(skin));

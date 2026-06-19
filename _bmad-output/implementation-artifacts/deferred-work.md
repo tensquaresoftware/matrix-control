@@ -1,5 +1,22 @@
 # Deferred Work
 
+- **Panel M change leaves R list stale until processor hook** — resolved 1+2: sync reads APVTS in 6.6; 7.4 processor calls `syncHistoryUiProperties` on `kSelectedM` change for full panel UX.
+
+## Deferred from: code review of 6-6-history-m-and-r-ui-properties (2026-06-20)
+
+- **`auditionSelectedHistoryEntry()` stub** — story 6.7 audition SysEx.
+- **`syncHistoryUiProperties` after delete/clear/export** — stories 6.9+ store mutations.
+- **Preset migration `patchMutatorHistory` → M/R properties** — brownfield, no migration story.
+- **`resolveAuditionBuffer` non-const side-effect** — intentional AC#4 apply-before-resolve.
+- **`applySelectionFromApvts` skip when `kSelectedM` absent** — preserves `setAuditionSelection()` for 6.4/6.5 tests.
+- **`resolveSelectedRootIndex()` caller contract** — safe today because `retry()` calls apply first.
+- **`kCompareActive` not consumed by panel** — story 6.8 COMPARE toggle.
+- **No GUI panel tests** — AC#8 scoped to engine unit tests.
+- **DAW reload APVTS mirrors vs empty session store** — story 6.13 clear-on-patch-load.
+- **Corrupt/malformed APVTS / non-integer property coercion** — host edge cases.
+- **24px combo width clipping** — minor UX.
+- **Descriptor registration vs manual panel combo wiring** — existing project pattern.
+
 ## Deferred from: code review of 6-4-mutate-action (2026-06-19)
 
 - **Constructor 7 parameters vs Clean Code 3-param limit** (`PatchMutatorEngine.h:33-39`) — Guillaume chose option 3: defer `PatchMutatorEngineDeps` struct to Story 7.4 composition root; keep seven DI args for 6.4 as spec-written.

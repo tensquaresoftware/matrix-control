@@ -20,7 +20,8 @@ namespace TSS
 
 class WidgetFactory;
 
-class PatchMutatorPanel : public juce::Component
+class PatchMutatorPanel : public juce::Component,
+                          public juce::ValueTree::Listener
 {
 public:
     PatchMutatorPanel(TSS::ISkin& skin, const PatchMutatorPanelDimensions& dims, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
@@ -29,6 +30,14 @@ public:
     void resized() override;
     void setSkin(TSS::ISkin& skin);
     void setUiScale(float uiScale);
+
+    void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
+                                  const juce::Identifier& property) override;
+    void valueTreeChildAdded(juce::ValueTree&, juce::ValueTree&) override {}
+    void valueTreeChildRemoved(juce::ValueTree&, juce::ValueTree&, int) override {}
+    void valueTreeChildOrderChanged(juce::ValueTree&, int, int) override {}
+    void valueTreeParentChanged(juce::ValueTree&) override {}
+    void valueTreeRedirected(juce::ValueTree&) override;
 
 private:
     PatchMutatorPanelDimensions dims_;
@@ -57,11 +66,15 @@ private:
     std::unique_ptr<TSS::Toggle> lfo2Toggle_;
 
     std::unique_ptr<TSS::Label> historyLabel_;
-    std::unique_ptr<TSS::ComboBox> historyComboBox_;
+    std::unique_ptr<TSS::ComboBox> historyMComboBox_;
+    std::unique_ptr<TSS::ComboBox> historyRComboBox_;
     std::unique_ptr<TSS::Button> compareButton_;
     std::unique_ptr<TSS::Button> deleteButton_;
     std::unique_ptr<TSS::Button> clearButton_;
     std::unique_ptr<TSS::Button> exportButton_;
+
+    juce::Array<int> historyMRootIndices_;
+    juce::Array<int> historyRRetryIndices_;
 
     void propagateSkinsToControlWidgets(TSS::ISkin& skin);
     void propagateSkinsToToggleWidgets(TSS::ISkin& skin);
@@ -72,6 +85,12 @@ private:
     void setupHistoryLine(TSS::ISkin& skin, WidgetFactory& widgetFactory);
     void connectButtonToApvts(TSS::Button* button, const char* widgetId);
     void connectToggleToApvts(TSS::Toggle* toggle, const char* widgetId);
+
+    void refreshHistoryMComboBox();
+    void refreshHistoryRComboBox();
+    void syncHistoryMSelectionFromApvts();
+    void syncHistoryRSelectionFromApvts();
+    static juce::StringArray parsePipeSeparatedList(const juce::String& encodedList);
 
     void layoutSliderLine(int x, int y, TSS::Label* label, TSS::Slider* slider, TSS::Button* button,
                           const std::vector<TSS::Toggle*>& toggles, int actionButtonWidth);

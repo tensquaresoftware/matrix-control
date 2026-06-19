@@ -18,8 +18,11 @@
 #include "Core/Services/PatchMutator/MutationNaming.h"
 #include "Core/Services/PatchMutator/PatchMutatorEngine.h"
 #include "Shared/Definitions/PluginIDs.h"
+#include "Shared/Definitions/PluginDisplayNames.h"
 
 namespace PatchMutator = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets;
+namespace MutatorState = PluginIDs::PatchManagerSection::PatchMutatorModule::StateProperties;
+namespace MutatorDisplayNames = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets;
 
 class TestAudioProcessorMutator : public juce::AudioProcessor
 {
@@ -76,6 +79,15 @@ public:
         retry_sendsSysExOnce();
         retry_neverDeletesExistingRetries();
         retry_staysUnderSameRoot();
+
+        sync_emptyHistory_emptySentinel();
+        sync_afterInsertRoot_listsAndSelectsNewRoot();
+        sync_sortedRoots_numericOrder();
+        sync_retryListForSelectedRoot();
+        sync_changingSelectedM_rebuildsRList();
+        applySelectionFromApvts_drivesAudition();
+        mutate_success_updatesApvtsHistory();
+        retry_success_updatesApvtsHistory();
     }
 
 private:
@@ -513,6 +525,173 @@ private:
         expect(result.success);
         expectEquals(harness.engine.rootCount(), rootsBefore);
         expect(harness.store().hasRoot(0));
+    }
+
+    void sync_emptyHistory_emptySentinel()
+    {
+        beginTest("sync_emptyHistory_emptySentinel");
+
+        EngineHarness harness;
+        harness.engine.syncHistoryUiProperties(harness.proc.apvts);
+
+        expect(harness.proc.apvts.state.getProperty(MutatorState::kHistoryMList).toString().isEmpty());
+        expect(harness.proc.apvts.state.getProperty(MutatorState::kHistoryRList).toString().isEmpty());
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedM)), -1);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedR)),
+                     Core::MutationHistoryStore::kRootOnly);
+    }
+
+    void sync_afterInsertRoot_listsAndSelectsNewRoot()
+    {
+        beginTest("sync_afterInsertRoot_listsAndSelectsNewRoot");
+
+        EngineHarness harness;
+        harness.setRecipe(100, 100, true);
+
+        const auto result = harness.engine.mutate();
+        expect(result.success);
+
+        const auto mList = harness.proc.apvts.state.getProperty(MutatorState::kHistoryMList).toString();
+        expect(mList.contains("M00"));
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedM)), 0);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedR)),
+                     Core::MutationHistoryStore::kRootOnly);
+    }
+
+    void sync_sortedRoots_numericOrder()
+    {
+        beginTest("sync_sortedRoots_numericOrder");
+
+        EngineHarness harness;
+
+        const auto parent = makeDistinctBuffer(201);
+        expect(harness.store().insertRoot(5, makeDistinctBuffer(205), parent));
+        expect(harness.store().insertRoot(0, makeDistinctBuffer(200), parent));
+        expect(harness.store().insertRoot(2, makeDistinctBuffer(202), parent));
+
+        harness.engine.setAuditionSelection(2, Core::MutationHistoryStore::kRootOnly);
+        harness.engine.syncHistoryUiProperties(harness.proc.apvts);
+
+        expectEquals(harness.proc.apvts.state.getProperty(MutatorState::kHistoryMList).toString(),
+                     juce::String("M00|M02|M05"));
+    }
+
+    void sync_retryListForSelectedRoot()
+    {
+        beginTest("sync_retryListForSelectedRoot");
+
+        EngineHarness harness;
+
+        const auto parent = makeDistinctBuffer(301);
+        auto m05 = makeDistinctBuffer(305);
+        Core::MutationNaming::applyPatchName(m05, 5);
+        expect(harness.store().insertRoot(5, m05, parent));
+
+        auto r00 = makeDistinctBuffer(310);
+        Core::MutationNaming::applyPatchName(r00, 5, 0);
+        expect(harness.store().insertRetry(5, 0, r00, parent));
+
+        auto r02 = makeDistinctBuffer(312);
+        Core::MutationNaming::applyPatchName(r02, 5, 2);
+        expect(harness.store().insertRetry(5, 2, r02, parent));
+
+        harness.engine.setAuditionSelection(5, Core::MutationHistoryStore::kRootOnly);
+        harness.engine.syncHistoryUiProperties(harness.proc.apvts);
+
+        const auto rList = harness.proc.apvts.state.getProperty(MutatorState::kHistoryRList).toString();
+        const auto expectedRList = MutatorDisplayNames::kHistoryRootSentinel + "|R00|R02";
+        expectEquals(rList, expectedRList);
+    }
+
+    void sync_changingSelectedM_rebuildsRList()
+    {
+        beginTest("sync_changingSelectedM_rebuildsRList");
+
+        EngineHarness harness;
+
+        const auto parent = makeDistinctBuffer(401);
+        expect(harness.store().insertRoot(2, makeDistinctBuffer(402), parent));
+        expect(harness.store().insertRoot(5, makeDistinctBuffer(405), parent));
+
+        auto rOnM02 = makeDistinctBuffer(412);
+        Core::MutationNaming::applyPatchName(rOnM02, 2, 1);
+        expect(harness.store().insertRetry(2, 1, rOnM02, parent));
+
+        auto rOnM05 = makeDistinctBuffer(415);
+        Core::MutationNaming::applyPatchName(rOnM05, 5, 3);
+        expect(harness.store().insertRetry(5, 3, rOnM05, parent));
+
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedM, 2, nullptr);
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedR,
+                                             MutatorState::kSelectedRRootOnly,
+                                             nullptr);
+        harness.engine.syncHistoryUiProperties(harness.proc.apvts);
+        const auto rListM02 = harness.proc.apvts.state.getProperty(MutatorState::kHistoryRList).toString();
+
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedM, 5, nullptr);
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedR,
+                                             MutatorState::kSelectedRRootOnly,
+                                             nullptr);
+        harness.engine.syncHistoryUiProperties(harness.proc.apvts);
+        const auto rListM05 = harness.proc.apvts.state.getProperty(MutatorState::kHistoryRList).toString();
+
+        expect(rListM02.contains("R01"));
+        expect(rListM05.contains("R03"));
+        expect(rListM02 != rListM05);
+    }
+
+    void applySelectionFromApvts_drivesAudition()
+    {
+        beginTest("applySelectionFromApvts_drivesAudition");
+
+        EngineHarness harness;
+
+        const auto parent = makeDistinctBuffer(501);
+        auto m02 = makeDistinctBuffer(502);
+        Core::MutationNaming::applyPatchName(m02, 2);
+        expect(harness.store().insertRoot(2, m02, parent));
+
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedM, 2, nullptr);
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedR,
+                                             Core::MutationHistoryStore::kRootOnly,
+                                             nullptr);
+        harness.engine.applySelectionFromApvts();
+
+        const auto audition = harness.engine.resolveAuditionBuffer();
+        expect(std::memcmp(audition.data(), m02.data(), Core::PatchModel::kBufferSize) == 0);
+    }
+
+    void mutate_success_updatesApvtsHistory()
+    {
+        beginTest("mutate_success_updatesApvtsHistory");
+
+        EngineHarness harness;
+        harness.setRecipe(100, 100, true);
+
+        const auto result = harness.engine.mutate();
+        expect(result.success);
+        expect(! harness.proc.apvts.state.getProperty(MutatorState::kHistoryMList).toString().isEmpty());
+    }
+
+    void retry_success_updatesApvtsHistory()
+    {
+        beginTest("retry_success_updatesApvtsHistory");
+
+        EngineHarness harness;
+        harness.setRecipe(100, 100, true);
+
+        auto m00 = makeDistinctBuffer(601);
+        auto m00Parent = makeDistinctBuffer(602);
+        Core::MutationNaming::applyPatchName(m00, 0);
+        expect(harness.store().insertRoot(0, m00, m00Parent));
+        harness.engine.syncHistoryUiProperties(harness.proc.apvts);
+
+        const auto result = harness.engine.retry();
+        expect(result.success);
+
+        const auto rList = harness.proc.apvts.state.getProperty(MutatorState::kHistoryRList).toString();
+        expect(rList.contains("R00"));
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedR)), 0);
     }
 };
 
