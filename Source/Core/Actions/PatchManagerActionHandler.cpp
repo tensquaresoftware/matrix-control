@@ -127,11 +127,8 @@ namespace Core
             current.bank = getCurrentBank(limits);
             current.patch = getCurrentPatch(limits);
 
-            const bool banksLocked = static_cast<bool>(apvts_.state.getProperty(
-                BankUtilityModule::StateProperties::kBanksLocked,
-                false));
-
-            applyPatchCoordinates(limits.advancePatch(current, direction, banksLocked), limits);
+            // Display-only lock indicator (D-023a-R3); navigation must not read kBanksLocked.
+            applyPatchCoordinates(limits.advancePatch(current, direction), limits);
             return;
         }
 

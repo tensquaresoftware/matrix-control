@@ -41,9 +41,9 @@ FR-16: Master parameter editing — Each MASTER change sends complete master Sys
 FR-17: Master module init confirmation — MASTER module Init requires confirmation dialog; PATCH Init does not.
 FR-18: Master file operations via Settings — Load/Save Master, Save as default init, Init all, library actions on Settings page only.
 FR-19: Bank selection — Buttons 0–9 set active bank; red text on selected bank button.
-FR-20: Bank lock — UNLOCK sends `0CH`; bank select sends `0AH` (locks); `patchManagerBanksLocked` mirrors hardware; red dot on Internal Patches bank NumberBox when locked.
+FR-20: Bank lock — UNLOCK sends `0CH` only; bank select sends `0AH`; action-derived red dot on Current Bank NumberBox (on after bank select, off after UNLOCK); no navigation coupling.
 FR-21: Bank selection exclusivity — No separate bank NumberBox in Internal Patches; bank via Bank Utility only.
-FR-22: Patch navigation — `<` / `>` and NumberBox with wrap across banks when unlocked.
+FR-22: Patch navigation — `<` / `>` and NumberBox wrap within current bank only; bank change via Bank Utility 0–9.
 FR-23: ROM gating — PASTE/STORE disabled on ROM banks 2–9 with footer warning.
 FR-24: Internal patch operations — INIT/COPY/PASTE/STORE via ActionDispatcher; COPY snapshots APVTS patch buffer; STORE to synth RAM rules.
 FR-51: Unsaved patch edit warning — Confirm dialog when navigating away with unsaved edits (internal or Computer Patches); Settings policy always/never warn.
@@ -1154,6 +1154,28 @@ So that bank lock behaviour matches Oberheim spec (FR-20 corrected).
 **And** all IDs renamed: `bankUtilityUnlockBank`, `patchManagerBanksLocked`, display UNLOCK
 **And** unit tests updated; grep anchors clean
 
+**ERRATA (2026-06-19 — Correct Course D-023-R2):** AC lock mirror and cross-bank navigation **superseded** by Story **7-3c**. ID renames (AC above) remain valid.
+
+### Story 7-3c: Bank Utility UNLOCK Simplify (MIDI-only)
+
+As a sound designer,
+I want UNLOCK to send remote SysEx only and patch navigation to stay within the current bank,
+So that plugin behaviour matches hardware limits without false lock/cross-bank state (FR-20, FR-22 corrected).
+
+**Acceptance Criteria:**
+
+**Given** Story 7-3b ID renames landed
+**When** user clicks UNLOCK on Matrix-1000/1000R
+**Then** handler sends `0CH` only; sets lock **indicator** false (dot off); no bank/patch coordinate change; no `clearSyncedBankState()`
+**When** user selects bank 0–9
+**Then** bank APVTS + Set Bank + Program Change unchanged from 7-3b; lock **indicator** true (dot on)
+**When** user navigates with Prev/Next or patch NumberBox
+**Then** patch wraps within current bank only (99→0, 0→99); bank never changes via navigation; lock indicator unchanged
+**And** lock indicator property is **display-only** — navigation code must not read it (grep-clean in `DeviceMemoryLimits`, `PatchManagerActionHandler` Prev/Next paths)
+**And** `markBanksLockedInApvts` removed from navigation paths; indicator set only on bank select / UNLOCK / Set Bank send paths
+**And** tests updated: remove cross-bank/unlock-sync tests; add intra-bank wrap + `unlock_doesNotChangeApvtsCoordinates` + indicator on/off assertions
+**And** Matrix-6/6R: Bank Utility grayed; no `0AH`/`0CH`; indicator N/A
+
 ### Story 7.4: MutatorActionHandler
 
 As a sound designer,
@@ -1175,9 +1197,9 @@ So that bank selection matches synth semantics (FR-19, FR-20, FR-21).
 
 **Acceptance Criteria:**
 
-**Given** Story 7-3b
+**Given** Story 7-3c
 **When** user selects bank or clicks UNLOCK
-**Then** selected bank shows red text; Internal Patches bank NumberBox shows red dot when `patchManagerBanksLocked`; UNLOCK button has no padlock icon; no duplicate bank-select control in Internal Patches
+**Then** selected bank shows red text on Bank Utility 0–9; Current Bank NumberBox shows red dot when lock indicator is on (D-023a-R3); UNLOCK button has no padlock icon; optional footer on UNLOCK click per D-022-R4
 **And** `selectedBank` APVTS property stays in sync
 
 ### Story 7.6: Internal Patches Panel Wiring
@@ -1190,7 +1212,7 @@ So that RAM/ROM rules apply in UI (FR-22, FR-23, FR-24).
 
 **Given** Story 7.3
 **When** user navigates with `<` `>` or NumberBox
-**Then** wrap across banks when unlocked; ROM banks 2–9 gray PASTE/STORE with footer on attempt
+**Then** patch navigation wraps within current bank only (99→0, 0→99); ROM banks 2–9 gray PASTE/STORE with footer on attempt
 **And** STORE sends patch per Matrix-1000 RAM rules
 
 ### Story 7.7: Settings Page Consolidation

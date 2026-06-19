@@ -18,8 +18,7 @@ public:
         testMatrix6RLimits();
         testUnknownDefaultsToMatrix1000();
         testMatrix6CyclicWrap();
-        testMatrix1000InterBankWrapUnlocked();
-        testMatrix1000LockedWrapWithinBank();
+        testMatrix1000WrapWithinBank();
         testRomGatingMatrix1000Only();
         testDeviceTypeRegistryMemberBytes();
     }
@@ -77,55 +76,44 @@ private:
 
         const auto limits = Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix6);
 
-        const auto from99 = limits.advancePatch({ 0, Matrix6Or6RLimits::kMaxPatchNumber }, 1, false);
+        const auto from99 = limits.advancePatch({ 0, Matrix6Or6RLimits::kMaxPatchNumber }, 1);
         expectEquals(from99.bank, 0);
         expectEquals(from99.patch, Matrix6Or6RLimits::kMinPatchNumber);
 
-        const auto from00 = limits.advancePatch({ 0, Matrix6Or6RLimits::kMinPatchNumber }, -1, false);
+        const auto from00 = limits.advancePatch({ 0, Matrix6Or6RLimits::kMinPatchNumber }, -1);
         expectEquals(from00.bank, 0);
         expectEquals(from00.patch, Matrix6Or6RLimits::kMaxPatchNumber);
     }
 
-    void testMatrix1000InterBankWrapUnlocked()
+    void testMatrix1000WrapWithinBank()
     {
-        beginTest("advancePatch — Matrix-1000 inter-bank wrap when unlocked");
+        beginTest("advancePatch — Matrix-1000 always wraps within bank");
 
         const auto limits = Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000);
 
-        const auto nextBank = limits.advancePatch(
+        const auto nextWrap = limits.advancePatch(
             { 0, Matrix1000Limits::kMaxPatchNumber },
-            1,
-            false);
-        expectEquals(nextBank.bank, 1);
-        expectEquals(nextBank.patch, Matrix1000Limits::kMinPatchNumber);
+            1);
+        expectEquals(nextWrap.bank, 0);
+        expectEquals(nextWrap.patch, Matrix1000Limits::kMinPatchNumber);
 
-        const auto prevBank = limits.advancePatch(
-            { 1, Matrix1000Limits::kMinPatchNumber },
-            -1,
-            false);
-        expectEquals(prevBank.bank, 0);
-        expectEquals(prevBank.patch, Matrix1000Limits::kMaxPatchNumber);
-
-        const auto wrapToLastBank = limits.advancePatch(
+        const auto lowestAddressPrevWrap = limits.advancePatch(
             { Matrix1000Limits::kMinBankNumber, Matrix1000Limits::kMinPatchNumber },
-            -1,
-            false);
-        expectEquals(wrapToLastBank.bank, Matrix1000Limits::kMaxBankNumber);
-        expectEquals(wrapToLastBank.patch, Matrix1000Limits::kMaxPatchNumber);
-    }
+            -1);
+        expectEquals(lowestAddressPrevWrap.bank, Matrix1000Limits::kMinBankNumber);
+        expectEquals(lowestAddressPrevWrap.patch, Matrix1000Limits::kMaxPatchNumber);
 
-    void testMatrix1000LockedWrapWithinBank()
-    {
-        beginTest("advancePatch — Matrix-1000 locked wraps within bank only");
+        const auto prevWrap = limits.advancePatch(
+            { 1, Matrix1000Limits::kMinPatchNumber },
+            -1);
+        expectEquals(prevWrap.bank, 1);
+        expectEquals(prevWrap.patch, Matrix1000Limits::kMaxPatchNumber);
 
-        const auto limits = Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000);
-
-        const auto wrapped = limits.advancePatch(
+        const auto midBankWrap = limits.advancePatch(
             { 3, Matrix1000Limits::kMaxPatchNumber },
-            1,
-            true);
-        expectEquals(wrapped.bank, 3);
-        expectEquals(wrapped.patch, Matrix1000Limits::kMinPatchNumber);
+            1);
+        expectEquals(midBankWrap.bank, 3);
+        expectEquals(midBankWrap.patch, Matrix1000Limits::kMinPatchNumber);
     }
 
     void testRomGatingMatrix1000Only()

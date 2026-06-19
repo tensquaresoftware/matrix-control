@@ -286,7 +286,7 @@ User selects active bank via buttons 0–9; Core pushes `selectedBank` to APVTS;
 
 #### FR-20: Bank lock
 
-Bank Utility provides bank buttons 0–9 (Set Bank / `0AH`, enables hardware bank lock) and an **UNLOCK** button (Unlock Bank / `0CH`). Editor state `patchManagerBanksLocked` mirrors hardware lock for navigation wrap and UI indicators. No lock toggle on Bank Utility. Internal Patches bank NumberBox shows a red lock indicator when banks are locked. Master Edit **BANK LOCK** (`miscBankLockEnable`) is a separate master parameter (byte 165).
+Bank Utility provides bank buttons 0–9 (Set Bank / `0AH`) and an **UNLOCK** button (Unlock Bank / `0CH`). **UNLOCK** sends `0CH` only — a remote helper for synth front-panel bank lock release; it does **not** change bank or patch coordinates. An **action-derived** lock indicator (red dot on Internal Patches Current Bank NumberBox) turns **on** when the user selects a bank via buttons 0–9 (or any plugin path that sends Set Bank) and **off** when the user clicks UNLOCK; it approximates the Matrix-1000 display lock symbol but does **not** read hardware state and does **not** affect navigation. **Control-surface policy (D-022-R6):** during a plugin session, the user operates the synth via Matrix-Control only; front-panel hardware changes are out of sync scope — to be documented in the user manual. Bank Utility layout (module title **BANK UTILITY**, label **SELECT BANK**, buttons 0–9, UNLOCK) is frozen per Figma 4 px grid. Master Edit **BANK LOCK** (`miscBankLockEnable`) is a separate master parameter (byte 165).
 
 #### FR-21: Bank selection exclusivity
 
@@ -300,7 +300,7 @@ Internal Patches does **not** provide a separate bank NumberBox — bank selecti
 
 #### FR-22: Patch navigation
 
-User navigates patch number via `<` / `>` and editable patch NumberBox; navigation wraps across banks when no bank is locked (patch 99 → patch 00 next bank).
+User navigates patch number via `<` / `>` and editable patch NumberBox; navigation **always** wraps within the current bank (patch 99 → patch 00, patch 00 → patch 99). Bank change is **only** via Bank Utility buttons 0–9. After UNLOCK, the user may use the synth front panel for 3-digit entry; plugin Prev/Next without re-selecting bank may diverge from hardware — accepted limitation, optionally documented in footer on UNLOCK click.
 
 #### FR-23: ROM gating
 

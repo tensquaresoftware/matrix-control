@@ -83,6 +83,9 @@ void InternalPatchesPanel::valueTreePropertyChanged(
         clipboardPasteEnabled_ = static_cast<bool>(treeWhosePropertyHasChanged.getProperty(property, false));
         refreshDeviceLimits();
     }
+
+    if (propertyName == PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties::kBanksLocked)
+        refreshBankLockIndicator();
 }
 
 void InternalPatchesPanel::valueTreeRedirected(juce::ValueTree&)
@@ -224,8 +227,20 @@ void InternalPatchesPanel::refreshDeviceLimits()
         PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCurrentBankNumber,
         Matrix1000Limits::kMinBankNumber));
     updatePasteStoreEnabled(limits, currentBank);
+    refreshBankLockIndicator();
 
     resized();
+}
+
+void InternalPatchesPanel::refreshBankLockIndicator()
+{
+    if (currentBankNumber == nullptr)
+        return;
+
+    const bool banksLocked = static_cast<bool>(apvts_.state.getProperty(
+        PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties::kBanksLocked,
+        false));
+    currentBankNumber->setShowDot(bankNumberVisible_ && banksLocked);
 }
 
 void InternalPatchesPanel::applyPatchNumberRange(const Core::DeviceMemoryLimits& limits)
@@ -306,7 +321,7 @@ void InternalPatchesPanel::setupCurrentBankNumberBox(TSS::ISkin& skin)
         false,
         Matrix1000Limits::kMinBankNumber,
         Matrix1000Limits::kMaxBankNumber);
-    currentBankNumber->setShowDot(true);
+    currentBankNumber->setShowDot(false);
     addAndMakeVisible(*currentBankNumber);
 }
 

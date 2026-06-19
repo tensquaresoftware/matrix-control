@@ -83,8 +83,7 @@ namespace Core
     }
 
     PatchCoordinates DeviceMemoryLimits::advancePatch(PatchCoordinates current,
-                                                      int direction,
-                                                      bool bankLocked) const noexcept
+                                                      int direction) const noexcept
     {
         const int step = direction < 0 ? -1 : 1;
         auto result = current;
@@ -96,7 +95,7 @@ namespace Core
             return result;
         }
 
-        int nextPatch = current.patch + step;
+        const int nextPatch = current.patch + step;
 
         if (nextPatch >= minPatchNumber_ && nextPatch <= maxPatchNumber_)
         {
@@ -104,39 +103,8 @@ namespace Core
             return result;
         }
 
-        if (bankLocked)
-        {
-            result.patch = wrapPatchWithinDevice(current, step);
-            return result;
-        }
-
-        if (step > 0)
-        {
-            if (current.bank < maxBankNumber_)
-            {
-                result.bank = current.bank + 1;
-                result.patch = minPatchNumber_;
-            }
-            else
-            {
-                result.bank = minBankNumber_;
-                result.patch = minPatchNumber_;
-            }
-        }
-        else
-        {
-            if (current.bank > minBankNumber_)
-            {
-                result.bank = current.bank - 1;
-                result.patch = maxPatchNumber_;
-            }
-            else
-            {
-                result.bank = maxBankNumber_;
-                result.patch = maxPatchNumber_;
-            }
-        }
-
+        result.patch = wrapPatchWithinDevice(current, step);
+        result.bank = current.bank;
         return result;
     }
 }

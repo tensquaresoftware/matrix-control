@@ -74,6 +74,7 @@ private:
     void setupStorePatchButton(TSS::ISkin& skin, WidgetFactory& widgetFactory);
 
     void refreshDeviceLimits();
+    void refreshBankLockIndicator();
     void applyPatchNumberRange(const Core::DeviceMemoryLimits& limits);
     void updatePasteStoreEnabled(const Core::DeviceMemoryLimits& limits, int currentBank);
 

@@ -269,3 +269,10 @@
 
 - **`signBitPosition` undefined for `maxValue ≤ 0` or non-`2^n−1` ranges** (`Source/Core/Models/PatchModel.cpp:53-58`) — `jlimit` acts as a safety net so no current descriptor is affected; revisit if a signed descriptor with a non-power-of-two max is ever added.
 - **`getChoiceIndex` silently clamps stale/corrupt buffer bytes** (`Source/Core/Models/PatchModel.cpp:40`) — defensive clamping via `jmax`/`jlimit` is correct for the current descriptor set; add `jassert(!descriptor.choices.isEmpty())` if a stricter contract is desired.
+
+## Deferred from: code review of 7-3c-bank-utility-unlock-simplify (2026-06-19)
+
+- **Point rouge transitoire « off » lors d'une sélection de banque** (`InternalPatchesPanel.cpp:76-88`) — `kCurrentBankNumber` déclenche `refreshBankLockIndicator` avant `markBanksLockedInApvts()` ; état final correct ; risque visuel faible.
+- **Nom `kBanksLocked` ne reflète plus la sémantique display-only** — dette sémantique pré-existante ; rename hors scope 7-3c.
+- **Commande grep AC#9 dans la story** — chemin répertoire inexistant ; cosmétique doc.
+- **`InternalPatchesPanel.cpp/.h` absents du File List story** — wiring indicateur AC#7 ; mettre à jour le File List.

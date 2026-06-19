@@ -21,7 +21,8 @@ updated: 2026-06-19
 
 Status: done
 
-<!-- Ultimate context engine analysis completed — comprehensive developer guide created -->
+> **ERRATA (2026-06-19 — Correct Course D-023-R2):** AC #1–3 (lock mirror, cross-bank navigation, `patchManagerBanksLocked` semantics) are **superseded** by Story **7-3c**. AC #4 (ID renames) remains valid. See `Documentation/Development/Plans/2026/06/2026-06-19-Correct-Course-Bank-Utility-Unlock-Simplify-Handoff.md` and `sprint-change-proposal-2026-06-19-bank-unlock-simplify.md`.
+
 
 ## Story
 

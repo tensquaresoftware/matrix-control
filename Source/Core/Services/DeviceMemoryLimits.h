@@ -27,8 +27,7 @@ namespace Core
         bool isPasteStoreAllowed(int bankNumber) const noexcept;
 
         PatchCoordinates advancePatch(PatchCoordinates current,
-                                    int direction,
-                                    bool bankLocked) const noexcept;
+                                    int direction) const noexcept;
 
         int wrapPatchWithinDevice(PatchCoordinates current, int direction) const noexcept;
 
