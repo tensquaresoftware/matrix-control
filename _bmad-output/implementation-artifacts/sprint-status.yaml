@@ -1,5 +1,5 @@
 # generated: 2026-05-29
-# last_updated: 2026-06-19 (6-3 MutationNaming — done)
+# last_updated: 2026-06-19 (6-4 mutate-action — done)
 # project: Matrix-Control
 # project_key: NOKEY
 # tracking_system: file-system
@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-05-29
-last_updated: 2026-06-19 (6-3 MutationNaming — done)
+last_updated: 2026-06-19 (6-4 mutate-action — done)
 project: Matrix-Control
 project_key: NOKEY
 tracking_system: file-system
@@ -102,7 +102,7 @@ development_status:
   6-1-mutationalgorithm-specification: done
   6-2-mutationhistorystore-two-level-mr: done
   6-3-mutationnaming-and-display-names: done
-  6-4-mutate-action: backlog
+  6-4-mutate-action: done
   6-5-retry-from-parent-snapshot: backlog
   6-6-history-m-and-r-ui-properties: backlog
   6-7-history-selection-audition-with-debounce: backlog

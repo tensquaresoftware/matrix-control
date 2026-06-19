@@ -1,5 +1,13 @@
 # Deferred Work
 
+## Deferred from: code review of 6-4-mutate-action (2026-06-19)
+
+- **Constructor 7 parameters vs Clean Code 3-param limit** (`PatchMutatorEngine.h:33-39`) — Guillaume chose option 3: defer `PatchMutatorEngineDeps` struct to Story 7.4 composition root; keep seven DI args for 6.4 as spec-written.
+- **`mutate()` exceeds 20-line orchestration limit** (`PatchMutatorEngine.cpp:72-137`) — style debt; extract early-return helpers in a focused cleanup pass.
+- **No documented thread-safety contract on `PatchMutatorEngine`** (`PatchMutatorEngine.h`) — message-thread assumption matches other Core services; document when Story 7.4 wires processor.
+- **Silent fallback to live patch when history entry missing** (`PatchMutatorEngine.cpp:241-255`) — defensive; store should stay internally consistent.
+- **Negative `getCurrentPatchNumber()` not rejected before `sendPatch`** (`PatchMutatorEngine.cpp:263-268`) — `jlimit(0,255)` clamps; callback contract owned by 7.4 composition root.
+
 ## Deferred from: code review of 6-2-mutationhistorystore-two-level-mr (2026-06-19)
 
 - **Full `Matrix-Control_Tests` target not green** — pre-existing `MidiActivityTrackerTests` failure; all 11 `MutationHistoryStore` tests pass.
