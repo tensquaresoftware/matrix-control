@@ -750,6 +750,8 @@ namespace PluginDisplayNames
         namespace ComputerPatchesModule
         {
             constexpr const char* kName = "COMPUTER PATCHES";
+            constexpr const char* kEmptySentinel = "<EMPTY!>";
+            constexpr const char* kSelectSentinel = "<SELECT>";
 
             namespace FooterMessages
             {

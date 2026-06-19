@@ -11,6 +11,11 @@
 #include "Panels/MainComponent/FooterPanel/FooterPanel.h"
 #include "GUI/Widgets/ModuleHeader.h"
 
+namespace Core
+{
+    class PatchFileService;
+}
+
 namespace TSS
 {
     class Skin;
@@ -21,7 +26,11 @@ class WidgetFactory;
 class MainComponent : public juce::Component
 {
 public:
-    MainComponent(TSS::Skin& skin, const GuiLayoutDimensions& layoutDimensions, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    MainComponent(TSS::Skin& skin,
+                  const GuiLayoutDimensions& layoutDimensions,
+                  WidgetFactory& widgetFactory,
+                  juce::AudioProcessorValueTreeState& apvts,
+                  const Core::PatchFileService& patchFileService);
     ~MainComponent() override = default;
 
     void paint(juce::Graphics&) override;

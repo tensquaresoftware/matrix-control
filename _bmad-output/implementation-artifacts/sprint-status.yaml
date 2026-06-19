@@ -1,5 +1,5 @@
 # generated: 2026-05-29
-# last_updated: 2026-06-19 (Story 4-1 done)
+# last_updated: 2026-06-19 (Story 4-2 done)
 # project: Matrix-Control
 # project_key: NOKEY
 # tracking_system: file-system
@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-05-29
-last_updated: 2026-06-19 (Story 4-1 done)
+last_updated: 2026-06-19 (Story 4-2 done)
 project: Matrix-Control
 project_key: NOKEY
 tracking_system: file-system
@@ -87,7 +87,7 @@ development_status:
   epic-3-retrospective: optional
   epic-4: in-progress
   4-1-patchfileservice-folder-scan: done
-  4-2-combobox-sentinel-states: backlog
+  4-2-combobox-sentinel-states: done
   4-3-folder-path-persistence: backlog
   4-4-save-with-filename-injection: backlog
   4-5-import-name-reconciliation: backlog

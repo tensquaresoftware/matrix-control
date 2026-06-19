@@ -6,7 +6,11 @@
 #include "GUI/Panels/MainComponent/BodyPanel/SharedPanel/MatrixModulationPanel/MatrixModulationPanel.h"
 #include "GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/PatchManagerPanel.h"
 
-SharedPanel::SharedPanel(TSS::ISkin& skin, const SharedPanelDimensions& dims, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+SharedPanel::SharedPanel(TSS::ISkin& skin,
+                         const SharedPanelDimensions& dims,
+                         WidgetFactory& widgetFactory,
+                         juce::AudioProcessorValueTreeState& apvts,
+                         const Core::PatchFileService& patchFileService)
     : dims_(dims)
 {
     matrixModulationPanel_ = std::make_unique<MatrixModulationPanel>(
@@ -20,7 +24,8 @@ SharedPanel::SharedPanel(TSS::ISkin& skin, const SharedPanelDimensions& dims, Wi
         skin,
         dims_.patchManager,
         widgetFactory,
-        apvts);
+        apvts,
+        patchFileService);
     addAndMakeVisible(*patchManagerPanel_);
 }
 

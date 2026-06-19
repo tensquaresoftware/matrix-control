@@ -1,5 +1,10 @@
 # Deferred Work
 
+## Deferred from: code review of 4-2-combobox-sentinel-states (2026-06-19)
+
+- **`kScanRevision` uses `getMillisecondCounterHiRes()`** (`PatchManagerActionHandler.cpp:242-245`) — theoretical duplicate if two scans complete in same tick; same project-wide APVTS trigger pattern as 5-3.
+- **Lexicographic case-sensitive file sort** (`PatchFileService.cpp:80`) — inherited from Story 4.1; combobox display order follows service cache.
+
 ## Deferred from: code review of 4-1-patchfileservice-folder-scan (2026-06-19)
 
 - **Scan synchrone bloque le thread UI** (`PatchFileService.cpp:15-47`) — acceptable v1 selon dev notes story 4.1 ; worker async si bibliothèques volumineuses.

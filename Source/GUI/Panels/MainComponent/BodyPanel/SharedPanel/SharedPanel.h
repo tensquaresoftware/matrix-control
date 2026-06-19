@@ -8,6 +8,11 @@
 
 #include "GUI/Layout/PanelDimensions.h"
 
+namespace Core
+{
+    class PatchFileService;
+}
+
 namespace TSS
 {
     class ISkin;
@@ -20,7 +25,11 @@ class WidgetFactory;
 class SharedPanel : public juce::Component
 {
 public:
-    SharedPanel(TSS::ISkin& skin, const SharedPanelDimensions& dims, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    SharedPanel(TSS::ISkin& skin,
+                const SharedPanelDimensions& dims,
+                WidgetFactory& widgetFactory,
+                juce::AudioProcessorValueTreeState& apvts,
+                const Core::PatchFileService& patchFileService);
     ~SharedPanel() override;
 
     void resized() override;

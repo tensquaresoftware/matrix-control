@@ -239,6 +239,10 @@ namespace Core
 
         const auto result = patchFileService_->scanFolder(folder);
         PatchFileServiceFooter::propagateScanResult(apvts_, result);
+        apvts_.state.setProperty(
+            PluginIDs::PatchManagerSection::ComputerPatchesModule::StateProperties::kScanRevision,
+            juce::Time::getMillisecondCounterHiRes(),
+            nullptr);
     }
 
     void PatchManagerActionHandler::propagateRomBlockedFooter()

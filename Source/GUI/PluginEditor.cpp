@@ -109,7 +109,7 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     const auto editorHeight = layoutDimensions_.editor.height;
 
     mainComponent_ = std::make_unique<MainComponent>(
-        *skin_, layoutDimensions_, *widgetFactory_, pluginProcessor.getApvts());
+        *skin_, layoutDimensions_, *widgetFactory_, pluginProcessor.getApvts(), pluginProcessor.getPatchFileService());
     addAndMakeVisible(*mainComponent_);
 
     mainComponent_->setBusReorderHandler(

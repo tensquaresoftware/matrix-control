@@ -554,6 +554,11 @@ namespace PluginIDs
             constexpr const char* kBrowserGroupId = "computerPatchesBrowserGroup";
             constexpr const char* kStorageGroupId = "computerPatchesStorageGroup";
 
+            namespace StateProperties
+            {
+                constexpr const char* kScanRevision = "computerPatchesScanRevision";
+            }
+
             namespace StandaloneWidgets
             {
                 constexpr const char* kLoadPreviousPatchFile = "computerPatchesLoadPrevious";

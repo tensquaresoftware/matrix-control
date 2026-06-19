@@ -15,7 +15,11 @@
 #include "GUI/Factories/WidgetFactory.h"
 
 
-PatchManagerPanel::PatchManagerPanel(TSS::ISkin& skin, const PatchManagerPanelDimensions& dims, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+PatchManagerPanel::PatchManagerPanel(TSS::ISkin& skin,
+                                     const PatchManagerPanelDimensions& dims,
+                                     WidgetFactory& widgetFactory,
+                                     juce::AudioProcessorValueTreeState& apvts,
+                                     const Core::PatchFileService& patchFileService)
     : dims_(dims)
     , skin_(&skin)
     , sectionHeader_(std::make_unique<TSS::SectionHeader>(
@@ -26,7 +30,7 @@ PatchManagerPanel::PatchManagerPanel(TSS::ISkin& skin, const PatchManagerPanelDi
         TSS::SectionHeader::ColourVariant::Blue))
     , bankUtilityPanel_(std::make_unique<BankUtilityPanel>(skin, dims_.bankUtility, widgetFactory, apvts))
     , internalPatchesPanel_(std::make_unique<InternalPatchesPanel>(skin, dims_.internalPatches, widgetFactory, apvts))
-    , computerPatchesPanel_(std::make_unique<ComputerPatchesPanel>(skin, dims_.computerPatches, widgetFactory, apvts))
+    , computerPatchesPanel_(std::make_unique<ComputerPatchesPanel>(skin, dims_.computerPatches, widgetFactory, apvts, patchFileService))
     , patchMutatorPanel_(std::make_unique<PatchMutatorPanel>(skin, dims_.patchMutator, widgetFactory, apvts))
 {
     setOpaque(false);

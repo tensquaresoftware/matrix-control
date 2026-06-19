@@ -136,7 +136,7 @@ namespace TSS
         if (selectedIndex >= 0)
             return getItemText(selectedIndex);
 
-        return juce::String();
+        return getTextWhenNothingSelected();
     }
 
     juce::Colour ComboBox::getTextColourForCurrentStyle(bool enabled) const

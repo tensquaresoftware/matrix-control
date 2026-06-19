@@ -7,6 +7,11 @@
 
 #include "GUI/Layout/PanelDimensions.h"
 
+namespace Core
+{
+    class PatchFileService;
+}
+
 namespace TSS
 {
     class ISkin;
@@ -18,23 +23,35 @@ namespace TSS
 
 class WidgetFactory;
 
-class ComputerPatchesPanel : public juce::Component
+class ComputerPatchesPanel : public juce::Component,
+                             public juce::ValueTree::Listener
 {
 public:
-    ComputerPatchesPanel(TSS::ISkin& skin, const ComputerPatchesPanelDimensions& dims, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    ComputerPatchesPanel(TSS::ISkin& skin,
+                         const ComputerPatchesPanelDimensions& dims,
+                         WidgetFactory& widgetFactory,
+                         juce::AudioProcessorValueTreeState& apvts,
+                         const Core::PatchFileService& patchFileService);
     ~ComputerPatchesPanel() override;
 
     void resized() override;
     void setSkin(TSS::ISkin& skin);
     void setUiScale(float uiScale);
 
-private:
-    inline constexpr static int kSelectPatchFileEmptyId_ = 1;
+    void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
+                                  const juce::Identifier& property) override;
+    void valueTreeChildAdded(juce::ValueTree&, juce::ValueTree&) override {}
+    void valueTreeChildRemoved(juce::ValueTree&, juce::ValueTree&, int) override {}
+    void valueTreeChildOrderChanged(juce::ValueTree&, int, int) override {}
+    void valueTreeParentChanged(juce::ValueTree&) override {}
+    void valueTreeRedirected(juce::ValueTree&) override;
 
+private:
     ComputerPatchesPanelDimensions dims_;
     TSS::ISkin* skin_;
     float uiScale_ = 1.0f;
     juce::AudioProcessorValueTreeState& apvts_;
+    const Core::PatchFileService& patchFileService_;
 
     std::unique_ptr<TSS::ModuleHeader> moduleHeader_;
 
@@ -58,6 +75,12 @@ private:
     void setupOpenPatchFolderButton(TSS::ISkin& skin, WidgetFactory& widgetFactory);
     void setupSavePatchFileAsButton(TSS::ISkin& skin, WidgetFactory& widgetFactory);
     void setupSavePatchFileButton(TSS::ISkin& skin, WidgetFactory& widgetFactory);
+
+    void refreshPatchFileComboBox();
+    void applyEmptySentinel();
+    void applySelectSentinel(const juce::StringArray& sortedValidFileNames);
+    void setNavigationButtonsEnabled(bool enabled);
+    void clearPatchFileSelectionProperty();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ComputerPatchesPanel)
 };

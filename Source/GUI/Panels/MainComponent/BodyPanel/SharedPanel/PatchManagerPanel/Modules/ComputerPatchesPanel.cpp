@@ -1,5 +1,6 @@
 #include "ComputerPatchesPanel.h"
 
+#include "Core/Services/PatchFileService.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Looks/LookBuilders.h"
@@ -7,18 +8,34 @@
 #include "GUI/Widgets/GroupLabel.h"
 #include "GUI/Widgets/Button.h"
 #include "GUI/Widgets/ComboBox.h"
-#include "Shared/Definitions/PluginDescriptors.h"
+#include "Shared/Definitions/PluginDisplayNames.h"
+#include "Shared/Definitions/PluginIDs.h"
 #include "GUI/Factories/WidgetFactory.h"
 #include <juce_core/juce_core.h>
 
+namespace
+{
+    namespace ComputerPatchesDisplayNames = PluginDisplayNames::PatchManagerSection::ComputerPatchesModule;
+    namespace ComputerPatchesIds = PluginIDs::PatchManagerSection::ComputerPatchesModule;
 
-ComputerPatchesPanel::ComputerPatchesPanel(TSS::ISkin& skin, const ComputerPatchesPanelDimensions& dims, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+    juce::String fileNameWithoutSyxExtension(const juce::String& fileName)
+    {
+        return juce::File::createFileWithoutCheckingPath(fileName).getFileNameWithoutExtension();
+    }
+}
+
+ComputerPatchesPanel::ComputerPatchesPanel(TSS::ISkin& skin,
+                                           const ComputerPatchesPanelDimensions& dims,
+                                           WidgetFactory& widgetFactory,
+                                           juce::AudioProcessorValueTreeState& apvts,
+                                           const Core::PatchFileService& patchFileService)
     : dims_(dims)
     , skin_(&skin)
     , apvts_(apvts)
+    , patchFileService_(patchFileService)
 {
     setOpaque(false);
-    setupModuleHeader(skin, widgetFactory, PluginIDs::PatchManagerSection::ComputerPatchesModule::kGroupId);
+    setupModuleHeader(skin, widgetFactory, ComputerPatchesIds::kGroupId);
 
     setupBrowserGroupLabel(skin);
     setupLoadPreviousPatchFileButton(skin, widgetFactory);
@@ -30,10 +47,79 @@ ComputerPatchesPanel::ComputerPatchesPanel(TSS::ISkin& skin, const ComputerPatch
     setupSavePatchFileAsButton(skin, widgetFactory);
     setupSavePatchFileButton(skin, widgetFactory);
 
+    apvts_.state.addListener(this);
+    refreshPatchFileComboBox();
+
     setSize(dims_.width, dims_.height);
 }
 
-ComputerPatchesPanel::~ComputerPatchesPanel() = default;
+ComputerPatchesPanel::~ComputerPatchesPanel()
+{
+    apvts_.state.removeListener(this);
+}
+
+void ComputerPatchesPanel::valueTreePropertyChanged(juce::ValueTree&,
+                                                    const juce::Identifier& property)
+{
+    if (property.toString() == ComputerPatchesIds::StateProperties::kScanRevision)
+        refreshPatchFileComboBox();
+}
+
+void ComputerPatchesPanel::valueTreeRedirected(juce::ValueTree&)
+{
+    refreshPatchFileComboBox();
+}
+
+void ComputerPatchesPanel::refreshPatchFileComboBox()
+{
+    if (selectPatchFileComboBox_ == nullptr)
+        return;
+
+    const auto& scan = patchFileService_.getLastScanResult();
+    selectPatchFileComboBox_->clear(juce::dontSendNotification);
+
+    if (! scan.folderUsable || scan.validCount == 0)
+    {
+        applyEmptySentinel();
+        return;
+    }
+
+    applySelectSentinel(scan.sortedValidFileNames);
+    clearPatchFileSelectionProperty();
+}
+
+void ComputerPatchesPanel::applyEmptySentinel()
+{
+    selectPatchFileComboBox_->setTextWhenNothingSelected(ComputerPatchesDisplayNames::kEmptySentinel);
+    selectPatchFileComboBox_->setSelectedId(0, juce::dontSendNotification);
+    selectPatchFileComboBox_->setEnabled(false);
+    setNavigationButtonsEnabled(false);
+    clearPatchFileSelectionProperty();
+}
+
+void ComputerPatchesPanel::applySelectSentinel(const juce::StringArray& sortedValidFileNames)
+{
+    for (int i = 0; i < sortedValidFileNames.size(); ++i)
+        selectPatchFileComboBox_->addItem(fileNameWithoutSyxExtension(sortedValidFileNames[i]), i + 1);
+
+    selectPatchFileComboBox_->setTextWhenNothingSelected(ComputerPatchesDisplayNames::kSelectSentinel);
+    selectPatchFileComboBox_->setSelectedId(0, juce::dontSendNotification);
+    selectPatchFileComboBox_->setEnabled(true);
+    setNavigationButtonsEnabled(false);
+}
+
+void ComputerPatchesPanel::setNavigationButtonsEnabled(bool enabled)
+{
+    if (loadPreviousPatchFileButton_ != nullptr)
+        loadPreviousPatchFileButton_->setEnabled(enabled);
+    if (loadNextPatchFileButton_ != nullptr)
+        loadNextPatchFileButton_->setEnabled(enabled);
+}
+
+void ComputerPatchesPanel::clearPatchFileSelectionProperty()
+{
+    apvts_.state.setProperty(ComputerPatchesIds::StandaloneWidgets::kSelectPatchFile, 0, nullptr);
+}
 
 void ComputerPatchesPanel::resized()
 {
@@ -198,34 +284,18 @@ void ComputerPatchesPanel::setupSelectPatchFileComboBox(TSS::ISkin& skin)
         TSS::comboBoxLookFromSkin(skin),
         TSS::ComboBox::Style::ButtonLike);
     selectPatchFileComboBox_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
-
-    const juce::StringArray patchNames = {
-        "TOTOHORN", "1000STRG", "MOOOG_B", "EZYBRASS", "SYNTH",
-        "MIBES", "CHUNK", "MINDSEAR", "CASTILLO", "DESTROY+",
-        "BIG PIK", "M-CHOIR", "STRINGME", ")LIQUID(", "PNO-ELEC",
-        "BED TRAK", "STELLAR", "SYNCAGE", "SHIVERS", "+ ZETA +",
-        "STEELDR.", "TAURUS", "POWRSOLO", "INTERSTL", "REZTFUL",
-        "WATRLNG", "BEELS", "LIKETHIS", "NTHENEWS", "SOFT MIX",
-        "OBXA-A7", "BREATH", "MUTRONO", "SLOWATER", "HAUNTING",
-        "FLANGED", "TENSION", "ECHOTRON", "PIRATES!", "EP SWEP",
-        "DEJAVUE'", "DRAMA", "VIOLINCE", "BOUNCE", "SAGAN'Z",
-        "OB LEAD", "FEEDGIT", "SAMPLE", "TINYPIAN", "GALACTIC"
-    };
-    
-    for (int i = 0; i < patchNames.size(); ++i)
-    {
-        selectPatchFileComboBox_->addItem(patchNames[i], i + 1);
-    }
-    
-    selectPatchFileComboBox_->setSelectedId(1);
-    selectPatchFileComboBox_->setEnabled(true);
     selectPatchFileComboBox_->onChange = [this]
     {
         if (auto* comboBox = selectPatchFileComboBox_.get())
         {
-            apvts_.state.setProperty(PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSelectPatchFile,
-                                    comboBox->getSelectedId(),
-                                    nullptr);
+            const int selectedId = comboBox->getSelectedId();
+            if (selectedId >= 1)
+            {
+                apvts_.state.setProperty(ComputerPatchesIds::StandaloneWidgets::kSelectPatchFile,
+                                        selectedId,
+                                        nullptr);
+            }
+            setNavigationButtonsEnabled(selectedId >= 1);
         }
     };
     addAndMakeVisible(*selectPatchFileComboBox_);

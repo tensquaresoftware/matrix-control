@@ -6,11 +6,15 @@
 
 using TSS::SkinColourId;
 
-MainComponent::MainComponent(TSS::Skin& skin, const GuiLayoutDimensions& layoutDimensions, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+MainComponent::MainComponent(TSS::Skin& skin,
+                             const GuiLayoutDimensions& layoutDimensions,
+                             WidgetFactory& widgetFactory,
+                             juce::AudioProcessorValueTreeState& apvts,
+                             const Core::PatchFileService& patchFileService)
     : skin_(&skin)
     , layoutDimensions_(layoutDimensions)
     , headerPanel(skin, layoutDimensions_.header.width, layoutDimensions_.header.height)
-    , bodyPanel(skin, layoutDimensions_, widgetFactory, apvts)
+    , bodyPanel(skin, layoutDimensions_, widgetFactory, apvts, patchFileService)
     , footerPanel(skin, layoutDimensions_.footer.width, layoutDimensions_.footer.height, apvts)
 {
     setOpaque(true);

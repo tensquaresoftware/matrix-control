@@ -15,7 +15,11 @@ using TSS::SkinColourId;
 
 using ::TSS::VerticalSeparator;
 
-BodyPanel::BodyPanel(TSS::ISkin& skin, const GuiLayoutDimensions& layoutDimensions, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+BodyPanel::BodyPanel(TSS::ISkin& skin,
+                     const GuiLayoutDimensions& layoutDimensions,
+                     WidgetFactory& widgetFactory,
+                     juce::AudioProcessorValueTreeState& apvts,
+                     const Core::PatchFileService& patchFileService)
     : dims_(layoutDimensions.body)
     , skin_(&skin)
 {
@@ -31,7 +35,7 @@ BodyPanel::BodyPanel(TSS::ISkin& skin, const GuiLayoutDimensions& layoutDimensio
         dims_.separators);
     addAndMakeVisible(*verticalSeparator1_);
 
-    sharedPanel_ = std::make_unique<SharedPanel>(skin, dims_.shared, widgetFactory, apvts);
+    sharedPanel_ = std::make_unique<SharedPanel>(skin, dims_.shared, widgetFactory, apvts, patchFileService);
     addAndMakeVisible(*sharedPanel_);
 
     verticalSeparator2_ = std::make_unique<VerticalSeparator>(

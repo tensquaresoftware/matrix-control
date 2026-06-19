@@ -8,6 +8,11 @@
 #include "GUI/Layout/PanelDimensions.h"
 #include "GUI/Widgets/ModuleHeader.h"
 
+namespace Core
+{
+    class PatchFileService;
+}
+
 namespace TSS
 {
     class ISkin;
@@ -22,7 +27,11 @@ class WidgetFactory;
 class BodyPanel : public juce::Component
 {
 public:
-    BodyPanel(TSS::ISkin& skin, const GuiLayoutDimensions& layoutDimensions, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    BodyPanel(TSS::ISkin& skin,
+              const GuiLayoutDimensions& layoutDimensions,
+              WidgetFactory& widgetFactory,
+              juce::AudioProcessorValueTreeState& apvts,
+              const Core::PatchFileService& patchFileService);
     ~BodyPanel() override;
 
     void paint(juce::Graphics&) override;

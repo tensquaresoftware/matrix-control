@@ -7,6 +7,11 @@
 
 #include "GUI/Layout/PanelDimensions.h"
 
+namespace Core
+{
+    class PatchFileService;
+}
+
 namespace TSS
 {
     class ISkin;
@@ -22,7 +27,11 @@ class PatchMutatorPanel;
 class PatchManagerPanel : public juce::Component
 {
 public:
-    PatchManagerPanel(TSS::ISkin& skin, const PatchManagerPanelDimensions& dims, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    PatchManagerPanel(TSS::ISkin& skin,
+                      const PatchManagerPanelDimensions& dims,
+                      WidgetFactory& widgetFactory,
+                      juce::AudioProcessorValueTreeState& apvts,
+                      const Core::PatchFileService& patchFileService);
     ~PatchManagerPanel() override;
 
     void resized() override;
