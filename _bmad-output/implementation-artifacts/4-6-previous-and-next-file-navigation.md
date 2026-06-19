@@ -3,7 +3,7 @@ organization: Ten Square Software
 project: Matrix-Control
 title: Story 4.6 — Previous and Next File Navigation
 author: BMad Agent
-status: review
+status: done
 baseline_commit: 48a0456
 sources:
   - planning-artifacts/epics.md
