@@ -17,6 +17,8 @@ namespace
     constexpr const char* kNoMutationChangeFooterMessage =
         "Mutation made no changes. Try higher Amount or Random.";
     constexpr const char* kHistoryLimitFooterMessage = "Mutation history is full. Defrag to continue.";
+    constexpr const char* kEmptyHistoryFooterMessage = "Mutation history is empty.";
+    constexpr const char* kNoSelectionFooterMessage = "No valid mutation history entry selected.";
     constexpr const char* kFooterSeverityWarning = "warning";
 
     void setPatchLoadSuppressHooks(Core::ActionExecutionHooks& hooks, bool suppress)
@@ -151,7 +153,95 @@ MutatorActionResult PatchMutatorEngine::mutate()
 
 MutatorActionResult PatchMutatorEngine::retry()
 {
+    if (historyStore_.isEmpty())
+    {
+        MutatorActionResult result;
+        result.footerMessage = kEmptyHistoryFooterMessage;
+        result.footerSeverity = kFooterSeverityWarning;
+        return result;
+    }
+
+    const auto rootIndexOpt = resolveSelectedRootIndex();
+    if (! rootIndexOpt.has_value() || ! historyStore_.hasRoot(*rootIndexOpt))
+    {
+        MutatorActionResult result;
+        result.footerMessage = kNoSelectionFooterMessage;
+        result.footerSeverity = kFooterSeverityWarning;
+        return result;
+    }
+
+    const int rootIndex = *rootIndexOpt;
+
+    if (historyStore_.isRetrySlotsFull(rootIndex) || historyStore_.isRetryIndexExhausted(rootIndex))
+    {
+        MutatorActionResult result;
+        result.footerMessage = kHistoryLimitFooterMessage;
+        result.footerSeverity = kFooterSeverityWarning;
+        result.defragModalRequested = true;
+        return result;
+    }
+
+    const auto selectedEntry = resolveSelectedEntryForRetry(rootIndex);
+    if (! selectedEntry.has_value())
+    {
+        MutatorActionResult result;
+        result.footerMessage = kNoSelectionFooterMessage;
+        result.footerSeverity = kFooterSeverityWarning;
+        return result;
+    }
+
+    const auto recipe = buildRecipeFromApvts();
+    if (recipe.amountPercent == 0 || recipe.randomPercent == 0)
+    {
+        MutatorActionResult result;
+        result.footerMessage = kNoOpRecipeFooterMessage;
+        result.footerSeverity = kFooterSeverityWarning;
+        return result;
+    }
+
+    PatchModel parentSnapshot;
+    parentSnapshot.loadFrom(selectedEntry->parentSnapshot.data());
+
+    PatchModel working;
+    working.loadFrom(selectedEntry->parentSnapshot.data());
+
+    rng_.setSeedRandomly();
+    JuceRandomSource rngSource(rng_);
+    const bool mutated = algorithm_.apply(working, recipe, rngSource);
+    if (! mutated)
+    {
+        MutatorActionResult result;
+        result.footerMessage = kNoMutationChangeFooterMessage;
+        result.footerSeverity = kFooterSeverityWarning;
+        return result;
+    }
+
+    const auto retryIndexOpt = historyStore_.peekNextRetryIndex(rootIndex);
+    if (! retryIndexOpt.has_value())
+    {
+        MutatorActionResult result;
+        result.footerMessage = kHistoryLimitFooterMessage;
+        result.footerSeverity = kFooterSeverityWarning;
+        result.defragModalRequested = true;
+        return result;
+    }
+
+    const int retryIndex = *retryIndexOpt;
+    MutationNaming::applyPatchName(working, rootIndex, retryIndex);
+
+    if (! historyStore_.insertRetry(rootIndex, retryIndex, working, parentSnapshot))
+    {
+        MutatorActionResult result;
+        result.footerMessage = kHistoryLimitFooterMessage;
+        result.footerSeverity = kFooterSeverityWarning;
+        result.defragModalRequested = true;
+        return result;
+    }
+
+    pushResultToEditorAndSynth(working);
+
     MutatorActionResult result;
+    result.success = true;
     return result;
 }
 
@@ -266,6 +356,32 @@ PatchModel PatchMutatorEngine::resolveAuditionBuffer() const
     }
 
     return *patchModel_;
+}
+
+std::optional<int> PatchMutatorEngine::resolveSelectedRootIndex() const
+{
+    if (historyStore_.isEmpty())
+        return std::nullopt;
+
+    if (selectedRootIndex_ >= 0)
+        return selectedRootIndex_;
+
+    const auto sortedRoots = historyStore_.getSortedRootIndices();
+    if (sortedRoots.isEmpty())
+        return std::nullopt;
+
+    return sortedRoots.getLast();
+}
+
+std::optional<MutationEntry> PatchMutatorEngine::resolveSelectedEntryForRetry(int rootIndex) const
+{
+    if (selectedRetryIndex_ == MutationHistoryStore::kRootOnly)
+        return historyStore_.getEntry(rootIndex, MutationHistoryStore::kRootOnly);
+
+    if (const auto retryEntry = historyStore_.getEntry(rootIndex, selectedRetryIndex_))
+        return retryEntry;
+
+    return historyStore_.getEntry(rootIndex, MutationHistoryStore::kRootOnly);
 }
 
 void PatchMutatorEngine::pushResultToEditorAndSynth(const PatchModel& mutatedModel)

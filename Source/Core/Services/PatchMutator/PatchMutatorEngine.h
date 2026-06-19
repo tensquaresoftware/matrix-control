@@ -62,7 +62,12 @@ namespace Core
         MutationRecipe buildRecipeFromApvts() const;
         // resolveAuditionBuffer: empty history -> live editor; selectedRootIndex_ < 0 -> highest sorted root
         // (root-only); missing entry at selection -> root-only entry or live editor fallback.
+        // MUTATE-only — returns selected entry result, not parentSnapshot (D-083).
         PatchModel resolveAuditionBuffer() const;
+        // RETRY-only — resolves Mi from selection with same root fallback as resolveAuditionBuffer.
+        std::optional<int> resolveSelectedRootIndex() const;
+        // RETRY-only — returns selected entry for parentSnapshot input; differs from audition semantics (D-083).
+        std::optional<MutationEntry> resolveSelectedEntryForRetry(int rootIndex) const;
         void pushResultToEditorAndSynth(const PatchModel& mutatedModel);
         static bool readBoolProperty(const juce::ValueTree& state,
                                      const juce::Identifier& propertyId,

@@ -289,6 +289,14 @@
 - **`signBitPosition` undefined for `maxValue ≤ 0` or non-`2^n−1` ranges** (`Source/Core/Models/PatchModel.cpp:53-58`) — `jlimit` acts as a safety net so no current descriptor is affected; revisit if a signed descriptor with a non-power-of-two max is ever added.
 - **`getChoiceIndex` silently clamps stale/corrupt buffer bytes** (`Source/Core/Models/PatchModel.cpp:40`) — defensive clamping via `jmax`/`jlimit` is correct for the current descriptor set; add `jassert(!descriptor.choices.isEmpty())` if a stricter contract is desired.
 
+## Deferred from: code review of 6-5-retry-from-parent-snapshot (2026-06-20)
+
+- **Footer messages not asserted in retry tests** (`PatchMutatorEngineTests.cpp`) — AC2 requires `{ success: false, footerMessage }`; constants exist and are returned but tests only check `success`.
+- **`retry_usesParentSnapshot_notResult` does not prove algorithm input source** (`PatchMutatorEngineTests.cpp:354-356`) — asserts stored `parentSnapshot` byte, not that `working` was loaded from `parentSnapshot` vs `result`.
+- **Missing-root failure path untested** (`PatchMutatorEngine.cpp:165-170`) — stale `selectedRootIndex_` with no matching root returns `kNoSelectionFooterMessage`; no test.
+- **Highest-sorted-root fallback untested** (`PatchMutatorEngine.cpp:369-373`) — no retry test with multiple roots and `selectedRootIndex_ < 0`.
+- **`retry_noOpRecipe_blocked` covers Amount=0 only** (`PatchMutatorEngineTests.cpp:441`) — `randomPercent == 0` guard path unverified.
+
 ## Deferred from: code review of 7-3c-bank-utility-unlock-simplify (2026-06-19)
 
 - **Point rouge transitoire « off » lors d'une sélection de banque** (`InternalPatchesPanel.cpp:76-88`) — `kCurrentBankNumber` déclenche `refreshBankLockIndicator` avant `markBanksLockedInApvts()` ; état final correct ; risque visuel faible.
