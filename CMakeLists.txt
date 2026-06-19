@@ -126,6 +126,7 @@ set(PLUGIN_SOURCES
     Source/Core/Models/PackedFieldCodec.cpp
     Source/Core/Models/PatchModel.cpp
     Source/Core/Services/ClipboardService.cpp
+    Source/Core/Services/PatchMutator/MutationHistoryStore.cpp
     Source/Core/Services/ClipboardPasteEnabledResolver.cpp
     Source/Core/Services/DeviceMemoryLimits.cpp
     Source/Core/Services/DeviceTypeRegistry.cpp
@@ -300,6 +301,7 @@ if(MATRIX_BUILD_TESTS)
     target_sources(Matrix-Control_Tests PRIVATE
         Tests/TestMain.cpp
         Tests/Unit/ClipboardServiceTests.cpp
+        Tests/Unit/MutationHistoryStoreTests.cpp
         Tests/Unit/ClipboardPasteEnabledResolverTests.cpp
         Tests/Unit/ApvtsMasterMapperTests.cpp
         Tests/Unit/DeviceMemoryLimitsTests.cpp
@@ -356,6 +358,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/Models/MasterModel.cpp
         Source/Core/Models/PatchModel.cpp
         Source/Core/Services/ClipboardService.cpp
+        Source/Core/Services/PatchMutator/MutationHistoryStore.cpp
         Source/Core/Services/ClipboardPasteEnabledResolver.cpp
         Source/Core/Services/DeviceMemoryLimits.cpp
         Source/Core/Services/DeviceTypeRegistry.cpp

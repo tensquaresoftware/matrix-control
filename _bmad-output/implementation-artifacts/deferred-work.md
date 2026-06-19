@@ -1,5 +1,16 @@
 # Deferred Work
 
+## Deferred from: code review of 6-2-mutationhistorystore-two-level-mr (2026-06-19)
+
+- **Full `Matrix-Control_Tests` target not green** — pre-existing `MidiActivityTrackerTests` failure; all 11 `MutationHistoryStore` tests pass.
+- **`getInitialSnapshot()` without prior `setInitialSnapshot()`** — returns zero buffer; AC #3 provides `hasInitialSnapshot()` guard; caller contract (Story 6.8 engine).
+- **`isRetrySlotsFull` / `peekNextRetryIndex` on missing root** — indistinguishable from “capacity available”; engine must call `hasRoot` first (Story 6.4+).
+- **`rootCount()` O(n) and redundant sort** — acceptable v1; worst-case ~2.7 MB RAM per architecture note.
+
+## Deferred from: code review of 6-1-mutationalgorithm-specification (2026-06-19)
+
+- **Golden vectors lack pinned output hex** — Owner sign-off 2026-06-19 accepted deferred pinning to Story 6.4 per GV-04 note; AC #7 literal "expected output" not fully met in appendix.
+
 ## Deferred from: Internal Patches startup policy (2026-06-19)
 
 - **Persist bank/patch in session for display-only recall** — rejected; hardware state unknown at launch. Policy: always 0/00. See `spec-internal-patch-startup-coordinates.md`.
