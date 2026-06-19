@@ -1,5 +1,5 @@
 # generated: 2026-05-29
-# last_updated: 2026-06-19 (Story 4-6 done)
+# last_updated: 2026-06-19 (Story 7-4 ready-for-dev)
 # project: Matrix-Control
 # project_key: NOKEY
 # tracking_system: file-system
@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-05-29
-last_updated: 2026-06-19 (Story 4-6 done)
+last_updated: 2026-06-19 (Story 7-4 ready-for-dev)
 project: Matrix-Control
 project_key: NOKEY
 tracking_system: file-system
@@ -118,7 +118,7 @@ development_status:
   7-2-moduleactionhandler-i-c-p-and-matrix-mod-init: done
   7-3-patchmanageractionhandler-bank-and-internal: done
   7-3b-bank-utility-unlock-semantics-and-id-rename: done
-  7-4-mutatoractionhandler: backlog
+  7-4-mutatoractionhandler: ready-for-dev
   7-5-bank-utility-ui-wiring: backlog
   7-6-internal-patches-panel-wiring: backlog
   7-7-settings-page-consolidation: done

@@ -3,7 +3,7 @@
 **Author:** Guillaume DUPONT
 **Organization:** Ten Square Software
 **Context:** VST/AU plugin development with JUCE (Cursor + Claude Code)
-**Revision date:** 2026-06-08
+**Revision date:** 2026-06-19
 
 ---
 
@@ -86,6 +86,29 @@ If Guillaume explicitly requests a "rapid prototype", "POC", or "spike", I may s
 ### 2.3 Document metadata
 
 When I modify a file (documentation, code, configuration, etc.) that contains a **revision date** or **version number** in its header or metadata, I MUST update them accordingly.
+
+### 2.4 BMad — titres des conversations Cursor Agents
+
+When Guillaume starts a conversation with a **BMad skill** (attached skill or slash command), the agent MUST **rename the current chat immediately** in the Cursor Agents sidebar, before any other work.
+
+Use the MCP tool `rename_chat` (`cursor-app-control`). Cursor rule: `.cursor/rules/bmad-agent-chat-titles.mdc`.
+
+**Format:** `BMad {Workflow Label} {Story ID}` — omit the story ID when none is provided.
+
+**No date in the title.** Do not append a date in parentheses (e.g. `BMad Sprint Status (2026-06-19)`). The Agents sidebar already shows when each conversation took place. Several runs of the same command may share the same title.
+
+| Command (examples) | Sidebar title |
+|---|---|
+| `/bmad-create-story 4-5` | `BMad Create Story 4-5` |
+| `/bmad-dev-story 4-5` | `BMad Dev Story 4-5` |
+| `/bmad-code-review 4-5` | `BMad Code Review 4-5` |
+| `/bmad-correct-course 4-5` | `BMad Correct Course 4-5` |
+| `/bmad-sprint-status` | `BMad Sprint Status` |
+| `/bmad-help` | `BMad Help` |
+
+Story IDs include epic-story numbers (`4-5`, `7-3b`) and utility stories (`U-0`, `U-11`).
+
+**Persistence:** only `rename_chat` writes the title durably. The bulk script `_local/rename-bmad-agent-chats.py` updates the sidebar cache only — opening a conversation restores the old auto-generated title from the checkpoint. To fix existing conversations, open each one and send any message; the agent will rename via `rename_chat` on first reply.
 
 ---
 

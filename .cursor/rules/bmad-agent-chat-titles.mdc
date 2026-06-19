@@ -1,0 +1,66 @@
+---
+description: Rename Cursor Agents sidebar title when a BMad skill or slash command is used
+alwaysApply: true
+---
+
+# BMad — titres des conversations Agents
+
+When Guillaume starts a conversation with a **BMad skill** (attached skill or slash command such as `/bmad-create-story`, `/bmad-dev-story`, `/bmad-code-review`, `/bmad-correct-course`, etc.), **rename the current chat immediately** — as the **first tool call**, before any other work.
+
+Also apply on **resume**: if Guillaume sends a message in an existing BMad conversation whose title is still the auto-generated one (e.g. `Story creation process`, `Code review discussion`, `bmad dev story 4-4`) instead of the BMad format below, call `rename_chat` first — infer skill and story ID from the conversation's first user message (attached skill or slash command).
+
+Use the MCP tool `rename_chat` on server `cursor-app-control`. **Only this API persists the title** — direct database edits to the sidebar cache are overwritten when the conversation is opened (Cursor reloads the title from the conversation checkpoint).
+
+## Title format
+
+`BMad {Workflow Label} {Story ID}` — omit `{Story ID}` when none is provided.
+
+**Never append a date** (e.g. `(2026-06-19)`) to the title. The Agents sidebar already shows when each conversation occurred (`Today`, `2d`, etc.). Duplicate runs of the same workflow share the same title — the sidebar timestamp is enough to tell them apart.
+
+| Skill / command prefix | Label |
+|---|---|
+| `bmad-create-story` | Create Story |
+| `bmad-dev-story` | Dev Story |
+| `bmad-code-review` | Code Review |
+| `bmad-correct-course` | Correct Course |
+| `bmad-sprint-planning` | Sprint Planning |
+| `bmad-sprint-status` | Sprint Status |
+| `bmad-quick-dev` | Quick Dev |
+| `bmad-check-implementation-readiness` | Implementation Readiness |
+| `bmad-create-architecture` | Create Architecture |
+| `bmad-create-epics-and-stories` | Create Epics |
+| `bmad-prd` | PRD |
+| `bmad-spec` | Spec |
+| `bmad-retrospective` | Retrospective |
+| `bmad-help` | Help |
+| `bmad-checkpoint-preview` | Checkpoint |
+| `bmad-investigate` | Investigate |
+| `bmad-review-adversarial-general` | Adversarial Review |
+| `bmad-review-edge-case-hunter` | Edge Case Review |
+| `bmad-party-mode` | Party Mode |
+| `bmad-brainstorming` | Brainstorming |
+| `bmad-ux` | UX |
+| `bmad-technical-research` | Technical Research |
+| `bmad-generate-project-context` | Project Context |
+| `bmad-document-project` | Document Project |
+| Other `bmad-*` skill | Title-case the skill slug after `bmad-`, words separated by spaces |
+
+## Story ID extraction
+
+Parse from the user message (slash command or attached skill context):
+
+- Epic-story: `4-5`, `7-3b`, `2-9b`
+- Utility stories: `U-0`, `U-11`
+- Accept `/bmad-create-story 4-5`, `/bmad-create story 4-5`, or `story 4-5` in plain text
+
+## Examples
+
+- `/bmad-create-story 4-5` → `BMad Create Story 4-5`
+- `/bmad-dev-story 4-4` → `BMad Dev Story 4-4`
+- `/bmad-code-review 4-4` → `BMad Code Review 4-4`
+- `/bmad-correct-course 4-5` → `BMad Correct Course 4-5`
+- `/bmad-help` (no story) → `BMad Help`
+
+**Do not** use date suffixes — wrong: `BMad Sprint Status (2026-06-19)`; correct: `BMad Sprint Status`.
+
+Do not announce the rename unless Guillaume asks — just apply it silently and continue the workflow.
