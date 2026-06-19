@@ -40,6 +40,8 @@ public:
     void sendPatch(juce::uint8 patchNumber, const juce::uint8* packedData);
     void sendMaster(juce::uint8 version, const juce::uint8* packedData);
     void sendProgramChange(int programNumber, int channel = 1);
+    void sendSetBank(int bank);
+    void sendUnlockBank();
     void enqueueRemoteParameterEdit(int parameterNumber, juce::uint8 packedValue);
     void enqueueMatrixModBusEdit(juce::uint8 bus,
                                  juce::uint8 source,

@@ -23,6 +23,7 @@ namespace SysExConstants
         constexpr juce::uint8 kSetGroupMode = 0x07;
         constexpr juce::uint8 kSetBank = 0x0A;
         constexpr juce::uint8 kRemoteParameterEditMatrix = 0x0B;
+        constexpr juce::uint8 kUnlockBank = 0x0C;
     }
 
     // Request types (for opcode 0x04)

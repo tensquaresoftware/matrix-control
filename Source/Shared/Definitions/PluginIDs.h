@@ -509,12 +509,12 @@ namespace PluginIDs
             namespace StateProperties
             {
                 constexpr const char* kSelectedBank = "patchManagerSelectedBank";
-                constexpr const char* kBankLock = "patchManagerBankLock";
+                constexpr const char* kBanksLocked = "patchManagerBanksLocked";
             }
 
             namespace StandaloneWidgets
             {
-                constexpr const char* kLockBank    = "bankUtilityLockBank";
+                constexpr const char* kUnlockBank  = "bankUtilityUnlockBank";
                 constexpr const char* kSelectBank0 = "bankUtilitySelectBank0";
                 constexpr const char* kSelectBank1 = "bankUtilitySelectBank1";
                 constexpr const char* kSelectBank2 = "bankUtilitySelectBank2";

@@ -116,6 +116,7 @@ set(PLUGIN_SOURCES
     Source/Core/Init/InitTemplateLoader.cpp
     Source/Core/Init/MasterModuleInitService.cpp
     Source/Core/Init/PatchModuleInitService.cpp
+    Source/Core/Init/PatchInitService.cpp
     Source/Core/Init/MatrixModInitService.cpp
     Source/Core/Factories/ApvtsFactory.cpp
     Source/Core/Models/ApvtsMasterMapper.cpp
@@ -164,6 +165,7 @@ set(PLUGIN_SOURCES
     Source/Core/MIDI/MidiManager.cpp
     Source/Core/MIDI/MidiPortOpenFeedback.cpp
     Source/Core/MIDI/PatchParameterSysExDispatcher.cpp
+    Source/Core/MIDI/PatchSelectionMidiSync.cpp
     Source/Core/MIDI/Queue/MidiOutboundQueue.cpp
     Source/Core/MIDI/Queue/SysExDelayProfile.cpp
     Source/Core/MIDI/Queue/SysExInterMessageDelay.cpp
@@ -313,6 +315,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/MatrixModBusReorderServiceTests.cpp
         Tests/Unit/MasterModuleInitServiceTests.cpp
         Tests/Unit/PatchModuleInitServiceTests.cpp
+        Tests/Unit/PatchManagerActionHandlerTests.cpp
         Tests/Unit/ModuleActionHandlerTests.cpp
         Tests/Unit/MatrixModInitServiceTests.cpp
         Tests/Unit/PatchParameterSysExDispatcherTests.cpp
@@ -340,6 +343,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/Init/InitTemplateLoader.cpp
         Source/Core/Init/MasterModuleInitService.cpp
         Source/Core/Init/PatchModuleInitService.cpp
+        Source/Core/Init/PatchInitService.cpp
         Source/Core/Init/MatrixModInitService.cpp
         Source/Core/Models/ApvtsMasterMapper.cpp
         Source/Core/Models/ApvtsPatchMapper.cpp
@@ -368,6 +372,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/MIDI/MatrixModBusParameterSysExDispatcher.cpp
         Source/Core/MIDI/MatrixModBusReorderService.cpp
         Source/Core/MIDI/PatchParameterSysExDispatcher.cpp
+        Source/Core/MIDI/PatchSelectionMidiSync.cpp
         Source/Core/MIDI/Ports/MidiInputPort.cpp
         Source/Core/MIDI/Ports/MidiOutputPort.cpp
         Source/Core/MIDI/Transport/MidiReceiver.cpp

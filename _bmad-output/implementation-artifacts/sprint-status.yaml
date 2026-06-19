@@ -1,5 +1,5 @@
 # generated: 2026-05-29
-# last_updated: 2026-06-18 (Story 7-2 → done)
+# last_updated: 2026-06-19 (Stories 7-3 and 7-3b done; M-1000 smoke UAT)
 # project: Matrix-Control
 # project_key: NOKEY
 # tracking_system: file-system
@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-05-29
-last_updated: 2026-06-18 (Story 7-2 → done)
+last_updated: 2026-06-19 (Stories 7-3 and 7-3b done; M-1000 smoke UAT)
 project: Matrix-Control
 project_key: NOKEY
 tracking_system: file-system
@@ -116,7 +116,8 @@ development_status:
   epic-7: in-progress
   7-1-actiondispatcher-and-handler-interfaces: done
   7-2-moduleactionhandler-i-c-p-and-matrix-mod-init: done
-  7-3-patchmanageractionhandler-bank-and-internal: backlog
+  7-3-patchmanageractionhandler-bank-and-internal: done
+  7-3b-bank-utility-unlock-semantics-and-id-rename: done
   7-4-mutatoractionhandler: backlog
   7-5-bank-utility-ui-wiring: backlog
   7-6-internal-patches-panel-wiring: backlog

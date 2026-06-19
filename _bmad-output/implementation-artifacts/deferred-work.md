@@ -1,5 +1,12 @@
 # Deferred Work
 
+## Deferred from: code review of 7-3b-bank-utility-unlock-semantics-and-id-rename (2026-06-19)
+
+- **MIDI dupliqué sur navigation prev/next** (`PatchManagerActionHandler.cpp:242-258`, `PluginProcessor.cpp:1220-1221`) — `applyPatchCoordinates` + listener `handlePatchNumberChange` enchaînent deux `syncSelection` ; dette 7.3.
+- **Renommage APVTS lock sans migration** (`PluginIDs.h`, `MidiManager.cpp`) — `patchManagerBankLock` → `patchManagerBanksLocked` ; accepté pre-release par spec 7-3b.
+- **`kSelectedBank` désynchronisé après navigation cross-banque** (`PatchManagerActionHandler.cpp:242-252`) — UI Bank Utility ; reporté story 7.5.
+- **Flags suppress SysEx sans RAII** (`PatchManagerActionHandler.cpp:139-190`) — pattern transversal 7.1/7.2.
+
 ## Deferred from: code review of 7-2-moduleactionhandler-i-c-p-and-matrix-mod-init (2026-06-18)
 
 - **AC #8 — suppress-hook order not asserted in unit tests** (`ModuleActionHandlerTests.cpp`) — flags recorded but never expected true-during-push / false-before-dispatch.

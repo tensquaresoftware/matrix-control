@@ -10,6 +10,8 @@
 #include "Core/Actions/ModuleActionHandler.h"
 #include "Core/Actions/MutatorActionHandler.h"
 #include "Core/Actions/PatchManagerActionHandler.h"
+#include "Core/Init/PatchInitService.h"
+#include "Core/MIDI/PatchSelectionMidiSync.h"
 #include "Core/Audio/AudioPassthroughProcessor.h"
 #include "Core/Audio/AudioInputSourceCatalog.h"
 #include "Core/Audio/HardwareLatency.h"
@@ -219,10 +221,24 @@ PluginProcessor::PluginProcessor()
             return juce::File(apvts.state.getProperty(PluginIDs::Settings::kInitTemplatesFolderPath).toString());
         });
 
+    patchInitService_ = std::make_unique<Core::PatchInitService>(
+        *patchModel_,
+        *initTemplateLoader_,
+        [this]()
+        {
+            return juce::File(apvts.state.getProperty(PluginIDs::Settings::kInitTemplatesFolderPath).toString());
+        });
+
+    patchSelectionMidiSync_ = std::make_unique<Core::PatchSelectionMidiSync>(midiManager.get());
+    patchSelectionMidiSync_->resetLastSyncedBank(static_cast<int>(apvts.state.getProperty(
+        PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCurrentBankNumber,
+        0)));
+
     const Core::ActionExecutionHooks actionHooks{
         [this](bool suppress) { suppressMatrixModParameterSysEx_ = suppress; },
         [this](bool suppress) { suppressMasterParameterSysEx_ = suppress; },
-        [this](bool suppress) { suppressPatchParameterSysEx_ = suppress; }
+        [this](bool suppress) { suppressPatchParameterSysEx_ = suppress; },
+        [this](bool suppress) { suppressPatchSelectionMidiSync_ = suppress; }
     };
 
     moduleActionHandler_ = std::make_unique<Core::ModuleActionHandler>(
@@ -240,7 +256,14 @@ PluginProcessor::PluginProcessor()
 
     patchManagerActionHandler_ = std::make_unique<Core::PatchManagerActionHandler>(
         apvts,
-        [this]() { return getResolvedDeviceMemoryLimits(); });
+        [this]() { return getResolvedDeviceMemoryLimits(); },
+        patchModel_.get(),
+        apvtsPatchMapper_.get(),
+        clipboardService_.get(),
+        patchInitService_.get(),
+        patchSelectionMidiSync_.get(),
+        midiManager.get(),
+        actionHooks);
 
     mutatorActionHandler_ = std::make_unique<Core::MutatorActionHandler>();
 
@@ -1253,6 +1276,9 @@ void PluginProcessor::handlePatchNumberChange(const juce::String& parameterId)
     if (parameterId != PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCurrentPatchNumber)
         return;
 
+    if (suppressPatchSelectionMidiSync_)
+        return;
+
     const auto limits = getResolvedDeviceMemoryLimits();
     const int patchNumber = static_cast<int>(apvts.state.getProperty(parameterId, 0));
     const int clampedPatch = juce::jlimit(limits.minPatchNumber(), limits.maxPatchNumber(), patchNumber);
@@ -1263,8 +1289,25 @@ void PluginProcessor::handlePatchNumberChange(const juce::String& parameterId)
         return;
     }
 
-    if (midiManager != nullptr)
+    if (patchSelectionMidiSync_ != nullptr)
+    {
+        const int bankNumber = static_cast<int>(apvts.state.getProperty(
+            PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCurrentBankNumber,
+            limits.minBankNumber()));
+        const bool setBankSent = patchSelectionMidiSync_->syncSelection(bankNumber, clampedPatch, limits, false);
+
+        if (setBankSent && limits.hasBankConcept())
+        {
+            apvts.state.setProperty(
+                PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties::kBanksLocked,
+                true,
+                nullptr);
+        }
+    }
+    else if (midiManager != nullptr)
+    {
         midiManager->sendProgramChange(clampedPatch);
+    }
 }
 
 Core::DeviceMemoryLimits PluginProcessor::getResolvedDeviceMemoryLimits() const
@@ -1300,6 +1343,14 @@ void PluginProcessor::reconcilePatchManagerCoordinatesForDeviceType()
     const int clampedPatch = juce::jlimit(limits.minPatchNumber(), limits.maxPatchNumber(), patchNumber);
     if (clampedPatch != patchNumber)
         apvts.state.setProperty(kCurrentPatchNumber, clampedPatch, nullptr);
+
+    if (patchSelectionMidiSync_ != nullptr)
+    {
+        const int syncedBank = limits.hasBankConcept()
+                                   ? static_cast<int>(apvts.state.getProperty(kCurrentBankNumber, limits.minBankNumber()))
+                                   : 0;
+        patchSelectionMidiSync_->resetLastSyncedBank(syncedBank);
+    }
 }
 
 void PluginProcessor::initializeClipboardPasteEnabledProperties()

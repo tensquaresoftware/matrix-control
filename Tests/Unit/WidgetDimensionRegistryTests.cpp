@@ -84,9 +84,9 @@ namespace
         using namespace PluginIDs;
 
         expectButtonWidth(test,
-                          PatchManagerSection::BankUtilityModule::StandaloneWidgets::kLockBank,
-                          BW::kPatchManagerLockBank,
-                          "lock bank");
+                          PatchManagerSection::BankUtilityModule::StandaloneWidgets::kUnlockBank,
+                          BW::kPatchManagerUnlockBank,
+                          "unlock bank");
         expectButtonWidth(test,
                           PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank0,
                           BW::kPatchManagerBankSelect,

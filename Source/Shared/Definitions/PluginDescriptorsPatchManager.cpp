@@ -18,8 +18,8 @@ namespace PluginDescriptors
     // Standalone Widgets ----------------------------------------------------------------------------------------------
     const std::vector<StandaloneWidgetDescriptor> PatchManagerSection::BankUtilityModule::kStandaloneWidgets = {
         {
-            .widgetId = PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kLockBank,
-            .displayName = PluginDisplayNames::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kLockBank,
+            .widgetId = PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kUnlockBank,
+            .displayName = PluginDisplayNames::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kUnlockBank,
             .parentGroupId = PluginIDs::PatchManagerSection::BankUtilityModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
         },

@@ -72,7 +72,7 @@ MidiManager::MidiManager(juce::AudioProcessorValueTreeState& apvtsRef,
     apvts.state.setProperty(PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties::kSelectedBank,
                             Matrix1000Limits::kMinBankNumber,
                             nullptr);
-    apvts.state.setProperty(PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties::kBankLock,
+    apvts.state.setProperty(PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties::kBanksLocked,
                             false,
                             nullptr);
     apvts.state.setProperty("lastError", juce::String(), nullptr);
@@ -257,6 +257,32 @@ void MidiManager::sendProgramChange(int programNumber, int channel)
     catch (const std::exception& e)
     {
         updateErrorState(e.what(), "ProgramChange");
+    }
+}
+
+void MidiManager::sendSetBank(int bank)
+{
+    try
+    {
+        auto sysExMessage = sysExEncoder->encodeSetBank(static_cast<juce::uint8>(bank));
+        editorPath_.enqueueSysEx(sysExMessage);
+    }
+    catch (const std::exception& e)
+    {
+        updateErrorState(e.what(), "SysEx");
+    }
+}
+
+void MidiManager::sendUnlockBank()
+{
+    try
+    {
+        auto sysExMessage = SysExEncoder::encodeUnlockBank();
+        editorPath_.enqueueSysEx(sysExMessage);
+    }
+    catch (const std::exception& e)
+    {
+        updateErrorState(e.what(), "SysEx");
     }
 }
 

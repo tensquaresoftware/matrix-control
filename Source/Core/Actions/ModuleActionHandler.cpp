@@ -1,6 +1,6 @@
 #include "Core/Actions/ModuleActionHandler.h"
 
-#include "Core/Exceptions/ExceptionPropagator.h"
+#include "Core/Init/InitTemplateFooter.h"
 #include "Core/Init/MatrixModInitService.h"
 #include "Core/Init/PatchModuleInitService.h"
 #include "Core/MIDI/MatrixModBusParameterSysExDispatcher.h"
@@ -233,18 +233,7 @@ namespace Core
 
     void ModuleActionHandler::propagateInitTemplateFooterMessage(const InitTemplateLoadResult& result)
     {
-        if (result.infoMessage.isEmpty())
-        {
-            ExceptionPropagator::clearMessage(apvts_);
-            return;
-        }
-
-        apvts_.state.setProperty("uiMessageText", result.infoMessage, nullptr);
-
-        const auto severity = (result.fallbackReason == InitTemplateFallbackReason::kFileInvalid)
-            ? juce::String("warning")
-            : juce::String("info");
-        apvts_.state.setProperty("uiMessageSeverity", severity, nullptr);
+        InitTemplateFooter::propagateMessage(apvts_, result);
     }
 
     int ModuleActionHandler::parseMatrixModBusInitIndex(const juce::String& propertyId) const

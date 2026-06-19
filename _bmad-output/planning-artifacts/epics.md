@@ -41,7 +41,7 @@ FR-16: Master parameter editing — Each MASTER change sends complete master Sys
 FR-17: Master module init confirmation — MASTER module Init requires confirmation dialog; PATCH Init does not.
 FR-18: Master file operations via Settings — Load/Save Master, Save as default init, Init all, library actions on Settings page only.
 FR-19: Bank selection — Buttons 0–9 set active bank; red text on selected bank button.
-FR-20: Bank lock — BANK LOCK toggles lock on selected bank; red padlock on locked bank button.
+FR-20: Bank lock — UNLOCK sends `0CH`; bank select sends `0AH` (locks); `patchManagerBanksLocked` mirrors hardware; red dot on Internal Patches bank NumberBox when locked.
 FR-21: Bank selection exclusivity — No separate bank NumberBox in Internal Patches; bank via Bank Utility only.
 FR-22: Patch navigation — `<` / `>` and NumberBox with wrap across banks when unlocked.
 FR-23: ROM gating — PASTE/STORE disabled on ROM banks 2–9 with footer warning.
@@ -1138,6 +1138,22 @@ So that Patch Manager buttons behave per PRD (FR-19–FR-24).
 **Then** handler updates APVTS and enqueues appropriate MIDI/SysEx
 **And** ROM gating FR-23 enforced before STORE/PASTE
 
+### Story 7-3b: Bank Utility UNLOCK Semantics and ID Rename
+
+As a sound designer,
+I want the UNLOCK button to send Unlock Bank SysEx only,
+So that bank lock behaviour matches Oberheim spec (FR-20 corrected).
+
+**Acceptance Criteria:**
+
+**Given** Story 7.3 Core handler scaffold
+**When** user clicks UNLOCK
+**Then** handler sends only `0CH`, sets `patchManagerBanksLocked` false, never sends `0AH`
+**When** user selects bank 0–9 or navigation sends Set Bank
+**Then** `patchManagerBanksLocked` set true
+**And** all IDs renamed: `bankUtilityUnlockBank`, `patchManagerBanksLocked`, display UNLOCK
+**And** unit tests updated; grep anchors clean
+
 ### Story 7.4: MutatorActionHandler
 
 As a sound designer,
@@ -1154,14 +1170,14 @@ So that MUTATE/RETRY/DELETE/CLEAR/EXPORT/COMPARE work from panel (FR-30–FR-34,
 ### Story 7.5: Bank Utility UI Wiring
 
 As a sound designer,
-I want bank buttons 0–9 and BANK LOCK wired to Core state,
+I want bank buttons 0–9 and UNLOCK wired to Core state,
 So that bank selection matches synth semantics (FR-19, FR-20, FR-21).
 
 **Acceptance Criteria:**
 
-**Given** Story 7.3
-**When** user selects bank or toggles lock
-**Then** selected bank shows red text; locked bank shows red padlock; no duplicate bank NumberBox in Internal Patches
+**Given** Story 7-3b
+**When** user selects bank or clicks UNLOCK
+**Then** selected bank shows red text; Internal Patches bank NumberBox shows red dot when `patchManagerBanksLocked`; UNLOCK button has no padlock icon; no duplicate bank-select control in Internal Patches
 **And** `selectedBank` APVTS property stays in sync
 
 ### Story 7.6: Internal Patches Panel Wiring

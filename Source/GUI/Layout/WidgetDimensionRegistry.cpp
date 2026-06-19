@@ -18,8 +18,8 @@ std::optional<int> WidgetDimensionRegistry::resolveStandaloneButtonWidth(const j
     using namespace PluginIDs;
     namespace BW = TSS::Design::Atoms::Widths::Button;
 
-    if (widgetId == PatchManagerSection::BankUtilityModule::StandaloneWidgets::kLockBank)
-        return BW::kPatchManagerLockBank;
+    if (widgetId == PatchManagerSection::BankUtilityModule::StandaloneWidgets::kUnlockBank)
+        return BW::kPatchManagerUnlockBank;
 
     if (widgetId.startsWith("bankUtilitySelectBank"))
         return BW::kPatchManagerBankSelect;

@@ -21,6 +21,8 @@ public:
                                              juce::uint8 source,
                                              juce::uint8 amount,
                                              juce::uint8 destination) const;
+    juce::MemoryBlock encodeSetBank(juce::uint8 bank) const;
+    static juce::MemoryBlock encodeUnlockBank();
     static size_t unpackBytes(const juce::uint8* bytes, size_t numBytes, juce::uint8* output);
     static juce::uint8 calculateChecksum(const juce::uint8* data, size_t length);
 

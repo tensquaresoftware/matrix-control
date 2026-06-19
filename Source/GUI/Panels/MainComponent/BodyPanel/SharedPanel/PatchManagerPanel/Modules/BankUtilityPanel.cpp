@@ -71,7 +71,7 @@ void BankUtilityPanel::setBankUtilityGrayed(bool grayed)
     bankUtilityGrayed_ = grayed;
     const float alpha = grayed ? 0.5f : 1.0f;
 
-    styleBankButton(lockBankButton_.get(), grayed);
+    styleBankButton(unlockBankButton_.get(), grayed);
     styleBankButton(selectBank0Button_.get(), grayed);
     styleBankButton(selectBank1Button_.get(), grayed);
     styleBankButton(selectBank2Button_.get(), grayed);
@@ -136,7 +136,7 @@ void BankUtilityPanel::resized()
     const int labelHeight         = juce::roundToInt(static_cast<float>(dims_.bankSelectorLabel.height) * sf);
     const int buttonWidth         = juce::roundToInt(static_cast<float>(dims_.buttons.patchManagerBankSelectWidth) * sf);
     const int buttonHeight        = juce::roundToInt(static_cast<float>(dims_.buttons.height) * sf);
-    const int lockButtonWidth   = juce::roundToInt(static_cast<float>(dims_.buttons.patchManagerLockBankWidth) * sf);
+    const int lockButtonWidth   = juce::roundToInt(static_cast<float>(dims_.buttons.patchManagerUnlockBankWidth) * sf);
 
     if (auto* header = bankUtilityModuleHeader_.get())
         header->setBounds(0, 0, moduleHeaderWidth, moduleHeaderHeight);
@@ -175,11 +175,11 @@ void BankUtilityPanel::resized()
     const int row2Y = juce::roundToInt(
         (static_cast<float>(dims_.moduleHeader.height + dims_.buttons.height) + rowGapDesign) * sf);
 
-    if (auto* button = lockBankButton_.get())
+    if (auto* button = unlockBankButton_.get())
         button->setBounds(0, row2Y, lockButtonWidth, buttonHeight);
 
     // Row 2 X positions: banks 5-9, after unlock button
-    const float row2OriginX = static_cast<float>(dims_.buttons.patchManagerLockBankWidth) * sf
+    const float row2OriginX = static_cast<float>(dims_.buttons.patchManagerUnlockBankWidth) * sf
         + rowGapDesign * sf;
 
     auto setBankButtonBoundsRow2 = [&](TSS::Button* btn, int index, int y)
@@ -199,7 +199,7 @@ void BankUtilityPanel::resized()
 
     if (bankSelectorLabel_)      bankSelectorLabel_->setUiScale(sf);
     if (bankUtilityModuleHeader_) bankUtilityModuleHeader_->setUiScale(sf);
-    if (lockBankButton_)       lockBankButton_->setUiScale(sf);
+    if (unlockBankButton_)       unlockBankButton_->setUiScale(sf);
     if (selectBank0Button_)      selectBank0Button_->setUiScale(sf);
     if (selectBank1Button_)      selectBank1Button_->setUiScale(sf);
     if (selectBank2Button_)      selectBank2Button_->setUiScale(sf);
@@ -230,8 +230,8 @@ void BankUtilityPanel::setSkin(TSS::ISkin& skin)
         selectBank3Button_->setLook(TSS::buttonLookFromSkin(skin));
     if (selectBank4Button_)
         selectBank4Button_->setLook(TSS::buttonLookFromSkin(skin));
-    if (lockBankButton_)
-        lockBankButton_->setLook(TSS::buttonLookFromSkin(skin));
+    if (unlockBankButton_)
+        unlockBankButton_->setLook(TSS::buttonLookFromSkin(skin));
     if (selectBank5Button_)
         selectBank5Button_->setLook(TSS::buttonLookFromSkin(skin));
     if (selectBank6Button_)
@@ -339,14 +339,14 @@ void BankUtilityPanel::setupSelectBankButtons(TSS::ISkin& skin, WidgetFactory& w
         PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank4);
     addAndMakeVisible(*selectBank4Button_);
 
-    lockBankButton_ = std::make_unique<TSS::Button>(
-        dims_.buttons.patchManagerLockBankWidth,
+    unlockBankButton_ = std::make_unique<TSS::Button>(
+        dims_.buttons.patchManagerUnlockBankWidth,
         dims_.buttons.height,
         TSS::buttonLookFromSkin(skin),
-        widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kLockBank).value_or(""));
-    lockBankButton_->onClick = makeBankAction(
-        PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kLockBank);
-    addAndMakeVisible(*lockBankButton_);
+        widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kUnlockBank).value_or(""));
+    unlockBankButton_->onClick = makeBankAction(
+        PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kUnlockBank);
+    addAndMakeVisible(*unlockBankButton_);
 
     selectBank5Button_     = std::make_unique<TSS::Button>(
         dims_.buttons.patchManagerBankSelectWidth,

@@ -63,7 +63,7 @@ namespace Core
             { PluginIDs::MatrixModulationSection::ModulationBus::StandaloneWidgets::kBus9Init, ActionHandlerKind::Module },
 
             // BankUtilityModule
-            { PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kLockBank, ActionHandlerKind::PatchManager },
+            { PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kUnlockBank, ActionHandlerKind::PatchManager },
             { PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank0, ActionHandlerKind::PatchManager },
             { PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank1, ActionHandlerKind::PatchManager },
             { PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank2, ActionHandlerKind::PatchManager },

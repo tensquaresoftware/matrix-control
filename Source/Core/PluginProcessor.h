@@ -45,6 +45,8 @@ namespace Core
     class ModuleActionHandler;
     class PatchManagerActionHandler;
     class MutatorActionHandler;
+    class PatchInitService;
+    class PatchSelectionMidiSync;
 }
 
 class PluginProcessor : public juce::AudioProcessor, public juce::ValueTree::Listener
@@ -274,6 +276,8 @@ private:
     std::unique_ptr<Core::InitTemplateLoader> initTemplateLoader_;
     std::unique_ptr<Core::MasterModuleInitService> masterModuleInitService_;
     std::unique_ptr<Core::PatchModuleInitService> patchModuleInitService_;
+    std::unique_ptr<Core::PatchInitService> patchInitService_;
+    std::unique_ptr<Core::PatchSelectionMidiSync> patchSelectionMidiSync_;
     std::unique_ptr<Core::ClipboardService> clipboardService_;
     std::unique_ptr<Core::ModuleActionHandler> moduleActionHandler_;
     std::unique_ptr<Core::PatchManagerActionHandler> patchManagerActionHandler_;
@@ -286,6 +290,7 @@ private:
     bool suppressMatrixModParameterSysEx_ { false };
     bool suppressMasterParameterSysEx_ { false };
     bool suppressPatchParameterSysEx_ { false };
+    bool suppressPatchSelectionMidiSync_ { false };
     bool developmentLoggingStarted_ { false };
     std::unique_ptr<DeferredMidiPortSyncTimer> deferredMidiPortSyncTimer_;
     

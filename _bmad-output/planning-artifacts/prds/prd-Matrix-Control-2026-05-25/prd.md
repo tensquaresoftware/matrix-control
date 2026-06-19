@@ -278,7 +278,7 @@ Load Master from file, Save Master as, Save as default init (`MasterInit.syx`), 
 
 ### 4.6 PATCH MANAGER — Bank Utility
 
-**Description:** Banks 0–9 selection and BANK LOCK aligned with Matrix-1000 front-panel semantics (replaces legacy UNLOCK). Realizes UJ-2.
+**Description:** Banks 0–9 selection and **UNLOCK** aligned with Oberheim MIDI spec and legacy Matrix-1000 Editor UX. Realizes UJ-2.
 
 #### FR-19: Bank selection
 
@@ -286,7 +286,7 @@ User selects active bank via buttons 0–9; Core pushes `selectedBank` to APVTS;
 
 #### FR-20: Bank lock
 
-**BANK LOCK** toggles lock on the selected bank; locked bank shows red padlock icon on the button. Lock semantics match native synth behavior (not legacy M4L UNLOCK inversion).
+Bank Utility provides bank buttons 0–9 (Set Bank / `0AH`, enables hardware bank lock) and an **UNLOCK** button (Unlock Bank / `0CH`). Editor state `patchManagerBanksLocked` mirrors hardware lock for navigation wrap and UI indicators. No lock toggle on Bank Utility. Internal Patches bank NumberBox shows a red lock indicator when banks are locked. Master Edit **BANK LOCK** (`miscBankLockEnable`) is a separate master parameter (byte 165).
 
 #### FR-21: Bank selection exclusivity
 

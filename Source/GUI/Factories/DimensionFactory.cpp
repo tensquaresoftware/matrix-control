@@ -17,7 +17,7 @@ namespace
             .pasteWidth = BW::kPaste,
             .height = Atoms::Heights::kButton,
             .patchManagerBankSelectWidth = BW::kPatchManagerBankSelect,
-            .patchManagerLockBankWidth = BW::kPatchManagerLockBank,
+            .patchManagerUnlockBankWidth = BW::kPatchManagerUnlockBank,
             .internalPatchesInitWidth = BW::kInternalPatchesInit,
             .internalPatchesCopyWidth = BW::kInternalPatchesCopy,
             .internalPatchesPasteWidth = BW::kInternalPatchesPaste,

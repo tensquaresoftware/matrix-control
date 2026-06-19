@@ -123,6 +123,29 @@ public:
             expect(data[6] == signedPackedByte);
         }
 
+        beginTest("Set Bank (0x0A) encoding");
+        {
+            auto message = encoder.encodeSetBank(7);
+            expectEquals(static_cast<int>(message.getSize()), 6);
+
+            const auto* data = static_cast<const juce::uint8*>(message.getData());
+            expect(data[0] == SysExConstants::kSysExStart);
+            expect(data[3] == SysExConstants::Opcode::kSetBank);
+            expect(data[4] == 7);
+            expect(data[5] == SysExConstants::kSysExEnd);
+        }
+
+        beginTest("Unlock Bank (0x0C) encoding");
+        {
+            auto message = SysExEncoder::encodeUnlockBank();
+            expectEquals(static_cast<int>(message.getSize()), 5);
+
+            const auto* data = static_cast<const juce::uint8*>(message.getData());
+            expect(data[0] == SysExConstants::kSysExStart);
+            expect(data[3] == SysExConstants::Opcode::kUnlockBank);
+            expect(data[4] == SysExConstants::kSysExEnd);
+        }
+
         beginTest("Unpack bytes to nibbles");
         {
             juce::uint8 packedBytes[] = { 0x12, 0x34, 0x56 };

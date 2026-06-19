@@ -712,7 +712,7 @@ namespace PluginDisplayNames
             namespace StandaloneWidgets
             {
                 constexpr const char* kBankSelector = "SELECT BANK";
-                constexpr const char* kLockBank     = "BANK LOCK";
+                constexpr const char* kUnlockBank   = "UNLOCK";
                 constexpr const char* kSelectBank0  = "0";
                 constexpr const char* kSelectBank1  = "1";
                 constexpr const char* kSelectBank2  = "2";
@@ -729,6 +729,8 @@ namespace PluginDisplayNames
         namespace InternalPatchesModule
         {
             constexpr const char* kName = "INTERNAL PATCHES";
+            constexpr const char* kRomBankPasteStoreFooterMessage =
+                "Paste and Store are not available on ROM banks 2-9.";
 
             namespace StandaloneWidgets
             {
