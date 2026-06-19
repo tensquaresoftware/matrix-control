@@ -687,3 +687,25 @@ if(WIN32 AND COPY_TO_SYSTEM_FOLDERS AND PLUGIN_FORMATS_LIST MATCHES "VST3")
         VERBATIM
     )
 endif()
+
+# IDE: filtered compile_commands.json at repo root (excludes BinaryData blobs that hang clangd).
+find_package(Python3 COMPONENTS Interpreter QUIET)
+if(Python3_FOUND AND CMAKE_EXPORT_COMPILE_COMMANDS AND EXISTS "${CMAKE_BINARY_DIR}/compile_commands.json")
+    execute_process(
+        COMMAND "${Python3_EXECUTABLE}"
+                "${CMAKE_CURRENT_SOURCE_DIR}/CMake/filter-ide-compile-commands.py"
+                --project-root "${CMAKE_CURRENT_SOURCE_DIR}"
+                --build-dir "${CMAKE_BINARY_DIR}"
+        RESULT_VARIABLE _matrix_control_filter_compile_commands_result
+        OUTPUT_VARIABLE _matrix_control_filter_compile_commands_output
+        ERROR_VARIABLE _matrix_control_filter_compile_commands_error
+    )
+    if(NOT _matrix_control_filter_compile_commands_result EQUAL 0)
+        message(WARNING "IDE compile_commands filter failed: ${_matrix_control_filter_compile_commands_error}")
+    else()
+        string(STRIP "${_matrix_control_filter_compile_commands_output}" _matrix_control_filter_compile_commands_output)
+        if(NOT _matrix_control_filter_compile_commands_output STREQUAL "")
+            message(STATUS "${_matrix_control_filter_compile_commands_output}")
+        endif()
+    endif()
+endif()
