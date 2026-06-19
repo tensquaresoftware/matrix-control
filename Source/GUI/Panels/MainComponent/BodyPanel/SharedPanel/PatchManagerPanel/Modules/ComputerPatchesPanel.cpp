@@ -85,7 +85,28 @@ void ComputerPatchesPanel::refreshPatchFileComboBox()
     }
 
     applySelectSentinel(scan.sortedValidFileNames);
+    syncSelectionFromApvts();
+}
+
+void ComputerPatchesPanel::syncSelectionFromApvts()
+{
+    if (selectPatchFileComboBox_ == nullptr)
+        return;
+
+    const int selectedId = static_cast<int>(apvts_.state.getProperty(
+        ComputerPatchesIds::StandaloneWidgets::kSelectPatchFile,
+        0));
+
+    if (selectedId >= 1 && selectedId <= selectPatchFileComboBox_->getNumItems())
+    {
+        selectPatchFileComboBox_->setSelectedId(selectedId, juce::dontSendNotification);
+        setNavigationButtonsEnabled(true);
+        return;
+    }
+
+    selectPatchFileComboBox_->setSelectedId(0, juce::dontSendNotification);
     clearPatchFileSelectionProperty();
+    setNavigationButtonsEnabled(false);
 }
 
 void ComputerPatchesPanel::applyEmptySentinel()

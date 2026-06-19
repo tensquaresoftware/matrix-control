@@ -42,6 +42,8 @@ public:
     void sendProgramChange(int programNumber, int channel = 1);
     void sendSetBank(int bank);
     void sendUnlockBank();
+    SysExEncoder& getSysExEncoder() noexcept { return *sysExEncoder; }
+    const SysExEncoder& getSysExEncoder() const noexcept { return *sysExEncoder; }
     void enqueueRemoteParameterEdit(int parameterNumber, juce::uint8 packedValue);
     void enqueueMatrixModBusEdit(juce::uint8 bus,
                                  juce::uint8 source,

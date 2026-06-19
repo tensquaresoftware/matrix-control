@@ -1,6 +1,7 @@
 #include "Core/Services/PatchFileService.h"
 
 #include "Core/MIDI/SysEx/SysExDecoder.h"
+#include "Core/MIDI/SysEx/SysExEncoder.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 
 namespace Core
@@ -39,6 +40,72 @@ namespace Core
     void PatchFileService::clearLastScan() noexcept
     {
         lastScan_ = {};
+    }
+
+    PatchFileSaveResult PatchFileService::savePatchSysExFile(const juce::File& targetFile,
+                                                             const juce::uint8* packedData,
+                                                             SysExEncoder& encoder)
+    {
+        PatchFileSaveResult result;
+
+        if (packedData == nullptr)
+        {
+            result.errorMessage = "Invalid patch data";
+            return result;
+        }
+
+        const auto target = targetFile.hasFileExtension(kSyxExtension)
+            ? targetFile
+            : targetFile.withFileExtension(kSyxExtension);
+
+        const auto parent = target.getParentDirectory();
+        if (! parent.isDirectory() || ! parent.hasWriteAccess())
+        {
+            result.errorMessage = "Folder not writable";
+            return result;
+        }
+
+        const auto encoded = encoder.encodePatchSysEx(0, packedData);
+        if (encoded.getSize() == 0)
+        {
+            result.errorMessage = "Encode failed";
+            return result;
+        }
+
+        const auto tempFile = parent.getNonexistentChildFile(
+            target.getFileNameWithoutExtension() + "_write",
+            ".tmp");
+
+        if (! tempFile.replaceWithData(encoded.getData(), encoded.getSize()))
+        {
+            result.errorMessage = "Write failed";
+            return result;
+        }
+
+        juce::MemoryBlock readBack;
+        if (! tempFile.loadFileAsData(readBack) || ! decoder_.validatePatchSysExMessage(readBack))
+        {
+            tempFile.deleteFile();
+            result.errorMessage = "Validation failed";
+            return result;
+        }
+
+        if (target.existsAsFile() && ! target.deleteFile())
+        {
+            tempFile.deleteFile();
+            result.errorMessage = "Write failed";
+            return result;
+        }
+
+        if (! tempFile.moveFileTo(target))
+        {
+            tempFile.deleteFile();
+            result.errorMessage = "Write failed";
+            return result;
+        }
+
+        result.success = true;
+        return result;
     }
 
     bool PatchFileService::hasSyxExtension(const juce::File& file) noexcept

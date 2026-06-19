@@ -3,9 +3,16 @@
 #include <juce_core/juce_core.h>
 
 class SysExDecoder;
+class SysExEncoder;
 
 namespace Core
 {
+
+    struct PatchFileSaveResult
+    {
+        bool success = false;
+        juce::String errorMessage;
+    };
 
     struct PatchFolderScanResult
     {
@@ -26,6 +33,9 @@ namespace Core
         explicit PatchFileService(SysExDecoder& decoder) noexcept;
 
         PatchFolderScanResult scanFolder(const juce::File& folder);
+        PatchFileSaveResult savePatchSysExFile(const juce::File& targetFile,
+                                               const juce::uint8* packedData,
+                                               SysExEncoder& encoder);
         const PatchFolderScanResult& getLastScanResult() const noexcept { return lastScan_; }
         bool hasCachedScanResult() const noexcept;
         void clearLastScan() noexcept;

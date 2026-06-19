@@ -1,6 +1,11 @@
 # Deferred Work
 
-## Deferred from: code review of 4-3-folder-path-persistence (2026-06-19)
+## Deferred from: code review of 4-4-save-with-filename-injection (2026-06-19)
+
+- **SAVE AS outside library folder** — no combobox entry after save; spec v1 allows any folder, rescan stays on library path only.
+- **Long disk filename vs 8-char injected name** — intentional FR-28 / D-025 divergence per story dev notes.
+- **`ensureSyxExtension` unused** — dead API added but not wired; low impact cleanup.
+
 
 - **Lacunes de tests optionnelles** — remplacement explicite AC #7, intégration `PluginProcessor::setStateInformation`, assert `kScanRevision` plus fort ; conformité AC validée par l'auditeur.
 - **Chemins absolus non portables entre machines** (`PatchManagerActionHandler.cpp:241`) — v1 AD-7 / D-010 ; chemins relatifs ou bookmarks hors périmètre.

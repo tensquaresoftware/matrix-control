@@ -89,6 +89,26 @@ PluginEditor::PluginEditor(PluginProcessor& p)
         return {};
     });
 
+    pluginProcessor.setPatchSaveFilePicker(
+        [safeThis = juce::Component::SafePointer<PluginEditor>(this)](
+            juce::File suggestedFolder, juce::String suggestedStem) -> juce::File
+        {
+            if (safeThis == nullptr)
+                return {};
+
+            juce::FileChooser chooser("Save patch as",
+                                      suggestedFolder.getChildFile(suggestedStem + ".syx"),
+                                      "*.syx",
+                                      true,
+                                      false,
+                                      safeThis.getComponent());
+
+            if (chooser.browseForFileToSave(true))
+                return chooser.getResult();
+
+            return {};
+        });
+
     skinBlack_ = TSS::Skin::create(TSS::Skin::ColourVariant::Black);
     skinCream_ = TSS::Skin::create(TSS::Skin::ColourVariant::Cream);
 

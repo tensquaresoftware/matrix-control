@@ -1,7 +1,9 @@
 #include <juce_core/juce_core.h>
 
 #include "Core/MIDI/SysEx/SysExDecoder.h"
+#include "Core/MIDI/SysEx/SysExEncoder.h"
 #include "Core/MIDI/SysEx/SysExParser.h"
+#include "Core/Init/InitDefaults.h"
 #include "Core/Services/PatchFileService.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 
@@ -41,11 +43,14 @@ public:
         scan_readFailure_countsInvalid();
         scan_sortOrder_patchFixtures();
         scan_uppercaseSyxExtension_countsValid();
+        savePatchSysExFile_validRoundTrip();
+        savePatchSysExFile_writeFailureHandled();
     }
 
 private:
     SysExParser parser_;
     SysExDecoder decoder_;
+    SysExEncoder encoder_;
     Core::PatchFileService service_;
 
     juce::File createTempScanDir()
@@ -233,6 +238,42 @@ private:
         expectEquals(result.sortedValidFileNames[0], juce::String("Patch 71.SYX"));
 
         tempDir.deleteRecursively();
+    }
+
+    void savePatchSysExFile_validRoundTrip()
+    {
+        beginTest("savePatchSysExFile_validRoundTrip");
+
+        const auto tempDir = createTempScanDir();
+        const auto target = tempDir.getChildFile("SavedPatch.syx");
+
+        const auto result = service_.savePatchSysExFile(
+            target,
+            Core::InitDefaults::patchData(),
+            encoder_);
+
+        expect(result.success);
+        expect(target.existsAsFile());
+        expectEquals(service_.scanFolder(tempDir).validCount, 1);
+
+        tempDir.deleteRecursively();
+    }
+
+    void savePatchSysExFile_writeFailureHandled()
+    {
+        beginTest("savePatchSysExFile_writeFailureHandled");
+
+        const auto missingParent = juce::File::getSpecialLocation(juce::File::tempDirectory)
+                                       .getChildFile("MatrixControlMissingParent")
+                                       .getChildFile("nested/SavedPatch.syx");
+
+        const auto result = service_.savePatchSysExFile(
+            missingParent,
+            Core::InitDefaults::patchData(),
+            encoder_);
+
+        expect(! result.success);
+        expect(result.errorMessage.isNotEmpty());
     }
 };
 

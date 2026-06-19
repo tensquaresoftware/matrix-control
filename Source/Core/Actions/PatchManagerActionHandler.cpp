@@ -6,14 +6,37 @@
 #include "Core/MIDI/PatchSelectionMidiSync.h"
 #include "Core/Models/ApvtsPatchMapper.h"
 #include "Core/Models/PatchModel.h"
+#include "Core/Models/PatchNameSyncer.h"
 #include "Core/Services/ClipboardService.h"
 #include "Core/Services/PatchFileService.h"
+#include "Core/Services/PatchFileNameSanitizer.h"
 #include "Core/Services/PatchFileServiceFooter.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginIDs.h"
 
 namespace Core
 {
+
+    namespace
+    {
+        int indexOfFileNameIgnoreCase(const juce::StringArray& names, const juce::String& fileName)
+        {
+            for (int i = 0; i < names.size(); ++i)
+            {
+                if (names[i].equalsIgnoreCase(fileName))
+                    return i;
+            }
+
+            return -1;
+        }
+
+        juce::String savedSyxFileName(const juce::File& targetFile)
+        {
+            return targetFile.hasFileExtension(PatchFileService::kSyxExtension)
+                ? targetFile.getFileName()
+                : targetFile.withFileExtension(PatchFileService::kSyxExtension).getFileName();
+        }
+    }
 
     PatchManagerActionHandler::PatchManagerActionHandler(
         juce::AudioProcessorValueTreeState& apvts,
@@ -25,7 +48,10 @@ namespace Core
         PatchSelectionMidiSync* patchSelectionMidiSync,
         MidiManager* midiManager,
         PatchFileService* patchFileService,
+        PatchNameSyncer* patchNameSyncer,
+        SysExEncoder* sysExEncoder,
         PatchFolderPicker pickFolder,
+        PatchSaveFilePicker pickSaveFile,
         ActionExecutionHooks hooks)
         : apvts_(apvts)
         , deviceMemoryLimits_(std::move(deviceMemoryLimits))
@@ -36,7 +62,10 @@ namespace Core
         , patchSelectionMidiSync_(patchSelectionMidiSync)
         , midiManager_(midiManager)
         , patchFileService_(patchFileService)
+        , patchNameSyncer_(patchNameSyncer)
+        , sysExEncoder_(sysExEncoder)
         , pickFolder_(std::move(pickFolder))
+        , pickSaveFile_(std::move(pickSaveFile))
         , hooks_(std::move(hooks))
     {
     }
@@ -89,13 +118,23 @@ namespace Core
             return;
         }
 
+        if (propertyId == ComputerPatchesModule::StandaloneWidgets::kSavePatchAs)
+        {
+            handleSavePatchAs();
+            return;
+        }
+
+        if (propertyId == ComputerPatchesModule::StandaloneWidgets::kSavePatchFile)
+        {
+            handleSavePatchFile();
+            return;
+        }
+
         if (propertyId == ComputerPatchesModule::StandaloneWidgets::kLoadPreviousPatchFile
             || propertyId == ComputerPatchesModule::StandaloneWidgets::kLoadNextPatchFile
-            || propertyId == ComputerPatchesModule::StandaloneWidgets::kSelectPatchFile
-            || propertyId == ComputerPatchesModule::StandaloneWidgets::kSavePatchAs
-            || propertyId == ComputerPatchesModule::StandaloneWidgets::kSavePatchFile)
+            || propertyId == ComputerPatchesModule::StandaloneWidgets::kSelectPatchFile)
         {
-            return; // Epic 4
+            return; // Epic 4.5 / 4.6
         }
 
         if (!limits.hasBankConcept())
@@ -242,6 +281,151 @@ namespace Core
             folder.getFullPathName(),
             nullptr);
         scanAndPublishFolder(folder);
+    }
+
+    void PatchManagerActionHandler::handleSavePatchAs()
+    {
+        if (! pickSaveFile_)
+            return;
+
+        const auto target = pickSaveFile_(resolveDefaultSaveFolder(), resolveSuggestedSaveStem());
+
+        if (target.getFullPathName().isEmpty())
+            return;
+
+        saveCurrentPatchToFile(target);
+    }
+
+    void PatchManagerActionHandler::handleSavePatchFile()
+    {
+        if (patchFileService_ == nullptr)
+            return;
+
+        const int selectedId = static_cast<int>(apvts_.state.getProperty(
+            PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSelectPatchFile,
+            0));
+
+        if (selectedId < 1)
+            return;
+
+        const auto& scan = patchFileService_->getLastScanResult();
+        const auto expectedFolder = resolveRescanFolder();
+
+        if (! scan.folderUsable || ! scan.folder.isDirectory() || ! expectedFolder.isDirectory()
+            || scan.folder.getFullPathName() != expectedFolder.getFullPathName())
+            return;
+
+        const int index = selectedId - 1;
+        if (index < 0 || index >= scan.sortedValidFileNames.size())
+            return;
+
+        saveCurrentPatchToFile(scan.folder.getChildFile(scan.sortedValidFileNames[index]));
+    }
+
+    void PatchManagerActionHandler::saveCurrentPatchToFile(const juce::File& targetFile)
+    {
+        if (patchModel_ == nullptr || apvtsPatchMapper_ == nullptr || patchFileService_ == nullptr
+            || patchNameSyncer_ == nullptr || sysExEncoder_ == nullptr)
+            return;
+
+        apvtsPatchMapper_->apvtsToBuffer();
+
+        const auto originalName = patchModel_->getName();
+        patchModel_->setName(PatchFileNameSanitizer::sanitizeFileStem(
+            targetFile.getFileNameWithoutExtension()));
+
+        const auto result = patchFileService_->savePatchSysExFile(
+            targetFile.withFileExtension(PatchFileService::kSyxExtension),
+            patchModel_->data(),
+            *sysExEncoder_);
+
+        if (! result.success)
+        {
+            patchModel_->setName(originalName);
+            publishSaveFailureFooter(result.errorMessage);
+            return;
+        }
+
+        completeSuccessfulSave(savedSyxFileName(targetFile));
+    }
+
+    void PatchManagerActionHandler::completeSuccessfulSave(const juce::String& savedFileName)
+    {
+        patchNameSyncer_->bufferToApvts();
+        publishSaveSuccessFooter(savedFileName);
+        rescanAndSelectSavedFile(savedFileName);
+    }
+
+    void PatchManagerActionHandler::rescanAndSelectSavedFile(const juce::String& savedFileName)
+    {
+        if (patchFileService_ == nullptr)
+            return;
+
+        const auto folder = resolveRescanFolder();
+        if (! folder.isDirectory())
+            return;
+
+        patchFileService_->scanFolder(folder);
+
+        const auto& names = patchFileService_->getLastScanResult().sortedValidFileNames;
+        const int index = indexOfFileNameIgnoreCase(names, savedFileName);
+
+        apvts_.state.setProperty(
+            PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSelectPatchFile,
+            index >= 0 ? index + 1 : 0,
+            nullptr);
+        bumpScanRevision();
+    }
+
+    juce::File PatchManagerActionHandler::resolveRescanFolder() const
+    {
+        const auto path = apvts_.state.getProperty(
+            PluginIDs::PatchManagerSection::ComputerPatchesModule::StateProperties::kFolderPath,
+            juce::String()).toString();
+
+        if (path.isNotEmpty())
+        {
+            const juce::File persisted(path);
+            if (persisted.isDirectory())
+                return persisted;
+        }
+
+        if (patchFileService_ != nullptr)
+            return patchFileService_->getLastScanResult().folder;
+
+        return {};
+    }
+
+    juce::File PatchManagerActionHandler::resolveDefaultSaveFolder() const
+    {
+        const auto folder = resolveRescanFolder();
+        return folder.isDirectory() ? folder : juce::File();
+    }
+
+    juce::String PatchManagerActionHandler::resolveSuggestedSaveStem() const
+    {
+        const auto raw = apvts_.state.getProperty(
+            PluginIDs::PatchEditSection::PatchNameModule::kPatchName,
+            juce::String()).toString();
+
+        const auto sanitized = PatchFileNameSanitizer::sanitizeToMatrixName(raw.trim());
+        return sanitized.isNotEmpty() ? sanitized : juce::String(PatchFileNameSanitizer::kEmptyNameFallback);
+    }
+
+    void PatchManagerActionHandler::publishSaveSuccessFooter(const juce::String& fileName)
+    {
+        apvts_.state.setProperty(
+            "uiMessageText",
+            PluginDisplayNames::PatchManagerSection::ComputerPatchesModule::FooterMessages::formatSaveSuccess(
+                fileName),
+            nullptr);
+        apvts_.state.setProperty("uiMessageSeverity", juce::String("info"), nullptr);
+    }
+
+    void PatchManagerActionHandler::publishSaveFailureFooter(const juce::String& message)
+    {
+        apvts_.state.setProperty("uiMessageText", message, nullptr);
+        apvts_.state.setProperty("uiMessageSeverity", juce::String("warning"), nullptr);
     }
 
     void PatchManagerActionHandler::rescanPersistedComputerPatchesFolder()

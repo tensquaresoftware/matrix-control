@@ -760,6 +760,11 @@ namespace PluginDisplayNames
                     return juce::String(validCount) + " valid, " + juce::String(invalidCount) + " invalid";
                 }
 
+                inline juce::String formatSaveSuccess(const juce::String& fileName)
+                {
+                    return "Saved " + fileName;
+                }
+
                 constexpr const char* kEmptyFolder = "0 files in folder";
                 constexpr const char* kFolderNotFound = "Folder not found";
             }

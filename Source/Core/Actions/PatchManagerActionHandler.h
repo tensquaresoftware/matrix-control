@@ -9,6 +9,7 @@
 #include "Core/Services/DeviceMemoryLimits.h"
 
 class MidiManager;
+class SysExEncoder;
 
 namespace Core
 {
@@ -18,6 +19,7 @@ namespace Core
     class PatchFileService;
     class PatchInitService;
     class PatchModel;
+    class PatchNameSyncer;
     class PatchSelectionMidiSync;
 
     class PatchManagerActionHandler final : public IActionHandler
@@ -25,6 +27,8 @@ namespace Core
     public:
         using DeviceMemoryLimitsSupplier = std::function<DeviceMemoryLimits()>;
         using PatchFolderPicker = std::function<juce::File()>;
+        using PatchSaveFilePicker = std::function<juce::File(juce::File suggestedFolder,
+                                                             juce::String suggestedStem)>;
 
         PatchManagerActionHandler(juce::AudioProcessorValueTreeState& apvts,
                                   DeviceMemoryLimitsSupplier deviceMemoryLimits,
@@ -35,7 +39,10 @@ namespace Core
                                   PatchSelectionMidiSync* patchSelectionMidiSync,
                                   MidiManager* midiManager,
                                   PatchFileService* patchFileService,
+                                  PatchNameSyncer* patchNameSyncer,
+                                  SysExEncoder* sysExEncoder,
                                   PatchFolderPicker pickFolder,
+                                  PatchSaveFilePicker pickSaveFile,
                                   ActionExecutionHooks hooks);
 
         void handleAction(const juce::String& propertyId, const juce::var& newValue) override;
@@ -50,9 +57,19 @@ namespace Core
         void handleInternalPatchPaste(const DeviceMemoryLimits& limits);
         void handleInternalPatchStore(const DeviceMemoryLimits& limits);
         void handleOpenPatchFolder();
+        void handleSavePatchAs();
+        void handleSavePatchFile();
+        void saveCurrentPatchToFile(const juce::File& targetFile);
+        void completeSuccessfulSave(const juce::String& savedFileName);
+        void rescanAndSelectSavedFile(const juce::String& savedFileName);
+        juce::File resolveRescanFolder() const;
+        juce::File resolveDefaultSaveFolder() const;
+        juce::String resolveSuggestedSaveStem() const;
         void scanAndPublishFolder(const juce::File& folder);
         void clearPublishedScanCache();
         void bumpScanRevision();
+        void publishSaveSuccessFooter(const juce::String& fileName);
+        void publishSaveFailureFooter(const juce::String& message);
         void propagateRomBlockedFooter();
         int getCurrentBank(const DeviceMemoryLimits& limits) const;
         int getCurrentPatch(const DeviceMemoryLimits& limits) const;
@@ -67,7 +84,10 @@ namespace Core
         PatchSelectionMidiSync* patchSelectionMidiSync_;
         MidiManager* midiManager_;
         PatchFileService* patchFileService_;
+        PatchNameSyncer* patchNameSyncer_;
+        SysExEncoder* sysExEncoder_;
         PatchFolderPicker pickFolder_;
+        PatchSaveFilePicker pickSaveFile_;
         ActionExecutionHooks hooks_;
     };
 

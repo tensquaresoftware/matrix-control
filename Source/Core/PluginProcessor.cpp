@@ -266,10 +266,18 @@ PluginProcessor::PluginProcessor()
         patchSelectionMidiSync_.get(),
         midiManager.get(),
         patchFileService_.get(),
+        patchNameSyncer_.get(),
+        &midiManager->getSysExEncoder(),
         [this]() -> juce::File
         {
             if (patchFolderPicker_)
                 return patchFolderPicker_();
+            return {};
+        },
+        [this](juce::File suggestedFolder, juce::String suggestedStem) -> juce::File
+        {
+            if (patchSaveFilePicker_)
+                return patchSaveFilePicker_(suggestedFolder, suggestedStem);
             return {};
         },
         actionHooks);
@@ -754,6 +762,11 @@ void PluginProcessor::setGuiScaleId(int scaleId)
 void PluginProcessor::setPatchFolderPicker(PatchFolderPicker picker)
 {
     patchFolderPicker_ = std::move(picker);
+}
+
+void PluginProcessor::setPatchSaveFilePicker(PatchSaveFilePicker picker)
+{
+    patchSaveFilePicker_ = std::move(picker);
 }
 
 int PluginProcessor::getSkinVariantId() const

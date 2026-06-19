@@ -79,6 +79,7 @@ private:
     void refreshPatchFileComboBox();
     void applyEmptySentinel();
     void applySelectSentinel(const juce::StringArray& sortedValidFileNames);
+    void syncSelectionFromApvts();
     void setNavigationButtonsEnabled(bool enabled);
     void clearPatchFileSelectionProperty();
 

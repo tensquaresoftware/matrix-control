@@ -138,6 +138,10 @@ public:
     using PatchFolderPicker = std::function<juce::File()>;
 
     void setPatchFolderPicker(PatchFolderPicker picker);
+
+    using PatchSaveFilePicker = std::function<juce::File(juce::File suggestedFolder, juce::String suggestedStem)>;
+
+    void setPatchSaveFilePicker(PatchSaveFilePicker picker);
     Core::PatchFileService& getPatchFileService() noexcept { return *patchFileService_; }
     const Core::PatchFileService& getPatchFileService() const noexcept { return *patchFileService_; }
 
@@ -290,6 +294,7 @@ private:
     std::unique_ptr<Core::ClipboardService> clipboardService_;
     std::unique_ptr<Core::PatchFileService> patchFileService_;
     PatchFolderPicker patchFolderPicker_;
+    PatchSaveFilePicker patchSaveFilePicker_;
     std::unique_ptr<Core::ModuleActionHandler> moduleActionHandler_;
     std::unique_ptr<Core::PatchManagerActionHandler> patchManagerActionHandler_;
     std::unique_ptr<Core::MutatorActionHandler> mutatorActionHandler_;
