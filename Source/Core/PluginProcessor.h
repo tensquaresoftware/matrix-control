@@ -218,6 +218,7 @@ private:
     void initializeAudioProperties();
     void initializeHardwareLatencyProperty();
     void initializeInitTemplatesFolderProperty();
+    void initializeComputerPatchesFolderProperty();
     void applyHardwareLatencyToHost();
     void notifyNonParameterStateChanged();
     void scheduleDeferredMidiPortSyncForPluginHost();

@@ -27,6 +27,8 @@ namespace Core
 
         PatchFolderScanResult scanFolder(const juce::File& folder);
         const PatchFolderScanResult& getLastScanResult() const noexcept { return lastScan_; }
+        bool hasCachedScanResult() const noexcept;
+        void clearLastScan() noexcept;
 
     private:
         static bool hasSyxExtension(const juce::File& file) noexcept;

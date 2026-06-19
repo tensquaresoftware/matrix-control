@@ -40,6 +40,8 @@ namespace Core
 
         void handleAction(const juce::String& propertyId, const juce::var& newValue) override;
 
+        void rescanPersistedComputerPatchesFolder();
+
     private:
         void applyPatchCoordinates(const PatchCoordinates& coordinates, const DeviceMemoryLimits& limits);
         void handleUnlockBank(const DeviceMemoryLimits& limits);
@@ -48,6 +50,9 @@ namespace Core
         void handleInternalPatchPaste(const DeviceMemoryLimits& limits);
         void handleInternalPatchStore(const DeviceMemoryLimits& limits);
         void handleOpenPatchFolder();
+        void scanAndPublishFolder(const juce::File& folder);
+        void clearPublishedScanCache();
+        void bumpScanRevision();
         void propagateRomBlockedFooter();
         int getCurrentBank(const DeviceMemoryLimits& limits) const;
         int getCurrentPatch(const DeviceMemoryLimits& limits) const;

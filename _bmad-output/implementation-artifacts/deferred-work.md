@@ -1,5 +1,14 @@
 # Deferred Work
 
+## Deferred from: code review of 4-3-folder-path-persistence (2026-06-19)
+
+- **Lacunes de tests optionnelles** — remplacement explicite AC #7, intégration `PluginProcessor::setStateInformation`, assert `kScanRevision` plus fort ; conformité AC validée par l'auditeur.
+- **Chemins absolus non portables entre machines** (`PatchManagerActionHandler.cpp:241`) — v1 AD-7 / D-010 ; chemins relatifs ou bookmarks hors périmètre.
+- **Scan synchrone sur `setStateInformation`** (`PluginProcessor.cpp:565`) — acceptable v1 selon story 4.1.
+- **`handleOpenPatchFolder` 16 lignes** (`PatchManagerActionHandler.cpp:230`) — dette style mineure (limite 15 lignes story).
+- **Chemin whitespace / relatif / XML corrompu non validé** (`PatchManagerActionHandler.cpp:249`) — entrées manuelles improbables.
+- **`kScanRevision` via `getMillisecondCounterHiRes()`** — pattern hérité story 4.2 ; collision théorique même tick.
+
 ## Deferred from: code review of 4-2-combobox-sentinel-states (2026-06-19)
 
 - **`kScanRevision` uses `getMillisecondCounterHiRes()`** (`PatchManagerActionHandler.cpp:242-245`) — theoretical duplicate if two scans complete in same tick; same project-wide APVTS trigger pattern as 5-3.

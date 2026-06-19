@@ -290,6 +290,11 @@ PluginProcessor::PluginProcessor()
     initializeAudioProperties();
     initializeHardwareLatencyProperty();
     initializeInitTemplatesFolderProperty();
+    initializeComputerPatchesFolderProperty();
+
+    if (patchManagerActionHandler_ != nullptr)
+        patchManagerActionHandler_->rescanPersistedComputerPatchesFolder();
+
     initializePatchNameProperty();
     initializeClipboardPasteEnabledProperties();
     apvts.state.addListener(this);
@@ -557,6 +562,9 @@ void PluginProcessor::setStateInformation(const void* data, int sizeInBytes)
             syncMidiPortsFromState(false);
             scheduleDeferredMidiPortSyncForPluginHost();
 
+            if (patchManagerActionHandler_ != nullptr)
+                patchManagerActionHandler_->rescanPersistedComputerPatchesFolder();
+
             if (shouldUseDevelopmentLogging())
                 ApvtsLogger::getInstance().logStateLoaded("DAW state");
         }
@@ -778,6 +786,18 @@ void PluginProcessor::initializeInitTemplatesFolderProperty()
 {
     if (!apvts.state.hasProperty(PluginIDs::Settings::kInitTemplatesFolderPath))
         apvts.state.setProperty(PluginIDs::Settings::kInitTemplatesFolderPath, juce::String(), nullptr);
+}
+
+void PluginProcessor::initializeComputerPatchesFolderProperty()
+{
+    if (!apvts.state.hasProperty(
+            PluginIDs::PatchManagerSection::ComputerPatchesModule::StateProperties::kFolderPath))
+    {
+        apvts.state.setProperty(
+            PluginIDs::PatchManagerSection::ComputerPatchesModule::StateProperties::kFolderPath,
+            juce::String(),
+            nullptr);
+    }
 }
 
 void PluginProcessor::syncHardwareLatencyFromState()

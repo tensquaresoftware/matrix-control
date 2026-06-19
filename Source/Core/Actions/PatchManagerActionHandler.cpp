@@ -237,8 +237,58 @@ namespace Core
         if (! folder.isDirectory())
             return;
 
+        apvts_.state.setProperty(
+            PluginIDs::PatchManagerSection::ComputerPatchesModule::StateProperties::kFolderPath,
+            folder.getFullPathName(),
+            nullptr);
+        scanAndPublishFolder(folder);
+    }
+
+    void PatchManagerActionHandler::rescanPersistedComputerPatchesFolder()
+    {
+        const auto path = apvts_.state.getProperty(
+            PluginIDs::PatchManagerSection::ComputerPatchesModule::StateProperties::kFolderPath,
+            juce::String()).toString();
+
+        if (path.isEmpty())
+        {
+            clearPublishedScanCache();
+            return;
+        }
+
+        scanAndPublishFolder(juce::File(path));
+    }
+
+    void PatchManagerActionHandler::clearPublishedScanCache()
+    {
+        if (patchFileService_ == nullptr || ! patchFileService_->hasCachedScanResult())
+            return;
+
+        const auto footerMessage = patchFileService_->getLastScanResult().footerMessage;
+        patchFileService_->clearLastScan();
+
+        if (footerMessage.isNotEmpty()
+            && apvts_.state.getProperty("uiMessageText").toString() == footerMessage)
+        {
+            apvts_.state.setProperty("uiMessageText", juce::String(), nullptr);
+            apvts_.state.setProperty("uiMessageSeverity", juce::String(), nullptr);
+        }
+
+        bumpScanRevision();
+    }
+
+    void PatchManagerActionHandler::scanAndPublishFolder(const juce::File& folder)
+    {
+        if (patchFileService_ == nullptr)
+            return;
+
         const auto result = patchFileService_->scanFolder(folder);
         PatchFileServiceFooter::propagateScanResult(apvts_, result);
+        bumpScanRevision();
+    }
+
+    void PatchManagerActionHandler::bumpScanRevision()
+    {
         apvts_.state.setProperty(
             PluginIDs::PatchManagerSection::ComputerPatchesModule::StateProperties::kScanRevision,
             juce::Time::getMillisecondCounterHiRes(),

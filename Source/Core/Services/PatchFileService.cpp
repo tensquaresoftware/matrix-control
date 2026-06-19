@@ -26,6 +26,21 @@ namespace Core
         return result;
     }
 
+    bool PatchFileService::hasCachedScanResult() const noexcept
+    {
+        const auto& scan = lastScan_;
+        return scan.folderUsable
+            || scan.validCount > 0
+            || scan.invalidCount > 0
+            || scan.footerMessage.isNotEmpty()
+            || scan.folder.getFullPathName().isNotEmpty();
+    }
+
+    void PatchFileService::clearLastScan() noexcept
+    {
+        lastScan_ = {};
+    }
+
     bool PatchFileService::hasSyxExtension(const juce::File& file) noexcept
     {
         return file.getFileExtension().toLowerCase() == kSyxExtension;

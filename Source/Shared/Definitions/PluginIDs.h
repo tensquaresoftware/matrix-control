@@ -556,6 +556,7 @@ namespace PluginIDs
 
             namespace StateProperties
             {
+                constexpr const char* kFolderPath   = "computerPatchesFolderPath";
                 constexpr const char* kScanRevision = "computerPatchesScanRevision";
             }
 
