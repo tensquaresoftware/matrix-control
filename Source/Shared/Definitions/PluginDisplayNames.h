@@ -751,6 +751,17 @@ namespace PluginDisplayNames
         {
             constexpr const char* kName = "COMPUTER PATCHES";
 
+            namespace FooterMessages
+            {
+                inline juce::String formatScanSummary(int validCount, int invalidCount)
+                {
+                    return juce::String(validCount) + " valid, " + juce::String(invalidCount) + " invalid";
+                }
+
+                constexpr const char* kEmptyFolder = "0 files in folder";
+                constexpr const char* kFolderNotFound = "Folder not found";
+            }
+
             namespace StandaloneWidgets
             {
                 constexpr const char* kBrowser               = "BROWSER";

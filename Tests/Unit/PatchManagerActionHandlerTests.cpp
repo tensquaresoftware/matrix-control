@@ -16,6 +16,7 @@
 #include "Core/Models/PatchModel.h"
 #include "Core/Services/ClipboardService.h"
 #include "Core/Services/DeviceMemoryLimits.h"
+#include "Core/Services/PatchFileService.h"
 #include "Shared/Definitions/Matrix1000Limits.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
@@ -171,6 +172,7 @@ private:
         MidiManager midiManager;
         Core::PatchSelectionMidiSync patchSelectionMidiSync;
         Core::DeviceMemoryLimits limits;
+        Core::PatchFileService patchFileService;
         bool suppressPatchSysEx { false };
         bool suppressMatrixModSysEx { false };
         Core::PatchManagerActionHandler handler;
@@ -183,6 +185,7 @@ private:
             , midiManager(proc.apvts, queue, tracker)
             , patchSelectionMidiSync(&midiManager)
             , limits(std::move(limitsIn))
+            , patchFileService(decoder)
             , handler(proc.apvts,
                       [this]() { return limits; },
                       &model,
@@ -191,6 +194,8 @@ private:
                       &patchInitService,
                       &patchSelectionMidiSync,
                       &midiManager,
+                      &patchFileService,
+                      []() { return juce::File(); },
                       Core::ActionExecutionHooks{
                           [this](bool suppress) { suppressMatrixModSysEx = suppress; },
                           nullptr,

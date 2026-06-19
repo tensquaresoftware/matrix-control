@@ -10,6 +10,7 @@
 #include "Core/Actions/ModuleActionHandler.h"
 #include "Core/Actions/MutatorActionHandler.h"
 #include "Core/Actions/PatchManagerActionHandler.h"
+#include "Core/Services/PatchFileService.h"
 #include "Core/Init/PatchInitService.h"
 #include "Core/MIDI/PatchSelectionMidiSync.h"
 #include "Core/Audio/AudioPassthroughProcessor.h"
@@ -200,6 +201,7 @@ PluginProcessor::PluginProcessor()
 
     sysExParser_ = std::make_unique<SysExParser>();
     sysExDecoder_ = std::make_unique<SysExDecoder>(*sysExParser_);
+    patchFileService_ = std::make_unique<Core::PatchFileService>(*sysExDecoder_);
     initTemplateLoader_ = std::make_unique<Core::InitTemplateLoader>(*sysExDecoder_);
     masterModuleInitService_ = std::make_unique<Core::MasterModuleInitService>(
         *masterModel_,
@@ -263,6 +265,13 @@ PluginProcessor::PluginProcessor()
         patchInitService_.get(),
         patchSelectionMidiSync_.get(),
         midiManager.get(),
+        patchFileService_.get(),
+        [this]() -> juce::File
+        {
+            if (patchFolderPicker_)
+                return patchFolderPicker_();
+            return {};
+        },
         actionHooks);
 
     mutatorActionHandler_ = std::make_unique<Core::MutatorActionHandler>();
@@ -732,6 +741,11 @@ void PluginProcessor::setGuiScaleId(int scaleId)
 {
     apvts.state.setProperty(PluginIDs::Settings::kGuiScale, scaleId, nullptr);
     notifyNonParameterStateChanged();
+}
+
+void PluginProcessor::setPatchFolderPicker(PatchFolderPicker picker)
+{
+    patchFolderPicker_ = std::move(picker);
 }
 
 int PluginProcessor::getSkinVariantId() const

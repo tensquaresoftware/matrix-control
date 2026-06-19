@@ -1,5 +1,7 @@
 #include "PluginEditor.h"
 
+#include <juce_gui_basics/juce_gui_basics.h>
+
 #include "Core/Audio/AudioPassthroughProcessor.h"
 #include "Core/Audio/StandaloneAudioInputRouter.h"
 #include "Core/MIDI/MidiActivityTracker.h"
@@ -69,6 +71,24 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     : AudioProcessorEditor(&p)
     , pluginProcessor(p)
 {
+    pluginProcessor.setPatchFolderPicker([safeThis = juce::Component::SafePointer<PluginEditor>(this)]() -> juce::File
+    {
+        if (safeThis == nullptr)
+            return {};
+
+        juce::FileChooser chooser("Select patch folder",
+                                  juce::File(),
+                                  juce::String(),
+                                  true,
+                                  false,
+                                  safeThis.getComponent());
+
+        if (chooser.browseForDirectory())
+            return chooser.getResult();
+
+        return {};
+    });
+
     skinBlack_ = TSS::Skin::create(TSS::Skin::ColourVariant::Black);
     skinCream_ = TSS::Skin::create(TSS::Skin::ColourVariant::Cream);
 

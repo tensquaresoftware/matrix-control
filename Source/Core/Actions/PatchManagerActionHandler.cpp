@@ -7,6 +7,8 @@
 #include "Core/Models/ApvtsPatchMapper.h"
 #include "Core/Models/PatchModel.h"
 #include "Core/Services/ClipboardService.h"
+#include "Core/Services/PatchFileService.h"
+#include "Core/Services/PatchFileServiceFooter.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginIDs.h"
 
@@ -22,6 +24,8 @@ namespace Core
         PatchInitService* patchInitService,
         PatchSelectionMidiSync* patchSelectionMidiSync,
         MidiManager* midiManager,
+        PatchFileService* patchFileService,
+        PatchFolderPicker pickFolder,
         ActionExecutionHooks hooks)
         : apvts_(apvts)
         , deviceMemoryLimits_(std::move(deviceMemoryLimits))
@@ -31,6 +35,8 @@ namespace Core
         , patchInitService_(patchInitService)
         , patchSelectionMidiSync_(patchSelectionMidiSync)
         , midiManager_(midiManager)
+        , patchFileService_(patchFileService)
+        , pickFolder_(std::move(pickFolder))
         , hooks_(std::move(hooks))
     {
     }
@@ -77,10 +83,15 @@ namespace Core
             return;
         }
 
+        if (propertyId == ComputerPatchesModule::StandaloneWidgets::kOpenPatchFolder)
+        {
+            handleOpenPatchFolder();
+            return;
+        }
+
         if (propertyId == ComputerPatchesModule::StandaloneWidgets::kLoadPreviousPatchFile
             || propertyId == ComputerPatchesModule::StandaloneWidgets::kLoadNextPatchFile
             || propertyId == ComputerPatchesModule::StandaloneWidgets::kSelectPatchFile
-            || propertyId == ComputerPatchesModule::StandaloneWidgets::kOpenPatchFolder
             || propertyId == ComputerPatchesModule::StandaloneWidgets::kSavePatchAs
             || propertyId == ComputerPatchesModule::StandaloneWidgets::kSavePatchFile)
         {
@@ -214,6 +225,20 @@ namespace Core
 
         apvtsPatchMapper_->apvtsToBuffer();
         midiManager_->sendPatch(static_cast<juce::uint8>(getCurrentPatch(limits)), patchModel_->data());
+    }
+
+    void PatchManagerActionHandler::handleOpenPatchFolder()
+    {
+        if (patchFileService_ == nullptr || ! pickFolder_)
+            return;
+
+        const juce::File folder = pickFolder_();
+
+        if (! folder.isDirectory())
+            return;
+
+        const auto result = patchFileService_->scanFolder(folder);
+        PatchFileServiceFooter::propagateScanResult(apvts_, result);
     }
 
     void PatchManagerActionHandler::propagateRomBlockedFooter()

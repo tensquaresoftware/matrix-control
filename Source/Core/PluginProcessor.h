@@ -2,6 +2,7 @@
 
 #include <atomic>
 #include <bitset>
+#include <functional>
 #include <memory>
 #include <map>
 #include <optional>
@@ -41,6 +42,7 @@ namespace Core
     class AudioPassthroughProcessor;
     class MidiActivityTracker;
     class ClipboardService;
+    class PatchFileService;
     class ActionDispatcher;
     class ModuleActionHandler;
     class PatchManagerActionHandler;
@@ -132,6 +134,12 @@ public:
     const Core::MidiActivityTracker& getMidiActivityTracker() const noexcept { return *midiActivityTracker_; }
 
     bool isStandalone() const;
+
+    using PatchFolderPicker = std::function<juce::File()>;
+
+    void setPatchFolderPicker(PatchFolderPicker picker);
+    Core::PatchFileService& getPatchFileService() noexcept { return *patchFileService_; }
+    const Core::PatchFileService& getPatchFileService() const noexcept { return *patchFileService_; }
 
     void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
                                  const juce::Identifier& property) override;
@@ -279,6 +287,8 @@ private:
     std::unique_ptr<Core::PatchInitService> patchInitService_;
     std::unique_ptr<Core::PatchSelectionMidiSync> patchSelectionMidiSync_;
     std::unique_ptr<Core::ClipboardService> clipboardService_;
+    std::unique_ptr<Core::PatchFileService> patchFileService_;
+    PatchFolderPicker patchFolderPicker_;
     std::unique_ptr<Core::ModuleActionHandler> moduleActionHandler_;
     std::unique_ptr<Core::PatchManagerActionHandler> patchManagerActionHandler_;
     std::unique_ptr<Core::MutatorActionHandler> mutatorActionHandler_;

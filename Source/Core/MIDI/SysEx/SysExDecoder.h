@@ -25,6 +25,7 @@ public:
 
     bool decodePatchSysEx(const juce::MemoryBlock& sysEx, juce::uint8* output) const;
     bool decodeMasterSysEx(const juce::MemoryBlock& sysEx, juce::uint8* output) const;
+    bool validatePatchSysExMessage(const juce::MemoryBlock& sysEx) const;
     DeviceIdInfo decodeDeviceId(const juce::MemoryBlock& sysEx) const;
     static size_t packNibbles(const juce::uint8* nibbles, size_t numNibbles, juce::uint8* output);
 
@@ -35,8 +36,7 @@ private:
                           size_t dataStartIndex,
                           size_t expectedPackedSize,
                           juce::uint8* output) const;
-    
-    bool validatePatchSysExMessage(const juce::MemoryBlock& sysEx) const;
+
     bool extractPackedDataFromPatchSysEx(const juce::MemoryBlock& sysEx, juce::uint8* output) const;
     bool validateMasterSysExMessage(const juce::MemoryBlock& sysEx) const;
     bool extractPackedDataFromMasterSysEx(const juce::MemoryBlock& sysEx, juce::uint8* output) const;

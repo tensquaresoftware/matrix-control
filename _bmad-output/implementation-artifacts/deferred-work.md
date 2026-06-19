@@ -1,5 +1,12 @@
 # Deferred Work
 
+## Deferred from: code review of 4-1-patchfileservice-folder-scan (2026-06-19)
+
+- **Scan synchrone bloque le thread UI** (`PatchFileService.cpp:15-47`) — acceptable v1 selon dev notes story 4.1 ; worker async si bibliothèques volumineuses.
+- **Logs `decodePatchSysEx: validation failed` à chaque fichier rejeté** (`SysExDecoder.cpp`) — message pré-existant du décodeur ; bruit en scan bulk.
+- **Pas de test d'intégration handler OPEN** (`PatchManagerActionHandlerTests.cpp:198`) — optionnel selon spec story 4.1.
+- **`loadFileAsData` sans plafond de taille** (`PatchFileService.cpp:67-72`) — hors périmètre v1.
+
 ## Deferred from: code review of 7-3b-bank-utility-unlock-semantics-and-id-rename (2026-06-19)
 
 - **MIDI dupliqué sur navigation prev/next** (`PatchManagerActionHandler.cpp:242-258`, `PluginProcessor.cpp:1220-1221`) — `applyPatchCoordinates` + listener `handlePatchNumberChange` enchaînent deux `syncSelection` ; dette 7.3.

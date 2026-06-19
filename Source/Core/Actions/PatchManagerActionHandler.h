@@ -15,6 +15,7 @@ namespace Core
 
     class ApvtsPatchMapper;
     class ClipboardService;
+    class PatchFileService;
     class PatchInitService;
     class PatchModel;
     class PatchSelectionMidiSync;
@@ -23,6 +24,7 @@ namespace Core
     {
     public:
         using DeviceMemoryLimitsSupplier = std::function<DeviceMemoryLimits()>;
+        using PatchFolderPicker = std::function<juce::File()>;
 
         PatchManagerActionHandler(juce::AudioProcessorValueTreeState& apvts,
                                   DeviceMemoryLimitsSupplier deviceMemoryLimits,
@@ -32,6 +34,8 @@ namespace Core
                                   PatchInitService* patchInitService,
                                   PatchSelectionMidiSync* patchSelectionMidiSync,
                                   MidiManager* midiManager,
+                                  PatchFileService* patchFileService,
+                                  PatchFolderPicker pickFolder,
                                   ActionExecutionHooks hooks);
 
         void handleAction(const juce::String& propertyId, const juce::var& newValue) override;
@@ -43,6 +47,7 @@ namespace Core
         void handleInternalPatchInit();
         void handleInternalPatchPaste(const DeviceMemoryLimits& limits);
         void handleInternalPatchStore(const DeviceMemoryLimits& limits);
+        void handleOpenPatchFolder();
         void propagateRomBlockedFooter();
         int getCurrentBank(const DeviceMemoryLimits& limits) const;
         int getCurrentPatch(const DeviceMemoryLimits& limits) const;
@@ -56,6 +61,8 @@ namespace Core
         PatchInitService* patchInitService_;
         PatchSelectionMidiSync* patchSelectionMidiSync_;
         MidiManager* midiManager_;
+        PatchFileService* patchFileService_;
+        PatchFolderPicker pickFolder_;
         ActionExecutionHooks hooks_;
     };
 

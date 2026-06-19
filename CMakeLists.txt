@@ -129,6 +129,7 @@ set(PLUGIN_SOURCES
     Source/Core/Services/ClipboardPasteEnabledResolver.cpp
     Source/Core/Services/DeviceMemoryLimits.cpp
     Source/Core/Services/DeviceTypeRegistry.cpp
+    Source/Core/Services/PatchFileService.cpp
     Source/Core/Actions/ActionDispatcher.cpp
     Source/Core/Actions/ActionPropertyRegistry.cpp
     Source/Core/Actions/ModuleActionHandler.cpp
@@ -316,6 +317,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/MasterModuleInitServiceTests.cpp
         Tests/Unit/PatchModuleInitServiceTests.cpp
         Tests/Unit/PatchManagerActionHandlerTests.cpp
+        Tests/Unit/PatchFileServiceTests.cpp
         Tests/Unit/ModuleActionHandlerTests.cpp
         Tests/Unit/MatrixModInitServiceTests.cpp
         Tests/Unit/PatchParameterSysExDispatcherTests.cpp
@@ -353,6 +355,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/Services/ClipboardPasteEnabledResolver.cpp
         Source/Core/Services/DeviceMemoryLimits.cpp
         Source/Core/Services/DeviceTypeRegistry.cpp
+        Source/Core/Services/PatchFileService.cpp
         Source/Core/Actions/ActionDispatcher.cpp
         Source/Core/Actions/ActionPropertyRegistry.cpp
         Source/Core/Actions/ModuleActionHandler.cpp
@@ -524,6 +527,7 @@ target_compile_definitions(Matrix-Control
         JUCE_USE_CURL=0
         JUCE_VST3_CAN_REPLACE_VST2=0
         JUCE_REPORT_APP_USAGE=0
+        JUCE_MODAL_LOOPS_PERMITTED=1
     PRIVATE
         MATRIX_CONTROL_PROJECT_VERSION="${PROJECT_VERSION}"
         MATRIX_CONTROL_PRERELEASE_SUFFIX="${MATRIX_CONTROL_PRERELEASE_SUFFIX}"
