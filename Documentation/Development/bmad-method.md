@@ -4,11 +4,11 @@ project: All
 title: BMad Method — Development Cycle Quick Reference
 author: Guillaume DUPONT
 status: reference
-version: "1.0"
+version: "1.2"
 sources:
   - https://github.com/bmad-code-org/bmad-method
 created: 2026-06-17
-updated: 2026-06-18
+updated: 2026-06-19
 ---
 
 # BMad Method — Development Cycle Quick Reference
@@ -19,7 +19,7 @@ Reference guide for [the **BMad** method](https://github.com/bmad-code-org/bmad-
 
 Recommended setup: chat in your preferred language with the AI assistant; deliverables in `_bmad-output/` in English.
 
-**Command syntax**: invoke each skill with a leading slash and hyphens — e.g. `/bmad-help`, `/bmad-dev-story`. You can also phrase the request in natural language; the agent recognises both forms.
+**Command syntax**: `/bmad-help`, `/bmad-dev-story`, etc. Natural-language requests work too when they clearly match a skill.
 
 ---
 
@@ -31,331 +31,272 @@ Analysis (optional) → Planning → Solution design → Implementation
                                     Sprint → [Story → Dev → Review → UAT] × N
 ```
 
-Each **skill** maps to a guided workflow. Invoke it in chat, ideally in a **new conversation** to avoid mixing contexts.
+Each **skill** is a guided workflow. Ideally use a **new conversation** per major step.
 
-To find out where you stand: `/bmad-help` or “where am I in the sprint?”
+### Starting a project with BMad
 
-**When unsure which command to use**: `/bmad-help` is the safe default. It analyses project state (existing artifacts, current phase, `sprint-status.yaml`) and recommends the **skill(s)** to run next, in the correct order according to the BMad catalogue. It does **not** automatically invoke named personas (Mary, Amelia, etc.): those are optional entry points to certain skills, and many workflows (code review, sprint planning, create story…) have no persona at all. Help points you to the command — e.g. `/bmad-dev-story` rather than “talk to Amelia” — ; you still launch it yourself, ideally in a fresh conversation.
+**Greenfield** (starting from scratch): Analysis *(if needed)* → PRD → Architecture → Epics; then `/bmad-generate-project-context` once stack and conventions are established.
+
+**Brownfield** (code already exists): `/bmad-generate-project-context` and/or `/bmad-document-project` before or alongside planning; then continue with PRD, architecture, and epics as on greenfield.
+
+### Why this order?
+
+Mirrors a product/tech team: *why* first, then *what*, *how*, and finally *in what order to code* — rather than unstructured “vibe-coding” without guardrails.
+
+---
+
+## BMad command catalogue
+
+When unsure: invoke **`/bmad-help`** — analyses project state and recommends the next skill.
+
+### Phase 1 — Analysis *(optional)*
+
+| Command | Code | Role |
+|---------|------|------|
+| `/bmad-brainstorming` | BP | Guided ideation when the concept is still fuzzy. |
+| `/bmad-market-research` | MR | Competition, customers, and market framing. |
+| `/bmad-domain-research` | DR | Industry/domain vocabulary and subject-matter depth. |
+| `/bmad-technical-research` | TR | Feasibility, stack options, and technical approaches. |
+| `/bmad-product-brief` | CB | Lightweight product summary when the concept is already mature. |
+| `/bmad-prfaq` | WB | *Working Backwards* PRFAQ to stress-test the concept before the PRD. |
+
+### Phase 2 — Planning
+
+| Command | Code | Role |
+|---------|------|------|
+| `/bmad-prd` | PRD | Create, update, or validate the Product Requirements Document. |
+| `/bmad-ux` | CU | UX specifications when the UI is central to the product. |
+
+### Phase 3 — Solution design
+
+| Command | Code | Role |
+|---------|------|------|
+| `/bmad-create-architecture` | CA | Technical architecture and structural decisions. |
+| `/bmad-create-epics-and-stories` | CE | Epics and stories breakdown. |
+| `/bmad-check-implementation-readiness` | IR | Alignment check across PRD, UX, architecture, and stories before coding. |
+
+### Phase 4 — Implementation
+
+| Command | Code | Role |
+|---------|------|------|
+| `/bmad-sprint-planning` | SP† | Build or refresh `sprint-status.yaml`. |
+| `/bmad-sprint-status` | SS | Sprint summary and routing to the next workflow. |
+| `/bmad-create-story` | CS | Draft the next (or a targeted) story with full dev context. |
+| `/bmad-create-story validate` | VS | Validate story completeness and ACs before dev. |
+| `/bmad-dev-story` | DS | Implement the story, run tests, update the story file. |
+| `/bmad-code-review` | CR | Adversarial code review (Blind Hunter, Edge Case Hunter, Acceptance Auditor). |
+| `/bmad-checkpoint-preview` | CK | Guided human review of a commit, branch, or PR. |
+| `/bmad-qa-generate-e2e-tests` | QA | Generate automated API/E2E tests *(not a substitute for CR or UAT)*. |
+| `/bmad-retrospective` | ER | End-of-epic retrospective and lessons learned. |
+
+> † **Note:** menu code **SP** means *Sprint Planning* here; `/bmad-spec` also uses SP in some catalogues — different skill — see *Anytime — documents & quality* below.
+
+### Anytime — development & change
+
+| Command | Code | Role |
+|---------|------|------|
+| `/bmad-help` | BH | Orientation: where you are and what to run next. |
+| `/bmad-quick-dev` | QQ | Intent → plan → code → review outside a full story. |
+| `/bmad-correct-course` | CC | Major scope or direction change; sprint change proposal. |
+| `/bmad-investigate` | IN | Structured forensic investigation of a bug or incident. |
+| `/bmad-generate-project-context` | GPC | Generate `project-context.md` from the codebase (brownfield). |
+| `/bmad-document-project` | DP | Document an existing project for agent context. |
+| `/bmad-party-mode` | PM | Multi-agent roundtable on a cross-cutting topic. |
+
+### Anytime — documents & quality
+
+| Command | Code | Role |
+|---------|------|------|
+| `/bmad-spec` | SP | Distil intent into a concise SPEC contract (+ validation mode). |
+| `/bmad-review-adversarial-general` | AR | Standalone cynical review of a document or artefact. |
+| `/bmad-review-edge-case-hunter` | ECH | Method-driven edge-case review (orthogonal to AR). |
+| `/bmad-editorial-review-prose` | EP | Copy-editing pass on written content. |
+| `/bmad-editorial-review-structure` | ES | Structure, cuts, and reorganisation of a long document. |
+| `/bmad-index-docs` | ID | Build or refresh an index of docs in a folder. |
+| `/bmad-shard-doc` | SD | Split an oversized markdown doc into smaller files. |
+| `/bmad-customize` | BC | Customise agent/workflow behaviour via `_bmad/custom/`. |
+| `/bmad-advanced-elicitation` | — | Deep critique and refinement of recent agent output. |
+
+### Tech writer (Paige) — `/bmad-agent-tech-writer`
+
+| Invocation | Code | Role |
+|------------|------|------|
+| write action | WD | Draft or rewrite documentation to standards. |
+| mermaid action | MG | Generate a Mermaid diagram from a description. |
+| validate action | VD | Review a document against documentation standards. |
+| explain action | EC | Explain a technical concept with examples. |
+| update-standards action | US | Update Paige's documentation standards memory. |
+
+### Named agent personas *(optional entry points)*
+
+Not standalone workflows — conversational shortcuts to certain skills:
+
+| Command | Persona | Typical use |
+|---------|---------|-------------|
+| `/bmad-agent-analyst` | Mary | Business analysis, research framing. |
+| `/bmad-agent-pm` | John | Product vision and PRD coaching. |
+| `/bmad-agent-ux-designer` | Sally | UX flows and interface specs. |
+| `/bmad-agent-architect` | Winston | Architecture trade-offs. |
+| `/bmad-agent-dev` | Amelia | Story implementation focus. |
+| `/bmad-agent-tech-writer` | Paige | Documentation (see table above). |
+
+Prefer the **workflow command** (`/bmad-dev-story`, `/bmad-code-review`, …) over a persona when one exists.
+
+---
+
+## Quality assurance — four complementary layers
+
+Automated tests and code review alone are not enough. Think of **four different checks**, from fastest to closest to real usage:
+
+1. **Unit tests** — one isolated piece (a function, a rule). Fast, but often in an empty or simplified environment.
+2. **Code review (CR)** — a second look at the **diff** and the spec, hunting for gaps or mistakes in the code written.
+3. **Integration tests** — several pieces wired together (as in the running app) to see if the whole still behaves correctly.
+4. **Smoke test / UAT** — run the app (or test it like a user) and manually verify the important paths.
+
+Each layer catches what the previous one may miss:
+
+| Layer | In plain terms | What it often misses |
+|-------|----------------|----------------------|
+| **Unit** | “Is this rule correct on its own?” | Behaviour when everything is wired together; deferred effects (timers, callbacks…) |
+| **Review (CR)** | “Does the code match the story? Any obvious omissions?” | What only shows up when running the app or connecting to the real world |
+| **Integration** | “When A calls B which updates C, is the outcome right?” | User feel, external hardware, production conditions |
+| **Smoke / UAT** | “When I actually use it, does it work for me?” | Every possible case — not an exhaustive automated suite |
+
+### Concrete example
+
+You add a button that should send **one** request to the server. Tests pass, code review is clean, the story moves to `done`. Then manual testing shows **ten requests** firing at once.
+
+Why? Often because:
+- the code *looks* correct on read-through;
+- tests did not reproduce the real setup (data, state, sequencing);
+- something fires **a little later** (after a delay, a screen refresh…) and tests did not wait for it.
+
+**To avoid this**, in your Definition of Done:
+- whenever a story touches **data, files, network, or session**: add at least one **replayable integration test** (“one action → one expected effect”);
+- before closing an epic: run a **short manual checklist** on critical paths;
+- keep three distinct roles: **CR** = the code; **QA** (`/bmad-qa-generate-e2e-tests`) = replayable automation; **UAT** = you (or a tester) validating the finished product.
+
+---
+
+## Story loop and Git
+
+Here **story** = any **BMad work item** tracked in `sprint-status.yaml` and materialised by a story file under `_bmad-output/` (often a *user story* with Given / When / Then ACs, but also technical stories, bug fixes, refactors, spikes, hygiene/utility stories…). `/bmad-create-story` and `/bmad-dev-story` apply to **all of them**; only the file content differs.
+
+```
+CS → VS → DS → CR → [UAT if required] → done → CS (next) or ER (epic end)
+```
+
+**UAT** (*User Acceptance Testing*): **no** `/bmad-uat` command. A **manual** step — real paths, product checklist, validation of user-visible ACs. Usually **after CR** and **before** `done` in `sprint-status.yaml`. Distinct from `/bmad-code-review` (diff review) and `/bmad-qa-generate-e2e-tests` (automation).
+
+| Step | Commit? | Notes |
+|------|---------|-------|
+| `create-story` | Optional | Spec-only commit if you want a locked story before code. |
+| `dev-story` (during) | **No** | Preserves `baseline_commit` for the review diff. |
+| `code-review` → `done` | **Yes — preferred** | One coherent unit: code + tests + story + `sprint-status.yaml`. |
+
+Push when the story is `done` (or when opening a PR). Use a **different LLM** for `/bmad-code-review` than for `/bmad-dev-story`, in a **fresh conversation**.
+
+Commit messages: follow the **project convention** (language, imperative, bullets — often documented in `project-context.md` or `CONVENTIONS.md`).
+
+---
+
+## When things drift
+
+| Situation | Code | Command |
+|-----------|------|---------|
+| CR feedback | DS | `/bmad-dev-story` until clean |
+| Small same-scope tweak | DS or QQ | `/bmad-dev-story` or `/bmad-quick-dev` |
+| New cross-cutting scope | CC | `/bmad-correct-course` then update PRD / architecture / stories |
+| Bug / incident | IN → DS | `/bmad-investigate` then `/bmad-dev-story` or a new story |
+| Multiple viewpoints | PM | `/bmad-party-mode` |
+| Urgent fix outside sprint | QQ | `/bmad-quick-dev` |
+
+**Rule:** same story, same intent → DS (or QQ if tiny). New intent or architectural impact → CC first. Do not let code and `_bmad-output/` diverge.
 
 ---
 
 ## Terminology
 
-The tables below define BMad vocabulary; detailed commands and their order are in the phase sections and the cheat sheet.
-
-### Method and tooling
+### Workflow and artefacts
 
 | Term | Meaning |
 |------|---------|
-| **BMad** | AI-driven development method (*Build More Architect Dreams* / *Breakthrough Method for Agile AI-Driven Development*). |
-| **BMM** | BMad Method module — the full Analysis → Planning → Solution design → Implementation flow installed under `_bmad/`. |
-| **Skill** | Guided workflow invoked via `/bmad-…` ; each skill has a defined role, inputs, and outputs. |
-| **Persona** | Named agent (Mary, John, Sally…) — optional entry point to certain skills, not a standalone workflow. |
-| **Menu code** | Two-letter shorthand (BP, DS, CR…) listed in this guide's tables; quick skill reference. |
-| **Party Mode** | Orchestrated roundtable between multiple personas on a cross-cutting topic (`/bmad-party-mode`). |
-| **`_bmad/`** | Versioned BMad configuration and modules in the repo. |
-| **`_bmad-output/`** | Artifacts produced by workflows (PRD, stories, sprint, etc.). |
-| **`.agents/`** | Local Cursor skills cache; regenerated by the BMad installer after clone — not versioned. |
-| **`project-context.md`** | Project constitution for agents — conventions, stack, non-negotiable rules. |
+| **Skill** | Workflow invoked via `/bmad-…` (e.g. dev-story, code-review). |
+| **Workflow** | Step sequence a skill runs (create-story, dev, review…). |
+| **Persona** | Named agent (Mary, Amelia…) — conversational shortcut, not a full workflow. |
+| **`_bmad/`** | Versioned BMad install (config, scripts, team customisations). |
+| **`_bmad-output/`** | Generated deliverables (PRD, epics, stories, sprint-status…). |
+| **`planning_artifacts`** | Subfolder (often `_bmad-output/planning-artifacts/`): PRD, architecture, epics. |
+| **`implementation_artifacts`** | Subfolder (often `_bmad-output/implementation-artifacts/`): story files, specs, deferred-work. |
+| **`project-context.md`** | Project “constitution” for agents: stack, conventions, prohibitions. |
+| **`sprint-status.yaml`** | Sprint dashboard: status of each epic and story. |
+| **`baseline_commit`** | Reference commit at the start of a story’s dev — used for the CR diff. |
 
-### Cycle phases
-
-| Term | Meaning |
-|------|---------|
-| **Phase 1 — Analysis** | Optional exploration: brainstorm, research, brief, or PRFAQ. |
-| **Phase 2 — Planning** | PRD required; UX recommended when UI is central. |
-| **Phase 3 — Solution design** | Architecture, epics/stories, implementation readiness check (IR). |
-| **Phase 4 — Implementation** | Sprint planning then story loop (CS → VS → DS → CR → …). |
-| **Greenfield** | New project with no existing code. |
-| **Brownfield** | Existing project; reverse-documentation via `/bmad-generate-project-context` and `/bmad-document-project`. |
-
-### Documents and deliverables
+### Planning and breakdown
 
 | Term | Meaning |
 |------|---------|
-| **PRD** | *Product Requirements Document* — product spec (requirements, scope, priorities). |
-| **PRFAQ** | *Press Release + FAQ* — *Working Backwards* exercise to stress-test the concept before the PRD. |
-| **Brief** | Lightweight product summary in the analysis phase; shorter alternative to PRFAQ. |
-| **SPEC** | Concise intent contract (*what*, not *how*); `/bmad-spec` skill, distinct from a full PRD. |
-| **Architecture** | Structural technical decisions — stack, layers, patterns, trade-offs. |
-| **UX design** | Interface and user-flow specifications. |
-| **Epic** | Thematic grouping of stories; intermediate delivery unit. |
-| **Story** | Implementable work unit — file with context, ACs, tasks, and dev journal. |
-| **Sprint** | Ordered sequence of stories to execute; driven by `sprint-status.yaml`. |
-| **Artifact** | Any document or file produced by a BMad workflow. |
-| **`planning-artifacts/`** | Deliverables for phases 1–3 (PRD, architecture, epics…). |
-| **`implementation-artifacts/`** | Deliverables for phase 4 (stories, sprint, retrospectives…). |
+| **PRD** | *Product Requirements Document* — product specification. |
+| **Epic** | Large functional batch grouping several stories (e.g. epic 4 = patch management). |
+| **Story** | BMad work item (file + sprint entry) — user story or other (tech, bug fix, spike…). |
+| **AC** | *Acceptance Criteria* — Given / When / Then validation points. |
+| **SPEC** | Short contract produced by `/bmad-spec` to lock intent before coding. |
+| **Spike** | Exploratory technical story (feasibility) — little or no final product deliverable. |
+| **Greenfield** | New project — starting from scratch. |
+| **Brownfield** | Existing project — code is already there; document before planning. |
+| **IR** | *Implementation Readiness* — alignment check before coding (`/bmad-check-implementation-readiness`). |
+| **CC** | *Correct Course* — major direction change (`/bmad-correct-course`). |
 
-### Story — content and statuses
+### Implementation and statuses
 
 | Term | Meaning |
 |------|---------|
-| **AC** | *Acceptance Criteria* — often written as **Given / When / Then**. |
-| **Tasks / subtasks** | Concrete action list the dev checks off during `/bmad-dev-story`. |
-| **Dev Agent Record** | Story file section: debug log, completion notes, implementation plan. |
-| **`baseline_commit`** | Reference commit in story frontmatter — known starting point for the diff. |
-| **HALT** | Forced workflow stop when a blocking condition is met (missing config, invalid story, approval required…). |
-| **`backlog`** | Story or epic defined but not yet ready for dev. |
-| **`ready-for-dev`** | Story file created and validated; ready for implementation. |
-| **`in-progress`** | Implementation underway (`/bmad-dev-story`). |
-| **`review`** | Dev complete; awaiting code review (CR). |
-| **`done`** | Story delivered — ACs, tasks, review (and UAT when required) satisfied. |
+| **`backlog` → `ready-for-dev` → `in-progress` → `review` → `done`** | Story lifecycle in `sprint-status.yaml`. |
+| **DoD** | *Definition of Done* — “truly finished” checklist (tests, UAT, docs…). |
+| **Fresh conversation** | New chat session for a step (especially CR ≠ dev). |
+| **Deferred work** | Work deliberately postponed (`deferred-work.md`) — out of scope for the current story. |
 
-**Epic** (in `sprint-status.yaml`): `backlog` → `in-progress` (automatic when the first story is created) → `done` (manual when all stories are `done`).
-
-See the **Phase 4** diagram for the DS → CR → UAT order in the story loop.
-
-### Quality, review, and change
+### Quality and review
 
 | Term | Meaning |
 |------|---------|
-| **CR** | *Code Review* — adversarial code review; sends back to dev if issues remain. |
-| **AR** | *Adversarial review* — Systematic critical review; built into CR for code, also available for documents. |
-| **ECH** | *Edge Case Hunter* — complementary review targeting edge cases and missed branches. |
-| **CK** | *Checkpoint* — guided human review of a change (commit, branch, PR). |
-| **QA** | Generated automated tests (`/bmad-qa-generate-e2e-tests`) — complements, does not replace, UAT. |
-| **IR** | *Implementation Readiness* — alignment check across PRD / UX / architecture / stories before the sprint. |
-| **ER** | *Epic Retrospective* — end-of-epic wrap-up and lessons learned. |
-| **CC** | *Correct Course* — major mid-sprint change management; produces a **sprint change proposal**. |
-| **IN** | *Investigate* — structured bug or incident investigation. |
+| **Diff** | List of **code changes** (lines added, removed, changed) between two states — in BMad, mainly between `baseline_commit` and the story’s current state. Visible in Git (`git diff`), a PR (*Files changed*), or the editor Source Control tab. |
+| **CR** | *Code Review* — `/bmad-code-review`, adversarial review of the diff. |
+| **Adversarial review** | Review that actively hunts for problems (not a casual “LGTM”). |
+| **Blind Hunter** | CR layer: analyses the diff without story bias (what the code actually does). |
+| **Edge Case Hunter** | CR layer: boundary conditions and rare paths. |
+| **Acceptance Auditor** | CR layer: are the story and ACs actually covered? |
+| **UAT** | *User Acceptance Testing* — manual user validation; no slash command. |
+| **Smoke test** | Quick manual check: “do the essentials work in real conditions?” |
+| **QA** | Here: generated automated tests (`/bmad-qa-generate-e2e-tests`) — distinct from CR and UAT. |
+| **CR triage** | Sorting review findings: **decision needed**, **fix to apply**, **defer**. |
 
-### UAT (*User Acceptance Testing*)
+Full BMad vocabulary: [official docs](https://docs.bmad-method.org/llms.txt).
 
-**Human validation** that the deliverable meets the story's acceptance criteria under conditions close to real use (app open, devices connected, end-to-end scenarios).
+### Software team ↔ BMad personas
 
-| Aspect                      | Detail                                                       |
-| --------------------------- | ------------------------------------------------------------ |
-| **Who**                     | Usually you (product owner) or a designated tester — not the AI agent alone |
-| **What**                    | Checklist derived from ACs: visual rendering, ergonomics, functional behaviour, hardware or external service integration, etc. |
-| **Where it lives**          | Task or AC in the story file; sometimes a dedicated journal (`manual-uat-…md`); dated sign-off recorded in the story |
-| **Manual UAT**              | Step-by-step manual execution (e.g. verify UI at multiple scale factors, test a full path in the real environment) |
-| **Vs code review (CR)**     | CR judges the *code*; UAT judges the *product* as a user experiences it |
-| **Vs automated tests (QA)** | `/bmad-qa-generate-e2e-tests` produces repeatable tests; UAT covers what machines miss (pixel-perfect layout, feel, hardware) |
-| **Vs checkpoint (CK)**      | `/bmad-checkpoint-preview` guides a review (commit, branch, PR); UAT validates business ACs, not just the diff |
-| **BMad command**            | No `/bmad-uat` command: it is a story step, not a catalogue skill |
-
-In the story loop, UAT typically runs **after** dev and code review, **before** marking the story `done` — when the story calls for it.
-
----
-
-## Phase 1 — Analysis *(optional)*
-
-| Code | Agent | Skill | When to use |
-|------|-------|-------|-------------|
-| BP | Brainstorm Project | `/bmad-brainstorming` | Vague idea, creative exploration |
-| MR | Market Research | `/bmad-market-research` | Factual framing (competition, customers) |
-| DR | Domain Research | `/bmad-domain-research` | Domain expertise, industry terminology |
-| TR | Technical Research | `/bmad-technical-research` | Feasibility, architecture options |
-| CB | Create Brief | `/bmad-product-brief` | Mature concept, lightweight version |
-| WB | Working Backwards | `/bmad-prfaq` | Stress-test the concept before the PRD |
-
-**Greenfield project**: you start from a blank slate. Follow the classic chain Analysis → PRD → Architecture → Epics, with no reverse-engineering step. Phase 1 (brief or PRFAQ, research) is strongly recommended to frame the vision before writing the PRD. Generate `project-context.md` via `/bmad-generate-project-context` once the stack and repo conventions are in place — no need to do this first.
-
-**Brownfield project**: code already exists. Before or alongside planning, run `/bmad-generate-project-context` to produce `project-context.md` — the “constitution” all agents read. Also useful: `/bmad-document-project` to inventory and document what already exists.
-
----
-
-## Phase 2 — Planning
-
-| Code | Agent | Skill | Role | Required? |
-|------|-------|-------|------|-----------|
-| PRD | Product Requirements Document | `/bmad-prd` | Create, update, or validate the product requirements document | **Yes** |
-| CU | Create UX | `/bmad-ux` | Interface specifications | Recommended when UI is central |
-
-Output: PRD (+ optional UX) in `_bmad-output/planning-artifacts/`.
-
----
-
-## Phase 3 — Solution design
-
-| Code | Agent | Skill | Required? |
-|------|-------|-------|-----------|
-| CA | Create Architecture | `/bmad-create-architecture` | **Yes** |
-| CE | Create Epics | `/bmad-create-epics-and-stories` | **Yes** |
-| IR | Implementation Readiness | `/bmad-check-implementation-readiness` | **Yes** |
-
-Output: architecture, epics/stories, implementation readiness report.
-
----
-
-## Phase 4 — Implementation
-
-### Sprint kick-off
-
-| Code | Agent | Skill | Role |
-|------|-------|-------|------|
-| SP | Sprint Planning | `/bmad-sprint-planning` | Creates `sprint-status.yaml`<br />(ordered story queue) |
-| SS | Sprint Status | `/bmad-sprint-status` | Status check at any time |
-
-### Per user story loop *(core cycle)*
-
-```
-CS (prepare the story)
-    ↓
-VS (validate readiness)
-    ↓
-DS (develop + tests)
-    ↓
-CR (code review)
-    ↓
-Commit & Push (when code review done)
-    ↓
-UAT (user acceptance, when required by the story)
-    ↓
-  ┌─ issues → back to DS
-  ├─ OK → CS (next story)
-  └─ epic complete → ER (retrospective, optional)
-```
-
-| Code | Agent | Skill | Role |
-|------|-------|-------|------|
-| CS | Create Story | `/bmad-create-story` | Drafts the next story (or a targeted one) with full context |
-| VS | Validate Story | `/bmad-create-story` | *Validate* action: checks completeness and acceptance criteria before coding |
-| DS | Dev Story | `/bmad-dev-story` | Implements, checks off tasks, updates the story |
-| CR | Code Review | `/bmad-code-review` | Adversarial review; sends back to dev if needed |
-| ER | Epic Retrospective | `/bmad-retrospective` | Wrap-up at end of epic |
-| CK | Checkpoint | `/bmad-checkpoint-preview` | Guided human review (commit, branch, PR) |
-| QA | QA Automation | `/bmad-qa-generate-e2e-tests` | Automated test generation *(not a review)* |
-
-**Typical invocation**: `/bmad-dev-story` or “implement the next story in the sprint”.
-
-### Git — when to commit and push
-
-BMad does not commit for you. Request commits explicitly when you are ready. The story loop maps to Git as follows:
-
-| Step | Commit? | Why |
-|------|---------|-----|
-| **`create-story`** | Optional, separate | BMad artifacts only (story file + `sprint-status.yaml`). No application code. Commit the spec alone only if you want a locked spec trace before coding. |
-| **`dev-story` (during)** | **No** | `/bmad-dev-story` records `baseline_commit` at start — the diff reference for code review. Mid-story commits break that baseline and mix stories. |
-| **`dev-story` (end → `review`)** | Possible, not ideal | Code and tests are green, but review often requests fixes or scope splits. Committing here usually means a follow-up fixup commit. |
-| **`code-review` (end → `done`)** | **Yes — best time** | Review has filtered scope, flagged out-of-story hunks, and validated ACs. One coherent unit: code + tests + story file + `sprint-status.yaml`. |
-
-**Recommended flow (one story):**
-
-```
-create-story  →  ready-for-dev        (no required commit)
-dev-story     →  in-progress → review (no commit yet)
-code-review   →  review → done        (apply review fixes if any)
-commit        →  code + tests + story + sprint-status
-push          →  optional: backup, CI, or PR
-```
-
-**Why wait until after review:** past reviews on this project flagged fixtures not committed, hunks from other epics bundled in the same diff, and out-of-scope changes to split at commit time. Review prepares the commit as much as it validates the code.
-
-**Push timing:**
-
-| Situation | Push |
-|-----------|------|
-| Solo work, no PR | With the final commit when the story is `done` |
-| Feature branch + PR | After the final commit, then open the PR |
-| Intermediate backup | Push to a WIP branch if needed — not the nominal BMad flow |
-
-**`baseline_commit` hygiene:** ideally the previous story is already committed (`done`) before starting `/bmad-dev-story`, so the review diff covers one intent only.
-
-**Commit message** (project convention): English, imperative summary line + bullet list of significant changes.
-
-**Exception — two commits:** (1) story spec after `create-story`, then (2) implementation after `done`; or an early commit at `review` for PR feedback, expecting a second commit for review fixes. For solo story-by-story work, **one post-review commit** is the best clarity/effort ratio.
-
----
-
-## Special cases — what to do when things drift
-
-### After a story is “done”
-
-| Situation | Severity | Approach |
-|-----------|----------|----------|
-| **Code review** (CR) feedback | Normal | Back to **DS** (`/bmad-dev-story`) until approved |
-| **Small tweak** to GUI or behaviour, same story scope | Low | **DS** on the same story (reopen tasks / AC) or **QQ** (`/bmad-quick-dev`) if truly minor |
-| **New need** covered by an existing story not yet started | Medium | Update the story (**CS**) or its content, then **VS → DS** |
-| **Scope change** (new feature, architecture impact, multiple stories) | High | **CC** (`/bmad-correct-course`) — impact analysis and sprint change proposal |
-| **Bug** in production or regression | Variable | **IN** (`/bmad-investigate`) for diagnosis; then DS or a new story depending on root cause |
-| **Product change** (priorities, vision) | High | **CC** then possibly update **PRD** and/or **CE** (epics/stories) |
-| **UI change** not foreseen in PRD/UX | Medium to high | Local cosmetic → DS/QQ; global pattern → **CU** (`/bmad-ux`) + **CC** or story updates |
-| **Technical debt** discovered mid-sprint | Variable | Dedicated story via **CS**, or note in **ER** retro; avoid untracked scope creep |
-| Need for **multiple viewpoints** (arch vs product vs UX) | — | **Party Mode** (`/bmad-party-mode`) — roundtable between agents |
-| Outside formal cycle (urgent fix, isolated tweak) | — | **QQ** (`/bmad-quick-dev`) — intent → plan → code → review, without a full story |
-
-### Practical rules
-
-- **Same story, same intent** → DS (or QQ if very small).
-- **New intent or cross-cutting impact** → CC, then update artifacts (PRD, architecture, stories) before coding again.
-- **Never** let code and `_bmad-output/` diverge: sprint docs are the source of truth for *what*; the repo is the source of truth for *how*.
-
-### Correct Course (CC) in brief
-
-Trigger: `/bmad-correct-course` or “propose sprint change”.
-
-Analyses impact on PRD, epics, architecture, UX → produces a **sprint change proposal** with concrete actions (update PRD, rerun sprint planning, create new stories, etc.).
-
----
-
-## Anytime skills
-
-| Code | Agent | Command | Role |
-|------|-------|---------|------|
-| BH | BMad Help | `/bmad-help` | Help / orientation |
-| GPC | Generate Project Context | `/bmad-generate-project-context` | Generate project context (`project-context.md`) |
-| DP | Document Project | `/bmad-document-project` | Document an existing project |
-| QQ | Quick Dev | `/bmad-quick-dev` | Fast development outside a story |
-| CC | Correct Course | `/bmad-correct-course` | Major change management |
-| IN | Investigate | `/bmad-investigate` | Forensic investigation of a bug or incident |
-| PM | Party Mode | `/bmad-party-mode` | Multi-agent discussion |
-| WD | Write Document | `/bmad-agent-tech-writer` (write action) | Paige — documentation writing |
-| MG | Mermaid Generate | `/bmad-agent-tech-writer` (mermaid action) | Paige — Mermaid diagrams |
-| VD | Validate Document | `/bmad-agent-tech-writer` (validate action) | Paige — document validation |
-| EC | Explain Concept | `/bmad-agent-tech-writer` (explain action) | Paige — technical concept explanation |
-
----
-
-## Named agents — roles
-
-These are not full workflows on their own: they are **personas** you can invoke directly (“talk to Winston”, “ask Sally”) or via `/bmad-party-mode`.
-
-| Name | Title | Summary role | Associated skill |
-|------|-------|--------------|------------------|
-| **Mary** | Business analyst | Research, competition, needs, requirements framing | `/bmad-agent-analyst` + research / brief |
-| **John** | Product manager | Product vision, PRD, shippable increments | `/bmad-agent-pm` + `/bmad-prd` |
-| **Sally** | UX designer | User flows, interface specs, UI edge cases | `/bmad-agent-ux-designer` + `/bmad-ux` |
-| **Winston** | Architect | Technical decisions, trade-offs, maintainable architecture | `/bmad-agent-architect` + `/bmad-create-architecture` |
-| **Amelia** | Developer | Story implementation, tests, acceptance criteria | `/bmad-agent-dev` + `/bmad-dev-story` |
-| **Paige** | Technical writer | Documentation, diagrams, clear written deliverables | `/bmad-agent-tech-writer` |
-
-**Party Mode**: the orchestrator runs a discussion between 2–4 agents on a cross-cutting topic (e.g. “does this GUI change affect the architecture?”).
-
-Workflows without a dedicated persona (code review, sprint planning, investigate, correct course) run via their **command** directly — no first name required.
+| Role | BMad equivalent |
+|------|-----------------|
+| Product Manager | John + `/bmad-prd` |
+| Business Analyst | Mary + research / brief skills |
+| Architect | Winston + `/bmad-create-architecture` |
+| UX Designer | Sally + `/bmad-ux` |
+| Developer | Amelia + `/bmad-dev-story` |
+| QA / Test | `/bmad-qa-generate-e2e-tests` + UAT + smoke |
+| Support / Ops | `/bmad-investigate`, CC feedback, or new stories |
 
 ---
 
 ## Recommendations
 
-1. **New conversation** per important skill (PRD, story, dev, review).
-2. **`project-context.md`** and the project conventions file: read automatically by agents — keep them up to date.
-3. **`sprint-status.yaml`**: sprint state; update after each story.
-4. **Artifacts in English**, chat in your preferred language — configure in `_bmad/bmm/config.yaml`.
-5. **No automatic commits**: request them explicitly when you are ready — ideally **once per story, after code review** (see [Git — when to commit and push](#git--when-to-commit-and-push) in Phase 4).
-6. **Different LLM for code review**: run `/bmad-code-review` in a fresh conversation, preferably with a different model than `/bmad-dev-story`.
+1. **New conversation** per major skill.
+2. Keep **`project-context.md`** and project conventions up to date.
+3. Update **`sprint-status.yaml`** after each story.
+4. **Four-layer quality**: unit + integration where runtime matters + CR + smoke/UAT before epic sign-off.
+5. **No automatic commits** — request explicitly after CR.
+6. **`/bmad-help`** when in doubt.
+7. **One story at a time** — next story only after CR (and UAT if required).
 
 ---
 
-## Invocation cheat sheet
-
-| You want to… | Command | Code |
-|--------------|---------|------|
-| Unsure what to do / which command | `/bmad-help` *(recommends the next skill)* | BH |
-| Where am I in the sprint? | `/bmad-sprint-status` | SS |
-| Prepare the next story | `/bmad-create-story` | CS |
-| Validate a story | `/bmad-create-story` (validate) | VS |
-| Implement the story | `/bmad-dev-story` | DS |
-| Review after implementation | `/bmad-code-review` | CR |
-| User acceptance (UAT) | No command — checklist in the story | — |
-| Change direction | `/bmad-correct-course` | CC |
-| Investigate a bug | `/bmad-investigate` | IN |
-| Cross-agent opinions | `/bmad-party-mode` | PM |
-| Quick tweak outside sprint | `/bmad-quick-dev` | QQ |
-| Talk to an agent | “Talk to Winston” / “Ask Sally” | — |
-
----
-
-*BMad Method quick reference — updated 2026-06-18*
-
-> **Note:** menu code `SP` means *Sprint Planning* in this guide; the `/bmad-spec` skill also uses `SP` for *Spec* — different context, command `/bmad-spec`.
+*BMad Method quick reference — updated 2026-06-19*
