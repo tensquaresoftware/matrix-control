@@ -186,7 +186,7 @@ Panels: `setProperty(id, timestamp)` only. Debounce for History combobox selecti
 PatchMutatorEngine
 ├── MutationHistoryStore      // roots M00–M99 + per-root retries R00–R99
 │   └── MutationEntry         // result buffer, parentSnapshot, indices
-├── MutationAlgorithm         // Amount/Random + module toggles (open question §9)
+├── MutationAlgorithm         // Amount/Random + module toggles — see mutation-algorithm-spec.md
 ├── MutationNaming            // format Mxx, Mxx-Ryy; max+1 with gaps
 └── HistoryDefragService      // FR-59 contiguous renumber
 ```
@@ -256,7 +256,7 @@ Epics E1–E2 are **sequential gate**; E7 can start in parallel once handler int
 
 ## Open Architecture Items (next sessions)
 
-1. **MutationAlgorithm** — Amount/Random curves, per-parameter jitter rules, module toggle mask
+1. ~~**MutationAlgorithm**~~ — **approved** in [`mutation-algorithm-spec.md`](mutation-algorithm-spec.md) v1.0 (Story 6.1, sign-off 2026-06-19, Option A)
 2. **SysExDelayProfile** — string matching rules for Tauntek/Gligli/Nordcore vs stock
 3. **Matrix Mod bus opcode** — 0x0B vs 0x06 block (PRD open question #3)
 4. **APVTS property catalog** — full list for Patch Manager + Mutator mirrors (E6/E7 stories)
@@ -613,7 +613,7 @@ Execute in order; one thematic commit per bullet recommended:
 
 | Deferred detail | PRD ref | Architecture owner |
 |---|---|---|
-| Mutation Amount/Random rules | FR-30, §9 #7 | `MutationAlgorithm` — E6 story |
+| Mutation Amount/Random rules | FR-30, §9 #7 | [`MutationAlgorithm`](mutation-algorithm-spec.md) — E6 Story 6.1 spec; E6 Story 6.4 impl |
 | Matrix Mod bus opcode | §9 #3 | SysEx dispatch — E2 spike on hardware |
 | SysEx automation throttle curves | §9 #2 | `SysExDelayProfile` — E2 + SM-1 |
 | INIT hardcoded defaults | §9 #4 | `InitDefaults` — E3 (non-blocking) |
@@ -647,7 +647,7 @@ Execute in order; one thematic commit per bullet recommended:
 **Important Gaps:**
 
 1. **APVTS property catalog** — Mutator/PM mirror property IDs not enumerated (E6/E7 stories)
-2. **MutationAlgorithm** — PRD §9 #7; define in E6 before MUTATE ships
+2. ~~**MutationAlgorithm**~~ — approved [`mutation-algorithm-spec.md`](mutation-algorithm-spec.md) v1.0 (Story 6.1); implement in E6 Story 6.4
 3. **SysExDelayProfile matching rules** — EPROM string detection (E2)
 4. **Matrix Mod opcode** — confirm on hardware before E2 locks encoder (PRD §9 #3)
 
