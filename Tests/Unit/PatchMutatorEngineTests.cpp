@@ -88,6 +88,12 @@ public:
         applySelectionFromApvts_drivesAudition();
         mutate_success_updatesApvtsHistory();
         retry_success_updatesApvtsHistory();
+
+        audition_emptyHistory_noSysEx();
+        audition_selectedRoot_sendsSysExOnce();
+        audition_selectedRetry_sendsSysExOnce();
+        audition_idempotent_skipsDuplicateSysEx();
+        audition_compareActive_noSysEx();
     }
 
 private:
@@ -692,6 +698,105 @@ private:
         const auto rList = harness.proc.apvts.state.getProperty(MutatorState::kHistoryRList).toString();
         expect(rList.contains("R00"));
         expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedR)), 0);
+    }
+
+    void audition_emptyHistory_noSysEx()
+    {
+        beginTest("audition_emptyHistory_noSysEx");
+
+        EngineHarness harness;
+        harness.engine.auditionSelectedHistoryEntry();
+        expectEquals(countPatchSysExMessages(harness.queue), 0);
+    }
+
+    void audition_selectedRoot_sendsSysExOnce()
+    {
+        beginTest("audition_selectedRoot_sendsSysExOnce");
+
+        EngineHarness harness;
+
+        auto m00 = makeDistinctBuffer(701);
+        auto m00Parent = makeDistinctBuffer(702);
+        Core::MutationNaming::applyPatchName(m00, 0);
+        expect(harness.store().insertRoot(0, m00, m00Parent));
+
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedM, 0, nullptr);
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedR,
+                                             Core::MutationHistoryStore::kRootOnly,
+                                             nullptr);
+
+        harness.engine.auditionSelectedHistoryEntry();
+
+        expectEquals(countPatchSysExMessages(harness.queue), 1);
+        expect(std::memcmp(harness.model.data(), m00.data(), Core::PatchModel::kBufferSize) == 0);
+    }
+
+    void audition_selectedRetry_sendsSysExOnce()
+    {
+        beginTest("audition_selectedRetry_sendsSysExOnce");
+
+        EngineHarness harness;
+
+        auto m00 = makeDistinctBuffer(711);
+        auto m00Parent = makeDistinctBuffer(712);
+        Core::MutationNaming::applyPatchName(m00, 0);
+        expect(harness.store().insertRoot(0, m00, m00Parent));
+
+        auto r00 = makeDistinctBuffer(713);
+        Core::MutationNaming::applyPatchName(r00, 0, 0);
+        expect(harness.store().insertRetry(0, 0, r00, m00Parent));
+
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedM, 0, nullptr);
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedR, 0, nullptr);
+
+        harness.engine.auditionSelectedHistoryEntry();
+
+        expectEquals(countPatchSysExMessages(harness.queue), 1);
+        expect(std::memcmp(harness.model.data(), r00.data(), Core::PatchModel::kBufferSize) == 0);
+    }
+
+    void audition_idempotent_skipsDuplicateSysEx()
+    {
+        beginTest("audition_idempotent_skipsDuplicateSysEx");
+
+        EngineHarness harness;
+
+        auto m00 = makeDistinctBuffer(721);
+        auto m00Parent = makeDistinctBuffer(722);
+        Core::MutationNaming::applyPatchName(m00, 0);
+        expect(harness.store().insertRoot(0, m00, m00Parent));
+
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedM, 0, nullptr);
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedR,
+                                             Core::MutationHistoryStore::kRootOnly,
+                                             nullptr);
+
+        harness.engine.auditionSelectedHistoryEntry();
+        expectEquals(countPatchSysExMessages(harness.queue), 1);
+
+        harness.engine.auditionSelectedHistoryEntry();
+        expectEquals(countPatchSysExMessages(harness.queue), 0);
+    }
+
+    void audition_compareActive_noSysEx()
+    {
+        beginTest("audition_compareActive_noSysEx");
+
+        EngineHarness harness;
+
+        auto m00 = makeDistinctBuffer(731);
+        auto m00Parent = makeDistinctBuffer(732);
+        Core::MutationNaming::applyPatchName(m00, 0);
+        expect(harness.store().insertRoot(0, m00, m00Parent));
+
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedM, 0, nullptr);
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedR,
+                                             Core::MutationHistoryStore::kRootOnly,
+                                             nullptr);
+        harness.proc.apvts.state.setProperty(MutatorState::kCompareActive, true, nullptr);
+
+        harness.engine.auditionSelectedHistoryEntry();
+        expectEquals(countPatchSysExMessages(harness.queue), 0);
     }
 };
 

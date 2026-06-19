@@ -130,6 +130,7 @@ set(PLUGIN_SOURCES
     Source/Core/Services/PatchMutator/MutationNaming.cpp
     Source/Core/Services/PatchMutator/MutationAlgorithm.cpp
     Source/Core/Services/PatchMutator/PatchMutatorEngine.cpp
+    Source/Core/Util/ComboboxPatchSendDebouncer.cpp
     Source/Core/Services/ClipboardPasteEnabledResolver.cpp
     Source/Core/Services/DeviceMemoryLimits.cpp
     Source/Core/Services/DeviceTypeRegistry.cpp
@@ -308,6 +309,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/MutationNamingTests.cpp
         Tests/Unit/MutationAlgorithmTests.cpp
         Tests/Unit/PatchMutatorEngineTests.cpp
+        Tests/Unit/ComboboxPatchSendDebouncerTests.cpp
         Tests/Unit/ClipboardPasteEnabledResolverTests.cpp
         Tests/Unit/ApvtsMasterMapperTests.cpp
         Tests/Unit/DeviceMemoryLimitsTests.cpp
@@ -368,6 +370,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/Services/PatchMutator/MutationNaming.cpp
         Source/Core/Services/PatchMutator/MutationAlgorithm.cpp
         Source/Core/Services/PatchMutator/PatchMutatorEngine.cpp
+        Source/Core/Util/ComboboxPatchSendDebouncer.cpp
         Source/Core/Factories/ApvtsFactory.cpp
         Source/Core/Factories/ApvtsValidator.cpp
         Source/Core/Factories/ApvtsLayoutBuilder.cpp

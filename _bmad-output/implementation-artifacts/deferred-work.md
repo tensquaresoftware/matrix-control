@@ -2,6 +2,12 @@
 
 - **Panel M change leaves R list stale until processor hook** — resolved 1+2: sync reads APVTS in 6.6; 7.4 processor calls `syncHistoryUiProperties` on `kSelectedM` change for full panel UX.
 
+## Deferred from: code review of 6-7-history-selection-audition-with-debounce (2026-06-20)
+
+- **Debouncer pending callback dropped on destruction** — `stopTimer()` only; acceptable for 6.7; 7.4 handler lifetime must outlive debouncer or add explicit cancel.
+- **No mutate→audition integration test for AC #2 double-SysEx scenario** — idempotent memcmp path tested via double `auditionSelectedHistoryEntry()`; full mutate→sync→audition chain deferred.
+- **No message-thread assertion on `ComboboxPatchSendDebouncer::schedule()`** — matches existing `MatrixModSysExCoalesceTimer` pattern; document at 7.4 wiring.
+
 ## Deferred from: code review of 6-6-history-m-and-r-ui-properties (2026-06-20)
 
 - **`auditionSelectedHistoryEntry()` stub** — story 6.7 audition SysEx.

@@ -301,6 +301,20 @@ MutatorActionResult PatchMutatorEngine::defragHistory()
 
 void PatchMutatorEngine::auditionSelectedHistoryEntry()
 {
+    if (readBoolProperty(apvts_.state, MutatorState::kCompareActive, false))
+        return;
+
+    applySelectionFromApvts();
+
+    if (historyStore_.isEmpty() || selectedRootIndex_ < 0)
+        return;
+
+    const PatchModel auditionModel = resolveAuditionBuffer();
+
+    if (std::memcmp(auditionModel.data(), patchModel_->data(), PatchModel::kBufferSize) == 0)
+        return;
+
+    pushResultToEditorAndSynth(auditionModel);
 }
 
 void PatchMutatorEngine::syncHistoryUiProperties(juce::AudioProcessorValueTreeState& apvts)
