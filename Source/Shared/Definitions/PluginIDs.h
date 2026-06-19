@@ -17,6 +17,16 @@ namespace PluginIDs
         constexpr const char* kHardwareLatencyMs = "settingsHardwareLatencyMs";
         constexpr const char* kInitTemplatesFolderPath = "settingsInitTemplatesFolderPath";
         constexpr const char* kTestWidget = "settingsTestWidget";
+        constexpr const char* kComputerPatchesNameReconciliationPolicy =
+            "settingsComputerPatchesNameReconciliationPolicy";
+
+        namespace NameReconciliationPolicy
+        {
+            constexpr int kPreferInternal = 1;
+            constexpr int kPreferFilename = 2;
+            constexpr int kAskOncePerLoad = 3;
+            constexpr int kDefault = kPreferInternal;
+        }
 
         namespace SkinVariants
         {

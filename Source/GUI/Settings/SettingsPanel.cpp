@@ -4,6 +4,7 @@
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinValues.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
+#include "Shared/Definitions/PluginIDs.h"
 #include "Core/Audio/HardwareLatency.h"
 
 using TSS::SkinColourId;
@@ -23,7 +24,7 @@ SettingsPanel::SettingsPanel(TSS::ISkin& skin, bool isPluginMode)
     , masterOpsLabel_(kLabelWidth_, kControlHeight_, TSS::labelLookFromSkin(skin), PluginDisplayNames::Settings::kMasterOperationsSection)
     , masterOpsPlaceholder_(kContentWidth_ - kLabelWidth_ - kGap_, kControlHeight_, TSS::labelLookFromSkin(skin), PluginDisplayNames::Settings::kComingSoon)
     , policiesLabel_(kLabelWidth_, kControlHeight_, TSS::labelLookFromSkin(skin), PluginDisplayNames::Settings::kPoliciesSection)
-    , policiesPlaceholder_(kContentWidth_ - kLabelWidth_ - kGap_, kControlHeight_, TSS::labelLookFromSkin(skin), PluginDisplayNames::Settings::kComingSoon)
+    , nameReconciliationPolicyCombo_(kContentWidth_ - kLabelWidth_ - kGap_, kControlHeight_, TSS::comboBoxLookFromSkin(skin))
     , defragLabel_(kLabelWidth_, kControlHeight_, TSS::labelLookFromSkin(skin), PluginDisplayNames::Settings::kDefragSection)
     , defragPlaceholder_(kContentWidth_ - kLabelWidth_ - kGap_, kControlHeight_, TSS::labelLookFromSkin(skin), PluginDisplayNames::Settings::kComingSoon)
     , loggingLabel_(kLabelWidth_, kControlHeight_, TSS::labelLookFromSkin(skin), PluginDisplayNames::Settings::kLoggingSection)
@@ -37,11 +38,19 @@ SettingsPanel::SettingsPanel(TSS::ISkin& skin, bool isPluginMode)
     addAndMakeVisible(masterOpsLabel_);
     addAndMakeVisible(masterOpsPlaceholder_);
     addAndMakeVisible(policiesLabel_);
-    addAndMakeVisible(policiesPlaceholder_);
+    addAndMakeVisible(nameReconciliationPolicyCombo_);
     addAndMakeVisible(defragLabel_);
     addAndMakeVisible(defragPlaceholder_);
     addAndMakeVisible(loggingLabel_);
     addAndMakeVisible(loggingPlaceholder_);
+
+    using namespace PluginIDs::Settings::NameReconciliationPolicy;
+    nameReconciliationPolicyCombo_.addItem(PluginDisplayNames::Settings::kNameReconciliationPreferInternal,
+                                         kPreferInternal);
+    nameReconciliationPolicyCombo_.addItem(PluginDisplayNames::Settings::kNameReconciliationPreferFilename,
+                                         kPreferFilename);
+    nameReconciliationPolicyCombo_.addItem(PluginDisplayNames::Settings::kNameReconciliationAskOnce,
+                                         kAskOncePerLoad);
 
     setPluginMode(isPluginMode);
 }
@@ -96,7 +105,7 @@ void SettingsPanel::layoutContent(juce::Rectangle<int> bounds)
     }
 
     layoutPlaceholderRow(masterOpsLabel_, masterOpsPlaceholder_);
-    layoutPlaceholderRow(policiesLabel_, policiesPlaceholder_);
+    layoutRow(policiesLabel_, nameReconciliationPolicyCombo_, bounds.getWidth() - labelWidth - gap);
     layoutPlaceholderRow(defragLabel_, defragPlaceholder_);
     layoutPlaceholderRow(loggingLabel_, loggingPlaceholder_);
 }
@@ -110,7 +119,7 @@ void SettingsPanel::setSkin(TSS::ISkin& skin)
     masterOpsLabel_.setLook(labelLook);
     masterOpsPlaceholder_.setLook(labelLook);
     policiesLabel_.setLook(labelLook);
-    policiesPlaceholder_.setLook(labelLook);
+    nameReconciliationPolicyCombo_.setLook(TSS::comboBoxLookFromSkin(skin));
     defragLabel_.setLook(labelLook);
     defragPlaceholder_.setLook(labelLook);
     loggingLabel_.setLook(labelLook);

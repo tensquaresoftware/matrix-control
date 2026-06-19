@@ -4,6 +4,7 @@
 
 #include "GUI/Widgets/Label.h"
 #include "GUI/Widgets/Slider.h"
+#include "GUI/Widgets/ComboBox.h"
 
 namespace TSS
 {
@@ -27,6 +28,7 @@ public:
     void setPluginMode(bool isPluginMode);
 
     TSS::Slider& getHardwareLatencySlider() { return hardwareLatencySlider_; }
+    TSS::ComboBox& getNameReconciliationPolicyCombo() { return nameReconciliationPolicyCombo_; }
 
 private:
     void updateModeSpecificVisibility();
@@ -49,7 +51,7 @@ private:
     TSS::Label masterOpsLabel_;
     TSS::Label masterOpsPlaceholder_;
     TSS::Label policiesLabel_;
-    TSS::Label policiesPlaceholder_;
+    TSS::ComboBox nameReconciliationPolicyCombo_;
     TSS::Label defragLabel_;
     TSS::Label defragPlaceholder_;
     TSS::Label loggingLabel_;

@@ -1,12 +1,14 @@
 #pragma once
 
 #include <functional>
+#include <optional>
 
 #include <juce_audio_processors/juce_audio_processors.h>
 
 #include "Core/Actions/ActionExecutionHooks.h"
 #include "Core/Actions/IActionHandler.h"
 #include "Core/Services/DeviceMemoryLimits.h"
+#include "Core/Services/PatchFileNameReconciler.h"
 
 class MidiManager;
 class SysExEncoder;
@@ -29,6 +31,7 @@ namespace Core
         using PatchFolderPicker = std::function<juce::File()>;
         using PatchSaveFilePicker = std::function<juce::File(juce::File suggestedFolder,
                                                              juce::String suggestedStem)>;
+        using PatchNameReconciliationPicker = PatchFileNameReconciler::Picker;
 
         PatchManagerActionHandler(juce::AudioProcessorValueTreeState& apvts,
                                   DeviceMemoryLimitsSupplier deviceMemoryLimits,
@@ -43,6 +46,7 @@ namespace Core
                                   SysExEncoder* sysExEncoder,
                                   PatchFolderPicker pickFolder,
                                   PatchSaveFilePicker pickSaveFile,
+                                  PatchNameReconciliationPicker pickNameReconciliation,
                                   ActionExecutionHooks hooks);
 
         void handleAction(const juce::String& propertyId, const juce::var& newValue) override;
@@ -59,6 +63,35 @@ namespace Core
         void handleOpenPatchFolder();
         void handleSavePatchAs();
         void handleSavePatchFile();
+        void handleLoadSelectedPatchFile(const DeviceMemoryLimits& limits);
+        struct SelectedPatchFileResolution
+        {
+            enum class Kind
+            {
+                kSilentNoOp,
+                kFailed,
+                kOk
+            };
+
+            Kind kind = Kind::kSilentNoOp;
+            juce::File file;
+            juce::String failureMessage;
+        };
+
+        int readComputerPatchesSelectedId() const;
+        bool isComputerPatchesScanCurrent() const;
+        juce::File fileAtComputerPatchesIndex(int index) const;
+        SelectedPatchFileResolution resolveSelectedPatchFileForLoad() const;
+        SelectedPatchFileResolution makeLoadFailedResolution(const juce::String& message) const;
+        bool canExecutePatchLoad() const;
+        bool loadPackedPatchFromFile(const juce::File& file, juce::uint8* packedOut);
+        PatchNameReconciliationResult reconcileLoadedPatchName(const juce::File& file);
+        std::optional<PatchNameReconciliationResult> decodeAndReconcilePatchFile(const juce::File& file);
+        void syncLoadedPatchToApvts();
+        void applyLoadedPatchToApvtsAndSynth(const DeviceMemoryLimits& limits);
+        void publishLoadFooters(const juce::String& fileName,
+                                  const PatchNameReconciliationResult& reconciliation);
+        void publishLoadFailureFooter(const juce::String& message);
         void saveCurrentPatchToFile(const juce::File& targetFile);
         void completeSuccessfulSave(const juce::String& savedFileName);
         void rescanAndSelectSavedFile(const juce::String& savedFileName);
@@ -88,6 +121,7 @@ namespace Core
         SysExEncoder* sysExEncoder_;
         PatchFolderPicker pickFolder_;
         PatchSaveFilePicker pickSaveFile_;
+        PatchNameReconciliationPicker pickNameReconciliation_;
         ActionExecutionHooks hooks_;
     };
 

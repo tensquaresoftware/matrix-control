@@ -5,6 +5,7 @@
 
 #include "Core/Actions/ActionExecutionHooks.h"
 #include "Core/Actions/PatchManagerActionHandler.h"
+#include "Core/Init/InitDefaults.h"
 #include "Core/Init/InitTemplateLoader.h"
 #include "Core/Init/PatchInitService.h"
 #include "Core/MIDI/MidiActivityTracker.h"
@@ -21,6 +22,7 @@
 #include "Core/Services/ClipboardService.h"
 #include "Core/Services/DeviceMemoryLimits.h"
 #include "Core/Services/PatchFileService.h"
+#include "Core/Services/PatchFileNameReconciler.h"
 #include "Shared/Definitions/Matrix1000Limits.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
@@ -32,6 +34,7 @@ namespace BankUtility = PatchManager::BankUtilityModule;
 namespace ComputerPatches = PatchManager::ComputerPatchesModule;
 namespace PatchNameIds = PluginIDs::PatchEditSection::PatchNameModule;
 namespace FooterMessages = PluginDisplayNames::PatchManagerSection::ComputerPatchesModule::FooterMessages;
+namespace Policy = PluginIDs::Settings::NameReconciliationPolicy;
 
 class TestAudioProcessorPatchManager : public juce::AudioProcessor
 {
@@ -195,6 +198,14 @@ public:
         testSave_noSysEx();
         testSaveAs_noSysEx();
         testSave_syncsPatchEditName();
+        testLoadSelected_enqueuesSysEx();
+        testLoadSelected_sentinelNoOp();
+        testLoadSelected_staleScanNoOp();
+        testLoadSelected_outOfRangeWarning();
+        testLoadSelected_invalidFileWarning();
+        testLoad_askOnceCancelRestoresModel();
+        testLoad_mismatch_preferInternalFooter();
+        testLoad_mismatch_preferFilenameFooter();
     }
 
 private:
@@ -220,6 +231,7 @@ private:
         std::function<juce::File(juce::File, juce::String)> pickSaveFileCallback {
             [](juce::File, juce::String) { return juce::File(); }
         };
+        Core::PatchFileNameReconciler::Picker pickReconciliationCallback;
         bool suppressPatchSysEx { false };
         bool suppressMatrixModSysEx { false };
         Core::PatchManagerActionHandler handler;
@@ -248,6 +260,11 @@ private:
                       [this]() { return pickFolderCallback(); },
                       [this](juce::File folder, juce::String stem) {
                           return pickSaveFileCallback(folder, stem);
+                      },
+                      [this](juce::String internalSanitized, juce::String fileSanitized) {
+                          if (pickReconciliationCallback)
+                              return pickReconciliationCallback(internalSanitized, fileSanitized);
+                          return std::optional<Core::NameReconciliationChoice>{};
                       },
                       Core::ActionExecutionHooks{
                           [this](bool suppress) { suppressMatrixModSysEx = suppress; },
@@ -848,6 +865,278 @@ private:
         harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kSavePatchAs, juce::var());
 
         expect(harness.proc.apvts.state.getProperty(PatchNameIds::kPatchName).toString() == "MY-PATCH");
+
+        tempDir.deleteRecursively();
+    }
+
+    void testLoadSelected_enqueuesSysEx()
+    {
+        beginTest("loadSelected_enqueuesSysEx");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, 0, 12, false);
+        const auto tempDir = createTempScanDir();
+        expect(tempDir.createDirectory());
+        copyFixturePatchToDir(tempDir, "Patch 71.syx");
+
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StateProperties::kFolderPath,
+            tempDir.getFullPathName(),
+            nullptr);
+        harness.handler.rescanPersistedComputerPatchesFolder();
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile,
+            1,
+            nullptr);
+
+        harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kSelectPatchFile, juce::var());
+
+        const auto queued = scanQueue(harness.queue);
+        expect(queued.patchData);
+        expect(harness.proc.apvts.state.getProperty("uiMessageSeverity").toString() == "info");
+        expect(harness.proc.apvts.state.getProperty("uiMessageText").toString()
+               == FooterMessages::formatReconciliationNotice("BNK2 71", false));
+
+        tempDir.deleteRecursively();
+    }
+
+    void testLoadSelected_sentinelNoOp()
+    {
+        beginTest("loadSelected_sentinelNoOp");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        const auto tempDir = createTempScanDir();
+        expect(tempDir.createDirectory());
+        copyFixturePatchToDir(tempDir, "Patch 71.syx");
+
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StateProperties::kFolderPath,
+            tempDir.getFullPathName(),
+            nullptr);
+        harness.handler.rescanPersistedComputerPatchesFolder();
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile,
+            0,
+            nullptr);
+
+        harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kSelectPatchFile, juce::var());
+
+        expect(harness.queue.isEmpty());
+        expect(! harness.proc.apvts.state.getProperty("uiMessageText").toString().startsWith("Loaded "));
+
+        tempDir.deleteRecursively();
+    }
+
+    void testLoadSelected_staleScanNoOp()
+    {
+        beginTest("loadSelected_staleScanNoOp");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        const auto tempDir = createTempScanDir();
+        expect(tempDir.createDirectory());
+        copyFixturePatchToDir(tempDir, "Patch 71.syx");
+
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StateProperties::kFolderPath,
+            tempDir.getFullPathName(),
+            nullptr);
+        harness.handler.rescanPersistedComputerPatchesFolder();
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile,
+            1,
+            nullptr);
+
+        expect(tempDir.deleteRecursively());
+
+        harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kSelectPatchFile, juce::var());
+
+        expect(harness.queue.isEmpty());
+        expect(harness.proc.apvts.state.getProperty("uiMessageSeverity").toString() == "warning");
+        expect(harness.proc.apvts.state.getProperty("uiMessageText").toString()
+               == FooterMessages::kLoadSelectionStale);
+
+        tempDir.deleteRecursively();
+    }
+
+    void testLoadSelected_outOfRangeWarning()
+    {
+        beginTest("loadSelected_outOfRangeWarning");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        const auto tempDir = createTempScanDir();
+        expect(tempDir.createDirectory());
+        copyFixturePatchToDir(tempDir, "Patch 71.syx");
+
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StateProperties::kFolderPath,
+            tempDir.getFullPathName(),
+            nullptr);
+        harness.handler.rescanPersistedComputerPatchesFolder();
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile,
+            99,
+            nullptr);
+
+        harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kSelectPatchFile, juce::var());
+
+        expect(harness.queue.isEmpty());
+        expect(harness.proc.apvts.state.getProperty("uiMessageSeverity").toString() == "warning");
+        expect(harness.proc.apvts.state.getProperty("uiMessageText").toString()
+               == FooterMessages::kLoadSelectionStale);
+
+        tempDir.deleteRecursively();
+    }
+
+    void testLoadSelected_invalidFileWarning()
+    {
+        beginTest("loadSelected_invalidFileWarning");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        const auto tempDir = createTempScanDir();
+        expect(tempDir.createDirectory());
+        copyFixturePatchToDir(tempDir, "Patch 71.syx");
+
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StateProperties::kFolderPath,
+            tempDir.getFullPathName(),
+            nullptr);
+        harness.handler.rescanPersistedComputerPatchesFolder();
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile,
+            1,
+            nullptr);
+
+        const auto patchNameBefore = harness.proc.apvts.state.getProperty(PatchNameIds::kPatchName).toString();
+        const juce::uint8 garbage[] = { 0x00, 0x01, 0x02, 0x03 };
+        expect(tempDir.getChildFile("Patch 71.syx").replaceWithData(garbage, sizeof(garbage)));
+
+        harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kSelectPatchFile, juce::var());
+
+        expect(harness.proc.apvts.state.getProperty("uiMessageSeverity").toString() == "warning");
+        expect(harness.proc.apvts.state.getProperty("uiMessageText").toString().isNotEmpty());
+        expect(harness.proc.apvts.state.getProperty(PatchNameIds::kPatchName).toString() == patchNameBefore);
+        expect(harness.queue.isEmpty());
+
+        tempDir.deleteRecursively();
+    }
+
+    void testLoad_askOnceCancelRestoresModel()
+    {
+        beginTest("load_askOnceCancelRestoresModel");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        harness.mapper.apvtsToBuffer();
+        harness.model.setName("KEEP-ME");
+        harness.mapper.bufferToApvts();
+        const auto patchNameBefore = harness.proc.apvts.state.getProperty(PatchNameIds::kPatchName).toString();
+
+        const auto tempDir = createTempScanDir();
+        expect(tempDir.createDirectory());
+        copyFixturePatchToDir(tempDir, "Patch 71.syx");
+
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StateProperties::kFolderPath,
+            tempDir.getFullPathName(),
+            nullptr);
+        harness.proc.apvts.state.setProperty(
+            PluginIDs::Settings::kComputerPatchesNameReconciliationPolicy,
+            Policy::kAskOncePerLoad,
+            nullptr);
+        harness.handler.rescanPersistedComputerPatchesFolder();
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile,
+            1,
+            nullptr);
+
+        harness.pickReconciliationCallback =
+            [](juce::String, juce::String) -> std::optional<Core::NameReconciliationChoice>
+            {
+                return std::nullopt;
+            };
+
+        harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kSelectPatchFile, juce::var());
+
+        expect(harness.model.getName() == "KEEP-ME");
+        expect(harness.proc.apvts.state.getProperty(PatchNameIds::kPatchName).toString() == patchNameBefore);
+        expect(harness.queue.isEmpty());
+
+        tempDir.deleteRecursively();
+    }
+
+    void testLoad_mismatch_preferInternalFooter()
+    {
+        beginTest("load_mismatch_preferInternalFooter");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        const auto tempDir = createTempScanDir();
+        expect(tempDir.createDirectory());
+
+        Core::PatchModel exportModel;
+        exportModel.loadFrom(Core::InitDefaults::patchData());
+        exportModel.setName("INSIDE");
+        expect(harness.patchFileService.savePatchSysExFile(
+            tempDir.getChildFile("OUTSIDE.syx"),
+            exportModel.data(),
+            harness.sysExEncoder).success);
+
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StateProperties::kFolderPath,
+            tempDir.getFullPathName(),
+            nullptr);
+        harness.proc.apvts.state.setProperty(
+            PluginIDs::Settings::kComputerPatchesNameReconciliationPolicy,
+            Policy::kPreferInternal,
+            nullptr);
+        harness.handler.rescanPersistedComputerPatchesFolder();
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile,
+            1,
+            nullptr);
+
+        harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kSelectPatchFile, juce::var());
+
+        expect(harness.proc.apvts.state.getProperty("uiMessageText").toString()
+               == FooterMessages::formatReconciliationNotice("INSIDE", false));
+        expect(harness.proc.apvts.state.getProperty(PatchNameIds::kPatchName).toString() == "INSIDE");
+
+        tempDir.deleteRecursively();
+    }
+
+    void testLoad_mismatch_preferFilenameFooter()
+    {
+        beginTest("load_mismatch_preferFilenameFooter");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        const auto tempDir = createTempScanDir();
+        expect(tempDir.createDirectory());
+
+        Core::PatchModel exportModel;
+        exportModel.loadFrom(Core::InitDefaults::patchData());
+        exportModel.setName("INSIDE");
+        expect(harness.patchFileService.savePatchSysExFile(
+            tempDir.getChildFile("OUTSIDE.syx"),
+            exportModel.data(),
+            harness.sysExEncoder).success);
+
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StateProperties::kFolderPath,
+            tempDir.getFullPathName(),
+            nullptr);
+        harness.proc.apvts.state.setProperty(
+            PluginIDs::Settings::kComputerPatchesNameReconciliationPolicy,
+            Policy::kPreferFilename,
+            nullptr);
+        harness.handler.rescanPersistedComputerPatchesFolder();
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile,
+            1,
+            nullptr);
+
+        harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kSelectPatchFile, juce::var());
+
+        expect(harness.proc.apvts.state.getProperty("uiMessageText").toString()
+               == FooterMessages::formatReconciliationNotice("OUTSIDE", true));
+        expect(harness.proc.apvts.state.getProperty(PatchNameIds::kPatchName).toString() == "OUTSIDE");
 
         tempDir.deleteRecursively();
     }

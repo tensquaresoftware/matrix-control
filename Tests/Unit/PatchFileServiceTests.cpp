@@ -1,5 +1,6 @@
 #include <juce_core/juce_core.h>
 
+#include "Core/MIDI/SysEx/SysExConstants.h"
 #include "Core/MIDI/SysEx/SysExDecoder.h"
 #include "Core/MIDI/SysEx/SysExEncoder.h"
 #include "Core/MIDI/SysEx/SysExParser.h"
@@ -45,6 +46,8 @@ public:
         scan_uppercaseSyxExtension_countsValid();
         savePatchSysExFile_validRoundTrip();
         savePatchSysExFile_writeFailureHandled();
+        loadPatchSysExFile_validFixture();
+        loadPatchSysExFile_invalid();
     }
 
 private:
@@ -271,6 +274,45 @@ private:
             missingParent,
             Core::InitDefaults::patchData(),
             encoder_);
+
+        expect(! result.success);
+        expect(result.errorMessage.isNotEmpty());
+    }
+
+    void loadPatchSysExFile_validFixture()
+    {
+        beginTest("loadPatchSysExFile_validFixture");
+
+        const auto source = fixturesPatchesDir().getChildFile("Patch 71.syx");
+        expect(source.existsAsFile());
+
+        juce::uint8 packed[SysExConstants::kPatchPackedDataSize] = {};
+        const auto result = service_.loadPatchSysExFile(source, packed);
+
+        expect(result.success);
+
+        bool hasNonZero = false;
+        for (auto byte : packed)
+        {
+            if (byte != 0)
+            {
+                hasNonZero = true;
+                break;
+            }
+        }
+
+        expect(hasNonZero);
+    }
+
+    void loadPatchSysExFile_invalid()
+    {
+        beginTest("loadPatchSysExFile_invalid");
+
+        const auto source = fixturesMastersDir().getChildFile("Master 1.syx");
+        expect(source.existsAsFile());
+
+        juce::uint8 packed[SysExConstants::kPatchPackedDataSize] = {};
+        const auto result = service_.loadPatchSysExFile(source, packed);
 
         expect(! result.success);
         expect(result.errorMessage.isNotEmpty());

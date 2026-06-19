@@ -61,10 +61,23 @@ namespace PluginDisplayNames
         constexpr const char* kDefragSection           = "DEFRAG";
         constexpr const char* kLoggingSection          = "LOGGING";
         constexpr const char* kComingSoon              = "Coming soon...";
+        constexpr const char* kNameReconciliationPreferInternal = "PREFER INTERNAL NAME";
+        constexpr const char* kNameReconciliationPreferFilename = "PREFER FILENAME";
+        constexpr const char* kNameReconciliationAskOnce        = "ASK ONCE PER LOAD";
     }
 
     namespace Dialogs
     {
+        namespace PatchNameReconciliation
+        {
+            constexpr const char* kTitle = "Patch name mismatch";
+            constexpr const char* kBodyTemplate =
+                "Internal name: {INTERNAL}\nFilename: {FILENAME}\n\nWhich name should be used for this load?";
+            constexpr const char* kInternal = "Internal";
+            constexpr const char* kFilename = "Filename";
+            constexpr const char* kCancel   = "Cancel";
+        }
+
         namespace MasterInitConfirm
         {
             constexpr const char* kTitle = "Reset master module?";
@@ -765,8 +778,24 @@ namespace PluginDisplayNames
                     return "Saved " + fileName;
                 }
 
+                inline juce::String formatLoadSuccess(const juce::String& fileName)
+                {
+                    return "Loaded " + fileName;
+                }
+
+                inline juce::String formatReconciliationNotice(const juce::String& resolvedName,
+                                                               bool usedFilename)
+                {
+                    if (usedFilename)
+                        return "Loaded " + resolvedName + " (filename used)";
+
+                    return "Loaded " + resolvedName + " (internal name used)";
+                }
+
                 constexpr const char* kEmptyFolder = "0 files in folder";
                 constexpr const char* kFolderNotFound = "Folder not found";
+                constexpr const char* kLoadSelectionStale = "Selection out of date";
+                constexpr const char* kPatchFileNotFound = "Patch file not found";
             }
 
             namespace StandaloneWidgets

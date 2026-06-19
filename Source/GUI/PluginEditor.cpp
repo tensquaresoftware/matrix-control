@@ -6,6 +6,7 @@
 #include "Core/Audio/StandaloneAudioInputRouter.h"
 #include "Core/MIDI/MidiActivityTracker.h"
 #include "Core/PluginProcessor.h"
+#include "Core/Services/PatchFileNameReconciler.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Widgets/ComboBox.h"
 #include "GUI/Panels/MainComponent/HeaderPanel/HeaderPanel.h"
@@ -16,6 +17,7 @@
 #include "Skins/Skin.h"
 #include "Factories/WidgetFactory.h"
 #include "Shared/Definitions/PluginIDs.h"
+#include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginAudioConstants.h"
 
 using TSS::SkinColourId;
@@ -107,6 +109,32 @@ PluginEditor::PluginEditor(PluginProcessor& p)
                 return chooser.getResult();
 
             return {};
+        });
+
+    pluginProcessor.setPatchNameReconciliationPicker(
+        [safeThis = juce::Component::SafePointer<PluginEditor>(this)](
+            juce::String internalSanitized, juce::String fileSanitized)
+            -> std::optional<Core::NameReconciliationChoice>
+        {
+            if (safeThis == nullptr)
+                return std::nullopt;
+
+            namespace Dialog = PluginDisplayNames::Dialogs::PatchNameReconciliation;
+            const auto body = juce::String(Dialog::kBodyTemplate)
+                                  .replace("{INTERNAL}", internalSanitized)
+                                  .replace("{FILENAME}", fileSanitized);
+
+            juce::AlertWindow alert(Dialog::kTitle, body, juce::AlertWindow::QuestionIcon);
+            alert.addButton(Dialog::kInternal, 1);
+            alert.addButton(Dialog::kFilename, 2);
+            alert.addButton(Dialog::kCancel, 0);
+
+            switch (alert.runModalLoop())
+            {
+                case 1: return Core::NameReconciliationChoice::kInternal;
+                case 2: return Core::NameReconciliationChoice::kFilename;
+                default: return std::nullopt;
+            }
         });
 
     skinBlack_ = TSS::Skin::create(TSS::Skin::ColourVariant::Black);
@@ -650,6 +678,11 @@ void PluginEditor::restoreSettingsPanelFromState(SettingsPanel& panel)
 {
     if (!pluginProcessor.isStandalone())
         panel.getHardwareLatencySlider().setValue(pluginProcessor.getHardwareLatencyMs(), juce::dontSendNotification);
+
+    const int policy = static_cast<int>(pluginProcessor.getApvts().state.getProperty(
+        PluginIDs::Settings::kComputerPatchesNameReconciliationPolicy,
+        PluginIDs::Settings::NameReconciliationPolicy::kDefault));
+    panel.getNameReconciliationPolicyCombo().setSelectedId(policy, juce::dontSendNotification);
 }
 
 void PluginEditor::wireSettingsPanel(SettingsPanel& panel)
@@ -657,6 +690,14 @@ void PluginEditor::wireSettingsPanel(SettingsPanel& panel)
     panel.getHardwareLatencySlider().onValueChange = [this, &panel]
     {
         pluginProcessor.setHardwareLatencyMs(static_cast<float>(panel.getHardwareLatencySlider().getValue()));
+    };
+
+    panel.getNameReconciliationPolicyCombo().onChange = [this, &panel]
+    {
+        pluginProcessor.getApvts().state.setProperty(
+            PluginIDs::Settings::kComputerPatchesNameReconciliationPolicy,
+            panel.getNameReconciliationPolicyCombo().getSelectedId(),
+            nullptr);
     };
 }
 

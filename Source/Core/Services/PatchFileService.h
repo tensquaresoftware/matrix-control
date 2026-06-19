@@ -14,6 +14,12 @@ namespace Core
         juce::String errorMessage;
     };
 
+    struct PatchFileLoadResult
+    {
+        bool success = false;
+        juce::String errorMessage;
+    };
+
     struct PatchFolderScanResult
     {
         juce::File folder;
@@ -36,6 +42,7 @@ namespace Core
         PatchFileSaveResult savePatchSysExFile(const juce::File& targetFile,
                                                const juce::uint8* packedData,
                                                SysExEncoder& encoder);
+        PatchFileLoadResult loadPatchSysExFile(const juce::File& file, juce::uint8* packedOut);
         const PatchFolderScanResult& getLastScanResult() const noexcept { return lastScan_; }
         bool hasCachedScanResult() const noexcept;
         void clearLastScan() noexcept;

@@ -280,6 +280,13 @@ PluginProcessor::PluginProcessor()
                 return patchSaveFilePicker_(suggestedFolder, suggestedStem);
             return {};
         },
+        [this](juce::String internalSanitized, juce::String fileSanitized)
+            -> std::optional<Core::NameReconciliationChoice>
+        {
+            if (patchNameReconciliationPicker_)
+                return patchNameReconciliationPicker_(internalSanitized, fileSanitized);
+            return std::nullopt;
+        },
         actionHooks);
 
     mutatorActionHandler_ = std::make_unique<Core::MutatorActionHandler>();
@@ -299,6 +306,7 @@ PluginProcessor::PluginProcessor()
     initializeHardwareLatencyProperty();
     initializeInitTemplatesFolderProperty();
     initializeComputerPatchesFolderProperty();
+    initializeNameReconciliationPolicyProperty();
 
     if (patchManagerActionHandler_ != nullptr)
         patchManagerActionHandler_->rescanPersistedComputerPatchesFolder();
@@ -769,6 +777,11 @@ void PluginProcessor::setPatchSaveFilePicker(PatchSaveFilePicker picker)
     patchSaveFilePicker_ = std::move(picker);
 }
 
+void PluginProcessor::setPatchNameReconciliationPicker(PatchNameReconciliationPicker picker)
+{
+    patchNameReconciliationPicker_ = std::move(picker);
+}
+
 int PluginProcessor::getSkinVariantId() const
 {
     return static_cast<int>(apvts.state.getProperty(
@@ -809,6 +822,17 @@ void PluginProcessor::initializeComputerPatchesFolderProperty()
         apvts.state.setProperty(
             PluginIDs::PatchManagerSection::ComputerPatchesModule::StateProperties::kFolderPath,
             juce::String(),
+            nullptr);
+    }
+}
+
+void PluginProcessor::initializeNameReconciliationPolicyProperty()
+{
+    if (! apvts.state.hasProperty(PluginIDs::Settings::kComputerPatchesNameReconciliationPolicy))
+    {
+        apvts.state.setProperty(
+            PluginIDs::Settings::kComputerPatchesNameReconciliationPolicy,
+            PluginIDs::Settings::NameReconciliationPolicy::kDefault,
             nullptr);
     }
 }

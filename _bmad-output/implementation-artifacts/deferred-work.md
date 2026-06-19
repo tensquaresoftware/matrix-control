@@ -1,5 +1,10 @@
 # Deferred Work
 
+## Deferred from: code review of 4-5-import-name-reconciliation (2026-06-19)
+
+- **CONVENTIONS.md hors périmètre story** — section BMad titres agents ajoutée dans le même diff que le chargement 4.5 ; à committer séparément.
+- **`AlertWindow::runModalLoop` synchrone** (`PluginEditor.cpp:132`) — premier modal du projet ; migration async JUCE 8 reportée.
+
 ## Deferred from: code review of 4-4-save-with-filename-injection (2026-06-19)
 
 - **SAVE AS outside library folder** — no combobox entry after save; spec v1 allows any folder, rescan stays on library path only.

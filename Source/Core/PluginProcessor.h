@@ -11,6 +11,7 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 
 #include "Core/Services/DeviceMemoryLimits.h"
+#include "Core/Services/PatchFileNameReconciler.h"
 
 #include "Core/MIDI/MatrixModBusParameterSysExDispatcher.h"
 #include "Shared/Definitions/Matrix1000Limits.h"
@@ -142,6 +143,10 @@ public:
     using PatchSaveFilePicker = std::function<juce::File(juce::File suggestedFolder, juce::String suggestedStem)>;
 
     void setPatchSaveFilePicker(PatchSaveFilePicker picker);
+
+    using PatchNameReconciliationPicker = Core::PatchFileNameReconciler::Picker;
+
+    void setPatchNameReconciliationPicker(PatchNameReconciliationPicker picker);
     Core::PatchFileService& getPatchFileService() noexcept { return *patchFileService_; }
     const Core::PatchFileService& getPatchFileService() const noexcept { return *patchFileService_; }
 
@@ -223,6 +228,7 @@ private:
     void initializeHardwareLatencyProperty();
     void initializeInitTemplatesFolderProperty();
     void initializeComputerPatchesFolderProperty();
+    void initializeNameReconciliationPolicyProperty();
     void applyHardwareLatencyToHost();
     void notifyNonParameterStateChanged();
     void scheduleDeferredMidiPortSyncForPluginHost();
@@ -295,6 +301,7 @@ private:
     std::unique_ptr<Core::PatchFileService> patchFileService_;
     PatchFolderPicker patchFolderPicker_;
     PatchSaveFilePicker patchSaveFilePicker_;
+    PatchNameReconciliationPicker patchNameReconciliationPicker_;
     std::unique_ptr<Core::ModuleActionHandler> moduleActionHandler_;
     std::unique_ptr<Core::PatchManagerActionHandler> patchManagerActionHandler_;
     std::unique_ptr<Core::MutatorActionHandler> mutatorActionHandler_;

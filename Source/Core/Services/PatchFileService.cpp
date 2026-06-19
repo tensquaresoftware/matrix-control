@@ -108,6 +108,45 @@ namespace Core
         return result;
     }
 
+    PatchFileLoadResult PatchFileService::loadPatchSysExFile(const juce::File& file, juce::uint8* packedOut)
+    {
+        PatchFileLoadResult result;
+
+        if (packedOut == nullptr)
+        {
+            result.errorMessage = "Invalid patch buffer";
+            return result;
+        }
+
+        if (! file.existsAsFile())
+        {
+            result.errorMessage = "File not found";
+            return result;
+        }
+
+        juce::MemoryBlock sysEx;
+        if (! file.loadFileAsData(sysEx))
+        {
+            result.errorMessage = "Read failed";
+            return result;
+        }
+
+        if (! decoder_.validatePatchSysExMessage(sysEx))
+        {
+            result.errorMessage = "Invalid patch file";
+            return result;
+        }
+
+        if (! decoder_.decodePatchSysEx(sysEx, packedOut))
+        {
+            result.errorMessage = "Decode failed";
+            return result;
+        }
+
+        result.success = true;
+        return result;
+    }
+
     bool PatchFileService::hasSyxExtension(const juce::File& file) noexcept
     {
         return file.getFileExtension().toLowerCase() == kSyxExtension;
