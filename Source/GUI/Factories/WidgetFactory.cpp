@@ -33,6 +33,8 @@ std::unique_ptr<TSS::Slider> WidgetFactory::createSliderFromDescriptor(
             static_cast<double>(desc->defaultValue),
             1.0,
             {},
+            {},
+            {},
             {}});
     return slider;
 }

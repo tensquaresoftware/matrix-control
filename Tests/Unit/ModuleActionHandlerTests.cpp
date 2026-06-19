@@ -100,7 +100,8 @@ private:
                       Core::ActionExecutionHooks{
                           [this](bool suppress) { suppressMatrixModSysEx = suppress; },
                           nullptr,
-                          [this](bool suppress) { suppressPatchSysEx = suppress; } })
+                          [this](bool suppress) { suppressPatchSysEx = suppress; },
+                          nullptr })
         {
         }
     };

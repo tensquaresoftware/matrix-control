@@ -65,6 +65,8 @@ void PatchMutatorPanel::setupAmountLine(TSS::ISkin& skin, WidgetFactory& widgetF
             amountIt != allIntParams.end() ? static_cast<double>(amountIt->defaultValue) : 0.0,
             1.0,
             PluginDisplayNames::Units::kPercent,
+            {},
+            {},
             {}});
     amountSlider_->onValueChange = [this]
     {
@@ -148,6 +150,8 @@ void PatchMutatorPanel::setupRandomLine(TSS::ISkin& skin, WidgetFactory& widgetF
             randomIt != allIntParams.end() ? static_cast<double>(randomIt->defaultValue) : 0.0,
             1.0,
             PluginDisplayNames::Units::kPercent,
+            {},
+            {},
             {}});
     randomSlider_->onValueChange = [this]
     {

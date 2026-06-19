@@ -20,6 +20,8 @@ SettingsPanel::SettingsPanel(TSS::ISkin& skin, bool isPluginMode)
                                  Core::HardwareLatency::kMinMs,
                                  Core::HardwareLatency::kStepMs,
                                  "ms",
+                                 {},
+                                 {},
                                  {}})
     , masterOpsLabel_(kLabelWidth_, kControlHeight_, TSS::labelLookFromSkin(skin), PluginDisplayNames::Settings::kMasterOperationsSection)
     , masterOpsPlaceholder_(kContentWidth_ - kLabelWidth_ - kGap_, kControlHeight_, TSS::labelLookFromSkin(skin), PluginDisplayNames::Settings::kComingSoon)

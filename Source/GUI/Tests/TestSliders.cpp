@@ -41,16 +41,16 @@ public:
         addAndMakeVisible(*scaleLabel_);
 
         firstSlider_ = createSlider(dimensions_.topSliderWidth, dimensions_.topSliderHeight, sliderLook,
-                                    TSS::SliderConfig{ 0.0, 100.0, 50.0, 1.0, "%", {} });
+                                    TSS::SliderConfig{ 0.0, 100.0, 50.0, 1.0, "%", {}, {}, {} });
 
         secondSlider_ = createSlider(dimensions_.topSliderWidth, dimensions_.topSliderHeight, sliderLook,
-                                     TSS::SliderConfig{ -63.0, 63.0, 0.0, 1.0, {}, {} });
+                                     TSS::SliderConfig{ -63.0, 63.0, 0.0, 1.0, {}, {}, {}, {} });
 
         thirdSlider_ = createSlider(dimensions_.bottomSliderWidth, dimensions_.bottomSliderHeight, sliderLook,
-                                    TSS::SliderConfig{ 0.0, 127.0, 63.0, 1.0, {}, {} });
+                                    TSS::SliderConfig{ 0.0, 127.0, 63.0, 1.0, {}, {}, {}, {} });
 
         fourthSlider_ = createSlider(dimensions_.bottomSliderWidth, dimensions_.bottomSliderHeight, sliderLookBoldLarge,
-                                     TSS::SliderConfig{ 0.0, 127.0, 63.0, 1.0, {}, {} });
+                                     TSS::SliderConfig{ 0.0, 127.0, 63.0, 1.0, {}, {}, {}, {} });
     }
 
     int getScaledColumnWidth() const

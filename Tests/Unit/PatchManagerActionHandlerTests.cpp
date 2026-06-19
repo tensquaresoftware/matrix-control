@@ -68,29 +68,6 @@ public:
 
 namespace
 {
-    bool sysExMessageHasOpcode(const juce::MemoryBlock& block, juce::uint8 opcode, int expectedDataByte = -1)
-    {
-        if (block.getSize() < 5)
-            return false;
-
-        const auto* data = static_cast<const juce::uint8*>(block.getData());
-        if (data[0] != SysExConstants::kSysExStart
-            || data[1] != SysExConstants::kManufacturerIdOberheim
-            || data[2] != SysExConstants::kDeviceIdMatrix1000
-            || data[3] != opcode)
-        {
-            return false;
-        }
-
-        if (expectedDataByte >= 0)
-        {
-            if (block.getSize() < 6 || data[4] != static_cast<juce::uint8>(expectedDataByte))
-                return false;
-        }
-
-        return data[block.getSize() - 1] == SysExConstants::kSysExEnd;
-    }
-
     struct QueueScanResult
     {
         bool setBank = false;
@@ -276,7 +253,8 @@ private:
                       Core::ActionExecutionHooks{
                           [this](bool suppress) { suppressMatrixModSysEx = suppress; },
                           nullptr,
-                          [this](bool suppress) { suppressPatchSysEx = suppress; } })
+                          [this](bool suppress) { suppressPatchSysEx = suppress; },
+                          nullptr })
         {
             initializePatchManagerState(proc.apvts.state, 0, 0, false);
             patchSelectionMidiSync.resetLastSyncedBank(0);
