@@ -39,12 +39,14 @@ PatchMutatorPanel::PatchMutatorPanel(TSS::ISkin& skin, const PatchMutatorPanelDi
     apvts_.state.addListener(this);
     refreshHistoryMComboBox();
     refreshHistoryRComboBox();
+    refreshCompareUiState();
 
     setSize(dims_.width, dims_.height);
 }
 
 PatchMutatorPanel::~PatchMutatorPanel()
 {
+    stopTimer();
     apvts_.state.removeListener(this);
 }
 
@@ -324,12 +326,55 @@ void PatchMutatorPanel::valueTreePropertyChanged(juce::ValueTree&,
     {
         refreshHistoryRComboBox();
     }
+    if (name == MutatorState::kCompareActive || name == MutatorState::kHistoryMList
+        || name == MutatorState::kSelectedM)
+    {
+        refreshCompareUiState();
+    }
 }
 
 void PatchMutatorPanel::valueTreeRedirected(juce::ValueTree&)
 {
     refreshHistoryMComboBox();
     refreshHistoryRComboBox();
+    refreshCompareUiState();
+}
+
+void PatchMutatorPanel::timerCallback()
+{
+    compareBlinkVisible_ = ! compareBlinkVisible_;
+    if (compareButton_ != nullptr)
+        compareButton_->setAlpha(compareBlinkVisible_ ? 1.0f : 0.35f);
+}
+
+void PatchMutatorPanel::refreshCompareUiState()
+{
+    const bool compareActive = static_cast<bool>(apvts_.state.getProperty(MutatorState::kCompareActive,
+                                                                         false));
+    const auto mList = parsePipeSeparatedList(apvts_.state.getProperty(MutatorState::kHistoryMList).toString());
+    const int selectedM = static_cast<int>(apvts_.state.getProperty(MutatorState::kSelectedM, -1));
+    const bool historyEmpty = mList.isEmpty() || selectedM < 0;
+
+    if (compareButton_ != nullptr)
+        compareButton_->setEnabled(compareActive || ! historyEmpty);
+
+    if (historyMComboBox_ != nullptr)
+        historyMComboBox_->setEnabled(! compareActive && ! historyEmpty);
+
+    if (historyRComboBox_ != nullptr)
+        historyRComboBox_->setEnabled(! compareActive && ! historyEmpty);
+
+    if (compareActive)
+    {
+        compareBlinkVisible_ = true;
+        startTimerHz(2);
+    }
+    else
+    {
+        stopTimer();
+        if (compareButton_ != nullptr)
+            compareButton_->setAlpha(1.0f);
+    }
 }
 
 juce::StringArray PatchMutatorPanel::parsePipeSeparatedList(const juce::String& encodedList)
@@ -353,13 +398,12 @@ void PatchMutatorPanel::refreshHistoryMComboBox()
     {
         historyMComboBox_->setTextWhenNothingSelected(MutatorDisplayNames::kEmptyHistorySentinel);
         historyMComboBox_->setSelectedId(0, juce::dontSendNotification);
-        historyMComboBox_->setEnabled(false);
         if (historyRComboBox_ != nullptr)
         {
             historyRComboBox_->clear(juce::dontSendNotification);
             historyRComboBox_->setSelectedId(0, juce::dontSendNotification);
-            historyRComboBox_->setEnabled(false);
         }
+        refreshCompareUiState();
         return;
     }
 
@@ -374,6 +418,7 @@ void PatchMutatorPanel::refreshHistoryMComboBox()
 
     historyMComboBox_->setEnabled(true);
     syncHistoryMSelectionFromApvts();
+    refreshCompareUiState();
 }
 
 void PatchMutatorPanel::refreshHistoryRComboBox()
@@ -386,7 +431,7 @@ void PatchMutatorPanel::refreshHistoryRComboBox()
     {
         historyRComboBox_->clear(juce::dontSendNotification);
         historyRComboBox_->setSelectedId(0, juce::dontSendNotification);
-        historyRComboBox_->setEnabled(false);
+        refreshCompareUiState();
         return;
     }
 
@@ -405,6 +450,7 @@ void PatchMutatorPanel::refreshHistoryRComboBox()
 
     historyRComboBox_->setEnabled(true);
     syncHistoryRSelectionFromApvts();
+    refreshCompareUiState();
 }
 
 void PatchMutatorPanel::syncHistoryMSelectionFromApvts()

@@ -2,6 +2,12 @@
 
 - **Panel M change leaves R list stale until processor hook** — resolved 1+2: sync reads APVTS in 6.6; 7.4 processor calls `syncHistoryUiProperties` on `kSelectedM` change for full panel UX.
 
+## Deferred from: code review of 6-8-compare-mode (2026-06-20)
+
+- **DELETE/CLEAR during compare may restore stale `compareSavedM_`/`compareSavedR_`** — story 6.9 compare exit side-effects.
+- **Initial snapshot not reset on patch load / history clear without mutate** — story 6.13 clear-on-patch-load.
+- **`pushResultToEditorAndSynth` return value ignored on compare enter/exit** — pre-existing 6.4–6.7 pattern; revisit if handler propagates push failures.
+
 ## Deferred from: code review of 6-7-history-selection-audition-with-debounce (2026-06-20)
 
 - **Debouncer pending callback dropped on destruction** — `stopTimer()` only; acceptable for 6.7; 7.4 handler lifetime must outlive debouncer or add explicit cancel.

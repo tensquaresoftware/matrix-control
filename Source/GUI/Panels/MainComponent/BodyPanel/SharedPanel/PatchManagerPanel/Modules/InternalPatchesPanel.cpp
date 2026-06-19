@@ -12,6 +12,7 @@
 #include "Shared/Definitions/Matrix1000Limits.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
 #include "Shared/Definitions/PluginDescriptors.h"
+#include "Shared/Definitions/PluginIDs.h"
 #include "GUI/Factories/WidgetFactory.h"
 #include <juce_core/juce_core.h>
 
@@ -86,6 +87,9 @@ void InternalPatchesPanel::valueTreePropertyChanged(
 
     if (propertyName == PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties::kBanksLocked)
         refreshBankLockIndicator();
+
+    if (propertyName == PluginIDs::PatchManagerSection::PatchMutatorModule::StateProperties::kCompareActive)
+        refreshDeviceLimits();
 }
 
 void InternalPatchesPanel::valueTreeRedirected(juce::ValueTree&)
@@ -252,12 +256,15 @@ void InternalPatchesPanel::applyPatchNumberRange(const Core::DeviceMemoryLimits&
 void InternalPatchesPanel::updatePasteStoreEnabled(const Core::DeviceMemoryLimits& limits, int currentBank)
 {
     const bool allowPasteStore = limits.isPasteStoreAllowed(currentBank);
+    const bool compareActive = static_cast<bool>(apvts_.state.getProperty(
+        PluginIDs::PatchManagerSection::PatchMutatorModule::StateProperties::kCompareActive,
+        false));
 
     if (pastePatchButton_)
         pastePatchButton_->setEnabled(allowPasteStore && clipboardPasteEnabled_);
 
     if (storePatchButton_)
-        storePatchButton_->setEnabled(allowPasteStore);
+        storePatchButton_->setEnabled(allowPasteStore && ! compareActive);
 }
 
 void InternalPatchesPanel::setupModuleHeader(TSS::ISkin& skin, WidgetFactory& widgetFactory, const juce::String& moduleId)

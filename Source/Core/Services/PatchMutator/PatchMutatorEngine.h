@@ -87,6 +87,8 @@ namespace Core
         juce::Random rng_;
         int selectedRootIndex_ = -1;
         int selectedRetryIndex_ = MutationHistoryStore::kRootOnly;
+        int compareSavedM_ = -1;
+        int compareSavedR_ = MutationHistoryStore::kRootOnly;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PatchMutatorEngine)
     };

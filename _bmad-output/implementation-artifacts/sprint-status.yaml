@@ -1,5 +1,5 @@
 # generated: 2026-05-29
-# last_updated: 2026-06-20 (6-7 history-selection-audition-with-debounce — done)
+# last_updated: 2026-06-20 (6-8 compare-mode — done)
 # project: Matrix-Control
 # project_key: NOKEY
 # tracking_system: file-system
@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-05-29
-last_updated: 2026-06-20 (6-7 history-selection-audition-with-debounce — done)
+last_updated: 2026-06-20 (6-8 compare-mode — done)
 project: Matrix-Control
 project_key: NOKEY
 tracking_system: file-system
@@ -106,7 +106,7 @@ development_status:
   6-5-retry-from-parent-snapshot: done
   6-6-history-m-and-r-ui-properties: done
   6-7-history-selection-audition-with-debounce: done
-  6-8-compare-mode: backlog
+  6-8-compare-mode: done
   6-9-delete-and-clear-history: backlog
   6-10-historydefrag-on-limit: backlog
   6-11-mutator-export-layout: backlog

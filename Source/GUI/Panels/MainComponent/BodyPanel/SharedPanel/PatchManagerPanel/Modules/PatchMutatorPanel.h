@@ -21,7 +21,8 @@ namespace TSS
 class WidgetFactory;
 
 class PatchMutatorPanel : public juce::Component,
-                          public juce::ValueTree::Listener
+                          public juce::ValueTree::Listener,
+                          private juce::Timer
 {
 public:
     PatchMutatorPanel(TSS::ISkin& skin, const PatchMutatorPanelDimensions& dims, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
@@ -88,9 +89,13 @@ private:
 
     void refreshHistoryMComboBox();
     void refreshHistoryRComboBox();
+    void refreshCompareUiState();
     void syncHistoryMSelectionFromApvts();
     void syncHistoryRSelectionFromApvts();
+    void timerCallback() override;
     static juce::StringArray parsePipeSeparatedList(const juce::String& encodedList);
+
+    bool compareBlinkVisible_ = true;
 
     void layoutSliderLine(int x, int y, TSS::Label* label, TSS::Slider* slider, TSS::Button* button,
                           const std::vector<TSS::Toggle*>& toggles, int actionButtonWidth);

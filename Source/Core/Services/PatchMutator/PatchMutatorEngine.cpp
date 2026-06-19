@@ -21,6 +21,8 @@ namespace
     constexpr const char* kHistoryLimitFooterMessage = "Mutation history is full. Defrag to continue.";
     constexpr const char* kEmptyHistoryFooterMessage = "Mutation history is empty.";
     constexpr const char* kNoSelectionFooterMessage = "No valid mutation history entry selected.";
+    constexpr const char* kNoInitialSnapshotFooterMessage =
+        "No initial patch snapshot available for compare.";
     constexpr const char* kFooterSeverityWarning = "warning";
 
     void setPatchLoadSuppressHooks(Core::ActionExecutionHooks& hooks, bool suppress)
@@ -120,6 +122,10 @@ MutatorActionResult PatchMutatorEngine::mutate()
     }
 
     const PatchModel auditionBuffer = resolveAuditionBuffer();
+
+    if (! historyStore_.hasInitialSnapshot())
+        historyStore_.setInitialSnapshot(auditionBuffer);
+
     PatchModel parentSnapshot;
     parentSnapshot.loadFrom(auditionBuffer.data());
 
@@ -271,7 +277,54 @@ MutatorActionResult PatchMutatorEngine::retry()
 
 MutatorActionResult PatchMutatorEngine::toggleCompare()
 {
+    applySelectionFromApvts();
+
+    auto& state = apvts_.state;
+    const bool currentlyActive = readBoolProperty(state, MutatorState::kCompareActive, false);
+
+    if (currentlyActive)
+    {
+        state.setProperty(MutatorState::kCompareActive, false, nullptr);
+        state.setProperty(MutatorState::kSelectedM, compareSavedM_, nullptr);
+        state.setProperty(MutatorState::kSelectedR, compareSavedR_, nullptr);
+        applySelectionFromApvts();
+
+        const PatchModel auditionModel = resolveAuditionBuffer();
+        if (std::memcmp(auditionModel.data(), patchModel_->data(), PatchModel::kBufferSize) != 0)
+            pushResultToEditorAndSynth(auditionModel);
+
+        MutatorActionResult result;
+        result.success = true;
+        return result;
+    }
+
+    if (historyStore_.isEmpty())
+    {
+        MutatorActionResult result;
+        result.footerMessage = kEmptyHistoryFooterMessage;
+        result.footerSeverity = kFooterSeverityWarning;
+        return result;
+    }
+
+    if (! historyStore_.hasInitialSnapshot())
+    {
+        MutatorActionResult result;
+        result.footerMessage = kNoInitialSnapshotFooterMessage;
+        result.footerSeverity = kFooterSeverityWarning;
+        return result;
+    }
+
+    compareSavedM_ = selectedRootIndex_;
+    compareSavedR_ = selectedRetryIndex_;
+
+    state.setProperty(MutatorState::kCompareActive, true, nullptr);
+
+    const PatchModel initialSnapshot = historyStore_.getInitialSnapshot();
+    if (std::memcmp(initialSnapshot.data(), patchModel_->data(), PatchModel::kBufferSize) != 0)
+        pushResultToEditorAndSynth(initialSnapshot);
+
     MutatorActionResult result;
+    result.success = true;
     return result;
 }
 
