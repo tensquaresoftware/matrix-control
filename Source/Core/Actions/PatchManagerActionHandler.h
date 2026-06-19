@@ -64,6 +64,7 @@ namespace Core
         void handleSavePatchAs();
         void handleSavePatchFile();
         void handleLoadSelectedPatchFile(const DeviceMemoryLimits& limits);
+        void advanceComputerPatchesSelection(bool isNext);
         struct SelectedPatchFileResolution
         {
             enum class Kind

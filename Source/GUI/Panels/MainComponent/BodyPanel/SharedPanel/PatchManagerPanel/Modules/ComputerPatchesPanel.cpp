@@ -61,8 +61,11 @@ ComputerPatchesPanel::~ComputerPatchesPanel()
 void ComputerPatchesPanel::valueTreePropertyChanged(juce::ValueTree&,
                                                     const juce::Identifier& property)
 {
-    if (property.toString() == ComputerPatchesIds::StateProperties::kScanRevision)
+    const auto name = property.toString();
+    if (name == ComputerPatchesIds::StateProperties::kScanRevision)
         refreshPatchFileComboBox();
+    else if (name == ComputerPatchesIds::StandaloneWidgets::kSelectPatchFile)
+        syncSelectionFromApvts();
 }
 
 void ComputerPatchesPanel::valueTreeRedirected(juce::ValueTree&)

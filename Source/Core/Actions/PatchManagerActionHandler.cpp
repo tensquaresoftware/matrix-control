@@ -159,7 +159,16 @@ namespace Core
         if (propertyId == ComputerPatchesModule::StandaloneWidgets::kLoadPreviousPatchFile
             || propertyId == ComputerPatchesModule::StandaloneWidgets::kLoadNextPatchFile)
         {
-            return; // Story 4.6
+            const int beforeId = readComputerPatchesSelectedId();
+            const bool isNext = propertyId == ComputerPatchesModule::StandaloneWidgets::kLoadNextPatchFile;
+            advanceComputerPatchesSelection(isNext);
+            if (readComputerPatchesSelectedId() == beforeId && beforeId >= 1 && isComputerPatchesScanCurrent())
+            {
+                const int count = patchFileService_->getLastScanResult().sortedValidFileNames.size();
+                if (count >= 1)
+                    handleLoadSelectedPatchFile(limits);
+            }
+            return;
         }
 
         if (!limits.hasBankConcept())
@@ -366,6 +375,26 @@ namespace Core
 
         applyLoadedPatchToApvtsAndSynth(limits);
         publishLoadFooters(resolution.file.getFileName(), *reconciliation);
+    }
+
+    void PatchManagerActionHandler::advanceComputerPatchesSelection(bool isNext)
+    {
+        const int currentId = readComputerPatchesSelectedId();
+        if (currentId < 1 || ! isComputerPatchesScanCurrent())
+            return;
+
+        const int count = patchFileService_->getLastScanResult().sortedValidFileNames.size();
+        if (count < 1 || currentId > count)
+            return;
+
+        const int nextId = isNext
+            ? (currentId >= count ? 1 : currentId + 1)
+            : (currentId <= 1 ? count : currentId - 1);
+
+        apvts_.state.setProperty(
+            PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSelectPatchFile,
+            nextId,
+            nullptr);
     }
 
     int PatchManagerActionHandler::readComputerPatchesSelectedId() const

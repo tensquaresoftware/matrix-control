@@ -1,5 +1,13 @@
 # Deferred Work
 
+## Deferred from: code review of 4-6-previous-and-next-file-navigation (2026-06-19)
+
+- **Appel direct `handleLoadSelectedPatchFile` quand id inchangé (N==1)** (`PatchManagerActionHandler.cpp:165-166`) — déviation documentée du libellé tâche « advance only » ; justifiée par le no-op JUCE `setProperty` ; conforme AC#3.
+- **Pas de test GUI `syncSelectionFromApvts`** (`ComputerPatchesPanel.cpp:67-68`) — aucune infra de tests panel ; listener vérifié par inspection.
+- **Tests simulent le dispatch `kSelectPatchFile` manuellement** (`PatchManagerActionHandlerTests.cpp:289-301`) — limitation harness ; chaîne PluginProcessor non intégrée.
+- **`advanceComputerPatchesSelection` ~19 lignes** (`PatchManagerActionHandler.cpp:376-394`) — dette style mineure (limite 15 lignes).
+- **Section BMad titres dans `CONVENTIONS.md`** — hors périmètre story 4.6 ; à committer séparément.
+
 ## Deferred from: code review of 4-5-import-name-reconciliation (2026-06-19)
 
 - **CONVENTIONS.md hors périmètre story** — section BMad titres agents ajoutée dans le même diff que le chargement 4.5 ; à committer séparément.
