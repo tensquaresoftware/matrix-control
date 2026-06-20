@@ -2,6 +2,13 @@
 
 - **Panel M change leaves R list stale until processor hook** — resolved 1+2: sync reads APVTS in 6.6; 7.4 processor calls `syncHistoryUiProperties` on `kSelectedM` change for full panel UX.
 
+## Deferred from: code review of 6-11-mutator-export-layout (2026-06-20)
+
+- **Partial export fail-fast leaves prior files on disk** — v1 spec explicit; no rollback required.
+- **Re-export overwrite behavior undefined** — out of scope v1; document or handle in future export UX story.
+- **Non-writable folder tests use nonexistent path, not read-only directory** — test hardening; CI may not cover permission-denied scenario.
+- **No tests for mid-batch export failure / orphan output** — v1 fail-fast policy documented in spec; add when rollback story exists.
+
 ## Deferred from: code review of 6-10-historydefrag-on-limit (2026-06-20)
 
 - **`HistoryDefragService::defrag()` exceeds 15-line function limit** — architecture guideline; extract compaction loop helper when touching service again.

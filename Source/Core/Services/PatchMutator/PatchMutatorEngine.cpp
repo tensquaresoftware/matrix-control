@@ -3,9 +3,11 @@
 #include <cstring>
 
 #include "Core/MIDI/MidiManager.h"
+#include "Core/MIDI/SysEx/SysExEncoder.h"
 #include "Core/Models/ApvtsPatchMapper.h"
 #include "Core/Models/PatchModel.h"
 #include "Core/Models/PatchNameSyncer.h"
+#include "Core/Services/PatchFileService.h"
 #include "Core/Services/PatchMutator/HistoryDefragService.h"
 #include "Core/Services/PatchMutator/MutationNaming.h"
 #include "Shared/Definitions/PluginIDs.h"
@@ -27,8 +29,42 @@ namespace
     constexpr const char* kRootDeleteCascadeFooterPrefix = "Deleted ";
     constexpr const char* kRootDeleteCascadeFooterSuffix = " and all retries.";
     constexpr const char* kDefragCompleteFooterMessage = "Mutation history renumbered.";
+    constexpr const char* kExportFolderNotWritableFooterMessage = "Export folder is not writable.";
+    constexpr const char* kExportFailedFooterMessage = "Mutation export failed.";
     constexpr const char* kFooterSeverityWarning = "warning";
     constexpr const char* kFooterSeverityInfo = "info";
+
+    juce::String formatExportCompleteFooterMessage(int filesWritten)
+    {
+        return "Exported " + juce::String(filesWritten) + " mutation file(s).";
+    }
+
+    Core::MutatorActionResult makeExportWarningResult(const char* message)
+    {
+        Core::MutatorActionResult result;
+        result.footerMessage = message;
+        result.footerSeverity = kFooterSeverityWarning;
+        return result;
+    }
+
+    Core::MutatorActionResult makeExportHistoryResult(const Core::PatchFileExportResult& exportResult)
+    {
+        Core::MutatorActionResult result;
+
+        if (! exportResult.success)
+        {
+            result.footerMessage = exportResult.errorMessage.isNotEmpty()
+                ? exportResult.errorMessage
+                : juce::String(kExportFailedFooterMessage);
+            result.footerSeverity = kFooterSeverityWarning;
+            return result;
+        }
+
+        result.success = true;
+        result.footerMessage = formatExportCompleteFooterMessage(exportResult.filesWritten);
+        result.footerSeverity = kFooterSeverityInfo;
+        return result;
+    }
 
     void setPatchLoadSuppressHooks(Core::ActionExecutionHooks& hooks, bool suppress)
     {
@@ -91,7 +127,9 @@ PatchMutatorEngine::PatchMutatorEngine(PatchModel* patchModel,
                                        MidiManager* midiManager,
                                        juce::AudioProcessorValueTreeState& apvts,
                                        ActionExecutionHooks hooks,
-                                       std::function<int()> getCurrentPatchNumber)
+                                       std::function<int()> getCurrentPatchNumber,
+                                       PatchFileService* patchFileService,
+                                       SysExEncoder* sysExEncoder)
     : patchModel_(patchModel)
     , apvtsPatchMapper_(apvtsPatchMapper)
     , patchNameSyncer_(patchNameSyncer)
@@ -99,6 +137,8 @@ PatchMutatorEngine::PatchMutatorEngine(PatchModel* patchModel,
     , apvts_(apvts)
     , hooks_(std::move(hooks))
     , getCurrentPatchNumber_(std::move(getCurrentPatchNumber))
+    , patchFileService_(patchFileService)
+    , sysExEncoder_(sysExEncoder)
 {
     jassert(patchModel_ != nullptr);
     jassert(apvtsPatchMapper_ != nullptr);
@@ -412,10 +452,21 @@ MutatorActionResult PatchMutatorEngine::clearHistory()
     return result;
 }
 
-MutatorActionResult PatchMutatorEngine::exportHistory(const juce::File&)
+MutatorActionResult PatchMutatorEngine::exportHistory(const juce::File& destinationFolder)
 {
-    MutatorActionResult result;
-    return result;
+    if (historyStore_.isEmpty())
+        return makeExportWarningResult(kEmptyHistoryFooterMessage);
+
+    if (patchFileService_ == nullptr || sysExEncoder_ == nullptr)
+        return Core::MutatorActionResult{};
+
+    if (! destinationFolder.isDirectory() || ! destinationFolder.hasWriteAccess())
+        return makeExportWarningResult(kExportFolderNotWritableFooterMessage);
+
+    return makeExportHistoryResult(patchFileService_->exportMutatorHistory(
+        destinationFolder,
+        historyStore_,
+        *sysExEncoder_));
 }
 
 MutatorActionResult PatchMutatorEngine::defragHistory()

@@ -11,9 +11,13 @@
 #include "Core/MIDI/MidiManager.h"
 #include "Core/MIDI/Queue/MidiOutboundQueue.h"
 #include "Core/MIDI/SysEx/SysExConstants.h"
+#include "Core/MIDI/SysEx/SysExDecoder.h"
+#include "Core/MIDI/SysEx/SysExEncoder.h"
+#include "Core/MIDI/SysEx/SysExParser.h"
 #include "Core/Models/ApvtsPatchMapper.h"
 #include "Core/Models/PatchModel.h"
 #include "Core/Models/PatchNameSyncer.h"
+#include "Core/Services/PatchFileService.h"
 #include "Core/Services/PatchMutator/MutationHistoryStore.h"
 #include "Core/Services/PatchMutator/MutationNaming.h"
 #include "Core/Services/PatchMutator/PatchMutatorEngine.h"
@@ -129,6 +133,12 @@ public:
         defrag_disablesCompare();
         defrag_auditionsRemappedSelection();
         defrag_successFooter();
+
+        export_emptyHistory_blocked();
+        export_success_footer();
+        export_nonWritableFolder_blocked();
+        export_doesNotMutateStore();
+        export_noSysEx();
     }
 
 private:
@@ -141,6 +151,9 @@ private:
         Core::MidiOutboundQueue queue;
         Core::MidiActivityTracker tracker;
         MidiManager midiManager;
+        SysExParser parser;
+        SysExDecoder decoder;
+        Core::PatchFileService patchFileService;
         bool suppressPatchSysEx { false };
         bool suppressMatrixModSysEx { false };
         int currentPatchNumber { 0 };
@@ -150,6 +163,8 @@ private:
             : mapper(proc.apvts, model)
             , patchNameSyncer(proc.apvts, model)
             , midiManager(proc.apvts, queue, tracker)
+            , decoder(parser)
+            , patchFileService(decoder)
             , engine(&model,
                      &mapper,
                      &patchNameSyncer,
@@ -160,7 +175,9 @@ private:
                          nullptr,
                          [this](bool suppress) { suppressPatchSysEx = suppress; },
                          nullptr },
-                     [this]() { return currentPatchNumber; })
+                     [this]() { return currentPatchNumber; },
+                     &patchFileService,
+                     &midiManager.getSysExEncoder())
         {
             model.loadFrom(Core::InitDefaults::patchData());
         }
@@ -1588,6 +1605,106 @@ private:
         expect(result.success);
         expectEquals(result.footerSeverity, juce::String("info"));
         expectEquals(result.footerMessage, juce::String("Mutation history renumbered."));
+    }
+
+    void export_emptyHistory_blocked()
+    {
+        beginTest("export_emptyHistory_blocked");
+
+        EngineHarness harness;
+        const auto tempDir = juce::File::getSpecialLocation(juce::File::tempDirectory)
+                                 .getNonexistentChildFile("MatrixControlMutatorExport", "", false);
+        expect(tempDir.createDirectory());
+
+        const auto result = harness.engine.exportHistory(tempDir);
+
+        expect(! result.success);
+        expectEquals(result.footerMessage, juce::String("Mutation history is empty."));
+        expectEquals(result.footerSeverity, juce::String("warning"));
+        expectEquals(tempDir.getNumberOfChildFiles(0), 0);
+
+        tempDir.deleteRecursively();
+    }
+
+    void export_success_footer()
+    {
+        beginTest("export_success_footer");
+
+        EngineHarness harness;
+        harness.setRecipe(50, 50);
+
+        expect(harness.engine.mutate().success);
+
+        const auto tempDir = juce::File::getSpecialLocation(juce::File::tempDirectory)
+                                 .getNonexistentChildFile("MatrixControlMutatorExport", "", false);
+        expect(tempDir.createDirectory());
+
+        const auto result = harness.engine.exportHistory(tempDir);
+
+        expect(result.success);
+        expectEquals(result.footerSeverity, juce::String("info"));
+        expectEquals(result.footerMessage, juce::String("Exported 2 mutation file(s)."));
+
+        tempDir.deleteRecursively();
+    }
+
+    void export_nonWritableFolder_blocked()
+    {
+        beginTest("export_nonWritableFolder_blocked");
+
+        EngineHarness harness;
+        harness.setRecipe(50, 50);
+        expect(harness.engine.mutate().success);
+
+        const auto missing = juce::File::getSpecialLocation(juce::File::tempDirectory)
+                                 .getChildFile("MatrixControlMissingMutatorExportFolder");
+
+        const auto result = harness.engine.exportHistory(missing);
+
+        expect(! result.success);
+        expectEquals(result.footerMessage, juce::String("Export folder is not writable."));
+        expectEquals(result.footerSeverity, juce::String("warning"));
+    }
+
+    void export_doesNotMutateStore()
+    {
+        beginTest("export_doesNotMutateStore");
+
+        EngineHarness harness;
+        harness.setRecipe(50, 50);
+        expect(harness.engine.mutate().success);
+
+        const auto rootCountBefore = harness.store().rootCount();
+
+        const auto tempDir = juce::File::getSpecialLocation(juce::File::tempDirectory)
+                                 .getNonexistentChildFile("MatrixControlMutatorExport", "", false);
+        expect(tempDir.createDirectory());
+        expect(harness.engine.exportHistory(tempDir).success);
+
+        expectEquals(harness.store().rootCount(), rootCountBefore);
+
+        tempDir.deleteRecursively();
+    }
+
+    void export_noSysEx()
+    {
+        beginTest("export_noSysEx");
+
+        EngineHarness harness;
+        harness.setRecipe(50, 50);
+        expect(harness.engine.mutate().success);
+
+        while (! harness.queue.isEmpty())
+            (void) harness.queue.dequeue();
+
+        const auto tempDir = juce::File::getSpecialLocation(juce::File::tempDirectory)
+                                 .getNonexistentChildFile("MatrixControlMutatorExport", "", false);
+        expect(tempDir.createDirectory());
+        expect(harness.engine.exportHistory(tempDir).success);
+
+        expectEquals(countPatchSysExMessages(harness.queue), 0);
+
+        tempDir.deleteRecursively();
     }
 };
 

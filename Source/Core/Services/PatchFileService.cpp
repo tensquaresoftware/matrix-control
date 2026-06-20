@@ -2,6 +2,9 @@
 
 #include "Core/MIDI/SysEx/SysExDecoder.h"
 #include "Core/MIDI/SysEx/SysExEncoder.h"
+#include "Core/Services/PatchFileNameSanitizer.h"
+#include "Core/Services/PatchMutator/MutationHistoryStore.h"
+#include "Core/Services/PatchMutator/MutationNaming.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 
 namespace Core
@@ -104,6 +107,174 @@ namespace Core
             return result;
         }
 
+        result.success = true;
+        return result;
+    }
+
+    PatchFileExportResult PatchFileService::validateMutatorExport(const juce::File& folder,
+                                                                    const MutationHistoryStore& store)
+    {
+        PatchFileExportResult result;
+
+        if (store.isEmpty())
+        {
+            result.errorMessage = "History empty";
+            return result;
+        }
+
+        if (! folder.isDirectory() || ! folder.hasWriteAccess())
+            result.errorMessage = "Folder not writable";
+        else
+            result.success = true;
+
+        return result;
+    }
+
+    PatchFileExportResult PatchFileService::writeInitialSnapshot(const juce::File& folder,
+                                                                 const MutationHistoryStore& store,
+                                                                 SysExEncoder& encoder)
+    {
+        const auto initialFile = folder.getChildFile("Initial.syx");
+        return writeExportPatchFile(initialFile, store.getInitialSnapshot().data(), encoder);
+    }
+
+    PatchFileExportResult PatchFileService::writeExportPatchFile(const juce::File& file,
+                                                                 const juce::uint8* packedData,
+                                                                 SysExEncoder& encoder)
+    {
+        PatchFileExportResult result;
+        const auto save = savePatchSysExFile(file, packedData, encoder);
+
+        if (! save.success)
+        {
+            result.errorMessage = save.errorMessage;
+            return result;
+        }
+
+        result.success = true;
+        result.filesWritten = 1;
+        return result;
+    }
+
+    PatchFileExportResult PatchFileService::writeRootEntry(const juce::File& rootDir,
+                                                           int rootIndex,
+                                                           const MutationHistoryStore& store,
+                                                           SysExEncoder& encoder)
+    {
+        PatchFileExportResult result;
+        result.success = true;
+
+        if (const auto rootEntry = store.getEntry(rootIndex, MutationHistoryStore::kRootOnly))
+        {
+            const auto rootLabel = MutationNaming::formatRootLabel(rootIndex);
+            const auto rootFile = rootDir.getChildFile(
+                PatchFileNameSanitizer::ensureSyxExtension(rootLabel));
+            return writeExportPatchFile(rootFile, rootEntry->result.data(), encoder);
+        }
+
+        return result;
+    }
+
+    PatchFileExportResult PatchFileService::writeRetryEntries(const juce::File& rootDir,
+                                                              int rootIndex,
+                                                              const MutationHistoryStore& store,
+                                                              SysExEncoder& encoder)
+    {
+        PatchFileExportResult result;
+        result.success = true;
+
+        for (const auto retryIndex : store.getSortedRetryIndices(rootIndex))
+        {
+            if (const auto retryEntry = store.getEntry(rootIndex, retryIndex))
+            {
+                const auto stem = MutationNaming::formatExportStem(rootIndex, retryIndex);
+                const auto retryFile = rootDir.getChildFile(
+                    PatchFileNameSanitizer::ensureSyxExtension(stem));
+                const auto write = writeExportPatchFile(retryFile, retryEntry->result.data(), encoder);
+
+                if (! write.success)
+                    return write;
+
+                result.filesWritten += write.filesWritten;
+            }
+        }
+
+        return result;
+    }
+
+    PatchFileExportResult PatchFileService::writeRootFolder(const juce::File& folder,
+                                                            int rootIndex,
+                                                            const MutationHistoryStore& store,
+                                                            SysExEncoder& encoder)
+    {
+        PatchFileExportResult result;
+        const auto rootDir = folder.getChildFile(MutationNaming::formatRootLabel(rootIndex));
+
+        if (! rootDir.createDirectory())
+        {
+            result.errorMessage = "Folder not writable";
+            return result;
+        }
+
+        const auto rootWrite = writeRootEntry(rootDir, rootIndex, store, encoder);
+        if (! rootWrite.success)
+            return rootWrite;
+
+        result.filesWritten += rootWrite.filesWritten;
+
+        const auto retryWrite = writeRetryEntries(rootDir, rootIndex, store, encoder);
+        if (! retryWrite.success)
+            return retryWrite;
+
+        result.filesWritten += retryWrite.filesWritten;
+        result.success = true;
+        return result;
+    }
+
+    PatchFileExportResult PatchFileService::writeAllRootFolders(const juce::File& folder,
+                                                                const MutationHistoryStore& store,
+                                                                SysExEncoder& encoder)
+    {
+        PatchFileExportResult result;
+
+        for (const auto rootIndex : store.getSortedRootIndices())
+        {
+            const auto rootWrite = writeRootFolder(folder, rootIndex, store, encoder);
+
+            if (! rootWrite.success)
+                return rootWrite;
+
+            result.filesWritten += rootWrite.filesWritten;
+        }
+
+        result.success = true;
+        return result;
+    }
+
+    PatchFileExportResult PatchFileService::exportMutatorHistory(const juce::File& folder,
+                                                                 const MutationHistoryStore& store,
+                                                                 SysExEncoder& encoder)
+    {
+        const auto validation = validateMutatorExport(folder, store);
+        if (! validation.success)
+            return validation;
+
+        PatchFileExportResult result;
+
+        if (store.hasInitialSnapshot())
+        {
+            const auto initialWrite = writeInitialSnapshot(folder, store, encoder);
+            if (! initialWrite.success)
+                return initialWrite;
+
+            result.filesWritten += initialWrite.filesWritten;
+        }
+
+        const auto rootsWrite = writeAllRootFolders(folder, store, encoder);
+        if (! rootsWrite.success)
+            return rootsWrite;
+
+        result.filesWritten += rootsWrite.filesWritten;
         result.success = true;
         return result;
     }

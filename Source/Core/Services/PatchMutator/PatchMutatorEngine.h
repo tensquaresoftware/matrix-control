@@ -10,12 +10,14 @@
 #include "Core/Services/PatchMutator/MutationHistoryStore.h"
 
 class MidiManager;
+class SysExEncoder;
 
 class PatchMutatorEngineTests;
 
 namespace Core
 {
     class ApvtsPatchMapper;
+    class PatchFileService;
     class PatchModel;
     class PatchNameSyncer;
 
@@ -36,7 +38,9 @@ namespace Core
                            MidiManager* midiManager,
                            juce::AudioProcessorValueTreeState& apvts,
                            ActionExecutionHooks hooks,
-                           std::function<int()> getCurrentPatchNumber);
+                           std::function<int()> getCurrentPatchNumber,
+                           PatchFileService* patchFileService = nullptr,
+                           SysExEncoder* sysExEncoder = nullptr);
 
         MutatorActionResult mutate();
         MutatorActionResult retry();                       // Story 6.5
@@ -86,6 +90,8 @@ namespace Core
         juce::AudioProcessorValueTreeState& apvts_;
         ActionExecutionHooks hooks_;
         std::function<int()> getCurrentPatchNumber_;
+        PatchFileService* patchFileService_ = nullptr;
+        SysExEncoder* sysExEncoder_ = nullptr;
 
         MutationHistoryStore historyStore_;
         MutationAlgorithm algorithm_;

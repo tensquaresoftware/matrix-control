@@ -1,3 +1,5 @@
+#include <cstring>
+
 #include <juce_core/juce_core.h>
 
 #include "Core/MIDI/SysEx/SysExConstants.h"
@@ -5,7 +7,10 @@
 #include "Core/MIDI/SysEx/SysExEncoder.h"
 #include "Core/MIDI/SysEx/SysExParser.h"
 #include "Core/Init/InitDefaults.h"
+#include "Core/Models/PatchModel.h"
 #include "Core/Services/PatchFileService.h"
+#include "Core/Services/PatchMutator/MutationHistoryStore.h"
+#include "Core/Services/PatchMutator/MutationNaming.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 
 namespace FooterMessages = PluginDisplayNames::PatchManagerSection::ComputerPatchesModule::FooterMessages;
@@ -48,6 +53,15 @@ public:
         savePatchSysExFile_writeFailureHandled();
         loadPatchSysExFile_validFixture();
         loadPatchSysExFile_invalid();
+
+        exportMutatorHistory_emptyStore_fails();
+        exportMutatorHistory_writesInitialAndRoot();
+        exportMutatorHistory_writesRetries();
+        exportMutatorHistory_gapIndices();
+        exportMutatorHistory_nameBytesMatch();
+        exportMutatorHistory_initialKeepsOriginalName();
+        exportMutatorHistory_nonWritableFolder_fails();
+        exportMutatorHistory_roundTripValidates();
     }
 
 private:
@@ -62,6 +76,40 @@ private:
                        .getNonexistentChildFile("MatrixControlPatchFileService", "", false);
         expect(dir.createDirectory(), "Temp scan dir should be created");
         return dir;
+    }
+
+    static Core::PatchModel makeDistinctBuffer(int seed)
+    {
+        Core::PatchModel model;
+        const auto marker = static_cast<juce::uint8>(seed & 0xFF);
+        std::memset(model.data(), marker, Core::PatchModel::kBufferSize);
+        model.data()[8] = marker;
+        return model;
+    }
+
+    static Core::PatchModel makeParentBuffer(int seed)
+    {
+        Core::PatchModel model;
+        const auto marker = static_cast<juce::uint8>((seed + 100) & 0xFF);
+        std::memset(model.data(), marker, Core::PatchModel::kBufferSize);
+        model.data()[9] = marker;
+        return model;
+    }
+
+    static Core::PatchModel namedResult(int rootIndex, int retryIndex, int seed)
+    {
+        auto model = makeDistinctBuffer(seed);
+        Core::MutationNaming::applyPatchName(model, rootIndex, retryIndex);
+        return model;
+    }
+
+    juce::String decodedPatchName(const juce::File& file)
+    {
+        juce::uint8 packed[SysExConstants::kPatchPackedDataSize] = {};
+        expect(service_.loadPatchSysExFile(file, packed).success);
+        Core::PatchModel model;
+        model.loadFrom(packed);
+        return model.getName();
     }
 
     void copyFixturePatchToDir(const juce::File& dir, const juce::String& fileName)
@@ -316,6 +364,183 @@ private:
 
         expect(! result.success);
         expect(result.errorMessage.isNotEmpty());
+    }
+
+    void exportMutatorHistory_emptyStore_fails()
+    {
+        beginTest("exportMutatorHistory_emptyStore_fails");
+
+        const auto tempDir = createTempScanDir();
+        Core::MutationHistoryStore store;
+
+        const auto result = service_.exportMutatorHistory(tempDir, store, encoder_);
+
+        expect(! result.success);
+        expect(result.errorMessage.isNotEmpty());
+
+        tempDir.deleteRecursively();
+    }
+
+    void exportMutatorHistory_writesInitialAndRoot()
+    {
+        beginTest("exportMutatorHistory_writesInitialAndRoot");
+
+        const auto tempDir = createTempScanDir();
+        Core::MutationHistoryStore store;
+
+        auto initial = makeDistinctBuffer(301);
+        initial.setName("MY PATCH");
+        store.setInitialSnapshot(initial);
+        expect(store.insertRoot(0, namedResult(0, Core::MutationHistoryStore::kRootOnly, 302),
+                                makeParentBuffer(302)));
+
+        const auto result = service_.exportMutatorHistory(tempDir, store, encoder_);
+
+        expect(result.success);
+        expect(result.filesWritten >= 2);
+        expect(tempDir.getChildFile("Initial.syx").existsAsFile());
+        expect(tempDir.getChildFile("M00").isDirectory());
+        expect(tempDir.getChildFile("M00").getChildFile("M00.syx").existsAsFile());
+
+        tempDir.deleteRecursively();
+    }
+
+    void exportMutatorHistory_writesRetries()
+    {
+        beginTest("exportMutatorHistory_writesRetries");
+
+        const auto tempDir = createTempScanDir();
+        Core::MutationHistoryStore store;
+
+        expect(store.insertRoot(0, namedResult(0, Core::MutationHistoryStore::kRootOnly, 310),
+                                makeParentBuffer(310)));
+        expect(store.insertRetry(0, 0, namedResult(0, 0, 311), makeParentBuffer(311)));
+        expect(store.insertRetry(0, 1, namedResult(0, 1, 312), makeParentBuffer(312)));
+
+        const auto result = service_.exportMutatorHistory(tempDir, store, encoder_);
+
+        expect(result.success);
+        expect(tempDir.getChildFile("M00").getChildFile("M00-R00.syx").existsAsFile());
+        expect(tempDir.getChildFile("M00").getChildFile("M00-R01.syx").existsAsFile());
+
+        tempDir.deleteRecursively();
+    }
+
+    void exportMutatorHistory_gapIndices()
+    {
+        beginTest("exportMutatorHistory_gapIndices");
+
+        const auto tempDir = createTempScanDir();
+        Core::MutationHistoryStore store;
+
+        expect(store.insertRoot(0, namedResult(0, Core::MutationHistoryStore::kRootOnly, 320),
+                                makeParentBuffer(320)));
+        expect(store.insertRoot(5, namedResult(5, Core::MutationHistoryStore::kRootOnly, 325),
+                                makeParentBuffer(325)));
+        expect(store.insertRoot(99, namedResult(99, Core::MutationHistoryStore::kRootOnly, 399),
+                                makeParentBuffer(399)));
+
+        const auto result = service_.exportMutatorHistory(tempDir, store, encoder_);
+
+        expect(result.success);
+        expect(tempDir.getChildFile("M00").isDirectory());
+        expect(tempDir.getChildFile("M05").isDirectory());
+        expect(tempDir.getChildFile("M99").isDirectory());
+        expect(! tempDir.getChildFile("M01").exists());
+        expect(! tempDir.getChildFile("M02").exists());
+
+        tempDir.deleteRecursively();
+    }
+
+    void exportMutatorHistory_nameBytesMatch()
+    {
+        beginTest("exportMutatorHistory_nameBytesMatch");
+
+        const auto tempDir = createTempScanDir();
+        Core::MutationHistoryStore store;
+
+        expect(store.insertRoot(5, namedResult(5, Core::MutationHistoryStore::kRootOnly, 335),
+                                makeParentBuffer(335)));
+        expect(store.insertRetry(5, 2, namedResult(5, 2, 352), makeParentBuffer(352)));
+
+        const auto result = service_.exportMutatorHistory(tempDir, store, encoder_);
+        expect(result.success);
+
+        expectEquals(decodedPatchName(tempDir.getChildFile("M05").getChildFile("M05.syx")),
+                     Core::MutationNaming::formatPatchName(5));
+        expectEquals(decodedPatchName(tempDir.getChildFile("M05").getChildFile("M05-R02.syx")),
+                     Core::MutationNaming::formatPatchName(5, 2));
+
+        tempDir.deleteRecursively();
+    }
+
+    void exportMutatorHistory_initialKeepsOriginalName()
+    {
+        beginTest("exportMutatorHistory_initialKeepsOriginalName");
+
+        const auto tempDir = createTempScanDir();
+        Core::MutationHistoryStore store;
+
+        auto initial = makeDistinctBuffer(340);
+        initial.setName("MY PATCH");
+        store.setInitialSnapshot(initial);
+        expect(store.insertRoot(0, namedResult(0, Core::MutationHistoryStore::kRootOnly, 341),
+                                makeParentBuffer(341)));
+
+        const auto result = service_.exportMutatorHistory(tempDir, store, encoder_);
+        expect(result.success);
+
+        expectEquals(decodedPatchName(tempDir.getChildFile("Initial.syx")), juce::String("MY PATCH"));
+
+        tempDir.deleteRecursively();
+    }
+
+    void exportMutatorHistory_nonWritableFolder_fails()
+    {
+        beginTest("exportMutatorHistory_nonWritableFolder_fails");
+
+        Core::MutationHistoryStore store;
+        expect(store.insertRoot(0, namedResult(0, Core::MutationHistoryStore::kRootOnly, 350),
+                                makeParentBuffer(350)));
+
+        const auto missing = juce::File::getSpecialLocation(juce::File::tempDirectory)
+                                 .getChildFile("MatrixControlMissingExportFolder");
+
+        const auto result = service_.exportMutatorHistory(missing, store, encoder_);
+
+        expect(! result.success);
+        expect(result.errorMessage.isNotEmpty());
+    }
+
+    void exportMutatorHistory_roundTripValidates()
+    {
+        beginTest("exportMutatorHistory_roundTripValidates");
+
+        const auto tempDir = createTempScanDir();
+        Core::MutationHistoryStore store;
+
+        auto initial = makeDistinctBuffer(360);
+        initial.setName("INITNAME");
+        store.setInitialSnapshot(initial);
+        expect(store.insertRoot(0, namedResult(0, Core::MutationHistoryStore::kRootOnly, 361),
+                                makeParentBuffer(361)));
+        expect(store.insertRetry(0, 0, namedResult(0, 0, 362), makeParentBuffer(362)));
+
+        const auto exportResult = service_.exportMutatorHistory(tempDir, store, encoder_);
+        expect(exportResult.success);
+        expectEquals(exportResult.filesWritten, 3);
+
+        const auto rootScan = service_.scanFolder(tempDir);
+        expect(rootScan.folderUsable);
+        expectEquals(rootScan.validCount, 1);
+        expectEquals(rootScan.invalidCount, 0);
+
+        const auto m00Scan = service_.scanFolder(tempDir.getChildFile("M00"));
+        expect(m00Scan.folderUsable);
+        expectEquals(m00Scan.validCount, 2);
+        expectEquals(m00Scan.invalidCount, 0);
+
+        tempDir.deleteRecursively();
     }
 };
 

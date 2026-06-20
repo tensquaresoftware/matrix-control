@@ -8,6 +8,8 @@ class SysExEncoder;
 namespace Core
 {
 
+    class MutationHistoryStore;
+
     struct PatchFileSaveResult
     {
         bool success = false;
@@ -17,6 +19,13 @@ namespace Core
     struct PatchFileLoadResult
     {
         bool success = false;
+        juce::String errorMessage;
+    };
+
+    struct PatchFileExportResult
+    {
+        bool success = false;
+        int filesWritten = 0;
         juce::String errorMessage;
     };
 
@@ -43,6 +52,9 @@ namespace Core
                                                const juce::uint8* packedData,
                                                SysExEncoder& encoder);
         PatchFileLoadResult loadPatchSysExFile(const juce::File& file, juce::uint8* packedOut);
+        PatchFileExportResult exportMutatorHistory(const juce::File& folder,
+                                                   const MutationHistoryStore& store,
+                                                   SysExEncoder& encoder);
         const PatchFolderScanResult& getLastScanResult() const noexcept { return lastScan_; }
         bool hasCachedScanResult() const noexcept;
         void clearLastScan() noexcept;
@@ -65,6 +77,29 @@ namespace Core
                                              int invalidCount,
                                              int syxFileCount) const;
         void cacheResult(PatchFolderScanResult result);
+        PatchFileExportResult validateMutatorExport(const juce::File& folder,
+                                                    const MutationHistoryStore& store);
+        PatchFileExportResult writeInitialSnapshot(const juce::File& folder,
+                                                   const MutationHistoryStore& store,
+                                                   SysExEncoder& encoder);
+        PatchFileExportResult writeExportPatchFile(const juce::File& file,
+                                                   const juce::uint8* packedData,
+                                                   SysExEncoder& encoder);
+        PatchFileExportResult writeRootEntry(const juce::File& rootDir,
+                                             int rootIndex,
+                                             const MutationHistoryStore& store,
+                                             SysExEncoder& encoder);
+        PatchFileExportResult writeRetryEntries(const juce::File& rootDir,
+                                                int rootIndex,
+                                                const MutationHistoryStore& store,
+                                                SysExEncoder& encoder);
+        PatchFileExportResult writeRootFolder(const juce::File& folder,
+                                              int rootIndex,
+                                              const MutationHistoryStore& store,
+                                              SysExEncoder& encoder);
+        PatchFileExportResult writeAllRootFolders(const juce::File& folder,
+                                                  const MutationHistoryStore& store,
+                                                  SysExEncoder& encoder);
 
         SysExDecoder& decoder_;
         PatchFolderScanResult lastScan_;
