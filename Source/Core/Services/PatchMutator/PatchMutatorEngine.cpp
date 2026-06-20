@@ -542,6 +542,7 @@ void PatchMutatorEngine::syncHistoryUiProperties(juce::AudioProcessorValueTreeSt
         state.setProperty(MutatorState::kSelectedR, MutationHistoryStore::kRootOnly, nullptr);
         selectedRootIndex_ = -1;
         selectedRetryIndex_ = MutationHistoryStore::kRootOnly;
+        refreshActionEnabledMirrors(apvts);
         return;
     }
 
@@ -570,6 +571,49 @@ void PatchMutatorEngine::syncHistoryUiProperties(juce::AudioProcessorValueTreeSt
     state.setProperty(MutatorState::kHistoryRList, joinLabels(rLabels), nullptr);
     state.setProperty(MutatorState::kSelectedM, m, nullptr);
     state.setProperty(MutatorState::kSelectedR, selectedRetryIndex_, nullptr);
+    refreshActionEnabledMirrors(apvts);
+}
+
+namespace
+{
+    bool computeMutateEnabled(const Core::MutationHistoryStore& store)
+    {
+        return store.peekNextRootIndex().has_value();
+    }
+
+    bool computeExportEnabled(const Core::MutationHistoryStore& store)
+    {
+        return ! store.isEmpty();
+    }
+
+    bool computeDeleteEnabled(const Core::MutationHistoryStore& store, int selectedRoot)
+    {
+        return ! store.isEmpty() && selectedRoot >= 0;
+    }
+
+    bool computeRetryEnabled(const Core::MutationHistoryStore& store, int selectedRoot)
+    {
+        if (store.isEmpty() || selectedRoot < 0)
+            return false;
+
+        return store.peekNextRetryIndex(selectedRoot).has_value();
+    }
+} // namespace
+
+void PatchMutatorEngine::refreshActionEnabledMirrors(juce::AudioProcessorValueTreeState& apvts)
+{
+    applySelectionFromApvts();
+
+    auto& state = apvts.state;
+    state.setProperty(MutatorState::kMutateEnabled, computeMutateEnabled(historyStore_), nullptr);
+    state.setProperty(MutatorState::kRetryEnabled,
+                      computeRetryEnabled(historyStore_, selectedRootIndex_),
+                      nullptr);
+    state.setProperty(MutatorState::kExportEnabled, computeExportEnabled(historyStore_), nullptr);
+    state.setProperty(MutatorState::kDeleteEnabled,
+                      computeDeleteEnabled(historyStore_, selectedRootIndex_),
+                      nullptr);
+    state.setProperty(MutatorState::kClearEnabled, computeExportEnabled(historyStore_), nullptr);
 }
 
 void PatchMutatorEngine::forceExitCompare()
@@ -659,10 +703,6 @@ void PatchMutatorEngine::applySelectionFromApvts()
         selectedRetryIndex_ = r;
     else
         selectedRetryIndex_ = MutationHistoryStore::kRootOnly;
-}
-
-void PatchMutatorEngine::refreshActionEnabledMirrors(juce::AudioProcessorValueTreeState&)
-{
 }
 
 void PatchMutatorEngine::setAuditionSelection(int rootIndex, int retryIndex)

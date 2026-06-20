@@ -41,6 +41,7 @@ public:
     void valueTreeRedirected(juce::ValueTree&) override;
 
 private:
+    class ActionEnabledPropertyListener;
     PatchMutatorPanelDimensions dims_;
     TSS::ISkin* skin_;
     float uiScale_ = 1.0f;
@@ -74,8 +75,12 @@ private:
     std::unique_ptr<TSS::Button> clearButton_;
     std::unique_ptr<TSS::Button> exportButton_;
 
+    std::unique_ptr<ActionEnabledPropertyListener> actionEnabledListener_;
+
     juce::Array<int> historyMRootIndices_;
     juce::Array<int> historyRRetryIndices_;
+
+    bool recipeHydrating_ = false;
 
     void propagateSkinsToControlWidgets(TSS::ISkin& skin);
     void propagateSkinsToToggleWidgets(TSS::ISkin& skin);
@@ -90,6 +95,9 @@ private:
     void refreshHistoryMComboBox();
     void refreshHistoryRComboBox();
     void refreshCompareUiState();
+    void refreshRecipeFromApvts();
+    void hydrateRecipeTogglesFromApvts(const juce::ValueTree& state);
+    static bool isRecipeProperty(const juce::String& propertyName);
     void syncHistoryMSelectionFromApvts();
     void syncHistoryRSelectionFromApvts();
     void timerCallback() override;

@@ -593,6 +593,13 @@ namespace PluginIDs
                 constexpr const char* kSelectedR   = "patchMutatorSelectedR";
                 constexpr const char* kCompareActive = "patchMutatorCompareActive";
                 constexpr int kSelectedRRootOnly = -1; // matches Core::MutationHistoryStore::kRootOnly
+
+                // uiMirror — action button enabled flags (Core → GUI; not persisted in session XML)
+                constexpr const char* kMutateEnabled = "patchMutatorMutateEnabled";
+                constexpr const char* kRetryEnabled  = "patchMutatorRetryEnabled";
+                constexpr const char* kExportEnabled = "patchMutatorExportEnabled";
+                constexpr const char* kDeleteEnabled = "patchMutatorDeleteEnabled";
+                constexpr const char* kClearEnabled  = "patchMutatorClearEnabled";
             }
 
             namespace StandaloneWidgets

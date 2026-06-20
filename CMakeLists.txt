@@ -311,6 +311,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/HistoryDefragServiceTests.cpp
         Tests/Unit/MutationAlgorithmTests.cpp
         Tests/Unit/PatchMutatorEngineTests.cpp
+        Tests/Unit/MutatorRecipePersistenceTests.cpp
         Tests/Unit/ComboboxPatchSendDebouncerTests.cpp
         Tests/Unit/ClipboardPasteEnabledResolverTests.cpp
         Tests/Unit/ApvtsMasterMapperTests.cpp

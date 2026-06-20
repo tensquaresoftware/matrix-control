@@ -2,6 +2,16 @@
 
 - **Panel M change leaves R list stale until processor hook** — resolved 1+2: sync reads APVTS in 6.6; 7.4 processor calls `syncHistoryUiProperties` on `kSelectedM` change for full panel UX.
 
+## Deferred from: code review of 6-12-recipe-persistence-and-action-enabled-states (2026-06-20)
+
+- **Recipe property IDs maintained in three separate lists** — add/remove toggle requires edits in `MutatorSessionPersistence.h`, `PatchMutatorPanel::isRecipeProperty`, and toggle binding table.
+- **Engine `MutationHistoryStore` not cleared on session load** — story scopes engine wiring to 7.4; APVTS ephemeral reset sufficient for UI until then.
+- **Four processor methods are one-line passthroughs** — mirrors clipboard init pattern; thin wrappers acceptable.
+- **`recipeHydrating_` not RAII-guarded** — no exceptions in JUCE UI callbacks.
+- **No amount/random clamp on session load** — engine clamps at mutation time; matches other APVTS property init patterns.
+- **Combo selection change does not refresh enabled mirrors** — requires engine/handler wiring (7.4) on `kSelectedM` change.
+- **Limit tests inject store directly** — spec test table allows harness store manipulation for mirror predicate matrix.
+
 ## Deferred from: code review of 6-11-mutator-export-layout (2026-06-20)
 
 - **Partial export fail-fast leaves prior files on disk** — v1 spec explicit; no rollback required.

@@ -1,5 +1,7 @@
 #include "PatchMutatorPanel.h"
 
+#include <vector>
+
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Looks/LookBuilders.h"
@@ -20,7 +22,87 @@ namespace
     namespace MutatorDisplayNames = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets;
     namespace MutatorIds = PluginIDs::PatchManagerSection::PatchMutatorModule;
     namespace MutatorState = MutatorIds::StateProperties;
+    namespace MutatorWidgets = MutatorIds::StandaloneWidgets;
+
+    struct ActionEnabledBinding
+    {
+        const char* propertyId;
+        TSS::Button* button;
+    };
+
+    void hydrateIntSlider(TSS::Slider* slider, const juce::ValueTree& state, const char* propertyId)
+    {
+        if (slider == nullptr)
+            return;
+
+        slider->setValue(static_cast<double>(static_cast<int>(state.getProperty(propertyId, 0))),
+                         juce::dontSendNotification);
+    }
+
+    void hydrateToggleBinding(TSS::Toggle* toggle, const juce::ValueTree& state, const char* propertyId)
+    {
+        if (toggle == nullptr)
+            return;
+
+        toggle->setToggleState(static_cast<bool>(state.getProperty(propertyId, false)),
+                                juce::dontSendNotification);
+    }
 }
+
+class PatchMutatorPanel::ActionEnabledPropertyListener : public juce::ValueTree::Listener
+{
+public:
+    ActionEnabledPropertyListener(juce::ValueTree state, std::vector<ActionEnabledBinding> bindings)
+        : state_(std::move(state))
+        , bindings_(std::move(bindings))
+    {
+        state_.addListener(this);
+        syncFromState();
+    }
+
+    ~ActionEnabledPropertyListener() override
+    {
+        state_.removeListener(this);
+    }
+
+    void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
+                                  const juce::Identifier& property) override
+    {
+        for (const auto& binding : bindings_)
+        {
+            if (property.toString() != binding.propertyId || binding.button == nullptr)
+                continue;
+
+            binding.button->setEnabled(static_cast<bool>(
+                treeWhosePropertyHasChanged.getProperty(property, false)));
+        }
+    }
+
+    void valueTreeChildAdded(juce::ValueTree&, juce::ValueTree&) override {}
+    void valueTreeChildRemoved(juce::ValueTree&, juce::ValueTree&, int) override {}
+    void valueTreeChildOrderChanged(juce::ValueTree&, int, int) override {}
+    void valueTreeParentChanged(juce::ValueTree&) override {}
+    void valueTreeRedirected(juce::ValueTree&) override
+    {
+        syncFromState();
+    }
+
+private:
+    void syncFromState()
+    {
+        for (const auto& binding : bindings_)
+        {
+            if (binding.button == nullptr)
+                continue;
+
+            binding.button->setEnabled(static_cast<bool>(
+                state_.getProperty(binding.propertyId, false)));
+        }
+    }
+
+    juce::ValueTree state_;
+    std::vector<ActionEnabledBinding> bindings_;
+};
 
 PatchMutatorPanel::PatchMutatorPanel(TSS::ISkin& skin, const PatchMutatorPanelDimensions& dims, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : dims_(dims)
@@ -36,7 +118,17 @@ PatchMutatorPanel::PatchMutatorPanel(TSS::ISkin& skin, const PatchMutatorPanelDi
     if (! apvts_.state.hasProperty(MutatorState::kCompareActive))
         apvts_.state.setProperty(MutatorState::kCompareActive, false, nullptr);
 
+    actionEnabledListener_ = std::make_unique<ActionEnabledPropertyListener>(
+        apvts_.state,
+        std::vector<ActionEnabledBinding>{
+            { MutatorState::kMutateEnabled, mutateButton_.get() },
+            { MutatorState::kRetryEnabled, retryButton_.get() },
+            { MutatorState::kExportEnabled, exportButton_.get() },
+            { MutatorState::kDeleteEnabled, deleteButton_.get() },
+            { MutatorState::kClearEnabled, clearButton_.get() } });
+
     apvts_.state.addListener(this);
+    refreshRecipeFromApvts();
     refreshHistoryMComboBox();
     refreshHistoryRComboBox();
     refreshCompareUiState();
@@ -92,10 +184,12 @@ void PatchMutatorPanel::setupAmountLine(TSS::ISkin& skin, WidgetFactory& widgetF
             {}});
     amountSlider_->onValueChange = [this]
     {
-        apvts_.state.setProperty(
-            PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kAmount,
-            static_cast<int>(amountSlider_->getValue()),
-            nullptr);
+        if (recipeHydrating_)
+            return;
+
+        apvts_.state.setProperty(MutatorWidgets::kAmount,
+                                  static_cast<int>(amountSlider_->getValue()),
+                                  nullptr);
     };
     addAndMakeVisible(*amountSlider_);
 
@@ -177,10 +271,12 @@ void PatchMutatorPanel::setupRandomLine(TSS::ISkin& skin, WidgetFactory& widgetF
             {}});
     randomSlider_->onValueChange = [this]
     {
-        apvts_.state.setProperty(
-            PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kRandom,
-            static_cast<int>(randomSlider_->getValue()),
-            nullptr);
+        if (recipeHydrating_)
+            return;
+
+        apvts_.state.setProperty(MutatorWidgets::kRandom,
+                                  static_cast<int>(randomSlider_->getValue()),
+                                  nullptr);
     };
     addAndMakeVisible(*randomSlider_);
 
@@ -319,6 +415,10 @@ void PatchMutatorPanel::valueTreePropertyChanged(juce::ValueTree&,
                                                const juce::Identifier& property)
 {
     const auto name = property.toString();
+
+    if (isRecipeProperty(name))
+        refreshRecipeFromApvts();
+
     if (name == MutatorState::kHistoryMList || name == MutatorState::kSelectedM)
         refreshHistoryMComboBox();
     if (name == MutatorState::kHistoryRList || name == MutatorState::kSelectedM
@@ -335,9 +435,51 @@ void PatchMutatorPanel::valueTreePropertyChanged(juce::ValueTree&,
 
 void PatchMutatorPanel::valueTreeRedirected(juce::ValueTree&)
 {
+    refreshRecipeFromApvts();
     refreshHistoryMComboBox();
     refreshHistoryRComboBox();
     refreshCompareUiState();
+}
+
+bool PatchMutatorPanel::isRecipeProperty(const juce::String& propertyName)
+{
+    return propertyName == MutatorWidgets::kAmount
+           || propertyName == MutatorWidgets::kRandom
+           || propertyName == MutatorWidgets::kEnableDco1
+           || propertyName == MutatorWidgets::kEnableDco2
+           || propertyName == MutatorWidgets::kEnableVcfVca
+           || propertyName == MutatorWidgets::kEnableFmTrack
+           || propertyName == MutatorWidgets::kEnableRampPortamento
+           || propertyName == MutatorWidgets::kEnableEnvelope1
+           || propertyName == MutatorWidgets::kEnableEnvelope2
+           || propertyName == MutatorWidgets::kEnableEnvelope3
+           || propertyName == MutatorWidgets::kEnableLfo1
+           || propertyName == MutatorWidgets::kEnableLfo2;
+}
+
+void PatchMutatorPanel::refreshRecipeFromApvts()
+{
+    const auto& state = apvts_.state;
+
+    recipeHydrating_ = true;
+    hydrateIntSlider(amountSlider_.get(), state, MutatorWidgets::kAmount);
+    hydrateIntSlider(randomSlider_.get(), state, MutatorWidgets::kRandom);
+    hydrateRecipeTogglesFromApvts(state);
+    recipeHydrating_ = false;
+}
+
+void PatchMutatorPanel::hydrateRecipeTogglesFromApvts(const juce::ValueTree& state)
+{
+    hydrateToggleBinding(dco1Toggle_.get(), state, MutatorWidgets::kEnableDco1);
+    hydrateToggleBinding(dco2Toggle_.get(), state, MutatorWidgets::kEnableDco2);
+    hydrateToggleBinding(vcfVcaToggle_.get(), state, MutatorWidgets::kEnableVcfVca);
+    hydrateToggleBinding(fmTrackToggle_.get(), state, MutatorWidgets::kEnableFmTrack);
+    hydrateToggleBinding(rampPortamentoToggle_.get(), state, MutatorWidgets::kEnableRampPortamento);
+    hydrateToggleBinding(env1Toggle_.get(), state, MutatorWidgets::kEnableEnvelope1);
+    hydrateToggleBinding(env2Toggle_.get(), state, MutatorWidgets::kEnableEnvelope2);
+    hydrateToggleBinding(env3Toggle_.get(), state, MutatorWidgets::kEnableEnvelope3);
+    hydrateToggleBinding(lfo1Toggle_.get(), state, MutatorWidgets::kEnableLfo1);
+    hydrateToggleBinding(lfo2Toggle_.get(), state, MutatorWidgets::kEnableLfo2);
 }
 
 void PatchMutatorPanel::timerCallback()
@@ -513,6 +655,9 @@ void PatchMutatorPanel::connectToggleToApvts(TSS::Toggle* toggle, const char* wi
     {
         toggle->onStateChange = [this, toggle, widgetId]
         {
+            if (recipeHydrating_)
+                return;
+
             apvts_.state.setProperty(widgetId, toggle->getToggleState(), nullptr);
         };
     }

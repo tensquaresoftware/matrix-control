@@ -47,6 +47,7 @@
 #include "Shared/Definitions/MatrixDeviceTypes.h"
 #include "Shared/Definitions/PluginDescriptors.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
+#include "Core/Services/PatchMutator/MutatorSessionPersistence.h"
 #include "Shared/Definitions/PluginIDs.h"
 #include "GUI/PluginEditor.h"
 #include "MIDI/MidiManager.h"
@@ -310,6 +311,9 @@ PluginProcessor::PluginProcessor()
 
     initializePatchNameProperty();
     initializeClipboardPasteEnabledProperties();
+    initializeMutatorRecipeState();
+    resetEphemeralMutatorStateAfterSessionLoad();
+    initializeMutatorActionEnabledMirrorsForEmptyHistory();
     apvts.state.addListener(this);
     deferredMidiPortSyncTimer_ = std::make_unique<DeferredMidiPortSyncTimer>(*this);
     startMidiThread();
@@ -558,6 +562,7 @@ juce::AudioProcessorEditor* PluginProcessor::createEditor()
 void PluginProcessor::getStateInformation(juce::MemoryBlock& destData)
 {
     auto state = apvts.copyState();
+    stripEphemeralMutatorStateForPersistence(state);
     std::unique_ptr<juce::XmlElement> xml(state.createXml());
     copyXmlToBinary(*xml, destData);
 }
@@ -571,6 +576,9 @@ void PluginProcessor::setStateInformation(const void* data, int sizeInBytes)
         if (xmlState->hasTagName(apvts.state.getType()))
         {
             apvts.replaceState(juce::ValueTree::fromXml(*xmlState));
+            initializeMutatorRecipeState();
+            resetEphemeralMutatorStateAfterSessionLoad();
+            initializeMutatorActionEnabledMirrorsForEmptyHistory();
             syncAudioRuntimeFromState();
             syncHardwareLatencyFromState();
             syncMidiPortsFromState(false);
@@ -1459,6 +1467,26 @@ void PluginProcessor::initializeClipboardPasteEnabledProperties()
         if (!apvts.state.hasProperty(propertyId))
             apvts.state.setProperty(propertyId, false, nullptr);
     }
+}
+
+void PluginProcessor::initializeMutatorRecipeState()
+{
+    Core::MutatorSessionPersistence::initializeRecipeState(apvts.state);
+}
+
+void PluginProcessor::stripEphemeralMutatorStateForPersistence(juce::ValueTree& state)
+{
+    Core::MutatorSessionPersistence::stripEphemeralStateForPersistence(state);
+}
+
+void PluginProcessor::resetEphemeralMutatorStateAfterSessionLoad()
+{
+    Core::MutatorSessionPersistence::resetEphemeralStateAfterSessionLoad(apvts.state);
+}
+
+void PluginProcessor::initializeMutatorActionEnabledMirrorsForEmptyHistory()
+{
+    Core::MutatorSessionPersistence::setActionEnabledMirrorsForEmptyHistory(apvts.state);
 }
 
 void PluginProcessor::refreshClipboardPasteEnabledProperties()

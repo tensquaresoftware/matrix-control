@@ -139,6 +139,13 @@ public:
         export_nonWritableFolder_blocked();
         export_doesNotMutateStore();
         export_noSysEx();
+
+        enabled_emptyHistory();
+        enabled_afterFirstMutate();
+        enabled_rootLimit();
+        enabled_retryLimit();
+        enabled_afterDeleteLast();
+        enabled_afterDefrag();
     }
 
 private:
@@ -200,6 +207,21 @@ private:
 
         Core::MutationHistoryStore& store() { return engine.historyStore_; }
     };
+
+    void expectActionEnabledMirrors(const EngineHarness& harness,
+                                    bool mutateEnabled,
+                                    bool retryEnabled,
+                                    bool exportEnabled,
+                                    bool deleteEnabled,
+                                    bool clearEnabled)
+    {
+        const auto& state = harness.proc.apvts.state;
+        expect(static_cast<bool>(state.getProperty(MutatorState::kMutateEnabled)) == mutateEnabled);
+        expect(static_cast<bool>(state.getProperty(MutatorState::kRetryEnabled)) == retryEnabled);
+        expect(static_cast<bool>(state.getProperty(MutatorState::kExportEnabled)) == exportEnabled);
+        expect(static_cast<bool>(state.getProperty(MutatorState::kDeleteEnabled)) == deleteEnabled);
+        expect(static_cast<bool>(state.getProperty(MutatorState::kClearEnabled)) == clearEnabled);
+    }
 
     static int countPatchSysExMessages(Core::MidiOutboundQueue& queue)
     {
@@ -1705,6 +1727,97 @@ private:
         expectEquals(countPatchSysExMessages(harness.queue), 0);
 
         tempDir.deleteRecursively();
+    }
+
+    void enabled_emptyHistory()
+    {
+        beginTest("enabled_emptyHistory");
+
+        EngineHarness harness;
+        harness.engine.refreshActionEnabledMirrors(harness.proc.apvts);
+        expectActionEnabledMirrors(harness, true, false, false, false, false);
+    }
+
+    void enabled_afterFirstMutate()
+    {
+        beginTest("enabled_afterFirstMutate");
+
+        EngineHarness harness;
+        harness.setRecipe(100, 100, true);
+        expect(harness.engine.mutate().success);
+        expectActionEnabledMirrors(harness, true, true, true, true, true);
+    }
+
+    void enabled_rootLimit()
+    {
+        beginTest("enabled_rootLimit");
+
+        EngineHarness harness;
+        harness.setRecipe(100, 100, true);
+
+        for (int i = 0; i < Core::MutationHistoryStore::kMaxRoots; ++i)
+        {
+            const auto resultPatch = makeDistinctBuffer(i + 10);
+            const auto parentPatch = makeDistinctBuffer(i + 110);
+            expect(harness.store().insertRoot(i, resultPatch, parentPatch));
+        }
+
+        harness.engine.syncHistoryUiProperties(harness.proc.apvts);
+        expectActionEnabledMirrors(harness, false, true, true, true, true);
+    }
+
+    void enabled_retryLimit()
+    {
+        beginTest("enabled_retryLimit");
+
+        EngineHarness harness;
+        harness.setRecipe(100, 100, true);
+
+        auto m00 = makeDistinctBuffer(1801);
+        auto m00Parent = makeDistinctBuffer(1802);
+        Core::MutationNaming::applyPatchName(m00, 0);
+        expect(harness.store().insertRoot(0, m00, m00Parent));
+
+        for (int i = 0; i < Core::MutationHistoryStore::kMaxRetriesPerRoot; ++i)
+        {
+            auto retryPatch = makeDistinctBuffer(i + 1900);
+            Core::MutationNaming::applyPatchName(retryPatch, 0, i);
+            expect(harness.store().insertRetry(0, i, retryPatch, m00Parent));
+        }
+
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedM, 0, nullptr);
+        harness.engine.syncHistoryUiProperties(harness.proc.apvts);
+        expectActionEnabledMirrors(harness, true, false, true, true, true);
+    }
+
+    void enabled_afterDeleteLast()
+    {
+        beginTest("enabled_afterDeleteLast");
+
+        EngineHarness harness;
+        harness.setRecipe(100, 100, true);
+        expect(harness.engine.mutate().success);
+        expect(harness.engine.deleteSelected().success);
+        expectActionEnabledMirrors(harness, true, false, false, false, false);
+    }
+
+    void enabled_afterDefrag()
+    {
+        beginTest("enabled_afterDefrag");
+
+        EngineHarness harness;
+        harness.setRecipe(100, 100, true);
+
+        auto m99 = makeDistinctBuffer(2001);
+        auto m99Parent = makeDistinctBuffer(2002);
+        Core::MutationNaming::applyPatchName(m99, 99);
+        expect(harness.store().insertRoot(99, m99, m99Parent));
+
+        harness.engine.syncHistoryUiProperties(harness.proc.apvts);
+        expectActionEnabledMirrors(harness, false, true, true, true, true);
+
+        expect(harness.engine.defragHistory().success);
+        expectActionEnabledMirrors(harness, true, true, true, true, true);
     }
 };
 

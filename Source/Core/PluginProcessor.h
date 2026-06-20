@@ -264,6 +264,10 @@ private:
     void handlePatchNumberChange(const juce::String& parameterId);
     void initializeClipboardPasteEnabledProperties();
     void refreshClipboardPasteEnabledProperties();
+    void initializeMutatorRecipeState();
+    void stripEphemeralMutatorStateForPersistence(juce::ValueTree& state);
+    void resetEphemeralMutatorStateAfterSessionLoad();
+    void initializeMutatorActionEnabledMirrorsForEmptyHistory();
     Core::DeviceMemoryLimits getResolvedDeviceMemoryLimits() const;
     void reconcilePatchManagerCoordinatesForDeviceType();
     void resetInternalPatchCoordinatesToDefaults();

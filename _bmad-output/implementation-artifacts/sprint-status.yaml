@@ -1,5 +1,5 @@
 # generated: 2026-05-29
-# last_updated: 2026-06-20 (6-11 mutator-export-layout — done)
+# last_updated: 2026-06-20 (6-12 recipe-persistence-and-action-enabled-states — done)
 # project: Matrix-Control
 # project_key: NOKEY
 # tracking_system: file-system
@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-05-29
-last_updated: 2026-06-20 (6-11 mutator-export-layout — done)
+last_updated: 2026-06-20 (6-12 recipe-persistence-and-action-enabled-states — done)
 project: Matrix-Control
 project_key: NOKEY
 tracking_system: file-system
@@ -110,7 +110,7 @@ development_status:
   6-9-delete-and-clear-history: done
   6-10-historydefrag-on-limit: done
   6-11-mutator-export-layout: done
-  6-12-recipe-persistence-and-action-enabled-states: backlog
+  6-12-recipe-persistence-and-action-enabled-states: done
   6-13-clear-history-on-patch-load: backlog
   epic-6-retrospective: optional
   epic-7: in-progress
