@@ -47,6 +47,7 @@ namespace Core
         MutatorActionResult toggleCompare();               // Story 6.8
         MutatorActionResult deleteSelected();              // Story 6.9
         MutatorActionResult clearHistory();                // Story 6.9
+        MutatorActionResult resetSessionForPatchLoad();    // Story 6.13
         MutatorActionResult exportHistory(const juce::File& destinationFolder); // Story 6.11
         MutatorActionResult defragHistory();               // Story 6.10
 

@@ -44,6 +44,7 @@ namespace Core
     class MidiActivityTracker;
     class ClipboardService;
     class PatchFileService;
+    class PatchMutatorEngine;
     class ActionDispatcher;
     class ModuleActionHandler;
     class PatchManagerActionHandler;
@@ -268,6 +269,7 @@ private:
     void stripEphemeralMutatorStateForPersistence(juce::ValueTree& state);
     void resetEphemeralMutatorStateAfterSessionLoad();
     void initializeMutatorActionEnabledMirrorsForEmptyHistory();
+    int getCurrentPatchNumberForMutator() const;
     Core::DeviceMemoryLimits getResolvedDeviceMemoryLimits() const;
     void reconcilePatchManagerCoordinatesForDeviceType();
     void resetInternalPatchCoordinatesToDefaults();
@@ -304,6 +306,7 @@ private:
     std::unique_ptr<Core::PatchSelectionMidiSync> patchSelectionMidiSync_;
     std::unique_ptr<Core::ClipboardService> clipboardService_;
     std::unique_ptr<Core::PatchFileService> patchFileService_;
+    std::unique_ptr<Core::PatchMutatorEngine> patchMutatorEngine_;
     PatchFolderPicker patchFolderPicker_;
     PatchSaveFilePicker patchSaveFilePicker_;
     PatchNameReconciliationPicker patchNameReconciliationPicker_;

@@ -452,6 +452,20 @@ MutatorActionResult PatchMutatorEngine::clearHistory()
     return result;
 }
 
+MutatorActionResult PatchMutatorEngine::resetSessionForPatchLoad()
+{
+    forceExitCompare();
+    historyStore_.clear();
+    historyStore_.clearInitialSnapshot();
+    selectedRootIndex_ = -1;
+    selectedRetryIndex_ = MutationHistoryStore::kRootOnly;
+    syncHistoryUiProperties(apvts_);
+
+    MutatorActionResult result;
+    result.success = true;
+    return result;
+}
+
 MutatorActionResult PatchMutatorEngine::exportHistory(const juce::File& destinationFolder)
 {
     if (historyStore_.isEmpty())

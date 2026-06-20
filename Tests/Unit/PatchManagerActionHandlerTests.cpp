@@ -1,4 +1,5 @@
 #include <functional>
+#include <memory>
 
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_core/juce_core.h>
@@ -194,11 +195,18 @@ public:
         testLoadAdjacent_enqueuesSysEx();
         testLoadAdjacent_staleScanNoOp();
         testLoadAdjacent_emptyListNoOp();
+        testLoadSelected_invokesOnPatchLoaded();
     }
 
 private:
     struct HandlerHarness
     {
+        struct PatchLoadHookState
+        {
+            bool invoked = false;
+        };
+
+        std::shared_ptr<PatchLoadHookState> patchLoadHookState;
         TestAudioProcessorPatchManager proc;
         Core::PatchModel model;
         Core::ApvtsPatchMapper mapper;
@@ -225,7 +233,8 @@ private:
         Core::PatchManagerActionHandler handler;
 
         explicit HandlerHarness(Core::DeviceMemoryLimits limitsIn)
-            : mapper(proc.apvts, model)
+            : patchLoadHookState(std::make_shared<PatchLoadHookState>())
+            , mapper(proc.apvts, model)
             , decoder(parser)
             , initLoader(decoder)
             , patchInitService(model, initLoader, []() { return juce::File(); })
@@ -258,7 +267,11 @@ private:
                           [this](bool suppress) { suppressMatrixModSysEx = suppress; },
                           nullptr,
                           [this](bool suppress) { suppressPatchSysEx = suppress; },
-                          nullptr })
+                          nullptr,
+                          [state = patchLoadHookState]()
+                          {
+                              state->invoked = true;
+                          } })
         {
             initializePatchManagerState(proc.apvts.state, 0, 0, false);
             patchSelectionMidiSync.clearSyncedBankState();
@@ -1411,6 +1424,32 @@ private:
         expect(harness.queue.isEmpty());
         expect(harness.proc.apvts.state.getProperty("uiMessageText").toString().isEmpty());
         expect(harness.proc.apvts.state.getProperty("uiMessageSeverity").toString().isEmpty());
+
+        tempDir.deleteRecursively();
+    }
+
+    void testLoadSelected_invokesOnPatchLoaded()
+    {
+        beginTest("loadSelected_invokesOnPatchLoaded");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        const auto tempDir = createTempScanDir();
+        expect(tempDir.createDirectory());
+        copyFixturePatchToDir(tempDir, "Patch 71.syx");
+
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StateProperties::kFolderPath,
+            tempDir.getFullPathName(),
+            nullptr);
+        harness.handler.rescanPersistedComputerPatchesFolder();
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile,
+            1,
+            nullptr);
+
+        expect(! harness.patchLoadHookState->invoked);
+        harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kSelectPatchFile, juce::var());
+        expect(harness.patchLoadHookState->invoked);
 
         tempDir.deleteRecursively();
     }

@@ -48,6 +48,7 @@
 #include "Shared/Definitions/PluginDescriptors.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 #include "Core/Services/PatchMutator/MutatorSessionPersistence.h"
+#include "Core/Services/PatchMutator/PatchMutatorEngine.h"
 #include "Shared/Definitions/PluginIDs.h"
 #include "GUI/PluginEditor.h"
 #include "MIDI/MidiManager.h"
@@ -234,11 +235,28 @@ PluginProcessor::PluginProcessor()
 
     patchSelectionMidiSync_ = std::make_unique<Core::PatchSelectionMidiSync>(midiManager.get());
 
-    const Core::ActionExecutionHooks actionHooks{
+    Core::ActionExecutionHooks actionHooks{
         [this](bool suppress) { suppressMatrixModParameterSysEx_ = suppress; },
         [this](bool suppress) { suppressMasterParameterSysEx_ = suppress; },
         [this](bool suppress) { suppressPatchParameterSysEx_ = suppress; },
         [this](bool suppress) { suppressPatchSelectionMidiSync_ = suppress; }
+    };
+
+    patchMutatorEngine_ = std::make_unique<Core::PatchMutatorEngine>(
+        patchModel_.get(),
+        apvtsPatchMapper_.get(),
+        patchNameSyncer_.get(),
+        midiManager.get(),
+        apvts,
+        actionHooks,
+        [this]() { return getCurrentPatchNumberForMutator(); },
+        patchFileService_.get(),
+        &midiManager->getSysExEncoder());
+
+    actionHooks.onPatchLoaded = [this]()
+    {
+        if (patchMutatorEngine_ != nullptr)
+            patchMutatorEngine_->resetSessionForPatchLoad();
     };
 
     moduleActionHandler_ = std::make_unique<Core::ModuleActionHandler>(
@@ -1482,6 +1500,16 @@ void PluginProcessor::stripEphemeralMutatorStateForPersistence(juce::ValueTree& 
 void PluginProcessor::resetEphemeralMutatorStateAfterSessionLoad()
 {
     Core::MutatorSessionPersistence::resetEphemeralStateAfterSessionLoad(apvts.state);
+
+    if (patchMutatorEngine_ != nullptr)
+        patchMutatorEngine_->resetSessionForPatchLoad();
+}
+
+int PluginProcessor::getCurrentPatchNumberForMutator() const
+{
+    namespace InternalPatches = PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets;
+
+    return static_cast<int>(apvts.state.getProperty(InternalPatches::kCurrentPatchNumber, 0));
 }
 
 void PluginProcessor::initializeMutatorActionEnabledMirrorsForEmptyHistory()

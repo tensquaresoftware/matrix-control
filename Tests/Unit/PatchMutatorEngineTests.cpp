@@ -146,6 +146,12 @@ public:
         enabled_retryLimit();
         enabled_afterDeleteLast();
         enabled_afterDefrag();
+
+        reset_afterMutate_clearsHistoryAndSnapshot();
+        reset_afterCompareActive();
+        reset_preservesRecipe();
+        reset_noAuditionSysEx();
+        reset_enabledMirrorsEmptyHistory();
     }
 
 private:
@@ -181,6 +187,7 @@ private:
                          [this](bool suppress) { suppressMatrixModSysEx = suppress; },
                          nullptr,
                          [this](bool suppress) { suppressPatchSysEx = suppress; },
+                         nullptr,
                          nullptr },
                      [this]() { return currentPatchNumber; },
                      &patchFileService,
@@ -1818,6 +1825,91 @@ private:
 
         expect(harness.engine.defragHistory().success);
         expectActionEnabledMirrors(harness, true, true, true, true, true);
+    }
+
+    void reset_afterMutate_clearsHistoryAndSnapshot()
+    {
+        beginTest("reset_afterMutate_clearsHistoryAndSnapshot");
+
+        EngineHarness harness;
+        harness.setRecipe(100, 100, true);
+        expect(harness.engine.mutate().success);
+        expect(harness.store().hasInitialSnapshot());
+        expectEquals(harness.engine.rootCount(), 1);
+
+        expect(harness.engine.resetSessionForPatchLoad().success);
+        expectEquals(harness.store().rootCount(), 0);
+        expect(! harness.store().hasInitialSnapshot());
+        expect(! static_cast<bool>(harness.proc.apvts.state.getProperty(MutatorState::kCompareActive, false)));
+        expect(harness.proc.apvts.state.getProperty(MutatorState::kHistoryMList).toString().isEmpty());
+        expect(harness.proc.apvts.state.getProperty(MutatorState::kHistoryRList).toString().isEmpty());
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedM)), -1);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedR)),
+                     Core::MutationHistoryStore::kRootOnly);
+    }
+
+    void reset_afterCompareActive()
+    {
+        beginTest("reset_afterCompareActive");
+
+        EngineHarness harness;
+        harness.setRecipe(100, 100, true);
+        expect(harness.engine.mutate().success);
+        expect(harness.engine.toggleCompare().success);
+        expect(static_cast<bool>(harness.proc.apvts.state.getProperty(MutatorState::kCompareActive, false)));
+
+        expect(harness.engine.resetSessionForPatchLoad().success);
+        expect(! static_cast<bool>(harness.proc.apvts.state.getProperty(MutatorState::kCompareActive, false)));
+        expectEquals(harness.store().rootCount(), 0);
+    }
+
+    void reset_preservesRecipe()
+    {
+        beginTest("reset_preservesRecipe");
+
+        EngineHarness harness;
+        harness.setRecipe(75, 50, true);
+        harness.proc.apvts.state.setProperty(PatchMutator::kEnableDco2, true, nullptr);
+        harness.proc.apvts.state.setProperty(PatchMutator::kEnableVcfVca, true, nullptr);
+        expect(harness.engine.mutate().success);
+
+        const auto amountBefore = static_cast<int>(harness.proc.apvts.state.getProperty(PatchMutator::kAmount, 0));
+        const auto randomBefore = static_cast<int>(harness.proc.apvts.state.getProperty(PatchMutator::kRandom, 0));
+        const auto dco1Before = static_cast<bool>(harness.proc.apvts.state.getProperty(PatchMutator::kEnableDco1, false));
+        const auto dco2Before = static_cast<bool>(harness.proc.apvts.state.getProperty(PatchMutator::kEnableDco2, false));
+        const auto vcfBefore = static_cast<bool>(harness.proc.apvts.state.getProperty(PatchMutator::kEnableVcfVca, false));
+
+        expect(harness.engine.resetSessionForPatchLoad().success);
+
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(PatchMutator::kAmount, 0)), amountBefore);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(PatchMutator::kRandom, 0)), randomBefore);
+        expect(static_cast<bool>(harness.proc.apvts.state.getProperty(PatchMutator::kEnableDco1, false)) == dco1Before);
+        expect(static_cast<bool>(harness.proc.apvts.state.getProperty(PatchMutator::kEnableDco2, false)) == dco2Before);
+        expect(static_cast<bool>(harness.proc.apvts.state.getProperty(PatchMutator::kEnableVcfVca, false)) == vcfBefore);
+    }
+
+    void reset_noAuditionSysEx()
+    {
+        beginTest("reset_noAuditionSysEx");
+
+        EngineHarness harness;
+        harness.setRecipe(100, 100, true);
+        expect(harness.engine.mutate().success);
+        (void) countPatchSysExMessages(harness.queue);
+
+        expect(harness.engine.resetSessionForPatchLoad().success);
+        expectEquals(countPatchSysExMessages(harness.queue), 0);
+    }
+
+    void reset_enabledMirrorsEmptyHistory()
+    {
+        beginTest("reset_enabledMirrorsEmptyHistory");
+
+        EngineHarness harness;
+        harness.setRecipe(100, 100, true);
+        expect(harness.engine.mutate().success);
+        expect(harness.engine.resetSessionForPatchLoad().success);
+        expectActionEnabledMirrors(harness, true, false, false, false, false);
     }
 };
 

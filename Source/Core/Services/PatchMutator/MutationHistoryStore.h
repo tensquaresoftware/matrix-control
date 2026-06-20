@@ -50,6 +50,7 @@ namespace Core
         bool deleteRoot(int rootIndex);
         bool deleteRetry(int rootIndex, int retryIndex);
         void clear() noexcept;
+        void clearInitialSnapshot() noexcept;
 
         bool isEmpty() const noexcept;
         int rootCount() const noexcept;

@@ -2,6 +2,13 @@
 
 - **Panel M change leaves R list stale until processor hook** — resolved 1+2: sync reads APVTS in 6.6; 7.4 processor calls `syncHistoryUiProperties` on `kSelectedM` change for full panel UX.
 
+## Deferred from: code review of 6-13-clear-history-on-patch-load (2026-06-20)
+
+- **Hook contract for future synth load not documented in source** — AC #9 contract in story markdown; optional comment on `ActionExecutionHooks::onPatchLoaded` when `requestCurrentPatch` is implemented.
+- **Handler hook test covers select-file load only** — Prev/Next navigation uses same `applyLoadedPatchToApvtsAndSynth`; redundant path test unless regression fear.
+- **No PluginProcessor integration test for engine + hook wiring** — story AC #12 limits scope to engine/handler unit tests; composition-root test deferred to 7.4.
+- **`getCurrentPatchNumberForMutator()` silent fallback to patch 0** — pre-existing APVTS default pattern; clamp/validate when 7.4 wires mutator actions.
+
 ## Deferred from: code review of 6-12-recipe-persistence-and-action-enabled-states (2026-06-20)
 
 - **Recipe property IDs maintained in three separate lists** — add/remove toggle requires edits in `MutatorSessionPersistence.h`, `PatchMutatorPanel::isRecipeProperty`, and toggle binding table.

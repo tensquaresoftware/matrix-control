@@ -523,7 +523,8 @@ namespace Core
     {
         syncLoadedPatchToApvts();
 
-        // FR-31 hook: MutationHistoryStore::clear() on patch load (Epic 6.13).
+        if (hooks_.onPatchLoaded)
+            hooks_.onPatchLoaded();
 
         if (midiManager_ != nullptr)
             midiManager_->sendPatch(static_cast<juce::uint8>(getCurrentPatch(limits)), patchModel_->data());

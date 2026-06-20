@@ -26,6 +26,7 @@ public:
         gapExhausted_singleAt99();
         gapExhausted_retryAt99();
         clear_keepsInitialSnapshot();
+        clearInitialSnapshot_clearsSnapshot();
         getEntry_returnsCopy();
     }
 
@@ -277,6 +278,23 @@ private:
 
         const auto restored = store.getInitialSnapshot();
         expect(std::memcmp(restored.data(), initial.data(), Core::PatchModel::kBufferSize) == 0);
+    }
+
+    void clearInitialSnapshot_clearsSnapshot()
+    {
+        beginTest("clearInitialSnapshot_clearsSnapshot");
+
+        Core::MutationHistoryStore store;
+        store.setInitialSnapshot(makeDistinctBuffer(8));
+        expect(store.hasInitialSnapshot());
+
+        store.clearInitialSnapshot();
+
+        expect(! store.hasInitialSnapshot());
+
+        const auto restored = store.getInitialSnapshot();
+        const auto zeroed = Core::PatchModel();
+        expect(std::memcmp(restored.data(), zeroed.data(), Core::PatchModel::kBufferSize) == 0);
     }
 
     void getEntry_returnsCopy()
