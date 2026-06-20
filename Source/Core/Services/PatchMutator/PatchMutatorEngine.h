@@ -29,7 +29,22 @@ namespace Core
         bool defragModalRequested = false;
     };
 
-    class PatchMutatorEngine
+    class PatchMutatorEnginePort
+    {
+    public:
+        virtual ~PatchMutatorEnginePort() = default;
+
+        virtual MutatorActionResult mutate() = 0;
+        virtual MutatorActionResult retry() = 0;
+        virtual MutatorActionResult toggleCompare() = 0;
+        virtual MutatorActionResult deleteSelected() = 0;
+        virtual MutatorActionResult clearHistory() = 0;
+        virtual MutatorActionResult exportHistory(const juce::File& destinationFolder) = 0;
+        virtual MutatorActionResult defragHistory() = 0;
+        virtual void auditionSelectedHistoryEntry() = 0;
+    };
+
+    class PatchMutatorEngine final : public PatchMutatorEnginePort
     {
     public:
         PatchMutatorEngine(PatchModel* patchModel,
@@ -42,16 +57,16 @@ namespace Core
                            PatchFileService* patchFileService = nullptr,
                            SysExEncoder* sysExEncoder = nullptr);
 
-        MutatorActionResult mutate();
-        MutatorActionResult retry();                       // Story 6.5
-        MutatorActionResult toggleCompare();               // Story 6.8
-        MutatorActionResult deleteSelected();              // Story 6.9
-        MutatorActionResult clearHistory();                // Story 6.9
-        MutatorActionResult resetSessionForPatchLoad();    // Story 6.13
-        MutatorActionResult exportHistory(const juce::File& destinationFolder); // Story 6.11
-        MutatorActionResult defragHistory();               // Story 6.10
+        MutatorActionResult mutate() override;
+        MutatorActionResult retry() override;
+        MutatorActionResult toggleCompare() override;
+        MutatorActionResult deleteSelected() override;
+        MutatorActionResult clearHistory() override;
+        MutatorActionResult resetSessionForPatchLoad();
+        MutatorActionResult exportHistory(const juce::File& destinationFolder) override;
+        MutatorActionResult defragHistory() override;
 
-        void auditionSelectedHistoryEntry();               // Story 6.7
+        void auditionSelectedHistoryEntry() override;
         void syncHistoryUiProperties(juce::AudioProcessorValueTreeState& apvts); // Story 6.6
         void refreshActionEnabledMirrors(juce::AudioProcessorValueTreeState& apvts); // Story 6.12
 

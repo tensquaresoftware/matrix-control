@@ -91,6 +91,38 @@ PluginEditor::PluginEditor(PluginProcessor& p)
         return {};
     });
 
+    pluginProcessor.setMutatorExportFolderPicker(
+        [safeThis = juce::Component::SafePointer<PluginEditor>(this)]() -> juce::File
+        {
+            if (safeThis == nullptr)
+                return {};
+
+            juce::FileChooser chooser("Select mutation export folder",
+                                      juce::File(),
+                                      juce::String(),
+                                      true,
+                                      false,
+                                      safeThis.getComponent());
+
+            if (chooser.browseForDirectory())
+                return chooser.getResult();
+
+            return {};
+        });
+
+    pluginProcessor.setMutatorDefragLimitModalGate(
+        [](std::function<void()> onConfirmed)
+        {
+            namespace Dialog = PluginDisplayNames::Dialogs::MutatorHistoryDefrag;
+
+            juce::AlertWindow alert(Dialog::kTitle, Dialog::kBody, juce::AlertWindow::QuestionIcon);
+            alert.addButton(Dialog::kConfirm, 1);
+            alert.addButton(Dialog::kCancel, 0);
+
+            if (alert.runModalLoop() == 1 && onConfirmed)
+                onConfirmed();
+        });
+
     pluginProcessor.setPatchSaveFilePicker(
         [safeThis = juce::Component::SafePointer<PluginEditor>(this)](
             juce::File suggestedFolder, juce::String suggestedStem) -> juce::File

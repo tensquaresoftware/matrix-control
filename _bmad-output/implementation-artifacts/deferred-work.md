@@ -2,6 +2,10 @@
 
 - **Panel M change leaves R list stale until processor hook** — resolved 1+2: sync reads APVTS in 6.6; 7.4 processor calls `syncHistoryUiProperties` on `kSelectedM` change for full panel UX.
 
+## Deferred from: code review of 7-4-mutatoractionhandler (2026-06-20)
+
+- **`actionHooks.onPatchLoaded` copied before assignment** — pre-existing Epic 6 ordering; patch load clear works via PatchManagerActionHandler until engine needs the hook directly.
+
 ## Deferred from: code review of 6-13-clear-history-on-patch-load (2026-06-20)
 
 - **Hook contract for future synth load not documented in source** — AC #9 contract in story markdown; optional comment on `ActionExecutionHooks::onPatchLoaded` when `requestCurrentPatch` is implemented.

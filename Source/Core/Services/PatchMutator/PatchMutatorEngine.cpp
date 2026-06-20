@@ -66,6 +66,26 @@ namespace
         return result;
     }
 
+    class SuppressMutatorHistorySelectionDebounceGuard
+    {
+    public:
+        explicit SuppressMutatorHistorySelectionDebounceGuard(Core::ActionExecutionHooks& hooks)
+            : hooks_(hooks)
+        {
+            if (hooks_.setSuppressMutatorHistorySelectionDebounce)
+                hooks_.setSuppressMutatorHistorySelectionDebounce(true);
+        }
+
+        ~SuppressMutatorHistorySelectionDebounceGuard()
+        {
+            if (hooks_.setSuppressMutatorHistorySelectionDebounce)
+                hooks_.setSuppressMutatorHistorySelectionDebounce(false);
+        }
+
+    private:
+        Core::ActionExecutionHooks& hooks_;
+    };
+
     void setPatchLoadSuppressHooks(Core::ActionExecutionHooks& hooks, bool suppress)
     {
         if (hooks.setSuppressPatchSysEx)
@@ -330,8 +350,11 @@ MutatorActionResult PatchMutatorEngine::toggleCompare()
     if (currentlyActive)
     {
         state.setProperty(MutatorState::kCompareActive, false, nullptr);
-        state.setProperty(MutatorState::kSelectedM, compareSavedM_, nullptr);
-        state.setProperty(MutatorState::kSelectedR, compareSavedR_, nullptr);
+        {
+            SuppressMutatorHistorySelectionDebounceGuard suppressGuard(hooks_);
+            state.setProperty(MutatorState::kSelectedM, compareSavedM_, nullptr);
+            state.setProperty(MutatorState::kSelectedR, compareSavedR_, nullptr);
+        }
         applySelectionFromApvts();
 
         const PatchModel auditionModel = resolveAuditionBuffer();
@@ -533,6 +556,8 @@ void PatchMutatorEngine::auditionSelectedHistoryEntry()
 
 void PatchMutatorEngine::syncHistoryUiProperties(juce::AudioProcessorValueTreeState& apvts)
 {
+    SuppressMutatorHistorySelectionDebounceGuard suppressGuard(hooks_);
+
     auto& state = apvts.state;
 
     if (! state.hasProperty(MutatorState::kCompareActive))

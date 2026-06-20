@@ -239,7 +239,8 @@ PluginProcessor::PluginProcessor()
         [this](bool suppress) { suppressMatrixModParameterSysEx_ = suppress; },
         [this](bool suppress) { suppressMasterParameterSysEx_ = suppress; },
         [this](bool suppress) { suppressPatchParameterSysEx_ = suppress; },
-        [this](bool suppress) { suppressPatchSelectionMidiSync_ = suppress; }
+        [this](bool suppress) { suppressPatchSelectionMidiSync_ = suppress; },
+        [this](bool suppress) { suppressMutatorHistorySelectionDebounce_ = suppress; }
     };
 
     patchMutatorEngine_ = std::make_unique<Core::PatchMutatorEngine>(
@@ -305,7 +306,20 @@ PluginProcessor::PluginProcessor()
         },
         actionHooks);
 
-    mutatorActionHandler_ = std::make_unique<Core::MutatorActionHandler>();
+    mutatorActionHandler_ = std::make_unique<Core::MutatorActionHandler>(
+        apvts,
+        patchMutatorEngine_.get(),
+        [this]() -> juce::File
+        {
+            if (mutatorExportFolderPicker_)
+                return mutatorExportFolderPicker_();
+            return {};
+        },
+        [this](std::function<void()> onConfirmed)
+        {
+            if (mutatorDefragLimitModalGate_)
+                mutatorDefragLimitModalGate_(std::move(onConfirmed));
+        });
 
     actionDispatcher_ = std::make_unique<Core::ActionDispatcher>(
         *moduleActionHandler_,
@@ -796,6 +810,16 @@ void PluginProcessor::setGuiScaleId(int scaleId)
 void PluginProcessor::setPatchFolderPicker(PatchFolderPicker picker)
 {
     patchFolderPicker_ = std::move(picker);
+}
+
+void PluginProcessor::setMutatorExportFolderPicker(MutatorExportFolderPicker picker)
+{
+    mutatorExportFolderPicker_ = std::move(picker);
+}
+
+void PluginProcessor::setMutatorDefragLimitModalGate(MutatorDefragLimitModalGate gate)
+{
+    mutatorDefragLimitModalGate_ = std::move(gate);
 }
 
 void PluginProcessor::setPatchSaveFilePicker(PatchSaveFilePicker picker)
@@ -1323,6 +1347,14 @@ void PluginProcessor::valueTreePropertyChanged(juce::ValueTree& treeWhosePropert
 
     if (Core::ActionPropertyRegistry::isActionProperty(parameterId))
         actionDispatcher_->onActionPropertyChanged(parameterId, newValue);
+
+    namespace MutatorState = PluginIDs::PatchManagerSection::PatchMutatorModule::StateProperties;
+    if (! suppressMutatorHistorySelectionDebounce_
+        && (parameterId == MutatorState::kSelectedM || parameterId == MutatorState::kSelectedR))
+    {
+        if (mutatorActionHandler_ != nullptr)
+            mutatorActionHandler_->onHistorySelectionChanged();
+    }
 
     const auto propertyName = property.toString();
     if (propertyName == MatrixDeviceTypes::kApvtsPropertyName

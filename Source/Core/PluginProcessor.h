@@ -141,6 +141,14 @@ public:
 
     void setPatchFolderPicker(PatchFolderPicker picker);
 
+    using MutatorExportFolderPicker = std::function<juce::File()>;
+
+    void setMutatorExportFolderPicker(MutatorExportFolderPicker picker);
+
+    using MutatorDefragLimitModalGate = std::function<void(std::function<void()>)>;
+
+    void setMutatorDefragLimitModalGate(MutatorDefragLimitModalGate gate);
+
     using PatchSaveFilePicker = std::function<juce::File(juce::File suggestedFolder, juce::String suggestedStem)>;
 
     void setPatchSaveFilePicker(PatchSaveFilePicker picker);
@@ -308,6 +316,8 @@ private:
     std::unique_ptr<Core::PatchFileService> patchFileService_;
     std::unique_ptr<Core::PatchMutatorEngine> patchMutatorEngine_;
     PatchFolderPicker patchFolderPicker_;
+    MutatorExportFolderPicker mutatorExportFolderPicker_;
+    MutatorDefragLimitModalGate mutatorDefragLimitModalGate_;
     PatchSaveFilePicker patchSaveFilePicker_;
     PatchNameReconciliationPicker patchNameReconciliationPicker_;
     std::unique_ptr<Core::ModuleActionHandler> moduleActionHandler_;
@@ -322,6 +332,7 @@ private:
     bool suppressMasterParameterSysEx_ { false };
     bool suppressPatchParameterSysEx_ { false };
     bool suppressPatchSelectionMidiSync_ { false };
+    bool suppressMutatorHistorySelectionDebounce_ { false };
     bool developmentLoggingStarted_ { false };
     std::unique_ptr<DeferredMidiPortSyncTimer> deferredMidiPortSyncTimer_;
     

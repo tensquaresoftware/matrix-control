@@ -335,6 +335,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/PatchFileServiceTests.cpp
         Tests/Unit/PatchFileNameSanitizerTests.cpp
         Tests/Unit/PatchFileNameReconcilerTests.cpp
+        Tests/Unit/MutatorActionHandlerTests.cpp
         Tests/Unit/ModuleActionHandlerTests.cpp
         Tests/Unit/MatrixModInitServiceTests.cpp
         Tests/Unit/PatchParameterSysExDispatcherTests.cpp

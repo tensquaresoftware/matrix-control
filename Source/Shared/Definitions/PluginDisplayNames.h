@@ -86,6 +86,15 @@ namespace PluginDisplayNames
             constexpr const char* kConfirm = "Reset";
             constexpr const char* kCancel  = "Cancel";
         }
+
+        namespace MutatorHistoryDefrag
+        {
+            constexpr const char* kTitle = "Mutation history full";
+            constexpr const char* kBody =
+                "Defrag will compact mutation history and preserve the current selection. Continue?";
+            constexpr const char* kConfirm = "Defrag";
+            constexpr const char* kCancel  = "Cancel";
+        }
     }
 
     namespace Units

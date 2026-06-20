@@ -268,6 +268,7 @@ private:
                           nullptr,
                           [this](bool suppress) { suppressPatchSysEx = suppress; },
                           nullptr,
+                          nullptr,
                           [state = patchLoadHookState]()
                           {
                               state->invoked = true;
