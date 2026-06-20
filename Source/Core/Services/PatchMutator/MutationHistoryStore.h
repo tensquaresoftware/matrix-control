@@ -11,6 +11,8 @@
 namespace Core
 {
 
+    class HistoryDefragService;
+
     struct MutationEntry
     {
         int rootIndex = 0;
@@ -59,12 +61,16 @@ namespace Core
         bool hasRetry(int rootIndex, int retryIndex) const noexcept;
 
     private:
+        friend class HistoryDefragService;
+
         struct RootBucket
         {
             MutationEntry rootEntry {};
             bool hasRootEntry = false;
             std::map<int, MutationEntry> retries;
         };
+
+        void replaceRootsForDefrag(std::map<int, RootBucket>&& newRoots) noexcept;
 
         static bool isValidRootIndex(int rootIndex) noexcept;
         static bool isValidRetryIndex(int retryIndex) noexcept;

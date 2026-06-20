@@ -2,6 +2,11 @@
 
 - **Panel M change leaves R list stale until processor hook** — resolved 1+2: sync reads APVTS in 6.6; 7.4 processor calls `syncHistoryUiProperties` on `kSelectedM` change for full panel UX.
 
+## Deferred from: code review of 6-10-historydefrag-on-limit (2026-06-20)
+
+- **`HistoryDefragService::defrag()` exceeds 15-line function limit** — architecture guideline; extract compaction loop helper when touching service again.
+- **`PatchMutatorEngine::defragHistory()` exceeds 15-line function limit** — same architecture guideline; optional refactor in focused cleanup pass.
+
 ## Deferred from: code review of 6-9-delete-and-clear-history (2026-06-20)
 
 - **`deleteSelected()` / `resolveSelectionAfterDelete()` exceed ≤15-line convention** — helpers are correct and match spec algorithm; optional refactor in a focused cleanup pass.

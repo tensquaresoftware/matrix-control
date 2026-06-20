@@ -162,6 +162,11 @@ void MutationHistoryStore::clear() noexcept
     roots_.clear();
 }
 
+void MutationHistoryStore::replaceRootsForDefrag(std::map<int, RootBucket>&& newRoots) noexcept
+{
+    roots_ = std::move(newRoots);
+}
+
 bool MutationHistoryStore::isEmpty() const noexcept
 {
     return roots_.empty();

@@ -6,6 +6,7 @@
 #include "Core/Models/ApvtsPatchMapper.h"
 #include "Core/Models/PatchModel.h"
 #include "Core/Models/PatchNameSyncer.h"
+#include "Core/Services/PatchMutator/HistoryDefragService.h"
 #include "Core/Services/PatchMutator/MutationNaming.h"
 #include "Shared/Definitions/PluginIDs.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
@@ -25,6 +26,7 @@ namespace
         "No initial patch snapshot available for compare.";
     constexpr const char* kRootDeleteCascadeFooterPrefix = "Deleted ";
     constexpr const char* kRootDeleteCascadeFooterSuffix = " and all retries.";
+    constexpr const char* kDefragCompleteFooterMessage = "Mutation history renumbered.";
     constexpr const char* kFooterSeverityWarning = "warning";
     constexpr const char* kFooterSeverityInfo = "info";
 
@@ -419,6 +421,30 @@ MutatorActionResult PatchMutatorEngine::exportHistory(const juce::File&)
 MutatorActionResult PatchMutatorEngine::defragHistory()
 {
     MutatorActionResult result;
+
+    if (historyStore_.isEmpty())
+    {
+        result.footerMessage = kEmptyHistoryFooterMessage;
+        result.footerSeverity = kFooterSeverityWarning;
+        return result;
+    }
+
+    forceExitCompare();
+
+    const auto selection = std::make_pair(selectedRootIndex_, selectedRetryIndex_);
+    const auto defragResult = HistoryDefragService::defrag(historyStore_, selection);
+
+    if (! defragResult.success)
+        return result;
+
+    selectedRootIndex_ = defragResult.remappedRootIndex;
+    selectedRetryIndex_ = defragResult.remappedRetryIndex;
+    syncHistoryUiProperties(apvts_);
+    auditionAfterHistoryMutation();
+
+    result.success = true;
+    result.footerMessage = kDefragCompleteFooterMessage;
+    result.footerSeverity = kFooterSeverityInfo;
     return result;
 }
 
