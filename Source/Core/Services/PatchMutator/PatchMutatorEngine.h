@@ -70,6 +70,11 @@ namespace Core
         std::optional<MutationEntry> resolveSelectedEntryForRetry(int rootIndex) const;
         void pushResultToEditorAndSynth(const PatchModel& mutatedModel);
         void applySelectionFromApvts();
+        void forceExitCompare();
+        std::pair<int, int> resolveSelectionAfterDelete(int rootIndex,
+                                                        int retryIndex,
+                                                        bool isRetryDelete);
+        void auditionAfterHistoryMutation();
         static bool readBoolProperty(const juce::ValueTree& state,
                                      const juce::Identifier& propertyId,
                                      bool defaultValue);

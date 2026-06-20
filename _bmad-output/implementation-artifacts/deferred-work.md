@@ -2,6 +2,10 @@
 
 - **Panel M change leaves R list stale until processor hook** — resolved 1+2: sync reads APVTS in 6.6; 7.4 processor calls `syncHistoryUiProperties` on `kSelectedM` change for full panel UX.
 
+## Deferred from: code review of 6-9-delete-and-clear-history (2026-06-20)
+
+- **`deleteSelected()` / `resolveSelectionAfterDelete()` exceed ≤15-line convention** — helpers are correct and match spec algorithm; optional refactor in a focused cleanup pass.
+
 ## Deferred from: code review of 6-8-compare-mode (2026-06-20)
 
 - **DELETE/CLEAR during compare may restore stale `compareSavedM_`/`compareSavedR_`** — story 6.9 compare exit side-effects.

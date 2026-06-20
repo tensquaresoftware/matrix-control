@@ -23,7 +23,10 @@ namespace
     constexpr const char* kNoSelectionFooterMessage = "No valid mutation history entry selected.";
     constexpr const char* kNoInitialSnapshotFooterMessage =
         "No initial patch snapshot available for compare.";
+    constexpr const char* kRootDeleteCascadeFooterPrefix = "Deleted ";
+    constexpr const char* kRootDeleteCascadeFooterSuffix = " and all retries.";
     constexpr const char* kFooterSeverityWarning = "warning";
+    constexpr const char* kFooterSeverityInfo = "info";
 
     void setPatchLoadSuppressHooks(Core::ActionExecutionHooks& hooks, bool suppress)
     {
@@ -330,13 +333,80 @@ MutatorActionResult PatchMutatorEngine::toggleCompare()
 
 MutatorActionResult PatchMutatorEngine::deleteSelected()
 {
+    applySelectionFromApvts();
+
+    if (historyStore_.isEmpty())
+    {
+        MutatorActionResult result;
+        result.footerMessage = kEmptyHistoryFooterMessage;
+        result.footerSeverity = kFooterSeverityWarning;
+        return result;
+    }
+
+    const int m = selectedRootIndex_;
+    if (m < 0 || ! historyStore_.hasRoot(m))
+    {
+        MutatorActionResult result;
+        result.footerMessage = kNoSelectionFooterMessage;
+        result.footerSeverity = kFooterSeverityWarning;
+        return result;
+    }
+
+    forceExitCompare();
+
+    const int r = selectedRetryIndex_;
+    int newM = m;
+    int newR = MutationHistoryStore::kRootOnly;
     MutatorActionResult result;
+
+    if (r != MutationHistoryStore::kRootOnly && historyStore_.hasRetry(m, r))
+    {
+        std::tie(newM, newR) = resolveSelectionAfterDelete(m, r, true);
+
+        if (! historyStore_.deleteRetry(m, r))
+        {
+            result.footerMessage = kNoSelectionFooterMessage;
+            result.footerSeverity = kFooterSeverityWarning;
+            return result;
+        }
+    }
+    else
+    {
+        std::tie(newM, newR) = resolveSelectionAfterDelete(m, MutationHistoryStore::kRootOnly, false);
+
+        if (! historyStore_.deleteRoot(m))
+        {
+            result.footerMessage = kNoSelectionFooterMessage;
+            result.footerSeverity = kFooterSeverityWarning;
+            return result;
+        }
+
+        result.footerMessage = kRootDeleteCascadeFooterPrefix
+                               + MutationNaming::formatRootLabel(m)
+                               + kRootDeleteCascadeFooterSuffix;
+        result.footerSeverity = kFooterSeverityInfo;
+    }
+
+    selectedRootIndex_ = newM;
+    selectedRetryIndex_ = newR;
+    syncHistoryUiProperties(apvts_);
+    auditionAfterHistoryMutation();
+
+    result.success = true;
     return result;
 }
 
 MutatorActionResult PatchMutatorEngine::clearHistory()
 {
+    forceExitCompare();
+    historyStore_.clear();
+    selectedRootIndex_ = -1;
+    selectedRetryIndex_ = MutationHistoryStore::kRootOnly;
+    syncHistoryUiProperties(apvts_);
+    auditionAfterHistoryMutation();
+
     MutatorActionResult result;
+    result.success = true;
     return result;
 }
 
@@ -423,6 +493,68 @@ void PatchMutatorEngine::syncHistoryUiProperties(juce::AudioProcessorValueTreeSt
     state.setProperty(MutatorState::kHistoryRList, joinLabels(rLabels), nullptr);
     state.setProperty(MutatorState::kSelectedM, m, nullptr);
     state.setProperty(MutatorState::kSelectedR, selectedRetryIndex_, nullptr);
+}
+
+void PatchMutatorEngine::forceExitCompare()
+{
+    auto& state = apvts_.state;
+    if (! readBoolProperty(state, MutatorState::kCompareActive, false))
+        return;
+
+    state.setProperty(MutatorState::kCompareActive, false, nullptr);
+    compareSavedM_ = -1;
+    compareSavedR_ = MutationHistoryStore::kRootOnly;
+}
+
+std::pair<int, int> PatchMutatorEngine::resolveSelectionAfterDelete(int rootIndex,
+                                                                    int retryIndex,
+                                                                    bool isRetryDelete)
+{
+    if (isRetryDelete)
+    {
+        const auto retries = historyStore_.getSortedRetryIndices(rootIndex);
+        for (int i = 0; i < retries.size(); ++i)
+        {
+            if (retries[i] != retryIndex)
+                continue;
+
+            if (i > 0)
+                return { rootIndex, retries[i - 1] };
+
+            return { rootIndex, MutationHistoryStore::kRootOnly };
+        }
+
+        return { rootIndex, MutationHistoryStore::kRootOnly };
+    }
+
+    const auto roots = historyStore_.getSortedRootIndices();
+    for (int i = 0; i < roots.size(); ++i)
+    {
+        if (roots[i] != rootIndex)
+            continue;
+
+        if (i > 0)
+            return { roots[i - 1], MutationHistoryStore::kRootOnly };
+
+        return { -1, MutationHistoryStore::kRootOnly };
+    }
+
+    return { -1, MutationHistoryStore::kRootOnly };
+}
+
+void PatchMutatorEngine::auditionAfterHistoryMutation()
+{
+    PatchModel buffer;
+
+    if (! historyStore_.isEmpty())
+        buffer = resolveAuditionBuffer();
+    else if (historyStore_.hasInitialSnapshot())
+        buffer = historyStore_.getInitialSnapshot();
+    else
+        buffer = *patchModel_;
+
+    if (std::memcmp(buffer.data(), patchModel_->data(), PatchModel::kBufferSize) != 0)
+        pushResultToEditorAndSynth(buffer);
 }
 
 void PatchMutatorEngine::applySelectionFromApvts()
