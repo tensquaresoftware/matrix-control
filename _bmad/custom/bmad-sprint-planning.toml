@@ -1,0 +1,11 @@
+# Team override for bmad-sprint-planning — readable epic sections in sprint-status.yaml.
+# Merges over .agents/skills/bmad-sprint-planning/customize.toml (persistent_facts append).
+
+[workflow]
+
+persistent_facts = [
+  "file:{project-root}/_bmad/custom/sprint-status-layout.md",
+  "When writing or regenerating sprint-status.yaml, apply the Matrix-Control layout in sprint-status-layout.md: blank line + `# Epic {id}: {title}` comment before each epic block (title from epics source headers).",
+  "Epic slug in keys may be numeric or alphabetic (e.g. epic-r, epic-u); comment id must match the epic header (Epic R, Epic U).",
+  "On refresh, preserve existing story statuses and action_items; only add or fix missing epic comment headers and blank-line separators.",
+]

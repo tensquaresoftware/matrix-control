@@ -4,11 +4,11 @@ project: All
 title: BMad Method — Development Cycle Quick Reference
 author: Guillaume DUPONT
 status: reference
-version: "1.2"
+version: "1.3"
 sources:
   - https://github.com/bmad-code-org/bmad-method
 created: 2026-06-17
-updated: 2026-06-19
+updated: 2026-06-23
 ---
 
 # BMad Method — Development Cycle Quick Reference
@@ -198,6 +198,23 @@ Push when the story is `done` (or when opening a PR). Use a **different LLM** fo
 
 Commit messages: follow the **project convention** (language, imperative, bullets — often documented in `project-context.md` or `CONVENTIONS.md`).
 
+### Sprint status layout (Matrix-Control)
+
+`_bmad-output/implementation-artifacts/sprint-status.yaml` groups each epic for readability:
+
+- one blank line before each epic block (except the first);
+- a YAML comment with the epic title from `planning-artifacts/epics.md`, e.g. `# Epic 7: Patch Manager & Action Dispatch`;
+- then `epic-{slug}:`, its stories, and `epic-{slug}-retrospective`.
+
+This layout is enforced by a **team workflow override** (BMad 6.9+):
+
+| File | Role |
+|------|------|
+| `_bmad/custom/bmad-sprint-planning.toml` | Injects layout rules into `/bmad-sprint-planning` via `persistent_facts`. |
+| `_bmad/custom/sprint-status-layout.md` | Full spec and example referenced by the override. |
+
+`/bmad-sprint-planning` is the only workflow that regenerates the whole file; other skills (`create-story`, `dev-story`, `quick-dev`, `code-review`) patch statuses and must preserve comments and structure. To customise further: `/bmad-customize` or edit the files above.
+
 ---
 
 ## When things drift
@@ -229,7 +246,7 @@ Commit messages: follow the **project convention** (language, imperative, bullet
 | **`planning_artifacts`** | Subfolder (often `_bmad-output/planning-artifacts/`): PRD, architecture, epics. |
 | **`implementation_artifacts`** | Subfolder (often `_bmad-output/implementation-artifacts/`): story files, specs, deferred-work. |
 | **`project-context.md`** | Project “constitution” for agents: stack, conventions, prohibitions. |
-| **`sprint-status.yaml`** | Sprint dashboard: status of each epic and story. |
+| **`sprint-status.yaml`** | Sprint dashboard: status of each epic and story. Layout convention: see *Sprint status layout* under *Story loop and Git*. |
 | **`baseline_commit`** | Reference commit at the start of a story’s dev — used for the CR diff. |
 
 ### Planning and breakdown
@@ -299,4 +316,4 @@ Full BMad vocabulary: [official docs](https://docs.bmad-method.org/llms.txt).
 
 ---
 
-*BMad Method quick reference — updated 2026-06-19*
+*BMad Method quick reference — updated 2026-06-23*
