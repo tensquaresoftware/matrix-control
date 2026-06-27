@@ -8,7 +8,7 @@ baseline_commit: 651d9c706dd72f0799e75d58d11f91e40ceee8ca
 sources:
   - planning-artifacts/sprint-change-proposal-2026-06-06.md
   - planning-artifacts/epics.md
-  - planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/architecture.md
+  - planning-artifacts/architecture/architecture-matrix-control-2026-05-25/architecture.md
   - implementation-artifacts/r-1-remove-plugin-audio-input-bus.md
   - project-context.md
 created: 2026-06-06

@@ -6,9 +6,9 @@ author: BMad Agent
 status: complete
 version: "1.0"
 sources:
-  - ../../prds/prd-Matrix-Control-2026-05-25/prd.md
-  - ../../prds/prd-Matrix-Control-2026-05-25/addendum.md
-  - ../../prds/prd-Matrix-Control-2026-05-25/.decision-log.md
+  - ../../prds/prd-matrix-control-2026-05-25/prd.md
+  - ../../prds/prd-matrix-control-2026-05-25/addendum.md
+  - ../../prds/prd-matrix-control-2026-05-25/.decision-log.md
   - ../../project-context.md
   - ../../../reference-docs/oberheim/index.md
 created: 2026-05-29
@@ -17,9 +17,9 @@ stepsCompleted: [1, 2, 3, 4, 5, 6, 7, 8]
 lastStep: 8
 completedAt: 2026-05-29
 inputDocuments:
-  - prd-Matrix-Control-2026-05-25/prd.md
-  - prd-Matrix-Control-2026-05-25/addendum.md
-  - prd-Matrix-Control-2026-05-25/.decision-log.md
+  - prd-matrix-control-2026-05-25/prd.md
+  - prd-matrix-control-2026-05-25/addendum.md
+  - prd-matrix-control-2026-05-25/.decision-log.md
   - project-context.md
   - reference-docs/oberheim/index.md
 workflowType: architecture

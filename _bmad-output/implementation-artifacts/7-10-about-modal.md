@@ -7,8 +7,8 @@ status: done
 baseline_commit: 384673a4bfae0f11b401acaa28428f7ea2d650db
 sources:
   - planning-artifacts/epics.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/prd.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/.decision-log.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/prd.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/.decision-log.md
   - implementation-artifacts/7-7-settings-page-consolidation.md
   - implementation-artifacts/manual-uat-epic2-midi-audio-hardware.md
   - project-context.md
@@ -54,7 +54,7 @@ so that I can see product version, authorship, and links without hunting in the 
    • Organization : Ten Square Software
    • Author : Guillaume DUPONT
    • Email : tensquaresoftware@gmail.com
-   • GitHub : github.com/tensquaresoftware/Matrix-Control
+   • GitHub : github.com/tensquaresoftware/matrix-control
    • LinkedIn : in/guillaumedupontmontpellier/
    • Version : <version string>
    • Release date : <YYYY-MM-DD>

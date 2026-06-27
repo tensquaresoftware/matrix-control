@@ -1,6 +1,6 @@
 # Input Reconciliation — Product Brief v0.3
 
-**Source:** `../../briefs/brief-Matrix-Control-2026-05-22/brief.md`
+**Source:** `../../briefs/brief-matrix-control-2026-05-22/brief.md`
 
 ## Summary
 

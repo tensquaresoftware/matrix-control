@@ -32,7 +32,7 @@ You do not need to write code to contribute. Here are several ways you can help:
 
 ## Reporting Bugs
 
-Before opening a bug report, please check the [existing issues](https://github.com/tensquaresoftware/Matrix-Control/issues) to avoid duplicates.
+Before opening a bug report, please check the [existing issues](https://github.com/tensquaresoftware/matrix-control/issues) to avoid duplicates.
 
 When filing a bug, please include:
 
@@ -49,7 +49,7 @@ Use the **Bug Report** issue template when available.
 
 ## Suggesting Features
 
-Feature suggestions are welcome via [GitHub Issues](https://github.com/tensquaresoftware/Matrix-Control/issues) using the **Feature Request** template.
+Feature suggestions are welcome via [GitHub Issues](https://github.com/tensquaresoftware/matrix-control/issues) using the **Feature Request** template.
 
 Please describe:
 

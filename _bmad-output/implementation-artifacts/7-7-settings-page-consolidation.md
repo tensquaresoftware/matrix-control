@@ -7,8 +7,8 @@ status: done
 baseline_commit: 114bd7c979ca7e967ea8262cf20f37922ad5eae1
 sources:
   - planning-artifacts/epics.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/prd.md
-  - planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/architecture.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/prd.md
+  - planning-artifacts/architecture/architecture-matrix-control-2026-05-25/architecture.md
   - implementation-artifacts/r-2-hardware-latency-gui.md
   - implementation-artifacts/deferred-work.md
   - project-context.md

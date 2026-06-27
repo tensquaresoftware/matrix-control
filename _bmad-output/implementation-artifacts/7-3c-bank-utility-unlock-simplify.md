@@ -8,8 +8,8 @@ baseline_commit: uncommitted (post-7-3b investigation WIP)
 sources:
   - planning-artifacts/sprint-change-proposal-2026-06-19-bank-unlock-simplify.md
   - planning-artifacts/epics.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/prd.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/.decision-log.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/prd.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/.decision-log.md
   - Documentation/Development/Plans/2026/06/2026-06-19-Correct-Course-Bank-Utility-Unlock-Simplify-Handoff.md
   - implementation-artifacts/7-3b-bank-utility-unlock-semantics-and-id-rename.md
   - implementation-artifacts/investigations/next-patch-after-unlock-missing-set-bank-investigation.md

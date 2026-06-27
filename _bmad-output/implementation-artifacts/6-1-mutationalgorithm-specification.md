@@ -7,11 +7,11 @@ status: done
 baseline_commit: 3b9d4c5
 sources:
   - planning-artifacts/epics.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/prd.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/addendum.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/.decision-log.md
-  - planning-artifacts/briefs/brief-Matrix-Control-2026-05-22/vision-input-fr.md
-  - planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/architecture.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/prd.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/addendum.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/.decision-log.md
+  - planning-artifacts/briefs/brief-matrix-control-2026-05-22/vision-input-fr.md
+  - planning-artifacts/architecture/architecture-matrix-control-2026-05-25/architecture.md
   - implementation-artifacts/7-4-mutatoractionhandler.md
   - project-context.md
 created: 2026-06-19
@@ -32,7 +32,7 @@ so that MUTATE/RETRY implementation has a testable spec (PRD §9 #7, AD-6).
 
 ## Acceptance Criteria
 
-1. **Given** FR-30–FR-34 and FR-54–FR-60 **When** the spec is written **Then** a standalone document exists at `_bmad-output/planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/mutation-algorithm-spec.md` with normative rules (MUST/SHOULD/MAY) — not prose-only intent.
+1. **Given** FR-30–FR-34 and FR-54–FR-60 **When** the spec is written **Then** a standalone document exists at `_bmad-output/planning-artifacts/architecture/architecture-matrix-control-2026-05-25/mutation-algorithm-spec.md` with normative rules (MUST/SHOULD/MAY) — not prose-only intent.
 
 2. **And** the spec defines **recipe inputs** read from APVTS at mutation time:
    - `patchMutatorAmount` — int 0–100 (%), default 0
@@ -198,7 +198,7 @@ Engine passes auditioned buffer (MUTATE) or `parentSnapshot` (RETRY) — algorit
 
 ### Normative rules — approved spec (v1.0.1)
 
-The authoritative normative document is [`mutation-algorithm-spec.md`](../planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/mutation-algorithm-spec.md) (status: **approved**, Option A, owner sign-off 2026-06-19). Story 6.4 MUST implement that file — not the historical draft notes below this section if any remain from story creation.
+The authoritative normative document is [`mutation-algorithm-spec.md`](../planning-artifacts/architecture/architecture-matrix-control-2026-05-25/mutation-algorithm-spec.md) (status: **approved**, Option A, owner sign-off 2026-06-19). Story 6.4 MUST implement that file — not the historical draft notes below this section if any remain from story creation.
 
 Key decisions (for quick reference only):
 
@@ -218,7 +218,7 @@ Key decisions (for quick reference only):
 ### File structure (this story)
 
 ```
-_bmad-output/planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/
+_bmad-output/planning-artifacts/architecture/architecture-matrix-control-2026-05-25/
 ├── architecture.md                    (UPDATE — AD-6 link, resolve open item)
 └── mutation-algorithm-spec.md         (NEW — primary deliverable)
 
@@ -294,7 +294,7 @@ Claude (Auto / Cursor Agent)
 
 ### Completion Notes List
 
-- Created normative spec at `_bmad-output/planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/mutation-algorithm-spec.md` with MUST/SHOULD/MAY rules for recipe inputs, Amount/Random curves, module toggle mask, excluded fields, Matrix Mod bytes 104–133, RNG policy, and Story 6.4 interface contract.
+- Created normative spec at `_bmad-output/planning-artifacts/architecture/architecture-matrix-control-2026-05-25/mutation-algorithm-spec.md` with MUST/SHOULD/MAY rules for recipe inputs, Amount/Random curves, module toggle mask, excluded fields, Matrix Mod bytes 104–133, RNG policy, and Story 6.4 interface contract.
 - Four golden test vectors (GV-01–GV-04) in spec Appendix A; input buffer grounded in `InitDefaults` / `PatchInit.syx`.
 - Updated `architecture.md`: AD-6 cross-reference, open item #1 struck through, gap analysis updated.
 - Owner sign-off 2026-06-19: **Option A** (Matrix Mod always mutates when A>0,R>0); golden vectors accepted; spec approved. Story 6.4 gate cleared.
@@ -309,8 +309,8 @@ Claude (Auto / Cursor Agent)
 
 ### File List
 
-- `_bmad-output/planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/mutation-algorithm-spec.md` (NEW)
-- `_bmad-output/planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/architecture.md` (UPDATED)
+- `_bmad-output/planning-artifacts/architecture/architecture-matrix-control-2026-05-25/mutation-algorithm-spec.md` (NEW)
+- `_bmad-output/planning-artifacts/architecture/architecture-matrix-control-2026-05-25/architecture.md` (UPDATED)
 - `_bmad-output/implementation-artifacts/6-1-mutationalgorithm-specification.md` (UPDATED)
 - `_bmad-output/implementation-artifacts/sprint-status.yaml` (UPDATED)
 

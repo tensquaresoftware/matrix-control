@@ -7,9 +7,9 @@ status: review
 baseline_commit: 044ad3f2237e6bf61b6644e88ece2259c6647aaa
 sources:
   - planning-artifacts/epics.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/prd.md
-  - planning-artifacts/briefs/brief-Matrix-Control-2026-05-22/brief.md
-  - planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/architecture.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/prd.md
+  - planning-artifacts/briefs/brief-matrix-control-2026-05-22/brief.md
+  - planning-artifacts/architecture/architecture-matrix-control-2026-05-25/architecture.md
   - reference-docs/oberheim/oberheim-matrix-6-6r-midi-sysex-implementation.md
   - reference-docs/oberheim/oberheim-matrix-1000-midi-sysex-implementation.md
   - Source/Shared/Definitions/Matrix1000Limits.h

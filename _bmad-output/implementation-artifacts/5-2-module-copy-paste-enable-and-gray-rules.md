@@ -7,10 +7,10 @@ status: done
 baseline_commit: 53f70a236e63c57ddc0bb18d0ca44c6e9d8cb5d1
 sources:
   - planning-artifacts/epics.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/prd.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/addendum.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/.decision-log.md
-  - planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/architecture.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/prd.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/addendum.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/.decision-log.md
+  - planning-artifacts/architecture/architecture-matrix-control-2026-05-25/architecture.md
   - planning-artifacts/sprint-change-proposal-2026-06-18.md
   - implementation-artifacts/5-1-clipboardservice-compatibility-matrix.md
   - project-context.md
@@ -293,9 +293,9 @@ Register: `static ClipboardPasteEnabledResolverTests clipboardPasteEnabledResolv
 ### References
 
 - [Source: `_bmad-output/planning-artifacts/epics.md` § Story 5.2]
-- [Source: `_bmad-output/planning-artifacts/prds/prd-Matrix-Control-2026-05-25/prd.md` FR-35, FR-45]
-- [Source: `_bmad-output/planning-artifacts/prds/prd-Matrix-Control-2026-05-25/addendum.md` § Clipboard compatibility matrix]
-- [Source: `_bmad-output/planning-artifacts/prds/prd-Matrix-Control-2026-05-25/.decision-log.md` D-033, D-060, D-095]
+- [Source: `_bmad-output/planning-artifacts/prds/prd-matrix-control-2026-05-25/prd.md` FR-35, FR-45]
+- [Source: `_bmad-output/planning-artifacts/prds/prd-matrix-control-2026-05-25/addendum.md` § Clipboard compatibility matrix]
+- [Source: `_bmad-output/planning-artifacts/prds/prd-matrix-control-2026-05-25/.decision-log.md` D-033, D-060, D-095]
 - [Source: `_bmad-output/planning-artifacts/sprint-change-proposal-2026-06-18.md` § Implementation sequence]
 - [Source: `implementation-artifacts/5-1-clipboardservice-compatibility-matrix.md`]
 - [Source: `Source/Core/Services/ClipboardService.h` — query API]

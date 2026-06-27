@@ -7,11 +7,11 @@ status: done
 baseline_commit: 3b9d4c5
 sources:
   - planning-artifacts/epics.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/prd.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/addendum.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/.decision-log.md
-  - planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/architecture.md
-  - planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/mutation-algorithm-spec.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/prd.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/addendum.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/.decision-log.md
+  - planning-artifacts/architecture/architecture-matrix-control-2026-05-25/architecture.md
+  - planning-artifacts/architecture/architecture-matrix-control-2026-05-25/mutation-algorithm-spec.md
   - implementation-artifacts/6-1-mutationalgorithm-specification.md
   - implementation-artifacts/7-4-mutatoractionhandler.md
   - project-context.md
@@ -155,7 +155,7 @@ so that MUTATE/RETRY semantics have a Core backing (FR-54 foundation, FR-55, FR-
 
 ### Normative data model (addendum + D-083)
 
-Per [addendum.md § Patch Mutator — Data model](../planning-artifacts/prds/prd-Matrix-Control-2026-05-25/addendum.md):
+Per [addendum.md § Patch Mutator — Data model](../planning-artifacts/prds/prd-matrix-control-2026-05-25/addendum.md):
 
 | Field | Purpose |
 |---|---|

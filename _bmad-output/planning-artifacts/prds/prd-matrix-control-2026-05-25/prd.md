@@ -6,7 +6,7 @@ author: BMad Agent
 status: final
 version: "1.1"
 sources:
-  - ../../briefs/brief-Matrix-Control-2026-05-22/brief.md
+  - ../../briefs/brief-matrix-control-2026-05-22/brief.md
   - .decision-log.md
   - addendum.md
   - ../../reference-docs/oberheim/index.md

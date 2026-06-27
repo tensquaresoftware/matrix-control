@@ -7,9 +7,9 @@ status: done
 baseline_commit: b88c870
 sources:
   - planning-artifacts/epics.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/prd.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/.decision-log.md
-  - planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/architecture.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/prd.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/.decision-log.md
+  - planning-artifacts/architecture/architecture-matrix-control-2026-05-25/architecture.md
   - implementation-artifacts/2-3-instrument-path-and-editor-path-producers.md
   - implementation-artifacts/2-6-matrix-mod-bus-parameter-sysex.md
   - project-context.md

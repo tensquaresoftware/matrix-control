@@ -7,10 +7,10 @@ status: done
 baseline_commit: d933ea3
 sources:
   - planning-artifacts/epics.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/prd.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/addendum.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/.decision-log.md
-  - planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/architecture.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/prd.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/addendum.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/.decision-log.md
+  - planning-artifacts/architecture/architecture-matrix-control-2026-05-25/architecture.md
   - implementation-artifacts/6-2-mutationhistorystore-two-level-mr.md
   - implementation-artifacts/6-4-mutate-action.md
   - implementation-artifacts/6-5-retry-from-parent-snapshot.md

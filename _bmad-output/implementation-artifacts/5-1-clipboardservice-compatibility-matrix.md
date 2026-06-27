@@ -7,10 +7,10 @@ status: done
 baseline_commit: 20afdb136e63c57ddc0bb18d0ca44c6e9d8cb5d1
 sources:
   - planning-artifacts/epics.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/prd.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/addendum.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/.decision-log.md
-  - planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/architecture.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/prd.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/addendum.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/.decision-log.md
+  - planning-artifacts/architecture/architecture-matrix-control-2026-05-25/architecture.md
   - planning-artifacts/sprint-change-proposal-2026-06-18.md
   - implementation-artifacts/3-3-matrix-mod-init-defaults.md
   - implementation-artifacts/3-4-master-module-init-confirmation-path.md
@@ -302,9 +302,9 @@ Recent commits confirm Epic 3 closure and Core service patterns:
 ### References
 
 - [Source: `_bmad-output/planning-artifacts/epics.md` § Epic 5, Story 5.1]
-- [Source: `_bmad-output/planning-artifacts/prds/prd-Matrix-Control-2026-05-25/addendum.md` § Clipboard compatibility matrix]
-- [Source: `_bmad-output/planning-artifacts/prds/prd-Matrix-Control-2026-05-25/.decision-log.md` D-033, D-060, D-095]
-- [Source: `_bmad-output/planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/architecture.md` § ClipboardService, AD-8, E5 mapping]
+- [Source: `_bmad-output/planning-artifacts/prds/prd-matrix-control-2026-05-25/addendum.md` § Clipboard compatibility matrix]
+- [Source: `_bmad-output/planning-artifacts/prds/prd-matrix-control-2026-05-25/.decision-log.md` D-033, D-060, D-095]
+- [Source: `_bmad-output/planning-artifacts/architecture/architecture-matrix-control-2026-05-25/architecture.md` § ClipboardService, AD-8, E5 mapping]
 - [Source: `Source/Shared/Definitions/PluginDescriptorsPatchEdit.cpp` — DCO/ENV/LFO module descriptor tables]
 - [Source: `Source/Core/Init/MatrixModInitService.cpp` — descriptor-driven model mutation pattern]
 - [Source: `Tests/Unit/MatrixModInitServiceTests.cpp` — PatchModel byte assertion harness]

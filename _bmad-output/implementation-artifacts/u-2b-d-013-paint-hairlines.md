@@ -9,7 +9,7 @@ parent_story: u-2-transversal-widgets-scale-audit
 sources:
   - planning-artifacts/epic-ui-scale-audit-pixel-perfect-layout.md
   - implementation-artifacts/u-2-transversal-widgets-scale-audit.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/.decision-log.md (D-013)
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/.decision-log.md (D-013)
   - Source/GUI/Layout/ScaledDrawing.h
   - CONVENTIONS.md
 created: 2026-06-10

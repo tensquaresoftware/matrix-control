@@ -7,8 +7,8 @@ status: done
 baseline_commit: 2e21abf
 sources:
   - planning-artifacts/epics.md
-  - planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/architecture.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/addendum.md
+  - planning-artifacts/architecture/architecture-matrix-control-2026-05-25/architecture.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/addendum.md
   - implementation-artifacts/2-4-apvts-patch-parameter-to-sysex-0x06.md
   - implementation-artifacts/2-5-apvts-master-parameter-to-full-master-sysex-0x03.md
   - _bmad-output/reference-docs/oberheim/oberheim-matrix-1000-midi-sysex-implementation.md

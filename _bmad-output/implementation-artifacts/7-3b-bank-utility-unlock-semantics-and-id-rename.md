@@ -8,8 +8,8 @@ baseline_commit: uncommitted (Story 7.3 branch work)
 sources:
   - planning-artifacts/epics.md
   - planning-artifacts/sprint-change-proposal-2026-06-19.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/prd.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/.decision-log.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/prd.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/.decision-log.md
   - Documentation/Development/Plans/2026/06/2026-06-18-Correct-Course-Bank-Utility-UNLOCK-Handoff.md
   - implementation-artifacts/7-3-patchmanageractionhandler-bank-and-internal.md
   - project-context.md

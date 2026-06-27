@@ -7,10 +7,10 @@ status: done
 baseline_commit: 164d029
 sources:
   - planning-artifacts/epics.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/prd.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/addendum.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/.decision-log.md
-  - planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/architecture.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/prd.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/addendum.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/.decision-log.md
+  - planning-artifacts/architecture/architecture-matrix-control-2026-05-25/architecture.md
   - implementation-artifacts/3-1-initdefaults-hardcoded-buffers.md
   - implementation-artifacts/7-7-settings-page-consolidation.md
   - project-context.md
@@ -275,10 +275,10 @@ Recent commits are documentation/tooling (quality principles, BMad docs, U-11). 
 ### References
 
 - [Source: _bmad-output/planning-artifacts/epics.md#Story-3.2]
-- [Source: _bmad-output/planning-artifacts/prds/prd-Matrix-Control-2026-05-25/prd.md#FR-36, FR-37, FR-3, FR-40, FR-44]
-- [Source: _bmad-output/planning-artifacts/prds/prd-Matrix-Control-2026-05-25/addendum.md#INIT-policy]
-- [Source: _bmad-output/planning-artifacts/prds/prd-Matrix-Control-2026-05-25/.decision-log.md#D-034, D-034a, D-040, D-058]
-- [Source: _bmad-output/planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/architecture.md#AD-2, E3]
+- [Source: _bmad-output/planning-artifacts/prds/prd-matrix-control-2026-05-25/prd.md#FR-36, FR-37, FR-3, FR-40, FR-44]
+- [Source: _bmad-output/planning-artifacts/prds/prd-matrix-control-2026-05-25/addendum.md#INIT-policy]
+- [Source: _bmad-output/planning-artifacts/prds/prd-matrix-control-2026-05-25/.decision-log.md#D-034, D-034a, D-040, D-058]
+- [Source: _bmad-output/planning-artifacts/architecture/architecture-matrix-control-2026-05-25/architecture.md#AD-2, E3]
 - [Source: Source/Core/Init/InitDefaults.h]
 - [Source: Source/Core/Models/PatchModel.h, MasterModel.h]
 - [Source: Source/Core/MIDI/SysEx/SysExDecoder.h, SysExConstants.h]

@@ -11,7 +11,7 @@ related_stories:
   - 2-10-matrix-mod-bus-reorder-sysex
 sources:
   - planning-artifacts/epic-ui-scale-audit-pixel-perfect-layout.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/addendum.md (D-073, FR-50)
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/addendum.md (D-073, FR-50)
   - planning-artifacts/epics.md (UX-DR5)
   - Source/GUI/Widgets/ModulationBusCell.cpp
   - Source/GUI/Panels/MainComponent/BodyPanel/SharedPanel/MatrixModulationPanel/MatrixModulationPanel.cpp

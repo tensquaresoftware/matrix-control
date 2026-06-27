@@ -7,9 +7,9 @@ status: done
 baseline_commit: 837e423 (HEAD) + uncommitted Epic 2 work (2.8 ActivityLed/MidiActivityTracker in working tree)
 sources:
   - planning-artifacts/epics.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/prd.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/.decision-log.md
-  - planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/architecture.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/prd.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/.decision-log.md
+  - planning-artifacts/architecture/architecture-matrix-control-2026-05-25/architecture.md
   - implementation-artifacts/2-7-audio-passthrough-and-peak-indicator.md
   - implementation-artifacts/2-8-activity-leds-on-queue-traffic.md
   - implementation-artifacts/2-9b-header-routing-controls-uat-slice.md

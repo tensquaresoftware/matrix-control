@@ -7,12 +7,12 @@ status: ready
 version: "1.1"
 sources:
   - planning-artifacts/epics.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/prd.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/.decision-log.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/addendum.md
-  - planning-artifacts/briefs/brief-Matrix-Control-2026-05-22/brief.md
-  - planning-artifacts/briefs/brief-Matrix-Control-2026-05-22/brownfield-inventory-for-prd.md
-  - planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/architecture.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/prd.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/.decision-log.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/addendum.md
+  - planning-artifacts/briefs/brief-matrix-control-2026-05-22/brief.md
+  - planning-artifacts/briefs/brief-matrix-control-2026-05-22/brownfield-inventory-for-prd.md
+  - planning-artifacts/architecture/architecture-matrix-control-2026-05-25/architecture.md
   - project-context.md
   - implementation-artifacts/2-11-header-panel-layout-and-widget-styling.md
   - brainstorming/brainstorming-session-2026-06-07-ui-dimensions-strategy.md

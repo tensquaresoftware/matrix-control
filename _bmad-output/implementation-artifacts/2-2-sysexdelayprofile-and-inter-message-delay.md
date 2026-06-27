@@ -7,9 +7,9 @@ status: done
 baseline_commit: 8b0cfb1021750fbce88af158318b57a59443822b
 sources:
   - planning-artifacts/epics.md
-  - planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/architecture.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/addendum.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/.decision-log.md
+  - planning-artifacts/architecture/architecture-matrix-control-2026-05-25/architecture.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/addendum.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/.decision-log.md
   - implementation-artifacts/2-1-midioutboundqueue-core.md
   - reference-docs/oberheim/index.md
 created: 2026-06-04

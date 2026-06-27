@@ -7,9 +7,9 @@ status: done
 baseline_commit: 48a0456
 sources:
   - planning-artifacts/epics.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/prd.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/addendum.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/.decision-log.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/prd.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/addendum.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/.decision-log.md
   - implementation-artifacts/4-5-import-name-reconciliation.md
   - implementation-artifacts/4-2-combobox-sentinel-states.md
   - project-context.md
@@ -281,9 +281,9 @@ Sort-order fixture names from `PatchFileServiceTests::scan_sortOrder_patchFixtur
 ### References
 
 - [Source: `_bmad-output/planning-artifacts/epics.md` — Epic 4 Story 4.6, FR-52]
-- [Source: `_bmad-output/planning-artifacts/prds/prd-Matrix-Control-2026-05-25/prd.md` — FR-52]
-- [Source: `_bmad-output/planning-artifacts/prds/prd-Matrix-Control-2026-05-25/addendum.md` — D-075]
-- [Source: `_bmad-output/planning-artifacts/prds/prd-Matrix-Control-2026-05-25/.decision-log.md` — D-075 rationale]
+- [Source: `_bmad-output/planning-artifacts/prds/prd-matrix-control-2026-05-25/prd.md` — FR-52]
+- [Source: `_bmad-output/planning-artifacts/prds/prd-matrix-control-2026-05-25/addendum.md` — D-075]
+- [Source: `_bmad-output/planning-artifacts/prds/prd-matrix-control-2026-05-25/.decision-log.md` — D-075 rationale]
 - [Source: `implementation-artifacts/4-5-import-name-reconciliation.md` — load pipeline, prev/next deferred]
 - [Source: `implementation-artifacts/4-2-combobox-sentinel-states.md` — button disable, 1-based ids]
 - [Source: `Source/Core/Actions/PatchManagerActionHandler.cpp:159-163` — stub to replace]

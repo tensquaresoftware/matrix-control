@@ -8,7 +8,7 @@ sources:
   - Documentation/Development/Plans/2026/06/2026-06-19-Correct-Course-Bank-Utility-Unlock-Simplify-Handoff.md
   - implementation-artifacts/investigations/next-patch-after-unlock-missing-set-bank-investigation.md
   - planning-artifacts/sprint-change-proposal-2026-06-19.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/prd.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/prd.md
   - planning-artifacts/epics.md
 created: 2026-06-19
 updated: 2026-06-19

@@ -7,11 +7,11 @@ status: review
 baseline_commit: 494bb5e2e63c57ddc0bb18d0ca44c6e9d8cb5d1
 sources:
   - planning-artifacts/epics.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/prd.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/addendum.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/.decision-log.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/prd.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/addendum.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/.decision-log.md
   - planning-artifacts/sprint-change-proposal-2026-06-18.md
-  - planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/architecture.md
+  - planning-artifacts/architecture/architecture-matrix-control-2026-05-25/architecture.md
   - implementation-artifacts/5-1-clipboardservice-compatibility-matrix.md
   - implementation-artifacts/5-2-module-copy-paste-enable-and-gray-rules.md
   - project-context.md
@@ -299,7 +299,7 @@ Per NFR-1 and architecture AD-8:
 ### References
 
 - [Source: `_bmad-output/planning-artifacts/epics.md` § Story 5.3]
-- [Source: `_bmad-output/planning-artifacts/prds/prd-Matrix-Control-2026-05-25/.decision-log.md` D-033, D-095]
+- [Source: `_bmad-output/planning-artifacts/prds/prd-matrix-control-2026-05-25/.decision-log.md` D-033, D-095]
 - [Source: `_bmad-output/planning-artifacts/sprint-change-proposal-2026-06-18.md` §4.7]
 - [Source: `implementation-artifacts/5-2-module-copy-paste-enable-and-gray-rules.md`]
 - [Source: `Source/GUI/Widgets/ModuleHeader.cpp` — I/C/P layout + PasteEnabledPropertyListener]

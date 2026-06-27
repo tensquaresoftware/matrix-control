@@ -7,10 +7,10 @@ status: review
 baseline_commit: 95ec511
 sources:
   - planning-artifacts/epics.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/prd.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/addendum.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/.decision-log.md
-  - planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/architecture.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/prd.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/addendum.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/.decision-log.md
+  - planning-artifacts/architecture/architecture-matrix-control-2026-05-25/architecture.md
   - implementation-artifacts/3-1-initdefaults-hardcoded-buffers.md
   - implementation-artifacts/3-2-inittemplateloader-for-patchinit-and-masterinit.md
   - implementation-artifacts/3-3-matrix-mod-init-defaults.md
@@ -375,8 +375,8 @@ No conflicting master init work in flight.
 ### References
 
 - [Source: _bmad-output/planning-artifacts/epics.md#Story-3.4]
-- [Source: _bmad-output/planning-artifacts/prds/prd-Matrix-Control-2026-05-25/prd.md#FR-17, FR-38]
-- [Source: _bmad-output/planning-artifacts/prds/prd-Matrix-Control-2026-05-25/.decision-log.md#D-039, D-034, D-035]
+- [Source: _bmad-output/planning-artifacts/prds/prd-matrix-control-2026-05-25/prd.md#FR-17, FR-38]
+- [Source: _bmad-output/planning-artifacts/prds/prd-matrix-control-2026-05-25/.decision-log.md#D-039, D-034, D-035]
 - [Source: _bmad-output/planning-artifacts/architecture/.../architecture.md#modal policy, AD-4]
 - [Source: implementation-artifacts/3-2-inittemplateloader-for-patchinit-and-masterinit.md]
 - [Source: implementation-artifacts/3-3-matrix-mod-init-defaults.md]

@@ -7,10 +7,10 @@ status: done
 baseline_commit: a1547e6
 sources:
   - planning-artifacts/epics.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/prd.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/addendum.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/.decision-log.md
-  - planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/architecture.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/prd.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/addendum.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/.decision-log.md
+  - planning-artifacts/architecture/architecture-matrix-control-2026-05-25/architecture.md
   - implementation-artifacts/3-4-master-module-init-confirmation-path.md
   - implementation-artifacts/5-1-clipboardservice-compatibility-matrix.md
   - implementation-artifacts/7-3-patchmanageractionhandler-bank-and-internal.md
@@ -329,10 +329,10 @@ Recent work focused on **ActionDispatcher** and **PatchManagerActionHandler** ba
 ### References
 
 - [Source: `_bmad-output/planning-artifacts/epics.md` — Epic 4 Story 4.1]
-- [Source: `_bmad-output/planning-artifacts/prds/prd-Matrix-Control-2026-05-25/prd.md` — FR-25]
-- [Source: `_bmad-output/planning-artifacts/prds/prd-Matrix-Control-2026-05-25/addendum.md` — § Computer Patches combobox states (D-024)]
-- [Source: `_bmad-output/planning-artifacts/prds/prd-Matrix-Control-2026-05-25/.decision-log.md` — D-024, D-034a, D-058]
-- [Source: `_bmad-output/planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/architecture.md` — AD-2 PatchFileService, E4 mapping]
+- [Source: `_bmad-output/planning-artifacts/prds/prd-matrix-control-2026-05-25/prd.md` — FR-25]
+- [Source: `_bmad-output/planning-artifacts/prds/prd-matrix-control-2026-05-25/addendum.md` — § Computer Patches combobox states (D-024)]
+- [Source: `_bmad-output/planning-artifacts/prds/prd-matrix-control-2026-05-25/.decision-log.md` — D-024, D-034a, D-058]
+- [Source: `_bmad-output/planning-artifacts/architecture/architecture-matrix-control-2026-05-25/architecture.md` — AD-2 PatchFileService, E4 mapping]
 - [Source: `Source/Core/MIDI/SysEx/SysExDecoder.h` — validatePatchSysExMessage]
 - [Source: `Source/Core/Actions/PatchManagerActionHandler.cpp:80-88` — Epic 4 stub]
 - [Source: `Source/GUI/Panels/.../ComputerPatchesPanel.cpp:202-218` — hardcoded combobox placeholder]

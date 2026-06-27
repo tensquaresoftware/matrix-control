@@ -114,7 +114,7 @@ Epic 7 can still be completed as planned; scope adjustment is **corrective**, no
 
 ### 4.1 Decision log — add D-022-R1/R2/R3; supersede D-022
 
-**File:** `_bmad-output/planning-artifacts/prds/prd-Matrix-Control-2026-05-25/.decision-log.md`
+**File:** `_bmad-output/planning-artifacts/prds/prd-matrix-control-2026-05-25/.decision-log.md`
 
 **ADD after D-022:**
 
@@ -156,7 +156,7 @@ Epic 7 can still be completed as planned; scope adjustment is **corrective**, no
 
 ### 4.2 PRD — §4.6 and FR-20
 
-**File:** `_bmad-output/planning-artifacts/prds/prd-Matrix-Control-2026-05-25/prd.md`
+**File:** `_bmad-output/planning-artifacts/prds/prd-matrix-control-2026-05-25/prd.md`
 
 **§4.6 Description — OLD:**
 > Banks 0–9 selection and BANK LOCK aligned with Matrix-1000 front-panel semantics (replaces legacy UNLOCK).

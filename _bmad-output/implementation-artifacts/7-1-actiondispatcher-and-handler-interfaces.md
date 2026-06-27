@@ -7,9 +7,9 @@ status: review
 baseline_commit: aa72810660c0561cdbfc65ed3ba8cbc06c9ba22f
 sources:
   - planning-artifacts/epics.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/prd.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/.decision-log.md
-  - planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/architecture.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/prd.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/.decision-log.md
+  - planning-artifacts/architecture/architecture-matrix-control-2026-05-25/architecture.md
   - planning-artifacts/sprint-change-proposal-2026-06-18.md
   - implementation-artifacts/5-2-module-copy-paste-enable-and-gray-rules.md
   - implementation-artifacts/5-3-matrix-modulation-section-i-c-p-gui.md

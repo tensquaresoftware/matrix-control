@@ -1,11 +1,11 @@
 # Matrix-Control
 
-![Matrix-Control GUI](https://raw.githubusercontent.com/tensquaresoftware/Matrix-Control/main/Assets/Screenshots/Matrix-Control-GUI-WIP.png)
+![Matrix-Control GUI](https://raw.githubusercontent.com/tensquaresoftware/matrix-control/main/Assets/Screenshots/Matrix-Control-GUI-WIP.png)
 
-[![Status: Work in Progress](https://img.shields.io/badge/Status-Work%20in%20Progress-FFA500?style=for-the-badge)](https://github.com/tensquaresoftware/Matrix-Control)
-[![Language: C++](https://img.shields.io/badge/Language-C%2B%2B-00599C?style=for-the-badge&logo=c%2B%2B&logoColor=white)](https://github.com/tensquaresoftware/Matrix-Control)
+[![Status: Work in Progress](https://img.shields.io/badge/Status-Work%20in%20Progress-FFA500?style=for-the-badge)](https://github.com/tensquaresoftware/matrix-control)
+[![Language: C++](https://img.shields.io/badge/Language-C%2B%2B-00599C?style=for-the-badge&logo=c%2B%2B&logoColor=white)](https://github.com/tensquaresoftware/matrix-control)
 [![Framework: JUCE 8](https://img.shields.io/badge/Framework-JUCE%208-5765A4?style=for-the-badge)](https://juce.com)
-[![Formats: AU / VST3 / Standalone](https://img.shields.io/badge/Formats-AU%20%7C%20VST3%20%7C%20Standalone-2E86AB?style=for-the-badge)](https://github.com/tensquaresoftware/Matrix-Control)
+[![Formats: AU / VST3 / Standalone](https://img.shields.io/badge/Formats-AU%20%7C%20VST3%20%7C%20Standalone-2E86AB?style=for-the-badge)](https://github.com/tensquaresoftware/matrix-control)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 [![Sponsor](https://img.shields.io/badge/Sponsor-Ten%20Square%20Software-ff69b4?style=for-the-badge&logo=github-sponsors&logoColor=white)](https://github.com/sponsors/tensquaresoftware)
 

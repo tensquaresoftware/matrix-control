@@ -8,8 +8,8 @@ baseline_commit: f851b78
 sources:
   - planning-artifacts/sprint-change-proposal-2026-06-06.md
   - planning-artifacts/epics.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/prd.md
-  - planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/architecture.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/prd.md
+  - planning-artifacts/architecture/architecture-matrix-control-2026-05-25/architecture.md
   - implementation-artifacts/r-2-hardware-latency-gui.md
   - implementation-artifacts/r-1-remove-plugin-audio-input-bus.md
   - project-context.md

@@ -7,7 +7,7 @@ status: done
 baseline_commit: 8b0cfb1021750fbce88af158318b57a59443822b
 sources:
   - planning-artifacts/epics.md
-  - planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/architecture.md
+  - planning-artifacts/architecture/architecture-matrix-control-2026-05-25/architecture.md
   - implementation-artifacts/1-5-patch-name-bytes-0-7-sync.md
 created: 2026-06-04
 ---

@@ -7,10 +7,10 @@ status: done
 baseline_commit: a1e1bbc
 sources:
   - planning-artifacts/epics.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/prd.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/addendum.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/.decision-log.md
-  - planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/architecture.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/prd.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/addendum.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/.decision-log.md
+  - planning-artifacts/architecture/architecture-matrix-control-2026-05-25/architecture.md
   - reference-docs/oberheim/oberheim-matrix-1000-midi-sysex-implementation.md
   - implementation-artifacts/7-1-actiondispatcher-and-handler-interfaces.md
   - implementation-artifacts/7-2-moduleactionhandler-i-c-p-and-matrix-mod-init.md

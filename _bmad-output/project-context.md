@@ -5,9 +5,9 @@ title: Project Context
 author: BMad Agent
 version: "1.3"
 sources:
-  - planning-artifacts/briefs/brief-Matrix-Control-2026-05-22/brief.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/prd.md
-  - planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/architecture.md
+  - planning-artifacts/briefs/brief-matrix-control-2026-05-22/brief.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/prd.md
+  - planning-artifacts/architecture/architecture-matrix-control-2026-05-25/architecture.md
   - reference-docs/oberheim/index.md
   - CONVENTIONS.md
 created: 2026-05-23

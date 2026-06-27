@@ -7,7 +7,7 @@ status: done
 baseline_commit: 9202ad248bcc4969fb1e7bcc9933c63bcc2d3a02
 sources:
   - planning-artifacts/epics.md
-  - planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/architecture.md
+  - planning-artifacts/architecture/architecture-matrix-control-2026-05-25/architecture.md
   - implementation-artifacts/2-1-midioutboundqueue-core.md
   - implementation-artifacts/2-3-instrument-path-and-editor-path-producers.md
   - implementation-artifacts/1-3-apvtspatchmapper-round-trip.md

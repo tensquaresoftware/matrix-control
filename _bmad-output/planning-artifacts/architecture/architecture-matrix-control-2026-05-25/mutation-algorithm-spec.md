@@ -6,9 +6,9 @@ author: BMad Agent
 status: approved
 version: "1.0.1"
 sources:
-  - ../../prds/prd-Matrix-Control-2026-05-25/prd.md
-  - ../../prds/prd-Matrix-Control-2026-05-25/addendum.md
-  - ../../prds/prd-Matrix-Control-2026-05-25/.decision-log.md
+  - ../../prds/prd-matrix-control-2026-05-25/prd.md
+  - ../../prds/prd-matrix-control-2026-05-25/addendum.md
+  - ../../prds/prd-matrix-control-2026-05-25/.decision-log.md
   - architecture.md
   - ../../../implementation-artifacts/6-1-mutationalgorithm-specification.md
 created: 2026-06-19

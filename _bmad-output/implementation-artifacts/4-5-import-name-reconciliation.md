@@ -409,9 +409,9 @@ Use `HandlerHarness` from `PatchManagerActionHandlerTests` — extend with fake 
 ### References
 
 - [Source: `_bmad-output/planning-artifacts/epics.md` — Epic 4 Story 4.5, FR-29]
-- [Source: `_bmad-output/planning-artifacts/prds/prd-Matrix-Control-2026-05-25/prd.md` — FR-29, FR-40]
-- [Source: `_bmad-output/planning-artifacts/prds/prd-Matrix-Control-2026-05-25/.decision-log.md` — D-025]
-- [Source: `_bmad-output/planning-artifacts/prds/prd-Matrix-Control-2026-05-25/addendum.md` — D-025 policies, outbound SysEx table]
+- [Source: `_bmad-output/planning-artifacts/prds/prd-matrix-control-2026-05-25/prd.md` — FR-29, FR-40]
+- [Source: `_bmad-output/planning-artifacts/prds/prd-matrix-control-2026-05-25/.decision-log.md` — D-025]
+- [Source: `_bmad-output/planning-artifacts/prds/prd-matrix-control-2026-05-25/addendum.md` — D-025 policies, outbound SysEx table]
 - [Source: `implementation-artifacts/4-4-save-with-filename-injection.md` — sanitizer, save pipeline, review learnings]
 - [Source: `implementation-artifacts/4-2-combobox-sentinel-states.md` — selection property, deferred load]
 - [Source: `implementation-artifacts/4-1-patchfileservice-folder-scan.md` — validation contract]

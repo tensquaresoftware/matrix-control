@@ -8,7 +8,7 @@ baseline_commit: c013da1 + uncommitted working tree (passthrough bus-buffer refa
 sources:
   - planning-artifacts/sprint-change-proposal-2026-06-06.md
   - planning-artifacts/epics.md
-  - planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/architecture.md
+  - planning-artifacts/architecture/architecture-matrix-control-2026-05-25/architecture.md
   - implementation-artifacts/2-7-audio-passthrough-and-peak-indicator.md
   - implementation-artifacts/2-9b-header-routing-controls-uat-slice.md
   - implementation-artifacts/2-11-header-panel-layout-and-widget-styling.md

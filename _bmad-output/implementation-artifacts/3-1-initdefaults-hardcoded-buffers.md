@@ -7,10 +7,10 @@ status: done
 baseline_commit: 164d029
 sources:
   - planning-artifacts/epics.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/prd.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/addendum.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/.decision-log.md
-  - planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/architecture.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/prd.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/addendum.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/.decision-log.md
+  - planning-artifacts/architecture/architecture-matrix-control-2026-05-25/architecture.md
   - implementation-artifacts/r-4-midioutboundqueue-mpsc-audit.md
   - implementation-artifacts/1-1-patchmodel-packed-buffer.md
   - implementation-artifacts/1-2-mastermodel-packed-buffer.md
@@ -218,10 +218,10 @@ Recent commits are documentation/tooling (quality principles, BMad docs, U-11 la
 ### References
 
 - [Source: _bmad-output/planning-artifacts/epics.md#Story-3.1]
-- [Source: _bmad-output/planning-artifacts/prds/prd-Matrix-Control-2026-05-25/prd.md#FR-36, §9 #4]
-- [Source: _bmad-output/planning-artifacts/prds/prd-Matrix-Control-2026-05-25/addendum.md#INIT-policy]
-- [Source: _bmad-output/planning-artifacts/prds/prd-Matrix-Control-2026-05-25/.decision-log.md#D-034]
-- [Source: _bmad-output/planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/architecture.md#AD-2, E3]
+- [Source: _bmad-output/planning-artifacts/prds/prd-matrix-control-2026-05-25/prd.md#FR-36, §9 #4]
+- [Source: _bmad-output/planning-artifacts/prds/prd-matrix-control-2026-05-25/addendum.md#INIT-policy]
+- [Source: _bmad-output/planning-artifacts/prds/prd-matrix-control-2026-05-25/.decision-log.md#D-034]
+- [Source: _bmad-output/planning-artifacts/architecture/architecture-matrix-control-2026-05-25/architecture.md#AD-2, E3]
 - [Source: Source/Core/MIDI/SysEx/SysExConstants.h:44-46]
 - [Source: Source/Core/Models/PatchModel.h, MasterModel.h]
 - [Source: Tests/Fixtures/Masters/Master 1.syx]

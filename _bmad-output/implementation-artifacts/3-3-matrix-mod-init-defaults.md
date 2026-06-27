@@ -7,10 +7,10 @@ status: review
 baseline_commit: 5ba775c
 sources:
   - planning-artifacts/epics.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/prd.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/addendum.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/.decision-log.md
-  - planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/architecture.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/prd.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/addendum.md
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/.decision-log.md
+  - planning-artifacts/architecture/architecture-matrix-control-2026-05-25/architecture.md
   - implementation-artifacts/2-6-matrix-mod-bus-parameter-sysex.md
   - implementation-artifacts/2-10-matrix-mod-bus-reorder-sysex.md
   - implementation-artifacts/3-1-initdefaults-hardcoded-buffers.md
@@ -276,8 +276,8 @@ No conflicting Matrix Mod init work in flight. Reuse uncommitted/readily availab
 ### References
 
 - [Source: _bmad-output/planning-artifacts/epics.md#Story-3.3]
-- [Source: _bmad-output/planning-artifacts/prds/prd-Matrix-Control-2026-05-25/prd.md#FR-15]
-- [Source: _bmad-output/planning-artifacts/prds/prd-Matrix-Control-2026-05-25/.decision-log.md#D-034]
+- [Source: _bmad-output/planning-artifacts/prds/prd-matrix-control-2026-05-25/prd.md#FR-15]
+- [Source: _bmad-output/planning-artifacts/prds/prd-matrix-control-2026-05-25/.decision-log.md#D-034]
 - [Source: _bmad-output/planning-artifacts/architecture/.../architecture.md#E3, AD-4]
 - [Source: implementation-artifacts/2-6-matrix-mod-bus-parameter-sysex.md]
 - [Source: implementation-artifacts/2-10-matrix-mod-bus-reorder-sysex.md]

@@ -7,7 +7,7 @@ status: done
 baseline_commit: d1fca4fbd26853a5e787923d578352de141f0a09
 sources:
   - planning-artifacts/epics.md
-  - planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/architecture.md
+  - planning-artifacts/architecture/architecture-matrix-control-2026-05-25/architecture.md
   - implementation-artifacts/2-4-apvts-patch-parameter-to-sysex-0x06.md
   - implementation-artifacts/1-4-apvtsmastermapper-round-trip.md
   - implementation-artifacts/2-1-midioutboundqueue-core.md

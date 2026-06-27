@@ -122,8 +122,8 @@ auval -v aufx Mcpi Tssf   # expect PASS ~1–2 s
 - [Source: _bmad-output/planning-artifacts/epics.md — Story 0.5]
 - [Source: _bmad-output/implementation-artifacts/chore-juce-project-generator-v2-structure.md]
 - [Source: Documentation/p001-path-migration-manifest.md]
-- [Source: _bmad-output/planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/architecture.md — AD-9, AD-10, boot validators]
-- [Source: _bmad-output/planning-artifacts/prds/prd-Matrix-Control-2026-05-25/.decision-log.md — D-003]
+- [Source: _bmad-output/planning-artifacts/architecture/architecture-matrix-control-2026-05-25/architecture.md — AD-9, AD-10, boot validators]
+- [Source: _bmad-output/planning-artifacts/prds/prd-matrix-control-2026-05-25/.decision-log.md — D-003]
 
 ## Dev Agent Record
 

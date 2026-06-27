@@ -39,8 +39,8 @@ namespace PluginDisplayNames
         constexpr const char* kEmailDisplay          = "tensquaresoftware@gmail.com";
         constexpr const char* kEmailUrl              = "mailto:tensquaresoftware@gmail.com";
         constexpr const char* kGitHubLabel           = "GitHub";
-        constexpr const char* kGitHubDisplay         = "github.com/tensquaresoftware/Matrix-Control";
-        constexpr const char* kGitHubUrl             = "https://github.com/tensquaresoftware/Matrix-Control";
+        constexpr const char* kGitHubDisplay         = "github.com/tensquaresoftware/matrix-control";
+        constexpr const char* kGitHubUrl             = "https://github.com/tensquaresoftware/matrix-control";
         constexpr const char* kLinkedInLabel         = "LinkedIn";
         constexpr const char* kLinkedInDisplay       = "in/guillaumedupontmontpellier/";
         constexpr const char* kLinkedInUrl           = "https://www.linkedin.com/in/guillaumedupontmontpellier/";

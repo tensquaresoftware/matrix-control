@@ -121,7 +121,7 @@ Allman braces, 4-space indent, `#pragma once`, includes ordered system → JUCE 
 - [Source: Source/Shared/Definitions/PluginDescriptors.h:54-205]
 - [Source: Source/Core/MIDI/SysEx/SysExConstants.h:39-45]
 - [Source: Source/Core/MIDI/SysEx/SysExEncoder.h, SysExDecoder.h]
-- [Source: _bmad-output/planning-artifacts/architecture/architecture-Matrix-Control-2026-05-25/architecture.md:281, 308-312]
+- [Source: _bmad-output/planning-artifacts/architecture/architecture-matrix-control-2026-05-25/architecture.md:281, 308-312]
 - [Source: _bmad-output/project-context.md#Architecture-Invariants, #Single-sources-of-truth]
 - Existing test style: [Source: Tests/Unit/SysExParserTests.cpp]
 

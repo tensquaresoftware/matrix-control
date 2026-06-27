@@ -30,12 +30,12 @@ Matrix-Control est un plugin JUCE 8 (VST3/AU/Standalone) — éditeur MIDI + ins
 ## Documents à lire en priorité (extract, don't ingest)
 
 **Brief (source produit — autoritaire)**
-- `_bmad-output/planning-artifacts/briefs/brief-Matrix-Control-2026-05-22/brief.md` (v0.3, status: ready)
-- `_bmad-output/planning-artifacts/briefs/brief-Matrix-Control-2026-05-22/addendum.md`
-- `_bmad-output/planning-artifacts/briefs/brief-Matrix-Control-2026-05-22/.decision-log.md`
+- `_bmad-output/planning-artifacts/briefs/brief-matrix-control-2026-05-22/brief.md` (v0.3, status: ready)
+- `_bmad-output/planning-artifacts/briefs/brief-matrix-control-2026-05-22/addendum.md`
+- `_bmad-output/planning-artifacts/briefs/brief-matrix-control-2026-05-22/.decision-log.md`
 
 **Inventaire brownfield C++ (source technique — à réconcilier avec le brief)**
-- `_bmad-output/planning-artifacts/briefs/brief-Matrix-Control-2026-05-22/brownfield-inventory-for-prd.md`
+- `_bmad-output/planning-artifacts/briefs/brief-matrix-control-2026-05-22/brownfield-inventory-for-prd.md`
 
 **Contexte agent & conventions**
 - `_bmad-output/project-context.md`
@@ -116,5 +116,5 @@ In a new chat, you can also start with:
 
 Intent: Create. Coaching path. Phase 0 brownfield workshop before any FR drafting.
 
-Read and follow: _bmad-output/planning-artifacts/briefs/brief-Matrix-Control-2026-05-22/prd-kickoff-prompt.md
+Read and follow: _bmad-output/planning-artifacts/briefs/brief-matrix-control-2026-05-22/prd-kickoff-prompt.md
 ```

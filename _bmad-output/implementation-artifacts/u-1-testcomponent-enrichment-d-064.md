@@ -7,7 +7,7 @@ status: done
 baseline_commit: 5a4c988
 sources:
   - planning-artifacts/epic-ui-scale-audit-pixel-perfect-layout.md
-  - planning-artifacts/prds/prd-Matrix-Control-2026-05-25/.decision-log.md (D-064, D-063)
+  - planning-artifacts/prds/prd-matrix-control-2026-05-25/.decision-log.md (D-064, D-063)
   - implementation-artifacts/u-0-zone-dimension-tables.md
   - implementation-artifacts/u-2-transversal-widgets-scale-audit.md
   - Source/GUI/Tests/TestComponent.cpp

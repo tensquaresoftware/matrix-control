@@ -3,10 +3,10 @@ stepsCompleted: [1, 2, 3, 4]
 status: complete
 completedAt: 2026-05-29
 inputDocuments:
-  - prds/prd-Matrix-Control-2026-05-25/prd.md
-  - prds/prd-Matrix-Control-2026-05-25/addendum.md
-  - prds/prd-Matrix-Control-2026-05-25/.decision-log.md
-  - architecture/architecture-Matrix-Control-2026-05-25/architecture.md
+  - prds/prd-matrix-control-2026-05-25/prd.md
+  - prds/prd-matrix-control-2026-05-25/addendum.md
+  - prds/prd-matrix-control-2026-05-25/.decision-log.md
+  - architecture/architecture-matrix-control-2026-05-25/architecture.md
   - project-context.md
 ---
 
