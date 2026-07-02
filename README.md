@@ -73,6 +73,8 @@ Matrix-Control is developed in my free time, alongside a day job as an instructi
 
 If you enjoy the Matrix-1000 Editor or are looking forward to Matrix-Control, sponsoring the project on [GitHub Sponsors](https://github.com/sponsors/tensquaresoftware) is the most direct way to help keep the development going. Every contribution, no matter the size, is genuinely appreciated.
 
+Also see **[Luthier](https://github.com/tensquaresoftware/luthier)** — a Projucer-inspired desktop app for generating CMake-based JUCE plugin projects from the same author.
+
 ---
 
 ## Build Instructions
