@@ -1,6 +1,6 @@
 # Matrix-Control
 
-![Matrix-Control GUI](https://raw.githubusercontent.com/tensquaresoftware/matrix-control/main/Assets/Screenshots/Matrix-Control-GUI-WIP.png)
+![Matrix-Control GUI](./matrix-control.png)
 
 [![Status: Work in Progress](https://img.shields.io/badge/Status-Work%20in%20Progress-FFA500?style=for-the-badge)](https://github.com/tensquaresoftware/matrix-control)
 [![Language: C++](https://img.shields.io/badge/Language-C%2B%2B-00599C?style=for-the-badge&logo=c%2B%2B&logoColor=white)](https://github.com/tensquaresoftware/matrix-control)
