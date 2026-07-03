@@ -1,0 +1,27 @@
+# Project AI Assistant Notes
+
+This is a JUCE audio plugin project built with CMake (no Projucer), managed by Luthier.
+
+## Layout
+
+- `Source/Core/` — audio processor, MIDI, models, services, init, loggers.
+- `Source/GUI/` — editor, panels, widgets, skins, looks.
+- `Source/Shared/` — definitions, helpers, project paths.
+- `Tests/` — unit test runner (`MATRIX_BUILD_TESTS=ON`).
+- `CMakeLists.txt` — build configuration; edit the **USER OPTIONS** block at the top for copy settings, and add new `.cpp` files to `PLUGIN_SOURCES`.
+- `CMakeUserPresets.json` — per-platform CMake presets (Debug / Release).
+- `.luthier.json` — Luthier sidecar (project metadata for Open / regenerate).
+
+## Build
+
+JUCE is located via the `JUCE_DIR` environment variable, per-OS workspace paths in `CMakeLists.txt`, or a standard install path. Configure and build with the preset for your platform, for example:
+
+`cmake --preset macos-debug-arm64 && cmake --build --preset macos-debug-arm64`
+
+See `README.md` for the full per-platform instructions.
+
+## Conventions
+
+- Target the C++ standard set in `CMakeLists.txt` (`CMAKE_CXX_STANDARD`).
+- Version SSOT: `project(Matrix-Control VERSION …)` in CMake → `PluginVersion`.
+- Refer to the JUCE 8 API: https://docs.juce.com

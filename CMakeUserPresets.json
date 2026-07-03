@@ -2,134 +2,144 @@
   "version": 4,
   "configurePresets": [
     {
-      "name": "default-macos-arm64",
-      "displayName": "macOS Apple Silicon (Ninja) - Native on Apple Silicon",
+      "name": "macos-debug-arm64",
+      "displayName": "macOS Apple Silicon — Debug",
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/Builds/macOS/ARM",
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Darwin"
-      },
+      "binaryDir": "${sourceDir}/Builds/macOS/ARM/Debug",
+      "condition": {"type": "equals", "lhs": "${hostSystemName}", "rhs": "Darwin"},
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_OSX_ARCHITECTURES": "arm64",
-        "JUCE_DIR": "$env{JUCE_DIR}"
+        "JUCE_DIR": "$env{JUCE_DIR}",
+        "ARTEFACTS_DIR_MACOS": "/Volumes/Guillaume/Dev/SDKs/JUCE/Artefacts"
       }
     },
     {
-      "name": "default-macos-x86_64",
-      "displayName": "macOS Intel (Ninja) - Native on Mac Intel",
+      "name": "macos-release-arm64",
+      "displayName": "macOS Apple Silicon — Release",
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/Builds/macOS/Intel",
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Darwin"
-      },
+      "binaryDir": "${sourceDir}/Builds/macOS/ARM/Release",
+      "condition": {"type": "equals", "lhs": "${hostSystemName}", "rhs": "Darwin"},
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_OSX_ARCHITECTURES": "arm64",
+        "JUCE_DIR": "$env{JUCE_DIR}",
+        "ARTEFACTS_DIR_MACOS": "/Volumes/Guillaume/Dev/SDKs/JUCE/Artefacts"
+      }
+    },
+    {
+      "name": "macos-debug-x86_64",
+      "displayName": "macOS Intel — Debug",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/Builds/macOS/Intel/Debug",
+      "condition": {"type": "equals", "lhs": "${hostSystemName}", "rhs": "Darwin"},
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_OSX_ARCHITECTURES": "x86_64",
-        "JUCE_DIR": "$env{JUCE_DIR}"
+        "JUCE_DIR": "$env{JUCE_DIR}",
+        "ARTEFACTS_DIR_MACOS": "/Volumes/Guillaume/Dev/SDKs/JUCE/Artefacts"
       }
     },
     {
-      "name": "default-macos-x86_64-rosetta",
-      "displayName": "macOS Intel-Rosetta (Ninja) - x86_64 on Apple Silicon",
+      "name": "macos-release-x86_64",
+      "displayName": "macOS Intel — Release",
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/Builds/macOS/Intel-Rosetta",
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Darwin"
-      },
+      "binaryDir": "${sourceDir}/Builds/macOS/Intel/Release",
+      "condition": {"type": "equals", "lhs": "${hostSystemName}", "rhs": "Darwin"},
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_OSX_ARCHITECTURES": "x86_64",
-        "JUCE_DIR": "$env{JUCE_DIR}"
+        "JUCE_DIR": "$env{JUCE_DIR}",
+        "ARTEFACTS_DIR_MACOS": "/Volumes/Guillaume/Dev/SDKs/JUCE/Artefacts"
       }
     },
     {
-      "name": "default-macos-universal",
-      "displayName": "macOS Universal (Ninja) - Apple Silicon + Intel",
+      "name": "macos-debug-universal",
+      "displayName": "macOS Universal (arm64 + x86_64) — Debug",
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/Builds/macOS/Universal",
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Darwin"
-      },
+      "binaryDir": "${sourceDir}/Builds/macOS/Universal/Debug",
+      "condition": {"type": "equals", "lhs": "${hostSystemName}", "rhs": "Darwin"},
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_OSX_ARCHITECTURES": "arm64;x86_64",
-        "JUCE_DIR": "$env{JUCE_DIR}"
+        "JUCE_DIR": "$env{JUCE_DIR}",
+        "ARTEFACTS_DIR_MACOS": "/Volumes/Guillaume/Dev/SDKs/JUCE/Artefacts"
       }
     },
     {
-      "name": "default-windows",
-      "displayName": "Windows x64 (Visual Studio 2022) - Native on x64",
+      "name": "macos-release-universal",
+      "displayName": "macOS Universal (arm64 + x86_64) — Release",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/Builds/macOS/Universal/Release",
+      "condition": {"type": "equals", "lhs": "${hostSystemName}", "rhs": "Darwin"},
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_OSX_ARCHITECTURES": "arm64;x86_64",
+        "JUCE_DIR": "$env{JUCE_DIR}",
+        "ARTEFACTS_DIR_MACOS": "/Volumes/Guillaume/Dev/SDKs/JUCE/Artefacts"
+      }
+    },
+    {
+      "name": "windows-debug",
+      "displayName": "Windows x64 — Debug",
       "generator": "Visual Studio 17 2022",
       "binaryDir": "${sourceDir}/Builds/Windows",
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Windows"
-      },
-      "architecture": {
-        "value": "x64",
-        "strategy": "external"
-      },
+      "condition": {"type": "equals", "lhs": "${hostSystemName}", "rhs": "Windows"},
+      "architecture": {"value": "x64", "strategy": "external"},
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "JUCE_DIR": "$env{JUCE_DIR}"
+        "JUCE_DIR": "$env{JUCE_DIR}",
+        "ARTEFACTS_DIR_WINDOWS": "C:/Users/Guillaume/Dev/SDKs/JUCE/Artefacts"
       }
     },
     {
-      "name": "default-linux",
-      "displayName": "Linux x64 (Ninja) - Native on x86_64",
+      "name": "windows-release",
+      "displayName": "Windows x64 — Release",
+      "generator": "Visual Studio 17 2022",
+      "binaryDir": "${sourceDir}/Builds/Windows",
+      "condition": {"type": "equals", "lhs": "${hostSystemName}", "rhs": "Windows"},
+      "architecture": {"value": "x64", "strategy": "external"},
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "JUCE_DIR": "$env{JUCE_DIR}",
+        "ARTEFACTS_DIR_WINDOWS": "C:/Users/Guillaume/Dev/SDKs/JUCE/Artefacts"
+      }
+    },
+    {
+      "name": "linux-debug",
+      "displayName": "Linux x86_64 — Debug",
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/Builds/Linux",
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Linux"
-      },
+      "binaryDir": "${sourceDir}/Builds/Linux/Debug",
+      "condition": {"type": "equals", "lhs": "${hostSystemName}", "rhs": "Linux"},
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "JUCE_DIR": "$env{JUCE_DIR}"
+        "JUCE_DIR": "$env{JUCE_DIR}",
+        "ARTEFACTS_DIR_LINUX": "/home/guillaume/Dev/SDKs/JUCE/Artefacts"
+      }
+    },
+    {
+      "name": "linux-release",
+      "displayName": "Linux x86_64 — Release",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/Builds/Linux/Release",
+      "condition": {"type": "equals", "lhs": "${hostSystemName}", "rhs": "Linux"},
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "JUCE_DIR": "$env{JUCE_DIR}",
+        "ARTEFACTS_DIR_LINUX": "/home/guillaume/Dev/SDKs/JUCE/Artefacts"
       }
     }
   ],
   "buildPresets": [
-    {
-      "name": "default-macos-arm64",
-      "configurePreset": "default-macos-arm64",
-      "configuration": "Debug"
-    },
-    {
-      "name": "default-macos-x86_64",
-      "configurePreset": "default-macos-x86_64",
-      "configuration": "Debug"
-    },
-    {
-      "name": "default-macos-x86_64-rosetta",
-      "configurePreset": "default-macos-x86_64-rosetta",
-      "configuration": "Debug"
-    },
-    {
-      "name": "default-macos-universal",
-      "configurePreset": "default-macos-universal",
-      "configuration": "Debug"
-    },
-    {
-      "name": "default-windows",
-      "configurePreset": "default-windows",
-      "configuration": "Debug"
-    },
-    {
-      "name": "default-linux",
-      "configurePreset": "default-linux",
-      "configuration": "Debug"
-    }
+    {"name": "macos-debug-arm64",      "configurePreset": "macos-debug-arm64",      "configuration": "Debug"},
+    {"name": "macos-release-arm64",    "configurePreset": "macos-release-arm64",    "configuration": "Release"},
+    {"name": "macos-debug-x86_64",     "configurePreset": "macos-debug-x86_64",     "configuration": "Debug"},
+    {"name": "macos-release-x86_64",   "configurePreset": "macos-release-x86_64",   "configuration": "Release"},
+    {"name": "macos-debug-universal",  "configurePreset": "macos-debug-universal",  "configuration": "Debug"},
+    {"name": "macos-release-universal","configurePreset": "macos-release-universal","configuration": "Release"},
+    {"name": "windows-debug",          "configurePreset": "windows-debug",          "configuration": "Debug"},
+    {"name": "windows-release",        "configurePreset": "windows-release",        "configuration": "Release"},
+    {"name": "linux-debug",            "configurePreset": "linux-debug",            "configuration": "Debug"},
+    {"name": "linux-release",          "configurePreset": "linux-release",          "configuration": "Release"}
   ]
 }

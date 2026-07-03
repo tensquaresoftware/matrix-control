@@ -6,21 +6,21 @@
             "type": "shell",
             "command": "cmake",
             "args": [
-                "--preset", "default-macos-arm64"
+                "--preset", "macos-debug-arm64"
             ],
             "osx": {
                 "args": [
-                    "--preset", "default-macos-arm64"
+                    "--preset", "macos-debug-arm64"
                 ]
             },
             "windows": {
                 "args": [
-                    "--preset", "default-windows"
+                    "--preset", "windows-debug"
                 ]
             },
             "linux": {
                 "args": [
-                    "--preset", "default-linux"
+                    "--preset", "linux-debug"
                 ]
             },
             "group": "build",
@@ -32,19 +32,19 @@
             "command": "bash",
             "args": [
                 "-c",
-                "test -d \"${command:cmake.buildDirectory}\" || cmake --preset default-macos-arm64"
+                "test -d \"${command:cmake.buildDirectory}\" || cmake --preset macos-debug-arm64"
             ],
             "windows": {
                 "command": "powershell",
                 "args": [
                     "-Command",
-                    "if (-not (Test-Path '${command:cmake.buildDirectory}')) { cmake --preset default-windows }"
+                    "if (-not (Test-Path '${command:cmake.buildDirectory}')) { cmake --preset windows-debug }"
                 ]
             },
             "linux": {
                 "args": [
                     "-c",
-                    "test -d \"${command:cmake.buildDirectory}\" || cmake --preset default-linux"
+                    "test -d \"${command:cmake.buildDirectory}\" || cmake --preset linux-debug"
                 ]
             },
             "group": "build",

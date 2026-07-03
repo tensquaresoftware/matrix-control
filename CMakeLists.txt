@@ -13,22 +13,17 @@ if(APPLE)
         set(CMAKE_OSX_ARCHITECTURES "arm64" CACHE STRING "Build architectures for macOS (arm64 or x86_64)")
     endif()
     # Preset vs host consistency: avoid wrong preset for the current machine
-    # - Apple Silicon: reject "macOS Intel" (native); use "macOS Intel-Rosetta"
-    # - Mac Intel: reject "macOS Intel-Rosetta" and "macOS Apple Silicon" (ARM); use "macOS Intel" (native)
+    # - Apple Silicon: reject bare Builds/macOS/Intel (native Mac Intel layout)
+    # - Mac Intel: reject Apple Silicon presets (ARM/*)
     if(HOST_ARCH STREQUAL "arm64")
-        # Rosetta builds use .../Intel-Rosetta, so they do not match .../Intel/?$ at end of path.
         if(CMAKE_BINARY_DIR MATCHES "Builds/macOS/Intel/?$")
             message(FATAL_ERROR
-                "On Apple Silicon, do not use the 'macOS Intel' preset (default-macos-x86_64; meant for native Mac Intel). Use 'macOS Intel-Rosetta' instead (preset default-macos-x86_64-rosetta): in your IDE select that preset. To list all presets: cmake --list-presets.")
+                "On Apple Silicon, do not use a native Mac Intel build directory (Builds/macOS/Intel). Use macos-debug-x86_64 (Builds/macOS/Intel/Debug) for x86_64 cross-compile, or macos-debug-arm64 for native arm64. To list all presets: cmake --list-presets.")
         endif()
     elseif(HOST_ARCH STREQUAL "x86_64" OR HOST_ARCH STREQUAL "i386")
-        if(CMAKE_BINARY_DIR MATCHES "Intel-Rosetta")
+        if(CMAKE_BINARY_DIR MATCHES "Builds/macOS/ARM")
             message(FATAL_ERROR
-                "On Mac Intel, do not use the 'macOS Intel-Rosetta' preset (default-macos-x86_64-rosetta; meant for Apple Silicon). Use 'macOS Intel' instead (preset default-macos-x86_64): in your IDE select that preset. To list all presets: cmake --list-presets.")
-        endif()
-        if(CMAKE_BINARY_DIR MATCHES "Builds/macOS/ARM/?$")
-            message(FATAL_ERROR
-                "On Mac Intel, do not use the 'macOS Apple Silicon' preset (default-macos-arm64). Use 'macOS Intel' instead (preset default-macos-x86_64): in your IDE select that preset. To list all presets: cmake --list-presets.")
+                "On Mac Intel, do not use an Apple Silicon preset (macos-debug-arm64). Use macos-debug-x86_64 instead. To list all presets: cmake --list-presets.")
         endif()
     endif()
     # Use Ninja generator on macOS if not specified
@@ -45,30 +40,58 @@ elseif(WIN32)
     endif()
 endif()
 
-project(Matrix-Control VERSION 0.0.18)
+project(Matrix-Control VERSION 0.1.0)
 
 string(TIMESTAMP MATRIX_CONTROL_BUILD_DATE "%Y-%m-%d" UTC)
 set(MATRIX_CONTROL_PRERELEASE_SUFFIX "alpha"
     CACHE STRING "Pre-release suffix appended to version (empty string for release builds)")
 
-# Plugin copy configuration (edit project-configuration.cmake to customize)
-include(project-configuration.cmake)
+# =============================================================================
+# PLUGIN COPY CONFIGURATION
+# COPY_TO_SYSTEM_FOLDERS: ON/OFF — copies plugins to standard DAW scan locations
+#   Windows: VST3 → C:\Program Files\Common Files\VST3\ (UAC prompt)
+#   macOS: AU → ~/Library/Audio/Plug-Ins/Components/, VST3 → ~/Library/Audio/Plug-Ins/VST3/
+#   Linux: VST3 → ~/.vst3/
+# COPY_TO_ARTEFACTS_DIR: ON/OFF — copies build outputs to a central custom folder
+#   (ARTEFACTS_DIR_WINDOWS/MACOS/LINUX, organized by platform and architecture)
+# Override at configure time: cmake .. -DUSER_COPY_TO_ARTEFACTS_DIR=ON
+# =============================================================================
+
+set(USER_COPY_TO_SYSTEM_FOLDERS ON)
+set(USER_COPY_TO_ARTEFACTS_DIR ON)
+
+set(COPY_TO_SYSTEM_FOLDERS ${USER_COPY_TO_SYSTEM_FOLDERS} CACHE BOOL "Copy plugins to system folders after build (all OS)" FORCE)
+set(COPY_TO_ARTEFACTS_DIR ${USER_COPY_TO_ARTEFACTS_DIR} CACHE BOOL "Copy build outputs to central artefacts folder (organized by platform/architecture)" FORCE)
+
+set(ARTEFACTS_DIR_WINDOWS "C:/Users/Guillaume/Dev/SDKs/JUCE/Artefacts")
+set(ARTEFACTS_DIR_MACOS   "/Volumes/Guillaume/Dev/SDKs/JUCE/Artefacts")
+set(ARTEFACTS_DIR_LINUX   "/home/guillaume/Dev/SDKs/JUCE/Artefacts")
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Reference JUCE: priority cache (preset/-D), then ENV, then platform default
+set(JUCE_DIR_WINDOWS "C:/Users/Guillaume/Dev/SDKs/JUCE")
+set(JUCE_DIR_MACOS   "/Volumes/Guillaume/Dev/SDKs/JUCE/")
+set(JUCE_DIR_LINUX   "/home/guillaume/Dev/SDKs/JUCE")
+
+# Reference JUCE: priority cache (preset/-D), then ENV, then workspace per-OS, then platform default
 # Portable logic - works on any platform regardless of where the project was generated
 set(JUCE_DIR_CANDIDATE "")
 if(DEFINED JUCE_DIR AND NOT JUCE_DIR STREQUAL "" AND EXISTS "${JUCE_DIR}")
     set(JUCE_DIR_CANDIDATE "${JUCE_DIR}")
 elseif(DEFINED ENV{JUCE_DIR} AND NOT "$ENV{JUCE_DIR}" STREQUAL "")
     set(JUCE_DIR_CANDIDATE "$ENV{JUCE_DIR}")
+elseif(WIN32 AND NOT JUCE_DIR_WINDOWS STREQUAL "" AND EXISTS "${JUCE_DIR_WINDOWS}")
+    set(JUCE_DIR_CANDIDATE "${JUCE_DIR_WINDOWS}")
+elseif(APPLE AND NOT JUCE_DIR_MACOS STREQUAL "" AND EXISTS "${JUCE_DIR_MACOS}")
+    set(JUCE_DIR_CANDIDATE "${JUCE_DIR_MACOS}")
+elseif(UNIX AND NOT APPLE AND NOT JUCE_DIR_LINUX STREQUAL "" AND EXISTS "${JUCE_DIR_LINUX}")
+    set(JUCE_DIR_CANDIDATE "${JUCE_DIR_LINUX}")
 elseif(APPLE AND EXISTS "/Applications/JUCE")
     set(JUCE_DIR_CANDIDATE "/Applications/JUCE")
 elseif(WIN32 AND EXISTS "C:/Program Files/JUCE")
     set(JUCE_DIR_CANDIDATE "C:/Program Files/JUCE")
-elseif(UNIX AND EXISTS "/usr/local/JUCE")
+elseif(UNIX AND NOT APPLE AND EXISTS "/usr/local/JUCE")
     set(JUCE_DIR_CANDIDATE "/usr/local/JUCE")
 endif()
 
@@ -511,6 +534,9 @@ endif()
 
 juce_add_plugin(Matrix-Control
     COMPANY_NAME "Ten Square Software"
+    COMPANY_COPYRIGHT "2026 © Ten Square Software"
+    COMPANY_WEBSITE "https://github.com/tensquaresoftware"
+    COMPANY_EMAIL "tensquaresoftware@gmail.com"
     BUNDLE_ID "com.TenSquareSoftware.Matrix-Control"
     PLUGIN_MANUFACTURER_CODE Tssf
     PLUGIN_CODE Mcpi
@@ -573,7 +599,7 @@ endif()
 # =============================================================================
 # COPY TO CENTRAL ARTEFACTS FOLDER
 # When COPY_TO_ARTEFACTS_DIR is ON, copies build outputs to a central custom folder.
-# Paths: ARTEFACTS_DIR_WINDOWS, ARTEFACTS_DIR_MACOS, ARTEFACTS_DIR_LINUX (injected from generator-configuration.py).
+# Paths: ARTEFACTS_DIR_WINDOWS, ARTEFACTS_DIR_MACOS, ARTEFACTS_DIR_LINUX (USER OPTIONS block above).
 # Structure: {ARTEFACTS_DIR}/{OS}/{arch}/{format}/
 # - macOS: ARM/, Intel/, Intel-Rosetta/, Universal/
 # - Windows/Linux: no arch subfolder
