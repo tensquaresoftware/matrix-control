@@ -122,7 +122,7 @@ juce_add_binary_data(PluginFonts
     SOURCES
         Assets/Fonts/PTSansNarrow-Regular.ttf
         Assets/Fonts/PTSansNarrow-Bold.ttf
-        Assets/Fonts/Orbitron.ttf
+        Assets/Fonts/Orbitron-Bold.ttf
 )
 
 # ============================================================================

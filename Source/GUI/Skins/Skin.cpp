@@ -58,10 +58,10 @@ namespace TSS
     juce::Font Skin::getBrandFontBold() const
     {
         const auto typeface = juce::Typeface::createSystemTypefaceFor(
-            PluginFontsData::Orbitron_ttf,
-            static_cast<size_t>(PluginFontsData::Orbitron_ttfSize)
+            PluginFontsData::OrbitronBold_ttf,
+            static_cast<size_t>(PluginFontsData::OrbitronBold_ttfSize)
         );
-        return juce::Font(juce::FontOptions(typeface).withHeight(kBrandFontHeight_)).boldened();
+        return juce::Font(juce::FontOptions(typeface).withHeight(kBrandFontHeight_));
     }
 
     juce::Colour Skin::getToggleBackgroundColour(bool isOn) const

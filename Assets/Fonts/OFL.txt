@@ -1,7 +1,13 @@
+Fonts in this directory are licensed under the SIL Open Font License, Version 1.1.
+
+PT Sans Narrow
 Copyright (c) 2010, ParaType Ltd. (http://www.paratype.com/public),
 with Reserved Font Names "PT Sans" and "ParaType".
 
-This Font Software is licensed under the SIL Open Font License, Version 1.1.
+Orbitron
+Copyright 2018 The Orbitron Project Authors (https://github.com/theleagueof/orbitron),
+with Reserved Font Name: "Orbitron".
+
 This license is copied below, and is also available with a FAQ at:
 https://openfontlicense.org
 
