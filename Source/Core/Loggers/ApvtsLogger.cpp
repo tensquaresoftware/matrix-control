@@ -444,7 +444,7 @@ void ApvtsLogger::logValueTreePropertyChanged(const juce::Identifier& property,
     bool isButtonClick = false;
     if (newValue.isInt64() || newValue.isDouble())
     {
-        int64_t value = static_cast<int64_t>(newValue);
+        const auto value = static_cast<juce::int64>(newValue);
         if (value > 1000000000000LL)
         {
             isButtonClick = true;
