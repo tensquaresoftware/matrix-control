@@ -2,32 +2,32 @@
 
 namespace Core::StandaloneAudioInputRouterDetail
 {
-    __attribute__((weak)) juce::StringArray getInputChannelNames()
+    juce::StringArray getInputChannelNames()
     {
         return {};
     }
 
-    __attribute__((weak)) juce::StringArray getInputChannelIds()
+    juce::StringArray getInputChannelIds()
     {
         return {};
     }
 
-    __attribute__((weak)) std::vector<Core::AudioInputSourceEntry> getCatalogEntries()
+    std::vector<Core::AudioInputSourceEntry> getCatalogEntries()
     {
         return {};
     }
 
-    __attribute__((weak)) void addAudioDeviceChangeListener(juce::ChangeListener& listener)
+    void addAudioDeviceChangeListener(juce::ChangeListener& listener)
     {
         juce::ignoreUnused(listener);
     }
 
-    __attribute__((weak)) void removeAudioDeviceChangeListener(juce::ChangeListener& listener)
+    void removeAudioDeviceChangeListener(juce::ChangeListener& listener)
     {
         juce::ignoreUnused(listener);
     }
 
-    __attribute__((weak)) void enableInputMonitoring()
+    void enableInputMonitoring()
     {
     }
 }

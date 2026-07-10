@@ -138,7 +138,6 @@ set(PLUGIN_SOURCES
     Source/Core/Audio/HardwareLatency.cpp
     Source/Core/Audio/InstrumentMidiForwarder.cpp
     Source/Core/Audio/StandaloneAudioInputRouter.cpp
-    Source/Core/Audio/StandaloneAudioInputRouterStubs.cpp
     Source/Core/MIDI/KeyboardFromMidiInput.cpp
     Source/Core/Init/InitDefaults.cpp
     Source/Core/Init/InitTemplateLoader.cpp
@@ -563,6 +562,15 @@ target_sources(Matrix-Control PRIVATE ${PLUGIN_SOURCES})
 target_sources(Matrix-Control_Standalone PRIVATE
     Source/Core/Audio/StandaloneAudioInputRouterStandalone.cpp
 )
+
+# Plugin format targets (not Standalone) link no-op router stubs.
+set(_MATRIX_STANDALONE_ROUTER_STUBS Source/Core/Audio/StandaloneAudioInputRouterStubs.cpp)
+if(TARGET Matrix-Control_VST3)
+    target_sources(Matrix-Control_VST3 PRIVATE ${_MATRIX_STANDALONE_ROUTER_STUBS})
+endif()
+if(TARGET Matrix-Control_AU)
+    target_sources(Matrix-Control_AU PRIVATE ${_MATRIX_STANDALONE_ROUTER_STUBS})
+endif()
 
 target_include_directories(Matrix-Control
     PRIVATE

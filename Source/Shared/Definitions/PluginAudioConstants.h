@@ -14,7 +14,7 @@ namespace PluginAudioConstants
     inline constexpr int kInputGainMaxIndex = 1 + static_cast<int>(kMaxInputGainDb - kMinInputGainDb);
     inline constexpr int kInputGainDefaultIndex = 1 + static_cast<int>(0.0f - kMinInputGainDb);
 
-    inline constexpr float snapInputGainDb(float gainDb) noexcept
+    inline float snapInputGainDb(float gainDb) noexcept
     {
         if (!std::isfinite(gainDb))
             return 0.0f;
