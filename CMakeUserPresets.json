@@ -11,7 +11,7 @@
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_OSX_ARCHITECTURES": "arm64",
         "JUCE_DIR": "$env{JUCE_DIR}",
-        "ARTEFACTS_DIR_MACOS": "/Volumes/Guillaume/Dev/SDKs/JUCE/Artefacts"
+        "ARTEFACTS_DIR_MACOS": "/Users/Guillaume/Library/CloudStorage/Dropbox/Dev/Artefacts"
       }
     },
     {
@@ -24,7 +24,7 @@
         "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_OSX_ARCHITECTURES": "arm64",
         "JUCE_DIR": "$env{JUCE_DIR}",
-        "ARTEFACTS_DIR_MACOS": "/Volumes/Guillaume/Dev/SDKs/JUCE/Artefacts"
+        "ARTEFACTS_DIR_MACOS": "/Users/Guillaume/Library/CloudStorage/Dropbox/Dev/Artefacts"
       }
     },
     {
@@ -37,7 +37,7 @@
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_OSX_ARCHITECTURES": "x86_64",
         "JUCE_DIR": "$env{JUCE_DIR}",
-        "ARTEFACTS_DIR_MACOS": "/Volumes/Guillaume/Dev/SDKs/JUCE/Artefacts"
+        "ARTEFACTS_DIR_MACOS": "/Users/Guillaume/Library/CloudStorage/Dropbox/Dev/Artefacts"
       }
     },
     {
@@ -50,7 +50,7 @@
         "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_OSX_ARCHITECTURES": "x86_64",
         "JUCE_DIR": "$env{JUCE_DIR}",
-        "ARTEFACTS_DIR_MACOS": "/Volumes/Guillaume/Dev/SDKs/JUCE/Artefacts"
+        "ARTEFACTS_DIR_MACOS": "/Users/Guillaume/Library/CloudStorage/Dropbox/Dev/Artefacts"
       }
     },
     {
@@ -63,7 +63,7 @@
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_OSX_ARCHITECTURES": "arm64;x86_64",
         "JUCE_DIR": "$env{JUCE_DIR}",
-        "ARTEFACTS_DIR_MACOS": "/Volumes/Guillaume/Dev/SDKs/JUCE/Artefacts"
+        "ARTEFACTS_DIR_MACOS": "/Users/Guillaume/Library/CloudStorage/Dropbox/Dev/Artefacts"
       }
     },
     {
@@ -76,12 +76,38 @@
         "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_OSX_ARCHITECTURES": "arm64;x86_64",
         "JUCE_DIR": "$env{JUCE_DIR}",
-        "ARTEFACTS_DIR_MACOS": "/Volumes/Guillaume/Dev/SDKs/JUCE/Artefacts"
+        "ARTEFACTS_DIR_MACOS": "/Users/Guillaume/Library/CloudStorage/Dropbox/Dev/Artefacts"
       }
     },
     {
       "name": "windows-debug",
-      "displayName": "Windows x64 — Debug",
+      "displayName": "Windows x64 — Debug (VS 2026)",
+      "generator": "Visual Studio 18 2026",
+      "binaryDir": "${sourceDir}/Builds/Windows",
+      "condition": {"type": "equals", "lhs": "${hostSystemName}", "rhs": "Windows"},
+      "architecture": {"value": "x64", "strategy": "external"},
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "JUCE_DIR": "$env{JUCE_DIR}",
+        "ARTEFACTS_DIR_WINDOWS": "C:/Users/Guillaume/Dropbox/Dev/Artefacts"
+      }
+    },
+    {
+      "name": "windows-release",
+      "displayName": "Windows x64 — Release (VS 2026)",
+      "generator": "Visual Studio 18 2026",
+      "binaryDir": "${sourceDir}/Builds/Windows",
+      "condition": {"type": "equals", "lhs": "${hostSystemName}", "rhs": "Windows"},
+      "architecture": {"value": "x64", "strategy": "external"},
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "JUCE_DIR": "$env{JUCE_DIR}",
+        "ARTEFACTS_DIR_WINDOWS": "C:/Users/Guillaume/Dropbox/Dev/Artefacts"
+      }
+    },
+    {
+      "name": "windows-debug-vs2022",
+      "displayName": "Windows x64 — Debug (VS 2022 legacy)",
       "generator": "Visual Studio 17 2022",
       "binaryDir": "${sourceDir}/Builds/Windows",
       "condition": {"type": "equals", "lhs": "${hostSystemName}", "rhs": "Windows"},
@@ -89,12 +115,12 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "JUCE_DIR": "$env{JUCE_DIR}",
-        "ARTEFACTS_DIR_WINDOWS": "C:/Users/Guillaume/Dev/SDKs/JUCE/Artefacts"
+        "ARTEFACTS_DIR_WINDOWS": "C:/Users/Guillaume/Dropbox/Dev/Artefacts"
       }
     },
     {
-      "name": "windows-release",
-      "displayName": "Windows x64 — Release",
+      "name": "windows-release-vs2022",
+      "displayName": "Windows x64 — Release (VS 2022 legacy)",
       "generator": "Visual Studio 17 2022",
       "binaryDir": "${sourceDir}/Builds/Windows",
       "condition": {"type": "equals", "lhs": "${hostSystemName}", "rhs": "Windows"},
@@ -102,7 +128,7 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
         "JUCE_DIR": "$env{JUCE_DIR}",
-        "ARTEFACTS_DIR_WINDOWS": "C:/Users/Guillaume/Dev/SDKs/JUCE/Artefacts"
+        "ARTEFACTS_DIR_WINDOWS": "C:/Users/Guillaume/Dropbox/Dev/Artefacts"
       }
     },
     {
@@ -114,7 +140,7 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "JUCE_DIR": "$env{JUCE_DIR}",
-        "ARTEFACTS_DIR_LINUX": "/home/guillaume/Dev/SDKs/JUCE/Artefacts"
+        "ARTEFACTS_DIR_LINUX": "/home/guillaume/Dropbox/Dev/Artefacts"
       }
     },
     {
@@ -126,7 +152,7 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
         "JUCE_DIR": "$env{JUCE_DIR}",
-        "ARTEFACTS_DIR_LINUX": "/home/guillaume/Dev/SDKs/JUCE/Artefacts"
+        "ARTEFACTS_DIR_LINUX": "/home/guillaume/Dropbox/Dev/Artefacts"
       }
     }
   ],
@@ -139,6 +165,8 @@
     {"name": "macos-release-universal","configurePreset": "macos-release-universal","configuration": "Release"},
     {"name": "windows-debug",          "configurePreset": "windows-debug",          "configuration": "Debug"},
     {"name": "windows-release",        "configurePreset": "windows-release",        "configuration": "Release"},
+    {"name": "windows-debug-vs2022",   "configurePreset": "windows-debug-vs2022",   "configuration": "Debug"},
+    {"name": "windows-release-vs2022", "configurePreset": "windows-release-vs2022", "configuration": "Release"},
     {"name": "linux-debug",            "configurePreset": "linux-debug",            "configuration": "Debug"},
     {"name": "linux-release",          "configurePreset": "linux-release",          "configuration": "Release"}
   ]

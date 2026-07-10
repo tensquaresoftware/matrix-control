@@ -13,17 +13,22 @@ if(APPLE)
         set(CMAKE_OSX_ARCHITECTURES "arm64" CACHE STRING "Build architectures for macOS (arm64 or x86_64)")
     endif()
     # Preset vs host consistency: avoid wrong preset for the current machine
-    # - Apple Silicon: reject bare Builds/macOS/Intel (native Mac Intel layout)
-    # - Mac Intel: reject Apple Silicon presets (ARM/*)
+    # - Apple Silicon: reject "macOS Intel" (native); use "macOS Intel-Rosetta"
+    # - Mac Intel: reject "macOS Intel-Rosetta" and "macOS Apple Silicon" (ARM); use "macOS Intel" (native)
     if(HOST_ARCH STREQUAL "arm64")
+        # Rosetta builds use .../Intel-Rosetta, so they do not match .../Intel/?$ at end of path.
         if(CMAKE_BINARY_DIR MATCHES "Builds/macOS/Intel/?$")
             message(FATAL_ERROR
-                "On Apple Silicon, do not use a native Mac Intel build directory (Builds/macOS/Intel). Use macos-debug-x86_64 (Builds/macOS/Intel/Debug) for x86_64 cross-compile, or macos-debug-arm64 for native arm64. To list all presets: cmake --list-presets.")
+                "On Apple Silicon, do not use the 'macOS Intel' preset (default-macos-x86_64; meant for native Mac Intel). Use 'macOS Intel-Rosetta' instead (preset default-macos-x86_64-rosetta): in Cursor select that preset. To list all presets: cmake --list-presets.")
         endif()
     elseif(HOST_ARCH STREQUAL "x86_64" OR HOST_ARCH STREQUAL "i386")
-        if(CMAKE_BINARY_DIR MATCHES "Builds/macOS/ARM")
+        if(CMAKE_BINARY_DIR MATCHES "Intel-Rosetta")
             message(FATAL_ERROR
-                "On Mac Intel, do not use an Apple Silicon preset (macos-debug-arm64). Use macos-debug-x86_64 instead. To list all presets: cmake --list-presets.")
+                "On Mac Intel, do not use the 'macOS Intel-Rosetta' preset (default-macos-x86_64-rosetta; meant for Apple Silicon). Use 'macOS Intel' instead (preset default-macos-x86_64): in Cursor select that preset. To list all presets: cmake --list-presets.")
+        endif()
+        if(CMAKE_BINARY_DIR MATCHES "Builds/macOS/ARM/?$")
+            message(FATAL_ERROR
+                "On Mac Intel, do not use the 'macOS Apple Silicon' preset (default-macos-arm64). Use 'macOS Intel' instead (preset default-macos-x86_64): in Cursor select that preset. To list all presets: cmake --list-presets.")
         endif()
     endif()
     # Use Ninja generator on macOS if not specified
@@ -34,13 +39,13 @@ if(APPLE)
         endif()
     endif()
 elseif(WIN32)
-    # Use Visual Studio generator on Windows if not specified
+    # Use Visual Studio generator on Windows if not specified (prefer VS 2026; CMake 4.2+)
     if(NOT CMAKE_GENERATOR)
-        set(CMAKE_GENERATOR "Visual Studio 17 2022" CACHE INTERNAL "")
+        set(CMAKE_GENERATOR "Visual Studio 18 2026" CACHE INTERNAL "")
     endif()
 endif()
 
-project(Matrix-Control VERSION 0.1.0)
+project(Matrix-Control VERSION 0.1.1)
 
 string(TIMESTAMP MATRIX_CONTROL_BUILD_DATE "%Y-%m-%d" UTC)
 set(MATRIX_CONTROL_PRERELEASE_SUFFIX "alpha"
@@ -63,9 +68,9 @@ set(USER_COPY_TO_ARTEFACTS_DIR ON)
 set(COPY_TO_SYSTEM_FOLDERS ${USER_COPY_TO_SYSTEM_FOLDERS} CACHE BOOL "Copy plugins to system folders after build (all OS)" FORCE)
 set(COPY_TO_ARTEFACTS_DIR ${USER_COPY_TO_ARTEFACTS_DIR} CACHE BOOL "Copy build outputs to central artefacts folder (organized by platform/architecture)" FORCE)
 
-set(ARTEFACTS_DIR_WINDOWS "C:/Users/Guillaume/Dev/SDKs/JUCE/Artefacts")
-set(ARTEFACTS_DIR_MACOS   "/Volumes/Guillaume/Dev/SDKs/JUCE/Artefacts")
-set(ARTEFACTS_DIR_LINUX   "/home/guillaume/Dev/SDKs/JUCE/Artefacts")
+set(ARTEFACTS_DIR_WINDOWS "C:/Users/Guillaume/Dropbox/Dev/Artefacts")
+set(ARTEFACTS_DIR_MACOS   "/Users/Guillaume/Library/CloudStorage/Dropbox/Dev/Artefacts")
+set(ARTEFACTS_DIR_LINUX   "/home/guillaume/Dropbox/Dev/Artefacts")
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
