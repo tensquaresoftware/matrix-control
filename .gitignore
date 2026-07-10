@@ -76,6 +76,8 @@ docs/
 # Nested lowercase "tests/" folders (e.g. inside tooling) stay ignored.
 !/Tests/
 !/Source/GUI/Tests/
+# Same for Assets/ (fonts, etc.) vs legacy lowercase "assets/" leftover rule.
+!/Assets/
 
 # Temporary files
 *.log
