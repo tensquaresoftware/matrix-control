@@ -16,6 +16,8 @@ build/
 
 # Cache directories
 .cache/
+__pycache__/
+*.py[cod]
 
 # Xcode
 *.xcodeproj

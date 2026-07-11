@@ -23,7 +23,20 @@ env:
   JUCE_VERSION: "8.0.12"
 
 jobs:
+  release-script-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout Matrix-Control
+        uses: actions/checkout@v4
+
+      - name: Run release script unit tests
+        run: |
+          python3 -m pip install -r Scripts/release/requirements-test.txt
+          python3 -m pytest Scripts/release/tests/ -q
+
   build-and-test:
+    needs: release-script-tests
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     strategy:
