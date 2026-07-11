@@ -16,19 +16,6 @@ public:
 
 private:
     static constexpr int kTestDebounceMs = 20;
-    static constexpr int kWaitMarginMs = 30;
-
-    static void waitForDebounceWindow(int totalMs)
-    {
-        const auto deadline = juce::Time::getMillisecondCounter()
-                              + static_cast<juce::uint32>(totalMs);
-
-        while (juce::Time::getMillisecondCounter() < deadline)
-        {
-            juce::Timer::callPendingTimersSynchronously();
-            juce::Thread::sleep(1);
-        }
-    }
 
     void debouncer_rapidSchedule_firesOnce()
     {
@@ -40,7 +27,7 @@ private:
         for (int i = 0; i < 5; ++i)
             debouncer.schedule([&callbackCount] { ++callbackCount; });
 
-        waitForDebounceWindow(kTestDebounceMs + kWaitMarginMs);
+        debouncer.flushPendingSynchronouslyForTests();
         expectEquals(callbackCount, 1);
     }
 
@@ -54,7 +41,7 @@ private:
         debouncer.schedule([&result] { result = 'A'; });
         debouncer.schedule([&result] { result = 'B'; });
 
-        waitForDebounceWindow(kTestDebounceMs + kWaitMarginMs);
+        debouncer.flushPendingSynchronouslyForTests();
         expectEquals(static_cast<int>(result), static_cast<int>('B'));
     }
 };

@@ -1,11 +1,14 @@
 #include <juce_core/juce_core.h>
+#include <juce_gui_basics/juce_gui_basics.h>
 
 // Console entry point for the Matrix-Control unit test runner. Every UnitTest
 // subclass registers itself statically, so running all tests requires no manual
 // registration here. Returns a non-zero exit code when any test fails so the
 // runner can gate CI / local builds.
-int main()
+int main(int, char**)
 {
+    juce::ScopedJuceInitialiser_GUI juceInitialiser;
+
     juce::UnitTestRunner runner;
     runner.setAssertOnFailure(false);
     runner.runAllTests();

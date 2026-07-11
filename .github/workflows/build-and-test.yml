@@ -1,0 +1,108 @@
+# Multi-platform build + Core unit tests (Story 11.1).
+# Matrix: ubuntu-latest, windows-latest, macos-latest (fail-fast: false — Luthier 10.1 pattern).
+#
+# Preset choices (CMakeUserPresets.json):
+#   macOS  — macos-debug-arm64   (Ninja, Apple Silicon runner = macos-latest)
+#   Windows — windows-debug        (VS 2026; GHA windows-latest migrated to VS 2026 in June 2026)
+#   Linux  — linux-debug          (Ninja)
+#
+# CI overrides (no personal artefact paths, no plugin copy side effects):
+#   -DMATRIX_BUILD_TESTS=ON
+#   -DUSER_COPY_TO_SYSTEM_FOLDERS=OFF
+#   -DUSER_COPY_TO_ARTEFACTS_DIR=OFF
+
+name: Build and Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  JUCE_VERSION: "8.0.12"
+
+jobs:
+  build-and-test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            preset: macos-debug-arm64
+            build_config: ""
+            test_binary: Builds/macOS/ARM/Debug/Matrix-Control_Tests_artefacts/Debug/Matrix-Control_Tests
+          - os: windows-latest
+            preset: windows-debug
+            build_config: --config Debug
+            test_binary: Builds/Windows/Matrix-Control_Tests_artefacts/Debug/Matrix-Control_Tests.exe
+          - os: ubuntu-latest
+            preset: linux-debug
+            build_config: ""
+            test_binary: Builds/Linux/Debug/Matrix-Control_Tests_artefacts/Debug/Matrix-Control_Tests
+
+    steps:
+      - name: Checkout Matrix-Control
+        uses: actions/checkout@v4
+
+      - name: Cache JUCE
+        id: cache-juce
+        uses: actions/cache@v4
+        with:
+          path: JUCE
+          key: juce-${{ env.JUCE_VERSION }}-${{ runner.os }}
+
+      - name: Checkout JUCE
+        if: steps.cache-juce.outputs.cache-hit != 'true'
+        uses: actions/checkout@v4
+        with:
+          repository: juce-framework/JUCE
+          ref: ${{ env.JUCE_VERSION }}
+          path: JUCE
+
+      - name: Install Linux build dependencies
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            build-essential \
+            cmake \
+            ninja-build \
+            pkg-config \
+            libasound2-dev \
+            libjack-jackd2-dev \
+            ladspa-sdk \
+            libcurl4-openssl-dev \
+            libfreetype6-dev \
+            libfontconfig1-dev \
+            libx11-dev \
+            libxcomposite-dev \
+            libxcursor-dev \
+            libxext-dev \
+            libxinerama-dev \
+            libxrandr-dev \
+            libxrender-dev \
+            libglu1-mesa-dev \
+            mesa-common-dev \
+            libglib2.0-dev
+
+      - name: Configure CMake
+        shell: bash
+        env:
+          JUCE_DIR: ${{ github.workspace }}/JUCE
+        run: |
+          cmake --preset "${{ matrix.preset }}" \
+            -DMATRIX_BUILD_TESTS=ON \
+            -DUSER_COPY_TO_SYSTEM_FOLDERS=OFF \
+            -DUSER_COPY_TO_ARTEFACTS_DIR=OFF
+
+      - name: Build plugin and unit tests
+        run: >
+          cmake --build --preset "${{ matrix.preset }}"
+          --target Matrix-Control Matrix-Control_Tests
+          ${{ matrix.build_config }}
+
+      - name: Run unit tests
+        shell: bash
+        run: '"${{ matrix.test_binary }}"'

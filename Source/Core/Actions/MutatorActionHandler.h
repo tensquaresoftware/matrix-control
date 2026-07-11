@@ -29,6 +29,12 @@ namespace Core
 
         void onHistorySelectionChanged();
 
+        // Unit-test seam — see ComboboxPatchSendDebouncer::flushPendingSynchronouslyForTests().
+        void flushHistorySelectionDebouncerForTests()
+        {
+            historySelectionDebouncer_.flushPendingSynchronouslyForTests();
+        }
+
     private:
         void handleMutate();
         void handleRetry();

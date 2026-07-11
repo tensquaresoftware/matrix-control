@@ -131,7 +131,6 @@ public:
 
 private:
     static constexpr int kTestDebounceMs = 20;
-    static constexpr int kWaitMarginMs = 30;
 
     struct Harness
     {
@@ -284,14 +283,7 @@ private:
 
         expectEquals(harness.engine.auditionCallCount, 0);
 
-        const auto deadline = juce::Time::getMillisecondCounter()
-                              + static_cast<juce::uint32>(kTestDebounceMs + kWaitMarginMs);
-
-        while (juce::Time::getMillisecondCounter() < deadline)
-        {
-            juce::Timer::callPendingTimersSynchronously();
-            juce::Thread::sleep(1);
-        }
+        harness.handler.flushHistorySelectionDebouncerForTests();
 
         expectEquals(harness.engine.auditionCallCount, 1);
     }

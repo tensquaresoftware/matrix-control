@@ -56,7 +56,8 @@ Concretely, this means:
 
 The project is actively under development. As of early 2026:
 
-- ✅ Project structure, build system (CMake), and CI pipeline are in place
+- ✅ Project structure and build system (CMake) are in place
+- ✅ CI pipeline (GitHub Actions) — multi-platform build + Core unit tests on push/PR to `main`
 - ✅ Core MIDI infrastructure (SysEx parsing, validation, sending) is functional
 - ✅ GUI layout and visual design are well advanced
 - 🔄 Full patch editing (read/write all Matrix-1000 parameters) — in progress

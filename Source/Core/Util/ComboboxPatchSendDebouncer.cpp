@@ -19,6 +19,15 @@ void ComboboxPatchSendDebouncer::schedule(std::function<void()> callback)
     startTimer(debounceMs_);
 }
 
+void ComboboxPatchSendDebouncer::flushPendingSynchronouslyForTests()
+{
+    if (isTimerRunning())
+    {
+        stopTimer();
+        timerCallback();
+    }
+}
+
 void ComboboxPatchSendDebouncer::timerCallback()
 {
     stopTimer();

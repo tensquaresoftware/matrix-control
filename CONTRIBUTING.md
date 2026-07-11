@@ -10,6 +10,7 @@ Thank you for your interest in Matrix-Control! Whether you are a JUCE developer,
 - [Reporting Bugs](https://claude.ai/chat/16b5619a-506c-4e52-9a86-10a1574ec048#reporting-bugs)
 - [Suggesting Features](https://claude.ai/chat/16b5619a-506c-4e52-9a86-10a1574ec048#suggesting-features)
 - [Contributing Code](https://claude.ai/chat/16b5619a-506c-4e52-9a86-10a1574ec048#contributing-code)
+- [Continuous Integration](https://claude.ai/chat/16b5619a-506c-4e52-9a86-10a1574ec048#continuous-integration)
 - [Code Style Guidelines](https://claude.ai/chat/16b5619a-506c-4e52-9a86-10a1574ec048#code-style-guidelines)
 - [Commit Message Convention](https://claude.ai/chat/16b5619a-506c-4e52-9a86-10a1574ec048#commit-message-convention)
 - [Pull Request Process](https://claude.ai/chat/16b5619a-506c-4e52-9a86-10a1574ec048#pull-request-process)
@@ -93,6 +94,71 @@ Familiarity with the following is recommended:
 6. **Commit** using the [commit convention](https://claude.ai/chat/16b5619a-506c-4e52-9a86-10a1574ec048#commit-message-convention)
 
 7. **Push** your branch and open a **Pull Request**
+
+------
+
+## Continuous Integration
+
+Every **push** and **pull request** targeting `main` runs the [Build and Test](https://github.com/tensquaresoftware/matrix-control/actions/workflows/build-and-test.yml) workflow on GitHub Actions.
+
+### Matrix
+
+| Runner | CMake preset | Toolchain |
+|--------|--------------|-----------|
+| `macos-latest` (Apple Silicon) | `macos-debug-arm64` | Ninja |
+| `windows-latest` | `windows-debug` | Visual Studio 2026 (x64) |
+| `ubuntu-latest` | `linux-debug` | Ninja |
+
+Each leg:
+
+1. Checks out JUCE **8.0.12** (cached between runs)
+2. Configures with `MATRIX_BUILD_TESTS=ON` and plugin copy disabled (`USER_COPY_TO_*=OFF`)
+3. Builds the `Matrix-Control` plugin target and `Matrix-Control_Tests`
+4. Runs the `Matrix-Control_Tests` console binary (headless Core unit tests — no MIDI hardware)
+
+The matrix uses `fail-fast: false` so all three OS results appear in one run.
+
+### Reproduce CI locally
+
+Set `JUCE_DIR` to your JUCE 8.0.12 install, then configure with the preset for your platform and the same CI flags:
+
+**macOS (Apple Silicon):**
+
+```bash
+export JUCE_DIR=/Applications/JUCE
+cmake --preset macos-debug-arm64 \
+  -DMATRIX_BUILD_TESTS=ON \
+  -DUSER_COPY_TO_SYSTEM_FOLDERS=OFF \
+  -DUSER_COPY_TO_ARTEFACTS_DIR=OFF
+cmake --build --preset macos-debug-arm64 --target Matrix-Control Matrix-Control_Tests
+"Builds/macOS/ARM/Debug/Matrix-Control_Tests_artefacts/Debug/Matrix-Control_Tests"
+```
+
+**Windows (PowerShell):**
+
+```powershell
+$env:JUCE_DIR = "C:\JUCE"
+cmake --preset windows-debug `
+  -DMATRIX_BUILD_TESTS=ON `
+  -DUSER_COPY_TO_SYSTEM_FOLDERS=OFF `
+  -DUSER_COPY_TO_ARTEFACTS_DIR=OFF
+cmake --build --preset windows-debug --target Matrix-Control Matrix-Control_Tests --config Debug
+& "Builds/Windows/Matrix-Control_Tests_artefacts/Debug/Matrix-Control_Tests.exe"
+```
+
+**Linux (Ubuntu/Debian):**
+
+Install the same packages as the workflow (`build-essential`, `ninja-build`, ALSA/JACK, FreeType, X11/Mesa dev libs — see `.github/workflows/build-and-test.yml`), then:
+
+```bash
+export JUCE_DIR=/path/to/JUCE
+cmake --preset linux-debug \
+  -DMATRIX_BUILD_TESTS=ON \
+  -DUSER_COPY_TO_SYSTEM_FOLDERS=OFF \
+  -DUSER_COPY_TO_ARTEFACTS_DIR=OFF
+cmake --build --preset linux-debug --target Matrix-Control Matrix-Control_Tests
+"Builds/Linux/Debug/Matrix-Control_Tests_artefacts/Debug/Matrix-Control_Tests"
+```
 
 ------
 

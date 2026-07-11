@@ -331,9 +331,23 @@ Users see a Figma-faithful interface at every UI Scale preset (50–200%) — cr
 
 ---
 
-**Implementation sequence (D-058):** E0 → E1 → E2 → E3 → E4 → E5 → E6 → E7 → E8 → E9 → E10 · **Parallel track:** Epic U (GUI scale audit)
+### Epic 11: CI & Release Infrastructure
 
-**Total:** 12 epics (incl. Epic U) · **66 stories** · Epic U = layout audit overlay (FR-43 geometry) · Epic U stories: U-IDs, U-0, U-0b, U-1…U-10
+Automated multi-platform build and Core unit tests on GitHub Actions; release pipeline deferred until v1 distribution strategy is fixed.
+
+**FRs covered:** — (implements NFR-1, SM-6)
+
+**Priority:** Immediate (2026-07-11 correct-course)
+
+**Depends on:** Epic 0 (CMake, tests layout) · **Blocks:** confident merge gate for Epics 7, 8, U
+
+**Note:** CD (AU/VST3/Standalone signing, notarisation) = Story 11.2, deferred pre-v1.0.0.
+
+---
+
+**Implementation sequence (D-058):** E0 → E1 → E2 → E3 → E4 → E5 → E6 → E7 → E8 → E9 → E10 · **Parallel track:** Epic U (GUI scale audit) · **Infrastructure gate:** Epic 11 Story 11.1 (2026-07-11)
+
+**Total:** 13 epics (incl. Epic U, Epic 11) · **68 stories** · Epic U = layout audit overlay (FR-43 geometry) · Epic U stories: U-IDs, U-0, U-0b, U-1…U-10 · Epic 11 = CI/CD infrastructure
 
 ---
 
@@ -1592,6 +1606,39 @@ So that v1 ships without debug UI clutter.
 **When** Release build is produced
 **Then** TestComponent excluded from release; debug retains sandbox
 **And** D-062 criterion met with owner sign-off
+
+---
+
+## Epic 11: CI & Release Infrastructure
+
+Cross-platform compile and test automation before merge; release pipeline when v1 distribution is ready.
+
+### Story 11.1: CI Multi-Platform Build & Unit Tests
+
+As a contributor,
+I want every push and pull request to build Matrix-Control and run Core unit tests on macOS, Windows, and Linux,
+So that cross-platform compile regressions and logic failures are caught before merge.
+
+**Acceptance Criteria:**
+
+**Given** a push or pull request targeting `main`
+**When** GitHub Actions runs
+**Then** `.github/workflows/build-and-test.yml` executes on `macos-latest`, `windows-latest`, and `ubuntu-latest`
+**And** each leg checks out JUCE 8.0.12, configures with `MATRIX_BUILD_TESTS=ON`, builds plugin + `Matrix-Control_Tests`, runs the test binary
+**And** `COPY_TO_SYSTEM_FOLDERS=OFF` and `COPY_TO_ARTEFACTS_DIR=OFF` in CI
+**And** `CONTRIBUTING.md` and `README.md` document CI accurately
+
+**Depends on:** Epic 0 Stories 0.4, 0.5 · **Blocks:** Epic 7 Stories 7-5, 7-6, 7-8 (recommended merge gate)
+
+### Story 11.2: CD Release Pipeline (deferred)
+
+As a maintainer,
+I want pushing a semver git tag to trigger multi-OS plugin builds and a GitHub Release,
+So that v1.0.0 distribution does not require manual per-OS packaging.
+
+**Status:** backlog — deferred until v1.0.0 release planning (codesign, notarisation, AU/VST3/Standalone artefacts).
+
+**Depends on:** Story 11.1 · **Model:** Luthier Story 10.2
 
 ---
 
