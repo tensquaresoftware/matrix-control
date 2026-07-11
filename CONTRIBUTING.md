@@ -10,7 +10,8 @@ Thank you for your interest in Matrix-Control! Whether you are a JUCE developer,
 - [Reporting Bugs](https://claude.ai/chat/16b5619a-506c-4e52-9a86-10a1574ec048#reporting-bugs)
 - [Suggesting Features](https://claude.ai/chat/16b5619a-506c-4e52-9a86-10a1574ec048#suggesting-features)
 - [Contributing Code](https://claude.ai/chat/16b5619a-506c-4e52-9a86-10a1574ec048#contributing-code)
-- [Continuous Integration](https://claude.ai/chat/16b5619a-506c-4e52-9a86-10a1574ec048#continuous-integration)
+- [Continuous Integration](#continuous-integration)
+- [Releasing](#releasing)
 - [Code Style Guidelines](https://claude.ai/chat/16b5619a-506c-4e52-9a86-10a1574ec048#code-style-guidelines)
 - [Commit Message Convention](https://claude.ai/chat/16b5619a-506c-4e52-9a86-10a1574ec048#commit-message-convention)
 - [Pull Request Process](https://claude.ai/chat/16b5619a-506c-4e52-9a86-10a1574ec048#pull-request-process)
@@ -158,6 +159,70 @@ cmake --preset linux-debug \
   -DUSER_COPY_TO_ARTEFACTS_DIR=OFF
 cmake --build --preset linux-debug --target Matrix-Control Matrix-Control_Tests
 "Builds/Linux/Debug/Matrix-Control_Tests_artefacts/Debug/Matrix-Control_Tests"
+```
+
+------
+
+## Releasing
+
+Public downloads are published via **GitHub Releases**, triggered by pushing a semver **git tag** (not by merging to `main`).
+
+### Version source of truth
+
+1. Bump `project(Matrix-Control VERSION X.Y.Z)` in `CMakeLists.txt`.
+2. Set `MATRIX_CONTROL_PRERELEASE_SUFFIX`:
+   - **Stable release:** empty string (`""`) — required for `v1.0.0`.
+   - **Pre-release:** suffix matching the tag (e.g. `rc1` for `v1.0.0-rc1`, `alpha` for `v0.2.0-alpha`).
+3. Commit, then create an **annotated tag** with a **`v` prefix** matching the version + suffix:
+   - Stable: `git tag -a v1.0.0 -m "Matrix-Control 1.0.0"`
+   - RC: `git tag -a v1.0.0-rc1 -m "Matrix-Control 1.0.0-rc1"`
+4. Push the tag: `git push origin v1.0.0-rc1`
+
+The [Release](https://github.com/tensquaresoftware/matrix-control/actions/workflows/release.yml) workflow validates the tag against `CMakeLists.txt`, builds **Release** binaries on macOS / Windows / Linux, runs unit tests, packages per-OS zips, and publishes a GitHub Release.
+
+### Recommended flow (RC → stable)
+
+1. Clear blockers (e.g. Epic U-10 release gate — no `TestComponent` in Release builds).
+2. Bump version + set suffix (e.g. `rc1`), tag `vX.Y.Z-rc1`, push tag.
+3. Download assets from the GitHub Release; smoke-test on each OS (DAW + standalone).
+4. For stable: set `MATRIX_CONTROL_PRERELEASE_SUFFIX=""`, commit, tag `vX.Y.Z`, push tag.
+
+### Required GitHub secrets (macOS signing)
+
+Configure in **Settings → Secrets and variables → Actions** (names only — never commit values):
+
+| Secret | Purpose |
+|--------|---------|
+| `DEV_ID_APP_CERT` | Base64-encoded `.p12` Developer ID Application certificate |
+| `DEV_ID_APP_PASSWORD` | Password for the `.p12` |
+| `DEVELOPER_ID_APPLICATION` | Codesign identity name (e.g. `Developer ID Application: …`) |
+| `NOTARIZATION_USERNAME` | Apple ID for notarytool |
+| `NOTARIZATION_PASSWORD` | App-specific password for notarytool |
+| `APPLE_TEAM_ID` | Apple Developer Team ID |
+
+The macOS release leg **fails** if any of these are missing — there is no silent skip of signing/notarization.
+
+**Windows Authenticode** signing is optional for v1 (unsigned VST3/Standalone is acceptable for MIT open-source distribution).
+
+### Local packaging (fallback)
+
+If CI is unavailable, build Release locally and pack with:
+
+```bash
+cmake --preset macos-release-arm64 \
+  -DMATRIX_BUILD_TESTS=ON \
+  -DUSER_COPY_TO_SYSTEM_FOLDERS=OFF \
+  -DUSER_COPY_TO_ARTEFACTS_DIR=OFF \
+  -DMATRIX_CONTROL_PRERELEASE_SUFFIX=""
+cmake --build --preset macos-release-arm64 --target Matrix-Control
+python3 Scripts/release/prepare_release.py --tag v1.0.0 pack macos --arch arm64
+```
+
+Release script unit tests:
+
+```bash
+python3 -m pip install -r Scripts/release/requirements-test.txt
+python3 -m pytest Scripts/release/tests/ -q
 ```
 
 ------

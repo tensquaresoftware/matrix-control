@@ -12,7 +12,7 @@ baseline_workflow: none
 
 # Story 11.1: CI Multi-Platform (build + unit tests matrix)
 
-Status: review
+Status: done
 
 <!-- Epic 11 — CI & Release Infrastructure. Sprint Change Proposal 2026-07-11. -->
 
@@ -41,8 +41,8 @@ So that cross-platform compile regressions and logic failures are caught before 
 | Concern | CI approach |
 |---------|-------------|
 | JUCE | Checkout tag `8.0.12` → `JUCE_DIR` env |
-| Artefact copy | `-DCOPY_TO_SYSTEM_FOLDERS=OFF -DCOPY_TO_ARTEFACTS_DIR=OFF` |
-| Windows VS | GitHub `windows-latest` → likely VS 2022 preset (`windows-debug-vs2022`) |
+| Artefact copy | `-DUSER_COPY_TO_SYSTEM_FOLDERS=OFF -DUSER_COPY_TO_ARTEFACTS_DIR=OFF` (propagates to `COPY_TO_*` via CMake) |
+| Windows VS | GitHub `windows-latest` → `windows-debug` preset (VS 2026; `windows-debug-vs2022` retained for local legacy) |
 | macOS | `macos-latest` = Apple Silicon → `macos-debug-arm64` |
 | Linux | apt deps for JUCE (document in workflow + CONTRIBUTING) |
 | Tests | Build + run `Matrix-Control_Tests` — no `--unit-tests` plugin flag |
@@ -100,6 +100,27 @@ So that cross-platform compile regressions and logic failures are caught before 
 - [x] Fix `README.md` CI status line
 - [x] Optional: add CI preset overrides or documented `-D` flags
 
+### Review Findings
+
+- [x] [Review][Decision] **Preset Windows : VS 2026 vs VS 2022** — Résolu : garder `windows-debug` (VS 2026) ; mettre à jour spec/constraints pour refléter le choix documenté dans le workflow.
+- [x] [Review][Decision] **Seams de test dans le code Core de production** — Résolu : garder tel quel (seams commentés, simplicité acceptable).
+- [x] [Review][Decision] **Tests debounce : flush synchrone vs attente timer** — Résolu : accepter le compromis CI (flush sync, pas de restauration wall-clock).
+
+- [x] [Review][Patch] **Build step Windows sans shell explicite** [`.github/workflows/build-and-test.yml:100`]
+- [x] [Review][Patch] **Pas de vérification d'existence du binaire de test** [`.github/workflows/build-and-test.yml:106`]
+- [x] [Review][Patch] **Pas de timeout sur le job CI** [`.github/workflows/build-and-test.yml:26`]
+- [x] [Review][Patch] **File List story incomplète** [`11-1-ci-multi-platform-build-and-tests.md:133`]
+- [x] [Review][Patch] **Spec constraints : preset Windows + noms flags COPY** [`11-1-ci-multi-platform-build-and-tests.md:512`]
+- [x] [Review][Patch] **Completion notes : preuve CI PR #20 absente** [`11-1-ci-multi-platform-build-and-tests.md:131`]
+- [x] [Review][Patch] **Lien TOC CI pointe vers claude.ai** [`CONTRIBUTING.md:13`]
+
+- [x] [Review][Defer] **Chemins test_binary hard-codés par OS** [`.github/workflows/build-and-test.yml:35-43`] — deferred, pre-existing fragility acceptable while paths stable
+- [x] [Review][Defer] **COPY_* CACHE FORCE vs cache stale local** [`CMakeLists.txt:132-133`] — deferred, CI fresh checkout mitigates
+- [x] [Review][Defer] **TOC CONTRIBUTING entier en URLs claude.ai** [`CONTRIBUTING.md:9-17`] — deferred, pre-existing
+- [x] [Review][Defer] **Thread::sleep(50) dans MidiManagerTests** [`Tests/Unit/MidiManagerTests.cpp:205`] — deferred, pre-existing
+- [x] [Review][Defer] **Chemins Dropbox dans CMakeUserPresets** [`CMakeUserPresets.json`] — deferred, copy OFF en CI
+- [x] [Review][Defer] **Tests MIDI skip silencieux sans device** [`Tests/Unit/MidiManagerTests.cpp:362`] — deferred, conforme AC3 headless
+
 ## Dev Notes
 
 - **Recent fixes to protect:** `ApvtsLogger` Linux cast, router stub linkage, embedded Orbitron font.
@@ -128,7 +149,8 @@ So that cross-platform compile regressions and logic failures are caught before 
 - ✅ `CMakeLists.txt` — USER copy flags respect `-D` overrides; `PluginDescriptorsMasterEdit.cpp` linked into test target.
 - ✅ `CONTRIBUTING.md` — Continuous Integration section with matrix table and local reproduction commands.
 - ✅ `README.md` — CI status updated to ✅ (multi-platform build + tests on push/PR to `main`).
-- ✅ macOS leg verified locally: plugin + `Matrix-Control_Tests` build and run (exit 0). Windows/Linux legs use same workflow pattern; first GHA run on merge to `main` confirms cross-platform green.
+- ✅ macOS leg verified locally: plugin + `Matrix-Control_Tests` build and run (exit 0).
+- ✅ PR #20 CI (2026-07-11): all three matrix legs green on `ubuntu-latest`, `windows-latest`, and `macos-latest` before merge to `main`.
 
 ## File List
 
@@ -136,11 +158,23 @@ So that cross-platform compile regressions and logic failures are caught before 
 - `CMakeLists.txt` (modified)
 - `CONTRIBUTING.md` (modified)
 - `README.md` (modified)
+- `Source/Core/Actions/MutatorActionHandler.h` (modified — test seam)
+- `Source/Core/Util/ComboboxPatchSendDebouncer.cpp` (modified — test seam)
+- `Source/Core/Util/ComboboxPatchSendDebouncer.h` (modified — test seam)
+- `Tests/TestMain.cpp` (modified — GUI initialiser for headless CI)
+- `Tests/Unit/ComboboxPatchSendDebouncerTests.cpp` (modified — sync flush)
+- `Tests/Unit/MidiManagerTests.cpp` (modified — skip without MIDI device)
+- `Tests/Unit/MutatorActionHandlerTests.cpp` (modified — sync flush)
 - `_bmad-output/implementation-artifacts/sprint-status.yaml` (modified)
+- `_bmad-output/planning-artifacts/epics.md` (modified)
+- `_bmad-output/planning-artifacts/prds/prd-matrix-control-2026-05-25/.decision-log.md` (modified)
+- `_bmad-output/planning-artifacts/prds/prd-matrix-control-2026-05-25/prd.md` (modified)
+- `_bmad-output/planning-artifacts/sprint-change-proposal-2026-07-11-ci-infrastructure.md` (added)
 
 ## Change Log
 
 - 2026-07-11 — Story 11.1 implemented: GitHub Actions 3-OS build+test matrix, CI copy-flag fix, test target link fix, CONTRIBUTING/README CI docs.
+- 2026-07-11 — Code review: workflow hardening (timeout, bash shell, test binary preflight), story traceability/doc fixes, CONTRIBUTING CI TOC anchor.
 
 ## References
 

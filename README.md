@@ -58,6 +58,7 @@ The project is actively under development. As of early 2026:
 
 - ✅ Project structure and build system (CMake) are in place
 - ✅ CI pipeline (GitHub Actions) — multi-platform build + Core unit tests on push/PR to `main`
+- ✅ CD pipeline — tag-triggered Release builds and [GitHub Releases](https://github.com/tensquaresoftware/matrix-control/releases)
 - ✅ Core MIDI infrastructure (SysEx parsing, validation, sending) is functional
 - ✅ GUI layout and visual design are well advanced
 - 🔄 Full patch editing (read/write all Matrix-1000 parameters) — in progress
