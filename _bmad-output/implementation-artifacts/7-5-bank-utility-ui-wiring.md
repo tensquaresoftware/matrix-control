@@ -20,7 +20,7 @@ updated: 2026-07-11
 
 # Story 7.5: Bank Utility UI Wiring
 
-Status: review
+Status: done
 
 <!-- Ultimate context engine analysis completed — comprehensive developer guide created -->
 
@@ -83,6 +83,18 @@ so that bank selection matches synth semantics (FR-19, FR-20, FR-21).
   - [x] Grep `BankUtilityPanel` — no SysEx, no handler calls
   - [x] Run tests + Standalone smoke (Dev Notes checklist)
   - [x] Clean Code limits on new panel methods
+
+### Review Findings
+
+- [x] [Review][Patch] `reconcilePatchManagerCoordinatesForDeviceType` ne synchronise pas `kSelectedBank` — décision Guillaume : miroir dans cette fonction à chaque écriture de `kCurrentBankNumber` (AC #6). [PluginProcessor.cpp:1457-1468]
+
+- [x] [Review][Patch] `valueTreeRedirected` est un no-op — après restauration de session DAW (`replaceState`), le surlignage peut rester périmé si `kSelectedBank` ne change pas de valeur et aucun `valueTreePropertyChanged` ne se déclenche. Aligner sur `InternalPatchesPanel` : appeler `refreshDeviceGating()` + `refreshSelectedBankHighlight()`. [BankUtilityPanel.h:40]
+
+- [x] [Review][Patch] Le rouge disparaît au survol du bouton banque sélectionné — seul `textOff` est surchargé ; `Button::getTextColour` priorise `textHover` / `textClicked`. Surcharger aussi ces deux champs dans l'accent look. [BankUtilityPanel.cpp:138-139]
+
+- [x] [Review][Defer] Matrix-6/6R graying non validé manuellement (AC #7) — smoke item 6 non exercé ; dette harness documentée Appendix C UAT grid ; logique code conforme.
+
+- [x] [Review][Defer] AC #9 builds/tests non re-exécutés dans cette revue — preuve dans Dev Agent Record (1830 tests green) ; pas de régression visible dans le diff handler/InternalPatches.
 
 ## Dev Notes
 
@@ -322,3 +334,4 @@ Composer 2.5
 - 2026-07-11: Story 7.5 created — Bank Utility UI wiring guide (red text, dot verify, UNLOCK footer, kSelectedBank sync).
 - 2026-07-11: Story 7.5 implemented — Bank Utility red highlight, UNLOCK footer, kSelectedBank reset sync; status → review.
 - 2026-07-11: Manual UAT PASS on Matrix-1000 (Tauntek v1.20); Matrix-6/6R graying untested — device simulation harness tracked in UAT grid Appendix C.
+- 2026-07-11: Code review — 3 patches applied (`valueTreeRedirected`, hover red accent, `reconcilePatchManagerCoordinatesForDeviceType` kSelectedBank mirror); status → done.

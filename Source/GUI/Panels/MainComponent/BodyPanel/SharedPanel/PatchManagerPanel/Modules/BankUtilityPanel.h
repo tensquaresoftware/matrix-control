@@ -37,7 +37,7 @@ public:
     void valueTreeChildRemoved(juce::ValueTree&, juce::ValueTree&, int) override {}
     void valueTreeChildOrderChanged(juce::ValueTree&, int, int) override {}
     void valueTreeParentChanged(juce::ValueTree&) override {}
-    void valueTreeRedirected(juce::ValueTree&) override {}
+    void valueTreeRedirected(juce::ValueTree&) override;
 
 private:
     BankUtilityPanelDimensions dims_;

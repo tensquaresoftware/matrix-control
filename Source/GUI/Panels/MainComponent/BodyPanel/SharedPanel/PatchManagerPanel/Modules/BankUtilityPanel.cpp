@@ -62,6 +62,12 @@ void BankUtilityPanel::valueTreePropertyChanged(juce::ValueTree&,
     }
 }
 
+void BankUtilityPanel::valueTreeRedirected(juce::ValueTree&)
+{
+    refreshDeviceGating();
+    refreshSelectedBankHighlight();
+}
+
 void BankUtilityPanel::refreshDeviceGating()
 {
     const bool deviceDetected = static_cast<bool>(apvts_.state.getProperty("deviceDetected"));
@@ -136,7 +142,10 @@ void BankUtilityPanel::refreshSelectedBankHighlight()
         if (auto* button = buttons[selected])
         {
             auto accentLook = normalBankLook_;
-            accentLook.textOff = juce::Colour(ColourChart::kRed);
+            const auto selectedRed = juce::Colour(ColourChart::kRed);
+            accentLook.textOff = selectedRed;
+            accentLook.textHover = selectedRed;
+            accentLook.textClicked = selectedRed;
             button->setLook(accentLook);
         }
     }
