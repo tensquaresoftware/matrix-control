@@ -84,4 +84,5 @@ def test_resolve_tier_logic_documented_in_workflow():
     assert 'tier="fast"' in workflow_text or "tier=fast" in workflow_text
     assert "ready_for_review" in workflow_text
     assert "gh pr view" in workflow_text
+    assert "GH_TOKEN" in workflow_text
     assert 'any(. == "ci-full")' in workflow_text
