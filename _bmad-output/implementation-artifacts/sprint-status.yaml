@@ -1,5 +1,5 @@
 # generated: 2026-05-29
-# last_updated: 2026-06-20 (story 7-4 MutatorActionHandler → done)
+# last_updated: 2026-07-11 (Story 11-1 CI workflow — review)
 # project: Matrix-Control
 # project_key: NOKEY
 # tracking_system: file-system
@@ -41,7 +41,7 @@
 # - Retrospective appends its action items to action_items; sprint-status surfaces open ones
 
 generated: 2026-05-29
-last_updated: 2026-06-20 (story 7-4 MutatorActionHandler → done)
+last_updated: 2026-07-11 (Story 11-1 CI workflow — review)
 project: Matrix-Control
 project_key: NOKEY
 tracking_system: file-system
@@ -192,3 +192,9 @@ development_status:
   u-9-master-edit-panel-layout-audit: backlog
   u-10-release-gate-prod-audit-sign-off-and-d-062-d-063: backlog
   epic-u-retrospective: optional
+
+  # Epic 11: CI & Release Infrastructure (Correct Course 2026-07-11)
+  epic-11: in-progress
+  11-1-ci-multi-platform-build-and-tests: review
+  11-2-cd-release-pipeline: backlog
+  epic-11-retrospective: optional

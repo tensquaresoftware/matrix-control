@@ -59,11 +59,11 @@ set(MATRIX_CONTROL_PRERELEASE_SUFFIX "alpha"
 #   Linux: VST3 → ~/.vst3/
 # COPY_TO_ARTEFACTS_DIR: ON/OFF — copies build outputs to a central custom folder
 #   (ARTEFACTS_DIR_WINDOWS/MACOS/LINUX, organized by platform and architecture)
-# Override at configure time: cmake .. -DUSER_COPY_TO_ARTEFACTS_DIR=ON
+# Override at configure time: cmake .. -DUSER_COPY_TO_ARTEFACTS_DIR=OFF
 # =============================================================================
 
-set(USER_COPY_TO_SYSTEM_FOLDERS ON)
-set(USER_COPY_TO_ARTEFACTS_DIR ON)
+set(USER_COPY_TO_SYSTEM_FOLDERS ON CACHE BOOL "Default: copy plugins to system folders after build")
+set(USER_COPY_TO_ARTEFACTS_DIR ON CACHE BOOL "Default: copy build outputs to central artefacts folder")
 
 set(COPY_TO_SYSTEM_FOLDERS ${USER_COPY_TO_SYSTEM_FOLDERS} CACHE BOOL "Copy plugins to system folders after build (all OS)" FORCE)
 set(COPY_TO_ARTEFACTS_DIR ${USER_COPY_TO_ARTEFACTS_DIR} CACHE BOOL "Copy build outputs to central artefacts folder (organized by platform/architecture)" FORCE)
@@ -445,6 +445,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/MIDI/SysEx/SysExEncoder.cpp
         Source/Core/Loggers/MidiLogger.cpp
         Source/Shared/Definitions/PluginDescriptors.cpp
+        Source/Shared/Definitions/PluginDescriptorsMasterEdit.cpp
         Source/Shared/Definitions/PluginDescriptorsMatrixModulation.cpp
         Source/Shared/Definitions/PluginDescriptorsPatchEdit.cpp
         Source/Shared/Definitions/PluginHelpers.cpp

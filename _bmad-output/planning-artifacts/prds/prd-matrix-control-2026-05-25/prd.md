@@ -578,7 +578,7 @@ Full ambitious v1 per brief § Scope: virtual instrument dual-role, PATCH + MAST
 
 - **SM-4:** Computer patch Save/Load reliability (M4L pain point closed). Validates FR-25–FR-29, FR-52, UJ-3.
 - **SM-5:** Beta tester positive feedback (Jeremy Bernstein + M4L community). Validates overall UX.
-- **SM-6:** CI Core unit tests green on macOS for SysEx round-trip, PatchModel packing, ClipboardService, ActionDispatcher routing mocks. Validates NFR-1.
+- **SM-6:** CI build and Core unit tests green on **macOS, Windows, and Linux** for SysEx round-trip, PatchModel packing, ClipboardService, ActionDispatcher routing mocks. Validates NFR-1.
 - **SM-7:** Patch Mutator exploratory session — MUTATE/RETRY chains, COMPARE, EXPORT folder layout, Defrag at limit. Validates FR-30–FR-34, FR-54–FR-60, UJ-4.
 
 **Counter-metrics (do not optimize)**
