@@ -125,9 +125,12 @@ After the first successful run that includes the `ci-success` job on the Story 1
 ```bash
 gh api repos/tensquaresoftware/matrix-control/branches/main/protection/required_status_checks \
   -X PATCH \
-  -f strict=true \
-  -f 'contexts[]=release-script-tests' \
-  -f 'contexts[]=ci-success'
+  --input - <<'EOF'
+{
+  "strict": true,
+  "contexts": ["release-script-tests", "ci-success"]
+}
+EOF
 ```
 
 Remove any legacy required checks named `build-and-test (...)` (truncated matrix job names from Story 11.1–11.2).

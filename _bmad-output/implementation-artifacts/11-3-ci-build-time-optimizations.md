@@ -3,7 +3,7 @@ organization: Ten Square Software
 project: Matrix-Control
 title: Story 11.3 — CI Build-Time Optimizations
 author: BMad Agent
-status: review
+status: done
 epic: 11
 story: 3
 story_key: 11-3-ci-build-time-optimizations
@@ -25,7 +25,7 @@ updated: 2026-07-11
 
 # Story 11.3: CI Build-Time Optimizations
 
-Status: review
+Status: done
 
 <!-- Epic 11 — CI & Release Infrastructure. Flow ergonomics story: faster PR CI without weakening the 3-OS merge gate. Does NOT modify release.yml (Story 11.2). -->
 
@@ -120,7 +120,7 @@ So that the dev → PR → review → merge loop stays practical on a solo maint
 - [ ] (Optional) Implement Lever **A** or **E** — compile/configure cache (AC: 2, 3)
 - [x] Extend workflow structure tests (AC: 7)
 - [x] Update `CONTRIBUTING.md` CI section (AC: 5)
-- [ ] Validate on a test PR: cold + warm run; capture timings in Dev Agent Record (AC: 2) — **Flow B: pending single push post code-review**
+- [x] Validate on a test PR: cold + warm run; capture timings in Dev Agent Record (AC: 2) — PR #23 fast ~5 min, full ~12 min 33 s (cold only; warm deferred)
 - [x] Resolve or defer 11-1 review item: hard-coded `test_binary` paths (consider `ctest` or `cmake --build --target run_tests` if added) — **deferred**: paths centralized in `resolve-ci-tier` JSON; `ctest` out of scope for v1
 
 ### Review Findings
@@ -271,14 +271,14 @@ Composer (dev-story Flow B)
 | Windows matrix leg | ~12 min 23 s | PR #21 — **wall clock** |
 | **Full PR total** | **~12 min** | 3 parallel legs |
 
-**After 11.3 (expected, not yet measured on GitHub):**
+**After 11.3 — measured on GitHub PR #23 (2026-07-11):**
 
-| Tier | Expected |
-|------|----------|
-| Draft PR (fast) | ~5 min (macOS + release-script-tests) |
-| Ready for review / push `main` | ~12 min (unchanged full gate) |
+| Tier | Trigger | Wall clock | Jobs |
+|------|---------|------------|------|
+| **Fast (cold)** | Draft PR, run after `0759d56` (`29158097668`) | **~5 min** | `release-script-tests` 8 s, `resolve-ci-tier` 4 s, `build-and-test` macOS 4 min, `ci-success` 2 s |
+| **Full (cold)** | Ready for review, run `29158329606` | **~12 min 33 s** | macOS ~9 min, Linux ~9 min, Windows ~12 min (wall clock), `ci-success` 2 s |
 
-After timings: capture on the single Flow B PR push (cold run ready-for-review; optional warm re-run via `ci-full` label).
+Baseline comparison: fast tier **~5 min vs ~12 min** full PR pre-11.3 — **−58%** wall clock during WIP loop. Full tier unchanged (~12 min vs ~12 min baseline). Target ≤8 min fast tier met.
 
 ### Completion Notes List
 
@@ -286,7 +286,7 @@ After timings: capture on the single Flow B PR push (cold run ready-for-review; 
 - Lever **F**: `ci-success` aggregate job; branch protection migration documented in `CONTRIBUTING.md` (`gh api` payload).
 - Optional levers A/C/D/E skipped for v1 (B alone meets fast-tier target).
 - `test_binary` paths consolidated in `resolve-ci-tier` shell (single SSOT within workflow); still hard-coded strings — `ctest` deferred.
-- **Flow B:** no push yet; AC2 after-timings pending PR validation.
+- **Flow B PR #23:** fast tier ~5 min, full tier ~12 min 33 s (cold); branch protection migrated to `release-script-tests` + `ci-success` (AC4).
 - **Code review (2026-07-11):** patches applied — `labeled`/`unlabeled` triggers, live PR state via `gh pr view`, `jq` exact `ci-full` match; AC2/AC4 deferred per review decisions.
 
 ### File List
@@ -301,6 +301,8 @@ After timings: capture on the single Flow B PR push (cold run ready-for-review; 
 
 - 2026-07-11 — Story 11.3 created: CI build-time optimizations + `ci-success` branch protection lever after 7-5 PR ~12 min observation and main protection setup.
 - 2026-07-11 — Implemented Lever B (draft fast tier) + F (`ci-success`); workflow structure tests; CONTRIBUTING CI tiers (Flow B, no push).
+
+- 2026-07-11 — PR #23 validated AC2 timings; branch protection migrated; story done.
 
 ## References
 
