@@ -117,14 +117,19 @@ private:
     {
         beginTest("Queued SysEx gate sharing (sendSysExWithDelay) — two SysEx drain without hang");
 
+        const auto outputId = firstAvailableOutputDeviceId();
+        if (outputId.isEmpty())
+        {
+            logMessage("Skipped — no MIDI output device available");
+            return;
+        }
+
         Core::MidiOutboundQueue queue;
         Core::MidiActivityTracker tracker;
         MinimalAudioProcessor proc;
         MidiManager manager(proc.apvts, queue, tracker);
 
-        const auto outputId = firstAvailableOutputDeviceId();
-        if (outputId.isNotEmpty())
-            manager.setMidiOutputPort(outputId);
+        expect(manager.setMidiOutputPort(outputId), "Output port should open");
 
         manager.startThread();
 
@@ -200,14 +205,19 @@ private:
     {
         beginTest("Empty SysEx payload — dequeued and skipped without sendSysExWithDelay");
 
+        const auto outputId = firstAvailableOutputDeviceId();
+        if (outputId.isEmpty())
+        {
+            logMessage("Skipped — no MIDI output device available");
+            return;
+        }
+
         Core::MidiOutboundQueue queue;
         Core::MidiActivityTracker tracker;
         MinimalAudioProcessor proc;
         MidiManager manager(proc.apvts, queue, tracker);
 
-        const auto outputId = firstAvailableOutputDeviceId();
-        if (outputId.isNotEmpty())
-            manager.setMidiOutputPort(outputId);
+        expect(manager.setMidiOutputPort(outputId), "Output port should open");
 
         manager.startThread();
         queue.enqueueSysEx(juce::MemoryBlock());

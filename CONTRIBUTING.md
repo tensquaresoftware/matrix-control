@@ -106,7 +106,7 @@ Every **push** and **pull request** targeting `main` runs the [Build and Test](h
 | Runner | CMake preset | Toolchain |
 |--------|--------------|-----------|
 | `macos-latest` (Apple Silicon) | `macos-debug-arm64` | Ninja |
-| `windows-latest` | `windows-debug-vs2022` | Visual Studio 2022 (x64) |
+| `windows-latest` | `windows-debug` | Visual Studio 2026 (x64) |
 | `ubuntu-latest` | `linux-debug` | Ninja |
 
 Each leg:
@@ -138,11 +138,11 @@ cmake --build --preset macos-debug-arm64 --target Matrix-Control Matrix-Control_
 
 ```powershell
 $env:JUCE_DIR = "C:\JUCE"
-cmake --preset windows-debug-vs2022 `
+cmake --preset windows-debug `
   -DMATRIX_BUILD_TESTS=ON `
   -DUSER_COPY_TO_SYSTEM_FOLDERS=OFF `
   -DUSER_COPY_TO_ARTEFACTS_DIR=OFF
-cmake --build --preset windows-debug-vs2022 --target Matrix-Control Matrix-Control_Tests --config Debug
+cmake --build --preset windows-debug --target Matrix-Control Matrix-Control_Tests --config Debug
 & "Builds/Windows/Matrix-Control_Tests_artefacts/Debug/Matrix-Control_Tests.exe"
 ```
 

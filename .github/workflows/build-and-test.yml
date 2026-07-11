@@ -3,7 +3,7 @@
 #
 # Preset choices (CMakeUserPresets.json):
 #   macOS  — macos-debug-arm64   (Ninja, Apple Silicon runner = macos-latest)
-#   Windows — windows-debug-vs2022 (VS 2022; GHA windows-latest ships VS 2022, not VS 2026)
+#   Windows — windows-debug        (VS 2026; GHA windows-latest migrated to VS 2026 in June 2026)
 #   Linux  — linux-debug          (Ninja)
 #
 # CI overrides (no personal artefact paths, no plugin copy side effects):
@@ -34,7 +34,7 @@ jobs:
             build_config: ""
             test_binary: Builds/macOS/ARM/Debug/Matrix-Control_Tests_artefacts/Debug/Matrix-Control_Tests
           - os: windows-latest
-            preset: windows-debug-vs2022
+            preset: windows-debug
             build_config: --config Debug
             test_binary: Builds/Windows/Matrix-Control_Tests_artefacts/Debug/Matrix-Control_Tests.exe
           - os: ubuntu-latest
@@ -67,6 +67,7 @@ jobs:
           sudo apt-get update
           sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
             build-essential \
+            cmake \
             ninja-build \
             pkg-config \
             libasound2-dev \
@@ -74,6 +75,7 @@ jobs:
             ladspa-sdk \
             libcurl4-openssl-dev \
             libfreetype6-dev \
+            libfontconfig1-dev \
             libx11-dev \
             libxcomposite-dev \
             libxcursor-dev \
@@ -82,7 +84,8 @@ jobs:
             libxrandr-dev \
             libxrender-dev \
             libglu1-mesa-dev \
-            mesa-common-dev
+            mesa-common-dev \
+            libglib2.0-dev
 
       - name: Configure CMake
         shell: bash
