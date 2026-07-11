@@ -10,7 +10,7 @@ Thank you for your interest in Matrix-Control! Whether you are a JUCE developer,
 - [Reporting Bugs](https://claude.ai/chat/16b5619a-506c-4e52-9a86-10a1574ec048#reporting-bugs)
 - [Suggesting Features](https://claude.ai/chat/16b5619a-506c-4e52-9a86-10a1574ec048#suggesting-features)
 - [Contributing Code](https://claude.ai/chat/16b5619a-506c-4e52-9a86-10a1574ec048#contributing-code)
-- [Continuous Integration](https://claude.ai/chat/16b5619a-506c-4e52-9a86-10a1574ec048#continuous-integration)
+- [Continuous Integration](#continuous-integration)
 - [Code Style Guidelines](https://claude.ai/chat/16b5619a-506c-4e52-9a86-10a1574ec048#code-style-guidelines)
 - [Commit Message Convention](https://claude.ai/chat/16b5619a-506c-4e52-9a86-10a1574ec048#commit-message-convention)
 - [Pull Request Process](https://claude.ai/chat/16b5619a-506c-4e52-9a86-10a1574ec048#pull-request-process)

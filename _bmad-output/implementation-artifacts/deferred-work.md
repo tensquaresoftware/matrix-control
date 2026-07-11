@@ -1,5 +1,14 @@
 # Deferred Work
 
+## Deferred from: code review of 11-1-ci-multi-platform-build-and-tests (2026-07-11)
+
+- **Hard-coded test_binary paths per OS in CI workflow** — fragile if CMake output layout changes; consider ctest or artifact discovery later.
+- **COPY_* CACHE FORCE may retain stale copy flags on local reconfigure** — CI mitigated by fresh checkout each run.
+- **CONTRIBUTING.md entire TOC uses claude.ai URLs instead of in-repo anchors** — pre-existing; fix holistically in doc hygiene pass.
+- **Thread::sleep(50) in MidiManagerTests queue timing** — pre-existing potential CI flakiness under load.
+- **Personal Dropbox artefact paths in CMakeUserPresets.json** — copy disabled in CI; optional ci-* presets deferred.
+- **MIDI-dependent tests skip silently when no output device** — acceptable for AC3 headless CI; mock coverage deferred.
+
 - **Panel M change leaves R list stale until processor hook** — resolved 1+2: sync reads APVTS in 6.6; 7.4 processor calls `syncHistoryUiProperties` on `kSelectedM` change for full panel UX.
 
 ## Deferred from: code review of 7-4-mutatoractionhandler (2026-06-20)
