@@ -100,9 +100,39 @@ Familiarity with the following is recommended:
 
 ## Continuous Integration
 
-Every **push** and **pull request** targeting `main` runs the [Build and Test](https://github.com/tensquaresoftware/matrix-control/actions/workflows/build-and-test.yml) workflow on GitHub Actions.
+Every **push** to `main` and every **pull request** targeting `main` runs the [Build and Test](https://github.com/tensquaresoftware/matrix-control/actions/workflows/build-and-test.yml) workflow on GitHub Actions.
 
-### Matrix
+### CI tiers (Story 11.3)
+
+| Trigger | Jobs | Typical duration |
+|---------|------|------------------|
+| **Draft PR** — `opened`, `synchronize`, `reopened` while draft | `release-script-tests` + macOS Debug build/tests | ~5 min |
+| **Ready for review** — non-draft PR, `ready_for_review`, or label **`ci-full`** | `release-script-tests` + full 3-OS matrix | ~12 min |
+| **Push to `main`** (post-merge) | Always full 3-OS matrix | ~12 min |
+
+During active development, open PRs as **draft** to use the fast tier. Mark the PR **ready for review** (or add the `ci-full` label) before merge — the full cross-platform matrix must pass.
+
+**Merge gate:** branch protection requires **`release-script-tests`** and **`ci-success`** (aggregate job). The three matrix leg names are informational only and must not be required checks (they change if workflow matrix parameters change).
+
+**Solo maintainer tip:** `dev-story` → local macOS tests → `code-review` can run in parallel with CI; merge only when Checks are green.
+
+To request a full matrix re-run without toggling draft state, add the **`ci-full`** label to the PR.
+
+### Branch protection update (maintainers)
+
+After the first successful run that includes the `ci-success` job on the Story 11-3 PR (before merge), update required status checks:
+
+```bash
+gh api repos/tensquaresoftware/matrix-control/branches/main/protection/required_status_checks \
+  -X PATCH \
+  -f strict=true \
+  -f 'contexts[]=release-script-tests' \
+  -f 'contexts[]=ci-success'
+```
+
+Remove any legacy required checks named `build-and-test (...)` (truncated matrix job names from Story 11.1–11.2).
+
+### Matrix (full tier)
 
 | Runner | CMake preset | Toolchain |
 |--------|--------------|-----------|

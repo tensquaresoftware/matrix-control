@@ -1,5 +1,9 @@
 # Deferred Work
 
+## Deferred from: code review of 11-3-ci-build-time-optimizations (2026-07-11)
+
+- **PRs de fork — l’auteur ne peut pas ajouter `ci-full` sans maintainer** — limitation GitHub Actions ; documenter dans CONTRIBUTING si friction observée.
+
 ## Deferred from: code review of 11-2-cd-release-pipeline (2026-07-11)
 
 - **Dry-run E2E (push tag réel + assets GitHub Release)** — post-merge maintainer après configuration des secrets ; déjà documenté story L187.
