@@ -1640,6 +1640,18 @@ So that v1.0.0 distribution does not require manual per-OS packaging.
 
 **Depends on:** Story 11.1 · **Model:** Luthier Story 10.2
 
+### Story 11.3: CI Build-Time Optimizations (backlog)
+
+As a contributor,
+I want pull-request CI to finish faster without weakening the cross-platform merge gate,
+So that the dev → PR → review → merge loop stays practical.
+
+**Status:** ready-for-dev — story file `implementation-artifacts/11-3-ci-build-time-optimizations.md` (2026-07-11).
+
+**Candidate levers:** draft PR fast tier (macOS-only); tests-only PR builds; ccache/sccache; path filters for docs-only; **`ci-success` aggregate job** for stable branch protection checks.
+
+**Depends on:** Stories 11.1, 11.2 · **Does not modify:** `release.yml`
+
 ---
 
 ## Final Validation (Step 4)
