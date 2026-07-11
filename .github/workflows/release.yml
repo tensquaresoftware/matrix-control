@@ -1,0 +1,305 @@
+# Tag-triggered Release build, sign (macOS), package, and GitHub Release (Story 11.2).
+#
+# Preset choices (CMakeUserPresets.json):
+#   macOS  — macos-release-arm64   (Apple Silicon runner = macos-latest)
+#   Windows — windows-release        (VS 2026)
+#   Linux  — linux-release          (Ninja)
+#
+# CI overrides:
+#   -DMATRIX_BUILD_TESTS=ON
+#   -DUSER_COPY_TO_SYSTEM_FOLDERS=OFF
+#   -DUSER_COPY_TO_ARTEFACTS_DIR=OFF
+#   -DMATRIX_CONTROL_PRERELEASE_SUFFIX=<from tag suffix, empty for stable>
+
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  JUCE_VERSION: "8.0.12"
+
+jobs:
+  validate-tag:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
+      version: ${{ steps.tag.outputs.version }}
+      suffix: ${{ steps.tag.outputs.suffix }}
+    steps:
+      - name: Checkout Matrix-Control
+        uses: actions/checkout@v4
+
+      - name: Validate semver tag and CMake version
+        id: tag
+        shell: bash
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          python3 Scripts/release/prepare_release.py validate-tag "$TAG"
+          PARSED=$(python3 -c "
+          import sys
+          sys.path.insert(0, 'Scripts/release')
+          from prepare_release import parse_version_from_tag
+          parsed = parse_version_from_tag('${TAG}')
+          print(parsed.display_version)
+          print(parsed.suffix)
+          ")
+          VERSION=$(echo "$PARSED" | sed -n '1p')
+          SUFFIX=$(echo "$PARSED" | sed -n '2p')
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "suffix=$SUFFIX" >> "$GITHUB_OUTPUT"
+          echo "Release version: $VERSION (tag: $TAG)"
+
+  build:
+    needs: validate-tag
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            platform: macos
+            preset: macos-release-arm64
+            build_config: ""
+            archive_suffix: macOS-arm64
+            pack_extra: --arch arm64
+            test_binary: Builds/macOS/ARM/Release/Matrix-Control_Tests_artefacts/Release/Matrix-Control_Tests
+            artefacts_root: Builds/macOS/ARM/Release/Matrix-Control_artefacts/Release
+          - os: windows-latest
+            platform: windows
+            preset: windows-release
+            build_config: --config Release
+            archive_suffix: Windows
+            pack_extra: ""
+            test_binary: Builds/Windows/Matrix-Control_Tests_artefacts/Release/Matrix-Control_Tests.exe
+            artefacts_root: Builds/Windows/Matrix-Control_artefacts/Release
+          - os: ubuntu-latest
+            platform: linux
+            preset: linux-release
+            build_config: ""
+            archive_suffix: Linux
+            pack_extra: ""
+            test_binary: Builds/Linux/Release/Matrix-Control_Tests_artefacts/Release/Matrix-Control_Tests
+            artefacts_root: Builds/Linux/Release/Matrix-Control_artefacts/Release
+
+    steps:
+      - name: Checkout Matrix-Control
+        uses: actions/checkout@v4
+
+      - name: Cache JUCE
+        id: cache-juce
+        uses: actions/cache@v4
+        with:
+          path: JUCE
+          key: juce-${{ env.JUCE_VERSION }}-${{ runner.os }}
+
+      - name: Checkout JUCE
+        if: steps.cache-juce.outputs.cache-hit != 'true'
+        uses: actions/checkout@v4
+        with:
+          repository: juce-framework/JUCE
+          ref: ${{ env.JUCE_VERSION }}
+          path: JUCE
+
+      - name: Install Linux build dependencies
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            build-essential \
+            cmake \
+            ninja-build \
+            pkg-config \
+            libasound2-dev \
+            libjack-jackd2-dev \
+            ladspa-sdk \
+            libcurl4-openssl-dev \
+            libfreetype6-dev \
+            libfontconfig1-dev \
+            libx11-dev \
+            libxcomposite-dev \
+            libxcursor-dev \
+            libxext-dev \
+            libxinerama-dev \
+            libxrandr-dev \
+            libxrender-dev \
+            libglu1-mesa-dev \
+            mesa-common-dev \
+            libglib2.0-dev
+
+      - name: Configure CMake (Release)
+        shell: bash
+        env:
+          JUCE_DIR: ${{ github.workspace }}/JUCE
+        run: |
+          cmake --preset "${{ matrix.preset }}" \
+            -DMATRIX_BUILD_TESTS=ON \
+            -DUSER_COPY_TO_SYSTEM_FOLDERS=OFF \
+            -DUSER_COPY_TO_ARTEFACTS_DIR=OFF \
+            -DMATRIX_CONTROL_PRERELEASE_SUFFIX="${{ needs.validate-tag.outputs.suffix }}"
+
+      - name: Build plugin and unit tests
+        shell: bash
+        run: |
+          cmake --build --preset "${{ matrix.preset }}" \
+            --target Matrix-Control Matrix-Control_Tests \
+            ${{ matrix.build_config }}
+
+      - name: Run unit tests
+        shell: bash
+        run: |
+          test -f "${{ matrix.test_binary }}"
+          "${{ matrix.test_binary }}"
+
+      - name: Require macOS signing secrets
+        if: matrix.platform == 'macos'
+        shell: bash
+        env:
+          DEV_ID_APP_CERT: ${{ secrets.DEV_ID_APP_CERT }}
+          DEV_ID_APP_PASSWORD: ${{ secrets.DEV_ID_APP_PASSWORD }}
+          DEVELOPER_ID_APPLICATION: ${{ secrets.DEVELOPER_ID_APPLICATION }}
+          NOTARIZATION_USERNAME: ${{ secrets.NOTARIZATION_USERNAME }}
+          NOTARIZATION_PASSWORD: ${{ secrets.NOTARIZATION_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          missing=0
+          for var in DEV_ID_APP_CERT DEV_ID_APP_PASSWORD DEVELOPER_ID_APPLICATION NOTARIZATION_USERNAME NOTARIZATION_PASSWORD APPLE_TEAM_ID; do
+            if [ -z "${!var}" ]; then
+              echo "Missing required secret: $var"
+              missing=1
+            fi
+          done
+          if [ "$missing" -ne 0 ]; then
+            echo "macOS release builds require codesign + notarization secrets (see CONTRIBUTING.md)."
+            exit 1
+          fi
+
+      - name: Import signing certificate (macOS)
+        if: matrix.platform == 'macos'
+        uses: sudara/basic-macos-keychain-action@v1
+        id: keychain
+        with:
+          dev-id-app-cert: ${{ secrets.DEV_ID_APP_CERT }}
+          dev-id-app-password: ${{ secrets.DEV_ID_APP_PASSWORD }}
+
+      - name: Codesign and notarize (macOS)
+        if: matrix.platform == 'macos'
+        timeout-minutes: 30
+        shell: bash
+        env:
+          DEVELOPER_ID_APPLICATION: ${{ secrets.DEVELOPER_ID_APPLICATION }}
+          NOTARIZATION_USERNAME: ${{ secrets.NOTARIZATION_USERNAME }}
+          NOTARIZATION_PASSWORD: ${{ secrets.NOTARIZATION_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          ROOT="${{ matrix.artefacts_root }}"
+          VST3="$ROOT/VST3/Matrix-Control.vst3"
+          AU="$ROOT/AU/Matrix-Control.component"
+          APP="$ROOT/Standalone/Matrix-Control.app"
+          for path in "$VST3" "$AU" "$APP"; do
+            test -d "$path" || { echo "Missing bundle: $path"; exit 1; }
+          done
+
+          sign_bundle() {
+            codesign --force --keychain "${{ steps.keychain.outputs.keychain-path }}" \
+              -s "$DEVELOPER_ID_APPLICATION" \
+              --deep --strict --options=runtime --timestamp \
+              "$1"
+            codesign --verify --deep --strict --verbose=2 "$1"
+          }
+
+          sign_bundle "$VST3"
+          sign_bundle "$AU"
+          sign_bundle "$APP"
+
+          NOTARY_DIR=$(mktemp -d)
+          notarize_and_staple() {
+            local bundle="$1"
+            local zip="$NOTARY_DIR/$(basename "$bundle").zip"
+            ditto -c -k --keepParent "$bundle" "$zip"
+            xcrun notarytool submit "$zip" \
+              --apple-id "$NOTARIZATION_USERNAME" \
+              --password "$NOTARIZATION_PASSWORD" \
+              --team-id "$APPLE_TEAM_ID" \
+              --wait
+            xcrun stapler staple "$bundle"
+          }
+
+          notarize_and_staple "$VST3"
+          notarize_and_staple "$AU"
+          notarize_and_staple "$APP"
+
+      - name: Pack platform release archive
+        shell: bash
+        run: |
+          python3 Scripts/release/prepare_release.py \
+            --tag "${{ needs.validate-tag.outputs.tag }}" \
+            --force \
+            pack "${{ matrix.platform }}" \
+            --artefacts-root "${{ matrix.artefacts_root }}" \
+            ${{ matrix.pack_extra }}
+
+      - name: Upload platform archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.platform }}-archive
+          path: _local/releases/${{ needs.validate-tag.outputs.version }}/Matrix-Control-v${{ needs.validate-tag.outputs.version }}-${{ matrix.archive_suffix }}.zip
+          retention-days: 7
+
+  publish:
+    needs: [validate-tag, build]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Matrix-Control
+        uses: actions/checkout@v4
+
+      - name: Download platform archives
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Assemble release directory
+        shell: bash
+        env:
+          VERSION: ${{ needs.validate-tag.outputs.version }}
+        run: |
+          RELEASE_DIR="_local/releases/${VERSION}"
+          mkdir -p "$RELEASE_DIR"
+          for platform in linux macos windows; do
+            src=$(find "artifacts/${platform}-archive" -maxdepth 1 -name "Matrix-Control-v${VERSION}-*.zip" -print -quit)
+            if [ -z "$src" ] || [ ! -f "$src" ]; then
+              echo "Missing platform archive for ${platform}: expected Matrix-Control-v${VERSION}-*.zip"
+              exit 1
+            fi
+            cp "$src" "$RELEASE_DIR/"
+          done
+          ls -la "$RELEASE_DIR"
+
+      - name: Finalize and publish GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ needs.validate-tag.outputs.tag }}
+        shell: bash
+        run: |
+          python3 Scripts/release/prepare_release.py \
+            --tag "$TAG" \
+            --force \
+            finalize
+          python3 Scripts/release/prepare_release.py \
+            --tag "$TAG" \
+            publish-ci --yes

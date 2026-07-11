@@ -1,5 +1,12 @@
 # Deferred Work
 
+## Deferred from: code review of 11-2-cd-release-pipeline (2026-07-11)
+
+- **Dry-run E2E (push tag réel + assets GitHub Release)** — post-merge maintainer après configuration des secrets ; déjà documenté story L187.
+- **Windows Authenticode non signé pour v1** — choix spec ; documenté CONTRIBUTING comme acceptable MIT open-source.
+- **macOS arm64-only en CI (pas universal)** — décision spec Dev Notes ; universal optionnel documenté.
+- **Pins pytest/PyYAML sans borne supérieure** — dette mineure reproductibilité locale/CI.
+
 ## Deferred from: code review of 7-5-bank-utility-ui-wiring (2026-07-11)
 
 - **Matrix-6/6R Bank Utility graying UAT not exercised** — smoke item 6 blocked (no M-6 hardware); device-type simulation harness backlog (UAT grid Appendix C); code path review only in Story 7-5 review.
