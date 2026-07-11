@@ -1451,13 +1451,17 @@ void PluginProcessor::reconcilePatchManagerCoordinatesForDeviceType()
     const auto limits = getResolvedDeviceMemoryLimits();
 
     using namespace PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets;
+    namespace BankState = PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties;
 
     const int bankNumber = static_cast<int>(apvts.state.getProperty(kCurrentBankNumber, 0));
 
     if (!limits.hasBankConcept())
     {
         if (bankNumber != 0)
+        {
             apvts.state.setProperty(kCurrentBankNumber, 0, nullptr);
+            apvts.state.setProperty(BankState::kSelectedBank, 0, nullptr);
+        }
     }
     else
     {
@@ -1465,7 +1469,10 @@ void PluginProcessor::reconcilePatchManagerCoordinatesForDeviceType()
                                              limits.maxBankNumber(),
                                              bankNumber);
         if (clampedBank != bankNumber)
+        {
             apvts.state.setProperty(kCurrentBankNumber, clampedBank, nullptr);
+            apvts.state.setProperty(BankState::kSelectedBank, clampedBank, nullptr);
+        }
     }
 
     const int patchNumber = static_cast<int>(apvts.state.getProperty(kCurrentPatchNumber, 0));
@@ -1480,6 +1487,7 @@ void PluginProcessor::reconcilePatchManagerCoordinatesForDeviceType()
 void PluginProcessor::resetInternalPatchCoordinatesToDefaults()
 {
     using namespace PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets;
+    namespace BankState = PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties;
 
     const auto limits = getResolvedDeviceMemoryLimits();
     const int defaultBank = limits.hasBankConcept() ? limits.minBankNumber() : 0;
@@ -1488,6 +1496,7 @@ void PluginProcessor::resetInternalPatchCoordinatesToDefaults()
     suppressPatchSelectionMidiSync_ = true;
     apvts.state.setProperty(kCurrentBankNumber, defaultBank, nullptr);
     apvts.state.setProperty(kCurrentPatchNumber, defaultPatch, nullptr);
+    apvts.state.setProperty(BankState::kSelectedBank, defaultBank, nullptr);
     suppressPatchSelectionMidiSync_ = false;
 
     if (patchSelectionMidiSync_ != nullptr)

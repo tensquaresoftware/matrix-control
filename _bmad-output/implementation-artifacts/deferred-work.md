@@ -7,6 +7,11 @@
 - **macOS arm64-only en CI (pas universal)** — décision spec Dev Notes ; universal optionnel documenté.
 - **Pins pytest/PyYAML sans borne supérieure** — dette mineure reproductibilité locale/CI.
 
+## Deferred from: code review of 7-5-bank-utility-ui-wiring (2026-07-11)
+
+- **Matrix-6/6R Bank Utility graying UAT not exercised** — smoke item 6 blocked (no M-6 hardware); device-type simulation harness backlog (UAT grid Appendix C); code path review only in Story 7-5 review.
+- **AC #9 build/test gate not re-run in code review** — Dev Agent Record claims 1830 tests + macOS targets green; no independent re-verification in review session.
+
 ## Deferred from: code review of 11-1-ci-multi-platform-build-and-tests (2026-07-11)
 
 - **Hard-coded test_binary paths per OS in CI workflow** — fragile if CMake output layout changes; consider ctest or artifact discovery later.
