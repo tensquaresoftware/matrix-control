@@ -20,6 +20,9 @@ public:
 
     void schedule(std::function<void()> callback);
 
+    // Unit-test seam — runs a pending debounced callback without wall-clock waits (CI-safe).
+    void flushPendingSynchronouslyForTests();
+
 private:
     void timerCallback() override;
 
