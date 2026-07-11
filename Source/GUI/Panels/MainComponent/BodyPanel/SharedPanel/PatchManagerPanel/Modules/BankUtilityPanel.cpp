@@ -5,6 +5,7 @@
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Looks/LookBuilders.h"
+#include "GUI/Skins/ColourChart.h"
 #include "GUI/Widgets/ModuleHeader.h"
 #include "GUI/Widgets/Label.h"
 #include "GUI/Widgets/Button.h"
@@ -33,8 +34,10 @@ BankUtilityPanel::BankUtilityPanel(TSS::ISkin& skin, const BankUtilityPanelDimen
     setupBankSelectorLabel(skin);
     setupSelectBankButtons(skin, widgetFactory);
 
+    normalBankLook_ = TSS::buttonLookFromSkin(skin);
     apvts_.state.addListener(this);
     refreshDeviceGating();
+    refreshSelectedBankHighlight();
 
     setSize(dims_.width, dims_.height);
 }
@@ -52,6 +55,10 @@ void BankUtilityPanel::valueTreePropertyChanged(juce::ValueTree&,
         || propertyName == "deviceDetected")
     {
         refreshDeviceGating();
+    }
+    else if (propertyName == PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties::kSelectedBank)
+    {
+        refreshSelectedBankHighlight();
     }
 }
 
@@ -95,7 +102,44 @@ void BankUtilityPanel::setBankUtilityGrayed(bool grayed)
         bankUtilityModuleHeader_->setInterceptsMouseClicks(!grayed, !grayed);
     }
 
+    refreshSelectedBankHighlight();
     repaint();
+}
+
+void BankUtilityPanel::refreshSelectedBankHighlight()
+{
+    const int selected = static_cast<int>(apvts_.state.getProperty(
+        PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties::kSelectedBank,
+        0));
+
+    TSS::Button* const buttons[] = {
+        selectBank0Button_.get(),
+        selectBank1Button_.get(),
+        selectBank2Button_.get(),
+        selectBank3Button_.get(),
+        selectBank4Button_.get(),
+        selectBank5Button_.get(),
+        selectBank6Button_.get(),
+        selectBank7Button_.get(),
+        selectBank8Button_.get(),
+        selectBank9Button_.get(),
+    };
+
+    for (int index = 0; index < 10; ++index)
+    {
+        if (auto* button = buttons[index])
+            button->setLook(normalBankLook_);
+    }
+
+    if (!bankUtilityGrayed_ && selected >= 0 && selected < 10)
+    {
+        if (auto* button = buttons[selected])
+        {
+            auto accentLook = normalBankLook_;
+            accentLook.textOff = juce::Colour(ColourChart::kRed);
+            button->setLook(accentLook);
+        }
+    }
 }
 
 void BankUtilityPanel::styleBankButton(TSS::Button* button, bool grayed)
@@ -215,33 +259,37 @@ void BankUtilityPanel::resized()
 void BankUtilityPanel::setSkin(TSS::ISkin& skin)
 {
     skin_ = &skin;
+    normalBankLook_ = TSS::buttonLookFromSkin(skin);
+
     if (bankUtilityModuleHeader_)
         bankUtilityModuleHeader_->setLook(TSS::moduleHeaderLookFromSkin(skin));
 
     if (bankSelectorLabel_)
         bankSelectorLabel_->setLook(TSS::labelLookFromSkin(skin));
     if (selectBank0Button_)
-        selectBank0Button_->setLook(TSS::buttonLookFromSkin(skin));
+        selectBank0Button_->setLook(normalBankLook_);
     if (selectBank1Button_)
-        selectBank1Button_->setLook(TSS::buttonLookFromSkin(skin));
+        selectBank1Button_->setLook(normalBankLook_);
     if (selectBank2Button_)
-        selectBank2Button_->setLook(TSS::buttonLookFromSkin(skin));
+        selectBank2Button_->setLook(normalBankLook_);
     if (selectBank3Button_)
-        selectBank3Button_->setLook(TSS::buttonLookFromSkin(skin));
+        selectBank3Button_->setLook(normalBankLook_);
     if (selectBank4Button_)
-        selectBank4Button_->setLook(TSS::buttonLookFromSkin(skin));
+        selectBank4Button_->setLook(normalBankLook_);
     if (unlockBankButton_)
-        unlockBankButton_->setLook(TSS::buttonLookFromSkin(skin));
+        unlockBankButton_->setLook(normalBankLook_);
     if (selectBank5Button_)
-        selectBank5Button_->setLook(TSS::buttonLookFromSkin(skin));
+        selectBank5Button_->setLook(normalBankLook_);
     if (selectBank6Button_)
-        selectBank6Button_->setLook(TSS::buttonLookFromSkin(skin));
+        selectBank6Button_->setLook(normalBankLook_);
     if (selectBank7Button_)
-        selectBank7Button_->setLook(TSS::buttonLookFromSkin(skin));
+        selectBank7Button_->setLook(normalBankLook_);
     if (selectBank8Button_)
-        selectBank8Button_->setLook(TSS::buttonLookFromSkin(skin));
+        selectBank8Button_->setLook(normalBankLook_);
     if (selectBank9Button_)
-        selectBank9Button_->setLook(TSS::buttonLookFromSkin(skin));
+        selectBank9Button_->setLook(normalBankLook_);
+
+    refreshSelectedBankHighlight();
 }
 
 void BankUtilityPanel::setUiScale(float uiScale)
@@ -344,8 +392,22 @@ void BankUtilityPanel::setupSelectBankButtons(TSS::ISkin& skin, WidgetFactory& w
         dims_.buttons.height,
         TSS::buttonLookFromSkin(skin),
         widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kUnlockBank).value_or(""));
-    unlockBankButton_->onClick = makeBankAction(
-        PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kUnlockBank);
+    unlockBankButton_->onClick = [this]
+    {
+        if (bankUtilityGrayed_)
+        {
+            showMatrix1000OnlyFooterMessage();
+            return;
+        }
+
+        apvts_.state.setProperty(
+            PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kUnlockBank,
+            juce::Time::getCurrentTime().toMilliseconds(),
+            nullptr);
+        setFooterInfoMessage(
+            apvts_,
+            PluginDisplayNames::PatchManagerSection::BankUtilityModule::kUnlockBankFooterMessage);
+    };
     addAndMakeVisible(*unlockBankButton_);
 
     selectBank5Button_     = std::make_unique<TSS::Button>(

@@ -730,6 +730,8 @@ namespace PluginDisplayNames
             constexpr const char* kName = "BANK UTILITY";
             constexpr const char* kMatrix1000OnlyFooterMessage =
                 "Bank selection is available on Matrix-1000 only.";
+            constexpr const char* kUnlockBankFooterMessage =
+                "Synth bank lock released — use front panel for 3-digit entry; plugin bank/patch unchanged.";
 
             namespace StandaloneWidgets
             {

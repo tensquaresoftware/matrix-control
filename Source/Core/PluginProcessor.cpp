@@ -1480,6 +1480,7 @@ void PluginProcessor::reconcilePatchManagerCoordinatesForDeviceType()
 void PluginProcessor::resetInternalPatchCoordinatesToDefaults()
 {
     using namespace PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets;
+    namespace BankState = PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties;
 
     const auto limits = getResolvedDeviceMemoryLimits();
     const int defaultBank = limits.hasBankConcept() ? limits.minBankNumber() : 0;
@@ -1488,6 +1489,7 @@ void PluginProcessor::resetInternalPatchCoordinatesToDefaults()
     suppressPatchSelectionMidiSync_ = true;
     apvts.state.setProperty(kCurrentBankNumber, defaultBank, nullptr);
     apvts.state.setProperty(kCurrentPatchNumber, defaultPatch, nullptr);
+    apvts.state.setProperty(BankState::kSelectedBank, defaultBank, nullptr);
     suppressPatchSelectionMidiSync_ = false;
 
     if (patchSelectionMidiSync_ != nullptr)

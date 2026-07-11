@@ -117,7 +117,7 @@ Full UAT still requires real Matrix-6/6R for inquiry, SysEx, and display behavio
 | Date | Tester | Scope | Pass | Fail | Blocked | Summary |
 |------|--------|-------|------|------|---------|---------|
 | 2026-06-19 | Guillaume | — | — | — | — | Grid created; session not started. Matrix-1000 smoke 7.3b validated separately. |
-| | | | | | | |
+| 2026-07-11 | Guillaume | Story 7.5 Bank Utility UI | 5 | 0 | 1 | M-1000 smoke PASS (Tauntek v1.20). M6-2.x graying **BLOCKED** — no Matrix-6/6R hardware. Handler paths for M-6 covered in CI only. |
 
 ---
 
@@ -133,6 +133,29 @@ Use only for **UI / handler dry-runs** while Matrix-1000 is connected. Do not re
 4. Restore `deviceType` to `"Matrix-1000"` before normal editing.
 
 **Automated coverage (CI):** `PatchManagerActionHandlerTests` — `bankSelect_matrix6_noSetBank`, `unlockBank_matrix6_noOp`.
+
+---
+
+## Appendix C — Device-type simulation harness (backlog)
+
+**Problem:** Guillaume's lab has **Matrix-1000 only** (Tauntek EPROM v1.20). Many features (Bank Utility graying, memory limits, inquiry identity) need Matrix-6 / Matrix-6R behaviour that cannot be validated on real hardware today.
+
+**Current workarounds (insufficient for full UAT):**
+
+| Approach | Covers | Gaps |
+|----------|--------|------|
+| Appendix A — manual APVTS `deviceType` override | UI gating dry-runs with `deviceDetected == true` | No dev UI; easy to forget restore; no inquiry/SysEx fidelity |
+| CI unit tests (`PatchManagerActionHandlerTests`, `DeviceMemoryLimits`) | Handler no-op / limit branches | No GUI, no visual graying sign-off |
+
+**Target (when Epic 8 or a utility story prioritizes it):**
+
+1. **Dev-only control** (Settings or TestComponent) to set `deviceType` + `deviceDetected` without MIDI inquiry — three presets: Matrix-1000, Matrix-6, Matrix-6R.
+2. **Optional MIDI mock** for inquiry response bytes (Epic 8.2+) so footer identity and auto-detection paths are testable without hardware.
+3. **Document** the override in this grid and in Standalone smoke checklists.
+
+**Stories likely to need this:** 7.5 (partial — M-6 graying untested), 7.6, 8.1–8.3, U-8 / U-9 panel audits.
+
+Until the harness exists: mark Matrix-6/6R UAT rows `BLOCKED` or `N/A`; rely on CI + Appendix A for best-effort UI checks.
 
 ---
 

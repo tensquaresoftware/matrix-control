@@ -6,6 +6,7 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 
 #include "GUI/Layout/PanelDimensions.h"
+#include "GUI/Looks/WidgetLooks.h"
 
 namespace TSS
 {
@@ -44,6 +45,7 @@ private:
     float uiScale_ = 1.0f;
     juce::AudioProcessorValueTreeState& apvts_;
     bool bankUtilityGrayed_ = false;
+    TSS::ButtonLook normalBankLook_;
 
     std::unique_ptr<TSS::ModuleHeader> bankUtilityModuleHeader_;
     std::unique_ptr<TSS::Label> bankSelectorLabel_;
@@ -64,6 +66,7 @@ private:
     void setupSelectBankButtons(TSS::ISkin& skin, WidgetFactory& widgetFactory);
 
     void refreshDeviceGating();
+    void refreshSelectedBankHighlight();
     void setBankUtilityGrayed(bool grayed);
     void showMatrix1000OnlyFooterMessage();
     void styleBankButton(TSS::Button* button, bool grayed);
