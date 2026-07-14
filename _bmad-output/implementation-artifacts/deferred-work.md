@@ -1,5 +1,11 @@
 # Deferred Work
 
+## Deferred from: code review of 7-6-internal-patches-panel-wiring (2026-07-14)
+
+- **Footer ROM persiste après retour banque RAM** (`InternalPatchesPanel.cpp:316`) — pas de clear `uiMessageText`/`uiMessageSeverity` quand `romPasteStoreBlocked_` repasse à false ; polish UX mineur.
+- **Hover footer absent si curseur déjà sur bouton au blocage ROM** (`InternalPatchesPanel.cpp:134`) — `mouseEnter` ne fire pas sans mouvement souris lors du passage banque→ROM.
+- **Smoke manuel Standalone non documenté (AC9 partiel)** — UAT reporté à Guillaume par politique projet ; pas de preuve dans le diff de revue.
+
 ## Deferred from: code review of 7-11-internal-patches-init-sysex-device-rules (2026-07-14)
 
 - **Footer succès INIT affiché avant envoi MIDI / si `midiManager_` null** — pattern hérité de 7.3 (INIT éditeur-only) ; pas de requirement spec sur cohérence footer ↔ livraison MIDI.
