@@ -202,6 +202,25 @@ cmake --build --preset linux-debug --target Matrix-Control Matrix-Control_Tests
 "Builds/Linux/Debug/Matrix-Control_Tests_artefacts/Debug/Matrix-Control_Tests"
 ```
 
+### GitHub Actions maintenance
+
+Workflows target the **Node.js 24** runtime on GitHub-hosted runners. GitHub deprecated Node 20 for JavaScript actions in mid-2026; runners remove it in fall 2026. Pin first-party actions to their Node-24 majors (commit `8ac1354`, 2026-07-14):
+
+| Action | Pinned version | Workflow(s) |
+|--------|----------------|-------------|
+| `actions/checkout` | `@v5` | Build and Test, Release |
+| `actions/cache` | `@v5` | Build and Test, Release |
+| `actions/upload-artifact` | `@v6` | Release |
+| `actions/download-artifact` | `@v7` | Release |
+
+**Upgrade policy:** When GitHub shows Node deprecation annotations, bump to the latest major of each action that declares `node24` in its `action.yml`. Prefer `@v7` over `@v8` for `download-artifact` until you explicitly need v8 behaviour (stricter digest checks, ESM migration).
+
+**Third-party actions:** `sudara/basic-macos-keychain-action@v1` (Release macOS signing) is a **composite** action (shell only) — not affected by the Node runtime migration.
+
+**Self-hosted runners:** Not used today. If added later, require Actions Runner **≥ 2.327.1** for Node 24 actions.
+
+Correct-course archive: `Documentation/Development/Plans/2026/07/2026-07-14-Correct-Course-GitHub-Actions-Node-24-Migration.md` (decision **D-047-T**).
+
 ------
 
 ## Releasing

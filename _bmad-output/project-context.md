@@ -387,6 +387,8 @@ Guillaume develops primarily on **macOS**. Epic 11 CI remains; **branch protecti
 
 See `CONTRIBUTING.md` § Continuous Integration and `_bmad-output/planning-artifacts/sprint-change-proposal-2026-07-14-solo-dev-workflow.md`.
 
+**CI action pins:** GitHub Actions JavaScript steps run on Node 24 — see `CONTRIBUTING.md` § GitHub Actions maintenance (checkout/cache `@v5`, upload `@v6`, download `@v7`).
+
 ---
 
 ## What Agents Must NOT Do
