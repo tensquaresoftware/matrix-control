@@ -4,6 +4,7 @@
 
 #include "GUI/Layout/WidgetDimensions.h"
 #include "GUI/Looks/WidgetLooks.h"
+#include "ComboBoxControlPainter.h"
 
 namespace TSS
 {
@@ -40,8 +41,8 @@ namespace TSS
         int getBaseComponentWidth() const { return width_; }
         int getBaseComponentHeight() const { return height_; }
         
-        static int getBaseWidth() { return kDefaultWidth_; }
-        static int getBaseHeight() { return kDefaultHeight_; }
+        static int getBaseWidth() { return ComboBoxControlMetrics::kDefaultWidth; }
+        static int getBaseHeight() { return ComboBoxControlMetrics::kDefaultHeight; }
 
         static void setPopupLayoutDimensions(const PopupMenuLayoutDimensions& dimensions);
         static const PopupMenuLayoutDimensions& getPopupLayoutDimensions();
@@ -49,15 +50,6 @@ namespace TSS
         int getScaledVerticalMargin() const;
 
     private:
-        inline constexpr static int kDefaultWidth_ = 100;
-        inline constexpr static int kDefaultHeight_ = 20;
-        inline constexpr static int kLeftPadding_ = 4;
-        inline constexpr static int kRightPadding_ = 4;
-        inline constexpr static int kBorderThickness_ = 1;
-        inline constexpr static int kBorderThicknessButtonLike_ = 2;
-        inline constexpr static int kTriangleBaseSize_ = 7;
-        inline constexpr static float kTriangleHeightFactor_ = 0.8660254f;
-
         ComboBoxLook look_{};
         PopupMenuLook popupLook_{};
         int width_;
@@ -69,22 +61,7 @@ namespace TSS
 
         static PopupMenuLayoutDimensions popupLayoutDimensions_;
 
-        void drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);
-        void drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);
-        void drawTriangle(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);
-        void drawBorderIfNeeded(juce::Graphics& g, const juce::Rectangle<float>& bounds, const juce::Rectangle<float>& backgroundBounds, bool enabled, bool hasFocus);
-        
-        juce::Rectangle<float> calculateBackgroundBounds(const juce::Rectangle<float>& bounds) const;
-        juce::Path createTrianglePath(float x, float y, float baseSize) const;
-
         juce::String getSelectedItemText() const;
-        juce::Colour getTextColourForCurrentStyle(bool enabled) const;
-        juce::Colour getTriangleColourForCurrentStyle(bool enabled) const;
-        juce::Colour getBackgroundColourForCurrentStyle(bool enabled) const;
-        juce::Colour getBorderColourForCurrentStyle(bool enabled) const;
-        juce::Colour getFocusBorderColourForCurrentStyle() const;
-        juce::Rectangle<float> calculateTextBounds(const juce::Rectangle<float>& bounds) const;
-
         bool canShowPopup() const;
         void showPopupAsynchronously();
 

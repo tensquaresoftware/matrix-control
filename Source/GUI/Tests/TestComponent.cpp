@@ -11,6 +11,7 @@
 #include "GUI/Tests/TestActivityLeds.h"
 #include "GUI/Tests/TestButtons.h"
 #include "GUI/Tests/TestComboBoxes.h"
+#include "GUI/Tests/TestHierarchicalComboBoxes.h"
 #include "GUI/Tests/TestEnvelopeDisplays.h"
 #include "GUI/Tests/TestGroupLabels.h"
 #include "GUI/Tests/TestHorizontalSeparators.h"
@@ -37,7 +38,7 @@
 namespace
 {
     constexpr int kFirstComboItemId_ = 1;
-    constexpr int kLastComboItemId_ = 20;
+    constexpr int kLastComboItemId_ = 21;
 
     class TestContentHost : public juce::Component
     {
@@ -128,6 +129,8 @@ void TestComponent::setSkin(TSS::ISkin& skin)
         testSliders_->setSkin(skin);
     if (testComboBoxes_ != nullptr)
         testComboBoxes_->setSkin(skin);
+    if (testHierarchicalComboBoxes_ != nullptr)
+        testHierarchicalComboBoxes_->setSkin(skin);
     if (testNumberBoxes_ != nullptr)
         testNumberBoxes_->setSkin(skin);
     if (testLabels_ != nullptr)
@@ -432,6 +435,12 @@ void TestComponent::createTestPages(juce::AudioProcessorValueTreeState& apvts)
     testComboBoxes_ = std::make_unique<TestComboBoxes>(*skin_);
     testContentHost_->addAndMakeVisible(*testComboBoxes_);
 
+    testHierarchicalComboBoxes_ = std::make_unique<TestHierarchicalComboBoxes>(
+        *skin_,
+        patchManager.patchMutator.comboBoxes.patchMutatorHistoryWidth,
+        patchManager.patchMutator.comboBoxes.standardHeight);
+    testContentHost_->addAndMakeVisible(*testHierarchicalComboBoxes_);
+
     testNumberBoxes_ = std::make_unique<TestNumberBoxes>(*skin_, patchManager.internalPatches.numberBoxes);
     testContentHost_->addAndMakeVisible(*testNumberBoxes_);
 
@@ -521,6 +530,7 @@ void TestComponent::populateWidgetSelector()
     widgetSelector_.addItem("Toggle", static_cast<int>(TestWidgetType::Toggle));
     widgetSelector_.addItem("Slider", static_cast<int>(TestWidgetType::Slider));
     widgetSelector_.addItem("ComboBox", static_cast<int>(TestWidgetType::ComboBox));
+    widgetSelector_.addItem("HierarchicalComboBox", static_cast<int>(TestWidgetType::HierarchicalComboBox));
     widgetSelector_.addItem("NumberBox", static_cast<int>(TestWidgetType::NumberBox));
     widgetSelector_.addItem("Label", static_cast<int>(TestWidgetType::Label));
     widgetSelector_.addItem("GroupLabel", static_cast<int>(TestWidgetType::GroupLabel));
@@ -570,6 +580,7 @@ void TestComponent::updateVisibleTests()
     setVisibleForType(TestWidgetType::Toggle, testToggles_.get());
     setVisibleForType(TestWidgetType::Slider, testSliders_.get());
     setVisibleForType(TestWidgetType::ComboBox, testComboBoxes_.get());
+    setVisibleForType(TestWidgetType::HierarchicalComboBox, testHierarchicalComboBoxes_.get());
     setVisibleForType(TestWidgetType::NumberBox, testNumberBoxes_.get());
     setVisibleForType(TestWidgetType::Label, testLabels_.get());
     setVisibleForType(TestWidgetType::GroupLabel, testGroupLabels_.get());
@@ -610,6 +621,9 @@ void TestComponent::layoutTestContentHost()
         { TestWidgetType::ComboBox, testComboBoxes_.get(),
           [this] { return testComboBoxes_ != nullptr ? testComboBoxes_->getPreferredWidth() : 0; },
           [this] { return testComboBoxes_ != nullptr ? testComboBoxes_->getPreferredHeight() : 0; } },
+        { TestWidgetType::HierarchicalComboBox, testHierarchicalComboBoxes_.get(),
+          [this] { return testHierarchicalComboBoxes_ != nullptr ? testHierarchicalComboBoxes_->getPreferredWidth() : 0; },
+          [this] { return testHierarchicalComboBoxes_ != nullptr ? testHierarchicalComboBoxes_->getPreferredHeight() : 0; } },
         { TestWidgetType::NumberBox, testNumberBoxes_.get(),
           [this] { return testNumberBoxes_ != nullptr ? testNumberBoxes_->getPreferredWidth() : 0; },
           [this] { return testNumberBoxes_ != nullptr ? testNumberBoxes_->getPreferredHeight() : 0; } },

@@ -3,7 +3,8 @@ organization: Ten Square Software
 project: Matrix-Control
 title: Story U-12 — HierarchicalComboBox Widget
 author: BMad Agent
-status: ready-for-dev
+status: review
+baseline_commit: d4e0ed888c523602233c75ba3ae5e580c0ed88f3
 sources:
   - planning-artifacts/sprint-change-proposal-2026-07-14-init-sysex-and-hierarchical-history-combobox.md
   - planning-artifacts/prds/prd-matrix-control-2026-05-25/.decision-log.md
@@ -17,7 +18,7 @@ updated: 2026-07-14
 
 # Story U-12: HierarchicalComboBox Widget
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -59,22 +60,22 @@ so that two-level selections (e.g. Patch Mutator History M → R) use one contro
 
 ## Tasks / Subtasks
 
-- [ ] **Widget skeleton** (AC: #1, #4, #5)
-  - [ ] Create `HierarchicalComboBox` extending `juce::Component` (or composing inner label/button like ComboBox)
-  - [ ] Reuse look builders: `comboBoxLookFromSkin`, `popupMenuLookFromSkin`
-  - [ ] `setUiScale`, `setLook`, `paint`, `mouseDown` → show menu
+- [x] **Widget skeleton** (AC: #1, #4, #5)
+  - [x] Create `HierarchicalComboBox` extending `juce::Component` (or composing inner label/button like ComboBox)
+  - [x] Reuse look builders: `comboBoxLookFromSkin`, `popupMenuLookFromSkin`
+  - [x] `setUiScale`, `setLook`, `paint`, `mouseDown` → show menu
 
-- [ ] **Popup menu model** (AC: #2, #3)
-  - [ ] Internal item tree: primary id → optional child list
-  - [ ] Build nested `PopupMenu` on show; chevron via menu item properties or custom paint if needed
-  - [ ] Wire selection → stored ids → `onChange`
+- [x] **Popup menu model** (AC: #2, #3)
+  - [x] Internal item tree: primary id → optional child list
+  - [x] Build nested `PopupMenu` on show; chevron via menu item properties or custom paint if needed
+  - [x] Wire selection → stored ids → `onChange`
 
-- [ ] **Design atom + factory hook** (AC: #6)
-  - [ ] Add `kPatchMutatorHistory = 48` to `DesignAtoms.h`
-  - [ ] Wire in `DimensionFactory` as `patchMutatorHistoryWidth` (or reuse slider width field in panel dims — document in 6-14)
+- [x] **Design atom + factory hook** (AC: #6)
+  - [x] Add `kPatchMutatorHistory = 48` to `DesignAtoms.h`
+  - [x] Wire in `DimensionFactory` as `patchMutatorHistoryWidth` (or reuse slider width field in panel dims — document in 6-14)
 
-- [ ] **TestComponent demo** (AC: #5, #8)
-  - [ ] Minimal M/R sample data for manual hover/submenu verification at 50%/100%/150% UI scale
+- [x] **TestComponent demo** (AC: #5, #8)
+  - [x] Minimal M/R sample data for manual hover/submenu verification at 50%/100%/150% UI scale
 
 ## Dev Notes
 
@@ -114,12 +115,39 @@ History control width @ 100 % = **48 px** = RANDOM slider width (`Atoms::Widths:
 
 ### Agent Model Used
 
-{{agent_model_name_version}}
+Claude (Cursor Agent)
+
+### Implementation Plan
+
+- `TSS::HierarchicalComboBox` as `juce::Component` with Standard ComboBox closed-state paint (shared constants with `TSS::ComboBox`).
+- Popup via `juce::PopupMenu::addSubMenu` + `showMenuAsync`; styled with private `LookAndFeel_V4` subclass driven by `PopupMenuLook` and `uiScale`.
+- Item tree stored as primary vector with child vectors; menu result IDs mapped back to `{primaryId, childId}` on selection commit.
+- Design atom `kPatchMutatorHistory = 48` exposed as `ComboBoxDimensions::patchMutatorHistoryWidth` in `DimensionFactory`.
+- `TestHierarchicalComboBoxes` sandbox page (U-2 column pattern) with sample M/R data and empty sentinel row.
 
 ### Completion Notes List
 
+- Implemented `TSS::HierarchicalComboBox` with full public API, sentinel/empty non-openable state, `setInactiveAppearance`, and em-dash root-only display rule.
+- Added TestComponent selector entry **HierarchicalComboBox** with scale columns at 50%–200%.
+- Fixed pre-existing `GrayedControlHelper.cpp` compile error (`forwarders()` used before declaration) encountered during build.
+- macOS Debug build green; full unit test suite passes (no new GUI pixel tests per project policy).
+
 ### File List
+
+- Source/GUI/Widgets/HierarchicalComboBox.h (added)
+- Source/GUI/Widgets/HierarchicalComboBox.cpp (added)
+- Source/GUI/Layout/Design/DesignAtoms.h (modified)
+- Source/GUI/Layout/WidgetDimensions.h (modified)
+- Source/GUI/Factories/DimensionFactory.cpp (modified)
+- Source/GUI/Tests/TestHierarchicalComboBoxes.h (added)
+- Source/GUI/Tests/TestHierarchicalComboBoxes.cpp (added)
+- Source/GUI/Tests/TestComponent.h (modified)
+- Source/GUI/Tests/TestComponent.cpp (modified)
+- Source/GUI/Helpers/GrayedControlHelper.cpp (modified — build fix)
+- CMakeLists.txt (modified)
+- _bmad-output/implementation-artifacts/sprint-status.yaml (modified)
 
 ## Change Log
 
 - 2026-07-14: Story U-12 created — HierarchicalComboBox widget (Correct Course D-082-R2).
+- 2026-07-14: Implemented HierarchicalComboBox widget, design atom, DimensionFactory hook, and TestComponent demo; story ready for review.

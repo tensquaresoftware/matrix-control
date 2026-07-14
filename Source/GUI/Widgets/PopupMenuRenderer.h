@@ -17,9 +17,18 @@ namespace TSS
 
         void drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds) const;
         void drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds, float systemDisplayScale) const;
-        void drawItem(juce::Graphics& g, const ComboBox& comboBox, int itemIndex, 
-                     const juce::Rectangle<float>& itemBounds, int highlightedItemIndex, 
+        void drawItem(juce::Graphics& g, const ComboBox& comboBox, int itemIndex,
+                     const juce::Rectangle<float>& itemBounds, int highlightedItemIndex,
                      const juce::Font& font) const;
+        void drawLabelItem(juce::Graphics& g,
+                           const juce::String& text,
+                           const juce::Rectangle<float>& itemBounds,
+                           bool isHighlighted,
+                           bool isEnabled,
+                           const juce::Font& font) const;
+        void drawSubMenuChevron(juce::Graphics& g,
+                                const juce::Rectangle<float>& itemBounds,
+                                const juce::Font& font) const;
         void drawVerticalSeparators(juce::Graphics& g, const juce::Rectangle<float>& contentBounds,
                                    int columnCount, float actualColumnWidth, float separatorWidth) const;
 

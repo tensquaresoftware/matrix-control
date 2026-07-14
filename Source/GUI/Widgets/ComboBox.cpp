@@ -1,8 +1,8 @@
 #include "ComboBox.h"
+#include "ComboBoxControlPainter.h"
 #include "MultiColumnPopupMenu.h"
 #include "ScrollablePopupMenu.h"
 
-#include "GUI/Layout/ScaledDrawing.h"
 #include "GUI/Skins/ColourChart.h"
 
 namespace TSS
@@ -74,60 +74,20 @@ namespace TSS
 
     void ComboBox::paint(juce::Graphics& g)
     {
-        const auto bounds = getLocalBounds().toFloat();
-        const auto enabled = isEnabled();
-        const auto hasFocus = hasFocus_ || isPopupOpen_;
-        const auto backgroundBounds = calculateBackgroundBounds(bounds);
+        const auto style = style_ == Style::ButtonLike
+            ? ComboBoxControlStyle::ButtonLike
+            : ComboBoxControlStyle::Standard;
 
-        drawBackground(g, backgroundBounds, enabled);
-        drawText(g, bounds, enabled);
-        drawTriangle(g, bounds, enabled);
-        drawBorderIfNeeded(g, bounds, backgroundBounds, enabled, hasFocus);
-    }
-
-    void ComboBox::drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled)
-    {
-        g.setColour(getBackgroundColourForCurrentStyle(enabled));
-        g.fillRect(bounds);
-    }
-
-    void ComboBox::drawBorderIfNeeded(juce::Graphics& g, const juce::Rectangle<float>& bounds, const juce::Rectangle<float>& backgroundBounds, bool enabled, bool hasFocus)
-    {
-        const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
-
-        if (style_ == Style::ButtonLike)
-        {
-            const float thickness = ScaledDrawing::snappedStrokeThicknessFromDesign(
-                static_cast<float>(kBorderThicknessButtonLike_),
-                uiScale_,
-                systemDisplayScale,
-                ScaledDrawing::StrokeSnapPolicy::kRound);
-            g.setColour(getBorderColourForCurrentStyle(enabled));
-            g.drawRect(bounds, thickness);
-            return;
-        }
-
-        if (hasFocus)
-        {
-            const float thickness = ScaledDrawing::snappedStrokeThicknessFromDesign(
-                static_cast<float>(kBorderThickness_),
-                uiScale_,
-                systemDisplayScale,
-                ScaledDrawing::StrokeSnapPolicy::kRound);
-            g.setColour(getFocusBorderColourForCurrentStyle());
-            g.drawRect(backgroundBounds, thickness);
-        }
-    }
-
-    void ComboBox::drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled)
-    {
-        const auto text = getSelectedItemText();
-        const auto textColour = getTextColourForCurrentStyle(enabled);
-        const auto textBounds = calculateTextBounds(bounds);
-
-        g.setColour(textColour);
-        g.setFont(look_.font.withHeight(look_.font.getHeight() * uiScale_));
-        g.drawText(text, textBounds, juce::Justification::centredLeft, false);
+        ComboBoxControlPainter::paintClosedState(
+            g,
+            *this,
+            getLocalBounds().toFloat(),
+            style,
+            look_,
+            uiScale_,
+            getSelectedItemText(),
+            isEnabled(),
+            hasFocus_ || isPopupOpen_);
     }
 
     juce::String ComboBox::getSelectedItemText() const
@@ -137,90 +97,6 @@ namespace TSS
             return getItemText(selectedIndex);
 
         return getTextWhenNothingSelected();
-    }
-
-    juce::Colour ComboBox::getTextColourForCurrentStyle(bool enabled) const
-    {
-        if (style_ == Style::ButtonLike)
-            return enabled ? look_.buttonLikeText : look_.buttonLikeTextDisabled;
-        
-        return enabled ? look_.textEnabled : look_.textDisabled;
-    }
-
-    juce::Colour ComboBox::getTriangleColourForCurrentStyle(bool enabled) const
-    {
-        if (style_ == Style::ButtonLike)
-            return enabled ? look_.buttonLikeTriangle : look_.buttonLikeTriangleDisabled;
-        
-        return enabled ? look_.triangleEnabled : look_.triangleDisabled;
-    }
-
-    juce::Colour ComboBox::getBackgroundColourForCurrentStyle(bool enabled) const
-    {
-        if (style_ == Style::ButtonLike)
-            return enabled ? look_.buttonLikeBackground : look_.buttonLikeBackgroundDisabled;
-        
-        return enabled ? look_.backgroundEnabled : look_.backgroundDisabled;
-    }
-
-    juce::Colour ComboBox::getBorderColourForCurrentStyle(bool enabled) const
-    {
-        if (style_ == Style::ButtonLike)
-            return enabled ? look_.buttonLikeBorder : look_.buttonLikeBorderDisabled;
-        
-        return enabled ? look_.borderEnabled : look_.borderDisabled;
-    }
-
-    juce::Colour ComboBox::getFocusBorderColourForCurrentStyle() const
-    {
-        return look_.focusBorder;
-    }
-
-    juce::Rectangle<float> ComboBox::calculateTextBounds(const juce::Rectangle<float>& bounds) const
-    {
-        auto textBounds = bounds;
-        const float leftPad = static_cast<float>(kLeftPadding_) * uiScale_;
-        const float triangleSpace = static_cast<float>(kTriangleBaseSize_) * uiScale_;
-        const float rightPad = static_cast<float>(kRightPadding_) * uiScale_;
-        
-        textBounds.removeFromLeft(leftPad);
-        textBounds.removeFromRight(triangleSpace);
-        textBounds.removeFromRight(rightPad);
-        return textBounds;
-    }
-
-    void ComboBox::drawTriangle(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled)
-    {
-        const auto triangleColour = getTriangleColourForCurrentStyle(enabled);
-        g.setColour(triangleColour);
-
-        const float triangleBaseSize = static_cast<float>(kTriangleBaseSize_) * uiScale_;
-        const float triangleHeight = triangleBaseSize * kTriangleHeightFactor_;
-        const float rightPad = static_cast<float>(kRightPadding_) * uiScale_;
-        const float triangleX = bounds.getRight() - triangleBaseSize - rightPad;
-        const float triangleY = bounds.getCentreY() - triangleHeight * 0.5f;
-
-        const auto trianglePath = createTrianglePath(triangleX, triangleY, triangleBaseSize);
-        g.fillPath(trianglePath);
-    }
-
-    juce::Path ComboBox::createTrianglePath(float x, float y, float baseSize) const
-    {
-        juce::Path path;
-        
-        const auto height = baseSize * kTriangleHeightFactor_;
-        
-        path.startNewSubPath(x, y);
-        path.lineTo(x + baseSize, y);
-        path.lineTo(x + baseSize * 0.5f, y + height);
-        path.closeSubPath();
-        
-        return path;
-    }
-
-    juce::Rectangle<float> ComboBox::calculateBackgroundBounds(const juce::Rectangle<float>& bounds) const
-    {
-        return bounds;
     }
 
     void ComboBox::showPopup()

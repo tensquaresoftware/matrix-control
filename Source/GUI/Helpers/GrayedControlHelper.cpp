@@ -7,6 +7,14 @@ namespace TSS::GrayedControlHelper
 {
     namespace
     {
+        class GrayedClickForwarder;
+
+        std::unordered_map<juce::Component*, std::unique_ptr<GrayedClickForwarder>>& forwarders()
+        {
+            static std::unordered_map<juce::Component*, std::unique_ptr<GrayedClickForwarder>> map;
+            return map;
+        }
+
         class GrayedClickForwarder : public juce::MouseListener,
                                      public juce::ComponentListener
         {
@@ -61,12 +69,6 @@ namespace TSS::GrayedControlHelper
             bool grayed_ = false;
             std::function<void()> showFooter_;
         };
-
-        std::unordered_map<juce::Component*, std::unique_ptr<GrayedClickForwarder>>& forwarders()
-        {
-            static std::unordered_map<juce::Component*, std::unique_ptr<GrayedClickForwarder>> map;
-            return map;
-        }
     }
 
     void applyGrayedAppearance(juce::Component& component, bool grayed)

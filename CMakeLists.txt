@@ -223,6 +223,7 @@ set(PLUGIN_SOURCES
     Source/GUI/Tests/TestActivityLeds.cpp
     Source/GUI/Tests/TestButtons.cpp
     Source/GUI/Tests/TestComboBoxes.cpp
+    Source/GUI/Tests/TestHierarchicalComboBoxes.cpp
     Source/GUI/Tests/TestColourPickerButton.cpp
     Source/GUI/Tests/TestComponent.cpp
     Source/GUI/Tests/TestEnvelopeDisplays.cpp
@@ -285,6 +286,9 @@ set(PLUGIN_SOURCES
     # GUI - Widgets
     Source/GUI/Widgets/Button.cpp
     Source/GUI/Widgets/ComboBox.cpp
+    Source/GUI/Widgets/ComboBoxControlPainter.cpp
+    Source/GUI/Widgets/HierarchicalComboBox.cpp
+    Source/GUI/Widgets/HierarchicalPopupMenu.cpp
     Source/GUI/Widgets/Toggle.cpp
     Source/GUI/Widgets/EnvelopeDisplay.cpp
     Source/GUI/Widgets/GroupLabel.cpp

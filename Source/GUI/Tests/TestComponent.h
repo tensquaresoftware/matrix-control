@@ -19,6 +19,7 @@ class WidgetFactory;
 class TestActivityLeds;
 class TestButtons;
 class TestComboBoxes;
+class TestHierarchicalComboBoxes;
 class TestEnvelopeDisplays;
 class TestGroupLabels;
 class TestHorizontalSeparators;
@@ -58,6 +59,7 @@ public:
         Toggle,
         Slider,
         ComboBox,
+        HierarchicalComboBox,
         NumberBox,
         Label,
         GroupLabel,
@@ -115,6 +117,7 @@ private:
     std::unique_ptr<TestToggles> testToggles_;
     std::unique_ptr<TestSliders> testSliders_;
     std::unique_ptr<TestComboBoxes> testComboBoxes_;
+    std::unique_ptr<TestHierarchicalComboBoxes> testHierarchicalComboBoxes_;
     std::unique_ptr<TestNumberBoxes> testNumberBoxes_;
     std::unique_ptr<TestLabels> testLabels_;
     std::unique_ptr<TestGroupLabels> testGroupLabels_;
