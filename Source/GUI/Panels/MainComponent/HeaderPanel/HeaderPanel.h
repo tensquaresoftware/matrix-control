@@ -28,6 +28,7 @@ class HeaderPanel : public juce::Component
 public:
     static constexpr int kPortSentinelItemId = 1;
     static constexpr int kFirstDeviceItemId = 2;
+    static constexpr int kPluginHostItemId = 2;
 
     HeaderPanel(TSS::ISkin& skin, int width, int height);
     ~HeaderPanel() override = default;
@@ -85,6 +86,7 @@ private:
     void updateKeyboardFromVisibility();
     void updateAudioControlsVisibility();
     void configureStandaloneKeyboardFrom();
+    void configurePluginKeyboardFrom();
     int findItemIdForIdentifier(const std::vector<juce::String>& identifiers,
                                 const juce::String& deviceId) const;
     juce::String getSelectedPortIdentifier(const TSS::ComboBox& combo,

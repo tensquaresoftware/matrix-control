@@ -2,6 +2,7 @@
 
 #include "Core/Services/DeviceMemoryLimits.h"
 #include "Core/Services/DeviceTypeRegistry.h"
+#include "GUI/Helpers/GrayedControlHelper.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Looks/LookBuilders.h"
@@ -14,15 +15,6 @@
 #include "GUI/Factories/WidgetFactory.h"
 #include <juce_core/juce_core.h>
 
-
-namespace
-{
-    void setFooterInfoMessage(juce::AudioProcessorValueTreeState& apvts, const juce::String& message)
-    {
-        apvts.state.setProperty("uiMessageText", message, nullptr);
-        apvts.state.setProperty("uiMessageSeverity", "info", nullptr);
-    }
-}
 
 BankUtilityPanel::BankUtilityPanel(TSS::ISkin& skin, const BankUtilityPanelDimensions& dims, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : dims_(dims)
@@ -82,7 +74,6 @@ void BankUtilityPanel::refreshDeviceGating()
 void BankUtilityPanel::setBankUtilityGrayed(bool grayed)
 {
     bankUtilityGrayed_ = grayed;
-    const float alpha = grayed ? 0.5f : 1.0f;
 
     styleBankButton(unlockBankButton_.get(), grayed);
     styleBankButton(selectBank0Button_.get(), grayed);
@@ -98,14 +89,14 @@ void BankUtilityPanel::setBankUtilityGrayed(bool grayed)
 
     if (bankSelectorLabel_)
     {
-        bankSelectorLabel_->setAlpha(alpha);
-        bankSelectorLabel_->setInterceptsMouseClicks(!grayed, !grayed);
+        TSS::GrayedControlHelper::applyGrayedAppearance(*bankSelectorLabel_, grayed);
+        bankSelectorLabel_->setInterceptsMouseClicks(! grayed, ! grayed);
     }
 
     if (bankUtilityModuleHeader_)
     {
-        bankUtilityModuleHeader_->setAlpha(alpha);
-        bankUtilityModuleHeader_->setInterceptsMouseClicks(!grayed, !grayed);
+        TSS::GrayedControlHelper::applyGrayedAppearance(*bankUtilityModuleHeader_, grayed);
+        bankUtilityModuleHeader_->setInterceptsMouseClicks(! grayed, ! grayed);
     }
 
     refreshSelectedBankHighlight();
@@ -157,12 +148,12 @@ void BankUtilityPanel::styleBankButton(TSS::Button* button, bool grayed)
         return;
 
     button->setEnabled(true);
-    button->setAlpha(grayed ? 0.5f : 1.0f);
+    TSS::GrayedControlHelper::applyGrayedAppearance(*button, grayed);
 }
 
 void BankUtilityPanel::showMatrix1000OnlyFooterMessage()
 {
-    setFooterInfoMessage(
+    TSS::GrayedControlHelper::setFooterInfoMessage(
         apvts_,
         PluginDisplayNames::PatchManagerSection::BankUtilityModule::kMatrix1000OnlyFooterMessage);
 }
@@ -413,7 +404,7 @@ void BankUtilityPanel::setupSelectBankButtons(TSS::ISkin& skin, WidgetFactory& w
             PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kUnlockBank,
             juce::Time::getCurrentTime().toMilliseconds(),
             nullptr);
-        setFooterInfoMessage(
+        TSS::GrayedControlHelper::setFooterInfoMessage(
             apvts_,
             PluginDisplayNames::PatchManagerSection::BankUtilityModule::kUnlockBankFooterMessage);
     };

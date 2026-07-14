@@ -153,6 +153,7 @@ set(PLUGIN_SOURCES
     Source/Core/Models/PackedFieldCodec.cpp
     Source/Core/Models/PatchModel.cpp
     Source/Core/Services/ClipboardService.cpp
+    Source/Core/Services/SessionPersistencePolicy.cpp
     Source/Core/Services/PatchMutator/MutationHistoryStore.cpp
     Source/Core/Services/PatchMutator/MutationNaming.cpp
     Source/Core/Services/PatchMutator/HistoryDefragService.cpp
@@ -185,6 +186,7 @@ set(PLUGIN_SOURCES
     Source/GUI/Dialogs/MasterInitConfirmDialog.cpp
     Source/GUI/Factories/WidgetFactory.cpp
     Source/GUI/Factories/DimensionFactory.cpp
+    Source/GUI/Helpers/GrayedControlHelper.cpp
     Source/GUI/Factories/WidgetFactoryValidator.cpp
     Source/GUI/Layout/WidgetDimensionRegistry.cpp
     
@@ -339,6 +341,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/MutationAlgorithmTests.cpp
         Tests/Unit/PatchMutatorEngineTests.cpp
         Tests/Unit/MutatorRecipePersistenceTests.cpp
+        Tests/Unit/SessionPersistencePolicyTests.cpp
         Tests/Unit/ComboboxPatchSendDebouncerTests.cpp
         Tests/Unit/ClipboardPasteEnabledResolverTests.cpp
         Tests/Unit/ApvtsMasterMapperTests.cpp
@@ -397,6 +400,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/Models/MasterModel.cpp
         Source/Core/Models/PatchModel.cpp
         Source/Core/Services/ClipboardService.cpp
+        Source/Core/Services/SessionPersistencePolicy.cpp
         Source/Core/Services/PatchMutator/MutationHistoryStore.cpp
         Source/Core/Services/PatchMutator/MutationNaming.cpp
         Source/Core/Services/PatchMutator/HistoryDefragService.cpp

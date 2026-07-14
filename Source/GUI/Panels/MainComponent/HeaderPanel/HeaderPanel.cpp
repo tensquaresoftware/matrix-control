@@ -2,6 +2,7 @@
 
 #include <juce_audio_devices/juce_audio_devices.h>
 
+#include "GUI/Helpers/GrayedControlHelper.h"
 #include "GUI/Widgets/Label.h"
 #include "GUI/Widgets/ComboBox.h"
 #include "GUI/Widgets/HeaderLogoPopupMenu.h"
@@ -237,13 +238,10 @@ void HeaderPanel::resized()
         x += packetExternalGap - gap;
     };
 
-    if (!isPluginMode_)
-    {
-        placePacketLed(instrumentActivityLed_);
-        placePacketLabel(keyboardFromLabel_, keyboardFromLabelWidth);
-        placePacketCombo(keyboardFromComboBox_, portComboWidth);
-        endPacket();
-    }
+    placePacketLed(instrumentActivityLed_);
+    placePacketLabel(keyboardFromLabel_, keyboardFromLabelWidth);
+    placePacketCombo(keyboardFromComboBox_, portComboWidth);
+    endPacket();
 
     placePacketLed(editorActivityLed_);
     placePacketLabel(midiFromLabel_, editorMidiFromLabelWidth);
@@ -344,7 +342,9 @@ void HeaderPanel::setPluginMode(bool isPlugin)
     updateKeyboardFromVisibility();
     updateAudioControlsVisibility();
 
-    if (!isPluginMode_)
+    if (isPluginMode_)
+        configurePluginKeyboardFrom();
+    else
         configureStandaloneKeyboardFrom();
 
     resized();
@@ -363,11 +363,9 @@ void HeaderPanel::updateAudioControlsVisibility()
 
 void HeaderPanel::updateKeyboardFromVisibility()
 {
-    const bool showKeyboardFrom = !isPluginMode_;
-
-    instrumentActivityLed_.setVisible(showKeyboardFrom);
-    keyboardFromLabel_.setVisible(showKeyboardFrom);
-    keyboardFromComboBox_.setVisible(showKeyboardFrom);
+    instrumentActivityLed_.setVisible(true);
+    keyboardFromLabel_.setVisible(true);
+    keyboardFromComboBox_.setVisible(true);
 }
 
 void HeaderPanel::populateMidiPortLists()
@@ -375,7 +373,9 @@ void HeaderPanel::populateMidiPortLists()
     populateInputPortCombo(midiFromComboBox_, midiFromPortIdentifiers_);
     populateOutputPortCombo(midiToComboBox_, midiToPortIdentifiers_);
 
-    if (!isPluginMode_)
+    if (isPluginMode_)
+        configurePluginKeyboardFrom();
+    else
         configureStandaloneKeyboardFrom();
 }
 
@@ -425,7 +425,19 @@ void HeaderPanel::populateOutputPortCombo(TSS::ComboBox& combo, std::vector<juce
 
 void HeaderPanel::configureStandaloneKeyboardFrom()
 {
+    keyboardFromComboBox_.setEnabled(true);
+    TSS::GrayedControlHelper::applyGrayedAppearance(keyboardFromComboBox_, false);
     populateInputPortCombo(keyboardFromComboBox_, keyboardFromPortIdentifiers_);
+}
+
+void HeaderPanel::configurePluginKeyboardFrom()
+{
+    keyboardFromComboBox_.clear(juce::dontSendNotification);
+    keyboardFromPortIdentifiers_.clear();
+    keyboardFromComboBox_.addItem(PluginDisplayNames::HeaderPanel::kHostDisplay, kPluginHostItemId);
+    keyboardFromComboBox_.setSelectedId(kPluginHostItemId, juce::dontSendNotification);
+    keyboardFromComboBox_.setEnabled(false);
+    TSS::GrayedControlHelper::applyGrayedAppearance(keyboardFromComboBox_, true);
 }
 
 juce::String HeaderPanel::getSelectedMidiFromPortIdentifier() const

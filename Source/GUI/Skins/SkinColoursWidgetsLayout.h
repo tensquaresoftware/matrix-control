@@ -89,5 +89,32 @@ namespace TSS::SkinColours
                 ColourChart::kDarkGrey5
             };
         }
+
+        namespace FooterPanel
+        {
+            inline constexpr ColourElement kMessageInfo = {
+                "FooterMessageInfo",
+                ColourChart::kLightGrey1,
+                ColourChart::kDarkGrey4
+            };
+
+            inline constexpr ColourElement kMessageSuccess = {
+                "FooterMessageSuccess",
+                ColourChart::kGreen4,
+                ColourChart::kGreen3
+            };
+
+            inline constexpr ColourElement kMessageWarning = {
+                "FooterMessageWarning",
+                ColourChart::kOrange,
+                ColourChart::kOrange
+            };
+
+            inline constexpr ColourElement kMessageError = {
+                "FooterMessageError",
+                ColourChart::kRed,
+                ColourChart::kRed
+            };
+        }
     }
 }

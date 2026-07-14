@@ -10,6 +10,10 @@ namespace TSS
         kHeaderPanelBackground,
         kBodyPanelBackground,
         kFooterPanelBackground,
+        kFooterMessageInfo,
+        kFooterMessageSuccess,
+        kFooterMessageWarning,
+        kFooterMessageError,
         
         // SectionHeader colours
         kSectionHeaderText,

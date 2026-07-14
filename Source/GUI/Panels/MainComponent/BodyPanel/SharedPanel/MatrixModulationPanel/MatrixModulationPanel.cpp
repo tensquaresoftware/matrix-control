@@ -1,5 +1,6 @@
 #include "MatrixModulationPanel.h"
 
+#include "GUI/Helpers/GrayedControlHelper.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
@@ -8,6 +9,7 @@
 #include "GUI/Widgets/ModulationBusHeader.h"
 #include "GUI/Widgets/Button.h"
 #include "GUI/Widgets/ModulationBusCell.h"
+#include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginDescriptors.h"
 #include "Shared/Definitions/PluginHelpers.h"
 #include "Shared/Definitions/PluginIDs.h"
@@ -16,10 +18,12 @@
 class MatrixModulationPanel::PasteEnabledPropertyListener : public juce::ValueTree::Listener
 {
 public:
-    PasteEnabledPropertyListener(juce::ValueTree state,
+    PasteEnabledPropertyListener(juce::AudioProcessorValueTreeState& apvts,
+                                 juce::ValueTree state,
                                  const juce::String& propertyId,
                                  TSS::Button& pasteButton)
-        : state_(std::move(state))
+        : apvts_(apvts)
+        , state_(std::move(state))
         , propertyId_(propertyId)
         , pasteButton_(pasteButton)
     {
@@ -38,7 +42,8 @@ public:
         if (property.toString() != propertyId_)
             return;
 
-        pasteButton_.setEnabled(static_cast<bool>(treeWhosePropertyHasChanged.getProperty(property, false)));
+        pasteEnabled_ = static_cast<bool>(treeWhosePropertyHasChanged.getProperty(property, false));
+        syncFromState();
     }
 
     void valueTreeChildAdded(juce::ValueTree&, juce::ValueTree&) override {}
@@ -53,12 +58,39 @@ public:
 private:
     void syncFromState()
     {
-        pasteButton_.setEnabled(static_cast<bool>(state_.getProperty(propertyId_, false)));
+        pasteEnabled_ = static_cast<bool>(state_.getProperty(propertyId_, false));
+        pasteButton_.setEnabled(true);
+        pasteButton_.setInactiveAppearance(! pasteEnabled_);
+        TSS::GrayedControlHelper::applyGrayedAppearance(pasteButton_, ! pasteEnabled_);
+
+        if (pasteEnabled_)
+        {
+            TSS::GrayedControlHelper::clearGrayedClickHandler(pasteButton_);
+            pasteButton_.onClick = [this]
+            {
+                apvts_.state.setProperty(
+                    PluginIDs::MatrixModulationSection::StandaloneWidgets::kMatrixModulationPaste,
+                    juce::Time::getCurrentTime().toMilliseconds(),
+                    nullptr);
+            };
+        }
+        else
+        {
+            pasteButton_.onClick = nullptr;
+            TSS::GrayedControlHelper::setGrayedClickHandler(pasteButton_, true, [this]
+            {
+                TSS::GrayedControlHelper::setFooterInfoMessage(
+                    apvts_,
+                    PluginDisplayNames::MatrixModulationSection::Header::kIncompatiblePasteFooter);
+            });
+        }
     }
 
+    juce::AudioProcessorValueTreeState& apvts_;
     juce::ValueTree state_;
     juce::String propertyId_;
     TSS::Button& pasteButton_;
+    bool pasteEnabled_ = false;
 };
 
 MatrixModulationPanel::~MatrixModulationPanel() = default;
@@ -311,13 +343,6 @@ void MatrixModulationPanel::createSectionActionButtons(TSS::ISkin& skin)
         PluginIDs::MatrixModulationSection::StandaloneWidgets::kMatrixModulationPaste,
         skin,
         dims_.buttonHeight);
-    pasteButton_->onClick = [this]
-    {
-        apvts_.state.setProperty(
-            PluginIDs::MatrixModulationSection::StandaloneWidgets::kMatrixModulationPaste,
-            juce::Time::getCurrentTime().toMilliseconds(),
-            nullptr);
-    };
     addAndMakeVisible(*pasteButton_);
 
     attachPasteEnabledListener();
@@ -329,6 +354,7 @@ void MatrixModulationPanel::attachPasteEnabledListener()
         return;
 
     pasteEnabledListener_ = std::make_unique<PasteEnabledPropertyListener>(
+        apvts_,
         apvts_.state,
         PluginIDs::MatrixModulationSection::StandaloneWidgets::kMatrixModulationPasteEnabled,
         *pasteButton_);

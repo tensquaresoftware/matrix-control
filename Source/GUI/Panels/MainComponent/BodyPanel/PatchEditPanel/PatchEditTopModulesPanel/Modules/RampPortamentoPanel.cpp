@@ -1,9 +1,13 @@
 #include "RampPortamentoPanel.h"
 
-#include "GUI/Skins/Skin.h"
+#include "GUI/Helpers/GrayedControlHelper.h"
 #include "GUI/Panels/Reusable/ModulePanelConfigBuilder.h"
-#include "Shared/Definitions/PluginIDs.h"
+#include "GUI/Skins/Skin.h"
+#include "GUI/Widgets/ComboBox.h"
+#include "GUI/Widgets/ParameterCell.h"
 #include "GUI/Factories/WidgetFactory.h"
+#include "Shared/Definitions/PluginDisplayNames.h"
+#include "Shared/Definitions/PluginIDs.h"
 
 
 ModulePanelLayout RampPortamentoPanel::createLayout()
@@ -29,4 +33,52 @@ RampPortamentoPanel::RampPortamentoPanel(TSS::ISkin& skin, int width, int height
                          const ModuleHeaderDimensions& moduleHeaderDims, const ParameterCellDimensions& parameterCellDims)
     : BaseModulePanel(skin, widgetFactory, apvts, createLayout(), width, height, moduleHeaderDims, parameterCellDims)
 {
+    apvts.addParameterListener(
+        PluginIDs::PatchEditSection::RampPortamentoModule::ParameterWidgets::kPortamentoKeyboardMode,
+        this);
+    refreshLegatoPortaGraying();
+}
+
+RampPortamentoPanel::~RampPortamentoPanel()
+{
+    apvts_.removeParameterListener(
+        PluginIDs::PatchEditSection::RampPortamentoModule::ParameterWidgets::kPortamentoKeyboardMode,
+        this);
+}
+
+void RampPortamentoPanel::parameterChanged(const juce::String& parameterID, float)
+{
+    if (parameterID == PluginIDs::PatchEditSection::RampPortamentoModule::ParameterWidgets::kPortamentoKeyboardMode)
+        refreshLegatoPortaGraying();
+}
+
+void RampPortamentoPanel::refreshLegatoPortaGraying()
+{
+    const auto* keyboardModeParam = apvts_.getParameter(
+        PluginIDs::PatchEditSection::RampPortamentoModule::ParameterWidgets::kPortamentoKeyboardMode);
+    const auto* choiceParam = dynamic_cast<const juce::AudioParameterChoice*>(keyboardModeParam);
+
+    legatoPortaGrayed_ = choiceParam != nullptr && choiceParam->getIndex() == kUnisonKeyboardModeIndex;
+
+    if (auto* legatoCell = getParameterCellAt(7))
+    {
+        if (auto* combo = legatoCell->getComboBox())
+            combo->setEnabled(true);
+
+        TSS::GrayedControlHelper::applyGrayedAppearance(*legatoCell, legatoPortaGrayed_);
+
+        if (legatoPortaGrayed_)
+        {
+            TSS::GrayedControlHelper::setGrayedClickHandler(*legatoCell, true, [this]
+            {
+                TSS::GrayedControlHelper::setFooterInfoMessage(
+                    apvts_,
+                    PluginDisplayNames::PatchEditSection::RampPortamentoModule::kLegatoPortaUnisonBlockedFooter);
+            });
+        }
+        else
+        {
+            TSS::GrayedControlHelper::clearGrayedClickHandler(*legatoCell);
+        }
+    }
 }

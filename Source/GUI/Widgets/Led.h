@@ -31,8 +31,6 @@ namespace TSS
         ISkin* skin_ = nullptr;
         ButtonLook buttonLook_{};
         SliderLook sliderLook_{};
-        int width_;
-        int height_;
         float uiScale_ = 1.0f;
         float displayedLevel_ = 0.0f;
         juce::int64 lastUpdateMs_ = 0;

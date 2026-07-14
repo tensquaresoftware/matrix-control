@@ -20,7 +20,6 @@ public:
     void setSkin(TSS::ISkin& skin);
     void setUiScale(float uiScale);
 
-    // ValueTree::Listener
     void valueTreePropertyChanged(juce::ValueTree& tree,
                                  const juce::Identifier& property) override;
 
@@ -45,14 +44,21 @@ private:
     
     juce::String currentMessage;
     MessageSeverity currentSeverity = MessageSeverity::None;
+    bool deviceDetected_ = false;
+    juce::String deviceType_;
+    juce::String deviceVersion_;
     
     static const juce::Identifier kMessageTextId;
     static const juce::Identifier kMessageSeverityId;
+    static const juce::Identifier kDeviceDetectedId;
+    static const juce::Identifier kDeviceTypeId;
+    static const juce::Identifier kDeviceVersionId;
     
     MessageSeverity parseSeverity(const juce::String& severityStr) const;
     juce::Colour getSeverityColour(MessageSeverity severity) const;
     juce::String getSeverityIcon(MessageSeverity severity) const;
+    juce::String buildDeviceIdentityText() const;
+    void syncFromApvtsState(juce::ValueTree& tree);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(FooterPanel)
 };
-

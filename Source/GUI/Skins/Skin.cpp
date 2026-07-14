@@ -188,6 +188,10 @@ namespace TSS
         colours_[SkinColourId::kHeaderPanelBackground] = juce::Colour(accessColour(Panels::kHeaderPanelBackground));
         colours_[SkinColourId::kBodyPanelBackground] = juce::Colour(accessColour(Panels::kBodyPanelBackground));
         colours_[SkinColourId::kFooterPanelBackground] = juce::Colour(accessColour(Panels::kFooterPanelBackground));
+        colours_[SkinColourId::kFooterMessageInfo] = juce::Colour(accessColour(Widgets::FooterPanel::kMessageInfo));
+        colours_[SkinColourId::kFooterMessageSuccess] = juce::Colour(accessColour(Widgets::FooterPanel::kMessageSuccess));
+        colours_[SkinColourId::kFooterMessageWarning] = juce::Colour(accessColour(Widgets::FooterPanel::kMessageWarning));
+        colours_[SkinColourId::kFooterMessageError] = juce::Colour(accessColour(Widgets::FooterPanel::kMessageError));
     }
     
     template <typename Accessor>

@@ -48,6 +48,7 @@
 #include "Shared/Definitions/PluginDescriptors.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 #include "Core/Services/PatchMutator/MutatorSessionPersistence.h"
+#include "Core/Services/SessionPersistencePolicy.h"
 #include "Core/Services/PatchMutator/PatchMutatorEngine.h"
 #include "Shared/Definitions/PluginIDs.h"
 #include "GUI/PluginEditor.h"
@@ -604,7 +605,12 @@ void PluginProcessor::setStateInformation(const void* data, int sizeInBytes)
     {
         if (xmlState->hasTagName(apvts.state.getType()))
         {
-            apvts.replaceState(juce::ValueTree::fromXml(*xmlState));
+            auto restoredState = juce::ValueTree::fromXml(*xmlState);
+
+            if (Core::SessionPersistencePolicy::shouldStripPatchAndMasterParameters(restoredState))
+                Core::SessionPersistencePolicy::stripPatchAndMasterParameters(restoredState);
+
+            apvts.replaceState(restoredState);
             initializeMutatorRecipeState();
             resetEphemeralMutatorStateAfterSessionLoad();
             initializeMutatorActionEnabledMirrorsForEmptyHistory();

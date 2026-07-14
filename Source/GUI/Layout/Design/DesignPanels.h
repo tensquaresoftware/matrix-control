@@ -186,6 +186,7 @@ namespace TSS::Design
         namespace Footer
         {
             inline constexpr int kHeight = 32;
+            inline constexpr int kIdentityMinWidth = 160;
         }
     }
 

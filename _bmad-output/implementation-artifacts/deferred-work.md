@@ -1,5 +1,11 @@
 # Deferred Work
 
+## Deferred from: code review of 7-8-header-footer-shell-and-persistence (2026-07-14)
+
+- **Hand-maintained parameter ID collection in `SessionPersistencePolicy`** — new modules/parameters must be added manually to `collectManagedParameterIds()`; omission silently defeats strip policy.
+- **`RampPortamentoPanel` hard-coded `getParameterCellAt(7)`** — LEGATO PORTA graying tied to layout index; reordering cells breaks rule without compile failure.
+- **`GrayedControlHelper` direct APVTS footer writes** — uses `setProperty` on `uiMessageText`/`uiMessageSeverity` instead of `ExceptionPropagator`; spec allows thin wrapper.
+
 ## Deferred from: code review of 7-6-internal-patches-panel-wiring (2026-07-14)
 
 - **Footer ROM persiste après retour banque RAM** (`InternalPatchesPanel.cpp:316`) — pas de clear `uiMessageText`/`uiMessageSeverity` quand `romPasteStoreBlocked_` repasse à false ; polish UX mineur.

@@ -1,22 +1,28 @@
 #include "ModuleHeader.h"
 
 #include "GUI/Factories/WidgetFactory.h"
+#include "GUI/Helpers/GrayedControlHelper.h"
 #include "GUI/Layout/ScaledDrawing.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Looks/LookBuilders.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Widgets/Button.h"
+#include "Shared/Definitions/PluginDisplayNames.h"
 
 namespace TSS
 {
     class ModuleHeader::PasteEnabledPropertyListener : public juce::ValueTree::Listener
     {
     public:
-        PasteEnabledPropertyListener(juce::ValueTree state,
+        PasteEnabledPropertyListener(juce::AudioProcessorValueTreeState& apvts,
+                                     juce::ValueTree state,
                                      const juce::String& propertyId,
-                                     Button& pasteButton)
-            : state_(std::move(state))
+                                     Button& pasteButton,
+                                     const juce::String& pasteWidgetId)
+            : apvts_(apvts)
+            , state_(std::move(state))
             , propertyId_(propertyId)
+            , pasteWidgetId_(pasteWidgetId)
             , pasteButton_(pasteButton)
         {
             state_.addListener(this);
@@ -34,7 +40,8 @@ namespace TSS
             if (property.toString() != propertyId_)
                 return;
 
-            pasteButton_.setEnabled(static_cast<bool>(treeWhosePropertyHasChanged.getProperty(property, false)));
+            pasteEnabled_ = static_cast<bool>(treeWhosePropertyHasChanged.getProperty(property, false));
+            syncFromState();
         }
 
         void valueTreeChildAdded(juce::ValueTree&, juce::ValueTree&) override {}
@@ -49,12 +56,37 @@ namespace TSS
     private:
         void syncFromState()
         {
-            pasteButton_.setEnabled(static_cast<bool>(state_.getProperty(propertyId_, false)));
+            pasteEnabled_ = static_cast<bool>(state_.getProperty(propertyId_, false));
+            pasteButton_.setEnabled(true);
+            pasteButton_.setInactiveAppearance(! pasteEnabled_);
+            GrayedControlHelper::applyGrayedAppearance(pasteButton_, ! pasteEnabled_);
+
+            if (pasteEnabled_)
+            {
+                GrayedControlHelper::clearGrayedClickHandler(pasteButton_);
+                pasteButton_.onClick = [this]
+                {
+                    apvts_.state.setProperty(pasteWidgetId_, juce::Time::getCurrentTime().toMilliseconds(), nullptr);
+                };
+            }
+            else
+            {
+                pasteButton_.onClick = nullptr;
+                GrayedControlHelper::setGrayedClickHandler(pasteButton_, true, [this]
+                {
+                    GrayedControlHelper::setFooterInfoMessage(
+                        apvts_,
+                        PluginDisplayNames::ShortLabels::kIncompatiblePasteFooter);
+                });
+            }
         }
 
+        juce::AudioProcessorValueTreeState& apvts_;
         juce::ValueTree state_;
         juce::String propertyId_;
+        juce::String pasteWidgetId_;
         Button& pasteButton_;
+        bool pasteEnabled_ = false;
     };
 
     namespace
@@ -240,9 +272,11 @@ namespace TSS
             return;
 
         pasteEnabledListener_ = std::make_unique<PasteEnabledPropertyListener>(
+            spec.apvts,
             spec.apvts.state,
             pasteEnabledPropertyId_,
-            *pasteButton_);
+            *pasteButton_,
+            spec.pasteWidgetId);
     }
 
     void ModuleHeader::createCopyPasteButtons(const WithActionsSpec& spec)
@@ -261,10 +295,6 @@ namespace TSS
             spec.pasteWidgetId,
             spec.skin,
             dimensions_.buttonHeight);
-        pasteButton_->onClick = [this, id = spec.pasteWidgetId]
-        {
-            apvts_->state.setProperty(id, juce::Time::getCurrentTime().toMilliseconds(), nullptr);
-        };
         addAndMakeVisible(*pasteButton_);
     }
 

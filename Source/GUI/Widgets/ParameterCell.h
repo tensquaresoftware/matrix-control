@@ -38,6 +38,7 @@ public:
     int getDesignRowHeight() const;
 
     TSS::Slider* getSlider() const { return slider_.get(); }
+    TSS::ComboBox* getComboBox() const { return comboBox_.get(); }
 
 private:
     void createParameterLabel(TSS::ISkin& skin, WidgetFactory& factory, const juce::String& parameterId);

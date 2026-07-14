@@ -20,11 +20,17 @@ namespace PluginDisplayNames
         constexpr const char* kInputGainLabel      = "INPUT GAIN :";
         constexpr const char* kNoInputSentinel     = "NO INPUT";
         constexpr const char* kNoOutputSentinel    = "NO OUTPUT";
+        constexpr const char* kHostDisplay         = "HOST";
         constexpr const char* kSettingsButton      = "SETTINGS...";
         constexpr const char* kAudioMidiButton     = "AUDIO/MIDI...";
         constexpr const char* kAboutButton         = "ABOUT...";
         constexpr const char* kLogoSkinSection     = "SKIN";
         constexpr const char* kLogoUiScaleSection  = "UI SCALE";
+    }
+
+    namespace FooterPanel
+    {
+        constexpr const char* kNoDevice = "No device";
     }
 
     namespace About
@@ -108,6 +114,8 @@ namespace PluginDisplayNames
         constexpr const char* kInit  = "I"; // Init buttons
         constexpr const char* kCopy  = "C"; // Copy buttons
         constexpr const char* kPaste = "P"; // Paste buttons
+        constexpr const char* kIncompatiblePasteFooter =
+            "Clipboard contents are not compatible with this module.";
     }
 
     namespace ChoiceLists
@@ -514,6 +522,8 @@ namespace PluginDisplayNames
         namespace RampPortamentoModule
         {
             constexpr const char* kName = "RAMP/PORTAMENTO";
+            constexpr const char* kLegatoPortaUnisonBlockedFooter =
+                "Legato Portamento is not available when Keyboard Mode is Unison.";
 
             namespace StandaloneWidgets
             {
@@ -684,6 +694,8 @@ namespace PluginDisplayNames
             constexpr const char* kSource      = "SOURCE";
             constexpr const char* kAmount      = "AMOUNT";
             constexpr const char* kDestination = "DESTINATION";
+            constexpr const char* kIncompatiblePasteFooter =
+                "Clipboard contents are not compatible with Matrix Modulation paste.";
 
             namespace StandaloneWidgets
             {

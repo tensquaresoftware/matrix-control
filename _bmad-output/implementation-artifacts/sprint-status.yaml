@@ -1,5 +1,5 @@
 # generated: 2026-05-29
-# last_updated: 2026-07-14 (Story 7-6 done — code review footer fix)
+# last_updated: 2026-07-14 (Story 7-8 done — code review patches applied)
 # project: Matrix-Control
 # project_key: NOKEY
 # tracking_system: file-system
@@ -41,7 +41,7 @@
 # - Retrospective appends its action items to action_items; sprint-status surfaces open ones
 
 generated: 2026-05-29
-last_updated: 2026-07-14 (Story 7-6 done — code review footer fix)
+last_updated: 2026-07-14 (Story 7-8 done — code review patches applied)
 project: Matrix-Control
 project_key: NOKEY
 tracking_system: file-system
@@ -148,7 +148,7 @@ development_status:
   7-6-internal-patches-panel-wiring: done
   7-11-internal-patches-init-sysex-device-rules: done
   7-7-settings-page-consolidation: done
-  7-8-header-footer-shell-and-persistence: backlog
+  7-8-header-footer-shell-and-persistence: done
   7-9-matrix-mod-bus-reorder-ux-handler: done
   7-10-about-modal: done
   epic-7-retrospective: optional

@@ -9,11 +9,9 @@
 namespace TSS
 {
     Led::Led(int width, int height)
-        : width_(width)
-        , height_(height)
     {
         setOpaque(true);
-        setSize(width_, height_);
+        setSize(width, height);
     }
 
     void Led::paint(juce::Graphics& g)

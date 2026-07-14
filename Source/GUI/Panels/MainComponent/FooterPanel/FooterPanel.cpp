@@ -1,15 +1,20 @@
 #include "FooterPanel.h"
 
-
 #include "GUI/Layout/Design/DesignPanels.h"
 #include "GUI/Layout/ScaledDrawing.h"
+#include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
+#include "Shared/Definitions/MatrixDeviceTypes.h"
+#include "Shared/Definitions/PluginDisplayNames.h"
 
 using TSS::SkinColourId;
 
 const juce::Identifier FooterPanel::kMessageTextId("uiMessageText");
 const juce::Identifier FooterPanel::kMessageSeverityId("uiMessageSeverity");
+const juce::Identifier FooterPanel::kDeviceDetectedId("deviceDetected");
+const juce::Identifier FooterPanel::kDeviceTypeId(MatrixDeviceTypes::kApvtsPropertyName);
+const juce::Identifier FooterPanel::kDeviceVersionId("deviceVersion");
 
 FooterPanel::FooterPanel(TSS::ISkin& skin, int width, int height, juce::AudioProcessorValueTreeState& apvtsRef)
     : width_(width)
@@ -18,21 +23,8 @@ FooterPanel::FooterPanel(TSS::ISkin& skin, int width, int height, juce::AudioPro
     , apvts(apvtsRef)
 {
     setOpaque(true);
-    // Écouter les changements de l'APVTS
     apvts.state.addListener(this);
-    
-    // Initialiser avec le message actuel s'il existe
-    const auto messageTextVar = apvts.state.getProperty(kMessageTextId, juce::String());
-    const auto severityStrVar = apvts.state.getProperty(kMessageSeverityId, juce::String());
-    
-    const juce::String messageText = messageTextVar.toString();
-    const juce::String severityStr = severityStrVar.toString();
-    
-    if (messageText.isNotEmpty())
-    {
-        currentMessage = messageText;
-        currentSeverity = parseSeverity(severityStr);
-    }
+    syncFromApvtsState(apvts.state);
 }
 
 FooterPanel::~FooterPanel()
@@ -55,25 +47,45 @@ void FooterPanel::paint(juce::Graphics& g)
     g.setColour(skin_->getColour(SkinColourId::kVerticalSeparatorLine));
     g.fillRect(borderLine);
 
+    const int padding = juce::jmax(1, juce::roundToInt(static_cast<float>(kPadding_) * uiScale_));
+    const int iconSize = juce::jmax(1, juce::roundToInt(static_cast<float>(kIconSize_) * uiScale_));
+    const int identityMinWidth = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(TSS::Design::Panels::Footer::kIdentityMinWidth),
+        uiScale_);
+
+    auto bounds = getLocalBounds().reduced(padding);
+    const auto identityText = buildDeviceIdentityText();
+
+    if (identityText.isNotEmpty())
+    {
+        const auto identityBounds = bounds.removeFromRight(juce::jmin(identityMinWidth, bounds.getWidth() / 2));
+        g.setColour(skin_->getColour(SkinColourId::kLabelText));
+        g.setFont(skin_->getBaseFont().withHeight(skin_->getBaseFont().getHeight() * uiScale_));
+        g.drawFittedText(identityText,
+                         identityBounds,
+                         juce::Justification::centredRight,
+                         1,
+                         1.0f);
+    }
+
     if (currentMessage.isEmpty() || currentSeverity == MessageSeverity::None)
         return;
 
-    const int padding = juce::jmax(1, juce::roundToInt(static_cast<float>(kPadding_) * uiScale_));
-    const int iconSize = juce::jmax(1, juce::roundToInt(static_cast<float>(kIconSize_) * uiScale_));
-    
-    auto bounds = getLocalBounds().reduced(padding);
-    
     g.setColour(getSeverityColour(currentSeverity));
     g.setFont(skin_->getBaseFont().withHeight(skin_->getBaseFont().getHeight() * uiScale_));
-    
+
     const juce::String icon = getSeverityIcon(currentSeverity);
     if (icon.isNotEmpty())
     {
         const auto iconBounds = bounds.removeFromLeft(iconSize + padding);
         g.drawText(icon, iconBounds, juce::Justification::centredLeft);
     }
-    
-    g.drawText(currentMessage, bounds, juce::Justification::centredLeft);
+
+    g.drawFittedText(currentMessage,
+                     bounds,
+                     juce::Justification::centredLeft,
+                     1,
+                     1.0f);
 }
 
 void FooterPanel::resized()
@@ -97,16 +109,24 @@ void FooterPanel::setUiScale(float uiScale)
 void FooterPanel::valueTreePropertyChanged(juce::ValueTree& tree,
                                           const juce::Identifier& property)
 {
-    if (property == kMessageTextId || property == kMessageSeverityId)
+    if (property == kMessageTextId
+        || property == kMessageSeverityId
+        || property == kDeviceDetectedId
+        || property == kDeviceTypeId
+        || property == kDeviceVersionId)
     {
-        const auto messageText = tree.getProperty(kMessageTextId, juce::String()).toString();
-        const auto severityStr = tree.getProperty(kMessageSeverityId, juce::String()).toString();
-        
-        currentMessage = messageText;
-        currentSeverity = parseSeverity(severityStr);
-        
+        syncFromApvtsState(tree);
         repaint();
     }
+}
+
+void FooterPanel::syncFromApvtsState(juce::ValueTree& tree)
+{
+    currentMessage = tree.getProperty(kMessageTextId, juce::String()).toString();
+    currentSeverity = parseSeverity(tree.getProperty(kMessageSeverityId, juce::String()).toString());
+    deviceDetected_ = static_cast<bool>(tree.getProperty(kDeviceDetectedId, false));
+    deviceType_ = tree.getProperty(kDeviceTypeId, juce::String()).toString();
+    deviceVersion_ = tree.getProperty(kDeviceVersionId, juce::String()).toString();
 }
 
 FooterPanel::MessageSeverity FooterPanel::parseSeverity(const juce::String& severityStr) const
@@ -130,13 +150,13 @@ juce::Colour FooterPanel::getSeverityColour(MessageSeverity severity) const
         case MessageSeverity::None:
             return skin_->getColour(SkinColourId::kLabelText);
         case MessageSeverity::Info:
-            return juce::Colour(0xFF808080);  // Gris
+            return skin_->getColour(SkinColourId::kFooterMessageInfo);
         case MessageSeverity::Success:
-            return juce::Colour(0xFF00FF00);  // Vert
+            return skin_->getColour(SkinColourId::kFooterMessageSuccess);
         case MessageSeverity::Warning:
-            return juce::Colour(0xFFFF8800);  // Orange
+            return skin_->getColour(SkinColourId::kFooterMessageWarning);
         case MessageSeverity::Error:
-            return juce::Colour(0xFFFF0000);  // Rouge
+            return skin_->getColour(SkinColourId::kFooterMessageError);
         default:
             return skin_->getColour(SkinColourId::kLabelText);
     }
@@ -161,3 +181,17 @@ juce::String FooterPanel::getSeverityIcon(MessageSeverity severity) const
     }
 }
 
+juce::String FooterPanel::buildDeviceIdentityText() const
+{
+    if (! deviceDetected_)
+        return PluginDisplayNames::FooterPanel::kNoDevice;
+
+    if (deviceType_.isEmpty())
+        return PluginDisplayNames::FooterPanel::kNoDevice;
+
+    juce::String identity = deviceType_;
+    if (deviceVersion_.isNotEmpty())
+        identity += " · v" + deviceVersion_;
+
+    return identity;
+}
