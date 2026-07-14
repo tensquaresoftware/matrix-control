@@ -3,7 +3,7 @@ organization: Ten Square Software
 project: Matrix-Control
 title: Story 7.6 — Internal Patches Panel Wiring
 author: BMad Agent
-status: review
+status: done
 baseline_commit: d309fa8
 sources:
   - planning-artifacts/epics.md
@@ -21,7 +21,7 @@ updated: 2026-07-14
 
 # Story 7.6: Internal Patches Panel Wiring
 
-Status: review
+Status: done
 
 <!-- Ultimate context engine analysis completed — comprehensive developer guide created -->
 
@@ -39,9 +39,9 @@ so that RAM/ROM rules apply in UI (FR-22, FR-23, FR-24).
 
 3. **And** when user clicks INIT / COPY / PASTE / STORE **Then** panel fires timestamp properties on the matching StandaloneWidget IDs; `ActionDispatcher` routes INIT/PASTE/STORE to `PatchManagerActionHandler` and COPY to `ModuleActionHandler` — **no business logic in panel**.
 
-4. **And** ROM gating (FR-23, D-023): on ROM banks 2–9, PASTE and STORE appear grayed; **footer warning** (`kRomBankPasteStoreFooterMessage`, severity `warning`) on **click attempt** and **mouse hover** over grayed PASTE/STORE. Core `propagateRomBlockedFooter()` remains as defense-in-depth if action still reaches handler.
+4. **And** ROM gating (FR-23, D-023): on ROM banks 2–9, INIT, PASTE and STORE appear grayed (`setInactiveAppearance`); **footer warning** (`kRomBankPasteStoreFooterMessage`, severity `warning`) on **click attempt** and **mouse hover** over grayed INIT/PASTE/STORE. Core `propagateRomBlockedFooter()` remains as defense-in-depth if action still reaches handler. INIT/PASTE/STORE ROM gating aligned with Story 7-11 (AC3).
 
-5. **And** non-ROM disable reasons unchanged: PASTE grayed when `internalPatchesPastePatchEnabled` is false (no footer — Core silent no-op); STORE grayed when `patchMutatorCompareActive` is true (Story 6.8 — no ROM footer).
+5. **And** non-ROM disable reasons unchanged: PASTE grayed when `internalPatchesPastePatchEnabled` is false (no footer — Core silent no-op); INIT and STORE grayed when `patchMutatorCompareActive` is true (Story 6.8 / 7-11 AC3b — no ROM footer).
 
 6. **And** ctor and `valueTreeRedirected` sync NumberBox displays from APVTS (`kCurrentBankNumber`, `kCurrentPatchNumber`) so session restore / device-type reconcile shows correct digits without requiring a property change event.
 
@@ -69,7 +69,7 @@ so that RAM/ROM rules apply in UI (FR-22, FR-23, FR-24).
 - [x] **ROM footer on click + hover** (AC: #4)
   - [x] Refactor `updatePasteStoreEnabled` to track `romPasteStoreBlocked_` separately from clipboard/compare disables
   - [x] ROM blocked: visual gray (`setAlpha(0.5f)`) but **keep `setEnabled(true)`** so clicks reach panel handler; `onClick` shows footer via local helper (do **not** dispatch action property when ROM-blocked — Core footer is redundant but acceptable if dispatched; prefer panel-only to avoid spurious MIDI)
-  - [x] ROM blocked hover: `mouseEnter` on PASTE/STORE → same warning footer (reuse `kRomBankPasteStoreFooterMessage`)
+  - [x] ROM blocked hover: `mouseEnter` on INIT/PASTE/STORE → same warning footer (reuse `kRomBankPasteStoreFooterMessage`)
   - [x] RAM banks: restore `setAlpha(1.0f)`; apply normal enable rules for clipboard/compare
 
 - [x] **Footer helper** (AC: #4)
@@ -79,6 +79,14 @@ so that RAM/ROM rules apply in UI (FR-22, FR-23, FR-24).
   - [x] No Core handler diffs unless audit finds a genuine regression (unlikely)
   - [x] Run full test suite + Standalone smoke (Dev Notes)
   - [x] Clean Code limits on new panel methods (extract helpers if >15 lines)
+
+### Review Findings
+
+- [x] [Review][Patch] INIT gating ROM/Compare + footer élargi — décision option 3 : garder `wirePasteStoreButton` sur INIT (aligné 7-11) ; `kRomBankPasteStoreFooterMessage` → « Init, Paste and Store are not available on ROM banks 2-9. » ; AC4/AC5 spec mis à jour.
+
+- [x] [Review][Defer] Footer ROM persiste après retour banque RAM [`InternalPatchesPanel.cpp:316`] — aucun clear de `uiMessageText` quand `romPasteStoreBlocked_` repasse à false ; warning peut rester affiché.
+- [x] [Review][Defer] Hover footer absent si curseur déjà sur bouton au blocage ROM [`InternalPatchesPanel.cpp:134`] — `mouseEnter` ne se déclenche pas sans mouvement souris quand la banque passe ROM→curseur immobile.
+- [x] [Review][Defer] Smoke manuel Standalone non documenté (AC9 partiel) — Dev Agent Record indique UAT reporté à Guillaume ; pas de preuve dans le diff.
 
 ## Dev Notes
 
@@ -228,7 +236,7 @@ Tests/ — no new tests required; existing PatchManagerActionHandlerTests cover 
 
 1. Fresh instance → bank NumberBox shows `0`, patch `0`; PASTE/STORE enabled on bank 0.
 2. Bank Utility → bank **1** (RAM) → bank NumberBox updates to `1`; patch unchanged; PASTE/STORE still enabled (same disabled look as bank 0 when clipboard empty only applies to PASTE if empty).
-3. Bank Utility → bank **3** (ROM; banks 2–9) → PASTE/STORE use **disabled palette** (identical to clipboard-disabled PASTE); no hover/pressed highlight; click PASTE → footer warning; hover STORE → footer warning; no SysEx STORE.
+3. Bank Utility → bank **3** (ROM; banks 2–9) → INIT/PASTE/STORE use **disabled palette** (identical to clipboard-disabled PASTE); no hover/pressed highlight; click INIT or PASTE → footer warning; hover STORE → footer warning; no SysEx STORE/INIT.
 4. Bank Utility → bank **0** (RAM) → PASTE/STORE enabled again.
 5. Patch **99** → click `>` → wraps to **00**, same bank; bank NumberBox unchanged.
 6. Patch **00** → click `<` → wraps to **99**, same bank.
@@ -320,6 +328,7 @@ Composer 2.5
 
 ### File List
 
+- `Source/Shared/Definitions/PluginDisplayNames.h`
 - `Source/GUI/Widgets/Button.h`
 - `Source/GUI/Widgets/Button.cpp`
 - `Source/GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/Modules/InternalPatchesPanel.h`
@@ -331,3 +340,4 @@ Composer 2.5
 - 2026-07-14: Story 7.6 created — Internal Patches panel wiring guide (ROM footer UX, NumberBox sync, brownfield audit).
 - 2026-07-14: Story 7.6 implemented — ROM footer click/hover, NumberBox session sync, paste/store wiring refactor; tests green.
 - 2026-07-14: ROM gray fix — `Button::setInactiveAppearance` replaces alpha hack; smoke checklist bank numbers corrected (RAM 0–1, ROM 2–9).
+- 2026-07-14: Code review — INIT ROM/Compare gating confirmed (7-11); footer message broadened to include Init; story done.
