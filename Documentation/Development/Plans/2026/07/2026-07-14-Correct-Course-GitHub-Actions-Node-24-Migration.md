@@ -100,7 +100,7 @@ GitHub Actions began defaulting JavaScript actions to **Node.js 24** on hosted r
 
 ### 5.3 Verification
 
-- [ ] Next **Build and Test** run on `main` shows no Node 20 deprecation Annotations.
+- [x] Next **Build and Test** run on `main` shows no Node 20 deprecation Annotations (confirmed 2026-07-14).
 - [ ] Next **Release** tag run (when applicable) upload/download artefacts succeed unchanged.
 
 ---
@@ -132,4 +132,4 @@ When GitHub shows new deprecation warnings:
 | 3 — Decision (D-047-T) | [x] Done |
 | 4 — Workflow bumps | [x] Done (`8ac1354`) |
 | 5 — Documentation | [x] Done |
-| 6 — CI verification | [ ] Pending next green run without Node 20 warnings |
+| 6 — CI verification | [x] Build and Test green, no Node 20 warnings (2026-07-14) |
