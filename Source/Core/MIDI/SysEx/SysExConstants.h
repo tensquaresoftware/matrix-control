@@ -24,6 +24,7 @@ namespace SysExConstants
         constexpr juce::uint8 kSetBank = 0x0A;
         constexpr juce::uint8 kRemoteParameterEditMatrix = 0x0B;
         constexpr juce::uint8 kUnlockBank = 0x0C;
+        constexpr juce::uint8 kSinglePatchToEditBuffer = 0x0D;
     }
 
     // Request types (for opcode 0x04)
@@ -38,6 +39,7 @@ namespace SysExConstants
 
     // SysEx message lengths (total transmitted bytes)
     constexpr size_t kPatchMessageLength = 275;  // 134 packed bytes = 268 nibbles + 5 header + 1 checksum + 1 EOX
+    constexpr size_t kPatchToEditBufferMessageLength = 274;  // same payload; 4-byte header (no patch number)
     constexpr size_t kMasterMessageLength = 351;  // 172 packed bytes = 344 nibbles + 5 header + 1 checksum + 1 EOX
     constexpr size_t kSplitPatchMessageLength = 36 + 5 + 1 + 1;  // 36 bytes + header + checksum + EOX
     constexpr size_t kMatrixModBusMessageLength = 9;  // F0 10 06 0B <bus> <source> <amount> <destination> F7

@@ -32,6 +32,7 @@
 namespace PatchManager = PluginIDs::PatchManagerSection;
 namespace InternalPatches = PatchManager::InternalPatchesModule::StandaloneWidgets;
 namespace BankUtility = PatchManager::BankUtilityModule;
+namespace MutatorState = PatchManager::PatchMutatorModule::StateProperties;
 namespace ComputerPatches = PatchManager::ComputerPatchesModule;
 namespace PatchNameIds = PluginIDs::PatchEditSection::PatchNameModule;
 namespace FooterMessages = PluginDisplayNames::PatchManagerSection::ComputerPatchesModule::FooterMessages;
@@ -74,7 +75,10 @@ namespace
         bool setBank = false;
         bool unlockBank = false;
         bool patchData = false;
+        bool editBufferPatch = false;
         int setBankValue = -1;
+        int patchNumber = -1;
+        int patchSysExCount = 0;
     };
 
     QueueScanResult scanQueue(Core::MidiOutboundQueue& queue)
@@ -108,6 +112,14 @@ namespace
             else if (data[3] == SysExConstants::Opcode::kSinglePatchData)
             {
                 result.patchData = true;
+                ++result.patchSysExCount;
+                if (block.getSize() >= 6)
+                    result.patchNumber = data[4];
+            }
+            else if (data[3] == SysExConstants::Opcode::kSinglePatchToEditBuffer)
+            {
+                result.editBufferPatch = true;
+                ++result.patchSysExCount;
             }
         }
 
@@ -153,6 +165,10 @@ public:
         testStoreRomBankBlocked();
         testStoreRamBankSuccess();
         testInitLoadsTemplateAndBufferToApvts();
+        testInitMatrix1000_sendsEditBuffer();
+        testInitMatrix6_sendsPatchToCurrentSlot();
+        testInitRomBankBlocked();
+        testInitCompareActiveBlocked();
         testBankSelectMatrix1000SetBank();
         testBankSelectMatrix6NoSetBank();
         testNavigationWithinBankNoSetBank();
@@ -379,6 +395,70 @@ private:
         expect(!harness.suppressPatchSysEx);
         expect(!harness.suppressMatrixModSysEx);
         expect(harness.proc.apvts.state.getProperty("uiMessageText").toString().isNotEmpty());
+
+        const auto queued = scanQueue(harness.queue);
+        expect(queued.editBufferPatch);
+        expect(!queued.patchData);
+        expectEquals(queued.patchSysExCount, 1);
+    }
+
+    void testInitMatrix1000_sendsEditBuffer()
+    {
+        beginTest("init_matrix1000_sendsEditBuffer");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, 1, 12, false);
+
+        harness.handler.handleAction(InternalPatches::kInitPatch, juce::var());
+
+        const auto queued = scanQueue(harness.queue);
+        expect(queued.editBufferPatch);
+        expect(!queued.patchData);
+        expectEquals(queued.patchNumber, -1);
+        expectEquals(queued.patchSysExCount, 1);
+    }
+
+    void testInitMatrix6_sendsPatchToCurrentSlot()
+    {
+        beginTest("init_matrix6_sendsPatchToCurrentSlot");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix6));
+        initializePatchManagerState(harness.proc.apvts.state, 0, 42, false);
+
+        harness.handler.handleAction(InternalPatches::kInitPatch, juce::var());
+
+        const auto queued = scanQueue(harness.queue);
+        expect(queued.patchData);
+        expect(!queued.editBufferPatch);
+        expectEquals(queued.patchNumber, 42);
+        expectEquals(queued.patchSysExCount, 1);
+    }
+
+    void testInitRomBankBlocked()
+    {
+        beginTest("init_romBank_blocked");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, 5, 1, false);
+
+        harness.handler.handleAction(InternalPatches::kInitPatch, juce::var());
+
+        const auto footer = harness.proc.apvts.state.getProperty("uiMessageText").toString();
+        expect(footer == PluginDisplayNames::PatchManagerSection::InternalPatchesModule::kRomBankPasteStoreFooterMessage);
+        expect(harness.proc.apvts.state.getProperty("uiMessageSeverity").toString() == "warning");
+        expect(harness.queue.isEmpty());
+    }
+
+    void testInitCompareActiveBlocked()
+    {
+        beginTest("init_compareActive_blocked");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, 1, 12, false);
+        harness.proc.apvts.state.setProperty(MutatorState::kCompareActive, true, nullptr);
+
+        harness.handler.handleAction(InternalPatches::kInitPatch, juce::var());
+
         expect(harness.queue.isEmpty());
     }
 

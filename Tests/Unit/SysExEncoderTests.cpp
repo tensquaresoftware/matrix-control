@@ -3,6 +3,7 @@
 
 #include "Core/MIDI/SysEx/SysExConstants.h"
 #include "Core/MIDI/SysEx/SysExEncoder.h"
+#include "Core/Init/InitDefaults.h"
 
 /**
  * Unit tests for SysExEncoder
@@ -157,6 +158,24 @@ public:
             expect(nibbles[1] == 0x01, "High nibble of 0x12 should be 0x01");
             expect(nibbles[2] == 0x04, "Low nibble of 0x34 should be 0x04");
             expect(nibbles[3] == 0x03, "High nibble of 0x34 should be 0x03");
+        }
+
+        beginTest("Single Patch to Edit Buffer (0x0D) encoding");
+        {
+            const auto* packedData = Core::InitDefaults::patchData();
+            auto message = encoder.encodePatchToEditBufferSysEx(packedData);
+
+            expectEquals(static_cast<int>(message.getSize()),
+                         static_cast<int>(SysExConstants::kPatchToEditBufferMessageLength));
+
+            const auto* data = static_cast<const juce::uint8*>(message.getData());
+            expect(data[0] == SysExConstants::kSysExStart);
+            expect(data[1] == SysExConstants::kManufacturerIdOberheim);
+            expect(data[2] == SysExConstants::kDeviceIdMatrix1000);
+            expect(data[3] == SysExConstants::Opcode::kSinglePatchToEditBuffer);
+            expect(data[message.getSize() - 2]
+                   == SysExEncoder::calculateChecksum(packedData, SysExConstants::kPatchPackedDataSize));
+            expect(data[message.getSize() - 1] == SysExConstants::kSysExEnd);
         }
     }
 };

@@ -1,5 +1,14 @@
 # Deferred Work
 
+## Deferred from: code review of 7-11-internal-patches-init-sysex-device-rules (2026-07-14)
+
+- **Footer succès INIT affiché avant envoi MIDI / si `midiManager_` null** — pattern hérité de 7.3 (INIT éditeur-only) ; pas de requirement spec sur cohérence footer ↔ livraison MIDI.
+- **Pas de garde « port MIDI ouvert » avant enqueue** — identique à `sendPatch` ; erreur via `lastError` au moment de l’envoi effectif.
+- **`apvtsToBuffer()` sans vérification de succès** — même pattern que PASTE/STORE.
+- **`getCurrentPatch()` non clampé** — même pattern que PASTE/STORE ; M-6 borné 0–99.
+- **Type device `kUnknown` → branche M-1000 / 0x0D** — résolution DeviceMemoryLimits pré-existante, hors périmètre 7-11.
+- **Pas de tests unitaires `MidiManager::sendPatchToEditBuffer`** — AC5 couvre encodeur + handler ; pas exigé par la story.
+
 ## Deferred from: code review of 11-3-ci-build-time-optimizations (2026-07-11)
 
 - **PRs de fork — l’auteur ne peut pas ajouter `ci-full` sans maintainer** — limitation GitHub Actions ; documenter dans CONTRIBUTING si friction observée.

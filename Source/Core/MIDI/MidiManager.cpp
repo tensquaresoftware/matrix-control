@@ -228,6 +228,25 @@ void MidiManager::sendPatch(juce::uint8 patchNumber, const juce::uint8* packedDa
     }
 }
 
+void MidiManager::sendPatchToEditBuffer(const juce::uint8* packedData)
+{
+    if (packedData == nullptr)
+    {
+        updateErrorState("Invalid patch data", "SysEx");
+        return;
+    }
+
+    try
+    {
+        auto sysExMessage = sysExEncoder->encodePatchToEditBufferSysEx(packedData);
+        editorPath_.enqueueSysEx(sysExMessage);
+    }
+    catch (const std::exception& e)
+    {
+        updateErrorState(e.what(), "SysEx");
+    }
+}
+
 void MidiManager::sendMaster(juce::uint8 version, const juce::uint8* packedData)
 {
     if (packedData == nullptr)

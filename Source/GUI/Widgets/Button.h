@@ -14,7 +14,8 @@ namespace TSS
 
         void setLook(const ButtonLook& look);
         void setUiScale(float uiScale);
-        
+        void setInactiveAppearance(bool inactive);
+
         void paintButton(juce::Graphics& g, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override;
 
         int getWidth() const { return width_; }
@@ -27,6 +28,7 @@ namespace TSS
         int width_;
         int height_;
         float uiScale_ = 1.0f;
+        bool inactiveAppearance_ = false;
 
         juce::Colour getBackgroundColour(bool enabled, bool isHighlighted, bool isDown) const;
         juce::Colour getBorderColour(bool enabled) const;

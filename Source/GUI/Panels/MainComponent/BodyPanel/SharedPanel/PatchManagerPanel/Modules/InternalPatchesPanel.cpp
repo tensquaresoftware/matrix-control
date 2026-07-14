@@ -12,10 +12,25 @@
 #include "Shared/Definitions/Matrix1000Limits.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
 #include "Shared/Definitions/PluginDescriptors.h"
+#include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginIDs.h"
 #include "GUI/Factories/WidgetFactory.h"
 #include <juce_core/juce_core.h>
 
+
+namespace
+{
+    void setFooterWarningMessage(juce::AudioProcessorValueTreeState& apvts, const juce::String& message)
+    {
+        apvts.state.setProperty("uiMessageText", message, nullptr);
+        apvts.state.setProperty("uiMessageSeverity", juce::String("warning"), nullptr);
+    }
+
+    void dispatchTimestampAction(juce::AudioProcessorValueTreeState& apvts, const juce::Identifier& propertyId)
+    {
+        apvts.state.setProperty(propertyId, juce::Time::getCurrentTime().toMilliseconds(), nullptr);
+    }
+}
 
 InternalPatchesPanel::InternalPatchesPanel(TSS::ISkin& skin, const InternalPatchesPanelDimensions& dims, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : dims_(dims)
@@ -42,12 +57,27 @@ InternalPatchesPanel::InternalPatchesPanel(TSS::ISkin& skin, const InternalPatch
         PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kPastePatchEnabled,
         false));
     refreshDeviceLimits();
+    syncNumberBoxesFromApvts();
+
+    if (initPatchButton_)
+        initPatchButton_->addMouseListener(this, false);
+    if (pastePatchButton_)
+        pastePatchButton_->addMouseListener(this, false);
+    if (storePatchButton_)
+        storePatchButton_->addMouseListener(this, false);
     
     setSize(dims_.width, dims_.height);
 }
 
 InternalPatchesPanel::~InternalPatchesPanel()
 {
+    if (initPatchButton_)
+        initPatchButton_->removeMouseListener(this);
+    if (pastePatchButton_)
+        pastePatchButton_->removeMouseListener(this);
+    if (storePatchButton_)
+        storePatchButton_->removeMouseListener(this);
+
     apvts_.state.removeListener(this);
 }
 
@@ -98,6 +128,19 @@ void InternalPatchesPanel::valueTreeRedirected(juce::ValueTree&)
         PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kPastePatchEnabled,
         false));
     refreshDeviceLimits();
+    syncNumberBoxesFromApvts();
+}
+
+void InternalPatchesPanel::mouseEnter(const juce::MouseEvent& event)
+{
+    if (! romPasteStoreBlocked_)
+        return;
+
+    const auto* component = event.eventComponent;
+    if (component == initPatchButton_.get()
+        || component == pastePatchButton_.get()
+        || component == storePatchButton_.get())
+        showRomBlockedFooterMessage();
 }
 
 void InternalPatchesPanel::resized()
@@ -247,6 +290,21 @@ void InternalPatchesPanel::refreshBankLockIndicator()
     currentBankNumber->setShowDot(bankNumberVisible_ && banksLocked);
 }
 
+void InternalPatchesPanel::syncNumberBoxesFromApvts()
+{
+    const int bank = static_cast<int>(apvts_.state.getProperty(
+        PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCurrentBankNumber,
+        Matrix1000Limits::kMinBankNumber));
+    const int patch = static_cast<int>(apvts_.state.getProperty(
+        PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCurrentPatchNumber,
+        Matrix1000Limits::kMinPatchNumber));
+
+    if (currentBankNumber)
+        currentBankNumber->setValue(bank);
+    if (currentPatchNumber)
+        currentPatchNumber->setValue(patch);
+}
+
 void InternalPatchesPanel::applyPatchNumberRange(const Core::DeviceMemoryLimits& limits)
 {
     if (currentPatchNumber)
@@ -255,16 +313,55 @@ void InternalPatchesPanel::applyPatchNumberRange(const Core::DeviceMemoryLimits&
 
 void InternalPatchesPanel::updatePasteStoreEnabled(const Core::DeviceMemoryLimits& limits, int currentBank)
 {
-    const bool allowPasteStore = limits.isPasteStoreAllowed(currentBank);
+    romPasteStoreBlocked_ = ! limits.isPasteStoreAllowed(currentBank);
     const bool compareActive = static_cast<bool>(apvts_.state.getProperty(
         PluginIDs::PatchManagerSection::PatchMutatorModule::StateProperties::kCompareActive,
         false));
 
-    if (pastePatchButton_)
-        pastePatchButton_->setEnabled(allowPasteStore && clipboardPasteEnabled_);
+    wirePasteStoreButton(
+        initPatchButton_.get(),
+        PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kInitPatch,
+        ! compareActive);
+    wirePasteStoreButton(
+        pastePatchButton_.get(),
+        PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kPastePatch,
+        clipboardPasteEnabled_);
+    wirePasteStoreButton(
+        storePatchButton_.get(),
+        PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kStorePatch,
+        ! compareActive);
+}
 
-    if (storePatchButton_)
-        storePatchButton_->setEnabled(allowPasteStore && ! compareActive);
+void InternalPatchesPanel::wirePasteStoreButton(TSS::Button* button,
+                                                const juce::Identifier& actionPropertyId,
+                                                bool functionallyEnabled)
+{
+    if (button == nullptr)
+        return;
+
+    if (romPasteStoreBlocked_)
+    {
+        button->setInactiveAppearance(true);
+        button->setEnabled(true);
+        button->setAlpha(1.0f);
+        button->onClick = [this] { showRomBlockedFooterMessage(); };
+        return;
+    }
+
+    button->setInactiveAppearance(false);
+    button->setAlpha(1.0f);
+    button->setEnabled(functionallyEnabled);
+    button->onClick = [this, actionPropertyId]
+    {
+        dispatchTimestampAction(apvts_, actionPropertyId);
+    };
+}
+
+void InternalPatchesPanel::showRomBlockedFooterMessage()
+{
+    setFooterWarningMessage(
+        apvts_,
+        PluginDisplayNames::PatchManagerSection::InternalPatchesModule::kRomBankPasteStoreFooterMessage);
 }
 
 void InternalPatchesPanel::setupModuleHeader(TSS::ISkin& skin, WidgetFactory& widgetFactory, const juce::String& moduleId)
@@ -297,9 +394,9 @@ void InternalPatchesPanel::setupLoadPreviousPatchButton(TSS::ISkin& skin, Widget
         dims_.buttons.height);
     loadPreviousPatchButton_->onClick = [this]
     {
-        apvts_.state.setProperty(PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kLoadPreviousPatch,
-                                juce::Time::getCurrentTime().toMilliseconds(),
-                                nullptr);
+        dispatchTimestampAction(
+            apvts_,
+            PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kLoadPreviousPatch);
     };
     addAndMakeVisible(*loadPreviousPatchButton_);
 }
@@ -312,9 +409,9 @@ void InternalPatchesPanel::setupLoadNextPatchButton(TSS::ISkin& skin, WidgetFact
         dims_.buttons.height);
     loadNextPatchButton_->onClick = [this]
     {
-        apvts_.state.setProperty(PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kLoadNextPatch,
-                                juce::Time::getCurrentTime().toMilliseconds(),
-                                nullptr);
+        dispatchTimestampAction(
+            apvts_,
+            PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kLoadNextPatch);
     };
     addAndMakeVisible(*loadNextPatchButton_);
 }
@@ -378,9 +475,9 @@ void InternalPatchesPanel::setupInitPatchButton(TSS::ISkin& skin, WidgetFactory&
         dims_.buttons.height);
     initPatchButton_->onClick = [this]
     {
-        apvts_.state.setProperty(PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kInitPatch,
-                                juce::Time::getCurrentTime().toMilliseconds(),
-                                nullptr);
+        dispatchTimestampAction(
+            apvts_,
+            PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kInitPatch);
     };
     addAndMakeVisible(*initPatchButton_);
 }
@@ -393,9 +490,9 @@ void InternalPatchesPanel::setupCopyPatchButton(TSS::ISkin& skin, WidgetFactory&
         dims_.buttons.height);
     copyPatchButton_->onClick = [this]
     {
-        apvts_.state.setProperty(PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCopyPatch,
-                                juce::Time::getCurrentTime().toMilliseconds(),
-                                nullptr);
+        dispatchTimestampAction(
+            apvts_,
+            PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCopyPatch);
     };
     addAndMakeVisible(*copyPatchButton_);
 }
@@ -408,9 +505,9 @@ void InternalPatchesPanel::setupPastePatchButton(TSS::ISkin& skin, WidgetFactory
         dims_.buttons.height);
     pastePatchButton_->onClick = [this]
     {
-        apvts_.state.setProperty(PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kPastePatch,
-                                juce::Time::getCurrentTime().toMilliseconds(),
-                                nullptr);
+        dispatchTimestampAction(
+            apvts_,
+            PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kPastePatch);
     };
     addAndMakeVisible(*pastePatchButton_);
 }
@@ -423,9 +520,9 @@ void InternalPatchesPanel::setupStorePatchButton(TSS::ISkin& skin, WidgetFactory
         dims_.buttons.height);
     storePatchButton_->onClick = [this]
     {
-        apvts_.state.setProperty(PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kStorePatch,
-                                juce::Time::getCurrentTime().toMilliseconds(),
-                                nullptr);
+        dispatchTimestampAction(
+            apvts_,
+            PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kStorePatch);
     };
     addAndMakeVisible(*storePatchButton_);
 }

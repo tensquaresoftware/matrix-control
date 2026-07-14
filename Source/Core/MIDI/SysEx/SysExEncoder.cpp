@@ -19,6 +19,21 @@ juce::MemoryBlock SysExEncoder::encodePatchSysEx(juce::uint8 patchNumber, const 
     return buildCompletePatchSysExMessage(header, nibbles, checksum);
 }
 
+juce::MemoryBlock SysExEncoder::encodePatchToEditBufferSysEx(const juce::uint8* packedData) const
+{
+    if (packedData == nullptr)
+    {
+        MidiLogger::getInstance().logError("encodePatchToEditBufferSysEx: null packedData pointer");
+        return {};
+    }
+
+    auto header = buildHeader(SysExConstants::Opcode::kSinglePatchToEditBuffer);
+    std::vector<juce::uint8> nibbles = unpackBytesToNibbles(packedData, SysExConstants::kPatchPackedDataSize);
+    juce::uint8 checksum = calculateChecksum(packedData, SysExConstants::kPatchPackedDataSize);
+
+    return buildCompletePatchSysExMessage(header, nibbles, checksum);
+}
+
 juce::MemoryBlock SysExEncoder::encodeMasterSysEx(juce::uint8 version, const juce::uint8* packedData) const
 {
     if (packedData == nullptr)

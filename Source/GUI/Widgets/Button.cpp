@@ -29,11 +29,22 @@ namespace TSS
         repaint();
     }
 
+    void Button::setInactiveAppearance(bool inactive)
+    {
+        if (inactiveAppearance_ == inactive)
+            return;
+
+        inactiveAppearance_ = inactive;
+        repaint();
+    }
+
     void Button::paintButton(juce::Graphics& g, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)
     {
         const auto bounds = getLocalBounds().toFloat();
         const auto buttonText = getButtonText();
-        const bool enabled = isEnabled();
+        const bool paintEnabled = isEnabled() && ! inactiveAppearance_;
+        const bool paintHighlighted = paintEnabled && shouldDrawButtonAsHighlighted;
+        const bool paintDown = paintEnabled && shouldDrawButtonAsDown;
         const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
         const float borderThickness = ScaledDrawing::snappedStrokeThicknessFromDesign(
             static_cast<float>(kBorderThickness_),
@@ -41,15 +52,15 @@ namespace TSS
             systemDisplayScale,
             ScaledDrawing::StrokeSnapPolicy::kFloor);
 
-        g.setColour(getBackgroundColour(enabled, shouldDrawButtonAsHighlighted, shouldDrawButtonAsDown));
+        g.setColour(getBackgroundColour(paintEnabled, paintHighlighted, paintDown));
         g.fillRect(bounds);
 
-        g.setColour(getBorderColour(enabled));
+        g.setColour(getBorderColour(paintEnabled));
         g.drawRect(bounds, borderThickness);
 
         if (! buttonText.isEmpty())
         {
-            g.setColour(getTextColour(enabled, shouldDrawButtonAsHighlighted, shouldDrawButtonAsDown));
+            g.setColour(getTextColour(paintEnabled, paintHighlighted, paintDown));
             g.setFont(look_.font.withHeight(look_.font.getHeight() * uiScale_));
             g.drawText(buttonText, bounds, juce::Justification::centred, false);
         }

@@ -13,6 +13,7 @@ public:
     ~SysExEncoder() = default;
 
     juce::MemoryBlock encodePatchSysEx(juce::uint8 patchNumber, const juce::uint8* packedData) const;
+    juce::MemoryBlock encodePatchToEditBufferSysEx(const juce::uint8* packedData) const;
     juce::MemoryBlock encodeMasterSysEx(juce::uint8 version, const juce::uint8* packedData) const;
     static juce::MemoryBlock encodeDeviceInquiry();
     juce::MemoryBlock encodeRequestMessage(juce::uint8 requestType, juce::uint8 patchNumber = 0) const;

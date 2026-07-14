@@ -243,11 +243,34 @@ namespace Core
         if (patchInitService_ == nullptr || apvtsPatchMapper_ == nullptr)
             return;
 
+        const auto limits = deviceMemoryLimits_();
+
+        if (!limits.isPasteStoreAllowed(getCurrentBank(limits)))
+        {
+            propagateRomBlockedFooter();
+            return;
+        }
+
+        if (static_cast<bool>(apvts_.state.getProperty(
+                PluginIDs::PatchManagerSection::PatchMutatorModule::StateProperties::kCompareActive,
+                false)))
+            return;
+
         const auto result = patchInitService_->initFullPatch();
 
         pushPatchModelToApvtsWithSuppress(apvts_, hooks_, *apvtsPatchMapper_, nullptr);
 
         InitTemplateFooter::propagateMessage(apvts_, result);
+
+        if (patchModel_ == nullptr || midiManager_ == nullptr)
+            return;
+
+        apvtsPatchMapper_->apvtsToBuffer();
+
+        if (limits.hasBankConcept())
+            midiManager_->sendPatchToEditBuffer(patchModel_->data());
+        else
+            midiManager_->sendPatch(static_cast<juce::uint8>(getCurrentPatch(limits)), patchModel_->data());
     }
 
     void PatchManagerActionHandler::handleInternalPatchPaste(const DeviceMemoryLimits& limits)

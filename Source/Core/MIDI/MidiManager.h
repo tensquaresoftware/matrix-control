@@ -38,6 +38,7 @@ public:
     bool isOutputPortOpenWithDevice(const juce::String& deviceId) const;
 
     void sendPatch(juce::uint8 patchNumber, const juce::uint8* packedData);
+    void sendPatchToEditBuffer(const juce::uint8* packedData);
     void sendMaster(juce::uint8 version, const juce::uint8* packedData);
     void sendProgramChange(int programNumber, int channel = 1);
     void sendSetBank(int bank);
