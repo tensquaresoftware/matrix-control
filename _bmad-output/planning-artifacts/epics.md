@@ -1106,6 +1106,21 @@ So that history always belongs to the current patch context (FR-31).
 **Then** history store clears; recipe sliders/toggles unchanged
 **And** COMPARE disabled until next MUTATE
 
+### Story 6-14: Patch Mutator Hierarchical History ComboBox
+
+As a sound designer,
+I want one History combobox with M roots and R retries in a hover submenu,
+So that labels are readable and COMPARE aligns with the RANDOM row (D-082-R2).
+
+**Acceptance Criteria:**
+
+**Given** Story U-12 and Story 6.6 APVTS properties
+**When** user opens History on Patch Mutator panel
+**Then** single 48 px control replaces dual M/R comboboxes; submenu shows retries per root
+**And** COMPARE column aligns with RETRY row; no Core/engine changes
+
+**ERRATA (2026-07-14):** Supersedes Story 6.6 panel dual-combobox wiring only.
+
 ---
 
 ## Epic 7: Patch Manager & Action Dispatch
@@ -1228,6 +1243,23 @@ So that RAM/ROM rules apply in UI (FR-22, FR-23, FR-24).
 **When** user navigates with `<` `>` or NumberBox
 **Then** patch navigation wraps within current bank only (99→0, 0→99); ROM banks 2–9 gray PASTE/STORE with footer on attempt
 **And** STORE sends patch per Matrix-1000 RAM rules
+
+### Story 7-11: Internal Patches INIT SysEx Device Rules
+
+As a sound designer,
+I want INIT to push the init template to the synth using device-correct SysEx,
+So that M-1000 loads the edit buffer and M-6/6R update the current patch (D-044-R2).
+
+**Acceptance Criteria:**
+
+**Given** Story 7.3 INIT template path
+**When** user clicks INIT on Matrix-1000
+**Then** SysEx **0x0D** (edit buffer) enqueued after APVTS load
+**When** user clicks INIT on Matrix-6/6R
+**Then** SysEx **0x01** to current patch number enqueued
+**And** STORE/PASTE unchanged; unit tests cover both device paths
+
+**ERRATA (2026-07-14):** Supersedes Story 7.3 AC #4 editor-only INIT.
 
 ### Story 7.7: Settings Page Consolidation
 
@@ -1502,6 +1534,21 @@ So that controls look crisp inside any panel (UX-DR8).
 **When** each widget in `Source/GUI/Widgets/` is reviewed
 **Then** `ScaledLayout` + `ScaledDrawing` used consistently ; widgets do not include Design headers
 **And** manual UAT passes at all seven presets
+
+### Story U-12: HierarchicalComboBox Widget
+
+As a GUI developer,
+I want a reusable `TSS::HierarchicalComboBox` with hover submenus,
+So that two-level selections use one control with ComboBox look (D-082-R2).
+
+**Acceptance Criteria:**
+
+**Given** existing ComboBox look pipeline
+**When** hierarchical popup opens
+**Then** primary items show `>` chevron when hovered and open secondary submenu to the right
+**And** width atom `kPatchMutatorHistory = 48` matches RANDOM slider; builds green
+
+**ERRATA (2026-07-14 — Correct Course):** Supersedes D-082 dual flat combobox **widget** pattern; panel migration in Story **6-14**.
 
 ### Story U.3: Header Right Cluster Layout & Sign-Off
 
