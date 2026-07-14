@@ -339,7 +339,7 @@ Automated multi-platform build and Core unit tests on GitHub Actions; release pi
 
 **Priority:** Immediate (2026-07-11 correct-course)
 
-**Depends on:** Epic 0 (CMake, tests layout) · **Blocks:** confident merge gate for Epics 7, 8, U
+**Depends on:** Epic 0 (CMake, tests layout) · **Provides:** periodic 3-OS CI assurance on `main`; solo default is local macOS gate + async CI (D-047-S, 2026-07-14)
 
 **Note:** CD (AU/VST3/Standalone signing, notarisation) = Story 11.2, deferred pre-v1.0.0.
 

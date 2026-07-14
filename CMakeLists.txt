@@ -493,6 +493,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/Loggers/MidiLogger.cpp
         Source/Shared/Definitions/PluginDescriptors.cpp
         Source/Shared/Definitions/PluginDescriptorsPatchEdit.cpp
+        Source/Shared/Definitions/PluginDescriptorsMasterEdit.cpp
         Source/Shared/Definitions/PluginDescriptorsMatrixModulation.cpp
         Source/Shared/Definitions/PluginDescriptorsPatchManager.cpp
         Source/Shared/Definitions/PluginHelpers.cpp

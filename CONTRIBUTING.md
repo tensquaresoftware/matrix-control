@@ -102,25 +102,35 @@ Familiarity with the following is recommended:
 
 Every **push** to `main` and every **pull request** targeting `main` runs the [Build and Test](https://github.com/tensquaresoftware/matrix-control/actions/workflows/build-and-test.yml) workflow on GitHub Actions.
 
-### CI tiers (Story 11.3)
+### Solo maintainer workflow (default)
+
+Matrix-Control is primarily maintained by a **solo developer on macOS**. The default loop prioritises velocity:
+
+1. **Local gate (before every commit):** configure and build with the macOS Debug preset, run `Matrix-Control_Tests` (see [Reproduce CI locally](#reproduce-ci-locally) below).
+2. **Push directly to `main`** — no PR required for routine story work.
+3. **CI runs asynchronously** on `main` (full 3-OS matrix, ~12 min). Results are **informational** — they do not block pushes or merges.
+4. **Fix cross-platform breaks** when CI reports them (batch fixes are fine between stories or before a release).
+5. **Release gate (unchanged):** tag and publish only from a commit where CI is green on all three OS legs.
+
+`main` may temporarily fail CI on Windows or Linux while macOS development continues. That is acceptable pre-release for a solo workflow; JUCE cross-platform abstractions catch most issues, but MSVC/GCC-specific compile errors still happen occasionally.
+
+### Optional PR path
+
+Use a PR when it helps — external contributions, large refactors, or CMake/toolchain changes you want isolated:
 
 | Trigger | Jobs | Typical duration |
 |---------|------|------------------|
 | **Draft PR** — `opened`, `synchronize`, `reopened` while draft | `release-script-tests` + macOS Debug build/tests | ~5 min |
 | **Ready for review** — non-draft PR, `ready_for_review`, or label **`ci-full`** | `release-script-tests` + full 3-OS matrix | ~12 min |
-| **Push to `main`** (post-merge) | Always full 3-OS matrix | ~12 min |
+| **Push to `main`** | Always full 3-OS matrix | ~12 min |
 
-During active development, open PRs as **draft** to use the fast tier. Mark the PR **ready for review** (or add the `ci-full` label) before merge — the full cross-platform matrix must pass.
+Open PRs as **draft** during active review to use the fast tier. Mark **ready for review** or add the **`ci-full`** label when you want the full cross-platform matrix on a PR.
 
-**Merge gate:** branch protection requires **`release-script-tests`** and **`ci-success`** (aggregate job). The three matrix leg names are informational only and must not be required checks (they change if workflow matrix parameters change).
+The aggregate job **`ci-success`** (and the three matrix leg names) are informational. They are **not** required status checks on `main`.
 
-**Solo maintainer tip:** `dev-story` → local macOS tests → `code-review` can run in parallel with CI; merge only when Checks are green.
+### Re-enable merge gate (team mode)
 
-To request a full matrix re-run without toggling draft state, add the **`ci-full`** label to the PR.
-
-### Branch protection update (maintainers)
-
-After the first successful run that includes the `ci-success` job on the Story 11-3 PR (before merge), update required status checks:
+If the project adopts a multi-contributor workflow, restore required checks:
 
 ```bash
 gh api repos/tensquaresoftware/matrix-control/branches/main/protection/required_status_checks \
@@ -132,8 +142,6 @@ gh api repos/tensquaresoftware/matrix-control/branches/main/protection/required_
 }
 EOF
 ```
-
-Remove any legacy required checks named `build-and-test (...)` (truncated matrix job names from Story 11.1–11.2).
 
 ### Matrix (full tier)
 

@@ -11,14 +11,14 @@ sources:
   - reference-docs/oberheim/index.md
   - CONVENTIONS.md
 created: 2026-05-23
-updated: 2026-06-16
+updated: 2026-07-14
 ---
 
 # Project Context
 
 **Purpose:** Implementation constitution for BMad agents working on this repository.  
 **Baseline code tag:** `v0.0.66-alpha-pre-bmad`  
-**Last updated:** 2026-06-16 (BMad tooling hygiene — `.agents/` gitignored)
+**Last updated:** 2026-07-14 (solo dev workflow — CI informational, not merge gate)
 
 ---
 
@@ -371,6 +371,21 @@ BMad planning artifacts live in `_bmad-output/planning-artifacts/`. Promote vali
 - Tags: annotated, format `v0.0.xx-alpha[-suffix]`, e.g. `v0.0.66-alpha-pre-bmad`.
 - **Do not commit** unless explicitly requested by the project owner.
 - Do not force-push `main`.
+
+### Solo development workflow (2026-07-14)
+
+Guillaume develops primarily on **macOS**. Epic 11 CI remains; **branch protection required checks were removed** so pushes to `main` are not blocked by GitHub Actions.
+
+| Phase | Gate |
+|---|---|
+| **Every commit** | Local macOS Debug preset + `Matrix-Control_Tests` |
+| **Push to `main`** | No PR required; CI runs async (full 3-OS matrix, informational) |
+| **Cross-platform fixes** | When CI reports red, or batched before release |
+| **Release tag** | CI green on target commit + manual smoke (unchanged) |
+
+**BMad story cycle (default):** `create-story` → `dev-story` → local macOS verify → `code-review` in chat → commit/push to `main`. PR optional for risky CMake/toolchain work or external contributions.
+
+See `CONTRIBUTING.md` § Continuous Integration and `_bmad-output/planning-artifacts/sprint-change-proposal-2026-07-14-solo-dev-workflow.md`.
 
 ---
 

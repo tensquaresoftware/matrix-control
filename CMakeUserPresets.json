@@ -11,7 +11,9 @@
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_OSX_ARCHITECTURES": "arm64",
         "JUCE_DIR": "$env{JUCE_DIR}",
-        "ARTEFACTS_DIR_MACOS": "/Users/Guillaume/Library/CloudStorage/Dropbox/Dev/Artefacts"
+        "ARTEFACTS_DIR_MACOS": "/Users/Guillaume/Library/CloudStorage/Dropbox/Dev/Artefacts",
+        "USER_COPY_TO_SYSTEM_FOLDERS": "ON",
+        "USER_COPY_TO_ARTEFACTS_DIR": "ON"
       }
     },
     {
@@ -24,7 +26,9 @@
         "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_OSX_ARCHITECTURES": "arm64",
         "JUCE_DIR": "$env{JUCE_DIR}",
-        "ARTEFACTS_DIR_MACOS": "/Users/Guillaume/Library/CloudStorage/Dropbox/Dev/Artefacts"
+        "ARTEFACTS_DIR_MACOS": "/Users/Guillaume/Library/CloudStorage/Dropbox/Dev/Artefacts",
+        "USER_COPY_TO_SYSTEM_FOLDERS": "ON",
+        "USER_COPY_TO_ARTEFACTS_DIR": "ON"
       }
     },
     {
@@ -37,7 +41,9 @@
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_OSX_ARCHITECTURES": "x86_64",
         "JUCE_DIR": "$env{JUCE_DIR}",
-        "ARTEFACTS_DIR_MACOS": "/Users/Guillaume/Library/CloudStorage/Dropbox/Dev/Artefacts"
+        "ARTEFACTS_DIR_MACOS": "/Users/Guillaume/Library/CloudStorage/Dropbox/Dev/Artefacts",
+        "USER_COPY_TO_SYSTEM_FOLDERS": "ON",
+        "USER_COPY_TO_ARTEFACTS_DIR": "ON"
       }
     },
     {
@@ -50,7 +56,9 @@
         "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_OSX_ARCHITECTURES": "x86_64",
         "JUCE_DIR": "$env{JUCE_DIR}",
-        "ARTEFACTS_DIR_MACOS": "/Users/Guillaume/Library/CloudStorage/Dropbox/Dev/Artefacts"
+        "ARTEFACTS_DIR_MACOS": "/Users/Guillaume/Library/CloudStorage/Dropbox/Dev/Artefacts",
+        "USER_COPY_TO_SYSTEM_FOLDERS": "ON",
+        "USER_COPY_TO_ARTEFACTS_DIR": "ON"
       }
     },
     {
@@ -63,7 +71,9 @@
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_OSX_ARCHITECTURES": "arm64;x86_64",
         "JUCE_DIR": "$env{JUCE_DIR}",
-        "ARTEFACTS_DIR_MACOS": "/Users/Guillaume/Library/CloudStorage/Dropbox/Dev/Artefacts"
+        "ARTEFACTS_DIR_MACOS": "/Users/Guillaume/Library/CloudStorage/Dropbox/Dev/Artefacts",
+        "USER_COPY_TO_SYSTEM_FOLDERS": "ON",
+        "USER_COPY_TO_ARTEFACTS_DIR": "ON"
       }
     },
     {
@@ -76,7 +86,9 @@
         "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_OSX_ARCHITECTURES": "arm64;x86_64",
         "JUCE_DIR": "$env{JUCE_DIR}",
-        "ARTEFACTS_DIR_MACOS": "/Users/Guillaume/Library/CloudStorage/Dropbox/Dev/Artefacts"
+        "ARTEFACTS_DIR_MACOS": "/Users/Guillaume/Library/CloudStorage/Dropbox/Dev/Artefacts",
+        "USER_COPY_TO_SYSTEM_FOLDERS": "ON",
+        "USER_COPY_TO_ARTEFACTS_DIR": "ON"
       }
     },
     {
