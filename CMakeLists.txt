@@ -563,6 +563,11 @@ target_sources(Matrix-Control PRIVATE ${PLUGIN_SOURCES})
 
 target_sources(Matrix-Control_Standalone PRIVATE
     Source/Core/Audio/StandaloneAudioInputRouterStandalone.cpp
+    Source/Standalone/MatrixControlStandaloneApp.cpp
+)
+
+target_compile_definitions(Matrix-Control_Standalone PRIVATE
+    JUCE_USE_CUSTOM_PLUGIN_STANDALONE_APP=1
 )
 
 # Plugin format targets (not Standalone) link no-op router stubs.

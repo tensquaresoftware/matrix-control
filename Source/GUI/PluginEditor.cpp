@@ -239,8 +239,6 @@ PluginEditor::PluginEditor(PluginProcessor& p)
 
     if (pluginProcessor.isStandalone())
     {
-        Core::StandaloneAudioInputRouter::enableInputMonitoring();
-
         const auto savedKeyboardFromPortId = pluginProcessor.getApvts().state.getProperty("keyboardFromPortId", juce::String()).toString();
         headerPanel.selectKeyboardFromPort(savedKeyboardFromPortId);
         pluginProcessor.setKeyboardFromPort(headerPanel.getSelectedKeyboardFromPortIdentifier());
@@ -343,6 +341,20 @@ void PluginEditor::resized()
     if (baseWidth <= 0)
         return;
 
+    if (pluginProcessor.isStandalone())
+    {
+        const int targetWidth = juce::roundToInt(static_cast<float>(layoutDimensions_.editor.width) * appliedUiScale_);
+        const int targetHeight = juce::roundToInt(static_cast<float>(layoutDimensions_.editor.height) * appliedUiScale_);
+
+        setResizeLimits(targetWidth, targetHeight, targetWidth, targetHeight);
+
+        if (getWidth() != targetWidth || getHeight() != targetHeight)
+        {
+            setSize(targetWidth, targetHeight);
+            return;
+        }
+    }
+
     if (auto* comp = mainComponent_.get())
         comp->setBounds(getLocalBounds());
 
@@ -354,6 +366,15 @@ void PluginEditor::resized()
 
     layoutUiElementsTestComponent();
     syncUiScaleFromEditor();
+
+    if (pluginProcessor.isStandalone())
+        syncStandaloneWindowSize();
+}
+
+void PluginEditor::syncStandaloneWindowSize()
+{
+    if (auto* window = findParentComponentOfClass<juce::DocumentWindow>())
+        window->setContentComponentSize(getWidth(), getHeight());
 }
 
 void PluginEditor::syncUiScaleFromEditor()
@@ -484,6 +505,11 @@ void PluginEditor::wireHeaderPanel(HeaderPanel& headerPanel)
             openAboutWindow();
     };
 
+    headerPanel.onAudioMidiSettingsRequested = []
+    {
+        Core::StandaloneAudioInputRouter::showAudioMidiSettingsDialog();
+    };
+
     headerPanel.onUiTestsToggleRequested = [this]
     {
         setUiElementsTestVisible(!uiElementsTestVisible_);
@@ -542,11 +568,18 @@ void PluginEditor::updateSkin()
 
 void PluginEditor::applyUiScale(float uiScale)
 {
-    const int baseWidth = layoutDimensions_.editor.width;
-    const int baseHeight = layoutDimensions_.editor.height;
+    appliedUiScale_ = uiScale;
 
-    setSize(juce::roundToInt(static_cast<float>(baseWidth) * uiScale),
-            juce::roundToInt(static_cast<float>(baseHeight) * uiScale));
+    const int targetWidth = juce::roundToInt(static_cast<float>(layoutDimensions_.editor.width) * uiScale);
+    const int targetHeight = juce::roundToInt(static_cast<float>(layoutDimensions_.editor.height) * uiScale);
+
+    if (pluginProcessor.isStandalone())
+        setResizeLimits(targetWidth, targetHeight, targetWidth, targetHeight);
+
+    setSize(targetWidth, targetHeight);
+
+    if (pluginProcessor.isStandalone())
+        syncStandaloneWindowSize();
 }
 
 void PluginEditor::setUiElementsTestVisible(bool visible)
@@ -791,6 +824,10 @@ void PluginEditor::changeListenerCallback(juce::ChangeBroadcaster*)
 {
     refreshAudioFromCombo();
 
-    if (pluginProcessor.isStandalone())
+    if (! pluginProcessor.isStandalone())
+        return;
+
+    const auto sourceId = pluginProcessor.getApvts().state.getProperty("audioFromSourceId", juce::String()).toString();
+    if (sourceId.isNotEmpty())
         Core::StandaloneAudioInputRouter::enableInputMonitoring();
 }

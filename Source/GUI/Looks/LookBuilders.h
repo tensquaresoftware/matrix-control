@@ -9,6 +9,7 @@ namespace TSS
     ButtonLook buttonLookFromSkin(const ISkin& skin);
     SliderLook sliderLookFromSkin(const ISkin& skin);
     LabelLook labelLookFromSkin(const ISkin& skin);
+    LabelLook brandLabelLookFromSkin(const ISkin& skin);
     HorizontalSeparatorLook horizontalSeparatorLookFromSkin(const ISkin& skin);
     ComboBoxLook comboBoxLookFromSkin(const ISkin& skin);
     PopupMenuLook popupMenuLookFromSkin(const ISkin& skin);

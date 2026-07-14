@@ -30,4 +30,8 @@ namespace Core::StandaloneAudioInputRouterDetail
     void enableInputMonitoring()
     {
     }
+
+    void showAudioMidiSettingsDialog()
+    {
+    }
 }

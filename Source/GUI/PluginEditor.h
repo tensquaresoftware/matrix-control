@@ -69,11 +69,13 @@ private:
     std::unique_ptr<AboutWindow> aboutWindow_;
     std::unique_ptr<MasterInitConfirmDialog> masterInitConfirmDialog_;
     bool uiElementsTestVisible_ = false;
+    float appliedUiScale_ = 1.0f;
     std::unique_ptr<HeaderRefreshTimer> headerRefreshTimer_;
 
     void updateSkin();
     void applyUiScale(float uiScale);
     void syncUiScaleFromEditor();
+    void syncStandaloneWindowSize();
     void setUiElementsTestVisible(bool visible);
     void layoutUiElementsTestComponent();
 

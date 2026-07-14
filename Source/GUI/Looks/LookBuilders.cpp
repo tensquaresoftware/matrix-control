@@ -1,5 +1,6 @@
 #include "LookBuilders.h"
 
+#include "GUI/Layout/Design/DesignPanels.h"
 #include "GUI/Looks/TypographyStyles.h"
 #include "GUI/Skins/ISkin.h"
 
@@ -54,6 +55,14 @@ namespace TSS
         LabelLook look;
         look.text = skin.getColour(SkinColourId::kLabelText);
         look.font = resolvedTypographyFont(skin, TypographyStyleId::kDefault);
+        return look;
+    }
+
+    LabelLook brandLabelLookFromSkin(const ISkin& skin)
+    {
+        LabelLook look;
+        look.text = skin.getColour(SkinColourId::kLabelText);
+        look.font = skin.getBrandFontBold().withHeight(static_cast<float>(Design::Panels::Header::kLogoFontHeight));
         return look;
     }
 

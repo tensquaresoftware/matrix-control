@@ -471,9 +471,6 @@ void PluginProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
     ensureAudioInputBusEnabled();
     syncAudioRuntimeFromState();
 
-    if (isStandaloneWrapper())
-        Core::StandaloneAudioInputRouter::enableInputMonitoring();
-
     audioPassthroughSampleRate_ = sampleRate > 0.0 ? sampleRate : 44100.0;
     refreshAudioPassthroughLayout(audioPassthroughSampleRate_);
     applyHardwareLatencyToHost();

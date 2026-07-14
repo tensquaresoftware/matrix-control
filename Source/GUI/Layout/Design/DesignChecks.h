@@ -10,6 +10,10 @@ namespace TSS::Design
     static_assert(GUI::kWidth == 1300, "MainComponent width");
     static_assert(GUI::kHeight == 800, "MainComponent height");
     static_assert(Panels::Header::kHeight == 40, "HeaderPanel height");
+    static_assert(Panels::Header::kLogoWidth % 4 == 0, "Header logo width must be on the design ÷4 grid");
+    static_assert(Panels::Header::kLogoHeight % 4 == 0, "Header logo height must be on the design ÷4 grid");
+    static_assert(Panels::Header::kLogoFontHeight % 4 == 0, "Header logo font height must be on the design ÷4 grid");
+    static_assert(Panels::Header::kLogoGapAfter % 4 == 0, "Header logo gap must be on the design ÷4 grid");
     static_assert(Panels::Body::kHeight == 728, "BodyPanel height");
     static_assert(Panels::Footer::kHeight == 32, "FooterPanel height");
 

@@ -174,9 +174,11 @@ namespace TSS::Design
         namespace Header
         {
             inline constexpr int kHeight = 40;
+            inline constexpr int kLogoWidth = 172;
+            inline constexpr int kLogoHeight = 20;
+            inline constexpr int kLogoVerticalOffset = -1;
             inline constexpr int kLogoFontHeight = 20;
             inline constexpr int kLogoGapAfter = 32;
-            inline constexpr int kLogoExtraWidth = 8;
             inline constexpr int kLogoPopupColumnWidth = 80;
             inline constexpr int kSettingsButtonWidth = 72;
         }

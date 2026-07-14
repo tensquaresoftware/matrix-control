@@ -15,4 +15,5 @@ namespace Core::StandaloneAudioInputRouterDetail
     void addAudioDeviceChangeListener(juce::ChangeListener& listener);
     void removeAudioDeviceChangeListener(juce::ChangeListener& listener);
     void enableInputMonitoring();
+    void showAudioMidiSettingsDialog();
 }

@@ -20,6 +20,7 @@ namespace TSS
                                              int currentUiScaleId,
                                              std::function<void(int skinItemId)> onSkinSelected,
                                              std::function<void(int scaleId)> onUiScaleSelected,
+                                             std::function<void()> onAudioMidiSettingsRequested,
                                              std::function<void()> onSettingsRequested,
                                              std::function<void()> onAboutRequested)
         : uiScale_(uiScale)
@@ -27,8 +28,10 @@ namespace TSS
         , currentUiScaleId_(currentUiScaleId)
         , onSkinSelected_(std::move(onSkinSelected))
         , onUiScaleSelected_(std::move(onUiScaleSelected))
+        , onAudioMidiSettingsRequested_(std::move(onAudioMidiSettingsRequested))
         , onSettingsRequested_(std::move(onSettingsRequested))
         , onAboutRequested_(std::move(onAboutRequested))
+        , showAudioMidiDevices_(onAudioMidiSettingsRequested_ != nullptr)
         , look_(popupMenuLookFromSkin(skin))
         , renderer_(std::make_unique<PopupMenuRenderer>(true, uiScale_))
         , cachedFont_(look_.font.withHeight(look_.font.getHeight() * uiScale_))
@@ -67,14 +70,24 @@ namespace TSS
                            1, 2 });
         items_.push_back({ ItemKind::Spacer, 0, {}, 1, 3 });
         items_.push_back({ ItemKind::HorizontalRule, 0, {}, 1, 4 });
+
+        int actionRow = 5;
+        if (showAudioMidiDevices_)
+        {
+            items_.push_back({ ItemKind::AudioMidiDevices,
+                               0,
+                               PluginDisplayNames::HeaderPanel::kAudioMidiButton,
+                               1, actionRow++ });
+        }
+
         items_.push_back({ ItemKind::Settings,
                            0,
                            PluginDisplayNames::HeaderPanel::kSettingsButton,
-                           1, 5 });
+                           1, actionRow++ });
         items_.push_back({ ItemKind::About,
                            0,
                            PluginDisplayNames::HeaderPanel::kAboutButton,
-                           1, 6 });
+                           1, actionRow++ });
     }
 
     int HeaderLogoPopupMenu::getItemHeightPx() const
@@ -139,7 +152,8 @@ namespace TSS
             return false;
 
         const auto kind = items_[static_cast<size_t>(flatIndex)].kind;
-        return kind == ItemKind::Skin || kind == ItemKind::UiScale || kind == ItemKind::Settings || kind == ItemKind::About;
+        return kind == ItemKind::Skin || kind == ItemKind::UiScale || kind == ItemKind::AudioMidiDevices
+            || kind == ItemKind::Settings || kind == ItemKind::About;
     }
 
     bool HeaderLogoPopupMenu::isCurrentSelection(int flatIndex) const
@@ -148,7 +162,7 @@ namespace TSS
             return false;
 
         const auto& item = items_[static_cast<size_t>(flatIndex)];
-        if (item.kind == ItemKind::Settings || item.kind == ItemKind::About)
+        if (item.kind == ItemKind::Settings || item.kind == ItemKind::About || item.kind == ItemKind::AudioMidiDevices)
             return false;
 
         if (item.kind == ItemKind::Skin)
@@ -184,6 +198,11 @@ namespace TSS
         {
             if (onUiScaleSelected_)
                 onUiScaleSelected_(item.valueId);
+        }
+        else if (item.kind == ItemKind::AudioMidiDevices)
+        {
+            if (onAudioMidiSettingsRequested_)
+                onAudioMidiSettingsRequested_();
         }
         else if (item.kind == ItemKind::Settings)
         {
@@ -324,6 +343,7 @@ namespace TSS
                                   int currentUiScaleId,
                                   std::function<void(int skinItemId)> onSkinSelected,
                                   std::function<void(int scaleId)> onUiScaleSelected,
+                                  std::function<void()> onAudioMidiSettingsRequested,
                                   std::function<void()> onSettingsRequested,
                                   std::function<void()> onAboutRequested)
     {
@@ -338,6 +358,7 @@ namespace TSS
             currentUiScaleId,
             std::move(onSkinSelected),
             std::move(onUiScaleSelected),
+            std::move(onAudioMidiSettingsRequested),
             std::move(onSettingsRequested),
             std::move(onAboutRequested));
         auto* rawPtr = popupMenu.get();
@@ -350,7 +371,7 @@ namespace TSS
             ScaledDrawing::StrokeSnapPolicy::kRound);
         const int insetPx = juce::roundToInt(borderThickness);
         const int itemHeightPx = rawPtr->getItemHeightPx();
-        const int maxRows = 8;
+        const int maxRows = onAudioMidiSettingsRequested != nullptr ? 9 : 8;
         const int separatorPx = juce::roundToInt(rawPtr->getSeparatorWidth());
         const int popupWidth = juce::roundToInt(rawPtr->getColumnWidth(0))
             + separatorPx

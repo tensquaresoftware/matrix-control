@@ -1,6 +1,7 @@
 #include "Logo.h"
 
 #include "GUI/Layout/Design/DesignPanels.h"
+#include "GUI/Looks/LookBuilders.h"
 #include "GUI/Skins/ColourChart.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinValues.h"
@@ -8,26 +9,21 @@
 
 namespace TSS
 {
-    Logo::Logo()
-        : logoText_(PluginDisplayNames::kPluginName)
+    Logo::Logo(ISkin& skin)
+        : Label(Design::Panels::Header::kLogoWidth,
+                Design::Panels::Header::kLogoHeight,
+                brandLabelLookFromSkin(skin),
+                PluginDisplayNames::kPluginName)
+        , skin_(&skin)
     {
-        setOpaque(false);
         setInterceptsMouseClicks(true, false);
     }
 
     void Logo::setSkin(ISkin& skin)
     {
         skin_ = &skin;
-        repaint();
-    }
-
-    void Logo::setUiScale(float uiScale)
-    {
-        if (juce::approximatelyEqual(uiScale_, uiScale))
-            return;
-
-        uiScale_ = uiScale;
-        repaint();
+        setLook(brandLabelLookFromSkin(skin));
+        applyTextColour();
     }
 
     void Logo::setHighlighted(bool highlighted)
@@ -36,36 +32,19 @@ namespace TSS
             return;
 
         isHighlighted_ = highlighted;
-        repaint();
+        applyTextColour();
     }
 
-    juce::Font Logo::getScaledFont() const
+    void Logo::applyTextColour()
     {
         if (skin_ == nullptr)
-            return juce::Font(juce::FontOptions().withHeight(Design::Panels::Header::kLogoFontHeight * uiScale_));
-
-        return skin_->getBrandFontBold().withHeight(skin_->getBrandFontBold().getHeight() * uiScale_);
-    }
-
-    int Logo::getPreferredWidth() const
-    {
-        const auto font = getScaledFont();
-        juce::GlyphArrangement glyphs;
-        glyphs.addLineOfText(font, logoText_, 0.0f, 0.0f);
-        return juce::roundToInt(glyphs.getBoundingBox(0, -1, true).getWidth())
-            + juce::roundToInt(static_cast<float>(Design::Panels::Header::kLogoExtraWidth) * uiScale_);
-    }
-
-    void Logo::paint(juce::Graphics& g)
-    {
-        if (skin_ == nullptr || logoText_.isEmpty())
             return;
 
-        g.setColour(isHighlighted_
+        auto look = brandLabelLookFromSkin(*skin_);
+        look.text = isHighlighted_
                         ? juce::Colour(ColourChart::kWhite)
-                        : skin_->getColour(SkinColourId::kLabelText));
-        g.setFont(getScaledFont());
-        g.drawText(logoText_, getLocalBounds(), juce::Justification::centredLeft, false);
+                        : skin_->getColour(SkinColourId::kLabelText);
+        setLook(look);
     }
 
     void Logo::mouseUp(const juce::MouseEvent& e)

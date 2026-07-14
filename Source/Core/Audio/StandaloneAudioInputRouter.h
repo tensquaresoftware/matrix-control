@@ -18,5 +18,6 @@ namespace Core
         static void addAudioDeviceChangeListener(juce::ChangeListener& listener);
         static void removeAudioDeviceChangeListener(juce::ChangeListener& listener);
         static void enableInputMonitoring();
+        static void showAudioMidiSettingsDialog();
     };
 }

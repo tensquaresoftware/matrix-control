@@ -9,6 +9,7 @@
 #include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Layout/Design/DesignPanels.h"
 #include "GUI/Layout/ScaledDrawing.h"
+#include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Looks/LookBuilders.h"
 #include "Shared/Definitions/PluginAudioConstants.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
@@ -65,6 +66,7 @@ HeaderPanel::HeaderPanel(TSS::ISkin& skin, int width, int height)
     : width_(width)
     , height_(height)
     , skin_(&skin)
+    , logo_(skin)
     , midiFromLabel_(kEditorMidiFromLabelWidth_, kControlHeight_, TSS::labelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kEditorMidiFromLabel)
     , midiFromComboBox_(kPortComboBoxWidth_, kControlHeight_, TSS::comboBoxLookFromSkin(skin), TSS::ComboBox::Style::ButtonLike)
     , editorActivityLed_(kLedSize_, kLedSize_)
@@ -91,7 +93,6 @@ HeaderPanel::HeaderPanel(TSS::ISkin& skin, int width, int height)
 {
     setOpaque(true);
 
-    logo_.setSkin(skin);
     logo_.onPopupRequested = [this] { showLogoPopup(); };
     logo_.onSettingsRequested = [this]
     {
@@ -108,27 +109,29 @@ HeaderPanel::HeaderPanel(TSS::ISkin& skin, int width, int height)
         if (onUiScaleReset)
             onUiScaleReset();
     };
+
     addAndMakeVisible(logo_);
-    addAndMakeVisible(midiFromLabel_);
-    midiFromComboBox_.setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
-    addAndMakeVisible(midiFromComboBox_);
-    editorActivityLed_.setSkin(skin);
-    addAndMakeVisible(editorActivityLed_);
 
-    addAndMakeVisible(midiToLabel_);
-    midiToComboBox_.setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
-    addAndMakeVisible(midiToComboBox_);
-    midiToActivityLed_.setSkin(skin);
-    addAndMakeVisible(midiToActivityLed_);
-
+    instrumentActivityLed_.setSkin(skin);
+    addAndMakeVisible(instrumentActivityLed_);
     addAndMakeVisible(keyboardFromLabel_);
     keyboardFromComboBox_.setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
     addAndMakeVisible(keyboardFromComboBox_);
-    instrumentActivityLed_.setSkin(skin);
-    addAndMakeVisible(instrumentActivityLed_);
 
-    audioFromComboBox_.setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
+    editorActivityLed_.setSkin(skin);
+    addAndMakeVisible(editorActivityLed_);
+    addAndMakeVisible(midiFromLabel_);
+    midiFromComboBox_.setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
+    addAndMakeVisible(midiFromComboBox_);
+
+    midiToActivityLed_.setSkin(skin);
+    addAndMakeVisible(midiToActivityLed_);
+    addAndMakeVisible(midiToLabel_);
+    midiToComboBox_.setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
+    addAndMakeVisible(midiToComboBox_);
+
     addAndMakeVisible(audioFromLabel_);
+    audioFromComboBox_.setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
     addAndMakeVisible(audioFromComboBox_);
     addAndMakeVisible(inputGainLabel_);
     addAndMakeVisible(inputGainSlider_);
@@ -178,12 +181,16 @@ void HeaderPanel::resized()
     const int ledY = bounds.getY() + (panelHeight - ledSizePx) / 2;
     const float leftPadding = static_cast<float>(kLeftPadding_) * sf;
     const float logoGapAfter = static_cast<float>(TSS::Design::Panels::Header::kLogoGapAfter) * sf;
-
-    logo_.setUiScale(uiScale_);
-    const int logoWidth = logo_.getPreferredWidth();
-    const int logoHeight = bounds.getHeight();
+    const int logoWidth = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(TSS::Design::Panels::Header::kLogoWidth), uiScale_);
+    const int logoHeight = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(TSS::Design::Panels::Header::kLogoHeight), uiScale_);
     const int logoX = juce::roundToInt(static_cast<float>(bounds.getX()) + leftPadding);
-    logo_.setBounds(logoX, bounds.getY(), logoWidth, logoHeight);
+    logo_.setBounds(logoX,
+                     controlY + TSS::Design::Panels::Header::kLogoVerticalOffset,
+                     logoWidth,
+                     logoHeight);
+    logo_.setUiScale(uiScale_);
 
     float x = static_cast<float>(logoX + logoWidth) + logoGapAfter;
     const int y = controlY;
@@ -308,6 +315,7 @@ void HeaderPanel::showLogoPopup()
             if (onUiScaleSelected)
                 onUiScaleSelected(scaleId);
         },
+        isPluginMode_ ? nullptr : onAudioMidiSettingsRequested,
         [this]
         {
             if (onSettingsRequested)

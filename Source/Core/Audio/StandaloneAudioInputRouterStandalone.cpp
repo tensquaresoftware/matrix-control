@@ -72,4 +72,10 @@ namespace Core::StandaloneAudioInputRouterDetail
         if (auto* holder = juce::StandalonePluginHolder::getInstance())
             holder->getMuteInputValue().setValue(false);
     }
+
+    void showAudioMidiSettingsDialog()
+    {
+        if (auto* holder = juce::StandalonePluginHolder::getInstance())
+            holder->showAudioSettingsDialog();
+    }
 }
