@@ -755,7 +755,7 @@ namespace PluginDisplayNames
         {
             constexpr const char* kName = "INTERNAL PATCHES";
             constexpr const char* kRomBankPasteStoreFooterMessage =
-                "Paste and Store are not available on ROM banks 2-9.";
+                "Init, Paste and Store are not available on ROM banks 2-9.";
 
             namespace StandaloneWidgets
             {
