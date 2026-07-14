@@ -101,7 +101,9 @@ private:
                           [this](bool suppress) { suppressMatrixModSysEx = suppress; },
                           nullptr,
                           [this](bool suppress) { suppressPatchSysEx = suppress; },
-                          nullptr })
+                          nullptr,
+                          nullptr,
+                          {} })
         {
         }
     };

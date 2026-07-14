@@ -240,8 +240,8 @@ PluginProcessor::PluginProcessor()
         [this](bool suppress) { suppressMasterParameterSysEx_ = suppress; },
         [this](bool suppress) { suppressPatchParameterSysEx_ = suppress; },
         [this](bool suppress) { suppressPatchSelectionMidiSync_ = suppress; },
-        [this](bool suppress) { suppressMutatorHistorySelectionDebounce_ = suppress; }
-    };
+        [this](bool suppress) { suppressMutatorHistorySelectionDebounce_ = suppress; },
+        {}};
 
     patchMutatorEngine_ = std::make_unique<Core::PatchMutatorEngine>(
         patchModel_.get(),

@@ -188,7 +188,8 @@ private:
                          nullptr,
                          [this](bool suppress) { suppressPatchSysEx = suppress; },
                          nullptr,
-                         nullptr },
+                         nullptr,
+                         {} },
                      [this]() { return currentPatchNumber; },
                      &patchFileService,
                      &midiManager.getSysExEncoder())
