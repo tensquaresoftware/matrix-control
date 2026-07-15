@@ -36,10 +36,13 @@ namespace Core
             handleExport();
     }
 
-    void MutatorActionHandler::onHistorySelectionChanged()
+    void MutatorActionHandler::onHistorySelectionChanged(bool rootSelectionChanged)
     {
         if (engine_ == nullptr)
             return;
+
+        if (rootSelectionChanged)
+            engine_->rebuildHistoryListMirrors();
 
         historySelectionDebouncer_.schedule([this]()
         {

@@ -28,19 +28,19 @@ namespace
     }
 
     std::optional<std::pair<int, int>> captureSelectedIndices(const MutationHistoryStore& store,
-                                                              int selectedM,
-                                                              int selectedR)
+                                                              int selectedMutateRootIndex,
+                                                              int selectedRetryIndex)
     {
-        if (selectedM < 0 || ! store.hasRoot(selectedM))
+        if (selectedMutateRootIndex < 0 || ! store.hasRoot(selectedMutateRootIndex))
             return std::nullopt;
 
-        if (selectedR == MutationHistoryStore::kRootOnly)
-            return std::make_pair(selectedM, MutationHistoryStore::kRootOnly);
+        if (selectedRetryIndex == MutationHistoryStore::kRootOnly)
+            return std::make_pair(selectedMutateRootIndex, MutationHistoryStore::kRootOnly);
 
-        if (store.hasRetry(selectedM, selectedR))
-            return std::make_pair(selectedM, selectedR);
+        if (store.hasRetry(selectedMutateRootIndex, selectedRetryIndex))
+            return std::make_pair(selectedMutateRootIndex, selectedRetryIndex);
 
-        return std::make_pair(selectedM, MutationHistoryStore::kRootOnly);
+        return std::make_pair(selectedMutateRootIndex, MutationHistoryStore::kRootOnly);
     }
 
     HistoryDefragResult remapSelection(const std::optional<std::pair<int, int>>& selectedIndices,

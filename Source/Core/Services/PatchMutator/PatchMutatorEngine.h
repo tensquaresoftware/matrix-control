@@ -42,6 +42,7 @@ namespace Core
         virtual MutatorActionResult exportHistory(const juce::File& destinationFolder) = 0;
         virtual MutatorActionResult defragHistory() = 0;
         virtual void auditionSelectedHistoryEntry() = 0;
+        virtual void rebuildHistoryListMirrors() = 0;
     };
 
     class PatchMutatorEngine final : public PatchMutatorEnginePort
@@ -67,6 +68,7 @@ namespace Core
         MutatorActionResult defragHistory() override;
 
         void auditionSelectedHistoryEntry() override;
+        void rebuildHistoryListMirrors() override;
         void syncHistoryUiProperties(juce::AudioProcessorValueTreeState& apvts); // Story 6.6
         void refreshActionEnabledMirrors(juce::AudioProcessorValueTreeState& apvts); // Story 6.12
 
@@ -114,8 +116,8 @@ namespace Core
         juce::Random rng_;
         int selectedRootIndex_ = -1;
         int selectedRetryIndex_ = MutationHistoryStore::kRootOnly;
-        int compareSavedM_ = -1;
-        int compareSavedR_ = MutationHistoryStore::kRootOnly;
+        int compareSavedMutateRootIndex_ = -1;
+        int compareSavedRetryIndex_ = MutationHistoryStore::kRootOnly;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PatchMutatorEngine)
     };

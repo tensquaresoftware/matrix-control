@@ -1353,10 +1353,12 @@ void PluginProcessor::valueTreePropertyChanged(juce::ValueTree& treeWhosePropert
 
     namespace MutatorState = PluginIDs::PatchManagerSection::PatchMutatorModule::StateProperties;
     if (! suppressMutatorHistorySelectionDebounce_
-        && (parameterId == MutatorState::kSelectedM || parameterId == MutatorState::kSelectedR))
+        && (parameterId == MutatorState::kSelectedMutateRootIndex || parameterId == MutatorState::kSelectedRetryIndex))
     {
         if (mutatorActionHandler_ != nullptr)
-            mutatorActionHandler_->onHistorySelectionChanged();
+        {
+            mutatorActionHandler_->onHistorySelectionChanged(parameterId == MutatorState::kSelectedMutateRootIndex);
+        }
     }
 
     const auto propertyName = property.toString();

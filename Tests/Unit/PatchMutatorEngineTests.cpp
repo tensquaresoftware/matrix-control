@@ -88,7 +88,8 @@ public:
         sync_afterInsertRoot_listsAndSelectsNewRoot();
         sync_sortedRoots_numericOrder();
         sync_retryListForSelectedRoot();
-        sync_changingSelectedM_rebuildsRList();
+        sync_changingSelectedMutateRoot_rebuildsRetryList();
+        sync_consecutiveMutates_listsAllRoots();
         applySelectionFromApvts_drivesAudition();
         mutate_success_updatesApvtsHistory();
         retry_success_updatesApvtsHistory();
@@ -622,10 +623,11 @@ private:
         EngineHarness harness;
         harness.engine.syncHistoryUiProperties(harness.proc.apvts);
 
-        expect(harness.proc.apvts.state.getProperty(MutatorState::kHistoryMList).toString().isEmpty());
-        expect(harness.proc.apvts.state.getProperty(MutatorState::kHistoryRList).toString().isEmpty());
-        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedM)), -1);
-        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedR)),
+        expect(harness.proc.apvts.state.getProperty(MutatorState::kHistoryMutateList).toString().isEmpty());
+        expect(harness.proc.apvts.state.getProperty(MutatorState::kHistoryRetryList).toString().isEmpty());
+        expect(harness.proc.apvts.state.getProperty(MutatorState::kHistoryRetryListsByRoot).toString().isEmpty());
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedMutateRootIndex)), -1);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedRetryIndex)),
                      Core::MutationHistoryStore::kRootOnly);
     }
 
@@ -639,10 +641,10 @@ private:
         const auto result = harness.engine.mutate();
         expect(result.success);
 
-        const auto mList = harness.proc.apvts.state.getProperty(MutatorState::kHistoryMList).toString();
-        expect(mList.contains("M00"));
-        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedM)), 0);
-        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedR)),
+        const auto mutateLabelList = harness.proc.apvts.state.getProperty(MutatorState::kHistoryMutateList).toString();
+        expect(mutateLabelList.contains("M00"));
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedMutateRootIndex)), 0);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedRetryIndex)),
                      Core::MutationHistoryStore::kRootOnly);
     }
 
@@ -660,7 +662,7 @@ private:
         harness.engine.setAuditionSelection(2, Core::MutationHistoryStore::kRootOnly);
         harness.engine.syncHistoryUiProperties(harness.proc.apvts);
 
-        expectEquals(harness.proc.apvts.state.getProperty(MutatorState::kHistoryMList).toString(),
+        expectEquals(harness.proc.apvts.state.getProperty(MutatorState::kHistoryMutateList).toString(),
                      juce::String("M00|M02|M05"));
     }
 
@@ -686,14 +688,14 @@ private:
         harness.engine.setAuditionSelection(5, Core::MutationHistoryStore::kRootOnly);
         harness.engine.syncHistoryUiProperties(harness.proc.apvts);
 
-        const auto rList = harness.proc.apvts.state.getProperty(MutatorState::kHistoryRList).toString();
-        const auto expectedRList = MutatorDisplayNames::kHistoryRootSentinel + "|R00|R02";
-        expectEquals(rList, expectedRList);
+        const auto retryLabelList = harness.proc.apvts.state.getProperty(MutatorState::kHistoryRetryList).toString();
+        const auto expectedRetryLabelList = MutatorDisplayNames::kHistoryRootSentinel + "|R00|R02";
+        expectEquals(retryLabelList, expectedRetryLabelList);
     }
 
-    void sync_changingSelectedM_rebuildsRList()
+    void sync_changingSelectedMutateRoot_rebuildsRetryList()
     {
-        beginTest("sync_changingSelectedM_rebuildsRList");
+        beginTest("sync_changingSelectedMutateRoot_rebuildsRetryList");
 
         EngineHarness harness;
 
@@ -709,23 +711,45 @@ private:
         Core::MutationNaming::applyPatchName(rOnM05, 5, 3);
         expect(harness.store().insertRetry(5, 3, rOnM05, parent));
 
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedM, 2, nullptr);
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedR,
-                                             MutatorState::kSelectedRRootOnly,
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedMutateRootIndex, 2, nullptr);
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedRetryIndex,
+                                             MutatorState::kSelectedRetryRootOnly,
                                              nullptr);
-        harness.engine.syncHistoryUiProperties(harness.proc.apvts);
-        const auto rListM02 = harness.proc.apvts.state.getProperty(MutatorState::kHistoryRList).toString();
+        harness.engine.rebuildHistoryListMirrors();
+        const auto retryListForMutateRoot02 = harness.proc.apvts.state.getProperty(MutatorState::kHistoryRetryList).toString();
 
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedM, 5, nullptr);
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedR,
-                                             MutatorState::kSelectedRRootOnly,
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedMutateRootIndex, 5, nullptr);
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedRetryIndex,
+                                             MutatorState::kSelectedRetryRootOnly,
                                              nullptr);
-        harness.engine.syncHistoryUiProperties(harness.proc.apvts);
-        const auto rListM05 = harness.proc.apvts.state.getProperty(MutatorState::kHistoryRList).toString();
+        harness.engine.rebuildHistoryListMirrors();
+        const auto retryListForMutateRoot05 = harness.proc.apvts.state.getProperty(MutatorState::kHistoryRetryList).toString();
 
-        expect(rListM02.contains("R01"));
-        expect(rListM05.contains("R03"));
-        expect(rListM02 != rListM05);
+        expect(retryListForMutateRoot02.contains("R01"));
+        expect(retryListForMutateRoot05.contains("R03"));
+        expect(retryListForMutateRoot02 != retryListForMutateRoot05);
+
+        const auto retryListsByRoot = harness.proc.apvts.state.getProperty(MutatorState::kHistoryRetryListsByRoot).toString();
+        expect(retryListsByRoot.contains("2=" + MutatorDisplayNames::kHistoryRootSentinel + "|R01"));
+        expect(retryListsByRoot.contains("5=" + MutatorDisplayNames::kHistoryRootSentinel + "|R03"));
+    }
+
+    void sync_consecutiveMutates_listsAllRoots()
+    {
+        beginTest("sync_consecutiveMutates_listsAllRoots");
+
+        EngineHarness harness;
+        harness.setRecipe(100, 100, true);
+
+        expect(harness.engine.mutate().success);
+        expect(harness.engine.mutate().success);
+        expect(harness.engine.mutate().success);
+
+        expectEquals(harness.proc.apvts.state.getProperty(MutatorState::kHistoryMutateList).toString(),
+                     juce::String("M00|M01|M02"));
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedMutateRootIndex)), 2);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedRetryIndex)),
+                     Core::MutationHistoryStore::kRootOnly);
     }
 
     void applySelectionFromApvts_drivesAudition()
@@ -739,8 +763,8 @@ private:
         Core::MutationNaming::applyPatchName(m02, 2);
         expect(harness.store().insertRoot(2, m02, parent));
 
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedM, 2, nullptr);
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedR,
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedMutateRootIndex, 2, nullptr);
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedRetryIndex,
                                              Core::MutationHistoryStore::kRootOnly,
                                              nullptr);
         harness.engine.applySelectionFromApvts();
@@ -758,7 +782,7 @@ private:
 
         const auto result = harness.engine.mutate();
         expect(result.success);
-        expect(! harness.proc.apvts.state.getProperty(MutatorState::kHistoryMList).toString().isEmpty());
+        expect(! harness.proc.apvts.state.getProperty(MutatorState::kHistoryMutateList).toString().isEmpty());
     }
 
     void retry_success_updatesApvtsHistory()
@@ -777,9 +801,9 @@ private:
         const auto result = harness.engine.retry();
         expect(result.success);
 
-        const auto rList = harness.proc.apvts.state.getProperty(MutatorState::kHistoryRList).toString();
-        expect(rList.contains("R00"));
-        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedR)), 0);
+        const auto retryLabelList = harness.proc.apvts.state.getProperty(MutatorState::kHistoryRetryList).toString();
+        expect(retryLabelList.contains("R00"));
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedRetryIndex)), 0);
     }
 
     void audition_emptyHistory_noSysEx()
@@ -802,8 +826,8 @@ private:
         Core::MutationNaming::applyPatchName(m00, 0);
         expect(harness.store().insertRoot(0, m00, m00Parent));
 
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedM, 0, nullptr);
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedR,
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedMutateRootIndex, 0, nullptr);
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedRetryIndex,
                                              Core::MutationHistoryStore::kRootOnly,
                                              nullptr);
 
@@ -828,8 +852,8 @@ private:
         Core::MutationNaming::applyPatchName(r00, 0, 0);
         expect(harness.store().insertRetry(0, 0, r00, m00Parent));
 
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedM, 0, nullptr);
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedR, 0, nullptr);
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedMutateRootIndex, 0, nullptr);
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedRetryIndex, 0, nullptr);
 
         harness.engine.auditionSelectedHistoryEntry();
 
@@ -848,8 +872,8 @@ private:
         Core::MutationNaming::applyPatchName(m00, 0);
         expect(harness.store().insertRoot(0, m00, m00Parent));
 
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedM, 0, nullptr);
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedR,
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedMutateRootIndex, 0, nullptr);
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedRetryIndex,
                                              Core::MutationHistoryStore::kRootOnly,
                                              nullptr);
 
@@ -871,8 +895,8 @@ private:
         Core::MutationNaming::applyPatchName(m00, 0);
         expect(harness.store().insertRoot(0, m00, m00Parent));
 
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedM, 0, nullptr);
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedR,
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedMutateRootIndex, 0, nullptr);
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedRetryIndex,
                                              Core::MutationHistoryStore::kRootOnly,
                                              nullptr);
         harness.proc.apvts.state.setProperty(MutatorState::kCompareActive, true, nullptr);
@@ -984,15 +1008,15 @@ private:
         Core::MutationNaming::applyPatchName(r00, 0, 0);
         expect(harness.store().insertRetry(0, 0, r00, m00Parent));
 
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedM, 0, nullptr);
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedR, 0, nullptr);
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedMutateRootIndex, 0, nullptr);
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedRetryIndex, 0, nullptr);
         harness.engine.applySelectionFromApvts();
 
         expect(harness.engine.toggleCompare().success);
         expect(harness.engine.toggleCompare().success);
 
-        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedM)), 0);
-        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedR)), 0);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedMutateRootIndex)), 0);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedRetryIndex)), 0);
         expect(! static_cast<bool>(harness.proc.apvts.state.getProperty(MutatorState::kCompareActive, false)));
     }
 
@@ -1014,8 +1038,8 @@ private:
 
         std::memcpy(harness.model.data(), r00.data(), Core::PatchModel::kBufferSize);
 
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedM, 0, nullptr);
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedR, 0, nullptr);
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedMutateRootIndex, 0, nullptr);
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedRetryIndex, 0, nullptr);
         harness.engine.applySelectionFromApvts();
 
         expect(harness.engine.toggleCompare().success);
@@ -1037,8 +1061,8 @@ private:
         expect(harness.store().insertRoot(0, m00, m00Parent));
         harness.store().setInitialSnapshot(m00Parent);
 
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedM, 0, nullptr);
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedR,
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedMutateRootIndex, 0, nullptr);
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedRetryIndex,
                                              Core::MutationHistoryStore::kRootOnly,
                                              nullptr);
 
@@ -1073,7 +1097,7 @@ private:
         Core::MutationNaming::applyPatchName(m00, 0);
         expect(harness.store().insertRoot(0, m00, m00Parent));
 
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedM, -1, nullptr);
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedMutateRootIndex, -1, nullptr);
 
         const auto result = harness.engine.deleteSelected();
         expect(! result.success);
@@ -1101,8 +1125,8 @@ private:
         Core::MutationNaming::applyPatchName(r02, 0, 2);
         expect(harness.store().insertRetry(0, 2, r02, m00Parent));
 
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedM, 0, nullptr);
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedR, 2, nullptr);
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedMutateRootIndex, 0, nullptr);
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedRetryIndex, 2, nullptr);
 
         expect(harness.engine.deleteSelected().success);
         expect(! harness.store().hasRetry(0, 2));
@@ -1129,8 +1153,8 @@ private:
         Core::MutationNaming::applyPatchName(r01, 5, 1);
         expect(harness.store().insertRetry(5, 1, r01, m05Parent));
 
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedM, 5, nullptr);
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedR,
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedMutateRootIndex, 5, nullptr);
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedRetryIndex,
                                              Core::MutationHistoryStore::kRootOnly,
                                              nullptr);
 
@@ -1161,13 +1185,13 @@ private:
         Core::MutationNaming::applyPatchName(r02, 0, 2);
         expect(harness.store().insertRetry(0, 2, r02, m00Parent));
 
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedM, 0, nullptr);
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedR, 2, nullptr);
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedMutateRootIndex, 0, nullptr);
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedRetryIndex, 2, nullptr);
 
         std::memcpy(harness.model.data(), r02.data(), Core::PatchModel::kBufferSize);
 
         expect(harness.engine.deleteSelected().success);
-        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedR)), 0);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedRetryIndex)), 0);
         expectEquals(countPatchSysExMessages(harness.queue), 1);
         expect(std::memcmp(harness.model.data(), r00.data(), Core::PatchModel::kBufferSize) == 0);
     }
@@ -1187,11 +1211,11 @@ private:
         Core::MutationNaming::applyPatchName(r00, 0, 0);
         expect(harness.store().insertRetry(0, 0, r00, m00Parent));
 
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedM, 0, nullptr);
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedR, 0, nullptr);
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedMutateRootIndex, 0, nullptr);
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedRetryIndex, 0, nullptr);
 
         expect(harness.engine.deleteSelected().success);
-        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedR)),
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedRetryIndex)),
                      Core::MutationHistoryStore::kRootOnly);
     }
 
@@ -1211,13 +1235,13 @@ private:
         Core::MutationNaming::applyPatchName(m05, 5);
         expect(harness.store().insertRoot(5, m05, m05Parent));
 
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedM, 5, nullptr);
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedR,
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedMutateRootIndex, 5, nullptr);
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedRetryIndex,
                                              Core::MutationHistoryStore::kRootOnly,
                                              nullptr);
 
         expect(harness.engine.deleteSelected().success);
-        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedM)), 0);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedMutateRootIndex)), 0);
     }
 
     void delete_lastEntry_emptyHistory_auditionsInitialSnapshot()
@@ -1236,14 +1260,14 @@ private:
 
         std::memcpy(harness.model.data(), m00.data(), Core::PatchModel::kBufferSize);
 
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedM, 0, nullptr);
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedR,
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedMutateRootIndex, 0, nullptr);
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedRetryIndex,
                                              Core::MutationHistoryStore::kRootOnly,
                                              nullptr);
 
         expect(harness.engine.deleteSelected().success);
         expect(harness.store().isEmpty());
-        expect(harness.proc.apvts.state.getProperty(MutatorState::kHistoryMList).toString().isEmpty());
+        expect(harness.proc.apvts.state.getProperty(MutatorState::kHistoryMutateList).toString().isEmpty());
         expectEquals(countPatchSysExMessages(harness.queue), 1);
         expect(std::memcmp(harness.model.data(), snapshot.data(), Core::PatchModel::kBufferSize) == 0);
     }
@@ -1260,8 +1284,8 @@ private:
         expect(harness.store().insertRoot(0, m00, m00Parent));
         harness.store().setInitialSnapshot(m00Parent);
 
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedM, 0, nullptr);
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedR,
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedMutateRootIndex, 0, nullptr);
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedRetryIndex,
                                              Core::MutationHistoryStore::kRootOnly,
                                              nullptr);
         harness.proc.apvts.state.setProperty(MutatorState::kCompareActive, true, nullptr);
@@ -1291,8 +1315,8 @@ private:
         Core::MutationNaming::applyPatchName(r00, 5, 0);
         expect(harness.store().insertRetry(5, 0, r00, m05Parent));
 
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedM, 5, nullptr);
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedR,
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedMutateRootIndex, 5, nullptr);
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedRetryIndex,
                                              Core::MutationHistoryStore::kRootOnly,
                                              nullptr);
         harness.engine.applySelectionFromApvts();
@@ -1302,8 +1326,8 @@ private:
 
         expect(harness.engine.deleteSelected().success);
         expect(! static_cast<bool>(harness.proc.apvts.state.getProperty(MutatorState::kCompareActive, false)));
-        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedM)), 0);
-        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedR)),
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedMutateRootIndex)), 0);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedRetryIndex)),
                      Core::MutationHistoryStore::kRootOnly);
     }
 
@@ -1323,24 +1347,24 @@ private:
         Core::MutationNaming::applyPatchName(m05, 5);
         expect(harness.store().insertRoot(5, m05, m05Parent));
 
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedM, 5, nullptr);
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedR,
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedMutateRootIndex, 5, nullptr);
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedRetryIndex,
                                              Core::MutationHistoryStore::kRootOnly,
                                              nullptr);
         harness.engine.syncHistoryUiProperties(harness.proc.apvts);
 
-        const auto listBefore = harness.proc.apvts.state.getProperty(MutatorState::kHistoryMList).toString();
+        const auto listBefore = harness.proc.apvts.state.getProperty(MutatorState::kHistoryMutateList).toString();
         expect(listBefore.contains("M00"));
         expect(listBefore.contains("M05"));
 
         expect(harness.engine.deleteSelected().success);
 
-        const auto listAfter = harness.proc.apvts.state.getProperty(MutatorState::kHistoryMList).toString();
+        const auto listAfter = harness.proc.apvts.state.getProperty(MutatorState::kHistoryMutateList).toString();
         expect(listAfter.contains("M00"));
         expect(! listAfter.contains("M05"));
 
-        const auto rListAfter = harness.proc.apvts.state.getProperty(MutatorState::kHistoryRList).toString();
-        expectEquals(rListAfter, MutatorDisplayNames::kHistoryRootSentinel);
+        const auto retryLabelListAfter = harness.proc.apvts.state.getProperty(MutatorState::kHistoryRetryList).toString();
+        expectEquals(retryLabelListAfter, MutatorDisplayNames::kHistoryRootSentinel);
     }
 
     void clear_purgesHistory_emptySentinel()
@@ -1359,13 +1383,13 @@ private:
         Core::MutationNaming::applyPatchName(m05, 5);
         expect(harness.store().insertRoot(5, m05, m05Parent));
 
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedM, 0, nullptr);
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedMutateRootIndex, 0, nullptr);
 
         expect(harness.engine.clearHistory().success);
         expectEquals(harness.store().rootCount(), 0);
-        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedM)), -1);
-        expect(harness.proc.apvts.state.getProperty(MutatorState::kHistoryMList).toString().isEmpty());
-        expect(harness.proc.apvts.state.getProperty(MutatorState::kHistoryRList).toString().isEmpty());
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedMutateRootIndex)), -1);
+        expect(harness.proc.apvts.state.getProperty(MutatorState::kHistoryMutateList).toString().isEmpty());
+        expect(harness.proc.apvts.state.getProperty(MutatorState::kHistoryRetryList).toString().isEmpty());
     }
 
     void clear_disablesCompare()
@@ -1380,7 +1404,7 @@ private:
         expect(harness.store().insertRoot(0, m00, m00Parent));
         harness.store().setInitialSnapshot(m00Parent);
 
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedM, 0, nullptr);
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedMutateRootIndex, 0, nullptr);
         harness.proc.apvts.state.setProperty(MutatorState::kCompareActive, true, nullptr);
 
         expect(harness.engine.clearHistory().success);
@@ -1476,15 +1500,15 @@ private:
         Core::MutationNaming::applyPatchName(m99, 99);
         expect(harness.store().insertRoot(99, m99, m99Parent));
 
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedM, 99, nullptr);
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedR,
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedMutateRootIndex, 99, nullptr);
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedRetryIndex,
                                              Core::MutationHistoryStore::kRootOnly,
                                              nullptr);
         harness.engine.applySelectionFromApvts();
 
         expect(harness.engine.defragHistory().success);
-        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedM)), 0);
-        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedR)),
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedMutateRootIndex)), 0);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedRetryIndex)),
                      Core::MutationHistoryStore::kRootOnly);
     }
 
@@ -1503,13 +1527,13 @@ private:
         Core::MutationNaming::applyPatchName(r99, 0, 99);
         expect(harness.store().insertRetry(0, 99, r99, m00Parent));
 
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedM, 0, nullptr);
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedR, 99, nullptr);
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedMutateRootIndex, 0, nullptr);
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedRetryIndex, 99, nullptr);
         harness.engine.applySelectionFromApvts();
 
         expect(harness.engine.defragHistory().success);
-        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedM)), 0);
-        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedR)), 0);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedMutateRootIndex)), 0);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedRetryIndex)), 0);
     }
 
     void defrag_clampsEmptySelection()
@@ -1533,15 +1557,15 @@ private:
         Core::MutationNaming::applyPatchName(m99, 99);
         expect(harness.store().insertRoot(99, m99, m99Parent));
 
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedM, -1, nullptr);
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedR,
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedMutateRootIndex, -1, nullptr);
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedRetryIndex,
                                              Core::MutationHistoryStore::kRootOnly,
                                              nullptr);
         harness.engine.applySelectionFromApvts();
 
         expect(harness.engine.defragHistory().success);
-        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedM)), 2);
-        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedR)),
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedMutateRootIndex)), 2);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedRetryIndex)),
                      Core::MutationHistoryStore::kRootOnly);
     }
 
@@ -1570,8 +1594,8 @@ private:
 
         expect(harness.engine.defragHistory().success);
 
-        const auto mList = harness.proc.apvts.state.getProperty(MutatorState::kHistoryMList).toString();
-        expectEquals(mList, juce::String("M00|M01|M02"));
+        const auto mutateLabelList = harness.proc.apvts.state.getProperty(MutatorState::kHistoryMutateList).toString();
+        expectEquals(mutateLabelList, juce::String("M00|M01|M02"));
     }
 
     void defrag_disablesCompare()
@@ -1586,7 +1610,7 @@ private:
         expect(harness.store().insertRoot(0, m00, m00Parent));
         harness.store().setInitialSnapshot(m00Parent);
 
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedM, 0, nullptr);
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedMutateRootIndex, 0, nullptr);
         harness.proc.apvts.state.setProperty(MutatorState::kCompareActive, true, nullptr);
 
         expect(harness.engine.defragHistory().success);
@@ -1604,8 +1628,8 @@ private:
         Core::MutationNaming::applyPatchName(m99, 99);
         expect(harness.store().insertRoot(99, m99, m99Parent));
 
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedM, 99, nullptr);
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedR,
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedMutateRootIndex, 99, nullptr);
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedRetryIndex,
                                              Core::MutationHistoryStore::kRootOnly,
                                              nullptr);
         harness.engine.applySelectionFromApvts();
@@ -1793,7 +1817,7 @@ private:
             expect(harness.store().insertRetry(0, i, retryPatch, m00Parent));
         }
 
-        harness.proc.apvts.state.setProperty(MutatorState::kSelectedM, 0, nullptr);
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedMutateRootIndex, 0, nullptr);
         harness.engine.syncHistoryUiProperties(harness.proc.apvts);
         expectActionEnabledMirrors(harness, true, false, true, true, true);
     }
@@ -1842,10 +1866,11 @@ private:
         expectEquals(harness.store().rootCount(), 0);
         expect(! harness.store().hasInitialSnapshot());
         expect(! static_cast<bool>(harness.proc.apvts.state.getProperty(MutatorState::kCompareActive, false)));
-        expect(harness.proc.apvts.state.getProperty(MutatorState::kHistoryMList).toString().isEmpty());
-        expect(harness.proc.apvts.state.getProperty(MutatorState::kHistoryRList).toString().isEmpty());
-        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedM)), -1);
-        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedR)),
+        expect(harness.proc.apvts.state.getProperty(MutatorState::kHistoryMutateList).toString().isEmpty());
+        expect(harness.proc.apvts.state.getProperty(MutatorState::kHistoryRetryList).toString().isEmpty());
+        expect(harness.proc.apvts.state.getProperty(MutatorState::kHistoryRetryListsByRoot).toString().isEmpty());
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedMutateRootIndex)), -1);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedRetryIndex)),
                      Core::MutationHistoryStore::kRootOnly);
     }
 

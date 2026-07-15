@@ -844,8 +844,6 @@ namespace PluginDisplayNames
                 constexpr const char* kAmount         = "AMOUNT";
                 constexpr const char* kRandom         = "RANDOM";
                 constexpr const char* kHistory        = "HISTORY";
-                constexpr const char* kHistoryM       = "M";
-                constexpr const char* kHistoryR       = "R";
                 constexpr const char* kEmptyHistorySentinel = "<EMPTY>";
                 const juce::String    kHistoryRootSentinel =
                     juce::String::fromUTF8("\xe2\x80\x94"); // em dash U+2014 — root-only History R row

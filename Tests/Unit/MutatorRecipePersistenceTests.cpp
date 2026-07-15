@@ -91,10 +91,11 @@ private:
         expect(xml != nullptr);
 
         const auto xmlString = xml->toString();
-        expect(! xmlString.contains(MutatorState::kHistoryMList));
-        expect(! xmlString.contains(MutatorState::kHistoryRList));
-        expect(! xmlString.contains(MutatorState::kSelectedM));
-        expect(! xmlString.contains(MutatorState::kSelectedR));
+        expect(! xmlString.contains(MutatorState::kHistoryMutateList));
+        expect(! xmlString.contains(MutatorState::kHistoryRetryList));
+        expect(! xmlString.contains(MutatorState::kHistoryRetryListsByRoot));
+        expect(! xmlString.contains(MutatorState::kSelectedMutateRootIndex));
+        expect(! xmlString.contains(MutatorState::kSelectedRetryIndex));
         expect(! xmlString.contains(MutatorState::kCompareActive));
         expect(! xmlString.contains(MutatorState::kMutateEnabled));
         expect(! xmlString.contains(MutatorState::kRetryEnabled));
@@ -116,10 +117,11 @@ private:
         for (int i = 0; i < 10; ++i)
             sourceState.setProperty(kRecipeToggleIds[static_cast<size_t>(i)], (i % 2) == 0, nullptr);
 
-        sourceState.setProperty(MutatorState::kHistoryMList, "M00", nullptr);
-        sourceState.setProperty(MutatorState::kHistoryRList, "M00|R00", nullptr);
-        sourceState.setProperty(MutatorState::kSelectedM, 0, nullptr);
-        sourceState.setProperty(MutatorState::kSelectedR, 0, nullptr);
+        sourceState.setProperty(MutatorState::kHistoryMutateList, "M00", nullptr);
+        sourceState.setProperty(MutatorState::kHistoryRetryList, "M00|R00", nullptr);
+        sourceState.setProperty(MutatorState::kHistoryRetryListsByRoot, "0=—|R00", nullptr);
+        sourceState.setProperty(MutatorState::kSelectedMutateRootIndex, 0, nullptr);
+        sourceState.setProperty(MutatorState::kSelectedRetryIndex, 0, nullptr);
         sourceState.setProperty(MutatorState::kCompareActive, true, nullptr);
         sourceState.setProperty(MutatorState::kMutateEnabled, false, nullptr);
         sourceState.setProperty(MutatorState::kExportEnabled, true, nullptr);
@@ -142,11 +144,12 @@ private:
             expect(static_cast<bool>(restoredState.getProperty(kRecipeToggleIds[static_cast<size_t>(i)])) == expected);
         }
 
-        expect(restoredState.getProperty(MutatorState::kHistoryMList).toString().isEmpty());
-        expect(restoredState.getProperty(MutatorState::kHistoryRList).toString().isEmpty());
-        expectEquals(static_cast<int>(restoredState.getProperty(MutatorState::kSelectedM)), -1);
-        expectEquals(static_cast<int>(restoredState.getProperty(MutatorState::kSelectedR)),
-                     MutatorState::kSelectedRRootOnly);
+        expect(restoredState.getProperty(MutatorState::kHistoryMutateList).toString().isEmpty());
+        expect(restoredState.getProperty(MutatorState::kHistoryRetryList).toString().isEmpty());
+        expect(restoredState.getProperty(MutatorState::kHistoryRetryListsByRoot).toString().isEmpty());
+        expectEquals(static_cast<int>(restoredState.getProperty(MutatorState::kSelectedMutateRootIndex)), -1);
+        expectEquals(static_cast<int>(restoredState.getProperty(MutatorState::kSelectedRetryIndex)),
+                     MutatorState::kSelectedRetryRootOnly);
         expect(! static_cast<bool>(restoredState.getProperty(MutatorState::kCompareActive)));
 
         expect(static_cast<bool>(restoredState.getProperty(MutatorState::kMutateEnabled)));

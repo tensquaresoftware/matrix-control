@@ -165,6 +165,9 @@ namespace TSS
         if (! canShowPopupMenu())
             return;
 
+        if (onBeforeShowPopup)
+            onBeforeShowPopup();
+
         HierarchicalPopupMenu::show(*this);
     }
 
@@ -174,8 +177,10 @@ namespace TSS
         if (primary == nullptr || primary->isSentinel)
             return;
 
+        // Fall back to primary-only when the requested child is missing (e.g. after a rebuild
+        // where retries are still catching up) — never leave selection cleared at (0,0).
         if (childId != 0 && findChildItem(*primary, childId) == nullptr)
-            return;
+            childId = 0;
 
         const bool changed = selectedPrimaryId_ != primaryId || selectedChildId_ != childId;
         selectedPrimaryId_ = primaryId;

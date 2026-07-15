@@ -1,5 +1,12 @@
 # Deferred Work
 
+## Deferred from: code review of 6-14-patch-mutator-hierarchical-history-combobox (2026-07-15)
+
+- **Fragile Mxx/Rxx index parsing via `substring(1,3)`** (`PatchMutatorPanel.cpp`) — inherited from 6.6 dual-combo label convention; bogus labels → index 0.
+- **No automated tests for hierarchy cache / defer / `onBeforeShowPopup`** — panel UI risk paths covered only by manual smoke.
+- **No automated layout/scale assertions for COMPARE alignment** — AC #5 relies on manual smoke at 0.5 / 1.0 / 1.5.
+- **Unguarded short/non-numeric mutate labels** (`PatchMutatorPanel.cpp:645`) — same pre-existing label contract as above.
+
 ## Deferred from: code review of 7-8-header-footer-shell-and-persistence (2026-07-14)
 
 - **Hand-maintained parameter ID collection in `SessionPersistencePolicy`** — new modules/parameters must be added manually to `collectManagedParameterIds()`; omission silently defeats strip policy.

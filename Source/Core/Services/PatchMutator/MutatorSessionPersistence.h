@@ -40,10 +40,11 @@ namespace Core::MutatorSessionPersistence
     {
         namespace S = PluginIDs::PatchManagerSection::PatchMutatorModule::StateProperties;
 
-        state.removeProperty(S::kHistoryMList, nullptr);
-        state.removeProperty(S::kHistoryRList, nullptr);
-        state.removeProperty(S::kSelectedM, nullptr);
-        state.removeProperty(S::kSelectedR, nullptr);
+        state.removeProperty(S::kHistoryMutateList, nullptr);
+        state.removeProperty(S::kHistoryRetryList, nullptr);
+        state.removeProperty(S::kHistoryRetryListsByRoot, nullptr);
+        state.removeProperty(S::kSelectedMutateRootIndex, nullptr);
+        state.removeProperty(S::kSelectedRetryIndex, nullptr);
         state.removeProperty(S::kCompareActive, nullptr);
         state.removeProperty(S::kMutateEnabled, nullptr);
         state.removeProperty(S::kRetryEnabled, nullptr);
@@ -56,10 +57,11 @@ namespace Core::MutatorSessionPersistence
     {
         namespace S = PluginIDs::PatchManagerSection::PatchMutatorModule::StateProperties;
 
-        state.setProperty(S::kHistoryMList, juce::String(), nullptr);
-        state.setProperty(S::kHistoryRList, juce::String(), nullptr);
-        state.setProperty(S::kSelectedM, -1, nullptr);
-        state.setProperty(S::kSelectedR, S::kSelectedRRootOnly, nullptr);
+        state.setProperty(S::kHistoryMutateList, juce::String(), nullptr);
+        state.setProperty(S::kHistoryRetryList, juce::String(), nullptr);
+        state.setProperty(S::kHistoryRetryListsByRoot, juce::String(), nullptr);
+        state.setProperty(S::kSelectedMutateRootIndex, -1, nullptr);
+        state.setProperty(S::kSelectedRetryIndex, S::kSelectedRetryRootOnly, nullptr);
         state.setProperty(S::kCompareActive, false, nullptr);
     }
 

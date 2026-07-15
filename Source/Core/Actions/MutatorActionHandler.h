@@ -27,7 +27,7 @@ namespace Core
 
         void handleAction(const juce::String& propertyId, const juce::var& newValue) override;
 
-        void onHistorySelectionChanged();
+        void onHistorySelectionChanged(bool rootSelectionChanged = false);
 
         // Unit-test seam — see ComboboxPatchSendDebouncer::flushPendingSynchronouslyForTests().
         void flushHistorySelectionDebouncerForTests()

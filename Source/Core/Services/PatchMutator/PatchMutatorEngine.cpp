@@ -352,8 +352,8 @@ MutatorActionResult PatchMutatorEngine::toggleCompare()
         state.setProperty(MutatorState::kCompareActive, false, nullptr);
         {
             SuppressMutatorHistorySelectionDebounceGuard suppressGuard(hooks_);
-            state.setProperty(MutatorState::kSelectedM, compareSavedM_, nullptr);
-            state.setProperty(MutatorState::kSelectedR, compareSavedR_, nullptr);
+            state.setProperty(MutatorState::kSelectedMutateRootIndex, compareSavedMutateRootIndex_, nullptr);
+            state.setProperty(MutatorState::kSelectedRetryIndex, compareSavedRetryIndex_, nullptr);
         }
         applySelectionFromApvts();
 
@@ -382,8 +382,8 @@ MutatorActionResult PatchMutatorEngine::toggleCompare()
         return result;
     }
 
-    compareSavedM_ = selectedRootIndex_;
-    compareSavedR_ = selectedRetryIndex_;
+    compareSavedMutateRootIndex_ = selectedRootIndex_;
+    compareSavedRetryIndex_ = selectedRetryIndex_;
 
     state.setProperty(MutatorState::kCompareActive, true, nullptr);
 
@@ -408,8 +408,8 @@ MutatorActionResult PatchMutatorEngine::deleteSelected()
         return result;
     }
 
-    const int m = selectedRootIndex_;
-    if (m < 0 || ! historyStore_.hasRoot(m))
+    const int mutateRootIndex = selectedRootIndex_;
+    if (mutateRootIndex < 0 || ! historyStore_.hasRoot(mutateRootIndex))
     {
         MutatorActionResult result;
         result.footerMessage = kNoSelectionFooterMessage;
@@ -419,16 +419,16 @@ MutatorActionResult PatchMutatorEngine::deleteSelected()
 
     forceExitCompare();
 
-    const int r = selectedRetryIndex_;
-    int newM = m;
-    int newR = MutationHistoryStore::kRootOnly;
+    const int retryIndex = selectedRetryIndex_;
+    int newMutateRootIndex = mutateRootIndex;
+    int newRetryIndex = MutationHistoryStore::kRootOnly;
     MutatorActionResult result;
 
-    if (r != MutationHistoryStore::kRootOnly && historyStore_.hasRetry(m, r))
+    if (retryIndex != MutationHistoryStore::kRootOnly && historyStore_.hasRetry(mutateRootIndex, retryIndex))
     {
-        std::tie(newM, newR) = resolveSelectionAfterDelete(m, r, true);
+        std::tie(newMutateRootIndex, newRetryIndex) = resolveSelectionAfterDelete(mutateRootIndex, retryIndex, true);
 
-        if (! historyStore_.deleteRetry(m, r))
+        if (! historyStore_.deleteRetry(mutateRootIndex, retryIndex))
         {
             result.footerMessage = kNoSelectionFooterMessage;
             result.footerSeverity = kFooterSeverityWarning;
@@ -437,9 +437,11 @@ MutatorActionResult PatchMutatorEngine::deleteSelected()
     }
     else
     {
-        std::tie(newM, newR) = resolveSelectionAfterDelete(m, MutationHistoryStore::kRootOnly, false);
+        std::tie(newMutateRootIndex, newRetryIndex) = resolveSelectionAfterDelete(mutateRootIndex,
+                                                                                  MutationHistoryStore::kRootOnly,
+                                                                                  false);
 
-        if (! historyStore_.deleteRoot(m))
+        if (! historyStore_.deleteRoot(mutateRootIndex))
         {
             result.footerMessage = kNoSelectionFooterMessage;
             result.footerSeverity = kFooterSeverityWarning;
@@ -447,13 +449,13 @@ MutatorActionResult PatchMutatorEngine::deleteSelected()
         }
 
         result.footerMessage = kRootDeleteCascadeFooterPrefix
-                               + MutationNaming::formatRootLabel(m)
+                               + MutationNaming::formatRootLabel(mutateRootIndex)
                                + kRootDeleteCascadeFooterSuffix;
         result.footerSeverity = kFooterSeverityInfo;
     }
 
-    selectedRootIndex_ = newM;
-    selectedRetryIndex_ = newR;
+    selectedRootIndex_ = newMutateRootIndex;
+    selectedRetryIndex_ = newRetryIndex;
     syncHistoryUiProperties(apvts_);
     auditionAfterHistoryMutation();
 
@@ -536,6 +538,12 @@ MutatorActionResult PatchMutatorEngine::defragHistory()
     return result;
 }
 
+void PatchMutatorEngine::rebuildHistoryListMirrors()
+{
+    applySelectionFromApvts();
+    syncHistoryUiProperties(apvts_);
+}
+
 void PatchMutatorEngine::auditionSelectedHistoryEntry()
 {
     if (readBoolProperty(apvts_.state, MutatorState::kCompareActive, false))
@@ -563,53 +571,62 @@ void PatchMutatorEngine::syncHistoryUiProperties(juce::AudioProcessorValueTreeSt
     if (! state.hasProperty(MutatorState::kCompareActive))
         state.setProperty(MutatorState::kCompareActive, false, nullptr);
 
-    // Story 7.4: call syncHistoryUiProperties when kSelectedM changes so kHistoryRList
-    // rebuilds for the new root (panel writes properties only — AD-5).
-    if (state.hasProperty(MutatorState::kSelectedM))
-    {
-        const int apvtsM = static_cast<int>(state.getProperty(MutatorState::kSelectedM, -1));
-        if (apvtsM != selectedRootIndex_)
-            applySelectionFromApvts();
-    }
+    // Selection → list rebuild goes through rebuildHistoryListMirrors() which calls
+    // applySelectionFromApvts() first. Do not self-heal here: mutate/retry/delete set
+    // engine members then sync while APVTS may still hold the previous selection.
 
     const auto roots = historyStore_.getSortedRootIndices();
     if (roots.isEmpty())
     {
-        state.setProperty(MutatorState::kHistoryMList, juce::String(), nullptr);
-        state.setProperty(MutatorState::kHistoryRList, juce::String(), nullptr);
-        state.setProperty(MutatorState::kSelectedM, -1, nullptr);
-        state.setProperty(MutatorState::kSelectedR, MutationHistoryStore::kRootOnly, nullptr);
+        state.setProperty(MutatorState::kHistoryMutateList, juce::String(), nullptr);
+        state.setProperty(MutatorState::kHistoryRetryList, juce::String(), nullptr);
+        state.setProperty(MutatorState::kHistoryRetryListsByRoot, juce::String(), nullptr);
+        state.setProperty(MutatorState::kSelectedMutateRootIndex, -1, nullptr);
+        state.setProperty(MutatorState::kSelectedRetryIndex, MutationHistoryStore::kRootOnly, nullptr);
         selectedRootIndex_ = -1;
         selectedRetryIndex_ = MutationHistoryStore::kRootOnly;
         refreshActionEnabledMirrors(apvts);
         return;
     }
 
-    juce::StringArray mLabels;
+    juce::StringArray mutateLabels;
+    juce::StringArray retryListsByRoot;
     for (const int rootIndex : roots)
-        mLabels.add(MutationNaming::formatRootLabel(rootIndex));
-    state.setProperty(MutatorState::kHistoryMList, joinLabels(mLabels), nullptr);
+    {
+        mutateLabels.add(MutationNaming::formatRootLabel(rootIndex));
 
-    int m = selectedRootIndex_;
-    if (m < 0 || ! historyStore_.hasRoot(m))
-        m = roots.getLast();
+        juce::StringArray rootRetryLabels;
+        rootRetryLabels.add(historyRootSentinelLabel());
+        for (const int retryIndex : historyStore_.getSortedRetryIndices(rootIndex))
+            rootRetryLabels.add(MutationNaming::formatRetryLabel(retryIndex));
+        retryListsByRoot.add(juce::String(rootIndex) + "=" + joinLabels(rootRetryLabels));
+    }
+    state.setProperty(MutatorState::kHistoryMutateList, joinLabels(mutateLabels), nullptr);
+    state.setProperty(MutatorState::kHistoryRetryListsByRoot, retryListsByRoot.joinIntoString(";"), nullptr);
 
-    selectedRootIndex_ = m;
+    int selectedMutateRootIndex = selectedRootIndex_;
+    if (selectedMutateRootIndex < 0 || ! historyStore_.hasRoot(selectedMutateRootIndex))
+        selectedMutateRootIndex = roots.getLast();
 
-    const auto retries = historyStore_.getSortedRetryIndices(m);
+    selectedRootIndex_ = selectedMutateRootIndex;
+
+    const auto retries = historyStore_.getSortedRetryIndices(selectedMutateRootIndex);
     if (selectedRetryIndex_ != MutationHistoryStore::kRootOnly
-        && ! historyStore_.hasRetry(m, selectedRetryIndex_))
+        && ! historyStore_.hasRetry(selectedMutateRootIndex, selectedRetryIndex_))
     {
         selectedRetryIndex_ = MutationHistoryStore::kRootOnly;
     }
 
-    juce::StringArray rLabels;
-    rLabels.add(historyRootSentinelLabel());
+    // Write selection before the retry list so any listener that rebuilds on
+    // kHistoryRetryList already sees the matching selected mutate root.
+    state.setProperty(MutatorState::kSelectedMutateRootIndex, selectedMutateRootIndex, nullptr);
+
+    juce::StringArray retryLabels;
+    retryLabels.add(historyRootSentinelLabel());
     for (const int retryIndex : retries)
-        rLabels.add(MutationNaming::formatRetryLabel(retryIndex));
-    state.setProperty(MutatorState::kHistoryRList, joinLabels(rLabels), nullptr);
-    state.setProperty(MutatorState::kSelectedM, m, nullptr);
-    state.setProperty(MutatorState::kSelectedR, selectedRetryIndex_, nullptr);
+        retryLabels.add(MutationNaming::formatRetryLabel(retryIndex));
+    state.setProperty(MutatorState::kHistoryRetryList, joinLabels(retryLabels), nullptr);
+    state.setProperty(MutatorState::kSelectedRetryIndex, selectedRetryIndex_, nullptr);
     refreshActionEnabledMirrors(apvts);
 }
 
@@ -662,8 +679,8 @@ void PatchMutatorEngine::forceExitCompare()
         return;
 
     state.setProperty(MutatorState::kCompareActive, false, nullptr);
-    compareSavedM_ = -1;
-    compareSavedR_ = MutationHistoryStore::kRootOnly;
+    compareSavedMutateRootIndex_ = -1;
+    compareSavedRetryIndex_ = MutationHistoryStore::kRootOnly;
 }
 
 std::pair<int, int> PatchMutatorEngine::resolveSelectionAfterDelete(int rootIndex,
@@ -720,26 +737,26 @@ void PatchMutatorEngine::auditionAfterHistoryMutation()
 void PatchMutatorEngine::applySelectionFromApvts()
 {
     const auto& state = apvts_.state;
-    if (! state.hasProperty(MutatorState::kSelectedM))
+    if (! state.hasProperty(MutatorState::kSelectedMutateRootIndex))
         return;
 
-    const int m = static_cast<int>(state.getProperty(MutatorState::kSelectedM, -1));
-    const int r = static_cast<int>(state.getProperty(MutatorState::kSelectedR,
-                                                     MutationHistoryStore::kRootOnly));
+    const int mutateRootIndex = static_cast<int>(state.getProperty(MutatorState::kSelectedMutateRootIndex, -1));
+    const int retryIndex = static_cast<int>(state.getProperty(MutatorState::kSelectedRetryIndex,
+                                                               MutationHistoryStore::kRootOnly));
 
-    if (m < 0 || ! historyStore_.hasRoot(m))
+    if (mutateRootIndex < 0 || ! historyStore_.hasRoot(mutateRootIndex))
     {
         selectedRootIndex_ = -1;
         selectedRetryIndex_ = MutationHistoryStore::kRootOnly;
         return;
     }
 
-    selectedRootIndex_ = m;
+    selectedRootIndex_ = mutateRootIndex;
 
-    if (r == MutationHistoryStore::kRootOnly)
+    if (retryIndex == MutationHistoryStore::kRootOnly)
         selectedRetryIndex_ = MutationHistoryStore::kRootOnly;
-    else if (historyStore_.hasRetry(m, r))
-        selectedRetryIndex_ = r;
+    else if (historyStore_.hasRetry(mutateRootIndex, retryIndex))
+        selectedRetryIndex_ = retryIndex;
     else
         selectedRetryIndex_ = MutationHistoryStore::kRootOnly;
 }

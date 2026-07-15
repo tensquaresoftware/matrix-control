@@ -587,12 +587,14 @@ namespace PluginIDs
 
             namespace StateProperties
             {
-                constexpr const char* kHistoryMList  = "patchMutatorHistoryMList";
-                constexpr const char* kHistoryRList  = "patchMutatorHistoryRList";
-                constexpr const char* kSelectedM   = "patchMutatorSelectedM";
-                constexpr const char* kSelectedR   = "patchMutatorSelectedR";
+                constexpr const char* kHistoryMutateList = "patchMutatorHistoryMList";
+                constexpr const char* kHistoryRetryList  = "patchMutatorHistoryRList";
+                // Per-root retry menus for hierarchical History: "0=—|R00;5=—|R01" (ephemeral).
+                constexpr const char* kHistoryRetryListsByRoot = "patchMutatorHistoryRetryListsByRoot";
+                constexpr const char* kSelectedMutateRootIndex = "patchMutatorSelectedM";
+                constexpr const char* kSelectedRetryIndex    = "patchMutatorSelectedR";
                 constexpr const char* kCompareActive = "patchMutatorCompareActive";
-                constexpr int kSelectedRRootOnly = -1; // matches Core::MutationHistoryStore::kRootOnly
+                constexpr int kSelectedRetryRootOnly = -1; // matches Core::MutationHistoryStore::kRootOnly
 
                 // uiMirror — action button enabled flags (Core → GUI; not persisted in session XML)
                 constexpr const char* kMutateEnabled = "patchMutatorMutateEnabled";
@@ -606,8 +608,7 @@ namespace PluginIDs
             {
                 constexpr const char* kAmount         = "patchMutatorAmount";
                 constexpr const char* kRandom         = "patchMutatorRandom";
-                constexpr const char* kHistoryM       = "patchMutatorHistoryM";
-                constexpr const char* kHistoryR       = "patchMutatorHistoryR";
+                constexpr const char* kHistory          = "patchMutatorHistory";
 
                 constexpr const char* kMutate         = "patchMutatorMutate";
                 constexpr const char* kRetry          = "patchMutatorRetry";

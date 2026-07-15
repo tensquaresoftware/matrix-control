@@ -54,8 +54,6 @@ struct ComboBoxDimensions
     int matrixModulationSourceWidth;
     int matrixModulationDestinationWidth;
     int patchManagerComputerPatchesWidth;
-    int patchMutatorHistoryMWidth;
-    int patchMutatorHistoryRWidth;
     int patchMutatorHistoryWidth;
     PopupMenuLayoutDimensions popup;
 };

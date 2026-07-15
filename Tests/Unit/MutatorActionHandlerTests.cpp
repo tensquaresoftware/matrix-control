@@ -51,6 +51,7 @@ public:
     int clearCallCount { 0 };
     int exportCallCount { 0 };
     int defragCallCount { 0 };
+    int rebuildMirrorCallCount { 0 };
     int auditionCallCount { 0 };
     juce::File lastExportFolder;
 
@@ -109,6 +110,11 @@ public:
     {
         ++auditionCallCount;
     }
+
+    void rebuildHistoryListMirrors() override
+    {
+        ++rebuildMirrorCallCount;
+    }
 };
 
 class MutatorActionHandlerTests : public juce::UnitTest
@@ -127,6 +133,7 @@ public:
         export_cancelledPicker_noEngineCall();
         mutate_blocked_setsFooter();
         historySelection_debounced();
+        historySelection_rootChange_rebuildsMirrors();
     }
 
 private:
@@ -285,6 +292,23 @@ private:
 
         harness.handler.flushHistorySelectionDebouncerForTests();
 
+        expectEquals(harness.engine.auditionCallCount, 1);
+    }
+
+    void historySelection_rootChange_rebuildsMirrors()
+    {
+        beginTest("historySelection_rootChange_rebuildsMirrors");
+
+        Harness harness(kTestDebounceMs);
+
+        harness.handler.onHistorySelectionChanged(true);
+        expectEquals(harness.engine.rebuildMirrorCallCount, 1);
+        expectEquals(harness.engine.auditionCallCount, 0);
+
+        harness.handler.onHistorySelectionChanged(false);
+        expectEquals(harness.engine.rebuildMirrorCallCount, 1);
+
+        harness.handler.flushHistorySelectionDebouncerForTests();
         expectEquals(harness.engine.auditionCallCount, 1);
     }
 };

@@ -9,7 +9,7 @@
 #include "GUI/Widgets/Label.h"
 #include "GUI/Widgets/Slider.h"
 #include "GUI/Widgets/Button.h"
-#include "GUI/Widgets/ComboBox.h"
+#include "GUI/Widgets/HierarchicalComboBox.h"
 #include "GUI/Widgets/Toggle.h"
 #include "Shared/Definitions/PluginDescriptors.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
@@ -129,8 +129,7 @@ PatchMutatorPanel::PatchMutatorPanel(TSS::ISkin& skin, const PatchMutatorPanelDi
 
     apvts_.state.addListener(this);
     refreshRecipeFromApvts();
-    refreshHistoryMComboBox();
-    refreshHistoryRComboBox();
+    refreshHistoryComboBox();
     refreshCompareUiState();
 
     setSize(dims_.width, dims_.height);
@@ -337,50 +336,68 @@ void PatchMutatorPanel::setupHistoryLine(TSS::ISkin& skin, WidgetFactory& widget
         MutatorDisplayNames::kHistory);
     addAndMakeVisible(*historyLabel_);
 
-    historyMComboBox_ = std::make_unique<TSS::ComboBox>(
-        dims_.comboBoxes.patchMutatorHistoryMWidth,
+    historyComboBox_ = std::make_unique<TSS::HierarchicalComboBox>(
+        dims_.comboBoxes.patchMutatorHistoryWidth,
         dims_.comboBoxes.standardHeight,
-        TSS::comboBoxLookFromSkin(skin),
-        TSS::ComboBox::Style::Standard);
-    historyMComboBox_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
-    historyMComboBox_->setTextWhenNothingSelected(MutatorDisplayNames::kEmptyHistorySentinel);
-    historyMComboBox_->onChange = [this]
+        TSS::comboBoxLookFromSkin(skin));
+    historyComboBox_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
+    historyComboBox_->setTextWhenNothingSelected(MutatorDisplayNames::kEmptyHistorySentinel);
+    historyComboBox_->onBeforeShowPopup = [this]
     {
-        if (historyMComboBox_ == nullptr)
+        refreshHistoryComboBox();
+    };
+    historyComboBox_->onChange = [this]
+    {
+        if (historySelectionHydrating_ || historyComboBox_ == nullptr)
             return;
 
-        const int selectedId = historyMComboBox_->getSelectedId();
-        if (selectedId <= 0 || selectedId > historyMRootIndices_.size())
+        const int primaryId = historyComboBox_->getSelectedPrimaryId();
+        if (primaryId <= 0 || primaryId > mutateRootIndices_.size())
             return;
 
-        const int rootIndex = historyMRootIndices_[selectedId - 1];
-        apvts_.state.setProperty(MutatorState::kSelectedM, rootIndex, nullptr);
-        apvts_.state.setProperty(MutatorState::kSelectedR,
-                                 MutatorState::kSelectedRRootOnly,
+        const int newRootIndex = mutateRootIndices_[primaryId - 1];
+        const int currentRootIndex = static_cast<int>(apvts_.state.getProperty(MutatorState::kSelectedMutateRootIndex, -1));
+
+        const int childId = historyComboBox_->getSelectedChildId();
+
+        if (newRootIndex != currentRootIndex)
+        {
+            // Hierarchical UX: honour the submenu child clicked while changing M;
+            // fall back to root-only when no child is selected.
+            int newRetryIndex = MutatorState::kSelectedRetryRootOnly;
+            const auto cacheIt = retryLabelsByRootIndex_.find(newRootIndex);
+            if (childId > 0 && cacheIt != retryLabelsByRootIndex_.end()
+                && childId <= cacheIt->second.size())
+            {
+                newRetryIndex = childId == 1
+                                    ? MutatorState::kSelectedRetryRootOnly
+                                    : cacheIt->second[childId - 1].substring(1, 3).getIntValue();
+            }
+
+            deferHistoryComboRefresh_ = true;
+            apvts_.state.setProperty(MutatorState::kSelectedRetryIndex, newRetryIndex, nullptr);
+            apvts_.state.setProperty(MutatorState::kSelectedMutateRootIndex, newRootIndex, nullptr);
+            deferHistoryComboRefresh_ = false;
+            refreshHistoryComboBox();
+            return;
+        }
+
+        if (childId <= 0)
+        {
+            apvts_.state.setProperty(MutatorState::kSelectedRetryIndex,
+                                     MutatorState::kSelectedRetryRootOnly,
+                                     nullptr);
+            return;
+        }
+
+        if (childId > retryIndices_.size())
+            return;
+
+        apvts_.state.setProperty(MutatorState::kSelectedRetryIndex,
+                                 retryIndices_[childId - 1],
                                  nullptr);
     };
-    addAndMakeVisible(*historyMComboBox_);
-
-    historyRComboBox_ = std::make_unique<TSS::ComboBox>(
-        dims_.comboBoxes.patchMutatorHistoryRWidth,
-        dims_.comboBoxes.standardHeight,
-        TSS::comboBoxLookFromSkin(skin),
-        TSS::ComboBox::Style::Standard);
-    historyRComboBox_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
-    historyRComboBox_->onChange = [this]
-    {
-        if (historyRComboBox_ == nullptr)
-            return;
-
-        const int selectedId = historyRComboBox_->getSelectedId();
-        if (selectedId <= 0 || selectedId > historyRRetryIndices_.size())
-            return;
-
-        apvts_.state.setProperty(MutatorState::kSelectedR,
-                                 historyRRetryIndices_[selectedId - 1],
-                                 nullptr);
-    };
-    addAndMakeVisible(*historyRComboBox_);
+    addAndMakeVisible(*historyComboBox_);
 
     compareButton_ = widgetFactory.createStandaloneButton(
         PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kCompare,
@@ -419,15 +436,15 @@ void PatchMutatorPanel::valueTreePropertyChanged(juce::ValueTree&,
     if (isRecipeProperty(name))
         refreshRecipeFromApvts();
 
-    if (name == MutatorState::kHistoryMList || name == MutatorState::kSelectedM)
-        refreshHistoryMComboBox();
-    if (name == MutatorState::kHistoryRList || name == MutatorState::kSelectedM
-        || name == MutatorState::kSelectedR)
+    if (name == MutatorState::kHistoryMutateList || name == MutatorState::kHistoryRetryList
+        || name == MutatorState::kHistoryRetryListsByRoot
+        || name == MutatorState::kSelectedMutateRootIndex || name == MutatorState::kSelectedRetryIndex)
     {
-        refreshHistoryRComboBox();
+        scheduleHistoryComboBoxRefresh();
     }
-    if (name == MutatorState::kCompareActive || name == MutatorState::kHistoryMList
-        || name == MutatorState::kSelectedM)
+
+    if (name == MutatorState::kCompareActive || name == MutatorState::kHistoryMutateList
+        || name == MutatorState::kSelectedMutateRootIndex)
     {
         refreshCompareUiState();
     }
@@ -436,8 +453,7 @@ void PatchMutatorPanel::valueTreePropertyChanged(juce::ValueTree&,
 void PatchMutatorPanel::valueTreeRedirected(juce::ValueTree&)
 {
     refreshRecipeFromApvts();
-    refreshHistoryMComboBox();
-    refreshHistoryRComboBox();
+    refreshHistoryComboBox();
     refreshCompareUiState();
 }
 
@@ -493,18 +509,15 @@ void PatchMutatorPanel::refreshCompareUiState()
 {
     const bool compareActive = static_cast<bool>(apvts_.state.getProperty(MutatorState::kCompareActive,
                                                                          false));
-    const auto mList = parsePipeSeparatedList(apvts_.state.getProperty(MutatorState::kHistoryMList).toString());
-    const int selectedM = static_cast<int>(apvts_.state.getProperty(MutatorState::kSelectedM, -1));
-    const bool historyEmpty = mList.isEmpty() || selectedM < 0;
+    const auto mutateLabelList = parsePipeSeparatedList(apvts_.state.getProperty(MutatorState::kHistoryMutateList).toString());
+    const int selectedMutateRootIndex = static_cast<int>(apvts_.state.getProperty(MutatorState::kSelectedMutateRootIndex, -1));
+    const bool historyEmpty = mutateLabelList.isEmpty() || selectedMutateRootIndex < 0;
 
     if (compareButton_ != nullptr)
         compareButton_->setEnabled(compareActive || ! historyEmpty);
 
-    if (historyMComboBox_ != nullptr)
-        historyMComboBox_->setEnabled(! compareActive && ! historyEmpty);
-
-    if (historyRComboBox_ != nullptr)
-        historyRComboBox_->setEnabled(! compareActive && ! historyEmpty);
+    if (historyComboBox_ != nullptr)
+        historyComboBox_->setEnabled(! compareActive && ! historyEmpty);
 
     if (compareActive)
     {
@@ -527,115 +540,192 @@ juce::StringArray PatchMutatorPanel::parsePipeSeparatedList(const juce::String& 
     return juce::StringArray::fromTokens(encodedList, "|", "");
 }
 
-void PatchMutatorPanel::refreshHistoryMComboBox()
+void PatchMutatorPanel::scheduleHistoryComboBoxRefresh()
 {
-    if (historyMComboBox_ == nullptr)
+    if (deferHistoryComboRefresh_ || historyComboRefreshScheduled_)
         return;
 
-    const auto mList = parsePipeSeparatedList(apvts_.state.getProperty(MutatorState::kHistoryMList).toString());
-    historyMComboBox_->clear(juce::dontSendNotification);
-    historyMRootIndices_.clear();
+    historyComboRefreshScheduled_ = true;
 
-    if (mList.isEmpty())
+    juce::Component::SafePointer<PatchMutatorPanel> safePanel(this);
+    juce::MessageManager::callAsync([safePanel]
     {
-        historyMComboBox_->setTextWhenNothingSelected(MutatorDisplayNames::kEmptyHistorySentinel);
-        historyMComboBox_->setSelectedId(0, juce::dontSendNotification);
-        if (historyRComboBox_ != nullptr)
-        {
-            historyRComboBox_->clear(juce::dontSendNotification);
-            historyRComboBox_->setSelectedId(0, juce::dontSendNotification);
-        }
-        refreshCompareUiState();
-        return;
-    }
+        if (safePanel == nullptr)
+            return;
 
-    const auto selectedM = static_cast<int>(apvts_.state.getProperty(MutatorState::kSelectedM, -1));
-    for (int i = 0; i < mList.size(); ++i)
-    {
-        const auto label = mList[i];
-        const int rootIndex = label.substring(1, 3).getIntValue();
-        historyMRootIndices_.add(rootIndex);
-        historyMComboBox_->addItem(label, i + 1);
-    }
-
-    historyMComboBox_->setEnabled(true);
-    syncHistoryMSelectionFromApvts();
-    refreshCompareUiState();
+        safePanel->historyComboRefreshScheduled_ = false;
+        safePanel->refreshHistoryComboBox();
+    });
 }
 
-void PatchMutatorPanel::refreshHistoryRComboBox()
+std::map<int, juce::StringArray> PatchMutatorPanel::parseRetryListsByRoot(const juce::String& encoded)
 {
-    if (historyRComboBox_ == nullptr || historyMComboBox_ == nullptr)
-        return;
+    std::map<int, juce::StringArray> result;
+    if (encoded.isEmpty())
+        return result;
 
-    const auto mList = parsePipeSeparatedList(apvts_.state.getProperty(MutatorState::kHistoryMList).toString());
-    if (mList.isEmpty())
+    for (const auto& part : juce::StringArray::fromTokens(encoded, ";", ""))
     {
-        historyRComboBox_->clear(juce::dontSendNotification);
-        historyRComboBox_->setSelectedId(0, juce::dontSendNotification);
-        refreshCompareUiState();
-        return;
+        const int eq = part.indexOfChar('=');
+        if (eq <= 0)
+            continue;
+
+        const int rootIndex = part.substring(0, eq).getIntValue();
+        result[rootIndex] = parsePipeSeparatedList(part.substring(eq + 1));
     }
 
-    const auto rList = parsePipeSeparatedList(apvts_.state.getProperty(MutatorState::kHistoryRList).toString());
-    historyRComboBox_->clear(juce::dontSendNotification);
-    historyRRetryIndices_.clear();
+    return result;
+}
 
-    for (int i = 0; i < rList.size(); ++i)
+void PatchMutatorPanel::rebuildRetryLabelsCacheFromApvts()
+{
+    retryLabelsByRootIndex_ = parseRetryListsByRoot(
+        apvts_.state.getProperty(MutatorState::kHistoryRetryListsByRoot).toString());
+
+    // Fallback for older in-session state that only has the selected-root mirror.
+    if (retryLabelsByRootIndex_.empty())
     {
+        const int selectedMutateRootIndex = static_cast<int>(
+            apvts_.state.getProperty(MutatorState::kSelectedMutateRootIndex, -1));
+        const auto retryLabelList = parsePipeSeparatedList(
+            apvts_.state.getProperty(MutatorState::kHistoryRetryList).toString());
+        if (selectedMutateRootIndex >= 0 && ! retryLabelList.isEmpty())
+            retryLabelsByRootIndex_[selectedMutateRootIndex] = retryLabelList;
+    }
+}
+
+void PatchMutatorPanel::pruneRetryLabelsCache()
+{
+    for (auto it = retryLabelsByRootIndex_.begin(); it != retryLabelsByRootIndex_.end();)
+    {
+        if (! mutateRootIndices_.contains(it->first))
+            it = retryLabelsByRootIndex_.erase(it);
+        else
+            ++it;
+    }
+}
+
+void PatchMutatorPanel::addRetryChildrenForPrimary(int primaryId, const juce::StringArray& retryLabelList)
+{
+    const bool trackSelectionIndices = (primaryId > 0
+                                        && primaryId <= mutateRootIndices_.size()
+                                        && mutateRootIndices_[primaryId - 1]
+                                               == static_cast<int>(apvts_.state.getProperty(
+                                                   MutatorState::kSelectedMutateRootIndex, -1)));
+
+    if (trackSelectionIndices)
+        retryIndices_.clear();
+
+    for (int i = 0; i < retryLabelList.size(); ++i)
+    {
+        const int childId = i + 1;
         const int retryIndex = i == 0
-                                   ? MutatorState::kSelectedRRootOnly
-                                   : rList[i].substring(1, 3).getIntValue();
-        historyRRetryIndices_.add(retryIndex);
-        historyRComboBox_->addItem(rList[i], i + 1);
+                                   ? MutatorState::kSelectedRetryRootOnly
+                                   : retryLabelList[i].substring(1, 3).getIntValue();
+        if (trackSelectionIndices)
+            retryIndices_.add(retryIndex);
+        historyComboBox_->addChildItem(primaryId, childId, retryLabelList[i]);
+    }
+}
+
+void PatchMutatorPanel::refreshHistoryComboBox()
+{
+    if (historyComboBox_ == nullptr)
+        return;
+
+    const auto mutateLabelList = parsePipeSeparatedList(apvts_.state.getProperty(MutatorState::kHistoryMutateList).toString());
+    historySelectionHydrating_ = true;
+    historyComboBox_->clear();
+    mutateRootIndices_.clear();
+    retryIndices_.clear();
+
+    if (mutateLabelList.isEmpty())
+    {
+        retryLabelsByRootIndex_.clear();
+        historyComboBox_->setTextWhenNothingSelected(MutatorDisplayNames::kEmptyHistorySentinel);
+        historyComboBox_->setSelectedIds(0, 0, juce::dontSendNotification);
+        historySelectionHydrating_ = false;
+        refreshCompareUiState();
+        return;
     }
 
-    historyRComboBox_->setEnabled(true);
-    syncHistoryRSelectionFromApvts();
+    rebuildRetryLabelsCacheFromApvts();
+
+    for (int i = 0; i < mutateLabelList.size(); ++i)
+    {
+        const auto label = mutateLabelList[i];
+        const int primaryId = i + 1;
+        const int rootIndex = label.substring(1, 3).getIntValue();
+        mutateRootIndices_.add(rootIndex);
+        historyComboBox_->addPrimaryItem(primaryId, label);
+    }
+
+    pruneRetryLabelsCache();
+
+    for (int i = 0; i < mutateRootIndices_.size(); ++i)
+    {
+        const int rootIndex = mutateRootIndices_[i];
+        const auto cacheIt = retryLabelsByRootIndex_.find(rootIndex);
+        if (cacheIt == retryLabelsByRootIndex_.end() || cacheIt->second.isEmpty())
+            continue;
+
+        addRetryChildrenForPrimary(i + 1, cacheIt->second);
+    }
+
+    historyComboBox_->setEnabled(true);
+    syncHistorySelectionFromApvts();
+    historySelectionHydrating_ = false;
     refreshCompareUiState();
 }
 
-void PatchMutatorPanel::syncHistoryMSelectionFromApvts()
+void PatchMutatorPanel::syncHistorySelectionFromApvts()
 {
-    if (historyMComboBox_ == nullptr)
+    if (historyComboBox_ == nullptr)
         return;
 
-    const int selectedM = static_cast<int>(apvts_.state.getProperty(MutatorState::kSelectedM, -1));
-    if (selectedM < 0)
+    const int selectedMutateRootIndex = static_cast<int>(apvts_.state.getProperty(MutatorState::kSelectedMutateRootIndex, -1));
+    if (selectedMutateRootIndex < 0)
     {
-        historyMComboBox_->setSelectedId(0, juce::dontSendNotification);
+        historyComboBox_->setSelectedIds(0, 0, juce::dontSendNotification);
         return;
     }
 
-    for (int i = 0; i < historyMRootIndices_.size(); ++i)
+    int primaryId = 0;
+    for (int i = 0; i < mutateRootIndices_.size(); ++i)
     {
-        if (historyMRootIndices_[i] == selectedM)
+        if (mutateRootIndices_[i] == selectedMutateRootIndex)
         {
-            historyMComboBox_->setSelectedId(i + 1, juce::dontSendNotification);
-            return;
+            primaryId = i + 1;
+            break;
         }
     }
 
-    historyMComboBox_->setSelectedId(0, juce::dontSendNotification);
-}
-
-void PatchMutatorPanel::syncHistoryRSelectionFromApvts()
-{
-    if (historyRComboBox_ == nullptr)
-        return;
-
-    const int selectedR = static_cast<int>(apvts_.state.getProperty(MutatorState::kSelectedR,
-                                                                    MutatorState::kSelectedRRootOnly));
-    for (int i = 0; i < historyRRetryIndices_.size(); ++i)
+    if (primaryId <= 0)
     {
-        if (historyRRetryIndices_[i] == selectedR)
+        historyComboBox_->setSelectedIds(0, 0, juce::dontSendNotification);
+        return;
+    }
+
+    const int selectedRetryIndex = static_cast<int>(apvts_.state.getProperty(MutatorState::kSelectedRetryIndex,
+                                                                             MutatorState::kSelectedRetryRootOnly));
+    int childId = 0;
+
+    for (int i = 0; i < retryIndices_.size(); ++i)
+    {
+        if (retryIndices_[i] == selectedRetryIndex)
         {
-            historyRComboBox_->setSelectedId(i + 1, juce::dontSendNotification);
-            return;
+            childId = i + 1;
+            break;
         }
     }
 
-    historyRComboBox_->setSelectedId(0, juce::dontSendNotification);
+    if (childId == 0 && ! retryIndices_.isEmpty())
+    {
+        // Root-only, or orphan retry not present in this root's list — show "—".
+        childId = 1;
+    }
+
+    historyComboBox_->setSelectedIds(primaryId, childId, juce::dontSendNotification);
 }
 
 void PatchMutatorPanel::connectButtonToApvts(TSS::Button* button, const char* widgetId)
@@ -697,8 +787,7 @@ void PatchMutatorPanel::resized()
     if (randomSlider_)            randomSlider_->setUiScale(sf);
     if (retryButton_)             retryButton_->setUiScale(sf);
     if (historyLabel_)            historyLabel_->setUiScale(sf);
-    if (historyMComboBox_)        historyMComboBox_->setUiScale(sf);
-    if (historyRComboBox_)        historyRComboBox_->setUiScale(sf);
+    if (historyComboBox_)        historyComboBox_->setUiScale(sf);
     if (compareButton_)           compareButton_->setUiScale(sf);
     if (deleteButton_)            deleteButton_->setUiScale(sf);
     if (clearButton_)             clearButton_->setUiScale(sf);
@@ -764,8 +853,7 @@ void PatchMutatorPanel::layoutHistoryLine(int x, int y)
 
     const int labelW      = juce::roundToInt(static_cast<float>(dims_.labels.patchMutatorWidth) * sf);
     const int labelH      = juce::roundToInt(static_cast<float>(dims_.labels.height) * sf);
-    const int comboBoxMW = juce::roundToInt(static_cast<float>(dims_.comboBoxes.patchMutatorHistoryMWidth) * sf);
-    const int comboBoxRW = juce::roundToInt(static_cast<float>(dims_.comboBoxes.patchMutatorHistoryRWidth) * sf);
+    const int comboBoxW   = juce::roundToInt(static_cast<float>(dims_.comboBoxes.patchMutatorHistoryWidth) * sf);
     const int comboBoxH   = juce::roundToInt(static_cast<float>(dims_.comboBoxes.standardHeight) * sf);
     const int rowH          = juce::roundToInt(static_cast<float>(dims_.layout.contentRowHeight) * sf);
     const int labelY        = y + (rowH - labelH) / 2;
@@ -779,26 +867,23 @@ void PatchMutatorPanel::layoutHistoryLine(int x, int y)
 
     const float originX     = static_cast<float>(x);
     const float labelStep   = static_cast<float>(dims_.labels.patchMutatorWidth + controlGap) * sf;
-    const float comboMStep  = static_cast<float>(dims_.comboBoxes.patchMutatorHistoryMWidth + controlGap) * sf;
-    const float comboRStep  = static_cast<float>(dims_.comboBoxes.patchMutatorHistoryRWidth + controlGap) * sf;
+    const float comboStep   = static_cast<float>(dims_.comboBoxes.patchMutatorHistoryWidth + controlGap) * sf;
     const float compareStep = static_cast<float>(dims_.buttons.patchMutatorCompareWidth + controlGap) * sf;
     const float deleteStep  = static_cast<float>(dims_.buttons.patchMutatorDeleteWidth + controlGap) * sf;
     const float clearStep   = static_cast<float>(dims_.buttons.patchMutatorClearWidth + controlGap) * sf;
 
     if (auto* label = historyLabel_.get())
         label->setBounds(x, labelY, labelW, labelH);
-    if (auto* comboBox = historyMComboBox_.get())
-        comboBox->setBounds(juce::roundToInt(originX + labelStep), comboBoxY, comboBoxMW, comboBoxH);
-    if (auto* comboBox = historyRComboBox_.get())
-        comboBox->setBounds(juce::roundToInt(originX + labelStep + comboMStep), comboBoxY, comboBoxRW, comboBoxH);
+    if (auto* comboBox = historyComboBox_.get())
+        comboBox->setBounds(juce::roundToInt(originX + labelStep), comboBoxY, comboBoxW, comboBoxH);
     if (auto* button = compareButton_.get())
-        button->setBounds(juce::roundToInt(originX + labelStep + comboMStep + comboRStep), y, compareW, buttonH);
+        button->setBounds(juce::roundToInt(originX + labelStep + comboStep), y, compareW, buttonH);
     if (auto* button = deleteButton_.get())
-        button->setBounds(juce::roundToInt(originX + labelStep + comboMStep + comboRStep + compareStep), y, deleteW, buttonH);
+        button->setBounds(juce::roundToInt(originX + labelStep + comboStep + compareStep), y, deleteW, buttonH);
     if (auto* button = clearButton_.get())
-        button->setBounds(juce::roundToInt(originX + labelStep + comboMStep + comboRStep + compareStep + deleteStep), y, clearW, buttonH);
+        button->setBounds(juce::roundToInt(originX + labelStep + comboStep + compareStep + deleteStep), y, clearW, buttonH);
     if (auto* button = exportButton_.get())
-        button->setBounds(juce::roundToInt(originX + labelStep + comboMStep + comboRStep + compareStep + deleteStep + clearStep), y, exportW, buttonH);
+        button->setBounds(juce::roundToInt(originX + labelStep + comboStep + compareStep + deleteStep + clearStep), y, exportW, buttonH);
 }
 
 void PatchMutatorPanel::setSkin(TSS::ISkin& skin)
@@ -832,15 +917,10 @@ void PatchMutatorPanel::propagateSkinsToControlWidgets(TSS::ISkin& skin)
         randomSlider_->setLook(TSS::sliderLookFromSkin(skin));
     if (historyLabel_)
         historyLabel_->setLook(TSS::labelLookFromSkin(skin));
-    if (historyMComboBox_)
+    if (historyComboBox_)
     {
-        historyMComboBox_->setLook(TSS::comboBoxLookFromSkin(skin));
-        historyMComboBox_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
-    }
-    if (historyRComboBox_)
-    {
-        historyRComboBox_->setLook(TSS::comboBoxLookFromSkin(skin));
-        historyRComboBox_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
+        historyComboBox_->setLook(TSS::comboBoxLookFromSkin(skin));
+        historyComboBox_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
     }
     if (mutateButton_)
         mutateButton_->setLook(TSS::buttonLookFromSkin(skin));

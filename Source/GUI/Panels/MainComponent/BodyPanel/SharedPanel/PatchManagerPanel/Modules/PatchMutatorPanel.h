@@ -1,5 +1,6 @@
 #pragma once
 
+#include <map>
 #include <memory>
 
 #include <juce_gui_basics/juce_gui_basics.h>
@@ -14,7 +15,7 @@ namespace TSS
     class Label;
     class Slider;
     class Button;
-    class ComboBox;
+    class HierarchicalComboBox;
     class Toggle;
 }
 
@@ -68,8 +69,7 @@ private:
     std::unique_ptr<TSS::Toggle> lfo2Toggle_;
 
     std::unique_ptr<TSS::Label> historyLabel_;
-    std::unique_ptr<TSS::ComboBox> historyMComboBox_;
-    std::unique_ptr<TSS::ComboBox> historyRComboBox_;
+    std::unique_ptr<TSS::HierarchicalComboBox> historyComboBox_;
     std::unique_ptr<TSS::Button> compareButton_;
     std::unique_ptr<TSS::Button> deleteButton_;
     std::unique_ptr<TSS::Button> clearButton_;
@@ -77,10 +77,19 @@ private:
 
     std::unique_ptr<ActionEnabledPropertyListener> actionEnabledListener_;
 
-    juce::Array<int> historyMRootIndices_;
-    juce::Array<int> historyRRetryIndices_;
+    juce::Array<int> mutateRootIndices_;
+    juce::Array<int> retryIndices_;
+    std::map<int, juce::StringArray> retryLabelsByRootIndex_;
 
     bool recipeHydrating_ = false;
+    bool historySelectionHydrating_ = false;
+    bool deferHistoryComboRefresh_ = false;
+    bool historyComboRefreshScheduled_ = false;
+
+    void scheduleHistoryComboBoxRefresh();
+    void rebuildRetryLabelsCacheFromApvts();
+    void pruneRetryLabelsCache();
+    static std::map<int, juce::StringArray> parseRetryListsByRoot(const juce::String& encoded);
 
     void propagateSkinsToControlWidgets(TSS::ISkin& skin);
     void propagateSkinsToToggleWidgets(TSS::ISkin& skin);
@@ -92,14 +101,13 @@ private:
     void connectButtonToApvts(TSS::Button* button, const char* widgetId);
     void connectToggleToApvts(TSS::Toggle* toggle, const char* widgetId);
 
-    void refreshHistoryMComboBox();
-    void refreshHistoryRComboBox();
+    void refreshHistoryComboBox();
     void refreshCompareUiState();
     void refreshRecipeFromApvts();
     void hydrateRecipeTogglesFromApvts(const juce::ValueTree& state);
     static bool isRecipeProperty(const juce::String& propertyName);
-    void syncHistoryMSelectionFromApvts();
-    void syncHistoryRSelectionFromApvts();
+    void syncHistorySelectionFromApvts();
+    void addRetryChildrenForPrimary(int primaryId, const juce::StringArray& retryLabelList);
     void timerCallback() override;
     static juce::StringArray parsePipeSeparatedList(const juce::String& encodedList);
 

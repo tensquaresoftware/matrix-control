@@ -412,7 +412,7 @@ namespace TSS
             const bool isHighlighted = primaryIndex == highlightedPrimaryIndex_;
             renderer_.drawLabelItem(g, primary.label, itemBounds, isHighlighted, true, cachedFont_);
 
-            if (! primary.children.empty() && isHighlighted)
+            if (! primary.children.empty())
                 renderer_.drawSubMenuChevron(g, itemBounds, cachedFont_);
         }
 

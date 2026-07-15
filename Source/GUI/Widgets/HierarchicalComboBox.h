@@ -38,6 +38,7 @@ namespace TSS
         const juce::String& getTextWhenNothingSelected() const { return textWhenNothingSelected_; }
 
         std::function<void()> onChange;
+        std::function<void()> onBeforeShowPopup;
 
         void paint(juce::Graphics& g) override;
         void mouseDown(const juce::MouseEvent& e) override;
