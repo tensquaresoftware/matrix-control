@@ -7,37 +7,44 @@ alwaysApply: true
 
 During any **code review** (`bmad-code-review`, Bugbot, adversarial review, or an explicit review request):
 
+## Clarity bar (non-negotiable)
+
+The **first** presentation of every finding must already be as clear as if Guillaume had just said « Reformule en langage naturel et clair ». He must never need to ask for that reformulation.
+
+Before sending: could a reader who does not know the file names understand the decision question in ~20 seconds? If not, rewrite.
+
 ## Language and tone
 
 - Respond **in French**.
-- Use **simple, accessible language** — no unnecessary jargon or unexplained technical English.
+- Use **simple, accessible language** — short complete sentences, spoken register, not engineer-stacking.
 - Briefly define any unavoidable technical term on first use (e.g. « APVTS = stockage des paramètres du plugin »).
+- Never respond to Guillaume in English during a code review, even when subagents or the diff are in English.
+- Do **not** pack file paths + AC numbers + pixel coords + class names into the main problem paragraph. Put technical evidence in one short trailing line if needed.
 
 ## Required structure before details
 
-1. **En bref** — one sentence on what is being reviewed (what changed, why it matters).
-2. **Verdict** — counts by category in French:
-   - **Décision à prendre** — architectural or intent choice; Guillaume must decide
-   - **Correction à appliquer** — clear bug or gap with an obvious fix
-   - **À reporter** — out of scope or pre-existing debt
+1. **En bref** — one sentence in product language (not file names).
+2. **Verdict** — counts:
+   - **Décision à prendre**
+   - **Correction à appliquer**
+   - **À reporter**
 3. For **each finding**:
-   - **Ce qui est en jeu** — user impact or risk
-   - **Le problème** — concrete description (file/line when useful)
-   - **Ce qu'il faut faire** — action or numbered options with trade-offs in plain language
-   - **Si on ne fait rien** — consequence of ignoring it
-4. For **each décision à prendre**, always add **Recommandation BMad** (mandatory — never skip):
+   - **Title** — for décisions: a plain-language **question**; for corrections: a plain action/risk
+   - **Ce qui est en jeu** — impact for Guillaume or the plugin user (2–3 short sentences)
+   - **Le problème** — intent first (« La story devait… »), then what doesn’t fit, in short bullets
+   - **Ce qu'il faut faire** — everyday option labels (« Tout garder ensemble », etc.)
+   - **Si on ne fait rien**
+4. For **each décision à prendre**, always add **Recommandation BMad**:
    - **Option recommandée** — number and short label
-   - **Pourquoi** — 2–4 accessible sentences
-   - **Confiance** — `ferme` or `nuancée` (if several options are defensible, say so and still pick one)
+   - **Pourquoi** — 2–4 accessible sentences (same clarity bar)
+   - **Confiance** — `ferme` or `nuancée`
 
-## Tone
+## Story file vs chat
 
-- Write in **complete sentences** — no telegraphic bullet chains or keyword dumps.
-- Never respond to Guillaume in English during a code review, even when subagents or the diff are in English.
+- Story **Review Findings** may stay compact/technical for traceability.
+- **Chat** must stay at the plain-language level. Do not paste dense story bullets as the user-facing explanation.
 
 ## BMad workflow terms → French (user-facing)
-
-Do not expose internal jargon without translation:
 
 | Internal | Say to Guillaume |
 |----------|------------------|
@@ -51,4 +58,4 @@ Do not expose internal jargon without translation:
 
 ## Bugbot and subagents
 
-Subagents may output English or dense technical prose. **Always reformulate** findings in plain French before presenting them. The summary table may keep `file:line` in the Location column.
+Always reformulate findings in plain French before presenting them. Full presentation contract: `_bmad/custom/code-review-presentation-fr.md`.

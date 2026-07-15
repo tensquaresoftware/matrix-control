@@ -4,16 +4,21 @@
 [workflow]
 
 activation_steps_prepend = [
-  "Charger et appliquer le contrat de présentation : file:{project-root}/_bmad/custom/code-review-presentation-fr.md et file:{project-root}/.cursor/rules/code-review-communication.mdc. Toute sortie utilisateur de cette revue doit respecter ces deux documents.",
+  "Charger et appliquer le contrat de présentation : file:{project-root}/_bmad/custom/code-review-presentation-fr.md et file:{project-root}/.cursor/rules/code-review-communication.mdc. Toute sortie utilisateur de cette revue doit respecter ces deux documents — en particulier le barème de clarté (première version déjà au niveau « reformulé en langage naturel »).",
 ]
 
 persistent_facts = [
   "file:{project-root}/_bmad/custom/code-review-presentation-fr.md",
   "file:{project-root}/.cursor/rules/code-review-communication.mdc",
-  "Langue utilisateur : toujours le français pour Guillaume dans bmad-code-review — jamais répondre en anglais, même si les sous-agents ou le diff sont en anglais.",
-  "Ton : phrases complètes, langage naturel — interdit le style télégraphique, les listes de mots-clés, et le jargon anglais non expliqué.",
-  "Structure obligatoire avant le détail : En bref (1 phrase) puis Verdict (comptes décisions / corrections / à reporter).",
-  "Pour chaque constat : Ce qui est en jeu, Le problème, Ce qu'il faut faire, Si on ne fait rien.",
-  "Pour CHAQUE décision à prendre : section Recommandation BMad obligatoire (option recommandée + pourquoi en 2–4 phrases + confiance ferme ou nuancée). Guillaume ne doit jamais avoir à redemander la recommandation.",
-  "Reformuler tout output sous-agent (anglais, JSON, noms de couches) en français clair avant présentation.",
+  "Barème de clarté : la PREMIÈRE présentation de chaque constat doit déjà être aussi claire que si Guillaume avait demandé « Reformule en langage naturel et clair ». Il ne doit jamais avoir à redemander cette reformulation.",
+  "Auto-contrôle avant envoi : un lecteur qui ignore les noms de fichiers comprend-il la question en ~20 secondes ? Sinon, réécrire.",
+  "Titres des décisions = questions en français simple (ex. « Est-ce qu’on valide 6-16 alors que d’autres changements sont dans les mêmes fichiers ? »). Interdit les titres abstraits du type « Contenu hors périmètre… ».",
+  "Le problème : intention d’abord (« La story devait… »), puis écarts en puces courtes. Preuves techniques (fichier, AC, pixels, classes) seulement en ligne complémentaire, jamais empilées dans la phrase principale.",
+  "Options avec verbes du quotidien (« Tout garder ensemble », « Ne garder que cette story »), pas du jargon d’ingénierie.",
+  "Langue : toujours le français pour Guillaume — jamais l’anglais dans le chat.",
+  "Ton : phrases courtes et complètes — interdit style télégraphique et piles de jargon.",
+  "Structure : En bref → Verdict → pour chaque constat Ce qui est en jeu / Le problème / Ce qu’il faut faire / Si on ne fait rien.",
+  "Pour CHAQUE décision : Recommandation BMad obligatoire (option + pourquoi accessible + confiance ferme ou nuancée).",
+  "Chat ≠ story file : ne pas coller le texte dense des Review Findings dans le chat ; le chat reste au niveau « bon » du contrat de présentation.",
+  "Reformuler tout output sous-agent avant présentation.",
 ]
