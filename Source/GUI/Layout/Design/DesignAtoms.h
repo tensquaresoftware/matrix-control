@@ -64,11 +64,11 @@ namespace TSS::Design
                 inline constexpr int kComputerPatchesSaveAs = 44;
                 inline constexpr int kComputerPatchesSave = 36;
 
-                inline constexpr int kPatchMutatorMutate = 52;
-                inline constexpr int kPatchMutatorRetry = 52;
-                inline constexpr int kPatchMutatorCompare = 52;
+                inline constexpr int kPatchMutatorMutate = 48;
+                inline constexpr int kPatchMutatorRetry = 48;
+                inline constexpr int kPatchMutatorCompare = 48;
                 inline constexpr int kPatchMutatorDelete = 20;
-                inline constexpr int kPatchMutatorClear = 44;
+                inline constexpr int kPatchMutatorClear = 20;
                 inline constexpr int kPatchMutatorExport = 44;
             }
 
@@ -79,7 +79,7 @@ namespace TSS::Design
 
             namespace Slider
             {
-                inline constexpr int kPatchMutator = 48;
+                inline constexpr int kPatchMutator = 56;
             }
 
             namespace ComboBox
@@ -87,7 +87,7 @@ namespace TSS::Design
                 inline constexpr int kMatrixModulationSource = 60;
                 inline constexpr int kMatrixModulationDestination = 104;
                 inline constexpr int kPatchManagerComputerPatches = 88;
-                inline constexpr int kPatchMutatorHistory = 48;
+                inline constexpr int kPatchMutatorHistory = 56;
             }
 
             namespace NumberBox
@@ -135,7 +135,7 @@ namespace TSS::Design
                 inline constexpr int kVerticalMargin = Spacing::kStandard;
                 inline constexpr int kScrollbarWidth = 8;
                 inline constexpr int kMinThumbHeight = 20;
-                inline constexpr int kMaxScrollHeight = 300;
+                inline constexpr int kMaxScrollHeight = 200; // 10 × kItemHeight
                 inline constexpr int kBorderThickness = 1;
                 inline constexpr int kTextLeftPadding = 3;
             }

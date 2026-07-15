@@ -79,19 +79,24 @@ private:
     static void populateSampleHistory(TSS::HierarchicalComboBox& combo)
     {
         combo.clear();
+
+        // M00: retries → chevron + N2 with Mxx / Mxx-Ryy (AC #4)
         combo.addPrimaryItem(1, "M00");
-        combo.addChildItem(1, 1, PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kHistoryRootSentinel);
-        combo.addChildItem(1, 2, "R00");
-        combo.addChildItem(1, 3, "R01");
+        combo.addChildItem(1, 1, "M00");
+        combo.addChildItem(1, 2, "M00-R00");
+        combo.addChildItem(1, 3, "M00-R01");
+
+        // M01: root only → no N2 / no chevron
         combo.addPrimaryItem(2, "M01");
-        combo.addChildItem(2, 1, PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kHistoryRootSentinel);
-        combo.addChildItem(2, 2, "R00");
+
+        // M00…M10: eleven roots total so N1 scrolls at 10 visible rows (AC #3 / #9)
         combo.addPrimaryItem(3, "M02");
-        combo.addChildItem(3, 1, PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kHistoryRootSentinel);
-        combo.addChildItem(3, 2, "R00");
-        combo.addChildItem(3, 3, "R01");
-        combo.addChildItem(3, 4, "R02");
-        combo.addChildItem(3, 5, "R03");
+        combo.addChildItem(3, 1, "M02");
+        for (int retry = 0; retry < 11; ++retry)
+            combo.addChildItem(3, retry + 2, "M02-R" + juce::String::formatted("%02d", retry));
+
+        for (int root = 3; root <= 10; ++root)
+            combo.addPrimaryItem(root + 1, "M" + juce::String::formatted("%02d", root));
     }
 
     float scale_ { 1.0f };

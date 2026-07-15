@@ -16,7 +16,7 @@ namespace TSS
                 .verticalMargin = 4,
                 .scrollbarWidth = 8,
                 .minThumbHeight = 20,
-                .maxScrollHeight = 300,
+                .maxScrollHeight = 200,
                 .borderThickness = 1,
                 .textLeftPadding = 3,
             };

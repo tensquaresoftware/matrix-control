@@ -29,7 +29,7 @@ bool MutationAlgorithm::apply(PatchModel& inOut, const MutationRecipe& recipe, I
 
     const double amount = static_cast<double>(amountPercent) / 100.0;
     const double random = static_cast<double>(randomPercent) / 100.0;
-    const bool matrixModScopeActive = true;
+    const bool matrixModScopeActive = recipe.enableMatrixMod;
 
     for (const auto& descriptor : ApvtsPatchMapper::buildIntDescriptors())
     {

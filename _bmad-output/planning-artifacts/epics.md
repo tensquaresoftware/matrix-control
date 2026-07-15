@@ -1121,6 +1121,37 @@ So that labels are readable and COMPARE aligns with the RANDOM row (D-082-R2).
 
 **ERRATA (2026-07-14):** Supersedes Story 6.6 panel dual-combobox wiring only.
 
+### Story 6-15: History ComboBox Popup UX
+
+As a sound designer,
+I want the hierarchical History popup aligned like a normal ComboBox (no staircase, capped scroll, clear M/R labels, stable borders),
+So that long mutation histories stay usable (D-082-R2 polish after 6-14).
+
+**Acceptance Criteria:**
+
+**Given** Story 6-14 hierarchical History
+**When** user opens History (or any HierarchicalComboBox)
+**Then** N1/N2 open above/below per available space and share top (below) or bottom (above) edges — no staircase
+**And** each column scrolls after 10 visible rows; Computer Patches ComboBox also caps at 10
+**And** no N2 without retries; N2 labels are `Mxx` then `Mxx-Ryy`; borders stay green while open
+
+**Note (2026-07-15):** Authoritative implementation detail lives in `_bmad-output/implementation-artifacts/6-15-history-combobox-popup-ux.md` (UAT briefs 2026-07-14/15).
+
+### Story 6-16: Matrix Mod Recipe Toggle
+
+As a sound designer,
+I want a Patch Mutator recipe toggle MM that opts Matrix Modulation in or out of MUTATE/RETRY,
+So that I can keep modulation routing stable while exploring Patch Edit variations (supersedes Story 6.1 Option A).
+
+**Acceptance Criteria:**
+
+**Given** Story 6.1 Option A (Matrix Mod always mutated when A,R > 0)
+**When** the user toggles MM on the History row (under L2) after CLEAR→CL width reclaim
+**Then** bytes 104–133 mutate only when MM is enabled; MM persists with other recipe toggles (FR-34)
+**And** CLEAR label is `CL` at 20 px; SharedColumn width stays 268
+
+**Note (2026-07-15):** Authoritative implementation detail lives in `_bmad-output/implementation-artifacts/6-16-matrix-mod-recipe-toggle.md`.
+
 ---
 
 ## Epic 7: Patch Manager & Action Dispatch

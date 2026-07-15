@@ -1,5 +1,32 @@
 # Deferred Work
 
+## Deferred from: code review of 6-16-matrix-mod-recipe-toggle (2026-07-15)
+
+- **No automated History-row geometry assert for MM under L2 / CLEAR=20** — AC #4 and manual UAT cover scale 1.0 and non-1.0; no registry/unit lock on EXPORT trailing edge or MM×L2 x-alignment. Same manual-smoke class as prior Mutator layout stories.
+
+## Deferred from: story 6-16-matrix-mod-recipe-toggle (2026-07-15)
+
+- **FR-30 / planning copy still says “ten module toggles”** — recipe now has eleven enables (D1…L2 + MM). Epics FR prose and older stories keep “ten” as historical Patch Edit count; MM is the separate Matrix Mod gate. Update consumer-facing FR wording when next editing PRD/addendum for Epic 6.
+
+## Deferred from: spec-patch-mutator-history-control-widths (2026-07-15)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-mutator-history-control-widths.md`
+  summary: Manual UAT — verify closed HISTORY shows full `M99-R99` at 100% and 150% scale without clipping.
+  evidence: Closed ComboBox text area is ~41 px after padding/chevron; no automated GUI metric test ties worst-case label to `kPatchMutatorHistory = 56`.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-mutator-history-control-widths.md`
+  summary: Manual UAT — verify MUTATE/RETRY/COMPARE labels remain readable at 48 px button width.
+  evidence: Buttons paint centered with no ellipsis; COMPARE (7 chars) is the tightest case after 52→48 shrink.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-mutator-history-control-widths.md`
+  summary: Reconcile planning docs (epics 6-14/6-15, U-12) still documenting 48 px History/slider width.
+  evidence: Atoms now use 56 px; stale AC text risks partial revert on future stories.
+
+## Deferred from: code review of 6-15-history-combobox-popup-ux (2026-07-15)
+
+- **Duplicated `CustomScrollBar` in `HierarchicalPopupMenu`** — ~copy of `ScrollablePopupMenu` thumb/timer/wheel math; story 6-15 allowed reuse patterns without full U-13 DRY. Extract shared helper in U-13.
+- **Permanent 20 Hz scrollbar timers while hierarchical popup is open** — inherited from ScrollablePopupMenu CustomScrollBar pattern (`startTimerHz(20)` + idle `repaint`); fix with shared scroll infra in U-13.
+
 ## Deferred from: code review of 6-14-patch-mutator-hierarchical-history-combobox (2026-07-15)
 
 - **Fragile Mxx/Rxx index parsing via `substring(1,3)`** (`PatchMutatorPanel.cpp`) — inherited from 6.6 dual-combo label convention; bogus labels → index 0.

@@ -74,6 +74,7 @@ private:
     std::unique_ptr<TSS::Button> deleteButton_;
     std::unique_ptr<TSS::Button> clearButton_;
     std::unique_ptr<TSS::Button> exportButton_;
+    std::unique_ptr<TSS::Toggle> enableMatrixModToggle_;
 
     std::unique_ptr<ActionEnabledPropertyListener> actionEnabledListener_;
 

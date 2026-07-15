@@ -26,7 +26,8 @@ namespace Core::MutatorSessionPersistence
             Mutator::kEnableEnvelope2,
             Mutator::kEnableEnvelope3,
             Mutator::kEnableLfo1,
-            Mutator::kEnableLfo2
+            Mutator::kEnableLfo2,
+            Mutator::kEnableMatrixMod
         };
 
         for (const auto* toggleId : toggleIds)

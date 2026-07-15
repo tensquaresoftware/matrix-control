@@ -4,24 +4,25 @@ project: Matrix-Control
 title: MutationAlgorithm Specification
 author: BMad Agent
 status: approved
-version: "1.0.1"
+version: "1.1"
 sources:
   - ../../prds/prd-matrix-control-2026-05-25/prd.md
   - ../../prds/prd-matrix-control-2026-05-25/addendum.md
   - ../../prds/prd-matrix-control-2026-05-25/.decision-log.md
   - architecture.md
   - ../../../implementation-artifacts/6-1-mutationalgorithm-specification.md
+  - ../../../implementation-artifacts/6-16-matrix-mod-recipe-toggle.md
 created: 2026-06-19
-updated: 2026-06-19
+updated: 2026-07-15
 ---
 
 # MutationAlgorithm Specification
 
 Normative rules for the Patch Mutator buffer transform (`MutationAlgorithm::apply`). This document closes PRD §9 #7 and architecture AD-6 open item **MutationAlgorithm**.
 
-**Scope:** Algorithm transform only. MUTATE/RETRY history semantics (D-083), naming (Story 6.3), SysEx enqueue (Story 6.4), and GUI wiring (Stories 6.6–6.12, 7.4) are out of scope.
+**Scope:** Algorithm transform only. MUTATE/RETRY history semantics (D-083), naming (Story 6.3), SysEx enqueue (Story 6.4), and GUI wiring (Stories 6.6–6.12, 7.4, 6.16) are out of scope for the transform itself; Story 6.16 amends the Matrix Mod recipe gate.
 
-**Status:** `APPROVED` — owner sign-off 2026-06-19 (Story 6.1 AC #9). Matrix Mod scope: **Option A**.
+**Status:** `APPROVED` — owner sign-off 2026-06-19 (Story 6.1 AC #9). Matrix Mod scope: **Option A′ (recipe-gated)** — Option A superseded 2026-07-15 (Story 6.16).
 
 ---
 
@@ -30,9 +31,9 @@ Normative rules for the Patch Mutator buffer transform (`MutationAlgorithm::appl
 | Term | Meaning |
 |---|---|
 | **Patch buffer** | 134-byte packed PATCH data (`SysExConstants::kPatchPackedDataSize`) |
-| **Recipe** | Amount, Random, and ten module-enable booleans read from APVTS at mutation time |
+| **Recipe** | Amount, Random, ten Patch Edit module-enable booleans, and `enableMatrixMod` read from APVTS at mutation time |
 | **Descriptor** | Entry from `ApvtsPatchMapper::buildIntDescriptors()` or `buildChoiceDescriptors()` |
-| **Eligible descriptor** | Int or choice descriptor whose `parentGroupId` matches an enabled module toggle (§5), or a `MatrixModulationSection` descriptor with `sysExOffset` ∈ [104, 133] when §7.1 scope is active |
+| **Eligible descriptor** | Int or choice descriptor whose `parentGroupId` matches an enabled module toggle (§5), or a `MatrixModulationSection` descriptor with `sysExOffset` ∈ [104, 133] when §7.1 scope is active (`recipe.enableMatrixMod`) |
 | **No-op recipe** | Recipe for which §3 early-exit applies |
 
 ---
@@ -50,26 +51,34 @@ The engine MUST build a `MutationRecipe` from APVTS at each MUTATE or RETRY invo
 
 Descriptor source: `PluginDescriptors::PatchManagerSection::PatchMutatorModule::kIntParameters`.
 
-### 2.2 Module enable toggles
+### 2.2 Module enable toggles (Patch Edit)
 
 Ten booleans, default **off** until the user enables them in `PatchMutatorPanel`. Stored as APVTS **state** properties (not parameters).
 
 | Toggle property ID | UI label | Patch Edit `kGroupId` |
 |---|---|---|
-| `patchMutatorEnableDco1` | DCO1 | `patchEditSection.dco1Module` |
-| `patchMutatorEnableDco2` | DCO2 | `patchEditSection.dco2Module` |
-| `patchMutatorEnableVcfVca` | VCF/VCA | `patchEditSection.vcfVcaModule` |
-| `patchMutatorEnableFmTrack` | FM/TRACK | `patchEditSection.fmTrackModule` |
-| `patchMutatorEnableRampPortamento` | RAMP/PORT | `patchEditSection.rampPortamentoModule` |
-| `patchMutatorEnableEnvelope1` | ENV1 | `patchEditSection.envelope1Module` |
-| `patchMutatorEnableEnvelope2` | ENV2 | `patchEditSection.envelope2Module` |
-| `patchMutatorEnableEnvelope3` | ENV3 | `patchEditSection.envelope3Module` |
-| `patchMutatorEnableLfo1` | LFO1 | `patchEditSection.lfo1Module` |
-| `patchMutatorEnableLfo2` | LFO2 | `patchEditSection.lfo2Module` |
+| `patchMutatorEnableDco1` | D1 | `patchEditSection.dco1Module` |
+| `patchMutatorEnableDco2` | D2 | `patchEditSection.dco2Module` |
+| `patchMutatorEnableVcfVca` | F/A | `patchEditSection.vcfVcaModule` |
+| `patchMutatorEnableFmTrack` | F/T | `patchEditSection.fmTrackModule` |
+| `patchMutatorEnableRampPortamento` | R/P | `patchEditSection.rampPortamentoModule` |
+| `patchMutatorEnableEnvelope1` | E1 | `patchEditSection.envelope1Module` |
+| `patchMutatorEnableEnvelope2` | E2 | `patchEditSection.envelope2Module` |
+| `patchMutatorEnableEnvelope3` | E3 | `patchEditSection.envelope3Module` |
+| `patchMutatorEnableLfo1` | L1 | `patchEditSection.lfo1Module` |
+| `patchMutatorEnableLfo2` | L2 | `patchEditSection.lfo2Module` |
 
 Mapping is **1:1** between toggle and `PluginIDs::PatchEditSection::*Module::kGroupId`.
 
-### 2.3 C++ recipe shape (Story 6.4)
+### 2.2.1 Matrix Mod enable toggle (Story 6.16)
+
+| Toggle property ID | UI label | Gate |
+|---|---|---|
+| `patchMutatorEnableMatrixMod` | MM | Bytes 104–133 eligibility (§7.1) — **independent** of D1…L2 `parentGroupId` mapping |
+
+Default **off** (same as other enable toggles). Do **not** fold Matrix Mod into the Patch Edit `isModuleEnabled` table.
+
+### 2.3 C++ recipe shape (Story 6.4 + 6.16)
 
 ```cpp
 struct MutationRecipe
@@ -86,6 +95,7 @@ struct MutationRecipe
     bool enableEnvelope3;
     bool enableLfo1;
     bool enableLfo2;
+    bool enableMatrixMod;  // Story 6.16 — default false
 };
 ```
 
@@ -183,7 +193,7 @@ There is no Mutator toggle for MASTER parameters. The algorithm operates on the 
 
 ### 5.1 Descriptor access pattern
 
-Reuse `ApvtsPatchMapper::buildIntDescriptors()` / `buildChoiceDescriptors()` filtered by `parentGroupId` for Patch Edit module eligibility. Matrix Mod descriptors use a separate eligibility path (§7.1) — they MUST NOT be gated by module toggles. **MUST NOT** duplicate parameter lists or maintain parallel SysEx offset tables (AD-1, NFR-4).
+Reuse `ApvtsPatchMapper::buildIntDescriptors()` / `buildChoiceDescriptors()` filtered by `parentGroupId` for Patch Edit module eligibility. Matrix Mod descriptors use a separate eligibility path (§7.1) gated solely by `recipe.enableMatrixMod` — they MUST NOT be folded into D1…L2 `parentGroupId` mapping. **MUST NOT** duplicate parameter lists or maintain parallel SysEx offset tables (AD-1, NFR-4).
 
 Reference: `PatchModuleInitService::copyModuleFromInitTemplate`.
 
@@ -211,25 +221,35 @@ Matrix Mod occupies bytes **104–133** (30 bytes): 10 buses × 3 bytes (source,
 
 Descriptor source: `PluginDescriptors::MatrixModulationSection` — each bus has int amount (`minValue=-63, maxValue=63`) and choice source/destination parameters with `sysExOffset` in 104–133.
 
-### 7.1 Scope gate — Option A (approved)
+### 7.1 Scope gate — Option A′ (recipe-gated; supersedes Option A)
 
-**Owner decision (2026-06-19):** Option **A** is normative.
+**Owner decision (2026-06-19):** Option **A** (always mutate Matrix Mod when `A > 0` and `R > 0`, no UI toggle) was approved for Story 6.1.
 
-When `A > 0` and `R > 0`, the algorithm **MUST** mutate bytes **104–133** using §4 rules on Matrix Mod descriptors, **independent** of module toggles.
+**Owner decision (2026-07-15 / Story 6.16):** Option A was a product mistake. Users must opt Matrix Mod in via an explicit recipe toggle. Normative rule is now **Option A′ (recipe-gated)**:
 
-**Eligibility:** When Matrix Mod scope is active, every int or choice descriptor from `PluginDescriptors::MatrixModulationSection` whose `sysExOffset` ∈ [104, 133] is eligible — regardless of `parentGroupId` module-toggle state and regardless of `sysExId == kNoSysExId` (see §6 exception).
+```
+matrixModScopeActive = recipe.enableMatrixMod
+```
+
+When `A > 0`, `R > 0`, **and** `enableMatrixMod == true`, the algorithm **MUST** mutate bytes **104–133** using §4 rules on Matrix Mod descriptors, **independent** of Patch Edit module toggles (D1…L2).
+
+When `enableMatrixMod == false`, bytes **104–133** **MUST** remain unchanged by `apply`, even if `A > 0`, `R > 0`, and every Patch Edit toggle is on.
+
+**Eligibility:** When Matrix Mod scope is active, every int or choice descriptor from `PluginDescriptors::MatrixModulationSection` whose `sysExOffset` ∈ [104, 133] is eligible — regardless of `parentGroupId` module-toggle state and regardless of `sysExId == kNoSysExId` (see §6 exception). Do **not** add Matrix Mod to `isModuleEnabled`’s `parentGroupId` table.
 
 | Option | Rule | Status |
 |---|---|---|
-| **A** | When `A > 0` and `R > 0`, always mutate bytes 104–133 | **MUST** (approved) |
+| **A** | When `A > 0` and `R > 0`, always mutate bytes 104–133 | **Superseded** (2026-07-15) |
+| **A′** | Mutate 104–133 only when `recipe.enableMatrixMod == true` (and A,R > 0) | **MUST** (Story 6.16) |
 | **B** | Mutate 104–133 only if at least one module toggle is true | Rejected |
 | **C** | Never mutate Matrix Mod in v1 | Rejected |
+| **D** | Alias used in Story 6.16 planning for A′ | Same as A′ |
 
-Rationale: Absynth-style mutation affects whole timbre including routing; module toggles remain Patch Edit scoped.
+Rationale (A′): Patch Edit module toggles stay Patch Edit scoped; Matrix Mod routing is an explicit opt-in so users can keep modulation stable while exploring tone.
 
 ### 7.2 Matrix Mod mutation rules (when scope active)
 
-When Matrix Mod scope is active (`A > 0` and `R > 0` per §7.1):
+When Matrix Mod scope is active (`A > 0`, `R > 0`, and `recipe.enableMatrixMod == true` per §7.1):
 
 1. **MUST** prefer `MatrixModulationSection` descriptors whose `sysExOffset` ∈ [104, 133].
 2. Apply §4.1 to int amount fields (`minValue`, `maxValue` from descriptor).
@@ -324,7 +344,7 @@ Full input hex (134 bytes):
 
 RNG: `juce::Random rng; rng.setSeed(seed);` before `apply`.
 
-Matrix Mod scope: **Option A** (approved).
+Matrix Mod scope: **Option A′** (recipe-gated; Story 6.16).
 
 ---
 
@@ -347,9 +367,9 @@ Alternate: `amountPercent=50`, `randomPercent=0` — same expectation.
 | Field | Value |
 |---|---|
 | **Scenario** | Single enabled module; full Amount/Random |
-| **Recipe** | `A=100`, `R=100`, only `enableDco1=true`, all others false |
+| **Recipe** | `A=100`, `R=100`, only `enableDco1=true`, all other Patch Edit toggles false, `enableMatrixMod=false` |
 | **Seed** | `0x6D757461` |
-| **Expectation** | Bytes 0–7 unchanged. At least one byte in DCO1 offsets {9, 10, 11, 13, 25, 86, 87} MUST differ from input. Bytes for disabled modules (including DCO2) MUST match input. Byte 8 (RampPortamento) MUST match input when `enableRampPortamento=false`. Under Option A, bytes 104–133 MAY also change — assert DCO1 offsets separately from Matrix Mod slice. |
+| **Expectation** | Bytes 0–7 unchanged. At least one byte in DCO1 offsets {9, 10, 11, 13, 25, 86, 87} MUST differ from input. Bytes for disabled modules (including DCO2) MUST match input. Byte 8 (RampPortamento) MUST match input when `enableRampPortamento=false`. Bytes 104–133 MUST match input when `enableMatrixMod=false`. |
 | **`apply` return** | `true` if any byte 8–133 changed; `false` only if entire buffer 8–133 unchanged |
 
 **Representative DCO1 offsets** (from `PluginDescriptorsPatchEdit.cpp`):
@@ -366,18 +386,22 @@ Verification: compare output vs input; at least one byte in {9, 10, 11, 13, 25, 
 
 ---
 
-### GV-03 — Matrix Mod only (all module toggles off)
+### GV-03 — Matrix Mod only (all Patch Edit toggles off, MM on)
 
 | Field | Value |
 |---|---|
 | **Scenario** | Matrix Mod mutation with no Patch Edit modules enabled |
-| **Recipe** | `A=50`, `R=100`, all module toggles **false** |
+| **Recipe** | `A=50`, `R=100`, all Patch Edit module toggles **false**, `enableMatrixMod=true` |
 | **Seed** | `0x4D61746D` |
-| **Scope** | Option **A** — Matrix Mod mutates even with all module toggles off |
+| **Scope** | Option **A′** — Matrix Mod mutates only when `enableMatrixMod` is true |
 | **Expectation** | Bytes 0–7 unchanged. Bytes 8–103 unchanged. At least one byte in 104–133 MUST differ from input (init template has zeros in 104–133). |
 | **`apply` return** | `true` |
 
 Init Matrix Mod slice (104–115): `00 00 00 00 00 00 00 00 00 00 00 00`.
+
+**Negative companion (Story 6.16):** same A/R/seed with all Patch Edit off **and** `enableMatrixMod=false` → bytes 8–133 unchanged; `apply` returns `false`.
+
+**Cross-gate companion:** `enableMatrixMod=false` with at least one Patch Edit module on → Matrix Mod range 104–133 unchanged while that module’s range may change.
 
 ---
 
@@ -389,7 +413,7 @@ Init Matrix Mod slice (104–115): `00 00 00 00 00 00 00 00 00 00 00 00`.
 | **Recipe** | `A=100`, `R=100`, only `enableDco1=true` |
 | **Seed** | `0x43484F31` |
 | **Target** | DCO1 Wave Select (`sysExOffset=13`, 4 choices, init index encoded in byte 13 = `0x02`) |
-| **Expectation** | With seed `0x43484F31`, after processing prior DCO1 int/choice descriptors in iteration order, byte 13 MUST equal the deterministically computed choice index. Story 6.4 tests MUST capture the full output byte 13 value on first test run and pin it in this appendix after verification. |
+| **Expectation** | With seed `0x43484F31` and `enableMatrixMod=false` (default), after processing prior eligible DCO1 int/choice descriptors in iteration order, byte 13 MUST equal `2` (re-pinned under Option A′ — MM-off skips Matrix Mod RNG draws that previously preceded this choice under Option A). |
 | **`apply` return** | `true` |
 
 > **Implementation note:** Pin exact expected byte values in Story 6.4 when implementing `SeededRandom` against `juce::Random`. The seed policy and iteration order in §4.3/§8.3 are normative; numeric outputs are verified by test, not hand-simulated.
@@ -403,6 +427,7 @@ Init Matrix Mod slice (104–115): `00 00 00 00 00 00 00 00 00 00 00 00`.
 | 2026-06-19 | 1.0-draft | Initial normative spec — Story 6.1 |
 | 2026-06-19 | 1.0 | Owner sign-off: Option A confirmed; early exit §3 updated; approved for Story 6.4 |
 | 2026-06-19 | 1.0.1 | Code review fixes: §6 kNoSysExId exception, §7 eligibility path, apply() return rule, cross-refs, GV-02, Appendix B |
+| 2026-07-15 | 1.1 | Story 6.16: Option A superseded by Option A′ (`enableMatrixMod` recipe gate); §2.2.1, §5.1, §7.1, GV-02/GV-03 updated |
 
 ---
 

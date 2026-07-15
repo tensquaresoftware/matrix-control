@@ -15,17 +15,23 @@ namespace TSS
         ~HierarchicalPopupMenu() override;
 
         void paint(juce::Graphics& g) override;
+        void resized() override;
         bool hitTest(int x, int y) override;
         void mouseMove(const juce::MouseEvent& e) override;
         void mouseUp(const juce::MouseEvent& e) override;
         void mouseExit(const juce::MouseEvent& e) override;
+        void mouseWheelMove(const juce::MouseEvent& e, const juce::MouseWheelDetails& wheel) override;
         void inputAttemptWhenModal() override;
         bool keyPressed(const juce::KeyPress& key) override;
 
         static void show(HierarchicalComboBox& owner);
 
     private:
-        inline constexpr static float kHighlightGap_ = 1.0f;
+        class CustomScrollBar;
+
+        inline constexpr static float kThumbInsetBase_ = 2.0f;
+        inline constexpr static float kWheelScrollFactorContent_ = 100.0f;
+        inline constexpr static float kLabelWidthPadding_ = 8.0f;
 
         HierarchicalComboBox& owner_;
         PopupMenuRenderer renderer_;
@@ -35,13 +41,41 @@ namespace TSS
         int highlightedChildIndex_ = -1;
         float primaryColumnWidth_ = 0.0f;
         float secondaryColumnWidth_ = 0.0f;
+        bool opensAbove_ = false;
+        int primaryScrollOffset_ = 0;
+        int secondaryScrollOffset_ = 0;
+
+        std::unique_ptr<CustomScrollBar> primaryScrollBar_;
+        std::unique_ptr<CustomScrollBar> secondaryScrollBar_;
 
         bool hasSecondaryColumn() const;
         int getOpenablePrimaryCount() const;
+        int getSecondaryItemCount() const;
         float getItemHeight() const;
         float getBorderThicknessDesign() const;
         float getLayoutBorderThickness() const;
-        float getSnappedBorderThickness() const;
+        float getMaxViewportContentHeight() const;
+        float getScrollbarThickness() const;
+        bool primaryNeedsScrollbar() const;
+        bool secondaryNeedsScrollbar() const;
+        float getPrimaryPanelWidth() const;
+        float getSecondaryPanelWidth() const;
+        float getPrimaryPanelHeight() const;
+        float getSecondaryPanelHeight() const;
+        float getStackHeight() const;
+        void clampScrollOffsets();
+        void scrollPrimaryBy(int deltaPixels);
+        void scrollSecondaryBy(int deltaPixels);
+        void ensureHighlightedPrimaryVisible();
+        void ensureHighlightedChildVisible();
+        void applyPreferredSize();
+        void layoutScrollBars();
+        int getScaledVerticalMargin() const;
+        void measureColumnWidths();
+        void drawAlignedPanelBorders(juce::Graphics& g,
+                                     juce::Rectangle<float> primaryPanel,
+                                     juce::Rectangle<float> secondaryPanel,
+                                     float thickness) const;
         void drawPanelBorderEdges(juce::Graphics& g,
                                   juce::Rectangle<float> panel,
                                   float thickness,
@@ -49,10 +83,6 @@ namespace TSS
                                   bool drawTop,
                                   bool drawRight,
                                   bool drawBottom) const;
-        void drawStaircasePanelBorders(juce::Graphics& g,
-                                       juce::Rectangle<float> primaryPanel,
-                                       juce::Rectangle<float> secondaryPanel,
-                                       float thickness) const;
         juce::Rectangle<float> getPrimaryPanelBounds() const;
         juce::Rectangle<float> getSecondaryPanelBounds() const;
         juce::Rectangle<float> getPrimaryContentBounds() const;
@@ -64,7 +94,6 @@ namespace TSS
         void updateHighlightFromPosition(int x, int y);
         void selectPrimaryLeaf(int primaryIndex);
         void selectChild(int primaryIndex, int childIndex);
-        int getHighlightedPrimaryIndex() const { return highlightedPrimaryIndex_; }
         void getPreferredContentSize(float& width, float& height) const;
         void closePopup();
 

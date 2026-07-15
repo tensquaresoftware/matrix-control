@@ -42,6 +42,64 @@ namespace Core
         return formatPatchName(rootIndex, retryIndex);
     }
 
+    int MutationNaming::parseEngineRetryToken(const juce::String& token)
+    {
+        if (! token.startsWithChar('R') || token.length() < 3)
+            return -1;
+
+        const int retryIndex = token.substring(1, 3).getIntValue();
+        if (! isValidRetryIndex(retryIndex))
+            return -1;
+
+        // Reject non-canonical forms (e.g. "R0x", "R00extra") that still parse digits.
+        if (formatRetryLabel(retryIndex) != token)
+            return -1;
+
+        return retryIndex;
+    }
+
+    HistorySubmenuDisplay MutationNaming::buildHistorySubmenuDisplay(
+        int rootIndex,
+        const juce::StringArray& engineRetryLabels)
+    {
+        HistorySubmenuDisplay result;
+        if (! isValidRootIndex(rootIndex) || engineRetryLabels.size() <= 1)
+            return result;
+
+        const auto rootOnlyLabel = formatPatchName(rootIndex, MutationHistoryStore::kRootOnly);
+        if (rootOnlyLabel.isEmpty())
+            return result;
+
+        result.labels.add(rootOnlyLabel);
+        result.retryIndices.add(MutationHistoryStore::kRootOnly);
+
+        for (int i = 1; i < engineRetryLabels.size(); ++i)
+        {
+            const int retryIndex = parseEngineRetryToken(engineRetryLabels[i]);
+            if (retryIndex < 0)
+                continue;
+
+            const auto label = formatPatchName(rootIndex, retryIndex);
+            if (label.isEmpty())
+                continue;
+
+            result.labels.add(label);
+            result.retryIndices.add(retryIndex);
+        }
+
+        if (result.labels.size() <= 1)
+            return {};
+
+        return result;
+    }
+
+    juce::StringArray MutationNaming::buildHistorySubmenuDisplayLabels(
+        int rootIndex,
+        const juce::StringArray& engineRetryLabels)
+    {
+        return buildHistorySubmenuDisplay(rootIndex, engineRetryLabels).labels;
+    }
+
     bool MutationNaming::applyPatchName(PatchModel& model, int rootIndex, int retryIndex)
     {
         const auto name = formatPatchName(rootIndex, retryIndex);

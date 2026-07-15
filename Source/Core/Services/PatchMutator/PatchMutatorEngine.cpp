@@ -794,6 +794,7 @@ MutationRecipe PatchMutatorEngine::buildRecipeFromApvts() const
     recipe.enableEnvelope3 = readBoolProperty(state, PatchMutator::kEnableEnvelope3, false);
     recipe.enableLfo1 = readBoolProperty(state, PatchMutator::kEnableLfo1, false);
     recipe.enableLfo2 = readBoolProperty(state, PatchMutator::kEnableLfo2, false);
+    recipe.enableMatrixMod = readBoolProperty(state, PatchMutator::kEnableMatrixMod, false);
     return recipe;
 }
 

@@ -212,6 +212,7 @@ private:
             proc.apvts.state.setProperty(PatchMutator::kEnableEnvelope3, false, nullptr);
             proc.apvts.state.setProperty(PatchMutator::kEnableLfo1, false, nullptr);
             proc.apvts.state.setProperty(PatchMutator::kEnableLfo2, false, nullptr);
+            proc.apvts.state.setProperty(PatchMutator::kEnableMatrixMod, false, nullptr);
         }
 
         Core::MutationHistoryStore& store() { return engine.historyStore_; }

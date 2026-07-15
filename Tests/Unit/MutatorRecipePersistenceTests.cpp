@@ -69,7 +69,8 @@ namespace
         MutatorWidgets::kEnableEnvelope2,
         MutatorWidgets::kEnableEnvelope3,
         MutatorWidgets::kEnableLfo1,
-        MutatorWidgets::kEnableLfo2
+        MutatorWidgets::kEnableLfo2,
+        MutatorWidgets::kEnableMatrixMod
     };
 }
 
@@ -114,7 +115,7 @@ private:
         sourceState.setProperty(MutatorWidgets::kAmount, 42, nullptr);
         sourceState.setProperty(MutatorWidgets::kRandom, 17, nullptr);
 
-        for (int i = 0; i < 10; ++i)
+        for (int i = 0; i < 11; ++i)
             sourceState.setProperty(kRecipeToggleIds[static_cast<size_t>(i)], (i % 2) == 0, nullptr);
 
         sourceState.setProperty(MutatorState::kHistoryMutateList, "M00", nullptr);
@@ -138,7 +139,7 @@ private:
         expectEquals(static_cast<int>(restoredState.getProperty(MutatorWidgets::kAmount)), 42);
         expectEquals(static_cast<int>(restoredState.getProperty(MutatorWidgets::kRandom)), 17);
 
-        for (int i = 0; i < 10; ++i)
+        for (int i = 0; i < 11; ++i)
         {
             const bool expected = (i % 2) == 0;
             expect(static_cast<bool>(restoredState.getProperty(kRecipeToggleIds[static_cast<size_t>(i)])) == expected);

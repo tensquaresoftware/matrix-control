@@ -627,6 +627,7 @@ namespace PluginIDs
                 constexpr const char* kEnableEnvelope3      = "patchMutatorEnableEnvelope3";
                 constexpr const char* kEnableLfo1           = "patchMutatorEnableLfo1";
                 constexpr const char* kEnableLfo2           = "patchMutatorEnableLfo2";
+                constexpr const char* kEnableMatrixMod      = "patchMutatorEnableMatrixMod";
             }
         }
     }

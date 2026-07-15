@@ -16,6 +16,7 @@
 #include "Shared/Definitions/PluginIDs.h"
 #include "GUI/Factories/WidgetFactory.h"
 #include "Core/Factories/ApvtsFactory.h"
+#include "Core/Services/PatchMutator/MutationNaming.h"
 
 namespace
 {
@@ -366,12 +367,12 @@ void PatchMutatorPanel::setupHistoryLine(TSS::ISkin& skin, WidgetFactory& widget
             // fall back to root-only when no child is selected.
             int newRetryIndex = MutatorState::kSelectedRetryRootOnly;
             const auto cacheIt = retryLabelsByRootIndex_.find(newRootIndex);
-            if (childId > 0 && cacheIt != retryLabelsByRootIndex_.end()
-                && childId <= cacheIt->second.size())
+            if (childId > 0 && cacheIt != retryLabelsByRootIndex_.end())
             {
-                newRetryIndex = childId == 1
-                                    ? MutatorState::kSelectedRetryRootOnly
-                                    : cacheIt->second[childId - 1].substring(1, 3).getIntValue();
+                const auto display = Core::MutationNaming::buildHistorySubmenuDisplay(
+                    newRootIndex, cacheIt->second);
+                if (childId <= display.retryIndices.size())
+                    newRetryIndex = display.retryIndices[childId - 1];
             }
 
             deferHistoryComboRefresh_ = true;
@@ -426,6 +427,15 @@ void PatchMutatorPanel::setupHistoryLine(TSS::ISkin& skin, WidgetFactory& widget
         dims_.buttons.height);
     connectButtonToApvts(exportButton_.get(), PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kExport);
     addAndMakeVisible(*exportButton_);
+
+    enableMatrixModToggle_ = std::make_unique<TSS::Toggle>(
+        dims_.toggles.patchMutatorWidth,
+        dims_.toggles.height,
+        TSS::toggleLookFromSkin(skin),
+        PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableMatrixMod);
+    connectToggleToApvts(enableMatrixModToggle_.get(),
+                         PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableMatrixMod);
+    addAndMakeVisible(*enableMatrixModToggle_);
 }
 
 void PatchMutatorPanel::valueTreePropertyChanged(juce::ValueTree&,
@@ -470,7 +480,8 @@ bool PatchMutatorPanel::isRecipeProperty(const juce::String& propertyName)
            || propertyName == MutatorWidgets::kEnableEnvelope2
            || propertyName == MutatorWidgets::kEnableEnvelope3
            || propertyName == MutatorWidgets::kEnableLfo1
-           || propertyName == MutatorWidgets::kEnableLfo2;
+           || propertyName == MutatorWidgets::kEnableLfo2
+           || propertyName == MutatorWidgets::kEnableMatrixMod;
 }
 
 void PatchMutatorPanel::refreshRecipeFromApvts()
@@ -496,6 +507,7 @@ void PatchMutatorPanel::hydrateRecipeTogglesFromApvts(const juce::ValueTree& sta
     hydrateToggleBinding(env3Toggle_.get(), state, MutatorWidgets::kEnableEnvelope3);
     hydrateToggleBinding(lfo1Toggle_.get(), state, MutatorWidgets::kEnableLfo1);
     hydrateToggleBinding(lfo2Toggle_.get(), state, MutatorWidgets::kEnableLfo2);
+    hydrateToggleBinding(enableMatrixModToggle_.get(), state, MutatorWidgets::kEnableMatrixMod);
 }
 
 void PatchMutatorPanel::timerCallback()
@@ -607,24 +619,29 @@ void PatchMutatorPanel::pruneRetryLabelsCache()
 
 void PatchMutatorPanel::addRetryChildrenForPrimary(int primaryId, const juce::StringArray& retryLabelList)
 {
-    const bool trackSelectionIndices = (primaryId > 0
-                                        && primaryId <= mutateRootIndices_.size()
-                                        && mutateRootIndices_[primaryId - 1]
-                                               == static_cast<int>(apvts_.state.getProperty(
-                                                   MutatorState::kSelectedMutateRootIndex, -1)));
+    if (primaryId <= 0 || primaryId > mutateRootIndices_.size())
+        return;
+
+    const int rootIndex = mutateRootIndices_[primaryId - 1];
+    const auto display = Core::MutationNaming::buildHistorySubmenuDisplay(rootIndex, retryLabelList);
+    if (display.labels.isEmpty())
+        return;
+
+    jassert(display.labels.size() == display.retryIndices.size());
+
+    const bool trackSelectionIndices = (rootIndex
+                                        == static_cast<int>(apvts_.state.getProperty(
+                                            MutatorState::kSelectedMutateRootIndex, -1)));
 
     if (trackSelectionIndices)
         retryIndices_.clear();
 
-    for (int i = 0; i < retryLabelList.size(); ++i)
+    for (int i = 0; i < display.labels.size(); ++i)
     {
         const int childId = i + 1;
-        const int retryIndex = i == 0
-                                   ? MutatorState::kSelectedRetryRootOnly
-                                   : retryLabelList[i].substring(1, 3).getIntValue();
         if (trackSelectionIndices)
-            retryIndices_.add(retryIndex);
-        historyComboBox_->addChildItem(primaryId, childId, retryLabelList[i]);
+            retryIndices_.add(display.retryIndices[i]);
+        historyComboBox_->addChildItem(primaryId, childId, display.labels[i]);
     }
 }
 
@@ -721,7 +738,7 @@ void PatchMutatorPanel::syncHistorySelectionFromApvts()
 
     if (childId == 0 && ! retryIndices_.isEmpty())
     {
-        // Root-only, or orphan retry not present in this root's list — show "—".
+        // Root-only, or orphan retry not present in this root's list — select N2 root recall.
         childId = 1;
     }
 
@@ -802,6 +819,7 @@ void PatchMutatorPanel::resized()
     if (env3Toggle_)              env3Toggle_->setUiScale(sf);
     if (lfo1Toggle_)              lfo1Toggle_->setUiScale(sf);
     if (lfo2Toggle_)              lfo2Toggle_->setUiScale(sf);
+    if (enableMatrixModToggle_)   enableMatrixModToggle_->setUiScale(sf);
 }
 
 void PatchMutatorPanel::layoutSliderLine(int x, int y, TSS::Label* label, TSS::Slider* slider, TSS::Button* button,
@@ -819,7 +837,7 @@ void PatchMutatorPanel::layoutSliderLine(int x, int y, TSS::Label* label, TSS::S
     const int toggleH     = juce::roundToInt(static_cast<float>(dims_.toggles.height) * sf);
     const int controlGap  = dims_.layout.interControlGap;
 
-    const float labelStep  = static_cast<float>(dims_.labels.patchMutatorWidth + controlGap) * sf;
+    const float labelStep  = static_cast<float>(dims_.labels.patchMutatorWidth) * sf;
     const float sliderStep = static_cast<float>(dims_.sliders.patchMutatorWidth + controlGap) * sf;
     const float buttonStep = static_cast<float>(actionButtonWidth + controlGap) * sf;
     const float toggleStep = static_cast<float>(dims_.toggles.patchMutatorWidth + controlGap) * sf;
@@ -863,14 +881,17 @@ void PatchMutatorPanel::layoutHistoryLine(int x, int y)
     const int deleteW     = juce::roundToInt(static_cast<float>(dims_.buttons.patchMutatorDeleteWidth) * sf);
     const int clearW      = juce::roundToInt(static_cast<float>(dims_.buttons.patchMutatorClearWidth) * sf);
     const int exportW     = juce::roundToInt(static_cast<float>(dims_.buttons.patchMutatorExportWidth) * sf);
+    const int toggleW     = juce::roundToInt(static_cast<float>(dims_.toggles.patchMutatorWidth) * sf);
+    const int toggleH     = juce::roundToInt(static_cast<float>(dims_.toggles.height) * sf);
     const int controlGap  = dims_.layout.interControlGap;
 
     const float originX     = static_cast<float>(x);
-    const float labelStep   = static_cast<float>(dims_.labels.patchMutatorWidth + controlGap) * sf;
+    const float labelStep   = static_cast<float>(dims_.labels.patchMutatorWidth) * sf;
     const float comboStep   = static_cast<float>(dims_.comboBoxes.patchMutatorHistoryWidth + controlGap) * sf;
     const float compareStep = static_cast<float>(dims_.buttons.patchMutatorCompareWidth + controlGap) * sf;
     const float deleteStep  = static_cast<float>(dims_.buttons.patchMutatorDeleteWidth + controlGap) * sf;
     const float clearStep   = static_cast<float>(dims_.buttons.patchMutatorClearWidth + controlGap) * sf;
+    const float exportStep  = static_cast<float>(dims_.buttons.patchMutatorExportWidth + controlGap) * sf;
 
     if (auto* label = historyLabel_.get())
         label->setBounds(x, labelY, labelW, labelH);
@@ -884,6 +905,9 @@ void PatchMutatorPanel::layoutHistoryLine(int x, int y)
         button->setBounds(juce::roundToInt(originX + labelStep + comboStep + compareStep + deleteStep), y, clearW, buttonH);
     if (auto* button = exportButton_.get())
         button->setBounds(juce::roundToInt(originX + labelStep + comboStep + compareStep + deleteStep + clearStep), y, exportW, buttonH);
+    if (auto* toggle = enableMatrixModToggle_.get())
+        toggle->setBounds(juce::roundToInt(originX + labelStep + comboStep + compareStep + deleteStep + clearStep + exportStep),
+                          y, toggleW, toggleH);
 }
 
 void PatchMutatorPanel::setSkin(TSS::ISkin& skin)
@@ -959,4 +983,6 @@ void PatchMutatorPanel::propagateSkinsToToggleWidgets(TSS::ISkin& skin)
         lfo1Toggle_->setLook(toggleLook);
     if (lfo2Toggle_)
         lfo2Toggle_->setLook(toggleLook);
+    if (enableMatrixModToggle_)
+        enableMatrixModToggle_->setLook(toggleLook);
 }

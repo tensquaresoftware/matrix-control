@@ -307,6 +307,12 @@ namespace PluginDescriptors
             .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableLfo2,
             .parentGroupId = PluginIDs::PatchManagerSection::PatchMutatorModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
+        },
+        {
+            .widgetId = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableMatrixMod,
+            .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableMatrixMod,
+            .parentGroupId = PluginIDs::PatchManagerSection::PatchMutatorModule::kGroupId,
+            .widgetType = StandaloneWidgetType::kButton,
         }
     };
 

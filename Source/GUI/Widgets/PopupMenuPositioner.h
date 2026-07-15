@@ -12,6 +12,7 @@ namespace TSS
         int height = 0;
         int x = 0;
         int y = 0;
+        bool opensAbove = false;
     };
 
     class PopupMenuPositioner

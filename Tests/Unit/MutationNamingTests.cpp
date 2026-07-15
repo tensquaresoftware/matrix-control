@@ -20,6 +20,9 @@ public:
         formatPatchName_retry();
         formatPatchName_maxBoundary();
         formatExportStem_matchesPatchName();
+        buildHistorySubmenuDisplayLabels_sentinelOnly_empty();
+        buildHistorySubmenuDisplayLabels_withRetries();
+        buildHistorySubmenuDisplay_skipsInvalidTokens_keepsParallelIndices();
         applyPatchName_root_roundTrip();
         applyPatchName_retry_roundTrip();
         applyPatchName_preservesOtherBytes();
@@ -91,6 +94,53 @@ private:
 
         expectEquals(Core::MutationNaming::formatExportStem(5, 2),
                      Core::MutationNaming::formatPatchName(5, 2));
+    }
+
+    void buildHistorySubmenuDisplayLabels_sentinelOnly_empty()
+    {
+        beginTest("buildHistorySubmenuDisplayLabels_sentinelOnly_empty");
+
+        const juce::StringArray sentinelOnly { juce::String::fromUTF8("\xe2\x80\x94") };
+        expect(Core::MutationNaming::buildHistorySubmenuDisplayLabels(1, sentinelOnly).isEmpty());
+        expect(Core::MutationNaming::buildHistorySubmenuDisplayLabels(1, {}).isEmpty());
+    }
+
+    void buildHistorySubmenuDisplayLabels_withRetries()
+    {
+        beginTest("buildHistorySubmenuDisplayLabels_withRetries");
+
+        const juce::StringArray engineLabels {
+            juce::String::fromUTF8("\xe2\x80\x94"),
+            "R00",
+            "R02"
+        };
+        const auto labels = Core::MutationNaming::buildHistorySubmenuDisplayLabels(5, engineLabels);
+        expectEquals(labels.size(), 3);
+        expectEquals(labels[0], juce::String("M05"));
+        expectEquals(labels[1], juce::String("M05-R00"));
+        expectEquals(labels[2], juce::String("M05-R02"));
+    }
+
+    void buildHistorySubmenuDisplay_skipsInvalidTokens_keepsParallelIndices()
+    {
+        beginTest("buildHistorySubmenuDisplay_skipsInvalidTokens_keepsParallelIndices");
+
+        const juce::StringArray engineLabels {
+            juce::String::fromUTF8("\xe2\x80\x94"),
+            "xx",   // too short / not Ryy
+            "R01",
+            "R99extra", // non-canonical
+            "R03"
+        };
+        const auto display = Core::MutationNaming::buildHistorySubmenuDisplay(5, engineLabels);
+        expectEquals(display.labels.size(), 3);
+        expectEquals(display.retryIndices.size(), 3);
+        expectEquals(display.labels[0], juce::String("M05"));
+        expectEquals(display.retryIndices[0], Core::MutationHistoryStore::kRootOnly);
+        expectEquals(display.labels[1], juce::String("M05-R01"));
+        expectEquals(display.retryIndices[1], 1);
+        expectEquals(display.labels[2], juce::String("M05-R03"));
+        expectEquals(display.retryIndices[2], 3);
     }
 
     void applyPatchName_root_roundTrip()

@@ -30,8 +30,9 @@ namespace TSS
         const auto adjustedPosition = adjustPositionToFitScreen(
             anchor, initialPosition, popupWidth, popupHeight, topLevelScreenBounds, verticalMargin);
         const auto relativePosition = adjustedPosition - topLevelScreenBounds.getPosition();
+        const bool opensAbove = adjustedPosition.getY() < initialPosition.getY();
 
-        return { popupWidth, popupHeight, relativePosition.getX(), relativePosition.getY() };
+        return { popupWidth, popupHeight, relativePosition.getX(), relativePosition.getY(), opensAbove };
     }
 
     juce::Point<int> PopupMenuPositioner::calculateInitialPosition(

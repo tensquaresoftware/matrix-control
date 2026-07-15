@@ -19,7 +19,8 @@ public:
         gv02_dco1Only_changesDco1();
         gv03_matrixModOnly();
         gv04_choiceDeterministic();
-        allTogglesOff_matrixModStillMutates();
+        allTogglesOff_mmOff_matrixModUnchanged();
+        mmOff_patchEditOn_matrixModUnchanged();
         moduleToggleMask_disablesModule();
     }
 
@@ -43,6 +44,7 @@ private:
     {
         auto recipe = makeFullRecipe();
         recipe.enableDco1 = true;
+        recipe.enableMatrixMod = false;
         return recipe;
     }
 
@@ -72,6 +74,17 @@ private:
         for (const auto offset : offsets)
         {
             if (before.data()[offset] != after.data()[offset])
+                return true;
+        }
+
+        return false;
+    }
+
+    static bool anyMatrixModByteChanged(const Core::PatchModel& before, const Core::PatchModel& after)
+    {
+        for (size_t i = 104; i <= 133; ++i)
+        {
+            if (before.data()[i] != after.data()[i])
                 return true;
         }
 
@@ -133,6 +146,7 @@ private:
         const std::vector<size_t> dco1Offsets { 9, 10, 11, 13, 25, 86, 87 };
         expect(anyByteDiffersInSet(input, working, dco1Offsets));
         expectEquals(static_cast<int>(working.data()[8]), static_cast<int>(input.data()[8]));
+        expect(bytesEqualInRange(input, working, 104, 134));
     }
 
     void gv03_matrixModOnly()
@@ -145,6 +159,7 @@ private:
         Core::MutationRecipe recipe;
         recipe.amountPercent = 50;
         recipe.randomPercent = 100;
+        recipe.enableMatrixMod = true;
 
         Core::SeededRandom rng(0x4D61746DU);
         Core::MutationAlgorithm algorithm;
@@ -152,18 +167,7 @@ private:
         expect(algorithm.apply(working, recipe, rng));
         expect(bytesEqualInRange(input, working, 0, 8));
         expect(bytesEqualInRange(input, working, 8, 104));
-
-        bool matrixModChanged = false;
-        for (size_t i = 104; i <= 133; ++i)
-        {
-            if (input.data()[i] != working.data()[i])
-            {
-                matrixModChanged = true;
-                break;
-            }
-        }
-
-        expect(matrixModChanged);
+        expect(anyMatrixModByteChanged(input, working));
     }
 
     void gv04_choiceDeterministic()
@@ -178,12 +182,12 @@ private:
         Core::MutationAlgorithm algorithm;
 
         expect(algorithm.apply(working, recipe, rng));
-        expectEquals(static_cast<int>(working.data()[13]), 1);
+        expectEquals(static_cast<int>(working.data()[13]), 2);
     }
 
-    void allTogglesOff_matrixModStillMutates()
+    void allTogglesOff_mmOff_matrixModUnchanged()
     {
-        beginTest("allTogglesOff_matrixModStillMutates");
+        beginTest("allTogglesOff_mmOff_matrixModUnchanged");
 
         const auto input = makeInitPatchModel();
         auto working = input;
@@ -191,23 +195,34 @@ private:
         Core::MutationRecipe recipe;
         recipe.amountPercent = 50;
         recipe.randomPercent = 100;
+        recipe.enableMatrixMod = false;
 
         Core::SeededRandom rng(0x4D61746DU);
         Core::MutationAlgorithm algorithm;
 
+        expect(! algorithm.apply(working, recipe, rng));
+        expect(bytesEqualInRange(input, working, 8, 134));
+        expect(! anyMatrixModByteChanged(input, working));
+    }
+
+    void mmOff_patchEditOn_matrixModUnchanged()
+    {
+        beginTest("mmOff_patchEditOn_matrixModUnchanged");
+
+        const auto input = makeInitPatchModel();
+        auto working = input;
+
+        auto recipe = recipeWithOnlyDco1Enabled();
+        recipe.enableMatrixMod = false;
+
+        Core::SeededRandom rng(0x6D757461U);
+        Core::MutationAlgorithm algorithm;
+
         expect(algorithm.apply(working, recipe, rng));
 
-        bool matrixModChanged = false;
-        for (size_t i = 104; i <= 133; ++i)
-        {
-            if (input.data()[i] != working.data()[i])
-            {
-                matrixModChanged = true;
-                break;
-            }
-        }
-
-        expect(matrixModChanged);
+        const std::vector<size_t> dco1Offsets { 9, 10, 11, 13, 25, 86, 87 };
+        expect(anyByteDiffersInSet(input, working, dco1Offsets));
+        expect(bytesEqualInRange(input, working, 104, 134));
     }
 
     void moduleToggleMask_disablesModule()

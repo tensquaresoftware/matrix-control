@@ -852,7 +852,7 @@ namespace PluginDisplayNames
                 constexpr const char* kRetry          = "RETRY";
                 constexpr const char* kCompare        = "COMPARE";
                 const juce::String    kDelete         = juce::String::fromUTF8("\xe2\x80\x94"); // displays a @'–'
-                constexpr const char* kClear          = "CLEAR";
+                constexpr const char* kClear          = "CL";
                 constexpr const char* kExport         = "EXPORT";
 
                 constexpr const char* kEnableDco1           = "D1";
@@ -865,6 +865,7 @@ namespace PluginDisplayNames
                 constexpr const char* kEnableEnvelope3      = "E3";
                 constexpr const char* kEnableLfo1           = "L1";
                 constexpr const char* kEnableLfo2           = "L2";
+                constexpr const char* kEnableMatrixMod      = "MM";
             }
         }
     } 

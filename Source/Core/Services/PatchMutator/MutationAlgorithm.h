@@ -22,6 +22,7 @@ namespace Core
         bool enableEnvelope3 = false;
         bool enableLfo1 = false;
         bool enableLfo2 = false;
+        bool enableMatrixMod = false;
     };
 
     struct IRandomSource

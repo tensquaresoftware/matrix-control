@@ -8,6 +8,141 @@
 
 namespace TSS
 {
+    class HierarchicalPopupMenu::CustomScrollBar : public juce::Component, private juce::Timer
+    {
+    public:
+        CustomScrollBar(HierarchicalPopupMenu& owner,
+                        bool isPrimary,
+                        const juce::Colour& scrollbarColour,
+                        float thumbInset,
+                        int minThumbHeightDesign,
+                        float uiScale)
+            : owner_(owner)
+            , isPrimary_(isPrimary)
+            , scrollbarColour_(scrollbarColour)
+            , thumbInset_(thumbInset)
+            , minThumbHeightDesign_(minThumbHeightDesign)
+            , uiScale_(uiScale)
+        {
+            setRepaintsOnMouseActivity(true);
+            startTimerHz(kScrollbarRepaintHz_);
+        }
+
+        void paint(juce::Graphics& g) override
+        {
+            const int trackHeight = getHeight();
+            const int trackWidth = getWidth();
+            const int contentHeight = isPrimary_ ? owner_.getOpenablePrimaryCount() * juce::roundToInt(owner_.getItemHeight())
+                                                 : owner_.getSecondaryItemCount() * juce::roundToInt(owner_.getItemHeight());
+            const int viewportHeight = juce::roundToInt(owner_.getMaxViewportContentHeight());
+            if (contentHeight <= viewportHeight || trackHeight <= 0)
+                return;
+
+            const int viewY = isPrimary_ ? owner_.primaryScrollOffset_ : owner_.secondaryScrollOffset_;
+            const int minThumbHeight = juce::roundToInt(static_cast<float>(minThumbHeightDesign_) * uiScale_);
+            const int thumbHeight = juce::jmax(minThumbHeight,
+                                               juce::roundToInt(static_cast<float>(trackHeight)
+                                                                * static_cast<float>(viewportHeight)
+                                                                / static_cast<float>(contentHeight)));
+            const int range = contentHeight - viewportHeight;
+            const int thumbY = (range > 0)
+                ? juce::roundToInt(static_cast<float>(viewY)
+                                   * static_cast<float>(trackHeight - thumbHeight)
+                                   / static_cast<float>(range))
+                : 0;
+
+            juce::Rectangle<float> thumbBounds(0.0f,
+                                               static_cast<float>(thumbY),
+                                               static_cast<float>(trackWidth),
+                                               static_cast<float>(thumbHeight));
+            const auto colour = (isMouseOver() || isMouseButtonDown())
+                ? scrollbarColour_.brighter(kThumbHighlightBrighter_)
+                : scrollbarColour_;
+            g.setColour(colour);
+            g.fillRect(thumbBounds.reduced(thumbInset_));
+        }
+
+        void mouseDown(const juce::MouseEvent& e) override
+        {
+            if (isEnabled())
+                scrollToMousePosition(e.getPosition().y);
+        }
+
+        void mouseDrag(const juce::MouseEvent& e) override
+        {
+            if (isEnabled())
+                scrollToMousePosition(e.getPosition().y);
+        }
+
+        void mouseWheelMove(const juce::MouseEvent&, const juce::MouseWheelDetails& wheel) override
+        {
+            if (! isEnabled())
+                return;
+
+            const int delta = juce::roundToInt(
+                -wheel.deltaY * owner_.getMaxViewportContentHeight() * kWheelScrollFactorScrollbar_);
+            if (delta == 0)
+                return;
+
+            if (isPrimary_)
+                owner_.scrollPrimaryBy(delta);
+            else
+                owner_.scrollSecondaryBy(delta);
+        }
+
+    private:
+        void timerCallback() override { repaint(); }
+
+        void scrollToMousePosition(int mouseY)
+        {
+            const int trackHeight = getHeight();
+            const int contentHeight = isPrimary_ ? owner_.getOpenablePrimaryCount() * juce::roundToInt(owner_.getItemHeight())
+                                                 : owner_.getSecondaryItemCount() * juce::roundToInt(owner_.getItemHeight());
+            const int viewportHeight = juce::roundToInt(owner_.getMaxViewportContentHeight());
+            if (contentHeight <= viewportHeight || trackHeight <= 0)
+                return;
+
+            const int minThumbHeight = juce::roundToInt(static_cast<float>(minThumbHeightDesign_) * uiScale_);
+            const int thumbHeight = juce::jmax(minThumbHeight,
+                                               juce::roundToInt(static_cast<float>(trackHeight)
+                                                                * static_cast<float>(viewportHeight)
+                                                                / static_cast<float>(contentHeight)));
+            const int range = contentHeight - viewportHeight;
+            const int thumbRange = trackHeight - thumbHeight;
+            if (thumbRange <= 0)
+                return;
+
+            const int viewY = juce::jlimit(
+                0,
+                range,
+                juce::roundToInt(static_cast<float>(mouseY - thumbHeight / 2)
+                                 * static_cast<float>(range)
+                                 / static_cast<float>(thumbRange)));
+
+            if (isPrimary_)
+            {
+                owner_.primaryScrollOffset_ = viewY;
+                owner_.repaint();
+            }
+            else
+            {
+                owner_.secondaryScrollOffset_ = viewY;
+                owner_.repaint();
+            }
+        }
+
+        inline constexpr static int kScrollbarRepaintHz_ = 20;
+        inline constexpr static float kThumbHighlightBrighter_ = 0.2f;
+        inline constexpr static float kWheelScrollFactorScrollbar_ = 0.5f;
+
+        HierarchicalPopupMenu& owner_;
+        bool isPrimary_ = true;
+        juce::Colour scrollbarColour_;
+        float thumbInset_;
+        int minThumbHeightDesign_;
+        float uiScale_;
+    };
+
     int HierarchicalPopupMenu::countOpenablePrimaries(const HierarchicalComboBox& owner)
     {
         int count = 0;
@@ -59,14 +194,14 @@ namespace TSS
         , renderer_(false, owner.getUiScale())
         , uiScale_(owner.getUiScale())
         , cachedFont_(owner.getPopupMenuLook().font.withHeight(owner.getPopupMenuLook().font.getHeight() * uiScale_))
-        , primaryColumnWidth_(static_cast<float>(owner.getBaseComponentWidth()) * uiScale_)
-        , secondaryColumnWidth_(static_cast<float>(owner.getBaseComponentWidth()) * uiScale_)
     {
         renderer_.setLook(owner.getPopupMenuLook());
         setWantsKeyboardFocus(true);
         setAlwaysOnTop(true);
         setInterceptsMouseClicks(true, true);
         setOpaque(false);
+
+        measureColumnWidths();
 
         highlightedPrimaryIndex_ = openableIndexForPrimaryId(owner_, owner_.getSelectedPrimaryId());
         if (highlightedPrimaryIndex_ < 0 && countOpenablePrimaries(owner_) > 0)
@@ -88,9 +223,77 @@ namespace TSS
                 }
             }
         }
+
+        ensureHighlightedPrimaryVisible();
+        ensureHighlightedChildVisible();
+
+        const auto& popupLook = owner_.getPopupMenuLook();
+        const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(owner_);
+        const float thumbInset = static_cast<float>(ScaledDrawing::logicalInsetPixelsFromDesign(
+            kThumbInsetBase_,
+            uiScale_,
+            systemDisplayScale));
+
+        if (primaryNeedsScrollbar())
+        {
+            primaryScrollBar_ = std::make_unique<CustomScrollBar>(
+                *this,
+                true,
+                popupLook.scrollbar,
+                thumbInset,
+                ComboBox::getPopupLayoutDimensions().minThumbHeight,
+                uiScale_);
+            addAndMakeVisible(*primaryScrollBar_);
+        }
+
+        if (hasSecondaryColumn() && secondaryNeedsScrollbar())
+        {
+            secondaryScrollBar_ = std::make_unique<CustomScrollBar>(
+                *this,
+                false,
+                popupLook.scrollbar,
+                thumbInset,
+                ComboBox::getPopupLayoutDimensions().minThumbHeight,
+                uiScale_);
+            addAndMakeVisible(*secondaryScrollBar_);
+        }
     }
 
     HierarchicalPopupMenu::~HierarchicalPopupMenu() = default;
+
+    void HierarchicalPopupMenu::measureColumnWidths()
+    {
+        const float closedWidth = static_cast<float>(owner_.getBaseComponentWidth()) * uiScale_;
+        const float textPadding = static_cast<float>(ComboBox::getPopupLayoutDimensions().textLeftPadding) * uiScale_;
+        const float chevronReserve = cachedFont_.getHeight() * 0.6f + textPadding;
+        const float sidePadding = textPadding + kLabelWidthPadding_ * uiScale_;
+
+        const auto measureLabel = [this](const juce::String& text) {
+            return juce::GlyphArrangement::getStringWidth(cachedFont_, text);
+        };
+
+        float maxPrimary = closedWidth;
+        float maxSecondary = measureLabel("M99-R99") + sidePadding;
+
+        for (int i = 0; i < owner_.getPrimaryItemCount(); ++i)
+        {
+            const auto& primary = owner_.getPrimaryItem(i);
+            if (primary.isSentinel)
+                continue;
+
+            float width = measureLabel(primary.label) + sidePadding;
+            if (! primary.children.empty())
+                width += chevronReserve;
+
+            maxPrimary = juce::jmax(maxPrimary, width);
+
+            for (const auto& child : primary.children)
+                maxSecondary = juce::jmax(maxSecondary, measureLabel(child.label) + sidePadding);
+        }
+
+        primaryColumnWidth_ = maxPrimary;
+        secondaryColumnWidth_ = maxSecondary;
+    }
 
     bool HierarchicalPopupMenu::hasSecondaryColumn() const
     {
@@ -109,6 +312,18 @@ namespace TSS
         return countOpenablePrimaries(owner_);
     }
 
+    int HierarchicalPopupMenu::getSecondaryItemCount() const
+    {
+        if (! hasSecondaryColumn() || highlightedPrimaryIndex_ < 0)
+            return 0;
+
+        const auto storageIndex = primaryStorageIndexForOpenableIndex(owner_, highlightedPrimaryIndex_);
+        if (storageIndex < 0)
+            return 0;
+
+        return static_cast<int>(owner_.getPrimaryItem(storageIndex).children.size());
+    }
+
     float HierarchicalPopupMenu::getItemHeight() const
     {
         return static_cast<float>(ComboBox::getPopupLayoutDimensions().itemHeight) * uiScale_;
@@ -124,51 +339,163 @@ namespace TSS
         return juce::jmax(1.0f, getBorderThicknessDesign() * uiScale_);
     }
 
-    float HierarchicalPopupMenu::getSnappedBorderThickness() const
+    float HierarchicalPopupMenu::getMaxViewportContentHeight() const
     {
-        return ScaledDrawing::snappedStrokeThicknessFromDesign(
-            getBorderThicknessDesign(),
-            uiScale_,
-            ScaledDrawing::systemDisplayScaleForComponent(*this),
-            ScaledDrawing::StrokeSnapPolicy::kRound);
+        return static_cast<float>(ComboBox::getPopupLayoutDimensions().maxScrollHeight) * uiScale_;
+    }
+
+    float HierarchicalPopupMenu::getScrollbarThickness() const
+    {
+        return juce::jmax(1.0f, static_cast<float>(ComboBox::getPopupLayoutDimensions().scrollbarWidth) * uiScale_);
+    }
+
+    bool HierarchicalPopupMenu::primaryNeedsScrollbar() const
+    {
+        return static_cast<float>(getOpenablePrimaryCount()) * getItemHeight() > getMaxViewportContentHeight() + 0.5f;
+    }
+
+    bool HierarchicalPopupMenu::secondaryNeedsScrollbar() const
+    {
+        return static_cast<float>(getSecondaryItemCount()) * getItemHeight() > getMaxViewportContentHeight() + 0.5f;
+    }
+
+    float HierarchicalPopupMenu::getPrimaryPanelWidth() const
+    {
+        const float border = getLayoutBorderThickness();
+        const float scrollbar = primaryNeedsScrollbar() ? getScrollbarThickness() : 0.0f;
+        return primaryColumnWidth_ + scrollbar + 2.0f * border;
+    }
+
+    float HierarchicalPopupMenu::getSecondaryPanelWidth() const
+    {
+        const float border = getLayoutBorderThickness();
+        const float scrollbar = secondaryNeedsScrollbar() ? getScrollbarThickness() : 0.0f;
+        return secondaryColumnWidth_ + scrollbar + 2.0f * border;
+    }
+
+    float HierarchicalPopupMenu::getPrimaryPanelHeight() const
+    {
+        const float border = getLayoutBorderThickness();
+        const float contentHeight = juce::jmin(static_cast<float>(getOpenablePrimaryCount()) * getItemHeight(),
+                                               getMaxViewportContentHeight());
+        return contentHeight + 2.0f * border;
+    }
+
+    float HierarchicalPopupMenu::getSecondaryPanelHeight() const
+    {
+        if (! hasSecondaryColumn())
+            return 0.0f;
+
+        const float border = getLayoutBorderThickness();
+        const float contentHeight = juce::jmin(static_cast<float>(getSecondaryItemCount()) * getItemHeight(),
+                                               getMaxViewportContentHeight());
+        return contentHeight + 2.0f * border;
+    }
+
+    float HierarchicalPopupMenu::getStackHeight() const
+    {
+        if (! hasSecondaryColumn())
+            return getPrimaryPanelHeight();
+
+        return juce::jmax(getPrimaryPanelHeight(), getSecondaryPanelHeight());
+    }
+
+    void HierarchicalPopupMenu::clampScrollOffsets()
+    {
+        const float itemHeight = getItemHeight();
+        const int primaryContent = juce::roundToInt(static_cast<float>(getOpenablePrimaryCount()) * itemHeight);
+        const int primaryViewport = juce::roundToInt(juce::jmin(static_cast<float>(primaryContent),
+                                                                getMaxViewportContentHeight()));
+        primaryScrollOffset_ = juce::jlimit(0, juce::jmax(0, primaryContent - primaryViewport), primaryScrollOffset_);
+
+        const int secondaryContent = juce::roundToInt(static_cast<float>(getSecondaryItemCount()) * itemHeight);
+        const int secondaryViewport = juce::roundToInt(juce::jmin(static_cast<float>(secondaryContent),
+                                                                  getMaxViewportContentHeight()));
+        secondaryScrollOffset_ = juce::jlimit(0, juce::jmax(0, secondaryContent - secondaryViewport), secondaryScrollOffset_);
+    }
+
+    void HierarchicalPopupMenu::scrollPrimaryBy(int deltaPixels)
+    {
+        if (! primaryNeedsScrollbar() || deltaPixels == 0)
+            return;
+
+        primaryScrollOffset_ += deltaPixels;
+        clampScrollOffsets();
+        repaint();
+        if (primaryScrollBar_ != nullptr)
+            primaryScrollBar_->repaint();
+    }
+
+    void HierarchicalPopupMenu::scrollSecondaryBy(int deltaPixels)
+    {
+        if (! secondaryNeedsScrollbar() || deltaPixels == 0)
+            return;
+
+        secondaryScrollOffset_ += deltaPixels;
+        clampScrollOffsets();
+        repaint();
+        if (secondaryScrollBar_ != nullptr)
+            secondaryScrollBar_->repaint();
+    }
+
+    void HierarchicalPopupMenu::ensureHighlightedPrimaryVisible()
+    {
+        if (highlightedPrimaryIndex_ < 0 || ! primaryNeedsScrollbar())
+            return;
+
+        const float itemHeight = getItemHeight();
+        const float itemY = static_cast<float>(highlightedPrimaryIndex_) * itemHeight;
+        const float viewportHeight = getMaxViewportContentHeight();
+        const float viewY = static_cast<float>(primaryScrollOffset_);
+
+        if (itemY < viewY)
+            primaryScrollOffset_ = juce::roundToInt(itemY);
+        else if (itemY + itemHeight > viewY + viewportHeight)
+            primaryScrollOffset_ = juce::roundToInt(itemY + itemHeight - viewportHeight);
+
+        clampScrollOffsets();
+    }
+
+    void HierarchicalPopupMenu::ensureHighlightedChildVisible()
+    {
+        if (highlightedChildIndex_ < 0 || ! secondaryNeedsScrollbar())
+            return;
+
+        const float itemHeight = getItemHeight();
+        const float itemY = static_cast<float>(highlightedChildIndex_) * itemHeight;
+        const float viewportHeight = getMaxViewportContentHeight();
+        const float viewY = static_cast<float>(secondaryScrollOffset_);
+
+        if (itemY < viewY)
+            secondaryScrollOffset_ = juce::roundToInt(itemY);
+        else if (itemY + itemHeight > viewY + viewportHeight)
+            secondaryScrollOffset_ = juce::roundToInt(itemY + itemHeight - viewportHeight);
+
+        clampScrollOffsets();
     }
 
     juce::Rectangle<float> HierarchicalPopupMenu::getPrimaryPanelBounds() const
     {
-        const float border = getLayoutBorderThickness();
-        const float itemHeight = getItemHeight();
-        const float height = static_cast<float>(getOpenablePrimaryCount()) * itemHeight + 2.0f * border;
-
-        return {
-            0.0f,
-            0.0f,
-            primaryColumnWidth_ + 2.0f * border,
-            height
-        };
+        const float height = getPrimaryPanelHeight();
+        const float y = opensAbove_ ? (getStackHeight() - height) : 0.0f;
+        return { 0.0f, y, getPrimaryPanelWidth(), height };
     }
 
     juce::Rectangle<float> HierarchicalPopupMenu::getSecondaryPanelBounds() const
     {
-        if (! hasSecondaryColumn() || highlightedPrimaryIndex_ < 0)
+        if (! hasSecondaryColumn())
             return {};
 
-        const auto storageIndex = primaryStorageIndexForOpenableIndex(owner_, highlightedPrimaryIndex_);
-        if (storageIndex < 0)
-            return {};
-
-        const auto& primary = owner_.getPrimaryItem(storageIndex);
-        const float border = getLayoutBorderThickness();
-        const float itemHeight = getItemHeight();
         const auto primaryPanel = getPrimaryPanelBounds();
-        const float panelTop = primaryPanel.getY()
-                             + static_cast<float>(highlightedPrimaryIndex_) * itemHeight;
-        const float panelHeight = static_cast<float>(primary.children.size()) * itemHeight + 2.0f * border;
+        const float border = getLayoutBorderThickness();
+        const float height = getSecondaryPanelHeight();
+        const float y = opensAbove_ ? (getStackHeight() - height) : 0.0f;
 
         return {
             primaryPanel.getRight() - border,
-            panelTop,
-            secondaryColumnWidth_ + 2.0f * border,
-            panelHeight
+            y,
+            getSecondaryPanelWidth(),
+            height
         };
     }
 
@@ -183,19 +510,7 @@ namespace TSS
         if (panel.isEmpty())
             return {};
 
-        const auto storageIndex = primaryStorageIndexForOpenableIndex(owner_, highlightedPrimaryIndex_);
-        if (storageIndex < 0)
-            return {};
-
-        const auto& primary = owner_.getPrimaryItem(storageIndex);
-        const float border = getLayoutBorderThickness();
-
-        return {
-            panel.getX() + border,
-            panel.getY() + border,
-            secondaryColumnWidth_,
-            static_cast<float>(primary.children.size()) * getItemHeight()
-        };
+        return panel.reduced(getLayoutBorderThickness());
     }
 
     juce::Rectangle<float> HierarchicalPopupMenu::getPrimaryItemBounds(int primaryIndex) const
@@ -204,7 +519,8 @@ namespace TSS
         const float itemHeight = getItemHeight();
         return {
             contentBounds.getX(),
-            contentBounds.getY() + static_cast<float>(primaryIndex) * itemHeight,
+            contentBounds.getY() + static_cast<float>(primaryIndex) * itemHeight
+                - static_cast<float>(primaryScrollOffset_),
             primaryColumnWidth_,
             itemHeight
         };
@@ -216,18 +532,14 @@ namespace TSS
         if (contentBounds.isEmpty())
             return {};
 
-        const auto storageIndex = primaryStorageIndexForOpenableIndex(owner_, highlightedPrimaryIndex_);
-        if (storageIndex < 0)
-            return {};
-
-        const auto& primary = owner_.getPrimaryItem(storageIndex);
-        if (! juce::isPositiveAndBelow(childIndex, static_cast<int>(primary.children.size())))
+        if (! juce::isPositiveAndBelow(childIndex, getSecondaryItemCount()))
             return {};
 
         const float itemHeight = getItemHeight();
         return {
             contentBounds.getX(),
-            contentBounds.getY() + static_cast<float>(childIndex) * itemHeight,
+            contentBounds.getY() + static_cast<float>(childIndex) * itemHeight
+                - static_cast<float>(secondaryScrollOffset_),
             secondaryColumnWidth_,
             itemHeight
         };
@@ -237,14 +549,100 @@ namespace TSS
     {
         const auto primaryPanel = getPrimaryPanelBounds();
         width = primaryPanel.getWidth();
-        height = primaryPanel.getHeight();
+        height = getStackHeight();
 
         if (hasSecondaryColumn())
         {
             const auto secondaryPanel = getSecondaryPanelBounds();
             width = secondaryPanel.getRight();
-            height = juce::jmax(primaryPanel.getHeight(), secondaryPanel.getBottom());
         }
+    }
+
+    int HierarchicalPopupMenu::getScaledVerticalMargin() const
+    {
+        return juce::roundToInt(
+            static_cast<float>(ComboBox::getPopupLayoutDimensions().verticalMargin) * uiScale_);
+    }
+
+    void HierarchicalPopupMenu::applyPreferredSize()
+    {
+        float width = 0.0f;
+        float height = 0.0f;
+        getPreferredContentSize(width, height);
+
+        const auto dimensions = PopupMenuPositioner::calculateDimensions(
+            owner_,
+            juce::roundToInt(width),
+            juce::roundToInt(height),
+            getScaledVerticalMargin());
+
+        opensAbove_ = dimensions.opensAbove;
+        getPreferredContentSize(width, height);
+
+        setBounds(dimensions.x,
+                  dimensions.y,
+                  juce::roundToInt(width),
+                  juce::roundToInt(height));
+
+        layoutScrollBars();
+        repaint();
+    }
+
+    void HierarchicalPopupMenu::layoutScrollBars()
+    {
+        const float border = getLayoutBorderThickness();
+        const float scrollbarWidth = getScrollbarThickness();
+
+        if (primaryScrollBar_ != nullptr && primaryNeedsScrollbar())
+        {
+            const auto content = getPrimaryContentBounds();
+            primaryScrollBar_->setBounds(
+                juce::roundToInt(content.getRight() - scrollbarWidth),
+                juce::roundToInt(content.getY()),
+                juce::roundToInt(scrollbarWidth),
+                juce::roundToInt(content.getHeight()));
+            primaryScrollBar_->setVisible(true);
+        }
+        else if (primaryScrollBar_ != nullptr)
+        {
+            primaryScrollBar_->setVisible(false);
+        }
+
+        const bool showSecondaryBar = hasSecondaryColumn() && secondaryNeedsScrollbar();
+        if (showSecondaryBar)
+        {
+            if (secondaryScrollBar_ == nullptr)
+            {
+                const auto& popupLook = owner_.getPopupMenuLook();
+                const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
+                const float thumbInset = static_cast<float>(ScaledDrawing::logicalInsetPixelsFromDesign(
+                    kThumbInsetBase_,
+                    uiScale_,
+                    systemDisplayScale));
+                secondaryScrollBar_ = std::make_unique<CustomScrollBar>(
+                    *this,
+                    false,
+                    popupLook.scrollbar,
+                    thumbInset,
+                    ComboBox::getPopupLayoutDimensions().minThumbHeight,
+                    uiScale_);
+                addAndMakeVisible(*secondaryScrollBar_);
+            }
+
+            const auto content = getSecondaryContentBounds();
+            secondaryScrollBar_->setBounds(
+                juce::roundToInt(content.getRight() - scrollbarWidth),
+                juce::roundToInt(content.getY()),
+                juce::roundToInt(scrollbarWidth),
+                juce::roundToInt(content.getHeight()));
+            secondaryScrollBar_->setVisible(true);
+        }
+        else if (secondaryScrollBar_ != nullptr)
+        {
+            secondaryScrollBar_->setVisible(false);
+        }
+
+        juce::ignoreUnused(border);
     }
 
     int HierarchicalPopupMenu::getPrimaryIndexAt(int x, int y) const
@@ -253,7 +651,15 @@ namespace TSS
         if (! contentBounds.contains(static_cast<float>(x), static_cast<float>(y)))
             return -1;
 
-        const int row = static_cast<int>((static_cast<float>(y) - contentBounds.getY()) / getItemHeight());
+        if (primaryNeedsScrollbar())
+        {
+            const float scrollbarLeft = contentBounds.getRight() - getScrollbarThickness();
+            if (static_cast<float>(x) >= scrollbarLeft)
+                return -1;
+        }
+
+        const float localY = static_cast<float>(y) - contentBounds.getY() + static_cast<float>(primaryScrollOffset_);
+        const int row = static_cast<int>(localY / getItemHeight());
         if (row < 0 || row >= getOpenablePrimaryCount())
             return -1;
 
@@ -265,19 +671,24 @@ namespace TSS
         if (! hasSecondaryColumn())
             return -1;
 
-        const auto storageIndex = primaryStorageIndexForOpenableIndex(owner_, highlightedPrimaryIndex_);
-        if (storageIndex < 0)
+        const auto contentBounds = getSecondaryContentBounds();
+        if (! contentBounds.contains(static_cast<float>(x), static_cast<float>(y)))
             return -1;
 
-        const auto& primary = owner_.getPrimaryItem(storageIndex);
-        for (int childIndex = 0; childIndex < static_cast<int>(primary.children.size()); ++childIndex)
+        // Ignore clicks on the scrollbar track.
+        if (secondaryNeedsScrollbar())
         {
-            const auto bounds = getSecondaryItemBounds(childIndex);
-            if (bounds.contains(static_cast<float>(x), static_cast<float>(y)))
-                return childIndex;
+            const float scrollbarLeft = contentBounds.getRight() - getScrollbarThickness();
+            if (static_cast<float>(x) >= scrollbarLeft)
+                return -1;
         }
 
-        return -1;
+        const float localY = static_cast<float>(y) - contentBounds.getY() + static_cast<float>(secondaryScrollOffset_);
+        const int row = static_cast<int>(localY / getItemHeight());
+        if (row < 0 || row >= getSecondaryItemCount())
+            return -1;
+
+        return row;
     }
 
     void HierarchicalPopupMenu::updateHighlightFromPosition(int x, int y)
@@ -291,9 +702,22 @@ namespace TSS
         }
 
         const auto primaryIndex = getPrimaryIndexAt(x, y);
-        if (primaryIndex >= 0 && primaryIndex != highlightedPrimaryIndex_)
+        if (primaryIndex < 0)
+            return;
+
+        if (primaryIndex != highlightedPrimaryIndex_)
         {
             highlightedPrimaryIndex_ = primaryIndex;
+            highlightedChildIndex_ = -1;
+            secondaryScrollOffset_ = 0;
+            clampScrollOffsets();
+            applyPreferredSize();
+            return;
+        }
+
+        // Same primary row: clear N2 row highlight when the pointer leaves N2.
+        if (highlightedChildIndex_ >= 0)
+        {
             highlightedChildIndex_ = -1;
             repaint();
         }
@@ -359,24 +783,53 @@ namespace TSS
             g.fillRect(panel.getRight() - thickness, panel.getY(), thickness, panel.getHeight());
     }
 
-    void HierarchicalPopupMenu::drawStaircasePanelBorders(juce::Graphics& g,
-                                                            juce::Rectangle<float> primaryPanel,
-                                                            juce::Rectangle<float> secondaryPanel,
-                                                            float thickness) const
+    void HierarchicalPopupMenu::drawAlignedPanelBorders(juce::Graphics& g,
+                                                        juce::Rectangle<float> primaryPanel,
+                                                        juce::Rectangle<float> secondaryPanel,
+                                                        float thickness) const
     {
+        // Shared edge: omit primary right / secondary left, then stroke the join once.
         drawPanelBorderEdges(g, primaryPanel, thickness, true, true, false, true);
+        drawPanelBorderEdges(g, secondaryPanel, thickness, false, true, true, true);
 
         const float sharedX = primaryPanel.getRight() - thickness;
-        const float upperRightHeight = juce::jmax(0.0f, secondaryPanel.getY() - primaryPanel.getY());
-        if (upperRightHeight > 0.0f)
-            g.fillRect(sharedX, primaryPanel.getY(), thickness, upperRightHeight);
+        const float joinTop = juce::jmax(primaryPanel.getY(), secondaryPanel.getY());
+        const float joinBottom = juce::jmin(primaryPanel.getBottom(), secondaryPanel.getBottom());
+        if (joinBottom > joinTop)
+            g.fillRect(sharedX, joinTop, thickness, joinBottom - joinTop);
 
-        const float lowerRightTop = secondaryPanel.getBottom();
-        const float lowerRightHeight = juce::jmax(0.0f, primaryPanel.getBottom() - lowerRightTop);
-        if (lowerRightHeight > 0.0f)
-            g.fillRect(sharedX, lowerRightTop, thickness, lowerRightHeight);
+        // Cap any protruding vertical segment at the shared edge outside the secondary.
+        if (secondaryPanel.getY() > primaryPanel.getY())
+            g.fillRect(sharedX, primaryPanel.getY(), thickness, secondaryPanel.getY() - primaryPanel.getY());
 
-        drawPanelBorderEdges(g, secondaryPanel, thickness, true, true, true, true);
+        if (secondaryPanel.getBottom() < primaryPanel.getBottom())
+            g.fillRect(sharedX,
+                       secondaryPanel.getBottom(),
+                       thickness,
+                       primaryPanel.getBottom() - secondaryPanel.getBottom());
+
+        if (primaryPanel.getY() > secondaryPanel.getY())
+            g.fillRect(sharedX, secondaryPanel.getY(), thickness, primaryPanel.getY() - secondaryPanel.getY());
+
+        if (primaryPanel.getBottom() < secondaryPanel.getBottom())
+            g.fillRect(sharedX,
+                       primaryPanel.getBottom(),
+                       thickness,
+                       secondaryPanel.getBottom() - primaryPanel.getBottom());
+
+        // Close secondary left edge above/below shared join (already covered by fillRect join when aligned).
+        // Re-draw secondary left only where it does not overlap primary height.
+        if (secondaryPanel.getY() < primaryPanel.getY())
+            g.fillRect(secondaryPanel.getX(),
+                       secondaryPanel.getY(),
+                       thickness,
+                       primaryPanel.getY() - secondaryPanel.getY());
+
+        if (secondaryPanel.getBottom() > primaryPanel.getBottom())
+            g.fillRect(secondaryPanel.getX(),
+                       primaryPanel.getBottom(),
+                       thickness,
+                       secondaryPanel.getBottom() - primaryPanel.getBottom());
     }
 
     bool HierarchicalPopupMenu::hitTest(int x, int y)
@@ -398,68 +851,81 @@ namespace TSS
     void HierarchicalPopupMenu::paint(juce::Graphics& g)
     {
         const auto primaryPanel = getPrimaryPanelBounds();
+        const auto primaryContent = getPrimaryContentBounds();
         const auto popupLook = owner_.getPopupMenuLook();
 
         renderer_.drawBackground(g, primaryPanel);
-        for (int primaryIndex = 0; primaryIndex < getOpenablePrimaryCount(); ++primaryIndex)
+
         {
-            const auto storageIndex = primaryStorageIndexForOpenableIndex(owner_, primaryIndex);
-            if (storageIndex < 0)
-                continue;
+            juce::Graphics::ScopedSaveState clipState(g);
+            g.reduceClipRegion(primaryContent.toNearestInt());
 
-            const auto& primary = owner_.getPrimaryItem(storageIndex);
-            const auto itemBounds = getPrimaryItemBounds(primaryIndex);
-            const bool isHighlighted = primaryIndex == highlightedPrimaryIndex_;
-            renderer_.drawLabelItem(g, primary.label, itemBounds, isHighlighted, true, cachedFont_);
+            for (int primaryIndex = 0; primaryIndex < getOpenablePrimaryCount(); ++primaryIndex)
+            {
+                const auto storageIndex = primaryStorageIndexForOpenableIndex(owner_, primaryIndex);
+                if (storageIndex < 0)
+                    continue;
 
-            if (! primary.children.empty())
-                renderer_.drawSubMenuChevron(g, itemBounds, cachedFont_);
+                const auto& primary = owner_.getPrimaryItem(storageIndex);
+                const auto itemBounds = getPrimaryItemBounds(primaryIndex);
+                if (! itemBounds.intersects(primaryContent))
+                    continue;
+
+                const bool isHighlighted = primaryIndex == highlightedPrimaryIndex_;
+                renderer_.drawLabelItem(g, primary.label, itemBounds, isHighlighted, true, cachedFont_);
+
+                if (! primary.children.empty())
+                    renderer_.drawSubMenuChevron(g, itemBounds, cachedFont_);
+            }
         }
-
-        g.setColour(popupLook.border);
-        const float border = getLayoutBorderThickness();
 
         if (hasSecondaryColumn())
         {
             const auto secondaryPanel = getSecondaryPanelBounds();
+            const auto secondaryContent = getSecondaryContentBounds();
             const auto storageIndex = primaryStorageIndexForOpenableIndex(owner_, highlightedPrimaryIndex_);
             const auto& primary = owner_.getPrimaryItem(storageIndex);
 
             renderer_.drawBackground(g, secondaryPanel);
-            for (size_t childIndex = 0; childIndex < primary.children.size(); ++childIndex)
+
             {
-                const auto itemBounds = getSecondaryItemBounds(static_cast<int>(childIndex));
-                const bool isHighlighted = highlightedChildIndex_ == static_cast<int>(childIndex);
-                renderer_.drawLabelItem(g,
-                                        primary.children[childIndex].label,
-                                        itemBounds,
-                                        isHighlighted,
-                                        true,
-                                        cachedFont_);
+                juce::Graphics::ScopedSaveState clipState(g);
+                g.reduceClipRegion(secondaryContent.toNearestInt());
+
+                for (size_t childIndex = 0; childIndex < primary.children.size(); ++childIndex)
+                {
+                    const auto itemBounds = getSecondaryItemBounds(static_cast<int>(childIndex));
+                    if (! itemBounds.intersects(secondaryContent))
+                        continue;
+
+                    const bool isHighlighted = highlightedChildIndex_ == static_cast<int>(childIndex);
+                    renderer_.drawLabelItem(g,
+                                            primary.children[childIndex].label,
+                                            itemBounds,
+                                            isHighlighted,
+                                            true,
+                                            cachedFont_);
+                }
             }
 
-            drawStaircasePanelBorders(g, primaryPanel, secondaryPanel, border);
+            g.setColour(popupLook.border);
+            drawAlignedPanelBorders(g, primaryPanel, secondaryPanel, getLayoutBorderThickness());
         }
         else
         {
-            drawPanelBorderEdges(g, primaryPanel, border, true, true, true, true);
+            g.setColour(popupLook.border);
+            drawPanelBorderEdges(g, primaryPanel, getLayoutBorderThickness(), true, true, true, true);
         }
+    }
+
+    void HierarchicalPopupMenu::resized()
+    {
+        layoutScrollBars();
     }
 
     void HierarchicalPopupMenu::mouseMove(const juce::MouseEvent& e)
     {
-        const auto previousPrimary = highlightedPrimaryIndex_;
-        const auto hadSecondary = hasSecondaryColumn();
         updateHighlightFromPosition(e.getPosition().x, e.getPosition().y);
-
-        if (highlightedPrimaryIndex_ != previousPrimary || hasSecondaryColumn() != hadSecondary)
-        {
-            float width = 0.0f;
-            float height = 0.0f;
-            getPreferredContentSize(width, height);
-            setSize(juce::roundToInt(width), juce::roundToInt(height));
-            repaint();
-        }
     }
 
     void HierarchicalPopupMenu::mouseUp(const juce::MouseEvent& e)
@@ -471,6 +937,15 @@ namespace TSS
             return;
         }
 
+        // Ignore clicks on the primary scrollbar.
+        const auto primaryContent = getPrimaryContentBounds();
+        if (primaryNeedsScrollbar()
+            && primaryContent.contains(static_cast<float>(e.x), static_cast<float>(e.y))
+            && static_cast<float>(e.x) >= primaryContent.getRight() - getScrollbarThickness())
+        {
+            return;
+        }
+
         const auto primaryIndex = getPrimaryIndexAt(e.getPosition().x, e.getPosition().y);
         if (primaryIndex >= 0)
             selectPrimaryLeaf(primaryIndex);
@@ -478,6 +953,23 @@ namespace TSS
 
     void HierarchicalPopupMenu::mouseExit(const juce::MouseEvent&)
     {
+    }
+
+    void HierarchicalPopupMenu::mouseWheelMove(const juce::MouseEvent& e, const juce::MouseWheelDetails& wheel)
+    {
+        const int delta = juce::roundToInt(-wheel.deltaY * kWheelScrollFactorContent_);
+        if (delta == 0)
+            return;
+
+        if (hasSecondaryColumn()
+            && getSecondaryPanelBounds().contains(static_cast<float>(e.x), static_cast<float>(e.y)))
+        {
+            scrollSecondaryBy(delta);
+            return;
+        }
+
+        if (getPrimaryPanelBounds().contains(static_cast<float>(e.x), static_cast<float>(e.y)))
+            scrollPrimaryBy(delta);
     }
 
     void HierarchicalPopupMenu::inputAttemptWhenModal()
@@ -518,10 +1010,19 @@ namespace TSS
             owner,
             juce::roundToInt(contentWidth),
             juce::roundToInt(contentHeight),
-            ComboBox::getPopupLayoutDimensions().verticalMargin);
+            rawPtr->getScaledVerticalMargin());
+
+        rawPtr->opensAbove_ = dimensions.opensAbove;
+
+        // Recompute panel Y offsets now that opensAbove_ is known.
+        rawPtr->getPreferredContentSize(contentWidth, contentHeight);
 
         topLevelComponent->addAndMakeVisible(popupMenu.release());
-        rawPtr->setBounds(dimensions.x, dimensions.y, dimensions.width, dimensions.height);
+        rawPtr->setBounds(dimensions.x,
+                          dimensions.y,
+                          juce::roundToInt(contentWidth),
+                          juce::roundToInt(contentHeight));
+        rawPtr->layoutScrollBars();
         rawPtr->toFront(false);
         rawPtr->grabKeyboardFocus();
         rawPtr->enterModalState(false, nullptr, true);

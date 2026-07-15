@@ -208,6 +208,13 @@ namespace TSS
                 if (trimmedChildLabel == "-" || trimmedChildLabel == juce::String::fromUTF8("\xe2\x80\x94"))
                     return primary->label;
 
+                // Full patch names (Mxx / Mxx-Ryy) replace the closed-control text.
+                if (trimmedChildLabel == primary->label
+                    || trimmedChildLabel.startsWith(primary->label + "-"))
+                {
+                    return trimmedChildLabel;
+                }
+
                 return primary->label + " " + child->label;
             }
         }
