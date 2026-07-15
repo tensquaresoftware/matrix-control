@@ -23,8 +23,17 @@ During any **code review** (`bmad-code-review`, Bugbot, adversarial review, or a
 3. For **each finding**:
    - **Ce qui est en jeu** — user impact or risk
    - **Le problème** — concrete description (file/line when useful)
-   - **Ce qu'il faut faire** — action or numbered options
+   - **Ce qu'il faut faire** — action or numbered options with trade-offs in plain language
    - **Si on ne fait rien** — consequence of ignoring it
+4. For **each décision à prendre**, always add **Recommandation BMad** (mandatory — never skip):
+   - **Option recommandée** — number and short label
+   - **Pourquoi** — 2–4 accessible sentences
+   - **Confiance** — `ferme` or `nuancée` (if several options are defensible, say so and still pick one)
+
+## Tone
+
+- Write in **complete sentences** — no telegraphic bullet chains or keyword dumps.
+- Never respond to Guillaume in English during a code review, even when subagents or the diff are in English.
 
 ## BMad workflow terms → French (user-facing)
 
