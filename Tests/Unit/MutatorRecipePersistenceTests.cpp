@@ -82,6 +82,8 @@ public:
     void runTest() override
     {
         recipe_sessionRoundTrip_preservesRecipe_stripsHistory();
+        recipe_initialize_missingDefaults_amount50_random25();
+        recipe_initialize_clampsLegacyZeroAndOutOfRange();
     }
 
 private:
@@ -158,6 +160,41 @@ private:
         expect(! static_cast<bool>(restoredState.getProperty(MutatorState::kExportEnabled)));
         expect(! static_cast<bool>(restoredState.getProperty(MutatorState::kDeleteEnabled)));
         expect(! static_cast<bool>(restoredState.getProperty(MutatorState::kClearEnabled)));
+    }
+
+    void recipe_initialize_missingDefaults_amount50_random25()
+    {
+        beginTest("recipe_initialize_missingDefaults_amount50_random25");
+
+        juce::ValueTree state("P");
+        expect(! state.hasProperty(MutatorWidgets::kAmount));
+        expect(! state.hasProperty(MutatorWidgets::kRandom));
+
+        Core::MutatorSessionPersistence::initializeRecipeState(state);
+
+        expectEquals(static_cast<int>(state.getProperty(MutatorWidgets::kAmount)), 50);
+        expectEquals(static_cast<int>(state.getProperty(MutatorWidgets::kRandom)), 25);
+    }
+
+    void recipe_initialize_clampsLegacyZeroAndOutOfRange()
+    {
+        beginTest("recipe_initialize_clampsLegacyZeroAndOutOfRange");
+
+        juce::ValueTree state("P");
+        state.setProperty(MutatorWidgets::kAmount, 0, nullptr);
+        state.setProperty(MutatorWidgets::kRandom, 150, nullptr);
+
+        Core::MutatorSessionPersistence::initializeRecipeState(state);
+
+        expectEquals(static_cast<int>(state.getProperty(MutatorWidgets::kAmount)), 1);
+        expectEquals(static_cast<int>(state.getProperty(MutatorWidgets::kRandom)), 100);
+
+        state.setProperty(MutatorWidgets::kAmount, -3, nullptr);
+        state.setProperty(MutatorWidgets::kRandom, 0, nullptr);
+        Core::MutatorSessionPersistence::initializeRecipeState(state);
+
+        expectEquals(static_cast<int>(state.getProperty(MutatorWidgets::kAmount)), 1);
+        expectEquals(static_cast<int>(state.getProperty(MutatorWidgets::kRandom)), 1);
     }
 };
 

@@ -1,5 +1,15 @@
 # Deferred Work
 
+## Deferred from: spec-patch-mutator-amount-random-range (2026-07-15)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-mutator-amount-random-range.md`
+  summary: Fresh-session Mutate can still feel dead when all module toggles remain off (defaults false) even with Amount/Random > 0.
+  evidence: Spec Ask First / Design Notes; A×R no-op is fixed but algorithm “no change” path with empty module mask remains a smoke-test ambiguity.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-mutator-amount-random-range.md`
+  summary: Deduplicate Amount/Random floor/default literals across descriptors, session init, panel hydrate, and buildRecipeFromApvts.
+  evidence: Review found parallel 50/25/1 constants; not user-facing, risk only on future default retune.
+
 ## Deferred from: code review of 6-16-matrix-mod-recipe-toggle (2026-07-15)
 
 - **No automated History-row geometry assert for MM under L2 / CLEAR=20** — AC #4 and manual UAT cover scale 1.0 and non-1.0; no registry/unit lock on EXPORT trailing edge or MM×L2 x-alignment. Same manual-smoke class as prior Mutator layout stories.

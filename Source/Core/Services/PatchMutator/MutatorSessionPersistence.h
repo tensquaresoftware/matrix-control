@@ -10,11 +10,29 @@ namespace Core::MutatorSessionPersistence
     {
         namespace Mutator = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets;
 
+        constexpr int kRecipePercentMin = 1;
+        constexpr int kRecipePercentMax = 100;
+        constexpr int kDefaultAmountPercent = 50;
+        constexpr int kDefaultRandomPercent = 25;
+
+        const auto clampRecipePercent = [](int value) noexcept
+        {
+            return juce::jlimit(kRecipePercentMin, kRecipePercentMax, value);
+        };
+
         if (! state.hasProperty(Mutator::kAmount))
-            state.setProperty(Mutator::kAmount, 0, nullptr);
+            state.setProperty(Mutator::kAmount, kDefaultAmountPercent, nullptr);
+        else
+            state.setProperty(Mutator::kAmount,
+                              clampRecipePercent(static_cast<int>(state.getProperty(Mutator::kAmount))),
+                              nullptr);
 
         if (! state.hasProperty(Mutator::kRandom))
-            state.setProperty(Mutator::kRandom, 0, nullptr);
+            state.setProperty(Mutator::kRandom, kDefaultRandomPercent, nullptr);
+        else
+            state.setProperty(Mutator::kRandom,
+                              clampRecipePercent(static_cast<int>(state.getProperty(Mutator::kRandom))),
+                              nullptr);
 
         const char* toggleIds[] = {
             Mutator::kEnableDco1,

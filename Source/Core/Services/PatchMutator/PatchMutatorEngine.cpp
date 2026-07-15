@@ -782,8 +782,8 @@ MutationRecipe PatchMutatorEngine::buildRecipeFromApvts() const
     const auto& state = apvts_.state;
 
     MutationRecipe recipe;
-    recipe.amountPercent = readPatchMutatorPercent(apvts_, PatchMutator::kAmount, 0);
-    recipe.randomPercent = readPatchMutatorPercent(apvts_, PatchMutator::kRandom, 0);
+    recipe.amountPercent = readPatchMutatorPercent(apvts_, PatchMutator::kAmount, 50);
+    recipe.randomPercent = readPatchMutatorPercent(apvts_, PatchMutator::kRandom, 25);
     recipe.enableDco1 = readBoolProperty(state, PatchMutator::kEnableDco1, false);
     recipe.enableDco2 = readBoolProperty(state, PatchMutator::kEnableDco2, false);
     recipe.enableVcfVca = readBoolProperty(state, PatchMutator::kEnableVcfVca, false);

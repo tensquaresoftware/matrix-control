@@ -15,7 +15,6 @@
 #include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginIDs.h"
 #include "GUI/Factories/WidgetFactory.h"
-#include "Core/Factories/ApvtsFactory.h"
 #include "Core/Services/PatchMutator/MutationNaming.h"
 
 namespace
@@ -31,12 +30,28 @@ namespace
         TSS::Button* button;
     };
 
-    void hydrateIntSlider(TSS::Slider* slider, const juce::ValueTree& state, const char* propertyId)
+    const PluginDescriptors::IntParameterDescriptor* findMutatorIntDescriptor(const char* parameterId)
+    {
+        const auto& descriptors = PluginDescriptors::PatchManagerSection::PatchMutatorModule::kIntParameters;
+
+        for (const auto& descriptor : descriptors)
+        {
+            if (descriptor.parameterId == parameterId)
+                return &descriptor;
+        }
+
+        return nullptr;
+    }
+
+    void hydrateIntSlider(TSS::Slider* slider,
+                          const juce::ValueTree& state,
+                          const char* propertyId,
+                          int defaultValue)
     {
         if (slider == nullptr)
             return;
 
-        slider->setValue(static_cast<double>(static_cast<int>(state.getProperty(propertyId, 0))),
+        slider->setValue(static_cast<double>(static_cast<int>(state.getProperty(propertyId, defaultValue))),
                          juce::dontSendNotification);
     }
 
@@ -163,20 +178,17 @@ void PatchMutatorPanel::setupAmountLine(TSS::ISkin& skin, WidgetFactory& widgetF
         PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kAmount);
     addAndMakeVisible(*amountLabel_);
 
-    const auto allIntParams = ApvtsFactory::getAllIntParameters();
-    const auto amountIt = std::find_if(allIntParams.begin(), allIntParams.end(),
-        [](const PluginDescriptors::IntParameterDescriptor& desc) {
-            return desc.parameterId == PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kAmount;
-        });
-    
+    const auto* amountDesc = findMutatorIntDescriptor(
+        PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kAmount);
+
     amountSlider_ = std::make_unique<TSS::Slider>(
         dims_.sliders.patchMutatorWidth,
         dims_.sliders.standardHeight,
         TSS::sliderLookFromSkin(skin),
         TSS::SliderConfig{
-            amountIt != allIntParams.end() ? static_cast<double>(amountIt->minValue) : 0.0,
-            amountIt != allIntParams.end() ? static_cast<double>(amountIt->maxValue) : 100.0,
-            amountIt != allIntParams.end() ? static_cast<double>(amountIt->defaultValue) : 0.0,
+            amountDesc != nullptr ? static_cast<double>(amountDesc->minValue) : 1.0,
+            amountDesc != nullptr ? static_cast<double>(amountDesc->maxValue) : 100.0,
+            amountDesc != nullptr ? static_cast<double>(amountDesc->defaultValue) : 50.0,
             1.0,
             PluginDisplayNames::Units::kPercent,
             {},
@@ -250,20 +262,17 @@ void PatchMutatorPanel::setupRandomLine(TSS::ISkin& skin, WidgetFactory& widgetF
         PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kRandom);
     addAndMakeVisible(*randomLabel_);
 
-    const auto allIntParams = ApvtsFactory::getAllIntParameters();
-    const auto randomIt = std::find_if(allIntParams.begin(), allIntParams.end(),
-        [](const PluginDescriptors::IntParameterDescriptor& desc) {
-            return desc.parameterId == PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kRandom;
-        });
-    
+    const auto* randomDesc = findMutatorIntDescriptor(
+        PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kRandom);
+
     randomSlider_ = std::make_unique<TSS::Slider>(
         dims_.sliders.patchMutatorWidth,
         dims_.sliders.standardHeight,
         TSS::sliderLookFromSkin(skin),
         TSS::SliderConfig{
-            randomIt != allIntParams.end() ? static_cast<double>(randomIt->minValue) : 0.0,
-            randomIt != allIntParams.end() ? static_cast<double>(randomIt->maxValue) : 100.0,
-            randomIt != allIntParams.end() ? static_cast<double>(randomIt->defaultValue) : 0.0,
+            randomDesc != nullptr ? static_cast<double>(randomDesc->minValue) : 1.0,
+            randomDesc != nullptr ? static_cast<double>(randomDesc->maxValue) : 100.0,
+            randomDesc != nullptr ? static_cast<double>(randomDesc->defaultValue) : 25.0,
             1.0,
             PluginDisplayNames::Units::kPercent,
             {},
@@ -441,6 +450,9 @@ void PatchMutatorPanel::setupHistoryLine(TSS::ISkin& skin, WidgetFactory& widget
 void PatchMutatorPanel::valueTreePropertyChanged(juce::ValueTree&,
                                                const juce::Identifier& property)
 {
+    if (recipeHydrating_)
+        return;
+
     const auto name = property.toString();
 
     if (isRecipeProperty(name))
@@ -486,11 +498,26 @@ bool PatchMutatorPanel::isRecipeProperty(const juce::String& propertyName)
 
 void PatchMutatorPanel::refreshRecipeFromApvts()
 {
-    const auto& state = apvts_.state;
+    auto& state = apvts_.state;
 
     recipeHydrating_ = true;
-    hydrateIntSlider(amountSlider_.get(), state, MutatorWidgets::kAmount);
-    hydrateIntSlider(randomSlider_.get(), state, MutatorWidgets::kRandom);
+
+    const auto clampRecipePercentProperty = [&state](const char* propertyId, int defaultValue)
+    {
+        const int raw = state.hasProperty(propertyId)
+                            ? static_cast<int>(state.getProperty(propertyId))
+                            : defaultValue;
+        const int clamped = juce::jlimit(1, 100, raw);
+
+        if (! state.hasProperty(propertyId) || static_cast<int>(state.getProperty(propertyId)) != clamped)
+            state.setProperty(propertyId, clamped, nullptr);
+    };
+
+    clampRecipePercentProperty(MutatorWidgets::kAmount, 50);
+    clampRecipePercentProperty(MutatorWidgets::kRandom, 25);
+
+    hydrateIntSlider(amountSlider_.get(), state, MutatorWidgets::kAmount, 50);
+    hydrateIntSlider(randomSlider_.get(), state, MutatorWidgets::kRandom, 25);
     hydrateRecipeTogglesFromApvts(state);
     recipeHydrating_ = false;
 }

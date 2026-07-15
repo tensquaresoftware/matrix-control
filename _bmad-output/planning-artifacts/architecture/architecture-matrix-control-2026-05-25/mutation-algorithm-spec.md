@@ -46,10 +46,12 @@ The engine MUST build a `MutationRecipe` from APVTS at each MUTATE or RETRY invo
 
 | Property ID | Type | Range | Default | SysEx |
 |---|---|---|---|---|
-| `patchMutatorAmount` | int | 0–100 (percent) | 0 | `kNoSysExId` (recipe only) |
-| `patchMutatorRandom` | int | 0–100 (percent) | 0 | `kNoSysExId` (recipe only) |
+| `patchMutatorAmount` | int | **UI / recipe state:** 1–100 (percent); algorithm still accepts 0 for defensive early-exit | 50 | `kNoSysExId` (recipe only) |
+| `patchMutatorRandom` | int | **UI / recipe state:** 1–100 (percent); algorithm still accepts 0 for defensive early-exit | 25 | `kNoSysExId` (recipe only) |
 
 Descriptor source: `PluginDescriptors::PatchManagerSection::PatchMutatorModule::kIntParameters`.
+
+`MutatorSessionPersistence::initializeRecipeState` MUST initialize missing Amount/Random to these defaults and MUST clamp any existing values into **[1, 100]** with write-back (legacy sessions may store 0).
 
 ### 2.2 Module enable toggles (Patch Edit)
 
@@ -83,8 +85,8 @@ Default **off** (same as other enable toggles). Do **not** fold Matrix Mod into 
 ```cpp
 struct MutationRecipe
 {
-    int amountPercent;   // 0–100, clamped
-    int randomPercent;   // 0–100, clamped
+    int amountPercent;   // UI recipe floor 1–100; 0 still valid for defensive early-exit / tests
+    int randomPercent;   // UI recipe floor 1–100; 0 still valid for defensive early-exit / tests
     bool enableDco1;
     bool enableDco2;
     bool enableVcfVca;
@@ -108,6 +110,8 @@ The algorithm MUST return `false` (no mutation applied) when:
 - `amountPercent == 0` **OR** `randomPercent == 0` — output buffer MUST be byte-identical to input (all 134 bytes).
 
 When this condition holds, the implementation MUST NOT consume RNG draws.
+
+> **UI note:** Patch Mutator panel and `initializeRecipeState` use floor **1%** for Amount/Random. Programmatic / test recipes may still supply 0; the early-exit above remains normative.
 
 When `A > 0` and `R > 0`, the algorithm processes all eligible descriptors (§5 module mask + §7 Matrix Mod). After processing, it MUST return `false` if every byte 8–133 is unchanged from input; otherwise MUST return `true`. Bytes 0–7 MUST remain unchanged in all cases.
 

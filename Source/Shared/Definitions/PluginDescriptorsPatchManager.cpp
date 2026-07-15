@@ -322,9 +322,9 @@ namespace PluginDescriptors
             .parameterId = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kAmount,
             .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kAmount,
             .parentGroupId = PluginIDs::PatchManagerSection::PatchMutatorModule::kGroupId,
-            .minValue = 0,
+            .minValue = 1,
             .maxValue = 100,
-            .defaultValue = 0,
+            .defaultValue = 50,
             .sysExOffset = 0,
             .sysExId = kNoSysExId
         },
@@ -332,9 +332,9 @@ namespace PluginDescriptors
             .parameterId = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kRandom,
             .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kRandom,
             .parentGroupId = PluginIDs::PatchManagerSection::PatchMutatorModule::kGroupId,
-            .minValue = 0,
+            .minValue = 1,
             .maxValue = 100,
-            .defaultValue = 0,
+            .defaultValue = 25,
             .sysExOffset = 0,
             .sysExId = kNoSysExId
         }
