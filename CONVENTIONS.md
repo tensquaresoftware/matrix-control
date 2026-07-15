@@ -93,18 +93,18 @@ When Guillaume starts a conversation with a **BMad skill** (attached skill or sl
 
 Use the MCP tool `rename_chat` (`cursor-app-control`). Cursor rule: `.cursor/rules/bmad-agent-chat-titles.mdc`.
 
-**Format:** `BMad {Workflow Label} {Story ID}` — omit the story ID when none is provided.
+**Format:** `BMad — {Workflow Label} {Story ID}` — use an em dash (`—`) after `BMad`; omit the story ID when none is provided.
 
-**No date in the title.** Do not append a date in parentheses (e.g. `BMad Sprint Status (2026-06-19)`). The Agents sidebar already shows when each conversation took place. Several runs of the same command may share the same title.
+**No date in the title.** Do not append a date in parentheses (e.g. `BMad — Sprint Status (2026-06-19)`). The Agents sidebar already shows when each conversation took place. Several runs of the same command may share the same title.
 
 | Command (examples) | Sidebar title |
 |---|---|
-| `/bmad-create-story 4-5` | `BMad Create Story 4-5` |
-| `/bmad-dev-story 4-5` | `BMad Dev Story 4-5` |
-| `/bmad-code-review 4-5` | `BMad Code Review 4-5` |
-| `/bmad-correct-course 4-5` | `BMad Correct Course 4-5` |
-| `/bmad-sprint-status` | `BMad Sprint Status` |
-| `/bmad-help` | `BMad Help` |
+| `/bmad-create-story 4-5` | `BMad — Create Story 4-5` |
+| `/bmad-dev-story 4-5` | `BMad — Dev Story 4-5` |
+| `/bmad-code-review 4-5` | `BMad — Code Review 4-5` |
+| `/bmad-correct-course 4-5` | `BMad — Correct Course 4-5` |
+| `/bmad-sprint-status` | `BMad — Sprint Status` |
+| `/bmad-help` | `BMad — Help` |
 
 Story IDs include epic-story numbers (`4-5`, `7-3b`) and utility stories (`U-0`, `U-11`).
 
