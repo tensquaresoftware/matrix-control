@@ -23,6 +23,13 @@ namespace Core
         bool enableLfo1 = false;
         bool enableLfo2 = false;
         bool enableMatrixMod = false;
+
+        bool hasAnyModuleEnabled() const noexcept
+        {
+            return enableDco1 || enableDco2 || enableVcfVca || enableFmTrack
+                   || enableRampPortamento || enableEnvelope1 || enableEnvelope2
+                   || enableEnvelope3 || enableLfo1 || enableLfo2 || enableMatrixMod;
+        }
     };
 
     struct IRandomSource

@@ -19,6 +19,7 @@ namespace
     namespace MutatorState = PluginIDs::PatchManagerSection::PatchMutatorModule::StateProperties;
 
     constexpr const char* kNoOpRecipeFooterMessage = "Set Amount and Random above 0 to mutate.";
+    constexpr const char* kNoModuleScopeFooterMessage = "Enable at least one module to mutate.";
     constexpr const char* kNoMutationChangeFooterMessage =
         "Mutation made no changes. Try higher Amount or Random.";
     constexpr const char* kHistoryLimitFooterMessage = "Mutation history is full. Defrag to continue.";
@@ -186,6 +187,14 @@ MutatorActionResult PatchMutatorEngine::mutate()
         return result;
     }
 
+    if (! recipe.hasAnyModuleEnabled())
+    {
+        MutatorActionResult result;
+        result.footerMessage = kNoModuleScopeFooterMessage;
+        result.footerSeverity = kFooterSeverityWarning;
+        return result;
+    }
+
     const PatchModel auditionBuffer = resolveAuditionBuffer();
 
     if (! historyStore_.hasInitialSnapshot())
@@ -287,6 +296,14 @@ MutatorActionResult PatchMutatorEngine::retry()
     {
         MutatorActionResult result;
         result.footerMessage = kNoOpRecipeFooterMessage;
+        result.footerSeverity = kFooterSeverityWarning;
+        return result;
+    }
+
+    if (! recipe.hasAnyModuleEnabled())
+    {
+        MutatorActionResult result;
+        result.footerMessage = kNoModuleScopeFooterMessage;
         result.footerSeverity = kFooterSeverityWarning;
         return result;
     }
@@ -632,9 +649,10 @@ void PatchMutatorEngine::syncHistoryUiProperties(juce::AudioProcessorValueTreeSt
 
 namespace
 {
-    bool computeMutateEnabled(const Core::MutationHistoryStore& store)
+    bool computeMutateEnabled(const Core::MutationHistoryStore& store,
+                              const Core::MutationRecipe& recipe)
     {
-        return store.peekNextRootIndex().has_value();
+        return store.peekNextRootIndex().has_value() && recipe.hasAnyModuleEnabled();
     }
 
     bool computeExportEnabled(const Core::MutationHistoryStore& store)
@@ -660,8 +678,11 @@ void PatchMutatorEngine::refreshActionEnabledMirrors(juce::AudioProcessorValueTr
 {
     applySelectionFromApvts();
 
+    const auto recipe = buildRecipeFromApvts();
     auto& state = apvts.state;
-    state.setProperty(MutatorState::kMutateEnabled, computeMutateEnabled(historyStore_), nullptr);
+    state.setProperty(MutatorState::kMutateEnabled,
+                      computeMutateEnabled(historyStore_, recipe),
+                      nullptr);
     state.setProperty(MutatorState::kRetryEnabled,
                       computeRetryEnabled(historyStore_, selectedRootIndex_),
                       nullptr);

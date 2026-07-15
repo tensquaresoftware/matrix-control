@@ -84,6 +84,7 @@ public:
         recipe_sessionRoundTrip_preservesRecipe_stripsHistory();
         recipe_initialize_missingDefaults_amount50_random25();
         recipe_initialize_clampsLegacyZeroAndOutOfRange();
+        recipe_emptyHistoryMirrors_allTogglesOff_disablesMutate();
     }
 
 private:
@@ -196,6 +197,26 @@ private:
         expectEquals(static_cast<int>(state.getProperty(MutatorWidgets::kAmount)), 1);
         expectEquals(static_cast<int>(state.getProperty(MutatorWidgets::kRandom)), 1);
     }
+
+    void recipe_emptyHistoryMirrors_allTogglesOff_disablesMutate()
+    {
+        beginTest("recipe_emptyHistoryMirrors_allTogglesOff_disablesMutate");
+
+        juce::ValueTree state("P");
+        Core::MutatorSessionPersistence::initializeRecipeState(state);
+        Core::MutatorSessionPersistence::setActionEnabledMirrorsForEmptyHistory(state);
+
+        expect(! static_cast<bool>(state.getProperty(MutatorState::kMutateEnabled)));
+        expect(! static_cast<bool>(state.getProperty(MutatorState::kRetryEnabled)));
+        expect(! static_cast<bool>(state.getProperty(MutatorState::kExportEnabled)));
+        expect(! static_cast<bool>(state.getProperty(MutatorState::kDeleteEnabled)));
+        expect(! static_cast<bool>(state.getProperty(MutatorState::kClearEnabled)));
+
+        state.setProperty(MutatorWidgets::kEnableLfo2, true, nullptr);
+        Core::MutatorSessionPersistence::setActionEnabledMirrorsForEmptyHistory(state);
+        expect(static_cast<bool>(state.getProperty(MutatorState::kMutateEnabled)));
+    }
 };
+
 
 static MutatorRecipePersistenceTests mutatorRecipePersistenceTests;

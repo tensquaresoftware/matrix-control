@@ -6,6 +6,45 @@
 
 namespace Core::MutatorSessionPersistence
 {
+    namespace detail
+    {
+        inline constexpr const char* kRecipeModuleToggleIds[] = {
+            PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableDco1,
+            PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableDco2,
+            PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableVcfVca,
+            PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableFmTrack,
+            PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableRampPortamento,
+            PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableEnvelope1,
+            PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableEnvelope2,
+            PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableEnvelope3,
+            PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableLfo1,
+            PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableLfo2,
+            PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kEnableMatrixMod
+        };
+    } // namespace detail
+
+    inline bool isRecipeModuleEnableProperty(const juce::String& propertyId)
+    {
+        for (const auto* toggleId : detail::kRecipeModuleToggleIds)
+        {
+            if (propertyId == toggleId)
+                return true;
+        }
+
+        return false;
+    }
+
+    inline bool anyRecipeModuleToggleEnabled(const juce::ValueTree& state)
+    {
+        for (const auto* toggleId : detail::kRecipeModuleToggleIds)
+        {
+            if (static_cast<bool>(state.getProperty(toggleId, false)))
+                return true;
+        }
+
+        return false;
+    }
+
     inline void initializeRecipeState(juce::ValueTree& state)
     {
         namespace Mutator = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets;
@@ -34,21 +73,7 @@ namespace Core::MutatorSessionPersistence
                               clampRecipePercent(static_cast<int>(state.getProperty(Mutator::kRandom))),
                               nullptr);
 
-        const char* toggleIds[] = {
-            Mutator::kEnableDco1,
-            Mutator::kEnableDco2,
-            Mutator::kEnableVcfVca,
-            Mutator::kEnableFmTrack,
-            Mutator::kEnableRampPortamento,
-            Mutator::kEnableEnvelope1,
-            Mutator::kEnableEnvelope2,
-            Mutator::kEnableEnvelope3,
-            Mutator::kEnableLfo1,
-            Mutator::kEnableLfo2,
-            Mutator::kEnableMatrixMod
-        };
-
-        for (const auto* toggleId : toggleIds)
+        for (const auto* toggleId : detail::kRecipeModuleToggleIds)
         {
             if (! state.hasProperty(toggleId))
                 state.setProperty(toggleId, false, nullptr);
@@ -88,7 +113,7 @@ namespace Core::MutatorSessionPersistence
     {
         namespace S = PluginIDs::PatchManagerSection::PatchMutatorModule::StateProperties;
 
-        state.setProperty(S::kMutateEnabled, true, nullptr);
+        state.setProperty(S::kMutateEnabled, anyRecipeModuleToggleEnabled(state), nullptr);
         state.setProperty(S::kRetryEnabled, false, nullptr);
         state.setProperty(S::kExportEnabled, false, nullptr);
         state.setProperty(S::kDeleteEnabled, false, nullptr);

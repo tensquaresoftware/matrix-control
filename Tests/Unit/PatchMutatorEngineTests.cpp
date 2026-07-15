@@ -69,6 +69,7 @@ public:
         mutate_gapAllocation();
         mutate_limitBlocks();
         mutate_noOpRecipe_blocked();
+        mutate_noModuleToggle_blocked();
         mutate_fromAuditionedRetry();
         mutate_sendsSysExOnce();
         mutate_neverDeletesRoots();
@@ -142,7 +143,9 @@ public:
         export_noSysEx();
 
         enabled_emptyHistory();
+        enabled_emptyHistory_noModuleToggle_disabled();
         enabled_afterFirstMutate();
+        enabled_afterFirstMutate_clearLastToggle_disablesMutate();
         enabled_rootLimit();
         enabled_retryLimit();
         enabled_afterDeleteLast();
@@ -332,6 +335,20 @@ private:
 
         const auto result = harness.engine.mutate();
         expect(! result.success);
+        expectEquals(harness.engine.rootCount(), 0);
+        expectEquals(countPatchSysExMessages(harness.queue), 0);
+    }
+
+    void mutate_noModuleToggle_blocked()
+    {
+        beginTest("mutate_noModuleToggle_blocked");
+
+        EngineHarness harness;
+        harness.setRecipe(100, 100, false);
+
+        const auto result = harness.engine.mutate();
+        expect(! result.success);
+        expectEquals(result.footerMessage, juce::String("Enable at least one module to mutate."));
         expectEquals(harness.engine.rootCount(), 0);
         expectEquals(countPatchSysExMessages(harness.queue), 0);
     }
@@ -1767,8 +1784,19 @@ private:
         beginTest("enabled_emptyHistory");
 
         EngineHarness harness;
+        harness.setRecipe(100, 100, true);
         harness.engine.refreshActionEnabledMirrors(harness.proc.apvts);
         expectActionEnabledMirrors(harness, true, false, false, false, false);
+    }
+
+    void enabled_emptyHistory_noModuleToggle_disabled()
+    {
+        beginTest("enabled_emptyHistory_noModuleToggle_disabled");
+
+        EngineHarness harness;
+        harness.setRecipe(100, 100, false);
+        harness.engine.refreshActionEnabledMirrors(harness.proc.apvts);
+        expectActionEnabledMirrors(harness, false, false, false, false, false);
     }
 
     void enabled_afterFirstMutate()
@@ -1779,6 +1807,20 @@ private:
         harness.setRecipe(100, 100, true);
         expect(harness.engine.mutate().success);
         expectActionEnabledMirrors(harness, true, true, true, true, true);
+    }
+
+    void enabled_afterFirstMutate_clearLastToggle_disablesMutate()
+    {
+        beginTest("enabled_afterFirstMutate_clearLastToggle_disablesMutate");
+
+        EngineHarness harness;
+        harness.setRecipe(100, 100, true);
+        expect(harness.engine.mutate().success);
+        expectActionEnabledMirrors(harness, true, true, true, true, true);
+
+        harness.proc.apvts.state.setProperty(PatchMutator::kEnableDco1, false, nullptr);
+        harness.engine.refreshActionEnabledMirrors(harness.proc.apvts);
+        expectActionEnabledMirrors(harness, false, true, true, true, true);
     }
 
     void enabled_rootLimit()

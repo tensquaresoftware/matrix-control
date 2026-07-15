@@ -1361,6 +1361,12 @@ void PluginProcessor::valueTreePropertyChanged(juce::ValueTree& treeWhosePropert
         }
     }
 
+    if (patchMutatorEngine_ != nullptr
+        && Core::MutatorSessionPersistence::isRecipeModuleEnableProperty(parameterId))
+    {
+        patchMutatorEngine_->refreshActionEnabledMirrors(apvts);
+    }
+
     const auto propertyName = property.toString();
     if (propertyName == MatrixDeviceTypes::kApvtsPropertyName
         || propertyName == "deviceDetected")
@@ -1560,7 +1566,10 @@ int PluginProcessor::getCurrentPatchNumberForMutator() const
 
 void PluginProcessor::initializeMutatorActionEnabledMirrorsForEmptyHistory()
 {
-    Core::MutatorSessionPersistence::setActionEnabledMirrorsForEmptyHistory(apvts.state);
+    if (patchMutatorEngine_ != nullptr)
+        patchMutatorEngine_->refreshActionEnabledMirrors(apvts);
+    else
+        Core::MutatorSessionPersistence::setActionEnabledMirrorsForEmptyHistory(apvts.state);
 }
 
 void PluginProcessor::refreshClipboardPasteEnabledProperties()

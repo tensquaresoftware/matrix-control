@@ -1,10 +1,25 @@
 # Deferred Work
 
+## Deferred from: spec-patch-mutator-mutate-disabled-without-module-toggle (2026-07-15)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-mutator-mutate-disabled-without-module-toggle.md`
+  summary: Dual “any module enabled” encodings (MutationRecipe fields vs ValueTree toggle-ID table) can drift if a toggle is added later.
+  evidence: Blind Hunter; `hasAnyModuleEnabled` and `anyRecipeModuleToggleEnabled` / `buildRecipeFromApvts` are parallel maps.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-mutator-mutate-disabled-without-module-toggle.md`
+  summary: No automated test covers PluginProcessor live listener path that refreshes mirrors on toggle change.
+  evidence: Blind Hunter; unit tests call `refreshActionEnabledMirrors` directly after setProperty.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-mutator-mutate-disabled-without-module-toggle.md`
+  summary: PatchMutatorPanel keeps a separate hand-maintained recipe enable-ID list for UI hydration.
+  evidence: Blind Hunter; pre-existing fork with Core toggle tables; out of oneshot scope to consolidate.
+
 ## Deferred from: spec-patch-mutator-amount-random-range (2026-07-15)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-patch-mutator-amount-random-range.md`
   summary: Fresh-session Mutate can still feel dead when all module toggles remain off (defaults false) even with Amount/Random > 0.
-  evidence: Spec Ask First / Design Notes; A×R no-op is fixed but algorithm “no change” path with empty module mask remains a smoke-test ambiguity.
+  evidence: Spec Ask First / Design Notes; A×R no-op is fixed but algorithm “no change” path with empty module mask remains a smoke-test ambiguity. *Superseded for UX greying by spec-patch-mutator-mutate-disabled-without-module-toggle (button disabled + engine footer); leave until next persistence cleanup if still relevant.*
+
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-patch-mutator-amount-random-range.md`
   summary: Deduplicate Amount/Random floor/default literals across descriptors, session init, panel hydrate, and buildRecipeFromApvts.
