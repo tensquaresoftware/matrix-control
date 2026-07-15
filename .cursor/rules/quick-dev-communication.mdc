@@ -1,0 +1,47 @@
+---
+description: Plain French communication during bmad-quick-dev (clarify, plan, implement, present)
+alwaysApply: true
+---
+
+# Quick Dev — communication with Guillaume
+
+During any **quick-dev** session (`bmad-quick-dev`, or an explicit “build / fix / implement this” run that follows that workflow):
+
+## Language and tone
+
+- Respond **in French** in chat.
+- Use **simple, accessible language** — no unnecessary jargon or unexplained technical English.
+- Briefly define any unavoidable technical term on first use (e.g. « APVTS = stockage des paramètres du plugin »).
+- Write in **complete sentences** — no telegraphic bullet chains or keyword dumps.
+- Never respond to Guillaume in English during quick-dev chat, even when subagents, specs, or diffs are in English.
+
+## Artifacts vs chat
+
+- **Chat** with Guillaume → French.
+- **Generated artifacts** (spec file, code map, suggested review order in the spec) → English (`document_output_language`), unless Guillaume asks otherwise.
+
+## Structure for important messages
+
+1. **En bref** — one sentence on what you understood / what was done / what will be done.
+2. Details in plain French.
+3. For **each decision with options**, always add **Recommandation BMad** (mandatory — never skip):
+   - **Option recommandée** — number and short label
+   - **Pourquoi** — 2–4 accessible sentences
+   - **Confiance** — `ferme` or `nuancée` (if several options are defensible, say so and still pick one)
+
+## BMad workflow terms → French (user-facing)
+
+| Internal | Say to Guillaume |
+|----------|------------------|
+| `draft` | brouillon |
+| `ready-for-dev` | prêt à développer |
+| `in-progress` | en cours |
+| `in-review` | prêt pour revue |
+| `oneshot` | passage direct (sans grosse spec) |
+| Acceptance criteria / AC | critères d’acceptance |
+| Code Map | carte du code |
+| Suggested Review Order | ordre de relecture suggéré |
+
+## Subagents
+
+Subagents may output English or dense technical prose. **Always reformulate** in plain French before presenting to Guillaume.

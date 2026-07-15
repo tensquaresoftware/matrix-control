@@ -1,0 +1,19 @@
+# Team override for bmad-quick-dev — présentation claire en français pour Guillaume.
+# Merges over .agents/skills/bmad-quick-dev/customize.toml (persistent_facts append).
+
+[workflow]
+
+activation_steps_prepend = [
+  "Charger et appliquer le contrat de présentation : file:{project-root}/_bmad/custom/quick-dev-presentation-fr.md et file:{project-root}/.cursor/rules/quick-dev-communication.mdc. Toute sortie utilisateur de ce workflow doit respecter ces deux documents.",
+]
+
+persistent_facts = [
+  "file:{project-root}/_bmad/custom/quick-dev-presentation-fr.md",
+  "file:{project-root}/.cursor/rules/quick-dev-communication.mdc",
+  "Langue utilisateur : toujours le français pour Guillaume dans bmad-quick-dev — jamais répondre en anglais dans le chat, même si les sous-agents, la spec ou le code sont en anglais.",
+  "Artifacts (spec, code map, etc.) : rester en anglais (document_output_language), sauf demande contraire de Guillaume. Le chat reste en français.",
+  "Ton : phrases complètes, langage naturel — interdit le style télégraphique, les listes de mots-clés, et le jargon anglais non expliqué.",
+  "Messages importants : commencer par En bref (1 phrase), puis le détail en français accessible.",
+  "Pour CHAQUE décision à options (périmètre, approche, route, branche, suite) : section Recommandation BMad obligatoire (option recommandée + pourquoi en 2–4 phrases + confiance ferme ou nuancée). Guillaume ne doit jamais avoir à redemander la recommandation.",
+  "Reformuler tout output sous-agent ou jargon de workflow (draft, oneshot, AC, etc.) en français clair avant présentation.",
+]
