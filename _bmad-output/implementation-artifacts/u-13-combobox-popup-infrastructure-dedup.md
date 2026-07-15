@@ -66,7 +66,7 @@ Remaining duplication:
    - Popup open/close notification hooks
 2. `PopupMenuBase` (or successor) consumes the host interface; **`ComboBox` implements it** without behaviour change.
 3. **`HierarchicalComboBox` implements the same interface** so popup code can share close/modal/keyboard patterns where applicable.
-4. **`HierarchicalPopupMenu` adopts shared pieces** (renderer setup, escape handling, close lifecycle, layout constant access) — full merge into `PopupMenuBase` inheritance is optional if staircase layout keeps a dedicated subclass.
+4. **`HierarchicalPopupMenu` adopts shared pieces** (renderer setup, escape handling, close lifecycle, layout constant access, aligned dual-panel borders, per-column scroll) — full merge into `PopupMenuBase` inheritance is optional if dual-panel layout keeps a dedicated subclass.
 
 ### AC 2 — Control lifecycle dedup
 
@@ -78,7 +78,7 @@ Remaining duplication:
 
 1. Manual QA via TestComponent:
    - Standard `ComboBox` (single + multi-column popup) at 50%–200%
-   - `HierarchicalComboBox` staircase popup (transparent void, N1/N2 borders, hover M01/M02)
+   - `HierarchicalComboBox` aligned dual-panel popup (transparent void, N1/N2 borders, hover M01/M02)
 2. Full unit test suite green.
 3. No diff in closed-state or popup appearance at 100% UI scale (reviewer sign-off).
 
@@ -122,9 +122,10 @@ Remaining duplication:
 - `PopupMenuPositioner` — anchor positioning
 - `ComboBox::getPopupLayoutDimensions()` — popup layout SSOT
 
-### Keep separate
+### Keep separate / share carefully
 
-- `HierarchicalPopupMenu::drawStaircasePanelBorders` and transparent `hitTest` — hierarchical-only
+- Transparent `hitTest` for dual-panel void space — hierarchical-only (may remain)
+- **Staircase borders are obsolete** (Story **6-15**): do **not** preserve `drawStaircasePanelBorders`. DRY work should share the **aligned dual-panel** border path (N1/N2 top- or bottom-aligned; shared vertical edge) plus per-column scroll/viewport patterns with `ScrollablePopupMenu`
 
 ### Estimated effort
 
