@@ -159,6 +159,7 @@ set(PLUGIN_SOURCES
     Source/Core/Services/PatchMutator/HistoryDefragService.cpp
     Source/Core/Services/PatchMutator/MutationAlgorithm.cpp
     Source/Core/Services/PatchMutator/PatchMutatorEngine.cpp
+    Source/Core/Services/PatchMutator/PatchLoadContext.cpp
     Source/Core/Util/ComboboxPatchSendDebouncer.cpp
     Source/Core/Services/ClipboardPasteEnabledResolver.cpp
     Source/Core/Services/DeviceMemoryLimits.cpp
@@ -344,6 +345,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/HistoryDefragServiceTests.cpp
         Tests/Unit/MutationAlgorithmTests.cpp
         Tests/Unit/PatchMutatorEngineTests.cpp
+        Tests/Unit/PatchLoadContextTests.cpp
         Tests/Unit/MutatorRecipePersistenceTests.cpp
         Tests/Unit/SessionPersistencePolicyTests.cpp
         Tests/Unit/ComboboxPatchSendDebouncerTests.cpp
@@ -410,6 +412,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/Services/PatchMutator/HistoryDefragService.cpp
         Source/Core/Services/PatchMutator/MutationAlgorithm.cpp
         Source/Core/Services/PatchMutator/PatchMutatorEngine.cpp
+        Source/Core/Services/PatchMutator/PatchLoadContext.cpp
         Source/Core/Util/ComboboxPatchSendDebouncer.cpp
         Source/Core/Factories/ApvtsFactory.cpp
         Source/Core/Factories/ApvtsValidator.cpp

@@ -42,6 +42,21 @@ bool MutationHistoryStore::hasInitialSnapshot() const noexcept
     return hasInitialSnapshot_;
 }
 
+void MutationHistoryStore::setFrozenExportBasename(const juce::String& basename)
+{
+    frozenExportBasename_ = basename;
+}
+
+juce::String MutationHistoryStore::getFrozenExportBasename() const
+{
+    return frozenExportBasename_;
+}
+
+bool MutationHistoryStore::hasFrozenExportBasename() const noexcept
+{
+    return frozenExportBasename_.isNotEmpty();
+}
+
 std::optional<int> MutationHistoryStore::peekNextRootIndex() const noexcept
 {
     int maxRoot = -1;
@@ -166,6 +181,7 @@ void MutationHistoryStore::clearInitialSnapshot() noexcept
 {
     hasInitialSnapshot_ = false;
     initialSnapshot_.fill(0);
+    frozenExportBasename_.clear();
 }
 
 void MutationHistoryStore::replaceRootsForDefrag(std::map<int, RootBucket>&& newRoots) noexcept

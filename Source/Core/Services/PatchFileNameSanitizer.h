@@ -9,6 +9,9 @@ namespace Core
     {
         static juce::String sanitizeFileStem(juce::String input);
         static juce::String sanitizeToMatrixName(juce::String stem);
+        // Same filtering as sanitizeToMatrixName but returns an empty string instead of the
+        // fallback when nothing survives — used by export folder naming to omit blank names.
+        static juce::String sanitizeToMatrixNameOrEmpty(juce::String stem);
         static juce::String ensureSyxExtension(const juce::String& stem);
 
         static constexpr const char* kEmptyNameFallback = "PATCH";

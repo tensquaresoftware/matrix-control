@@ -35,6 +35,18 @@ namespace
     constexpr const char* kFooterSeverityWarning = "warning";
     constexpr const char* kFooterSeverityInfo = "info";
 
+    namespace CompareMessages = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::Messages;
+
+    void clearCompareLockedFooterIfPresent(juce::AudioProcessorValueTreeState& apvts)
+    {
+        if (apvts.state.getProperty("uiMessageText").toString()
+            == juce::String(CompareMessages::kCompareLockedFooter))
+        {
+            apvts.state.setProperty("uiMessageText", juce::String(), nullptr);
+            apvts.state.setProperty("uiMessageSeverity", juce::String(), nullptr);
+        }
+    }
+
     juce::String formatExportCompleteFooterMessage(int filesWritten)
     {
         return "Exported " + juce::String(filesWritten) + " mutation file(s).";
@@ -198,7 +210,10 @@ MutatorActionResult PatchMutatorEngine::mutate()
     const PatchModel auditionBuffer = resolveAuditionBuffer();
 
     if (! historyStore_.hasInitialSnapshot())
+    {
         historyStore_.setInitialSnapshot(auditionBuffer);
+        freezeExportBasename(auditionBuffer);
+    }
 
     PatchModel parentSnapshot;
     parentSnapshot.loadFrom(auditionBuffer.data());
@@ -378,6 +393,8 @@ MutatorActionResult PatchMutatorEngine::toggleCompare()
         if (std::memcmp(auditionModel.data(), patchModel_->data(), PatchModel::kBufferSize) != 0)
             pushResultToEditorAndSynth(auditionModel);
 
+        clearCompareLockedFooterIfPresent(apvts_);
+
         MutatorActionResult result;
         result.success = true;
         return result;
@@ -410,6 +427,8 @@ MutatorActionResult PatchMutatorEngine::toggleCompare()
 
     MutatorActionResult result;
     result.success = true;
+    result.footerMessage = CompareMessages::kCompareLockedFooter;
+    result.footerSeverity = kFooterSeverityInfo;
     return result;
 }
 
@@ -519,10 +538,67 @@ MutatorActionResult PatchMutatorEngine::exportHistory(const juce::File& destinat
     if (! destinationFolder.isDirectory() || ! destinationFolder.hasWriteAccess())
         return makeExportWarningResult(kExportFolderNotWritableFooterMessage);
 
-    return makeExportHistoryResult(patchFileService_->exportMutatorHistory(
-        destinationFolder,
-        historyStore_,
-        *sysExEncoder_));
+    if (! historyStore_.hasFrozenExportBasename())
+        return makeExportHistoryResult(patchFileService_->exportMutatorHistory(
+            destinationFolder, historyStore_, *sysExEncoder_));
+
+    const auto sessionFolder = destinationFolder.getChildFile(historyStore_.getFrozenExportBasename());
+    if (sessionFolder.exists())
+    {
+        MutatorActionResult result;
+        result.exportCollisionModalRequested = true;
+        return result;
+    }
+
+    return runSessionExport(sessionFolder, false);
+}
+
+MutatorActionResult PatchMutatorEngine::exportHistoryResolved(const juce::File& destinationFolder,
+                                                              ExportCollisionResolution resolution)
+{
+    if (resolution == ExportCollisionResolution::kCancel)
+    {
+        MutatorActionResult cancelled;
+        cancelled.footerMessage = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::Messages::kExportCancelledFooter;
+        cancelled.footerSeverity = kFooterSeverityInfo;
+        return cancelled;
+    }
+
+    if (historyStore_.isEmpty())
+        return makeExportWarningResult(kEmptyHistoryFooterMessage);
+
+    if (patchFileService_ == nullptr || sysExEncoder_ == nullptr || ! historyStore_.hasFrozenExportBasename())
+        return Core::MutatorActionResult{};
+
+    if (! destinationFolder.isDirectory() || ! destinationFolder.hasWriteAccess())
+        return makeExportWarningResult(kExportFolderNotWritableFooterMessage);
+
+    const auto basename = historyStore_.getFrozenExportBasename();
+    const auto sessionFolder = resolution == ExportCollisionResolution::kKeep
+        ? Core::PatchFileService::resolveKeepSessionFolder(destinationFolder, basename)
+        : destinationFolder.getChildFile(basename);
+
+    return runSessionExport(sessionFolder, resolution == ExportCollisionResolution::kOverwrite);
+}
+
+MutatorActionResult PatchMutatorEngine::runSessionExport(const juce::File& sessionFolder, bool clearExisting)
+{
+    return makeExportHistoryResult(patchFileService_->exportMutatorHistorySession(
+        sessionFolder, historyStore_, *sysExEncoder_, clearExisting));
+}
+
+void PatchMutatorEngine::freezeExportBasename(const PatchModel& snapshot)
+{
+    if (! patchLoadContextProvider_)
+        return;
+
+    const auto context = patchLoadContextProvider_();
+    historyStore_.setFrozenExportBasename(context.computeExportBasename(snapshot.getName()));
+}
+
+void PatchMutatorEngine::setPatchLoadContextProvider(std::function<PatchLoadContext()> provider)
+{
+    patchLoadContextProvider_ = std::move(provider);
 }
 
 MutatorActionResult PatchMutatorEngine::defragHistory()
@@ -702,6 +778,7 @@ void PatchMutatorEngine::forceExitCompare()
     state.setProperty(MutatorState::kCompareActive, false, nullptr);
     compareSavedMutateRootIndex_ = -1;
     compareSavedRetryIndex_ = MutationHistoryStore::kRootOnly;
+    clearCompareLockedFooterIfPresent(apvts_);
 }
 
 std::pair<int, int> PatchMutatorEngine::resolveSelectionAfterDelete(int rootIndex,

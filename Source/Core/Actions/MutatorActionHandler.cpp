@@ -1,5 +1,6 @@
 #include "Core/Actions/MutatorActionHandler.h"
 
+#include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginIDs.h"
 
 namespace Core
@@ -9,11 +10,13 @@ namespace Core
                                                PatchMutatorEnginePort* engine,
                                                ExportFolderPicker pickExportFolder,
                                                DefragLimitModalGate showDefragLimitModal,
+                                               ExportCollisionModalGate showExportCollisionModal,
                                                int historySelectionDebounceMs)
         : apvts_(apvts)
         , engine_(engine)
         , pickExportFolder_(std::move(pickExportFolder))
         , showDefragLimitModal_(std::move(showDefragLimitModal))
+        , showExportCollisionModal_(std::move(showExportCollisionModal))
         , historySelectionDebouncer_(historySelectionDebounceMs)
     {
     }
@@ -100,7 +103,27 @@ namespace Core
         if (! folder.isDirectory())
             return;
 
-        handleEngineResult(engine_->exportHistory(folder));
+        const auto result = engine_->exportHistory(folder);
+
+        if (result.exportCollisionModalRequested && showExportCollisionModal_)
+        {
+            showExportCollisionModal_([this, folder](ExportCollisionResolution resolution)
+            {
+                if (engine_ != nullptr)
+                    handleEngineResult(engine_->exportHistoryResolved(folder, resolution));
+            });
+            return;
+        }
+
+        if (result.exportCollisionModalRequested)
+        {
+            propagateFooterMessage(
+                PluginDisplayNames::PatchManagerSection::PatchMutatorModule::Messages::kExportCancelledFooter,
+                "info");
+            return;
+        }
+
+        handleEngineResult(result);
     }
 
     void MutatorActionHandler::propagateFooterMessage(const juce::String& message,

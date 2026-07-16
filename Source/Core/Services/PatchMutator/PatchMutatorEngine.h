@@ -8,6 +8,7 @@
 #include "Core/Actions/ActionExecutionHooks.h"
 #include "Core/Services/PatchMutator/MutationAlgorithm.h"
 #include "Core/Services/PatchMutator/MutationHistoryStore.h"
+#include "Core/Services/PatchMutator/PatchLoadContext.h"
 
 class MidiManager;
 class SysExEncoder;
@@ -27,6 +28,24 @@ namespace Core
         juce::String footerMessage;
         juce::String footerSeverity;
         bool defragModalRequested = false;
+        // Export target session folder already exists — caller must resolve via modal
+        // (Overwrite / Keep / Cancel) then call exportHistoryResolved().
+        bool exportCollisionModalRequested = false;
+    };
+
+    enum class ExportCollisionResolution
+    {
+        kOverwrite,
+        kKeep,
+        kCancel
+    };
+
+    // User's choice in the pre-patch-context-change history gate (Export / Cancel / Discard).
+    enum class MutatorHistoryGateChoice
+    {
+        kExport,
+        kCancel,
+        kDiscard
     };
 
     class PatchMutatorEnginePort
@@ -40,6 +59,8 @@ namespace Core
         virtual MutatorActionResult deleteSelected() = 0;
         virtual MutatorActionResult clearHistory() = 0;
         virtual MutatorActionResult exportHistory(const juce::File& destinationFolder) = 0;
+        virtual MutatorActionResult exportHistoryResolved(const juce::File& destinationFolder,
+                                                          ExportCollisionResolution resolution) = 0;
         virtual MutatorActionResult defragHistory() = 0;
         virtual void auditionSelectedHistoryEntry() = 0;
         virtual void rebuildHistoryListMirrors() = 0;
@@ -65,7 +86,14 @@ namespace Core
         MutatorActionResult clearHistory() override;
         MutatorActionResult resetSessionForPatchLoad();
         MutatorActionResult exportHistory(const juce::File& destinationFolder) override;
+        // Second phase of export after a collision modal chose Overwrite / Keep / Cancel.
+        MutatorActionResult exportHistoryResolved(const juce::File& destinationFolder,
+                                                  ExportCollisionResolution resolution) override;
         MutatorActionResult defragHistory() override;
+
+        // Supplies the current PatchLoadContext (device vs computer file) so the engine can
+        // freeze the Export folder basename on the first MUTATE. Owned by PluginProcessor.
+        void setPatchLoadContextProvider(std::function<PatchLoadContext()> provider);
 
         void auditionSelectedHistoryEntry() override;
         void rebuildHistoryListMirrors() override;
@@ -91,6 +119,8 @@ namespace Core
         // RETRY-only — returns selected entry for parentSnapshot input; differs from audition semantics (D-083).
         std::optional<MutationEntry> resolveSelectedEntryForRetry(int rootIndex) const;
         void pushResultToEditorAndSynth(const PatchModel& mutatedModel);
+        void freezeExportBasename(const PatchModel& snapshot);
+        MutatorActionResult runSessionExport(const juce::File& sessionFolder, bool clearExisting);
         void applySelectionFromApvts();
         void forceExitCompare();
         std::pair<int, int> resolveSelectionAfterDelete(int rootIndex,
@@ -110,6 +140,7 @@ namespace Core
         std::function<int()> getCurrentPatchNumber_;
         PatchFileService* patchFileService_ = nullptr;
         SysExEncoder* sysExEncoder_ = nullptr;
+        std::function<PatchLoadContext()> patchLoadContextProvider_;
 
         MutationHistoryStore historyStore_;
         MutationAlgorithm algorithm_;

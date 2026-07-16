@@ -55,6 +55,16 @@ namespace Core
         PatchFileExportResult exportMutatorHistory(const juce::File& folder,
                                                    const MutationHistoryStore& store,
                                                    SysExEncoder& encoder);
+        // Hybrid session-folder export: writes the FR-33 layout inside sessionFolder.
+        // When clearExisting is true the folder contents are removed first (Overwrite);
+        // otherwise the folder must be created fresh.
+        PatchFileExportResult exportMutatorHistorySession(const juce::File& sessionFolder,
+                                                          const MutationHistoryStore& store,
+                                                          SysExEncoder& encoder,
+                                                          bool clearExisting);
+        // First non-existing session folder among basename, basename-2, basename-3, … (Keep).
+        static juce::File resolveKeepSessionFolder(const juce::File& parentFolder,
+                                                   const juce::String& basename);
         const PatchFolderScanResult& getLastScanResult() const noexcept { return lastScan_; }
         bool hasCachedScanResult() const noexcept;
         void clearLastScan() noexcept;
@@ -100,6 +110,9 @@ namespace Core
         PatchFileExportResult writeAllRootFolders(const juce::File& folder,
                                                   const MutationHistoryStore& store,
                                                   SysExEncoder& encoder);
+        PatchFileExportResult writeHistoryLayout(const juce::File& folder,
+                                                 const MutationHistoryStore& store,
+                                                 SysExEncoder& encoder);
 
         SysExDecoder& decoder_;
         PatchFolderScanResult lastScan_;

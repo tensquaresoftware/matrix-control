@@ -18,11 +18,14 @@ namespace Core
     public:
         using ExportFolderPicker = std::function<juce::File()>;
         using DefragLimitModalGate = std::function<void(std::function<void()>)>;
+        using ExportCollisionModalGate =
+            std::function<void(std::function<void(ExportCollisionResolution)>)>;
 
         MutatorActionHandler(juce::AudioProcessorValueTreeState& apvts,
                              PatchMutatorEnginePort* engine,
                              ExportFolderPicker pickExportFolder = {},
                              DefragLimitModalGate showDefragLimitModal = {},
+                             ExportCollisionModalGate showExportCollisionModal = {},
                              int historySelectionDebounceMs = kComboboxPatchSendDebounceMs);
 
         void handleAction(const juce::String& propertyId, const juce::var& newValue) override;
@@ -49,6 +52,7 @@ namespace Core
         PatchMutatorEnginePort* engine_;
         ExportFolderPicker pickExportFolder_;
         DefragLimitModalGate showDefragLimitModal_;
+        ExportCollisionModalGate showExportCollisionModal_;
         ComboboxPatchSendDebouncer historySelectionDebouncer_;
     };
 

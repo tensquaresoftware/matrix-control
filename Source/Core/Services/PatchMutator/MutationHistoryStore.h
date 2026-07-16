@@ -34,6 +34,12 @@ namespace Core
         PatchModel getInitialSnapshot() const;
         bool hasInitialSnapshot() const noexcept;
 
+        // Export session folder basename frozen at the first MUTATE alongside the initial
+        // snapshot. Lifetime is tied to the snapshot: cleared by clearInitialSnapshot().
+        void setFrozenExportBasename(const juce::String& basename);
+        juce::String getFrozenExportBasename() const;
+        bool hasFrozenExportBasename() const noexcept;
+
         std::optional<int> peekNextRootIndex() const noexcept;
         std::optional<int> peekNextRetryIndex(int rootIndex) const noexcept;
         bool isRootSlotsFull() const noexcept;
@@ -86,6 +92,7 @@ namespace Core
         std::map<int, RootBucket> roots_;
         std::array<juce::uint8, PatchModel::kBufferSize> initialSnapshot_ {};
         bool hasInitialSnapshot_ = false;
+        juce::String frozenExportBasename_;
     };
 
 } // namespace Core

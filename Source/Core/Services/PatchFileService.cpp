@@ -251,14 +251,10 @@ namespace Core
         return result;
     }
 
-    PatchFileExportResult PatchFileService::exportMutatorHistory(const juce::File& folder,
-                                                                 const MutationHistoryStore& store,
-                                                                 SysExEncoder& encoder)
+    PatchFileExportResult PatchFileService::writeHistoryLayout(const juce::File& folder,
+                                                               const MutationHistoryStore& store,
+                                                               SysExEncoder& encoder)
     {
-        const auto validation = validateMutatorExport(folder, store);
-        if (! validation.success)
-            return validation;
-
         PatchFileExportResult result;
 
         if (store.hasInitialSnapshot())
@@ -277,6 +273,57 @@ namespace Core
         result.filesWritten += rootsWrite.filesWritten;
         result.success = true;
         return result;
+    }
+
+    PatchFileExportResult PatchFileService::exportMutatorHistory(const juce::File& folder,
+                                                                 const MutationHistoryStore& store,
+                                                                 SysExEncoder& encoder)
+    {
+        const auto validation = validateMutatorExport(folder, store);
+        if (! validation.success)
+            return validation;
+
+        return writeHistoryLayout(folder, store, encoder);
+    }
+
+    juce::File PatchFileService::resolveKeepSessionFolder(const juce::File& parentFolder,
+                                                          const juce::String& basename)
+    {
+        constexpr int kMaxKeepSuffix = 999;
+        juce::File candidate = parentFolder.getChildFile(basename);
+
+        for (int suffix = 2; candidate.exists() && suffix <= kMaxKeepSuffix; ++suffix)
+            candidate = parentFolder.getChildFile(basename + "-" + juce::String(suffix));
+
+        return candidate;
+    }
+
+    PatchFileExportResult PatchFileService::exportMutatorHistorySession(const juce::File& sessionFolder,
+                                                                        const MutationHistoryStore& store,
+                                                                        SysExEncoder& encoder,
+                                                                        bool clearExisting)
+    {
+        PatchFileExportResult result;
+
+        if (store.isEmpty())
+        {
+            result.errorMessage = "History empty";
+            return result;
+        }
+
+        if (clearExisting && sessionFolder.exists() && ! sessionFolder.deleteRecursively())
+        {
+            result.errorMessage = "Folder not writable";
+            return result;
+        }
+
+        if (! sessionFolder.createDirectory())
+        {
+            result.errorMessage = "Folder not writable";
+            return result;
+        }
+
+        return writeHistoryLayout(sessionFolder, store, encoder);
     }
 
     PatchFileLoadResult PatchFileService::loadPatchSysExFile(const juce::File& file, juce::uint8* packedOut)

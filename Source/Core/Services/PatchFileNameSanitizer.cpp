@@ -19,6 +19,16 @@ namespace Core
 
     juce::String PatchFileNameSanitizer::sanitizeToMatrixName(juce::String stem)
     {
+        const auto filtered = sanitizeToMatrixNameOrEmpty(std::move(stem));
+
+        if (filtered.isEmpty())
+            return kEmptyNameFallback;
+
+        return filtered;
+    }
+
+    juce::String PatchFileNameSanitizer::sanitizeToMatrixNameOrEmpty(juce::String stem)
+    {
         stem = stem.toUpperCase();
         juce::String filtered;
 
@@ -28,12 +38,7 @@ namespace Core
                 filtered += character;
         }
 
-        filtered = filtered.substring(0, kMaxNameLength);
-
-        if (filtered.isEmpty())
-            return kEmptyNameFallback;
-
-        return filtered;
+        return filtered.substring(0, kMaxNameLength);
     }
 
     juce::String PatchFileNameSanitizer::ensureSyxExtension(const juce::String& stem)

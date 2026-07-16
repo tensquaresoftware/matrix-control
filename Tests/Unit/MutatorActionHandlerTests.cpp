@@ -50,10 +50,12 @@ public:
     int deleteCallCount { 0 };
     int clearCallCount { 0 };
     int exportCallCount { 0 };
+    int exportResolvedCallCount { 0 };
     int defragCallCount { 0 };
     int rebuildMirrorCallCount { 0 };
     int auditionCallCount { 0 };
     juce::File lastExportFolder;
+    Core::ExportCollisionResolution lastExportResolution { Core::ExportCollisionResolution::kCancel };
 
     Core::MutatorActionResult mutateResult;
     Core::MutatorActionResult retryResult;
@@ -61,6 +63,7 @@ public:
     Core::MutatorActionResult deleteResult;
     Core::MutatorActionResult clearResult;
     Core::MutatorActionResult exportResult;
+    Core::MutatorActionResult exportResolvedResult;
     Core::MutatorActionResult defragResult;
 
     Core::MutatorActionResult mutate() override
@@ -98,6 +101,15 @@ public:
         ++exportCallCount;
         lastExportFolder = destinationFolder;
         return exportResult;
+    }
+
+    Core::MutatorActionResult exportHistoryResolved(const juce::File& destinationFolder,
+                                                    Core::ExportCollisionResolution resolution) override
+    {
+        ++exportResolvedCallCount;
+        lastExportFolder = destinationFolder;
+        lastExportResolution = resolution;
+        return exportResolvedResult;
     }
 
     Core::MutatorActionResult defragHistory() override
@@ -155,6 +167,7 @@ private:
                           ++exportPickerCallCount;
                           return exportPickerResult;
                       },
+                      {},
                       {},
                       debounceMs)
         {

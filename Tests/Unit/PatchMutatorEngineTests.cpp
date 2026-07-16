@@ -20,6 +20,7 @@
 #include "Core/Services/PatchFileService.h"
 #include "Core/Services/PatchMutator/MutationHistoryStore.h"
 #include "Core/Services/PatchMutator/MutationNaming.h"
+#include "Core/Services/PatchMutator/PatchLoadContext.h"
 #include "Core/Services/PatchMutator/PatchMutatorEngine.h"
 #include "Shared/Definitions/PluginIDs.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
@@ -103,6 +104,11 @@ public:
 
         mutate_firstRoot_capturesInitialSnapshot();
         mutate_secondRoot_doesNotOverwriteInitialSnapshot();
+        mutate_firstRoot_freezesExportBasename();
+        resetSessionForPatchLoad_clearsFrozenBasename();
+        export_withFrozenBasename_createsSessionSubfolder();
+        export_existingSessionFolder_requestsCollisionModal();
+        exportResolved_keep_writesIndexedFolder();
         compare_emptyHistory_blocked();
         compare_enter_auditionsInitialSnapshot();
         compare_enter_setsCompareActive();
@@ -962,6 +968,110 @@ private:
         const auto secondSnapshot = harness.store().getInitialSnapshot();
         expect(std::memcmp(firstSnapshot.data(), secondSnapshot.data(), Core::PatchModel::kBufferSize) == 0);
         expect(std::memcmp(secondSnapshot.data(), preFirstMutate.data(), Core::PatchModel::kBufferSize) == 0);
+    }
+
+    static juce::File makeTempExportDir()
+    {
+        auto dir = juce::File::getSpecialLocation(juce::File::tempDirectory)
+                       .getNonexistentChildFile("MatrixControlMutatorExport", "", false);
+        dir.createDirectory();
+        return dir;
+    }
+
+    void mutate_firstRoot_freezesExportBasename()
+    {
+        beginTest("mutate_firstRoot_freezesExportBasename");
+
+        EngineHarness harness;
+        harness.setRecipe(100, 100, true);
+        harness.engine.setPatchLoadContextProvider(
+            []() { return Core::PatchLoadContext::deviceMemory(8, 25); });
+        harness.model.setName("OB-VOX");
+
+        expect(harness.engine.mutate().success);
+        expectEquals(harness.store().getFrozenExportBasename(), juce::String("B08-P25-OB-VOX"));
+    }
+
+    void resetSessionForPatchLoad_clearsFrozenBasename()
+    {
+        beginTest("resetSessionForPatchLoad_clearsFrozenBasename");
+
+        EngineHarness harness;
+        harness.setRecipe(100, 100, true);
+        harness.engine.setPatchLoadContextProvider(
+            []() { return Core::PatchLoadContext::deviceMemory(1, 2); });
+
+        expect(harness.engine.mutate().success);
+        expect(harness.store().hasFrozenExportBasename());
+
+        harness.engine.resetSessionForPatchLoad();
+        expect(! harness.store().hasFrozenExportBasename());
+    }
+
+    void export_withFrozenBasename_createsSessionSubfolder()
+    {
+        beginTest("export_withFrozenBasename_createsSessionSubfolder");
+
+        EngineHarness harness;
+        harness.setRecipe(100, 100, true);
+        harness.engine.setPatchLoadContextProvider(
+            []() { return Core::PatchLoadContext::deviceMemory(8, 25); });
+        harness.model.setName("OB-VOX");
+        expect(harness.engine.mutate().success);
+
+        const auto tempDir = makeTempExportDir();
+        const auto result = harness.engine.exportHistory(tempDir);
+
+        expect(result.success);
+        expect(! result.exportCollisionModalRequested);
+        expect(tempDir.getChildFile("B08-P25-OB-VOX").isDirectory());
+        expect(tempDir.getChildFile("B08-P25-OB-VOX").getChildFile("M00").isDirectory());
+
+        tempDir.deleteRecursively();
+    }
+
+    void export_existingSessionFolder_requestsCollisionModal()
+    {
+        beginTest("export_existingSessionFolder_requestsCollisionModal");
+
+        EngineHarness harness;
+        harness.setRecipe(100, 100, true);
+        harness.engine.setPatchLoadContextProvider(
+            []() { return Core::PatchLoadContext::deviceMemory(8, 25); });
+        harness.model.setName("OB-VOX");
+        expect(harness.engine.mutate().success);
+
+        const auto tempDir = makeTempExportDir();
+        expect(tempDir.getChildFile("B08-P25-OB-VOX").createDirectory());
+
+        const auto result = harness.engine.exportHistory(tempDir);
+        expect(result.exportCollisionModalRequested);
+        expect(! result.success);
+
+        tempDir.deleteRecursively();
+    }
+
+    void exportResolved_keep_writesIndexedFolder()
+    {
+        beginTest("exportResolved_keep_writesIndexedFolder");
+
+        EngineHarness harness;
+        harness.setRecipe(100, 100, true);
+        harness.engine.setPatchLoadContextProvider(
+            []() { return Core::PatchLoadContext::deviceMemory(8, 25); });
+        harness.model.setName("OB-VOX");
+        expect(harness.engine.mutate().success);
+
+        const auto tempDir = makeTempExportDir();
+        expect(tempDir.getChildFile("B08-P25-OB-VOX").createDirectory());
+
+        const auto result = harness.engine.exportHistoryResolved(
+            tempDir, Core::ExportCollisionResolution::kKeep);
+
+        expect(result.success);
+        expect(tempDir.getChildFile("B08-P25-OB-VOX-2").isDirectory());
+
+        tempDir.deleteRecursively();
     }
 
     void compare_emptyHistory_blocked()

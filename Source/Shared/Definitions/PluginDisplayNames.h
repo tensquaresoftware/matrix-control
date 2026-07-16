@@ -867,6 +867,35 @@ namespace PluginDisplayNames
                 constexpr const char* kEnableLfo2           = "L2";
                 constexpr const char* kEnableMatrixMod      = "MM";
             }
+
+            // Footer + dialog copy for the session-load / Compare features. English only.
+            namespace Messages
+            {
+                constexpr const char* kCompareLockedFooter =
+                    "Compare mode \xe2\x80\x94 editing and patch/bank changes are locked. "
+                    "Click COMPARE again to exit.";
+
+                constexpr const char* kHistoryGateTitle = "Unsaved mutations";
+                constexpr const char* kHistoryGateMessage =
+                    "You have mutations in the current session that are not exported. "
+                    "Export them before changing patch?";
+                constexpr const char* kHistoryGateExport = "Export";
+                constexpr const char* kHistoryGateCancel = "Cancel";
+                constexpr const char* kHistoryGateDiscard = "Discard";
+
+                constexpr const char* kExportCollisionTitle = "Export folder exists";
+                constexpr const char* kExportCollisionMessage =
+                    "A session folder with this name already exists.";
+                constexpr const char* kExportCollisionOverwrite = "Overwrite";
+                constexpr const char* kExportCollisionKeep = "Keep both";
+                constexpr const char* kExportCollisionCancel = "Cancel";
+
+                constexpr const char* kExportCancelledFooter = "Export cancelled.";
+
+                constexpr const char* kDeviceDumpFailedFooter =
+                    "Could not read the patch from the synth. Keeping the current editor buffer. "
+                    "Check that MIDI From is the synth MIDI OUT.";
+            }
         }
     } 
 }
