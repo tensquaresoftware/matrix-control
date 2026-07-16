@@ -1,7 +1,6 @@
 #include "FooterPanel.h"
 
 #include "GUI/Layout/Design/DesignPanels.h"
-#include "GUI/Layout/ScaledDrawing.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
@@ -35,17 +34,6 @@ FooterPanel::~FooterPanel()
 void FooterPanel::paint(juce::Graphics& g)
 {
     g.fillAll(skin_->getColour(SkinColourId::kFooterPanelBackground));
-
-    const float systemDisplayScale = TSS::ScaledDrawing::systemDisplayScaleForComponent(*this);
-    const float borderThickness = TSS::ScaledDrawing::snappedStrokeThicknessFromDesign(
-        static_cast<float>(TSS::Design::Panels::kPanelEdgeBorderThickness),
-        uiScale_,
-        systemDisplayScale,
-        TSS::ScaledDrawing::StrokeSnapPolicy::kRound);
-
-    auto borderLine = getLocalBounds().toFloat().removeFromTop(borderThickness);
-    g.setColour(skin_->getColour(SkinColourId::kVerticalSeparatorLine));
-    g.fillRect(borderLine);
 
     const int padding = juce::jmax(1, juce::roundToInt(static_cast<float>(kPadding_) * uiScale_));
     const int iconSize = juce::jmax(1, juce::roundToInt(static_cast<float>(kIconSize_) * uiScale_));

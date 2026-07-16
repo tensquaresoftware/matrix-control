@@ -8,7 +8,6 @@
 #include "GUI/Skins/Skin.h"
 #include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Layout/Design/DesignPanels.h"
-#include "GUI/Layout/ScaledDrawing.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Looks/LookBuilders.h"
 #include "Shared/Definitions/PluginAudioConstants.h"
@@ -144,17 +143,6 @@ HeaderPanel::HeaderPanel(TSS::ISkin& skin, int width, int height)
 void HeaderPanel::paint(juce::Graphics& g)
 {
     g.fillAll(skin_->getColour(SkinColourId::kHeaderPanelBackground));
-
-    const float systemDisplayScale = TSS::ScaledDrawing::systemDisplayScaleForComponent(*this);
-    const float borderThickness = TSS::ScaledDrawing::snappedStrokeThicknessFromDesign(
-        static_cast<float>(TSS::Design::Panels::kPanelEdgeBorderThickness),
-        uiScale_,
-        systemDisplayScale,
-        TSS::ScaledDrawing::StrokeSnapPolicy::kRound);
-
-    auto borderLine = getLocalBounds().toFloat().removeFromBottom(borderThickness);
-    g.setColour(skin_->getColour(SkinColourId::kVerticalSeparatorLine));
-    g.fillRect(borderLine);
 }
 
 void HeaderPanel::resized()
@@ -166,7 +154,9 @@ void HeaderPanel::resized()
     const float controlHeight = static_cast<float>(kControlHeight_) * sf;
     const int panelHeight = bounds.getHeight();
     const int controlHeightPx = juce::roundToInt(controlHeight);
-    const int controlY = bounds.getY() + (panelHeight - controlHeightPx) / 2;
+    const int contentYOffset = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(TSS::Design::Panels::Header::kContentVerticalOffset), sf);
+    const int controlY = bounds.getY() + (panelHeight - controlHeightPx) / 2 + contentYOffset;
 
     const float editorMidiFromLabelWidth = static_cast<float>(kEditorMidiFromLabelWidth_) * sf;
     const float midiToLabelWidth = static_cast<float>(kMidiToLabelWidth_) * sf;
@@ -178,7 +168,7 @@ void HeaderPanel::resized()
     const float peakIndicatorWidth = static_cast<float>(kPeakIndicatorWidth_) * sf;
     const float ledSize = static_cast<float>(kLedSize_) * sf;
     const int ledSizePx = juce::roundToInt(ledSize);
-    const int ledY = bounds.getY() + (panelHeight - ledSizePx) / 2;
+    const int ledY = bounds.getY() + (panelHeight - ledSizePx) / 2 + contentYOffset;
     const float leftPadding = static_cast<float>(kLeftPadding_) * sf;
     const float logoGapAfter = static_cast<float>(TSS::Design::Panels::Header::kLogoGapAfter) * sf;
     const int logoWidth = TSS::ScaledLayout::scaledInt(

@@ -169,14 +169,14 @@ namespace TSS::Design
             inline constexpr int kEffectiveHeight = PatchEditSection::kHeight;
         }
 
-        inline constexpr int kPanelEdgeBorderThickness = 4;
-
         namespace Header
         {
             inline constexpr int kHeight = 40;
             inline constexpr int kLogoWidth = 172;
             inline constexpr int kLogoHeight = 20;
             inline constexpr int kLogoVerticalOffset = -1;
+            // Half of the former 4 px bottom edge border (removed): nudge content down to re-center.
+            inline constexpr int kContentVerticalOffset = 2;
             inline constexpr int kLogoFontHeight = 20;
             inline constexpr int kLogoGapAfter = 32;
             inline constexpr int kLogoPopupColumnWidth = 80;
