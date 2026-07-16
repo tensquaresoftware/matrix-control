@@ -88,9 +88,10 @@ void BodyPanel::resized()
     const int topY = bounds.getY() + padding;
 
     patchEditPanel_->setBounds(patchEditX, topY, patchEditPanelWidth, patchEditPanelHeight);
-    verticalSeparator1_->setBounds(separator1X, topY, separatorW, separatorH);
+    // Full Body height (not content band): joins Header/Footer thick borders through padding gutters.
+    verticalSeparator1_->setBounds(separator1X, bounds.getY(), separatorW, separatorH);
     sharedPanel_->setBounds(sharedColumnX, topY, sharedColumnW, sharedColumnHeight);
-    verticalSeparator2_->setBounds(separator2X, topY, separatorW, separatorH);
+    verticalSeparator2_->setBounds(separator2X, bounds.getY(), separatorW, separatorH);
     masterEditPanel_->setBounds(masterEditX, topY, masterEditW, masterEditH);
 }
 

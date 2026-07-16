@@ -255,7 +255,8 @@ namespace TSS::Design
 
         namespace Heights
         {
-            inline constexpr int kVerticalSeparator = Panels::Body::kEffectiveHeight;
+            // Full Body height so separators join Header/Footer panel-edge borders.
+            inline constexpr int kVerticalSeparator = Panels::Body::kHeight;
         }
     }
 }

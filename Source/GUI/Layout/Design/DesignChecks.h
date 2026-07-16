@@ -125,4 +125,7 @@ namespace TSS::Design
         "Patch manager modules stack height");
 
     static_assert(GUI::kHeight == Panels::Header::kHeight + GUI::kBodyHeight + Panels::Footer::kHeight, "GUI height stack");
+
+    static_assert(PanelWidgets::Heights::kVerticalSeparator == Panels::Body::kHeight,
+        "Vertical separators span full Body height to join Header/Footer borders");
 }
