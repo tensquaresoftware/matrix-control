@@ -119,6 +119,7 @@ private:
                                               const juce::String& requestDescription,
                                               juce::uint8 patchNumber = 0);
     void sendArmedSinglePatchRequest(juce::uint8 patchNumber, std::uint64_t token);
+    void armAsyncSinglePatchCapture(std::uint64_t token);
     void finishAsyncPackedPatch(std::uint64_t token, std::vector<juce::uint8> packed);
     void pollOutboundIdleThenRequest(juce::uint8 patchNumber,
                                      std::uint64_t token,
@@ -127,6 +128,9 @@ private:
                                      int outboundIdleTimeoutMs);
     std::vector<juce::uint8> decodePackedPatchResponse(const juce::MemoryBlock& response,
                                                        const juce::String& requestDescription);
+    // Quiet decode for async capture: returns empty for non-patch / corrupt SysEx without
+    // treating that as request failure (caller may keep listening until timeout).
+    std::vector<juce::uint8> tryDecodeAsyncPatchResponse(const juce::MemoryBlock& response);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MidiManager)
 };

@@ -36,7 +36,7 @@ context:
 - Device dump must work for RAM and ROM banks (do not gate on paste/store allow).
 
 **Ask First:**
-- Hardware cannot return a patch dump after navigation (timeout / invalid SysEx): whether to keep coordinates + old editor buffer, revert coordinates, or show only footer — do not invent a silent policy beyond a clear warning footer without owner OK.
+- ~~Hardware cannot return a patch dump after navigation (timeout / invalid SysEx): whether to keep coordinates + old editor buffer, revert coordinates, or show only footer~~ — **Resolved (code review 6-13, 2026-07-16):** keep coordinates + old editor buffer + warning footer; **do not** clear Mutator history on dump failure / no device (clear only after a successful dump load).
 - Exact dialog button labels/copy if Guillaume wants French UI strings (code/docs stay English unless he asks otherwise).
 
 **Never:**
@@ -50,7 +50,7 @@ context:
 
 | Scenario | Input / State | Expected Output / Behavior | Error Handling |
 |----------|--------------|---------------------------|----------------|
-| Device nav load | Bank/patch change, synth returns dump | Editor mirrors dump; PatchLoadContext=DeviceMemory+coords; Mutator history cleared | Dump fail → warning footer; HALT policy if unclear (Ask First) |
+| Device nav load | Bank/patch change, synth returns dump | Editor mirrors dump; PatchLoadContext=DeviceMemory+coords; Mutator history cleared | Dump fail → warning footer; coords + old buffer kept; Mutator history **not** cleared |
 | Computer load | Select `.syx` | Editor loads file; context=ComputerFile+stem; history cleared | Existing file-load errors unchanged |
 | First MUTATE | Context set, history empty | Capture initial snapshot + freeze export folder basename from context | N/A |
 | Export device named | Frozen `B08-P25` + name `OB-VOX` | Write under `…/B08-P25-OB-VOX/` | Folder not writable → existing export warning |
@@ -102,7 +102,7 @@ context:
 All five previously-remaining gaps are now implemented. Full plugin (Standalone / AU / VST3) builds clean and 465/465 unit tests pass (460 prior + 5 new). Manual hardware verification of the device dump path is still recommended (see below).
 
 Second-pass implementation (device dump, history gate, collision UI, compare lock):
-- **Device dump after Bank/Internal nav:** `MidiManager::waitUntilOutboundQueueIdle(timeoutMs)` (drains the outbound queue via `isEmpty()` + a `hasPendingSysEx_` atomic, waking the consumer) and `MidiManager::isDeviceDumpAvailable()` (output open AND `deviceDetected`). `PatchManagerActionHandler::loadCurrentPatchFromDevice()` waits idle -> ~50 ms settle -> `requestCurrentPatch()` -> `PatchModel::loadFrom` -> APVTS suppress push -> DeviceMemory context -> `onPatchLoaded`. On dump failure it keeps coordinates + old buffer and shows an English warning footer; never `sendPatch` back. Wired on prev/next, bank buttons, and `PluginProcessor::handlePatchNumberChange`. Skips cleanly when no device is available (headless/tests).
+- **Device dump after Bank/Internal nav:** `MidiManager::requestSinglePatchAsync` (outbound idle poll + settle + armed one-shot capture; ignores non-patch SysEx until timeout) and `MidiManager::isDeviceDumpAvailable()` (input + output ports open). `PatchManagerActionHandler::loadCurrentPatchFromDevice()` requests dump async → on success `PatchModel::loadFrom` → APVTS suppress push → DeviceMemory context → `onPatchLoaded`. On dump failure / no device: keeps coordinates + old buffer + warning footer; **does not** clear Mutator history; never `sendPatch` back. Wired on prev/next, bank buttons, and `PluginProcessor::handlePatchNumberChange`.
 - **History gate:** `ActionExecutionHooks::confirmPatchContextChange` -> `PluginProcessor::confirmPatchContextChangeGate()` (empty history / no UI gate -> proceed; else Export/Cancel/Discard). Export runs the folder-picker + engine export + collision resolution and only proceeds when it succeeds; Discard calls `resetSessionForPatchLoad`; Cancel aborts. Consulted before nav, `.syx` load, INIT, PASTE, and direct patch-number edits (number box reverts to the previous value on Cancel). INIT/PASTE now also call `onPatchLoaded` after a successful apply.
 - **Collision modal UI:** `PluginEditor` supplies `setMutatorExportCollisionModalGate` (Overwrite / Keep both / Cancel AlertWindow) and `setMutatorHistoryGateModalGate` (Export / Discard / Cancel AlertWindow).
 - **Compare lock:** new `TSS::CompareLockBinder` (GUI helper listening to `kCompareActive`) locks Patch Edit + Master Edit (BodyPanel), Matrix Mod (SharedPanel), and Bank Utility / Internal Patches / Computer Patches (PatchManagerPanel) by blocking child mouse clicks + graying; interactive displays freeze because their parent panel is locked. The Mutator panel self-locks every control except COMPARE. Footer set on Compare enter (`kCompareLockedFooter`) and cleared on any exit (toggle-off, `forceExitCompare`). Logo menu stays usable.
@@ -193,4 +193,11 @@ Remaining work: manual hardware verification only (see Manual checks). No known 
 
 - Basename / collision / history-gate ordering coverage.
   [`PatchLoadContextTests.cpp:1`](../../Tests/Unit/PatchLoadContextTests.cpp#L1)
+
+### Review Findings (2026-07-16 — commits b53b279…c12c857)
+
+- [x] [Review][Decision] Dump failure must not clear Mutator history — resolved Option 2: clear only after successful dump; footer + keep coords/buffer on fail.
+- [x] [Review][Patch] Async one-shot SysEx consumed non-patch frames — fixed: `tryDecodeAsyncPatchResponse` + re-arm until timeout.
+- [x] [Review][Patch] History-gate modal off message thread — fixed: refuse context change when not on message thread; `jassert` in editor gates.
+- [x] [Review][Defer] Export Keep-both suffix capped at `-999` — deferred to `deferred-work.md` (extreme stress only).
 

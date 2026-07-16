@@ -636,18 +636,11 @@ namespace Core
         if (patchModel_ == nullptr || apvtsPatchMapper_ == nullptr || midiManager_ == nullptr)
             return;
 
-        const auto clearMutatorSession = [this]
-        {
-            if (hooks_.onPatchLoaded)
-                hooks_.onPatchLoaded();
-        };
-
-        // No synth connected/detected: keep the old editor buffer, warn, still clear Mutator
-        // history because the user left that patch context.
+        // No synth connected: keep the old editor buffer and Mutator history; only warn.
+        // History clears only after a successful dump (real patch load), not on dump failure.
         if (! midiManager_->isDeviceDumpAvailable())
         {
             publishDeviceDumpFailureFooter();
-            clearMutatorSession();
             return;
         }
 
@@ -658,12 +651,11 @@ namespace Core
         // Idle wait + settle + dump request run via timers inside MidiManager.
         midiManager_->requestSinglePatchAsync(
             static_cast<juce::uint8>(patch),
-            [this, bank, patch, clearMutatorSession](std::vector<juce::uint8> dump)
+            [this, bank, patch](std::vector<juce::uint8> dump)
             {
                 if (dump.size() != SysExConstants::kPatchPackedDataSize)
                 {
                     publishDeviceDumpFailureFooter();
-                    clearMutatorSession();
                     return;
                 }
 
@@ -676,8 +668,10 @@ namespace Core
                 if (hooks_.setPatchLoadContext)
                     hooks_.setPatchLoadContext(PatchLoadContext::deviceMemory(bank, patch));
 
-                // Treat the dump like a patch load: clears Mutator history/Compare. Do NOT sendPatch back.
-                clearMutatorSession();
+                // Treat a successful dump like a patch load: clears Mutator history/Compare.
+                // Do NOT sendPatch back.
+                if (hooks_.onPatchLoaded)
+                    hooks_.onPatchLoaded();
             },
             kDeviceSettleMs,
             kOutboundIdleTimeoutMs);

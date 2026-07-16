@@ -856,6 +856,21 @@ bool PluginProcessor::confirmPatchContextChangeGate()
     if (! mutatorHistoryGateModalGate_)
         return true;
 
+    // AlertWindow / FileChooser require the message thread. Off-thread callers cannot safely
+    // open a modal; refuse the context change rather than risk a freeze or nested-loop crash.
+    if (auto* messageManager = juce::MessageManager::getInstanceWithoutCreating())
+    {
+        if (! messageManager->isThisTheMessageThread())
+        {
+            jassertfalse;
+            return false;
+        }
+    }
+    else
+    {
+        return false;
+    }
+
     switch (mutatorHistoryGateModalGate_())
     {
         case Core::MutatorHistoryGateChoice::kCancel:

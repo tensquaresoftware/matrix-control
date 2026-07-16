@@ -126,6 +126,8 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     pluginProcessor.setMutatorExportCollisionModalGate(
         [](std::function<void(Core::ExportCollisionResolution)> onResolved)
         {
+            jassert(juce::MessageManager::getInstance()->isThisTheMessageThread());
+
             namespace Msg = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::Messages;
 
             juce::AlertWindow alert(Msg::kExportCollisionTitle,
@@ -149,6 +151,8 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     pluginProcessor.setMutatorHistoryGateModalGate(
         []() -> Core::MutatorHistoryGateChoice
         {
+            jassert(juce::MessageManager::getInstance()->isThisTheMessageThread());
+
             namespace Msg = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::Messages;
 
             juce::AlertWindow alert(Msg::kHistoryGateTitle,

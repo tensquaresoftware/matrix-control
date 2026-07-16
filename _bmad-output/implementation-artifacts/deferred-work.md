@@ -487,12 +487,8 @@
 ## Deferred from: spec-mutator-synth-load-history-export-compare (2026-07-16)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-mutator-synth-load-history-export-compare.md`
-  summary: Device dump after Bank/Internal nav blocks the message thread (queue drain + settle + sync SysEx RPC).
-  evidence: Blind Hunter; `loadCurrentPatchFromDevice` uses wait/sleep/requestCurrentPatch on the UI thread; async redesign needed for snappy rapid navigation.
-
-- source_spec: `_bmad-output/implementation-artifacts/spec-mutator-synth-load-history-export-compare.md`
   summary: History-gate and collision AlertWindow modals run nested message loops from APVTS/ValueTree change paths.
-  evidence: Blind Hunter; `handlePatchNumberChange` → `confirmPatchContextChangeGate` → `runModalLoop`; re-entrancy risk if timers/edits fire during modal.
+  evidence: Blind Hunter; `handlePatchNumberChange` → `confirmPatchContextChangeGate` → `runModalLoop`; re-entrancy risk if timers/edits fire during modal. Partial mitigation (2026-07-16 review): gate refuses off message-thread; nested-loop redesign still open.
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-mutator-synth-load-history-export-compare.md`
   summary: Hard-coded 50 ms settle / 500 ms queue-idle timeouts for device dump may be wrong for slow MIDI interfaces.
@@ -509,4 +505,15 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-mutator-synth-load-history-export-compare.md`
   summary: History-gate Export path and Export button path handle collision resolution via two different sync/async styles.
   evidence: Blind Hunter; gate captures sync resolution; button uses async callback — latent fork if modal becomes async.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-mutator-synth-load-history-export-compare.md`
+  summary: Export Keep-both collision suffixes stop at `-999` and may return an existing folder.
+  evidence: Code review 6-13; `resolveKeepSessionFolder` max suffix 999; extreme-stress only — harden with explicit failure or unbounded suffix later.
+
+## Resolved during code review 6-13 (2026-07-16)
+
+- Device dump no longer blocks the message thread (`requestSinglePatchAsync` + timers).
+- Dump failure / no device keeps Mutator history (clear only after successful dump).
+- Async one-shot SysEx capture ignores non-patch frames and keeps listening until timeout.
+- History-gate modal refused when not on the message thread (`jassert` + cancel).
 

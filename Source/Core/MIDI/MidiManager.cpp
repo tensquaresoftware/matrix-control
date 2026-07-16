@@ -396,6 +396,58 @@ std::vector<juce::uint8> MidiManager::decodePackedPatchResponse(const juce::Memo
     return {};
 }
 
+std::vector<juce::uint8> MidiManager::tryDecodeAsyncPatchResponse(const juce::MemoryBlock& response)
+{
+    if (response.getSize() == 0 || sysExParser == nullptr || sysExDecoder == nullptr)
+        return {};
+
+    // Ignore non-patch SysEx (Device ID, Master, noise) without failing the pending request.
+    const auto validation = sysExParser->validateSysEx(response);
+    if (! validation.isValid || validation.messageType != SysExParser::MessageType::kPatch)
+        return {};
+
+    std::vector<juce::uint8> packedData(SysExConstants::kPatchPackedDataSize);
+    if (! sysExDecoder->decodePatchSysEx(response, packedData.data()))
+        return {};
+
+    MidiLogger::getInstance().logSysExReceived(response, "single patch response");
+    return packedData;
+}
+
+void MidiManager::armAsyncSinglePatchCapture(std::uint64_t token)
+{
+    if (token != asyncRequestToken_.load(std::memory_order_acquire))
+        return;
+
+    if (midiReceiver == nullptr)
+    {
+        finishAsyncPackedPatch(token, {});
+        return;
+    }
+
+    midiReceiver->armOneShotSysExCapture(
+        [this, token](const juce::MemoryBlock& response)
+        {
+            // MIDI input thread: marshal decode + callback to the message thread.
+            juce::MessageManager::callAsync(
+                [this, token, response]
+                {
+                    if (token != asyncRequestToken_.load(std::memory_order_acquire))
+                        return;
+
+                    auto packed = tryDecodeAsyncPatchResponse(response);
+                    if (! packed.empty())
+                    {
+                        finishAsyncPackedPatch(token, std::move(packed));
+                        return;
+                    }
+
+                    // Parasitic / non-patch SysEx consumed the one-shot — keep listening.
+                    armAsyncSinglePatchCapture(token);
+                });
+        });
+}
+
 void MidiManager::sendArmedSinglePatchRequest(juce::uint8 patchNumber, std::uint64_t token)
 {
     if (token != asyncRequestToken_.load(std::memory_order_acquire))
@@ -412,21 +464,7 @@ void MidiManager::sendArmedSinglePatchRequest(juce::uint8 patchNumber, std::uint
         auto requestMessage = sysExEncoder->encodeRequestMessage(
             SysExConstants::RequestType::kRequestSinglePatch, patchNumber);
 
-        midiReceiver->armOneShotSysExCapture(
-            [this, token](const juce::MemoryBlock& response)
-            {
-                // MIDI input thread: marshal decode + callback to the message thread.
-                juce::MessageManager::callAsync(
-                    [this, token, response]
-                    {
-                        if (token != asyncRequestToken_.load(std::memory_order_acquire))
-                            return;
-
-                        finishAsyncPackedPatch(token,
-                                               decodePackedPatchResponse(response, "single patch"));
-                    });
-            });
-
+        armAsyncSinglePatchCapture(token);
         sendSysExWithDelay(requestMessage, "single patch request");
 
         juce::Timer::callAfterDelay(
