@@ -62,10 +62,11 @@ void RampPortamentoPanel::refreshLegatoPortaGraying()
 
     if (auto* legatoCell = getParameterCellAt(7))
     {
-        if (auto* combo = legatoCell->getComboBox())
-            combo->setEnabled(true);
+        // Label and separator stay fully opaque — only the ComboBox uses disabled skin paint.
+        legatoCell->setAlpha(1.0f);
 
-        TSS::GrayedControlHelper::applyGrayedAppearance(*legatoCell, legatoPortaGrayed_);
+        if (auto* combo = legatoCell->getComboBox())
+            combo->setEnabled(! legatoPortaGrayed_);
 
         if (legatoPortaGrayed_)
         {
