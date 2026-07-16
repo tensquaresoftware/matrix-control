@@ -22,7 +22,8 @@ PatchEditDisplaysPanel::PatchEditDisplaysPanel(TSS::ISkin& skin, const PatchEdit
           dims_.patchName.width,
           dims_.childBand.height,
           dims_.patchName,
-          dims_.moduleHeader))
+          dims_.moduleHeader,
+          apvts))
     , apvtsSync_(std::make_unique<InteractiveDisplayApvtsSync>(
         apvts,
         envelope1Display_,

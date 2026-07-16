@@ -5,16 +5,25 @@
 #include "GUI/Widgets/ModuleHeader.h"
 #include "GUI/Widgets/PatchNameDisplay.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
+#include "Shared/Definitions/PluginIDs.h"
+
+namespace
+{
+    using PluginIDs::PatchEditSection::PatchNameModule::kPatchName;
+    using PluginDisplayNames::PatchEditSection::PatchNameModule::StandaloneWidgets::kDefaultPatchName;
+}
 
 PatchNameDisplayPanel::PatchNameDisplayPanel(TSS::ISkin& skin,
                                              int width,
                                              int height,
                                              const PatchNameDisplayDimensions& patchNameDims,
-                                             const ModuleHeaderDimensions& moduleHeaderDims)
+                                             const ModuleHeaderDimensions& moduleHeaderDims,
+                                             juce::AudioProcessorValueTreeState& apvts)
     : width_(width)
     , height_(height)
     , patchNameDims_(patchNameDims)
     , moduleHeaderDims_(moduleHeaderDims)
+    , apvts_(apvts)
     , moduleHeader_(std::make_unique<TSS::ModuleHeader>(
           patchNameDims_.width,
           moduleHeaderDims_.height,
@@ -31,9 +40,15 @@ PatchNameDisplayPanel::PatchNameDisplayPanel(TSS::ISkin& skin,
     setSize(width_, height_);
     addAndMakeVisible(*moduleHeader_);
     addAndMakeVisible(*patchNameDisplay_);
+
+    apvts_.state.addListener(this);
+    syncFromApvtsState();
 }
 
-PatchNameDisplayPanel::~PatchNameDisplayPanel() = default;
+PatchNameDisplayPanel::~PatchNameDisplayPanel()
+{
+    apvts_.state.removeListener(this);
+}
 
 TSS::PatchNameDisplay& PatchNameDisplayPanel::getPatchNameDisplay()
 {
@@ -79,4 +94,30 @@ void PatchNameDisplayPanel::setUiScale(float uiScale)
 
     resized();
     repaint();
+}
+
+void PatchNameDisplayPanel::valueTreePropertyChanged(juce::ValueTree&,
+                                                     const juce::Identifier& property)
+{
+    if (property.toString() != kPatchName)
+        return;
+
+    syncFromApvtsState();
+}
+
+void PatchNameDisplayPanel::valueTreeRedirected(juce::ValueTree&)
+{
+    syncFromApvtsState();
+}
+
+void PatchNameDisplayPanel::syncFromApvtsState()
+{
+    if (patchNameDisplay_ == nullptr)
+        return;
+
+    auto name = apvts_.state.getProperty(kPatchName, juce::String(kDefaultPatchName)).toString();
+    if (name.isEmpty())
+        name = kDefaultPatchName;
+
+    patchNameDisplay_->setPatchName(name);
 }

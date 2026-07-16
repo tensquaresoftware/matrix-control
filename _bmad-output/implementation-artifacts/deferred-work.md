@@ -1,5 +1,9 @@
 # Deferred Work
 
+## Deferred from: code review of 1-6-wire-patch-name-display (2026-07-16)
+
+- **Public `getPatchNameDisplay()` remains an APVTS bypass** — Pre-existing accessor; story 1-6 kept the widget API unchanged. External `setPatchName` can paint a name that drifts from `apvts.state["patchEditPatchName"]` until the next listener fire. Revisit if a future editor or handler starts calling it.
+
 ## Deferred from: spec-patch-mutator-mutate-disabled-without-module-toggle (2026-07-15)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-patch-mutator-mutate-disabled-without-module-toggle.md`
