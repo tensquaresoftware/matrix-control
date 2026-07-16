@@ -7,15 +7,53 @@ alwaysApply: true
 
 When Guillaume starts a conversation with a **BMad skill** (attached skill or slash command such as `/bmad-create-story`, `/bmad-dev-story`, `/bmad-code-review`, `/bmad-correct-course`, etc.), **rename the current chat immediately** — as the **first tool call**, before any other work.
 
-Also apply on **resume**: if Guillaume sends a message in an existing BMad conversation whose title is still the auto-generated one (e.g. `Story creation process`, `Code review discussion`, `bmad dev story 4-4`) instead of the BMad format below, call `rename_chat` first — infer skill and story ID from the conversation's first user message (attached skill or slash command).
+Also apply on **resume**: if Guillaume sends a message in an existing BMad conversation whose title is still the auto-generated one (e.g. `Story creation process`, `Code review discussion`, `bmad dev story 4-4`) instead of the BMad format below, call `rename_chat` first — infer skill and story ID / topic from the conversation's first user message (attached skill or slash command).
 
 Use the MCP tool `rename_chat` on server `cursor-app-control`. **Only this API persists the title** — direct database edits to the sidebar cache are overwritten when the conversation is opened (Cursor reloads the title from the conversation checkpoint).
 
-## Title format
+**Never announce the rename** unless Guillaume asks — apply it silently and continue the workflow.
 
-`BMad — {Workflow Label} {Story ID}` — use an em dash (`—`) after `BMad`; omit `{Story ID}` when none is provided.
+---
 
-**Never append a date** (e.g. `(2026-06-19)`) to the title. The Agents sidebar already shows when each conversation occurred (`Today`, `2d`, etc.). Duplicate runs of the same workflow share the same title — the sidebar timestamp is enough to tell them apart.
+## Title formats
+
+Use an em dash (`—`) after `BMad`. **Never append a date** (e.g. `(2026-06-19)`). The Agents sidebar already shows when each conversation occurred.
+
+### A — Story triad (fixed shape, no topic, no colon)
+
+These three commands keep a compact ID-only title:
+
+| Skill / command | Title |
+|---|---|
+| `bmad-create-story` | `BMad — Create Story {Story ID}` |
+| `bmad-dev-story` | `BMad — Dev Story {Story ID}` |
+| `bmad-code-review` | `BMad — Code Review {Story ID}` |
+
+Omit `{Story ID}` only when none can be inferred.
+
+Examples:
+
+- `/bmad-create-story 4-5` → `BMad — Create Story 4-5`
+- `/bmad-dev-story 4-4` → `BMad — Dev Story 4-4`
+- `/bmad-code-review 4-4` → `BMad — Code Review 4-4`
+
+### B — All other BMad commands (label + short topic)
+
+Format: `BMad — {Workflow Label} : {Topic}`
+
+- Space before and after the colon.
+- `{Topic}` = short explanation of **this** conversation’s subject (see Topic rules below).
+- If no useful topic can be inferred (e.g. bare `/bmad-help`), use the label only: `BMad — Help` (no colon).
+
+Examples:
+
+- `/bmad-quick-dev` + mutator work → `BMad — Quick Dev : Patch Mutator`
+- `/bmad-correct-course` + bank unlock simplify → `BMad — Correct Course : Bank Unlock`
+- `/bmad-sprint-status` → `BMad — Sprint Status` (no topic needed)
+
+---
+
+## Workflow labels
 
 | Skill / command prefix | Label |
 |---|---|
@@ -45,6 +83,20 @@ Use the MCP tool `rename_chat` on server `cursor-app-control`. **Only this API p
 | `bmad-document-project` | Document Project |
 | Other `bmad-*` skill | Title-case the skill slug after `bmad-`, words separated by spaces |
 
+---
+
+## Topic rules (format B only)
+
+Infer the topic from the user intent / first message (and attached story or spec name when present).
+
+1. **Length:** 2–4 content words. Prefer nouns / proper names already in the request.
+2. **Language:** English Title Case (same as workflow labels), even if Guillaume wrote in French.
+3. **Strip stop words** (FR + EN), including: `a`, `an`, `the`, `of`, `for`, `to`, `and`, `or`, `in`, `on`, `with`, `from`, `into`, `de`, `du`, `des`, `la`, `le`, `les`, `un`, `une`, `et`, `ou`, `à`, `au`, `aux`, `en`, `dans`, `pour`, `sur`, `avec`, `par`, `réduction`, `amélioration` when they are filler — keep the distinctive nouns only.
+4. **Good:** `Patch Mutator`, `Bank Unlock`, `Compare Lock`, `Midi Latency`
+5. **Bad:** `Réduction de la latence audio` (stop words + too long), `Improve the patch mutator export flow` (verbose)
+
+---
+
 ## Story ID extraction
 
 Parse from the user message (slash command or attached skill context):
@@ -53,14 +105,66 @@ Parse from the user message (slash command or attached skill context):
 - Utility stories: `U-0`, `U-11`
 - Accept `/bmad-create-story 4-5`, `/bmad-create story 4-5`, or `story 4-5` in plain text
 
-## Examples
+---
 
-- `/bmad-create-story 4-5` → `BMad — Create Story 4-5`
-- `/bmad-dev-story 4-4` → `BMad — Dev Story 4-4`
-- `/bmad-code-review 4-4` → `BMad — Code Review 4-4`
-- `/bmad-correct-course 4-5` → `BMad — Correct Course 4-5`
-- `/bmad-help` (no story) → `BMad — Help`
+## Duplicate titles → ` (n)` suffix
 
-**Do not** use date suffixes — wrong: `BMad — Sprint Status (2026-06-19)`; correct: `BMad — Sprint Status`.
+When several conversations would share the **same base title** (formats A or B), disambiguate with a numeric suffix:
 
-Do not announce the rename unless Guillaume asks — just apply it silently and continue the workflow.
+```
+BMad — Quick Dev : Patch Mutator (1)
+BMad — Quick Dev : Patch Mutator (2)
+BMad — Quick Dev : Patch Mutator (3)
+```
+
+### Algorithm (before calling `rename_chat`)
+
+1. Compute the **base title** (no `(n)` suffix) using format A or B above.
+2. Read existing Agents sidebar names from Cursor’s state DB (**read-only**):
+
+   ```bash
+   python3 - <<'PY'
+   import json, re, sqlite3
+   from pathlib import Path
+   base = """BASE_TITLE_HERE"""  # replace with the computed base title
+   db = Path.home() / "Library/Application Support/Cursor/User/globalStorage/state.vscdb"
+   conn = sqlite3.connect(f"file:{db}?mode=ro", uri=True)
+   row = conn.execute(
+       "SELECT value FROM ItemTable WHERE key='composer.composerHeaders'"
+   ).fetchone()
+   conn.close()
+   names = [c.get("name") or "" for c in json.loads(row[0]).get("allComposers", [])]
+   pat = re.compile(rf"^{re.escape(base)}(?: \((\d+)\))?$")
+   taken = set()
+   for name in names:
+       m = pat.match(name)
+       if not m:
+           continue
+       taken.add(int(m.group(1)) if m.group(1) else 0)
+   if not taken:
+       print(base)
+   else:
+       n = 1
+       while n in taken:
+           n += 1
+       print(f"{base} ({n})")
+   PY
+   ```
+
+3. Use the printed string as the `rename_chat` title.
+4. Semantics:
+   - First conversation with that base → unsuffixed base (empty `taken`).
+   - If an unsuffixed base already exists (`0 ∈ taken`), the next free title is `base (1)`, then `(2)`, etc.
+   - If only numbered copies exist, pick the smallest free positive integer.
+5. Do **not** rename other conversations — only the current chat via `rename_chat`.
+6. Do **not** use dates as disambiguators.
+
+---
+
+## Wrong vs right
+
+| Wrong | Right |
+|---|---|
+| `BMad — Sprint Status (2026-06-19)` | `BMad — Sprint Status` |
+| `BMad — Correct Course : Réduction de la latence audio` | `BMad — Correct Course : Audio Latency` |
+| Two chats both named `BMad — Quick Dev : Patch Mutator` | Second becomes `BMad — Quick Dev : Patch Mutator (1)` |

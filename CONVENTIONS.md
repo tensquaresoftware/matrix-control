@@ -91,20 +91,30 @@ When I modify a file (documentation, code, configuration, etc.) that contains a 
 
 When Guillaume starts a conversation with a **BMad skill** (attached skill or slash command), the agent MUST **rename the current chat immediately** in the Cursor Agents sidebar, before any other work.
 
-Use the MCP tool `rename_chat` (`cursor-app-control`). Cursor rule: `.cursor/rules/bmad-agent-chat-titles.mdc`.
+Use the MCP tool `rename_chat` (`cursor-app-control`). Cursor rule: `.cursor/rules/bmad-agent-chat-titles.mdc` (authoritative detail).
 
-**Format:** `BMad — {Workflow Label} {Story ID}` — use an em dash (`—`) after `BMad`; omit the story ID when none is provided.
+**No date in the title.** The Agents sidebar already shows when each conversation took place.
 
-**No date in the title.** Do not append a date in parentheses (e.g. `BMad — Sprint Status (2026-06-19)`). The Agents sidebar already shows when each conversation took place. Several runs of the same command may share the same title.
+**Format A — story triad** (ID only, no colon):
 
-| Command (examples) | Sidebar title |
+| Command | Sidebar title |
 |---|---|
 | `/bmad-create-story 4-5` | `BMad — Create Story 4-5` |
 | `/bmad-dev-story 4-5` | `BMad — Dev Story 4-5` |
 | `/bmad-code-review 4-5` | `BMad — Code Review 4-5` |
-| `/bmad-correct-course 4-5` | `BMad — Correct Course 4-5` |
+
+**Format B — all other BMad commands:** `BMad — {Workflow Label} : {Topic}`
+
+- Short English topic (2–4 content words, Title Case, no stop words).
+- Omit the colon and topic when none is useful (e.g. `/bmad-help` → `BMad — Help`).
+
+| Command (examples) | Sidebar title |
+|---|---|
+| `/bmad-quick-dev` (mutator work) | `BMad — Quick Dev : Patch Mutator` |
+| `/bmad-correct-course` (bank unlock) | `BMad — Correct Course : Bank Unlock` |
 | `/bmad-sprint-status` | `BMad — Sprint Status` |
-| `/bmad-help` | `BMad — Help` |
+
+**Duplicates:** if the base title is already used, append ` (n)` with the next free positive integer (`(1)`, `(2)`, …). See the Cursor rule for the read-only DB check before `rename_chat`.
 
 Story IDs include epic-story numbers (`4-5`, `7-3b`) and utility stories (`U-0`, `U-11`).
 
