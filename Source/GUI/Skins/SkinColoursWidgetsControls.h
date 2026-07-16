@@ -52,14 +52,15 @@ namespace TSS::SkinColours
 
             inline constexpr ColourElement kBackgroundDisabled = {
                 "ButtonBackgroundDisabled",
-                Common::kBackgroundDisabled,
-                Common::kBackgroundDisabled,
+                ColourChart::kDarkGrey2,
+                ColourChart::kDarkGrey2,
             };
 
+            // Same chart values as enabled border (black/cream variants).
             inline constexpr ColourElement kBorderDisabled = {
                 "ButtonBorderDisabled",
-                Common::kBorderDisabled,
-                Common::kBorderDisabled,
+                ColourChart::kDarkGrey3,
+                ColourChart::kDarkGrey4
             };
 
             inline constexpr ColourElement kTextDisabled = {
@@ -100,6 +101,25 @@ namespace TSS::SkinColours
                 ColourChart::kGreen4,
                 ColourChart::kGreen4
             };
+
+            inline constexpr ColourElement kBackgroundDisabled = {
+                "ToggleBackgroundDisabled",
+                ColourChart::kDarkGrey2,
+                ColourChart::kDarkGrey2,
+            };
+
+            // Same chart values as enabled border (black/cream variants).
+            inline constexpr ColourElement kBorderDisabled = {
+                "ToggleBorderDisabled",
+                ColourChart::kDarkGrey3,
+                ColourChart::kDarkGrey4
+            };
+
+            inline constexpr ColourElement kTextDisabled = {
+                "ToggleTextDisabled",
+                Common::kContentDisabled,
+                Common::kContentDisabled,
+            };
         }
 
         namespace Slider
@@ -128,6 +148,12 @@ namespace TSS::SkinColours
                 ColourChart::kGreen2
             };
 
+            inline constexpr ColourElement kBackgroundDisabled = {
+                "SliderBackgroundDisabled",
+                Common::kBackgroundDisabled,
+                Common::kBackgroundDisabled
+            };
+
             inline constexpr ColourElement kTrackDisabled = {
                 "SliderTrackDisabled",
                 Common::kDecorationDisabled,
@@ -136,8 +162,8 @@ namespace TSS::SkinColours
 
             inline constexpr ColourElement kValueBarDisabled = {
                 "SliderValueBarDisabled",
-                Common::kDecorationDisabled,
-                Common::kDecorationDisabled
+                Common::kContentDisabled,
+                Common::kContentDisabled
             };
 
             inline constexpr ColourElement kTextDisabled = {

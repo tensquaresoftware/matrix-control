@@ -75,20 +75,32 @@ namespace TSS
         const auto trackBoundsInt = getLocalBounds();
         const auto trackBoundsFloat = trackBoundsInt.toFloat();
 
-        drawTrack(g, trackBoundsInt, enabled);
+        if (enabled)
+        {
+            drawTrack(g, trackBoundsInt, true);
+        }
+        else
+        {
+            g.setColour(look_.backgroundDisabled);
+            g.fillRect(trackBoundsInt);
 
-        const auto valueBarBounds = calculateValueBarBounds(trackBoundsInt, insetPerSide, enabled);
+            const auto railBounds = trackBoundsInt.reduced(insetPerSide);
+            if (! railBounds.isEmpty())
+            {
+                g.setColour(look_.trackDisabled);
+                g.fillRect(railBounds);
+            }
+        }
+
+        const auto valueBarBounds = calculateValueBarBounds(trackBoundsInt, insetPerSide);
         drawValueBar(g, valueBarBounds, enabled);
 
         drawText(g, trackBoundsFloat, enabled);
         drawFocusBorderIfNeeded(g, trackBoundsFloat, hasFocus_);
     }
 
-    juce::Rectangle<float> Slider::calculateValueBarBounds(const juce::Rectangle<int>& trackBoundsInt, int insetPerSide, bool enabled) const
+    juce::Rectangle<float> Slider::calculateValueBarBounds(const juce::Rectangle<int>& trackBoundsInt, int insetPerSide) const
     {
-        if (! enabled)
-            return {};
-
         const auto range = getRange();
         const auto rangeLength = range.getLength();
 

@@ -580,17 +580,10 @@ void PatchMutatorPanel::refreshCompareUiState()
 
     // Nav is useful only when circular step can change selection (≥2 flat entries).
     const bool historyNavEnabled = ! compareActive && flatHistoryEntryCount >= 2;
-    const float historyNavAlpha = historyNavEnabled ? 1.0f : 0.5f;
     if (historyPreviousButton_ != nullptr)
-    {
         historyPreviousButton_->setEnabled(historyNavEnabled);
-        historyPreviousButton_->setAlpha(historyNavAlpha);
-    }
     if (historyNextButton_ != nullptr)
-    {
         historyNextButton_->setEnabled(historyNavEnabled);
-        historyNextButton_->setAlpha(historyNavAlpha);
-    }
 
     if (compareActive)
     {
@@ -607,15 +600,12 @@ void PatchMutatorPanel::refreshCompareUiState()
 
 void PatchMutatorPanel::applyCompareControlLock(bool compareActive)
 {
-    const float alpha = compareActive ? 0.5f : 1.0f;
-
-    const auto lockControl = [compareActive, alpha](juce::Component* control)
+    const auto lockControl = [compareActive](juce::Component* control)
     {
         if (control == nullptr)
             return;
 
         control->setEnabled(! compareActive);
-        control->setAlpha(alpha);
     };
 
     lockControl(amountSlider_.get());
@@ -632,7 +622,7 @@ void PatchMutatorPanel::applyCompareControlLock(bool compareActive)
     lockControl(lfo2Toggle_.get());
     lockControl(enableMatrixModToggle_.get());
 
-    // Action buttons: locked -> disabled + gray; unlocked -> restore from their enabled mirror.
+    // Action buttons: locked -> disabled skin paint; unlocked -> restore from their enabled mirror.
     const auto lockActionButton = [this, compareActive](TSS::Button* button, const char* mirrorId)
     {
         if (button == nullptr)
@@ -642,7 +632,6 @@ void PatchMutatorPanel::applyCompareControlLock(bool compareActive)
                                  ? false
                                  : static_cast<bool>(apvts_.state.getProperty(mirrorId, false));
         button->setEnabled(enabled);
-        button->setAlpha(enabled ? 1.0f : 0.5f);
     };
 
     lockActionButton(mutateButton_.get(), MutatorState::kMutateEnabled);
@@ -652,10 +641,7 @@ void PatchMutatorPanel::applyCompareControlLock(bool compareActive)
     lockActionButton(exportButton_.get(), MutatorState::kExportEnabled);
 
     if (historyComboBox_ != nullptr)
-    {
-        historyComboBox_->setAlpha(alpha);
         historyComboBox_->setEnabled(! compareActive);
-    }
 
     // History prev/next enablement is owned by refreshCompareUiState (needs flat entry count).
 }

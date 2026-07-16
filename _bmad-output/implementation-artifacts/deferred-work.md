@@ -510,6 +510,16 @@
   summary: Export Keep-both collision suffixes stop at `-999` and may return an existing folder.
   evidence: Code review 6-13; `resolveKeepSessionFolder` max suffix 999; extreme-stress only — harden with explicit failure or unbounded suffix later.
 
+## Deferred from: spec-disabled-controls-look (2026-07-17)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-disabled-controls-look.md`
+  summary: Dead `*BorderDisabled` Look/skin fields remain loaded while paint uses enabled border colours.
+  evidence: Blind Hunter / Edge Case; Button, Toggle, ButtonLike tokens still wired but unused at paint time — cleanup when skin API is next trimmed.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-disabled-controls-look.md`
+  summary: Very small or near-zero slider values can omit the disabled value fill (width rounds to 0).
+  evidence: Edge Case Hunter; same rounding path as enabled sliders; pre-existing, not introduced by the three-layer disabled paint.
+
 ## Resolved during code review 6-13 (2026-07-16)
 
 - Device dump no longer blocks the message thread (`requestSinglePatchAsync` + timers).

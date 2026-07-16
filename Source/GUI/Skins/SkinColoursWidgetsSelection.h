@@ -42,8 +42,8 @@ namespace TSS::SkinColours
 
                 inline constexpr ColourElement kTriangleDisabled = {
                     "ComboBoxStandardTriangleDisabled",
-                    Common::kDecorationDisabled,
-                    Common::kDecorationDisabled
+                    Common::kContentDisabled,
+                    Common::kContentDisabled
                 };
 
                 inline constexpr ColourElement kTextDisabled = {
@@ -81,14 +81,15 @@ namespace TSS::SkinColours
 
                 inline constexpr ColourElement kBackgroundDisabled = {
                     "ComboBoxButtonLikeBackgroundDisabled",
-                    Common::kBackgroundDisabled,
-                    Common::kBackgroundDisabled,
+                    ColourChart::kDarkGrey2,
+                    ColourChart::kDarkGrey2,
                 };
 
+                // Same chart values as enabled border (black/cream variants).
                 inline constexpr ColourElement kBorderDisabled = {
                     "ComboBoxButtonLikeBorderDisabled",
-                    Common::kBorderDisabled,
-                    Common::kBorderDisabled,
+                    ColourChart::kDarkGrey3,
+                    ColourChart::kDarkGrey4
                 };
 
                 inline constexpr ColourElement kTextDisabled = {

@@ -246,6 +246,9 @@ namespace TSS
         colours_[SkinColourId::kToggleTextOff] = juce::Colour(accessColour(Widgets::Toggle::kTextOff));
         colours_[SkinColourId::kToggleBackgroundOn] = juce::Colour(accessColour(Widgets::Toggle::kBackgroundOn));
         colours_[SkinColourId::kToggleTextOn] = juce::Colour(accessColour(Widgets::Toggle::kTextOn));
+        colours_[SkinColourId::kToggleBackgroundDisabled] = juce::Colour(accessColour(Widgets::Toggle::kBackgroundDisabled));
+        colours_[SkinColourId::kToggleBorderDisabled] = juce::Colour(accessColour(Widgets::Toggle::kBorderDisabled));
+        colours_[SkinColourId::kToggleTextDisabled] = juce::Colour(accessColour(Widgets::Toggle::kTextDisabled));
     }
     
     template <typename Accessor>
@@ -255,6 +258,7 @@ namespace TSS
         
         colours_[SkinColourId::kSliderTrackEnabled] = juce::Colour(accessColour(Widgets::Slider::kTrack));
         colours_[SkinColourId::kSliderTrackDisabled] = juce::Colour(accessColour(Widgets::Slider::kTrackDisabled));
+        colours_[SkinColourId::kSliderBackgroundDisabled] = juce::Colour(accessColour(Widgets::Slider::kBackgroundDisabled));
         colours_[SkinColourId::kSliderValueBarEnabled] = juce::Colour(accessColour(Widgets::Slider::kValueBar));
         colours_[SkinColourId::kSliderValueBarDisabled] = juce::Colour(accessColour(Widgets::Slider::kValueBarDisabled));
         colours_[SkinColourId::kSliderTextEnabled] = juce::Colour(accessColour(Widgets::Slider::kText));

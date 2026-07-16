@@ -2,7 +2,6 @@
 
 #include <juce_audio_devices/juce_audio_devices.h>
 
-#include "GUI/Helpers/GrayedControlHelper.h"
 #include "GUI/Widgets/Label.h"
 #include "GUI/Widgets/ComboBox.h"
 #include "GUI/Widgets/HeaderLogoPopupMenu.h"
@@ -426,7 +425,6 @@ void HeaderPanel::populateOutputPortCombo(TSS::ComboBox& combo, std::vector<juce
 void HeaderPanel::configureStandaloneKeyboardFrom()
 {
     keyboardFromComboBox_.setEnabled(true);
-    TSS::GrayedControlHelper::applyGrayedAppearance(keyboardFromComboBox_, false);
     populateInputPortCombo(keyboardFromComboBox_, keyboardFromPortIdentifiers_);
 }
 
@@ -437,7 +435,6 @@ void HeaderPanel::configurePluginKeyboardFrom()
     keyboardFromComboBox_.addItem(PluginDisplayNames::HeaderPanel::kHostDisplay, kPluginHostItemId);
     keyboardFromComboBox_.setSelectedId(kPluginHostItemId, juce::dontSendNotification);
     keyboardFromComboBox_.setEnabled(false);
-    TSS::GrayedControlHelper::applyGrayedAppearance(keyboardFromComboBox_, true);
 }
 
 juce::String HeaderPanel::getSelectedMidiFromPortIdentifier() const

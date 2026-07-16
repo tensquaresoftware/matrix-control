@@ -59,7 +59,6 @@ namespace TSS
             pasteEnabled_ = static_cast<bool>(state_.getProperty(propertyId_, false));
             pasteButton_.setEnabled(true);
             pasteButton_.setInactiveAppearance(! pasteEnabled_);
-            GrayedControlHelper::applyGrayedAppearance(pasteButton_, ! pasteEnabled_);
 
             if (pasteEnabled_)
             {

@@ -82,9 +82,9 @@ namespace TSS
 
     juce::Colour Button::getBorderColour(bool enabled) const
     {
-        if (! enabled)
-            return look_.borderDisabled;
+        juce::ignoreUnused(enabled);
 
+        // Disabled border matches the enabled border for this control.
         return getToggleState() ? look_.borderOn : look_.borderOff;
     }
 

@@ -41,6 +41,7 @@ namespace TSS
         SliderLook look;
         look.trackEnabled = skin.getSliderTrackColour(true);
         look.trackDisabled = skin.getSliderTrackColour(false);
+        look.backgroundDisabled = skin.getColour(SkinColourId::kSliderBackgroundDisabled);
         look.valueBarEnabled = skin.getSliderValueBarColour(true);
         look.valueBarDisabled = skin.getSliderValueBarColour(false);
         look.textEnabled = skin.getSliderTextColour(true);
@@ -174,6 +175,9 @@ namespace TSS
         look.backgroundOn = skin.getToggleBackgroundColour(true);
         look.textOff = skin.getToggleTextColour(false);
         look.textOn = skin.getToggleTextColour(true);
+        look.backgroundDisabled = skin.getColour(SkinColourId::kToggleBackgroundDisabled);
+        look.borderDisabled = skin.getColour(SkinColourId::kToggleBorderDisabled);
+        look.textDisabled = skin.getColour(SkinColourId::kToggleTextDisabled);
         look.font = resolvedTypographyFont(skin, TypographyStyleId::kDefault);
         return look;
     }

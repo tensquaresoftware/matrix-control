@@ -46,7 +46,11 @@ namespace TSS
         juce::Colour borderColourForStyle(ComboBoxControlStyle style, const ComboBoxLook& look, bool enabled)
         {
             if (style == ComboBoxControlStyle::ButtonLike)
-                return enabled ? look.buttonLikeBorder : look.buttonLikeBorderDisabled;
+            {
+                juce::ignoreUnused(enabled);
+                // Disabled border matches the enabled ButtonLike border.
+                return look.buttonLikeBorder;
+            }
 
             return enabled ? look.borderEnabled : look.borderDisabled;
         }

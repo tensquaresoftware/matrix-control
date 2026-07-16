@@ -71,7 +71,7 @@ namespace TSS
         void drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);
         void drawFocusBorderIfNeeded(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool hasFocus);
 
-        juce::Rectangle<float> calculateValueBarBounds(const juce::Rectangle<int>& trackBoundsInt, int insetPerSide, bool enabled) const;
+        juce::Rectangle<float> calculateValueBarBounds(const juce::Rectangle<int>& trackBoundsInt, int insetPerSide) const;
 
         static int countDecimalPlacesForStep(double step);
         double calculateStep(bool isShiftPressed) const;

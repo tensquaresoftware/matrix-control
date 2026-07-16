@@ -26,6 +26,7 @@ namespace TSS
     {
         juce::Colour trackEnabled{};
         juce::Colour trackDisabled{};
+        juce::Colour backgroundDisabled{};
         juce::Colour valueBarEnabled{};
         juce::Colour valueBarDisabled{};
         juce::Colour textEnabled{};
@@ -131,6 +132,9 @@ namespace TSS
         juce::Colour backgroundOn{};
         juce::Colour textOff{};
         juce::Colour textOn{};
+        juce::Colour backgroundDisabled{};
+        juce::Colour borderDisabled{};
+        juce::Colour textDisabled{};
         juce::Font font{juce::FontOptions{}};
     };
 

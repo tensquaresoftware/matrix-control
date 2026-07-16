@@ -57,10 +57,14 @@ namespace TSS
         kToggleTextOff,
         kToggleBackgroundOn,
         kToggleTextOn,
+        kToggleBackgroundDisabled,
+        kToggleBorderDisabled,
+        kToggleTextDisabled,
         
         // Slider colours
         kSliderTrackEnabled,
         kSliderTrackDisabled,
+        kSliderBackgroundDisabled,
         kSliderValueBarEnabled,
         kSliderValueBarDisabled,
         kSliderTextEnabled,
