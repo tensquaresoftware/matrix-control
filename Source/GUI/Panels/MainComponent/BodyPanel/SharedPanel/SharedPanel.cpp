@@ -3,6 +3,7 @@
 #include "GUI/Factories/WidgetFactory.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Skins/SkinHelpers.h"
+#include "GUI/Helpers/CompareLockBinder.h"
 #include "GUI/Panels/MainComponent/BodyPanel/SharedPanel/MatrixModulationPanel/MatrixModulationPanel.h"
 #include "GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/PatchManagerPanel.h"
 
@@ -27,6 +28,10 @@ SharedPanel::SharedPanel(TSS::ISkin& skin,
         apvts,
         patchFileService);
     addAndMakeVisible(*patchManagerPanel_);
+
+    compareLockBinder_ = std::make_unique<TSS::CompareLockBinder>(
+        apvts,
+        std::vector<juce::Component*>{ matrixModulationPanel_.get() });
 }
 
 SharedPanel::~SharedPanel() = default;

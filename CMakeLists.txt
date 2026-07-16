@@ -188,6 +188,7 @@ set(PLUGIN_SOURCES
     Source/GUI/Factories/WidgetFactory.cpp
     Source/GUI/Factories/DimensionFactory.cpp
     Source/GUI/Helpers/GrayedControlHelper.cpp
+    Source/GUI/Helpers/CompareLockBinder.cpp
     Source/GUI/Factories/WidgetFactoryValidator.cpp
     Source/GUI/Layout/WidgetDimensionRegistry.cpp
     

@@ -123,6 +123,49 @@ PluginEditor::PluginEditor(PluginProcessor& p)
                 onConfirmed();
         });
 
+    pluginProcessor.setMutatorExportCollisionModalGate(
+        [](std::function<void(Core::ExportCollisionResolution)> onResolved)
+        {
+            namespace Msg = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::Messages;
+
+            juce::AlertWindow alert(Msg::kExportCollisionTitle,
+                                    Msg::kExportCollisionMessage,
+                                    juce::AlertWindow::QuestionIcon);
+            alert.addButton(Msg::kExportCollisionOverwrite, 1);
+            alert.addButton(Msg::kExportCollisionKeep, 2);
+            alert.addButton(Msg::kExportCollisionCancel, 0);
+
+            if (! onResolved)
+                return;
+
+            switch (alert.runModalLoop())
+            {
+                case 1: onResolved(Core::ExportCollisionResolution::kOverwrite); break;
+                case 2: onResolved(Core::ExportCollisionResolution::kKeep); break;
+                default: onResolved(Core::ExportCollisionResolution::kCancel); break;
+            }
+        });
+
+    pluginProcessor.setMutatorHistoryGateModalGate(
+        []() -> Core::MutatorHistoryGateChoice
+        {
+            namespace Msg = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::Messages;
+
+            juce::AlertWindow alert(Msg::kHistoryGateTitle,
+                                    Msg::kHistoryGateMessage,
+                                    juce::AlertWindow::QuestionIcon);
+            alert.addButton(Msg::kHistoryGateExport, 1);
+            alert.addButton(Msg::kHistoryGateDiscard, 2);
+            alert.addButton(Msg::kHistoryGateCancel, 0);
+
+            switch (alert.runModalLoop())
+            {
+                case 1: return Core::MutatorHistoryGateChoice::kExport;
+                case 2: return Core::MutatorHistoryGateChoice::kDiscard;
+                default: return Core::MutatorHistoryGateChoice::kCancel;
+            }
+        });
+
     pluginProcessor.setPatchSaveFilePicker(
         [safeThis = juce::Component::SafePointer<PluginEditor>(this)](
             juce::File suggestedFolder, juce::String suggestedStem) -> juce::File

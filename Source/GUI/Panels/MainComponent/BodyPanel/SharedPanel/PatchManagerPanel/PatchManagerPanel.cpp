@@ -5,6 +5,7 @@
 #include "Modules/ComputerPatchesPanel.h"
 #include "Modules/PatchMutatorPanel.h"
 
+#include "GUI/Helpers/CompareLockBinder.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Looks/LookBuilders.h"
 #include "GUI/Skins/ISkin.h"
@@ -39,6 +40,13 @@ PatchManagerPanel::PatchManagerPanel(TSS::ISkin& skin,
     addAndMakeVisible(*internalPatchesPanel_);
     addAndMakeVisible(*computerPatchesPanel_);
     addAndMakeVisible(*patchMutatorPanel_);
+
+    // Patch Mutator panel self-manages its Compare lock (COMPARE button must stay live).
+    compareLockBinder_ = std::make_unique<TSS::CompareLockBinder>(
+        apvts,
+        std::vector<juce::Component*>{ bankUtilityPanel_.get(),
+                                       internalPatchesPanel_.get(),
+                                       computerPatchesPanel_.get() });
 
     setSize(dims_.width, dims_.height);
 }

@@ -104,6 +104,7 @@ private:
 
     void refreshHistoryComboBox();
     void refreshCompareUiState();
+    void applyCompareControlLock(bool compareActive);
     void refreshRecipeFromApvts();
     void hydrateRecipeTogglesFromApvts(const juce::ValueTree& state);
     static bool isRecipeProperty(const juce::String& propertyName);

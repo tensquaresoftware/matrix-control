@@ -6,6 +6,7 @@
 #include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Widgets/VerticalSeparator.h"
 #include "GUI/Widgets/ModuleHeader.h"
+#include "GUI/Helpers/CompareLockBinder.h"
 #include "PatchEditPanel/PatchEditPanel.h"
 #include "MasterEditPanel/MasterEditPanel.h"
 #include "SharedPanel/SharedPanel.h"
@@ -47,6 +48,10 @@ BodyPanel::BodyPanel(TSS::ISkin& skin,
 
     masterEditPanel_ = std::make_unique<MasterEditPanel>(skin, dims_.masterEdit, widgetFactory, apvts);
     addAndMakeVisible(*masterEditPanel_);
+
+    compareLockBinder_ = std::make_unique<TSS::CompareLockBinder>(
+        apvts,
+        std::vector<juce::Component*>{ patchEditPanel_.get(), masterEditPanel_.get() });
 }
 
 BodyPanel::~BodyPanel() = default;

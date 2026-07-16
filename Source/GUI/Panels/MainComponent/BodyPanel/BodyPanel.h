@@ -17,6 +17,7 @@ namespace TSS
 {
     class ISkin;
     class VerticalSeparator;
+    class CompareLockBinder;
 }
 
 class PatchEditPanel;
@@ -55,6 +56,7 @@ private:
     std::unique_ptr<SharedPanel> sharedPanel_;
     std::unique_ptr<TSS::VerticalSeparator> verticalSeparator2_;
     std::unique_ptr<MasterEditPanel> masterEditPanel_;
+    std::unique_ptr<TSS::CompareLockBinder> compareLockBinder_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BodyPanel)
 };

@@ -16,6 +16,7 @@ namespace Core
 namespace TSS
 {
     class ISkin;
+    class CompareLockBinder;
 }
 
 class MatrixModulationPanel;
@@ -46,6 +47,7 @@ private:
 
     std::unique_ptr<MatrixModulationPanel> matrixModulationPanel_;
     std::unique_ptr<PatchManagerPanel> patchManagerPanel_;
+    std::unique_ptr<TSS::CompareLockBinder> compareLockBinder_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SharedPanel)
 };

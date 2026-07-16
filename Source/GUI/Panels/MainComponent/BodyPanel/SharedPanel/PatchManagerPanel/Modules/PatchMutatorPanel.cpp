@@ -552,6 +552,8 @@ void PatchMutatorPanel::refreshCompareUiState()
     const int selectedMutateRootIndex = static_cast<int>(apvts_.state.getProperty(MutatorState::kSelectedMutateRootIndex, -1));
     const bool historyEmpty = mutateLabelList.isEmpty() || selectedMutateRootIndex < 0;
 
+    applyCompareControlLock(compareActive);
+
     if (compareButton_ != nullptr)
         compareButton_->setEnabled(compareActive || ! historyEmpty);
 
@@ -568,6 +570,59 @@ void PatchMutatorPanel::refreshCompareUiState()
         stopTimer();
         if (compareButton_ != nullptr)
             compareButton_->setAlpha(1.0f);
+    }
+}
+
+void PatchMutatorPanel::applyCompareControlLock(bool compareActive)
+{
+    const float alpha = compareActive ? 0.5f : 1.0f;
+
+    const auto lockControl = [compareActive, alpha](juce::Component* control)
+    {
+        if (control == nullptr)
+            return;
+
+        control->setEnabled(! compareActive);
+        control->setAlpha(alpha);
+    };
+
+    lockControl(amountSlider_.get());
+    lockControl(randomSlider_.get());
+    lockControl(dco1Toggle_.get());
+    lockControl(dco2Toggle_.get());
+    lockControl(vcfVcaToggle_.get());
+    lockControl(fmTrackToggle_.get());
+    lockControl(rampPortamentoToggle_.get());
+    lockControl(env1Toggle_.get());
+    lockControl(env2Toggle_.get());
+    lockControl(env3Toggle_.get());
+    lockControl(lfo1Toggle_.get());
+    lockControl(lfo2Toggle_.get());
+    lockControl(enableMatrixModToggle_.get());
+
+    // Action buttons: locked -> disabled + gray; unlocked -> restore from their enabled mirror.
+    const auto lockActionButton = [this, compareActive](TSS::Button* button, const char* mirrorId)
+    {
+        if (button == nullptr)
+            return;
+
+        const bool enabled = compareActive
+                                 ? false
+                                 : static_cast<bool>(apvts_.state.getProperty(mirrorId, false));
+        button->setEnabled(enabled);
+        button->setAlpha(enabled ? 1.0f : 0.5f);
+    };
+
+    lockActionButton(mutateButton_.get(), MutatorState::kMutateEnabled);
+    lockActionButton(retryButton_.get(), MutatorState::kRetryEnabled);
+    lockActionButton(deleteButton_.get(), MutatorState::kDeleteEnabled);
+    lockActionButton(clearButton_.get(), MutatorState::kClearEnabled);
+    lockActionButton(exportButton_.get(), MutatorState::kExportEnabled);
+
+    if (historyComboBox_ != nullptr)
+    {
+        historyComboBox_->setAlpha(alpha);
+        historyComboBox_->setEnabled(! compareActive);
     }
 }
 

@@ -16,6 +16,7 @@ namespace TSS
 {
     class ISkin;
     class SectionHeader;
+    class CompareLockBinder;
 }
 
 class WidgetFactory;
@@ -48,6 +49,7 @@ private:
     std::unique_ptr<InternalPatchesPanel> internalPatchesPanel_;
     std::unique_ptr<ComputerPatchesPanel> computerPatchesPanel_;
     std::unique_ptr<PatchMutatorPanel> patchMutatorPanel_;
+    std::unique_ptr<TSS::CompareLockBinder> compareLockBinder_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PatchManagerPanel)
 };
