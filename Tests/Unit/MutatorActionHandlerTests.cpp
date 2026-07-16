@@ -54,6 +54,8 @@ public:
     int defragCallCount { 0 };
     int rebuildMirrorCallCount { 0 };
     int auditionCallCount { 0 };
+    int advanceHistoryCallCount { 0 };
+    bool lastAdvanceWasNext { false };
     juce::File lastExportFolder;
     Core::ExportCollisionResolution lastExportResolution { Core::ExportCollisionResolution::kCancel };
 
@@ -127,6 +129,12 @@ public:
     {
         ++rebuildMirrorCallCount;
     }
+
+    void advanceHistorySelection(bool isNext) override
+    {
+        ++advanceHistoryCallCount;
+        lastAdvanceWasNext = isNext;
+    }
 };
 
 class MutatorActionHandlerTests : public juce::UnitTest
@@ -146,6 +154,8 @@ public:
         mutate_blocked_setsFooter();
         historySelection_debounced();
         historySelection_rootChange_rebuildsMirrors();
+        historyPrevious_delegatesToEngine();
+        historyNext_delegatesToEngine();
     }
 
 private:
@@ -323,6 +333,28 @@ private:
 
         harness.handler.flushHistorySelectionDebouncerForTests();
         expectEquals(harness.engine.auditionCallCount, 1);
+    }
+
+    void historyPrevious_delegatesToEngine()
+    {
+        beginTest("historyPrevious_delegatesToEngine");
+
+        Harness harness;
+        harness.handler.handleAction(PatchMutator::kHistoryPrevious, juce::int64(1));
+
+        expectEquals(harness.engine.advanceHistoryCallCount, 1);
+        expect(! harness.engine.lastAdvanceWasNext);
+    }
+
+    void historyNext_delegatesToEngine()
+    {
+        beginTest("historyNext_delegatesToEngine");
+
+        Harness harness;
+        harness.handler.handleAction(PatchMutator::kHistoryNext, juce::int64(1));
+
+        expectEquals(harness.engine.advanceHistoryCallCount, 1);
+        expect(harness.engine.lastAdvanceWasNext);
     }
 };
 

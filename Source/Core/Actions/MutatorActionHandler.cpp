@@ -37,6 +37,10 @@ namespace Core
             handleClear();
         else if (propertyId == kExport)
             handleExport();
+        else if (propertyId == kHistoryPrevious)
+            handleHistoryPrevious();
+        else if (propertyId == kHistoryNext)
+            handleHistoryNext();
     }
 
     void MutatorActionHandler::onHistorySelectionChanged(bool rootSelectionChanged)
@@ -124,6 +128,22 @@ namespace Core
         }
 
         handleEngineResult(result);
+    }
+
+    void MutatorActionHandler::handleHistoryPrevious()
+    {
+        if (engine_ == nullptr)
+            return;
+
+        engine_->advanceHistorySelection(false);
+    }
+
+    void MutatorActionHandler::handleHistoryNext()
+    {
+        if (engine_ == nullptr)
+            return;
+
+        engine_->advanceHistorySelection(true);
     }
 
     void MutatorActionHandler::propagateFooterMessage(const juce::String& message,

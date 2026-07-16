@@ -637,6 +637,67 @@ void PatchMutatorEngine::rebuildHistoryListMirrors()
     syncHistoryUiProperties(apvts_);
 }
 
+void PatchMutatorEngine::advanceHistorySelection(bool isNext)
+{
+    if (readBoolProperty(apvts_.state, MutatorState::kCompareActive, false))
+        return;
+
+    applySelectionFromApvts();
+
+    struct FlatEntry
+    {
+        int rootIndex = -1;
+        int retryIndex = MutationHistoryStore::kRootOnly;
+    };
+
+    juce::Array<FlatEntry> flat;
+    for (const int rootIndex : historyStore_.getSortedRootIndices())
+    {
+        flat.add({ rootIndex, MutationHistoryStore::kRootOnly });
+        for (const int retryIndex : historyStore_.getSortedRetryIndices(rootIndex))
+            flat.add({ rootIndex, retryIndex });
+    }
+
+    if (flat.isEmpty())
+        return;
+
+    // Circular nav is a no-op with a single entry — keep selection unchanged.
+    if (flat.size() < 2)
+        return;
+
+    int currentIndex = -1;
+    for (int i = 0; i < flat.size(); ++i)
+    {
+        if (flat.getReference(i).rootIndex == selectedRootIndex_
+            && flat.getReference(i).retryIndex == selectedRetryIndex_)
+        {
+            currentIndex = i;
+            break;
+        }
+    }
+
+    // Stale / unknown selection — do not pretend we are at flat[0] and jump.
+    if (currentIndex < 0)
+        return;
+
+    const int count = flat.size();
+    const int nextIndex = isNext
+                              ? (currentIndex + 1) % count
+                              : (currentIndex - 1 + count) % count;
+    const auto& next = flat.getReference(nextIndex);
+
+    if (next.rootIndex == selectedRootIndex_ && next.retryIndex == selectedRetryIndex_)
+        return;
+
+    selectedRootIndex_ = next.rootIndex;
+    selectedRetryIndex_ = next.retryIndex;
+
+    // Match panel write order so existing selection listeners rebuild + audition.
+    auto& state = apvts_.state;
+    state.setProperty(MutatorState::kSelectedRetryIndex, selectedRetryIndex_, nullptr);
+    state.setProperty(MutatorState::kSelectedMutateRootIndex, selectedRootIndex_, nullptr);
+}
+
 void PatchMutatorEngine::auditionSelectedHistoryEntry()
 {
     if (readBoolProperty(apvts_.state, MutatorState::kCompareActive, false))

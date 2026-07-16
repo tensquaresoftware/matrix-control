@@ -98,6 +98,8 @@ namespace Core
             { PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kDelete, ActionHandlerKind::Mutator },
             { PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kClear, ActionHandlerKind::Mutator },
             { PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kExport, ActionHandlerKind::Mutator },
+            { PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kHistoryPrevious, ActionHandlerKind::Mutator },
+            { PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kHistoryNext, ActionHandlerKind::Mutator },
         };
 
         const std::unordered_map<juce::String, ActionHandlerKind>& registryMap()

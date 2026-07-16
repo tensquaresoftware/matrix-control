@@ -45,6 +45,8 @@ namespace Core
         void handleDelete();
         void handleClear();
         void handleExport();
+        void handleHistoryPrevious();
+        void handleHistoryNext();
         void propagateFooterMessage(const juce::String& message, const juce::String& severity);
         void handleEngineResult(const MutatorActionResult& result);
 

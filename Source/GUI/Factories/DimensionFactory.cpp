@@ -31,6 +31,7 @@ namespace
             .patchMutatorDeleteWidth = BW::kPatchMutatorDelete,
             .patchMutatorClearWidth = BW::kPatchMutatorClear,
             .patchMutatorExportWidth = BW::kPatchMutatorExport,
+            .patchMutatorHistoryNavWidth = BW::kPatchMutatorHistoryNav,
         };
     }
 

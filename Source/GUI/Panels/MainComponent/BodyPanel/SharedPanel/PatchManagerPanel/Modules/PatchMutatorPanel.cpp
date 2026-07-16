@@ -409,6 +409,22 @@ void PatchMutatorPanel::setupHistoryLine(TSS::ISkin& skin, WidgetFactory& widget
     };
     addAndMakeVisible(*historyComboBox_);
 
+    historyPreviousButton_ = widgetFactory.createStandaloneButton(
+        PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kHistoryPrevious,
+        skin,
+        dims_.buttons.height);
+    connectButtonToApvts(historyPreviousButton_.get(),
+                         PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kHistoryPrevious);
+    addAndMakeVisible(*historyPreviousButton_);
+
+    historyNextButton_ = widgetFactory.createStandaloneButton(
+        PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kHistoryNext,
+        skin,
+        dims_.buttons.height);
+    connectButtonToApvts(historyNextButton_.get(),
+                         PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kHistoryNext);
+    addAndMakeVisible(*historyNextButton_);
+
     compareButton_ = widgetFactory.createStandaloneButton(
         PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kCompare,
         skin,
@@ -466,6 +482,7 @@ void PatchMutatorPanel::valueTreePropertyChanged(juce::ValueTree&,
     }
 
     if (name == MutatorState::kCompareActive || name == MutatorState::kHistoryMutateList
+        || name == MutatorState::kHistoryRetryListsByRoot
         || name == MutatorState::kSelectedMutateRootIndex)
     {
         refreshCompareUiState();
@@ -551,6 +568,7 @@ void PatchMutatorPanel::refreshCompareUiState()
     const auto mutateLabelList = parsePipeSeparatedList(apvts_.state.getProperty(MutatorState::kHistoryMutateList).toString());
     const int selectedMutateRootIndex = static_cast<int>(apvts_.state.getProperty(MutatorState::kSelectedMutateRootIndex, -1));
     const bool historyEmpty = mutateLabelList.isEmpty() || selectedMutateRootIndex < 0;
+    const int flatHistoryEntryCount = countFlatHistoryEntries(apvts_.state);
 
     applyCompareControlLock(compareActive);
 
@@ -559,6 +577,20 @@ void PatchMutatorPanel::refreshCompareUiState()
 
     if (historyComboBox_ != nullptr)
         historyComboBox_->setEnabled(! compareActive && ! historyEmpty);
+
+    // Nav is useful only when circular step can change selection (≥2 flat entries).
+    const bool historyNavEnabled = ! compareActive && flatHistoryEntryCount >= 2;
+    const float historyNavAlpha = historyNavEnabled ? 1.0f : 0.5f;
+    if (historyPreviousButton_ != nullptr)
+    {
+        historyPreviousButton_->setEnabled(historyNavEnabled);
+        historyPreviousButton_->setAlpha(historyNavAlpha);
+    }
+    if (historyNextButton_ != nullptr)
+    {
+        historyNextButton_->setEnabled(historyNavEnabled);
+        historyNextButton_->setAlpha(historyNavAlpha);
+    }
 
     if (compareActive)
     {
@@ -624,6 +656,8 @@ void PatchMutatorPanel::applyCompareControlLock(bool compareActive)
         historyComboBox_->setAlpha(alpha);
         historyComboBox_->setEnabled(! compareActive);
     }
+
+    // History prev/next enablement is owned by refreshCompareUiState (needs flat entry count).
 }
 
 juce::StringArray PatchMutatorPanel::parsePipeSeparatedList(const juce::String& encodedList)
@@ -669,6 +703,20 @@ std::map<int, juce::StringArray> PatchMutatorPanel::parseRetryListsByRoot(const 
     }
 
     return result;
+}
+
+int PatchMutatorPanel::countFlatHistoryEntries(const juce::ValueTree& state)
+{
+    const auto byRoot = parseRetryListsByRoot(state.getProperty(MutatorState::kHistoryRetryListsByRoot).toString());
+    if (! byRoot.empty())
+    {
+        int count = 0;
+        for (const auto& entry : byRoot)
+            count += entry.second.size();
+        return count;
+    }
+
+    return parsePipeSeparatedList(state.getProperty(MutatorState::kHistoryMutateList).toString()).size();
 }
 
 void PatchMutatorPanel::rebuildRetryLabelsCacheFromApvts()
@@ -887,6 +935,8 @@ void PatchMutatorPanel::resized()
     if (retryButton_)             retryButton_->setUiScale(sf);
     if (historyLabel_)            historyLabel_->setUiScale(sf);
     if (historyComboBox_)        historyComboBox_->setUiScale(sf);
+    if (historyPreviousButton_)   historyPreviousButton_->setUiScale(sf);
+    if (historyNextButton_)       historyNextButton_->setUiScale(sf);
     if (compareButton_)           compareButton_->setUiScale(sf);
     if (deleteButton_)            deleteButton_->setUiScale(sf);
     if (clearButton_)             clearButton_->setUiScale(sf);
@@ -919,7 +969,7 @@ void PatchMutatorPanel::layoutSliderLine(int x, int y, TSS::Label* label, TSS::S
     const int toggleH     = juce::roundToInt(static_cast<float>(dims_.toggles.height) * sf);
     const int controlGap  = dims_.layout.interControlGap;
 
-    const float labelStep  = static_cast<float>(dims_.labels.patchMutatorWidth) * sf;
+    const float labelStep  = static_cast<float>(dims_.labels.patchMutatorWidth + controlGap) * sf;
     const float sliderStep = static_cast<float>(dims_.sliders.patchMutatorWidth + controlGap) * sf;
     const float buttonStep = static_cast<float>(actionButtonWidth + controlGap) * sf;
     const float toggleStep = static_cast<float>(dims_.toggles.patchMutatorWidth + controlGap) * sf;
@@ -959,6 +1009,7 @@ void PatchMutatorPanel::layoutHistoryLine(int x, int y)
     const int labelY        = y + (rowH - labelH) / 2;
     const int comboBoxY     = y + (rowH - comboBoxH) / 2;
     const int buttonH       = juce::roundToInt(static_cast<float>(dims_.buttons.height) * sf);
+    const int navW        = juce::roundToInt(static_cast<float>(dims_.buttons.patchMutatorHistoryNavWidth) * sf);
     const int compareW    = juce::roundToInt(static_cast<float>(dims_.buttons.patchMutatorCompareWidth) * sf);
     const int deleteW     = juce::roundToInt(static_cast<float>(dims_.buttons.patchMutatorDeleteWidth) * sf);
     const int clearW      = juce::roundToInt(static_cast<float>(dims_.buttons.patchMutatorClearWidth) * sf);
@@ -968,28 +1019,50 @@ void PatchMutatorPanel::layoutHistoryLine(int x, int y)
     const int controlGap  = dims_.layout.interControlGap;
 
     const float originX     = static_cast<float>(x);
-    const float labelStep   = static_cast<float>(dims_.labels.patchMutatorWidth) * sf;
+    const float labelStep   = static_cast<float>(dims_.labels.patchMutatorWidth + controlGap) * sf;
     const float comboStep   = static_cast<float>(dims_.comboBoxes.patchMutatorHistoryWidth + controlGap) * sf;
+    const float navStep     = static_cast<float>(dims_.buttons.patchMutatorHistoryNavWidth + controlGap) * sf;
     const float compareStep = static_cast<float>(dims_.buttons.patchMutatorCompareWidth + controlGap) * sf;
     const float deleteStep  = static_cast<float>(dims_.buttons.patchMutatorDeleteWidth + controlGap) * sf;
     const float clearStep   = static_cast<float>(dims_.buttons.patchMutatorClearWidth + controlGap) * sf;
     const float exportStep  = static_cast<float>(dims_.buttons.patchMutatorExportWidth + controlGap) * sf;
 
+    float cursorX = originX;
+
     if (auto* label = historyLabel_.get())
         label->setBounds(x, labelY, labelW, labelH);
+    cursorX += labelStep;
+
     if (auto* comboBox = historyComboBox_.get())
-        comboBox->setBounds(juce::roundToInt(originX + labelStep), comboBoxY, comboBoxW, comboBoxH);
+        comboBox->setBounds(juce::roundToInt(cursorX), comboBoxY, comboBoxW, comboBoxH);
+    cursorX += comboStep;
+
+    if (auto* button = historyPreviousButton_.get())
+        button->setBounds(juce::roundToInt(cursorX), y, navW, buttonH);
+    cursorX += navStep;
+
+    if (auto* button = historyNextButton_.get())
+        button->setBounds(juce::roundToInt(cursorX), y, navW, buttonH);
+    cursorX += navStep;
+
     if (auto* button = compareButton_.get())
-        button->setBounds(juce::roundToInt(originX + labelStep + comboStep), y, compareW, buttonH);
+        button->setBounds(juce::roundToInt(cursorX), y, compareW, buttonH);
+    cursorX += compareStep;
+
     if (auto* button = deleteButton_.get())
-        button->setBounds(juce::roundToInt(originX + labelStep + comboStep + compareStep), y, deleteW, buttonH);
+        button->setBounds(juce::roundToInt(cursorX), y, deleteW, buttonH);
+    cursorX += deleteStep;
+
     if (auto* button = clearButton_.get())
-        button->setBounds(juce::roundToInt(originX + labelStep + comboStep + compareStep + deleteStep), y, clearW, buttonH);
+        button->setBounds(juce::roundToInt(cursorX), y, clearW, buttonH);
+    cursorX += clearStep;
+
     if (auto* button = exportButton_.get())
-        button->setBounds(juce::roundToInt(originX + labelStep + comboStep + compareStep + deleteStep + clearStep), y, exportW, buttonH);
+        button->setBounds(juce::roundToInt(cursorX), y, exportW, buttonH);
+    cursorX += exportStep;
+
     if (auto* toggle = enableMatrixModToggle_.get())
-        toggle->setBounds(juce::roundToInt(originX + labelStep + comboStep + compareStep + deleteStep + clearStep + exportStep),
-                          y, toggleW, toggleH);
+        toggle->setBounds(juce::roundToInt(cursorX), y, toggleW, toggleH);
 }
 
 void PatchMutatorPanel::setSkin(TSS::ISkin& skin)
@@ -1032,6 +1105,10 @@ void PatchMutatorPanel::propagateSkinsToControlWidgets(TSS::ISkin& skin)
         mutateButton_->setLook(TSS::buttonLookFromSkin(skin));
     if (retryButton_)
         retryButton_->setLook(TSS::buttonLookFromSkin(skin));
+    if (historyPreviousButton_)
+        historyPreviousButton_->setLook(TSS::buttonLookFromSkin(skin));
+    if (historyNextButton_)
+        historyNextButton_->setLook(TSS::buttonLookFromSkin(skin));
     if (compareButton_)
         compareButton_->setLook(TSS::buttonLookFromSkin(skin));
     if (deleteButton_)

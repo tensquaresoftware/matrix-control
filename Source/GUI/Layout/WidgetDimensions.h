@@ -28,6 +28,7 @@ struct ButtonDimensions
     int patchMutatorDeleteWidth;
     int patchMutatorClearWidth;
     int patchMutatorExportWidth;
+    int patchMutatorHistoryNavWidth;
 };
 
 struct SliderDimensions

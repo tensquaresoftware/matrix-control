@@ -847,13 +847,15 @@ namespace PluginDisplayNames
                 constexpr const char* kEmptyHistorySentinel = "<EMPTY>";
                 const juce::String    kHistoryRootSentinel =
                     juce::String::fromUTF8("\xe2\x80\x94"); // em dash U+2014 — root-only History R row
-                
+
+                constexpr const char* kHistoryPrevious = "<";
+                constexpr const char* kHistoryNext     = ">";
                 constexpr const char* kMutate         = "MUTATE";
                 constexpr const char* kRetry          = "RETRY";
-                constexpr const char* kCompare        = "COMPARE";
-                const juce::String    kDelete         = juce::String::fromUTF8("\xe2\x80\x94"); // displays a @'–'
-                constexpr const char* kClear          = "CL";
-                constexpr const char* kExport         = "EXPORT";
+                constexpr const char* kCompare        = "C";
+                constexpr const char* kDelete         = "D";
+                constexpr const char* kClear          = "F"; // face = Flush; wire id remains Clear
+                constexpr const char* kExport         = "E";
 
                 constexpr const char* kEnableDco1           = "D1";
                 constexpr const char* kEnableDco2           = "D2";

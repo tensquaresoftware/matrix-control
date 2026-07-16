@@ -70,6 +70,8 @@ private:
 
     std::unique_ptr<TSS::Label> historyLabel_;
     std::unique_ptr<TSS::HierarchicalComboBox> historyComboBox_;
+    std::unique_ptr<TSS::Button> historyPreviousButton_;
+    std::unique_ptr<TSS::Button> historyNextButton_;
     std::unique_ptr<TSS::Button> compareButton_;
     std::unique_ptr<TSS::Button> deleteButton_;
     std::unique_ptr<TSS::Button> clearButton_;
@@ -91,6 +93,7 @@ private:
     void rebuildRetryLabelsCacheFromApvts();
     void pruneRetryLabelsCache();
     static std::map<int, juce::StringArray> parseRetryListsByRoot(const juce::String& encoded);
+    static int countFlatHistoryEntries(const juce::ValueTree& state);
 
     void propagateSkinsToControlWidgets(TSS::ISkin& skin);
     void propagateSkinsToToggleWidgets(TSS::ISkin& skin);

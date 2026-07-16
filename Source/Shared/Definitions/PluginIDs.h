@@ -609,6 +609,8 @@ namespace PluginIDs
                 constexpr const char* kAmount         = "patchMutatorAmount";
                 constexpr const char* kRandom         = "patchMutatorRandom";
                 constexpr const char* kHistory          = "patchMutatorHistory";
+                constexpr const char* kHistoryPrevious  = "patchMutatorHistoryPrevious";
+                constexpr const char* kHistoryNext      = "patchMutatorHistoryNext";
 
                 constexpr const char* kMutate         = "patchMutatorMutate";
                 constexpr const char* kRetry          = "patchMutatorRetry";

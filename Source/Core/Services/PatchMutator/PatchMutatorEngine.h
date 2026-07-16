@@ -64,6 +64,7 @@ namespace Core
         virtual MutatorActionResult defragHistory() = 0;
         virtual void auditionSelectedHistoryEntry() = 0;
         virtual void rebuildHistoryListMirrors() = 0;
+        virtual void advanceHistorySelection(bool isNext) = 0;
     };
 
     class PatchMutatorEngine final : public PatchMutatorEnginePort
@@ -97,6 +98,7 @@ namespace Core
 
         void auditionSelectedHistoryEntry() override;
         void rebuildHistoryListMirrors() override;
+        void advanceHistorySelection(bool isNext) override;
         void syncHistoryUiProperties(juce::AudioProcessorValueTreeState& apvts); // Story 6.6
         void refreshActionEnabledMirrors(juce::AudioProcessorValueTreeState& apvts); // Story 6.12
 

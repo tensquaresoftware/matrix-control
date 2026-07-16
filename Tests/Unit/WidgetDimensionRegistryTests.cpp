@@ -146,6 +146,14 @@ namespace
                           PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kExport,
                           BW::kPatchMutatorExport,
                           "export");
+        expectButtonWidth(test,
+                          PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kHistoryPrevious,
+                          BW::kPatchMutatorHistoryNav,
+                          "history previous");
+        expectButtonWidth(test,
+                          PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kHistoryNext,
+                          BW::kPatchMutatorHistoryNav,
+                          "history next");
 
         expectButtonWidth(test,
                           PatchEditSection::Dco1Module::StandaloneWidgets::kInit,

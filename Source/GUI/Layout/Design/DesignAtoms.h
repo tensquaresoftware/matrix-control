@@ -64,12 +64,13 @@ namespace TSS::Design
                 inline constexpr int kComputerPatchesSaveAs = 44;
                 inline constexpr int kComputerPatchesSave = 36;
 
-                inline constexpr int kPatchMutatorMutate = 48;
-                inline constexpr int kPatchMutatorRetry = 48;
-                inline constexpr int kPatchMutatorCompare = 48;
+                inline constexpr int kPatchMutatorMutate = 44;
+                inline constexpr int kPatchMutatorRetry = 44;
+                inline constexpr int kPatchMutatorCompare = 20;
                 inline constexpr int kPatchMutatorDelete = 20;
                 inline constexpr int kPatchMutatorClear = 20;
-                inline constexpr int kPatchMutatorExport = 44;
+                inline constexpr int kPatchMutatorExport = 20;
+                inline constexpr int kPatchMutatorHistoryNav = 20;
             }
 
             namespace Toggle

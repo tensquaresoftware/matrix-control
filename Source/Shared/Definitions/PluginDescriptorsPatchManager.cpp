@@ -213,6 +213,18 @@ namespace PluginDescriptors
             .widgetType = StandaloneWidgetType::kComboBox
         },
         {
+            .widgetId = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kHistoryPrevious,
+            .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kHistoryPrevious,
+            .parentGroupId = PluginIDs::PatchManagerSection::PatchMutatorModule::kGroupId,
+            .widgetType = StandaloneWidgetType::kButton
+        },
+        {
+            .widgetId = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kHistoryNext,
+            .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kHistoryNext,
+            .parentGroupId = PluginIDs::PatchManagerSection::PatchMutatorModule::kGroupId,
+            .widgetType = StandaloneWidgetType::kButton
+        },
+        {
             .widgetId = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kMutate,
             .displayName = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kMutate,
             .parentGroupId = PluginIDs::PatchManagerSection::PatchMutatorModule::kGroupId,

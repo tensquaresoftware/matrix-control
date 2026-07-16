@@ -58,6 +58,10 @@ std::optional<int> WidgetDimensionRegistry::resolveStandaloneButtonWidth(const j
     if (widgetId == PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kExport)
         return BW::kPatchMutatorExport;
 
+    if (widgetId == PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kHistoryPrevious
+        || widgetId == PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kHistoryNext)
+        return BW::kPatchMutatorHistoryNav;
+
     if (widgetId.startsWith("patchMutatorEnable"))
         return BW::kInit;
 
