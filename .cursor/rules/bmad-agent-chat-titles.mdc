@@ -42,13 +42,15 @@ Examples:
 Format: `BMad — {Workflow Label} : {Topic}`
 
 - Space before and after the colon.
-- `{Topic}` = short explanation of **this** conversation’s subject (see Topic rules below).
+- `{Workflow Label}` stays in English (command name).
+- `{Topic}` is a short **French** subject (see Topic rules below).
 - If no useful topic can be inferred (e.g. bare `/bmad-help`), use the label only: `BMad — Help` (no colon).
 
 Examples:
 
 - `/bmad-quick-dev` + mutator work → `BMad — Quick Dev : Patch Mutator`
-- `/bmad-correct-course` + bank unlock simplify → `BMad — Correct Course : Bank Unlock`
+- `/bmad-quick-dev` + disabled controls look → `BMad — Quick Dev : Look contrôles inactifs`
+- `/bmad-correct-course` + bank unlock simplify → `BMad — Correct Course : Unlock banque`
 - `/bmad-sprint-status` → `BMad — Sprint Status` (no topic needed)
 
 ---
@@ -89,11 +91,14 @@ Examples:
 
 Infer the topic from the user intent / first message (and attached story or spec name when present).
 
-1. **Length:** 2–4 content words. Prefer nouns / proper names already in the request.
-2. **Language:** English Title Case (same as workflow labels), even if Guillaume wrote in French.
-3. **Strip stop words** (FR + EN), including: `a`, `an`, `the`, `of`, `for`, `to`, `and`, `or`, `in`, `on`, `with`, `from`, `into`, `de`, `du`, `des`, `la`, `le`, `les`, `un`, `une`, `et`, `ou`, `à`, `au`, `aux`, `en`, `dans`, `pour`, `sur`, `avec`, `par`, `réduction`, `amélioration` when they are filler — keep the distinctive nouns only.
-4. **Good:** `Patch Mutator`, `Bank Unlock`, `Compare Lock`, `Midi Latency`
-5. **Bad:** `Réduction de la latence audio` (stop words + too long), `Improve the patch mutator export flow` (verbose)
+1. **Language split (mandatory):**
+   - **English stays only** for the fixed prefix: `BMad` + workflow label (`Quick Dev`, `Correct Course`, …).
+   - **French for the topic** after the colon — never English Title Case for the subject.
+2. **Length:** 2–5 content words. Prefer concrete nouns already in the request.
+3. **Casing:** sentence-style French (not English Title Case). Keep established product / UI terms when useful (`Look`, `Patch Mutator`, `MIDI`, IDs) mixed into an otherwise French phrase.
+4. **Strip stop words** when they only pad the phrase: `a`, `an`, `the`, `of`, `for`, `to`, `and`, `or`, `de`, `du`, `des`, `la`, `le`, `les`, `un`, `une`, `et`, `ou`, `à`, `au`, `aux`, `en`, `dans`, `pour`, `sur`, `avec`, `par` — keep distinctive nouns. Avoid long filler like `réduction de la…` / `amélioration de…`.
+5. **Good:** `Look contrôles inactifs`, `Patch Mutator`, `Unlock banque`, `Latence MIDI`
+6. **Bad:** `Disabled Controls Look` (English topic), `Réduction de la latence audio` (stop words + too long), `Improve the patch mutator export flow` (English + verbose)
 
 ---
 
@@ -112,9 +117,9 @@ Parse from the user message (slash command or attached skill context):
 When several conversations would share the **same base title** (formats A or B), disambiguate with a numeric suffix:
 
 ```
-BMad — Quick Dev : Patch Mutator (1)
-BMad — Quick Dev : Patch Mutator (2)
-BMad — Quick Dev : Patch Mutator (3)
+BMad — Quick Dev : Look contrôles inactifs (1)
+BMad — Quick Dev : Look contrôles inactifs (2)
+BMad — Quick Dev : Look contrôles inactifs (3)
 ```
 
 ### Algorithm (before calling `rename_chat`)
@@ -166,5 +171,6 @@ BMad — Quick Dev : Patch Mutator (3)
 | Wrong | Right |
 |---|---|
 | `BMad — Sprint Status (2026-06-19)` | `BMad — Sprint Status` |
-| `BMad — Correct Course : Réduction de la latence audio` | `BMad — Correct Course : Audio Latency` |
-| Two chats both named `BMad — Quick Dev : Patch Mutator` | Second becomes `BMad — Quick Dev : Patch Mutator (1)` |
+| `BMad — Quick Dev : Disabled Controls Look` | `BMad — Quick Dev : Look contrôles inactifs` |
+| `BMad — Correct Course : Réduction de la latence audio` | `BMad — Correct Course : Latence audio` |
+| Two chats both named `BMad — Quick Dev : Look contrôles inactifs` | Second becomes `BMad — Quick Dev : Look contrôles inactifs (1)` |

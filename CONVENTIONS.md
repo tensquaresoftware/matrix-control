@@ -105,13 +105,15 @@ Use the MCP tool `rename_chat` (`cursor-app-control`). Cursor rule: `.cursor/rul
 
 **Format B — all other BMad commands:** `BMad — {Workflow Label} : {Topic}`
 
-- Short English topic (2–4 content words, Title Case, no stop words).
+- Workflow labels stay in English (`Quick Dev`, `Correct Course`, …).
+- Topic after the colon is **French** (short, 2–5 words, no filler) — not English Title Case. Product/UI terms may stay as-is inside the French phrase (`Look`, `Patch Mutator`, `MIDI`).
 - Omit the colon and topic when none is useful (e.g. `/bmad-help` → `BMad — Help`).
 
 | Command (examples) | Sidebar title |
 |---|---|
+| `/bmad-quick-dev` (disabled controls look) | `BMad — Quick Dev : Look contrôles inactifs` |
 | `/bmad-quick-dev` (mutator work) | `BMad — Quick Dev : Patch Mutator` |
-| `/bmad-correct-course` (bank unlock) | `BMad — Correct Course : Bank Unlock` |
+| `/bmad-correct-course` (bank unlock) | `BMad — Correct Course : Unlock banque` |
 | `/bmad-sprint-status` | `BMad — Sprint Status` |
 
 **Duplicates:** if the base title is already used, append ` (n)` with the next free positive integer (`(1)`, `(2)`, …). See the Cursor rule for the read-only DB check before `rename_chat`.
