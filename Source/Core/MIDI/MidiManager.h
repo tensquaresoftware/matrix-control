@@ -2,7 +2,10 @@
 
 #include <memory>
 #include <atomic>
+#include <cstdint>
+#include <functional>
 #include <optional>
+#include <vector>
 
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_core/juce_core.h>
@@ -52,8 +55,28 @@ public:
                                  juce::uint8 destination);
 
     std::vector<juce::uint8> requestCurrentPatch();
+    // Request a single patch from the current bank by number (Request Data type=1).
+    std::vector<juce::uint8> requestSinglePatch(juce::uint8 patchNumber);
     std::vector<juce::uint8> requestMasterData();
-    
+
+    // Non-blocking single-patch request. Waits for the outbound queue to go idle (without
+    // blocking the message thread), settles, sends the request, then invokes callback on the
+    // message thread with packed patch bytes — or an empty vector on timeout / decode / cancel.
+    using PackedPatchCallback = std::function<void(std::vector<juce::uint8>)>;
+    void requestSinglePatchAsync(juce::uint8 patchNumber,
+                                 PackedPatchCallback callback,
+                                 int settleMs = 50,
+                                 int outboundIdleTimeoutMs = 500);
+    void cancelPendingSysExRequest() noexcept;
+
+    // True when MIDI output and input ports are open so a dump request can be attempted.
+    // Does not require deviceDetected — Program Change already works with ports alone.
+    bool isDeviceDumpAvailable() const;
+
+    // Blocks (message thread) until the outbound queue has drained and no SysEx is pending,
+    // or until timeoutMs elapses. Returns true if the queue reached idle. Wakes the consumer.
+    bool waitUntilOutboundQueueIdle(int timeoutMs);
+
     bool performDeviceInquiry();
     void run() override;
 
@@ -87,8 +110,23 @@ private:
     void sendSysExWithDelay(const juce::MemoryBlock& sysExMessage, const juce::String& description);
 
     std::optional<Core::MidiOutboundQueue::Message> pendingSysEx_;
-    std::vector<juce::uint8> requestSysExData(juce::uint8 requestType, size_t expectedPackedSize, 
-                                         const juce::String& requestDescription);
+    std::atomic<bool> hasPendingSysEx_{ false };
+    std::atomic<std::uint64_t> asyncRequestToken_{ 0 };
+    PackedPatchCallback pendingAsyncCallback_;
+
+    std::vector<juce::uint8> requestSysExData(juce::uint8 requestType,
+                                              size_t expectedPackedSize,
+                                              const juce::String& requestDescription,
+                                              juce::uint8 patchNumber = 0);
+    void sendArmedSinglePatchRequest(juce::uint8 patchNumber, std::uint64_t token);
+    void finishAsyncPackedPatch(std::uint64_t token, std::vector<juce::uint8> packed);
+    void pollOutboundIdleThenRequest(juce::uint8 patchNumber,
+                                     std::uint64_t token,
+                                     int settleMs,
+                                     juce::uint32 idleStartMs,
+                                     int outboundIdleTimeoutMs);
+    std::vector<juce::uint8> decodePackedPatchResponse(const juce::MemoryBlock& response,
+                                                       const juce::String& requestDescription);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MidiManager)
 };

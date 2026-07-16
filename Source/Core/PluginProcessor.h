@@ -12,6 +12,8 @@
 
 #include "Core/Services/DeviceMemoryLimits.h"
 #include "Core/Services/PatchFileNameReconciler.h"
+#include "Core/Services/PatchMutator/PatchLoadContext.h"
+#include "Core/Services/PatchMutator/PatchMutatorEngine.h"
 
 #include "Core/MIDI/MatrixModBusParameterSysExDispatcher.h"
 #include "Shared/Definitions/Matrix1000Limits.h"
@@ -149,6 +151,15 @@ public:
 
     void setMutatorDefragLimitModalGate(MutatorDefragLimitModalGate gate);
 
+    using MutatorExportCollisionModalGate =
+        std::function<void(std::function<void(Core::ExportCollisionResolution)>)>;
+
+    void setMutatorExportCollisionModalGate(MutatorExportCollisionModalGate gate);
+
+    using MutatorHistoryGateModalGate = std::function<Core::MutatorHistoryGateChoice()>;
+
+    void setMutatorHistoryGateModalGate(MutatorHistoryGateModalGate gate);
+
     using PatchSaveFilePicker = std::function<juce::File(juce::File suggestedFolder, juce::String suggestedStem)>;
 
     void setPatchSaveFilePicker(PatchSaveFilePicker picker);
@@ -271,6 +282,9 @@ private:
     juce::String getChoiceLabelForNumericValue(const juce::String& parameterId, const juce::var& newValue) const;
     void handleBankNumberChange(const juce::String& parameterId);
     void handlePatchNumberChange(const juce::String& parameterId);
+    void updateDevicePatchLoadContext();
+    bool confirmPatchContextChangeGate();
+    bool runMutatorExportForGate();
     void initializeClipboardPasteEnabledProperties();
     void refreshClipboardPasteEnabledProperties();
     void initializeMutatorRecipeState();
@@ -318,6 +332,11 @@ private:
     PatchFolderPicker patchFolderPicker_;
     MutatorExportFolderPicker mutatorExportFolderPicker_;
     MutatorDefragLimitModalGate mutatorDefragLimitModalGate_;
+    MutatorExportCollisionModalGate mutatorExportCollisionModalGate_;
+    MutatorHistoryGateModalGate mutatorHistoryGateModalGate_;
+    Core::PatchLoadContext patchLoadContext_;
+    int lastKnownPatchNumber_ = 0;
+    bool lastKnownPatchNumberInitialized_ = false;
     PatchSaveFilePicker patchSaveFilePicker_;
     PatchNameReconciliationPicker patchNameReconciliationPicker_;
     std::unique_ptr<Core::ModuleActionHandler> moduleActionHandler_;

@@ -21,27 +21,33 @@ MidiReceiver::~MidiReceiver()
 {
     // Mark as destroying to prevent callbacks from accessing members
     isDestroying = true;
-    
+
+    cancelOneShotSysExCapture();
+
     // Stop MIDI input to prevent new callbacks
     if (midiInput != nullptr)
     {
         midiInput->stop();
     }
-    
+
     reset();
 }
 
 void MidiReceiver::setMidiInput(juce::MidiInput* input)
 {
+    // Re-binding the same device must not stop it: MidiManager calls this on every
+    // syncMidiPortsFromState / restoreMidiPortsForHost, including when the port is
+    // already open. Stopping without start() silently kills inbound MIDI for the session.
+    if (midiInput == input)
+        return;
+
     if (midiInput != nullptr)
-    {
         midiInput->stop();
-    }
 
     midiInput = input;
 
-    // Note: The callback must be set when opening the port via MidiInputPort::openPort()
-    // The MidiInput is already started if callback was provided during opening
+    if (midiInput != nullptr)
+        midiInput->start();
 }
 
 void MidiReceiver::handleIncomingMidiMessage(juce::MidiInput* source,
@@ -64,15 +70,17 @@ void MidiReceiver::handleIncomingMidiMessage(juce::MidiInput* source,
 
     if (message.isSysEx())
     {
-        const juce::uint8* sysExData = message.getSysExData();
-        int sysExSize = message.getSysExDataSize();
+        // JUCE's getSysExData() excludes F0/F7. Our parser/decoder require the full envelope
+        // (same format as on-disk .syx and outbound encode). Use getRawData() which keeps both.
+        const juce::uint8* rawData = message.getRawData();
+        const int rawSize = message.getRawDataSize();
 
-        MidiLogger::getInstance().logInfo("SysEx message detected: " + 
-                                          juce::String(sysExSize) + " bytes");
+        MidiLogger::getInstance().logInfo("SysEx message detected: " +
+                                          juce::String(rawSize) + " bytes");
 
-        if (sysExSize > 0 && sysExData != nullptr)
+        if (rawSize > 0 && rawData != nullptr)
         {
-            juce::MemoryBlock completeSysEx(sysExData, static_cast<size_t>(sysExSize));
+            juce::MemoryBlock completeSysEx(rawData, static_cast<size_t>(rawSize));
             MidiLogger::getInstance().logSysExReceived(completeSysEx);
             processCompleteSysEx(completeSysEx);
         }
@@ -140,12 +148,38 @@ bool MidiReceiver::isInputAvailable() const noexcept
     return midiInput != nullptr;
 }
 
+void MidiReceiver::armOneShotSysExCapture(SysExCaptureCallback callback)
+{
+    std::lock_guard<std::mutex> lock(oneShotMutex_);
+    oneShotCapture_ = std::move(callback);
+}
+
+void MidiReceiver::cancelOneShotSysExCapture() noexcept
+{
+    std::lock_guard<std::mutex> lock(oneShotMutex_);
+    oneShotCapture_ = nullptr;
+}
+
 void MidiReceiver::processCompleteSysEx(const juce::MemoryBlock& completeSysEx)
 {
     if (isDestroying.load())
         return;
-    
+
     storeReceivedSysExAndNotify(completeSysEx);
+    deliverOneShotCapture(completeSysEx);
+}
+
+void MidiReceiver::deliverOneShotCapture(const juce::MemoryBlock& completeSysEx)
+{
+    SysExCaptureCallback callback;
+    {
+        std::lock_guard<std::mutex> lock(oneShotMutex_);
+        callback = std::move(oneShotCapture_);
+        oneShotCapture_ = nullptr;
+    }
+
+    if (callback)
+        callback(completeSysEx);
 }
 
 bool MidiReceiver::checkIfResponseReceived()

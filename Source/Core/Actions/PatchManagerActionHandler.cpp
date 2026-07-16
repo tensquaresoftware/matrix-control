@@ -17,8 +17,18 @@
 #include "Shared/Definitions/PluginIDs.h"
 
 #include <cstring>
+#include <vector>
 
 namespace FooterMessages = PluginDisplayNames::PatchManagerSection::ComputerPatchesModule::FooterMessages;
+namespace MutatorMessages = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::Messages;
+
+namespace
+{
+    // Time given to the synth to settle after Set Bank / Program Change before the dump request.
+    constexpr int kDeviceSettleMs = 50;
+    // Upper bound on non-blocking outbound-idle polling before the async dump request.
+    constexpr int kOutboundIdleTimeoutMs = 500;
+}
 
 namespace
 {
@@ -120,6 +130,9 @@ namespace Core
         if (propertyId == InternalPatchesModule::StandaloneWidgets::kLoadPreviousPatch
             || propertyId == InternalPatchesModule::StandaloneWidgets::kLoadNextPatch)
         {
+            if (! confirmPatchContextChange())
+                return;
+
             const bool isNext = propertyId == InternalPatchesModule::StandaloneWidgets::kLoadNextPatch;
             const int direction = isNext ? 1 : -1;
 
@@ -129,6 +142,7 @@ namespace Core
 
             // Display-only lock indicator (D-023a-R3); navigation must not read kBanksLocked.
             applyPatchCoordinates(limits.advancePatch(current, direction), limits);
+            loadCurrentPatchFromDevice(limits);
             return;
         }
 
@@ -201,6 +215,9 @@ namespace Core
         const int bankIndex = parseBankButtonIndex(propertyId);
         if (bankIndex >= 0)
         {
+            if (! confirmPatchContextChange())
+                return;
+
             const int clampedBank = juce::jlimit(limits.minBankNumber(), limits.maxBankNumber(), bankIndex);
             apvts_.state.setProperty(BankUtilityModule::StateProperties::kSelectedBank, clampedBank, nullptr);
             apvts_.state.setProperty(InternalPatchesModule::StandaloneWidgets::kCurrentBankNumber, clampedBank, nullptr);
@@ -209,6 +226,7 @@ namespace Core
                 patchSelectionMidiSync_->syncSelection(clampedBank, getCurrentPatch(limits), limits, true);
 
             markBanksLockedInApvts();
+            loadCurrentPatchFromDevice(limits);
             return;
         }
 
@@ -256,9 +274,19 @@ namespace Core
                 false)))
             return;
 
+        if (! confirmPatchContextChange())
+            return;
+
         const auto result = patchInitService_->initFullPatch();
 
+        if (hooks_.setPatchLoadContext)
+            hooks_.setPatchLoadContext(
+                PatchLoadContext::deviceMemory(getCurrentBank(limits), getCurrentPatch(limits)));
+
         pushPatchModelToApvtsWithSuppress(apvts_, hooks_, *apvtsPatchMapper_, nullptr);
+
+        if (hooks_.onPatchLoaded)
+            hooks_.onPatchLoaded();
 
         InitTemplateFooter::propagateMessage(apvts_, result);
 
@@ -289,10 +317,20 @@ namespace Core
         if (patchModel_ == nullptr || apvtsPatchMapper_ == nullptr)
             return;
 
+        if (! confirmPatchContextChange())
+            return;
+
         apvtsPatchMapper_->apvtsToBuffer();
         clipboardService_->pasteFullPatch(*patchModel_);
 
+        if (hooks_.setPatchLoadContext)
+            hooks_.setPatchLoadContext(
+                PatchLoadContext::deviceMemory(currentBank, getCurrentPatch(limits)));
+
         pushPatchModelToApvtsWithSuppress(apvts_, hooks_, *apvtsPatchMapper_, nullptr);
+
+        if (hooks_.onPatchLoaded)
+            hooks_.onPatchLoaded();
 
         if (midiManager_ != nullptr)
             midiManager_->sendPatch(static_cast<juce::uint8>(getCurrentPatch(limits)), patchModel_->data());
@@ -390,9 +428,16 @@ namespace Core
             return;
         }
 
+        if (! confirmPatchContextChange())
+            return;
+
         const auto reconciliation = decodeAndReconcilePatchFile(resolution.file);
         if (! reconciliation.has_value())
             return;
+
+        if (hooks_.setPatchLoadContext)
+            hooks_.setPatchLoadContext(
+                PatchLoadContext::computerFile(resolution.file.getFileNameWithoutExtension()));
 
         applyLoadedPatchToApvtsAndSynth(limits);
         publishLoadFooters(resolution.file.getFileName(), *reconciliation);
@@ -571,6 +616,71 @@ namespace Core
     {
         apvts_.state.setProperty("uiMessageText", message, nullptr);
         apvts_.state.setProperty("uiMessageSeverity", juce::String("warning"), nullptr);
+    }
+
+    void PatchManagerActionHandler::publishDeviceDumpFailureFooter()
+    {
+        apvts_.state.setProperty("uiMessageText",
+                                 juce::String(MutatorMessages::kDeviceDumpFailedFooter),
+                                 nullptr);
+        apvts_.state.setProperty("uiMessageSeverity", juce::String("warning"), nullptr);
+    }
+
+    bool PatchManagerActionHandler::confirmPatchContextChange()
+    {
+        return ! hooks_.confirmPatchContextChange || hooks_.confirmPatchContextChange();
+    }
+
+    void PatchManagerActionHandler::loadCurrentPatchFromDevice(const DeviceMemoryLimits& limits)
+    {
+        if (patchModel_ == nullptr || apvtsPatchMapper_ == nullptr || midiManager_ == nullptr)
+            return;
+
+        const auto clearMutatorSession = [this]
+        {
+            if (hooks_.onPatchLoaded)
+                hooks_.onPatchLoaded();
+        };
+
+        // No synth connected/detected: keep the old editor buffer, warn, still clear Mutator
+        // history because the user left that patch context.
+        if (! midiManager_->isDeviceDumpAvailable())
+        {
+            publishDeviceDumpFailureFooter();
+            clearMutatorSession();
+            return;
+        }
+
+        const int bank = getCurrentBank(limits);
+        const int patch = getCurrentPatch(limits);
+
+        // Fully async: never block the message thread (button release + NumberBox paint depend on it).
+        // Idle wait + settle + dump request run via timers inside MidiManager.
+        midiManager_->requestSinglePatchAsync(
+            static_cast<juce::uint8>(patch),
+            [this, bank, patch, clearMutatorSession](std::vector<juce::uint8> dump)
+            {
+                if (dump.size() != SysExConstants::kPatchPackedDataSize)
+                {
+                    publishDeviceDumpFailureFooter();
+                    clearMutatorSession();
+                    return;
+                }
+
+                if (patchModel_ == nullptr || apvtsPatchMapper_ == nullptr)
+                    return;
+
+                patchModel_->loadFrom(dump.data());
+                pushPatchModelToApvtsWithSuppress(apvts_, hooks_, *apvtsPatchMapper_, patchNameSyncer_);
+
+                if (hooks_.setPatchLoadContext)
+                    hooks_.setPatchLoadContext(PatchLoadContext::deviceMemory(bank, patch));
+
+                // Treat the dump like a patch load: clears Mutator history/Compare. Do NOT sendPatch back.
+                clearMutatorSession();
+            },
+            kDeviceSettleMs,
+            kOutboundIdleTimeoutMs);
     }
 
     void PatchManagerActionHandler::saveCurrentPatchToFile(const juce::File& targetFile)

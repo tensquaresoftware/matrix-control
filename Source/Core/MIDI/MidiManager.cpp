@@ -84,6 +84,7 @@ MidiManager::MidiManager(juce::AudioProcessorValueTreeState& apvtsRef,
 
 MidiManager::~MidiManager()
 {
+    cancelPendingSysExRequest();
     stopThread(5000);
     stopMidiInputCallbacks();
     
@@ -343,11 +344,221 @@ std::vector<juce::uint8> MidiManager::requestCurrentPatch()
                            "patch");
 }
 
+std::vector<juce::uint8> MidiManager::requestSinglePatch(juce::uint8 patchNumber)
+{
+    return requestSysExData(SysExConstants::RequestType::kRequestSinglePatch,
+                           SysExConstants::kPatchPackedDataSize,
+                           "single patch",
+                           patchNumber);
+}
+
+void MidiManager::cancelPendingSysExRequest() noexcept
+{
+    const auto token = asyncRequestToken_.fetch_add(1, std::memory_order_acq_rel) + 1;
+    juce::ignoreUnused(token);
+
+    if (midiReceiver != nullptr)
+        midiReceiver->cancelOneShotSysExCapture();
+
+    pendingAsyncCallback_ = nullptr;
+}
+
+void MidiManager::finishAsyncPackedPatch(std::uint64_t token, std::vector<juce::uint8> packed)
+{
+    // First finisher for this token wins (success or timeout); invalidates the other.
+    auto expected = token;
+    if (! asyncRequestToken_.compare_exchange_strong(expected, token + 1, std::memory_order_acq_rel))
+        return;
+
+    if (midiReceiver != nullptr)
+        midiReceiver->cancelOneShotSysExCapture();
+
+    auto callback = std::move(pendingAsyncCallback_);
+    pendingAsyncCallback_ = nullptr;
+
+    if (callback)
+        callback(std::move(packed));
+}
+
+std::vector<juce::uint8> MidiManager::decodePackedPatchResponse(const juce::MemoryBlock& response,
+                                                                const juce::String& requestDescription)
+{
+    if (response.getSize() == 0)
+        return {};
+
+    MidiLogger::getInstance().logSysExReceived(response, requestDescription + " response");
+
+    std::vector<juce::uint8> packedData(SysExConstants::kPatchPackedDataSize);
+    if (sysExDecoder->decodePatchSysEx(response, packedData.data()))
+        return packedData;
+
+    updateErrorState("Failed to decode " + requestDescription + " response", "SysEx");
+    return {};
+}
+
+void MidiManager::sendArmedSinglePatchRequest(juce::uint8 patchNumber, std::uint64_t token)
+{
+    if (token != asyncRequestToken_.load(std::memory_order_acquire))
+        return;
+
+    if (midiReceiver == nullptr || midiSender == nullptr || ! midiSender->isOutputAvailable())
+    {
+        finishAsyncPackedPatch(token, {});
+        return;
+    }
+
+    try
+    {
+        auto requestMessage = sysExEncoder->encodeRequestMessage(
+            SysExConstants::RequestType::kRequestSinglePatch, patchNumber);
+
+        midiReceiver->armOneShotSysExCapture(
+            [this, token](const juce::MemoryBlock& response)
+            {
+                // MIDI input thread: marshal decode + callback to the message thread.
+                juce::MessageManager::callAsync(
+                    [this, token, response]
+                    {
+                        if (token != asyncRequestToken_.load(std::memory_order_acquire))
+                            return;
+
+                        finishAsyncPackedPatch(token,
+                                               decodePackedPatchResponse(response, "single patch"));
+                    });
+            });
+
+        sendSysExWithDelay(requestMessage, "single patch request");
+
+        juce::Timer::callAfterDelay(
+            SysExConstants::kDefaultTimeoutMs,
+            [this, token]
+            {
+                if (token != asyncRequestToken_.load(std::memory_order_acquire))
+                    return;
+
+                MidiLogger::getInstance().logWarning(
+                    "Timeout waiting for SysEx response ("
+                    + juce::String(SysExConstants::kDefaultTimeoutMs) + "ms)");
+                updateErrorState("Timeout waiting for single patch response", "Timeout");
+                finishAsyncPackedPatch(token, {});
+            });
+    }
+    catch (const MidiConnectionException& e)
+    {
+        updateErrorState(e.getMessage(), "Connection");
+        finishAsyncPackedPatch(token, {});
+    }
+    catch (const std::exception& e)
+    {
+        updateErrorState(e.what(), "SysEx");
+        finishAsyncPackedPatch(token, {});
+    }
+}
+
+void MidiManager::requestSinglePatchAsync(juce::uint8 patchNumber,
+                                          PackedPatchCallback callback,
+                                          int settleMs,
+                                          int outboundIdleTimeoutMs)
+{
+    cancelPendingSysExRequest();
+
+    const auto token = asyncRequestToken_.load(std::memory_order_acquire);
+    pendingAsyncCallback_ = std::move(callback);
+
+    wakeConsumer();
+    pollOutboundIdleThenRequest(patchNumber,
+                                token,
+                                juce::jmax(0, settleMs),
+                                juce::Time::getMillisecondCounter(),
+                                juce::jmax(0, outboundIdleTimeoutMs));
+}
+
+void MidiManager::pollOutboundIdleThenRequest(juce::uint8 patchNumber,
+                                              std::uint64_t token,
+                                              int settleMs,
+                                              juce::uint32 idleStartMs,
+                                              int outboundIdleTimeoutMs)
+{
+    if (token != asyncRequestToken_.load(std::memory_order_acquire))
+        return;
+
+    const bool isIdle = outboundQueue_.isEmpty()
+                        && ! hasPendingSysEx_.load(std::memory_order_acquire);
+
+    if (isIdle)
+    {
+        if (settleMs <= 0)
+        {
+            sendArmedSinglePatchRequest(patchNumber, token);
+            return;
+        }
+
+        juce::Timer::callAfterDelay(settleMs,
+                                    [this, patchNumber, token]
+                                    {
+                                        sendArmedSinglePatchRequest(patchNumber, token);
+                                    });
+        return;
+    }
+
+    if (juce::Time::getMillisecondCounter() - idleStartMs
+        >= static_cast<juce::uint32>(outboundIdleTimeoutMs))
+    {
+        MidiLogger::getInstance().logWarning("Timeout waiting for outbound MIDI queue to go idle");
+        updateErrorState("Timeout waiting for outbound MIDI queue to go idle", "Timeout");
+        finishAsyncPackedPatch(token, {});
+        return;
+    }
+
+    wakeConsumer();
+    juce::Timer::callAfterDelay(1,
+                                [this, patchNumber, token, settleMs, idleStartMs, outboundIdleTimeoutMs]
+                                {
+                                    pollOutboundIdleThenRequest(patchNumber,
+                                                                token,
+                                                                settleMs,
+                                                                idleStartMs,
+                                                                outboundIdleTimeoutMs);
+                                });
+}
+
 std::vector<juce::uint8> MidiManager::requestMasterData()
 {
     return requestSysExData(SysExConstants::RequestType::kRequestMasterParameters,
                            SysExConstants::kMasterPackedDataSize,
                            "master");
+}
+
+bool MidiManager::isDeviceDumpAvailable() const
+{
+    return midiSender != nullptr
+        && midiSender->isOutputAvailable()
+        && midiReceiver != nullptr
+        && midiReceiver->isInputAvailable();
+}
+
+bool MidiManager::waitUntilOutboundQueueIdle(int timeoutMs)
+{
+    const auto isIdle = [this]
+    {
+        return outboundQueue_.isEmpty() && ! hasPendingSysEx_.load(std::memory_order_acquire);
+    };
+
+    const auto startMs = juce::Time::getMillisecondCounter();
+    const auto deadlineMs = startMs + static_cast<juce::uint32>(juce::jmax(0, timeoutMs));
+
+    wakeConsumer();
+
+    while (! isIdle())
+    {
+        if (juce::Time::getMillisecondCounter() >= deadlineMs)
+            return isIdle();
+
+        wakeConsumer();
+        juce::Thread::sleep(1);
+    }
+
+    return true;
 }
 
 bool MidiManager::performDeviceInquiry()
@@ -402,12 +613,14 @@ bool MidiManager::performDeviceInquiry()
     }
 }
 
-std::vector<juce::uint8> MidiManager::requestSysExData(juce::uint8 requestType, size_t expectedPackedSize, 
-                                                    const juce::String& requestDescription)
+std::vector<juce::uint8> MidiManager::requestSysExData(juce::uint8 requestType,
+                                                       size_t expectedPackedSize,
+                                                       const juce::String& requestDescription,
+                                                       juce::uint8 patchNumber)
 {
     try
     {
-        auto requestMessage = sysExEncoder->encodeRequestMessage(requestType, 0);
+        auto requestMessage = sysExEncoder->encodeRequestMessage(requestType, patchNumber);
         sendSysExWithDelay(requestMessage, requestDescription + " request");
 
         auto response = midiReceiver->waitForSysExResponse(SysExConstants::kDefaultTimeoutMs);
@@ -423,7 +636,8 @@ std::vector<juce::uint8> MidiManager::requestSysExData(juce::uint8 requestType, 
         std::vector<juce::uint8> packedData(expectedPackedSize);
         bool decodeSuccess = false;
         
-        if (requestType == SysExConstants::RequestType::kRequestEditBuffer)
+        if (requestType == SysExConstants::RequestType::kRequestEditBuffer
+            || requestType == SysExConstants::RequestType::kRequestSinglePatch)
         {
             decodeSuccess = sysExDecoder->decodePatchSysEx(response, packedData.data());
         }
@@ -550,6 +764,8 @@ bool MidiManager::processOutboundQueue()
             updateErrorState(e.what(), "MIDI");
         }
     }
+
+    hasPendingSysEx_.store(pendingSysEx_.has_value(), std::memory_order_release);
 
     return didWork;
 }

@@ -53,7 +53,15 @@ namespace Core
 
         void rescanPersistedComputerPatchesFolder();
 
+        // Requests the current patch from the synth (async dump) and mirrors it into the editor
+        // (PatchModel + APVTS) as a patch load. No-op when no device is available. Used after
+        // Bank/Internal navigation and after direct patch-number edits.
+        void loadCurrentPatchFromDevice(const DeviceMemoryLimits& limits);
+
     private:
+        // Returns true when the pending patch-context change may proceed (history gate hook
+        // absent, history empty, or user chose Export/Discard); false when the user cancelled.
+        bool confirmPatchContextChange();
         void applyPatchCoordinates(const PatchCoordinates& coordinates, const DeviceMemoryLimits& limits);
         void handleUnlockBank(const DeviceMemoryLimits& limits);
         void markBanksLockedInApvts();
@@ -93,6 +101,7 @@ namespace Core
         void publishLoadFooters(const juce::String& fileName,
                                   const PatchNameReconciliationResult& reconciliation);
         void publishLoadFailureFooter(const juce::String& message);
+        void publishDeviceDumpFailureFooter();
         void saveCurrentPatchToFile(const juce::File& targetFile);
         void completeSuccessfulSave(const juce::String& savedFileName);
         void rescanAndSelectSavedFile(const juce::String& savedFileName);

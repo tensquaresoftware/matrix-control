@@ -92,9 +92,42 @@ public:
         testRealtimeDispatchesAfterOutputPortOpened();
         testEmptySysExPayloadSkipped();
         testRealtimeNotStarvedDuringSysExGate();
+        testDeviceDumpUnavailableWithoutDevice();
+        testWaitUntilOutboundQueueIdleReturnsTrueWhenEmpty();
     }
 
 private:
+    void testDeviceDumpUnavailableWithoutDevice()
+    {
+        beginTest("Device dump unavailable when no output/device detected");
+
+        Core::MidiOutboundQueue queue;
+        Core::MidiActivityTracker tracker;
+        MinimalAudioProcessor proc;
+        MidiManager manager(proc.apvts, queue, tracker);
+
+        // No MIDI ports open at construction.
+        expect(!manager.isDeviceDumpAvailable(),
+               "Device dump must be unavailable without open MIDI input and output ports");
+    }
+
+    void testWaitUntilOutboundQueueIdleReturnsTrueWhenEmpty()
+    {
+        beginTest("waitUntilOutboundQueueIdle returns true when queue already empty");
+
+        Core::MidiOutboundQueue queue;
+        Core::MidiActivityTracker tracker;
+        MinimalAudioProcessor proc;
+        MidiManager manager(proc.apvts, queue, tracker);
+
+        const auto startMs = juce::Time::getMillisecondCounter();
+        const bool idle = manager.waitUntilOutboundQueueIdle(200);
+        const auto elapsedMs = juce::Time::getMillisecondCounter() - startMs;
+
+        expect(idle, "Empty queue should report idle immediately");
+        expect(elapsedMs < 100, "Idle wait should return promptly on an empty queue");
+    }
+
     void testRealtimeRetainedWithoutOutput()
     {
         beginTest("Enqueue realtime — queue retained when no output port");

@@ -242,6 +242,8 @@ PluginProcessor::PluginProcessor()
         [this](bool suppress) { suppressPatchParameterSysEx_ = suppress; },
         [this](bool suppress) { suppressPatchSelectionMidiSync_ = suppress; },
         [this](bool suppress) { suppressMutatorHistorySelectionDebounce_ = suppress; },
+        {},
+        [this](const Core::PatchLoadContext& context) { patchLoadContext_ = context; },
         {}};
 
     patchMutatorEngine_ = std::make_unique<Core::PatchMutatorEngine>(
@@ -255,11 +257,15 @@ PluginProcessor::PluginProcessor()
         patchFileService_.get(),
         &midiManager->getSysExEncoder());
 
+    patchMutatorEngine_->setPatchLoadContextProvider([this]() { return patchLoadContext_; });
+
     actionHooks.onPatchLoaded = [this]()
     {
         if (patchMutatorEngine_ != nullptr)
             patchMutatorEngine_->resetSessionForPatchLoad();
     };
+
+    actionHooks.confirmPatchContextChange = [this]() { return confirmPatchContextChangeGate(); };
 
     moduleActionHandler_ = std::make_unique<Core::ModuleActionHandler>(
         apvts,
@@ -320,6 +326,11 @@ PluginProcessor::PluginProcessor()
         {
             if (mutatorDefragLimitModalGate_)
                 mutatorDefragLimitModalGate_(std::move(onConfirmed));
+        },
+        [this](std::function<void(Core::ExportCollisionResolution)> onResolved)
+        {
+            if (mutatorExportCollisionModalGate_)
+                mutatorExportCollisionModalGate_(std::move(onResolved));
         });
 
     actionDispatcher_ = std::make_unique<Core::ActionDispatcher>(
@@ -823,6 +834,115 @@ void PluginProcessor::setMutatorExportFolderPicker(MutatorExportFolderPicker pic
 void PluginProcessor::setMutatorDefragLimitModalGate(MutatorDefragLimitModalGate gate)
 {
     mutatorDefragLimitModalGate_ = std::move(gate);
+}
+
+void PluginProcessor::setMutatorExportCollisionModalGate(MutatorExportCollisionModalGate gate)
+{
+    mutatorExportCollisionModalGate_ = std::move(gate);
+}
+
+void PluginProcessor::setMutatorHistoryGateModalGate(MutatorHistoryGateModalGate gate)
+{
+    mutatorHistoryGateModalGate_ = std::move(gate);
+}
+
+bool PluginProcessor::confirmPatchContextChangeGate()
+{
+    // No mutations to lose -> proceed silently.
+    if (patchMutatorEngine_ == nullptr || patchMutatorEngine_->rootCount() == 0)
+        return true;
+
+    // No UI gate wired (headless / tests) -> proceed without blocking.
+    if (! mutatorHistoryGateModalGate_)
+        return true;
+
+    switch (mutatorHistoryGateModalGate_())
+    {
+        case Core::MutatorHistoryGateChoice::kCancel:
+            return false;
+
+        case Core::MutatorHistoryGateChoice::kDiscard:
+            patchMutatorEngine_->resetSessionForPatchLoad();
+            return true;
+
+        case Core::MutatorHistoryGateChoice::kExport:
+        {
+            // Only proceed when export completes; then clear history so a skipped dump cannot
+            // leave mutations hanging after the user already archived them.
+            if (! runMutatorExportForGate())
+                return false;
+
+            patchMutatorEngine_->resetSessionForPatchLoad();
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool PluginProcessor::runMutatorExportForGate()
+{
+    namespace Messages = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::Messages;
+
+    const auto publishCancelled = [this]()
+    {
+        apvts.state.setProperty("uiMessageText", juce::String(Messages::kExportCancelledFooter), nullptr);
+        apvts.state.setProperty("uiMessageSeverity", juce::String("info"), nullptr);
+    };
+
+    if (patchMutatorEngine_ == nullptr || ! mutatorExportFolderPicker_)
+    {
+        publishCancelled();
+        return false;
+    }
+
+    const juce::File folder = mutatorExportFolderPicker_();
+    if (! folder.isDirectory())
+    {
+        publishCancelled();
+        return false;
+    }
+
+    const auto propagateFooter = [this](const Core::MutatorActionResult& result)
+    {
+        if (result.footerMessage.isNotEmpty())
+        {
+            apvts.state.setProperty("uiMessageText", result.footerMessage, nullptr);
+            apvts.state.setProperty("uiMessageSeverity", result.footerSeverity, nullptr);
+        }
+    };
+
+    auto result = patchMutatorEngine_->exportHistory(folder);
+
+    if (result.exportCollisionModalRequested)
+    {
+        if (! mutatorExportCollisionModalGate_)
+        {
+            publishCancelled();
+            return false;
+        }
+
+        auto resolution = Core::ExportCollisionResolution::kCancel;
+        bool resolved = false;
+        // PluginEditor's collision gate runs its modal loop synchronously and invokes the
+        // callback before returning, so capturing the resolution here is safe.
+        mutatorExportCollisionModalGate_([&resolution, &resolved](Core::ExportCollisionResolution chosen)
+        {
+            resolution = chosen;
+            resolved = true;
+        });
+
+        if (! resolved || resolution == Core::ExportCollisionResolution::kCancel)
+        {
+            publishCancelled();
+            return false;
+        }
+
+        result = patchMutatorEngine_->exportHistoryResolved(folder, resolution);
+    }
+
+    propagateFooter(result);
+    return result.success;
 }
 
 void PluginProcessor::setPatchSaveFilePicker(PatchSaveFilePicker picker)
@@ -1416,8 +1536,14 @@ void PluginProcessor::handlePatchNumberChange(const juce::String& parameterId)
     if (parameterId != PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCurrentPatchNumber)
         return;
 
+    // Track coordinate writes made under suppression (bank buttons, reset) so the history-gate
+    // revert below always has the last user-visible patch number to restore.
     if (suppressPatchSelectionMidiSync_)
+    {
+        lastKnownPatchNumber_ = static_cast<int>(apvts.state.getProperty(parameterId, lastKnownPatchNumber_));
+        lastKnownPatchNumberInitialized_ = true;
         return;
+    }
 
     const auto limits = getResolvedDeviceMemoryLimits();
     const int patchNumber = static_cast<int>(apvts.state.getProperty(parameterId, 0));
@@ -1428,6 +1554,28 @@ void PluginProcessor::handlePatchNumberChange(const juce::String& parameterId)
         apvts.state.setProperty(parameterId, clampedPatch, nullptr);
         return;
     }
+
+    if (! lastKnownPatchNumberInitialized_)
+    {
+        // Seed from the APVTS value that was current before this write is impossible here
+        // (property already updated). Prefer startup/session sync; fall back to min patch.
+        lastKnownPatchNumber_ = limits.minPatchNumber();
+        lastKnownPatchNumberInitialized_ = true;
+    }
+
+    // History gate before this patch-context change; on Cancel restore the previous number.
+    if (! confirmPatchContextChangeGate())
+    {
+        suppressPatchSelectionMidiSync_ = true;
+        apvts.state.setProperty(parameterId, lastKnownPatchNumber_, nullptr);
+        suppressPatchSelectionMidiSync_ = false;
+        return;
+    }
+
+    lastKnownPatchNumber_ = clampedPatch;
+    lastKnownPatchNumberInitialized_ = true;
+
+    updateDevicePatchLoadContext();
 
     if (patchSelectionMidiSync_ != nullptr)
     {
@@ -1448,6 +1596,20 @@ void PluginProcessor::handlePatchNumberChange(const juce::String& parameterId)
     {
         midiManager->sendProgramChange(clampedPatch);
     }
+
+    // Mirror the synth's edit buffer into the editor (clears Mutator history via onPatchLoaded).
+    if (patchManagerActionHandler_ != nullptr)
+        patchManagerActionHandler_->loadCurrentPatchFromDevice(limits);
+}
+
+void PluginProcessor::updateDevicePatchLoadContext()
+{
+    using namespace PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets;
+
+    const auto limits = getResolvedDeviceMemoryLimits();
+    const int bank = static_cast<int>(apvts.state.getProperty(kCurrentBankNumber, limits.minBankNumber()));
+    const int patch = static_cast<int>(apvts.state.getProperty(kCurrentPatchNumber, limits.minPatchNumber()));
+    patchLoadContext_ = Core::PatchLoadContext::deviceMemory(bank, patch);
 }
 
 Core::DeviceMemoryLimits PluginProcessor::getResolvedDeviceMemoryLimits() const
@@ -1509,6 +1671,9 @@ void PluginProcessor::resetInternalPatchCoordinatesToDefaults()
     apvts.state.setProperty(kCurrentPatchNumber, defaultPatch, nullptr);
     apvts.state.setProperty(BankState::kSelectedBank, defaultBank, nullptr);
     suppressPatchSelectionMidiSync_ = false;
+
+    lastKnownPatchNumber_ = defaultPatch;
+    lastKnownPatchNumberInitialized_ = true;
 
     if (patchSelectionMidiSync_ != nullptr)
         patchSelectionMidiSync_->clearSyncedBankState();

@@ -212,6 +212,9 @@ public:
         testLoadAdjacent_staleScanNoOp();
         testLoadAdjacent_emptyListNoOp();
         testLoadSelected_invokesOnPatchLoaded();
+        testHistoryGate_cancelAbortsNavigation();
+        testHistoryGate_proceedAllowsNavigation();
+        testHistoryGate_cancelAbortsInit();
     }
 
 private:
@@ -222,7 +225,14 @@ private:
             bool invoked = false;
         };
 
+        struct GateState
+        {
+            bool allow = true;
+            int calls = 0;
+        };
+
         std::shared_ptr<PatchLoadHookState> patchLoadHookState;
+        std::shared_ptr<GateState> gateState;
         TestAudioProcessorPatchManager proc;
         Core::PatchModel model;
         Core::ApvtsPatchMapper mapper;
@@ -250,6 +260,7 @@ private:
 
         explicit HandlerHarness(Core::DeviceMemoryLimits limitsIn)
             : patchLoadHookState(std::make_shared<PatchLoadHookState>())
+            , gateState(std::make_shared<GateState>())
             , mapper(proc.apvts, model)
             , decoder(parser)
             , initLoader(decoder)
@@ -288,6 +299,12 @@ private:
                           [state = patchLoadHookState]()
                           {
                               state->invoked = true;
+                          },
+                          nullptr,
+                          [state = gateState]()
+                          {
+                              ++state->calls;
+                              return state->allow;
                           } })
         {
             initializePatchManagerState(proc.apvts.state, 0, 0, false);
@@ -508,6 +525,55 @@ private:
         expect(static_cast<bool>(harness.proc.apvts.state.getProperty(BankUtility::StateProperties::kBanksLocked)));
         const auto queued = scanQueue(harness.queue);
         expect(!queued.setBank);
+    }
+
+    void testHistoryGate_cancelAbortsNavigation()
+    {
+        beginTest("historyGate_cancelAbortsNavigation");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, 0, 5, true);
+        harness.patchSelectionMidiSync.resetLastSyncedBank(0);
+        harness.gateState->allow = false;
+
+        harness.handler.handleAction(InternalPatches::kLoadNextPatch, juce::var());
+
+        // Gate was consulted and, on Cancel, coordinates stay put with no MIDI emitted.
+        expectEquals(harness.gateState->calls, 1);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentPatchNumber)), 5);
+        const auto queued = scanQueue(harness.queue);
+        expect(!queued.setBank);
+        expect(queued.patchSysExCount == 0);
+    }
+
+    void testHistoryGate_proceedAllowsNavigation()
+    {
+        beginTest("historyGate_proceedAllowsNavigation");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, 0, 5, true);
+        harness.patchSelectionMidiSync.resetLastSyncedBank(0);
+        harness.gateState->allow = true;
+
+        harness.handler.handleAction(InternalPatches::kLoadNextPatch, juce::var());
+
+        expectEquals(harness.gateState->calls, 1);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentPatchNumber)), 6);
+    }
+
+    void testHistoryGate_cancelAbortsInit()
+    {
+        beginTest("historyGate_cancelAbortsInit");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, 1, 12, false);
+        harness.gateState->allow = false;
+
+        harness.handler.handleAction(InternalPatches::kInitPatch, juce::var());
+
+        // On Cancel the patch load hook (history reset) must not fire.
+        expectEquals(harness.gateState->calls, 1);
+        expect(!harness.patchLoadHookState->invoked);
     }
 
     void testAt99_fourNext_staysBank0()
