@@ -363,7 +363,7 @@ APVTS exposes **Int** and **Choice** parameters. Each descriptor defines:
 | **History M** | `<EMPTY>` or **M00–M99** | Sorted **numerically ascending** |
 | **History R** | `—` (root **Mi** only) or **R00–R99** for selected **Mi** | Updates when **M** changes |
 
-No `<` `>` buttons (D-026). PATCH NAME field displays **`Mxx`** or **`Mxx-Ryy`**.
+History `[<]` / `[>]` circular flat navigation allowed (Story 6-17; supersedes D-026). PATCH NAME field displays **`Mxx`** or **`Mxx-Ryy`**.
 
 ### Data model (per entry)
 

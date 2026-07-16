@@ -395,7 +395,7 @@ Amount, Random sliders and module enable toggles persist across sessions via APV
 
 **History R** lists retries for the selected root: sentinel **`—`** (root only, audition **Mi**), then **R00–R99** for that **Mi**. Disabled or empty when History M is `<EMPTY>`.
 
-Changing **M** updates **R** for that root. No `<` `>` navigation buttons (D-026).
+Changing **M** updates **R** for that root. History `[<]` / `[>]` circular flat navigation is allowed (Story 6-17; supersedes D-026 ban on Mutator nav buttons).
 
 #### FR-55: MUTATE semantics
 

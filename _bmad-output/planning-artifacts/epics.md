@@ -58,7 +58,7 @@ FR-31: Session-only history — Mutator history RAM-only; cleared on patch load;
 FR-32: Compare mode — COMPARE toggles initial snapshot audition; blinking label; History grayed; re-toggle restores selection.
 FR-33: Manual export layout — EXPORT writes `Initial.syx` at root plus `Mxx/` folders with `Mxx.syx` and `Mxx-Ryy.syx`.
 FR-34: Recipe persistence — Amount, Random, module toggles persist via APVTS across sessions.
-FR-54: Two-level History comboboxes — History M: M00–M99 numeric sort; History R: `—` or R00–R99 per selected Mi; no `<` `>` nav.
+FR-54: Two-level History comboboxes — History M: M00–M99 numeric sort; History R: `—` or R00–R99 per selected Mi; History `[<]`/`[>]` circular flat nav allowed (Story 6-17; supersedes D-026 ban).
 FR-55: MUTATE semantics — New root max(Mi)+1 with gaps preserved; first root M00; PATCH NAME updated; disabled at 100 roots.
 FR-56: RETRY semantics — New retry max(R)+1 under same Mi from parentSnapshot; first retry R00; disabled at 100 retries per Mi.
 FR-57: History selection audition — Full patch SysEx after debounce on M or R selection.
@@ -121,7 +121,7 @@ UX-DR2: TrackGeneratorDisplay five-point Y-only drag geometry per addendum (impl
 UX-DR3: Activity LED UX pattern for Instrument/Editor queue traffic (implements FR-9).
 UX-DR4: COMPARE mode blinking label and History graying states (implements FR-32).
 UX-DR5: Matrix Mod bus reorder drag interaction — swap vs move detail (implements FR-50).
-UX-DR6: Patch Mutator panel layout — Amount/Random, toggles, History M/R, action buttons (implements FR-54–FR-60).
+UX-DR6: Patch Mutator panel layout — Amount/Random, toggles, hierarchical History + `[<]`/`[>]`, compact action buttons C/D/F/E + MM (implements FR-54–FR-60; Story 6-17).
 UX-DR7: Logo popup vs inline Skin/Scale — pending Figma approval (implements FR-41, PRD §9 #1).
 UX-DR8: ScaledLayout per UI scale preset without global AffineTransform blur (implements FR-43).
 
@@ -490,6 +490,19 @@ So that PATCH NAME display and `.syx` filenames stay aligned (FR-13).
 **When** patch name is edited in PATCH EDIT or loaded from buffer
 **Then** bytes 0–7 use 6-bit ASCII Matrix rules and APVTS property mirrors the display string
 **And** max 8 characters enforced with validator feedback
+
+### Story 1.6: Wire Patch Name Display
+
+As a sound designer,
+I want the PATCH NAME display in Patch Edit to show the current APVTS patch name,
+So that the widget reflects loads, dumps, and Mutator names instead of a static `"--------"` (FR-13 display half).
+
+**Acceptance Criteria:**
+
+**Given** Story 1.5 (`PatchNameSyncer`, `patchEditPatchName`)
+**When** Core updates `apvts.state` via `bufferToApvts()` or session state already holds a name
+**Then** `PatchNameDisplay` updates via a GUI `ValueTree::Listener` (not `InteractiveDisplayApvtsSync`)
+**And** in-place name editing UI remains out of scope (follow-up for FR-13 editable half)
 
 ---
 
@@ -1012,7 +1025,7 @@ So that I can select mutations in the panel (FR-54, UX-DR6).
 **Given** Story 6.2
 **When** store changes
 **Then** APVTS properties expose `historyMList`, `historyRList`, `selectedM`, `selectedR` with `<EMPTY>` and `—` sentinels
-**And** no `<` `>` navigation buttons (D-026)
+**And** no `<` `>` navigation buttons (D-026) — **superseded by Story 6-17** (History prev/next allowed)
 
 ### Story 6.7: History Selection Audition with Debounce
 
@@ -1151,6 +1164,21 @@ So that I can keep modulation routing stable while exploring Patch Edit variatio
 **And** CLEAR label is `CL` at 20 px; SharedColumn width stays 268
 
 **Note (2026-07-15):** Authoritative implementation detail lives in `_bmad-output/implementation-artifacts/6-16-matrix-mod-recipe-toggle.md`.
+
+### Story 6-17: History Prev/Next and Compact Action Labels
+
+As a sound designer,
+I want History `[<]` / `[>]` buttons beside the History combobox, plus compact `C` / `D` / `F` / `E` action labels and the restored 4 px label gaps,
+So that I can circularly step mutations/retries for quick Compare without opening the combo (supersedes D-026 “no Mutator `<` `>` nav”).
+
+**Acceptance Criteria:**
+
+**Given** hierarchical History (6-14 / 6-15) and Figma Mutator chrome
+**When** the user uses History prev/next and views action buttons
+**Then** `[<]`/`[>]` circularly traverse flat History order (Mxx → Mxx-Ryy → …); faces are `C`/`D`/`F`/`E` at 20 px (no tooltips — out of scope); AMOUNT/RANDOM/HISTORY labels regain 4 px gaps; SharedColumn stays 268
+**And** UI face `F` = Flush while wire id / Core Clear naming may remain; Compare lock grays prev/next like History; prev/next also gray until History has ≥2 flat entries
+
+**Note (2026-07-16):** Authoritative implementation detail lives in `_bmad-output/implementation-artifacts/6-17-history-prev-next-and-compact-action-labels.md`. **ERRATA:** Supersedes D-026 ban on Mutator `<`/`>` navigation and Story 6-14 AC #5 COMPARE-under-RETRY alignment. **Code-review errata:** tooltips dropped per PO; enablement requires ≥2 flat entries.
 
 ---
 
