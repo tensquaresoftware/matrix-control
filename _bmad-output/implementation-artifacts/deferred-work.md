@@ -474,3 +474,30 @@
 - **Nom `kBanksLocked` ne reflète plus la sémantique display-only** — dette sémantique pré-existante ; rename hors scope 7-3c.
 - **Commande grep AC#9 dans la story** — chemin répertoire inexistant ; cosmétique doc.
 - **`InternalPatchesPanel.cpp/.h` absents du File List story** — wiring indicateur AC#7 ; mettre à jour le File List.
+
+## Deferred from: spec-mutator-synth-load-history-export-compare (2026-07-16)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-mutator-synth-load-history-export-compare.md`
+  summary: Device dump after Bank/Internal nav blocks the message thread (queue drain + settle + sync SysEx RPC).
+  evidence: Blind Hunter; `loadCurrentPatchFromDevice` uses wait/sleep/requestCurrentPatch on the UI thread; async redesign needed for snappy rapid navigation.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-mutator-synth-load-history-export-compare.md`
+  summary: History-gate and collision AlertWindow modals run nested message loops from APVTS/ValueTree change paths.
+  evidence: Blind Hunter; `handlePatchNumberChange` → `confirmPatchContextChangeGate` → `runModalLoop`; re-entrancy risk if timers/edits fire during modal.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-mutator-synth-load-history-export-compare.md`
+  summary: Hard-coded 50 ms settle / 500 ms queue-idle timeouts for device dump may be wrong for slow MIDI interfaces.
+  evidence: Blind Hunter / Edge Case; silent stale-buffer risk if synth is slower than settle; needs hardware profiling or delay profile hook.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-mutator-synth-load-history-export-compare.md`
+  summary: Compare footer clear matches exact `kCompareLockedFooter` string only.
+  evidence: Blind Hunter; brittle if another message overwrites the footer while Compare is active.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-mutator-synth-load-history-export-compare.md`
+  summary: End-to-end device-dump path has no mocked-MIDI unit coverage.
+  evidence: Blind Hunter + Completion Notes; only idle/availability smoke tests exist; needs fake MIDI port harness.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-mutator-synth-load-history-export-compare.md`
+  summary: History-gate Export path and Export button path handle collision resolution via two different sync/async styles.
+  evidence: Blind Hunter; gate captures sync resolution; button uses async callback — latent fork if modal becomes async.
+
