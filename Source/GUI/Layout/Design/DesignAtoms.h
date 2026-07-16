@@ -167,8 +167,6 @@ namespace TSS::Design
             {
                 inline constexpr int kStandard = 24;
                 inline constexpr int kLineWidth = 4;
-                inline constexpr int kTopPadding = 4;
-                inline constexpr int kBottomPadding = 2;
             }
 
             namespace Indicator

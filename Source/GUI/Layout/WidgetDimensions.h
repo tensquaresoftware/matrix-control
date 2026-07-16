@@ -121,8 +121,6 @@ struct SeparatorDimensions
     int verticalStandardHeight;
     int horizontalHeight;
     int verticalLineWidth;
-    int verticalTopPadding;
-    int verticalBottomPadding;
 };
 
 struct DisplayBandDimensions

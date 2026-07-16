@@ -405,8 +405,6 @@ GuiLayoutDimensions DimensionFactory::buildGuiLayoutDimensions()
             .verticalStandardHeight = PanelWidgets::Heights::kVerticalSeparator,
             .horizontalHeight = Atoms::Heights::kHorizontalSeparator,
             .verticalLineWidth = Atoms::Widths::VerticalSeparator::kLineWidth,
-            .verticalTopPadding = Atoms::Widths::VerticalSeparator::kTopPadding,
-            .verticalBottomPadding = Atoms::Widths::VerticalSeparator::kBottomPadding,
         },
         .patchEdit = std::move(patchEdit),
         .shared = std::move(shared),

@@ -42,8 +42,6 @@ namespace TSS
         const auto lineX = bounds.getCentreX() - lineWidth * 0.5f;
 
         auto line = bounds;
-        line.removeFromTop(static_cast<float>(dimensions_.verticalTopPadding) * uiScale_);
-        line.removeFromBottom(static_cast<float>(dimensions_.verticalBottomPadding) * uiScale_);
         line.setX(lineX);
         line.setWidth(lineWidth);
 
