@@ -166,7 +166,7 @@ namespace Core
 
         if (propertyId == ComputerPatchesModule::StandaloneWidgets::kOpenPatchFolder)
         {
-            handleOpenPatchFolder();
+            handleOpenPatchFolder(limits);
             return;
         }
 
@@ -359,7 +359,7 @@ namespace Core
         midiManager_->sendPatch(static_cast<juce::uint8>(getCurrentPatch(limits)), patchModel_->data());
     }
 
-    void PatchManagerActionHandler::handleOpenPatchFolder()
+    void PatchManagerActionHandler::handleOpenPatchFolder(const DeviceMemoryLimits& limits)
     {
         if (patchFileService_ == nullptr || ! pickFolder_)
             return;
@@ -374,6 +374,46 @@ namespace Core
             folder.getFullPathName(),
             nullptr);
         scanAndPublishFolder(folder);
+
+        const auto& scan = patchFileService_->getLastScanResult();
+        if (! scan.folderUsable || scan.validCount < 1)
+        {
+            apvts_.state.setProperty(
+                PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSelectPatchFile,
+                0,
+                nullptr);
+            return;
+        }
+
+        constexpr int kFirstPatchFileId = 1;
+        const int beforeId = readComputerPatchesSelectedId();
+        apvts_.state.setProperty(
+            PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSelectPatchFile,
+            kFirstPatchFileId,
+            nullptr);
+
+        // JUCE skips notification when the value is unchanged — same as prev/next with N==1.
+        if (readComputerPatchesSelectedId() == beforeId && beforeId == kFirstPatchFileId)
+            handleLoadSelectedPatchFile(limits);
+    }
+
+    void PatchManagerActionHandler::resetComputerPatchesBrowserAfterSessionLoad()
+    {
+        apvts_.state.setProperty(
+            PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSelectPatchFile,
+            0,
+            nullptr);
+
+        if (patchFileService_ != nullptr && patchFileService_->hasCachedScanResult())
+            clearPublishedScanCache();
+        else
+            bumpScanRevision();
+    }
+
+    void PatchManagerActionHandler::discardComputerPatchesScanCacheQuietly()
+    {
+        if (patchFileService_ != nullptr && patchFileService_->hasCachedScanResult())
+            patchFileService_->clearLastScan();
     }
 
     void PatchManagerActionHandler::handleSavePatchAs()

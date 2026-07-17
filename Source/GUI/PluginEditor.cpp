@@ -78,8 +78,20 @@ PluginEditor::PluginEditor(PluginProcessor& p)
         if (safeThis == nullptr)
             return {};
 
+        juce::File startDirectory;
+        const auto persistedPath = safeThis->pluginProcessor.getApvts().state.getProperty(
+            PluginIDs::PatchManagerSection::ComputerPatchesModule::StateProperties::kFolderPath,
+            juce::String()).toString();
+
+        if (persistedPath.isNotEmpty())
+        {
+            const juce::File persistedFolder(persistedPath);
+            if (persistedFolder.isDirectory())
+                startDirectory = persistedFolder;
+        }
+
         juce::FileChooser chooser("Select patch folder",
-                                  juce::File(),
+                                  startDirectory,
                                   juce::String(),
                                   true,
                                   false,

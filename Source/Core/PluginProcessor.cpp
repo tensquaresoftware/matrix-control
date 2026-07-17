@@ -350,9 +350,6 @@ PluginProcessor::PluginProcessor()
     initializeComputerPatchesFolderProperty();
     initializeNameReconciliationPolicyProperty();
 
-    if (patchManagerActionHandler_ != nullptr)
-        patchManagerActionHandler_->rescanPersistedComputerPatchesFolder();
-
     initializePatchNameProperty();
     initializeClipboardPasteEnabledProperties();
     initializeMutatorRecipeState();
@@ -625,6 +622,11 @@ void PluginProcessor::setStateInformation(const void* data, int sizeInBytes)
             // valueTreeRedirected / PatchNameSyncer never briefly rehydrate a stale name.
             Core::MutatorSessionPersistence::resetEphemeralStateAfterSessionLoad(restoredState);
 
+            // Drop in-memory Computer Patches scan before replaceState so redirected panel
+            // refresh cannot briefly show the previous session's file list.
+            if (patchManagerActionHandler_ != nullptr)
+                patchManagerActionHandler_->discardComputerPatchesScanCacheQuietly();
+
             apvts.replaceState(restoredState);
             initializeMutatorRecipeState();
             resetEphemeralMutatorStateAfterSessionLoad();
@@ -635,7 +637,7 @@ void PluginProcessor::setStateInformation(const void* data, int sizeInBytes)
             scheduleDeferredMidiPortSyncForPluginHost();
 
             if (patchManagerActionHandler_ != nullptr)
-                patchManagerActionHandler_->rescanPersistedComputerPatchesFolder();
+                patchManagerActionHandler_->resetComputerPatchesBrowserAfterSessionLoad();
 
             resetInternalPatchCoordinatesToDefaults();
 

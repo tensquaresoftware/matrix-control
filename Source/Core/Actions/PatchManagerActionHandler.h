@@ -52,6 +52,9 @@ namespace Core
         void handleAction(const juce::String& propertyId, const juce::var& newValue) override;
 
         void rescanPersistedComputerPatchesFolder();
+        void resetComputerPatchesBrowserAfterSessionLoad();
+        // Drops in-memory scan before APVTS replaceState so valueTreeRedirected cannot flash a stale list.
+        void discardComputerPatchesScanCacheQuietly();
 
         // Requests the current patch from the synth (async dump) and mirrors it into the editor
         // (PatchModel + APVTS) as a patch load. No-op when no device is available. Used after
@@ -68,7 +71,7 @@ namespace Core
         void handleInternalPatchInit();
         void handleInternalPatchPaste(const DeviceMemoryLimits& limits);
         void handleInternalPatchStore(const DeviceMemoryLimits& limits);
-        void handleOpenPatchFolder();
+        void handleOpenPatchFolder(const DeviceMemoryLimits& limits);
         void handleSavePatchAs();
         void handleSavePatchFile();
         void handleLoadSelectedPatchFile(const DeviceMemoryLimits& limits);

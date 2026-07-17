@@ -1,5 +1,17 @@
 # Deferred Work
 
+## Deferred from: code review of spec-computer-patches-open-auto-select-first (2026-07-17)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-computer-patches-open-auto-select-first.md`
+  summary: Mutator history gate Cancel after Open can leave combo on first file while the edit buffer stays on the previous patch (same pattern as manual combo load cancel; Open makes it more frequent).
+  evidence: Blind Hunter; Open commits scan + `kSelectPatchFile=1` before `confirmPatchContextChange`; cancel aborts load without reverting selection.
+
+## Deferred from: quick-dev computer-patches-open-auto-select-first (2026-07-17)
+
+- source_spec: none (clarified during quick-dev; implement with Epic 9)
+  summary: FR-51 / DirtyPatchTracker — before OPEN (and other navigation that would replace the current patch), if the loaded patch has unsaved edits, show a two-button modal: **Cancel** (abort Open, keep editing so the user can STORE or SAVE AS themselves) and **Continue** (discard unsaved edits and proceed with Open). No in-modal save path.
+  evidence: Product intent captured in quick-dev; DirtyPatchTracker and FR-51 dialog are still backlog (`9-1-dirtypatchtracker`, `9-2-unsaved-edit-confirmation-dialog`). OPEN today has no dirty gate; auto-load-after-Open increases the need for this guard. Prefer Cancel/Continue over a Save-first modal so STORE vs SAVE AS stays user-chosen.
+
 ## Deferred from: code review of 6-17-history-prev-next-and-compact-action-labels (2026-07-16)
 
 - **No end-to-end test for APVTS stamp → handler → selection → audition chain** — Unit tests cover `advanceHistorySelection` on the engine and handler→mock engine only; the thin-panel property stamp path is unverified end-to-end.

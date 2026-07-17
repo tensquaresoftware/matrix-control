@@ -182,7 +182,10 @@ public:
         testUnlockBankMatrix6NoOp();
         testOpenPersistsFolderPath();
         testOpenCancelledDoesNotPersist();
-        testRescanPersistedFolderScansOnStartup();
+        testOpenAutoSelectsAndLoadsFirst();
+        testOpenEmptyFolderNoLoad();
+        testOpenAlreadySelectedFirstReloads();
+        testSessionLoadResetsBrowserWithoutRescan();
         testRescanPersistedFolderMissingPathWarningFooter();
         testRescanPersistedFolderEmptyPathNoOp();
         testRescanPersistedFolderEmptyPathClearsStaleCache();
@@ -323,6 +326,20 @@ private:
             ComputerPatches::StandaloneWidgets::kSelectPatchFile,
             0));
         harness.handler.handleAction(adjacentPropertyId, juce::var());
+        const int afterId = static_cast<int>(harness.proc.apvts.state.getProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile,
+            0));
+
+        if (afterId != beforeId)
+            simulateSelectPatchFileDispatch(harness);
+    }
+
+    void fireOpenAndDispatchLoad(HandlerHarness& harness)
+    {
+        const int beforeId = static_cast<int>(harness.proc.apvts.state.getProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile,
+            0));
+        harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kOpenPatchFolder, juce::var());
         const int afterId = static_cast<int>(harness.proc.apvts.state.getProperty(
             ComputerPatches::StandaloneWidgets::kSelectPatchFile,
             0));
@@ -729,6 +746,9 @@ private:
         expect(harness.proc.apvts.state.getProperty(ComputerPatches::StateProperties::kFolderPath).toString()
                == tempDir.getFullPathName());
         expectEquals(harness.patchFileService.getLastScanResult().validCount, 1);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile)),
+            1);
 
         tempDir.deleteRecursively();
     }
@@ -748,26 +768,119 @@ private:
                == keepPath);
     }
 
-    void testRescanPersistedFolderScansOnStartup()
+    void testOpenAutoSelectsAndLoadsFirst()
     {
-        beginTest("rescanPersistedFolder_scansOnStartup");
+        beginTest("open_autoSelectsAndLoadsFirst");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, 0, 12, false);
+        const auto tempDir = createTempScanDir();
+        expect(tempDir.createDirectory());
+        copyFixturePatchToDir(tempDir, "Patch 5.syx");
+        copyFixturePatchToDir(tempDir, "Patch 71.syx");
+
+        harness.pickFolderCallback = [&tempDir]() { return tempDir; };
+        fireOpenAndDispatchLoad(harness);
+
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile)),
+            1);
+        expect(harness.patchFileService.getLastScanResult().sortedValidFileNames[0]
+               == "Patch 5.syx");
+        const auto queued = scanQueue(harness.queue);
+        expect(queued.patchData);
+        expect(harness.patchLoadHookState->invoked);
+
+        tempDir.deleteRecursively();
+    }
+
+    void testOpenEmptyFolderNoLoad()
+    {
+        beginTest("open_emptyFolder_noLoad");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile,
+            3,
+            nullptr);
+        const auto tempDir = createTempScanDir();
+        expect(tempDir.createDirectory());
+
+        harness.pickFolderCallback = [&tempDir]() { return tempDir; };
+        fireOpenAndDispatchLoad(harness);
+
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile)),
+            0);
+        expectEquals(harness.patchFileService.getLastScanResult().validCount, 0);
+        expect(harness.queue.isEmpty());
+        expect(! harness.patchLoadHookState->invoked);
+
+        tempDir.deleteRecursively();
+    }
+
+    void testOpenAlreadySelectedFirstReloads()
+    {
+        beginTest("open_alreadySelectedFirst_reloads");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, 0, 12, false);
+        const auto tempDir = createTempScanDir();
+        expect(tempDir.createDirectory());
+        copyFixturePatchToDir(tempDir, "Patch 71.syx");
+
+        harness.pickFolderCallback = [&tempDir]() { return tempDir; };
+        fireOpenAndDispatchLoad(harness);
+        expect(harness.patchLoadHookState->invoked);
+
+        harness.patchLoadHookState->invoked = false;
+        while (! harness.queue.isEmpty())
+            (void) harness.queue.dequeue();
+
+        fireOpenAndDispatchLoad(harness);
+
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile)),
+            1);
+        expect(harness.patchLoadHookState->invoked);
+        const auto queued = scanQueue(harness.queue);
+        expect(queued.patchData);
+
+        tempDir.deleteRecursively();
+    }
+
+    void testSessionLoadResetsBrowserWithoutRescan()
+    {
+        beginTest("sessionLoad_resetsBrowser_withoutRescan");
 
         HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
         const auto tempDir = createTempScanDir();
         expect(tempDir.createDirectory());
         copyFixturePatchToDir(tempDir, "Patch 71.syx");
 
-        harness.proc.apvts.state.setProperty(
-            ComputerPatches::StateProperties::kFolderPath,
-            tempDir.getFullPathName(),
-            nullptr);
+        harness.pickFolderCallback = [&tempDir]() { return tempDir; };
+        fireOpenAndDispatchLoad(harness);
+        expect(harness.patchFileService.getLastScanResult().validCount > 0);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile)),
+            1);
 
-        harness.handler.rescanPersistedComputerPatchesFolder();
+        const auto pathBefore = harness.proc.apvts.state.getProperty(
+            ComputerPatches::StateProperties::kFolderPath).toString();
+        const auto revisionBefore = harness.proc.apvts.state.getProperty(
+            ComputerPatches::StateProperties::kScanRevision);
 
-        const auto& scan = harness.patchFileService.getLastScanResult();
-        expect(scan.validCount > 0);
-        expect(harness.proc.apvts.state.getProperty("uiMessageText").toString().isNotEmpty());
-        expect(harness.proc.apvts.state.hasProperty(ComputerPatches::StateProperties::kScanRevision));
+        harness.handler.resetComputerPatchesBrowserAfterSessionLoad();
+
+        expect(harness.proc.apvts.state.getProperty(ComputerPatches::StateProperties::kFolderPath).toString()
+               == pathBefore);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile)),
+            0);
+        expectEquals(harness.patchFileService.getLastScanResult().validCount, 0);
+        expect(! harness.patchFileService.getLastScanResult().folderUsable);
+        expect(harness.proc.apvts.state.getProperty(ComputerPatches::StateProperties::kScanRevision)
+               != revisionBefore);
 
         tempDir.deleteRecursively();
     }
