@@ -22,10 +22,9 @@ namespace Core
     // (case-insensitive substring) TAUNTEK, GLIGLI, or NORDCORE. Matching is
     // best-effort until SM-1 hardware confirms reply strings.
     //
-    // Device family: member bytes from Device Inquiry reply (decoded as-is;
-    // independent of SysExConstants::DeviceInquiry::kExpected* — D-080 Epic 8).
-    //   M-1000: memb-lo=0x02, memb-hi=0x00 (Oberheim spec)
-    //   M-6/6R: memb-lo=0x01, memb-hi=0x00 provisional until hardware confirm
+    // Device family: member bytes from Device Inquiry reply, compared via
+    // SysExConstants::DeviceInquiry (M-1000 D-080 + provisional M-6/6R).
+    // Unknown members fall back to stock M-1000 delay (Story 2.2).
     //
     // Optimised delay values are placeholders; SM-1 hardware gate may tune.
     class SysExDelayProfile

@@ -76,13 +76,16 @@ namespace SysExConstants
 
         // Expected response format: F0 7E <chan> 06 02 10 06 00 02 00 <rev-0> <rev-1> <rev-2> <rev-3> F7
         // Manufacturer: 0x10 (Oberheim)
-        // Family: 0x06 (Matrix series)
-        // Member: 0x10 0x02 (Matrix-1000)
+        // Family: 0x06 0x00 (Matrix series)
+        // Member (M-1000): 0x02 0x00 (Oberheim memb-lo/hi — D-080)
         constexpr juce::uint8 kExpectedManufacturer = 0x10;
         constexpr juce::uint8 kExpectedFamily = 0x06;
-        // Member: 0x02 0x00 (Matrix-1000); 0x01 0x00 provisional (Matrix-6/6R)
+        constexpr juce::uint8 kExpectedFamilyHigh = 0x00;
         constexpr juce::uint8 kExpectedMemberLow = 0x02;
         constexpr juce::uint8 kExpectedMemberHigh = 0x00;
+        // Provisional Matrix-6/6R member bytes — unconfirmed on hardware (PRD §9 #6).
+        // One unconfirmed pair only; inquiry cannot invent a distinct 6R pattern, so
+        // the provisional bytes map to Matrix-6 until UAT confirms.
         constexpr juce::uint8 kMatrix6MemberLow = 0x01;
         constexpr juce::uint8 kMatrix6MemberHigh = 0x00;
     }

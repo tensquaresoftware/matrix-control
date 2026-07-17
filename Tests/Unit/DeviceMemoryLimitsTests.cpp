@@ -1,10 +1,9 @@
 #include <juce_core/juce_core.h>
 
 #include "Core/Services/DeviceMemoryLimits.h"
-#include "Core/Services/DeviceTypeRegistry.h"
-#include "Core/MIDI/SysEx/SysExConstants.h"
 #include "Shared/Definitions/Matrix1000Limits.h"
 #include "Shared/Definitions/Matrix6Or6RLimits.h"
+#include "Shared/Definitions/MatrixDeviceTypes.h"
 
 class DeviceMemoryLimitsTests : public juce::UnitTest
 {
@@ -20,7 +19,6 @@ public:
         testMatrix6CyclicWrap();
         testMatrix1000WrapWithinBank();
         testRomGatingMatrix1000Only();
-        testDeviceTypeRegistryMemberBytes();
     }
 
 private:
@@ -127,25 +125,6 @@ private:
         const auto m6 = Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix6);
         expect(m6.isPasteStoreAllowed(0));
         expect(m6.isPasteStoreAllowed(Matrix6Or6RLimits::kMaxPatchNumber));
-    }
-
-    void testDeviceTypeRegistryMemberBytes()
-    {
-        beginTest("DeviceTypeRegistry — member byte mapping");
-
-        expectEquals(
-            static_cast<int>(Core::DeviceTypeRegistry::fromMemberBytes(
-                SysExConstants::DeviceInquiry::kExpectedMemberLow,
-                SysExConstants::DeviceInquiry::kExpectedMemberHigh)),
-            static_cast<int>(MatrixDeviceTypes::Type::kMatrix1000));
-        expectEquals(
-            static_cast<int>(Core::DeviceTypeRegistry::fromMemberBytes(
-                SysExConstants::DeviceInquiry::kMatrix6MemberLow,
-                SysExConstants::DeviceInquiry::kMatrix6MemberHigh)),
-            static_cast<int>(MatrixDeviceTypes::Type::kMatrix6));
-        expectEquals(
-            static_cast<int>(Core::DeviceTypeRegistry::fromMemberBytes(0xFF, 0xFF)),
-            static_cast<int>(MatrixDeviceTypes::Type::kUnknown));
     }
 };
 

@@ -80,7 +80,7 @@ DeviceIdInfo SysExDecoder::decodeDeviceId(const juce::MemoryBlock& sysEx) const
     }
     else
     {
-        MidiLogger::getInstance().logWarning("Device ID validation failed - not a Matrix-1000");
+        MidiLogger::getInstance().logWarning("Device ID validation failed - not a Matrix family device");
     }
 
     return info;
@@ -196,7 +196,8 @@ void SysExDecoder::validateMatrixFamilyDevice(DeviceIdInfo& info) const
     const bool manufacturerMatches =
         info.manufacturerId == SysExConstants::DeviceInquiry::kExpectedManufacturer;
     const bool familyMatches =
-        info.familyLow == SysExConstants::DeviceInquiry::kExpectedFamily;
+        info.familyLow == SysExConstants::DeviceInquiry::kExpectedFamily
+        && info.familyHigh == SysExConstants::DeviceInquiry::kExpectedFamilyHigh;
 
     const bool memberMatchesMatrix1000 =
         info.memberLow == SysExConstants::DeviceInquiry::kExpectedMemberLow
@@ -208,6 +209,14 @@ void SysExDecoder::validateMatrixFamilyDevice(DeviceIdInfo& info) const
 
     info.isValid = manufacturerMatches && familyMatches
         && (memberMatchesMatrix1000 || memberMatchesMatrix6);
+
+    if (!info.isValid && manufacturerMatches
+        && info.familyLow == SysExConstants::DeviceInquiry::kExpectedFamily
+        && info.familyHigh != SysExConstants::DeviceInquiry::kExpectedFamilyHigh)
+    {
+        MidiLogger::getInstance().logWarning(
+            "Device ID rejected: family high byte is not 0x00 (Oberheim reply format)");
+    }
 }
 
 size_t SysExDecoder::getChecksumIndex(size_t totalSize) const

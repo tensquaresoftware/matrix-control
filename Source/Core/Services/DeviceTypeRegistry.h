@@ -8,6 +8,9 @@ struct DeviceIdInfo;
 
 namespace Core
 {
+    /** Maps Universal Device Inquiry member bytes to MatrixDeviceTypes.
+        Matrix-6/6R member bytes remain provisional until hardware UAT (PRD §9 #6);
+        inquiry never invents a distinct Matrix-6R pattern. */
     class DeviceTypeRegistry
     {
     public:

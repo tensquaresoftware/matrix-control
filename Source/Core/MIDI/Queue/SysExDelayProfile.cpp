@@ -1,5 +1,6 @@
 #include "Core/MIDI/Queue/SysExDelayProfile.h"
 
+#include "Core/MIDI/SysEx/SysExConstants.h"
 #include "Core/MIDI/SysEx/SysExDecoder.h"
 
 namespace Core
@@ -17,13 +18,16 @@ namespace Core
         MatrixDeviceFamily deviceFamilyFromMemberBytes(juce::uint8 memberLow,
                                                       juce::uint8 memberHigh) noexcept
         {
-            if (memberLow == 0x02 && memberHigh == 0x00)
+            if (memberLow == SysExConstants::DeviceInquiry::kExpectedMemberLow
+                && memberHigh == SysExConstants::DeviceInquiry::kExpectedMemberHigh)
                 return MatrixDeviceFamily::kMatrix1000;
 
-            // Provisional M-6/6R pattern — Epic 8 / SM-1 may revise when hardware confirms.
-            if (memberLow == 0x01 && memberHigh == 0x00)
+            // Provisional M-6/6R pattern — revise when hardware confirms (PRD §9 #6).
+            if (memberLow == SysExConstants::DeviceInquiry::kMatrix6MemberLow
+                && memberHigh == SysExConstants::DeviceInquiry::kMatrix6MemberHigh)
                 return MatrixDeviceFamily::kMatrix6Or6R;
 
+            // Unknown member bytes → stock M-1000 delay fallback (Story 2.2).
             return MatrixDeviceFamily::kMatrix1000;
         }
     }

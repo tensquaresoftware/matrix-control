@@ -353,6 +353,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/ClipboardPasteEnabledResolverTests.cpp
         Tests/Unit/ApvtsMasterMapperTests.cpp
         Tests/Unit/DeviceMemoryLimitsTests.cpp
+        Tests/Unit/DeviceTypeRegistryTests.cpp
         Tests/Unit/InitDefaultsTests.cpp
         Tests/Unit/InitTemplateLoaderTests.cpp
         Tests/Unit/ApvtsPatchMapperTests.cpp

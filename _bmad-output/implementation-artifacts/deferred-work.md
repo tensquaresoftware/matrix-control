@@ -596,3 +596,29 @@
   summary: Matrix-6/6R remote-edit prose references a Select Parameter operation with no opcode section.
   evidence: Blind Hunter; youngmonkey page also lacks that opcode; source gap, not introduced by this verification.
 
+
+## Deferred from: code review of 8-1-devicetyperegistry-and-member-byte-fix (2026-07-17)
+
+- source_spec: `_bmad-output/implementation-artifacts/8-1-devicetyperegistry-and-member-byte-fix.md`
+  summary: Member-byte accept/reject decision tree remains duplicated across DeviceTypeRegistry, SysExDecoder::validateMatrixFamilyDevice, and SysExDelayProfile::deviceFamilyFromMemberBytes.
+  evidence: Blind Hunter; constants are shared but branching is not — future UAT byte changes risk partial updates.
+
+- source_spec: `_bmad-output/implementation-artifacts/8-1-devicetyperegistry-and-member-byte-fix.md`
+  summary: SysExDelayProfileTests hardcode 0x02/0x00 and 0x01/0x00 instead of SysExConstants::DeviceInquiry named constants.
+  evidence: Blind Hunter; pre-existing test style; unknown-member fallback can mask constant drift.
+
+- source_spec: `_bmad-output/implementation-artifacts/8-1-devicetyperegistry-and-member-byte-fix.md`
+  summary: Asymmetric naming kExpectedFamily (low only) vs kExpectedFamilyHigh invites incomplete family checks.
+  evidence: Blind Hunter; rename would touch call sites beyond this story’s audit scope.
+
+- source_spec: `_bmad-output/implementation-artifacts/8-1-devicetyperegistry-and-member-byte-fix.md`
+  summary: Optional decoder golden coverage only rejects bad familyHigh; missing wrong manufacturer / familyLow / swapped D-080 members / happy-path familyHigh asserts.
+  evidence: Blind Hunter; AC6 treats golden decoder tests as optional.
+
+- source_spec: `_bmad-output/implementation-artifacts/8-1-devicetyperegistry-and-member-byte-fix.md`
+  summary: testD080MemberConstants does not lock provisional kMatrix6MemberLow/High against named literals.
+  evidence: Blind Hunter; AC2 only requires M-1000 D-080 lock.
+
+- source_spec: `_bmad-output/implementation-artifacts/8-1-devicetyperegistry-and-member-byte-fix.md`
+  summary: fromApvtsProperty remains untested in DeviceTypeRegistryTests.
+  evidence: Blind Hunter; AC6 focuses on inquiry / member-byte mapping, not APVTS override path.

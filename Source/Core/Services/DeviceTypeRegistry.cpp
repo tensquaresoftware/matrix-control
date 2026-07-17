@@ -27,7 +27,8 @@ namespace Core
         if (info.manufacturerId != SysExConstants::DeviceInquiry::kExpectedManufacturer)
             return MatrixDeviceTypes::Type::kUnknown;
 
-        if (info.familyLow != SysExConstants::DeviceInquiry::kExpectedFamily)
+        if (info.familyLow != SysExConstants::DeviceInquiry::kExpectedFamily
+            || info.familyHigh != SysExConstants::DeviceInquiry::kExpectedFamilyHigh)
             return MatrixDeviceTypes::Type::kUnknown;
 
         return fromMemberBytes(info.memberLow, info.memberHigh);
