@@ -26,4 +26,4 @@ Canonical Oberheim MIDI/SysEx references archived for Matrix-Control BMad workfl
 
 **Related verification artifact:** `_bmad-output/implementation-artifacts/spec-midi-docs-oberheim-verification.md` (2026-07-17 quick-dev).
 
-**Matrix-Control code today:** `Source/Core/MIDI/SysEx/SysExConstants.h` — validate `kExpectedMemberLow/High` against M-1000 Device ID table (`memb-lo=02H`, `memb-hi=00H`). Note: opcode `0x0D` requires a literal header byte `0` after the opcode (see Matrix-1000 MD); encoder fix tracked separately.
+**Matrix-Control code today:** `Source/Core/MIDI/SysEx/SysExConstants.h` — validate `kExpectedMemberLow/High` against M-1000 Device ID table (`memb-lo=02H`, `memb-hi=00H`). Opcode `0x0D` includes literal header byte `0` after the opcode (`F0 10 06 0D 00 …`, 275 bytes) — encoder aligned 2026-07-17.

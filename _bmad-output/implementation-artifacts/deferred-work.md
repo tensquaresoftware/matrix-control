@@ -3,8 +3,8 @@
 ## Deferred from: quick-dev plugin-patch-push-edit-buffer hardware UAT (2026-07-17)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-plugin-patch-push-edit-buffer.md`
-  summary: Matrix-1000 SysEx 0x0D (Single Patch to Edit Buffer) is not audible on Guillaume's hardware (RAM or ROM); Mutate/audition temporarily uses 0x01 on RAM (overwrites slot) and 0x06/0x0B remote edits on ROM.
-  evidence: MIDI log showed correct F0 10 06 0D outbound; smoke test confirmed no sound change on RAM/ROM until path was changed. Product intent remains non-destructive edit-buffer audition — revisit 0x0D format/recall nudge once hardware path is understood.
+  summary: ~~Matrix-1000 0x0D inaudible~~ **Resolved 2026-07-17**: missing literal header byte `0` after opcode `0DH` (encoder emitted 274-byte message). Docs + encoder restored to `F0 10 06 0D 00 …` (275 bytes). Hardware re-UAT still recommended for audible Mutate/INIT on RAM and ROM.
+  evidence: Official Oberheim manual + Edit Buffer Lab round-trip (WITH `0` ≈ name-only diffs; WITHOUT `0` = massive misalignment). Code fix: `SysExEncoder::buildHeader` + `kPatchToEditBufferMessageLength` + `sendFullPatchForAudition` → 0x0D on M-1000.
 
 ## Deferred from: code review of spec-plugin-patch-push-edit-buffer (2026-07-17)
 
