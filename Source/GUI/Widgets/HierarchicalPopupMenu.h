@@ -96,6 +96,7 @@ namespace TSS
         void selectChild(int primaryIndex, int childIndex);
         void getPreferredContentSize(float& width, float& height) const;
         void closePopup();
+        void closePopupWithSelection(int primaryId, int childId);
 
         static int countOpenablePrimaries(const HierarchicalComboBox& owner);
         static int openableIndexForPrimaryId(const HierarchicalComboBox& owner, int primaryId);

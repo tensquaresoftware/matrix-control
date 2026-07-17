@@ -3,7 +3,7 @@ organization: Ten Square Software
 project: Matrix-Control
 title: Story U-12 — HierarchicalComboBox Widget
 author: BMad Agent
-status: review
+status: done
 baseline_commit: d4e0ed888c523602233c75ba3ae5e580c0ed88f3
 sources:
   - planning-artifacts/sprint-change-proposal-2026-07-14-init-sysex-and-hierarchical-history-combobox.md
@@ -13,12 +13,12 @@ sources:
   - Source/GUI/Widgets/ComboBox.cpp
   - project-context.md
 created: 2026-07-14
-updated: 2026-07-14
+updated: 2026-07-17
 ---
 
 # Story U-12: HierarchicalComboBox Widget
 
-Status: review
+Status: done
 
 ## Story
 
@@ -77,6 +77,12 @@ so that two-level selections (e.g. Patch Mutator History M → R) use one contro
 - [x] **TestComponent demo** (AC: #5, #8)
   - [x] Minimal M/R sample data for manual hover/submenu verification at 50%/100%/150% UI scale
 
+### Review Findings
+
+- [x] [Review][Decision] Forced Above/Below may clip off-screen — **Resolved: accept strict Above/Below (no clamp).** Viewport capped at 10 rows then scroll; no practical off-screen risk for this project’s hierarchical popups.
+- [x] [Review][Patch] Commit selection fires `onChange` before popup teardown — **Fixed:** `closePopupWithSelection` tears down modal first, then commits so Mutator `onChange` clear/rebuild cannot run under a live popup.
+- [x] [Review][Patch] Story File List and Implementation Plan outdated — **Fixed:** plan + File List aligned with custom `HierarchicalPopupMenu` and placement add-on files.
+
 ## Dev Notes
 
 ### Naming rationale (D-082-R2)
@@ -119,11 +125,12 @@ Claude (Cursor Agent)
 
 ### Implementation Plan
 
-- `TSS::HierarchicalComboBox` as `juce::Component` with Standard ComboBox closed-state paint (shared constants with `TSS::ComboBox`).
-- Popup via `juce::PopupMenu::addSubMenu` + `showMenuAsync`; styled with private `LookAndFeel_V4` subclass driven by `PopupMenuLook` and `uiScale`.
-- Item tree stored as primary vector with child vectors; menu result IDs mapped back to `{primaryId, childId}` on selection commit.
-- Design atom `kPatchMutatorHistory = 48` exposed as `ComboBoxDimensions::patchMutatorHistoryWidth` in `DimensionFactory`.
+- `TSS::HierarchicalComboBox` as `juce::Component` with Standard ComboBox closed-state paint via shared `ComboBoxControlPainter`.
+- Popup via custom modal `HierarchicalPopupMenu` (AC #4 “or equivalent JUCE 8 pattern”): staircase primary + hover secondary column, `PopupMenuRenderer` + `PopupMenuLook`, no global `AffineTransform`.
+- Item tree stored as primary vector with child vectors; leaf selection commits `{primaryId, childId}` after popup teardown.
+- Design atom `kPatchMutatorHistory` exposed as `ComboBoxDimensions::patchMutatorHistoryWidth` in `DimensionFactory`.
 - `TestHierarchicalComboBoxes` sandbox page (U-2 column pattern) with sample M/R data and empty sentinel row.
+- Add-on: `PopupVerticalPlacement` (`Auto` / `Above` / `Below`) on `PopupMenuPositioner`; HISTORY forces `Above`.
 
 ### Completion Notes List
 
@@ -131,11 +138,23 @@ Claude (Cursor Agent)
 - Added TestComponent selector entry **HierarchicalComboBox** with scale columns at 50%–200%.
 - Fixed pre-existing `GrayedControlHelper.cpp` compile error (`forwarders()` used before declaration) encountered during build.
 - macOS Debug build green; full unit test suite passes (no new GUI pixel tests per project policy).
+- Code review (2026-07-17): selection commit deferred until after popup teardown; story File List / plan aligned with delivered files.
 
 ### File List
 
 - Source/GUI/Widgets/HierarchicalComboBox.h (added)
 - Source/GUI/Widgets/HierarchicalComboBox.cpp (added)
+- Source/GUI/Widgets/HierarchicalPopupMenu.h (added)
+- Source/GUI/Widgets/HierarchicalPopupMenu.cpp (added)
+- Source/GUI/Widgets/ComboBoxControlPainter.h (added)
+- Source/GUI/Widgets/ComboBoxControlPainter.cpp (added)
+- Source/GUI/Widgets/ComboBox.h (modified)
+- Source/GUI/Widgets/ComboBox.cpp (modified)
+- Source/GUI/Widgets/PopupMenuRenderer.h (modified)
+- Source/GUI/Widgets/PopupMenuRenderer.cpp (modified)
+- Source/GUI/Widgets/PopupMenuPositioner.h (modified — placement add-on)
+- Source/GUI/Widgets/PopupMenuPositioner.cpp (modified — placement add-on)
+- Source/GUI/Panels/.../PatchMutatorPanel.cpp (modified — HISTORY `Above` only)
 - Source/GUI/Layout/Design/DesignAtoms.h (modified)
 - Source/GUI/Layout/WidgetDimensions.h (modified)
 - Source/GUI/Factories/DimensionFactory.cpp (modified)
@@ -146,9 +165,11 @@ Claude (Cursor Agent)
 - Source/GUI/Helpers/GrayedControlHelper.cpp (modified — build fix)
 - CMakeLists.txt (modified)
 - _bmad-output/implementation-artifacts/sprint-status.yaml (modified)
+- _bmad-output/implementation-artifacts/u-13-combobox-popup-infrastructure-dedup.md (added — backlog note from U-12)
 
 ## Change Log
 
 - 2026-07-14: Story U-12 created — HierarchicalComboBox widget (Correct Course D-082-R2).
 - 2026-07-14: Implemented HierarchicalComboBox widget, design atom, DimensionFactory hook, and TestComponent demo; story ready for review.
 - 2026-07-17: **Post-implementation add-on (review context):** `PopupVerticalPlacement` (`Auto` / `Above` / `Below`) on `PopupMenuPositioner` + ComboBox / HierarchicalComboBox setters; Patch Mutator HISTORY forces `Above`. Default remains `Auto` — other combos unchanged. Smoke-tested; treat as follow-up delta vs original U-12 ACs, not a scope change.
+- 2026-07-17: Code review — accept strict Above/Below; fix selection commit after popup teardown; refresh File List / Implementation Plan.

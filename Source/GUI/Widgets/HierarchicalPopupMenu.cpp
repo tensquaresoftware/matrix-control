@@ -734,8 +734,8 @@ namespace TSS
         if (! primary.children.empty())
             return;
 
-        owner_.commitSelectionFromPopup(primary.id, 0);
-        closePopup();
+        // Commit after teardown so onChange rebuild/clear cannot run under a live popup.
+        closePopupWithSelection(primary.id, 0);
     }
 
     void HierarchicalPopupMenu::selectChild(int primaryIndex, int childIndex)
@@ -748,18 +748,33 @@ namespace TSS
         if (! juce::isPositiveAndBelow(childIndex, static_cast<int>(primary.children.size())))
             return;
 
-        owner_.commitSelectionFromPopup(primary.id, primary.children[static_cast<size_t>(childIndex)].id);
-        closePopup();
+        const int primaryId = primary.id;
+        const int childId = primary.children[static_cast<size_t>(childIndex)].id;
+        closePopupWithSelection(primaryId, childId);
     }
 
     void HierarchicalPopupMenu::closePopup()
     {
+        auto& owner = owner_;
         exitModalState(0);
-        owner_.notifyPopupClosed();
+        owner.notifyPopupClosed();
 
         if (auto* parent = getParentComponent())
             parent->removeChildComponent(this);
 
+        delete this;
+    }
+
+    void HierarchicalPopupMenu::closePopupWithSelection(int primaryId, int childId)
+    {
+        auto& owner = owner_;
+        exitModalState(0);
+        owner.notifyPopupClosed();
+
+        if (auto* parent = getParentComponent())
+            parent->removeChildComponent(this);
+
+        owner.commitSelectionFromPopup(primaryId, childId);
         delete this;
     }
 
