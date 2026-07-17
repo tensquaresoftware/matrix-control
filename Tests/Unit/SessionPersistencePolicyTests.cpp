@@ -196,7 +196,7 @@ private:
         TestSessionPersistenceProcessor source;
         source.apvts.getParameter(patchParamId)->setValueNotifyingHost(0.75f);
         const float savedValue = source.apvts.getParameter(patchParamId)->getValue();
-        expect(savedValue != defaultValue);
+        expect(! juce::approximatelyEqual(savedValue, defaultValue));
 
         source.apvts.state.setProperty("midiInputPortId", "input-a", nullptr);
         source.apvts.state.setProperty("midiOutputPortId", "output-a", nullptr);
@@ -208,8 +208,8 @@ private:
         restored.setStateInformation(savedState.getData(), static_cast<int>(savedState.getSize()));
 
         const float restoredValue = restored.apvts.getParameter(patchParamId)->getValue();
-        expectEquals(restoredValue, defaultValue);
-        expect(restoredValue != savedValue);
+        expectWithinAbsoluteError(restoredValue, defaultValue, 1.0e-6f);
+        expect(! juce::approximatelyEqual(restoredValue, savedValue));
         expectEquals(restored.apvts.state.getProperty("midiInputPortId").toString(), juce::String("input-a"));
         expectEquals(restored.apvts.state.getProperty("midiOutputPortId").toString(), juce::String("output-a"));
     }
