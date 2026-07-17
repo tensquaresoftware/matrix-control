@@ -162,6 +162,7 @@ public:
     {
         testPasteRomBankBlocked();
         testPasteRamBankSuccess();
+        testPasteMatrix6_sendsPatchSlot();
         testStoreRomBankBlocked();
         testStoreRamBankSuccess();
         testInitLoadsTemplateAndBufferToApvts();
@@ -200,6 +201,7 @@ public:
         testSaveAs_noSysEx();
         testSave_syncsPatchEditName();
         testLoadSelected_enqueuesSysEx();
+        testLoadSelected_matrix6_sendsPatchSlot();
         testLoadSelected_sentinelNoOp();
         testLoadSelected_staleScanNoOp();
         testLoadSelected_outOfRangeWarning();
@@ -387,7 +389,25 @@ private:
 
         expect(harness.clipboard.canPasteFullPatch());
         const auto queued = scanQueue(harness.queue);
+        expect(queued.editBufferPatch);
+        expect(!queued.patchData);
+    }
+
+    void testPasteMatrix6_sendsPatchSlot()
+    {
+        beginTest("paste_matrix6_sendsPatchSlot");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix6));
+        initializePatchManagerState(harness.proc.apvts.state, 0, 7, false);
+        harness.mapper.apvtsToBuffer();
+        harness.clipboard.copyFullPatch(harness.model);
+
+        harness.handler.handleAction(InternalPatches::kPastePatch, juce::var());
+
+        const auto queued = scanQueue(harness.queue);
         expect(queued.patchData);
+        expect(!queued.editBufferPatch);
+        expectEquals(queued.patchNumber, 7);
     }
 
     void testStoreRomBankBlocked()
@@ -417,6 +437,7 @@ private:
         expect(queued.setBank);
         expectEquals(queued.setBankValue, 1);
         expect(queued.patchData);
+        expect(!queued.editBufferPatch);
     }
 
     void testInitLoadsTemplateAndBufferToApvts()
@@ -788,7 +809,8 @@ private:
         expect(harness.patchFileService.getLastScanResult().sortedValidFileNames[0]
                == "Patch 5.syx");
         const auto queued = scanQueue(harness.queue);
-        expect(queued.patchData);
+        expect(queued.editBufferPatch);
+        expect(!queued.patchData);
         expect(harness.patchLoadHookState->invoked);
 
         tempDir.deleteRecursively();
@@ -844,7 +866,8 @@ private:
             1);
         expect(harness.patchLoadHookState->invoked);
         const auto queued = scanQueue(harness.queue);
-        expect(queued.patchData);
+        expect(queued.editBufferPatch);
+        expect(!queued.patchData);
 
         tempDir.deleteRecursively();
     }
@@ -1252,10 +1275,41 @@ private:
         harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kSelectPatchFile, juce::var());
 
         const auto queued = scanQueue(harness.queue);
-        expect(queued.patchData);
+        expect(queued.editBufferPatch);
+        expect(!queued.patchData);
         expect(harness.proc.apvts.state.getProperty("uiMessageSeverity").toString() == "info");
         expect(harness.proc.apvts.state.getProperty("uiMessageText").toString()
                == FooterMessages::formatReconciliationNotice("BNK2 71", false));
+
+        tempDir.deleteRecursively();
+    }
+
+    void testLoadSelected_matrix6_sendsPatchSlot()
+    {
+        beginTest("loadSelected_matrix6_sendsPatchSlot");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix6));
+        initializePatchManagerState(harness.proc.apvts.state, 0, 12, false);
+        const auto tempDir = createTempScanDir();
+        expect(tempDir.createDirectory());
+        copyFixturePatchToDir(tempDir, "Patch 71.syx");
+
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StateProperties::kFolderPath,
+            tempDir.getFullPathName(),
+            nullptr);
+        harness.handler.rescanPersistedComputerPatchesFolder();
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile,
+            1,
+            nullptr);
+
+        harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kSelectPatchFile, juce::var());
+
+        const auto queued = scanQueue(harness.queue);
+        expect(queued.patchData);
+        expect(!queued.editBufferPatch);
+        expectEquals(queued.patchNumber, 12);
 
         tempDir.deleteRecursively();
     }
@@ -1523,7 +1577,7 @@ private:
         expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
                          ComputerPatches::StandaloneWidgets::kSelectPatchFile)),
                      1);
-        expect(scanQueue(harness.queue).patchData);
+        expect(scanQueue(harness.queue).editBufferPatch);
 
         tempDir.deleteRecursively();
     }
@@ -1550,7 +1604,7 @@ private:
         expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
                          ComputerPatches::StandaloneWidgets::kSelectPatchFile)),
                      3);
-        expect(scanQueue(harness.queue).patchData);
+        expect(scanQueue(harness.queue).editBufferPatch);
 
         tempDir.deleteRecursively();
     }
@@ -1575,7 +1629,7 @@ private:
         expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
                          ComputerPatches::StandaloneWidgets::kSelectPatchFile)),
                      1);
-        expect(scanQueue(harness.queue).patchData);
+        expect(scanQueue(harness.queue).editBufferPatch);
 
         tempDir.deleteRecursively();
     }
@@ -1625,7 +1679,7 @@ private:
         expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
                          ComputerPatches::StandaloneWidgets::kSelectPatchFile)),
                      2);
-        expect(scanQueue(harness.queue).patchData);
+        expect(scanQueue(harness.queue).editBufferPatch);
 
         tempDir.deleteRecursively();
     }

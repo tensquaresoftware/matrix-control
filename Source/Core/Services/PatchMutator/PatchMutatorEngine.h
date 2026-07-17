@@ -9,6 +9,7 @@
 #include "Core/Services/PatchMutator/MutationAlgorithm.h"
 #include "Core/Services/PatchMutator/MutationHistoryStore.h"
 #include "Core/Services/PatchMutator/PatchLoadContext.h"
+#include "Core/Services/DeviceMemoryLimits.h"
 
 class MidiManager;
 class SysExEncoder;
@@ -77,6 +78,7 @@ namespace Core
                            juce::AudioProcessorValueTreeState& apvts,
                            ActionExecutionHooks hooks,
                            std::function<int()> getCurrentPatchNumber,
+                           std::function<DeviceMemoryLimits()> getDeviceMemoryLimits,
                            PatchFileService* patchFileService = nullptr,
                            SysExEncoder* sysExEncoder = nullptr);
 
@@ -140,6 +142,7 @@ namespace Core
         juce::AudioProcessorValueTreeState& apvts_;
         ActionExecutionHooks hooks_;
         std::function<int()> getCurrentPatchNumber_;
+        std::function<DeviceMemoryLimits()> getDeviceMemoryLimits_;
         PatchFileService* patchFileService_ = nullptr;
         SysExEncoder* sysExEncoder_ = nullptr;
         std::function<PatchLoadContext()> patchLoadContextProvider_;

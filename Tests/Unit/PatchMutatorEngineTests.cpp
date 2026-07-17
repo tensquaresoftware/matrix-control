@@ -23,6 +23,8 @@
 #include "Core/Services/PatchMutator/MutationNaming.h"
 #include "Core/Services/PatchMutator/PatchLoadContext.h"
 #include "Core/Services/PatchMutator/PatchMutatorEngine.h"
+#include "Core/Services/DeviceMemoryLimits.h"
+#include "Shared/Definitions/MatrixDeviceTypes.h"
 #include "Shared/Definitions/PluginIDs.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 
@@ -74,6 +76,8 @@ public:
         mutate_noModuleToggle_blocked();
         mutate_fromAuditionedRetry();
         mutate_sendsSysExOnce();
+        mutate_matrix1000_sendsEditBuffer();
+        mutate_matrix6_sendsPatchSlot();
         mutate_neverDeletesRoots();
 
         retry_emptyHistory_blocked();
@@ -84,6 +88,7 @@ public:
         retry_limitBlocks();
         retry_noOpRecipe_blocked();
         retry_sendsSysExOnce();
+        retry_matrix1000_sendsEditBuffer();
         retry_neverDeletesExistingRetries();
         retry_staysUnderSameRoot();
 
@@ -188,6 +193,9 @@ private:
         bool suppressPatchSysEx { false };
         bool suppressMatrixModSysEx { false };
         int currentPatchNumber { 0 };
+        Core::DeviceMemoryLimits deviceLimits {
+            Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000)
+        };
         Core::PatchMutatorEngine engine;
 
         EngineHarness()
@@ -209,6 +217,7 @@ private:
                          nullptr,
                          {} },
                      [this]() { return currentPatchNumber; },
+                     [this]() { return deviceLimits; },
                      &patchFileService,
                      &midiManager.getSysExEncoder())
         {
@@ -268,11 +277,45 @@ private:
                 continue;
 
             const auto* data = static_cast<const juce::uint8*>(block.getData());
-            if (data[3] == SysExConstants::Opcode::kSinglePatchData)
+            if (data[3] == SysExConstants::Opcode::kSinglePatchData
+                || data[3] == SysExConstants::Opcode::kSinglePatchToEditBuffer)
                 ++count;
         }
 
         return count;
+    }
+
+    struct FullPatchOpcodeCounts
+    {
+        int slotWrite = 0;   // 0x01
+        int editBuffer = 0;  // 0x0D
+    };
+
+    static FullPatchOpcodeCounts countFullPatchOpcodes(Core::MidiOutboundQueue& queue)
+    {
+        FullPatchOpcodeCounts counts;
+
+        while (! queue.isEmpty())
+        {
+            const auto msg = queue.dequeue();
+            if (! msg.has_value())
+                break;
+
+            if (msg->category != Core::MidiOutboundQueue::MessageCategory::kSysEx)
+                continue;
+
+            const auto& block = msg->sysExData;
+            if (block.getSize() < 4)
+                continue;
+
+            const auto* data = static_cast<const juce::uint8*>(block.getData());
+            if (data[3] == SysExConstants::Opcode::kSinglePatchData)
+                ++counts.slotWrite;
+            else if (data[3] == SysExConstants::Opcode::kSinglePatchToEditBuffer)
+                ++counts.editBuffer;
+        }
+
+        return counts;
     }
 
     static Core::PatchModel makeDistinctBuffer(int seed)
@@ -405,6 +448,37 @@ private:
         const auto result = harness.engine.mutate();
         expect(result.success);
         expectEquals(countPatchSysExMessages(harness.queue), 1);
+    }
+
+    void mutate_matrix1000_sendsEditBuffer()
+    {
+        beginTest("mutate_matrix1000_sendsEditBuffer");
+
+        EngineHarness harness;
+        harness.deviceLimits = Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000);
+        harness.setRecipe(100, 100, true);
+
+        const auto result = harness.engine.mutate();
+        expect(result.success);
+        const auto opcodes = countFullPatchOpcodes(harness.queue);
+        expectEquals(opcodes.editBuffer, 1);
+        expectEquals(opcodes.slotWrite, 0);
+    }
+
+    void mutate_matrix6_sendsPatchSlot()
+    {
+        beginTest("mutate_matrix6_sendsPatchSlot");
+
+        EngineHarness harness;
+        harness.deviceLimits = Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix6);
+        harness.currentPatchNumber = 17;
+        harness.setRecipe(100, 100, true);
+
+        const auto result = harness.engine.mutate();
+        expect(result.success);
+        const auto opcodes = countFullPatchOpcodes(harness.queue);
+        expectEquals(opcodes.slotWrite, 1);
+        expectEquals(opcodes.editBuffer, 0);
     }
 
     void mutate_neverDeletesRoots()
@@ -599,6 +673,25 @@ private:
         const auto result = harness.engine.retry();
         expect(result.success);
         expectEquals(countPatchSysExMessages(harness.queue), 1);
+    }
+
+    void retry_matrix1000_sendsEditBuffer()
+    {
+        beginTest("retry_matrix1000_sendsEditBuffer");
+
+        EngineHarness harness;
+        harness.setRecipe(100, 100, true);
+
+        auto m00 = makeDistinctBuffer(111);
+        auto m00Parent = makeDistinctBuffer(112);
+        Core::MutationNaming::applyPatchName(m00, 0);
+        expect(harness.store().insertRoot(0, m00, m00Parent));
+
+        const auto result = harness.engine.retry();
+        expect(result.success);
+        const auto opcodes = countFullPatchOpcodes(harness.queue);
+        expectEquals(opcodes.editBuffer, 1);
+        expectEquals(opcodes.slotWrite, 0);
     }
 
     void retry_neverDeletesExistingRetries()

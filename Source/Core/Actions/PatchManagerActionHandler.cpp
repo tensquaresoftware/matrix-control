@@ -294,11 +294,9 @@ namespace Core
             return;
 
         apvtsPatchMapper_->apvtsToBuffer();
-
-        if (limits.hasBankConcept())
-            midiManager_->sendPatchToEditBuffer(patchModel_->data());
-        else
-            midiManager_->sendPatch(static_cast<juce::uint8>(getCurrentPatch(limits)), patchModel_->data());
+        midiManager_->sendFullPatchForAudition(patchModel_->data(),
+                                               static_cast<juce::uint8>(getCurrentPatch(limits)),
+                                               limits.hasBankConcept());
     }
 
     void PatchManagerActionHandler::handleInternalPatchPaste(const DeviceMemoryLimits& limits)
@@ -333,7 +331,9 @@ namespace Core
             hooks_.onPatchLoaded();
 
         if (midiManager_ != nullptr)
-            midiManager_->sendPatch(static_cast<juce::uint8>(getCurrentPatch(limits)), patchModel_->data());
+            midiManager_->sendFullPatchForAudition(patchModel_->data(),
+                                                   static_cast<juce::uint8>(getCurrentPatch(limits)),
+                                                   limits.hasBankConcept());
     }
 
     void PatchManagerActionHandler::handleInternalPatchStore(const DeviceMemoryLimits& limits)
@@ -635,7 +635,9 @@ namespace Core
             hooks_.onPatchLoaded();
 
         if (midiManager_ != nullptr)
-            midiManager_->sendPatch(static_cast<juce::uint8>(getCurrentPatch(limits)), patchModel_->data());
+            midiManager_->sendFullPatchForAudition(patchModel_->data(),
+                                                   static_cast<juce::uint8>(getCurrentPatch(limits)),
+                                                   limits.hasBankConcept());
     }
 
     void PatchManagerActionHandler::publishLoadFooters(const juce::String& fileName,

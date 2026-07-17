@@ -42,6 +42,11 @@ public:
 
     void sendPatch(juce::uint8 patchNumber, const juce::uint8* packedData);
     void sendPatchToEditBuffer(const juce::uint8* packedData);
+    // Audition / non-STORE full-patch push: edit buffer (0x0D) when the device has banks
+    // (Matrix-1000); otherwise 0x01 to patchNumber (Matrix-6/6R). STORE keeps sendPatch.
+    void sendFullPatchForAudition(const juce::uint8* packedData,
+                                  juce::uint8 patchNumber,
+                                  bool deviceHasBankConcept);
     void sendMaster(juce::uint8 version, const juce::uint8* packedData);
     void sendProgramChange(int programNumber, int channel = 1);
     void sendSetBank(int bank);

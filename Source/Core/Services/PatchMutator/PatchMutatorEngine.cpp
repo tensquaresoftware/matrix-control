@@ -161,6 +161,7 @@ PatchMutatorEngine::PatchMutatorEngine(PatchModel* patchModel,
                                        juce::AudioProcessorValueTreeState& apvts,
                                        ActionExecutionHooks hooks,
                                        std::function<int()> getCurrentPatchNumber,
+                                       std::function<DeviceMemoryLimits()> getDeviceMemoryLimits,
                                        PatchFileService* patchFileService,
                                        SysExEncoder* sysExEncoder)
     : patchModel_(patchModel)
@@ -170,6 +171,7 @@ PatchMutatorEngine::PatchMutatorEngine(PatchModel* patchModel,
     , apvts_(apvts)
     , hooks_(std::move(hooks))
     , getCurrentPatchNumber_(std::move(getCurrentPatchNumber))
+    , getDeviceMemoryLimits_(std::move(getDeviceMemoryLimits))
     , patchFileService_(patchFileService)
     , sysExEncoder_(sysExEncoder)
 {
@@ -1025,12 +1027,19 @@ void PatchMutatorEngine::pushResultToEditorAndSynth(const PatchModel& mutatedMod
     std::memcpy(patchModel_->data(), mutatedModel.data(), PatchModel::kBufferSize);
     pushPatchModelToApvtsWithSuppress(apvts_, hooks_, *apvtsPatchMapper_, patchNameSyncer_);
 
-    if (midiManager_ != nullptr && getCurrentPatchNumber_)
-    {
-        const int patchNumber = getCurrentPatchNumber_();
-        midiManager_->sendPatch(static_cast<juce::uint8>(juce::jlimit(0, 255, patchNumber)),
-                               patchModel_->data());
-    }
+    if (midiManager_ == nullptr || ! getDeviceMemoryLimits_)
+        return;
+
+    const bool hasBankConcept = getDeviceMemoryLimits_().hasBankConcept();
+    const juce::uint8 patchNumber = getCurrentPatchNumber_
+        ? static_cast<juce::uint8>(juce::jlimit(0, 255, getCurrentPatchNumber_()))
+        : 0;
+
+    // Slot-write path (Matrix-6/6R) needs a patch number supplier; edit-buffer (M-1000) does not.
+    if (! hasBankConcept && ! getCurrentPatchNumber_)
+        return;
+
+    midiManager_->sendFullPatchForAudition(patchModel_->data(), patchNumber, hasBankConcept);
 }
 
 bool PatchMutatorEngine::readBoolProperty(const juce::ValueTree& state,

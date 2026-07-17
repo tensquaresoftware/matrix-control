@@ -1,5 +1,21 @@
 # Deferred Work
 
+## Deferred from: code review of spec-plugin-patch-push-edit-buffer (2026-07-17)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-plugin-patch-push-edit-buffer.md`
+  summary: No dedicated MidiManager unit test for sendFullPatchForAudition (null / branch / enqueue).
+  evidence: Blind Hunter; behavior covered only via PatchManager and Mutator harnesses.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-plugin-patch-push-edit-buffer.md`
+  summary: History audition / Compare Mutator paths still assert combined full-patch SysEx counts, not exclusive 0x0D vs 0x01 opcodes.
+  evidence: Blind Hunter; Mutate and Retry now have opcode asserts; remaining push paths still use broadened countPatchSysExMessages.
+
+## Deferred from: quick-dev plugin-patch-push-edit-buffer (2026-07-17)
+
+- source_spec: none
+  summary: DirtyPatchTracker + unsaved-edit confirmation modal (FR-51 / Epic 9) before navigating away from an edited patch.
+  evidence: Split from edit-buffer SysEx alignment quick-dev; Guillaume chose [S] — keep modal for Epic 9 (`9-1-dirtypatchtracker`, `9-2-unsaved-edit-confirmation-dialog`).
+
 ## Deferred from: code review of spec-computer-patches-open-auto-select-first (2026-07-17)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-computer-patches-open-auto-select-first.md`

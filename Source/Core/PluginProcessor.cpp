@@ -254,6 +254,7 @@ PluginProcessor::PluginProcessor()
         apvts,
         actionHooks,
         [this]() { return getCurrentPatchNumberForMutator(); },
+        [this]() { return getResolvedDeviceMemoryLimits(); },
         patchFileService_.get(),
         &midiManager->getSysExEncoder());
 

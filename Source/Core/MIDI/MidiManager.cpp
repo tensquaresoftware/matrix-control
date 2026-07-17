@@ -248,6 +248,16 @@ void MidiManager::sendPatchToEditBuffer(const juce::uint8* packedData)
     }
 }
 
+void MidiManager::sendFullPatchForAudition(const juce::uint8* packedData,
+                                           juce::uint8 patchNumber,
+                                           bool deviceHasBankConcept)
+{
+    if (deviceHasBankConcept)
+        sendPatchToEditBuffer(packedData);
+    else
+        sendPatch(patchNumber, packedData);
+}
+
 void MidiManager::sendMaster(juce::uint8 version, const juce::uint8* packedData)
 {
     if (packedData == nullptr)
