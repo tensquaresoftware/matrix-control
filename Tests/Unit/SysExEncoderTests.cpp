@@ -167,12 +167,14 @@ public:
 
             expectEquals(static_cast<int>(message.getSize()),
                          static_cast<int>(SysExConstants::kPatchToEditBufferMessageLength));
+            expectEquals(static_cast<int>(message.getSize()), 275);
 
             const auto* data = static_cast<const juce::uint8*>(message.getData());
             expect(data[0] == SysExConstants::kSysExStart);
             expect(data[1] == SysExConstants::kManufacturerIdOberheim);
             expect(data[2] == SysExConstants::kDeviceIdMatrix1000);
             expect(data[3] == SysExConstants::Opcode::kSinglePatchToEditBuffer);
+            expect(data[4] == 0x00); // literal header byte required by Oberheim 0DH format
             expect(data[message.getSize() - 2]
                    == SysExEncoder::calculateChecksum(packedData, SysExConstants::kPatchPackedDataSize));
             expect(data[message.getSize() - 1] == SysExConstants::kSysExEnd);

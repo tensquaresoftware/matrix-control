@@ -27,7 +27,7 @@ juce::MemoryBlock SysExEncoder::encodePatchToEditBufferSysEx(const juce::uint8* 
         return {};
     }
 
-    auto header = buildHeader(SysExConstants::Opcode::kSinglePatchToEditBuffer);
+    auto header = buildHeader(SysExConstants::Opcode::kSinglePatchToEditBuffer, 0);
     std::vector<juce::uint8> nibbles = unpackBytesToNibbles(packedData, SysExConstants::kPatchPackedDataSize);
     juce::uint8 checksum = calculateChecksum(packedData, SysExConstants::kPatchPackedDataSize);
 
@@ -200,6 +200,7 @@ std::vector<juce::uint8> SysExEncoder::buildHeader(juce::uint8 opcode, juce::uin
     header.push_back(SysExConstants::kDeviceIdMatrix1000);
     header.push_back(opcode);
     if (headerData != 0 || opcode == SysExConstants::Opcode::kSinglePatchData ||
+        opcode == SysExConstants::Opcode::kSinglePatchToEditBuffer ||
         opcode == SysExConstants::Opcode::kMasterParameterData ||
         opcode == SysExConstants::Opcode::kRequestData)
     {
