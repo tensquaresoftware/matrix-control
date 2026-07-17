@@ -17,7 +17,7 @@ namespace TSS::SkinColours
             inline constexpr ColourElement kBorder = {
                 "ButtonBorder",
                 ColourChart::kDarkGrey3,
-                ColourChart::kDarkGrey4
+                ColourChart::kDarkGrey3
             };
 
             inline constexpr ColourElement kText = {
@@ -52,15 +52,15 @@ namespace TSS::SkinColours
 
             inline constexpr ColourElement kBackgroundDisabled = {
                 "ButtonBackgroundDisabled",
-                ColourChart::kDarkGrey2,
-                ColourChart::kDarkGrey2,
+                ColourChart::kDarkGrey1,
+                ColourChart::kDarkGrey1,
             };
 
             // Same chart values as enabled border (black/cream variants).
             inline constexpr ColourElement kBorderDisabled = {
                 "ButtonBorderDisabled",
                 ColourChart::kDarkGrey3,
-                ColourChart::kDarkGrey4
+                ColourChart::kDarkGrey3
             };
 
             inline constexpr ColourElement kTextDisabled = {
@@ -75,7 +75,7 @@ namespace TSS::SkinColours
             inline constexpr ColourElement kBorder = {
                 "ToggleBorder",
                 ColourChart::kDarkGrey3,
-                ColourChart::kDarkGrey4
+                ColourChart::kDarkGrey3
             };
 
             inline constexpr ColourElement kBackgroundOff = {
@@ -104,15 +104,15 @@ namespace TSS::SkinColours
 
             inline constexpr ColourElement kBackgroundDisabled = {
                 "ToggleBackgroundDisabled",
-                ColourChart::kDarkGrey2,
-                ColourChart::kDarkGrey2,
+                ColourChart::kDarkGrey1,
+                ColourChart::kDarkGrey1,
             };
 
             // Same chart values as enabled border (black/cream variants).
             inline constexpr ColourElement kBorderDisabled = {
                 "ToggleBorderDisabled",
                 ColourChart::kDarkGrey3,
-                ColourChart::kDarkGrey4
+                ColourChart::kDarkGrey3
             };
 
             inline constexpr ColourElement kTextDisabled = {

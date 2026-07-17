@@ -15,12 +15,12 @@ namespace TSS::SkinColours
 
     namespace Common
     {
-        // Shared disabled defaults. Buttons/toggles/ButtonLike use Grey2 backgrounds and
+        // Shared disabled defaults. Buttons/toggles/ButtonLike use Grey1 backgrounds and
         // enabled-border colours locally; standard combos and slider fond use Grey3 here.
         static constexpr juce::uint32 kBackgroundDisabled = ColourChart::kDarkGrey3;
         static constexpr juce::uint32 kBorderDisabled = ColourChart::kDarkGrey4;
         static constexpr juce::uint32 kDecorationDisabled = ColourChart::kDarkGrey2;
-        static constexpr juce::uint32 kContentDisabled = ColourChart::kDarkGrey4;
+        static constexpr juce::uint32 kContentDisabled = ColourChart::kDarkGrey5;
         static constexpr juce::uint32 kContentHoover = ColourChart::kDarkGrey1;
     }
 }
