@@ -72,6 +72,11 @@ namespace TSS
         repaint();
     }
 
+    void ComboBox::setPopupVerticalPlacement(PopupVerticalPlacement placement)
+    {
+        popupVerticalPlacement_ = placement;
+    }
+
     void ComboBox::paint(juce::Graphics& g)
     {
         const auto style = style_ == Style::ButtonLike

@@ -151,3 +151,4 @@ Claude (Cursor Agent)
 
 - 2026-07-14: Story U-12 created — HierarchicalComboBox widget (Correct Course D-082-R2).
 - 2026-07-14: Implemented HierarchicalComboBox widget, design atom, DimensionFactory hook, and TestComponent demo; story ready for review.
+- 2026-07-17: **Post-implementation add-on (review context):** `PopupVerticalPlacement` (`Auto` / `Above` / `Below`) on `PopupMenuPositioner` + ComboBox / HierarchicalComboBox setters; Patch Mutator HISTORY forces `Above`. Default remains `Auto` — other combos unchanged. Smoke-tested; treat as follow-up delta vs original U-12 ACs, not a scope change.

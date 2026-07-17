@@ -46,6 +46,11 @@ namespace TSS
         repaint();
     }
 
+    void HierarchicalComboBox::setPopupVerticalPlacement(PopupVerticalPlacement placement)
+    {
+        popupVerticalPlacement_ = placement;
+    }
+
     void HierarchicalComboBox::clear()
     {
         primaryItems_.clear();

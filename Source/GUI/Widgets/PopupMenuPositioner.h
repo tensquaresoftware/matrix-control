@@ -6,6 +6,13 @@ namespace TSS
 {
     class ComboBox;
 
+    enum class PopupVerticalPlacement
+    {
+        Auto,
+        Above,
+        Below
+    };
+
     struct PopupMenuDimensions
     {
         int width = 0;
@@ -28,19 +35,17 @@ namespace TSS
             const juce::Component& anchor,
             int popupWidth,
             int popupHeight,
-            int verticalMargin);
+            int verticalMargin,
+            PopupVerticalPlacement placement = PopupVerticalPlacement::Auto);
 
     private:
-        static juce::Point<int> calculateInitialPosition(
+        static juce::Point<int> positionBelow(
             const juce::Component& anchor,
             int verticalMargin);
 
-        static juce::Point<int> adjustPositionToFitScreen(
+        static juce::Point<int> positionAbove(
             const juce::Component& anchor,
-            juce::Point<int> desiredPosition,
-            int popupWidth,
             int popupHeight,
-            const juce::Rectangle<int>& screenBounds,
             int verticalMargin);
 
         static int adjustXPosition(
@@ -49,11 +54,13 @@ namespace TSS
             int popupWidth,
             const juce::Rectangle<int>& screenBounds);
 
-        static int adjustYPosition(
+        static int resolveYPosition(
             const juce::Component& anchor,
-            int desiredY,
+            int desiredYBelow,
             int popupHeight,
             const juce::Rectangle<int>& screenBounds,
-            int verticalMargin);
+            int verticalMargin,
+            PopupVerticalPlacement placement,
+            bool& opensAbove);
     };
 }

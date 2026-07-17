@@ -351,6 +351,7 @@ void PatchMutatorPanel::setupHistoryLine(TSS::ISkin& skin, WidgetFactory& widget
         dims_.comboBoxes.standardHeight,
         TSS::comboBoxLookFromSkin(skin));
     historyComboBox_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
+    historyComboBox_->setPopupVerticalPlacement(TSS::PopupVerticalPlacement::Above);
     historyComboBox_->setTextWhenNothingSelected(MutatorDisplayNames::kEmptyHistorySentinel);
     historyComboBox_->onBeforeShowPopup = [this]
     {

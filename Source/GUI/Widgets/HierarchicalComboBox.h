@@ -7,6 +7,7 @@
 
 #include "GUI/Looks/WidgetLooks.h"
 #include "ComboBoxControlPainter.h"
+#include "PopupMenuPositioner.h"
 
 namespace TSS
 {
@@ -22,6 +23,8 @@ namespace TSS
         void setPopupMenuLook(const PopupMenuLook& look);
         void setUiScale(float uiScale);
         void setInactiveAppearance(bool inactive);
+        void setPopupVerticalPlacement(PopupVerticalPlacement placement);
+        PopupVerticalPlacement getPopupVerticalPlacement() const { return popupVerticalPlacement_; }
 
         void clear();
         void addPrimaryItem(int id, const juce::String& label, bool isSentinel = false);
@@ -88,6 +91,7 @@ namespace TSS
         bool hasFocus_ = false;
         bool inactiveAppearance_ = false;
         float uiScale_ = 1.0f;
+        PopupVerticalPlacement popupVerticalPlacement_ = PopupVerticalPlacement::Auto;
 
         void showPopup();
         void commitSelection(int primaryId, int childId, juce::NotificationType notification);

@@ -5,6 +5,7 @@
 #include "GUI/Layout/WidgetDimensions.h"
 #include "GUI/Looks/WidgetLooks.h"
 #include "ComboBoxControlPainter.h"
+#include "PopupMenuPositioner.h"
 
 namespace TSS
 {
@@ -27,6 +28,8 @@ namespace TSS
         void setLook(const ComboBoxLook& look);
         void setPopupMenuLook(const PopupMenuLook& look);
         void setUiScale(float uiScale);
+        void setPopupVerticalPlacement(PopupVerticalPlacement placement);
+        PopupVerticalPlacement getPopupVerticalPlacement() const { return popupVerticalPlacement_; }
 
         void paint(juce::Graphics& g) override;
         void showPopup() override;
@@ -58,6 +61,7 @@ namespace TSS
         bool isPopupOpen_ = false;
         bool hasFocus_ = false;
         float uiScale_ = 1.0f;
+        PopupVerticalPlacement popupVerticalPlacement_ = PopupVerticalPlacement::Auto;
 
         static PopupMenuLayoutDimensions popupLayoutDimensions_;
 

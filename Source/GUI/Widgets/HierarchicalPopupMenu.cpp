@@ -574,7 +574,8 @@ namespace TSS
             owner_,
             juce::roundToInt(width),
             juce::roundToInt(height),
-            getScaledVerticalMargin());
+            getScaledVerticalMargin(),
+            owner_.getPopupVerticalPlacement());
 
         opensAbove_ = dimensions.opensAbove;
         getPreferredContentSize(width, height);
@@ -1010,7 +1011,8 @@ namespace TSS
             owner,
             juce::roundToInt(contentWidth),
             juce::roundToInt(contentHeight),
-            rawPtr->getScaledVerticalMargin());
+            rawPtr->getScaledVerticalMargin(),
+            owner.getPopupVerticalPlacement());
 
         rawPtr->opensAbove_ = dimensions.opensAbove;
 
