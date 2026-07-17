@@ -1,5 +1,11 @@
 # Deferred Work
 
+## Deferred from: code review of spec-compare-copy-button-red-active-text (2026-07-17)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-compare-copy-button-red-active-text.md`
+  summary: Story 7-5 still tells agents not to use `setToggleState` because Button `textOn` was not red — that guidance is now obsolete.
+  evidence: `7-5-bank-utility-ui-wiring.md` Design Notes; Bank Utility still uses look overrides instead of toggle-on.
+
 ## Deferred from: quick-dev plugin-patch-push-edit-buffer hardware UAT (2026-07-17)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-plugin-patch-push-edit-buffer.md`

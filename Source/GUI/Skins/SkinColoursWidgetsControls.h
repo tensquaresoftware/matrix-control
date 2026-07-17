@@ -26,6 +26,12 @@ namespace TSS::SkinColours
                 ColourChart::kLightGrey2,
             };
 
+            inline constexpr ColourElement kTextOn = {
+                "ButtonTextOn",
+                ColourChart::kRed,
+                ColourChart::kRed,
+            };
+
             inline constexpr ColourElement kBackgroundHoover = {
                 "ButtonBackgroundHoover",
                 ColourChart::kBlack,

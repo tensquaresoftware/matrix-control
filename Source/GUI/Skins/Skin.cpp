@@ -227,7 +227,7 @@ namespace TSS
         colours_[SkinColourId::kButtonTextOff] = juce::Colour(accessColour(Widgets::Button::kText));
         colours_[SkinColourId::kButtonBackgroundOn] = juce::Colour(accessColour(Widgets::Button::kBackground));
         colours_[SkinColourId::kButtonBorderOn] = juce::Colour(accessColour(Widgets::Button::kBorder));
-        colours_[SkinColourId::kButtonTextOn] = juce::Colour(accessColour(Widgets::Button::kText));
+        colours_[SkinColourId::kButtonTextOn] = juce::Colour(accessColour(Widgets::Button::kTextOn));
         colours_[SkinColourId::kButtonBackgroundHover] = juce::Colour(accessColour(Widgets::Button::kBackgroundHoover));
         colours_[SkinColourId::kButtonTextHover] = juce::Colour(accessColour(Widgets::Button::kTextHoover));
         colours_[SkinColourId::kButtonBackgroundClicked] = juce::Colour(accessColour(Widgets::Button::kBackgroundClicked));

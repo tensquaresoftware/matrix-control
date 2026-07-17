@@ -96,9 +96,13 @@ namespace TSS
         if (isDown)
             return look_.textClicked;
         
+        // Sustained On (e.g. Compare active) must keep textOn even while hovered.
+        if (getToggleState())
+            return look_.textOn;
+
         if (isHighlighted)
             return look_.textHover;
         
-        return getToggleState() ? look_.textOn : look_.textOff;
+        return look_.textOff;
     }
 }

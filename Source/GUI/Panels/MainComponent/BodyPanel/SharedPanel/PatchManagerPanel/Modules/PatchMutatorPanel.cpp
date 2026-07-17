@@ -573,7 +573,10 @@ void PatchMutatorPanel::refreshCompareUiState()
     applyCompareControlLock(compareActive);
 
     if (compareButton_ != nullptr)
+    {
         compareButton_->setEnabled(compareActive || ! historyEmpty);
+        compareButton_->setToggleState(compareActive, juce::dontSendNotification);
+    }
 
     if (historyComboBox_ != nullptr)
         historyComboBox_->setEnabled(! compareActive && ! historyEmpty);
