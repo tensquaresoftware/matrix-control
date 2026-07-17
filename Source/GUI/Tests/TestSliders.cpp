@@ -51,6 +51,11 @@ public:
 
         fourthSlider_ = createSlider(dimensions_.bottomSliderWidth, dimensions_.bottomSliderHeight, sliderLookBoldLarge,
                                      TSS::SliderConfig{ 0.0, 127.0, 63.0, 1.0, {}, {}, {}, {} });
+
+        // Half-range disabled sample for visual calibration of grayed slider colours.
+        disabledHalfSlider_ = createSlider(dimensions_.bottomSliderWidth, dimensions_.bottomSliderHeight, sliderLook,
+                                           TSS::SliderConfig{ 0.0, 100.0, 50.0, 1.0, "%", {}, {}, {} });
+        disabledHalfSlider_->setEnabled(false);
     }
 
     int getScaledColumnWidth() const
@@ -72,6 +77,8 @@ public:
          + rowGap
          + scaledBottomSliderHeight
          + rowGap
+         + scaledBottomSliderHeight
+         + rowGap
          + scaledBottomSliderHeight;
     }
 
@@ -88,12 +95,14 @@ public:
         const int secondSliderX = scaledTopSliderWidth + scaledGap;
         const int thirdSliderY = slidersStartY + scaledTopSliderHeight + dimensions_.gap;
         const int fourthSliderY = thirdSliderY + scaledBottomSliderHeight + dimensions_.gap;
+        const int disabledSliderY = fourthSliderY + scaledBottomSliderHeight + dimensions_.gap;
 
         scaleLabel_->setBounds(0, labelY, scaledBottomSliderWidth, dimensions_.scaleLabelHeight);
         firstSlider_->setBounds(0, slidersStartY, scaledTopSliderWidth, scaledTopSliderHeight);
         secondSlider_->setBounds(secondSliderX, slidersStartY, scaledTopSliderWidth, scaledTopSliderHeight);
         thirdSlider_->setBounds(0, thirdSliderY, scaledBottomSliderWidth, scaledBottomSliderHeight);
         fourthSlider_->setBounds(0, fourthSliderY, scaledBottomSliderWidth, scaledBottomSliderHeight);
+        disabledHalfSlider_->setBounds(0, disabledSliderY, scaledBottomSliderWidth, scaledBottomSliderHeight);
     }
 
 private:
@@ -115,6 +124,7 @@ private:
     std::unique_ptr<TSS::Slider> secondSlider_;
     std::unique_ptr<TSS::Slider> thirdSlider_;
     std::unique_ptr<TSS::Slider> fourthSlider_;
+    std::unique_ptr<TSS::Slider> disabledHalfSlider_;
 };
 
 TestSliders::TestSliders(TSS::ISkin& skin)

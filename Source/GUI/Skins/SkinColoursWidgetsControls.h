@@ -168,8 +168,8 @@ namespace TSS::SkinColours
 
             inline constexpr ColourElement kValueBarDisabled = {
                 "SliderValueBarDisabled",
-                Common::kContentDisabled,
-                Common::kContentDisabled
+                ColourChart::kDarkGrey4,
+                ColourChart::kDarkGrey4
             };
 
             inline constexpr ColourElement kTextDisabled = {
