@@ -107,7 +107,7 @@ void MasterInitConfirmDialog::paint(juce::Graphics& g)
     g.fillRect(titleBar);
     g.fillRect(content);
 
-    g.setColour(skin_->getColour(SkinColourId::kLabelText));
+    g.setColour(skin_->getColour(SkinColourId::kDarkPanelText));
     g.setFont(skin_->getBaseFontBold().withHeight(skin_->getBaseFontBold().getHeight() * uiScale_));
     g.drawText(PluginDisplayNames::Dialogs::MasterInitConfirm::kTitle,
                titleBar,

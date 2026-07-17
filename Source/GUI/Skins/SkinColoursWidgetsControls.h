@@ -11,7 +11,7 @@ namespace TSS::SkinColours
             inline constexpr ColourElement kBackground = {
                 "ButtonBackground",
                 ColourChart::kBlack,
-                ColourChart::kLightGrey2
+                ColourChart::kBlack
             };
 
             inline constexpr ColourElement kBorder = {
@@ -23,25 +23,25 @@ namespace TSS::SkinColours
             inline constexpr ColourElement kText = {
                 "ButtonText",
                 ColourChart::kLightGrey2,
-                ColourChart::kDarkGrey1,
+                ColourChart::kLightGrey2,
             };
 
             inline constexpr ColourElement kBackgroundHoover = {
                 "ButtonBackgroundHoover",
                 ColourChart::kBlack,
-                ColourChart::kLightGrey2
+                ColourChart::kBlack
             };
 
             inline constexpr ColourElement kTextHoover = {
                 "ButtonTextHoover",
                 ColourChart::kWhite,
-                ColourChart::kDarkGrey1,
+                ColourChart::kWhite,
             };
 
             inline constexpr ColourElement kBackgroundClicked = {
                 "ButtonBackgroundClicked",
                 ColourChart::kBlack,
-                ColourChart::kLightGrey2
+                ColourChart::kBlack
             };
 
             inline constexpr ColourElement kTextClicked = {

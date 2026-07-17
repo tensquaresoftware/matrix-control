@@ -66,18 +66,18 @@ HeaderPanel::HeaderPanel(TSS::ISkin& skin, int width, int height)
     , height_(height)
     , skin_(&skin)
     , logo_(skin)
-    , midiFromLabel_(kEditorMidiFromLabelWidth_, kControlHeight_, TSS::labelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kEditorMidiFromLabel)
+    , midiFromLabel_(kEditorMidiFromLabelWidth_, kControlHeight_, TSS::darkPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kEditorMidiFromLabel)
     , midiFromComboBox_(kPortComboBoxWidth_, kControlHeight_, TSS::comboBoxLookFromSkin(skin), TSS::ComboBox::Style::ButtonLike)
     , editorActivityLed_(kLedSize_, kLedSize_)
-    , midiToLabel_(kMidiToLabelWidth_, kControlHeight_, TSS::labelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kMidiToLabel)
+    , midiToLabel_(kMidiToLabelWidth_, kControlHeight_, TSS::darkPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kMidiToLabel)
     , midiToComboBox_(kPortComboBoxWidth_, kControlHeight_, TSS::comboBoxLookFromSkin(skin), TSS::ComboBox::Style::ButtonLike)
     , midiToActivityLed_(kLedSize_, kLedSize_)
-    , keyboardFromLabel_(kKeyboardFromLabelWidth_, kControlHeight_, TSS::labelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kKeyboardFromLabel)
+    , keyboardFromLabel_(kKeyboardFromLabelWidth_, kControlHeight_, TSS::darkPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kKeyboardFromLabel)
     , keyboardFromComboBox_(kPortComboBoxWidth_, kControlHeight_, TSS::comboBoxLookFromSkin(skin), TSS::ComboBox::Style::ButtonLike)
     , instrumentActivityLed_(kLedSize_, kLedSize_)
-    , audioFromLabel_(kAudioFromLabelWidth_, kControlHeight_, TSS::labelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kAudioFromLabel)
+    , audioFromLabel_(kAudioFromLabelWidth_, kControlHeight_, TSS::darkPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kAudioFromLabel)
     , audioFromComboBox_(kPortComboBoxWidth_, kControlHeight_, TSS::comboBoxLookFromSkin(skin), TSS::ComboBox::Style::ButtonLike)
-    , inputGainLabel_(kInputGainLabelWidth_, kControlHeight_, TSS::labelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kInputGainLabel)
+    , inputGainLabel_(kInputGainLabelWidth_, kControlHeight_, TSS::darkPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kInputGainLabel)
     , inputGainSlider_(kInputGainSliderWidth_, kControlHeight_, TSS::sliderLookFromSkin(skin),
                        TSS::SliderConfig{
                            static_cast<double>(PluginAudioConstants::kInputGainSilenceIndex),
@@ -259,22 +259,22 @@ void HeaderPanel::setSkin(TSS::ISkin& skin)
 {
     skin_ = &skin;
     logo_.setSkin(skin);
-    midiFromLabel_.setLook(TSS::labelLookFromSkin(skin));
+    midiFromLabel_.setLook(TSS::darkPanelLabelLookFromSkin(skin));
     midiFromComboBox_.setLook(TSS::comboBoxLookFromSkin(skin));
     midiFromComboBox_.setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
-    midiToLabel_.setLook(TSS::labelLookFromSkin(skin));
+    midiToLabel_.setLook(TSS::darkPanelLabelLookFromSkin(skin));
     midiToComboBox_.setLook(TSS::comboBoxLookFromSkin(skin));
     midiToComboBox_.setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
-    keyboardFromLabel_.setLook(TSS::labelLookFromSkin(skin));
+    keyboardFromLabel_.setLook(TSS::darkPanelLabelLookFromSkin(skin));
     keyboardFromComboBox_.setLook(TSS::comboBoxLookFromSkin(skin));
     keyboardFromComboBox_.setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
     editorActivityLed_.setSkin(skin);
     midiToActivityLed_.setSkin(skin);
     instrumentActivityLed_.setSkin(skin);
-    audioFromLabel_.setLook(TSS::labelLookFromSkin(skin));
+    audioFromLabel_.setLook(TSS::darkPanelLabelLookFromSkin(skin));
     audioFromComboBox_.setLook(TSS::comboBoxLookFromSkin(skin));
     audioFromComboBox_.setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
-    inputGainLabel_.setLook(TSS::labelLookFromSkin(skin));
+    inputGainLabel_.setLook(TSS::darkPanelLabelLookFromSkin(skin));
     inputGainSlider_.setLook(TSS::sliderLookFromSkin(skin));
     peakIndicator_.setSkin(skin);
 }

@@ -59,10 +59,18 @@ namespace TSS
         return look;
     }
 
+    LabelLook darkPanelLabelLookFromSkin(const ISkin& skin)
+    {
+        LabelLook look;
+        look.text = skin.getColour(SkinColourId::kDarkPanelText);
+        look.font = resolvedTypographyFont(skin, TypographyStyleId::kDefault);
+        return look;
+    }
+
     LabelLook brandLabelLookFromSkin(const ISkin& skin)
     {
         LabelLook look;
-        look.text = skin.getColour(SkinColourId::kLabelText);
+        look.text = skin.getColour(SkinColourId::kDarkPanelText);
         look.font = skin.getBrandFontBold().withHeight(static_cast<float>(Design::Panels::Header::kLogoFontHeight));
         return look;
     }

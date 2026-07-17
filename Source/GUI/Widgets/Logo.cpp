@@ -43,7 +43,7 @@ namespace TSS
         auto look = brandLabelLookFromSkin(*skin_);
         look.text = isHighlighted_
                         ? juce::Colour(ColourChart::kWhite)
-                        : skin_->getColour(SkinColourId::kLabelText);
+                        : skin_->getColour(SkinColourId::kDarkPanelText);
         setLook(look);
     }
 

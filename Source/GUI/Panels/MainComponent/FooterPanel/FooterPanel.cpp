@@ -47,7 +47,7 @@ void FooterPanel::paint(juce::Graphics& g)
     if (identityText.isNotEmpty())
     {
         const auto identityBounds = bounds.removeFromRight(juce::jmin(identityMinWidth, bounds.getWidth() / 2));
-        g.setColour(skin_->getColour(SkinColourId::kLabelText));
+        g.setColour(skin_->getColour(SkinColourId::kDarkPanelText));
         g.setFont(skin_->getBaseFont().withHeight(skin_->getBaseFont().getHeight() * uiScale_));
         g.drawFittedText(identityText,
                          identityBounds,
@@ -136,7 +136,7 @@ juce::Colour FooterPanel::getSeverityColour(MessageSeverity severity) const
     switch (severity)
     {
         case MessageSeverity::None:
-            return skin_->getColour(SkinColourId::kLabelText);
+            return skin_->getColour(SkinColourId::kDarkPanelText);
         case MessageSeverity::Info:
             return skin_->getColour(SkinColourId::kFooterMessageInfo);
         case MessageSeverity::Success:
@@ -146,7 +146,7 @@ juce::Colour FooterPanel::getSeverityColour(MessageSeverity severity) const
         case MessageSeverity::Error:
             return skin_->getColour(SkinColourId::kFooterMessageError);
         default:
-            return skin_->getColour(SkinColourId::kLabelText);
+            return skin_->getColour(SkinColourId::kDarkPanelText);
     }
 }
 
