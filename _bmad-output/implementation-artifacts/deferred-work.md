@@ -527,3 +527,17 @@
 - Async one-shot SysEx capture ignores non-patch frames and keeps listening until timeout.
 - History-gate modal refused when not on the message thread (`jassert` + cancel).
 
+
+## Deferred from: spec-startup-patch-name-default (2026-07-17)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-startup-patch-name-default.md`
+  summary: No PluginProcessor-level unit test asserts PatchNameSyncer model bytes after session restore.
+  evidence: Blind Hunter; MutatorRecipePersistenceTests cover APVTS helpers only — model sync lives in PluginProcessor::resetEphemeralMutatorStateAfterSessionLoad.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-startup-patch-name-default.md`
+  summary: Patch-name session policy lives inside MutatorSessionPersistence helpers.
+  evidence: Blind Hunter; kPatchName is Patch Edit metadata, not mutator-scoped — risk if mutator-only persistence is later refactored without noticing the name rule.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-startup-patch-name-default.md`
+  summary: Offline (no MIDI ports) session restore can keep patch PARAM values while Patch Name resets to --------.
+  evidence: Blind Hunter; accepted for this bugfix per D-010 / option 1; PARAM strip policy remains SessionPersistencePolicy scope.

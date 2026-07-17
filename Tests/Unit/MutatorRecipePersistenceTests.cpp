@@ -3,10 +3,13 @@
 
 #include "Core/Factories/ApvtsFactory.h"
 #include "Core/Services/PatchMutator/MutatorSessionPersistence.h"
+#include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginIDs.h"
 
 namespace MutatorWidgets = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets;
 namespace MutatorState = PluginIDs::PatchManagerSection::PatchMutatorModule::StateProperties;
+namespace PatchNameIds = PluginIDs::PatchEditSection::PatchNameModule;
+namespace PatchNameDefaults = PluginDisplayNames::PatchEditSection::PatchNameModule::StandaloneWidgets;
 
 class TestAudioProcessorPersistence : public juce::AudioProcessor
 {
@@ -50,7 +53,9 @@ public:
         if (xmlState == nullptr || ! xmlState->hasTagName(apvts.state.getType()))
             return;
 
-        apvts.replaceState(juce::ValueTree::fromXml(*xmlState));
+        auto restoredState = juce::ValueTree::fromXml(*xmlState);
+        Core::MutatorSessionPersistence::resetEphemeralStateAfterSessionLoad(restoredState);
+        apvts.replaceState(restoredState);
         Core::MutatorSessionPersistence::initializeRecipeState(apvts.state);
         Core::MutatorSessionPersistence::resetEphemeralStateAfterSessionLoad(apvts.state);
         Core::MutatorSessionPersistence::setActionEnabledMirrorsForEmptyHistory(apvts.state);
@@ -82,6 +87,9 @@ public:
     void runTest() override
     {
         recipe_sessionRoundTrip_preservesRecipe_stripsHistory();
+        recipe_sessionRoundTrip_stripsPatchName_resetsToDefault();
+        recipe_staleXmlPatchName_loadForcesDefault();
+        recipe_liveSession_patchNameRemainsUntilPersistenceStrip();
         recipe_initialize_missingDefaults_amount50_random25();
         recipe_initialize_clampsLegacyZeroAndOutOfRange();
         recipe_emptyHistoryMirrors_allTogglesOff_disablesMutate();
@@ -106,6 +114,7 @@ private:
         expect(! xmlString.contains(MutatorState::kExportEnabled));
         expect(! xmlString.contains(MutatorState::kDeleteEnabled));
         expect(! xmlString.contains(MutatorState::kClearEnabled));
+        expect(! xmlString.contains(PatchNameIds::kPatchName));
     }
 
     void recipe_sessionRoundTrip_preservesRecipe_stripsHistory()
@@ -161,6 +170,52 @@ private:
         expect(! static_cast<bool>(restoredState.getProperty(MutatorState::kExportEnabled)));
         expect(! static_cast<bool>(restoredState.getProperty(MutatorState::kDeleteEnabled)));
         expect(! static_cast<bool>(restoredState.getProperty(MutatorState::kClearEnabled)));
+    }
+
+    void recipe_sessionRoundTrip_stripsPatchName_resetsToDefault()
+    {
+        beginTest("recipe_sessionRoundTrip_stripsPatchName_resetsToDefault");
+
+        TestAudioProcessorPersistence source;
+        source.apvts.state.setProperty(PatchNameIds::kPatchName, "M00", nullptr);
+
+        juce::MemoryBlock savedState;
+        source.getStateInformation(savedState);
+        expectSerializedXmlOmitsEphemeralMutatorState(savedState);
+
+        TestAudioProcessorPersistence restored;
+        restored.setStateInformation(savedState.getData(), static_cast<int>(savedState.getSize()));
+
+        expectEquals(restored.apvts.state.getProperty(PatchNameIds::kPatchName).toString(),
+                     juce::String(PatchNameDefaults::kDefaultPatchName));
+    }
+
+    void recipe_staleXmlPatchName_loadForcesDefault()
+    {
+        beginTest("recipe_staleXmlPatchName_loadForcesDefault");
+
+        juce::ValueTree state("P");
+        state.setProperty(PatchNameIds::kPatchName, "MY-PATCH", nullptr);
+
+        Core::MutatorSessionPersistence::resetEphemeralStateAfterSessionLoad(state);
+
+        expectEquals(state.getProperty(PatchNameIds::kPatchName).toString(),
+                     juce::String(PatchNameDefaults::kDefaultPatchName));
+    }
+
+    void recipe_liveSession_patchNameRemainsUntilPersistenceStrip()
+    {
+        beginTest("recipe_liveSession_patchNameRemainsUntilPersistenceStrip");
+
+        juce::ValueTree live("P");
+        live.setProperty(PatchNameIds::kPatchName, "M00", nullptr);
+
+        expectEquals(live.getProperty(PatchNameIds::kPatchName).toString(), juce::String("M00"));
+
+        auto toPersist = live.createCopy();
+        Core::MutatorSessionPersistence::stripEphemeralStateForPersistence(toPersist);
+        expect(! toPersist.hasProperty(PatchNameIds::kPatchName));
+        expectEquals(live.getProperty(PatchNameIds::kPatchName).toString(), juce::String("M00"));
     }
 
     void recipe_initialize_missingDefaults_amount50_random25()

@@ -621,6 +621,10 @@ void PluginProcessor::setStateInformation(const void* data, int sizeInBytes)
             if (Core::SessionPersistencePolicy::shouldStripPatchAndMasterParameters(restoredState))
                 Core::SessionPersistencePolicy::stripPatchAndMasterParameters(restoredState);
 
+            // Clear ephemeral mutator state + patch name before replaceState so
+            // valueTreeRedirected / PatchNameSyncer never briefly rehydrate a stale name.
+            Core::MutatorSessionPersistence::resetEphemeralStateAfterSessionLoad(restoredState);
+
             apvts.replaceState(restoredState);
             initializeMutatorRecipeState();
             resetEphemeralMutatorStateAfterSessionLoad();
@@ -1732,6 +1736,9 @@ void PluginProcessor::stripEphemeralMutatorStateForPersistence(juce::ValueTree& 
 void PluginProcessor::resetEphemeralMutatorStateAfterSessionLoad()
 {
     Core::MutatorSessionPersistence::resetEphemeralStateAfterSessionLoad(apvts.state);
+
+    if (patchNameSyncer_ != nullptr)
+        patchNameSyncer_->apvtsToBuffer();
 
     if (patchMutatorEngine_ != nullptr)
         patchMutatorEngine_->resetSessionForPatchLoad();

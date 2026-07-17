@@ -2,6 +2,7 @@
 
 #include <juce_data_structures/juce_data_structures.h>
 
+#include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginIDs.h"
 
 namespace Core::MutatorSessionPersistence
@@ -95,11 +96,14 @@ namespace Core::MutatorSessionPersistence
         state.removeProperty(S::kExportEnabled, nullptr);
         state.removeProperty(S::kDeleteEnabled, nullptr);
         state.removeProperty(S::kClearEnabled, nullptr);
+        // Patch name is session-ephemeral (D-010: no claimed loaded patch across sessions).
+        state.removeProperty(PluginIDs::PatchEditSection::PatchNameModule::kPatchName, nullptr);
     }
 
     inline void resetEphemeralStateAfterSessionLoad(juce::ValueTree& state)
     {
         namespace S = PluginIDs::PatchManagerSection::PatchMutatorModule::StateProperties;
+        using PluginDisplayNames::PatchEditSection::PatchNameModule::StandaloneWidgets::kDefaultPatchName;
 
         state.setProperty(S::kHistoryMutateList, juce::String(), nullptr);
         state.setProperty(S::kHistoryRetryList, juce::String(), nullptr);
@@ -107,6 +111,10 @@ namespace Core::MutatorSessionPersistence
         state.setProperty(S::kSelectedMutateRootIndex, -1, nullptr);
         state.setProperty(S::kSelectedRetryIndex, S::kSelectedRetryRootOnly, nullptr);
         state.setProperty(S::kCompareActive, false, nullptr);
+        // Force idle name even if stale XML still embeds a previous session name (crash / legacy).
+        state.setProperty(PluginIDs::PatchEditSection::PatchNameModule::kPatchName,
+                          juce::String(kDefaultPatchName),
+                          nullptr);
     }
 
     inline void setActionEnabledMirrorsForEmptyHistory(juce::ValueTree& state)
