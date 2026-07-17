@@ -1,18 +1,24 @@
 ---
 organization: Ten Square Software
 project: Matrix-Control
-title: Oberheim Matrix-1000 — MIDI & SysEx Implementation
+title: Oberheim Matrix-1000
 author: Guillaume DUPONT
-status: reference
-provenance: Transcription from official Oberheim PDF (scanned source on the web)
-sources:
-  - oberheim-matrix-6-6r-midi-sysex-implementation.md
 created: 2025-10-25
-updated: 2025-10-25
-archived: 2026-05-29
+updated: 2026-07-17
+notes: |
+  2026-07-17: Re-verified MIDI Summary / SysEx pages against official Matrix-1000 Owner's Manual PDF
+  (scanned pages ~41–56). Firm fixes: Omni Mode On data byte 00H; Active Sensing status FEH;
+  restore literal header byte 0 after opcode 0DH; remove length note wrongly attached under 0EH;
+  restore Global Parameter bytes 166–168 (incl. Group Mode Enable); Device ID rev-3 ASCII 30H ('0');
+  Table 3 unused destination code 0; minor typos (order / received); 0BH wording aligned to manual
+  (path / val / dest). Ambiguities retained as printed — see ## Verification notes.
 ---
 
-# Oberheim Matrix-1000 — MIDI & SysEx Implementation
+# Oberheim Matrix-1000
+
+## MIDI & SysEx Implementation
+
+---
 
 ## Channel Voice Messages
 
@@ -31,7 +37,7 @@ archived: 2026-05-29
 | 1011 xxxx | 79H<br>00H | Reset All Controllers                         |
 | 1011 xxxx | 7BH<br>00H | All Notes Off                                 |
 | 1011 xxxx | 7CH<br>00H | Omni Mode Off                                 |
-| 1011 xxxx | 7DH<br>0HH | Omni Mode On<br>(Omni assumed Off in Mono On) |
+| 1011 xxxx | 7DH<br>00H | Omni Mode On<br>(Omni assumed Off in Mono On) |
 | 1011 xxxx | 7EH<br>06H | Mono Mode On                                  |
 | 1011 xxxx | 7FH<br>00H | Mono Mode Off                                 |
 
@@ -48,9 +54,9 @@ archived: 2026-05-29
 
 ## System Real Time Messages
 
-| Status    | Data Bytes | Description    |
-| --------- | ---------- | -------------- |
-| 1111 0000 | F0H        | Active Sensing |
+| Status              | Data Bytes | Description    |
+| ------------------- | ---------- | -------------- |
+| 1111 1110 (`FEH`)   | *(none)*   | Active Sensing |
 
 ## SysEx Data Format
 
@@ -105,7 +111,9 @@ Note: A gap of at least 10 ms should be allowed between patches when sending mul
 = 0 when `<type>` = 0 or 3  
 = number of patch requested when `<type>` = 1
 
-Note: When all patches are requested, 100 patches from the current bank are transmitted in ascending orde using individual Single Patch messages (code 01 above). This is followed by 50 dummy "split" patches for compatibility with the "Request All" function of the Matrix-6. Each of these splits has the form F0H 10H 06H 02H <36 bytes of data> F7H. For further information on this format, see the Matrix-6 MIDI Specification. All patches are transmitted with ten msec between patches.
+Note: When all patches are requested, 100 patches from the current bank are transmitted in ascending order using individual Single Patch messages (code 01 above). This is followed by 50 dummy "split" patches for compatibility with the "Request All" function of the Matrix-6. Each of these splits has the form F0H 10H 06H 02H <36 bytes of data> F7H. For further information on this format, see the Matrix-6 MIDI Specification. All patches are transmitted with ten msec between patches.
+
+> **Implementer note:** These Matrix-1000 dummy `02H` frames are **not** the full Matrix-6/6R Split Patch message (`02H <number> <nybble data> <checksum> F7H`). Treat them as M-6-compat padding in a Request-All stream, not as parseable Split dumps.
 
 ### 06H - Remote Parameter Edit
 
@@ -117,6 +125,8 @@ Note: When all patches are requested, 100 patches from the current bank are tran
 
 Note: All values are sign extended from bit 6 into bit 7 except for parameter 121 (VCF Frequency). Range checking should be done on the value of each parameter before it is sent.
 
+> **Implementer note (as printed contradiction):** The same manual lists remote-edit parameters as `0–99`, maps VCF Initial Frequency to front-panel parameter **21** (packed byte 26), and uses packed byte **121** for MM Bus 5 destination. Treat “parameter 121 (VCF Frequency)” as a likely typesetting error for **21**; do not use 121 as the remote-edit ID for VCF frequency.
+
 ### 07H - Set Group Mode
 
 `F0H 10H 06H 07H <number> <ID> F7H`
@@ -127,7 +137,7 @@ Note: All values are sign extended from bit 6 into bit 7 except for parameter 12
 = 0 to set the first unit to be the master  
 = 1-5 to set the unit to be a slave
 
-Note: The value recieved for <ID> is used as the unit ID for certain SysEx messages. It is also accessible from the front panel as extended function 5.
+Note: The value received for <ID> is used as the unit ID for certain SysEx messages. It is also accessible from the front panel as extended function 5.
 
 Note: On receipt of this message, the unit enters group mode with its unit number set to <ID>. It then re-transmits this message with the ID incremented.
 
@@ -141,19 +151,19 @@ Note: On receipt of this message, the unit will change banks and enable the bank
 
 ### 0BH - Remote Parameter Edit (Matrix Modulation)
 
-`F0H 10H 06H 0BH <bus> <source> <amount> <destination> F7H`
+`F0H 10H 06H 0BH <path> <source> <val> <dest> F7H`
 
-`<bus>` = Matrix Modulation bus number (0-9)
+`<path>` = Matrix Modulation path number (0-9)
 
 `<source>`:  
-= 0 to delete this bus  
+= 0 to delete this path  
 = 1-20 to specify modulation source (see *Table 2*)
 
-`<amount>` = modulation amount from `<source>` to `<destination>`
+`<val>` = Modulation Amount
 
-`<destination>`:  
-= 0 to delete this bus  
-= 1-32 to specify modulation destination (see *Table 3*)  
+`<dest>`:  
+= 0 to delete this path  
+= 1-32 to specify modulation destination (see *Table 3*)
 
 Note: The value is sign extended from bit 6 into bit 7. Range checking should be done on all data before it is sent.
 
@@ -165,7 +175,11 @@ On receipt of this message, Bank Lock will be disabled.
 
 ### 0DH - Single Patch Data to Edit Buffer
 
-`F0H 10H 06H 0DH <data> <checksum> F7H`
+`F0H 10H 06H 0DH 0 <data> <checksum> F7H`
+
+The literal `0` after `0DH` is a fixed header byte (not part of packed patch `<data>`).  
+With that byte, the header is 5 bytes — same total message size as `01H` Single Patch Data  
+(268 nibbles + 5-byte header + checksum + F7 = 275 bytes).
 
 `<data>` = patch data unpacked to two nibbles per byte (see patch format listing)
 
@@ -173,7 +187,7 @@ On receipt of this message, Bank Lock will be disabled.
 
 Note: On receipt, this data will be stored into the edit buffer.
 
-Note: Wait at least 10 ms after sending a patch to the Matrix-1000.
+Note: Wait at least ten msec after sending a patch to the Matrix-1000.
 
 ### 0EH - Store Edit Buffer
 
@@ -186,13 +200,12 @@ Note: Wait at least 10 ms after sending a patch to the Matrix-1000.
 `<ID>`:  
 = 0 if Group Mode is Off  
 = Unit ID for target Matrix-1000 in Group Mode  
-= 7FH for any unit in Group Mode  
-= 268 nibbles transmitted + 5 bytes Header + 1 byte
+= 7FH for any unit in Group Mode
 
 ## Single Patch Data Format
 
 * Statistics: 134 Bytes/Single Patch
-* 5 bytes Header + 1 byte Checksum + 1 byte EOX  
+* 268 nibbles transmitted + 5 bytes Header + 1 byte Checksum + 1 byte EOX
 * Total transmitted: 275 bytes/Single Patch
 
 | Byte | Parameter | # Bits     | Description                                                                                          |
@@ -208,7 +221,7 @@ Note: Wait at least 10 ms after sending a patch to the Matrix-1000.
 | 15   | 15        | 6          | DCO 2 Initial Waveshape<br>0 = Sawtooth<br>31 = Triangle                                             |
 | 16   | 13        | 6          | DCO 2 Initial Pulse Width                                                                            |
 | 17   | 17        | 2          | DCO 2 Fixed Modulations<br>Bit 0 = Lever 1<br>Bit 1 = Vibrato                                        |
-| 18   | 16        | 3          | DCO 1 Waveform Enable<br>Bit 0 = Pulse<br>Bit 1 = Wave<br>Bit 2 = Noise                              |
+| 18   | 16        | 3          | DCO 1 Waveform Enable `(as printed — likely DCO 2; Noise bit suggests DCO 2)`<br>Bit 0 = Pulse<br>Bit 1 = Wave<br>Bit 2 = Noise |
 | 19   | 12        | 6 (signed) | DCO 2 Detune                                                                                         |
 | 20   | 20        | 6          | Mix                                                                                                  |
 | 21   | 8         | 2          | DCO 1 Fixed Modulations<br>Bit 0 = Portamento<br>Bit 1 = Not used                                    |
@@ -223,7 +236,7 @@ Note: Wait at least 10 ms after sending a patch to the Matrix-1000.
 | 30   | 30        | 6          | VCF FM Initial Amount                                                                                |
 | 31   | 27        | 6          | VCA 1 (exponential) Initial Amount                                                                   |
 | 32   | 44        | 6          | Portamento Initial Rate                                                                              |
-| 33   | 46        | 2          | Lag Mode<br>0 = Constant Speed<br>1 = Constant Time<br>2 = Exponential<br>3 = Exponential            |
+| 33   | 46        | 2          | Lag Mode<br>0 = Constant Speed<br>1 = Constant Time<br>2 = Exponential<br>3 = Exponential `(as printed — duplicate label)` |
 | 34   | 47        | 1          | Legato Portamento Enable                                                                             |
 | 35   | 80        | 6          | LFO 1 Initial Speed                                                                                  |
 | 36   | 86        | 2          | LFO 1 Trigger<br>0 = No Trigger<br>1 = Single Trigger<br>2 = Multi Trigger<br>3 = External Trigger   |
@@ -374,33 +387,34 @@ Note: The `0 = Unused Modulation` parameter in this table is found in the `Modul
 
 Unused Modulations must have their `Sources` and `Destinations` set to 0.
 
+0 = Unused Modulation  
 1 = DCO 1 Frequency  
-2 = DCO 1 Pulse Width   
+2 = DCO 1 Pulse Width  
 3 = DCO 1 Waveshape  
 4 = DCO 2 Frequency  
 5 = DCO 2 Pulse Width  
 6 = DCO 2 Waveshape  
-7 = Mix Level      
+7 = Mix Level  
 8 = VCF FM Amount  
 9 = VCF Frequency  
 10 = VCF Resonance  
 11 = VCA 1 Level  
 12 = VCA 2 Level  
-13 = Env 1 Delay  
-14 = Env 1 Attack  
-15 = Env 1 Decay  
-16 = Env 1 Release  
-17 = Env 1 Amplitude  
-18 = Env 2 Delay  
-19 = Env 2 Attack  
-20 = Env 2 Decay  
-21 = Env 2 Release  
-22 = Env 2 Amplitude  
-23 = Env 3 Delay  
-24 = Env 3 Attack  
-25 = Env 3 Decay  
-26 = Env 3 Release  
-27 = Env 3 Amplitude  
+13 = Envelope 1 Delay  
+14 = Envelope 1 Attack  
+15 = Envelope 1 Decay  
+16 = Envelope 1 Release  
+17 = Envelope 1 Amplitude  
+18 = Envelope 2 Delay  
+19 = Envelope 2 Attack  
+20 = Envelope 2 Decay  
+21 = Envelope 2 Release  
+22 = Envelope 2 Amplitude  
+23 = Envelope 3 Delay  
+24 = Envelope 3 Attack  
+25 = Envelope 3 Decay  
+26 = Envelope 3 Release  
+27 = Envelope 3 Amplitude  
 28 = LFO 1 Speed  
 29 = LFO 1 Amplitude  
 30 = LFO 2 Speed  
@@ -444,8 +458,9 @@ Unused Modulations must have their `Sources` and `Destinations` set to 0.
 | 162-163 |            | *Not Used*                                      |
 | 164     | 1          | Bend Range                                      |
 | 165     | 1          | Bank Lock Enable<br>(In MSB only)               |
-| 167     | 1          | Number of Units<br>(Group Mode)                 |
-| 168     | 1          | Current Unit Number<br>(In MSB only)            |
+| 166     | 1          | Number of Units<br>(Group Mode) `(as printed bit-width; values 2–6 via 07H — treat width as uncertain)` |
+| 167     | 1          | Current Unit Number<br>(Group Mode) `(as printed bit-width; IDs 0–5 via 07H — treat width as uncertain)` |
+| 168     | 1          | Group Mode Enable<br>(In MSB only)              |
 | 169     | 1          | Unison Enable                                   |
 | 170     | 1          | Volume Invert Enable                            |
 | 171     | 1          | Memory Protect Enable                           |
@@ -492,7 +507,7 @@ Example: version 1.10 is represented by:
 * `<rev-0>` = 20H (` `)  
 * `<rev-1>` = 31H (`1`)  
 * `<rev-2>` = 31H (`1`)  
-* `<rev-3>` = 31H (`0`)
+* `<rev-3>` = 30H (`0`)
 
 ### Active Controllers
 
@@ -519,3 +534,17 @@ Example: version 1.10 is represented by:
 Non-registered parameters may be used to control any parameter by using the front panel parameter number. Matrix modulations must be controlled by use of the System Exclusive message. When using registered or non-registered parameter editing, all received data entry controller values are offset by 40H, except when the currently selected parameter is the registered pitch bend range. Thus, a data entry value of 40H will update the selected parameter to be 0, while 3EH is interpreted as -2. This allows for transmission of negative numbers.
 
 ---
+
+## Verification notes
+
+Re-checked 2026-07-17 against the official Matrix-1000 Owner's Manual PDF (MIDI Summary through miscellaneous commands; scanned pages with footer ~41–56).
+
+**Firm transcription fixes applied in this file** (see YAML `notes`).
+
+**Left as printed / ambiguous (do not invent):**
+
+- Global Parameter byte **33** is omitted in the manual table (jumps 32 → 34); unused rows elsewhere are explicit.
+- Bank Select SysEx line is poorly OCR’d in the scan; the reconstructed form here matches a prior clean transcription and was not re-proven from a crisp glyph-level read.
+- Remote-edit note “parameter 121 (VCF Frequency)” conflicts with param range `0–99` and param **21** for VCF frequency — see implementer note under `06H`.
+- Global bytes 166–167 list `# Bits: 1` while Group Mode uses multi-value IDs — see table caveats.
+- Byte 18 “DCO 1 … Noise” and Lag Mode duplicate “Exponential” labels — marked in the patch table.

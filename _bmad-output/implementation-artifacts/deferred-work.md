@@ -1,5 +1,11 @@
 # Deferred Work
 
+## Deferred from: quick-dev plugin-patch-push-edit-buffer hardware UAT (2026-07-17)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-plugin-patch-push-edit-buffer.md`
+  summary: Matrix-1000 SysEx 0x0D (Single Patch to Edit Buffer) is not audible on Guillaume's hardware (RAM or ROM); Mutate/audition temporarily uses 0x01 on RAM (overwrites slot) and 0x06/0x0B remote edits on ROM.
+  evidence: MIDI log showed correct F0 10 06 0D outbound; smoke test confirmed no sound change on RAM/ROM until path was changed. Product intent remains non-destructive edit-buffer audition — revisit 0x0D format/recall nudge once hardware path is understood.
+
 ## Deferred from: code review of spec-plugin-patch-push-edit-buffer (2026-07-17)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-plugin-patch-push-edit-buffer.md`
@@ -569,3 +575,18 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-startup-patch-name-default.md`
   summary: Offline (no MIDI ports) session restore can keep patch PARAM values while Patch Name resets to --------.
   evidence: Blind Hunter; accepted for this bugfix per D-010 / option 1; PARAM strip policy remains SessionPersistencePolicy scope.
+
+## Deferred from: quick-dev midi-docs-oberheim-verification (2026-07-17)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-midi-docs-oberheim-verification.md`
+  summary: Matrix-1000 Global Parameter table omits byte 33 (jumps 32→34) as in the official manual.
+  evidence: Blind Hunter; PDF table has the same gap; do not invent a Not Used row without a clearer source.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-midi-docs-oberheim-verification.md`
+  summary: Matrix-1000 Bank Select SysEx reconstruction not glyph-proven from the scanned PDF OCR.
+  evidence: Blind Hunter; page OCR is mangled; MD form retained pending a cleaner scan or hardware capture.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-midi-docs-oberheim-verification.md`
+  summary: Matrix-6/6R remote-edit prose references a Select Parameter operation with no opcode section.
+  evidence: Blind Hunter; youngmonkey page also lacks that opcode; source gap, not introduced by this verification.
+
