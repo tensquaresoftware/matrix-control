@@ -252,6 +252,14 @@ void MidiManager::sendFullPatchForAudition(const juce::uint8* packedData,
                                            juce::uint8 patchNumber,
                                            bool deviceHasBankConcept)
 {
+    if (packedData == nullptr)
+    {
+        updateErrorState("Invalid patch data", "SysEx");
+        return;
+    }
+
+    // Matrix-1000: non-destructive edit-buffer dump (opcode 0x0D with literal header byte 0).
+    // Matrix-6/6R: no 0x0D — write current slot via 0x01.
     if (deviceHasBankConcept)
         sendPatchToEditBuffer(packedData);
     else

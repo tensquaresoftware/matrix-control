@@ -77,6 +77,7 @@ public:
         mutate_fromAuditionedRetry();
         mutate_sendsSysExOnce();
         mutate_matrix1000_sendsEditBuffer();
+        mutate_matrix1000_rom_sendsRemoteEdits();
         mutate_matrix6_sendsPatchSlot();
         mutate_neverDeletesRoots();
 
@@ -287,8 +288,10 @@ private:
 
     struct FullPatchOpcodeCounts
     {
-        int slotWrite = 0;   // 0x01
-        int editBuffer = 0;  // 0x0D
+        int slotWrite = 0;      // 0x01
+        int editBuffer = 0;     // 0x0D
+        int remoteParamEdit = 0; // 0x06
+        int matrixModEdit = 0;   // 0x0B
     };
 
     static FullPatchOpcodeCounts countFullPatchOpcodes(Core::MidiOutboundQueue& queue)
@@ -313,6 +316,10 @@ private:
                 ++counts.slotWrite;
             else if (data[3] == SysExConstants::Opcode::kSinglePatchToEditBuffer)
                 ++counts.editBuffer;
+            else if (data[3] == SysExConstants::Opcode::kRemoteParameterEdit)
+                ++counts.remoteParamEdit;
+            else if (data[3] == SysExConstants::Opcode::kRemoteParameterEditMatrix)
+                ++counts.matrixModEdit;
         }
 
         return counts;
@@ -452,7 +459,7 @@ private:
 
     void mutate_matrix1000_sendsEditBuffer()
     {
-        beginTest("mutate_matrix1000_sendsEditBuffer");
+        beginTest("mutate_matrix1000_ram_sendsEditBuffer");
 
         EngineHarness harness;
         harness.deviceLimits = Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000);
@@ -461,8 +468,26 @@ private:
         const auto result = harness.engine.mutate();
         expect(result.success);
         const auto opcodes = countFullPatchOpcodes(harness.queue);
-        expectEquals(opcodes.editBuffer, 1);
         expectEquals(opcodes.slotWrite, 0);
+        expectEquals(opcodes.editBuffer, 1);
+        expectEquals(opcodes.remoteParamEdit, 0);
+    }
+
+    void mutate_matrix1000_rom_sendsRemoteEdits()
+    {
+        beginTest("mutate_matrix1000_rom_sendsEditBuffer");
+
+        EngineHarness harness;
+        harness.deviceLimits = Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000);
+        harness.setRecipe(100, 100, true);
+
+        const auto result = harness.engine.mutate();
+        expect(result.success);
+        const auto opcodes = countFullPatchOpcodes(harness.queue);
+        expectEquals(opcodes.slotWrite, 0);
+        expectEquals(opcodes.editBuffer, 1);
+        expectEquals(opcodes.remoteParamEdit, 0);
+        expectEquals(opcodes.matrixModEdit, 0);
     }
 
     void mutate_matrix6_sendsPatchSlot()
@@ -479,6 +504,7 @@ private:
         const auto opcodes = countFullPatchOpcodes(harness.queue);
         expectEquals(opcodes.slotWrite, 1);
         expectEquals(opcodes.editBuffer, 0);
+        expectEquals(opcodes.remoteParamEdit, 0);
     }
 
     void mutate_neverDeletesRoots()
@@ -677,7 +703,7 @@ private:
 
     void retry_matrix1000_sendsEditBuffer()
     {
-        beginTest("retry_matrix1000_sendsEditBuffer");
+        beginTest("retry_matrix1000_ram_sendsEditBuffer");
 
         EngineHarness harness;
         harness.setRecipe(100, 100, true);
@@ -690,8 +716,8 @@ private:
         const auto result = harness.engine.retry();
         expect(result.success);
         const auto opcodes = countFullPatchOpcodes(harness.queue);
-        expectEquals(opcodes.editBuffer, 1);
         expectEquals(opcodes.slotWrite, 0);
+        expectEquals(opcodes.editBuffer, 1);
     }
 
     void retry_neverDeletesExistingRetries()

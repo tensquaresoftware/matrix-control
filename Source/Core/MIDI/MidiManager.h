@@ -42,8 +42,9 @@ public:
 
     void sendPatch(juce::uint8 patchNumber, const juce::uint8* packedData);
     void sendPatchToEditBuffer(const juce::uint8* packedData);
-    // Audition / non-STORE full-patch push: edit buffer (0x0D) when the device has banks
-    // (Matrix-1000); otherwise 0x01 to patchNumber (Matrix-6/6R). STORE keeps sendPatch.
+    // Full-patch audition to the synth:
+    // - Matrix-6/6R: 0x01 to patchNumber
+    // - Matrix-1000: 0x0D edit buffer (header F0 10 06 0D 00 … per Oberheim manual)
     void sendFullPatchForAudition(const juce::uint8* packedData,
                                   juce::uint8 patchNumber,
                                   bool deviceHasBankConcept);

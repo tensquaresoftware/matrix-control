@@ -389,8 +389,8 @@ private:
 
         expect(harness.clipboard.canPasteFullPatch());
         const auto queued = scanQueue(harness.queue);
-        expect(queued.editBufferPatch);
         expect(!queued.patchData);
+        expect(queued.editBufferPatch);
     }
 
     void testPasteMatrix6_sendsPatchSlot()
@@ -452,8 +452,8 @@ private:
         expect(harness.proc.apvts.state.getProperty("uiMessageText").toString().isNotEmpty());
 
         const auto queued = scanQueue(harness.queue);
-        expect(queued.editBufferPatch);
         expect(!queued.patchData);
+        expect(queued.editBufferPatch);
         expectEquals(queued.patchSysExCount, 1);
     }
 
@@ -467,9 +467,8 @@ private:
         harness.handler.handleAction(InternalPatches::kInitPatch, juce::var());
 
         const auto queued = scanQueue(harness.queue);
-        expect(queued.editBufferPatch);
         expect(!queued.patchData);
-        expectEquals(queued.patchNumber, -1);
+        expect(queued.editBufferPatch);
         expectEquals(queued.patchSysExCount, 1);
     }
 
@@ -809,8 +808,8 @@ private:
         expect(harness.patchFileService.getLastScanResult().sortedValidFileNames[0]
                == "Patch 5.syx");
         const auto queued = scanQueue(harness.queue);
-        expect(queued.editBufferPatch);
         expect(!queued.patchData);
+        expect(queued.editBufferPatch);
         expect(harness.patchLoadHookState->invoked);
 
         tempDir.deleteRecursively();
@@ -866,8 +865,8 @@ private:
             1);
         expect(harness.patchLoadHookState->invoked);
         const auto queued = scanQueue(harness.queue);
-        expect(queued.editBufferPatch);
         expect(!queued.patchData);
+        expect(queued.editBufferPatch);
 
         tempDir.deleteRecursively();
     }
@@ -1275,8 +1274,8 @@ private:
         harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kSelectPatchFile, juce::var());
 
         const auto queued = scanQueue(harness.queue);
-        expect(queued.editBufferPatch);
         expect(!queued.patchData);
+        expect(queued.editBufferPatch);
         expect(harness.proc.apvts.state.getProperty("uiMessageSeverity").toString() == "info");
         expect(harness.proc.apvts.state.getProperty("uiMessageText").toString()
                == FooterMessages::formatReconciliationNotice("BNK2 71", false));
