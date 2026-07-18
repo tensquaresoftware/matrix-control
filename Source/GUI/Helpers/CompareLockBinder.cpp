@@ -9,6 +9,7 @@ namespace
 {
     namespace MutatorState = PluginIDs::PatchManagerSection::PatchMutatorModule::StateProperties;
     namespace FooterCopy = PluginDisplayNames::FooterPanel;
+    namespace CompareMessages = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::Messages;
 
     constexpr float kLockedAlpha = 0.5f;
     const juce::Identifier kDeviceDetectedId("deviceDetected");
@@ -59,7 +60,7 @@ namespace TSS
         apply();
     }
 
-    void CompareLockBinder::syncDeviceLockFooter(bool deviceDetected)
+    void CompareLockBinder::syncDeviceLockFooter(bool deviceDetected, bool compareActive)
     {
         if (! deviceDetected)
         {
@@ -68,10 +69,17 @@ namespace TSS
         }
 
         if (apvts_.state.getProperty("uiMessageText").toString()
-            == juce::String(FooterCopy::kDeviceLockGuidance))
+            != juce::String(FooterCopy::kDeviceLockGuidance))
         {
-            apvts_.state.setProperty("uiMessageText", juce::String(), nullptr);
+            return;
         }
+
+        // Exact-string clear (match Compare): text + severity, then restore Compare copy if still active.
+        apvts_.state.setProperty("uiMessageText", juce::String(), nullptr);
+        apvts_.state.setProperty("uiMessageSeverity", juce::String(), nullptr);
+
+        if (compareActive)
+            GrayedControlHelper::setFooterInfoMessage(apvts_, CompareMessages::kCompareLockedFooter);
     }
 
     void CompareLockBinder::apply()
@@ -91,6 +99,6 @@ namespace TSS
                 applySectionLock(*component, locked);
         }
 
-        syncDeviceLockFooter(deviceDetected);
+        syncDeviceLockFooter(deviceDetected, compareActive);
     }
 }

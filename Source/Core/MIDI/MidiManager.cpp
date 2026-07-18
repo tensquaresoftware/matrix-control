@@ -9,9 +9,24 @@
 #include "Core/Services/DeviceTypeRegistry.h"
 #include "Shared/Definitions/PluginIDs.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
+#include "Shared/Definitions/PluginDisplayNames.h"
 
 namespace
 {
+    // Port open/clear paths wipe the left-zone footer; re-assert FR-2 guidance while still locked.
+    void clearFooterThenReassertDeviceLockGuidance(juce::AudioProcessorValueTreeState& apvts)
+    {
+        ExceptionPropagator::clearMessage(apvts);
+
+        if (static_cast<bool>(apvts.state.getProperty("deviceDetected", false)))
+            return;
+
+        apvts.state.setProperty("uiMessageText",
+                                 juce::String(PluginDisplayNames::FooterPanel::kDeviceLockGuidance),
+                                 nullptr);
+        apvts.state.setProperty("uiMessageSeverity", "info", nullptr);
+    }
+
     Core::MidiActivityTracker::Path pathForOutboundMessage(
         const Core::MidiOutboundQueue::Message& msg) noexcept
     {
@@ -102,7 +117,7 @@ bool MidiManager::setMidiInputPort(const juce::String& deviceId, bool reportOpen
     {
         MidiLogger::getInstance().logInfo("Clearing MIDI input port selection");
         stopMidiInputCallbacks();
-        ExceptionPropagator::clearMessage(apvts);
+        clearFooterThenReassertDeviceLockGuidance(apvts);
         return true;
     }
 
@@ -111,7 +126,7 @@ bool MidiManager::setMidiInputPort(const juce::String& deviceId, bool reportOpen
         if (midiReceiver != nullptr)
             midiReceiver->setMidiInput(inputMidiPort->getMidiInput());
 
-        ExceptionPropagator::clearMessage(apvts);
+        clearFooterThenReassertDeviceLockGuidance(apvts);
         return true;
     }
 
@@ -136,7 +151,7 @@ bool MidiManager::setMidiInputPort(const juce::String& deviceId, bool reportOpen
     if (openResult.succeeded())
     {
         midiReceiver->setMidiInput(inputMidiPort->getMidiInput());
-        ExceptionPropagator::clearMessage(apvts);
+        clearFooterThenReassertDeviceLockGuidance(apvts);
         MidiLogger::getInstance().logInfo("MIDI input port successfully set");
         return true;
     }
@@ -158,7 +173,7 @@ bool MidiManager::setMidiOutputPort(const juce::String& deviceId, bool reportOpe
         {
             outputMidiPort->closePort();
         }
-        ExceptionPropagator::clearMessage(apvts);
+        clearFooterThenReassertDeviceLockGuidance(apvts);
         return true;
     }
 
@@ -167,7 +182,7 @@ bool MidiManager::setMidiOutputPort(const juce::String& deviceId, bool reportOpe
         if (midiSender != nullptr)
             midiSender->setMidiOutput(outputMidiPort->getMidiOutput());
 
-        ExceptionPropagator::clearMessage(apvts);
+        clearFooterThenReassertDeviceLockGuidance(apvts);
         return true;
     }
 
@@ -192,7 +207,7 @@ bool MidiManager::setMidiOutputPort(const juce::String& deviceId, bool reportOpe
     if (openResult.succeeded())
     {
         midiSender->setMidiOutput(outputMidiPort->getMidiOutput());
-        ExceptionPropagator::clearMessage(apvts);
+        clearFooterThenReassertDeviceLockGuidance(apvts);
         MidiLogger::getInstance().logInfo("MIDI output port successfully set");
         wakeConsumer();
         return true;

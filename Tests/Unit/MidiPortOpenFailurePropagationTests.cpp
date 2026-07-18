@@ -4,6 +4,7 @@
 #include "Core/MIDI/MidiActivityTracker.h"
 #include "Core/MIDI/MidiManager.h"
 #include "Core/MIDI/Queue/MidiOutboundQueue.h"
+#include "Shared/Definitions/PluginDisplayNames.h"
 
 namespace
 {
@@ -149,16 +150,25 @@ private:
 
     void testEmptyDeviceIdClearDoesNotSetFooterMessage()
     {
-        beginTest("empty device id clear — no footer message");
+        beginTest("empty device id clear — re-asserts device-lock guidance while undetected");
 
         MinimalAudioProcessor processor;
         Core::MidiOutboundQueue queue;
         Core::MidiActivityTracker tracker;
         MidiManager midiManager(processor.apvts, queue, tracker);
 
+        // MidiManager ctor leaves deviceDetected=false (FR-2 locked).
         expect(midiManager.setMidiInputPort(juce::String()));
         expect(midiManager.setMidiOutputPort(juce::String()));
 
+        expectEquals(processor.apvts.state.getProperty("uiMessageText").toString(),
+                     juce::String(PluginDisplayNames::FooterPanel::kDeviceLockGuidance));
+        expectEquals(processor.apvts.state.getProperty("uiMessageSeverity").toString(),
+                     juce::String("info"));
+
+        processor.apvts.state.setProperty("deviceDetected", true, nullptr);
+        expect(midiManager.setMidiInputPort(juce::String()));
+        expect(midiManager.setMidiOutputPort(juce::String()));
         expect(processor.apvts.state.getProperty("uiMessageText").toString().isEmpty());
         expect(processor.apvts.state.getProperty("uiMessageSeverity").toString().isEmpty());
     }
