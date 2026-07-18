@@ -636,3 +636,21 @@
 - source_spec: `_bmad-output/implementation-artifacts/8-2-device-inquiry-and-footer-identity.md`
   summary: No unit tests for async Device Inquiry success, timeout, invalid re-arm, or cancel/restart under a fake receiver — only DeviceInquiryTrigger debounce + clear-when-no-ports.
   evidence: Blind Hunter; story T5 allows documenting manual UAT when no injectable seam exists.
+
+## Deferred from: code review of t-1-matrix-device-inquiry-simulator (2026-07-18)
+
+- source_spec: `_bmad-output/implementation-artifacts/t-1-matrix-device-inquiry-simulator.md`
+  summary: No automated tests in Matrix-Simulator repo after extract; goldens live only in Matrix-Control SysExEncoderTests and cannot catch simulator DeviceInquiry.h drift.
+  evidence: Blind Hunter; Acceptance Auditor soft drift-process note.
+
+- source_spec: `_bmad-output/implementation-artifacts/t-1-matrix-device-inquiry-simulator.md`
+  summary: Matrix-Simulator CMakeLists hard-codes machine-local JUCE absolute paths (plus env/preset fallbacks).
+  evidence: Blind Hunter; same developer-machine pattern as Matrix-Control.
+
+- source_spec: `_bmad-output/implementation-artifacts/t-1-matrix-device-inquiry-simulator.md`
+  summary: Once hasPortFilter_ is true, enabled port IDs are sticky — stale identifiers accumulate and there is no UI path back to “all ports”.
+  evidence: Blind Hunter + Edge Case Hunter (empty filter / persistence).
+
+- source_spec: `_bmad-output/implementation-artifacts/t-1-matrix-device-inquiry-simulator.md`
+  summary: Non-inquiry SysEx floods post unbounded MessageManager::callAsync log lines with no rate limit.
+  evidence: Edge Case Hunter; AC only requires ignore/log without crash.

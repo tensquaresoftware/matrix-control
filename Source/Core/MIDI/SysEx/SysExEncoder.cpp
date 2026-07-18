@@ -57,6 +57,41 @@ juce::MemoryBlock SysExEncoder::encodeDeviceInquiry()
     return message;
 }
 
+juce::MemoryBlock SysExEncoder::encodeDeviceInquiryReply(juce::uint8 memberLow,
+                                                         juce::uint8 memberHigh,
+                                                         juce::StringRef firmwareVersion,
+                                                         juce::uint8 channel)
+{
+    juce::uint8 versionBytes[4] = { ' ', ' ', ' ', ' ' };
+    auto version = juce::String(firmwareVersion);
+    if (version.isEmpty())
+        version = "1.11";
+
+    const int copyLen = juce::jmin(4, version.length());
+    for (int i = 0; i < copyLen; ++i)
+        versionBytes[static_cast<size_t>(i)] = static_cast<juce::uint8>(version[i] & 0x7f);
+
+    const juce::uint8 reply[] = {
+        SysExConstants::kSysExStart,
+        SysExConstants::DeviceInquiry::kUniversalNonRealtimeId,
+        channel,
+        SysExConstants::DeviceInquiry::kSubIdGeneralInfo,
+        SysExConstants::DeviceInquiry::kSubIdDeviceIdReply,
+        SysExConstants::DeviceInquiry::kExpectedManufacturer,
+        SysExConstants::DeviceInquiry::kExpectedFamily,
+        SysExConstants::DeviceInquiry::kExpectedFamilyHigh,
+        memberLow,
+        memberHigh,
+        versionBytes[0],
+        versionBytes[1],
+        versionBytes[2],
+        versionBytes[3],
+        SysExConstants::kSysExEnd
+    };
+
+    return juce::MemoryBlock(reply, sizeof(reply));
+}
+
 juce::MemoryBlock SysExEncoder::encodeRequestMessage(juce::uint8 requestType, juce::uint8 patchNumber) const
 {
     auto header = buildHeader(SysExConstants::Opcode::kRequestData, requestType);

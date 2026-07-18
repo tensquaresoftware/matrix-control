@@ -2,8 +2,12 @@
 #include <juce_core/juce_core.h>
 
 #include "Core/MIDI/SysEx/SysExConstants.h"
+#include "Core/MIDI/SysEx/SysExDecoder.h"
 #include "Core/MIDI/SysEx/SysExEncoder.h"
+#include "Core/MIDI/SysEx/SysExParser.h"
 #include "Core/Init/InitDefaults.h"
+#include "Core/Services/DeviceTypeRegistry.h"
+#include "Shared/Definitions/MatrixDeviceTypes.h"
 
 /**
  * Unit tests for SysExEncoder
@@ -29,6 +33,112 @@ public:
                 expect(data[i] == SysExConstants::DeviceInquiry::kRequestMessage[i],
                        juce::String("Device Inquiry byte ") + juce::String(i) + " should match");
             }
+        }
+
+        beginTest("Device Inquiry reply encoding — Matrix-1000 golden bytes");
+        {
+            const juce::uint8 expected[] = {
+                0xF0, 0x7E, 0x00, 0x06, 0x02,
+                0x10, 0x06, 0x00, 0x02, 0x00,
+                '1', '.', '1', '1',
+                0xF7
+            };
+            const auto reply = SysExEncoder::encodeDeviceInquiryReply(
+                SysExConstants::DeviceInquiry::kExpectedMemberLow,
+                SysExConstants::DeviceInquiry::kExpectedMemberHigh);
+
+            expectEquals(static_cast<int>(reply.getSize()), static_cast<int>(sizeof(expected)));
+            const auto* data = static_cast<const juce::uint8*>(reply.getData());
+            for (size_t i = 0; i < sizeof(expected); ++i)
+                expect(data[i] == expected[i],
+                       juce::String("M-1000 reply byte ") + juce::String(static_cast<int>(i)));
+        }
+
+        beginTest("Device Inquiry reply encoding — provisional Matrix-6 golden bytes");
+        {
+            const juce::uint8 expected[] = {
+                0xF0, 0x7E, 0x00, 0x06, 0x02,
+                0x10, 0x06, 0x00, 0x01, 0x00,
+                '1', '.', '1', '1',
+                0xF7
+            };
+            const auto reply = SysExEncoder::encodeDeviceInquiryReply(
+                SysExConstants::DeviceInquiry::kMatrix6MemberLow,
+                SysExConstants::DeviceInquiry::kMatrix6MemberHigh);
+
+            expectEquals(static_cast<int>(reply.getSize()), static_cast<int>(sizeof(expected)));
+            const auto* data = static_cast<const juce::uint8*>(reply.getData());
+            for (size_t i = 0; i < sizeof(expected); ++i)
+                expect(data[i] == expected[i],
+                       juce::String("M-6 reply byte ") + juce::String(static_cast<int>(i)));
+        }
+
+        beginTest("Device Inquiry reply — round-trip decode + registry");
+        {
+            SysExParser parser;
+            SysExDecoder decoder(parser);
+
+            const auto m1000 = SysExEncoder::encodeDeviceInquiryReply(
+                SysExConstants::DeviceInquiry::kExpectedMemberLow,
+                SysExConstants::DeviceInquiry::kExpectedMemberHigh);
+            const auto m1000Info = decoder.decodeDeviceId(m1000);
+            expect(m1000Info.isValid);
+            expectEquals(static_cast<int>(Core::DeviceTypeRegistry::fromDeviceInquiry(m1000Info)),
+                         static_cast<int>(MatrixDeviceTypes::Type::kMatrix1000));
+            expectEquals(m1000Info.version, juce::String("1.11"));
+
+            const auto m6 = SysExEncoder::encodeDeviceInquiryReply(
+                SysExConstants::DeviceInquiry::kMatrix6MemberLow,
+                SysExConstants::DeviceInquiry::kMatrix6MemberHigh);
+            const auto m6Info = decoder.decodeDeviceId(m6);
+            expect(m6Info.isValid);
+            expectEquals(static_cast<int>(Core::DeviceTypeRegistry::fromDeviceInquiry(m6Info)),
+                         static_cast<int>(MatrixDeviceTypes::Type::kMatrix6));
+        }
+
+        beginTest("Device Inquiry reply — version padded/truncated to 4 ASCII chars");
+        {
+            const auto shortVer = SysExEncoder::encodeDeviceInquiryReply(
+                SysExConstants::DeviceInquiry::kExpectedMemberLow,
+                SysExConstants::DeviceInquiry::kExpectedMemberHigh,
+                "1.1");
+            const auto* shortData = static_cast<const juce::uint8*>(shortVer.getData());
+            expect(shortData[10] == '1');
+            expect(shortData[11] == '.');
+            expect(shortData[12] == '1');
+            expect(shortData[13] == ' ');
+
+            const auto longVer = SysExEncoder::encodeDeviceInquiryReply(
+                SysExConstants::DeviceInquiry::kExpectedMemberLow,
+                SysExConstants::DeviceInquiry::kExpectedMemberHigh,
+                "12.34x");
+            const auto* longData = static_cast<const juce::uint8*>(longVer.getData());
+            expect(longData[10] == '1');
+            expect(longData[11] == '2');
+            expect(longData[12] == '.');
+            expect(longData[13] == '3');
+
+            const auto emptyVer = SysExEncoder::encodeDeviceInquiryReply(
+                SysExConstants::DeviceInquiry::kExpectedMemberLow,
+                SysExConstants::DeviceInquiry::kExpectedMemberHigh,
+                "");
+            const auto* emptyData = static_cast<const juce::uint8*>(emptyVer.getData());
+            expect(emptyData[10] == '1');
+            expect(emptyData[11] == '.');
+            expect(emptyData[12] == '1');
+            expect(emptyData[13] == '1');
+
+            juce::String highBit;
+            highBit << juce::juce_wchar(0xE9); // 'é' — must not emit a data byte >= 0x80
+            const auto masked = SysExEncoder::encodeDeviceInquiryReply(
+                SysExConstants::DeviceInquiry::kExpectedMemberLow,
+                SysExConstants::DeviceInquiry::kExpectedMemberHigh,
+                highBit);
+            const auto* maskedData = static_cast<const juce::uint8*>(masked.getData());
+            expect(maskedData[10] <= 0x7F);
+            expect(maskedData[11] == ' ');
+            expect(maskedData[12] == ' ');
+            expect(maskedData[13] == ' ');
         }
         
         beginTest("Request message encoding");

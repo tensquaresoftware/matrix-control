@@ -16,6 +16,16 @@ public:
     juce::MemoryBlock encodePatchToEditBufferSysEx(const juce::uint8* packedData) const;
     juce::MemoryBlock encodeMasterSysEx(juce::uint8 version, const juce::uint8* packedData) const;
     static juce::MemoryBlock encodeDeviceInquiry();
+
+    /** Universal Device Inquiry reply:
+        F0 7E <chan> 06 02 10 06 00 <memb-lo> <memb-hi> <rev0..3> F7.
+        Firmware version is clamped/padded to exactly 4 ASCII bytes (7-bit);
+        empty input uses default "1.11". */
+    static juce::MemoryBlock encodeDeviceInquiryReply(juce::uint8 memberLow,
+                                                      juce::uint8 memberHigh,
+                                                      juce::StringRef firmwareVersion = "1.11",
+                                                      juce::uint8 channel = 0x00);
+
     juce::MemoryBlock encodeRequestMessage(juce::uint8 requestType, juce::uint8 patchNumber = 0) const;
     juce::MemoryBlock encodeRemoteParameterEdit(juce::uint8 parameterNumber, juce::uint8 value) const;
     juce::MemoryBlock encodeMatrixModBusEdit(juce::uint8 bus,
