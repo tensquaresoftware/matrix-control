@@ -654,3 +654,13 @@
 - source_spec: `_bmad-output/implementation-artifacts/t-1-matrix-device-inquiry-simulator.md`
   summary: Non-inquiry SysEx floods post unbounded MessageManager::callAsync log lines with no rate limit.
   evidence: Edge Case Hunter; AC only requires ignore/log without crash.
+
+## Deferred from: code review of 8-3-ui-lock-without-synth (2026-07-18)
+
+- source_spec: `_bmad-output/implementation-artifacts/8-3-ui-lock-without-synth.md`
+  summary: Four CompareLockBinder instances each call syncDeviceLockFooter from apply — no single owner for left-zone device-lock guidance.
+  evidence: Blind Hunter; BodyPanel, SharedPanel, PatchManagerPanel×2.
+
+- source_spec: `_bmad-output/implementation-artifacts/8-3-ui-lock-without-synth.md`
+  summary: maySendEditorSysEx / isDeviceInquirySysEx allowlist is unit-tested but MidiManager inquiry bypasses via ungated sendSysExWithDelay; gate API is deviceDetected-only.
+  evidence: Blind Hunter; intentional path-based unlock today — wire or document later.

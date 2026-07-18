@@ -3,7 +3,7 @@ organization: Ten Square Software
 project: Matrix-Control
 title: Story 8.3 — UI Lock Without Synth
 author: BMad Agent
-status: review
+status: done
 baseline_commit: 62e67c61a5a6e41bceedd47743c5a0bdb38b99eb
 sources:
   - planning-artifacts/epics.md
@@ -20,7 +20,7 @@ updated: 2026-07-18
 
 # Story 8.3: UI Lock Without Synth
 
-Status: review
+Status: done
 
 <!-- Ultimate context engine analysis completed - comprehensive developer guide created -->
 
@@ -312,16 +312,27 @@ Composer (Cursor agent router)
 - Tests/Unit/MidiManagerTests.cpp
 - Tests/Unit/PatchMutatorEngineTests.cpp
 - Tests/Unit/PatchManagerActionHandlerTests.cpp
+- Tests/Unit/MidiPortOpenFailurePropagationTests.cpp
 - CMakeLists.txt
 - _bmad-output/implementation-artifacts/sprint-status.yaml
 - _bmad-output/implementation-artifacts/8-3-ui-lock-without-synth.md
 
+### Review Findings
+
+- [x] [Review][Patch] Footer message priority while device-locked — Always force `kDeviceLockGuidance` while undetected; on unlock clear device guidance (incl. severity) and restore Compare footer if Compare still active (Guillaume chose option 1) [Source/GUI/Helpers/CompareLockBinder.cpp]
+- [x] [Review][Decision] In-flight editor MIDI after lock — Resolved: allow in-flight drain; enqueue gate only (Guillaume chose option 2). No code change.
+- [x] [Review][Patch] Re-assert device-lock footer after port `clearMessage` while still undetected [Source/Core/MIDI/MidiManager.cpp]
+- [x] [Review][Patch] Clear `uiMessageSeverity` when clearing device-lock guidance (match Compare exact-string clear) [Source/GUI/Helpers/CompareLockBinder.cpp]
+- [x] [Review][Defer] Single owner for device-lock footer sync across four binders [Source/GUI/Helpers/CompareLockBinder.cpp] — deferred, pre-existing multi-binder wiring amplified by this story
+- [x] [Review][Defer] `maySendEditorSysEx` allowlist unused by MidiManager send path (inquiry uses ungated `sendSysExWithDelay`) [Source/Core/MIDI/EditorOutboundGate.h] — deferred, pre-existing path design; document or wire later
+
 ### Change Log
 
 - 2026-07-18 — Implemented FR-2 UI lock, footer guidance, and Core outbound gate; story → review.
+- 2026-07-18 — Code review: footer guidance re-assert after port clear; unlock clears severity and restores Compare copy; in-flight queue drain accepted; story → done.
 
 ## Story Completion Status
 
 - Ultimate context engine analysis completed — comprehensive developer guide created
-- Status: **review**
+- Status: **done**
 - Sprint key: `8-3-ui-lock-without-synth`
