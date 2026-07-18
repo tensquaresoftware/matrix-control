@@ -222,6 +222,7 @@ private:
                      &patchFileService,
                      &midiManager.getSysExEncoder())
         {
+            proc.apvts.state.setProperty("deviceDetected", true, nullptr);
             model.loadFrom(Core::InitDefaults::patchData());
         }
 

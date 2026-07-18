@@ -75,9 +75,13 @@ public:
                                  int outboundIdleTimeoutMs = 500);
     void cancelPendingSysExRequest() noexcept;
 
-    // True when MIDI output and input ports are open so a dump request can be attempted.
-    // Does not require deviceDetected — Program Change already works with ports alone.
+    // True when MIDI output and input ports are open so a dump / inquiry can be attempted.
+    // Ports alone do not satisfy FR-2: editor Program Change and SysEx still require deviceDetected
+    // (see isEditorOutboundAllowed). Device Inquiry is the unlock path and bypasses that gate.
     bool isDeviceDumpAvailable() const;
+
+    // FR-2: true when deviceDetected — editor PC / SysEx may be enqueued (inquiry excepted).
+    bool isEditorOutboundAllowed() const;
 
     // Blocks (message thread) until the outbound queue has drained and no SysEx is pending,
     // or until timeoutMs elapses. Returns true if the queue reached idle. Wakes the consumer.

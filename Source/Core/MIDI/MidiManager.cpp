@@ -3,6 +3,7 @@
 #include "Core/Exceptions/ExceptionPropagator.h"
 #include "Core/Loggers/MidiLogger.h"
 #include "Core/MIDI/DeviceInquiryTrigger.h"
+#include "Core/MIDI/EditorOutboundGate.h"
 #include "Core/MIDI/MidiPortOpenFeedback.h"
 #include "Core/MIDI/Queue/SysExDelayProfile.h"
 #include "Core/Services/DeviceTypeRegistry.h"
@@ -213,6 +214,9 @@ bool MidiManager::isOutputPortOpenWithDevice(const juce::String& deviceId) const
 
 void MidiManager::sendPatch(juce::uint8 patchNumber, const juce::uint8* packedData)
 {
+    if (! isEditorOutboundAllowed())
+        return;
+
     if (packedData == nullptr)
     {
         updateErrorState("Invalid patch data", "SysEx");
@@ -232,6 +236,9 @@ void MidiManager::sendPatch(juce::uint8 patchNumber, const juce::uint8* packedDa
 
 void MidiManager::sendPatchToEditBuffer(const juce::uint8* packedData)
 {
+    if (! isEditorOutboundAllowed())
+        return;
+
     if (packedData == nullptr)
     {
         updateErrorState("Invalid patch data", "SysEx");
@@ -253,6 +260,9 @@ void MidiManager::sendFullPatchForAudition(const juce::uint8* packedData,
                                            juce::uint8 patchNumber,
                                            bool deviceHasBankConcept)
 {
+    if (! isEditorOutboundAllowed())
+        return;
+
     if (packedData == nullptr)
     {
         updateErrorState("Invalid patch data", "SysEx");
@@ -269,6 +279,9 @@ void MidiManager::sendFullPatchForAudition(const juce::uint8* packedData,
 
 void MidiManager::sendMaster(juce::uint8 version, const juce::uint8* packedData)
 {
+    if (! isEditorOutboundAllowed())
+        return;
+
     if (packedData == nullptr)
     {
         updateErrorState("Invalid master data", "SysEx");
@@ -288,6 +301,9 @@ void MidiManager::sendMaster(juce::uint8 version, const juce::uint8* packedData)
 
 void MidiManager::sendProgramChange(int programNumber, int channel)
 {
+    if (! isEditorOutboundAllowed())
+        return;
+
     try
     {
         editorPath_.enqueueProgramChange(programNumber, channel);
@@ -301,6 +317,9 @@ void MidiManager::sendProgramChange(int programNumber, int channel)
 
 void MidiManager::sendSetBank(int bank)
 {
+    if (! isEditorOutboundAllowed())
+        return;
+
     try
     {
         auto sysExMessage = sysExEncoder->encodeSetBank(static_cast<juce::uint8>(bank));
@@ -314,6 +333,9 @@ void MidiManager::sendSetBank(int bank)
 
 void MidiManager::sendUnlockBank()
 {
+    if (! isEditorOutboundAllowed())
+        return;
+
     try
     {
         auto sysExMessage = SysExEncoder::encodeUnlockBank();
@@ -327,6 +349,9 @@ void MidiManager::sendUnlockBank()
 
 void MidiManager::enqueueRemoteParameterEdit(int parameterNumber, juce::uint8 packedValue)
 {
+    if (! isEditorOutboundAllowed())
+        return;
+
     if (parameterNumber < 0 || parameterNumber > 127)
         return;
 
@@ -341,6 +366,9 @@ void MidiManager::enqueueMatrixModBusEdit(juce::uint8 bus,
                                           juce::uint8 amount,
                                           juce::uint8 destination)
 {
+    if (! isEditorOutboundAllowed())
+        return;
+
     if (bus >= static_cast<juce::uint8>(Matrix1000Limits::kModulationBusCount))
         return;
 
@@ -472,6 +500,12 @@ void MidiManager::sendArmedSinglePatchRequest(juce::uint8 patchNumber, std::uint
     if (token != asyncRequestToken_.load(std::memory_order_acquire))
         return;
 
+    if (! isEditorOutboundAllowed())
+    {
+        finishAsyncPackedPatch(token, {});
+        return;
+    }
+
     if (midiReceiver == nullptr || midiSender == nullptr || ! midiSender->isOutputAvailable())
     {
         finishAsyncPackedPatch(token, {});
@@ -517,6 +551,13 @@ void MidiManager::requestSinglePatchAsync(juce::uint8 patchNumber,
                                           int settleMs,
                                           int outboundIdleTimeoutMs)
 {
+    if (! isEditorOutboundAllowed())
+    {
+        if (callback)
+            callback({});
+        return;
+    }
+
     cancelPendingSysExRequest();
 
     const auto token = asyncRequestToken_.load(std::memory_order_acquire);
@@ -592,6 +633,12 @@ bool MidiManager::isDeviceDumpAvailable() const
         && midiSender->isOutputAvailable()
         && midiReceiver != nullptr
         && midiReceiver->isInputAvailable();
+}
+
+bool MidiManager::isEditorOutboundAllowed() const
+{
+    return Core::isEditorOutboundAllowed(
+        static_cast<bool>(apvts.state.getProperty("deviceDetected", false)));
 }
 
 bool MidiManager::waitUntilOutboundQueueIdle(int timeoutMs)
@@ -878,6 +925,9 @@ std::vector<juce::uint8> MidiManager::requestSysExData(juce::uint8 requestType,
                                                        const juce::String& requestDescription,
                                                        juce::uint8 patchNumber)
 {
+    if (! isEditorOutboundAllowed())
+        return {};
+
     try
     {
         auto requestMessage = sysExEncoder->encodeRequestMessage(requestType, patchNumber);

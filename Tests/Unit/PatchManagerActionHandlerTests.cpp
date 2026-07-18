@@ -312,6 +312,7 @@ private:
                               return state->allow;
                           } })
         {
+            proc.apvts.state.setProperty("deviceDetected", true, nullptr);
             initializePatchManagerState(proc.apvts.state, 0, 0, false);
             patchSelectionMidiSync.clearSyncedBankState();
         }

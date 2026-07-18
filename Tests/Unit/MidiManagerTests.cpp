@@ -95,6 +95,9 @@ public:
         testDeviceDumpUnavailableWithoutDevice();
         testWaitUntilOutboundQueueIdleReturnsTrueWhenEmpty();
         testRefreshInquiryClearsDetectionWithoutPorts();
+        testEditorOutboundGateBlocksProgramChangeWhenUndetected();
+        testEditorOutboundGateBlocksSysExWhenUndetected();
+        testEditorOutboundGateAllowsSendWhenDetected();
     }
 
 private:
@@ -151,6 +154,67 @@ private:
         expect(elapsedMs < 100, "Idle wait should return promptly on an empty queue");
     }
 
+    void testEditorOutboundGateBlocksProgramChangeWhenUndetected()
+    {
+        beginTest("FR-2 — Program Change not enqueued when deviceDetected=false");
+
+        Core::MidiOutboundQueue queue;
+        Core::MidiActivityTracker tracker;
+        MinimalAudioProcessor proc;
+        MidiManager manager(proc.apvts, queue, tracker);
+
+        proc.apvts.state.setProperty("deviceDetected", false, nullptr);
+        expect(! manager.isEditorOutboundAllowed());
+
+        manager.startThread();
+        manager.sendProgramChange(42, 1);
+        juce::Thread::sleep(50);
+
+        expect(queue.isEmpty(), "Program Change must not enqueue while locked");
+        manager.stopThread(2000);
+    }
+
+    void testEditorOutboundGateBlocksSysExWhenUndetected()
+    {
+        beginTest("FR-2 — editor SysEx not enqueued when deviceDetected=false");
+
+        Core::MidiOutboundQueue queue;
+        Core::MidiActivityTracker tracker;
+        MinimalAudioProcessor proc;
+        MidiManager manager(proc.apvts, queue, tracker);
+
+        proc.apvts.state.setProperty("deviceDetected", false, nullptr);
+
+        manager.startThread();
+        manager.enqueueRemoteParameterEdit(10, 64);
+        manager.sendSetBank(1);
+        juce::Thread::sleep(50);
+
+        expect(queue.isEmpty(), "Editor SysEx must not enqueue while locked");
+        manager.stopThread(2000);
+    }
+
+    void testEditorOutboundGateAllowsSendWhenDetected()
+    {
+        beginTest("FR-2 — Program Change and SysEx enqueue when deviceDetected=true");
+
+        Core::MidiOutboundQueue queue;
+        Core::MidiActivityTracker tracker;
+        MinimalAudioProcessor proc;
+        MidiManager manager(proc.apvts, queue, tracker);
+
+        proc.apvts.state.setProperty("deviceDetected", true, nullptr);
+        expect(manager.isEditorOutboundAllowed());
+
+        manager.startThread();
+        manager.sendProgramChange(7, 1);
+        manager.enqueueRemoteParameterEdit(5, 32);
+        juce::Thread::sleep(50);
+
+        expect(! queue.isEmpty(), "Editor outbound must enqueue once unlocked");
+        manager.stopThread(2000);
+    }
+
     void testRealtimeRetainedWithoutOutput()
     {
         beginTest("Enqueue realtime — queue retained when no output port");
@@ -159,6 +223,8 @@ private:
         Core::MidiActivityTracker tracker;
         MinimalAudioProcessor proc;
         MidiManager manager(proc.apvts, queue, tracker);
+
+        proc.apvts.state.setProperty("deviceDetected", true, nullptr);
 
         manager.startThread();
         manager.sendProgramChange(42, 1);
@@ -178,6 +244,8 @@ private:
         MinimalAudioProcessor proc;
         MidiManager manager(proc.apvts, queue, tracker);
 
+        proc.apvts.state.setProperty("deviceDetected", true, nullptr);
+
         manager.startThread();
         manager.enqueueRemoteParameterEdit(10, 64);
 
@@ -195,6 +263,8 @@ private:
         Core::MidiActivityTracker tracker;
         MinimalAudioProcessor proc;
         MidiManager manager(proc.apvts, queue, tracker);
+
+        proc.apvts.state.setProperty("deviceDetected", true, nullptr);
 
         if (!openFirstAvailableOutputOrSkip(manager, *this))
             return;
@@ -219,6 +289,8 @@ private:
         Core::MidiActivityTracker tracker;
         MinimalAudioProcessor proc;
         MidiManager manager(proc.apvts, queue, tracker);
+
+        proc.apvts.state.setProperty("deviceDetected", true, nullptr);
 
         manager.startThread();
 
@@ -309,6 +381,8 @@ private:
         Core::MidiActivityTracker tracker;
         MinimalAudioProcessor proc;
         MidiManager manager(proc.apvts, queue, tracker);
+
+        proc.apvts.state.setProperty("deviceDetected", true, nullptr);
 
         if (!manager.setMidiOutputPort(outputId))
         {
