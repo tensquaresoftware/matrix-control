@@ -1,5 +1,5 @@
 # generated: 2026-05-29
-# last_updated: 2026-07-18 (T-1 → done after code review; 8-3 → review)
+# last_updated: 2026-07-18 (Epic T → done; 8-3 → review)
 # project: Matrix-Control
 # project_key: NOKEY
 # tracking_system: file-system
@@ -202,7 +202,7 @@ development_status:
   epic-u-retrospective: optional
 
   # Epic T: Dev Tools / Travel Simulators
-  epic-t: in-progress
+  epic-t: done
   t-1-matrix-device-inquiry-simulator: done
   epic-t-retrospective: optional
 
