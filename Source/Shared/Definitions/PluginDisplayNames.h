@@ -31,6 +31,10 @@ namespace PluginDisplayNames
     namespace FooterPanel
     {
         constexpr const char* kNoDevice = "No device";
+
+        // Left-zone guidance while FR-2 device lock is active (D-038 — footer only, no modal).
+        constexpr const char* kDeviceLockGuidance =
+            "No synth detected — check MIDI cables, MIDI From / MIDI To, and power-cycle the Matrix.";
     }
 
     namespace About

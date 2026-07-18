@@ -41,12 +41,19 @@ PatchManagerPanel::PatchManagerPanel(TSS::ISkin& skin,
     addAndMakeVisible(*computerPatchesPanel_);
     addAndMakeVisible(*patchMutatorPanel_);
 
-    // Patch Mutator panel self-manages its Compare lock (COMPARE button must stay live).
+    // Patch Mutator self-manages Compare (COMPARE stays live); binder only applies device lock.
+    // Section header is locked with Bank/Internal/Computer so it dims with the section (device or Compare).
     compareLockBinder_ = std::make_unique<TSS::CompareLockBinder>(
         apvts,
-        std::vector<juce::Component*>{ bankUtilityPanel_.get(),
+        std::vector<juce::Component*>{ sectionHeader_.get(),
+                                       bankUtilityPanel_.get(),
                                        internalPatchesPanel_.get(),
                                        computerPatchesPanel_.get() });
+
+    deviceLockBinder_ = std::make_unique<TSS::CompareLockBinder>(
+        apvts,
+        std::vector<juce::Component*>{ patchMutatorPanel_.get() },
+        false);
 
     setSize(dims_.width, dims_.height);
 }

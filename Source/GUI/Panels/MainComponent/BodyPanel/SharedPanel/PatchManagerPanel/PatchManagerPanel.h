@@ -50,6 +50,7 @@ private:
     std::unique_ptr<ComputerPatchesPanel> computerPatchesPanel_;
     std::unique_ptr<PatchMutatorPanel> patchMutatorPanel_;
     std::unique_ptr<TSS::CompareLockBinder> compareLockBinder_;
+    std::unique_ptr<TSS::CompareLockBinder> deviceLockBinder_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PatchManagerPanel)
 };
