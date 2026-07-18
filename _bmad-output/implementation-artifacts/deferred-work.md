@@ -622,3 +622,17 @@
 - source_spec: `_bmad-output/implementation-artifacts/8-1-devicetyperegistry-and-member-byte-fix.md`
   summary: fromApvtsProperty remains untested in DeviceTypeRegistryTests.
   evidence: Blind Hunter; AC6 focuses on inquiry / member-byte mapping, not APVTS override path.
+
+## Deferred from: code review of 8-2-device-inquiry-and-footer-identity (2026-07-18)
+
+- source_spec: `_bmad-output/implementation-artifacts/8-2-device-inquiry-and-footer-identity.md`
+  summary: Timer::callAfterDelay / MessageManager::callAsync lambdas capture raw MidiManager `this` without SafePointer; destructor bumps async token but cannot stop a callback that already started on a destroyed object.
+  evidence: Blind Hunter + Edge Case Hunter; same pattern already used by requestSinglePatchAsync / armAsyncSinglePatchCapture.
+
+- source_spec: `_bmad-output/implementation-artifacts/8-2-device-inquiry-and-footer-identity.md`
+  summary: No jassert that performDeviceInquiry runs on the message thread (Timer / callAsync assumptions).
+  evidence: Edge Case Hunter; today only syncMidiPortsFromStateImpl (message thread) calls refresh → inquiry.
+
+- source_spec: `_bmad-output/implementation-artifacts/8-2-device-inquiry-and-footer-identity.md`
+  summary: No unit tests for async Device Inquiry success, timeout, invalid re-arm, or cancel/restart under a fake receiver — only DeviceInquiryTrigger debounce + clear-when-no-ports.
+  evidence: Blind Hunter; story T5 allows documenting manual UAT when no injectable seam exists.

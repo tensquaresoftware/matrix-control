@@ -94,6 +94,7 @@ public:
         testRealtimeNotStarvedDuringSysExGate();
         testDeviceDumpUnavailableWithoutDevice();
         testWaitUntilOutboundQueueIdleReturnsTrueWhenEmpty();
+        testRefreshInquiryClearsDetectionWithoutPorts();
     }
 
 private:
@@ -109,6 +110,28 @@ private:
         // No MIDI ports open at construction.
         expect(!manager.isDeviceDumpAvailable(),
                "Device dump must be unavailable without open MIDI input and output ports");
+    }
+
+    void testRefreshInquiryClearsDetectionWithoutPorts()
+    {
+        beginTest("refreshDeviceInquiryAfterPortSync clears stale detection without ports");
+
+        Core::MidiOutboundQueue queue;
+        Core::MidiActivityTracker tracker;
+        MinimalAudioProcessor proc;
+        MidiManager manager(proc.apvts, queue, tracker);
+
+        proc.apvts.state.setProperty("deviceDetected", true, nullptr);
+        proc.apvts.state.setProperty("deviceVersion", "1.20", nullptr);
+        proc.apvts.state.setProperty("deviceType", "Matrix-1000", nullptr);
+
+        manager.refreshDeviceInquiryAfterPortSync();
+
+        expect(! static_cast<bool>(proc.apvts.state.getProperty("deviceDetected")),
+               "Detection must clear when MIDI From/To are not both available");
+        expectEquals(proc.apvts.state.getProperty("deviceType").toString(), juce::String("Unknown"));
+        expect(proc.apvts.state.getProperty("deviceVersion").toString().isEmpty(),
+               "deviceVersion must clear with detection");
     }
 
     void testWaitUntilOutboundQueueIdleReturnsTrueWhenEmpty()

@@ -657,6 +657,7 @@ bool PluginProcessor::setMidiInputPort(const juce::String& deviceId)
     {
         apvts.state.setProperty("midiInputPortId", deviceId, nullptr);
         notifyNonParameterStateChanged();
+        midiManager->refreshDeviceInquiryAfterPortSync();
         return true;
     }
 
@@ -672,6 +673,7 @@ bool PluginProcessor::setMidiOutputPort(const juce::String& deviceId)
     {
         apvts.state.setProperty("midiOutputPortId", deviceId, nullptr);
         notifyNonParameterStateChanged();
+        midiManager->refreshDeviceInquiryAfterPortSync();
         return true;
     }
 
@@ -1063,6 +1065,7 @@ void PluginProcessor::syncMidiPortsFromStateImpl(bool reportOpenFailures)
         apvts.state.setProperty("midiOutputPortId", sanitizedOutputPortId, nullptr);
 
     midiManager->setMidiOutputPort(sanitizedOutputPortId, reportOpenFailures);
+    midiManager->refreshDeviceInquiryAfterPortSync();
 }
 
 void PluginProcessor::syncMidiPortsFromState(bool reportOpenFailures)

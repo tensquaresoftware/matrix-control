@@ -1,5 +1,5 @@
 # generated: 2026-05-29
-# last_updated: 2026-07-17 (8-1 → done)
+# last_updated: 2026-07-18 (8-2 → done)
 # project: Matrix-Control
 # project_key: NOKEY
 # tracking_system: file-system
@@ -41,7 +41,7 @@
 # - Retrospective appends its action items to action_items; sprint-status surfaces open ones
 
 generated: 2026-05-29
-last_updated: 2026-07-17
+last_updated: 2026-07-18
 project: Matrix-Control
 project_key: NOKEY
 tracking_system: file-system
@@ -160,7 +160,7 @@ development_status:
   # Epic 8: Synth Connection & Instrument Role
   epic-8: in-progress
   8-1-devicetyperegistry-and-member-byte-fix: done
-  8-2-device-inquiry-and-footer-identity: backlog
+  8-2-device-inquiry-and-footer-identity: done
   8-3-ui-lock-without-synth: backlog
   8-4-virtual-instrument-registration-and-bus-layout: backlog
   8-5-matrix-6-6r-patch-memory-limits: done

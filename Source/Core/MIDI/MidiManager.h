@@ -83,7 +83,15 @@ public:
     // or until timeoutMs elapses. Returns true if the queue reached idle. Wakes the consumer.
     bool waitUntilOutboundQueueIdle(int timeoutMs);
 
-    bool performDeviceInquiry();
+    // Non-blocking Universal Device Inquiry (armOneShotSysExCapture + timeout timer).
+    // Safe to call from the message thread after ports are configured — never blocks MidiManager::run.
+    void performDeviceInquiry();
+
+    // After MIDI From/To change or sync: start inquiry when both ports are open (debounced by
+    // pair), or clear detection when the pair is incomplete. Call from PluginProcessor after
+    // setMidi*Port and from syncMidiPortsFromStateImpl.
+    void refreshDeviceInquiryAfterPortSync();
+
     void run() override;
 
 private:
@@ -119,6 +127,8 @@ private:
     std::atomic<bool> hasPendingSysEx_{ false };
     std::atomic<std::uint64_t> asyncRequestToken_{ 0 };
     PackedPatchCallback pendingAsyncCallback_;
+    juce::String lastInquiryInputId_;
+    juce::String lastInquiryOutputId_;
 
     std::vector<juce::uint8> requestSysExData(juce::uint8 requestType,
                                               size_t expectedPackedSize,
@@ -137,6 +147,21 @@ private:
     // Quiet decode for async capture: returns empty for non-patch / corrupt SysEx without
     // treating that as request failure (caller may keep listening until timeout).
     std::vector<juce::uint8> tryDecodeAsyncPatchResponse(const juce::MemoryBlock& response);
+
+    void clearDeviceDetectionAfterPortLoss();
+    void clearLastInquiryPortPair() noexcept;
+    bool armAsyncDeviceInquiryCapture(std::uint64_t token);
+    void sendArmedDeviceInquiry(std::uint64_t token);
+    void pollOutboundIdleThenDeviceInquiry(std::uint64_t token,
+                                           int settleMs,
+                                           juce::uint32 idleStartMs,
+                                           int outboundIdleTimeoutMs);
+    void finishAsyncDeviceInquirySuccess(std::uint64_t token,
+                                         const DeviceIdInfo& info,
+                                         MatrixDeviceTypes::Type deviceType);
+    void finishAsyncDeviceInquiryFailure(std::uint64_t token,
+                                         const juce::String& errorMessage,
+                                         const juce::String& errorType);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MidiManager)
 };
