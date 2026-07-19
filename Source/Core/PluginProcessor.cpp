@@ -1484,14 +1484,11 @@ void PluginProcessor::valueTreePropertyChanged(juce::ValueTree& treeWhosePropert
 
     if (masterParameterIds_.count(parameterId) > 0)
     {
-        if (isMasterEditOutboundAllowed())
-        {
-            if (!suppressMasterParameterSysEx_)
-                apvtsMasterMapper_->apvtsToBuffer();
+        if (! suppressMasterParameterSysEx_)
+            apvtsMasterMapper_->apvtsToBuffer();
 
-            if (!suppressMasterParameterSysEx_)
-                masterParameterSysExDispatcher_->dispatch(parameterId);
-        }
+        if (isMasterEditOutboundAllowed() && ! suppressMasterParameterSysEx_)
+            masterParameterSysExDispatcher_->dispatch(parameterId);
     }
 
     if (parameterId == PluginIDs::PatchEditSection::PatchNameModule::kPatchName)
@@ -1673,16 +1670,17 @@ void PluginProcessor::applyPreferredStandaloneAudioFromForDeviceType()
     if (kind == Core::PreferredAudioFromKind::kNone)
         return;
 
+    const auto catalogIds = getAudioInputSourceIds();
     const auto currentSourceId = apvts.state.getProperty("audioFromSourceId", juce::String()).toString();
     const juce::String prefix = (kind == Core::PreferredAudioFromKind::kMono) ? "mono:" : "stereo:";
 
-    if (currentSourceId.startsWith(prefix))
+    if (currentSourceId.startsWith(prefix) && catalogIds.contains(currentSourceId))
         return;
 
     const auto preferredSourceId = Core::pickPreferredAudioFromSourceId(
         deviceType,
         deviceDetected,
-        getAudioInputSourceIds());
+        catalogIds);
 
     if (preferredSourceId.isEmpty())
         return;

@@ -356,6 +356,8 @@ namespace PluginDisplayNames
         constexpr const char* kName = "MASTER EDIT";
         constexpr const char* kMatrix6PatchOnlyFooterMessage =
             "MASTER EDIT is Matrix-1000 only. Matrix-6/6R use PATCH workflows.";
+        constexpr const char* kUnsupportedDeviceFooterMessage =
+            "MASTER EDIT requires a detected Matrix-1000. This device type is not supported for MASTER.";
 
         namespace MidiModule
         {

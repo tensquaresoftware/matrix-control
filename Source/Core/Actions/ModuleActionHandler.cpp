@@ -105,9 +105,12 @@ namespace Core
 
         if (! isMasterEditAllowed(deviceDetected, deviceType))
         {
+            const auto* footerMessage = MatrixDeviceTypes::isMatrix6Family(deviceType)
+                ? PluginDisplayNames::MasterEditSection::kMatrix6PatchOnlyFooterMessage
+                : PluginDisplayNames::MasterEditSection::kUnsupportedDeviceFooterMessage;
             apvts_.state.setProperty(
                 "uiMessageText",
-                juce::String(PluginDisplayNames::MasterEditSection::kMatrix6PatchOnlyFooterMessage),
+                juce::String(footerMessage),
                 nullptr);
             apvts_.state.setProperty("uiMessageSeverity", juce::String("info"), nullptr);
             return true;
