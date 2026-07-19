@@ -1,11 +1,19 @@
 ---
-description: Plain French communication during bmad-quick-dev (clarify, plan, implement, present)
+description: Plain French communication during bmad-quick-dev (clarify, plan, implement, review, present)
 alwaysApply: true
 ---
 
 # Quick Dev — communication with Guillaume
 
 During any **quick-dev** session (`bmad-quick-dev`, or an explicit “build / fix / implement this” run that follows that workflow):
+
+## Clarity bar (non-negotiable)
+
+Shared SSOT: `_bmad/custom/clarity-bar-fr.md`.
+
+**Phrase-test before every important message** (including internal review findings and the final presentation): if Guillaume would reply « Reformule en langage naturel, sans jargon excessif », rewrite. He must never need to ask.
+
+The Quick Dev **review phase** has the **same** clarity requirement as `bmad-code-review` (En bref → Verdict → structured findings → Recommandation BMad).
 
 ## Language and tone
 
@@ -14,10 +22,11 @@ During any **quick-dev** session (`bmad-quick-dev`, or an explicit “build / fi
 - Briefly define any unavoidable technical term on first use (e.g. « APVTS = stockage des paramètres du plugin »).
 - Write in **complete sentences** — no telegraphic bullet chains or keyword dumps.
 - Never respond to Guillaume in English during quick-dev chat, even when subagents, specs, or diffs are in English.
+- Technical evidence (paths, AC ids, symbols) only as a short trailing line — not in the main meaning-bearing sentences.
 
 ## Artifacts vs chat
 
-- **Chat** with Guillaume → French.
+- **Chat** with Guillaume → French + clarity bar.
 - **Generated artifacts** (spec file, code map, suggested review order in the spec) → English (`document_output_language`), unless Guillaume asks otherwise.
 
 ## Structure for important messages
@@ -41,7 +50,8 @@ During any **quick-dev** session (`bmad-quick-dev`, or an explicit “build / fi
 | Acceptance criteria / AC | critères d’acceptance |
 | Code Map | carte du code |
 | Suggested Review Order | ordre de relecture suggéré |
+| `decision-needed` / `patch` / `defer` | décision à prendre / correction à appliquer / à reporter |
 
 ## Subagents
 
-Subagents may output English or dense technical prose. **Always reformulate** in plain French before presenting to Guillaume.
+Subagents may output English or dense technical prose. **Always reformulate** in plain French before presenting to Guillaume — especially review output. Full contract: `_bmad/custom/quick-dev-presentation-fr.md`.

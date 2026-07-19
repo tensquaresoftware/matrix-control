@@ -3,7 +3,9 @@
 Ce document s’applique à **toute** sortie utilisateur de `bmad-code-review`, Bugbot et revues adversariales explicites.
 Il prime sur le style des sous-agents et des étapes internes du workflow.
 
-**Barème de clarté (obligatoire) :** la **première** présentation d’un constat doit déjà être aussi claire que si Guillaume venait de répondre « Reformule le problème en langage naturel et clair ». Il ne doit **jamais** avoir à demander cette reformulation.
+**Barème partagé (obligatoire) :** charger et appliquer `clarity-bar-fr.md` en premier. Tout ce qui suit **ajoute** la structure revue ; rien n’assouplit le barème.
+
+**Rappel phrase-test :** la première présentation d’un constat doit déjà être aussi claire que si Guillaume venait de dire « Reformule en langage naturel, sans jargon excessif ». S’il devrait le dire, **réécrire**.
 
 ---
 
@@ -15,7 +17,7 @@ Il prime sur le style des sous-agents et des étapes internes du workflow.
 
 ## Ton
 
-- Phrases **courtes et complètes**, langage naturel — comme une explication orale à un producteur de musique qui lit le code occasionnellement.
+- Phrases **courtes et complètes**, langage naturel — producteur de musique qui lit le code occasionnellement.
 - Interdit : style télégraphique, pile de jargon, phrases qui empilent fichier + critère d’acceptance + pixels + noms de classes.
 - Un terme technique indispensable → une courte glose à la première occurrence (ex. « APVTS = stockage des paramètres du plugin »).
 
@@ -58,7 +60,7 @@ Il prime sur le style des sous-agents et des étapes internes du workflow.
 ### Recommandation BMad (obligatoire pour chaque décision)
 
 - **Option recommandée** — numéro + intitulé court  
-- **Pourquoi** — 2 à 4 phrases **accessibles** (même barème de clarté)  
+- **Pourquoi** — 2 à 4 phrases **accessibles** (même barème / phrase-test)  
 - **Confiance** — `ferme` ou `nuancée`
 
 Guillaume ne doit jamais devoir redemander la recommandation.
@@ -67,12 +69,12 @@ Critères de choix : (1) risque utilisateur / stabilité, (2) `project-context.m
 
 ---
 
-## Règles anti-densité (ce qui a fait échouer la revue 6-16)
+## Règles anti-densité (ce qui a fait échouer les revues passées)
 
 **Interdit dans « Le problème » et « Ce qui est en jeu » :**
 
 - Empiler dans une même phrase : chemin de fichier + numéro d’AC + cotes en pixels + noms de classes/modules
-- Allusions opaque (« Option A′ », « oneshot `spec-…` », « volataires ») sans dire d’abord ce que ça signifie pour la décision
+- Allusions opaques (« Option A′ », « oneshot `spec-…` », jargon interne) sans dire d’abord ce que ça signifie pour la décision
 - Partir des fichiers pour raconter le problème (partir de l’intention produit)
 
 **Autorisé :**
@@ -82,14 +84,12 @@ Critères de choix : (1) risque utilisateur / stabilité, (2) `project-context.m
 
 ### Auto-contrôle avant d’envoyer
 
-Relire le texte et répondre oui à tout, sinon **réécrire** avant envoi :
+Appliquer **intégralement** la checklist de `clarity-bar-fr.md`, plus :
 
-1. Un lecteur qui ne connaît pas les noms de fichiers comprend-il la question en 20 secondes ?
-2. Le titre est-il une question (décision) ou une action claire (correction) ?
-3. A-t-on enlevé au moins une couche de jargon / références techniques de la phrase principale ?
-4. Les options se distinguent-elles sans connaître le code ?
+1. Le titre est-il une question (décision) ou une action claire (correction) ?
+2. Les options se distinguent-elles sans connaître le code ?
 
-Si Guillaume devrait dire « reformule en langage naturel », **le message n’est pas prêt**.
+Si Guillaume devrait dire « reformule en langage naturel, sans jargon excessif », **le message n’est pas prêt**.
 
 ---
 
@@ -121,4 +121,4 @@ Toujours reformuler en français clair avant présentation. Un tableau récap pe
 
 ## Walkthrough des décisions (step 04)
 
-Une décision à la fois, déjà au niveau « Bon », avec Recommandation BMad, puis attente du numéro de Guillaume.
+Une décision à la fois, déjà au niveau « Bon » / phrase-test, avec Recommandation BMad, puis attente du numéro de Guillaume.

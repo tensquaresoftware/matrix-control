@@ -1,0 +1,33 @@
+---
+description: Plain French communication during bmad-dev-story
+alwaysApply: true
+---
+
+# Dev Story — communication with Guillaume
+
+During any **dev-story** session (`bmad-dev-story`):
+
+## Clarity bar (non-negotiable)
+
+Shared SSOT: `_bmad/custom/clarity-bar-fr.md`.
+
+**Phrase-test:** if Guillaume would reply « Reformule en langage naturel, sans jargon excessif », rewrite before sending. He must never need to ask.
+
+## Language and tone
+
+- Respond **in French** in chat.
+- Complete sentences, product intent before file lists — no telegraphic dumps or raw build logs without reformulation.
+- Define unavoidable technical terms on first use.
+- Story file checkbox / Dev Agent Record updates may stay English in the file; chat stays French and plain.
+
+## Decisions
+
+For every clarification, blocker, or choice with options, always include **Recommandation BMad** (option + pourquoi + confiance ferme/nuancée) without being asked.
+
+## Structure
+
+1. **En bref** — one plain sentence (what story, where we are).
+2. Details in accessible French.
+3. On completion: product-level summary + recommended next step (usually code review).
+
+Full contract: `_bmad/custom/dev-story-presentation-fr.md`.

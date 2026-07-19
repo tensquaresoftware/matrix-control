@@ -1,0 +1,20 @@
+# Team override for bmad-create-story — barème de clarté pour Guillaume.
+# Merges over .agents/skills/bmad-create-story/customize.toml (persistent_facts append).
+
+[workflow]
+
+activation_steps_prepend = [
+  "Charger et appliquer d’abord file:{project-root}/_bmad/custom/clarity-bar-fr.md (phrase-test non négociable), puis file:{project-root}/_bmad/custom/create-story-presentation-fr.md et file:{project-root}/.cursor/rules/create-story-communication.mdc. Toute sortie chat doit déjà passer « Reformule en langage naturel, sans jargon excessif » sans que Guillaume le demande.",
+]
+
+persistent_facts = [
+  "file:{project-root}/_bmad/custom/clarity-bar-fr.md",
+  "file:{project-root}/_bmad/custom/create-story-presentation-fr.md",
+  "file:{project-root}/.cursor/rules/create-story-communication.mdc",
+  "Phrase-test avant envoi : si Guillaume dirait « Reformule en langage naturel, sans jargon excessif », réécrire.",
+  "Langue : toujours le français dans le chat — le fichier story reste en anglais (document_output_language).",
+  "Ton : phrases complètes, langage naturel — interdit style télégraphique et jargon non expliqué.",
+  "Messages importants : En bref puis détail accessible.",
+  "Pour CHAQUE décision à options : Recommandation BMad obligatoire (option + pourquoi + confiance).",
+  "Ne pas coller d’extraits denses de la story dans le chat sans reformulation.",
+]

@@ -1,24 +1,26 @@
-# Team override for bmad-code-review — présentation claire en français pour Guillaume.
+# Team override for bmad-code-review — barème de clarté durci pour Guillaume.
 # Merges over .agents/skills/bmad-code-review/customize.toml (persistent_facts append).
 
 [workflow]
 
 activation_steps_prepend = [
-  "Charger et appliquer le contrat de présentation : file:{project-root}/_bmad/custom/code-review-presentation-fr.md et file:{project-root}/.cursor/rules/code-review-communication.mdc. Toute sortie utilisateur de cette revue doit respecter ces deux documents — en particulier le barème de clarté (première version déjà au niveau « reformulé en langage naturel »).",
+  "Charger et appliquer d’abord file:{project-root}/_bmad/custom/clarity-bar-fr.md (phrase-test non négociable), puis file:{project-root}/_bmad/custom/code-review-presentation-fr.md et file:{project-root}/.cursor/rules/code-review-communication.mdc. Toute sortie utilisateur de cette revue doit respecter ces documents — la première version de chaque constat doit déjà passer la phrase-test « Reformule en langage naturel, sans jargon excessif ».",
 ]
 
 persistent_facts = [
+  "file:{project-root}/_bmad/custom/clarity-bar-fr.md",
   "file:{project-root}/_bmad/custom/code-review-presentation-fr.md",
   "file:{project-root}/.cursor/rules/code-review-communication.mdc",
-  "Barème de clarté : la PREMIÈRE présentation de chaque constat doit déjà être aussi claire que si Guillaume avait demandé « Reformule en langage naturel et clair ». Il ne doit jamais avoir à redemander cette reformulation.",
-  "Auto-contrôle avant envoi : un lecteur qui ignore les noms de fichiers comprend-il la question en ~20 secondes ? Sinon, réécrire.",
-  "Titres des décisions = questions en français simple (ex. « Est-ce qu’on valide 6-16 alors que d’autres changements sont dans les mêmes fichiers ? »). Interdit les titres abstraits du type « Contenu hors périmètre… ».",
-  "Le problème : intention d’abord (« La story devait… »), puis écarts en puces courtes. Preuves techniques (fichier, AC, pixels, classes) seulement en ligne complémentaire, jamais empilées dans la phrase principale.",
-  "Options avec verbes du quotidien (« Tout garder ensemble », « Ne garder que cette story »), pas du jargon d’ingénierie.",
+  "Phrase-test avant envoi : si Guillaume dirait « Reformule en langage naturel, sans jargon excessif », réécrire. Il ne doit jamais avoir à le demander.",
+  "Barème de clarté : la PREMIÈRE présentation de chaque constat doit déjà être au niveau de cette reformulation.",
+  "Auto-contrôle : un lecteur qui ignore les noms de fichiers comprend-il la question en ~20 secondes ? Sinon, réécrire.",
+  "Titres des décisions = questions en français simple. Interdit les titres abstraits du type « Contenu hors périmètre… ».",
+  "Le problème : intention d’abord (« La story devait… »), puis écarts en puces courtes. Preuves techniques seulement en ligne complémentaire.",
+  "Options avec verbes du quotidien (« Tout garder ensemble », « Ne garder que cette story »).",
   "Langue : toujours le français pour Guillaume — jamais l’anglais dans le chat.",
   "Ton : phrases courtes et complètes — interdit style télégraphique et piles de jargon.",
   "Structure : En bref → Verdict → pour chaque constat Ce qui est en jeu / Le problème / Ce qu’il faut faire / Si on ne fait rien.",
   "Pour CHAQUE décision : Recommandation BMad obligatoire (option + pourquoi accessible + confiance ferme ou nuancée).",
-  "Chat ≠ story file : ne pas coller le texte dense des Review Findings dans le chat ; le chat reste au niveau « bon » du contrat de présentation.",
+  "Chat ≠ story file : ne pas coller le texte dense des Review Findings dans le chat.",
   "Reformuler tout output sous-agent avant présentation.",
 ]

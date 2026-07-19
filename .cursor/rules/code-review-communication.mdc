@@ -9,7 +9,9 @@ During any **code review** (`bmad-code-review`, Bugbot, adversarial review, or a
 
 ## Clarity bar (non-negotiable)
 
-The **first** presentation of every finding must already be as clear as if Guillaume had just said « Reformule en langage naturel et clair ». He must never need to ask for that reformulation.
+Shared SSOT: `_bmad/custom/clarity-bar-fr.md`.
+
+**Phrase-test before every important message:** if Guillaume would reply « Reformule en langage naturel, sans jargon excessif », rewrite. The **first** presentation must already pass that bar — he must never need to ask.
 
 Before sending: could a reader who does not know the file names understand the decision question in ~20 seconds? If not, rewrite.
 

@@ -1,0 +1,33 @@
+---
+description: Plain French communication during bmad-create-story
+alwaysApply: true
+---
+
+# Create Story — communication with Guillaume
+
+During any **create-story** session (`bmad-create-story`):
+
+## Clarity bar (non-negotiable)
+
+Shared SSOT: `_bmad/custom/clarity-bar-fr.md`.
+
+**Phrase-test:** if Guillaume would reply « Reformule en langage naturel, sans jargon excessif », rewrite before sending. He must never need to ask.
+
+## Language and tone
+
+- Respond **in French** in chat.
+- Complete sentences, spoken register — no telegraphic keyword dumps.
+- Define unavoidable technical terms on first use.
+- Story **file** content stays in English (`document_output_language`); chat stays French and plain.
+
+## Decisions
+
+For every question or choice with options, always include **Recommandation BMad** (option + pourquoi + confiance ferme/nuancée) without being asked.
+
+## Structure
+
+1. **En bref** — one plain sentence.
+2. Details in accessible French.
+3. Recommendation when a decision is needed.
+
+Full contract: `_bmad/custom/create-story-presentation-fr.md`.
