@@ -32,6 +32,8 @@ These commands keep a compact ID-only title when a story ID is present:
 
 Omit `{Story ID}` only when none can be inferred. For `bmad-quick-dev` without a story ID, fall through to format B.
 
+For `bmad-quick-dev` only: after `rename_chat`, the first user-facing chat content must follow `.cursor/rules/quick-dev-communication.mdc` — heading `Contexte de la Story` + one synthetic French sentence, then the rest of the workflow.
+
 Examples:
 
 - `/bmad-create-story 4-5` → `BMad — Create Story 4-5`

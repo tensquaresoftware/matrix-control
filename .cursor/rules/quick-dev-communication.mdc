@@ -7,6 +7,25 @@ alwaysApply: true
 
 During any **quick-dev** session (`bmad-quick-dev`, or an explicit “build / fix / implement this” run that follows that workflow):
 
+## Amorce « Contexte de la Story » (mandatory on activation)
+
+Right after renaming the Agents chat (see `bmad-agent-chat-titles.mdc`) and completing Quick Dev activation setup, the **first user-facing chat content** MUST be:
+
+1. A heading: `Contexte de la Story`
+2. **One** synthetic sentence in plain French — natural language, no excess jargon — summarizing what the story (or the freeform request, if no story ID) is about.
+3. Do **not** dive into implementation details, file lists, or acceptance criteria in this sentence.
+4. Then continue with the rest of Quick Dev (clarify / route / implement / …).
+
+Example shape:
+
+```
+## Contexte de la Story
+
+Cette story enregistre Matrix-Control comme instrument virtuel dans le DAW et définit le câblage audio des bus.
+
+…suite du workflow…
+```
+
 ## Clarity bar (non-negotiable)
 
 Shared SSOT: `_bmad/custom/clarity-bar-fr.md`.
@@ -37,6 +56,8 @@ The Quick Dev **review phase** has the **same** clarity requirement as `bmad-cod
    - **Option recommandée** — number and short label
    - **Pourquoi** — 2–4 accessible sentences
    - **Confiance** — `ferme` or `nuancée` (if several options are defensible, say so and still pick one)
+
+**Exception:** the activation opening uses `Contexte de la Story` (see above), not `En bref`.
 
 ## BMad workflow terms → French (user-facing)
 
