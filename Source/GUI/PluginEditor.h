@@ -19,7 +19,8 @@ class AboutWindow;
 class MasterInitConfirmDialog;
 
 class PluginEditor : public juce::AudioProcessorEditor,
-                     private juce::ChangeListener
+                     private juce::ChangeListener,
+                     private juce::ValueTree::Listener
 {
 public:
     explicit PluginEditor(PluginProcessor&);
@@ -37,6 +38,13 @@ private:
     void attachStandaloneAudioDeviceListener();
     void detachStandaloneAudioDeviceListener();
     void changeListenerCallback(juce::ChangeBroadcaster* source) override;
+    void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
+                                  const juce::Identifier& property) override;
+    void valueTreeChildAdded(juce::ValueTree&, juce::ValueTree&) override {}
+    void valueTreeChildRemoved(juce::ValueTree&, juce::ValueTree&, int) override {}
+    void valueTreeChildOrderChanged(juce::ValueTree&, int, int) override {}
+    void valueTreeParentChanged(juce::ValueTree&) override {}
+    void valueTreeRedirected(juce::ValueTree&) override;
 
     void openSettingsWindow();
     void closeSettingsWindow();

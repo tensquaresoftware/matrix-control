@@ -354,6 +354,8 @@ namespace PluginDisplayNames
     namespace MasterEditSection
     {
         constexpr const char* kName = "MASTER EDIT";
+        constexpr const char* kMatrix6PatchOnlyFooterMessage =
+            "MASTER EDIT is Matrix-1000 only. Matrix-6 / 6R use PATCH workflows.";
 
         namespace MidiModule
         {

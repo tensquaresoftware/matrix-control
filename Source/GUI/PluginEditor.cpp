@@ -19,6 +19,7 @@
 #include "Shared/Definitions/PluginIDs.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginAudioConstants.h"
+#include "Shared/Definitions/MatrixDeviceTypes.h"
 
 using TSS::SkinColourId;
 
@@ -383,6 +384,7 @@ PluginEditor::PluginEditor(PluginProcessor& p)
 
     headerRefreshTimer_ = std::make_unique<HeaderRefreshTimer>(pluginProcessor, headerPanel, *this);
     attachStandaloneAudioDeviceListener();
+    pluginProcessor.getApvts().state.addListener(this);
 
     syncUiScaleFromEditor();
     layoutUiElementsTestComponent();
@@ -675,6 +677,7 @@ void PluginEditor::layoutUiElementsTestComponent()
 
 PluginEditor::~PluginEditor()
 {
+    pluginProcessor.getApvts().state.removeListener(this);
     detachStandaloneAudioDeviceListener();
     closeSettingsWindow();
     closeAboutWindow();
@@ -889,4 +892,36 @@ void PluginEditor::changeListenerCallback(juce::ChangeBroadcaster*)
     const auto sourceId = pluginProcessor.getApvts().state.getProperty("audioFromSourceId", juce::String()).toString();
     if (sourceId.isNotEmpty())
         Core::StandaloneAudioInputRouter::enableInputMonitoring();
+}
+
+void PluginEditor::valueTreePropertyChanged(juce::ValueTree&,
+                                            const juce::Identifier& property)
+{
+    if (! pluginProcessor.isStandalone())
+        return;
+
+    const auto propertyName = property.toString();
+    if (propertyName == MatrixDeviceTypes::kApvtsPropertyName
+        || propertyName == "deviceDetected")
+    {
+        juce::MessageManager::callAsync(
+            [safeThis = juce::Component::SafePointer<PluginEditor>(this)]
+            {
+                if (safeThis != nullptr)
+                    safeThis->refreshAudioFromCombo();
+            });
+    }
+}
+
+void PluginEditor::valueTreeRedirected(juce::ValueTree&)
+{
+    if (! pluginProcessor.isStandalone())
+        return;
+
+    juce::MessageManager::callAsync(
+        [safeThis = juce::Component::SafePointer<PluginEditor>(this)]
+        {
+            if (safeThis != nullptr)
+                safeThis->refreshAudioFromCombo();
+        });
 }
