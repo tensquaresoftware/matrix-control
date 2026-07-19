@@ -3,13 +3,17 @@
 #include "Core/Init/InitTemplateFooter.h"
 #include "Core/Init/MatrixModInitService.h"
 #include "Core/Init/PatchModuleInitService.h"
+#include "Core/MIDI/MasterEditGate.h"
 #include "Core/MIDI/MatrixModBusParameterSysExDispatcher.h"
 #include "Core/MIDI/PatchParameterSysExDispatcher.h"
 #include "Core/Models/ApvtsPatchMapper.h"
 #include "Core/Models/PatchModel.h"
 #include "Core/Services/ClipboardPasteEnabledResolver.h"
 #include "Core/Services/ClipboardService.h"
+#include "Core/Services/DeviceTypeRegistry.h"
 #include "Shared/Definitions/Matrix1000Limits.h"
+#include "Shared/Definitions/MatrixDeviceTypes.h"
+#include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginIDs.h"
 
 namespace Core
@@ -94,6 +98,20 @@ namespace Core
 
         if (!moduleKind.has_value())
             return false;
+
+        const bool deviceDetected = static_cast<bool>(apvts_.state.getProperty("deviceDetected", false));
+        const auto deviceType = DeviceTypeRegistry::fromApvtsProperty(
+            apvts_.state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
+
+        if (! isMasterEditAllowed(deviceDetected, deviceType))
+        {
+            apvts_.state.setProperty(
+                "uiMessageText",
+                juce::String(PluginDisplayNames::MasterEditSection::kMatrix6PatchOnlyFooterMessage),
+                nullptr);
+            apvts_.state.setProperty("uiMessageSeverity", juce::String("info"), nullptr);
+            return true;
+        }
 
         if (hooks_.setSuppressMasterSysEx)
             hooks_.setSuppressMasterSysEx(true);

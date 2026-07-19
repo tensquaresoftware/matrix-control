@@ -15,9 +15,11 @@
 #include "Core/MIDI/PatchSelectionMidiSync.h"
 #include "Core/Audio/AudioPassthroughProcessor.h"
 #include "Core/Audio/AudioInputSourceCatalog.h"
+#include "Core/Audio/DeviceAudioInputPreference.h"
 #include "Core/Audio/HardwareLatency.h"
 #include "Core/Audio/InstrumentMidiForwarder.h"
 #include "Core/Audio/StandaloneAudioInputRouter.h"
+#include "Core/MIDI/MasterEditGate.h"
 
 #include "Core/MIDI/KeyboardFromMidiInput.h"
 #include "Core/MIDI/MidiActivityTracker.h"
@@ -1480,11 +1482,14 @@ void PluginProcessor::valueTreePropertyChanged(juce::ValueTree& treeWhosePropert
 
     if (masterParameterIds_.count(parameterId) > 0)
     {
-        if (!suppressMasterParameterSysEx_)
-            apvtsMasterMapper_->apvtsToBuffer();
+        if (isMasterEditOutboundAllowed())
+        {
+            if (!suppressMasterParameterSysEx_)
+                apvtsMasterMapper_->apvtsToBuffer();
 
-        if (!suppressMasterParameterSysEx_)
-            masterParameterSysExDispatcher_->dispatch(parameterId);
+            if (!suppressMasterParameterSysEx_)
+                masterParameterSysExDispatcher_->dispatch(parameterId);
+        }
     }
 
     if (parameterId == PluginIDs::PatchEditSection::PatchNameModule::kPatchName)
@@ -1517,6 +1522,7 @@ void PluginProcessor::valueTreePropertyChanged(juce::ValueTree& treeWhosePropert
         || propertyName == "deviceDetected")
     {
         reconcilePatchManagerCoordinatesForDeviceType();
+        applyPreferredStandaloneAudioFromForDeviceType();
     }
 }
 
@@ -1642,6 +1648,44 @@ Core::DeviceMemoryLimits PluginProcessor::getResolvedDeviceMemoryLimits() const
     const auto deviceType = Core::DeviceTypeRegistry::fromApvtsProperty(
         apvts.state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
     return Core::DeviceMemoryLimits::resolve(deviceType);
+}
+
+bool PluginProcessor::isMasterEditOutboundAllowed() const
+{
+    const bool deviceDetected = static_cast<bool>(apvts.state.getProperty("deviceDetected", false));
+    const auto deviceType = Core::DeviceTypeRegistry::fromApvtsProperty(
+        apvts.state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
+    return Core::isMasterEditAllowed(deviceDetected, deviceType);
+}
+
+void PluginProcessor::applyPreferredStandaloneAudioFromForDeviceType()
+{
+    if (! isStandaloneWrapper())
+        return;
+
+    const bool deviceDetected = static_cast<bool>(apvts.state.getProperty("deviceDetected", false));
+    const auto deviceType = Core::DeviceTypeRegistry::fromApvtsProperty(
+        apvts.state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
+    const auto kind = Core::preferredAudioFromKind(deviceType, deviceDetected);
+
+    if (kind == Core::PreferredAudioFromKind::kNone)
+        return;
+
+    const auto currentSourceId = apvts.state.getProperty("audioFromSourceId", juce::String()).toString();
+    const juce::String prefix = (kind == Core::PreferredAudioFromKind::kMono) ? "mono:" : "stereo:";
+
+    if (currentSourceId.startsWith(prefix))
+        return;
+
+    const auto preferredSourceId = Core::pickPreferredAudioFromSourceId(
+        deviceType,
+        deviceDetected,
+        getAudioInputSourceIds());
+
+    if (preferredSourceId.isEmpty())
+        return;
+
+    setAudioFromSourceId(preferredSourceId);
 }
 
 void PluginProcessor::reconcilePatchManagerCoordinatesForDeviceType()
@@ -1835,6 +1879,7 @@ void PluginProcessor::valueTreeRedirected(juce::ValueTree& treeWhichHasBeenChang
     patchNameSyncer_->apvtsToBuffer();
     syncAudioRuntimeFromState();
     refreshClipboardPasteEnabledProperties();
+    applyPreferredStandaloneAudioFromForDeviceType();
 }
 
 void PluginProcessor::buildPatchParameterIdSet()

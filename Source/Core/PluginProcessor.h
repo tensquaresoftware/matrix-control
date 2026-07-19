@@ -293,7 +293,9 @@ private:
     void initializeMutatorActionEnabledMirrorsForEmptyHistory();
     int getCurrentPatchNumberForMutator() const;
     Core::DeviceMemoryLimits getResolvedDeviceMemoryLimits() const;
+    bool isMasterEditOutboundAllowed() const;
     void reconcilePatchManagerCoordinatesForDeviceType();
+    void applyPreferredStandaloneAudioFromForDeviceType();
     void resetInternalPatchCoordinatesToDefaults();
     void buildPatchParameterIdSet();
     void buildMasterParameterIdSet();
