@@ -664,3 +664,13 @@
 - source_spec: `_bmad-output/implementation-artifacts/8-3-ui-lock-without-synth.md`
   summary: maySendEditorSysEx / isDeviceInquirySysEx allowlist is unit-tested but MidiManager inquiry bypasses via ungated sendSysExWithDelay; gate API is deviceDetected-only.
   evidence: Blind Hunter; intentional path-based unlock today — wire or document later.
+
+## Deferred from: quick-dev review of spec-8-4-virtual-instrument-registration-and-bus-layout (2026-07-19)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-8-4-virtual-instrument-registration-and-bus-layout.md`
+  summary: Master SysEx fail-closed is not centralized in MidiManager::sendMaster — only PluginProcessor dispatch and ModuleActionHandler INIT are gated.
+  evidence: Blind Hunter; future callers of MasterParameterSysExDispatcher could bypass FR-46.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-8-4-virtual-instrument-registration-and-bus-layout.md`
+  summary: When master edit becomes allowed after detection, stored master APVTS is not flushed to hardware until the next parameter edit.
+  evidence: Edge Case Hunter; no AC requires auto-sync on unlock for MASTER.
