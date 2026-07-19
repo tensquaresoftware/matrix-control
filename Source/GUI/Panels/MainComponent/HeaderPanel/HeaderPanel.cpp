@@ -535,8 +535,6 @@ void HeaderPanel::selectAudioFromSourceId(const juce::String& sourceId)
         }
     }
 
-    if (! audioFromSourceIdentifiers_.empty())
-        audioFromComboBox_.setSelectedId(1, juce::dontSendNotification);
-    else
-        audioFromComboBox_.setSelectedId(kPortSentinelItemId, juce::dontSendNotification);
+    // Missing id: do not fall back to catalog[0] (can flip mono/stereo kind).
+    audioFromComboBox_.setSelectedId(kPortSentinelItemId, juce::dontSendNotification);
 }

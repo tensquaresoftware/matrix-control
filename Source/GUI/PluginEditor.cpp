@@ -850,14 +850,28 @@ void PluginEditor::refreshAudioFromCombo(HeaderPanel* headerOverride)
             sourceIdToRestore = header->getSelectedAudioFromSourceId();
 
         header->populateAudioFromCombo(names, ids);
-        header->selectAudioFromSourceId(sourceIdToRestore);
 
-        const auto effectiveSourceId = header->getSelectedAudioFromSourceId();
+        if (sourceIdToRestore.isNotEmpty() && ids.contains(sourceIdToRestore))
+        {
+            header->selectAudioFromSourceId(sourceIdToRestore);
+            pluginProcessor.setAudioFromSourceId(sourceIdToRestore);
+            return;
+        }
 
-        if (effectiveSourceId.isNotEmpty())
-            pluginProcessor.setAudioFromSourceId(effectiveSourceId);
-        else if (! ids.isEmpty())
-            pluginProcessor.setAudioFromSourceId(ids[0]);
+        if (sourceIdToRestore.isEmpty())
+        {
+            const auto effectiveSourceId = header->getSelectedAudioFromSourceId();
+
+            if (effectiveSourceId.isNotEmpty())
+                pluginProcessor.setAudioFromSourceId(effectiveSourceId);
+            else if (! ids.isEmpty())
+                pluginProcessor.setAudioFromSourceId(ids[0]);
+        }
+        else
+        {
+            // Stale id not in catalog: keep APVTS preference; avoid writing combo fallback of the wrong kind.
+            header->selectAudioFromSourceId(sourceIdToRestore);
+        }
 
         return;
     }
@@ -865,7 +879,7 @@ void PluginEditor::refreshAudioFromCombo(HeaderPanel* headerOverride)
     if (sourceIdToRestore.isEmpty() && ! ids.isEmpty())
         sourceIdToRestore = ids[0];
 
-    if (sourceIdToRestore.isNotEmpty())
+    if (sourceIdToRestore.isNotEmpty() && (ids.isEmpty() || ids.contains(sourceIdToRestore)))
         pluginProcessor.setAudioFromSourceId(sourceIdToRestore);
 }
 
