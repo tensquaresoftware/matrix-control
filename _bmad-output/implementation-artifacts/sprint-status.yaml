@@ -1,5 +1,5 @@
 # generated: 2026-05-29
-# last_updated: 2026-07-19 (8-4 → done; epic-8 → done)
+# last_updated: 2026-07-19 (9-1 → done)
 # project: Matrix-Control
 # project_key: NOKEY
 # tracking_system: file-system
@@ -168,7 +168,7 @@ development_status:
 
   # Epic 9: Unsaved Edit Protection
   epic-9: in-progress
-  9-1-dirtypatchtracker: review
+  9-1-dirtypatchtracker: done
   9-2-unsaved-edit-confirmation-dialog: backlog
   epic-9-retrospective: optional
 

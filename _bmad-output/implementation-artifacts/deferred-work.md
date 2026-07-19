@@ -1,5 +1,11 @@
 # Deferred Work
 
+## Deferred from: code review of spec-9-1-dirtypatchtracker (2026-07-19)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-9-1-dirtypatchtracker.md`
+  summary: PatchModel name encode (`setName` 7-bit ASCII) vs decode (`getName` 6-bit Matrix) asymmetry can mark dirty after hardware dump capture then APVTS name round-trip with no user rename; Story 9.2 capture/sync paths should account for this.
+  evidence: Blind Hunter; `PatchModel.cpp` setName/getName; pre-existing, not introduced by DirtyPatchTracker.
+
 ## Deferred from: quick-dev review of spec-9-1-dirtypatchtracker (2026-07-19)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-9-1-dirtypatchtracker.md`

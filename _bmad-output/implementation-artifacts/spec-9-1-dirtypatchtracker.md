@@ -123,3 +123,10 @@ Do not inject the tracker into `PatchManagerActionHandler` in 9.1 unless Ask Fir
 
 - Register sources on plugin and test targets
   [`CMakeLists.txt`](../../CMakeLists.txt)
+
+### Review Findings
+
+- [x] [Review][Patch] Add APVTS-driven patch-name dirty coverage through `syncApvtsAndIsDirty` [Tests/Unit/DirtyPatchTrackerTests.cpp:164] — param APVTS path is tested; name-syncer half of the Always pairing is only exercised via `PatchModel::setName`, not via APVTS property → helper.
+- [x] [Review][Defer] No public getter / no live captureSnapshot sites [PluginProcessor.h:333] — deferred, intentional 9.1 Ask First (already in deferred-work for 9.2)
+- [x] [Review][Defer] Capture sites must sync APVTS→model before captureSnapshot — deferred, intentional 9.1 lean API (already in deferred-work for 9.2)
+- [x] [Review][Defer] Patch name encode/decode asymmetry can false-dirty after hardware capture + APVTS name sync [PatchModel.cpp:53-69] — deferred, pre-existing
