@@ -95,15 +95,16 @@ Use the MCP tool `rename_chat` (`cursor-app-control`). Cursor rule: `.cursor/rul
 
 **No date in the title.** The Agents sidebar already shows when each conversation took place.
 
-**Format A — story triad** (ID only, no colon):
+**Format A — story ID compact** (ID only, no colon):
 
 | Command | Sidebar title |
 |---|---|
 | `/bmad-create-story 4-5` | `BMad — Create Story 4-5` |
 | `/bmad-dev-story 4-5` | `BMad — Dev Story 4-5` |
 | `/bmad-code-review 4-5` | `BMad — Code Review 4-5` |
+| `/bmad-quick-dev 8-4` | `BMad — Quick Dev 8-4` |
 
-**Format B — all other BMad commands:** `BMad — {Workflow Label} : {Topic}`
+**Format B — all other BMad commands** (also `bmad-quick-dev` when **no** story ID): `BMad — {Workflow Label} : {Topic}`
 
 - Workflow labels stay in English (`Quick Dev`, `Correct Course`, …).
 - Topic after the colon is **French** (short, 2–5 words, no filler) — not English Title Case. Product/UI terms may stay as-is inside the French phrase (`Look`, `Patch Mutator`, `MIDI`).
@@ -111,8 +112,7 @@ Use the MCP tool `rename_chat` (`cursor-app-control`). Cursor rule: `.cursor/rul
 
 | Command (examples) | Sidebar title |
 |---|---|
-| `/bmad-quick-dev` (disabled controls look) | `BMad — Quick Dev : Look contrôles inactifs` |
-| `/bmad-quick-dev` (mutator work) | `BMad — Quick Dev : Patch Mutator` |
+| `/bmad-quick-dev` (disabled controls look, no story) | `BMad — Quick Dev : Look contrôles inactifs` |
 | `/bmad-correct-course` (bank unlock) | `BMad — Correct Course : Unlock banque` |
 | `/bmad-sprint-status` | `BMad — Sprint Status` |
 

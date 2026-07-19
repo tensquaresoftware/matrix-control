@@ -5,7 +5,7 @@ alwaysApply: true
 
 # BMad — titres des conversations Agents
 
-When Guillaume starts a conversation with a **BMad skill** (attached skill or slash command such as `/bmad-create-story`, `/bmad-dev-story`, `/bmad-code-review`, `/bmad-correct-course`, etc.), **rename the current chat immediately** — as the **first tool call**, before any other work.
+When Guillaume starts a conversation with a **BMad skill** (attached skill or slash command such as `/bmad-create-story`, `/bmad-dev-story`, `/bmad-code-review`, `/bmad-quick-dev`, `/bmad-correct-course`, etc.), **rename the current chat immediately** — as the **first tool call**, before any other work.
 
 Also apply on **resume**: if Guillaume sends a message in an existing BMad conversation whose title is still the auto-generated one (e.g. `Story creation process`, `Code review discussion`, `bmad dev story 4-4`) instead of the BMad format below, call `rename_chat` first — infer skill and story ID / topic from the conversation's first user message (attached skill or slash command).
 
@@ -19,25 +19,30 @@ Use the MCP tool `rename_chat` on server `cursor-app-control`. **Only this API p
 
 Use an em dash (`—`) after `BMad`. **Never append a date** (e.g. `(2026-06-19)`). The Agents sidebar already shows when each conversation occurred.
 
-### A — Story triad (fixed shape, no topic, no colon)
+### A — Story ID compact (fixed shape, no topic, no colon)
 
-These three commands keep a compact ID-only title:
+These commands keep a compact ID-only title when a story ID is present:
 
 | Skill / command | Title |
 |---|---|
 | `bmad-create-story` | `BMad — Create Story {Story ID}` |
 | `bmad-dev-story` | `BMad — Dev Story {Story ID}` |
 | `bmad-code-review` | `BMad — Code Review {Story ID}` |
+| `bmad-quick-dev` | `BMad — Quick Dev {Story ID}` |
 
-Omit `{Story ID}` only when none can be inferred.
+Omit `{Story ID}` only when none can be inferred. For `bmad-quick-dev` without a story ID, fall through to format B.
 
 Examples:
 
 - `/bmad-create-story 4-5` → `BMad — Create Story 4-5`
 - `/bmad-dev-story 4-4` → `BMad — Dev Story 4-4`
 - `/bmad-code-review 4-4` → `BMad — Code Review 4-4`
+- `/bmad-quick-dev 8-4` → `BMad — Quick Dev 8-4`
+- `/bmad-quick-dev` + story `8-4` in the message → `BMad — Quick Dev 8-4`
 
 ### B — All other BMad commands (label + short topic)
+
+Also used for `bmad-quick-dev` **only when no story ID** can be inferred.
 
 Format: `BMad — {Workflow Label} : {Topic}`
 
@@ -48,8 +53,7 @@ Format: `BMad — {Workflow Label} : {Topic}`
 
 Examples:
 
-- `/bmad-quick-dev` + mutator work → `BMad — Quick Dev : Patch Mutator`
-- `/bmad-quick-dev` + disabled controls look → `BMad — Quick Dev : Look contrôles inactifs`
+- `/bmad-quick-dev` + disabled controls look (no story ID) → `BMad — Quick Dev : Look contrôles inactifs`
 - `/bmad-correct-course` + bank unlock simplify → `BMad — Correct Course : Unlock banque`
 - `/bmad-sprint-status` → `BMad — Sprint Status` (no topic needed)
 
@@ -106,9 +110,9 @@ Infer the topic from the user intent / first message (and attached story or spec
 
 Parse from the user message (slash command or attached skill context):
 
-- Epic-story: `4-5`, `7-3b`, `2-9b`
+- Epic-story: `4-5`, `7-3b`, `2-9b`, `8-4`
 - Utility stories: `U-0`, `U-11`
-- Accept `/bmad-create-story 4-5`, `/bmad-create story 4-5`, or `story 4-5` in plain text
+- Accept `/bmad-create-story 4-5`, `/bmad-quick-dev 8-4`, `/bmad-create story 4-5`, or `story 4-5` / `US 8-4` in plain text
 
 ---
 
@@ -117,9 +121,9 @@ Parse from the user message (slash command or attached skill context):
 When several conversations would share the **same base title** (formats A or B), disambiguate with a numeric suffix:
 
 ```
-BMad — Quick Dev : Look contrôles inactifs (1)
-BMad — Quick Dev : Look contrôles inactifs (2)
-BMad — Quick Dev : Look contrôles inactifs (3)
+BMad — Quick Dev 8-4 (1)
+BMad — Quick Dev 8-4 (2)
+BMad — Quick Dev 8-4 (3)
 ```
 
 ### Algorithm (before calling `rename_chat`)
@@ -171,6 +175,7 @@ BMad — Quick Dev : Look contrôles inactifs (3)
 | Wrong | Right |
 |---|---|
 | `BMad — Sprint Status (2026-06-19)` | `BMad — Sprint Status` |
-| `BMad — Quick Dev : Disabled Controls Look` | `BMad — Quick Dev : Look contrôles inactifs` |
+| `BMad — Quick Dev : 8-4` | `BMad — Quick Dev 8-4` |
+| `BMad — Quick Dev : Disabled Controls Look` | `BMad — Quick Dev : Look contrôles inactifs` (no story ID) |
 | `BMad — Correct Course : Réduction de la latence audio` | `BMad — Correct Course : Latence audio` |
-| Two chats both named `BMad — Quick Dev : Look contrôles inactifs` | Second becomes `BMad — Quick Dev : Look contrôles inactifs (1)` |
+| Two chats both named `BMad — Quick Dev 8-4` | Second becomes `BMad — Quick Dev 8-4 (1)` |
