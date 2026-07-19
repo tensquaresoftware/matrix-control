@@ -67,6 +67,7 @@ public:
         testReCaptureClearsDirty();
         testClearSnapshotResetsBaseline();
         testApvtsSyncPathMatchesPackedCompare();
+        testApvtsNameEditIsDirtyViaSyncHelper();
         testMasterOnlyChangeDoesNotDirty();
     }
 
@@ -189,6 +190,32 @@ private:
                                                 99)));
             param->setValueNotifyingHost(normalised);
         }
+
+        expect(tracker.syncApvtsAndIsDirty(mapper, nameSyncer, model));
+        expect(tracker.isDirty(model));
+    }
+
+    void testApvtsNameEditIsDirtyViaSyncHelper()
+    {
+        beginTest("APVTS name edit via sync helper — dirty");
+
+        TestDirtyPatchProcessor processor;
+        Core::PatchModel model;
+        Core::ApvtsPatchMapper mapper(processor.apvts, model);
+        Core::PatchNameSyncer nameSyncer(processor.apvts, model);
+        Core::DirtyPatchTracker tracker;
+
+        model.setName("OLDNAME0");
+        mapper.bufferToApvts();
+        nameSyncer.bufferToApvts();
+        tracker.captureSnapshot(model);
+
+        expect(! tracker.syncApvtsAndIsDirty(mapper, nameSyncer, model));
+
+        processor.apvts.state.setProperty(
+            PluginIDs::PatchEditSection::PatchNameModule::kPatchName,
+            "NEWNAME1",
+            nullptr);
 
         expect(tracker.syncApvtsAndIsDirty(mapper, nameSyncer, model));
         expect(tracker.isDirty(model));
