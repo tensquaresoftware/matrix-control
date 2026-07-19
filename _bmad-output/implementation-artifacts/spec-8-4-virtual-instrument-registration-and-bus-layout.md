@@ -159,3 +159,17 @@ context:
 
 - Preference + master-gate unit coverage
   [`DeviceAudioInputPreferenceTests.cpp:1`](../../Tests/Unit/DeviceAudioInputPreferenceTests.cpp#L1)
+
+### Review Findings
+
+- [x] [Review][Decision] MASTER gate: Matrix-1000 allowlist vs `isMatrix6Family` — resolved: keep allowlist (MASTER only for detected Matrix-1000; Unknown stays blocked on MASTER). Whole-GUI gray + explicit footer when detected+Unknown deferred (out of 8-4 scope). Footer copy for non–Matrix-6 blocks → patch below.
+- [x] [Review][Decision] Master buffer sync while outbound gated — resolved: always `apvtsToBuffer`; gate SysEx `dispatch` only (no auto flush on re-allow).
+- [x] [Review][Patch] Always map master APVTS→buffer; gate only SysEx dispatch when outbound blocked [`PluginProcessor.cpp:1487`]
+- [x] [Review][Patch] Skip or neutralize child MASTER gray alpha when Compare/device root lock already dims the panel [`MasterEditPanel.cpp:91`]
+- [x] [Review][Patch] Footer: Matrix-6 copy only for Matrix-6 family; distinct/explicit copy when MASTER blocked for Unknown (not Matrix-6 wording) [`ModuleActionHandler.cpp:106`] [`MasterEditPanel.cpp:106`]
+- [x] [Review][Patch] Treat preferred Audio From as current only if id is still in the catalog; avoid combo fallback rewriting a wrong mono/stereo source [`PluginProcessor.cpp:1676`] [`PluginEditor.cpp:831`]
+- [x] [Review][Patch] Prevent keyboard interaction on grayed MASTER children after `giveAwayKeyboardFocus` [`MasterEditPanel.cpp:91`]
+- [x] [Review][Defer] Whole-GUI gray + explicit footer when `deviceDetected` and type is Unknown — deferred (product rule confirmed 2026-07-19; out of 8-4); follow-up story / correct course
+- [x] [Review][Defer] `updateDeviceStatus` sets `deviceDetected` before `deviceType` — deferred, pre-existing [`MidiManager.cpp:1134`]
+- [x] [Review][Defer] Defense-in-depth `sendMaster` MasterEditGate — deferred, pre-existing; known call sites already gated [`MidiManager.cpp:295`]
+- [x] [Review][Defer] No PluginProcessor/ModuleActionHandler integration tests beyond pure helpers — deferred, pre-existing coverage gap vs helper unit tests [`DeviceAudioInputPreferenceTests.cpp:1`]

@@ -1,5 +1,23 @@
 # Deferred Work
 
+## Deferred from: code review of spec-8-4-virtual-instrument-registration-and-bus-layout (2026-07-19)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-8-4-virtual-instrument-registration-and-bus-layout.md`
+  summary: When device is detected but type is Unknown (neither Matrix-1000 nor Matrix-6/6R), gray the entire GUI and show an explicit footer — product rule confirmed in 8-4 review; out of 8-4 scope (MASTER keep allowlist; footer wording patched in 8-4).
+  evidence: Decision 1 resolution 2026-07-19; follow-up story / correct course.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-8-4-virtual-instrument-registration-and-bus-layout.md`
+  summary: `MidiManager::updateDeviceStatus` sets `deviceDetected` before `deviceType`, so new MASTER/Audio From listeners can briefly see detected+stale/unknown type.
+  evidence: Blind Hunter; pre-existing property order, surfaced by 8.4 listeners.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-8-4-virtual-instrument-registration-and-bus-layout.md`
+  summary: `MidiManager::sendMaster` still gates only on editor outbound (`deviceDetected`), not `isMasterEditAllowed`; defense-in-depth hardening if new call sites appear.
+  evidence: Blind Hunter; current INIT/parameter paths already gated upstream.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-8-4-virtual-instrument-registration-and-bus-layout.md`
+  summary: Unit coverage stops at pure helpers (`preferredAudioFromKind` / `isMasterEditAllowed`); no harness that `PluginProcessor` skips mapper/dispatch or INIT no-ops on M-6.
+  evidence: Acceptance Auditor + Blind Hunter; helper tests lock the shared predicate.
+
 ## Deferred from: code review of spec-9-1-dirtypatchtracker (2026-07-19)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-9-1-dirtypatchtracker.md`
