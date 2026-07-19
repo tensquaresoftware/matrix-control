@@ -4,6 +4,7 @@
 #include "Modules/VibratoPanel.h"
 #include "Modules/MiscPanel.h"
 
+#include "Core/MIDI/EditorOutboundGate.h"
 #include "Core/MIDI/MasterEditGate.h"
 #include "Core/Services/DeviceTypeRegistry.h"
 #include "GUI/Helpers/GrayedControlHelper.h"
@@ -20,6 +21,28 @@
 #include "Shared/Definitions/PluginIDs.h"
 #include "GUI/Factories/WidgetFactory.h"
 
+namespace
+{
+    void setSubtreeKeyboardInteractionEnabled(juce::Component& root, bool enabled)
+    {
+        root.setWantsKeyboardFocus(enabled);
+        root.setMouseClickGrabsKeyboardFocus(enabled);
+
+        for (int i = 0; i < root.getNumChildComponents(); ++i)
+        {
+            if (auto* child = root.getChildComponent(i))
+                setSubtreeKeyboardInteractionEnabled(*child, enabled);
+        }
+    }
+
+    const char* masterBlockedFooterMessage(MatrixDeviceTypes::Type deviceType)
+    {
+        if (MatrixDeviceTypes::isMatrix6Family(deviceType))
+            return PluginDisplayNames::MasterEditSection::kMatrix6PatchOnlyFooterMessage;
+
+        return PluginDisplayNames::MasterEditSection::kUnsupportedDeviceFooterMessage;
+    }
+}
 
 MasterEditPanel::MasterEditPanel(TSS::ISkin& skin, const MasterEditPanelDimensions& dims, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : dims_(dims)
@@ -56,8 +79,11 @@ void MasterEditPanel::valueTreePropertyChanged(juce::ValueTree&,
                                                const juce::Identifier& property)
 {
     const auto propertyName = property.toString();
+    namespace MutatorState = PluginIDs::PatchManagerSection::PatchMutatorModule::StateProperties;
+
     if (propertyName == MatrixDeviceTypes::kApvtsPropertyName
-        || propertyName == "deviceDetected")
+        || propertyName == "deviceDetected"
+        || propertyName == MutatorState::kCompareActive)
     {
         refreshDeviceGating();
     }
@@ -73,9 +99,15 @@ void MasterEditPanel::refreshDeviceGating()
     const bool deviceDetected = static_cast<bool>(apvts_.state.getProperty("deviceDetected", false));
     const auto deviceType = Core::DeviceTypeRegistry::fromApvtsProperty(
         apvts_.state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
+    const bool compareActive = static_cast<bool>(apvts_.state.getProperty(
+        PluginIDs::PatchManagerSection::PatchMutatorModule::StateProperties::kCompareActive,
+        false));
 
-    // Align with Core master gate: only Matrix-1000 keeps MASTER interactive when detected.
-    const bool shouldGray = deviceDetected && ! Core::isMasterEditAllowed(deviceDetected, deviceType);
+    // Root Compare/device lock already dims the panel — skip child gray to avoid ~0.25 alpha.
+    const bool rootLocked = Core::isSectionLocked(deviceDetected, compareActive);
+    const bool shouldGray = ! rootLocked
+        && deviceDetected
+        && ! Core::isMasterEditAllowed(deviceDetected, deviceType);
     setMasterEditGrayed(shouldGray);
 }
 
@@ -86,6 +118,7 @@ void MasterEditPanel::applyGrayedToChild(juce::Component* child, bool grayed)
 
     TSS::GrayedControlHelper::applyGrayedAppearance(*child, grayed);
     child->setInterceptsMouseClicks(! grayed, ! grayed);
+    setSubtreeKeyboardInteractionEnabled(*child, ! grayed);
 }
 
 void MasterEditPanel::setMasterEditGrayed(bool grayed)
@@ -105,9 +138,9 @@ void MasterEditPanel::setMasterEditGrayed(bool grayed)
 
 void MasterEditPanel::showMatrix6PatchOnlyFooterMessage()
 {
-    TSS::GrayedControlHelper::setFooterInfoMessage(
-        apvts_,
-        PluginDisplayNames::MasterEditSection::kMatrix6PatchOnlyFooterMessage);
+    const auto deviceType = Core::DeviceTypeRegistry::fromApvtsProperty(
+        apvts_.state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
+    TSS::GrayedControlHelper::setFooterInfoMessage(apvts_, masterBlockedFooterMessage(deviceType));
 }
 
 void MasterEditPanel::mouseDown(const juce::MouseEvent& event)
