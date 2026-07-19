@@ -32,7 +32,7 @@ so that stock and optimised EPROMs are not overloaded (FR-7, NFR-2, PRD §9 #2 s
 1. `SysExDelayProfile` lives in `Source/Core/MIDI/Queue/SysExDelayProfile.{h,cpp}`, namespace `Core`. Zero GUI dependencies. Resolves **EPROM class** (`kStock` / `kOptimised`) and **device family** (`kMatrix1000` / `kMatrix6Or6R`) from Device Inquiry data (`DeviceIdInfo` or equivalent version string + member bytes). String matching rules for Tauntek / Gligli / Nordcore are documented in code comments and tested.
 2. `getDelayMs() const noexcept` returns the active minimum inter-SysEx gap in milliseconds:
    - **Stock M-1000:** 10 ms
-   - **Stock M-6 / 6R:** 20 ms
+   - **Stock M-6/6R:** 20 ms
    - **Optimised (any family):** shorter than stock — use named constants `kOptimisedDelayMsMatrix1000` and `kOptimisedDelayMsMatrix6` (placeholder values allowed; document `// SM-1 hardware gate may tune` in source)
 3. `SysExInterMessageDelay` lives in `Source/Core/MIDI/Queue/SysExInterMessageDelay.{h,cpp}`, namespace `Core`. Holds a `SysExDelayProfile`, tracks timestamp of last SysEx send, and exposes **testable** API (no hidden wall-clock in untestable private methods):
    - `int millisUntilNextAllowed(juce::int64 nowMs) const noexcept` — returns 0 when next SysEx may send, else remaining wait
@@ -105,7 +105,7 @@ Story 2.2 builds the profile + gate and migrates the **existing** synchronous `s
 
 ### Delay Profile Table (D-078)
 
-| Profile | Detection | M-1000 delay | M-6 / 6R delay |
+| Profile | Detection | M-1000 delay | M-6/6R delay |
 |---|---|---|---|
 | **Stock** | Default; factory Oberheim version string | **10 ms** | **20 ms** |
 | **Optimised** | Version contains `TAUNTEK`, `GLIGLI`, or `NORDCORE` (case-insensitive substring) | **&lt; 10 ms** (constant TBD, suggest **5 ms** placeholder) | **&lt; 20 ms** (constant TBD, suggest **10 ms** placeholder) |
@@ -121,7 +121,7 @@ Source: [addendum.md § SysEx delay profiles], [architecture.md:56], [oberheim-m
 | Device | Member bytes (Oberheim spec) | Story 2.2 mapping |
 |---|---|---|
 | Matrix-1000 | `memb-lo=0x02`, `memb-hi=0x00` | `kMatrix1000` |
-| Matrix-6 / 6R | TBD on hardware (Epic 8) | `kMatrix6Or6R` when member pattern known; else fall back to `kMatrix1000` delay table with comment |
+| Matrix-6/6R | TBD on hardware (Epic 8) | `kMatrix6Or6R` when member pattern known; else fall back to `kMatrix1000` delay table with comment |
 
 **Known bug D-080:** `SysExConstants::DeviceInquiry::kExpectedMemberLow/High` may be swapped vs Oberheim spec. Do **not** fix member-byte validation in this story unless required for profile tests — Epic 8 Story 8-1 owns the fix. Profile code should use decoded `DeviceIdInfo` values as-is; add a unit test with explicit member bytes independent of `kExpected*` constants.
 

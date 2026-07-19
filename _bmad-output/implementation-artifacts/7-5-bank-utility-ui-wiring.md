@@ -320,7 +320,7 @@ Composer 2.5
 - Builds green: `Matrix-Control_Tests`, `Matrix-Control_VST3`, `Matrix-Control_Standalone` (macOS Debug ARM64).
 - Full test suite passed (1830 tests, exit 0).
 - **Manual UAT (2026-07-11, Guillaume):** Matrix-1000 + Tauntek EPROM v1.20 — smoke checklist **PASS** (items 1–5, 7). Item 6 (Matrix-6 graying) **not exercised** — no Matrix-6/6R hardware available.
-- **Testing debt:** Need a first-class **device-type simulation harness** (Matrix-1000 / Matrix-6 / Matrix-6R) for manual UAT and future stories — see `Documentation/Development/Plans/2026/06/2026-06-19-Matrix-6-6R-User-Acceptance-Test-Grid.md` Appendix C. Today: partial APVTS override (Appendix A) + CI handler tests only.
+- **Testing debt:** Need a first-class **device-type simulation harness** (Matrix-1000 / Matrix-6/6R) for manual UAT and future stories — see `Documentation/Development/Plans/2026/06/2026-06-19-Matrix-6-6R-User-Acceptance-Test-Grid.md` Appendix C. Today: partial APVTS override (Appendix A) + CI handler tests only.
 
 ### File List
 

@@ -41,7 +41,7 @@ so that Patch Manager buttons behave per PRD (FR-19–FR-24).
 
 2. **And** bank selection + navigation (already partially implemented) **also enqueue synth selection MIDI**:
    - **Matrix-1000** (`limits.hasBankConcept()`): on bank change → Set Bank SysEx **0x0A** with bank 0–9; on patch change → Program Change with patch 0–99; order **Set Bank before Program Change** when both change in one action.
-   - **Matrix-6 / Matrix-6R**: Program Change only (patch 0–99); **never** enqueue Set Bank **0x0A** or Unlock **0x0C**.
+   - **Matrix-6/6R**: Program Change only (patch 0–99); **never** enqueue Set Bank **0x0A** or Unlock **0x0C**.
    - Bank Utility buttons remain no-ops when `!limits.hasBankConcept()` (existing guard preserved).
 
 3. **And** **UNLOCK** action (FR-20 corrected — see Story **7-3b**):

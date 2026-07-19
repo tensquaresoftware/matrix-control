@@ -89,7 +89,7 @@ Unchanged from 7-3b:
 
 After UNLOCK, user may use **synth front panel** for 3-digit entry. If user continues **plugin** Prev/Next without re-selecting bank, hardware may diverge (Matrix-1000 may reset bank context on `0CH`). **Accept** — not a plugin bug; document in footer/tooltip. **Do not** add Set Bank + silent Unlock hacks.
 
-### 3.5 Matrix-6 / Matrix-6R
+### 3.5 Matrix-6/6R
 
 Unchanged: bank utility grayed; no `0AH`/`0CH`.
 

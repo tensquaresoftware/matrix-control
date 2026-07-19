@@ -26,7 +26,7 @@ You do not need to write code to contribute. Here are several ways you can help:
 - **Report a bug** — unexpected behaviour, crashes, or incorrect MIDI output
 - **Suggest a feature** — something that would make Matrix-Control more useful or enjoyable
 - **Improve documentation** — typos, unclear explanations, missing build instructions
-- **Test on hardware** — if you own a Matrix-1000 (or a Matrix-6 / Matrix-6R), your feedback on real-hardware behaviour is invaluable
+- **Test on hardware** — if you own a Matrix-1000 (or a Matrix-6/6R), your feedback on real-hardware behaviour is invaluable
 - **Contribute code** — bug fixes, new features, performance improvements
 - **Sponsor the project** — see [Supporting the Project](https://claude.ai/chat/16b5619a-506c-4e52-9a86-10a1574ec048#supporting-the-project)
 

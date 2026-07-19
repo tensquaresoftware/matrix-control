@@ -129,7 +129,7 @@ Epic 8 = synth connection & instrument role. Story order in sprint status: **8.1
 
 ### D-080 and Oberheim member bytes
 
-| Field | Matrix-1000 (authoritative) | Matrix-6 / 6R |
+| Field | Matrix-1000 (authoritative) | Matrix-6/6R |
 |-------|----------------------------|---------------|
 | Manufacturer | `10H` | same family expected |
 | Family lo/hi | `06H` / `00H` | same |
@@ -234,7 +234,7 @@ Composer (Cursor agent router)
 
 ### Completion Notes List
 
-**Hardware verification note (AC #4 / PRD §9 #6):** Matrix-6 / Matrix-6R Universal Device Inquiry member bytes remain **unconfirmed on hardware**. The provisional mapping `kMatrix6MemberLow/High = 0x01/0x00` → `MatrixDeviceTypes::Type::kMatrix6` is intentional until UAT. Distinct Matrix-6R member bytes are **unknown** and are **not** invented from inquiry; `kMatrix6R` stays available only via APVTS / manual override.
+**Hardware verification note (AC #4 / PRD §9 #6):** Matrix-6/6R Universal Device Inquiry member bytes remain **unconfirmed on hardware**. The provisional mapping `kMatrix6MemberLow/High = 0x01/0x00` → `MatrixDeviceTypes::Type::kMatrix6` is intentional until UAT. Distinct Matrix-6R member bytes are **unknown** and are **not** invented from inquiry; `kMatrix6R` stays available only via APVTS / manual override.
 
 **Implementation summary:**
 - Audited D-080 constants (`0x02`/`0x00`); fixed stale `Member: 0x10 0x02` comment; registry continues to use `SysExConstants` only

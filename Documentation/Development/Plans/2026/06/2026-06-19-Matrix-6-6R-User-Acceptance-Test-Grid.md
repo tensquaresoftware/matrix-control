@@ -1,4 +1,4 @@
-# Matrix-6 / Matrix-6R — User Acceptance Test Grid
+# Matrix-6/6R — User Acceptance Test Grid
 
 Living document for structured manual UAT on Matrix-6 and Matrix-6R hardware (or controlled simulation).  
 Update **Session log** and row **Result** columns after each test pass.
@@ -28,7 +28,7 @@ Full UAT still requires real Matrix-6/6R for inquiry, SysEx, and display behavio
 |-------|-------|
 | **Tester** | |
 | **Build** | Standalone Debug / VST3 — commit `________` |
-| **Synth** | Matrix-6 / Matrix-6R — firmware `________` |
+| **Synth** | Matrix-6/6R — firmware `________` |
 | **MIDI** | Input / Output ports |
 | **Host** (if VST3) | |
 | **deviceType (APVTS)** | `Matrix-6` / `Matrix-6R` / inquiry auto |
@@ -138,7 +138,7 @@ Use only for **UI / handler dry-runs** while Matrix-1000 is connected. Do not re
 
 ## Appendix C — Device-type simulation harness (backlog)
 
-**Problem:** Guillaume's lab has **Matrix-1000 only** (Tauntek EPROM v1.20). Many features (Bank Utility graying, memory limits, inquiry identity) need Matrix-6 / Matrix-6R behaviour that cannot be validated on real hardware today.
+**Problem:** Guillaume's lab has **Matrix-1000 only** (Tauntek EPROM v1.20). Many features (Bank Utility graying, memory limits, inquiry identity) need Matrix-6/6R behaviour that cannot be validated on real hardware today.
 
 **Current workarounds (insufficient for full UAT):**
 

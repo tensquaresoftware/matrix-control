@@ -155,7 +155,7 @@ Répartition des six voix : 6/0, 4/2, 2/4 ou 0/6 (nombre de voix pour Lower / Up
 
 ## 7. Format général des messages SysEx Oberheim
 
-Structure de tout message SysEx Matrix-6 / Matrix-6R :
+Structure de tout message SysEx Matrix-6/6R :
 
 ```
 F0H   10H   [identifiant appareil]   [code opération]   [données…]   F7H
@@ -165,7 +165,7 @@ F0H   10H   [identifiant appareil]   [code opération]   [données…]   F7H
 |---|---|
 | `F0H` | Début SysEx |
 | `10H` | Identifiant fabricant Oberheim |
-| Identifiant appareil | **`06H`** — format natif Matrix-6 / Matrix-6R |
+| Identifiant appareil | **`06H`** — format natif Matrix-6/6R |
 | | **`02H`** — format compatible Matrix-12 / Xpander (accepté à la **réception** ; le Matrix-6 **émet** en `06H`) |
 | `F7H` | Fin du message (EOX) |
 
@@ -342,9 +342,9 @@ Comme sur le Matrix-1000 : chaque octet de données est envoyé en **deux demi-o
 
 ---
 
-## 11. Comparaison Matrix-1000 / Matrix-6 / Matrix-6R
+## 11. Comparaison Matrix-1000 / Matrix-6/6R
 
-| Sujet | Matrix-1000 | Matrix-6 / Matrix-6R |
+| Sujet | Matrix-1000 | Matrix-6/6R |
 |---|---|---|
 | Taille patch simple packé | 134 octets | **Identique** |
 | Taille master packé | 172 octets | **236 octets** |
@@ -387,13 +387,13 @@ La spec communautaire Matrix-6 **ne décrit pas** l’interrogation universelle.
 | Champ | Matrix-1000 (officiel) |
 |---|---|
 | Fabricant | `10H` Oberheim |
-| Famille (octet bas) | `06H` — famille Matrix-6 / Matrix-6R / Matrix-1000 |
+| Famille (octet bas) | `06H` — famille Matrix-6/6R / Matrix-1000 |
 | Famille (octet haut) | `00H` |
 | Membre (octet bas) | **`02H`** — identifie le **Matrix-1000** |
 | Membre (octet haut) | **`00H`** |
 | Version | 4 caractères ASCII, alignés à droite (ex. espaces + `110` = version 1.10) |
 
-**Matrix-6 / Matrix-6R :** les octets « membre » ne sont **pas** documentés dans les fichiers archivés ; ils diffèrent probablement du Matrix-1000. À confirmer en envoyant la demande et en lisant la réponse sur le matériel.
+**Matrix-6/6R :** les octets « membre » ne sont **pas** documentés dans les fichiers archivés ; ils diffèrent probablement du Matrix-1000. À confirmer en envoyant la demande et en lisant la réponse sur le matériel.
 
 ---
 
@@ -422,7 +422,7 @@ La spec communautaire Matrix-6 **ne décrit pas** l’interrogation universelle.
 
 ---
 
-## 14. Astuce — Volume MIDI sur Matrix-6 / Matrix-6R
+## 14. Astuce — Volume MIDI sur Matrix-6/6R
 
 Pour moduler le volume via le **Control Change 7 (Volume)** routé comme Pédale 1, pilotant l’enveloppe 2 → VCA 2 :
 

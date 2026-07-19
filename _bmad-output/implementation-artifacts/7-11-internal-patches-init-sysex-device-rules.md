@@ -30,7 +30,7 @@ so that INIT matches my Matrix-1000 Editor prototype on M-1000 and writes the cu
 
 1. **Given** Story 7.3 INIT template path (`PatchInitService`, suppress flags, footer) **When** user triggers `internalPatchesInit` on **Matrix-1000** (`limits.hasBankConcept() == true`) **Then** handler loads template → APVTS (unchanged suppress pattern) **and** enqueues **one** SysEx **0x0D** (Single Patch Data to Edit Buffer) via `MidiManager::sendPatchToEditBuffer` **And** **no** 0x01 patch-number message on INIT.
 
-2. **And** **Given** device type **Matrix-6 / Matrix-6R** (`!limits.hasBankConcept()`) **When** user triggers INIT **Then** handler loads template → APVTS **and** enqueues **0x01** Single Patch Data to **current patch number** (same packed buffer path as PASTE/STORE) **And** **never** sends 0x0D or 0x0E.
+2. **And** **Given** device type **Matrix-6/6R** (`!limits.hasBankConcept()`) **When** user triggers INIT **Then** handler loads template → APVTS **and** enqueues **0x01** Single Patch Data to **current patch number** (same packed buffer path as PASTE/STORE) **And** **never** sends 0x0D or 0x0E.
 
 3. **And** INIT is **blocked** on ROM banks (same FR-23 gating as PASTE/STORE — UI grayed + handler defense-in-depth); footer info/warning from `InitTemplateLoadResult` unchanged on allowed banks.
 

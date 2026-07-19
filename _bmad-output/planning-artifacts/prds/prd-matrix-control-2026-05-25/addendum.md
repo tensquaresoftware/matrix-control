@@ -85,7 +85,7 @@ Reference: `_bmad-output/reference-docs/oberheim/oberheim-matrix-1000-midi-sysex
 
 ## PatchModel / MasterModel (D-057)
 
-- **PatchModel:** 134-byte packed buffer (Matrix-1000 / Matrix-6 / Matrix-6R PATCH); bytes **0–7** = patch name (6-bit ASCII per char); accessors `getPatchName` / `setPatchName` on buffer.
+- **PatchModel:** 134-byte packed buffer (Matrix-1000 / Matrix-6/6R PATCH); bytes **0–7** = patch name (6-bit ASCII per char); accessors `getPatchName` / `setPatchName` on buffer.
 - **MasterModel:** 172-byte packed buffer (Matrix-1000 only in v1). Matrix-6/6R master is **236 bytes** — v2 when MASTER EDIT ships (D-006).
 - **ApvtsPatchMapper / ApvtsMasterMapper:** read/write APVTS ↔ buffer using `sysExId` and `sysExOffset` from `PluginDescriptors` only — **no parallel offset table**.
 - APVTS remains UI value source of truth; buffer is SysEx serialization view.
@@ -246,14 +246,14 @@ Init templates loaded via **InitTemplateLoader** — not Computer Patches combob
 
 **Reply:** Device ID `F0 7E <chan> 06 02 <mfg> <fam-lo> <fam-hi> <memb-lo> <memb-hi> <rev-0..3> F7`
 
-| Field | Matrix-1000 (documented) | Matrix-6 / 6R |
+| Field | Matrix-1000 (documented) | Matrix-6/6R |
 |---|---|---|
 | `<mfg>` | `10H` Oberheim | same |
 | `<fam-lo>` / `<fam-hi>` | `06H` / `00H` | same |
 | `<memb-lo>` / `<memb-hi>` | **`02H` / `00H`** | **TBD — hardware confirm** (open question PRD §9) |
 | `<rev-0..3>` | ASCII firmware, right-justified | same pattern |
 
-**APVTS properties:** `deviceDetected`, `deviceType` (enum: Matrix-1000 / Matrix-6 / Matrix-6R), `deviceVersion` (four-char string).
+**APVTS properties:** `deviceDetected`, `deviceType` (enum: Matrix-1000 / Matrix-6/6R), `deviceVersion` (four-char string).
 
 **UI placement:** device type + firmware → **footer right zone** (FR-53), not header.
 
@@ -267,7 +267,7 @@ Init templates loaded via **InitTemplateLoader** — not Computer Patches combob
 
 Minimum gap **after EOX** before the next outbound SysEx (or next patch dump). Profile selected from Device Inquiry firmware string / EPROM class.
 
-| Profile | When | M-1000 baseline | M-6 / 6R baseline |
+| Profile | When | M-1000 baseline | M-6/6R baseline |
 |---|---|---|---|
 | **Stock** | Factory Oberheim firmware | **10 ms** (official) | **20 ms** (M-6 ref) |
 | **Optimised** | Tauntek / Gligli / Nordcore (string match TBD) | Shorter than stock (Architecture + hardware test) | Shorter than stock (TBD) |

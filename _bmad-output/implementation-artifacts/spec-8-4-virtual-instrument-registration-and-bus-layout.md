@@ -84,7 +84,7 @@ context:
 **Execution:**
 - [x] `CMakeLists.txt` + `PluginProcessor` buses -- verify instrument + AD-11 hosted/standalone; document-only if already correct -- close FR-4 registration / bus AC without churn
 - [x] `MatrixDeviceTypes` / small helper + `PluginProcessor`/`PluginEditor`/`AudioInputSourceCatalog` -- on standalone `deviceType` change after inquiry, prefer mono (M-1000) or stereo (M-6/6R) Audio From default/guidance without changing stereo bus declaration -- FR-4 standalone consequence
-- [x] Unit test preferred-layout helper -- cover M-1000 / M-6 / 6R / unknown -- lock I/O matrix
+- [x] Unit test preferred-layout helper -- cover M-1000 / M-6/6R / unknown -- lock I/O matrix
 - [x] `MasterEditPanel` + `PluginDisplayNames` -- ValueTree listener on `deviceDetected`/`deviceType`; gray children when M-6 family; footer on blocked use -- FR-46 GUI
 - [x] `ModuleActionHandler` + `PluginProcessor` master dispatch -- no-op master INIT and master parameter SysEx when M-6 family -- fail-closed like 8.5 banks
 - [x] Unit tests for master Core gates -- M-6 no-op / M-1000 still sends when outbound allowed -- regression

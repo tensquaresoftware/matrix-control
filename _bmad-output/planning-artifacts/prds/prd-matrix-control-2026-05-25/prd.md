@@ -111,7 +111,7 @@ Alex loads a patch from the synth. The **History M** combobox shows `<EMPTY>`; *
 The system performs Universal Device Inquiry when MIDI ports are configured, parses the Device ID reply, and reports detection via APVTS properties (`deviceDetected`, `deviceType`, `deviceVersion`).
 
 **Consequences (testable):**
-- Valid Oberheim Matrix family response sets `deviceDetected=true`, sets `deviceType` (Matrix-1000 / Matrix-6 / Matrix-6R) from Device ID member bytes, and displays firmware version in the **footer** right zone (FR-53).
+- Valid Oberheim Matrix family response sets `deviceDetected=true`, sets `deviceType` (Matrix-1000 / Matrix-6/6R) from Device ID member bytes, and displays firmware version in the **footer** right zone (FR-53).
 - Matrix-1000, Matrix-6, and Matrix-6R are accepted for v1 PATCH workflows; Matrix-6/6R trigger MASTER EDIT graying (FR-46).
 - Timeout or incompatible device sets `deviceDetected=false` and locks all editing actions.
 - Member-byte parsing follows Oberheim reference docs (D-079); fix known `SysExConstants` member-byte order mismatch during implementation (D-080).
@@ -507,7 +507,7 @@ Non-blocking footer displays errors, warnings, and informational messages (`uiMe
 
 #### FR-53: Footer device identity
 
-Footer **right zone** displays detected **device type** (Matrix-1000 / Matrix-6 / Matrix-6R) and **firmware version** string from Device Inquiry (FR-1). Hidden or placeholder when `deviceDetected=false`.
+Footer **right zone** displays detected **device type** (Matrix-1000 / Matrix-6/6R) and **firmware version** string from Device Inquiry (FR-1). Hidden or placeholder when `deviceDetected=false`.
 
 #### FR-45: Graying rules
 

@@ -34,7 +34,7 @@ so that I can navigate and store patches 00–99 without Matrix-1000 bank semant
 | Model | Banks | Patches per scope | Total internal patches |
 |-------|-------|-------------------|--------------------------|
 | Matrix-1000 | 10 (0–9; 0–1 RAM, 2–9 ROM) | 00–99 per bank | 1000 |
-| Matrix-6 / Matrix-6R | *none* | 00–99 | 100 |
+| Matrix-6/6R | *none* | 00–99 | 100 |
 
 `Matrix1000Limits.h` today encodes the M-1000 model only. M-6/6R have no Set Bank opcode (`0x0A` — M-1000 only per Oberheim refs). FR-46 currently covers MASTER EDIT graying only; this story adds **patch-memory semantics**.
 
@@ -53,7 +53,7 @@ so that I can navigate and store patches 00–99 without Matrix-1000 bank semant
 
 1. Add a small Core helper (preferred location: `Source/Core/Services/DeviceMemoryLimits.{h,cpp}` or method on `DeviceTypeRegistry` from Story 8.1) exposing a read-only view, e.g. `DeviceMemoryLimits`, resolved from `deviceType`:
    - **Matrix-1000:** `hasBankConcept=true`, banks `Matrix1000Limits::kMinBankNumber`–`kMaxBankNumber`, patches `kMinPatchNumber`–`kMaxPatchNumber`, `hasRomBanks=true` (banks 2–9).
-   - **Matrix-6 / Matrix-6R:** `hasBankConcept=false`, patches `Matrix6Or6RLimits::kMinPatchNumber`–`kMaxPatchNumber`, `hasRomBanks=false`.
+   - **Matrix-6/6R:** `hasBankConcept=false`, patches `Matrix6Or6RLimits::kMinPatchNumber`–`kMaxPatchNumber`, `hasRomBanks=false`.
    - **Unknown / not detected:** default to Matrix-1000 limits until inquiry succeeds (safe superset); re-resolve when `deviceType` updates.
 2. All patch/bank validation in Core (handlers, `MidiManager` navigation, Program Change / patch-request paths) consults this helper — **no** scattered `if (deviceType == …)` with magic numbers.
 3. GUI panels receive limits via APVTS `deviceType` listener + helper, or via properties pushed by Core — **no** GUI include of Core services beyond existing processor/editor patterns.

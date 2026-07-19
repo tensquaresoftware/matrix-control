@@ -33,7 +33,7 @@ updated: 2026-07-14
 
 **Expected behaviour (Guillaume prototype + Oberheim M-1000):**
 
-| Action | Matrix-1000 | Matrix-6 / 6R |
+| Action | Matrix-1000 | Matrix-6/6R |
 |--------|-------------|---------------|
 | **INIT** | SysEx **0x0D** — Single Patch Data to **edit buffer** | SysEx **0x01** — Single Patch Data to **current patch number** (no edit-buffer opcodes) |
 | **STORE** | Unchanged v1 — **0x01** to current patch slot (smoke 10 OK) | Unchanged — **0x01** |
