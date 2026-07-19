@@ -120,7 +120,7 @@ Use the MCP tool `rename_chat` (`cursor-app-control`). Cursor rule: `.cursor/rul
 
 Story IDs include epic-story numbers (`4-5`, `7-3b`) and utility stories (`U-0`, `U-11`).
 
-**Persistence:** only `rename_chat` writes the title durably. The bulk script `_local/rename-bmad-agent-chats.py` updates the sidebar cache only — opening a conversation restores the old auto-generated title from the checkpoint. To fix existing conversations, open each one and send any message; the agent will rename via `rename_chat` on first reply.
+**Persistence:** only `rename_chat` writes the title durably. The bulk script `_local/BMad/rename-bmad-agent-chats.py` updates the sidebar cache only — opening a conversation restores the old auto-generated title from the checkpoint. To fix existing conversations, open each one and send any message; the agent will rename via `rename_chat` on first reply.
 
 ---
 
