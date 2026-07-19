@@ -42,6 +42,7 @@
 #include "Core/MIDI/SysEx/SysExParser.h"
 #include "Core/Services/ClipboardPasteEnabledResolver.h"
 #include "Core/Services/ClipboardService.h"
+#include "Core/Services/DirtyPatchTracker.h"
 #include "Core/Services/DeviceMemoryLimits.h"
 #include "Core/Services/DeviceTypeRegistry.h"
 #include "Shared/Definitions/PluginAudioConstants.h"
@@ -169,6 +170,7 @@ PluginProcessor::PluginProcessor()
     , apvtsMasterMapper_{ std::make_unique<Core::ApvtsMasterMapper>(apvts, *masterModel_) }
     , patchNameSyncer_{ std::make_unique<Core::PatchNameSyncer>(apvts, *patchModel_) }
     , clipboardService_{ std::make_unique<Core::ClipboardService>() }
+    , dirtyPatchTracker_{ std::make_unique<Core::DirtyPatchTracker>() }
 {
     patchParameterSysExDispatcher_ = std::make_unique<Core::PatchParameterSysExDispatcher>(
         *patchModel_,

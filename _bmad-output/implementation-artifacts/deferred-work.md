@@ -1,5 +1,15 @@
 # Deferred Work
 
+## Deferred from: quick-dev review of spec-9-1-dirtypatchtracker (2026-07-19)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-9-1-dirtypatchtracker.md`
+  summary: PluginProcessor owns DirtyPatchTracker but exposes no getter and has no production captureSnapshot call sites (load/save/STORE); Story 9.2 must wire access and snapshot refresh.
+  evidence: Blind Hunter + Edge Case Hunter; intentional 9.1 Ask First default left capture out of handlers; member only constructed in PluginProcessor init list.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-9-1-dirtypatchtracker.md`
+  summary: Story 9.2 capture sites must sync APVTS→PatchModel (mapper + PatchNameSyncer) before captureSnapshot so the baseline matches live UI state.
+  evidence: Edge Case Hunter; captureSnapshot stores whatever bytes are in the model; unsynced capture can skew dirty checks until handlers define sync-before-capture.
+
 ## Deferred from: code review of spec-compare-copy-button-red-active-text (2026-07-17)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-compare-copy-button-red-active-text.md`

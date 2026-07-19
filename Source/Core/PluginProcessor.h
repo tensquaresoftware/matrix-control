@@ -45,6 +45,7 @@ namespace Core
     class AudioPassthroughProcessor;
     class MidiActivityTracker;
     class ClipboardService;
+    class DirtyPatchTracker;
     class PatchFileService;
     class PatchMutatorEngine;
     class ActionDispatcher;
@@ -329,6 +330,7 @@ private:
     std::unique_ptr<Core::PatchInitService> patchInitService_;
     std::unique_ptr<Core::PatchSelectionMidiSync> patchSelectionMidiSync_;
     std::unique_ptr<Core::ClipboardService> clipboardService_;
+    std::unique_ptr<Core::DirtyPatchTracker> dirtyPatchTracker_;
     std::unique_ptr<Core::PatchFileService> patchFileService_;
     std::unique_ptr<Core::PatchMutatorEngine> patchMutatorEngine_;
     PatchFolderPicker patchFolderPicker_;
