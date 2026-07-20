@@ -1,0 +1,42 @@
+---
+description: Harden plain-French clarity for all BMad explanations, questions, and decisions
+alwaysApply: true
+---
+
+# BMad — barème de clarté (NON NÉGOCIABLE)
+
+SSOT détaillé : `_bmad/custom/clarity-bar-fr.md` — **lire et appliquer** pour tout chat BMad listé ci-dessous.
+
+## Scope
+
+`bmad-create-story` · `bmad-dev-story` · `bmad-quick-dev` · `bmad-code-review`  
+(et toute session qui suit ces workflows)
+
+## Hard fact
+
+Guillaume a souvent dû demander une reformulation pour comprendre.  
+Si un message nécessiterait encore « Reformule en langage naturel, sans jargon excessif », **il n’est pas prêt** — réécrire avant envoi. La première version doit déjà passer.
+
+## Applies to every chat turn
+
+Not only reviews — **every** explanation, question, and decision:
+
+1. **Intention produit d’abord** (ce que ça change pour l’usage), pas les fichiers.
+2. **Français parlé**, phrases complètes — pas de télégraphique, pas de pile d’anglais technique.
+3. Terme technique indispensable → **glose courte** à la première occurrence.
+4. Chemins / IDs / symboles → **ligne complémentaire en bas**, jamais dans la phrase porteuse de sens.
+5. **Question / décision** → question claire seule + options en verbes du quotidien + **Recommandation BMad** (option + pourquoi clair + confiance).
+
+## Forbidden openers / dumps
+
+- `Fix X + Y + Z`, titres opaques, extraits story/diff collés tels quels
+- Jargon BMad brut non traduit (`oneshot`, `draft`, `decision-needed`, `AC#…`)
+- Une phrase qui empile chemin + critère + classe C++ + jargon
+
+## Self-check (all must pass)
+
+1. Compréhensible en ~20 s sans connaître les noms de fichiers ?
+2. Phrase-test « Reformule… » → je **ne** reformulerais **pas** ?
+3. Si décision : options quotidiennes + Recommandation BMad aussi claire que le reste ?
+
+Any fail → rewrite before sending.

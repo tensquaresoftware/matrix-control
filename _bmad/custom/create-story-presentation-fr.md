@@ -4,7 +4,7 @@ Ce document s’applique à **toute** sortie utilisateur de `bmad-create-story` 
 
 **Barème partagé (obligatoire) :** charger et appliquer `clarity-bar-fr.md` en premier.
 
-**Rappel phrase-test :** si Guillaume dirait « Reformule en langage naturel, sans jargon excessif », **réécrire** avant d’envoyer.
+**Rappel phrase-test :** si Guillaume dirait « Reformule en langage naturel, sans jargon excessif », **réécrire** avant d’envoyer — y compris pour **chaque** question et décision. SSOT : `clarity-bar-fr.md` + `.cursor/rules/bmad-clarity-bar.mdc`.
 
 ---
 

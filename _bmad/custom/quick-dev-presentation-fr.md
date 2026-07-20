@@ -5,7 +5,7 @@ Il prime sur le style télégraphique des étapes internes et des sous-agents.
 
 **Barème partagé (obligatoire) :** charger et appliquer `clarity-bar-fr.md` en premier. Rien ici n’assouplit ce barème.
 
-**Rappel phrase-test :** avant chaque message important, si Guillaume dirait « Reformule en langage naturel, sans jargon excessif », **réécrire**.
+**Rappel phrase-test :** avant **chaque** message (explication, question, décision, bilan, constat), si Guillaume dirait « Reformule en langage naturel, sans jargon excessif », **réécrire**. Voir aussi `clarity-bar-fr.md` (SSOT) et `.cursor/rules/bmad-clarity-bar.mdc`.
 
 ---
 

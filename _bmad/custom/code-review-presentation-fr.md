@@ -5,7 +5,7 @@ Il prime sur le style des sous-agents et des étapes internes du workflow.
 
 **Barème partagé (obligatoire) :** charger et appliquer `clarity-bar-fr.md` en premier. Tout ce qui suit **ajoute** la structure revue ; rien n’assouplit le barème.
 
-**Rappel phrase-test :** la première présentation d’un constat doit déjà être aussi claire que si Guillaume venait de dire « Reformule en langage naturel, sans jargon excessif ». S’il devrait le dire, **réécrire**.
+**Rappel phrase-test :** la première présentation d’un constat doit déjà être aussi claire que si Guillaume venait de dire « Reformule en langage naturel, sans jargon excessif ». S’il devrait le dire, **réécrire**. Même exigence pour **chaque** question et décision de la revue. SSOT : `clarity-bar-fr.md` + `.cursor/rules/bmad-clarity-bar.mdc`.
 
 ---
 
