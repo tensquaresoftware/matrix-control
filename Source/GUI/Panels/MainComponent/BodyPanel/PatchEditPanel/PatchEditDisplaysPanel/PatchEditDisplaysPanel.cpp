@@ -1,10 +1,41 @@
 #include "PatchEditDisplaysPanel.h"
 
+#include "Modules/EnvelopeDisplayApvtsBinding.h"
 #include "Modules/PatchNameDisplayPanel.h"
 
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Looks/LookBuilders.h"
 #include "GUI/Skins/ISkin.h"
+#include "Shared/Definitions/PluginIDs.h"
+
+namespace
+{
+    using EnvIds = EnvelopeDisplayApvtsBinding::ParameterIds;
+
+    const EnvIds kEnvelope1ParameterIds {{
+        PluginIDs::PatchEditSection::Envelope1Module::ParameterWidgets::kDelay,
+        PluginIDs::PatchEditSection::Envelope1Module::ParameterWidgets::kAttack,
+        PluginIDs::PatchEditSection::Envelope1Module::ParameterWidgets::kDecay,
+        PluginIDs::PatchEditSection::Envelope1Module::ParameterWidgets::kSustain,
+        PluginIDs::PatchEditSection::Envelope1Module::ParameterWidgets::kRelease
+    }};
+
+    const EnvIds kEnvelope2ParameterIds {{
+        PluginIDs::PatchEditSection::Envelope2Module::ParameterWidgets::kDelay,
+        PluginIDs::PatchEditSection::Envelope2Module::ParameterWidgets::kAttack,
+        PluginIDs::PatchEditSection::Envelope2Module::ParameterWidgets::kDecay,
+        PluginIDs::PatchEditSection::Envelope2Module::ParameterWidgets::kSustain,
+        PluginIDs::PatchEditSection::Envelope2Module::ParameterWidgets::kRelease
+    }};
+
+    const EnvIds kEnvelope3ParameterIds {{
+        PluginIDs::PatchEditSection::Envelope3Module::ParameterWidgets::kDelay,
+        PluginIDs::PatchEditSection::Envelope3Module::ParameterWidgets::kAttack,
+        PluginIDs::PatchEditSection::Envelope3Module::ParameterWidgets::kDecay,
+        PluginIDs::PatchEditSection::Envelope3Module::ParameterWidgets::kSustain,
+        PluginIDs::PatchEditSection::Envelope3Module::ParameterWidgets::kRelease
+    }};
+}
 
 PatchEditDisplaysPanel::~PatchEditDisplaysPanel() = default;
 
@@ -23,6 +54,9 @@ PatchEditDisplaysPanel::PatchEditDisplaysPanel(TSS::ISkin& skin, const PatchEdit
           dims_.patchName,
           dims_.moduleHeader,
           apvts))
+    , envelope1Binding_(std::make_unique<EnvelopeDisplayApvtsBinding>(*apvts_, envelope1Display_, kEnvelope1ParameterIds))
+    , envelope2Binding_(std::make_unique<EnvelopeDisplayApvtsBinding>(*apvts_, envelope2Display_, kEnvelope2ParameterIds))
+    , envelope3Binding_(std::make_unique<EnvelopeDisplayApvtsBinding>(*apvts_, envelope3Display_, kEnvelope3ParameterIds))
 {
     setOpaque(false);
     setSize(dims_.width, dims_.height);
