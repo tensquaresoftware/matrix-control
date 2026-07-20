@@ -1,6 +1,5 @@
 #include "PatchEditDisplaysPanel.h"
 
-#include "Modules/InteractiveDisplayApvtsSync.h"
 #include "Modules/PatchNameDisplayPanel.h"
 
 #include "GUI/Layout/ScaledLayout.h"
@@ -24,30 +23,15 @@ PatchEditDisplaysPanel::PatchEditDisplaysPanel(TSS::ISkin& skin, const PatchEdit
           dims_.patchName,
           dims_.moduleHeader,
           apvts))
-    , apvtsSync_(std::make_unique<InteractiveDisplayApvtsSync>(
-        apvts,
-        envelope1Display_,
-        envelope2Display_,
-        envelope3Display_,
-        trackGeneratorDisplay_))
 {
     setOpaque(false);
     setSize(dims_.width, dims_.height);
-
-    apvtsSync_->syncAllFromApvts();
 
     addAndMakeVisible(envelope1Display_);
     addAndMakeVisible(envelope2Display_);
     addAndMakeVisible(envelope3Display_);
     addAndMakeVisible(trackGeneratorDisplay_);
     addAndMakeVisible(*patchNameDisplayPanel_);
-}
-
-void PatchEditDisplaysPanel::connectSliderFastPaths(PatchEditTopModulesPanel& topModulesPanel,
-                                                    PatchEditBottomModulesPanel& bottomModulesPanel)
-{
-    if (apvtsSync_ != nullptr)
-        apvtsSync_->connectSliderFastPaths(topModulesPanel, bottomModulesPanel);
 }
 
 void PatchEditDisplaysPanel::resized()

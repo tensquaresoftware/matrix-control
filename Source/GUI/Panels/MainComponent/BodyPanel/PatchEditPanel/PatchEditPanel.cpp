@@ -41,11 +41,6 @@ PatchEditPanel::PatchEditPanel(TSS::ISkin& skin,
     addAndMakeVisible(*patchEditDisplaysPanel_);
     addAndMakeVisible(*patchEditBottomModulesPanel_);
 
-    if (patchEditDisplaysPanel_ != nullptr && patchEditTopModulesPanel_ != nullptr && patchEditBottomModulesPanel_ != nullptr)
-    {
-        patchEditDisplaysPanel_->connectSliderFastPaths(*patchEditTopModulesPanel_, *patchEditBottomModulesPanel_);
-    }
-
     setSize(dims_.width, dims_.height);
 }
 

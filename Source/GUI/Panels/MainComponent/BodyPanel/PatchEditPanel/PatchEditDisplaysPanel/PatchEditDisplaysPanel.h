@@ -14,9 +14,6 @@ namespace TSS
     class ISkin;
 }
 
-class InteractiveDisplayApvtsSync;
-class PatchEditBottomModulesPanel;
-class PatchEditTopModulesPanel;
 class PatchNameDisplayPanel;
 
 class PatchEditDisplaysPanel : public juce::Component
@@ -28,13 +25,12 @@ public:
     void resized() override;
     void setSkin(TSS::ISkin& skin);
     void setUiScale(float uiScale);
-    void connectSliderFastPaths(PatchEditTopModulesPanel& topModulesPanel,
-                                PatchEditBottomModulesPanel& bottomModulesPanel);
 
 private:
     PatchEditDisplaysPanelDimensions dims_;
     TSS::ISkin* skin_;
-    juce::AudioProcessorValueTreeState* apvts_ = nullptr;
+    // Kept for Stories 10.2 / 10.3 (direct display ↔ APVTS wiring).
+    [[maybe_unused]] juce::AudioProcessorValueTreeState* apvts_ = nullptr;
     float uiScale_ = 1.0f;
 
     TSS::EnvelopeDisplay envelope1Display_;
@@ -42,7 +38,6 @@ private:
     TSS::EnvelopeDisplay envelope3Display_;
     TSS::TrackGeneratorDisplay trackGeneratorDisplay_;
     std::unique_ptr<PatchNameDisplayPanel> patchNameDisplayPanel_;
-    std::unique_ptr<InteractiveDisplayApvtsSync> apvtsSync_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PatchEditDisplaysPanel)
 };

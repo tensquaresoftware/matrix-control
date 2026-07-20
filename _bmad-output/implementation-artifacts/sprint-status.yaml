@@ -1,5 +1,5 @@
 # generated: 2026-05-29
-# last_updated: 2026-07-20 (epic-9 → done)
+# last_updated: 2026-07-20
 # project: Matrix-Control
 # project_key: NOKEY
 # tracking_system: file-system
@@ -174,8 +174,8 @@ development_status:
   epic-9-retrospective: optional
 
   # Epic 10: Direct Interactive Display Editing
-  epic-10: backlog
-  10-1-remove-interactivedisplayapvtssync-bridge: backlog
+  epic-10: in-progress
+  10-1-remove-interactivedisplayapvtssync-bridge: done
   10-2-envelopedisplay-direct-apvts-editing: backlog
   10-3-trackgeneratordisplay-direct-apvts-editing: backlog
   epic-10-retrospective: optional
