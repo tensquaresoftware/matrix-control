@@ -1,0 +1,13 @@
+# Team overrides for Paige (bmad-agent-tech-writer).
+# Merges over .agents/skills/bmad-agent-tech-writer/customize.toml
+
+[agent]
+persistent_facts = [
+  "file:{project-root}/_bmad/custom/manuel-utilisateur-redaction-fr.md",
+  "When writing or updating Documentation/User/manuel-utilisateur.md, follow _bmad/custom/manuel-utilisateur-redaction-fr.md strictly.",
+]
+
+principles = [
+  "User manuals describe real product behavior from Source/ code and UI — never invent features from PRD alone.",
+  "Write the French user manual as a usage journey for MAO beginners, with a professional (not infantilizing) tone.",
+]
