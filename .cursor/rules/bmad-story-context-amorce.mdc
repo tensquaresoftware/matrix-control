@@ -29,11 +29,14 @@ After optional `rename_chat` (see `bmad-agent-chat-titles.mdc`) and skill activa
 Rules for the sentence:
 
 1. **One sentence only** (two short sentences max if unavoidable).
-2. **Plain French**, natural language, **no excess jargon** — pass the phrase-test « Reformule en langage naturel, sans jargon excessif ».
+2. **Plain French** around the idea — natural language, **no excess engineering jargon** — pass the phrase-test « Reformule en langage naturel, sans jargon excessif ».
 3. Summarize **what the story / request is about** at product level — not how you will implement it.
-4. **Forbidden in this blurb:** file paths, AC IDs, class names, long bullet lists, English Title Case dumps, implementation plans.
-5. If no story ID yet (freeform quick-dev), still use the same heading and summarize the requested change in one sentence.
-6. For `bmad-create-story`, summarize the story **about to be written** (intent from epic / sprint / user ask).
+4. **Keep product / domain English names as-is** (do **not** force-translate).  
+   Ex. say **Track Generator**, not « générateur de piste » ; **Patch Mutator**, not « mutateur de patch ».  
+   Labels follow the product UI / `PluginDisplayNames.h`.
+5. **Forbidden in this blurb:** file paths, AC IDs, class names, long bullet lists, implementation plans, English sentence dumps that are not product labels.
+6. If no story ID yet (freeform quick-dev), still use the same heading and summarize the requested change in one sentence.
+7. For `bmad-create-story`, summarize the story **about to be written** (intent from epic / sprint / user ask).
 
 Then continue the normal workflow.
 
@@ -46,17 +49,26 @@ If this conversation **already contains** a prior assistant message with the hea
 Before sending the first assistant message of a fresh run of one of the four commands above:
 
 1. Does the reply **start** with `## Contexte de la Story`?
-2. Is the following text **one** plain-French sentence without jargon dump?
-3. Is anything else (tools except silent `rename_chat`, greetings, En bref) **after** that block?
+2. Is the following text **one** plain-French sentence (with product names kept in English when that is their real name)?
+3. Did you avoid force-translating product terms (e.g. Track Generator)?
+4. Is anything else (tools except silent `rename_chat`, greetings, En bref) **after** that block?
 
 If any answer is no → rewrite before sending.
 
-## Example
+## Examples
+
+**Bad** (forced translation of a product name):
 
 ```
 ## Contexte de la Story
 
-Cette story enregistre Matrix-Control comme instrument virtuel dans le DAW et définit le câblage audio des bus.
+Cette story enlève le vieux pont qui relie les courbes d’enveloppe et le générateur de piste aux paramètres, pour préparer une édition directe plus propre.
+```
 
-…suite du workflow…
+**Good** (French sentence, product names kept):
+
+```
+## Contexte de la Story
+
+Cette story enlève le vieux pont qui relie les enveloppes et le Track Generator aux paramètres, pour préparer une édition directe plus propre.
 ```

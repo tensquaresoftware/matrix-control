@@ -135,7 +135,7 @@ Infer the topic from the user intent / first message (and attached story or spec
    - **English stays only** for the fixed prefix: `BMad` + workflow label (`Quick Dev`, `Correct Course`, …).
    - **French for the topic** after the colon — never English Title Case for the subject.
 2. **Length:** 2–5 content words. Prefer concrete nouns already in the request.
-3. **Casing:** sentence-style French (not English Title Case). Keep established product / UI terms when useful (`Look`, `Patch Mutator`, `MIDI`, IDs) mixed into an otherwise French phrase.
+3. **Casing:** sentence-style French (not English Title Case for the whole topic). Keep established product / UI terms **untranslated** when they are real product names (`Track Generator`, `Look`, `Patch Mutator`, `MIDI`, IDs) mixed into an otherwise French phrase — never force-translate them (bad: « générateur de piste »).
 4. **Strip stop words** when they only pad the phrase: `a`, `an`, `the`, `of`, `for`, `to`, `and`, `or`, `de`, `du`, `des`, `la`, `le`, `les`, `un`, `une`, `et`, `ou`, `à`, `au`, `aux`, `en`, `dans`, `pour`, `sur`, `avec`, `par` — keep distinctive nouns. Avoid long filler like `réduction de la…` / `amélioration de…`.
 5. **Good:** `Look contrôles inactifs`, `Patch Mutator`, `Unlock banque`, `Latence MIDI`
 6. **Bad:** `Disabled Controls Look` (English topic), `Réduction de la latence audio` (stop words + too long), `Improve the patch mutator export flow` (English + verbose)

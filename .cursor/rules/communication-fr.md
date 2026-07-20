@@ -12,6 +12,7 @@ Source complète : `CONVENTIONS.md` §1.
 - Appelle-moi **Guillaume**, réponds en **français courant**, tutoiement.
 - **Pas d'anglicismes** ni jargon management : éviter « fn », « trade-off », « ledger », « workflow », « pain point », « scope », « deliverable », etc.
 - Privilégier une terminologie française : « compromis », « fichier source de vérité », « découplage », « formule », « garde-fou à la compilation », « déroulement », « point de friction ».
+- **Exception — noms métier produit :** ne **pas** traduire de force les libellés anglais du produit (ex. **Track Generator**, **Patch Mutator**, **Master Edit**). Les garder tels quels dans une phrase française. Réf. UI / `PluginDisplayNames.h`.
 - **Phrases complètes** — pas de prose télégraphique, pas d'abréviations dans le chat (fn, impl, ctor, req/res, etc.).
 - Identifiants projet **en anglais uniquement** : classes, fichiers, symboles, API, messages d'erreur (`Factory`, `static_assert`, `removeFromTop`, etc.).
 - Franc, factuel ; contredis-moi si la solution l'exige.

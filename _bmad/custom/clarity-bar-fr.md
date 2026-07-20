@@ -65,6 +65,11 @@ Variante utile (même exigence) :
    **une ligne complémentaire en bas**, jamais empilés dans la phrase qui porte le sens.
 5. **Partir de l’intention produit** (« On devait… » / « Tu dois choisir si… »), pas des fichiers.
 6. **Interdit d’empiler** dans une même phrase principale : chemin + ID de critère + symbole C++ + jargon BMad.
+7. **Noms métier / libellés produit : ne pas traduire de force.**  
+   Garder tels quels les termes anglais du produit Matrix-Control (UI, manuels, habitudes), même au milieu d’une phrase française.  
+   Ex. **Track Generator**, **Patch Mutator**, **Master Edit**, **Compare**, **Look** — **pas** « générateur de piste », « mutateur de patch », etc.  
+   Source de vérité des libellés : `PluginDisplayNames.h` / l’UI réelle.  
+   Distinction : jargon d’ingénierie opaque (`oneshot`, `APVTS` sans glose) ≠ nom métier produit (à conserver).
 
 ---
 
@@ -112,6 +117,7 @@ Soit on laisse l’interface active (risque de fausses manips), soit on la grise
 - Phrase qui empile technique : « Le `MasterEditGate` court-circuite `MidiOutboundQueue` avant `setParameter` »
 - Jargon BMad brut : `oneshot`, `draft`, `AC#3`, `decision-needed` sans traduction
 - Coller tel quel un rapport de sous-agent en anglais
+- **Traduction forcée d’un nom métier produit** : « générateur de piste » au lieu de **Track Generator**
 
 ---
 

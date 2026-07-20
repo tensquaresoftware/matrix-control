@@ -22,16 +22,18 @@ Si un message nécessiterait encore « Reformule en langage naturel, sans jargon
 Not only reviews — **every** explanation, question, and decision:
 
 1. **Intention produit d’abord** (ce que ça change pour l’usage), pas les fichiers.
-2. **Français parlé**, phrases complètes — pas de télégraphique, pas de pile d’anglais technique.
-3. Terme technique indispensable → **glose courte** à la première occurrence.
-4. Chemins / IDs / symboles → **ligne complémentaire en bas**, jamais dans la phrase porteuse de sens.
-5. **Question / décision** → question claire seule + options en verbes du quotidien + **Recommandation BMad** (option + pourquoi clair + confiance).
+2. **Français parlé**, phrases complètes — pas de télégraphique, pas de pile d’anglais technique d’ingénierie.
+3. **Noms métier produit en anglais : les garder** (Track Generator, Patch Mutator, …) — **ne jamais les traduire de force** dans une phrase française.
+4. Terme technique d’ingénierie indispensable → **glose courte** à la première occurrence.
+5. Chemins / IDs / symboles → **ligne complémentaire en bas**, jamais dans la phrase porteuse de sens.
+6. **Question / décision** → question claire seule + options en verbes du quotidien + **Recommandation BMad** (option + pourquoi clair + confiance).
 
 ## Forbidden openers / dumps
 
 - `Fix X + Y + Z`, titres opaques, extraits story/diff collés tels quels
 - Jargon BMad brut non traduit (`oneshot`, `draft`, `decision-needed`, `AC#…`)
 - Une phrase qui empile chemin + critère + classe C++ + jargon
+- Traduction forcée d’un libellé produit (« générateur de piste » au lieu de **Track Generator**)
 
 ## Self-check (all must pass)
 
