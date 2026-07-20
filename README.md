@@ -25,7 +25,7 @@ The Matrix-1000 shares almost the same synthesis engine as the legendary Matrix-
 |---|---|---|---|
 | macOS | ✅ | ✅ | ✅ |
 | Windows | — | ✅ | ✅ |
-| Linux | — | 🔜 | 🔜 |
+| Linux | — | ✅ | ✅ |
 
 ---
 
@@ -64,7 +64,6 @@ The project is actively under development. As of early 2026:
 - 🔄 Full patch editing (read/write all Matrix-1000 parameters) — in progress
 - 🔜 Patch management (save, load, tag, organize)
 - 🔜 Randomization / mutation engine
-- 🔜 Linux support
 - 🔜 User guide and full technical documentation
 
 ---
