@@ -43,6 +43,7 @@
 #include "Core/Services/ClipboardPasteEnabledResolver.h"
 #include "Core/Services/ClipboardService.h"
 #include "Core/Services/DirtyPatchTracker.h"
+#include "Core/Services/UnsavedEditWarningPolicy.h"
 #include "Core/Services/DeviceMemoryLimits.h"
 #include "Core/Services/DeviceTypeRegistry.h"
 #include "Shared/Definitions/PluginAudioConstants.h"
@@ -270,7 +271,9 @@ PluginProcessor::PluginProcessor()
             patchMutatorEngine_->resetSessionForPatchLoad();
     };
 
-    actionHooks.confirmPatchContextChange = [this]() { return confirmPatchContextChangeGate(); };
+    actionHooks.confirmPatchContextChange = [this](bool includeUnsavedEditWarning) {
+        return confirmPatchContextChangeGate(includeUnsavedEditWarning);
+    };
 
     moduleActionHandler_ = std::make_unique<Core::ModuleActionHandler>(
         apvts,
@@ -296,6 +299,7 @@ PluginProcessor::PluginProcessor()
         midiManager.get(),
         patchFileService_.get(),
         patchNameSyncer_.get(),
+        dirtyPatchTracker_.get(),
         &midiManager->getSysExEncoder(),
         [this]() -> juce::File
         {
@@ -354,6 +358,7 @@ PluginProcessor::PluginProcessor()
     initializeInitTemplatesFolderProperty();
     initializeComputerPatchesFolderProperty();
     initializeNameReconciliationPolicyProperty();
+    initializeUnsavedEditWarningPolicyProperty();
 
     initializePatchNameProperty();
     initializeClipboardPasteEnabledProperties();
@@ -365,6 +370,12 @@ PluginProcessor::PluginProcessor()
     startMidiThread();
     refreshClipboardPasteEnabledProperties();
     resetInternalPatchCoordinatesToDefaults();
+
+    // FR-51: establish a clean baseline from factory APVTS defaults so edits before the
+    // first load/SAVE/STORE/INIT are still detected as dirty.
+    apvtsPatchMapper_->apvtsToBuffer();
+    patchNameSyncer_->apvtsToBuffer();
+    dirtyPatchTracker_->captureSnapshot(*patchModel_);
 }
 
 PluginProcessor::~PluginProcessor()
@@ -646,6 +657,16 @@ void PluginProcessor::setStateInformation(const void* data, int sizeInBytes)
 
             resetInternalPatchCoordinatesToDefaults();
 
+            // Re-baseline after host restore so subsequent edits are measured against the
+            // restored (or stripped-then-default) PATCH buffer, not a pre-session snapshot.
+            if (dirtyPatchTracker_ != nullptr && apvtsPatchMapper_ != nullptr && patchNameSyncer_ != nullptr
+                && patchModel_ != nullptr)
+            {
+                apvtsPatchMapper_->apvtsToBuffer();
+                patchNameSyncer_->apvtsToBuffer();
+                dirtyPatchTracker_->captureSnapshot(*patchModel_);
+            }
+
             if (shouldUseDevelopmentLogging())
                 ApvtsLogger::getInstance().logStateLoaded("DAW state");
         }
@@ -859,8 +880,54 @@ void PluginProcessor::setMutatorHistoryGateModalGate(MutatorHistoryGateModalGate
     mutatorHistoryGateModalGate_ = std::move(gate);
 }
 
-bool PluginProcessor::confirmPatchContextChangeGate()
+void PluginProcessor::setUnsavedEditConfirmModalGate(UnsavedEditConfirmModalGate gate)
 {
+    unsavedEditConfirmModalGate_ = std::move(gate);
+}
+
+bool PluginProcessor::confirmUnsavedEditGateIfNeeded()
+{
+    using namespace PluginIDs::Settings::UnsavedEditWarningPolicy;
+
+    const int policy = static_cast<int>(apvts.state.getProperty(
+        PluginIDs::Settings::kUnsavedEditWarningPolicy,
+        kDefault));
+
+    if (dirtyPatchTracker_ == nullptr || patchModel_ == nullptr || apvtsPatchMapper_ == nullptr
+        || patchNameSyncer_ == nullptr)
+        return true;
+
+    const bool isDirty = dirtyPatchTracker_->syncApvtsAndIsDirty(
+        *apvtsPatchMapper_, *patchNameSyncer_, *patchModel_);
+
+    if (! Core::UnsavedEditWarning::shouldPrompt(policy, isDirty))
+        return true;
+
+    // No UI gate wired (headless / tests) -> proceed without blocking.
+    if (! unsavedEditConfirmModalGate_)
+        return true;
+
+    if (auto* messageManager = juce::MessageManager::getInstanceWithoutCreating())
+    {
+        if (! messageManager->isThisTheMessageThread())
+        {
+            jassertfalse;
+            return false;
+        }
+    }
+    else
+    {
+        return false;
+    }
+
+    return unsavedEditConfirmModalGate_();
+}
+
+bool PluginProcessor::confirmPatchContextChangeGate(bool includeUnsavedEditWarning)
+{
+    if (includeUnsavedEditWarning && ! confirmUnsavedEditGateIfNeeded())
+        return false;
+
     // No mutations to lose -> proceed silently.
     if (patchMutatorEngine_ == nullptr || patchMutatorEngine_->rootCount() == 0)
         return true;
@@ -1034,6 +1101,17 @@ void PluginProcessor::initializeNameReconciliationPolicyProperty()
         apvts.state.setProperty(
             PluginIDs::Settings::kComputerPatchesNameReconciliationPolicy,
             PluginIDs::Settings::NameReconciliationPolicy::kDefault,
+            nullptr);
+    }
+}
+
+void PluginProcessor::initializeUnsavedEditWarningPolicyProperty()
+{
+    if (! apvts.state.hasProperty(PluginIDs::Settings::kUnsavedEditWarningPolicy))
+    {
+        apvts.state.setProperty(
+            PluginIDs::Settings::kUnsavedEditWarningPolicy,
+            PluginIDs::Settings::UnsavedEditWarningPolicy::kDefault,
             nullptr);
     }
 }

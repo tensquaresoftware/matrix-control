@@ -10,6 +10,7 @@
 #include "Core/Models/PatchModel.h"
 #include "Core/Models/PatchNameSyncer.h"
 #include "Core/Services/DirtyPatchTracker.h"
+#include "Core/Services/UnsavedEditWarningPolicy.h"
 #include "Shared/Definitions/PluginDescriptors.h"
 #include "Shared/Definitions/PluginIDs.h"
 
@@ -69,6 +70,9 @@ public:
         testApvtsSyncPathMatchesPackedCompare();
         testApvtsNameEditIsDirtyViaSyncHelper();
         testMasterOnlyChangeDoesNotDirty();
+        testUnsavedWarningPolicy_neverWarnSkipsPrompt();
+        testUnsavedWarningPolicy_warnAlwaysWhenDirty();
+        testUnsavedWarningPolicy_cleanNeverPrompts();
     }
 
 private:
@@ -253,6 +257,32 @@ private:
 
         expect(! tracker.syncApvtsAndIsDirty(patchMapper, nameSyncer, patchModel));
         expect(! tracker.isDirty(patchModel));
+    }
+
+    void testUnsavedWarningPolicy_neverWarnSkipsPrompt()
+    {
+        beginTest("Unsaved warning policy — never warn skips prompt");
+
+        using namespace PluginIDs::Settings::UnsavedEditWarningPolicy;
+        expect(! Core::UnsavedEditWarning::shouldPrompt(kNeverWarn, true));
+    }
+
+    void testUnsavedWarningPolicy_warnAlwaysWhenDirty()
+    {
+        beginTest("Unsaved warning policy — warn always when dirty");
+
+        using namespace PluginIDs::Settings::UnsavedEditWarningPolicy;
+        expect(Core::UnsavedEditWarning::shouldPrompt(kWarnAlways, true));
+        expect(Core::UnsavedEditWarning::shouldPrompt(kDefault, true));
+    }
+
+    void testUnsavedWarningPolicy_cleanNeverPrompts()
+    {
+        beginTest("Unsaved warning policy — clean never prompts");
+
+        using namespace PluginIDs::Settings::UnsavedEditWarningPolicy;
+        expect(! Core::UnsavedEditWarning::shouldPrompt(kWarnAlways, false));
+        expect(! Core::UnsavedEditWarning::shouldPrompt(kNeverWarn, false));
     }
 };
 

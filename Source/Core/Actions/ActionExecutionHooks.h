@@ -18,9 +18,11 @@ namespace Core
         // Records where the editor patch just came from (device vs computer file) so the
         // Mutator can freeze Export folder names. Set at real load sites; may be empty.
         std::function<void(const PatchLoadContext&)> setPatchLoadContext;
-        // History gate: consulted before any patch-context change. Returns true to proceed
-        // (history empty, or user chose Export/Discard), false to abort. May be empty.
-        std::function<bool()> confirmPatchContextChange;
+        // Patch-context gate: consulted before navigation, load, INIT, or PASTE.
+        // `includeUnsavedEditWarning` is true for navigation / file load / NumberBox;
+        // false for in-place INIT/PASTE (Mutator history only — no FR-51 modal).
+        // Returns true to proceed, false to abort. May be empty (proceed).
+        std::function<bool(bool includeUnsavedEditWarning)> confirmPatchContextChange;
     };
 
 } // namespace Core

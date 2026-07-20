@@ -9,6 +9,7 @@
 #include "Core/Models/PatchModel.h"
 #include "Core/Models/PatchNameSyncer.h"
 #include "Core/Services/ClipboardService.h"
+#include "Core/Services/DirtyPatchTracker.h"
 #include "Core/Services/PatchFileService.h"
 #include "Core/Services/PatchFileNameSanitizer.h"
 #include "Core/Services/PatchFileNameReconciler.h"
@@ -17,6 +18,7 @@
 #include "Shared/Definitions/PluginIDs.h"
 
 #include <cstring>
+#include <optional>
 #include <vector>
 
 namespace FooterMessages = PluginDisplayNames::PatchManagerSection::ComputerPatchesModule::FooterMessages;
@@ -98,6 +100,7 @@ namespace Core
         MidiManager* midiManager,
         PatchFileService* patchFileService,
         PatchNameSyncer* patchNameSyncer,
+        DirtyPatchTracker* dirtyPatchTracker,
         SysExEncoder* sysExEncoder,
         PatchFolderPicker pickFolder,
         PatchSaveFilePicker pickSaveFile,
@@ -113,6 +116,7 @@ namespace Core
         , midiManager_(midiManager)
         , patchFileService_(patchFileService)
         , patchNameSyncer_(patchNameSyncer)
+        , dirtyPatchTracker_(dirtyPatchTracker)
         , sysExEncoder_(sysExEncoder)
         , pickFolder_(std::move(pickFolder))
         , pickSaveFile_(std::move(pickSaveFile))
@@ -193,13 +197,14 @@ namespace Core
         {
             const int beforeId = readComputerPatchesSelectedId();
             const bool isNext = propertyId == ComputerPatchesModule::StandaloneWidgets::kLoadNextPatchFile;
-            advanceComputerPatchesSelection(isNext);
-            if (readComputerPatchesSelectedId() == beforeId && beforeId >= 1 && isComputerPatchesScanCurrent())
-            {
-                const int count = patchFileService_->getLastScanResult().sortedValidFileNames.size();
-                if (count >= 1)
-                    handleLoadSelectedPatchFile(limits);
-            }
+            const auto nextId = advanceComputerPatchesSelection(isNext);
+
+            // Single-file wrap: JUCE skips notification when the id is unchanged — force one load.
+            // Do NOT key off post-load selectedId: Cancel revert restores beforeId and would
+            // otherwise re-enter the load (second FR-51 prompt / silent discard of kept edits).
+            if (nextId.has_value() && *nextId == beforeId)
+                handleLoadSelectedPatchFile(limits);
+
             return;
         }
 
@@ -274,7 +279,7 @@ namespace Core
                 false)))
             return;
 
-        if (! confirmPatchContextChange())
+        if (! confirmPatchContextChange(false))
             return;
 
         const auto result = patchInitService_->initFullPatch();
@@ -283,7 +288,8 @@ namespace Core
             hooks_.setPatchLoadContext(
                 PatchLoadContext::deviceMemory(getCurrentBank(limits), getCurrentPatch(limits)));
 
-        pushPatchModelToApvtsWithSuppress(apvts_, hooks_, *apvtsPatchMapper_, nullptr);
+        pushPatchModelToApvtsWithSuppress(apvts_, hooks_, *apvtsPatchMapper_, patchNameSyncer_);
+        captureCleanSnapshot();
 
         if (hooks_.onPatchLoaded)
             hooks_.onPatchLoaded();
@@ -315,7 +321,7 @@ namespace Core
         if (patchModel_ == nullptr || apvtsPatchMapper_ == nullptr)
             return;
 
-        if (! confirmPatchContextChange())
+        if (! confirmPatchContextChange(false))
             return;
 
         apvtsPatchMapper_->apvtsToBuffer();
@@ -356,7 +362,14 @@ namespace Core
             markBanksLockedInApvts();
 
         apvtsPatchMapper_->apvtsToBuffer();
+        if (patchNameSyncer_ != nullptr)
+            patchNameSyncer_->apvtsToBuffer();
+
         midiManager_->sendPatch(static_cast<juce::uint8>(getCurrentPatch(limits)), patchModel_->data());
+
+        // sendPatch is void and may no-op when outbound is blocked — only clear dirty on a real send.
+        if (midiManager_->isEditorOutboundAllowed())
+            captureCleanSnapshot();
     }
 
     void PatchManagerActionHandler::handleOpenPatchFolder(const DeviceMemoryLimits& limits)
@@ -368,6 +381,11 @@ namespace Core
 
         if (! folder.isDirectory())
             return;
+
+        const juce::String previousFolderPath = apvts_.state.getProperty(
+            PluginIDs::PatchManagerSection::ComputerPatchesModule::StateProperties::kFolderPath,
+            juce::String()).toString();
+        const int previousSelectedId = lastCommittedComputerPatchesSelectedId_;
 
         apvts_.state.setProperty(
             PluginIDs::PatchManagerSection::ComputerPatchesModule::StateProperties::kFolderPath,
@@ -382,8 +400,15 @@ namespace Core
                 PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSelectPatchFile,
                 0,
                 nullptr);
+            rememberComputerPatchesSelection(0);
             return;
         }
+
+        // Auto-load may Cancel — restore the prior browser (folder + scan + selection).
+        pendingBrowserRestoreOnCancel_ = ComputerPatchesBrowserSnapshot {
+            previousFolderPath,
+            previousSelectedId
+        };
 
         constexpr int kFirstPatchFileId = 1;
         const int beforeId = readComputerPatchesSelectedId();
@@ -403,11 +428,14 @@ namespace Core
             PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSelectPatchFile,
             0,
             nullptr);
+        rememberComputerPatchesSelection(0);
 
         if (patchFileService_ != nullptr && patchFileService_->hasCachedScanResult())
             clearPublishedScanCache();
         else
             bumpScanRevision();
+
+        pendingBrowserRestoreOnCancel_.reset();
     }
 
     void PatchManagerActionHandler::discardComputerPatchesScanCacheQuietly()
@@ -457,6 +485,9 @@ namespace Core
 
     void PatchManagerActionHandler::handleLoadSelectedPatchFile(const DeviceMemoryLimits& limits)
     {
+        if (suppressComputerPatchesSelectLoad_)
+            return;
+
         const auto resolution = resolveSelectedPatchFileForLoad();
 
         if (resolution.kind == SelectedPatchFileResolution::Kind::kSilentNoOp)
@@ -465,33 +496,44 @@ namespace Core
         if (resolution.kind == SelectedPatchFileResolution::Kind::kFailed)
         {
             publishLoadFailureFooter(resolution.failureMessage);
+            abortComputerPatchesNavigation();
             return;
         }
 
-        if (! confirmPatchContextChange())
+        const int requestedId = readComputerPatchesSelectedId();
+        if (! confirmPatchContextChange(true))
+        {
+            abortComputerPatchesNavigation();
             return;
+        }
 
         const auto reconciliation = decodeAndReconcilePatchFile(resolution.file);
         if (! reconciliation.has_value())
+        {
+            abortComputerPatchesNavigation();
             return;
+        }
+
+        pendingBrowserRestoreOnCancel_.reset();
 
         if (hooks_.setPatchLoadContext)
             hooks_.setPatchLoadContext(
                 PatchLoadContext::computerFile(resolution.file.getFileNameWithoutExtension()));
 
         applyLoadedPatchToApvtsAndSynth(limits);
+        rememberComputerPatchesSelection(requestedId);
         publishLoadFooters(resolution.file.getFileName(), *reconciliation);
     }
 
-    void PatchManagerActionHandler::advanceComputerPatchesSelection(bool isNext)
+    std::optional<int> PatchManagerActionHandler::advanceComputerPatchesSelection(bool isNext)
     {
         const int currentId = readComputerPatchesSelectedId();
         if (currentId < 1 || ! isComputerPatchesScanCurrent())
-            return;
+            return std::nullopt;
 
         const int count = patchFileService_->getLastScanResult().sortedValidFileNames.size();
         if (count < 1 || currentId > count)
-            return;
+            return std::nullopt;
 
         const int nextId = isNext
             ? (currentId >= count ? 1 : currentId + 1)
@@ -501,6 +543,7 @@ namespace Core
             PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSelectPatchFile,
             nextId,
             nullptr);
+        return nextId;
     }
 
     int PatchManagerActionHandler::readComputerPatchesSelectedId() const
@@ -630,6 +673,7 @@ namespace Core
     void PatchManagerActionHandler::applyLoadedPatchToApvtsAndSynth(const DeviceMemoryLimits& limits)
     {
         syncLoadedPatchToApvts();
+        captureCleanSnapshot();
 
         if (hooks_.onPatchLoaded)
             hooks_.onPatchLoaded();
@@ -668,9 +712,78 @@ namespace Core
         apvts_.state.setProperty("uiMessageSeverity", juce::String("warning"), nullptr);
     }
 
-    bool PatchManagerActionHandler::confirmPatchContextChange()
+    bool PatchManagerActionHandler::confirmPatchContextChange(bool includeUnsavedEditWarning)
     {
-        return ! hooks_.confirmPatchContextChange || hooks_.confirmPatchContextChange();
+        return ! hooks_.confirmPatchContextChange
+            || hooks_.confirmPatchContextChange(includeUnsavedEditWarning);
+    }
+
+    void PatchManagerActionHandler::captureCleanSnapshot()
+    {
+        if (dirtyPatchTracker_ == nullptr || patchModel_ == nullptr || apvtsPatchMapper_ == nullptr)
+            return;
+
+        // Re-sync APVTS → model before capture so name encode/decode asymmetry after
+        // bufferToApvts cannot leave a false-dirty baseline (deferred 9.1 residual risk).
+        apvtsPatchMapper_->apvtsToBuffer();
+        if (patchNameSyncer_ != nullptr)
+            patchNameSyncer_->apvtsToBuffer();
+
+        dirtyPatchTracker_->captureSnapshot(*patchModel_);
+    }
+
+    void PatchManagerActionHandler::revertComputerPatchesSelectionIfNeeded(int previousSelectedId)
+    {
+        if (readComputerPatchesSelectedId() == previousSelectedId)
+            return;
+
+        suppressComputerPatchesSelectLoad_ = true;
+        apvts_.state.setProperty(
+            PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSelectPatchFile,
+            previousSelectedId,
+            nullptr);
+        suppressComputerPatchesSelectLoad_ = false;
+    }
+
+    void PatchManagerActionHandler::rememberComputerPatchesSelection(int selectedId)
+    {
+        lastCommittedComputerPatchesSelectedId_ = selectedId;
+    }
+
+    void PatchManagerActionHandler::restoreComputerPatchesBrowser(const juce::String& folderPath,
+                                                                  int selectedId)
+    {
+        suppressComputerPatchesSelectLoad_ = true;
+
+        apvts_.state.setProperty(
+            PluginIDs::PatchManagerSection::ComputerPatchesModule::StateProperties::kFolderPath,
+            folderPath,
+            nullptr);
+
+        if (folderPath.isEmpty())
+            clearPublishedScanCache();
+        else
+            scanAndPublishFolder(juce::File(folderPath));
+
+        apvts_.state.setProperty(
+            PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSelectPatchFile,
+            selectedId,
+            nullptr);
+
+        suppressComputerPatchesSelectLoad_ = false;
+    }
+
+    void PatchManagerActionHandler::abortComputerPatchesNavigation()
+    {
+        if (pendingBrowserRestoreOnCancel_.has_value())
+        {
+            const auto snapshot = *pendingBrowserRestoreOnCancel_;
+            pendingBrowserRestoreOnCancel_.reset();
+            restoreComputerPatchesBrowser(snapshot.folderPath, snapshot.selectedId);
+            return;
+        }
+
+        revertComputerPatchesSelectionIfNeeded(lastCommittedComputerPatchesSelectedId_);
     }
 
     void PatchManagerActionHandler::loadCurrentPatchFromDevice(const DeviceMemoryLimits& limits)
@@ -706,6 +819,7 @@ namespace Core
 
                 patchModel_->loadFrom(dump.data());
                 pushPatchModelToApvtsWithSuppress(apvts_, hooks_, *apvtsPatchMapper_, patchNameSyncer_);
+                captureCleanSnapshot();
 
                 if (hooks_.setPatchLoadContext)
                     hooks_.setPatchLoadContext(PatchLoadContext::deviceMemory(bank, patch));
@@ -749,6 +863,7 @@ namespace Core
     void PatchManagerActionHandler::completeSuccessfulSave(const juce::String& savedFileName)
     {
         patchNameSyncer_->bufferToApvts();
+        captureCleanSnapshot();
         publishSaveSuccessFooter(savedFileName);
         rescanAndSelectSavedFile(savedFileName);
     }
@@ -771,6 +886,7 @@ namespace Core
             PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSelectPatchFile,
             index >= 0 ? index + 1 : 0,
             nullptr);
+        rememberComputerPatchesSelection(index >= 0 ? index + 1 : 0);
         bumpScanRevision();
     }
 

@@ -183,6 +183,22 @@ PluginEditor::PluginEditor(PluginProcessor& p)
             }
         });
 
+    pluginProcessor.setUnsavedEditConfirmModalGate(
+        []() -> bool
+        {
+            jassert(juce::MessageManager::getInstance()->isThisTheMessageThread());
+
+            namespace Dialog = PluginDisplayNames::Dialogs::UnsavedEditConfirm;
+
+            juce::AlertWindow alert(Dialog::kTitle,
+                                    Dialog::kBody,
+                                    juce::AlertWindow::WarningIcon);
+            alert.addButton(Dialog::kContinue, 1);
+            alert.addButton(Dialog::kCancel, 0);
+
+            return alert.runModalLoop() == 1;
+        });
+
     pluginProcessor.setPatchSaveFilePicker(
         [safeThis = juce::Component::SafePointer<PluginEditor>(this)](
             juce::File suggestedFolder, juce::String suggestedStem) -> juce::File
@@ -810,6 +826,16 @@ void PluginEditor::restoreSettingsPanelFromState(SettingsPanel& panel)
         PluginIDs::Settings::kComputerPatchesNameReconciliationPolicy,
         PluginIDs::Settings::NameReconciliationPolicy::kDefault));
     panel.getNameReconciliationPolicyCombo().setSelectedId(policy, juce::dontSendNotification);
+
+    const int unsavedPolicyRaw = static_cast<int>(pluginProcessor.getApvts().state.getProperty(
+        PluginIDs::Settings::kUnsavedEditWarningPolicy,
+        PluginIDs::Settings::UnsavedEditWarningPolicy::kDefault));
+    const int unsavedPolicy =
+        (unsavedPolicyRaw == PluginIDs::Settings::UnsavedEditWarningPolicy::kWarnAlways
+         || unsavedPolicyRaw == PluginIDs::Settings::UnsavedEditWarningPolicy::kNeverWarn)
+            ? unsavedPolicyRaw
+            : PluginIDs::Settings::UnsavedEditWarningPolicy::kDefault;
+    panel.getUnsavedEditWarningPolicyCombo().setSelectedId(unsavedPolicy, juce::dontSendNotification);
 }
 
 void PluginEditor::wireSettingsPanel(SettingsPanel& panel)
@@ -824,6 +850,14 @@ void PluginEditor::wireSettingsPanel(SettingsPanel& panel)
         pluginProcessor.getApvts().state.setProperty(
             PluginIDs::Settings::kComputerPatchesNameReconciliationPolicy,
             panel.getNameReconciliationPolicyCombo().getSelectedId(),
+            nullptr);
+    };
+
+    panel.getUnsavedEditWarningPolicyCombo().onChange = [this, &panel]
+    {
+        pluginProcessor.getApvts().state.setProperty(
+            PluginIDs::Settings::kUnsavedEditWarningPolicy,
+            panel.getUnsavedEditWarningPolicyCombo().getSelectedId(),
             nullptr);
     };
 }

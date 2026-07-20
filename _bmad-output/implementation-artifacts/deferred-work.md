@@ -1,5 +1,35 @@
 # Deferred Work
 
+## Deferred from: code review of 9-2-unsaved-edit-confirmation-dialog (2026-07-20)
+
+- source_spec: `_bmad-output/implementation-artifacts/9-2-unsaved-edit-confirmation-dialog.md`
+  summary: After dirty Continue on internal navigation, `loadCurrentPatchFromDevice` can bail (`!isDeviceDumpAvailable` / failed dump) leaving advanced bank/patch coordinates with edits already accepted for discard.
+  evidence: Blind Hunter; pre-existing async dump pattern; FR-51 gate correctly runs before request.
+
+- source_spec: `_bmad-output/implementation-artifacts/9-2-unsaved-edit-confirmation-dialog.md`
+  summary: Edits made between dirty Continue and async dump completion are overwritten then `captureCleanSnapshot` marks clean with no second FR-51 warning.
+  evidence: Blind Hunter; pre-existing settle window on async dump callback.
+
+- source_spec: `_bmad-output/implementation-artifacts/9-2-unsaved-edit-confirmation-dialog.md`
+  summary: PASTE still uses `pushPatchModelToApvtsWithSuppress(..., nullptr)` for PatchNameSyncer; post-paste dirty compare can skew vs INIT path that now syncs the name.
+  evidence: Blind Hunter; pre-existing PASTE path; AC intentionally excludes FR-51 modal for PASTE.
+
+- source_spec: `_bmad-output/implementation-artifacts/9-2-unsaved-edit-confirmation-dialog.md`
+  summary: Name-reconciliation Cancel after user already Continued through dirty + Mutator history Discard cannot restore history — Cancel only reverts combo selection.
+  evidence: Blind Hunter; pre-existing composition of sequential gates.
+
+- source_spec: `_bmad-output/implementation-artifacts/9-2-unsaved-edit-confirmation-dialog.md`
+  summary: `lastCommittedComputerPatchesSelectedId_` defaults to 0 until a successful load/reset path remembers an id; early Cancel revert target can be wrong.
+  evidence: Blind Hunter; bootstrap edge.
+
+- source_spec: `_bmad-output/implementation-artifacts/9-2-unsaved-edit-confirmation-dialog.md`
+  summary: INIT always captures a clean snapshot after `initFullPatch`, including fallback/invalid template landing.
+  evidence: Blind Hunter; intentional for FR-51 smoke after INIT (completion notes).
+
+- source_spec: `_bmad-output/implementation-artifacts/9-2-unsaved-edit-confirmation-dialog.md`
+  summary: Broader automated coverage still missing for OPEN Cancel folder+selection restore, NumberBox+chained dirty gate, and never-warn vs real modal (beyond handler-level Prev/Next Cancel regression test).
+  evidence: Blind Hunter; T5 left some paths as optional / smoke.
+
 ## Deferred from: code review of spec-8-4-virtual-instrument-registration-and-bus-layout (2026-07-19)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-8-4-virtual-instrument-registration-and-bus-layout.md`

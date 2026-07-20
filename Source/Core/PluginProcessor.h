@@ -161,6 +161,11 @@ public:
 
     void setMutatorHistoryGateModalGate(MutatorHistoryGateModalGate gate);
 
+    // FR-51 unsaved-edit modal: returns true for Continue, false for Cancel.
+    using UnsavedEditConfirmModalGate = std::function<bool()>;
+
+    void setUnsavedEditConfirmModalGate(UnsavedEditConfirmModalGate gate);
+
     using PatchSaveFilePicker = std::function<juce::File(juce::File suggestedFolder, juce::String suggestedStem)>;
 
     void setPatchSaveFilePicker(PatchSaveFilePicker picker);
@@ -250,6 +255,7 @@ private:
     void initializeInitTemplatesFolderProperty();
     void initializeComputerPatchesFolderProperty();
     void initializeNameReconciliationPolicyProperty();
+    void initializeUnsavedEditWarningPolicyProperty();
     void applyHardwareLatencyToHost();
     void notifyNonParameterStateChanged();
     void scheduleDeferredMidiPortSyncForPluginHost();
@@ -284,7 +290,8 @@ private:
     void handleBankNumberChange(const juce::String& parameterId);
     void handlePatchNumberChange(const juce::String& parameterId);
     void updateDevicePatchLoadContext();
-    bool confirmPatchContextChangeGate();
+    bool confirmPatchContextChangeGate(bool includeUnsavedEditWarning = true);
+    bool confirmUnsavedEditGateIfNeeded();
     bool runMutatorExportForGate();
     void initializeClipboardPasteEnabledProperties();
     void refreshClipboardPasteEnabledProperties();
@@ -338,6 +345,7 @@ private:
     MutatorDefragLimitModalGate mutatorDefragLimitModalGate_;
     MutatorExportCollisionModalGate mutatorExportCollisionModalGate_;
     MutatorHistoryGateModalGate mutatorHistoryGateModalGate_;
+    UnsavedEditConfirmModalGate unsavedEditConfirmModalGate_;
     Core::PatchLoadContext patchLoadContext_;
     int lastKnownPatchNumber_ = 0;
     bool lastKnownPatchNumberInitialized_ = false;

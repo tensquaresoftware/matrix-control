@@ -75,10 +75,23 @@ namespace PluginDisplayNames
         constexpr const char* kNameReconciliationPreferInternal = "PREFER INTERNAL NAME";
         constexpr const char* kNameReconciliationPreferFilename = "PREFER FILENAME";
         constexpr const char* kNameReconciliationAskOnce        = "ASK ONCE PER LOAD";
+        constexpr const char* kUnsavedEditWarningLabel          = "UNSAVED :";
+        constexpr const char* kUnsavedEditWarnAlways           = "WARN ALWAYS";
+        constexpr const char* kUnsavedEditNeverWarn            = "NEVER WARN";
     }
 
     namespace Dialogs
     {
+        namespace UnsavedEditConfirm
+        {
+            constexpr const char* kTitle = "Unsaved edits";
+            constexpr const char* kBody =
+                "This patch has edits that were not stored to the synth and not saved as a .syx file.\n\n"
+                "Continue and discard these edits, or Cancel to keep editing.";
+            constexpr const char* kCancel   = "Cancel";
+            constexpr const char* kContinue = "Continue";
+        }
+
         namespace PatchNameReconciliation
         {
             constexpr const char* kTitle = "Patch name mismatch";

@@ -22,6 +22,7 @@
 #include "Core/Models/PatchNameSyncer.h"
 #include "Core/Services/ClipboardService.h"
 #include "Core/Services/DeviceMemoryLimits.h"
+#include "Core/Services/DirtyPatchTracker.h"
 #include "Core/Services/PatchFileService.h"
 #include "Core/Services/PatchFileNameReconciler.h"
 #include "Shared/Definitions/Matrix1000Limits.h"
@@ -220,6 +221,15 @@ public:
         testHistoryGate_cancelAbortsNavigation();
         testHistoryGate_proceedAllowsNavigation();
         testHistoryGate_cancelAbortsInit();
+        testUnsavedGate_initSkipsUnsavedWarningFlag();
+        testUnsavedGate_loadCancelRevertsSelection();
+        testUnsavedGate_prevNextCancelDoesNotDoubleLoad();
+        testUnsavedGate_openCancelRestoresPriorBrowser();
+        testUnsavedGate_captureAfterLoadLeavesClean();
+        testUnsavedGate_captureAfterSaveLeavesClean();
+        testUnsavedGate_captureAfterStoreLeavesClean();
+        testUnsavedGate_storeBlockedKeepsDirty();
+        testUnsavedGate_captureAfterInitThenEditIsDirty();
     }
 
 private:
@@ -234,6 +244,7 @@ private:
         {
             bool allow = true;
             int calls = 0;
+            bool lastIncludeUnsavedEditWarning = false;
         };
 
         std::shared_ptr<PatchLoadHookState> patchLoadHookState;
@@ -242,6 +253,7 @@ private:
         Core::PatchModel model;
         Core::ApvtsPatchMapper mapper;
         Core::ClipboardService clipboard;
+        Core::DirtyPatchTracker dirtyPatchTracker;
         SysExParser parser;
         SysExDecoder decoder;
         Core::InitTemplateLoader initLoader;
@@ -285,6 +297,7 @@ private:
                       &midiManager,
                       &patchFileService,
                       &patchNameSyncer,
+                      &dirtyPatchTracker,
                       &sysExEncoder,
                       [this]() { return pickFolderCallback(); },
                       [this](juce::File folder, juce::String stem) {
@@ -306,9 +319,10 @@ private:
                               state->invoked = true;
                           },
                           nullptr,
-                          [state = gateState]()
+                          [state = gateState](bool includeUnsavedEditWarning)
                           {
                               ++state->calls;
+                              state->lastIncludeUnsavedEditWarning = includeUnsavedEditWarning;
                               return state->allow;
                           } })
         {
@@ -359,6 +373,37 @@ private:
             nullptr);
         harness.handler.rescanPersistedComputerPatchesFolder();
     }
+
+    // Mirrors production ActionDispatcher: SelectPatchFile property changes load synchronously.
+    struct SelectPatchFileLoadDispatcher : private juce::ValueTree::Listener
+    {
+        HandlerHarness& harness;
+        bool armed = true;
+
+        explicit SelectPatchFileLoadDispatcher(HandlerHarness& harnessIn)
+            : harness(harnessIn)
+        {
+            harness.proc.apvts.state.addListener(this);
+        }
+
+        ~SelectPatchFileLoadDispatcher() override
+        {
+            harness.proc.apvts.state.removeListener(this);
+        }
+
+        void valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier& property) override
+        {
+            if (! armed)
+                return;
+
+            if (property.toString() != ComputerPatches::StandaloneWidgets::kSelectPatchFile)
+                return;
+
+            armed = false;
+            harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kSelectPatchFile, juce::var());
+            armed = true;
+        }
+    };
 
     void testPasteRomBankBlocked()
     {
@@ -611,7 +656,223 @@ private:
 
         // On Cancel the patch load hook (history reset) must not fire.
         expectEquals(harness.gateState->calls, 1);
+        expect(! harness.gateState->lastIncludeUnsavedEditWarning);
         expect(!harness.patchLoadHookState->invoked);
+    }
+
+    void testUnsavedGate_initSkipsUnsavedWarningFlag()
+    {
+        beginTest("unsavedGate_initSkipsUnsavedWarningFlag");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, 0, 3, false);
+
+        harness.handler.handleAction(InternalPatches::kInitPatch, juce::var());
+
+        expectEquals(harness.gateState->calls, 1);
+        expect(! harness.gateState->lastIncludeUnsavedEditWarning);
+    }
+
+    void testUnsavedGate_loadCancelRevertsSelection()
+    {
+        beginTest("unsavedGate_loadCancelRevertsSelection");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        const auto tempDir = createTempScanDir();
+        expect(tempDir.createDirectory());
+        copyFixturePatchToDir(tempDir, "Patch 5.syx");
+        copyFixturePatchToDir(tempDir, "Patch 71.syx");
+        setupComputerPatchesScan(harness, tempDir);
+
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile, 1, nullptr);
+        simulateSelectPatchFileDispatch(harness);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile)), 1);
+
+        harness.gateState->allow = false;
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile, 2, nullptr);
+        simulateSelectPatchFileDispatch(harness);
+
+        expectEquals(harness.gateState->calls, 2);
+        expect(harness.gateState->lastIncludeUnsavedEditWarning);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile)), 1);
+
+        tempDir.deleteRecursively();
+    }
+
+    void testUnsavedGate_prevNextCancelDoesNotDoubleLoad()
+    {
+        beginTest("unsavedGate_prevNextCancelDoesNotDoubleLoad");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        const auto tempDir = createTempScanDir();
+        expect(tempDir.createDirectory());
+        copyFixturePatchToDir(tempDir, "Patch 5.syx");
+        copyFixturePatchToDir(tempDir, "Patch 71.syx");
+        setupComputerPatchesScan(harness, tempDir);
+
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile, 1, nullptr);
+        simulateSelectPatchFileDispatch(harness);
+        expectEquals(harness.gateState->calls, 1);
+
+        SelectPatchFileLoadDispatcher dispatcher(harness);
+        harness.gateState->allow = false;
+        harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kLoadNextPatchFile, juce::var());
+
+        expectEquals(harness.gateState->calls, 2);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile)), 1);
+
+        tempDir.deleteRecursively();
+    }
+
+    void testUnsavedGate_openCancelRestoresPriorBrowser()
+    {
+        beginTest("unsavedGate_openCancelRestoresPriorBrowser");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        const auto folderA = createTempScanDir();
+        const auto folderB = createTempScanDir();
+        expect(folderA.createDirectory());
+        expect(folderB.createDirectory());
+        copyFixturePatchToDir(folderA, "Patch 5.syx");
+        copyFixturePatchToDir(folderA, "Patch 71.syx");
+        copyFixturePatchToDir(folderB, "Patch 71.syx");
+
+        setupComputerPatchesScan(harness, folderA);
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile, 2, nullptr);
+        simulateSelectPatchFileDispatch(harness);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile)), 2);
+
+        SelectPatchFileLoadDispatcher dispatcher(harness);
+        harness.gateState->allow = false;
+        harness.pickFolderCallback = [&folderB]() { return folderB; };
+        harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kOpenPatchFolder, juce::var());
+
+        expectEquals(harness.gateState->calls, 2);
+        expect(harness.proc.apvts.state.getProperty(ComputerPatches::StateProperties::kFolderPath).toString()
+               == folderA.getFullPathName());
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile)), 2);
+        expectEquals(harness.patchFileService.getLastScanResult().validCount, 2);
+
+        folderA.deleteRecursively();
+        folderB.deleteRecursively();
+    }
+
+    void testUnsavedGate_captureAfterLoadLeavesClean()
+    {
+        beginTest("unsavedGate_captureAfterLoadLeavesClean");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        const auto tempDir = createTempScanDir();
+        expect(tempDir.createDirectory());
+        copyFixturePatchToDir(tempDir, "Patch 71.syx");
+        setupComputerPatchesScan(harness, tempDir);
+
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile, 1, nullptr);
+        simulateSelectPatchFileDispatch(harness);
+
+        expect(harness.dirtyPatchTracker.hasSnapshot());
+        expect(! harness.dirtyPatchTracker.syncApvtsAndIsDirty(
+            harness.mapper, harness.patchNameSyncer, harness.model));
+
+        tempDir.deleteRecursively();
+    }
+
+    void testUnsavedGate_captureAfterSaveLeavesClean()
+    {
+        beginTest("unsavedGate_captureAfterSaveLeavesClean");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        const auto tempDir = createTempScanDir();
+        expect(tempDir.createDirectory());
+
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StateProperties::kFolderPath,
+            tempDir.getFullPathName(),
+            nullptr);
+        harness.handler.rescanPersistedComputerPatchesFolder();
+
+        harness.pickSaveFileCallback = [&tempDir](juce::File, juce::String stem) {
+            return tempDir.getChildFile(stem + ".syx");
+        };
+
+        harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kSavePatchAs, juce::var());
+
+        expect(harness.dirtyPatchTracker.hasSnapshot());
+        expect(! harness.dirtyPatchTracker.syncApvtsAndIsDirty(
+            harness.mapper, harness.patchNameSyncer, harness.model));
+
+        tempDir.deleteRecursively();
+    }
+
+    void testUnsavedGate_captureAfterStoreLeavesClean()
+    {
+        beginTest("unsavedGate_captureAfterStoreLeavesClean");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, 0, 7, false);
+        harness.mapper.apvtsToBuffer();
+        harness.dirtyPatchTracker.captureSnapshot(harness.model);
+
+        harness.model.setName("EDITED!!");
+        harness.patchNameSyncer.bufferToApvts();
+        expect(harness.dirtyPatchTracker.syncApvtsAndIsDirty(
+            harness.mapper, harness.patchNameSyncer, harness.model));
+
+        harness.handler.handleAction(InternalPatches::kStorePatch, juce::var());
+
+        expect(harness.dirtyPatchTracker.hasSnapshot());
+        expect(! harness.dirtyPatchTracker.syncApvtsAndIsDirty(
+            harness.mapper, harness.patchNameSyncer, harness.model));
+    }
+
+    void testUnsavedGate_storeBlockedKeepsDirty()
+    {
+        beginTest("unsavedGate_storeBlockedKeepsDirty");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, 0, 7, false);
+        harness.mapper.apvtsToBuffer();
+        harness.dirtyPatchTracker.captureSnapshot(harness.model);
+
+        harness.model.setName("EDITED!!");
+        harness.patchNameSyncer.bufferToApvts();
+        expect(harness.dirtyPatchTracker.syncApvtsAndIsDirty(
+            harness.mapper, harness.patchNameSyncer, harness.model));
+
+        harness.proc.apvts.state.setProperty("deviceDetected", false, nullptr);
+        harness.handler.handleAction(InternalPatches::kStorePatch, juce::var());
+
+        expect(harness.dirtyPatchTracker.syncApvtsAndIsDirty(
+            harness.mapper, harness.patchNameSyncer, harness.model));
+    }
+
+    void testUnsavedGate_captureAfterInitThenEditIsDirty()
+    {
+        beginTest("unsavedGate_captureAfterInitThenEditIsDirty");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, 0, 3, false);
+
+        harness.handler.handleAction(InternalPatches::kInitPatch, juce::var());
+
+        expect(harness.dirtyPatchTracker.hasSnapshot());
+        expect(! harness.dirtyPatchTracker.syncApvtsAndIsDirty(
+            harness.mapper, harness.patchNameSyncer, harness.model));
+
+        harness.model.setName("DIRTYINI");
+        harness.patchNameSyncer.bufferToApvts();
+        expect(harness.dirtyPatchTracker.syncApvtsAndIsDirty(
+            harness.mapper, harness.patchNameSyncer, harness.model));
     }
 
     void testAt99_fourNext_staysBank0()
@@ -1397,6 +1658,9 @@ private:
         expect(harness.proc.apvts.state.getProperty("uiMessageSeverity").toString() == "warning");
         expect(harness.proc.apvts.state.getProperty("uiMessageText").toString()
                == FooterMessages::kLoadSelectionStale);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile)),
+            0);
 
         tempDir.deleteRecursively();
     }
@@ -1430,6 +1694,9 @@ private:
         expect(harness.proc.apvts.state.getProperty("uiMessageText").toString().isNotEmpty());
         expect(harness.proc.apvts.state.getProperty(PatchNameIds::kPatchName).toString() == patchNameBefore);
         expect(harness.queue.isEmpty());
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile)),
+            0);
 
         tempDir.deleteRecursively();
     }

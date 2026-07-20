@@ -1,5 +1,5 @@
 # generated: 2026-05-29
-# last_updated: 2026-07-19 (9-1 → done)
+# last_updated: 2026-07-20 (9-2 → done)
 # project: Matrix-Control
 # project_key: NOKEY
 # tracking_system: file-system
@@ -48,6 +48,7 @@ tracking_system: file-system
 story_location: _bmad-output/implementation-artifacts
 
 development_status:
+
 
   # Epic 0: Development Foundation (P-001)
   epic-0: done
@@ -169,7 +170,7 @@ development_status:
   # Epic 9: Unsaved Edit Protection
   epic-9: in-progress
   9-1-dirtypatchtracker: done
-  9-2-unsaved-edit-confirmation-dialog: backlog
+  9-2-unsaved-edit-confirmation-dialog: done
   epic-9-retrospective: optional
 
   # Epic 10: Direct Interactive Display Editing

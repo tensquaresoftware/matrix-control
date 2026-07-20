@@ -18,6 +18,7 @@ namespace Core
 
     class ApvtsPatchMapper;
     class ClipboardService;
+    class DirtyPatchTracker;
     class PatchFileService;
     class PatchInitService;
     class PatchModel;
@@ -43,6 +44,7 @@ namespace Core
                                   MidiManager* midiManager,
                                   PatchFileService* patchFileService,
                                   PatchNameSyncer* patchNameSyncer,
+                                  DirtyPatchTracker* dirtyPatchTracker,
                                   SysExEncoder* sysExEncoder,
                                   PatchFolderPicker pickFolder,
                                   PatchSaveFilePicker pickSaveFile,
@@ -62,9 +64,16 @@ namespace Core
         void loadCurrentPatchFromDevice(const DeviceMemoryLimits& limits);
 
     private:
-        // Returns true when the pending patch-context change may proceed (history gate hook
-        // absent, history empty, or user chose Export/Discard); false when the user cancelled.
-        bool confirmPatchContextChange();
+        // Returns true when the pending patch-context change may proceed.
+        // `includeUnsavedEditWarning` selects FR-51 + history (navigation) vs history-only (INIT/PASTE).
+        bool confirmPatchContextChange(bool includeUnsavedEditWarning = true);
+        void captureCleanSnapshot();
+        void revertComputerPatchesSelectionIfNeeded(int previousSelectedId);
+        void rememberComputerPatchesSelection(int selectedId);
+        void restoreComputerPatchesBrowser(const juce::String& folderPath, int selectedId);
+        void abortComputerPatchesNavigation();
+        // Returns the id written to APVTS, or nullopt when navigation was a no-op.
+        std::optional<int> advanceComputerPatchesSelection(bool isNext);
         void applyPatchCoordinates(const PatchCoordinates& coordinates, const DeviceMemoryLimits& limits);
         void handleUnlockBank(const DeviceMemoryLimits& limits);
         void markBanksLockedInApvts();
@@ -75,7 +84,6 @@ namespace Core
         void handleSavePatchAs();
         void handleSavePatchFile();
         void handleLoadSelectedPatchFile(const DeviceMemoryLimits& limits);
-        void advanceComputerPatchesSelection(bool isNext);
         struct SelectedPatchFileResolution
         {
             enum class Kind
@@ -131,11 +139,23 @@ namespace Core
         MidiManager* midiManager_;
         PatchFileService* patchFileService_;
         PatchNameSyncer* patchNameSyncer_;
+        DirtyPatchTracker* dirtyPatchTracker_;
         SysExEncoder* sysExEncoder_;
         PatchFolderPicker pickFolder_;
         PatchSaveFilePicker pickSaveFile_;
         PatchNameReconciliationPicker pickNameReconciliation_;
         ActionExecutionHooks hooks_;
+        int lastCommittedComputerPatchesSelectedId_ = 0;
+        bool suppressComputerPatchesSelectLoad_ = false;
+
+        // When OPEN replaces the browser then Cancel/fails the auto-load, restore this snapshot.
+        struct ComputerPatchesBrowserSnapshot
+        {
+            juce::String folderPath;
+            int selectedId = 0;
+        };
+
+        std::optional<ComputerPatchesBrowserSnapshot> pendingBrowserRestoreOnCancel_;
     };
 
 } // namespace Core

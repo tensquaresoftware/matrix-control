@@ -27,6 +27,8 @@ SettingsPanel::SettingsPanel(TSS::ISkin& skin, bool isPluginMode)
     , masterOpsPlaceholder_(kContentWidth_ - kLabelWidth_ - kGap_, kControlHeight_, TSS::labelLookFromSkin(skin), PluginDisplayNames::Settings::kComingSoon)
     , policiesLabel_(kLabelWidth_, kControlHeight_, TSS::labelLookFromSkin(skin), PluginDisplayNames::Settings::kPoliciesSection)
     , nameReconciliationPolicyCombo_(kContentWidth_ - kLabelWidth_ - kGap_, kControlHeight_, TSS::comboBoxLookFromSkin(skin))
+    , unsavedEditWarningLabel_(kLabelWidth_, kControlHeight_, TSS::labelLookFromSkin(skin), PluginDisplayNames::Settings::kUnsavedEditWarningLabel)
+    , unsavedEditWarningPolicyCombo_(kContentWidth_ - kLabelWidth_ - kGap_, kControlHeight_, TSS::comboBoxLookFromSkin(skin))
     , defragLabel_(kLabelWidth_, kControlHeight_, TSS::labelLookFromSkin(skin), PluginDisplayNames::Settings::kDefragSection)
     , defragPlaceholder_(kContentWidth_ - kLabelWidth_ - kGap_, kControlHeight_, TSS::labelLookFromSkin(skin), PluginDisplayNames::Settings::kComingSoon)
     , loggingLabel_(kLabelWidth_, kControlHeight_, TSS::labelLookFromSkin(skin), PluginDisplayNames::Settings::kLoggingSection)
@@ -41,6 +43,8 @@ SettingsPanel::SettingsPanel(TSS::ISkin& skin, bool isPluginMode)
     addAndMakeVisible(masterOpsPlaceholder_);
     addAndMakeVisible(policiesLabel_);
     addAndMakeVisible(nameReconciliationPolicyCombo_);
+    addAndMakeVisible(unsavedEditWarningLabel_);
+    addAndMakeVisible(unsavedEditWarningPolicyCombo_);
     addAndMakeVisible(defragLabel_);
     addAndMakeVisible(defragPlaceholder_);
     addAndMakeVisible(loggingLabel_);
@@ -53,6 +57,10 @@ SettingsPanel::SettingsPanel(TSS::ISkin& skin, bool isPluginMode)
                                          kPreferFilename);
     nameReconciliationPolicyCombo_.addItem(PluginDisplayNames::Settings::kNameReconciliationAskOnce,
                                          kAskOncePerLoad);
+
+    using namespace PluginIDs::Settings::UnsavedEditWarningPolicy;
+    unsavedEditWarningPolicyCombo_.addItem(PluginDisplayNames::Settings::kUnsavedEditWarnAlways, kWarnAlways);
+    unsavedEditWarningPolicyCombo_.addItem(PluginDisplayNames::Settings::kUnsavedEditNeverWarn, kNeverWarn);
 
     setPluginMode(isPluginMode);
 }
@@ -108,6 +116,7 @@ void SettingsPanel::layoutContent(juce::Rectangle<int> bounds)
 
     layoutPlaceholderRow(masterOpsLabel_, masterOpsPlaceholder_);
     layoutRow(policiesLabel_, nameReconciliationPolicyCombo_, bounds.getWidth() - labelWidth - gap);
+    layoutRow(unsavedEditWarningLabel_, unsavedEditWarningPolicyCombo_, bounds.getWidth() - labelWidth - gap);
     layoutPlaceholderRow(defragLabel_, defragPlaceholder_);
     layoutPlaceholderRow(loggingLabel_, loggingPlaceholder_);
 }
@@ -122,6 +131,8 @@ void SettingsPanel::setSkin(TSS::ISkin& skin)
     masterOpsPlaceholder_.setLook(labelLook);
     policiesLabel_.setLook(labelLook);
     nameReconciliationPolicyCombo_.setLook(TSS::comboBoxLookFromSkin(skin));
+    unsavedEditWarningLabel_.setLook(labelLook);
+    unsavedEditWarningPolicyCombo_.setLook(TSS::comboBoxLookFromSkin(skin));
     defragLabel_.setLook(labelLook);
     defragPlaceholder_.setLook(labelLook);
     loggingLabel_.setLook(labelLook);

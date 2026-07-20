@@ -19,6 +19,8 @@ namespace PluginIDs
         constexpr const char* kTestWidget = "settingsTestWidget";
         constexpr const char* kComputerPatchesNameReconciliationPolicy =
             "settingsComputerPatchesNameReconciliationPolicy";
+        constexpr const char* kUnsavedEditWarningPolicy =
+            "settingsUnsavedEditWarningPolicy";
 
         namespace NameReconciliationPolicy
         {
@@ -26,6 +28,13 @@ namespace PluginIDs
             constexpr int kPreferFilename = 2;
             constexpr int kAskOncePerLoad = 3;
             constexpr int kDefault = kPreferInternal;
+        }
+
+        namespace UnsavedEditWarningPolicy
+        {
+            constexpr int kWarnAlways = 1;
+            constexpr int kNeverWarn = 2;
+            constexpr int kDefault = kWarnAlways;
         }
 
         namespace SkinVariants
