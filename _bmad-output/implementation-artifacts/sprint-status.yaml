@@ -174,10 +174,10 @@ development_status:
   epic-9-retrospective: optional
 
   # Epic 10: Direct Interactive Display Editing
-  epic-10: in-progress
+  epic-10: done
   10-1-remove-interactivedisplayapvtssync-bridge: done
   10-2-envelopedisplay-direct-apvts-editing: done
-  10-3-trackgeneratordisplay-direct-apvts-editing: backlog
+  10-3-trackgeneratordisplay-direct-apvts-editing: done
   epic-10-retrospective: optional
 
   # Epic U: UI Scale Audit & Pixel-Perfect Layout

@@ -738,3 +738,9 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-8-4-virtual-instrument-registration-and-bus-layout.md`
   summary: When master edit becomes allowed after detection, stored master APVTS is not flushed to hardware until the next parameter edit.
   evidence: Edge Case Hunter; no AC requires auto-sync on unlock for MASTER.
+
+## Deferred from: code review of 10-3-trackgeneratordisplay-direct-apvts-editing (2026-07-20)
+
+- source_spec: `_bmad-output/implementation-artifacts/10-3-trackgeneratordisplay-direct-apvts-editing.md`
+  summary: After endChangeGesture clears the gesture gate, a callAsync lambda queued before the drag can still apply a pre-drag value to the display (gate only skips while the gesture is active). Same pattern as EnvelopeDisplayApvtsBinding; fix would need a generation/token across envelope + track bindings.
+  evidence: Blind Hunter; intentional copy of 10.2 gesture-gate pattern.

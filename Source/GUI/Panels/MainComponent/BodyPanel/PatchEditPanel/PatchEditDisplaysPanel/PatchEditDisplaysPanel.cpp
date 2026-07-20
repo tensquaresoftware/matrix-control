@@ -2,6 +2,7 @@
 
 #include "Modules/EnvelopeDisplayApvtsBinding.h"
 #include "Modules/PatchNameDisplayPanel.h"
+#include "Modules/TrackGeneratorDisplayApvtsBinding.h"
 
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Looks/LookBuilders.h"
@@ -11,6 +12,7 @@
 namespace
 {
     using EnvIds = EnvelopeDisplayApvtsBinding::ParameterIds;
+    using TrackIds = TrackGeneratorDisplayApvtsBinding::ParameterIds;
 
     const EnvIds kEnvelope1ParameterIds {{
         PluginIDs::PatchEditSection::Envelope1Module::ParameterWidgets::kDelay,
@@ -35,6 +37,14 @@ namespace
         PluginIDs::PatchEditSection::Envelope3Module::ParameterWidgets::kSustain,
         PluginIDs::PatchEditSection::Envelope3Module::ParameterWidgets::kRelease
     }};
+
+    const TrackIds kTrackGeneratorParameterIds {{
+        PluginIDs::PatchEditSection::FmTrackModule::ParameterWidgets::kTrackPoint1,
+        PluginIDs::PatchEditSection::FmTrackModule::ParameterWidgets::kTrackPoint2,
+        PluginIDs::PatchEditSection::FmTrackModule::ParameterWidgets::kTrackPoint3,
+        PluginIDs::PatchEditSection::FmTrackModule::ParameterWidgets::kTrackPoint4,
+        PluginIDs::PatchEditSection::FmTrackModule::ParameterWidgets::kTrackPoint5
+    }};
 }
 
 PatchEditDisplaysPanel::~PatchEditDisplaysPanel() = default;
@@ -57,6 +67,8 @@ PatchEditDisplaysPanel::PatchEditDisplaysPanel(TSS::ISkin& skin, const PatchEdit
     , envelope1Binding_(std::make_unique<EnvelopeDisplayApvtsBinding>(*apvts_, envelope1Display_, kEnvelope1ParameterIds))
     , envelope2Binding_(std::make_unique<EnvelopeDisplayApvtsBinding>(*apvts_, envelope2Display_, kEnvelope2ParameterIds))
     , envelope3Binding_(std::make_unique<EnvelopeDisplayApvtsBinding>(*apvts_, envelope3Display_, kEnvelope3ParameterIds))
+    , trackGeneratorBinding_(std::make_unique<TrackGeneratorDisplayApvtsBinding>(
+          *apvts_, trackGeneratorDisplay_, kTrackGeneratorParameterIds))
 {
     setOpaque(false);
     setSize(dims_.width, dims_.height);
