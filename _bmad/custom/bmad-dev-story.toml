@@ -4,17 +4,23 @@
 [workflow]
 
 activation_steps_prepend = [
-  "Charger et appliquer d’abord file:{project-root}/_bmad/custom/clarity-bar-fr.md (phrase-test non négociable), puis file:{project-root}/_bmad/custom/dev-story-presentation-fr.md et file:{project-root}/.cursor/rules/dev-story-communication.mdc. Toute sortie chat doit déjà passer « Reformule en langage naturel, sans jargon excessif » sans que Guillaume le demande.",
+  "Charger et appliquer d’abord file:{project-root}/_bmad/custom/clarity-bar-fr.md et file:{project-root}/.cursor/rules/bmad-clarity-bar.mdc (phrase-test non négociable sur TOUTE explication, question et décision), puis file:{project-root}/_bmad/custom/dev-story-presentation-fr.md, file:{project-root}/.cursor/rules/dev-story-communication.mdc et file:{project-root}/.cursor/rules/bmad-story-context-amorce.mdc. Guillaume ne doit jamais avoir à demander une reformulation pour comprendre.",
+  "HARD GATE amorce : après rename_chat (une seule fois si le titre ne commence pas déjà par « BMad — », rule bmad-agent-chat-titles) le PREMIER contenu visible pour Guillaume DOIT être « ## Contexte de la Story » + UNE phrase synthétique en français clair (sans jargon excessif) sur la story à développer. Interdit d’ouvrir par un salut, En bref, ou des questions avant ce bloc. Si « Contexte de la Story » est déjà apparu plus tôt dans cette conversation, ne pas le répéter. Ensuite seulement : suite du workflow.",
 ]
 
 persistent_facts = [
   "file:{project-root}/_bmad/custom/clarity-bar-fr.md",
+  "file:{project-root}/.cursor/rules/bmad-clarity-bar.mdc",
   "file:{project-root}/_bmad/custom/dev-story-presentation-fr.md",
   "file:{project-root}/.cursor/rules/dev-story-communication.mdc",
+  "file:{project-root}/.cursor/rules/bmad-story-context-amorce.mdc",
+  "Amorce dev-story : premier message = ## Contexte de la Story + une phrase claire ; ne pas répéter aux tours suivants.",
+  "Rename-once : si le titre Agents commence déjà par « BMad — », ne jamais rappeler rename_chat.",
+  "HARD GATE clarté : toute explication, question ou décision doit passer la phrase-test « Reformule en langage naturel, sans jargon excessif » AVANT envoi. Intention produit d’abord ; preuves techniques en bas ; options en verbes du quotidien ; Recommandation BMad obligatoire et aussi claire.",
   "Phrase-test avant envoi : si Guillaume dirait « Reformule en langage naturel, sans jargon excessif », réécrire.",
   "Langue : toujours le français dans le chat — mises à jour du fichier story en anglais dans le fichier.",
   "Ton : phrases complètes, langage naturel — interdit style télégraphique, logs bruts non reformulés, jargon non expliqué.",
-  "Messages importants : En bref puis détail accessible (intention produit avant liste de fichiers).",
+  "Messages importants : En bref puis détail accessible (intention produit avant liste de fichiers). Exception : le tout premier message d’activation commence par Contexte de la Story.",
   "Pour CHAQUE décision ou blocage à options : Recommandation BMad obligatoire (option + pourquoi + confiance).",
   "À la completion : résumé produit clair + suite proposée avec recommandation (souvent code-review).",
 ]

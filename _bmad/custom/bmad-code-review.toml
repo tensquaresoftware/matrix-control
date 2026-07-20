@@ -4,13 +4,19 @@
 [workflow]
 
 activation_steps_prepend = [
-  "Charger et appliquer d’abord file:{project-root}/_bmad/custom/clarity-bar-fr.md (phrase-test non négociable), puis file:{project-root}/_bmad/custom/code-review-presentation-fr.md et file:{project-root}/.cursor/rules/code-review-communication.mdc. Toute sortie utilisateur de cette revue doit respecter ces documents — la première version de chaque constat doit déjà passer la phrase-test « Reformule en langage naturel, sans jargon excessif ».",
+  "Charger et appliquer d’abord file:{project-root}/_bmad/custom/clarity-bar-fr.md et file:{project-root}/.cursor/rules/bmad-clarity-bar.mdc (phrase-test non négociable sur TOUTE explication, question et décision), puis file:{project-root}/_bmad/custom/code-review-presentation-fr.md, file:{project-root}/.cursor/rules/code-review-communication.mdc et file:{project-root}/.cursor/rules/bmad-story-context-amorce.mdc. Guillaume ne doit jamais avoir à demander une reformulation pour comprendre un constat ou une décision.",
+  "HARD GATE amorce : après rename_chat (une seule fois si le titre ne commence pas déjà par « BMad — », rule bmad-agent-chat-titles) le PREMIER contenu visible pour Guillaume DOIT être « ## Contexte de la Story » + UNE phrase synthétique en français clair (sans jargon excessif) sur la story revue. Interdit d’ouvrir par En bref / Verdict avant ce bloc. Si « Contexte de la Story » est déjà apparu plus tôt dans cette conversation, ne pas le répéter. Ensuite seulement : structure En bref → Verdict → constats.",
 ]
 
 persistent_facts = [
   "file:{project-root}/_bmad/custom/clarity-bar-fr.md",
+  "file:{project-root}/.cursor/rules/bmad-clarity-bar.mdc",
   "file:{project-root}/_bmad/custom/code-review-presentation-fr.md",
   "file:{project-root}/.cursor/rules/code-review-communication.mdc",
+  "file:{project-root}/.cursor/rules/bmad-story-context-amorce.mdc",
+  "Amorce code-review : premier message = ## Contexte de la Story + une phrase claire ; ne pas répéter aux tours suivants.",
+  "Rename-once : si le titre Agents commence déjà par « BMad — », ne jamais rappeler rename_chat.",
+  "HARD GATE clarté : toute explication, question ou décision doit passer la phrase-test « Reformule en langage naturel, sans jargon excessif » AVANT envoi. Intention produit d’abord ; preuves techniques en bas ; options en verbes du quotidien ; Recommandation BMad obligatoire et aussi claire.",
   "Phrase-test avant envoi : si Guillaume dirait « Reformule en langage naturel, sans jargon excessif », réécrire. Il ne doit jamais avoir à le demander.",
   "Barème de clarté : la PREMIÈRE présentation de chaque constat doit déjà être au niveau de cette reformulation.",
   "Auto-contrôle : un lecteur qui ignore les noms de fichiers comprend-il la question en ~20 secondes ? Sinon, réécrire.",
@@ -19,7 +25,7 @@ persistent_facts = [
   "Options avec verbes du quotidien (« Tout garder ensemble », « Ne garder que cette story »).",
   "Langue : toujours le français pour Guillaume — jamais l’anglais dans le chat.",
   "Ton : phrases courtes et complètes — interdit style télégraphique et piles de jargon.",
-  "Structure : En bref → Verdict → pour chaque constat Ce qui est en jeu / Le problème / Ce qu’il faut faire / Si on ne fait rien.",
+  "Structure après l’amorce : En bref → Verdict → pour chaque constat Ce qui est en jeu / Le problème / Ce qu’il faut faire / Si on ne fait rien.",
   "Pour CHAQUE décision : Recommandation BMad obligatoire (option + pourquoi accessible + confiance ferme ou nuancée).",
   "Chat ≠ story file : ne pas coller le texte dense des Review Findings dans le chat.",
   "Reformuler tout output sous-agent avant présentation.",

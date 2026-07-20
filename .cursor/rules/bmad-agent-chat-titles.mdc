@@ -5,13 +5,49 @@ alwaysApply: true
 
 # BMad — titres des conversations Agents
 
-When Guillaume starts a conversation with a **BMad skill** (attached skill or slash command such as `/bmad-create-story`, `/bmad-dev-story`, `/bmad-code-review`, `/bmad-quick-dev`, `/bmad-correct-course`, etc.), **rename the current chat immediately** — as the **first tool call**, before any other work.
-
-Also apply on **resume**: if Guillaume sends a message in an existing BMad conversation whose title is still the auto-generated one (e.g. `Story creation process`, `Code review discussion`, `bmad dev story 4-4`) instead of the BMad format below, call `rename_chat` first — infer skill and story ID / topic from the conversation's first user message (attached skill or slash command).
+When Guillaume starts a conversation with a **BMad skill** (attached skill or slash command such as `/bmad-create-story`, `/bmad-dev-story`, `/bmad-code-review`, `/bmad-quick-dev`, `/bmad-correct-course`, etc.), consider renaming the current chat — **only under the gate below**.
 
 Use the MCP tool `rename_chat` on server `cursor-app-control`. **Only this API persists the title** — direct database edits to the sidebar cache are overwritten when the conversation is opened (Cursor reloads the title from the conversation checkpoint).
 
+**Standing project instruction overrides the MCP tool blurb** that says “only when the user explicitly asks / never rename proactively”. For BMad activations in this repo, the rename-once gate below **is** that explicit standing ask — call `rename_chat` when the gate allows it.
+
 **Never announce the rename** unless Guillaume asks — apply it silently and continue the workflow.
+
+---
+
+## Rename-once gate (NON NÉGOCIABLE)
+
+Call `rename_chat` **at most once per conversation**.
+
+### When to rename (allowed)
+
+All of the following must be true:
+
+1. This is a BMad skill / slash-command turn (or a resume where the title is still auto-generated).
+2. The **current** sidebar title does **not** already look like a BMad title — i.e. it does **not** start with `BMad —` (em dash) or `BMad -` (hyphen fallback).
+3. You have **not** already called `rename_chat` earlier in this conversation.
+
+Typical auto-generated titles that still need a rename: `Story creation process`, `Code review discussion`, `bmad dev story 4-4`, `Quick dev request`, etc.
+
+### When NOT to rename (forbidden)
+
+- The title already starts with `BMad —` / `BMad -` → **never** call `rename_chat` again, even if the story ID, topic, or command would suggest a “better” title.
+- This conversation’s history already contains a prior `rename_chat` tool call → **skip** (treat as already renamed).
+- Any later turn in the same conversation after a successful rename → **skip**.
+- Do not “fix”, “refresh”, or re-apply duplicate suffixes on subsequent messages.
+
+### Resume behavior
+
+- Title already `BMad — …` → skip rename; continue workflow.
+- Title still auto-generated → rename **once**, then never again in that conversation.
+
+When renaming is allowed, do it as the **first tool call**, before other work.
+
+---
+
+## After rename — story-command amorce
+
+For `bmad-create-story`, `bmad-dev-story`, `bmad-quick-dev`, and `bmad-code-review`, follow `.cursor/rules/bmad-story-context-amorce.mdc` for the first user-facing content (`Contexte de la Story`).
 
 ---
 
@@ -31,8 +67,6 @@ These commands keep a compact ID-only title when a story ID is present:
 | `bmad-quick-dev` | `BMad — Quick Dev {Story ID}` |
 
 Omit `{Story ID}` only when none can be inferred. For `bmad-quick-dev` without a story ID, fall through to format B.
-
-For `bmad-quick-dev` only: after `rename_chat`, the first user-facing chat content must follow `.cursor/rules/quick-dev-communication.mdc` — heading `Contexte de la Story` + one synthetic French sentence, then the rest of the workflow.
 
 Examples:
 
@@ -130,6 +164,8 @@ BMad — Quick Dev 8-4 (3)
 
 ### Algorithm (before calling `rename_chat`)
 
+Only run this when the rename-once gate allows a rename.
+
 1. Compute the **base title** (no `(n)` suffix) using format A or B above.
 2. Read existing Agents sidebar names from Cursor’s state DB (**read-only**):
 
@@ -178,6 +214,7 @@ BMad — Quick Dev 8-4 (3)
 |---|---|
 | `BMad — Sprint Status (2026-06-19)` | `BMad — Sprint Status` |
 | `BMad — Quick Dev : 8-4` | `BMad — Quick Dev 8-4` |
+| Renaming again on turn 2 because the topic “improved” | Keep the existing `BMad — …` title |
 | `BMad — Quick Dev : Disabled Controls Look` | `BMad — Quick Dev : Look contrôles inactifs` (no story ID) |
 | `BMad — Correct Course : Réduction de la latence audio` | `BMad — Correct Course : Latence audio` |
 | Two chats both named `BMad — Quick Dev 8-4` | Second becomes `BMad — Quick Dev 8-4 (1)` |

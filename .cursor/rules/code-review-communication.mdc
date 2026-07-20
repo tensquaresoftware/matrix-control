@@ -7,11 +7,15 @@ alwaysApply: true
 
 During any **code review** (`bmad-code-review`, Bugbot, adversarial review, or an explicit review request):
 
+## Amorce « Contexte de la Story » (`bmad-code-review` only)
+
+SSOT: `.cursor/rules/bmad-story-context-amorce.mdc` — on first activation of `bmad-code-review`, first user-facing content must be `## Contexte de la Story` + one plain-French sentence; do not repeat later. (Does not apply to ad-hoc Bugbot / adversarial reviews without that slash command.)
+
 ## Clarity bar (non-negotiable)
 
-Shared SSOT: `_bmad/custom/clarity-bar-fr.md`.
+Shared SSOT: `_bmad/custom/clarity-bar-fr.md` + always-on rule `.cursor/rules/bmad-clarity-bar.mdc`.
 
-**Phrase-test before every important message:** if Guillaume would reply « Reformule en langage naturel, sans jargon excessif », rewrite. The **first** presentation must already pass that bar — he must never need to ask.
+**Phrase-test before every important message:** if Guillaume would reply « Reformule en langage naturel, sans jargon excessif », rewrite. The **first** presentation must already pass that bar — he must never need to ask. Same bar for **every** explanation, question, and decision in the review.
 
 Before sending: could a reader who does not know the file names understand the decision question in ~20 seconds? If not, rewrite.
 

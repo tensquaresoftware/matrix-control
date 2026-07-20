@@ -7,11 +7,15 @@ alwaysApply: true
 
 During any **dev-story** session (`bmad-dev-story`):
 
+## Amorce « Contexte de la Story »
+
+SSOT: `.cursor/rules/bmad-story-context-amorce.mdc` — first user-facing content on activation must be `## Contexte de la Story` + one plain-French sentence; do not repeat later.
+
 ## Clarity bar (non-negotiable)
 
-Shared SSOT: `_bmad/custom/clarity-bar-fr.md`.
+Shared SSOT: `_bmad/custom/clarity-bar-fr.md` + always-on rule `.cursor/rules/bmad-clarity-bar.mdc`.
 
-**Phrase-test:** if Guillaume would reply « Reformule en langage naturel, sans jargon excessif », rewrite before sending. He must never need to ask.
+**Phrase-test:** if Guillaume would reply « Reformule en langage naturel, sans jargon excessif », rewrite before sending. He must never need to ask — applies to **every** explanation, question, and decision, not only “big” messages.
 
 ## Language and tone
 

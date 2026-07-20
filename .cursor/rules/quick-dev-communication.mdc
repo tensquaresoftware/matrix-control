@@ -7,30 +7,17 @@ alwaysApply: true
 
 During any **quick-dev** session (`bmad-quick-dev`, or an explicit “build / fix / implement this” run that follows that workflow):
 
-## Amorce « Contexte de la Story » (mandatory on activation)
+## Amorce « Contexte de la Story »
 
-Right after renaming the Agents chat (see `bmad-agent-chat-titles.mdc`) and completing Quick Dev activation setup, the **first user-facing chat content** MUST be:
+SSOT (mandatory for create-story / dev-story / quick-dev / code-review): `.cursor/rules/bmad-story-context-amorce.mdc`.
 
-1. A heading: `Contexte de la Story`
-2. **One** synthetic sentence in plain French — natural language, no excess jargon — summarizing what the story (or the freeform request, if no story ID) is about.
-3. Do **not** dive into implementation details, file lists, or acceptance criteria in this sentence.
-4. Then continue with the rest of Quick Dev (clarify / route / implement / …).
-
-Example shape:
-
-```
-## Contexte de la Story
-
-Cette story enregistre Matrix-Control comme instrument virtuel dans le DAW et définit le câblage audio des bus.
-
-…suite du workflow…
-```
+On first activation of this Quick Dev run, the first user-facing content must be `## Contexte de la Story` + one plain-French sentence, then the rest of the workflow. Do not repeat on later turns.
 
 ## Clarity bar (non-negotiable)
 
-Shared SSOT: `_bmad/custom/clarity-bar-fr.md`.
+Shared SSOT: `_bmad/custom/clarity-bar-fr.md` + always-on rule `.cursor/rules/bmad-clarity-bar.mdc`.
 
-**Phrase-test before every important message** (including internal review findings and the final presentation): if Guillaume would reply « Reformule en langage naturel, sans jargon excessif », rewrite. He must never need to ask.
+**Phrase-test before every important message** (including internal review findings and the final presentation): if Guillaume would reply « Reformule en langage naturel, sans jargon excessif », rewrite. He must never need to ask — same bar for **every** explanation, question, and decision.
 
 The Quick Dev **review phase** has the **same** clarity requirement as `bmad-code-review` (En bref → Verdict → structured findings → Recommandation BMad).
 

@@ -89,9 +89,11 @@ When I modify a file (documentation, code, configuration, etc.) that contains a 
 
 ### 2.4 BMad — titres des conversations Cursor Agents
 
-When Guillaume starts a conversation with a **BMad skill** (attached skill or slash command), the agent MUST **rename the current chat immediately** in the Cursor Agents sidebar, before any other work.
+When Guillaume starts a conversation with a **BMad skill** (attached skill or slash command), the agent may **rename the current chat** in the Cursor Agents sidebar — **at most once per conversation**.
 
 Use the MCP tool `rename_chat` (`cursor-app-control`). Cursor rule: `.cursor/rules/bmad-agent-chat-titles.mdc` (authoritative detail).
+
+**Rename-once:** if the sidebar title already starts with `BMad —`, never call `rename_chat` again in that conversation (no refresh, no “better” title on later turns).
 
 **No date in the title.** The Agents sidebar already shows when each conversation took place.
 
@@ -118,9 +120,11 @@ Use the MCP tool `rename_chat` (`cursor-app-control`). Cursor rule: `.cursor/rul
 
 **Duplicates:** if the base title is already used, append ` (n)` with the next free positive integer (`(1)`, `(2)`, …). See the Cursor rule for the read-only DB check before `rename_chat`.
 
+**Amorce (create / dev / quick-dev / code-review):** first user-facing content must be `## Contexte de la Story` + one plain-French sentence — SSOT `.cursor/rules/bmad-story-context-amorce.mdc`. Do not repeat on later turns.
+
 Story IDs include epic-story numbers (`4-5`, `7-3b`) and utility stories (`U-0`, `U-11`).
 
-**Persistence:** only `rename_chat` writes the title durably. The bulk script `_local/BMad/rename-bmad-agent-chats.py` updates the sidebar cache only — opening a conversation restores the old auto-generated title from the checkpoint. To fix existing conversations, open each one and send any message; the agent will rename via `rename_chat` on first reply.
+**Persistence:** only `rename_chat` writes the title durably. The bulk script `_local/BMad/rename-bmad-agent-chats.py` updates the sidebar cache only — opening a conversation restores the old auto-generated title from the checkpoint. To fix existing conversations **whose title is still auto-generated**, open each one and send any message; the agent will rename via `rename_chat` once on first reply.
 
 ---
 

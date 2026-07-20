@@ -4,15 +4,19 @@
 [workflow]
 
 activation_steps_prepend = [
-  "Charger et appliquer d’abord file:{project-root}/_bmad/custom/clarity-bar-fr.md (phrase-test non négociable), puis file:{project-root}/_bmad/custom/quick-dev-presentation-fr.md et file:{project-root}/.cursor/rules/quick-dev-communication.mdc. Toute sortie utilisateur — surtout la revue interne — doit déjà passer la phrase-test « Reformule en langage naturel, sans jargon excessif » sans que Guillaume le demande.",
-  "Après rename_chat (règle bmad-agent-chat-titles) et la mise en place de Quick Dev : le premier contenu visible pour Guillaume DOIT être le titre « Contexte de la Story », suivi d’UNE phrase synthétique en français clair (sans jargon excessif) qui récapitule en quoi consiste la story à traiter (ou la demande libre s’il n’y a pas d’ID de story). Pas de détails d’implémentation ici. Ensuite seulement : enchaîner le reste (accueil, clarify/route, etc.).",
+  "Charger et appliquer d’abord file:{project-root}/_bmad/custom/clarity-bar-fr.md et file:{project-root}/.cursor/rules/bmad-clarity-bar.mdc (phrase-test non négociable sur TOUTE explication, question et décision), puis file:{project-root}/_bmad/custom/quick-dev-presentation-fr.md, file:{project-root}/.cursor/rules/quick-dev-communication.mdc et file:{project-root}/.cursor/rules/bmad-story-context-amorce.mdc. Guillaume ne doit jamais avoir à demander une reformulation pour comprendre.",
+  "HARD GATE amorce : après rename_chat (une seule fois si le titre ne commence pas déjà par « BMad — », rule bmad-agent-chat-titles) le PREMIER contenu visible pour Guillaume DOIT être « ## Contexte de la Story » + UNE phrase synthétique en français clair (sans jargon excessif) qui récapitule la story / demande. Interdit d’ouvrir par un salut, En bref, ou des questions avant ce bloc. Si « Contexte de la Story » est déjà apparu plus tôt dans cette conversation, ne pas le répéter. Ensuite seulement : suite du workflow.",
 ]
 
 persistent_facts = [
   "file:{project-root}/_bmad/custom/clarity-bar-fr.md",
+  "file:{project-root}/.cursor/rules/bmad-clarity-bar.mdc",
   "file:{project-root}/_bmad/custom/quick-dev-presentation-fr.md",
   "file:{project-root}/.cursor/rules/quick-dev-communication.mdc",
-  "Amorce Quick Dev : après rename_chat, premier message = titre « Contexte de la Story » + une phrase synthétique en français clair sur l’objet de la story (sans plonger dans les détails), puis le reste du workflow.",
+  "file:{project-root}/.cursor/rules/bmad-story-context-amorce.mdc",
+  "Amorce Quick Dev : premier message = ## Contexte de la Story + une phrase claire ; ne pas répéter aux tours suivants.",
+  "Rename-once : si le titre Agents commence déjà par « BMad — », ne jamais rappeler rename_chat.",
+  "HARD GATE clarté : toute explication, question ou décision doit passer la phrase-test « Reformule en langage naturel, sans jargon excessif » AVANT envoi. Intention produit d’abord ; preuves techniques en bas ; options en verbes du quotidien ; Recommandation BMad obligatoire et aussi claire.",
   "Phrase-test avant envoi : si Guillaume dirait « Reformule en langage naturel, sans jargon excessif », réécrire. Il ne doit jamais avoir à le demander.",
   "Langue utilisateur : toujours le français pour Guillaume dans bmad-quick-dev — jamais répondre en anglais dans le chat, même si les sous-agents, la spec ou le code sont en anglais.",
   "Artifacts (spec, code map, etc.) : rester en anglais (document_output_language), sauf demande contraire de Guillaume. Le chat reste en français.",
