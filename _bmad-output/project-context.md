@@ -235,7 +235,7 @@ Do not route editor SysEx through `processBlock()` midiBuffer.
 ### Dev test harness
 
 - `Source/GUI/Tests/TestComponent` — temporary widget visual testing at multiple scales.
-- Toggle via **UI Elements** button in `HeaderPanel` (right side).
+- Toggle via logo **Shift+Ctrl** gesture in `HeaderPanel` (Debug / UI Elements test area).
 - Do not remove until UI scaling is validated across all widget types.
 
 ---
@@ -322,7 +322,7 @@ Apply these to SysEx, MIDI, and Core logic (see Oberheim reference docs):
 ```
 PluginEditor
 └── MainComponent
-    ├── HeaderPanel      (skin, UI scale, UI Elements toggle)
+    ├── HeaderPanel      (logo popup: skin / UI scale; Shift+Ctrl UI Elements Debug)
     ├── BodyPanel
     │   ├── PatchEditPanel (top modules, displays, bottom modules)
     │   ├── SharedPanel (Matrix Modulation + Patch Manager)

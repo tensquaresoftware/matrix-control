@@ -16,6 +16,25 @@ struct HeaderPanelDimensions
 {
     int width;
     int height;
+    int logoWidth;
+    int logoHeight;
+    int logoVerticalOffset;
+    int contentVerticalOffset;
+    int logoGapAfter;
+    int logoPopupColumnWidth;
+    int leftPadding;
+    int controlHeight;
+    int ledSize;
+    int gap;
+    int packetExternalGap;
+    int editorMidiFromLabelWidth;
+    int midiToLabelWidth;
+    int keyboardFromLabelWidth;
+    int audioFromLabelWidth;
+    int inputGainLabelWidth;
+    int portComboBoxWidth;
+    int inputGainSliderWidth;
+    int peakIndicatorWidth;
 };
 
 struct FooterPanelDimensions

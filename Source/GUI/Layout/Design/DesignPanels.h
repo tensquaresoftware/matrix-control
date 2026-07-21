@@ -180,7 +180,18 @@ namespace TSS::Design
             inline constexpr int kLogoFontHeight = 20;
             inline constexpr int kLogoGapAfter = 32;
             inline constexpr int kLogoPopupColumnWidth = 80;
-            inline constexpr int kSettingsButtonWidth = 72;
+            inline constexpr int kLeftPadding = 12;
+            inline constexpr int kControlHeight = 20;
+            inline constexpr int kGap = 4;
+            inline constexpr int kPacketExternalGap = kGap * 4;
+            inline constexpr int kEditorMidiFromLabelWidth = 88;
+            inline constexpr int kMidiToLabelWidth = 40;
+            inline constexpr int kKeyboardFromLabelWidth = 84;
+            inline constexpr int kAudioFromLabelWidth = 64;
+            inline constexpr int kInputGainLabelWidth = 64;
+            inline constexpr int kPortComboBoxWidth = 112;
+            inline constexpr int kInputGainSliderWidth = 60;
+            inline constexpr int kPeakIndicatorWidth = 12;
         }
 
         namespace Footer

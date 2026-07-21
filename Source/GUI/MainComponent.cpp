@@ -13,7 +13,7 @@ MainComponent::MainComponent(TSS::Skin& skin,
                              const Core::PatchFileService& patchFileService)
     : skin_(&skin)
     , layoutDimensions_(layoutDimensions)
-    , headerPanel(skin, layoutDimensions_.header.width, layoutDimensions_.header.height)
+    , headerPanel(skin, layoutDimensions_.header)
     , bodyPanel(skin, layoutDimensions_, widgetFactory, apvts, patchFileService)
     , footerPanel(skin, layoutDimensions_.footer.width, layoutDimensions_.footer.height, apvts)
 {

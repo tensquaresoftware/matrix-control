@@ -46,8 +46,6 @@ namespace TSS::Design
 
             namespace Button
             {
-                inline constexpr int kHeaderPanelTheme = 68;
-
                 inline constexpr int kInit = 20;
                 inline constexpr int kCopy = 20;
                 inline constexpr int kPaste = 20;

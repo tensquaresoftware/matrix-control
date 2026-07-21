@@ -12,7 +12,7 @@ namespace TSS
                  private juce::Timer
     {
     public:
-        explicit Logo(ISkin& skin);
+        explicit Logo(ISkin& skin, int width, int height);
         ~Logo() override = default;
 
         void setSkin(ISkin& skin);

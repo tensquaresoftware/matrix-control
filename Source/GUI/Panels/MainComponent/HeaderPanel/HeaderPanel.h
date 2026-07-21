@@ -12,7 +12,7 @@
 #include "GUI/Widgets/PeakIndicator.h"
 #include "GUI/Widgets/Slider.h"
 
-#include "GUI/Layout/Design/DesignPanels.h"
+#include "GUI/Layout/PanelDimensions.h"
 #include "GUI/Skins/Skin.h"
 #include "Shared/Definitions/PluginIDs.h"
 
@@ -30,7 +30,7 @@ public:
     static constexpr int kFirstDeviceItemId = 2;
     static constexpr int kPluginHostItemId = 2;
 
-    HeaderPanel(TSS::ISkin& skin, int width, int height);
+    HeaderPanel(TSS::ISkin& skin, const HeaderPanelDimensions& dimensions);
     ~HeaderPanel() override = default;
 
     void paint(juce::Graphics&) override;
@@ -76,8 +76,6 @@ public:
     TSS::Slider& getInputGainSlider() { return inputGainSlider_; }
     TSS::PeakIndicator& getPeakIndicator() { return peakIndicator_; }
 
-    static int getGap() { return kGap_; }
-
 private:
     void showLogoPopup();
 
@@ -92,22 +90,7 @@ private:
     juce::String getSelectedPortIdentifier(const TSS::ComboBox& combo,
                                            const std::vector<juce::String>& identifiers) const;
 
-    int width_;
-    int height_;
-    inline constexpr static int kEditorMidiFromLabelWidth_ = 88;
-    inline constexpr static int kMidiToLabelWidth_ = 40;
-    inline constexpr static int kKeyboardFromLabelWidth_ = 84;
-    inline constexpr static int kAudioFromLabelWidth_ = 64;
-    inline constexpr static int kInputGainLabelWidth_ = 64;
-    inline constexpr static int kPortComboBoxWidth_ = 112;
-    inline constexpr static int kInputGainSliderWidth_ = 60;
-    inline constexpr static int kPeakIndicatorWidth_ = 12;
-    inline constexpr static int kLedSize_ = 12;
-    inline constexpr static int kGap_ = 4;
-    inline constexpr static int kPacketExternalGap_ = kGap_ * 4;
-    inline constexpr static int kControlHeight_ = 20;
-    inline constexpr static int kLeftPadding_ = 12;
-
+    HeaderPanelDimensions dimensions_;
     TSS::ISkin* skin_;
     float uiScale_ = 1.0f;
     bool isPluginMode_ = false;

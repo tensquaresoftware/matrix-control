@@ -1,6 +1,5 @@
 #include "Logo.h"
 
-#include "GUI/Layout/Design/DesignPanels.h"
 #include "GUI/Looks/LookBuilders.h"
 #include "GUI/Skins/ColourChart.h"
 #include "GUI/Skins/ISkin.h"
@@ -9,9 +8,9 @@
 
 namespace TSS
 {
-    Logo::Logo(ISkin& skin)
-        : Label(Design::Panels::Header::kLogoWidth,
-                Design::Panels::Header::kLogoHeight,
+    Logo::Logo(ISkin& skin, int width, int height)
+        : Label(width,
+                height,
                 brandLabelLookFromSkin(skin),
                 PluginDisplayNames::kPluginName)
         , skin_(&skin)

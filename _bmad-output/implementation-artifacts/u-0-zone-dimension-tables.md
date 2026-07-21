@@ -10,7 +10,7 @@ sources:
   - Source/GUI/Layout/Design/DesignPanels.h
   - Source/GUI/Layout/Design/DesignChecks.h
 created: 2026-06-09
-updated: 2026-06-09
+updated: 2026-07-21
 ---
 
 # U-0 Zone Dimension Tables
@@ -32,9 +32,12 @@ Valeurs de référence @ 100 % (grille ÷4). Chemins de symboles : namespace `TS
 
 | px @ 100 % | Symbole Design* | Story UAT |
 |------------|-------------------|-----------|
-| 1300 × 32 | `Panels::Header::kWidth` × `Panels::Header::kHeight` | U-3 |
+| 1300 × 40 | `Panels::Header::kWidth` × `Panels::Header::kHeight` | U-3 |
 | 1300 × 32 | `Panels::Footer::kWidth` × `Panels::Footer::kHeight` | U-4 |
-| 68 | `Atoms::Widths::Button::kHeaderPanelTheme` | U-3 |
+
+### FR-41 layout slots (header)
+
+Logo is the left-side anchor. Skin / UI Scale live in the logo popup columns (`kLogoPopupColumnWidth`); UI Elements (Debug) is logo Shift+Ctrl. Implemented in Stories 7.8 / 7.10 — no on-bar SCALE/SKIN/UI Elements cluster.
 
 ## Patch Edit (haut / milieu / bas)
 

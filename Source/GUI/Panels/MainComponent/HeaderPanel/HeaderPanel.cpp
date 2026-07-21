@@ -7,7 +7,6 @@
 #include "GUI/Widgets/HeaderLogoPopupMenu.h"
 #include "GUI/Skins/Skin.h"
 #include "GUI/Skins/SkinHelpers.h"
-#include "GUI/Layout/Design/DesignPanels.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Looks/LookBuilders.h"
 #include "Shared/Definitions/PluginAudioConstants.h"
@@ -61,24 +60,23 @@ namespace
     }
 }
 
-HeaderPanel::HeaderPanel(TSS::ISkin& skin, int width, int height)
-    : width_(width)
-    , height_(height)
+HeaderPanel::HeaderPanel(TSS::ISkin& skin, const HeaderPanelDimensions& dimensions)
+    : dimensions_(dimensions)
     , skin_(&skin)
-    , logo_(skin)
-    , midiFromLabel_(kEditorMidiFromLabelWidth_, kControlHeight_, TSS::darkPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kEditorMidiFromLabel)
-    , midiFromComboBox_(kPortComboBoxWidth_, kControlHeight_, TSS::comboBoxLookFromSkin(skin), TSS::ComboBox::Style::ButtonLike)
-    , editorActivityLed_(kLedSize_, kLedSize_)
-    , midiToLabel_(kMidiToLabelWidth_, kControlHeight_, TSS::darkPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kMidiToLabel)
-    , midiToComboBox_(kPortComboBoxWidth_, kControlHeight_, TSS::comboBoxLookFromSkin(skin), TSS::ComboBox::Style::ButtonLike)
-    , midiToActivityLed_(kLedSize_, kLedSize_)
-    , keyboardFromLabel_(kKeyboardFromLabelWidth_, kControlHeight_, TSS::darkPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kKeyboardFromLabel)
-    , keyboardFromComboBox_(kPortComboBoxWidth_, kControlHeight_, TSS::comboBoxLookFromSkin(skin), TSS::ComboBox::Style::ButtonLike)
-    , instrumentActivityLed_(kLedSize_, kLedSize_)
-    , audioFromLabel_(kAudioFromLabelWidth_, kControlHeight_, TSS::darkPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kAudioFromLabel)
-    , audioFromComboBox_(kPortComboBoxWidth_, kControlHeight_, TSS::comboBoxLookFromSkin(skin), TSS::ComboBox::Style::ButtonLike)
-    , inputGainLabel_(kInputGainLabelWidth_, kControlHeight_, TSS::darkPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kInputGainLabel)
-    , inputGainSlider_(kInputGainSliderWidth_, kControlHeight_, TSS::sliderLookFromSkin(skin),
+    , logo_(skin, dimensions.logoWidth, dimensions.logoHeight)
+    , midiFromLabel_(dimensions.editorMidiFromLabelWidth, dimensions.controlHeight, TSS::darkPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kEditorMidiFromLabel)
+    , midiFromComboBox_(dimensions.portComboBoxWidth, dimensions.controlHeight, TSS::comboBoxLookFromSkin(skin), TSS::ComboBox::Style::ButtonLike)
+    , editorActivityLed_(dimensions.ledSize, dimensions.ledSize)
+    , midiToLabel_(dimensions.midiToLabelWidth, dimensions.controlHeight, TSS::darkPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kMidiToLabel)
+    , midiToComboBox_(dimensions.portComboBoxWidth, dimensions.controlHeight, TSS::comboBoxLookFromSkin(skin), TSS::ComboBox::Style::ButtonLike)
+    , midiToActivityLed_(dimensions.ledSize, dimensions.ledSize)
+    , keyboardFromLabel_(dimensions.keyboardFromLabelWidth, dimensions.controlHeight, TSS::darkPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kKeyboardFromLabel)
+    , keyboardFromComboBox_(dimensions.portComboBoxWidth, dimensions.controlHeight, TSS::comboBoxLookFromSkin(skin), TSS::ComboBox::Style::ButtonLike)
+    , instrumentActivityLed_(dimensions.ledSize, dimensions.ledSize)
+    , audioFromLabel_(dimensions.audioFromLabelWidth, dimensions.controlHeight, TSS::darkPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kAudioFromLabel)
+    , audioFromComboBox_(dimensions.portComboBoxWidth, dimensions.controlHeight, TSS::comboBoxLookFromSkin(skin), TSS::ComboBox::Style::ButtonLike)
+    , inputGainLabel_(dimensions.inputGainLabelWidth, dimensions.controlHeight, TSS::darkPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kInputGainLabel)
+    , inputGainSlider_(dimensions.inputGainSliderWidth, dimensions.controlHeight, TSS::sliderLookFromSkin(skin),
                        TSS::SliderConfig{
                            static_cast<double>(PluginAudioConstants::kInputGainSilenceIndex),
                            static_cast<double>(PluginAudioConstants::kInputGainMaxIndex),
@@ -88,7 +86,7 @@ HeaderPanel::HeaderPanel(TSS::ISkin& skin, int width, int height)
                            {},
                            inputGainNormalizedFill,
                            inputGainFormatValue})
-    , peakIndicator_(kPeakIndicatorWidth_, kControlHeight_)
+    , peakIndicator_(dimensions.peakIndicatorWidth, dimensions.controlHeight)
 {
     setOpaque(true);
 
@@ -149,35 +147,35 @@ void HeaderPanel::resized()
 {
     const auto bounds = getLocalBounds();
     const float sf = uiScale_;
-    const float gap = static_cast<float>(kGap_) * sf;
-    const float packetExternalGap = static_cast<float>(kPacketExternalGap_) * sf;
-    const float controlHeight = static_cast<float>(kControlHeight_) * sf;
+    const float gap = static_cast<float>(dimensions_.gap) * sf;
+    const float packetExternalGap = static_cast<float>(dimensions_.packetExternalGap) * sf;
+    const float controlHeight = static_cast<float>(dimensions_.controlHeight) * sf;
     const int panelHeight = bounds.getHeight();
     const int controlHeightPx = juce::roundToInt(controlHeight);
     const int contentYOffset = TSS::ScaledLayout::scaledInt(
-        static_cast<float>(TSS::Design::Panels::Header::kContentVerticalOffset), sf);
+        static_cast<float>(dimensions_.contentVerticalOffset), sf);
     const int controlY = bounds.getY() + (panelHeight - controlHeightPx) / 2 + contentYOffset;
 
-    const float editorMidiFromLabelWidth = static_cast<float>(kEditorMidiFromLabelWidth_) * sf;
-    const float midiToLabelWidth = static_cast<float>(kMidiToLabelWidth_) * sf;
-    const float keyboardFromLabelWidth = static_cast<float>(kKeyboardFromLabelWidth_) * sf;
-    const float audioFromLabelWidth = static_cast<float>(kAudioFromLabelWidth_) * sf;
-    const float inputGainLabelWidth = static_cast<float>(kInputGainLabelWidth_) * sf;
-    const float portComboWidth = static_cast<float>(kPortComboBoxWidth_) * sf;
-    const float inputGainSliderWidth = static_cast<float>(kInputGainSliderWidth_) * sf;
-    const float peakIndicatorWidth = static_cast<float>(kPeakIndicatorWidth_) * sf;
-    const float ledSize = static_cast<float>(kLedSize_) * sf;
+    const float editorMidiFromLabelWidth = static_cast<float>(dimensions_.editorMidiFromLabelWidth) * sf;
+    const float midiToLabelWidth = static_cast<float>(dimensions_.midiToLabelWidth) * sf;
+    const float keyboardFromLabelWidth = static_cast<float>(dimensions_.keyboardFromLabelWidth) * sf;
+    const float audioFromLabelWidth = static_cast<float>(dimensions_.audioFromLabelWidth) * sf;
+    const float inputGainLabelWidth = static_cast<float>(dimensions_.inputGainLabelWidth) * sf;
+    const float portComboWidth = static_cast<float>(dimensions_.portComboBoxWidth) * sf;
+    const float inputGainSliderWidth = static_cast<float>(dimensions_.inputGainSliderWidth) * sf;
+    const float peakIndicatorWidth = static_cast<float>(dimensions_.peakIndicatorWidth) * sf;
+    const float ledSize = static_cast<float>(dimensions_.ledSize) * sf;
     const int ledSizePx = juce::roundToInt(ledSize);
     const int ledY = bounds.getY() + (panelHeight - ledSizePx) / 2 + contentYOffset;
-    const float leftPadding = static_cast<float>(kLeftPadding_) * sf;
-    const float logoGapAfter = static_cast<float>(TSS::Design::Panels::Header::kLogoGapAfter) * sf;
+    const float leftPadding = static_cast<float>(dimensions_.leftPadding) * sf;
+    const float logoGapAfter = static_cast<float>(dimensions_.logoGapAfter) * sf;
     const int logoWidth = TSS::ScaledLayout::scaledInt(
-        static_cast<float>(TSS::Design::Panels::Header::kLogoWidth), uiScale_);
+        static_cast<float>(dimensions_.logoWidth), uiScale_);
     const int logoHeight = TSS::ScaledLayout::scaledInt(
-        static_cast<float>(TSS::Design::Panels::Header::kLogoHeight), uiScale_);
+        static_cast<float>(dimensions_.logoHeight), uiScale_);
     const int logoX = juce::roundToInt(static_cast<float>(bounds.getX()) + leftPadding);
     logo_.setBounds(logoX,
-                     controlY + TSS::Design::Panels::Header::kLogoVerticalOffset,
+                     controlY + dimensions_.logoVerticalOffset,
                      logoWidth,
                      logoHeight);
     logo_.setUiScale(uiScale_);
