@@ -2,6 +2,7 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
+#include "PopupMenuCustomScrollBar.h"
 #include "PopupMenuRenderer.h"
 
 namespace TSS
@@ -27,8 +28,6 @@ namespace TSS
         static void show(HierarchicalComboBox& owner);
 
     private:
-        class CustomScrollBar;
-
         inline constexpr static float kThumbInsetBase_ = 2.0f;
         inline constexpr static float kWheelScrollFactorContent_ = 100.0f;
         inline constexpr static float kLabelWidthPadding_ = 8.0f;
@@ -45,8 +44,10 @@ namespace TSS
         int primaryScrollOffset_ = 0;
         int secondaryScrollOffset_ = 0;
 
-        std::unique_ptr<CustomScrollBar> primaryScrollBar_;
-        std::unique_ptr<CustomScrollBar> secondaryScrollBar_;
+        std::unique_ptr<CallbackPopupMenuScrollModel> primaryScrollModel_;
+        std::unique_ptr<CallbackPopupMenuScrollModel> secondaryScrollModel_;
+        std::unique_ptr<PopupMenuCustomScrollBar> primaryScrollBar_;
+        std::unique_ptr<PopupMenuCustomScrollBar> secondaryScrollBar_;
 
         bool hasSecondaryColumn() const;
         int getOpenablePrimaryCount() const;
@@ -70,6 +71,8 @@ namespace TSS
         void ensureHighlightedChildVisible();
         void applyPreferredSize();
         void layoutScrollBars();
+        void ensurePrimaryScrollBar();
+        void ensureSecondaryScrollBar();
         int getScaledVerticalMargin() const;
         void measureColumnWidths();
         void drawAlignedPanelBorders(juce::Graphics& g,

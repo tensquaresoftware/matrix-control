@@ -1,5 +1,10 @@
 # Deferred Work
 
+## Deferred from: code review of u-13-combobox-popup-infrastructure-dedup (2026-07-21)
+
+- ComboBox can leave `isPopupOpen_` stuck true if `ScrollablePopupMenu::show` / `MultiColumnPopupMenu::show` early-returns after `notifyPopupOpened` (null top-level, or empty items race). Same open-before-show order existed before U-13; not introduced by the host extract.
+  evidence: Blind Hunter + Edge Case Hunter; `ComboBox.cpp` `showPopupAsynchronously`.
+
 ## Deferred from: code review of 9-2-unsaved-edit-confirmation-dialog (2026-07-20)
 
 - source_spec: `_bmad-output/implementation-artifacts/9-2-unsaved-edit-confirmation-dialog.md`
@@ -162,8 +167,8 @@
 
 ## Deferred from: code review of 6-15-history-combobox-popup-ux (2026-07-15)
 
-- **Duplicated `CustomScrollBar` in `HierarchicalPopupMenu`** — ~copy of `ScrollablePopupMenu` thumb/timer/wheel math; story 6-15 allowed reuse patterns without full U-13 DRY. Extract shared helper in U-13.
-- **Permanent 20 Hz scrollbar timers while hierarchical popup is open** — inherited from ScrollablePopupMenu CustomScrollBar pattern (`startTimerHz(20)` + idle `repaint`); fix with shared scroll infra in U-13.
+- ~~**Duplicated `CustomScrollBar` in `HierarchicalPopupMenu`** — ~copy of `ScrollablePopupMenu` thumb/timer/wheel math; story 6-15 allowed reuse patterns without full U-13 DRY. Extract shared helper in U-13.~~ **Cleared by U-13** (`PopupMenuCustomScrollBar` + scroll models).
+- ~~**Permanent 20 Hz scrollbar timers while hierarchical popup is open** — inherited from ScrollablePopupMenu CustomScrollBar pattern (`startTimerHz(20)` + idle `repaint`); fix with shared scroll infra in U-13.~~ **Cleared by U-13** (event-driven repaint only).
 
 ## Deferred from: code review of 6-14-patch-mutator-hierarchical-history-combobox (2026-07-15)
 

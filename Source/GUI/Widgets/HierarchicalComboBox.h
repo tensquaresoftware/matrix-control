@@ -7,13 +7,14 @@
 
 #include "GUI/Looks/WidgetLooks.h"
 #include "ComboBoxControlPainter.h"
+#include "IPopupMenuHost.h"
 #include "PopupMenuPositioner.h"
 
 namespace TSS
 {
     class HierarchicalPopupMenu;
 
-    class HierarchicalComboBox : public juce::Component
+    class HierarchicalComboBox : public juce::Component, public IPopupMenuHost
     {
     public:
         explicit HierarchicalComboBox(int width, int height, const ComboBoxLook& look);
@@ -24,7 +25,7 @@ namespace TSS
         void setUiScale(float uiScale);
         void setInactiveAppearance(bool inactive);
         void setPopupVerticalPlacement(PopupVerticalPlacement placement);
-        PopupVerticalPlacement getPopupVerticalPlacement() const { return popupVerticalPlacement_; }
+        PopupVerticalPlacement getPopupVerticalPlacement() const override { return popupVerticalPlacement_; }
 
         void clear();
         void addPrimaryItem(int id, const juce::String& label, bool isSentinel = false);
@@ -48,9 +49,16 @@ namespace TSS
         void focusGained(juce::Component::FocusChangeType cause) override;
         void focusLost(juce::Component::FocusChangeType cause) override;
 
-        float getUiScale() const { return uiScale_; }
-        int getBaseComponentWidth() const { return width_; }
+        float getUiScale() const override { return uiScale_; }
+        const PopupMenuLook& getPopupMenuLook() const override { return popupLook_; }
+        juce::Component& asHostComponent() override { return *this; }
+        const juce::Component& asHostComponent() const override { return *this; }
+        int getBaseComponentWidth() const override { return width_; }
         int getBaseComponentHeight() const { return height_; }
+        int getScaledVerticalMargin() const override;
+
+        void notifyPopupOpened() override;
+        void notifyPopupClosed() override;
 
         static int getBaseHeight() { return ComboBoxControlMetrics::kDefaultHeight; }
 
@@ -73,10 +81,7 @@ namespace TSS
 
         int getPrimaryItemCount() const { return static_cast<int>(primaryItems_.size()); }
         const PrimaryItem& getPrimaryItem(int index) const { return primaryItems_[static_cast<size_t>(index)]; }
-        const PopupMenuLook& getPopupMenuLook() const { return popupLook_; }
         bool canShowPopupMenu() const;
-        void notifyPopupOpened();
-        void notifyPopupClosed();
         void commitSelectionFromPopup(int primaryId, int childId);
 
         ComboBoxLook look_{};

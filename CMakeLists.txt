@@ -310,6 +310,7 @@ set(PLUGIN_SOURCES
     Source/GUI/Widgets/PeakIndicator.cpp
     Source/GUI/Widgets/PatchNameDisplay.cpp
     Source/GUI/Widgets/PopupMenuBase.cpp
+    Source/GUI/Widgets/PopupMenuCustomScrollBar.cpp
     Source/GUI/Widgets/PopupMenuPositioner.cpp
     Source/GUI/Widgets/PopupMenuRenderer.cpp
     Source/GUI/Widgets/ScrollablePopupMenu.cpp

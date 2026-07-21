@@ -1,4 +1,5 @@
 #include "ComboBox.h"
+#include "ComboBoxClosedControlHelper.h"
 #include "ComboBoxControlPainter.h"
 #include "MultiColumnPopupMenu.h"
 #include "ScrollablePopupMenu.h"
@@ -39,6 +40,7 @@ namespace TSS
     {
         return juce::roundToInt(static_cast<float>(popupLayoutDimensions_.verticalMargin) * uiScale_);
     }
+
     ComboBox::ComboBox(int width, int height, const ComboBoxLook& look, Style style)
         : juce::ComboBox()
         , look_(look)
@@ -54,22 +56,17 @@ namespace TSS
 
     void ComboBox::setLook(const ComboBoxLook& look)
     {
-        look_ = look;
-        repaint();
+        ComboBoxClosedControlHelper::applyLook(look_, look, *this);
     }
 
     void ComboBox::setPopupMenuLook(const PopupMenuLook& look)
     {
-        popupLook_ = look;
+        ComboBoxClosedControlHelper::applyPopupMenuLook(popupLook_, look);
     }
 
     void ComboBox::setUiScale(float uiScale)
     {
-        if (juce::approximatelyEqual(uiScale_, uiScale))
-            return;
-        
-        uiScale_ = uiScale;
-        repaint();
+        ComboBoxClosedControlHelper::applyUiScale(uiScale_, uiScale, *this);
     }
 
     void ComboBox::setPopupVerticalPlacement(PopupVerticalPlacement placement)
@@ -92,7 +89,7 @@ namespace TSS
             uiScale_,
             getSelectedItemText(),
             isEnabled(),
-            hasFocus_ || isPopupOpen_);
+            ComboBoxClosedControlHelper::shouldShowFocusRing(hasFocus_, isPopupOpen_));
     }
 
     juce::String ComboBox::getSelectedItemText() const
@@ -121,23 +118,29 @@ namespace TSS
     void ComboBox::showPopupAsynchronously()
     {
         const auto useScrollableMode = (style_ == Style::ButtonLike);
-        
+
         juce::MessageManager::callAsync([safePointer = SafePointer<ComboBox>(this), useScrollableMode]()
         {
             if (safePointer != nullptr && safePointer->canShowPopup())
             {
-                safePointer->isPopupOpen_ = true;
-                
+                safePointer->notifyPopupOpened();
+
                 if (useScrollableMode)
-                {
                     ScrollablePopupMenu::show(*safePointer);
-                }
                 else
-                {
                     MultiColumnPopupMenu::show(*safePointer);
-                }
             }
         });
+    }
+
+    void ComboBox::notifyPopupOpened()
+    {
+        ComboBoxClosedControlHelper::applyPopupOpened(isPopupOpen_, *this);
+    }
+
+    void ComboBox::notifyPopupClosed()
+    {
+        ComboBoxClosedControlHelper::applyPopupClosed(isPopupOpen_, *this);
     }
 
     void ComboBox::mouseDown(const juce::MouseEvent& e)
@@ -145,24 +148,17 @@ namespace TSS
         if (isEnabled())
         {
             if (e.mods.isLeftButtonDown())
-            {
                 showPopup();
-            }
         }
     }
 
     void ComboBox::focusGained(juce::Component::FocusChangeType)
     {
-        if (isEnabled() && ! hasFocus_)
-        {
-            hasFocus_ = true;
-            repaint();
-        }
+        ComboBoxClosedControlHelper::applyFocusGained(hasFocus_, *this, isEnabled());
     }
 
     void ComboBox::focusLost(juce::Component::FocusChangeType)
     {
-        hasFocus_ = false;
-        repaint();
+        ComboBoxClosedControlHelper::applyFocusLost(hasFocus_, *this);
     }
 }

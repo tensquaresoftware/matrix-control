@@ -2,6 +2,7 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
+#include "IPopupMenuHost.h"
 #include "PopupMenuRenderer.h"
 
 namespace TSS
@@ -25,11 +26,12 @@ namespace TSS
 
         void updateHighlightedItem(int itemIndex);
         void selectItem(int itemIndex);
-        
+
         bool isValidItemIndex(int itemIndex) const;
-        
+
         virtual void handleKeyboardNavigation(const juce::KeyPress& key) = 0;
 
+        IPopupMenuHost& host_;
         ComboBox& comboBox_;
         bool isButtonLike_ = false;
         int highlightedItemIndex_ = -1;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "PopupMenuBase.h"
+#include "PopupMenuCustomScrollBar.h"
 
 namespace TSS
 {
@@ -20,7 +21,6 @@ namespace TSS
 
     private:
         class ScrollableContentComponent;
-        class CustomScrollBar;
 
         inline constexpr static float kRightMarginFromHighlightToEdge_ = 8.0f;
         inline constexpr static float kWheelScrollFactorContent_ = 100.0f;
@@ -32,17 +32,19 @@ namespace TSS
 
         std::unique_ptr<juce::Viewport> viewport_;
         std::unique_ptr<ScrollableContentComponent> contentComponent_;
-        std::unique_ptr<CustomScrollBar> customScrollBar_;
+        std::unique_ptr<ViewportPopupMenuScrollModel> scrollModel_;
+        std::unique_ptr<PopupMenuCustomScrollBar> customScrollBar_;
 
         void setupScrollableContent();
-        
+        void repaintScrollBar();
+
         juce::Rectangle<float> getItemBounds(int itemIndex) const;
         int getItemIndexAt(int x, int y) const;
-        
+
         void drawItems(juce::Graphics& g);
 
         void scrollViewportBy(int deltaPixels);
-        
+
         void navigateUp();
         void navigateDown();
 

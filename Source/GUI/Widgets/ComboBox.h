@@ -5,15 +5,15 @@
 #include "GUI/Layout/WidgetDimensions.h"
 #include "GUI/Looks/WidgetLooks.h"
 #include "ComboBoxControlPainter.h"
+#include "IPopupMenuHost.h"
 #include "PopupMenuPositioner.h"
 
 namespace TSS
 {
-    class PopupMenuBase;
     class MultiColumnPopupMenu;
     class ScrollablePopupMenu;
 
-    class ComboBox : public juce::ComboBox
+    class ComboBox : public juce::ComboBox, public IPopupMenuHost
     {
     public:
         enum class Style
@@ -29,7 +29,7 @@ namespace TSS
         void setPopupMenuLook(const PopupMenuLook& look);
         void setUiScale(float uiScale);
         void setPopupVerticalPlacement(PopupVerticalPlacement placement);
-        PopupVerticalPlacement getPopupVerticalPlacement() const { return popupVerticalPlacement_; }
+        PopupVerticalPlacement getPopupVerticalPlacement() const override { return popupVerticalPlacement_; }
 
         void paint(juce::Graphics& g) override;
         void showPopup() override;
@@ -39,18 +39,22 @@ namespace TSS
         void focusGained(juce::Component::FocusChangeType cause) override;
         void focusLost(juce::Component::FocusChangeType cause) override;
 
-        float getUiScale() const { return uiScale_; }
-        const PopupMenuLook& getPopupMenuLook() const { return popupLook_; }
-        int getBaseComponentWidth() const { return width_; }
+        float getUiScale() const override { return uiScale_; }
+        const PopupMenuLook& getPopupMenuLook() const override { return popupLook_; }
+        juce::Component& asHostComponent() override { return *this; }
+        const juce::Component& asHostComponent() const override { return *this; }
+        int getBaseComponentWidth() const override { return width_; }
         int getBaseComponentHeight() const { return height_; }
-        
+        int getScaledVerticalMargin() const override;
+
+        void notifyPopupOpened() override;
+        void notifyPopupClosed() override;
+
         static int getBaseWidth() { return ComboBoxControlMetrics::kDefaultWidth; }
         static int getBaseHeight() { return ComboBoxControlMetrics::kDefaultHeight; }
 
         static void setPopupLayoutDimensions(const PopupMenuLayoutDimensions& dimensions);
         static const PopupMenuLayoutDimensions& getPopupLayoutDimensions();
-
-        int getScaledVerticalMargin() const;
 
     private:
         ComboBoxLook look_{};
@@ -69,7 +73,6 @@ namespace TSS
         bool canShowPopup() const;
         void showPopupAsynchronously();
 
-        friend class PopupMenuBase;
         friend class MultiColumnPopupMenu;
         friend class ScrollablePopupMenu;
 

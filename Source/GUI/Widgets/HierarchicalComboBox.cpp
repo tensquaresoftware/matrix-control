@@ -1,5 +1,7 @@
 #include "HierarchicalComboBox.h"
 
+#include "ComboBox.h"
+#include "ComboBoxClosedControlHelper.h"
 #include "ComboBoxControlPainter.h"
 #include "HierarchicalPopupMenu.h"
 
@@ -19,22 +21,17 @@ namespace TSS
 
     void HierarchicalComboBox::setLook(const ComboBoxLook& look)
     {
-        look_ = look;
-        repaint();
+        ComboBoxClosedControlHelper::applyLook(look_, look, *this);
     }
 
     void HierarchicalComboBox::setPopupMenuLook(const PopupMenuLook& look)
     {
-        popupLook_ = look;
+        ComboBoxClosedControlHelper::applyPopupMenuLook(popupLook_, look);
     }
 
     void HierarchicalComboBox::setUiScale(float uiScale)
     {
-        if (juce::approximatelyEqual(uiScale_, uiScale))
-            return;
-
-        uiScale_ = uiScale;
-        repaint();
+        ComboBoxClosedControlHelper::applyUiScale(uiScale_, uiScale, *this);
     }
 
     void HierarchicalComboBox::setInactiveAppearance(bool inactive)
@@ -49,6 +46,11 @@ namespace TSS
     void HierarchicalComboBox::setPopupVerticalPlacement(PopupVerticalPlacement placement)
     {
         popupVerticalPlacement_ = placement;
+    }
+
+    int HierarchicalComboBox::getScaledVerticalMargin() const
+    {
+        return juce::roundToInt(static_cast<float>(ComboBox::getPopupLayoutDimensions().verticalMargin) * uiScale_);
     }
 
     void HierarchicalComboBox::clear()
@@ -109,7 +111,7 @@ namespace TSS
             uiScale_,
             getDisplayText(),
             enabled,
-            hasFocus_ || isPopupOpen_);
+            ComboBoxClosedControlHelper::shouldShowFocusRing(hasFocus_, isPopupOpen_));
     }
 
     void HierarchicalComboBox::mouseDown(const juce::MouseEvent& e)
@@ -120,17 +122,12 @@ namespace TSS
 
     void HierarchicalComboBox::focusGained(juce::Component::FocusChangeType)
     {
-        if (isEnabled() && ! hasFocus_)
-        {
-            hasFocus_ = true;
-            repaint();
-        }
+        ComboBoxClosedControlHelper::applyFocusGained(hasFocus_, *this, isEnabled());
     }
 
     void HierarchicalComboBox::focusLost(juce::Component::FocusChangeType)
     {
-        hasFocus_ = false;
-        repaint();
+        ComboBoxClosedControlHelper::applyFocusLost(hasFocus_, *this);
     }
 
     bool HierarchicalComboBox::canShowPopupMenu() const
@@ -149,15 +146,12 @@ namespace TSS
 
     void HierarchicalComboBox::notifyPopupOpened()
     {
-        isPopupOpen_ = true;
-        repaint();
+        ComboBoxClosedControlHelper::applyPopupOpened(isPopupOpen_, *this);
     }
 
     void HierarchicalComboBox::notifyPopupClosed()
     {
-        isPopupOpen_ = false;
-        repaint();
-        grabKeyboardFocus();
+        ComboBoxClosedControlHelper::applyPopupClosed(isPopupOpen_, *this);
     }
 
     void HierarchicalComboBox::commitSelectionFromPopup(int primaryId, int childId)

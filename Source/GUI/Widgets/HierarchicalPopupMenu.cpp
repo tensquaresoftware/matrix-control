@@ -2,147 +2,13 @@
 
 #include "ComboBox.h"
 #include "HierarchicalComboBox.h"
+#include "PopupMenuModalHelpers.h"
 #include "PopupMenuPositioner.h"
 
 #include "GUI/Layout/ScaledDrawing.h"
 
 namespace TSS
 {
-    class HierarchicalPopupMenu::CustomScrollBar : public juce::Component, private juce::Timer
-    {
-    public:
-        CustomScrollBar(HierarchicalPopupMenu& owner,
-                        bool isPrimary,
-                        const juce::Colour& scrollbarColour,
-                        float thumbInset,
-                        int minThumbHeightDesign,
-                        float uiScale)
-            : owner_(owner)
-            , isPrimary_(isPrimary)
-            , scrollbarColour_(scrollbarColour)
-            , thumbInset_(thumbInset)
-            , minThumbHeightDesign_(minThumbHeightDesign)
-            , uiScale_(uiScale)
-        {
-            setRepaintsOnMouseActivity(true);
-            startTimerHz(kScrollbarRepaintHz_);
-        }
-
-        void paint(juce::Graphics& g) override
-        {
-            const int trackHeight = getHeight();
-            const int trackWidth = getWidth();
-            const int contentHeight = isPrimary_ ? owner_.getOpenablePrimaryCount() * juce::roundToInt(owner_.getItemHeight())
-                                                 : owner_.getSecondaryItemCount() * juce::roundToInt(owner_.getItemHeight());
-            const int viewportHeight = juce::roundToInt(owner_.getMaxViewportContentHeight());
-            if (contentHeight <= viewportHeight || trackHeight <= 0)
-                return;
-
-            const int viewY = isPrimary_ ? owner_.primaryScrollOffset_ : owner_.secondaryScrollOffset_;
-            const int minThumbHeight = juce::roundToInt(static_cast<float>(minThumbHeightDesign_) * uiScale_);
-            const int thumbHeight = juce::jmax(minThumbHeight,
-                                               juce::roundToInt(static_cast<float>(trackHeight)
-                                                                * static_cast<float>(viewportHeight)
-                                                                / static_cast<float>(contentHeight)));
-            const int range = contentHeight - viewportHeight;
-            const int thumbY = (range > 0)
-                ? juce::roundToInt(static_cast<float>(viewY)
-                                   * static_cast<float>(trackHeight - thumbHeight)
-                                   / static_cast<float>(range))
-                : 0;
-
-            juce::Rectangle<float> thumbBounds(0.0f,
-                                               static_cast<float>(thumbY),
-                                               static_cast<float>(trackWidth),
-                                               static_cast<float>(thumbHeight));
-            const auto colour = (isMouseOver() || isMouseButtonDown())
-                ? scrollbarColour_.brighter(kThumbHighlightBrighter_)
-                : scrollbarColour_;
-            g.setColour(colour);
-            g.fillRect(thumbBounds.reduced(thumbInset_));
-        }
-
-        void mouseDown(const juce::MouseEvent& e) override
-        {
-            if (isEnabled())
-                scrollToMousePosition(e.getPosition().y);
-        }
-
-        void mouseDrag(const juce::MouseEvent& e) override
-        {
-            if (isEnabled())
-                scrollToMousePosition(e.getPosition().y);
-        }
-
-        void mouseWheelMove(const juce::MouseEvent&, const juce::MouseWheelDetails& wheel) override
-        {
-            if (! isEnabled())
-                return;
-
-            const int delta = juce::roundToInt(
-                -wheel.deltaY * owner_.getMaxViewportContentHeight() * kWheelScrollFactorScrollbar_);
-            if (delta == 0)
-                return;
-
-            if (isPrimary_)
-                owner_.scrollPrimaryBy(delta);
-            else
-                owner_.scrollSecondaryBy(delta);
-        }
-
-    private:
-        void timerCallback() override { repaint(); }
-
-        void scrollToMousePosition(int mouseY)
-        {
-            const int trackHeight = getHeight();
-            const int contentHeight = isPrimary_ ? owner_.getOpenablePrimaryCount() * juce::roundToInt(owner_.getItemHeight())
-                                                 : owner_.getSecondaryItemCount() * juce::roundToInt(owner_.getItemHeight());
-            const int viewportHeight = juce::roundToInt(owner_.getMaxViewportContentHeight());
-            if (contentHeight <= viewportHeight || trackHeight <= 0)
-                return;
-
-            const int minThumbHeight = juce::roundToInt(static_cast<float>(minThumbHeightDesign_) * uiScale_);
-            const int thumbHeight = juce::jmax(minThumbHeight,
-                                               juce::roundToInt(static_cast<float>(trackHeight)
-                                                                * static_cast<float>(viewportHeight)
-                                                                / static_cast<float>(contentHeight)));
-            const int range = contentHeight - viewportHeight;
-            const int thumbRange = trackHeight - thumbHeight;
-            if (thumbRange <= 0)
-                return;
-
-            const int viewY = juce::jlimit(
-                0,
-                range,
-                juce::roundToInt(static_cast<float>(mouseY - thumbHeight / 2)
-                                 * static_cast<float>(range)
-                                 / static_cast<float>(thumbRange)));
-
-            if (isPrimary_)
-            {
-                owner_.primaryScrollOffset_ = viewY;
-                owner_.repaint();
-            }
-            else
-            {
-                owner_.secondaryScrollOffset_ = viewY;
-                owner_.repaint();
-            }
-        }
-
-        inline constexpr static int kScrollbarRepaintHz_ = 20;
-        inline constexpr static float kThumbHighlightBrighter_ = 0.2f;
-        inline constexpr static float kWheelScrollFactorScrollbar_ = 0.5f;
-
-        HierarchicalPopupMenu& owner_;
-        bool isPrimary_ = true;
-        juce::Colour scrollbarColour_;
-        float thumbInset_;
-        int minThumbHeightDesign_;
-        float uiScale_;
-    };
-
     int HierarchicalPopupMenu::countOpenablePrimaries(const HierarchicalComboBox& owner)
     {
         int count = 0;
@@ -227,6 +93,20 @@ namespace TSS
         ensureHighlightedPrimaryVisible();
         ensureHighlightedChildVisible();
 
+        if (primaryNeedsScrollbar())
+            ensurePrimaryScrollBar();
+
+        if (hasSecondaryColumn() && secondaryNeedsScrollbar())
+            ensureSecondaryScrollBar();
+    }
+
+    HierarchicalPopupMenu::~HierarchicalPopupMenu() = default;
+
+    void HierarchicalPopupMenu::ensurePrimaryScrollBar()
+    {
+        if (primaryScrollBar_ != nullptr)
+            return;
+
         const auto& popupLook = owner_.getPopupMenuLook();
         const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(owner_);
         const float thumbInset = static_cast<float>(ScaledDrawing::logicalInsetPixelsFromDesign(
@@ -234,32 +114,67 @@ namespace TSS
             uiScale_,
             systemDisplayScale));
 
-        if (primaryNeedsScrollbar())
-        {
-            primaryScrollBar_ = std::make_unique<CustomScrollBar>(
-                *this,
-                true,
-                popupLook.scrollbar,
-                thumbInset,
-                ComboBox::getPopupLayoutDimensions().minThumbHeight,
-                uiScale_);
-            addAndMakeVisible(*primaryScrollBar_);
-        }
+        primaryScrollModel_ = std::make_unique<CallbackPopupMenuScrollModel>(
+            [this]() {
+                return getOpenablePrimaryCount() * juce::roundToInt(getItemHeight());
+            },
+            [this]() {
+                return juce::roundToInt(getMaxViewportContentHeight());
+            },
+            [this]() {
+                return primaryScrollOffset_;
+            },
+            [this](int y) {
+                primaryScrollOffset_ = y;
+                clampScrollOffsets();
+                repaint();
+            });
 
-        if (hasSecondaryColumn() && secondaryNeedsScrollbar())
-        {
-            secondaryScrollBar_ = std::make_unique<CustomScrollBar>(
-                *this,
-                false,
-                popupLook.scrollbar,
-                thumbInset,
-                ComboBox::getPopupLayoutDimensions().minThumbHeight,
-                uiScale_);
-            addAndMakeVisible(*secondaryScrollBar_);
-        }
+        primaryScrollBar_ = std::make_unique<PopupMenuCustomScrollBar>(
+            *primaryScrollModel_,
+            popupLook.scrollbar,
+            thumbInset,
+            ComboBox::getPopupLayoutDimensions().minThumbHeight,
+            uiScale_);
+        addAndMakeVisible(*primaryScrollBar_);
     }
 
-    HierarchicalPopupMenu::~HierarchicalPopupMenu() = default;
+    void HierarchicalPopupMenu::ensureSecondaryScrollBar()
+    {
+        if (secondaryScrollBar_ != nullptr)
+            return;
+
+        const auto& popupLook = owner_.getPopupMenuLook();
+        const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(owner_);
+        const float thumbInset = static_cast<float>(ScaledDrawing::logicalInsetPixelsFromDesign(
+            kThumbInsetBase_,
+            uiScale_,
+            systemDisplayScale));
+
+        secondaryScrollModel_ = std::make_unique<CallbackPopupMenuScrollModel>(
+            [this]() {
+                return getSecondaryItemCount() * juce::roundToInt(getItemHeight());
+            },
+            [this]() {
+                return juce::roundToInt(getMaxViewportContentHeight());
+            },
+            [this]() {
+                return secondaryScrollOffset_;
+            },
+            [this](int y) {
+                secondaryScrollOffset_ = y;
+                clampScrollOffsets();
+                repaint();
+            });
+
+        secondaryScrollBar_ = std::make_unique<PopupMenuCustomScrollBar>(
+            *secondaryScrollModel_,
+            popupLook.scrollbar,
+            thumbInset,
+            ComboBox::getPopupLayoutDimensions().minThumbHeight,
+            uiScale_);
+        addAndMakeVisible(*secondaryScrollBar_);
+    }
 
     void HierarchicalPopupMenu::measureColumnWidths()
     {
@@ -594,8 +509,9 @@ namespace TSS
         const float border = getLayoutBorderThickness();
         const float scrollbarWidth = getScrollbarThickness();
 
-        if (primaryScrollBar_ != nullptr && primaryNeedsScrollbar())
+        if (primaryNeedsScrollbar())
         {
+            ensurePrimaryScrollBar();
             const auto content = getPrimaryContentBounds();
             primaryScrollBar_->setBounds(
                 juce::roundToInt(content.getRight() - scrollbarWidth),
@@ -609,27 +525,9 @@ namespace TSS
             primaryScrollBar_->setVisible(false);
         }
 
-        const bool showSecondaryBar = hasSecondaryColumn() && secondaryNeedsScrollbar();
-        if (showSecondaryBar)
+        if (hasSecondaryColumn() && secondaryNeedsScrollbar())
         {
-            if (secondaryScrollBar_ == nullptr)
-            {
-                const auto& popupLook = owner_.getPopupMenuLook();
-                const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
-                const float thumbInset = static_cast<float>(ScaledDrawing::logicalInsetPixelsFromDesign(
-                    kThumbInsetBase_,
-                    uiScale_,
-                    systemDisplayScale));
-                secondaryScrollBar_ = std::make_unique<CustomScrollBar>(
-                    *this,
-                    false,
-                    popupLook.scrollbar,
-                    thumbInset,
-                    ComboBox::getPopupLayoutDimensions().minThumbHeight,
-                    uiScale_);
-                addAndMakeVisible(*secondaryScrollBar_);
-            }
-
+            ensureSecondaryScrollBar();
             const auto content = getSecondaryContentBounds();
             secondaryScrollBar_->setBounds(
                 juce::roundToInt(content.getRight() - scrollbarWidth),
@@ -755,18 +653,12 @@ namespace TSS
 
     void HierarchicalPopupMenu::closePopup()
     {
-        auto& owner = owner_;
-        exitModalState(0);
-        owner.notifyPopupClosed();
-
-        if (auto* parent = getParentComponent())
-            parent->removeChildComponent(this);
-
-        delete this;
+        PopupMenuModalHelpers::dismissAndDelete(*this, owner_);
     }
 
     void HierarchicalPopupMenu::closePopupWithSelection(int primaryId, int childId)
     {
+        // Keep commit in this friend member (not a lambda) so private API stays accessible.
         auto& owner = owner_;
         exitModalState(0);
         owner.notifyPopupClosed();
@@ -995,13 +887,7 @@ namespace TSS
 
     bool HierarchicalPopupMenu::keyPressed(const juce::KeyPress& key)
     {
-        if (key.getKeyCode() == juce::KeyPress::escapeKey)
-        {
-            closePopup();
-            return true;
-        }
-
-        return false;
+        return PopupMenuModalHelpers::handleEscapeKey(key, *this, owner_);
     }
 
     void HierarchicalPopupMenu::show(HierarchicalComboBox& owner)
