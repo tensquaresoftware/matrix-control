@@ -1,5 +1,19 @@
 # Deferred Work
 
+## Deferred from: code review of u-3-header-right-cluster-layout-and-sign-off (2026-07-21)
+
+- source_spec: `_bmad-output/implementation-artifacts/u-3-header-right-cluster-layout-and-sign-off.md`
+  summary: Newly promoted Header packet Design tokens (left padding, gaps, label/combo/slider/peak widths) have no matching `static_assert`s in DesignChecks.h; existing header checks cover height/logo W/H/font/gap-after only.
+  evidence: Blind Hunter; private HeaderPanel constants also lacked ÷4 asserts before promotion.
+
+- source_spec: `_bmad-output/implementation-artifacts/u-3-header-right-cluster-layout-and-sign-off.md`
+  summary: Other planning artifacts still cite HeaderPanel height 32 (e.g. u-0-figma-tokenize-and-design-reconciliation.md); AC4 only updated u-0-zone-dimension-tables.md and project-context.
+  evidence: Blind Hunter; out of AC4 file list.
+
+- source_spec: `_bmad-output/implementation-artifacts/u-3-header-right-cluster-layout-and-sign-off.md`
+  summary: `logoPopupColumnWidth` is filled on HeaderPanelDimensions but HeaderLogoPopupMenu still hard-wires Design `kLogoPopupColumnWidth`; AC2 marked injection optional and Completion Notes deferred the wire-up.
+  evidence: Blind Hunter + Acceptance Auditor; intentional optional deferral.
+
 ## Deferred from: code review of u-13-combobox-popup-infrastructure-dedup (2026-07-21)
 
 - ComboBox can leave `isPopupOpen_` stuck true if `ScrollablePopupMenu::show` / `MultiColumnPopupMenu::show` early-returns after `notifyPopupOpened` (null top-level, or empty items race). Same open-before-show order existed before U-13; not introduced by the host extract.

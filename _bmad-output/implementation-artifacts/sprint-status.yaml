@@ -191,7 +191,7 @@ development_status:
   u-11-module-panel-config-dedup: done
   u-12-hierarchical-combobox-widget: done
   u-13-combobox-popup-infrastructure-dedup: done
-  u-3-header-right-cluster-layout-and-sign-off: backlog
+  u-3-header-right-cluster-layout-and-sign-off: done
   u-4-footer-panel-layout-audit: backlog
   u-5-body-shell-padding-separators-and-column-gaps: backlog
   u-6-patch-edit-panels-layout-audit: backlog
