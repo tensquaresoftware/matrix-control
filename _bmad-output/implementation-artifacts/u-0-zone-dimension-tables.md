@@ -21,7 +21,7 @@ Valeurs de référence @ 100 % (grille ÷4). Chemins de symboles : namespace `TS
 
 | px @ 100 % | Symbole Design* | Story UAT |
 |------------|-------------------|-----------|
-| 1300 × 792 | `GUI::kWidth` × `GUI::kHeight` | U-5 |
+| 1300 × 800 | `GUI::kWidth` × `GUI::kHeight` | U-5 |
 | 1276 × 728 | `GUI::kBodyInnerWidth` × `GUI::kBodyHeight` | U-5 |
 | 12 | `Spacing::kLarge` / `Panels::Body::kPadding` | U-5 |
 | 704 | `Panels::Body::kEffectiveHeight` | U-5 |
@@ -34,10 +34,17 @@ Valeurs de référence @ 100 % (grille ÷4). Chemins de symboles : namespace `TS
 |------------|-------------------|-----------|
 | 1300 × 40 | `Panels::Header::kWidth` × `Panels::Header::kHeight` | U-3 |
 | 1300 × 32 | `Panels::Footer::kWidth` × `Panels::Footer::kHeight` | U-4 |
+| 8 | `Panels::Footer::kPadding` (`Spacing::kMedium`) | U-4 |
+| 14 | `Panels::Footer::kIconSize` (intentional ÷4 exception) | U-4 |
+| 160 | `Panels::Footer::kIdentityMinWidth` | U-4 |
 
 ### FR-41 layout slots (header)
 
 Logo is the left-side anchor. Skin / UI Scale live in the logo popup columns (`kLogoPopupColumnWidth`); UI Elements (Debug) is logo Shift+Ctrl. Implemented in Stories 7.8 / 7.10 — no on-bar SCALE/SKIN/UI Elements cluster.
+
+### Footer layout slots (U-4)
+
+Two-zone only (left message + right device identity). No centre-actions cluster. Padding / icon / identity min-width are injected via `FooterPanelDimensions` from `DimensionFactory` (panels must not `#include Design*`).
 
 ## Patch Edit (haut / milieu / bas)
 

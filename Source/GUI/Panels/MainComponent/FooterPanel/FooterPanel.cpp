@@ -1,6 +1,5 @@
 #include "FooterPanel.h"
 
-#include "GUI/Layout/Design/DesignPanels.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
@@ -15,9 +14,10 @@ const juce::Identifier FooterPanel::kDeviceDetectedId("deviceDetected");
 const juce::Identifier FooterPanel::kDeviceTypeId(MatrixDeviceTypes::kApvtsPropertyName);
 const juce::Identifier FooterPanel::kDeviceVersionId("deviceVersion");
 
-FooterPanel::FooterPanel(TSS::ISkin& skin, int width, int height, juce::AudioProcessorValueTreeState& apvtsRef)
-    : width_(width)
-    , height_(height)
+FooterPanel::FooterPanel(TSS::ISkin& skin,
+                         const FooterPanelDimensions& dimensions,
+                         juce::AudioProcessorValueTreeState& apvtsRef)
+    : dimensions_(dimensions)
     , skin_(&skin)
     , apvts(apvtsRef)
 {
@@ -35,10 +35,12 @@ void FooterPanel::paint(juce::Graphics& g)
 {
     g.fillAll(skin_->getColour(SkinColourId::kFooterPanelBackground));
 
-    const int padding = juce::jmax(1, juce::roundToInt(static_cast<float>(kPadding_) * uiScale_));
-    const int iconSize = juce::jmax(1, juce::roundToInt(static_cast<float>(kIconSize_) * uiScale_));
+    // Preserve brownfield scale/round order: padding/icon use roundToInt;
+    // identity min-width uses ScaledLayout::scaledInt (same as pre-U-4).
+    const int padding = juce::jmax(1, juce::roundToInt(static_cast<float>(dimensions_.padding) * uiScale_));
+    const int iconSize = juce::jmax(1, juce::roundToInt(static_cast<float>(dimensions_.iconSize) * uiScale_));
     const int identityMinWidth = TSS::ScaledLayout::scaledInt(
-        static_cast<float>(TSS::Design::Panels::Footer::kIdentityMinWidth),
+        static_cast<float>(dimensions_.identityMinWidth),
         uiScale_);
 
     auto bounds = getLocalBounds().reduced(padding);
@@ -89,7 +91,7 @@ void FooterPanel::setUiScale(float uiScale)
 {
     if (juce::approximatelyEqual(uiScale_, uiScale))
         return;
-    
+
     uiScale_ = uiScale;
     repaint();
 }
@@ -127,7 +129,7 @@ FooterPanel::MessageSeverity FooterPanel::parseSeverity(const juce::String& seve
         return MessageSeverity::Warning;
     if (severityStr == "error")
         return MessageSeverity::Error;
-    
+
     return MessageSeverity::None;
 }
 

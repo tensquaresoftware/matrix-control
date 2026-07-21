@@ -1,5 +1,15 @@
 # Deferred Work
 
+## Deferred from: code review of u-4-footer-panel-layout-audit (2026-07-22)
+
+- source_spec: `_bmad-output/implementation-artifacts/u-4-footer-panel-layout-audit.md`
+  summary: Pathological footer paint bounds at extreme/invalid scales — identity min-width lacks jmax(1) floor; oversized padding can empty bounds; iconSize+padding can exceed leftover message width. Pre-U-4 math preserved; normal UI Scale presets unaffected.
+  evidence: Blind Hunter + Edge Case Hunter; FooterPanel.cpp paint.
+
+- source_spec: `_bmad-output/implementation-artifacts/u-4-footer-panel-layout-audit.md`
+  summary: Icon-to-message spacing reuses chrome padding (iconSize + padding) with no dedicated gap Design token; Figma may want separate inset vs gap. Out of injection-only scope.
+  evidence: Blind Hunter; FooterPanel.cpp paint.
+
 ## Deferred from: code review of u-3-header-right-cluster-layout-and-sign-off (2026-07-21)
 
 - source_spec: `_bmad-output/implementation-artifacts/u-3-header-right-cluster-layout-and-sign-off.md`

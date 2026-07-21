@@ -15,7 +15,7 @@ MainComponent::MainComponent(TSS::Skin& skin,
     , layoutDimensions_(layoutDimensions)
     , headerPanel(skin, layoutDimensions_.header)
     , bodyPanel(skin, layoutDimensions_, widgetFactory, apvts, patchFileService)
-    , footerPanel(skin, layoutDimensions_.footer.width, layoutDimensions_.footer.height, apvts)
+    , footerPanel(skin, layoutDimensions_.footer, apvts)
 {
     setOpaque(true);
     setSize(layoutDimensions_.editor.width, layoutDimensions_.editor.height);
