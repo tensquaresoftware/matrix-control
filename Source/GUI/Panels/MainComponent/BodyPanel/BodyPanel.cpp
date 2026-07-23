@@ -64,7 +64,7 @@ void BodyPanel::paint(juce::Graphics& g)
 
 void BodyPanel::resized()
 {
-    const auto bounds = getLocalBounds();
+    auto area = getLocalBounds();
     const float sf = uiScale_;
 
     const int padding              = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.padding), sf);
@@ -75,24 +75,28 @@ void BodyPanel::resized()
     const int masterEditH          = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.masterEditHeight), sf);
     const int separatorW           = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.separators.verticalStandardWidth), sf);
     const int separatorH           = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.separators.verticalStandardHeight), sf);
+    const int sharedColumnHeight   = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.sharedColumnHeight), sf);
 
-    const int sharedColumnHeight = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.sharedColumnHeight), sf);
+    area.removeFromLeft(padding);
+    area.removeFromRight(padding);
 
-    const float originX = static_cast<float>(bounds.getX() + padding);
-    const int patchEditX        = bounds.getX() + padding;
-    const int separator1X       = juce::roundToInt(originX + static_cast<float>(dims_.patchEditWidth) * sf);
-    const int sharedColumnX       = juce::roundToInt(originX + static_cast<float>(dims_.patchEditWidth + dims_.separators.verticalStandardWidth) * sf);
-    const int separator2X       = juce::roundToInt(originX + static_cast<float>(dims_.patchEditWidth + dims_.separators.verticalStandardWidth + dims_.sharedColumnWidth) * sf);
-    const int masterEditX       = juce::roundToInt(originX + static_cast<float>(dims_.patchEditWidth + dims_.separators.verticalStandardWidth + dims_.sharedColumnWidth + dims_.separators.verticalStandardWidth) * sf);
+    const int topY = padding;
 
-    const int topY = bounds.getY() + padding;
+    const auto patchEditBounds = area.removeFromLeft(patchEditPanelWidth);
+    patchEditPanel_->setBounds(patchEditBounds.getX(), topY, patchEditBounds.getWidth(), patchEditPanelHeight);
 
-    patchEditPanel_->setBounds(patchEditX, topY, patchEditPanelWidth, patchEditPanelHeight);
     // Full Body height (not content band): joins Header/Footer thick borders through padding gutters.
-    verticalSeparator1_->setBounds(separator1X, bounds.getY(), separatorW, separatorH);
-    sharedPanel_->setBounds(sharedColumnX, topY, sharedColumnW, sharedColumnHeight);
-    verticalSeparator2_->setBounds(separator2X, bounds.getY(), separatorW, separatorH);
-    masterEditPanel_->setBounds(masterEditX, topY, masterEditW, masterEditH);
+    const auto separator1Bounds = area.removeFromLeft(separatorW);
+    verticalSeparator1_->setBounds(separator1Bounds.getX(), 0, separator1Bounds.getWidth(), separatorH);
+
+    const auto sharedBounds = area.removeFromLeft(sharedColumnW);
+    sharedPanel_->setBounds(sharedBounds.getX(), topY, sharedBounds.getWidth(), sharedColumnHeight);
+
+    const auto separator2Bounds = area.removeFromLeft(separatorW);
+    verticalSeparator2_->setBounds(separator2Bounds.getX(), 0, separator2Bounds.getWidth(), separatorH);
+
+    const auto masterEditBounds = area.removeFromLeft(masterEditW);
+    masterEditPanel_->setBounds(masterEditBounds.getX(), topY, masterEditBounds.getWidth(), masterEditH);
 }
 
 void BodyPanel::setSkin(TSS::ISkin& skin)

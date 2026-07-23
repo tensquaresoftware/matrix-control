@@ -44,18 +44,20 @@ void SharedPanel::setBusReorderHandler(BusReorderHandler handler)
 
 void SharedPanel::resized()
 {
-    const auto bounds = getLocalBounds();
+    auto area = getLocalBounds();
     const float sf = uiScale_;
     const int w = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.width), sf);
     const int matrixH = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.matrixModulationHeight), sf);
     const int stackGap = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.verticalStackGap), sf);
     const int patchManagerH = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.patchManagerHeight), sf);
-    const int x = bounds.getX();
-    int y = bounds.getY();
 
-    matrixModulationPanel_->setBounds(x, y, w, matrixH);
-    y += matrixH + stackGap;
-    patchManagerPanel_->setBounds(x, y, w, patchManagerH);
+    const auto matrixBounds = area.removeFromTop(matrixH);
+    matrixModulationPanel_->setBounds(matrixBounds.getX(), matrixBounds.getY(), w, matrixBounds.getHeight());
+
+    area.removeFromTop(stackGap);
+
+    const auto patchManagerBounds = area.removeFromTop(patchManagerH);
+    patchManagerPanel_->setBounds(patchManagerBounds.getX(), patchManagerBounds.getY(), w, patchManagerBounds.getHeight());
 }
 
 void SharedPanel::setSkin(TSS::ISkin& skin)

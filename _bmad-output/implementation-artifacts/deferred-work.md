@@ -1,5 +1,15 @@
 # Deferred Work
 
+## Deferred from: code review of u-5-body-shell-padding-separators-and-column-gaps (2026-07-23)
+
+- source_spec: `_bmad-output/implementation-artifacts/u-5-body-shell-padding-separators-and-column-gaps.md`
+  summary: SharedPanel still sizes Matrix Mod / Patch Manager children with scaled `dims_.width` while vertical placement uses `removeFromTop` rectangles. Harmless while BodyPanel sizes Shared to the matching design width; children can overhang only if Shared itself is truncated.
+  evidence: Blind Hunter + Edge Case Hunter; SharedPanel.cpp resized.
+
+- source_spec: `_bmad-output/implementation-artifacts/u-5-body-shell-padding-separators-and-column-gaps.md`
+  summary: BodyPanel `removeFromLeft` column chain leaves any remainder (or shortfall on Master Edit) unchecked — no `jassert` that leftover width ≈ 0 after the five segments. Compile-time DesignChecks cover design identity; runtime odd-scale leftover detection deferred (U-10 aggregate UAT).
+  evidence: Blind Hunter + Edge Case Hunter; BodyPanel.cpp resized.
+
 ## Deferred from: code review of u-4-footer-panel-layout-audit (2026-07-22)
 
 - source_spec: `_bmad-output/implementation-artifacts/u-4-footer-panel-layout-audit.md`

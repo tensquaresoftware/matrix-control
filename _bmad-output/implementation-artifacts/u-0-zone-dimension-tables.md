@@ -10,7 +10,7 @@ sources:
   - Source/GUI/Layout/Design/DesignPanels.h
   - Source/GUI/Layout/Design/DesignChecks.h
 created: 2026-06-09
-updated: 2026-07-21
+updated: 2026-07-23
 ---
 
 # U-0 Zone Dimension Tables
@@ -26,7 +26,7 @@ Valeurs de référence @ 100 % (grille ÷4). Chemins de symboles : namespace `TS
 | 12 | `Spacing::kLarge` / `Panels::Body::kPadding` | U-5 |
 | 704 | `Panels::Body::kEffectiveHeight` | U-5 |
 | 700 | `Panels::Body::SharedColumn::kHeight` | U-5, U-8 |
-| 24 × 704 | `Atoms::Widths::VerticalSeparator::kStandard` × `PanelWidgets::Heights::kVerticalSeparator` | U-5 |
+| 24 × 728 | `Atoms::Widths::VerticalSeparator::kStandard` × `PanelWidgets::Heights::kVerticalSeparator` (full Body height) | U-5 |
 
 ## Header / Footer
 
@@ -78,7 +78,7 @@ Two-zone only (left message + right device identity). No centre-actions cluster.
 | 268 × 76 | `Recipes::ComputerPatchesModule::kHeight` | U-8 |
 | 268 × 100 | `Recipes::PatchMutatorModule::kHeight` | U-8 |
 | 8 | `PatchManagerSection::kModuleStackGap` (entre modules) | U-8 |
-| 12 | `SharedColumn::kVerticalStackGap` (Matrix Mod ↔ Patch Manager) | U-8 |
+| 12 | `SharedColumn::kVerticalStackGap` (Matrix Mod ↔ Patch Manager; shell gap — U-5) | U-5 |
 
 ## Master Edit
 
