@@ -801,3 +801,17 @@
 - source_spec: `_bmad-output/implementation-artifacts/10-3-trackgeneratordisplay-direct-apvts-editing.md`
   summary: After endChangeGesture clears the gesture gate, a callAsync lambda queued before the drag can still apply a pre-drag value to the display (gate only skips while the gesture is active). Same pattern as EnvelopeDisplayApvtsBinding; fix would need a generation/token across envelope + track bindings.
   evidence: Blind Hunter; intentional copy of 10.2 gesture-gate pattern.
+
+## Deferred from: code review of u-9-master-edit-panel-layout-audit.md (2026-07-24)
+
+- source_spec: `_bmad-output/implementation-artifacts/u-9-master-edit-panel-layout-audit.md`
+  summary: At odd UI Scale presets, the sum of individually scaled Master Edit strips (header + modules + gaps) can leave unused bottom slack or starve later strips; story policy is fixed scaled strips with aggregate residual UAT on U-10.
+  evidence: Blind Hunter + Edge Case Hunter; MasterEditPanel.cpp resized.
+
+- source_spec: `_bmad-output/implementation-artifacts/u-9-master-edit-panel-layout-audit.md`
+  summary: Parent-assigned module heights (scaledInt of whole-module design heights) can disagree by a pixel with BaseModulePanel’s interior sum (scaled header + N × scaled row) at non-100% presets — possible internal clipping/slack inside Midi/Vibrato/Misc.
+  evidence: Blind Hunter; no module code changed in U-9; U-10 residual.
+
+- source_spec: `_bmad-output/implementation-artifacts/u-9-master-edit-panel-layout-audit.md`
+  summary: MasterEditPanelDimensions::sectionHeaderWidth is injected and used at construction, but resized() sizes the section header from the full parent strip width — latent coupling if header width ever diverges from panel width.
+  evidence: Blind Hunter; pre-existing, unchanged by U-9 stack refactor.

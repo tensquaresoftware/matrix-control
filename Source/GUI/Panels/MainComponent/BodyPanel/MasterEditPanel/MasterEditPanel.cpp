@@ -156,7 +156,7 @@ void MasterEditPanel::mouseDown(const juce::MouseEvent& event)
 
 void MasterEditPanel::resized()
 {
-    const auto bounds = getLocalBounds();
+    auto area = getLocalBounds();
     const float sf = uiScale_;
 
     const int sectionHeaderHeight = TSS::ScaledLayout::scaledInt(
@@ -167,14 +167,13 @@ void MasterEditPanel::resized()
     const int miscH = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.miscPanelHeight), sf);
     const int interModuleGap = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.interModuleGap), sf);
 
-    sectionHeader_->setBounds(bounds.getX(), bounds.getY(), bounds.getWidth(), sectionHeaderHeight);
+    sectionHeader_->setBounds(area.removeFromTop(sectionHeaderHeight));
 
-    int y = bounds.getY() + sectionHeaderHeight;
-    midiPanel_->setBounds(bounds.getX(), y, childWidth, midiH);
-    y += midiH + interModuleGap;
-    vibratoPanel_->setBounds(bounds.getX(), y, childWidth, vibratoH);
-    y += vibratoH + interModuleGap;
-    miscPanel_->setBounds(bounds.getX(), y, childWidth, miscH);
+    midiPanel_->setBounds(area.removeFromTop(midiH).withWidth(childWidth));
+    area.removeFromTop(interModuleGap);
+    vibratoPanel_->setBounds(area.removeFromTop(vibratoH).withWidth(childWidth));
+    area.removeFromTop(interModuleGap);
+    miscPanel_->setBounds(area.removeFromTop(miscH).withWidth(childWidth));
 }
 
 void MasterEditPanel::setSkin(TSS::ISkin& skin)
