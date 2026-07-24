@@ -48,15 +48,19 @@ public:
 
     void setMasterInitConfirmationGate(TSS::ModuleHeader::InitConfirmationGate gate);
 
+#if JUCE_DEBUG
     void setUiElementsTestVisible(bool visible);
     juce::Rectangle<int> getUiElementsTestAreaBounds() const;
+#endif
 
 private:
     TSS::Skin* skin_;
     GuiLayoutDimensions layoutDimensions_;
     float uiScale_ = 1.0f;
+#if JUCE_DEBUG
     bool uiElementsTestVisible_ = false;
     int uiElementsTestAreaY_ = 0;
+#endif
 
     HeaderPanel headerPanel;
     BodyPanel bodyPanel;

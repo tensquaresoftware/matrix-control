@@ -3,7 +3,7 @@ organization: Ten Square Software
 project: Matrix-Control
 title: Project Context
 author: BMad Agent
-version: "1.3"
+version: "1.4"
 sources:
   - planning-artifacts/briefs/brief-matrix-control-2026-05-22/brief.md
   - planning-artifacts/prds/prd-matrix-control-2026-05-25/prd.md
@@ -11,7 +11,7 @@ sources:
   - reference-docs/oberheim/index.md
   - CONVENTIONS.md
 created: 2026-05-23
-updated: 2026-07-14
+updated: 2026-07-24
 ---
 
 # Project Context
@@ -234,9 +234,10 @@ Do not route editor SysEx through `processBlock()` midiBuffer.
 
 ### Dev test harness
 
-- `Source/GUI/Tests/TestComponent` — temporary widget visual testing at multiple scales.
-- Toggle via logo **Shift+Ctrl** gesture in `HeaderPanel` (Debug / UI Elements test area).
-- Do not remove until UI scaling is validated across all widget types.
+- `Source/GUI/Tests/TestComponent` — Debug-only widget visual harness (enriched pages from story U-1).
+- Toggle via logo **Shift+Ctrl** gesture (`Logo` → `HeaderPanel` → `PluginEditor`). Compiled out in Release (`#if JUCE_DEBUG`); CMake attaches `TEST_SANDBOX_SOURCES` only for `CONFIG:Debug` (D-063 / story U-10).
+- Release binaries must not contain sandbox object code or `TestComponent` symbols. Keep sources in the repo for post-release visual regression in Debug.
+- Prod panels + widgets are the signed visual reference after U-10 aggregate audit (D-062) — the sandbox is not the release visual authority.
 
 ---
 
@@ -322,7 +323,7 @@ Apply these to SysEx, MIDI, and Core logic (see Oberheim reference docs):
 ```
 PluginEditor
 └── MainComponent
-    ├── HeaderPanel      (logo popup: skin / UI scale; Shift+Ctrl UI Elements Debug)
+    ├── HeaderPanel      (logo popup: skin / UI scale; Shift+Ctrl UI Elements Debug-only)
     ├── BodyPanel
     │   ├── PatchEditPanel (top modules, displays, bottom modules)
     │   ├── SharedPanel (Matrix Modulation + Patch Manager)
@@ -361,7 +362,7 @@ BMad planning artifacts live in `_bmad-output/planning-artifacts/`. Promote vali
 - **Framework:** JUCE `UnitTest` (current) — Catch2/GTest acceptable if migrated in architecture epic
 - **Fixtures:** `Tests/Fixtures/` for `.syx` binaries
 - **No tests** in audio thread or `paint()` paths
-- GUI validation: manual via Standalone / `TestComponent` harness
+- GUI validation: manual via Standalone; Debug-only `TestComponent` harness for widget regression
 
 ---
 

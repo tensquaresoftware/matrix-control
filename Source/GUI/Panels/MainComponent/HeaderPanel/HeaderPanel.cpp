@@ -96,11 +96,13 @@ HeaderPanel::HeaderPanel(TSS::ISkin& skin, const HeaderPanelDimensions& dimensio
         if (onSettingsRequested)
             onSettingsRequested();
     };
+#if JUCE_DEBUG
     logo_.onUiTestsToggleRequested = [this]
     {
         if (onUiTestsToggleRequested)
             onUiTestsToggleRequested();
     };
+#endif
     logo_.onUiScaleReset = [this]
     {
         if (onUiScaleReset)

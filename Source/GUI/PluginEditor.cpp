@@ -261,9 +261,6 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     setWantsKeyboardFocus(false);
     setInterceptsMouseClicks(true, true);
 
-    const auto editorWidth = layoutDimensions_.editor.width;
-    const auto editorHeight = layoutDimensions_.editor.height;
-
     mainComponent_ = std::make_unique<MainComponent>(
         *skin_, layoutDimensions_, *widgetFactory_, pluginProcessor.getApvts(), pluginProcessor.getPatchFileService());
     addAndMakeVisible(*mainComponent_);
@@ -282,6 +279,9 @@ PluginEditor::PluginEditor(PluginProcessor& p)
             openMasterInitConfirmDialog(moduleDisplayName, std::move(onConfirmed));
         });
 
+#if JUCE_DEBUG
+    const auto editorWidth = layoutDimensions_.editor.width;
+    const auto editorHeight = layoutDimensions_.editor.height;
     testComponent_ = std::make_unique<TestComponent>(
         *skin_,
         pluginProcessor.getApvts(),
@@ -290,6 +290,7 @@ PluginEditor::PluginEditor(PluginProcessor& p)
         editorHeight);
     addChildComponent(*testComponent_);
     testComponent_->setVisible(false);
+#endif
 
     updateSkin();
 
@@ -403,7 +404,9 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     pluginProcessor.getApvts().state.addListener(this);
 
     syncUiScaleFromEditor();
+#if JUCE_DEBUG
     layoutUiElementsTestComponent();
+#endif
     repaint();
 }
 
@@ -441,7 +444,9 @@ void PluginEditor::resized()
     if (aboutWindow_ != nullptr && aboutWindow_->isVisible())
         aboutWindow_->setBounds(getLocalBounds());
 
+#if JUCE_DEBUG
     layoutUiElementsTestComponent();
+#endif
     syncUiScaleFromEditor();
 
     if (pluginProcessor.isStandalone())
@@ -587,10 +592,12 @@ void PluginEditor::wireHeaderPanel(HeaderPanel& headerPanel)
         Core::StandaloneAudioInputRouter::showAudioMidiSettingsDialog();
     };
 
+#if JUCE_DEBUG
     headerPanel.onUiTestsToggleRequested = [this]
     {
         setUiElementsTestVisible(!uiElementsTestVisible_);
     };
+#endif
 }
 
 void PluginEditor::restoreHeaderPanelFromState(HeaderPanel& headerPanel)
@@ -601,6 +608,7 @@ void PluginEditor::restoreHeaderPanelFromState(HeaderPanel& headerPanel)
 
 void PluginEditor::mouseDown(const juce::MouseEvent& event)
 {
+#if JUCE_DEBUG
     if (uiElementsTestVisible_
         && testComponent_ != nullptr
         && testComponent_->isVisible()
@@ -609,12 +617,16 @@ void PluginEditor::mouseDown(const juce::MouseEvent& event)
         testComponent_->grabKeyboardFocus();
         return;
     }
+#else
+    juce::ignoreUnused(event);
+#endif
 
     unfocusAllComponents();
 }
 
 bool PluginEditor::keyPressed(const juce::KeyPress& key)
 {
+#if JUCE_DEBUG
     if (uiElementsTestVisible_
         && testComponent_ != nullptr
         && testComponent_->isVisible()
@@ -622,6 +634,7 @@ bool PluginEditor::keyPressed(const juce::KeyPress& key)
     {
         return true;
     }
+#endif
 
     return juce::AudioProcessorEditor::keyPressed(key);
 }
@@ -637,8 +650,10 @@ void PluginEditor::updateSkin()
     if (aboutWindow_ != nullptr)
         aboutWindow_->setSkin(*skin_);
 
+#if JUCE_DEBUG
     if (testComponent_ != nullptr)
         testComponent_->setSkin(*skin_);
+#endif
 
     repaint();
 }
@@ -659,6 +674,7 @@ void PluginEditor::applyUiScale(float uiScale)
         syncStandaloneWindowSize();
 }
 
+#if JUCE_DEBUG
 void PluginEditor::setUiElementsTestVisible(bool visible)
 {
     if (uiElementsTestVisible_ == visible)
@@ -690,6 +706,7 @@ void PluginEditor::layoutUiElementsTestComponent()
 
     testComponent_->setBounds(mainComponent_->getUiElementsTestAreaBounds());
 }
+#endif
 
 PluginEditor::~PluginEditor()
 {

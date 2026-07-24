@@ -9,7 +9,10 @@
 #include "MainComponent.h"
 #include "GUI/Layout/PanelDimensions.h"
 #include "Skins/Skin.h"
+
+#if JUCE_DEBUG
 #include "Tests/TestComponent.h"
+#endif
 
 class WidgetFactory;
 class HeaderPanel;
@@ -72,11 +75,13 @@ private:
     std::unique_ptr<WidgetFactory> widgetFactory_;
     GuiLayoutDimensions layoutDimensions_;
     std::unique_ptr<MainComponent> mainComponent_;
+#if JUCE_DEBUG
     std::unique_ptr<TestComponent> testComponent_;
+    bool uiElementsTestVisible_ = false;
+#endif
     std::unique_ptr<SettingsWindow> settingsWindow_;
     std::unique_ptr<AboutWindow> aboutWindow_;
     std::unique_ptr<MasterInitConfirmDialog> masterInitConfirmDialog_;
-    bool uiElementsTestVisible_ = false;
     float appliedUiScale_ = 1.0f;
     std::unique_ptr<HeaderRefreshTimer> headerRefreshTimer_;
 
@@ -84,8 +89,10 @@ private:
     void applyUiScale(float uiScale);
     void syncUiScaleFromEditor();
     void syncStandaloneWindowSize();
+#if JUCE_DEBUG
     void setUiElementsTestVisible(bool visible);
     void layoutUiElementsTestComponent();
+#endif
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginEditor)
 };

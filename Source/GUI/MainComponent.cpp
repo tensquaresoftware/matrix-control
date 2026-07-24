@@ -42,6 +42,7 @@ void MainComponent::resized()
     const int footerY = headerHeight + bodyHeight;
 
     headerPanel.setBounds(bounds.getX(), bounds.getY(), bounds.getWidth(), headerHeight);
+#if JUCE_DEBUG
     uiElementsTestAreaY_ = headerHeight;
 
     if (uiElementsTestVisible_)
@@ -50,6 +51,7 @@ void MainComponent::resized()
         footerPanel.setVisible(false);
         return;
     }
+#endif
 
     bodyPanel.setVisible(true);
     footerPanel.setVisible(true);
@@ -57,6 +59,7 @@ void MainComponent::resized()
     footerPanel.setBounds(bounds.getX(), bounds.getY() + footerY, bounds.getWidth(), footerHeight);
 }
 
+#if JUCE_DEBUG
 void MainComponent::setUiElementsTestVisible(bool visible)
 {
     if (uiElementsTestVisible_ == visible)
@@ -71,6 +74,7 @@ juce::Rectangle<int> MainComponent::getUiElementsTestAreaBounds() const
     const auto bounds = getLocalBounds();
     return bounds.withTrimmedTop(uiElementsTestAreaY_);
 }
+#endif
 
 void MainComponent::setSkin(TSS::Skin& skin)
 {

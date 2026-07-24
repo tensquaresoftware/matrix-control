@@ -199,7 +199,7 @@ development_status:
   u-7b-matrix-mod-reorder-drag-colours: done
   u-8-patch-manager-panels-layout-audit: done
   u-9-master-edit-panel-layout-audit: done
-  u-10-release-gate-prod-audit-sign-off-and-d-062-d-063: backlog
+  u-10-release-gate-prod-audit-sign-off-and-d-062-d-063: done
   epic-u-retrospective: optional
 
   # Epic T: Dev Tools / Travel Simulators

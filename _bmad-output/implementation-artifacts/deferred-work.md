@@ -1,31 +1,49 @@
 # Deferred Work
 
+## Deferred from: code review of u-10-release-gate-prod-audit-sign-off-and-d-062-d-063 (2026-07-24)
+
+- No CI / Release-workflow regression check that fails if `TestComponent` / `Source/GUI/Tests` re-enter Release artefacts — AC2 only required a local nm/strings (or equivalent) proof; consider a workflow hygiene step later.
+- No compile-time sync between `JUCE_DEBUG` and CMake `$<CONFIG:Debug>` for sandbox sources — mismatched custom configs could theoretically link-fail; local Debug+Release presets already proven green.
+- `CONVENTIONS.md` E2E/GUI testing row still cites Standalone / `TestComponent` without a Debug-only qualifier — AC3 updated `project-context.md` only; align conventions SSOT in a later docs pass.
+
+## Accepted by U-10 aggregate UAT (2026-07-24)
+
+The following Epic U residuals were reviewed as **known acceptable deltas** (cosmetic ±1–2 px / latent non-blocking) under story U-10 policy. See Consolidated Audit Report in `_bmad-output/implementation-artifacts/u-10-release-gate-prod-audit-sign-off-and-d-062-d-063.md`. No layout rewrite unless a later UAT finds a blocking defect.
+
+- **U-5 Body / Shared** — column-chain leftover unchecked; Shared children sized to design width while parent uses `removeFromTop` (harmless at design width).
+- **U-6 Patch Edit** — no runtime leftover assert on 5-column / vertical stack; DesignChecks @ 100 % only.
+- **U-7 Matrix Mod** — fixed-width strips; non-preset scales can leave ±1–2 px Init vs Paste X drift.
+- **U-8 Patch Manager** — undersized Internal/Computer strips clamp via `removeFromLeft` (harmless at design width).
+- **U-9 Master Edit** — odd-scale strip sum slack/starve; parent module height vs BaseModulePanel interior ±1 px; unused `sectionHeaderWidth` (latent, not UAT-blocking).
+
+Original review bullets below remain for history; status for U-10-owned residuals: **accepted 2026-07-24** (link: story U-10 audit report).
+
 ## Deferred from: code review of u-8-patch-manager-panels-layout-audit (2026-07-24)
 
 - source_spec: `_bmad-output/implementation-artifacts/u-8-patch-manager-panels-layout-audit.md`
-  summary: Internal/Computer Patches integer `removeFromLeft` strips clamp to remaining panel width when the panel is narrower than the design control sum, so later controls can shrink instead of keeping full design widths (old absolute `setBounds` overflowed). Harmless while Patch Manager modules are sized to design width; odd/undersized residual scrutiny remains on U-10 (same class as U-5 Shared overhang defer).
+  summary: Internal/Computer Patches integer `removeFromLeft` strips clamp to remaining panel width when the panel is narrower than the design control sum, so later controls can shrink instead of keeping full design widths (old absolute `setBounds` overflowed). Harmless while Patch Manager modules are sized to design width; odd/undersized residual scrutiny remains on U-10 (same class as U-5 Shared overhang defer). **U-10 accepted delta (2026-07-24).**
   evidence: Blind Hunter + Edge Case Hunter; InternalPatchesPanel.cpp / ComputerPatchesPanel.cpp resized browser/storage rows.
 
 ## Deferred from: code review of u-7-matrix-modulation-panel-layout-audit (2026-07-24)
 
 - source_spec: `_bmad-output/implementation-artifacts/u-7-matrix-modulation-panel-layout-audit.md`
-  summary: Fixed-width integer column strip (no last-column remainder absorption) keeps Init @ 248 @ 100 % and aligns Init/Paste on all seven UI Scale presets; at some non-preset scales successive `scaledInt` can leave ±1–2 px leftover so bus Init X and section Paste X diverge. Residual odd-scale scrutiny already owned by U-10 (same class as U-5/U-6 leftover defers).
+  summary: Fixed-width integer column strip (no last-column remainder absorption) keeps Init @ 248 @ 100 % and aligns Init/Paste on all seven UI Scale presets; at some non-preset scales successive `scaledInt` can leave ±1–2 px leftover so bus Init X and section Paste X diverge. Residual odd-scale scrutiny already owned by U-10 (same class as U-5/U-6 leftover defers). **U-10 accepted delta (2026-07-24).**
   evidence: Blind Hunter + Edge Case Hunter; ModulationBusRowLayout.h, ModulationBusCell.cpp, MatrixModulationPanel::layoutSectionActionButtons.
 
 ## Deferred from: code review of u-6-patch-edit-panels-layout-audit (2026-07-24)
 
 - source_spec: `_bmad-output/implementation-artifacts/u-6-patch-edit-panels-layout-audit.md`
-  summary: No runtime assert that five-column last-column width ≈ scaled childW, or that PatchEditPanel vertical stack leftover ≈ 0 after four `removeFromTop` strips. DesignChecks cover @100 % identities; odd-scale residual scrutiny remains on U-10 (same class as U-5 Body leftover defer).
+  summary: No runtime assert that five-column last-column width ≈ scaled childW, or that PatchEditPanel vertical stack leftover ≈ 0 after four `removeFromTop` strips. DesignChecks cover @100 % identities; odd-scale residual scrutiny remains on U-10 (same class as U-5 Body leftover defer). **U-10 accepted delta (2026-07-24).**
   evidence: Blind Hunter + Edge Case Hunter; PatchEditFiveColumnLayout.h, PatchEditPanel.cpp.
 
 ## Deferred from: code review of u-5-body-shell-padding-separators-and-column-gaps (2026-07-23)
 
 - source_spec: `_bmad-output/implementation-artifacts/u-5-body-shell-padding-separators-and-column-gaps.md`
-  summary: SharedPanel still sizes Matrix Mod / Patch Manager children with scaled `dims_.width` while vertical placement uses `removeFromTop` rectangles. Harmless while BodyPanel sizes Shared to the matching design width; children can overhang only if Shared itself is truncated.
+  summary: SharedPanel still sizes Matrix Mod / Patch Manager children with scaled `dims_.width` while vertical placement uses `removeFromTop` rectangles. Harmless while BodyPanel sizes Shared to the matching design width; children can overhang only if Shared itself is truncated. **U-10 accepted delta (2026-07-24).**
   evidence: Blind Hunter + Edge Case Hunter; SharedPanel.cpp resized.
 
 - source_spec: `_bmad-output/implementation-artifacts/u-5-body-shell-padding-separators-and-column-gaps.md`
-  summary: BodyPanel `removeFromLeft` column chain leaves any remainder (or shortfall on Master Edit) unchecked — no `jassert` that leftover width ≈ 0 after the five segments. Compile-time DesignChecks cover design identity; runtime odd-scale leftover detection deferred (U-10 aggregate UAT).
+  summary: BodyPanel `removeFromLeft` column chain leaves any remainder (or shortfall on Master Edit) unchecked — no `jassert` that leftover width ≈ 0 after the five segments. Compile-time DesignChecks cover design identity; runtime odd-scale leftover detection deferred (U-10 aggregate UAT). **U-10 accepted delta (2026-07-24).**
   evidence: Blind Hunter + Edge Case Hunter; BodyPanel.cpp resized.
 
 ## Deferred from: code review of u-4-footer-panel-layout-audit (2026-07-22)
@@ -805,13 +823,13 @@
 ## Deferred from: code review of u-9-master-edit-panel-layout-audit.md (2026-07-24)
 
 - source_spec: `_bmad-output/implementation-artifacts/u-9-master-edit-panel-layout-audit.md`
-  summary: At odd UI Scale presets, the sum of individually scaled Master Edit strips (header + modules + gaps) can leave unused bottom slack or starve later strips; story policy is fixed scaled strips with aggregate residual UAT on U-10.
+  summary: At odd UI Scale presets, the sum of individually scaled Master Edit strips (header + modules + gaps) can leave unused bottom slack or starve later strips; story policy is fixed scaled strips with aggregate residual UAT on U-10. **U-10 accepted delta (2026-07-24).**
   evidence: Blind Hunter + Edge Case Hunter; MasterEditPanel.cpp resized.
 
 - source_spec: `_bmad-output/implementation-artifacts/u-9-master-edit-panel-layout-audit.md`
-  summary: Parent-assigned module heights (scaledInt of whole-module design heights) can disagree by a pixel with BaseModulePanel’s interior sum (scaled header + N × scaled row) at non-100% presets — possible internal clipping/slack inside Midi/Vibrato/Misc.
+  summary: Parent-assigned module heights (scaledInt of whole-module design heights) can disagree by a pixel with BaseModulePanel’s interior sum (scaled header + N × scaled row) at non-100% presets — possible internal clipping/slack inside Midi/Vibrato/Misc. **U-10 accepted delta (2026-07-24).**
   evidence: Blind Hunter; no module code changed in U-9; U-10 residual.
 
 - source_spec: `_bmad-output/implementation-artifacts/u-9-master-edit-panel-layout-audit.md`
-  summary: MasterEditPanelDimensions::sectionHeaderWidth is injected and used at construction, but resized() sizes the section header from the full parent strip width — latent coupling if header width ever diverges from panel width.
+  summary: MasterEditPanelDimensions::sectionHeaderWidth is injected and used at construction, but resized() sizes the section header from the full parent strip width — latent coupling if header width ever diverges from panel width. **U-10 accepted delta (2026-07-24) — latent, not UAT-blocking.**
   evidence: Blind Hunter; pre-existing, unchanged by U-9 stack refactor.

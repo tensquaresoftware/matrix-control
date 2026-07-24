@@ -20,7 +20,9 @@ namespace TSS
 
         std::function<void()> onPopupRequested;
         std::function<void()> onSettingsRequested;
+#if JUCE_DEBUG
         std::function<void()> onUiTestsToggleRequested;
+#endif
         std::function<void()> onUiScaleReset;
 
         void mouseUp(const juce::MouseEvent& e) override;

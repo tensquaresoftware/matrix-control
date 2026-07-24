@@ -51,7 +51,9 @@ public:
     std::function<void()> onSettingsRequested;
     std::function<void()> onAudioMidiSettingsRequested;
     std::function<void()> onAboutRequested;
+#if JUCE_DEBUG
     std::function<void()> onUiTestsToggleRequested;
+#endif
 
     juce::String getSelectedMidiFromPortIdentifier() const;
     juce::String getSelectedMidiToPortIdentifier() const;
