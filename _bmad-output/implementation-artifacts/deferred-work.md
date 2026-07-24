@@ -1,5 +1,11 @@
 # Deferred Work
 
+## Deferred from: code review of u-6-patch-edit-panels-layout-audit (2026-07-24)
+
+- source_spec: `_bmad-output/implementation-artifacts/u-6-patch-edit-panels-layout-audit.md`
+  summary: No runtime assert that five-column last-column width ≈ scaled childW, or that PatchEditPanel vertical stack leftover ≈ 0 after four `removeFromTop` strips. DesignChecks cover @100 % identities; odd-scale residual scrutiny remains on U-10 (same class as U-5 Body leftover defer).
+  evidence: Blind Hunter + Edge Case Hunter; PatchEditFiveColumnLayout.h, PatchEditPanel.cpp.
+
 ## Deferred from: code review of u-5-body-shell-padding-separators-and-column-gaps (2026-07-23)
 
 - source_spec: `_bmad-output/implementation-artifacts/u-5-body-shell-padding-separators-and-column-gaps.md`
