@@ -162,6 +162,7 @@ void ModulationBusCell::setDropTargetHighlighted(bool highlighted)
         return;
 
     dropTargetHighlighted_ = highlighted;
+    updateBusNumberLabelWeight();
     repaint();
 }
 
@@ -171,7 +172,20 @@ void ModulationBusCell::setDragSourceHighlighted(bool highlighted)
         return;
 
     dragSourceHighlighted_ = highlighted;
+    updateBusNumberLabelWeight();
     repaint();
+}
+
+void ModulationBusCell::updateBusNumberLabelWeight()
+{
+    if (busNumberLabel_ == nullptr || skin_ == nullptr)
+        return;
+
+    auto look = TSS::labelLookFromSkin(*skin_);
+    if (dragSourceHighlighted_ || dropTargetHighlighted_)
+        look.font = skin_->getBaseFontBold().withHeight(look.font.getHeight());
+
+    busNumberLabel_->setLook(look);
 }
 
 void ModulationBusCell::paint(juce::Graphics& g)
@@ -179,10 +193,13 @@ void ModulationBusCell::paint(juce::Graphics& g)
     if (!dropTargetHighlighted_ && !dragSourceHighlighted_)
         return;
 
-    const auto bounds = getLocalBounds().toFloat();
+    if (busNumberLabel_ == nullptr)
+        return;
+
+    const auto bounds = busNumberLabel_->getBounds().toFloat();
     const juce::Colour highlightColour = dragSourceHighlighted_
-        ? juce::Colour(ColourChart::kBlue)
-        : juce::Colour(ColourChart::kRed);
+        ? juce::Colour(ColourChart::kBlue).withAlpha(0.75f)
+        : juce::Colour(ColourChart::kRed).withAlpha(0.75f);
     g.setColour(highlightColour);
     g.fillRect(bounds);
 }
@@ -327,8 +344,7 @@ void ModulationBusCell::layoutSeparator(int yTop, int separatorHeight)
 void ModulationBusCell::setSkin(TSS::ISkin& skin)
 {
     skin_ = &skin;
-    if (busNumberLabel_)
-        busNumberLabel_->setLook(TSS::labelLookFromSkin(skin));
+    updateBusNumberLabelWeight();
     if (sourceComboBox_)
     {
         sourceComboBox_->setLook(TSS::comboBoxLookFromSkin(skin));

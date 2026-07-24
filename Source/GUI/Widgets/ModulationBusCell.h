@@ -60,6 +60,7 @@ private:
     bool isBusNumberLabelHit(juce::Point<int> localPosition) const;
     juce::Point<int> toPanelPosition(juce::Point<int> localPosition) const;
     void finishReorderDrag(juce::Point<int> localPosition);
+    void updateBusNumberLabelWeight();
 
     int busNumber_ { 0 };
     bool reorderDragPending_ { false };
