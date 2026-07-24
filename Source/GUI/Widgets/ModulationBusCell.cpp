@@ -15,12 +15,6 @@
 #include "Shared/Definitions/PluginDisplayNames.h"
 #include "GUI/Factories/WidgetFactory.h"
 
-namespace
-{
-constexpr float kReorderDragSourcePlaceholderAlpha = 0.12f;
-constexpr float kReorderDropTargetRedAlpha         = 0.25f;
-}
-
 ModulationBusCell::~ModulationBusCell() = default;
 
 ModulationBusCell::ModulationBusCell(TSS::ISkin& skin,
@@ -187,8 +181,8 @@ void ModulationBusCell::paint(juce::Graphics& g)
 
     const auto bounds = getLocalBounds().toFloat();
     const juce::Colour highlightColour = dragSourceHighlighted_
-        ? juce::Colours::white.withAlpha(kReorderDragSourcePlaceholderAlpha)
-        : juce::Colour(ColourChart::kRed).withAlpha(kReorderDropTargetRedAlpha);
+        ? juce::Colour(ColourChart::kBlue)
+        : juce::Colour(ColourChart::kRed);
     g.setColour(highlightColour);
     g.fillRect(bounds);
 }
