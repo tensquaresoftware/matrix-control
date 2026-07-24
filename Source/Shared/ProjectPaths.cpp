@@ -11,7 +11,9 @@ namespace
     constexpr const char* kLogsFolderName { "Logs" };
     constexpr const char* kMidiLogsFolderName { "MIDI" };
     constexpr const char* kApvtsLogsFolderName { "APVTS" };
-    constexpr const char* kMacOsSystemPlugInsPath { "/Library/Audio/Plug-Ins/" };
+    constexpr const char* kDevProjectRootFileName { "dev-project-root.txt" };
+    // Matches both /Library/... and ~/Library/... — walk-up from either tree can hang hosts.
+    constexpr const char* kMacOsPlugInsPathFragment { "/Library/Audio/Plug-Ins/" };
     constexpr int kMaxWalkUpDepth { 32 };
 
     struct RootCache
@@ -42,10 +44,9 @@ namespace
         return cmakeFile.loadFileAsString().contains(kProjectNameToken);
     }
 
-    bool isSystemInstalledPluginPath(const juce::File& file)
+    bool isMacPluginInstallTreePath(const juce::File& file)
     {
-        const auto path = file.getFullPathName();
-        return path.contains(kMacOsSystemPlugInsPath);
+        return file.getFullPathName().contains(kMacOsPlugInsPathFragment);
     }
 
     juce::File findRootFromStartDirectory(const juce::File& startDirectory)
@@ -57,7 +58,11 @@ namespace
             if (directoryContainsProjectMarker(current))
                 return current;
 
-            current = current.getParentDirectory();
+            const juce::File parent = current.getParentDirectory();
+            if (parent == current)
+                break;
+
+            current = parent;
         }
 
         return {};
@@ -68,6 +73,11 @@ namespace
         return juce::File::getSpecialLocation(juce::File::userApplicationDataDirectory)
             .getChildFile(kCompanyFolderName)
             .getChildFile(kProductFolderName);
+    }
+
+    juce::File getDevProjectRootFile()
+    {
+        return getFallbackRoot().getChildFile(kDevProjectRootFileName);
     }
 
     juce::File resolveRootFromEnvironment()
@@ -83,15 +93,45 @@ namespace
         return {};
     }
 
+    juce::File resolveRootFromPersistedDevPath()
+    {
+        const juce::File file = getDevProjectRootFile();
+        if (!file.existsAsFile())
+            return {};
+
+        const juce::String path = file.loadFileAsString().trim();
+        if (path.isEmpty())
+            return {};
+
+        const juce::File root(path);
+        if (directoryContainsProjectMarker(root))
+            return root;
+
+        return {};
+    }
+
+    void persistDevProjectRoot(const juce::File& root)
+    {
+        if (!root.isDirectory())
+            return;
+
+        const juce::File file = getDevProjectRootFile();
+        file.getParentDirectory().createDirectory();
+        file.replaceWithText(root.getFullPathName() + "\n");
+    }
+
     juce::Array<juce::File> collectWalkUpRoots()
     {
         juce::Array<juce::File> startPoints;
         const auto executableFile = juce::File::getSpecialLocation(juce::File::currentExecutableFile);
 
-        if (!isSystemInstalledPluginPath(executableFile))
+        // Never walk up from AU/VST3 install trees (user or system) — host load hangs.
+        if (!isMacPluginInstallTreePath(executableFile))
             startPoints.add(executableFile.getParentDirectory());
 
-        startPoints.add(juce::File::getCurrentWorkingDirectory());
+        const juce::File cwd = juce::File::getCurrentWorkingDirectory();
+        if (!isMacPluginInstallTreePath(cwd))
+            startPoints.add(cwd);
 
         juce::Array<juce::File> discoveredRoots;
 
@@ -129,17 +169,28 @@ namespace
 
         cache.resolved = true;
 
-        const juce::File walkUpRoot = pickPreferredWalkUpRoot(collectWalkUpRoots());
-        if (walkUpRoot.exists())
-        {
-            cache.root = walkUpRoot;
-            return;
-        }
-
+        // Env first: cheap and safe for DAW hosts launched from Cursor / CI.
         const juce::File envRoot = resolveRootFromEnvironment();
         if (envRoot.exists())
         {
             cache.root = envRoot;
+            persistDevProjectRoot(cache.root);
+            return;
+        }
+
+        const juce::File walkUpRoot = pickPreferredWalkUpRoot(collectWalkUpRoots());
+        if (walkUpRoot.exists())
+        {
+            cache.root = walkUpRoot;
+            persistDevProjectRoot(cache.root);
+            return;
+        }
+
+        // After a Standalone/Cursor session, Ableton can reuse the remembered repo root.
+        const juce::File persistedRoot = resolveRootFromPersistedDevPath();
+        if (persistedRoot.exists())
+        {
+            cache.root = persistedRoot;
             return;
         }
 
