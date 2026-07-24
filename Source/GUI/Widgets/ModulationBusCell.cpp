@@ -1,4 +1,5 @@
 #include "ModulationBusCell.h"
+#include "ModulationBusRowLayout.h"
 
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Skins/ColourChart.h"
@@ -293,29 +294,32 @@ void ModulationBusCell::layoutWidgetRow()
     const float sf = uiScale_;
     const int y = 0;
 
-    const int labelW  = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions_.busNumberLabelWidth), sf);
-    const int labelH  = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions_.busNumberLabelHeight), sf);
-    const int sourceW = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions_.sourceComboBoxWidth), sf);
+    const int labelH = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions_.busNumberLabelHeight), sf);
     const int sourceH = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions_.sourceComboBoxHeight), sf);
-    const int amountW = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions_.amountSliderWidth), sf);
     const int amountH = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions_.amountSliderHeight), sf);
-    const int destW   = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions_.destinationComboBoxWidth), sf);
-    const int destH   = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions_.destinationComboBoxHeight), sf);
-    const int initW   = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions_.initButtonWidth), sf);
-    const int initH   = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions_.initButtonHeight), sf);
+    const int destH = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions_.destinationComboBoxHeight), sf);
+    const int initH = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions_.initButtonHeight), sf);
 
-    const float gap = static_cast<float>(dimensions_.interControlGap) * sf;
-    const float sourceX = (static_cast<float>(dimensions_.busNumberLabelWidth)
-        + static_cast<float>(dimensions_.interControlGap)) * sf;
-    const float amountX = sourceX + static_cast<float>(dimensions_.sourceComboBoxWidth) * sf + gap;
-    const float destX   = amountX + static_cast<float>(dimensions_.amountSliderWidth) * sf + gap;
-    const float initX   = destX   + static_cast<float>(dimensions_.destinationComboBoxWidth) * sf + gap;
+    // Fixed scaled widths (no remainder absorption) so Init stays on design X 248 @ 100 %.
+    const auto cols = TSS::computeModulationBusColumnStrip(
+        sf,
+        dimensions_.busNumberLabelWidth,
+        dimensions_.sourceComboBoxWidth,
+        dimensions_.amountSliderWidth,
+        dimensions_.destinationComboBoxWidth,
+        dimensions_.initButtonWidth,
+        dimensions_.interControlGap);
 
-    if (auto* label   = busNumberLabel_.get())     label->setBounds(0, y, labelW, labelH);
-    if (auto* combo   = sourceComboBox_.get())     combo->setBounds(juce::roundToInt(sourceX), y, sourceW, sourceH);
-    if (auto* slider  = amountSlider_.get())       slider->setBounds(juce::roundToInt(amountX), y, amountW, amountH);
-    if (auto* combo   = destinationComboBox_.get()) combo->setBounds(juce::roundToInt(destX), y, destW, destH);
-    if (auto* button  = initButton_.get())         button->setBounds(juce::roundToInt(initX), y, initW, initH);
+    if (auto* label = busNumberLabel_.get())
+        label->setBounds(cols.busNumberX, y, cols.busNumberW, labelH);
+    if (auto* combo = sourceComboBox_.get())
+        combo->setBounds(cols.sourceX, y, cols.sourceW, sourceH);
+    if (auto* slider = amountSlider_.get())
+        slider->setBounds(cols.amountX, y, cols.amountW, amountH);
+    if (auto* combo = destinationComboBox_.get())
+        combo->setBounds(cols.destinationX, y, cols.destinationW, destH);
+    if (auto* button = initButton_.get())
+        button->setBounds(cols.initX, y, cols.initW, initH);
 }
 
 void ModulationBusCell::layoutSeparator(int yTop, int separatorHeight)

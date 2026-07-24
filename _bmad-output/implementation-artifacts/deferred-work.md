@@ -1,5 +1,11 @@
 # Deferred Work
 
+## Deferred from: code review of u-7-matrix-modulation-panel-layout-audit (2026-07-24)
+
+- source_spec: `_bmad-output/implementation-artifacts/u-7-matrix-modulation-panel-layout-audit.md`
+  summary: Fixed-width integer column strip (no last-column remainder absorption) keeps Init @ 248 @ 100 % and aligns Init/Paste on all seven UI Scale presets; at some non-preset scales successive `scaledInt` can leave ±1–2 px leftover so bus Init X and section Paste X diverge. Residual odd-scale scrutiny already owned by U-10 (same class as U-5/U-6 leftover defers).
+  evidence: Blind Hunter + Edge Case Hunter; ModulationBusRowLayout.h, ModulationBusCell.cpp, MatrixModulationPanel::layoutSectionActionButtons.
+
 ## Deferred from: code review of u-6-patch-edit-panels-layout-audit (2026-07-24)
 
 - source_spec: `_bmad-output/implementation-artifacts/u-6-patch-edit-panels-layout-audit.md`

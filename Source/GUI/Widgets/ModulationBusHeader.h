@@ -47,10 +47,10 @@ namespace TSS
         void drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawLine(juce::Graphics& g, const juce::Rectangle<float>& bounds);
 
-        void drawBusNumberText(juce::Graphics& g, float x, float y);
-        void drawBusSourceText(juce::Graphics& g, float x, float y);
-        void drawBusAmountText(juce::Graphics& g, float x, float y);
-        void drawBusDestinationText(juce::Graphics& g, float x, float y);
+        void drawBusNumberText(juce::Graphics& g, float x, float y, float width, float height);
+        void drawBusSourceText(juce::Graphics& g, float x, float y, float width, float height);
+        void drawBusAmountText(juce::Graphics& g, float x, float y, float width, float height);
+        void drawBusDestinationText(juce::Graphics& g, float x, float y, float width, float height);
 
         juce::Colour getLineColour() const;
 

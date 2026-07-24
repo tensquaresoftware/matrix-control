@@ -66,7 +66,7 @@ Two-zone only (left message + right device identity). No centre-actions cluster.
 | 268 × 304 | `Panels::Body::MatrixModulationSection::kWidth` × `kHeight` | U-7 |
 | 268 × 24 | `Recipes::ModulationBusCell::kWidth` × `kHeight` | U-2, U-7 |
 | 268 × 32 | `PanelWidgets::Widths::ModulationBusHeader::kStandard` × `Atoms::Heights::kModulationBusHeader` | U-7 |
-| 4 | `Atoms::Widths::ModulationBusCell::kInterControlGap` | U-7 |
+| 4 | `Atoms::Widths::ModulationBus::kInterControlGap` | U-7 |
 
 ## Patch Manager (4 modules)
 
