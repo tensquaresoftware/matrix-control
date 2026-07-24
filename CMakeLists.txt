@@ -45,7 +45,7 @@ elseif(WIN32)
     endif()
 endif()
 
-project(Matrix-Control VERSION 0.1.1)
+project(Matrix-Control VERSION 0.1.2)
 
 string(TIMESTAMP MATRIX_CONTROL_BUILD_DATE "%Y-%m-%d" UTC)
 set(MATRIX_CONTROL_PRERELEASE_SUFFIX "alpha"
