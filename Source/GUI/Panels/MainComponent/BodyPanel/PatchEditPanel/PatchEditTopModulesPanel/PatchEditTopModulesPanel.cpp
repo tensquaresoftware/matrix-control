@@ -6,6 +6,7 @@
 #include "Modules/FmTrackPanel.h"
 #include "Modules/RampPortamentoPanel.h"
 
+#include "GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditFiveColumnLayout.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Factories/WidgetFactory.h"
@@ -43,31 +44,19 @@ PatchEditTopModulesPanel::PatchEditTopModulesPanel(TSS::ISkin& skin,
 
 void PatchEditTopModulesPanel::resized()
 {
-    const auto bounds = getLocalBounds();
-    std::array<juce::Component*, 5> panels = {
-        dco1Panel_.get(), 
-        dco2Panel_.get(), 
-        vcfVcaPanel_.get(),
-        fmTrackPanel_.get(), 
-        rampPortamentoPanel_.get()
-    };
-    
-    const int childWidth = juce::roundToInt(static_cast<float>(rowDims_.childModuleWidth) * uiScale_);
-    const int childHeight = juce::roundToInt(static_cast<float>(rowDims_.childModuleHeight) * uiScale_);
-    const float childStep = static_cast<float>(rowDims_.childModuleWidth + rowDims_.interModuleGap) * uiScale_;
-    const int lastIndex = static_cast<int>(panels.size()) - 1;
-
-    int i = 0;
-    for (auto* panel : panels)
-    {
-        if (panel)
+    TSS::layoutPatchEditFiveColumns(
+        getLocalBounds(),
+        uiScale_,
+        rowDims_.childModuleWidth,
+        rowDims_.childModuleHeight,
+        rowDims_.interModuleGap,
         {
-            const int x = juce::roundToInt(static_cast<float>(i) * childStep);
-            const int w = (i == lastIndex) ? (bounds.getWidth() - x) : childWidth;
-            panel->setBounds(bounds.getX() + x, bounds.getY(), w, childHeight);
-        }
-        ++i;
-    }
+            dco1Panel_.get(),
+            dco2Panel_.get(),
+            vcfVcaPanel_.get(),
+            fmTrackPanel_.get(),
+            rampPortamentoPanel_.get()
+        });
 }
 
 void PatchEditTopModulesPanel::setSkin(TSS::ISkin& skin)

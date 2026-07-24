@@ -4,8 +4,8 @@
 #include "Modules/PatchNameDisplayPanel.h"
 #include "Modules/TrackGeneratorDisplayApvtsBinding.h"
 
-#include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Looks/LookBuilders.h"
+#include "GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditFiveColumnLayout.h"
 #include "GUI/Skins/ISkin.h"
 #include "Shared/Definitions/PluginIDs.h"
 
@@ -82,22 +82,19 @@ PatchEditDisplaysPanel::PatchEditDisplaysPanel(TSS::ISkin& skin, const PatchEdit
 
 void PatchEditDisplaysPanel::resized()
 {
-    const float sf = uiScale_;
-    const int childWidth = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.childBand.width), sf);
-    const int childHeight = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.childBand.height), sf);
-    const float childStep = static_cast<float>(dims_.childBand.width + dims_.interModuleGap) * sf;
-
-    envelope1Display_.setBounds(0, 0, childWidth, childHeight);
-    envelope2Display_.setBounds(juce::roundToInt(1.0f * childStep), 0, childWidth, childHeight);
-    envelope3Display_.setBounds(juce::roundToInt(2.0f * childStep), 0, childWidth, childHeight);
-    trackGeneratorDisplay_.setBounds(juce::roundToInt(3.0f * childStep), 0, childWidth, childHeight);
-
-    const int patchNameSectionX = juce::roundToInt(4.0f * childStep);
-    const int patchNameSectionW = getWidth() - patchNameSectionX;
-    const int patchNameSectionH = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.childBand.height), sf);
-
-    if (patchNameDisplayPanel_ != nullptr)
-        patchNameDisplayPanel_->setBounds(patchNameSectionX, 0, patchNameSectionW, patchNameSectionH);
+    TSS::layoutPatchEditFiveColumns(
+        getLocalBounds(),
+        uiScale_,
+        dims_.childBand.width,
+        dims_.childBand.height,
+        dims_.interModuleGap,
+        {
+            &envelope1Display_,
+            &envelope2Display_,
+            &envelope3Display_,
+            &trackGeneratorDisplay_,
+            patchNameDisplayPanel_.get()
+        });
 }
 
 void PatchEditDisplaysPanel::setSkin(TSS::ISkin& skin)

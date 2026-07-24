@@ -46,7 +46,7 @@ PatchEditPanel::PatchEditPanel(TSS::ISkin& skin,
 
 void PatchEditPanel::resized()
 {
-    const auto bounds = getLocalBounds();
+    auto area = getLocalBounds();
     const float sf = uiScale_;
 
     const int sectionHeaderHeight = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.sectionHeaderHeight), sf);
@@ -54,14 +54,10 @@ void PatchEditPanel::resized()
     const int middleHeight = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.middleHeight), sf);
     const int bottomHeight = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.bottomHeight), sf);
 
-    int y = bounds.getY();
-    sectionHeader_->setBounds(bounds.getX(), y, bounds.getWidth(), sectionHeaderHeight);
-    y += sectionHeaderHeight;
-    patchEditTopModulesPanel_->setBounds(bounds.getX(), y, bounds.getWidth(), topHeight);
-    y += topHeight;
-    patchEditDisplaysPanel_->setBounds(bounds.getX(), y, bounds.getWidth(), middleHeight);
-    y += middleHeight;
-    patchEditBottomModulesPanel_->setBounds(bounds.getX(), y, bounds.getWidth(), bottomHeight);
+    sectionHeader_->setBounds(area.removeFromTop(sectionHeaderHeight));
+    patchEditTopModulesPanel_->setBounds(area.removeFromTop(topHeight));
+    patchEditDisplaysPanel_->setBounds(area.removeFromTop(middleHeight));
+    patchEditBottomModulesPanel_->setBounds(area.removeFromTop(bottomHeight));
 }
 
 void PatchEditPanel::setSkin(TSS::ISkin& skin)

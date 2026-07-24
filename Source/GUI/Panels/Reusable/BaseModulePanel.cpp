@@ -94,12 +94,12 @@ void BaseModulePanel::resized()
     const int rowHeight = TSS::ScaledLayout::scaledInt(
         static_cast<float>(parameterCellDims_.rowHeight), uiScale_);
 
-    int y = bounds.getY();
     for (size_t i = 0; i < paramCount; ++i)
     {
         if (auto* cell = parameterCells_[i].get())
-            cell->setBounds(bounds.getX(), y, bounds.getWidth(), rowHeight);
-        y += rowHeight;
+            cell->setBounds(bounds.removeFromTop(rowHeight));
+        else
+            bounds.removeFromTop(rowHeight);
     }
 }
 

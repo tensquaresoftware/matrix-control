@@ -57,19 +57,24 @@ TSS::PatchNameDisplay& PatchNameDisplayPanel::getPatchNameDisplay()
 
 void PatchNameDisplayPanel::resized()
 {
+    auto area = getLocalBounds();
     const float sf = uiScale_;
-    const int w = getWidth();
-    const int topPad = TSS::ScaledLayout::scaledInt(static_cast<float>(patchNameDims_.topPadding), sf);
-    const int headerH = TSS::ScaledLayout::scaledInt(static_cast<float>(moduleHeaderDims_.height), sf);
-    const int bottomPad = TSS::ScaledLayout::scaledInt(static_cast<float>(patchNameDims_.bottomPadding), sf);
-    const int displayH = TSS::ScaledLayout::scaledInt(static_cast<float>(patchNameDims_.height), sf);
-    const int displayY = getHeight() - bottomPad - displayH;
+
+    area.removeFromTop(TSS::ScaledLayout::scaledInt(static_cast<float>(patchNameDims_.topPadding), sf));
 
     if (moduleHeader_ != nullptr)
-        moduleHeader_->setBounds(0, topPad, w, headerH);
+        moduleHeader_->setBounds(area.removeFromTop(
+            TSS::ScaledLayout::scaledInt(static_cast<float>(moduleHeaderDims_.height), sf)));
+
+    area.removeFromTop(TSS::ScaledLayout::scaledInt(
+        static_cast<float>(patchNameDims_.moduleHeaderToDisplayGap), sf));
+
+    area.removeFromBottom(TSS::ScaledLayout::scaledInt(
+        static_cast<float>(patchNameDims_.bottomPadding), sf));
 
     if (patchNameDisplay_ != nullptr)
-        patchNameDisplay_->setBounds(0, displayY, w, displayH);
+        patchNameDisplay_->setBounds(area.removeFromTop(
+            TSS::ScaledLayout::scaledInt(static_cast<float>(patchNameDims_.height), sf)));
 }
 
 void PatchNameDisplayPanel::setSkin(TSS::ISkin& skin)
