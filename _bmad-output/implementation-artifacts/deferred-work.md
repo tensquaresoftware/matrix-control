@@ -1,5 +1,11 @@
 # Deferred Work
 
+## Deferred from: code review of u-8-patch-manager-panels-layout-audit (2026-07-24)
+
+- source_spec: `_bmad-output/implementation-artifacts/u-8-patch-manager-panels-layout-audit.md`
+  summary: Internal/Computer Patches integer `removeFromLeft` strips clamp to remaining panel width when the panel is narrower than the design control sum, so later controls can shrink instead of keeping full design widths (old absolute `setBounds` overflowed). Harmless while Patch Manager modules are sized to design width; odd/undersized residual scrutiny remains on U-10 (same class as U-5 Shared overhang defer).
+  evidence: Blind Hunter + Edge Case Hunter; InternalPatchesPanel.cpp / ComputerPatchesPanel.cpp resized browser/storage rows.
+
 ## Deferred from: code review of u-7-matrix-modulation-panel-layout-audit (2026-07-24)
 
 - source_spec: `_bmad-output/implementation-artifacts/u-7-matrix-modulation-panel-layout-audit.md`
