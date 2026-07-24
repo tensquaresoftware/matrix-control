@@ -181,7 +181,7 @@ development_status:
   epic-10-retrospective: optional
 
   # Epic U: UI Scale Audit & Pixel-Perfect Layout
-  epic-u: in-progress
+  epic-u: done
   u-ids-widget-id-harmonization: done
   u-0-figma-intake-and-design-reconciliation: done
   u-0b-factory-dimension-registry-and-descriptor-decoupling: done
