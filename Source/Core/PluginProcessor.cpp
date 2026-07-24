@@ -376,6 +376,11 @@ PluginProcessor::PluginProcessor()
     apvtsPatchMapper_->apvtsToBuffer();
     patchNameSyncer_->apvtsToBuffer();
     dirtyPatchTracker_->captureSnapshot(*patchModel_);
+
+    // Standalone may never call prepareToPlay when no audio device is selected in
+    // Matrix-Control.settings — still start Debug file logging at construction.
+    if (isStandaloneWrapper())
+        ensureDevelopmentLoggingStarted();
 }
 
 PluginProcessor::~PluginProcessor()
