@@ -4,7 +4,7 @@ Auteur: Guillaume DUPONT
 Projet: Matrix-Control
 Titre: Matrix-Control — Manuel utilisateur
 Version: 0.1
-Version-Produit: 0.1.1-alpha
+Version-Produit: 0.1.2-alpha
 Created: 2026-07-20
 Updated: 2026-07-20
 References:
