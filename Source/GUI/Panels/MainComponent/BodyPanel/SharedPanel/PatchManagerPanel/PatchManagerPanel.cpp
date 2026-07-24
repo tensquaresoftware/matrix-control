@@ -62,7 +62,7 @@ PatchManagerPanel::~PatchManagerPanel() = default;
 
 void PatchManagerPanel::resized()
 {
-    const auto bounds = getLocalBounds();
+    auto area = getLocalBounds();
     const float sf = uiScale_;
     const int panelWidth = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.width), sf);
     const int sectionHeaderHeight = TSS::ScaledLayout::scaledInt(
@@ -74,27 +74,22 @@ void PatchManagerPanel::resized()
     const int patchMutatorH = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.patchMutatorHeight), sf);
 
     if (auto* header = sectionHeader_.get())
-        header->setBounds(bounds.getX(), bounds.getY(), bounds.getWidth(), sectionHeaderHeight);
-
-    int y = bounds.getY() + sectionHeaderHeight;
+        header->setBounds(area.removeFromTop(sectionHeaderHeight));
 
     if (auto* panel = bankUtilityPanel_.get())
-    {
-        panel->setBounds(bounds.getX(), y, panelWidth, bankUtilityH);
-        y += bankUtilityH + moduleStackGap;
-    }
+        panel->setBounds(area.removeFromTop(bankUtilityH).withWidth(panelWidth));
+    area.removeFromTop(moduleStackGap);
+
     if (auto* panel = internalPatchesPanel_.get())
-    {
-        panel->setBounds(bounds.getX(), y, panelWidth, internalPatchesH);
-        y += internalPatchesH + moduleStackGap;
-    }
+        panel->setBounds(area.removeFromTop(internalPatchesH).withWidth(panelWidth));
+    area.removeFromTop(moduleStackGap);
+
     if (auto* panel = computerPatchesPanel_.get())
-    {
-        panel->setBounds(bounds.getX(), y, panelWidth, computerPatchesH);
-        y += computerPatchesH + moduleStackGap;
-    }
+        panel->setBounds(area.removeFromTop(computerPatchesH).withWidth(panelWidth));
+    area.removeFromTop(moduleStackGap);
+
     if (auto* panel = patchMutatorPanel_.get())
-        panel->setBounds(bounds.getX(), y, panelWidth, patchMutatorH);
+        panel->setBounds(area.removeFromTop(patchMutatorH).withWidth(panelWidth));
 }
 
 void PatchManagerPanel::setSkin(TSS::ISkin& skin)

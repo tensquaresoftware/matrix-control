@@ -1,7 +1,10 @@
 #include "InternalPatchesPanel.h"
 
+#include "../PatchManagerEqualWidthStrip.h"
+
 #include "Core/Services/DeviceMemoryLimits.h"
 #include "Core/Services/DeviceTypeRegistry.h"
+#include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Looks/LookBuilders.h"
@@ -147,66 +150,70 @@ void InternalPatchesPanel::resized()
 {
     const float sf = uiScale_;
 
-    // Dimensions (scaled)
-    const int moduleHeaderH   = juce::roundToInt(static_cast<float>(dims_.moduleHeader.height) * sf);
-    const int moduleHeaderW   = juce::roundToInt(static_cast<float>(dims_.moduleHeader.patchManagerTitleBandWidth) * sf);
-    const int groupLabelH     = juce::roundToInt(static_cast<float>(dims_.groupLabels.height) * sf);
-    const int browserGroupW   = juce::roundToInt(static_cast<float>(dims_.groupLabels.internalPatchesBrowserWidth) * sf);
-    const int memoryGroupW    = juce::roundToInt(static_cast<float>(dims_.groupLabels.internalPatchesMemoryWidth) * sf);
-    const int navButtonW      = juce::roundToInt(static_cast<float>(dims_.buttons.initWidth) * sf);
-    const int bankNumberW     = juce::roundToInt(static_cast<float>(dims_.numberBoxes.bankNumberWidth) * sf);
-    const int patchNumberW    = juce::roundToInt(static_cast<float>(dims_.numberBoxes.patchNumberWidth) * sf);
-    const int memButtonW      = juce::roundToInt(static_cast<float>(dims_.buttons.internalPatchesInitWidth) * sf);
-    const int buttonH         = juce::roundToInt(static_cast<float>(dims_.buttons.height) * sf);
+    const int moduleHeaderH = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.moduleHeader.height), sf);
+    const int moduleHeaderW = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(dims_.moduleHeader.patchManagerTitleBandWidth), sf);
+    const int groupLabelH = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.groupLabels.height), sf);
+    const int browserGroupW = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(dims_.groupLabels.internalPatchesBrowserWidth), sf);
+    const int memoryGroupW = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(dims_.groupLabels.internalPatchesMemoryWidth), sf);
+    const int navButtonW = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.buttons.initWidth), sf);
+    const int bankNumberW = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(dims_.numberBoxes.bankNumberWidth), sf);
+    const int patchNumberW = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(dims_.numberBoxes.patchNumberWidth), sf);
+    const int buttonH = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.buttons.height), sf);
+    const int interGap = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.layout.interControlGap), sf);
+    const int columnGap = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.layout.columnGap), sf);
 
-    // Module header
     if (moduleHeader)
         moduleHeader->setBounds(0, 0, moduleHeaderW, moduleHeaderH);
 
-    // Row 1 Y: group labels
-    const int row1Y = juce::roundToInt(static_cast<float>(dims_.moduleHeader.height) * sf);
+    const int row1Y = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.moduleHeader.height), sf);
 
-    // Browser group label at X=0
     if (browserGroupLabel)
         browserGroupLabel->setBounds(0, row1Y, browserGroupW, groupLabelH);
 
-    // Memory group label at X = browserGroupWidth + kGroupLabelGap
-    const int memoryGroupX = juce::roundToInt(
-        static_cast<float>(dims_.groupLabels.internalPatchesBrowserWidth + dims_.layout.columnGap) * sf);
+    const int memoryGroupX = browserGroupW + columnGap;
     if (memoryGroupLabel)
         memoryGroupLabel->setBounds(memoryGroupX, row1Y, memoryGroupW, groupLabelH);
 
-    // Row 2 Y: buttons/numberboxes
-    const int row2Y = juce::roundToInt(static_cast<float>(dims_.moduleHeader.height + dims_.groupLabels.height) * sf);
+    // Row 2 — successive integer strips (fixed widths; bank NumberBox hide reflows patch left)
+    const int row2Y = row1Y + groupLabelH;
 
-    // Browser section: nav buttons + number boxes, each X computed independently
-    const float navStep    = static_cast<float>(dims_.buttons.initWidth + dims_.layout.interControlGap) * sf;
-    const float bankNumX   = navStep * 2.0f;
-    const float patchNumX  = bankNumberVisible_
-        ? bankNumX + static_cast<float>(dims_.numberBoxes.bankNumberWidth + dims_.layout.interControlGap) * sf
-        : bankNumX;
-
+    auto browserRow = juce::Rectangle<int>(0, row2Y, getWidth(), buttonH);
     if (loadPreviousPatchButton_)
-        loadPreviousPatchButton_->setBounds(0, row2Y, navButtonW, buttonH);
+        loadPreviousPatchButton_->setBounds(browserRow.removeFromLeft(navButtonW));
+    else
+        browserRow.removeFromLeft(navButtonW);
+    browserRow.removeFromLeft(interGap);
+
     if (loadNextPatchButton_)
-        loadNextPatchButton_->setBounds(juce::roundToInt(navStep), row2Y, navButtonW, buttonH);
-    if (currentBankNumber && bankNumberVisible_)
-        currentBankNumber->setBounds(juce::roundToInt(bankNumX), row2Y, bankNumberW, buttonH);
+        loadNextPatchButton_->setBounds(browserRow.removeFromLeft(navButtonW));
+    else
+        browserRow.removeFromLeft(navButtonW);
+    browserRow.removeFromLeft(interGap);
+
+    if (bankNumberVisible_)
+    {
+        if (currentBankNumber)
+            currentBankNumber->setBounds(browserRow.removeFromLeft(bankNumberW));
+        else
+            browserRow.removeFromLeft(bankNumberW);
+        browserRow.removeFromLeft(interGap);
+    }
+
     if (currentPatchNumber)
-        currentPatchNumber->setBounds(juce::roundToInt(patchNumX), row2Y, patchNumberW, buttonH);
+        currentPatchNumber->setBounds(browserRow.removeFromLeft(patchNumberW));
 
-    // Memory section: 4 buttons, each X computed independently from memory origin
-    const float memOriginX = static_cast<float>(dims_.groupLabels.internalPatchesBrowserWidth + dims_.layout.columnGap) * sf;
-    const float memStep    = static_cast<float>(dims_.buttons.internalPatchesInitWidth + dims_.layout.interControlGap) * sf;
-
-    if (initPatchButton_)
-        initPatchButton_->setBounds(juce::roundToInt(memOriginX), row2Y, memButtonW, buttonH);
-    if (copyPatchButton_)
-        copyPatchButton_->setBounds(juce::roundToInt(memOriginX + 1.0f * memStep), row2Y, memButtonW, buttonH);
-    if (pastePatchButton_)
-        pastePatchButton_->setBounds(juce::roundToInt(memOriginX + 2.0f * memStep), row2Y, memButtonW, buttonH);
-    if (storePatchButton_)
-        storePatchButton_->setBounds(juce::roundToInt(memOriginX + 3.0f * memStep), row2Y, memButtonW, buttonH);
+    juce::Component* memButtons[] = {
+        initPatchButton_.get(), copyPatchButton_.get(),
+        pastePatchButton_.get(), storePatchButton_.get()
+    };
+    TSS::placeEqualWidthStrip(memoryGroupX, row2Y, sf,
+                              dims_.buttons.internalPatchesInitWidth, dims_.buttons.height,
+                              dims_.layout.interControlGap, memButtons, 4);
 
     if (moduleHeader)             moduleHeader->setUiScale(sf);
     if (browserGroupLabel)        browserGroupLabel->setUiScale(sf);

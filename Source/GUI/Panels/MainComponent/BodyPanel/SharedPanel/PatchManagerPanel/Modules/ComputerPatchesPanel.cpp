@@ -1,6 +1,7 @@
 #include "ComputerPatchesPanel.h"
 
 #include "Core/Services/PatchFileService.h"
+#include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Looks/LookBuilders.h"
@@ -149,57 +150,73 @@ void ComputerPatchesPanel::resized()
 {
     const float sf = uiScale_;
 
-    // Dimensions (scaled)
-    const int moduleHeaderH    = juce::roundToInt(static_cast<float>(dims_.moduleHeader.height) * sf);
-    const int moduleHeaderW    = juce::roundToInt(static_cast<float>(dims_.moduleHeader.patchManagerTitleBandWidth) * sf);
-    const int groupLabelH      = juce::roundToInt(static_cast<float>(dims_.groupLabels.height) * sf);
-    const int browserGroupW    = juce::roundToInt(static_cast<float>(dims_.groupLabels.computerPatchesBrowserWidth) * sf);
-    const int storageGroupW    = juce::roundToInt(static_cast<float>(dims_.groupLabels.computerPatchesStorageWidth) * sf);
-    const int navButtonW       = juce::roundToInt(static_cast<float>(dims_.buttons.initWidth) * sf);
-    const int comboBoxW        = juce::roundToInt(static_cast<float>(dims_.comboBoxes.patchManagerComputerPatchesWidth) * sf);
-    const int loadButtonW      = juce::roundToInt(static_cast<float>(dims_.buttons.computerPatchesLoadWidth) * sf);
-    const int saveButtonW      = juce::roundToInt(static_cast<float>(dims_.buttons.computerPatchesSaveWidth) * sf);
-    const int saveAsButtonW    = juce::roundToInt(static_cast<float>(dims_.buttons.computerPatchesSaveAsWidth) * sf);
-    const int buttonH          = juce::roundToInt(static_cast<float>(dims_.buttons.height) * sf);
+    const int moduleHeaderH = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.moduleHeader.height), sf);
+    const int moduleHeaderW = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(dims_.moduleHeader.patchManagerTitleBandWidth), sf);
+    const int groupLabelH = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.groupLabels.height), sf);
+    const int browserGroupW = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(dims_.groupLabels.computerPatchesBrowserWidth), sf);
+    const int storageGroupW = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(dims_.groupLabels.computerPatchesStorageWidth), sf);
+    const int navButtonW = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.buttons.initWidth), sf);
+    const int comboBoxW = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(dims_.comboBoxes.patchManagerComputerPatchesWidth), sf);
+    const int loadButtonW = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(dims_.buttons.computerPatchesLoadWidth), sf);
+    const int saveButtonW = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(dims_.buttons.computerPatchesSaveWidth), sf);
+    const int saveAsButtonW = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(dims_.buttons.computerPatchesSaveAsWidth), sf);
+    const int buttonH = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.buttons.height), sf);
+    const int interGap = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.layout.interControlGap), sf);
+    const int columnGap = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.layout.columnGap), sf);
 
-    // Module header
     if (moduleHeader_)
         moduleHeader_->setBounds(0, 0, moduleHeaderW, moduleHeaderH);
 
-    // Row 1 Y: group labels (computed independently)
-    const int row1Y = juce::roundToInt(static_cast<float>(dims_.moduleHeader.height) * sf);
+    const int row1Y = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.moduleHeader.height), sf);
 
     if (browserGroupLabel)
         browserGroupLabel->setBounds(0, row1Y, browserGroupW, groupLabelH);
 
-    const int storageGroupX = juce::roundToInt(
-        static_cast<float>(dims_.groupLabels.computerPatchesBrowserWidth + dims_.layout.columnGap) * sf);
+    const int storageGroupX = browserGroupW + columnGap;
     if (storageGroupLabel)
         storageGroupLabel->setBounds(storageGroupX, row1Y, storageGroupW, groupLabelH);
 
-    // Row 2 Y: widgets (computed independently)
-    const int row2Y = juce::roundToInt(static_cast<float>(dims_.moduleHeader.height + dims_.groupLabels.height) * sf);
+    // Row 2 — successive integer strips (fixed widths; no remainder absorption)
+    const int row2Y = row1Y + groupLabelH;
 
-    // Browser section: nav buttons + combobox
-    const float navStep = static_cast<float>(dims_.buttons.initWidth + dims_.layout.interControlGap) * sf;
+    auto browserRow = juce::Rectangle<int>(0, row2Y, getWidth(), buttonH);
     if (loadPreviousPatchFileButton_)
-        loadPreviousPatchFileButton_->setBounds(0, row2Y, navButtonW, buttonH);
+        loadPreviousPatchFileButton_->setBounds(browserRow.removeFromLeft(navButtonW));
+    else
+        browserRow.removeFromLeft(navButtonW);
+    browserRow.removeFromLeft(interGap);
+
     if (loadNextPatchFileButton_)
-        loadNextPatchFileButton_->setBounds(juce::roundToInt(navStep), row2Y, navButtonW, buttonH);
+        loadNextPatchFileButton_->setBounds(browserRow.removeFromLeft(navButtonW));
+    else
+        browserRow.removeFromLeft(navButtonW);
+    browserRow.removeFromLeft(interGap);
+
     if (selectPatchFileComboBox_)
-        selectPatchFileComboBox_->setBounds(juce::roundToInt(navStep * 2.0f), row2Y, comboBoxW, buttonH);
+        selectPatchFileComboBox_->setBounds(browserRow.removeFromLeft(comboBoxW));
 
-    // Storage section: open + save-as + save
-    const float storageOriginX = static_cast<float>(dims_.groupLabels.computerPatchesBrowserWidth + dims_.layout.columnGap) * sf;
-    const float openStep       = static_cast<float>(dims_.buttons.computerPatchesLoadWidth + dims_.layout.interControlGap) * sf;
-    const float saveAsStep     = static_cast<float>(dims_.buttons.computerPatchesSaveAsWidth + dims_.layout.interControlGap) * sf;
-
+    auto storageRow = juce::Rectangle<int>(storageGroupX, row2Y, getWidth() - storageGroupX, buttonH);
     if (openPatchFolderButton_)
-        openPatchFolderButton_->setBounds(juce::roundToInt(storageOriginX), row2Y, loadButtonW, buttonH);
+        openPatchFolderButton_->setBounds(storageRow.removeFromLeft(loadButtonW));
+    else
+        storageRow.removeFromLeft(loadButtonW);
+    storageRow.removeFromLeft(interGap);
+
     if (savePatchFileAsButton_)
-        savePatchFileAsButton_->setBounds(juce::roundToInt(storageOriginX + openStep), row2Y, saveAsButtonW, buttonH);
+        savePatchFileAsButton_->setBounds(storageRow.removeFromLeft(saveAsButtonW));
+    else
+        storageRow.removeFromLeft(saveAsButtonW);
+    storageRow.removeFromLeft(interGap);
+
     if (savePatchFileButton_)
-        savePatchFileButton_->setBounds(juce::roundToInt(storageOriginX + openStep + saveAsStep), row2Y, saveButtonW, buttonH);
+        savePatchFileButton_->setBounds(storageRow.removeFromLeft(saveButtonW));
 
     if (moduleHeader_)                  moduleHeader_->setUiScale(sf);
     if (browserGroupLabel)              browserGroupLabel->setUiScale(sf);

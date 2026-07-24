@@ -1,8 +1,11 @@
 #include "BankUtilityPanel.h"
 
+#include "../PatchManagerEqualWidthStrip.h"
+
 #include "Core/Services/DeviceMemoryLimits.h"
 #include "Core/Services/DeviceTypeRegistry.h"
 #include "GUI/Helpers/GrayedControlHelper.h"
+#include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Looks/LookBuilders.h"
@@ -172,74 +175,50 @@ void BankUtilityPanel::mouseDown(const juce::MouseEvent& event)
 void BankUtilityPanel::resized()
 {
     const float sf = uiScale_;
-    const float rowGapDesign = static_cast<float>(dims_.layout.interControlGap);
 
-    const int moduleHeaderHeight  = juce::roundToInt(static_cast<float>(dims_.moduleHeader.height) * sf);
-    const int moduleHeaderWidth   = juce::roundToInt(static_cast<float>(dims_.moduleHeader.patchManagerTitleBandWidth) * sf);
-    const int labelWidth          = juce::roundToInt(static_cast<float>(dims_.bankSelectorLabel.patchManagerSelectBankWidth) * sf);
-    const int labelHeight         = juce::roundToInt(static_cast<float>(dims_.bankSelectorLabel.height) * sf);
-    const int buttonWidth         = juce::roundToInt(static_cast<float>(dims_.buttons.patchManagerBankSelectWidth) * sf);
-    const int buttonHeight        = juce::roundToInt(static_cast<float>(dims_.buttons.height) * sf);
-    const int lockButtonWidth   = juce::roundToInt(static_cast<float>(dims_.buttons.patchManagerUnlockBankWidth) * sf);
+    const int moduleHeaderHeight = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.moduleHeader.height), sf);
+    const int moduleHeaderWidth = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(dims_.moduleHeader.patchManagerTitleBandWidth), sf);
+    const int labelWidth = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(dims_.bankSelectorLabel.patchManagerSelectBankWidth), sf);
+    const int labelHeight = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.bankSelectorLabel.height), sf);
+    const int buttonHeight = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.buttons.height), sf);
+    const int lockButtonWidth = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(dims_.buttons.patchManagerUnlockBankWidth), sf);
+    const int rowGap = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.layout.interControlGap), sf);
+    const int rowH = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.layout.contentRowHeight), sf);
 
     if (auto* header = bankUtilityModuleHeader_.get())
         header->setBounds(0, 0, moduleHeaderWidth, moduleHeaderHeight);
 
-    // Row 1 Y — directly under ModuleHeader (Recipes::BankUtilityModule::kHeight = 76 @ 100 %)
-    const int row1Y = juce::roundToInt(static_cast<float>(dims_.moduleHeader.height) * sf);
-
-    const int rowH = juce::roundToInt(static_cast<float>(dims_.layout.contentRowHeight) * sf);
+    // Row 1 — label + banks 0–4 (Recipes::BankUtilityModule::kHeight = 76 @ 100 %)
+    const int row1Y = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.moduleHeader.height), sf);
     const int shortControlY = row1Y + (rowH - labelHeight) / 2;
 
     if (auto* label = bankSelectorLabel_.get())
         label->setBounds(0, shortControlY, labelWidth, labelHeight);
 
-    // Row 1 X positions: each computed independently from float origin
-    const float row1OriginX = static_cast<float>(dims_.bankSelectorLabel.patchManagerSelectBankWidth) * sf
-        + rowGapDesign * sf;
-    const float bankButtonStep = static_cast<float>(dims_.buttons.patchManagerBankSelectWidth) * sf
-        + rowGapDesign * sf;
-
-    auto setBankButtonBounds = [&](TSS::Button* btn, int index, int y)
-    {
-        if (btn)
-        {
-            const int x = juce::roundToInt(row1OriginX + static_cast<float>(index) * bankButtonStep);
-            btn->setBounds(x, y, buttonWidth, buttonHeight);
-        }
+    juce::Component* row1Banks[] = {
+        selectBank0Button_.get(), selectBank1Button_.get(), selectBank2Button_.get(),
+        selectBank3Button_.get(), selectBank4Button_.get()
     };
+    TSS::placeEqualWidthStrip(labelWidth + rowGap, row1Y, sf,
+                              dims_.buttons.patchManagerBankSelectWidth, dims_.buttons.height,
+                              dims_.layout.interControlGap, row1Banks, 5);
 
-    setBankButtonBounds(selectBank0Button_.get(), 0, row1Y);
-    setBankButtonBounds(selectBank1Button_.get(), 1, row1Y);
-    setBankButtonBounds(selectBank2Button_.get(), 2, row1Y);
-    setBankButtonBounds(selectBank3Button_.get(), 3, row1Y);
-    setBankButtonBounds(selectBank4Button_.get(), 4, row1Y);
-
-    // Row 2 Y (computed independently from float origin)
-    const int row2Y = juce::roundToInt(
-        (static_cast<float>(dims_.moduleHeader.height + dims_.buttons.height) + rowGapDesign) * sf);
+    // Row 2 — unlock + banks 5–9 (successive integer stack: header + row + gap)
+    const int row2Y = row1Y + rowH + rowGap;
 
     if (auto* button = unlockBankButton_.get())
         button->setBounds(0, row2Y, lockButtonWidth, buttonHeight);
 
-    // Row 2 X positions: banks 5-9, after unlock button
-    const float row2OriginX = static_cast<float>(dims_.buttons.patchManagerUnlockBankWidth) * sf
-        + rowGapDesign * sf;
-
-    auto setBankButtonBoundsRow2 = [&](TSS::Button* btn, int index, int y)
-    {
-        if (btn)
-        {
-            const int x = juce::roundToInt(row2OriginX + static_cast<float>(index) * bankButtonStep);
-            btn->setBounds(x, y, buttonWidth, buttonHeight);
-        }
+    juce::Component* row2Banks[] = {
+        selectBank5Button_.get(), selectBank6Button_.get(), selectBank7Button_.get(),
+        selectBank8Button_.get(), selectBank9Button_.get()
     };
-
-    setBankButtonBoundsRow2(selectBank5Button_.get(), 0, row2Y);
-    setBankButtonBoundsRow2(selectBank6Button_.get(), 1, row2Y);
-    setBankButtonBoundsRow2(selectBank7Button_.get(), 2, row2Y);
-    setBankButtonBoundsRow2(selectBank8Button_.get(), 3, row2Y);
-    setBankButtonBoundsRow2(selectBank9Button_.get(), 4, row2Y);
+    TSS::placeEqualWidthStrip(lockButtonWidth + rowGap, row2Y, sf,
+                              dims_.buttons.patchManagerBankSelectWidth, dims_.buttons.height,
+                              dims_.layout.interControlGap, row2Banks, 5);
 
     if (bankSelectorLabel_)      bankSelectorLabel_->setUiScale(sf);
     if (bankUtilityModuleHeader_) bankUtilityModuleHeader_->setUiScale(sf);
