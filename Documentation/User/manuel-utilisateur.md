@@ -166,7 +166,7 @@ Il n’existe **pas** de bouton de connexion automatique. En pratique :
 
 Si aucun appareil n’est reconnu, le bas de la fenêtre affiche un message du type :
 
-> *No synth detected — check MIDI cables, MIDI From / MIDI To, and power-cycle the Matrix.*
+> *No synth detected - check MIDI cables, MIDI From / MIDI To options, and power-cycle your Matrix synth.*
 
 Les sections d’édition restent alors verrouillées jusqu’à détection. Ce comportement est voulu : Matrix-Control n’envoie pas de changements à l’aveugle.
 
@@ -533,7 +533,7 @@ En général **non** conservé tel quel : le contenu du patch en cours d’édit
 |----------|-----------|
 | `No device` / éditeur verrouillé | Vérifier le sens des câbles ; les ports `FROM` / `TO` ; que le synthé est allumé ; éventuellement l’éteindre puis le rallumer ; sous Windows, s’assurer qu’aucune autre application n’occupe le port |
 | Les contrôles bougent mais le patch ne change pas | Vérifier `MIDI TO` ; le canal MIDI (`MASTER EDIT` sur Matrix-1000) ; `MEMORY PROTECT` / `BANK LOCK` |
-| Changement de patch : l’écran ne se met pas à jour | Vérifier `EDITOR MIDI FROM` (le synthé doit pouvoir répondre) |
+| Changement de patch : l’écran ne se met pas à jour | Vérifier `MIDI FROM` (le synthé doit pouvoir répondre) |
 | `STORE` ou `PASTE` grisés | Banque 2–9 sur Matrix-1000 — passer en banque 0 ou 1 |
 | `MASTER EDIT` / `BANK UTILITY` grisés | Vous êtes sur Matrix-6/6R, ou aucun appareil n’est détecté |
 | Compare empêche toute édition | Cliquer à nouveau sur `C` dans le Mutator |

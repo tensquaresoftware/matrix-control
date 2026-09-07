@@ -50,7 +50,7 @@ namespace PluginDisplayNames
 
         // Left-zone guidance while FR-2 device lock is active (D-038 — footer only, no modal).
         constexpr const char* kDeviceLockGuidance =
-            "No synth detected - check MIDI cables, Editor MIDI From / MIDI To options, and power-cycle your Matrix synth.";
+            "No synth detected - check MIDI cables, MIDI From / MIDI To options, and power-cycle your Matrix synth.";
 
         // Presence inquiry timed out while still detected — synth likely overloaded, not unplugged.
         constexpr const char* kDeviceUnresponsiveGuidance =
@@ -1301,7 +1301,7 @@ namespace PluginDisplayNames
 
                 constexpr const char* kDeviceDumpFailedFooter =
                     "Could not read the patch from the synth. Keeping the current editor buffer. "
-                    "Check that EDITOR MIDI FROM is the synth MIDI OUT.";
+                    "Check that MIDI FROM is the synth MIDI OUT.";
                 constexpr const char* kDeviceDumpAbortedEditedFooter =
                     "Synth patch load cancelled because the editor changed while waiting. "
                     "Bank and patch numbers were restored; your edits were kept.";
