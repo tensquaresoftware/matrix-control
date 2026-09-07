@@ -1,5 +1,6 @@
 #include "Core/Actions/PatchManagerActionHandler.h"
 
+#include "Core/MIDI/PatchSelectionMidiSync.h"
 #include "Shared/Definitions/PluginIDs.h"
 
 namespace Core
@@ -25,7 +26,15 @@ namespace Core
             abandonPendingInternalNavSettle();
             patchNavDebouncer_.cancel();
             computerSelectDebouncer_.cancel();
-            beginPendingDeviceLoad(captureInternalCoordinates(limits));
+
+            // Recall the current memory slot on the synth before dumping into the editor.
+            // Computer header reload uses sendFullPatchForAudition; Internal must Program Change
+            // (and Set Bank when needed) or the last .syx audition stays in the edit buffer.
+            const auto coords = captureInternalCoordinates(limits);
+            if (patchSelectionMidiSync_ != nullptr)
+                patchSelectionMidiSync_->syncSelection(coords.bank, coords.patch, limits, true);
+
+            beginPendingDeviceLoad(coords);
             loadCurrentPatchFromDevice(limits);
             return true;
         }

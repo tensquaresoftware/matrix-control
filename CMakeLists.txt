@@ -472,6 +472,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/PatchManagerActionHandlerTestSupport.cpp
         Tests/Unit/PatchManagerActionHandlerBasicTests.cpp
         Tests/Unit/PatchManagerActionHandlerBankCopyPasteTests.cpp
+        Tests/Unit/PatchManagerActionHandlerBankReclickTests.cpp
         Tests/Unit/PatchManagerActionHandlerGateTests.cpp
         Tests/Unit/PatchManagerActionHandlerUnsavedChantier2Tests.cpp
         Tests/Unit/PatchManagerActionHandlerDeferredGateTests.cpp

@@ -21,6 +21,7 @@ public:
         testInternalHeader_focusOnlyWhenCoordinatesUndefined();
         testInternalHeader_reclaimAndReloadWhenEstablished();
         testInternalHeader_alreadyFocusedStillReloads();
+        testInternalHeader_reclaimSendsProgramChangeBeforeDump();
         testComputerHeader_gateCancelKeepsFocusNoLoad();
         testInternalHeader_gateCancelKeepsFocusNoDump();
     }
@@ -162,6 +163,11 @@ private:
         expectEquals(harness.gateState->calls, 1);
         expectEquals(harness.dumpFakeState->requestCount, 1);
         expectEquals(static_cast<int>(harness.dumpFakeState->lastRequestedPatch), 17);
+        const auto queued = scanQueue(harness.queue);
+        expect(queued.setBank);
+        expectEquals(queued.setBankValue, 2);
+        expect(queued.programChangeCount >= 1);
+        expectEquals(queued.lastProgramChange, 17);
 
         harness.fireDeferredDump();
         expectEquals(navigationFocus(harness), PatchManager::NavigationFocus::kInternal);
@@ -185,6 +191,37 @@ private:
         expectEquals(navigationFocus(harness), PatchManager::NavigationFocus::kInternal);
         expectEquals(harness.dumpFakeState->requestCount, 1);
         expectEquals(static_cast<int>(harness.dumpFakeState->lastRequestedPatch), 8);
+        const auto queued = scanQueue(harness.queue);
+        expect(queued.setBank);
+        expectEquals(queued.setBankValue, 1);
+        expect(queued.programChangeCount >= 1);
+        expectEquals(queued.lastProgramChange, 8);
+    }
+
+    void testInternalHeader_reclaimSendsProgramChangeBeforeDump()
+    {
+        beginTest("internalHeader_reclaim_sendsProgramChange_beforeDump");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, 3, 12, true);
+        harness.proc.apvts.state.setProperty(
+            PatchManager::StateProperties::kNavigationFocus,
+            PatchManager::NavigationFocus::kComputer,
+            nullptr);
+        harness.patchSelectionMidiSync.resetLastSyncedBank(3);
+        harness.useSuccessfulDeviceDump();
+        harness.dumpFakeState->deferCallback = true;
+
+        harness.handler.handleAction(InternalPatches::kHeaderClick, juce::var());
+
+        expectEquals(harness.dumpFakeState->requestCount, 1);
+        const auto queued = scanQueue(harness.queue);
+        expect(queued.setBank);
+        expectEquals(queued.setBankValue, 3);
+        expect(queued.programChangeCount >= 1);
+        expectEquals(queued.lastProgramChange, 12);
+        expect(!queued.editBufferPatch);
+        expect(!queued.patchData);
     }
 
     void testComputerHeader_gateCancelKeepsFocusNoLoad()
@@ -233,6 +270,7 @@ private:
         expectEquals(navigationFocus(harness), PatchManager::NavigationFocus::kInternal);
         expectEquals(harness.gateState->calls, 1);
         expectEquals(harness.dumpFakeState->requestCount, 0);
+        expect(harness.queue.isEmpty());
     }
 };
 

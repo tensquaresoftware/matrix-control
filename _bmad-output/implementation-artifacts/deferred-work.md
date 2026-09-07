@@ -1409,3 +1409,9 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-version-0-3-0-alpha.md`
   summary: Tracked empty CHANGELOG.md has no 0.3.0-alpha / Unreleased stub after the product version bump.
   evidence: Blind Hunter; changelog hygiene not in Intent; empty file pre-existed.
+
+## Deferred from: oneshot review of spec-patch-nav-internal-header-reload-bank-reclick.md (2026-09-07)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-nav-internal-header-reload-bank-reclick.md`
+  summary: Sibling done spec still describes Internal header reclaim as device-dump/editor reload only, omitting Set Bank + Program Change recall.
+  evidence: Blind Hunter; historical done artifact left untouched in this bugfix.

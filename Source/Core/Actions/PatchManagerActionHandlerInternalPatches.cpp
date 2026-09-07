@@ -315,11 +315,16 @@ namespace Core
             return true;
         }
 
+        const int clampedBank = juce::jlimit(limits.minBankNumber(), limits.maxBankNumber(), bankIndex);
+
+        // Re-clicking the already-current bank must not reset to patch 00 or re-fire load.
+        if (arePatchCoordinatesEstablished() && clampedBank == getCurrentBank(limits))
+            return true;
+
         if (! confirmPatchContextChange())
             return true;
 
         const auto priorCoordinates = captureInternalCoordinates(limits);
-        const int clampedBank = juce::jlimit(limits.minBankNumber(), limits.maxBankNumber(), bankIndex);
         apvts_.state.setProperty(BankUtilityModule::StateProperties::kSelectedBank, clampedBank, nullptr);
 
         // Picking a bank lands on its first slot.
