@@ -63,12 +63,33 @@ namespace Core
         int syxFileCount = 0;
     };
 
+    // Single-file .syx gate shared by Computer Patches scan and drag-drop preview/reject.
+    enum class SinglePatchSyxRejectKind
+    {
+        kNone,
+        kNotSyx,
+        kBankOrMultiMessage,
+        kInvalid
+    };
+
+    struct SinglePatchSyxAssessment
+    {
+        bool isValidSinglePatch = false;
+        SinglePatchSyxRejectKind rejectKind = SinglePatchSyxRejectKind::kNone;
+        // When valid: internal Matrix name, or OS stem when empty / BNK* / unusable.
+        juce::String previewPrimaryName;
+    };
+
     class PatchFileService
     {
     public:
         static constexpr const char* kSyxExtension = ".syx";
 
         explicit PatchFileService(SysExDecoder& decoder) noexcept;
+
+        // Public SSOT for drag preview and drop reject (wraps the same validate as scan).
+        SinglePatchSyxAssessment assessSinglePatchSyxFile(const juce::File& file) const;
+        bool isValidSinglePatchSyxFile(const juce::File& file) const;
 
         PatchFolderScanResult scanFolder(const juce::File& folder);
         // patchNumber is retained for call-site compatibility (bank export passes slot 0-99) but
@@ -109,6 +130,9 @@ namespace Core
         static bool replaceFileWithTemp(const juce::File& target, juce::File& tempFile);
         PatchFileSaveResult finalizeTempSyxWrite(const juce::File& target, juce::File tempFile);
         bool validateFileContents(const juce::File& file) const;
+        static bool looksLikeBankOrMultiMessageDump(const juce::MemoryBlock& sysEx) noexcept;
+        juce::String resolveDragPreviewPrimaryName(const juce::File& file,
+                                                  const juce::uint8* packedData) const;
         void appendValidFileName(juce::StringArray& names, const juce::File& file) const;
         void collectSyxScanResults(const juce::Array<juce::File>& syxFiles,
                                    juce::StringArray& validNames,

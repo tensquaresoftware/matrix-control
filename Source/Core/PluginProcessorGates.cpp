@@ -18,6 +18,14 @@ void PluginProcessor::setPatchFolderPicker(PatchFolderPicker picker)
     patchFolderPicker_ = std::move(picker);
 }
 
+void PluginProcessor::loadDroppedComputerPatchFile(const juce::File& file)
+{
+    if (patchManagerActionHandler_ == nullptr)
+        return;
+
+    patchManagerActionHandler_->loadDroppedComputerPatchFile(file, getResolvedDeviceMemoryLimits());
+}
+
 void PluginProcessor::setMutatorExportFolderPicker(MutatorExportFolderPicker picker)
 {
     mutatorExportFolderPicker_ = std::move(picker);

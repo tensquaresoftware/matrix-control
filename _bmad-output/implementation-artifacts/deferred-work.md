@@ -1425,3 +1425,13 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-matrix-1000-silent-patch-stuck.md`
   summary: MasterParameterSysExDispatcherTests still seeds midiChannel via MasterModel::setChoiceIndex without composing Omni/Mono.
   evidence: Pre-existing test fixture pattern outside this diff; production CHANNEL edits go through the mapper.
+
+## Deferred from: code review of spec-syx-drag-drop-load.md (2026-09-07)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-syx-drag-drop-load.md`
+  summary: Multi-file drop reject (kDropRejectedMultiFile) lives only in PluginEditor with no automated test.
+  evidence: handleSyxFilesDropped gates files.size()!=1 before Core; DropLoad harness cannot see StringArray without extracting a Core-visible helper; GUI entry remains manual per Core testing policy.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-syx-drag-drop-load.md`
+  summary: Successful .syx drop may briefly show Computer Patches scan-summary footer before load-success footer.
+  evidence: scanAndPublishFolder publishes scan footer before loadSelectedPatchFileImmediately; same pattern as Open; Implementation Notes already call it out.

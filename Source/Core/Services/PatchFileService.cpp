@@ -1,7 +1,10 @@
 #include "Core/Services/PatchFileService.h"
 
+#include "Core/MIDI/SysEx/SysExConstants.h"
 #include "Core/MIDI/SysEx/SysExDecoder.h"
 #include "Core/MIDI/SysEx/SysExEncoder.h"
+#include "Core/Models/PatchModel.h"
+#include "Core/Services/PatchFileNameSanitizer.h"
 #include "Core/Services/PatchMutator/MutationNaming.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 
@@ -23,6 +26,89 @@ namespace Core
     PatchFileService::PatchFileService(SysExDecoder& decoder) noexcept
         : decoder_(decoder)
     {
+    }
+
+    bool PatchFileService::looksLikeBankOrMultiMessageDump(const juce::MemoryBlock& sysEx) noexcept
+    {
+        if (sysEx.getSize() > SysExConstants::kPatchMessageLength)
+            return true;
+
+        int startCount = 0;
+        const auto* bytes = static_cast<const juce::uint8*>(sysEx.getData());
+        for (size_t i = 0; i < sysEx.getSize(); ++i)
+        {
+            if (bytes[i] == SysExConstants::kSysExStart)
+                ++startCount;
+        }
+
+        return startCount > 1;
+    }
+
+    juce::String PatchFileService::resolveDragPreviewPrimaryName(const juce::File& file,
+                                                                 const juce::uint8* packedData) const
+    {
+        PatchModel model;
+        model.loadFrom(packedData);
+        model.normalizeNameEncoding();
+
+        const auto name = model.getName();
+        if (! PatchFileNameSanitizer::isUsablePatchName(name)
+            || PatchFileNameSanitizer::isOberheimBankPlaceholderName(name))
+        {
+            return file.getFileNameWithoutExtension();
+        }
+
+        return name;
+    }
+
+    SinglePatchSyxAssessment PatchFileService::assessSinglePatchSyxFile(const juce::File& file) const
+    {
+        SinglePatchSyxAssessment assessment;
+
+        if (! file.existsAsFile())
+        {
+            assessment.rejectKind = SinglePatchSyxRejectKind::kInvalid;
+            return assessment;
+        }
+
+        if (! hasSyxExtension(file))
+        {
+            assessment.rejectKind = SinglePatchSyxRejectKind::kNotSyx;
+            return assessment;
+        }
+
+        if (! validateFileContents(file))
+        {
+            juce::MemoryBlock sysEx;
+            if (! file.loadFileAsData(sysEx))
+            {
+                assessment.rejectKind = SinglePatchSyxRejectKind::kInvalid;
+                return assessment;
+            }
+
+            assessment.rejectKind = looksLikeBankOrMultiMessageDump(sysEx)
+                ? SinglePatchSyxRejectKind::kBankOrMultiMessage
+                : SinglePatchSyxRejectKind::kInvalid;
+            return assessment;
+        }
+
+        juce::MemoryBlock sysEx;
+        juce::uint8 packed[SysExConstants::kPatchPackedDataSize] = {};
+        if (! file.loadFileAsData(sysEx) || ! decoder_.decodePatchSysEx(sysEx, packed))
+        {
+            assessment.rejectKind = SinglePatchSyxRejectKind::kInvalid;
+            return assessment;
+        }
+
+        assessment.isValidSinglePatch = true;
+        assessment.rejectKind = SinglePatchSyxRejectKind::kNone;
+        assessment.previewPrimaryName = resolveDragPreviewPrimaryName(file, packed);
+        return assessment;
+    }
+
+    bool PatchFileService::isValidSinglePatchSyxFile(const juce::File& file) const
+    {
+        return assessSinglePatchSyxFile(file).isValidSinglePatch;
     }
 
     PatchFolderScanResult PatchFileService::scanFolder(const juce::File& folder)

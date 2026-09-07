@@ -23,8 +23,10 @@ class SettingsPanel;
 class SettingsWindow;
 class AboutWindow;
 class MasterInitConfirmDialog;
+class PatchNameDisplayPanel;
 
 class PluginEditor : public juce::AudioProcessorEditor,
+                     public juce::FileDragAndDropTarget,
                      private juce::KeyListener,
                      private juce::ChangeListener,
                      private juce::ValueTree::Listener
@@ -38,6 +40,12 @@ public:
     void mouseDown(const juce::MouseEvent& e) override;
     bool keyPressed(const juce::KeyPress& key) override;
     bool keyPressed(const juce::KeyPress& key, juce::Component* originatingComponent) override;
+
+    bool isInterestedInFileDrag(const juce::StringArray& files) override;
+    void fileDragEnter(const juce::StringArray& files, int x, int y) override;
+    void fileDragMove(const juce::StringArray& files, int x, int y) override;
+    void fileDragExit(const juce::StringArray& files) override;
+    void filesDropped(const juce::StringArray& files, int x, int y) override;
 
     /** Refresh header MIDI port combos after an OS MIDI device-list change. */
     void refreshMidiPortListsFromOsChange();
@@ -97,6 +105,11 @@ private:
     void wirePatchEditDisplayBindings();
     void restoreAndWireHeader();
     void attachEditorRuntimeListeners();
+
+    PatchNameDisplayPanel* getPatchNameDisplayPanelIfPresent();
+    void updatePatchNameDragOverlay(const juce::StringArray& files);
+    void clearPatchNameDragOverlay();
+    void handleSyxFilesDropped(const juce::StringArray& files);
 
     // wirePatchAndMutatorBindings() sub-bindings (PluginEditorPatchBindings.cpp).
     void setPatchFolderPickerBinding();
@@ -189,6 +202,9 @@ private:
     float appliedUiScale_ = 1.0f;
     std::unique_ptr<HeaderRefreshTimer> headerRefreshTimer_;
     std::unique_ptr<ClipboardFeedbackPhaseTimer> clipboardFeedbackPhaseTimer_;
+    juce::String lastDragAssessedPath_;
+    bool lastDragAssessedValid_ = false;
+    juce::String lastDragAssessedPreview_;
 
     void updateSkin();
     void applyUiScale(float uiScale);

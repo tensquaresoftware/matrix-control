@@ -33,6 +33,10 @@ public:
 
     TSS::PatchNameDisplay& getPatchNameDisplay();
 
+    // Drag-drop overlay on PATCH NAME — display-only; does not write APVTS patch name.
+    void applyDragOverlay(bool validSinglePatch, const juce::String& previewPrimaryName);
+    void clearDragOverlay();
+
     // True when the current origin/bank allows the inline rename (ROM banks are not editable).
     using CanEditProvider = std::function<bool()>;
     void setCanEditProvider(CanEditProvider provider);

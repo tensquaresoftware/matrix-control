@@ -68,6 +68,7 @@ namespace Core
         clearLastDeviceDumpRawName();
 
         noteComputerPatchOrigin(file);
+        dropAttemptCommitted_ = true;
 
         applyLoadedPatchToApvtsAndSynth(limits);
         markPatchCoordinatesEstablished();

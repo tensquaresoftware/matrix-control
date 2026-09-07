@@ -231,6 +231,7 @@ set(PLUGIN_SOURCES
     Source/GUI/PluginEditorSkinScale.cpp
     Source/GUI/PluginEditorHeader.cpp
     Source/GUI/PluginEditorAudio.cpp
+    Source/GUI/PluginEditorFileDragDrop.cpp
     Source/GUI/About/AboutPanel.cpp
     Source/GUI/About/AboutWindow.cpp
     Source/GUI/Dialogs/BankTransferProgressDialog.cpp
@@ -353,6 +354,7 @@ set(PLUGIN_SOURCES
     Source/GUI/Widgets/Led.cpp
     Source/GUI/Widgets/PeakIndicator.cpp
     Source/GUI/Widgets/PatchNameDisplay.cpp
+    Source/GUI/Widgets/PatchNameDisplayPaint.cpp
     Source/GUI/Widgets/PopupMenuBase.cpp
     Source/GUI/Widgets/PopupMenuCustomScrollBar.cpp
     Source/GUI/Widgets/PopupMenuPositioner.cpp
@@ -481,6 +483,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/PatchManagerActionHandlerBrowserTests.cpp
         Tests/Unit/PatchManagerActionHandlerSaveTests.cpp
         Tests/Unit/PatchManagerActionHandlerLoadTests.cpp
+        Tests/Unit/PatchManagerActionHandlerDropLoadTests.cpp
         Tests/Unit/PatchManagerActionHandlerBankExportFilenameTests.cpp
         Tests/Unit/PatchManagerActionHandlerHeaderClickTests.cpp
         Tests/Unit/ModuleHeaderTitleColourTests.cpp
@@ -488,6 +491,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/PatchManagerActionHandlerComputerNavigationTests.cpp
         Tests/Unit/PatchManagerActionHandlerNavDebounceTests.cpp
         Tests/Unit/PatchFileServiceTests.cpp
+        Tests/Unit/PatchFileServiceAssessTests.cpp
         Tests/Unit/PatchFileServiceMutatorExportTests.cpp
         Tests/Unit/PatchFileNameSanitizerTests.cpp
         Tests/Unit/PatchNameOverlayStoreTests.cpp

@@ -36,6 +36,11 @@ namespace TSS
         void cancelEdit();
         bool isEditing() const noexcept { return editing_; }
 
+        // Drag-drop overlay: fixed primary, blinking secondary at 2 Hz. Does not touch APVTS.
+        void showDragOverlay(const juce::String& primaryText, const juce::String& secondaryText);
+        void clearDragOverlay();
+        bool isDragOverlayActive() const noexcept { return dragOverlayActive_; }
+
         void onCommit(std::function<void(juce::String)> callback);
         void onIllegalCharacter(std::function<void()> callback);
         // Fires when a pending illegal-character footer should clear mid-edit
@@ -79,6 +84,7 @@ namespace TSS
         inline constexpr static float kCaretBottomTrim_ = 3.0f;
         inline constexpr static float kPrimaryIdleAlpha_ = 0.80f;
         inline constexpr static float kPrimaryHoverAlpha_ = 1.00f;
+        inline constexpr static int kDragSecondaryBlinkHz_ = 2;
 
         PatchNameDisplayLook look_{};
         int width_;
@@ -92,6 +98,10 @@ namespace TSS
         bool hoveredPrimary_ = false;
         bool listeningForOutsideClicks_ = false;
         bool illegalCharPending_ = false;
+        bool dragOverlayActive_ = false;
+        bool dragSecondaryVisible_ = true;
+        juce::String dragOverlayPrimary_;
+        juce::String dragOverlaySecondary_;
         juce::String editBuffer_;
         int caretIndex_ = 0;
         bool caretOn_ = true;
@@ -125,6 +135,13 @@ namespace TSS
         void drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawNameSlots(juce::Graphics& g, const juce::Rectangle<float>& rowBounds);
+        void drawEditingNameSlots(juce::Graphics& g,
+                                  const juce::Rectangle<float>& rowBounds,
+                                  const juce::Font& scaledFont);
+        void paintEditSlotCharacter(juce::Graphics& g,
+                                    const juce::Rectangle<float>& bounds,
+                                    const juce::String& character,
+                                    bool caretHere);
         void drawSecondaryText(juce::Graphics& g, const juce::Rectangle<float>& rowBounds);
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PatchNameDisplay)

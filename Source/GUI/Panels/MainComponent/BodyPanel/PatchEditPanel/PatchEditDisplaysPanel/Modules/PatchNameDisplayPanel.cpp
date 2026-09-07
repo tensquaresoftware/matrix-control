@@ -83,6 +83,35 @@ TSS::PatchNameDisplay& PatchNameDisplayPanel::getPatchNameDisplay()
     return *patchNameDisplay_;
 }
 
+void PatchNameDisplayPanel::applyDragOverlay(bool validSinglePatch,
+                                             const juce::String& previewPrimaryName)
+{
+    if (patchNameDisplay_ == nullptr)
+        return;
+
+    namespace Overlay = PluginDisplayNames::PatchEditSection::PatchNameModule::DragDropOverlay;
+
+    if (validSinglePatch)
+    {
+        patchNameDisplay_->showDragOverlay(
+            previewPrimaryName.isNotEmpty() ? previewPrimaryName : juce::String(Overlay::kBadPrimary),
+            Overlay::kDropToLoad);
+    }
+    else
+    {
+        patchNameDisplay_->showDragOverlay(Overlay::kBadPrimary, Overlay::kBadFile);
+    }
+}
+
+void PatchNameDisplayPanel::clearDragOverlay()
+{
+    if (patchNameDisplay_ == nullptr)
+        return;
+
+    patchNameDisplay_->clearDragOverlay();
+    syncFromApvtsState();
+}
+
 void PatchNameDisplayPanel::setCanEditProvider(CanEditProvider provider)
 {
     canEditProvider_ = std::move(provider);
@@ -213,6 +242,9 @@ void PatchNameDisplayPanel::clearInvalidCharacterFooterIfPresent()
 void PatchNameDisplayPanel::syncFromApvtsState()
 {
     if (patchNameDisplay_ == nullptr)
+        return;
+
+    if (patchNameDisplay_->isDragOverlayActive())
         return;
 
     auto name = apvts_.state.getProperty(kPatchName, juce::String(kDefaultPatchName)).toString();

@@ -1,0 +1,202 @@
+#include "PatchManagerActionHandlerTestSupport.h"
+
+#include "PatchFixturePaths.h"
+
+using namespace PatchManagerActionHandlerTestSupport;
+
+class PatchManagerActionHandlerDropLoadTests : public juce::UnitTest
+{
+public:
+    PatchManagerActionHandlerDropLoadTests()
+        : juce::UnitTest("PatchManagerActionHandlerDropLoad")
+    {
+    }
+
+    void runTest() override
+    {
+        testDropLoad_validSelectsAndLoads();
+        testDropLoad_rejectBankOrMulti();
+        testDropLoad_rejectNonSyx();
+        testDropLoad_rejectInvalid();
+        testDropLoad_gateCancelRestoresBrowser();
+    }
+
+private:
+    void testDropLoad_validSelectsAndLoads()
+    {
+        beginTest("dropLoad_validSelectsAndLoads");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, 0, 12, false);
+
+        const auto priorDir = createTempScanDir();
+        expect(priorDir.createDirectory());
+        copyFixturePatchToDir(priorDir, "Patch 5.syx");
+        setupComputerPatchesScan(harness, priorDir);
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile,
+            1,
+            nullptr);
+        harness.handler.flushComputerSelectDebouncerForTests();
+
+        const auto dropDir = createTempScanDir();
+        expect(dropDir.createDirectory());
+        copyFixturePatchToDir(dropDir, "Patch 71.syx");
+        const auto dropped = dropDir.getChildFile("Patch 71.syx");
+
+        const auto result = harness.handler.loadDroppedComputerPatchFile(dropped, harness.limits);
+
+        expect(result == Core::PatchManagerActionHandler::DroppedComputerPatchLoadResult::kLoaded);
+        expectEquals(harness.proc.apvts.state.getProperty(
+                         ComputerPatches::StateProperties::kFolderPath).toString(),
+                     dropDir.getFullPathName());
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
+                         ComputerPatches::StandaloneWidgets::kSelectPatchFile)),
+                     1);
+        expect(harness.proc.apvts.state.getProperty("uiMessageText").toString()
+               == FooterMessages::formatReconciliationNotice("BNK2: 71", false)
+               || harness.proc.apvts.state.getProperty("uiMessageText").toString()
+                      == FooterMessages::formatLoadSuccess("Patch 71.syx"));
+        expect(scanQueue(harness.queue).editBufferPatch);
+
+        priorDir.deleteRecursively();
+        dropDir.deleteRecursively();
+    }
+
+    void testDropLoad_rejectBankOrMulti()
+    {
+        beginTest("dropLoad_rejectBankOrMulti");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, 0, 12, false);
+
+        const auto priorDir = createTempScanDir();
+        expect(priorDir.createDirectory());
+        copyFixturePatchToDir(priorDir, "Patch 5.syx");
+        setupComputerPatchesScan(harness, priorDir);
+
+        const auto dropDir = createTempScanDir();
+        expect(dropDir.createDirectory());
+        const auto a = PatchTestFixtures::resolvePatchFixtureFile("Patch 5.syx");
+        const auto b = PatchTestFixtures::resolvePatchFixtureFile("Patch 71.syx");
+        juce::MemoryBlock combined;
+        expect(a.loadFileAsData(combined));
+        juce::MemoryBlock second;
+        expect(b.loadFileAsData(second));
+        combined.append(second.getData(), second.getSize());
+        const auto dropped = dropDir.getChildFile("bankish.syx");
+        expect(dropped.replaceWithData(combined.getData(), combined.getSize()));
+
+        const auto folderBefore = harness.proc.apvts.state.getProperty(
+            ComputerPatches::StateProperties::kFolderPath).toString();
+
+        const auto result = harness.handler.loadDroppedComputerPatchFile(dropped, harness.limits);
+
+        expect(result == Core::PatchManagerActionHandler::DroppedComputerPatchLoadResult::kRejected);
+        expectEquals(harness.proc.apvts.state.getProperty(
+                         ComputerPatches::StateProperties::kFolderPath).toString(),
+                     folderBefore);
+        expectEquals(harness.proc.apvts.state.getProperty("uiMessageText").toString(),
+                     juce::String(FooterMessages::kDropRejectedBankOrMulti));
+        expect(harness.queue.isEmpty());
+
+        priorDir.deleteRecursively();
+        dropDir.deleteRecursively();
+    }
+
+    void testDropLoad_rejectNonSyx()
+    {
+        beginTest("dropLoad_rejectNonSyx");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        const auto dropDir = createTempScanDir();
+        expect(dropDir.createDirectory());
+        const auto dropped = dropDir.getChildFile("notes.txt");
+        expect(dropped.replaceWithText("hello"));
+
+        const auto result = harness.handler.loadDroppedComputerPatchFile(dropped, harness.limits);
+
+        expect(result == Core::PatchManagerActionHandler::DroppedComputerPatchLoadResult::kRejected);
+        expectEquals(harness.proc.apvts.state.getProperty("uiMessageText").toString(),
+                     juce::String(FooterMessages::kDropRejectedNotSyx));
+        expect(harness.queue.isEmpty());
+
+        dropDir.deleteRecursively();
+    }
+
+    void testDropLoad_rejectInvalid()
+    {
+        beginTest("dropLoad_rejectInvalid");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        const auto dropDir = createTempScanDir();
+        expect(dropDir.createDirectory());
+
+        const auto valid = PatchTestFixtures::resolvePatchFixtureFile("Patch 5.syx");
+        juce::MemoryBlock truncated;
+        expect(valid.loadFileAsData(truncated));
+        expect(truncated.getSize() > 40);
+        truncated.setSize(40, true);
+
+        const auto dropped = dropDir.getChildFile("corrupt.syx");
+        expect(dropped.replaceWithData(truncated.getData(), truncated.getSize()));
+
+        const auto result = harness.handler.loadDroppedComputerPatchFile(dropped, harness.limits);
+
+        expect(result == Core::PatchManagerActionHandler::DroppedComputerPatchLoadResult::kRejected);
+        expectEquals(harness.proc.apvts.state.getProperty("uiMessageText").toString(),
+                     juce::String(FooterMessages::kDropRejectedInvalid));
+        expect(harness.queue.isEmpty());
+
+        dropDir.deleteRecursively();
+    }
+
+    void testDropLoad_gateCancelRestoresBrowser()
+    {
+        beginTest("dropLoad_gateCancelRestoresBrowser");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, 0, 12, false);
+
+        const auto priorDir = createTempScanDir();
+        expect(priorDir.createDirectory());
+        copyFixturePatchToDir(priorDir, "Patch 5.syx");
+        setupComputerPatchesScan(harness, priorDir);
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile,
+            1,
+            nullptr);
+        harness.handler.flushComputerSelectDebouncerForTests();
+
+        const auto folderBefore = harness.proc.apvts.state.getProperty(
+            ComputerPatches::StateProperties::kFolderPath).toString();
+        const int selectBefore = static_cast<int>(harness.proc.apvts.state.getProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile));
+
+        const auto dropDir = createTempScanDir();
+        expect(dropDir.createDirectory());
+        copyFixturePatchToDir(dropDir, "Patch 71.syx");
+        harness.gateState->allow = false;
+
+        const auto result = harness.handler.loadDroppedComputerPatchFile(
+            dropDir.getChildFile("Patch 71.syx"), harness.limits);
+
+        expect(result == Core::PatchManagerActionHandler::DroppedComputerPatchLoadResult::kCancelled);
+        expect(harness.gateState->calls >= 1);
+        expectEquals(harness.proc.apvts.state.getProperty(
+                         ComputerPatches::StateProperties::kFolderPath).toString(),
+                     folderBefore);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
+                         ComputerPatches::StandaloneWidgets::kSelectPatchFile)),
+                     selectBefore);
+        // Set Bank may already be queued while pinning the destination; the .syx must not load.
+        const auto queued = scanQueue(harness.queue);
+        expect(! queued.editBufferPatch);
+        expect(! queued.patchData);
+
+        priorDir.deleteRecursively();
+        dropDir.deleteRecursively();
+    }
+};
+
+static PatchManagerActionHandlerDropLoadTests patchManagerActionHandlerDropLoadTests;

@@ -962,6 +962,16 @@ namespace PluginDisplayNames
             {
                 constexpr const char* kInvalidCharacterFooter = "Invalid character for patch name";
             }
+
+            // Drag-drop .syx overlay on PATCH NAME (primary fixed; secondary blinks).
+            namespace DragDropOverlay
+            {
+                // Eight U+00B7 MIDDLE DOT — distinct from startup "--------".
+                constexpr const char* kBadPrimary =
+                    "\xC2\xB7\xC2\xB7\xC2\xB7\xC2\xB7\xC2\xB7\xC2\xB7\xC2\xB7\xC2\xB7";
+                constexpr const char* kDropToLoad = "DROP TO LOAD";
+                constexpr const char* kBadFile = "BAD FILE";
+            }
         }
     }
 
@@ -1168,6 +1178,16 @@ namespace PluginDisplayNames
                 constexpr const char* kPatchFileNotFound = "Patch file not found";
                 constexpr const char* kInvalidSaveStem =
                     "Invalid patch file name (use A-Z, 0-9, space, -, _; max 8)";
+
+                // Drag-drop onto the editor (footer only on drop — never during drag).
+                constexpr const char* kDropRejectedMultiFile =
+                    "Drop rejected: drop one .syx at a time";
+                constexpr const char* kDropRejectedNotSyx =
+                    "Drop rejected: not a Matrix patch .syx";
+                constexpr const char* kDropRejectedBankOrMulti =
+                    "Drop rejected: bank or multi-message dump";
+                constexpr const char* kDropRejectedInvalid =
+                    "Drop rejected: invalid patch file";
             }
 
             namespace StandaloneWidgets

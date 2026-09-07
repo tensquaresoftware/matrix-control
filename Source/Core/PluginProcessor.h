@@ -242,6 +242,10 @@ public:
     Core::PatchFileService& getPatchFileService() noexcept { return *patchFileService_; }
     const Core::PatchFileService& getPatchFileService() const noexcept { return *patchFileService_; }
 
+    // Drag-drop one Computer Patches .syx onto the editor (folder → scan → select → load).
+    // Reject / success / cancel footers and browser restore are handled in Core.
+    void loadDroppedComputerPatchFile(const juce::File& file);
+
     void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
                                  const juce::Identifier& property) override;
     void valueTreeChildAdded(juce::ValueTree& parentTree,

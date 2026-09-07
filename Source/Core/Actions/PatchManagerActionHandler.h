@@ -104,6 +104,17 @@ namespace Core
         // Re-apply COMPUTER PATCHES DISPLAY SYSEX / FILE NAMES to the loaded .syx without prompting.
         void reapplyComputerPatchDisplayedName();
 
+        // Drag-drop one .syx onto the editor: parent folder → scan → select → existing immediate load.
+        enum class DroppedComputerPatchLoadResult
+        {
+            kLoaded,
+            kCancelled,
+            kRejected
+        };
+
+        DroppedComputerPatchLoadResult loadDroppedComputerPatchFile(const juce::File& file,
+                                                                    const DeviceMemoryLimits& limits);
+
         // Persist a musical overlay for the current Internal bank/patch when the name is usable
         // and not an Oberheim BNK placeholder (inline rename / STORE paths).
         void rememberCurrentOverlayFromModel();
@@ -331,6 +342,12 @@ namespace Core
         void publishLoadFooters(const juce::String& fileName,
                                   const PatchNameReconciliationResult& reconciliation);
         void publishLoadFailureFooter(const juce::String& message);
+        void publishDropRejectFooter(SinglePatchSyxRejectKind rejectKind);
+        DroppedComputerPatchLoadResult rejectDroppedComputerPatch(SinglePatchSyxRejectKind rejectKind);
+        bool prepareDroppedComputerPatchSelection(const juce::File& file,
+                                                  const DeviceMemoryLimits& limits,
+                                                  int& outTargetId);
+        DroppedComputerPatchLoadResult finalizeDroppedComputerPatchLoad();
         void noteDevicePatchOrigin(int bank, int patch);
         void noteComputerPatchOrigin(const juce::File& file);
         bool performUnsavedGatePersistAction(UnsavedEditPersistKind persistKind);
@@ -498,6 +515,8 @@ namespace Core
         // Mirrored from PatchLoadContext for leave Persist (file Save vs Store) without a get hook.
         bool editorPatchFromComputerFile_ = false;
         juce::String knownSyxFullPath_;
+        // Set only by commitLoadedComputerPatchFile during a drop attempt (see loadDropped…).
+        bool dropAttemptCommitted_ = false;
 
         // When OPEN replaces the browser then Cancel/fails the auto-load, restore this snapshot.
         struct ComputerPatchesBrowserSnapshot
