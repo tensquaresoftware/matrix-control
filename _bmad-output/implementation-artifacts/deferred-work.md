@@ -1435,3 +1435,13 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-syx-drag-drop-load.md`
   summary: Successful .syx drop may briefly show Computer Patches scan-summary footer before load-success footer.
   evidence: scanAndPublishFolder publishes scan footer before loadSelectedPatchFileImmediately; same pattern as Open; Implementation Notes already call it out.
+
+## Deferred from: code review of spec-syx-drag-drop-load.md (2026-09-08)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-syx-drag-drop-load.md`
+  summary: Reconfirmed — multi-file drop reject remains GUI-only with no automated coverage.
+  evidence: Same as 2026-09-07 entry; re-review layers agreed defer (Core testing policy).
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-syx-drag-drop-load.md`
+  summary: Reconfirmed — successful drop may flash scan-summary footer before load success.
+  evidence: Same as 2026-09-07 entry; Open-parity; still deferred.

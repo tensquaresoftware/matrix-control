@@ -31,19 +31,23 @@ void PluginEditor::updatePatchNameDragOverlay(const juce::StringArray& files)
     if (panel == nullptr)
         return;
 
+    // Multi / empty: show BAD FILE once; skip re-apply on every fileDragMove so blink can run.
     if (files.size() != 1)
     {
-        lastDragAssessedPath_.clear();
+        constexpr const char* kMultiFileDragSentinel = "\x01multi";
+        if (lastDragAssessedPath_ == kMultiFileDragSentinel)
+            return;
+
+        lastDragAssessedPath_ = kMultiFileDragSentinel;
+        lastDragAssessedValid_ = false;
+        lastDragAssessedPreview_.clear();
         panel->applyDragOverlay(false, {});
         return;
     }
 
     const juce::String path = files[0];
     if (path == lastDragAssessedPath_)
-    {
-        panel->applyDragOverlay(lastDragAssessedValid_, lastDragAssessedPreview_);
         return;
-    }
 
     const auto assessment = pluginProcessor.getPatchFileService().assessSinglePatchSyxFile(
         juce::File(path));

@@ -24,7 +24,7 @@ context:
 - Whole editor listens for file drag (`FileDragAndDropTarget` on `PluginEditor`); not a small drop zone.
 - Drag feedback only in PATCH NAME: primary fixed; secondary blinks at `startTimerHz(2)` (same cadence as Copy / Compare blink); both valid and invalid blink.
 - Valid single Matrix patch: primary = internal name from file (empty / `BNK*` placeholder / unusable → OS filename stem fallback); secondary = `DROP TO LOAD` in existing secondary red (`look.secondaryText`).
-- Invalid / unsupported: primary = `········` (8 middle dots — distinct from startup `--------`); secondary = `BAD FILE`; never invent a real patch name.
+- Invalid / unsupported: primary = `********` (8 asterisks — distinct from startup `--------`); secondary = `BAD FILE`; never invent a real patch name.
 - `dragExit` / leave without drop: restore real current PATCH NAME display immediately; stop drag blink.
 - Drop success: set Computer Patches folder to file parent → `scanAndPublishFolder` → select that file → `loadSelectedPatchFileImmediately` (or equivalent existing select+load path); reuse `confirmPatchContextChange` / unsaved + history gates unchanged.
 - Drop failure: reject clearly; never load “first message” of a bank/multi dump. Footer message states rejection reason. No live footer text during drag.
@@ -42,7 +42,7 @@ context:
 | Scenario | Input / State | Expected Output / Behavior | Error Handling |
 |----------|--------------|---------------------------|----------------|
 | Drag valid single `.syx` | One 275-byte Matrix patch file over editor | PATCH NAME primary = internal name (or stem fallback); secondary `DROP TO LOAD` blinks ~2 Hz; footer unchanged | N/A |
-| Drag invalid / non-`.syx` / multi-file | Unsupported payload over editor | Primary `········`; secondary `BAD FILE` blinks; footer unchanged | N/A |
+| Drag invalid / non-`.syx` / multi-file | Unsupported payload over editor | Primary `********`; secondary `BAD FILE` blinks; footer unchanged | N/A |
 | Drag exit | Leave window without drop | Restore pre-drag PATCH NAME + secondary; blink off | N/A |
 | Drop valid, clean editor | One valid `.syx` | Folder = parent; scan; combo selects file; patch loads; footer success naming the `.syx` file | Existing load errors use existing footers |
 | Drop valid, dirty / Mutator history | Gates would normally confirm | Same confirm as Open / combo change; Cancel aborts drop load and restores display | Cancel → no folder/selection change committed beyond what existing cancel restore already does |
@@ -93,6 +93,7 @@ context:
 - Matrix: Core drop/validate/gate/bank/invalid rows covered by unit tests that ran. Pure GUI rows (drag overlay blink, dragExit restore, multi-file footer, inline-rename cancel) are manual; multi-file automated coverage deferred.
 - Known: successful drop may briefly show scan summary footer before load success (same as Open) — deferred.
 - Review patches: drop commit flag; assess wraps `validateFileContents`; overlay primary ignores hover; drag assess path cache; empty drop no footer; tightened Master/internal-name/invalid tests.
+- 2026-09-07 follow-up: bad primary `********` (font lacked middle-dot glyphs); stop re-applying overlay on every `fileDragMove` so secondary 2 Hz blink can toggle.
 
 ## Spec Change Log
 
@@ -157,3 +158,30 @@ context:
 - Drag valid `.syx` over window → PATCH NAME overlay + blink; leave → restore; drop → Computer Patches selects file and loads; footer on drop only
 - Drag bank dump / `.txt` / two files → `BAD FILE`; drop → reject footer, no load
 - Dirty patch drop → same unsaved confirm as Open; Cancel aborts
+
+### Review Findings
+
+_(Code review 2026-09-08 — commit `df3bba2c` + uncommitted asterisk/blink follow-up)_
+
+- [x] [Review][Patch] Lock gate-cancel after re-dropping the already-loaded `.syx` [`Tests/Unit/PatchManagerActionHandlerDropLoadTests.cpp`] — added `dropLoad_gateCancelAfterSamePathReload` (load once, re-drop same path with gate declining → `kCancelled`)
+
+- [x] [Review][Defer] Multi-file drop reject has no automated coverage [`Source/GUI/PluginEditorFileDragDrop.cpp`] — deferred: GUI-only `StringArray` path; already tracked in deferred-work (2026-09-07); Core policy
+- [x] [Review][Defer] Successful drop may flash scan-summary footer before load success [`PatchManagerActionHandlerComputerBrowser.cpp` prepare/scan] — deferred: Open-parity; already tracked in deferred-work (2026-09-07)
+
+#### Rejected
+
+- AC still shows middle-dot bad primary while Always/`********` match code — false for product; fixing would edit this spec’s AC bullet (reject per triage)
+- Tasks checkbox claims multi-file unit coverage — overclaim is spec hygiene (edit spec); real gap deferred above
+- Multi-file drop clears PATCH NAME before footer (no lingering BAD FILE) — false: drop must restore real name; drag already showed BAD FILE; footer carries reject
+- Code Map / Change Log stale vs Implementation Notes — fix would edit spec
+- `clearPatchNameDragOverlay` leaves valid/preview cache fields — false: path clear forces re-assess; fields unused until overwrite
+- prepare/select miss → generic invalid footer — low; unlikely everyday; dedicated copy adds surface (same as prior triage)
+- Footer uses warning severity / Design Notes mention info/error — low / design-doc drift; not user-facing defect
+- Assess tests omit uppercase `.SYX` / empty path edges — low; non-everyday; DropLoad already covers several rejects
+- Valid overlay with empty preview falls back to bad primary + DROP TO LOAD — low; stem fallback normally nonempty; exotic
+- `PluginProcessor::loadDroppedComputerPatchFile` silent if handler null — low; not everyday post-init
+- Mid-drag file rewrite / assess double-read TOCTOU — low; exotic; fix adds complexity
+- Case-fold twin filenames in parent folder — low; rare on default macOS volume; same Open helper
+- Overlay clear stale name flash — false: `PatchNameDisplayPanel::clearDragOverlay` calls `syncFromApvtsState`
+- Success footer may use reconciliation notice instead of filename — false: intentional reuse of existing load footers
+- `dropAttemptCommitted_` comment vs write site — low cosmetic; cleared at drop start so harmless

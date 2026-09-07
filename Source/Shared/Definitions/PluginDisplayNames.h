@@ -966,9 +966,8 @@ namespace PluginDisplayNames
             // Drag-drop .syx overlay on PATCH NAME (primary fixed; secondary blinks).
             namespace DragDropOverlay
             {
-                // Eight U+00B7 MIDDLE DOT — distinct from startup "--------".
-                constexpr const char* kBadPrimary =
-                    "\xC2\xB7\xC2\xB7\xC2\xB7\xC2\xB7\xC2\xB7\xC2\xB7\xC2\xB7\xC2\xB7";
+                // Eight asterisks — distinct from startup "--------"; ASCII-safe for the display font.
+                constexpr const char* kBadPrimary = "********";
                 constexpr const char* kDropToLoad = "DROP TO LOAD";
                 constexpr const char* kBadFile = "BAD FILE";
             }

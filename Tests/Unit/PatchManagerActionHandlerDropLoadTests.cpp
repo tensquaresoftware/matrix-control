@@ -19,6 +19,7 @@ public:
         testDropLoad_rejectNonSyx();
         testDropLoad_rejectInvalid();
         testDropLoad_gateCancelRestoresBrowser();
+        testDropLoad_gateCancelAfterSamePathReload();
     }
 
 private:
@@ -195,6 +196,32 @@ private:
         expect(! queued.patchData);
 
         priorDir.deleteRecursively();
+        dropDir.deleteRecursively();
+    }
+
+    void testDropLoad_gateCancelAfterSamePathReload()
+    {
+        beginTest("dropLoad_gateCancelAfterSamePathReload");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, 0, 12, false);
+
+        const auto dropDir = createTempScanDir();
+        expect(dropDir.createDirectory());
+        copyFixturePatchToDir(dropDir, "Patch 71.syx");
+        const auto dropped = dropDir.getChildFile("Patch 71.syx");
+
+        const auto first = harness.handler.loadDroppedComputerPatchFile(dropped, harness.limits);
+        expect(first == Core::PatchManagerActionHandler::DroppedComputerPatchLoadResult::kLoaded);
+
+        harness.gateState->allow = false;
+        const int gateCallsBefore = harness.gateState->calls;
+
+        const auto second = harness.handler.loadDroppedComputerPatchFile(dropped, harness.limits);
+
+        expect(second == Core::PatchManagerActionHandler::DroppedComputerPatchLoadResult::kCancelled);
+        expect(harness.gateState->calls > gateCallsBefore);
+
         dropDir.deleteRecursively();
     }
 };

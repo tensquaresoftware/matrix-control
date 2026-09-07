@@ -8,6 +8,14 @@ namespace TSS
     void PatchNameDisplay::showDragOverlay(const juce::String& primaryText,
                                            const juce::String& secondaryText)
     {
+        // Same overlay already running — do not reset blink phase (fileDragMove spam).
+        if (dragOverlayActive_
+            && dragOverlayPrimary_ == primaryText
+            && dragOverlaySecondary_ == secondaryText)
+        {
+            return;
+        }
+
         if (editing_)
             cancelEdit();
 
