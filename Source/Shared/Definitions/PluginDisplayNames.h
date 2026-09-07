@@ -263,7 +263,7 @@ namespace PluginDisplayNames
 
             inline juce::String formatCopyProgressMessage(int bank)
             {
-                return "Reading source bank " + juce::String(bank) + " into clipboard :";
+                return "Reading source bank " + juce::String(bank) + " :";
             }
 
             inline juce::String formatPasteSafetyCopyMessage(int destinationBank)
