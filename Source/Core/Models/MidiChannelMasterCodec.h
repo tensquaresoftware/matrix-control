@@ -7,7 +7,7 @@
 namespace Core
 {
 
-    // Encodes / decodes the Master Edit CHANNEL combo (OMNI / CHANNEL 1–16 / MONO G1–9)
+    // Encodes / decodes the Master Edit CHANNEL combo (OMNI / 1–16 / MONO G1–9)
     // into the three Oberheim master bytes: basic channel (11), Omni (12), Mono (35).
     // MasterModel keeps generic single-offset accessors; callers that understand the
     // composite field use this codec (ApvtsMasterMapper, init copy).

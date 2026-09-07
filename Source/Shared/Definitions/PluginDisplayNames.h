@@ -406,23 +406,24 @@ namespace PluginDisplayNames
 
         namespace MidiChannel
         {
+            // Closed/open combo values: omit repeating "CHANNEL" — the parameter label already says it.
             constexpr const char* kOmni      = "OMNI";
-            constexpr const char* kChannel1  = "CHANNEL 1";
-            constexpr const char* kChannel2  = "CHANNEL 2";
-            constexpr const char* kChannel3  = "CHANNEL 3";
-            constexpr const char* kChannel4  = "CHANNEL 4";
-            constexpr const char* kChannel5  = "CHANNEL 5";
-            constexpr const char* kChannel6  = "CHANNEL 6";
-            constexpr const char* kChannel7  = "CHANNEL 7";
-            constexpr const char* kChannel8  = "CHANNEL 8";
-            constexpr const char* kChannel9  = "CHANNEL 9";
-            constexpr const char* kChannel10 = "CHANNEL 10";
-            constexpr const char* kChannel11 = "CHANNEL 11";
-            constexpr const char* kChannel12 = "CHANNEL 12";
-            constexpr const char* kChannel13 = "CHANNEL 13";
-            constexpr const char* kChannel14 = "CHANNEL 14";
-            constexpr const char* kChannel15 = "CHANNEL 15";
-            constexpr const char* kChannel16 = "CHANNEL 16";
+            constexpr const char* kChannel1  = "1";
+            constexpr const char* kChannel2  = "2";
+            constexpr const char* kChannel3  = "3";
+            constexpr const char* kChannel4  = "4";
+            constexpr const char* kChannel5  = "5";
+            constexpr const char* kChannel6  = "6";
+            constexpr const char* kChannel7  = "7";
+            constexpr const char* kChannel8  = "8";
+            constexpr const char* kChannel9  = "9";
+            constexpr const char* kChannel10 = "10";
+            constexpr const char* kChannel11 = "11";
+            constexpr const char* kChannel12 = "12";
+            constexpr const char* kChannel13 = "13";
+            constexpr const char* kChannel14 = "14";
+            constexpr const char* kChannel15 = "15";
+            constexpr const char* kChannel16 = "16";
             constexpr const char* kMonoG1    = "MONO G1";
             constexpr const char* kMonoG2    = "MONO G2";
             constexpr const char* kMonoG3    = "MONO G3";
