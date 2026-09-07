@@ -100,7 +100,7 @@ Ces machines partagent le même genre de « moteur » sonore (deux oscillateurs,
 
 **Banques en lecture seule du Matrix-1000 : **Sur le Matrix-1000, les banques **2 à 9** sont en lecture seule (mémoire ROM) pour certaines actions : les boutons `INIT`, `PASTE` et `STORE` y sont indisponibles. Les banques **0** et **1** sont celles dans lesquelles vous pouvez enregistrer vos modifications dans la machine (mémoire RAM).
 
-**Reconnaissance du synthé :** Dès que les ports MIDI sont correctement sélectionnés, Matrix-Control demande au synthé de s’identifier. En bas à droite de la fenêtre, vous voyez alors le type de machine détecté, ou `No device` s’il n’y a pas encore de dialogue.
+**Reconnaissance du synthé :** Dès que les ports MIDI sont correctement sélectionnés, Matrix-Control demande au synthé de s’identifier. En bas à droite de la fenêtre, vous voyez alors le type de machine détecté, ou `NOT CONNECTED` (sous le badge `DEVICE`) s’il n’y a pas encore de dialogue.
 
 > **À noter.** Un Matrix-6R peut pour l’instant apparaître simplement comme Matrix-6. Pour éditer un patch au quotidien, cela ne change presque rien : `BANK UTILITY` et `MASTER EDIT` restent réservés au Matrix-1000.
 
@@ -166,7 +166,7 @@ Il n’existe **pas** de bouton de connexion automatique. En pratique :
 
 Si aucun appareil n’est reconnu, le bas de la fenêtre affiche un message du type :
 
-> *No synth detected - check MIDI cables, MIDI From / MIDI To options, and power-cycle your Matrix synth.*
+> *No synth detected - check MIDI cables, MIDI FROM / MIDI TO options, and power-cycle your Matrix synth.*
 
 Les sections d’édition restent alors verrouillées jusqu’à détection. Ce comportement est voulu : Matrix-Control n’envoie pas de changements à l’aveugle.
 
@@ -185,7 +185,7 @@ L’écran s’organise en trois bandes :
 
 ```
 ┌─ En haut ─────────────────────────────────────────────────────────┐
-│  Logo MATRIX-CONTROL · MIDI FROM / TO · KEYBOARD FROM · (audio)   │
+│  Logo MATRIX-CONTROL · MIDI FROM · MIDI TO · KEYBOARD FROM · (audio)   │
 ├─ Au centre ───────────────────────────────────────────────────────┤
 │  PATCH EDIT  │  MATRIX MODULATION + PATCH MANAGER  │ MASTER EDIT  │
 ├─ En bas ──────────────────────────────────────────────────────────┤
@@ -218,7 +218,7 @@ Dans ce manuel, nous désignons les grands blocs de l’interface comme suit :
 ### En bas
 
 - **À gauche :** messages d’information, de succès, d’avertissement ou d’erreur (icônes ℹ ✓ ⚠ ✗)
-- **À droite :** machine détectée (par ex. Matrix-1000) ou `No device`
+- **À droite :** machine détectée (par ex. Matrix-1000) ou `NOT CONNECTED`
 
 > **Capture d’écran — À placer ici**  
 > *Légende :* Vue d’ensemble des trois colonnes et du bandeau du bas.
@@ -233,7 +233,7 @@ Une fois le synthé détecté et un patch chargé (voir [section 9](#9-choisir-u
 
 Chaque mouvement de bouton, de curseur ou de menu déroulant est transmis au synthé. Vous entendez immédiatement le résultat sur la machine (et éventuellement via l’entrée audio en Standalone).
 
-### Annuler / rétablir (`Undo` / `Redo`)
+### Annuler / rétablir (`UNDO` / `REDO`)
 
 | Action | macOS | Windows / Linux |
 |--------|-------|-----------------|
@@ -323,7 +323,7 @@ Dans `PATCH MANAGER` → module `INTERNAL PATCHES` :
 
 Lorsque vous changez de banque ou de patch, Matrix-Control :
 
-1. Peut afficher la boîte de dialogue `Unsaved edits` si des modifications n’ont été ni stockées dans le synthé (`STORE`) ni sauvegardées en fichier `.syx` (selon le réglage `UNSAVED` des Settings) — choix `Cancel` pour rester sur le patch courant, ou `Continue` pour poursuivre et abandonner ces modifications 
+1. Peut afficher la boîte de dialogue `Unsaved patch` si des modifications n’ont été ni stockées dans le synthé (`STORE`) ni sauvegardées en fichier `.syx` (selon le réglage `UNSAVED STATE` des Settings) — choix `Cancel` pour rester sur le patch courant, `Discard` pour abandonner les modifications et poursuivre, ou `Store` / `Save` / `Save As` selon le contexte pour les conserver avant de changer de patch
 2. Demande au synthé de basculer sur cet emplacement 
 3. **Lit** le patch depuis le synthé et l’affiche dans l’éditeur 
 4. **N’écrit pas** automatiquement ce patch en retour juste après cette lecture
@@ -337,7 +337,7 @@ Lorsque vous changez de banque ou de patch, Matrix-Control :
 | `PASTE` | Colle un patch précédemment copié |
 | `STORE` | Enregistre le patch dans l’emplacement courant **du synthé** |
 
-Sur les banques en lecture seule **2–9** du Matrix-1000, `INIT`, `PASTE` et `STORE` sont indisponibles ; un message en bas de fenêtre l’explique.
+Sur les banques en lecture seule **2–9** du Matrix-1000, `INIT`, `PASTE` et `STORE` sont indisponibles (contrôles grisés).
 
 > **Capture d’écran — À placer ici**  
 > *Légende :* Module `INTERNAL PATCHES` avec les zones `BROWSER` et `MEMORY`.
@@ -346,16 +346,11 @@ Sur les banques en lecture seule **2–9** du Matrix-1000, `INIT`, `PASTE` et `S
 
 ## 10. Banques du Matrix-1000 (BANK UTILITY)
 
-Le module `BANK UTILITY` est réservé au **Matrix-1000**. Sur Matrix-6/6R, il est grisé : ces modèles ne disposent pas de banques. Un message du type « Matrix-1000 only » peut alors apparaître en bas de fenêtre.
+Le module `BANK UTILITY` est réservé au **Matrix-1000**. Sur Matrix-6/6R, il est grisé : ces modèles ne disposent pas de banques.
 
-### `SELECT BANK` (`0`–`9`)
+### Boutons de banque (`0`–`9`)
 
-Les boutons `0` à `9` sélectionnent la banque active ; le patch courant est ensuite relu depuis le synthé (avec la même logique de confirmation `Unsaved edits` que pour un changement de patch).
-
-### `UNLOCK`
-
-Envoie une commande de déverrouillage de banque au synthé.  
-Cela **ne modifie pas** la banque ni le patch affichés dans Matrix-Control. Un message indique que vous pouvez utiliser la façade du synthé pour une saisie à 3 chiffres ; le logiciel ne suit pas automatiquement ce geste effectué sur la machine.
+Les boutons `0` à `9` sélectionnent la banque active ; le patch courant est ensuite relu depuis le synthé (avec la même logique de confirmation `Unsaved patch` que pour un changement de patch).
 
 ---
 
@@ -453,9 +448,9 @@ L’historique ne survit pas à la fermeture du projet ou de l’application.
 
 La section `MASTER EDIT` regroupe les **paramètres globaux** du Matrix-1000 : des réglages qui concernent la machine entière et s’appliquent donc **à tous les patches**, et non à un seul son.
 
-Elle n’est disponible que lorsqu’un **Matrix-1000** est détecté. Sur Matrix-6/6R, toute la colonne est grisée (message du type « Matrix-1000 only »).
+Elle n’est disponible que lorsqu’un **Matrix-1000** est détecté. Sur Matrix-6/6R, toute la colonne est grisée.
 
-Trois modules composent cette section — `MIDI`, `VIBRATO` et `MISC` — chacun muni d’un bouton `I` pour le réinitialiser. Avant d’appliquer cette réinitialisation, Matrix-Control affiche la boîte `Reset master module?` (`Reset` / `Cancel`).
+Trois modules composent cette section — `MIDI`, `VIBRATO` et `MISC` — chacun muni d’un bouton `I` pour le réinitialiser. Avant d’appliquer cette réinitialisation, Matrix-Control affiche la boîte `RESET MASTER MODULE?` (`Reset` / `Cancel`).
 
 En pratique, vous y trouverez notamment le canal MIDI, le vibrato global, l’accordage et la transposition maîtres, ainsi que des options de protection mémoire ou de verrouillage de banque. L’idée maîtresse : ce que vous réglez ici influence le comportement général du synthé, quel que soit le patch chargé.
 
@@ -494,11 +489,11 @@ La touche **Échap** ferme en général les fenêtres `SETTINGS` et `ABOUT`, ain
 | Réglage | Disponible ? | Détail |
 |---------|--------------|--------|
 | `HARDWARE LATENCY` | Oui, **en mode plugin seulement** | 0 à 200 ms. Indique au DAW le retard du chemin matériel (synthé + câbles + interface audio), afin de mieux caler l’audio. |
-| Politique de noms | Oui | `PREFER INTERNAL NAME` / `PREFER FILENAME` / `ASK ONCE PER LOAD` |
-| `UNSAVED` | Oui | `WARN ALWAYS` / `NEVER WARN` |
+| `MATRIX-1000 PATCHES` | Oui | `DISPLAY MUSICAL NAMES` / `DISPLAY HARDWARE NAMES` |
+| `COMPUTER PATCHES` | Oui | `DISPLAY SYSEX NAMES` / `DISPLAY FILE NAMES` / `ASK ONCE PER LOAD` |
+| `UNSAVED STATE` | Oui | `ALWAYS WARN` / `NEVER WARN` |
 | `MASTER OPERATIONS` | Non — *Coming soon...* | Pas encore proposé |
-| `DEFRAG` | Non — *Coming soon...* dans Settings | Un compactage d’historique existe déjà via le Mutator lorsque l’historique est plein |
-| `LOGGING` | Non — *Coming soon...* | Pas encore proposé |
+| `DEFRAG HISTORY` | Non — *Coming soon...* dans Settings | Un compactage d’historique existe déjà via le Mutator lorsque l’historique est plein |
 
 L’apparence et la taille ne se règlent **pas** dans Settings : elles se trouvent dans le menu du logo `MATRIX-CONTROL`.
 
@@ -515,7 +510,7 @@ L’apparence et la taille ne se règlent **pas** dans Settings : elles se trouv
 | `AUDIO FROM` / `INPUT GAIN` | Masqués | Visibles (retour audio du synthé dans l’application) |
 | `AUDIO/MIDI...` | Non | Oui (menu du logo `MATRIX-CONTROL`, ou Option/Alt + clic sur le logo) |
 | `HARDWARE LATENCY` (Settings) | Visible | Masqué |
-| Notes jouées | Depuis le DAW / le clavier routé vers la piste | Depuis le port Keyboard From |
+| Notes jouées | Depuis le DAW / le clavier routé vers la piste | Depuis le port `KEYBOARD FROM` |
 
 Dans les deux cas, le **son** demeure celui du synthé. Matrix-Control pilote les réglages.
 
@@ -531,7 +526,7 @@ En général **non** conservé tel quel : le contenu du patch en cours d’édit
 
 | Symptôme | Que faire |
 |----------|-----------|
-| `No device` / éditeur verrouillé | Vérifier le sens des câbles ; les ports `FROM` / `TO` ; que le synthé est allumé ; éventuellement l’éteindre puis le rallumer ; sous Windows, s’assurer qu’aucune autre application n’occupe le port |
+| `NOT CONNECTED` / éditeur verrouillé | Vérifier le sens des câbles ; les ports `MIDI FROM` / `MIDI TO` ; que le synthé est allumé ; éventuellement l’éteindre puis le rallumer ; sous Windows, s’assurer qu’aucune autre application n’occupe le port |
 | Les contrôles bougent mais le patch ne change pas | Vérifier `MIDI TO` ; le canal MIDI (`MASTER EDIT` sur Matrix-1000) ; `MEMORY PROTECT` / `BANK LOCK` |
 | Changement de patch : l’écran ne se met pas à jour | Vérifier `MIDI FROM` (le synthé doit pouvoir répondre) |
 | `STORE` ou `PASTE` grisés | Banque 2–9 sur Matrix-1000 — passer en banque 0 ou 1 |

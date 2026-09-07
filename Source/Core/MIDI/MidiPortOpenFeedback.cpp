@@ -2,6 +2,7 @@
 
 #include "Core/Exceptions/ExceptionPropagator.h"
 #include "Core/Loggers/MidiLogger.h"
+#include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Exceptions/WidgetFactoryExceptions.h"
 #include "Shared/ProjectPaths.h"
 
@@ -47,7 +48,9 @@ juce::String formatFooterMessage(bool isInput,
                                  const juce::String& portDisplayName,
                                  MidiPortOpenFailureReason reason)
 {
-    const juce::String direction = isInput ? "MIDI From" : "MIDI To";
+    const juce::String direction = isInput
+                                       ? PluginDisplayNames::HeaderPanel::kEditorMidiFromLabel
+                                       : PluginDisplayNames::HeaderPanel::kMidiToLabel;
     const juce::String displayName = portDisplayName.isNotEmpty() ? portDisplayName : "Unknown port";
 
     if (reason == MidiPortOpenFailureReason::kNotFound)

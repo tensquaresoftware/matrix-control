@@ -105,7 +105,7 @@ private:
 
         const auto footerMessage = processor.apvts.state.getProperty("uiMessageText").toString();
         expect(footerMessage.isNotEmpty());
-        expect(footerMessage.contains("MIDI To"));
+        expect(footerMessage.contains("MIDI TO"));
         expect(footerMessage.contains("port not found"));
         expectEquals(processor.apvts.state.getProperty("uiMessageSeverity").toString(),
                      juce::String("error"));
@@ -127,7 +127,7 @@ private:
 
         const auto footerMessage = processor.apvts.state.getProperty("uiMessageText").toString();
         expect(footerMessage.isNotEmpty());
-        expect(footerMessage.contains("MIDI From"));
+        expect(footerMessage.contains("MIDI FROM"));
         expect(footerMessage.contains("port not found"));
         expectEquals(processor.apvts.state.getProperty("uiMessageSeverity").toString(),
                      juce::String("error"));
@@ -224,7 +224,7 @@ private:
             midiManager.getOpenInputDeviceId());
 
         expectEquals(processor.apvts.state.getProperty("midiInputPortId").toString(), juce::String());
-        expect(processor.apvts.state.getProperty("uiMessageText").toString().contains("MIDI From"));
+        expect(processor.apvts.state.getProperty("uiMessageText").toString().contains("MIDI FROM"));
     }
 
     void testSoftSyncKeepsDesiredIdUntilReportingAlign()

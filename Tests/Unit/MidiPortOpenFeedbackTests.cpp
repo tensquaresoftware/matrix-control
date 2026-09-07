@@ -35,7 +35,7 @@ private:
             true,
             "IAC Driver Bus 1",
             Core::MidiPortOpenFailureReason::kNotFound);
-        expect(inputMessage.contains("MIDI From"));
+        expect(inputMessage.contains("MIDI FROM"));
         expect(inputMessage.contains("IAC Driver Bus 1"));
         expect(inputMessage.contains("port not found"));
 
@@ -43,7 +43,7 @@ private:
             false,
             "loopMIDI Port",
             Core::MidiPortOpenFailureReason::kNotFound);
-        expect(outputMessage.contains("MIDI To"));
+        expect(outputMessage.contains("MIDI TO"));
         expect(outputMessage.contains("loopMIDI Port"));
     }
 
@@ -56,7 +56,7 @@ private:
             "loopMIDI Port 1",
             Core::MidiPortOpenFailureReason::kOpenRejected);
 
-        expect(message.contains("MIDI To"));
+        expect(message.contains("MIDI TO"));
         expect(message.contains("loopMIDI Port 1"));
         expect(message.contains("could not open"));
 

@@ -50,7 +50,7 @@ namespace PluginDisplayNames
 
         // Left-zone guidance while FR-2 device lock is active (D-038 — footer only, no modal).
         constexpr const char* kDeviceLockGuidance =
-            "No synth detected - check MIDI cables, MIDI From / MIDI To options, and power-cycle your Matrix synth.";
+            "No synth detected - check MIDI cables, MIDI FROM / MIDI TO options, and power-cycle your Matrix synth.";
 
         // Presence inquiry timed out while still detected — synth likely overloaded, not unplugged.
         constexpr const char* kDeviceUnresponsiveGuidance =
@@ -58,11 +58,11 @@ namespace PluginDisplayNames
 
         // Connected Oberheim Matrix-family device whose member is not Matrix-1000 / Matrix-6/6R.
         constexpr const char* kUnsupportedMatrixDeviceFooter =
-            "Connected Matrix device is not supported - editing is locked. Use MIDI From / MIDI To to change ports.";
+            "Connected Matrix device is not supported - editing is locked. Use MIDI FROM / MIDI TO to change ports.";
 
-        // Standalone: MIDI From and Keyboard From must open distinct input devices.
+        // Standalone: MIDI FROM and KEYBOARD FROM must open distinct input devices.
         constexpr const char* kMidiFromKeyboardFromConflictFooter =
-            "MIDI From and Keyboard From must use different MIDI input devices.";
+            "MIDI FROM and KEYBOARD FROM must use different MIDI input devices.";
     }
 
     namespace About
@@ -792,7 +792,7 @@ namespace PluginDisplayNames
         {
             constexpr const char* kName = "RAMP/PORTAMENTO";
             constexpr const char* kLegatoPortaUnisonBlockedFooter =
-                "Legato Portamento is not available when Keyboard Mode is Unison.";
+                "LEGATO PORTA is not available when KEYBOARD MODE is UNISON.";
 
             namespace StandaloneWidgets
             {
@@ -1280,7 +1280,7 @@ namespace PluginDisplayNames
             {
                 constexpr const char* kCompareLockedFooter =
                     "Compare mode - editing and patch/bank changes are locked. "
-                    "Click COMPARE again to exit.";
+                    "Click C again to exit.";
 
                 constexpr const char* kHistoryGateTitle = "Unsaved mutations";
                 constexpr const char* kHistoryGateMessage =
