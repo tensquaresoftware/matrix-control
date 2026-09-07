@@ -157,6 +157,7 @@ set(PLUGIN_SOURCES
     Source/Core/Models/ApvtsMasterMapper.cpp
     Source/Core/Models/ApvtsPatchMapper.cpp
     Source/Core/Models/MasterModel.cpp
+    Source/Core/Models/MidiChannelMasterCodec.cpp
     Source/Core/Models/PatchNameSyncer.cpp
     Source/Core/Models/PackedFieldCodec.cpp
     Source/Core/Models/PatchModel.cpp
@@ -445,6 +446,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/ComboboxPatchSendDebouncerTests.cpp
         Tests/Unit/ClipboardPasteEnabledResolverTests.cpp
         Tests/Unit/ApvtsMasterMapperTests.cpp
+        Tests/Unit/MidiChannelMasterCodecTests.cpp
         Tests/Unit/DeviceMemoryLimitsTests.cpp
         Tests/Unit/DeviceTypeRegistryTests.cpp
         Tests/Unit/DeviceInquiryTriggerTests.cpp
@@ -546,6 +548,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/Models/ApvtsMasterMapper.cpp
         Source/Core/Models/ApvtsPatchMapper.cpp
         Source/Core/Models/MasterModel.cpp
+        Source/Core/Models/MidiChannelMasterCodec.cpp
         Source/Core/Models/PatchModel.cpp
         Source/Core/Services/ClipboardService.cpp
         Source/Core/Services/ClipboardModulePasteHelpers.cpp
@@ -678,6 +681,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/Models/ApvtsMasterMapper.cpp
         Source/Core/Models/ApvtsPatchMapper.cpp
         Source/Core/Models/MasterModel.cpp
+        Source/Core/Models/MidiChannelMasterCodec.cpp
         Source/Core/Models/PatchModel.cpp
         Source/Core/Models/PackedFieldCodec.cpp
         Source/Core/MIDI/SysEx/SysExEncoder.cpp

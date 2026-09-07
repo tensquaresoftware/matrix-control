@@ -1,10 +1,21 @@
 #include "ApvtsMasterMapper.h"
 
 #include "Core/Models/MasterModel.h"
+#include "Core/Models/MidiChannelMasterCodec.h"
 #include "Shared/Definitions/PluginDescriptors.h"
+#include "Shared/Definitions/PluginIDs.h"
 
 namespace Core
 {
+
+namespace
+{
+    bool isMidiChannelChoice(const PluginDescriptors::ChoiceParameterDescriptor& d) noexcept
+    {
+        return d.parameterId
+            == PluginIDs::MasterEditSection::MidiModule::ParameterWidgets::kChannel;
+    }
+}
 
 ApvtsMasterMapper::ApvtsMasterMapper(juce::AudioProcessorValueTreeState& apvts, MasterModel& model)
     : apvts_(apvts)
@@ -57,8 +68,18 @@ void ApvtsMasterMapper::syncIntToBuffer(const PluginDescriptors::IntParameterDes
 void ApvtsMasterMapper::syncChoiceToBuffer(const PluginDescriptors::ChoiceParameterDescriptor& d)
 {
     auto* rawValue = apvts_.getRawParameterValue(d.parameterId);
-    if (rawValue != nullptr)
-        model_.setChoiceIndex(d, juce::roundToInt(rawValue->load()));
+    if (rawValue == nullptr)
+        return;
+
+    const int index = juce::roundToInt(rawValue->load());
+
+    if (isMidiChannelChoice(d))
+    {
+        MidiChannelMasterCodec::applyComboIndex(model_.data(), MasterModel::kBufferSize, index);
+        return;
+    }
+
+    model_.setChoiceIndex(d, index);
 }
 
 void ApvtsMasterMapper::pushIntToApvts(const PluginDescriptors::IntParameterDescriptor& d)
@@ -71,8 +92,14 @@ void ApvtsMasterMapper::pushIntToApvts(const PluginDescriptors::IntParameterDesc
 void ApvtsMasterMapper::pushChoiceToApvts(const PluginDescriptors::ChoiceParameterDescriptor& d)
 {
     auto* param = apvts_.getParameter(d.parameterId);
-    if (param != nullptr)
-        param->setValueNotifyingHost(param->convertTo0to1(static_cast<float>(model_.getChoiceIndex(d))));
+    if (param == nullptr)
+        return;
+
+    const int index = isMidiChannelChoice(d)
+                          ? MidiChannelMasterCodec::readComboIndex(model_.data(), MasterModel::kBufferSize)
+                          : model_.getChoiceIndex(d);
+
+    param->setValueNotifyingHost(param->convertTo0to1(static_cast<float>(index)));
 }
 
 std::vector<PluginDescriptors::IntParameterDescriptor> ApvtsMasterMapper::buildIntDescriptors()

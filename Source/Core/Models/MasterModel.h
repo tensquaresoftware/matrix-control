@@ -33,8 +33,8 @@ namespace Core
 
         // The MIDI Basic Channel choice descriptor spans bytes 11/12/35 on the synth but
         // carries a single sysExOffset (11); this touches byte 11 only. Full Omni/Mono
-        // composition is owned by ApvtsMasterMapper (Story 1.4); the 172-byte buffer
-        // round-trip preserves all three bytes regardless.
+        // composition is MidiChannelMasterCodec (used by ApvtsMasterMapper); the 172-byte
+        // buffer round-trip preserves all three bytes regardless.
         int getChoiceIndex(const PluginDescriptors::ChoiceParameterDescriptor& descriptor) const;
         void setChoiceIndex(const PluginDescriptors::ChoiceParameterDescriptor& descriptor, int index);
 

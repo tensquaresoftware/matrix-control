@@ -3,6 +3,7 @@
 #include "Core/MIDI/MasterParameterSysExDispatcher.h"
 #include "Core/Models/ApvtsMasterMapper.h"
 #include "Core/Models/MasterModel.h"
+#include "Core/Models/MidiChannelMasterCodec.h"
 #include "Shared/Definitions/PluginDescriptors.h"
 #include "Shared/Definitions/PluginIDs.h"
 
@@ -66,8 +67,20 @@ void MasterModuleInitService::copyModuleFromInitTemplate(const MasterModel& init
 
     for (const auto& descriptor : kChoiceParameters)
     {
-        if (descriptor.parentGroupId == moduleGroupId)
-            masterModel_.setChoiceIndex(descriptor, initTemplate.getChoiceIndex(descriptor));
+        if (descriptor.parentGroupId != moduleGroupId)
+            continue;
+
+        if (descriptor.parameterId
+            == PluginIDs::MasterEditSection::MidiModule::ParameterWidgets::kChannel)
+        {
+            const int comboIndex = MidiChannelMasterCodec::readComboIndex(
+                initTemplate.data(), MasterModel::kBufferSize);
+            MidiChannelMasterCodec::applyComboIndex(
+                masterModel_.data(), MasterModel::kBufferSize, comboIndex);
+            continue;
+        }
+
+        masterModel_.setChoiceIndex(descriptor, initTemplate.getChoiceIndex(descriptor));
     }
 }
 

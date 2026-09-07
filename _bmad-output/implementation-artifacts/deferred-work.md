@@ -1415,3 +1415,13 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-patch-nav-internal-header-reload-bank-reclick.md`
   summary: Sibling done spec still describes Internal header reclaim as device-dump/editor reload only, omitting Set Bank + Program Change recall.
   evidence: Blind Hunter; historical done artifact left untouched in this bugfix.
+
+## Deferred from: spec-matrix-1000-silent-patch-stuck (2026-09-07)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-matrix-1000-silent-patch-stuck.md`
+  summary: MasterModel::setChoiceIndex still writes the raw CHANNEL menu index into byte 11 only; non-mapper callers can recreate the silent-Matrix bug.
+  evidence: Intentional generic accessors; live APVTS path uses MidiChannelMasterCodec via ApvtsMasterMapper; remaining risk is tests or future call sites that bypass the codec.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-matrix-1000-silent-patch-stuck.md`
+  summary: MasterParameterSysExDispatcherTests still seeds midiChannel via MasterModel::setChoiceIndex without composing Omni/Mono.
+  evidence: Pre-existing test fixture pattern outside this diff; production CHANNEL edits go through the mapper.

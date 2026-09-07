@@ -11,6 +11,7 @@
 #include "Core/MIDI/SysEx/SysExParser.h"
 #include "Core/Models/ApvtsMasterMapper.h"
 #include "Core/Models/MasterModel.h"
+#include "Core/Models/MidiChannelMasterCodec.h"
 #include "Shared/Definitions/PluginDescriptors.h"
 
 class TestAudioProcessorMaster : public juce::AudioProcessor
@@ -53,6 +54,7 @@ public:
         runApvtsToBuffer();
         runBufferToApvts();
         runReferenceRoundTrip();
+        runMidiChannelCompositionRoundTrip();
     }
 
 private:
@@ -129,19 +131,19 @@ private:
         auto choiceDescs = Core::ApvtsMasterMapper::buildChoiceDescriptors();
         const auto& pedal1  = intDescs[0];    // Pedal1Select, offset 17, [0, 121]
         const auto& lever2  = intDescs[2];    // Lever2Select, offset 19, [0, 121]
-        const auto& channel = choiceDescs[0]; // Channel, offset 11, 26 choices
+        const auto& midiEcho = choiceDescs[1]; // MidiEcho On/Off — not the composite CHANNEL
 
-        TestAudioProcessorMaster proc(makeIntChoiceLayout(pedal1, lever2, channel));
+        TestAudioProcessorMaster proc(makeIntChoiceLayout(pedal1, lever2, midiEcho));
         Core::MasterModel model;
         Core::ApvtsMasterMapper mapper(proc.apvts, model);
-        *proc.apvts.getRawParameterValue(pedal1.parameterId)  = 10.0f;
-        *proc.apvts.getRawParameterValue(lever2.parameterId)  = 5.0f;
-        *proc.apvts.getRawParameterValue(channel.parameterId) = 3.0f;
+        *proc.apvts.getRawParameterValue(pedal1.parameterId)   = 10.0f;
+        *proc.apvts.getRawParameterValue(lever2.parameterId)   = 5.0f;
+        *proc.apvts.getRawParameterValue(midiEcho.parameterId) = 1.0f;
         mapper.apvtsToBuffer();
 
         expectEquals(model.getValue(pedal1), 10);
         expectEquals(model.getValue(lever2), 5);
-        expectEquals(model.getChoiceIndex(channel), 3);
+        expectEquals(model.getChoiceIndex(midiEcho), 1);
     }
 
     void runBufferToApvts()
@@ -150,21 +152,21 @@ private:
 
         auto intDescs    = Core::ApvtsMasterMapper::buildIntDescriptors();
         auto choiceDescs = Core::ApvtsMasterMapper::buildChoiceDescriptors();
-        const auto& pedal1  = intDescs[0];
-        const auto& lever2  = intDescs[2];
-        const auto& channel = choiceDescs[0];
+        const auto& pedal1   = intDescs[0];
+        const auto& lever2   = intDescs[2];
+        const auto& midiEcho = choiceDescs[1];
 
-        TestAudioProcessorMaster proc(makeIntChoiceLayout(pedal1, lever2, channel));
+        TestAudioProcessorMaster proc(makeIntChoiceLayout(pedal1, lever2, midiEcho));
         Core::MasterModel model;
         Core::ApvtsMasterMapper mapper(proc.apvts, model);
         model.setValue(pedal1, 20);
         model.setValue(lever2, 7);
-        model.setChoiceIndex(channel, 5);
+        model.setChoiceIndex(midiEcho, 1);
         mapper.bufferToApvts();
 
         expectEquals(juce::roundToInt(proc.apvts.getRawParameterValue(pedal1.parameterId)->load()),  20);
         expectEquals(juce::roundToInt(proc.apvts.getRawParameterValue(lever2.parameterId)->load()),  7);
-        expectEquals(juce::roundToInt(proc.apvts.getRawParameterValue(channel.parameterId)->load()), 5);
+        expectEquals(juce::roundToInt(proc.apvts.getRawParameterValue(midiEcho.parameterId)->load()), 1);
     }
 
     void runReferenceRoundTrip()
@@ -197,6 +199,44 @@ private:
             const auto expected = static_cast<int>((*decoded)[static_cast<size_t>(d.sysExOffset)]);
             expectEquals(model.getValue(d), expected,
                          "Offset " + juce::String(d.sysExOffset) + " must survive round-trip");
+        }
+    }
+
+    void runMidiChannelCompositionRoundTrip()
+    {
+        beginTest("CHANNEL composition: APVTS <-> buffer (OMNI / CHANNEL 4 / MONO G3)");
+
+        const auto choiceDescs = Core::ApvtsMasterMapper::buildChoiceDescriptors();
+        const auto& channel = choiceDescs[0];
+        juce::AudioProcessorValueTreeState::ParameterLayout layout;
+        layout.add(std::make_unique<juce::AudioParameterChoice>(
+            juce::ParameterID(channel.parameterId, 1), channel.displayName,
+            channel.choices, channel.defaultIndex));
+
+        TestAudioProcessorMaster proc(std::move(layout));
+        Core::MasterModel model;
+        Core::ApvtsMasterMapper mapper(proc.apvts, model);
+        auto* raw = proc.apvts.getRawParameterValue(channel.parameterId);
+
+        const struct Case { float combo; int b; int o; int m; } cases[] = {
+            { 0.0f, 0, 1, 0 }, { 4.0f, 3, 0, 0 }, { 19.0f, 2, 0, 1 }
+        };
+
+        for (const auto& c : cases)
+        {
+            *raw = c.combo;
+            mapper.apvtsToBuffer();
+            expectEquals(static_cast<int>(model.data()[11]), c.b);
+            expectEquals(static_cast<int>(model.data()[12]), c.o);
+            expectEquals(static_cast<int>(model.data()[35]), c.m);
+        }
+
+        for (const int combo : { 0, 4, 19 })
+        {
+            Core::MidiChannelMasterCodec::applyComboIndex(
+                model.data(), Core::MasterModel::kBufferSize, combo);
+            mapper.bufferToApvts();
+            expectEquals(juce::roundToInt(raw->load()), combo);
         }
     }
 };

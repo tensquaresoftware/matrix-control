@@ -19,38 +19,10 @@
 #include "Core/MIDI/SysEx/SysExParser.h"
 #include "Core/Models/ApvtsMasterMapper.h"
 #include "Core/Models/MasterModel.h"
+#include "Core/Models/MidiChannelMasterCodec.h"
 #include "Shared/Definitions/PluginDescriptors.h"
 #include "Shared/Definitions/PluginIDs.h"
-
-class TestAudioProcessorMasterInit : public juce::AudioProcessor
-{
-public:
-    explicit TestAudioProcessorMasterInit(juce::AudioProcessorValueTreeState::ParameterLayout layout)
-        : juce::AudioProcessor(BusesProperties())
-        , apvts(*this, nullptr, "P", std::move(layout))
-    {
-    }
-
-    juce::AudioProcessorValueTreeState apvts;
-
-    const juce::String getName() const override { return "Test"; }
-    void prepareToPlay(double, int) override {}
-    void releaseResources() override {}
-    void processBlock(juce::AudioBuffer<float>&, juce::MidiBuffer&) override {}
-    juce::AudioProcessorEditor* createEditor() override { return nullptr; }
-    bool hasEditor() const override { return false; }
-    bool acceptsMidi() const override { return false; }
-    bool producesMidi() const override { return false; }
-    bool isMidiEffect() const override { return false; }
-    double getTailLengthSeconds() const override { return 0.0; }
-    int getNumPrograms() override { return 1; }
-    int getCurrentProgram() override { return 0; }
-    void setCurrentProgram(int) override {}
-    const juce::String getProgramName(int) override { return {}; }
-    void changeProgramName(int, const juce::String&) override {}
-    void getStateInformation(juce::MemoryBlock&) override {}
-    void setStateInformation(const void*, int) override {}
-};
+#include "MasterModuleInitServiceTestSupport.h"
 
 class MasterModuleInitServiceTests : public juce::UnitTest
 {
@@ -187,6 +159,13 @@ private:
         model.setChoiceIndex(MiscModule::kChoiceParameters[0], 1);
     }
 
+    static bool channelTripletMatch(const Core::MasterModel& lhs, const Core::MasterModel& rhs)
+    {
+        return lhs.data()[11] == rhs.data()[11]
+            && lhs.data()[12] == rhs.data()[12]
+            && lhs.data()[35] == rhs.data()[35];
+    }
+
     static bool moduleBytesMatch(const Core::MasterModel& lhs,
                                  const Core::MasterModel& rhs,
                                  const juce::String& moduleGroupId)
@@ -194,18 +173,34 @@ private:
         using namespace PluginDescriptors::MasterEditSection;
 
         for (const auto& d : kIntParameters)
-        {
             if (d.parentGroupId == moduleGroupId && lhs.getValue(d) != rhs.getValue(d))
                 return false;
-        }
 
         for (const auto& d : kChoiceParameters)
         {
-            if (d.parentGroupId == moduleGroupId && lhs.getChoiceIndex(d) != rhs.getChoiceIndex(d))
+            if (d.parentGroupId != moduleGroupId)
+                continue;
+
+            const bool channelMismatch =
+                d.parameterId == PluginIDs::MasterEditSection::MidiModule::ParameterWidgets::kChannel
+                    ? ! channelTripletMatch(lhs, rhs)
+                    : lhs.getChoiceIndex(d) != rhs.getChoiceIndex(d);
+            if (channelMismatch)
                 return false;
         }
 
         return true;
+    }
+
+    static void rewriteMasterInitWithOmniOn(const juce::File& templatesDir,
+                                           SysExEncoder& encoder,
+                                           Core::MasterModel& initTemplate)
+    {
+        initTemplate.data()[12] = 1;
+        initTemplate.data()[35] = 0;
+        const auto syx = encoder.encodeMasterSysEx(0x03, initTemplate.data());
+        templatesDir.getChildFile(Core::InitTemplateLoader::kMasterInitFileName)
+            .replaceWithData(syx.getData(), syx.getSize());
     }
 
     void testInitMidiModulePreservesOtherModules()
@@ -216,9 +211,12 @@ private:
         copyFixtureToDir(tempDir, Core::InitTemplateLoader::kMasterInitFileName);
 
         InitTestHarness harness(makeFullMasterLayout(), tempDir);
-        const auto initTemplate = makeInitTemplateModel(tempDir);
+        auto initTemplate = makeInitTemplateModel(tempDir);
+        rewriteMasterInitWithOmniOn(tempDir, harness.encoder, initTemplate);
 
         fillModelWithDistinctValues(harness.model);
+        harness.model.data()[12] = 0;
+        harness.model.data()[35] = 1; // Mono dirty — fails if init only copies byte 11
 
         const auto beforeVibrato = harness.model;
         const auto beforeMisc = harness.model;
@@ -227,6 +225,8 @@ private:
         expect(result.success);
         expect(result.infoMessage.isEmpty());
 
+        expectEquals(static_cast<int>(harness.model.data()[12]), 1);
+        expectEquals(static_cast<int>(harness.model.data()[35]), 0);
         expect(moduleBytesMatch(harness.model, initTemplate, PluginIDs::MasterEditSection::MidiModule::kGroupId));
         expect(moduleBytesMatch(harness.model, beforeVibrato, PluginIDs::MasterEditSection::VibratoModule::kGroupId));
         expect(moduleBytesMatch(harness.model, beforeMisc, PluginIDs::MasterEditSection::MiscModule::kGroupId));
@@ -427,13 +427,6 @@ private:
             propagateInitTemplateFooterMessage(result);
         }
 
-        void runMidiInit()
-        {
-            suppressMasterParameterSysEx_ = true;
-            initService.initModule(Core::MasterModuleKind::kMidi);
-            suppressMasterParameterSysEx_ = false;
-        }
-
         void runMidiInitViaPropertyStamp()
         {
             using namespace PluginIDs::MasterEditSection;
@@ -549,8 +542,12 @@ private:
 
         for (const auto& d : MidiModule::kChoiceParameters)
         {
-            expectEquals(juce::roundToInt(harness.apvts.getRawParameterValue(d.parameterId)->load()),
-                         harness.model.getChoiceIndex(d));
+            expectEquals(
+                juce::roundToInt(harness.apvts.getRawParameterValue(d.parameterId)->load()),
+                d.parameterId == PluginIDs::MasterEditSection::MidiModule::ParameterWidgets::kChannel
+                    ? Core::MidiChannelMasterCodec::readComboIndex(harness.model.data(),
+                                                                  Core::MasterModel::kBufferSize)
+                    : harness.model.getChoiceIndex(d));
         }
 
         expect(harness.queue.dequeue().has_value());
