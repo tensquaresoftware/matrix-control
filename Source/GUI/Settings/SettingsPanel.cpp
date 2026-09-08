@@ -82,6 +82,31 @@ void SettingsPanel::layoutPlaceholderRow(juce::Rectangle<int>& bounds,
     bounds.removeFromTop(metrics.rowGap);
 }
 
+void SettingsPanel::layoutButtonRow(juce::Rectangle<int>& bounds,
+                                    const RowLayoutMetrics& metrics,
+                                    const ButtonRowLayoutArgs& args)
+{
+    auto row = bounds.removeFromTop(metrics.controlHeight);
+    const int x = row.getX();
+    const int y = row.getY();
+
+    args.label->setBounds(x, y, metrics.labelWidth, metrics.controlHeight);
+    args.label->setUiScale(uiScale_);
+
+    int cursorX = x + metrics.labelWidth;
+    auto widthIt = args.buttonWidths.begin();
+
+    for (auto* button : args.buttons)
+    {
+        const int width = (widthIt != args.buttonWidths.end()) ? *widthIt++ : metrics.comboWidth;
+        button->setBounds(cursorX, y, width, metrics.controlHeight);
+        button->setUiScale(uiScale_);
+        cursorX += width + metrics.buttonGap;
+    }
+
+    bounds.removeFromTop(metrics.rowGap);
+}
+
 void SettingsPanel::layoutPatchSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics)
 {
     layoutSectionHeader(bounds,
@@ -105,6 +130,11 @@ void SettingsPanel::layoutPatchSection(juce::Rectangle<int>& bounds, const RowLa
                             LabeledControlRowArgs{ unsavedStateLabel_.get(),
                                                    unsavedStateCombo_.get(),
                                                    metrics.comboWidth });
+    layoutButtonRow(bounds,
+                    metrics,
+                    ButtonRowLayoutArgs{ patchInitTemplateLabel_.get(),
+                                         { patchSaveAsInitButton_.get(), patchDeleteInitButton_.get() },
+                                         { metrics.saveAsInitWidth, metrics.deleteInitWidth } });
 }
 
 void SettingsPanel::layoutPatchMutatorSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics)
@@ -141,7 +171,20 @@ void SettingsPanel::layoutMasterSection(juce::Rectangle<int>& bounds, const RowL
                                                        metrics.sliderWidth });
     }
 
-    layoutPlaceholderRow(bounds, metrics, *masterOperationsLabel_, *masterOperationsPlaceholder_);
+    layoutButtonRow(bounds,
+                    metrics,
+                    ButtonRowLayoutArgs{ masterUtilityLabel_.get(),
+                                         { masterLoadButton_.get(),
+                                           masterSaveAsButton_.get(),
+                                           masterInitButton_.get() },
+                                         { metrics.utilityLoadWidth,
+                                           metrics.utilitySaveAsWidth,
+                                           metrics.utilityInitWidth } });
+    layoutButtonRow(bounds,
+                    metrics,
+                    ButtonRowLayoutArgs{ masterInitTemplateLabel_.get(),
+                                         { masterSaveAsInitButton_.get(), masterDeleteInitButton_.get() },
+                                         { metrics.saveAsInitWidth, metrics.deleteInitWidth } });
 }
 
 void SettingsPanel::layoutContent(juce::Rectangle<int> bounds)
@@ -153,6 +196,12 @@ void SettingsPanel::layoutContent(juce::Rectangle<int> bounds)
     metrics.controlHeight = juce::roundToInt(static_cast<float>(kControlHeight_) * uiScale_);
     metrics.separatorHeight = juce::roundToInt(static_cast<float>(kSeparatorHeight_) * uiScale_);
     metrics.comboWidth = juce::roundToInt(static_cast<float>(kComboWidth_) * uiScale_);
+    metrics.buttonGap = juce::roundToInt(static_cast<float>(kButtonGap_) * uiScale_);
+    metrics.utilityLoadWidth = juce::roundToInt(static_cast<float>(kUtilityLoadWidth_) * uiScale_);
+    metrics.utilitySaveAsWidth = juce::roundToInt(static_cast<float>(kUtilitySaveAsWidth_) * uiScale_);
+    metrics.utilityInitWidth = juce::roundToInt(static_cast<float>(kUtilityInitWidth_) * uiScale_);
+    metrics.saveAsInitWidth = juce::roundToInt(static_cast<float>(kSaveAsInitWidth_) * uiScale_);
+    metrics.deleteInitWidth = juce::roundToInt(static_cast<float>(kDeleteInitWidth_) * uiScale_);
 
     layoutPatchSection(bounds, metrics);
     bounds.removeFromTop(metrics.rowGap);
@@ -191,4 +240,10 @@ void SettingsPanel::updateModeSpecificVisibility()
 
     hardwareLatencyLabel_->setVisible(showPluginControls);
     hardwareLatencySlider_->setVisible(showPluginControls);
+}
+
+void SettingsPanel::refreshInitTemplateDeleteEnablement(bool patchInitExists, bool masterInitExists)
+{
+    patchDeleteInitButton_->setEnabled(patchInitExists);
+    masterDeleteInitButton_->setEnabled(masterInitExists);
 }

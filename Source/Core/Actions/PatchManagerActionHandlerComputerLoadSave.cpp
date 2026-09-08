@@ -26,6 +26,9 @@ namespace Core
         if (! pickSaveFile_)
             return;
 
+        if (refuseSaveIfInitSentinelActive())
+            return;
+
         const auto target = pickSaveFile_(resolveDefaultSaveFolder(), resolveSuggestedSaveStem());
 
         if (target.getFullPathName().isEmpty())
@@ -37,6 +40,9 @@ namespace Core
     void PatchManagerActionHandler::handleSavePatchFile()
     {
         if (patchFileService_ == nullptr)
+            return;
+
+        if (refuseSaveIfInitSentinelActive())
             return;
 
         const int selectedId = readComputerPatchesSelectedId();
@@ -317,13 +323,15 @@ namespace Core
             || patchNameSyncer_ == nullptr || sysExEncoder_ == nullptr)
             return;
 
+        if (refuseSaveIfInitSentinelActive())
+            return;
+
         apvtsPatchMapper_->apvtsToBuffer();
-        if (patchNameSyncer_ != nullptr)
-            patchNameSyncer_->apvtsToBuffer();
+        patchNameSyncer_->apvtsToBuffer();
 
         const auto targetWithExt = targetFile.withFileExtension(PatchFileService::kSyxExtension);
-        const auto rawStem = targetWithExt.getFileNameWithoutExtension();
-        const auto matrixStem = PatchFileNameSanitizer::normalizeMatrixSaveStemOrEmpty(rawStem);
+        const auto matrixStem = PatchFileNameSanitizer::normalizeMatrixSaveStemOrEmpty(
+            targetWithExt.getFileNameWithoutExtension());
 
         // Refuse illegal stems at the write boundary (no silent sanitizeFileStem rewrite).
         if (matrixStem.isEmpty())
@@ -332,15 +340,19 @@ namespace Core
             return;
         }
 
+        writeValidatedPatchSyx(targetWithExt, matrixStem);
+    }
+
+    void PatchManagerActionHandler::writeValidatedPatchSyx(const juce::File& targetWithExt,
+                                                           const juce::String& matrixStem)
+    {
         const auto writeTarget =
             targetWithExt.getSiblingFile(PatchFileNameSanitizer::ensureSyxExtension(matrixStem));
         const auto previousName = patchModel_->getName();
         patchModel_->setName(matrixStem);
 
         const auto result = patchFileService_->savePatchSysExFile(
-            writeTarget,
-            patchModel_->data(),
-            *sysExEncoder_);
+            writeTarget, patchModel_->data(), *sysExEncoder_);
 
         if (! result.success)
         {
@@ -440,15 +452,6 @@ namespace Core
     {
         const auto folder = resolveRescanFolder();
         return folder.isDirectory() ? folder : juce::File();
-    }
-
-    juce::String PatchManagerActionHandler::resolveSuggestedSaveStem() const
-    {
-        const auto raw = apvts_.state.getProperty(
-            PluginIDs::PatchEditSection::PatchNameModule::kPatchName,
-            juce::String()).toString();
-
-        return PatchFileNameSanitizer::sanitizeFileStem(raw);
     }
 
     void PatchManagerActionHandler::publishSaveSuccessFooter(const juce::String& fileName)

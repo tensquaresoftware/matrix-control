@@ -61,6 +61,9 @@ namespace Core
         // inline editor to accept/reject typed characters without duplicating the rule.
         static bool isAllowedMatrixChar(juce::juce_wchar character) noexcept;
 
+        // True when the live Patch Name is the post-INIT runtime sentinel (`* INIT *`).
+        static bool isInitPatchNameSentinel(const juce::String& name) noexcept;
+
         static constexpr const char* kEmptyNameFallback = "PATCH";
         static constexpr int kMaxNameLength = 8;
 

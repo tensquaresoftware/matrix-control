@@ -40,6 +40,21 @@ InitTemplateLoadResult MasterModuleInitService::initModule(MasterModuleKind modu
     return result;
 }
 
+InitTemplateLoadResult MasterModuleInitService::initAllModules()
+{
+    MasterModel initTemplate;
+    const auto result = initTemplateLoader_.loadMaster(initTemplate, templatesFolder_());
+
+    copyModuleFromInitTemplate(initTemplate, moduleGroupIdFor(MasterModuleKind::kMidi));
+    copyModuleFromInitTemplate(initTemplate, moduleGroupIdFor(MasterModuleKind::kVibrato));
+    copyModuleFromInitTemplate(initTemplate, moduleGroupIdFor(MasterModuleKind::kMisc));
+
+    apvtsMasterMapper_.bufferToApvts();
+    sysExDispatcher_.dispatchFull();
+
+    return result;
+}
+
 juce::String MasterModuleInitService::moduleGroupIdFor(MasterModuleKind module) noexcept
 {
     using namespace PluginIDs::MasterEditSection;

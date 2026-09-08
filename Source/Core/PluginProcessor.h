@@ -242,6 +242,17 @@ public:
     Core::PatchFileService& getPatchFileService() noexcept { return *patchFileService_; }
     const Core::PatchFileService& getPatchFileService() const noexcept { return *patchFileService_; }
 
+    // Settings — system Init templates and Master utility (message thread).
+    void savePatchAsInitTemplate();
+    void saveMasterAsInitTemplate();
+    void deletePatchInitTemplate();
+    void deleteMasterInitTemplate();
+    bool patchInitTemplateExists() const;
+    bool masterInitTemplateExists() const;
+    void initAllMasterModulesFromTemplate();
+    void loadMasterFromUserFile(const juce::File& file);
+    void saveMasterToUserFile(const juce::File& file);
+
     // Drag-drop one Computer Patches .syx onto the editor (folder → scan → select → load).
     // Reject / success / cancel footers and browser restore are handled in Core.
     void loadDroppedComputerPatchFile(const juce::File& file);
@@ -340,7 +351,6 @@ private:
     void initializeMidiPortProperties();
     void initializeAudioProperties();
     void initializeHardwareLatencyProperty();
-    void initializeInitTemplatesFolderProperty();
     void initializeComputerPatchesFolderProperty();
     void initializeComputerPatchesNamesPolicyProperty();
     void initializeUnsavedStatePolicyProperty();

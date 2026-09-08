@@ -166,11 +166,16 @@ private:
     void openAboutWindow();
     void closeAboutWindow();
     void openMasterInitConfirmDialog(const juce::String& moduleDisplayName, std::function<void()> onConfirm);
+    void openMasterGlobalInitConfirmDialog(std::function<void()> onConfirm);
     void closeMasterInitConfirmDialog();
     void showBankTransferProgressDialog(const BankTransferProgressShowRequest& request);
     void hideBankTransferProgressDialog();
     SettingsPanel* getSettingsPanelIfOpen();
     void wireSettingsPanel(SettingsPanel& panel);
+    void wireSettingsInitAndMasterActions(SettingsPanel& panel);
+    void wireSettingsMasterFileActions(SettingsPanel& panel);
+    void refreshInitTemplateDeleteButtons(SettingsPanel& panel);
+    bool confirmDeleteInitTemplate(const juce::String& bodyMessage);
     void wireHeaderPanel(HeaderPanel& headerPanel);
     void wireHeaderEditorialUndoRedoButtons(HeaderPanel& headerPanel);
     void restoreSettingsPanelFromState(SettingsPanel& panel);

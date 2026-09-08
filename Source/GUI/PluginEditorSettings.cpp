@@ -6,6 +6,7 @@
 
 #include "Core/Services/PatchNameDisplayMode.h"
 #include "GUI/Settings/SettingsPanel.h"
+#include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginIDs.h"
 
 namespace
@@ -88,6 +89,96 @@ void PluginEditor::restoreSettingsPanelFromState(SettingsPanel& panel)
                                PluginIDs::Settings::DeleteWarningPolicy::kDefault,
                                normalizeDeleteWarningPolicy),
         juce::dontSendNotification);
+
+    refreshInitTemplateDeleteButtons(panel);
+}
+
+void PluginEditor::refreshInitTemplateDeleteButtons(SettingsPanel& panel)
+{
+    panel.refreshInitTemplateDeleteEnablement(pluginProcessor.patchInitTemplateExists(),
+                                              pluginProcessor.masterInitTemplateExists());
+}
+
+bool PluginEditor::confirmDeleteInitTemplate(const juce::String& bodyMessage)
+{
+    namespace Dialog = PluginDisplayNames::Dialogs::DeleteInitTemplateConfirm;
+
+    return PluginEditorInternal::showOrderedConfirmAlert({
+               juce::MessageBoxIconType::WarningIcon,
+               Dialog::kTitle,
+               bodyMessage,
+               Dialog::kCancel,
+               Dialog::kDelete,
+               this
+           })
+           == 1;
+}
+
+void PluginEditor::wireSettingsInitAndMasterActions(SettingsPanel& panel)
+{
+    panel.getPatchSaveAsInitButton().onClick = [this, &panel]
+    {
+        pluginProcessor.savePatchAsInitTemplate();
+        refreshInitTemplateDeleteButtons(panel);
+    };
+
+    panel.getMasterSaveAsInitButton().onClick = [this, &panel]
+    {
+        pluginProcessor.saveMasterAsInitTemplate();
+        refreshInitTemplateDeleteButtons(panel);
+    };
+
+    panel.getPatchDeleteInitButton().onClick = [this, &panel]
+    {
+        if (! confirmDeleteInitTemplate(PluginDisplayNames::Dialogs::DeleteInitTemplateConfirm::kBodyPatch))
+            return;
+
+        pluginProcessor.deletePatchInitTemplate();
+        refreshInitTemplateDeleteButtons(panel);
+    };
+
+    panel.getMasterDeleteInitButton().onClick = [this, &panel]
+    {
+        if (! confirmDeleteInitTemplate(PluginDisplayNames::Dialogs::DeleteInitTemplateConfirm::kBodyMaster))
+            return;
+
+        pluginProcessor.deleteMasterInitTemplate();
+        refreshInitTemplateDeleteButtons(panel);
+    };
+
+    panel.getMasterInitButton().onClick = [this]
+    {
+        openMasterGlobalInitConfirmDialog([this]
+        {
+            pluginProcessor.initAllMasterModulesFromTemplate();
+        });
+    };
+
+    wireSettingsMasterFileActions(panel);
+}
+
+void PluginEditor::wireSettingsMasterFileActions(SettingsPanel& panel)
+{
+    panel.getMasterLoadButton().onClick = [this]
+    {
+        const auto file = PluginEditorInternal::browseForFileToOpenSync(
+            this, PluginDisplayNames::Settings::kLoadMasterDialogTitle, {}, "*.syx");
+
+        if (file.getFullPathName().isNotEmpty())
+            pluginProcessor.loadMasterFromUserFile(file);
+    };
+
+    panel.getMasterSaveAsButton().onClick = [this]
+    {
+        const auto file = PluginEditorInternal::browseForFileToSaveSync(
+            this,
+            PluginDisplayNames::Settings::kSaveMasterAsDialogTitle,
+            juce::File().getChildFile("Master.syx"),
+            "*.syx");
+
+        if (file.getFullPathName().isNotEmpty())
+            pluginProcessor.saveMasterToUserFile(file);
+    };
 }
 
 void PluginEditor::wireSettingsPanel(SettingsPanel& panel)
@@ -143,4 +234,6 @@ void PluginEditor::wireSettingsPanel(SettingsPanel& panel)
         pluginProcessor.getApvts().state.setProperty(
             PluginIDs::Settings::kDeleteWarningPolicy, selectedId, nullptr);
     };
+
+    wireSettingsInitAndMasterActions(panel);
 }

@@ -135,6 +135,7 @@ set(PLUGIN_SOURCES
     Source/Core/PluginProcessor.cpp
     Source/Core/PluginProcessorAudio.cpp
     Source/Core/PluginProcessorClipboard.cpp
+    Source/Core/PluginProcessorInitTemplates.cpp
     Source/Core/PluginProcessorConstruction.cpp
     Source/Core/PluginProcessorGates.cpp
     Source/Core/PluginProcessorMidiPorts.cpp
@@ -149,6 +150,7 @@ set(PLUGIN_SOURCES
     Source/Core/MIDI/KeyboardFromMidiInput.cpp
     Source/Core/Init/InitDefaults.cpp
     Source/Core/Init/InitTemplateLoader.cpp
+    Source/Core/Init/InitTemplateWriter.cpp
     Source/Core/Init/MasterModuleInitService.cpp
     Source/Core/Init/PatchModuleInitService.cpp
     Source/Core/Init/PatchInitService.cpp
@@ -198,6 +200,7 @@ set(PLUGIN_SOURCES
     Source/Core/Actions/PatchManagerActionHandler.cpp
     Source/Core/Actions/PatchManagerActionHandlerSnapshot.cpp
     Source/Core/Actions/PatchManagerActionHandlerInternalPatches.cpp
+    Source/Core/Actions/PatchManagerActionHandlerInitSentinel.cpp
     Source/Core/Actions/PatchManagerActionHandlerHeaderClick.cpp
     Source/Core/Actions/PatchManagerActionHandlerComputerBrowser.cpp
     Source/Core/Actions/PatchManagerActionHandlerComputerLoadSave.cpp
@@ -459,6 +462,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/LockDimmingFilmPolicyTests.cpp
         Tests/Unit/InitDefaultsTests.cpp
         Tests/Unit/InitTemplateLoaderTests.cpp
+        Tests/Unit/InitTemplateWriterTests.cpp
         Tests/Unit/ApvtsPatchMapperTests.cpp
         Tests/Unit/PluginVersionTests.cpp
         Tests/Unit/PatchNameSyncerTests.cpp
@@ -545,6 +549,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Shared/Definitions/PluginDescriptorsPatchManager.cpp
         Source/Core/Init/InitDefaults.cpp
         Source/Core/Init/InitTemplateLoader.cpp
+        Source/Core/Init/InitTemplateWriter.cpp
         Source/Core/Init/MasterModuleInitService.cpp
         Source/Core/Init/PatchModuleInitService.cpp
         Source/Core/Init/PatchInitService.cpp
@@ -595,6 +600,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/Actions/PatchManagerActionHandler.cpp
         Source/Core/Actions/PatchManagerActionHandlerSnapshot.cpp
         Source/Core/Actions/PatchManagerActionHandlerInternalPatches.cpp
+        Source/Core/Actions/PatchManagerActionHandlerInitSentinel.cpp
         Source/Core/Actions/PatchManagerActionHandlerHeaderClick.cpp
         Source/Core/Actions/PatchManagerActionHandlerComputerBrowser.cpp
         Source/Core/Actions/PatchManagerActionHandlerComputerLoadSave.cpp

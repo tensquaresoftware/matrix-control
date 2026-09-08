@@ -103,7 +103,13 @@ namespace PluginDisplayNames
         constexpr const char* kUnsavedStateLabel       = "UNSAVED STATE";
         constexpr const char* kDeleteWarningLabel      = "DELETE WARNING";
         constexpr const char* kDefragHistoryLabel      = "DEFRAG HISTORY";
-        constexpr const char* kMasterOperationsLabel   = "MASTER OPERATIONS";
+        constexpr const char* kInitTemplateLabel       = "INIT TEMPLATE";
+        constexpr const char* kUtilityLabel            = "UTILITY";
+        constexpr const char* kSaveAsInitButton        = "SAVE AS INIT";
+        constexpr const char* kDeleteButton            = "DELETE";
+        constexpr const char* kLoadButton              = "LOAD";
+        constexpr const char* kSaveAsButton            = "SAVE AS";
+        constexpr const char* kInitButton              = "INIT";
         constexpr const char* kComingSoon              = "Coming soon...";
         constexpr const char* kDisplaySysexNames       = "DISPLAY SYSEX NAMES";
         constexpr const char* kDisplayFileNames        = "DISPLAY FILE NAMES";
@@ -112,6 +118,29 @@ namespace PluginDisplayNames
         constexpr const char* kNeverWarn               = "NEVER WARN";
         constexpr const char* kDisplayMusicalNames     = "DISPLAY MUSICAL NAMES";
         constexpr const char* kDisplayHardwareNames    = "DISPLAY HARDWARE NAMES";
+        constexpr const char* kLoadMasterDialogTitle   = "Load Master";
+        constexpr const char* kSaveMasterAsDialogTitle = "Save Master As";
+
+        namespace FooterMessages
+        {
+            constexpr const char* kPatchInitTemplateSaved =
+                "Patch init template saved (PatchInit.syx)";
+            constexpr const char* kMasterInitTemplateSaved =
+                "Master init template saved (MasterInit.syx)";
+            constexpr const char* kInitTemplateWriteFailed =
+                "Could not write init template";
+            constexpr const char* kPatchInitTemplateDeleted =
+                "Patch init template deleted (PatchInit.syx)";
+            constexpr const char* kMasterInitTemplateDeleted =
+                "Master init template deleted (MasterInit.syx)";
+            constexpr const char* kInitTemplateDeleteFailed =
+                "Could not delete init template";
+            constexpr const char* kMasterLoaded = "Master loaded";
+            constexpr const char* kMasterSaved = "Master saved";
+            constexpr const char* kMasterFileFailed = "Master file failed";
+            constexpr const char* kRenameBeforeSave =
+                "Rename patch (replace * INIT *) before SAVE / SAVE AS";
+        }
     }
 
     namespace Dialogs
@@ -170,6 +199,16 @@ namespace PluginDisplayNames
             constexpr const char* kCancel  = "Cancel";
         }
 
+        namespace MasterGlobalInitConfirm
+        {
+            constexpr const char* kTitle = "RESET ALL MASTER MODULES?";
+            constexpr const char* kBody =
+                "This will reset MIDI, VIBRATO, and MISC to the Master init template "
+                "(or built-in defaults) and send a full master SysEx to the synth.";
+            constexpr const char* kConfirm = "Reset";
+            constexpr const char* kCancel  = "Cancel";
+        }
+
         namespace MutatorHistoryDefrag
         {
             constexpr const char* kTitle = "Mutation history full";
@@ -200,6 +239,21 @@ namespace PluginDisplayNames
             constexpr const char* kCancel        = "Cancel";
             constexpr const char* kDelete        = "Delete";
             constexpr const char* kDontAskAgain  = "Don't ask again";
+        }
+
+        namespace DeleteInitTemplateConfirm
+        {
+            constexpr const char* kTitle = "Delete init template?";
+            constexpr const char* kBodyPatch =
+                "This removes the system Patch init template (PatchInit.syx).\n"
+                "The next Patch INIT will use the built-in defaults.\n\n"
+                "DELETE to remove it, or Cancel to keep the file.";
+            constexpr const char* kBodyMaster =
+                "This removes the system Master init template (MasterInit.syx).\n"
+                "The next Master INIT will use the built-in defaults.\n\n"
+                "DELETE to remove it, or Cancel to keep the file.";
+            constexpr const char* kCancel = "Cancel";
+            constexpr const char* kDelete = "DELETE";
         }
 
         namespace BankImportConfirm
@@ -949,9 +1003,10 @@ namespace PluginDisplayNames
             {
                 // Patch names are 8 characters long in the Oberheim Matrix-1000 :
                 constexpr const char* kDefaultPatchName = "--------";
-                // Assigned after full-patch INIT when the template name is blank — distinct from
+                // Runtime sentinel after Internal Patches INIT (8 chars). Not Matrix-legal for
+                // Computer Patches Save / Save As — user must rename first. Distinct from
                 // session-idle kDefaultPatchName and from Mutator Compare secondary "INITIAL".
-                constexpr const char* kInitPatchName = "INIT";
+                constexpr const char* kInitPatchName = "* INIT *";
                 // Secondary line literal while Compare is active — distinct from the Mxx / Mxx-Ryy
                 // Mutator history labels used the rest of the time.
                 constexpr const char* kCompareSecondaryLabel = "INITIAL";

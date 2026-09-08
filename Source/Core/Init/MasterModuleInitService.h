@@ -29,6 +29,8 @@ namespace Core
                                 TemplatesFolderSupplier templatesFolder);
 
         InitTemplateLoadResult initModule(MasterModuleKind module);
+        // Resets MIDI + VIBRATO + MISC from MasterInit.syx (or InitDefaults) and sends full SysEx.
+        InitTemplateLoadResult initAllModules();
 
     private:
         static juce::String moduleGroupIdFor(MasterModuleKind module) noexcept;

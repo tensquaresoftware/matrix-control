@@ -115,6 +115,30 @@ juce::File browseForFileToSaveSync(juce::Component* associatedComponent,
     return chooser.getResult();
 }
 
+juce::File browseForFileToOpenSync(juce::Component* associatedComponent,
+                                   const juce::String& dialogTitle,
+                                   const juce::File& startDirectory,
+                                   const juce::String& filePatterns)
+{
+    const juce::Component::SafePointer<juce::Component> safe(associatedComponent);
+    raiseUiBeforeModalDialog(safe.getComponent());
+
+    juce::FileChooser chooser(dialogTitle,
+                              startDirectory,
+                              filePatterns,
+                              true,
+                              false,
+                              safe.getComponent());
+
+    const bool ok = chooser.browseForFileToOpen();
+    raiseUiBeforeModalDialog(safe.getComponent());
+
+    if (! ok)
+        return {};
+
+    return chooser.getResult();
+}
+
 /** Visual LTR: Cancel -> [middle] -> primary (rightmost = default).
     Semantic codes (stable across platforms): Cancel/Escape/OOR -> 0, primary -> 1, middle -> 2.
 

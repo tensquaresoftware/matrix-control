@@ -1,5 +1,7 @@
 #include "Core/Services/PatchFileNameSanitizer.h"
 
+#include "Shared/Definitions/PluginDisplayNames.h"
+
 namespace Core
 {
 
@@ -190,6 +192,12 @@ namespace Core
             || character == ' '
             || character == '-'
             || character == '_';
+    }
+
+    bool PatchFileNameSanitizer::isInitPatchNameSentinel(const juce::String& name) noexcept
+    {
+        using PluginDisplayNames::PatchEditSection::PatchNameModule::StandaloneWidgets::kInitPatchName;
+        return name == juce::String(kInitPatchName);
     }
 
 } // namespace Core

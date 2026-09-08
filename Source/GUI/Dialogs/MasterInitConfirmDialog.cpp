@@ -35,7 +35,16 @@ MasterInitConfirmDialog::~MasterInitConfirmDialog() = default;
 void MasterInitConfirmDialog::prepareForShow(const juce::String& moduleDisplayName,
                                              std::function<void()> onConfirm)
 {
+    globalReset_ = false;
     moduleDisplayName_ = moduleDisplayName;
+    onConfirm_ = std::move(onConfirm);
+    repaint();
+}
+
+void MasterInitConfirmDialog::prepareForGlobalShow(std::function<void()> onConfirm)
+{
+    globalReset_ = true;
+    moduleDisplayName_.clear();
     onConfirm_ = std::move(onConfirm);
     repaint();
 }
@@ -74,6 +83,9 @@ juce::Rectangle<int> MasterInitConfirmDialog::getDialogBounds() const
 
 juce::String MasterInitConfirmDialog::formatBodyText() const
 {
+    if (globalReset_)
+        return PluginDisplayNames::Dialogs::MasterGlobalInitConfirm::kBody;
+
     return juce::String(PluginDisplayNames::Dialogs::MasterInitConfirm::kBodyTemplate)
         .replace("{MODULE}", moduleDisplayName_);
 }
@@ -113,7 +125,8 @@ void MasterInitConfirmDialog::paint(juce::Graphics& g)
 
     g.setColour(skin_->getColour(SkinColourId::kDarkPanelText));
     g.setFont(skin_->getBaseFontBold().withHeight(skin_->getBaseFontBold().getHeight() * uiScale_));
-    g.drawText(PluginDisplayNames::Dialogs::MasterInitConfirm::kTitle,
+    g.drawText(globalReset_ ? PluginDisplayNames::Dialogs::MasterGlobalInitConfirm::kTitle
+                            : PluginDisplayNames::Dialogs::MasterInitConfirm::kTitle,
                titleBar,
                juce::Justification::centred,
                false);

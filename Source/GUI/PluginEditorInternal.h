@@ -48,6 +48,12 @@ namespace PluginEditorInternal
                                        const juce::File& startFileOrDirectory,
                                        const juce::String& filePatterns);
 
+    /** Raise → sync native open FileChooser → raise. Empty File if cancelled. */
+    juce::File browseForFileToOpenSync(juce::Component* associatedComponent,
+                                       const juce::String& dialogTitle,
+                                       const juce::File& startDirectory,
+                                       const juce::String& filePatterns);
+
     // ---- Mutator Delete confirm with an optional "Don't ask again" checkbox. ----
     struct MutatorDeleteConfirmResult
     {

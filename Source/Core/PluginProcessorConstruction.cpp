@@ -28,6 +28,7 @@
 #include "Core/Models/PatchNameSyncer.h"
 #include "Core/Services/ClipboardService.h"
 #include "Core/Services/DirtyPatchTracker.h"
+#include "Shared/ProjectPaths.h"
 #include "Core/Services/PatchFileService.h"
 #include "Core/Services/PatchMutator/PatchMutatorEngine.h"
 #include "MIDI/MidiManager.h"
@@ -79,33 +80,29 @@ void PluginProcessor::createSysExDispatchers()
 void PluginProcessor::createInitAndFileServices()
 {
     initTemplateLoader_ = std::make_unique<Core::InitTemplateLoader>(*sysExDecoder_);
+    const auto fixedInitTemplatesFolder = []()
+    {
+        return ProjectPaths::getInitTemplatesDirectory();
+    };
+
     masterModuleInitService_ = std::make_unique<Core::MasterModuleInitService>(
         *masterModel_,
         *apvtsMasterMapper_,
         *initTemplateLoader_,
         *masterParameterSysExDispatcher_,
-        [this]()
-        {
-            return juce::File(apvts.state.getProperty(PluginIDs::Settings::kInitTemplatesFolderPath).toString());
-        });
+        fixedInitTemplatesFolder);
 
     patchModuleInitService_ = std::make_unique<Core::PatchModuleInitService>(
         *patchModel_,
         *apvtsPatchMapper_,
         *initTemplateLoader_,
         *patchParameterSysExDispatcher_,
-        [this]()
-        {
-            return juce::File(apvts.state.getProperty(PluginIDs::Settings::kInitTemplatesFolderPath).toString());
-        });
+        fixedInitTemplatesFolder);
 
     patchInitService_ = std::make_unique<Core::PatchInitService>(
         *patchModel_,
         *initTemplateLoader_,
-        [this]()
-        {
-            return juce::File(apvts.state.getProperty(PluginIDs::Settings::kInitTemplatesFolderPath).toString());
-        });
+        fixedInitTemplatesFolder);
 
     patchSelectionMidiSync_ = std::make_unique<Core::PatchSelectionMidiSync>(midiManager.get());
 }
@@ -289,7 +286,6 @@ void PluginProcessor::finishConstructionSetup()
     initializeMidiPortProperties();
     initializeAudioProperties();
     initializeHardwareLatencyProperty();
-    initializeInitTemplatesFolderProperty();
     initializeComputerPatchesFolderProperty();
     initializeComputerPatchesNamesPolicyProperty();
     initializeUnsavedStatePolicyProperty();

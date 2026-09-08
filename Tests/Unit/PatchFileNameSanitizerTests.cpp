@@ -26,6 +26,7 @@ public:
         resolvePatchNameOrBankPatchFallback_keepsUsableNames();
         nameFromBankExportStem_extractsNameAfterSlot();
         isOberheimBankPlaceholderName_detectsBnkPattern();
+        isInitPatchNameSentinel_matchesRuntimeLiteral();
     }
 
 private:
@@ -245,6 +246,17 @@ private:
         expect(Core::PatchFileNameSanitizer::isOberheimBankPlaceholderName("bnk0:00"));
         expect(! Core::PatchFileNameSanitizer::isOberheimBankPlaceholderName("GOODTIME"));
         expect(! Core::PatchFileNameSanitizer::isOberheimBankPlaceholderName(""));
+    }
+
+    void isInitPatchNameSentinel_matchesRuntimeLiteral()
+    {
+        beginTest("isInitPatchNameSentinel_matchesRuntimeLiteral");
+
+        expect(Core::PatchFileNameSanitizer::isInitPatchNameSentinel("* INIT *"));
+        expect(! Core::PatchFileNameSanitizer::isInitPatchNameSentinel("INIT"));
+        expect(! Core::PatchFileNameSanitizer::isInitPatchNameSentinel("--------"));
+        expect(! Core::PatchFileNameSanitizer::isInitPatchNameSentinel("*INIT*"));
+        expect(! Core::PatchFileNameSanitizer::isExactMatrixFileStem("* INIT *"));
     }
 };
 

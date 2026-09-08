@@ -173,6 +173,36 @@ void PluginEditor::openMasterInitConfirmDialog(const juce::String& moduleDisplay
     masterInitConfirmDialog_->grabKeyboardFocus();
 }
 
+void PluginEditor::openMasterGlobalInitConfirmDialog(std::function<void()> onConfirm)
+{
+    closeSettingsWindow();
+    closeAboutWindow();
+
+    if (masterInitConfirmDialog_ == nullptr)
+    {
+        masterInitConfirmDialog_ = std::make_unique<MasterInitConfirmDialog>(
+            *skin_,
+            [this] { closeMasterInitConfirmDialog(); });
+        addChildComponent(*masterInitConfirmDialog_);
+    }
+    else
+    {
+        masterInitConfirmDialog_->setSkin(*skin_);
+    }
+
+    masterInitConfirmDialog_->prepareForGlobalShow(std::move(onConfirm));
+
+    const int baseWidth = layoutDimensions_.editor.width;
+    const float uiScale = (baseWidth > 0)
+        ? TSS::ScaledLayout::uiScaleFromEditorBounds(getWidth(), baseWidth)
+        : 1.0f;
+    updateMasterInitConfirmDialogLayout(uiScale);
+
+    masterInitConfirmDialog_->setVisible(true);
+    masterInitConfirmDialog_->toFront(true);
+    masterInitConfirmDialog_->grabKeyboardFocus();
+}
+
 void PluginEditor::closeMasterInitConfirmDialog()
 {
     if (masterInitConfirmDialog_ != nullptr)

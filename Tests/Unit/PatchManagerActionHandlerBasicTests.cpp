@@ -17,8 +17,8 @@ public:
         testInitLoadsTemplateAndBufferToApvts();
         testInitBlankTemplate_assignsInitPatchName();
         testInitBlankCustomTemplate_assignsInitPatchName();
-        testInitNamedTemplate_preservesTemplateName();
-        testInitDefaultDashNameTemplate_preserved();
+        testInitNamedTemplate_forcesInitSentinel();
+        testInitDefaultDashNameTemplate_forcesInitSentinel();
         testInitMatrix1000_sendsEditBuffer();
         testInitMatrix6_sendsPatchToCurrentSlot();
         testInitRomBankBlocked();
@@ -200,10 +200,11 @@ private:
         tempDir.deleteRecursively();
     }
 
-    void testInitNamedTemplate_preservesTemplateName()
+    void testInitNamedTemplate_forcesInitSentinel()
     {
-        beginTest("init_namedTemplate_preservesTemplateName");
+        beginTest("init_namedTemplate_forcesInitSentinel");
 
+        using PluginDisplayNames::PatchEditSection::PatchNameModule::StandaloneWidgets::kInitPatchName;
         using PluginIDs::PatchEditSection::PatchNameModule::kPatchName;
 
         const auto tempDir = createTempInitTemplatesDir();
@@ -215,17 +216,19 @@ private:
         if (wrote)
             harness.handler.handleAction(InternalPatches::kInitPatch, juce::var());
 
-        expectEquals(harness.model.getName(), juce::String("MYINIT"));
-        expectEquals(harness.proc.apvts.state.getProperty(kPatchName).toString(), juce::String("MYINIT"));
+        expectEquals(harness.model.getName(), juce::String(kInitPatchName));
+        expectEquals(harness.proc.apvts.state.getProperty(kPatchName).toString(),
+                     juce::String(kInitPatchName));
 
         tempDir.deleteRecursively();
     }
 
-    void testInitDefaultDashNameTemplate_preserved()
+    void testInitDefaultDashNameTemplate_forcesInitSentinel()
     {
-        beginTest("init_defaultDashNameTemplate_preserved");
+        beginTest("init_defaultDashNameTemplate_forcesInitSentinel");
 
         using PluginDisplayNames::PatchEditSection::PatchNameModule::StandaloneWidgets::kDefaultPatchName;
+        using PluginDisplayNames::PatchEditSection::PatchNameModule::StandaloneWidgets::kInitPatchName;
         using PluginIDs::PatchEditSection::PatchNameModule::kPatchName;
 
         const auto tempDir = createTempInitTemplatesDir();
@@ -237,9 +240,9 @@ private:
         if (wrote)
             harness.handler.handleAction(InternalPatches::kInitPatch, juce::var());
 
-        expectEquals(harness.model.getName(), juce::String(kDefaultPatchName));
+        expectEquals(harness.model.getName(), juce::String(kInitPatchName));
         expectEquals(harness.proc.apvts.state.getProperty(kPatchName).toString(),
-                     juce::String(kDefaultPatchName));
+                     juce::String(kInitPatchName));
 
         tempDir.deleteRecursively();
     }

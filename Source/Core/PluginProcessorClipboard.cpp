@@ -371,12 +371,6 @@ void PluginProcessor::initializeHardwareLatencyProperty()
     syncHardwareLatencyFromState();
 }
 
-void PluginProcessor::initializeInitTemplatesFolderProperty()
-{
-    if (!apvts.state.hasProperty(PluginIDs::Settings::kInitTemplatesFolderPath))
-        apvts.state.setProperty(PluginIDs::Settings::kInitTemplatesFolderPath, juce::String(), nullptr);
-}
-
 void PluginProcessor::initializeComputerPatchesFolderProperty()
 {
     if (!apvts.state.hasProperty(

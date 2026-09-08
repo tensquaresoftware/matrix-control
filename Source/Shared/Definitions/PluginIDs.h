@@ -15,6 +15,8 @@ namespace PluginIDs
         constexpr const char* kGuiScale = "settingsGuiScale";
         constexpr const char* kSkinVariant = "settingsSkinVariant";
         constexpr const char* kHardwareLatencyMs = "settingsHardwareLatencyMs";
+        // Legacy session property — no longer used for live Init resolve (fixed app-data Init/).
+        // Kept so older sessions that persist this key still load cleanly.
         constexpr const char* kInitTemplatesFolderPath = "settingsInitTemplatesFolderPath";
         constexpr const char* kTestWidget = "settingsTestWidget";
         // Persistence keys keep historical string values for session compatibility.

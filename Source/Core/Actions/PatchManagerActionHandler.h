@@ -353,11 +353,14 @@ namespace Core
         bool performUnsavedGatePersistAction(UnsavedEditPersistKind persistKind);
         bool didUnsavedGatePersistSucceed(UnsavedEditPersistKind persistKind) const;
         void saveCurrentPatchToFile(const juce::File& targetFile);
+        void writeValidatedPatchSyx(const juce::File& targetWithExt, const juce::String& matrixStem);
         void completeSuccessfulSave(const juce::File& savedFile);
         void rescanAndSelectSavedFile(const juce::String& savedFileName);
         juce::File resolveRescanFolder() const;
         juce::File resolveDefaultSaveFolder() const;
         juce::String resolveSuggestedSaveStem() const;
+        bool isInitPatchNameSentinelActive() const;
+        bool refuseSaveIfInitSentinelActive();
         void scanAndPublishFolder(const juce::File& folder);
         void clearPublishedScanCache();
         void bumpScanRevision();

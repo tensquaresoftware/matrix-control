@@ -1445,3 +1445,31 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-syx-drag-drop-load.md`
   summary: Reconfirmed — successful drop may flash scan-summary footer before load success.
   evidence: Same as 2026-09-07 entry; Open-parity; still deferred.
+
+## Deferred from: spec-system-init-syx-filenames.md (2026-09-08)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-system-init-syx-filenames.md`
+  summary: User manual still does not spell the full OS Application Support path to the system Init/ folder.
+  evidence: Product intent hides the folder; documenting the exact path is support/docs polish deferred from this Build.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-system-init-syx-filenames.md`
+  summary: Decision-log D-042 still mentions a stale “Reset all Master to default” mockup label wording.
+  evidence: Chrome locked to UTILITY/INIT; D-034/D-035 updated this Build; D-042 hygiene left for a docs pass.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-system-init-syx-filenames.md`
+  summary: openMasterGlobalInitConfirmDialog duplicates openMasterInitConfirmDialog layout/focus wiring.
+  evidence: Both work; shared helper would be a follow-up DRY cleanup, not required for acceptance.
+
+## Deferred from: spec-settings-delete-init-template.md (2026-09-08)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-settings-delete-init-template.md`
+  summary: SAVE AS INIT still returns silently with no footer when required processor dependencies are null.
+  evidence: Pre-existing prior SAVE AS INIT path in the same dirty tree; not introduced by DELETE.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-settings-delete-init-template.md`
+  summary: Live fixed Init/ no-arg Writer/service resolve path is not covered by an AppData round-trip test.
+  evidence: Pre-existing SAVE AS INIT verification gap; DELETE logic is covered via injectable tempDir overloads.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-settings-delete-init-template.md`
+  summary: Master LOAD via loadMasterFromUserFile has no unit test that a failed load leaves MasterModel bytes unchanged.
+  evidence: Master UTILITY LOAD from prior SAVE AS INIT story; out of DELETE scope.

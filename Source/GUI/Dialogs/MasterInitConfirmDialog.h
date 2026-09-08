@@ -20,6 +20,7 @@ public:
     ~MasterInitConfirmDialog() override;
 
     void prepareForShow(const juce::String& moduleDisplayName, std::function<void()> onConfirm);
+    void prepareForGlobalShow(std::function<void()> onConfirm);
 
     void setSkin(TSS::ISkin& skin);
     void setUiScale(float uiScale);
@@ -40,6 +41,7 @@ private:
     std::function<void()> onConfirm_;
     TSS::ISkin* skin_;
     juce::String moduleDisplayName_;
+    bool globalReset_ = false;
     float uiScale_ = 1.0f;
 
     juce::TextButton resetButton_;

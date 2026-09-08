@@ -8,9 +8,6 @@
 #include "Core/Models/PatchModel.h"
 #include "Core/Services/ClipboardService.h"
 #include "Core/Services/DirtyPatchTracker.h"
-#include "Shared/Definitions/PluginDisplayNames.h"
-#include "Shared/Definitions/PluginIDs.h"
-
 #include "Core/MIDI/PatchSelectionMidiSync.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginIDs.h"
@@ -20,9 +17,9 @@ namespace Core
 
     namespace
     {
-        void assignInitPatchNameIfBlank(PatchModel* patchModel)
+        void assignInitPatchNameSentinel(PatchModel* patchModel)
         {
-            if (patchModel == nullptr || ! patchModel->getName().isEmpty())
+            if (patchModel == nullptr)
                 return;
 
             using PluginDisplayNames::PatchEditSection::PatchNameModule::StandaloneWidgets::kInitPatchName;
@@ -414,7 +411,7 @@ namespace Core
         clearLastDeviceDumpRawName();
 
         const auto result = patchInitService_->initFullPatch();
-        assignInitPatchNameIfBlank(patchModel_);
+        assignInitPatchNameSentinel(patchModel_);
 
         noteDevicePatchOrigin(getCurrentBank(limits), getCurrentPatch(limits));
 

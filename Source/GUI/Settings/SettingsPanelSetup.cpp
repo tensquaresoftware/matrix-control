@@ -19,6 +19,11 @@ std::unique_ptr<TSS::ComboBox> SettingsPanel::makeCombo(TSS::ISkin& skin, int wi
     return std::make_unique<TSS::ComboBox>(width, kControlHeight_, TSS::comboBoxLookFromSkin(skin));
 }
 
+std::unique_ptr<TSS::Button> SettingsPanel::makeButton(TSS::ISkin& skin, int width, const juce::String& text)
+{
+    return std::make_unique<TSS::Button>(width, kControlHeight_, TSS::buttonLookFromSkin(skin), text);
+}
+
 std::unique_ptr<TSS::HorizontalSeparator> SettingsPanel::makeSeparator(TSS::ISkin& skin)
 {
     return std::make_unique<TSS::HorizontalSeparator>(
@@ -37,6 +42,12 @@ void SettingsPanel::setupPatchSection(TSS::ISkin& skin)
     computerPatchesCombo_ = makeCombo(skin, kComboWidth_);
     unsavedStateLabel_ = makeLabel(skin, kLabelWidth_, PluginDisplayNames::Settings::kUnsavedStateLabel);
     unsavedStateCombo_ = makeCombo(skin, kComboWidth_);
+    patchInitTemplateLabel_ =
+        makeLabel(skin, kLabelWidth_, PluginDisplayNames::Settings::kInitTemplateLabel);
+    patchSaveAsInitButton_ =
+        makeButton(skin, kSaveAsInitWidth_, PluginDisplayNames::Settings::kSaveAsInitButton);
+    patchDeleteInitButton_ =
+        makeButton(skin, kDeleteInitWidth_, PluginDisplayNames::Settings::kDeleteButton);
 
     addAndMakeVisible(*patchSectionLabel_);
     addAndMakeVisible(*patchSectionSeparator_);
@@ -46,6 +57,9 @@ void SettingsPanel::setupPatchSection(TSS::ISkin& skin)
     addAndMakeVisible(*computerPatchesCombo_);
     addAndMakeVisible(*unsavedStateLabel_);
     addAndMakeVisible(*unsavedStateCombo_);
+    addAndMakeVisible(*patchInitTemplateLabel_);
+    addAndMakeVisible(*patchSaveAsInitButton_);
+    addAndMakeVisible(*patchDeleteInitButton_);
 }
 
 void SettingsPanel::setupPatchMutatorSection(TSS::ISkin& skin)
@@ -86,17 +100,29 @@ void SettingsPanel::setupMasterSection(TSS::ISkin& skin)
             {},
             {},
             {}});
-    masterOperationsLabel_ =
-        makeLabel(skin, kLabelWidth_, PluginDisplayNames::Settings::kMasterOperationsLabel);
-    masterOperationsPlaceholder_ =
-        makeLabel(skin, kComboWidth_, PluginDisplayNames::Settings::kComingSoon);
+    masterUtilityLabel_ = makeLabel(skin, kLabelWidth_, PluginDisplayNames::Settings::kUtilityLabel);
+    masterLoadButton_ = makeButton(skin, kUtilityLoadWidth_, PluginDisplayNames::Settings::kLoadButton);
+    masterSaveAsButton_ =
+        makeButton(skin, kUtilitySaveAsWidth_, PluginDisplayNames::Settings::kSaveAsButton);
+    masterInitButton_ = makeButton(skin, kUtilityInitWidth_, PluginDisplayNames::Settings::kInitButton);
+    masterInitTemplateLabel_ =
+        makeLabel(skin, kLabelWidth_, PluginDisplayNames::Settings::kInitTemplateLabel);
+    masterSaveAsInitButton_ =
+        makeButton(skin, kSaveAsInitWidth_, PluginDisplayNames::Settings::kSaveAsInitButton);
+    masterDeleteInitButton_ =
+        makeButton(skin, kDeleteInitWidth_, PluginDisplayNames::Settings::kDeleteButton);
 
     addAndMakeVisible(*masterSectionLabel_);
     addAndMakeVisible(*masterSectionSeparator_);
     addAndMakeVisible(*hardwareLatencyLabel_);
     addAndMakeVisible(*hardwareLatencySlider_);
-    addAndMakeVisible(*masterOperationsLabel_);
-    addAndMakeVisible(*masterOperationsPlaceholder_);
+    addAndMakeVisible(*masterUtilityLabel_);
+    addAndMakeVisible(*masterLoadButton_);
+    addAndMakeVisible(*masterSaveAsButton_);
+    addAndMakeVisible(*masterInitButton_);
+    addAndMakeVisible(*masterInitTemplateLabel_);
+    addAndMakeVisible(*masterSaveAsInitButton_);
+    addAndMakeVisible(*masterDeleteInitButton_);
 }
 
 void SettingsPanel::populateComboItems()
@@ -136,6 +162,7 @@ void SettingsPanel::applyChildLooks(TSS::ISkin& skin)
     const auto labelLook = TSS::labelLookFromSkin(skin);
     const auto separatorLook = TSS::horizontalSeparatorLookFromSkin(skin);
     const auto comboLook = TSS::comboBoxLookFromSkin(skin);
+    const auto buttonLook = TSS::buttonLookFromSkin(skin);
 
     patchSectionLabel_->setLook(labelLook);
     patchSectionSeparator_->setLook(separatorLook);
@@ -145,6 +172,9 @@ void SettingsPanel::applyChildLooks(TSS::ISkin& skin)
     computerPatchesCombo_->setLook(comboLook);
     unsavedStateLabel_->setLook(labelLook);
     unsavedStateCombo_->setLook(comboLook);
+    patchInitTemplateLabel_->setLook(labelLook);
+    patchSaveAsInitButton_->setLook(buttonLook);
+    patchDeleteInitButton_->setLook(buttonLook);
 
     patchMutatorSectionLabel_->setLook(labelLook);
     patchMutatorSectionSeparator_->setLook(separatorLook);
@@ -157,8 +187,13 @@ void SettingsPanel::applyChildLooks(TSS::ISkin& skin)
     masterSectionSeparator_->setLook(separatorLook);
     hardwareLatencyLabel_->setLook(labelLook);
     hardwareLatencySlider_->setLook(TSS::sliderLookFromSkin(skin));
-    masterOperationsLabel_->setLook(labelLook);
-    masterOperationsPlaceholder_->setLook(labelLook);
+    masterUtilityLabel_->setLook(labelLook);
+    masterLoadButton_->setLook(buttonLook);
+    masterSaveAsButton_->setLook(buttonLook);
+    masterInitButton_->setLook(buttonLook);
+    masterInitTemplateLabel_->setLook(labelLook);
+    masterSaveAsInitButton_->setLook(buttonLook);
+    masterDeleteInitButton_->setLook(buttonLook);
 
     applyComboPopupLooks(skin);
 }

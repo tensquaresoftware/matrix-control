@@ -109,6 +109,20 @@ namespace Core
         return loadMasterFromFile(model, file);
     }
 
+    InitTemplateLoadResult InitTemplateLoader::loadMasterFile(MasterModel& model,
+                                                              const juce::File& file) const
+    {
+        if (! file.existsAsFile())
+        {
+            return makeFallbackResult(InitTemplateKind::kMaster,
+                                      InitTemplateFallbackReason::kFileMissing,
+                                      InitDefaults::masterData(),
+                                      model);
+        }
+
+        return loadMasterFromFile(model, file);
+    }
+
     InitTemplateLoadResult InitTemplateLoader::loadPatchFromFile(PatchModel& model,
                                                                  const juce::File& file) const
     {

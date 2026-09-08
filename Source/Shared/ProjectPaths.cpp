@@ -216,6 +216,25 @@ juce::File ProjectPaths::getLogsDirectory(LogCategory category)
         .getChildFile(subfolder);
 }
 
+juce::File ProjectPaths::getApplicationDataDirectory()
+{
+    return getFallbackRoot();
+}
+
+juce::File ProjectPaths::getInitTemplatesDirectory()
+{
+    constexpr const char* kInitFolderName { "Init" };
+    const juce::File initDir = getApplicationDataDirectory().getChildFile(kInitFolderName);
+
+    if (! initDir.exists())
+        initDir.createDirectory();
+
+    if (! initDir.isDirectory())
+        return {};
+
+    return initDir;
+}
+
 bool ProjectPaths::isUsingFallbackRoot()
 {
     resolveProjectRootIfNeeded();

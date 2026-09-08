@@ -492,8 +492,16 @@ La touche **Échap** ferme en général les fenêtres `SETTINGS` et `ABOUT`, ain
 | `MATRIX-1000 PATCHES` | Oui | `DISPLAY MUSICAL NAMES` / `DISPLAY HARDWARE NAMES` |
 | `COMPUTER PATCHES` | Oui | `DISPLAY SYSEX NAMES` / `DISPLAY FILE NAMES` / `ASK ONCE PER LOAD` |
 | `UNSAVED STATE` | Oui | `ALWAYS WARN` / `NEVER WARN` |
-| `MASTER OPERATIONS` | Non — *Coming soon...* | Pas encore proposé |
+| `INIT TEMPLATE` (PATCH) | Oui | `SAVE AS INIT` enregistre le patch courant comme modèle système (`PatchInit.syx`) ; `DELETE` le retire après confirmation |
+| `UTILITY` (MASTER) | Oui | `LOAD` / `SAVE AS` / `INIT` (réinitialise tous les modules Master après confirmation) |
+| `INIT TEMPLATE` (MASTER) | Oui | `SAVE AS INIT` enregistre le Master courant comme modèle système (`MasterInit.syx`) ; `DELETE` le retire après confirmation |
 | `DEFRAG HISTORY` | Non — *Coming soon...* dans Settings | Un compactage d’historique existe déjà via le Mutator lorsque l’historique est plein |
+
+Les fichiers modèles (`PatchInit.syx`, `MasterInit.syx`) vivent dans un dossier système `Init/` géré par le plugin. Préférer `SAVE AS INIT` et `DELETE` dans Settings plutôt que de les éditer, déplacer ou supprimer à la main dans le Finder (ou l’Explorateur). `SAVE AS INIT` écrase le fichier système et, pour le patch, enregistre un nom vide dans le `.syx`. `DELETE` retire le fichier système correspondant après confirmation : le prochain `INIT` reprend alors les valeurs intégrées par défaut.
+
+`UTILITY` → `INIT` (MASTER) demande une confirmation avant de réinitialiser tous les modules Master.
+
+Après un `INIT` Internal Patches, le Patch Name affiche `* INIT *` : il faut choisir un nom Matrix valide avant `SAVE` / `SAVE AS` dans Computer Patches.
 
 L’apparence et la taille ne se règlent **pas** dans Settings : elles se trouvent dans le menu du logo `MATRIX-CONTROL`.
 

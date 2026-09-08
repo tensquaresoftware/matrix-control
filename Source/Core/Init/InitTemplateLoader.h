@@ -34,6 +34,7 @@ namespace Core
 
         InitTemplateLoadResult loadPatch(PatchModel& model, const juce::File& templatesFolder) const;
         InitTemplateLoadResult loadMaster(MasterModel& model, const juce::File& templatesFolder) const;
+        InitTemplateLoadResult loadMasterFile(MasterModel& model, const juce::File& file) const;
 
         static juce::File resolvePatchInitFile(const juce::File& templatesFolder);
         static juce::File resolveMasterInitFile(const juce::File& templatesFolder);
