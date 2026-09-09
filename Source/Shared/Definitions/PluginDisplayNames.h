@@ -1026,6 +1026,13 @@ namespace PluginDisplayNames
                 constexpr const char* kDropToLoad = "DROP TO LOAD";
                 constexpr const char* kBadFile = "BAD FILE";
             }
+
+            // Name-required presentation (STORE-after-INIT gate UI): empty L1 + caret, blinking L2.
+            // Distinct from DragDropOverlay and from Mutator Compare secondary "INITIAL".
+            namespace NameRequired
+            {
+                constexpr const char* kSecondaryLabel = "NAME REQUIRED";
+            }
         }
     }
 

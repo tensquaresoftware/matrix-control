@@ -11,6 +11,10 @@ namespace TSS
     // Paint-only Patch Name display + inline rename editor. Deliberately NOT a JUCE
     // TextEditor overlay: custom caret paint, but editing semantics match a normal
     // text field (insert / backspace-shift / delete-shift) capped at 8 Matrix chars.
+    //
+    // Presentation priority (resolved in paint — not a Settings name-source mode):
+    // drag overlay > name-required > Mutator/Compare secondary > idle primary.
+    // Do not confuse with Core::PatchNameDisplay (musical vs hardware name source).
     class PatchNameDisplay : public juce::Component,
                              private juce::Timer
     {
@@ -25,6 +29,7 @@ namespace TSS
         void setPatchName(const juce::String& patchName);
 
         // Secondary line — Mxx / Mxx-Ryy / INITIAL. Empty = single centred name (no history/Compare).
+        // Suppressed while name-required is armed (restored when cleared).
         void setSecondaryLabel(const juce::String& secondaryLabel);
 
         // Gates the double-click affordance (ROM banks / Compare / etc. are not editable).
@@ -33,13 +38,21 @@ namespace TSS
 
         void beginEdit();
         // Abandon: restores the previous name display, no commit callback fires.
+        // Name-required: clears the mode and fires the cancel outcome.
         void cancelEdit();
         bool isEditing() const noexcept { return editing_; }
 
         // Drag-drop overlay: fixed primary, blinking secondary at 2 Hz. Does not touch APVTS.
+        // Wins over name-required while active; clearing restores name-required if still armed.
         void showDragOverlay(const juce::String& primaryText, const juce::String& secondaryText);
         void clearDragOverlay();
         bool isDragOverlayActive() const noexcept { return dragOverlayActive_; }
+
+        // Name-required (STORE gate UI): empty L1 + caret, blinking L2 "NAME REQUIRED".
+        // Consumer arms/clears; does not require editable_ (STORE follow-up owns when to arm).
+        void armNameRequired();
+        void clearNameRequired();
+        bool isNameRequiredArmed() const noexcept { return nameRequiredArmed_; }
 
         void onCommit(std::function<void(juce::String)> callback);
         void onIllegalCharacter(std::function<void()> callback);
@@ -49,6 +62,8 @@ namespace TSS
         // Fires once per edit session end (commit or cancel) — panel uses this to clear
         // any footer error message it may have shown for an illegal character.
         void onEditEnded(std::function<void()> callback);
+        // Name-required only: true = trim-non-empty commit; false = cancel or empty Return.
+        void onNameRequiredOutcome(std::function<void(bool success)> callback);
 
         void paint(juce::Graphics& g) override;
         void mouseDown(const juce::MouseEvent& e) override;
@@ -99,7 +114,8 @@ namespace TSS
         bool listeningForOutsideClicks_ = false;
         bool illegalCharPending_ = false;
         bool dragOverlayActive_ = false;
-        bool dragSecondaryVisible_ = true;
+        bool nameRequiredArmed_ = false;
+        bool blinkSecondaryVisible_ = true;
         juce::String dragOverlayPrimary_;
         juce::String dragOverlaySecondary_;
         juce::String editBuffer_;
@@ -110,6 +126,7 @@ namespace TSS
         std::function<void()> onIllegalCharacter_;
         std::function<void()> onIllegalCharacterCleared_;
         std::function<void()> onEditEnded_;
+        std::function<void(bool)> onNameRequiredOutcome_;
 
         void timerCallback() override;
 
@@ -120,12 +137,20 @@ namespace TSS
         void moveCaret(int delta);
         void restartCaretBlink();
         void clearIllegalCharacterPending();
+        bool handleTypedCharacter(juce::juce_wchar rawCharacter);
         void updateHoverFromPosition(juce::Point<float> position);
         void attachOutsideClickListener();
         void detachOutsideClickListener();
         // Past-the-end caret is allowed only while length < 8 (room to type). At max
         // length the caret parks on the last real character — never a 9th slot.
         int maxCaretIndex() const noexcept;
+
+        void enterNameRequiredEditSession();
+        void suspendEditForDragOverlay();
+        void endEditSessionVisuals();
+        void notifyNameRequiredOutcome(bool success);
+        bool showsNameRequiredSecondary() const noexcept;
+        juce::String activeSecondaryText() const;
 
         TextBlockLayout computeTextBlockLayout(juce::Rectangle<float> bounds) const;
         juce::Colour primaryTextColour() const;

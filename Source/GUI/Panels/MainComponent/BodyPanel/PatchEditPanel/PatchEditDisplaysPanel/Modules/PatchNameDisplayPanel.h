@@ -37,6 +37,11 @@ public:
     void applyDragOverlay(bool validSinglePatch, const juce::String& previewPrimaryName);
     void clearDragOverlay();
 
+    // Name-required presentation (STORE-after-INIT gate UI). Drag overlay still wins while active.
+    void armNameRequired();
+    void clearNameRequired();
+    bool isNameRequiredArmed() const;
+
     // True when the current origin/bank allows the inline rename (ROM banks are not editable).
     using CanEditProvider = std::function<bool()>;
     void setCanEditProvider(CanEditProvider provider);
@@ -45,12 +50,18 @@ public:
     using RenameCommitHandler = std::function<void(const juce::String& newName)>;
     void setRenameCommitHandler(RenameCommitHandler handler);
 
+    // Name-required session ended: success = trim-non-empty commit; false = cancel or empty Return.
+    // STORE pending-action wiring is a follow-up consumer — this Build only exposes the signal.
+    using NameRequiredOutcomeHandler = std::function<void(bool success)>;
+    void setNameRequiredOutcomeHandler(NameRequiredOutcomeHandler handler);
+
     void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
                                   const juce::Identifier& property) override;
     void valueTreeRedirected(juce::ValueTree& treeWhichHasBeenChanged) override;
 
 private:
     void syncFromApvtsState();
+    void ensureNameRequiredOutcomeForwarder();
     juce::String computeSecondaryLabel() const;
     void clearInvalidCharacterFooterIfPresent();
     static bool isTrackedProperty(const juce::String& propertyName);
@@ -64,6 +75,7 @@ private:
     juce::AudioProcessorValueTreeState& apvts_;
     CanEditProvider canEditProvider_;
     RenameCommitHandler renameCommitHandler_;
+    NameRequiredOutcomeHandler nameRequiredOutcomeHandler_;
 
     std::unique_ptr<TSS::ModuleHeader> moduleHeader_;
     std::unique_ptr<TSS::PatchNameDisplay> patchNameDisplay_;

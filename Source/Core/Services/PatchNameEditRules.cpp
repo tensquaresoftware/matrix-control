@@ -12,4 +12,20 @@ namespace Core
         return editedName;
     }
 
+    bool PatchNameEditRules::isSuccessfulPendingStoreNameCommit(const juce::String& editedName)
+    {
+        return editedName.trim().isNotEmpty();
+    }
+
+    PatchNameEditRules::NameRequiredCommitEndState PatchNameEditRules::resolveNameRequiredCommitEndState(
+        const juce::String& editedName,
+        const juce::String& previousName)
+    {
+        NameRequiredCommitEndState endState;
+        endState.success = isSuccessfulPendingStoreNameCommit(editedName);
+        endState.shouldInvokeRenameCommit = endState.success;
+        endState.resolvedName = resolveCommittedPatchName(editedName, previousName);
+        return endState;
+    }
+
 } // namespace Core

@@ -112,6 +112,29 @@ void PatchNameDisplayPanel::clearDragOverlay()
     syncFromApvtsState();
 }
 
+void PatchNameDisplayPanel::armNameRequired()
+{
+    if (patchNameDisplay_ == nullptr)
+        return;
+
+    ensureNameRequiredOutcomeForwarder();
+    patchNameDisplay_->armNameRequired();
+}
+
+void PatchNameDisplayPanel::clearNameRequired()
+{
+    if (patchNameDisplay_ == nullptr)
+        return;
+
+    patchNameDisplay_->clearNameRequired();
+    syncFromApvtsState();
+}
+
+bool PatchNameDisplayPanel::isNameRequiredArmed() const
+{
+    return patchNameDisplay_ != nullptr && patchNameDisplay_->isNameRequiredArmed();
+}
+
 void PatchNameDisplayPanel::setCanEditProvider(CanEditProvider provider)
 {
     canEditProvider_ = std::move(provider);
@@ -121,6 +144,27 @@ void PatchNameDisplayPanel::setCanEditProvider(CanEditProvider provider)
 void PatchNameDisplayPanel::setRenameCommitHandler(RenameCommitHandler handler)
 {
     renameCommitHandler_ = std::move(handler);
+}
+
+void PatchNameDisplayPanel::setNameRequiredOutcomeHandler(NameRequiredOutcomeHandler handler)
+{
+    nameRequiredOutcomeHandler_ = std::move(handler);
+    ensureNameRequiredOutcomeForwarder();
+}
+
+void PatchNameDisplayPanel::ensureNameRequiredOutcomeForwarder()
+{
+    if (patchNameDisplay_ == nullptr)
+        return;
+
+    patchNameDisplay_->onNameRequiredOutcome([this](bool success)
+    {
+        if (nameRequiredOutcomeHandler_)
+            nameRequiredOutcomeHandler_(success);
+
+        // Mode cleared in the widget — refresh editable/secondary that sync skipped while armed.
+        syncFromApvtsState();
+    });
 }
 
 void PatchNameDisplayPanel::resized()
@@ -253,5 +297,8 @@ void PatchNameDisplayPanel::syncFromApvtsState()
 
     patchNameDisplay_->setPatchName(name);
     patchNameDisplay_->setSecondaryLabel(computeSecondaryLabel());
-    patchNameDisplay_->setEditable(canEditProvider_ ? canEditProvider_() : false);
+
+    // Name-required owns the edit session; do not flip editable mid-session via APVTS noise.
+    if (! patchNameDisplay_->isNameRequiredArmed())
+        patchNameDisplay_->setEditable(canEditProvider_ ? canEditProvider_() : false);
 }

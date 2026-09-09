@@ -17,12 +17,17 @@ namespace TSS
         }
 
         if (editing_)
-            cancelEdit();
+        {
+            if (nameRequiredArmed_)
+                suspendEditForDragOverlay();
+            else
+                cancelEdit();
+        }
 
         dragOverlayActive_ = true;
         dragOverlayPrimary_ = primaryText;
         dragOverlaySecondary_ = secondaryText;
-        dragSecondaryVisible_ = true;
+        blinkSecondaryVisible_ = true;
         hoveredPrimary_ = false;
         startTimerHz(kDragSecondaryBlinkHz_);
         repaint();
@@ -37,8 +42,12 @@ namespace TSS
         dragOverlayActive_ = false;
         dragOverlayPrimary_.clear();
         dragOverlaySecondary_.clear();
-        dragSecondaryVisible_ = true;
-        repaint();
+        blinkSecondaryVisible_ = true;
+
+        if (nameRequiredArmed_)
+            enterNameRequiredEditSession();
+        else
+            repaint();
     }
 
     juce::Font PatchNameDisplay::scaledPrimaryFont() const
@@ -67,7 +76,7 @@ namespace TSS
         const float primaryHeight = primaryFont.getHeight();
         const bool showSecondary = dragOverlayActive_
             ? dragOverlaySecondary_.isNotEmpty()
-            : secondaryLabel_.isNotEmpty();
+            : activeSecondaryText().isNotEmpty();
 
         if (! showSecondary)
         {
@@ -106,7 +115,7 @@ namespace TSS
             g.setFont(scaledPrimaryFont());
             g.drawText(dragOverlayPrimary_, layout.primaryRow, juce::Justification::centred, false);
 
-            if (layout.hasSecondary && dragSecondaryVisible_)
+            if (layout.hasSecondary && blinkSecondaryVisible_)
             {
                 g.setColour(look_.secondaryText);
                 g.setFont(scaledSecondaryFont());
@@ -225,8 +234,11 @@ namespace TSS
 
     void PatchNameDisplay::drawSecondaryText(juce::Graphics& g, const juce::Rectangle<float>& rowBounds)
     {
+        if (showsNameRequiredSecondary() && ! blinkSecondaryVisible_)
+            return;
+
         g.setColour(look_.secondaryText);
         g.setFont(scaledSecondaryFont());
-        g.drawText(secondaryLabel_, rowBounds, juce::Justification::centred, false);
+        g.drawText(activeSecondaryText(), rowBounds, juce::Justification::centred, false);
     }
 }

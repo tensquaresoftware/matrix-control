@@ -1,6 +1,5 @@
 #include "PatchNameDisplay.h"
 
-#include "Core/Services/PatchFileNameSanitizer.h"
 #include "Core/Services/PatchNameEditRules.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 
@@ -52,7 +51,7 @@ namespace TSS
 
     void PatchNameDisplay::setSecondaryLabel(const juce::String& secondaryLabel)
     {
-        if (dragOverlayActive_)
+        if (dragOverlayActive_ || nameRequiredArmed_)
         {
             secondaryLabel_ = secondaryLabel;
             return;
@@ -72,7 +71,7 @@ namespace TSS
 
         editable_ = editable;
 
-        if (! editable_)
+        if (! editable_ && ! nameRequiredArmed_)
         {
             hoveredPrimary_ = false;
             if (editing_)
@@ -102,9 +101,76 @@ namespace TSS
         onEditEnded_ = std::move(callback);
     }
 
+    void PatchNameDisplay::onNameRequiredOutcome(std::function<void(bool success)> callback)
+    {
+        onNameRequiredOutcome_ = std::move(callback);
+    }
+
+    void PatchNameDisplay::armNameRequired()
+    {
+        if (dragOverlayActive_)
+        {
+            nameRequiredArmed_ = true;
+            return;
+        }
+
+        if (nameRequiredArmed_ && editing_)
+            return;
+
+        // End a normal rename cleanly (onEditEnded) before entering name-required.
+        if (editing_ && ! nameRequiredArmed_)
+            cancelEdit();
+
+        nameRequiredArmed_ = true;
+        enterNameRequiredEditSession();
+    }
+
+    void PatchNameDisplay::clearNameRequired()
+    {
+        if (! nameRequiredArmed_)
+            return;
+
+        nameRequiredArmed_ = false;
+
+        if (dragOverlayActive_)
+        {
+            // Armed under drag overlay — abort without touching the overlay timer.
+            notifyNameRequiredOutcome(false);
+            return;
+        }
+
+        if (editing_)
+        {
+            endEditSessionVisuals();
+            editing_ = false;
+            illegalCharPending_ = false;
+            if (onEditEnded_)
+                onEditEnded_();
+        }
+
+        repaint();
+        notifyNameRequiredOutcome(false);
+    }
+
+    void PatchNameDisplay::enterNameRequiredEditSession()
+    {
+        editBuffer_.clear();
+        caretIndex_ = 0;
+        caretOn_ = true;
+        blinkSecondaryVisible_ = true;
+        illegalCharPending_ = false;
+        editing_ = true;
+        hoveredPrimary_ = false;
+
+        grabKeyboardFocus();
+        attachOutsideClickListener();
+        startTimerHz(kDragSecondaryBlinkHz_);
+        repaint();
+    }
+
     void PatchNameDisplay::beginEdit()
     {
-        if (! editable_ || editing_ || dragOverlayActive_)
+        if (! editable_ || editing_ || dragOverlayActive_ || nameRequiredArmed_)
             return;
 
         // Fresh empty field — do not preload the current patch name.
@@ -120,19 +186,48 @@ namespace TSS
         repaint();
     }
 
-    void PatchNameDisplay::cancelEdit()
+    void PatchNameDisplay::notifyNameRequiredOutcome(bool success)
     {
-        if (! editing_)
-            return;
+        if (onNameRequiredOutcome_)
+            onNameRequiredOutcome_(success);
+    }
 
+    void PatchNameDisplay::endEditSessionVisuals()
+    {
         stopTimer();
         detachOutsideClickListener();
+    }
+
+    void PatchNameDisplay::cancelEdit()
+    {
+        if (! editing_ && ! nameRequiredArmed_)
+            return;
+
+        const bool wasNameRequired = nameRequiredArmed_;
+
+        // Name-required only suspended under drag: disarm + abort, keep overlay blink alive.
+        if (dragOverlayActive_ && wasNameRequired)
+        {
+            nameRequiredArmed_ = false;
+            editing_ = false;
+            illegalCharPending_ = false;
+            notifyNameRequiredOutcome(false);
+            return;
+        }
+
+        nameRequiredArmed_ = false;
+
+        endEditSessionVisuals();
         editing_ = false;
         illegalCharPending_ = false;
+        blinkSecondaryVisible_ = true;
         repaint();
 
         if (onEditEnded_)
             onEditEnded_();
+
+        if (wasNameRequired)
+            notifyNameRequiredOutcome(false);
     }
 
     void PatchNameDisplay::commitEdit()
@@ -140,19 +235,41 @@ namespace TSS
         if (! editing_)
             return;
 
-        const auto resolvedName = Core::PatchNameEditRules::resolveCommittedPatchName(editBuffer_, patchName_);
+        const bool wasNameRequired = nameRequiredArmed_;
+        const auto nameRequiredEnd = wasNameRequired
+            ? Core::PatchNameEditRules::resolveNameRequiredCommitEndState(editBuffer_, patchName_)
+            : Core::PatchNameEditRules::NameRequiredCommitEndState {};
+        const auto resolvedName = wasNameRequired
+            ? nameRequiredEnd.resolvedName
+            : Core::PatchNameEditRules::resolveCommittedPatchName(editBuffer_, patchName_);
 
-        stopTimer();
-        detachOutsideClickListener();
+        nameRequiredArmed_ = false;
+        endEditSessionVisuals();
         editing_ = false;
         illegalCharPending_ = false;
+        blinkSecondaryVisible_ = true;
         repaint();
 
-        if (onCommit_)
-            onCommit_(resolvedName);
+        if (! wasNameRequired || nameRequiredEnd.shouldInvokeRenameCommit)
+        {
+            if (onCommit_)
+                onCommit_(resolvedName);
+        }
 
         if (onEditEnded_)
             onEditEnded_();
+
+        if (wasNameRequired)
+            notifyNameRequiredOutcome(nameRequiredEnd.success);
+    }
+
+    void PatchNameDisplay::suspendEditForDragOverlay()
+    {
+        // Keep nameRequiredArmed_ so clearDragOverlay can restore the session.
+        endEditSessionVisuals();
+        editing_ = false;
+        illegalCharPending_ = false;
+        caretOn_ = true;
     }
 
     void PatchNameDisplay::attachOutsideClickListener()
@@ -182,222 +299,5 @@ namespace TSS
             return kNameLength_ - 1;
 
         return editBuffer_.length();
-    }
-
-    void PatchNameDisplay::insertCharacterAtCaret(juce::juce_wchar character)
-    {
-        if (editBuffer_.length() >= kNameLength_)
-            return;
-
-        editBuffer_ = editBuffer_.substring(0, caretIndex_)
-            + juce::String::charToString(character)
-            + editBuffer_.substring(caretIndex_);
-        ++caretIndex_;
-        caretIndex_ = juce::jmin(caretIndex_, maxCaretIndex());
-        restartCaretBlink();
-    }
-
-    void PatchNameDisplay::deleteCharacterBeforeCaret()
-    {
-        if (editBuffer_.isEmpty())
-            return;
-
-        // At max length the caret sits on the last character (no 9th slot). Backspace
-        // must delete that last character, not the one before it.
-        if (editBuffer_.length() == kNameLength_ && caretIndex_ == kNameLength_ - 1)
-        {
-            deleteCharacterAtCaret();
-            return;
-        }
-
-        if (caretIndex_ <= 0)
-            return;
-
-        editBuffer_ = editBuffer_.substring(0, caretIndex_ - 1)
-            + editBuffer_.substring(caretIndex_);
-        --caretIndex_;
-        restartCaretBlink();
-    }
-
-    void PatchNameDisplay::deleteCharacterAtCaret()
-    {
-        if (caretIndex_ >= editBuffer_.length())
-            return;
-
-        editBuffer_ = editBuffer_.substring(0, caretIndex_)
-            + editBuffer_.substring(caretIndex_ + 1);
-        caretIndex_ = juce::jmin(caretIndex_, maxCaretIndex());
-        restartCaretBlink();
-    }
-
-    void PatchNameDisplay::moveCaret(int delta)
-    {
-        caretIndex_ = juce::jlimit(0, maxCaretIndex(), caretIndex_ + delta);
-        clearIllegalCharacterPending();
-        restartCaretBlink();
-    }
-
-    void PatchNameDisplay::clearIllegalCharacterPending()
-    {
-        if (! illegalCharPending_)
-            return;
-
-        illegalCharPending_ = false;
-        if (onIllegalCharacterCleared_)
-            onIllegalCharacterCleared_();
-    }
-
-    void PatchNameDisplay::restartCaretBlink()
-    {
-        caretOn_ = true;
-        stopTimer();
-        startTimer(kCaretBlinkIntervalMs_);
-        repaint();
-    }
-
-    void PatchNameDisplay::timerCallback()
-    {
-        if (dragOverlayActive_)
-        {
-            dragSecondaryVisible_ = ! dragSecondaryVisible_;
-            repaint();
-            return;
-        }
-
-        caretOn_ = ! caretOn_;
-        repaint();
-    }
-
-    void PatchNameDisplay::updateHoverFromPosition(juce::Point<float> position)
-    {
-        const bool wasHovered = hoveredPrimary_;
-
-        if (! editable_ || editing_)
-        {
-            hoveredPrimary_ = false;
-        }
-        else
-        {
-            const auto layout = computeTextBlockLayout(getLocalBounds().toFloat());
-            hoveredPrimary_ = layout.primaryRow.contains(position);
-        }
-
-        if (hoveredPrimary_ != wasHovered)
-            repaint();
-    }
-
-    void PatchNameDisplay::mouseDown(const juce::MouseEvent& e)
-    {
-        if (! editing_)
-            return;
-
-        // Commit when the click is outside this display rectangle (e.g. module header
-        // or anywhere else in the UI). Clicks inside the afficheur keep editing.
-        if (getScreenBounds().contains(e.getScreenPosition()))
-            return;
-
-        commitEdit();
-    }
-
-    void PatchNameDisplay::mouseDoubleClick(const juce::MouseEvent& e)
-    {
-        if (! editable_)
-            return;
-
-        const auto layout = computeTextBlockLayout(getLocalBounds().toFloat());
-        if (! layout.primaryRow.contains(e.position))
-            return;
-
-        beginEdit();
-    }
-
-    void PatchNameDisplay::mouseEnter(const juce::MouseEvent& e)
-    {
-        updateHoverFromPosition(e.position);
-    }
-
-    void PatchNameDisplay::mouseExit(const juce::MouseEvent&)
-    {
-        if (! hoveredPrimary_)
-            return;
-
-        hoveredPrimary_ = false;
-        repaint();
-    }
-
-    void PatchNameDisplay::mouseMove(const juce::MouseEvent& e)
-    {
-        updateHoverFromPosition(e.position);
-    }
-
-    bool PatchNameDisplay::keyPressed(const juce::KeyPress& key)
-    {
-        if (! editing_)
-            return false;
-
-        if (key == juce::KeyPress::returnKey)
-        {
-            commitEdit();
-            return true;
-        }
-
-        if (key == juce::KeyPress::escapeKey)
-        {
-            cancelEdit();
-            return true;
-        }
-
-        if (key.getKeyCode() == juce::KeyPress::leftKey)
-        {
-            moveCaret(-1);
-            return true;
-        }
-
-        if (key.getKeyCode() == juce::KeyPress::rightKey)
-        {
-            moveCaret(1);
-            return true;
-        }
-
-        // Normal text-field editing: Backspace removes the char before the caret and
-        // shifts the tail left; Delete removes at the caret. Cap remains 8 chars.
-        if (key.getKeyCode() == juce::KeyPress::backspaceKey)
-        {
-            clearIllegalCharacterPending();
-            deleteCharacterBeforeCaret();
-            return true;
-        }
-
-        if (key.getKeyCode() == juce::KeyPress::deleteKey)
-        {
-            clearIllegalCharacterPending();
-            deleteCharacterAtCaret();
-            return true;
-        }
-
-        const auto rawCharacter = key.getTextCharacter();
-        if (rawCharacter == 0)
-            return false; // non-printable key (Tab, function keys...) — let default handling occur
-
-        const auto typedCharacter = juce::CharacterFunctions::toUpperCase(rawCharacter);
-
-        if (! Core::PatchFileNameSanitizer::isAllowedMatrixChar(typedCharacter))
-        {
-            illegalCharPending_ = true;
-            if (onIllegalCharacter_)
-                onIllegalCharacter_();
-            return true;
-        }
-
-        clearIllegalCharacterPending();
-        insertCharacterAtCaret(typedCharacter);
-        return true;
-    }
-
-    void PatchNameDisplay::focusLost(juce::Component::FocusChangeType)
-    {
-        // Keyboard focus leaving the display also commits (e.g. Tab). Outside clicks are
-        // handled by the global mouse listener against this component's screen bounds.
-        commitEdit();
     }
 }
