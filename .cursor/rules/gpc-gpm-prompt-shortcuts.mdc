@@ -1,0 +1,39 @@
+---
+description: Raccourcis GPC/GPM — générer un prompt collable, ne pas exécuter le chantier
+alwaysApply: true
+---
+
+# GPC / GPM — raccourcis d’écriture (Guillaume)
+
+Quand Guillaume écrit **GPC**, **GPM**, ou l’équivalent en toutes lettres (« Génère un Prompt Complet / Minimal »), **ce n’est pas une demande d’exécution**.
+
+## Lexique (non négociable)
+
+| Raccourci | Signifie | Action attendue |
+|-----------|----------|-----------------|
+| **GPC** | Génère un **Prompt Complet** | Produire un prompt **prêt à coller** dans un **nouveau** chat |
+| **GPM** | Génère un **Prompt Minimal** | Idem, version **courte** |
+
+**Ne jamais** interpréter GPM / GPC comme : Pull Request, `gh pr`, push, commit, lancement de `/bmad-build` / `/bmad-code-review`, ou application du chantier dans **ce** chat.
+
+## Comportement
+
+1. **Générer uniquement** le texte du prompt (bloc ` ```text ` collable).
+2. **Ne pas** démarrer le skill / workflow nommé dans le prompt, sauf si Guillaume le demande **explicitement en plus**.
+3. Le prompt commence en général par la commande BMad cible (`/bmad-code-review`, `/bmad-build`, …) si le but est clair.
+4. Structure type :
+   - **GPM** : `## Contexte` (1–3 phrases) + `## Scope` (diff / spec / chemins) + `## Hors scope` (bref)
+   - **GPC** : même squelette + intention, décisions déjà tranchées, focus, fichiers d’indice, hors-scope détaillé, pièges connus
+5. Langue du prompt : **français** (comme le chat) ; identifiants / chemins / commandes en anglais tel quels.
+6. Si le but manque (« GPM » seul) → une question courte, puis le prompt.
+
+## Exemples d’intention
+
+- « GPM pour un code review » → prompt minimal `/bmad-code-review` + contexte/scope du chantier en cours
+- « GPC pour reprendre le Build 8-4 » → prompt complet `/bmad-build` avec état, spec, décisions
+
+## Anti-motifs
+
+- Créer une PR GitHub parce que le message contient « GPM »
+- Lancer la revue / le build dans le chat courant au lieu de livrer le prompt
+- Répondre seulement « voici ce que tu pourrais écrire » sans bloc collable
