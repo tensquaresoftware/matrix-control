@@ -3,15 +3,16 @@ organization: Ten Square Software
 project: Matrix-Control
 title: Passation — notes MIDI coincées & lag 1ère édition slider
 author: BMad Agent
-status: ready-for-dev
+status: done
 sources:
   - implementation-artifacts/manual-uat-epic2-midi-audio-hardware.md
   - implementation-artifacts/2-6-matrix-mod-bus-parameter-sysex.md
   - implementation-artifacts/2-9-wire-midimanager-queue-consumer.md
   - implementation-artifacts/r-4-midioutboundqueue-mpsc-audit.md
 created: 2026-06-16
-updated: 2026-06-16
+updated: 2026-09-09
 priority: high
+closure_note: "2026-09-09 — BUG-MIDI-01 shipped via spec-bug-midi-01-residual-panic-alert; BUG-MIDI-02 (first-slider lag) closed as no longer observed by Guillaume."
 ---
 
 # Passation — bugs MIDI post-UAT Epic 2

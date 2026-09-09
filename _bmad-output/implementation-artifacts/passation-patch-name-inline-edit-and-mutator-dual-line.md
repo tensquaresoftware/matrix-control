@@ -3,9 +3,9 @@ organization: Ten Square Software
 project: Matrix-Control
 title: Passation — Patch Name inline edit + Mutator dual-line display
 author: BMad Help / Guillaume
-status: ready-for-dev
+status: done
 created: 2026-07-26
-updated: 2026-07-26
+updated: 2026-09-09
 priority: high
 workflow: bmad-quick-dev (fresh context)
 related:

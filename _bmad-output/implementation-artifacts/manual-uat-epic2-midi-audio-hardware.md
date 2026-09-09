@@ -3,9 +3,9 @@ organization: Ten Square Software
 project: Matrix-Control
 title: UAT manuel Epic 2 — Matrix-1000
 author: Guillaume DUPONT
-status: draft
+status: done
 created: 2026-06-05
-updated: 2026-06-06
+updated: 2026-09-09
 scope: Epic 2 (stories 2-3 à 2-11), Epic R (R-1 à R-3), stories 2-10 et 7-9, story 7-7
 target_hardware: Oberheim Matrix-1000
 target_host: Ableton Live 12 Suite (VST3 + AU) + Standalone macOS
