@@ -137,3 +137,24 @@ When name-required success finishes a pending STORE: commit name locally (model 
 - INIT → STORE → see name-required, no store; type legal name + Enter → STORE completes
 - INIT → STORE → Escape → no store; STORE again → name-required re-arms
 - Named patch STORE still works without name-required
+
+### Review Findings
+
+_(Code review 2026-09-09 — range `77cdbf53..60c71605`)_
+
+- [x] [Review][Defer] Automate `commitPatchNameRename` suppressAuditionSysEx vs MIDI outbound queue (incl. `!canEditPatchName` + suppress) [`PluginProcessorClipboard.cpp` ~323] — deferred: already in deferred-work; helpers/StoreSentinel stay green if suppress inverted
+- [x] [Review][Defer] Automate Editor pending-STORE outcome → `executeInternalPatchStore` [`PluginEditorUiConstruction.cpp` ~83] — deferred: GUI loop outside Core unit pyramid; smoke-manual covered
+- [x] [Review][Defer] Optional Matrix-6/6R one-write assert on deferred rename+STORE — deferred: policy shared; M-1000 StoreSentinel present
+- [x] [Review][Defer] Automate panel interrupt cancel when `isNameRequiredArmed` [`PatchNameDisplayPanel.cpp` ~237] — deferred: GUI interrupt path; Escape/blur already manual/harness
+
+#### Rejected
+
+- Retype `* INIT *` counts as name-required success — **false**: `*` is not an allowed Matrix character; keyboard path cannot re-enter the sentinel
+- `suppressAuditionSysEx` doubles as `canEditPatchName` bypass — **false** as defect: intentional prior review patch for Hardware Names pending-STORE; not a new hole in this wiring
+- Persist→STORE modal UX awkward under sentinel — **false** vs frozen matrix (same gate as button STORE)
+- Empty hook / null panel silent STORE block — **low** reject: Editor always installs hook; unlikely everyday
+- Hook assigned inside `createPatchMutatorEngine` — **false** as defect: shared hooks bag filled before PatchManager create; speculative future cleanup risk only
+- Design Notes `pendingStore_` vs `pendingInternalStore_` — reject: docs-only; fixing would edit the spec under review
+- Near-identity policy helpers — **low** reject: document frozen policy for audit; not everyday harm
+- No automated STORE-enabled-under-sentinel regression — **low** reject: enablement unchanged by not touching InternalPatchesPanel; optional test not worth new surface
+- Drag-overlay delays name-required visuals after STORE — **low** reject: STORE mid-drag overlay uncommon; arm flag still set and interrupt cancel covers armed-under-drag

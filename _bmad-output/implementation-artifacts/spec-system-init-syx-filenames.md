@@ -94,6 +94,30 @@ context:
 - Given Settings MASTER `LOAD` / `SAVE AS`, when used, then Master loads from / exports to a user-chosen `.syx` without using the Computer Patches combobox as init storage.
 - Given no Settings folder browse control, when Settings opens, then no `INIT FOLDER` row appears.
 
+### Review Findings
+
+Combined code review (`eddf49d8...HEAD`, 2026-09-09) with `spec-settings-delete-init-template.md`.
+
+- [x] [Review][Decision→Defer] After INIT, protect hardware from `* INIT *` on STORE (button stays enabled; require valid Patch Name via proper PATCH NAME UI modes) — deferred: pause this review; implement PATCH NAME display modes first, then resume review / wire STORE. Audition policy TBD in that follow-up.
+- [ ] [Review][Patch] SAVE AS INIT silent no-op when processor deps are null — publish footer instead of bare `return` [`PluginProcessorInitTemplates.cpp:36-38` / `50-51`] (left as action item while PATCH NAME chantier runs)
+- [ ] [Review][Patch] Add `initAllModules` empty-folder fallback unit test [`MasterModuleInitService` / `InitTemplateWriterTests.cpp`] (left as action item while PATCH NAME chantier runs)
+- [x] [Review][Defer] Live AppData Init/ no-arg resolve path untested — deferred: pre-existing verification gap; tempDir overloads cover I/O logic
+- [x] [Review][Defer] `loadMasterFromUserFile` failure does not assert MasterModel unchanged — deferred: secondary isolation gap; success path covered
+- [x] [Review][Defer] Mutator export/history basename can use sentinel `* INIT *` — deferred: out of frozen AC scope (Computer Patches Save/Save As only)
+- [x] [Review][Defer] Master UTILITY SAVE AS chooser starts at process CWD — deferred: UX polish; AC does not require a Documents start folder
+
+#### Rejected
+- Settings height overflow in plugin mode (`false`) — content ~423 px vs design 456 (1 px spare at 100%); not ~23 px overflow
+- Legacy custom Init folder migration (`false`) — frozen intent ignores prior free-form path
+- DELETE vs “SAVE AS INIT only” on Master INIT TEMPLATE (`false` for code) — superseded by sibling DELETE spec in same commit; do not remove DELETE
+- Orphaned `kComingSoon` (`false`) — still used by Patch Mutator Defrag History placeholder
+- Unused `MasterGlobalInitConfirm::kConfirm`/`kCancel` (`low`) — identical to per-module strings; prior review already accepted
+- Generic Master SAVE AS INIT fail footer overwriting `kMasterFileFailed` (`false`) — intentional prior patch for INIT TEMPLATE vocabulary
+- InitTemplateWriter also owns Master LOAD/user SAVE (`low`) — intentional Core SSOT for this chrome; no demonstrated caller divergence
+- Duplicated Settings footer helpers (`low`) — both paths work; no named harm
+- AppData Init create-fail UX / exists creates empty Init/ (`low` / intentional) — create-on-demand is frozen behavior
+- Manual omits STORE sentinel warning (`low`) — follows Computer Patches-only AC until Decision above
+
 ## Implementation Notes
 
 - Fixed Init/ under Application Support; Settings PATCH/MASTER chrome locked (INIT TEMPLATE, UTILITY).

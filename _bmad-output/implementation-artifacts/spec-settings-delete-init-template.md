@@ -79,6 +79,21 @@ context:
 - Given SAVE AS INIT just wrote the file, when the write succeeds, then the matching DELETE becomes enabled without reopening Settings.
 - Given Master UTILITY or module header I, when this story ships, then those flows are unchanged.
 
+### Review Findings
+
+Combined code review (`eddf49d8...HEAD`, 2026-09-09) with `spec-system-init-syx-filenames.md`. DELETE ACs themselves: no acceptance gaps.
+
+- [x] [Review][Decision→Defer] After INIT, protect hardware from `* INIT *` on STORE via PATCH NAME UI (not greyed STORE) — deferred: same pause as sibling system-init review; resume after PATCH NAME modes chantier.
+- [ ] [Review][Patch] SAVE AS INIT silent no-op when processor deps are null — publish footer instead of bare `return` [`PluginProcessorInitTemplates.cpp:36-38` / `50-51`] (action item; not applied in this pause)
+- [ ] [Review][Patch] Add `initAllModules` empty-folder fallback unit test [`MasterModuleInitService` / `InitTemplateWriterTests.cpp`] (action item; not applied in this pause)
+- [x] [Review][Defer] Live AppData Init/ no-arg resolve path untested — deferred: reconfirmed; already in deferred-work
+- [x] [Review][Defer] `loadMasterFromUserFile` failure does not assert MasterModel unchanged — deferred: reconfirmed; already in deferred-work
+- [x] [Review][Defer] Mutator export/history basename can use sentinel `* INIT *` — deferred: out of DELETE / system-init AC scope
+- [x] [Review][Defer] Master UTILITY SAVE AS chooser starts at process CWD — deferred: UX polish outside DELETE ACs
+
+#### Rejected
+- See `spec-system-init-syx-filenames.md` Review Findings Rejected list (same combined triage). DELETE-focused acceptance auditor: no findings.
+
 ## Implementation Notes
 
 - DELETE beside SAVE AS INIT (68+4+68=140) on PATCH and MASTER INIT TEMPLATE rows; enabled only when the matching fixed Init/ file exists.

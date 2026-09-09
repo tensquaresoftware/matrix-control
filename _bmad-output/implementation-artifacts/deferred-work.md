@@ -1531,3 +1531,9 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-store-after-init-name-required.md`
   summary: Optional Matrix-6/6R StoreSentinel assert that deferred rename+STORE does not double-send slot writes when audition would have used 0x01.
   evidence: Blind Hunter 2026-09-09; frozen one-write policy shared; M-1000 coverage present.
+
+## Deferred from: code review of spec-store-after-init-name-required.md (2026-09-09)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-store-after-init-name-required.md`
+  summary: Automate `PatchNameDisplayPanel` interrupt cancel when `isNameRequiredArmed()` (APVTS property change / redirect), including drag-armed sessions that may not report `isEditing()` — today only production code; no unit observer.
+  evidence: Verification-gap review 2026-09-09; revert `|| isNameRequiredArmed()` leaves CI green; GUI manual/harness same as Escape/blur.
