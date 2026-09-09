@@ -99,7 +99,10 @@ void PluginProcessor::initAllMasterModulesFromTemplate()
         return;
     }
 
+    cancelMasterEditSysExDebounce();
     const auto result = masterModuleInitService_->initAllModules();
+    // bufferToApvts inside init may arm the debounce; drop it so only dispatchFull remains.
+    cancelMasterEditSysExDebounce();
     Core::InitTemplateFooter::propagateMessage(apvts, result);
 }
 
@@ -125,7 +128,9 @@ void PluginProcessor::loadMasterFromUserFile(const juce::File& file)
         return;
     }
 
+    cancelMasterEditSysExDebounce();
     apvtsMasterMapper_->bufferToApvts();
+    cancelMasterEditSysExDebounce();
     masterParameterSysExDispatcher_->dispatchFull();
     publishSettingsFooter(apvts, PluginDisplayNames::Settings::FooterMessages::kMasterLoaded, false);
 }

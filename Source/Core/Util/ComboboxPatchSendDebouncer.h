@@ -15,6 +15,11 @@ inline constexpr int kComboboxPatchSendDebounceMs = 150;
 // Patch Manager Next/Previous button navigation settle window (separate from combobox 150).
 inline constexpr int kPatchNavButtonDebounceMs = 300;
 
+// Master Edit outbound full-dump (0x03) settle window. Same 150 ms order as combobox /
+// Mutator History, but named separately: Master always sends a full Parameter Data dump,
+// not a granular patch-nav / audition path (do not alias kPatchNavButtonDebounceMs).
+inline constexpr int kMasterEditSysExDebounceMs = 150;
+
 class ComboboxPatchSendDebouncer final : private juce::Timer
 {
 public:

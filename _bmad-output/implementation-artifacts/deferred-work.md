@@ -1555,3 +1555,13 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-store-after-init-name-required.md`
   summary: Automate `PatchNameDisplayPanel` interrupt cancel when `isNameRequiredArmed()` (APVTS property change / redirect), including drag-armed sessions that may not report `isEditing()` — today only production code; no unit observer.
   evidence: Verification-gap review 2026-09-09; revert `|| isNameRequiredArmed()` leaves CI green; GUI manual/harness same as Escape/blur.
+
+## Deferred from: review of spec-master-edit-sysex-debounce.md (2026-09-09)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-master-edit-sysex-debounce.md`
+  summary: Strengthen Master Edit SysEx debounce tests to drive real PluginProcessor flush seam (not only the mirrored harness).
+  evidence: Current unit tests mirror schedule/fire/cancel locally; restoring immediate dispatch or dropping processor cancel sites would still leave harness tests green. Spec AC allows harness + sync flush; Patch Manager/Mutator use real-object flush seams.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-master-edit-sysex-debounce.md`
+  summary: Add Master-aware coverage to editorial undo/redo MIDI tests for cancelPending of Master debounce.
+  evidence: performEditorialUndo/Redo cancel Master debounce beside Matrix Mod; UndoManagerEditorialUndoMidiTests has no Master enqueue assertion, so deleting those cancel calls would not fail CI.

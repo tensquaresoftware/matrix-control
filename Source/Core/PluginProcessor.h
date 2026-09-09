@@ -35,6 +35,7 @@ namespace Core
     class ApvtsMasterMapper;
     class PatchNameSyncer;
     class MasterParameterSysExDispatcher;
+    class ComboboxPatchSendDebouncer;
     class MatrixModBusParameterSysExDispatcher;
     class MatrixModBusReorderService;
     class MatrixModInitService;
@@ -264,6 +265,9 @@ public:
     void loadMasterFromUserFile(const juce::File& file);
     void saveMasterToUserFile(const juce::File& file);
 
+    // Unit-test seam — see ComboboxPatchSendDebouncer::flushPendingSynchronouslyForTests().
+    void flushMasterEditSysExDebouncerForTests();
+
     // Drag-drop one Computer Patches .syx onto the editor (folder → scan → select → load).
     // Reject / success / cancel footers and browser restore are handled in Core.
     void loadDroppedComputerPatchFile(const juce::File& file);
@@ -425,6 +429,8 @@ private:
     void dispatchMasterParameterChange(const juce::String& parameterId);
     void dispatchMutatorHistorySelectionChange(const juce::String& parameterId);
     void handleDeviceTypePropertyChange(const juce::String& propertyName);
+    void cancelMasterEditSysExDebounce() noexcept;
+    void firePendingMasterEditSysEx();
     void resyncSynthAfterEditorialUndoRedo();
     void beginEditorialResyncGranularMidiQuietPeriod();
     bool isEditorialResyncGranularMidiQuiet() const;
@@ -471,6 +477,7 @@ private:
     std::unique_ptr<Core::MasterParameterSysExDispatcher> masterParameterSysExDispatcher_;
     std::unique_ptr<Core::MatrixModBusParameterSysExDispatcher> matrixModBusParameterSysExDispatcher_;
     std::unique_ptr<MatrixModSysExCoalesceTimer> matrixModSysExCoalesceTimer_;
+    std::unique_ptr<Core::ComboboxPatchSendDebouncer> masterEditSysExDebouncer_;
     std::unique_ptr<Core::MatrixModBusReorderService> matrixModBusReorderService_;
     std::unique_ptr<Core::MatrixModInitService> matrixModInitService_;
     std::unique_ptr<SysExParser> sysExParser_;

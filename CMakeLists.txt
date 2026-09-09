@@ -475,6 +475,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/PatchModelTests.cpp
         Tests/Unit/SysExEncoderTests.cpp
         Tests/Unit/MasterParameterSysExDispatcherTests.cpp
+        Tests/Unit/MasterEditSysExDebounceTests.cpp
         Tests/Unit/MatrixModBusParameterSysExDispatcherTests.cpp
         Tests/Unit/MatrixModBusReorderServiceTests.cpp
         Tests/Unit/MasterModuleInitServiceTests.cpp

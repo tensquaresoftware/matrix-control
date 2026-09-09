@@ -17,6 +17,7 @@
 #include "Core/Models/PatchNameSyncer.h"
 #include "Core/Services/PatchMutator/MutatorSessionPersistence.h"
 #include "Core/Services/PatchMutator/PatchMutatorEngine.h"
+#include "Core/Util/ComboboxPatchSendDebouncer.h"
 #include "Loggers/ApvtsLogger.h"
 #include "Loggers/MidiLogger.h"
 #include "MIDI/MidiManager.h"
@@ -182,8 +183,40 @@ void PluginProcessor::dispatchMasterParameterChange(const juce::String& paramete
 
     apvtsMasterMapper_->apvtsToBuffer();
 
-    if (isMasterEditOutboundAllowed())
-        masterParameterSysExDispatcher_->dispatch(parameterId);
+    if (! isMasterEditOutboundAllowed())
+        return;
+
+    if (masterEditSysExDebouncer_ == nullptr)
+        return;
+
+    masterEditSysExDebouncer_->schedule([this] { firePendingMasterEditSysEx(); });
+}
+
+void PluginProcessor::cancelMasterEditSysExDebounce() noexcept
+{
+    if (masterEditSysExDebouncer_ != nullptr)
+        masterEditSysExDebouncer_->cancel();
+}
+
+void PluginProcessor::firePendingMasterEditSysEx()
+{
+    if (suppressMasterParameterSysEx_ || isEditorialResyncGranularMidiQuiet())
+        return;
+
+    if (! isMasterEditOutboundAllowed())
+        return;
+
+    if (masterParameterSysExDispatcher_ == nullptr || apvtsMasterMapper_ == nullptr)
+        return;
+
+    apvtsMasterMapper_->apvtsToBuffer();
+    masterParameterSysExDispatcher_->dispatchFull();
+}
+
+void PluginProcessor::flushMasterEditSysExDebouncerForTests()
+{
+    if (masterEditSysExDebouncer_ != nullptr)
+        masterEditSysExDebouncer_->flushPendingSynchronouslyForTests();
 }
 
 void PluginProcessor::dispatchMutatorHistorySelectionChange(const juce::String& parameterId)
@@ -294,6 +327,8 @@ bool PluginProcessor::performEditorialUndo()
     if (matrixModSysExCoalesceTimer_ != nullptr)
         matrixModSysExCoalesceTimer_->cancelPending();
 
+    cancelMasterEditSysExDebounce();
+
     suppressPatchParameterSysEx_ = true;
     suppressMatrixModParameterSysEx_ = true;
     suppressMasterParameterSysEx_ = true;
@@ -307,6 +342,8 @@ bool PluginProcessor::performEditorialUndo()
 
     if (matrixModSysExCoalesceTimer_ != nullptr)
         matrixModSysExCoalesceTimer_->cancelPending();
+
+    cancelMasterEditSysExDebounce();
 
     suppressPatchParameterSysEx_ = false;
     suppressMatrixModParameterSysEx_ = false;
@@ -325,6 +362,8 @@ bool PluginProcessor::performEditorialRedo()
     if (matrixModSysExCoalesceTimer_ != nullptr)
         matrixModSysExCoalesceTimer_->cancelPending();
 
+    cancelMasterEditSysExDebounce();
+
     suppressPatchParameterSysEx_ = true;
     suppressMatrixModParameterSysEx_ = true;
     suppressMasterParameterSysEx_ = true;
@@ -338,6 +377,8 @@ bool PluginProcessor::performEditorialRedo()
 
     if (matrixModSysExCoalesceTimer_ != nullptr)
         matrixModSysExCoalesceTimer_->cancelPending();
+
+    cancelMasterEditSysExDebounce();
 
     suppressPatchParameterSysEx_ = false;
     suppressMatrixModParameterSysEx_ = false;

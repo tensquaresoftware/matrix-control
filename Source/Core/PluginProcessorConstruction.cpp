@@ -31,6 +31,7 @@
 #include "Shared/ProjectPaths.h"
 #include "Core/Services/PatchFileService.h"
 #include "Core/Services/PatchMutator/PatchMutatorEngine.h"
+#include "Core/Util/ComboboxPatchSendDebouncer.h"
 #include "MIDI/MidiManager.h"
 #include "Shared/Definitions/PluginIDs.h"
 
@@ -61,6 +62,9 @@ void PluginProcessor::createSysExDispatchers()
 
     matrixModSysExCoalesceTimer_ = std::make_unique<MatrixModSysExCoalesceTimer>(
         *matrixModBusParameterSysExDispatcher_);
+
+    masterEditSysExDebouncer_ = std::make_unique<Core::ComboboxPatchSendDebouncer>(
+        Core::kMasterEditSysExDebounceMs);
 
     matrixModBusReorderService_ = std::make_unique<Core::MatrixModBusReorderService>(
         *patchModel_,
@@ -111,7 +115,13 @@ void PluginProcessor::createActionSubsystem()
 {
     Core::ActionExecutionHooks actionHooks{
         .setSuppressMatrixModSysEx = [this](bool suppress) { suppressMatrixModParameterSysEx_ = suppress; },
-        .setSuppressMasterSysEx = [this](bool suppress) { suppressMasterParameterSysEx_ = suppress; },
+        .setSuppressMasterSysEx =
+            [this](bool suppress)
+            {
+                if (suppress)
+                    cancelMasterEditSysExDebounce();
+                suppressMasterParameterSysEx_ = suppress;
+            },
         .setSuppressPatchSysEx = [this](bool suppress) { suppressPatchParameterSysEx_ = suppress; },
         .setSuppressPatchSelectionMidiSync = [this](bool suppress) { suppressPatchSelectionMidiSync_ = suppress; },
         .setSuppressMutatorHistorySelectionDebounce =
