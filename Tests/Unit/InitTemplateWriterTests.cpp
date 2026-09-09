@@ -34,7 +34,9 @@ public:
         writeMasterInit_writesMasterInitSyx();
         writeAndLoadMasterInit_roundTrip();
         initAllModules_appliesTemplate();
+        initAllModules_emptyFolderUsesHardcodedFallback();
         saveBlocked_whenSentinelActive();
+        unsavedGateSaveBlocked_whenSentinelActive();
         deletePatchInit_removesFileAndLoadFallsBack();
         deleteMasterInit_removesFileAndLoadFallsBack();
         deletePatchInit_absentFileFails();
@@ -276,6 +278,52 @@ private:
         tempDir.deleteRecursively();
     }
 
+    void initAllModules_emptyFolderUsesHardcodedFallback()
+    {
+        beginTest("initAllModules_emptyFolderUsesHardcodedFallback");
+
+        SysExParser parser;
+        SysExDecoder decoder(parser);
+        Core::InitTemplateLoader loader(decoder);
+
+        TestAudioProcessorMasterInit proc(makeMasterLayout());
+        Core::MasterModel model;
+        Core::ApvtsMasterMapper mapper(proc.apvts, model);
+
+        const auto emptyDir = juce::File::getSpecialLocation(juce::File::tempDirectory)
+                                  .getNonexistentChildFile("MatrixControlInitAllMasterEmpty", "", true);
+        expect(emptyDir.createDirectory());
+        expect(! Core::InitTemplateLoader::resolveMasterInitFile(emptyDir).existsAsFile());
+
+        fillModelWithDistinctValues(model);
+        model.data()[12] = 0;
+        model.data()[35] = 1;
+        mapper.bufferToApvts();
+
+        int dispatchCount = 0;
+        Core::MasterParameterSysExDispatcher dispatcher(model, [&](const juce::uint8*) { ++dispatchCount; });
+        Core::MasterModuleInitService service(model, mapper, loader, dispatcher, [&]() { return emptyDir; });
+
+        const auto result = service.initAllModules();
+        expect(result.success && result.source == Core::InitTemplateSource::kHardcodedFallback);
+        expect(result.infoMessage.isNotEmpty());
+        expect(dispatchCount == 1);
+
+        Core::MasterModel expectedDefaults;
+        expectedDefaults.loadFrom(Core::InitDefaults::masterData());
+
+        using namespace PluginIDs::MasterEditSection;
+        expect(moduleBytesMatch(model, expectedDefaults, MidiModule::kGroupId)
+               && moduleBytesMatch(model, expectedDefaults, VibratoModule::kGroupId)
+               && moduleBytesMatch(model, expectedDefaults, MiscModule::kGroupId));
+
+        Core::MasterModel fromApvts;
+        Core::ApvtsMasterMapper(proc.apvts, fromApvts).apvtsToBuffer();
+        expect(std::memcmp(fromApvts.data(), model.data(), Core::MasterModel::kBufferSize) == 0);
+
+        emptyDir.deleteRecursively();
+    }
+
     void saveBlocked_whenSentinelActive()
     {
         beginTest("saveBlocked_whenSentinelActive");
@@ -317,6 +365,44 @@ private:
         harness.model.setName(kInitPatchName);
 
         harness.handler.handleAction(ComputerWidgets::kSavePatchFile, juce::var());
+
+        expectEquals(target.getSize(), sizeBefore);
+        expect(target.getLastModificationTime() == modBefore);
+        expectEquals(harness.proc.apvts.state.getProperty("uiMessageText").toString(),
+                     juce::String(kRenameBeforeSave));
+
+        tempDir.deleteRecursively();
+    }
+
+    void unsavedGateSaveBlocked_whenSentinelActive()
+    {
+        beginTest("unsavedGateSaveBlocked_whenSentinelActive");
+
+        using PluginDisplayNames::PatchEditSection::PatchNameModule::StandaloneWidgets::kInitPatchName;
+        using PluginDisplayNames::Settings::FooterMessages::kRenameBeforeSave;
+        using PluginIDs::PatchEditSection::PatchNameModule::kPatchName;
+        using namespace PatchManagerActionHandlerTestSupport;
+        namespace ComputerWidgets = PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets;
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        const auto tempDir = createTempScanDir();
+        expect(tempDir.createDirectory());
+        copyFixturePatchToDir(tempDir, "Patch 71.syx");
+        const auto target = tempDir.getChildFile("Patch 71.syx");
+
+        setupComputerPatchesScan(harness, tempDir);
+        harness.proc.apvts.state.setProperty(ComputerWidgets::kSelectPatchFile, 1, nullptr);
+        simulateSelectPatchFileDispatch(harness);
+        expect(harness.handler.hasUsableKnownSyxPath());
+
+        harness.proc.apvts.state.setProperty(kPatchName, kInitPatchName, nullptr);
+        harness.model.setName(kInitPatchName);
+
+        const auto sizeBefore = target.getSize();
+        const auto modBefore = target.getLastModificationTime();
+
+        expect(! harness.handler.tryPersistCurrentPatchFromUnsavedGate(
+            Core::UnsavedEditPersistKind::kSave));
 
         expectEquals(target.getSize(), sizeBefore);
         expect(target.getLastModificationTime() == modBefore);

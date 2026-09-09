@@ -96,27 +96,35 @@ context:
 
 ### Review Findings
 
-Combined code review (`eddf49d8...HEAD`, 2026-09-09) with `spec-settings-delete-init-template.md`.
+Combined code review resume GPC B (`eddf49d8..0983e464`, 2026-09-09) with `spec-settings-delete-init-template.md`. STORE / PATCH NAME modes wiring **out of scope** (shipped elsewhere; smoke INIT→STORE OK).
 
-- [x] [Review][Decision→Defer] After INIT, protect hardware from `* INIT *` on STORE (button stays enabled; require valid Patch Name via proper PATCH NAME UI modes) — deferred: pause this review; implement PATCH NAME display modes first, then resume review / wire STORE. Audition policy TBD in that follow-up.
-- [ ] [Review][Patch] SAVE AS INIT silent no-op when processor deps are null — publish footer instead of bare `return` [`PluginProcessorInitTemplates.cpp:36-38` / `50-51`] (left as action item while PATCH NAME chantier runs)
-- [ ] [Review][Patch] Add `initAllModules` empty-folder fallback unit test [`MasterModuleInitService` / `InitTemplateWriterTests.cpp`] (left as action item while PATCH NAME chantier runs)
-- [x] [Review][Defer] Live AppData Init/ no-arg resolve path untested — deferred: pre-existing verification gap; tempDir overloads cover I/O logic
-- [x] [Review][Defer] `loadMasterFromUserFile` failure does not assert MasterModel unchanged — deferred: secondary isolation gap; success path covered
+- [x] [Review][Patch] SAVE AS INIT (and sibling Settings Core actions) silent no-op when processor deps are null — publish warning footer instead of bare `return` [`PluginProcessorInitTemplates.cpp:36-38` / `50-51` / also initAll / Master LOAD / SAVE]
+- [x] [Review][Patch] Add `initAllModules` empty-folder fallback unit test [`MasterModuleInitService` / `InitTemplateWriterTests.cpp`]
+- [x] [Review][Patch] Cover unsaved-gate Computer Save (`tryPersist…kSave`) while `* INIT *` is active — assert no overwrite + rename footer [`PatchManagerActionHandlerComputerLoadSave.cpp` refuse inside `saveCurrentPatchToFile`; gate path only covered via button Save today] — also fail-closed in `performUnsavedGatePersistAction` before write
+- [x] [Review][Decision→Defer→Done] After INIT, protect hardware from `* INIT *` on STORE via PATCH NAME UI — **superseded/closed**: PATCH NAME modes (`77cdbf53`) + STORE gate (`60c71605`) shipped; findings closed in `spec-store-after-init-name-required.md`; do not re-litigate unless regression in this Settings Init range (none found)
+- [x] [Review][Defer] Live AppData Init/ no-arg resolve path untested — deferred: reconfirmed on resume; tempDir overloads cover I/O logic
+- [x] [Review][Defer] `loadMasterFromUserFile` failure does not assert MasterModel unchanged — deferred: reconfirmed on resume; secondary isolation gap; success path covered
 - [x] [Review][Defer] Mutator export/history basename can use sentinel `* INIT *` — deferred: out of frozen AC scope (Computer Patches Save/Save As only)
-- [x] [Review][Defer] Master UTILITY SAVE AS chooser starts at process CWD — deferred: UX polish; AC does not require a Documents start folder
+- [x] [Review][Defer] Master UTILITY SAVE AS chooser starts at process CWD — deferred: reconfirmed; UX polish; AC does not require a Documents start folder
 
 #### Rejected
 - Settings height overflow in plugin mode (`false`) — content ~423 px vs design 456 (1 px spare at 100%); not ~23 px overflow
 - Legacy custom Init folder migration (`false`) — frozen intent ignores prior free-form path
 - DELETE vs “SAVE AS INIT only” on Master INIT TEMPLATE (`false` for code) — superseded by sibling DELETE spec in same commit; do not remove DELETE
 - Orphaned `kComingSoon` (`false`) — still used by Patch Mutator Defrag History placeholder
-- Unused `MasterGlobalInitConfirm::kConfirm`/`kCancel` (`low`) — identical to per-module strings; prior review already accepted
+- Unused `MasterGlobalInitConfirm::kConfirm`/`kCancel` (`false`/`low`) — identical to per-module strings; prior review already accepted; reconfirmed on resume
 - Generic Master SAVE AS INIT fail footer overwriting `kMasterFileFailed` (`false`) — intentional prior patch for INIT TEMPLATE vocabulary
 - InitTemplateWriter also owns Master LOAD/user SAVE (`low`) — intentional Core SSOT for this chrome; no demonstrated caller divergence
 - Duplicated Settings footer helpers (`low`) — both paths work; no named harm
 - AppData Init create-fail UX / exists creates empty Init/ (`low` / intentional) — create-on-demand is frozen behavior
-- Manual omits STORE sentinel warning (`low`) — follows Computer Patches-only AC until Decision above
+- Manual omits STORE sentinel warning (`low`) — STORE gate shipped in separate chantier; Settings Init AC remains Computer Patches Save/Save As
+- Master UTILITY INIT closes Settings before confirm; Cancel leaves Settings closed (`low`) — intentional overlay pattern (same as other modal chrome); reopen is one click
+- `writeMasterToFile` ignores `createDirectory` result (`low`) — write failure still surfaces via footer; prior triage already cleared parent-create behavior
+- `MasterInitConfirmDialog` height 120 for global body (`maybe-false`/`low`) — no visual proof of truncation; reject without evidence
+- `writePatchInit_blanksNameBytes` uses model name `"SENTINEL"` not `* INIT *` (`false`) — production blanks name bytes unconditionally; test proves blanking, not sentinel string identity
+- No test that renaming off `* INIT *` then allows Save (`low`) — button refuse paths already covered; inverse happy-path not worth extra surface this pass
+- UTILITY `SAVE AS` 44 px label clip (`maybe-false`/`low`) — design contract is 44+4+44+4+44; no proven everyday clip
+- Unsaved-gate `perform…` returns true after sentinel refuse (`false`) — `tryPersist` still fails via dirty check in `didUnsavedGatePersistSucceed`; real gap is missing gate-path *test* (kept as Patch above)
 
 ## Implementation Notes
 

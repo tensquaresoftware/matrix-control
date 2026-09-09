@@ -81,18 +81,19 @@ context:
 
 ### Review Findings
 
-Combined code review (`eddf49d8...HEAD`, 2026-09-09) with `spec-system-init-syx-filenames.md`. DELETE ACs themselves: no acceptance gaps.
+Combined code review resume GPC B (`eddf49d8..0983e464`, 2026-09-09) with `spec-system-init-syx-filenames.md`. DELETE ACs themselves: no new acceptance gaps on resume. STORE / PATCH NAME modes **out of scope** (shipped elsewhere).
 
-- [x] [Review][Decision→Defer] After INIT, protect hardware from `* INIT *` on STORE via PATCH NAME UI (not greyed STORE) — deferred: same pause as sibling system-init review; resume after PATCH NAME modes chantier.
-- [ ] [Review][Patch] SAVE AS INIT silent no-op when processor deps are null — publish footer instead of bare `return` [`PluginProcessorInitTemplates.cpp:36-38` / `50-51`] (action item; not applied in this pause)
-- [ ] [Review][Patch] Add `initAllModules` empty-folder fallback unit test [`MasterModuleInitService` / `InitTemplateWriterTests.cpp`] (action item; not applied in this pause)
-- [x] [Review][Defer] Live AppData Init/ no-arg resolve path untested — deferred: reconfirmed; already in deferred-work
-- [x] [Review][Defer] `loadMasterFromUserFile` failure does not assert MasterModel unchanged — deferred: reconfirmed; already in deferred-work
+- [x] [Review][Patch] SAVE AS INIT (and sibling Settings Core actions) silent no-op when processor deps are null — publish warning footer instead of bare `return` [`PluginProcessorInitTemplates.cpp:36-38` / `50-51` / also initAll / Master LOAD / SAVE]
+- [x] [Review][Patch] Add `initAllModules` empty-folder fallback unit test [`MasterModuleInitService` / `InitTemplateWriterTests.cpp`]
+- [x] [Review][Patch] Cover unsaved-gate Computer Save (`tryPersist…kSave`) while `* INIT *` is active — assert no overwrite + rename footer (sentinel refuse lives in `saveCurrentPatchToFile`; button Save covered, gate path not) — also fail-closed in `performUnsavedGatePersistAction` before write
+- [x] [Review][Decision→Defer→Done] After INIT, protect hardware from `* INIT *` on STORE via PATCH NAME UI — **superseded/closed**: modes + STORE gate shipped; do not re-litigate unless regression in this Settings Init range (none found)
+- [x] [Review][Defer] Live AppData Init/ no-arg resolve path untested — deferred: reconfirmed on resume; already in deferred-work
+- [x] [Review][Defer] `loadMasterFromUserFile` failure does not assert MasterModel unchanged — deferred: reconfirmed on resume; already in deferred-work
 - [x] [Review][Defer] Mutator export/history basename can use sentinel `* INIT *` — deferred: out of DELETE / system-init AC scope
-- [x] [Review][Defer] Master UTILITY SAVE AS chooser starts at process CWD — deferred: UX polish outside DELETE ACs
+- [x] [Review][Defer] Master UTILITY SAVE AS chooser starts at process CWD — deferred: reconfirmed; UX polish outside DELETE ACs
 
 #### Rejected
-- See `spec-system-init-syx-filenames.md` Review Findings Rejected list (same combined triage). DELETE-focused acceptance auditor: no findings.
+- See `spec-system-init-syx-filenames.md` Review Findings Rejected list (same combined triage resume). DELETE-focused acceptance auditor: no new findings.
 
 ## Implementation Notes
 

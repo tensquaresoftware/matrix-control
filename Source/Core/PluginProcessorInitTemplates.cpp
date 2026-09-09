@@ -35,7 +35,12 @@ void PluginProcessor::savePatchAsInitTemplate()
 {
     if (patchModel_ == nullptr || apvtsPatchMapper_ == nullptr || patchNameSyncer_ == nullptr
         || patchFileService_ == nullptr || midiManager == nullptr)
+    {
+        publishSettingsFooter(apvts,
+                              PluginDisplayNames::Settings::FooterMessages::kInitTemplateWriteFailed,
+                              true);
         return;
+    }
 
     apvtsPatchMapper_->apvtsToBuffer();
     patchNameSyncer_->apvtsToBuffer();
@@ -48,7 +53,12 @@ void PluginProcessor::savePatchAsInitTemplate()
 void PluginProcessor::saveMasterAsInitTemplate()
 {
     if (masterModel_ == nullptr || apvtsMasterMapper_ == nullptr || midiManager == nullptr)
+    {
+        publishSettingsFooter(apvts,
+                              PluginDisplayNames::Settings::FooterMessages::kInitTemplateWriteFailed,
+                              true);
         return;
+    }
 
     apvtsMasterMapper_->apvtsToBuffer();
 
@@ -82,7 +92,12 @@ bool PluginProcessor::masterInitTemplateExists() const
 void PluginProcessor::initAllMasterModulesFromTemplate()
 {
     if (masterModuleInitService_ == nullptr)
+    {
+        publishSettingsFooter(apvts,
+                              PluginDisplayNames::Settings::FooterMessages::kMasterFileFailed,
+                              true);
         return;
+    }
 
     const auto result = masterModuleInitService_->initAllModules();
     Core::InitTemplateFooter::propagateMessage(apvts, result);
@@ -92,7 +107,12 @@ void PluginProcessor::loadMasterFromUserFile(const juce::File& file)
 {
     if (masterModel_ == nullptr || apvtsMasterMapper_ == nullptr || initTemplateLoader_ == nullptr
         || masterParameterSysExDispatcher_ == nullptr)
+    {
+        publishSettingsFooter(apvts,
+                              PluginDisplayNames::Settings::FooterMessages::kMasterFileFailed,
+                              true);
         return;
+    }
 
     const auto result = Core::InitTemplateWriter::loadMasterFromUserFile(
         *masterModel_, file, *initTemplateLoader_);
@@ -113,7 +133,12 @@ void PluginProcessor::loadMasterFromUserFile(const juce::File& file)
 void PluginProcessor::saveMasterToUserFile(const juce::File& file)
 {
     if (masterModel_ == nullptr || apvtsMasterMapper_ == nullptr || midiManager == nullptr)
+    {
+        publishSettingsFooter(apvts,
+                              PluginDisplayNames::Settings::FooterMessages::kMasterFileFailed,
+                              true);
         return;
+    }
 
     apvtsMasterMapper_->apvtsToBuffer();
 

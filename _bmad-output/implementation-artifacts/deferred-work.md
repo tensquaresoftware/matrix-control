@@ -1463,8 +1463,8 @@ Original review bullets below remain for history; status for U-10-owned residual
 ## Deferred from: spec-settings-delete-init-template.md (2026-09-08)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-settings-delete-init-template.md`
-  summary: SAVE AS INIT still returns silently with no footer when required processor dependencies are null.
-  evidence: Pre-existing prior SAVE AS INIT path in the same dirty tree; not introduced by DELETE.
+  summary: DONE (promoted to open Patch on Settings Init resume 2026-09-09) — SAVE AS INIT silent null-deps no-op is tracked as unchecked `[Review][Patch]` on both Settings Init specs (not deferred).
+  evidence: Was deferred during DELETE-only pass; combined resume keeps it as actionable patch.
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-settings-delete-init-template.md`
   summary: Live fixed Init/ no-arg Writer/service resolve path is not covered by an AppData round-trip test.
@@ -1477,8 +1477,8 @@ Original review bullets below remain for history; status for U-10-owned residual
 ## Deferred from: code review of spec-system-init-syx-filenames.md + spec-settings-delete-init-template.md (2026-09-09)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-system-init-syx-filenames.md`
-  summary: DONE (superseded) — STORE-after-INIT name-required gate shipped in `spec-store-after-init-name-required.md` (sentinel gate + pending STORE + audition suppress on name-required success). Next: resume paused combined Settings Init review (`spec-system-init-syx-filenames` + `spec-settings-delete-init-template`) and refresh Review Findings that still say “resume after PATCH NAME modes”.
-  evidence: Former chantier-first reminder; product STORE gate implemented 2026-09-09.
+  summary: DONE (superseded) — STORE-after-INIT name-required gate shipped in `spec-store-after-init-name-required.md`. Combined Settings Init review resumed 2026-09-09 (GPC B); Review Findings Decision→Defer “resume after PATCH NAME” closed as Decision→Defer→Done on both Settings Init specs.
+  evidence: Former chantier-first reminder; product STORE gate implemented 2026-09-09; resume review refreshed findings.
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-system-init-syx-filenames.md`
   summary: Reconfirmed — live fixed Init/ no-arg Writer/service resolve path still lacks an AppData round-trip unit test.
@@ -1507,18 +1507,36 @@ Original review bullets below remain for history; status for U-10-owned residual
   evidence: Former verification-gap; STORE wiring Build asserts Core gate; Escape/blur GUI outcome still best checked manually or in TestComponent.
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-patch-name-display-modes.md`
-  summary: Settings Init / DELETE Review Findings still say “resume after PATCH NAME modes chantier”; refresh those findings when resuming the combined Settings Init review now that modes UI + STORE gate exist.
-  evidence: Blind Hunter cross-spec staleness; out of STORE Build’s code scope — resume review is the next step.
+  summary: DONE — Settings Init / DELETE Review Findings refreshed on resume 2026-09-09; Decision→Defer “resume after PATCH NAME” closed as Decision→Defer→Done.
+  evidence: Blind Hunter cross-spec staleness; resume review completed the refresh.
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-patch-name-display-modes.md`
-  summary: Older deferred note still says “implement PATCH NAME display-modes first”; STORE wiring is now done — next action is Settings Init combined review resume only.
-  evidence: Blind Hunter overlapping deferred-work next-steps; do not rewrite historical entries.
+  summary: DONE — STORE wiring done; Settings Init combined review resumed 2026-09-09 (no further “implement modes first” gate).
+  evidence: Blind Hunter overlapping deferred-work next-steps; historical reminder closed by resume.
 
 ## Deferred from: spec-store-after-init-name-required.md (2026-09-09)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-store-after-init-name-required.md`
-  summary: Resume paused combined Settings Init code review (`spec-system-init-syx-filenames` + `spec-settings-delete-init-template`) and refresh Review Findings text that still points at the PATCH NAME modes chantier / STORE follow-up.
-  evidence: GPC B / Build AC; STORE gate shipped; review was paused pending this wiring.
+  summary: DONE — paused combined Settings Init code review resumed 2026-09-09 (GPC B); Review Findings refreshed; Decision→Defer PATCH NAME/STORE closed.
+  evidence: GPC B / Build AC; STORE gate shipped; resume completed.
+
+## Deferred from: code review resume of spec-system-init-syx-filenames.md + spec-settings-delete-init-template.md (2026-09-09)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-system-init-syx-filenames.md`
+  summary: Reconfirmed on resume — live fixed Init/ no-arg Writer/service resolve path still lacks an AppData round-trip unit test.
+  evidence: Resume verification-gap; tempDir overloads cover I/O; no-arg path unpinned.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-system-init-syx-filenames.md`
+  summary: Reconfirmed on resume — `loadMasterFromUserFile` failure path has no assert that MasterModel bytes stay unchanged.
+  evidence: Resume verification-gap; success round-trip covered only.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-system-init-syx-filenames.md`
+  summary: Reconfirmed on resume — Mutator export/history basename can still use sentinel `* INIT *` (out of Settings Init AC).
+  evidence: Out of frozen Computer Patches Save/Save As scope; unchanged.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-system-init-syx-filenames.md`
+  summary: Reconfirmed on resume — Master UTILITY SAVE AS chooser starts at process CWD.
+  evidence: UX polish; AC does not require Documents start folder.
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-store-after-init-name-required.md`
   summary: Automate `commitPatchNameRename(..., suppressAuditionSysEx)` against the MIDI outbound queue (true skips audition; false still auditions) — today only the bool policy helper is unit-tested.

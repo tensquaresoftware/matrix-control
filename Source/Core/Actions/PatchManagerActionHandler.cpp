@@ -289,6 +289,11 @@ namespace Core
                 if (! hasUsableKnownSyxPath())
                     return false;
 
+                // Gate path must fail closed on sentinel: perform() used to return true even when
+                // saveCurrentPatchToFile refused, which could look like success if dirty was clear.
+                if (refuseSaveIfInitSentinelActive())
+                    return false;
+
                 saveCurrentPatchToFile(juce::File(knownSyxFullPath_));
                 return true;
 
