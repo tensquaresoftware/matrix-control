@@ -98,11 +98,14 @@ context:
 - Debouncer: `ComboboxPatchSendDebouncer` at `kMasterEditSysExDebounceMs` (150), owned by `PluginProcessor` as `masterEditSysExDebouncer_`.
 - Listener path keeps `apvtsToBuffer()` immediate; schedule → `firePendingMasterEditSysEx()` re-checks suppress / quiet / outbound gate then `dispatchFull()`.
 - Cancel sites: editorial undo/redo (both sides of undo like Matrix Mod), `setSuppressMasterSysEx(true)` (module INIT), `initAllMasterModulesFromTemplate` / `loadMasterFromUserFile` (cancel before and after `bufferToApvts` so listener-armed schedules cannot double-send after intentional `dispatchFull`).
-- Tests: `Tests/Unit/MasterEditSysExDebounceTests.cpp` harness mirrors processor schedule/fire/cancel (sync flush only); review added null-guard, suppress/quiet-at-fire, and second-burst cases; Unicode arrows removed from `beginTest` titles.
+- After `bufferToApvts` / INIT / leave-suppress: `flushDeferredApvtsParameterSync` then cancel (same pattern as editorial undo) so late APVTS→ValueTree sync cannot re-arm a second 0x03.
+- Leaving `setSuppressMasterSysEx(false)` flushes deferred sync while still suppressed, then cancels, then clears the flag.
+- Tests: `Tests/Unit/MasterEditSysExDebounceTests.cpp` harness mirrors processor schedule/fire/cancel (sync flush only); review added null-guard, suppress/quiet-at-fire, suppress-true cancel, and second-burst cases; Unicode arrows removed from `beginTest` titles.
 
 ## Spec Change Log
 
 - 2026-09-09 — Implemented Master Edit outbound SysEx trailing debounce (150 ms); unit tests + lint green.
+- 2026-09-10 — Code review patches: flush deferred APVTS sync before trailing Master debounce cancel (INIT / load / leave-suppress); harness test for suppress-true cancel.
 
 ## Review Triage Log
 
@@ -125,6 +128,23 @@ context:
 | VG: editorial undo cancel unobserved in UndoManager tests | medium | True CI-blind spot; not trivial to wire — **defer** (with BH editorial) |
 
 Review patches applied 2026-09-09; deferred entries appended to `deferred-work.md`.
+
+### Review Findings
+
+*(Code review of commit `297a3e76`, 2026-09-10 — layers: Blind Hunter, Edge Case Hunter, Verification Gap, Acceptance Auditor.)*
+
+- [x] [Review][Patch] Flush deferred APVTS→ValueTree sync before trailing Master debounce cancel on INIT / Master file load / leave-suppress — without `flushDeferredApvtsParameterSync` + cancel (same pattern as editorial undo/redo), a late ValueTree property sync can re-arm the debouncer after the intentional `dispatchFull` and enqueue a second full 0x03. [`PluginProcessorInitTemplates.cpp:102-105`, `131-133`; `PluginProcessorConstruction.cpp:118-123`]
+- [x] [Review][Patch] Add harness coverage that suppress-true cancels pending Master debounce (module INIT wrap) — today tests cover no-arm while suppressed and drop-at-fire while still suppressed, not cancel-on-suppress then clear then flush with zero enqueue. [`PluginProcessorConstruction.cpp:118-123`; `Tests/Unit/MasterEditSysExDebounceTests.cpp`]
+- [x] [Review][Defer] Drive real `PluginProcessor` flush seam in Master debounce tests — deferred: already recorded 2026-09-09; reconfirmed this review
+- [x] [Review][Defer] Master-aware editorial undo/redo MIDI cancel coverage — deferred: already recorded 2026-09-09; reconfirmed this review
+
+#### Rejected (2026-09-10)
+
+- CHANNEL skim vs Pedal1-only coalesce tests — `low`: shared schedule path; adding a second near-identical case is not everyday risk.
+- Coalesce asserts model value not decoded 0x03 payload — `low`: `dispatchFull` sends current model buffer; rejected same way in prior triage.
+- Spec Code Map / Tasks checklist / frontmatter / ctest ellipsis stale — reject: fix would edit the spec under review.
+- Dual hard-coded 150 without `static_assert` — `low`: named constants intentional per frozen decisions.
+- `ComboboxPatchSendDebouncer` naming for Master — `low`: rename is larger than a direct fix; constant comment documents Master policy.
 
 ## Design Notes
 

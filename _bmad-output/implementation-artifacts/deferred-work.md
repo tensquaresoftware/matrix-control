@@ -1565,3 +1565,13 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-master-edit-sysex-debounce.md`
   summary: Add Master-aware coverage to editorial undo/redo MIDI tests for cancelPending of Master debounce.
   evidence: performEditorialUndo/Redo cancel Master debounce beside Matrix Mod; UndoManagerEditorialUndoMidiTests has no Master enqueue assertion, so deleting those cancel calls would not fail CI.
+
+## Deferred from: code review of spec-master-edit-sysex-debounce.md (2026-09-10)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-master-edit-sysex-debounce.md`
+  summary: RECONFIRMED — strengthen Master Edit SysEx debounce tests to drive real PluginProcessor flush seam (not only the mirrored harness). See 2026-09-09 entry above.
+  evidence: Blind Hunter + Verification Gap + Acceptance Auditor on commit 297a3e76; `flushMasterEditSysExDebouncerForTests` still unused by tests.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-master-edit-sysex-debounce.md`
+  summary: RECONFIRMED — Master-aware editorial undo/redo MIDI cancel coverage for Master debounce. See 2026-09-09 entry above.
+  evidence: Blind Hunter + Verification Gap + Acceptance Auditor on commit 297a3e76; production cancel sites present, UndoManagerEditorialUndoMidiTests still Matrix-Mod-only.

@@ -1,6 +1,7 @@
 // Settings INIT TEMPLATE / Master UTILITY actions (message-thread).
 
 #include "PluginProcessor.h"
+#include "PluginProcessorInternal.h"
 
 #include "Core/Init/InitTemplateFooter.h"
 #include "Core/Init/InitTemplateWriter.h"
@@ -101,7 +102,9 @@ void PluginProcessor::initAllMasterModulesFromTemplate()
 
     cancelMasterEditSysExDebounce();
     const auto result = masterModuleInitService_->initAllModules();
-    // bufferToApvts inside init may arm the debounce; drop it so only dispatchFull remains.
+    // bufferToApvts may arm via deferred APVTS→ValueTree sync; flush then cancel so only
+    // the intentional dispatchFull inside initAllModules remains.
+    PluginProcessorInternal::flushDeferredApvtsParameterSync(apvts);
     cancelMasterEditSysExDebounce();
     Core::InitTemplateFooter::propagateMessage(apvts, result);
 }
@@ -130,6 +133,7 @@ void PluginProcessor::loadMasterFromUserFile(const juce::File& file)
 
     cancelMasterEditSysExDebounce();
     apvtsMasterMapper_->bufferToApvts();
+    PluginProcessorInternal::flushDeferredApvtsParameterSync(apvts);
     cancelMasterEditSysExDebounce();
     masterParameterSysExDispatcher_->dispatchFull();
     publishSettingsFooter(apvts, PluginDisplayNames::Settings::FooterMessages::kMasterLoaded, false);

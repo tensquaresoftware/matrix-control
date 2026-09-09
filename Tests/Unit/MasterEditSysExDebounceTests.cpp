@@ -77,6 +77,14 @@ struct MasterEditSysExDebounceHarness
         debouncer.flushPendingSynchronouslyForTests();
     }
 
+    // Mirrors PluginProcessor setSuppressMasterSysEx(true) cancel-then-flag.
+    void setSuppressMasterSysEx(bool suppress)
+    {
+        if (suppress)
+            cancelPending();
+        suppressMasterParameterSysEx = suppress;
+    }
+
     // INIT / file-load: cancel pending, then one intentional dispatchFull.
     void dispatchFullImmediateAfterCancel()
     {
@@ -121,6 +129,7 @@ public:
         gateFalseAtFire_noEnqueue();
         suppressOrQuiet_doesNotArmDebounce();
         suppressOrQuietAfterSchedule_dropsAtFire();
+        suppressTrue_cancelsPendingWithoutEnqueueAfterClear();
         secondBurstAfterFlush_sendsAgain();
     }
 
@@ -243,6 +252,26 @@ private:
             harness.flushPendingSynchronouslyForTests();
             expectEquals(harness.enqueueCount, 0);
         }
+    }
+
+    void suppressTrue_cancelsPendingWithoutEnqueueAfterClear()
+    {
+        beginTest("suppress true cancels pending; clear then flush yields no enqueue");
+
+        MasterEditSysExDebounceHarness harness;
+        harness.noteMasterParameterChanged(pedal1ParameterId());
+        expect(harness.debouncer.isPending());
+
+        // Module INIT wrap: suppress true cancels; intentional dispatchFull happens under suppress.
+        harness.setSuppressMasterSysEx(true);
+        expect(! harness.debouncer.isPending());
+        harness.dispatcher.dispatchFull();
+        expectEquals(harness.enqueueCount, 1);
+
+        harness.setSuppressMasterSysEx(false);
+        harness.flushPendingSynchronouslyForTests();
+        expectEquals(harness.enqueueCount, 1);
+        expectEquals(harness.drainMasterEnqueueCount(), 1);
     }
 
     void secondBurstAfterFlush_sendsAgain()

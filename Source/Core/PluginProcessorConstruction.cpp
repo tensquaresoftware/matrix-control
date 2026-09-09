@@ -119,8 +119,17 @@ void PluginProcessor::createActionSubsystem()
             [this](bool suppress)
             {
                 if (suppress)
+                {
                     cancelMasterEditSysExDebounce();
-                suppressMasterParameterSysEx_ = suppress;
+                    suppressMasterParameterSysEx_ = true;
+                    return;
+                }
+
+                // Leaving suppress after module INIT: flush deferred APVTS→ValueTree while
+                // still suppressed, then cancel so a late sync cannot arm a second 0x03.
+                flushDeferredApvtsParameterSync(apvts);
+                cancelMasterEditSysExDebounce();
+                suppressMasterParameterSysEx_ = false;
             },
         .setSuppressPatchSysEx = [this](bool suppress) { suppressPatchParameterSysEx_ = suppress; },
         .setSuppressPatchSelectionMidiSync = [this](bool suppress) { suppressPatchSelectionMidiSync_ = suppress; },
