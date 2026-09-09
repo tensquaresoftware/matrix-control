@@ -51,6 +51,11 @@ void PluginProcessor::setUnsavedEditConfirmModalGate(UnsavedEditConfirmModalGate
     unsavedEditConfirmModalGate_ = std::move(gate);
 }
 
+void PluginProcessor::setNameRequiredBeforeStoreRequest(NameRequiredBeforeStoreRequest request)
+{
+    nameRequiredBeforeStoreRequest_ = std::move(request);
+}
+
 void PluginProcessor::setMutatorFlushConfirmModalGate(MutatorFlushConfirmModalGate gate)
 {
     mutatorFlushConfirmModalGate_ = std::move(gate);

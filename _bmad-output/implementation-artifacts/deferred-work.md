@@ -1477,8 +1477,8 @@ Original review bullets below remain for history; status for U-10-owned residual
 ## Deferred from: code review of spec-system-init-syx-filenames.md + spec-settings-delete-init-template.md (2026-09-09)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-system-init-syx-filenames.md`
-  summary: After Internal Patches INIT, STORE must not send `* INIT *` to the synth; STORE stays enabled and must require a Matrix-legal Patch Name via a proper PATCH NAME two-line / edit mode (L1 empty+caret, L2 blinking e.g. NAME REQUIRED) — not a greyed STORE button and not a footer-only clear. Code review paused; implement PATCH NAME display-modes chantier first, then resume combined Settings Init review and wire STORE (+ decide audition SysEx name policy).
-  evidence: Combined review Decision 2026-09-09; product choice option 2 (protect hardware) refined to enabled-STORE + name gate; Option 2 UI via PatchNameDisplay (not Option 1 footer-only).
+  summary: DONE (superseded) — STORE-after-INIT name-required gate shipped in `spec-store-after-init-name-required.md` (sentinel gate + pending STORE + audition suppress on name-required success). Next: resume paused combined Settings Init review (`spec-system-init-syx-filenames` + `spec-settings-delete-init-template`) and refresh Review Findings that still say “resume after PATCH NAME modes”.
+  evidence: Former chantier-first reminder; product STORE gate implemented 2026-09-09.
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-system-init-syx-filenames.md`
   summary: Reconfirmed — live fixed Init/ no-arg Writer/service resolve path still lacks an AppData round-trip unit test.
@@ -1499,17 +1499,35 @@ Original review bullets below remain for history; status for U-10-owned residual
 ## Deferred from: spec-patch-name-display-modes.md (2026-09-09)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-patch-name-display-modes.md`
-  summary: Wire STORE-after-INIT pending-action to Patch Name name-required arm/cancel/success outcomes (Escape/blur/empty Return abort; Matrix-legal commit may complete STORE). Resume paused Settings Init combined review (`spec-system-init-syx-filenames` + `spec-settings-delete-init-template`) after this UI contract is in place. Decide audition SysEx name policy while name-required is active.
-  evidence: This Build ships UI modes + TestComponent harness only; product STORE gate intentionally deferred. Prior deferred note (2026-09-09 combined review) still applies — replace that chantier-first reminder with this wiring step.
+  summary: DONE (superseded) — STORE-after-INIT pending-action + name-required arm/cancel/success wired in `spec-store-after-init-name-required.md`. Audition SysEx suppressed on pending-STORE name commit (STORE `sendPatch` alone). Resume Settings Init combined review next.
+  evidence: Former UI-only Build follow-up; product STORE gate implemented 2026-09-09.
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-patch-name-display-modes.md`
-  summary: Automated coverage that Escape/blur/outside-cancel from name-required notifies `onNameRequiredOutcome(false)` (no false-positive success).
-  evidence: Verification-gap review 2026-09-09; no STORE consumer yet — assert when wiring STORE-after-INIT or add harness outcome readout covered by that follow-up.
+  summary: DONE (covered by STORE gate consumer) — name-required cancel/empty outcome aborts pending STORE (no SysEx); Core unit tests lock sentinel STORE gate + hook invoke; GUI cancel path remains manual / harness.
+  evidence: Former verification-gap; STORE wiring Build asserts Core gate; Escape/blur GUI outcome still best checked manually or in TestComponent.
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-patch-name-display-modes.md`
-  summary: Settings Init / DELETE Review Findings still say “resume after PATCH NAME modes chantier”; refresh those findings when resuming the combined Settings Init review now that the modes UI contract exists.
-  evidence: Blind Hunter cross-spec staleness; out of this Build’s code scope.
+  summary: Settings Init / DELETE Review Findings still say “resume after PATCH NAME modes chantier”; refresh those findings when resuming the combined Settings Init review now that modes UI + STORE gate exist.
+  evidence: Blind Hunter cross-spec staleness; out of STORE Build’s code scope — resume review is the next step.
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-patch-name-display-modes.md`
-  summary: Older deferred note still says “implement PATCH NAME display-modes first”; the 2026-09-09 modes Build entry supersedes that reminder — next action is STORE wiring + review resume only.
+  summary: Older deferred note still says “implement PATCH NAME display-modes first”; STORE wiring is now done — next action is Settings Init combined review resume only.
   evidence: Blind Hunter overlapping deferred-work next-steps; do not rewrite historical entries.
+
+## Deferred from: spec-store-after-init-name-required.md (2026-09-09)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-store-after-init-name-required.md`
+  summary: Resume paused combined Settings Init code review (`spec-system-init-syx-filenames` + `spec-settings-delete-init-template`) and refresh Review Findings text that still points at the PATCH NAME modes chantier / STORE follow-up.
+  evidence: GPC B / Build AC; STORE gate shipped; review was paused pending this wiring.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-store-after-init-name-required.md`
+  summary: Automate `commitPatchNameRename(..., suppressAuditionSysEx)` against the MIDI outbound queue (true skips audition; false still auditions) — today only the bool policy helper is unit-tested.
+  evidence: Verification-gap review 2026-09-09; invert suppress leaves helper/StoreSentinel green.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-store-after-init-name-required.md`
+  summary: Automate Editor pending-STORE outcome true → `executeInternalPatchStore` (and false → no STORE) beyond Core helpers; GUI Escape/blur remains manual/harness.
+  evidence: Verification-gap review 2026-09-09; remove execute call leaves Core tests green.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-store-after-init-name-required.md`
+  summary: Optional Matrix-6/6R StoreSentinel assert that deferred rename+STORE does not double-send slot writes when audition would have used 0x01.
+  evidence: Blind Hunter 2026-09-09; frozen one-write policy shared; M-1000 coverage present.

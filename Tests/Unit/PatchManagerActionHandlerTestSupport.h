@@ -127,9 +127,15 @@ namespace PatchManagerActionHandlerTestSupport
             int requestCount = 0;
         };
 
+        struct NameRequiredBeforeStoreHookState
+        {
+            int calls = 0;
+        };
+
         std::shared_ptr<PatchLoadHookState> patchLoadHookState;
         std::shared_ptr<GateState> gateState;
         std::shared_ptr<DumpFakeState> dumpFakeState;
+        std::shared_ptr<NameRequiredBeforeStoreHookState> nameRequiredBeforeStoreHookState;
         TestAudioProcessorPatchManager proc;
         Core::PatchModel model;
         Core::ApvtsPatchMapper mapper;

@@ -55,6 +55,7 @@ PluginEditor::~PluginEditor()
     pluginProcessor.setMutatorExportCollisionModalGate({});
     pluginProcessor.setMutatorHistoryGateModalGate({});
     pluginProcessor.setUnsavedEditConfirmModalGate({});
+    pluginProcessor.setNameRequiredBeforeStoreRequest({});
     pluginProcessor.setMutatorFlushConfirmModalGate({});
     pluginProcessor.setMutatorDeleteConfirmModalGate({});
     pluginProcessor.setPatchNameReconciliationPicker({});

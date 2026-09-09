@@ -490,6 +490,9 @@ namespace Core
         if (patchModel_ == nullptr || apvtsPatchMapper_ == nullptr || midiManager_ == nullptr)
             return;
 
+        if (tryDeferStoreForInitNameRequired())
+            return;
+
         if (patchSelectionMidiSync_ != nullptr)
             patchSelectionMidiSync_->syncSelection(currentBank, getCurrentPatch(limits), limits, true);
 

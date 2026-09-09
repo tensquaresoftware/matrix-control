@@ -4,6 +4,7 @@
 #include "PluginEditor.h"
 #include "PluginEditorInternal.h"
 
+#include "Core/Services/PatchNameEditRules.h"
 #include "GUI/Factories/WidgetFactory.h"
 #include "GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditPanel.h"
 #include "GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditDisplaysPanel/PatchEditDisplaysPanel.h"
@@ -72,7 +73,40 @@ void PluginEditor::wirePatchEditDisplayBindings()
     patchNameDisplayPanel.setRenameCommitHandler(
         [this](const juce::String& newName)
         {
-            pluginProcessor.commitPatchNameRename(newName);
+            // Pending STORE: commit name locally only — STORE sendPatch is the one device write.
+            pluginProcessor.commitPatchNameRename(
+                newName,
+                Core::PatchNameEditRules::shouldSuppressRenameAuditionForPendingStore(
+                    pendingInternalStore_));
+        });
+
+    patchNameDisplayPanel.setNameRequiredOutcomeHandler(
+        [this](bool success)
+        {
+            if (! pendingInternalStore_)
+                return;
+
+            const bool completeStore =
+                Core::PatchNameEditRules::shouldCompletePendingStore(pendingInternalStore_, success);
+            pendingInternalStore_ = false;
+
+            if (completeStore)
+                pluginProcessor.executeInternalPatchStore();
+        });
+
+    // Core STORE gate → arm name-required. Set pending first so a cancel-during-rearm
+    // outcome cannot clear the new pending STORE before arm completes.
+    pluginProcessor.setNameRequiredBeforeStoreRequest(
+        [this]()
+        {
+            auto* panel = getPatchNameDisplayPanelIfPresent();
+            if (panel == nullptr)
+                return;
+
+            // Set pending only when name-required can actually arm (avoids orphan pending).
+            pendingInternalStore_ = true;
+            // Re-click while armed: armNameRequired is idempotent while editing; pending stays true.
+            panel->armNameRequired();
         });
 
     displaysPanel.setBeginEditorialTransaction(

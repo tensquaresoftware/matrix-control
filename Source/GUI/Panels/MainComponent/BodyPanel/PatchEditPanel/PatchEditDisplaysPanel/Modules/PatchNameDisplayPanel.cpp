@@ -232,19 +232,24 @@ void PatchNameDisplayPanel::valueTreePropertyChanged(juce::ValueTree&,
     if (! isTrackedProperty(property.toString()))
         return;
 
-    // Any of these properties changing while the caret editor is open is an interrupt
-    // (Mutate/Retry/Compare/patch nav/load) — abandon the edit before refreshing the display.
-    if (patchNameDisplay_ != nullptr && patchNameDisplay_->isEditing())
+    // Any of these properties changing while name edit / name-required is open is an interrupt
+    // (Mutate/Retry/Compare/patch nav/load) — abandon before refreshing the display.
+    if (patchNameDisplay_ != nullptr
+        && (patchNameDisplay_->isEditing() || patchNameDisplay_->isNameRequiredArmed()))
+    {
         patchNameDisplay_->cancelEdit();
+    }
 
     syncFromApvtsState();
 }
 
 void PatchNameDisplayPanel::valueTreeRedirected(juce::ValueTree&)
 {
-    if (patchNameDisplay_ != nullptr && patchNameDisplay_->isEditing())
+    if (patchNameDisplay_ != nullptr
+        && (patchNameDisplay_->isEditing() || patchNameDisplay_->isNameRequiredArmed()))
+    {
         patchNameDisplay_->cancelEdit();
-
+    }
     syncFromApvtsState();
 }
 

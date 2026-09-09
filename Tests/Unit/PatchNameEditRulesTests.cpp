@@ -17,6 +17,8 @@ public:
         pendingStore_unsuccessfulWhenEmptyOrSpaces();
         nameRequiredEndState_successInvokesRename();
         nameRequiredEndState_emptyAbortsWithoutRename();
+        pendingStore_completeOnlyWhenPendingAndSuccess();
+        pendingStore_suppressesRenameAuditionWhenPending();
     }
 
 private:
@@ -98,6 +100,24 @@ private:
         expect(! spacesEnd.success);
         expect(! spacesEnd.shouldInvokeRenameCommit);
         expectEquals(spacesEnd.resolvedName, juce::String("WARMPAD "));
+    }
+
+    void pendingStore_completeOnlyWhenPendingAndSuccess()
+    {
+        beginTest("pendingStore_completeOnlyWhenPendingAndSuccess");
+
+        expect(Core::PatchNameEditRules::shouldCompletePendingStore(true, true));
+        expect(! Core::PatchNameEditRules::shouldCompletePendingStore(true, false));
+        expect(! Core::PatchNameEditRules::shouldCompletePendingStore(false, true));
+        expect(! Core::PatchNameEditRules::shouldCompletePendingStore(false, false));
+    }
+
+    void pendingStore_suppressesRenameAuditionWhenPending()
+    {
+        beginTest("pendingStore_suppressesRenameAuditionWhenPending");
+
+        expect(Core::PatchNameEditRules::shouldSuppressRenameAuditionForPendingStore(true));
+        expect(! Core::PatchNameEditRules::shouldSuppressRenameAuditionForPendingStore(false));
     }
 };
 

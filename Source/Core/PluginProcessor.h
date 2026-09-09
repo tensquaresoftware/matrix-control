@@ -134,7 +134,14 @@ public:
     // (buffer memcmp) + frozen export basename refresh + live full-patch MIDI push (0x0D).
     // Empty / all-spaces name is a no-op (belt-and-suspenders — the widget already keeps
     // the previous name on an empty commit).
-    void commitPatchNameRename(const juce::String& newName);
+    // When suppressAuditionSysEx is true (pending STORE name-required), skip the audition
+    // push — STORE sendPatch alone writes the named patch to the current slot.
+    // Pending-STORE rename is allowed even when normal rename is gated (e.g. Hardware Names),
+    // so the STORE path can replace `* INIT *` in the model before sendPatch.
+    void commitPatchNameRename(const juce::String& newName, bool suppressAuditionSysEx = false);
+
+    // Re-enters Internal STORE after a successful name-required commit (Editor pending STORE).
+    void executeInternalPatchStore();
 
     // Re-resolve displayed Patch Name after MATRIX-1000 PATCHES display Settings change.
     void refreshPatchNameDisplayForSettingsMode();
@@ -206,6 +213,10 @@ public:
         std::function<Core::UnsavedEditConfirmChoice(Core::UnsavedEditPersistKind persistKind)>;
 
     void setUnsavedEditConfirmModalGate(UnsavedEditConfirmModalGate gate);
+
+    // STORE-after-INIT: Editor arms name-required + owns pending STORE (may be empty).
+    using NameRequiredBeforeStoreRequest = std::function<void()>;
+    void setNameRequiredBeforeStoreRequest(NameRequiredBeforeStoreRequest request);
 
     // Patch Mutator Flush (F): returns true for Continue, false for Cancel.
     using MutatorFlushConfirmModalGate = std::function<bool()>;
@@ -366,6 +377,8 @@ private:
     void syncMidiOutputPortFromState(bool reportOpenFailures);
     bool arePersistedMidiPortsOpen() const;
     void initializePatchNameProperty();
+    void rememberOverlayNameAfterRenameIfNeeded();
+    void sendPatchNameRenameAudition();
     bool getInstrumentPathEnabled(const juce::MidiBuffer& midiMessages) const;
     void ensureAudioInputBusEnabled();
     int getAudioFromInputChannelCount() const noexcept;
@@ -482,6 +495,7 @@ private:
     MutatorExportCollisionModalGate mutatorExportCollisionModalGate_;
     MutatorHistoryGateModalGate mutatorHistoryGateModalGate_;
     UnsavedEditConfirmModalGate unsavedEditConfirmModalGate_;
+    NameRequiredBeforeStoreRequest nameRequiredBeforeStoreRequest_;
     MutatorFlushConfirmModalGate mutatorFlushConfirmModalGate_;
     MutatorDeleteConfirmModalGate mutatorDeleteConfirmModalGate_;
     Core::PatchLoadContext patchLoadContext_;

@@ -29,6 +29,12 @@ namespace Core
         static NameRequiredCommitEndState resolveNameRequiredCommitEndState(
             const juce::String& editedName,
             const juce::String& previousName);
+
+        // Editor pending-STORE: run real STORE only when a session was pending and name-required succeeded.
+        static bool shouldCompletePendingStore(bool pendingStoreActive, bool nameRequiredSuccess) noexcept;
+
+        // Frozen policy: while a STORE is pending, rename commit must not audition — STORE sendPatch alone.
+        static bool shouldSuppressRenameAuditionForPendingStore(bool pendingStoreActive) noexcept;
     };
 
 } // namespace Core

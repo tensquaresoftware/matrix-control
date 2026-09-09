@@ -28,4 +28,16 @@ namespace Core
         return endState;
     }
 
+    bool PatchNameEditRules::shouldCompletePendingStore(bool pendingStoreActive,
+                                                         bool nameRequiredSuccess) noexcept
+    {
+        return pendingStoreActive && nameRequiredSuccess;
+    }
+
+    bool PatchNameEditRules::shouldSuppressRenameAuditionForPendingStore(
+        bool pendingStoreActive) noexcept
+    {
+        return pendingStoreActive;
+    }
+
 } // namespace Core

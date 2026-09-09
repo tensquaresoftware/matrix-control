@@ -44,6 +44,9 @@ namespace Core
         std::function<void()> onEditorialCheckpoint;
         // Opens one editorial undo transaction before bulk APVTS writes (Init/Paste module).
         std::function<void(const juce::String&)> beginEditorialTransaction;
+        // STORE hit an active `* INIT *` sentinel: Editor arms name-required + pending STORE.
+        // Core must not include GUI types; empty = gate still blocks SysEx (headless/tests).
+        std::function<void()> requestNameRequiredBeforeStore;
     };
 
 } // namespace Core

@@ -320,31 +320,39 @@ void PluginProcessor::refreshComputerPatchNameDisplayForSettingsPolicy()
     patchManagerActionHandler_->reapplyComputerPatchDisplayedName();
 }
 
-void PluginProcessor::commitPatchNameRename(const juce::String& newName)
+void PluginProcessor::commitPatchNameRename(const juce::String& newName, bool suppressAuditionSysEx)
 {
     if (patchModel_ == nullptr || patchNameSyncer_ == nullptr)
         return;
 
-    if (! canEditPatchName())
-        return;
-
-    if (newName.trim().isEmpty())
+    if ((! canEditPatchName() && ! suppressAuditionSysEx) || newName.trim().isEmpty())
         return;
 
     patchModel_->setName(newName);
     patchNameSyncer_->bufferToApvts();
-
-    if (patchLoadContext_.origin == Core::PatchLoadContext::Origin::kDeviceMemory
-        && patchManagerActionHandler_ != nullptr
-        && getResolvedDeviceMemoryLimits().hasBankConcept())
-    {
-        patchManagerActionHandler_->rememberCurrentOverlayFromModel();
-    }
+    rememberOverlayNameAfterRenameIfNeeded();
 
     if (patchMutatorEngine_ != nullptr)
         patchMutatorEngine_->refreshFrozenExportBasename(patchModel_->getName());
 
-    if (midiManager == nullptr)
+    if (! suppressAuditionSysEx)
+        sendPatchNameRenameAudition();
+}
+
+void PluginProcessor::rememberOverlayNameAfterRenameIfNeeded()
+{
+    if (patchLoadContext_.origin != Core::PatchLoadContext::Origin::kDeviceMemory)
+        return;
+
+    if (patchManagerActionHandler_ == nullptr || ! getResolvedDeviceMemoryLimits().hasBankConcept())
+        return;
+
+    patchManagerActionHandler_->rememberCurrentOverlayFromModel();
+}
+
+void PluginProcessor::sendPatchNameRenameAudition()
+{
+    if (midiManager == nullptr || patchModel_ == nullptr)
         return;
 
     const auto limits = getResolvedDeviceMemoryLimits();
@@ -352,6 +360,16 @@ void PluginProcessor::commitPatchNameRename(const juce::String& newName)
         juce::jlimit(0, 255, getCurrentPatchNumberForMutator()));
 
     midiManager->sendFullPatchForAudition(patchModel_->data(), patchNumber, limits.hasBankConcept());
+}
+
+void PluginProcessor::executeInternalPatchStore()
+{
+    if (patchManagerActionHandler_ == nullptr)
+        return;
+
+    patchManagerActionHandler_->handleAction(
+        PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kStorePatch,
+        juce::var());
 }
 
 void PluginProcessor::initializePatchNameProperty()

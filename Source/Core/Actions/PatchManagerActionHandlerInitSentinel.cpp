@@ -42,4 +42,15 @@ namespace Core
         return true;
     }
 
+    bool PatchManagerActionHandler::tryDeferStoreForInitNameRequired()
+    {
+        if (! isInitPatchNameSentinelActive())
+            return false;
+
+        if (hooks_.requestNameRequiredBeforeStore)
+            hooks_.requestNameRequiredBeforeStore();
+
+        return true;
+    }
+
 } // namespace Core

@@ -143,6 +143,7 @@ private:
         expectEquals(queued.setBankValue, 1);
         expect(queued.patchData);
         expect(!queued.editBufferPatch);
+        expectEquals(harness.nameRequiredBeforeStoreHookState->calls, 0);
     }
 
     void testInitLoadsTemplateAndBufferToApvts()

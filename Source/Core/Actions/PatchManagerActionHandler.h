@@ -361,6 +361,8 @@ namespace Core
         juce::String resolveSuggestedSaveStem() const;
         bool isInitPatchNameSentinelActive() const;
         bool refuseSaveIfInitSentinelActive();
+        // True when STORE was deferred for name-required (sentinel active).
+        bool tryDeferStoreForInitNameRequired();
         void scanAndPublishFolder(const juce::File& folder);
         void clearPublishedScanCache();
         void bumpScanRevision();

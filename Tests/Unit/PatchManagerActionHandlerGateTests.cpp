@@ -117,9 +117,19 @@ private:
 
         harness.handler.handleAction(InternalPatches::kInitPatch, juce::var());
         expect(harness.handler.isPatchNotStoredInRam());
+        scanQueue(harness.queue); // drain INIT audition SysEx before STORE assertions
 
+        // INIT leaves `* INIT *` — STORE defers (name-required); notStored stays until a real name.
+        harness.handler.handleAction(InternalPatches::kStorePatch, juce::var());
+        expectEquals(harness.nameRequiredBeforeStoreHookState->calls, 1);
+        expect(harness.queue.isEmpty());
+        expect(harness.handler.isPatchNotStoredInRam());
+
+        harness.model.setName("NEWNAMED");
+        harness.patchNameSyncer.bufferToApvts();
         harness.handler.handleAction(InternalPatches::kStorePatch, juce::var());
 
+        expectEquals(harness.nameRequiredBeforeStoreHookState->calls, 1);
         expect(! harness.handler.isPatchNotStoredInRam());
         expect(! harness.dirtyPatchTracker.syncApvtsAndIsDirty(
             harness.mapper, harness.patchNameSyncer, harness.model));
@@ -169,9 +179,20 @@ private:
 
         harness.handler.handleAction(InternalPatches::kInitPatch, juce::var());
         expect(harness.handler.isPatchNotStoredInRam());
+        scanQueue(harness.queue); // drain INIT audition SysEx before Persist assertions
 
+        // Persist→STORE while sentinel: same deferral as button STORE — persist fails until renamed.
+        expect(! harness.handler.tryPersistCurrentPatchFromUnsavedGate(
+            Core::UnsavedEditPersistKind::kStore));
+        expectEquals(harness.nameRequiredBeforeStoreHookState->calls, 1);
+        expect(harness.queue.isEmpty());
+        expect(harness.handler.isPatchNotStoredInRam());
+
+        harness.model.setName("NEWNAMED");
+        harness.patchNameSyncer.bufferToApvts();
         expect(harness.handler.tryPersistCurrentPatchFromUnsavedGate(
             Core::UnsavedEditPersistKind::kStore));
+        expectEquals(harness.nameRequiredBeforeStoreHookState->calls, 1);
         expect(! harness.handler.isPatchNotStoredInRam());
         expect(! harness.dirtyPatchTracker.syncApvtsAndIsDirty(
             harness.mapper, harness.patchNameSyncer, harness.model));

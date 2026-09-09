@@ -480,6 +480,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/PatchModuleInitServiceTests.cpp
         Tests/Unit/PatchManagerActionHandlerTestSupport.cpp
         Tests/Unit/PatchManagerActionHandlerBasicTests.cpp
+        Tests/Unit/PatchManagerActionHandlerStoreSentinelTests.cpp
         Tests/Unit/PatchManagerActionHandlerBankCopyPasteTests.cpp
         Tests/Unit/PatchManagerActionHandlerBankReclickTests.cpp
         Tests/Unit/PatchManagerActionHandlerGateTests.cpp

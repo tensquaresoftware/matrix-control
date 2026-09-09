@@ -110,23 +110,15 @@ void PluginProcessor::createInitAndFileServices()
 void PluginProcessor::createActionSubsystem()
 {
     Core::ActionExecutionHooks actionHooks{
-        [this](bool suppress) { suppressMatrixModParameterSysEx_ = suppress; },
-        [this](bool suppress) { suppressMasterParameterSysEx_ = suppress; },
-        [this](bool suppress) { suppressPatchParameterSysEx_ = suppress; },
-        [this](bool suppress) { suppressPatchSelectionMidiSync_ = suppress; },
-        [this](bool suppress) { suppressMutatorHistorySelectionDebounce_ = suppress; },
-        {},
-        [this](const Core::PatchLoadContext& context) { patchLoadContext_ = context; },
-        {},
-        {},
-        {},
-        {},
-        {},
-        {},
-        {},
-        {},
-        [this]() { establishEditorialCheckpoint(); },
-        [this](const juce::String& name) { beginEditorialTransaction(name); }};
+        .setSuppressMatrixModSysEx = [this](bool suppress) { suppressMatrixModParameterSysEx_ = suppress; },
+        .setSuppressMasterSysEx = [this](bool suppress) { suppressMasterParameterSysEx_ = suppress; },
+        .setSuppressPatchSysEx = [this](bool suppress) { suppressPatchParameterSysEx_ = suppress; },
+        .setSuppressPatchSelectionMidiSync = [this](bool suppress) { suppressPatchSelectionMidiSync_ = suppress; },
+        .setSuppressMutatorHistorySelectionDebounce =
+            [this](bool suppress) { suppressMutatorHistorySelectionDebounce_ = suppress; },
+        .setPatchLoadContext = [this](const Core::PatchLoadContext& context) { patchLoadContext_ = context; },
+        .onEditorialCheckpoint = [this]() { establishEditorialCheckpoint(); },
+        .beginEditorialTransaction = [this](const juce::String& name) { beginEditorialTransaction(name); }};
 
     createPatchMutatorEngine(actionHooks);
     createModuleActionHandler(actionHooks);
@@ -175,6 +167,12 @@ void PluginProcessor::createPatchMutatorEngine(Core::ActionExecutionHooks& hooks
 
     hooks.confirmPatchContextChange = [this](bool includeUnsavedEditWarning) {
         return confirmPatchContextChangeGate(includeUnsavedEditWarning);
+    };
+
+    hooks.requestNameRequiredBeforeStore = [this]()
+    {
+        if (nameRequiredBeforeStoreRequest_)
+            nameRequiredBeforeStoreRequest_();
     };
 }
 

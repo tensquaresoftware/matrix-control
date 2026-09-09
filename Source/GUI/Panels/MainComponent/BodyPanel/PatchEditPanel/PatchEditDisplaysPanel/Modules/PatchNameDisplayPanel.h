@@ -51,7 +51,7 @@ public:
     void setRenameCommitHandler(RenameCommitHandler handler);
 
     // Name-required session ended: success = trim-non-empty commit; false = cancel or empty Return.
-    // STORE pending-action wiring is a follow-up consumer — this Build only exposes the signal.
+    // PluginEditor uses this for pending STORE complete/abort.
     using NameRequiredOutcomeHandler = std::function<void(bool success)>;
     void setNameRequiredOutcomeHandler(NameRequiredOutcomeHandler handler);
 

@@ -170,6 +170,10 @@ namespace PatchManagerActionHandlerTestSupport
             proc.undoManager.clearUndoHistory();
             handler.syncDirtySnapshotFromApvts();
         };
+        hooks.requestNameRequiredBeforeStore = [state = nameRequiredBeforeStoreHookState]()
+        {
+            ++state->calls;
+        };
         return hooks;
     }
 
@@ -188,6 +192,7 @@ namespace PatchManagerActionHandlerTestSupport
         : patchLoadHookState(std::make_shared<PatchLoadHookState>())
         , gateState(std::make_shared<GateState>())
         , dumpFakeState(std::make_shared<DumpFakeState>())
+        , nameRequiredBeforeStoreHookState(std::make_shared<NameRequiredBeforeStoreHookState>())
         , mapper(proc.apvts, model)
         , decoder(parser)
         , initLoader(decoder)

@@ -210,6 +210,8 @@ private:
     juce::String lastDragAssessedPath_;
     bool lastDragAssessedValid_ = false;
     juce::String lastDragAssessedPreview_;
+    // STORE-after-INIT: true while name-required must complete before Internal STORE SysEx.
+    bool pendingInternalStore_ = false;
 
     void updateSkin();
     void applyUiScale(float uiScale);
