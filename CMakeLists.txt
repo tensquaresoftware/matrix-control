@@ -464,6 +464,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/InitDefaultsTests.cpp
         Tests/Unit/InitTemplateLoaderTests.cpp
         Tests/Unit/InitTemplateWriterTests.cpp
+        Tests/Unit/InitTemplateSentinelSaveTests.cpp
         Tests/Unit/ApvtsPatchMapperTests.cpp
         Tests/Unit/PluginVersionTests.cpp
         Tests/Unit/PatchNameSyncerTests.cpp
