@@ -309,16 +309,24 @@ namespace Core
                                                        const PatchNameReconciliationResult& reconciliation)
     {
         const auto location = FooterMessages::formatReadablePatchLocation(file);
-        const auto message = reconciliation.hadMismatch
+        const auto loadedMessage = reconciliation.hadMismatch
             ? FooterMessages::formatReconciliationNotice(location, reconciliation.usedFilename)
             : FooterMessages::formatLoadSuccess(location);
 
+        const auto message = pendingCombinedScanLoadFooter_.has_value()
+            ? FooterMessages::formatFirstLoadAfterScanMessage(pendingCombinedScanLoadFooter_->validCount,
+                                                             pendingCombinedScanLoadFooter_->invalidCount,
+                                                             loadedMessage)
+            : loadedMessage;
+
+        clearPendingCombinedScanLoadFooter();
         apvts_.state.setProperty("uiMessageText", message, nullptr);
         apvts_.state.setProperty("uiMessageSeverity", juce::String("info"), nullptr);
     }
 
     void PatchManagerActionHandler::publishLoadFailureFooter(const juce::String& message)
     {
+        clearPendingCombinedScanLoadFooter();
         apvts_.state.setProperty("uiMessageText", message, nullptr);
         apvts_.state.setProperty("uiMessageSeverity", juce::String("warning"), nullptr);
     }

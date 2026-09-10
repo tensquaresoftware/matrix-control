@@ -22,6 +22,7 @@ public:
         testDropLoad_gateCancelAfterSamePathReload();
         testDropLoad_folderDropRemembersFolder();
         testDropLoad_zeroValidRejectsWithoutVirtualInstall();
+        testDropLoad_firstLoadCombinedFooterThenNavPlainLoaded();
     }
 
 private:
@@ -56,12 +57,16 @@ private:
         expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
                          ComputerPatches::StandaloneWidgets::kSelectPatchFile)),
                      1);
-        expect(harness.proc.apvts.state.getProperty("uiMessageText").toString()
-               == FooterMessages::formatReconciliationNotice(
-                      FooterMessages::formatReadablePatchLocation(dropped), false)
-               || harness.proc.apvts.state.getProperty("uiMessageText").toString()
-                      == FooterMessages::formatLoadSuccess(
-                             FooterMessages::formatReadablePatchLocation(dropped)));
+        {
+            const auto location = FooterMessages::formatReadablePatchLocation(dropped);
+            const auto text = harness.proc.apvts.state.getProperty("uiMessageText").toString();
+            const auto loadedPlain = FooterMessages::formatLoadSuccess(location);
+            const auto loadedReconFalse = FooterMessages::formatReconciliationNotice(location, false);
+            const auto loadedReconTrue = FooterMessages::formatReconciliationNotice(location, true);
+            expect(text == FooterMessages::formatFirstLoadAfterScanMessage(1, 0, loadedPlain)
+                   || text == FooterMessages::formatFirstLoadAfterScanMessage(1, 0, loadedReconFalse)
+                   || text == FooterMessages::formatFirstLoadAfterScanMessage(1, 0, loadedReconTrue));
+        }
         expect(scanQueue(harness.queue).editBufferPatch);
 
         priorDir.deleteRecursively();
@@ -297,6 +302,52 @@ private:
 
         priorDir.deleteRecursively();
         junkDir.deleteRecursively();
+    }
+
+    void testDropLoad_firstLoadCombinedFooterThenNavPlainLoaded()
+    {
+        beginTest("dropLoad_firstLoadCombinedFooterThenNavPlainLoaded");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, 0, 12, false);
+
+        const auto dropDir = createTempScanDir();
+        expect(dropDir.createDirectory());
+        copyFixturePatchToDir(dropDir, "Patch 71.syx");
+        copyFixturePatchToDir(dropDir, "Patch 66.syx");
+        expect(dropDir.getChildFile("broken.syx").replaceWithText("not a patch"));
+
+        juce::StringArray paths;
+        paths.add(dropDir.getFullPathName());
+        expect(harness.handler.loadDroppedComputerPatchSelection(paths, harness.limits)
+               == Core::PatchManagerActionHandler::DroppedComputerPatchLoadResult::kLoaded);
+
+        const auto& scan = harness.patchFileService.getLastScanResult();
+        expectEquals(scan.validCount, 2);
+        expect(scan.invalidCount >= 1);
+        const auto firstName = scan.sortedValidFileNames[0];
+        const auto location = FooterMessages::formatReadablePatchLocation(dropDir.getChildFile(firstName));
+        const auto firstFooter = harness.proc.apvts.state.getProperty("uiMessageText").toString();
+        expect(firstFooter.startsWith("Patch files:"));
+        expect(firstFooter.contains(" / "));
+        expect(firstFooter.contains(" — Loaded "));
+        expect(! firstFooter.contains("/ 0 invalid"));
+
+        fireAdjacentNavigation(harness, ComputerPatches::StandaloneWidgets::kLoadNextPatchFile);
+
+        const auto secondName = harness.patchFileService.getLastScanResult().sortedValidFileNames[
+            static_cast<int>(harness.proc.apvts.state.getProperty(
+                ComputerPatches::StandaloneWidgets::kSelectPatchFile))
+            - 1];
+        const auto secondLocation =
+            FooterMessages::formatReadablePatchLocation(dropDir.getChildFile(secondName));
+        const auto secondFooter = harness.proc.apvts.state.getProperty("uiMessageText").toString();
+        expect(secondFooter.startsWith("Loaded "));
+        expect(! secondFooter.startsWith("Patch files:"));
+        expect(secondFooter.contains(secondLocation)
+               || secondFooter.contains(dropDir.getChildFile(secondName).getFileName()));
+
+        dropDir.deleteRecursively();
     }
 
 };

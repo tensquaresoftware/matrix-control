@@ -58,18 +58,21 @@ namespace Core
             PluginIDs::PatchManagerSection::ComputerPatchesModule::StateProperties::kFolderPath,
             parent.getFullPathName(),
             nullptr);
-        scanAndPublishFolder(parent);
 
-        const auto& scan = patchFileService_->getLastScanResult();
+        const auto scan = patchFileService_->scanFolder(parent);
+        bumpScanRevision();
+
         using namespace PatchManagerActionHandlerInternal;
         const int index = indexOfFileNameIgnoreCase(scan.sortedValidFileNames, file.getFileName());
 
         if (! scan.folderUsable || index < 0)
         {
+            clearPendingCombinedScanLoadFooter();
             restoreComputerPatchesBrowser(previous);
             return false;
         }
 
+        armPendingCombinedScanLoadFooter(scan.validCount, scan.invalidCount);
         pendingBrowserRestoreOnCancel_ = previous;
         establishCoordinatesForComputerOpen(limits);
         outTargetId = index + 1;
@@ -88,18 +91,22 @@ namespace Core
             PluginIDs::PatchManagerSection::ComputerPatchesModule::StateProperties::kFolderPath,
             folder.getFullPathName(),
             nullptr);
-        scanAndPublishFolder(folder);
 
-        const auto& scan = patchFileService_->getLastScanResult();
+        const auto scan = patchFileService_->scanFolder(folder);
+        bumpScanRevision();
+
         if (! scan.folderUsable || scan.validCount < 1)
         {
             // Keep empty/unusable folder published (OPEN-like footers); no load.
+            clearPendingCombinedScanLoadFooter();
+            PatchFileServiceFooter::propagateScanResult(apvts_, scan);
             clearComputerPatchesSelection();
             clearComputerNavigationFocusIfOwned();
             pendingBrowserRestoreOnCancel_.reset();
             return false;
         }
 
+        armPendingCombinedScanLoadFooter(scan.validCount, scan.invalidCount);
         pendingBrowserRestoreOnCancel_ = previous;
         establishCoordinatesForComputerOpen(limits);
         outTargetId = 1;
@@ -115,14 +122,16 @@ namespace Core
         const auto previous = captureComputerPatchesBrowserSnapshot();
 
         const auto result = patchFileService_->mergeDroppedSelection(selection);
-        PatchFileServiceFooter::propagateScanResult(apvts_, result);
         bumpScanRevision();
 
         if (result.validCount < 1)
         {
+            clearPendingCombinedScanLoadFooter();
             restoreComputerPatchesBrowser(previous);
             return false;
         }
+
+        armPendingCombinedScanLoadFooter(result.validCount, result.invalidCount);
 
         // Virtual list must not overwrite the last real folder remembered for OPEN / Save As.
         pendingBrowserRestoreOnCancel_ = previous;

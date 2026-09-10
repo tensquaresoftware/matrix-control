@@ -1608,3 +1608,12 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-computer-patches-multi-drop-virtual-list.md`
   summary: Plural junk drag overlay `BAD FILES` still has no automated coverage (reconfirmed after post-patch re-review).
   evidence: Verification Gap; GUI convention + manual Finder; prior deferred entries remain valid.
+
+## Deferred from: build review of spec-computer-patches-footer-first-load.md (2026-09-10)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-computer-patches-footer-first-load.md`
+  summary: Tighten first-load footer tests (exact formatFirstLoadAfterScanMessage counts; OPEN+Prev/Next plain Loaded parity; cancel-then-nav no accidental combine).
+  evidence: Blind Hunter oneshot review; soft startsWith/contains assertions and missing OPEN nav parity are coverage gaps, not product bugs.
+- source_spec: `_bmad-output/implementation-artifacts/spec-computer-patches-footer-first-load.md`
+  summary: Extract shared scan-without-footer helper for OPEN/drop prepare paths to avoid future flash regressions.
+  evidence: Blind Hunter; three near-duplicate scan+bump sites after oneshot.

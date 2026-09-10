@@ -1235,6 +1235,30 @@ namespace PluginDisplayNames
                     return "Loaded " + location;
                 }
 
+                // Prefix for the first successful load after OPEN / drop scan (not Prev/Next).
+                inline juce::String formatScanLoadPrefix(int validCount, int invalidCount)
+                {
+                    auto summary = "Patch files: " + juce::String(validCount) + " valid";
+                    if (invalidCount > 0)
+                        summary += " / " + juce::String(invalidCount) + " invalid";
+                    return summary;
+                }
+
+                inline juce::String formatFirstLoadAfterScan(int validCount,
+                                                            int invalidCount,
+                                                            const juce::String& location)
+                {
+                    return formatScanLoadPrefix(validCount, invalidCount) + " — "
+                           + formatLoadSuccess(location);
+                }
+
+                inline juce::String formatFirstLoadAfterScanMessage(int validCount,
+                                                                   int invalidCount,
+                                                                   const juce::String& loadedMessage)
+                {
+                    return formatScanLoadPrefix(validCount, invalidCount) + " — " + loadedMessage;
+                }
+
                 inline juce::String formatReconciliationNotice(const juce::String& location,
                                                                bool usedFilename)
                 {

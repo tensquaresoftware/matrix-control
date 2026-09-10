@@ -92,6 +92,17 @@ private:
         expect(queued.editBufferPatch);
         expect(harness.patchLoadHookState->invoked);
 
+        const auto firstName = harness.patchFileService.getLastScanResult().sortedValidFileNames[0];
+        const auto location = FooterMessages::formatReadablePatchLocation(tempDir.getChildFile(firstName));
+        const auto footer = harness.proc.apvts.state.getProperty("uiMessageText").toString();
+        const auto loadedPlain = FooterMessages::formatLoadSuccess(location);
+        const auto loadedReconFalse = FooterMessages::formatReconciliationNotice(location, false);
+        const auto loadedReconTrue = FooterMessages::formatReconciliationNotice(location, true);
+        expect(footer == FooterMessages::formatFirstLoadAfterScanMessage(2, 0, loadedPlain)
+               || footer == FooterMessages::formatFirstLoadAfterScanMessage(2, 0, loadedReconFalse)
+               || footer == FooterMessages::formatFirstLoadAfterScanMessage(2, 0, loadedReconTrue));
+        expect(! footer.contains("/ 0 invalid"));
+
         tempDir.deleteRecursively();
     }
 
@@ -116,6 +127,8 @@ private:
         expectEquals(harness.patchFileService.getLastScanResult().validCount, 0);
         expect(harness.queue.isEmpty());
         expect(! harness.patchLoadHookState->invoked);
+        expectEquals(harness.proc.apvts.state.getProperty("uiMessageText").toString(),
+                     juce::String(FooterMessages::kEmptyFolder));
 
         tempDir.deleteRecursively();
     }

@@ -9,6 +9,16 @@
 namespace Core
 {
 
+    void PatchManagerActionHandler::armPendingCombinedScanLoadFooter(int validCount, int invalidCount)
+    {
+        pendingCombinedScanLoadFooter_ = PendingCombinedScanLoadFooter { validCount, invalidCount };
+    }
+
+    void PatchManagerActionHandler::clearPendingCombinedScanLoadFooter()
+    {
+        pendingCombinedScanLoadFooter_.reset();
+    }
+
     void PatchManagerActionHandler::establishCoordinatesForComputerOpen(const DeviceMemoryLimits& limits)
     {
         if (arePatchCoordinatesEstablished())
@@ -47,15 +57,20 @@ namespace Core
             PluginIDs::PatchManagerSection::ComputerPatchesModule::StateProperties::kFolderPath,
             folder.getFullPathName(),
             nullptr);
-        scanAndPublishFolder(folder);
 
-        const auto& scan = patchFileService_->getLastScanResult();
+        const auto scan = patchFileService_->scanFolder(folder);
+        bumpScanRevision();
+
         if (! scan.folderUsable || scan.validCount < 1)
         {
+            clearPendingCombinedScanLoadFooter();
+            PatchFileServiceFooter::propagateScanResult(apvts_, scan);
             clearComputerPatchesSelection();
             clearComputerNavigationFocusIfOwned();
             return;
         }
+
+        armPendingCombinedScanLoadFooter(scan.validCount, scan.invalidCount);
 
         pendingBrowserRestoreOnCancel_ = previous;
 
@@ -87,6 +102,7 @@ namespace Core
 
     void PatchManagerActionHandler::resetComputerPatchesBrowserAfterSessionLoad()
     {
+        clearPendingCombinedScanLoadFooter();
         clearComputerPatchesSelection();
         lastStableComputerPatchesSelectedId_ = 0;
         apvts_.state.setProperty(
@@ -261,6 +277,7 @@ namespace Core
     void PatchManagerActionHandler::restoreComputerPatchesBrowser(
         const ComputerPatchesBrowserSnapshot& snapshot)
     {
+        clearPendingCombinedScanLoadFooter();
         suppressComputerPatchesSelectLoad_ = true;
 
         apvts_.state.setProperty(
@@ -323,6 +340,7 @@ namespace Core
 
     void PatchManagerActionHandler::abortComputerPatchesNavigation()
     {
+        clearPendingCombinedScanLoadFooter();
         abandonPendingInternalNavSettle();
         patchNavDebouncer_.cancel();
         computerSelectDebouncer_.cancel();

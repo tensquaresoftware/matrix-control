@@ -401,6 +401,8 @@ namespace Core
         // True when STORE was deferred for name-required (sentinel active).
         bool tryDeferStoreForInitNameRequired();
         void scanAndPublishFolder(const juce::File& folder);
+        void armPendingCombinedScanLoadFooter(int validCount, int invalidCount);
+        void clearPendingCombinedScanLoadFooter();
         void clearPublishedScanCache();
         void bumpScanRevision();
         void publishSaveSuccessFooter(const juce::File& savedFile);
@@ -559,6 +561,14 @@ namespace Core
         juce::String knownSyxFullPath_;
         // Set only by commitLoadedComputerPatchFile during a drop attempt (see loadDropped…).
         bool dropAttemptCommitted_ = false;
+
+        struct PendingCombinedScanLoadFooter
+        {
+            int validCount = 0;
+            int invalidCount = 0;
+        };
+
+        std::optional<PendingCombinedScanLoadFooter> pendingCombinedScanLoadFooter_;
 
         std::optional<ComputerPatchesBrowserSnapshot> pendingBrowserRestoreOnCancel_;
 

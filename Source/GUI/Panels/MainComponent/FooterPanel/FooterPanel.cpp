@@ -94,9 +94,10 @@ void FooterPanel::paintBadgeAndDetail(juce::Graphics& g, const BadgeDetailPaintA
     g.setFont(args.font);
     g.setColour(args.detailColour);
 
-    // Prefer start of status messages; Loaded/Saved keep head + useful end (full disk paths).
+    // Prefer start of status messages; Loaded/Saved (and first-load scan+Loaded) keep head + useful end.
     const bool usePathStyleTruncate = args.detailText.startsWith("Loaded ")
-        || args.detailText.startsWith("Saved ");
+        || args.detailText.startsWith("Saved ")
+        || args.detailText.contains(" — Loaded ");
     const auto fittedDetail = TSS::TextFitHelpers::fitWithAsciiEllipsis(
         args.detailText,
         args.font,
