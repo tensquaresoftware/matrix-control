@@ -1617,3 +1617,18 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-computer-patches-footer-first-load.md`
   summary: Extract shared scan-without-footer helper for OPEN/drop prepare paths to avoid future flash regressions.
   evidence: Blind Hunter; three near-duplicate scan+bump sites after oneshot.
+
+## Deferred from: code review of spec-computer-patches-footer-first-load.md (2026-09-10)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-computer-patches-footer-first-load.md`
+  summary: Cancel-then-nav assert that a later Prev/Next stays plain Loaded after gate cancel cleared the pending combine arm.
+  evidence: Edge Case Hunter + Verification Gap; clears already on restore/abort; prior build deferred-work entry covers tighten suite.
+- source_spec: `_bmad-output/implementation-artifacts/spec-computer-patches-footer-first-load.md`
+  summary: OPEN first-load then Prev/Next plain Loaded parity (Browser tests currently stop at combined first footer).
+  evidence: Blind Hunter; already in build deferred-work tighten list.
+- source_spec: `_bmad-output/implementation-artifacts/spec-computer-patches-footer-first-load.md`
+  summary: Shared scan-without-footer helper for OPEN / drop prepare (reconfirmed).
+  evidence: Blind Hunter; already deferred from build review.
+- source_spec: `_bmad-output/implementation-artifacts/spec-computer-patches-footer-first-load.md`
+  summary: No automated FooterPanel check that combined `Patch files:… — Loaded …` takes path-style truncation.
+  evidence: Verification Gap Other findings; GUI paint convention — manual/smoke only.

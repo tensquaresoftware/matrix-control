@@ -253,7 +253,8 @@ namespace PatchManagerActionHandlerTestSupport
         harness.handler.flushPatchNavDebouncerForTests();
     }
 
-    void fireOpenAndDispatchLoad(HandlerHarness& harness)
+    void fireOpenAndDispatchLoad(HandlerHarness& harness,
+                                 std::optional<juce::String>* midFooterBeforeLoad)
     {
         const int beforeId = static_cast<int>(harness.proc.apvts.state.getProperty(
             ComputerPatches::StandaloneWidgets::kSelectPatchFile,
@@ -264,9 +265,14 @@ namespace PatchManagerActionHandlerTestSupport
             0));
 
         if (afterId != beforeId)
+        {
+            if (midFooterBeforeLoad != nullptr)
+                *midFooterBeforeLoad = harness.proc.apvts.state.getProperty("uiMessageText").toString();
             simulateSelectPatchFileDispatch(harness);
-        else
-            harness.handler.flushComputerSelectDebouncerForTests();
+            return;
+        }
+
+        harness.handler.flushComputerSelectDebouncerForTests();
     }
 
     void setupComputerPatchesScan(HandlerHarness& harness, const juce::File& tempDir)
@@ -276,6 +282,20 @@ namespace PatchManagerActionHandlerTestSupport
             tempDir.getFullPathName(),
             nullptr);
         harness.handler.rescanPersistedComputerPatchesFolder();
+    }
+
+    bool matchesCombinedFirstLoadFooter(const juce::String& text,
+                                        int validCount,
+                                        int invalidCount,
+                                        const juce::File& file)
+    {
+        const auto location = FooterMessages::formatReadablePatchLocation(file);
+        const auto loadedPlain = FooterMessages::formatLoadSuccess(location);
+        const auto loadedReconFalse = FooterMessages::formatReconciliationNotice(location, false);
+        const auto loadedReconTrue = FooterMessages::formatReconciliationNotice(location, true);
+        return text == FooterMessages::formatFirstLoadAfterScanMessage(validCount, invalidCount, loadedPlain)
+            || text == FooterMessages::formatFirstLoadAfterScanMessage(validCount, invalidCount, loadedReconFalse)
+            || text == FooterMessages::formatFirstLoadAfterScanMessage(validCount, invalidCount, loadedReconTrue);
     }
 
     SelectPatchFileLoadDispatcher::SelectPatchFileLoadDispatcher(HandlerHarness& harnessIn)

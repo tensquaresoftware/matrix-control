@@ -19,8 +19,7 @@ namespace Core
     {
         void assignInitPatchNameSentinel(PatchModel* patchModel)
         {
-            if (patchModel == nullptr)
-                return;
+            if (patchModel == nullptr) return;
 
             using PluginDisplayNames::PatchEditSection::PatchNameModule::StandaloneWidgets::kInitPatchName;
             patchModel->setName(kInitPatchName);
@@ -210,13 +209,13 @@ namespace Core
             return;
 
         computerSelectDebouncer_.cancel();
+        clearPendingCombinedScanLoadFooter();
         revertComputerPatchesSelectionIfNeeded(resolveComputerPatchesCancelRevertId());
     }
 
     void PatchManagerActionHandler::settleInternalPatchNavigation()
     {
         const auto limits = deviceMemoryLimits_();
-
         if (! pendingInternalNavBaseline_.has_value())
             return;
 

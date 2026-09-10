@@ -178,8 +178,17 @@ namespace PatchManagerActionHandlerTestSupport
     void simulateSelectPatchFileDispatch(HandlerHarness& harness);
     void fireAdjacentNavigation(HandlerHarness& harness, const juce::String& adjacentPropertyId);
     void fireInternalPatchNavigation(HandlerHarness& harness, const juce::String& navigationPropertyId);
-    void fireOpenAndDispatchLoad(HandlerHarness& harness);
+    // When midFooterBeforeLoad is non-null, OPEN must take the deferred-select path;
+    // the optional is set to the pre-load footer (often empty — that is no-flash success).
+    void fireOpenAndDispatchLoad(HandlerHarness& harness,
+                                 std::optional<juce::String>* midFooterBeforeLoad = nullptr);
     void setupComputerPatchesScan(HandlerHarness& harness, const juce::File& tempDir);
+
+    // True when text is the combined first-load footer for that scan + Loaded (any recon variant).
+    bool matchesCombinedFirstLoadFooter(const juce::String& text,
+                                        int validCount,
+                                        int invalidCount,
+                                        const juce::File& file);
 
     // Mirrors production ActionDispatcher: SelectPatchFile property changes schedule a 150 ms load settle.
     struct SelectPatchFileLoadDispatcher : private juce::ValueTree::Listener

@@ -23,7 +23,7 @@ context:
 
 **Always:**
 - Drag overlay (no heavy inventory): lightweight accept when selection has any directory and/or any `.syx` path → L1 `PATCHES...` (ASCII dots, 10 chars, fixed, no counter) + blinking L2 `DROP TO LOAD`; single plain `.syx` keeps today’s assess + name preview; otherwise junk overlay — singular `BAD FILE` for one unloadable item, plural `BAD FILES` for two or more.
-- Drop single real folder: non-recursive scan (same as OPEN); combo = valid only; load first sorted; PATCH NAME = that patch; remember folder as real `kFolderPath`; footer `formatScanSummary` then Loaded.
+- Drop single real folder: non-recursive scan (same as OPEN); combo = valid only; load first sorted; PATCH NAME = that patch; remember folder as real `kFolderPath`; first-load footer combines scan tally + Loaded (`formatFirstLoadAfterScanMessage`); later in-list loads stay Loaded only (see `spec-computer-patches-footer-first-load.md`).
 - Drop multi files / multi folders / mix: build in-memory virtual list of absolute paths of valid `.syx` only (each selected folder: non-recursive scan; merge with directly selected `.syx`); combo = that list only (not parent folder full scan); load first valid; PATCH NAME same; do not treat any parent as the virtual “folder” for OPEN.
 - Combo order: same open-list sort as `scanFolder` (basename via `MutationNaming::compareOpenListFileNames`); equal basenames → stable tie-break by full path.
 - Homonyms: show identical display names; no artificial folder suffixes; combo item IDs stay unique (1-based index).
@@ -31,7 +31,7 @@ context:
 - Reload / new session: virtual list gone; fall back to last real folder.
 - SAVE writes the current computer-file origin path (session origin, not “whatever the combo row still shows”); Save As uses a real disk location, preferring last real folder when relevant.
 - Virtual list + Save As (input vs output): Save As must **not** mutate the drop-built virtual list or select the export as a list row. If the export path is not already a list entry, clear combo selection (`<SELECT>`, same as OPEN + Save As outside the opened folder). Update origin path to the Save As file so the next SAVE overwrites that export until the user re-enters list browsing (choose a combo row, then Prev/Next or COMPUTER PATCHES title reload). Plain SAVE on a list origin may still rewrite that list entry’s absolute path when the on-disk identity of the same slot changes.
-- Footer: reuse `formatScanSummary`, Loaded/Saved/reconciliation, `Drop rejected: …`; enrich Loaded/Saved with a readable location (prefer useful end: folder + file); ASCII `...` only; retire/adapt `kDropRejectedMultiFile` (no longer “one .syx at a time”).
+- Footer: scan-only / empty paths still use `formatScanSummary` (and existing empty/reject strings); first successful load after OPEN/drop uses combined `formatFirstLoadAfterScanMessage`; later loads use Loaded/Saved/reconciliation; enrich Loaded/Saved with a readable location (prefer useful end: folder + file); ASCII `...` only; retire/adapt `kDropRejectedMultiFile` (no longer “one .syx at a time”).
 
 **Never:**
 - Persist virtual list across sessions; recursive subfolder scan; homonym decorations; PATCH NAME height/typo changes beyond overlay needs; Bank Utility / bank-dump drop; parallel loader bypassing Computer Patches gates; heavy per-`fileDragMove` validation of thousands of files; treat Save As as a browsing/list mutation while a virtual list is active.
@@ -44,7 +44,7 @@ context:
 | Drag folder / multi / mix with ≥1 dir or `.syx` | Finder selection | `PATCHES...` + `DROP TO LOAD` blink; no deep scan | N/A |
 | Drag junk only (1 item) | No dir / no `.syx` | `********` + `BAD FILE` | N/A |
 | Drag junk only (≥2 items) | No dir / no `.syx` | `********` + `BAD FILES` | N/A |
-| Drop one folder (valid files) | Non-recursive `.syx` | Real folder mode; combo sorted valids; load first; `kFolderPath` = folder; scan + Loaded footers | Empty / all invalid → existing reject / empty footers; no load |
+| Drop one folder (valid files) | Non-recursive `.syx` | Real folder mode; combo sorted valids; load first; `kFolderPath` = folder; combined first-load footer (scan tally + Loaded) | Empty / all invalid → existing reject / empty footers; no load |
 | Drop multi `.syx` / folders / mix | Valid after merge | Virtual list mode; combo = merged valids only; load first; `kFolderPath` unchanged | Zero valid → drop reject (existing family); no virtual list install |
 | Drop single `.syx` | Valid file | Existing parent-folder scan + select that file; real folder remembered | Existing reject kinds |
 | OPEN after virtual list | Virtual list active | Opens last real folder (not list parents); replaces list with that folder scan | Missing folder → existing folder-not-found |
@@ -84,7 +84,7 @@ context:
 - [x] `CMakeLists.txt` / `Tests/CMakeLists.txt` — Register new sources if split — green build
 
 **Acceptance Criteria:**
-- Given a folder of `.syx` dropped on the editor, when drop completes, then Computer Patches shows only valid patches, loads the first sorted, remembers that folder for OPEN, and shows scan + Loaded footers.
+- Given a folder of `.syx` dropped on the editor, when drop completes, then Computer Patches shows only valid patches, loads the first sorted, remembers that folder for OPEN, and shows a combined first-load footer (scan tally + Loaded).
 - Given multiple `.syx` and/or folders dropped together, when drop completes, then the combo is exactly the merged valid absolute paths (sorted), the first loads, and OPEN still opens the previous real folder unchanged by the virtual list.
 - Given a virtual list with two same-named files from different folders, when browsing the combo, then both labels match the real filename stem and each entry loads its own file.
 - Given drag of a multi/folder selection that includes a directory or `.syx`, when hovering, then PATCH NAME shows `PATCHES...` / `DROP TO LOAD` without scanning the whole tree on every move.
@@ -94,6 +94,7 @@ context:
 
 ## Implementation Notes
 
+- Frozen footer wording renegotiated (2026-09-10 code review of `spec-computer-patches-footer-first-load.md`): first successful OPEN/drop load uses combined scan+Loaded; scan-only `formatScanSummary` remains for empty/unusable paths only.
 - Added Core coverage for session rescan clearing virtual list, Prev/Next on absolute virtual paths, and SAVE overwrite + readable footer while virtual mode stays active.
 - Drag overlay rows remain manual (GUI); Core matrix rows covered by DropLoad + PatchFileService tests (0 failures).
 - Review patches: virtual SAVE rewrites absolute list paths and selects by full path only; cancel restore republishes scan footer; tests for virtual gate-cancel, empty-folder drop, and post-SAVE path identity.

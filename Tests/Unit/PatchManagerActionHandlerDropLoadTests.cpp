@@ -60,12 +60,7 @@ private:
         {
             const auto location = FooterMessages::formatReadablePatchLocation(dropped);
             const auto text = harness.proc.apvts.state.getProperty("uiMessageText").toString();
-            const auto loadedPlain = FooterMessages::formatLoadSuccess(location);
-            const auto loadedReconFalse = FooterMessages::formatReconciliationNotice(location, false);
-            const auto loadedReconTrue = FooterMessages::formatReconciliationNotice(location, true);
-            expect(text == FooterMessages::formatFirstLoadAfterScanMessage(1, 0, loadedPlain)
-                   || text == FooterMessages::formatFirstLoadAfterScanMessage(1, 0, loadedReconFalse)
-                   || text == FooterMessages::formatFirstLoadAfterScanMessage(1, 0, loadedReconTrue));
+            expect(matchesCombinedFirstLoadFooter(text, 1, 0, dropped));
         }
         expect(scanQueue(harness.queue).editBufferPatch);
 
@@ -326,11 +321,12 @@ private:
         expectEquals(scan.validCount, 2);
         expect(scan.invalidCount >= 1);
         const auto firstName = scan.sortedValidFileNames[0];
-        const auto location = FooterMessages::formatReadablePatchLocation(dropDir.getChildFile(firstName));
+        const auto firstFile = dropDir.getChildFile(firstName);
         const auto firstFooter = harness.proc.apvts.state.getProperty("uiMessageText").toString();
-        expect(firstFooter.startsWith("Patch files:"));
-        expect(firstFooter.contains(" / "));
-        expect(firstFooter.contains(" — Loaded "));
+        expect(matchesCombinedFirstLoadFooter(firstFooter,
+                                              scan.validCount,
+                                              scan.invalidCount,
+                                              firstFile));
         expect(! firstFooter.contains("/ 0 invalid"));
 
         fireAdjacentNavigation(harness, ComputerPatches::StandaloneWidgets::kLoadNextPatchFile);

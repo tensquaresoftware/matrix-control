@@ -41,9 +41,8 @@ private:
         copyFixturePatchToDir(dirA, "Patch 71.syx");
 
         const auto patch5 = PatchTestFixtures::resolvePatchFixtureFile("Patch 5.syx");
-        expect(patch5.existsAsFile());
-        expect(patch5.copyFileTo(dirB.getChildFile("Patch 71.syx")));
-        expect(dirB.getChildFile("Patch 71.syx").existsAsFile());
+        expect(patch5.existsAsFile()
+               && patch5.copyFileTo(dirB.getChildFile("Patch 71.syx")));
 
         juce::StringArray paths;
         paths.add(dirA.getChildFile("Patch 71.syx").getFullPathName());
@@ -52,25 +51,24 @@ private:
                == Core::PatchManagerActionHandler::DroppedComputerPatchLoadResult::kLoaded);
 
         const auto& scan = harness.patchFileService.getLastScanResult();
-        expect(scan.isVirtualList());
-        expectEquals(scan.validCount, 2);
+        expect(scan.isVirtualList() && scan.validCount == 2);
         expectEquals(scan.sortedValidFiles.size(), 2);
-        expectEquals(scan.sortedValidFileNames.size(), 2);
         expectEquals(scan.sortedValidFileNames[0], juce::String("Patch 71.syx"));
         expectEquals(scan.sortedValidFileNames[1], juce::String("Patch 71.syx"));
         expect(scan.sortedValidFiles[0].getFullPathName()
                != scan.sortedValidFiles[1].getFullPathName());
+        expect(matchesCombinedFirstLoadFooter(
+            harness.proc.apvts.state.getProperty("uiMessageText").toString(),
+            scan.validCount,
+            scan.invalidCount,
+            scan.sortedValidFiles[0]));
 
         const auto nameAfterFirst = harness.proc.apvts.state.getProperty(PatchNameIds::kPatchName).toString();
-
         harness.proc.apvts.state.setProperty(
-            ComputerPatches::StandaloneWidgets::kSelectPatchFile,
-            2,
-            nullptr);
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile, 2, nullptr);
         simulateSelectPatchFileDispatch(harness);
-
-        const auto nameAfterSecond = harness.proc.apvts.state.getProperty(PatchNameIds::kPatchName).toString();
-        expect(nameAfterFirst != nameAfterSecond);
+        expect(nameAfterFirst
+               != harness.proc.apvts.state.getProperty(PatchNameIds::kPatchName).toString());
 
         dirA.deleteRecursively();
         dirB.deleteRecursively();

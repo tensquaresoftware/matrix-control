@@ -23,7 +23,7 @@ context:
 
 ## Implementation Notes
 
-- Agent decisions: (1) When name reconciliation applies on that first load, keep the reconciliation Loaded clause and still prefix with `Patch files:` (`formatFirstLoadAfterScanMessage`). (2) Formulas: with invalids `Patch files: N valid / M invalid — Loaded <path>`; with zero invalids omit `/ 0 invalid`. (3) Same wording for OPEN and all drop shapes. (4) Suppress `propagateScanResult` footer write when arming a pending combine; still update scan cache / revision. (5) Clear pending arm on cancel restore, reject/empty paths, abort, session reset, and load failure so a later nav load cannot accidentally combine.
+- Agent decisions: (1) When name reconciliation applies on that first load, keep the reconciliation Loaded clause and still prefix with `Patch files:` (`formatFirstLoadAfterScanMessage`). (2) Formulas: with invalids `Patch files: N valid / M invalid — Loaded <path>`; with zero invalids omit `/ 0 invalid`. (3) Same wording for OPEN and all drop shapes. (4) Suppress `propagateScanResult` footer write when arming a pending combine; still update scan cache / revision. (5) Clear pending arm on cancel restore, reject/empty paths, abort, session reset, load failure, and abandon of pending Computer select settle so a later nav load cannot accidentally combine.
 - Helpers: `FooterMessages::formatScanLoadPrefix`, `formatFirstLoadAfterScan`, `formatFirstLoadAfterScanMessage` in `PluginDisplayNames.h`.
 - Arming: OPEN / drop folder / drop single / drop virtual set `pendingCombinedScanLoadFooter_` when a load will follow; empty/unusable scans still publish scan-only footers.
 - `publishLoadFooters` consumes the arm once; Prev/Next and later selects use plain Loaded / reconciliation.
@@ -38,3 +38,23 @@ context:
 - `formatFirstLoadAfterScan` unused beside Message helper — **low/rejected**: thin convenience wrapper kept for exact Loaded-only combine.
 - Soft test assertions / missing OPEN+nav parity / shared scan-without-footer helper / cancel-arm follow-up assert — **defer**: coverage gaps not blocking.
 - Spec still `in-progress` at review time — **patch**: set `done` on finalize.
+
+### Review Findings
+
+- [x] [Review][Decision] Update multi-drop frozen footer wording to match combined first-load — Resolved: option 1; renegotiated `spec-computer-patches-multi-drop-virtual-list.md` frozen Always/matrix/AC + Implementation Notes pointer.
+- [x] [Review][Patch] Clear pending combined footer when abandoning debounced Computer select settle [Source/Core/Actions/PatchManagerActionHandlerInternalPatches.cpp:207]
+- [x] [Review][Patch] Assert exact `formatFirstLoadAfterScanMessage` on folder-drop first-load (invalids path) [Tests/Unit/PatchManagerActionHandlerDropLoadTests.cpp:307]
+- [x] [Review][Patch] Assert combined first-load footer on virtual multi-drop happy path [Tests/Unit/PatchManagerActionHandlerDropLoadExtrasTests.cpp:29]
+- [x] [Review][Patch] Assert no scan-only footer between OPEN prepare and load dispatch [Tests/Unit/PatchManagerActionHandlerBrowserTests.cpp:71]
+- [x] [Review][Defer] Cancel-then-nav no accidental combine assert — deferred: already logged in deferred-work; product clears exist on restore/abort; coverage follow-up only
+- [x] [Review][Defer] OPEN + Prev/Next plain Loaded parity assert — deferred: already logged in deferred-work; DropLoad covers nav; OPEN coverage gap only
+- [x] [Review][Defer] Shared scan-without-footer helper for OPEN/drop prepare — deferred: already logged in deferred-work; three near-duplicate sites, not a user bug
+- [x] [Review][Defer] Automated FooterPanel truncate for combined ` — Loaded ` lines — deferred: paint/GUI unit-test habit; smoke/manual walkthrough covers
+
+#### Rejected
+
+- `formatFirstLoadAfterScan` unused — low/rejected: intentional thin wrapper (prior build triage); not worth deleting in this review.
+- Dual grammar unexplained in Implementation Notes — rejected: fix would edit the spec under review; intentional dual wording already recorded.
+- Missing lifetime comment on `pendingCombinedScanLoadFooter_` — low/rejected: unlikely everyday harm; clear sites already listed in Implementation Notes.
+- Three-way recon `||` in OPEN/single-drop exact asserts — false: intentional tolerance for reconciliation variant, not a soft-count gap.
+- Hard-coded ` — Loaded ` separator in FooterMessages vs FooterPanel — low/rejected: only bites on a future wording edit; shared constant can wait with other polish.

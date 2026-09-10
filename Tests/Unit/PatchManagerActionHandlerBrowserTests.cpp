@@ -80,7 +80,16 @@ private:
         copyFixturePatchToDir(tempDir, "Patch 71.syx");
 
         harness.pickFolderCallback = [&tempDir]() { return tempDir; };
-        fireOpenAndDispatchLoad(harness);
+
+        // Force a select-id change so OPEN defers load and we can observe the mid-footer.
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile, 0, nullptr);
+
+        std::optional<juce::String> midFooter;
+        fireOpenAndDispatchLoad(harness, &midFooter);
+        expect(midFooter.has_value());
+        expect(*midFooter != FooterMessages::formatScanSummary(2, 0));
+        expect(! midFooter->startsWith("Patch files:"));
 
         expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
             ComputerPatches::StandaloneWidgets::kSelectPatchFile)),
@@ -88,19 +97,13 @@ private:
         expect(harness.patchFileService.getLastScanResult().sortedValidFileNames[0]
                == "Patch 5.syx");
         const auto queued = scanQueue(harness.queue);
-        expect(!queued.patchData);
-        expect(queued.editBufferPatch);
+        expect(!queued.patchData && queued.editBufferPatch);
         expect(harness.patchLoadHookState->invoked);
 
-        const auto firstName = harness.patchFileService.getLastScanResult().sortedValidFileNames[0];
-        const auto location = FooterMessages::formatReadablePatchLocation(tempDir.getChildFile(firstName));
+        const auto firstFile = tempDir.getChildFile(
+            harness.patchFileService.getLastScanResult().sortedValidFileNames[0]);
         const auto footer = harness.proc.apvts.state.getProperty("uiMessageText").toString();
-        const auto loadedPlain = FooterMessages::formatLoadSuccess(location);
-        const auto loadedReconFalse = FooterMessages::formatReconciliationNotice(location, false);
-        const auto loadedReconTrue = FooterMessages::formatReconciliationNotice(location, true);
-        expect(footer == FooterMessages::formatFirstLoadAfterScanMessage(2, 0, loadedPlain)
-               || footer == FooterMessages::formatFirstLoadAfterScanMessage(2, 0, loadedReconFalse)
-               || footer == FooterMessages::formatFirstLoadAfterScanMessage(2, 0, loadedReconTrue));
+        expect(matchesCombinedFirstLoadFooter(footer, 2, 0, firstFile));
         expect(! footer.contains("/ 0 invalid"));
 
         tempDir.deleteRecursively();
