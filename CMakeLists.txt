@@ -186,6 +186,7 @@ set(PLUGIN_SOURCES
     Source/Core/Services/DeviceMemoryLimits.cpp
     Source/Core/Services/DeviceTypeRegistry.cpp
     Source/Core/Services/PatchFileService.cpp
+    Source/Core/Services/PatchFileServiceSelection.cpp
     Source/Core/Services/PatchFileServiceMutatorExport.cpp
     Source/Core/Services/PatchFileNameSanitizer.cpp
     Source/Core/Services/PatchNameOverlayStore.cpp
@@ -203,6 +204,7 @@ set(PLUGIN_SOURCES
     Source/Core/Actions/PatchManagerActionHandlerInitSentinel.cpp
     Source/Core/Actions/PatchManagerActionHandlerHeaderClick.cpp
     Source/Core/Actions/PatchManagerActionHandlerComputerBrowser.cpp
+    Source/Core/Actions/PatchManagerActionHandlerComputerDrop.cpp
     Source/Core/Actions/PatchManagerActionHandlerComputerLoadSave.cpp
     Source/Core/Actions/PatchManagerActionHandlerDeviceLoad.cpp
     Source/Core/Actions/PatchManagerActionHandlerBankExport.cpp
@@ -492,6 +494,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/PatchManagerActionHandlerSaveTests.cpp
         Tests/Unit/PatchManagerActionHandlerLoadTests.cpp
         Tests/Unit/PatchManagerActionHandlerDropLoadTests.cpp
+        Tests/Unit/PatchManagerActionHandlerDropLoadExtrasTests.cpp
         Tests/Unit/PatchManagerActionHandlerBankExportFilenameTests.cpp
         Tests/Unit/PatchManagerActionHandlerHeaderClickTests.cpp
         Tests/Unit/ModuleHeaderTitleColourTests.cpp
@@ -590,6 +593,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/Services/DeviceMemoryLimits.cpp
         Source/Core/Services/DeviceTypeRegistry.cpp
         Source/Core/Services/PatchFileService.cpp
+    Source/Core/Services/PatchFileServiceSelection.cpp
         Source/Core/Services/PatchFileServiceMutatorExport.cpp
         Source/Core/Services/PatchFileNameSanitizer.cpp
         Source/Core/Services/PatchNameOverlayStore.cpp
@@ -607,6 +611,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/Actions/PatchManagerActionHandlerInitSentinel.cpp
         Source/Core/Actions/PatchManagerActionHandlerHeaderClick.cpp
         Source/Core/Actions/PatchManagerActionHandlerComputerBrowser.cpp
+    Source/Core/Actions/PatchManagerActionHandlerComputerDrop.cpp
         Source/Core/Actions/PatchManagerActionHandlerComputerLoadSave.cpp
         Source/Core/Actions/PatchManagerActionHandlerDeviceLoad.cpp
         Source/Core/Actions/PatchManagerActionHandlerBankExport.cpp

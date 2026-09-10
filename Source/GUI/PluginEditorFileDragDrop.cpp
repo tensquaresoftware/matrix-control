@@ -12,6 +12,34 @@
 namespace
 {
     namespace FooterMessages = PluginDisplayNames::PatchManagerSection::ComputerPatchesModule::FooterMessages;
+
+    bool pathLooksLikeSyx(const juce::String& path) noexcept
+    {
+        return juce::File(path).getFileExtension().equalsIgnoreCase(Core::PatchFileService::kSyxExtension);
+    }
+
+    // Lightweight drag heuristic: any directory and/or any .syx → accept overlay (no deep scan).
+    bool selectionLooksAcceptable(const juce::StringArray& files) noexcept
+    {
+        for (const auto& path : files)
+        {
+            const juce::File file(path);
+
+            if (file.isDirectory() || pathLooksLikeSyx(path))
+                return true;
+        }
+
+        return false;
+    }
+
+    bool isSingleNonDirectorySyx(const juce::StringArray& files) noexcept
+    {
+        if (files.size() != 1)
+            return false;
+
+        const juce::File file(files[0]);
+        return ! file.isDirectory() && pathLooksLikeSyx(files[0]);
+    }
 }
 
 PatchNameDisplayPanel* PluginEditor::getPatchNameDisplayPanelIfPresent()
@@ -31,17 +59,29 @@ void PluginEditor::updatePatchNameDragOverlay(const juce::StringArray& files)
     if (panel == nullptr)
         return;
 
-    // Multi / empty: show BAD FILE once; skip re-apply on every fileDragMove so blink can run.
-    if (files.size() != 1)
+    if (files.isEmpty() || ! selectionLooksAcceptable(files))
     {
-        constexpr const char* kMultiFileDragSentinel = "\x01multi";
-        if (lastDragAssessedPath_ == kMultiFileDragSentinel)
+        constexpr const char* kJunkDragSentinel = "\x01junk";
+        if (lastDragAssessedPath_ == kJunkDragSentinel)
             return;
 
-        lastDragAssessedPath_ = kMultiFileDragSentinel;
+        lastDragAssessedPath_ = kJunkDragSentinel;
         lastDragAssessedValid_ = false;
         lastDragAssessedPreview_.clear();
-        panel->applyDragOverlay(false, {});
+        panel->applyDragOverlay(PatchNameDisplayPanel::DragOverlayKind::kInvalid);
+        return;
+    }
+
+    if (! isSingleNonDirectorySyx(files))
+    {
+        constexpr const char* kSelectionDragSentinel = "\x01selection";
+        if (lastDragAssessedPath_ == kSelectionDragSentinel)
+            return;
+
+        lastDragAssessedPath_ = kSelectionDragSentinel;
+        lastDragAssessedValid_ = true;
+        lastDragAssessedPreview_.clear();
+        panel->applyDragOverlay(PatchNameDisplayPanel::DragOverlayKind::kValidSelection);
         return;
     }
 
@@ -54,7 +94,10 @@ void PluginEditor::updatePatchNameDragOverlay(const juce::StringArray& files)
     lastDragAssessedPath_ = path;
     lastDragAssessedValid_ = assessment.isValidSinglePatch;
     lastDragAssessedPreview_ = assessment.previewPrimaryName;
-    panel->applyDragOverlay(lastDragAssessedValid_, lastDragAssessedPreview_);
+    panel->applyDragOverlay(
+        assessment.isValidSinglePatch ? PatchNameDisplayPanel::DragOverlayKind::kValidSingle
+                                      : PatchNameDisplayPanel::DragOverlayKind::kInvalid,
+        lastDragAssessedPreview_);
 }
 
 void PluginEditor::clearPatchNameDragOverlay()
@@ -72,14 +115,14 @@ void PluginEditor::handleSyxFilesDropped(const juce::StringArray& files)
     if (files.isEmpty())
         return;
 
-    if (files.size() != 1)
+    if (! selectionLooksAcceptable(files))
     {
         TSS::GrayedControlHelper::setFooterWarningMessage(
-            pluginProcessor.getApvts(), FooterMessages::kDropRejectedMultiFile);
+            pluginProcessor.getApvts(), FooterMessages::kDropRejectedNotSyx);
         return;
     }
 
-    pluginProcessor.loadDroppedComputerPatchFile(juce::File(files[0]));
+    pluginProcessor.loadDroppedComputerPatchSelection(files);
 }
 
 bool PluginEditor::isInterestedInFileDrag(const juce::StringArray& files)

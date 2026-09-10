@@ -104,7 +104,7 @@ namespace Core
         // Re-apply COMPUTER PATCHES DISPLAY SYSEX / FILE NAMES to the loaded .syx without prompting.
         void reapplyComputerPatchDisplayedName();
 
-        // Drag-drop one .syx onto the editor: parent folder → scan → select → existing immediate load.
+        // Drag-drop onto the editor: single .syx, one folder, or multi/mix → Computer Patches load.
         enum class DroppedComputerPatchLoadResult
         {
             kLoaded,
@@ -114,6 +114,9 @@ namespace Core
 
         DroppedComputerPatchLoadResult loadDroppedComputerPatchFile(const juce::File& file,
                                                                     const DeviceMemoryLimits& limits);
+        DroppedComputerPatchLoadResult loadDroppedComputerPatchSelection(
+            const juce::StringArray& paths,
+            const DeviceMemoryLimits& limits);
 
         // Persist a musical overlay for the current Internal bank/patch when the name is usable
         // and not an Oberheim BNK placeholder (inline rename / STORE paths).
@@ -170,6 +173,18 @@ namespace Core
         void rememberComputerPatchesSelection(int selectedId);
         void clearComputerPatchesSelection();
         void seedCommittedComputerPatchesSelectionIfNeeded();
+
+        // When OPEN / drop replaces the browser then Cancel/fails the auto-load, restore this snapshot.
+        struct ComputerPatchesBrowserSnapshot
+        {
+            juce::String folderPath;
+            int selectedId = 0;
+            bool isVirtualList = false;
+            juce::Array<juce::File> virtualFiles;
+        };
+
+        ComputerPatchesBrowserSnapshot captureComputerPatchesBrowserSnapshot() const;
+        void restoreComputerPatchesBrowser(const ComputerPatchesBrowserSnapshot& snapshot);
         void restoreComputerPatchesBrowser(const juce::String& folderPath, int selectedId);
         void abortComputerPatchesNavigation();
         // Returns the id written to APVTS, or nullopt when navigation was a no-op.
@@ -339,23 +354,41 @@ namespace Core
                                              const PatchNameReconciliationResult& reconciliation);
         void syncLoadedPatchToApvts();
         void applyLoadedPatchToApvtsAndSynth(const DeviceMemoryLimits& limits);
-        void publishLoadFooters(const juce::String& fileName,
+        void publishLoadFooters(const juce::File& file,
                                   const PatchNameReconciliationResult& reconciliation);
         void publishLoadFailureFooter(const juce::String& message);
         void publishDropRejectFooter(SinglePatchSyxRejectKind rejectKind);
         DroppedComputerPatchLoadResult rejectDroppedComputerPatch(SinglePatchSyxRejectKind rejectKind);
+        DroppedComputerPatchLoadResult rejectDroppedComputerPatchWithMessage(const char* message);
         bool prepareDroppedComputerPatchSelection(const juce::File& file,
                                                   const DeviceMemoryLimits& limits,
                                                   int& outTargetId);
+        bool prepareDroppedComputerFolderSelection(const juce::File& folder,
+                                                   const DeviceMemoryLimits& limits,
+                                                   int& outTargetId);
+        bool prepareDroppedComputerVirtualSelection(const juce::Array<juce::File>& selection,
+                                                    const DeviceMemoryLimits& limits,
+                                                    int& outTargetId);
         DroppedComputerPatchLoadResult finalizeDroppedComputerPatchLoad();
+        DroppedComputerPatchLoadResult selectAndLoadComputerPatchAtId(int targetId,
+                                                                      const DeviceMemoryLimits& limits);
+        DroppedComputerPatchLoadResult loadDroppedSingleFolder(const juce::File& folder,
+                                                               const DeviceMemoryLimits& limits);
+        DroppedComputerPatchLoadResult loadDroppedSingleSyxFile(const juce::File& file,
+                                                                const DeviceMemoryLimits& limits);
+        DroppedComputerPatchLoadResult loadDroppedVirtualSelection(const juce::Array<juce::File>& files,
+                                                                   const DeviceMemoryLimits& limits);
         void noteDevicePatchOrigin(int bank, int patch);
         void noteComputerPatchOrigin(const juce::File& file);
         bool performUnsavedGatePersistAction(UnsavedEditPersistKind persistKind);
         bool didUnsavedGatePersistSucceed(UnsavedEditPersistKind persistKind) const;
         void saveCurrentPatchToFile(const juce::File& targetFile);
+        juce::File resolveSelectedComputerPatchFileForSave() const;
         void writeValidatedPatchSyx(const juce::File& targetWithExt, const juce::String& matrixStem);
         void completeSuccessfulSave(const juce::File& savedFile);
-        void rescanAndSelectSavedFile(const juce::String& savedFileName);
+        void rescanAndSelectSavedFile(const juce::File& savedFile);
+        void rewriteVirtualListEntryForSavedFile(const juce::File& savedFile);
+        void selectSavedFileInCurrentScan(const juce::File& savedFile);
         juce::File resolveRescanFolder() const;
         juce::File resolveDefaultSaveFolder() const;
         juce::String resolveSuggestedSaveStem() const;
@@ -366,7 +399,7 @@ namespace Core
         void scanAndPublishFolder(const juce::File& folder);
         void clearPublishedScanCache();
         void bumpScanRevision();
-        void publishSaveSuccessFooter(const juce::String& fileName);
+        void publishSaveSuccessFooter(const juce::File& savedFile);
         void publishSaveFailureFooter(const juce::String& message);
         void propagateRomBlockedFooter();
         int getCurrentBank(const DeviceMemoryLimits& limits) const;
@@ -522,13 +555,6 @@ namespace Core
         juce::String knownSyxFullPath_;
         // Set only by commitLoadedComputerPatchFile during a drop attempt (see loadDropped…).
         bool dropAttemptCommitted_ = false;
-
-        // When OPEN replaces the browser then Cancel/fails the auto-load, restore this snapshot.
-        struct ComputerPatchesBrowserSnapshot
-        {
-            juce::String folderPath;
-            int selectedId = 0;
-        };
 
         std::optional<ComputerPatchesBrowserSnapshot> pendingBrowserRestoreOnCancel_;
 

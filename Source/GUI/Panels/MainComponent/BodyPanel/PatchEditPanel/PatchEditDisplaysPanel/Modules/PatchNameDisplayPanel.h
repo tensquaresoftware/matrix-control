@@ -34,7 +34,14 @@ public:
     TSS::PatchNameDisplay& getPatchNameDisplay();
 
     // Drag-drop overlay on PATCH NAME — display-only; does not write APVTS patch name.
-    void applyDragOverlay(bool validSinglePatch, const juce::String& previewPrimaryName);
+    enum class DragOverlayKind
+    {
+        kInvalid,
+        kValidSingle,
+        kValidSelection
+    };
+
+    void applyDragOverlay(DragOverlayKind kind, const juce::String& previewPrimaryName = {});
     void clearDragOverlay();
 
     // Name-required presentation (STORE-after-INIT gate UI). Drag overlay still wins while active.

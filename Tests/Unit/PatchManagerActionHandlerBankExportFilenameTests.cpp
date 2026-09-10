@@ -59,7 +59,9 @@ private:
                      juce::String("NYLON 12"));
         expect(harness.proc.apvts.state.getProperty("uiMessageText").toString()
                == FooterMessages::formatLoadSuccess(
-                   Core::PatchFileNameSanitizer::ensureSyxExtension(stem)));
+                      FooterMessages::formatReadablePatchLocation(
+                          tempDir.getChildFile(
+                              Core::PatchFileNameSanitizer::ensureSyxExtension(stem)))));
 
         tempDir.deleteRecursively();
     }

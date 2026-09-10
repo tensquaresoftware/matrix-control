@@ -69,7 +69,8 @@ private:
         const auto savedFile = tempDir.getChildFile("PATCH.syx");
         expect(savedFile.existsAsFile());
         expect(harness.proc.apvts.state.getProperty("uiMessageText").toString()
-               == FooterMessages::formatSaveSuccess(savedFile.getFileName()));
+               == FooterMessages::formatSaveSuccess(
+                      FooterMessages::formatReadablePatchLocation(savedFile)));
         expect(harness.proc.apvts.state.getProperty("uiMessageSeverity").toString() == "info");
         expect(harness.proc.apvts.state.hasProperty(ComputerPatches::StateProperties::kScanRevision));
         expect(harness.proc.apvts.state.getProperty(ComputerPatches::StateProperties::kScanRevision)
@@ -120,7 +121,8 @@ private:
         // Case-sensitive volumes must not keep "Patch 71.syx" beside "PATCH 71.syx".
         expectEquals(tempDir.getNumberOfChildFiles(juce::File::findFiles, "*.syx"), 1);
         expect(harness.proc.apvts.state.getProperty("uiMessageText").toString()
-               == FooterMessages::formatSaveSuccess("PATCH 71.syx"));
+               == FooterMessages::formatSaveSuccess(
+                      FooterMessages::formatReadablePatchLocation(written)));
         expectEquals(static_cast<int>(harness.patchFileService.getLastScanResult().validCount), 1);
         expect(sizeBefore > 0);
 
@@ -303,7 +305,8 @@ private:
                      juce::String("*'CANOPY"));
         expectEquals(loadSavedPatchName(harness, savedFile), juce::String("TEST"));
         expect(harness.proc.apvts.state.getProperty("uiMessageText").toString()
-               == FooterMessages::formatSaveSuccess("TEST.syx"));
+               == FooterMessages::formatSaveSuccess(
+                      FooterMessages::formatReadablePatchLocation(savedFile)));
 
         tempDir.deleteRecursively();
     }

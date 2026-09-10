@@ -20,6 +20,8 @@ public:
         testDropLoad_rejectInvalid();
         testDropLoad_gateCancelRestoresBrowser();
         testDropLoad_gateCancelAfterSamePathReload();
+        testDropLoad_folderDropRemembersFolder();
+        testDropLoad_zeroValidRejectsWithoutVirtualInstall();
     }
 
 private:
@@ -57,7 +59,8 @@ private:
         expect(harness.proc.apvts.state.getProperty("uiMessageText").toString()
                == FooterMessages::formatReconciliationNotice("BNK2: 71", false)
                || harness.proc.apvts.state.getProperty("uiMessageText").toString()
-                      == FooterMessages::formatLoadSuccess("Patch 71.syx"));
+                      == FooterMessages::formatLoadSuccess(
+                             FooterMessages::formatReadablePatchLocation(dropped)));
         expect(scanQueue(harness.queue).editBufferPatch);
 
         priorDir.deleteRecursively();
@@ -224,6 +227,77 @@ private:
 
         dropDir.deleteRecursively();
     }
+
+    void testDropLoad_folderDropRemembersFolder()
+    {
+        beginTest("dropLoad_folderDropRemembersFolder");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, 0, 12, false);
+
+        const auto priorDir = createTempScanDir();
+        expect(priorDir.createDirectory());
+        copyFixturePatchToDir(priorDir, "Patch 5.syx");
+        setupComputerPatchesScan(harness, priorDir);
+
+        const auto dropDir = createTempScanDir();
+        expect(dropDir.createDirectory());
+        copyFixturePatchToDir(dropDir, "Patch 71.syx");
+        copyFixturePatchToDir(dropDir, "Patch 66.syx");
+
+        juce::StringArray paths;
+        paths.add(dropDir.getFullPathName());
+        const auto result = harness.handler.loadDroppedComputerPatchSelection(paths, harness.limits);
+
+        expect(result == Core::PatchManagerActionHandler::DroppedComputerPatchLoadResult::kLoaded);
+        expectEquals(harness.proc.apvts.state.getProperty(
+                         ComputerPatches::StateProperties::kFolderPath).toString(),
+                     dropDir.getFullPathName());
+        expect(! harness.patchFileService.getLastScanResult().isVirtualList());
+        expectEquals(harness.patchFileService.getLastScanResult().validCount, 2);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
+                         ComputerPatches::StandaloneWidgets::kSelectPatchFile)),
+                     1);
+
+        priorDir.deleteRecursively();
+        dropDir.deleteRecursively();
+    }
+
+    void testDropLoad_zeroValidRejectsWithoutVirtualInstall()
+    {
+        beginTest("dropLoad_zeroValidRejectsWithoutVirtualInstall");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, 0, 12, false);
+
+        const auto priorDir = createTempScanDir();
+        expect(priorDir.createDirectory());
+        copyFixturePatchToDir(priorDir, "Patch 5.syx");
+        setupComputerPatchesScan(harness, priorDir);
+        const auto folderBefore = priorDir.getFullPathName();
+
+        const auto junkDir = createTempScanDir();
+        expect(junkDir.createDirectory());
+        expect(junkDir.getChildFile("notes.txt").replaceWithText("x"));
+
+        juce::StringArray paths;
+        paths.add(junkDir.getChildFile("notes.txt").getFullPathName());
+        paths.add(junkDir.getFullPathName());
+
+        const auto result = harness.handler.loadDroppedComputerPatchSelection(paths, harness.limits);
+
+        expect(result == Core::PatchManagerActionHandler::DroppedComputerPatchLoadResult::kRejected);
+        expectEquals(harness.proc.apvts.state.getProperty(
+                         ComputerPatches::StateProperties::kFolderPath).toString(),
+                     folderBefore);
+        expect(! harness.patchFileService.getLastScanResult().isVirtualList());
+        expectEquals(harness.proc.apvts.state.getProperty("uiMessageText").toString(),
+                     juce::String(FooterMessages::kDropRejectedNoValid));
+
+        priorDir.deleteRecursively();
+        junkDir.deleteRecursively();
+    }
+
 };
 
 static PatchManagerActionHandlerDropLoadTests patchManagerActionHandlerDropLoadTests;

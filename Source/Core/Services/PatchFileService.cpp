@@ -21,6 +21,7 @@ namespace Core
                 return MutationNaming::compareOpenListFileNames(first, second);
             }
         };
+
     }
 
     PatchFileService::PatchFileService(SysExDecoder& decoder) noexcept
@@ -125,6 +126,7 @@ namespace Core
         return result;
     }
 
+
     bool PatchFileService::hasCachedScanResult() const noexcept
     {
         const auto& scan = lastScan_;
@@ -132,7 +134,8 @@ namespace Core
             || scan.validCount > 0
             || scan.invalidCount > 0
             || scan.footerMessage.isNotEmpty()
-            || scan.folder.getFullPathName().isNotEmpty();
+            || scan.folder.getFullPathName().isNotEmpty()
+            || scan.isVirtualList();
     }
 
     void PatchFileService::clearLastScan() noexcept
@@ -298,6 +301,7 @@ namespace Core
         }
     }
 
+
     PatchFolderScanResult PatchFileService::scanReadableFolder(const juce::File& folder) const
     {
         const auto syxFiles = findSyxFiles(folder);
@@ -325,6 +329,8 @@ namespace Core
         for (const auto& name : ordered)
             validNames.add(name);
     }
+
+
 
     bool PatchFileService::validateFileContents(const juce::File& file) const
     {
@@ -358,6 +364,7 @@ namespace Core
         PatchFolderScanResult result;
         result.folder = folder;
         result.folderUsable = true;
+        result.listMode = PatchScanListMode::kFolder;
         result.validCount = counts.validCount;
         result.invalidCount = counts.invalidCount;
         result.sortedValidFileNames = std::move(validNames);
@@ -370,6 +377,7 @@ namespace Core
 
         return result;
     }
+
 
     void PatchFileService::cacheResult(PatchFolderScanResult result)
     {

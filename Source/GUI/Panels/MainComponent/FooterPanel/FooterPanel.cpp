@@ -94,9 +94,14 @@ void FooterPanel::paintBadgeAndDetail(juce::Graphics& g, const BadgeDetailPaintA
     g.setFont(args.font);
     g.setColour(args.detailColour);
 
-    // Prefer start of the message; truncate with ASCII "..." only (no U+2026 mojibake).
+    // Prefer start of status messages; Loaded/Saved locations keep the useful end via middle truncate.
+    const bool usePathStyleTruncate = args.detailText.startsWith("Loaded ")
+        || args.detailText.startsWith("Saved ");
     const auto fittedDetail = TSS::TextFitHelpers::fitWithAsciiEllipsis(
-        args.detailText, args.font, static_cast<float>(bounds.getWidth()), false);
+        args.detailText,
+        args.font,
+        static_cast<float>(bounds.getWidth()),
+        usePathStyleTruncate);
     g.drawText(fittedDetail, bounds, juce::Justification::centredLeft, false);
 }
 

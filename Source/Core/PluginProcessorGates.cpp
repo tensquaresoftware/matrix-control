@@ -20,10 +20,18 @@ void PluginProcessor::setPatchFolderPicker(PatchFolderPicker picker)
 
 void PluginProcessor::loadDroppedComputerPatchFile(const juce::File& file)
 {
+    juce::StringArray paths;
+    paths.add(file.getFullPathName());
+    loadDroppedComputerPatchSelection(paths);
+}
+
+void PluginProcessor::loadDroppedComputerPatchSelection(const juce::StringArray& paths)
+{
     if (patchManagerActionHandler_ == nullptr)
         return;
 
-    patchManagerActionHandler_->loadDroppedComputerPatchFile(file, getResolvedDeviceMemoryLimits());
+    patchManagerActionHandler_->loadDroppedComputerPatchSelection(
+        paths, getResolvedDeviceMemoryLimits());
 }
 
 void PluginProcessor::setMutatorExportFolderPicker(MutatorExportFolderPicker picker)

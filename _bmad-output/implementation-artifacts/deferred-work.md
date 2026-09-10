@@ -1575,3 +1575,9 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-master-edit-sysex-debounce.md`
   summary: RECONFIRMED — Master-aware editorial undo/redo MIDI cancel coverage for Master debounce. See 2026-09-09 entry above.
   evidence: Blind Hunter + Verification Gap + Acceptance Auditor on commit 297a3e76; production cancel sites present, UndoManagerEditorialUndoMidiTests still Matrix-Mod-only.
+
+## Deferred from: build review of spec-computer-patches-multi-drop-virtual-list.md (2026-09-10)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-computer-patches-multi-drop-virtual-list.md`
+  summary: PATCH NAME drag overlay for multi/folder/junk selections has no automated coverage (manual Finder check only).
+  evidence: Verification-gap review; repo convention and spec Verification mark GUI blink/overlay as manual; Core drop matrix is unit-tested.

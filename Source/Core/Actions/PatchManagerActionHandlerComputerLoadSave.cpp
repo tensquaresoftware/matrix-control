@@ -39,29 +39,23 @@ namespace Core
 
     void PatchManagerActionHandler::handleSavePatchFile()
     {
-        if (patchFileService_ == nullptr)
+        if (patchFileService_ == nullptr || refuseSaveIfInitSentinelActive())
             return;
 
-        if (refuseSaveIfInitSentinelActive())
+        const auto target = resolveSelectedComputerPatchFileForSave();
+        if (target.getFullPathName().isEmpty())
             return;
 
+        saveCurrentPatchToFile(target);
+    }
+
+    juce::File PatchManagerActionHandler::resolveSelectedComputerPatchFileForSave() const
+    {
         const int selectedId = readComputerPatchesSelectedId();
+        if (selectedId < 1 || ! isComputerPatchesScanCurrent())
+            return {};
 
-        if (selectedId < 1)
-            return;
-
-        const auto& scan = patchFileService_->getLastScanResult();
-        const auto expectedFolder = resolveRescanFolder();
-
-        if (! scan.folderUsable || ! scan.folder.isDirectory() || ! expectedFolder.isDirectory()
-            || scan.folder.getFullPathName() != expectedFolder.getFullPathName())
-            return;
-
-        const int index = selectedId - 1;
-        if (index < 0 || index >= scan.sortedValidFileNames.size())
-            return;
-
-        saveCurrentPatchToFile(scan.folder.getChildFile(scan.sortedValidFileNames[index]));
+        return fileAtComputerPatchesIndex(selectedId - 1);
     }
 
     void PatchManagerActionHandler::commitLoadedComputerPatchFile(const DeviceMemoryLimits& limits,
@@ -84,7 +78,7 @@ namespace Core
             PluginIDs::PatchManagerSection::ComputerPatchesModule::StateProperties::kSelectPatchCancelBaseline,
             0,
             nullptr);
-        publishLoadFooters(file.getFileName(), reconciliation);
+        publishLoadFooters(file, reconciliation);
     }
 
     void PatchManagerActionHandler::handleLoadSelectedPatchFile(const DeviceMemoryLimits& limits)
@@ -298,14 +292,15 @@ namespace Core
                                                    limits.hasBankConcept());
     }
 
-    void PatchManagerActionHandler::publishLoadFooters(const juce::String& fileName,
+    void PatchManagerActionHandler::publishLoadFooters(const juce::File& file,
                                                        const PatchNameReconciliationResult& reconciliation)
     {
+        const auto location = FooterMessages::formatReadablePatchLocation(file);
         const auto message = reconciliation.hadMismatch
             ? FooterMessages::formatReconciliationNotice(
                   reconciliation.resolvedName,
                   reconciliation.usedFilename)
-            : FooterMessages::formatLoadSuccess(fileName);
+            : FooterMessages::formatLoadSuccess(location);
 
         apvts_.state.setProperty("uiMessageText", message, nullptr);
         apvts_.state.setProperty("uiMessageSeverity", juce::String("info"), nullptr);
@@ -374,7 +369,6 @@ namespace Core
 
     void PatchManagerActionHandler::completeSuccessfulSave(const juce::File& savedFile)
     {
-        const auto savedFileName = PatchManagerActionHandlerInternal::savedSyxFileName(savedFile);
         // Device / INIT: keep RAM risk only when it already applied (e.g. INIT) or the user had
         // edits before this export. A clean ROM/device load + Save As must not invent at-risk
         // state — otherwise OPEN after export falsely shows Unsaved Patch.
@@ -400,33 +394,8 @@ namespace Core
             }
         }
 
-        publishSaveSuccessFooter(savedFileName);
-        rescanAndSelectSavedFile(savedFileName);
-    }
-
-    void PatchManagerActionHandler::rescanAndSelectSavedFile(const juce::String& savedFileName)
-    {
-        if (patchFileService_ == nullptr)
-            return;
-
-        const auto folder = resolveRescanFolder();
-        if (! folder.isDirectory())
-            return;
-
-        patchFileService_->scanFolder(folder);
-
-        const auto& names = patchFileService_->getLastScanResult().sortedValidFileNames;
-        using namespace PatchManagerActionHandlerInternal;
-        const int index = indexOfFileNameIgnoreCase(names, savedFileName);
-
-        suppressComputerPatchesSelectLoad_ = true;
-        apvts_.state.setProperty(
-            PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSelectPatchFile,
-            index >= 0 ? index + 1 : 0,
-            nullptr);
-        suppressComputerPatchesSelectLoad_ = false;
-        rememberComputerPatchesSelection(index >= 0 ? index + 1 : 0);
-        bumpScanRevision();
+        publishSaveSuccessFooter(savedFile);
+        rescanAndSelectSavedFile(savedFile);
     }
 
     juce::File PatchManagerActionHandler::resolveRescanFolder() const
@@ -443,7 +412,11 @@ namespace Core
         }
 
         if (patchFileService_ != nullptr)
-            return patchFileService_->getLastScanResult().folder;
+        {
+            const auto& scan = patchFileService_->getLastScanResult();
+            if (! scan.isVirtualList())
+                return scan.folder;
+        }
 
         return {};
     }
@@ -454,11 +427,11 @@ namespace Core
         return folder.isDirectory() ? folder : juce::File();
     }
 
-    void PatchManagerActionHandler::publishSaveSuccessFooter(const juce::String& fileName)
+    void PatchManagerActionHandler::publishSaveSuccessFooter(const juce::File& savedFile)
     {
         apvts_.state.setProperty(
             "uiMessageText",
-            FooterMessages::formatSaveSuccess(fileName),
+            FooterMessages::formatSaveSuccess(FooterMessages::formatReadablePatchLocation(savedFile)),
             nullptr);
         apvts_.state.setProperty("uiMessageSeverity", juce::String("info"), nullptr);
     }

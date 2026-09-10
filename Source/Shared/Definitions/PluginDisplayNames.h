@@ -1023,6 +1023,8 @@ namespace PluginDisplayNames
             {
                 // Eight asterisks — distinct from startup "--------"; ASCII-safe for the display font.
                 constexpr const char* kBadPrimary = "********";
+                // Multi / folder drag accept — ASCII dots, 10 chars fixed (no counter).
+                constexpr const char* kPatchesEllipsis = "PATCHES...";
                 constexpr const char* kDropToLoad = "DROP TO LOAD";
                 constexpr const char* kBadFile = "BAD FILE";
             }
@@ -1214,14 +1216,26 @@ namespace PluginDisplayNames
                     return juce::String(validCount) + " valid, " + juce::String(invalidCount) + " invalid";
                 }
 
-                inline juce::String formatSaveSuccess(const juce::String& fileName)
+                // Prefer leaf folder + file so the useful end stays readable in the footer.
+                inline juce::String formatReadablePatchLocation(const juce::File& file)
                 {
-                    return "Saved " + fileName;
+                    const auto leafFolder = file.getParentDirectory().getFileName();
+                    const auto fileName = file.getFileName();
+
+                    if (leafFolder.isEmpty())
+                        return fileName;
+
+                    return leafFolder + "/" + fileName;
                 }
 
-                inline juce::String formatLoadSuccess(const juce::String& fileName)
+                inline juce::String formatSaveSuccess(const juce::String& location)
                 {
-                    return "Loaded " + fileName;
+                    return "Saved " + location;
+                }
+
+                inline juce::String formatLoadSuccess(const juce::String& location)
+                {
+                    return "Loaded " + location;
                 }
 
                 inline juce::String formatReconciliationNotice(const juce::String& resolvedName,
@@ -1241,8 +1255,8 @@ namespace PluginDisplayNames
                     "Invalid patch file name (use A-Z, 0-9, space, -, _; max 8)";
 
                 // Drag-drop onto the editor (footer only on drop — never during drag).
-                constexpr const char* kDropRejectedMultiFile =
-                    "Drop rejected: drop one .syx at a time";
+                constexpr const char* kDropRejectedNoValid =
+                    "Drop rejected: no valid Matrix patch .syx";
                 constexpr const char* kDropRejectedNotSyx =
                     "Drop rejected: not a Matrix patch .syx";
                 constexpr const char* kDropRejectedBankOrMulti =

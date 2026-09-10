@@ -29,15 +29,30 @@ namespace Core
         juce::String errorMessage;
     };
 
+    enum class PatchScanListMode
+    {
+        kFolder,
+        kVirtualList
+    };
+
     struct PatchFolderScanResult
     {
         juce::File folder;
         bool folderUsable = false;
+        PatchScanListMode listMode = PatchScanListMode::kFolder;
         int validCount = 0;
         int invalidCount = 0;
+        // Display stems / basenames for the combo (folder and virtual). Homonyms allowed.
         juce::StringArray sortedValidFileNames;
+        // Absolute files for virtual list; empty in folder mode (resolve via folder + name).
+        juce::Array<juce::File> sortedValidFiles;
         juce::String footerMessage;
         juce::String footerSeverity;
+
+        bool isVirtualList() const noexcept
+        {
+            return listMode == PatchScanListMode::kVirtualList;
+        }
     };
 
     struct MutatorExportWriteArgs
@@ -92,6 +107,11 @@ namespace Core
         bool isValidSinglePatchSyxFile(const juce::File& file) const;
 
         PatchFolderScanResult scanFolder(const juce::File& folder);
+        // Non-recursive per selected folder + direct .syx files → absolute valid paths, sorted.
+        // Caches as virtual-list mode (does not invent a parent folder).
+        PatchFolderScanResult mergeDroppedSelection(const juce::Array<juce::File>& selection);
+        // Re-install a previously validated virtual list (cancel restore) without re-scanning disk.
+        void installVirtualFileList(const juce::Array<juce::File>& absoluteFiles);
         // patchNumber is retained for call-site compatibility (bank export passes slot 0-99) but
         // does not affect the SysEx header: all on-disk .syx use opcode 0x0D with header byte 0.
         // Slot semantics live in the filename (e.g. bank export Pxx stems) and Bank Import, not
@@ -138,12 +158,20 @@ namespace Core
                                    juce::StringArray& validNames,
                                    int& validCount,
                                    int& invalidCount) const;
+        void collectValidAbsoluteFiles(const juce::Array<juce::File>& syxFiles,
+                                       juce::Array<juce::File>& validFiles,
+                                       int& validCount,
+                                       int& invalidCount) const;
         static void sortOpenListFileNames(juce::StringArray& validNames);
+        static void sortOpenListFiles(juce::Array<juce::File>& files);
+        static void appendUniqueAbsoluteFile(juce::Array<juce::File>& files, const juce::File& file);
         PatchFolderScanResult scanReadableFolder(const juce::File& folder) const;
         PatchFolderScanResult makeUnusableFolderResult(const juce::File& folder) const;
         PatchFolderScanResult makeScanResult(const juce::File& folder,
                                              juce::StringArray validNames,
                                              const FolderScanCounts& counts) const;
+        PatchFolderScanResult makeVirtualListResult(juce::Array<juce::File> validFiles,
+                                                    int invalidCount) const;
         void cacheResult(PatchFolderScanResult result);
         PatchFileExportResult validateMutatorExport(const juce::File& folder,
                                                     const MutationHistoryStore& store);

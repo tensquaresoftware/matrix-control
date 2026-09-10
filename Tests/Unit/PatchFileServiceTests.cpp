@@ -53,6 +53,9 @@ public:
         loadPatchSysExFile_validFixture();
         loadPatchSysExFile_thirdPartyOpcode01StillLoadable();
         loadPatchSysExFile_invalid();
+        mergeDroppedSelection_mergesFoldersAndFiles();
+        mergeDroppedSelection_sortTieBreakByPath();
+        mergeDroppedSelection_zeroValidStillVirtualCache();
     }
 
 private:
@@ -426,6 +429,86 @@ private:
 
         expect(! result.success);
         expect(result.errorMessage.isNotEmpty());
+    }
+
+    void mergeDroppedSelection_mergesFoldersAndFiles()
+    {
+        beginTest("mergeDroppedSelection_mergesFoldersAndFiles");
+
+        const auto dirA = createTempScanDir();
+        expect(dirA.createDirectory());
+        const auto dirB = createTempScanDir();
+        expect(dirB.createDirectory());
+        copyFixturePatchToDir(dirA, "Patch 71.syx");
+        copyFixturePatchToDir(dirB, "Patch 5.syx");
+        copyFixturePatchToDir(dirB, "Patch 66.syx");
+
+        juce::Array<juce::File> selection;
+        selection.add(dirA);
+        selection.add(dirB.getChildFile("Patch 66.syx"));
+
+        const auto result = service_.mergeDroppedSelection(selection);
+
+        expect(result.isVirtualList());
+        expect(result.folderUsable);
+        expectEquals(result.validCount, 2);
+        expectEquals(result.sortedValidFiles.size(), 2);
+        expectEquals(result.sortedValidFileNames[0], juce::String("Patch 66.syx"));
+        expectEquals(result.sortedValidFileNames[1], juce::String("Patch 71.syx"));
+        expectEquals(result.footerMessage, FooterMessages::formatScanSummary(2, 0));
+
+        dirA.deleteRecursively();
+        dirB.deleteRecursively();
+    }
+
+    void mergeDroppedSelection_sortTieBreakByPath()
+    {
+        beginTest("mergeDroppedSelection_sortTieBreakByPath");
+
+        const auto dirA = createTempScanDir();
+        expect(dirA.createDirectory());
+        const auto dirB = createTempScanDir();
+        expect(dirB.createDirectory());
+        copyFixturePatchToDir(dirA, "Patch 71.syx");
+        copyFixturePatchToDir(dirB, "Patch 71.syx");
+
+        juce::Array<juce::File> selection;
+        selection.add(dirB.getChildFile("Patch 71.syx"));
+        selection.add(dirA.getChildFile("Patch 71.syx"));
+
+        const auto result = service_.mergeDroppedSelection(selection);
+
+        expectEquals(result.validCount, 2);
+        expectEquals(result.sortedValidFileNames[0], juce::String("Patch 71.syx"));
+        expectEquals(result.sortedValidFileNames[1], juce::String("Patch 71.syx"));
+        expect(result.sortedValidFiles[0].getFullPathName().compareIgnoreCase(
+                   result.sortedValidFiles[1].getFullPathName())
+               < 0);
+
+        dirA.deleteRecursively();
+        dirB.deleteRecursively();
+    }
+
+    void mergeDroppedSelection_zeroValidStillVirtualCache()
+    {
+        beginTest("mergeDroppedSelection_zeroValidStillVirtualCache");
+
+        const auto junkDir = createTempScanDir();
+        expect(junkDir.createDirectory());
+        expect(junkDir.getChildFile("notes.txt").replaceWithText("x"));
+
+        juce::Array<juce::File> selection;
+        selection.add(junkDir);
+        selection.add(junkDir.getChildFile("notes.txt"));
+
+        const auto result = service_.mergeDroppedSelection(selection);
+
+        expect(result.isVirtualList());
+        expectEquals(result.validCount, 0);
+        expect(result.invalidCount >= 1);
+        expectEquals(service_.getLastScanResult().validCount, 0);
+
+        junkDir.deleteRecursively();
     }
 };
 

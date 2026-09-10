@@ -268,9 +268,10 @@ public:
     // Unit-test seam — see ComboboxPatchSendDebouncer::flushPendingSynchronouslyForTests().
     void flushMasterEditSysExDebouncerForTests();
 
-    // Drag-drop one Computer Patches .syx onto the editor (folder → scan → select → load).
+    // Drag-drop Computer Patches selection onto the editor (single .syx / folder / multi-mix).
     // Reject / success / cancel footers and browser restore are handled in Core.
     void loadDroppedComputerPatchFile(const juce::File& file);
+    void loadDroppedComputerPatchSelection(const juce::StringArray& paths);
 
     void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
                                  const juce::Identifier& property) override;

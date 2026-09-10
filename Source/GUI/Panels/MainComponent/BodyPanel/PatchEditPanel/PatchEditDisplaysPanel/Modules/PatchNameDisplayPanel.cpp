@@ -83,7 +83,7 @@ TSS::PatchNameDisplay& PatchNameDisplayPanel::getPatchNameDisplay()
     return *patchNameDisplay_;
 }
 
-void PatchNameDisplayPanel::applyDragOverlay(bool validSinglePatch,
+void PatchNameDisplayPanel::applyDragOverlay(DragOverlayKind kind,
                                              const juce::String& previewPrimaryName)
 {
     if (patchNameDisplay_ == nullptr)
@@ -91,15 +91,21 @@ void PatchNameDisplayPanel::applyDragOverlay(bool validSinglePatch,
 
     namespace Overlay = PluginDisplayNames::PatchEditSection::PatchNameModule::DragDropOverlay;
 
-    if (validSinglePatch)
+    switch (kind)
     {
-        patchNameDisplay_->showDragOverlay(
-            previewPrimaryName.isNotEmpty() ? previewPrimaryName : juce::String(Overlay::kBadPrimary),
-            Overlay::kDropToLoad);
-    }
-    else
-    {
-        patchNameDisplay_->showDragOverlay(Overlay::kBadPrimary, Overlay::kBadFile);
+        case DragOverlayKind::kValidSingle:
+            patchNameDisplay_->showDragOverlay(
+                previewPrimaryName.isNotEmpty() ? previewPrimaryName : juce::String(Overlay::kBadPrimary),
+                Overlay::kDropToLoad);
+            break;
+
+        case DragOverlayKind::kValidSelection:
+            patchNameDisplay_->showDragOverlay(Overlay::kPatchesEllipsis, Overlay::kDropToLoad);
+            break;
+
+        case DragOverlayKind::kInvalid:
+            patchNameDisplay_->showDragOverlay(Overlay::kBadPrimary, Overlay::kBadFile);
+            break;
     }
 }
 
