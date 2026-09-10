@@ -53,7 +53,10 @@ private:
         expect(queued.editBufferPatch);
         expect(harness.proc.apvts.state.getProperty("uiMessageSeverity").toString() == "info");
         expect(harness.proc.apvts.state.getProperty("uiMessageText").toString()
-               == FooterMessages::formatReconciliationNotice("BNK2: 71", false));
+               == FooterMessages::formatReconciliationNotice(
+                      FooterMessages::formatReadablePatchLocation(
+                          tempDir.getChildFile("Patch 71.syx")),
+                      false));
 
         tempDir.deleteRecursively();
     }
@@ -290,7 +293,10 @@ private:
         simulateSelectPatchFileDispatch(harness);
 
         expect(harness.proc.apvts.state.getProperty("uiMessageText").toString()
-               == FooterMessages::formatReconciliationNotice("INSIDE", false));
+               == FooterMessages::formatReconciliationNotice(
+                      FooterMessages::formatReadablePatchLocation(
+                          tempDir.getChildFile("OUTSIDE.syx")),
+                      false));
         expect(harness.proc.apvts.state.getProperty(PatchNameIds::kPatchName).toString() == "INSIDE");
 
         tempDir.deleteRecursively();
@@ -329,7 +335,10 @@ private:
         simulateSelectPatchFileDispatch(harness);
 
         expect(harness.proc.apvts.state.getProperty("uiMessageText").toString()
-               == FooterMessages::formatReconciliationNotice("OUTSIDE", true));
+               == FooterMessages::formatReconciliationNotice(
+                      FooterMessages::formatReadablePatchLocation(
+                          tempDir.getChildFile("OUTSIDE.syx")),
+                      true));
         expect(harness.proc.apvts.state.getProperty(PatchNameIds::kPatchName).toString() == "OUTSIDE");
 
         tempDir.deleteRecursively();

@@ -36,7 +36,8 @@ public:
     // Drag-drop overlay on PATCH NAME — display-only; does not write APVTS patch name.
     enum class DragOverlayKind
     {
-        kInvalid,
+        kInvalid,        // one unloadable item → BAD FILE
+        kInvalidPlural,  // two or more unloadable items → BAD FILES
         kValidSingle,
         kValidSelection
     };

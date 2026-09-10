@@ -57,7 +57,8 @@ private:
                          ComputerPatches::StandaloneWidgets::kSelectPatchFile)),
                      1);
         expect(harness.proc.apvts.state.getProperty("uiMessageText").toString()
-               == FooterMessages::formatReconciliationNotice("BNK2: 71", false)
+               == FooterMessages::formatReconciliationNotice(
+                      FooterMessages::formatReadablePatchLocation(dropped), false)
                || harness.proc.apvts.state.getProperty("uiMessageText").toString()
                       == FooterMessages::formatLoadSuccess(
                              FooterMessages::formatReadablePatchLocation(dropped)));

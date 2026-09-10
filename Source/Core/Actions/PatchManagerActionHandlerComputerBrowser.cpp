@@ -76,10 +76,12 @@ namespace Core
 
     void PatchManagerActionHandler::clearComputerPatchesSelection()
     {
+        suppressComputerPatchesSelectLoad_ = true;
         apvts_.state.setProperty(
             PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSelectPatchFile,
             0,
             nullptr);
+        suppressComputerPatchesSelectLoad_ = false;
         rememberComputerPatchesSelection(0);
     }
 
@@ -99,6 +101,13 @@ namespace Core
 
         pendingBrowserRestoreOnCancel_.reset();
         reloadPatchNameOverlayFromApvts();
+    }
+
+    void PatchManagerActionHandler::applyComputerPatchesBrowserAfterSessionLoad()
+    {
+        // Keep reset+rescan as one production entry so session restore cannot call only half.
+        resetComputerPatchesBrowserAfterSessionLoad();
+        rescanPersistedComputerPatchesFolder();
     }
 
     void PatchManagerActionHandler::discardComputerPatchesScanCacheQuietly()
@@ -263,7 +272,8 @@ namespace Core
         {
             if (patchFileService_ != nullptr)
             {
-                patchFileService_->installVirtualFileList(snapshot.virtualFiles);
+                patchFileService_->installVirtualFileList(snapshot.virtualFiles,
+                                                         snapshot.virtualInvalidCount);
                 PatchFileServiceFooter::propagateScanResult(
                     apvts_, patchFileService_->getLastScanResult());
             }
@@ -304,6 +314,7 @@ namespace Core
             {
                 snapshot.isVirtualList = true;
                 snapshot.virtualFiles = scan.sortedValidFiles;
+                snapshot.virtualInvalidCount = scan.invalidCount;
             }
         }
 

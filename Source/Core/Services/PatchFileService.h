@@ -111,7 +111,8 @@ namespace Core
         // Caches as virtual-list mode (does not invent a parent folder).
         PatchFolderScanResult mergeDroppedSelection(const juce::Array<juce::File>& selection);
         // Re-install a previously validated virtual list (cancel restore) without re-scanning disk.
-        void installVirtualFileList(const juce::Array<juce::File>& absoluteFiles);
+        // invalidCount is preserved for scan-summary footers (cancel restore / in-list SAVE rewrite).
+        void installVirtualFileList(const juce::Array<juce::File>& absoluteFiles, int invalidCount = 0);
         // patchNumber is retained for call-site compatibility (bank export passes slot 0-99) but
         // does not affect the SysEx header: all on-disk .syx use opcode 0x0D with header byte 0.
         // Slot semantics live in the filename (e.g. bank export Pxx stems) and Bank Import, not

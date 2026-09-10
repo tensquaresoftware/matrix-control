@@ -495,6 +495,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/PatchManagerActionHandlerLoadTests.cpp
         Tests/Unit/PatchManagerActionHandlerDropLoadTests.cpp
         Tests/Unit/PatchManagerActionHandlerDropLoadExtrasTests.cpp
+        Tests/Unit/PatchManagerActionHandlerDropLoadReviewTests.cpp
         Tests/Unit/PatchManagerActionHandlerBankExportFilenameTests.cpp
         Tests/Unit/PatchManagerActionHandlerHeaderClickTests.cpp
         Tests/Unit/ModuleHeaderTitleColourTests.cpp

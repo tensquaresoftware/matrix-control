@@ -20,7 +20,7 @@ public:
         testOpenEmptyFolder_clearsComputerFocus();
         testOpenUndefined_cancelLeavesCoordinatesUnestablished();
         testOpenAlreadySelectedFirstReloads();
-        testSessionLoadResetsBrowserWithoutRescan();
+        testSessionLoadResetsBrowserThenRescansPersistedFolder();
         testRescanPersistedFolderMissingPathWarningFooter();
         testRescanPersistedFolderEmptyPathNoOp();
         testRescanPersistedFolderEmptyPathClearsStaleCache();
@@ -304,9 +304,9 @@ private:
         tempDir.deleteRecursively();
     }
 
-    void testSessionLoadResetsBrowserWithoutRescan()
+    void testSessionLoadResetsBrowserThenRescansPersistedFolder()
     {
-        beginTest("sessionLoad_resetsBrowser_withoutRescan");
+        beginTest("sessionLoad_resetsBrowser_thenRescansPersistedFolder");
 
         HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
         const auto tempDir = createTempScanDir();
@@ -322,21 +322,33 @@ private:
 
         const auto pathBefore = harness.proc.apvts.state.getProperty(
             ComputerPatches::StateProperties::kFolderPath).toString();
-        const auto revisionBefore = harness.proc.apvts.state.getProperty(
-            ComputerPatches::StateProperties::kScanRevision);
 
-        harness.handler.resetComputerPatchesBrowserAfterSessionLoad();
+        // Install a virtual list on top of the remembered real folder (session-only browsing).
+        const auto otherDir = createTempScanDir();
+        expect(otherDir.createDirectory());
+        copyFixturePatchToDir(otherDir, "Patch 66.syx");
+        juce::StringArray virtualPaths;
+        virtualPaths.add(otherDir.getChildFile("Patch 66.syx").getFullPathName());
+        virtualPaths.add(tempDir.getChildFile("Patch 71.syx").getFullPathName());
+        expect(harness.handler.loadDroppedComputerPatchSelection(virtualPaths, harness.limits)
+               == Core::PatchManagerActionHandler::DroppedComputerPatchLoadResult::kLoaded);
+        expect(harness.patchFileService.getLastScanResult().isVirtualList());
+        expectEquals(harness.proc.apvts.state.getProperty(ComputerPatches::StateProperties::kFolderPath).toString(),
+                     pathBefore);
+
+        // Same production entry as PluginProcessor::applyRestoredPluginState.
+        harness.handler.applyComputerPatchesBrowserAfterSessionLoad();
 
         expect(harness.proc.apvts.state.getProperty(ComputerPatches::StateProperties::kFolderPath).toString()
                == pathBefore);
         expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
             ComputerPatches::StandaloneWidgets::kSelectPatchFile)),
             0);
-        expectEquals(harness.patchFileService.getLastScanResult().validCount, 0);
-        expect(! harness.patchFileService.getLastScanResult().folderUsable);
-        expect(harness.proc.apvts.state.getProperty(ComputerPatches::StateProperties::kScanRevision)
-               != revisionBefore);
+        expect(! harness.patchFileService.getLastScanResult().isVirtualList());
+        expectEquals(harness.patchFileService.getLastScanResult().validCount, 1);
+        expect(harness.patchFileService.getLastScanResult().folderUsable);
 
+        otherDir.deleteRecursively();
         tempDir.deleteRecursively();
     }
 

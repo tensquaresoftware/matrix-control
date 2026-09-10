@@ -1581,3 +1581,30 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-computer-patches-multi-drop-virtual-list.md`
   summary: PATCH NAME drag overlay for multi/folder/junk selections has no automated coverage (manual Finder check only).
   evidence: Verification-gap review; repo convention and spec Verification mark GUI blink/overlay as manual; Core drop matrix is unit-tested.
+
+## Deferred from: code review of spec-computer-patches-multi-drop-virtual-list.md (2026-09-10)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-computer-patches-multi-drop-virtual-list.md`
+  summary: Sibling `spec-syx-drag-drop-load.md` still documents multi-file reject (“one .syx at a time”) after this feature accepts multi/folder drops.
+  evidence: Blind Hunter; other-spec SSOT hygiene — do not edit under this review’s patch loop.
+- source_spec: `_bmad-output/implementation-artifacts/spec-computer-patches-multi-drop-virtual-list.md`
+  summary: PATCH NAME drag overlay / editor accept path still has no automated coverage (reconfirmed).
+  evidence: Verification Gap; GUI convention + manual Finder; prior deferred entry remains valid.
+- source_spec: `_bmad-output/implementation-artifacts/spec-computer-patches-multi-drop-virtual-list.md`
+  summary: Footer Loaded/Saved path-style middle truncate is untested in paint; APVTS asserts see full strings only.
+  evidence: Verification Gap; GUI paint; spec Verification already lists manual Loaded/Saved readability.
+- source_spec: `_bmad-output/implementation-artifacts/spec-computer-patches-multi-drop-virtual-list.md`
+  summary: No DropLoad-level test for multi-folder-only drops (two+ folders, no loose `.syx`).
+  evidence: Blind Hunter; coverage gap — mix and multi-file covered.
+- source_spec: `_bmad-output/implementation-artifacts/spec-computer-patches-multi-drop-virtual-list.md`
+  summary: No automated lock that Save As default folder prefers last real `kFolderPath` while a virtual list is active.
+  evidence: Blind Hunter; `resolveDefaultSaveFolder` already prefers persisted folder — coverage only.
+
+## Deferred from: code review (post-patches) of spec-computer-patches-multi-drop-virtual-list.md (2026-09-10)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-computer-patches-multi-drop-virtual-list.md`
+  summary: Full-path Loaded/Saved footer strings are asserted via the same `formatReadablePatchLocation` helper used in production (tautological Core check).
+  evidence: Verification Gap on post-patch re-review; paint middle-truncate already deferred; optional later assert on `getFullPathName()` without the helper.
+- source_spec: `_bmad-output/implementation-artifacts/spec-computer-patches-multi-drop-virtual-list.md`
+  summary: Plural junk drag overlay `BAD FILES` still has no automated coverage (reconfirmed after post-patch re-review).
+  evidence: Verification Gap; GUI convention + manual Finder; prior deferred entries remain valid.

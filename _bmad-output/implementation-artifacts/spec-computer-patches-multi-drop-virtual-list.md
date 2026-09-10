@@ -22,18 +22,19 @@ context:
 ## Boundaries & Constraints
 
 **Always:**
-- Drag overlay (no heavy inventory): lightweight accept when selection has any directory and/or any `.syx` path → L1 `PATCHES...` (ASCII dots, 10 chars, fixed, no counter) + blinking L2 `DROP TO LOAD`; single plain `.syx` keeps today’s assess + name preview; otherwise existing BAD FILE overlay.
+- Drag overlay (no heavy inventory): lightweight accept when selection has any directory and/or any `.syx` path → L1 `PATCHES...` (ASCII dots, 10 chars, fixed, no counter) + blinking L2 `DROP TO LOAD`; single plain `.syx` keeps today’s assess + name preview; otherwise junk overlay — singular `BAD FILE` for one unloadable item, plural `BAD FILES` for two or more.
 - Drop single real folder: non-recursive scan (same as OPEN); combo = valid only; load first sorted; PATCH NAME = that patch; remember folder as real `kFolderPath`; footer `formatScanSummary` then Loaded.
 - Drop multi files / multi folders / mix: build in-memory virtual list of absolute paths of valid `.syx` only (each selected folder: non-recursive scan; merge with directly selected `.syx`); combo = that list only (not parent folder full scan); load first valid; PATCH NAME same; do not treat any parent as the virtual “folder” for OPEN.
 - Combo order: same open-list sort as `scanFolder` (basename via `MutationNaming::compareOpenListFileNames`); equal basenames → stable tie-break by full path.
 - Homonyms: show identical display names; no artificial folder suffixes; combo item IDs stay unique (1-based index).
 - OPEN uses last real folder only: last OPEN, successful single-`.syx` drop (parent), or successful single-folder drop — never virtual-list parents, never Desktop default.
 - Reload / new session: virtual list gone; fall back to last real folder.
-- SAVE writes the current patch’s origin file; Save As uses real disk location, preferring last real folder when relevant.
+- SAVE writes the current computer-file origin path (session origin, not “whatever the combo row still shows”); Save As uses a real disk location, preferring last real folder when relevant.
+- Virtual list + Save As (input vs output): Save As must **not** mutate the drop-built virtual list or select the export as a list row. If the export path is not already a list entry, clear combo selection (`<SELECT>`, same as OPEN + Save As outside the opened folder). Update origin path to the Save As file so the next SAVE overwrites that export until the user re-enters list browsing (choose a combo row, then Prev/Next or COMPUTER PATCHES title reload). Plain SAVE on a list origin may still rewrite that list entry’s absolute path when the on-disk identity of the same slot changes.
 - Footer: reuse `formatScanSummary`, Loaded/Saved/reconciliation, `Drop rejected: …`; enrich Loaded/Saved with a readable location (prefer useful end: folder + file); ASCII `...` only; retire/adapt `kDropRejectedMultiFile` (no longer “one .syx at a time”).
 
 **Never:**
-- Persist virtual list across sessions; recursive subfolder scan; homonym decorations; PATCH NAME height/typo changes beyond overlay needs; Bank Utility / bank-dump drop; parallel loader bypassing Computer Patches gates; heavy per-`fileDragMove` validation of thousands of files.
+- Persist virtual list across sessions; recursive subfolder scan; homonym decorations; PATCH NAME height/typo changes beyond overlay needs; Bank Utility / bank-dump drop; parallel loader bypassing Computer Patches gates; heavy per-`fileDragMove` validation of thousands of files; treat Save As as a browsing/list mutation while a virtual list is active.
 
 ## I/O & Edge-Case Matrix
 
@@ -41,12 +42,16 @@ context:
 |----------|--------------|---------------------------|----------------|
 | Drag single valid `.syx` | One patch file | Existing overlay (name + `DROP TO LOAD`) | N/A |
 | Drag folder / multi / mix with ≥1 dir or `.syx` | Finder selection | `PATCHES...` + `DROP TO LOAD` blink; no deep scan | N/A |
-| Drag junk only | No dir / no `.syx` | `********` + `BAD FILE` | N/A |
+| Drag junk only (1 item) | No dir / no `.syx` | `********` + `BAD FILE` | N/A |
+| Drag junk only (≥2 items) | No dir / no `.syx` | `********` + `BAD FILES` | N/A |
 | Drop one folder (valid files) | Non-recursive `.syx` | Real folder mode; combo sorted valids; load first; `kFolderPath` = folder; scan + Loaded footers | Empty / all invalid → existing reject / empty footers; no load |
 | Drop multi `.syx` / folders / mix | Valid after merge | Virtual list mode; combo = merged valids only; load first; `kFolderPath` unchanged | Zero valid → drop reject (existing family); no virtual list install |
 | Drop single `.syx` | Valid file | Existing parent-folder scan + select that file; real folder remembered | Existing reject kinds |
 | OPEN after virtual list | Virtual list active | Opens last real folder (not list parents); replaces list with that folder scan | Missing folder → existing folder-not-found |
 | Prev/Next / combo in virtual list | Absolute paths in session | Navigate list; load origin files; SAVE to current origin | Stale/missing file → existing load failure footers |
+| Save As while virtual list active | Export path not in list | Write export; footer Saved at export path; origin → export path; **list unchanged**; combo → `<SELECT>` (selection 0) | Picker cancel → no write / no origin change |
+| SAVE after that Save As (no list re-entry) | Origin = export path | Overwrites export path; list still unchanged; selection stays 0 | Existing save failures |
+| Combo / title reload / Prev/Next after Save As | Re-enter list browsing | Choose a list row (then Prev/Next or title reload as usual); origin returns to that list path; later SAVE follows list again | Existing load / dirty gates |
 | Homonyms in virtual list | Same basename, different dirs | Identical combo / PATCH NAME labels; distinct indices | N/A |
 | Session reload | Had virtual list | List cleared; rescan last real folder if any | N/A |
 
@@ -84,6 +89,8 @@ context:
 - Given a virtual list with two same-named files from different folders, when browsing the combo, then both labels match the real filename stem and each entry loads its own file.
 - Given drag of a multi/folder selection that includes a directory or `.syx`, when hovering, then PATCH NAME shows `PATCHES...` / `DROP TO LOAD` without scanning the whole tree on every move.
 - Given SAVE on a virtually listed patch, when save succeeds, then the origin file is overwritten and the footer reports a readable location (not a raw untruncated macOS absolute path).
+- Given junk-only drag of two or more unloadable items, when hovering, then PATCH NAME shows `BAD FILES` (singular `BAD FILE` when exactly one).
+- Given Save As while a virtual list is active to a path not in that list, when export succeeds, then the drop list stays as built, the combo shows `<SELECT>`, the footer shows the export path, and the next SAVE overwrites that export until the user chooses a list row again (then Prev/Next or title reload as usual).
 
 ## Implementation Notes
 
@@ -92,6 +99,11 @@ context:
 - Review patches: virtual SAVE rewrites absolute list paths and selects by full path only; cancel restore republishes scan footer; tests for virtual gate-cancel, empty-folder drop, and post-SAVE path identity.
 
 ## Spec Change Log
+
+- 2026-09-10: Human renegotiation — junk drag overlay plural `BAD FILES` for ≥2 unloadable items (singular `BAD FILE` kept for one).
+- 2026-09-10: Human renegotiation — virtual-list Save As is output-only: do not mutate drop list; clear combo to `<SELECT>` when export is outside the list (align with OPEN + Save As elsewhere); SAVE follows session origin until list browsing re-entered.
+- 2026-09-10: Code-review patches — preserve virtual invalidCount on cancel restore; session reload rescans last real folder; DropLoadExtras UnitTest suite rename.
+- 2026-09-10: Post-patch re-review — SAVE falls back to session origin when combo is `<SELECT>`; clear selection suppresses load settle; session restore uses `applyComputerPatchesBrowserAfterSessionLoad`; DropLoadReview locks overwrite + in-list invalidCount.
 
 ## Review Triage Log
 
@@ -124,9 +136,11 @@ context:
 
 **Sort:** Reuse `MutationNaming::compareOpenListFileNames` on basename (same as `scanFolder`, including INITIAL / mutator ordering). Tie-break equal basenames with case-insensitive full path so order is stable.
 
-**Footer location:** Prefer `Loaded <leafFolder>/<file.syx>` (and same for Saved). If paint width still clips, use path-style middle truncate (`TextFitHelpers` `middle=true`) for these success lines so folder+file stay readable. ASCII `...` only.
+**Footer location:** Prefer full absolute disk path in Loaded/Saved (and reconciliation). Footer paint uses path-style middle truncate (`TextFitHelpers` `middle=true`) so distinct parents stay distinguishable when leaf folders share a name. ASCII `...` only.
 
 **Cancel / dirty gates:** Keep `confirmPatchContextChange` and browser snapshot restore; snapshot must include virtual vs folder mode and list contents when virtual.
+
+**Virtual Save As vs SAVE origin:** Drop list = browsing input; Save As = disk export. Do not append the export to the virtual combo. When the export is outside the list, clear selection to `<SELECT>` (same honesty as folder mode Save As outside the opened folder). Session origin (`knownSyxFullPath_` / patch-load context) tracks the last successful computer save/load path so SAVE matches the Saved/Loaded footer path without parsing footer text. Re-entering list browsing starts by choosing a combo row again; then Prev/Next or COMPUTER PATCHES title reload behave as usual.
 
 ## Verification
 
@@ -136,4 +150,45 @@ context:
 - `python3 Scripts/quality/lint_touched.py` -- expected: clean on touched C++
 
 **Manual checks:**
-- Finder: drop one folder; multi `.syx`; multi folders; mix files+folders; junk-only drag → BAD FILE; OPEN after virtual list; SAVE / Save As; homonym labels; footer Loaded/Saved readability.
+- Finder: drop one folder; multi `.syx`; multi folders; mix files+folders; junk-only drag → `BAD FILE` (1) / `BAD FILES` (≥2); OPEN after virtual list; SAVE / Save As (virtual: list unchanged, SAVE follows export until list re-entry); homonym labels; footer Loaded/Saved readability.
+
+### Review Findings
+
+- [x] [Review][Decision] Keep plural BAD FILES — resolved: keep plural; frozen Always / matrix / manual checks updated 2026-09-10.
+- [x] [Review][Decision] Virtual Save As vs list — resolved: leave list unchanged; clear combo to `<SELECT>` when export outside list; SAVE follows session origin until list re-entered; spec updated 2026-09-10.
+- [x] [Review][Patch] Virtual Save As outside list → keep list, selection 0 / `<SELECT>`; origin tracks export [Source/Core/Actions/PatchManagerActionHandlerComputerDrop.cpp]
+- [x] [Review][Patch] Preserve invalidCount when cancel-restoring a virtual list [Source/Core/Services/PatchFileServiceSelection.cpp]
+- [x] [Review][Patch] On session reload, rescan last real folder after clearing the virtual cache [Source/Core/PluginProcessorState.cpp]
+- [x] [Review][Patch] Give DropLoadExtrasTests a distinct UnitTest suite name [Tests/Unit/PatchManagerActionHandlerDropLoadExtrasTests.cpp]
+- [x] [Review][Defer] Sibling drag-drop spec still rejects multi-file — deferred: other-spec / SSOT hygiene (`spec-syx-drag-drop-load.md`)
+- [x] [Review][Defer] PATCH NAME drag overlay / editor accept has no automated net — deferred: GUI convention; already in deferred-work; manual Finder
+- [x] [Review][Defer] Footer Loaded/Saved middle-truncate untested in paint — deferred: GUI paint; spec Verification already manual
+- [x] [Review][Defer] No DropLoad test for multi-folder-only selection — deferred: coverage gap; folder+file and multi-file covered
+- [x] [Review][Defer] No automated lock that Save As default folder prefers last real folder while virtual — deferred: `resolveDefaultSaveFolder` already uses `kFolderPath`; coverage only
+
+**Rejected**
+- Reconciliation footer lost `resolvedName` — false: Design Notes require full path in Loaded/Saved/reconciliation; `(filename used)` / `(internal name used)` remain; winning name is on PATCH NAME.
+- Spec Code Map still cites ComputerBrowser for drop helpers — rejected: fix would edit this spec under review.
+- Spec Change Log empty / `review_loop_iteration: 0` — rejected: fix would edit this spec under review.
+- Zero-valid merge installs virtual cache before reject — false: prepare restores prior browser; lasting UI matches “no virtual list”.
+- Case-insensitive path dedupe can drop distinct files on case-sensitive volumes — low rejected: everyday macOS volumes are case-insensitive; richer dedupe adds complexity.
+- Stale `kDropRejectedMultiFile` bullets in deferred-work — false: tracking hygiene, not a product defect from this change.
+
+### Review Findings (post-patch re-review 2026-09-10)
+
+- [x] [Review][Patch] SAVE after virtual Save As outside list must overwrite export via session origin (`knownSyxFullPath_`), not no-op on selection 0 — harden DropLoadReview assert (size/mtime/content) [Source/Core/Actions/PatchManagerActionHandlerComputerLoadSave.cpp:40-58] — fixed: origin fallback + truncate/rewrite lock
+- [x] [Review][Patch] Wrap virtual Save As `clearComputerPatchesSelection` with load-suppress like other programmatic selection writes [Source/Core/Actions/PatchManagerActionHandlerComputerDrop.cpp:265] — fixed: suppress inside `clearComputerPatchesSelection`
+- [x] [Review][Patch] Lock session reload rescan through `PluginProcessor::applyRestoredPluginState` (or thinnest path that executes that block); optionally start from a virtual list [Source/Core/PluginProcessorState.cpp:100-104] — fixed: `applyComputerPatchesBrowserAfterSessionLoad` + virtual→folder Browser test
+- [x] [Review][Patch] Assert in-list virtual SAVE preserves `invalidCount` after rewrite [Tests/Unit/PatchManagerActionHandlerDropLoadReviewTests.cpp] — fixed
+- [x] [Review][Defer] Full-path Loaded/Saved APVTS asserts still go through `formatReadablePatchLocation` (tautological) — deferred: Core string shape; paint truncate already deferred; cheap non-tautological assert later
+- [x] [Review][Defer] Plural junk drag `BAD FILES` still has no automated overlay net — deferred: GUI convention; reconfirmed; manual Finder
+
+**Rejected (post-patch re-review)**
+- Frozen Always / AC / Code Map / Change Log footer-location wording drift vs Design Notes full absolute path — rejected: fix would edit this spec under review.
+- Design Notes cancel snapshot omits `invalidCount` while code preserves it — rejected: fix would edit this spec under review.
+- Spec Verification commands omit DropLoadReview suite — rejected: fix would edit this spec under review.
+- Case-fold Save As can match a virtual list entry via ignore-case on case-sensitive volumes — low rejected: everyday macOS volumes are case-insensitive (same prior disposition).
+- Empty drag file list shows singular BAD FILE — low rejected: empty Finder drag uncommon; clearing overlay is polish beyond a direct fix.
+- `installVirtualFileList` default `invalidCount = 0` — low rejected: both production call sites pass the count explicitly.
+- Save As outside clear without `bumpScanRevision` — false: combo tracks `kSelectPatchFile`; selection 0 updates UI without a scan bump.
+- Save As outside must assert `invalidCount` unchanged — low rejected: outside path does not reinstall the list; cancel-restore already locks the count.

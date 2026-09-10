@@ -106,6 +106,10 @@ void PatchNameDisplayPanel::applyDragOverlay(DragOverlayKind kind,
         case DragOverlayKind::kInvalid:
             patchNameDisplay_->showDragOverlay(Overlay::kBadPrimary, Overlay::kBadFile);
             break;
+
+        case DragOverlayKind::kInvalidPlural:
+            patchNameDisplay_->showDragOverlay(Overlay::kBadPrimary, Overlay::kBadFiles);
+            break;
     }
 }
 

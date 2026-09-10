@@ -61,11 +61,12 @@ namespace Core
         return result;
     }
 
-    void PatchFileService::installVirtualFileList(const juce::Array<juce::File>& absoluteFiles)
+    void PatchFileService::installVirtualFileList(const juce::Array<juce::File>& absoluteFiles,
+                                                  int invalidCount)
     {
         juce::Array<juce::File> files = absoluteFiles;
         sortOpenListFiles(files);
-        cacheResult(makeVirtualListResult(std::move(files), 0));
+        cacheResult(makeVirtualListResult(std::move(files), invalidCount));
     }
 
     void PatchFileService::collectValidAbsoluteFiles(const juce::Array<juce::File>& syxFiles,

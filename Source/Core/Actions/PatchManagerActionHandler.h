@@ -94,6 +94,8 @@ namespace Core
 
         void rescanPersistedComputerPatchesFolder();
         void resetComputerPatchesBrowserAfterSessionLoad();
+        // Production session-restore entry: clear virtual cache then rescan last real folder.
+        void applyComputerPatchesBrowserAfterSessionLoad();
         // Drops in-memory scan before APVTS replaceState so valueTreeRedirected cannot flash a stale list.
         void discardComputerPatchesScanCacheQuietly();
 
@@ -181,6 +183,7 @@ namespace Core
             int selectedId = 0;
             bool isVirtualList = false;
             juce::Array<juce::File> virtualFiles;
+            int virtualInvalidCount = 0;
         };
 
         ComputerPatchesBrowserSnapshot captureComputerPatchesBrowserSnapshot() const;
@@ -387,7 +390,8 @@ namespace Core
         void writeValidatedPatchSyx(const juce::File& targetWithExt, const juce::String& matrixStem);
         void completeSuccessfulSave(const juce::File& savedFile);
         void rescanAndSelectSavedFile(const juce::File& savedFile);
-        void rewriteVirtualListEntryForSavedFile(const juce::File& savedFile);
+        // Returns true when savedFile matched a virtual-list slot and the list path was updated.
+        bool rewriteVirtualListEntryForSavedFile(const juce::File& savedFile);
         void selectSavedFileInCurrentScan(const juce::File& savedFile);
         juce::File resolveRescanFolder() const;
         juce::File resolveDefaultSaveFolder() const;

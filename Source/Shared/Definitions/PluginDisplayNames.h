@@ -1027,6 +1027,8 @@ namespace PluginDisplayNames
                 constexpr const char* kPatchesEllipsis = "PATCHES...";
                 constexpr const char* kDropToLoad = "DROP TO LOAD";
                 constexpr const char* kBadFile = "BAD FILE";
+                // Plural secondary when the drag selection has two or more unloadable items.
+                constexpr const char* kBadFiles = "BAD FILES";
             }
 
             // Name-required presentation (STORE-after-INIT gate UI): empty L1 + caret, blinking L2.
@@ -1216,16 +1218,11 @@ namespace PluginDisplayNames
                     return juce::String(validCount) + " valid, " + juce::String(invalidCount) + " invalid";
                 }
 
-                // Prefer leaf folder + file so the useful end stays readable in the footer.
+                // Full absolute path; FooterPanel middle-truncates Loaded/Saved with ASCII "...".
                 inline juce::String formatReadablePatchLocation(const juce::File& file)
                 {
-                    const auto leafFolder = file.getParentDirectory().getFileName();
-                    const auto fileName = file.getFileName();
-
-                    if (leafFolder.isEmpty())
-                        return fileName;
-
-                    return leafFolder + "/" + fileName;
+                    const auto fullPath = file.getFullPathName();
+                    return fullPath.isNotEmpty() ? fullPath : file.getFileName();
                 }
 
                 inline juce::String formatSaveSuccess(const juce::String& location)
@@ -1238,13 +1235,13 @@ namespace PluginDisplayNames
                     return "Loaded " + location;
                 }
 
-                inline juce::String formatReconciliationNotice(const juce::String& resolvedName,
+                inline juce::String formatReconciliationNotice(const juce::String& location,
                                                                bool usedFilename)
                 {
                     if (usedFilename)
-                        return "Loaded " + resolvedName + " (filename used)";
+                        return "Loaded " + location + " (filename used)";
 
-                    return "Loaded " + resolvedName + " (internal name used)";
+                    return "Loaded " + location + " (internal name used)";
                 }
 
                 constexpr const char* kEmptyFolder = "0 files in folder";

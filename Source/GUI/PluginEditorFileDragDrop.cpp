@@ -61,14 +61,19 @@ void PluginEditor::updatePatchNameDragOverlay(const juce::StringArray& files)
 
     if (files.isEmpty() || ! selectionLooksAcceptable(files))
     {
-        constexpr const char* kJunkDragSentinel = "\x01junk";
-        if (lastDragAssessedPath_ == kJunkDragSentinel)
+        // Plural only when the selection itself has 2+ unloadable items (not a single bad .syx).
+        const auto invalidKind = files.size() >= 2
+            ? PatchNameDisplayPanel::DragOverlayKind::kInvalidPlural
+            : PatchNameDisplayPanel::DragOverlayKind::kInvalid;
+        const char* junkSentinel = files.size() >= 2 ? "\x01junks" : "\x01junk";
+
+        if (lastDragAssessedPath_ == junkSentinel)
             return;
 
-        lastDragAssessedPath_ = kJunkDragSentinel;
+        lastDragAssessedPath_ = junkSentinel;
         lastDragAssessedValid_ = false;
         lastDragAssessedPreview_.clear();
-        panel->applyDragOverlay(PatchNameDisplayPanel::DragOverlayKind::kInvalid);
+        panel->applyDragOverlay(invalidKind);
         return;
     }
 

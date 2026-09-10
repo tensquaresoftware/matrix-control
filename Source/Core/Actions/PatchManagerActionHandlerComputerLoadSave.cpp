@@ -52,10 +52,23 @@ namespace Core
     juce::File PatchManagerActionHandler::resolveSelectedComputerPatchFileForSave() const
     {
         const int selectedId = readComputerPatchesSelectedId();
-        if (selectedId < 1 || ! isComputerPatchesScanCurrent())
-            return {};
+        if (selectedId >= 1 && isComputerPatchesScanCurrent())
+        {
+            const auto selected = fileAtComputerPatchesIndex(selectedId - 1);
+            if (selected.getFullPathName().isNotEmpty())
+                return selected;
+        }
 
-        return fileAtComputerPatchesIndex(selectedId - 1);
+        // Save As outside the active list clears selection to <SELECT>; SAVE still
+        // follows session origin until the user re-enters list browsing.
+        if (knownSyxFullPath_.isNotEmpty())
+        {
+            const juce::File origin(knownSyxFullPath_);
+            if (origin.existsAsFile())
+                return origin;
+        }
+
+        return {};
     }
 
     void PatchManagerActionHandler::commitLoadedComputerPatchFile(const DeviceMemoryLimits& limits,
@@ -297,9 +310,7 @@ namespace Core
     {
         const auto location = FooterMessages::formatReadablePatchLocation(file);
         const auto message = reconciliation.hadMismatch
-            ? FooterMessages::formatReconciliationNotice(
-                  reconciliation.resolvedName,
-                  reconciliation.usedFilename)
+            ? FooterMessages::formatReconciliationNotice(location, reconciliation.usedFilename)
             : FooterMessages::formatLoadSuccess(location);
 
         apvts_.state.setProperty("uiMessageText", message, nullptr);

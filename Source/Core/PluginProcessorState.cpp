@@ -98,7 +98,7 @@ void PluginProcessor::applyRestoredPluginState(juce::ValueTree restoredState)
     scheduleDeferredMidiPortSyncForPluginHost();
 
     if (patchManagerActionHandler_ != nullptr)
-        patchManagerActionHandler_->resetComputerPatchesBrowserAfterSessionLoad();
+        patchManagerActionHandler_->applyComputerPatchesBrowserAfterSessionLoad();
 
     resetInternalPatchCoordinatesToDefaults();
 

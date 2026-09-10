@@ -8,7 +8,7 @@ class PatchManagerActionHandlerDropLoadExtrasTests : public juce::UnitTest
 {
 public:
     PatchManagerActionHandlerDropLoadExtrasTests()
-        : juce::UnitTest("PatchManagerActionHandlerDropLoad")
+        : juce::UnitTest("PatchManagerActionHandlerDropLoadExtras")
     {
     }
 

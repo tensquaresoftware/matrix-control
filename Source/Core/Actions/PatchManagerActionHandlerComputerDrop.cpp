@@ -256,8 +256,14 @@ namespace Core
 
         if (patchFileService_->getLastScanResult().isVirtualList())
         {
-            rewriteVirtualListEntryForSavedFile(savedFile);
-            selectSavedFileInCurrentScan(savedFile);
+            // In-list SAVE (same slot / case-fold rewrite): keep browsing that entry.
+            // Save As outside the drop list: leave the list intact and clear selection
+            // (<SELECT>), matching OPEN + Save As outside the opened folder.
+            if (rewriteVirtualListEntryForSavedFile(savedFile))
+                selectSavedFileInCurrentScan(savedFile);
+            else
+                clearComputerPatchesSelection();
+
             return;
         }
 
@@ -269,12 +275,13 @@ namespace Core
         selectSavedFileInCurrentScan(savedFile);
     }
 
-    void PatchManagerActionHandler::rewriteVirtualListEntryForSavedFile(const juce::File& savedFile)
+    bool PatchManagerActionHandler::rewriteVirtualListEntryForSavedFile(const juce::File& savedFile)
     {
         const auto& scan = patchFileService_->getLastScanResult();
         juce::Array<juce::File> files = scan.sortedValidFiles;
         const auto savedParent = savedFile.getParentDirectory().getFullPathName();
         const auto savedName = savedFile.getFileName();
+        const int invalidCount = scan.invalidCount;
 
         for (int i = 0; i < files.size(); ++i)
         {
@@ -285,9 +292,11 @@ namespace Core
                 continue;
 
             files.set(i, savedFile);
-            patchFileService_->installVirtualFileList(files);
-            return;
+            patchFileService_->installVirtualFileList(files, invalidCount);
+            return true;
         }
+
+        return false;
     }
 
     void PatchManagerActionHandler::selectSavedFileInCurrentScan(const juce::File& savedFile)
