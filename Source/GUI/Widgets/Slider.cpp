@@ -25,6 +25,12 @@ namespace TSS
         setInterceptsMouseClicks(true, false);
         setRange(config.minValue, config.maxValue, step_);
         setValue(defaultValue_, juce::dontSendNotification);
+        setDoubleClickReturnValue(false, defaultValue_);
+    }
+
+    Slider::~Slider()
+    {
+        hideValueEditor();
     }
 
     int Slider::countDecimalPlacesForStep(double step)
@@ -46,6 +52,7 @@ namespace TSS
     void Slider::setLook(const SliderLook& look)
     {
         look_ = look;
+        applyEditorAppearance();
         repaint();
     }
 
@@ -55,6 +62,8 @@ namespace TSS
             return;
 
         uiScale_ = uiScale;
+        applyEditorAppearance();
+        layoutEditor();
         repaint();
     }
 
@@ -71,9 +80,15 @@ namespace TSS
         return unit_;
     }
 
+    bool Slider::isValueEditorOpen() const
+    {
+        return editor_ != nullptr;
+    }
+
     void Slider::paint(juce::Graphics& g)
     {
         const bool enabled = isEnabled();
+        const bool editing = isValueEditorOpen();
         const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
         const int insetPerSide = ScaledDrawing::logicalInsetPixelsFromDesign(
             static_cast<float>(kValueBarPadding_),
@@ -100,11 +115,27 @@ namespace TSS
             }
         }
 
-        const auto valueBarBounds = calculateValueBarBounds(trackBoundsInt, insetPerSide);
-        drawValueBar(g, valueBarBounds, enabled);
+        if (! editing)
+        {
+            const auto valueBarBounds = calculateValueBarBounds(trackBoundsInt, insetPerSide);
+            drawValueBar(g, valueBarBounds, enabled);
+            drawText(g, trackBoundsFloat, enabled);
+        }
 
-        drawText(g, trackBoundsFloat, enabled);
-        drawFocusBorderIfNeeded(g, trackBoundsFloat, hasFocus_);
+        drawFocusBorderIfNeeded(g, trackBoundsFloat, hasFocus_ && ! editing);
+    }
+
+    void Slider::resized()
+    {
+        layoutEditor();
+    }
+
+    void Slider::enablementChanged()
+    {
+        if (! isEnabled() && isValueEditorOpen())
+            hideValueEditor();
+
+        repaint();
     }
 
     juce::Rectangle<float> Slider::calculateValueBarBounds(const juce::Rectangle<int>& trackBoundsInt, int insetPerSide) const
@@ -192,14 +223,44 @@ namespace TSS
             valueText += " " + unit_;
 
         g.setColour(enabled ? look_.textEnabled : look_.textDisabled);
-        g.setFont(look_.font.withHeight(look_.font.getHeight() * uiScale_));
+        g.setFont(scaledValueFont());
         g.drawText(valueText, bounds, juce::Justification::centred, false);
+    }
+
+    juce::Font Slider::scaledValueFont() const
+    {
+        return look_.font.withHeight(look_.font.getHeight() * uiScale_);
+    }
+
+    bool Slider::isCommandOrCtrlClick(const juce::MouseEvent& e)
+    {
+        return e.mods.isCommandDown();
     }
 
     void Slider::mouseDown(const juce::MouseEvent& e)
     {
         if (! isEnabled())
             return;
+
+        if (isValueEditorOpen())
+        {
+            if (isCommandOrCtrlClick(e))
+            {
+                hideValueEditor();
+                resetToDefaultValue();
+                return;
+            }
+
+            hideValueEditor();
+            return;
+        }
+
+        if (isCommandOrCtrlClick(e))
+        {
+            grabKeyboardFocus();
+            resetToDefaultValue();
+            return;
+        }
 
         grabKeyboardFocus();
         dragStartValue_ = getValue();
@@ -209,7 +270,7 @@ namespace TSS
 
     void Slider::mouseDrag(const juce::MouseEvent& e)
     {
-        if (! isEnabled())
+        if (! isEnabled() || isValueEditorOpen() || dragNotification_ == nullptr)
             return;
 
         const auto dragDistance = dragStartPosition_.y - e.getPosition().y;
@@ -232,11 +293,12 @@ namespace TSS
         if (! isEnabled())
             return;
 
-        resetToDefaultValue();
+        showValueEditor();
     }
 
     void Slider::resetToDefaultValue()
     {
+        const juce::Slider::ScopedDragNotification dragSession(*this);
         setValue(defaultValue_, juce::sendNotificationSync);
     }
 
@@ -264,14 +326,8 @@ namespace TSS
 
     bool Slider::keyPressed(const juce::KeyPress& key)
     {
-        if (! isEnabled() || ! hasFocus_)
+        if (! isEnabled() || ! hasFocus_ || isValueEditorOpen())
             return false;
-
-        if (key == juce::KeyPress::returnKey)
-        {
-            resetToDefaultValue();
-            return true;
-        }
 
         const bool isShiftPressed = key.getModifiers().isShiftDown();
         const auto step = calculateStep(isShiftPressed);

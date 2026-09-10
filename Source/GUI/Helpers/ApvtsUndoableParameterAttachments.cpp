@@ -51,7 +51,8 @@ namespace TSS
             newRange.symmetricSkew = range.symmetricSkew;
 
             slider.setNormalisableRange(newRange);
-            slider.setDoubleClickReturnValue(true, parameter.convertTo0to1(parameter.getDefaultValue()));
+            // Double-click opens the slider value editor; never reset via JUCE double-click-return.
+            slider.setDoubleClickReturnValue(false, static_cast<double>(parameter.convertFrom0to1(parameter.getDefaultValue())));
             slider.valueFromTextFunction = [&parameter](const juce::String& text)
             {
                 return static_cast<double>(

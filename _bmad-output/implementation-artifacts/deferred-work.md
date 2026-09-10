@@ -1632,3 +1632,12 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-computer-patches-footer-first-load.md`
   summary: No automated FooterPanel check that combined `Patch files:… — Loaded …` takes path-style truncation.
   evidence: Verification Gap Other findings; GUI paint convention — manual/smoke only.
+
+## Deferred from: build review of spec-direct-slider-value-entry.md (2026-09-11)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-direct-slider-value-entry.md`
+  summary: Double-click on a slider can still open empty drag/undo transactions because mouseDown always starts a gesture before the editor opens.
+  evidence: Pre-existing ScopedDragNotification-on-mouseDown pattern; attachment begins an editorial transaction even when the value does not change.
+- source_spec: `_bmad-output/implementation-artifacts/spec-direct-slider-value-entry.md`
+  summary: Slider edit text/caret colours from sliderLookFromSkin are covered by Manual UAT only, not by a LookBuilders unit assert.
+  evidence: Verification Gap; makeTestSliderLook hardcodes white; chrome already scoped to Manual UAT in the spec.

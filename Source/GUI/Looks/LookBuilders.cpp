@@ -68,6 +68,9 @@ namespace TSS
         look.textEnabled = skin.getSliderTextColour(true);
         look.textDisabled = skin.getSliderTextColour(false);
         look.focusBorder = skin.getColour(SkinColourId::kSliderFocusBorder);
+        // Reuse NumberBox editor white so slider edit digits/caret stay high-contrast on the green plate.
+        look.editorText = skin.getColour(SkinColourId::kNumberBoxEditorText);
+        look.editorCaret = skin.getColour(SkinColourId::kNumberBoxEditorText);
         look.font = resolvedTypographyFont(skin, TypographyStyleId::kDefault);
         return look;
     }

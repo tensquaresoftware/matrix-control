@@ -32,6 +32,8 @@ namespace TSS
         juce::Colour textEnabled{};
         juce::Colour textDisabled{};
         juce::Colour focusBorder{};
+        juce::Colour editorText{};
+        juce::Colour editorCaret{};
         juce::Font font{juce::FontOptions{}};
     };
 

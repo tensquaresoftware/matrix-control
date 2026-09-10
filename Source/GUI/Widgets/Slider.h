@@ -26,14 +26,17 @@ namespace TSS
     {
     public:
         Slider(int width, int height, const SliderLook& look, const SliderConfig& config);
-        ~Slider() override = default;
+        ~Slider() override;
 
         void setLook(const SliderLook& look);
         void setUiScale(float uiScale);
 
         juce::String getUnit() const;
+        bool isValueEditorOpen() const;
 
         void paint(juce::Graphics& g) override;
+        void resized() override;
+        void enablementChanged() override;
 
         void mouseDown(const juce::MouseEvent& e) override;
         void mouseDrag(const juce::MouseEvent& e) override;
@@ -52,6 +55,7 @@ namespace TSS
         inline constexpr static float kFocusBorderThickness_ = 1.0f;
         inline constexpr static double kDragSensitivity_ = 0.5;
         inline constexpr static double kShiftStepMultiplier_ = 10.0;
+        inline constexpr static int kMaxEditCharacters_ = 12;
 
         SliderLook look_{};
         int width_;
@@ -69,6 +73,7 @@ namespace TSS
         bool hasFocus_ = false;
         std::unique_ptr<juce::Slider::ScopedDragNotification> dragNotification_;
         std::unique_ptr<juce::Slider::ScopedDragNotification> arrowKeyDragNotification_;
+        std::unique_ptr<juce::TextEditor> editor_;
 
         void openArrowKeyDragSessionIfNeeded();
         void drawTrack(juce::Graphics& g, const juce::Rectangle<int>& bounds, bool enabled);
@@ -84,6 +89,17 @@ namespace TSS
         bool isDecrementKey(int keyCode) const;
         void updateValueWithStep(double step, bool increment);
         void resetToDefaultValue();
+
+        juce::Font scaledValueFont() const;
+        juce::Font scaledEditFont() const;
+        juce::String editorAllowedCharacters() const;
+        void layoutEditor();
+        void applyEditorAppearance();
+        void showValueEditor();
+        void hideValueEditor();
+        void handleEditorReturn();
+        static bool tryParseEditText(const juce::String& text, double& outValue);
+        static bool isCommandOrCtrlClick(const juce::MouseEvent& e);
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Slider)
     };

@@ -368,6 +368,7 @@ set(PLUGIN_SOURCES
     Source/GUI/Widgets/ScrollablePopupMenu.cpp
     Source/GUI/Widgets/SectionHeader.cpp
     Source/GUI/Widgets/Slider.cpp
+    Source/GUI/Widgets/SliderEditing.cpp
     Source/GUI/Widgets/TrackGeneratorDisplay.cpp
     
     # Shared
@@ -526,6 +527,8 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/UndoManagerCheckpointPolicyTests.cpp
         Tests/Unit/UndoManagerDirtyStateTests.cpp
         Tests/Unit/UndoManagerSliderArrowTests.cpp
+        Tests/Unit/SliderValueEntryTests.cpp
+        Tests/Unit/SliderValueEntryApvtsTests.cpp
         Tests/Unit/PatchParameterSysExDispatcherTests.cpp
         Tests/Unit/PatchParameterSysExComplianceTests.cpp
         Tests/Unit/MatrixModBusParameterSysExComplianceTests.cpp
@@ -552,6 +555,7 @@ if(MATRIX_BUILD_TESTS)
         Source/GUI/Layout/WidgetDimensionRegistry.cpp
         Source/GUI/Panels/Reusable/ModulePanelConfigBuilder.cpp
         Source/GUI/Widgets/Slider.cpp
+        Source/GUI/Widgets/SliderEditing.cpp
         Source/GUI/Helpers/ApvtsUndoableParameterAttachments.cpp
         Tests/Unit/MigratedModulePanelLayouts.cpp
         Source/Shared/Definitions/PluginDescriptorsPatchManager.cpp
