@@ -25,6 +25,7 @@ context: []
 - NumberBox: disabled stock TextEditor caret; parent paints red plate + border; transparent editor; custom caret in `paintOverChildren` with `y = 2T`, `height = H - 4T`, width `T`; blink timer 500 ms; horizontal X from TextEditor caret centre, clamped to keep T void from left/right border.
 - Slider: `ScaledWidthCaretComponent` + editor LookAndFeel so caret width = same T; vertical JUCE placement unchanged; clip paint to parent to avoid bleed.
 - Review patches: TextEditor-based X (not GlyphArrangement), horizontal T void clamp, slider caret parent clip.
+- Smoke-test fix: caret height used `NumberBox::getHeight()` which returned unscaled design `height_` (correct only at 100% UI Scale). Now uses `getLocalBounds().getHeight()`; renamed accessor to `getDesignHeight()`.
 - Did not reopen NumberBox gestures or red chrome fill colour.
 
 ## Review Triage Log

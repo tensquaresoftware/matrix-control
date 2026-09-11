@@ -181,7 +181,8 @@ namespace TSS
             return;
 
         const float thickness = borderStrokeThickness();
-        const float height = static_cast<float>(getHeight());
+        // Live scaled bounds — not getDesignHeight() (that is the unscaled config height).
+        const float height = static_cast<float>(getLocalBounds().getHeight());
         const float caretHeight = height - 4.0f * thickness;
 
         if (caretHeight <= 0.0f)
@@ -325,7 +326,7 @@ namespace TSS
         const auto caretInEditor = editor_->getCaretRectangle().toFloat();
         const float insertionCentreX = static_cast<float>(editor_->getX()) + caretInEditor.getCentreX();
         const float minX = thickness;
-        const float maxX = static_cast<float>(getWidth()) - 2.0f * thickness;
+        const float maxX = static_cast<float>(getLocalBounds().getWidth()) - 2.0f * thickness;
         return juce::jlimit(minX, maxX, insertionCentreX - 0.5f * thickness);
     }
 

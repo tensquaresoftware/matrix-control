@@ -56,7 +56,8 @@ namespace TSS
         void mouseDoubleClick(const juce::MouseEvent& e) override;
         void enablementChanged() override;
 
-        int getHeight() const { return height_; }
+        /** Design height from config (not the live scaled Component bounds). */
+        int getDesignHeight() const { return height_; }
 
     private:
         inline constexpr static int kDefaultHeight_ = 20;
