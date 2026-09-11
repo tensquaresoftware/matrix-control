@@ -42,3 +42,24 @@ context: []
 - Duplicate caret notify on type — `low` / rejected: harmless blink restart.
 - No unit tests for caret geometry — `defer`: visual UI Scale smoke is the acceptance path for this paint detail.
 - Unclipped slider caret bleed — `medium` / patched: intersect paint with parent local bounds.
+
+### Review Findings
+
+- [x] [Review][Patch] Misleading editCaretX comment claims a full horizontal T red void while clamp is flush to the inner border edge [`Source/GUI/Widgets/NumberBox.cpp:325`] — fixed: comment matches clamp / Intent (no horizontal T void)
+- [x] [Review][Defer] NumberBox edit caret may vanish when H ≤ 4T [`Source/GUI/Widgets/NumberBox.cpp:186-189`] — deferred: already in deferred-work.md; not hit at CurrentPatchNumber for 50–150%
+- [x] [Review][Defer] No automated tests for NumberBox/slider edit caret geometry vs UI Scale — deferred: already in deferred-work.md; Manual UAT / UI Scale smoke is the acceptance path (CONVENTIONS §8.5)
+
+#### Rejected
+
+- Intent empty-vs-typed X vs always following TextEditor caret — `false`: centred empty field + `getCaretRectangle()` already matches Intent behaviour
+- W < 3T inverted `jlimit` range — `false`: product editable NumberBox (CurrentPatchNumber) keeps W ≫ 3T across 50–200% scales; unreachable path
+- Slider `jmax(1.0f, T)` breaks T parity — `false`: at product scales snapped T ≥ 1; floor never changes painted width
+- NumberBox caret uses `editorText` not `editorCaret` — `false`: NumberBoxLook has no caret token; slider maps both to the same skin colour
+- Two caret stacks should share a helper — `false`: Intent keeps slider thickness-only vs NumberBox full geometry on purpose
+- Unused public `getDesignHeight()` — `low` / rejected: documents design vs live bounds after the shadowing bug; no caller harm
+- Collapse `notifyEditCaretChanged` into `restartEditCaretBlink` — `low` / rejected: pure alias, no user impact
+- Double blink restart on type (`onTextChange` + caret callback) — `low` / rejected: harmless (same as prior triage)
+- Incomplete `ScaledDrawing` SSOT comment — `low` / rejected: comment-only, not worth a change pass
+- Spec missing smoke checklist / cross-links to deferrals — rejected: fix would edit the spec under review
+- Implementation Notes “T void” overclaim vs clamp — rejected as a standalone fix: would edit the spec; code comment covered by the Patch above
+- Verification-gap re-raises of H ≤ 4T and missing caret tests — rejected as duplicates of existing deferred-work entries

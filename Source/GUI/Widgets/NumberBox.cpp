@@ -322,7 +322,8 @@ namespace TSS
             return thickness;
 
         // Follow TextEditor insertion X (layout-accurate); centre our width-T bar on it.
-        // Keep a full T of red void from the grey border on both sides (same token as vertical).
+        // Clamp so the bar stays off the grey border (left edge in [T, W - 2T]); no extra
+        // horizontal red void — vertical insets alone use the 2T / H - 4T rule.
         const auto caretInEditor = editor_->getCaretRectangle().toFloat();
         const float insertionCentreX = static_cast<float>(editor_->getX()) + caretInEditor.getCentreX();
         const float minX = thickness;
