@@ -30,6 +30,7 @@ namespace TSS
 
     Slider::~Slider()
     {
+        stopTimer();
         hideValueEditor();
     }
 
@@ -125,9 +126,37 @@ namespace TSS
         drawFocusBorderIfNeeded(g, trackBoundsFloat, hasFocus_ && ! editing);
     }
 
+    void Slider::paintOverChildren(juce::Graphics& g)
+    {
+        if (editor_ == nullptr || ! editCaretOn_)
+            return;
+
+        const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
+        const int insetPerSide = ScaledDrawing::logicalInsetPixelsFromDesign(
+            static_cast<float>(kValueBarPadding_),
+            uiScale_,
+            systemDisplayScale);
+        const float inset = static_cast<float>(insetPerSide);
+        const float height = static_cast<float>(getLocalBounds().getHeight());
+        const float caretHeight = height - 2.0f * inset;
+
+        if (caretHeight <= 0.0f)
+            return;
+
+        const float thickness = sliderCaretThickness();
+        const float width = static_cast<float>(getLocalBounds().getWidth());
+
+        if (thickness <= 0.0f || width < thickness)
+            return;
+
+        g.setColour(look_.editorCaret);
+        g.fillRect(editCaretX(thickness), inset, thickness, caretHeight);
+    }
+
     void Slider::resized()
     {
         layoutEditor();
+        repaint();
     }
 
     void Slider::enablementChanged()

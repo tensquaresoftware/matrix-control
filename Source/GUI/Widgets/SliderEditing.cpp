@@ -4,41 +4,23 @@
 
 #include "GUI/Layout/ScaledDrawing.h"
 #include "GUI/Skins/ColourChart.h"
-#include "GUI/Widgets/ScaledWidthCaretComponent.h"
 
 namespace TSS
 {
     namespace
     {
-        class SliderEditCaretLookAndFeel final : public juce::LookAndFeel_V4
-        {
-        public:
-            std::function<float()> caretThickness;
-
-            juce::CaretComponent* createCaretComponent(juce::Component* keyFocusOwner) override
-            {
-                return new ScaledWidthCaretComponent(keyFocusOwner, caretThickness);
-            }
-        };
-
         // Digits-only field: no mouse/keyboard text selection during edit.
         class SliderEditField final : public juce::TextEditor
         {
         public:
             std::function<bool(const juce::MouseEvent&)> onCommandOrCtrlClick;
+            std::function<void()> onCaretOrTextChanged;
 
-            explicit SliderEditField(std::function<float()> caretThickness)
+            SliderEditField()
             {
                 setSelectAllWhenFocused(false);
                 setPopupMenuEnabled(false);
-                setCaretVisible(true);
-                caretLookAndFeel_.caretThickness = std::move(caretThickness);
-                setLookAndFeel(&caretLookAndFeel_);
-            }
-
-            ~SliderEditField() override
-            {
-                setLookAndFeel(nullptr);
+                setCaretVisible(false);
             }
 
             void mouseDown(const juce::MouseEvent& e) override
@@ -82,13 +64,14 @@ namespace TSS
             }
 
         private:
-            SliderEditCaretLookAndFeel caretLookAndFeel_;
-
             void clearSelectionKeepCaret()
             {
                 const int caret = getCaretPosition();
                 setHighlightedRegion({});
                 setCaretPosition(caret);
+
+                if (onCaretOrTextChanged)
+                    onCaretOrTextChanged();
             }
         };
     }
@@ -134,7 +117,48 @@ namespace TSS
         editor_->setColour(juce::TextEditor::highlightedTextColourId, look_.editorText);
         editor_->setColour(juce::TextEditor::outlineColourId, juce::Colour(ColourChart::kTransparent));
         editor_->setColour(juce::TextEditor::focusedOutlineColourId, juce::Colour(ColourChart::kTransparent));
-        editor_->setColour(juce::CaretComponent::caretColourId, look_.editorCaret);
+    }
+
+    float Slider::sliderCaretThickness() const
+    {
+        return ScaledDrawing::snappedControlBorderThickness(*this, uiScale_);
+    }
+
+    float Slider::editCaretX(float thickness) const
+    {
+        if (editor_ == nullptr)
+            return 0.0f;
+
+        // Follow TextEditor insertion X; centre our thickness bar on it.
+        const auto caretInEditor = editor_->getCaretRectangle().toFloat();
+        const float insertionCentreX = static_cast<float>(editor_->getX()) + caretInEditor.getCentreX();
+        const float minX = 0.0f;
+        const float maxX = static_cast<float>(getLocalBounds().getWidth()) - thickness;
+        return juce::jlimit(minX, maxX, insertionCentreX - 0.5f * thickness);
+    }
+
+    void Slider::restartEditCaretBlink()
+    {
+        editCaretOn_ = true;
+        startTimer(kCaretBlinkIntervalMs_);
+        repaint();
+    }
+
+    void Slider::notifyEditCaretChanged()
+    {
+        restartEditCaretBlink();
+    }
+
+    void Slider::timerCallback()
+    {
+        if (editor_ == nullptr)
+        {
+            stopTimer();
+            return;
+        }
+
+        editCaretOn_ = ! editCaretOn_;
+        repaint();
     }
 
     void Slider::showValueEditor()
@@ -144,16 +168,14 @@ namespace TSS
 
         cancelActiveDragSession();
 
-        auto field = std::make_unique<SliderEditField>([this]()
-        {
-            return ScaledDrawing::snappedControlBorderThickness(*this, uiScale_);
-        });
+        auto field = std::make_unique<SliderEditField>();
         field->onCommandOrCtrlClick = [this](const juce::MouseEvent&)
         {
             hideValueEditor();
             resetToDefaultValue();
             return true;
         };
+        field->onCaretOrTextChanged = [this] { notifyEditCaretChanged(); };
 
         editor_ = std::move(field);
         layoutEditor();
@@ -168,10 +190,11 @@ namespace TSS
         editor_->onReturnKey = [this] { handleEditorReturn(); };
         editor_->onEscapeKey = [this] { hideValueEditor(); };
         editor_->onFocusLost = [this] { hideValueEditor(); };
+        editor_->onTextChange = [this] { notifyEditCaretChanged(); };
 
         addAndMakeVisible(*editor_);
         editor_->grabKeyboardFocus();
-        repaint();
+        restartEditCaretBlink();
     }
 
     void Slider::hideValueEditor()
@@ -179,6 +202,8 @@ namespace TSS
         if (editor_ == nullptr)
             return;
 
+        stopTimer();
+        editCaretOn_ = true;
         removeChildComponent(editor_.get());
         editor_.reset();
         repaint();

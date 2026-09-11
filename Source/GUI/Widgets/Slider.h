@@ -22,7 +22,8 @@ namespace TSS
 
     /** Linear bar slider. Width and height are design dimensions; \p look carries full widget styling
         including the complete \p SliderLook::font (family, weight, height) as for \p Button. */
-    class Slider : public juce::Slider
+    class Slider : public juce::Slider,
+                   private juce::Timer
     {
     public:
         Slider(int width, int height, const SliderLook& look, const SliderConfig& config);
@@ -35,6 +36,7 @@ namespace TSS
         bool isValueEditorOpen() const;
 
         void paint(juce::Graphics& g) override;
+        void paintOverChildren(juce::Graphics& g) override;
         void resized() override;
         void enablementChanged() override;
 
@@ -56,6 +58,7 @@ namespace TSS
         inline constexpr static double kDragSensitivity_ = 0.5;
         inline constexpr static double kShiftStepMultiplier_ = 10.0;
         inline constexpr static int kMaxEditCharacters_ = 12;
+        inline constexpr static int kCaretBlinkIntervalMs_ = 500;
 
         SliderLook look_{};
         int width_;
@@ -71,6 +74,7 @@ namespace TSS
         std::function<float(double)> normalizedFill_;
         std::function<juce::String(double)> formatValue_;
         bool hasFocus_ = false;
+        bool editCaretOn_ = true;
         std::unique_ptr<juce::Slider::ScopedDragNotification> dragNotification_;
         std::unique_ptr<juce::Slider::ScopedDragNotification> arrowKeyDragNotification_;
         std::unique_ptr<juce::TextEditor> editor_;
@@ -100,6 +104,12 @@ namespace TSS
         void handleEditorReturn();
         static bool tryParseEditText(const juce::String& text, double& outValue);
         static bool isCommandOrCtrlClick(const juce::MouseEvent& e);
+
+        float sliderCaretThickness() const;
+        float editCaretX(float thickness) const;
+        void restartEditCaretBlink();
+        void notifyEditCaretChanged();
+        void timerCallback() override;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Slider)
     };
