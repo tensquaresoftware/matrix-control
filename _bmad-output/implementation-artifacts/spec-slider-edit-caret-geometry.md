@@ -74,6 +74,25 @@ context:
 - Given CurrentPatchNumber edit after this change, when comparing appearance, then NumberBox caret geometry and chrome are unchanged.
 - Given Escape or Enter during slider edit, when the editor closes, then idle track / value bar / text behaviour is unchanged from today.
 
+### Review Findings
+
+- [x] [Review][Patch] Assert stock TextEditor caret stays off while slider value editor is open [`Tests/Unit/SliderValueEntryTests.cpp` / `SliderEditing.cpp:23`]
+- [x] [Review][Defer] Custom caret geometry and blink remain manual-only (no paint/geometry unit tests) — deferred: intentional frozen Never + existing deferred-work for NumberBox/slider caret geometry vs UI Scale
+- [x] [Review][Defer] Companion NumberBox caret spec still documents removed slider ScaledWidthCaret / thickness-only stack — deferred: documentation drift outside this frozen Intent; already logged under build review of this spec (2026-09-11)
+
+#### Rejected
+
+- Spec `status: done` while Manual UI Scale smoke unchecked — rejected: fix would edit this build’s spec under review; Guillaume reported smoke OK for this review
+- Stale Code Map present-tense (`setCaretVisible(true)` + ScaledWidthCaret) — rejected: fix would edit this build’s spec under review
+- Empty Spec Change Log / `review_loop_iteration: 0` vs triage log — rejected: fix would edit this build’s spec under review
+- I/O matrix omits mid-edit resize / UI Scale — rejected: fix would edit this build’s spec under review; code already `repaint()`s after `layoutEditor()` on resize
+- Intent silent on caret height vs bold edit glyphs — rejected: fix would edit frozen Intent under review; acceptance gate is plate void, not glyph alignment
+- `notifyEditCaretChanged` only forwards to `restartEditCaretBlink` — `false`: intentional NumberBox parity, not a defect of this change
+- Duplicated value-bar inset math in `paint` vs `paintOverChildren` — `low` / rejected: same formula by Intent; extracting a helper adds surface without everyday user harm (same as Build triage)
+- Double blink restart on type (`onCaretOrTextChanged` + `onTextChange`) — `low` / rejected: harmless timer restart; NumberBox same pattern
+- Dropped `CaretComponent::caretColourId` wiring — `false`: stock caret is off; custom paint uses `look_.editorCaret`
+- Acceptance Auditor: open Manual UI Scale smoke as AC evidence gap — rejected: same as first item (spec edit / smoke reported OK for this review)
+
 ## Implementation Notes
 
 - Disabled stock TextEditor caret (`setCaretVisible(false)`); removed `SliderEditCaretLookAndFeel` / `ScaledWidthCaretComponent`.

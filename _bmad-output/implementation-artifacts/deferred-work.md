@@ -1654,3 +1654,12 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-slider-edit-caret-geometry.md`
   summary: Done NumberBox caret spec still documents the removed slider ScaledWidthCaret / thickness-only stack.
   evidence: This build overturned that contract for vertical geometry and deleted ScaledWidthCaretComponent; the companion done artifact was left unchanged to avoid editing NumberBox scope.
+
+## Deferred from: code review of spec-slider-edit-caret-geometry.md (2026-09-11)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-slider-edit-caret-geometry.md`
+  summary: Custom slider edit caret geometry and blink remain manual-only (no automated paint/geometry observer).
+  evidence: Frozen Never forbids caret-geometry unit tests; Manual UI Scale smoke is the intentional gate; already covered for NumberBox/slider caret geometry vs UI Scale above.
+- source_spec: `_bmad-output/implementation-artifacts/spec-slider-edit-caret-geometry.md`
+  summary: Companion NumberBox caret spec still documents the removed slider ScaledWidthCaret / thickness-only stack.
+  evidence: Reconfirmed in code review; same deferred item as build review of this spec (2026-09-11).

@@ -41,7 +41,10 @@ private:
         expect(! slider.isValueEditorOpen());
         openValueEditor(slider);
         expect(slider.isValueEditorOpen());
-        expect(valueEditorOf(slider) != nullptr);
+
+        auto* editor = valueEditorOf(slider);
+        expect(editor != nullptr);
+        expect(! editor->isCaretVisible());
         expectEquals(slider.getValue(), 12.0);
     }
 
