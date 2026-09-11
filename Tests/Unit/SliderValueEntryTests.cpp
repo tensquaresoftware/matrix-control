@@ -172,6 +172,7 @@ private:
         expect(editor != nullptr);
         editor->setText("11", false);
         editor->mouseDown(makeMouseEvent(*editor, juce::ModifierKeys::commandModifier));
+        flushPendingUiUpdates();
 
         expect(! slider.isValueEditorOpen());
         expectEquals(slider.getValue(), static_cast<double>(descriptor->defaultValue));

@@ -169,10 +169,18 @@ namespace TSS
         cancelActiveDragSession();
 
         auto field = std::make_unique<SliderEditField>();
-        field->onCommandOrCtrlClick = [this](const juce::MouseEvent&)
+        // Defer destroy+reset: hideValueEditor() must not run inside this field's mouseDown.
+        field->onCommandOrCtrlClick = [safeThis = juce::Component::SafePointer<Slider>(this)](
+                                          const juce::MouseEvent&)
         {
-            hideValueEditor();
-            resetToDefaultValue();
+            juce::MessageManager::callAsync([safeThis]
+            {
+                if (safeThis == nullptr)
+                    return;
+
+                safeThis->hideValueEditor();
+                safeThis->resetToDefaultValue();
+            });
             return true;
         };
         field->onCaretOrTextChanged = [this] { notifyEditCaretChanged(); };
