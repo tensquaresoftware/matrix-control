@@ -54,6 +54,18 @@ namespace ScaledDrawing
         return snappedPhysical / safeDisplayScale;
     }
 
+    /** Design stroke used by NumberBox border and shared edit-caret thickness (sliders). */
+    inline constexpr float kControlBorderDesignThickness = 2.0f;
+
+    inline float snappedControlBorderThickness(const juce::Component& component, float uiScale)
+    {
+        return snappedStrokeThicknessFromDesign(
+            kControlBorderDesignThickness,
+            uiScale,
+            systemDisplayScaleForComponent(component),
+            StrokeSnapPolicy::kRound);
+    }
+
     /**
      * Logical pixel size from design dimensions: design * uiScale * systemDisplayScale (rounded).
      * Prefer using this only for special cases; normal Component bounds should use uiScale alone

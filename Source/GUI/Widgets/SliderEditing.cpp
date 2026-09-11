@@ -2,23 +2,43 @@
 
 #include <memory>
 
+#include "GUI/Layout/ScaledDrawing.h"
 #include "GUI/Skins/ColourChart.h"
+#include "GUI/Widgets/ScaledWidthCaretComponent.h"
 
 namespace TSS
 {
     namespace
     {
+        class SliderEditCaretLookAndFeel final : public juce::LookAndFeel_V4
+        {
+        public:
+            std::function<float()> caretThickness;
+
+            juce::CaretComponent* createCaretComponent(juce::Component* keyFocusOwner) override
+            {
+                return new ScaledWidthCaretComponent(keyFocusOwner, caretThickness);
+            }
+        };
+
         // Digits-only field: no mouse/keyboard text selection during edit.
         class SliderEditField final : public juce::TextEditor
         {
         public:
             std::function<bool(const juce::MouseEvent&)> onCommandOrCtrlClick;
 
-            SliderEditField()
+            explicit SliderEditField(std::function<float()> caretThickness)
             {
                 setSelectAllWhenFocused(false);
                 setPopupMenuEnabled(false);
                 setCaretVisible(true);
+                caretLookAndFeel_.caretThickness = std::move(caretThickness);
+                setLookAndFeel(&caretLookAndFeel_);
+            }
+
+            ~SliderEditField() override
+            {
+                setLookAndFeel(nullptr);
             }
 
             void mouseDown(const juce::MouseEvent& e) override
@@ -62,6 +82,8 @@ namespace TSS
             }
 
         private:
+            SliderEditCaretLookAndFeel caretLookAndFeel_;
+
             void clearSelectionKeepCaret()
             {
                 const int caret = getCaretPosition();
@@ -122,7 +144,10 @@ namespace TSS
 
         cancelActiveDragSession();
 
-        auto field = std::make_unique<SliderEditField>();
+        auto field = std::make_unique<SliderEditField>([this]()
+        {
+            return ScaledDrawing::snappedControlBorderThickness(*this, uiScale_);
+        });
         field->onCommandOrCtrlClick = [this](const juce::MouseEvent&)
         {
             hideValueEditor();

@@ -6,7 +6,8 @@
 
 namespace TSS
 {
-    class NumberBox : public juce::Component
+    class NumberBox : public juce::Component,
+                      private juce::Timer
     {
     public:
         using ValueChangedCallback = std::function<void(int)>;
@@ -30,7 +31,7 @@ namespace TSS
         };
 
         explicit NumberBox(const NumberBoxLook& look, const Config& config);
-        ~NumberBox() override = default;
+        ~NumberBox() override { stopTimer(); }
 
         void setLook(const NumberBoxLook& look);
         void setUiScale(float uiScale);
@@ -50,6 +51,7 @@ namespace TSS
         bool hasFocusHighlight() const { return focusHighlight_; }
 
         void paint(juce::Graphics& g) override;
+        void paintOverChildren(juce::Graphics& g) override;
         void resized() override;
         void mouseDoubleClick(const juce::MouseEvent& e) override;
         void enablementChanged() override;
@@ -58,7 +60,7 @@ namespace TSS
 
     private:
         inline constexpr static int kDefaultHeight_ = 20;
-        inline constexpr static int kBorderThickness_ = 2;
+        inline constexpr static int kCaretBlinkIntervalMs_ = 500;
 
         NumberBoxLook look_{};
         int height_ {kDefaultHeight_};
@@ -69,6 +71,7 @@ namespace TSS
         DisplayState displayState_ = DisplayState::kValue;
         bool focusHighlight_ = false;
         float uiScale_ = 1.0f;
+        bool editCaretOn_ = true;
         std::unique_ptr<juce::TextEditor> editor_;
         ValueChangedCallback onValueChanged_;
 
@@ -86,6 +89,10 @@ namespace TSS
         int editorBorderInset() const;
         void layoutEditor();
         void applyEditorAppearance();
+        void restartEditCaretBlink();
+        void notifyEditCaretChanged();
+        float editCaretX(float thickness) const;
+        void timerCallback() override;
 
         void showEditor();
         void hideEditor();

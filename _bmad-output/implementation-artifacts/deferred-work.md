@@ -1641,3 +1641,10 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-direct-slider-value-entry.md`
   summary: Slider edit text/caret colours from sliderLookFromSkin are covered by Manual UAT only, not by a LookBuilders unit assert.
   evidence: Verification Gap; makeTestSliderLook hardcodes white; chrome already scoped to Manual UAT in the spec.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-numberbox-edit-caret-geometry.md`
+  summary: NumberBox edit caret may vanish if control height is ever ≤ 4× border thickness T
+  evidence: paintOverChildren returns early when H - 4T ≤ 0; not hit at CurrentPatchNumber sizes for 50–150% scales, but unverified for extreme scale/height pairs
+- source_spec: `_bmad-output/implementation-artifacts/spec-numberbox-edit-caret-geometry.md`
+  summary: No automated tests for NumberBox/slider edit caret geometry vs UI Scale
+  evidence: paint-only contract; intentional manual smoke on UI Scale ladder instead of unit coverage

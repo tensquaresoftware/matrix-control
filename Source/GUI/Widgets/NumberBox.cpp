@@ -16,11 +16,13 @@ namespace TSS
         class NumberBoxEditField final : public juce::TextEditor
         {
         public:
+            std::function<void()> onCaretOrTextChanged;
+
             NumberBoxEditField()
             {
                 setSelectAllWhenFocused(false);
                 setPopupMenuEnabled(false);
-                setCaretVisible(true);
+                setCaretVisible(false);
             }
 
             void mouseDown(const juce::MouseEvent& e) override
@@ -66,6 +68,9 @@ namespace TSS
                 const int caret = getCaretPosition();
                 setHighlightedRegion({});
                 setCaretPosition(caret);
+
+                if (onCaretOrTextChanged)
+                    onCaretOrTextChanged();
             }
         };
     }
@@ -152,7 +157,7 @@ namespace TSS
     {
         const auto bounds = getLocalBounds().toFloat();
 
-        // Edit fill uses focus red so any inset gap matches the TextEditor.
+        // Parent paints the red edit plate so the grey border sits flush (no black ring).
         const auto fill = editor_ != nullptr
                               ? look_.textFocus
                               : (isEnabled() ? look_.background : look_.backgroundDisabled);
@@ -168,6 +173,22 @@ namespace TSS
         g.setColour(getTextColour());
         g.setFont(scaledDisplayFont());
         g.drawText(cachedValueText_, bounds, juce::Justification::centred, false);
+    }
+
+    void NumberBox::paintOverChildren(juce::Graphics& g)
+    {
+        if (editor_ == nullptr || ! editCaretOn_)
+            return;
+
+        const float thickness = borderStrokeThickness();
+        const float height = static_cast<float>(getHeight());
+        const float caretHeight = height - 4.0f * thickness;
+
+        if (caretHeight <= 0.0f)
+            return;
+
+        g.setColour(look_.editorText);
+        g.fillRect(editCaretX(thickness), 2.0f * thickness, thickness, caretHeight);
     }
 
     void NumberBox::resized()
@@ -248,11 +269,7 @@ namespace TSS
 
     float NumberBox::borderStrokeThickness() const
     {
-        return ScaledDrawing::snappedStrokeThicknessFromDesign(
-            static_cast<float>(kBorderThickness_),
-            uiScale_,
-            ScaledDrawing::systemDisplayScaleForComponent(*this),
-            ScaledDrawing::StrokeSnapPolicy::kRound);
+        return ScaledDrawing::snappedControlBorderThickness(*this, uiScale_);
     }
 
     int NumberBox::editorBorderInset() const
@@ -278,13 +295,50 @@ namespace TSS
 
         editor_->setFont(editorFont);
         editor_->applyFontToAllText(editorFont);
-        editor_->setColour(juce::TextEditor::backgroundColourId, look_.textFocus);
+        editor_->setColour(juce::TextEditor::backgroundColourId, juce::Colour(ColourChart::kTransparent));
         editor_->setColour(juce::TextEditor::textColourId, look_.editorText);
         editor_->setColour(juce::TextEditor::highlightColourId, look_.editorSelectionBackground);
         editor_->setColour(juce::TextEditor::highlightedTextColourId, look_.editorText);
         editor_->setColour(juce::TextEditor::outlineColourId, juce::Colour(ColourChart::kTransparent));
         editor_->setColour(juce::TextEditor::focusedOutlineColourId, juce::Colour(ColourChart::kTransparent));
-        editor_->setColour(juce::CaretComponent::caretColourId, look_.editorText);
+    }
+
+    void NumberBox::restartEditCaretBlink()
+    {
+        editCaretOn_ = true;
+        startTimer(kCaretBlinkIntervalMs_);
+        repaint();
+    }
+
+    void NumberBox::notifyEditCaretChanged()
+    {
+        restartEditCaretBlink();
+    }
+
+    float NumberBox::editCaretX(float thickness) const
+    {
+        if (editor_ == nullptr)
+            return thickness;
+
+        // Follow TextEditor insertion X (layout-accurate); centre our width-T bar on it.
+        // Keep a full T of red void from the grey border on both sides (same token as vertical).
+        const auto caretInEditor = editor_->getCaretRectangle().toFloat();
+        const float insertionCentreX = static_cast<float>(editor_->getX()) + caretInEditor.getCentreX();
+        const float minX = thickness;
+        const float maxX = static_cast<float>(getWidth()) - 2.0f * thickness;
+        return juce::jlimit(minX, maxX, insertionCentreX - 0.5f * thickness);
+    }
+
+    void NumberBox::timerCallback()
+    {
+        if (editor_ == nullptr)
+        {
+            stopTimer();
+            return;
+        }
+
+        editCaretOn_ = ! editCaretOn_;
+        repaint();
     }
 
     void NumberBox::showEditor()
@@ -292,7 +346,9 @@ namespace TSS
         if (editor_ != nullptr)
             return;
 
-        editor_ = std::make_unique<NumberBoxEditField>();
+        auto field = std::make_unique<NumberBoxEditField>();
+        field->onCaretOrTextChanged = [this] { notifyEditCaretChanged(); };
+        editor_ = std::move(field);
         layoutEditor();
         // Empty field: user retypes the full value; Escape / focus-lost keeps currentValue_.
         editor_->setText({}, false);
@@ -306,9 +362,11 @@ namespace TSS
         editor_->onReturnKey = [this] { handleEditorReturn(); };
         editor_->onEscapeKey = [this] { hideEditor(); };
         editor_->onFocusLost = [this] { hideEditor(); };
+        editor_->onTextChange = [this] { notifyEditCaretChanged(); };
 
         addAndMakeVisible(*editor_);
         editor_->grabKeyboardFocus();
+        restartEditCaretBlink();
     }
 
     void NumberBox::hideEditor()
@@ -316,6 +374,8 @@ namespace TSS
         if (editor_ == nullptr)
             return;
 
+        stopTimer();
+        editCaretOn_ = true;
         removeChildComponent(editor_.get());
         editor_.reset();
         repaint();
