@@ -110,6 +110,12 @@ inline void openValueEditor(TSS::Slider& slider)
     slider.mouseDoubleClick(makeMouseEvent(slider, {}, 2));
 }
 
+inline void flushPendingUiUpdates(int milliseconds = 50)
+{
+    if (auto* messageManager = juce::MessageManager::getInstanceWithoutCreating())
+        messageManager->runDispatchLoopUntil(milliseconds);
+}
+
 inline void commitEditorText(TSS::Slider& slider, const juce::String& text)
 {
     auto* editor = valueEditorOf(slider);

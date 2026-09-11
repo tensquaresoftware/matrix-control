@@ -272,6 +272,7 @@ namespace TSS
         auto newValue = juce::jlimit(range.start, range.end, parsedValue);
         newValue = range.snapToLegalValue(newValue);
 
+        if (! juce::approximatelyEqual(getValue(), newValue))
         {
             const juce::Slider::ScopedDragNotification dragSession(*this);
             setValue(newValue, juce::sendNotificationSync);

@@ -1642,6 +1642,15 @@ Original review bullets below remain for history; status for U-10-owned residual
   summary: Slider edit text/caret colours from sliderLookFromSkin are covered by Manual UAT only, not by a LookBuilders unit assert.
   evidence: Verification Gap; makeTestSliderLook hardcodes white; chrome already scoped to Manual UAT in the spec.
 
+## Deferred from: code review of spec-direct-slider-value-entry.md (2026-09-11)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-direct-slider-value-entry.md`
+  summary: Double-click on a slider can still open empty drag/undo transactions because mouseDown always starts a gesture before the editor opens.
+  evidence: Reconfirmed in code review (Edge Case Hunter); same pre-existing ScopedDragNotification-on-mouseDown pattern as build review deferral.
+- source_spec: `_bmad-output/implementation-artifacts/spec-direct-slider-value-entry.md`
+  summary: Slider edit text/caret colours from sliderLookFromSkin are covered by Manual UAT only, not by a LookBuilders unit assert.
+  evidence: Reconfirmed in code review (Verification Gap); chrome remains Manual UAT / optional LookBuilders follow-up.
+
 - source_spec: `_bmad-output/implementation-artifacts/spec-numberbox-edit-caret-geometry.md`
   summary: NumberBox edit caret may vanish if control height is ever ≤ 4× border thickness T
   evidence: paintOverChildren returns early when H - 4T ≤ 0; not hit at CurrentPatchNumber sizes for 50–150% scales, but unverified for extreme scale/height pairs

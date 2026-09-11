@@ -43,7 +43,7 @@ namespace TSS
         void mouseDown(const juce::MouseEvent& e) override;
         void mouseDrag(const juce::MouseEvent& e) override;
         void mouseUp(const juce::MouseEvent&) override;
-        void mouseDoubleClick(const juce::MouseEvent&) override;
+        void mouseDoubleClick(const juce::MouseEvent& e) override;
 
         void focusGained(juce::Component::FocusChangeType cause) override;
         void focusLost(juce::Component::FocusChangeType cause) override;

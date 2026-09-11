@@ -317,9 +317,9 @@ namespace TSS
         dragNotification_.reset();
     }
 
-    void Slider::mouseDoubleClick(const juce::MouseEvent&)
+    void Slider::mouseDoubleClick(const juce::MouseEvent& e)
     {
-        if (! isEnabled())
+        if (! isEnabled() || isCommandOrCtrlClick(e))
             return;
 
         showValueEditor();
@@ -327,6 +327,9 @@ namespace TSS
 
     void Slider::resetToDefaultValue()
     {
+        if (juce::approximatelyEqual(getValue(), defaultValue_))
+            return;
+
         const juce::Slider::ScopedDragNotification dragSession(*this);
         setValue(defaultValue_, juce::sendNotificationSync);
     }

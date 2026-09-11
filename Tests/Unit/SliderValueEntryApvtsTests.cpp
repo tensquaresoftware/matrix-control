@@ -46,8 +46,10 @@ private:
         expect(processor.undoManager.canUndo());
 
         processor.undoManager.undo();
+        flushPendingUiUpdates();
 
         expectEquals(readIntParameterValue(processor.apvts, descriptor->parameterId), 10);
+        expectEquals(slider.getValue(), 10.0);
     }
 
     void testCommandClickResetUpdatesApvtsAndUndoRestoresPrior()
@@ -79,8 +81,10 @@ private:
         expect(processor.undoManager.canUndo());
 
         processor.undoManager.undo();
+        flushPendingUiUpdates();
 
         expectEquals(readIntParameterValue(processor.apvts, descriptor->parameterId), 33);
+        expectEquals(slider.getValue(), 33.0);
     }
 
     void testAttachmentDisablesDoubleClickReturn()

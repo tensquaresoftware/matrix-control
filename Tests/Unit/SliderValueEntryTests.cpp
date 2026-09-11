@@ -25,6 +25,8 @@ public:
         testDisableWhileEditingClosesEditor();
         testOutOfRangeEnterSnapsToLegalRange();
         testBipolarEnterCommitsNegativeValue();
+        testCommandDoubleClickResetsWithoutOpeningEditor();
+        testFractionalStepEnterCommitsDecimalValue();
     }
 
 private:
@@ -44,6 +46,7 @@ private:
 
         auto* editor = valueEditorOf(slider);
         expect(editor != nullptr);
+        expect(editor->getText().isEmpty());
         expect(! editor->isCaretVisible());
         expectEquals(slider.getValue(), 12.0);
     }
@@ -278,6 +281,44 @@ private:
 
         expect(! slider.isValueEditorOpen());
         expectEquals(slider.getValue(), -10.0);
+    }
+
+    void testCommandDoubleClickResetsWithoutOpeningEditor()
+    {
+        beginTest("Cmd/Ctrl+double-click resets without opening the editor");
+
+        const auto descriptor = findDco1FrequencyDescriptor();
+        jassert(descriptor.has_value());
+
+        TSS::Slider slider(100, 20, makeTestSliderLook(), makeSliderConfigFromDescriptor(*descriptor));
+        slider.setValue(33.0, juce::dontSendNotification);
+
+        const auto click = makeMouseEvent(slider, juce::ModifierKeys::commandModifier, 2);
+        slider.mouseDown(click);
+        slider.mouseDoubleClick(click);
+
+        expectEquals(slider.getValue(), static_cast<double>(descriptor->defaultValue));
+        expect(! slider.isValueEditorOpen());
+    }
+
+    void testFractionalStepEnterCommitsDecimalValue()
+    {
+        beginTest("Fractional-step Enter commits a legal decimal value");
+
+        TSS::SliderConfig config;
+        config.minValue = 0.0;
+        config.maxValue = 50.0;
+        config.defaultValue = 5.0;
+        config.step = 0.1;
+
+        TSS::Slider slider(100, 20, makeTestSliderLook(), config);
+        slider.setValue(1.0, juce::dontSendNotification);
+        openValueEditor(slider);
+
+        commitEditorText(slider, "12.3");
+
+        expect(! slider.isValueEditorOpen());
+        expectEquals(slider.getValue(), 12.3);
     }
 };
 

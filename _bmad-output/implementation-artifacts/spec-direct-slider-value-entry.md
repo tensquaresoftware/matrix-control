@@ -115,6 +115,28 @@ context: []
 | Missing descriptor `jassert` then dereference in tests (Edge) | false | Same fixture pattern as `UndoManagerSliderArrowTests`; descriptor is always present in this tree. |
 | Edit colours from skin untested (Verification Gap) | low (defer) | Spec already scopes chrome to Manual UAT; optional LookBuilders assert is follow-up. |
 
+### Review Findings
+
+- [x] [Review][Patch] Cmd/Ctrl+double-click resets then still opens the editor [Source/GUI/Widgets/Slider.cpp:320] — `mouseDoubleClick` ignores modifiers; after Cmd/Ctrl `mouseDown` reset, the double-click path still calls `showValueEditor()`.
+- [x] [Review][Patch] Clear-to-type empty editor text is unasserted [Tests/Unit/SliderValueEntryTests.cpp:31] — `showValueEditor` clears the field; `testDoubleClickOpensEditor` never checks `getText().isEmpty()`.
+- [x] [Review][Patch] Fractional-step typed entry has no regression cover [Tests/Unit/SliderValueEntryTests.cpp] — all harnesses use integer `step`; Settings-like `0.1` commit (e.g. `"12.3"`) is unproven.
+- [x] [Review][Patch] APVTS undo tests omit slider value after undo [Tests/Unit/SliderValueEntryApvtsTests.cpp:48] — parameter restore is asserted; bound `Slider::getValue()` is not.
+- [x] [Review][Patch] Commit/reset always opens a drag session even when the value is unchanged [Source/GUI/Widgets/SliderEditing.cpp:275] / [Source/GUI/Widgets/Slider.cpp:328] — empty begin/end gesture when Enter snaps to current or Cmd/Ctrl reset targets the current default.
+- [x] [Review][Defer] Double-click opens empty drag/undo gestures before editor [Source/GUI/Widgets/Slider.cpp:269] — deferred: pre-existing `ScopedDragNotification` on plain `mouseDown`; already deferred from build review of this spec.
+- [x] [Review][Defer] SliderLook edit colours from skin unverified in unit tests [Source/GUI/Looks/LookBuilders.cpp] — deferred: Manual UAT / optional LookBuilders assert; already deferred from build review of this spec.
+
+#### Rejected
+
+- I/O matrix “plain click on self cancels” vs field click — reject: fix would edit the frozen spec; Approach + NumberBox parity keep field clicks from cancelling.
+- Stale Code Map / empty Spec Change Log / stale Review Triage Log rows — reject: fix would edit the spec under review (Build already shipped tests that supersede several “untested” triage rows).
+- `tryParseEditText` accepts `.` while input restrictions may hide it — reject (low): typing path is gated; paste/setText snap is opaque but not an everyday user defect worth new branches.
+- `SliderEditField::mouseDown` duplicates `isCommandDown` vs `isCommandOrCtrlClick` — reject (low): same JUCE API today; no demonstrated drift.
+- Escape/focus-lost tests invoke lambdas directly — reject (low): intentional headless pattern; wiring of the lambdas is what the tests cover.
+- Attachment test only checks `isDoubleClickReturnEnabled()` — reject (low): already noted in Build triage; flag assert matches the Never constraint; full gesture under attachment is nice-to-have.
+- Leading-dot `".5"` rejected by parser — false: `tryParseEditText` accepts `".5"` (`sawDigit` after the dot).
+- Manual UAT unchecked while `status: done` — reject: process/status hygiene, not a product defect in the diff.
+- Acceptance Auditor: no AC violations.
+
 ## Design Notes
 
 **Gesture vs colour:** Double-click means “type a value” on Slider and NumberBox. Edit chrome keeps each control’s identity (NumberBox red vs slider dark-green plate).
