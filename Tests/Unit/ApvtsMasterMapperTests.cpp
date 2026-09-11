@@ -13,6 +13,7 @@
 #include "Core/Models/MasterModel.h"
 #include "Core/Models/MidiChannelMasterCodec.h"
 #include "Shared/Definitions/PluginDescriptors.h"
+#include "Shared/Definitions/PluginIDs.h"
 
 class TestAudioProcessorMaster : public juce::AudioProcessor
 {
@@ -55,6 +56,7 @@ public:
         runBufferToApvts();
         runReferenceRoundTrip();
         runMidiChannelCompositionRoundTrip();
+        runUnisonEnableRoundTrip();
     }
 
 private:
@@ -238,6 +240,55 @@ private:
             mapper.bufferToApvts();
             expectEquals(juce::roundToInt(raw->load()), combo);
         }
+    }
+
+    void runUnisonEnableRoundTrip()
+    {
+        beginTest("Unison Enable (octet 169): APVTS <-> buffer OFF/ON");
+
+        const auto choiceDescs = Core::ApvtsMasterMapper::buildChoiceDescriptors();
+        const ChoiceDesc* unison = nullptr;
+        for (const auto& d : choiceDescs)
+        {
+            if (d.parameterId == PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kUnisonEnable)
+            {
+                unison = &d;
+                break;
+            }
+        }
+
+        expect(unison != nullptr, "miscUnisonEnable descriptor must exist");
+        if (unison == nullptr)
+            return;
+
+        expectEquals(unison->sysExOffset, 169);
+        expectEquals(unison->defaultIndex, 0);
+
+        juce::AudioProcessorValueTreeState::ParameterLayout layout;
+        layout.add(std::make_unique<juce::AudioParameterChoice>(
+            juce::ParameterID(unison->parameterId, 1), unison->displayName,
+            unison->choices, unison->defaultIndex));
+
+        TestAudioProcessorMaster proc(std::move(layout));
+        Core::MasterModel model;
+        Core::ApvtsMasterMapper mapper(proc.apvts, model);
+        auto* raw = proc.apvts.getRawParameterValue(unison->parameterId);
+
+        *raw = 0.0f;
+        mapper.apvtsToBuffer();
+        expectEquals(static_cast<int>(model.data()[169]), 0);
+
+        *raw = 1.0f;
+        mapper.apvtsToBuffer();
+        expectEquals(static_cast<int>(model.data()[169]), 1);
+
+        model.data()[169] = 0;
+        mapper.bufferToApvts();
+        expectEquals(juce::roundToInt(raw->load()), 0);
+
+        model.data()[169] = 1;
+        mapper.bufferToApvts();
+        expectEquals(juce::roundToInt(raw->load()), 1);
     }
 };
 

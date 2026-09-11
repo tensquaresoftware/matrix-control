@@ -1,5 +1,9 @@
 # Deferred Work
 
+## Deferred from: spec-unison-matrix-1000.md (2026-09-11)
+
+- **Global GUI↔SysEx combo encoding audit** — Keyboard Mode choice order was fixed for param 48; a full audit of all GUI combo indices vs packed SysEx encodings remains out of scope for this delivery.
+
 ## Deferred from: code review of spec-computer-patches-save-as-naming.md (2026-09-04)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-computer-patches-save-as-naming.md`
@@ -1672,3 +1676,13 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-slider-edit-caret-geometry.md`
   summary: Companion NumberBox caret spec still documents the removed slider ScaledWidthCaret / thickness-only stack.
   evidence: Reconfirmed in code review; same deferred item as build review of this spec (2026-09-11).
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-unison-matrix-1000.md`
+  summary: No automated tests for StrigUnisonGateHelper ComboBox disable/clear when Keyboard Mode leaves UNISON.
+  evidence: GUI helper + ComboBox outside Core unit-test harness; policy predicates covered; manual GUI checks remain the gate.
+- source_spec: `_bmad-output/implementation-artifacts/spec-unison-matrix-1000.md`
+  summary: No automated tests for PopupMenuBase/PopupMenuRenderer isItemEnabled select/draw gating used by disabled STRIG.
+  evidence: Custom popup widgets have no existing unit-test pattern; regression would only show in manual trigger popup use.
+- source_spec: `_bmad-output/implementation-artifacts/spec-unison-matrix-1000.md`
+  summary: Master Unison Enable lacks a dedicated SysEx 0x03 encode/dispatch unit assert beyond ApvtsMasterMapper byte 169.
+  evidence: Full master dump uses shared MasterParameterSysExDispatcher; Unison-specific coverage stops at packed buffer round-trip.

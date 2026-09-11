@@ -45,6 +45,7 @@ public:
 
     TSS::Slider* getSlider() const { return slider_.get(); }
     TSS::ComboBox* getComboBox() const { return comboBox_.get(); }
+    juce::Rectangle<int> getLabelBounds() const;
 
 private:
     void createParameterLabel(TSS::ISkin& skin, WidgetFactory& factory, const juce::String& parameterId);

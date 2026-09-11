@@ -14,6 +14,14 @@
 
 ParameterCell::~ParameterCell() = default;
 
+juce::Rectangle<int> ParameterCell::getLabelBounds() const
+{
+    if (label_ == nullptr)
+        return {};
+
+    return label_->getBounds();
+}
+
 ParameterCell::ParameterCell(const Config& config)
     : skin_(&config.skin)
     , parameterType_(config.type)

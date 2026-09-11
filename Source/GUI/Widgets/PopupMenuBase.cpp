@@ -72,14 +72,19 @@ namespace TSS
     {
         const int selectedIndex = itemIndex;
         const bool valid = isValidItemIndex(selectedIndex);
+        const auto itemId = valid
+            ? static_cast<juce::ComboBox&>(comboBox_).getItemId(selectedIndex)
+            : 0;
+        const bool selectable = valid && itemId != 0
+            && static_cast<juce::ComboBox&>(comboBox_).isItemEnabled(itemId);
 
-        PopupMenuModalHelpers::dismissAndDelete(*this, host_, [this, selectedIndex, valid]()
+        PopupMenuModalHelpers::dismissAndDelete(*this, host_, [this, selectedIndex, selectable]()
         {
-            if (! valid)
+            if (! selectable)
                 return;
 
-            const auto itemId = static_cast<juce::ComboBox&>(comboBox_).getItemId(selectedIndex);
-            static_cast<juce::ComboBox&>(comboBox_).setSelectedId(itemId, juce::sendNotificationSync);
+            const auto id = static_cast<juce::ComboBox&>(comboBox_).getItemId(selectedIndex);
+            static_cast<juce::ComboBox&>(comboBox_).setSelectedId(id, juce::sendNotificationSync);
         });
     }
 

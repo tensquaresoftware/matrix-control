@@ -17,9 +17,17 @@ namespace TSS
 
         void drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds) const;
         void drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds, float systemDisplayScale) const;
-        void drawItem(juce::Graphics& g, const ComboBox& comboBox, int itemIndex,
-                     const juce::Rectangle<float>& itemBounds, int highlightedItemIndex,
-                     const juce::Font& font) const;
+
+        struct DrawItemArgs
+        {
+            const ComboBox& comboBox;
+            int itemIndex = 0;
+            juce::Rectangle<float> itemBounds;
+            int highlightedItemIndex = -1;
+            const juce::Font& font;
+        };
+
+        void drawItem(juce::Graphics& g, const DrawItemArgs& args) const;
         void drawLabelItem(juce::Graphics& g,
                            const juce::String& text,
                            const juce::Rectangle<float>& itemBounds,

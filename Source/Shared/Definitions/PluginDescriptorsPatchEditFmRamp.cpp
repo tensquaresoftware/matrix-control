@@ -241,8 +241,10 @@ namespace PluginDescriptors
             .displayName = PluginDisplayNames::PatchEditSection::RampPortamentoModule::ParameterWidgets::kPortamentoKeyboardMode,
             .parentGroupId = PluginIDs::PatchEditSection::RampPortamentoModule::kGroupId,
             .choices = PluginHelpers::makeStringArray({
-                PluginDisplayNames::ChoiceLists::PortamentoKeyboardMode::kRotate, PluginDisplayNames::ChoiceLists::PortamentoKeyboardMode::kReasgn,
-                PluginDisplayNames::ChoiceLists::PortamentoKeyboardMode::kUnison, PluginDisplayNames::ChoiceLists::PortamentoKeyboardMode::kRearob }),
+                PluginDisplayNames::ChoiceLists::PortamentoKeyboardMode::kReasgn,
+                PluginDisplayNames::ChoiceLists::PortamentoKeyboardMode::kRotate,
+                PluginDisplayNames::ChoiceLists::PortamentoKeyboardMode::kUnison,
+                PluginDisplayNames::ChoiceLists::PortamentoKeyboardMode::kRearob }),
             .defaultIndex = 1,
             .sysExOffset = 8,
             .sysExId = 48

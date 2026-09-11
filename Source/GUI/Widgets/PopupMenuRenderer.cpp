@@ -103,13 +103,13 @@ namespace TSS
         g.fillPath(chevron);
     }
 
-    void PopupMenuRenderer::drawItem(juce::Graphics& g, const ComboBox& comboBox, int itemIndex,
-                                    const juce::Rectangle<float>& itemBounds, int highlightedItemIndex,
-                                    const juce::Font& font) const
+    void PopupMenuRenderer::drawItem(juce::Graphics& g, const DrawItemArgs& args) const
     {
-        const auto isHighlighted = (highlightedItemIndex == itemIndex);
-        const auto isActive = comboBox.getItemId(itemIndex) != 0;
-        drawLabelItem(g, comboBox.getItemText(itemIndex), itemBounds, isHighlighted && isActive, isActive, font);
+        const auto itemId = args.comboBox.getItemId(args.itemIndex);
+        const auto isSelectable = itemId != 0 && args.comboBox.isItemEnabled(itemId);
+        const auto isHighlighted = (args.highlightedItemIndex == args.itemIndex) && isSelectable;
+        drawLabelItem(g, args.comboBox.getItemText(args.itemIndex), args.itemBounds,
+                      isHighlighted, isSelectable, args.font);
     }
 
     void PopupMenuRenderer::drawVerticalSeparators(juce::Graphics& g, const juce::Rectangle<float>& contentBounds,

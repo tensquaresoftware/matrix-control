@@ -245,6 +245,7 @@ set(PLUGIN_SOURCES
     Source/GUI/Factories/DimensionFactory.cpp
     Source/GUI/Factories/DimensionFactoryBuilders.cpp
     Source/GUI/Helpers/GrayedControlHelper.cpp
+    Source/GUI/Helpers/StrigUnisonGateHelper.cpp
     Source/GUI/Helpers/ApvtsUndoableParameterAttachments.cpp
     Source/GUI/Helpers/CompareLockBinder.cpp
     Source/GUI/Helpers/ClipboardFeedbackButtonBinding.cpp
@@ -455,6 +456,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/ComboboxPatchSendDebouncerTests.cpp
         Tests/Unit/ClipboardPasteEnabledResolverTests.cpp
         Tests/Unit/ApvtsMasterMapperTests.cpp
+        Tests/Unit/UnisonKeyboardModePolicyTests.cpp
         Tests/Unit/MidiChannelMasterCodecTests.cpp
         Tests/Unit/DeviceMemoryLimitsTests.cpp
         Tests/Unit/DeviceTypeRegistryTests.cpp

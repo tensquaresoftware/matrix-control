@@ -846,7 +846,11 @@ namespace PluginDisplayNames
         {
             constexpr const char* kName = "RAMP/PORTAMENTO";
             constexpr const char* kLegatoPortaUnisonBlockedFooter =
-                "LEGATO PORTA is not available when KEYBOARD MODE is UNISON.";
+                "LEGATO PORTA is only available when KEYBOARD MODE is UNISON.";
+            constexpr const char* kMasterUnisonOverrideFooter =
+                "Master Unison is overriding Keyboard Mode.";
+            constexpr const char* kStrigRequiresUnisonFooter =
+                "STRIG is only available when KEYBOARD MODE is UNISON.";
 
             namespace StandaloneWidgets
             {

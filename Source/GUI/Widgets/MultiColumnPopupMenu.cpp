@@ -222,7 +222,12 @@ namespace TSS
             const auto itemBounds = getItemBounds(i);
             if (! itemBounds.isEmpty())
             {
-                renderer_.drawItem(g, comboBox_, i, itemBounds, highlightedItemIndex_, cachedFont_);
+                renderer_.drawItem(g, {
+                    .comboBox = comboBox_,
+                    .itemIndex = i,
+                    .itemBounds = itemBounds,
+                    .highlightedItemIndex = highlightedItemIndex_,
+                    .font = cachedFont_});
             }
         }
     }

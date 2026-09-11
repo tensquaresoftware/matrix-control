@@ -1,10 +1,9 @@
 #include "Lfo1Panel.h"
 
-#include "GUI/Skins/Skin.h"
 #include "GUI/Panels/Reusable/ModulePanelConfigBuilder.h"
-#include "Shared/Definitions/PluginIDs.h"
+#include "GUI/Widgets/ParameterCell.h"
 #include "GUI/Factories/WidgetFactory.h"
-
+#include "Shared/Definitions/PluginIDs.h"
 
 ModulePanelLayout Lfo1Panel::createLayout()
 {
@@ -41,4 +40,19 @@ Lfo1Panel::Lfo1Panel(const Config& config)
           .moduleHeaderDims = config.moduleHeaderDims,
           .parameterCellDims = config.parameterCellDims})
 {
+    keyboardModeListener_ = std::make_unique<TSS::StrigUnisonGateHelper::KeyboardModeChangeListener>(
+        apvts_,
+        [this](bool leftUnison) { refreshStrigGate(leftUnison); });
+    refreshStrigGate(false);
+}
+
+void Lfo1Panel::refreshStrigGate(bool clearIfCurrentStrig)
+{
+    auto* cell = getParameterCellAt(static_cast<size_t>(kTriggerModeCellIndex));
+    TSS::StrigUnisonGateHelper::refreshTriggerParameter({
+        .apvts = apvts_,
+        .combo = cell != nullptr ? cell->getComboBox() : nullptr,
+        .triggerParameterId = PluginIDs::PatchEditSection::Lfo1Module::ParameterWidgets::kTriggerMode,
+        .strigChoiceIndex = kTriggerStrigIndex,
+        .clearIfCurrentStrig = clearIfCurrentStrig});
 }
