@@ -1,7 +1,17 @@
+#include <array>
 #include <vector>
 
 #include <juce_core/juce_core.h>
 
+#include "Core/MIDI/EditorPath.h"
+#include "Core/MIDI/MasterParameterSysExDispatcher.h"
+#include "Core/MIDI/MidiActivityTracker.h"
+#include "Core/MIDI/PatchParameterSysExDispatcher.h"
+#include "Core/MIDI/Queue/MidiOutboundQueue.h"
+#include "Core/MIDI/SysEx/SysExConstants.h"
+#include "Core/MIDI/SysEx/SysExDecoder.h"
+#include "Core/MIDI/SysEx/SysExEncoder.h"
+#include "Core/MIDI/SysEx/SysExParser.h"
 #include "Core/Models/ApvtsMasterMapper.h"
 #include "Core/Models/ApvtsPatchMapper.h"
 #include "Core/Models/MasterModel.h"
@@ -11,6 +21,7 @@
 #include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginIDs.h"
 #include "Shared/Helpers/UnisonKeyboardModePolicy.h"
+#include "SysExWireCompliance.h"
 
 namespace
 {
@@ -25,6 +36,28 @@ namespace
         }
 
         return nullptr;
+    }
+
+    struct UnisonDomainDescriptors
+    {
+        std::vector<PluginDescriptors::ChoiceParameterDescriptor> patchChoices;
+        std::vector<PluginDescriptors::ChoiceParameterDescriptor> masterChoices;
+        const PluginDescriptors::ChoiceParameterDescriptor* keyboard = nullptr;
+        const PluginDescriptors::ChoiceParameterDescriptor* unison = nullptr;
+    };
+
+    UnisonDomainDescriptors loadUnisonDomainDescriptors()
+    {
+        UnisonDomainDescriptors loaded;
+        loaded.patchChoices = Core::ApvtsPatchMapper::buildChoiceDescriptors();
+        loaded.masterChoices = Core::ApvtsMasterMapper::buildChoiceDescriptors();
+        loaded.keyboard = findChoice(
+            loaded.patchChoices,
+            PluginIDs::PatchEditSection::RampPortamentoModule::ParameterWidgets::kPortamentoKeyboardMode);
+        loaded.unison = findChoice(
+            loaded.masterChoices,
+            PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kUnisonEnable);
+        return loaded;
     }
 }
 
@@ -41,6 +74,9 @@ public:
         strigAllowBlockAndFallbackIndex();
         masterOverrideBadgeVisibilityMatrix();
         independentPatchKeyboardModeAndMasterUnison();
+        keyboardModeRemoteEditDoesNotTouchMasterUnison();
+        masterUnisonFullDumpDoesNotTouchKeyboardMode();
+        masterUnisonEnableSurvivesFullMasterEncodeDecode();
     }
 
 private:
@@ -179,36 +215,173 @@ private:
     {
         beginTest("Changing Keyboard Mode does not rewrite Master Unison octet 169 and vice versa");
 
-        const auto patchChoices = Core::ApvtsPatchMapper::buildChoiceDescriptors();
-        const auto masterChoices = Core::ApvtsMasterMapper::buildChoiceDescriptors();
-        const auto* keyboardDesc = findChoice(
-            patchChoices,
-            PluginIDs::PatchEditSection::RampPortamentoModule::ParameterWidgets::kPortamentoKeyboardMode);
-        const auto* unisonDesc = findChoice(
-            masterChoices,
-            PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kUnisonEnable);
-
-        expect(keyboardDesc != nullptr && unisonDesc != nullptr);
-        if (keyboardDesc == nullptr || unisonDesc == nullptr)
+        const auto domain = loadUnisonDomainDescriptors();
+        expect(domain.keyboard != nullptr && domain.unison != nullptr);
+        if (domain.keyboard == nullptr || domain.unison == nullptr)
             return;
 
         Core::PatchModel patchModel;
         Core::MasterModel masterModel;
 
-        patchModel.setChoiceIndex(*keyboardDesc, 1);
-        masterModel.setChoiceIndex(*unisonDesc, 0);
+        patchModel.setChoiceIndex(*domain.keyboard, 1);
+        masterModel.setChoiceIndex(*domain.unison, 0);
         expectEquals(static_cast<int>(patchModel.data()[8]), 1);
         expectEquals(static_cast<int>(masterModel.data()[169]), 0);
 
-        patchModel.setChoiceIndex(*keyboardDesc, TSS::UnisonKeyboardModePolicy::kUnisonKeyboardModeIndex);
+        patchModel.setChoiceIndex(*domain.keyboard, TSS::UnisonKeyboardModePolicy::kUnisonKeyboardModeIndex);
         expectEquals(static_cast<int>(patchModel.data()[8]),
                      TSS::UnisonKeyboardModePolicy::kUnisonKeyboardModeIndex);
         expectEquals(static_cast<int>(masterModel.data()[169]), 0);
 
-        masterModel.setChoiceIndex(*unisonDesc, 1);
+        masterModel.setChoiceIndex(*domain.unison, 1);
         expectEquals(static_cast<int>(masterModel.data()[169]), 1);
         expectEquals(static_cast<int>(patchModel.data()[8]),
                      TSS::UnisonKeyboardModePolicy::kUnisonKeyboardModeIndex);
+    }
+
+    void expectDecodedMasterOctet169(const juce::MemoryBlock& sysEx, int expectedValue)
+    {
+        expect(SysExWireCompliance::assertMasterMessageMatches(sysEx, 0x03));
+
+        SysExParser parser;
+        SysExDecoder decoder(parser);
+        std::array<juce::uint8, SysExConstants::kMasterPackedDataSize> decoded {};
+        expect(decoder.decodeMasterSysEx(sysEx, decoded.data()));
+        expectEquals(static_cast<int>(decoded[169]), expectedValue);
+    }
+
+    void expectRemoteEditQueued(Core::MidiOutboundQueue& queue,
+                                int expectedParam,
+                                int expectedValue)
+    {
+        auto msg = queue.dequeue();
+        expect(msg.has_value());
+        if (msg.has_value())
+        {
+            expect(SysExWireCompliance::assertRemoteEditMatches(
+                msg->sysExData,
+                static_cast<juce::uint8>(expectedParam),
+                static_cast<juce::uint8>(expectedValue)));
+        }
+        expect(queue.isEmpty());
+    }
+
+    void seedMasterOnWithKeyboardUnison(Core::PatchModel& patchModel,
+                                        Core::MasterModel& masterModel,
+                                        const UnisonDomainDescriptors& domain)
+    {
+        masterModel.setChoiceIndex(*domain.unison, 1);
+        patchModel.setChoiceIndex(*domain.keyboard,
+                                  TSS::UnisonKeyboardModePolicy::kUnisonKeyboardModeIndex);
+    }
+
+    void keyboardModeRemoteEditDoesNotTouchMasterUnison()
+    {
+        beginTest("Scenario A path: Keyboard Mode → Remote Edit 48 only; Master byte 169 untouched");
+
+        const auto domain = loadUnisonDomainDescriptors();
+        expect(domain.keyboard != nullptr && domain.unison != nullptr);
+        if (domain.keyboard == nullptr || domain.unison == nullptr)
+            return;
+
+        Core::PatchModel patchModel;
+        Core::MasterModel masterModel;
+        seedMasterOnWithKeyboardUnison(patchModel, masterModel, domain);
+
+        Core::MidiOutboundQueue queue;
+        Core::MidiActivityTracker tracker;
+        SysExEncoder encoder;
+        int masterEnqueueCount = 0;
+        int remoteEditCount = 0;
+        int lastRemoteParam = -1;
+        int lastRemoteValue = -1;
+
+        Core::PatchParameterSysExDispatcher patchDispatcher(
+            patchModel,
+            [&](int parameterNumber, juce::uint8 packedValue)
+            {
+                ++remoteEditCount;
+                lastRemoteParam = parameterNumber;
+                lastRemoteValue = packedValue;
+                Core::EditorPath(queue, tracker).enqueueSysEx(
+                    encoder.encodeRemoteParameterEdit(
+                        static_cast<juce::uint8>(parameterNumber), packedValue));
+            });
+        Core::MasterParameterSysExDispatcher masterDispatcher(
+            masterModel, [&](const juce::uint8*) { ++masterEnqueueCount; });
+
+        patchModel.setChoiceIndex(*domain.keyboard, 1); // leave UNISON → ROTATE
+        patchDispatcher.dispatch(domain.keyboard->parameterId);
+        masterDispatcher.dispatch(domain.keyboard->parameterId);
+
+        expectEquals(remoteEditCount, 1);
+        expectEquals(lastRemoteParam, 48);
+        expectEquals(lastRemoteValue, 1);
+        expectEquals(masterEnqueueCount, 0);
+        expectEquals(static_cast<int>(masterModel.data()[169]), 1);
+        expectRemoteEditQueued(queue, 48, 1);
+    }
+
+    void masterUnisonFullDumpDoesNotTouchKeyboardMode()
+    {
+        beginTest("Scenario B path: Master Unison OFF → full 0x03; patch byte 8 stays UNISON");
+
+        const auto domain = loadUnisonDomainDescriptors();
+        expect(domain.keyboard != nullptr && domain.unison != nullptr);
+        if (domain.keyboard == nullptr || domain.unison == nullptr)
+            return;
+
+        Core::PatchModel patchModel;
+        Core::MasterModel masterModel;
+        patchModel.setChoiceIndex(*domain.keyboard, TSS::UnisonKeyboardModePolicy::kUnisonKeyboardModeIndex);
+        masterModel.setChoiceIndex(*domain.unison, 1);
+
+        Core::MidiOutboundQueue queue;
+        Core::MidiActivityTracker tracker;
+        SysExEncoder encoder;
+        int remoteEditCount = 0;
+
+        Core::PatchParameterSysExDispatcher patchDispatcher(
+            patchModel, [&](int, juce::uint8) { ++remoteEditCount; });
+        Core::MasterParameterSysExDispatcher masterDispatcher(
+            masterModel,
+            [&](const juce::uint8* packedData)
+            {
+                Core::EditorPath editorPath(queue, tracker);
+                editorPath.enqueueSysEx(encoder.encodeMasterSysEx(0x03, packedData));
+            });
+
+        masterModel.setChoiceIndex(*domain.unison, 0);
+        masterDispatcher.dispatch(domain.unison->parameterId);
+        patchDispatcher.dispatch(domain.unison->parameterId);
+
+        expectEquals(remoteEditCount, 0);
+        expectEquals(static_cast<int>(patchModel.data()[8]),
+                     TSS::UnisonKeyboardModePolicy::kUnisonKeyboardModeIndex);
+        expectEquals(static_cast<int>(masterModel.data()[169]), 0);
+
+        auto msg = queue.dequeue();
+        expect(msg.has_value());
+        if (msg.has_value())
+            expectDecodedMasterOctet169(msg->sysExData, 0);
+        expect(queue.isEmpty());
+    }
+
+    void masterUnisonEnableSurvivesFullMasterEncodeDecode()
+    {
+        beginTest("Unison Enable ON survives full Master 0x03 encode/decode at octet 169");
+
+        const auto domain = loadUnisonDomainDescriptors();
+        expect(domain.unison != nullptr);
+        if (domain.unison == nullptr)
+            return;
+
+        Core::MasterModel model;
+        model.setChoiceIndex(*domain.unison, 1);
+
+        SysExEncoder encoder;
+        const auto encoded = encoder.encodeMasterSysEx(0x03, model.data());
+        expectDecodedMasterOctet169(encoded, 1);
     }
 };
 

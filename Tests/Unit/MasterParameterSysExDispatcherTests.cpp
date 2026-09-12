@@ -1,3 +1,4 @@
+#include <array>
 #include <cstring>
 
 #include <juce_core/juce_core.h>
@@ -7,7 +8,9 @@
 #include "Core/MIDI/MasterParameterSysExDispatcher.h"
 #include "Core/MIDI/Queue/MidiOutboundQueue.h"
 #include "Core/MIDI/SysEx/SysExConstants.h"
+#include "Core/MIDI/SysEx/SysExDecoder.h"
 #include "Core/MIDI/SysEx/SysExEncoder.h"
+#include "Core/MIDI/SysEx/SysExParser.h"
 #include "Core/Models/ApvtsMasterMapper.h"
 #include "Core/Models/MasterModel.h"
 #include "Shared/Definitions/PluginIDs.h"
@@ -21,6 +24,7 @@ public:
     {
         testIntParameterEnqueuesFullMaster();
         testChoiceParameterEnqueuesFullMaster();
+        testUnisonEnableEnqueuesFullMasterWithOctet169();
         testUnknownParameterNoEnqueue();
     }
 
@@ -122,6 +126,53 @@ private:
         auto msg = queue.dequeue();
         expect(msg.has_value());
         expect(sysExMatchesMasterMessage(msg->sysExData, kMasterVersion));
+        expect(queue.isEmpty());
+    }
+
+    void testUnisonEnableEnqueuesFullMasterWithOctet169()
+    {
+        beginTest("Choice master param — Unison Enable → full 0x03 with octet 169 ON");
+
+        Core::MasterModel model;
+        Core::MidiOutboundQueue queue;
+        Core::MidiActivityTracker tracker;
+        SysExEncoder encoder;
+
+        constexpr juce::uint8 kMasterVersion = 0x03;
+
+        const auto choiceDescs = Core::ApvtsMasterMapper::buildChoiceDescriptors();
+        const auto* unisonDesc = findDescriptorByParameterId(
+            choiceDescs,
+            PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kUnisonEnable);
+        expect(unisonDesc != nullptr);
+        if (unisonDesc == nullptr)
+            return;
+
+        expectEquals(unisonDesc->sysExOffset, 169);
+        model.setChoiceIndex(*unisonDesc, 1);
+
+        Core::MasterParameterSysExDispatcher dispatcher(
+            model,
+            [&](const juce::uint8* packedData)
+            {
+                Core::EditorPath editorPath(queue, tracker);
+                editorPath.enqueueSysEx(encoder.encodeMasterSysEx(kMasterVersion, packedData));
+            });
+
+        dispatcher.dispatch(unisonDesc->parameterId);
+
+        auto msg = queue.dequeue();
+        expect(msg.has_value());
+        if (! msg.has_value())
+            return;
+
+        expect(sysExMatchesMasterMessage(msg->sysExData, kMasterVersion));
+
+        SysExParser parser;
+        SysExDecoder decoder(parser);
+        std::array<juce::uint8, SysExConstants::kMasterPackedDataSize> decoded {};
+        expect(decoder.decodeMasterSysEx(msg->sysExData, decoded.data()));
+        expectEquals(static_cast<int>(decoded[169]), 1);
         expect(queue.isEmpty());
     }
 
