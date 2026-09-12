@@ -1686,3 +1686,36 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-unison-matrix-1000.md`
   summary: Master Unison Enable lacks a dedicated SysEx 0x03 encode/dispatch unit assert beyond ApvtsMasterMapper byte 169.
   evidence: Full master dump uses shared MasterParameterSysExDispatcher; Unison-specific coverage stops at packed buffer round-trip.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-oberheim-owners-manuals-fidelity-repair.md`
+  summary: SPLIT EDIT body / Split Example STEPs still OCR-damaged (hierarchy only was in scope).
+  evidence: Review found truncated/mashed Split prose after MASTER/SPLIT heading move; primary repair order excluded Split body transcription.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-oberheim-owners-manuals-fidelity-repair.md`
+  summary: Secondary condensations remain in Patch Map 15–17, Cassette 21/22 steps, and VCF 23–25.
+  evidence: Blind Hunter; outside surgical priority zones already restored (MIDI 00–05, ACT SENSE, Cassette Errors, VCF 21–22).
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-oberheim-owners-manuals-fidelity-repair.md`
+  summary: Possible Matrix-6-only framing for Master Keyboard params 42/43; Spillover wrap rules for N+1/N+3 above channel 16 undocumented.
+  evidence: maybe-false edge findings — settle with full Master Keyboard / Spillover PDF compare before inventing wrap text.
+
+## Deferred from: spec-oberheim-owners-manuals-fidelity-audit.md (2026-09-12)
+
+<!-- Resolved 2026-09-12: F1/F2 patched into oberheim-matrix-6-6r-owners-manual.md; F4 clarified as false alarm (simple ON/OFF checklist already present). -->
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-oberheim-owners-manuals-fidelity-audit.md`
+  summary: Matrix-6R Creating A Patch `17. DC2 LEV` callout says ON; Preview p.99 and MD chart say BOTH.
+  evidence: Preview `VALUE = BOTH`; MD STEP 3 chart Levers=BOTH vs callout ON; audit F1.
+  <!-- Resolved 2026-09-12: callout set to BOTH. -->
+- source_spec: `_bmad-output/implementation-artifacts/spec-oberheim-owners-manuals-fidelity-audit.md`
+  summary: Matrix-6R `18. MIDI MONO` missing intro / Using MIDI MONO / BASIC CHANNEL lead-in / SPLIT note vs Preview p.77–79.
+  evidence: MD has table + auto-change bullets only; audit F2.
+  <!-- Resolved 2026-09-12: prose restored from Preview + CloudConverter. -->
+- source_spec: `_bmad-output/implementation-artifacts/spec-oberheim-owners-manuals-fidelity-audit.md`
+  summary: Spillover Split chart still not reconstructable from Preview p.71 OCR.
+  evidence: Column-scrambled grid; unblock = clean table crop; audit F3. Best-effort annotated chart already in MD — do not invent cells.
+  <!-- Resolved 2026-09-12: table corrected from Guillaume clean crop (MIDI OUT always N/N+1; row order 2/4 first). -->
+- source_spec: `_bmad-output/implementation-artifacts/spec-oberheim-owners-manuals-fidelity-audit.md`
+  summary: Patch Map Echo combination chart flattened vs Preview p.77 multi-state matrix.
+  evidence: OCR unreliable for full matrix; unblock = clean crop; audit F4.
+  <!-- Resolved 2026-09-12: CloudConverter picture text = simple ON/OFF checklist already in MD; Preview multi-state dump was noise. -->
