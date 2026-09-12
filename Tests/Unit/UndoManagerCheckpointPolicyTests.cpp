@@ -7,6 +7,7 @@
 #include "Core/Models/PatchModel.h"
 #include "Core/Models/PatchNameSyncer.h"
 #include "Core/Services/DirtyPatchTracker.h"
+#include "Core/Services/PatchMutator/MutationPolicy.h"
 #include "Core/Services/PatchMutator/PatchMutatorEngine.h"
 #include "Core/MIDI/MidiManager.h"
 #include "Core/MIDI/SysEx/SysExDecoder.h"
@@ -123,8 +124,14 @@ struct MutateCheckpointHarness
     {
         namespace PatchMutator = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets;
 
-        proc.apvts.state.setProperty(PatchMutator::kAmount, 100, nullptr);
-        proc.apvts.state.setProperty(PatchMutator::kRandom, 100, nullptr);
+        // Amount / Random no longer reach the algorithm — MODE owns the curve.
+        // WILD + FREE matches PatchMutatorEngineTestSupport (avoids Drift no-op flakes).
+        proc.apvts.state.setProperty(PatchMutator::kMode,
+                                      static_cast<int>(Core::MutationMode::kWild),
+                                      nullptr);
+        proc.apvts.state.setProperty(PatchMutator::kPitch,
+                                      static_cast<int>(Core::MutationPitchMode::kFree),
+                                      nullptr);
         proc.apvts.state.setProperty(PatchMutator::kEnableDco1, true, nullptr);
         proc.apvts.state.setProperty(PatchMutator::kEnableDco2, false, nullptr);
         proc.apvts.state.setProperty(PatchMutator::kEnableVcfVca, false, nullptr);
@@ -229,7 +236,7 @@ private:
         expect(harness.proc.undoManager.canUndo());
 
         const auto result = harness.engine.mutate();
-        expect(result.success);
+        expect(result.success, "MUTATE should succeed with WILD/FREE + DCO1 scope");
         expect(! harness.proc.undoManager.canUndo());
         expect(harness.engine.rootCount() >= 1);
         expect(! harness.dirtyPatchTracker.syncApvtsAndIsDirty(harness.mapper,
@@ -244,11 +251,11 @@ private:
         MutateCheckpointHarness harness;
         harness.setMutateRecipe();
 
-        expect(harness.engine.mutate().success);
+        expect(harness.engine.mutate().success, "seed MUTATE should succeed with WILD/FREE + DCO1 scope");
         harness.writeProbeParam(14);
         expect(harness.proc.undoManager.canUndo());
 
-        expect(harness.engine.retry().success);
+        expect(harness.engine.retry().success, "RETRY should succeed after a seeded MUTATE root");
         expect(! harness.proc.undoManager.canUndo());
     }
 };
