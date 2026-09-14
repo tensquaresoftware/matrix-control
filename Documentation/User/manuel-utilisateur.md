@@ -482,6 +482,18 @@ Raccourcis sur le logo :
 | Shift + clic | Ouvre `SETTINGS...` |
 | Option + clic (macOS) / Alt + clic (Windows, Linux) | Ouvre `AUDIO/MIDI...` (Standalone uniquement) |
 
+Raccourcis clavier (quand l’éditeur a le focus, hors saisie de texte) :
+
+| Action | macOS | Windows / Linux |
+|--------|-------|-----------------|
+| Ouvrir / ramener `SETTINGS` | ⌘ , | Ctrl+, |
+| Ouvrir `AUDIO/MIDI...` (Standalone uniquement) | ⌥ ⌘ , | Ctrl+Alt+, |
+| `UI SCALE` plus grand (cran suivant, 50–200 %) | ⌘+ (aussi ⌘=) | Ctrl+Plus (aussi Ctrl+=) |
+| `UI SCALE` plus petit (cran précédent) | ⌘- | Ctrl+- |
+| `UI SCALE` à 100 % | ⌘ 0 | Ctrl+0 |
+
+Ces raccourcis sont aussi rappelés dans le menu du logo et dans la section `KEYBOARD` de `SETTINGS`.
+
 La touche **Échap** ferme en général les fenêtres `SETTINGS` et `ABOUT`, ainsi que certains dialogues.
 
 ### Fenêtre `SETTINGS`
@@ -492,6 +504,7 @@ La touche **Échap** ferme en général les fenêtres `SETTINGS` et `ABOUT`, ain
 | `MATRIX-1000 PATCHES` | Oui | `DISPLAY MUSICAL NAMES` / `DISPLAY HARDWARE NAMES` |
 | `COMPUTER PATCHES` | Oui | `DISPLAY SYSEX NAMES` / `DISPLAY FILE NAMES` / `ASK ONCE PER LOAD` |
 | `UNSAVED STATE` | Oui | `ALWAYS WARN` / `NEVER WARN` |
+| `KEYBOARD` | Oui | Rappel des raccourcis clavier Settings / UI Scale (et Audio/MIDI en Standalone) |
 | `INIT TEMPLATE` (PATCH) | Oui | `SAVE AS INIT` enregistre le patch courant comme modèle système (`PatchInit.syx`) ; `DELETE` le retire après confirmation |
 | `UTILITY` (MASTER) | Oui | `LOAD` / `SAVE AS` / `INIT` (réinitialise tous les modules Master après confirmation) |
 | `INIT TEMPLATE` (MASTER) | Oui | `SAVE AS INIT` enregistre le Master courant comme modèle système (`MasterInit.syx`) ; `DELETE` le retire après confirmation |
@@ -516,7 +529,7 @@ L’apparence et la taille ne se règlent **pas** dans Settings : elles se trouv
 |----------|--------------------|------------|
 | `KEYBOARD FROM` | Fixé à `HOST` | Choix d’un port MIDI clavier |
 | `AUDIO FROM` / `INPUT GAIN` | Masqués | Visibles (retour audio du synthé dans l’application) |
-| `AUDIO/MIDI...` | Non | Oui (menu du logo `MATRIX-CONTROL`, ou Option/Alt + clic sur le logo) |
+| `AUDIO/MIDI...` | Non | Oui (menu du logo `MATRIX-CONTROL`, Option/Alt + clic sur le logo, ou ⌥⌘, / Ctrl+Alt+,) |
 | `HARDWARE LATENCY` (Settings) | Visible | Masqué |
 | Notes jouées | Depuis le DAW / le clavier routé vers la piste | Depuis le port `KEYBOARD FROM` |
 

@@ -14,6 +14,7 @@ SettingsPanel::SettingsPanel(TSS::ISkin& skin, bool isPluginMode)
     setupPatchSection(skin);
     setupPatchMutatorSection(skin);
     setupMasterSection(skin);
+    setupKeyboardSection(skin);
     populateComboItems();
     applyComboPopupLooks(skin);
 
@@ -187,6 +188,22 @@ void SettingsPanel::layoutMasterSection(juce::Rectangle<int>& bounds, const RowL
                                          { metrics.saveAsInitWidth, metrics.deleteInitWidth } });
 }
 
+void SettingsPanel::layoutKeyboardSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics)
+{
+    layoutSectionHeader(bounds,
+                        SectionHeaderLayoutArgs{ keyboardSectionLabel_.get(),
+                                                 keyboardSectionSeparator_.get(),
+                                                 metrics.controlHeight,
+                                                 metrics.separatorHeight,
+                                                 metrics.rowGap });
+    layoutPlaceholderRow(bounds, metrics, *settingsShortcutLabel_, *settingsShortcutValue_);
+
+    if (! isPluginMode_)
+        layoutPlaceholderRow(bounds, metrics, *audioMidiShortcutLabel_, *audioMidiShortcutValue_);
+
+    layoutPlaceholderRow(bounds, metrics, *uiScaleShortcutLabel_, *uiScaleShortcutValue_);
+}
+
 void SettingsPanel::layoutContent(juce::Rectangle<int> bounds)
 {
     RowLayoutMetrics metrics;
@@ -208,6 +225,8 @@ void SettingsPanel::layoutContent(juce::Rectangle<int> bounds)
     layoutPatchMutatorSection(bounds, metrics);
     bounds.removeFromTop(metrics.rowGap);
     layoutMasterSection(bounds, metrics);
+    bounds.removeFromTop(metrics.rowGap);
+    layoutKeyboardSection(bounds, metrics);
 }
 
 void SettingsPanel::setSkin(TSS::ISkin& skin)
@@ -237,9 +256,12 @@ void SettingsPanel::setPluginMode(bool isPluginMode)
 void SettingsPanel::updateModeSpecificVisibility()
 {
     const bool showPluginControls = isPluginMode_;
+    const bool showStandaloneShortcuts = ! isPluginMode_;
 
     hardwareLatencyLabel_->setVisible(showPluginControls);
     hardwareLatencySlider_->setVisible(showPluginControls);
+    audioMidiShortcutLabel_->setVisible(showStandaloneShortcuts);
+    audioMidiShortcutValue_->setVisible(showStandaloneShortcuts);
 }
 
 void SettingsPanel::refreshInitTemplateDeleteEnablement(bool patchInitExists, bool masterInitExists)

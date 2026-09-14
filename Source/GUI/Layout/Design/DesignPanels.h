@@ -187,7 +187,8 @@ namespace TSS::Design
             inline constexpr int kContentVerticalOffset = 2;
             inline constexpr int kLogoFontHeight = 20;
             inline constexpr int kLogoGapAfter = 20;
-            inline constexpr int kLogoPopupColumnWidth = 80;
+            inline constexpr int kLogoPopupColumnWidth = 100;
+            inline constexpr int kLogoPopupActionColumnWidth = 100;
             inline constexpr int kLeftPadding = 12;
             inline constexpr int kRightPadding = 12;
             inline constexpr int kControlHeight = 20;

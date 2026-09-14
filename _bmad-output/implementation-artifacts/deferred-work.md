@@ -1719,3 +1719,13 @@ Original review bullets below remain for history; status for U-10-owned residual
   summary: Patch Map Echo combination chart flattened vs Preview p.77 multi-state matrix.
   evidence: OCR unreliable for full matrix; unblock = clean crop; audit F4.
   <!-- Resolved 2026-09-12: CloudConverter picture text = simple ON/OFF checklist already in MD; Preview multi-state dump was noise. -->
+
+## Deferred from: spec-settings-audio-midi-ui-scale-shortcuts.md (2026-09-14)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-settings-audio-midi-ui-scale-shortcuts.md`
+  summary: Settings modal keeps a fixed design height when the Audio/MIDI KEYBOARD row is hidden in plugin mode, leaving empty space at the bottom.
+  evidence: Same content-driven height debt as earlier Settings height deferrals; KEYBOARD section adds another mode-dependent row without shrinking `kDesignHeight`.
+
+## Deferred from: code review of spec-settings-audio-midi-ui-scale-shortcuts.md (2026-09-14)
+
+- No automated check that `PluginEditor` chrome shortcut actions fire (`openSettingsWindow`, UI Scale apply, Audio/MIDI dialog) — CONVENTIONS forbid GUI component unit tests; classifier-only coverage matches editorial undo; needs a harness approach later.

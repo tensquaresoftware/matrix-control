@@ -264,10 +264,24 @@ void PluginEditor::attachEditorRuntimeListeners()
     addKeyListener(this);
     mainComponent_->addKeyListener(this);
     mainComponent_->setEditorialUndoRedoKeyHandler(
-        [this](const juce::KeyPress& key) { return tryHandleEditorialUndoRedoKey(key); });
+        [this](const juce::KeyPress& key)
+        {
+            return tryHandleEditorialUndoRedoKey(key) || tryHandleEditorChromeKey(key);
+        });
     syncUiScaleFromEditor();
 #if JUCE_DEBUG
     layoutUiElementsTestComponent();
 #endif
     repaint();
+
+    // Standalone peers sit on the DocumentWindow: with no focused descendant, Cmd/Ctrl
+    // shortcuts never reach PluginEditor/MainComponent and the OS beeps instead.
+    juce::MessageManager::callAsync([safeThis = juce::Component::SafePointer<PluginEditor>(this)]
+                                    {
+                                        if (safeThis == nullptr || ! safeThis->isShowing())
+                                            return;
+
+                                        if (! safeThis->hasKeyboardFocus(true))
+                                            safeThis->grabKeyboardFocus();
+                                    });
 }

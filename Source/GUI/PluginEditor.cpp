@@ -6,7 +6,9 @@
 #include "GUI/Dialogs/BankTransferProgressDialog.h"
 #include "GUI/Dialogs/MasterInitConfirmDialog.h"
 #include "GUI/Factories/WidgetFactory.h"
+#include "Core/Audio/StandaloneAudioInputRouter.h"
 #include "GUI/Helpers/EditorialUndoRedoShortcuts.h"
+#include "GUI/Helpers/EditorChromeShortcuts.h"
 #include "GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditDisplaysPanel/PatchEditDisplaysPanel.h"
 #include "GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditPanel.h"
 #include "GUI/Widgets/PatchNameDisplay.h"
@@ -14,6 +16,7 @@
 #include "GUI/Settings/SettingsPanel.h"
 #include "GUI/Settings/SettingsWindow.h"
 #include "GUI/Widgets/Slider.h"
+#include "Shared/Definitions/PluginIDs.h"
 #include "Skins/Skin.h"
 
 namespace
@@ -150,6 +153,9 @@ bool PluginEditor::keyPressed(const juce::KeyPress& key)
     if (tryHandleEditorialUndoRedoKey(key))
         return true;
 
+    if (tryHandleEditorChromeKey(key))
+        return true;
+
 #if JUCE_DEBUG
     if (uiElementsTestVisible_
         && testComponent_ != nullptr
@@ -217,7 +223,58 @@ void PluginEditor::prepareEditorialUndoRedo()
 bool PluginEditor::keyPressed(const juce::KeyPress& key, juce::Component* originatingComponent)
 {
     juce::ignoreUnused(originatingComponent);
-    return tryHandleEditorialUndoRedoKey(key);
+    return tryHandleEditorialUndoRedoKey(key) || tryHandleEditorChromeKey(key);
+}
+
+bool PluginEditor::tryHandleEditorChromeKey(const juce::KeyPress& key)
+{
+    const auto shortcut = TSS::classifyEditorChromeShortcut(key);
+    if (shortcut == TSS::EditorChromeShortcut::kNone)
+        return false;
+
+    if (isEditorialUndoBlockedByTextFocus())
+        return false;
+
+    using namespace PluginIDs::Settings::ScaleLevels;
+
+    switch (shortcut)
+    {
+        case TSS::EditorChromeShortcut::kOpenSettings:
+            openSettingsWindow();
+            return true;
+
+        case TSS::EditorChromeShortcut::kOpenAudioMidiSettings:
+            if (! pluginProcessor.isStandalone())
+                return false;
+
+            Core::StandaloneAudioInputRouter::showAudioMidiSettingsDialog();
+            return true;
+
+        case TSS::EditorChromeShortcut::kUiScaleIncrease:
+        {
+            const int scaleId = pluginProcessor.getGuiScaleId();
+            if (scaleId < kMax)
+                applyUiScaleFromItemId(scaleId + 1, true);
+            return true;
+        }
+
+        case TSS::EditorChromeShortcut::kUiScaleDecrease:
+        {
+            const int scaleId = pluginProcessor.getGuiScaleId();
+            if (scaleId > kMin)
+                applyUiScaleFromItemId(scaleId - 1, true);
+            return true;
+        }
+
+        case TSS::EditorChromeShortcut::kUiScaleReset:
+            applyUiScaleFromItemId(k100, true);
+            return true;
+
+        case TSS::EditorChromeShortcut::kNone:
+            break;
+    }
+
+    return false;
 }
 
 bool PluginEditor::tryHandleEditorialUndoRedoKey(const juce::KeyPress& key)

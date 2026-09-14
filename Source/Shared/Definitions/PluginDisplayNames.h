@@ -98,6 +98,10 @@ namespace PluginDisplayNames
         constexpr const char* kPatchSection            = "PATCH";
         constexpr const char* kPatchMutatorSection     = "PATCH MUTATOR";
         constexpr const char* kMasterSection           = "MASTER";
+        constexpr const char* kKeyboardSection         = "KEYBOARD";
+        constexpr const char* kSettingsShortcutLabel   = "SETTINGS";
+        constexpr const char* kAudioMidiShortcutLabel  = "AUDIO/MIDI";
+        constexpr const char* kUiScaleShortcutLabel    = "UI SCALE";
         constexpr const char* kMatrix1000PatchesLabel  = "MATRIX-1000 PATCHES";
         constexpr const char* kComputerPatchesLabel    = "COMPUTER PATCHES";
         constexpr const char* kUnsavedStateLabel       = "UNSAVED STATE";

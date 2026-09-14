@@ -160,6 +160,7 @@ private:
     bool isEditorialUndoBlockedByTextFocus() const;
     void prepareEditorialUndoRedo();
     bool tryHandleEditorialUndoRedoKey(const juce::KeyPress& key);
+    bool tryHandleEditorChromeKey(const juce::KeyPress& key);
 
     void openSettingsWindow();
     void closeSettingsWindow();

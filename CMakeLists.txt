@@ -524,6 +524,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/UndoManagerMatrixModReorderTests.cpp
         Tests/Unit/UndoManagerEditorialUndoApiTests.cpp
         Tests/Unit/EditorialUndoRedoShortcutTests.cpp
+        Tests/Unit/EditorChromeShortcutTests.cpp
         Tests/Unit/UndoManagerMatrixModSourceChoiceTests.cpp
         Tests/Unit/UndoManagerEditorialUndoMidiTests.cpp
         Tests/Unit/UndoManagerCheckpointPolicyTests.cpp

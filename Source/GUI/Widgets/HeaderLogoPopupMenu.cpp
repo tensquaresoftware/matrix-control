@@ -5,6 +5,7 @@
 #include "PopupMenuRenderer.h"
 #include "ComboBox.h"
 
+#include "GUI/Helpers/EditorChromeShortcuts.h"
 #include "GUI/Layout/ScaledDrawing.h"
 #include "GUI/Layout/Design/DesignPanels.h"
 #include "GUI/Looks/LookBuilders.h"
@@ -41,27 +42,50 @@ namespace TSS
     void HeaderLogoPopupMenu::buildItems()
     {
         items_.clear();
+        appendUiScaleColumnItems();
+        appendSkinAndActionColumnItems();
+    }
 
-        items_.push_back({ ItemKind::SectionHeader, 0, PluginDisplayNames::HeaderPanel::kLogoUiScaleSection, 0, 0 });
-        items_.push_back({ ItemKind::UiScale, PluginIDs::Settings::ScaleLevels::k50, PluginDisplayNames::ChoiceLists::ScaleLevels::k50, 0, 1 });
-        items_.push_back({ ItemKind::UiScale, PluginIDs::Settings::ScaleLevels::k75, PluginDisplayNames::ChoiceLists::ScaleLevels::k75, 0, 2 });
-        items_.push_back({ ItemKind::UiScale, PluginIDs::Settings::ScaleLevels::k100, PluginDisplayNames::ChoiceLists::ScaleLevels::k100, 0, 3 });
-        items_.push_back({ ItemKind::UiScale, PluginIDs::Settings::ScaleLevels::k125, PluginDisplayNames::ChoiceLists::ScaleLevels::k125, 0, 4 });
-        items_.push_back({ ItemKind::UiScale, PluginIDs::Settings::ScaleLevels::k150, PluginDisplayNames::ChoiceLists::ScaleLevels::k150, 0, 5 });
-        items_.push_back({ ItemKind::UiScale, PluginIDs::Settings::ScaleLevels::k175, PluginDisplayNames::ChoiceLists::ScaleLevels::k175, 0, 6 });
-        items_.push_back({ ItemKind::UiScale, PluginIDs::Settings::ScaleLevels::k200, PluginDisplayNames::ChoiceLists::ScaleLevels::k200, 0, 7 });
+    void HeaderLogoPopupMenu::appendUiScaleColumnItems()
+    {
+        items_.push_back({ ItemKind::SectionHeader,
+                           0,
+                           PluginDisplayNames::HeaderPanel::kLogoUiScaleSection,
+                           TSS::EditorChromeShortcutLabels::uiScaleStep(),
+                           0,
+                           0 });
+        items_.push_back({ ItemKind::UiScale, PluginIDs::Settings::ScaleLevels::k50,
+                           PluginDisplayNames::ChoiceLists::ScaleLevels::k50, {}, 0, 1 });
+        items_.push_back({ ItemKind::UiScale, PluginIDs::Settings::ScaleLevels::k75,
+                           PluginDisplayNames::ChoiceLists::ScaleLevels::k75, {}, 0, 2 });
+        items_.push_back({ ItemKind::UiScale, PluginIDs::Settings::ScaleLevels::k100,
+                           PluginDisplayNames::ChoiceLists::ScaleLevels::k100,
+                           TSS::EditorChromeShortcutLabels::uiScaleReset(), 0, 3 });
+        items_.push_back({ ItemKind::UiScale, PluginIDs::Settings::ScaleLevels::k125,
+                           PluginDisplayNames::ChoiceLists::ScaleLevels::k125, {}, 0, 4 });
+        items_.push_back({ ItemKind::UiScale, PluginIDs::Settings::ScaleLevels::k150,
+                           PluginDisplayNames::ChoiceLists::ScaleLevels::k150, {}, 0, 5 });
+        items_.push_back({ ItemKind::UiScale, PluginIDs::Settings::ScaleLevels::k175,
+                           PluginDisplayNames::ChoiceLists::ScaleLevels::k175, {}, 0, 6 });
+        items_.push_back({ ItemKind::UiScale, PluginIDs::Settings::ScaleLevels::k200,
+                           PluginDisplayNames::ChoiceLists::ScaleLevels::k200, {}, 0, 7 });
+    }
 
-        items_.push_back({ ItemKind::SectionHeader, 0, PluginDisplayNames::HeaderPanel::kLogoSkinSection, 1, 0 });
+    void HeaderLogoPopupMenu::appendSkinAndActionColumnItems()
+    {
+        items_.push_back({ ItemKind::SectionHeader, 0, PluginDisplayNames::HeaderPanel::kLogoSkinSection, {}, 1, 0 });
         items_.push_back({ ItemKind::Skin,
                            static_cast<int>(Skin::SkinComboBoxItemId::kBlack),
                            PluginDisplayNames::ChoiceLists::SkinVariants::kBlack,
+                           {},
                            1, 1 });
         items_.push_back({ ItemKind::Skin,
                            static_cast<int>(Skin::SkinComboBoxItemId::kCream),
                            PluginDisplayNames::ChoiceLists::SkinVariants::kCream,
+                           {},
                            1, 2 });
-        items_.push_back({ ItemKind::Spacer, 0, {}, 1, 3 });
-        items_.push_back({ ItemKind::HorizontalRule, 0, {}, 1, 4 });
+        items_.push_back({ ItemKind::Spacer, 0, {}, {}, 1, 3 });
+        items_.push_back({ ItemKind::HorizontalRule, 0, {}, {}, 1, 4 });
 
         int actionRow = 5;
         if (showAudioMidiDevices_)
@@ -69,16 +93,19 @@ namespace TSS
             items_.push_back({ ItemKind::AudioMidiDevices,
                                0,
                                PluginDisplayNames::HeaderPanel::kAudioMidiButton,
+                               TSS::EditorChromeShortcutLabels::openAudioMidi(),
                                1, actionRow++ });
         }
 
         items_.push_back({ ItemKind::Settings,
                            0,
                            PluginDisplayNames::HeaderPanel::kSettingsButton,
+                           TSS::EditorChromeShortcutLabels::openSettings(),
                            1, actionRow++ });
         items_.push_back({ ItemKind::About,
                            0,
                            PluginDisplayNames::HeaderPanel::kAboutButton,
+                           {},
                            1, actionRow++ });
     }
 
@@ -93,9 +120,10 @@ namespace TSS
         return juce::jmax(1.0f, 1.0f * uiScale_);
     }
 
-    float HeaderLogoPopupMenu::getColumnWidth(int /*column*/) const
+    float HeaderLogoPopupMenu::getColumnWidth(int column) const
     {
-        return static_cast<float>(kColumnWidthDesign_) * uiScale_;
+        const int designWidth = column == 0 ? kColumnWidthDesign_ : kActionColumnWidthDesign_;
+        return static_cast<float>(designWidth) * uiScale_;
     }
 
     juce::Rectangle<float> HeaderLogoPopupMenu::getItemBounds(int flatIndex) const
@@ -228,53 +256,60 @@ namespace TSS
                                           getColumnWidth(0),
                                           separatorWidth);
 
-        const float textPadding = static_cast<float>(ComboBox::getPopupLayoutDimensions().textLeftPadding) * uiScale_;
-        const float highlightGap = juce::jmax(1.0f, kHighlightGap_ * uiScale_);
         const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
-        const float ruleThickness = ScaledDrawing::snappedStrokeThicknessFromDesign(
-            static_cast<float>(ComboBox::getPopupLayoutDimensions().borderThickness),
-            uiScale_,
-            systemDisplayScale,
-            ScaledDrawing::StrokeSnapPolicy::kRound);
+        const ItemDrawMetrics metrics{
+            .textPadding = static_cast<float>(ComboBox::getPopupLayoutDimensions().textLeftPadding) * uiScale_,
+            .highlightGap = juce::jmax(1.0f, kHighlightGap_ * uiScale_),
+            .ruleThickness = ScaledDrawing::snappedStrokeThicknessFromDesign(
+                static_cast<float>(ComboBox::getPopupLayoutDimensions().borderThickness),
+                uiScale_,
+                systemDisplayScale,
+                ScaledDrawing::StrokeSnapPolicy::kRound)};
 
         for (int i = 0; i < static_cast<int>(items_.size()); ++i)
+            drawMenuItem(g, i, metrics);
+    }
+
+    void HeaderLogoPopupMenu::drawMenuItem(juce::Graphics& g, int flatIndex, const ItemDrawMetrics& metrics)
+    {
+        const auto& item = items_[static_cast<size_t>(flatIndex)];
+        const auto itemBounds = getItemBounds(flatIndex);
+
+        if (item.kind == ItemKind::Spacer)
+            return;
+
+        if (item.kind == ItemKind::HorizontalRule)
         {
-            const auto& item = items_[static_cast<size_t>(i)];
-            const auto itemBounds = getItemBounds(i);
+            g.setColour(look_.borderButtonLike);
+            g.fillRect(itemBounds.withSizeKeepingCentre(itemBounds.getWidth(), metrics.ruleThickness));
+            return;
+        }
 
-            if (item.kind == ItemKind::Spacer)
-                continue;
+        const bool isHighlighted = highlightedFlatIndex_ == flatIndex;
+        const bool isSelected = isCurrentSelection(flatIndex);
+        const bool isSectionHeader = item.kind == ItemKind::SectionHeader;
 
-            if (item.kind == ItemKind::HorizontalRule)
-            {
-                g.setColour(look_.borderButtonLike);
-                g.fillRect(itemBounds.withSizeKeepingCentre(itemBounds.getWidth(), ruleThickness));
-                continue;
-            }
+        if ((isHighlighted || isSelected) && ! isSectionHeader)
+        {
+            g.setColour(look_.backgroundHoverButtonLike);
+            g.fillRect(itemBounds.reduced(metrics.highlightGap));
+        }
 
-            const bool isHighlighted = highlightedFlatIndex_ == i;
-            const bool isSelected = isCurrentSelection(i);
-            const bool isSectionHeader = item.kind == ItemKind::SectionHeader;
+        auto textColour = isSectionHeader ? look_.textButtonLike.withAlpha(0.5f) : look_.textButtonLike;
+        if ((isHighlighted || isSelected) && ! isSectionHeader)
+            textColour = look_.textHoverButtonLike;
 
-            if ((isHighlighted || isSelected) && ! isSectionHeader)
-            {
-                g.setColour(look_.backgroundHoverButtonLike);
-                g.fillRect(itemBounds.reduced(highlightGap));
-            }
+        g.setColour(textColour);
+        g.setFont(cachedFont_);
 
-            auto textColour = isSectionHeader
-                ? look_.textButtonLike.withAlpha(0.5f)
-                : look_.textButtonLike;
+        const auto textBounds = itemBounds.withTrimmedLeft(metrics.textPadding)
+                                    .withTrimmedRight(metrics.textPadding);
+        g.drawText(item.text, textBounds, juce::Justification::centredLeft, false);
 
-            if ((isHighlighted || isSelected) && ! isSectionHeader)
-                textColour = look_.textHoverButtonLike;
-
-            g.setColour(textColour);
-            g.setFont(cachedFont_);
-            g.drawText(item.text,
-                       itemBounds.withTrimmedLeft(textPadding),
-                       juce::Justification::centredLeft,
-                       false);
+        if (item.shortcut.isNotEmpty())
+        {
+            g.setFont(TSS::shortcutHintFont(cachedFont_.getHeight()));
+            g.drawText(item.shortcut, textBounds, juce::Justification::centredRight, false);
         }
     }
 

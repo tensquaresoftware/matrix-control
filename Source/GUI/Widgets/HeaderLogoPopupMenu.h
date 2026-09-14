@@ -60,6 +60,7 @@ namespace TSS
             ItemKind kind = ItemKind::SectionHeader;
             int valueId = 0;
             juce::String text;
+            juce::String shortcut;
             int column = 0;
             int row = 0;
         };
@@ -68,6 +69,8 @@ namespace TSS
         inline constexpr static float kHighlightGap_ = 1.0f;
         inline constexpr static int kColumnCount_ = 2;
         inline constexpr static int kColumnWidthDesign_ = TSS::Design::Panels::Header::kLogoPopupColumnWidth;
+        inline constexpr static int kActionColumnWidthDesign_ =
+            TSS::Design::Panels::Header::kLogoPopupActionColumnWidth;
 
         float uiScale_ = 1.0f;
         int currentSkinItemId_ = 0;
@@ -87,6 +90,8 @@ namespace TSS
         std::vector<MenuItem> items_;
 
         void buildItems();
+        void appendUiScaleColumnItems();
+        void appendSkinAndActionColumnItems();
         int getItemHeightPx() const;
         float getSeparatorWidth() const;
         float getColumnWidth(int column) const;
@@ -98,6 +103,13 @@ namespace TSS
         void updateHighlightedItem(int flatIndex);
         void selectItem(int flatIndex);
         void closePopup();
+        struct ItemDrawMetrics
+        {
+            float textPadding = 0.0f;
+            float highlightGap = 0.0f;
+            float ruleThickness = 0.0f;
+        };
         void drawItems(juce::Graphics& g, const juce::Rectangle<float>& contentBounds);
+        void drawMenuItem(juce::Graphics& g, int flatIndex, const ItemDrawMetrics& metrics);
     };
 }
