@@ -102,6 +102,7 @@ namespace PluginDisplayNames
         constexpr const char* kSettingsShortcutLabel   = "SETTINGS";
         constexpr const char* kAudioMidiShortcutLabel  = "AUDIO/MIDI";
         constexpr const char* kUiScaleShortcutLabel    = "UI SCALE";
+        constexpr const char* kSkinShortcutLabel       = "SKIN";
         constexpr const char* kMatrix1000PatchesLabel  = "MATRIX-1000 PATCHES";
         constexpr const char* kComputerPatchesLabel    = "COMPUTER PATCHES";
         constexpr const char* kUnsavedStateLabel       = "UNSAVED STATE";

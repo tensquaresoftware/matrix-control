@@ -9,6 +9,7 @@
 #include "Core/PluginProcessor.h"
 #include "MainComponent.h"
 #include "GUI/Dialogs/BankTransferProgressDialog.h"
+#include "GUI/Helpers/EditorChromeShortcuts.h"
 #include "GUI/Layout/PanelDimensions.h"
 #include "Skins/Skin.h"
 #include "Core/MIDI/Queue/RealtimeQueuePressureMonitor.h"
@@ -161,6 +162,7 @@ private:
     void prepareEditorialUndoRedo();
     bool tryHandleEditorialUndoRedoKey(const juce::KeyPress& key);
     bool tryHandleEditorChromeKey(const juce::KeyPress& key);
+    bool performEditorChromeShortcut(TSS::EditorChromeShortcut shortcut);
 
     void openSettingsWindow();
     void closeSettingsWindow();

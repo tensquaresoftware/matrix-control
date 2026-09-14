@@ -202,6 +202,7 @@ void SettingsPanel::layoutKeyboardSection(juce::Rectangle<int>& bounds, const Ro
         layoutPlaceholderRow(bounds, metrics, *audioMidiShortcutLabel_, *audioMidiShortcutValue_);
 
     layoutPlaceholderRow(bounds, metrics, *uiScaleShortcutLabel_, *uiScaleShortcutValue_);
+    layoutPlaceholderRow(bounds, metrics, *skinShortcutLabel_, *skinShortcutValue_);
 }
 
 void SettingsPanel::layoutContent(juce::Rectangle<int> bounds)

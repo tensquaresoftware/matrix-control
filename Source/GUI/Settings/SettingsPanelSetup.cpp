@@ -143,6 +143,10 @@ void SettingsPanel::setupKeyboardSection(TSS::ISkin& skin)
         makeLabel(skin, kLabelWidth_, PluginDisplayNames::Settings::kUiScaleShortcutLabel);
     uiScaleShortcutValue_ =
         makeLabel(skin, kComboWidth_, TSS::EditorChromeShortcutLabels::uiScaleGroup());
+    skinShortcutLabel_ =
+        makeLabel(skin, kLabelWidth_, PluginDisplayNames::Settings::kSkinShortcutLabel);
+    skinShortcutValue_ =
+        makeLabel(skin, kComboWidth_, TSS::EditorChromeShortcutLabels::skinGroup());
 
     addAndMakeVisible(*keyboardSectionLabel_);
     addAndMakeVisible(*keyboardSectionSeparator_);
@@ -152,6 +156,8 @@ void SettingsPanel::setupKeyboardSection(TSS::ISkin& skin)
     addAndMakeVisible(*audioMidiShortcutValue_);
     addAndMakeVisible(*uiScaleShortcutLabel_);
     addAndMakeVisible(*uiScaleShortcutValue_);
+    addAndMakeVisible(*skinShortcutLabel_);
+    addAndMakeVisible(*skinShortcutValue_);
 }
 
 void SettingsPanel::populateComboItems()
@@ -229,12 +235,14 @@ void SettingsPanel::applyChildLooks(TSS::ISkin& skin)
     settingsShortcutLabel_->setLook(labelLook);
     audioMidiShortcutLabel_->setLook(labelLook);
     uiScaleShortcutLabel_->setLook(labelLook);
+    skinShortcutLabel_->setLook(labelLook);
 
     auto shortcutValueLook = labelLook;
     shortcutValueLook.font = TSS::shortcutHintFont(labelLook.font.getHeight());
     settingsShortcutValue_->setLook(shortcutValueLook);
     audioMidiShortcutValue_->setLook(shortcutValueLook);
     uiScaleShortcutValue_->setLook(shortcutValueLook);
+    skinShortcutValue_->setLook(shortcutValueLook);
 
     applyComboPopupLooks(skin);
 }

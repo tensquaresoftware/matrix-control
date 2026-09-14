@@ -228,6 +228,15 @@ bool PluginEditor::keyPressed(const juce::KeyPress& key, juce::Component* origin
 
 bool PluginEditor::tryHandleEditorChromeKey(const juce::KeyPress& key)
 {
+    if (const int skinVariantId = TSS::classifySkinVariantShortcut(key); skinVariantId != 0)
+    {
+        if (isEditorialUndoBlockedByTextFocus())
+            return false;
+
+        applySkinFromItemId(skinVariantId, true);
+        return true;
+    }
+
     const auto shortcut = TSS::classifyEditorChromeShortcut(key);
     if (shortcut == TSS::EditorChromeShortcut::kNone)
         return false;
@@ -235,6 +244,11 @@ bool PluginEditor::tryHandleEditorChromeKey(const juce::KeyPress& key)
     if (isEditorialUndoBlockedByTextFocus())
         return false;
 
+    return performEditorChromeShortcut(shortcut);
+}
+
+bool PluginEditor::performEditorChromeShortcut(TSS::EditorChromeShortcut shortcut)
+{
     using namespace PluginIDs::Settings::ScaleLevels;
 
     switch (shortcut)

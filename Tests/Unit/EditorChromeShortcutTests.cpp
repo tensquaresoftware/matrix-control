@@ -15,6 +15,8 @@ public:
         matchesZoomKeysIncludingEqualsAndNumPad();
         matchesZoomKeysWithNonZeroTextCharacter();
         matchesAzertyZeroKeyPeersAsUiScaleReset();
+        matchesSkinDigitShortcuts();
+        rejectsUnassignedSkinDigits();
         rejectsWhenTextWouldConflictWithPlainKeys();
         macShortcutLabelsUseUnicodeCodePoints();
     }
@@ -153,6 +155,41 @@ private:
         expectEquals(static_cast<int>(TSS::classifyEditorChromeShortcut(
                          juce::KeyPress(juce::KeyPress::numberPad0, commandShift, 0))),
                      static_cast<int>(TSS::EditorChromeShortcut::kUiScaleReset));
+    }
+
+    void matchesSkinDigitShortcuts()
+    {
+        beginTest("matchesSkinDigitShortcuts");
+
+        using juce::ModifierKeys;
+        const auto command = ModifierKeys::commandModifier;
+        const auto commandShift = command | ModifierKeys::shiftModifier;
+        constexpr juce::juce_wchar kEAcute = 0x00e9;
+        constexpr juce::juce_wchar kEAcuteUpper = 0x00c9;
+
+        expectEquals(TSS::classifySkinVariantShortcut(juce::KeyPress('1', command, 0)), 1);
+        expectEquals(TSS::classifySkinVariantShortcut(juce::KeyPress('2', command, 0)), 2);
+        expectEquals(TSS::classifySkinVariantShortcut(juce::KeyPress('1', commandShift, 0)), 1);
+        expectEquals(TSS::classifySkinVariantShortcut(
+                         juce::KeyPress(juce::KeyPress::numberPad2, command, 0)),
+                     2);
+        expectEquals(TSS::classifySkinVariantShortcut(juce::KeyPress('&', command, 0)), 1);
+        expectEquals(TSS::classifySkinVariantShortcut(
+                         juce::KeyPress(static_cast<int>(kEAcuteUpper), command, kEAcute)),
+                     2);
+        expect(TSS::isEditorChromeShortcut(juce::KeyPress('1', command, 0)));
+    }
+
+    void rejectsUnassignedSkinDigits()
+    {
+        beginTest("rejectsUnassignedSkinDigits");
+
+        using juce::ModifierKeys;
+        const auto command = ModifierKeys::commandModifier;
+
+        expectEquals(TSS::classifySkinVariantShortcut(juce::KeyPress('3', command, 0)), 0);
+        expect(! TSS::isAssignedSkinVariantId(3));
+        expect(! TSS::isEditorChromeShortcut(juce::KeyPress('3', command, 0)));
     }
 
     void rejectsWhenTextWouldConflictWithPlainKeys()

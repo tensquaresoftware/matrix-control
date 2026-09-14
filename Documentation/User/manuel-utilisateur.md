@@ -491,6 +491,8 @@ Raccourcis clavier (quand l’éditeur a le focus, hors saisie de texte) :
 | `UI SCALE` plus grand (cran suivant, 50–200 %) | ⌘+ (aussi ⌘=) | Ctrl+Plus (aussi Ctrl+=) |
 | `UI SCALE` plus petit (cran précédent) | ⌘- | Ctrl+- |
 | `UI SCALE` à 100 % | ⌘ 0 | Ctrl+0 |
+| Skin `BLACK` | ⌘ 1 | Ctrl+1 |
+| Skin `CREAM` | ⌘ 2 | Ctrl+2 |
 
 Ces raccourcis sont aussi rappelés dans le menu du logo et dans la section `KEYBOARD` de `SETTINGS`.
 
@@ -504,7 +506,7 @@ La touche **Échap** ferme en général les fenêtres `SETTINGS` et `ABOUT`, ain
 | `MATRIX-1000 PATCHES` | Oui | `DISPLAY MUSICAL NAMES` / `DISPLAY HARDWARE NAMES` |
 | `COMPUTER PATCHES` | Oui | `DISPLAY SYSEX NAMES` / `DISPLAY FILE NAMES` / `ASK ONCE PER LOAD` |
 | `UNSAVED STATE` | Oui | `ALWAYS WARN` / `NEVER WARN` |
-| `KEYBOARD` | Oui | Rappel des raccourcis clavier Settings / UI Scale (et Audio/MIDI en Standalone) |
+| `KEYBOARD` | Oui | Rappel des raccourcis clavier Settings / UI Scale / Skin (et Audio/MIDI en Standalone) |
 | `INIT TEMPLATE` (PATCH) | Oui | `SAVE AS INIT` enregistre le patch courant comme modèle système (`PatchInit.syx`) ; `DELETE` le retire après confirmation |
 | `UTILITY` (MASTER) | Oui | `LOAD` / `SAVE AS` / `INIT` (réinitialise tous les modules Master après confirmation) |
 | `INIT TEMPLATE` (MASTER) | Oui | `SAVE AS INIT` enregistre le Master courant comme modèle système (`MasterInit.syx`) ; `DELETE` le retire après confirmation |

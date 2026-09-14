@@ -77,12 +77,12 @@ namespace TSS
         items_.push_back({ ItemKind::Skin,
                            static_cast<int>(Skin::SkinComboBoxItemId::kBlack),
                            PluginDisplayNames::ChoiceLists::SkinVariants::kBlack,
-                           {},
+                           TSS::EditorChromeShortcutLabels::skinVariant(1),
                            1, 1 });
         items_.push_back({ ItemKind::Skin,
                            static_cast<int>(Skin::SkinComboBoxItemId::kCream),
                            PluginDisplayNames::ChoiceLists::SkinVariants::kCream,
-                           {},
+                           TSS::EditorChromeShortcutLabels::skinVariant(2),
                            1, 2 });
         items_.push_back({ ItemKind::Spacer, 0, {}, {}, 1, 3 });
         items_.push_back({ ItemKind::HorizontalRule, 0, {}, {}, 1, 4 });
