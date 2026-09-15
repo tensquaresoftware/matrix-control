@@ -25,6 +25,7 @@ public:
         adjacentTraverseSupersedesPendingClear();
         stickyWriterDuringHelpLeavesOverlayUntilClear();
         warningAndErrorAreCoveredWhileOverlayActive();
+        mutatorPopupDefersClearUntilIdle();
         helpCopyConstantsMatchSpec();
     }
 
@@ -134,6 +135,16 @@ private:
         expect(! TSS::shouldPaintContextualHelpOverSticky(false));
     }
 
+    void mutatorPopupDefersClearUntilIdle()
+    {
+        beginTest("Mutator popup - defer clear while focus inside or modal active");
+
+        expect(TSS::shouldDeferContextualHelpClearForMutatorPopup(true, false));
+        expect(TSS::shouldDeferContextualHelpClearForMutatorPopup(false, true));
+        expect(TSS::shouldDeferContextualHelpClearForMutatorPopup(true, true));
+        expect(! TSS::shouldDeferContextualHelpClearForMutatorPopup(false, false));
+    }
+
     void helpCopyConstantsMatchSpec()
     {
         beginTest("Help copy - badge and 22 Mutator strings match approved spec");
@@ -142,28 +153,28 @@ private:
                      juce::String("HELP"));
 
         static constexpr const char* kExpected[][2] = {
-            { MutatorHelp::kMode, "Sets how far mutations stray — Kindred, Drift, Warp, or Wild." },
-            { MutatorHelp::kPitch, "Controls how DCO pitch may move — Keep, Consonant, Dissonant, or Free." },
-            { MutatorHelp::kHistory, "Recalls a mutation or retry from this session." },
-            { MutatorHelp::kMutate, "Creates a new variation from the current recipe and sends it to the synth." },
-            { MutatorHelp::kRetry, "Rolls again from the same mutation root." },
-            { MutatorHelp::kHistoryPrevious, "Steps backward through session history." },
-            { MutatorHelp::kHistoryNext, "Steps forward through session history." },
-            { MutatorHelp::kCompare, "Compares with the origin patch and locks editing until you click C again." },
-            { MutatorHelp::kDelete, "Deletes the selected history entry." },
-            { MutatorHelp::kFlush, "Flushes the whole session mutation history." },
-            { MutatorHelp::kExport, "Exports the session mutations as SysEx files." },
-            { MutatorHelp::kEnableDco1, "Include DCO 1 in the mutation recipe." },
-            { MutatorHelp::kEnableDco2, "Include DCO 2 in the mutation recipe." },
-            { MutatorHelp::kEnableVcfVca, "Include filter and amplifier (VCF/VCA) in the recipe." },
-            { MutatorHelp::kEnableFmTrack, "Include FM and keyboard tracking in the recipe." },
-            { MutatorHelp::kEnableRampPortamento, "Include ramps and portamento in the recipe." },
-            { MutatorHelp::kEnableEnvelope1, "Include envelope 1 in the recipe." },
-            { MutatorHelp::kEnableEnvelope2, "Include envelope 2 in the recipe." },
-            { MutatorHelp::kEnableEnvelope3, "Include envelope 3 in the recipe." },
-            { MutatorHelp::kEnableLfo1, "Include LFO 1 in the recipe." },
-            { MutatorHelp::kEnableLfo2, "Include LFO 2 in the recipe." },
-            { MutatorHelp::kEnableMatrixMod, "Include Matrix Mod buses in the recipe." },
+            { MutatorHelp::kMode, "Patch Mutator: Sets how far mutations stray - Kindred, Drift, Warp, or Wild." },
+            { MutatorHelp::kPitch, "Patch Mutator: Controls how DCO pitch may move - Keep, Consonant, Dissonant, or Free." },
+            { MutatorHelp::kHistory, "Patch Mutator: Recalls a mutation or retry from this session." },
+            { MutatorHelp::kMutate, "Patch Mutator: Creates a new variation from the current recipe and sends it to the synth." },
+            { MutatorHelp::kRetry, "Patch Mutator: Rolls again from the same mutation root." },
+            { MutatorHelp::kHistoryPrevious, "Patch Mutator: Steps backward through session history." },
+            { MutatorHelp::kHistoryNext, "Patch Mutator: Steps forward through session history." },
+            { MutatorHelp::kCompare, "Patch Mutator: Compares with the origin patch and locks editing until you click C button again." },
+            { MutatorHelp::kDelete, "Patch Mutator: Deletes the selected history entry." },
+            { MutatorHelp::kFlush, "Patch Mutator: Flushes the whole session mutation history." },
+            { MutatorHelp::kExport, "Patch Mutator: Exports the session mutations as SysEx files." },
+            { MutatorHelp::kEnableDco1, "Patch Mutator: Include DCO 1 module in the mutation recipe." },
+            { MutatorHelp::kEnableDco2, "Patch Mutator: Include DCO 2 module in the mutation recipe." },
+            { MutatorHelp::kEnableVcfVca, "Patch Mutator: Include VCF/VCA module in the recipe." },
+            { MutatorHelp::kEnableFmTrack, "Patch Mutator: Include FM/TRACK module in the recipe." },
+            { MutatorHelp::kEnableRampPortamento, "Patch Mutator: Include RAMP/PORTAMENTO module in the recipe." },
+            { MutatorHelp::kEnableEnvelope1, "Patch Mutator: Include ENV 1 module in the recipe." },
+            { MutatorHelp::kEnableEnvelope2, "Patch Mutator: Include ENV 2 module in the recipe." },
+            { MutatorHelp::kEnableEnvelope3, "Patch Mutator: Include ENV 3 module in the recipe." },
+            { MutatorHelp::kEnableLfo1, "Patch Mutator: Include LFO 1 module in the recipe." },
+            { MutatorHelp::kEnableLfo2, "Patch Mutator: Include LFO 2 module in the recipe." },
+            { MutatorHelp::kEnableMatrixMod, "Patch Mutator: Include MATRIX MODULATION module in the recipe." },
         };
 
         expectEquals(static_cast<int>(sizeof(kExpected) / sizeof(kExpected[0])), 22);

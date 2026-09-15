@@ -22,16 +22,30 @@ namespace
 {
     constexpr int kContextualHelpClearDelayMs = 75;
 
+    bool isMutatorPopupComponent(const juce::Component* component)
+    {
+        return dynamic_cast<const TSS::HierarchicalPopupMenu*>(component) != nullptr
+            || dynamic_cast<const TSS::MultiColumnPopupMenu*>(component) != nullptr
+            || dynamic_cast<const TSS::ScrollablePopupMenu*>(component) != nullptr;
+    }
+
     bool isFocusInsideMutatorPopupMenu(const juce::Component* focused)
     {
         for (auto* c = focused; c != nullptr; c = c->getParentComponent())
         {
-            if (dynamic_cast<const TSS::HierarchicalPopupMenu*>(c) != nullptr
-                || dynamic_cast<const TSS::MultiColumnPopupMenu*>(c) != nullptr
-                || dynamic_cast<const TSS::ScrollablePopupMenu*>(c) != nullptr)
-            {
+            if (isMutatorPopupComponent(c))
                 return true;
-            }
+        }
+
+        return false;
+    }
+
+    bool isMutatorPopupModalActive()
+    {
+        for (int i = 0; i < juce::Component::getNumCurrentlyModalComponents(); ++i)
+        {
+            if (isMutatorPopupComponent(juce::Component::getCurrentlyModalComponent(i)))
+                return true;
         }
 
         return false;
@@ -167,8 +181,14 @@ void PatchMutatorPanel::applyContextualHelpClearIfIdle(int generation)
         return;
     }
 
-    if (isFocusInsideMutatorPopupMenu(juce::Component::getCurrentlyFocusedComponent()))
+    const bool focusInPopup =
+        isFocusInsideMutatorPopupMenu(juce::Component::getCurrentlyFocusedComponent());
+    if (TSS::shouldDeferContextualHelpClearForMutatorPopup(focusInPopup,
+                                                           isMutatorPopupModalActive()))
+    {
+        scheduleContextualHelpClear();
         return;
+    }
 
     if (auto* footer = resolveFooterPanel())
         footer->clearContextualHelpOverlay();
@@ -188,7 +208,10 @@ void PatchMutatorPanel::mouseExit(const juce::MouseEvent& event)
 void PatchMutatorPanel::globalFocusChanged(juce::Component* focusedComponent)
 {
     if (! isShowing())
+    {
+        scheduleContextualHelpClear();
         return;
+    }
 
     if (helpTextForControl(focusedComponent) != nullptr)
     {
@@ -196,8 +219,12 @@ void PatchMutatorPanel::globalFocusChanged(juce::Component* focusedComponent)
         return;
     }
 
-    if (isFocusInsideMutatorPopupMenu(focusedComponent))
+    if (TSS::shouldDeferContextualHelpClearForMutatorPopup(
+            isFocusInsideMutatorPopupMenu(focusedComponent),
+            isMutatorPopupModalActive()))
+    {
         return;
+    }
 
     scheduleContextualHelpClear();
 }

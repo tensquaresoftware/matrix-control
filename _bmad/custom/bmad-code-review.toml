@@ -13,6 +13,7 @@ persistent_facts = [
   "file:{project-root}/_bmad/custom/clarity-bar-fr.md",
   "file:{project-root}/.cursor/rules/bmad-clarity-bar.mdc",
   "file:{project-root}/_bmad/custom/code-review-presentation-fr.md",
+  "file:{project-root}/_bmad/custom/ascii-display-strings.md",
   "file:{project-root}/.cursor/rules/code-review-communication.mdc",
   "file:{project-root}/.cursor/rules/bmad-story-context-amorce.mdc",
   "Amorce code-review : premier message = ## Contexte de la Story + une phrase claire ; ne pas répéter aux tours suivants.",
@@ -30,4 +31,5 @@ persistent_facts = [
   "Pour CHAQUE décision : Recommandation BMad obligatoire (option + pourquoi accessible + confiance ferme ou nuancée).",
   "Chat ≠ story file : ne pas coller le texte dense des Review Findings dans le chat.",
   "Reformuler tout output sous-agent avant présentation.",
+  "Copy UI affichée (footer, aide, dialogs) : ASCII seulement dans PluginDisplayNames — flag tout tiret cadratin / Unicode dans les literals (ascii-display-strings.md).",
 ]

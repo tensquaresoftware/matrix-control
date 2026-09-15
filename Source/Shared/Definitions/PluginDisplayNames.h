@@ -46,7 +46,7 @@ namespace PluginDisplayNames
 
         constexpr const char* kMidiQueuePressureBadge = "MIDI";
         constexpr const char* kMidiQueuePressureMessage =
-            "Send queue backed up — click PANIC to clear stuck notes.";
+            "Send queue backed up - click PANIC to clear stuck notes.";
 
         constexpr const char* kContextualHelpBadge = "HELP";
 
@@ -1259,7 +1259,7 @@ namespace PluginDisplayNames
                                                             int invalidCount,
                                                             const juce::String& location)
                 {
-                    return formatScanLoadPrefix(validCount, invalidCount) + " — "
+                    return formatScanLoadPrefix(validCount, invalidCount) + " - "
                            + formatLoadSuccess(location);
                 }
 
@@ -1267,7 +1267,7 @@ namespace PluginDisplayNames
                                                                    int invalidCount,
                                                                    const juce::String& loadedMessage)
                 {
-                    return formatScanLoadPrefix(validCount, invalidCount) + " — " + loadedMessage;
+                    return formatScanLoadPrefix(validCount, invalidCount) + " - " + loadedMessage;
                 }
 
                 inline juce::String formatReconciliationNotice(const juce::String& location,
@@ -1403,52 +1403,53 @@ namespace PluginDisplayNames
             }
 
             // Furtive left-footer help while hovering / focusing Mutator controls (display-only).
+            // Same "Patch Mutator: " prefix as sticky Mutator footers for module-scoped homogeneity.
             namespace ContextualHelp
             {
                 constexpr const char* kMode =
-                    "Sets how far mutations stray — Kindred, Drift, Warp, or Wild.";
+                    "Patch Mutator: Sets how far mutations stray - Kindred, Drift, Warp, or Wild.";
                 constexpr const char* kPitch =
-                    "Controls how DCO pitch may move — Keep, Consonant, Dissonant, or Free.";
+                    "Patch Mutator: Controls how DCO pitch may move - Keep, Consonant, Dissonant, or Free.";
                 constexpr const char* kHistory =
-                    "Recalls a mutation or retry from this session.";
+                    "Patch Mutator: Recalls a mutation or retry from this session.";
                 constexpr const char* kMutate =
-                    "Creates a new variation from the current recipe and sends it to the synth.";
+                    "Patch Mutator: Creates a new variation from the current recipe and sends it to the synth.";
                 constexpr const char* kRetry =
-                    "Rolls again from the same mutation root.";
+                    "Patch Mutator: Rolls again from the same mutation root.";
                 constexpr const char* kHistoryPrevious =
-                    "Steps backward through session history.";
+                    "Patch Mutator: Steps backward through session history.";
                 constexpr const char* kHistoryNext =
-                    "Steps forward through session history.";
+                    "Patch Mutator: Steps forward through session history.";
                 constexpr const char* kCompare =
-                    "Compares with the origin patch and locks editing until you click C again.";
+                    "Patch Mutator: Compares with the origin patch and locks editing until you click C button again.";
                 constexpr const char* kDelete =
-                    "Deletes the selected history entry.";
+                    "Patch Mutator: Deletes the selected history entry.";
                 constexpr const char* kFlush =
-                    "Flushes the whole session mutation history.";
+                    "Patch Mutator: Flushes the whole session mutation history.";
                 constexpr const char* kExport =
-                    "Exports the session mutations as SysEx files.";
+                    "Patch Mutator: Exports the session mutations as SysEx files.";
                 constexpr const char* kEnableDco1 =
-                    "Include DCO 1 in the mutation recipe.";
+                    "Patch Mutator: Include DCO 1 module in the mutation recipe.";
                 constexpr const char* kEnableDco2 =
-                    "Include DCO 2 in the mutation recipe.";
+                    "Patch Mutator: Include DCO 2 module in the mutation recipe.";
                 constexpr const char* kEnableVcfVca =
-                    "Include filter and amplifier (VCF/VCA) in the recipe.";
+                    "Patch Mutator: Include VCF/VCA module in the recipe.";
                 constexpr const char* kEnableFmTrack =
-                    "Include FM and keyboard tracking in the recipe.";
+                    "Patch Mutator: Include FM/TRACK module in the recipe.";
                 constexpr const char* kEnableRampPortamento =
-                    "Include ramps and portamento in the recipe.";
+                    "Patch Mutator: Include RAMP/PORTAMENTO module in the recipe.";
                 constexpr const char* kEnableEnvelope1 =
-                    "Include envelope 1 in the recipe.";
+                    "Patch Mutator: Include ENV 1 module in the recipe.";
                 constexpr const char* kEnableEnvelope2 =
-                    "Include envelope 2 in the recipe.";
+                    "Patch Mutator: Include ENV 2 module in the recipe.";
                 constexpr const char* kEnableEnvelope3 =
-                    "Include envelope 3 in the recipe.";
+                    "Patch Mutator: Include ENV 3 module in the recipe.";
                 constexpr const char* kEnableLfo1 =
-                    "Include LFO 1 in the recipe.";
+                    "Patch Mutator: Include LFO 1 module in the recipe.";
                 constexpr const char* kEnableLfo2 =
-                    "Include LFO 2 in the recipe.";
+                    "Patch Mutator: Include LFO 2 module in the recipe.";
                 constexpr const char* kEnableMatrixMod =
-                    "Include Matrix Mod buses in the recipe.";
+                    "Patch Mutator: Include MATRIX MODULATION module in the recipe.";
             }
 
             // Footer + dialog copy for the session-load / Compare features. English only.

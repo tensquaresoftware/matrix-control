@@ -1749,3 +1749,15 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-patch-mutator-footer-contextual-help.md`
   summary: Compare+other matrix row is not asserted against help overlay inactivity under the dimming film.
   evidence: Current test only reuses LockDimmingFilmPolicy; needs GUI/film interaction or Standalone Compare check.
+
+## Deferred from: code review of spec-patch-mutator-footer-contextual-help.md (2026-09-15)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-mutator-footer-contextual-help.md`
+  summary: HELP badge paint colours (white fill / dark glyph / white detail) have no automated assert.
+  evidence: Tests only check `"HELP"` literal; CONVENTIONS avoid paint() unit tests — Standalone visual UAT.
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-mutator-footer-contextual-help.md`
+  summary: `CONVENTIONS.md` still lacks an ASCII-only UI punctuation section while project-context and `_bmad/custom/ascii-display-strings.md` document it.
+  evidence: Agent-context / conventions sync; not a product runtime patch.
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-mutator-footer-contextual-help.md`
+  summary: ascii-display-strings checklist greps literals but does not call out consumer matchers (e.g. FooterPanel Loaded truncate) that must stay in sync with formatters.
+  evidence: Agent-context doc polish after this review’s truncate finding.

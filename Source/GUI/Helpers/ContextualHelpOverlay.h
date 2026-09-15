@@ -51,4 +51,14 @@ namespace TSS
 
         return ! anyMutatorControlStillActive;
     }
+
+    /**
+     * Keep the HELP overlay while a Mutator combo popup is still in play
+     * (focus inside the menu, or the menu still modal). Caller should reschedule clear.
+     */
+    inline bool shouldDeferContextualHelpClearForMutatorPopup(bool focusInsideMutatorPopup,
+                                                              bool mutatorPopupModalActive)
+    {
+        return focusInsideMutatorPopup || mutatorPopupModalActive;
+    }
 }

@@ -10,7 +10,7 @@ sources:
   - planning-artifacts/architecture/architecture-matrix-control-2026-05-25/architecture.md
   - CONVENTIONS.md
 created: 2026-05-23
-updated: 2026-07-24
+updated: 2026-09-15
 ---
 
 # Project Context
@@ -308,6 +308,7 @@ Apply these to SysEx, MIDI, and Core logic (see Oberheim reference docs):
 - `#pragma once` on all headers.
 - Includes: system → JUCE → project (relative from root, never `../../../`).
 - **English only** in code, comments, commit messages, GitHub issues.
+- **User-visible string encoding:** Footer status, contextual help, confirmation dialogs, and other UI-painted copy in `PluginDisplayNames` must use **ASCII-only punctuation** (`-`, ` - `, `...`). No em dash, en dash, curly quotes, or Unicode ellipsis in new display strings — they render as mojibake in the footer font. SSOT: `_bmad/custom/ascii-display-strings.md`; prior fix: `spec-user-message-ascii-encoding.md`.
 - **No magic numbers** — named `constexpr` constants.
 - **`nullptr` only** — never `NULL` or `0` for pointers.
 - Prefer `enum class`, smart pointers (`unique_ptr` default), RAII, early returns.
@@ -405,6 +406,7 @@ See `CONTRIBUTING.md` § Continuous Integration and `_bmad-output/planning-artif
 - Delete `Documentation/Development/Plans/` archive.
 - Reorganize the root folder structure or rename `Source/`.
 - Add French text in source code or public documentation.
+- Use UTF-8 punctuation (em dash, en dash, curly quotes, `…`) in footer/status/dialog/help string literals — ASCII only unless an approved exception in `_bmad/custom/ascii-display-strings.md`.
 - Skip refactors when Clean Code limits are exceeded.
 
 ---

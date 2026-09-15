@@ -14,6 +14,7 @@ persistent_facts = [
   "file:{project-root}/_bmad/custom/clarity-bar-fr.md",
   "file:{project-root}/.cursor/rules/bmad-clarity-bar.mdc",
   "file:{project-root}/_bmad/custom/build-presentation-fr.md",
+  "file:{project-root}/_bmad/custom/ascii-display-strings.md",
   "file:{project-root}/.cursor/rules/build-communication.mdc",
   "file:{project-root}/.cursor/rules/bmad-story-context-amorce.mdc",
   "Amorce Build : premier message = ## Contexte de la Story + une phrase claire ; ne pas répéter aux tours suivants.",
@@ -27,4 +28,5 @@ persistent_facts = [
   "Revue interne Build : même exigence de clarté que bmad-code-review (En bref → Verdict → constats structurés → Recommandation BMad).",
   "Pour CHAQUE décision à options (périmètre, approche, route, branche, suite, points de revue) : section Recommandation BMad obligatoire (option recommandée + pourquoi en 2–4 phrases + confiance ferme ou nuancée). Guillaume ne doit jamais avoir à redemander la recommandation.",
   "Reformuler tout output sous-agent ou jargon de workflow (draft, oneshot, AC, etc.) en français clair avant présentation.",
+  "Chaînes affichées (footer, aide contextuelle, dialogs) : ASCII seulement dans PluginDisplayNames — jamais tiret cadratin / Unicode dans les literals de copy UI (voir ascii-display-strings.md).",
 ]

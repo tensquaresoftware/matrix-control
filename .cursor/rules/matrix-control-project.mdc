@@ -43,3 +43,4 @@ Source complète : `CONVENTIONS.md` §5–§6.2, §9. Constitution BMad : `_bmad
 - Pas de scaling global AffineTransform sur l'UI principale
 - Pas de dépendance GUI dans `Source/Core/`
 - Ne pas réécrire / disperser les données de `PluginDescriptors`
+- Pas de tiret cadratin / ponctuation Unicode dans les chaînes `PluginDisplayNames` affichées en footer ou dialog — ASCII seulement (`_bmad/custom/ascii-display-strings.md`)

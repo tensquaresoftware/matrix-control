@@ -30,28 +30,31 @@ context:
 - Help strings are English UI constants under `PluginDisplayNames` (Mutator help namespace); keep lines short enough for the left band (paint-time truncate OK).
 - **Help chrome (decided):** left band shows a `HELP` badge + detail text. Badge rectangle fill uses the same white as GUI labels (`SkinColourId::kLabelText`); badge glyph colour is dark (footer background / readable on white). Detail text to the right of the badge uses the same white (`kLabelText`) so help contrasts with INFO's chrome-grey badge/detail and reads as furtive.
 - **Overlay priority (decided):** while help is active, always temporarily cover the left sticky paint — including Warning and Error — then restore sticky on leave/blur. Centre system MIDI alert stays independent.
-- Exact help copy for v1 (approve with this spec):
+- Exact help copy for v1 (human-renegotiated: same `Patch Mutator: ` prefix as sticky footers):
 | Control | Help text |
 |---------|-----------|
-| MODE | Sets how far mutations stray — Kindred, Drift, Warp, or Wild. |
-| PITCH | Controls how DCO pitch may move — Keep, Consonant, Dissonant, or Free. |
-| HISTORY | Recalls a mutation or retry from this session. |
-| MUTATE | Creates a new variation from the current recipe and sends it to the synth. |
-| RETRY | Rolls again from the same mutation root. |
-| `<` | Steps backward through session history. |
-| `>` | Steps forward through session history. |
-| C | Compares with the origin patch and locks editing until you click C again. |
-| D | Deletes the selected history entry. |
-| F | Flushes the whole session mutation history. |
-| E | Exports the session mutations as SysEx files. |
-| D1 | Include DCO 1 in the mutation recipe. |
-| D2 | Include DCO 2 in the mutation recipe. |
-| F/A | Include filter and amplifier (VCF/VCA) in the recipe. |
-| F/T | Include FM and keyboard tracking in the recipe. |
-| R/P | Include ramps and portamento in the recipe. |
-| E1 / E2 / E3 | Include envelope 1 / 2 / 3 in the recipe. |
-| L1 / L2 | Include LFO 1 / 2 in the recipe. |
-| MM | Include Matrix Mod buses in the recipe. |
+| MODE | Patch Mutator: Sets how far mutations stray - Kindred, Drift, Warp, or Wild. |
+| PITCH | Patch Mutator: Controls how DCO pitch may move - Keep, Consonant, Dissonant, or Free. |
+| HISTORY | Patch Mutator: Recalls a mutation or retry from this session. |
+| MUTATE | Patch Mutator: Creates a new variation from the current recipe and sends it to the synth. |
+| RETRY | Patch Mutator: Rolls again from the same mutation root. |
+| `<` | Patch Mutator: Steps backward through session history. |
+| `>` | Patch Mutator: Steps forward through session history. |
+| C | Patch Mutator: Compares with the origin patch and locks editing until you click C button again. |
+| D | Patch Mutator: Deletes the selected history entry. |
+| F | Patch Mutator: Flushes the whole session mutation history. |
+| E | Patch Mutator: Exports the session mutations as SysEx files. |
+| D1 | Patch Mutator: Include DCO 1 module in the mutation recipe. |
+| D2 | Patch Mutator: Include DCO 2 module in the mutation recipe. |
+| F/A | Patch Mutator: Include VCF/VCA module in the recipe. |
+| F/T | Patch Mutator: Include FM/TRACK module in the recipe. |
+| R/P | Patch Mutator: Include RAMP/PORTAMENTO module in the recipe. |
+| E1 | Patch Mutator: Include ENV 1 module in the recipe. |
+| E2 | Patch Mutator: Include ENV 2 module in the recipe. |
+| E3 | Patch Mutator: Include ENV 3 module in the recipe. |
+| L1 | Patch Mutator: Include LFO 1 module in the recipe. |
+| L2 | Patch Mutator: Include LFO 2 module in the recipe. |
+| MM | Patch Mutator: Include MATRIX MODULATION module in the recipe. |
 
 **Never:**
 - Write help into APVTS sticky properties (Unison-badge `setFooterInfoMessage` pattern is forbidden for this feature).
@@ -102,11 +105,34 @@ context:
 - Given keyboard focus moves onto a focusable Mutator control, when focus is gained, then the same help appears as for hover.
 - Given the centre MIDI-pressure alert is active, when Mutator help shows, then the centre band is unaffected.
 
+### Review Findings
+
+- [x] [Review][Decision] Keep non-Mutator ASCII collateral in this chantier? — Resolved: keep MIDI + first-load-after-scan ASCII in this livraison; truncate matcher fix remains a patch.
+- [x] [Review][Patch] Path-style truncate still looks for em-dash ` — Loaded ` after formatters switched to ASCII ` - Loaded ` [`FooterPanel.cpp:100`] — fixed: accept both ` - Loaded ` and ` — Loaded `
+- [x] [Review][Patch] When Mutator panel is not showing, focus handler returns without clearing HELP — overlay can stick [`PatchMutatorPanelContextualHelp.cpp:190-191`] — fixed: schedule clear when panel not showing
+- [x] [Review][Patch] Popup clear policy incomplete: HELP can clear while Mode/Pitch/History menu is open (open but unfocused), and early-return on popup focus does not reschedule clear so HELP can stick after dismiss; extract/test a pure keep-overlay predicate [`PatchMutatorPanelContextualHelp.cpp:158-174`] — fixed: defer while focus-in-popup or mutator popup modal; reschedule; helper + unit test
+- [x] [Review][Defer] Scenario-named overlay tests exercise helpers only, not FooterPanel/Mutator wiring — deferred: already logged; CONVENTIONS avoid GUI paint tests; Standalone UAT
+- [x] [Review][Defer] No automated census that all 22 controls are bound — deferred: already logged; UAT hover-all-22
+- [x] [Review][Defer] Compare+other help inactivity not asserted beyond film policy — deferred: already logged; Standalone Compare check
+- [x] [Review][Defer] HELP badge paint colours (white fill / dark glyph / white detail) untested — deferred: paint/GUI unit-test habit; visual UAT
+- [x] [Review][Defer] `CONVENTIONS.md` lacks ASCII-only UI punctuation section despite project-context / ascii-display-strings SSOT — deferred: agent-context / conventions sync outside product patch
+- [x] [Review][Defer] ascii-display-strings checklist omits consumer-side matchers that must track formatter punctuation — deferred: agent-context doc polish
+
+#### Rejected
+
+- `false` — `shouldPaintContextualHelpOverSticky` identity: intentional always-cover policy when overlay active (prior triage + AC).
+- `false` — Toggle “mutation recipe” vs “recipe” / Include vs Sets voice / “click C button”: match frozen approved help table; fix would edit frozen copy/spec.
+- `false` — Empty Spec Change Log / missing verification transcript: fix would be editing this build’s spec artifact.
+- `low` — Prefixed help length / mid-clause truncate: speculative; paint-time truncate already allowed; no measured overflow evidence.
+- `false` — Acceptance: formal ACs and Always/Never for Mutator overlay appear met; residual gaps are verification/defer or the decision/patches above.
+
 ## Implementation Notes
 
 - FooterPanel uses `TSS::ContextualHelpOverlay` + HELP badge paint (white fill / dark glyph / white detail via `kLabelText`).
 - PatchMutatorPanel wires 22 controls (mouse + FocusChangeListener); 75 ms deferred clear; resolves footer via `MainComponent::getFooterPanel()`.
 - Review patches: deep mouse listeners + parent walk for help lookup; keep overlay while Mutator popup menus hold focus; prefer focused control over hover when both active; ignore focus churn when panel not showing; removed unused FooterPanel overlay getters.
+- Review patches (2026-09-15 code review): ASCII path truncate accepts ` - Loaded ` and legacy em dash; schedule HELP clear when Mutator panel is not showing; defer clear while Mutator popup focus/modal and reschedule; `shouldDeferContextualHelpClearForMutatorPopup` unit-tested.
+- ASCII fix (2026-09-15): contextual help MODE/PITCH use ` - ` not em dash; SSOT `_bmad/custom/ascii-display-strings.md`.
 - Matrix rows covered by `ContextualHelpOverlayTests` (ran `--category ContextualHelpOverlay`, 0 failures). Standalone visual UAT still for Guillaume.
 - Build: `macos-debug-arm64` OK; `lint_touched.py` OK.
 
@@ -135,7 +161,7 @@ context:
 
 - Precedent: centre-band `setMidiQueuePressureAlert` proves FooterPanel can hold ephemeral display state without APVTS. Left-band help follows that pattern.
 - Unison “M” badge writes sticky on hover — wrong model; do not copy.
-- Help copy omits `Patch Mutator:` prefix (hover context is already the module); sticky action messages keep their prefix.
+- Help copy uses the same `Patch Mutator: ` prefix as sticky Mutator footers (renegotiated after first ship).
 - HELP badge label constant under `PluginDisplayNames::FooterPanel` (e.g. `kContextualHelpBadge = "HELP"`).
 - Agent-owned: leave-clear delay ~50–100 ms; cancel on re-enter; no GUI-wide registry in this chantier.
 

@@ -95,8 +95,10 @@ void FooterPanel::paintBadgeAndDetail(juce::Graphics& g, const BadgeDetailPaintA
     g.setColour(args.detailColour);
 
     // Prefer start of status messages; Loaded/Saved / Mutator Export keep head + useful end.
+    // Accept ASCII " - Loaded " (current formatters) and legacy em-dash " — Loaded ".
     const bool usePathStyleTruncate = args.detailText.startsWith("Loaded ")
         || args.detailText.startsWith("Saved ")
+        || args.detailText.contains(" - Loaded ")
         || args.detailText.contains(" — Loaded ")
         || args.detailText.startsWith(
                PluginDisplayNames::PatchManagerSection::PatchMutatorModule::Messages::kExportCompleteFooterStem);
