@@ -1737,3 +1737,15 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-patch-mutator-sticky-footer-action-messages.md`
   summary: Delete with a stale selected retry index can fall through to root cascade delete messaging.
   evidence: Pre-existing deleteSelected control flow (retry branch only when hasRetry); not introduced by sticky copy — worth a dedicated guard story later.
+
+## Deferred from: spec-patch-mutator-footer-contextual-help.md (2026-09-15)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-mutator-footer-contextual-help.md`
+  summary: Scenario-named ContextualHelpOverlay unit tests exercise helpers only, not FooterPanel set/clear/paint or PatchMutatorPanel mouse/focus wiring.
+  evidence: Verification-gap review; CONVENTIONS avoid GUI paint tests; Standalone UAT remains the consumer check.
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-mutator-footer-contextual-help.md`
+  summary: No automated census that all 22 Mutator controls are registered in the contextual-help map.
+  evidence: Omitting a bind() still passes ContextualHelpOverlayTests; UAT hover-all-22 is the planned catch.
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-mutator-footer-contextual-help.md`
+  summary: Compare+other matrix row is not asserted against help overlay inactivity under the dimming film.
+  evidence: Current test only reuses LockDimmingFilmPolicy; needs GUI/film interaction or Standalone Compare check.

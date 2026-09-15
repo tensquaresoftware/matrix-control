@@ -3,6 +3,7 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 
+#include "GUI/Helpers/ContextualHelpOverlay.h"
 #include "GUI/Layout/PanelDimensions.h"
 
 namespace TSS
@@ -24,6 +25,10 @@ public:
     void setSkin(TSS::ISkin& skin);
     void setUiScale(float uiScale);
     void setMidiQueuePressureAlert(bool active);
+
+    /** Display-only left-band overlay; never writes APVTS sticky properties. */
+    void setContextualHelpOverlay(const juce::String& detailText);
+    void clearContextualHelpOverlay();
 
     void valueTreePropertyChanged(juce::ValueTree& tree,
                                  const juce::Identifier& property) override;
@@ -92,9 +97,13 @@ private:
                                      juce::Rectangle<int> bounds,
                                      const juce::Font& font,
                                      juce::Colour detailColour) const;
+    void paintContextualHelp(juce::Graphics& g,
+                             juce::Rectangle<int> bounds,
+                             const juce::Font& font) const;
     void syncFromApvtsState(juce::ValueTree& tree);
 
     bool midiQueuePressureAlertActive_ = false;
+    TSS::ContextualHelpOverlay contextualHelpOverlay_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(FooterPanel)
 };

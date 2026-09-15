@@ -326,6 +326,7 @@ set(PLUGIN_SOURCES
     Source/GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/Modules/InternalPatchesPanel.cpp
     Source/GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/Modules/InternalPatchesPanelSetup.cpp
     Source/GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/Modules/PatchMutatorPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/Modules/PatchMutatorPanelContextualHelp.cpp
     Source/GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/Modules/PatchMutatorPanelHistory.cpp
     Source/GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/Modules/PatchMutatorPanelLayout.cpp
     Source/GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/Modules/PatchMutatorPanelSetup.cpp
@@ -466,6 +467,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/DeviceAudioInputPreferenceTests.cpp
         Tests/Unit/EditorOutboundGateTests.cpp
         Tests/Unit/LockDimmingFilmPolicyTests.cpp
+        Tests/Unit/ContextualHelpOverlayTests.cpp
         Tests/Unit/InitDefaultsTests.cpp
         Tests/Unit/InitTemplateLoaderTests.cpp
         Tests/Unit/InitTemplateWriterTests.cpp

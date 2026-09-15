@@ -48,6 +48,8 @@ namespace PluginDisplayNames
         constexpr const char* kMidiQueuePressureMessage =
             "Send queue backed up — click PANIC to clear stuck notes.";
 
+        constexpr const char* kContextualHelpBadge = "HELP";
+
         // Left-zone guidance while FR-2 device lock is active (D-038 — footer only, no modal).
         constexpr const char* kDeviceLockGuidance =
             "No synth detected - check MIDI cables, MIDI FROM / MIDI TO options, and power-cycle your Matrix synth.";
@@ -1398,6 +1400,55 @@ namespace PluginDisplayNames
                         return juce::String::fromUTF8("\xc2\xb1") + juce::String(clamped);
                     }
                 }
+            }
+
+            // Furtive left-footer help while hovering / focusing Mutator controls (display-only).
+            namespace ContextualHelp
+            {
+                constexpr const char* kMode =
+                    "Sets how far mutations stray — Kindred, Drift, Warp, or Wild.";
+                constexpr const char* kPitch =
+                    "Controls how DCO pitch may move — Keep, Consonant, Dissonant, or Free.";
+                constexpr const char* kHistory =
+                    "Recalls a mutation or retry from this session.";
+                constexpr const char* kMutate =
+                    "Creates a new variation from the current recipe and sends it to the synth.";
+                constexpr const char* kRetry =
+                    "Rolls again from the same mutation root.";
+                constexpr const char* kHistoryPrevious =
+                    "Steps backward through session history.";
+                constexpr const char* kHistoryNext =
+                    "Steps forward through session history.";
+                constexpr const char* kCompare =
+                    "Compares with the origin patch and locks editing until you click C again.";
+                constexpr const char* kDelete =
+                    "Deletes the selected history entry.";
+                constexpr const char* kFlush =
+                    "Flushes the whole session mutation history.";
+                constexpr const char* kExport =
+                    "Exports the session mutations as SysEx files.";
+                constexpr const char* kEnableDco1 =
+                    "Include DCO 1 in the mutation recipe.";
+                constexpr const char* kEnableDco2 =
+                    "Include DCO 2 in the mutation recipe.";
+                constexpr const char* kEnableVcfVca =
+                    "Include filter and amplifier (VCF/VCA) in the recipe.";
+                constexpr const char* kEnableFmTrack =
+                    "Include FM and keyboard tracking in the recipe.";
+                constexpr const char* kEnableRampPortamento =
+                    "Include ramps and portamento in the recipe.";
+                constexpr const char* kEnableEnvelope1 =
+                    "Include envelope 1 in the recipe.";
+                constexpr const char* kEnableEnvelope2 =
+                    "Include envelope 2 in the recipe.";
+                constexpr const char* kEnableEnvelope3 =
+                    "Include envelope 3 in the recipe.";
+                constexpr const char* kEnableLfo1 =
+                    "Include LFO 1 in the recipe.";
+                constexpr const char* kEnableLfo2 =
+                    "Include LFO 2 in the recipe.";
+                constexpr const char* kEnableMatrixMod =
+                    "Include Matrix Mod buses in the recipe.";
             }
 
             // Footer + dialog copy for the session-load / Compare features. English only.

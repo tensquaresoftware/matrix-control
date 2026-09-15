@@ -169,6 +169,25 @@ void FooterPanel::paintMidiQueuePressureAlert(juce::Graphics& g,
     });
 }
 
+void FooterPanel::paintContextualHelp(juce::Graphics& g,
+                                      juce::Rectangle<int> bounds,
+                                      const juce::Font& font) const
+{
+    if (! TSS::shouldPaintContextualHelpOverSticky(contextualHelpOverlay_.isActive()))
+        return;
+
+    const auto labelWhite = skin_->getColour(SkinColourId::kLabelText);
+    paintBadgeAndDetail(g, {
+        bounds,
+        PluginDisplayNames::FooterPanel::kContextualHelpBadge,
+        contextualHelpOverlay_.getDetail(),
+        labelWhite,
+        skin_->getColour(SkinColourId::kFooterPanelBackground),
+        labelWhite,
+        font
+    });
+}
+
 void FooterPanel::paint(juce::Graphics& g)
 {
     g.fillAll(skin_->getColour(SkinColourId::kFooterPanelBackground));
@@ -182,8 +201,13 @@ void FooterPanel::paint(juce::Graphics& g)
 
     const auto font = skin_->getBaseFont().withHeight(skin_->getBaseFont().getHeight() * uiScale_);
     const auto chromeGrey = skin_->getColour(SkinColourId::kFooterMessageInfo);
+    const auto leftBounds = layout.leftBand.reduced(layout.padding, 0);
 
-    paintStatusMessage(g, layout.leftBand.reduced(layout.padding, 0), font, chromeGrey);
+    if (TSS::shouldPaintContextualHelpOverSticky(contextualHelpOverlay_.isActive()))
+        paintContextualHelp(g, leftBounds, font);
+    else
+        paintStatusMessage(g, leftBounds, font, chromeGrey);
+
     paintMidiQueuePressureAlert(g, layout.centreBand.reduced(layout.padding, 0), font, chromeGrey);
     paintDeviceStatus(g, layout.rightBand.reduced(layout.padding, 0), font, chromeGrey);
 }
@@ -212,6 +236,24 @@ void FooterPanel::setMidiQueuePressureAlert(bool active)
         return;
 
     midiQueuePressureAlertActive_ = active;
+    repaint();
+}
+
+void FooterPanel::setContextualHelpOverlay(const juce::String& detailText)
+{
+    if (contextualHelpOverlay_.getDetail() == detailText)
+        return;
+
+    contextualHelpOverlay_.setDetail(detailText);
+    repaint();
+}
+
+void FooterPanel::clearContextualHelpOverlay()
+{
+    if (! contextualHelpOverlay_.isActive())
+        return;
+
+    contextualHelpOverlay_.clear();
     repaint();
 }
 
