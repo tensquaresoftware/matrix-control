@@ -135,7 +135,8 @@ private:
         expect(result.success);
         expect(static_cast<bool>(harness.proc.apvts.state.getProperty(MutatorState::kCompareActive, false)));
         expectEquals(result.footerMessage,
-                     juce::String(PluginDisplayNames::PatchManagerSection::PatchMutatorModule::Messages::kCompareLockedFooter));
+                     juce::String("Patch Mutator: Compare mode - editing and patch/bank changes are locked. "
+                                  "Click C again to exit."));
         expectEquals(result.footerSeverity, juce::String("info"));
     }
 
@@ -143,15 +144,14 @@ private:
     {
         beginTest("compare_exit_clearsLockedFooterExactMatch");
 
-        namespace MutatorMessages = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::Messages;
-
         EngineHarness harness;
         harness.setRecipe(100, 100, true);
         expect(harness.engine.mutate().success);
         expect(harness.engine.toggleCompare().success);
 
         harness.proc.apvts.state.setProperty("uiMessageText",
-                                             juce::String(MutatorMessages::kCompareLockedFooter),
+                                             juce::String("Patch Mutator: Compare mode - editing and patch/bank changes are locked. "
+                                                          "Click C again to exit."),
                                              nullptr);
         harness.proc.apvts.state.setProperty("uiMessageSeverity", "info", nullptr);
 

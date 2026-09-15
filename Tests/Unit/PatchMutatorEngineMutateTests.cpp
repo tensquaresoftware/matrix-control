@@ -1,5 +1,7 @@
 #include "PatchMutatorEngineTestSupport.h"
 
+#include "Core/Services/PatchMutator/PatchMutatorEngineInternal.h"
+
 using namespace PatchMutatorEngineTestSupport;
 
 class PatchMutatorEngineMutateTests : public juce::UnitTest
@@ -21,6 +23,7 @@ public:
         mutate_matrix6_sendsPatchSlot();
         mutate_neverDeletesRoots();
         mutate_success_updatesApvtsHistory();
+        footerForDiverseMutation_noUsableRoll_usesPrefixedNoChangeSticky();
     }
 
 private:
@@ -232,6 +235,14 @@ private:
         const auto result = harness.engine.mutate();
         expect(result.success);
         expect(! harness.proc.apvts.state.getProperty(MutatorState::kHistoryMutateList).toString().isEmpty());
+    }
+
+    void footerForDiverseMutation_noUsableRoll_usesPrefixedNoChangeSticky()
+    {
+        beginTest("footerForDiverseMutation_noUsableRoll_usesPrefixedNoChangeSticky");
+
+        expectEquals(juce::String(PatchMutatorEngineInternal::kNoMutationChangeFooterMessage),
+                     juce::String("Patch Mutator: No changes. Try a wider MODE or more modules."));
     }
 
 };

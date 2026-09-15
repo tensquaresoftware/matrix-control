@@ -92,6 +92,26 @@ context:
 - Given that Export message exceeds left band width, when painted, then detail uses middle truncation without changing stored `uiMessageText`.
 - Given Compare exit, when the locked sticky is present, then clear-if-exact still clears the prefixed Compare string only.
 
+### Review Findings
+
+- [x] [Review][Patch] Pin no-change Mutator sticky to prefixed literal in unit tests [`Source/Core/Services/PatchMutator/PatchMutatorEngineInternal.h:38`]
+- [x] [Review][Patch] Pin Compare locked and device-dump Mutator footers to prefixed literals (not production-constant equality) [`Tests/Unit/PatchMutatorEngineCompareSnapshotTests.cpp:137`] [`Tests/Unit/PatchManagerActionHandlerDeferredGateTests.cpp:48`]
+- [x] [Review][Defer] Export long-path middle-truncation has no automated paint coverage [`Source/GUI/Panels/MainComponent/FooterPanel/FooterPanel.cpp:98`] — deferred: repo convention avoids GUI paint unit tests; already listed in deferred-work.md; keep Standalone visual check
+
+#### Rejected
+
+- Spec Change Log empty — false: only fix is editing the spec under review.
+- Spec Verification lists wrong CMake/ctest targets — false: only fix is editing the spec under review (Implementation Notes already document `Matrix-Control_Tests`).
+- Dual `Patch Mutator: ` SSOT (engine prefix vs PluginDisplayNames literals) — low: just-migrated together; full unification is a refactor beyond a direct fix.
+- `clearHistory` empty early-return skips `forceExitCompare` — false: Compare enter requires non-empty history; empty+Compare is not reachable through normal engine paths.
+- Export cancel severity undocumented in I/O matrix — false: only fix is editing the spec under review.
+- Flush confirm Cancel path untested — false: `MutatorActionHandlerTests::clear_confirmCancel_skipsClear` already locks handler cancel without engine clear.
+- Inconsistent deferred-work bullet formatting — low: catalog hygiene, not user-facing.
+- `review_loop_iteration: 0` with status done — false: only fix is editing the spec under review.
+- `makeExportHistoryResult` can double-prefix — false: `PatchFileService` Mutator export errors are unprefixed today (`History empty`, `Folder not writable`, …).
+- `assignDeleteSuccessFooter` unused `retryIndex` on root path — low: dead param on one branch; unlikely everyday harm.
+- Stale retry falls through to root-cascade delete sticky — false: `applySelectionFromApvts` clamps missing retries to root before delete; pre-existing control flow already deferred earlier for this spec.
+
 ## Implementation Notes
 
 - Prefixed all engine `k*Footer*` stickies + `PluginDisplayNames` Mutator sticky Messages (`Compare`, Export cancelled, device-dump Mutator footers); dialog-only strings unchanged.
