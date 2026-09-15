@@ -30,21 +30,27 @@ namespace PatchMutatorEngineInternal
     constexpr int kRetryDiversityMinChangedBytes = 3;
     constexpr size_t kMutableByteRangeStart = 8;
 
-    constexpr const char* kNoModuleScopeFooterMessage = "Enable at least one module to mutate.";
+    // All Patch Mutator sticky footers share this module prefix (badge stays separate).
+    constexpr const char* kStickyModulePrefix = "Patch Mutator: ";
+
+    constexpr const char* kNoModuleScopeFooterMessage =
+        "Patch Mutator: Enable at least one module to mutate.";
     constexpr const char* kNoMutationChangeFooterMessage =
-        "No changes. Try a wider MODE or more modules.";
+        "Patch Mutator: No changes. Try a wider MODE or more modules.";
     constexpr const char* kRetryTooSimilarFooterMessage =
-        "RETRY too similar. Try a wider MODE or more modules.";
-    constexpr const char* kHistoryLimitFooterMessage = "Mutation history is full. Defrag to continue.";
-    constexpr const char* kEmptyHistoryFooterMessage = "Mutation history is empty.";
-    constexpr const char* kNoSelectionFooterMessage = "No valid mutation history entry selected.";
+        "Patch Mutator: RETRY too similar. Try a wider MODE or more modules.";
+    constexpr const char* kHistoryLimitFooterMessage =
+        "Patch Mutator: Mutation history is full. Defrag to continue.";
+    constexpr const char* kEmptyHistoryFooterMessage = "Patch Mutator: Mutation history is empty.";
+    constexpr const char* kNoSelectionFooterMessage =
+        "Patch Mutator: No valid mutation history entry selected.";
     constexpr const char* kNoInitialSnapshotFooterMessage =
-        "No initial patch snapshot available for compare.";
-    constexpr const char* kRootDeleteCascadeFooterPrefix = "Deleted ";
-    constexpr const char* kRootDeleteCascadeFooterSuffix = " and all retries.";
-    constexpr const char* kDefragCompleteFooterMessage = "Mutation history renumbered.";
-    constexpr const char* kExportFolderNotWritableFooterMessage = "Export folder is not writable.";
-    constexpr const char* kExportFailedFooterMessage = "Mutation export failed.";
+        "Patch Mutator: No initial patch snapshot available for compare.";
+    constexpr const char* kFlushSuccessFooterMessage = "Patch Mutator: Mutation history flushed.";
+    constexpr const char* kDefragCompleteFooterMessage = "Patch Mutator: Mutation history renumbered.";
+    constexpr const char* kExportFolderNotWritableFooterMessage =
+        "Patch Mutator: Export folder is not writable.";
+    constexpr const char* kExportFailedFooterMessage = "Patch Mutator: Mutation export failed.";
     constexpr const char* kFooterSeverityWarning = "warning";
     constexpr const char* kFooterSeverityInfo = "info";
 
@@ -58,9 +64,22 @@ namespace PatchMutatorEngineInternal
         }
     }
 
-    inline juce::String formatExportCompleteFooterMessage(int filesWritten)
+    inline juce::String formatRetryDeleteFooterMessage(const juce::String& patchName)
     {
-        return "Exported " + juce::String(filesWritten) + " mutation file(s).";
+        return juce::String(kStickyModulePrefix) + "Deleted " + patchName + ".";
+    }
+
+    inline juce::String formatRootDeleteCascadeFooterMessage(const juce::String& rootLabel)
+    {
+        return juce::String(kStickyModulePrefix) + "Deleted " + rootLabel + " and all retries.";
+    }
+
+    inline juce::String formatExportCompleteFooterMessage(int filesWritten,
+                                                          const juce::File& destinationFolder)
+    {
+        return juce::String(CompareMessages::kExportCompleteFooterStem)
+               + juce::String(filesWritten)
+               + " mutation file(s) to " + destinationFolder.getFullPathName() + ".";
     }
 
     inline Core::MutatorActionResult makeExportWarningResult(const char* message)
@@ -71,21 +90,23 @@ namespace PatchMutatorEngineInternal
         return result;
     }
 
-    inline Core::MutatorActionResult makeExportHistoryResult(const Core::PatchFileExportResult& exportResult)
+    inline Core::MutatorActionResult makeExportHistoryResult(const Core::PatchFileExportResult& exportResult,
+                                                            const juce::File& destinationFolder)
     {
         Core::MutatorActionResult result;
 
         if (! exportResult.success)
         {
             result.footerMessage = exportResult.errorMessage.isNotEmpty()
-                ? exportResult.errorMessage
+                ? juce::String(kStickyModulePrefix) + exportResult.errorMessage
                 : juce::String(kExportFailedFooterMessage);
             result.footerSeverity = kFooterSeverityWarning;
             return result;
         }
 
         result.success = true;
-        result.footerMessage = formatExportCompleteFooterMessage(exportResult.filesWritten);
+        result.footerMessage = formatExportCompleteFooterMessage(exportResult.filesWritten,
+                                                                destinationFolder);
         result.footerSeverity = kFooterSeverityInfo;
         return result;
     }

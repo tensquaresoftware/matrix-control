@@ -1,5 +1,7 @@
 #include "PatchMutatorEngineTestSupport.h"
 
+#include "Core/Services/PatchMutator/PatchMutatorEngineInternal.h"
+
 using namespace PatchMutatorEngineTestSupport;
 
 class PatchMutatorEngineExportTests : public juce::UnitTest
@@ -16,11 +18,13 @@ public:
         export_withFrozenBasename_createsSessionSubfolder();
         export_existingSessionFolder_requestsCollisionModal();
         exportResolved_keep_writesIndexedFolder();
+        exportResolved_cancel_setsPrefixedFooter();
         export_writesLiveUserName_notMxxLabel();
         export_afterRename_createsNewFolderKeepsOld();
         export_emptyHistory_blocked();
         export_success_footer();
         export_nonWritableFolder_blocked();
+        export_failedFallback_prefixesErrorMessage();
         export_doesNotMutateStore();
         export_noSysEx();
     }
@@ -101,9 +105,14 @@ private:
 
         expect(result.success);
         expect(! result.exportCollisionModalRequested);
-        expect(tempDir.getChildFile("OB-VOX @ B8-P25").isDirectory());
-        expect(tempDir.getChildFile("OB-VOX @ B8-P25").getChildFile("M00.syx").existsAsFile());
-        expect(! tempDir.getChildFile("OB-VOX @ B8-P25").getChildFile("M00").isDirectory());
+        const auto sessionFolder = tempDir.getChildFile("OB-VOX @ B8-P25");
+        expect(sessionFolder.isDirectory());
+        expect(sessionFolder.getChildFile("M00.syx").existsAsFile());
+        expect(! sessionFolder.getChildFile("M00").isDirectory());
+        expectEquals(result.footerMessage,
+                     juce::String("Patch Mutator: Exported 2 mutation file(s) to ")
+                         + sessionFolder.getFullPathName() + ".");
+        expectEquals(result.footerSeverity, juce::String("info"));
 
         tempDir.deleteRecursively();
     }
@@ -148,6 +157,26 @@ private:
 
         expect(result.success);
         expect(tempDir.getChildFile("OB-VOX @ B8-P25-2").isDirectory());
+        expectEquals(result.footerMessage,
+                     juce::String("Patch Mutator: Exported 2 mutation file(s) to ")
+                         + tempDir.getChildFile("OB-VOX @ B8-P25-2").getFullPathName() + ".");
+
+        tempDir.deleteRecursively();
+    }
+
+    void exportResolved_cancel_setsPrefixedFooter()
+    {
+        beginTest("exportResolved_cancel_setsPrefixedFooter");
+
+        EngineHarness harness;
+        const auto tempDir = makeTempExportDir();
+
+        const auto result = harness.engine.exportHistoryResolved(
+            tempDir, Core::ExportCollisionResolution::kCancel);
+
+        expect(! result.success);
+        expectEquals(result.footerMessage, juce::String("Patch Mutator: Export cancelled."));
+        expectEquals(result.footerSeverity, juce::String("info"));
 
         tempDir.deleteRecursively();
     }
@@ -217,7 +246,7 @@ private:
         const auto result = harness.engine.exportHistory(tempDir);
 
         expect(! result.success);
-        expectEquals(result.footerMessage, juce::String("Mutation history is empty."));
+        expectEquals(result.footerMessage, juce::String("Patch Mutator: Mutation history is empty."));
         expectEquals(result.footerSeverity, juce::String("warning"));
         expectEquals(tempDir.getNumberOfChildFiles(0), 0);
 
@@ -241,7 +270,9 @@ private:
 
         expect(result.success);
         expectEquals(result.footerSeverity, juce::String("info"));
-        expectEquals(result.footerMessage, juce::String("Exported 2 mutation file(s)."));
+        expectEquals(result.footerMessage,
+                     juce::String("Patch Mutator: Exported 2 mutation file(s) to ")
+                         + tempDir.getFullPathName() + ".");
 
         tempDir.deleteRecursively();
     }
@@ -260,8 +291,31 @@ private:
         const auto result = harness.engine.exportHistory(missing);
 
         expect(! result.success);
-        expectEquals(result.footerMessage, juce::String("Export folder is not writable."));
+        expectEquals(result.footerMessage, juce::String("Patch Mutator: Export folder is not writable."));
         expectEquals(result.footerSeverity, juce::String("warning"));
+    }
+
+    void export_failedFallback_prefixesErrorMessage()
+    {
+        beginTest("export_failedFallback_prefixesErrorMessage");
+
+        Core::PatchFileExportResult emptyError;
+        emptyError.success = false;
+        const auto emptyFallback = PatchMutatorEngineInternal::makeExportHistoryResult(
+            emptyError, juce::File("/tmp"));
+        expect(! emptyFallback.success);
+        expectEquals(emptyFallback.footerMessage,
+                     juce::String("Patch Mutator: Mutation export failed."));
+        expectEquals(emptyFallback.footerSeverity, juce::String("warning"));
+
+        Core::PatchFileExportResult rawError;
+        rawError.success = false;
+        rawError.errorMessage = "Folder not writable";
+        const auto prefixed = PatchMutatorEngineInternal::makeExportHistoryResult(
+            rawError, juce::File("/tmp"));
+        expect(! prefixed.success);
+        expectEquals(prefixed.footerMessage, juce::String("Patch Mutator: Folder not writable"));
+        expectEquals(prefixed.footerSeverity, juce::String("warning"));
     }
 
     void export_doesNotMutateStore()

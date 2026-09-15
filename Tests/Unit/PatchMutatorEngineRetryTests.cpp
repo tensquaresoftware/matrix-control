@@ -253,7 +253,7 @@ private:
         const auto result = harness.engine.retry();
         expect(! result.success);
         expectEquals(result.footerMessage,
-                     juce::String(PatchMutatorEngineInternal::kRetryTooSimilarFooterMessage));
+                     juce::String("Patch Mutator: RETRY too similar. Try a wider MODE or more modules."));
         expectEquals(harness.store().retryCount(0), 0);
         expectEquals(countPatchSysExMessages(harness.queue), 0);
     }

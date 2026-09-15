@@ -1729,3 +1729,11 @@ Original review bullets below remain for history; status for U-10-owned residual
 ## Deferred from: code review of spec-settings-audio-midi-ui-scale-shortcuts.md (2026-09-14)
 
 - No automated check that `PluginEditor` chrome shortcut actions fire (`openSettingsWindow`, UI Scale apply, Audio/MIDI dialog) — CONVENTIONS forbid GUI component unit tests; classifier-only coverage matches editorial undo; needs a harness approach later.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-mutator-sticky-footer-action-messages.md`
+  summary: Export long-path middle-truncation in FooterPanel has no automated paint/unit coverage.
+  evidence: Spec AC requires middle-truncate for long Export stickies; repo does not unit-test GUI paint — keep Standalone visual check.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-mutator-sticky-footer-action-messages.md`
+  summary: Delete with a stale selected retry index can fall through to root cascade delete messaging.
+  evidence: Pre-existing deleteSelected control flow (retry branch only when hasRetry); not introduced by sticky copy — worth a dedicated guard story later.

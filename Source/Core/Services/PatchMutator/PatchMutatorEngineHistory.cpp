@@ -27,8 +27,10 @@ MutatorActionResult PatchMutatorEngine::exportHistory(const juce::File& destinat
         return makeExportWarningResult(kExportFolderNotWritableFooterMessage);
 
     if (! historyStore_.hasFrozenExportBasename())
-        return makeExportHistoryResult(patchFileService_->exportMutatorHistory(
-            destinationFolder, historyStore_, *sysExEncoder_, patchModel_->getName()));
+        return makeExportHistoryResult(
+            patchFileService_->exportMutatorHistory(
+                destinationFolder, historyStore_, *sysExEncoder_, patchModel_->getName()),
+            destinationFolder);
 
     const auto sessionFolder = destinationFolder.getChildFile(historyStore_.getFrozenExportBasename());
     if (sessionFolder.exists())
@@ -78,7 +80,8 @@ MutatorActionResult PatchMutatorEngine::runSessionExport(const juce::File& sessi
         clearExisting,
         patchModel_->getName()
     };
-    return makeExportHistoryResult(patchFileService_->exportMutatorHistorySession(args));
+    return makeExportHistoryResult(patchFileService_->exportMutatorHistorySession(args),
+                                   sessionFolder);
 }
 
 MutatorActionResult PatchMutatorEngine::defragHistory()

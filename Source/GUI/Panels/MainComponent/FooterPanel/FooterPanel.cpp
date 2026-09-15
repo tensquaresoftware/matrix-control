@@ -94,10 +94,12 @@ void FooterPanel::paintBadgeAndDetail(juce::Graphics& g, const BadgeDetailPaintA
     g.setFont(args.font);
     g.setColour(args.detailColour);
 
-    // Prefer start of status messages; Loaded/Saved (and first-load scan+Loaded) keep head + useful end.
+    // Prefer start of status messages; Loaded/Saved / Mutator Export keep head + useful end.
     const bool usePathStyleTruncate = args.detailText.startsWith("Loaded ")
         || args.detailText.startsWith("Saved ")
-        || args.detailText.contains(" — Loaded ");
+        || args.detailText.contains(" — Loaded ")
+        || args.detailText.startsWith(
+               PluginDisplayNames::PatchManagerSection::PatchMutatorModule::Messages::kExportCompleteFooterStem);
     const auto fittedDetail = TSS::TextFitHelpers::fitWithAsciiEllipsis(
         args.detailText,
         args.font,

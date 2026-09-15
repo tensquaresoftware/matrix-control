@@ -12,6 +12,20 @@ using namespace PatchMutatorEngineInternal;
 namespace Core
 {
 
+namespace
+{
+void assignDeleteSuccessFooter(MutatorActionResult& result,
+                               int rootIndex,
+                               int retryIndex,
+                               bool isRetryDelete)
+{
+    result.footerMessage = isRetryDelete
+        ? formatRetryDeleteFooterMessage(MutationNaming::formatPatchName(rootIndex, retryIndex))
+        : formatRootDeleteCascadeFooterMessage(MutationNaming::formatRootLabel(rootIndex));
+    result.footerSeverity = kFooterSeverityInfo;
+}
+} // namespace
+
 const char* PatchMutatorEngine::footerForDiverseMutation(DiverseMutationOutcome outcome) noexcept
 {
     switch (outcome)
@@ -220,6 +234,8 @@ MutatorActionResult PatchMutatorEngine::deleteSelected()
 
         if (! historyStore_.deleteRetry(mutateRootIndex, retryIndex))
             return makeWarningResult(kNoSelectionFooterMessage);
+
+        assignDeleteSuccessFooter(result, mutateRootIndex, retryIndex, true);
     }
     else
     {
@@ -230,10 +246,7 @@ MutatorActionResult PatchMutatorEngine::deleteSelected()
         if (! historyStore_.deleteRoot(mutateRootIndex))
             return makeWarningResult(kNoSelectionFooterMessage);
 
-        result.footerMessage = kRootDeleteCascadeFooterPrefix
-                               + MutationNaming::formatRootLabel(mutateRootIndex)
-                               + kRootDeleteCascadeFooterSuffix;
-        result.footerSeverity = kFooterSeverityInfo;
+        assignDeleteSuccessFooter(result, mutateRootIndex, MutationHistoryStore::kRootOnly, false);
     }
 
     selectedRootIndex_ = newMutateRootIndex;
@@ -247,13 +260,20 @@ MutatorActionResult PatchMutatorEngine::deleteSelected()
 
 MutatorActionResult PatchMutatorEngine::clearHistory()
 {
+    if (historyStore_.isEmpty())
+        return makeWarningResult(kEmptyHistoryFooterMessage);
+
     forceExitCompare();
     historyStore_.clear();
     selectedRootIndex_ = -1;
     selectedRetryIndex_ = MutationHistoryStore::kRootOnly;
     syncHistoryUiProperties(apvts_);
     auditionAfterHistoryMutation();
-    return makeSuccessResult();
+
+    MutatorActionResult result = makeSuccessResult();
+    result.footerMessage = kFlushSuccessFooterMessage;
+    result.footerSeverity = kFooterSeverityInfo;
+    return result;
 }
 
 MutatorActionResult PatchMutatorEngine::resetSessionForPatchLoad()

@@ -1401,10 +1401,11 @@ namespace PluginDisplayNames
             }
 
             // Footer + dialog copy for the session-load / Compare features. English only.
+            // Sticky footers use "Patch Mutator: " prefix; dialog-only strings stay unprefixed.
             namespace Messages
             {
                 constexpr const char* kCompareLockedFooter =
-                    "Compare mode - editing and patch/bank changes are locked. "
+                    "Patch Mutator: Compare mode - editing and patch/bank changes are locked. "
                     "Click C again to exit.";
 
                 constexpr const char* kHistoryGateTitle = "Unsaved mutations";
@@ -1422,13 +1423,16 @@ namespace PluginDisplayNames
                 constexpr const char* kExportCollisionKeep = "Keep both";
                 constexpr const char* kExportCollisionCancel = "Cancel";
 
-                constexpr const char* kExportCancelledFooter = "Export cancelled.";
+                constexpr const char* kExportCancelledFooter = "Patch Mutator: Export cancelled.";
+
+                // Stem for Export success sticky + FooterPanel path-style middle truncate.
+                constexpr const char* kExportCompleteFooterStem = "Patch Mutator: Exported ";
 
                 constexpr const char* kDeviceDumpFailedFooter =
-                    "Could not read the patch from the synth. Keeping the current editor buffer. "
+                    "Patch Mutator: Could not read the patch from the synth. Keeping the current editor buffer. "
                     "Check that MIDI FROM is the synth MIDI OUT.";
                 constexpr const char* kDeviceDumpAbortedEditedFooter =
-                    "Synth patch load cancelled because the editor changed while waiting. "
+                    "Patch Mutator: Synth patch load cancelled because the editor changed while waiting. "
                     "Bank and patch numbers were restored; your edits were kept.";
             }
         }

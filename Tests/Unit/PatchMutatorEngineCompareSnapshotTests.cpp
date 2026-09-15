@@ -12,8 +12,11 @@ public:
         mutate_firstRoot_capturesInitialSnapshot();
         mutate_secondRoot_doesNotOverwriteInitialSnapshot();
         compare_emptyHistory_blocked();
+        compare_noInitialSnapshot_blocked();
         compare_enter_auditionsInitialSnapshot();
         compare_enter_setsCompareActive();
+        compare_exit_clearsLockedFooterExactMatch();
+        compare_exit_leavesUnrelatedFooter();
         compare_exit_restoresSelection();
         compare_exit_auditionsRestoredEntry();
         compare_auditionBlockedWhileActive();
@@ -75,8 +78,29 @@ private:
 
         const auto result = harness.engine.toggleCompare();
         expect(! result.success);
+        expectEquals(result.footerMessage, juce::String("Patch Mutator: Mutation history is empty."));
         expect(! static_cast<bool>(harness.proc.apvts.state.getProperty(MutatorState::kCompareActive, false)));
         expectEquals(countPatchSysExMessages(harness.queue), 0);
+    }
+
+    void compare_noInitialSnapshot_blocked()
+    {
+        beginTest("compare_noInitialSnapshot_blocked");
+
+        EngineHarness harness;
+
+        auto m00 = makeDistinctBuffer(815);
+        auto m00Parent = makeDistinctBuffer(816);
+        Core::MutationNaming::applyPatchName(m00, 0);
+        expect(harness.store().insertRoot(0, m00, m00Parent));
+        harness.proc.apvts.state.setProperty(MutatorState::kSelectedMutateRootIndex, 0, nullptr);
+
+        const auto result = harness.engine.toggleCompare();
+        expect(! result.success);
+        expectEquals(result.footerMessage,
+                     juce::String("Patch Mutator: No initial patch snapshot available for compare."));
+        expectEquals(result.footerSeverity, juce::String("warning"));
+        expect(! static_cast<bool>(harness.proc.apvts.state.getProperty(MutatorState::kCompareActive, false)));
     }
 
     void compare_enter_auditionsInitialSnapshot()
@@ -110,6 +134,49 @@ private:
         const auto result = harness.engine.toggleCompare();
         expect(result.success);
         expect(static_cast<bool>(harness.proc.apvts.state.getProperty(MutatorState::kCompareActive, false)));
+        expectEquals(result.footerMessage,
+                     juce::String(PluginDisplayNames::PatchManagerSection::PatchMutatorModule::Messages::kCompareLockedFooter));
+        expectEquals(result.footerSeverity, juce::String("info"));
+    }
+
+    void compare_exit_clearsLockedFooterExactMatch()
+    {
+        beginTest("compare_exit_clearsLockedFooterExactMatch");
+
+        namespace MutatorMessages = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::Messages;
+
+        EngineHarness harness;
+        harness.setRecipe(100, 100, true);
+        expect(harness.engine.mutate().success);
+        expect(harness.engine.toggleCompare().success);
+
+        harness.proc.apvts.state.setProperty("uiMessageText",
+                                             juce::String(MutatorMessages::kCompareLockedFooter),
+                                             nullptr);
+        harness.proc.apvts.state.setProperty("uiMessageSeverity", "info", nullptr);
+
+        expect(harness.engine.toggleCompare().success);
+        expect(harness.proc.apvts.state.getProperty("uiMessageText").toString().isEmpty());
+        expect(harness.proc.apvts.state.getProperty("uiMessageSeverity").toString().isEmpty());
+    }
+
+    void compare_exit_leavesUnrelatedFooter()
+    {
+        beginTest("compare_exit_leavesUnrelatedFooter");
+
+        EngineHarness harness;
+        harness.setRecipe(100, 100, true);
+        expect(harness.engine.mutate().success);
+        expect(harness.engine.toggleCompare().success);
+
+        harness.proc.apvts.state.setProperty("uiMessageText", "Unrelated sticky", nullptr);
+        harness.proc.apvts.state.setProperty("uiMessageSeverity", "warning", nullptr);
+
+        expect(harness.engine.toggleCompare().success);
+        expectEquals(harness.proc.apvts.state.getProperty("uiMessageText").toString(),
+                     juce::String("Unrelated sticky"));
+        expectEquals(harness.proc.apvts.state.getProperty("uiMessageSeverity").toString(),
+                     juce::String("warning"));
     }
 
     void compare_exit_restoresSelection()

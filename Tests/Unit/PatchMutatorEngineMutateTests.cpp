@@ -79,6 +79,9 @@ private:
         const auto result = harness.engine.mutate();
         expect(! result.success);
         expect(result.defragModalRequested);
+        expectEquals(result.footerMessage,
+                     juce::String("Patch Mutator: Mutation history is full. Defrag to continue."));
+        expectEquals(result.footerSeverity, juce::String("warning"));
     }
 
     // Legacy Amount / Random may still sit in a restored session; MODE owns the curve inputs.
@@ -105,7 +108,7 @@ private:
 
         const auto result = harness.engine.mutate();
         expect(! result.success);
-        expectEquals(result.footerMessage, juce::String("Enable at least one module to mutate."));
+        expectEquals(result.footerMessage, juce::String("Patch Mutator: Enable at least one module to mutate."));
         expectEquals(harness.engine.rootCount(), 0);
         expectEquals(countPatchSysExMessages(harness.queue), 0);
     }

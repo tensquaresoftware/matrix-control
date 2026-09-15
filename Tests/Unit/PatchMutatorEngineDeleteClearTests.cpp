@@ -21,6 +21,7 @@ public:
         delete_whileCompareActive_noStaleRestore();
         delete_syncsApvtsAfterSuccess();
         clear_purgesHistory_emptySentinel();
+        clear_emptyHistory_blocked();
         clear_disablesCompare();
         clear_auditionsInitialSnapshot();
         clear_keepsInitialSnapshot();
@@ -35,7 +36,7 @@ private:
 
         const auto result = harness.engine.deleteSelected();
         expect(! result.success);
-        expectEquals(result.footerMessage, juce::String("Mutation history is empty."));
+        expectEquals(result.footerMessage, juce::String("Patch Mutator: Mutation history is empty."));
         expectEquals(result.footerSeverity, juce::String("warning"));
         expectEquals(countPatchSysExMessages(harness.queue), 0);
     }
@@ -55,7 +56,8 @@ private:
 
         const auto result = harness.engine.deleteSelected();
         expect(! result.success);
-        expectEquals(result.footerMessage, juce::String("No valid mutation history entry selected."));
+        expectEquals(result.footerMessage,
+                     juce::String("Patch Mutator: No valid mutation history entry selected."));
         expectEquals(result.footerSeverity, juce::String("warning"));
         expectEquals(countPatchSysExMessages(harness.queue), 0);
     }
@@ -82,7 +84,10 @@ private:
         harness.proc.apvts.state.setProperty(MutatorState::kSelectedMutateRootIndex, 0, nullptr);
         harness.proc.apvts.state.setProperty(MutatorState::kSelectedRetryIndex, 2, nullptr);
 
-        expect(harness.engine.deleteSelected().success);
+        const auto result = harness.engine.deleteSelected();
+        expect(result.success);
+        expectEquals(result.footerMessage, juce::String("Patch Mutator: Deleted M00-R02."));
+        expectEquals(result.footerSeverity, juce::String("info"));
         expect(! harness.store().hasRetry(0, 2));
         expect(harness.store().hasRetry(0, 0));
         expect(! harness.store().hasRetry(0, 1));
@@ -114,7 +119,7 @@ private:
 
         const auto result = harness.engine.deleteSelected();
         expect(result.success);
-        expect(result.footerMessage.isNotEmpty());
+        expectEquals(result.footerMessage, juce::String("Patch Mutator: Deleted M05 and all retries."));
         expectEquals(result.footerSeverity, juce::String("info"));
         expect(! harness.store().hasRoot(5));
         expectEquals(harness.store().retryCount(5), 0);
@@ -344,11 +349,26 @@ private:
 
         harness.proc.apvts.state.setProperty(MutatorState::kSelectedMutateRootIndex, 0, nullptr);
 
-        expect(harness.engine.clearHistory().success);
+        const auto result = harness.engine.clearHistory();
+        expect(result.success);
+        expectEquals(result.footerMessage, juce::String("Patch Mutator: Mutation history flushed."));
+        expectEquals(result.footerSeverity, juce::String("info"));
         expectEquals(harness.store().rootCount(), 0);
         expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedMutateRootIndex)), -1);
         expect(harness.proc.apvts.state.getProperty(MutatorState::kHistoryMutateList).toString().isEmpty());
         expect(harness.proc.apvts.state.getProperty(MutatorState::kHistoryRetryList).toString().isEmpty());
+    }
+
+    void clear_emptyHistory_blocked()
+    {
+        beginTest("clear_emptyHistory_blocked");
+
+        EngineHarness harness;
+
+        const auto result = harness.engine.clearHistory();
+        expect(! result.success);
+        expectEquals(result.footerMessage, juce::String("Patch Mutator: Mutation history is empty."));
+        expectEquals(result.footerSeverity, juce::String("warning"));
     }
 
     void clear_disablesCompare()

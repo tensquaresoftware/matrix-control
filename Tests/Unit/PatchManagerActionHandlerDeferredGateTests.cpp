@@ -45,7 +45,8 @@ private:
             harness.mapper, harness.patchNameSyncer, harness.model));
         expect(! harness.patchLoadHookState->invoked);
         expect(harness.proc.apvts.state.getProperty("uiMessageSeverity").toString() == "warning");
-        expect(harness.proc.apvts.state.getProperty("uiMessageText").toString().contains("Could not read"));
+        expectEquals(harness.proc.apvts.state.getProperty("uiMessageText").toString(),
+                     juce::String(PluginDisplayNames::PatchManagerSection::PatchMutatorModule::Messages::kDeviceDumpFailedFooter));
         expect(harness.model.getName() == "DIRTY!!!");
     }
 
@@ -103,7 +104,8 @@ private:
         expect(harness.dirtyPatchTracker.syncApvtsAndIsDirty(
             harness.mapper, harness.patchNameSyncer, harness.model));
         expect(! harness.patchLoadHookState->invoked);
-        expect(harness.proc.apvts.state.getProperty("uiMessageText").toString().contains("cancelled"));
+        expectEquals(harness.proc.apvts.state.getProperty("uiMessageText").toString(),
+                     juce::String(PluginDisplayNames::PatchManagerSection::PatchMutatorModule::Messages::kDeviceDumpAbortedEditedFooter));
     }
 
     void testUnsavedGate_bootstrapCancelBeforeFirstCommit()
