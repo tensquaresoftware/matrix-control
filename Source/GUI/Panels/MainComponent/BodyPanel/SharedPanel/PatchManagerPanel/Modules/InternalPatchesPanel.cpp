@@ -5,6 +5,7 @@
 #include "Core/Services/DeviceMemoryLimits.h"
 #include "Core/Services/DeviceTypeRegistry.h"
 #include "GUI/Helpers/ClipboardFeedbackButtonBinding.h"
+#include "GUI/Helpers/ContextualHelpBindingSupport.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Looks/LookBuilders.h"
@@ -14,6 +15,7 @@
 #include "GUI/Widgets/NumberBox.h"
 #include "Shared/Definitions/Matrix1000Limits.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
+#include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginIDs.h"
 #include "GUI/Factories/WidgetFactory.h"
 #include <juce_core/juce_core.h>
@@ -115,7 +117,28 @@ InternalPatchesPanel::InternalPatchesPanel(TSS::ISkin& skin, const InternalPatch
     if (storePatchButton_)
         storePatchButton_->addMouseListener(this, false);
 
+    registerContextualHelp();
     setSize(dims_.width, dims_.height);
+}
+
+void InternalPatchesPanel::registerContextualHelp()
+{
+    namespace Help = PluginDisplayNames::PatchManagerSection::InternalPatchesModule::ContextualHelp;
+
+    contextualHelpBinder_ = std::make_unique<TSS::ContextualHelpBinder>(
+        TSS::makeMainComponentFooterResolver(*this));
+
+    contextualHelpBinder_->bind(moduleHeader.get(), Help::kTitle);
+    contextualHelpBinder_->bind(browserGroupLabel.get(), Help::kBrowser);
+    contextualHelpBinder_->bind(memoryGroupLabel.get(), Help::kMemory);
+    contextualHelpBinder_->bind(loadPreviousPatchButton_.get(), Help::kPrevious);
+    contextualHelpBinder_->bind(loadNextPatchButton_.get(), Help::kNext);
+    contextualHelpBinder_->bind(currentBankNumber.get(), Help::kCurrentBank);
+    contextualHelpBinder_->bind(currentPatchNumber.get(), Help::kCurrentPatch);
+    contextualHelpBinder_->bind(initPatchButton_.get(), Help::kInit);
+    contextualHelpBinder_->bind(copyPatchButton_.get(), Help::kCopy);
+    contextualHelpBinder_->bind(pastePatchButton_.get(), Help::kPaste);
+    contextualHelpBinder_->bind(storePatchButton_.get(), Help::kStore);
 }
 
 InternalPatchesPanel::~InternalPatchesPanel()

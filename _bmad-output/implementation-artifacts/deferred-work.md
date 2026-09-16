@@ -1,5 +1,25 @@
 # Deferred Work
 
+## Deferred from: spec-gui-wide-footer-contextual-help.md (2026-09-16)
+
+- **Project-popup defer unit coverage** — `shouldDeferContextualHelpClearForProjectPopup` / `HeaderLogoPopupMenu` type recognition not unit-tested (only Mutator bool helper).
+- **Rename `shouldDeferContextualHelpClearForMutatorPopup`** — public helper name is Mutator-era; call sites now mean any project popup.
+- **Shared FocusChangeListener / binder consolidation** — each panel binder registers a global focus listener; optional single dispatcher later.
+- **`setHostShowingPredicate` beyond Mutator** — other hideable tabs do not gate HELP on visibility.
+- **Optional HELP targets not in frozen Desktop inventory** — Bank Utility module header; Ramp/Portamento Master Override badge; Settings non-shortcut row labels.
+- **`bindParameterCellHelps` length assert** — silent skip if cell count drifts from help array.
+- **MatrixModulation / Mutator comment hygiene** — leftover include / duplicate ContextualHelp block comment.
+
+## Deferred from: code review of spec-gui-wide-footer-contextual-help.md (2026-09-16)
+
+- **Project-popup defer unit coverage** — reconfirmed; still only Mutator bool helper in tests.
+- **Rename Mutator-era popup defer helper** — reconfirmed.
+- **Shared FocusChangeListener / multi-binder consolidation** — reconfirmed; out of scope for this review pass.
+- **`setHostShowingPredicate` on hideable Patch Manager tabs** — reconfirmed (Settings/About tracked separately as patch in Review Findings).
+- **Optional HELP targets outside Desktop inventory** — reconfirmed.
+- **`bindParameterCellHelps` length assert** — reconfirmed.
+- **Mutator ContextualHelp duplicate banner comment** — reconfirmed.
+
 ## Deferred from: spec-unison-matrix-1000.md (2026-09-11)
 
 - **Global GUI↔SysEx combo encoding audit** — Keyboard Mode choice order was fixed for param 48; a full audit of all GUI combo indices vs packed SysEx encodings remains out of scope for this delivery.

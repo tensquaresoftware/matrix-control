@@ -9,6 +9,7 @@
 #include "GUI/Widgets/HorizontalSeparator.h"
 #include "GUI/Widgets/Label.h"
 #include "GUI/Widgets/Slider.h"
+#include "GUI/Helpers/ContextualHelpBinder.h"
 
 namespace TSS
 {
@@ -33,6 +34,8 @@ public:
     void setSkin(TSS::ISkin& skin);
     void setUiScale(float uiScale);
     void setPluginMode(bool isPluginMode);
+
+    void registerContextualHelp(TSS::ContextualHelpBinder::FooterResolver resolveFooter);
 
     TSS::Slider& getHardwareLatencySlider() { return *hardwareLatencySlider_; }
     TSS::ComboBox& getMatrix1000PatchesCombo() { return *matrix1000PatchesCombo_; }
@@ -189,6 +192,8 @@ private:
     std::unique_ptr<TSS::Label> uiScaleShortcutValue_;
     std::unique_ptr<TSS::Label> skinShortcutLabel_;
     std::unique_ptr<TSS::Label> skinShortcutValue_;
+
+    std::unique_ptr<TSS::ContextualHelpBinder> contextualHelpBinder_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SettingsPanel)
 };

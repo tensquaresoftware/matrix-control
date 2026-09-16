@@ -7,6 +7,7 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 
 #include "GUI/Layout/PanelDimensions.h"
+#include "GUI/Helpers/ContextualHelpBinder.h"
 
 namespace TSS
 {
@@ -20,12 +21,10 @@ namespace TSS
 }
 
 class WidgetFactory;
-class FooterPanel;
 
 class PatchMutatorPanel : public juce::Component,
                           public juce::ValueTree::Listener,
-                          private juce::Timer,
-                          private juce::FocusChangeListener
+                          private juce::Timer
 {
 public:
     PatchMutatorPanel(TSS::ISkin& skin, const PatchMutatorPanelDimensions& dims, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
@@ -45,9 +44,6 @@ public:
     void valueTreeChildOrderChanged(juce::ValueTree&, int, int) override {}
     void valueTreeParentChanged(juce::ValueTree&) override {}
     void valueTreeRedirected(juce::ValueTree&) override;
-
-    void mouseEnter(const juce::MouseEvent& event) override;
-    void mouseExit(const juce::MouseEvent& event) override;
 
 private:
     class ActionEnabledPropertyListener;
@@ -102,6 +98,7 @@ private:
 
     std::unique_ptr<ActionEnabledPropertyListener> actionEnabledListener_;
     std::unique_ptr<WaveSelectParameterListener> waveSelectParameterListener_;
+    std::unique_ptr<TSS::ContextualHelpBinder> contextualHelpBinder_;
 
     juce::Array<int> mutateRootIndices_;
     juce::Array<int> retryIndices_;
@@ -113,8 +110,6 @@ private:
     bool historyComboRefreshScheduled_ = false;
     bool historyInitialRowPresent_ = false;
     bool compareBlinkVisible_ = true;
-    int contextualHelpClearGeneration_ = 0;
-    std::map<juce::Component*, const char*> contextualHelpByControl_;
 
     // History / recipe / compare (PatchMutatorPanelHistory.cpp).
     void scheduleHistoryComboBoxRefresh();
@@ -153,15 +148,7 @@ private:
     void connectToggleToApvts(TSS::Toggle* toggle, const char* widgetId);
 
     // Contextual help (PatchMutatorPanelContextualHelp.cpp).
-    void registerContextualHelpBindings();
-    void unregisterContextualHelpBindings();
-    void showContextualHelpFor(juce::Component* control);
-    void scheduleContextualHelpClear();
-    void applyContextualHelpClearIfIdle(int generation);
-    const char* helpTextForControl(juce::Component* control) const;
-    juce::Component* resolveActiveContextualHelpControl() const;
-    FooterPanel* resolveFooterPanel() const;
-    void globalFocusChanged(juce::Component* focusedComponent) override;
+    void registerContextualHelp();
 
     // Layout / skin (PatchMutatorPanelLayout.cpp).
     void propagateSkinsToControlWidgets(TSS::ISkin& skin);

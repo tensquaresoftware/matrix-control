@@ -5,6 +5,7 @@
 #include "PopupMenuRenderer.h"
 #include "ComboBox.h"
 
+#include "GUI/Helpers/ContextualHelpBinder.h"
 #include "GUI/Helpers/EditorChromeShortcuts.h"
 #include "GUI/Layout/ScaledDrawing.h"
 #include "GUI/Layout/Design/DesignPanels.h"
@@ -24,6 +25,7 @@ namespace TSS
         , onAudioMidiSettingsRequested_(std::move(config.onAudioMidiSettingsRequested))
         , onSettingsRequested_(std::move(config.onSettingsRequested))
         , onAboutRequested_(std::move(config.onAboutRequested))
+        , contextualHelpBinder_(config.contextualHelpBinder)
         , showAudioMidiDevices_(onAudioMidiSettingsRequested_ != nullptr)
         , look_(popupMenuLookFromSkin(skin))
         , renderer_(std::make_unique<PopupMenuRenderer>(true, uiScale_))
@@ -203,6 +205,46 @@ namespace TSS
         repaint();
     }
 
+    const char* HeaderLogoPopupMenu::contextualHelpTextForItem(int flatIndex) const
+    {
+        if (! juce::isPositiveAndBelow(flatIndex, static_cast<int>(items_.size())))
+            return nullptr;
+
+        namespace Help = PluginDisplayNames::HeaderPanel::ContextualHelp;
+        switch (items_[static_cast<size_t>(flatIndex)].kind)
+        {
+            case ItemKind::Settings:         return Help::kSettings;
+            case ItemKind::AudioMidiDevices: return Help::kAudioMidi;
+            case ItemKind::About:            return Help::kAbout;
+            case ItemKind::Skin:             return Help::kSkin;
+            case ItemKind::UiScale:          return Help::kUiScale;
+            case ItemKind::SectionHeader:
+                if (items_[static_cast<size_t>(flatIndex)].text
+                    == PluginDisplayNames::HeaderPanel::kLogoSkinSection)
+                    return Help::kSkin;
+                if (items_[static_cast<size_t>(flatIndex)].text
+                    == PluginDisplayNames::HeaderPanel::kLogoUiScaleSection)
+                    return Help::kUiScale;
+                return nullptr;
+            case ItemKind::Spacer:
+            case ItemKind::HorizontalRule:
+                return nullptr;
+        }
+
+        return nullptr;
+    }
+
+    void HeaderLogoPopupMenu::updateContextualHelpForItem(int flatIndex)
+    {
+        if (contextualHelpBinder_ == nullptr)
+            return;
+
+        if (const auto* helpText = contextualHelpTextForItem(flatIndex))
+            contextualHelpBinder_->showHelpText(helpText);
+        else
+            contextualHelpBinder_->scheduleClear();
+    }
+
     void HeaderLogoPopupMenu::selectItem(int flatIndex)
     {
         if (! isSelectableItem(flatIndex))
@@ -240,11 +282,19 @@ namespace TSS
 
     void HeaderLogoPopupMenu::closePopup()
     {
+        if (contextualHelpBinder_ != nullptr)
+            contextualHelpBinder_->scheduleClear();
+
         if (auto* modal = getCurrentlyModalComponent())
         {
             if (modal == this)
                 exitModalState(0);
         }
+    }
+
+    void HeaderLogoPopupMenu::detachContextualHelpBinder()
+    {
+        contextualHelpBinder_ = nullptr;
     }
 
     void HeaderLogoPopupMenu::drawItems(juce::Graphics& g, const juce::Rectangle<float>& contentBounds)
@@ -332,7 +382,9 @@ namespace TSS
 
     void HeaderLogoPopupMenu::mouseMove(const juce::MouseEvent& e)
     {
-        updateHighlightedItem(getFlatIndexAt(e.getPosition().x, e.getPosition().y));
+        const int flatIndex = getFlatIndexAt(e.getPosition().x, e.getPosition().y);
+        updateHighlightedItem(flatIndex);
+        updateContextualHelpForItem(flatIndex);
     }
 
     void HeaderLogoPopupMenu::mouseUp(const juce::MouseEvent& e)
@@ -345,6 +397,7 @@ namespace TSS
     void HeaderLogoPopupMenu::mouseExit(const juce::MouseEvent&)
     {
         updateHighlightedItem(-1);
+        updateContextualHelpForItem(-1);
     }
 
     bool HeaderLogoPopupMenu::keyPressed(const juce::KeyPress& key)

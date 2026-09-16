@@ -22,16 +22,12 @@ namespace
     const juce::Identifier kDeviceMidiUnresponsiveId(Core::kDeviceMidiUnresponsiveProperty);
 }
 
-MainComponent::MainComponent(TSS::Skin& skin,
-                             const GuiLayoutDimensions& layoutDimensions,
-                             WidgetFactory& widgetFactory,
-                             juce::AudioProcessorValueTreeState& apvts,
-                             const Core::PatchFileService& patchFileService)
-    : skin_(&skin)
-    , layoutDimensions_(layoutDimensions)
-    , headerPanel(skin, layoutDimensions_.header)
-    , bodyPanel(skin, layoutDimensions_, widgetFactory, apvts, patchFileService)
-    , footerPanel(skin, layoutDimensions_.footer, apvts)
+MainComponent::MainComponent(const MainComponentConstructionArgs& args)
+    : skin_(&args.skin)
+    , layoutDimensions_(args.layoutDimensions)
+    , footerPanel(args.skin, layoutDimensions_.footer, args.apvts)
+    , headerPanel(args.skin, layoutDimensions_.header)
+    , bodyPanel(args.skin, layoutDimensions_, args.widgetFactory, args.apvts, args.patchFileService)
 {
     setOpaque(true);
     setSize(layoutDimensions_.editor.width, layoutDimensions_.editor.height);

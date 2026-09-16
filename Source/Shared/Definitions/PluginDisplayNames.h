@@ -29,6 +29,48 @@ namespace PluginDisplayNames
         constexpr const char* kPanic               = "PANIC";
         constexpr const char* kUndo                = "UNDO";
         constexpr const char* kRedo                = "REDO";
+
+        namespace ContextualHelp
+        {
+            constexpr const char* kMidiFrom =
+                "SESSION: Selects the MIDI input that receives SysEx and notes from the synthesizer.";
+            constexpr const char* kMidiTo =
+                "SESSION: Selects the MIDI output that sends edits and notes to the synthesizer.";
+            constexpr const char* kKeyboardFrom =
+                "SESSION: Selects a separate MIDI keyboard input for playing (Standalone application only).";
+            constexpr const char* kHost =
+                "SESSION: Keyboard MIDI comes from the DAW host (Plugin only).";
+            constexpr const char* kAudioFrom =
+                "SESSION: Selects the audio input used for monitoring through the plugin.";
+            constexpr const char* kInputGain =
+                "SESSION: Sets monitoring level for the selected audio input.";
+            constexpr const char* kUndo =
+                "SESSION: Undoes the last Patch or master edit in this session.";
+            constexpr const char* kRedo =
+                "SESSION: Redoes the last undone edit.";
+            constexpr const char* kPanic =
+                "SESSION: Sends MIDI panic to clear stuck notes and ease a backed-up send queue.";
+            constexpr const char* kLogo =
+                "SESSION: Opens the logo menu for Settings, Audio/MIDI, About, Skin, and UI Scale.";
+            constexpr const char* kSettings =
+                "SESSION: Opens plugin Settings (paths, warnings, master utility, shortcuts).";
+            constexpr const char* kAudioMidi =
+                "SESSION: Opens the host Audio/MIDI device settings (Standalone application only).";
+            constexpr const char* kAbout =
+                "SESSION: Shows product version, links, and credits.";
+            constexpr const char* kSkin =
+                "SESSION: Chooses the visual skin for the editor.";
+            constexpr const char* kUiScale =
+                "SESSION: Sets the user interface scale.";
+            constexpr const char* kKeyboardFromActivityLed =
+                "SESSION: Lights when MIDI activity arrives on Keyboard From or Host.";
+            constexpr const char* kMidiFromActivityLed =
+                "SESSION: Lights when MIDI activity arrives from the synthesizer on MIDI From.";
+            constexpr const char* kMidiToActivityLed =
+                "SESSION: Lights when MIDI activity is sent to the synthesizer on MIDI To.";
+            constexpr const char* kAudioPeakIndicator =
+                "SESSION: Shows the peak level of the monitored audio input.";
+        }
     }
 
     namespace FooterPanel
@@ -49,6 +91,12 @@ namespace PluginDisplayNames
             "Send queue backed up - click PANIC to clear stuck notes.";
 
         constexpr const char* kContextualHelpBadge = "HELP";
+
+        namespace ContextualHelp
+        {
+            constexpr const char* kDevice =
+                "DEVICE: Shows the connected synthesizer model and EPROM version, or connection status.";
+        }
 
         // Left-zone guidance while FR-2 device lock is active (D-038 — footer only, no modal).
         constexpr const char* kDeviceLockGuidance =
@@ -87,6 +135,16 @@ namespace PluginDisplayNames
         constexpr const char* kLinkedInUrl           = "https://www.linkedin.com/in/guillaumedupontmontpellier/";
         constexpr const char* kVersionLabel          = "Version";
         constexpr const char* kReleaseDateLabel      = "Release date";
+
+        namespace ContextualHelp
+        {
+            constexpr const char* kEmail =
+                "ABOUT: Opens email to Ten Square Software.";
+            constexpr const char* kGitHub =
+                "ABOUT: Opens the Matrix-Control GitHub repository.";
+            constexpr const char* kLinkedIn =
+                "ABOUT: Opens the author LinkedIn profile.";
+        }
     }
 
     namespace Settings
@@ -148,6 +206,45 @@ namespace PluginDisplayNames
             constexpr const char* kRenameBeforeSave =
                 "Rename patch (replace * INIT *) before SAVE / SAVE AS";
         }
+
+        namespace ContextualHelp
+        {
+            constexpr const char* kMatrix1000Patches =
+                "SETTINGS: Chooses how Matrix-1000 patch names are displayed.";
+            constexpr const char* kComputerPatches =
+                "SETTINGS: Chooses how computer .syx patch names are displayed.";
+            constexpr const char* kUnsavedState =
+                "SETTINGS: Chooses when to warn about unsaved patch changes.";
+            constexpr const char* kPatchSaveAsInit =
+                "SETTINGS: Saves the current patch as the patch init template.";
+            constexpr const char* kPatchDeleteInit =
+                "SETTINGS: Deletes the saved patch init template.";
+            constexpr const char* kDeleteWarning =
+                "SETTINGS: Chooses when Patch Mutator delete asks for confirmation.";
+            constexpr const char* kDefragHistory =
+                "SETTINGS: Coming soon - renumber mutation history when full.";
+            constexpr const char* kHardwareLatency =
+                "SETTINGS: Sets inter-SysEx delay for reliable hardware transfers (plugin).";
+            constexpr const char* kMasterLoad =
+                "SETTINGS: Loads a Master settings file into the editor.";
+            constexpr const char* kMasterSaveAs =
+                "SETTINGS: Saves current Master settings as a new file.";
+            constexpr const char* kMasterInit =
+                "SETTINGS: Resets Master settings to the master init template.";
+            constexpr const char* kMasterSaveAsInit =
+                "SETTINGS: Saves current Master settings as the master init template.";
+            constexpr const char* kMasterDeleteInit =
+                "SETTINGS: Deletes the saved master init template.";
+            constexpr const char* kSettingsShortcut =
+                "SETTINGS: Shows the keyboard shortcut that opens Settings.";
+            constexpr const char* kAudioMidiShortcut =
+                "SETTINGS: Shows the keyboard shortcut that opens Audio/MIDI.";
+            constexpr const char* kUiScaleShortcut =
+                "SETTINGS: Shows the keyboard shortcut cycle for UI Scale.";
+            constexpr const char* kSkinShortcut =
+                "SETTINGS: Shows the keyboard shortcut cycle for Skin.";
+        }
+
     }
 
     namespace Dialogs
@@ -701,6 +798,28 @@ namespace PluginDisplayNames
                 constexpr const char* kLever2Select = "LEVER 2 SELECT";
                 constexpr const char* kLever3Select = "LEVER 3 SELECT";
             }
+
+            namespace ContextualHelp
+            {
+                constexpr const char* kInit =
+                    "MIDI: Resets this module to its init values.";
+                constexpr const char* kChannel =
+                    "MIDI: Sets the synthesizer MIDI channel.";
+                constexpr const char* kMidiEcho =
+                    "MIDI: Echoes incoming MIDI back out when enabled.";
+                constexpr const char* kControllers =
+                    "MIDI: Enables or disables MIDI controller reception.";
+                constexpr const char* kPatchChanges =
+                    "MIDI: Enables or disables MIDI program changes.";
+                constexpr const char* kPedal1Select =
+                    "MIDI: Assigns the function for pedal 1.";
+                constexpr const char* kPedal2Select =
+                    "MIDI: Assigns the function for pedal 2.";
+                constexpr const char* kLever2Select =
+                    "MIDI: Assigns the function for lever 2.";
+                constexpr const char* kLever3Select =
+                    "MIDI: Assigns the function for lever 3.";
+            }
         }
 
         namespace VibratoModule
@@ -722,6 +841,26 @@ namespace PluginDisplayNames
                 constexpr const char* kAmpModSource   = "AMP MOD SOURCE";
                 constexpr const char* kAmpModAmount   = "AMP MOD AMOUNT";
             }
+
+            namespace ContextualHelp
+            {
+                constexpr const char* kInit =
+                    "VIBRATO: Resets this module to its init values.";
+                constexpr const char* kSpeed =
+                    "VIBRATO: Sets global vibrato rate.";
+                constexpr const char* kWaveform =
+                    "VIBRATO: Chooses the vibrato waveform.";
+                constexpr const char* kAmplitude =
+                    "VIBRATO: Sets global vibrato depth.";
+                constexpr const char* kSpeedModSource =
+                    "VIBRATO: Selects what modulates vibrato speed.";
+                constexpr const char* kSpeedModAmount =
+                    "VIBRATO: How much the speed mod source affects vibrato rate.";
+                constexpr const char* kAmpModSource =
+                    "VIBRATO: Selects what modulates vibrato depth.";
+                constexpr const char* kAmpModAmount =
+                    "VIBRATO: How much the amp mod source affects vibrato depth.";
+            }
         }
 
         namespace MiscModule
@@ -742,6 +881,26 @@ namespace PluginDisplayNames
                 constexpr const char* kVolumeInvertEnable  = "VOLUME INVERT";
                 constexpr const char* kBankLockEnable      = "BANK LOCK";
                 constexpr const char* kMemoryProtectEnable = "MEMORY PROTECT";
+            }
+
+            namespace ContextualHelp
+            {
+                constexpr const char* kInit =
+                    "MISC: Resets this module to its init values.";
+                constexpr const char* kMasterTune =
+                    "MISC: Fine-tunes overall instrument pitch.";
+                constexpr const char* kMasterTranspose =
+                    "MISC: Transposes the instrument in semitones.";
+                constexpr const char* kBendRange =
+                    "MISC: Sets pitch-bend range in semitones up and down.";
+                constexpr const char* kUnison =
+                    "MISC: Enables Master Unison (can override Patch keyboard mode).";
+                constexpr const char* kVolumeInvert =
+                    "MISC: Inverts volume pedal response when enabled.";
+                constexpr const char* kBankLock =
+                    "MISC: Locks bank changes on the hardware.";
+                constexpr const char* kMemoryProtect =
+                    "MISC: Protects synth memory from being overwritten.";
             }
         }
     }
@@ -774,6 +933,36 @@ namespace PluginDisplayNames
                 constexpr const char* kKeyboardPortamento  = "KEYBD/PORTA";
                 constexpr const char* kKeyClick            = "KEY CLICK";
             }
+
+            namespace ContextualHelp
+            {
+                constexpr const char* kInit =
+                    "DCO 1: Resets this module to its init values.";
+                constexpr const char* kCopy =
+                    "DCO 1: Copies this module to the clipboard.";
+                constexpr const char* kPaste =
+                    "DCO 1: Pastes compatible clipboard data into this module.";
+                constexpr const char* kFrequency =
+                    "DCO 1: Sets DCO 1 pitch in semitones.";
+                constexpr const char* kFrequencyModByLfo1 =
+                    "DCO 1: How much LFO 1 modulates DCO 1 frequency.";
+                constexpr const char* kSync =
+                    "DCO 1: Hard-syncs DCO 1 to DCO 2 when enabled.";
+                constexpr const char* kPulseWidth =
+                    "DCO 1: Sets pulse width for pulse / combination waves.";
+                constexpr const char* kPulseWidthModByLfo2 =
+                    "DCO 1: How much LFO 2 modulates pulse width.";
+                constexpr const char* kWaveShape =
+                    "DCO 1: Mixes wave components for the selected wave family.";
+                constexpr const char* kWaveSelect =
+                    "DCO 1: Chooses the DCO 1 waveform family.";
+                constexpr const char* kLevers =
+                    "DCO 1: Enables lever modulation for this DCO.";
+                constexpr const char* kKeyboardPortamento =
+                    "DCO 1: Tracks keyboard / portamento for this DCO.";
+                constexpr const char* kKeyClick =
+                    "DCO 1: Adds a short click on key-on for this DCO.";
+            }
         }
 
         namespace Dco2Module
@@ -800,6 +989,36 @@ namespace PluginDisplayNames
                 constexpr const char* kKeyboardPortamento  = "KEYBD/PORTA";
                 constexpr const char* kKeyClick            = "KEY CLICK";
             }
+
+            namespace ContextualHelp
+            {
+                constexpr const char* kInit =
+                    "DCO 2: Resets this module to its init values.";
+                constexpr const char* kCopy =
+                    "DCO 2: Copies this module to the clipboard.";
+                constexpr const char* kPaste =
+                    "DCO 2: Pastes compatible clipboard data into this module.";
+                constexpr const char* kFrequency =
+                    "DCO 2: Sets DCO 2 pitch in semitones.";
+                constexpr const char* kFrequencyModByLfo1 =
+                    "DCO 2: How much LFO 1 modulates DCO 2 frequency.";
+                constexpr const char* kDetune =
+                    "DCO 2: Fine detune of DCO 2 relative to DCO 1.";
+                constexpr const char* kPulseWidth =
+                    "DCO 2: Sets pulse width for pulse / combination waves.";
+                constexpr const char* kPulseWidthModByLfo2 =
+                    "DCO 2: How much LFO 2 modulates pulse width.";
+                constexpr const char* kWaveShape =
+                    "DCO 2: Mixes wave components for the selected wave family.";
+                constexpr const char* kWaveSelect =
+                    "DCO 2: Chooses the DCO 2 waveform family (includes Noise).";
+                constexpr const char* kLevers =
+                    "DCO 2: Enables lever modulation for this DCO.";
+                constexpr const char* kKeyboardPortamento =
+                    "DCO 2: Tracks keyboard / portamento for this DCO.";
+                constexpr const char* kKeyClick =
+                    "DCO 2: Adds a short click on key-on for this DCO.";
+            }
         }
 
         namespace VcfVcaModule
@@ -824,6 +1043,32 @@ namespace PluginDisplayNames
                 constexpr const char* kLevers                 = "LEVERS";
                 constexpr const char* kKeyboardPortamento     = "KEYBD/PORTA";
             }
+
+            namespace ContextualHelp
+            {
+                constexpr const char* kInit =
+                    "VCF/VCA: Resets this module to its init values.";
+                constexpr const char* kBalance =
+                    "VCF/VCA: Balances DCO 1 and DCO 2 into the filter stage.";
+                constexpr const char* kFrequency =
+                    "VCF/VCA: Sets the filter cutoff frequency.";
+                constexpr const char* kFrequencyModByEnv1 =
+                    "VCF/VCA: How much ENV 1 modulates filter cutoff frequency.";
+                constexpr const char* kFrequencyModByPressure =
+                    "VCF/VCA: How much pressure modulates filter cutoff frequency.";
+                constexpr const char* kResonance =
+                    "VCF/VCA: Sets filter resonance (emphasis at cutoff frequency).";
+                constexpr const char* kVca1Volume =
+                    "VCF/VCA: Sets VCA 1 overall volume.";
+                constexpr const char* kVca1ModByVelocity =
+                    "VCF/VCA: How much velocity modulates VCA 1.";
+                constexpr const char* kVca2ModByEnv2 =
+                    "VCF/VCA: How much ENV 2 modulates VCA 2.";
+                constexpr const char* kLevers =
+                    "VCF/VCA: Enables lever modulation for filter / amplifier.";
+                constexpr const char* kKeyboardPortamento =
+                    "VCF/VCA: Tracks keyboard / portamento for the filter.";
+            }
         }
 
         namespace FmTrackModule
@@ -846,6 +1091,32 @@ namespace PluginDisplayNames
                 constexpr const char* kTrackPoint4     = "TRACK POINT 4";
                 constexpr const char* kTrackPoint5     = "TRACK POINT 5";
                 constexpr const char* kTrackInput      = "TRACK INPUT";
+            }
+
+            namespace ContextualHelp
+            {
+                constexpr const char* kInit =
+                    "FM/TRACK: Resets this module to its init values.";
+                constexpr const char* kFmAmount =
+                    "FM/TRACK: Sets FM amount into the VCF from DCO 2.";
+                constexpr const char* kFmModByEnv3 =
+                    "FM/TRACK: How much ENV 3 modulates FM amount.";
+                constexpr const char* kFmModByPressure =
+                    "FM/TRACK: How much pressure modulates FM amount.";
+                constexpr const char* kTrackPoint1 =
+                    "FM/TRACK: Sets Track Generator point 1 level.";
+                constexpr const char* kTrackPoint2 =
+                    "FM/TRACK: Sets Track Generator point 2 level.";
+                constexpr const char* kTrackPoint3 =
+                    "FM/TRACK: Sets Track Generator point 3 level.";
+                constexpr const char* kTrackPoint4 =
+                    "FM/TRACK: Sets Track Generator point 4 level.";
+                constexpr const char* kTrackPoint5 =
+                    "FM/TRACK: Sets Track Generator point 5 level.";
+                constexpr const char* kTrackInput =
+                    "FM/TRACK: Selects the source that drives the Track Generator.";
+                constexpr const char* kTrackGeneratorDisplay =
+                    "FM/TRACK: Drag the Track Generator curve points for tracking shape.";
             }
         }
 
@@ -876,6 +1147,30 @@ namespace PluginDisplayNames
                 constexpr const char* kPortamentoLegato        = "LEGATO PORTA";
                 constexpr const char* kPortamentoKeyboardMode  = "KEYBOARD MODE";
             }
+
+            namespace ContextualHelp
+            {
+                constexpr const char* kInit =
+                    "RAMP/PORTAMENTO: Resets this module to its init values.";
+                constexpr const char* kRamp1Rate =
+                    "RAMP/PORTAMENTO: Sets Ramp 1 rise time.";
+                constexpr const char* kRamp1Trigger =
+                    "RAMP/PORTAMENTO: Chooses what starts Ramp 1.";
+                constexpr const char* kRamp2Rate =
+                    "RAMP/PORTAMENTO: Sets Ramp 2 rise time.";
+                constexpr const char* kRamp2Trigger =
+                    "RAMP/PORTAMENTO: Chooses what starts Ramp 2.";
+                constexpr const char* kPortamentoRate =
+                    "RAMP/PORTAMENTO: Sets glide time between notes.";
+                constexpr const char* kPortamentoModByVelocity =
+                    "RAMP/PORTAMENTO: How much velocity scales portamento rate.";
+                constexpr const char* kPortamentoMode =
+                    "RAMP/PORTAMENTO: Chooses how portamento glides between notes.";
+                constexpr const char* kPortamentoLegato =
+                    "RAMP/PORTAMENTO: Enables legato-only portamento (Unison keyboard modes).";
+                constexpr const char* kPortamentoKeyboardMode =
+                    "RAMP/PORTAMENTO: Chooses poly / unison / related keyboard response.";
+            }
         }
 
         namespace Envelope1Module
@@ -901,6 +1196,38 @@ namespace PluginDisplayNames
                 constexpr const char* kTriggerMode            = "TRIGGER MODE";
                 constexpr const char* kEnvelopeMode           = "ENVELOPE MODE";
                 constexpr const char* kLfo1Trigger            = "LFO 1 TRIGGER";
+            }
+
+            namespace ContextualHelp
+            {
+                constexpr const char* kInit =
+                    "ENV 1: Resets this module to its init values.";
+                constexpr const char* kCopy =
+                    "ENV 1: Copies this module to the clipboard.";
+                constexpr const char* kPaste =
+                    "ENV 1: Pastes compatible clipboard data into this module.";
+                constexpr const char* kDelay =
+                    "ENV 1: Delay before the envelope attack starts.";
+                constexpr const char* kAttack =
+                    "ENV 1: Time to rise from zero to peak.";
+                constexpr const char* kDecay =
+                    "ENV 1: Time to fall from peak to sustain.";
+                constexpr const char* kSustain =
+                    "ENV 1: Level held while the key is down.";
+                constexpr const char* kRelease =
+                    "ENV 1: Time to fall to zero after key-up.";
+                constexpr const char* kAmplitude =
+                    "ENV 1: Overall envelope depth.";
+                constexpr const char* kAmplitudeModByVelocity =
+                    "ENV 1: How much velocity scales envelope amplitude.";
+                constexpr const char* kTriggerMode =
+                    "ENV 1: Chooses how the envelope is triggered.";
+                constexpr const char* kEnvelopeMode =
+                    "ENV 1: Chooses envelope contour behaviour.";
+                constexpr const char* kLfo1Trigger =
+                    "ENV 1: Lets LFO 1 retrigger this envelope when enabled.";
+                constexpr const char* kEnvelopeDisplay =
+                    "ENV 1: Drag Delay, Attack, Decay, Sustain, and Release on the curve.";
             }
         }
 
@@ -928,6 +1255,38 @@ namespace PluginDisplayNames
                 constexpr const char* kEnvelopeMode           = "ENVELOPE MODE";
                 constexpr const char* kLfo1Trigger            = "LFO 1 TRIGGER";
             }
+
+            namespace ContextualHelp
+            {
+                constexpr const char* kInit =
+                    "ENV 2: Resets this module to its init values.";
+                constexpr const char* kCopy =
+                    "ENV 2: Copies this module to the clipboard.";
+                constexpr const char* kPaste =
+                    "ENV 2: Pastes compatible clipboard data into this module.";
+                constexpr const char* kDelay =
+                    "ENV 2: Delay before the envelope attack starts.";
+                constexpr const char* kAttack =
+                    "ENV 2: Time to rise from zero to peak.";
+                constexpr const char* kDecay =
+                    "ENV 2: Time to fall from peak to sustain.";
+                constexpr const char* kSustain =
+                    "ENV 2: Level held while the key is down.";
+                constexpr const char* kRelease =
+                    "ENV 2: Time to fall to zero after key-up.";
+                constexpr const char* kAmplitude =
+                    "ENV 2: Overall envelope depth.";
+                constexpr const char* kAmplitudeModByVelocity =
+                    "ENV 2: How much velocity scales envelope amplitude.";
+                constexpr const char* kTriggerMode =
+                    "ENV 2: Chooses how the envelope is triggered.";
+                constexpr const char* kEnvelopeMode =
+                    "ENV 2: Chooses envelope contour behaviour.";
+                constexpr const char* kLfo1Trigger =
+                    "ENV 2: Lets LFO 1 retrigger this envelope when enabled.";
+                constexpr const char* kEnvelopeDisplay =
+                    "ENV 2: Drag Delay, Attack, Decay, Sustain, and Release on the curve.";
+            }
         }
 
         namespace Envelope3Module
@@ -954,6 +1313,38 @@ namespace PluginDisplayNames
                 constexpr const char* kEnvelopeMode           = "ENVELOPE MODE";
                 constexpr const char* kLfo1Trigger            = "LFO 1 TRIGGER";
             }
+
+            namespace ContextualHelp
+            {
+                constexpr const char* kInit =
+                    "ENV 3: Resets this module to its init values.";
+                constexpr const char* kCopy =
+                    "ENV 3: Copies this module to the clipboard.";
+                constexpr const char* kPaste =
+                    "ENV 3: Pastes compatible clipboard data into this module.";
+                constexpr const char* kDelay =
+                    "ENV 3: Delay before the envelope attack starts.";
+                constexpr const char* kAttack =
+                    "ENV 3: Time to rise from zero to peak.";
+                constexpr const char* kDecay =
+                    "ENV 3: Time to fall from peak to sustain.";
+                constexpr const char* kSustain =
+                    "ENV 3: Level held while the key is down.";
+                constexpr const char* kRelease =
+                    "ENV 3: Time to fall to zero after key-up.";
+                constexpr const char* kAmplitude =
+                    "ENV 3: Overall envelope depth.";
+                constexpr const char* kAmplitudeModByVelocity =
+                    "ENV 3: How much velocity scales envelope amplitude.";
+                constexpr const char* kTriggerMode =
+                    "ENV 3: Chooses how the envelope is triggered.";
+                constexpr const char* kEnvelopeMode =
+                    "ENV 3: Chooses envelope contour behaviour.";
+                constexpr const char* kLfo1Trigger =
+                    "ENV 3: Lets LFO 1 retrigger this envelope when enabled.";
+                constexpr const char* kEnvelopeDisplay =
+                    "ENV 3: Drag Delay, Attack, Decay, Sustain, and Release on the curve.";
+            }
         }
 
         namespace Lfo1Module
@@ -978,6 +1369,34 @@ namespace PluginDisplayNames
                 constexpr const char* kTriggerMode         = "TRIGGER MODE";
                 constexpr const char* kLag                 = "LAG";
                 constexpr const char* kSampleInput         = "SAMPLE INPUT";
+            }
+
+            namespace ContextualHelp
+            {
+                constexpr const char* kInit =
+                    "LFO 1: Resets this module to its init values.";
+                constexpr const char* kCopy =
+                    "LFO 1: Copies this module to the clipboard.";
+                constexpr const char* kPaste =
+                    "LFO 1: Pastes compatible clipboard data into this module.";
+                constexpr const char* kSpeed =
+                    "LFO 1: Sets LFO 1 rate.";
+                constexpr const char* kSpeedModByPressure =
+                    "LFO 1: How much pressure modulates LFO 1 speed.";
+                constexpr const char* kRetriggerPoint =
+                    "LFO 1: Phase point used when the LFO retriggers.";
+                constexpr const char* kAmplitude =
+                    "LFO 1: Sets LFO 1 depth.";
+                constexpr const char* kAmplitudeModByRamp1 =
+                    "LFO 1: How much Ramp 1 scales LFO 1 amplitude.";
+                constexpr const char* kWaveform =
+                    "LFO 1: Chooses the LFO 1 waveform.";
+                constexpr const char* kTriggerMode =
+                    "LFO 1: Chooses how LFO 1 starts and retriggers.";
+                constexpr const char* kLag =
+                    "LFO 1: Smooths LFO 1 output changes.";
+                constexpr const char* kSampleInput =
+                    "LFO 1: Chooses which modulation source the LFO samples when WAVEFORM is SAMPLED.";
             }
         }
 
@@ -1004,6 +1423,34 @@ namespace PluginDisplayNames
                 constexpr const char* kLag                 = "LAG";
                 constexpr const char* kSampleInput         = "SAMPLE INPUT";
             }
+
+            namespace ContextualHelp
+            {
+                constexpr const char* kInit =
+                    "LFO 2: Resets this module to its init values.";
+                constexpr const char* kCopy =
+                    "LFO 2: Copies this module to the clipboard.";
+                constexpr const char* kPaste =
+                    "LFO 2: Pastes compatible clipboard data into this module.";
+                constexpr const char* kSpeed =
+                    "LFO 2: Sets LFO 2 rate.";
+                constexpr const char* kSpeedModByKeyboard =
+                    "LFO 2: How much keyboard tracking modulates LFO 2 speed.";
+                constexpr const char* kRetriggerPoint =
+                    "LFO 2: Phase point used when the LFO retriggers.";
+                constexpr const char* kAmplitude =
+                    "LFO 2: Sets LFO 2 depth.";
+                constexpr const char* kAmplitudeModByRamp2 =
+                    "LFO 2: How much Ramp 2 scales LFO 2 amplitude.";
+                constexpr const char* kWaveform =
+                    "LFO 2: Chooses the LFO 2 waveform.";
+                constexpr const char* kTriggerMode =
+                    "LFO 2: Chooses how LFO 2 starts and retriggers.";
+                constexpr const char* kLag =
+                    "LFO 2: Smooths LFO 2 output changes.";
+                constexpr const char* kSampleInput =
+                    "LFO 2: Chooses which modulation source the LFO samples when WAVEFORM is SAMPLED.";
+            }
         }
 
         namespace PatchNameModule
@@ -1021,6 +1468,12 @@ namespace PluginDisplayNames
                 // Secondary line literal while Compare is active — distinct from the Mxx / Mxx-Ryy
                 // Mutator history labels used the rest of the time.
                 constexpr const char* kCompareSecondaryLabel = "INITIAL";
+            }
+
+            namespace ContextualHelp
+            {
+                constexpr const char* kPatchNameDisplay =
+                    "PATCH NAME: Shows the 8-character patch name - double-click to rename when editable.";
             }
 
             // Footer copy for the inline rename custom-caret editor. English only.
@@ -1070,6 +1523,26 @@ namespace PluginDisplayNames
                 constexpr const char* kCopy  = ShortLabels::kCopy;
                 constexpr const char* kPaste = ShortLabels::kPaste;
             }
+        }
+
+        namespace ContextualHelp
+        {
+            constexpr const char* kSectionInit =
+                "MATRIX MODULATION: Resets all modulation buses to init.";
+            constexpr const char* kSectionCopy =
+                "MATRIX MODULATION: Copies all modulation buses to the clipboard.";
+            constexpr const char* kSectionPaste =
+                "MATRIX MODULATION: Pastes compatible clipboard data into all modulation buses.";
+            constexpr const char* kBusHandle =
+                "MATRIX MODULATION: Drag to reorder this modulation bus.";
+            constexpr const char* kBusInit =
+                "MATRIX MODULATION: Resets this bus source, amount, and destination.";
+            constexpr const char* kSource =
+                "MATRIX MODULATION: Selects the modulation source for this bus.";
+            constexpr const char* kAmount =
+                "MATRIX MODULATION: Sets how strongly this bus modulates its destination.";
+            constexpr const char* kDestination =
+                "MATRIX MODULATION: Selects what this bus modulates.";
         }
 
         namespace ModulationBus
@@ -1195,6 +1668,38 @@ namespace PluginDisplayNames
                         + juce::String(targetBank) + ".";
                 }
             }
+
+            namespace ContextualHelp
+            {
+                constexpr const char* kBank0 =
+                    "BANK UTILITY: Selects Matrix-1000 bank 0 (RAM) and sets it as the copy/paste/import/export target.";
+                constexpr const char* kBank1 =
+                    "BANK UTILITY: Selects Matrix-1000 bank 1 (RAM) and sets it as the copy/paste/import/export target.";
+                constexpr const char* kBank2 =
+                    "BANK UTILITY: Selects Matrix-1000 bank 2 (ROM) and sets it as the copy/export target (paste/import need RAM 0-1).";
+                constexpr const char* kBank3 =
+                    "BANK UTILITY: Selects Matrix-1000 bank 3 (ROM) and sets it as the copy/export target (paste/import need RAM 0-1).";
+                constexpr const char* kBank4 =
+                    "BANK UTILITY: Selects Matrix-1000 bank 4 (ROM) and sets it as the copy/export target (paste/import need RAM 0-1).";
+                constexpr const char* kBank5 =
+                    "BANK UTILITY: Selects Matrix-1000 bank 5 (ROM) and sets it as the copy/export target (paste/import need RAM 0-1).";
+                constexpr const char* kBank6 =
+                    "BANK UTILITY: Selects Matrix-1000 bank 6 (ROM) and sets it as the copy/export target (paste/import need RAM 0-1).";
+                constexpr const char* kBank7 =
+                    "BANK UTILITY: Selects Matrix-1000 bank 7 (ROM) and sets it as the copy/export target (paste/import need RAM 0-1).";
+                constexpr const char* kBank8 =
+                    "BANK UTILITY: Selects Matrix-1000 bank 8 (ROM) and sets it as the copy/export target (paste/import need RAM 0-1).";
+                constexpr const char* kBank9 =
+                    "BANK UTILITY: Selects Matrix-1000 bank 9 (ROM) and sets it as the copy/export target (paste/import need RAM 0-1).";
+                constexpr const char* kCopy =
+                    "BANK UTILITY: Copies the selected bank from the synthesizer to the clipboard.";
+                constexpr const char* kPaste =
+                    "BANK UTILITY: Pastes the clipboard bank into the selected destination bank.";
+                constexpr const char* kImport =
+                    "BANK UTILITY: Imports patch files into the selected RAM bank.";
+                constexpr const char* kExport =
+                    "BANK UTILITY: Exports the selected bank as SysEx files on disk.";
+            }
         }
 
         namespace InternalPatchesModule
@@ -1213,6 +1718,32 @@ namespace PluginDisplayNames
                 constexpr const char* kCopyPatch          = "COPY";
                 constexpr const char* kPastePatch         = "PASTE";
                 constexpr const char* kStorePatch         = "STORE";
+            }
+
+            namespace ContextualHelp
+            {
+                constexpr const char* kTitle =
+                    "INTERNAL PATCHES: Reloads / focuses the internal patch browser for the connected synthesizer.";
+                constexpr const char* kBrowser =
+                    "INTERNAL PATCHES: Shows the internal patch browser list.";
+                constexpr const char* kMemory =
+                    "INTERNAL PATCHES: Shows memory-oriented patch controls.";
+                constexpr const char* kPrevious =
+                    "INTERNAL PATCHES: Loads the previous patch in the current bank.";
+                constexpr const char* kNext =
+                    "INTERNAL PATCHES: Loads the next patch in the current bank.";
+                constexpr const char* kCurrentBank =
+                    "INTERNAL PATCHES: Selects the current synthesizer bank.";
+                constexpr const char* kCurrentPatch =
+                    "INTERNAL PATCHES: Selects the current patch number in the bank.";
+                constexpr const char* kInit =
+                    "INTERNAL PATCHES: Loads the init patch template into the editor and sends it to the synthesizer.";
+                constexpr const char* kCopy =
+                    "INTERNAL PATCHES: Copies the current patch to the clipboard.";
+                constexpr const char* kPaste =
+                    "INTERNAL PATCHES: Pastes a clipboard patch into the editor and sends it to the synthesizer.";
+                constexpr const char* kStore =
+                    "INTERNAL PATCHES: Stores the current patch into the selected synthesizer memory slot.";
             }
         }
 
@@ -1307,6 +1838,28 @@ namespace PluginDisplayNames
                 constexpr const char* kOpenPatchFolder       = "OPEN";
                 constexpr const char* kSavePatchAsFile       = "SAVE AS";
                 constexpr const char* kSavePatchFile         = "SAVE";
+            }
+
+            namespace ContextualHelp
+            {
+                constexpr const char* kTitle =
+                    "COMPUTER PATCHES: Reloads / focuses computer .syx patch browsing on disk.";
+                constexpr const char* kBrowser =
+                    "COMPUTER PATCHES: Shows the computer patch browser list.";
+                constexpr const char* kStorage =
+                    "COMPUTER PATCHES: Shows save / storage controls for .syx files.";
+                constexpr const char* kPrevious =
+                    "COMPUTER PATCHES: Loads the previous patch file in the folder.";
+                constexpr const char* kNext =
+                    "COMPUTER PATCHES: Loads the next patch file in the folder.";
+                constexpr const char* kSelectPatch =
+                    "COMPUTER PATCHES: Chooses which .syx patch file is selected.";
+                constexpr const char* kOpen =
+                    "COMPUTER PATCHES: Opens a folder of .syx patch files.";
+                constexpr const char* kSaveAs =
+                    "COMPUTER PATCHES: Saves the current patch as a new .syx file.";
+                constexpr const char* kSave =
+                    "COMPUTER PATCHES: Saves over the current .syx file.";
             }
         }
 
@@ -1403,53 +1956,54 @@ namespace PluginDisplayNames
             }
 
             // Furtive left-footer help while hovering / focusing Mutator controls (display-only).
-            // Same "Patch Mutator: " prefix as sticky Mutator footers for module-scoped homogeneity.
+            // Furtive left-footer help while hovering / focusing Mutator controls (display-only).
+            // HELP uses "PATCH MUTATOR: " (GUI casing). Sticky Messages keep "Patch Mutator: ".
             namespace ContextualHelp
             {
                 constexpr const char* kMode =
-                    "Patch Mutator: Sets how far mutations stray - Kindred, Drift, Warp, or Wild.";
+                    "PATCH MUTATOR: Sets how far mutations stray - Kindred, Drift, Warp, or Wild.";
                 constexpr const char* kPitch =
-                    "Patch Mutator: Controls how DCO pitch may move - Keep, Consonant, Dissonant, or Free.";
+                    "PATCH MUTATOR: Controls how DCO pitch may move - Keep, Consonant, Dissonant, or Free.";
                 constexpr const char* kHistory =
-                    "Patch Mutator: Recalls a mutation or retry from this session.";
+                    "PATCH MUTATOR: Recalls a mutation or retry from this session.";
                 constexpr const char* kMutate =
-                    "Patch Mutator: Creates a new variation from the current recipe and sends it to the synth.";
+                    "PATCH MUTATOR: Creates a new variation from the current recipe and sends it to the synthesizer.";
                 constexpr const char* kRetry =
-                    "Patch Mutator: Rolls again from the same mutation root.";
+                    "PATCH MUTATOR: Rolls again from the same mutation root.";
                 constexpr const char* kHistoryPrevious =
-                    "Patch Mutator: Steps backward through session history.";
+                    "PATCH MUTATOR: Steps backward through session history.";
                 constexpr const char* kHistoryNext =
-                    "Patch Mutator: Steps forward through session history.";
+                    "PATCH MUTATOR: Steps forward through session history.";
                 constexpr const char* kCompare =
-                    "Patch Mutator: Compares with the origin patch and locks editing until you click C button again.";
+                    "PATCH MUTATOR: Compares with the origin patch and locks editing until you click [C] button again.";
                 constexpr const char* kDelete =
-                    "Patch Mutator: Deletes the selected history entry.";
+                    "PATCH MUTATOR: Deletes the selected history entry.";
                 constexpr const char* kFlush =
-                    "Patch Mutator: Flushes the whole session mutation history.";
+                    "PATCH MUTATOR: Flushes the whole session mutation history.";
                 constexpr const char* kExport =
-                    "Patch Mutator: Exports the session mutations as SysEx files.";
+                    "PATCH MUTATOR: Exports the session mutations as SysEx files.";
                 constexpr const char* kEnableDco1 =
-                    "Patch Mutator: Include DCO 1 module in the mutation recipe.";
+                    "PATCH MUTATOR: Include DCO 1 module in the mutation recipe.";
                 constexpr const char* kEnableDco2 =
-                    "Patch Mutator: Include DCO 2 module in the mutation recipe.";
+                    "PATCH MUTATOR: Include DCO 2 module in the mutation recipe.";
                 constexpr const char* kEnableVcfVca =
-                    "Patch Mutator: Include VCF/VCA module in the recipe.";
+                    "PATCH MUTATOR: Include VCF/VCA module in the recipe.";
                 constexpr const char* kEnableFmTrack =
-                    "Patch Mutator: Include FM/TRACK module in the recipe.";
+                    "PATCH MUTATOR: Include FM/TRACK module in the recipe.";
                 constexpr const char* kEnableRampPortamento =
-                    "Patch Mutator: Include RAMP/PORTAMENTO module in the recipe.";
+                    "PATCH MUTATOR: Include RAMP/PORTAMENTO module in the recipe.";
                 constexpr const char* kEnableEnvelope1 =
-                    "Patch Mutator: Include ENV 1 module in the recipe.";
+                    "PATCH MUTATOR: Include ENV 1 module in the recipe.";
                 constexpr const char* kEnableEnvelope2 =
-                    "Patch Mutator: Include ENV 2 module in the recipe.";
+                    "PATCH MUTATOR: Include ENV 2 module in the recipe.";
                 constexpr const char* kEnableEnvelope3 =
-                    "Patch Mutator: Include ENV 3 module in the recipe.";
+                    "PATCH MUTATOR: Include ENV 3 module in the recipe.";
                 constexpr const char* kEnableLfo1 =
-                    "Patch Mutator: Include LFO 1 module in the recipe.";
+                    "PATCH MUTATOR: Include LFO 1 module in the recipe.";
                 constexpr const char* kEnableLfo2 =
-                    "Patch Mutator: Include LFO 2 module in the recipe.";
+                    "PATCH MUTATOR: Include LFO 2 module in the recipe.";
                 constexpr const char* kEnableMatrixMod =
-                    "Patch Mutator: Include MATRIX MODULATION module in the recipe.";
+                    "PATCH MUTATOR: Include MATRIX MODULATION module in the recipe.";
             }
 
             // Footer + dialog copy for the session-load / Compare features. English only.

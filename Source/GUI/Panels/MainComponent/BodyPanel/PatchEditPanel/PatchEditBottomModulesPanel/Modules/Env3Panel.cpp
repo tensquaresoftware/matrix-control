@@ -1,5 +1,8 @@
 #include "Env3Panel.h"
 
+#include "GUI/Helpers/ContextualHelpBindingSupport.h"
+#include "Shared/Definitions/PluginDisplayNames.h"
+
 #include "GUI/Panels/Reusable/ModulePanelConfigBuilder.h"
 #include "GUI/Widgets/ParameterCell.h"
 #include "GUI/Factories/WidgetFactory.h"
@@ -40,6 +43,7 @@ Env3Panel::Env3Panel(const Config& config)
           .moduleHeaderDims = config.moduleHeaderDims,
           .parameterCellDims = config.parameterCellDims})
 {
+    registerContextualHelp();
     keyboardModeListener_ = std::make_unique<TSS::StrigUnisonGateHelper::KeyboardModeChangeListener>(
         apvts_,
         [this](bool leftUnison) { refreshStrigGate(leftUnison); });
@@ -56,3 +60,30 @@ void Env3Panel::refreshStrigGate(bool clearIfCurrentStrig)
         .strigChoiceIndex = kTriggerStrigIndex,
         .clearIfCurrentStrig = clearIfCurrentStrig});
 }
+
+void Env3Panel::registerContextualHelp()
+{
+    namespace Help = PluginDisplayNames::PatchEditSection::Envelope3Module::ContextualHelp;
+
+    contextualHelpBinder_ = std::make_unique<TSS::ContextualHelpBinder>(
+        TSS::makeMainComponentFooterResolver(*this));
+
+    TSS::bindModuleHeaderInitCopyPaste(*contextualHelpBinder_,
+                                        moduleHeader_.get(),
+                                        { Help::kInit, Help::kCopy, Help::kPaste });
+
+    static constexpr const char* kCellHelps[] = {
+        Help::kDelay,
+        Help::kAttack,
+        Help::kDecay,
+        Help::kSustain,
+        Help::kRelease,
+        Help::kAmplitude,
+        Help::kAmplitudeModByVelocity,
+        Help::kTriggerMode,
+        Help::kEnvelopeMode,
+        Help::kLfo1Trigger,
+    };
+    TSS::bindParameterCellHelps(*contextualHelpBinder_, *this, kCellHelps, std::size(kCellHelps));
+}
+

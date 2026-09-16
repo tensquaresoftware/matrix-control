@@ -2,6 +2,7 @@
 
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinValues.h"
+#include "Shared/Definitions/PluginDisplayNames.h"
 
 using TSS::SkinColourId;
 
@@ -19,6 +20,37 @@ SettingsPanel::SettingsPanel(TSS::ISkin& skin, bool isPluginMode)
     applyComboPopupLooks(skin);
 
     setPluginMode(isPluginMode);
+}
+
+void SettingsPanel::registerContextualHelp(TSS::ContextualHelpBinder::FooterResolver resolveFooter)
+{
+    namespace Help = PluginDisplayNames::Settings::ContextualHelp;
+
+    contextualHelpBinder_ = std::make_unique<TSS::ContextualHelpBinder>(std::move(resolveFooter));
+    contextualHelpBinder_->setHostShowingPredicate([this] { return isShowing(); });
+
+    contextualHelpBinder_->bind(matrix1000PatchesCombo_.get(), Help::kMatrix1000Patches);
+    contextualHelpBinder_->bind(computerPatchesCombo_.get(), Help::kComputerPatches);
+    contextualHelpBinder_->bind(unsavedStateCombo_.get(), Help::kUnsavedState);
+    contextualHelpBinder_->bind(patchSaveAsInitButton_.get(), Help::kPatchSaveAsInit);
+    contextualHelpBinder_->bind(patchDeleteInitButton_.get(), Help::kPatchDeleteInit);
+    contextualHelpBinder_->bind(deleteWarningCombo_.get(), Help::kDeleteWarning);
+    contextualHelpBinder_->bind(defragHistoryLabel_.get(), Help::kDefragHistory);
+    contextualHelpBinder_->bind(defragHistoryPlaceholder_.get(), Help::kDefragHistory);
+    contextualHelpBinder_->bind(hardwareLatencySlider_.get(), Help::kHardwareLatency);
+    contextualHelpBinder_->bind(masterLoadButton_.get(), Help::kMasterLoad);
+    contextualHelpBinder_->bind(masterSaveAsButton_.get(), Help::kMasterSaveAs);
+    contextualHelpBinder_->bind(masterInitButton_.get(), Help::kMasterInit);
+    contextualHelpBinder_->bind(masterSaveAsInitButton_.get(), Help::kMasterSaveAsInit);
+    contextualHelpBinder_->bind(masterDeleteInitButton_.get(), Help::kMasterDeleteInit);
+    contextualHelpBinder_->bind(settingsShortcutLabel_.get(), Help::kSettingsShortcut);
+    contextualHelpBinder_->bind(settingsShortcutValue_.get(), Help::kSettingsShortcut);
+    contextualHelpBinder_->bind(audioMidiShortcutLabel_.get(), Help::kAudioMidiShortcut);
+    contextualHelpBinder_->bind(audioMidiShortcutValue_.get(), Help::kAudioMidiShortcut);
+    contextualHelpBinder_->bind(uiScaleShortcutLabel_.get(), Help::kUiScaleShortcut);
+    contextualHelpBinder_->bind(uiScaleShortcutValue_.get(), Help::kUiScaleShortcut);
+    contextualHelpBinder_->bind(skinShortcutLabel_.get(), Help::kSkinShortcut);
+    contextualHelpBinder_->bind(skinShortcutValue_.get(), Help::kSkinShortcut);
 }
 
 void SettingsPanel::paint(juce::Graphics& g)

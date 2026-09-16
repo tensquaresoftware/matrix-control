@@ -1,5 +1,8 @@
 #include "Lfo2Panel.h"
 
+#include "GUI/Helpers/ContextualHelpBindingSupport.h"
+#include "Shared/Definitions/PluginDisplayNames.h"
+
 #include "GUI/Panels/Reusable/ModulePanelConfigBuilder.h"
 #include "GUI/Widgets/ParameterCell.h"
 #include "GUI/Factories/WidgetFactory.h"
@@ -40,6 +43,7 @@ Lfo2Panel::Lfo2Panel(const Config& config)
           .moduleHeaderDims = config.moduleHeaderDims,
           .parameterCellDims = config.parameterCellDims})
 {
+    registerContextualHelp();
     keyboardModeListener_ = std::make_unique<TSS::StrigUnisonGateHelper::KeyboardModeChangeListener>(
         apvts_,
         [this](bool leftUnison) { refreshStrigGate(leftUnison); });
@@ -56,3 +60,30 @@ void Lfo2Panel::refreshStrigGate(bool clearIfCurrentStrig)
         .strigChoiceIndex = kTriggerStrigIndex,
         .clearIfCurrentStrig = clearIfCurrentStrig});
 }
+
+void Lfo2Panel::registerContextualHelp()
+{
+    namespace Help = PluginDisplayNames::PatchEditSection::Lfo2Module::ContextualHelp;
+
+    contextualHelpBinder_ = std::make_unique<TSS::ContextualHelpBinder>(
+        TSS::makeMainComponentFooterResolver(*this));
+
+    TSS::bindModuleHeaderInitCopyPaste(*contextualHelpBinder_,
+                                        moduleHeader_.get(),
+                                        { Help::kInit, Help::kCopy, Help::kPaste });
+
+    static constexpr const char* kCellHelps[] = {
+        Help::kSpeed,
+        Help::kSpeedModByKeyboard,
+        Help::kRetriggerPoint,
+        Help::kAmplitude,
+        Help::kAmplitudeModByRamp2,
+        Help::kWaveform,
+        Help::kTriggerMode,
+        Help::kLag,
+        Help::kSampleInput,
+        nullptr,
+    };
+    TSS::bindParameterCellHelps(*contextualHelpBinder_, *this, kCellHelps, std::size(kCellHelps));
+}
+

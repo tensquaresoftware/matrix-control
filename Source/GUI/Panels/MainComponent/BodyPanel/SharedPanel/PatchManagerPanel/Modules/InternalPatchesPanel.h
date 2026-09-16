@@ -7,6 +7,7 @@
 
 #include "GUI/Layout/PanelDimensions.h"
 #include "Core/Services/DeviceMemoryLimits.h"
+#include "GUI/Helpers/ContextualHelpBinder.h"
 
 namespace TSS
 {
@@ -41,6 +42,8 @@ public:
     void valueTreeRedirected(juce::ValueTree&) override;
 
 private:
+    void registerContextualHelp();
+
     InternalPatchesPanelDimensions dims_;
     TSS::ISkin* skin_;
     float uiScale_ = 1.0f;
@@ -63,6 +66,7 @@ private:
     std::unique_ptr<TSS::Button> storePatchButton_;
     std::unique_ptr<TSS::ClipboardFeedbackButtonBinding> copyFeedbackBinding_;
     std::unique_ptr<TSS::ClipboardFeedbackButtonBinding> pasteFeedbackBinding_;
+    std::unique_ptr<TSS::ContextualHelpBinder> contextualHelpBinder_;
 
     void setupModuleHeader(TSS::ISkin& skin, WidgetFactory& widgetFactory, const juce::String& moduleId);
     void setupBrowserGroupLabel(TSS::ISkin& skin);

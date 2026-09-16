@@ -4,6 +4,8 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
+#include "GUI/Helpers/ContextualHelpBinder.h"
+
 namespace TSS
 {
     class ISkin;
@@ -25,6 +27,7 @@ public:
     void setSkin(TSS::ISkin& skin);
     void setUiScale(float uiScale);
     void setOnEscapePressed(std::function<void()> callback);
+    void registerContextualHelp(TSS::ContextualHelpBinder::FooterResolver resolveFooter);
 
 private:
     struct SpecGridLayout
@@ -59,6 +62,8 @@ private:
     juce::HyperlinkButton emailLink_;
     juce::HyperlinkButton githubLink_;
     juce::HyperlinkButton linkedInLink_;
+
+    std::unique_ptr<TSS::ContextualHelpBinder> contextualHelpBinder_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AboutPanel)
 };

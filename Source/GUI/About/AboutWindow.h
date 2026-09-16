@@ -38,6 +38,8 @@ public:
     void setSkin(TSS::ISkin& skin);
     void setUiScale(float uiScale);
 
+    AboutPanel& getAboutPanel() { return *aboutPanel_; }
+
     void paint(juce::Graphics& g) override;
     void resized() override;
     void mouseDown(const juce::MouseEvent& e) override;

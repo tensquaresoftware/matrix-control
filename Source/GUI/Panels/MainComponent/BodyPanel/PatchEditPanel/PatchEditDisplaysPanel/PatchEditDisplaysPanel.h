@@ -9,6 +9,7 @@
 #include "GUI/Layout/PanelDimensions.h"
 #include "GUI/Widgets/EnvelopeDisplay.h"
 #include "GUI/Widgets/TrackGeneratorDisplay.h"
+#include "GUI/Helpers/ContextualHelpBinder.h"
 
 namespace TSS
 {
@@ -35,6 +36,8 @@ public:
     void endActiveEditGestures();
 
 private:
+    void registerContextualHelp();
+
     PatchEditDisplaysPanelDimensions dims_;
     TSS::ISkin* skin_;
     juce::AudioProcessorValueTreeState* apvts_ = nullptr;
@@ -51,6 +54,7 @@ private:
     std::unique_ptr<EnvelopeDisplayApvtsBinding> envelope2Binding_;
     std::unique_ptr<EnvelopeDisplayApvtsBinding> envelope3Binding_;
     std::unique_ptr<TrackGeneratorDisplayApvtsBinding> trackGeneratorBinding_;
+    std::unique_ptr<TSS::ContextualHelpBinder> contextualHelpBinder_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PatchEditDisplaysPanel)
 };

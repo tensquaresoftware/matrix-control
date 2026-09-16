@@ -14,6 +14,7 @@ namespace TSS
     class ISkin;
     class Logo;
     class PopupMenuRenderer;
+    class ContextualHelpBinder;
 
     class HeaderLogoPopupMenu : public juce::Component
     {
@@ -23,6 +24,7 @@ namespace TSS
             float uiScale = 1.0f;
             int currentSkinItemId = 0;
             int currentUiScaleId = 0;
+            ContextualHelpBinder* contextualHelpBinder = nullptr;
             std::function<void(int skinItemId)> onSkinSelected;
             std::function<void(int scaleId)> onUiScaleSelected;
             std::function<void()> onAudioMidiSettingsRequested;
@@ -39,6 +41,8 @@ namespace TSS
         void mouseExit(const juce::MouseEvent& e) override;
         bool keyPressed(const juce::KeyPress& key) override;
         void inputAttemptWhenModal() override;
+
+        void detachContextualHelpBinder();
 
         static void show(Logo& logo, ISkin& skin, Config config);
 
@@ -82,6 +86,7 @@ namespace TSS
         std::function<void()> onAudioMidiSettingsRequested_;
         std::function<void()> onSettingsRequested_;
         std::function<void()> onAboutRequested_;
+        ContextualHelpBinder* contextualHelpBinder_ = nullptr;
         bool showAudioMidiDevices_ = false;
 
         PopupMenuLook look_{};
@@ -101,6 +106,8 @@ namespace TSS
         bool isSelectableItem(int flatIndex) const;
         bool isCurrentSelection(int flatIndex) const;
         void updateHighlightedItem(int flatIndex);
+        void updateContextualHelpForItem(int flatIndex);
+        const char* contextualHelpTextForItem(int flatIndex) const;
         void selectItem(int flatIndex);
         void closePopup();
         struct ItemDrawMetrics

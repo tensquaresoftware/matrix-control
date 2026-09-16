@@ -6,6 +6,7 @@
 #include "Core/Services/DeviceMemoryLimits.h"
 #include "Core/Services/DeviceTypeRegistry.h"
 #include "GUI/Helpers/ClipboardFeedbackButtonBinding.h"
+#include "GUI/Helpers/ContextualHelpBindingSupport.h"
 #include "GUI/Helpers/GrayedControlHelper.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Skins/ISkin.h"
@@ -117,8 +118,30 @@ BankUtilityPanel::BankUtilityPanel(TSS::ISkin& skin, const BankUtilityPanelDimen
     refreshDeviceGating();
     refreshCurrentBankMarker();
     refreshUtilityEnabled();
+    registerContextualHelp();
 
     setSize(dims_.width, dims_.height);
+}
+
+void BankUtilityPanel::registerContextualHelp()
+{
+    namespace Help = PluginDisplayNames::PatchManagerSection::BankUtilityModule::ContextualHelp;
+
+    contextualHelpBinder_ = std::make_unique<TSS::ContextualHelpBinder>(
+        TSS::makeMainComponentFooterResolver(*this));
+
+    static constexpr const char* kBankHelps[kBankCount] = {
+        Help::kBank0, Help::kBank1, Help::kBank2, Help::kBank3, Help::kBank4,
+        Help::kBank5, Help::kBank6, Help::kBank7, Help::kBank8, Help::kBank9,
+    };
+
+    for (int i = 0; i < kBankCount; ++i)
+        contextualHelpBinder_->bind(selectBankButtons_[static_cast<size_t>(i)].get(), kBankHelps[i]);
+
+    contextualHelpBinder_->bind(copyBankButton_.get(), Help::kCopy);
+    contextualHelpBinder_->bind(pasteBankButton_.get(), Help::kPaste);
+    contextualHelpBinder_->bind(importBankButton_.get(), Help::kImport);
+    contextualHelpBinder_->bind(exportBankButton_.get(), Help::kExport);
 }
 
 BankUtilityPanel::~BankUtilityPanel()

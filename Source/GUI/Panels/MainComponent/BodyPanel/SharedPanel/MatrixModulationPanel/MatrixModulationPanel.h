@@ -11,6 +11,7 @@
 #include "GUI/Layout/PanelDimensions.h"
 #include "Shared/Definitions/PluginDescriptors.h"
 #include "GUI/Widgets/ModulationBusCell.h"
+#include "GUI/Helpers/ContextualHelpBinder.h"
 
 namespace TSS
 {
@@ -40,6 +41,7 @@ public:
 private:
     class PasteEnabledPropertyListener;
 
+    void registerContextualHelp();
     void beginBusReorderDrag(int sourceBus);
     void updateBusReorderDrag(juce::Point<int> positionInPanel);
     void finishBusReorderDrag(juce::Point<int> positionInPanel);
@@ -83,6 +85,7 @@ private:
     std::unique_ptr<TSS::ClipboardFeedbackButtonBinding> copyFeedbackBinding_;
     std::unique_ptr<TSS::ClipboardFeedbackButtonBinding> pasteFeedbackBinding_;
     std::vector<std::unique_ptr<ModulationBusCell>> modulationBuses_;
+    std::unique_ptr<TSS::ContextualHelpBinder> contextualHelpBinder_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MatrixModulationPanel)
 };

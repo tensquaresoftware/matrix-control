@@ -248,6 +248,7 @@ set(PLUGIN_SOURCES
     Source/GUI/Helpers/StrigUnisonGateHelper.cpp
     Source/GUI/Helpers/ApvtsUndoableParameterAttachments.cpp
     Source/GUI/Helpers/CompareLockBinder.cpp
+    Source/GUI/Helpers/ContextualHelpBinder.cpp
     Source/GUI/Helpers/ClipboardFeedbackButtonBinding.cpp
     Source/GUI/Helpers/LockDimmingFilm.cpp
     Source/GUI/Factories/WidgetFactoryValidator.cpp
@@ -302,6 +303,7 @@ set(PLUGIN_SOURCES
     Source/GUI/Panels/MainComponent/BodyPanel/MasterEditPanel/Modules/MiscPanel.cpp
     Source/GUI/Panels/MainComponent/BodyPanel/MasterEditPanel/Modules/VibratoPanel.cpp
     Source/GUI/Panels/MainComponent/BodyPanel/SharedPanel/MatrixModulationPanel/MatrixModulationPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/SharedPanel/MatrixModulationPanel/MatrixModulationPanelContextualHelp.cpp
     Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditBottomModulesPanel/PatchEditBottomModulesPanel.cpp
     Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditBottomModulesPanel/Modules/Env1Panel.cpp
     Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditBottomModulesPanel/Modules/Env2Panel.cpp
@@ -323,6 +325,7 @@ set(PLUGIN_SOURCES
     Source/GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/Modules/BankUtilityPanel.cpp
     Source/GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/Modules/BankUtilityPanelSetup.cpp
     Source/GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/Modules/ComputerPatchesPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/Modules/ComputerPatchesPanelContextualHelp.cpp
     Source/GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/Modules/InternalPatchesPanel.cpp
     Source/GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/Modules/InternalPatchesPanelSetup.cpp
     Source/GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/Modules/PatchMutatorPanel.cpp

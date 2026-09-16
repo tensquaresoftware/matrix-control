@@ -4,9 +4,12 @@
 #include "Modules/PatchNameDisplayPanel.h"
 #include "Modules/TrackGeneratorDisplayApvtsBinding.h"
 
+#include "GUI/Helpers/ContextualHelpBindingSupport.h"
 #include "GUI/Looks/LookBuilders.h"
 #include "GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditFiveColumnLayout.h"
 #include "GUI/Skins/ISkin.h"
+#include "GUI/Widgets/PatchNameDisplay.h"
+#include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginIDs.h"
 
 namespace
@@ -78,6 +81,29 @@ PatchEditDisplaysPanel::PatchEditDisplaysPanel(TSS::ISkin& skin, const PatchEdit
     addAndMakeVisible(envelope3Display_);
     addAndMakeVisible(trackGeneratorDisplay_);
     addAndMakeVisible(*patchNameDisplayPanel_);
+    registerContextualHelp();
+}
+
+void PatchEditDisplaysPanel::registerContextualHelp()
+{
+    contextualHelpBinder_ = std::make_unique<TSS::ContextualHelpBinder>(
+        TSS::makeMainComponentFooterResolver(*this));
+
+    contextualHelpBinder_->bind(
+        &envelope1Display_,
+        PluginDisplayNames::PatchEditSection::Envelope1Module::ContextualHelp::kEnvelopeDisplay);
+    contextualHelpBinder_->bind(
+        &envelope2Display_,
+        PluginDisplayNames::PatchEditSection::Envelope2Module::ContextualHelp::kEnvelopeDisplay);
+    contextualHelpBinder_->bind(
+        &envelope3Display_,
+        PluginDisplayNames::PatchEditSection::Envelope3Module::ContextualHelp::kEnvelopeDisplay);
+    contextualHelpBinder_->bind(
+        &trackGeneratorDisplay_,
+        PluginDisplayNames::PatchEditSection::FmTrackModule::ContextualHelp::kTrackGeneratorDisplay);
+    contextualHelpBinder_->bind(
+        &patchNameDisplayPanel_->getPatchNameDisplay(),
+        PluginDisplayNames::PatchEditSection::PatchNameModule::ContextualHelp::kPatchNameDisplay);
 }
 
 void PatchEditDisplaysPanel::resized()

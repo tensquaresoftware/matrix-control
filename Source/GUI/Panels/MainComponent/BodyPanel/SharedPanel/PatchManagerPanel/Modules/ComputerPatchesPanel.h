@@ -6,6 +6,7 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 
 #include "GUI/Layout/PanelDimensions.h"
+#include "GUI/Helpers/ContextualHelpBinder.h"
 
 namespace Core
 {
@@ -52,6 +53,8 @@ public:
     void valueTreeRedirected(juce::ValueTree&) override;
 
 private:
+    void registerContextualHelp();
+
     ComputerPatchesPanelDimensions dims_;
     TSS::ISkin* skin_;
     float uiScale_ = 1.0f;
@@ -70,6 +73,7 @@ private:
     std::unique_ptr<TSS::Button> openPatchFolderButton_;
     std::unique_ptr<TSS::Button> savePatchFileAsButton_;
     std::unique_ptr<TSS::Button> savePatchFileButton_;
+    std::unique_ptr<TSS::ContextualHelpBinder> contextualHelpBinder_;
 
     void setupModuleHeader(TSS::ISkin& skin, WidgetFactory& widgetFactory, const juce::String& moduleId);
     void setupBrowserGroupLabel(TSS::ISkin& skin);

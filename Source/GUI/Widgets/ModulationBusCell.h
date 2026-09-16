@@ -62,6 +62,12 @@ public:
     void setDropTargetHighlighted(bool highlighted);
     void setDragSourceHighlighted(bool highlighted);
 
+    TSS::Label* getBusNumberLabel() const { return busNumberLabel_.get(); }
+    TSS::ComboBox* getSourceComboBox() const { return sourceComboBox_.get(); }
+    TSS::Slider* getAmountSlider() const { return amountSlider_.get(); }
+    TSS::ComboBox* getDestinationComboBox() const { return destinationComboBox_.get(); }
+    TSS::Button* getInitButton() const { return initButton_.get(); }
+
 private:
     bool isBusNumberLabelHit(juce::Point<int> localPosition) const;
     juce::Point<int> toPanelPosition(juce::Point<int> localPosition) const;

@@ -1,5 +1,8 @@
 #include "MiscPanel.h"
 
+#include "GUI/Helpers/ContextualHelpBindingSupport.h"
+#include "Shared/Definitions/PluginDisplayNames.h"
+
 #include "GUI/Skins/Skin.h"
 #include "GUI/Panels/Reusable/ModulePanelConfigBuilder.h"
 #include "Shared/Definitions/PluginIDs.h"
@@ -34,4 +37,27 @@ MiscPanel::MiscPanel(const Config& config)
           .moduleHeaderDims = config.moduleHeaderDims,
           .parameterCellDims = config.parameterCellDims})
 {
+    registerContextualHelp();
 }
+
+void MiscPanel::registerContextualHelp()
+{
+    namespace Help = PluginDisplayNames::MasterEditSection::MiscModule::ContextualHelp;
+
+    contextualHelpBinder_ = std::make_unique<TSS::ContextualHelpBinder>(
+        TSS::makeMainComponentFooterResolver(*this));
+
+    TSS::bindModuleHeaderInitOnly(*contextualHelpBinder_, moduleHeader_.get(), Help::kInit);
+
+    static constexpr const char* kCellHelps[] = {
+        Help::kMasterTune,
+        Help::kMasterTranspose,
+        Help::kBendRange,
+        Help::kUnison,
+        Help::kVolumeInvert,
+        Help::kBankLock,
+        Help::kMemoryProtect,
+    };
+    TSS::bindParameterCellHelps(*contextualHelpBinder_, *this, kCellHelps, std::size(kCellHelps));
+}
+

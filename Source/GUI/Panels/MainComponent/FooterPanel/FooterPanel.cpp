@@ -1,5 +1,6 @@
 #include "FooterPanel.h"
 
+#include "GUI/Helpers/ContextualHelpBinder.h"
 #include "GUI/Helpers/DeviceVersionDisplayFormat.h"
 #include "GUI/Helpers/TextFitHelpers.h"
 #include "GUI/Layout/ScaledLayout.h"
@@ -25,12 +26,16 @@ FooterPanel::FooterPanel(TSS::ISkin& skin,
     , apvts(apvtsRef)
 {
     setOpaque(true);
+    deviceHitArea_.setInterceptsMouseClicks(true, false);
+    addAndMakeVisible(deviceHitArea_);
+    registerDeviceContextualHelp();
     apvts.state.addListener(this);
     syncFromApvtsState(apvts.state);
 }
 
 FooterPanel::~FooterPanel()
 {
+    contextualHelpBinder_.reset();
     apvts.state.removeListener(this);
 }
 
@@ -216,6 +221,7 @@ void FooterPanel::paint(juce::Graphics& g)
 
 void FooterPanel::resized()
 {
+    updateDeviceHitAreaBounds();
 }
 
 void FooterPanel::setSkin(TSS::ISkin& skin)
@@ -229,6 +235,7 @@ void FooterPanel::setUiScale(float uiScale)
         return;
 
     uiScale_ = uiScale;
+    updateDeviceHitAreaBounds();
     repaint();
 }
 
@@ -241,13 +248,17 @@ void FooterPanel::setMidiQueuePressureAlert(bool active)
     repaint();
 }
 
-void FooterPanel::setContextualHelpOverlay(const juce::String& detailText)
+int FooterPanel::setContextualHelpOverlay(const juce::String& detailText)
 {
-    if (contextualHelpOverlay_.getDetail() == detailText)
-        return;
+    contextualHelpEpoch_ = TSS::nextContextualHelpOverlayEpoch(contextualHelpEpoch_);
 
-    contextualHelpOverlay_.setDetail(detailText);
-    repaint();
+    if (contextualHelpOverlay_.getDetail() != detailText)
+    {
+        contextualHelpOverlay_.setDetail(detailText);
+        repaint();
+    }
+
+    return contextualHelpEpoch_;
 }
 
 void FooterPanel::clearContextualHelpOverlay()
@@ -256,6 +267,16 @@ void FooterPanel::clearContextualHelpOverlay()
         return;
 
     contextualHelpOverlay_.clear();
+    repaint();
+}
+
+void FooterPanel::clearContextualHelpOverlayIfEpoch(int epoch)
+{
+    if (! TSS::clearContextualHelpOverlayDetailIfEpoch(contextualHelpOverlay_,
+                                                       epoch,
+                                                       contextualHelpEpoch_))
+        return;
+
     repaint();
 }
 
@@ -343,4 +364,22 @@ juce::String FooterPanel::buildDeviceDetailText() const
         detail += " (V" + versionDisplay + ")";
 
     return detail;
+}
+
+void FooterPanel::updateDeviceHitAreaBounds()
+{
+    const auto layout = computeBandLayout();
+    deviceHitArea_.setBounds(layout.rightBand.reduced(layout.padding, 0));
+}
+
+void FooterPanel::registerDeviceContextualHelp()
+{
+    contextualHelpBinder_ = std::make_unique<TSS::ContextualHelpBinder>(
+        [this]() -> FooterPanel*
+        {
+            return this;
+        });
+    contextualHelpBinder_->bind(
+        &deviceHitArea_,
+        PluginDisplayNames::FooterPanel::ContextualHelp::kDevice);
 }

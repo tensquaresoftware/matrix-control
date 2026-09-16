@@ -1,7 +1,10 @@
 #include "HeaderPanel.h"
 
+#include <memory>
+
 #include <juce_audio_devices/juce_audio_devices.h>
 
+#include "GUI/Helpers/ContextualHelpBindingSupport.h"
 #include "GUI/Widgets/HeaderLogoPopupMenu.h"
 #include "GUI/Skins/Skin.h"
 #include "GUI/Skins/SkinHelpers.h"
@@ -57,6 +60,28 @@ namespace
     }
 }
 
+namespace
+{
+    void dismissOpenHeaderLogoPopupMenus()
+    {
+        for (int i = juce::Component::getNumCurrentlyModalComponents(); --i >= 0;)
+        {
+            if (auto* menu = dynamic_cast<TSS::HeaderLogoPopupMenu*>(
+                    juce::Component::getCurrentlyModalComponent(i)))
+            {
+                menu->detachContextualHelpBinder();
+                menu->exitModalState(0);
+            }
+        }
+    }
+}
+
+HeaderPanel::~HeaderPanel()
+{
+    dismissOpenHeaderLogoPopupMenus();
+    contextualHelpBinder_.reset();
+}
+
 HeaderPanel::HeaderPanel(TSS::ISkin& skin, const HeaderPanelDimensions& dimensions)
     : dimensions_(dimensions)
     , skin_(&skin)
@@ -103,6 +128,30 @@ HeaderPanel::HeaderPanel(TSS::ISkin& skin, const HeaderPanelDimensions& dimensio
     addChildControls(skin);
     populateMidiPortLists();
     syncPanicEnabledFromMidiToSelection();
+    registerContextualHelp();
+}
+
+void HeaderPanel::registerContextualHelp()
+{
+    namespace Help = PluginDisplayNames::HeaderPanel::ContextualHelp;
+
+    contextualHelpBinder_ = std::make_unique<TSS::ContextualHelpBinder>(
+        TSS::makeMainComponentFooterResolver(*this));
+
+    contextualHelpBinder_->bind(&midiFromComboBox_, Help::kMidiFrom);
+    contextualHelpBinder_->bind(&midiToComboBox_, Help::kMidiTo);
+    contextualHelpBinder_->bind(&keyboardFromComboBox_,
+                                isPluginMode_ ? Help::kHost : Help::kKeyboardFrom);
+    contextualHelpBinder_->bind(&audioFromComboBox_, Help::kAudioFrom);
+    contextualHelpBinder_->bind(&inputGainSlider_, Help::kInputGain);
+    contextualHelpBinder_->bind(&undoButton_, Help::kUndo);
+    contextualHelpBinder_->bind(&redoButton_, Help::kRedo);
+    contextualHelpBinder_->bind(&panicButton_, Help::kPanic);
+    contextualHelpBinder_->bind(&logo_, Help::kLogo);
+    contextualHelpBinder_->bind(&instrumentActivityLed_, Help::kKeyboardFromActivityLed);
+    contextualHelpBinder_->bind(&editorActivityLed_, Help::kMidiFromActivityLed);
+    contextualHelpBinder_->bind(&midiToActivityLed_, Help::kMidiToActivityLed);
+    contextualHelpBinder_->bind(&peakIndicator_, Help::kAudioPeakIndicator);
 }
 
 void HeaderPanel::paint(juce::Graphics& g)
@@ -142,6 +191,7 @@ void HeaderPanel::showLogoPopup()
         if (onAboutRequested)
             onAboutRequested();
     };
+    config.contextualHelpBinder = contextualHelpBinder_.get();
 
     TSS::HeaderLogoPopupMenu::show(logo_, *skin_, std::move(config));
 }
@@ -166,6 +216,17 @@ void HeaderPanel::setPluginMode(bool isPlugin)
         configurePluginKeyboardFrom();
     else
         configureStandaloneKeyboardFrom();
+
+    namespace Help = PluginDisplayNames::HeaderPanel::ContextualHelp;
+    if (contextualHelpBinder_ != nullptr)
+    {
+        contextualHelpBinder_->bind(&keyboardFromComboBox_,
+                                    isPluginMode_ ? Help::kHost : Help::kKeyboardFrom);
+    }
+    else
+    {
+        registerContextualHelp();
+    }
 
     resized();
 }

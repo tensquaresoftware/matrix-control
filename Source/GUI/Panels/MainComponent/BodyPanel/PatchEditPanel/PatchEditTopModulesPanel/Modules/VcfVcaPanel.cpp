@@ -1,5 +1,8 @@
 #include "VcfVcaPanel.h"
 
+#include "GUI/Helpers/ContextualHelpBindingSupport.h"
+#include "Shared/Definitions/PluginDisplayNames.h"
+
 #include "GUI/Skins/Skin.h"
 #include "GUI/Panels/Reusable/ModulePanelConfigBuilder.h"
 #include "Shared/Definitions/PluginIDs.h"
@@ -36,4 +39,30 @@ VcfVcaPanel::VcfVcaPanel(const Config& config)
           .moduleHeaderDims = config.moduleHeaderDims,
           .parameterCellDims = config.parameterCellDims})
 {
+    registerContextualHelp();
 }
+
+void VcfVcaPanel::registerContextualHelp()
+{
+    namespace Help = PluginDisplayNames::PatchEditSection::VcfVcaModule::ContextualHelp;
+
+    contextualHelpBinder_ = std::make_unique<TSS::ContextualHelpBinder>(
+        TSS::makeMainComponentFooterResolver(*this));
+
+    TSS::bindModuleHeaderInitOnly(*contextualHelpBinder_, moduleHeader_.get(), Help::kInit);
+
+    static constexpr const char* kCellHelps[] = {
+        Help::kBalance,
+        Help::kFrequency,
+        Help::kFrequencyModByEnv1,
+        Help::kFrequencyModByPressure,
+        Help::kResonance,
+        Help::kVca1Volume,
+        Help::kVca1ModByVelocity,
+        Help::kVca2ModByEnv2,
+        Help::kLevers,
+        Help::kKeyboardPortamento,
+    };
+    TSS::bindParameterCellHelps(*contextualHelpBinder_, *this, kCellHelps, std::size(kCellHelps));
+}
+

@@ -26,15 +26,20 @@ namespace TSS
 
 class WidgetFactory;
 
+struct MainComponentConstructionArgs
+{
+    TSS::Skin& skin;
+    const GuiLayoutDimensions& layoutDimensions;
+    WidgetFactory& widgetFactory;
+    juce::AudioProcessorValueTreeState& apvts;
+    const Core::PatchFileService& patchFileService;
+};
+
 class MainComponent : public juce::Component,
                       private juce::ValueTree::Listener
 {
 public:
-    MainComponent(TSS::Skin& skin,
-                  const GuiLayoutDimensions& layoutDimensions,
-                  WidgetFactory& widgetFactory,
-                  juce::AudioProcessorValueTreeState& apvts,
-                  const Core::PatchFileService& patchFileService);
+    explicit MainComponent(const MainComponentConstructionArgs& args);
     ~MainComponent() override;
 
     void paint(juce::Graphics&) override;
@@ -86,9 +91,10 @@ private:
     int uiElementsTestAreaY_ = 0;
 #endif
 
+    // Footer before Header/Body so panel binders can clear HELP during teardown without UAF.
+    FooterPanel footerPanel;
     HeaderPanel headerPanel;
     BodyPanel bodyPanel;
-    FooterPanel footerPanel;
     std::unique_ptr<TSS::LockDimmingFilm> lockDimmingFilm_;
 
     std::function<bool(const juce::KeyPress&)> editorialUndoRedoKeyHandler_;

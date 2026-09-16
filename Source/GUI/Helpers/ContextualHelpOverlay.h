@@ -1,5 +1,7 @@
 #pragma once
 
+#include <limits>
+
 #include <juce_core/juce_core.h>
 
 namespace TSS
@@ -40,25 +42,58 @@ namespace TSS
 
     /**
      * Anti-flicker leave/blur gate: apply clear only if this delayed callback is still current
-     * and no Mutator control is still hovered or focused.
+     * and no bound control is still hovered or focused.
      */
     inline bool shouldClearContextualHelpOverlay(int scheduledGeneration,
                                                  int currentGeneration,
-                                                 bool anyMutatorControlStillActive)
+                                                 bool anyBoundControlStillActive)
     {
         if (scheduledGeneration != currentGeneration)
             return false;
 
-        return ! anyMutatorControlStillActive;
+        return ! anyBoundControlStillActive;
     }
 
     /**
-     * Keep the HELP overlay while a Mutator combo popup is still in play
+     * Keep the HELP overlay while a combo / logo popup is still in play
      * (focus inside the menu, or the menu still modal). Caller should reschedule clear.
      */
-    inline bool shouldDeferContextualHelpClearForMutatorPopup(bool focusInsideMutatorPopup,
-                                                              bool mutatorPopupModalActive)
+    inline bool shouldDeferContextualHelpClearForMutatorPopup(bool focusInsidePopup,
+                                                              bool popupModalActive)
     {
-        return focusInsideMutatorPopup || mutatorPopupModalActive;
+        return focusInsidePopup || popupModalActive;
+    }
+
+    /** True when clear may drop the overlay because this caller still owns the epoch. */
+    inline bool shouldClearContextualHelpOverlayForEpoch(int ownedEpoch, int currentEpoch)
+    {
+        return ownedEpoch > 0 && ownedEpoch == currentEpoch;
+    }
+
+    /** Monotonic overlay epoch with wrap at INT_MAX (same policy as FooterPanel). */
+    inline int nextContextualHelpOverlayEpoch(int currentEpoch)
+    {
+        if (currentEpoch == std::numeric_limits<int>::max())
+            return 1;
+
+        return currentEpoch + 1;
+    }
+
+    /**
+     * Epoch-scoped clear shared by FooterPanel and unit tests.
+     * Returns true when the overlay was cleared.
+     */
+    inline bool clearContextualHelpOverlayDetailIfEpoch(ContextualHelpOverlay& overlay,
+                                                        int ownedEpoch,
+                                                        int currentEpoch)
+    {
+        if (! shouldClearContextualHelpOverlayForEpoch(ownedEpoch, currentEpoch))
+            return false;
+
+        if (! overlay.isActive())
+            return false;
+
+        overlay.clear();
+        return true;
     }
 }

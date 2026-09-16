@@ -88,6 +88,10 @@ namespace TSS
         void mouseExit(const juce::MouseEvent& event) override;
         void mouseDown(const juce::MouseEvent& event) override;
 
+        Button* getInitButton() const { return initButton_.get(); }
+        Button* getCopyButton() const { return copyButton_.get(); }
+        Button* getPasteButton() const { return pasteButton_.get(); }
+
     private:
         enum class Presentation
         {

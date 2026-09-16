@@ -55,6 +55,17 @@ AboutPanel::AboutPanel(TSS::ISkin& skin)
     addAndMakeVisible(linkedInLink_);
 }
 
+void AboutPanel::registerContextualHelp(TSS::ContextualHelpBinder::FooterResolver resolveFooter)
+{
+    namespace Help = PluginDisplayNames::About::ContextualHelp;
+
+    contextualHelpBinder_ = std::make_unique<TSS::ContextualHelpBinder>(std::move(resolveFooter));
+    contextualHelpBinder_->setHostShowingPredicate([this] { return isShowing(); });
+    contextualHelpBinder_->bind(&emailLink_, Help::kEmail);
+    contextualHelpBinder_->bind(&githubLink_, Help::kGitHub);
+    contextualHelpBinder_->bind(&linkedInLink_, Help::kLinkedIn);
+}
+
 void AboutPanel::setOnEscapePressed(std::function<void()> callback)
 {
     onEscapePressed_ = std::move(callback);

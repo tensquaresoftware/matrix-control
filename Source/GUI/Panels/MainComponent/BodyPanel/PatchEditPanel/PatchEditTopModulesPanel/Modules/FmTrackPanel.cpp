@@ -1,5 +1,8 @@
 #include "FmTrackPanel.h"
 
+#include "GUI/Helpers/ContextualHelpBindingSupport.h"
+#include "Shared/Definitions/PluginDisplayNames.h"
+
 #include "GUI/Skins/Skin.h"
 #include "GUI/Panels/Reusable/ModulePanelConfigBuilder.h"
 #include "Shared/Definitions/PluginIDs.h"
@@ -36,4 +39,30 @@ FmTrackPanel::FmTrackPanel(const Config& config)
           .moduleHeaderDims = config.moduleHeaderDims,
           .parameterCellDims = config.parameterCellDims})
 {
+    registerContextualHelp();
 }
+
+void FmTrackPanel::registerContextualHelp()
+{
+    namespace Help = PluginDisplayNames::PatchEditSection::FmTrackModule::ContextualHelp;
+
+    contextualHelpBinder_ = std::make_unique<TSS::ContextualHelpBinder>(
+        TSS::makeMainComponentFooterResolver(*this));
+
+    TSS::bindModuleHeaderInitOnly(*contextualHelpBinder_, moduleHeader_.get(), Help::kInit);
+
+    static constexpr const char* kCellHelps[] = {
+        Help::kFmAmount,
+        Help::kFmModByEnv3,
+        Help::kFmModByPressure,
+        Help::kTrackPoint1,
+        Help::kTrackPoint2,
+        Help::kTrackPoint3,
+        Help::kTrackPoint4,
+        Help::kTrackPoint5,
+        Help::kTrackInput,
+        nullptr,
+    };
+    TSS::bindParameterCellHelps(*contextualHelpBinder_, *this, kCellHelps, std::size(kCellHelps));
+}
+

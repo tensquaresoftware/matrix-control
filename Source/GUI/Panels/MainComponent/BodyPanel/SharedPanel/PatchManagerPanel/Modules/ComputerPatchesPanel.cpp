@@ -93,6 +93,7 @@ ComputerPatchesPanel::ComputerPatchesPanel(const Config& config)
     apvts_.state.addListener(this);
     refreshPatchFileComboBox();
     refreshNavigationFocusHighlight();
+    registerContextualHelp();
 
     setSize(dims_.width, dims_.height);
 }

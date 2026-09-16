@@ -10,7 +10,7 @@
 #include "GUI/Widgets/ModulationBusHeader.h"
 #include "GUI/Widgets/Button.h"
 #include "GUI/Widgets/ModulationBusCell.h"
-#include "Shared/Definitions/PluginDescriptors.h"
+#include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginHelpers.h"
 #include "Shared/Definitions/PluginIDs.h"
 #include "GUI/Factories/WidgetFactory.h"
@@ -50,10 +50,7 @@ public:
     void valueTreeChildRemoved(juce::ValueTree&, juce::ValueTree&, int) override {}
     void valueTreeChildOrderChanged(juce::ValueTree&, int, int) override {}
     void valueTreeParentChanged(juce::ValueTree&) override {}
-    void valueTreeRedirected(juce::ValueTree&) override
-    {
-        syncFromState();
-    }
+    void valueTreeRedirected(juce::ValueTree&) override { syncFromState(); }
 
 private:
     void syncFromState()
@@ -140,6 +137,7 @@ MatrixModulationPanel::MatrixModulationPanel(TSS::ISkin& skin, const MatrixModul
     }
 
     setSize(dims_.width, dims_.height);
+    registerContextualHelp();
 }
 
 void MatrixModulationPanel::setBusReorderHandler(BusReorderHandler handler)

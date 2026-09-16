@@ -8,6 +8,7 @@
 
 #include "GUI/Layout/PanelDimensions.h"
 #include "GUI/Looks/WidgetLooks.h"
+#include "GUI/Helpers/ContextualHelpBinder.h"
 
 namespace TSS
 {
@@ -46,6 +47,8 @@ public:
     static constexpr int kBankCount = 10;
 
 private:
+    void registerContextualHelp();
+
     BankUtilityPanelDimensions dims_;
     TSS::ISkin* skin_;
     float uiScale_ = 1.0f;
@@ -61,6 +64,7 @@ private:
     std::unique_ptr<TSS::Button> importBankButton_;
     std::unique_ptr<TSS::ClipboardFeedbackButtonBinding> copyFeedbackBinding_;
     std::unique_ptr<TSS::ClipboardFeedbackButtonBinding> pasteFeedbackBinding_;
+    std::unique_ptr<TSS::ContextualHelpBinder> contextualHelpBinder_;
 
     void setupModuleHeader(TSS::ISkin& skin, WidgetFactory& widgetFactory, const juce::String& moduleId);
     void setupSelectBankButtons(TSS::ISkin& skin, WidgetFactory& widgetFactory);

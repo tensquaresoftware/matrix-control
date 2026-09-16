@@ -124,7 +124,7 @@ PatchMutatorPanel::PatchMutatorPanel(TSS::ISkin& skin,
     refreshCompareUiState();
     refreshPitchControlEnabled();
     schedulePitchControlEnabledBootRefresh();
-    registerContextualHelpBindings();
+    registerContextualHelp();
 
     setSize(dims_.width, dims_.height);
 }
@@ -132,7 +132,6 @@ PatchMutatorPanel::PatchMutatorPanel(TSS::ISkin& skin,
 PatchMutatorPanel::~PatchMutatorPanel()
 {
     stopTimer();
-    unregisterContextualHelpBindings();
     unbindWaveSelectPitchListeners();
     apvts_.state.removeListener(this);
 }

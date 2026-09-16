@@ -1,5 +1,8 @@
 #include "RampPortamentoPanel.h"
 
+#include "GUI/Helpers/ContextualHelpBindingSupport.h"
+#include "Shared/Definitions/PluginDisplayNames.h"
+
 #include "GUI/Helpers/GrayedControlHelper.h"
 #include "GUI/Helpers/StrigUnisonGateHelper.h"
 #include "GUI/Layout/ScaledLayout.h"
@@ -113,6 +116,7 @@ RampPortamentoPanel::RampPortamentoPanel(const Config& config)
           .moduleHeaderDims = config.moduleHeaderDims,
           .parameterCellDims = config.parameterCellDims})
 {
+    registerContextualHelp();
     masterOverrideBadge_ = std::make_unique<MasterOverrideBadge>(
         config.skin,
         [this] { showMasterOverrideFooter(); });
@@ -289,3 +293,27 @@ void RampPortamentoPanel::layoutMasterOverrideBadge()
     masterOverrideBadge_->setBounds(badgeX, badgeY, badgeSize, badgeSize);
     masterOverrideBadge_->toFront(false);
 }
+
+void RampPortamentoPanel::registerContextualHelp()
+{
+    namespace Help = PluginDisplayNames::PatchEditSection::RampPortamentoModule::ContextualHelp;
+
+    contextualHelpBinder_ = std::make_unique<TSS::ContextualHelpBinder>(
+        TSS::makeMainComponentFooterResolver(*this));
+
+    TSS::bindModuleHeaderInitOnly(*contextualHelpBinder_, moduleHeader_.get(), Help::kInit);
+
+    static constexpr const char* kCellHelps[] = {
+        Help::kRamp1Rate,
+        Help::kRamp1Trigger,
+        Help::kRamp2Rate,
+        Help::kRamp2Trigger,
+        Help::kPortamentoRate,
+        Help::kPortamentoModByVelocity,
+        Help::kPortamentoMode,
+        Help::kPortamentoLegato,
+        Help::kPortamentoKeyboardMode,
+    };
+    TSS::bindParameterCellHelps(*contextualHelpBinder_, *this, kCellHelps, std::size(kCellHelps));
+}
+

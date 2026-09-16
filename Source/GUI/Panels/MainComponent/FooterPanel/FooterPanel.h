@@ -3,12 +3,15 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 
+#include <memory>
+
 #include "GUI/Helpers/ContextualHelpOverlay.h"
 #include "GUI/Layout/PanelDimensions.h"
 
 namespace TSS
 {
     class ISkin;
+    class ContextualHelpBinder;
 }
 
 class FooterPanel : public juce::Component,
@@ -26,9 +29,13 @@ public:
     void setUiScale(float uiScale);
     void setMidiQueuePressureAlert(bool active);
 
-    /** Display-only left-band overlay; never writes APVTS sticky properties. */
-    void setContextualHelpOverlay(const juce::String& detailText);
+    /**
+     * Display-only left-band overlay; never writes APVTS sticky properties.
+     * Returns a monotonic epoch so callers can clear only if they still own the overlay.
+     */
+    int setContextualHelpOverlay(const juce::String& detailText);
     void clearContextualHelpOverlay();
+    void clearContextualHelpOverlayIfEpoch(int epoch);
 
     void valueTreePropertyChanged(juce::ValueTree& tree,
                                  const juce::Identifier& property) override;
@@ -101,9 +108,14 @@ private:
                              juce::Rectangle<int> bounds,
                              const juce::Font& font) const;
     void syncFromApvtsState(juce::ValueTree& tree);
+    void updateDeviceHitAreaBounds();
+    void registerDeviceContextualHelp();
 
     bool midiQueuePressureAlertActive_ = false;
     TSS::ContextualHelpOverlay contextualHelpOverlay_;
+    int contextualHelpEpoch_ = 0;
+    juce::Component deviceHitArea_;
+    std::unique_ptr<TSS::ContextualHelpBinder> contextualHelpBinder_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(FooterPanel)
 };

@@ -32,8 +32,12 @@ void PluginEditor::createUiShell()
     setWantsKeyboardFocus(false);
     setInterceptsMouseClicks(true, true);
 
-    mainComponent_ = std::make_unique<MainComponent>(
-        *skin_, layoutDimensions_, *widgetFactory_, pluginProcessor.getApvts(), pluginProcessor.getPatchFileService());
+    mainComponent_ = std::make_unique<MainComponent>(MainComponentConstructionArgs{
+        *skin_,
+        layoutDimensions_,
+        *widgetFactory_,
+        pluginProcessor.getApvts(),
+        pluginProcessor.getPatchFileService()});
     addAndMakeVisible(*mainComponent_);
     mainComponent_->attachLockDimmingFilm(pluginProcessor.getApvts());
 

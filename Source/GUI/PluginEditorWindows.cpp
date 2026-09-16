@@ -5,9 +5,12 @@
 #include "PluginEditorInternal.h"
 
 #include "GUI/About/AboutWindow.h"
+#include "GUI/About/AboutPanel.h"
 #include "GUI/Dialogs/BankTransferProgressDialog.h"
 #include "GUI/Dialogs/MasterInitConfirmDialog.h"
 #include "GUI/Layout/ScaledLayout.h"
+#include "GUI/MainComponent.h"
+#include "GUI/Panels/MainComponent/FooterPanel/FooterPanel.h"
 #include "GUI/Settings/SettingsPanel.h"
 #include "GUI/Settings/SettingsWindow.h"
 
@@ -81,6 +84,11 @@ void PluginEditor::openSettingsWindow()
             isPluginMode,
             [this](SettingsPanel& panel)
             {
+                panel.registerContextualHelp([this]() -> FooterPanel*
+                {
+                    return mainComponent_ != nullptr ? &mainComponent_->getFooterPanel()
+                                                     : nullptr;
+                });
                 wireSettingsPanel(panel);
             },
             [this] { closeSettingsWindow(); });
@@ -118,6 +126,10 @@ void PluginEditor::openAboutWindow()
         aboutWindow_ = std::make_unique<AboutWindow>(
             *skin_,
             [this] { closeAboutWindow(); });
+        aboutWindow_->getAboutPanel().registerContextualHelp([this]() -> FooterPanel*
+        {
+            return mainComponent_ != nullptr ? &mainComponent_->getFooterPanel() : nullptr;
+        });
         addChildComponent(*aboutWindow_);
     }
     else

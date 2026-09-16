@@ -1,5 +1,8 @@
 #include "Dco2Panel.h"
 
+#include "GUI/Helpers/ContextualHelpBindingSupport.h"
+#include "Shared/Definitions/PluginDisplayNames.h"
+
 #include "GUI/Skins/Skin.h"
 #include "GUI/Panels/Reusable/ModulePanelConfigBuilder.h"
 #include "Shared/Definitions/PluginIDs.h"
@@ -41,4 +44,32 @@ Dco2Panel::Dco2Panel(const Config& config)
           .moduleHeaderDims = config.moduleHeaderDims,
           .parameterCellDims = config.parameterCellDims})
 {
+    registerContextualHelp();
 }
+
+void Dco2Panel::registerContextualHelp()
+{
+    namespace Help = PluginDisplayNames::PatchEditSection::Dco2Module::ContextualHelp;
+
+    contextualHelpBinder_ = std::make_unique<TSS::ContextualHelpBinder>(
+        TSS::makeMainComponentFooterResolver(*this));
+
+    TSS::bindModuleHeaderInitCopyPaste(*contextualHelpBinder_,
+                                        moduleHeader_.get(),
+                                        { Help::kInit, Help::kCopy, Help::kPaste });
+
+    static constexpr const char* kCellHelps[] = {
+        Help::kFrequency,
+        Help::kFrequencyModByLfo1,
+        Help::kDetune,
+        Help::kPulseWidth,
+        Help::kPulseWidthModByLfo2,
+        Help::kWaveShape,
+        Help::kWaveSelect,
+        Help::kLevers,
+        Help::kKeyboardPortamento,
+        Help::kKeyClick,
+    };
+    TSS::bindParameterCellHelps(*contextualHelpBinder_, *this, kCellHelps, std::size(kCellHelps));
+}
+

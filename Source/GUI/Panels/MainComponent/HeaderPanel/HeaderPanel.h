@@ -16,6 +16,7 @@
 #include "GUI/Layout/PanelDimensions.h"
 #include "GUI/Skins/Skin.h"
 #include "Shared/Definitions/PluginIDs.h"
+#include "GUI/Helpers/ContextualHelpBinder.h"
 
 namespace TSS
 {
@@ -32,7 +33,7 @@ public:
     static constexpr int kPluginHostItemId = 2;
 
     HeaderPanel(TSS::ISkin& skin, const HeaderPanelDimensions& dimensions);
-    ~HeaderPanel() override = default;
+    ~HeaderPanel() override;
 
     void paint(juce::Graphics&) override;
     void resized() override;
@@ -94,6 +95,7 @@ private:
     void wireActionButtons();
     void addChildControls(TSS::ISkin& skin);
     void applyPanicButtonLook();
+    void registerContextualHelp();
 
     void populateInputPortCombo(TSS::ComboBox& combo, std::vector<juce::String>& identifiers);
     void populateOutputPortCombo(TSS::ComboBox& combo, std::vector<juce::String>& identifiers);
@@ -137,6 +139,8 @@ private:
     std::vector<juce::String> midiToPortIdentifiers_;
     std::vector<juce::String> keyboardFromPortIdentifiers_;
     std::vector<juce::String> audioFromSourceIdentifiers_;
+
+    std::unique_ptr<TSS::ContextualHelpBinder> contextualHelpBinder_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(HeaderPanel)
 };
