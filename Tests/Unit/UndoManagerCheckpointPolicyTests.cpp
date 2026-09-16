@@ -145,11 +145,27 @@ struct MutateCheckpointHarness
         proc.apvts.state.setProperty(PatchMutator::kEnableMatrixMod, false, nullptr);
     }
 
-    void writeProbeParam(int value)
+    // Prefer `preferredValue`, but always land on a different denormalised value so
+    // UndoManager records a transaction (WILD MUTATE can leave DCO1 Frequency at 14 —
+    // Windows CI 35028483328 failed canUndo after a no-op probe write).
+    void writeProbeParam(int preferredValue)
     {
         const auto& descriptor = firstPatchIntDescriptor();
+        const int current = juce::roundToInt(
+            proc.apvts.getRawParameterValue(descriptor.parameterId)->load());
+        int value = preferredValue;
+        if (value == current)
+        {
+            value = (current >= descriptor.maxValue) ? descriptor.minValue
+                                                     : current + 1;
+        }
+
         // getParameterAsValue stores the denormalised parameter domain (same as getRawParameterValue).
         proc.apvts.getParameterAsValue(descriptor.parameterId).setValue(static_cast<float>(value));
+
+        const int written = juce::roundToInt(
+            proc.apvts.getRawParameterValue(descriptor.parameterId)->load());
+        jassert(written != current);
     }
 };
 
@@ -252,8 +268,14 @@ private:
         harness.setMutateRecipe();
 
         expect(harness.engine.mutate().success, "seed MUTATE should succeed with WILD/FREE + DCO1 scope");
+
+        // Force the preferred-value collision path that flaked when MUTATE left Frequency at 14.
+        const auto& probe = firstPatchIntDescriptor();
+        harness.proc.apvts.getParameterAsValue(probe.parameterId).setValue(14.0f);
+        harness.proc.undoManager.clearUndoHistory();
         harness.writeProbeParam(14);
-        expect(harness.proc.undoManager.canUndo());
+        expect(harness.proc.undoManager.canUndo(),
+               "probe must record undo even when preferred value matches current");
 
         expect(harness.engine.retry().success, "RETRY should succeed after a seeded MUTATE root");
         expect(! harness.proc.undoManager.canUndo());
