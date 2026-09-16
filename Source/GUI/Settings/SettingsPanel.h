@@ -21,9 +21,9 @@ class SettingsPanel : public juce::Component
 public:
     // Content = label column 120 + control column 140 (no gap); outer = content + padding 16*2.
     // Control column fits UTILITY (LOAD | SAVE AS | INIT) at 44+4+44+4+44.
-    // Height includes KEYBOARD section (header + up to 4 shortcut rows) after MASTER.
+    // Height sized for plugin content including HARDWARE LATENCY (standalone leaves spare space).
     static constexpr int kDesignWidth = 292;
-    static constexpr int kDesignHeight = 633;
+    static constexpr int kDesignHeight = 456;
 
     SettingsPanel(TSS::ISkin& skin, bool isPluginMode);
     ~SettingsPanel() override = default;
@@ -89,7 +89,6 @@ private:
     void setupPatchSection(TSS::ISkin& skin);
     void setupPatchMutatorSection(TSS::ISkin& skin);
     void setupMasterSection(TSS::ISkin& skin);
-    void setupKeyboardSection(TSS::ISkin& skin);
     void populateComboItems();
     void applyComboPopupLooks(TSS::ISkin& skin);
     void applyChildLooks(TSS::ISkin& skin);
@@ -104,7 +103,6 @@ private:
     void layoutPatchSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics);
     void layoutPatchMutatorSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics);
     void layoutMasterSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics);
-    void layoutKeyboardSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics);
     void layoutSectionHeader(juce::Rectangle<int>& bounds, const SectionHeaderLayoutArgs& args);
     void layoutLabeledControlRow(juce::Rectangle<int>& bounds,
                                  const RowLayoutMetrics& metrics,
@@ -181,17 +179,6 @@ private:
     std::unique_ptr<TSS::Label> masterInitTemplateLabel_;
     std::unique_ptr<TSS::Button> masterSaveAsInitButton_;
     std::unique_ptr<TSS::Button> masterDeleteInitButton_;
-
-    std::unique_ptr<TSS::Label> keyboardSectionLabel_;
-    std::unique_ptr<TSS::HorizontalSeparator> keyboardSectionSeparator_;
-    std::unique_ptr<TSS::Label> settingsShortcutLabel_;
-    std::unique_ptr<TSS::Label> settingsShortcutValue_;
-    std::unique_ptr<TSS::Label> audioMidiShortcutLabel_;
-    std::unique_ptr<TSS::Label> audioMidiShortcutValue_;
-    std::unique_ptr<TSS::Label> uiScaleShortcutLabel_;
-    std::unique_ptr<TSS::Label> uiScaleShortcutValue_;
-    std::unique_ptr<TSS::Label> skinShortcutLabel_;
-    std::unique_ptr<TSS::Label> skinShortcutValue_;
 
     std::unique_ptr<TSS::ContextualHelpBinder> contextualHelpBinder_;
 

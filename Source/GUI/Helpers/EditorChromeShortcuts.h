@@ -244,30 +244,12 @@ namespace TSS
 #endif
         }
 
-        inline juce::String uiScaleGroup()
-        {
-#if JUCE_MAC
-            return macCommandGlyph() + " +/- / " + macCommandGlyph() + " 0";
-#else
-            return "Ctrl+/- / Ctrl+0";
-#endif
-        }
-
         inline juce::String skinVariant(int digit)
         {
 #if JUCE_MAC
             return macCommandGlyph() + " " + juce::String(digit);
 #else
             return "Ctrl+" + juce::String(digit);
-#endif
-        }
-
-        inline juce::String skinGroup()
-        {
-#if JUCE_MAC
-            return macCommandGlyph() + " 1 / " + macCommandGlyph() + " 2";
-#else
-            return "Ctrl+1 / Ctrl+2";
 #endif
         }
     }

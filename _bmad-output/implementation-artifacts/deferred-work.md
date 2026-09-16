@@ -1743,9 +1743,8 @@ Original review bullets below remain for history; status for U-10-owned residual
 ## Deferred from: spec-settings-audio-midi-ui-scale-shortcuts.md (2026-09-14)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-settings-audio-midi-ui-scale-shortcuts.md`
-  summary: Settings modal keeps a fixed design height when the Audio/MIDI KEYBOARD row is hidden in plugin mode, leaving empty space at the bottom.
-  evidence: Same content-driven height debt as earlier Settings height deferrals; KEYBOARD section adds another mode-dependent row without shrinking `kDesignHeight`.
-
+  summary: ~~Settings modal keeps a fixed design height when the Audio/MIDI KEYBOARD row is hidden in plugin mode, leaving empty space at the bottom.~~ **Resolved 2026-09-16 (spec-remove-settings-keyboard-section)**: KEYBOARD section removed; remaining fixed-height vs HARDWARE LATENCY hide is covered by the earlier Settings height deferral (2026-09-03).
+  evidence: ~~Same content-driven height debt as earlier Settings height deferrals; KEYBOARD section adds another mode-dependent row without shrinking `kDesignHeight`.~~
 ## Deferred from: code review of spec-settings-audio-midi-ui-scale-shortcuts.md (2026-09-14)
 
 - No automated check that `PluginEditor` chrome shortcut actions fire (`openSettingsWindow`, UI Scale apply, Audio/MIDI dialog) — CONVENTIONS forbid GUI component unit tests; classifier-only coverage matches editorial undo; needs a harness approach later.

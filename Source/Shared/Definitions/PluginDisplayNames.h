@@ -158,11 +158,6 @@ namespace PluginDisplayNames
         constexpr const char* kPatchSection            = "PATCH";
         constexpr const char* kPatchMutatorSection     = "PATCH MUTATOR";
         constexpr const char* kMasterSection           = "MASTER";
-        constexpr const char* kKeyboardSection         = "KEYBOARD";
-        constexpr const char* kSettingsShortcutLabel   = "SETTINGS";
-        constexpr const char* kAudioMidiShortcutLabel  = "AUDIO/MIDI";
-        constexpr const char* kUiScaleShortcutLabel    = "UI SCALE";
-        constexpr const char* kSkinShortcutLabel       = "SKIN";
         constexpr const char* kMatrix1000PatchesLabel  = "MATRIX-1000 PATCHES";
         constexpr const char* kComputerPatchesLabel    = "COMPUTER PATCHES";
         constexpr const char* kUnsavedStateLabel       = "UNSAVED STATE";
@@ -235,14 +230,6 @@ namespace PluginDisplayNames
                 "SETTINGS: Saves current Master settings as the master init template.";
             constexpr const char* kMasterDeleteInit =
                 "SETTINGS: Deletes the saved master init template.";
-            constexpr const char* kSettingsShortcut =
-                "SETTINGS: Shows the keyboard shortcut that opens Settings.";
-            constexpr const char* kAudioMidiShortcut =
-                "SETTINGS: Shows the keyboard shortcut that opens Audio/MIDI.";
-            constexpr const char* kUiScaleShortcut =
-                "SETTINGS: Shows the keyboard shortcut cycle for UI Scale.";
-            constexpr const char* kSkinShortcut =
-                "SETTINGS: Shows the keyboard shortcut cycle for Skin.";
         }
 
     }
