@@ -46,7 +46,7 @@ private:
         expect(! harness.patchLoadHookState->invoked);
         expect(harness.proc.apvts.state.getProperty("uiMessageSeverity").toString() == "warning");
         expectEquals(harness.proc.apvts.state.getProperty("uiMessageText").toString(),
-                     juce::String("Patch Mutator: Could not read the patch from the synth. Keeping the current editor buffer. "
+                     juce::String("PATCH MUTATOR: Could not read the patch from the synth. Keeping the current editor buffer. "
                                   "Check that MIDI FROM is the synth MIDI OUT."));
         expect(harness.model.getName() == "DIRTY!!!");
     }
@@ -106,7 +106,7 @@ private:
             harness.mapper, harness.patchNameSyncer, harness.model));
         expect(! harness.patchLoadHookState->invoked);
         expectEquals(harness.proc.apvts.state.getProperty("uiMessageText").toString(),
-                     juce::String("Patch Mutator: Synth patch load cancelled because the editor changed while waiting. "
+                     juce::String("PATCH MUTATOR: Synth patch load cancelled because the editor changed while waiting. "
                                   "Bank and patch numbers were restored; your edits were kept."));
     }
 

@@ -110,7 +110,7 @@ private:
         expect(sessionFolder.getChildFile("M00.syx").existsAsFile());
         expect(! sessionFolder.getChildFile("M00").isDirectory());
         expectEquals(result.footerMessage,
-                     juce::String("Patch Mutator: Exported 2 mutation file(s) to ")
+                     juce::String("PATCH MUTATOR: Exported 2 mutation file(s) to ")
                          + sessionFolder.getFullPathName() + ".");
         expectEquals(result.footerSeverity, juce::String("info"));
 
@@ -158,7 +158,7 @@ private:
         expect(result.success);
         expect(tempDir.getChildFile("OB-VOX @ B8-P25-2").isDirectory());
         expectEquals(result.footerMessage,
-                     juce::String("Patch Mutator: Exported 2 mutation file(s) to ")
+                     juce::String("PATCH MUTATOR: Exported 2 mutation file(s) to ")
                          + tempDir.getChildFile("OB-VOX @ B8-P25-2").getFullPathName() + ".");
 
         tempDir.deleteRecursively();
@@ -175,7 +175,7 @@ private:
             tempDir, Core::ExportCollisionResolution::kCancel);
 
         expect(! result.success);
-        expectEquals(result.footerMessage, juce::String("Patch Mutator: Export cancelled."));
+        expectEquals(result.footerMessage, juce::String("PATCH MUTATOR: Export cancelled."));
         expectEquals(result.footerSeverity, juce::String("info"));
 
         tempDir.deleteRecursively();
@@ -246,7 +246,7 @@ private:
         const auto result = harness.engine.exportHistory(tempDir);
 
         expect(! result.success);
-        expectEquals(result.footerMessage, juce::String("Patch Mutator: Mutation history is empty."));
+        expectEquals(result.footerMessage, juce::String("PATCH MUTATOR: Mutation history is empty."));
         expectEquals(result.footerSeverity, juce::String("warning"));
         expectEquals(tempDir.getNumberOfChildFiles(0), 0);
 
@@ -271,7 +271,7 @@ private:
         expect(result.success);
         expectEquals(result.footerSeverity, juce::String("info"));
         expectEquals(result.footerMessage,
-                     juce::String("Patch Mutator: Exported 2 mutation file(s) to ")
+                     juce::String("PATCH MUTATOR: Exported 2 mutation file(s) to ")
                          + tempDir.getFullPathName() + ".");
 
         tempDir.deleteRecursively();
@@ -291,7 +291,7 @@ private:
         const auto result = harness.engine.exportHistory(missing);
 
         expect(! result.success);
-        expectEquals(result.footerMessage, juce::String("Patch Mutator: Export folder is not writable."));
+        expectEquals(result.footerMessage, juce::String("PATCH MUTATOR: Export folder is not writable."));
         expectEquals(result.footerSeverity, juce::String("warning"));
     }
 
@@ -305,7 +305,7 @@ private:
             emptyError, juce::File("/tmp"));
         expect(! emptyFallback.success);
         expectEquals(emptyFallback.footerMessage,
-                     juce::String("Patch Mutator: Mutation export failed."));
+                     juce::String("PATCH MUTATOR: Mutation export failed."));
         expectEquals(emptyFallback.footerSeverity, juce::String("warning"));
 
         Core::PatchFileExportResult rawError;
@@ -314,7 +314,7 @@ private:
         const auto prefixed = PatchMutatorEngineInternal::makeExportHistoryResult(
             rawError, juce::File("/tmp"));
         expect(! prefixed.success);
-        expectEquals(prefixed.footerMessage, juce::String("Patch Mutator: Folder not writable"));
+        expectEquals(prefixed.footerMessage, juce::String("PATCH MUTATOR: Folder not writable"));
         expectEquals(prefixed.footerSeverity, juce::String("warning"));
     }
 

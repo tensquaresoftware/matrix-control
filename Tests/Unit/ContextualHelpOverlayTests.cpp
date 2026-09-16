@@ -38,14 +38,14 @@ private:
     {
         beginTest("Hover help - overlay active; sticky string untouched");
 
-        juce::String sticky = "Patch Mutator: Compare mode - editing locked.";
+        juce::String sticky = "PATCH MUTATOR: Compare mode - editing locked.";
         TSS::ContextualHelpOverlay overlay;
 
         overlay.setDetail(MutatorHelp::kMutate);
 
         expect(overlay.isActive());
         expectEquals(overlay.getDetail(), juce::String(MutatorHelp::kMutate));
-        expectEquals(sticky, juce::String("Patch Mutator: Compare mode - editing locked."));
+        expectEquals(sticky, juce::String("PATCH MUTATOR: Compare mode - editing locked."));
         expect(TSS::shouldPaintContextualHelpOverSticky(overlay.isActive()));
     }
 
@@ -116,19 +116,19 @@ private:
     {
         beginTest("Sticky writer during help - overlay stays until leave clear");
 
-        juce::String apvtsSticky = "Patch Mutator: Mutation history flushed.";
+        juce::String apvtsSticky = "PATCH MUTATOR: Mutation history flushed.";
         TSS::ContextualHelpOverlay overlay;
         overlay.setDetail(MutatorHelp::kExport);
 
-        apvtsSticky = "Patch Mutator: Exported 3 mutation file(s) to /tmp/out.";
+        apvtsSticky = "PATCH MUTATOR: Exported 3 mutation file(s) to /tmp/out.";
 
         expect(overlay.isActive());
         expectEquals(overlay.getDetail(), juce::String(MutatorHelp::kExport));
-        expect(apvtsSticky.startsWith("Patch Mutator: Exported "));
+        expect(apvtsSticky.startsWith("PATCH MUTATOR: Exported "));
 
         overlay.clear();
         expect(! overlay.isActive());
-        expect(apvtsSticky.startsWith("Patch Mutator: Exported "));
+        expect(apvtsSticky.startsWith("PATCH MUTATOR: Exported "));
     }
 
     void warningAndErrorAreCoveredWhileOverlayActive()

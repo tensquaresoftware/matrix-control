@@ -83,7 +83,7 @@ private:
         expect(! result.success);
         expect(result.defragModalRequested);
         expectEquals(result.footerMessage,
-                     juce::String("Patch Mutator: Mutation history is full. Defrag to continue."));
+                     juce::String("PATCH MUTATOR: Mutation history is full. Defrag to continue."));
         expectEquals(result.footerSeverity, juce::String("warning"));
     }
 
@@ -111,7 +111,7 @@ private:
 
         const auto result = harness.engine.mutate();
         expect(! result.success);
-        expectEquals(result.footerMessage, juce::String("Patch Mutator: Enable at least one module to mutate."));
+        expectEquals(result.footerMessage, juce::String("PATCH MUTATOR: Enable at least one module to mutate."));
         expectEquals(harness.engine.rootCount(), 0);
         expectEquals(countPatchSysExMessages(harness.queue), 0);
     }
@@ -242,7 +242,7 @@ private:
         beginTest("footerForDiverseMutation_noUsableRoll_usesPrefixedNoChangeSticky");
 
         expectEquals(juce::String(PatchMutatorEngineInternal::kNoMutationChangeFooterMessage),
-                     juce::String("Patch Mutator: No changes. Try a wider MODE or more modules."));
+                     juce::String("PATCH MUTATOR: No changes. Try a wider MODE or more modules."));
     }
 
 };

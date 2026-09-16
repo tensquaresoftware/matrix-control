@@ -234,7 +234,7 @@ private:
         const auto result = harness.engine.defragHistory();
         expect(result.success);
         expectEquals(result.footerSeverity, juce::String("info"));
-        expectEquals(result.footerMessage, juce::String("Patch Mutator: Mutation history renumbered."));
+        expectEquals(result.footerMessage, juce::String("PATCH MUTATOR: Mutation history renumbered."));
     }
 
 };

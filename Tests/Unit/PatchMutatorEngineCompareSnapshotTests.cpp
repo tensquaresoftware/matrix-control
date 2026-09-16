@@ -78,7 +78,7 @@ private:
 
         const auto result = harness.engine.toggleCompare();
         expect(! result.success);
-        expectEquals(result.footerMessage, juce::String("Patch Mutator: Mutation history is empty."));
+        expectEquals(result.footerMessage, juce::String("PATCH MUTATOR: Mutation history is empty."));
         expect(! static_cast<bool>(harness.proc.apvts.state.getProperty(MutatorState::kCompareActive, false)));
         expectEquals(countPatchSysExMessages(harness.queue), 0);
     }
@@ -98,7 +98,7 @@ private:
         const auto result = harness.engine.toggleCompare();
         expect(! result.success);
         expectEquals(result.footerMessage,
-                     juce::String("Patch Mutator: No initial patch snapshot available for compare."));
+                     juce::String("PATCH MUTATOR: No initial patch snapshot available for compare."));
         expectEquals(result.footerSeverity, juce::String("warning"));
         expect(! static_cast<bool>(harness.proc.apvts.state.getProperty(MutatorState::kCompareActive, false)));
     }
@@ -135,7 +135,7 @@ private:
         expect(result.success);
         expect(static_cast<bool>(harness.proc.apvts.state.getProperty(MutatorState::kCompareActive, false)));
         expectEquals(result.footerMessage,
-                     juce::String("Patch Mutator: Compare mode - editing and patch/bank changes are locked. "
+                     juce::String("PATCH MUTATOR: Compare mode - editing and patch/bank changes are locked. "
                                   "Click C again to exit."));
         expectEquals(result.footerSeverity, juce::String("info"));
     }
@@ -150,7 +150,7 @@ private:
         expect(harness.engine.toggleCompare().success);
 
         harness.proc.apvts.state.setProperty("uiMessageText",
-                                             juce::String("Patch Mutator: Compare mode - editing and patch/bank changes are locked. "
+                                             juce::String("PATCH MUTATOR: Compare mode - editing and patch/bank changes are locked. "
                                                           "Click C again to exit."),
                                              nullptr);
         harness.proc.apvts.state.setProperty("uiMessageSeverity", "info", nullptr);

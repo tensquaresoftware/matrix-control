@@ -186,18 +186,18 @@ namespace PluginDisplayNames
             constexpr const char* kPatchInitTemplateSaved =
                 "Patch init template saved (PatchInit.syx)";
             constexpr const char* kMasterInitTemplateSaved =
-                "Master init template saved (MasterInit.syx)";
+                "MASTER init template saved (MasterInit.syx)";
             constexpr const char* kInitTemplateWriteFailed =
                 "Could not write init template";
             constexpr const char* kPatchInitTemplateDeleted =
                 "Patch init template deleted (PatchInit.syx)";
             constexpr const char* kMasterInitTemplateDeleted =
-                "Master init template deleted (MasterInit.syx)";
+                "MASTER init template deleted (MasterInit.syx)";
             constexpr const char* kInitTemplateDeleteFailed =
                 "Could not delete init template";
-            constexpr const char* kMasterLoaded = "Master loaded";
-            constexpr const char* kMasterSaved = "Master saved";
-            constexpr const char* kMasterFileFailed = "Master file failed";
+            constexpr const char* kMasterLoaded = "MASTER loaded";
+            constexpr const char* kMasterSaved = "MASTER saved";
+            constexpr const char* kMasterFileFailed = "MASTER file failed";
             constexpr const char* kRenameBeforeSave =
                 "Rename patch (replace * INIT *) before SAVE / SAVE AS";
         }
@@ -455,7 +455,7 @@ namespace PluginDisplayNames
 
     namespace ClipboardMessages
     {
-        constexpr const char* kMatrixModulationName = "Matrix Modulation";
+        constexpr const char* kMatrixModulationName = "MATRIX MODULATION";
 
         inline juce::String formatModuleCopied(const juce::String& moduleName)
         {
@@ -1113,7 +1113,7 @@ namespace PluginDisplayNames
             constexpr const char* kLegatoPortaUnisonBlockedFooter =
                 "LEGATO PORTA is only available when KEYBOARD MODE is UNISON.";
             constexpr const char* kMasterUnisonOverrideFooter =
-                "Master Unison is overriding Keyboard Mode.";
+                "MASTER UNISON is overriding KEYBOARD MODE.";
             constexpr const char* kStrigRequiresUnisonFooter =
                 "STRIG is only available when KEYBOARD MODE is UNISON.";
 
@@ -1502,7 +1502,7 @@ namespace PluginDisplayNames
             constexpr const char* kAmount      = "AMOUNT";
             constexpr const char* kDestination = "DESTINATION";
             constexpr const char* kIncompatiblePasteFooter =
-                "Clipboard contents are not compatible with Matrix Modulation paste.";
+                "Clipboard contents are not compatible with MATRIX MODULATION paste.";
 
             namespace StandaloneWidgets
             {
@@ -1944,7 +1944,7 @@ namespace PluginDisplayNames
 
             // Furtive left-footer help while hovering / focusing Mutator controls (display-only).
             // Furtive left-footer help while hovering / focusing Mutator controls (display-only).
-            // HELP uses "PATCH MUTATOR: " (GUI casing). Sticky Messages keep "Patch Mutator: ".
+            // Sticky Messages and HELP both use "PATCH MUTATOR: " (GUI casing).
             namespace ContextualHelp
             {
                 constexpr const char* kMode =
@@ -1994,11 +1994,11 @@ namespace PluginDisplayNames
             }
 
             // Footer + dialog copy for the session-load / Compare features. English only.
-            // Sticky footers use "Patch Mutator: " prefix; dialog-only strings stay unprefixed.
+            // Sticky footers use "PATCH MUTATOR: " prefix; dialog-only strings stay unprefixed.
             namespace Messages
             {
                 constexpr const char* kCompareLockedFooter =
-                    "Patch Mutator: Compare mode - editing and patch/bank changes are locked. "
+                    "PATCH MUTATOR: Compare mode - editing and patch/bank changes are locked. "
                     "Click C again to exit.";
 
                 constexpr const char* kHistoryGateTitle = "Unsaved mutations";
@@ -2016,16 +2016,16 @@ namespace PluginDisplayNames
                 constexpr const char* kExportCollisionKeep = "Keep both";
                 constexpr const char* kExportCollisionCancel = "Cancel";
 
-                constexpr const char* kExportCancelledFooter = "Patch Mutator: Export cancelled.";
+                constexpr const char* kExportCancelledFooter = "PATCH MUTATOR: Export cancelled.";
 
                 // Stem for Export success sticky + FooterPanel path-style middle truncate.
-                constexpr const char* kExportCompleteFooterStem = "Patch Mutator: Exported ";
+                constexpr const char* kExportCompleteFooterStem = "PATCH MUTATOR: Exported ";
 
                 constexpr const char* kDeviceDumpFailedFooter =
-                    "Patch Mutator: Could not read the patch from the synth. Keeping the current editor buffer. "
+                    "PATCH MUTATOR: Could not read the patch from the synth. Keeping the current editor buffer. "
                     "Check that MIDI FROM is the synth MIDI OUT.";
                 constexpr const char* kDeviceDumpAbortedEditedFooter =
-                    "Patch Mutator: Synth patch load cancelled because the editor changed while waiting. "
+                    "PATCH MUTATOR: Synth patch load cancelled because the editor changed while waiting. "
                     "Bank and patch numbers were restored; your edits were kept.";
             }
         }

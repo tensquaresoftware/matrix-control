@@ -31,26 +31,26 @@ namespace PatchMutatorEngineInternal
     constexpr size_t kMutableByteRangeStart = 8;
 
     // All Patch Mutator sticky footers share this module prefix (badge stays separate).
-    constexpr const char* kStickyModulePrefix = "Patch Mutator: ";
+    constexpr const char* kStickyModulePrefix = "PATCH MUTATOR: ";
 
     constexpr const char* kNoModuleScopeFooterMessage =
-        "Patch Mutator: Enable at least one module to mutate.";
+        "PATCH MUTATOR: Enable at least one module to mutate.";
     constexpr const char* kNoMutationChangeFooterMessage =
-        "Patch Mutator: No changes. Try a wider MODE or more modules.";
+        "PATCH MUTATOR: No changes. Try a wider MODE or more modules.";
     constexpr const char* kRetryTooSimilarFooterMessage =
-        "Patch Mutator: RETRY too similar. Try a wider MODE or more modules.";
+        "PATCH MUTATOR: RETRY too similar. Try a wider MODE or more modules.";
     constexpr const char* kHistoryLimitFooterMessage =
-        "Patch Mutator: Mutation history is full. Defrag to continue.";
-    constexpr const char* kEmptyHistoryFooterMessage = "Patch Mutator: Mutation history is empty.";
+        "PATCH MUTATOR: Mutation history is full. Defrag to continue.";
+    constexpr const char* kEmptyHistoryFooterMessage = "PATCH MUTATOR: Mutation history is empty.";
     constexpr const char* kNoSelectionFooterMessage =
-        "Patch Mutator: No valid mutation history entry selected.";
+        "PATCH MUTATOR: No valid mutation history entry selected.";
     constexpr const char* kNoInitialSnapshotFooterMessage =
-        "Patch Mutator: No initial patch snapshot available for compare.";
-    constexpr const char* kFlushSuccessFooterMessage = "Patch Mutator: Mutation history flushed.";
-    constexpr const char* kDefragCompleteFooterMessage = "Patch Mutator: Mutation history renumbered.";
+        "PATCH MUTATOR: No initial patch snapshot available for compare.";
+    constexpr const char* kFlushSuccessFooterMessage = "PATCH MUTATOR: Mutation history flushed.";
+    constexpr const char* kDefragCompleteFooterMessage = "PATCH MUTATOR: Mutation history renumbered.";
     constexpr const char* kExportFolderNotWritableFooterMessage =
-        "Patch Mutator: Export folder is not writable.";
-    constexpr const char* kExportFailedFooterMessage = "Patch Mutator: Mutation export failed.";
+        "PATCH MUTATOR: Export folder is not writable.";
+    constexpr const char* kExportFailedFooterMessage = "PATCH MUTATOR: Mutation export failed.";
     constexpr const char* kFooterSeverityWarning = "warning";
     constexpr const char* kFooterSeverityInfo = "info";
 
