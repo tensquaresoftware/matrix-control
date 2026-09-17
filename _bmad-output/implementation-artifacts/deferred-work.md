@@ -1,5 +1,9 @@
 # Deferred Work
 
+## Deferred from: code review of spec-master-pull-on-connect.md (2026-09-18)
+
+- **Sticky-footer inventory missing `kMasterPullFailed`** — New Master pull-on-connect failure string is not listed in `inventory-sticky-footer-messages.md` / Settings footer table. Deferred: sticky-footer inventory pass is out of scope for this chantier (separate dirty inventory artifact).
+
 ## Deferred from: spec-gui-wide-footer-contextual-help.md (2026-09-16)
 
 - **Project-popup defer unit coverage** — `shouldDeferContextualHelpClearForProjectPopup` / `HeaderLogoPopupMenu` type recognition not unit-tested (only Mutator bool helper).

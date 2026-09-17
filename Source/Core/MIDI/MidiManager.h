@@ -86,7 +86,22 @@ public:
                                  PackedPatchCallback callback,
                                  int settleMs = Core::MidiRequestTiming::kMinDeviceSettleMs,
                                  int outboundIdleTimeoutMs = Core::MidiRequestTiming::kMinOutboundIdleTimeoutMs);
-    void cancelPendingSysExRequest() noexcept;
+    // Non-blocking Master Parameter Data request (type=3). Same idle/settle/timeout pattern as
+    // requestSinglePatchAsync; gated by isMasterEditOutboundAllowed (Matrix-1000 only).
+    void requestMasterDataAsync(PackedPatchCallback callback,
+                                int settleMs = Core::MidiRequestTiming::kMinDeviceSettleMs,
+                                int outboundIdleTimeoutMs = Core::MidiRequestTiming::kMinOutboundIdleTimeoutMs);
+    // Processor registers apply path (MasterModel + APVTS under suppress). Empty dump = failure.
+    void setMasterPullApplyHandler(PackedPatchCallback handler);
+    // Apply a pulled Master dump, or publish the failure footer when empty/wrong size (no apply).
+    void deliverMasterPullResult(std::vector<juce::uint8> packed);
+    // Policy + trigger seam used after Device Inquiry success (and by unit tests).
+    // Returns true when a Master pull was armed (async capture pending).
+    bool maybePullMasterAfterInquirySuccess(bool wasDetectedBeforeSuccess,
+                                            MatrixDeviceTypes::Type previousType,
+                                            MatrixDeviceTypes::Type newType,
+                                            bool forceBecausePortPairChanged = false);
+    void cancelPendingSysExRequest();
 
     // True when MIDI output and input ports are open so a dump / inquiry can be attempted.
     // Ports alone do not satisfy FR-2 / V1.2: editor Program Change and SysEx still require a
@@ -183,8 +198,14 @@ private:
     std::atomic<std::uint64_t> asyncRequestToken_{ 0 };
     std::atomic<bool> asyncSysExCaptureActive_{ false };
     PackedPatchCallback pendingAsyncCallback_;
+    PackedPatchCallback masterPullApplyHandler_;
     juce::String lastInquiryInputId_;
     juce::String lastInquiryOutputId_;
+    /** Set when Device Inquiry starts because MIDI From/To pair changed (not presence heartbeat). */
+    bool forceMasterPullOnNextInquirySuccess_ { false };
+    /** True while cancelPendingSysExRequest invokes the pending callback — empty Master
+        deliver is abort, not sticky failure. */
+    bool suppressMasterPullFailureFooterForEmptyResult_ { false };
     std::unique_ptr<DevicePresenceTimer> devicePresenceTimer_;
 
     std::vector<juce::uint8> requestSysExData(juce::uint8 requestType,
@@ -206,6 +227,16 @@ private:
     // Quiet decode for async capture: returns empty for non-patch / corrupt SysEx without
     // treating that as request failure (caller may keep listening until timeout).
     std::vector<juce::uint8> tryDecodeAsyncPatchResponse(const juce::MemoryBlock& response);
+
+    void sendArmedMasterRequest(std::uint64_t token);
+    void armAsyncMasterCapture(std::uint64_t token);
+    void scheduleAsyncMasterTimeout(std::uint64_t token);
+    void pollOutboundIdleThenMasterRequest(OutboundIdlePollArgs args);
+    void scheduleOrSendArmedMasterRequest(const OutboundIdlePollArgs& args);
+    std::vector<juce::uint8> tryDecodeAsyncMasterResponse(const juce::MemoryBlock& response);
+    void triggerMasterPullOnConnectIfAllowed();
+    void publishMasterPullFailureFooter();
+    void clearMasterPullFailureFooterIfPresent();
 
     void clearDeviceDetectionAfterPortLoss();
     void clearLastInquiryPortPair() noexcept;

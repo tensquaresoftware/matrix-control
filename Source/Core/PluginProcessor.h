@@ -430,6 +430,7 @@ private:
     void dispatchMasterParameterChange(const juce::String& parameterId);
     void dispatchMutatorHistorySelectionChange(const juce::String& parameterId);
     void handleDeviceTypePropertyChange(const juce::String& propertyName);
+    void applyInboundMasterDump(const std::vector<juce::uint8>& packedMaster);
     void cancelMasterEditSysExDebounce() noexcept;
     void firePendingMasterEditSysEx();
     void resyncSynthAfterEditorialUndoRedo();

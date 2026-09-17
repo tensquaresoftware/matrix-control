@@ -198,6 +198,9 @@ namespace PluginDisplayNames
             constexpr const char* kMasterLoaded = "MASTER loaded";
             constexpr const char* kMasterSaved = "MASTER saved";
             constexpr const char* kMasterFileFailed = "MASTER file failed";
+            constexpr const char* kMasterPullFailed =
+                "MASTER: Could not read Master parameters from the synth. Keeping current Master Edit settings. "
+                "Check that MIDI FROM is the synth MIDI OUT.";
             constexpr const char* kRenameBeforeSave =
                 "Rename patch (replace * INIT *) before SAVE / SAVE AS";
         }

@@ -315,6 +315,8 @@ void PluginProcessor::finishConstructionSetup()
     initializeMutatorRecipeState();
     resetEphemeralMutatorStateAfterSessionLoad();
     initializeMutatorActionEnabledMirrorsForEmptyHistory();
+    midiManager->setMasterPullApplyHandler(
+        [this](std::vector<juce::uint8> packed) { applyInboundMasterDump(packed); });
     apvts.state.addListener(this);
     deferredMidiPortSyncTimer_ = std::make_unique<DeferredMidiPortSyncTimer>(*this);
     installMidiDeviceListConnection();

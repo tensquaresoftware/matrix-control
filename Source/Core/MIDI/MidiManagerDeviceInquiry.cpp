@@ -7,6 +7,7 @@
 #include "Core/MIDI/DeviceInquiryCaptureFilter.h"
 #include "Core/MIDI/DeviceInquiryTrigger.h"
 #include "Core/MIDI/EditorOutboundGate.h"
+#include "Core/MIDI/MasterPullOnConnectPolicy.h"
 #include "Core/MIDI/Queue/SysExDelayProfile.h"
 #include "Core/Services/DeviceTypeRegistry.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
@@ -18,6 +19,7 @@ void MidiManager::clearDeviceDetectionAfterPortLoss()
 
     cancelPendingSysExRequest();
     clearLastInquiryPortPair();
+    forceMasterPullOnNextInquirySuccess_ = false;
 
     if (! wasDetected && ! hadInquiryPair)
     {
@@ -104,6 +106,9 @@ void MidiManager::refreshDeviceInquiryAfterPortSync()
                                        lastInquiryInputId_,
                                        lastInquiryOutputId_))
     {
+        // Port pair changed while both ports are open: detection may still say "connected".
+        // Force Master pull on the coming success so MIDI TO reconnect mirrors a fresh detect.
+        forceMasterPullOnNextInquirySuccess_ = true;
         lastInquiryInputId_ = inputId;
         lastInquiryOutputId_ = outputId;
         performDeviceInquiry();
@@ -194,8 +199,20 @@ void MidiManager::finishAsyncDeviceInquirySuccess(std::uint64_t token,
         midiReceiver->cancelOneShotSysExCapture();
 
     asyncSysExCaptureActive_.store(false, std::memory_order_release);
+
+    const bool wasDetected = static_cast<bool>(apvts.state.getProperty("deviceDetected", false));
+    const auto previousType = Core::DeviceTypeRegistry::fromApvtsProperty(
+        apvts.state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
+
     sysExDelay_.setProfile(Core::SysExDelayProfile::fromDeviceInquiry(info));
     updateDeviceStatus(true, info.version, deviceType);
+
+    const auto pullSnapshot = Core::consumeMasterPullInquirySnapshot(
+        wasDetected, previousType, forceMasterPullOnNextInquirySuccess_);
+    maybePullMasterAfterInquirySuccess(pullSnapshot.wasDetectedBeforeSuccess,
+                                       pullSnapshot.previousType,
+                                       deviceType,
+                                       pullSnapshot.forceBecausePortPairChanged);
 }
 
 void MidiManager::finishAsyncDeviceInquiryFailure(std::uint64_t token,
@@ -210,6 +227,7 @@ void MidiManager::finishAsyncDeviceInquiryFailure(std::uint64_t token,
         midiReceiver->cancelOneShotSysExCapture();
 
     asyncSysExCaptureActive_.store(false, std::memory_order_release);
+    forceMasterPullOnNextInquirySuccess_ = false;
     clearLastInquiryPortPair();
     sysExDelay_.setProfile(Core::SysExDelayProfile::stockDefault());
     updateDeviceStatus(false);

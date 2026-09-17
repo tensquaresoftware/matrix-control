@@ -5,7 +5,7 @@
 
 #include "Core/Loggers/MidiLogger.h"
 
-void MidiManager::cancelPendingSysExRequest() noexcept
+void MidiManager::cancelPendingSysExRequest()
 {
     const auto token = asyncRequestToken_.fetch_add(1, std::memory_order_acq_rel) + 1;
     juce::ignoreUnused(token);
@@ -13,8 +13,17 @@ void MidiManager::cancelPendingSysExRequest() noexcept
     if (midiReceiver != nullptr)
         midiReceiver->cancelOneShotSysExCapture();
 
+    auto callback = std::move(pendingAsyncCallback_);
     pendingAsyncCallback_ = nullptr;
     asyncSysExCaptureActive_.store(false, std::memory_order_release);
+
+    // Same contract as finishAsyncPackedPatch: invoke after clearing capture state.
+    // Callbacks must not throw (neither path catches). Empty to Master connect-pull means
+    // abort, not a sticky failure footer (suppress while invoking).
+    suppressMasterPullFailureFooterForEmptyResult_ = true;
+    if (callback)
+        callback({});
+    suppressMasterPullFailureFooterForEmptyResult_ = false;
 }
 
 void MidiManager::finishAsyncPackedPatch(std::uint64_t token, std::vector<juce::uint8> packed)

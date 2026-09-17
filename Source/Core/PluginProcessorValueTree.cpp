@@ -8,12 +8,14 @@
 #include "Core/Actions/ActionPropertyRegistry.h"
 #include "Core/Actions/MutatorActionHandler.h"
 #include "Core/Actions/PatchManagerActionHandler.h"
+#include "Core/MIDI/MasterInboundApply.h"
 #include "Core/MIDI/MasterParameterSysExDispatcher.h"
 #include "Core/MIDI/MatrixModBusParameterSysExDispatcher.h"
 #include "Core/MIDI/MatrixModBusReorderService.h"
 #include "Core/MIDI/PatchParameterSysExDispatcher.h"
 #include "Core/Models/ApvtsMasterMapper.h"
 #include "Core/Models/ApvtsPatchMapper.h"
+#include "Core/Models/MasterModel.h"
 #include "Core/Models/PatchNameSyncer.h"
 #include "Core/Services/PatchMutator/MutatorSessionPersistence.h"
 #include "Core/Services/PatchMutator/PatchMutatorEngine.h"
@@ -246,6 +248,21 @@ void PluginProcessor::handleDeviceTypePropertyChange(const juce::String& propert
 
     reconcilePatchManagerCoordinatesForDeviceType();
     applyPreferredStandaloneAudioFromForDeviceType();
+}
+
+void PluginProcessor::applyInboundMasterDump(const std::vector<juce::uint8>& packedMaster)
+{
+    if (masterModel_ == nullptr || apvtsMasterMapper_ == nullptr)
+        return;
+
+    Core::applyQuietInboundMasterDump({
+        *masterModel_,
+        *apvtsMasterMapper_,
+        apvts,
+        packedMaster,
+        [this] { cancelMasterEditSysExDebounce(); },
+        suppressMasterParameterSysEx_,
+    });
 }
 
 void PluginProcessor::valueTreeChildAdded(juce::ValueTree& parentTree,

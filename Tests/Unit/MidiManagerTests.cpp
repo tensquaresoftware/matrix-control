@@ -3,11 +3,13 @@
 #include <juce_core/juce_core.h>
 
 #include "Core/MIDI/MidiActivityTracker.h"
+#include "Core/MIDI/MasterPullOnConnectPolicy.h"
 #include "Core/MIDI/MidiManager.h"
 #include "Core/MIDI/Queue/MidiOutboundQueue.h"
 #include "Core/MIDI/SysEx/SysExConstants.h"
 #include "MidiManagerTestSupport.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
+#include "Shared/Definitions/PluginDisplayNames.h"
 
 using MidiManagerTestSupport::MinimalAudioProcessor;
 
@@ -27,6 +29,10 @@ public:
         testSendMasterFailClosedForNonMatrix1000();
         testWeakReferenceClearsAfterMidiManagerDestroy();
         testRequestSinglePatchAsyncIdleTimeoutFailsVisibly();
+        testRequestMasterDataAsyncIdleTimeoutFailsVisibly();
+        testRequestMasterDataAsyncSkippedForMatrix6();
+        testMasterPullInquirySnapshotConsumesPortPairForce();
+        testCancelConnectPullDoesNotPublishFailureFooter();
     }
 
 private:
@@ -217,6 +223,143 @@ private:
         expect(proc.apvts.state.getProperty("lastError").toString().contains("Timeout"),
                "Idle timeout must surface a visible Timeout error state");
         expectEquals(proc.apvts.state.getProperty("errorType").toString(), juce::String("Timeout"));
+    }
+
+    void testRequestMasterDataAsyncIdleTimeoutFailsVisibly()
+    {
+        beginTest("requestMasterDataAsync — injectable idle timeout fails with empty callback");
+
+        Core::MidiOutboundQueue queue;
+        Core::MidiActivityTracker tracker;
+        MinimalAudioProcessor proc;
+        MidiManager manager(proc.apvts, queue, tracker);
+
+        proc.apvts.state.setProperty("deviceDetected", true, nullptr);
+        proc.apvts.state.setProperty(MatrixDeviceTypes::kApvtsPropertyName,
+                                      MatrixDeviceTypes::kMatrix1000Id,
+                                      nullptr);
+
+        const juce::uint8 stuckBytes[] = { 0xF0, 0x10, 0x06, 0x06, 0x00, 0x40, 0xF7 };
+        juce::MemoryBlock stuckSysEx(stuckBytes, sizeof(stuckBytes));
+        queue.enqueueSysEx(stuckSysEx);
+
+        bool callbackRan = false;
+        bool callbackEmpty = false;
+        manager.requestMasterDataAsync(
+            [&](std::vector<juce::uint8> packed)
+            {
+                callbackRan = true;
+                callbackEmpty = packed.empty();
+            },
+            0,
+            0);
+
+        expect(callbackRan, "Idle timeout must invoke the Master pull callback");
+        expect(callbackEmpty, "Timed-out Master pull must fail with an empty packed buffer");
+        expect(proc.apvts.state.getProperty("lastError").toString().contains("Timeout"),
+               "Idle timeout must surface a visible Timeout error state");
+        expectEquals(proc.apvts.state.getProperty("errorType").toString(), juce::String("Timeout"));
+    }
+
+    void testRequestMasterDataAsyncSkippedForMatrix6()
+    {
+        beginTest("requestMasterDataAsync — Matrix-6 skips without starting a pull");
+
+        Core::MidiOutboundQueue queue;
+        Core::MidiActivityTracker tracker;
+        MinimalAudioProcessor proc;
+        MidiManager manager(proc.apvts, queue, tracker);
+
+        proc.apvts.state.setProperty("deviceDetected", true, nullptr);
+        proc.apvts.state.setProperty(MatrixDeviceTypes::kApvtsPropertyName,
+                                      MatrixDeviceTypes::kMatrix6Id,
+                                      nullptr);
+
+        bool callbackRan = false;
+        bool callbackEmpty = false;
+        manager.requestMasterDataAsync(
+            [&](std::vector<juce::uint8> packed)
+            {
+                callbackRan = true;
+                callbackEmpty = packed.empty();
+            });
+
+        expect(callbackRan, "Gate skip must invoke callback immediately");
+        expect(callbackEmpty, "Matrix-6 Master pull must not return packed data");
+    }
+
+    void testMasterPullInquirySnapshotConsumesPortPairForce()
+    {
+        beginTest("Master pull inquiry snapshot — port-pair force consumed into pull args");
+
+        bool forceFlag = true;
+        const auto snap = Core::consumeMasterPullInquirySnapshot(
+            true, MatrixDeviceTypes::Type::kMatrix1000, forceFlag);
+
+        expect(snap.forceBecausePortPairChanged && ! forceFlag);
+        expect(Core::shouldPullMasterAfterDeviceInquirySuccess(
+                   snap, MatrixDeviceTypes::Type::kMatrix1000));
+
+        Core::MidiOutboundQueue queue;
+        Core::MidiActivityTracker tracker;
+        MinimalAudioProcessor proc;
+        MidiManager manager(proc.apvts, queue, tracker);
+        proc.apvts.state.setProperty("deviceDetected", true, nullptr);
+        proc.apvts.state.setProperty(MatrixDeviceTypes::kApvtsPropertyName,
+                                      MatrixDeviceTypes::kMatrix1000Id,
+                                      nullptr);
+
+        expect(manager.maybePullMasterAfterInquirySuccess(
+                   snap.wasDetectedBeforeSuccess,
+                   snap.previousType,
+                   MatrixDeviceTypes::Type::kMatrix1000,
+                   snap.forceBecausePortPairChanged));
+        manager.cancelPendingSysExRequest();
+
+        bool noForce = false;
+        const auto heartbeat = Core::consumeMasterPullInquirySnapshot(
+            true, MatrixDeviceTypes::Type::kMatrix1000, noForce);
+        expect(! Core::shouldPullMasterAfterDeviceInquirySuccess(
+                    heartbeat, MatrixDeviceTypes::Type::kMatrix1000));
+    }
+
+    void testCancelConnectPullDoesNotPublishFailureFooter()
+    {
+        beginTest("cancel Master connect-pull — abort must not sticky-warn as read failure");
+
+        Core::MidiOutboundQueue queue;
+        Core::MidiActivityTracker tracker;
+        MinimalAudioProcessor proc;
+        MidiManager manager(proc.apvts, queue, tracker);
+
+        proc.apvts.state.setProperty("deviceDetected", true, nullptr);
+        proc.apvts.state.setProperty(MatrixDeviceTypes::kApvtsPropertyName,
+                                      MatrixDeviceTypes::kMatrix1000Id,
+                                      nullptr);
+        proc.apvts.state.setProperty("uiMessageText", juce::String(), nullptr);
+        proc.apvts.state.setProperty("uiMessageSeverity", juce::String(), nullptr);
+
+        bool applyCalled = false;
+        manager.setMasterPullApplyHandler(
+            [&](std::vector<juce::uint8>)
+            {
+                applyCalled = true;
+            });
+
+        manager.requestMasterDataAsync(
+            [&](std::vector<juce::uint8> packed)
+            {
+                manager.deliverMasterPullResult(std::move(packed));
+            },
+            5000,
+            5000);
+
+        manager.cancelPendingSysExRequest();
+
+        expect(! applyCalled, "Cancelled Master pull must not apply");
+        expect(proc.apvts.state.getProperty("uiMessageText").toString()
+                   != PluginDisplayNames::Settings::FooterMessages::kMasterPullFailed,
+               "Cancel/abort must not publish sticky Master pull failure footer");
     }
 };
 

@@ -268,6 +268,7 @@ set(PLUGIN_SOURCES
     Source/Core/MIDI/MidiManagerPorts.cpp
     Source/Core/MIDI/MidiManagerOutbound.cpp
     Source/Core/MIDI/MidiManagerAsyncPatch.cpp
+    Source/Core/MIDI/MidiManagerAsyncMaster.cpp
     Source/Core/MIDI/MidiManagerDeviceInquiry.cpp
     Source/Core/MIDI/MidiPortOpenFeedback.cpp
     Source/Core/MIDI/PatchParameterSysExDispatcher.cpp
@@ -486,6 +487,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/SysExEncoderTests.cpp
         Tests/Unit/MasterParameterSysExDispatcherTests.cpp
         Tests/Unit/MasterEditSysExDebounceTests.cpp
+        Tests/Unit/MasterPullOnConnectTests.cpp
         Tests/Unit/MatrixModBusParameterSysExDispatcherTests.cpp
         Tests/Unit/MatrixModBusReorderServiceTests.cpp
         Tests/Unit/MasterModuleInitServiceTests.cpp
@@ -647,6 +649,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/MIDI/MidiManagerPorts.cpp
         Source/Core/MIDI/MidiManagerOutbound.cpp
         Source/Core/MIDI/MidiManagerAsyncPatch.cpp
+        Source/Core/MIDI/MidiManagerAsyncMaster.cpp
         Source/Core/MIDI/MidiManagerDeviceInquiry.cpp
         Source/Core/MIDI/MidiPortOpenFeedback.cpp
         Source/Core/MIDI/MasterParameterSysExDispatcher.cpp
