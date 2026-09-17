@@ -34,10 +34,13 @@ namespace TSS
         juce::String detail_;
     };
 
-    /** True when the left band should paint help instead of the sticky APVTS message. */
-    inline bool shouldPaintContextualHelpOverSticky(bool overlayActive)
+    /** True when the left band should paint help instead of the sticky APVTS message.
+        Error stickies always win so disconnect / lock guidance stays visible even if a
+        bound control still holds hover or keyboard focus (e.g. MIDI TO after port change). */
+    inline bool shouldPaintContextualHelpOverSticky(bool overlayActive,
+                                                    bool stickyErrorPresent = false)
     {
-        return overlayActive;
+        return overlayActive && ! stickyErrorPresent;
     }
 
     /**

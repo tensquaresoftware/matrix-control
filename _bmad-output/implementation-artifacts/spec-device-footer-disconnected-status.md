@@ -29,6 +29,7 @@ context:
 - Prefer oneshot GUI fix; no new product copy.
 - Implemented 2026-09-17: FooterPanel listens to `deviceMidiUnresponsive`; detail → `NOT CONNECTED`; badge uses ERROR fill when unresponsive (same path as undetected). Shared `isDeviceIdentityOk()` for badge fill vs identity detail predicates.
 - Review: extracted shared OK helper; deferred historical unresponsive-spec / inventory doc drift.
+- Follow-up 2026-09-17 (smoke): HELP overlay no longer covers sticky Error — MIDI TO hover/focus after port change left HELP stuck over unresponsive ERROR; `shouldPaintContextualHelpOverSticky` now yields when sticky severity is Error.
 
 ## Review Triage Log
 

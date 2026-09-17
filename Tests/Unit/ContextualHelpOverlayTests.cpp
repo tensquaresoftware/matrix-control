@@ -26,7 +26,8 @@ public:
         compareFilmOnlyExposesCompareHole();
         adjacentTraverseSupersedesPendingClear();
         stickyWriterDuringHelpLeavesOverlayUntilClear();
-        warningAndErrorAreCoveredWhileOverlayActive();
+        warningStickyCoveredWhileOverlayActive();
+        errorStickyWinsOverOverlay();
         mutatorPopupDefersClearUntilIdle();
         helpCopyConstantsMatchSpec();
         epochOwnershipGatesClear();
@@ -131,12 +132,21 @@ private:
         expect(apvtsSticky.startsWith("PATCH MUTATOR: Exported "));
     }
 
-    void warningAndErrorAreCoveredWhileOverlayActive()
+    void warningStickyCoveredWhileOverlayActive()
     {
-        beginTest("Warning/Error sticky + hover - overlay always covers while active");
+        beginTest("Warning sticky + hover - overlay covers while active");
 
-        expect(TSS::shouldPaintContextualHelpOverSticky(true));
-        expect(! TSS::shouldPaintContextualHelpOverSticky(false));
+        expect(TSS::shouldPaintContextualHelpOverSticky(true, false));
+        expect(! TSS::shouldPaintContextualHelpOverSticky(false, false));
+    }
+
+    void errorStickyWinsOverOverlay()
+    {
+        beginTest("Error sticky - wins over HELP overlay while error present");
+
+        expect(! TSS::shouldPaintContextualHelpOverSticky(true, true));
+        expect(! TSS::shouldPaintContextualHelpOverSticky(false, true));
+        expect(TSS::shouldPaintContextualHelpOverSticky(true, false));
     }
 
     void mutatorPopupDefersClearUntilIdle()

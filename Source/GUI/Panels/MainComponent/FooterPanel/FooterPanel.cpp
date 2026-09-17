@@ -179,7 +179,9 @@ void FooterPanel::paintContextualHelp(juce::Graphics& g,
                                       juce::Rectangle<int> bounds,
                                       const juce::Font& font) const
 {
-    if (! TSS::shouldPaintContextualHelpOverSticky(contextualHelpOverlay_.isActive()))
+    const bool stickyError = currentSeverity == MessageSeverity::Error;
+    if (! TSS::shouldPaintContextualHelpOverSticky(contextualHelpOverlay_.isActive(),
+                                                   stickyError))
         return;
 
     const auto helpChrome = juce::Colour(ColourChart::kContextualHelpChrome);
@@ -208,8 +210,10 @@ void FooterPanel::paint(juce::Graphics& g)
     const auto font = skin_->getBaseFont().withHeight(skin_->getBaseFont().getHeight() * uiScale_);
     const auto chromeGrey = skin_->getColour(SkinColourId::kFooterMessageInfo);
     const auto leftBounds = layout.leftBand.reduced(layout.padding, 0);
+    const bool stickyError = currentSeverity == MessageSeverity::Error;
 
-    if (TSS::shouldPaintContextualHelpOverSticky(contextualHelpOverlay_.isActive()))
+    if (TSS::shouldPaintContextualHelpOverSticky(contextualHelpOverlay_.isActive(),
+                                                 stickyError))
         paintContextualHelp(g, leftBounds, font);
     else
         paintStatusMessage(g, leftBounds, font, chromeGrey);
