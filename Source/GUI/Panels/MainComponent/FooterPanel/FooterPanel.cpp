@@ -183,14 +183,14 @@ void FooterPanel::paintContextualHelp(juce::Graphics& g,
     if (! TSS::shouldPaintContextualHelpOverSticky(contextualHelpOverlay_.isActive()))
         return;
 
-    const auto labelWhite = skin_->getColour(SkinColourId::kLabelText);
+    const auto helpChrome = juce::Colour(ColourChart::kContextualHelpChrome);
     paintBadgeAndDetail(g, {
         bounds,
         PluginDisplayNames::FooterPanel::kContextualHelpBadge,
         contextualHelpOverlay_.getDetail(),
-        labelWhite,
+        helpChrome,
         skin_->getColour(SkinColourId::kFooterPanelBackground),
-        labelWhite,
+        helpChrome,
         font
     });
 }

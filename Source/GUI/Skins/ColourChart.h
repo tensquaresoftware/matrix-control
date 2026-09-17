@@ -19,6 +19,8 @@ struct ColourChart
     
     static constexpr juce::uint32 kLightGrey1  = 0xFF999999;
     static constexpr juce::uint32 kLightGrey2  = 0xFFB9B9B9;
+    /** Midway between former HELP #B0B0B0 and sticky INFO #606060 — furtive HELP chrome. */
+    static constexpr juce::uint32 kContextualHelpChrome = 0xFF888888;
     static constexpr juce::uint32 kLightGrey3  = 0xFFDDDDDD;
 
     static constexpr juce::uint32 kRed         = 0xFFFF0000;
