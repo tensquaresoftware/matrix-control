@@ -77,6 +77,7 @@ private:
     juce::String currentMessage;
     MessageSeverity currentSeverity = MessageSeverity::None;
     bool deviceDetected_ = false;
+    bool deviceMidiUnresponsive_ = false;
     juce::String deviceType_;
     juce::String deviceVersion_;
 
@@ -85,11 +86,13 @@ private:
     static const juce::Identifier kDeviceDetectedId;
     static const juce::Identifier kDeviceTypeId;
     static const juce::Identifier kDeviceVersionId;
+    static const juce::Identifier kDeviceMidiUnresponsiveId;
 
     MessageSeverity parseSeverity(const juce::String& severityStr) const;
     juce::Colour getSeverityColour(MessageSeverity severity) const;
     juce::String getSeverityPrefix(MessageSeverity severity) const;
     juce::String buildDeviceDetailText() const;
+    bool isDeviceIdentityOk() const;
     FooterBandLayout computeBandLayout() const;
     void paintBadgeAndDetail(juce::Graphics& g, const BadgeDetailPaintArgs& args) const;
     void paintStatusMessage(juce::Graphics& g,

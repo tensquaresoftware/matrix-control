@@ -1780,3 +1780,24 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-patch-mutator-footer-contextual-help.md`
   summary: ascii-display-strings checklist greps literals but does not call out consumer matchers (e.g. FooterPanel Loaded truncate) that must stay in sync with formatters.
   evidence: Agent-context doc polish after this review’s truncate finding.
+
+## Deferred from: spec-sticky-footer-messages-inventory.md (2026-09-16)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-sticky-footer-messages-inventory.md`
+  summary: Keep a versioned in-repo copy of the sticky footer inventory (Desktop-only deliverable today).
+  evidence: User asked for Desktop file; Blind Hunter noted no durable SSOT under `_bmad-output/` / Documentation for later casing work.
+
+## Deferred from: spec-contextual-help-footer-grey.md (2026-09-17)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-contextual-help-footer-grey.md`
+  summary: Older Mutator HELP footer spec still documents chrome as SkinColourId::kLabelText after HELP paint switched to ColourChart::kContextualHelpChrome (#B0B0B0).
+  evidence: Docs drift only; product paint is correct. Update or annotate the historical decided rule when next touching that story artifact.
+
+## Deferred from: spec-device-footer-disconnected-status.md (2026-09-17)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-device-footer-disconnected-status.md`
+  summary: Done unresponsive presence spec still describes footer only as left-band overload copy; agents re-reading it miss DEVICE identity reacting to deviceMidiUnresponsive.
+  evidence: Blind Hunter oneshot review; docs drift vs this FooterPanel fix — annotate or cross-link when next touching that artifact.
+- source_spec: `_bmad-output/implementation-artifacts/spec-device-footer-disconnected-status.md`
+  summary: Sticky/footer inventories and DEVICE contextual help do not document unresponsive → NOT CONNECTED + ERROR badge right-band state.
+  evidence: Blind Hunter; inventory/help copy follow-up for later casing or help polish waves.

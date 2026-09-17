@@ -1,5 +1,6 @@
 #include "FooterPanel.h"
 
+#include "Core/MIDI/EditorOutboundGate.h"
 #include "GUI/Helpers/ContextualHelpBinder.h"
 #include "GUI/Helpers/DeviceVersionDisplayFormat.h"
 #include "GUI/Helpers/TextFitHelpers.h"
@@ -17,6 +18,7 @@ const juce::Identifier FooterPanel::kMessageSeverityId("uiMessageSeverity");
 const juce::Identifier FooterPanel::kDeviceDetectedId("deviceDetected");
 const juce::Identifier FooterPanel::kDeviceTypeId(MatrixDeviceTypes::kApvtsPropertyName);
 const juce::Identifier FooterPanel::kDeviceVersionId("deviceVersion");
+const juce::Identifier FooterPanel::kDeviceMidiUnresponsiveId(Core::kDeviceMidiUnresponsiveProperty);
 
 FooterPanel::FooterPanel(TSS::ISkin& skin,
                          const FooterPanelDimensions& dimensions,
@@ -139,10 +141,7 @@ void FooterPanel::paintDeviceStatus(juce::Graphics& g,
                                     const juce::Font& font,
                                     juce::Colour detailColour) const
 {
-    const auto type = MatrixDeviceTypes::fromApvtsString(deviceType_);
-    const bool deviceOk = deviceDetected_
-        && MatrixDeviceTypes::isSupportedMatrixDevice(type);
-    const auto badgeFill = deviceOk
+    const auto badgeFill = isDeviceIdentityOk()
         ? skin_->getColour(SkinColourId::kFooterMessageInfo)
         : skin_->getColour(SkinColourId::kFooterMessageError).withAlpha(0.8f);
 
@@ -287,7 +286,8 @@ void FooterPanel::valueTreePropertyChanged(juce::ValueTree& tree,
         || property == kMessageSeverityId
         || property == kDeviceDetectedId
         || property == kDeviceTypeId
-        || property == kDeviceVersionId)
+        || property == kDeviceVersionId
+        || property == kDeviceMidiUnresponsiveId)
     {
         syncFromApvtsState(tree);
         repaint();
@@ -299,6 +299,7 @@ void FooterPanel::syncFromApvtsState(juce::ValueTree& tree)
     currentMessage = tree.getProperty(kMessageTextId, juce::String()).toString();
     currentSeverity = parseSeverity(tree.getProperty(kMessageSeverityId, juce::String()).toString());
     deviceDetected_ = static_cast<bool>(tree.getProperty(kDeviceDetectedId, false));
+    deviceMidiUnresponsive_ = static_cast<bool>(tree.getProperty(kDeviceMidiUnresponsiveId, false));
     deviceType_ = tree.getProperty(kDeviceTypeId, juce::String()).toString();
     deviceVersion_ = tree.getProperty(kDeviceVersionId, juce::String()).toString();
 }
@@ -351,7 +352,7 @@ juce::String FooterPanel::getSeverityPrefix(MessageSeverity severity) const
 
 juce::String FooterPanel::buildDeviceDetailText() const
 {
-    if (! deviceDetected_)
+    if (! deviceDetected_ || deviceMidiUnresponsive_)
         return PluginDisplayNames::FooterPanel::kDeviceNotConnectedDetail;
 
     const auto type = MatrixDeviceTypes::fromApvtsString(deviceType_);
@@ -364,6 +365,15 @@ juce::String FooterPanel::buildDeviceDetailText() const
         detail += " (V" + versionDisplay + ")";
 
     return detail;
+}
+
+bool FooterPanel::isDeviceIdentityOk() const
+{
+    if (! deviceDetected_ || deviceMidiUnresponsive_)
+        return false;
+
+    return MatrixDeviceTypes::isSupportedMatrixDevice(
+        MatrixDeviceTypes::fromApvtsString(deviceType_));
 }
 
 void FooterPanel::updateDeviceHitAreaBounds()
