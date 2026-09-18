@@ -14,6 +14,7 @@
 #include "GUI/Panels/MainComponent/FooterPanel/FooterPanel.h"
 #include "GUI/Settings/SettingsPanel.h"
 #include "GUI/Settings/SettingsWindow.h"
+#include "Core/MIDI/EditorOutboundGate.h"
 #include "Core/Services/DeviceConnectionMachineDefaults.h"
 #include "Core/Services/DeviceSetupDeviceRow.h"
 #include "Core/Services/DeviceTypeRegistry.h"
@@ -248,7 +249,7 @@ namespace
         return {
             .deviceDetected = static_cast<bool>(state.getProperty("deviceDetected", false)),
             .deviceMidiUnresponsive = static_cast<bool>(
-                state.getProperty("deviceMidiUnresponsive", false)),
+                state.getProperty(Core::kDeviceMidiUnresponsiveProperty, false)),
             .deviceType = Core::DeviceTypeRegistry::fromApvtsProperty(
                 state.getProperty(MatrixDeviceTypes::kApvtsPropertyName)),
             .deviceVersion = state.getProperty("deviceVersion", juce::String()).toString(),

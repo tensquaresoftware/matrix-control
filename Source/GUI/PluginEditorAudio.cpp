@@ -6,10 +6,10 @@
 #include "PluginEditorInternal.h"
 
 #include "Core/Audio/StandaloneAudioInputRouter.h"
+#include "Core/MIDI/EditorOutboundGate.h"
 #include "Core/MIDI/MidiManager.h"
 #include "Core/Services/DeviceTypeRegistry.h"
 #include "Core/Services/EpromTypePolicy.h"
-#include "GUI/Dialogs/EpromTypePromptDialog.h"
 #include "GUI/Panels/MainComponent/HeaderPanel/HeaderPanel.h"
 #include "GUI/Settings/SettingsPanel.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
@@ -169,12 +169,12 @@ void PluginEditor::handleDeviceSetupAssistantProperty(const juce::String& proper
     const bool isDeviceStatus = propertyName == "deviceDetected"
         || propertyName == "deviceVersion"
         || propertyName == MatrixDeviceTypes::kApvtsPropertyName
-        || propertyName == "deviceMidiUnresponsive";
+        || propertyName == Core::kDeviceMidiUnresponsiveProperty;
     if (! isDeviceStatus)
         return;
 
     refreshEpromTypePromptDialogLiveState();
-    if (propertyName != "deviceMidiUnresponsive")
+    if (propertyName != Core::kDeviceMidiUnresponsiveProperty)
         refreshEpromTypePromptDialogSuggestion();
 }
 

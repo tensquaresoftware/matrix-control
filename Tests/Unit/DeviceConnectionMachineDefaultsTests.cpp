@@ -148,6 +148,10 @@ private:
         const auto clearIn = Core::DeviceConnectionMachineDefaults::applyMidiInputPort(prior, {});
         expectEquals(clearIn.midiInputPortId, juce::String());
         expectEquals(clearIn.midiOutputPortId, juce::String("stored-out"));
+
+        const auto clearOut = Core::DeviceConnectionMachineDefaults::applyMidiOutputPort(prior, {});
+        expectEquals(clearOut.midiInputPortId, juce::String("stored-in"));
+        expectEquals(clearOut.midiOutputPortId, juce::String());
     }
 
     void testShouldReseedAfterHostRestore()

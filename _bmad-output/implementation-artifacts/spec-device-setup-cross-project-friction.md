@@ -87,6 +87,23 @@ baseline_commit: '65c70d0f'
 - Given the user later changes ports or EPROM via header/Settings, when they create another new project, then those latest values are seeded (and the assistant still stays closed).
 - Given machine promptDone is true, when both ports happen to be empty, then DEVICE SETUP still does not auto-open.
 
+### Review Findings
+
+- [x] [Review][Patch] Restore `kDeviceMidiUnresponsiveProperty` and drop unused `EpromTypePromptDialog.h` include — [PluginEditorAudio.cpp:12,172-177] [PluginEditorWindows.cpp:250-251]
+- [x] [Review][Patch] Assert empty MIDI TO clears that side only in single-port write-through test — [DeviceConnectionMachineDefaultsTests.cpp:148-150]
+- [x] [Review][Defer] Concurrent PropertiesFile load/modify/save races — deferred: already deferred in Build triage; multi-instance RMW without lock
+- [x] [Review][Defer] Sanitize/clear in syncMidiPortsFromState does not write through machine ports — deferred: already deferred; invalid seeded ids can reappear next project
+- [x] [Review][Defer] No PropertiesFile round-trip / production seed-write-through-open call-site tests — deferred: already deferred; repo harness gap
+- [x] [Review][Defer] MidiPortRoutingPropertyTests mirror omits machine write-through — deferred: already deferred; helper claim drift only
+
+#### Rejected
+
+- Frozen I/O matrix “do not overwrite restored empties” vs reseed — false: Design Notes / triage intentionally reseed when machine done && session not; fixing would mean editing the frozen matrix or undoing the Ableton factory fix
+- Reseed can overwrite unfinished session with real ports — false: prior triage chose session `promptDone` as the only discriminator; accepted tradeoff
+- `saveIfNeeded` return ignored — low: everyday disk failure unlikely; full harden is non-trivial (matches prior reject)
+- Default `machinePromptDone = false` on open guard — low: all production call sites pass the third arg; speculative future miss
+- Empty Spec Change Log — rejected: fix would only edit the spec under review
+
 ## Implementation Notes
 
 - Machine store: `~/Library/Application Support/Ten Square Software/Matrix-Control/Matrix-Control-DeviceConnection.settings` (PropertiesFile).
