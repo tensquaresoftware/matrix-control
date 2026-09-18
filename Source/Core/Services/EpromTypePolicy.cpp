@@ -9,7 +9,16 @@ namespace Core
     {
         juce::String normalizeVersionToken(const juce::String& version)
         {
-            return version.trim().toUpperCase();
+            // Device Inquiry often stores a packed ASCII token (e.g. "120");
+            // suggestion table keys use dotted form ("1.20"), matching footer display.
+            auto cleaned = version.removeCharacters(" \t").toUpperCase();
+            if (cleaned.isEmpty())
+                return {};
+
+            if (cleaned.containsChar('.') || cleaned.length() < 3)
+                return cleaned;
+
+            return cleaned.dropLastCharacters(2) + "." + cleaned.getLastCharacters(2);
         }
     }
 

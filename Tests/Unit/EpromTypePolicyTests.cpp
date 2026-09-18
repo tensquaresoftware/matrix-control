@@ -79,6 +79,9 @@ private:
         expectEquals(Core::EpromTypePolicy::suggestFromInquiryVersion("1.11", family), kFactory);
         expectEquals(Core::EpromTypePolicy::suggestFromInquiryVersion("1.09", family), kFactory);
         expectEquals(Core::EpromTypePolicy::suggestFromInquiryVersion(" 1.20 ", family), kTauntek);
+        expectEquals(Core::EpromTypePolicy::suggestFromInquiryVersion("120", family), kTauntek);
+        expectEquals(Core::EpromTypePolicy::suggestFromInquiryVersion("116", family), kGligli);
+        expectEquals(Core::EpromTypePolicy::suggestFromInquiryVersion("121", family), kUntergeek);
     }
 
     void testInquirySuggestionMatrix6()

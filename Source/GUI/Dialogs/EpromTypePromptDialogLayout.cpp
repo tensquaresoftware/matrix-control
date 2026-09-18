@@ -62,15 +62,11 @@ EpromTypePromptDialog::ContentLayout EpromTypePromptDialog::computeContentLayout
                                       juce::roundToInt(glyphs.getBoundingBox(0, glyphs.getNumGlyphs(), true).getHeight()));
 
     layout.bodyTextArea = content.removeFromTop(juce::jmin(bodyHeight, maxBodyHeight));
-    content.removeFromTop(rowGap);
-    layout.controlBand = content.removeFromTop(rowsHeight);
 
-    const int labelWidth = juce::roundToInt(static_cast<float>(kLabelWidth_) * uiScale_);
-    const int comboWidth = juce::roundToInt(static_cast<float>(kComboWidth_) * uiScale_);
-    const int rowWidth = labelWidth + comboWidth;
-    const auto centredBand = layout.controlBand.withSizeKeepingCentre(rowWidth, rowsHeight);
-    layout.deviceChromeBounds = centredBand.withY(centredBand.getY() + (controlHeight + rowGap) * 2)
-                                    .withHeight(controlHeight);
+    // Vertically centre the four control rows between body text and buttons.
+    const int remainingHeight = content.getHeight();
+    const int controlY = content.getY() + juce::jmax(0, (remainingHeight - rowsHeight) / 2);
+    layout.controlBand = { content.getX(), controlY, content.getWidth(), rowsHeight };
     return layout;
 }
 
@@ -79,42 +75,6 @@ juce::String EpromTypePromptDialog::searchingDetailWithDots() const
     static constexpr const char* kFrames[] = { ".", "..", "..." };
     return juce::String(PluginDisplayNames::Dialogs::EpromTypePrompt::kSearching)
            + kFrames[juce::jlimit(0, 2, searchingDotFrame_)];
-}
-
-void EpromTypePromptDialog::paintDeviceChrome(juce::Graphics& g, juce::Rectangle<int> bounds) const
-{
-    const auto font = skin_->getBaseFont().withHeight(skin_->getBaseFont().getHeight() * uiScale_);
-    const auto badgeFont = skin_->getBaseFontBold().withHeight(font.getHeight());
-    const int badgeHeight = juce::roundToInt(static_cast<float>(kDeviceBadgeHeight_) * uiScale_);
-    const int badgePad = juce::roundToInt(static_cast<float>(kDeviceBadgePad_) * uiScale_);
-    const int badgeGap = juce::roundToInt(static_cast<float>(kDeviceBadgeGap_) * uiScale_);
-
-    const auto badgeFill = deviceRowView_.identityOk
-        ? skin_->getColour(SkinColourId::kFooterMessageInfo)
-        : skin_->getColour(SkinColourId::kFooterMessageError).withAlpha(0.8f);
-    const auto detailColour = skin_->getColour(SkinColourId::kFooterMessageInfo);
-
-    g.setFont(badgeFont);
-    const auto badgeLabel = PluginDisplayNames::FooterPanel::kDeviceLabel;
-    const int labelWidth = juce::roundToInt(juce::GlyphArrangement::getStringWidth(badgeFont, badgeLabel));
-    const int badgeWidth = juce::jmin(bounds.getWidth(), labelWidth + 2 * badgePad);
-    const int badgeY = bounds.getCentreY() - badgeHeight / 2;
-    const juce::Rectangle<int> badgeBounds { bounds.getX(), badgeY, badgeWidth, badgeHeight };
-
-    g.setColour(badgeFill);
-    g.fillRect(badgeBounds);
-    g.setColour(skin_->getColour(SkinColourId::kFooterPanelBackground));
-    g.drawText(badgeLabel, badgeBounds, juce::Justification::centred, false);
-
-    auto detailBounds = bounds;
-    detailBounds.removeFromLeft(badgeWidth + badgeGap);
-    g.setFont(font);
-    g.setColour(detailColour);
-
-    const juce::String detail = deviceRowView_.kind == Core::DeviceSetupDeviceRowKind::kSearching
-        ? searchingDetailWithDots()
-        : deviceRowView_.detailText;
-    g.drawText(detail, detailBounds, juce::Justification::centredLeft, true);
 }
 
 void EpromTypePromptDialog::paint(juce::Graphics& g)
@@ -147,7 +107,6 @@ void EpromTypePromptDialog::paint(juce::Graphics& g)
     const auto bodyFont = skin_->getBaseFont().withHeight(skin_->getBaseFont().getHeight() * uiScale_);
     g.setFont(bodyFont);
     g.drawFittedText(bodyText(), layout.bodyTextArea, juce::Justification::topLeft, 5);
-    paintDeviceChrome(g, layout.deviceChromeBounds);
 }
 
 void EpromTypePromptDialog::resized()
@@ -166,17 +125,21 @@ void EpromTypePromptDialog::resized()
 
     const auto centredBand = layout.controlBand.withSizeKeepingCentre(rowWidth, rowsHeight);
 
-    auto placeRow = [&](int rowIndex, TSS::Label& label, TSS::ComboBox& combo)
+    auto placeRow = [&](int rowIndex, TSS::Label& label, juce::Component& field)
     {
         const int y = centredBand.getY() + rowIndex * (controlHeight + rowGap);
         label.setBounds(centredBand.getX(), y, labelWidth, controlHeight);
         label.setUiScale(uiScale_);
-        combo.setBounds(centredBand.getX() + labelWidth, y, comboWidth, controlHeight);
-        combo.setUiScale(uiScale_);
+        field.setBounds(centredBand.getX() + labelWidth, y, comboWidth, controlHeight);
+        if (auto* combo = dynamic_cast<TSS::ComboBox*>(&field))
+            combo->setUiScale(uiScale_);
+        else if (auto* value = dynamic_cast<TSS::ReadOnlyValueField*>(&field))
+            value->setUiScale(uiScale_);
     };
 
     placeRow(0, *midiFromLabel_, *midiFromCombo_);
     placeRow(1, *midiToLabel_, *midiToCombo_);
+    placeRow(2, *deviceLabel_, *deviceValueField_);
     placeRow(3, *epromTypeLabel_, *epromTypeCombo_);
 
     auto buttonRow = layout.buttonRow;

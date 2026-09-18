@@ -4,6 +4,7 @@
 #include "GUI/Helpers/DeviceVersionDisplayFormat.h"
 #include "GUI/Helpers/MidiPortComboPopulation.h"
 #include "GUI/Looks/LookBuilders.h"
+#include "GUI/Skins/ColourChart.h"
 #include "GUI/Skins/Skin.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginIDs.h"
@@ -17,34 +18,7 @@ EpromTypePromptDialog::EpromTypePromptDialog(TSS::ISkin& skin, std::function<voi
     setOpaque(false);
     setInterceptsMouseClicks(true, true);
     setWantsKeyboardFocus(true);
-
-    midiFromLabel_ = std::make_unique<TSS::Label>(
-        kLabelWidth_, kControlHeight_, TSS::labelLookFromSkin(skin),
-        PluginDisplayNames::Dialogs::EpromTypePrompt::kMidiFromLabel);
-    midiFromCombo_ = std::make_unique<TSS::ComboBox>(
-        kComboWidth_, kControlHeight_, TSS::comboBoxLookFromSkin(skin));
-    midiFromCombo_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
-
-    midiToLabel_ = std::make_unique<TSS::Label>(
-        kLabelWidth_, kControlHeight_, TSS::labelLookFromSkin(skin),
-        PluginDisplayNames::Dialogs::EpromTypePrompt::kMidiToLabel);
-    midiToCombo_ = std::make_unique<TSS::ComboBox>(
-        kComboWidth_, kControlHeight_, TSS::comboBoxLookFromSkin(skin));
-    midiToCombo_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
-
-    epromTypeLabel_ = std::make_unique<TSS::Label>(
-        kLabelWidth_, kControlHeight_, TSS::labelLookFromSkin(skin),
-        PluginDisplayNames::Dialogs::EpromTypePrompt::kEpromTypeLabel);
-    epromTypeCombo_ = std::make_unique<TSS::ComboBox>(
-        kComboWidth_, kControlHeight_, TSS::comboBoxLookFromSkin(skin));
-    epromTypeCombo_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
-
-    confirmButton_.onClick = [this] { confirm(); };
-    specifyLaterButton_.onClick = [this] { dismissAsLater(); };
-    specifyLaterButton_.setWantsKeyboardFocus(false);
-    specifyLaterButton_.setMouseClickGrabsKeyboardFocus(false);
-    confirmButton_.setMouseClickGrabsKeyboardFocus(false);
-
+    buildControls(skin);
     wireMidiComboCallbacks();
 
     epromTypeCombo_->onChange = [this]
@@ -53,10 +27,47 @@ EpromTypePromptDialog::EpromTypePromptDialog(TSS::ISkin& skin, std::function<voi
             epromComboTouchedByUser_ = true;
     };
 
+    confirmButton_.onClick = [this] { confirm(); };
+    specifyLaterButton_.onClick = [this] { dismissAsLater(); };
+    specifyLaterButton_.setWantsKeyboardFocus(false);
+    specifyLaterButton_.setMouseClickGrabsKeyboardFocus(false);
+    confirmButton_.setMouseClickGrabsKeyboardFocus(false);
+}
+
+void EpromTypePromptDialog::buildControls(TSS::ISkin& skin)
+{
+    const auto comboStyle = TSS::ComboBox::Style::ButtonLike;
+    const auto labelLook = TSS::labelLookFromSkin(skin);
+    const auto comboLook = TSS::comboBoxLookFromSkin(skin);
+    const auto popupLook = TSS::popupMenuLookFromSkin(skin);
+
+    auto makeLabel = [&](const char* text)
+    {
+        return std::make_unique<TSS::Label>(kLabelWidth_, kControlHeight_, labelLook, text);
+    };
+    auto makeCombo = [&]()
+    {
+        auto combo = std::make_unique<TSS::ComboBox>(
+            kComboWidth_, kControlHeight_, comboLook, comboStyle);
+        combo->setPopupMenuLook(popupLook);
+        return combo;
+    };
+
+    midiFromLabel_ = makeLabel(PluginDisplayNames::Dialogs::EpromTypePrompt::kMidiFromLabel);
+    midiFromCombo_ = makeCombo();
+    midiToLabel_ = makeLabel(PluginDisplayNames::Dialogs::EpromTypePrompt::kMidiToLabel);
+    midiToCombo_ = makeCombo();
+    deviceLabel_ = makeLabel(PluginDisplayNames::Dialogs::EpromTypePrompt::kDeviceLabel);
+    deviceValueField_ = std::make_unique<TSS::ReadOnlyValueField>(skin);
+    epromTypeLabel_ = makeLabel(PluginDisplayNames::Dialogs::EpromTypePrompt::kEpromTypeLabel);
+    epromTypeCombo_ = makeCombo();
+
     addAndMakeVisible(*midiFromLabel_);
     addAndMakeVisible(*midiFromCombo_);
     addAndMakeVisible(*midiToLabel_);
     addAndMakeVisible(*midiToCombo_);
+    addAndMakeVisible(*deviceLabel_);
+    addAndMakeVisible(*deviceValueField_);
     addAndMakeVisible(*epromTypeLabel_);
     addAndMakeVisible(*epromTypeCombo_);
     addAndMakeVisible(confirmButton_);
@@ -174,9 +185,12 @@ void EpromTypePromptDialog::setSkin(TSS::ISkin& skin)
     midiToLabel_->setLook(TSS::labelLookFromSkin(skin));
     midiToCombo_->setLook(TSS::comboBoxLookFromSkin(skin));
     midiToCombo_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
+    deviceLabel_->setLook(TSS::labelLookFromSkin(skin));
+    deviceValueField_->setSkin(skin);
     epromTypeLabel_->setLook(TSS::labelLookFromSkin(skin));
     epromTypeCombo_->setLook(TSS::comboBoxLookFromSkin(skin));
     epromTypeCombo_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
+    refreshDeviceValueField();
     repaint();
 }
 
@@ -258,8 +272,35 @@ void EpromTypePromptDialog::recomputeDeviceRow()
         .deviceType = liveStatus_.deviceType,
     }, versionDisplay);
 
+    refreshDeviceValueField();
     syncAnimationTimer();
-    repaint();
+}
+
+void EpromTypePromptDialog::refreshDeviceValueField()
+{
+    if (deviceValueField_ == nullptr || skin_ == nullptr)
+        return;
+
+    const juce::Colour fill { ColourChart::kDarkGrey4 };
+    const juce::Colour normalText { ColourChart::kLightGrey2 };
+    const juce::Colour errorText { ColourChart::kRed };
+
+    if (deviceRowView_.kind == Core::DeviceSetupDeviceRowKind::kSearching)
+    {
+        deviceValueField_->setColours(fill, normalText);
+        deviceValueField_->setText(searchingDetailWithDots());
+        return;
+    }
+
+    if (deviceRowView_.kind == Core::DeviceSetupDeviceRowKind::kNotConnected)
+    {
+        deviceValueField_->setColours(fill, errorText);
+        deviceValueField_->setText(deviceRowView_.detailText);
+        return;
+    }
+
+    deviceValueField_->setColours(fill, normalText);
+    deviceValueField_->setText(deviceRowView_.detailText);
 }
 
 void EpromTypePromptDialog::syncAnimationTimer()
@@ -302,7 +343,7 @@ void EpromTypePromptDialog::timerCallback()
     if (deviceRowView_.kind == Core::DeviceSetupDeviceRowKind::kSearching)
     {
         searchingDotFrame_ = (searchingDotFrame_ + 1) % 3;
-        repaint();
+        refreshDeviceValueField();
         return;
     }
 
