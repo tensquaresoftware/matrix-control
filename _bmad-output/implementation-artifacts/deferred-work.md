@@ -31,6 +31,11 @@
 
 <!-- Consumed 2026-09-18: Unison Detune (CC 94) gated on Settings EPROM TYPE — see spec-unison-detune-cc94.md -->
 
+## Deferred from: code review of spec-unison-detune-cc94.md (2026-09-18)
+
+- **MiscPanel EPROM graying / restore refresh has no automated GUI check** — `refreshUnisonDetuneGraying` is Core-adjacent UI wiring; unit suite stays on policy/MIDI/mapper. Deferred: grayed-click footer already manual in Verification; panel enablement follows project GUI convention.
+- **Sticky-footer inventory missing `kUnisonDetuneOptimisedEpromFooter`** — New INFO string not listed in `inventory-sticky-footer-messages.md`. Deferred: sticky-footer inventory pass is out of scope (same pattern as `kMasterPullFailed`).
+- **MiscPanel hardcoded Detune cell index** — `kUnisonDetuneCellIndex = 4` matches other ModulePanel grayed-cell patterns; layout mirror locks order. Deferred: id-based lookup would need a `BaseModulePanel` API beyond this chantier.
 
 ## Deferred from: code review of spec-master-pull-on-connect.md (2026-09-18)
 

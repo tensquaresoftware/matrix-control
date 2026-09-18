@@ -4,14 +4,16 @@
 #include "Core/MIDI/MidiActivityTracker.h"
 #include "Core/MIDI/MidiManager.h"
 #include "Core/MIDI/Queue/MidiOutboundQueue.h"
+#include "Core/MIDI/UnisonDetuneDispatch.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
 #include "Shared/Definitions/PluginDescriptors.h"
 #include "Shared/Definitions/PluginIDs.h"
 
 namespace
 {
-    // Mirrors PluginProcessor::dispatchUnisonDetuneChange (CC path only).
-    struct UnisonDetuneDispatchHarness
+    // Drives the same UnisonDetuneDispatch SSOT as PluginProcessor when the APVTS
+    // parameter changes. Full PluginProcessor is not linked into Matrix-Control_Tests.
+    struct UnisonDetuneDispatchHarness : private juce::AudioProcessorValueTreeState::Listener
     {
         class Proc : public juce::AudioProcessor
         {
@@ -96,22 +98,16 @@ namespace
             proc.apvts.state.setProperty(PluginIDs::Settings::kEpromType,
                                           PluginIDs::Settings::EpromType::kTauntek,
                                           nullptr);
+            proc.apvts.addParameterListener(
+                PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kUnisonDetune,
+                this);
         }
 
-        void dispatchUnisonDetuneChange(const juce::String& parameterId)
+        ~UnisonDetuneDispatchHarness() override
         {
-            if (parameterId
-                != PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kUnisonDetune)
-                return;
-
-            if (suppressMasterParameterSysEx || editorialQuiet)
-                return;
-
-            const auto* raw = proc.apvts.getRawParameterValue(parameterId);
-            if (raw == nullptr)
-                return;
-
-            manager.sendUnisonDetune(juce::roundToInt(raw->load()));
+            proc.apvts.removeParameterListener(
+                PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kUnisonDetune,
+                this);
         }
 
         void setDetuneValue(int value)
@@ -120,6 +116,16 @@ namespace
                 PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kUnisonDetune);
             jassert(param != nullptr);
             param->setValueNotifyingHost(param->convertTo0to1(static_cast<float>(value)));
+        }
+
+    private:
+        void parameterChanged(const juce::String& parameterId, float) override
+        {
+            Core::UnisonDetuneDispatch::onParameterChanged(
+                &manager,
+                proc.apvts,
+                parameterId,
+                { suppressMasterParameterSysEx, editorialQuiet });
         }
     };
 }
@@ -131,20 +137,18 @@ public:
 
     void runTest() override
     {
-        testDispatchEnqueuesCc94();
-        testDispatchSuppressedWhenMasterSysExSuppressed();
-        testDispatchSuppressedWhenEditorialQuiet();
+        testApvtsChangeEnqueuesCc94();
+        testApvtsChangeSuppressedWhenMasterSysExSuppressed();
+        testApvtsChangeSuppressedWhenEditorialQuiet();
     }
 
 private:
-    void testDispatchEnqueuesCc94()
+    void testApvtsChangeEnqueuesCc94()
     {
-        beginTest("dispatchUnisonDetuneChange — CC 94 on Basic Channel when optimised");
+        beginTest("APVTS miscUnisonDetune change - CC 94 via UnisonDetuneDispatch SSOT");
 
         UnisonDetuneDispatchHarness harness;
         harness.setDetuneValue(42);
-        harness.dispatchUnisonDetuneChange(
-            PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kUnisonDetune);
 
         auto msg = harness.queue.tryDequeueRealtime();
         expect(msg.has_value());
@@ -158,28 +162,24 @@ private:
         expect(harness.queue.isEmpty());
     }
 
-    void testDispatchSuppressedWhenMasterSysExSuppressed()
+    void testApvtsChangeSuppressedWhenMasterSysExSuppressed()
     {
-        beginTest("dispatchUnisonDetuneChange — no CC when suppressMasterParameterSysEx");
+        beginTest("APVTS miscUnisonDetune change - no CC when suppressMasterParameterSysEx");
 
         UnisonDetuneDispatchHarness harness;
         harness.suppressMasterParameterSysEx = true;
         harness.setDetuneValue(55);
-        harness.dispatchUnisonDetuneChange(
-            PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kUnisonDetune);
 
         expect(harness.queue.isEmpty());
     }
 
-    void testDispatchSuppressedWhenEditorialQuiet()
+    void testApvtsChangeSuppressedWhenEditorialQuiet()
     {
-        beginTest("dispatchUnisonDetuneChange — no CC when editorial quiet");
+        beginTest("APVTS miscUnisonDetune change - no CC when editorial quiet");
 
         UnisonDetuneDispatchHarness harness;
         harness.editorialQuiet = true;
         harness.setDetuneValue(66);
-        harness.dispatchUnisonDetuneChange(
-            PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kUnisonDetune);
 
         expect(harness.queue.isEmpty());
     }

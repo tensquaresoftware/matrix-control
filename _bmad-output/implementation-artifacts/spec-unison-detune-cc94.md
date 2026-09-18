@@ -89,6 +89,24 @@ context:
 - [x] State strip/collect managed IDs — include new APVTS id with other Master Edit params.
 - [x] Unit tests — gate truth table; CC 94 payload; assert no Master buffer offset for Detune.
 
+### Review Findings
+
+- [x] [Review][Patch] Dispatch tests mirror PluginProcessor instead of exercising the real listener path [Tests/Unit/UnisonDetuneDispatchTests.cpp] — fixed: `UnisonDetuneDispatch` SSOT shared with PluginProcessor; tests drive APVTS parameter listener → SSOT (PluginProcessor not in test runner)
+- [x] [Review][Defer] MiscPanel EPROM graying / restore refresh has no automated GUI check [Source/GUI/Panels/.../MiscPanel.cpp] — deferred: Core unit tests do not cover panel wiring; grayed-click footer already marked manual in Verification
+- [x] [Review][Defer] UNISON DETUNE INFO footer string missing from sticky-footer inventory [Source/Shared/Definitions/PluginDisplayNames.h] — deferred: sticky-footer inventory pass is a separate dirty artifact (same pattern as kMasterPullFailed)
+- [x] [Review][Defer] MiscPanel uses hardcoded Detune cell index 4 [MiscPanel.h] — deferred: matches established ModulePanel cell-index pattern; layout mirror locks order; id-based lookup would need BaseModulePanel API beyond this chantier
+
+**Rejected (this review pass):**
+- false — Stock-EPROM host-automation silence only covered in MidiManager: `sendUnisonDetune` is the gate; MidiManagerUnisonDetuneTests already assert FACTORY/UNKNOWN enqueue nothing
+- false — Missing MasterModel reject for `kNoSysExOffset`: packed callers use `buildIntDescriptors` filter; ApvtsMasterMapperTests lock Detune exclusion
+- false — `isPackedMasterInt` should use `>= 0`: only sentinel is `kNoSysExOffset` (`-1`); no other non-packed value exists
+- false — Init Misc leaves Detune unchanged without UI copy: intentional (APVTS+CC outside MasterInit.syx); prior triage already settled
+- false / reject — Spec Code Map MidiSender / Settings hooks and `review_loop_iteration: 0`: fixing would edit the spec under review
+- low (rejected) — No Mono-group midiChannel spray test: Omni path already exercises the all-channels branch
+- low (rejected) — No out-of-range clamp wire assertion: APVTS int is 0–127; clamp is defensive only
+- low (rejected) — Extract shared Panic/Detune channel helper: real duplication; prior triage rejected; unlikely everyday harm
+- low (rejected) — deferred-work consumed only via HTML comment: adequate audit trail for this chantier
+
 **Acceptance Criteria:**
 - Given EPROM TYPE = TAUNTEK (or GLIGLI/UNTERGEEK), when the user moves UNISON DETUNE, then the plugin sends MIDI CC 94 with the same 0–127 value on the configured MIDI channel.
 - Given EPROM TYPE = FACTORY or UNKNOWN, when the user views Master Edit MISC, then UNISON DETUNE is visible, grayed, shows INFO on click, and no CC 94 is sent.
@@ -104,11 +122,14 @@ context:
 - UI: MiscPanel listens to `settingsEpromType`, grays slider via `setEnabled`, INFO footer via `GrayedControlHelper` (same pattern as LEGATO PORTA).
 - Matrix coverage (unit tests run): optimised CC → MidiManager; stock suppress → MidiManager + EpromTypePolicy; outbound blocked → MidiManager; default/range/exclusion → ApvtsMasterMapper; strip ID → SessionPersistencePolicy; factory Slider path → ModulePanelConfigBuilder + MigratedModulePanelLayouts; Matrix-6/6R hide → MasterEditGate. Grayed-click footer interaction remains manual (GUI convention).
 - Review patches (2026-09-18): skip non-packed ints in Init/Master test helpers; MiscPanel `valueTreeRedirected` refresh; Basic Channel + dispatch harness tests; PluginEditorAudio EPROM dialog include kept (required to compile).
+- Review patch (2026-09-18 post-delivery): extracted `Core::UnisonDetuneDispatch::onParameterChanged` SSOT; PluginProcessor delegates to it; UnisonDetuneDispatchTests drive APVTS `parameterChanged` → SSOT (no mirrored dispatch body).
 
 ## Spec Change Log
 
 ## Review Triage Log
 
+- 2026-09-18 (post-delivery review) — medium — UnisonDetuneDispatchTests still mirrors `PluginProcessor::dispatchUnisonDetuneChange` instead of driving the real listener/dispatch path; production wire can go dead while suite stays green. Route: patch.
+- 2026-09-18 (post-delivery review) — defer — MiscPanel graying, sticky-footer inventory, hardcoded cell index (see Review Findings + deferred-work).
 - high — MasterModuleInitServiceTests / InitTemplateWriterTests walk MiscModule::kIntParameters including miscUnisonDetune (sysExOffset -1) and call MasterModel::setValue/getValue → PackedFieldCodec jassert / OOB; verified by failing MasterModuleInitService and InitTemplateWriter suites. Route: patch.
 - high — MiscPanel lacks valueTreeRedirected; host replaceState can leave Detune graying stale while Spec requires restore refresh; confirmed pattern used by MasterEditPanel and peers. Route: patch.
 - medium — MidiManagerTests only cover Omni 16-channel spray for CC 94, not configured midiChannel Basic Channel path (verification-gap). Route: patch.

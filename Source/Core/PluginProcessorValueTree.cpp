@@ -13,6 +13,7 @@
 #include "Core/MIDI/MatrixModBusParameterSysExDispatcher.h"
 #include "Core/MIDI/MatrixModBusReorderService.h"
 #include "Core/MIDI/PatchParameterSysExDispatcher.h"
+#include "Core/MIDI/UnisonDetuneDispatch.h"
 #include "Core/Models/ApvtsMasterMapper.h"
 #include "Core/Models/ApvtsPatchMapper.h"
 #include "Core/Models/MasterModel.h"
@@ -178,20 +179,11 @@ void PluginProcessor::dispatchPatchOrMatrixModParameterChange(const juce::String
 
 void PluginProcessor::dispatchUnisonDetuneChange(const juce::String& parameterId)
 {
-    if (parameterId != PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kUnisonDetune)
-        return;
-
-    if (suppressMasterParameterSysEx_ || isEditorialResyncGranularMidiQuiet())
-        return;
-
-    if (midiManager == nullptr)
-        return;
-
-    const auto* raw = apvts.getRawParameterValue(parameterId);
-    if (raw == nullptr)
-        return;
-
-    midiManager->sendUnisonDetune(juce::roundToInt(raw->load()));
+    Core::UnisonDetuneDispatch::onParameterChanged(
+        midiManager.get(),
+        apvts,
+        parameterId,
+        { suppressMasterParameterSysEx_, isEditorialResyncGranularMidiQuiet() });
 }
 
 void PluginProcessor::dispatchMasterParameterChange(const juce::String& parameterId)
