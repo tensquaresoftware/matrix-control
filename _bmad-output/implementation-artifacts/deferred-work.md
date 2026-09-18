@@ -1,5 +1,10 @@
 # Deferred Work
 
+## Deferred from: code review of spec-device-setup-assistant.md (2026-09-18)
+
+- **Editor-ready open wiring only covered by pure bool helper** — `shouldOpenDeviceSetupAssistant` is unit-tested; UiConstruction `promptDone` → open path is not. Deferred: repo unit tests stay on Core/pure helpers; PluginEditor construction harness is out of this chantier's test style.
+- **Packed Inquiry version normalize duplicated** — `EpromTypePolicy::normalizeVersionToken` and `TSS::formatDeviceVersionForDisplay` share the same “120” → “1.20” rule. Deferred: Shared extraction is more than a direct patch; current copies match.
+
 ## Deferred from: review of spec-device-setup-assistant.md (2026-09-18)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-device-setup-assistant.md`

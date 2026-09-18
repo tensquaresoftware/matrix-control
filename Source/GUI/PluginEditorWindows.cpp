@@ -17,7 +17,6 @@
 #include "Core/Services/DeviceSetupDeviceRow.h"
 #include "Core/Services/DeviceTypeRegistry.h"
 #include "Core/Services/EpromTypePolicy.h"
-#include "Core/MIDI/EditorOutboundGate.h"
 #include "Core/MIDI/MidiManager.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
 #include "Shared/Definitions/PluginIDs.h"

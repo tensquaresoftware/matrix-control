@@ -19,6 +19,8 @@ public:
         testSearchingWhileWindowActive();
         testBothPortsWithoutActiveWindowStayNotConnected();
         testSearchingWindowStartExhaustRestart();
+        testSearchingWindowUnresponsiveSetsExhausted();
+        testSearchingWindowExhaustClearPortSamePairRestart();
         testInquirySuccessShowsConnected();
         testUnresponsiveSettlesNotConnected();
         testConnectedDetailFormat();
@@ -135,6 +137,67 @@ private:
         expect(! restarted.state.exhausted);
         expect(restarted.shouldKickInquiry);
         expectEquals(restarted.state.trackedFromId, juce::String("in-b"));
+    }
+
+    void testSearchingWindowUnresponsiveSetsExhausted()
+    {
+        beginTest("searching window - unresponsive stop sets exhausted");
+
+        Core::DeviceSetupSearchingWindowState state;
+        auto started = Core::advanceDeviceSetupSearchingWindow(state, {
+            .midiFromId = "in-a",
+            .midiToId = "out-a",
+            .nowMs = 1000,
+        });
+        expect(started.state.active);
+        expect(! started.state.exhausted);
+
+        auto unresponsive = Core::advanceDeviceSetupSearchingWindow(started.state, {
+            .midiFromId = "in-a",
+            .midiToId = "out-a",
+            .deviceMidiUnresponsive = true,
+            .nowMs = 1500,
+        });
+        expect(! unresponsive.state.active);
+        expect(unresponsive.state.exhausted);
+        expect(! unresponsive.shouldKickInquiry);
+    }
+
+    void testSearchingWindowExhaustClearPortSamePairRestart()
+    {
+        beginTest("searching window - exhaust, clear a port, then same-pair restart");
+
+        Core::DeviceSetupSearchingWindowState state;
+        auto started = Core::advanceDeviceSetupSearchingWindow(state, {
+            .midiFromId = "in-a",
+            .midiToId = "out-a",
+            .nowMs = 1000,
+        });
+
+        auto exhausted = Core::advanceDeviceSetupSearchingWindow(started.state, {
+            .midiFromId = "in-a",
+            .midiToId = "out-a",
+            .nowMs = 1000 + static_cast<juce::uint32>(SysExConstants::kDefaultTimeoutMs),
+        });
+        expect(! exhausted.state.active);
+        expect(exhausted.state.exhausted);
+
+        auto cleared = Core::advanceDeviceSetupSearchingWindow(exhausted.state, {
+            .midiFromId = {},
+            .midiToId = "out-a",
+            .nowMs = 4000,
+        });
+        expect(! cleared.state.active);
+        expect(! cleared.state.exhausted);
+
+        auto restarted = Core::advanceDeviceSetupSearchingWindow(cleared.state, {
+            .midiFromId = "in-a",
+            .midiToId = "out-a",
+            .nowMs = 5000,
+        });
+        expect(restarted.state.active);
+        expect(! restarted.state.exhausted);
+        expect(restarted.shouldKickInquiry);
     }
 
     void testInquirySuccessShowsConnected()

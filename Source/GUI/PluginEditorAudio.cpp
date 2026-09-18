@@ -6,7 +6,6 @@
 #include "PluginEditorInternal.h"
 
 #include "Core/Audio/StandaloneAudioInputRouter.h"
-#include "Core/MIDI/EditorOutboundGate.h"
 #include "Core/MIDI/MidiManager.h"
 #include "Core/Services/DeviceTypeRegistry.h"
 #include "Core/Services/EpromTypePolicy.h"
@@ -188,7 +187,10 @@ void PluginEditor::coerceEpromTypeForCurrentDeviceFamily()
         state.getProperty(PluginIDs::Settings::kEpromType,
                           PluginIDs::Settings::EpromType::kDefault)));
     const int coerced = Core::EpromTypePolicy::coerceForDeviceFamily(stored, family);
-    if (coerced != stored)
+    const bool assistantOpen = epromTypePromptDialog_ != nullptr
+        && epromTypePromptDialog_->isVisible();
+    // DEVICE SETUP owns EPROM persistence until CONFIRM; do not rewrite APVTS while open.
+    if (coerced != stored && ! assistantOpen)
         state.setProperty(PluginIDs::Settings::kEpromType, coerced, nullptr);
 
     pluginProcessor.getMidiManager().refreshSysExDelayFromSettings();

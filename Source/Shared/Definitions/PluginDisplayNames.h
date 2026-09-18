@@ -312,7 +312,6 @@ namespace PluginDisplayNames
                 " A suggestion is preselected from the reported firmware version when possible.";
             constexpr const char* kMidiFromLabel = "MIDI FROM";
             constexpr const char* kMidiToLabel = "MIDI TO";
-            constexpr const char* kDeviceLabel = "DEVICE";
             constexpr const char* kSearching = "SEARCHING";
             constexpr const char* kEpromTypeLabel = "EPROM TYPE";
             constexpr const char* kConfirm = "CONFIRM";

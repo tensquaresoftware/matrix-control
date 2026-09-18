@@ -17,33 +17,6 @@ using TSS::SkinColourId;
 
 namespace
 {
-    int findItemIdForPortIdentifier(const std::vector<juce::String>& identifiers,
-                                    const juce::String& deviceId)
-    {
-        if (deviceId.isEmpty())
-            return HeaderPanel::kPortSentinelItemId;
-
-        for (size_t i = 0; i < identifiers.size(); ++i)
-        {
-            if (identifiers[i] == deviceId)
-                return static_cast<int>(i) + HeaderPanel::kFirstDeviceItemId;
-        }
-
-        return HeaderPanel::kPortSentinelItemId;
-    }
-
-    juce::String getPortIdentifierForItemId(const std::vector<juce::String>& identifiers, int itemId)
-    {
-        if (itemId < HeaderPanel::kFirstDeviceItemId)
-            return {};
-
-        const auto index = static_cast<size_t>(itemId - HeaderPanel::kFirstDeviceItemId);
-        if (index >= identifiers.size())
-            return {};
-
-        return identifiers[index];
-    }
-
     float inputGainNormalizedFill(double value)
     {
         return PluginAudioConstants::inputGainIndexToNormalizedFill(static_cast<int>(std::round(value)));
@@ -261,54 +234,11 @@ void HeaderPanel::populateMidiPortLists()
         configureStandaloneKeyboardFrom();
 }
 
-void HeaderPanel::populateInputPortCombo(TSS::ComboBox& combo, std::vector<juce::String>& identifiers)
-{
-    const juce::String previousIdentifier = getPortIdentifierForItemId(identifiers, combo.getSelectedId());
-
-    combo.clear(juce::dontSendNotification);
-    identifiers.clear();
-
-    combo.addItem(PluginDisplayNames::HeaderPanel::kNoInputSentinel, kPortSentinelItemId);
-
-    const auto devices = juce::MidiInput::getAvailableDevices();
-    for (int i = 0; i < devices.size(); ++i)
-    {
-        const auto& device = devices.getReference(i);
-        const int itemId = i + kFirstDeviceItemId;
-        combo.addItem(device.name.toUpperCase(), itemId);
-        identifiers.push_back(device.identifier);
-    }
-
-    combo.setSelectedId(findItemIdForPortIdentifier(identifiers, previousIdentifier),
-                        juce::dontSendNotification);
-}
-
-void HeaderPanel::populateOutputPortCombo(TSS::ComboBox& combo, std::vector<juce::String>& identifiers)
-{
-    const juce::String previousIdentifier = getPortIdentifierForItemId(identifiers, combo.getSelectedId());
-
-    combo.clear(juce::dontSendNotification);
-    identifiers.clear();
-
-    combo.addItem(PluginDisplayNames::HeaderPanel::kNoOutputSentinel, kPortSentinelItemId);
-
-    const auto devices = juce::MidiOutput::getAvailableDevices();
-    for (int i = 0; i < devices.size(); ++i)
-    {
-        const auto& device = devices.getReference(i);
-        const int itemId = i + kFirstDeviceItemId;
-        combo.addItem(device.name.toUpperCase(), itemId);
-        identifiers.push_back(device.identifier);
-    }
-
-    combo.setSelectedId(findItemIdForPortIdentifier(identifiers, previousIdentifier),
-                        juce::dontSendNotification);
-}
-
 void HeaderPanel::configureStandaloneKeyboardFrom()
 {
     keyboardFromComboBox_.setEnabled(true);
-    populateInputPortCombo(keyboardFromComboBox_, keyboardFromPortIdentifiers_);
+    TSS::MidiPortComboPopulation::populateInputPortCombo(keyboardFromComboBox_,
+                                                         keyboardFromPortIdentifiers_);
 }
 
 void HeaderPanel::configurePluginKeyboardFrom()
@@ -363,13 +293,13 @@ void HeaderPanel::selectKeyboardFromPort(const juce::String& deviceId)
 int HeaderPanel::findItemIdForIdentifier(const std::vector<juce::String>& identifiers,
                                          const juce::String& deviceId) const
 {
-    return findItemIdForPortIdentifier(identifiers, deviceId);
+    return TSS::MidiPortComboPopulation::findItemIdForPortIdentifier(identifiers, deviceId);
 }
 
 juce::String HeaderPanel::getSelectedPortIdentifier(const TSS::ComboBox& combo,
                                                     const std::vector<juce::String>& identifiers) const
 {
-    return getPortIdentifierForItemId(identifiers, combo.getSelectedId());
+    return TSS::MidiPortComboPopulation::selectedPortId(combo, identifiers);
 }
 
 void HeaderPanel::populateAudioFromCombo(const juce::StringArray& channelNames,

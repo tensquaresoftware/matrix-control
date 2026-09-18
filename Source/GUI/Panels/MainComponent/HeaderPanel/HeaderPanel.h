@@ -97,8 +97,6 @@ private:
     void applyPanicButtonLook();
     void registerContextualHelp();
 
-    void populateInputPortCombo(TSS::ComboBox& combo, std::vector<juce::String>& identifiers);
-    void populateOutputPortCombo(TSS::ComboBox& combo, std::vector<juce::String>& identifiers);
     void updateKeyboardFromVisibility();
     void updateAudioControlsVisibility();
     void configureStandaloneKeyboardFrom();

@@ -99,6 +99,29 @@ baseline_commit: '851445a5'
 - Given `promptDone` true, when Inquiry succeeds later, then no assistant.
 - Given Matrix-6/6R vs Matrix-1000, when EPROM items rebuild, then GLIGLI rules match Settings.
 
+### Review Findings
+
+- [x] [Review][Decision] DEVICE row look — resolved (2026-09-18): keep Label + ReadOnlyValueField polish; footer badge twin not required for this assistant. AC chrome wording superseded by polish intent.
+- [x] [Review][Decision] Family coerce while DEVICE SETUP open — resolved (2026-09-18): do not write stored EPROM while assistant is visible; combo rebuild/coerce on screen only until CONFIRM.
+- [x] [Review][Patch] Skip APVTS EPROM coerce write while DEVICE SETUP dialog is open [Source/GUI/PluginEditorAudio.cpp:181]
+- [x] [Review][Patch] Repaint body after live DEVICE updates so firmware suggestion suffix appears [Source/GUI/Dialogs/EpromTypePromptDialog.cpp:126]
+- [x] [Review][Patch] Refresh DEVICE SETUP MIDI lists on OS hot-plug [Source/GUI/PluginEditorHeader.cpp:106]
+- [x] [Review][Patch] Remove unused EditorOutboundGate includes in PluginEditorAudio/Windows [Source/GUI/PluginEditorAudio.cpp:9]
+- [x] [Review][Patch] Reuse footer DEVICE label constant instead of dialog duplicate [Source/Shared/Definitions/PluginDisplayNames.h:315]
+- [x] [Review][Patch] Finish Header adoption of shared MIDI port helpers (keyboard populate + local find/get twin) [Source/GUI/Panels/MainComponent/HeaderPanel/HeaderPanel.cpp:20]
+- [x] [Review][Patch] Unit-test SEARCHING window unresponsive path sets exhausted [Tests/Unit/DeviceSetupDeviceRowTests.cpp:159]
+- [x] [Review][Patch] Unit-test exhaust then clear a port then same-pair restart [Tests/Unit/DeviceSetupDeviceRowTests.cpp:95]
+- [x] [Review][Defer] Editor-ready open wiring only covered by pure bool helper [Source/GUI/PluginEditorUiConstruction.cpp] — deferred: repo unit tests stay on Core/pure helpers; PluginEditor open path needs an editor/integration harness beyond this chantier's test style.
+- [x] [Review][Defer] Packed Inquiry version normalize duplicated in Core and GUI helper [Source/Core/Services/EpromTypePolicy.cpp:10] — deferred: extracting a Shared helper is more than a direct patch; display and suggestion currently match.
+
+#### Rejected
+
+- Blind: no SEARCHING retry without port change — false: exhaust-until-port-pair-change is intentional after prior SEARCHING window patch; timeout → NOT CONNECTED matches frozen AC.
+- Blind: suggestion refresh before coerce leaves invalid combo selection — false: `populateComboItems` already coerces the preferred id for the new family before selecting.
+- Edge: Inquiry version newlines / non-space whitespace mangling — low: unlikely everyday Inquiry tokens; fix would add guards beyond observed traffic.
+- Edge: prior `trim()` contract removed — low: space/tab strip covers the packed-version cases this polish targets; other whitespace is rare.
+- VG Other: `testConfirmPersistsEpromAndFinishes` name overclaims APVTS writes — low: helper-only assert is clear enough; rename alone is not worth a patch pass.
+
 ## Implementation Notes
 
 Human decisions (2026-09-18): keep full spec; trigger = first editor ready when `!promptDone`; SPECIFY LATER keeps ports / leaves EPROM; CONFIRM allowed without device; DEVICE row (not DETECTED DEVICE) with SEARCHING animated dots; title `DEVICE SETUP`.

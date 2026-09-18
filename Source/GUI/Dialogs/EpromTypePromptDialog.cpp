@@ -57,7 +57,7 @@ void EpromTypePromptDialog::buildControls(TSS::ISkin& skin)
     midiFromCombo_ = makeCombo();
     midiToLabel_ = makeLabel(PluginDisplayNames::Dialogs::EpromTypePrompt::kMidiToLabel);
     midiToCombo_ = makeCombo();
-    deviceLabel_ = makeLabel(PluginDisplayNames::Dialogs::EpromTypePrompt::kDeviceLabel);
+    deviceLabel_ = makeLabel(PluginDisplayNames::FooterPanel::kDeviceLabel);
     deviceValueField_ = std::make_unique<TSS::ReadOnlyValueField>(skin);
     epromTypeLabel_ = makeLabel(PluginDisplayNames::Dialogs::EpromTypePrompt::kEpromTypeLabel);
     epromTypeCombo_ = makeCombo();
@@ -129,6 +129,7 @@ void EpromTypePromptDialog::updateLiveDeviceStatus(const LiveDeviceStatus& statu
     includeFirmwareSuggestionHint_ = status.deviceDetected
         && status.deviceVersion.trim().isNotEmpty();
     recomputeDeviceRow();
+    repaint();
 }
 
 void EpromTypePromptDialog::refreshEpromSuggestion(MatrixDeviceTypes::Type deviceType,

@@ -120,4 +120,6 @@ void PluginEditor::refreshMidiPortListsFromOsChange()
         headerPanel.selectKeyboardFromPort(
             pluginProcessor.getApvts().state.getProperty("keyboardFromPortId", juce::String()).toString());
     }
+
+    refreshEpromTypePromptDialogPorts();
 }
