@@ -306,10 +306,13 @@ namespace PluginDisplayNames
         {
             constexpr const char* kTitle = "EPROM TYPE";
             constexpr const char* kBody =
-                "Select the EPROM type for your synth. This affects MIDI timing and future features. "
-                "A suggestion may be shown from the reported firmware version; confirm or change it.";
-            constexpr const char* kOk = "OK";
-            constexpr const char* kLater = "LATER";
+                "Select the EPROM type currently installed in your synth. "
+                "This affects MIDI timing and future features.";
+            constexpr const char* kBodySuggestionSuffix =
+                " A suggestion is preselected from the reported firmware version when possible.";
+            constexpr const char* kEpromTypeLabel = "EPROM TYPE";
+            constexpr const char* kConfirm = "CONFIRM";
+            constexpr const char* kSpecifyLater = "SPECIFY LATER";
         }
 
         namespace MasterGlobalInitConfirm

@@ -144,6 +144,12 @@ void SettingsPanel::layoutDeviceSection(juce::Rectangle<int>& bounds, const RowL
                                                  metrics.separatorHeight,
                                                  metrics.rowGap });
 
+    layoutLabeledControlRow(bounds,
+                            metrics,
+                            LabeledControlRowArgs{ epromTypeLabel_.get(),
+                                                   epromTypeCombo_.get(),
+                                                   metrics.comboWidth });
+
     if (isPluginMode_)
     {
         layoutLabeledControlRow(bounds,
@@ -152,12 +158,6 @@ void SettingsPanel::layoutDeviceSection(juce::Rectangle<int>& bounds, const RowL
                                                        hardwareLatencySlider_.get(),
                                                        metrics.sliderWidth });
     }
-
-    layoutLabeledControlRow(bounds,
-                            metrics,
-                            LabeledControlRowArgs{ epromTypeLabel_.get(),
-                                                   epromTypeCombo_.get(),
-                                                   metrics.comboWidth });
 }
 
 void SettingsPanel::layoutPatchSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics)

@@ -300,16 +300,22 @@ void PluginEditor::openEpromTypePromptDialog()
     const auto deviceType = Core::DeviceTypeRegistry::fromApvtsProperty(
         state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
     const int preferred = preferredEpromTypeForPrompt(state, deviceType);
+    const juce::String deviceVersion = state.getProperty("deviceVersion", juce::String()).toString().trim();
+    const bool includeFirmwareSuggestionHint = deviceVersion.isNotEmpty()
+        && static_cast<bool>(state.getProperty("deviceDetected", false));
 
     ensureEpromTypePromptDialog();
-    epromTypePromptDialog_->prepareForShow(
-        deviceType,
-        preferred,
-        [this](int selectedId) { applyEpromTypePromptSelection(selectedId); },
-        [this]
-        {
-            markEpromTypePromptFinished(pluginProcessor.getApvts().state);
-        });
+    epromTypePromptDialog_->prepareForShow({
+        .deviceType = deviceType,
+        .preferredSelectedId = preferred,
+        .includeFirmwareSuggestionHint = includeFirmwareSuggestionHint,
+        .onConfirm = [this](int selectedId) { applyEpromTypePromptSelection(selectedId); },
+        .onLater =
+            [this]
+            {
+                markEpromTypePromptFinished(pluginProcessor.getApvts().state);
+            },
+    });
 
     const int baseWidth = layoutDimensions_.editor.width;
     const float uiScale = (baseWidth > 0)

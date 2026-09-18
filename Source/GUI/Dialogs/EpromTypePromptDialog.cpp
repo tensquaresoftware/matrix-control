@@ -16,38 +16,40 @@ namespace
 EpromTypePromptDialog::EpromTypePromptDialog(TSS::ISkin& skin, std::function<void()> onDismissRequested)
     : onDismissRequested_(std::move(onDismissRequested))
     , skin_(&skin)
-    , okButton_(PluginDisplayNames::Dialogs::EpromTypePrompt::kOk)
-    , laterButton_(PluginDisplayNames::Dialogs::EpromTypePrompt::kLater)
+    , confirmButton_(PluginDisplayNames::Dialogs::EpromTypePrompt::kConfirm)
+    , specifyLaterButton_(PluginDisplayNames::Dialogs::EpromTypePrompt::kSpecifyLater)
 {
     setOpaque(false);
     setInterceptsMouseClicks(true, true);
     setWantsKeyboardFocus(true);
 
+    epromTypeLabel_ = std::make_unique<TSS::Label>(
+        kLabelWidth_, kControlHeight_, TSS::labelLookFromSkin(skin),
+        PluginDisplayNames::Dialogs::EpromTypePrompt::kEpromTypeLabel);
     epromTypeCombo_ = std::make_unique<TSS::ComboBox>(
-        kComboWidth_, kComboHeight_, TSS::comboBoxLookFromSkin(skin));
+        kComboWidth_, kControlHeight_, TSS::comboBoxLookFromSkin(skin));
     epromTypeCombo_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
 
-    okButton_.onClick = [this] { confirm(); };
-    laterButton_.onClick = [this] { dismissAsLater(); };
-    laterButton_.setWantsKeyboardFocus(false);
-    laterButton_.setMouseClickGrabsKeyboardFocus(false);
-    okButton_.setMouseClickGrabsKeyboardFocus(false);
+    confirmButton_.onClick = [this] { confirm(); };
+    specifyLaterButton_.onClick = [this] { dismissAsLater(); };
+    specifyLaterButton_.setWantsKeyboardFocus(false);
+    specifyLaterButton_.setMouseClickGrabsKeyboardFocus(false);
+    confirmButton_.setMouseClickGrabsKeyboardFocus(false);
 
+    addAndMakeVisible(*epromTypeLabel_);
     addAndMakeVisible(*epromTypeCombo_);
-    addAndMakeVisible(okButton_);
-    addAndMakeVisible(laterButton_);
+    addAndMakeVisible(confirmButton_);
+    addAndMakeVisible(specifyLaterButton_);
 }
 
 EpromTypePromptDialog::~EpromTypePromptDialog() = default;
 
-void EpromTypePromptDialog::prepareForShow(MatrixDeviceTypes::Type deviceType,
-                                           int preferredSelectedId,
-                                           std::function<void(int selectedId)> onConfirm,
-                                           std::function<void()> onLater)
+void EpromTypePromptDialog::prepareForShow(PrepareForShowArgs args)
 {
-    onConfirm_ = std::move(onConfirm);
-    onLater_ = std::move(onLater);
-    populateComboItems(deviceType, preferredSelectedId);
+    onConfirm_ = std::move(args.onConfirm);
+    onLater_ = std::move(args.onLater);
+    includeFirmwareSuggestionHint_ = args.includeFirmwareSuggestionHint;
+    populateComboItems(args.deviceType, args.preferredSelectedId);
     repaint();
 }
 
@@ -68,6 +70,7 @@ void EpromTypePromptDialog::populateComboItems(MatrixDeviceTypes::Type deviceTyp
 void EpromTypePromptDialog::setSkin(TSS::ISkin& skin)
 {
     skin_ = &skin;
+    epromTypeLabel_->setLook(TSS::labelLookFromSkin(skin));
     epromTypeCombo_->setLook(TSS::comboBoxLookFromSkin(skin));
     epromTypeCombo_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
     repaint();
@@ -97,6 +100,51 @@ juce::Rectangle<int> EpromTypePromptDialog::getDialogBounds() const
                              + border * 2;
 
     return getLocalBounds().withSizeKeepingCentre(dialogWidth, dialogHeight);
+}
+
+EpromTypePromptDialog::ContentLayout EpromTypePromptDialog::computeContentLayout() const
+{
+    ContentLayout layout;
+
+    auto inner = getDialogBounds().reduced(getBorderThickness());
+    inner.removeFromTop(juce::roundToInt(static_cast<float>(kTitleBarHeight_) * uiScale_));
+
+    const int padding = juce::roundToInt(12.0f * uiScale_);
+    const int buttonHeight = juce::roundToInt(24.0f * uiScale_);
+    const int gapAboveButtons = juce::roundToInt(8.0f * uiScale_);
+
+    auto content = inner.reduced(padding);
+    layout.buttonRow = content.removeFromBottom(buttonHeight);
+    content.removeFromBottom(gapAboveButtons);
+
+    const auto bodyFont = skin_->getBaseFont().withHeight(skin_->getBaseFont().getHeight() * uiScale_);
+    const int gapUnderTitle = juce::roundToInt(bodyFont.getHeight());
+    content.removeFromTop(gapUnderTitle);
+
+    const int maxBodyHeight = juce::jmax(0, content.getHeight() / 2);
+    juce::GlyphArrangement glyphs;
+    glyphs.addFittedText(bodyFont,
+                         bodyText(),
+                         0.0f,
+                         0.0f,
+                         static_cast<float>(content.getWidth()),
+                         static_cast<float>(maxBodyHeight),
+                         juce::Justification::topLeft,
+                         5);
+    const int bodyHeight = juce::jmax(juce::roundToInt(bodyFont.getHeight()),
+                                      juce::roundToInt(glyphs.getBoundingBox(0, glyphs.getNumGlyphs(), true).getHeight()));
+
+    layout.bodyTextArea = content.removeFromTop(bodyHeight);
+    layout.controlBand = content;
+    return layout;
+}
+
+juce::String EpromTypePromptDialog::bodyText() const
+{
+    juce::String text(PluginDisplayNames::Dialogs::EpromTypePrompt::kBody);
+    if (includeFirmwareSuggestionHint_)
+        text += PluginDisplayNames::Dialogs::EpromTypePrompt::kBodySuggestionSuffix;
+    return text;
 }
 
 void EpromTypePromptDialog::dismissAsLater()
@@ -131,11 +179,11 @@ void EpromTypePromptDialog::paint(juce::Graphics& g)
     auto inner = dialogBounds.reduced(border);
     const int titleBarHeight = juce::roundToInt(static_cast<float>(kTitleBarHeight_) * uiScale_);
     auto titleBar = inner.removeFromTop(titleBarHeight);
-    auto content = inner;
+    auto contentFill = inner;
 
     g.setColour(skin_->getColour(SkinColourId::kHeaderPanelBackground));
     g.fillRect(titleBar);
-    g.fillRect(content);
+    g.fillRect(contentFill);
 
     g.setColour(skin_->getColour(SkinColourId::kDarkPanelText));
     g.setFont(skin_->getBaseFontBold().withHeight(skin_->getBaseFontBold().getHeight() * uiScale_));
@@ -144,46 +192,35 @@ void EpromTypePromptDialog::paint(juce::Graphics& g)
                juce::Justification::centred,
                false);
 
+    const auto layout = computeContentLayout();
     const auto bodyFont = skin_->getBaseFont().withHeight(skin_->getBaseFont().getHeight() * uiScale_);
-    const int gapUnderTitle = juce::roundToInt(bodyFont.getHeight());
-    const int padX = juce::roundToInt(12.0f * uiScale_);
-
-    auto textArea = content;
-    textArea.removeFromTop(gapUnderTitle);
-    textArea = textArea.withTrimmedLeft(padX).withTrimmedRight(padX);
-    textArea.removeFromBottom(juce::roundToInt(64.0f * uiScale_));
-
     g.setFont(bodyFont);
-    g.drawFittedText(PluginDisplayNames::Dialogs::EpromTypePrompt::kBody,
-                     textArea,
-                     juce::Justification::topLeft,
-                     6);
+    g.drawFittedText(bodyText(), layout.bodyTextArea, juce::Justification::topLeft, 5);
 }
 
 void EpromTypePromptDialog::resized()
 {
-    auto inner = getDialogBounds().reduced(getBorderThickness());
-    inner.removeFromTop(juce::roundToInt(static_cast<float>(kTitleBarHeight_) * uiScale_));
+    const auto layout = computeContentLayout();
 
-    const int padding = juce::roundToInt(12.0f * uiScale_);
-    const int buttonHeight = juce::roundToInt(24.0f * uiScale_);
-    const int buttonWidth = juce::roundToInt(72.0f * uiScale_);
+    const int confirmWidth = juce::roundToInt(static_cast<float>(kConfirmButtonWidth_) * uiScale_);
+    const int laterWidth = juce::roundToInt(static_cast<float>(kSpecifyLaterButtonWidth_) * uiScale_);
     const int buttonGap = juce::roundToInt(8.0f * uiScale_);
-    const int comboHeight = juce::roundToInt(static_cast<float>(kComboHeight_) * uiScale_);
+    const int controlHeight = juce::roundToInt(static_cast<float>(kControlHeight_) * uiScale_);
+    const int labelWidth = juce::roundToInt(static_cast<float>(kLabelWidth_) * uiScale_);
     const int comboWidth = juce::roundToInt(static_cast<float>(kComboWidth_) * uiScale_);
+    const int rowWidth = labelWidth + comboWidth;
 
-    auto content = inner.reduced(padding);
-    auto buttonRow = content.removeFromBottom(buttonHeight);
-    content.removeFromBottom(juce::roundToInt(8.0f * uiScale_));
-    auto comboRow = content.removeFromBottom(comboHeight);
-
-    epromTypeCombo_->setBounds(comboRow.withSizeKeepingCentre(comboWidth, comboHeight));
+    const auto centredRow = layout.controlBand.withSizeKeepingCentre(rowWidth, controlHeight);
+    epromTypeLabel_->setBounds(centredRow.getX(), centredRow.getY(), labelWidth, controlHeight);
+    epromTypeLabel_->setUiScale(uiScale_);
+    epromTypeCombo_->setBounds(centredRow.getX() + labelWidth, centredRow.getY(), comboWidth, controlHeight);
     epromTypeCombo_->setUiScale(uiScale_);
 
-    // LTR: LATER left, OK (primary) right
-    okButton_.setBounds(buttonRow.removeFromRight(buttonWidth));
+    auto buttonRow = layout.buttonRow;
+    // LTR: SPECIFY LATER left, CONFIRM (primary) right
+    confirmButton_.setBounds(buttonRow.removeFromRight(confirmWidth));
     buttonRow.removeFromRight(buttonGap);
-    laterButton_.setBounds(buttonRow.removeFromRight(buttonWidth));
+    specifyLaterButton_.setBounds(buttonRow.removeFromRight(laterWidth));
 }
 
 void EpromTypePromptDialog::mouseDown(const juce::MouseEvent& e)
