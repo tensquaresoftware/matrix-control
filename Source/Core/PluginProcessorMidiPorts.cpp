@@ -6,6 +6,7 @@
 
 #include "Core/MIDI/KeyboardFromMidiInput.h"
 #include "Core/MIDI/MidiPortStateCoherence.h"
+#include "Core/Services/DeviceConnectionMachineDefaults.h"
 #include "GUI/PluginEditor.h"
 #include "MIDI/MidiManager.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
@@ -77,6 +78,7 @@ bool PluginProcessor::setMidiInputPort(const juce::String& deviceId)
     if (midiManager->setMidiInputPort(deviceId))
     {
         apvts.state.setProperty("midiInputPortId", deviceId, nullptr);
+        Core::DeviceConnectionMachineDefaults::writeMidiInputPort(deviceId);
         Core::clearMidiFromKeyboardFromConflictFooterIfPresent(apvts.state);
         notifyNonParameterStateChanged();
         midiManager->refreshDeviceInquiryAfterPortSync();
@@ -94,6 +96,7 @@ bool PluginProcessor::setMidiOutputPort(const juce::String& deviceId)
     if (midiManager->setMidiOutputPort(deviceId))
     {
         apvts.state.setProperty("midiOutputPortId", deviceId, nullptr);
+        Core::DeviceConnectionMachineDefaults::writeMidiOutputPort(deviceId);
         notifyNonParameterStateChanged();
         midiManager->refreshDeviceInquiryAfterPortSync();
         return true;

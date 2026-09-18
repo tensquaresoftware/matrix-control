@@ -185,6 +185,7 @@ set(PLUGIN_SOURCES
     Source/Core/Services/ClipboardPasteEnabledResolver.cpp
     Source/Core/Services/DeviceMemoryLimits.cpp
     Source/Core/Services/DeviceTypeRegistry.cpp
+    Source/Core/Services/DeviceConnectionMachineDefaults.cpp
     Source/Core/Services/EpromTypePolicy.cpp
     Source/Core/Services/PatchFileService.cpp
     Source/Core/Services/PatchFileServiceSelection.cpp
@@ -561,6 +562,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/SysExDelayProfileTests.cpp
         Tests/Unit/EpromTypePolicyTests.cpp
         Tests/Unit/DeviceSetupDeviceRowTests.cpp
+        Tests/Unit/DeviceConnectionMachineDefaultsTests.cpp
         Tests/Unit/MidiPortComboPopulationTests.cpp
         Tests/Unit/SysExInterMessageDelayTests.cpp
         Tests/Unit/SysExParserTests.cpp

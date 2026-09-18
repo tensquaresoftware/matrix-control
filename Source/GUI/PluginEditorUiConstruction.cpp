@@ -4,6 +4,7 @@
 #include "PluginEditor.h"
 #include "PluginEditorInternal.h"
 
+#include "Core/Services/DeviceConnectionMachineDefaults.h"
 #include "Core/Services/DeviceSetupDeviceRow.h"
 #include "Core/Services/PatchNameEditRules.h"
 #include "GUI/Factories/WidgetFactory.h"
@@ -267,7 +268,8 @@ void PluginEditor::attachEditorRuntimeListeners()
     if (Core::shouldOpenDeviceSetupAssistant(
             static_cast<bool>(pluginProcessor.getApvts().state.getProperty(
                 PluginIDs::Settings::kEpromTypePromptDone, false)),
-            false))
+            false,
+            Core::DeviceConnectionMachineDefaults::load().promptDone))
     {
         juce::MessageManager::callAsync(
             [safeThis = juce::Component::SafePointer<PluginEditor>(this)]

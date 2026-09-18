@@ -113,6 +113,15 @@ namespace PluginIDs
         }
     }
 
+    // PropertiesFile keys for machine-global DEVICE SETUP defaults (not APVTS session ids).
+    namespace MachineDefaults
+    {
+        constexpr const char* kDeviceSetupPromptDone = "deviceSetupPromptDone";
+        constexpr const char* kMidiInputPortId = "midiInputPortId";
+        constexpr const char* kMidiOutputPortId = "midiOutputPortId";
+        constexpr const char* kEpromType = "settingsEpromType";
+    }
+
     namespace Mode
     {
         constexpr const char* kMaster = "masterMode";

@@ -35,10 +35,16 @@ namespace Core
         juce::String detailText;
     };
 
-    /** Open guard for the one-shot DEVICE SETUP assistant. */
-    inline bool shouldOpenDeviceSetupAssistant(bool promptDone, bool dialogAlreadyVisible) noexcept
+    /**
+     * Open guard for the one-shot DEVICE SETUP assistant.
+     * machinePromptDone covers host-restored sessions that still have session promptDone false
+     * after the user already completed DEVICE SETUP on this machine.
+     */
+    inline bool shouldOpenDeviceSetupAssistant(bool sessionPromptDone,
+                                               bool dialogAlreadyVisible,
+                                               bool machinePromptDone = false) noexcept
     {
-        return ! promptDone && ! dialogAlreadyVisible;
+        return ! sessionPromptDone && ! machinePromptDone && ! dialogAlreadyVisible;
     }
 
     struct DeviceSetupFinishFlags

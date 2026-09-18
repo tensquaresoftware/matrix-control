@@ -1837,3 +1837,18 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-device-footer-disconnected-status.md`
   summary: Sticky/footer inventories and DEVICE contextual help do not document unresponsive → NOT CONNECTED + ERROR badge right-band state.
   evidence: Blind Hunter; inventory/help copy follow-up for later casing or help polish waves.
+
+## Deferred from: review of spec-device-setup-cross-project-friction.md (2026-09-18)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-device-setup-cross-project-friction.md`
+  summary: Machine-defaults PropertiesFile load/modify/save has no inter-process lock; concurrent instances can race.
+  evidence: Edge/Blind hunters; RMW in DeviceConnectionMachineDefaults write paths; settle with file lock or atomic replace if multi-instance conflict appears.
+- source_spec: `_bmad-output/implementation-artifacts/spec-device-setup-cross-project-friction.md`
+  summary: No unit round-trip for PropertiesFile load/save and no production call-site coverage for seed/write-through/open wiring.
+  evidence: Verification-gap layer; needs injectable store seam or processor harness beyond current Core pure-helper style.
+- source_spec: `_bmad-output/implementation-artifacts/spec-device-setup-cross-project-friction.md`
+  summary: MIDI port sanitize/clear during syncMidiPortsFromState does not write through to machine defaults.
+  evidence: Blind hunter; invalid seeded ids can reappear on the next fresh instance until the user re-selects ports.
+- source_spec: `_bmad-output/implementation-artifacts/spec-device-setup-cross-project-friction.md`
+  summary: MidiPortRoutingPropertyTests APVTS mirror omits new machine write-through calls.
+  evidence: Verification-gap other finding; helper claim drift only.

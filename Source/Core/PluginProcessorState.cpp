@@ -11,6 +11,7 @@
 #include "Core/Models/PatchModel.h"
 #include "Core/Models/PatchNameSyncer.h"
 #include "Core/Services/DirtyPatchTracker.h"
+#include "Core/Services/DeviceConnectionMachineDefaults.h"
 #include "Core/Services/PatchMutator/MutatorSessionPersistence.h"
 #include "Core/Services/PatchMutator/PatchMutatorEngine.h"
 #include "Core/Services/SessionPersistencePolicy.h"
@@ -92,6 +93,11 @@ void PluginProcessor::applyRestoredPluginState(juce::ValueTree restoredState)
     initializeMutatorRecipeState();
     resetEphemeralMutatorStateAfterSessionLoad();
     initializeMutatorActionEnabledMirrorsForEmptyHistory();
+
+    // Factory/empty host chunks wipe construction-seeded connection prefs; re-seed when the
+    // machine already completed DEVICE SETUP and this session still looks unfinished.
+    Core::DeviceConnectionMachineDefaults::reseedApvtsAfterHostRestoreIfNeeded(apvts.state);
+
     syncAudioRuntimeFromState();
     syncHardwareLatencyFromState();
     if (midiManager != nullptr)

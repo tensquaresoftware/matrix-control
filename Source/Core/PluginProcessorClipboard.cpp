@@ -10,6 +10,7 @@
 #include "Core/Services/ClipboardFeedbackResolver.h"
 #include "Core/Services/ClipboardPasteEnabledResolver.h"
 #include "Core/Services/ClipboardService.h"
+#include "Core/Services/DeviceConnectionMachineDefaults.h"
 #include "Core/Services/PatchNameDisplayMode.h"
 #include "Core/Services/PatchMutator/PatchMutatorEngine.h"
 #include "MIDI/MidiManager.h"
@@ -460,4 +461,11 @@ void PluginProcessor::initializeEpromTypeProperties()
 
     if (! apvts.state.hasProperty(PluginIDs::Settings::kEpromTypePromptPending))
         apvts.state.setProperty(PluginIDs::Settings::kEpromTypePromptPending, false, nullptr);
+}
+
+void PluginProcessor::seedDeviceConnectionDefaultsFromMachine()
+{
+    // Fresh construction only — host setStateInformation later replaces this for restored projects.
+    Core::DeviceConnectionMachineDefaults::seedApvtsState(
+        apvts.state, Core::DeviceConnectionMachineDefaults::load());
 }

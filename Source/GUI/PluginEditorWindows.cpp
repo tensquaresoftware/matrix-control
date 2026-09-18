@@ -14,6 +14,7 @@
 #include "GUI/Panels/MainComponent/FooterPanel/FooterPanel.h"
 #include "GUI/Settings/SettingsPanel.h"
 #include "GUI/Settings/SettingsWindow.h"
+#include "Core/Services/DeviceConnectionMachineDefaults.h"
 #include "Core/Services/DeviceSetupDeviceRow.h"
 #include "Core/Services/DeviceTypeRegistry.h"
 #include "Core/Services/EpromTypePolicy.h"
@@ -247,7 +248,7 @@ namespace
         return {
             .deviceDetected = static_cast<bool>(state.getProperty("deviceDetected", false)),
             .deviceMidiUnresponsive = static_cast<bool>(
-                state.getProperty(Core::kDeviceMidiUnresponsiveProperty, false)),
+                state.getProperty("deviceMidiUnresponsive", false)),
             .deviceType = Core::DeviceTypeRegistry::fromApvtsProperty(
                 state.getProperty(MatrixDeviceTypes::kApvtsPropertyName)),
             .deviceVersion = state.getProperty("deviceVersion", juce::String()).toString(),
@@ -273,6 +274,7 @@ void PluginEditor::applyEpromTypePromptSelection(int selectedId)
     apvtsState.setProperty(PluginIDs::Settings::kEpromType, result.epromTypeId, nullptr);
     apvtsState.setProperty(PluginIDs::Settings::kEpromTypePromptDone, result.promptDone, nullptr);
     apvtsState.setProperty(PluginIDs::Settings::kEpromTypePromptPending, result.promptPending, nullptr);
+    Core::DeviceConnectionMachineDefaults::writeAfterConfirmFromState(apvtsState, result.epromTypeId);
     pluginProcessor.getMidiManager().refreshSysExDelayFromSettings();
 
     if (auto* panel = getSettingsPanelIfOpen())
@@ -359,19 +361,20 @@ void PluginEditor::applyEpromTypePromptMidiPortChange(bool isInput, const juce::
 
 void PluginEditor::applyEpromTypePromptSpecifyLater()
 {
-    auto& apvtsState = pluginProcessor.getApvts().state;
+    auto& state = pluginProcessor.getApvts().state;
     const auto flags = Core::deviceSetupSpecifyLaterFlags();
-    apvtsState.setProperty(PluginIDs::Settings::kEpromTypePromptDone, flags.promptDone, nullptr);
-    apvtsState.setProperty(PluginIDs::Settings::kEpromTypePromptPending, flags.promptPending, nullptr);
+    state.setProperty(PluginIDs::Settings::kEpromTypePromptDone, flags.promptDone, nullptr);
+    state.setProperty(PluginIDs::Settings::kEpromTypePromptPending, flags.promptPending, nullptr);
+    Core::DeviceConnectionMachineDefaults::writeAfterSpecifyLaterFromState(state);
 }
 
 void PluginEditor::openEpromTypePromptDialog()
 {
     auto& state = pluginProcessor.getApvts().state;
-    const bool promptDone = static_cast<bool>(
-        state.getProperty(PluginIDs::Settings::kEpromTypePromptDone, false));
-    const bool alreadyVisible = epromTypePromptDialog_ != nullptr && epromTypePromptDialog_->isVisible();
-    if (! Core::shouldOpenDeviceSetupAssistant(promptDone, alreadyVisible))
+    if (! Core::shouldOpenDeviceSetupAssistant(
+            static_cast<bool>(state.getProperty(PluginIDs::Settings::kEpromTypePromptDone, false)),
+            epromTypePromptDialog_ != nullptr && epromTypePromptDialog_->isVisible(),
+            Core::DeviceConnectionMachineDefaults::load().promptDone))
         return;
 
     const auto deviceType = Core::DeviceTypeRegistry::fromApvtsProperty(

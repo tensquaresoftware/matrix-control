@@ -373,6 +373,7 @@ private:
     void initializeDeleteWarningPolicyProperty();
     void initializeMatrix1000PatchesNamesModeProperty();
     void initializeEpromTypeProperties();
+    void seedDeviceConnectionDefaultsFromMachine();
     void applyHardwareLatencyToHost();
     void notifyNonParameterStateChanged();
     void scheduleDeferredMidiPortSyncForPluginHost();

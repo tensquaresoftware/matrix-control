@@ -309,6 +309,7 @@ void PluginProcessor::finishConstructionSetup()
     initializeDeleteWarningPolicyProperty();
     initializeMatrix1000PatchesNamesModeProperty();
     initializeEpromTypeProperties();
+    seedDeviceConnectionDefaultsFromMachine();
 
     initializePatchNameProperty();
     initializeClipboardPasteEnabledProperties();
@@ -322,6 +323,8 @@ void PluginProcessor::finishConstructionSetup()
     deferredMidiPortSyncTimer_ = std::make_unique<DeferredMidiPortSyncTimer>(*this);
     installMidiDeviceListConnection();
     startMidiThread();
+    syncMidiPortsFromState(false);
+    scheduleDeferredMidiPortSyncForPluginHost();
     refreshClipboardPasteEnabledProperties();
     refreshClipboardFeedbackProperties();
     resetInternalPatchCoordinatesToDefaults();

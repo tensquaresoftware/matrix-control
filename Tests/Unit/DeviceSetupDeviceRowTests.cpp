@@ -39,6 +39,8 @@ private:
         expect(! Core::shouldOpenDeviceSetupAssistant(true, false));
         expect(! Core::shouldOpenDeviceSetupAssistant(false, true));
         expect(! Core::shouldOpenDeviceSetupAssistant(true, true));
+        expect(! Core::shouldOpenDeviceSetupAssistant(false, false, true));
+        expect(Core::shouldOpenDeviceSetupAssistant(false, false, false));
     }
 
     void testPartialPortsStayNotConnected()

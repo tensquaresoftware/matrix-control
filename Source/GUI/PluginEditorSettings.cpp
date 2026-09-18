@@ -4,6 +4,7 @@
 #include "PluginEditor.h"
 #include "PluginEditorInternal.h"
 
+#include "Core/Services/DeviceConnectionMachineDefaults.h"
 #include "Core/Services/DeviceTypeRegistry.h"
 #include "Core/Services/EpromTypePolicy.h"
 #include "Core/Services/PatchNameDisplayMode.h"
@@ -221,6 +222,7 @@ void PluginEditor::wireSettingsEpromAndLatency(SettingsPanel& panel)
 
         pluginProcessor.getApvts().state.setProperty(
             PluginIDs::Settings::kEpromType, normalized, nullptr);
+        Core::DeviceConnectionMachineDefaults::writeEpromType(normalized);
         pluginProcessor.getMidiManager().refreshSysExDelayFromSettings();
     };
 }
