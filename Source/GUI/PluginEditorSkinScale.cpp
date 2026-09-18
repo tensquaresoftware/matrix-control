@@ -6,6 +6,7 @@
 
 #include "GUI/About/AboutWindow.h"
 #include "GUI/Dialogs/BankTransferProgressDialog.h"
+#include "GUI/Dialogs/EpromTypePromptDialog.h"
 #include "GUI/Dialogs/MasterInitConfirmDialog.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Panels/MainComponent/HeaderPanel/HeaderPanel.h"
@@ -39,6 +40,12 @@ void PluginEditor::updateSkin()
 
     if (bankTransferProgressDialog_ != nullptr)
         bankTransferProgressDialog_->setSkin(*skin_);
+
+    if (masterInitConfirmDialog_ != nullptr)
+        masterInitConfirmDialog_->setSkin(*skin_);
+
+    if (epromTypePromptDialog_ != nullptr)
+        epromTypePromptDialog_->setSkin(*skin_);
 
 #if JUCE_DEBUG
     if (testComponent_ != nullptr)
@@ -100,6 +107,9 @@ void PluginEditor::updateOverlayLayoutsForUiScale(float uiScale)
 
     if (masterInitConfirmDialog_ != nullptr && masterInitConfirmDialog_->isVisible())
         updateMasterInitConfirmDialogLayout(uiScale);
+
+    if (epromTypePromptDialog_ != nullptr && epromTypePromptDialog_->isVisible())
+        updateEpromTypePromptDialogLayout(uiScale);
 
     if (bankTransferProgressDialog_ != nullptr && bankTransferProgressDialog_->isVisible())
         updateBankTransferProgressDialogLayout(uiScale);

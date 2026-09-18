@@ -18,12 +18,11 @@ namespace Core
 
     // Inter-SysEx delay profiles (D-078, NFR-2).
     //
-    // EPROM class: optimised firmware when Device Inquiry version string contains
-    // (case-insensitive substring) TAUNTEK, GLIGLI, or NORDCORE. Matching is
-    // best-effort until SM-1 hardware confirms reply strings.
+    // EPROM class: Settings EPROM TYPE is the SSOT (FACTORY/UNKNOWN = stock;
+    // GLIGLI/TAUNTEK/UNTERGEEK = optimised). Device Inquiry version is never used
+    // for live delay class.
     //
-    // Device family: member bytes from Device Inquiry reply, compared via
-    // SysExConstants::DeviceInquiry (M-1000 D-080 + provisional M-6/6R).
+    // Device family: member bytes from Device Inquiry reply (or Settings device type).
     // Unknown members fall back to stock M-1000 delay (Story 2.2).
     //
     // Optimised delay values are placeholders; SM-1 hardware gate may tune.
@@ -35,7 +34,8 @@ namespace Core
         static constexpr int kOptimisedDelayMsMatrix1000 { 5 };  // SM-1 hardware gate may tune
         static constexpr int kOptimisedDelayMsMatrix6 { 10 };    // SM-1 hardware gate may tune
 
-        static SysExDelayProfile fromDeviceInquiry(const DeviceIdInfo& info);
+        static SysExDelayProfile fromSettings(int epromTypeId, MatrixDeviceFamily deviceFamily) noexcept;
+        static SysExDelayProfile fromDeviceInquiry(const DeviceIdInfo& info, int epromTypeId);
         static SysExDelayProfile stockDefault() noexcept;
 
         int getDelayMs() const noexcept;

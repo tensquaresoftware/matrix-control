@@ -2,7 +2,7 @@
 
 #include "Core/MIDI/Queue/SysExDelayProfile.h"
 #include "Core/MIDI/Queue/SysExInterMessageDelay.h"
-#include "Core/MIDI/SysEx/SysExDecoder.h"
+#include "Shared/Definitions/PluginIDs.h"
 
 class SysExInterMessageDelayTests : public juce::UnitTest
 {
@@ -45,15 +45,9 @@ private:
         gate.recordSysExSent(100);
         expectEquals(gate.millisUntilNextAllowed(105), 5);
 
-        const auto optimisedM1000 = Core::SysExDelayProfile::fromDeviceInquiry(
-            []() {
-                DeviceIdInfo info {};
-                info.memberLow = 0x02;
-                info.memberHigh = 0x00;
-                info.version = "TAUNTEK";
-                info.isValid = true;
-                return info;
-            }());
+        const auto optimisedM1000 = Core::SysExDelayProfile::fromSettings(
+            PluginIDs::Settings::EpromType::kTauntek,
+            Core::MatrixDeviceFamily::kMatrix1000);
         gate.setProfile(optimisedM1000);
 
         expectEquals(gate.millisUntilNextAllowed(105), 0);

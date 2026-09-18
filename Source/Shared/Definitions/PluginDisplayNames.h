@@ -155,9 +155,11 @@ namespace PluginDisplayNames
         constexpr const char* kHardwareLatencyLabel    = "HARDWARE LATENCY";
         constexpr const char* kAudioFromLabel          = "AUDIO FROM :";
         constexpr const char* kInputGainLabel          = "INPUT GAIN :";
+        constexpr const char* kDeviceSection           = "DEVICE";
         constexpr const char* kPatchSection            = "PATCH";
         constexpr const char* kPatchMutatorSection     = "PATCH MUTATOR";
         constexpr const char* kMasterSection           = "MASTER";
+        constexpr const char* kEpromTypeLabel          = "EPROM TYPE";
         constexpr const char* kMatrix1000PatchesLabel  = "MATRIX-1000 PATCHES";
         constexpr const char* kComputerPatchesLabel    = "COMPUTER PATCHES";
         constexpr const char* kUnsavedStateLabel       = "UNSAVED STATE";
@@ -178,6 +180,11 @@ namespace PluginDisplayNames
         constexpr const char* kNeverWarn               = "NEVER WARN";
         constexpr const char* kDisplayMusicalNames     = "DISPLAY MUSICAL NAMES";
         constexpr const char* kDisplayHardwareNames    = "DISPLAY HARDWARE NAMES";
+        constexpr const char* kEpromTypeFactory        = "FACTORY";
+        constexpr const char* kEpromTypeGligli         = "GLIGLI";
+        constexpr const char* kEpromTypeTauntek        = "TAUNTEK";
+        constexpr const char* kEpromTypeUntergeek      = "UNTERGEEK";
+        constexpr const char* kEpromTypeUnknown        = "UNKNOWN";
         constexpr const char* kLoadMasterDialogTitle   = "Load Master";
         constexpr const char* kSaveMasterAsDialogTitle = "Save Master As";
 
@@ -222,7 +229,9 @@ namespace PluginDisplayNames
             constexpr const char* kDefragHistory =
                 "SETTINGS: Coming soon - renumber mutation history when full.";
             constexpr const char* kHardwareLatency =
-                "SETTINGS: Sets inter-SysEx delay for reliable hardware transfers (plugin).";
+                "SETTINGS: Sets host audio latency compensation for this plugin instance.";
+            constexpr const char* kEpromType =
+                "SETTINGS: Declares the synth EPROM type used for MIDI timing and future features.";
             constexpr const char* kMasterLoad =
                 "SETTINGS: Loads a Master settings file into the editor.";
             constexpr const char* kMasterSaveAs =
@@ -291,6 +300,16 @@ namespace PluginDisplayNames
                 "This will reset all parameters in the {MODULE} module to init defaults and send a full master SysEx to the synth. Other master modules will not be changed.";
             constexpr const char* kConfirm = "Reset";
             constexpr const char* kCancel  = "Cancel";
+        }
+
+        namespace EpromTypePrompt
+        {
+            constexpr const char* kTitle = "EPROM TYPE";
+            constexpr const char* kBody =
+                "Select the EPROM type for your synth. This affects MIDI timing and future features. "
+                "A suggestion may be shown from the reported firmware version; confirm or change it.";
+            constexpr const char* kOk = "OK";
+            constexpr const char* kLater = "LATER";
         }
 
         namespace MasterGlobalInitConfirm

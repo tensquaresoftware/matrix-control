@@ -1,5 +1,6 @@
 #include "SettingsPanel.h"
 
+#include "Core/Services/EpromTypePolicy.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinValues.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
@@ -12,6 +13,7 @@ SettingsPanel::SettingsPanel(TSS::ISkin& skin, bool isPluginMode)
 {
     setOpaque(true);
 
+    setupDeviceSection(skin);
     setupPatchSection(skin);
     setupPatchMutatorSection(skin);
     setupMasterSection(skin);
@@ -19,6 +21,7 @@ SettingsPanel::SettingsPanel(TSS::ISkin& skin, bool isPluginMode)
     applyComboPopupLooks(skin);
 
     setPluginMode(isPluginMode);
+    refreshEpromTypeItems(PluginIDs::Settings::EpromType::kDefault);
 }
 
 void SettingsPanel::registerContextualHelp(TSS::ContextualHelpBinder::FooterResolver resolveFooter)
@@ -28,6 +31,8 @@ void SettingsPanel::registerContextualHelp(TSS::ContextualHelpBinder::FooterReso
     contextualHelpBinder_ = std::make_unique<TSS::ContextualHelpBinder>(std::move(resolveFooter));
     contextualHelpBinder_->setHostShowingPredicate([this] { return isShowing(); });
 
+    contextualHelpBinder_->bind(hardwareLatencySlider_.get(), Help::kHardwareLatency);
+    contextualHelpBinder_->bind(epromTypeCombo_.get(), Help::kEpromType);
     contextualHelpBinder_->bind(matrix1000PatchesCombo_.get(), Help::kMatrix1000Patches);
     contextualHelpBinder_->bind(computerPatchesCombo_.get(), Help::kComputerPatches);
     contextualHelpBinder_->bind(unsavedStateCombo_.get(), Help::kUnsavedState);
@@ -36,7 +41,6 @@ void SettingsPanel::registerContextualHelp(TSS::ContextualHelpBinder::FooterReso
     contextualHelpBinder_->bind(deleteWarningCombo_.get(), Help::kDeleteWarning);
     contextualHelpBinder_->bind(defragHistoryLabel_.get(), Help::kDefragHistory);
     contextualHelpBinder_->bind(defragHistoryPlaceholder_.get(), Help::kDefragHistory);
-    contextualHelpBinder_->bind(hardwareLatencySlider_.get(), Help::kHardwareLatency);
     contextualHelpBinder_->bind(masterLoadButton_.get(), Help::kMasterLoad);
     contextualHelpBinder_->bind(masterSaveAsButton_.get(), Help::kMasterSaveAs);
     contextualHelpBinder_->bind(masterInitButton_.get(), Help::kMasterInit);
@@ -131,6 +135,31 @@ void SettingsPanel::layoutButtonRow(juce::Rectangle<int>& bounds,
     bounds.removeFromTop(metrics.rowGap);
 }
 
+void SettingsPanel::layoutDeviceSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics)
+{
+    layoutSectionHeader(bounds,
+                        SectionHeaderLayoutArgs{ deviceSectionLabel_.get(),
+                                                 deviceSectionSeparator_.get(),
+                                                 metrics.controlHeight,
+                                                 metrics.separatorHeight,
+                                                 metrics.rowGap });
+
+    if (isPluginMode_)
+    {
+        layoutLabeledControlRow(bounds,
+                                metrics,
+                                LabeledControlRowArgs{ hardwareLatencyLabel_.get(),
+                                                       hardwareLatencySlider_.get(),
+                                                       metrics.sliderWidth });
+    }
+
+    layoutLabeledControlRow(bounds,
+                            metrics,
+                            LabeledControlRowArgs{ epromTypeLabel_.get(),
+                                                   epromTypeCombo_.get(),
+                                                   metrics.comboWidth });
+}
+
 void SettingsPanel::layoutPatchSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics)
 {
     layoutSectionHeader(bounds,
@@ -186,15 +215,6 @@ void SettingsPanel::layoutMasterSection(juce::Rectangle<int>& bounds, const RowL
                                                  metrics.separatorHeight,
                                                  metrics.rowGap });
 
-    if (isPluginMode_)
-    {
-        layoutLabeledControlRow(bounds,
-                                metrics,
-                                LabeledControlRowArgs{ hardwareLatencyLabel_.get(),
-                                                       hardwareLatencySlider_.get(),
-                                                       metrics.sliderWidth });
-    }
-
     layoutButtonRow(bounds,
                     metrics,
                     ButtonRowLayoutArgs{ masterUtilityLabel_.get(),
@@ -227,6 +247,8 @@ void SettingsPanel::layoutContent(juce::Rectangle<int> bounds)
     metrics.saveAsInitWidth = juce::roundToInt(static_cast<float>(kSaveAsInitWidth_) * uiScale_);
     metrics.deleteInitWidth = juce::roundToInt(static_cast<float>(kDeleteInitWidth_) * uiScale_);
 
+    layoutDeviceSection(bounds, metrics);
+    bounds.removeFromTop(metrics.rowGap);
     layoutPatchSection(bounds, metrics);
     bounds.removeFromTop(metrics.rowGap);
     layoutPatchMutatorSection(bounds, metrics);
@@ -258,12 +280,36 @@ void SettingsPanel::setPluginMode(bool isPluginMode)
     resized();
 }
 
+void SettingsPanel::setDeviceType(MatrixDeviceTypes::Type deviceType)
+{
+    if (deviceType_ == deviceType)
+        return;
+
+    deviceType_ = deviceType;
+    const int currentId = epromTypeCombo_->getSelectedId();
+    refreshEpromTypeItems(currentId > 0 ? currentId : PluginIDs::Settings::EpromType::kDefault);
+}
+
 void SettingsPanel::updateModeSpecificVisibility()
 {
     const bool showPluginControls = isPluginMode_;
 
     hardwareLatencyLabel_->setVisible(showPluginControls);
     hardwareLatencySlider_->setVisible(showPluginControls);
+}
+
+int SettingsPanel::refreshEpromTypeItems(int preferredSelectedId)
+{
+    const auto family = Core::EpromTypePolicy::deviceFamilyFromType(deviceType_);
+    const int selectedId = Core::EpromTypePolicy::coerceForDeviceFamily(preferredSelectedId, family);
+
+    epromTypeCombo_->clear(juce::dontSendNotification);
+    Core::EpromTypePolicy::forEachValidItem(family, [this](int id)
+    {
+        epromTypeCombo_->addItem(Core::EpromTypePolicy::displayNameForId(id), id);
+    });
+    epromTypeCombo_->setSelectedId(selectedId, juce::dontSendNotification);
+    return selectedId;
 }
 
 void SettingsPanel::refreshInitTemplateDeleteEnablement(bool patchInitExists, bool masterInitExists)

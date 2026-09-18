@@ -4,8 +4,12 @@
 #include "PluginEditor.h"
 #include "PluginEditorInternal.h"
 
+#include "Core/Services/DeviceTypeRegistry.h"
+#include "Core/Services/EpromTypePolicy.h"
 #include "Core/Services/PatchNameDisplayMode.h"
+#include "Core/MIDI/MidiManager.h"
 #include "GUI/Settings/SettingsPanel.h"
+#include "Shared/Definitions/MatrixDeviceTypes.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginIDs.h"
 
@@ -42,6 +46,11 @@ namespace
         return kDefault;
     }
 
+    int normalizeEpromType(int raw)
+    {
+        return Core::EpromTypePolicy::normalize(raw);
+    }
+
     int readNormalizedProperty(juce::ValueTree& state,
                                const char* propertyId,
                                int defaultValue,
@@ -59,8 +68,23 @@ void PluginEditor::restoreSettingsPanelFromState(SettingsPanel& panel)
 {
     auto& state = pluginProcessor.getApvts().state;
 
+    const auto deviceType = Core::DeviceTypeRegistry::fromApvtsProperty(
+        state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
+    panel.setDeviceType(deviceType);
+
     if (!pluginProcessor.isStandalone())
         panel.getHardwareLatencySlider().setValue(pluginProcessor.getHardwareLatencyMs(), juce::dontSendNotification);
+
+    const int epromType = readNormalizedProperty(state,
+                                                 PluginIDs::Settings::kEpromType,
+                                                 PluginIDs::Settings::EpromType::kDefault,
+                                                 normalizeEpromType);
+    const int coerced = panel.refreshEpromTypeItems(epromType);
+    if (coerced != epromType)
+    {
+        state.setProperty(PluginIDs::Settings::kEpromType, coerced, nullptr);
+        pluginProcessor.getMidiManager().refreshSysExDelayFromSettings();
+    }
 
     panel.getMatrix1000PatchesCombo().setSelectedId(
         readNormalizedProperty(state,
@@ -181,13 +205,28 @@ void PluginEditor::wireSettingsMasterFileActions(SettingsPanel& panel)
     };
 }
 
-void PluginEditor::wireSettingsPanel(SettingsPanel& panel)
+void PluginEditor::wireSettingsEpromAndLatency(SettingsPanel& panel)
 {
     panel.getHardwareLatencySlider().onValueChange = [this, &panel]
     {
         pluginProcessor.setHardwareLatencyMs(static_cast<float>(panel.getHardwareLatencySlider().getValue()));
     };
 
+    panel.getEpromTypeCombo().onChange = [this, &panel]
+    {
+        const int selectedId = panel.getEpromTypeCombo().getSelectedId();
+        const int normalized = Core::EpromTypePolicy::normalize(selectedId);
+        if (selectedId != normalized)
+            return;
+
+        pluginProcessor.getApvts().state.setProperty(
+            PluginIDs::Settings::kEpromType, normalized, nullptr);
+        pluginProcessor.getMidiManager().refreshSysExDelayFromSettings();
+    };
+}
+
+void PluginEditor::wireSettingsPolicyCombos(SettingsPanel& panel)
+{
     panel.getMatrix1000PatchesCombo().onChange = [this, &panel]
     {
         using namespace PluginIDs::Settings::Matrix1000PatchesNamesMode;
@@ -234,6 +273,11 @@ void PluginEditor::wireSettingsPanel(SettingsPanel& panel)
         pluginProcessor.getApvts().state.setProperty(
             PluginIDs::Settings::kDeleteWarningPolicy, selectedId, nullptr);
     };
+}
 
+void PluginEditor::wireSettingsPanel(SettingsPanel& panel)
+{
+    wireSettingsEpromAndLatency(panel);
+    wireSettingsPolicyCombos(panel);
     wireSettingsInitAndMasterActions(panel);
 }

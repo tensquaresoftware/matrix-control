@@ -6,6 +6,7 @@
 
 #include "Core/Actions/PatchManagerActionHandler.h"
 #include "Core/MIDI/EditorOutboundGate.h"
+#include "Core/MIDI/MidiManager.h"
 #include "Core/Models/ApvtsPatchMapper.h"
 #include "Core/Models/PatchModel.h"
 #include "Core/Models/PatchNameSyncer.h"
@@ -52,6 +53,8 @@ void PluginProcessor::getStateInformation(juce::MemoryBlock& destData)
 
     // Live MIDI health — never restore a wedged session lock from project state.
     state.removeProperty(Core::kDeviceMidiUnresponsiveProperty, nullptr);
+    // Transient one-time prompt request — never persist across sessions.
+    state.removeProperty(PluginIDs::Settings::kEpromTypePromptPending, nullptr);
 
     std::unique_ptr<juce::XmlElement> xml(state.createXml());
     copyXmlToBinary(*xml, destData);
@@ -91,6 +94,8 @@ void PluginProcessor::applyRestoredPluginState(juce::ValueTree restoredState)
     initializeMutatorActionEnabledMirrorsForEmptyHistory();
     syncAudioRuntimeFromState();
     syncHardwareLatencyFromState();
+    if (midiManager != nullptr)
+        midiManager->refreshSysExDelayFromSettings();
     // Option 2 (V1.2 review): standalone has no deferred retry series — align to open
     // reality immediately. Plugin host keeps a soft first sync so the desired id survives
     // intermediate retries; the last deferred attempt reports failures and aligns.

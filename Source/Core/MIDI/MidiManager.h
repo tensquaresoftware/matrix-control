@@ -45,6 +45,9 @@ public:
     juce::String getOpenOutputDeviceId() const;
     int getRequiredSysExDelayMs() const noexcept;
 
+    /** Rebuild inter-SysEx delay from Settings EPROM TYPE + current device family. */
+    void refreshSysExDelayFromSettings();
+
     void sendPatch(juce::uint8 patchNumber, const juce::uint8* packedData);
     void sendPatchToEditBuffer(const juce::uint8* packedData);
     // Matrix-1000: commit the current edit buffer to bank/patch (opcode 0x0E).

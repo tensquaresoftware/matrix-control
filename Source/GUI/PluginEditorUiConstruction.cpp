@@ -263,6 +263,17 @@ void PluginEditor::attachEditorRuntimeListeners()
     attachStandaloneAudioDeviceListener();
     pluginProcessor.getApvts().state.addListener(this);
 
+    if (static_cast<bool>(pluginProcessor.getApvts().state.getProperty(
+            PluginIDs::Settings::kEpromTypePromptPending, false)))
+    {
+        juce::MessageManager::callAsync(
+            [safeThis = juce::Component::SafePointer<PluginEditor>(this)]
+            {
+                if (safeThis != nullptr)
+                    safeThis->openEpromTypePromptDialog();
+            });
+    }
+
     setWantsKeyboardFocus(true);
     setFocusContainerType(juce::Component::FocusContainerType::keyboardFocusContainer);
     addKeyListener(this);

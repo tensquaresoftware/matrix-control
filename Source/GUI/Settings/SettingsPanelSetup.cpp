@@ -30,6 +30,36 @@ std::unique_ptr<TSS::HorizontalSeparator> SettingsPanel::makeSeparator(TSS::ISki
         kContentWidth_, kSeparatorHeight_, TSS::horizontalSeparatorLookFromSkin(skin));
 }
 
+void SettingsPanel::setupDeviceSection(TSS::ISkin& skin)
+{
+    deviceSectionLabel_ = makeLabel(skin, kContentWidth_, PluginDisplayNames::Settings::kDeviceSection);
+    deviceSectionSeparator_ = makeSeparator(skin);
+    hardwareLatencyLabel_ =
+        makeLabel(skin, kLabelWidth_, PluginDisplayNames::Settings::kHardwareLatencyLabel);
+    hardwareLatencySlider_ = std::make_unique<TSS::Slider>(
+        kSliderWidth_,
+        kControlHeight_,
+        TSS::sliderLookFromSkin(skin),
+        TSS::SliderConfig{
+            Core::HardwareLatency::kMinMs,
+            Core::HardwareLatency::kMaxMs,
+            Core::HardwareLatency::kMinMs,
+            Core::HardwareLatency::kStepMs,
+            "ms",
+            {},
+            {},
+            {}});
+    epromTypeLabel_ = makeLabel(skin, kLabelWidth_, PluginDisplayNames::Settings::kEpromTypeLabel);
+    epromTypeCombo_ = makeCombo(skin, kComboWidth_);
+
+    addAndMakeVisible(*deviceSectionLabel_);
+    addAndMakeVisible(*deviceSectionSeparator_);
+    addAndMakeVisible(*hardwareLatencyLabel_);
+    addAndMakeVisible(*hardwareLatencySlider_);
+    addAndMakeVisible(*epromTypeLabel_);
+    addAndMakeVisible(*epromTypeCombo_);
+}
+
 void SettingsPanel::setupPatchSection(TSS::ISkin& skin)
 {
     patchSectionLabel_ = makeLabel(skin, kContentWidth_, PluginDisplayNames::Settings::kPatchSection);
@@ -85,21 +115,6 @@ void SettingsPanel::setupMasterSection(TSS::ISkin& skin)
 {
     masterSectionLabel_ = makeLabel(skin, kContentWidth_, PluginDisplayNames::Settings::kMasterSection);
     masterSectionSeparator_ = makeSeparator(skin);
-    hardwareLatencyLabel_ =
-        makeLabel(skin, kLabelWidth_, PluginDisplayNames::Settings::kHardwareLatencyLabel);
-    hardwareLatencySlider_ = std::make_unique<TSS::Slider>(
-        kSliderWidth_,
-        kControlHeight_,
-        TSS::sliderLookFromSkin(skin),
-        TSS::SliderConfig{
-            Core::HardwareLatency::kMinMs,
-            Core::HardwareLatency::kMaxMs,
-            Core::HardwareLatency::kMinMs,
-            Core::HardwareLatency::kStepMs,
-            "ms",
-            {},
-            {},
-            {}});
     masterUtilityLabel_ = makeLabel(skin, kLabelWidth_, PluginDisplayNames::Settings::kUtilityLabel);
     masterLoadButton_ = makeButton(skin, kUtilityLoadWidth_, PluginDisplayNames::Settings::kLoadButton);
     masterSaveAsButton_ =
@@ -114,8 +129,6 @@ void SettingsPanel::setupMasterSection(TSS::ISkin& skin)
 
     addAndMakeVisible(*masterSectionLabel_);
     addAndMakeVisible(*masterSectionSeparator_);
-    addAndMakeVisible(*hardwareLatencyLabel_);
-    addAndMakeVisible(*hardwareLatencySlider_);
     addAndMakeVisible(*masterUtilityLabel_);
     addAndMakeVisible(*masterLoadButton_);
     addAndMakeVisible(*masterSaveAsButton_);
@@ -151,6 +164,7 @@ void SettingsPanel::populateComboItems()
 void SettingsPanel::applyComboPopupLooks(TSS::ISkin& skin)
 {
     const auto popupLook = TSS::popupMenuLookFromSkin(skin);
+    epromTypeCombo_->setPopupMenuLook(popupLook);
     matrix1000PatchesCombo_->setPopupMenuLook(popupLook);
     computerPatchesCombo_->setPopupMenuLook(popupLook);
     unsavedStateCombo_->setPopupMenuLook(popupLook);
@@ -163,6 +177,13 @@ void SettingsPanel::applyChildLooks(TSS::ISkin& skin)
     const auto separatorLook = TSS::horizontalSeparatorLookFromSkin(skin);
     const auto comboLook = TSS::comboBoxLookFromSkin(skin);
     const auto buttonLook = TSS::buttonLookFromSkin(skin);
+
+    deviceSectionLabel_->setLook(labelLook);
+    deviceSectionSeparator_->setLook(separatorLook);
+    hardwareLatencyLabel_->setLook(labelLook);
+    hardwareLatencySlider_->setLook(TSS::sliderLookFromSkin(skin));
+    epromTypeLabel_->setLook(labelLook);
+    epromTypeCombo_->setLook(comboLook);
 
     patchSectionLabel_->setLook(labelLook);
     patchSectionSeparator_->setLook(separatorLook);
@@ -185,8 +206,6 @@ void SettingsPanel::applyChildLooks(TSS::ISkin& skin)
 
     masterSectionLabel_->setLook(labelLook);
     masterSectionSeparator_->setLook(separatorLook);
-    hardwareLatencyLabel_->setLook(labelLook);
-    hardwareLatencySlider_->setLook(TSS::sliderLookFromSkin(skin));
     masterUtilityLabel_->setLook(labelLook);
     masterLoadButton_->setLook(buttonLook);
     masterSaveAsButton_->setLook(buttonLook);

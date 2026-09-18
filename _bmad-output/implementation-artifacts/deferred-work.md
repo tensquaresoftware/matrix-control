@@ -1,5 +1,26 @@
 # Deferred Work
 
+## Deferred from: review of spec-settings-device-eprom-type.md (2026-09-18)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-settings-device-eprom-type.md`
+  summary: Former NORDCORE-optimised SysEx delay substring detection was removed; Nordcore firmwares now follow UNKNOWN/FACTORY stock delay with no Settings item.
+  evidence: Intentional EPROM taxonomy excludes Nordcore; document migration for rare owners if needed later.
+- source_spec: `_bmad-output/implementation-artifacts/spec-settings-device-eprom-type.md`
+  summary: No automated test that Device Inquiry success sets kEpromTypePromptPending without writing EPROM TYPE.
+  evidence: Would need MidiManager inquiry success harness (similar to Master pull-on-connect); manual first-connect checks cover this chantier.
+
+## Deferred from: Settings DEVICE / EPROM TYPE scope split (2026-09-18)
+
+- source_spec: none
+  summary: Add INTERFACE Settings section (first) with CONTEXTUAL HELP SHOW/HIDE for furtive footer help.
+  evidence: Independently shippable GUI preference; deferred so DEVICE + EPROM TYPE can land alone.
+- source_spec: none
+  summary: Gate Unison Detune (CC 94) and related Master Edit UX on Settings EPROM TYPE (FACTORY/UNKNOWN off; GLIGLI/TAUNTEK/UNTERGEEK on).
+  evidence: Explicitly separate chantier after EPROM TYPE SSOT exists; not part of Settings structure work.
+- source_spec: none
+  summary: If Settings content outgrows a compact non-scrolling modal, consider Ableton-style vertical tabs instead of a general scroll.
+  evidence: Agreed fallback only if compact layout is insufficient later.
+
 ## Deferred from: code review of spec-master-pull-on-connect.md (2026-09-18)
 
 - **Sticky-footer inventory missing `kMasterPullFailed`** — New Master pull-on-connect failure string is not listed in `inventory-sticky-footer-messages.md` / Settings footer table. Deferred: sticky-footer inventory pass is out of scope for this chantier (separate dirty inventory artifact).

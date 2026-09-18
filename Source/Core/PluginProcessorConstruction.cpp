@@ -308,6 +308,7 @@ void PluginProcessor::finishConstructionSetup()
     initializeUnsavedStatePolicyProperty();
     initializeDeleteWarningPolicyProperty();
     initializeMatrix1000PatchesNamesModeProperty();
+    initializeEpromTypeProperties();
 
     initializePatchNameProperty();
     initializeClipboardPasteEnabledProperties();

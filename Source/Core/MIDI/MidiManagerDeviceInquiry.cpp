@@ -10,7 +10,9 @@
 #include "Core/MIDI/MasterPullOnConnectPolicy.h"
 #include "Core/MIDI/Queue/SysExDelayProfile.h"
 #include "Core/Services/DeviceTypeRegistry.h"
+#include "Core/Services/EpromTypePolicy.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
+#include "Shared/Definitions/PluginIDs.h"
 
 void MidiManager::clearDeviceDetectionAfterPortLoss()
 {
@@ -204,8 +206,16 @@ void MidiManager::finishAsyncDeviceInquirySuccess(std::uint64_t token,
     const auto previousType = Core::DeviceTypeRegistry::fromApvtsProperty(
         apvts.state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
 
-    sysExDelay_.setProfile(Core::SysExDelayProfile::fromDeviceInquiry(info));
+    const int epromType = Core::EpromTypePolicy::normalize(static_cast<int>(
+        apvts.state.getProperty(PluginIDs::Settings::kEpromType,
+                               PluginIDs::Settings::EpromType::kDefault)));
+    sysExDelay_.setProfile(Core::SysExDelayProfile::fromDeviceInquiry(info, epromType));
     updateDeviceStatus(true, info.version, deviceType);
+
+    const bool promptDone = static_cast<bool>(
+        apvts.state.getProperty(PluginIDs::Settings::kEpromTypePromptDone, false));
+    if (! promptDone)
+        apvts.state.setProperty(PluginIDs::Settings::kEpromTypePromptPending, true, nullptr);
 
     const auto pullSnapshot = Core::consumeMasterPullInquirySnapshot(
         wasDetected, previousType, forceMasterPullOnNextInquirySuccess_);

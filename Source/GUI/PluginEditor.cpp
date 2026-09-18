@@ -4,6 +4,7 @@
 
 #include "GUI/About/AboutWindow.h"
 #include "GUI/Dialogs/BankTransferProgressDialog.h"
+#include "GUI/Dialogs/EpromTypePromptDialog.h"
 #include "GUI/Dialogs/MasterInitConfirmDialog.h"
 #include "GUI/Factories/WidgetFactory.h"
 #include "Core/Audio/StandaloneAudioInputRouter.h"
@@ -174,6 +175,8 @@ bool PluginEditor::isEditorialUndoBlockedByModalOverlay() const
     if (aboutWindow_ != nullptr && aboutWindow_->isVisible())
         return true;
     if (masterInitConfirmDialog_ != nullptr && masterInitConfirmDialog_->isVisible())
+        return true;
+    if (epromTypePromptDialog_ != nullptr && epromTypePromptDialog_->isVisible())
         return true;
     if (bankTransferProgressDialog_ != nullptr && bankTransferProgressDialog_->isVisible())
         return true;

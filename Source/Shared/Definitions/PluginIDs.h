@@ -28,6 +28,10 @@ namespace PluginIDs
             "settingsMutatorDeleteWarningPolicy";
         constexpr const char* kMatrix1000PatchesNamesMode =
             "settingsPatchNameDisplayMode";
+        constexpr const char* kEpromType = "settingsEpromType";
+        constexpr const char* kEpromTypePromptDone = "settingsEpromTypePromptDone";
+        // Transient: Core requests a one-time editor prompt; editor clears after show/handle.
+        constexpr const char* kEpromTypePromptPending = "settingsEpromTypePromptPending";
 
         namespace ComputerPatchesNamesPolicy
         {
@@ -35,6 +39,16 @@ namespace PluginIDs
             constexpr int kDisplayFileNames = 2;
             constexpr int kAskOncePerLoad = 3;
             constexpr int kDefault = kDisplaySysexNames;
+        }
+
+        namespace EpromType
+        {
+            constexpr int kFactory = 1;
+            constexpr int kGligli = 2;
+            constexpr int kTauntek = 3;
+            constexpr int kUntergeek = 4;
+            constexpr int kUnknown = 5;
+            constexpr int kDefault = kUnknown;
         }
 
         namespace UnsavedStatePolicy

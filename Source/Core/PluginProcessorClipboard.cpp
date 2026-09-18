@@ -444,3 +444,20 @@ void PluginProcessor::initializeMatrix1000PatchesNamesModeProperty()
             nullptr);
     }
 }
+
+void PluginProcessor::initializeEpromTypeProperties()
+{
+    if (! apvts.state.hasProperty(PluginIDs::Settings::kEpromType))
+    {
+        apvts.state.setProperty(
+            PluginIDs::Settings::kEpromType,
+            PluginIDs::Settings::EpromType::kDefault,
+            nullptr);
+    }
+
+    if (! apvts.state.hasProperty(PluginIDs::Settings::kEpromTypePromptDone))
+        apvts.state.setProperty(PluginIDs::Settings::kEpromTypePromptDone, false, nullptr);
+
+    if (! apvts.state.hasProperty(PluginIDs::Settings::kEpromTypePromptPending))
+        apvts.state.setProperty(PluginIDs::Settings::kEpromTypePromptPending, false, nullptr);
+}

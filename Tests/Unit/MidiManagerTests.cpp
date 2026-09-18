@@ -10,6 +10,7 @@
 #include "MidiManagerTestSupport.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
+#include "Shared/Definitions/PluginIDs.h"
 
 using MidiManagerTestSupport::MinimalAudioProcessor;
 
@@ -33,6 +34,7 @@ public:
         testRequestMasterDataAsyncSkippedForMatrix6();
         testMasterPullInquirySnapshotConsumesPortPairForce();
         testCancelConnectPullDoesNotPublishFailureFooter();
+        testRefreshSysExDelayFromSettings();
     }
 
 private:
@@ -360,6 +362,42 @@ private:
         expect(proc.apvts.state.getProperty("uiMessageText").toString()
                    != PluginDisplayNames::Settings::FooterMessages::kMasterPullFailed,
                "Cancel/abort must not publish sticky Master pull failure footer");
+    }
+
+    void testRefreshSysExDelayFromSettings()
+    {
+        beginTest("refreshSysExDelayFromSettings — detected+TAUNTEK vs UNKNOWN/undetected");
+
+        Core::MidiOutboundQueue queue;
+        Core::MidiActivityTracker tracker;
+        MinimalAudioProcessor proc;
+        MidiManager manager(proc.apvts, queue, tracker);
+
+        proc.apvts.state.setProperty("deviceDetected", false, nullptr);
+        proc.apvts.state.setProperty(PluginIDs::Settings::kEpromType,
+                                      PluginIDs::Settings::EpromType::kTauntek,
+                                      nullptr);
+        manager.refreshSysExDelayFromSettings();
+        expectEquals(manager.getRequiredSysExDelayMs(),
+                     Core::SysExDelayProfile::kStockDelayMsMatrix1000);
+
+        proc.apvts.state.setProperty("deviceDetected", true, nullptr);
+        proc.apvts.state.setProperty(MatrixDeviceTypes::kApvtsPropertyName,
+                                      MatrixDeviceTypes::kMatrix1000Id,
+                                      nullptr);
+        proc.apvts.state.setProperty(PluginIDs::Settings::kEpromType,
+                                      PluginIDs::Settings::EpromType::kUnknown,
+                                      nullptr);
+        manager.refreshSysExDelayFromSettings();
+        expectEquals(manager.getRequiredSysExDelayMs(),
+                     Core::SysExDelayProfile::kStockDelayMsMatrix1000);
+
+        proc.apvts.state.setProperty(PluginIDs::Settings::kEpromType,
+                                      PluginIDs::Settings::EpromType::kTauntek,
+                                      nullptr);
+        manager.refreshSysExDelayFromSettings();
+        expectEquals(manager.getRequiredSysExDelayMs(),
+                     Core::SysExDelayProfile::kOptimisedDelayMsMatrix1000);
     }
 };
 

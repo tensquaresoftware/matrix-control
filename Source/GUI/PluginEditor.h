@@ -24,6 +24,7 @@ class SettingsPanel;
 class SettingsWindow;
 class AboutWindow;
 class MasterInitConfirmDialog;
+class EpromTypePromptDialog;
 class PatchNameDisplayPanel;
 
 class PluginEditor : public juce::AudioProcessorEditor,
@@ -171,10 +172,16 @@ private:
     void openMasterInitConfirmDialog(const juce::String& moduleDisplayName, std::function<void()> onConfirm);
     void openMasterGlobalInitConfirmDialog(std::function<void()> onConfirm);
     void closeMasterInitConfirmDialog();
+    void openEpromTypePromptDialog();
+    void closeEpromTypePromptDialog();
+    void ensureEpromTypePromptDialog();
+    void applyEpromTypePromptSelection(int selectedId);
     void showBankTransferProgressDialog(const BankTransferProgressShowRequest& request);
     void hideBankTransferProgressDialog();
     SettingsPanel* getSettingsPanelIfOpen();
     void wireSettingsPanel(SettingsPanel& panel);
+    void wireSettingsEpromAndLatency(SettingsPanel& panel);
+    void wireSettingsPolicyCombos(SettingsPanel& panel);
     void wireSettingsInitAndMasterActions(SettingsPanel& panel);
     void wireSettingsMasterFileActions(SettingsPanel& panel);
     void refreshInitTemplateDeleteButtons(SettingsPanel& panel);
@@ -186,6 +193,7 @@ private:
     void updateSettingsWindowLayout(float uiScale);
     void updateAboutWindowLayout(float uiScale);
     void updateMasterInitConfirmDialogLayout(float uiScale);
+    void updateEpromTypePromptDialogLayout(float uiScale);
     void updateBankTransferProgressDialogLayout(float uiScale);
 
     void applySkinFromItemId(int skinItemId, bool persistToState = true);
@@ -206,6 +214,7 @@ private:
     std::unique_ptr<SettingsWindow> settingsWindow_;
     std::unique_ptr<AboutWindow> aboutWindow_;
     std::unique_ptr<MasterInitConfirmDialog> masterInitConfirmDialog_;
+    std::unique_ptr<EpromTypePromptDialog> epromTypePromptDialog_;
     std::unique_ptr<BankTransferProgressDialog> bankTransferProgressDialog_;
     float appliedUiScale_ = 1.0f;
     std::unique_ptr<HeaderRefreshTimer> headerRefreshTimer_;

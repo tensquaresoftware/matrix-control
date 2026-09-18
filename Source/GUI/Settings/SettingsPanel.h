@@ -10,6 +10,7 @@
 #include "GUI/Widgets/Label.h"
 #include "GUI/Widgets/Slider.h"
 #include "GUI/Helpers/ContextualHelpBinder.h"
+#include "Shared/Definitions/MatrixDeviceTypes.h"
 
 namespace TSS
 {
@@ -21,9 +22,9 @@ class SettingsPanel : public juce::Component
 public:
     // Content = label column 120 + control column 140 (no gap); outer = content + padding 16*2.
     // Control column fits UTILITY (LOAD | SAVE AS | INIT) at 44+4+44+4+44.
-    // Height sized for plugin content including HARDWARE LATENCY (standalone leaves spare space).
+    // Height sized for plugin content including DEVICE (HARDWARE LATENCY + EPROM TYPE).
     static constexpr int kDesignWidth = 292;
-    static constexpr int kDesignHeight = 456;
+    static constexpr int kDesignHeight = 460;
 
     SettingsPanel(TSS::ISkin& skin, bool isPluginMode);
     ~SettingsPanel() override = default;
@@ -34,10 +35,12 @@ public:
     void setSkin(TSS::ISkin& skin);
     void setUiScale(float uiScale);
     void setPluginMode(bool isPluginMode);
+    void setDeviceType(MatrixDeviceTypes::Type deviceType);
 
     void registerContextualHelp(TSS::ContextualHelpBinder::FooterResolver resolveFooter);
 
     TSS::Slider& getHardwareLatencySlider() { return *hardwareLatencySlider_; }
+    TSS::ComboBox& getEpromTypeCombo() { return *epromTypeCombo_; }
     TSS::ComboBox& getMatrix1000PatchesCombo() { return *matrix1000PatchesCombo_; }
     TSS::ComboBox& getComputerPatchesCombo() { return *computerPatchesCombo_; }
     TSS::ComboBox& getUnsavedStateCombo() { return *unsavedStateCombo_; }
@@ -52,6 +55,9 @@ public:
     TSS::Button& getMasterDeleteInitButton() { return *masterDeleteInitButton_; }
 
     void refreshInitTemplateDeleteEnablement(bool patchInitExists, bool masterInitExists);
+
+    /** Rebuild EPROM TYPE items for the current device family; returns selected id after coerce. */
+    int refreshEpromTypeItems(int preferredSelectedId);
 
 private:
     struct SectionHeaderLayoutArgs
@@ -86,6 +92,7 @@ private:
         int controlWidth = 0;
     };
 
+    void setupDeviceSection(TSS::ISkin& skin);
     void setupPatchSection(TSS::ISkin& skin);
     void setupPatchMutatorSection(TSS::ISkin& skin);
     void setupMasterSection(TSS::ISkin& skin);
@@ -100,6 +107,7 @@ private:
 
     void updateModeSpecificVisibility();
     void layoutContent(juce::Rectangle<int> bounds);
+    void layoutDeviceSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics);
     void layoutPatchSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics);
     void layoutPatchMutatorSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics);
     void layoutMasterSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics);
@@ -123,9 +131,9 @@ private:
                          const ButtonRowLayoutArgs& args);
 
     inline constexpr static int kPadding_ = 16;
-    inline constexpr static int kRowGap_ = 12;
+    inline constexpr static int kRowGap_ = 8;
     // Design gap from section title row to the separator stroke (not the separator component box).
-    inline constexpr static int kSectionTitleGap_ = 4;
+    inline constexpr static int kSectionTitleGap_ = 2;
     inline constexpr static int kControlHeight_ = 20;
     // Match HorizontalSeparator line thickness so the stroke sits at the top of the gap+line stack.
     inline constexpr static int kSeparatorHeight_ = 1;
@@ -148,6 +156,14 @@ private:
     TSS::ISkin* skin_;
     float uiScale_ = 1.0f;
     bool isPluginMode_ = false;
+    MatrixDeviceTypes::Type deviceType_ = MatrixDeviceTypes::Type::kUnknown;
+
+    std::unique_ptr<TSS::Label> deviceSectionLabel_;
+    std::unique_ptr<TSS::HorizontalSeparator> deviceSectionSeparator_;
+    std::unique_ptr<TSS::Label> hardwareLatencyLabel_;
+    std::unique_ptr<TSS::Slider> hardwareLatencySlider_;
+    std::unique_ptr<TSS::Label> epromTypeLabel_;
+    std::unique_ptr<TSS::ComboBox> epromTypeCombo_;
 
     std::unique_ptr<TSS::Label> patchSectionLabel_;
     std::unique_ptr<TSS::HorizontalSeparator> patchSectionSeparator_;
@@ -170,8 +186,6 @@ private:
 
     std::unique_ptr<TSS::Label> masterSectionLabel_;
     std::unique_ptr<TSS::HorizontalSeparator> masterSectionSeparator_;
-    std::unique_ptr<TSS::Label> hardwareLatencyLabel_;
-    std::unique_ptr<TSS::Slider> hardwareLatencySlider_;
     std::unique_ptr<TSS::Label> masterUtilityLabel_;
     std::unique_ptr<TSS::Button> masterLoadButton_;
     std::unique_ptr<TSS::Button> masterSaveAsButton_;

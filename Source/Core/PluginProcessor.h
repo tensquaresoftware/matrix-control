@@ -372,6 +372,7 @@ private:
     void initializeUnsavedStatePolicyProperty();
     void initializeDeleteWarningPolicyProperty();
     void initializeMatrix1000PatchesNamesModeProperty();
+    void initializeEpromTypeProperties();
     void applyHardwareLatencyToHost();
     void notifyNonParameterStateChanged();
     void scheduleDeferredMidiPortSyncForPluginHost();

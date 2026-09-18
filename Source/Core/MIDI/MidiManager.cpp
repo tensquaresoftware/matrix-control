@@ -5,6 +5,7 @@
 #include "Core/MIDI/MasterEditGate.h"
 #include "Core/MIDI/Queue/SysExDelayProfile.h"
 #include "Core/Services/DeviceTypeRegistry.h"
+#include "Core/Services/EpromTypePolicy.h"
 #include "Shared/Definitions/PluginIDs.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
 
@@ -82,6 +83,24 @@ MidiManager::~MidiManager()
 int MidiManager::getRequiredSysExDelayMs() const noexcept
 {
     return sysExDelay_.getRequiredDelayMs();
+}
+
+void MidiManager::refreshSysExDelayFromSettings()
+{
+    const bool detected = static_cast<bool>(apvts.state.getProperty("deviceDetected", false));
+    if (! detected)
+    {
+        sysExDelay_.setProfile(Core::SysExDelayProfile::stockDefault());
+        return;
+    }
+
+    const int epromType = Core::EpromTypePolicy::normalize(static_cast<int>(
+        apvts.state.getProperty(PluginIDs::Settings::kEpromType,
+                               PluginIDs::Settings::EpromType::kDefault)));
+    const auto deviceType = Core::DeviceTypeRegistry::fromApvtsProperty(
+        apvts.state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
+    const auto family = Core::EpromTypePolicy::deviceFamilyFromType(deviceType);
+    sysExDelay_.setProfile(Core::SysExDelayProfile::fromSettings(epromType, family));
 }
 
 void MidiManager::sendPatch(juce::uint8 patchNumber, const juce::uint8* packedData)

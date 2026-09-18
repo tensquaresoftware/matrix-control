@@ -7,12 +7,18 @@
 #include "GUI/About/AboutWindow.h"
 #include "GUI/About/AboutPanel.h"
 #include "GUI/Dialogs/BankTransferProgressDialog.h"
+#include "GUI/Dialogs/EpromTypePromptDialog.h"
 #include "GUI/Dialogs/MasterInitConfirmDialog.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/MainComponent.h"
 #include "GUI/Panels/MainComponent/FooterPanel/FooterPanel.h"
 #include "GUI/Settings/SettingsPanel.h"
 #include "GUI/Settings/SettingsWindow.h"
+#include "Core/Services/DeviceTypeRegistry.h"
+#include "Core/Services/EpromTypePolicy.h"
+#include "Core/MIDI/MidiManager.h"
+#include "Shared/Definitions/MatrixDeviceTypes.h"
+#include "Shared/Definitions/PluginIDs.h"
 
 void PluginEditor::updateSettingsWindowLayout(float uiScale)
 {
@@ -41,6 +47,15 @@ void PluginEditor::updateMasterInitConfirmDialogLayout(float uiScale)
     masterInitConfirmDialog_->setBounds(getLocalBounds());
 }
 
+void PluginEditor::updateEpromTypePromptDialogLayout(float uiScale)
+{
+    if (epromTypePromptDialog_ == nullptr)
+        return;
+
+    epromTypePromptDialog_->setUiScale(uiScale);
+    epromTypePromptDialog_->setBounds(getLocalBounds());
+}
+
 void PluginEditor::updateBankTransferProgressDialogLayout(float uiScale)
 {
     if (bankTransferProgressDialog_ == nullptr)
@@ -57,6 +72,8 @@ bool PluginEditor::isEscapeBlockedByOverlay() const
     if (aboutWindow_ != nullptr && aboutWindow_->isVisible())
         return true;
     if (masterInitConfirmDialog_ != nullptr && masterInitConfirmDialog_->isVisible())
+        return true;
+    if (epromTypePromptDialog_ != nullptr && epromTypePromptDialog_->isVisible())
         return true;
     if (bankTransferProgressDialog_ != nullptr && bankTransferProgressDialog_->isVisible())
         return true;
@@ -219,6 +236,96 @@ void PluginEditor::closeMasterInitConfirmDialog()
 {
     if (masterInitConfirmDialog_ != nullptr)
         masterInitConfirmDialog_->setVisible(false);
+}
+
+namespace
+{
+    int preferredEpromTypeForPrompt(juce::ValueTree& state, MatrixDeviceTypes::Type deviceType)
+    {
+        const auto family = Core::EpromTypePolicy::deviceFamilyFromType(deviceType);
+        const juce::String version = state.getProperty("deviceVersion", juce::String()).toString();
+        const int suggested = Core::EpromTypePolicy::suggestFromInquiryVersion(version, family);
+        const int stored = Core::EpromTypePolicy::normalize(static_cast<int>(
+            state.getProperty(PluginIDs::Settings::kEpromType,
+                              PluginIDs::Settings::EpromType::kDefault)));
+
+        return Core::EpromTypePolicy::preferredForPrompt(suggested, stored);
+    }
+
+    void markEpromTypePromptFinished(juce::ValueTree& state)
+    {
+        state.setProperty(PluginIDs::Settings::kEpromTypePromptDone, true, nullptr);
+        state.setProperty(PluginIDs::Settings::kEpromTypePromptPending, false, nullptr);
+    }
+}
+
+void PluginEditor::applyEpromTypePromptSelection(int selectedId)
+{
+    auto& apvtsState = pluginProcessor.getApvts().state;
+    const int normalized = Core::EpromTypePolicy::normalize(selectedId);
+    apvtsState.setProperty(PluginIDs::Settings::kEpromType, normalized, nullptr);
+    markEpromTypePromptFinished(apvtsState);
+    pluginProcessor.getMidiManager().refreshSysExDelayFromSettings();
+
+    if (auto* panel = getSettingsPanelIfOpen())
+    {
+        panel->setDeviceType(Core::DeviceTypeRegistry::fromApvtsProperty(
+            apvtsState.getProperty(MatrixDeviceTypes::kApvtsPropertyName)));
+        panel->refreshEpromTypeItems(normalized);
+    }
+}
+
+void PluginEditor::ensureEpromTypePromptDialog()
+{
+    if (epromTypePromptDialog_ == nullptr)
+    {
+        epromTypePromptDialog_ = std::make_unique<EpromTypePromptDialog>(
+            *skin_,
+            [this] { closeEpromTypePromptDialog(); });
+        addChildComponent(*epromTypePromptDialog_);
+        return;
+    }
+
+    epromTypePromptDialog_->setSkin(*skin_);
+}
+
+void PluginEditor::openEpromTypePromptDialog()
+{
+    auto& state = pluginProcessor.getApvts().state;
+    if (static_cast<bool>(state.getProperty(PluginIDs::Settings::kEpromTypePromptDone, false)))
+        return;
+    if (epromTypePromptDialog_ != nullptr && epromTypePromptDialog_->isVisible())
+        return;
+
+    const auto deviceType = Core::DeviceTypeRegistry::fromApvtsProperty(
+        state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
+    const int preferred = preferredEpromTypeForPrompt(state, deviceType);
+
+    ensureEpromTypePromptDialog();
+    epromTypePromptDialog_->prepareForShow(
+        deviceType,
+        preferred,
+        [this](int selectedId) { applyEpromTypePromptSelection(selectedId); },
+        [this]
+        {
+            markEpromTypePromptFinished(pluginProcessor.getApvts().state);
+        });
+
+    const int baseWidth = layoutDimensions_.editor.width;
+    const float uiScale = (baseWidth > 0)
+        ? TSS::ScaledLayout::uiScaleFromEditorBounds(getWidth(), baseWidth)
+        : 1.0f;
+    updateEpromTypePromptDialogLayout(uiScale);
+
+    epromTypePromptDialog_->setVisible(true);
+    epromTypePromptDialog_->toFront(true);
+    epromTypePromptDialog_->grabKeyboardFocus();
+}
+
+void PluginEditor::closeEpromTypePromptDialog()
+{
+    if (epromTypePromptDialog_ != nullptr)
+        epromTypePromptDialog_->setVisible(false);
 }
 
 void PluginEditor::showBankTransferProgressDialog(const BankTransferProgressShowRequest& request)
