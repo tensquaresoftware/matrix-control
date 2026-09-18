@@ -893,10 +893,14 @@ namespace PluginDisplayNames
                 constexpr const char* kMasterTranspose     = "MASTER TRANSPOSE";
                 constexpr const char* kBendRange           = "BEND RANGE (+/-)";
                 constexpr const char* kUnisonEnable        = "UNISON";
+                constexpr const char* kUnisonDetune        = "UNISON DETUNE";
                 constexpr const char* kVolumeInvertEnable  = "VOLUME INVERT";
                 constexpr const char* kBankLockEnable      = "BANK LOCK";
                 constexpr const char* kMemoryProtectEnable = "MEMORY PROTECT";
             }
+
+            constexpr const char* kUnisonDetuneOptimisedEpromFooter =
+                "UNISON DETUNE requires an optimised EPROM (GLIGLI, TAUNTEK, or UNTERGEEK).";
 
             namespace ContextualHelp
             {
@@ -910,6 +914,8 @@ namespace PluginDisplayNames
                     "MISC: Sets pitch-bend range in semitones up and down.";
                 constexpr const char* kUnison =
                     "MISC: Enables Master Unison (can override Patch keyboard mode).";
+                constexpr const char* kUnisonDetune =
+                    "MISC: Sets Unison Detune depth (optimised EPROM / MIDI CC 94).";
                 constexpr const char* kVolumeInvert =
                     "MISC: Inverts volume pedal response when enabled.";
                 constexpr const char* kBankLock =

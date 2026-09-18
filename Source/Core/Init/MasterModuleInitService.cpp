@@ -74,7 +74,7 @@ void MasterModuleInitService::copyModuleFromInitTemplate(const MasterModel& init
 {
     using namespace PluginDescriptors::MasterEditSection;
 
-    for (const auto& descriptor : kIntParameters)
+    for (const auto& descriptor : ApvtsMasterMapper::buildIntDescriptors())
     {
         if (descriptor.parentGroupId == moduleGroupId)
             masterModel_.setValue(descriptor, initTemplate.getValue(descriptor));

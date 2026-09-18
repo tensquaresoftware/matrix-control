@@ -15,6 +15,11 @@ namespace
         return d.parameterId
             == PluginIDs::MasterEditSection::MidiModule::ParameterWidgets::kChannel;
     }
+
+    bool isPackedMasterInt(const PluginDescriptors::IntParameterDescriptor& d) noexcept
+    {
+        return d.sysExOffset != PluginDescriptors::kNoSysExOffset;
+    }
 }
 
 ApvtsMasterMapper::ApvtsMasterMapper(juce::AudioProcessorValueTreeState& apvts, MasterModel& model)
@@ -104,7 +109,16 @@ void ApvtsMasterMapper::pushChoiceToApvts(const PluginDescriptors::ChoiceParamet
 
 std::vector<PluginDescriptors::IntParameterDescriptor> ApvtsMasterMapper::buildIntDescriptors()
 {
-    return PluginDescriptors::MasterEditSection::kIntParameters;
+    std::vector<PluginDescriptors::IntParameterDescriptor> packed;
+    packed.reserve(PluginDescriptors::MasterEditSection::kIntParameters.size());
+
+    for (const auto& d : PluginDescriptors::MasterEditSection::kIntParameters)
+    {
+        if (isPackedMasterInt(d))
+            packed.push_back(d);
+    }
+
+    return packed;
 }
 
 std::vector<PluginDescriptors::ChoiceParameterDescriptor> ApvtsMasterMapper::buildChoiceDescriptors()

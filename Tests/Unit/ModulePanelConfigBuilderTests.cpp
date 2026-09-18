@@ -43,6 +43,11 @@ namespace
             PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kSync);
         test.expect(comboKind == PluginHelpers::ParameterWidgetKind::ComboBox,
                     "Choice descriptor should resolve to ComboBox");
+
+        const auto unisonDetuneKind = PluginHelpers::resolveParameterWidgetKind(
+            PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kUnisonDetune);
+        test.expect(unisonDetuneKind == PluginHelpers::ParameterWidgetKind::Slider,
+                    "UNISON DETUNE int descriptor should resolve to Slider via factories");
     }
 
     void expectSeparatorRow(juce::UnitTest& test)

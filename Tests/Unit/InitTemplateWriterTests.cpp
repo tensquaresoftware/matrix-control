@@ -67,57 +67,6 @@ private:
         return layout;
     }
 
-    static void fillModelWithDistinctValues(Core::MasterModel& model)
-    {
-        using namespace PluginDescriptors::MasterEditSection;
-
-        for (const auto& d : MidiModule::kIntParameters)
-            model.setValue(d, d.maxValue);
-
-        for (const auto& d : VibratoModule::kIntParameters)
-            model.setValue(d, d.minValue);
-
-        for (const auto& d : MiscModule::kIntParameters)
-            model.setValue(d, (d.minValue + d.maxValue) / 2);
-
-        model.setChoiceIndex(MidiModule::kChoiceParameters[0], 2);
-        model.setChoiceIndex(VibratoModule::kChoiceParameters[0], 3);
-        model.setChoiceIndex(MiscModule::kChoiceParameters[0], 1);
-    }
-
-    static bool channelTripletMatch(const Core::MasterModel& lhs, const Core::MasterModel& rhs)
-    {
-        return lhs.data()[11] == rhs.data()[11]
-            && lhs.data()[12] == rhs.data()[12]
-            && lhs.data()[35] == rhs.data()[35];
-    }
-
-    static bool moduleBytesMatch(const Core::MasterModel& lhs,
-                                 const Core::MasterModel& rhs,
-                                 const juce::String& moduleGroupId)
-    {
-        using namespace PluginDescriptors::MasterEditSection;
-
-        for (const auto& d : kIntParameters)
-            if (d.parentGroupId == moduleGroupId && lhs.getValue(d) != rhs.getValue(d))
-                return false;
-
-        for (const auto& d : kChoiceParameters)
-        {
-            if (d.parentGroupId != moduleGroupId)
-                continue;
-
-            const bool channelMismatch =
-                d.parameterId == PluginIDs::MasterEditSection::MidiModule::ParameterWidgets::kChannel
-                    ? ! channelTripletMatch(lhs, rhs)
-                    : lhs.getChoiceIndex(d) != rhs.getChoiceIndex(d);
-            if (channelMismatch)
-                return false;
-        }
-
-        return true;
-    }
-
     static void rewriteMasterInitWithOmniOn(const juce::File& templatesDir,
                                            SysExEncoder& encoder,
                                            Core::MasterModel& initTemplate)
@@ -249,7 +198,7 @@ private:
         rewriteMasterInitWithOmniOn(tempDir, encoder, initTemplate);
         loader.loadMaster(initTemplate, tempDir);
 
-        fillModelWithDistinctValues(model);
+        MasterModelTestHelpers::fillModelWithDistinctValues(model);
         model.data()[12] = 0;
         model.data()[35] = 1;
         mapper.bufferToApvts();
@@ -263,9 +212,9 @@ private:
         expect(dispatchCount == 1);
 
         using namespace PluginIDs::MasterEditSection;
-        expect(moduleBytesMatch(model, initTemplate, MidiModule::kGroupId)
-               && moduleBytesMatch(model, initTemplate, VibratoModule::kGroupId)
-               && moduleBytesMatch(model, initTemplate, MiscModule::kGroupId));
+        expect(MasterModelTestHelpers::moduleBytesMatch(model, initTemplate, MidiModule::kGroupId)
+               && MasterModelTestHelpers::moduleBytesMatch(model, initTemplate, VibratoModule::kGroupId)
+               && MasterModelTestHelpers::moduleBytesMatch(model, initTemplate, MiscModule::kGroupId));
 
         Core::MasterModel fromApvts;
         Core::ApvtsMasterMapper(proc.apvts, fromApvts).apvtsToBuffer();
@@ -291,7 +240,7 @@ private:
         expect(emptyDir.createDirectory());
         expect(! Core::InitTemplateLoader::resolveMasterInitFile(emptyDir).existsAsFile());
 
-        fillModelWithDistinctValues(model);
+        MasterModelTestHelpers::fillModelWithDistinctValues(model);
         model.data()[12] = 0;
         model.data()[35] = 1;
         mapper.bufferToApvts();
@@ -309,9 +258,9 @@ private:
         expectedDefaults.loadFrom(Core::InitDefaults::masterData());
 
         using namespace PluginIDs::MasterEditSection;
-        expect(moduleBytesMatch(model, expectedDefaults, MidiModule::kGroupId)
-               && moduleBytesMatch(model, expectedDefaults, VibratoModule::kGroupId)
-               && moduleBytesMatch(model, expectedDefaults, MiscModule::kGroupId));
+        expect(MasterModelTestHelpers::moduleBytesMatch(model, expectedDefaults, MidiModule::kGroupId)
+               && MasterModelTestHelpers::moduleBytesMatch(model, expectedDefaults, VibratoModule::kGroupId)
+               && MasterModelTestHelpers::moduleBytesMatch(model, expectedDefaults, MiscModule::kGroupId));
 
         Core::MasterModel fromApvts;
         Core::ApvtsMasterMapper(proc.apvts, fromApvts).apvtsToBuffer();

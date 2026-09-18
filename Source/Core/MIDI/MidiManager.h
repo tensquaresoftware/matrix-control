@@ -74,6 +74,10 @@ public:
     // via the normal realtime outbound path (never bypasses the queue).
     void sendPanic();
 
+    // Unison Detune (CC 94) when Settings EPROM TYPE is optimised; suppressed otherwise.
+    // Channel resolution matches sendPanic (midiChannel 1-16, or all channels for Omni/Mono).
+    void sendUnisonDetune(int value);
+
     size_t getRealtimeOutboundDepth() const noexcept;
 
     std::vector<juce::uint8> requestCurrentPatch();

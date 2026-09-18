@@ -429,6 +429,7 @@ private:
     bool resolveMutatorExportCollision(const juce::File& folder, Core::MutatorActionResult& result);
     void applyRestoredPluginState(juce::ValueTree restoredState);
     void dispatchPatchOrMatrixModParameterChange(const juce::String& parameterId);
+    void dispatchUnisonDetuneChange(const juce::String& parameterId);
     void dispatchMasterParameterChange(const juce::String& parameterId);
     void dispatchMutatorHistorySelectionChange(const juce::String& parameterId);
     void handleDeviceTypePropertyChange(const juce::String& propertyName);

@@ -14,6 +14,7 @@ public:
     {
         testNormalizeClampsInvalid();
         testToEpromClassStockAndOptimised();
+        testSupportsUnisonDetuneGate();
         testMatrix6FamilyRejectsGligli();
         testInquirySuggestionMatrix1000();
         testInquirySuggestionMatrix6();
@@ -52,6 +53,19 @@ private:
                      static_cast<int>(Core::EpromClass::kOptimised));
         expectEquals(static_cast<int>(Core::EpromTypePolicy::toEpromClass(kUntergeek)),
                      static_cast<int>(Core::EpromClass::kOptimised));
+    }
+
+    void testSupportsUnisonDetuneGate()
+    {
+        beginTest("supportsUnisonDetune — optimised on, FACTORY/UNKNOWN off");
+
+        using namespace PluginIDs::Settings::EpromType;
+
+        expect(! Core::EpromTypePolicy::supportsUnisonDetune(kFactory));
+        expect(! Core::EpromTypePolicy::supportsUnisonDetune(kUnknown));
+        expect(Core::EpromTypePolicy::supportsUnisonDetune(kGligli));
+        expect(Core::EpromTypePolicy::supportsUnisonDetune(kTauntek));
+        expect(Core::EpromTypePolicy::supportsUnisonDetune(kUntergeek));
     }
 
     void testMatrix6FamilyRejectsGligli()

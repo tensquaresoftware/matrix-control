@@ -289,10 +289,10 @@ namespace
                          PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kMasterTranspose,
                          PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kBendRange,
                          PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kUnisonEnable,
+                         PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kUnisonDetune,
                          PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kVolumeInvertEnable,
                          PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kBankLockEnable,
-                         PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kMemoryProtectEnable,
-                         ""
+                         PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kMemoryProtectEnable
                      }) };
     }
 }

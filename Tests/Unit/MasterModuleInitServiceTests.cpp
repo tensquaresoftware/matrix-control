@@ -141,57 +141,6 @@ private:
         return templateModel;
     }
 
-    static void fillModelWithDistinctValues(Core::MasterModel& model)
-    {
-        using namespace PluginDescriptors::MasterEditSection;
-
-        for (const auto& d : MidiModule::kIntParameters)
-            model.setValue(d, d.maxValue);
-
-        for (const auto& d : VibratoModule::kIntParameters)
-            model.setValue(d, d.minValue);
-
-        for (const auto& d : MiscModule::kIntParameters)
-            model.setValue(d, (d.minValue + d.maxValue) / 2);
-
-        model.setChoiceIndex(MidiModule::kChoiceParameters[0], 2);
-        model.setChoiceIndex(VibratoModule::kChoiceParameters[0], 3);
-        model.setChoiceIndex(MiscModule::kChoiceParameters[0], 1);
-    }
-
-    static bool channelTripletMatch(const Core::MasterModel& lhs, const Core::MasterModel& rhs)
-    {
-        return lhs.data()[11] == rhs.data()[11]
-            && lhs.data()[12] == rhs.data()[12]
-            && lhs.data()[35] == rhs.data()[35];
-    }
-
-    static bool moduleBytesMatch(const Core::MasterModel& lhs,
-                                 const Core::MasterModel& rhs,
-                                 const juce::String& moduleGroupId)
-    {
-        using namespace PluginDescriptors::MasterEditSection;
-
-        for (const auto& d : kIntParameters)
-            if (d.parentGroupId == moduleGroupId && lhs.getValue(d) != rhs.getValue(d))
-                return false;
-
-        for (const auto& d : kChoiceParameters)
-        {
-            if (d.parentGroupId != moduleGroupId)
-                continue;
-
-            const bool channelMismatch =
-                d.parameterId == PluginIDs::MasterEditSection::MidiModule::ParameterWidgets::kChannel
-                    ? ! channelTripletMatch(lhs, rhs)
-                    : lhs.getChoiceIndex(d) != rhs.getChoiceIndex(d);
-            if (channelMismatch)
-                return false;
-        }
-
-        return true;
-    }
-
     static void rewriteMasterInitWithOmniOn(const juce::File& templatesDir,
                                            SysExEncoder& encoder,
                                            Core::MasterModel& initTemplate)
@@ -214,7 +163,7 @@ private:
         auto initTemplate = makeInitTemplateModel(tempDir);
         rewriteMasterInitWithOmniOn(tempDir, harness.encoder, initTemplate);
 
-        fillModelWithDistinctValues(harness.model);
+        MasterModelTestHelpers::fillModelWithDistinctValues(harness.model);
         harness.model.data()[12] = 0;
         harness.model.data()[35] = 1; // Mono dirty — fails if init only copies byte 11
 
@@ -227,9 +176,9 @@ private:
 
         expectEquals(static_cast<int>(harness.model.data()[12]), 1);
         expectEquals(static_cast<int>(harness.model.data()[35]), 0);
-        expect(moduleBytesMatch(harness.model, initTemplate, PluginIDs::MasterEditSection::MidiModule::kGroupId));
-        expect(moduleBytesMatch(harness.model, beforeVibrato, PluginIDs::MasterEditSection::VibratoModule::kGroupId));
-        expect(moduleBytesMatch(harness.model, beforeMisc, PluginIDs::MasterEditSection::MiscModule::kGroupId));
+        expect(MasterModelTestHelpers::moduleBytesMatch(harness.model, initTemplate, PluginIDs::MasterEditSection::MidiModule::kGroupId));
+        expect(MasterModelTestHelpers::moduleBytesMatch(harness.model, beforeVibrato, PluginIDs::MasterEditSection::VibratoModule::kGroupId));
+        expect(MasterModelTestHelpers::moduleBytesMatch(harness.model, beforeMisc, PluginIDs::MasterEditSection::MiscModule::kGroupId));
 
         auto msg = harness.queue.dequeue();
         expect(msg.has_value());
@@ -247,15 +196,15 @@ private:
         InitTestHarness harness(makeFullMasterLayout(), tempDir);
         const auto initTemplate = makeInitTemplateModel(tempDir);
 
-        fillModelWithDistinctValues(harness.model);
+        MasterModelTestHelpers::fillModelWithDistinctValues(harness.model);
         const auto beforeMidi = harness.model;
         const auto beforeMisc = harness.model;
 
         harness.initService.initModule(Core::MasterModuleKind::kVibrato);
 
-        expect(moduleBytesMatch(harness.model, initTemplate, PluginIDs::MasterEditSection::VibratoModule::kGroupId));
-        expect(moduleBytesMatch(harness.model, beforeMidi, PluginIDs::MasterEditSection::MidiModule::kGroupId));
-        expect(moduleBytesMatch(harness.model, beforeMisc, PluginIDs::MasterEditSection::MiscModule::kGroupId));
+        expect(MasterModelTestHelpers::moduleBytesMatch(harness.model, initTemplate, PluginIDs::MasterEditSection::VibratoModule::kGroupId));
+        expect(MasterModelTestHelpers::moduleBytesMatch(harness.model, beforeMidi, PluginIDs::MasterEditSection::MidiModule::kGroupId));
+        expect(MasterModelTestHelpers::moduleBytesMatch(harness.model, beforeMisc, PluginIDs::MasterEditSection::MiscModule::kGroupId));
 
         expect(harness.queue.dequeue().has_value());
         expect(harness.queue.isEmpty());
@@ -271,15 +220,15 @@ private:
         InitTestHarness harness(makeFullMasterLayout(), tempDir);
         const auto initTemplate = makeInitTemplateModel(tempDir);
 
-        fillModelWithDistinctValues(harness.model);
+        MasterModelTestHelpers::fillModelWithDistinctValues(harness.model);
         const auto beforeMidi = harness.model;
         const auto beforeVibrato = harness.model;
 
         harness.initService.initModule(Core::MasterModuleKind::kMisc);
 
-        expect(moduleBytesMatch(harness.model, initTemplate, PluginIDs::MasterEditSection::MiscModule::kGroupId));
-        expect(moduleBytesMatch(harness.model, beforeMidi, PluginIDs::MasterEditSection::MidiModule::kGroupId));
-        expect(moduleBytesMatch(harness.model, beforeVibrato, PluginIDs::MasterEditSection::VibratoModule::kGroupId));
+        expect(MasterModelTestHelpers::moduleBytesMatch(harness.model, initTemplate, PluginIDs::MasterEditSection::MiscModule::kGroupId));
+        expect(MasterModelTestHelpers::moduleBytesMatch(harness.model, beforeMidi, PluginIDs::MasterEditSection::MidiModule::kGroupId));
+        expect(MasterModelTestHelpers::moduleBytesMatch(harness.model, beforeVibrato, PluginIDs::MasterEditSection::VibratoModule::kGroupId));
 
         expect(harness.queue.dequeue().has_value());
         expect(harness.queue.isEmpty());
@@ -311,7 +260,7 @@ private:
         copyFixtureToDir(tempDir, Core::InitTemplateLoader::kMasterInitFileName);
 
         InitTestHarness harness(makeFullMasterLayout(), tempDir);
-        fillModelWithDistinctValues(harness.model);
+        MasterModelTestHelpers::fillModelWithDistinctValues(harness.model);
 
         harness.initService.initModule(Core::MasterModuleKind::kMidi);
 
@@ -445,7 +394,7 @@ private:
             .replaceWithText("not valid sysex");
 
         ProcessorPathHarness harness(makeFullMasterLayout(), tempDir);
-        fillModelWithDistinctValues(harness.model);
+        MasterModelTestHelpers::fillModelWithDistinctValues(harness.model);
         harness.mapper.bufferToApvts();
 
         harness.handleMasterModuleInitPropertyChange(
@@ -505,12 +454,12 @@ private:
         copyFixtureToDir(tempDir, Core::InitTemplateLoader::kMasterInitFileName);
 
         ProcessorPathHarness harness(makeFullMasterLayout(), tempDir);
-        fillModelWithDistinctValues(harness.model);
+        MasterModelTestHelpers::fillModelWithDistinctValues(harness.model);
         const auto before = harness.model;
 
         harness.handleMasterModuleInitPropertyChange("dco1Init");
 
-        expect(moduleBytesMatch(harness.model, before, PluginIDs::MasterEditSection::MidiModule::kGroupId));
+        expect(MasterModelTestHelpers::moduleBytesMatch(harness.model, before, PluginIDs::MasterEditSection::MidiModule::kGroupId));
         expect(harness.queue.isEmpty());
 
         tempDir.deleteRecursively();
@@ -524,13 +473,13 @@ private:
         copyFixtureToDir(tempDir, Core::InitTemplateLoader::kMasterInitFileName);
 
         ProcessorPathHarness harness(makeFullMasterLayout(), tempDir);
-        fillModelWithDistinctValues(harness.model);
+        MasterModelTestHelpers::fillModelWithDistinctValues(harness.model);
         harness.mapper.bufferToApvts();
 
         const auto initTemplate = makeInitTemplateModel(tempDir);
         harness.runMidiInitViaPropertyStamp();
 
-        expect(moduleBytesMatch(harness.model, initTemplate, PluginIDs::MasterEditSection::MidiModule::kGroupId));
+        expect(MasterModelTestHelpers::moduleBytesMatch(harness.model, initTemplate, PluginIDs::MasterEditSection::MidiModule::kGroupId));
 
         using namespace PluginDescriptors::MasterEditSection;
 

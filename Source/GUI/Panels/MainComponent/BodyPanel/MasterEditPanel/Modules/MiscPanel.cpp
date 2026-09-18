@@ -1,6 +1,8 @@
 #include "MiscPanel.h"
 
+#include "Core/Services/EpromTypePolicy.h"
 #include "GUI/Helpers/ContextualHelpBindingSupport.h"
+#include "GUI/Helpers/GrayedControlHelper.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 
 #include "GUI/Skins/Skin.h"
@@ -19,10 +21,10 @@ ModulePanelLayout MiscPanel::createLayout()
             PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kMasterTranspose,
             PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kBendRange,
             PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kUnisonEnable,
+            PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kUnisonDetune,
             PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kVolumeInvertEnable,
             PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kBankLockEnable,
-            PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kMemoryProtectEnable,
-            ""
+            PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kMemoryProtectEnable
         });
 }
 
@@ -38,6 +40,13 @@ MiscPanel::MiscPanel(const Config& config)
           .parameterCellDims = config.parameterCellDims})
 {
     registerContextualHelp();
+    apvts_.state.addListener(this);
+    refreshUnisonDetuneGraying();
+}
+
+MiscPanel::~MiscPanel()
+{
+    apvts_.state.removeListener(this);
 }
 
 void MiscPanel::registerContextualHelp()
@@ -54,6 +63,7 @@ void MiscPanel::registerContextualHelp()
         Help::kMasterTranspose,
         Help::kBendRange,
         Help::kUnison,
+        Help::kUnisonDetune,
         Help::kVolumeInvert,
         Help::kBankLock,
         Help::kMemoryProtect,
@@ -61,3 +71,46 @@ void MiscPanel::registerContextualHelp()
     TSS::bindParameterCellHelps(*contextualHelpBinder_, *this, kCellHelps, std::size(kCellHelps));
 }
 
+void MiscPanel::valueTreePropertyChanged(juce::ValueTree&,
+                                         const juce::Identifier& property)
+{
+    if (property == juce::Identifier(PluginIDs::Settings::kEpromType))
+        refreshUnisonDetuneGraying();
+}
+
+void MiscPanel::valueTreeRedirected(juce::ValueTree&)
+{
+    refreshUnisonDetuneGraying();
+}
+
+void MiscPanel::refreshUnisonDetuneGraying()
+{
+    const int epromType = Core::EpromTypePolicy::normalize(static_cast<int>(
+        apvts_.state.getProperty(PluginIDs::Settings::kEpromType,
+                                 PluginIDs::Settings::EpromType::kDefault)));
+    const bool grayed = ! Core::EpromTypePolicy::supportsUnisonDetune(epromType);
+
+    auto* detuneCell = getParameterCellAt(static_cast<size_t>(kUnisonDetuneCellIndex));
+    if (detuneCell == nullptr)
+        return;
+
+    // Label and separator stay fully opaque — only the Slider uses disabled skin paint.
+    detuneCell->setAlpha(1.0f);
+
+    if (auto* slider = detuneCell->getSlider())
+        slider->setEnabled(! grayed);
+
+    if (grayed)
+    {
+        TSS::GrayedControlHelper::setGrayedClickHandler(*detuneCell, true, [this]
+        {
+            TSS::GrayedControlHelper::setFooterInfoMessage(
+                apvts_,
+                PluginDisplayNames::MasterEditSection::MiscModule::kUnisonDetuneOptimisedEpromFooter);
+        });
+    }
+    else
+    {
+        TSS::GrayedControlHelper::clearGrayedClickHandler(*detuneCell);
+    }
+}

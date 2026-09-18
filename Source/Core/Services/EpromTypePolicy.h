@@ -35,6 +35,13 @@ namespace Core
         static int coerceForDeviceFamily(int typeId, MatrixDeviceFamily family) noexcept;
 
         static EpromClass toEpromClass(int typeId) noexcept;
+
+        /** True when Settings EPROM TYPE is GLIGLI / TAUNTEK / UNTERGEEK (optimised). */
+        static bool supportsUnisonDetune(int typeId) noexcept
+        {
+            return toEpromClass(typeId) == EpromClass::kOptimised;
+        }
+
         static MatrixDeviceFamily deviceFamilyFromType(MatrixDeviceTypes::Type deviceType) noexcept;
         static MatrixDeviceFamily deviceFamilyFromMemberBytes(juce::uint8 memberLow,
                                                              juce::uint8 memberHigh) noexcept;

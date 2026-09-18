@@ -190,6 +190,7 @@ namespace PluginIDs
                 constexpr const char* kMasterTranspose     = "miscMasterTranspose";
                 constexpr const char* kBendRange           = "miscBendRange";
                 constexpr const char* kUnisonEnable        = "miscUnisonEnable";
+                constexpr const char* kUnisonDetune        = "miscUnisonDetune";
                 constexpr const char* kVolumeInvertEnable  = "miscVolumeInvertEnable";
                 constexpr const char* kBankLockEnable      = "miscBankLockEnable";
                 constexpr const char* kMemoryProtectEnable = "miscMemoryProtectEnable";

@@ -28,6 +28,10 @@ namespace PluginDescriptors
     // Used for modulation bus parameters, which don't have a SysEx ID
     constexpr int kNoSysExId = -1;
 
+    // Used for APVTS-only Master ints that are not part of the packed 172-byte Master model
+    // (e.g. Unison Detune / CC 94). Never pass to MasterModel::setValue / getValue.
+    constexpr int kNoSysExOffset = -1;
+
 
     // =================================================================================================================
     // APVTS Group Descriptors

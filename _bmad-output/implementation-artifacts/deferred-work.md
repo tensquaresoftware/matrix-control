@@ -26,11 +26,11 @@
   summary: Add INTERFACE Settings section (first) with CONTEXTUAL HELP SHOW/HIDE for furtive footer help.
   evidence: Independently shippable GUI preference; deferred so DEVICE + EPROM TYPE can land alone.
 - source_spec: none
-  summary: Gate Unison Detune (CC 94) and related Master Edit UX on Settings EPROM TYPE (FACTORY/UNKNOWN off; GLIGLI/TAUNTEK/UNTERGEEK on).
-  evidence: Explicitly separate chantier after EPROM TYPE SSOT exists; not part of Settings structure work.
-- source_spec: none
   summary: If Settings content outgrows a compact non-scrolling modal, consider Ableton-style vertical tabs instead of a general scroll.
   evidence: Agreed fallback only if compact layout is insufficient later.
+
+<!-- Consumed 2026-09-18: Unison Detune (CC 94) gated on Settings EPROM TYPE — see spec-unison-detune-cc94.md -->
+
 
 ## Deferred from: code review of spec-master-pull-on-connect.md (2026-09-18)
 

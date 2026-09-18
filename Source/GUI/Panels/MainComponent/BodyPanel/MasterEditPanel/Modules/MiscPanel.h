@@ -17,7 +17,8 @@ namespace TSS
 
 class WidgetFactory;
 
-class MiscPanel : public BaseModulePanel
+class MiscPanel : public BaseModulePanel,
+                  private juce::ValueTree::Listener
 {
 public:
     struct Config
@@ -32,12 +33,18 @@ public:
     };
 
     explicit MiscPanel(const Config& config);
-    ~MiscPanel() override = default;
+    ~MiscPanel() override;
 
     static ModulePanelLayout createLayout();
 
 private:
     void registerContextualHelp();
+    void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
+                                  const juce::Identifier& property) override;
+    void valueTreeRedirected(juce::ValueTree& treeWhichHasBeenChanged) override;
+    void refreshUnisonDetuneGraying();
+
+    static constexpr int kUnisonDetuneCellIndex = 4;
 
     std::unique_ptr<TSS::ContextualHelpBinder> contextualHelpBinder_;
 

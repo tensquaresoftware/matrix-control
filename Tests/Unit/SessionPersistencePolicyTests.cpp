@@ -68,6 +68,7 @@ public:
         testShouldStripWhenBothPortsConfigured();
         testWhitespacePortsDoNotArmStrip();
         testStripRemovesPatchParameterValues();
+        testStripRemovesUnisonDetuneParameter();
         testStripRemovesMatrixModParameterValues();
         testPreservesPrefsWhenStripping();
         testNoStripWhenPortsMissing();
@@ -125,6 +126,31 @@ private:
 
         expect(! state.getChildWithProperty("id", PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kFrequency).isValid());
         expect(! state.getChildWithProperty("id", PluginIDs::MasterEditSection::MidiModule::ParameterWidgets::kChannel).isValid());
+    }
+
+    void testStripRemovesUnisonDetuneParameter()
+    {
+        beginTest("stripPatchAndMasterParameters removes miscUnisonDetune APVTS node");
+
+        juce::ValueTree state("PARAM");
+        state.setProperty("midiInputPortId", "input-a", nullptr);
+        state.setProperty("midiOutputPortId", "output-a", nullptr);
+
+        juce::ValueTree detuneParam(ApvtsTypes::kParam);
+        detuneParam.setProperty(
+            "id",
+            PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kUnisonDetune,
+            nullptr);
+        detuneParam.setProperty(ApvtsTypes::kValue, 0.5f, nullptr);
+        state.appendChild(detuneParam, nullptr);
+
+        Core::SessionPersistencePolicy::stripPatchAndMasterParameters(state);
+
+        expect(! state.getChildWithProperty(
+                       "id",
+                       PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kUnisonDetune)
+                    .isValid(),
+               "miscUnisonDetune must be in the managed Master strip ID set");
     }
 
     void testStripRemovesMatrixModParameterValues()

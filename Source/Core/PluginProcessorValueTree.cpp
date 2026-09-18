@@ -125,6 +125,7 @@ void PluginProcessor::valueTreePropertyChanged(juce::ValueTree& treeWhosePropert
     }
 
     dispatchPatchOrMatrixModParameterChange(parameterId);
+    dispatchUnisonDetuneChange(parameterId);
     dispatchMasterParameterChange(parameterId);
 
     if (parameterId == PluginIDs::PatchEditSection::PatchNameModule::kPatchName)
@@ -173,6 +174,24 @@ void PluginProcessor::dispatchPatchOrMatrixModParameterChange(const juce::String
 
     apvtsPatchMapper_->apvtsToBuffer();
     patchParameterSysExDispatcher_->dispatch(parameterId);
+}
+
+void PluginProcessor::dispatchUnisonDetuneChange(const juce::String& parameterId)
+{
+    if (parameterId != PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kUnisonDetune)
+        return;
+
+    if (suppressMasterParameterSysEx_ || isEditorialResyncGranularMidiQuiet())
+        return;
+
+    if (midiManager == nullptr)
+        return;
+
+    const auto* raw = apvts.getRawParameterValue(parameterId);
+    if (raw == nullptr)
+        return;
+
+    midiManager->sendUnisonDetune(juce::roundToInt(raw->load()));
 }
 
 void PluginProcessor::dispatchMasterParameterChange(const juce::String& parameterId)

@@ -287,6 +287,17 @@ namespace PluginDescriptors
             .defaultValue = 2,
             .sysExOffset = 164,
             .sysExId = kNoSysExId
+        },
+        {
+            // APVTS + MIDI CC 94 only — not part of packed Master SysEx 0x03.
+            .parameterId = PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kUnisonDetune,
+            .displayName = PluginDisplayNames::MasterEditSection::MiscModule::ParameterWidgets::kUnisonDetune,
+            .parentGroupId = PluginIDs::MasterEditSection::MiscModule::kGroupId,
+            .minValue = 0,
+            .maxValue = 127,
+            .defaultValue = 0,
+            .sysExOffset = kNoSysExOffset,
+            .sysExId = kNoSysExId
         }
     };
 

@@ -57,6 +57,7 @@ public:
         runReferenceRoundTrip();
         runMidiChannelCompositionRoundTrip();
         runUnisonEnableRoundTrip();
+        runUnisonDetuneExcludedFromPackedMapper();
     }
 
 private:
@@ -289,6 +290,36 @@ private:
         model.data()[169] = 1;
         mapper.bufferToApvts();
         expectEquals(juce::roundToInt(raw->load()), 1);
+    }
+
+    void runUnisonDetuneExcludedFromPackedMapper()
+    {
+        beginTest("Unison Detune is APVTS-only — absent from packed Master mapper");
+
+        const auto packedInts = Core::ApvtsMasterMapper::buildIntDescriptors();
+        for (const auto& d : packedInts)
+        {
+            expect(d.parameterId
+                       != PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kUnisonDetune,
+                   "miscUnisonDetune must not appear in packed Master int descriptors");
+            expect(d.sysExOffset != PluginDescriptors::kNoSysExOffset);
+        }
+
+        const auto& allMiscInts = PluginDescriptors::MasterEditSection::MiscModule::kIntParameters;
+        bool foundInMiscTable = false;
+        for (const auto& d : allMiscInts)
+        {
+            if (d.parameterId
+                != PluginIDs::MasterEditSection::MiscModule::ParameterWidgets::kUnisonDetune)
+                continue;
+
+            foundInMiscTable = true;
+            expectEquals(d.minValue, 0);
+            expectEquals(d.maxValue, 127);
+            expectEquals(d.defaultValue, 0);
+            expectEquals(d.sysExOffset, PluginDescriptors::kNoSysExOffset);
+        }
+        expect(foundInMiscTable, "miscUnisonDetune must remain in Misc kIntParameters for APVTS");
     }
 };
 
