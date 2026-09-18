@@ -6,6 +6,7 @@
 #include "PluginEditorInternal.h"
 
 #include "Core/Audio/StandaloneAudioInputRouter.h"
+#include "Core/MIDI/EditorOutboundGate.h"
 #include "Core/MIDI/MidiManager.h"
 #include "Core/Services/DeviceTypeRegistry.h"
 #include "Core/Services/EpromTypePolicy.h"
@@ -125,52 +126,78 @@ void PluginEditor::valueTreePropertyChanged(juce::ValueTree&,
         || propertyName == "keyboardFromPortId")
     {
         syncMidiPortSelectionFromState(propertyName);
+        if (propertyName != "keyboardFromPortId")
+            refreshEpromTypePromptDialogPorts();
         return;
     }
 
     if (propertyName == PluginIDs::Settings::kEpromTypePromptPending)
     {
-        const bool pending = static_cast<bool>(
-            pluginProcessor.getApvts().state.getProperty(
-                PluginIDs::Settings::kEpromTypePromptPending, false));
-        if (pending)
-        {
-            juce::MessageManager::callAsync(
-                [safeThis = juce::Component::SafePointer<PluginEditor>(this)]
-                {
-                    if (safeThis != nullptr)
-                        safeThis->openEpromTypePromptDialog();
-                });
-        }
+        handleEpromTypePromptPendingProperty();
         return;
     }
 
+    handleDeviceSetupAssistantProperty(propertyName);
+
     if (propertyName == MatrixDeviceTypes::kApvtsPropertyName)
-    {
-        auto& state = pluginProcessor.getApvts().state;
-        const auto deviceType = Core::DeviceTypeRegistry::fromApvtsProperty(
-            state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
-        const auto family = Core::EpromTypePolicy::deviceFamilyFromType(deviceType);
-        const int stored = Core::EpromTypePolicy::normalize(static_cast<int>(
-            state.getProperty(PluginIDs::Settings::kEpromType,
-                              PluginIDs::Settings::EpromType::kDefault)));
-        const int coerced = Core::EpromTypePolicy::coerceForDeviceFamily(stored, family);
-        if (coerced != stored)
-            state.setProperty(PluginIDs::Settings::kEpromType, coerced, nullptr);
-
-        pluginProcessor.getMidiManager().refreshSysExDelayFromSettings();
-
-        if (auto* panel = getSettingsPanelIfOpen())
-        {
-            panel->setDeviceType(deviceType);
-            panel->refreshEpromTypeItems(coerced);
-        }
-    }
+        coerceEpromTypeForCurrentDeviceFamily();
 
     if (! pluginProcessor.isStandalone())
         return;
 
     scheduleAudioFromRefreshIfNeeded(propertyName);
+}
+
+void PluginEditor::handleEpromTypePromptPendingProperty()
+{
+    const bool pending = static_cast<bool>(
+        pluginProcessor.getApvts().state.getProperty(
+            PluginIDs::Settings::kEpromTypePromptPending, false));
+    if (! pending)
+        return;
+
+    juce::MessageManager::callAsync(
+        [safeThis = juce::Component::SafePointer<PluginEditor>(this)]
+        {
+            if (safeThis != nullptr)
+                safeThis->openEpromTypePromptDialog();
+        });
+}
+
+void PluginEditor::handleDeviceSetupAssistantProperty(const juce::String& propertyName)
+{
+    const bool isDeviceStatus = propertyName == "deviceDetected"
+        || propertyName == "deviceVersion"
+        || propertyName == MatrixDeviceTypes::kApvtsPropertyName
+        || propertyName == Core::kDeviceMidiUnresponsiveProperty;
+    if (! isDeviceStatus)
+        return;
+
+    refreshEpromTypePromptDialogLiveState();
+    if (propertyName != Core::kDeviceMidiUnresponsiveProperty)
+        refreshEpromTypePromptDialogSuggestion();
+}
+
+void PluginEditor::coerceEpromTypeForCurrentDeviceFamily()
+{
+    auto& state = pluginProcessor.getApvts().state;
+    const auto deviceType = Core::DeviceTypeRegistry::fromApvtsProperty(
+        state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
+    const auto family = Core::EpromTypePolicy::deviceFamilyFromType(deviceType);
+    const int stored = Core::EpromTypePolicy::normalize(static_cast<int>(
+        state.getProperty(PluginIDs::Settings::kEpromType,
+                          PluginIDs::Settings::EpromType::kDefault)));
+    const int coerced = Core::EpromTypePolicy::coerceForDeviceFamily(stored, family);
+    if (coerced != stored)
+        state.setProperty(PluginIDs::Settings::kEpromType, coerced, nullptr);
+
+    pluginProcessor.getMidiManager().refreshSysExDelayFromSettings();
+
+    if (auto* panel = getSettingsPanelIfOpen())
+    {
+        panel->setDeviceType(deviceType);
+        panel->refreshEpromTypeItems(coerced);
+    }
 }
 
 void PluginEditor::syncMidiPortSelectionFromState(const juce::String& propertyName)

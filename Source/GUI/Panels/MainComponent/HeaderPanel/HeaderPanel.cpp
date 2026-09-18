@@ -5,6 +5,7 @@
 #include <juce_audio_devices/juce_audio_devices.h>
 
 #include "GUI/Helpers/ContextualHelpBindingSupport.h"
+#include "GUI/Helpers/MidiPortComboPopulation.h"
 #include "GUI/Widgets/HeaderLogoPopupMenu.h"
 #include "GUI/Skins/Skin.h"
 #include "GUI/Skins/SkinHelpers.h"
@@ -251,8 +252,8 @@ void HeaderPanel::updateKeyboardFromVisibility()
 
 void HeaderPanel::populateMidiPortLists()
 {
-    populateInputPortCombo(midiFromComboBox_, midiFromPortIdentifiers_);
-    populateOutputPortCombo(midiToComboBox_, midiToPortIdentifiers_);
+    TSS::MidiPortComboPopulation::populateInputPortCombo(midiFromComboBox_, midiFromPortIdentifiers_);
+    TSS::MidiPortComboPopulation::populateOutputPortCombo(midiToComboBox_, midiToPortIdentifiers_);
 
     if (isPluginMode_)
         configurePluginKeyboardFrom();

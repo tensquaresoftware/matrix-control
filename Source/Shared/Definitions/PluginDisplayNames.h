@@ -304,12 +304,15 @@ namespace PluginDisplayNames
 
         namespace EpromTypePrompt
         {
-            constexpr const char* kTitle = "EPROM TYPE";
+            constexpr const char* kTitle = "DEVICE SETUP";
             constexpr const char* kBody =
-                "Select the EPROM type currently installed in your synth. "
+                "Select MIDI ports and the EPROM type installed in your synth. "
                 "This affects MIDI timing and future features.";
             constexpr const char* kBodySuggestionSuffix =
                 " A suggestion is preselected from the reported firmware version when possible.";
+            constexpr const char* kMidiFromLabel = "MIDI FROM";
+            constexpr const char* kMidiToLabel = "MIDI TO";
+            constexpr const char* kSearching = "SEARCHING";
             constexpr const char* kEpromTypeLabel = "EPROM TYPE";
             constexpr const char* kConfirm = "CONFIRM";
             constexpr const char* kSpecifyLater = "SPECIFY LATER";

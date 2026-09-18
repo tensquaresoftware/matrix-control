@@ -176,6 +176,14 @@ private:
     void closeEpromTypePromptDialog();
     void ensureEpromTypePromptDialog();
     void applyEpromTypePromptSelection(int selectedId);
+    void applyEpromTypePromptSpecifyLater();
+    void refreshEpromTypePromptDialogLiveState();
+    void refreshEpromTypePromptDialogPorts();
+    void refreshEpromTypePromptDialogSuggestion();
+    void applyEpromTypePromptMidiPortChange(bool isInput, const juce::String& portId);
+    void handleEpromTypePromptPendingProperty();
+    void handleDeviceSetupAssistantProperty(const juce::String& propertyName);
+    void coerceEpromTypeForCurrentDeviceFamily();
     void showBankTransferProgressDialog(const BankTransferProgressShowRequest& request);
     void hideBankTransferProgressDialog();
     SettingsPanel* getSettingsPanelIfOpen();

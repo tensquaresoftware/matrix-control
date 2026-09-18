@@ -14,8 +14,10 @@
 #include "GUI/Panels/MainComponent/FooterPanel/FooterPanel.h"
 #include "GUI/Settings/SettingsPanel.h"
 #include "GUI/Settings/SettingsWindow.h"
+#include "Core/Services/DeviceSetupDeviceRow.h"
 #include "Core/Services/DeviceTypeRegistry.h"
 #include "Core/Services/EpromTypePolicy.h"
+#include "Core/MIDI/EditorOutboundGate.h"
 #include "Core/MIDI/MidiManager.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
 #include "Shared/Definitions/PluginIDs.h"
@@ -240,38 +242,45 @@ void PluginEditor::closeMasterInitConfirmDialog()
 
 namespace
 {
+    EpromTypePromptDialog::LiveDeviceStatus makeEpromTypePromptLiveStatus(
+        const juce::ValueTree& state)
+    {
+        return {
+            .deviceDetected = static_cast<bool>(state.getProperty("deviceDetected", false)),
+            .deviceMidiUnresponsive = static_cast<bool>(
+                state.getProperty(Core::kDeviceMidiUnresponsiveProperty, false)),
+            .deviceType = Core::DeviceTypeRegistry::fromApvtsProperty(
+                state.getProperty(MatrixDeviceTypes::kApvtsPropertyName)),
+            .deviceVersion = state.getProperty("deviceVersion", juce::String()).toString(),
+        };
+    }
+
     int preferredEpromTypeForPrompt(juce::ValueTree& state, MatrixDeviceTypes::Type deviceType)
     {
         const auto family = Core::EpromTypePolicy::deviceFamilyFromType(deviceType);
-        const juce::String version = state.getProperty("deviceVersion", juce::String()).toString();
-        const int suggested = Core::EpromTypePolicy::suggestFromInquiryVersion(version, family);
-        const int stored = Core::EpromTypePolicy::normalize(static_cast<int>(
-            state.getProperty(PluginIDs::Settings::kEpromType,
-                              PluginIDs::Settings::EpromType::kDefault)));
-
-        return Core::EpromTypePolicy::preferredForPrompt(suggested, stored);
-    }
-
-    void markEpromTypePromptFinished(juce::ValueTree& state)
-    {
-        state.setProperty(PluginIDs::Settings::kEpromTypePromptDone, true, nullptr);
-        state.setProperty(PluginIDs::Settings::kEpromTypePromptPending, false, nullptr);
+        return Core::EpromTypePolicy::preferredForPrompt(
+            Core::EpromTypePolicy::suggestFromInquiryVersion(
+                state.getProperty("deviceVersion", juce::String()).toString(), family),
+            Core::EpromTypePolicy::normalize(static_cast<int>(
+                state.getProperty(PluginIDs::Settings::kEpromType,
+                                  PluginIDs::Settings::EpromType::kDefault))));
     }
 }
 
 void PluginEditor::applyEpromTypePromptSelection(int selectedId)
 {
     auto& apvtsState = pluginProcessor.getApvts().state;
-    const int normalized = Core::EpromTypePolicy::normalize(selectedId);
-    apvtsState.setProperty(PluginIDs::Settings::kEpromType, normalized, nullptr);
-    markEpromTypePromptFinished(apvtsState);
+    const auto result = Core::deviceSetupConfirmResult(selectedId);
+    apvtsState.setProperty(PluginIDs::Settings::kEpromType, result.epromTypeId, nullptr);
+    apvtsState.setProperty(PluginIDs::Settings::kEpromTypePromptDone, result.promptDone, nullptr);
+    apvtsState.setProperty(PluginIDs::Settings::kEpromTypePromptPending, result.promptPending, nullptr);
     pluginProcessor.getMidiManager().refreshSysExDelayFromSettings();
 
     if (auto* panel = getSettingsPanelIfOpen())
     {
         panel->setDeviceType(Core::DeviceTypeRegistry::fromApvtsProperty(
             apvtsState.getProperty(MatrixDeviceTypes::kApvtsPropertyName)));
-        panel->refreshEpromTypeItems(normalized);
+        panel->refreshEpromTypeItems(result.epromTypeId);
     }
 }
 
@@ -289,32 +298,111 @@ void PluginEditor::ensureEpromTypePromptDialog()
     epromTypePromptDialog_->setSkin(*skin_);
 }
 
+void PluginEditor::refreshEpromTypePromptDialogLiveState()
+{
+    if (epromTypePromptDialog_ == nullptr || ! epromTypePromptDialog_->isVisible())
+        return;
+
+    epromTypePromptDialog_->updateLiveDeviceStatus(
+        makeEpromTypePromptLiveStatus(pluginProcessor.getApvts().state));
+}
+
+void PluginEditor::refreshEpromTypePromptDialogPorts()
+{
+    if (epromTypePromptDialog_ == nullptr || ! epromTypePromptDialog_->isVisible())
+        return;
+
+    auto& state = pluginProcessor.getApvts().state;
+    epromTypePromptDialog_->syncPortsFromHost(
+        state.getProperty("midiInputPortId", juce::String()).toString(),
+        state.getProperty("midiOutputPortId", juce::String()).toString(),
+        true);
+}
+
+void PluginEditor::refreshEpromTypePromptDialogSuggestion()
+{
+    if (epromTypePromptDialog_ == nullptr || ! epromTypePromptDialog_->isVisible())
+        return;
+
+    auto& state = pluginProcessor.getApvts().state;
+    const auto deviceType = Core::DeviceTypeRegistry::fromApvtsProperty(
+        state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
+    epromTypePromptDialog_->refreshEpromSuggestion(
+        deviceType, preferredEpromTypeForPrompt(state, deviceType));
+}
+
+void PluginEditor::applyEpromTypePromptMidiPortChange(bool isInput, const juce::String& portId)
+{
+    auto& state = pluginProcessor.getApvts().state;
+    const juce::String key = isInput ? "midiInputPortId" : "midiOutputPortId";
+    const auto previousPortId = state.getProperty(key, juce::String()).toString();
+    const bool opened = isInput ? pluginProcessor.setMidiInputPort(portId)
+                                : pluginProcessor.setMidiOutputPort(portId);
+    if (opened)
+        return;
+
+    if (epromTypePromptDialog_ != nullptr)
+    {
+        const auto fromId = isInput ? previousPortId
+                                    : state.getProperty("midiInputPortId", juce::String()).toString();
+        const auto toId = isInput ? state.getProperty("midiOutputPortId", juce::String()).toString()
+                                  : previousPortId;
+        epromTypePromptDialog_->syncPortsFromHost(fromId, toId, false);
+    }
+    if (previousPortId.isEmpty())
+        return;
+
+    if (isInput)
+        pluginProcessor.setMidiInputPort(previousPortId);
+    else
+        pluginProcessor.setMidiOutputPort(previousPortId);
+}
+
+void PluginEditor::applyEpromTypePromptSpecifyLater()
+{
+    auto& apvtsState = pluginProcessor.getApvts().state;
+    const auto flags = Core::deviceSetupSpecifyLaterFlags();
+    apvtsState.setProperty(PluginIDs::Settings::kEpromTypePromptDone, flags.promptDone, nullptr);
+    apvtsState.setProperty(PluginIDs::Settings::kEpromTypePromptPending, flags.promptPending, nullptr);
+}
+
 void PluginEditor::openEpromTypePromptDialog()
 {
     auto& state = pluginProcessor.getApvts().state;
-    if (static_cast<bool>(state.getProperty(PluginIDs::Settings::kEpromTypePromptDone, false)))
-        return;
-    if (epromTypePromptDialog_ != nullptr && epromTypePromptDialog_->isVisible())
+    const bool promptDone = static_cast<bool>(
+        state.getProperty(PluginIDs::Settings::kEpromTypePromptDone, false));
+    const bool alreadyVisible = epromTypePromptDialog_ != nullptr && epromTypePromptDialog_->isVisible();
+    if (! Core::shouldOpenDeviceSetupAssistant(promptDone, alreadyVisible))
         return;
 
     const auto deviceType = Core::DeviceTypeRegistry::fromApvtsProperty(
         state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
     const int preferred = preferredEpromTypeForPrompt(state, deviceType);
     const juce::String deviceVersion = state.getProperty("deviceVersion", juce::String()).toString().trim();
-    const bool includeFirmwareSuggestionHint = deviceVersion.isNotEmpty()
-        && static_cast<bool>(state.getProperty("deviceDetected", false));
 
     ensureEpromTypePromptDialog();
     epromTypePromptDialog_->prepareForShow({
         .deviceType = deviceType,
         .preferredSelectedId = preferred,
-        .includeFirmwareSuggestionHint = includeFirmwareSuggestionHint,
+        .includeFirmwareSuggestionHint = deviceVersion.isNotEmpty()
+            && static_cast<bool>(state.getProperty("deviceDetected", false)),
+        .midiFromPortId = state.getProperty("midiInputPortId", juce::String()).toString(),
+        .midiToPortId = state.getProperty("midiOutputPortId", juce::String()).toString(),
+        .deviceStatus = makeEpromTypePromptLiveStatus(state),
         .onConfirm = [this](int selectedId) { applyEpromTypePromptSelection(selectedId); },
-        .onLater =
-            [this]
-            {
-                markEpromTypePromptFinished(pluginProcessor.getApvts().state);
-            },
+        .onLater = [this] { applyEpromTypePromptSpecifyLater(); },
+        .onMidiFromChanged = [this](const juce::String& portId)
+        {
+            applyEpromTypePromptMidiPortChange(true, portId);
+        },
+        .onMidiToChanged = [this](const juce::String& portId)
+        {
+            applyEpromTypePromptMidiPortChange(false, portId);
+        },
+        .onSearchingWindowStarted = [this]
+        {
+            pluginProcessor.getMidiManager().refreshDeviceInquiryAfterPortSync();
+        },
     });
 
     const int baseWidth = layoutDimensions_.editor.width;
@@ -322,7 +410,6 @@ void PluginEditor::openEpromTypePromptDialog()
         ? TSS::ScaledLayout::uiScaleFromEditorBounds(getWidth(), baseWidth)
         : 1.0f;
     updateEpromTypePromptDialogLayout(uiScale);
-
     epromTypePromptDialog_->setVisible(true);
     epromTypePromptDialog_->toFront(true);
     epromTypePromptDialog_->grabKeyboardFocus();

@@ -4,6 +4,7 @@
 #include "PluginEditor.h"
 #include "PluginEditorInternal.h"
 
+#include "Core/Services/DeviceSetupDeviceRow.h"
 #include "Core/Services/PatchNameEditRules.h"
 #include "GUI/Factories/WidgetFactory.h"
 #include "GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditPanel.h"
@@ -263,8 +264,10 @@ void PluginEditor::attachEditorRuntimeListeners()
     attachStandaloneAudioDeviceListener();
     pluginProcessor.getApvts().state.addListener(this);
 
-    if (static_cast<bool>(pluginProcessor.getApvts().state.getProperty(
-            PluginIDs::Settings::kEpromTypePromptPending, false)))
+    if (Core::shouldOpenDeviceSetupAssistant(
+            static_cast<bool>(pluginProcessor.getApvts().state.getProperty(
+                PluginIDs::Settings::kEpromTypePromptDone, false)),
+            false))
     {
         juce::MessageManager::callAsync(
             [safeThis = juce::Component::SafePointer<PluginEditor>(this)]

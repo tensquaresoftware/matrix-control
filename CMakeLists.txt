@@ -242,6 +242,7 @@ set(PLUGIN_SOURCES
     Source/GUI/About/AboutWindow.cpp
     Source/GUI/Dialogs/BankTransferProgressDialog.cpp
     Source/GUI/Dialogs/EpromTypePromptDialog.cpp
+    Source/GUI/Dialogs/EpromTypePromptDialogLayout.cpp
     Source/GUI/Dialogs/MasterInitConfirmDialog.cpp
     Source/GUI/Factories/WidgetFactory.cpp
     Source/GUI/Factories/DimensionFactory.cpp
@@ -559,6 +560,8 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/RealtimeQueuePressureMonitorTests.cpp
         Tests/Unit/SysExDelayProfileTests.cpp
         Tests/Unit/EpromTypePolicyTests.cpp
+        Tests/Unit/DeviceSetupDeviceRowTests.cpp
+        Tests/Unit/MidiPortComboPopulationTests.cpp
         Tests/Unit/SysExInterMessageDelayTests.cpp
         Tests/Unit/SysExParserTests.cpp
         Tests/Unit/WidgetDimensionRegistryTests.cpp

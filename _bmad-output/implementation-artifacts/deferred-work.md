@@ -1,5 +1,11 @@
 # Deferred Work
 
+## Deferred from: review of spec-device-setup-assistant.md (2026-09-18)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-device-setup-assistant.md`
+  summary: DEVICE SETUP port readiness uses non-empty combo selection, not a confirmed open/usable MIDI port; Inquiry already refuses closed ports.
+  evidence: Dialog mirrors header selection model; tightening readiness would need a shared open-port SSOT beyond this assistant chantier.
+
 ## Deferred from: review of spec-settings-device-eprom-type.md (2026-09-18)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-settings-device-eprom-type.md`
