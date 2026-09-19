@@ -1,5 +1,7 @@
 #include "Shared/ProjectPaths.h"
 
+#include <juce_data_structures/juce_data_structures.h>
+
 namespace
 {
     constexpr const char* kProjectNameToken { "project(Matrix-Control" };
@@ -68,11 +70,16 @@ namespace
         return {};
     }
 
+    // Same directory PropertiesFile resolves with folderName + Application Support
+    // (macOS: ~/Library/Application Support/…; Windows: %APPDATA%/…; Linux: ~/…).
     juce::File getFallbackRoot()
     {
-        return juce::File::getSpecialLocation(juce::File::userApplicationDataDirectory)
-            .getChildFile(kCompanyFolderName)
-            .getChildFile(kProductFolderName);
+        const juce::File settingsFile = ProjectPaths::makeProductPropertiesFileOptions(kProductFolderName)
+                                            .getDefaultFile();
+        if (settingsFile == juce::File())
+            return {};
+
+        return settingsFile.getParentDirectory();
     }
 
     juce::File getDevProjectRootFile()
@@ -219,6 +226,23 @@ juce::File ProjectPaths::getLogsDirectory(LogCategory category)
 juce::File ProjectPaths::getApplicationDataDirectory()
 {
     return getFallbackRoot();
+}
+
+juce::String ProjectPaths::getPropertiesFileFolderName()
+{
+    return juce::String(kCompanyFolderName) + "/" + kProductFolderName;
+}
+
+juce::PropertiesFile::Options ProjectPaths::makeProductPropertiesFileOptions(
+    const juce::String& applicationName)
+{
+    juce::PropertiesFile::Options options;
+    options.applicationName = applicationName;
+    options.filenameSuffix = ".settings";
+    options.folderName = getPropertiesFileFolderName();
+    options.osxLibrarySubFolder = "Application Support";
+    options.commonToAllUsers = false;
+    return options;
 }
 
 juce::File ProjectPaths::getInitTemplatesDirectory()

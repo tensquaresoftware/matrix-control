@@ -8,12 +8,8 @@ namespace Core::DeviceConnectionMachineDefaults
     {
         juce::PropertiesFile::Options makeStoreOptions()
         {
-            juce::PropertiesFile::Options options;
-            options.applicationName = "Matrix-Control-DeviceConnection";
-            options.filenameSuffix = ".settings";
-            options.folderName = "Ten Square Software/Matrix-Control";
-            options.osxLibrarySubFolder = "Application Support";
-            options.commonToAllUsers = false;
+            auto options = ProjectPaths::makeProductPropertiesFileOptions(
+                "Matrix-Control-DeviceConnection");
             options.ignoreCaseOfKeyNames = true;
             return options;
         }

@@ -483,6 +483,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/InitTemplateSentinelSaveTests.cpp
         Tests/Unit/ApvtsPatchMapperTests.cpp
         Tests/Unit/PluginVersionTests.cpp
+        Tests/Unit/ProjectPathsTests.cpp
         Tests/Unit/PatchNameSyncerTests.cpp
         Tests/Unit/MasterModelTests.cpp
         Tests/Unit/MidiActivityTrackerTests.cpp

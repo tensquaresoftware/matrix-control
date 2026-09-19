@@ -5,6 +5,7 @@
 #include <juce_gui_extra/juce_gui_extra.h>
 
 #include "Core/PluginProcessor.h"
+#include "Shared/ProjectPaths.h"
 #include "Standalone/MatrixControlStandaloneFilterWindow.h"
 
 namespace
@@ -14,17 +15,9 @@ class MatrixControlStandaloneApp final : public juce::JUCEApplication
 public:
     MatrixControlStandaloneApp()
     {
-        juce::PropertiesFile::Options options;
-        options.applicationName     = juce::CharPointer_UTF8 (JucePlugin_Name);
-        options.filenameSuffix      = ".settings";
-        options.osxLibrarySubFolder = "Application Support";
-       #if JUCE_LINUX || JUCE_BSD
-        options.folderName          = "~/.config";
-       #else
-        options.folderName          = "";
-       #endif
-
-        appProperties.setStorageParameters (options);
+        appProperties.setStorageParameters(
+            ProjectPaths::makeProductPropertiesFileOptions(
+                juce::CharPointer_UTF8(JucePlugin_Name)));
     }
 
     const juce::String getApplicationName() override           { return juce::CharPointer_UTF8 (JucePlugin_Name); }
