@@ -102,8 +102,22 @@ MutatorActionResult PatchMutatorEngine::defragHistory()
     syncHistoryUiProperties(apvts_);
     auditionAfterHistoryMutation();
 
+    const int mutationsUsed = historyStore_.rootCount();
+    const int mutationsAvailable = MutationHistoryStore::kMaxRoots - mutationsUsed;
+    int retriesUsed = 0;
+    int retriesAvailable = 0;
+    for (const int rootIndex : historyStore_.getSortedRootIndices())
+    {
+        const int rootRetries = historyStore_.retryCount(rootIndex);
+        retriesUsed += rootRetries;
+        retriesAvailable += MutationHistoryStore::kMaxRetriesPerRoot - rootRetries;
+    }
+
+    namespace DefragMessages = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::Messages;
+
     MutatorActionResult result = makeSuccessResult();
-    result.footerMessage = kDefragCompleteFooterMessage;
+    result.footerMessage = DefragMessages::formatDefragCompleteFooterMessage(
+        mutationsUsed, mutationsAvailable, retriesUsed, retriesAvailable);
     result.footerSeverity = kFooterSeverityInfo;
     return result;
 }

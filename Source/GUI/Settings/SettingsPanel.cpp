@@ -40,7 +40,7 @@ void SettingsPanel::registerContextualHelp(TSS::ContextualHelpBinder::FooterReso
     contextualHelpBinder_->bind(patchDeleteInitButton_.get(), Help::kPatchDeleteInit);
     contextualHelpBinder_->bind(deleteWarningCombo_.get(), Help::kDeleteWarning);
     contextualHelpBinder_->bind(defragHistoryLabel_.get(), Help::kDefragHistory);
-    contextualHelpBinder_->bind(defragHistoryPlaceholder_.get(), Help::kDefragHistory);
+    contextualHelpBinder_->bind(defragHistoryButton_.get(), Help::kDefragHistory);
     contextualHelpBinder_->bind(masterLoadButton_.get(), Help::kMasterLoad);
     contextualHelpBinder_->bind(masterSaveAsButton_.get(), Help::kMasterSaveAs);
     contextualHelpBinder_->bind(masterInitButton_.get(), Help::kMasterInit);
@@ -91,22 +91,6 @@ void SettingsPanel::layoutLabeledControlRow(juce::Rectangle<int>& bounds,
         slider->setUiScale(uiScale_);
     else if (auto* combo = dynamic_cast<TSS::ComboBox*>(args.control))
         combo->setUiScale(uiScale_);
-    bounds.removeFromTop(metrics.rowGap);
-}
-
-void SettingsPanel::layoutPlaceholderRow(juce::Rectangle<int>& bounds,
-                                         const RowLayoutMetrics& metrics,
-                                         TSS::Label& label,
-                                         TSS::Label& placeholder)
-{
-    auto row = bounds.removeFromTop(metrics.controlHeight);
-    const int x = row.getX();
-    const int y = row.getY();
-
-    label.setBounds(x, y, metrics.labelWidth, metrics.controlHeight);
-    label.setUiScale(uiScale_);
-    placeholder.setBounds(x + metrics.labelWidth, y, metrics.comboWidth, metrics.controlHeight);
-    placeholder.setUiScale(uiScale_);
     bounds.removeFromTop(metrics.rowGap);
 }
 
@@ -203,7 +187,11 @@ void SettingsPanel::layoutPatchMutatorSection(juce::Rectangle<int>& bounds, cons
                             LabeledControlRowArgs{ deleteWarningLabel_.get(),
                                                    deleteWarningCombo_.get(),
                                                    metrics.comboWidth });
-    layoutPlaceholderRow(bounds, metrics, *defragHistoryLabel_, *defragHistoryPlaceholder_);
+    layoutButtonRow(bounds,
+                    metrics,
+                    ButtonRowLayoutArgs{ defragHistoryLabel_.get(),
+                                         { defragHistoryButton_.get() },
+                                         { metrics.defragButtonWidth } });
 }
 
 void SettingsPanel::layoutMasterSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics)
@@ -246,6 +234,7 @@ void SettingsPanel::layoutContent(juce::Rectangle<int> bounds)
     metrics.utilityInitWidth = juce::roundToInt(static_cast<float>(kUtilityInitWidth_) * uiScale_);
     metrics.saveAsInitWidth = juce::roundToInt(static_cast<float>(kSaveAsInitWidth_) * uiScale_);
     metrics.deleteInitWidth = juce::roundToInt(static_cast<float>(kDeleteInitWidth_) * uiScale_);
+    metrics.defragButtonWidth = juce::roundToInt(static_cast<float>(kDefragButtonWidth_) * uiScale_);
 
     layoutDeviceSection(bounds, metrics);
     bounds.removeFromTop(metrics.rowGap);
@@ -316,4 +305,9 @@ void SettingsPanel::refreshInitTemplateDeleteEnablement(bool patchInitExists, bo
 {
     patchDeleteInitButton_->setEnabled(patchInitExists);
     masterDeleteInitButton_->setEnabled(masterInitExists);
+}
+
+void SettingsPanel::refreshDefragHistoryEnablement(bool hasMutationHistory)
+{
+    defragHistoryButton_->setEnabled(hasMutationHistory);
 }

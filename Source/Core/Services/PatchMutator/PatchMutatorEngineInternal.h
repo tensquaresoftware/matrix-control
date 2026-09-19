@@ -47,7 +47,6 @@ namespace PatchMutatorEngineInternal
     constexpr const char* kNoInitialSnapshotFooterMessage =
         "PATCH MUTATOR: No initial patch snapshot available for compare.";
     constexpr const char* kFlushSuccessFooterMessage = "PATCH MUTATOR: Mutation history flushed.";
-    constexpr const char* kDefragCompleteFooterMessage = "PATCH MUTATOR: Mutation history renumbered.";
     constexpr const char* kExportFolderNotWritableFooterMessage =
         "PATCH MUTATOR: Export folder is not writable.";
     constexpr const char* kExportFailedFooterMessage = "PATCH MUTATOR: Mutation export failed.";

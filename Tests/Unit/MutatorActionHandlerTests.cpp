@@ -158,6 +158,7 @@ public:
         export_invokesPickerThenEngine();
         export_cancelledPicker_noEngineCall();
         mutate_blocked_setsFooter();
+        mutate_limitDefragConfirm_publishesFooter();
         historySelection_debounced();
         historySelection_rootChange_rebuildsMirrors();
         historyPrevious_delegatesToEngine();
@@ -467,6 +468,42 @@ private:
         expectEquals(harness.engine.mutateCallCount, 1);
         expect(harness.proc.apvts.state.getProperty("uiMessageText").toString().isNotEmpty());
         expect(harness.proc.apvts.state.getProperty("uiMessageSeverity").toString() == "warning");
+    }
+
+    void mutate_limitDefragConfirm_publishesFooter()
+    {
+        beginTest("mutate_limitDefragConfirm_publishesFooter");
+
+        TestAudioProcessorMutatorHandler proc;
+        RecordingPatchMutatorEngine engine;
+        engine.mutateResult.defragModalRequested = true;
+        engine.defragResult.success = true;
+        engine.defragResult.footerMessage =
+            "PATCH MUTATOR: Mutation history renumbered. Mutations: 1 used / 99 available. "
+            "Retries: 0 used / 100 left under them.";
+        engine.defragResult.footerSeverity = "info";
+
+        Core::MutatorActionHandler handler({
+            proc.apvts,
+            &engine,
+            {},
+            [](std::function<void()> onConfirmed)
+            {
+                if (onConfirmed)
+                    onConfirmed();
+            },
+            {},
+            {},
+            {}
+        });
+
+        handler.handleAction(PatchMutator::kMutate, juce::int64(1));
+
+        expectEquals(engine.defragCallCount, 1);
+        expectEquals(proc.apvts.state.getProperty("uiMessageText").toString(),
+                     engine.defragResult.footerMessage);
+        expectEquals(proc.apvts.state.getProperty("uiMessageSeverity").toString(),
+                     juce::String("info"));
     }
 
     void historySelection_debounced()

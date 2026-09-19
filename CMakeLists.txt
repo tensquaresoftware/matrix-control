@@ -245,6 +245,7 @@ set(PLUGIN_SOURCES
     Source/GUI/Dialogs/EpromTypePromptDialog.cpp
     Source/GUI/Dialogs/EpromTypePromptDialogLayout.cpp
     Source/GUI/Dialogs/MasterInitConfirmDialog.cpp
+    Source/GUI/Dialogs/MutatorHistoryDefragConfirmDialog.cpp
     Source/GUI/Factories/WidgetFactory.cpp
     Source/GUI/Factories/DimensionFactory.cpp
     Source/GUI/Factories/DimensionFactoryBuilders.cpp

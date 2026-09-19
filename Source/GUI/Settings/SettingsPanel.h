@@ -48,6 +48,7 @@ public:
 
     TSS::Button& getPatchSaveAsInitButton() { return *patchSaveAsInitButton_; }
     TSS::Button& getPatchDeleteInitButton() { return *patchDeleteInitButton_; }
+    TSS::Button& getDefragHistoryButton() { return *defragHistoryButton_; }
     TSS::Button& getMasterLoadButton() { return *masterLoadButton_; }
     TSS::Button& getMasterSaveAsButton() { return *masterSaveAsButton_; }
     TSS::Button& getMasterInitButton() { return *masterInitButton_; }
@@ -55,6 +56,7 @@ public:
     TSS::Button& getMasterDeleteInitButton() { return *masterDeleteInitButton_; }
 
     void refreshInitTemplateDeleteEnablement(bool patchInitExists, bool masterInitExists);
+    void refreshDefragHistoryEnablement(bool hasMutationHistory);
 
     /** Rebuild EPROM TYPE items for the current device family; returns selected id after coerce. */
     int refreshEpromTypeItems(int preferredSelectedId);
@@ -83,6 +85,7 @@ private:
         int utilityInitWidth = 0;
         int saveAsInitWidth = 0;
         int deleteInitWidth = 0;
+        int defragButtonWidth = 0;
     };
 
     struct LabeledControlRowArgs
@@ -115,10 +118,6 @@ private:
     void layoutLabeledControlRow(juce::Rectangle<int>& bounds,
                                  const RowLayoutMetrics& metrics,
                                  const LabeledControlRowArgs& args);
-    void layoutPlaceholderRow(juce::Rectangle<int>& bounds,
-                              const RowLayoutMetrics& metrics,
-                              TSS::Label& label,
-                              TSS::Label& placeholder);
     struct ButtonRowLayoutArgs
     {
         TSS::Label* label = nullptr;
@@ -146,12 +145,14 @@ private:
     inline constexpr static int kUtilityInitWidth_ = 44;
     inline constexpr static int kSaveAsInitWidth_ = 68;
     inline constexpr static int kDeleteInitWidth_ = 68;
+    inline constexpr static int kDefragButtonWidth_ = 68;
     inline constexpr static int kContentWidth_ = kLabelWidth_ + kComboWidth_;
     static_assert(kDesignWidth == kContentWidth_ + kPadding_ * 2);
     static_assert(kUtilityLoadWidth_ + kButtonGap_ + kUtilitySaveAsWidth_ + kButtonGap_
                       + kUtilityInitWidth_
                   <= kComboWidth_);
     static_assert(kSaveAsInitWidth_ + kButtonGap_ + kDeleteInitWidth_ <= kComboWidth_);
+    static_assert(kDefragButtonWidth_ <= kComboWidth_);
 
     TSS::ISkin* skin_;
     float uiScale_ = 1.0f;
@@ -182,7 +183,7 @@ private:
     std::unique_ptr<TSS::Label> deleteWarningLabel_;
     std::unique_ptr<TSS::ComboBox> deleteWarningCombo_;
     std::unique_ptr<TSS::Label> defragHistoryLabel_;
-    std::unique_ptr<TSS::Label> defragHistoryPlaceholder_;
+    std::unique_ptr<TSS::Button> defragHistoryButton_;
 
     std::unique_ptr<TSS::Label> masterSectionLabel_;
     std::unique_ptr<TSS::HorizontalSeparator> masterSectionSeparator_;

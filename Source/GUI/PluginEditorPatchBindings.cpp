@@ -75,19 +75,7 @@ void PluginEditor::setMutatorDefragLimitGateBinding()
             if (! isMessageThread() || safeThis == nullptr)
                 return;
 
-            namespace Dialog = PluginDisplayNames::Dialogs::MutatorHistoryDefrag;
-
-            const int result = showOrderedConfirmAlert({
-                juce::MessageBoxIconType::QuestionIcon,
-                Dialog::kTitle,
-                Dialog::kBody,
-                Dialog::kCancel,
-                Dialog::kConfirm,
-                safeThis.getComponent()
-            });
-
-            if (result == 1 && onConfirmed)
-                onConfirmed();
+            safeThis->openMutatorHistoryDefragConfirmDialog(std::move(onConfirmed));
         });
 }
 

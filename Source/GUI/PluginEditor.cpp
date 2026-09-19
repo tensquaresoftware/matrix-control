@@ -6,6 +6,7 @@
 #include "GUI/Dialogs/BankTransferProgressDialog.h"
 #include "GUI/Dialogs/EpromTypePromptDialog.h"
 #include "GUI/Dialogs/MasterInitConfirmDialog.h"
+#include "GUI/Dialogs/MutatorHistoryDefragConfirmDialog.h"
 #include "GUI/Factories/WidgetFactory.h"
 #include "Core/Audio/StandaloneAudioInputRouter.h"
 #include "GUI/Helpers/EditorialUndoRedoShortcuts.h"
@@ -172,16 +173,16 @@ bool PluginEditor::keyPressed(const juce::KeyPress& key)
 
 bool PluginEditor::isEditorialUndoBlockedByModalOverlay() const
 {
-    if (aboutWindow_ != nullptr && aboutWindow_->isVisible())
-        return true;
-    if (masterInitConfirmDialog_ != nullptr && masterInitConfirmDialog_->isVisible())
-        return true;
-    if (epromTypePromptDialog_ != nullptr && epromTypePromptDialog_->isVisible())
-        return true;
-    if (bankTransferProgressDialog_ != nullptr && bankTransferProgressDialog_->isVisible())
-        return true;
+    const auto visible = [](const auto& component)
+    {
+        return component != nullptr && component->isVisible();
+    };
 
-    return false;
+    return visible(aboutWindow_)
+        || visible(masterInitConfirmDialog_)
+        || visible(mutatorHistoryDefragConfirmDialog_)
+        || visible(epromTypePromptDialog_)
+        || visible(bankTransferProgressDialog_);
 }
 
 bool PluginEditor::isEditorialUndoBlockedByTextFocus() const

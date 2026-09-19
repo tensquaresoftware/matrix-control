@@ -9,6 +9,7 @@
 #include "GUI/Dialogs/BankTransferProgressDialog.h"
 #include "GUI/Dialogs/EpromTypePromptDialog.h"
 #include "GUI/Dialogs/MasterInitConfirmDialog.h"
+#include "GUI/Dialogs/MutatorHistoryDefragConfirmDialog.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/MainComponent.h"
 #include "GUI/Panels/MainComponent/FooterPanel/FooterPanel.h"
@@ -70,18 +71,17 @@ void PluginEditor::updateBankTransferProgressDialogLayout(float uiScale)
 
 bool PluginEditor::isEscapeBlockedByOverlay() const
 {
-    if (settingsWindow_ != nullptr && settingsWindow_->isVisible())
-        return true;
-    if (aboutWindow_ != nullptr && aboutWindow_->isVisible())
-        return true;
-    if (masterInitConfirmDialog_ != nullptr && masterInitConfirmDialog_->isVisible())
-        return true;
-    if (epromTypePromptDialog_ != nullptr && epromTypePromptDialog_->isVisible())
-        return true;
-    if (bankTransferProgressDialog_ != nullptr && bankTransferProgressDialog_->isVisible())
-        return true;
+    const auto visible = [](const auto& component)
+    {
+        return component != nullptr && component->isVisible();
+    };
 
-    return false;
+    return visible(settingsWindow_)
+        || visible(aboutWindow_)
+        || visible(masterInitConfirmDialog_)
+        || visible(mutatorHistoryDefragConfirmDialog_)
+        || visible(epromTypePromptDialog_)
+        || visible(bankTransferProgressDialog_);
 }
 
 SettingsPanel* PluginEditor::getSettingsPanelIfOpen()
@@ -95,6 +95,7 @@ SettingsPanel* PluginEditor::getSettingsPanelIfOpen()
 void PluginEditor::openSettingsWindow()
 {
     closeAboutWindow();
+    closeMutatorHistoryDefragConfirmDialog();
 
     if (settingsWindow_ == nullptr)
     {
@@ -140,6 +141,7 @@ void PluginEditor::closeSettingsWindow()
 void PluginEditor::openAboutWindow()
 {
     closeSettingsWindow();
+    closeMutatorHistoryDefragConfirmDialog();
 
     if (aboutWindow_ == nullptr)
     {

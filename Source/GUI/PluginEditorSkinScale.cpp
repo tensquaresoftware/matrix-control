@@ -8,6 +8,7 @@
 #include "GUI/Dialogs/BankTransferProgressDialog.h"
 #include "GUI/Dialogs/EpromTypePromptDialog.h"
 #include "GUI/Dialogs/MasterInitConfirmDialog.h"
+#include "GUI/Dialogs/MutatorHistoryDefragConfirmDialog.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Panels/MainComponent/HeaderPanel/HeaderPanel.h"
 #include "GUI/Settings/SettingsWindow.h"
@@ -43,6 +44,9 @@ void PluginEditor::updateSkin()
 
     if (masterInitConfirmDialog_ != nullptr)
         masterInitConfirmDialog_->setSkin(*skin_);
+
+    if (mutatorHistoryDefragConfirmDialog_ != nullptr)
+        mutatorHistoryDefragConfirmDialog_->setSkin(*skin_);
 
     if (epromTypePromptDialog_ != nullptr)
         epromTypePromptDialog_->setSkin(*skin_);
@@ -99,20 +103,22 @@ void PluginEditor::syncUiScaleFromEditor()
 
 void PluginEditor::updateOverlayLayoutsForUiScale(float uiScale)
 {
-    if (settingsWindow_ != nullptr && settingsWindow_->isVisible())
-        updateSettingsWindowLayout(uiScale);
+    const auto layoutIfVisible = [uiScale](const auto& component, auto&& update)
+    {
+        if (component != nullptr && component->isVisible())
+            update(uiScale);
+    };
 
-    if (aboutWindow_ != nullptr && aboutWindow_->isVisible())
-        updateAboutWindowLayout(uiScale);
-
-    if (masterInitConfirmDialog_ != nullptr && masterInitConfirmDialog_->isVisible())
-        updateMasterInitConfirmDialogLayout(uiScale);
-
-    if (epromTypePromptDialog_ != nullptr && epromTypePromptDialog_->isVisible())
-        updateEpromTypePromptDialogLayout(uiScale);
-
-    if (bankTransferProgressDialog_ != nullptr && bankTransferProgressDialog_->isVisible())
-        updateBankTransferProgressDialogLayout(uiScale);
+    layoutIfVisible(settingsWindow_, [this](float scale) { updateSettingsWindowLayout(scale); });
+    layoutIfVisible(aboutWindow_, [this](float scale) { updateAboutWindowLayout(scale); });
+    layoutIfVisible(masterInitConfirmDialog_,
+                    [this](float scale) { updateMasterInitConfirmDialogLayout(scale); });
+    layoutIfVisible(mutatorHistoryDefragConfirmDialog_,
+                    [this](float scale) { updateMutatorHistoryDefragConfirmDialogLayout(scale); });
+    layoutIfVisible(epromTypePromptDialog_,
+                    [this](float scale) { updateEpromTypePromptDialogLayout(scale); });
+    layoutIfVisible(bankTransferProgressDialog_,
+                    [this](float scale) { updateBankTransferProgressDialogLayout(scale); });
 }
 
 void PluginEditor::applySkinFromItemId(int skinItemId, bool persistToState)

@@ -164,7 +164,8 @@ namespace PluginDisplayNames
         constexpr const char* kComputerPatchesLabel    = "COMPUTER PATCHES";
         constexpr const char* kUnsavedStateLabel       = "UNSAVED STATE";
         constexpr const char* kDeleteWarningLabel      = "DELETE WARNING";
-        constexpr const char* kDefragHistoryLabel      = "DEFRAG HISTORY";
+        constexpr const char* kDefragHistoryLabel      = "MUTATION HISTORY";
+        constexpr const char* kDefragButton            = "DEFRAG";
         constexpr const char* kInitTemplateLabel       = "INIT TEMPLATE";
         constexpr const char* kUtilityLabel            = "UTILITY";
         constexpr const char* kSaveAsInitButton        = "SAVE AS INIT";
@@ -172,7 +173,6 @@ namespace PluginDisplayNames
         constexpr const char* kLoadButton              = "LOAD";
         constexpr const char* kSaveAsButton            = "SAVE AS";
         constexpr const char* kInitButton              = "INIT";
-        constexpr const char* kComingSoon              = "Coming soon...";
         constexpr const char* kDisplaySysexNames       = "DISPLAY SYSEX NAMES";
         constexpr const char* kDisplayFileNames        = "DISPLAY FILE NAMES";
         constexpr const char* kAskOncePerLoad          = "ASK ONCE PER LOAD";
@@ -227,7 +227,7 @@ namespace PluginDisplayNames
             constexpr const char* kDeleteWarning =
                 "SETTINGS: Chooses when Patch Mutator delete asks for confirmation.";
             constexpr const char* kDefragHistory =
-                "SETTINGS: Coming soon - renumber mutation history when full.";
+                "SETTINGS: Renumber mutation history to free MUTATE and RETRY capacity.";
             constexpr const char* kHardwareLatency =
                 "SETTINGS: Sets host audio latency compensation for this plugin instance.";
             constexpr const char* kEpromType =
@@ -330,7 +330,7 @@ namespace PluginDisplayNames
 
         namespace MutatorHistoryDefrag
         {
-            constexpr const char* kTitle = "Mutation history full";
+            constexpr const char* kTitle = "Defrag mutation history?";
             constexpr const char* kBody =
                 "Defrag will compact mutation history and preserve the current selection. Continue?";
             constexpr const char* kConfirm = "Defrag";
@@ -2054,6 +2054,17 @@ namespace PluginDisplayNames
 
                 // Stem for Export success sticky + FooterPanel path-style middle truncate.
                 constexpr const char* kExportCompleteFooterStem = "PATCH MUTATOR: Exported ";
+
+                inline juce::String formatDefragCompleteFooterMessage(int mutationsUsed,
+                                                                      int mutationsAvailable,
+                                                                      int retriesUsed,
+                                                                      int retriesAvailable)
+                {
+                    return "PATCH MUTATOR: Mutation history renumbered. Mutations: "
+                        + juce::String(mutationsUsed) + " used / " + juce::String(mutationsAvailable)
+                        + " available. Retries: " + juce::String(retriesUsed) + " used / "
+                        + juce::String(retriesAvailable) + " left under them.";
+                }
 
                 constexpr const char* kDeviceDumpFailedFooter =
                     "PATCH MUTATOR: Could not read the patch from the synth. Keeping the current editor buffer. "

@@ -9,6 +9,8 @@
 #include "Core/Services/EpromTypePolicy.h"
 #include "Core/Services/PatchNameDisplayMode.h"
 #include "Core/MIDI/MidiManager.h"
+#include "GUI/Dialogs/MutatorHistoryDefragConfirmDialog.h"
+#include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Settings/SettingsPanel.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
@@ -116,6 +118,7 @@ void PluginEditor::restoreSettingsPanelFromState(SettingsPanel& panel)
         juce::dontSendNotification);
 
     refreshInitTemplateDeleteButtons(panel);
+    panel.refreshDefragHistoryEnablement(pluginProcessor.hasMutationHistory());
 }
 
 void PluginEditor::refreshInitTemplateDeleteButtons(SettingsPanel& panel)
@@ -176,6 +179,17 @@ void PluginEditor::wireSettingsInitAndMasterActions(SettingsPanel& panel)
         openMasterGlobalInitConfirmDialog([this]
         {
             pluginProcessor.initAllMasterModulesFromTemplate();
+        });
+    };
+
+    panel.getDefragHistoryButton().onClick = [this]
+    {
+        if (! pluginProcessor.hasMutationHistory())
+            return;
+
+        openMutatorHistoryDefragConfirmDialog([this]
+        {
+            pluginProcessor.defragMutationHistory();
         });
     };
 
@@ -282,4 +296,50 @@ void PluginEditor::wireSettingsPanel(SettingsPanel& panel)
     wireSettingsEpromAndLatency(panel);
     wireSettingsPolicyCombos(panel);
     wireSettingsInitAndMasterActions(panel);
+}
+
+void PluginEditor::updateMutatorHistoryDefragConfirmDialogLayout(float uiScale)
+{
+    if (mutatorHistoryDefragConfirmDialog_ == nullptr)
+        return;
+
+    mutatorHistoryDefragConfirmDialog_->setUiScale(uiScale);
+    mutatorHistoryDefragConfirmDialog_->setBounds(getLocalBounds());
+}
+
+void PluginEditor::openMutatorHistoryDefragConfirmDialog(std::function<void()> onConfirm)
+{
+    closeSettingsWindow();
+    closeAboutWindow();
+    closeMasterInitConfirmDialog();
+
+    if (mutatorHistoryDefragConfirmDialog_ == nullptr)
+    {
+        mutatorHistoryDefragConfirmDialog_ = std::make_unique<MutatorHistoryDefragConfirmDialog>(
+            *skin_,
+            [this] { closeMutatorHistoryDefragConfirmDialog(); });
+        addChildComponent(*mutatorHistoryDefragConfirmDialog_);
+    }
+    else
+    {
+        mutatorHistoryDefragConfirmDialog_->setSkin(*skin_);
+    }
+
+    mutatorHistoryDefragConfirmDialog_->prepareForShow(std::move(onConfirm));
+
+    const int baseWidth = layoutDimensions_.editor.width;
+    const float uiScale = (baseWidth > 0)
+        ? TSS::ScaledLayout::uiScaleFromEditorBounds(getWidth(), baseWidth)
+        : 1.0f;
+    updateMutatorHistoryDefragConfirmDialogLayout(uiScale);
+
+    mutatorHistoryDefragConfirmDialog_->setVisible(true);
+    mutatorHistoryDefragConfirmDialog_->toFront(true);
+    mutatorHistoryDefragConfirmDialog_->grabKeyboardFocus();
+}
+
+void PluginEditor::closeMutatorHistoryDefragConfirmDialog()
+{
+    if (mutatorHistoryDefragConfirmDialog_ != nullptr)
+        mutatorHistoryDefragConfirmDialog_->setVisible(false);
 }

@@ -1861,3 +1861,12 @@ Original review bullets below remain for history; status for U-10-owned residual
 ## Deferred from: code review of spec-device-setup-cross-project-friction.md (2026-09-18)
 
 - Reconfirmed (already listed under prior Build review of the same spec): concurrent PropertiesFile RMW races; sanitize/clear without machine write-through; no PropertiesFile / production call-site tests; MidiPortRoutingPropertyTests mirror drift.
+
+## Deferred from: review of spec-settings-mutation-history-defrag.md (2026-09-19)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-settings-mutation-history-defrag.md`
+  summary: Sticky-footer inventory still lists the old short Defrag success string instead of formatDefragCompleteFooterMessage.
+  evidence: Documentation inventory drift only; runtime footer is correct via PluginDisplayNames helper.
+- source_spec: `_bmad-output/implementation-artifacts/spec-settings-mutation-history-defrag.md`
+  summary: Sibling note in spec-system-init-syx-filenames.md still claims kComingSoon is owned by the Defrag History placeholder.
+  evidence: Placeholder and kComingSoon are gone from Source; stale artifact cross-note only.

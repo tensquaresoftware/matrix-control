@@ -100,15 +100,16 @@ void SettingsPanel::setupPatchMutatorSection(TSS::ISkin& skin)
     deleteWarningLabel_ = makeLabel(skin, kLabelWidth_, PluginDisplayNames::Settings::kDeleteWarningLabel);
     deleteWarningCombo_ = makeCombo(skin, kComboWidth_);
     defragHistoryLabel_ = makeLabel(skin, kLabelWidth_, PluginDisplayNames::Settings::kDefragHistoryLabel);
-    defragHistoryPlaceholder_ =
-        makeLabel(skin, kComboWidth_, PluginDisplayNames::Settings::kComingSoon);
+    defragHistoryButton_ =
+        makeButton(skin, kDefragButtonWidth_, PluginDisplayNames::Settings::kDefragButton);
+    defragHistoryButton_->setEnabled(false);
 
     addAndMakeVisible(*patchMutatorSectionLabel_);
     addAndMakeVisible(*patchMutatorSectionSeparator_);
     addAndMakeVisible(*deleteWarningLabel_);
     addAndMakeVisible(*deleteWarningCombo_);
     addAndMakeVisible(*defragHistoryLabel_);
-    addAndMakeVisible(*defragHistoryPlaceholder_);
+    addAndMakeVisible(*defragHistoryButton_);
 }
 
 void SettingsPanel::setupMasterSection(TSS::ISkin& skin)
@@ -202,7 +203,7 @@ void SettingsPanel::applyChildLooks(TSS::ISkin& skin)
     deleteWarningLabel_->setLook(labelLook);
     deleteWarningCombo_->setLook(comboLook);
     defragHistoryLabel_->setLook(labelLook);
-    defragHistoryPlaceholder_->setLook(labelLook);
+    defragHistoryButton_->setLook(buttonLook);
 
     masterSectionLabel_->setLook(labelLook);
     masterSectionSeparator_->setLook(separatorLook);

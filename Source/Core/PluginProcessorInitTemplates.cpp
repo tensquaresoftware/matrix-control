@@ -155,3 +155,18 @@ void PluginProcessor::saveMasterToUserFile(const juce::File& file)
         *masterModel_, file, midiManager->getSysExEncoder());
     publishSettingsFooter(apvts, result.infoMessage, ! result.success);
 }
+
+bool PluginProcessor::hasMutationHistory() const
+{
+    return patchMutatorEngine_ != nullptr && patchMutatorEngine_->rootCount() > 0;
+}
+
+void PluginProcessor::defragMutationHistory()
+{
+    if (patchMutatorEngine_ == nullptr)
+        return;
+
+    const auto result = patchMutatorEngine_->defragHistory();
+    if (result.footerMessage.isNotEmpty())
+        publishSettingsFooter(apvts, result.footerMessage, result.footerSeverity == "warning");
+}

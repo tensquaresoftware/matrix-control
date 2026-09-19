@@ -231,10 +231,38 @@ private:
         Core::MutationNaming::applyPatchName(m00, 0);
         expect(harness.store().insertRoot(0, m00, m00Parent));
 
+        auto m05 = makeDistinctBuffer(1163);
+        auto m05Parent = makeDistinctBuffer(1164);
+        Core::MutationNaming::applyPatchName(m05, 5);
+        expect(harness.store().insertRoot(5, m05, m05Parent));
+
+        auto m99 = makeDistinctBuffer(1165);
+        auto m99Parent = makeDistinctBuffer(1166);
+        Core::MutationNaming::applyPatchName(m99, 99);
+        expect(harness.store().insertRoot(99, m99, m99Parent));
+
+        auto r10 = makeDistinctBuffer(1167);
+        Core::MutationNaming::applyPatchName(r10, 0, 10);
+        expect(harness.store().insertRetry(0, 10, r10, m00Parent));
+
+        auto r20 = makeDistinctBuffer(1168);
+        Core::MutationNaming::applyPatchName(r20, 5, 20);
+        expect(harness.store().insertRetry(5, 20, r20, m05Parent));
+
+        for (int i = 0; i < 6; ++i)
+        {
+            auto retry = makeDistinctBuffer(1170 + i);
+            Core::MutationNaming::applyPatchName(retry, 99, i);
+            expect(harness.store().insertRetry(99, i, retry, m99Parent));
+        }
+
         const auto result = harness.engine.defragHistory();
         expect(result.success);
         expectEquals(result.footerSeverity, juce::String("info"));
-        expectEquals(result.footerMessage, juce::String("PATCH MUTATOR: Mutation history renumbered."));
+        expectEquals(result.footerMessage,
+                     juce::String("PATCH MUTATOR: Mutation history renumbered. "
+                                  "Mutations: 3 used / 97 available. "
+                                  "Retries: 8 used / 292 left under them."));
     }
 
 };

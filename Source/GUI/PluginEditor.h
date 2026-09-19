@@ -24,6 +24,7 @@ class SettingsPanel;
 class SettingsWindow;
 class AboutWindow;
 class MasterInitConfirmDialog;
+class MutatorHistoryDefragConfirmDialog;
 class EpromTypePromptDialog;
 class PatchNameDisplayPanel;
 
@@ -172,6 +173,8 @@ private:
     void openMasterInitConfirmDialog(const juce::String& moduleDisplayName, std::function<void()> onConfirm);
     void openMasterGlobalInitConfirmDialog(std::function<void()> onConfirm);
     void closeMasterInitConfirmDialog();
+    void openMutatorHistoryDefragConfirmDialog(std::function<void()> onConfirm);
+    void closeMutatorHistoryDefragConfirmDialog();
     void openEpromTypePromptDialog();
     void closeEpromTypePromptDialog();
     void ensureEpromTypePromptDialog();
@@ -201,6 +204,7 @@ private:
     void updateSettingsWindowLayout(float uiScale);
     void updateAboutWindowLayout(float uiScale);
     void updateMasterInitConfirmDialogLayout(float uiScale);
+    void updateMutatorHistoryDefragConfirmDialogLayout(float uiScale);
     void updateEpromTypePromptDialogLayout(float uiScale);
     void updateBankTransferProgressDialogLayout(float uiScale);
 
@@ -222,6 +226,7 @@ private:
     std::unique_ptr<SettingsWindow> settingsWindow_;
     std::unique_ptr<AboutWindow> aboutWindow_;
     std::unique_ptr<MasterInitConfirmDialog> masterInitConfirmDialog_;
+    std::unique_ptr<MutatorHistoryDefragConfirmDialog> mutatorHistoryDefragConfirmDialog_;
     std::unique_ptr<EpromTypePromptDialog> epromTypePromptDialog_;
     std::unique_ptr<BankTransferProgressDialog> bankTransferProgressDialog_;
     float appliedUiScale_ = 1.0f;

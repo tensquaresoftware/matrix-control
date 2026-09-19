@@ -265,6 +265,10 @@ public:
     void loadMasterFromUserFile(const juce::File& file);
     void saveMasterToUserFile(const juce::File& file);
 
+    // Settings — Patch Mutator mutation-history defrag (message thread).
+    bool hasMutationHistory() const;
+    void defragMutationHistory();
+
     // Unit-test seam — see ComboboxPatchSendDebouncer::flushPendingSynchronouslyForTests().
     void flushMasterEditSysExDebouncerForTests();
 
