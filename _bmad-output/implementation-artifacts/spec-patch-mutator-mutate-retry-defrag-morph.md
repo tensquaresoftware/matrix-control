@@ -18,7 +18,7 @@ context:
 
 **Problem:** When the next Mutation or Retry index cannot be allocated (100 entries or gap exhaustion such as M99/R99 still present), MUTATE/RETRY are greyed out, so the history-full Defrag confirm path is unreachable from those buttons. Auto-popup at M99 interrupts creative flow; Settings DEFRAG alone is not discoverable enough at the moment of blockage. Permanently replacing the button label with DEFRAG would feel like a function change and hide what the control normally does.
 
-**Approach:** When allocation for that action is blocked and no other disable reason applies, keep the resting label MUTATE or RETRY, leave the button enabled, and route click to the existing Defrag confirm → `defragHistory()`. On hover only, temporarily show DEFRAG using the normal red hover text colour. Keep Settings DEFRAG for voluntary tidy-up. Independent per button; no auto-modal on create.
+**Approach:** When allocation for that action is blocked and no other disable reason applies, keep the resting label MUTATE or RETRY, leave the button enabled, and route click to the existing Defrag confirm → `defragHistory()`. On hover only, temporarily show DEFRAG with the default button Look (shipping skins: white/franc hover text; red on click like any other action button). Keep Settings DEFRAG for voluntary tidy-up. Independent per button; no auto-modal on create.
 
 ## Boundaries & Constraints
 
@@ -27,7 +27,7 @@ context:
 - RETRY enters the Defrag-recovery state when next retry index under the **selected root** cannot be allocated **and** selection is a valid mutation root (not INITIAL / empty) **and** Compare is not locking.
 - MUTATE and RETRY recovery states are independent; History selection changes must refresh RETRY immediately.
 - At rest in recovery state: label stays MUTATE or RETRY; button enabled; click opens Defrag confirm (does not stamp Mutate/Retry APVTS actions).
-- On hover in recovery state only: temporary label DEFRAG with normal red hover text (existing button hover colour convention). Leave hover → restore MUTATE/RETRY.
+- On hover in recovery state only: temporary label DEFRAG using the default button Look (no special colour override). Leave hover → restore MUTATE/RETRY.
 - After successful Defrag (or a delete that restores a free index): leave recovery state; normal enable + action wiring resume.
 - Confirm path = same `openMutatorHistoryDefragConfirmDialog` + same copy as Settings / limit gate → same `defragHistory()` / rich success footer.
 - Separate "allocation blocked" from "disabled for other reasons" so recovery stays clickable.
@@ -43,7 +43,7 @@ context:
 
 | Scenario | Input / State | Expected Output / Behavior | Error Handling |
 |----------|--------------|---------------------------|----------------|
-| Root slots full | 100 roots, recipe OK, Compare off | MUTATE enabled, label MUTATE at rest; hover → DEFRAG (red hover text); click → confirm → defrag | Cancel: no store change |
+| Root slots full | 100 roots, recipe OK, Compare off | MUTATE enabled, label MUTATE at rest; hover → DEFRAG (default Look hover colour); click → confirm → defrag | Cancel: no store change |
 | Root gap exhaustion | Only M99 remains after deletes, recipe OK | Same recovery as full (not grey MUTATE) | Same confirm path |
 | Retry full under root | Selected M50 has 100 retries | RETRY in recovery; MUTATE unchanged if roots free | Selection to free root → normal RETRY |
 | Retry gap under root | Selected root has R99 only | RETRY in recovery | After Defrag → normal RETRY when place exists |
@@ -54,7 +54,7 @@ context:
 
 **Decisions:**
 - Keep full draft spec (slightly over token comfort band); single cohesive goal.
-- Look / label: identity + hover — resting MUTATE/RETRY always; DEFRAG only while hovered in recovery; default button Look (no alert fill, no resting red text).
+- Look / label: identity + hover — resting MUTATE/RETRY always; DEFRAG only while hovered in recovery; default button Look (no alert fill, no resting red text). Smoke (2026-09-23): hover DEFRAG paints white/franc; red on click is normal button pressed colour — accepted; do not invent a red-hover-only variant.
 - Product override of prior "no Defrag control on main Patch Mutator panel": recovery reuses MUTATE/RETRY controls only (hover hint + click → confirm), not a third chrome button.
 - No auto-modal at M99; voluntary click only.
 - Recovery click does not stamp Mutate/Retry APVTS actions; opens Defrag confirm directly (Settings-equivalent path).
@@ -67,7 +67,7 @@ context:
 - `Source/Core/Services/PatchMutator/PatchMutatorEngineHistory.cpp` — `refreshActionEnabledMirrors` publishes `kMutateEnabled` / `kRetryEnabled`; extend with recovery/allocation mirrors and refresh after history mutations / selection sync.
 - `Source/Shared/Definitions/PluginIDs.h` — MutatorState property IDs (~692+); add recovery/allocation IDs if needed; strip in `MutatorSessionPersistence` like other ephemeral mirrors.
 - `Source/GUI/Panels/.../PatchMutatorPanel.cpp` / `PatchMutatorPanelHistory.cpp` — `ActionEnabledPropertyListener` + `lockActionButton` Compare override; recovery enable + hover label swap + click → Defrag confirm instead of mutate/retry stamp.
-- `Source/GUI/Widgets/Button.*` — hover/text colour path; reuse existing red hover text for temporary DEFRAG label (no new Look unless button API lacks hover text override).
+- `Source/GUI/Widgets/Button.*` — hover/text colour path; temporary DEFRAG label uses default `buttonLookFromSkin` colours (no override).
 - `Source/GUI/PluginEditor*` / `PluginEditorSettings.cpp` — reuse `openMutatorHistoryDefragConfirmDialog`; wire panel recovery click to same presenter + processor/engine defrag (prefer Settings wrapper for footer consistency).
 - `Source/Shared/Definitions/PluginDisplayNames.h` — reuse Settings `kDefragButton` = `"DEFRAG"` for hover label.
 - `Source/GUI/Looks/LookBuilders.*` — keep `buttonLookFromSkin` only for these controls; do not apply `buttonAlertLookFromSkin`.
@@ -80,7 +80,7 @@ context:
 **Execution:**
 - [x] `Source/Core/Services/PatchMutator/PatchMutatorEngineInternal.h` (+ History refresh) -- Split mutate/retry "other gates" vs "allocation blocked"; publish mirrors -- UI can enable recovery without greying the only click path.
 - [x] `Source/Shared/Definitions/PluginIDs.h` + `MutatorSessionPersistence.*` -- Add ephemeral recovery/allocation property IDs; strip on session persist -- mirrors stay non-persisted.
-- [x] `Source/GUI/Panels/.../PatchMutatorPanel*.*` (+ Button hover if needed) -- Recovery enable, resting MUTATE/RETRY, hover DEFRAG with red hover text, Compare lock, selection refresh; recovery click → Defrag confirm hook -- main UX.
+- [x] `Source/GUI/Panels/.../PatchMutatorPanel*.*` (+ Button hover if needed) -- Recovery enable, resting MUTATE/RETRY, hover DEFRAG with default Look colours, Compare lock, selection refresh; recovery click → Defrag confirm hook -- main UX.
 - [x] `Source/GUI/PluginEditor*.*` -- Bind panel recovery click to shared confirm + `defragMutationHistory` / engine -- one confirm family.
 - [x] `Source/Shared/Definitions/PluginDisplayNames.h` -- Ensure DEFRAG hover label SSOT (reuse Settings string) -- ASCII English.
 - [x] `Tests/Unit/PatchMutatorEngineEnabledResetAdvanceTests.cpp` (+ gap cases if missing) -- Lock enabled vs recovery predicates for full and gap exhaustion; after defrag/delete leave recovery.
@@ -98,8 +98,11 @@ context:
 - `ActionEnabledPropertyListener` ANDs Compare lock so recovery-enabled mirrors cannot re-enable buttons during Compare.
 - Added `PatchMutatorEngineDefragRecoveryEnabledTests` (gap, no-module, delete-leave, selection toggle, INITIAL, independent root-full); advance cases in `PatchMutatorEngineAdvanceTests`; limit Defrag handler confirm in `MutatorActionHandlerDefragTests`.
 - Hover/no-hover GUI label swap is code-path covered (`refreshMutateRetryHoverLabels`); click without hover still opens confirm via `connectMutateOrRetryButton`. Remaining smoke is manual Standalone.
+- Smoke (2026-09-23): recovery hover DEFRAG uses default Look hover text (white/franc on shipping skins), not a dedicated red-hover colour; red appears on click like other buttons — accepted by product.
 
 ## Spec Change Log
+
+- 2026-09-23 — Human renegotiation after smoke: frozen Look wording said "red hover text" for temporary DEFRAG; shipping default Look paints white/franc on hover and red on click. Amended Approach / Always / matrix / Decisions / Code Map / tasks / Design Notes / Verification / Implementation Notes to match accepted behaviour (no code change). Avoids agents inventing a red-hover-only Look later. KEEP: identity + hover DEFRAG label swap; default `buttonLookFromSkin`; no alert fill.
 
 ## Review Triage Log
 
@@ -111,7 +114,7 @@ context:
 | No Compare+recovery button test | low | GUI boundary; Compare lock in `applyEnabled` is real. Deferred; engine gate patch reduces risk. |
 | Contextual help still create/reroll only | false | Frozen intent uses confirm dialog for Defrag meaning without hover; help text change not required. |
 | Silent no-op if recovery handler unset | low | Binding runs after `createUiShell` so handler is set in normal ctor; everyday path fine. Patch: `jassert` on recovery click without handler. |
-| Button/Look not touched for red hover | false | Spec requires reusing existing red hover text; no new Look. |
+| Button/Look not touched for red hover | false | Spec requires default button Look for temporary DEFRAG label (no new Look); post-smoke wording clarifies hover is not dedicated red. |
 | Allocation mirrors unused by production UI | false | Intentional ephemeral mirrors for predicates/tests; recovery flags drive UI. |
 | Sticky hover after dialog dismiss | low | Cosmetic; label refreshes on next mouse enter/exit. Unlikely everyday fuss; reject (not a trivial unique patch worth complexity). |
 | Defrag handler tests duplicate harness / no retry limit twin | low | Refactor hygiene; not user-facing. Reject. |
@@ -129,7 +132,7 @@ context:
 
 Today `computeMutateEnabled` requires `peekNextRootIndex`, so greying blocks the only UI path that used to raise the limit modal. Recovery needs a distinct predicate: allocation blocked **and** other gates pass → enabled + Defrag-on-click + hover DEFRAG; allocation blocked **and** other gates fail → MUTATE/RETRY disabled (no recovery). Prefer publishing explicit recovery/allocation mirrors over overloading a single bool.
 
-Hover DEFRAG is progressive disclosure for mouse users; the confirm dialog remains the contract for click-without-hover (touch/keyboard). Limit-gate `defragModalRequested` after a live mutate/retry remains valid for tests/programmatic calls.
+Hover DEFRAG is progressive disclosure for mouse users (default Look colours — white/franc hover, red on click in shipping skins); the confirm dialog remains the contract for click-without-hover (touch/keyboard). Limit-gate `defragModalRequested` after a live mutate/retry remains valid for tests/programmatic calls.
 
 ## Verification
 
@@ -139,6 +142,25 @@ Hover DEFRAG is progressive disclosure for mouse users; the confirm dialog remai
 - `python3 Scripts/quality/lint_touched.py` -- expected: clean on touched C++
 
 **Manual checks:**
-- Fill or gap-exhaust roots → MUTATE enabled with MUTATE at rest; hover shows DEFRAG in red; cancel confirm leaves history; confirm renumbers and restores normal MUTATE when room exists.
+- Fill or gap-exhaust roots → MUTATE enabled with MUTATE at rest; hover shows DEFRAG with default Look hover colour (white/franc); cancel confirm leaves history; confirm renumbers and restores normal MUTATE when room exists.
 - Fill retries under one root; switch selection to a free root → RETRY leaves recovery; switch back → recovery again.
 - Settings DEFRAG still works with empty-history disable and same confirm.
+
+### Review Findings
+
+- [x] [Review][Patch] Compare enter/exit never refresh recovery mirrors — call `refreshActionEnabledMirrors` (or sync) from `enterCompareMode` / `exitCompareMode`, and add a Core unit test that Compare on clears recovery then Compare off restores it when allocation is still blocked [`PatchMutatorEngineActions.cpp:146-197`]
+- [x] [Review][Defer] Panel recovery click → Defrag confirm untested — deferred: already recorded 2026-09-23 (Core unit style; Standalone smoke)
+- [x] [Review][Defer] Compare lock at MUTATE/RETRY buttons untested — deferred: already recorded 2026-09-23 (GUI boundary)
+
+#### Rejected
+
+- Blind: frozen "red hover" unmet in code — false: post-smoke product accepted default Look (white/franc hover); uncommitted spec amendment matches; inventing red-hover Look is out of scope
+- Blind: Code Map still present-tense on done spec — rejected: fix would edit the spec under review
+- Blind: `EnabledResetAdvanceTests` name after advance extract — low: discovery hygiene only; rename not worth a review patch
+- Blind: Compare disable applied in three places without ownership note — false: UI AND + lock remain intentional; everyday click/hover still grey during Compare
+- Blind: no test for modules-off while already in recovery — low: same predicate as existing no-module case; transition not everyday-critical
+- Blind: allocation-blocked mirrors unused by production GUI — false: intentional ephemeral mirrors for predicates/tests (prior triage)
+- Blind: panel recovery bypasses `MutatorActionHandler` / `defragModalRequested` — false: frozen intent opens shared confirm directly without stamping Mutate/Retry
+- Blind: hover label `callAsync` / Compare ordering fragility — low: speculative; unlikely everyday fuss; not a trivial unique patch
+- Blind: handler Defrag tests only cover limit-gate — false: accurate observation, not a defect of the morph path (limit-gate remains valid)
+- Blind + prior: GUI recovery click / Compare button coverage while spec `done` — deferred (see above), not re-opened as patch

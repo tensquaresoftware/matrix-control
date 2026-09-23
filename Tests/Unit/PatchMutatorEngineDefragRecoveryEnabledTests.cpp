@@ -19,6 +19,7 @@ public:
         enabled_retryRecovery_togglesWithHistorySelection();
         enabled_retryFull_initialSelected_noRecovery();
         enabled_rootLimit_retryStillNormal();
+        enabled_compareToggle_clearsAndRestoresRecovery();
     }
 
 private:
@@ -230,6 +231,40 @@ private:
             .clear = true,
             .mutateAllocationBlocked = true,
             .mutateDefragRecovery = true });
+    }
+
+    void enabled_compareToggle_clearsAndRestoresRecovery()
+    {
+        beginTest("enabled_compareToggle_clearsAndRestoresRecovery");
+
+        EngineHarness harness;
+        harness.setRecipe(100, 100, true);
+
+        harness.store().setInitialSnapshot(makeDistinctBuffer(3000));
+
+        auto m99 = makeDistinctBuffer(3001);
+        auto m99Parent = makeDistinctBuffer(3002);
+        Core::MutationNaming::applyPatchName(m99, 99);
+        expect(harness.store().insertRoot(99, m99, m99Parent));
+
+        harness.engine.setAuditionSelection(99, Core::MutationHistoryStore::kRootOnly);
+        harness.engine.syncHistoryUiProperties(harness.proc.apvts);
+        expect(static_cast<bool>(
+            harness.proc.apvts.state.getProperty(MutatorState::kMutateDefragRecovery, false)));
+
+        expect(harness.engine.toggleCompare().success);
+        expect(static_cast<bool>(harness.proc.apvts.state.getProperty(MutatorState::kCompareActive, false)));
+        expect(! static_cast<bool>(
+            harness.proc.apvts.state.getProperty(MutatorState::kMutateDefragRecovery, false)));
+
+        harness.engine.refreshActionEnabledMirrors(harness.proc.apvts);
+        expect(! static_cast<bool>(
+            harness.proc.apvts.state.getProperty(MutatorState::kMutateDefragRecovery, false)));
+
+        expect(harness.engine.toggleCompare().success);
+        expect(! static_cast<bool>(harness.proc.apvts.state.getProperty(MutatorState::kCompareActive, false)));
+        expect(static_cast<bool>(
+            harness.proc.apvts.state.getProperty(MutatorState::kMutateDefragRecovery, false)));
     }
 };
 

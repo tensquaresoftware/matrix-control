@@ -160,6 +160,8 @@ MutatorActionResult PatchMutatorEngine::exitCompareMode()
         pushResultToEditorAndSynth(auditionModel);
 
     clearCompareLockedFooterIfPresent(apvts_);
+    // Republish action mirrors so Defrag-recovery flags clear/restore with Compare.
+    refreshActionEnabledMirrors(apvts_);
     return makeSuccessResult();
 }
 
@@ -189,6 +191,9 @@ MutatorActionResult PatchMutatorEngine::enterCompareMode()
     const PatchModel initialSnapshot = historyStore_.getInitialSnapshot();
     if (candidateDiffersFromLive(initialSnapshot))
         pushResultToEditorAndSynth(initialSnapshot);
+
+    // Clear Defrag-recovery mirrors while Compare locks MUTATE/RETRY.
+    refreshActionEnabledMirrors(apvts_);
 
     MutatorActionResult result = makeSuccessResult();
     result.footerMessage = CompareMessages::kCompareLockedFooter;
