@@ -1888,3 +1888,9 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-input-gain-zero-db-text-entry.md`
   summary: Convert remaining positional SliderConfig aggregates (TestSliders, Settings hardware latency) to designated initializers after parseValue/allowedEditCharacters.
   evidence: Missing-field compiler warnings only; runtime defaults the new fields to empty/null.
+
+## Deferred from: code review of spec-input-gain-zero-db-text-entry.md (2026-09-23)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-input-gain-zero-db-text-entry.md`
+  summary: No automated test that HeaderPanel constructs INPUT GAIN with makeInputGainSliderConfig (production wiring).
+  evidence: SliderValueEntry covers the factory directly; HeaderPanel construction is outside that harness style. Reverting HeaderPanel to format-only would revive the bug in UI while unit tests stay green.

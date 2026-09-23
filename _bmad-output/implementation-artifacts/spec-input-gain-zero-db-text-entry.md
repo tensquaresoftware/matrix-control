@@ -40,3 +40,27 @@ context: []
 - Bare `inf` treated as silence — patch — silence tokens limited to `-inf` / `-∞`.
 - No direct helper unit tests — reject low — SliderValueEntry harness covers the shipped grammar.
 - Spec still in-progress while code landed — false — finalized to done in this pass.
+
+## Review Findings
+
+### Code review 2026-09-23 (`0080f245`)
+
+- [x] [Review][Patch] Assert INPUT GAIN editor allow-list after openValueEditor — `setText` bypasses `setInputRestrictions`; without assertion the allow-list can regress while parse tests stay green. [Tests/Unit/SliderValueEntryTests.cpp] — applied: insertTextAtCaret probe for allowed sample + reject `@`.
+- [x] [Review][Patch] Assert bare `inf` / `INF` keep previous value (not silence) — silence tokens are limited to `-inf` / `-∞` but no commit test locks the rejection. [Tests/Unit/SliderValueEntryTests.cpp] — applied: `testInputGainBareInfKeepsPreviousValue`.
+- [x] [Review][Defer] HeaderPanel production wiring of `makeInputGainSliderConfig` untested — deferred: constructing HeaderPanel is outside SliderValueEntry harness style; factory SSOT already covered by unit tests.
+- [x] [Review][Defer] Couple `formatValue` with `parseValue` at Slider level — deferred: pre-existing intentional opt-in; already logged in deferred-work.md; only INPUT GAIN uses formatValue today and pairs parseValue.
+- [x] [Review][Defer] Convert remaining positional `SliderConfig` aggregates — deferred: already logged in deferred-work.md; not caused by this bugfix beyond the new optional fields.
+
+### Rejected (code review 2026-09-23)
+
+- Blind: missing test for painted `"-∞ dB"` paste — low; editor opens empty; suffix strip already maps that string to silence; not everyday typing.
+- Blind: snap cliffs for free dB typing undocumented — reject low (prior triage); behavior lives in `PluginAudioConstants::snapInputGainDb`, silent decision already recorded.
+- Blind: fractional dB vs integer display — low; discrete index snap is intentional; expanding this bugfix not worth it.
+- Blind: `parseValue` without `allowedEditCharacters` keeps default digit set — low/defer-adjacent; only INPUT GAIN uses parseValue and pairs the allow-list today.
+- Blind: Unicode minus (U+2212) rejected — low; unlikely everyday; silence grammar is ASCII `-` + token.
+- Blind: no canary test that formatValue-only still mismatches units — covered by existing format/parse coupling defer.
+- Blind: missing typed variants (`0.0`, `0dB`, whitespace, case) — low; core happy paths covered; grammar already accepts several of these.
+- Blind: bundled assertions in one test case — low; cosmetic isolation, not a product defect.
+- Blind: `review_loop_iteration: 0` vs triage log — reject; fix would edit the spec under review.
+- Blind: `InputGainSliderText.h` includes full `Slider.h` — low; acceptable for factory returning `SliderConfig`; no everyday harm.
+- Acceptance: Approach text broader than opt-in `parseValue` — reject-as-actionable-here / already deferred coupling; frozen Approach is aspirational future-proofing, not a ship blocker for this bugfix.

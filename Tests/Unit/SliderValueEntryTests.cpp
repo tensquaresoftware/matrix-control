@@ -35,6 +35,8 @@ public:
         testInputGainTypedNegativeDb();
         testInputGainTypedPlusBoostAndInfinityGlyph();
         testInputGainIllegalEnterKeepsPreviousValue();
+        testInputGainEditorAllowListAcceptsSilenceAndUnitCharacters();
+        testInputGainBareInfKeepsPreviousValue();
     }
 
 private:
@@ -412,6 +414,48 @@ private:
         expect(! slider.isValueEditorOpen());
         expectEquals(slider.getValue(),
                      static_cast<double>(PluginAudioConstants::kInputGainDefaultIndex));
+    }
+
+    void testInputGainEditorAllowListAcceptsSilenceAndUnitCharacters()
+    {
+        beginTest("INPUT GAIN editor allow-list accepts silence and unit characters");
+
+        TSS::Slider slider(100, 20, makeTestSliderLook(), TSS::makeInputGainSliderConfig());
+        openValueEditor(slider);
+
+        auto* editor = valueEditorOf(slider);
+        expect(editor != nullptr);
+
+        // insertTextAtCaret respects setInputRestrictions; setText does not.
+        const auto infinityGlyph = juce::String::charToString(static_cast<juce::juce_wchar>(0x221E));
+        const auto allowedSample = juce::String("+6 dB-inf") + infinityGlyph;
+        editor->insertTextAtCaret(allowedSample);
+        expectEquals(editor->getText(), allowedSample);
+
+        editor->clear();
+        editor->insertTextAtCaret("@");
+        expectEquals(editor->getText(), juce::String());
+    }
+
+    void testInputGainBareInfKeepsPreviousValue()
+    {
+        beginTest("INPUT GAIN bare inf keeps previous value and closes editor");
+
+        const auto previous =
+            static_cast<double>(PluginAudioConstants::kInputGainDefaultIndex);
+
+        TSS::Slider slider(100, 20, makeTestSliderLook(), TSS::makeInputGainSliderConfig());
+        slider.setValue(previous, juce::dontSendNotification);
+
+        openValueEditor(slider);
+        commitEditorText(slider, "inf");
+        expect(! slider.isValueEditorOpen());
+        expectEquals(slider.getValue(), previous);
+
+        openValueEditor(slider);
+        commitEditorText(slider, "INF");
+        expect(! slider.isValueEditorOpen());
+        expectEquals(slider.getValue(), previous);
     }
 };
 
