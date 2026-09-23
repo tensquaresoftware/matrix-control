@@ -1879,3 +1879,12 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-patch-mutator-mutate-retry-defrag-morph.md`
   summary: No automated test that Compare keeps MUTATE/RETRY disabled (no hover DEFRAG / no Defrag click) while recovery mirrors would otherwise be true.
   evidence: Compare lock is GUI-only via ActionEnabledPropertyListener; engine now clears recovery mirrors when Compare is active. Panel harness out of this chantier's test style.
+
+## Deferred from: review of spec-input-gain-zero-db-text-entry.md (2026-09-23)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-input-gain-zero-db-text-entry.md`
+  summary: Coupler formatValue with parseValue so a custom display formatter cannot ship without a matching typed-text parser.
+  evidence: Today only INPUT GAIN uses formatValue and it pairs parseValue; future formatters could revive the unit mismatch without a Slider-level guard.
+- source_spec: `_bmad-output/implementation-artifacts/spec-input-gain-zero-db-text-entry.md`
+  summary: Convert remaining positional SliderConfig aggregates (TestSliders, Settings hardware latency) to designated initializers after parseValue/allowedEditCharacters.
+  evidence: Missing-field compiler warnings only; runtime defaults the new fields to empty/null.

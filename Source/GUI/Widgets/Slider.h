@@ -18,6 +18,10 @@ namespace TSS
         juce::String minimumDisplayText;
         std::function<float(double)> normalizedFill;
         std::function<juce::String(double)> formatValue;
+        // When set, typed editor text is converted by this callback instead of raw numeric parse.
+        std::function<bool(const juce::String&, double&)> parseValue;
+        // Extra / override allow-list when parseValue is set (empty = digits, '-', '.' only).
+        juce::String allowedEditCharacters;
     };
 
     /** Linear bar slider. Width and height are design dimensions; \p look carries full widget styling
@@ -73,6 +77,8 @@ namespace TSS
         juce::String minimumDisplayText_;
         std::function<float(double)> normalizedFill_;
         std::function<juce::String(double)> formatValue_;
+        std::function<bool(const juce::String&, double&)> parseValue_;
+        juce::String allowedEditCharacters_;
         bool hasFocus_ = false;
         bool editCaretOn_ = true;
         std::unique_ptr<juce::Slider::ScopedDragNotification> dragNotification_;

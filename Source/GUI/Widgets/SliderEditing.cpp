@@ -83,6 +83,9 @@ namespace TSS
 
     juce::String Slider::editorAllowedCharacters() const
     {
+        if (parseValue_ != nullptr && allowedEditCharacters_.isNotEmpty())
+            return allowedEditCharacters_;
+
         juce::String allowed("0123456789");
 
         if (getMinimum() < 0.0)
@@ -269,8 +272,10 @@ namespace TSS
 
         const auto text = editor_->getText();
         double parsedValue = 0.0;
+        const bool parsed = parseValue_ != nullptr ? parseValue_(text, parsedValue)
+                                                   : tryParseEditText(text, parsedValue);
 
-        if (! tryParseEditText(text, parsedValue))
+        if (! parsed)
         {
             hideValueEditor();
             return;

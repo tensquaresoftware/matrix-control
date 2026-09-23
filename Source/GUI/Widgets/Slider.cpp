@@ -18,6 +18,8 @@ namespace TSS
         , minimumDisplayText_(config.minimumDisplayText)
         , normalizedFill_(std::move(config.normalizedFill))
         , formatValue_(std::move(config.formatValue))
+        , parseValue_(std::move(config.parseValue))
+        , allowedEditCharacters_(config.allowedEditCharacters)
     {
         setOpaque(false);
         setSize(width_, height_);

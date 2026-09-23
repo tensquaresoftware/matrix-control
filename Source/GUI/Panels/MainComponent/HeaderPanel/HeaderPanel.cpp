@@ -10,29 +10,11 @@
 #include "GUI/Skins/Skin.h"
 #include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Looks/LookBuilders.h"
+#include "GUI/Helpers/InputGainSliderText.h"
 #include "Shared/Definitions/PluginAudioConstants.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 
 using TSS::SkinColourId;
-
-namespace
-{
-    float inputGainNormalizedFill(double value)
-    {
-        return PluginAudioConstants::inputGainIndexToNormalizedFill(static_cast<int>(std::round(value)));
-    }
-
-    juce::String inputGainFormatValue(double value)
-    {
-        const int index = static_cast<int>(std::round(value));
-
-        if (index <= PluginAudioConstants::kInputGainSilenceIndex)
-            return "-" + juce::String::charToString(static_cast<juce::juce_wchar>(0x221E)) + " dB";
-
-        const auto db = PluginAudioConstants::inputGainIndexToDb(index);
-        return juce::String(static_cast<int>(std::round(db))) + " dB";
-    }
-}
 
 namespace
 {
@@ -73,15 +55,7 @@ HeaderPanel::HeaderPanel(TSS::ISkin& skin, const HeaderPanelDimensions& dimensio
     , audioFromComboBox_(dimensions.portComboBoxWidth, dimensions.controlHeight, TSS::comboBoxLookFromSkin(skin), TSS::ComboBox::Style::ButtonLike)
     , inputGainLabel_(dimensions.inputGainLabelWidth, dimensions.controlHeight, TSS::darkPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kInputGainLabel)
     , inputGainSlider_(dimensions.inputGainSliderWidth, dimensions.controlHeight, TSS::sliderLookFromSkin(skin),
-                       TSS::SliderConfig{
-                           static_cast<double>(PluginAudioConstants::kInputGainSilenceIndex),
-                           static_cast<double>(PluginAudioConstants::kInputGainMaxIndex),
-                           static_cast<double>(PluginAudioConstants::kInputGainDefaultIndex),
-                           1.0,
-                           {},
-                           {},
-                           inputGainNormalizedFill,
-                           inputGainFormatValue})
+                       TSS::makeInputGainSliderConfig())
     , peakIndicator_(dimensions.peakIndicatorWidth, dimensions.controlHeight)
     , undoButton_(dimensions.undoButtonWidth,
                    dimensions.controlHeight,

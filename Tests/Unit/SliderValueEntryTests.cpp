@@ -1,5 +1,8 @@
 #include "SliderValueEntryTestSupport.h"
 
+#include "GUI/Helpers/InputGainSliderText.h"
+#include "Shared/Definitions/PluginAudioConstants.h"
+
 namespace
 {
 
@@ -27,6 +30,11 @@ public:
         testBipolarEnterCommitsNegativeValue();
         testCommandDoubleClickResetsWithoutOpeningEditor();
         testFractionalStepEnterCommitsDecimalValue();
+        testInputGainTypedZeroCommitsZeroDb();
+        testInputGainTypedSilenceAndDbSuffix();
+        testInputGainTypedNegativeDb();
+        testInputGainTypedPlusBoostAndInfinityGlyph();
+        testInputGainIllegalEnterKeepsPreviousValue();
     }
 
 private:
@@ -320,6 +328,90 @@ private:
 
         expect(! slider.isValueEditorOpen());
         expectEquals(slider.getValue(), 12.3);
+    }
+
+    void testInputGainTypedZeroCommitsZeroDb()
+    {
+        beginTest("INPUT GAIN typed 0 commits 0 dB index, not silence");
+
+        TSS::Slider slider(100, 20, makeTestSliderLook(), TSS::makeInputGainSliderConfig());
+        slider.setValue(static_cast<double>(PluginAudioConstants::kInputGainMaxIndex),
+                        juce::dontSendNotification);
+        openValueEditor(slider);
+
+        commitEditorText(slider, "0");
+
+        expect(! slider.isValueEditorOpen());
+        expectEquals(slider.getValue(),
+                     static_cast<double>(PluginAudioConstants::kInputGainDefaultIndex));
+    }
+
+    void testInputGainTypedSilenceAndDbSuffix()
+    {
+        beginTest("INPUT GAIN typed -inf and 0 dB map to silence and zero");
+
+        TSS::Slider slider(100, 20, makeTestSliderLook(), TSS::makeInputGainSliderConfig());
+        slider.setValue(static_cast<double>(PluginAudioConstants::kInputGainDefaultIndex),
+                        juce::dontSendNotification);
+        openValueEditor(slider);
+        commitEditorText(slider, "-inf");
+        expectEquals(slider.getValue(),
+                     static_cast<double>(PluginAudioConstants::kInputGainSilenceIndex));
+
+        openValueEditor(slider);
+        commitEditorText(slider, "0 dB");
+        expectEquals(slider.getValue(),
+                     static_cast<double>(PluginAudioConstants::kInputGainDefaultIndex));
+    }
+
+    void testInputGainTypedNegativeDb()
+    {
+        beginTest("INPUT GAIN typed negative dB commits the matching index");
+
+        TSS::Slider slider(100, 20, makeTestSliderLook(), TSS::makeInputGainSliderConfig());
+        slider.setValue(static_cast<double>(PluginAudioConstants::kInputGainDefaultIndex),
+                        juce::dontSendNotification);
+        openValueEditor(slider);
+
+        commitEditorText(slider, "-12");
+
+        expect(! slider.isValueEditorOpen());
+        expectEquals(slider.getValue(),
+                     static_cast<double>(PluginAudioConstants::inputGainDbToIndex(-12.0f)));
+    }
+
+    void testInputGainTypedPlusBoostAndInfinityGlyph()
+    {
+        beginTest("INPUT GAIN typed +boost and -infinity glyph commit correctly");
+
+        TSS::Slider slider(100, 20, makeTestSliderLook(), TSS::makeInputGainSliderConfig());
+        slider.setValue(static_cast<double>(PluginAudioConstants::kInputGainSilenceIndex),
+                        juce::dontSendNotification);
+        openValueEditor(slider);
+        commitEditorText(slider, "+6");
+        expectEquals(slider.getValue(),
+                     static_cast<double>(PluginAudioConstants::inputGainDbToIndex(6.0f)));
+
+        const auto infinityGlyph = juce::String::charToString(static_cast<juce::juce_wchar>(0x221E));
+        openValueEditor(slider);
+        commitEditorText(slider, "-" + infinityGlyph);
+        expectEquals(slider.getValue(),
+                     static_cast<double>(PluginAudioConstants::kInputGainSilenceIndex));
+    }
+
+    void testInputGainIllegalEnterKeepsPreviousValue()
+    {
+        beginTest("INPUT GAIN illegal Enter keeps previous value and closes editor");
+
+        TSS::Slider slider(100, 20, makeTestSliderLook(), TSS::makeInputGainSliderConfig());
+        slider.setValue(static_cast<double>(PluginAudioConstants::kInputGainDefaultIndex),
+                        juce::dontSendNotification);
+        openValueEditor(slider);
+        commitEditorText(slider, "1.2.3");
+
+        expect(! slider.isValueEditorOpen());
+        expectEquals(slider.getValue(),
+                     static_cast<double>(PluginAudioConstants::kInputGainDefaultIndex));
     }
 };
 
