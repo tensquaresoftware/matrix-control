@@ -71,17 +71,10 @@ void PluginEditor::updateBankTransferProgressDialogLayout(float uiScale)
 
 bool PluginEditor::isEscapeBlockedByOverlay() const
 {
-    const auto visible = [](const auto& component)
-    {
-        return component != nullptr && component->isVisible();
-    };
-
-    return visible(settingsWindow_)
-        || visible(aboutWindow_)
-        || visible(masterInitConfirmDialog_)
-        || visible(mutatorHistoryDefragConfirmDialog_)
-        || visible(epromTypePromptDialog_)
-        || visible(bankTransferProgressDialog_);
+    const auto visible = [](const auto& c) { return c != nullptr && c->isVisible(); };
+    return visible(settingsWindow_) || visible(aboutWindow_)
+        || visible(masterInitConfirmDialog_) || visible(mutatorHistoryDefragConfirmDialog_)
+        || visible(epromTypePromptDialog_) || visible(bankTransferProgressDialog_);
 }
 
 SettingsPanel* PluginEditor::getSettingsPanelIfOpen()
