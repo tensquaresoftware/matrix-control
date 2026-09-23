@@ -334,13 +334,26 @@ void PatchMutatorEngine::refreshActionEnabledMirrors(juce::AudioProcessorValueTr
 
     const auto recipe = buildRecipeFromApvts();
     auto& state = apvts.state;
+    const bool compareActive = readBoolProperty(state, MutatorState::kCompareActive, false);
     state.setProperty(MutatorState::kMutateEnabled,
                       computeMutateEnabled(historyStore_, recipe),
+                      nullptr);
+    state.setProperty(MutatorState::kMutateAllocationBlocked,
+                      computeMutateAllocationBlocked(historyStore_),
+                      nullptr);
+    state.setProperty(MutatorState::kMutateDefragRecovery,
+                      ! compareActive && computeMutateDefragRecovery(historyStore_, recipe),
                       nullptr);
     // INITIAL is the origin, not a history entry: RETRY / DELETE have nothing to act on.
     const int selectedEntryRootIndex = initialSelected_ ? -1 : selectedRootIndex_;
     state.setProperty(MutatorState::kRetryEnabled,
                       computeRetryEnabled(historyStore_, selectedEntryRootIndex),
+                      nullptr);
+    state.setProperty(MutatorState::kRetryAllocationBlocked,
+                      computeRetryAllocationBlocked(historyStore_, selectedEntryRootIndex),
+                      nullptr);
+    state.setProperty(MutatorState::kRetryDefragRecovery,
+                      ! compareActive && computeRetryDefragRecovery(historyStore_, selectedEntryRootIndex),
                       nullptr);
     state.setProperty(MutatorState::kExportEnabled, computeExportEnabled(historyStore_), nullptr);
     state.setProperty(MutatorState::kDeleteEnabled,

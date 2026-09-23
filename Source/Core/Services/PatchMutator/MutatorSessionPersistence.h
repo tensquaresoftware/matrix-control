@@ -129,6 +129,10 @@ namespace Core::MutatorSessionPersistence
         state.removeProperty(S::kExportEnabled, nullptr);
         state.removeProperty(S::kDeleteEnabled, nullptr);
         state.removeProperty(S::kClearEnabled, nullptr);
+        state.removeProperty(S::kMutateAllocationBlocked, nullptr);
+        state.removeProperty(S::kRetryAllocationBlocked, nullptr);
+        state.removeProperty(S::kMutateDefragRecovery, nullptr);
+        state.removeProperty(S::kRetryDefragRecovery, nullptr);
         // Patch name is session-ephemeral (D-010: no claimed loaded patch across sessions).
         state.removeProperty(PluginIDs::PatchEditSection::PatchNameModule::kPatchName, nullptr);
     }
@@ -161,5 +165,9 @@ namespace Core::MutatorSessionPersistence
         state.setProperty(S::kExportEnabled, false, nullptr);
         state.setProperty(S::kDeleteEnabled, false, nullptr);
         state.setProperty(S::kClearEnabled, false, nullptr);
+        state.setProperty(S::kMutateAllocationBlocked, false, nullptr);
+        state.setProperty(S::kRetryAllocationBlocked, false, nullptr);
+        state.setProperty(S::kMutateDefragRecovery, false, nullptr);
+        state.setProperty(S::kRetryDefragRecovery, false, nullptr);
     }
 } // namespace Core::MutatorSessionPersistence

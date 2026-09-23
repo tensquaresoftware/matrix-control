@@ -38,9 +38,12 @@ public:
             if (property.toString() != binding.propertyId || binding.button == nullptr)
                 continue;
 
-            binding.button->setEnabled(static_cast<bool>(
-                treeWhosePropertyHasChanged.getProperty(property, false)));
+            applyEnabled(binding.button,
+                         static_cast<bool>(treeWhosePropertyHasChanged.getProperty(property, false)));
         }
+
+        if (property.toString() == MutatorState::kCompareActive)
+            syncFromState();
     }
 
     void valueTreeChildAdded(juce::ValueTree&, juce::ValueTree&) override {}
@@ -53,6 +56,13 @@ public:
     }
 
 private:
+    void applyEnabled(TSS::Button* button, bool mirrorEnabled)
+    {
+        const bool compareActive = static_cast<bool>(
+            state_.getProperty(MutatorState::kCompareActive, false));
+        button->setEnabled(! compareActive && mirrorEnabled);
+    }
+
     void syncFromState()
     {
         for (const auto& binding : bindings_)
@@ -60,13 +70,35 @@ private:
             if (binding.button == nullptr)
                 continue;
 
-            binding.button->setEnabled(static_cast<bool>(
-                state_.getProperty(binding.propertyId, false)));
+            applyEnabled(binding.button,
+                         static_cast<bool>(state_.getProperty(binding.propertyId, false)));
         }
     }
 
     juce::ValueTree state_;
     std::vector<ActionEnabledBinding> bindings_;
+};
+
+class PatchMutatorPanel::DefragRecoveryHoverListener : public juce::MouseListener
+{
+public:
+    explicit DefragRecoveryHoverListener(PatchMutatorPanel& owner)
+        : owner_(owner)
+    {
+    }
+
+    void mouseEnter(const juce::MouseEvent&) override
+    {
+        owner_.refreshMutateRetryHoverLabels();
+    }
+
+    void mouseExit(const juce::MouseEvent&) override
+    {
+        owner_.refreshMutateRetryHoverLabels();
+    }
+
+private:
+    PatchMutatorPanel& owner_;
 };
 
 // Direct parameter listener — fires on UI edits and pushChoiceToApvts, independent of APVTS ValueTree flush.
@@ -115,6 +147,9 @@ PatchMutatorPanel::PatchMutatorPanel(TSS::ISkin& skin,
             { MutatorState::kDeleteEnabled, deleteButton_.get() },
             { MutatorState::kClearEnabled, clearButton_.get() } });
 
+    defragRecoveryHoverListener_ = std::make_unique<DefragRecoveryHoverListener>(*this);
+    bindDefragRecoveryHoverListeners();
+
     waveSelectParameterListener_ = std::make_unique<WaveSelectParameterListener>(*this);
     bindWaveSelectPitchListeners();
 
@@ -132,6 +167,7 @@ PatchMutatorPanel::PatchMutatorPanel(TSS::ISkin& skin,
 PatchMutatorPanel::~PatchMutatorPanel()
 {
     stopTimer();
+    unbindDefragRecoveryHoverListeners();
     unbindWaveSelectPitchListeners();
     apvts_.state.removeListener(this);
 }
@@ -160,6 +196,17 @@ void PatchMutatorPanel::valueTreePropertyChanged(juce::ValueTree&,
 
     if (isCompareUiRefreshProperty(name))
         refreshCompareUiState();
+
+    if (name == MutatorState::kMutateDefragRecovery || name == MutatorState::kRetryDefragRecovery
+        || name == MutatorState::kMutateEnabled || name == MutatorState::kRetryEnabled)
+    {
+        // Enable mirrors may apply in another ValueTree listener first — refresh on next turn.
+        juce::MessageManager::callAsync([safeThis = juce::Component::SafePointer<PatchMutatorPanel>(this)]
+        {
+            if (safeThis != nullptr)
+                safeThis->refreshMutateRetryHoverLabels();
+        });
+    }
 
     if (name == MutatorWidgets::kEnableDco1 || name == MutatorWidgets::kEnableDco2)
         refreshPitchControlEnabled();
@@ -361,27 +408,55 @@ void PatchMutatorPanel::timerCallback()
     }
 }
 
-void PatchMutatorPanel::connectButtonToApvts(TSS::Button* button, const char* widgetId)
+bool PatchMutatorPanel::isDefragRecoveryActive(const char* recoveryPropertyId) const
 {
-    if (button == nullptr)
-        return;
-
-    button->onClick = [this, widgetId]
-    {
-        apvts_.state.setProperty(widgetId, juce::Time::getCurrentTime().toMilliseconds(), nullptr);
-    };
+    return static_cast<bool>(apvts_.state.getProperty(recoveryPropertyId, false));
 }
 
-void PatchMutatorPanel::connectToggleToApvts(TSS::Toggle* toggle, const char* widgetId)
+void PatchMutatorPanel::bindDefragRecoveryHoverListeners()
 {
-    if (toggle == nullptr)
+    if (defragRecoveryHoverListener_ == nullptr)
         return;
 
-    toggle->onStateChange = [this, toggle, widgetId]
+    if (mutateButton_ != nullptr)
+        mutateButton_->addMouseListener(defragRecoveryHoverListener_.get(), false);
+
+    if (retryButton_ != nullptr)
+        retryButton_->addMouseListener(defragRecoveryHoverListener_.get(), false);
+}
+
+void PatchMutatorPanel::unbindDefragRecoveryHoverListeners()
+{
+    if (defragRecoveryHoverListener_ == nullptr)
+        return;
+
+    if (mutateButton_ != nullptr)
+        mutateButton_->removeMouseListener(defragRecoveryHoverListener_.get());
+
+    if (retryButton_ != nullptr)
+        retryButton_->removeMouseListener(defragRecoveryHoverListener_.get());
+}
+
+void PatchMutatorPanel::refreshMutateRetryHoverLabels()
+{
+    const auto applyHoverLabel = [this](TSS::Button* button,
+                                        const char* recoveryPropertyId,
+                                        const char* restingLabel)
     {
-        if (recipeHydrating_)
+        if (button == nullptr)
             return;
 
-        apvts_.state.setProperty(widgetId, toggle->getToggleState(), nullptr);
+        const bool showDefrag = button->isEnabled()
+                                && isDefragRecoveryActive(recoveryPropertyId)
+                                && button->isMouseOver(true);
+        button->setButtonText(showDefrag ? PluginDisplayNames::Settings::kDefragButton
+                                         : restingLabel);
     };
+
+    applyHoverLabel(mutateButton_.get(),
+                    MutatorState::kMutateDefragRecovery,
+                    MutatorDisplayNames::kMutate);
+    applyHoverLabel(retryButton_.get(),
+                    MutatorState::kRetryDefragRecovery,
+                    MutatorDisplayNames::kRetry);
 }

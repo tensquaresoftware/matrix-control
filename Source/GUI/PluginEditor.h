@@ -118,6 +118,7 @@ private:
     void setPatchFolderPickerBinding();
     void setMutatorExportFolderPickerBinding();
     void setMutatorDefragLimitGateBinding();
+    void setMutatorPanelDefragRecoveryBinding();
     void setMutatorExportCollisionGateBinding();
     void setMutatorHistoryGateBinding();
     void setUnsavedEditConfirmGateBinding();

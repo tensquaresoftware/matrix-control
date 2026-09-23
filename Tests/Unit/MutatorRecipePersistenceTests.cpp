@@ -115,6 +115,10 @@ private:
         expect(! xmlString.contains(MutatorState::kExportEnabled));
         expect(! xmlString.contains(MutatorState::kDeleteEnabled));
         expect(! xmlString.contains(MutatorState::kClearEnabled));
+        expect(! xmlString.contains(MutatorState::kMutateAllocationBlocked));
+        expect(! xmlString.contains(MutatorState::kRetryAllocationBlocked));
+        expect(! xmlString.contains(MutatorState::kMutateDefragRecovery));
+        expect(! xmlString.contains(MutatorState::kRetryDefragRecovery));
         expect(! xmlString.contains(PatchNameIds::kPatchName));
     }
 
@@ -139,6 +143,10 @@ private:
         state.setProperty(MutatorState::kCompareActive, true, nullptr);
         state.setProperty(MutatorState::kMutateEnabled, false, nullptr);
         state.setProperty(MutatorState::kExportEnabled, true, nullptr);
+        state.setProperty(MutatorState::kMutateAllocationBlocked, true, nullptr);
+        state.setProperty(MutatorState::kRetryAllocationBlocked, true, nullptr);
+        state.setProperty(MutatorState::kMutateDefragRecovery, true, nullptr);
+        state.setProperty(MutatorState::kRetryDefragRecovery, true, nullptr);
     }
 
     void expectRecipeSurvivedRoundTrip(const juce::ValueTree& state)
@@ -173,6 +181,10 @@ private:
         expect(! static_cast<bool>(state.getProperty(MutatorState::kExportEnabled)));
         expect(! static_cast<bool>(state.getProperty(MutatorState::kDeleteEnabled)));
         expect(! static_cast<bool>(state.getProperty(MutatorState::kClearEnabled)));
+        expect(! static_cast<bool>(state.getProperty(MutatorState::kMutateAllocationBlocked, true)));
+        expect(! static_cast<bool>(state.getProperty(MutatorState::kRetryAllocationBlocked, true)));
+        expect(! static_cast<bool>(state.getProperty(MutatorState::kMutateDefragRecovery, true)));
+        expect(! static_cast<bool>(state.getProperty(MutatorState::kRetryDefragRecovery, true)));
     }
 
     void recipe_sessionRoundTrip_preservesRecipe_stripsHistory()

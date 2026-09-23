@@ -71,7 +71,9 @@ void PatchMutatorPanel::setupModeLine(TSS::ISkin& skin, WidgetFactory& widgetFac
 
     mutateButton_ = widgetFactory.createStandaloneButton(
         MutatorWidgets::kMutate, skin, dims_.buttons.height);
-    connectButtonToApvts(mutateButton_.get(), MutatorWidgets::kMutate);
+    connectMutateOrRetryButton(mutateButton_.get(),
+                               MutatorWidgets::kMutate,
+                               MutatorState::kMutateDefragRecovery);
     addAndMakeVisible(*mutateButton_);
 
     dco1Toggle_ = makeRecipeToggle(skin, MutatorDisplayNames::kEnableDco1, MutatorWidgets::kEnableDco1);
@@ -129,7 +131,9 @@ void PatchMutatorPanel::setupPitchLine(TSS::ISkin& skin, WidgetFactory& widgetFa
 
     retryButton_ = widgetFactory.createStandaloneButton(
         MutatorWidgets::kRetry, skin, dims_.buttons.height);
-    connectButtonToApvts(retryButton_.get(), MutatorWidgets::kRetry);
+    connectMutateOrRetryButton(retryButton_.get(),
+                               MutatorWidgets::kRetry,
+                               MutatorState::kRetryDefragRecovery);
     addAndMakeVisible(*retryButton_);
 
     env1Toggle_ = makeRecipeToggle(skin, MutatorDisplayNames::kEnableEnvelope1, MutatorWidgets::kEnableEnvelope1);
@@ -192,4 +196,56 @@ void PatchMutatorPanel::setupHistoryLine(TSS::ISkin& skin, WidgetFactory& widget
 
     wireHistoryComboBox(skin);
     setupHistoryActionButtons(skin, widgetFactory);
+}
+
+void PatchMutatorPanel::setDefragRecoveryRequestHandler(std::function<void()> handler)
+{
+    onDefragRecoveryRequested_ = std::move(handler);
+}
+
+void PatchMutatorPanel::connectButtonToApvts(TSS::Button* button, const char* widgetId)
+{
+    if (button == nullptr)
+        return;
+
+    button->onClick = [this, widgetId]
+    {
+        apvts_.state.setProperty(widgetId, juce::Time::getCurrentTime().toMilliseconds(), nullptr);
+    };
+}
+
+void PatchMutatorPanel::connectMutateOrRetryButton(TSS::Button* button,
+                                                   const char* widgetId,
+                                                   const char* recoveryPropertyId)
+{
+    if (button == nullptr)
+        return;
+
+    button->onClick = [this, widgetId, recoveryPropertyId]
+    {
+        if (isDefragRecoveryActive(recoveryPropertyId))
+        {
+            jassert(onDefragRecoveryRequested_);
+            if (onDefragRecoveryRequested_)
+                onDefragRecoveryRequested_();
+
+            return;
+        }
+
+        apvts_.state.setProperty(widgetId, juce::Time::getCurrentTime().toMilliseconds(), nullptr);
+    };
+}
+
+void PatchMutatorPanel::connectToggleToApvts(TSS::Toggle* toggle, const char* widgetId)
+{
+    if (toggle == nullptr)
+        return;
+
+    toggle->onStateChange = [this, toggle, widgetId]
+    {
+        if (recipeHydrating_)
+            return;
+
+        apvts_.state.setProperty(widgetId, toggle->getToggleState(), nullptr);
+    };
 }

@@ -688,12 +688,20 @@ namespace PluginIDs
                 // uiMirror — session origin snapshot exists, so HISTORY can offer the INITIAL row
                 constexpr const char* kInitialSnapshotAvailable = "patchMutatorInitialAvailable";
 
-                // uiMirror — action button enabled flags (Core → GUI; not persisted in session XML)
+                // uiMirror — action button enabled flags (Core → GUI; not persisted in session XML).
+                // kMutateEnabled / kRetryEnabled are other-gates-only (recipe / selection); allocation
+                // and Defrag-recovery use the blocked / recovery mirrors below. GUI still ANDs Compare.
                 constexpr const char* kMutateEnabled = "patchMutatorMutateEnabled";
                 constexpr const char* kRetryEnabled  = "patchMutatorRetryEnabled";
                 constexpr const char* kExportEnabled = "patchMutatorExportEnabled";
                 constexpr const char* kDeleteEnabled = "patchMutatorDeleteEnabled";
                 constexpr const char* kClearEnabled  = "patchMutatorClearEnabled";
+
+                // uiMirror — allocation blocked vs Defrag-recovery (ephemeral; not session XML)
+                constexpr const char* kMutateAllocationBlocked = "patchMutatorMutateAllocationBlocked";
+                constexpr const char* kRetryAllocationBlocked  = "patchMutatorRetryAllocationBlocked";
+                constexpr const char* kMutateDefragRecovery    = "patchMutatorMutateDefragRecovery";
+                constexpr const char* kRetryDefragRecovery     = "patchMutatorRetryDefragRecovery";
             }
 
             namespace StandaloneWidgets

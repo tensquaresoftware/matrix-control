@@ -1870,3 +1870,12 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-settings-mutation-history-defrag.md`
   summary: Sibling note in spec-system-init-syx-filenames.md still claims kComingSoon is owned by the Defrag History placeholder.
   evidence: Placeholder and kComingSoon are gone from Source; stale artifact cross-note only.
+
+## Deferred from: review of spec-patch-mutator-mutate-retry-defrag-morph.md (2026-09-23)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-mutator-mutate-retry-defrag-morph.md`
+  summary: No automated test that Patch Mutator MUTATE/RETRY recovery click opens Defrag confirm without stamping Mutate/Retry APVTS actions.
+  evidence: Repo unit tests stay on Core; panel wiring is Standalone smoke. Engine recovery mirrors and Settings/limit Defrag paths are covered.
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-mutator-mutate-retry-defrag-morph.md`
+  summary: No automated test that Compare keeps MUTATE/RETRY disabled (no hover DEFRAG / no Defrag click) while recovery mirrors would otherwise be true.
+  evidence: Compare lock is GUI-only via ActionEnabledPropertyListener; engine now clears recovery mirrors when Compare is active. Panel harness out of this chantier's test style.

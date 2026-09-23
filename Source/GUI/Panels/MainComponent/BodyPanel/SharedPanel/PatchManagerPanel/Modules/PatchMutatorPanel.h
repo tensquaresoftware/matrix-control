@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <map>
 #include <memory>
 
@@ -37,6 +38,9 @@ public:
     /** Local bounds of COMPARE for MainComponent lock-film hole geometry; empty if absent. */
     juce::Rectangle<int> getCompareButtonBounds() const;
 
+    /** Opens Shared Defrag confirm (Settings-equivalent). Invoked when MUTATE/RETRY are in recovery. */
+    void setDefragRecoveryRequestHandler(std::function<void()> handler);
+
     void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
                                   const juce::Identifier& property) override;
     void valueTreeChildAdded(juce::ValueTree&, juce::ValueTree&) override {}
@@ -48,6 +52,7 @@ public:
 private:
     class ActionEnabledPropertyListener;
     class WaveSelectParameterListener;
+    class DefragRecoveryHoverListener;
 
     struct RecipeRowLayoutArgs
     {
@@ -98,7 +103,9 @@ private:
 
     std::unique_ptr<ActionEnabledPropertyListener> actionEnabledListener_;
     std::unique_ptr<WaveSelectParameterListener> waveSelectParameterListener_;
+    std::unique_ptr<DefragRecoveryHoverListener> defragRecoveryHoverListener_;
     std::unique_ptr<TSS::ContextualHelpBinder> contextualHelpBinder_;
+    std::function<void()> onDefragRecoveryRequested_;
 
     juce::Array<int> mutateRootIndices_;
     juce::Array<int> retryIndices_;
@@ -145,7 +152,14 @@ private:
                                                   const char* displayName,
                                                   const char* widgetId);
     void connectButtonToApvts(TSS::Button* button, const char* widgetId);
+    void connectMutateOrRetryButton(TSS::Button* button,
+                                    const char* widgetId,
+                                    const char* recoveryPropertyId);
     void connectToggleToApvts(TSS::Toggle* toggle, const char* widgetId);
+    void bindDefragRecoveryHoverListeners();
+    void unbindDefragRecoveryHoverListeners();
+    void refreshMutateRetryHoverLabels();
+    bool isDefragRecoveryActive(const char* recoveryPropertyId) const;
 
     // Contextual help (PatchMutatorPanelContextualHelp.cpp).
     void registerContextualHelp();

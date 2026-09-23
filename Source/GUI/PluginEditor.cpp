@@ -49,6 +49,7 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     wirePatchAndMutatorBindings();
     wireBankTransferBindings();
     createUiShell();
+    setMutatorPanelDefragRecoveryBinding();
     restoreAndWireHeader();
     attachEditorRuntimeListeners();
 }

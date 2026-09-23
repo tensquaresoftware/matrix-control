@@ -7,6 +7,10 @@
 #include "Core/Services/MutatorDeleteWarningPolicy.h"
 #include "Core/Services/PatchFileNameReconciler.h"
 #include "Core/Services/PatchFileNameSanitizer.h"
+#include "GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/Modules/PatchMutatorPanel.h"
+#include "GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/PatchManagerPanel.h"
+#include "GUI/Panels/MainComponent/BodyPanel/SharedPanel/SharedPanel.h"
+#include "GUI/Panels/MainComponent/BodyPanel/BodyPanel.h"
 #include "GUI/Settings/SettingsPanel.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginIDs.h"
@@ -76,6 +80,32 @@ void PluginEditor::setMutatorDefragLimitGateBinding()
                 return;
 
             safeThis->openMutatorHistoryDefragConfirmDialog(std::move(onConfirmed));
+        });
+}
+
+void PluginEditor::setMutatorPanelDefragRecoveryBinding()
+{
+    if (mainComponent_ == nullptr)
+        return;
+
+    auto& mutatorPanel = mainComponent_->getBodyPanel()
+                             .getSharedPanel()
+                             .getPatchManagerPanel()
+                             .getPatchMutatorPanel();
+
+    mutatorPanel.setDefragRecoveryRequestHandler(
+        [safeThis = juce::Component::SafePointer<PluginEditor>(this)]
+        {
+            if (safeThis == nullptr)
+                return;
+
+            safeThis->openMutatorHistoryDefragConfirmDialog([safeThis]
+            {
+                if (safeThis == nullptr)
+                    return;
+
+                safeThis->pluginProcessor.defragMutationHistory();
+            });
         });
 }
 

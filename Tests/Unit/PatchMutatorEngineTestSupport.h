@@ -113,6 +113,10 @@ namespace PatchMutatorEngineTestSupport
         bool exportEnabled = false;
         bool deleteEnabled = false;
         bool clear = false;
+        bool mutateAllocationBlocked = false;
+        bool retryAllocationBlocked = false;
+        bool mutateDefragRecovery = false;
+        bool retryDefragRecovery = false;
     };
 
     int countPatchSysExMessages(Core::MidiOutboundQueue& queue);

@@ -193,10 +193,29 @@ namespace PatchMutatorEngineInternal
         setPatchLoadSuppressHooks(hooks, false);
     }
 
+    // Gates vs allocation: recovery stays clickable when allocation is blocked but
+    // other disable reasons (no module / empty / INITIAL) still grey the control.
+    inline bool computeMutateGatesOk(const Core::MutationRecipe& recipe)
+    {
+        return recipe.hasAnyModuleEnabled();
+    }
+
+    inline bool computeMutateAllocationBlocked(const Core::MutationHistoryStore& store)
+    {
+        return ! store.peekNextRootIndex().has_value();
+    }
+
     inline bool computeMutateEnabled(const Core::MutationHistoryStore& store,
                                      const Core::MutationRecipe& recipe)
     {
-        return store.peekNextRootIndex().has_value() && recipe.hasAnyModuleEnabled();
+        juce::ignoreUnused(store);
+        return computeMutateGatesOk(recipe);
+    }
+
+    inline bool computeMutateDefragRecovery(const Core::MutationHistoryStore& store,
+                                            const Core::MutationRecipe& recipe)
+    {
+        return computeMutateGatesOk(recipe) && computeMutateAllocationBlocked(store);
     }
 
     inline bool computeExportEnabled(const Core::MutationHistoryStore& store)
@@ -209,11 +228,27 @@ namespace PatchMutatorEngineInternal
         return ! store.isEmpty() && selectedRoot >= 0;
     }
 
-    inline bool computeRetryEnabled(const Core::MutationHistoryStore& store, int selectedRoot)
+    inline bool computeRetryGatesOk(const Core::MutationHistoryStore& store, int selectedRoot)
     {
-        if (store.isEmpty() || selectedRoot < 0)
+        return ! store.isEmpty() && selectedRoot >= 0;
+    }
+
+    inline bool computeRetryAllocationBlocked(const Core::MutationHistoryStore& store, int selectedRoot)
+    {
+        if (! computeRetryGatesOk(store, selectedRoot))
             return false;
 
-        return store.peekNextRetryIndex(selectedRoot).has_value();
+        return ! store.peekNextRetryIndex(selectedRoot).has_value();
+    }
+
+    inline bool computeRetryEnabled(const Core::MutationHistoryStore& store, int selectedRoot)
+    {
+        return computeRetryGatesOk(store, selectedRoot);
+    }
+
+    inline bool computeRetryDefragRecovery(const Core::MutationHistoryStore& store, int selectedRoot)
+    {
+        return computeRetryGatesOk(store, selectedRoot)
+               && computeRetryAllocationBlocked(store, selectedRoot);
     }
 } // namespace PatchMutatorEngineInternal

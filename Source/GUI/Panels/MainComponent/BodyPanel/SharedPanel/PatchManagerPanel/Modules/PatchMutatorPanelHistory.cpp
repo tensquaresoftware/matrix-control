@@ -427,6 +427,8 @@ void PatchMutatorPanel::applyCompareControlLock(bool compareActive)
     lockActionButton(clearButton_.get(), MutatorState::kClearEnabled);
     lockActionButton(exportButton_.get(), MutatorState::kExportEnabled);
 
+    refreshMutateRetryHoverLabels();
+
     if (historyComboBox_ != nullptr)
         historyComboBox_->setEnabled(! compareActive);
 

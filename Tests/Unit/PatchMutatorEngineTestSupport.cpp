@@ -171,5 +171,13 @@ namespace PatchMutatorEngineTestSupport
         test.expect(static_cast<bool>(state.getProperty(MutatorState::kDeleteEnabled))
                     == expected.deleteEnabled);
         test.expect(static_cast<bool>(state.getProperty(MutatorState::kClearEnabled)) == expected.clear);
+        test.expect(static_cast<bool>(state.getProperty(MutatorState::kMutateAllocationBlocked, false))
+                    == expected.mutateAllocationBlocked);
+        test.expect(static_cast<bool>(state.getProperty(MutatorState::kRetryAllocationBlocked, false))
+                    == expected.retryAllocationBlocked);
+        test.expect(static_cast<bool>(state.getProperty(MutatorState::kMutateDefragRecovery, false))
+                    == expected.mutateDefragRecovery);
+        test.expect(static_cast<bool>(state.getProperty(MutatorState::kRetryDefragRecovery, false))
+                    == expected.retryDefragRecovery);
     }
 }

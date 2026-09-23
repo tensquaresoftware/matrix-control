@@ -458,8 +458,10 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/PatchMutatorEngineCompareSnapshotTests.cpp
         Tests/Unit/PatchMutatorEngineDeleteClearTests.cpp
         Tests/Unit/PatchMutatorEngineDefragTests.cpp
+        Tests/Unit/PatchMutatorEngineDefragRecoveryEnabledTests.cpp
         Tests/Unit/PatchMutatorEngineExportTests.cpp
         Tests/Unit/PatchMutatorEngineEnabledResetAdvanceTests.cpp
+        Tests/Unit/PatchMutatorEngineAdvanceTests.cpp
         Tests/Unit/PatchLoadContextTests.cpp
         Tests/Unit/Matrix1000FactoryPatchNamesTests.cpp
         Tests/Unit/MutatorRecipePersistenceTests.cpp
@@ -531,6 +533,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/PatchNameEditRulesTests.cpp
         Tests/Unit/PatchFileNameReconcilerTests.cpp
         Tests/Unit/MutatorActionHandlerTests.cpp
+        Tests/Unit/MutatorActionHandlerDefragTests.cpp
         Tests/Unit/ModuleActionHandlerTests.cpp
         Tests/Unit/MatrixModInitServiceTests.cpp
         Tests/Unit/UndoManagerApvtsSpikeTests.cpp
