@@ -15,9 +15,11 @@ public:
     void runTest() override
     {
         testDropLoad_validSelectsAndLoads();
+        testDropLoad_validM1kpSelectsAndLoads();
         testDropLoad_rejectBankOrMulti();
         testDropLoad_rejectNonSyx();
         testDropLoad_rejectInvalid();
+        testDropLoad_rejectInvalidM1kp();
         testDropLoad_gateCancelRestoresBrowser();
         testDropLoad_gateCancelAfterSamePathReload();
         testDropLoad_folderDropRemembersFolder();
@@ -65,6 +67,33 @@ private:
         expect(scanQueue(harness.queue).editBufferPatch);
 
         priorDir.deleteRecursively();
+        dropDir.deleteRecursively();
+    }
+
+    void testDropLoad_validM1kpSelectsAndLoads()
+    {
+        beginTest("dropLoad_validM1kpSelectsAndLoads");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, 0, 12, false);
+
+        const auto dropDir = createTempScanDir();
+        expect(dropDir.createDirectory());
+        expect(PatchTestFixtures::resolvePatchFixtureFile("P-Test.m1kp")
+                   .copyFileTo(dropDir.getChildFile("P-Test.m1kp")));
+        const auto dropped = dropDir.getChildFile("P-Test.m1kp");
+
+        const auto result = harness.handler.loadDroppedComputerPatchFile(dropped, harness.limits);
+
+        expect(result == Core::PatchManagerActionHandler::DroppedComputerPatchLoadResult::kLoaded);
+        expectEquals(harness.proc.apvts.state.getProperty(
+                         ComputerPatches::StateProperties::kFolderPath).toString(),
+                     dropDir.getFullPathName());
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
+                         ComputerPatches::StandaloneWidgets::kSelectPatchFile)),
+                     1);
+        expect(scanQueue(harness.queue).editBufferPatch);
+
         dropDir.deleteRecursively();
     }
 
@@ -145,6 +174,28 @@ private:
 
         const auto dropped = dropDir.getChildFile("corrupt.syx");
         expect(dropped.replaceWithData(truncated.getData(), truncated.getSize()));
+
+        const auto result = harness.handler.loadDroppedComputerPatchFile(dropped, harness.limits);
+
+        expect(result == Core::PatchManagerActionHandler::DroppedComputerPatchLoadResult::kRejected);
+        expectEquals(harness.proc.apvts.state.getProperty("uiMessageText").toString(),
+                     juce::String(FooterMessages::kDropRejectedInvalid));
+        expect(harness.queue.isEmpty());
+
+        dropDir.deleteRecursively();
+    }
+
+    void testDropLoad_rejectInvalidM1kp()
+    {
+        beginTest("dropLoad_rejectInvalidM1kp");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        const auto dropDir = createTempScanDir();
+        expect(dropDir.createDirectory());
+
+        const juce::uint8 truncated[] = { 0x41, 0x00, 0x42, 0x00 };
+        const auto dropped = dropDir.getChildFile("corrupt.m1kp");
+        expect(dropped.replaceWithData(truncated, sizeof(truncated)));
 
         const auto result = harness.handler.loadDroppedComputerPatchFile(dropped, harness.limits);
 

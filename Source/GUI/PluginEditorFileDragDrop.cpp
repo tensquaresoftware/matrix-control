@@ -13,32 +13,32 @@ namespace
 {
     namespace FooterMessages = PluginDisplayNames::PatchManagerSection::ComputerPatchesModule::FooterMessages;
 
-    bool pathLooksLikeSyx(const juce::String& path) noexcept
+    bool pathLooksLikePatchFile(const juce::String& path) noexcept
     {
-        return juce::File(path).getFileExtension().equalsIgnoreCase(Core::PatchFileService::kSyxExtension);
+        return Core::PatchFileService::hasSupportedPatchExtension(juce::File(path));
     }
 
-    // Lightweight drag heuristic: any directory and/or any .syx → accept overlay (no deep scan).
+    // Lightweight drag heuristic: any directory and/or any .syx/.m1kp → accept overlay (no deep scan).
     bool selectionLooksAcceptable(const juce::StringArray& files) noexcept
     {
         for (const auto& path : files)
         {
             const juce::File file(path);
 
-            if (file.isDirectory() || pathLooksLikeSyx(path))
+            if (file.isDirectory() || pathLooksLikePatchFile(path))
                 return true;
         }
 
         return false;
     }
 
-    bool isSingleNonDirectorySyx(const juce::StringArray& files) noexcept
+    bool isSingleNonDirectoryPatchFile(const juce::StringArray& files) noexcept
     {
         if (files.size() != 1)
             return false;
 
         const juce::File file(files[0]);
-        return ! file.isDirectory() && pathLooksLikeSyx(files[0]);
+        return ! file.isDirectory() && pathLooksLikePatchFile(files[0]);
     }
 }
 
@@ -61,7 +61,7 @@ void PluginEditor::updatePatchNameDragOverlay(const juce::StringArray& files)
 
     if (files.isEmpty() || ! selectionLooksAcceptable(files))
     {
-        // Plural only when the selection itself has 2+ unloadable items (not a single bad .syx).
+        // Plural only when the selection itself has 2+ unloadable items (not a single bad patch file).
         const auto invalidKind = files.size() >= 2
             ? PatchNameDisplayPanel::DragOverlayKind::kInvalidPlural
             : PatchNameDisplayPanel::DragOverlayKind::kInvalid;
@@ -77,7 +77,7 @@ void PluginEditor::updatePatchNameDragOverlay(const juce::StringArray& files)
         return;
     }
 
-    if (! isSingleNonDirectorySyx(files))
+    if (! isSingleNonDirectoryPatchFile(files))
     {
         constexpr const char* kSelectionDragSentinel = "\x01selection";
         if (lastDragAssessedPath_ == kSelectionDragSentinel)

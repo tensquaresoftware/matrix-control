@@ -75,10 +75,11 @@ namespace Core
     {
         int validCount = 0;
         int invalidCount = 0;
-        int syxFileCount = 0;
+        int patchFileCount = 0;
     };
 
-    // Single-file .syx gate shared by Computer Patches scan and drag-drop preview/reject.
+    // Single-file patch gate shared by Computer Patches scan and drag-drop preview/reject.
+    // kNotSyx means unsupported extension (not .syx / .m1kp).
     enum class SinglePatchSyxRejectKind
     {
         kNone,
@@ -99,15 +100,20 @@ namespace Core
     {
     public:
         static constexpr const char* kSyxExtension = ".syx";
+        static constexpr const char* kM1kpExtension = ".m1kp";
 
         explicit PatchFileService(SysExDecoder& decoder) noexcept;
+
+        // Computer Patches combobox label: stem for .syx; "Stem (m1kp)" for .m1kp.
+        static juce::String formatOpenListDisplayName(const juce::File& file);
+        static juce::String formatOpenListDisplayName(const juce::String& fileName);
 
         // Public SSOT for drag preview and drop reject (wraps the same validate as scan).
         SinglePatchSyxAssessment assessSinglePatchSyxFile(const juce::File& file) const;
         bool isValidSinglePatchSyxFile(const juce::File& file) const;
 
         PatchFolderScanResult scanFolder(const juce::File& folder);
-        // Non-recursive per selected folder + direct .syx files → absolute valid paths, sorted.
+        // Non-recursive per selected folder + direct .syx/.m1kp files → absolute valid paths, sorted.
         // Caches as virtual-list mode (does not invent a parent folder).
         PatchFolderScanResult mergeDroppedSelection(const juce::Array<juce::File>& selection);
         // Re-install a previously validated virtual list (cancel restore) without re-scanning disk.
@@ -141,25 +147,31 @@ namespace Core
         bool hasCachedScanResult() const noexcept;
         void clearLastScan() noexcept;
 
+        static bool hasSupportedPatchExtension(const juce::File& file) noexcept;
+
     private:
         static bool hasSyxExtension(const juce::File& file) noexcept;
+        static bool hasM1kpExtension(const juce::File& file) noexcept;
         static bool isFolderReadable(const juce::File& folder) noexcept;
-        static juce::Array<juce::File> findSyxFiles(const juce::File& folder);
+        static juce::Array<juce::File> findPatchFiles(const juce::File& folder);
         static juce::File withSyxExtension(const juce::File& file);
         static PatchFileSaveResult makeSaveFailure(const char* message);
         bool validateTempSyxContents(const juce::File& tempFile) const;
         static bool replaceFileWithTemp(const juce::File& target, juce::File& tempFile);
         PatchFileSaveResult finalizeTempSyxWrite(const juce::File& target, juce::File tempFile);
         bool validateFileContents(const juce::File& file) const;
+        bool decodePackedFromFile(const juce::File& file,
+                                  const juce::MemoryBlock& data,
+                                  juce::uint8* packedOut) const;
         static bool looksLikeBankOrMultiMessageDump(const juce::MemoryBlock& sysEx) noexcept;
         juce::String resolveDragPreviewPrimaryName(const juce::File& file,
                                                   const juce::uint8* packedData) const;
         void appendValidFileName(juce::StringArray& names, const juce::File& file) const;
-        void collectSyxScanResults(const juce::Array<juce::File>& syxFiles,
-                                   juce::StringArray& validNames,
-                                   int& validCount,
-                                   int& invalidCount) const;
-        void collectValidAbsoluteFiles(const juce::Array<juce::File>& syxFiles,
+        void collectPatchScanResults(const juce::Array<juce::File>& patchFiles,
+                                     juce::StringArray& validNames,
+                                     int& validCount,
+                                     int& invalidCount) const;
+        void collectValidAbsoluteFiles(const juce::Array<juce::File>& patchFiles,
                                        juce::Array<juce::File>& validFiles,
                                        int& validCount,
                                        int& invalidCount) const;

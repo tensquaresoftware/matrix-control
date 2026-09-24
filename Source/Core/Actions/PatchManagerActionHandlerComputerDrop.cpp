@@ -179,7 +179,7 @@ namespace Core
         {
             juce::Array<juce::File> files;
             int directoryCount = 0;
-            int syxFileCount = 0;
+            int patchFileCount = 0;
         };
 
         DroppedPathShape classifyDroppedPaths(const juce::StringArray& paths)
@@ -192,9 +192,17 @@ namespace Core
                 shape.files.add(file);
 
                 if (file.isDirectory())
+                {
                     ++shape.directoryCount;
-                else if (file.getFileExtension().equalsIgnoreCase(PatchFileService::kSyxExtension))
-                    ++shape.syxFileCount;
+                    continue;
+                }
+
+                const auto extension = file.getFileExtension();
+                if (extension.equalsIgnoreCase(PatchFileService::kSyxExtension)
+                    || extension.equalsIgnoreCase(PatchFileService::kM1kpExtension))
+                {
+                    ++shape.patchFileCount;
+                }
             }
 
             return shape;
@@ -246,13 +254,13 @@ namespace Core
             return rejectDroppedComputerPatch(SinglePatchSyxRejectKind::kInvalid);
 
         const auto shape = classifyDroppedPaths(paths);
-        if (shape.directoryCount == 0 && shape.syxFileCount == 0)
+        if (shape.directoryCount == 0 && shape.patchFileCount == 0)
             return rejectDroppedComputerPatch(SinglePatchSyxRejectKind::kNotSyx);
 
         if (shape.files.size() == 1 && shape.directoryCount == 1)
             return loadDroppedSingleFolder(shape.files[0], limits);
 
-        if (shape.files.size() == 1 && shape.directoryCount == 0 && shape.syxFileCount == 1)
+        if (shape.files.size() == 1 && shape.directoryCount == 0 && shape.patchFileCount == 1)
             return loadDroppedSingleSyxFile(shape.files[0], limits);
 
         return loadDroppedVirtualSelection(shape.files, limits);

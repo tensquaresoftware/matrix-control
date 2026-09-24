@@ -20,7 +20,7 @@ namespace
 
     juce::String fileNameWithoutSyxExtension(const juce::String& fileName)
     {
-        return juce::File::createFileWithoutCheckingPath(fileName).getFileNameWithoutExtension();
+        return Core::PatchFileService::formatOpenListDisplayName(fileName);
     }
 
     void placeOrSkipLeft(juce::Rectangle<int>& row, juce::Component* component, int width)

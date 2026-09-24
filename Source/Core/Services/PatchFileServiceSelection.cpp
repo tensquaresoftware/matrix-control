@@ -38,12 +38,12 @@ namespace Core
 
                 int folderValid = 0;
                 int folderInvalid = 0;
-                collectValidAbsoluteFiles(findSyxFiles(path), validFiles, folderValid, folderInvalid);
+                collectValidAbsoluteFiles(findPatchFiles(path), validFiles, folderValid, folderInvalid);
                 invalidCount += folderInvalid;
                 continue;
             }
 
-            if (! hasSyxExtension(path))
+            if (! hasSupportedPatchExtension(path))
             {
                 ++invalidCount;
                 continue;
@@ -69,12 +69,12 @@ namespace Core
         cacheResult(makeVirtualListResult(std::move(files), invalidCount));
     }
 
-    void PatchFileService::collectValidAbsoluteFiles(const juce::Array<juce::File>& syxFiles,
+    void PatchFileService::collectValidAbsoluteFiles(const juce::Array<juce::File>& patchFiles,
                                                      juce::Array<juce::File>& validFiles,
                                                      int& validCount,
                                                      int& invalidCount) const
     {
-        for (const auto& file : syxFiles)
+        for (const auto& file : patchFiles)
         {
             if (! validateFileContents(file))
             {

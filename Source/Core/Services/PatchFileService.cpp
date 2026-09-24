@@ -5,6 +5,7 @@
 #include "Core/MIDI/SysEx/SysExEncoder.h"
 #include "Core/Models/PatchModel.h"
 #include "Core/Services/PatchFileNameSanitizer.h"
+#include "Core/Services/PatchM1kpCodec.h"
 #include "Core/Services/PatchMutator/MutationNaming.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 
@@ -27,6 +28,21 @@ namespace Core
     PatchFileService::PatchFileService(SysExDecoder& decoder) noexcept
         : decoder_(decoder)
     {
+    }
+
+    juce::String PatchFileService::formatOpenListDisplayName(const juce::File& file)
+    {
+        const auto stem = file.getFileNameWithoutExtension();
+
+        if (hasM1kpExtension(file))
+            return stem + " (m1kp)";
+
+        return stem;
+    }
+
+    juce::String PatchFileService::formatOpenListDisplayName(const juce::String& fileName)
+    {
+        return formatOpenListDisplayName(juce::File::createFileWithoutCheckingPath(fileName));
     }
 
     bool PatchFileService::looksLikeBankOrMultiMessageDump(const juce::MemoryBlock& sysEx) noexcept
@@ -72,32 +88,32 @@ namespace Core
             return assessment;
         }
 
-        if (! hasSyxExtension(file))
+        if (! hasSupportedPatchExtension(file))
         {
             assessment.rejectKind = SinglePatchSyxRejectKind::kNotSyx;
             return assessment;
         }
 
-        if (! validateFileContents(file))
+        if (hasM1kpExtension(file)
+            && file.getSize() != static_cast<juce::int64>(PatchM1kpCodec::kFileByteSize))
         {
-            juce::MemoryBlock sysEx;
-            if (! file.loadFileAsData(sysEx))
-            {
-                assessment.rejectKind = SinglePatchSyxRejectKind::kInvalid;
-                return assessment;
-            }
-
-            assessment.rejectKind = looksLikeBankOrMultiMessageDump(sysEx)
-                ? SinglePatchSyxRejectKind::kBankOrMultiMessage
-                : SinglePatchSyxRejectKind::kInvalid;
+            assessment.rejectKind = SinglePatchSyxRejectKind::kInvalid;
             return assessment;
         }
 
-        juce::MemoryBlock sysEx;
-        juce::uint8 packed[SysExConstants::kPatchPackedDataSize] = {};
-        if (! file.loadFileAsData(sysEx) || ! decoder_.decodePatchSysEx(sysEx, packed))
+        juce::MemoryBlock data;
+        if (! file.loadFileAsData(data))
         {
             assessment.rejectKind = SinglePatchSyxRejectKind::kInvalid;
+            return assessment;
+        }
+
+        juce::uint8 packed[SysExConstants::kPatchPackedDataSize] = {};
+        if (! decodePackedFromFile(file, data, packed))
+        {
+            assessment.rejectKind = hasSyxExtension(file) && looksLikeBankOrMultiMessageDump(data)
+                ? SinglePatchSyxRejectKind::kBankOrMultiMessage
+                : SinglePatchSyxRejectKind::kInvalid;
             return assessment;
         }
 
@@ -235,22 +251,23 @@ namespace Core
             return result;
         }
 
-        juce::MemoryBlock sysEx;
-        if (! file.loadFileAsData(sysEx))
-        {
-            result.errorMessage = "Read failed";
-            return result;
-        }
-
-        if (! decoder_.validatePatchSysExMessage(sysEx))
+        if (hasM1kpExtension(file)
+            && file.getSize() != static_cast<juce::int64>(PatchM1kpCodec::kFileByteSize))
         {
             result.errorMessage = "Invalid patch file";
             return result;
         }
 
-        if (! decoder_.decodePatchSysEx(sysEx, packedOut))
+        juce::MemoryBlock data;
+        if (! file.loadFileAsData(data))
         {
-            result.errorMessage = "Decode failed";
+            result.errorMessage = "Read failed";
+            return result;
+        }
+
+        if (! decodePackedFromFile(file, data, packedOut))
+        {
+            result.errorMessage = "Invalid patch file";
             return result;
         }
 
@@ -260,7 +277,17 @@ namespace Core
 
     bool PatchFileService::hasSyxExtension(const juce::File& file) noexcept
     {
-        return file.getFileExtension().toLowerCase() == kSyxExtension;
+        return file.getFileExtension().equalsIgnoreCase(kSyxExtension);
+    }
+
+    bool PatchFileService::hasM1kpExtension(const juce::File& file) noexcept
+    {
+        return PatchM1kpCodec::hasExtension(file);
+    }
+
+    bool PatchFileService::hasSupportedPatchExtension(const juce::File& file) noexcept
+    {
+        return hasSyxExtension(file) || hasM1kpExtension(file);
     }
 
     bool PatchFileService::isFolderReadable(const juce::File& folder) noexcept
@@ -268,26 +295,26 @@ namespace Core
         return folder.hasReadAccess();
     }
 
-    juce::Array<juce::File> PatchFileService::findSyxFiles(const juce::File& folder)
+    juce::Array<juce::File> PatchFileService::findPatchFiles(const juce::File& folder)
     {
         const auto files = folder.findChildFiles(juce::File::findFiles, false);
-        juce::Array<juce::File> syxFiles;
+        juce::Array<juce::File> patchFiles;
 
         for (const auto& file : files)
         {
-            if (hasSyxExtension(file))
-                syxFiles.add(file);
+            if (hasSupportedPatchExtension(file))
+                patchFiles.add(file);
         }
 
-        return syxFiles;
+        return patchFiles;
     }
 
-    void PatchFileService::collectSyxScanResults(const juce::Array<juce::File>& syxFiles,
-                                                 juce::StringArray& validNames,
-                                                 int& validCount,
-                                                 int& invalidCount) const
+    void PatchFileService::collectPatchScanResults(const juce::Array<juce::File>& patchFiles,
+                                                   juce::StringArray& validNames,
+                                                   int& validCount,
+                                                   int& invalidCount) const
     {
-        for (const auto& file : syxFiles)
+        for (const auto& file : patchFiles)
         {
             if (validateFileContents(file))
             {
@@ -304,12 +331,12 @@ namespace Core
 
     PatchFolderScanResult PatchFileService::scanReadableFolder(const juce::File& folder) const
     {
-        const auto syxFiles = findSyxFiles(folder);
+        const auto patchFiles = findPatchFiles(folder);
         juce::StringArray validNames;
         FolderScanCounts counts;
-        counts.syxFileCount = syxFiles.size();
+        counts.patchFileCount = patchFiles.size();
 
-        collectSyxScanResults(syxFiles, validNames, counts.validCount, counts.invalidCount);
+        collectPatchScanResults(patchFiles, validNames, counts.validCount, counts.invalidCount);
         sortOpenListFileNames(validNames);
 
         return makeScanResult(folder, std::move(validNames), counts);
@@ -332,14 +359,42 @@ namespace Core
 
 
 
-    bool PatchFileService::validateFileContents(const juce::File& file) const
+    bool PatchFileService::decodePackedFromFile(const juce::File& file,
+                                                const juce::MemoryBlock& data,
+                                                juce::uint8* packedOut) const
     {
-        juce::MemoryBlock sysEx;
-
-        if (! file.loadFileAsData(sysEx))
+        if (packedOut == nullptr)
             return false;
 
-        return decoder_.validatePatchSysExMessage(sysEx);
+        if (hasM1kpExtension(file))
+            return PatchM1kpCodec::decodeToPacked(data, packedOut);
+
+        if (hasSyxExtension(file))
+            return decoder_.decodePatchSysEx(data, packedOut);
+
+        return false;
+    }
+
+    bool PatchFileService::validateFileContents(const juce::File& file) const
+    {
+        if (hasM1kpExtension(file)
+            && file.getSize() != static_cast<juce::int64>(PatchM1kpCodec::kFileByteSize))
+        {
+            return false;
+        }
+
+        juce::MemoryBlock data;
+
+        if (! file.loadFileAsData(data))
+            return false;
+
+        if (hasM1kpExtension(file))
+            return PatchM1kpCodec::isValidContents(data);
+
+        if (hasSyxExtension(file))
+            return decoder_.validatePatchSysExMessage(data);
+
+        return false;
     }
 
     void PatchFileService::appendValidFileName(juce::StringArray& names, const juce::File& file) const
@@ -370,7 +425,7 @@ namespace Core
         result.sortedValidFileNames = std::move(validNames);
         result.footerSeverity = "info";
 
-        if (counts.syxFileCount == 0)
+        if (counts.patchFileCount == 0)
             result.footerMessage = FooterMessages::kEmptyFolder;
         else
             result.footerMessage = FooterMessages::formatScanSummary(counts.validCount, counts.invalidCount);

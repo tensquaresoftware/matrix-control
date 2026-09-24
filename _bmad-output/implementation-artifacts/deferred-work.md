@@ -1967,3 +1967,19 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-port-combo-first-item-opt-in.md`
   summary: HeaderPanel keeps its own kPortSentinelItemId parallel to MidiPortComboPopulation::kPortSentinelItemId; paint gates on the MIDI helper constant only.
   evidence: Pre-existing dual constants both equal to 1; Audio From still uses HeaderPanel's local. Consolidate if/when Audio From stops owning a private sentinel id.
+
+## Deferred from: Build scope split — M4L legacy formats (2026-09-25)
+
+- source_spec: none
+  summary: Import Matrix-1000 Editor legacy master files (.m1km) into Matrix-Control.
+  evidence: Split from M4L retro-compat intent; .m1km / Groups cascade is independently shippable and farther from current Master .syx than .m1kp is from PatchModel.
+
+## Deferred from: review of spec-m1kp-patch-import.md (2026-09-25)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-m1kp-patch-import.md`
+  summary: Rename syx-branded patch-file APIs (loadPatchSysExFile, assessSinglePatchSyxFile, SinglePatchSyxRejectKind::kNotSyx, loadDroppedSingleSyxFile) now that .m1kp is also accepted.
+  evidence: Multi-format gates landed; renames are mechanical churn across Core/GUI/tests beyond this import story.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-m1kp-patch-import.md`
+  summary: No automated GUI test that ComputerPatchesPanel wires formatOpenListDisplayName into combobox items.
+  evidence: Core formatter dual-stem / (m1kp) labels are unit-tested; panel call site is GUI-only (project unit pyramid prefers Core helpers).

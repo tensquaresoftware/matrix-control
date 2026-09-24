@@ -192,6 +192,7 @@ set(PLUGIN_SOURCES
     Source/Core/Services/PatchFileService.cpp
     Source/Core/Services/PatchFileServiceSelection.cpp
     Source/Core/Services/PatchFileServiceMutatorExport.cpp
+    Source/Core/Services/PatchM1kpCodec.cpp
     Source/Core/Services/PatchFileNameSanitizer.cpp
     Source/Core/Services/PatchNameOverlayStore.cpp
     Source/Core/Services/PatchNameResolver.cpp
@@ -526,6 +527,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/PatchManagerActionHandlerComputerNavigationTests.cpp
         Tests/Unit/PatchManagerActionHandlerNavDebounceTests.cpp
         Tests/Unit/PatchFileServiceTests.cpp
+        Tests/Unit/PatchFileServiceM1kpTests.cpp
         Tests/Unit/PatchFileServiceAssessTests.cpp
         Tests/Unit/PatchFileServiceMutatorExportTests.cpp
         Tests/Unit/PatchFileNameSanitizerTests.cpp
@@ -632,6 +634,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/Services/PatchFileService.cpp
     Source/Core/Services/PatchFileServiceSelection.cpp
         Source/Core/Services/PatchFileServiceMutatorExport.cpp
+        Source/Core/Services/PatchM1kpCodec.cpp
         Source/Core/Services/PatchFileNameSanitizer.cpp
         Source/Core/Services/PatchNameOverlayStore.cpp
         Source/Core/Services/PatchNameResolver.cpp

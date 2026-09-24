@@ -30,6 +30,8 @@ public:
         assessSinglePatch_rejectsMultiMessageConcat();
         assessSinglePatch_bnkNameFallsBackToStem();
         assessSinglePatch_usableInternalNameShown();
+        assessSinglePatch_validM1kp();
+        assessSinglePatch_rejectsInvalidM1kp();
     }
 
 private:
@@ -146,6 +148,37 @@ private:
         const auto assessment = service_.assessSinglePatchSyxFile(target);
         expect(assessment.isValidSinglePatch);
         expectEquals(assessment.previewPrimaryName, juce::String("NYLON 12"));
+
+        tempDir.deleteRecursively();
+    }
+
+    void assessSinglePatch_validM1kp()
+    {
+        beginTest("assessSinglePatch_validM1kp");
+
+        const auto file = PatchTestFixtures::resolvePatchFixtureFile("P-Test.m1kp");
+        expect(file.existsAsFile());
+
+        const auto assessment = service_.assessSinglePatchSyxFile(file);
+        expect(assessment.isValidSinglePatch);
+        expect(assessment.rejectKind == Core::SinglePatchSyxRejectKind::kNone);
+        // Internal name is BNK2: 02 (bank placeholder) → preview falls back to stem.
+        expectEquals(assessment.previewPrimaryName, juce::String("P-Test"));
+        expect(service_.isValidSinglePatchSyxFile(file));
+    }
+
+    void assessSinglePatch_rejectsInvalidM1kp()
+    {
+        beginTest("assessSinglePatch_rejectsInvalidM1kp");
+
+        const auto tempDir = createTempScanDir();
+        const juce::uint8 truncated[] = { 0x41, 0x00 };
+        const auto file = tempDir.getChildFile("bad.m1kp");
+        expect(file.replaceWithData(truncated, sizeof(truncated)));
+
+        const auto assessment = service_.assessSinglePatchSyxFile(file);
+        expect(! assessment.isValidSinglePatch);
+        expect(assessment.rejectKind == Core::SinglePatchSyxRejectKind::kInvalid);
 
         tempDir.deleteRecursively();
     }

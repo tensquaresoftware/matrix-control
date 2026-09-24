@@ -217,7 +217,7 @@ namespace PluginDisplayNames
             constexpr const char* kMatrix1000Patches =
                 "SETTINGS: Chooses how Matrix-1000 patch names are displayed.";
             constexpr const char* kComputerPatches =
-                "SETTINGS: Chooses how computer .syx patch names are displayed.";
+                "SETTINGS: Chooses how computer patch names are displayed.";
             constexpr const char* kUnsavedState =
                 "SETTINGS: Chooses when to warn about unsaved patch changes.";
             constexpr const char* kPatchSaveAsInit =
@@ -257,8 +257,8 @@ namespace PluginDisplayNames
                 "Store writes it to the current RAM location. Discard abandons it and continues. "
                 "Cancel keeps editing.";
             constexpr const char* kBodySave =
-                "This patch has changes that were not saved to its .syx file.\n\n"
-                "Save overwrites that file. Discard abandons the changes and continues. "
+                "This patch has changes that were not saved to a .syx file.\n\n"
+                "Save writes/updates the .syx file (same name). Discard abandons the changes and continues. "
                 "Cancel keeps editing.";
             constexpr const char* kBodySaveAs =
                 "This patch has changes that were not saved as a .syx file.\n\n"
@@ -1675,7 +1675,7 @@ namespace PluginDisplayNames
 
                 inline juce::String formatImportNoValidFiles(int found)
                 {
-                    return "No valid .syx files to import (found " + juce::String(found) + ")";
+                    return "No valid patch files to import (found " + juce::String(found) + ")";
                 }
 
                 inline juce::String formatCopySuccess(int bank)
@@ -1840,9 +1840,9 @@ namespace PluginDisplayNames
 
                 // Drag-drop onto the editor (footer only on drop — never during drag).
                 constexpr const char* kDropRejectedNoValid =
-                    "Drop rejected: no valid Matrix patch .syx";
+                    "Drop rejected: no valid Matrix patch file";
                 constexpr const char* kDropRejectedNotSyx =
-                    "Drop rejected: not a Matrix patch .syx";
+                    "Drop rejected: not a Matrix patch file";
                 constexpr const char* kDropRejectedBankOrMulti =
                     "Drop rejected: bank or multi-message dump";
                 constexpr const char* kDropRejectedInvalid =
@@ -1864,7 +1864,7 @@ namespace PluginDisplayNames
             namespace ContextualHelp
             {
                 constexpr const char* kTitle =
-                    "COMPUTER PATCHES: Reloads / focuses computer .syx patch browsing on disk.";
+                    "COMPUTER PATCHES: Reloads / focuses computer patch browsing on disk.";
                 constexpr const char* kBrowser =
                     "COMPUTER PATCHES: Shows the computer patch browser list.";
                 constexpr const char* kStorage =
@@ -1874,13 +1874,13 @@ namespace PluginDisplayNames
                 constexpr const char* kNext =
                     "COMPUTER PATCHES: Loads the next patch file in the folder.";
                 constexpr const char* kSelectPatch =
-                    "COMPUTER PATCHES: Chooses which .syx patch file is selected.";
+                    "COMPUTER PATCHES: Chooses which patch file is selected.";
                 constexpr const char* kOpen =
-                    "COMPUTER PATCHES: Opens a folder of .syx patch files.";
+                    "COMPUTER PATCHES: Opens a folder of .syx / .m1kp patch files.";
                 constexpr const char* kSaveAs =
                     "COMPUTER PATCHES: Saves the current patch as a new .syx file.";
                 constexpr const char* kSave =
-                    "COMPUTER PATCHES: Saves over the current .syx file.";
+                    "COMPUTER PATCHES: Saves/updates the .syx file (same name).";
             }
         }
 
