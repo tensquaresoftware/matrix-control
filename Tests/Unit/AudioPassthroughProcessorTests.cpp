@@ -19,6 +19,8 @@ public:
         testPeakFollowsCurrentBlock();
         testSilenceProducesZeroPeak();
         testDisabledInputBusClearsOutput();
+        testInactivePassthroughClearsOutput();
+        testReactivatingPassthroughRestoresOutput();
         testZeroInputChannelsClearsOutput();
         testZeroLengthBlockIsSafe();
         testOutOfRangeMonoIndexClearsOutputAndPeak();
@@ -290,6 +292,56 @@ private:
         expectEquals(output.getSample(0, 0), 0.0f);
         expectEquals(output.getSample(1, 0), 0.0f);
         expectEquals(processor.getPeakLevel(), 0.0f);
+    }
+
+    void testInactivePassthroughClearsOutput()
+    {
+        beginTest("Inactive passthrough (Audio From NO INPUT) clears output and peak");
+
+        Core::AudioPassthroughProcessor processor;
+        processor.prepare(2, 2, true, 44100.0);
+        processor.setChannelMode(Core::AudioFromChannelMode::kStereo);
+        processor.setPassthroughActive(false);
+
+        juce::AudioBuffer<float> input(2, 4);
+        juce::AudioBuffer<float> output(2, 4);
+        input.setSample(0, 0, 0.9f);
+        input.setSample(1, 0, 0.9f);
+        output.setSample(0, 0, 0.9f);
+        output.setSample(1, 0, 0.9f);
+
+        processor.process(input, output, 2.0f);
+
+        expectEquals(output.getSample(0, 0), 0.0f);
+        expectEquals(output.getSample(1, 0), 0.0f);
+        expectEquals(processor.getPeakLevel(), 0.0f);
+    }
+
+    void testReactivatingPassthroughRestoresOutput()
+    {
+        beginTest("Reactivating passthrough after NO INPUT restores output and peak");
+
+        Core::AudioPassthroughProcessor processor;
+        processor.prepare(2, 2, true, 44100.0);
+        processor.setChannelMode(Core::AudioFromChannelMode::kStereo);
+        processor.setPassthroughActive(false);
+
+        juce::AudioBuffer<float> input(2, 4);
+        juce::AudioBuffer<float> output(2, 4);
+        input.setSample(0, 0, 0.5f);
+        input.setSample(1, 0, -0.25f);
+        output.clear();
+
+        processor.process(input, output, 1.0f);
+        expectEquals(output.getSample(0, 0), 0.0f);
+        expectEquals(processor.getPeakLevel(), 0.0f);
+
+        processor.setPassthroughActive(true);
+        processor.process(input, output, 1.0f);
+
+        expectEquals(output.getSample(0, 0), 0.5f);
+        expectEquals(output.getSample(1, 0), -0.25f);
+        expect(processor.getPeakLevel() > 0.4f);
     }
 
     void testOutOfRangeMonoIndexClearsOutputAndPeak()

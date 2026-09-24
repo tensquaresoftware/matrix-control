@@ -1909,3 +1909,12 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-combobox-reclick-to-close.md`
   summary: No automated coverage for ComboBox popup open/close / re-click dismiss (reconfirmed).
   evidence: Verification Gap layer; still no Tests/ observers; already deferred above.
+
+## Deferred from: review of spec-audio-from-none-no-device-mute.md (2026-09-24)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-audio-from-none-no-device-mute.md`
+  summary: No automated regression that empty Audio From never calls disableInputMonitoring / muteInput.
+  evidence: Would need StandalonePluginHolder harness or seam; unit suite cannot observe JUCE holder mute Value today.
+- source_spec: `_bmad-output/implementation-artifacts/spec-audio-from-none-no-device-mute.md`
+  summary: Empty audioFromSourceId does not survive relaunch (initializeAudioProperties invents stereo/mono from channel mode).
+  evidence: Pre-existing restore behavior outside this mute-banner fix; document or change only if product wants persisted NO INPUT.

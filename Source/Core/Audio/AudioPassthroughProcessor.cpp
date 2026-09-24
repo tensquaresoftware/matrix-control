@@ -31,6 +31,11 @@ namespace Core
         monoSourceChannelIndex_.store(juce::jmax(0, channelIndex), std::memory_order_relaxed);
     }
 
+    void AudioPassthroughProcessor::setPassthroughActive(bool active) noexcept
+    {
+        passthroughActive_.store(active, std::memory_order_relaxed);
+    }
+
     int AudioPassthroughProcessor::mapSourceChannel(int outputChannel) const noexcept
     {
         const auto mode = static_cast<AudioFromChannelMode>(channelMode_.load(std::memory_order_relaxed));
@@ -177,7 +182,9 @@ namespace Core
             juce::jmin(numOutputChannels_, output.getNumChannels())
         };
 
-        if (!inputBusEnabled_ || buffers.numInputChannelsAvailable <= 0)
+        if (!passthroughActive_.load(std::memory_order_relaxed)
+            || !inputBusEnabled_
+            || buffers.numInputChannelsAvailable <= 0)
         {
             clearAllOutputChannels(output, numSamples);
             updatePeakLevel(0.0f);

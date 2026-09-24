@@ -80,45 +80,40 @@ void PluginProcessor::syncAudioRuntimeFromState()
 
     const auto sourceId = apvts.state.getProperty("audioFromSourceId", juce::String()).toString();
 
-    if (sourceId.isNotEmpty())
-    {
-        syncAudioPassthroughFromSourceId(sourceId);
-    }
-    else
-    {
-        const int channelMode = static_cast<int>(apvts.state.getProperty("audioFromChannelMode", 0));
-        audioPassthroughProcessor_->setChannelMode(
-            static_cast<Core::AudioFromChannelMode>(juce::jlimit(0, 2, channelMode)));
-
-        if (isStandaloneWrapper())
-        {
-            runSyncOnMessageThread([]
-            {
-                Core::StandaloneAudioInputRouter::disableInputMonitoring();
-            });
-        }
-    }
+    syncAudioPassthroughFromSourceId(sourceId);
 }
 
 void PluginProcessor::syncAudioPassthroughFromSourceId(const juce::String& sourceId)
 {
-    const int channelMode = Core::AudioInputSourceCatalog::channelModeForSourceId(sourceId);
-    audioPassthroughProcessor_->setChannelMode(static_cast<Core::AudioFromChannelMode>(channelMode));
-    audioPassthroughProcessor_->setMonoSourceChannelIndex(
-        Core::AudioInputSourceCatalog::monoChannelIndexForSourceId(sourceId));
+    const bool sourceSelected = sourceId.isNotEmpty();
+
+    if (sourceSelected)
+    {
+        const int channelMode = Core::AudioInputSourceCatalog::channelModeForSourceId(sourceId);
+        audioPassthroughProcessor_->setChannelMode(static_cast<Core::AudioFromChannelMode>(channelMode));
+        audioPassthroughProcessor_->setMonoSourceChannelIndex(
+            Core::AudioInputSourceCatalog::monoChannelIndexForSourceId(sourceId));
+        // Arm routing before re-enabling so the audio thread never sees stale maps.
+        audioPassthroughProcessor_->setPassthroughActive(true);
+    }
+    else
+    {
+        // Silence first so a late audio block cannot use the previous route.
+        audioPassthroughProcessor_->setPassthroughActive(false);
+    }
 
     if (! isStandaloneWrapper())
         return;
 
-    // JUCE standalone mutes input by default (feedback protection). Toggle on the
-    // message thread — prepareToPlay / state restore may run off it.
-    const bool shouldMonitor = sourceId.isNotEmpty();
-    runSyncOnMessageThread([shouldMonitor]
+    // JUCE standalone defaults muteInput on (feedback protection) and shows a sticky
+    // banner. Clear mute only when a real Audio From source is applied. NO INPUT must
+    // not call disableInputMonitoring — that is software silence only.
+    if (! sourceSelected)
+        return;
+
+    runSyncOnMessageThread([]
     {
-        if (shouldMonitor)
-            Core::StandaloneAudioInputRouter::enableInputMonitoring();
-        else
-            Core::StandaloneAudioInputRouter::disableInputMonitoring();
+        Core::StandaloneAudioInputRouter::enableInputMonitoring();
     });
 }
 
@@ -174,6 +169,9 @@ void PluginProcessor::setAudioFromSourceId(const juce::String& sourceId)
 {
     apvts.state.setProperty("audioFromSourceId", sourceId, nullptr);
     syncAudioPassthroughFromSourceId(sourceId);
+
+    if (sourceId.isEmpty())
+        return;
 
     const int channelMode = Core::AudioInputSourceCatalog::channelModeForSourceId(sourceId);
     apvts.state.setProperty("audioFromChannelMode", channelMode, nullptr);

@@ -24,6 +24,9 @@ namespace Core
         void updateChannelLayout(int numInputChannels, int numOutputChannels, bool inputBusEnabled) noexcept;
         void setChannelMode(AudioFromChannelMode mode) noexcept;
         void setMonoSourceChannelIndex(int channelIndex) noexcept;
+        /** When false (empty audioFromSourceId / NO INPUT), clear outputs and peak without
+            touching JUCE standalone device mute. */
+        void setPassthroughActive(bool active) noexcept;
         void process(const juce::AudioBuffer<float>& input,
                      juce::AudioBuffer<float>& output,
                      float gainLinear) noexcept;
@@ -53,6 +56,7 @@ namespace Core
         std::atomic<float> peakDisplay_{ 0.0f };
         std::atomic<int> channelMode_{ static_cast<int>(AudioFromChannelMode::kStereo) };
         std::atomic<int> monoSourceChannelIndex_{ 0 };
+        std::atomic<bool> passthroughActive_{ true };
 
         int numInputChannels_ { 0 };
         int numOutputChannels_ { 0 };
