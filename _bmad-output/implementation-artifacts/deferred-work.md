@@ -1894,3 +1894,18 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-input-gain-zero-db-text-entry.md`
   summary: No automated test that HeaderPanel constructs INPUT GAIN with makeInputGainSliderConfig (production wiring).
   evidence: SliderValueEntry covers the factory directly; HeaderPanel construction is outside that harness style. Reverting HeaderPanel to format-only would revive the bug in UI while unit tests stay green.
+
+## Deferred from: review of spec-combobox-reclick-to-close.md (2026-09-24)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-combobox-reclick-to-close.md`
+  summary: No automated coverage for ComboBox popup open/close / re-click dismiss.
+  evidence: Repo has no modal popup open/close unit harness; GUI TestComboBoxes harness is visual only. Manual UAT covers the intent.
+
+## Deferred from: code review of spec-combobox-reclick-to-close.md (2026-09-24)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-combobox-reclick-to-close.md`
+  summary: Sticky suppressNextPopupOpen if armed and host mouseDown never arrives (next intentional open swallowed once).
+  evidence: Intentional tradeoff — async/auto clear rejected (can race and reopen); left-only arm + consume-first makes path rare. Manual UAT if reported.
+- source_spec: `_bmad-output/implementation-artifacts/spec-combobox-reclick-to-close.md`
+  summary: No automated coverage for ComboBox popup open/close / re-click dismiss (reconfirmed).
+  evidence: Verification Gap layer; still no Tests/ observers; already deferred above.
