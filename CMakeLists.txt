@@ -144,6 +144,7 @@ set(PLUGIN_SOURCES
     Source/Core/PluginProcessorValueTree.cpp
     Source/Core/Audio/AudioPassthroughProcessor.cpp
     Source/Core/Audio/AudioInputSourceCatalog.cpp
+    Source/Core/Audio/AudioFromSourceSync.cpp
     Source/Core/Audio/HardwareLatency.cpp
     Source/Core/Audio/InstrumentMidiForwarder.cpp
     Source/Core/Audio/StandaloneAudioInputRouter.cpp
@@ -557,6 +558,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/MasterParameterSysExComplianceTests.cpp
         Tests/Unit/EditorPathTests.cpp
         Tests/Unit/AudioPassthroughProcessorTests.cpp
+        Tests/Unit/AudioFromSourceSyncTests.cpp
         Tests/Unit/AudioInputSourceCatalogTests.cpp
         Tests/Unit/HardwareLatencyTests.cpp
         Tests/Unit/InstrumentMidiForwarderTests.cpp
@@ -655,6 +657,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/Models/PackedFieldCodec.cpp
         Source/Core/Audio/AudioPassthroughProcessor.cpp
         Source/Core/Audio/AudioInputSourceCatalog.cpp
+        Source/Core/Audio/AudioFromSourceSync.cpp
         Source/Core/Audio/StandaloneAudioInputRouter.cpp
         Source/Core/Audio/StandaloneAudioInputRouterStubs.cpp
         Source/Core/Audio/HardwareLatency.cpp

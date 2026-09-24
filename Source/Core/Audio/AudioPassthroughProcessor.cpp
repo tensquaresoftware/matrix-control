@@ -33,7 +33,8 @@ namespace Core
 
     void AudioPassthroughProcessor::setPassthroughActive(bool active) noexcept
     {
-        passthroughActive_.store(active, std::memory_order_relaxed);
+        // Release publishes prior map stores; process loads with acquire.
+        passthroughActive_.store(active, std::memory_order_release);
     }
 
     int AudioPassthroughProcessor::mapSourceChannel(int outputChannel) const noexcept
@@ -182,7 +183,7 @@ namespace Core
             juce::jmin(numOutputChannels_, output.getNumChannels())
         };
 
-        if (!passthroughActive_.load(std::memory_order_relaxed)
+        if (!passthroughActive_.load(std::memory_order_acquire)
             || !inputBusEnabled_
             || buffers.numInputChannelsAvailable <= 0)
         {

@@ -43,6 +43,23 @@ context: []
 - BH: `disableInputMonitoring` API remains as footgun — **low/reject** — call sites for Audio From removed; API still valid for other use.
 - BH: header comment ties Core API to UI label — **low/patch** — comment now states empty `audioFromSourceId` contract.
 
+### Review Findings
+
+- [x] [Review][Patch] Harden Audio From glue tests (decision → patch) — Extracted `AudioFromSourceSync` + unit tests (`AudioFromSourceSyncTests`).
+- [x] [Review][Patch] Use release/acquire for map-then-arm vs process load [`Source/Core/Audio/AudioPassthroughProcessor.cpp:36,185`] — `setPassthroughActive` stores release; `process` loads acquire.
+- [x] [Review][Defer] No automated muteInput / disableInputMonitoring observer [`Source/Core/PluginProcessorAudio.cpp:105-112`] — deferred: pre-existing gap; needs StandalonePluginHolder seam (already in deferred-work.md 2026-09-24).
+- [x] [Review][Defer] Empty audioFromSourceId does not survive relaunch [`Source/Core/PluginProcessorAudio.cpp:218-228`] — deferred: pre-existing `initializeAudioProperties` invents stereo/mono (already in deferred-work.md 2026-09-24).
+
+#### Rejected
+
+- BH comment “Arm routing before re-enabling” wrong — false: comment matches map-then-arm intent; code sets maps then `setPassthroughActive(true)`.
+- Spec “silence before deactivating” overstates / empty Spec Change Log / Design Notes / `review_loop_iteration: 0` — rejected: fix would be editing the spec under review.
+- Contextual help never explains NO INPUT as software silence — rejected: out of scope / pre-existing docs; not caused by this change.
+- `disableInputMonitoring` remains public footgun — rejected: no Audio From call sites left; API still valid; prior triage already rejected.
+- Manual UAT omits cold start and Settings-mute-then-select — rejected: cold start already deferred; force-clear mute on real source is Intent.
+- Empty id no longer applying channel mode onto processor / maps mutable while inactive — false: intentional preserve; inactive path ignores maps; next real source rewrites maps before arm.
+- Inactive tests only assert sample index 0 — rejected: low; `clearAllOutputChannels` covers full block; matching existing test style; not everyday user harm.
+
 ## Spec Change Log
 
 ## Design Notes

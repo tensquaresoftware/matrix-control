@@ -6,6 +6,7 @@
 #include "PluginProcessor.h"
 #include "PluginProcessorInternal.h"
 
+#include "Core/Audio/AudioFromSourceSync.h"
 #include "Core/Audio/AudioInputSourceCatalog.h"
 #include "Core/Audio/AudioPassthroughProcessor.h"
 #include "Core/Audio/DeviceAudioInputPreference.h"
@@ -85,22 +86,8 @@ void PluginProcessor::syncAudioRuntimeFromState()
 
 void PluginProcessor::syncAudioPassthroughFromSourceId(const juce::String& sourceId)
 {
-    const bool sourceSelected = sourceId.isNotEmpty();
-
-    if (sourceSelected)
-    {
-        const int channelMode = Core::AudioInputSourceCatalog::channelModeForSourceId(sourceId);
-        audioPassthroughProcessor_->setChannelMode(static_cast<Core::AudioFromChannelMode>(channelMode));
-        audioPassthroughProcessor_->setMonoSourceChannelIndex(
-            Core::AudioInputSourceCatalog::monoChannelIndexForSourceId(sourceId));
-        // Arm routing before re-enabling so the audio thread never sees stale maps.
-        audioPassthroughProcessor_->setPassthroughActive(true);
-    }
-    else
-    {
-        // Silence first so a late audio block cannot use the previous route.
-        audioPassthroughProcessor_->setPassthroughActive(false);
-    }
+    const auto decision = Core::decideAudioFromSourceSync(sourceId);
+    Core::applyAudioFromSourceSync(*audioPassthroughProcessor_, decision);
 
     if (! isStandaloneWrapper())
         return;
@@ -108,7 +95,7 @@ void PluginProcessor::syncAudioPassthroughFromSourceId(const juce::String& sourc
     // JUCE standalone defaults muteInput on (feedback protection) and shows a sticky
     // banner. Clear mute only when a real Audio From source is applied. NO INPUT must
     // not call disableInputMonitoring — that is software silence only.
-    if (! sourceSelected)
+    if (! decision.passthroughActive)
         return;
 
     runSyncOnMessageThread([]
@@ -170,11 +157,14 @@ void PluginProcessor::setAudioFromSourceId(const juce::String& sourceId)
     apvts.state.setProperty("audioFromSourceId", sourceId, nullptr);
     syncAudioPassthroughFromSourceId(sourceId);
 
-    if (sourceId.isEmpty())
+    const auto decision = Core::decideAudioFromSourceSync(sourceId);
+
+    if (! decision.shouldWriteChannelModeProperty)
         return;
 
-    const int channelMode = Core::AudioInputSourceCatalog::channelModeForSourceId(sourceId);
-    apvts.state.setProperty("audioFromChannelMode", channelMode, nullptr);
+    apvts.state.setProperty("audioFromChannelMode",
+                            static_cast<int>(decision.channelMode),
+                            nullptr);
 }
 
 juce::StringArray PluginProcessor::getAudioInputSourceNames() const
