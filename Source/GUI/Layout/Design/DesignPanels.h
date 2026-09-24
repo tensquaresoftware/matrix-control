@@ -186,7 +186,7 @@ namespace TSS::Design
             // Half of the former 4 px bottom edge border (removed): nudge content down to re-center.
             inline constexpr int kContentVerticalOffset = 2;
             inline constexpr int kLogoFontHeight = 20;
-            inline constexpr int kLogoGapAfter = 20;
+            inline constexpr int kLogoGapAfter = 16;
             inline constexpr int kLogoPopupColumnWidth = 100;
             inline constexpr int kLogoPopupActionColumnWidth = 100;
             inline constexpr int kLeftPadding = 12;
