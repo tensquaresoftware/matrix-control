@@ -103,13 +103,21 @@ void PluginEditor::restoreHeaderPanelFromState(HeaderPanel& headerPanel)
     headerPanel.setCurrentSkinItemId(pluginProcessor.getSkinVariantId());
 }
 
-void PluginEditor::refreshMidiPortListsFromOsChange()
+void PluginEditor::refreshMidiPortListsFromOsChange(bool revalidateOpenPorts)
 {
     if (mainComponent_ == nullptr)
         return;
 
     auto& headerPanel = mainComponent_->getHeaderPanel();
-    headerPanel.refreshPortLists();
+
+    // Soft dead-port clear: only when presence says not live (skipped on list-only poll).
+    if (revalidateOpenPorts)
+        pluginProcessor.revalidateOpenMidiPortsForUiRefresh();
+
+    headerPanel.populateMidiPortLists(
+        pluginProcessor.getMidiManager().getOpenInputDeviceId(),
+        pluginProcessor.getMidiManager().getOpenOutputDeviceId(),
+        pluginProcessor.getKeyboardFromOpenDeviceId());
     headerPanel.selectMidiFromPort(
         pluginProcessor.getApvts().state.getProperty("midiInputPortId", juce::String()).toString());
     headerPanel.selectMidiToPort(

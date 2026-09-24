@@ -149,6 +149,7 @@ set(PLUGIN_SOURCES
     Source/Core/Audio/InstrumentMidiForwarder.cpp
     Source/Core/Audio/StandaloneAudioInputRouter.cpp
     Source/Core/MIDI/KeyboardFromMidiInput.cpp
+    Source/Core/MIDI/MidiDevicePresence.cpp
     Source/Core/Init/InitDefaults.cpp
     Source/Core/Init/InitTemplateLoader.cpp
     Source/Core/Init/InitTemplateWriter.cpp
@@ -566,6 +567,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/MidiPortOpenFeedbackTests.cpp
         Tests/Unit/MidiPortOpenFailurePropagationTests.cpp
         Tests/Unit/MidiPortStateCoherenceTests.cpp
+        Tests/Unit/MidiDevicePresenceMatchTests.cpp
         Tests/Unit/MidiPortRoutingPropertyTests.cpp
         Tests/Unit/MidiOutboundQueueTests.cpp
         Tests/Unit/RealtimeQueuePressureMonitorTests.cpp
@@ -664,6 +666,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/Audio/HardwareLatency.cpp
         Source/Core/Audio/InstrumentMidiForwarder.cpp
         Source/Core/MIDI/KeyboardFromMidiInput.cpp
+        Source/Core/MIDI/MidiDevicePresence.cpp
         Source/Core/MIDI/EditorPath.cpp
         Source/Core/MIDI/MidiActivityTracker.cpp
         Source/Core/MIDI/MidiManager.cpp

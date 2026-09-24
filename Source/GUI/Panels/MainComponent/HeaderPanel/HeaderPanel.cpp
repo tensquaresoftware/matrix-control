@@ -4,6 +4,7 @@
 
 #include <juce_audio_devices/juce_audio_devices.h>
 
+#include "GUI/Helpers/AudioFromComboItemSet.h"
 #include "GUI/Helpers/ComboBoxLiveRefresh.h"
 #include "GUI/Helpers/ContextualHelpBindingSupport.h"
 #include "GUI/Helpers/MidiPortComboPopulation.h"
@@ -37,20 +38,14 @@ namespace
                                                  const std::vector<juce::String>& nextIds,
                                                  const juce::StringArray& channelNames)
     {
-        if (! TSS::ComboBoxLiveRefresh::identifiersEqual(currentIds, nextIds))
-            return false;
+        TSS::AudioFromComboItemSet::ComboTexts texts;
+        texts.numItems = combo.getNumItems();
+        texts.itemTexts.reserve(static_cast<size_t>(texts.numItems));
+        for (int i = 0; i < texts.numItems; ++i)
+            texts.itemTexts.push_back(combo.getItemText(i));
 
-        if (combo.getNumItems() != static_cast<int>(nextIds.size()) + 1)
-            return false;
-
-        const int count = channelNames.size();
-        for (int i = 0; i < count; ++i)
-        {
-            if (combo.getItemText(i + 1) != channelNames[i].toUpperCase())
-                return false;
-        }
-
-        return true;
+        return TSS::AudioFromComboItemSet::itemSetUnchanged(
+            currentIds, nextIds, channelNames, texts);
     }
 }
 
@@ -221,13 +216,26 @@ void HeaderPanel::updateKeyboardFromVisibility()
 
 void HeaderPanel::populateMidiPortLists()
 {
-    TSS::MidiPortComboPopulation::populateInputPortCombo(midiFromComboBox_, midiFromPortIdentifiers_);
-    TSS::MidiPortComboPopulation::populateOutputPortCombo(midiToComboBox_, midiToPortIdentifiers_);
+    populateMidiPortLists({}, {}, {});
+}
+
+void HeaderPanel::populateMidiPortLists(const juce::String& keepOpenInputId,
+                                        const juce::String& keepOpenOutputId,
+                                        const juce::String& keepOpenKeyboardFromId)
+{
+    TSS::MidiPortComboPopulation::populateInputPortCombo(
+        midiFromComboBox_, midiFromPortIdentifiers_, keepOpenInputId);
+    TSS::MidiPortComboPopulation::populateOutputPortCombo(
+        midiToComboBox_, midiToPortIdentifiers_, keepOpenOutputId);
 
     if (isPluginMode_)
         configurePluginKeyboardFrom();
     else
-        configureStandaloneKeyboardFrom();
+    {
+        keyboardFromComboBox_.setEnabled(true);
+        TSS::MidiPortComboPopulation::populateInputPortCombo(
+            keyboardFromComboBox_, keyboardFromPortIdentifiers_, keepOpenKeyboardFromId);
+    }
 }
 
 void HeaderPanel::configureStandaloneKeyboardFrom()

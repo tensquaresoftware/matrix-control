@@ -7,6 +7,21 @@
 
 namespace TSS
 {
+    namespace
+    {
+        /** Integer logical px for popup chrome (border / sentinel rule), matching the
+            physical-pixel snap then rounding so layout and paint share one grid. */
+        int popupChromeStrokePx(float uiScale, float systemDisplayScale, float designThickness)
+        {
+            const float snapped = ScaledDrawing::snappedStrokeThicknessFromDesign(
+                designThickness,
+                uiScale,
+                systemDisplayScale,
+                ScaledDrawing::StrokeSnapPolicy::kFloor);
+            return juce::jmax(1, juce::roundToInt(snapped));
+        }
+    }
+
     class ScrollablePopupMenu::ScrollableContentComponent : public juce::Component
     {
     public:
@@ -53,7 +68,7 @@ namespace TSS
         : PopupMenuBase(comboBox, true)
     {
         const auto numItems = comboBox_.getNumItems();
-        columnWidth_ = static_cast<float>(comboBox_.getBaseComponentWidth()) * uiScale_;
+        columnWidth_ = static_cast<float>(juce::jmax(1, comboBox_.getWidth()));
         const auto& popupLayout = ComboBox::getPopupLayoutDimensions();
         scrollableContentHeight_ = juce::roundToInt(static_cast<float>(numItems * popupLayout.itemHeight) * uiScale_);
 
@@ -82,40 +97,74 @@ namespace TSS
     {
         const auto bounds = getLocalBounds().toFloat();
         const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
-        const float borderThickness = ScaledDrawing::snappedStrokeThicknessFromDesign(
-            getBorderThicknessDesign(),
-            uiScale_,
-            systemDisplayScale,
-            ScaledDrawing::StrokeSnapPolicy::kFloor);
-        const auto contentBounds = bounds.reduced(borderThickness);
-        renderer_.drawBackground(g, contentBounds);
-        renderer_.drawBorder(g, bounds, systemDisplayScale);
+        const int strokePx = popupChromeStrokePx(uiScale_, systemDisplayScale, getBorderThicknessDesign());
+        const float stroke = static_cast<float>(strokePx);
+
+        // Full fill under an integer stroke avoids fractional gaps (dark "liseret") between
+        // background and border at 150%/175%.
+        renderer_.drawBackground(g, bounds);
+        g.setColour(isButtonLike_ ? comboBox_.getPopupMenuLook().borderButtonLike
+                                  : comboBox_.getPopupMenuLook().border);
+        g.drawRect(bounds, stroke);
+    }
+
+    void ScrollablePopupMenu::paintOverChildren(juce::Graphics& g)
+    {
+        const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
+        const int strokePx = popupChromeStrokePx(uiScale_, systemDisplayScale, getBorderThicknessDesign());
+        drawSentinelRuleIfNeeded(g,
+                                 getLocalBounds().toFloat().reduced(static_cast<float>(strokePx)),
+                                 static_cast<float>(strokePx));
+    }
+
+    void ScrollablePopupMenu::drawSentinelRuleIfNeeded(juce::Graphics& g,
+                                                       const juce::Rectangle<float>& contentBounds,
+                                                       float ruleThickness)
+    {
+        constexpr int kPortSentinelItemId = 1;
+        if (comboBox_.getNumItems() <= 1 || comboBox_.getItemId(0) != kPortSentinelItemId)
+            return;
+        if (viewport_ == nullptr)
+            return;
+
+        const float itemHeight = static_cast<float>(getItemHeightDesign()) * uiScale_;
+        const float scrollY = static_cast<float>(viewport_->getViewPositionY());
+        // Viewport origin matches the integer content box (same stroke as chrome).
+        const float ruleBottom = static_cast<float>(viewport_->getY()) + itemHeight - scrollY;
+        if (ruleBottom < contentBounds.getY() + ruleThickness
+            || ruleBottom > contentBounds.getBottom())
+        {
+            return;
+        }
+
+        g.setColour(comboBox_.getPopupMenuLook().borderButtonLike);
+        g.fillRect(contentBounds.getX(),
+                   ruleBottom - ruleThickness,
+                   contentBounds.getWidth(),
+                   ruleThickness);
     }
 
     void ScrollablePopupMenu::resized()
     {
         const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
-        const float borderThickness = ScaledDrawing::snappedStrokeThicknessFromDesign(
-            getBorderThicknessDesign(),
-            uiScale_,
-            systemDisplayScale,
-            ScaledDrawing::StrokeSnapPolicy::kFloor);
-        const int insetPx = juce::roundToInt(borderThickness);
-        auto inner = getLocalBounds().reduced(insetPx);
+        const int strokePx = popupChromeStrokePx(uiScale_, systemDisplayScale, getBorderThicknessDesign());
+        const auto inner = getLocalBounds().reduced(strokePx);
         if (viewport_ == nullptr)
             return;
+
+        viewport_->setBounds(inner);
 
         if (scrollbarNeeded_ && customScrollBar_ != nullptr)
         {
             const int scrollbarThicknessPx = juce::jmax(1, juce::roundToInt(
                 static_cast<float>(ComboBox::getPopupLayoutDimensions().scrollbarWidth) * uiScale_));
-            viewport_->setBounds(inner.removeFromLeft(inner.getWidth() - scrollbarThicknessPx));
-            customScrollBar_->setBounds(inner);
+            customScrollBar_->setBounds(inner.withTrimmedLeft(inner.getWidth() - scrollbarThicknessPx));
+            customScrollBar_->toFront(false);
         }
-        else
-        {
-            viewport_->setBounds(inner);
-        }
+
+        columnWidth_ = static_cast<float>(viewport_->getWidth());
+        if (contentComponent_ != nullptr)
+            contentComponent_->setSize(viewport_->getWidth(), scrollableContentHeight_);
     }
 
     void ScrollablePopupMenu::setupScrollableContent()
@@ -167,7 +216,8 @@ namespace TSS
         {
             const float itemHeight = static_cast<float>(getItemHeightDesign()) * uiScale_;
             const float y = static_cast<float>(itemIndex) * itemHeight;
-            return juce::Rectangle<float>(0.0f, y, columnWidth_, itemHeight);
+            const float width = static_cast<float>(juce::jmax(1, contentComponent_->getWidth()));
+            return juce::Rectangle<float>(0.0f, y, width, itemHeight);
         }
 
         return juce::Rectangle<float>();
@@ -192,17 +242,30 @@ namespace TSS
     void ScrollablePopupMenu::drawItems(juce::Graphics& g)
     {
         const auto numItems = comboBox_.getNumItems();
+        constexpr int kPortSentinelItemId = 1;
+        const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
+        const float ruleThickness = static_cast<float>(
+            popupChromeStrokePx(uiScale_, systemDisplayScale, getBorderThicknessDesign()));
 
         for (int i = 0; i < numItems; ++i)
         {
             const auto itemBounds = getItemBounds(i);
-            if (! itemBounds.isEmpty())
-                renderer_.drawItem(g, {
-                    .comboBox = comboBox_,
-                    .itemIndex = i,
-                    .itemBounds = itemBounds,
-                    .highlightedItemIndex = highlightedItemIndex_,
-                    .font = cachedFont_});
+            if (itemBounds.isEmpty())
+                continue;
+
+            const bool sentinelWithRule = (i == 0 && numItems > 1
+                                           && comboBox_.getItemId(0) == kPortSentinelItemId);
+
+            // reduced(gap) + trim ruleThickness: equal air above hover and above the rule.
+            // Gap comes from PopupMenuRenderer (integer HeaderLogo-style air).
+            renderer_.drawItem(g, {
+                .comboBox = comboBox_,
+                .itemIndex = i,
+                .itemBounds = itemBounds,
+                .highlightedItemIndex = highlightedItemIndex_,
+                .font = cachedFont_,
+                .systemDisplayScale = systemDisplayScale,
+                .highlightBottomExtraTrim = sentinelWithRule ? ruleThickness : 0.0f});
         }
     }
 
@@ -229,6 +292,7 @@ namespace TSS
         const int newY = juce::jlimit(0, range, viewport_->getViewPositionY() + deltaPixels);
         viewport_->setViewPosition(0, newY);
         repaintScrollBar();
+        repaint();
     }
 
     void ScrollablePopupMenu::scrollToHighlightedItem()
@@ -238,11 +302,11 @@ namespace TSS
 
         const float itemHeight = static_cast<float>(getItemHeightDesign()) * uiScale_;
         const float itemY = static_cast<float>(highlightedItemIndex_) * itemHeight;
-        const auto viewportY = viewport_->getViewPositionY();
-        const auto viewportHeight = viewport_->getHeight();
-
-        const bool isItemVisible = (itemY >= static_cast<float>(viewportY)
-            && itemY + itemHeight <= static_cast<float>(viewportY + viewportHeight));
+        const int viewportY = viewport_->getViewPositionY();
+        const int viewportHeight = viewport_->getHeight();
+        const bool isItemVisible =
+            (itemY >= static_cast<float>(viewportY)
+             && itemY + itemHeight <= static_cast<float>(viewportY + viewportHeight));
         if (! isItemVisible)
         {
             const auto centeredY = juce::jmax(0, juce::roundToInt(itemY - static_cast<float>(viewportHeight) * 0.5f));
@@ -302,26 +366,17 @@ namespace TSS
 
         const auto& popupLayout = ComboBox::getPopupLayoutDimensions();
         const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(comboBox);
-        const float borderThickness = ScaledDrawing::snappedStrokeThicknessFromDesign(
-            rawPtr->getBorderThicknessDesign(),
+        const int strokePx = popupChromeStrokePx(
             rawPtr->uiScale_,
             systemDisplayScale,
-            ScaledDrawing::StrokeSnapPolicy::kFloor);
-        const int insetPx = juce::roundToInt(borderThickness);
-        const int scrollbarThicknessPx = juce::jmax(1, juce::roundToInt(
-            static_cast<float>(popupLayout.scrollbarWidth) * rawPtr->uiScale_));
+            rawPtr->getBorderThicknessDesign());
         const float maxScrollableHeight = static_cast<float>(popupLayout.maxScrollHeight) * rawPtr->uiScale_;
         const int viewportHeightPx = (rawPtr->scrollableContentHeight_ <= static_cast<int>(maxScrollableHeight))
             ? rawPtr->scrollableContentHeight_
             : juce::roundToInt(maxScrollableHeight);
 
-        const int rightMarginPx = rawPtr->scrollbarNeeded_
-            ? juce::jmax(
-                juce::roundToInt(kRightMarginFromHighlightToEdge_ * rawPtr->uiScale_),
-                scrollbarThicknessPx)
-            : 0;
-        const int popupWidth = juce::roundToInt(rawPtr->columnWidth_) + rightMarginPx + 2 * insetPx;
-        const int popupHeight = viewportHeightPx + 2 * insetPx;
+        const int popupWidth = juce::roundToInt(rawPtr->columnWidth_) + 2 * strokePx;
+        const int popupHeight = viewportHeightPx + 2 * strokePx;
 
         const auto dimensions = PopupMenuPositioner::calculateDimensions(
             comboBox,

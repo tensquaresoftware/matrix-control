@@ -42,7 +42,13 @@ public:
     void setPluginMode(bool isPlugin);
 
     void populateMidiPortLists();
+    void populateMidiPortLists(const juce::String& keepOpenInputId,
+                               const juce::String& keepOpenOutputId,
+                               const juce::String& keepOpenKeyboardFromId);
     void refreshPortLists() { populateMidiPortLists(); }
+
+    /** When set, MIDI combo about-to-show uses this instead of a bare refreshPortLists(). */
+    std::function<void()> onMidiPortListsRefreshRequested;
 
     void setCurrentSkinItemId(int skinItemId) { currentSkinItemId_ = skinItemId; }
     void setCurrentUiScaleId(int scaleId) { currentUiScaleId_ = scaleId; }

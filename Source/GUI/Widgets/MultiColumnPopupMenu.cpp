@@ -216,7 +216,8 @@ namespace TSS
     void MultiColumnPopupMenu::drawItems(juce::Graphics& g)
     {
         const auto numItems = comboBox_.getNumItems();
-        
+        const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
+
         for (int i = 0; i < numItems; ++i)
         {
             const auto itemBounds = getItemBounds(i);
@@ -227,7 +228,8 @@ namespace TSS
                     .itemIndex = i,
                     .itemBounds = itemBounds,
                     .highlightedItemIndex = highlightedItemIndex_,
-                    .font = cachedFont_});
+                    .font = cachedFont_,
+                    .systemDisplayScale = systemDisplayScale});
             }
         }
     }

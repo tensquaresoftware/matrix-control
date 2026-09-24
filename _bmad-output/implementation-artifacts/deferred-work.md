@@ -1927,3 +1927,22 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-audio-midi-combo-live-refresh.md`
   summary: Unit tests never invoke populateInputPortCombo / populateOutputPortCombo / populateAudioFromCombo open-popup branches.
   evidence: Verification Gap — locking rebuildPreservingOpenPopup call order is the feasible CI lock; full populate path needs OS device mocking or a HeaderPanel GUI harness.
+
+## Deferred from: code review of spec-audio-midi-combo-live-refresh.md (2026-09-24)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-audio-midi-combo-live-refresh.md`
+  summary: PopupMenuRenderer::drawSentinelBottomRule is unused; ScrollablePopupMenu paints its own rule (colour / API can drift).
+  evidence: Cosmetic; wire shared helper or delete dead API in a later chrome pass.
+- source_spec: `_bmad-output/implementation-artifacts/spec-audio-midi-combo-live-refresh.md`
+  summary: ScrollablePopupMenu hardcodes sentinel item id 1 instead of a shared neutral constant.
+  evidence: Avoid pulling MidiPortComboPopulation into widget paint; share only if a popup-layout constant is introduced.
+
+## Deferred from: combo live-refresh smoke follow-up (2026-09-24)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-audio-midi-combo-live-refresh.md`
+  summary: Remember preferred audio interface and MIDI devices (interface + master keyboard) and restore them on hot-plug to reduce Settings friction.
+  evidence: User request after smoke test; out of scope for open-popup refresh / sort / sentinel separator polish. Discuss as a follow-up Build.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-audio-midi-combo-live-refresh.md`
+  summary: Emagic Unitor8/AMT8 ports can remain listed in CoreMIDI (and JUCE Audio/MIDI Settings) while the box is powered off; MT4/Oxygen disappear correctly via kMIDIPropertyOffline / USB removal. Soft power-off with USB still enumerated is not distinguishable from a live device without driver-specific heuristics.
+  evidence: Cross-check 2026-09-24 — AMT8 still visible in JUCE settings when off; MT4 behaves like Oxygen; IOKit USB node often stays present; further investigation not recommended unless Emagic driver behaviour changes.

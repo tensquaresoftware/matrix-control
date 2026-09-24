@@ -50,8 +50,9 @@ public:
     void fileDragExit(const juce::StringArray& files) override;
     void filesDropped(const juce::StringArray& files, int x, int y) override;
 
-    /** Refresh header MIDI port combos after an OS MIDI device-list change. */
-    void refreshMidiPortListsFromOsChange();
+    /** Refresh header MIDI port combos after an OS MIDI device-list change.
+        When revalidateOpenPorts is false (open-menu poll), only rebuild lists — no force-reopen. */
+    void refreshMidiPortListsFromOsChange(bool revalidateOpenPorts = true);
 
 private:
     // Nested runtime timers; bodies live in PluginEditorTimers.cpp.
@@ -62,12 +63,14 @@ private:
 
     private:
         void timerCallback() override;
+        void pollOpenMidiPopups();
 
         PluginProcessor& processor_;
         HeaderPanel& headerPanel_;
         PluginEditor& owner_;
         Core::RealtimeQueuePressureMonitor queuePressureMonitor_;
         int audioFromRefreshAttempts_ = 0;
+        int midiPopupPollTicks_ = 0;
     };
 
     class ClipboardFeedbackPhaseTimer : private juce::Timer,

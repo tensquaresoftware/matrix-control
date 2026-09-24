@@ -5,6 +5,7 @@
 #include "PluginProcessorInternal.h"
 
 #include "Core/MIDI/KeyboardFromMidiInput.h"
+#include "Core/MIDI/MidiDevicePresence.h"
 #include "Core/MIDI/MidiPortStateCoherence.h"
 #include "Core/Services/DeviceConnectionMachineDefaults.h"
 #include "GUI/PluginEditor.h"
@@ -13,6 +14,39 @@
 #include "Shared/Definitions/PluginIDs.h"
 
 using namespace PluginProcessorInternal;
+
+namespace
+{
+    void clearDeadMidiInputIfNeeded(MidiManager& midiManager,
+                                    juce::ValueTree& state,
+                                    const juce::String& desiredId)
+    {
+        if (! Core::shouldForceReopenForUiRefresh(desiredId, Core::isMidiInputIdentifierLive(desiredId)))
+            return;
+
+        if (Core::shouldClearDeadPortAfterReopen(desiredId,
+                                                 midiManager.forceReopenInputPort(desiredId, false)))
+        {
+            midiManager.forceReopenInputPort({}, false);
+            state.setProperty("midiInputPortId", juce::String(), nullptr);
+        }
+    }
+
+    void clearDeadMidiOutputIfNeeded(MidiManager& midiManager,
+                                     juce::ValueTree& state,
+                                     const juce::String& desiredId)
+    {
+        if (! Core::shouldForceReopenForUiRefresh(desiredId, Core::isMidiOutputIdentifierLive(desiredId)))
+            return;
+
+        if (Core::shouldClearDeadPortAfterReopen(desiredId,
+                                                 midiManager.forceReopenOutputPort(desiredId, false)))
+        {
+            midiManager.forceReopenOutputPort({}, false);
+            state.setProperty("midiOutputPortId", juce::String(), nullptr);
+        }
+    }
+}
 
 PluginProcessor::DeferredMidiPortSyncTimer::DeferredMidiPortSyncTimer(PluginProcessor& processorIn)
     : processor(processorIn)
@@ -145,6 +179,48 @@ bool PluginProcessor::setKeyboardFromPort(const juce::String& deviceId)
     apvts.state.setProperty("keyboardFromPortId", deviceId, nullptr);
     Core::clearMidiFromKeyboardFromConflictFooterIfPresent(apvts.state);
     return true;
+}
+
+void PluginProcessor::revalidateOpenMidiPortsForUiRefresh()
+{
+    if (midiManager == nullptr)
+        return;
+
+    clearDeadMidiInputIfNeeded(
+        *midiManager,
+        apvts.state,
+        apvts.state.getProperty("midiInputPortId", juce::String()).toString());
+    clearDeadMidiOutputIfNeeded(
+        *midiManager,
+        apvts.state,
+        apvts.state.getProperty("midiOutputPortId", juce::String()).toString());
+
+    if (! isStandaloneWrapper() || keyboardFromMidiInput_ == nullptr)
+        return;
+
+    const auto desiredKeyboard =
+        apvts.state.getProperty("keyboardFromPortId", juce::String()).toString();
+    if (! Core::shouldForceReopenForUiRefresh(desiredKeyboard,
+                                              Core::isMidiInputIdentifierLive(desiredKeyboard)))
+    {
+        return;
+    }
+
+    const bool reopenSucceeded = setKeyboardFromPort(desiredKeyboard);
+    // Conflict returns false without closing; only clear when we are not holding that id.
+    if (Core::shouldClearDeadPortAfterReopen(desiredKeyboard, reopenSucceeded)
+        && getKeyboardFromOpenDeviceId() != desiredKeyboard)
+    {
+        setKeyboardFromPort({});
+    }
+}
+
+juce::String PluginProcessor::getKeyboardFromOpenDeviceId() const
+{
+    if (keyboardFromMidiInput_ == nullptr || ! keyboardFromMidiInput_->isPortOpen())
+        return {};
+
+    return apvts.state.getProperty("keyboardFromPortId", juce::String()).toString();
 }
 
 void PluginProcessor::syncMidiPortsFromStateImpl(bool reportOpenFailures)

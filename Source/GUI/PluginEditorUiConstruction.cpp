@@ -194,6 +194,8 @@ void PluginEditor::restoreAndWireHeader()
 
 void PluginEditor::wireHeaderRuntimeControls(HeaderPanel& headerPanel)
 {
+    headerPanel.onMidiPortListsRefreshRequested = [this] { refreshMidiPortListsFromOsChange(); };
+
     headerPanel.getMidiFromComboBox().onChange = [this, &headerPanel]
     {
         const auto previousPortId = pluginProcessor.getApvts().state.getProperty("midiInputPortId", juce::String()).toString();

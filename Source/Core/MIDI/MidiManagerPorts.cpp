@@ -105,6 +105,45 @@ bool MidiManager::openMidiOutputPort(const juce::String& deviceId, bool reportOp
     return true;
 }
 
+bool MidiManager::forceReopenInputPort(const juce::String& deviceId, bool reportOpenFailure)
+{
+    if (deviceId.isEmpty())
+    {
+        stopMidiInputCallbacks();
+        clearFooterThenReassertDeviceLockGuidance(apvts);
+        return true;
+    }
+
+    if (midiReceiver != nullptr)
+        midiReceiver->setMidiInput(nullptr);
+
+    if (inputMidiPort != nullptr)
+        inputMidiPort->closePort();
+
+    return openMidiInputPort(deviceId, reportOpenFailure);
+}
+
+bool MidiManager::forceReopenOutputPort(const juce::String& deviceId, bool reportOpenFailure)
+{
+    if (deviceId.isEmpty())
+    {
+        if (midiSender != nullptr)
+            midiSender->setMidiOutput(nullptr);
+        if (outputMidiPort != nullptr)
+            outputMidiPort->closePort();
+        clearFooterThenReassertDeviceLockGuidance(apvts);
+        return true;
+    }
+
+    if (midiSender != nullptr)
+        midiSender->setMidiOutput(nullptr);
+
+    if (outputMidiPort != nullptr)
+        outputMidiPort->closePort();
+
+    return openMidiOutputPort(deviceId, reportOpenFailure);
+}
+
 bool MidiManager::isInputPortOpenWithDevice(const juce::String& deviceId) const
 {
     return inputMidiPort != nullptr && inputMidiPort->isOpenWithDevice(deviceId);

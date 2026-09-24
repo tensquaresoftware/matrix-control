@@ -23,6 +23,24 @@ PluginEditor::HeaderRefreshTimer::HeaderRefreshTimer(PluginProcessor& processor,
     startTimerHz(30);
 }
 
+void PluginEditor::HeaderRefreshTimer::pollOpenMidiPopups()
+{
+    // CoreMIDI sometimes delays or skips list callbacks while a modal popup is open
+    // (e.g. power-off of a USB interface). Poll slowly so open menus stay truthful.
+    constexpr int kMidiPopupPollIntervalTicks = 15; // 0.5 s at 30 Hz
+    if (++midiPopupPollTicks_ < kMidiPopupPollIntervalTicks)
+        return;
+
+    midiPopupPollTicks_ = 0;
+    if (headerPanel_.getMidiFromComboBox().isPopupOpen()
+        || headerPanel_.getMidiToComboBox().isPopupOpen()
+        || headerPanel_.getKeyboardFromComboBox().isPopupOpen())
+    {
+        // List-only: do not force-reopen ports while the user is browsing the menu.
+        owner_.refreshMidiPortListsFromOsChange(false);
+    }
+}
+
 void PluginEditor::HeaderRefreshTimer::timerCallback()
 {
     if (processor_.isStandalone())
@@ -41,6 +59,8 @@ void PluginEditor::HeaderRefreshTimer::timerCallback()
         headerPanel_.getPeakIndicator().setLevel(
             processor_.getAudioPassthroughProcessor().getPeakLevel());
     }
+
+    pollOpenMidiPopups();
 
     const auto& tracker = processor_.getMidiActivityTracker();
     headerPanel_.getInstrumentActivityLed().setLevel(

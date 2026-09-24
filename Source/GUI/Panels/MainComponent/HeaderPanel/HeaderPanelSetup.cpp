@@ -79,6 +79,17 @@ void HeaderPanel::addChildControls(TSS::ISkin& skin)
     addAndMakeVisible(undoButton_);
     addAndMakeVisible(redoButton_);
     addAndMakeVisible(panicButton_);
+
+    const auto refreshMidiPortsBeforeOpen = [this]()
+    {
+        if (onMidiPortListsRefreshRequested)
+            onMidiPortListsRefreshRequested();
+        else
+            refreshPortLists();
+    };
+    midiFromComboBox_.onAboutToShowPopup = refreshMidiPortsBeforeOpen;
+    midiToComboBox_.onAboutToShowPopup = refreshMidiPortsBeforeOpen;
+    keyboardFromComboBox_.onAboutToShowPopup = refreshMidiPortsBeforeOpen;
 }
 
 void HeaderPanel::applyPanicButtonLook()

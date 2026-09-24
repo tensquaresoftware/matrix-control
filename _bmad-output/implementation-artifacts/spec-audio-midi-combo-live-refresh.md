@@ -81,14 +81,15 @@ context: []
 ## Implementation Notes
 
 ### What shipped
-- `ComboBox` tracks the active modal popup (`attachOpenPopup` / `dismissPopup`), coalesces rapid async reopens via `popupShowGeneration_`, and exposes `isPopupOpen()`.
-- Shared helper `Source/GUI/Helpers/ComboBoxLiveRefresh.h`: pure `planRefresh` / `identifiersEqual` plus `rebuildPreservingOpenPopup` (dismiss → rebuild → `showPopup`).
-- MIDI populate (`MidiPortComboPopulation`) and Audio From populate (`HeaderPanel`) use that path; unchanged item ids skip rebuild (no-op) so rapid churn does not flicker; DEVICE SETUP / EPROM MIDI combos inherit via shared populate.
-- Editor OS refresh paths (`refreshMidiPortListsFromOsChange`, `refreshAudioFromCombo`) unchanged: still message-thread, still reselect from APVTS after populate.
+- `ComboBox` tracks the active modal popup (`attachOpenPopup` / `dismissPopup`), coalesces rapid async reopens via `popupShowGeneration_`, and exposes `isPopupOpen()` / `showPopupAfterItemRebuild()` (skips `onAboutToShowPopup` on live reopen).
+- Shared helper `Source/GUI/Helpers/ComboBoxLiveRefresh.h`: pure `planRefresh` / `identifiersEqual` plus `rebuildPreservingOpenPopup` (dismiss → rebuild → `showPopupAfterItemRebuild`).
+- MIDI populate (`MidiPortComboPopulation`) and Audio From populate (`HeaderPanel`) use that path; unchanged item ids+labels+count skip rebuild so rapid churn does not flicker; DEVICE SETUP / EPROM MIDI combos inherit via shared populate.
+- OS MIDI list change: `refreshMidiPortListsFromOsChange(true)` soft-revalidates ports (force-reopen only when presence says not live; clear only on reopen failure). Open-menu poll uses `refreshMidiPortListsFromOsChange(false)` — list rebuild only.
+- Apple: `MidiDevicePresence` filters offline CoreMIDI endpoints; non-Apple fail-open pass-through (no exclusive probes).
 
 ### Verification
 - `cmake --build --preset macos-debug-arm64` — success
-- `Matrix-Control_Tests --test ComboBoxLiveRefresh --test MidiPortComboPopulation` — 0 failures
+- `Matrix-Control_Tests --test ComboBoxLiveRefresh --test MidiPortComboPopulation --test MidiPortStateCoherence --test MidiDevicePresenceMatch` — 0 failures
 - `python3 Scripts/quality/lint_touched.py` — clean
 
 ### Manual UAT (Standalone)
@@ -116,6 +117,50 @@ context: []
 | Manual UAT only checklist, no pass evidence (Blind) | false | Spec Verification already treats Standalone hot-plug as manual; checklist is the required artifact. |
 | `showPopup` may no-op after dismiss (Edge) | maybe-false | Unverified in Standalone with on-screen editor; deferred. |
 | Populate MIDI/Audio branches never invoked under test (VG#2) | medium | Pre-verified gap; deferred — locking pure sequence is the feasible CI lock without OS device mocking. |
+
+### Review Findings
+
+#### 2026-09-24 (code review — commit ae1350b4 + polish WT)
+
+- [x] [Review][Decision] Poll 0.5 s while a MIDI popup is open — resolved: **option 1 list-only** (keep poll; do not call port revalidate / force-reopen from poll)
+- [x] [Review][Decision] When should UI refresh tear down / clear open MIDI ports? — resolved: **option 1 soft** (force-reopen only if presence says dead; clear only on reopen failure)
+- [x] [Review][Patch] Poll open MIDI popups: refresh combo lists only — no `revalidateOpenMidiPortsForUiRefresh` [`Source/GUI/PluginEditorTimers.cpp`]
+- [x] [Review][Patch] Soft dead-port policy: force-reopen only when !live; clear only when reopen fails [`Source/Core/PluginProcessorMidiPorts.cpp` / `MidiPortStateCoherence.h`]
+- [x] [Review][Patch] Do not treat Keyboard From conflict `false` as a dead port — clear only when not holding that id [`Source/Core/PluginProcessorMidiPorts.cpp`]
+- [x] [Review][Patch] Nested `onAboutToShowPopup` during dismiss→reopen — `showPopupAfterItemRebuild` skips callback [`Source/GUI/Widgets/ComboBox.*` / `ComboBoxLiveRefresh.h`]
+- [x] [Review][Patch] Non-Apple presence: fail-open pass-through (no exclusive openDevice probe) [`Source/Core/MIDI/MidiDevicePresence.cpp`]
+- [x] [Review][Patch] Multi-token CoreMIDI match includes live device UniqueID parts [`Source/Core/MIDI/MidiDevicePresenceMatch.h`]
+- [x] [Review][Patch] `audioFromItemSetUnchanged` loops only over nextIds size [`Source/GUI/Helpers/AudioFromComboItemSet.h`]
+- [x] [Review][Patch] Unit-test soft dead-port policy helpers [`Tests/Unit/MidiPortStateCoherenceTests.cpp`]
+- [x] [Review][Patch] Unit-test MidiDevicePresence identifier↔live-id matching [`Tests/Unit/MidiDevicePresenceMatchTests.cpp`]
+- [x] [Review][Patch] Unit-test midiPortItemSetUnchanged / Audio From twin for label+count skip [`Tests/Unit/MidiPortComboPopulationTests.cpp`]
+- [x] [Review][Defer] Open-popup populate path never under unit tests — deferred: already recorded; pure dismiss→rebuild→show remains the feasible CI lock
+- [x] [Review][Defer] `showPopup` may no-op after dismiss — deferred: already recorded maybe-false; settle with UAT / GUI harness
+- [x] [Review][Defer] Dead `PopupMenuRenderer::drawSentinelBottomRule` vs local Scrollable paint — deferred: cosmetic drift; wire or delete in a chrome pass
+- [x] [Review][Defer] Hardcoded sentinel item id `1` in ScrollablePopupMenu — deferred: avoid MidiPortComboPopulation coupling into widget paint; share only if a neutral constant lands
+- [x] [Review][Defer] Spec Implementation Notes still say editor OS refresh paths “unchanged” — resolved: Implementation Notes updated after soft/list-only patches
+
+**Rejected (this pass):**
+- Presence / alpha-sort / popup chrome “out of frozen Never” (Acceptance Auditor) — false: polish explicitly in review scope and prior product decisions.
+- `getMidiManager` null crash after revalidate early return — false: same editor lifetime assumption as the rest of PluginEditor; midiManager present when editor refreshes ports.
+- `canShowPopup` false after normal rebuild — false for everyday path: sentinel keeps `getNumItems() > 0`.
+- keepOpenDeviceId “flicker” path overclaimed — false as a user-facing defect: rare race; comment overstates, behaviour not harmful.
+- Scrollbar width / text clip — maybe-false low: overlay scrollbar intentional; not everyday without long lists; rejected for this pass.
+- Findings whose only fix is editing the frozen Intent / Never text — rejected per triage rules.
+
+| Finding | Verdict | Evidence / route |
+|---------|---------|------------------|
+| Poll + force-reopen every 0.5 s / about-to-show (BH, Edge, AA) | high | Confirmed. Decision 1→list-only poll → patch. |
+| shouldClearDeadPort clears on !live after successful reopen (BH, Edge, AA soft-sync) | high | Confirmed. Decision 2→soft clear policy → patch. |
+| Keyboard conflict → clear (BH, Edge) | high | Confirmed: `setKeyboardFromPort` false → clear. patch. |
+| Nested onAboutToShow on reopen (Edge) | medium | Confirmed: `showPopup` always invokes callback. patch. |
+| Non-Apple openDevice probe (BH, Edge) | medium | Confirmed else branch. patch. |
+| Multi-token device UniqueID (Edge) | medium | Confirmed loop checks endpoints only. patch. |
+| audioFrom name loop vs id count (BH) | low | Confirmed; patch bound to `nextIds`. |
+| VG: dead-port / presence / item-set text tests | medium | Pre-verified. patch. |
+| VG: open-popup populate untested | medium | Pre-verified; defer (already). |
+| AA: presence/sort/chrome out of scope | false | Human-authorized polish. |
+| midiManager null / canShowPopup / keepOpen / scrollbar | false or reject | See Rejected list. |
 
 ## Design Notes
 

@@ -25,14 +25,17 @@ namespace TSS
         g.fillRect(bounds);
     }
 
-    void PopupMenuRenderer::drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds, float systemDisplayScale) const
+    void PopupMenuRenderer::drawBorder(juce::Graphics& g,
+                                       const juce::Rectangle<float>& bounds,
+                                       float systemDisplayScale,
+                                       ScaledDrawing::StrokeSnapPolicy borderSnapPolicy) const
     {
         const auto& popupLayout = ComboBox::getPopupLayoutDimensions();
         const float borderThickness = ScaledDrawing::snappedStrokeThicknessFromDesign(
             static_cast<float>(popupLayout.borderThickness),
             uiScale_,
             systemDisplayScale,
-            ScaledDrawing::StrokeSnapPolicy::kRound);
+            borderSnapPolicy);
         const auto borderColour = isButtonLike_
             ? look_.borderButtonLike
             : look_.border;
@@ -40,20 +43,27 @@ namespace TSS
         g.drawRect(bounds, borderThickness);
     }
 
-    void PopupMenuRenderer::drawLabelItem(juce::Graphics& g,
-                                          const juce::String& text,
-                                          const juce::Rectangle<float>& itemBounds,
-                                          bool isHighlighted,
-                                          bool isEnabled,
-                                          const juce::Font& font) const
+    float PopupMenuRenderer::getHighlightGap(float /* systemDisplayScale */) const
     {
-        if (isHighlighted && isEnabled)
+        // HeaderLogoPopupMenu pattern: design * uiScale, min 1 logical px (integer).
+        constexpr float kHighlightGapDesign = 1.0f;
+        return static_cast<float>(juce::jmax(1, juce::roundToInt(kHighlightGapDesign * uiScale_)));
+    }
+
+    void PopupMenuRenderer::drawLabelItem(juce::Graphics& g, const DrawLabelArgs& args) const
+    {
+        jassert(args.font != nullptr);
+        const auto& font = *args.font;
+
+        if (args.isHighlighted && args.isEnabled)
         {
             const auto hooverBackgroundColour = isButtonLike_
                 ? look_.backgroundHoverButtonLike
                 : look_.backgroundHover;
-            const float gap = getHighlightGap();
-            const auto hooverBoundsFloat = itemBounds.reduced(gap);
+            const float gap = getHighlightGap(args.systemDisplayScale);
+            auto hooverBoundsFloat = args.itemBounds.reduced(gap);
+            if (args.highlightBottomExtraTrim > 0.0f)
+                hooverBoundsFloat.setBottom(hooverBoundsFloat.getBottom() - args.highlightBottomExtraTrim);
             g.setColour(hooverBackgroundColour);
             g.fillRect(hooverBoundsFloat);
 
@@ -64,23 +74,23 @@ namespace TSS
             g.setFont(font);
 
             const float textPadding = static_cast<float>(ComboBox::getPopupLayoutDimensions().textLeftPadding) * uiScale_;
-            const auto textBounds = itemBounds.withTrimmedLeft(textPadding);
-            g.drawText(text, textBounds, juce::Justification::centredLeft, false);
+            const auto textBounds = args.itemBounds.withTrimmedLeft(textPadding);
+            g.drawText(args.text, textBounds, juce::Justification::centredLeft, false);
             return;
         }
 
         auto textColour = isButtonLike_
             ? look_.textButtonLike
             : look_.text;
-        if (! isEnabled)
+        if (! args.isEnabled)
             textColour = textColour.withAlpha(0.5f);
 
         g.setColour(textColour);
         g.setFont(font);
 
         const float textPadding = static_cast<float>(ComboBox::getPopupLayoutDimensions().textLeftPadding) * uiScale_;
-        const auto textBounds = itemBounds.withTrimmedLeft(textPadding);
-        g.drawText(text, textBounds, juce::Justification::centredLeft, false);
+        const auto textBounds = args.itemBounds.withTrimmedLeft(textPadding);
+        g.drawText(args.text, textBounds, juce::Justification::centredLeft, false);
     }
 
     void PopupMenuRenderer::drawSubMenuChevron(juce::Graphics& g,
@@ -108,8 +118,14 @@ namespace TSS
         const auto itemId = args.comboBox.getItemId(args.itemIndex);
         const auto isSelectable = itemId != 0 && args.comboBox.isItemEnabled(itemId);
         const auto isHighlighted = (args.highlightedItemIndex == args.itemIndex) && isSelectable;
-        drawLabelItem(g, args.comboBox.getItemText(args.itemIndex), args.itemBounds,
-                      isHighlighted, isSelectable, args.font);
+        drawLabelItem(g, {
+            .text = args.comboBox.getItemText(args.itemIndex),
+            .itemBounds = args.itemBounds,
+            .isHighlighted = isHighlighted,
+            .isEnabled = isSelectable,
+            .font = &args.font,
+            .systemDisplayScale = args.systemDisplayScale,
+            .highlightBottomExtraTrim = args.highlightBottomExtraTrim});
     }
 
     void PopupMenuRenderer::drawVerticalSeparators(juce::Graphics& g, const juce::Rectangle<float>& contentBounds,
@@ -132,5 +148,25 @@ namespace TSS
             const float separatorX = contentX + static_cast<float>(i) * actualColumnWidth + static_cast<float>(i - 1) * separatorWidth;
             g.fillRect(juce::Rectangle<float>(separatorX, contentY, separatorWidth, contentHeight));
         }
+    }
+
+    void PopupMenuRenderer::drawSentinelBottomRule(juce::Graphics& g,
+                                                   const juce::Rectangle<float>& itemBounds,
+                                                   float systemDisplayScale) const
+    {
+        const auto& popupLayout = ComboBox::getPopupLayoutDimensions();
+        const float borderThickness = ScaledDrawing::snappedStrokeThicknessFromDesign(
+            static_cast<float>(popupLayout.borderThickness),
+            uiScale_,
+            systemDisplayScale,
+            ScaledDrawing::StrokeSnapPolicy::kFloor);
+        const auto borderColour = isButtonLike_
+            ? look_.borderButtonLike
+            : look_.border;
+        g.setColour(borderColour);
+        g.fillRect(itemBounds.getX(),
+                   itemBounds.getBottom() - borderThickness,
+                   itemBounds.getWidth(),
+                   borderThickness);
     }
 }

@@ -65,6 +65,6 @@ namespace TSS::ComboBoxLiveRefresh
             combo.isPopupOpen(),
             [&combo]() { combo.dismissPopup(); },
             rebuild,
-            [&combo]() { combo.showPopup(); });
+            [&combo]() { combo.showPopupAfterItemRebuild(); });
     }
 }

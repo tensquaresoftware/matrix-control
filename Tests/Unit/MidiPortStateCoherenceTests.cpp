@@ -19,6 +19,7 @@ public:
         testClearMidiFromKeyboardFromConflictFooterIfPresent();
         testMaybeAlignApvtsPortIdAfterOpenAttempt();
         testConflictRejectLeavesPeerRoleUnchanged();
+        testSoftDeadPortUiRefreshPolicy();
     }
 
 private:
@@ -123,6 +124,19 @@ private:
         state.setProperty("keyboardFromPortId", "dev-c", nullptr);
         Core::clearMidiFromKeyboardFromConflictFooterIfPresent(state);
         expect(state.getProperty("uiMessageText").toString().isEmpty());
+    }
+
+    void testSoftDeadPortUiRefreshPolicy()
+    {
+        beginTest("shouldForceReopenForUiRefresh — only when desired and not live");
+        expect(Core::shouldForceReopenForUiRefresh("port-a", false));
+        expect(! Core::shouldForceReopenForUiRefresh("port-a", true));
+        expect(! Core::shouldForceReopenForUiRefresh({}, false));
+
+        beginTest("shouldClearDeadPortAfterReopen — clear only on reopen failure");
+        expect(Core::shouldClearDeadPortAfterReopen("port-a", false));
+        expect(! Core::shouldClearDeadPortAfterReopen("port-a", true));
+        expect(! Core::shouldClearDeadPortAfterReopen({}, false));
     }
 };
 

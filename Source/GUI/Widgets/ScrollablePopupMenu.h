@@ -12,6 +12,7 @@ namespace TSS
         ~ScrollablePopupMenu() override;
 
         void paint(juce::Graphics& g) override;
+        void paintOverChildren(juce::Graphics& g) override;
         void resized() override;
 
         static void show(ComboBox& comboBox);
@@ -22,7 +23,6 @@ namespace TSS
     private:
         class ScrollableContentComponent;
 
-        inline constexpr static float kRightMarginFromHighlightToEdge_ = 8.0f;
         inline constexpr static float kWheelScrollFactorContent_ = 100.0f;
         inline constexpr static float kThumbInsetBase_ = 2.0f;
 
@@ -37,6 +37,9 @@ namespace TSS
 
         void setupScrollableContent();
         void repaintScrollBar();
+        void drawSentinelRuleIfNeeded(juce::Graphics& g,
+                                      const juce::Rectangle<float>& contentBounds,
+                                      float ruleThickness);
 
         juce::Rectangle<float> getItemBounds(int itemIndex) const;
         int getItemIndexAt(int x, int y) const;

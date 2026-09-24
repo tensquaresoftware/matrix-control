@@ -39,6 +39,10 @@ public:
     bool setMidiInputPort(const juce::String& deviceId, bool reportOpenFailure = true);
     bool setMidiOutputPort(const juce::String& deviceId, bool reportOpenFailure = true);
 
+    /** Close then reopen so powered-off-but-still-enumerated devices fail and clear. */
+    bool forceReopenInputPort(const juce::String& deviceId, bool reportOpenFailure = false);
+    bool forceReopenOutputPort(const juce::String& deviceId, bool reportOpenFailure = false);
+
     bool isInputPortOpenWithDevice(const juce::String& deviceId) const;
     bool isOutputPortOpenWithDevice(const juce::String& deviceId) const;
     juce::String getOpenInputDeviceId() const;

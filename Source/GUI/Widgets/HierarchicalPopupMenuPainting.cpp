@@ -4,6 +4,7 @@
 #include "HierarchicalPopupMenu.h"
 
 #include "HierarchicalComboBox.h"
+#include "GUI/Layout/ScaledDrawing.h"
 
 namespace TSS
 {
@@ -95,7 +96,13 @@ namespace TSS
                 continue;
 
             const bool isHighlighted = primaryIndex == highlightedPrimaryIndex_;
-            renderer_.drawLabelItem(g, primary.label, itemBounds, isHighlighted, true, cachedFont_);
+            renderer_.drawLabelItem(g, {
+                .text = primary.label,
+                .itemBounds = itemBounds,
+                .isHighlighted = isHighlighted,
+                .isEnabled = true,
+                .font = &cachedFont_,
+                .systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this)});
 
             if (! primary.children.empty())
                 renderer_.drawSubMenuChevron(g, itemBounds, cachedFont_);
@@ -124,12 +131,13 @@ namespace TSS
                     continue;
 
                 const bool isHighlighted = highlightedChildIndex_ == static_cast<int>(childIndex);
-                renderer_.drawLabelItem(g,
-                                        primary.children[childIndex].label,
-                                        itemBounds,
-                                        isHighlighted,
-                                        true,
-                                        cachedFont_);
+                renderer_.drawLabelItem(g, {
+                    .text = primary.children[childIndex].label,
+                    .itemBounds = itemBounds,
+                    .isHighlighted = isHighlighted,
+                    .isEnabled = true,
+                    .font = &cachedFont_,
+                    .systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this)});
             }
         }
 

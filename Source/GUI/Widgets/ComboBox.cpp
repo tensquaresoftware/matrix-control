@@ -106,6 +106,22 @@ namespace TSS
 
     void ComboBox::showPopup()
     {
+        showPopupInternal(true);
+    }
+
+    void ComboBox::showPopupAfterItemRebuild()
+    {
+        showPopupInternal(false);
+    }
+
+    void ComboBox::showPopupInternal(bool invokeAboutToShow)
+    {
+        if (! canShowPopup())
+            return;
+
+        if (invokeAboutToShow && onAboutToShowPopup)
+            onAboutToShowPopup();
+
         if (! canShowPopup())
             return;
 

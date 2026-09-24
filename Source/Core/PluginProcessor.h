@@ -153,6 +153,9 @@ public:
     bool setMidiInputPort(const juce::String& deviceId);
     bool setMidiOutputPort(const juce::String& deviceId);
     bool setKeyboardFromPort(const juce::String& deviceId);
+    /** Force-reopen current MIDI ports so powered-off devices drop out of UI lists. */
+    void revalidateOpenMidiPortsForUiRefresh();
+    juce::String getKeyboardFromOpenDeviceId() const;
 
     void setInputGainDb(float gainDb);
     void setHardwareLatencyMs(float latencyMs);

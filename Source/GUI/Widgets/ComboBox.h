@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include <juce_gui_basics/juce_gui_basics.h>
 
 #include "GUI/Layout/WidgetDimensions.h"
@@ -33,11 +35,16 @@ namespace TSS
 
         void paint(juce::Graphics& g) override;
         void showPopup() override;
+        /** Programmatic reopen after live item rebuild — skips onAboutToShowPopup. */
+        void showPopupAfterItemRebuild();
 
         void mouseDown(const juce::MouseEvent& e) override;
 
         void focusGained(juce::Component::FocusChangeType cause) override;
         void focusLost(juce::Component::FocusChangeType cause) override;
+
+        /** Invoked on the message thread immediately before a popup open is scheduled. */
+        std::function<void()> onAboutToShowPopup;
 
         float getUiScale() const override { return uiScale_; }
         const PopupMenuLook& getPopupMenuLook() const override { return popupLook_; }
@@ -81,6 +88,7 @@ namespace TSS
 
         juce::String getSelectedItemText() const;
         bool canShowPopup() const;
+        void showPopupInternal(bool invokeAboutToShow);
         void showPopupAsynchronously();
 
         friend class MultiColumnPopupMenu;

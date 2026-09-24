@@ -57,4 +57,18 @@ namespace Core
         if (coherentId != state.getProperty(property).toString())
             state.setProperty(property, coherentId, nullptr);
     }
+
+    /** UI soft dead-port policy: only attempt force-reopen when presence says not live. */
+    [[nodiscard]] inline bool shouldForceReopenForUiRefresh(const juce::String& desiredId,
+                                                            bool identifierStillLive) noexcept
+    {
+        return desiredId.isNotEmpty() && ! identifierStillLive;
+    }
+
+    /** After a force-reopen attempt: clear APVTS only when reopen failed (fail-open if reopen ok). */
+    [[nodiscard]] inline bool shouldClearDeadPortAfterReopen(const juce::String& desiredId,
+                                                            bool reopenSucceeded) noexcept
+    {
+        return desiredId.isNotEmpty() && ! reopenSucceeded;
+    }
 }
