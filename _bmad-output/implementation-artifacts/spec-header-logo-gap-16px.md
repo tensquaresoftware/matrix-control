@@ -23,6 +23,7 @@ context: []
 - Agent decision: change only the design constant; do not retarget standalone flow placement of UNDO/REDO (those still follow PacketPlacer and shift 4 px left with content — out of scope).
 - Changed `Source/GUI/Layout/Design/DesignPanels.h`: `Panels::Header::kLogoGapAfter` 20 → 16. `DesignChecks.h` static_assert (`% 4 == 0`) still holds. DimensionFactory and layout read the constant unchanged.
 - Standalone UAT note: UNDO/REDO follow the left flow (−4 design px); PANIC stays right-anchored, so the visual REDO↔PANIC gap grows by 4 design px. Plugin mode: right cluster X unchanged; left train starts 4 design px earlier (space scales with UI scale).
+- Follow-up 2026-09-24: `kLogoGapAfter` → 12; Standalone now uses the same right-anchored UNDO/REDO/PANIC placement as plugin (`placeStandaloneFlowActionButtons` removed) so logo-gap shrinks create air before UNDO in Standalone too.
 
 ## Review Triage Log
 

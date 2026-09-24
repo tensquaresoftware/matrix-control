@@ -137,13 +137,6 @@ namespace
             x_ += peakWidth + gap_;
         }
 
-        void placeButton(TSS::Button& button, float buttonWidth)
-        {
-            button.setBounds(juce::roundToInt(x_), y_, juce::roundToInt(buttonWidth), h_);
-            button.setUiScale(uiScale_);
-            x_ += buttonWidth + gap_;
-        }
-
         void endPacket()
         {
             x_ += packetExternalGap_ - gap_;
@@ -195,17 +188,6 @@ namespace
         cluster.undo.setUiScale(cluster.uiScale);
     }
 
-    void placeStandaloneFlowActionButtons(PacketPlacer& placer, const HeaderActionButtonCluster& cluster)
-    {
-        placer.placeButton(cluster.undo, cluster.metrics.undoButtonWidth);
-        placer.placeButton(cluster.redo, cluster.metrics.redoButtonWidth);
-
-        const int panicW = juce::roundToInt(static_cast<float>(cluster.dimensions.panicButtonWidth) * cluster.uiScale);
-        const int rightPad = juce::roundToInt(static_cast<float>(cluster.dimensions.rightPadding) * cluster.uiScale);
-        const int panicX = cluster.boundsRight - rightPad - panicW;
-        cluster.panic.setBounds(panicX, cluster.metrics.controlY, panicW, cluster.metrics.controlHeightPx);
-        cluster.panic.setUiScale(cluster.uiScale);
-    }
 }
 
 void HeaderPanel::resized()
@@ -250,8 +232,7 @@ void HeaderPanel::resized()
     const HeaderActionButtonCluster actionButtons {
         dimensions_, metrics, uiScale_, getLocalBounds().getRight(), undoButton_, redoButton_, panicButton_ };
 
-    if (isPluginMode_)
-        placeActionButtonsFromRight(actionButtons);
-    else
-        placeStandaloneFlowActionButtons(placer, actionButtons);
+    // Standalone and plugin: pin UNDO/REDO/PANIC from the right so logo-gap changes
+    // only shift the left control train and leave breathing room before UNDO.
+    placeActionButtonsFromRight(actionButtons);
 }
