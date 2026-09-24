@@ -818,6 +818,8 @@ juce_add_plugin(Matrix-Control
     COPY_PLUGIN_AFTER_BUILD ${COPY_PLUGIN_AFTER_BUILD_VALUE}
     VST3_CATEGORIES Instrument
     AU_MAIN_TYPE kAudioUnitType_MusicDevice
+    MICROPHONE_PERMISSION_ENABLED TRUE
+    MICROPHONE_PERMISSION_TEXT "Matrix-Control needs access to audio input devices."
 )
 
 target_sources(Matrix-Control PRIVATE

@@ -1946,3 +1946,9 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-audio-midi-combo-live-refresh.md`
   summary: Emagic Unitor8/AMT8 ports can remain listed in CoreMIDI (and JUCE Audio/MIDI Settings) while the box is powered off; MT4/Oxygen disappear correctly via kMIDIPropertyOffline / USB removal. Soft power-off with USB still enumerated is not distinguishable from a live device without driver-specific heuristics.
   evidence: Cross-check 2026-09-24 — AMT8 still visible in JUCE settings when off; MT4 behaves like Oxygen; IOKit USB node often stays present; further investigation not recommended unless Emagic driver behaviour changes.
+
+## Deferred from: review of spec-standalone-audio-finder-vs-cursor-launch.md (2026-09-24)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-standalone-audio-finder-vs-cursor-launch.md`
+  summary: Add a recurring macOS post-build or CI plutil assert that Standalone Info.plist keeps NSMicrophoneUsageDescription equal to the frozen dialog string.
+  evidence: Deleting MICROPHONE_PERMISSION_* would drop the usage key while unit tests and current GitHub Actions stay green; one-shot plutil already verified this pass.
