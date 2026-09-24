@@ -62,5 +62,20 @@ namespace TSS
             component.repaint();
             component.grabKeyboardFocus();
         }
+
+        inline void armSuppressNextPopupOpen(bool& suppressNextPopupOpen)
+        {
+            suppressNextPopupOpen = true;
+        }
+
+        /** Returns true once when a dismiss-via-host-reclick should not reopen. */
+        inline bool consumeSuppressNextPopupOpen(bool& suppressNextPopupOpen)
+        {
+            if (! suppressNextPopupOpen)
+                return false;
+
+            suppressNextPopupOpen = false;
+            return true;
+        }
     }
 }

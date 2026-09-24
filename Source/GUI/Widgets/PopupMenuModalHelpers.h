@@ -36,5 +36,20 @@ namespace TSS
             dismissAndDelete(popup, host);
             return true;
         }
+
+        /** Outside-click dismiss; if a left-click lands on the host, suppress the reopen mouseDown. */
+        inline void dismissFromOutsideClick(juce::Component& popup, IPopupMenuHost& host)
+        {
+            const auto screenPos = juce::Desktop::getInstance()
+                                       .getMainMouseSource()
+                                       .getScreenPosition();
+            const bool leftClickOnHost = juce::ModifierKeys::getCurrentModifiersRealtime().isLeftButtonDown()
+                && host.asHostComponent().getScreenBounds().toFloat().contains(screenPos);
+
+            if (leftClickOnHost)
+                host.suppressNextPopupOpen();
+
+            dismissAndDelete(popup, host);
+        }
     }
 }

@@ -49,6 +49,7 @@ namespace TSS
 
         void notifyPopupOpened() override;
         void notifyPopupClosed() override;
+        void suppressNextPopupOpen() override;
 
         static int getBaseWidth() { return ComboBoxControlMetrics::kDefaultWidth; }
         static int getBaseHeight() { return ComboBoxControlMetrics::kDefaultHeight; }
@@ -64,6 +65,7 @@ namespace TSS
         Style style_;
         bool isPopupOpen_ = false;
         bool hasFocus_ = false;
+        bool suppressNextPopupOpen_ = false;
         float uiScale_ = 1.0f;
         PopupVerticalPlacement popupVerticalPlacement_ = PopupVerticalPlacement::Auto;
 

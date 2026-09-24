@@ -23,5 +23,9 @@ namespace TSS
 
         virtual void notifyPopupOpened() = 0;
         virtual void notifyPopupClosed() = 0;
+
+        /** Arm a one-shot so the next mouseDown on the host does not reopen the popup
+            (re-click on the closed control while dismissing via outside-click). */
+        virtual void suppressNextPopupOpen() = 0;
     };
 }

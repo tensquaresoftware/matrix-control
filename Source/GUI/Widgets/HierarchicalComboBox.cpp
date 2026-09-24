@@ -124,8 +124,13 @@ namespace TSS
 
     void HierarchicalComboBox::mouseDown(const juce::MouseEvent& e)
     {
-        if (e.mods.isLeftButtonDown())
-            showPopup();
+        if (ComboBoxClosedControlHelper::consumeSuppressNextPopupOpen(suppressNextPopupOpen_))
+            return;
+
+        if (! e.mods.isLeftButtonDown())
+            return;
+
+        showPopup();
     }
 
     void HierarchicalComboBox::focusGained(juce::Component::FocusChangeType)
@@ -160,6 +165,11 @@ namespace TSS
     void HierarchicalComboBox::notifyPopupClosed()
     {
         ComboBoxClosedControlHelper::applyPopupClosed(isPopupOpen_, *this);
+    }
+
+    void HierarchicalComboBox::suppressNextPopupOpen()
+    {
+        ComboBoxClosedControlHelper::armSuppressNextPopupOpen(suppressNextPopupOpen_);
     }
 
     void HierarchicalComboBox::enablementChanged()

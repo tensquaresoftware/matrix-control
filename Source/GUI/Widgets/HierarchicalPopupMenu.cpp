@@ -309,7 +309,7 @@ namespace TSS
 
     void HierarchicalPopupMenu::inputAttemptWhenModal()
     {
-        closePopup();
+        PopupMenuModalHelpers::dismissFromOutsideClick(*this, owner_);
     }
 
     bool HierarchicalPopupMenu::keyPressed(const juce::KeyPress& key)

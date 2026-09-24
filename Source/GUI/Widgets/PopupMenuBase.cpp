@@ -39,7 +39,7 @@ namespace TSS
 
     void PopupMenuBase::inputAttemptWhenModal()
     {
-        closePopup();
+        PopupMenuModalHelpers::dismissFromOutsideClick(*this, host_);
     }
 
     bool PopupMenuBase::keyPressed(const juce::KeyPress& key)

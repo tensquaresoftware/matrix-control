@@ -144,13 +144,24 @@ namespace TSS
         ComboBoxClosedControlHelper::applyPopupClosed(isPopupOpen_, *this);
     }
 
+    void ComboBox::suppressNextPopupOpen()
+    {
+        ComboBoxClosedControlHelper::armSuppressNextPopupOpen(suppressNextPopupOpen_);
+    }
+
     void ComboBox::mouseDown(const juce::MouseEvent& e)
     {
-        if (isEnabled())
-        {
-            if (e.mods.isLeftButtonDown())
-                showPopup();
-        }
+        // Consume before enablement / button checks so a sticky arm cannot block a later open.
+        if (ComboBoxClosedControlHelper::consumeSuppressNextPopupOpen(suppressNextPopupOpen_))
+            return;
+
+        if (! isEnabled())
+            return;
+
+        if (! e.mods.isLeftButtonDown())
+            return;
+
+        showPopup();
     }
 
     void ComboBox::focusGained(juce::Component::FocusChangeType)

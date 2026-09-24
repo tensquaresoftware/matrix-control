@@ -66,6 +66,7 @@ namespace TSS
 
         void notifyPopupOpened() override;
         void notifyPopupClosed() override;
+        void suppressNextPopupOpen() override;
 
         void enablementChanged() override;
 
@@ -108,6 +109,7 @@ namespace TSS
         int selectedChildId_ = 0;
         bool isPopupOpen_ = false;
         bool hasFocus_ = false;
+        bool suppressNextPopupOpen_ = false;
         bool inactiveAppearance_ = false;
         float uiScale_ = 1.0f;
         PopupVerticalPlacement popupVerticalPlacement_ = PopupVerticalPlacement::Auto;
