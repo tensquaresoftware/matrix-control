@@ -819,7 +819,7 @@ juce_add_plugin(Matrix-Control
     VST3_CATEGORIES Instrument
     AU_MAIN_TYPE kAudioUnitType_MusicDevice
     MICROPHONE_PERMISSION_ENABLED TRUE
-    MICROPHONE_PERMISSION_TEXT "Matrix-Control needs access to audio input devices."
+    MICROPHONE_PERMISSION_TEXT "Lets Matrix-Control monitor your synthesizer through an input on your audio interface."
 )
 
 target_sources(Matrix-Control PRIVATE

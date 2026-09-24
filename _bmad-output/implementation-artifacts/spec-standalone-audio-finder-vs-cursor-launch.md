@@ -21,7 +21,7 @@ context:
 **Approach:** Harden the Standalone bundle so macOS can grant microphone / input access for LaunchServices launches: enable JUCE `MICROPHONE_PERMISSION_*` so `Info.plist` carries `NSMicrophoneUsageDescription`, rebuild, then verify Finder launches (and Artefacts copy) restore peak + speakers. Do not relocate Artefacts off Dropbox.
 
 **Decisions:**
-- Mic dialog text: `"Matrix-Control needs access to audio input devices."` (shorter wording; avoids “microphone”, which would confuse synth → audio interface monitoring).
+- Mic dialog text: `"Lets Matrix-Control monitor your synthesizer through an input on your audio interface."` (post-UAT wording; avoids “microphone”; explains synth → interface input monitoring; complements the OS-localized Mic title).
 
 ## Boundaries & Constraints
 
@@ -72,9 +72,23 @@ context:
 - Given Finder launch of that `.app` with Scarlett input live and AUDIO FROM set to that input, when macOS Microphone access is allowed, then Matrix-Control peak meter and speakers show the monitor (same as Cursor launch). **Pending Guillaume Finder retest** (see Implementation Notes checklist).
 - Given the user denies Microphone access, when the `.app` is launched from Finder, then monitor stays silent without crashing; no custom permission dialog is required in-app. **Pending Guillaume optional deny check**.
 
+### Review Findings
+
+- [x] [Review][Defer] Recurring CI/post-build `plutil` pin for Standalone `NSMicrophoneUsageDescription` [`CMakeLists.txt:821`] — deferred: real packaging regression hole (delete `MICROPHONE_PERMISSION_*` → silent Finder again while unit tests/GH Actions stay green); already recorded in `deferred-work.md` for this spec (2026-09-24); out of this review’s locked scope.
+
+**Rejected**
+- Blind/Acceptance: Implementation Notes still cite pre-UAT usage string while CMake/Decisions/live Builds+Artefacts plists use frozen post-UAT text — false as product defect (agent re-`plutil` 2026-09-24 confirms frozen string on Builds and Dropbox Artefacts); remaining mismatch is notes-only; fix would edit this build’s spec.
+- Blind/Acceptance: `status: done` with AC2/AC3 still Pending — false as code defect; Guillaume UAT Finder OK at three locations; deny/Privacy reset intentionally not retested (TCC already granted). Fix would edit this build’s AC markers/notes.
+- Blind: Artefacts evidence not refreshed after wording change — false; Artefacts Standalone plist now matches frozen string.
+- Blind: `Lets` without apostrophe — false; frozen product copy (ASCII Decision).
+- Blind: empty Spec Change Log / stale triage row / `review_loop_iteration: 0` / Verification ellipsis path / checklist omit deny-only path / no AU-VST3 note in Design Notes / no “still silent after allow” reopen branch — false or rejected: fix would edit this build’s spec; AU/VST3 usage-string side effect already accepted (AD-11 / prior triage).
+- Verification Gap (other): stale Implementation Notes string — same as first reject (notes-only; live plists correct).
+- Edge Case Hunter: empty `[]` — no claim.
+
 ## Implementation Notes
 
-- 2026-09-24: `CMakeLists.txt` `juce_add_plugin` now sets `MICROPHONE_PERMISSION_ENABLED TRUE` and `MICROPHONE_PERMISSION_TEXT "Matrix-Control needs access to audio input devices."` (ASCII, frozen string).
+- 2026-09-24 (post-UAT): Mic dialog text updated to `Lets Matrix-Control monitor your synthesizer through an input on your audio interface.` after Finder success and OS title redundancy feedback.
+- 2026-09-24: `CMakeLists.txt` `juce_add_plugin` now sets `MICROPHONE_PERMISSION_ENABLED TRUE` and `MICROPHONE_PERMISSION_TEXT` (ASCII, frozen string; see Decisions).
 - Reconfigure + build `macos-debug-arm64` / `Matrix-Control_Standalone`: success (ninja reported no further compile work after juceaide refreshed the bundle plist during configure).
 - Agent-verified plist: `Builds/macOS/ARM/Debug/Matrix-Control_artefacts/Debug/Standalone/Matrix-Control.app/Contents/Info.plist` contains `NSMicrophoneUsageDescription` = `Matrix-Control needs access to audio input devices.`
 - Also forced `CopyToArtefactsDir`: Dropbox Artefacts Standalone `Info.plist` now matches the same `NSMicrophoneUsageDescription` (2026-09-24).
