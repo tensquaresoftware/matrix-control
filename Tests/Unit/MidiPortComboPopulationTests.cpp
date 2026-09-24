@@ -1,5 +1,6 @@
 #include <vector>
 
+#include <juce_audio_devices/juce_audio_devices.h>
 #include <juce_core/juce_core.h>
 
 #include "GUI/Helpers/MidiPortComboPopulation.h"
@@ -14,6 +15,7 @@ public:
         testFindItemIdEmptyAndMissing();
         testFindItemIdMatchesDevice();
         testGetPortIdentifierSentinelAndBounds();
+        testIdentifiersMatchMidiDevices();
     }
 
 private:
@@ -50,6 +52,26 @@ private:
         expect(getPortIdentifierForItemId(ids, kFirstDeviceItemId + 99).isEmpty());
         expectEquals(getPortIdentifierForItemId(ids, kFirstDeviceItemId), juce::String("dev-a"));
         expectEquals(getPortIdentifierForItemId(ids, kFirstDeviceItemId + 1), juce::String("dev-b"));
+    }
+
+    void testIdentifiersMatchMidiDevices()
+    {
+        beginTest("identifiersMatchMidiDevices - order-sensitive equality");
+
+        using namespace TSS::MidiPortComboPopulation;
+
+        juce::Array<juce::MidiDeviceInfo> devices;
+        devices.add({ "A", "dev-a" });
+        devices.add({ "B", "dev-b" });
+
+        const std::vector<juce::String> matching { "dev-a", "dev-b" };
+        const std::vector<juce::String> reordered { "dev-b", "dev-a" };
+        const std::vector<juce::String> shorter { "dev-a" };
+
+        expect(identifiersMatchMidiDevices(matching, devices));
+        expect(! identifiersMatchMidiDevices(reordered, devices));
+        expect(! identifiersMatchMidiDevices(shorter, devices));
+        expect(identifiersMatchMidiDevices({}, {}));
     }
 };
 

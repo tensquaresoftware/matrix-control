@@ -2,6 +2,7 @@
 #include "ComboBoxClosedControlHelper.h"
 #include "ComboBoxControlPainter.h"
 #include "MultiColumnPopupMenu.h"
+#include "PopupMenuModalHelpers.h"
 #include "ScrollablePopupMenu.h"
 
 #include "GUI/Skins/ColourChart.h"
@@ -120,18 +121,23 @@ namespace TSS
     void ComboBox::showPopupAsynchronously()
     {
         const auto useScrollableMode = (style_ == Style::ButtonLike);
+        const auto generation = ++popupShowGeneration_;
 
-        juce::MessageManager::callAsync([safePointer = SafePointer<ComboBox>(this), useScrollableMode]()
-        {
-            if (safePointer != nullptr && safePointer->canShowPopup())
+        juce::MessageManager::callAsync(
+            [safePointer = SafePointer<ComboBox>(this), useScrollableMode, generation]()
             {
+                if (safePointer == nullptr || safePointer->popupShowGeneration_ != generation)
+                    return;
+
+                if (! safePointer->canShowPopup())
+                    return;
+
                 // Open notify happens inside ::show after empty/null guards (Hierarchical order).
                 if (useScrollableMode)
                     ScrollablePopupMenu::show(*safePointer);
                 else
                     MultiColumnPopupMenu::show(*safePointer);
-            }
-        });
+            });
     }
 
     void ComboBox::notifyPopupOpened()
@@ -141,7 +147,26 @@ namespace TSS
 
     void ComboBox::notifyPopupClosed()
     {
+        activePopup_ = nullptr;
+        ++popupShowGeneration_;
         ComboBoxClosedControlHelper::applyPopupClosed(isPopupOpen_, *this);
+    }
+
+    void ComboBox::attachOpenPopup(juce::Component& popup)
+    {
+        activePopup_ = &popup;
+    }
+
+    void ComboBox::dismissPopup()
+    {
+        if (auto* popup = activePopup_.getComponent())
+        {
+            PopupMenuModalHelpers::dismissAndDelete(*popup, *this);
+            return;
+        }
+
+        if (isPopupOpen_)
+            notifyPopupClosed();
     }
 
     void ComboBox::suppressNextPopupOpen()

@@ -4,6 +4,7 @@
 
 #include <juce_audio_devices/juce_audio_devices.h>
 
+#include "GUI/Helpers/ComboBoxLiveRefresh.h"
 #include "GUI/Helpers/ContextualHelpBindingSupport.h"
 #include "GUI/Helpers/MidiPortComboPopulation.h"
 #include "GUI/Widgets/HeaderLogoPopupMenu.h"
@@ -29,6 +30,27 @@ namespace
                 menu->exitModalState(0);
             }
         }
+    }
+
+    [[nodiscard]] bool audioFromItemSetUnchanged(const TSS::ComboBox& combo,
+                                                 const std::vector<juce::String>& currentIds,
+                                                 const std::vector<juce::String>& nextIds,
+                                                 const juce::StringArray& channelNames)
+    {
+        if (! TSS::ComboBoxLiveRefresh::identifiersEqual(currentIds, nextIds))
+            return false;
+
+        if (combo.getNumItems() != static_cast<int>(nextIds.size()) + 1)
+            return false;
+
+        const int count = channelNames.size();
+        for (int i = 0; i < count; ++i)
+        {
+            if (combo.getItemText(i + 1) != channelNames[i].toUpperCase())
+                return false;
+        }
+
+        return true;
     }
 }
 
@@ -280,28 +302,54 @@ void HeaderPanel::populateAudioFromCombo(const juce::StringArray& channelNames,
                                          const juce::StringArray& channelIds)
 {
     const auto previousSourceId = getSelectedAudioFromSourceId();
-
-    audioFromComboBox_.clear(juce::dontSendNotification);
-    audioFromSourceIdentifiers_.clear();
-
-    audioFromComboBox_.addItem(PluginDisplayNames::HeaderPanel::kNoInputSentinel, kPortSentinelItemId);
-
     const int count = juce::jmin(channelNames.size(), channelIds.size());
 
+    std::vector<juce::String> nextIds;
+    nextIds.reserve(static_cast<size_t>(count));
     for (int i = 0; i < count; ++i)
-    {
-        const int itemId = i + kFirstDeviceItemId;
-        audioFromComboBox_.addItem(channelNames[i].toUpperCase(), itemId);
-        audioFromSourceIdentifiers_.push_back(channelIds[i]);
-    }
+        nextIds.push_back(channelIds[i]);
 
-    if (count == 0)
+    const bool itemSetUnchanged = audioFromItemSetUnchanged(
+        audioFromComboBox_, audioFromSourceIdentifiers_, nextIds, channelNames);
+    const auto action = TSS::ComboBoxLiveRefresh::planRefresh(
+        audioFromComboBox_.isPopupOpen(), itemSetUnchanged);
+
+    if (action == TSS::ComboBoxLiveRefresh::Action::kSkipRebuild)
     {
-        audioFromComboBox_.setSelectedId(kPortSentinelItemId, juce::dontSendNotification);
+        if (count == 0)
+            audioFromComboBox_.setSelectedId(kPortSentinelItemId, juce::dontSendNotification);
+        else
+            selectAudioFromSourceId(previousSourceId);
         return;
     }
 
-    selectAudioFromSourceId(previousSourceId);
+    const auto rebuild = [this, &channelNames, &nextIds, count, &previousSourceId]()
+    {
+        audioFromComboBox_.clear(juce::dontSendNotification);
+        audioFromSourceIdentifiers_ = nextIds;
+
+        audioFromComboBox_.addItem(PluginDisplayNames::HeaderPanel::kNoInputSentinel,
+                                   kPortSentinelItemId);
+
+        for (int i = 0; i < count; ++i)
+        {
+            const int itemId = i + kFirstDeviceItemId;
+            audioFromComboBox_.addItem(channelNames[i].toUpperCase(), itemId);
+        }
+
+        if (count == 0)
+        {
+            audioFromComboBox_.setSelectedId(kPortSentinelItemId, juce::dontSendNotification);
+            return;
+        }
+
+        selectAudioFromSourceId(previousSourceId);
+    };
+
+    if (action == TSS::ComboBoxLiveRefresh::Action::kDismissRebuildReopen)
+        TSS::ComboBoxLiveRefresh::rebuildPreservingOpenPopup(audioFromComboBox_, rebuild);
+    else
+        rebuild();
 }
 
 juce::String HeaderPanel::getSelectedAudioFromSourceId() const

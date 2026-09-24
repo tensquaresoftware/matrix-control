@@ -298,6 +298,7 @@ namespace TSS
 
         auto popupMenu = std::make_unique<ScrollablePopupMenu>(comboBox);
         auto* rawPtr = popupMenu.get();
+        comboBox.attachOpenPopup(*rawPtr);
 
         const auto& popupLayout = ComboBox::getPopupLayoutDimensions();
         const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(comboBox);

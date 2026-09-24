@@ -1918,3 +1918,12 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-audio-from-none-no-device-mute.md`
   summary: Empty audioFromSourceId does not survive relaunch (initializeAudioProperties invents stereo/mono from channel mode).
   evidence: Pre-existing restore behavior outside this mute-banner fix; document or change only if product wants persisted NO INPUT.
+
+## Deferred from: review of spec-audio-midi-combo-live-refresh.md (2026-09-24)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-audio-midi-combo-live-refresh.md`
+  summary: After dismiss-then-reopen, showPopup could no-op if the combo cannot show (disabled / no items / missing top-level), leaving the menu closed.
+  evidence: maybe-false medium — Standalone on-screen editor normally has a desktop parent and items after rebuild; settle with UAT or a GUI harness that forces canShowPopup false after dismiss.
+- source_spec: `_bmad-output/implementation-artifacts/spec-audio-midi-combo-live-refresh.md`
+  summary: Unit tests never invoke populateInputPortCombo / populateOutputPortCombo / populateAudioFromCombo open-popup branches.
+  evidence: Verification Gap — locking rebuildPreservingOpenPopup call order is the feasible CI lock; full populate path needs OS device mocking or a HeaderPanel GUI harness.

@@ -351,6 +351,7 @@ namespace TSS
 
         auto popupMenu = std::make_unique<MultiColumnPopupMenu>(comboBox);
         auto* rawPtr = popupMenu.get();
+        comboBox.attachOpenPopup(*rawPtr);
 
         const float itemHeight = static_cast<float>(rawPtr->getItemHeightDesign()) * rawPtr->uiScale_;
         const float separatorWidth = 1.0f * rawPtr->uiScale_;

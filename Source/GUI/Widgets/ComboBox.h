@@ -51,6 +51,12 @@ namespace TSS
         void notifyPopupClosed() override;
         void suppressNextPopupOpen() override;
 
+        [[nodiscard]] bool isPopupOpen() const noexcept { return isPopupOpen_; }
+        /** Dismiss the modal popup without selecting an item (programmatic live refresh). */
+        void dismissPopup();
+        /** Called by Scrollable/MultiColumn show after constructing the modal popup. */
+        void attachOpenPopup(juce::Component& popup);
+
         static int getBaseWidth() { return ComboBoxControlMetrics::kDefaultWidth; }
         static int getBaseHeight() { return ComboBoxControlMetrics::kDefaultHeight; }
 
@@ -68,6 +74,8 @@ namespace TSS
         bool suppressNextPopupOpen_ = false;
         float uiScale_ = 1.0f;
         PopupVerticalPlacement popupVerticalPlacement_ = PopupVerticalPlacement::Auto;
+        juce::Component::SafePointer<juce::Component> activePopup_;
+        uint32_t popupShowGeneration_ = 0;
 
         static PopupMenuLayoutDimensions popupLayoutDimensions_;
 

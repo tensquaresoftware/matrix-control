@@ -574,6 +574,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/DeviceSetupDeviceRowTests.cpp
         Tests/Unit/DeviceConnectionMachineDefaultsTests.cpp
         Tests/Unit/MidiPortComboPopulationTests.cpp
+        Tests/Unit/ComboBoxLiveRefreshTests.cpp
         Tests/Unit/SysExInterMessageDelayTests.cpp
         Tests/Unit/SysExParserTests.cpp
         Tests/Unit/WidgetDimensionRegistryTests.cpp
