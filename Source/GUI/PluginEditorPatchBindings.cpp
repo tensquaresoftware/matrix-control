@@ -25,6 +25,7 @@ void PluginEditor::wirePatchAndMutatorBindings()
     setMutatorExportCollisionGateBinding();
     setMutatorHistoryGateBinding();
     setUnsavedEditConfirmGateBinding();
+    setM1kpSiblingSyxOverwriteConfirmGateBinding();
     setMutatorFlushConfirmGateBinding();
     setMutatorDeleteConfirmGateBinding();
     setPatchSaveFilePickerBinding();
@@ -214,6 +215,29 @@ void PluginEditor::setUnsavedEditConfirmGateBinding()
                 case 2: return Core::UnsavedEditConfirmChoice::kDiscard;
                 default: return Core::UnsavedEditConfirmChoice::kCancel;
             }
+        });
+}
+
+void PluginEditor::setM1kpSiblingSyxOverwriteConfirmGateBinding()
+{
+    pluginProcessor.setM1kpSiblingSyxOverwriteConfirmGate(
+        [safeThis = juce::Component::SafePointer<PluginEditor>(this)](
+            const juce::String& existingSyxFileName) -> bool
+        {
+            if (! isMessageThread() || safeThis == nullptr)
+                return false;
+
+            namespace Dialog = PluginDisplayNames::Dialogs::M1kpSiblingSyxOverwriteConfirm;
+
+            return showOrderedConfirmAlert({
+                       juce::MessageBoxIconType::WarningIcon,
+                       Dialog::kTitle,
+                       Dialog::formatBody(existingSyxFileName),
+                       Dialog::kCancel,
+                       Dialog::kContinue,
+                       safeThis.getComponent()
+                   })
+                   == 1;
         });
 }
 

@@ -1983,3 +1983,9 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-m1kp-patch-import.md`
   summary: No automated GUI test that ComputerPatchesPanel wires formatOpenListDisplayName into combobox items.
   evidence: Core formatter dual-stem / (m1kp) labels are unit-tested; panel call site is GUI-only (project unit pyramid prefers Core helpers).
+
+## Deferred from: code review of spec-m1kp-patch-import.md (2026-09-25)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-m1kp-patch-import.md`
+  summary: Editor drag/drop accepts .m1kp only through untested PluginEditorFileDragDrop gate (pathLooksLikePatchFile / selectionLooksAcceptable).
+  evidence: Core hasSupportedPatchExtension is unit-tested; DropLoad tests call loadDroppedComputerPatchFile and bypass the editor gate; project unit pyramid prefers Core helpers over GUI harness.

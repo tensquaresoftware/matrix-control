@@ -248,10 +248,13 @@ public:
 
     using BankImportConfirmGate = std::function<bool()>;
     using BankPasteConfirmGate = std::function<bool(int sourceBank, int targetBank)>;
+    using M1kpSiblingSyxOverwriteConfirmGate =
+        std::function<bool(const juce::String& existingSyxFileName)>;
 
     void setBankImportConfirmGate(BankImportConfirmGate gate);
     void setBankExportOverwriteConfirmGate(BankImportConfirmGate gate);
     void setBankPasteConfirmGate(BankPasteConfirmGate gate);
+    void setM1kpSiblingSyxOverwriteConfirmGate(M1kpSiblingSyxOverwriteConfirmGate gate);
     void setBankTransferProgressPresenter(Core::BankTransferProgressPresenter presenter);
 
     Core::PatchFileService& getPatchFileService() noexcept { return *patchFileService_; }

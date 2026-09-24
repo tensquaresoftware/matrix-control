@@ -49,6 +49,8 @@ namespace Core
         // for the progress-modal presenter type shared with PluginProcessor.
         using BankImportConfirmGate = std::function<bool()>;
         using BankPasteConfirmGate = std::function<bool(int sourceBank, int targetBank)>;
+        // true = overwrite existing same-stem .syx after a .m1kp load; false = abort SAVE.
+        using M1kpSiblingSyxOverwriteConfirmGate = std::function<bool(const juce::String& existingSyxFileName)>;
 
         struct Dependencies
         {
@@ -90,6 +92,7 @@ namespace Core
         void setBankImportConfirmGate(BankImportConfirmGate gate);
         void setBankExportOverwriteConfirmGate(BankImportConfirmGate gate);
         void setBankPasteConfirmGate(BankPasteConfirmGate gate);
+        void setM1kpSiblingSyxOverwriteConfirmGate(M1kpSiblingSyxOverwriteConfirmGate gate);
         void setBankTransferProgressPresenter(BankTransferProgressPresenter presenter);
 
         void rescanPersistedComputerPatchesFolder();
@@ -387,6 +390,8 @@ namespace Core
         bool didUnsavedGatePersistSucceed(UnsavedEditPersistKind persistKind) const;
         void saveCurrentPatchToFile(const juce::File& targetFile);
         juce::File resolveSelectedComputerPatchFileForSave() const;
+        bool confirmM1kpSiblingSyxOverwriteIfNeeded(const juce::File& originFile,
+                                                    const juce::File& writeTarget) const;
         void writeValidatedPatchSyx(const juce::File& targetWithExt, const juce::String& matrixStem);
         void completeSuccessfulSave(const juce::File& savedFile);
         void rescanAndSelectSavedFile(const juce::File& savedFile);
@@ -521,6 +526,7 @@ namespace Core
         BankImportConfirmGate bankImportConfirmGate_;
         BankImportConfirmGate bankExportOverwriteConfirmGate_;
         BankPasteConfirmGate bankPasteConfirmGate_;
+        M1kpSiblingSyxOverwriteConfirmGate m1kpSiblingSyxOverwriteConfirmGate_;
         BankTransferProgressPresenter bankTransferProgress_;
         PatchNameOverlayStore patchNameOverlay_;
         bool patchNameOverlayLoaded_ = false;

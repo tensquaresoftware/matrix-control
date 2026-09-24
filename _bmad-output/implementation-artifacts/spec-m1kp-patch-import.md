@@ -127,3 +127,27 @@ context:
 
 **Manual checks:**
 - Open Desktop `P-Test.m1kp` via in-scope surface; PATCH NAME / modules match the M4L editor; SAVE AS writes a loadable `.syx`.
+
+### Review Findings
+
+- [x] [Review][Decision] Dual-stem SAVE after .m1kp load can overwrite sibling .syx — resolved: keep SAVE → sibling `.syx`; add warning/confirm when that sibling already exists (option 3).
+
+- [x] [Review][Patch] Warn before SAVE overwrites existing sibling .syx after .m1kp origin [PatchManagerActionHandlerComputerLoadSave.cpp / M1kpSiblingSave.cpp] — Confirm gate + dialog when sibling `.syx` exists; cancel leaves both files untouched; unit tests in PatchManagerActionHandlerM1kpSaveTests.
+
+- [x] [Review][Defer] Editor drag/drop `.m1kp` acceptance only covered via Core helper [PluginEditorFileDragDrop.cpp:16-41] — deferred: GUI gate (`pathLooksLikePatchFile` / `selectionLooksAcceptable`) untested; DropLoad harness bypasses editor; Core `hasSupportedPatchExtension` unit-tested (project Core pyramid).
+
+- [x] [Review][Defer] Computer Patches combobox `(m1kp)` labels only via panel wiring [ComputerPatchesPanel.cpp:21-24] — deferred: already recorded in deferred-work (2026-09-25); Core `formatOpenListDisplayName` / dual-stem covered.
+
+#### Rejected
+
+- Blind: Design Notes “high byte always 0x00” — rejected: would edit the spec under review (also contradicted by signed int16 / negative round-trip).
+- Blind: Code Map / Spec Change Log refresh — rejected: would edit the spec under review.
+- Blind: no PATCH NAME badge-free assert after `.m1kp` load — false: badge only in `formatOpenListDisplayName`; reconcile uses `getFileNameWithoutExtension` stem; no path appends `(m1kp)` to PATCH NAME.
+- Blind: no Bank IMPORT planner-facing `.m1kp` test — false: Bank IMPORT consumes `scanFolder` + `loadPatchSysExFile` already covered for `.m1kp`; planner has no separate extension filter.
+- Blind: `BankImportPlanner.h` “.syx” foundCount comment — low reject: comment hygiene; unlikely everyday harm.
+- Blind: Storage contextual help still “.syx files” — false: Storage describes SAVE controls (still `.syx`-only); Open help already mentions `.m1kp`.
+- Blind: missing handler-level SAVE / leave-modal Persist test for `.m1kp` origin — low reject: service `loadM1kp_thenSaveWritesSyxOnly` covers write boundary; handler SAVE path is pre-existing `withFileExtension(.syx)`.
+- Blind+Edge: dual `kM1kpExtension` / codec `kExtension` — low reject: both literals are `.m1kp` today; `hasM1kpExtension` already delegates to codec; drift unlikely in everyday use (same as build triage).
+- Blind+Edge: missing `static_assert` on 268 vs 134×2 — low reject: runtime size gate enforces; cosmetic compile-time tie.
+- Edge: TOCTOU between `getSize` and `loadFileAsData` — low reject: race on a local patch during load is unlikely; decode still rejects non-268 after read; capped-read fix is more than a direct correction.
+- Edge: combobox label collision when `.syx` stem already looks like `Stem (m1kp)` — low reject: pathological filename; unlikely everyday.

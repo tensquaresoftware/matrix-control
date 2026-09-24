@@ -410,6 +410,12 @@ namespace Core
         bankExportOverwriteConfirmGate_ = std::move(gate);
     }
 
+    void PatchManagerActionHandler::setM1kpSiblingSyxOverwriteConfirmGate(
+        M1kpSiblingSyxOverwriteConfirmGate gate)
+    {
+        m1kpSiblingSyxOverwriteConfirmGate_ = std::move(gate);
+    }
+
     void PatchManagerActionHandler::setBankTransferProgressPresenter(BankTransferProgressPresenter presenter)
     {
         bankTransferProgress_ = std::move(presenter);

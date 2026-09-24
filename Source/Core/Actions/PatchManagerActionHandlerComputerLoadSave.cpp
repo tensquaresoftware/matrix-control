@@ -354,6 +354,12 @@ namespace Core
             return;
         }
 
+        const auto writeTarget =
+            targetWithExt.getSiblingFile(PatchFileNameSanitizer::ensureSyxExtension(matrixStem));
+
+        if (! confirmM1kpSiblingSyxOverwriteIfNeeded(targetFile, writeTarget))
+            return;
+
         writeValidatedPatchSyx(targetWithExt, matrixStem);
     }
 

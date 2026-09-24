@@ -211,6 +211,7 @@ set(PLUGIN_SOURCES
     Source/Core/Actions/PatchManagerActionHandlerComputerBrowser.cpp
     Source/Core/Actions/PatchManagerActionHandlerComputerDrop.cpp
     Source/Core/Actions/PatchManagerActionHandlerComputerLoadSave.cpp
+    Source/Core/Actions/PatchManagerActionHandlerM1kpSiblingSave.cpp
     Source/Core/Actions/PatchManagerActionHandlerDeviceLoad.cpp
     Source/Core/Actions/PatchManagerActionHandlerBankExport.cpp
     Source/Core/Actions/PatchManagerActionHandlerBankImport.cpp
@@ -516,6 +517,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/PatchManagerActionHandlerDeferredGateTests.cpp
         Tests/Unit/PatchManagerActionHandlerBrowserTests.cpp
         Tests/Unit/PatchManagerActionHandlerSaveTests.cpp
+        Tests/Unit/PatchManagerActionHandlerM1kpSaveTests.cpp
         Tests/Unit/PatchManagerActionHandlerLoadTests.cpp
         Tests/Unit/PatchManagerActionHandlerDropLoadTests.cpp
         Tests/Unit/PatchManagerActionHandlerDropLoadExtrasTests.cpp
@@ -651,8 +653,9 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/Actions/PatchManagerActionHandlerInitSentinel.cpp
         Source/Core/Actions/PatchManagerActionHandlerHeaderClick.cpp
         Source/Core/Actions/PatchManagerActionHandlerComputerBrowser.cpp
-    Source/Core/Actions/PatchManagerActionHandlerComputerDrop.cpp
+        Source/Core/Actions/PatchManagerActionHandlerComputerDrop.cpp
         Source/Core/Actions/PatchManagerActionHandlerComputerLoadSave.cpp
+        Source/Core/Actions/PatchManagerActionHandlerM1kpSiblingSave.cpp
         Source/Core/Actions/PatchManagerActionHandlerDeviceLoad.cpp
         Source/Core/Actions/PatchManagerActionHandlerBankExport.cpp
         Source/Core/Actions/PatchManagerActionHandlerBankImport.cpp

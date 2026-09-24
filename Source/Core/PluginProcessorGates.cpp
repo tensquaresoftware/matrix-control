@@ -108,6 +108,12 @@ void PluginProcessor::setBankExportOverwriteConfirmGate(BankImportConfirmGate ga
         patchManagerActionHandler_->setBankExportOverwriteConfirmGate(std::move(gate));
 }
 
+void PluginProcessor::setM1kpSiblingSyxOverwriteConfirmGate(M1kpSiblingSyxOverwriteConfirmGate gate)
+{
+    if (patchManagerActionHandler_ != nullptr)
+        patchManagerActionHandler_->setM1kpSiblingSyxOverwriteConfirmGate(std::move(gate));
+}
+
 void PluginProcessor::setBankPasteConfirmGate(BankPasteConfirmGate gate)
 {
     if (patchManagerActionHandler_ != nullptr)

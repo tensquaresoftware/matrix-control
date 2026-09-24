@@ -61,6 +61,7 @@ PluginEditor::~PluginEditor()
     pluginProcessor.setMutatorExportCollisionModalGate({});
     pluginProcessor.setMutatorHistoryGateModalGate({});
     pluginProcessor.setUnsavedEditConfirmModalGate({});
+    pluginProcessor.setM1kpSiblingSyxOverwriteConfirmGate({});
     pluginProcessor.setNameRequiredBeforeStoreRequest({});
     pluginProcessor.setMutatorFlushConfirmModalGate({});
     pluginProcessor.setMutatorDeleteConfirmModalGate({});

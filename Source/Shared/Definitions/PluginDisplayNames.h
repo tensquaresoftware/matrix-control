@@ -411,6 +411,23 @@ namespace PluginDisplayNames
             constexpr const char* kContinue = "Continue";
         }
 
+        // SAVE after loading a .m1kp when a same-stem .syx already exists in the folder.
+        namespace M1kpSiblingSyxOverwriteConfirm
+        {
+            constexpr const char* kTitle = "Overwrite existing .syx?";
+            constexpr const char* kCancel   = "Cancel";
+            constexpr const char* kContinue = "Continue";
+
+            inline juce::String formatBody(const juce::String& existingSyxFileName)
+            {
+                return "You loaded a .m1kp patch. Save will write "
+                    + existingSyxFileName
+                    + ", which already exists in this folder.\n\n"
+                    + "Continue replaces that .syx file. The original .m1kp stays unchanged.\n\n"
+                    + "Cancel keeps editing without saving.";
+            }
+        }
+
         namespace BankTransferProgress
         {
             constexpr const char* kExportTitle = "EXPORTING BANK TO DISK";

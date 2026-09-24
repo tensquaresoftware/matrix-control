@@ -125,6 +125,7 @@ private:
     void setMutatorExportCollisionGateBinding();
     void setMutatorHistoryGateBinding();
     void setUnsavedEditConfirmGateBinding();
+    void setM1kpSiblingSyxOverwriteConfirmGateBinding();
     void setMutatorFlushConfirmGateBinding();
     void setMutatorDeleteConfirmGateBinding();
     void setPatchSaveFilePickerBinding();
