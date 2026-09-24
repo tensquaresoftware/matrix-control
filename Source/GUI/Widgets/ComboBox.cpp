@@ -75,6 +75,11 @@ namespace TSS
         popupVerticalPlacement_ = placement;
     }
 
+    void ComboBox::setUsesPortSentinelPopupChrome(bool shouldUse) noexcept
+    {
+        usesPortSentinelPopupChrome_ = shouldUse;
+    }
+
     void ComboBox::paint(juce::Graphics& g)
     {
         const auto style = style_ == Style::ButtonLike

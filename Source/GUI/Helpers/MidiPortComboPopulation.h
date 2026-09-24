@@ -225,6 +225,8 @@ namespace TSS::MidiPortComboPopulation
                                   const juce::Array<juce::MidiDeviceInfo>& devices,
                                   const juce::String& sentinelLabel)
     {
+        combo.setUsesPortSentinelPopupChrome(true);
+
         const juce::String previousIdentifier = selectedPortId(combo, identifiers);
         const bool itemSetUnchanged = midiPortItemSetUnchanged(combo, identifiers, devices);
         const auto action = ComboBoxLiveRefresh::planRefresh(combo.isPopupOpen(), itemSetUnchanged);

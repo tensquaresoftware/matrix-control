@@ -1952,3 +1952,18 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-standalone-audio-finder-vs-cursor-launch.md`
   summary: Add a recurring macOS post-build or CI plutil assert that Standalone Info.plist keeps NSMicrophoneUsageDescription equal to the frozen dialog string.
   evidence: Deleting MICROPHONE_PERMISSION_* would drop the usage key while unit tests and current GitHub Actions stay green; one-shot plutil already verified this pass.
+
+## Deferred from: review of spec-port-combo-first-item-opt-in.md (2026-09-24)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-port-combo-first-item-opt-in.md`
+  summary: No automated regression asserting default usesPortSentinelPopupChrome false and populatePortCombo / populateAudioFromCombo enable it.
+  evidence: Would need ComboBox construction in unit tests or GUI harness; project unit suite prefers Core/pure helpers over ButtonLike popup paint.
+- source_spec: `_bmad-output/implementation-artifacts/spec-port-combo-first-item-opt-in.md`
+  summary: Audio From enables chrome with a one-off setter while MIDI uses MidiPortComboPopulation; no shared enablement helper.
+  evidence: Single audio call site; extracting a helper is YAGNI until a third port-like list appears.
+
+## Deferred from: code review of spec-port-combo-first-item-opt-in.md (2026-09-24)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-port-combo-first-item-opt-in.md`
+  summary: HeaderPanel keeps its own kPortSentinelItemId parallel to MidiPortComboPopulation::kPortSentinelItemId; paint gates on the MIDI helper constant only.
+  evidence: Pre-existing dual constants both equal to 1; Audio From still uses HeaderPanel's local. Consolidate if/when Audio From stops owning a private sentinel id.

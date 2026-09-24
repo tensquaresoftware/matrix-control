@@ -33,6 +33,13 @@ namespace TSS
         void setPopupVerticalPlacement(PopupVerticalPlacement placement);
         PopupVerticalPlacement getPopupVerticalPlacement() const override { return popupVerticalPlacement_; }
 
+        /** When true, ButtonLike ScrollablePopupMenu draws port-sentinel chrome on row 0
+            (NO INPUT / NO OUTPUT rule + shorter hover) when the popup has more than one item.
+            Consumers enable this for MIDI/audio port lists; leave false for normal first rows
+            (e.g. Computer Patches). No-op for Standard / multi-column popups. Default false. */
+        void setUsesPortSentinelPopupChrome(bool shouldUse) noexcept;
+        [[nodiscard]] bool usesPortSentinelPopupChrome() const noexcept { return usesPortSentinelPopupChrome_; }
+
         void paint(juce::Graphics& g) override;
         void showPopup() override;
         /** Programmatic reopen after live item rebuild — skips onAboutToShowPopup. */
@@ -79,6 +86,7 @@ namespace TSS
         bool isPopupOpen_ = false;
         bool hasFocus_ = false;
         bool suppressNextPopupOpen_ = false;
+        bool usesPortSentinelPopupChrome_ = false;
         float uiScale_ = 1.0f;
         PopupVerticalPlacement popupVerticalPlacement_ = PopupVerticalPlacement::Auto;
         juce::Component::SafePointer<juce::Component> activePopup_;

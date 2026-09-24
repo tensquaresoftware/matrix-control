@@ -121,8 +121,7 @@ namespace TSS
                                                        const juce::Rectangle<float>& contentBounds,
                                                        float ruleThickness)
     {
-        constexpr int kPortSentinelItemId = 1;
-        if (comboBox_.getNumItems() <= 1 || comboBox_.getItemId(0) != kPortSentinelItemId)
+        if (! comboBox_.usesPortSentinelPopupChrome() || comboBox_.getNumItems() <= 1)
             return;
         if (viewport_ == nullptr)
             return;
@@ -242,7 +241,6 @@ namespace TSS
     void ScrollablePopupMenu::drawItems(juce::Graphics& g)
     {
         const auto numItems = comboBox_.getNumItems();
-        constexpr int kPortSentinelItemId = 1;
         const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
         const float ruleThickness = static_cast<float>(
             popupChromeStrokePx(uiScale_, systemDisplayScale, getBorderThicknessDesign()));
@@ -254,7 +252,7 @@ namespace TSS
                 continue;
 
             const bool sentinelWithRule = (i == 0 && numItems > 1
-                                           && comboBox_.getItemId(0) == kPortSentinelItemId);
+                                           && comboBox_.usesPortSentinelPopupChrome());
 
             // reduced(gap) + trim ruleThickness: equal air above hover and above the rule.
             // Gap comes from PopupMenuRenderer (integer HeaderLogo-style air).

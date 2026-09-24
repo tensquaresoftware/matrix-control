@@ -247,6 +247,7 @@ void HeaderPanel::configureStandaloneKeyboardFrom()
 
 void HeaderPanel::configurePluginKeyboardFrom()
 {
+    keyboardFromComboBox_.setUsesPortSentinelPopupChrome(false);
     keyboardFromComboBox_.clear(juce::dontSendNotification);
     keyboardFromPortIdentifiers_.clear();
     keyboardFromComboBox_.addItem(PluginDisplayNames::HeaderPanel::kHostDisplay, kPluginHostItemId);
@@ -309,6 +310,8 @@ juce::String HeaderPanel::getSelectedPortIdentifier(const TSS::ComboBox& combo,
 void HeaderPanel::populateAudioFromCombo(const juce::StringArray& channelNames,
                                          const juce::StringArray& channelIds)
 {
+    audioFromComboBox_.setUsesPortSentinelPopupChrome(true);
+
     const auto previousSourceId = getSelectedAudioFromSourceId();
     const int count = juce::jmin(channelNames.size(), channelIds.size());
 
