@@ -1989,3 +1989,9 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-m1kp-patch-import.md`
   summary: Editor drag/drop accepts .m1kp only through untested PluginEditorFileDragDrop gate (pathLooksLikePatchFile / selectionLooksAcceptable).
   evidence: Core hasSupportedPatchExtension is unit-tested; DropLoad tests call loadDroppedComputerPatchFile and bypass the editor gate; project unit pyramid prefers Core helpers over GUI harness.
+
+## Deferred from: code review of spec-m1kp-filename-as-patch-name.md (2026-09-25)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-m1kp-filename-as-patch-name.md`
+  summary: Frozen intent in `spec-m1kp-patch-import.md` still says `.m1kp` PATCH NAME follows D-025 Settings; this feature renegotiates that for Computer Patches loads only.
+  evidence: Two approved SSOTs conflict until the older frozen decision is amended or marked superseded.

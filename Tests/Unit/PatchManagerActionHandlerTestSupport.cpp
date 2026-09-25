@@ -293,9 +293,11 @@ namespace PatchManagerActionHandlerTestSupport
         const auto loadedPlain = FooterMessages::formatLoadSuccess(location);
         const auto loadedReconFalse = FooterMessages::formatReconciliationNotice(location, false);
         const auto loadedReconTrue = FooterMessages::formatReconciliationNotice(location, true);
+        const auto loadedReconM1kp = FooterMessages::formatReconciliationNotice(location, true, true);
         return text == FooterMessages::formatFirstLoadAfterScanMessage(validCount, invalidCount, loadedPlain)
             || text == FooterMessages::formatFirstLoadAfterScanMessage(validCount, invalidCount, loadedReconFalse)
-            || text == FooterMessages::formatFirstLoadAfterScanMessage(validCount, invalidCount, loadedReconTrue);
+            || text == FooterMessages::formatFirstLoadAfterScanMessage(validCount, invalidCount, loadedReconTrue)
+            || text == FooterMessages::formatFirstLoadAfterScanMessage(validCount, invalidCount, loadedReconM1kp);
     }
 
     SelectPatchFileLoadDispatcher::SelectPatchFileLoadDispatcher(HandlerHarness& harnessIn)

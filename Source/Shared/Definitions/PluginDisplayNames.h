@@ -1840,8 +1840,12 @@ namespace PluginDisplayNames
                 }
 
                 inline juce::String formatReconciliationNotice(const juce::String& location,
-                                                               bool usedFilename)
+                                                               bool usedFilename,
+                                                               bool m1kpForcedFilename = false)
                 {
+                    if (usedFilename && m1kpForcedFilename)
+                        return "Loaded " + location + " (.m1kp always uses filename)";
+
                     if (usedFilename)
                         return "Loaded " + location + " (filename used)";
 

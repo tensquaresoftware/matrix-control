@@ -85,6 +85,21 @@ context:
 - Given an origin `.m1kp` still selected, when the user changes Computer Patches name Settings, then PATCH NAME does not revert to the packed INIT/BNK string.
 - Given a successful `.m1kp` load then SAVE, when the sibling `.syx` is written, then bytes 0–7 match the filename-derived Matrix name.
 
+### Review Findings
+
+- [x] [Review][Decision] Keep or suppress footer "(filename used)" when `.m1kp` force-mismatches packed name? — Resolved: use explicit copy `Loaded … (.m1kp always uses filename)` (option B).
+- [x] [Review][Patch] Cover Settings reapply for bank-export-like `.m1kp` stems [`Tests/Unit/PatchManagerActionHandlerM1kpNameTests.cpp`] — applied: `reapplyComputerDisplay_m1kpBankExportLikeStemKeepsFullSanitize` + footer assert `load_m1kp_footerSaysAlwaysUsesFilename`.
+- [x] [Review][Defer] Older frozen import spec still says `.m1kp` PATCH NAME follows D-025 [`spec-m1kp-patch-import.md`] — deferred: amend/supersede that frozen decision in a follow-up so the two specs stop contradicting each other.
+
+**Rejected (this code-review pass):**
+- false — Spec Code Map / Change Log / duplicate `updated` / Boundaries wording — fix would only edit this spec under review.
+- false — Header comment on `reconcileForcedFilename` — describes the injected sanitized result, not a pre-sanitized caller contract.
+- false — Drop-load name assert weak — `P-Test.m1kp` packs `BNK2: 02`; assert `P-TEST` already proves force under default Settings.
+- false — SAVE assert does not uniquely prove load-time force — SAVE injects target stem by design; load/drop suites cover force (same as Build triage).
+- false — Edge null `packed` / Ask Once empty picker on `reseedFromPackedAndReconcile` — unreachable from production callers (stack buffer; Ask Once never passed on reapply).
+- low (rejected) — Ask Once reapply untested / direct `reseed` unit tests / `INIT.m1kp` example — same force path already covered; no everyday product gap.
+- low (rejected) — Manual Verification omits Settings-reapply AC wording / no sprint-status row — process hygiene, not a code defect for this oneshot.
+
 ## Implementation Notes
 
 - Added `PatchFileNameReconciler::reconcileForcedFilename` + `reseedFromPackedAndReconcile`.
@@ -109,6 +124,7 @@ context:
 - false — Edge: null `packed` to `reseedFromPackedAndReconcile` — production only calls after successful load into a stack buffer; unreachable.
 - false — Edge: Ask Once + empty picker leaves seeded name in `reseedFromPackedAndReconcile` — reapply never passes Ask Once (`effectiveComputerNamePolicy` / early return); unreachable.
 - (verification-gap) — No verification gaps found.
+- code-review (2026-09-25): decision → footer `(.m1kp always uses filename)` applied; patch → reapply bank-export-like stem test + footer unit test applied; defer → older import-spec D-025 conflict remains in deferred-work.md.
 ## Design Notes
 
 **M4L behavior (v1.0.2):** Computer Patches UI showed the filename stem (max 8) and never wrote it into SysEx/`.m1kp` name bytes. Matrix-Control already injects on File Names policy; forcing that inject for `.m1kp` matches product architecture better than a display-only overlay.

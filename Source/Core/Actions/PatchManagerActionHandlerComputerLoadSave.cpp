@@ -265,7 +265,10 @@ namespace Core
     {
         const auto location = FooterMessages::formatReadablePatchLocation(file);
         const auto loadedMessage = reconciliation.hadMismatch
-            ? FooterMessages::formatReconciliationNotice(location, reconciliation.usedFilename)
+            ? FooterMessages::formatReconciliationNotice(
+                  location,
+                  reconciliation.usedFilename,
+                  PatchFileService::hasM1kpExtension(file))
             : FooterMessages::formatLoadSuccess(location);
 
         const auto message = pendingCombinedScanLoadFooter_.has_value()

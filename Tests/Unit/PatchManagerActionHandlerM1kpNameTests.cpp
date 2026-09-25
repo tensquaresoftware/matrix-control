@@ -20,6 +20,8 @@ public:
         testLoad_m1kp_bankExportLikeStemKeepsFullSanitize();
         testLoad_syx_keepsSysexUnderDefaultPolicy();
         testReapplyComputerDisplay_m1kpStaysFilenameUnderSysex();
+        testReapplyComputerDisplay_m1kpBankExportLikeStemKeepsFullSanitize();
+        testLoad_m1kp_footerSaysAlwaysUsesFilename();
     }
 
 private:
@@ -175,6 +177,68 @@ private:
         expectEquals(harness.model.getName(), juce::String("CLEANBSS"));
         expectEquals(harness.proc.apvts.state.getProperty(PatchNameIds::kPatchName).toString(),
                      juce::String("CLEANBSS"));
+
+        tempDir.deleteRecursively();
+    }
+
+    void testReapplyComputerDisplay_m1kpBankExportLikeStemKeepsFullSanitize()
+    {
+        beginTest("reapplyComputerDisplay_m1kpBankExportLikeStemKeepsFullSanitize");
+
+        const auto expected = Core::PatchFileNameSanitizer::sanitizeFileStem("P10. Nylon");
+        expectEquals(expected, juce::String("P10 NYLO"));
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        const auto tempDir = createTempScanDir();
+        expect(tempDir.createDirectory());
+        expect(PatchTestFixtures::resolvePatchFixtureFile("P-Test.m1kp")
+                   .copyFileTo(tempDir.getChildFile("P10. Nylon.m1kp")));
+
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StateProperties::kFolderPath, tempDir.getFullPathName(), nullptr);
+        harness.proc.apvts.state.setProperty(
+            PluginIDs::Settings::kComputerPatchesNamesPolicy, Policy::kDisplayFileNames, nullptr);
+        harness.handler.rescanPersistedComputerPatchesFolder();
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile, 1, nullptr);
+        simulateSelectPatchFileDispatch(harness);
+        expectEquals(harness.model.getName(), expected);
+
+        harness.proc.apvts.state.setProperty(
+            PluginIDs::Settings::kComputerPatchesNamesPolicy, Policy::kDisplaySysexNames, nullptr);
+        harness.handler.reapplyComputerPatchDisplayedName();
+        expectEquals(harness.model.getName(), expected);
+        expectEquals(harness.proc.apvts.state.getProperty(PatchNameIds::kPatchName).toString(),
+                     expected);
+
+        tempDir.deleteRecursively();
+    }
+
+    void testLoad_m1kp_footerSaysAlwaysUsesFilename()
+    {
+        beginTest("load_m1kp_footerSaysAlwaysUsesFilename");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        const auto tempDir = createTempScanDir();
+        expect(tempDir.createDirectory());
+        expect(PatchTestFixtures::resolvePatchFixtureFile("P-Test.m1kp")
+                   .copyFileTo(tempDir.getChildFile("CleanBss.m1kp")));
+
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StateProperties::kFolderPath, tempDir.getFullPathName(), nullptr);
+        harness.proc.apvts.state.setProperty(
+            PluginIDs::Settings::kComputerPatchesNamesPolicy, Policy::kDisplaySysexNames, nullptr);
+        harness.handler.rescanPersistedComputerPatchesFolder();
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile, 1, nullptr);
+
+        simulateSelectPatchFileDispatch(harness);
+
+        const auto file = tempDir.getChildFile("CleanBss.m1kp");
+        const auto location = FooterMessages::formatReadablePatchLocation(file);
+        const auto expectedFooter = FooterMessages::formatReconciliationNotice(location, true, true);
+        expect(expectedFooter.contains(".m1kp always uses filename"));
+        expectEquals(harness.proc.apvts.state.getProperty("uiMessageText").toString(), expectedFooter);
 
         tempDir.deleteRecursively();
     }
