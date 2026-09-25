@@ -19,6 +19,13 @@ namespace
         int bottomSliderHeight;
         int scaleLabelHeight;
     };
+
+    struct SliderScaleLooks
+    {
+        const TSS::SliderLook& slider;
+        const TSS::SliderLook& sliderBoldLarge;
+        const TSS::LabelLook& label;
+    };
 }
 
 class TestSliders::SliderScalePanel : public juce::Component
@@ -26,9 +33,7 @@ class TestSliders::SliderScalePanel : public juce::Component
 public:
     SliderScalePanel(float scale,
                      const juce::String& scaleLabelText,
-                     const TSS::SliderLook& sliderLook,
-                     const TSS::SliderLook& sliderLookBoldLarge,
-                     const TSS::LabelLook& labelLook,
+                     const SliderScaleLooks& looks,
                      const SliderSetDimensions& dimensions)
         : scale_(scale)
         , dimensions_(dimensions)
@@ -36,25 +41,49 @@ public:
         scaleLabel_ = std::make_unique<TSS::Label>(
             dimensions_.bottomSliderWidth,
             dimensions_.scaleLabelHeight,
-            labelLook,
+            looks.label,
             scaleLabelText);
         addAndMakeVisible(*scaleLabel_);
 
-        firstSlider_ = createSlider(dimensions_.topSliderWidth, dimensions_.topSliderHeight, sliderLook,
-                                    TSS::SliderConfig{ 0.0, 100.0, 50.0, 1.0, "%", {}, {}, {} });
+        firstSlider_ = createSlider(dimensions_.topSliderWidth, dimensions_.topSliderHeight, looks.slider,
+                                    TSS::SliderConfig{
+                                        .minValue = 0.0,
+                                        .maxValue = 100.0,
+                                        .defaultValue = 50.0,
+                                        .step = 1.0,
+                                        .unit = "%"});
 
-        secondSlider_ = createSlider(dimensions_.topSliderWidth, dimensions_.topSliderHeight, sliderLook,
-                                     TSS::SliderConfig{ -63.0, 63.0, 0.0, 1.0, {}, {}, {}, {} });
+        secondSlider_ = createSlider(dimensions_.topSliderWidth, dimensions_.topSliderHeight, looks.slider,
+                                     TSS::SliderConfig{
+                                         .minValue = -63.0,
+                                         .maxValue = 63.0,
+                                         .defaultValue = 0.0,
+                                         .step = 1.0});
 
-        thirdSlider_ = createSlider(dimensions_.bottomSliderWidth, dimensions_.bottomSliderHeight, sliderLook,
-                                    TSS::SliderConfig{ 0.0, 127.0, 63.0, 1.0, {}, {}, {}, {} });
+        thirdSlider_ = createSlider(dimensions_.bottomSliderWidth, dimensions_.bottomSliderHeight, looks.slider,
+                                    TSS::SliderConfig{
+                                        .minValue = 0.0,
+                                        .maxValue = 127.0,
+                                        .defaultValue = 63.0,
+                                        .step = 1.0});
 
-        fourthSlider_ = createSlider(dimensions_.bottomSliderWidth, dimensions_.bottomSliderHeight, sliderLookBoldLarge,
-                                     TSS::SliderConfig{ 0.0, 127.0, 63.0, 1.0, {}, {}, {}, {} });
+        fourthSlider_ = createSlider(dimensions_.bottomSliderWidth, dimensions_.bottomSliderHeight,
+                                     looks.sliderBoldLarge,
+                                     TSS::SliderConfig{
+                                         .minValue = 0.0,
+                                         .maxValue = 127.0,
+                                         .defaultValue = 63.0,
+                                         .step = 1.0});
 
         // Half-range disabled sample for visual calibration of grayed slider colours.
-        disabledHalfSlider_ = createSlider(dimensions_.bottomSliderWidth, dimensions_.bottomSliderHeight, sliderLook,
-                                           TSS::SliderConfig{ 0.0, 100.0, 50.0, 1.0, "%", {}, {}, {} });
+        disabledHalfSlider_ = createSlider(dimensions_.bottomSliderWidth, dimensions_.bottomSliderHeight,
+                                           looks.slider,
+                                           TSS::SliderConfig{
+                                               .minValue = 0.0,
+                                               .maxValue = 100.0,
+                                               .defaultValue = 50.0,
+                                               .step = 1.0,
+                                               .unit = "%"});
         disabledHalfSlider_->setEnabled(false);
     }
 
@@ -188,9 +217,7 @@ void TestSliders::createColumnPanels(TSS::ISkin& skin)
         auto panel = std::make_unique<SliderScalePanel>(
             spec.scale,
             spec.label,
-            sliderLook,
-            sliderLookBoldLarge,
-            labelLook,
+            SliderScaleLooks{ sliderLook, sliderLookBoldLarge, labelLook },
             dimensions);
         addAndMakeVisible(*panel);
         columnPanels_.push_back(std::move(panel));

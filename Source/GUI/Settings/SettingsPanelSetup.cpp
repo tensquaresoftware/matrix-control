@@ -41,14 +41,11 @@ void SettingsPanel::setupDeviceSection(TSS::ISkin& skin)
         kControlHeight_,
         TSS::sliderLookFromSkin(skin),
         TSS::SliderConfig{
-            Core::HardwareLatency::kMinMs,
-            Core::HardwareLatency::kMaxMs,
-            Core::HardwareLatency::kMinMs,
-            Core::HardwareLatency::kStepMs,
-            "ms",
-            {},
-            {},
-            {}});
+            .minValue = Core::HardwareLatency::kMinMs,
+            .maxValue = Core::HardwareLatency::kMaxMs,
+            .defaultValue = Core::HardwareLatency::kMinMs,
+            .step = Core::HardwareLatency::kStepMs,
+            .unit = "ms"});
     epromTypeLabel_ = makeLabel(skin, kLabelWidth_, PluginDisplayNames::Settings::kEpromTypeLabel);
     epromTypeCombo_ = makeCombo(skin, kComboWidth_);
 
