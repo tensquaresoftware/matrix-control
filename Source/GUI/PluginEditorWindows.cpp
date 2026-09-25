@@ -9,6 +9,7 @@
 #include "GUI/Dialogs/BankTransferProgressDialog.h"
 #include "GUI/Dialogs/EpromTypePromptDialog.h"
 #include "GUI/Dialogs/MasterInitConfirmDialog.h"
+#include "GUI/Dialogs/MasterM1kmLoadChoiceDialog.h"
 #include "GUI/Dialogs/MutatorHistoryDefragConfirmDialog.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/MainComponent.h"
@@ -73,7 +74,8 @@ bool PluginEditor::isEscapeBlockedByOverlay() const
 {
     const auto visible = [](const auto& c) { return c != nullptr && c->isVisible(); };
     return visible(settingsWindow_) || visible(aboutWindow_)
-        || visible(masterInitConfirmDialog_) || visible(mutatorHistoryDefragConfirmDialog_)
+        || visible(masterInitConfirmDialog_) || visible(masterM1kmLoadChoiceDialog_)
+        || visible(mutatorHistoryDefragConfirmDialog_)
         || visible(epromTypePromptDialog_) || visible(bankTransferProgressDialog_);
 }
 
@@ -89,6 +91,7 @@ void PluginEditor::openSettingsWindow()
 {
     closeAboutWindow();
     closeMutatorHistoryDefragConfirmDialog();
+    closeMasterM1kmLoadChoiceDialog();
 
     if (settingsWindow_ == nullptr)
     {
@@ -135,6 +138,7 @@ void PluginEditor::openAboutWindow()
 {
     closeSettingsWindow();
     closeMutatorHistoryDefragConfirmDialog();
+    closeMasterM1kmLoadChoiceDialog();
 
     if (aboutWindow_ == nullptr)
     {
@@ -174,6 +178,7 @@ void PluginEditor::openMasterInitConfirmDialog(const juce::String& moduleDisplay
 {
     closeSettingsWindow();
     closeAboutWindow();
+    closeMasterM1kmLoadChoiceDialog();
 
     if (masterInitConfirmDialog_ == nullptr)
     {
@@ -204,6 +209,7 @@ void PluginEditor::openMasterGlobalInitConfirmDialog(std::function<void()> onCon
 {
     closeSettingsWindow();
     closeAboutWindow();
+    closeMasterM1kmLoadChoiceDialog();
 
     if (masterInitConfirmDialog_ == nullptr)
     {
@@ -378,6 +384,8 @@ void PluginEditor::openEpromTypePromptDialog()
     const int preferred = preferredEpromTypeForPrompt(state, deviceType);
     const juce::String deviceVersion = state.getProperty("deviceVersion", juce::String()).toString().trim();
 
+    closeMasterM1kmLoadChoiceDialog();
+
     ensureEpromTypePromptDialog();
     epromTypePromptDialog_->prepareForShow({
         .deviceType = deviceType,
@@ -423,6 +431,7 @@ void PluginEditor::showBankTransferProgressDialog(const BankTransferProgressShow
 {
     closeSettingsWindow();
     closeAboutWindow();
+    closeMasterM1kmLoadChoiceDialog();
 
     if (bankTransferProgressDialog_ == nullptr)
     {

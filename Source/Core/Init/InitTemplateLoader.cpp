@@ -6,6 +6,7 @@
 #include "Core/Models/PatchModel.h"
 #include "Core/MIDI/SysEx/SysExConstants.h"
 #include "Core/MIDI/SysEx/SysExDecoder.h"
+#include "Core/Services/MasterM1kmCodec.h"
 
 namespace Core
 {
@@ -159,8 +160,42 @@ namespace Core
     InitTemplateLoadResult InitTemplateLoader::loadMasterFromFile(MasterModel& model,
                                                                   const juce::File& file) const
     {
-        juce::MemoryBlock sysEx;
-        if (! loadSysExBytes(file, sysEx))
+        if (MasterM1kmCodec::hasExtension(file))
+        {
+            if (file.getSize() != static_cast<juce::int64>(MasterM1kmCodec::kFileByteSize))
+            {
+                MidiLogger::getInstance().logError("Invalid master .m1km: " + file.getFullPathName());
+                return makeFallbackResult(InitTemplateKind::kMaster,
+                                          InitTemplateFallbackReason::kFileInvalid,
+                                          InitDefaults::masterData(),
+                                          model);
+            }
+
+            juce::MemoryBlock fileData;
+            if (! loadSysExBytes(file, fileData))
+            {
+                return makeFallbackResult(InitTemplateKind::kMaster,
+                                          InitTemplateFallbackReason::kFileInvalid,
+                                          InitDefaults::masterData(),
+                                          model);
+            }
+
+            juce::uint8 packed[SysExConstants::kMasterPackedDataSize] = {};
+            if (! MasterM1kmCodec::decodeToPacked(fileData, packed))
+            {
+                MidiLogger::getInstance().logError("Invalid master .m1km: " + file.getFullPathName());
+                return makeFallbackResult(InitTemplateKind::kMaster,
+                                          InitTemplateFallbackReason::kFileInvalid,
+                                          InitDefaults::masterData(),
+                                          model);
+            }
+
+            model.loadFrom(packed);
+            return makeUserFileResult();
+        }
+
+        juce::MemoryBlock fileData;
+        if (! loadSysExBytes(file, fileData))
         {
             return makeFallbackResult(InitTemplateKind::kMaster,
                                       InitTemplateFallbackReason::kFileInvalid,
@@ -168,7 +203,7 @@ namespace Core
                                       model);
         }
 
-        return decodeMasterIntoModel(model, file, sysEx);
+        return decodeMasterIntoModel(model, file, fileData);
     }
 
     InitTemplateLoadResult InitTemplateLoader::decodeMasterIntoModel(MasterModel& model,

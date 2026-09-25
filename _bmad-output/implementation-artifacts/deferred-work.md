@@ -1970,9 +1970,13 @@ Original review bullets below remain for history; status for U-10-owned residual
 
 ## Deferred from: Build scope split — M4L legacy formats (2026-09-25)
 
-- source_spec: none
-  summary: Import Matrix-1000 Editor legacy master files (.m1km) into Matrix-Control.
-  evidence: Split from M4L retro-compat intent; .m1km / Groups cascade is independently shippable and farther from current Master .syx than .m1kp is from PatchModel.
+<!-- Consumed 2026-09-25: .m1km Settings LOAD landed in spec-m1km-master-import.md -->
+
+## Deferred from: implementation of spec-m1km-master-import.md (2026-09-25)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-m1km-master-import.md`
+  summary: Master drag-drop load is out of this chantier; when built, .m1km drops must reopen the same Groups/cascade choice modal used by Settings LOAD (Master settings only / Full Master / Cancel) before commit.
+  evidence: Spec Intent + Design Notes; reusable MasterM1kmLoadChoiceDialog exists; drop path not wired.
 
 ## Deferred from: review of spec-m1kp-patch-import.md (2026-09-25)
 
@@ -1995,3 +1999,10 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-m1kp-filename-as-patch-name.md`
   summary: Frozen intent in `spec-m1kp-patch-import.md` still says `.m1kp` PATCH NAME follows D-025 Settings; this feature renegotiates that for Computer Patches loads only.
   evidence: Two approved SSOTs conflict until the older frozen decision is amended or marked superseded.
+
+## Deferred from: review of spec-m1km-master-import.md (2026-09-25)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-m1km-master-import.md`
+  summary: PluginProcessor::tryDecodeMasterM1kmUserFile live-master-untouched before modal is not unit-tested (Core decode-without-commit is).
+  evidence: Matrix-Control_Tests does not link PluginProcessorInitTemplates; settling would need Core extraction of the Settings decode gate or a processor harness.
+

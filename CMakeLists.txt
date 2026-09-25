@@ -193,6 +193,8 @@ set(PLUGIN_SOURCES
     Source/Core/Services/PatchFileServiceSelection.cpp
     Source/Core/Services/PatchFileServiceMutatorExport.cpp
     Source/Core/Services/PatchM1kpCodec.cpp
+    Source/Core/Services/MasterM1kmCodec.cpp
+    Source/Core/Services/MasterM1kmLoadPolicy.cpp
     Source/Core/Services/PatchFileNameSanitizer.cpp
     Source/Core/Services/PatchNameOverlayStore.cpp
     Source/Core/Services/PatchNameResolver.cpp
@@ -250,6 +252,7 @@ set(PLUGIN_SOURCES
     Source/GUI/Dialogs/EpromTypePromptDialog.cpp
     Source/GUI/Dialogs/EpromTypePromptDialogLayout.cpp
     Source/GUI/Dialogs/MasterInitConfirmDialog.cpp
+    Source/GUI/Dialogs/MasterM1kmLoadChoiceDialog.cpp
     Source/GUI/Dialogs/MutatorHistoryDefragConfirmDialog.cpp
     Source/GUI/Factories/WidgetFactory.cpp
     Source/GUI/Factories/DimensionFactory.cpp
@@ -488,6 +491,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/InitDefaultsTests.cpp
         Tests/Unit/InitTemplateLoaderTests.cpp
         Tests/Unit/InitTemplateWriterTests.cpp
+        Tests/Unit/MasterM1kmCodecTests.cpp
         Tests/Unit/InitTemplateSentinelSaveTests.cpp
         Tests/Unit/ApvtsPatchMapperTests.cpp
         Tests/Unit/PluginVersionTests.cpp
@@ -639,6 +643,8 @@ if(MATRIX_BUILD_TESTS)
     Source/Core/Services/PatchFileServiceSelection.cpp
         Source/Core/Services/PatchFileServiceMutatorExport.cpp
         Source/Core/Services/PatchM1kpCodec.cpp
+        Source/Core/Services/MasterM1kmCodec.cpp
+        Source/Core/Services/MasterM1kmLoadPolicy.cpp
         Source/Core/Services/PatchFileNameSanitizer.cpp
         Source/Core/Services/PatchNameOverlayStore.cpp
         Source/Core/Services/PatchNameResolver.cpp

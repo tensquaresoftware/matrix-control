@@ -13,6 +13,7 @@
 
 #include "Core/Actions/BankTransferProgressPresenter.h"
 #include "Core/Services/DeviceMemoryLimits.h"
+#include "Core/Services/MasterM1kmLoadPolicy.h"
 #include "Core/Services/PatchFileNameReconciler.h"
 #include "Core/Services/PatchMutator/PatchLoadContext.h"
 #include "Core/Services/PatchMutator/PatchMutatorEngine.h"
@@ -269,6 +270,11 @@ public:
     bool masterInitTemplateExists() const;
     void initAllMasterModulesFromTemplate();
     void loadMasterFromUserFile(const juce::File& file);
+    // Decodes .m1km into packedOut (172 bytes) without touching the live master.
+    // On failure publishes the MASTER file failed footer and returns false.
+    bool tryDecodeMasterM1kmUserFile(const juce::File& file, juce::uint8* packedOut172);
+    // Commits a previously decoded .m1km buffer after the Groups/cascade choice modal.
+    void commitMasterM1kmUserLoad(const juce::uint8* packed172, Core::MasterM1kmGroupsPolicy policy);
     void saveMasterToUserFile(const juce::File& file);
 
     // Settings — Patch Mutator mutation-history defrag (message thread).
@@ -445,6 +451,7 @@ private:
     void handleDeviceTypePropertyChange(const juce::String& propertyName);
     void applyInboundMasterDump(const std::vector<juce::uint8>& packedMaster);
     void cancelMasterEditSysExDebounce() noexcept;
+    void commitMasterUserLoadToApvtsAndSynth();
     void firePendingMasterEditSysEx();
     void resyncSynthAfterEditorialUndoRedo();
     void beginEditorialResyncGranularMidiQuietPeriod();

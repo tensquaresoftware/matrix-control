@@ -233,7 +233,7 @@ namespace PluginDisplayNames
             constexpr const char* kEpromType =
                 "SETTINGS: Declares the synth EPROM type used for MIDI timing and future features.";
             constexpr const char* kMasterLoad =
-                "SETTINGS: Loads a Master settings file into the editor.";
+                "SETTINGS: Loads a Master .syx or legacy .m1km file into the editor.";
             constexpr const char* kMasterSaveAs =
                 "SETTINGS: Saves current Master settings as a new file.";
             constexpr const char* kMasterInit =
@@ -426,6 +426,21 @@ namespace PluginDisplayNames
                     + "Continue replaces that .syx file. The original .m1kp stays unchanged.\n\n"
                     + "Cancel keeps editing without saving.";
             }
+        }
+
+        // Settings LOAD of a legacy .m1km master — Groups/cascade policy before commit.
+        namespace MasterM1kmLoadChoice
+        {
+            constexpr const char* kTitle = "Load .m1km Master?";
+            constexpr const char* kBody =
+                "This .m1km Master file may include Groups and cascade data. "
+                "Matrix-Control does not edit those yet, but the Matrix-1000 still uses them.\n\n"
+                "Choose whether to load Master settings only (Groups/cascade reset) or the full "
+                "master (Groups/cascade kept).\n"
+                "Cancel leaves the current Master unchanged.";
+            constexpr const char* kMasterSettingsOnly = "Master settings only";
+            constexpr const char* kFullMaster = "Full Master (including groups/cascade)";
+            constexpr const char* kCancel = "Cancel";
         }
 
         namespace BankTransferProgress

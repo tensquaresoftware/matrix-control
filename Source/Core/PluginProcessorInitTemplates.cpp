@@ -5,6 +5,7 @@
 
 #include "Core/Init/InitTemplateFooter.h"
 #include "Core/Init/InitTemplateWriter.h"
+#include "Core/Init/InitDefaults.h"
 #include "Core/Init/MasterModuleInitService.h"
 #include "Core/MIDI/MasterParameterSysExDispatcher.h"
 #include "Core/Models/ApvtsMasterMapper.h"
@@ -12,9 +13,13 @@
 #include "Core/Models/MasterModel.h"
 #include "Core/Models/PatchModel.h"
 #include "Core/Models/PatchNameSyncer.h"
+#include "Core/Services/MasterM1kmCodec.h"
+#include "Core/Services/MasterM1kmLoadPolicy.h"
 #include "Core/Services/PatchFileService.h"
 #include "MIDI/MidiManager.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
+
+#include <cstring>
 
 namespace
 {
@@ -120,6 +125,15 @@ void PluginProcessor::loadMasterFromUserFile(const juce::File& file)
         return;
     }
 
+    // .m1km requires an explicit Groups/cascade choice before commit (editor modal).
+    if (Core::MasterM1kmCodec::hasExtension(file))
+    {
+        publishSettingsFooter(apvts,
+                              PluginDisplayNames::Settings::FooterMessages::kMasterFileFailed,
+                              true);
+        return;
+    }
+
     const auto result = Core::InitTemplateWriter::loadMasterFromUserFile(
         *masterModel_, file, *initTemplateLoader_);
 
@@ -131,6 +145,55 @@ void PluginProcessor::loadMasterFromUserFile(const juce::File& file)
         return;
     }
 
+    commitMasterUserLoadToApvtsAndSynth();
+}
+
+bool PluginProcessor::tryDecodeMasterM1kmUserFile(const juce::File& file, juce::uint8* packedOut172)
+{
+    if (packedOut172 == nullptr || initTemplateLoader_ == nullptr
+        || ! Core::MasterM1kmCodec::hasExtension(file))
+    {
+        publishSettingsFooter(apvts,
+                              PluginDisplayNames::Settings::FooterMessages::kMasterFileFailed,
+                              true);
+        return false;
+    }
+
+    Core::MasterModel scratch;
+    const auto result = Core::InitTemplateWriter::decodeMasterUserFile(
+        scratch, file, *initTemplateLoader_);
+
+    if (! result.success || result.source != Core::InitTemplateSource::kUserFile)
+    {
+        publishSettingsFooter(apvts,
+                              PluginDisplayNames::Settings::FooterMessages::kMasterFileFailed,
+                              true);
+        return false;
+    }
+
+    std::memcpy(packedOut172, scratch.data(), Core::MasterModel::kBufferSize);
+    return true;
+}
+
+void PluginProcessor::commitMasterM1kmUserLoad(const juce::uint8* packed172,
+                                               Core::MasterM1kmGroupsPolicy policy)
+{
+    if (packed172 == nullptr || masterModel_ == nullptr || apvtsMasterMapper_ == nullptr
+        || masterParameterSysExDispatcher_ == nullptr)
+    {
+        publishSettingsFooter(apvts,
+                              PluginDisplayNames::Settings::FooterMessages::kMasterFileFailed,
+                              true);
+        return;
+    }
+
+    Core::MasterM1kmLoadPolicy::loadPackedIntoModel(
+        *masterModel_, packed172, policy, Core::InitDefaults::masterData());
+    commitMasterUserLoadToApvtsAndSynth();
+}
+
+void PluginProcessor::commitMasterUserLoadToApvtsAndSynth()
+{
     cancelMasterEditSysExDebounce();
     apvtsMasterMapper_->bufferToApvts();
     PluginProcessorInternal::flushDeferredApvtsParameterSync(apvts);

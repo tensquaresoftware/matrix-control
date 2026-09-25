@@ -4,17 +4,24 @@
 #include "PluginEditor.h"
 #include "PluginEditorInternal.h"
 
+#include <array>
+#include <memory>
+
 #include "Core/Services/DeviceConnectionMachineDefaults.h"
 #include "Core/Services/DeviceTypeRegistry.h"
 #include "Core/Services/EpromTypePolicy.h"
 #include "Core/Services/PatchNameDisplayMode.h"
 #include "Core/MIDI/MidiManager.h"
+#include "GUI/Dialogs/MasterM1kmLoadChoiceDialog.h"
 #include "GUI/Dialogs/MutatorHistoryDefragConfirmDialog.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Settings/SettingsPanel.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginIDs.h"
+#include "Core/Models/MasterModel.h"
+#include "Core/Services/MasterM1kmCodec.h"
+#include "Core/Services/MasterM1kmLoadPolicy.h"
 
 namespace
 {
@@ -201,10 +208,35 @@ void PluginEditor::wireSettingsMasterFileActions(SettingsPanel& panel)
     panel.getMasterLoadButton().onClick = [this]
     {
         const auto file = PluginEditorInternal::browseForFileToOpenSync(
-            this, PluginDisplayNames::Settings::kLoadMasterDialogTitle, {}, "*.syx");
+            this,
+            PluginDisplayNames::Settings::kLoadMasterDialogTitle,
+            {},
+            "*.syx;*.m1km");
 
-        if (file.getFullPathName().isNotEmpty())
-            pluginProcessor.loadMasterFromUserFile(file);
+        if (file.getFullPathName().isEmpty())
+            return;
+
+        if (Core::MasterM1kmCodec::hasExtension(file))
+        {
+            auto packed = std::make_shared<std::array<juce::uint8, Core::MasterModel::kBufferSize>>();
+            if (! pluginProcessor.tryDecodeMasterM1kmUserFile(file, packed->data()))
+                return;
+
+            openMasterM1kmLoadChoiceDialog(
+                [this, packed]
+                {
+                    pluginProcessor.commitMasterM1kmUserLoad(
+                        packed->data(), Core::MasterM1kmGroupsPolicy::kMasterSettingsOnly);
+                },
+                [this, packed]
+                {
+                    pluginProcessor.commitMasterM1kmUserLoad(
+                        packed->data(), Core::MasterM1kmGroupsPolicy::kFullMaster);
+                });
+            return;
+        }
+
+        pluginProcessor.loadMasterFromUserFile(file);
     };
 
     panel.getMasterSaveAsButton().onClick = [this]
@@ -218,6 +250,56 @@ void PluginEditor::wireSettingsMasterFileActions(SettingsPanel& panel)
         if (file.getFullPathName().isNotEmpty())
             pluginProcessor.saveMasterToUserFile(file);
     };
+}
+
+void PluginEditor::updateMasterM1kmLoadChoiceDialogLayout(float uiScale)
+{
+    if (masterM1kmLoadChoiceDialog_ == nullptr)
+        return;
+
+    masterM1kmLoadChoiceDialog_->setUiScale(uiScale);
+    masterM1kmLoadChoiceDialog_->setBounds(getLocalBounds());
+}
+
+void PluginEditor::openMasterM1kmLoadChoiceDialog(std::function<void()> onMasterSettingsOnly,
+                                                  std::function<void()> onFullMaster)
+{
+    closeAboutWindow();
+    closeMasterInitConfirmDialog();
+    closeMutatorHistoryDefragConfirmDialog();
+    closeEpromTypePromptDialog();
+    hideBankTransferProgressDialog();
+
+    if (masterM1kmLoadChoiceDialog_ == nullptr)
+    {
+        masterM1kmLoadChoiceDialog_ = std::make_unique<MasterM1kmLoadChoiceDialog>(
+            *skin_,
+            [this] { closeMasterM1kmLoadChoiceDialog(); });
+        addChildComponent(*masterM1kmLoadChoiceDialog_);
+    }
+    else
+    {
+        masterM1kmLoadChoiceDialog_->setSkin(*skin_);
+    }
+
+    masterM1kmLoadChoiceDialog_->prepareForShow(std::move(onMasterSettingsOnly),
+                                                std::move(onFullMaster));
+
+    const int baseWidth = layoutDimensions_.editor.width;
+    const float uiScale = (baseWidth > 0)
+        ? TSS::ScaledLayout::uiScaleFromEditorBounds(getWidth(), baseWidth)
+        : 1.0f;
+    updateMasterM1kmLoadChoiceDialogLayout(uiScale);
+
+    masterM1kmLoadChoiceDialog_->setVisible(true);
+    masterM1kmLoadChoiceDialog_->toFront(true);
+    masterM1kmLoadChoiceDialog_->grabKeyboardFocus();
+}
+
+void PluginEditor::closeMasterM1kmLoadChoiceDialog()
+{
+    if (masterM1kmLoadChoiceDialog_ != nullptr)
+        masterM1kmLoadChoiceDialog_->setVisible(false);
 }
 
 void PluginEditor::wireSettingsEpromAndLatency(SettingsPanel& panel)
@@ -312,6 +394,7 @@ void PluginEditor::openMutatorHistoryDefragConfirmDialog(std::function<void()> o
     closeSettingsWindow();
     closeAboutWindow();
     closeMasterInitConfirmDialog();
+    closeMasterM1kmLoadChoiceDialog();
 
     if (mutatorHistoryDefragConfirmDialog_ == nullptr)
     {

@@ -1,8 +1,11 @@
 #pragma once
 
+#include <optional>
+
 #include <juce_core/juce_core.h>
 
 #include "Core/Init/InitTemplateLoader.h"
+#include "Core/Services/MasterM1kmLoadPolicy.h"
 
 class SysExEncoder;
 
@@ -40,9 +43,19 @@ namespace Core
         static InitTemplateWriteResult writeMasterToFile(const MasterModel& masterModel,
                                                         const juce::File& targetFile,
                                                         SysExEncoder& encoder);
-        static InitTemplateLoadResult loadMasterFromUserFile(MasterModel& masterModel,
-                                                             const juce::File& file,
-                                                             InitTemplateLoader& loader);
+        // Loads a user Master file into masterModel. For .m1km, m1kmPolicy is required
+        // (no silent Groups/cascade default). For .syx, m1kmPolicy is ignored.
+        static InitTemplateLoadResult loadMasterFromUserFile(
+            MasterModel& masterModel,
+            const juce::File& file,
+            InitTemplateLoader& loader,
+            std::optional<MasterM1kmGroupsPolicy> m1kmPolicy = std::nullopt);
+
+        // Decodes without committing to a live model. On success scratch holds packed bytes
+        // and source is kUserFile. Invalid / unreadable files do not leave a success result.
+        static InitTemplateLoadResult decodeMasterUserFile(MasterModel& scratch,
+                                                           const juce::File& file,
+                                                           InitTemplateLoader& loader);
 
         static InitTemplateWriteResult deletePatchInit();
         static InitTemplateWriteResult deletePatchInit(const juce::File& initDirectory);

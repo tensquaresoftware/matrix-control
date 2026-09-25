@@ -8,6 +8,7 @@
 #include "GUI/Dialogs/BankTransferProgressDialog.h"
 #include "GUI/Dialogs/EpromTypePromptDialog.h"
 #include "GUI/Dialogs/MasterInitConfirmDialog.h"
+#include "GUI/Dialogs/MasterM1kmLoadChoiceDialog.h"
 #include "GUI/Dialogs/MutatorHistoryDefragConfirmDialog.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Panels/MainComponent/HeaderPanel/HeaderPanel.h"
@@ -44,6 +45,9 @@ void PluginEditor::updateSkin()
 
     if (masterInitConfirmDialog_ != nullptr)
         masterInitConfirmDialog_->setSkin(*skin_);
+
+    if (masterM1kmLoadChoiceDialog_ != nullptr)
+        masterM1kmLoadChoiceDialog_->setSkin(*skin_);
 
     if (mutatorHistoryDefragConfirmDialog_ != nullptr)
         mutatorHistoryDefragConfirmDialog_->setSkin(*skin_);
@@ -113,6 +117,8 @@ void PluginEditor::updateOverlayLayoutsForUiScale(float uiScale)
     layoutIfVisible(aboutWindow_, [this](float scale) { updateAboutWindowLayout(scale); });
     layoutIfVisible(masterInitConfirmDialog_,
                     [this](float scale) { updateMasterInitConfirmDialogLayout(scale); });
+    layoutIfVisible(masterM1kmLoadChoiceDialog_,
+                    [this](float scale) { updateMasterM1kmLoadChoiceDialogLayout(scale); });
     layoutIfVisible(mutatorHistoryDefragConfirmDialog_,
                     [this](float scale) { updateMutatorHistoryDefragConfirmDialogLayout(scale); });
     layoutIfVisible(epromTypePromptDialog_,

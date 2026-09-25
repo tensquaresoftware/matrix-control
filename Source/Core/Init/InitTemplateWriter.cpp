@@ -2,10 +2,12 @@
 
 #include <cstring>
 
+#include "Core/Init/InitDefaults.h"
 #include "Core/MIDI/SysEx/SysExConstants.h"
 #include "Core/MIDI/SysEx/SysExEncoder.h"
 #include "Core/Models/MasterModel.h"
 #include "Core/Models/PatchModel.h"
+#include "Core/Services/MasterM1kmCodec.h"
 #include "Core/Services/PatchFileService.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/ProjectPaths.h"
@@ -122,11 +124,10 @@ namespace Core
         return result;
     }
 
-    InitTemplateLoadResult InitTemplateWriter::loadMasterFromUserFile(MasterModel& masterModel,
-                                                                     const juce::File& file,
-                                                                     InitTemplateLoader& loader)
+    InitTemplateLoadResult InitTemplateWriter::decodeMasterUserFile(MasterModel& scratch,
+                                                                    const juce::File& file,
+                                                                    InitTemplateLoader& loader)
     {
-        MasterModel scratch;
         const auto result = loader.loadMasterFile(scratch, file);
 
         if (result.source != InitTemplateSource::kUserFile)
@@ -137,6 +138,37 @@ namespace Core
             failed.fallbackReason = result.fallbackReason;
             failed.infoMessage = PluginDisplayNames::Settings::FooterMessages::kMasterFileFailed;
             return failed;
+        }
+
+        return result;
+    }
+
+    InitTemplateLoadResult InitTemplateWriter::loadMasterFromUserFile(
+        MasterModel& masterModel,
+        const juce::File& file,
+        InitTemplateLoader& loader,
+        std::optional<MasterM1kmGroupsPolicy> m1kmPolicy)
+    {
+        MasterModel scratch;
+        const auto result = decodeMasterUserFile(scratch, file, loader);
+        if (! result.success)
+            return result;
+
+        if (MasterM1kmCodec::hasExtension(file))
+        {
+            if (! m1kmPolicy.has_value())
+            {
+                InitTemplateLoadResult failed;
+                failed.success = false;
+                failed.source = InitTemplateSource::kHardcodedFallback;
+                failed.fallbackReason = InitTemplateFallbackReason::kFileInvalid;
+                failed.infoMessage = PluginDisplayNames::Settings::FooterMessages::kMasterFileFailed;
+                return failed;
+            }
+
+            MasterM1kmLoadPolicy::loadPackedIntoModel(
+                masterModel, scratch.data(), *m1kmPolicy, InitDefaults::masterData());
+            return result;
         }
 
         masterModel.loadFrom(scratch.data());
