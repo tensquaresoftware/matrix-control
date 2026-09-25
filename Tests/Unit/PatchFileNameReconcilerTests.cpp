@@ -20,6 +20,8 @@ public:
         reconcile_askOnceCancel();
         reconcile_askOnceFilename();
         reconcile_sanitizerReuse();
+        reconcileForcedFilename_ignoresInternalName();
+        reconcileForcedFilename_sanitizesStemExamples();
     }
 
 private:
@@ -146,6 +148,44 @@ private:
         expect(! result.usedFilename);
         expect(! result.cancelled);
         expect(result.resolvedName == "BASS");
+    }
+
+    void reconcileForcedFilename_ignoresInternalName()
+    {
+        beginTest("reconcileForcedFilename_ignoresInternalName");
+
+        Core::PatchModel model;
+        model.loadFrom(Core::InitDefaults::patchData());
+        model.setName("BNK7: 57");
+
+        const auto result = Core::PatchFileNameReconciler::reconcileForcedFilename(model, "CleanBss");
+
+        expect(result.hadMismatch);
+        expect(result.usedFilename);
+        expect(! result.cancelled);
+        expectEquals(result.resolvedName, juce::String("CLEANBSS"));
+        expectEquals(model.getName(), juce::String("CLEANBSS"));
+    }
+
+    void reconcileForcedFilename_sanitizesStemExamples()
+    {
+        beginTest("reconcileForcedFilename_sanitizesStemExamples");
+
+        auto expectStem = [this](const juce::String& stem, const juce::String& expected)
+        {
+            Core::PatchModel model;
+            model.loadFrom(Core::InitDefaults::patchData());
+            model.setName("I N I T");
+            const auto result = Core::PatchFileNameReconciler::reconcileForcedFilename(model, stem);
+            expectEquals(model.getName(), expected);
+            expectEquals(result.resolvedName, expected);
+            expect(result.usedFilename);
+        };
+
+        expectStem("Rich Pad", "RICH PAD");
+        expectStem("MyBeautifulPad", "MYBEAUTI");
+        expectStem("Pad#1!!", "PAD1");
+        expectStem("@@@", "PATCH");
     }
 };
 

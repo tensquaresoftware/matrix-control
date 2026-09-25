@@ -90,4 +90,25 @@ namespace Core
         return makeMismatchResult(model.getName(), false);
     }
 
+    PatchNameReconciliationResult PatchFileNameReconciler::reconcileForcedFilename(
+        PatchModel& model,
+        const juce::String& fileStem)
+    {
+        using namespace PluginIDs::Settings::ComputerPatchesNamesPolicy;
+        return reconcile(model, fileStem, kDisplayFileNames, {});
+    }
+
+    PatchNameReconciliationResult PatchFileNameReconciler::reseedFromPackedAndReconcile(
+        PatchModel& model,
+        const juce::uint8* packed,
+        const juce::String& fileStem,
+        int policy)
+    {
+        PatchModel nameSource;
+        nameSource.loadFrom(packed);
+        nameSource.normalizeNameEncoding();
+        model.setName(nameSource.getName());
+        return reconcile(model, fileStem, policy, {});
+    }
+
 } // namespace Core

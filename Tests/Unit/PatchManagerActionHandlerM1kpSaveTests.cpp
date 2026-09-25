@@ -48,6 +48,15 @@ private:
         expect(! gateCalled);
         expect(tempDir.getChildFile("NICEPAD.syx").existsAsFile());
         expect(tempDir.getChildFile("NICEPAD.m1kp").existsAsFile());
+        expectEquals(harness.model.getName(), juce::String("NICEPAD"));
+
+        juce::uint8 packed[SysExConstants::kPatchPackedDataSize] = {};
+        expect(harness.patchFileService.loadPatchSysExFile(
+                   tempDir.getChildFile("NICEPAD.syx"), packed)
+                   .success);
+        Core::PatchModel saved;
+        saved.loadFrom(packed);
+        expectEquals(saved.getName(), juce::String("NICEPAD"));
 
         tempDir.deleteRecursively();
     }

@@ -193,69 +193,24 @@ namespace Core
         return false;
     }
 
-    namespace
-    {
-        // Strip a matching Bank Utility export prefix ("Pxx. {Name}") before FILE NAMES reconcile.
-        // Non-matching stems (artistic "P99 - DJ", slot-only "P76", …) stay unchanged.
-        juce::String stemForFilenameReconcile(const juce::File& file)
-        {
-            const auto rawStem = file.getFileNameWithoutExtension();
-            const auto fromExport = PatchFileNameSanitizer::nameFromBankExportStem(rawStem);
-            return fromExport.isNotEmpty() ? fromExport : rawStem;
-        }
-    }
-
     PatchNameReconciliationResult PatchManagerActionHandler::reconcileLoadedPatchName(const juce::File& file)
     {
+        // .m1kp: always PATCH NAME from filename stem (Settings / Ask Once ignored).
+        if (PatchFileService::hasM1kpExtension(file))
+        {
+            return PatchFileNameReconciler::reconcileForcedFilename(
+                *patchModel_, file.getFileNameWithoutExtension());
+        }
+
         const auto policy = static_cast<int>(apvts_.state.getProperty(
             PluginIDs::Settings::kComputerPatchesNamesPolicy,
             PluginIDs::Settings::ComputerPatchesNamesPolicy::kDefault));
 
         return PatchFileNameReconciler::reconcile(
             *patchModel_,
-            stemForFilenameReconcile(file),
+            PatchManagerActionHandlerInternal::stemForFilenameReconcile(file),
             policy,
             pickNameReconciliation_);
-    }
-
-    void PatchManagerActionHandler::reapplyComputerPatchDisplayedName()
-    {
-        if (! editorPatchFromComputerFile_ || ! canExecutePatchLoad() || ! hasUsableKnownSyxPath())
-            return;
-
-        using namespace PluginIDs::Settings::ComputerPatchesNamesPolicy;
-        const int policy = static_cast<int>(apvts_.state.getProperty(
-            PluginIDs::Settings::kComputerPatchesNamesPolicy, kDefault));
-
-        // ASK ONCE PER LOAD is load-time only — never prompt from a Settings change.
-        if (policy != kDisplaySysexNames && policy != kDisplayFileNames)
-            return;
-
-        const juce::File file(knownSyxFullPath_);
-        juce::uint8 packed[SysExConstants::kPatchPackedDataSize] = {};
-        if (! patchFileService_->loadPatchSysExFile(file, packed).success)
-            return;
-
-        PatchModel nameSource;
-        nameSource.loadFrom(packed);
-        nameSource.normalizeNameEncoding();
-
-        const bool wasDirty = dirtyPatchTracker_ != nullptr
-            && dirtyPatchTracker_->isDirty(*patchModel_);
-
-        // Seed from the .syx internal name, then apply the current DISPLAY policy (no picker).
-        patchModel_->setName(nameSource.getName());
-        PatchFileNameReconciler::reconcile(
-            *patchModel_,
-            stemForFilenameReconcile(file),
-            policy,
-            {});
-
-        using namespace PatchManagerActionHandlerInternal;
-        pushPatchModelToApvtsWithSuppress(apvts_, hooks_, *apvtsPatchMapper_, patchNameSyncer_);
-
-        if (dirtyPatchTracker_ != nullptr && ! wasDirty)
-            dirtyPatchTracker_->captureSnapshot(*patchModel_);
     }
 
     std::optional<PatchNameReconciliationResult>

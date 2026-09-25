@@ -5,6 +5,7 @@
 #include "Core/Actions/ActionExecutionHooks.h"
 #include "Core/Models/ApvtsPatchMapper.h"
 #include "Core/Models/PatchNameSyncer.h"
+#include "Core/Services/PatchFileNameSanitizer.h"
 #include "Core/Services/PatchFileService.h"
 
 // Free helpers shared by PatchManagerActionHandler.cpp and its companion .cpp files.
@@ -56,6 +57,15 @@ namespace PatchManagerActionHandlerInternal
         return targetFile.hasFileExtension(Core::PatchFileService::kSyxExtension)
             ? targetFile.getFileName()
             : targetFile.withFileExtension(Core::PatchFileService::kSyxExtension).getFileName();
+    }
+
+    // Strip a matching Bank Utility export prefix ("Pxx. {Name}") before FILE NAMES reconcile.
+    // Non-matching stems (artistic "P99 - DJ", slot-only "P76", …) stay unchanged.
+    inline juce::String stemForFilenameReconcile(const juce::File& file)
+    {
+        const auto rawStem = file.getFileNameWithoutExtension();
+        const auto fromExport = Core::PatchFileNameSanitizer::nameFromBankExportStem(rawStem);
+        return fromExport.isNotEmpty() ? fromExport : rawStem;
     }
 
     // After a Matrix case-fold write (e.g. Patch 71.syx → PATCH 71.syx), case-sensitive

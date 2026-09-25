@@ -34,6 +34,17 @@ namespace Core
                                                        const juce::String& fileStem,
                                                        int policy,
                                                        const Picker& picker);
+
+        // Always inject the sanitized filename stem into the model (Settings ignored).
+        static PatchNameReconciliationResult reconcileForcedFilename(PatchModel& model,
+                                                                     const juce::String& fileStem);
+
+        // Seed model name from packed bytes, then reconcile with policy (no Ask Once picker).
+        static PatchNameReconciliationResult reseedFromPackedAndReconcile(
+            PatchModel& model,
+            const juce::uint8* packed,
+            const juce::String& fileStem,
+            int policy);
     };
 
 } // namespace Core

@@ -92,6 +92,9 @@ private:
         expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
                          ComputerPatches::StandaloneWidgets::kSelectPatchFile)),
                      1);
+        expectEquals(harness.model.getName(), juce::String("P-TEST"));
+        expectEquals(harness.proc.apvts.state.getProperty(PatchNameIds::kPatchName).toString(),
+                     juce::String("P-TEST"));
         expect(scanQueue(harness.queue).editBufferPatch);
 
         dropDir.deleteRecursively();

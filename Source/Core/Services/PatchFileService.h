@@ -148,10 +148,10 @@ namespace Core
         void clearLastScan() noexcept;
 
         static bool hasSupportedPatchExtension(const juce::File& file) noexcept;
+        static bool hasM1kpExtension(const juce::File& file) noexcept;
 
     private:
         static bool hasSyxExtension(const juce::File& file) noexcept;
-        static bool hasM1kpExtension(const juce::File& file) noexcept;
         static bool isFolderReadable(const juce::File& folder) noexcept;
         static juce::Array<juce::File> findPatchFiles(const juce::File& folder);
         static juce::File withSyxExtension(const juce::File& file);
