@@ -64,6 +64,10 @@ namespace Core
     juce::String PatchFileService::resolveDragPreviewPrimaryName(const juce::File& file,
                                                                  const juce::uint8* packedData) const
     {
+        // .m1kp drop always forces the sanitized filename stem — hover must match.
+        if (hasM1kpExtension(file))
+            return PatchFileNameSanitizer::sanitizeFileStem(file.getFileNameWithoutExtension());
+
         PatchModel model;
         model.loadFrom(packedData);
         model.normalizeNameEncoding();

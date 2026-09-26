@@ -9,6 +9,7 @@
 #include "Core/MIDI/SysEx/SysExParser.h"
 #include "Core/Models/PatchModel.h"
 #include "Core/Services/PatchFileService.h"
+#include "Core/Services/PatchM1kpCodec.h"
 #include "PatchFixturePaths.h"
 #include "PatchFileServiceTestSupport.h"
 
@@ -31,6 +32,8 @@ public:
         assessSinglePatch_bnkNameFallsBackToStem();
         assessSinglePatch_usableInternalNameShown();
         assessSinglePatch_validM1kp();
+        assessSinglePatch_m1kpUsableInternalNameUsesSanitizedStem();
+        assessSinglePatch_m1kpBankExportLikeStemMatchesDropSanitize();
         assessSinglePatch_rejectsInvalidM1kp();
     }
 
@@ -162,9 +165,57 @@ private:
         const auto assessment = service_.assessSinglePatchSyxFile(file);
         expect(assessment.isValidSinglePatch);
         expect(assessment.rejectKind == Core::SinglePatchSyxRejectKind::kNone);
-        // Internal name is BNK2: 02 (bank placeholder) → preview falls back to stem.
-        expectEquals(assessment.previewPrimaryName, juce::String("P-Test"));
+        // Fixture packed name is BNK2: 02; .m1kp preview still uses sanitized stem (drop parity).
+        expectEquals(assessment.previewPrimaryName, juce::String("P-TEST"));
         expect(service_.isValidSinglePatchSyxFile(file));
+    }
+
+    void assessSinglePatch_m1kpUsableInternalNameUsesSanitizedStem()
+    {
+        beginTest("assessSinglePatch_m1kpUsableInternalNameUsesSanitizedStem");
+
+        const auto tempDir = createTempScanDir();
+        const auto target = tempDir.getChildFile("Nice Pad.m1kp");
+
+        Core::PatchModel model;
+        std::memcpy(model.data(),
+                    Core::InitDefaults::patchData(),
+                    SysExConstants::kPatchPackedDataSize);
+        // Usable packed name (not INIT): hover must still prefer sanitized stem.
+        model.setName("NYLON 12");
+
+        juce::MemoryBlock data(Core::PatchM1kpCodec::kFileByteSize, true);
+        auto* bytes = static_cast<juce::uint8*>(data.getData());
+        for (size_t i = 0; i < Core::PatchM1kpCodec::kInt16Count; ++i)
+        {
+            const auto value = static_cast<int16_t>(static_cast<int8_t>(model.data()[i]));
+            bytes[i * 2] = static_cast<juce::uint8>(value & 0xff);
+            bytes[i * 2 + 1] = static_cast<juce::uint8>((value >> 8) & 0xff);
+        }
+        expect(target.replaceWithData(data.getData(), data.getSize()));
+
+        const auto assessment = service_.assessSinglePatchSyxFile(target);
+        expect(assessment.isValidSinglePatch);
+        expect(assessment.rejectKind == Core::SinglePatchSyxRejectKind::kNone);
+        expectEquals(assessment.previewPrimaryName, juce::String("NICE PAD"));
+
+        tempDir.deleteRecursively();
+    }
+
+    void assessSinglePatch_m1kpBankExportLikeStemMatchesDropSanitize()
+    {
+        beginTest("assessSinglePatch_m1kpBankExportLikeStemMatchesDropSanitize");
+
+        const auto tempDir = createTempScanDir();
+        const auto target = tempDir.getChildFile("P10. Nylon.m1kp");
+        expect(PatchTestFixtures::resolvePatchFixtureFile("P-Test.m1kp").copyFileTo(target));
+
+        const auto assessment = service_.assessSinglePatchSyxFile(target);
+        expect(assessment.isValidSinglePatch);
+        expect(assessment.rejectKind == Core::SinglePatchSyxRejectKind::kNone);
+        expectEquals(assessment.previewPrimaryName, juce::String("P10 NYLO"));
+
+        tempDir.deleteRecursively();
     }
 
     void assessSinglePatch_rejectsInvalidM1kp()

@@ -2040,3 +2040,7 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-master-file-drag-drop.md`
   summary: Reconfirmed — Mid-drag path-cache TOCTOU if Master file size/contents change while hovering (path key only).
   evidence: Code review ff80039e..f6f80115; Edge Case Hunter; same class as existing patch drag cache.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-m1kp-drag-hover-patch-name.md`
+  summary: Add a shared `PatchM1kpCodec` encode helper so tests stop hand-rolling little-endian int16 files.
+  evidence: Blind Hunter oneshot review; decode exists without encode; assess test currently mirrors decode layout inline.
