@@ -205,6 +205,10 @@ namespace PluginDisplayNames
             constexpr const char* kMasterLoaded = "MASTER loaded";
             constexpr const char* kMasterSaved = "MASTER saved";
             constexpr const char* kMasterFileFailed = "MASTER file failed";
+            constexpr const char* kDropRejectedNotMaster =
+                "Drop rejected: not a Matrix Master file";
+            constexpr const char* kDropRejectedMasterMulti =
+                "Drop rejected: drop one Master file at a time";
             constexpr const char* kMasterPullFailed =
                 "MASTER: Could not read Master parameters from the synth. Keeping current Master Edit settings. "
                 "Check that MIDI FROM is the synth MIDI OUT.";
@@ -1509,6 +1513,8 @@ namespace PluginDisplayNames
         namespace PatchNameModule
         {
             constexpr const char* kName = "PATCH NAME";
+            // Temporary header title while a valid Master file is dragged over the editor.
+            constexpr const char* kLoadMasterName = "LOAD MASTER";
 
             namespace StandaloneWidgets
             {
@@ -1542,6 +1548,8 @@ namespace PluginDisplayNames
                 constexpr const char* kBadPrimary = "********";
                 // Multi / folder drag accept — ASCII dots, 10 chars fixed (no counter).
                 constexpr const char* kPatchesEllipsis = "PATCHES...";
+                // Fixed Master drag primary — Master has no 8-char name field.
+                constexpr const char* kMasterPrimary = "MASTER";
                 constexpr const char* kDropToLoad = "DROP TO LOAD";
                 constexpr const char* kBadFile = "BAD FILE";
                 // Plural secondary when the drag selection has two or more unloadable items.

@@ -194,6 +194,7 @@ set(PLUGIN_SOURCES
     Source/Core/Services/PatchFileServiceMutatorExport.cpp
     Source/Core/Services/PatchM1kpCodec.cpp
     Source/Core/Services/MasterM1kmCodec.cpp
+    Source/Core/Services/MasterFileAssess.cpp
     Source/Core/Services/MasterM1kmLoadPolicy.cpp
     Source/Core/Services/PatchFileNameSanitizer.cpp
     Source/Core/Services/PatchNameOverlayStore.cpp
@@ -492,6 +493,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/InitTemplateLoaderTests.cpp
         Tests/Unit/InitTemplateWriterTests.cpp
         Tests/Unit/MasterM1kmCodecTests.cpp
+        Tests/Unit/MasterFileAssessTests.cpp
         Tests/Unit/MasterM1kmCommitPathTests.cpp
         Tests/Unit/InitTemplateSentinelSaveTests.cpp
         Tests/Unit/ApvtsPatchMapperTests.cpp
@@ -645,6 +647,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/Services/PatchFileServiceMutatorExport.cpp
         Source/Core/Services/PatchM1kpCodec.cpp
         Source/Core/Services/MasterM1kmCodec.cpp
+        Source/Core/Services/MasterFileAssess.cpp
         Source/Core/Services/MasterM1kmLoadPolicy.cpp
         Source/Core/Services/PatchFileNameSanitizer.cpp
         Source/Core/Services/PatchNameOverlayStore.cpp

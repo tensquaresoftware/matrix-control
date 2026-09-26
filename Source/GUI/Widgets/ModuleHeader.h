@@ -76,6 +76,9 @@ namespace TSS
         void setText(const juce::String& text);
         juce::String getText() const { return text_; }
 
+        void setColourVariant(ColourVariant variant);
+        ColourVariant getColourVariant() const noexcept { return colourVariant_; }
+
         // Opt-in title click + hover focus-red. Default off (WithActionsSpec stays inert).
         void setTitleClickHandler(std::function<void()> handler);
 

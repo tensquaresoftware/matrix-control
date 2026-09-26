@@ -2012,3 +2012,17 @@ Original review bullets below remain for history; status for U-10-owned residual
   summary: Reconfirmed — PluginProcessor::tryDecodeMasterM1kmUserFile live-master-untouched before modal still untested at processor (Core decode-without-commit remains).
   evidence: Code review 592a1088..75095c63; Acceptance Auditor + Verification Gap; same harness barrier as 2026-09-25 entry.
 
+
+## Deferred from: review of spec-master-file-drag-drop.md (2026-09-26)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-master-file-drag-drop.md`
+  summary: Editor Master drop routing (filesDropped / handleMasterFileDropped) has no automated coverage.
+  evidence: Core MasterFileAssess is unit-tested; drop wiring is GUI-only; same Manual UAT pattern as prior syx drag-drop editor gates.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-master-file-drag-drop.md`
+  summary: Master drag chrome (LOAD MASTER / Orange / MASTER + DROP TO LOAD) has no automated coverage.
+  evidence: Spec Code Map says do not GUI-test blink; Manual UAT remains the covering check.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-master-file-drag-drop.md`
+  summary: Mid-drag path-cache TOCTOU if Master file size/contents change while hovering (path key only).
+  evidence: Same class as existing patch drag assess cache; settling would need size+modTime in the cache key for both Master and patch paths.

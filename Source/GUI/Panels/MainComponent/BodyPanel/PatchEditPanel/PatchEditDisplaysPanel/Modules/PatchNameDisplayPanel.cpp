@@ -83,6 +83,26 @@ TSS::PatchNameDisplay& PatchNameDisplayPanel::getPatchNameDisplay()
     return *patchNameDisplay_;
 }
 
+void PatchNameDisplayPanel::applyMasterDragChrome()
+{
+    if (moduleHeader_ == nullptr)
+        return;
+
+    masterDragChromeActive_ = true;
+    moduleHeader_->setText(PluginDisplayNames::PatchEditSection::PatchNameModule::kLoadMasterName);
+    moduleHeader_->setColourVariant(TSS::ModuleHeader::ColourVariant::Orange);
+}
+
+void PatchNameDisplayPanel::restoreNormalPatchNameChrome()
+{
+    if (moduleHeader_ == nullptr)
+        return;
+
+    masterDragChromeActive_ = false;
+    moduleHeader_->setText(PluginDisplayNames::PatchEditSection::PatchNameModule::kName);
+    moduleHeader_->setColourVariant(TSS::ModuleHeader::ColourVariant::Blue);
+}
+
 void PatchNameDisplayPanel::applyDragOverlay(DragOverlayKind kind,
                                              const juce::String& previewPrimaryName)
 {
@@ -90,6 +110,11 @@ void PatchNameDisplayPanel::applyDragOverlay(DragOverlayKind kind,
         return;
 
     namespace Overlay = PluginDisplayNames::PatchEditSection::PatchNameModule::DragDropOverlay;
+
+    if (kind == DragOverlayKind::kValidMaster)
+        applyMasterDragChrome();
+    else if (masterDragChromeActive_)
+        restoreNormalPatchNameChrome();
 
     switch (kind)
     {
@@ -101,6 +126,10 @@ void PatchNameDisplayPanel::applyDragOverlay(DragOverlayKind kind,
 
         case DragOverlayKind::kValidSelection:
             patchNameDisplay_->showDragOverlay(Overlay::kPatchesEllipsis, Overlay::kDropToLoad);
+            break;
+
+        case DragOverlayKind::kValidMaster:
+            patchNameDisplay_->showDragOverlay(Overlay::kMasterPrimary, Overlay::kDropToLoad);
             break;
 
         case DragOverlayKind::kInvalid:
@@ -117,6 +146,9 @@ void PatchNameDisplayPanel::clearDragOverlay()
 {
     if (patchNameDisplay_ == nullptr)
         return;
+
+    if (masterDragChromeActive_)
+        restoreNormalPatchNameChrome();
 
     patchNameDisplay_->clearDragOverlay();
     syncFromApvtsState();

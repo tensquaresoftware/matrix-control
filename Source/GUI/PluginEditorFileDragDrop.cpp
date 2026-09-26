@@ -1,5 +1,13 @@
 #include "PluginEditor.h"
 
+#include <array>
+#include <memory>
+
+#include "Core/MIDI/MidiManager.h"
+#include "Core/Models/MasterModel.h"
+#include "Core/Services/MasterFileAssess.h"
+#include "Core/Services/MasterM1kmCodec.h"
+#include "Core/Services/MasterM1kmLoadPolicy.h"
 #include "Core/Services/PatchFileService.h"
 #include "GUI/Helpers/GrayedControlHelper.h"
 #include "GUI/MainComponent.h"
@@ -12,6 +20,14 @@
 namespace
 {
     namespace FooterMessages = PluginDisplayNames::PatchManagerSection::ComputerPatchesModule::FooterMessages;
+    namespace MasterFooter = PluginDisplayNames::Settings::FooterMessages;
+
+    struct DragOverlayCache
+    {
+        juce::String& path;
+        bool& valid;
+        juce::String& preview;
+    };
 
     bool pathLooksLikePatchFile(const juce::String& path) noexcept
     {
@@ -32,13 +48,124 @@ namespace
         return false;
     }
 
+    bool isSingleNonDirectoryFile(const juce::StringArray& files) noexcept
+    {
+        return files.size() == 1 && ! juce::File(files[0]).isDirectory();
+    }
+
     bool isSingleNonDirectoryPatchFile(const juce::StringArray& files) noexcept
     {
-        if (files.size() != 1)
+        return isSingleNonDirectoryFile(files) && pathLooksLikePatchFile(files[0]);
+    }
+
+    bool isMasterExtensionCandidate(const juce::File& file) noexcept
+    {
+        return Core::MasterM1kmCodec::hasExtension(file)
+            || Core::MasterFileAssess::hasSyxExtension(file);
+    }
+
+    bool isJunkDragSelection(const juce::StringArray& files) noexcept
+    {
+        if (files.isEmpty())
+            return true;
+
+        if (selectionLooksAcceptable(files))
             return false;
 
-        const juce::File file(files[0]);
-        return ! file.isDirectory() && pathLooksLikePatchFile(files[0]);
+        return ! (isSingleNonDirectoryFile(files)
+                  && Core::MasterM1kmCodec::hasExtension(juce::File(files[0])));
+    }
+
+    bool selectionIncludesMasterExtension(const juce::StringArray& files) noexcept
+    {
+        for (const auto& path : files)
+        {
+            if (isMasterExtensionCandidate(juce::File(path)))
+                return true;
+        }
+
+        return false;
+    }
+
+    struct CachedOverlaySpec
+    {
+        juce::String cacheKey;
+        PatchNameDisplayPanel::DragOverlayKind kind = PatchNameDisplayPanel::DragOverlayKind::kInvalid;
+        bool isValid = false;
+        juce::String previewPrimary;
+    };
+
+    void applyCachedDragOverlay(PatchNameDisplayPanel& panel,
+                                DragOverlayCache& cache,
+                                const CachedOverlaySpec& spec)
+    {
+        if (spec.cacheKey == cache.path)
+            return;
+
+        cache.path = spec.cacheKey;
+        cache.valid = spec.isValid;
+        cache.preview = spec.previewPrimary;
+        panel.applyDragOverlay(spec.kind, spec.previewPrimary);
+    }
+
+    bool tryApplyMasterDragOverlay(PatchNameDisplayPanel& panel,
+                                   DragOverlayCache& cache,
+                                   const juce::StringArray& files,
+                                   SysExDecoder& decoder)
+    {
+        if (! isSingleNonDirectoryFile(files) || ! isMasterExtensionCandidate(juce::File(files[0])))
+            return false;
+
+        const juce::String path = files[0];
+        if (path == cache.path)
+            return true;
+
+        const auto masterAssessment = Core::MasterFileAssess::assess(juce::File(path), decoder);
+
+        if (masterAssessment.isValidMaster)
+        {
+            applyCachedDragOverlay(panel, cache,
+                                   { path, PatchNameDisplayPanel::DragOverlayKind::kValidMaster, true, {} });
+            return true;
+        }
+
+        // Invalid .m1km is never a patch — BAD FILE with Blue / PATCH NAME chrome.
+        if (Core::MasterM1kmCodec::hasExtension(juce::File(path)))
+        {
+            applyCachedDragOverlay(panel, cache,
+                                   { path, PatchNameDisplayPanel::DragOverlayKind::kInvalid, false, {} });
+            return true;
+        }
+
+        // Invalid-as-Master .syx may still be a valid patch — fall through.
+        return false;
+    }
+
+    void applyPatchOrSelectionDragOverlay(PatchNameDisplayPanel& panel,
+                                          DragOverlayCache& cache,
+                                          const juce::StringArray& files,
+                                          Core::PatchFileService& patchFileService)
+    {
+        if (! isSingleNonDirectoryPatchFile(files))
+        {
+            applyCachedDragOverlay(
+                panel, cache,
+                { "\x01selection", PatchNameDisplayPanel::DragOverlayKind::kValidSelection, true, {} });
+            return;
+        }
+
+        const juce::String path = files[0];
+        if (path == cache.path)
+            return;
+
+        const auto assessment = patchFileService.assessSinglePatchSyxFile(juce::File(path));
+        applyCachedDragOverlay(
+            panel, cache,
+            { path,
+              assessment.isValidSinglePatch ? PatchNameDisplayPanel::DragOverlayKind::kValidSingle
+                                            : PatchNameDisplayPanel::DragOverlayKind::kInvalid,
+              assessment.isValidSinglePatch,
+              assessment.previewPrimaryName });
     }
 }
 
@@ -55,54 +182,31 @@ PatchNameDisplayPanel* PluginEditor::getPatchNameDisplayPanelIfPresent()
 
 void PluginEditor::updatePatchNameDragOverlay(const juce::StringArray& files)
 {
+    if (isMasterM1kmLoadChoiceDialogVisible())
+        return;
+
     auto* panel = getPatchNameDisplayPanelIfPresent();
     if (panel == nullptr)
         return;
 
-    if (files.isEmpty() || ! selectionLooksAcceptable(files))
+    DragOverlayCache cache { lastDragAssessedPath_, lastDragAssessedValid_, lastDragAssessedPreview_ };
+
+    if (isJunkDragSelection(files))
     {
-        // Plural only when the selection itself has 2+ unloadable items (not a single bad patch file).
         const auto invalidKind = files.size() >= 2
             ? PatchNameDisplayPanel::DragOverlayKind::kInvalidPlural
             : PatchNameDisplayPanel::DragOverlayKind::kInvalid;
-        const char* junkSentinel = files.size() >= 2 ? "\x01junks" : "\x01junk";
-
-        if (lastDragAssessedPath_ == junkSentinel)
-            return;
-
-        lastDragAssessedPath_ = junkSentinel;
-        lastDragAssessedValid_ = false;
-        lastDragAssessedPreview_.clear();
-        panel->applyDragOverlay(invalidKind);
+        applyCachedDragOverlay(
+            *panel, cache,
+            { files.size() >= 2 ? "\x01junks" : "\x01junk", invalidKind, false, {} });
         return;
     }
 
-    if (! isSingleNonDirectoryPatchFile(files))
-    {
-        constexpr const char* kSelectionDragSentinel = "\x01selection";
-        if (lastDragAssessedPath_ == kSelectionDragSentinel)
-            return;
-
-        lastDragAssessedPath_ = kSelectionDragSentinel;
-        lastDragAssessedValid_ = true;
-        lastDragAssessedPreview_.clear();
-        panel->applyDragOverlay(PatchNameDisplayPanel::DragOverlayKind::kValidSelection);
-        return;
-    }
-
-    const juce::String path = files[0];
-    if (path == lastDragAssessedPath_)
+    if (tryApplyMasterDragOverlay(*panel, cache, files,
+                                  pluginProcessor.getMidiManager().getSysExDecoder()))
         return;
 
-    const auto assessment = pluginProcessor.getPatchFileService().assessSinglePatchSyxFile(
-        juce::File(path));
-    lastDragAssessedPath_ = path;
-    lastDragAssessedValid_ = assessment.isValidSinglePatch;
-    lastDragAssessedPreview_ = assessment.previewPrimaryName;
-    panel->applyDragOverlay(
-        assessment.isValidSinglePatch ? PatchNameDisplayPanel::DragOverlayKind::kValidSingle
-                                      : PatchNameDisplayPanel::DragOverlayKind::kInvalid,
-        lastDragAssessedPreview_);
+    applyPatchOrSelectionDragOverlay(*panel, cache, files, pluginProcessor.getPatchFileService());
 }
 
 void PluginEditor::clearPatchNameDragOverlay()
@@ -111,6 +215,33 @@ void PluginEditor::clearPatchNameDragOverlay()
 
     if (auto* panel = getPatchNameDisplayPanelIfPresent())
         panel->clearDragOverlay();
+}
+
+void PluginEditor::handleMasterFileDropped(const juce::File& file)
+{
+    clearPatchNameDragOverlay();
+
+    if (Core::MasterM1kmCodec::hasExtension(file))
+    {
+        auto packed = std::make_shared<std::array<juce::uint8, Core::MasterModel::kBufferSize>>();
+        if (! pluginProcessor.tryDecodeMasterM1kmUserFile(file, packed->data()))
+            return;
+
+        openMasterM1kmLoadChoiceDialog(
+            [this, packed]
+            {
+                pluginProcessor.commitMasterM1kmUserLoad(
+                    packed->data(), Core::MasterM1kmGroupsPolicy::kMasterSettingsOnly);
+            },
+            [this, packed]
+            {
+                pluginProcessor.commitMasterM1kmUserLoad(
+                    packed->data(), Core::MasterM1kmGroupsPolicy::kFullMaster);
+            });
+        return;
+    }
+
+    pluginProcessor.loadMasterFromUserFile(file);
 }
 
 void PluginEditor::handleSyxFilesDropped(const juce::StringArray& files)
@@ -137,11 +268,17 @@ bool PluginEditor::isInterestedInFileDrag(const juce::StringArray& files)
 
 void PluginEditor::fileDragEnter(const juce::StringArray& files, int, int)
 {
+    if (isMasterM1kmLoadChoiceDialogVisible())
+        return;
+
     updatePatchNameDragOverlay(files);
 }
 
 void PluginEditor::fileDragMove(const juce::StringArray& files, int, int)
 {
+    if (isMasterM1kmLoadChoiceDialogVisible())
+        return;
+
     updatePatchNameDragOverlay(files);
 }
 
@@ -152,5 +289,53 @@ void PluginEditor::fileDragExit(const juce::StringArray&)
 
 void PluginEditor::filesDropped(const juce::StringArray& files, int, int)
 {
+    if (isMasterM1kmLoadChoiceDialogVisible())
+    {
+        clearPatchNameDragOverlay();
+        return;
+    }
+
+    if (files.isEmpty())
+    {
+        clearPatchNameDragOverlay();
+        return;
+    }
+
+    // V1 Master drop: exactly one file. Multi-file never commits a Master.
+    if (files.size() >= 2)
+    {
+        if (selectionIncludesMasterExtension(files) && ! selectionLooksAcceptable(files))
+        {
+            clearPatchNameDragOverlay();
+            TSS::GrayedControlHelper::setFooterWarningMessage(
+                pluginProcessor.getApvts(), MasterFooter::kDropRejectedMasterMulti);
+            return;
+        }
+
+        handleSyxFilesDropped(files);
+        return;
+    }
+
+    if (isSingleNonDirectoryFile(files) && isMasterExtensionCandidate(juce::File(files[0])))
+    {
+        const juce::File file(files[0]);
+        const auto masterAssessment = Core::MasterFileAssess::assess(
+            file, pluginProcessor.getMidiManager().getSysExDecoder());
+
+        if (masterAssessment.isValidMaster)
+        {
+            handleMasterFileDropped(file);
+            return;
+        }
+
+        if (Core::MasterM1kmCodec::hasExtension(file))
+        {
+            clearPatchNameDragOverlay();
+            TSS::GrayedControlHelper::setFooterWarningMessage(
+                pluginProcessor.getApvts(), MasterFooter::kDropRejectedNotMaster);
+            return;
+        }
+    }
+
     handleSyxFilesDropped(files);
 }

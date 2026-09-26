@@ -195,6 +195,15 @@ namespace TSS
         repaint();
     }
 
+    void ModuleHeader::setColourVariant(ColourVariant variant)
+    {
+        if (colourVariant_ == variant)
+            return;
+
+        colourVariant_ = variant;
+        repaint();
+    }
+
     void ModuleHeader::paint(juce::Graphics& g)
     {
         if (text_.isEmpty())

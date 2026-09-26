@@ -117,6 +117,7 @@ private:
     void updatePatchNameDragOverlay(const juce::StringArray& files);
     void clearPatchNameDragOverlay();
     void handleSyxFilesDropped(const juce::StringArray& files);
+    void handleMasterFileDropped(const juce::File& file);
 
     // wirePatchAndMutatorBindings() sub-bindings (PluginEditorPatchBindings.cpp).
     void setPatchFolderPickerBinding();

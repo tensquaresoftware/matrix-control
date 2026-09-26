@@ -68,6 +68,8 @@ public:
     void sendUnlockBank();
     SysExEncoder& getSysExEncoder() noexcept { return *sysExEncoder; }
     const SysExEncoder& getSysExEncoder() const noexcept { return *sysExEncoder; }
+    SysExDecoder& getSysExDecoder() noexcept { return *sysExDecoder; }
+    const SysExDecoder& getSysExDecoder() const noexcept { return *sysExDecoder; }
     void enqueueRemoteParameterEdit(int parameterNumber, juce::uint8 packedValue);
     void enqueueMatrixModBusEdit(juce::uint8 bus,
                                  juce::uint8 source,

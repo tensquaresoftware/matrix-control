@@ -39,7 +39,8 @@ public:
         kInvalid,        // one unloadable item → BAD FILE
         kInvalidPlural,  // two or more unloadable items → BAD FILES
         kValidSingle,
-        kValidSelection
+        kValidSelection,
+        kValidMaster     // Master .syx / .m1km → MASTER + DROP TO LOAD + temporary chrome
     };
 
     void applyDragOverlay(DragOverlayKind kind, const juce::String& previewPrimaryName = {});
@@ -87,6 +88,10 @@ private:
 
     std::unique_ptr<TSS::ModuleHeader> moduleHeader_;
     std::unique_ptr<TSS::PatchNameDisplay> patchNameDisplay_;
+    bool masterDragChromeActive_ = false;
+
+    void applyMasterDragChrome();
+    void restoreNormalPatchNameChrome();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PatchNameDisplayPanel)
 };
