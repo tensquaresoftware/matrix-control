@@ -70,18 +70,41 @@ bool writeSysExFile(const juce::File& file, const juce::MemoryBlock& data)
     return file.replaceWithData(data.getData(), data.getSize());
 }
 
+juce::File fixturesInitDir()
+{
+    return ProjectPaths::getProjectRoot()
+        .getChildFile("Tests")
+        .getChildFile("Fixtures")
+        .getChildFile("Matrix-Control")
+        .getChildFile("Init");
+}
+
+bool writeOrFail(const juce::File& file, const juce::MemoryBlock& data, const char* label)
+{
+    if (writeSysExFile(file, data))
+        return true;
+
+    std::cerr << "Failed to write " << file.getFullPathName().toStdString() << " (" << label << ")\n";
+    return false;
+}
+
+bool expectSysExSize(const juce::MemoryBlock& data, size_t expected, const char* label)
+{
+    if (data.getSize() == expected)
+        return true;
+
+    std::cerr << label << " SysEx size mismatch: expected " << expected
+              << ", got " << data.getSize() << '\n';
+    return false;
+}
+
 } // namespace
 
 int main(int argc, char* argv[])
 {
     juce::ignoreUnused(argc, argv);
 
-    const juce::File fixturesInitDir = ProjectPaths::getProjectRoot()
-                                           .getChildFile("Tests")
-                                           .getChildFile("Fixtures")
-                                           .getChildFile("Matrix-Control")
-                                           .getChildFile("Init");
-
+    const auto outDir = fixturesInitDir();
     MinimalProcessor processor(ApvtsLayoutBuilder::createParameterLayout());
 
     Core::PatchModel patchModel;
@@ -98,34 +121,15 @@ int main(int argc, char* argv[])
     const auto patchSysEx = encoder.encodePatchSysEx(0, patchModel.data());
     const auto masterSysEx = encoder.encodeMasterSysEx(0x03, masterModel.data());
 
-    if (patchSysEx.getSize() != SysExConstants::kPatchMessageLength)
-    {
-        std::cerr << "Patch SysEx size mismatch: expected "
-                  << SysExConstants::kPatchMessageLength << ", got " << patchSysEx.getSize() << '\n';
+    if (! expectSysExSize(patchSysEx, SysExConstants::kPatchMessageLength, "Patch")
+        || ! expectSysExSize(masterSysEx, SysExConstants::kMasterMessageLength, "Master"))
         return 1;
-    }
 
-    if (masterSysEx.getSize() != SysExConstants::kMasterMessageLength)
-    {
-        std::cerr << "Master SysEx size mismatch: expected "
-                  << SysExConstants::kMasterMessageLength << ", got " << masterSysEx.getSize() << '\n';
+    const auto patchFile = outDir.getChildFile("PatchInit.syx");
+    const auto masterFile = outDir.getChildFile("MasterInit.syx");
+    if (! writeOrFail(patchFile, patchSysEx, "PatchInit")
+        || ! writeOrFail(masterFile, masterSysEx, "MasterInit"))
         return 1;
-    }
-
-    const juce::File patchFile = fixturesInitDir.getChildFile("PatchInit.syx");
-    const juce::File masterFile = fixturesInitDir.getChildFile("MasterInit.syx");
-
-    if (! writeSysExFile(patchFile, patchSysEx))
-    {
-        std::cerr << "Failed to write " << patchFile.getFullPathName().toStdString() << '\n';
-        return 1;
-    }
-
-    if (! writeSysExFile(masterFile, masterSysEx))
-    {
-        std::cerr << "Failed to write " << masterFile.getFullPathName().toStdString() << '\n';
-        return 1;
-    }
 
     std::cout << "Wrote " << patchFile.getFullPathName() << " (" << patchSysEx.getSize() << " bytes)\n";
     std::cout << "Wrote " << masterFile.getFullPathName() << " (" << masterSysEx.getSize() << " bytes)\n";

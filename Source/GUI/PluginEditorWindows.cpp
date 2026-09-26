@@ -9,7 +9,6 @@
 #include "GUI/Dialogs/BankTransferProgressDialog.h"
 #include "GUI/Dialogs/EpromTypePromptDialog.h"
 #include "GUI/Dialogs/MasterInitConfirmDialog.h"
-#include "GUI/Dialogs/MasterM1kmLoadChoiceDialog.h"
 #include "GUI/Dialogs/MutatorHistoryDefragConfirmDialog.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/MainComponent.h"
@@ -91,7 +90,6 @@ void PluginEditor::openSettingsWindow()
 {
     closeAboutWindow();
     closeMutatorHistoryDefragConfirmDialog();
-    closeMasterM1kmLoadChoiceDialog();
 
     if (settingsWindow_ == nullptr)
     {
@@ -130,6 +128,8 @@ void PluginEditor::openSettingsWindow()
 
 void PluginEditor::closeSettingsWindow()
 {
+    closeMasterM1kmLoadChoiceDialog();
+
     if (settingsWindow_ != nullptr)
         settingsWindow_->setVisible(false);
 }
@@ -138,7 +138,6 @@ void PluginEditor::openAboutWindow()
 {
     closeSettingsWindow();
     closeMutatorHistoryDefragConfirmDialog();
-    closeMasterM1kmLoadChoiceDialog();
 
     if (aboutWindow_ == nullptr)
     {
@@ -169,6 +168,8 @@ void PluginEditor::openAboutWindow()
 
 void PluginEditor::closeAboutWindow()
 {
+    closeMasterM1kmLoadChoiceDialog();
+
     if (aboutWindow_ != nullptr)
         aboutWindow_->setVisible(false);
 }
@@ -178,7 +179,6 @@ void PluginEditor::openMasterInitConfirmDialog(const juce::String& moduleDisplay
 {
     closeSettingsWindow();
     closeAboutWindow();
-    closeMasterM1kmLoadChoiceDialog();
 
     if (masterInitConfirmDialog_ == nullptr)
     {
@@ -209,7 +209,6 @@ void PluginEditor::openMasterGlobalInitConfirmDialog(std::function<void()> onCon
 {
     closeSettingsWindow();
     closeAboutWindow();
-    closeMasterM1kmLoadChoiceDialog();
 
     if (masterInitConfirmDialog_ == nullptr)
     {
@@ -431,7 +430,6 @@ void PluginEditor::showBankTransferProgressDialog(const BankTransferProgressShow
 {
     closeSettingsWindow();
     closeAboutWindow();
-    closeMasterM1kmLoadChoiceDialog();
 
     if (bankTransferProgressDialog_ == nullptr)
     {

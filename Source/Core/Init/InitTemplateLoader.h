@@ -43,6 +43,7 @@ namespace Core
     private:
         InitTemplateLoadResult loadPatchFromFile(PatchModel& model, const juce::File& file) const;
         InitTemplateLoadResult loadMasterFromFile(MasterModel& model, const juce::File& file) const;
+        InitTemplateLoadResult loadMasterFromM1kmFile(MasterModel& model, const juce::File& file) const;
         InitTemplateLoadResult decodePatchIntoModel(PatchModel& model, const juce::File& file,
                                                     const juce::MemoryBlock& sysEx) const;
         InitTemplateLoadResult decodeMasterIntoModel(MasterModel& model, const juce::File& file,

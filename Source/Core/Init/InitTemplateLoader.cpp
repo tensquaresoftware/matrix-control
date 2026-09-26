@@ -157,42 +157,46 @@ namespace Core
         return makeUserFileResult();
     }
 
+    InitTemplateLoadResult InitTemplateLoader::loadMasterFromM1kmFile(MasterModel& model,
+                                                                      const juce::File& file) const
+    {
+        if (file.getSize() != static_cast<juce::int64>(MasterM1kmCodec::kFileByteSize))
+        {
+            MidiLogger::getInstance().logError("Invalid master .m1km: " + file.getFullPathName());
+            return makeFallbackResult(InitTemplateKind::kMaster,
+                                      InitTemplateFallbackReason::kFileInvalid,
+                                      InitDefaults::masterData(),
+                                      model);
+        }
+
+        juce::MemoryBlock fileData;
+        if (! loadSysExBytes(file, fileData))
+        {
+            return makeFallbackResult(InitTemplateKind::kMaster,
+                                      InitTemplateFallbackReason::kFileInvalid,
+                                      InitDefaults::masterData(),
+                                      model);
+        }
+
+        juce::uint8 packed[SysExConstants::kMasterPackedDataSize] = {};
+        if (! MasterM1kmCodec::decodeToPacked(fileData, packed))
+        {
+            MidiLogger::getInstance().logError("Invalid master .m1km: " + file.getFullPathName());
+            return makeFallbackResult(InitTemplateKind::kMaster,
+                                      InitTemplateFallbackReason::kFileInvalid,
+                                      InitDefaults::masterData(),
+                                      model);
+        }
+
+        model.loadFrom(packed);
+        return makeUserFileResult();
+    }
+
     InitTemplateLoadResult InitTemplateLoader::loadMasterFromFile(MasterModel& model,
                                                                   const juce::File& file) const
     {
         if (MasterM1kmCodec::hasExtension(file))
-        {
-            if (file.getSize() != static_cast<juce::int64>(MasterM1kmCodec::kFileByteSize))
-            {
-                MidiLogger::getInstance().logError("Invalid master .m1km: " + file.getFullPathName());
-                return makeFallbackResult(InitTemplateKind::kMaster,
-                                          InitTemplateFallbackReason::kFileInvalid,
-                                          InitDefaults::masterData(),
-                                          model);
-            }
-
-            juce::MemoryBlock fileData;
-            if (! loadSysExBytes(file, fileData))
-            {
-                return makeFallbackResult(InitTemplateKind::kMaster,
-                                          InitTemplateFallbackReason::kFileInvalid,
-                                          InitDefaults::masterData(),
-                                          model);
-            }
-
-            juce::uint8 packed[SysExConstants::kMasterPackedDataSize] = {};
-            if (! MasterM1kmCodec::decodeToPacked(fileData, packed))
-            {
-                MidiLogger::getInstance().logError("Invalid master .m1km: " + file.getFullPathName());
-                return makeFallbackResult(InitTemplateKind::kMaster,
-                                          InitTemplateFallbackReason::kFileInvalid,
-                                          InitDefaults::masterData(),
-                                          model);
-            }
-
-            model.loadFrom(packed);
-            return makeUserFileResult();
-        }
+            return loadMasterFromM1kmFile(model, file);
 
         juce::MemoryBlock fileData;
         if (! loadSysExBytes(file, fileData))

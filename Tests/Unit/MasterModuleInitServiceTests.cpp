@@ -19,7 +19,6 @@
 #include "Core/MIDI/SysEx/SysExParser.h"
 #include "Core/Models/ApvtsMasterMapper.h"
 #include "Core/Models/MasterModel.h"
-#include "Core/Models/MidiChannelMasterCodec.h"
 #include "Shared/Definitions/PluginDescriptors.h"
 #include "Shared/Definitions/PluginIDs.h"
 #include "MasterModuleInitServiceTestSupport.h"
