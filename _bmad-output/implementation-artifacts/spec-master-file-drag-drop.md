@@ -101,6 +101,26 @@ context:
 - Given a valid Patch file drag/drop, when Master support is present, then Computer Patches behaviour and Blue / `PATCH NAME` chrome are unchanged.
 - Given a 275 B patch `.syx` and a 351 B master `.syx`, when each is dragged, then they never share the wrong load path or chrome.
 
+### Review Findings
+
+- [x] [Review][Patch] Add MasterFileAssess coverage for uppercase `.SYX` (and `.M1KM`) extension — [Tests/Unit/MasterFileAssessTests.cpp] match PatchFileService uppercase pattern; case-sensitive regression would miss Master classify.
+- [x] [Review][Defer] Editor Master drop routing has no automated coverage [Source/GUI/PluginEditorFileDragDrop.cpp] — deferred: GUI-only path; Manual UAT / Core assess pyramid (already recorded 2026-09-26; reconfirmed this review).
+- [x] [Review][Defer] Master drag chrome has no automated coverage [Source/GUI/Panels/.../PatchNameDisplayPanel.cpp] — deferred: no GUI harness by design; Manual UAT covering check (already recorded 2026-09-26; reconfirmed this review).
+- [x] [Review][Defer] Mid-drag path-cache TOCTOU (path key only) [Source/GUI/PluginEditorFileDragDrop.cpp] — deferred: same class as existing patch drag cache; settling needs size+modTime (already recorded 2026-09-26; reconfirmed this review).
+
+#### Rejected
+
+- `false` — Dual peek (`MasterFileAssess`) vs commit (`InitTemplateLoader`) disagreement: both `.syx` paths use `decodeMasterSysEx`; both `.m1km` paths use `MasterM1kmCodec`; drop re-assesses before commit.
+- `false` — Multi-file with Master extension falling through to Computer Patches: frozen intent (reject *or* fall through); never silent Master commit — satisfied.
+- `false` — `isJunkDragSelection` / Master `.syx` via patch-extension heuristic: intentional so invalid-as-Master `.syx` falls through to patch assess.
+- `false` — Spec `status: done` vs unchecked Manual UAT / stale Code Map / stale pre-guard triage bullets: process/docs; fix would edit this spec (rejected).
+- `false` — Dialog-open drag/drop still open findings in Review Triage Log: guards are in the delivered diff (`isMasterM1kmLoadChoiceDialogVisible`); remaining issue is log staleness only.
+- `false` — Acceptance Auditor: no AC / frozen-constraint mismatches.
+- `low` — `MidiManager::getSysExDecoder()` GUI surface: façade would add complexity; no everyday user harm (reconfirmed; prior build triage).
+- `low` — `decodeMasterSysEx` logging on drag peek: developer-only noise; quiet path would widen API.
+- `low` — Unused `ModuleHeader::getColourVariant()`: harmless accessor beside required setter; no everyday harm.
+- `low` — Hardcoded `/tmp/...` missing-file path in assess test: same pattern as other unit tests in repo; not unique risk for this change.
+
 ## Implementation Notes
 
 - Added `Core::MasterFileAssess` (peek-only; `.syx` via `SysExDecoder::decodeMasterSysEx`, `.m1km` via `MasterM1kmCodec`).

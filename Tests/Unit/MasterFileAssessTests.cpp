@@ -21,6 +21,8 @@ public:
     {
         assess_validMasterSyx();
         assess_validMasterM1km();
+        assess_validMasterUppercaseSyx();
+        assess_validMasterUppercaseM1km();
         assess_rejectsPatchSyxSize();
         assess_rejectsWrongSizeM1km();
         assess_rejectsWrongSizeSyx();
@@ -75,6 +77,42 @@ private:
         const auto assessment = Core::MasterFileAssess::assess(file, decoder_);
         expect(assessment.isValidMaster);
         expect(assessment.format == Core::MasterFileAssess::Format::kM1km);
+    }
+
+    void assess_validMasterUppercaseSyx()
+    {
+        beginTest("assess_validMasterUppercaseSyx");
+
+        const auto source = PatchTestFixtures::matrixControlMastersDir().getChildFile("Master 1.syx");
+        expect(source.existsAsFile());
+
+        const auto dir = createTempDir("MatrixControlMasterFileAssessUpperSyx");
+        const auto target = dir.getChildFile("Master 1.SYX");
+        expect(source.copyFileTo(target));
+
+        const auto assessment = Core::MasterFileAssess::assess(target, decoder_);
+        expect(assessment.isValidMaster);
+        expect(assessment.format == Core::MasterFileAssess::Format::kSyx);
+
+        dir.deleteRecursively();
+    }
+
+    void assess_validMasterUppercaseM1km()
+    {
+        beginTest("assess_validMasterUppercaseM1km");
+
+        const auto source = PatchTestFixtures::matrix1000EditorMastersDir().getChildFile("Master 1.m1km");
+        expect(source.existsAsFile());
+
+        const auto dir = createTempDir("MatrixControlMasterFileAssessUpperM1km");
+        const auto target = dir.getChildFile("Master 1.M1KM");
+        expect(source.copyFileTo(target));
+
+        const auto assessment = Core::MasterFileAssess::assess(target, decoder_);
+        expect(assessment.isValidMaster);
+        expect(assessment.format == Core::MasterFileAssess::Format::kM1km);
+
+        dir.deleteRecursively();
     }
 
     void assess_rejectsPatchSyxSize()

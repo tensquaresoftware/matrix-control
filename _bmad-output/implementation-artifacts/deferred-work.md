@@ -2026,3 +2026,17 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-master-file-drag-drop.md`
   summary: Mid-drag path-cache TOCTOU if Master file size/contents change while hovering (path key only).
   evidence: Same class as existing patch drag assess cache; settling would need size+modTime in the cache key for both Master and patch paths.
+
+## Deferred from: code review of spec-master-file-drag-drop.md (2026-09-26)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-master-file-drag-drop.md`
+  summary: Reconfirmed — Editor Master drop routing (filesDropped / handleMasterFileDropped) has no automated coverage.
+  evidence: Code review ff80039e..f6f80115; Verification Gap; GUI-only; Manual UAT / Core assess pyramid.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-master-file-drag-drop.md`
+  summary: Reconfirmed — Master drag chrome (LOAD MASTER / Orange / MASTER + DROP TO LOAD) has no automated coverage.
+  evidence: Code review ff80039e..f6f80115; Verification Gap; no GUI harness by design; Manual UAT covering check.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-master-file-drag-drop.md`
+  summary: Reconfirmed — Mid-drag path-cache TOCTOU if Master file size/contents change while hovering (path key only).
+  evidence: Code review ff80039e..f6f80115; Edge Case Hunter; same class as existing patch drag cache.
