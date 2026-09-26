@@ -23,6 +23,7 @@
 #include "Shared/Definitions/PluginDescriptors.h"
 #include "Shared/Definitions/PluginIDs.h"
 #include "MasterModuleInitServiceTestSupport.h"
+#include "PatchFixturePaths.h"
 
 class MasterModuleInitServiceTests : public juce::UnitTest
 {
@@ -79,7 +80,7 @@ private:
 
     static juce::File fixturesInitDir()
     {
-        return juce::File(MATRIX_TEST_FIXTURES_DIR).getChildFile("Init");
+        return PatchTestFixtures::initFixturesDir();
     }
 
     static juce::File createTempTemplatesDir()

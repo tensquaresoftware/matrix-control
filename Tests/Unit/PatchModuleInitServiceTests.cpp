@@ -19,6 +19,7 @@
 #include "Core/Models/PatchModel.h"
 #include "Shared/Definitions/PluginDescriptors.h"
 #include "Shared/Definitions/PluginIDs.h"
+#include "PatchFixturePaths.h"
 
 class TestAudioProcessorPatchInit : public juce::AudioProcessor
 {
@@ -100,7 +101,7 @@ private:
 
     static juce::File fixturesInitDir()
     {
-        return juce::File(MATRIX_TEST_FIXTURES_DIR).getChildFile("Init");
+        return PatchTestFixtures::initFixturesDir();
     }
 
     static juce::File createTempTemplatesDir()

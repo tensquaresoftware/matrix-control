@@ -8,10 +8,11 @@
 #include "Core/MIDI/SysEx/SysExParser.h"
 #include "Core/Models/MasterModel.h"
 #include "Shared/Definitions/PluginDescriptors.h"
+#include "PatchFixturePaths.h"
 
 // Unit tests for Core::MasterModel — the 172-byte packed master ("Global Parameters")
 // buffer. The reference round-trip uses the real Matrix-1000 master dump committed under
-// Tests/Fixtures/Masters/ (path injected via MATRIX_TEST_FIXTURES_DIR). Only one master
+// Tests/Fixtures/Matrix-Control/Masters/ (path injected via MATRIX_TEST_FIXTURES_DIR). Only one master
 // dump exists and it carries default (zero) signed values, so signed-field encoding is
 // validated separately with synthetic descriptors and explicit on-wire byte assertions.
 class MasterModelTests : public juce::UnitTest
@@ -29,7 +30,7 @@ public:
 private:
     static juce::File fixturesMastersDir()
     {
-        return juce::File(MATRIX_TEST_FIXTURES_DIR).getChildFile("Masters");
+        return PatchTestFixtures::matrixControlMastersDir();
     }
 
     void runReferenceRoundTrip()

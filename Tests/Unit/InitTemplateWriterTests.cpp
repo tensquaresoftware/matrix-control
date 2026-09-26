@@ -19,6 +19,7 @@
 #include "Shared/Definitions/PluginIDs.h"
 #include "Shared/ProjectPaths.h"
 #include "MasterModuleInitServiceTestSupport.h"
+#include "PatchFixturePaths.h"
 
 class InitTemplateWriterTests : public juce::UnitTest
 {
@@ -43,7 +44,7 @@ public:
 private:
     static juce::File fixturesInitDir()
     {
-        return juce::File(MATRIX_TEST_FIXTURES_DIR).getChildFile("Init");
+        return PatchTestFixtures::initFixturesDir();
     }
 
     static juce::AudioProcessorValueTreeState::ParameterLayout makeMasterLayout()

@@ -79,6 +79,7 @@ int main(int argc, char* argv[])
     const juce::File fixturesInitDir = ProjectPaths::getProjectRoot()
                                            .getChildFile("Tests")
                                            .getChildFile("Fixtures")
+                                           .getChildFile("Matrix-Control")
                                            .getChildFile("Init");
 
     MinimalProcessor processor(ApvtsLayoutBuilder::createParameterLayout());

@@ -13,6 +13,7 @@
 #include "Core/Services/MasterM1kmCodec.h"
 #include "Core/Services/MasterM1kmLoadPolicy.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
+#include "PatchFixturePaths.h"
 
 class MasterM1kmCodecTests : public juce::UnitTest
 {
@@ -45,7 +46,7 @@ public:
 private:
     static juce::File fixturesMastersDir()
     {
-        return juce::File(MATRIX_TEST_FIXTURES_DIR).getChildFile("Masters");
+        return PatchTestFixtures::matrix1000EditorMastersDir();
     }
 
     static juce::File studyFixture(const juce::String& fileName)

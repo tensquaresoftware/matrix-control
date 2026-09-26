@@ -20,7 +20,7 @@ namespace
 {
     juce::File fixturesMastersDir()
     {
-        return juce::File(MATRIX_TEST_FIXTURES_DIR).getChildFile("Masters");
+        return PatchTestFixtures::matrixControlMastersDir();
     }
 }
 

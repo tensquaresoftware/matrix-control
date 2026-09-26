@@ -2,6 +2,7 @@
 
 #include "Core/Actions/ActionExecutionHooks.h"
 #include "Core/Init/InitTemplateLoader.h"
+#include "PatchFixturePaths.h"
 #include "Shared/Definitions/ApvtsTypes.h"
 #include "Shared/Definitions/PluginIDs.h"
 
@@ -214,8 +215,7 @@ juce::File createTempTemplatesDir()
 
 void copyInitFixtureToDir(const juce::File& dir)
 {
-    const auto source = juce::File(MATRIX_TEST_FIXTURES_DIR)
-                            .getChildFile("Init")
+    const auto source = PatchTestFixtures::initFixturesDir()
                             .getChildFile(Core::InitTemplateLoader::kPatchInitFileName);
     source.copyFileTo(dir.getChildFile(Core::InitTemplateLoader::kPatchInitFileName));
 }

@@ -14,6 +14,7 @@
 #include "Core/Models/MidiChannelMasterCodec.h"
 #include "Shared/Definitions/PluginDescriptors.h"
 #include "Shared/Definitions/PluginIDs.h"
+#include "PatchFixturePaths.h"
 
 class TestAudioProcessorMaster : public juce::AudioProcessor
 {
@@ -67,7 +68,7 @@ private:
 
     static juce::File fixturesMastersDir()
     {
-        return juce::File(MATRIX_TEST_FIXTURES_DIR).getChildFile("Masters");
+        return PatchTestFixtures::matrixControlMastersDir();
     }
 
     static juce::AudioProcessorValueTreeState::ParameterLayout makeIntChoiceLayout(

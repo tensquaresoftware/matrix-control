@@ -108,9 +108,9 @@ private:
         seeds.push_back({ "init:InitDefaults", makeInitPatchModel() });
 
         NamedSeed initFixture;
-        initFixture.identity = "Init/PatchInit.syx";
-        const bool initLoaded = loadPatchFromFixtureRelative("Init/PatchInit.syx", initFixture.model);
-        expect(initLoaded, "Init/PatchInit.syx must load");
+        initFixture.identity = "Matrix-Control/Init/PatchInit.syx";
+        const bool initLoaded = loadPatchFromFixtureRelative("Matrix-Control/Init/PatchInit.syx", initFixture.model);
+        expect(initLoaded, "Matrix-Control/Init/PatchInit.syx must load");
         if (initLoaded)
             seeds.push_back(std::move(initFixture));
 

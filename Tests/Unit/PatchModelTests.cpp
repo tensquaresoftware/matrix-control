@@ -12,7 +12,7 @@
 
 // Unit tests for Core::PatchModel — the 134-byte packed single-patch buffer.
 // Round-trip cases use real Matrix-1000 reference patches committed under
-// Tests/Fixtures/Patches/ (path injected via MATRIX_TEST_FIXTURES_DIR).
+// Tests/Fixtures/Matrix-Control/Patches/ (path injected via MATRIX_TEST_FIXTURES_DIR).
 class PatchModelTests : public juce::UnitTest
 {
 public:

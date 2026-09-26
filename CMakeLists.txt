@@ -747,7 +747,7 @@ if(MATRIX_BUILD_TESTS)
         juce::juce_recommended_warning_flags
     )
 
-    # Dev tool: regenerate Tests/Fixtures/Init/PatchInit.syx and MasterInit.syx from descriptor defaults.
+    # Dev tool: regenerate Tests/Fixtures/Matrix-Control/Init/PatchInit.syx and MasterInit.syx from descriptor defaults.
     juce_add_console_app(GenerateInitFixtures PRODUCT_NAME "GenerateInitFixtures")
 
     target_sources(GenerateInitFixtures PRIVATE

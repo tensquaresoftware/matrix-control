@@ -8,6 +8,7 @@
 #include "Core/MIDI/SysEx/SysExDecoder.h"
 #include "Core/MIDI/SysEx/SysExEncoder.h"
 #include "Core/MIDI/SysEx/SysExParser.h"
+#include "PatchFixturePaths.h"
 
 class InitDefaultsTests : public juce::UnitTest
 {
@@ -26,7 +27,7 @@ public:
 private:
     static juce::File fixturesInitDir()
     {
-        return juce::File(MATRIX_TEST_FIXTURES_DIR).getChildFile("Init");
+        return PatchTestFixtures::initFixturesDir();
     }
 
     void runBufferSizes()
