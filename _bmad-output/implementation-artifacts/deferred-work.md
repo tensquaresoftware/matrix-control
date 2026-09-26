@@ -2006,3 +2006,9 @@ Original review bullets below remain for history; status for U-10-owned residual
   summary: PluginProcessor::tryDecodeMasterM1kmUserFile live-master-untouched before modal is not unit-tested (Core decode-without-commit is).
   evidence: Matrix-Control_Tests does not link PluginProcessorInitTemplates; settling would need Core extraction of the Settings decode gate or a processor harness.
 
+## Deferred from: code review of spec-m1km-master-import.md (2026-09-26)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-m1km-master-import.md`
+  summary: Reconfirmed — PluginProcessor::tryDecodeMasterM1kmUserFile live-master-untouched before modal still untested at processor (Core decode-without-commit remains).
+  evidence: Code review 592a1088..75095c63; Acceptance Auditor + Verification Gap; same harness barrier as 2026-09-25 entry.
+

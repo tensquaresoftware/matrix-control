@@ -100,6 +100,23 @@ context:
 - Given a master loaded from `.m1km`, when the user SAVE AS, then only a `.syx` is written and the original `.m1km` is unchanged.
 - Given Settings LOAD contextual help, when shown, then it mentions Master `.syx` and legacy `.m1km`.
 
+### Review Findings
+
+- [x] [Review][Patch] One-shot load callbacks on MasterM1kmLoadChoiceDialog (prevent double commit / SysEx) [Source/GUI/Dialogs/MasterM1kmLoadChoiceDialog.cpp:89]
+- [x] [Review][Patch] Assert All Groups Off fixture Groups/cascade differ from InitDefaults before policy reset [Tests/Unit/MasterM1kmCodecTests.cpp:333]
+- [x] [Review][Patch] Automate Settings-style commitMasterM1kmUserLoad success path (APVTS + 0x03 + footer) [Tests/Unit/MasterM1kmCommitPathTests.cpp]
+- [x] [Review][Defer] tryDecodeMasterM1kmUserFile live-master-untouched before modal untested at processor — deferred: already tracked in deferred-work.md; Core decode-without-commit covers shared helper; Matrix-Control_Tests does not link processor init templates
+
+**Rejected (this review):**
+- `false` — Failed-decode scratch InitDefaults pollution: local scratch discarded; live master fail-closed via Writer / tryDecode.
+- `false` — closeSettingsWindow leaves choice dialog up: true at 75095c63; already fixed on main in 609c50bc.
+- `false` — loadMasterFromUserFile hard-rejects .m1km: intentional fail-closed when modal is bypassed.
+- `false` — Oversized on-disk size gate untested: loader_invalidM1kmRejectsBeforeSuccess covers truncated (≠344) file.
+- `false` — Spec triage / Verification / Code Map hygiene: would require editing the spec under review.
+- `low` — All Groups Off unused fixture: rejected (All Groups On already covers policy; prior Build triage same call).
+- `low` — Case-only chooser filter `*.syx;*.m1km`: matches project-wide chooser pattern; unlikely on macOS everyday use.
+- `low` — decode_validStudyFixture lacks golden bytes: happy decode + full-master memcmp already pin packing.
+
 ## Implementation Notes
 
 - Added `MasterM1kmCodec` + `MasterM1kmLoadPolicy`; Settings LOAD decodes `.m1km` before the Groups/cascade modal, then commits with the chosen policy.

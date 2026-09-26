@@ -82,22 +82,31 @@ juce::Rectangle<int> MasterM1kmLoadChoiceDialog::getDialogBounds() const
 
 void MasterM1kmLoadChoiceDialog::dismiss()
 {
+    onMasterSettingsOnly_ = nullptr;
+    onFullMaster_ = nullptr;
+
     if (onDismissRequested_)
         onDismissRequested_();
 }
 
 void MasterM1kmLoadChoiceDialog::chooseMasterSettingsOnly()
 {
-    if (onMasterSettingsOnly_)
-        onMasterSettingsOnly_();
+    auto cb = std::move(onMasterSettingsOnly_);
+    onFullMaster_ = nullptr;
+
+    if (cb)
+        cb();
 
     dismiss();
 }
 
 void MasterM1kmLoadChoiceDialog::chooseFullMaster()
 {
-    if (onFullMaster_)
-        onFullMaster_();
+    auto cb = std::move(onFullMaster_);
+    onMasterSettingsOnly_ = nullptr;
+
+    if (cb)
+        cb();
 
     dismiss();
 }

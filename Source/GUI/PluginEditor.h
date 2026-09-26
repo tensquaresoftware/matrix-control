@@ -182,6 +182,7 @@ private:
     void openMasterM1kmLoadChoiceDialog(std::function<void()> onMasterSettingsOnly,
                                         std::function<void()> onFullMaster);
     void closeMasterM1kmLoadChoiceDialog();
+    bool isMasterM1kmLoadChoiceDialogVisible() const;
     void openMutatorHistoryDefragConfirmDialog(std::function<void()> onConfirm);
     void closeMutatorHistoryDefragConfirmDialog();
     void openEpromTypePromptDialog();

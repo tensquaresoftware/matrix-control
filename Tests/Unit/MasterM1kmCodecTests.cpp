@@ -339,13 +339,24 @@ private:
         Core::InitTemplateLoader loader(decoder);
 
         const auto tempDir = createTempDir("MatrixControlM1kmWriterSettingsOnly");
-        const auto target = tempDir.getChildFile("All Groups On.m1km");
-        expect(studyFixture("All Groups On.m1km").copyFileTo(target));
+        const auto target = tempDir.getChildFile("All Groups Off.m1km");
+        expect(studyFixture("All Groups Off.m1km").copyFileTo(target));
 
         juce::MemoryBlock data;
         expect(target.loadFileAsData(data));
         juce::uint8 decoded[Core::MasterM1kmCodec::kInt16Count] = {};
         expect(Core::MasterM1kmCodec::decodeToPacked(data, decoded));
+
+        const auto* defaults = Core::InitDefaults::masterData();
+        // Off fixture Groups are 0x00; InitDefaults Groups are 0xFF — a no-op reset cannot pass.
+        expect(std::memcmp(decoded + Core::MasterM1kmLoadPolicy::kGroupsOffset,
+                           defaults + Core::MasterM1kmLoadPolicy::kGroupsOffset,
+                           Core::MasterM1kmLoadPolicy::kGroupsCount)
+               != 0);
+        expect(std::memcmp(decoded + Core::MasterM1kmLoadPolicy::kCascadeOffset,
+                           defaults + Core::MasterM1kmLoadPolicy::kCascadeOffset,
+                           Core::MasterM1kmLoadPolicy::kCascadeCount)
+               != 0);
 
         Core::MasterModel live;
         const auto result = Core::InitTemplateWriter::loadMasterFromUserFile(
@@ -353,7 +364,6 @@ private:
         expect(result.success);
         expect(result.source == Core::InitTemplateSource::kUserFile);
 
-        const auto* defaults = Core::InitDefaults::masterData();
         expect(std::memcmp(live.data() + Core::MasterM1kmLoadPolicy::kGroupsOffset,
                            defaults + Core::MasterM1kmLoadPolicy::kGroupsOffset,
                            Core::MasterM1kmLoadPolicy::kGroupsCount)

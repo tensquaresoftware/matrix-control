@@ -73,7 +73,7 @@ bool PluginEditor::isEscapeBlockedByOverlay() const
 {
     const auto visible = [](const auto& c) { return c != nullptr && c->isVisible(); };
     return visible(settingsWindow_) || visible(aboutWindow_)
-        || visible(masterInitConfirmDialog_) || visible(masterM1kmLoadChoiceDialog_)
+        || visible(masterInitConfirmDialog_) || isMasterM1kmLoadChoiceDialogVisible()
         || visible(mutatorHistoryDefragConfirmDialog_)
         || visible(epromTypePromptDialog_) || visible(bankTransferProgressDialog_);
 }

@@ -492,6 +492,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/InitTemplateLoaderTests.cpp
         Tests/Unit/InitTemplateWriterTests.cpp
         Tests/Unit/MasterM1kmCodecTests.cpp
+        Tests/Unit/MasterM1kmCommitPathTests.cpp
         Tests/Unit/InitTemplateSentinelSaveTests.cpp
         Tests/Unit/ApvtsPatchMapperTests.cpp
         Tests/Unit/PluginVersionTests.cpp

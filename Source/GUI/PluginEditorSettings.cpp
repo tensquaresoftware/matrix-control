@@ -302,6 +302,11 @@ void PluginEditor::closeMasterM1kmLoadChoiceDialog()
         masterM1kmLoadChoiceDialog_->setVisible(false);
 }
 
+bool PluginEditor::isMasterM1kmLoadChoiceDialogVisible() const
+{
+    return masterM1kmLoadChoiceDialog_ != nullptr && masterM1kmLoadChoiceDialog_->isVisible();
+}
+
 void PluginEditor::wireSettingsEpromAndLatency(SettingsPanel& panel)
 {
     panel.getHardwareLatencySlider().onValueChange = [this, &panel]
