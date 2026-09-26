@@ -39,3 +39,25 @@ context: []
 - Spec still in-progress / no verification note — medium — patched: status done; manual verification bullets added.
 - About docs/story 7.10 out of date — defer — recorded in deferred-work.md.
 - Spec missing trailing newline — low — patched on finalize.
+
+### Review Findings
+
+- [x] [Review][Patch] AboutTextLink opens URL on non-left mouse click [Source/GUI/About/AboutPanel.cpp:79] — fixed: left-button press tracked in mouseDown; mouseUp launches only after left press
+- [x] [Review][Defer] Hover red `0xff9A131D` duplicated across AboutPanel / AboutWindow / SettingsWindow [Source/GUI/About/AboutPanel.cpp:16] — deferred: oneshot hors scope for close-button colour SSOT; third literal added here
+- [x] [Review][Defer] No automated check that BMad credit paints / panel height fits [Source/GUI/About/AboutPanel.cpp:320] — deferred: project GUI/manual-test policy; Manual UAT covers About
+- [x] [Review][Defer] No automated check that AboutTextLink click launches URLs (all four links) [Source/GUI/About/AboutPanel.cpp:79] — deferred: same GUI/manual-test policy; smoke covered click BMad
+
+#### Rejected
+
+- Spec / triage still describe orange HyperlinkButton — false: product intent renegotiated post-smoke (idle = label colour, custom AboutTextLink); fixing would only edit the spec under review
+- Frozen Intent omits Email/GitHub/LinkedIn rewrite — false: intentional polish for shared hover red; already decided
+- Acceptance: idle not orange / HyperlinkButton required — false: same renegotiated intent; code matches current product decisions
+- Separator gaps 12 vs 8 not “equal” — low: smoke validated layout; 4 px design asymmetry not everyday defect; equalizing needs taste call beyond a mechanical patch
+- AboutTextLink lacks keyboard / accessibility handler — low: About is mouse-first; Escape still closes; full a11y would add focus + key + handler complexity
+- Disabled link still paints as active — false: About links are never disabled in this panel
+- Tooltip URL dropped vs HyperlinkButton — false: ContextualHelpBinder already covers destination help in the footer
+- Credit overflow if phrase wider than content — low: fixed short English copy; unlikely everyday; prior triage rejected same risk
+- `layoutHyperlinkButtons` / `refreshHyperlinkAppearance` naming — low: cosmetic rename, not everyday harm
+- `review_loop_iteration: 0` stale — rejected: fix is edit spec under review
+- Manual checklist gaps in Implementation Notes — rejected: fix is edit spec under review
+- Commit message claims orange hyperlink — false for code defect: narrative stale; UI matches renegotiated colours

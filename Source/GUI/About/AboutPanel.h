@@ -46,6 +46,33 @@ private:
         juce::Rectangle<int> suffixBounds;
     };
 
+    class AboutTextLink final : public juce::Component
+    {
+    public:
+        AboutTextLink(const juce::String& text, juce::URL url);
+
+        void setFont(juce::Font font);
+        void setIdleColour(juce::Colour colour);
+        void setHoverColour(juce::Colour colour);
+        void setLinkText(const juce::String& text);
+        void setURL(juce::URL url);
+
+        void paint(juce::Graphics& g) override;
+        void mouseEnter(const juce::MouseEvent& event) override;
+        void mouseExit(const juce::MouseEvent& event) override;
+        void mouseDown(const juce::MouseEvent& event) override;
+        void mouseUp(const juce::MouseEvent& event) override;
+
+    private:
+        juce::String text_;
+        juce::URL url_;
+        juce::Font font_ { juce::FontOptions{} };
+        juce::Colour idleColour_ { juce::Colours::grey };
+        juce::Colour hoverColour_ { juce::Colours::red };
+        bool hovered_ = false;
+        bool leftPressActive_ = false;
+    };
+
     SpecGridLayout getSpecGridLayout() const;
     BmadCreditLayout getBmadCreditLayout() const;
     juce::Rectangle<int> getSpecRowBounds(int rowIndex, bool labelColumn) const;
@@ -73,10 +100,10 @@ private:
     float uiScale_ = 1.0f;
     std::function<void()> onEscapePressed_;
 
-    juce::HyperlinkButton emailLink_;
-    juce::HyperlinkButton githubLink_;
-    juce::HyperlinkButton linkedInLink_;
-    juce::HyperlinkButton bmadLink_;
+    AboutTextLink emailLink_;
+    AboutTextLink githubLink_;
+    AboutTextLink linkedInLink_;
+    AboutTextLink bmadLink_;
 
     std::unique_ptr<TSS::ContextualHelpBinder> contextualHelpBinder_;
 

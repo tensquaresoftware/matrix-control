@@ -12,29 +12,88 @@ using TSS::SkinColourId;
 namespace
 {
     constexpr juce::uint32 kTitleAndValueColour = ColourChart::kWhite;
-    constexpr juce::uint32 kBmadLinkColour = ColourChart::kOrange;
-
-    void configureHyperlink(juce::HyperlinkButton& link,
-                            const juce::String& text,
-                            const juce::URL& url,
-                            juce::uint32 textColour = kTitleAndValueColour)
-    {
-        link.setButtonText(text);
-        link.setURL(url);
-        link.setJustificationType(juce::Justification::centredLeft);
-        link.setMouseCursor(juce::MouseCursor::PointingHandCursor);
-        link.setColour(juce::TextButton::buttonColourId, juce::Colours::transparentBlack);
-        link.setColour(juce::TextButton::buttonOnColourId, juce::Colours::transparentBlack);
-        link.setColour(juce::TextButton::textColourOnId, juce::Colour(textColour));
-        link.setColour(juce::TextButton::textColourOffId, juce::Colour(textColour));
-    }
+    // Same red as About/Settings modal close cross (AboutWindow / SettingsWindow).
+    constexpr juce::uint32 kLinkHoverColour = 0xff9A131D;
 
     int measureTextWidth(const juce::Font& font, const juce::String& text)
     {
-        juce::GlyphArrangement glyphs;
-        glyphs.addLineOfText(font, text, 0.0f, 0.0f);
-        return juce::roundToInt(glyphs.getBoundingBox(0, -1, true).getWidth());
+        return juce::GlyphArrangement::getStringWidthInt(font, text);
     }
+}
+
+AboutPanel::AboutTextLink::AboutTextLink(const juce::String& text, juce::URL url)
+    : text_(text)
+    , url_(std::move(url))
+{
+    setMouseCursor(juce::MouseCursor::PointingHandCursor);
+}
+
+void AboutPanel::AboutTextLink::setFont(juce::Font font)
+{
+    font_ = std::move(font);
+    repaint();
+}
+
+void AboutPanel::AboutTextLink::setIdleColour(juce::Colour colour)
+{
+    idleColour_ = colour;
+    repaint();
+}
+
+void AboutPanel::AboutTextLink::setHoverColour(juce::Colour colour)
+{
+    hoverColour_ = colour;
+    repaint();
+}
+
+void AboutPanel::AboutTextLink::setLinkText(const juce::String& text)
+{
+    text_ = text;
+    repaint();
+}
+
+void AboutPanel::AboutTextLink::setURL(juce::URL url)
+{
+    url_ = std::move(url);
+}
+
+void AboutPanel::AboutTextLink::paint(juce::Graphics& g)
+{
+    g.setFont(font_);
+    g.setColour(hovered_ ? hoverColour_ : idleColour_);
+    g.drawText(text_, getLocalBounds(), juce::Justification::centredLeft, false);
+}
+
+void AboutPanel::AboutTextLink::mouseEnter(const juce::MouseEvent&)
+{
+    hovered_ = true;
+    repaint();
+}
+
+void AboutPanel::AboutTextLink::mouseExit(const juce::MouseEvent&)
+{
+    hovered_ = false;
+    leftPressActive_ = false;
+    repaint();
+}
+
+void AboutPanel::AboutTextLink::mouseDown(const juce::MouseEvent& event)
+{
+    leftPressActive_ = event.mods.isLeftButtonDown();
+}
+
+void AboutPanel::AboutTextLink::mouseUp(const juce::MouseEvent& event)
+{
+    const bool wasLeftPress = leftPressActive_;
+    leftPressActive_ = false;
+
+    if (! wasLeftPress || ! event.mouseWasClicked() || ! isEnabled() || ! url_.isWellFormed())
+        return;
+
+    if (! getLocalBounds().contains(event.getPosition()))
+        return;
+
+    url_.launchInDefaultBrowser();
 }
 
 AboutPanel::AboutPanel(TSS::ISkin& skin)
@@ -49,16 +108,7 @@ AboutPanel::AboutPanel(TSS::ISkin& skin)
                 juce::URL(PluginDisplayNames::About::kBmadCreditUrl))
 {
     setOpaque(true);
-
-    configureHyperlink(emailLink_, PluginDisplayNames::About::kEmailDisplay,
-                       juce::URL(PluginDisplayNames::About::kEmailUrl));
-    configureHyperlink(githubLink_, PluginDisplayNames::About::kGitHubDisplay,
-                       juce::URL(PluginDisplayNames::About::kGitHubUrl));
-    configureHyperlink(linkedInLink_, PluginDisplayNames::About::kLinkedInDisplay,
-                       juce::URL(PluginDisplayNames::About::kLinkedInUrl));
-    configureHyperlink(bmadLink_, PluginDisplayNames::About::kBmadCreditLinkDisplay,
-                       juce::URL(PluginDisplayNames::About::kBmadCreditUrl),
-                       kBmadLinkColour);
+    refreshHyperlinkAppearance();
 
     addAndMakeVisible(emailLink_);
     addAndMakeVisible(githubLink_);
@@ -85,15 +135,29 @@ void AboutPanel::setOnEscapePressed(std::function<void()> callback)
 
 void AboutPanel::refreshHyperlinkAppearance()
 {
-    configureHyperlink(emailLink_, PluginDisplayNames::About::kEmailDisplay,
-                       juce::URL(PluginDisplayNames::About::kEmailUrl));
-    configureHyperlink(githubLink_, PluginDisplayNames::About::kGitHubDisplay,
-                       juce::URL(PluginDisplayNames::About::kGitHubUrl));
-    configureHyperlink(linkedInLink_, PluginDisplayNames::About::kLinkedInDisplay,
-                       juce::URL(PluginDisplayNames::About::kLinkedInUrl));
-    configureHyperlink(bmadLink_, PluginDisplayNames::About::kBmadCreditLinkDisplay,
-                       juce::URL(PluginDisplayNames::About::kBmadCreditUrl),
-                       kBmadLinkColour);
+    const auto valueColour = juce::Colour(kTitleAndValueColour);
+    const auto labelColour = skin_->getColour(SkinColourId::kLabelText);
+    const auto hoverColour = juce::Colour(kLinkHoverColour);
+
+    emailLink_.setLinkText(PluginDisplayNames::About::kEmailDisplay);
+    emailLink_.setURL(juce::URL(PluginDisplayNames::About::kEmailUrl));
+    emailLink_.setIdleColour(valueColour);
+    emailLink_.setHoverColour(hoverColour);
+
+    githubLink_.setLinkText(PluginDisplayNames::About::kGitHubDisplay);
+    githubLink_.setURL(juce::URL(PluginDisplayNames::About::kGitHubUrl));
+    githubLink_.setIdleColour(valueColour);
+    githubLink_.setHoverColour(hoverColour);
+
+    linkedInLink_.setLinkText(PluginDisplayNames::About::kLinkedInDisplay);
+    linkedInLink_.setURL(juce::URL(PluginDisplayNames::About::kLinkedInUrl));
+    linkedInLink_.setIdleColour(valueColour);
+    linkedInLink_.setHoverColour(hoverColour);
+
+    bmadLink_.setLinkText(PluginDisplayNames::About::kBmadCreditLinkDisplay);
+    bmadLink_.setURL(juce::URL(PluginDisplayNames::About::kBmadCreditUrl));
+    bmadLink_.setIdleColour(labelColour);
+    bmadLink_.setHoverColour(hoverColour);
 
     layoutHyperlinkButtons();
 }
@@ -305,14 +369,13 @@ void AboutPanel::layoutHyperlinkButtons()
 
     const float sf = uiScale_;
     const auto linkFont = skin_->getBaseFont().withHeight(skin_->getBaseFont().getHeight() * sf);
-    emailLink_.setFont(linkFont, false);
-    githubLink_.setFont(linkFont, false);
-    linkedInLink_.setFont(linkFont, false);
+    emailLink_.setFont(linkFont);
+    githubLink_.setFont(linkFont);
+    linkedInLink_.setFont(linkFont);
 
     const auto credit = getBmadCreditLayout();
+    bmadLink_.setFont(linkFont.italicised());
     bmadLink_.setBounds(credit.linkBounds);
-    bmadLink_.setFont(linkFont.italicised(), false);
-    bmadLink_.setJustificationType(juce::Justification::centredLeft);
 }
 
 void AboutPanel::resized()

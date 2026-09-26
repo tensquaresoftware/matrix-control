@@ -2050,3 +2050,15 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-about-bmad-credit-footer.md`
   summary: About BMad credit footer is not reflected in epic/story About copy (e.g. story 7.10) or user-facing docs.
   evidence: Blind Hunter oneshot; product docs/stories describe About without the new credit line; docs update is outside this UI credit change.
+
+## Deferred from: code review of spec-about-bmad-credit-footer.md (2026-09-26)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-about-bmad-credit-footer.md`
+  summary: Hover red `0xff9A131D` is duplicated in AboutPanel, AboutWindow, and SettingsWindow (no shared close-cross / link-hover SSOT).
+  evidence: Blind Hunter; oneshot hors scope for Settings colour extract; third literal added with AboutTextLink hover.
+- source_spec: `_bmad-output/implementation-artifacts/spec-about-bmad-credit-footer.md`
+  summary: No automated assertion that BMad credit paints or that About panel height fits the credit stack.
+  evidence: Verification Gap; project GUI/manual-test policy; Manual UAT / smoke covers About.
+- source_spec: `_bmad-output/implementation-artifacts/spec-about-bmad-credit-footer.md`
+  summary: No automated check that AboutTextLink click launches configured URLs (Email / GitHub / LinkedIn / BMad).
+  evidence: Verification Gap; same GUI convention; smoke covered BMad click.
