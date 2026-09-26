@@ -1,5 +1,6 @@
 #include "AboutPanel.h"
 
+#include "GUI/Layout/ScaledDrawing.h"
 #include "GUI/Skins/ColourChart.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinValues.h"
@@ -11,8 +12,12 @@ using TSS::SkinColourId;
 namespace
 {
     constexpr juce::uint32 kTitleAndValueColour = ColourChart::kWhite;
+    constexpr juce::uint32 kBmadLinkColour = ColourChart::kOrange;
 
-    void configureHyperlink(juce::HyperlinkButton& link, const juce::String& text, const juce::URL& url)
+    void configureHyperlink(juce::HyperlinkButton& link,
+                            const juce::String& text,
+                            const juce::URL& url,
+                            juce::uint32 textColour = kTitleAndValueColour)
     {
         link.setButtonText(text);
         link.setURL(url);
@@ -20,8 +25,8 @@ namespace
         link.setMouseCursor(juce::MouseCursor::PointingHandCursor);
         link.setColour(juce::TextButton::buttonColourId, juce::Colours::transparentBlack);
         link.setColour(juce::TextButton::buttonOnColourId, juce::Colours::transparentBlack);
-        link.setColour(juce::TextButton::textColourOnId, juce::Colour(kTitleAndValueColour));
-        link.setColour(juce::TextButton::textColourOffId, juce::Colour(kTitleAndValueColour));
+        link.setColour(juce::TextButton::textColourOnId, juce::Colour(textColour));
+        link.setColour(juce::TextButton::textColourOffId, juce::Colour(textColour));
     }
 
     int measureTextWidth(const juce::Font& font, const juce::String& text)
@@ -40,6 +45,8 @@ AboutPanel::AboutPanel(TSS::ISkin& skin)
                   juce::URL(PluginDisplayNames::About::kGitHubUrl))
     , linkedInLink_(PluginDisplayNames::About::kLinkedInDisplay,
                     juce::URL(PluginDisplayNames::About::kLinkedInUrl))
+    , bmadLink_(PluginDisplayNames::About::kBmadCreditLinkDisplay,
+                juce::URL(PluginDisplayNames::About::kBmadCreditUrl))
 {
     setOpaque(true);
 
@@ -49,10 +56,14 @@ AboutPanel::AboutPanel(TSS::ISkin& skin)
                        juce::URL(PluginDisplayNames::About::kGitHubUrl));
     configureHyperlink(linkedInLink_, PluginDisplayNames::About::kLinkedInDisplay,
                        juce::URL(PluginDisplayNames::About::kLinkedInUrl));
+    configureHyperlink(bmadLink_, PluginDisplayNames::About::kBmadCreditLinkDisplay,
+                       juce::URL(PluginDisplayNames::About::kBmadCreditUrl),
+                       kBmadLinkColour);
 
     addAndMakeVisible(emailLink_);
     addAndMakeVisible(githubLink_);
     addAndMakeVisible(linkedInLink_);
+    addAndMakeVisible(bmadLink_);
 }
 
 void AboutPanel::registerContextualHelp(TSS::ContextualHelpBinder::FooterResolver resolveFooter)
@@ -64,6 +75,7 @@ void AboutPanel::registerContextualHelp(TSS::ContextualHelpBinder::FooterResolve
     contextualHelpBinder_->bind(&emailLink_, Help::kEmail);
     contextualHelpBinder_->bind(&githubLink_, Help::kGitHub);
     contextualHelpBinder_->bind(&linkedInLink_, Help::kLinkedIn);
+    contextualHelpBinder_->bind(&bmadLink_, Help::kBmad);
 }
 
 void AboutPanel::setOnEscapePressed(std::function<void()> callback)
@@ -79,6 +91,9 @@ void AboutPanel::refreshHyperlinkAppearance()
                        juce::URL(PluginDisplayNames::About::kGitHubUrl));
     configureHyperlink(linkedInLink_, PluginDisplayNames::About::kLinkedInDisplay,
                        juce::URL(PluginDisplayNames::About::kLinkedInUrl));
+    configureHyperlink(bmadLink_, PluginDisplayNames::About::kBmadCreditLinkDisplay,
+                       juce::URL(PluginDisplayNames::About::kBmadCreditUrl),
+                       kBmadLinkColour);
 
     layoutHyperlinkButtons();
 }
@@ -140,6 +155,45 @@ AboutPanel::SpecGridLayout AboutPanel::getSpecGridLayout() const
 
     layout.labelColumn = { gridX, layout.firstRowY, maxLabelWidth, layout.rowHeight * kSpecRowCount_ };
     layout.valueColumn = { gridX + maxLabelWidth + columnGap, layout.firstRowY, maxValueWidth, layout.rowHeight * kSpecRowCount_ };
+    return layout;
+}
+
+AboutPanel::BmadCreditLayout AboutPanel::getBmadCreditLayout() const
+{
+    BmadCreditLayout layout;
+    const float sf = uiScale_;
+    const int padding = juce::roundToInt(static_cast<float>(kPadding_) * sf);
+    const auto grid = getSpecGridLayout();
+    const int specsBottom = grid.firstRowY + grid.rowHeight * kSpecRowCount_;
+    const int gapBeforeSep = juce::roundToInt(static_cast<float>(kGapBeforeCreditSeparator_) * sf);
+    const int sepBand = juce::roundToInt(static_cast<float>(kCreditSeparatorBand_) * sf);
+    const int gapAfterSep = juce::roundToInt(static_cast<float>(kGapAfterCreditSeparator_) * sf);
+    const int creditHeight = juce::roundToInt(static_cast<float>(kCreditLineHeight_) * sf);
+
+    layout.separatorBounds = {
+        padding,
+        specsBottom + gapBeforeSep,
+        juce::jmax(0, getWidth() - padding * 2),
+        sepBand
+    };
+
+    const auto italicFont = skin_->getBaseFont()
+                                .withHeight(skin_->getBaseFont().getHeight() * sf)
+                                .italicised();
+    const auto prefix = juce::String(PluginDisplayNames::About::kBmadCreditPrefix);
+    const auto linkText = juce::String(PluginDisplayNames::About::kBmadCreditLinkDisplay);
+    const auto suffix = juce::String(PluginDisplayNames::About::kBmadCreditSuffix);
+    const int prefixWidth = measureTextWidth(italicFont, prefix);
+    const int linkWidth = measureTextWidth(italicFont, linkText);
+    const int suffixWidth = measureTextWidth(italicFont, suffix);
+    const int totalWidth = prefixWidth + linkWidth + suffixWidth;
+    const int contentWidth = juce::jmax(0, getWidth() - padding * 2);
+    const int startX = padding + juce::jmax(0, (contentWidth - totalWidth) / 2);
+    const int creditY = layout.separatorBounds.getBottom() + gapAfterSep;
+
+    layout.prefixBounds = { startX, creditY, prefixWidth, creditHeight };
+    layout.linkBounds = { startX + prefixWidth, creditY, linkWidth, creditHeight };
+    layout.suffixBounds = { startX + prefixWidth + linkWidth, creditY, suffixWidth, creditHeight };
     return layout;
 }
 
@@ -207,6 +261,40 @@ void AboutPanel::paint(juce::Graphics& g)
         g.setColour(valueColour);
         g.drawText(getSpecValue(row), valueBounds, juce::Justification::centredLeft, false);
     }
+
+    paintBmadCredit(g);
+}
+
+void AboutPanel::paintBmadCredit(juce::Graphics& g)
+{
+    const float sf = uiScale_;
+    const auto labelColour = skin_->getColour(SkinColourId::kLabelText);
+    const auto baseFont = skin_->getBaseFont().withHeight(skin_->getBaseFont().getHeight() * sf);
+    const auto credit = getBmadCreditLayout();
+
+    constexpr float kSeparatorDesignThickness = 1.0f;
+    const float lineThickness = TSS::ScaledDrawing::snappedStrokeThicknessFromDesign(
+        kSeparatorDesignThickness,
+        sf,
+        TSS::ScaledDrawing::systemDisplayScaleForComponent(*this),
+        TSS::ScaledDrawing::StrokeSnapPolicy::kRound);
+    auto separatorLine = credit.separatorBounds.toFloat();
+    separatorLine.setHeight(lineThickness);
+    separatorLine.setY(static_cast<float>(credit.separatorBounds.getCentreY()) - lineThickness * 0.5f);
+    g.setColour(skin_->getColour(SkinColourId::kHorizontalSeparatorLine));
+    g.fillRect(separatorLine);
+
+    const auto italicFont = baseFont.italicised();
+    g.setFont(italicFont);
+    g.setColour(labelColour);
+    g.drawText(PluginDisplayNames::About::kBmadCreditPrefix,
+               credit.prefixBounds,
+               juce::Justification::centredLeft,
+               false);
+    g.drawText(PluginDisplayNames::About::kBmadCreditSuffix,
+               credit.suffixBounds,
+               juce::Justification::centredLeft,
+               false);
 }
 
 void AboutPanel::layoutHyperlinkButtons()
@@ -220,6 +308,11 @@ void AboutPanel::layoutHyperlinkButtons()
     emailLink_.setFont(linkFont, false);
     githubLink_.setFont(linkFont, false);
     linkedInLink_.setFont(linkFont, false);
+
+    const auto credit = getBmadCreditLayout();
+    bmadLink_.setBounds(credit.linkBounds);
+    bmadLink_.setFont(linkFont.italicised(), false);
+    bmadLink_.setJustificationType(juce::Justification::centredLeft);
 }
 
 void AboutPanel::resized()

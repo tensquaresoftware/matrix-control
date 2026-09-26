@@ -2044,3 +2044,9 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-m1kp-drag-hover-patch-name.md`
   summary: Add a shared `PatchM1kpCodec` encode helper so tests stop hand-rolling little-endian int16 files.
   evidence: Blind Hunter oneshot review; decode exists without encode; assess test currently mirrors decode layout inline.
+
+## Deferred from: oneshot review of spec-about-bmad-credit-footer.md (2026-09-26)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-about-bmad-credit-footer.md`
+  summary: About BMad credit footer is not reflected in epic/story About copy (e.g. story 7.10) or user-facing docs.
+  evidence: Blind Hunter oneshot; product docs/stories describe About without the new credit line; docs update is outside this UI credit change.

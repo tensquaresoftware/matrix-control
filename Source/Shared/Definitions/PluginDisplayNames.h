@@ -135,6 +135,10 @@ namespace PluginDisplayNames
         constexpr const char* kLinkedInUrl           = "https://www.linkedin.com/in/guillaumedupontmontpellier/";
         constexpr const char* kVersionLabel          = "Version";
         constexpr const char* kReleaseDateLabel      = "Release date";
+        constexpr const char* kBmadCreditPrefix      = "Yet another project successfully completed with ";
+        constexpr const char* kBmadCreditLinkDisplay = "BMad";
+        constexpr const char* kBmadCreditSuffix      = "!";
+        constexpr const char* kBmadCreditUrl         = "https://github.com/bmad-code-org/bmad-method";
 
         namespace ContextualHelp
         {
@@ -144,6 +148,8 @@ namespace PluginDisplayNames
                 "ABOUT: Opens the Matrix-Control GitHub repository.";
             constexpr const char* kLinkedIn =
                 "ABOUT: Opens the author LinkedIn profile.";
+            constexpr const char* kBmad =
+                "ABOUT: Opens the BMad Method project on GitHub.";
         }
     }
 
