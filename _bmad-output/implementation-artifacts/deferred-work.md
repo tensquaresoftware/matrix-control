@@ -2068,3 +2068,12 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-settings-interface-contextual-help.md`
   summary: No GUI-component unit test that FooterPanel::setContextualHelpOverlay no-ops when preference is HIDE (binder show path).
   evidence: CONVENTIONS forbid GUI component unit tests; pure isContextualHelpPreferenceEnabled / normalize helpers are covered; manual SHOW/HIDE smoke remains in the spec Verification section.
+
+## Deferred from: code review of spec-settings-interface-contextual-help.md (2026-09-27)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-settings-interface-contextual-help.md`
+  summary: `hideClearsOverlayDetailPolicy` asserts the pure clear-on-HIDE helper then clears a local overlay; FooterPanel::valueTreePropertyChanged clear branch is not exercised by any unit test.
+  evidence: Verification Gap + Blind Hunter; CONVENTIONS forbid GUI component unit tests; production still calls shouldClearContextualHelpOverlayForPreference; manual SHOW/HIDE smoke.
+- source_spec: `_bmad-output/implementation-artifacts/spec-settings-interface-contextual-help.md`
+  summary: No automated check that binder → FooterPanel::setContextualHelpOverlay no-ops when preference is HIDE (show-gate).
+  evidence: Verification Gap; confirms build-review defer for the same gap; pure isContextualHelpPreferenceEnabled covered; GUI unit tests forbidden.

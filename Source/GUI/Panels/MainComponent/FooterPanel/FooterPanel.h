@@ -39,6 +39,7 @@ public:
 
     void valueTreePropertyChanged(juce::ValueTree& tree,
                                  const juce::Identifier& property) override;
+    void valueTreeRedirected(juce::ValueTree& tree) override;
 
 private:
     enum class MessageSeverity
@@ -114,6 +115,7 @@ private:
     void updateDeviceHitAreaBounds();
     void registerDeviceContextualHelp();
     bool isContextualHelpEnabled() const;
+    void clearContextualHelpOverlayIfPreferenceHidden();
 
     bool midiQueuePressureAlertActive_ = false;
     TSS::ContextualHelpOverlay contextualHelpOverlay_;

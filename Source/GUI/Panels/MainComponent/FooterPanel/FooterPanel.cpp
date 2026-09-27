@@ -180,6 +180,9 @@ void FooterPanel::paintContextualHelp(juce::Graphics& g,
                                       juce::Rectangle<int> bounds,
                                       const juce::Font& font) const
 {
+    if (! isContextualHelpEnabled())
+        return;
+
     const bool stickyError = currentSeverity == MessageSeverity::Error;
     if (! TSS::shouldPaintContextualHelpOverSticky(contextualHelpOverlay_.isActive(),
                                                    stickyError))
@@ -255,7 +258,11 @@ void FooterPanel::setMidiQueuePressureAlert(bool active)
 int FooterPanel::setContextualHelpOverlay(const juce::String& detailText)
 {
     if (! isContextualHelpEnabled())
+    {
+        // HIDE (incl. after replaceState): drop any stale overlay; do not show.
+        clearContextualHelpOverlay();
         return 0;
+    }
 
     contextualHelpEpoch_ = TSS::nextContextualHelpOverlayEpoch(contextualHelpEpoch_);
 
@@ -295,6 +302,12 @@ bool FooterPanel::isContextualHelpEnabled() const
     return TSS::isContextualHelpPreferenceEnabled(preferenceRaw);
 }
 
+void FooterPanel::clearContextualHelpOverlayIfPreferenceHidden()
+{
+    if (! isContextualHelpEnabled())
+        clearContextualHelpOverlay();
+}
+
 void FooterPanel::valueTreePropertyChanged(juce::ValueTree& tree,
                                           const juce::Identifier& property)
 {
@@ -319,6 +332,12 @@ void FooterPanel::valueTreePropertyChanged(juce::ValueTree& tree,
         syncFromApvtsState(tree);
         repaint();
     }
+}
+
+void FooterPanel::valueTreeRedirected(juce::ValueTree&)
+{
+    // Host replaceState does not fire per-property changes; drop HELP if restored HIDE.
+    clearContextualHelpOverlayIfPreferenceHidden();
 }
 
 void FooterPanel::syncFromApvtsState(juce::ValueTree& tree)

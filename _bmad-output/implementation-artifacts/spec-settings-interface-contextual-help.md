@@ -82,11 +82,31 @@ baseline_commit: 'ca838ca659e0146d72a33f7fbf5bb10654a0d2c3'
 - Given a session without the new key, when the plugin loads, then behaviour matches SHOW and the Settings combo shows SHOW.
 - Given Settings height after the new section, when the modal opens, then content fits without a general scroll bar.
 
+### Review Findings
+
+- [x] [Review][Patch] Clear HELP overlay when preference becomes HIDE via host `replaceState` / ValueTree redirect, not only via `valueTreePropertyChanged` [Source/GUI/Panels/MainComponent/FooterPanel/FooterPanel.cpp:255-309]
+- [x] [Review][Defer] `hideClearsOverlayDetailPolicy` does not exercise FooterPanel clear-on-HIDE listener [Tests/Unit/ContextualHelpOverlayTests.cpp:265-286] — deferred: CONVENTIONS forbid GUI component unit tests; pure `shouldClearContextualHelpOverlayForPreference` covered; manual SHOW/HIDE smoke
+- [x] [Review][Defer] FooterPanel show-gate unused by any automated path [Source/GUI/Panels/MainComponent/FooterPanel/FooterPanel.cpp:255-258] — deferred: same GUI unit-test ban; already recorded under build review of this spec; pure enable helpers covered
+
+#### Rejected
+
+- BH: init body in Construction vs Clipboard siblings — low / pre-existing split; `initializeSettingsPolicyProperties` groups calls; everyday harm unlikely
+- BH: Code Map still cites Clipboard for seed — fix would only edit this spec; rejected
+- BH: `property.toString() == kContextualHelp` vs Identifier peers — real style inconsistency; everyday harm unlikely; rejected as low
+- BH: Spec Review Triage Log / Implementation Notes disagree on VG1 closure — fix would only edit this spec; rejected
+- BH: restore groups contextual help with policy combos but wire is a separate function — intentional extract; both called together from Settings open path; rejected as low
+- BH: `review_loop_iteration` stays 0 / empty Spec Change Log — fix would only edit this spec; rejected
+- BH: `kShow` / `kHide` generic Settings-root labels — false; peers use same pattern; no incorrect reuse shown
+- BH: preference helpers live in `ContextualHelpOverlay.h` while type comment is overlay-only — comment drift; Spec Code Map asked for predicates next to helpers; rejected as low
+- AA: scroll-fit is height-bump evidence only — false as defect; AC satisfied by `kDesignHeight` 527 + Guillaume smoke (no scroll)
+- AA: Code Map path vs init site — same as BH Code Map; rejected
+- AA residual HIDE show-path helper-level — grouped with VG2 defer
+
 ## Implementation Notes
 
 - Key `settingsContextualHelp` with `ContextualHelp::{kShow=1,kHide=2,kDefault=kShow}`; processor seeds when absent.
 - Settings: INTERFACE first; `kDesignHeight` 460 → 527; restore/wire via extracted `restoreSettingsPolicyCombosFromState` / `wireSettingsContextualHelpCombo`.
-- Footer choke-point: `setContextualHelpOverlay` gated by `isContextualHelpPreferenceEnabled`; ValueTree change to HIDE calls `clearContextualHelpOverlay` immediately.
+- Footer choke-point: `setContextualHelpOverlay` gated by `isContextualHelpPreferenceEnabled`; ValueTree change to HIDE calls `clearContextualHelpOverlay` immediately; `valueTreeRedirected` + gated set + paint also drop/hide HELP when preference is HIDE after host `replaceState`.
 - Pure helpers + unit tests in `ContextualHelpOverlay` (SHOW/HIDE, invalid→SHOW, clear-on-HIDE via `shouldClearContextualHelpOverlayForPreference` used by FooterPanel). Manual UI smoke still recommended.
 - Light extract: `initializeSettingsPolicyProperties` groups Settings policy seed calls (includes new contextual help init).
 - Review patch: bind clear-on-HIDE test to the same helper FooterPanel calls.
