@@ -24,8 +24,8 @@ baseline_commit: '94052c61df039190f9dc35a19346bf27ee99860c'
 - ASCII labels: `INFO MESSAGE`, items `KEEP` / `AUTO CLEAR`; default KEEP; duration fixed 5 s (no duration combo).
 - Persist via APVTS `state` int property (stable key, e.g. `settingsInfoMessage`); nested ids `kKeep=1`, `kAutoClear=2`, `kDefault=kKeep`; missing/invalid → KEEP.
 - AUTO CLEAR applies only to sticky severity INFO; WARNING and ERROR never auto-clear from this preference.
-- Manual clear: click the sticky severity badge (INFO / WARNING / ERROR); hit-zone = badge square only — not the message text, not a separate trailing cross.
-- Badge chrome: fixed square reserved width (no message reflow on hover); fill = severity colour used for badge chrome; glyph = contrasting badge colour (footer/background tone as today). Rest = geometric severity picto; hover = geometric close cross (Settings/About Path pattern); leave without click restores picto, message unchanged.
+- Manual clear: click the sticky severity badge (icon square + INFO / WARNING / ERROR word); hit-zone = that full badge — not the message detail text, not a separate trailing cross.
+- Badge chrome: keep the severity word (INFO / WARNING / ERROR); add a fixed square to its left (stable width, no reflow on hover). Label band fill = severity colour with dark text; icon square fill = dark (badge text / footer tone); glyph in the square = severity colour. Rest = geometric severity picto; hover = geometric close cross in the same square while the severity word stays put; leave without click restores picto, message unchanged.
 - No furtive HELP on the severity badge hover/focus.
 - Auto-clear timer pauses while a furtive HELP overlay is painted over the sticky band; resume the **remaining** delay when HELP clears (no surprise clear).
 - Clear sticky = empty `uiMessageText` + `uiMessageSeverity` via existing clear path (`ExceptionPropagator::clearMessage` or equivalent), so all listeners sync.
@@ -49,7 +49,7 @@ baseline_commit: '94052c61df039190f9dc35a19346bf27ee99860c'
 | AUTO CLEAR + WARNING/ERROR | Preference AUTO CLEAR | Sticky stays (no auto-clear) | N/A |
 | Timer + HELP overlay | INFO auto-clear running; HELP shows | Timer pauses; resumes remainder when HELP ends | No clear while HELP covers |
 | Badge click | Sticky INFO/WARNING/ERROR visible | Clears sticky APVTS; band empty (or HELP if active) | Ignore click if no sticky |
-| Badge hover | Pointer over square | Picto → cross; message text layout unchanged | Leave → picto back |
+| Badge hover | Pointer over badge (square + severity word) | Picto → cross in square only; severity word and message layout unchanged | Leave → picto back |
 | CONTEXTUAL HELP HIDE | Preference HIDE | Sticky + badge dismiss still work; no HELP overlay | N/A |
 | KEEP after AUTO CLEAR | User switches to KEEP mid-timer | Cancel pending auto-clear; sticky remains | N/A |
 | New sticky while timer | New INFO/WARN/ERROR written | Restart policy for new message (INFO+AUTO CLEAR → new 5 s) | N/A |
@@ -82,6 +82,24 @@ baseline_commit: '94052c61df039190f9dc35a19346bf27ee99860c'
 - [x] `Source/GUI/Panels/MainComponent/FooterPanel/FooterPanel.*` — square badge pictos/cross, click clear, INFO auto-clear timer with HELP pause.
 - [ ] Manual matrix — SHOW/HIDE HELP × KEEP/AUTO CLEAR × badge click on INFO/WARNING/ERROR.
 
+### Review Findings
+
+- [x] [Review][Patch] Align sticky badge icon size SSOT with smoke-validated paint (height − 2×inset = 12; stop claiming unused kIconSize 14) [Source/GUI/Layout/Design/DesignPanels.h:221]
+- [x] [Review][Patch] Extract pure HELP-uncover auto-clear decision (remaining 0 → immediate clear) + unit test [Source/GUI/Helpers/StickyInfoMessagePolicy.h:58]
+- [x] [Review][Patch] Clamp severity icon square side to badge width so a narrow clamp cannot paint past the badge [Source/GUI/Helpers/FooterSeverityBadge.h:110]
+- [x] [Review][Patch] Replace French "liseret" in source comments / asserts / test comments with English [Source/GUI/Layout/Design/DesignPanels.h:224]
+- [x] [Review][Defer] Leave-clear binder hover-only wiring has no automated check beyond pure gate bools [Source/GUI/Helpers/ContextualHelpBinder.cpp:141] — deferred: CONVENTIONS forbid GUI component unit tests; pure shouldClearContextualHelpOverlay hover semantics already pinned
+
+**Rejected:**
+- `false` — HELP clear hover-only (focus no longer keeps overlay): intentional post-smoke decision; matches frozen Intent / review scope, not a regression to reopen.
+- `false` — Manual matrix task still unchecked: human smoke already reported OK; not a code defect.
+- `false` — Spec Code Map / Design Notes / AC wording / ctest filter mismatches: fix would edit the spec under review.
+- `false` — `clearMessage` leaves `uiMessageTimestamp`: timestamp is write-only; no reader, no user-visible bad outcome.
+- `false` — `timerCallback` hard-codes HELP-not-covering on fire: earlier `autoClearTimerFireWhileHelpCovers` branch already deferred when HELP covers; equivalent on this path.
+- `low` — Dual `MessageSeverity` / `StickyMessageSeverity` bridge: mapping is local and complete; rename/unify adds surface without product gain.
+- `low` — INFO MESSAGE help string under `ContextualHelp` namespace / wire helper name: works; rename-only, everyday harm unlikely (same class as prior triage).
+- `low` — uint32 millisecond-counter wrap zeros pause remainder: ~49-day uptime edge; fix adds timer complexity (same rejection as prior review).
+
 **Acceptance Criteria:**
 - Given Settings INTERFACE, when the user inspects row order, then INFO MESSAGE is above CONTEXTUAL HELP.
 - Given KEEP (default / missing key), when a sticky INFO appears, then it stays until the next sticky write or badge dismiss.
@@ -89,7 +107,7 @@ baseline_commit: '94052c61df039190f9dc35a19346bf27ee99860c'
 - Given AUTO CLEAR and sticky WARNING or ERROR, when time elapses, then the sticky remains.
 - Given AUTO CLEAR INFO timer running, when HELP overlays the band then clears, then auto-clear waits for the remaining time only (not a full restart, not an immediate clear).
 - Given any sticky severity, when the user clicks the severity badge square, then sticky text and severity clear; clicking the message text does nothing.
-- Given badge hover, when the pointer enters then leaves without click, then picto becomes cross then returns, and the message text does not reflow.
+- Given badge hover, when the pointer enters then leaves without click, then the square picto becomes a cross then returns, the severity word stays visible, and the message text does not reflow.
 - Given CONTEXTUAL HELP HIDE, when sticky messages show, then badge dismiss and KEEP/AUTO CLEAR still behave as above.
 - Given Settings after the new row, when the modal opens, then content fits without a general scroll bar.
 
@@ -101,6 +119,7 @@ baseline_commit: '94052c61df039190f9dc35a19346bf27ee99860c'
 - Unit tests: `StickyInfoMessagePolicyTests` (normalize, INFO-only, remaining delay, HELP pause/resume/fire, badge hit-area, 5 s constant). GUI paint/click/HIDE matrix rows remain manual (CONVENTIONS: no GUI component unit tests).
 - Manual smoke still required for SHOW/HIDE × KEEP/AUTO CLEAR × badge click on three severities.
 - Review patches: pause uses `remainingAutoClearDelayMs`; `valueTreeRedirected` cancels timer before sync; HELP-at-fire via `autoClearTimerFireWhileHelpCovers`; badge `PointingHandCursor`; INFO MESSAGE help covers INFO-only AUTO CLEAR + badge dismiss.
+- Smoke correction: severity word kept; icon square is added to its left (not an icon-only replacement); hover changes glyph only; hit-zone = square + severity word.
 
 ## Spec Change Log
 
@@ -126,7 +145,7 @@ baseline_commit: '94052c61df039190f9dc35a19346bf27ee99860c'
 
 ## Design Notes
 
-- Sticky left-band severity chrome becomes a **fixed square** (prefer `Footer::kIconSize` / badge height) with geometric pictos; HELP / DEVICE / MIDI queue keep text badges via a paint-mode flag on the shared helper — do not force icon mode on those bands.
+- Sticky left-band severity chrome = **fixed icon square + severity word** (INFO / WARNING / ERROR); hover swaps only the square glyph to a close cross. HELP / DEVICE / MIDI queue keep text-only badges via a paint-mode flag — do not force icon mode on those bands.
 - Invert fill/glyph like Settings close: fill = severity colour, glyph = footer background (or current badge text colour), so hover cross remains readable.
 - Timer ownership: FooterPanel (message thread); policy math in pure helpers. On sticky property change: cancel/restart. On preference → KEEP: cancel. On HELP covering: pause; on uncover: schedule remaining.
 - Picto shapes: simple Path geometry (info "i"/dot+stem, warning triangle, error octagon or "X" circle) — keep strokes consistent with close-cross thickness scale; no Unicode.

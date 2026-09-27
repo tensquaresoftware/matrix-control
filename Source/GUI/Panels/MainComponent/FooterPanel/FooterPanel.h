@@ -112,6 +112,10 @@ private:
                          const BadgeDetailPaintArgs& args,
                          int badgeHeight,
                          int badgePad) const;
+    int paintSeverityIconBadgeChrome(juce::Graphics& g,
+                                     const BadgeDetailPaintArgs& args,
+                                     int badgeHeight,
+                                     int badgePad) const;
     void paintStatusMessage(juce::Graphics& g,
                             juce::Rectangle<int> bounds,
                             const juce::Font& font,

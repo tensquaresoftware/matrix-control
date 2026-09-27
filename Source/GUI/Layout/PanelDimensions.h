@@ -58,6 +58,7 @@ struct FooterPanelDimensions
     int masterEditPanelWidth;
     int interColumnGap;
     int severityBadgeHeight;
+    int severityBadgeIconInset;
     int severityBadgeHorizontalPadding;
     int severityBadgeToMessageGap;
 };

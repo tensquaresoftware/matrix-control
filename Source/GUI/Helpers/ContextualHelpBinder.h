@@ -44,7 +44,7 @@ namespace TSS
         void globalFocusChanged(juce::Component* focusedComponent) override;
 
         const char* helpTextForControl(juce::Component* control) const;
-        juce::Component* resolveActiveControl() const;
+        juce::Component* resolveHoveredControl() const;
         void showHelpFor(juce::Component* control);
         void applyClearIfIdle(int generation);
         bool shouldDeferClear(juce::Component* focused) const;

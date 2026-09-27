@@ -69,6 +69,32 @@ namespace TSS
         return remainingMs <= 0 && ! helpCoversSticky;
     }
 
+    /** Decision when HELP uncovers sticky while an AUTO CLEAR arm may still be live. */
+    enum class AutoClearAfterHelpUncoverDecision
+    {
+        None = 0,
+        ResumeRemaining,
+        FireClear
+    };
+
+    inline AutoClearAfterHelpUncoverDecision decideAutoClearAfterHelpUncover(
+        bool autoClearArmed,
+        bool wasPaused,
+        bool helpCoversSticky,
+        int remainingMs)
+    {
+        if (shouldResumeAutoClearAfterHelp(autoClearArmed,
+                                           wasPaused,
+                                           helpCoversSticky,
+                                           remainingMs))
+            return AutoClearAfterHelpUncoverDecision::ResumeRemaining;
+
+        if (autoClearArmed && shouldFireAutoClear(remainingMs, helpCoversSticky))
+            return AutoClearAfterHelpUncoverDecision::FireClear;
+
+        return AutoClearAfterHelpUncoverDecision::None;
+    }
+
     /**
      * Armed timer fired while HELP covers sticky: defer clear, pause with remaining 0.
      * Caller must not clear sticky until HELP uncovers (then remaining 0 fires immediately).

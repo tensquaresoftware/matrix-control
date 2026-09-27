@@ -2077,3 +2077,9 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-settings-interface-contextual-help.md`
   summary: No automated check that binder → FooterPanel::setContextualHelpOverlay no-ops when preference is HIDE (show-gate).
   evidence: Verification Gap; confirms build-review defer for the same gap; pure isContextualHelpPreferenceEnabled covered; GUI unit tests forbidden.
+
+## Deferred from: code review of spec-settings-interface-info-message.md (2026-09-28)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-settings-interface-info-message.md`
+  summary: Leave-clear binder hover-only wiring (focus must not block HELP clear after mouseExit) has no automated check beyond pure `shouldClearContextualHelpOverlay` bools; binder `resolveHoveredControl` / `applyClearIfIdle` are untested.
+  evidence: Verification Gap; CONVENTIONS forbid GUI component unit tests; pure gate retitled/covered; sticky/AUTO CLEAR pause depends on HELP actually clearing on leave — covered by manual smoke.

@@ -82,6 +82,16 @@ private:
         expect(TSS::shouldFireAutoClear(0, false));
         expect(! TSS::shouldFireAutoClear(0, true));
         expect(! TSS::shouldFireAutoClear(100, false));
+
+        using Decision = TSS::AutoClearAfterHelpUncoverDecision;
+        expect(TSS::decideAutoClearAfterHelpUncover(true, true, false, 2500)
+               == Decision::ResumeRemaining);
+        expect(TSS::decideAutoClearAfterHelpUncover(true, true, false, 0)
+               == Decision::FireClear);
+        expect(TSS::decideAutoClearAfterHelpUncover(true, true, true, 0)
+               == Decision::None);
+        expect(TSS::decideAutoClearAfterHelpUncover(false, true, false, 0)
+               == Decision::None);
     }
 
     void timerFireWhileHelpDefersClear()
@@ -100,23 +110,35 @@ private:
 
     void badgeHitAreaAndStableSquare()
     {
-        beginTest("Badge hit area - sticky only when HELP not covering; square width stable");
+        beginTest("Badge hit area - square + label width stable; HELP hides hit area");
 
         expect(TSS::shouldShowStickySeverityBadgeHitArea(true, false));
         expect(! TSS::shouldShowStickySeverityBadgeHitArea(true, true));
         expect(! TSS::shouldShowStickySeverityBadgeHitArea(false, false));
 
         const juce::Rectangle<int> band { 10, 20, 200, 18 };
-        const auto square = TSS::severityBadgeSquareBounds(band, 14);
-        expectEquals(square.getWidth(), 14);
-        expectEquals(square.getHeight(), 14);
-        expectEquals(square.getX(), 10);
-        // Hover does not participate in bounds — layout stays fixed for message text.
-        const auto squareAgain = TSS::severityBadgeSquareBounds(band, 14);
-        expectEquals(squareAgain.getX(), square.getX());
-        expectEquals(squareAgain.getY(), square.getY());
-        expectEquals(squareAgain.getWidth(), square.getWidth());
-        expectEquals(squareAgain.getHeight(), square.getHeight());
+        // Combined badge = left uniform inset + square + label padding; hover is not an input.
+        const TSS::StickySeverityBadgeMetrics metrics { 12, 2, 40, 4, 16 };
+        expectEquals(TSS::stickySeverityIconStripWidth(metrics), 2 + 12);
+        expectEquals(TSS::stickySeverityBadgeWidth(metrics), 2 + 12 + 40 + 8);
+        const auto badge = TSS::stickySeverityBadgeBounds(band, metrics);
+        expectEquals(badge.getWidth(), 2 + 12 + 40 + 8);
+        expectEquals(badge.getX(), 10);
+        const auto square = TSS::stickySeverityIconSquareBounds(badge, metrics);
+        expectEquals(square.getX(), badge.getX() + 2);
+        expectEquals(square.getY(), badge.getY() + 2);
+        expectEquals(square.getWidth(), 12);
+        expectEquals(square.getHeight(), 12);
+        const auto badgeAgain = TSS::stickySeverityBadgeBounds(band, metrics);
+        expectEquals(badgeAgain.getWidth(), badge.getWidth());
+        expectEquals(badgeAgain.getHeight(), badge.getHeight());
+
+        const juce::Rectangle<int> narrowBand { 10, 20, 10, 18 };
+        const auto narrowBadge = TSS::stickySeverityBadgeBounds(narrowBand, metrics);
+        expectEquals(narrowBadge.getWidth(), 10);
+        const auto narrowSquare = TSS::stickySeverityIconSquareBounds(narrowBadge, metrics);
+        expect(narrowSquare.getWidth() <= juce::jmax(0, narrowBadge.getWidth() - 4));
+        expectEquals(narrowSquare.getWidth(), narrowSquare.getHeight());
     }
 
     void autoClearDurationIsFiveSeconds()

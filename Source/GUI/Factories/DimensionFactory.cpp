@@ -219,6 +219,7 @@ namespace
             .masterEditPanelWidth = Panels::Body::MasterEditSection::kPanelWidth,
             .interColumnGap = Panels::Body::kInterColumnGap,
             .severityBadgeHeight = Panels::Footer::kSeverityBadgeHeight,
+            .severityBadgeIconInset = Panels::Footer::kSeverityBadgeIconInset,
             .severityBadgeHorizontalPadding = Panels::Footer::kSeverityBadgeHorizontalPadding,
             .severityBadgeToMessageGap = Panels::Footer::kSeverityBadgeToMessageGap,
         };

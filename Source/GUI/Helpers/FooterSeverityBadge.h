@@ -69,29 +69,66 @@ namespace TSS
         }
     }
 
-    /** Fixed square reserved for sticky severity chrome (no text reflow on hover). */
-    inline juce::Rectangle<int> severityBadgeSquareBounds(juce::Rectangle<int> bandBounds,
-                                                          int iconSize)
+    /** Metrics for sticky severity badge: [inset + icon square][label + horizontal padding]. */
+    struct StickySeverityBadgeMetrics
     {
-        const int side = juce::jmin(iconSize, bandBounds.getHeight());
-        const int y = bandBounds.getCentreY() - side / 2;
-        return { bandBounds.getX(), y, side, side };
+        int iconSide = 0;
+        int iconInset = 0;
+        int labelWidth = 0;
+        int badgePad = 0;
+        int badgeHeight = 0;
+    };
+
+    /** Left strip holding the uniform inset + icon square (no right inset before label). */
+    inline int stickySeverityIconStripWidth(const StickySeverityBadgeMetrics& metrics)
+    {
+        return juce::jmax(0, metrics.iconInset) + juce::jmax(0, metrics.iconSide);
+    }
+
+    /** Hover changes only the glyph inside the square; label width stays fixed. */
+    inline int stickySeverityBadgeWidth(const StickySeverityBadgeMetrics& metrics)
+    {
+        const int textWidth = juce::jmax(0, metrics.labelWidth)
+                              + 2 * juce::jmax(0, metrics.badgePad);
+        return stickySeverityIconStripWidth(metrics) + textWidth;
+    }
+
+    inline juce::Rectangle<int> stickySeverityBadgeBounds(juce::Rectangle<int> bandBounds,
+                                                          const StickySeverityBadgeMetrics& metrics)
+    {
+        const int width = juce::jmin(bandBounds.getWidth(), stickySeverityBadgeWidth(metrics));
+        const int y = bandBounds.getCentreY() - metrics.badgeHeight / 2;
+        return { bandBounds.getX(), y, width, metrics.badgeHeight };
+    }
+
+    /** Icon square inset from badge left / top / bottom by the same uniform inset. */
+    inline juce::Rectangle<int> stickySeverityIconSquareBounds(
+        juce::Rectangle<int> badgeBounds,
+        const StickySeverityBadgeMetrics& metrics)
+    {
+        const int inset = juce::jmax(0, metrics.iconInset);
+        const int side = juce::jmin(juce::jmax(0, metrics.iconSide),
+                                    juce::jmax(0, metrics.badgeHeight - 2 * inset),
+                                    juce::jmax(0, badgeBounds.getWidth() - 2 * inset));
+        return {
+            badgeBounds.getX() + inset,
+            badgeBounds.getY() + inset,
+            side,
+            side
+        };
     }
 
     struct SeverityIconPaintArgs
     {
         juce::Rectangle<int> square;
         const juce::Path& unitGlyph;
-        juce::Colour fill;
         juce::Colour glyphColour;
     };
 
-    inline void paintSeverityIconInSquare(juce::Graphics& g, const SeverityIconPaintArgs& args)
+    /** Paint picto or close cross inside an already-filled square (no second fill). */
+    inline void paintSeverityGlyphInSquare(juce::Graphics& g, const SeverityIconPaintArgs& args)
     {
-        g.setColour(args.fill);
-        g.fillRect(args.square);
-
-        if (args.unitGlyph.isEmpty())
+        if (args.unitGlyph.isEmpty() || args.square.isEmpty())
             return;
 
         auto glyph = args.unitGlyph;

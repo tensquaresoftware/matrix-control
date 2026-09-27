@@ -138,15 +138,8 @@ namespace TSS
         return nullptr;
     }
 
-    juce::Component* ContextualHelpBinder::resolveActiveControl() const
+    juce::Component* ContextualHelpBinder::resolveHoveredControl() const
     {
-        for (const auto& entry : helpByControl_)
-        {
-            auto* control = entry.first;
-            if (control != nullptr && control->hasKeyboardFocus(true))
-                return control;
-        }
-
         for (const auto& entry : helpByControl_)
         {
             auto* control = entry.first;
@@ -185,11 +178,14 @@ namespace TSS
 
     void ContextualHelpBinder::applyClearIfIdle(int generation)
     {
-        const bool anyActive = resolveActiveControl() != nullptr;
-        if (! shouldClearContextualHelpOverlay(generation, clearGeneration_, anyActive))
+        // Hover-only keep: focus alone used to block clear after mouseExit and left HELP
+        // stuck over sticky messages when the pointer moved to empty GUI.
+        auto* hovered = resolveHoveredControl();
+        const bool anyHovered = hovered != nullptr;
+        if (! shouldClearContextualHelpOverlay(generation, clearGeneration_, anyHovered))
         {
-            if (generation == clearGeneration_ && anyActive)
-                showHelpFor(resolveActiveControl());
+            if (generation == clearGeneration_ && anyHovered)
+                showHelpFor(hovered);
             return;
         }
 

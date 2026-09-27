@@ -71,17 +71,19 @@ namespace TSS
     }
 
     /**
-     * Anti-flicker leave/blur gate: apply clear only if this delayed callback is still current
-     * and no bound control is still hovered or focused.
+     * Anti-flicker leave gate: apply clear only if this delayed callback is still current
+     * and no bound control is still under the pointer.
+     * Keyboard focus alone must not block clear after mouseExit — focus shows HELP via the
+     * focus listener; leaving to empty GUI must drop HELP so sticky footer paint returns.
      */
     inline bool shouldClearContextualHelpOverlay(int scheduledGeneration,
                                                  int currentGeneration,
-                                                 bool anyBoundControlStillActive)
+                                                 bool anyBoundControlHovered)
     {
         if (scheduledGeneration != currentGeneration)
             return false;
 
-        return ! anyBoundControlStillActive;
+        return ! anyBoundControlHovered;
     }
 
     /**

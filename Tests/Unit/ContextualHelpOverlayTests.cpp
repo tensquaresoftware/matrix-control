@@ -70,12 +70,13 @@ private:
 
     void focusAndBlurUseSameOverlayGateAsHover()
     {
-        beginTest("Focus / blur - same set and deferred-clear gate as hover");
+        beginTest("Leave clear gate - hover keeps HELP; no hover allows clear");
 
         TSS::ContextualHelpOverlay overlay;
         overlay.setDetail(MutatorHelp::kPitch);
         expect(overlay.isActive());
 
+        // Third arg is pointer hover only (not keyboard focus).
         expect(TSS::shouldClearContextualHelpOverlay(1, 1, false));
         expect(! TSS::shouldClearContextualHelpOverlay(1, 1, true));
     }
