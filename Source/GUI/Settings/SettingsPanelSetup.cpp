@@ -30,6 +30,21 @@ std::unique_ptr<TSS::HorizontalSeparator> SettingsPanel::makeSeparator(TSS::ISki
         kContentWidth_, kSeparatorHeight_, TSS::horizontalSeparatorLookFromSkin(skin));
 }
 
+void SettingsPanel::setupInterfaceSection(TSS::ISkin& skin)
+{
+    interfaceSectionLabel_ =
+        makeLabel(skin, kContentWidth_, PluginDisplayNames::Settings::kInterfaceSection);
+    interfaceSectionSeparator_ = makeSeparator(skin);
+    contextualHelpLabel_ =
+        makeLabel(skin, kLabelWidth_, PluginDisplayNames::Settings::kContextualHelpLabel);
+    contextualHelpCombo_ = makeCombo(skin, kComboWidth_);
+
+    addAndMakeVisible(*interfaceSectionLabel_);
+    addAndMakeVisible(*interfaceSectionSeparator_);
+    addAndMakeVisible(*contextualHelpLabel_);
+    addAndMakeVisible(*contextualHelpCombo_);
+}
+
 void SettingsPanel::setupDeviceSection(TSS::ISkin& skin)
 {
     deviceSectionLabel_ = makeLabel(skin, kContentWidth_, PluginDisplayNames::Settings::kDeviceSection);
@@ -138,6 +153,10 @@ void SettingsPanel::setupMasterSection(TSS::ISkin& skin)
 
 void SettingsPanel::populateComboItems()
 {
+    using namespace PluginIDs::Settings::ContextualHelp;
+    contextualHelpCombo_->addItem(PluginDisplayNames::Settings::kShow, kShow);
+    contextualHelpCombo_->addItem(PluginDisplayNames::Settings::kHide, kHide);
+
     using namespace PluginIDs::Settings::Matrix1000PatchesNamesMode;
     matrix1000PatchesCombo_->addItem(PluginDisplayNames::Settings::kDisplayMusicalNames,
                                      kDisplayMusicalNames);
@@ -162,6 +181,7 @@ void SettingsPanel::populateComboItems()
 void SettingsPanel::applyComboPopupLooks(TSS::ISkin& skin)
 {
     const auto popupLook = TSS::popupMenuLookFromSkin(skin);
+    contextualHelpCombo_->setPopupMenuLook(popupLook);
     epromTypeCombo_->setPopupMenuLook(popupLook);
     matrix1000PatchesCombo_->setPopupMenuLook(popupLook);
     computerPatchesCombo_->setPopupMenuLook(popupLook);
@@ -175,6 +195,11 @@ void SettingsPanel::applyChildLooks(TSS::ISkin& skin)
     const auto separatorLook = TSS::horizontalSeparatorLookFromSkin(skin);
     const auto comboLook = TSS::comboBoxLookFromSkin(skin);
     const auto buttonLook = TSS::buttonLookFromSkin(skin);
+
+    interfaceSectionLabel_->setLook(labelLook);
+    interfaceSectionSeparator_->setLook(separatorLook);
+    contextualHelpLabel_->setLook(labelLook);
+    contextualHelpCombo_->setLook(comboLook);
 
     deviceSectionLabel_->setLook(labelLook);
     deviceSectionSeparator_->setLook(separatorLook);

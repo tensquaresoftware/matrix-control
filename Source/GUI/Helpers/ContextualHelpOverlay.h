@@ -4,6 +4,8 @@
 
 #include <juce_core/juce_core.h>
 
+#include "Shared/Definitions/PluginIDs.h"
+
 namespace TSS
 {
     /** Display-only left-band help state — never written to APVTS sticky properties. */
@@ -33,6 +35,31 @@ namespace TSS
     private:
         juce::String detail_;
     };
+
+    /** Clamp invalid / missing preference ids to SHOW (session compatibility). */
+    inline int normalizeContextualHelpPreference(int preferenceRaw)
+    {
+        using namespace PluginIDs::Settings::ContextualHelp;
+
+        if (preferenceRaw == kShow || preferenceRaw == kHide)
+            return preferenceRaw;
+
+        return kDefault;
+    }
+
+    /** True when furtive HELP overlays may be shown (SHOW, or invalid → SHOW). */
+    inline bool isContextualHelpPreferenceEnabled(int preferenceRaw)
+    {
+        return normalizeContextualHelpPreference(preferenceRaw)
+               == PluginIDs::Settings::ContextualHelp::kShow;
+    }
+
+    /** True when preference change must clear the HELP overlay (HIDE after normalize). */
+    inline bool shouldClearContextualHelpOverlayForPreference(int preferenceRaw)
+    {
+        return normalizeContextualHelpPreference(preferenceRaw)
+               == PluginIDs::Settings::ContextualHelp::kHide;
+    }
 
     /** True when the left band should paint help instead of the sticky APVTS message.
         Error stickies always win so disconnect / lock guidance stays visible even if a

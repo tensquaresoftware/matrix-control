@@ -22,9 +22,9 @@ class SettingsPanel : public juce::Component
 public:
     // Content = label column 120 + control column 140 (no gap); outer = content + padding 16*2.
     // Control column fits UTILITY (LOAD | SAVE AS | INIT) at 44+4+44+4+44.
-    // Height sized for plugin content including DEVICE (HARDWARE LATENCY + EPROM TYPE).
+    // Height sized for INTERFACE + DEVICE (HARDWARE LATENCY + EPROM TYPE) + remaining sections.
     static constexpr int kDesignWidth = 292;
-    static constexpr int kDesignHeight = 460;
+    static constexpr int kDesignHeight = 527;
 
     SettingsPanel(TSS::ISkin& skin, bool isPluginMode);
     ~SettingsPanel() override = default;
@@ -43,6 +43,7 @@ public:
     TSS::ComboBox& getEpromTypeCombo() { return *epromTypeCombo_; }
     TSS::ComboBox& getMatrix1000PatchesCombo() { return *matrix1000PatchesCombo_; }
     TSS::ComboBox& getComputerPatchesCombo() { return *computerPatchesCombo_; }
+    TSS::ComboBox& getContextualHelpCombo() { return *contextualHelpCombo_; }
     TSS::ComboBox& getUnsavedStateCombo() { return *unsavedStateCombo_; }
     TSS::ComboBox& getDeleteWarningCombo() { return *deleteWarningCombo_; }
 
@@ -95,6 +96,7 @@ private:
         int controlWidth = 0;
     };
 
+    void setupInterfaceSection(TSS::ISkin& skin);
     void setupDeviceSection(TSS::ISkin& skin);
     void setupPatchSection(TSS::ISkin& skin);
     void setupPatchMutatorSection(TSS::ISkin& skin);
@@ -110,6 +112,7 @@ private:
 
     void updateModeSpecificVisibility();
     void layoutContent(juce::Rectangle<int> bounds);
+    void layoutInterfaceSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics);
     void layoutDeviceSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics);
     void layoutPatchSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics);
     void layoutPatchMutatorSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics);
@@ -158,6 +161,11 @@ private:
     float uiScale_ = 1.0f;
     bool isPluginMode_ = false;
     MatrixDeviceTypes::Type deviceType_ = MatrixDeviceTypes::Type::kUnknown;
+
+    std::unique_ptr<TSS::Label> interfaceSectionLabel_;
+    std::unique_ptr<TSS::HorizontalSeparator> interfaceSectionSeparator_;
+    std::unique_ptr<TSS::Label> contextualHelpLabel_;
+    std::unique_ptr<TSS::ComboBox> contextualHelpCombo_;
 
     std::unique_ptr<TSS::Label> deviceSectionLabel_;
     std::unique_ptr<TSS::HorizontalSeparator> deviceSectionSeparator_;

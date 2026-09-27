@@ -23,7 +23,7 @@
 ## Deferred from: Settings DEVICE / EPROM TYPE scope split (2026-09-18)
 
 - source_spec: none
-  summary: Add INTERFACE Settings section (first) with CONTEXTUAL HELP SHOW/HIDE for furtive footer help.
+  summary: ~~Add INTERFACE Settings section (first) with CONTEXTUAL HELP SHOW/HIDE for furtive footer help.~~ **Resolved 2026-09-27**: `spec-settings-interface-contextual-help.md`.
   evidence: Independently shippable GUI preference; deferred so DEVICE + EPROM TYPE can land alone.
 - source_spec: none
   summary: If Settings content outgrows a compact non-scrolling modal, consider Ableton-style vertical tabs instead of a general scroll.
@@ -2062,3 +2062,9 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-about-bmad-credit-footer.md`
   summary: No automated check that AboutTextLink click launches configured URLs (Email / GitHub / LinkedIn / BMad).
   evidence: Verification Gap; same GUI convention; smoke covered BMad click.
+
+## Deferred from: review of spec-settings-interface-contextual-help.md (2026-09-27)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-settings-interface-contextual-help.md`
+  summary: No GUI-component unit test that FooterPanel::setContextualHelpOverlay no-ops when preference is HIDE (binder show path).
+  evidence: CONVENTIONS forbid GUI component unit tests; pure isContextualHelpPreferenceEnabled / normalize helpers are covered; manual SHOW/HIDE smoke remains in the spec Verification section.

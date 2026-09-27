@@ -14,6 +14,7 @@
 #include "Core/MIDI/MidiManager.h"
 #include "GUI/Dialogs/MasterM1kmLoadChoiceDialog.h"
 #include "GUI/Dialogs/MutatorHistoryDefragConfirmDialog.h"
+#include "GUI/Helpers/ContextualHelpOverlay.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Settings/SettingsPanel.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
@@ -46,6 +47,11 @@ namespace
         return kDefault;
     }
 
+    int normalizeContextualHelpPreference(int preferenceRaw)
+    {
+        return TSS::normalizeContextualHelpPreference(preferenceRaw);
+    }
+
     int normalizeDeleteWarningPolicy(int policyRaw)
     {
         using namespace PluginIDs::Settings::DeleteWarningPolicy;
@@ -74,27 +80,16 @@ namespace
     }
 }
 
-void PluginEditor::restoreSettingsPanelFromState(SettingsPanel& panel)
+void PluginEditor::restoreSettingsPolicyCombosFromState(SettingsPanel& panel)
 {
     auto& state = pluginProcessor.getApvts().state;
 
-    const auto deviceType = Core::DeviceTypeRegistry::fromApvtsProperty(
-        state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
-    panel.setDeviceType(deviceType);
-
-    if (!pluginProcessor.isStandalone())
-        panel.getHardwareLatencySlider().setValue(pluginProcessor.getHardwareLatencyMs(), juce::dontSendNotification);
-
-    const int epromType = readNormalizedProperty(state,
-                                                 PluginIDs::Settings::kEpromType,
-                                                 PluginIDs::Settings::EpromType::kDefault,
-                                                 normalizeEpromType);
-    const int coerced = panel.refreshEpromTypeItems(epromType);
-    if (coerced != epromType)
-    {
-        state.setProperty(PluginIDs::Settings::kEpromType, coerced, nullptr);
-        pluginProcessor.getMidiManager().refreshSysExDelayFromSettings();
-    }
+    panel.getContextualHelpCombo().setSelectedId(
+        readNormalizedProperty(state,
+                               PluginIDs::Settings::kContextualHelp,
+                               PluginIDs::Settings::ContextualHelp::kDefault,
+                               normalizeContextualHelpPreference),
+        juce::dontSendNotification);
 
     panel.getMatrix1000PatchesCombo().setSelectedId(
         readNormalizedProperty(state,
@@ -123,7 +118,31 @@ void PluginEditor::restoreSettingsPanelFromState(SettingsPanel& panel)
                                PluginIDs::Settings::DeleteWarningPolicy::kDefault,
                                normalizeDeleteWarningPolicy),
         juce::dontSendNotification);
+}
 
+void PluginEditor::restoreSettingsPanelFromState(SettingsPanel& panel)
+{
+    auto& state = pluginProcessor.getApvts().state;
+
+    const auto deviceType = Core::DeviceTypeRegistry::fromApvtsProperty(
+        state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
+    panel.setDeviceType(deviceType);
+
+    if (!pluginProcessor.isStandalone())
+        panel.getHardwareLatencySlider().setValue(pluginProcessor.getHardwareLatencyMs(), juce::dontSendNotification);
+
+    const int epromType = readNormalizedProperty(state,
+                                                 PluginIDs::Settings::kEpromType,
+                                                 PluginIDs::Settings::EpromType::kDefault,
+                                                 normalizeEpromType);
+    const int coerced = panel.refreshEpromTypeItems(epromType);
+    if (coerced != epromType)
+    {
+        state.setProperty(PluginIDs::Settings::kEpromType, coerced, nullptr);
+        pluginProcessor.getMidiManager().refreshSysExDelayFromSettings();
+    }
+
+    restoreSettingsPolicyCombosFromState(panel);
     refreshInitTemplateDeleteButtons(panel);
     panel.refreshDefragHistoryEnablement(pluginProcessor.hasMutationHistory());
 }
@@ -328,6 +347,19 @@ void PluginEditor::wireSettingsEpromAndLatency(SettingsPanel& panel)
     };
 }
 
+void PluginEditor::wireSettingsContextualHelpCombo(SettingsPanel& panel)
+{
+    panel.getContextualHelpCombo().onChange = [this, &panel]
+    {
+        using namespace PluginIDs::Settings::ContextualHelp;
+        const int selectedId = panel.getContextualHelpCombo().getSelectedId();
+        if (selectedId != kShow && selectedId != kHide)
+            return;
+        pluginProcessor.getApvts().state.setProperty(
+            PluginIDs::Settings::kContextualHelp, selectedId, nullptr);
+    };
+}
+
 void PluginEditor::wireSettingsPolicyCombos(SettingsPanel& panel)
 {
     panel.getMatrix1000PatchesCombo().onChange = [this, &panel]
@@ -381,6 +413,7 @@ void PluginEditor::wireSettingsPolicyCombos(SettingsPanel& panel)
 void PluginEditor::wireSettingsPanel(SettingsPanel& panel)
 {
     wireSettingsEpromAndLatency(panel);
+    wireSettingsContextualHelpCombo(panel);
     wireSettingsPolicyCombos(panel);
     wireSettingsInitAndMasterActions(panel);
 }

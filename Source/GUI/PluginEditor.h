@@ -203,6 +203,7 @@ private:
     SettingsPanel* getSettingsPanelIfOpen();
     void wireSettingsPanel(SettingsPanel& panel);
     void wireSettingsEpromAndLatency(SettingsPanel& panel);
+    void wireSettingsContextualHelpCombo(SettingsPanel& panel);
     void wireSettingsPolicyCombos(SettingsPanel& panel);
     void wireSettingsInitAndMasterActions(SettingsPanel& panel);
     void wireSettingsMasterFileActions(SettingsPanel& panel);
@@ -210,6 +211,7 @@ private:
     bool confirmDeleteInitTemplate(const juce::String& bodyMessage);
     void wireHeaderPanel(HeaderPanel& headerPanel);
     void wireHeaderEditorialUndoRedoButtons(HeaderPanel& headerPanel);
+    void restoreSettingsPolicyCombosFromState(SettingsPanel& panel);
     void restoreSettingsPanelFromState(SettingsPanel& panel);
     void restoreHeaderPanelFromState(HeaderPanel& headerPanel);
     void updateSettingsWindowLayout(float uiScale);

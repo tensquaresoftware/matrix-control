@@ -13,6 +13,7 @@ SettingsPanel::SettingsPanel(TSS::ISkin& skin, bool isPluginMode)
 {
     setOpaque(true);
 
+    setupInterfaceSection(skin);
     setupDeviceSection(skin);
     setupPatchSection(skin);
     setupPatchMutatorSection(skin);
@@ -31,6 +32,7 @@ void SettingsPanel::registerContextualHelp(TSS::ContextualHelpBinder::FooterReso
     contextualHelpBinder_ = std::make_unique<TSS::ContextualHelpBinder>(std::move(resolveFooter));
     contextualHelpBinder_->setHostShowingPredicate([this] { return isShowing(); });
 
+    contextualHelpBinder_->bind(contextualHelpCombo_.get(), Help::kContextualHelp);
     contextualHelpBinder_->bind(hardwareLatencySlider_.get(), Help::kHardwareLatency);
     contextualHelpBinder_->bind(epromTypeCombo_.get(), Help::kEpromType);
     contextualHelpBinder_->bind(matrix1000PatchesCombo_.get(), Help::kMatrix1000Patches);
@@ -117,6 +119,21 @@ void SettingsPanel::layoutButtonRow(juce::Rectangle<int>& bounds,
     }
 
     bounds.removeFromTop(metrics.rowGap);
+}
+
+void SettingsPanel::layoutInterfaceSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics)
+{
+    layoutSectionHeader(bounds,
+                        SectionHeaderLayoutArgs{ interfaceSectionLabel_.get(),
+                                                 interfaceSectionSeparator_.get(),
+                                                 metrics.controlHeight,
+                                                 metrics.separatorHeight,
+                                                 metrics.rowGap });
+    layoutLabeledControlRow(bounds,
+                            metrics,
+                            LabeledControlRowArgs{ contextualHelpLabel_.get(),
+                                                   contextualHelpCombo_.get(),
+                                                   metrics.comboWidth });
 }
 
 void SettingsPanel::layoutDeviceSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics)
@@ -236,6 +253,8 @@ void SettingsPanel::layoutContent(juce::Rectangle<int> bounds)
     metrics.deleteInitWidth = juce::roundToInt(static_cast<float>(kDeleteInitWidth_) * uiScale_);
     metrics.defragButtonWidth = juce::roundToInt(static_cast<float>(kDefragButtonWidth_) * uiScale_);
 
+    layoutInterfaceSection(bounds, metrics);
+    bounds.removeFromTop(metrics.rowGap);
     layoutDeviceSection(bounds, metrics);
     bounds.removeFromTop(metrics.rowGap);
     layoutPatchSection(bounds, metrics);

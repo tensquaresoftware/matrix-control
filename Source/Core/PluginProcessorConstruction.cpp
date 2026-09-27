@@ -293,6 +293,27 @@ void PluginProcessor::createMutatorActionHandler()
     mutatorActionHandler_ = std::make_unique<Core::MutatorActionHandler>(std::move(dependencies));
 }
 
+void PluginProcessor::initializeContextualHelpProperty()
+{
+    if (! apvts.state.hasProperty(PluginIDs::Settings::kContextualHelp))
+    {
+        apvts.state.setProperty(
+            PluginIDs::Settings::kContextualHelp,
+            PluginIDs::Settings::ContextualHelp::kDefault,
+            nullptr);
+    }
+}
+
+void PluginProcessor::initializeSettingsPolicyProperties()
+{
+    initializeComputerPatchesNamesPolicyProperty();
+    initializeUnsavedStatePolicyProperty();
+    initializeContextualHelpProperty();
+    initializeDeleteWarningPolicyProperty();
+    initializeMatrix1000PatchesNamesModeProperty();
+    initializeEpromTypeProperties();
+}
+
 void PluginProcessor::finishConstructionSetup()
 {
     validatePluginDescriptorsAtStartup();
@@ -304,11 +325,7 @@ void PluginProcessor::finishConstructionSetup()
     initializeAudioProperties();
     initializeHardwareLatencyProperty();
     initializeComputerPatchesFolderProperty();
-    initializeComputerPatchesNamesPolicyProperty();
-    initializeUnsavedStatePolicyProperty();
-    initializeDeleteWarningPolicyProperty();
-    initializeMatrix1000PatchesNamesModeProperty();
-    initializeEpromTypeProperties();
+    initializeSettingsPolicyProperties();
     seedDeviceConnectionDefaultsFromMachine();
 
     initializePatchNameProperty();

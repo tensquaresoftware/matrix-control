@@ -161,15 +161,19 @@ namespace PluginDisplayNames
         constexpr const char* kHardwareLatencyLabel    = "HARDWARE LATENCY";
         constexpr const char* kAudioFromLabel          = "AUDIO FROM :";
         constexpr const char* kInputGainLabel          = "INPUT GAIN :";
+        constexpr const char* kInterfaceSection        = "INTERFACE";
         constexpr const char* kDeviceSection           = "DEVICE";
         constexpr const char* kPatchSection            = "PATCH";
         constexpr const char* kPatchMutatorSection     = "PATCH MUTATOR";
         constexpr const char* kMasterSection           = "MASTER";
+        constexpr const char* kContextualHelpLabel     = "CONTEXTUAL HELP";
         constexpr const char* kEpromTypeLabel          = "EPROM TYPE";
         constexpr const char* kMatrix1000PatchesLabel  = "MATRIX-1000 PATCHES";
         constexpr const char* kComputerPatchesLabel    = "COMPUTER PATCHES";
         constexpr const char* kUnsavedStateLabel       = "UNSAVED STATE";
         constexpr const char* kDeleteWarningLabel      = "DELETE WARNING";
+        constexpr const char* kShow                    = "SHOW";
+        constexpr const char* kHide                    = "HIDE";
         constexpr const char* kDefragHistoryLabel      = "MUTATION HISTORY";
         constexpr const char* kDefragButton            = "DEFRAG";
         constexpr const char* kInitTemplateLabel       = "INIT TEMPLATE";
@@ -224,6 +228,8 @@ namespace PluginDisplayNames
 
         namespace ContextualHelp
         {
+            constexpr const char* kContextualHelp =
+                "SETTINGS: Shows or hides the furtive HELP overlay in the footer.";
             constexpr const char* kMatrix1000Patches =
                 "SETTINGS: Chooses how Matrix-1000 patch names are displayed.";
             constexpr const char* kComputerPatches =

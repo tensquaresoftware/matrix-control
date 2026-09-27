@@ -113,6 +113,7 @@ private:
     void syncFromApvtsState(juce::ValueTree& tree);
     void updateDeviceHitAreaBounds();
     void registerDeviceContextualHelp();
+    bool isContextualHelpEnabled() const;
 
     bool midiQueuePressureAlertActive_ = false;
     TSS::ContextualHelpOverlay contextualHelpOverlay_;

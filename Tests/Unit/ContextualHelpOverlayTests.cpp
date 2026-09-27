@@ -6,6 +6,7 @@
 #include "GUI/Helpers/LockDimmingFilmPolicy.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
+#include "Shared/Definitions/PluginIDs.h"
 
 namespace MutatorHelp = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::ContextualHelp;
 
@@ -32,6 +33,9 @@ public:
         helpCopyConstantsMatchSpec();
         epochOwnershipGatesClear();
         epochOwnershipGatesFooterHandshake();
+        preferenceEnabledOnlyForShow();
+        preferenceInvalidDefaultsToShow();
+        hideClearsOverlayDetailPolicy();
     }
 
 private:
@@ -229,6 +233,56 @@ private:
         expect(! overlay.isActive());
 
         expectEquals(TSS::nextContextualHelpOverlayEpoch(std::numeric_limits<int>::max()), 1);
+    }
+
+    void preferenceEnabledOnlyForShow()
+    {
+        beginTest("Preference - SHOW enables HELP; HIDE disables");
+
+        using namespace PluginIDs::Settings::ContextualHelp;
+
+        expect(TSS::isContextualHelpPreferenceEnabled(kShow));
+        expect(! TSS::isContextualHelpPreferenceEnabled(kHide));
+        expectEquals(TSS::normalizeContextualHelpPreference(kShow), kShow);
+        expectEquals(TSS::normalizeContextualHelpPreference(kHide), kHide);
+    }
+
+    void preferenceInvalidDefaultsToShow()
+    {
+        beginTest("Preference - missing / invalid id clamps to SHOW");
+
+        using namespace PluginIDs::Settings::ContextualHelp;
+
+        expectEquals(TSS::normalizeContextualHelpPreference(0), kDefault);
+        expectEquals(TSS::normalizeContextualHelpPreference(-1), kDefault);
+        expectEquals(TSS::normalizeContextualHelpPreference(99), kDefault);
+        expect(TSS::isContextualHelpPreferenceEnabled(0));
+        expect(TSS::isContextualHelpPreferenceEnabled(-1));
+        expect(TSS::isContextualHelpPreferenceEnabled(99));
+        expectEquals(kDefault, kShow);
+    }
+
+    void hideClearsOverlayDetailPolicy()
+    {
+        beginTest("Preference HIDE - clear overlay detail unconditionally");
+
+        using namespace PluginIDs::Settings::ContextualHelp;
+
+        expect(TSS::shouldClearContextualHelpOverlayForPreference(kHide));
+        expect(! TSS::shouldClearContextualHelpOverlayForPreference(kShow));
+        expect(! TSS::shouldClearContextualHelpOverlayForPreference(0));
+        expect(! TSS::shouldClearContextualHelpOverlayForPreference(99));
+
+        TSS::ContextualHelpOverlay overlay;
+        overlay.setDetail(MutatorHelp::kMutate);
+        expect(overlay.isActive());
+
+        // Same production gate FooterPanel uses before clearContextualHelpOverlay.
+        if (TSS::shouldClearContextualHelpOverlayForPreference(kHide))
+            overlay.clear();
+
+        expect(! overlay.isActive());
+        expect(! TSS::shouldPaintContextualHelpOverSticky(overlay.isActive(), false));
     }
 };
 

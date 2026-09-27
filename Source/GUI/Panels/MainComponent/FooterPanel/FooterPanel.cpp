@@ -10,6 +10,7 @@
 #include "GUI/Skins/SkinHelpers.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
+#include "Shared/Definitions/PluginIDs.h"
 
 using TSS::SkinColourId;
 
@@ -253,6 +254,9 @@ void FooterPanel::setMidiQueuePressureAlert(bool active)
 
 int FooterPanel::setContextualHelpOverlay(const juce::String& detailText)
 {
+    if (! isContextualHelpEnabled())
+        return 0;
+
     contextualHelpEpoch_ = TSS::nextContextualHelpOverlayEpoch(contextualHelpEpoch_);
 
     if (contextualHelpOverlay_.getDetail() != detailText)
@@ -283,9 +287,28 @@ void FooterPanel::clearContextualHelpOverlayIfEpoch(int epoch)
     repaint();
 }
 
+bool FooterPanel::isContextualHelpEnabled() const
+{
+    const int preferenceRaw = static_cast<int>(apvts.state.getProperty(
+        PluginIDs::Settings::kContextualHelp,
+        PluginIDs::Settings::ContextualHelp::kDefault));
+    return TSS::isContextualHelpPreferenceEnabled(preferenceRaw);
+}
+
 void FooterPanel::valueTreePropertyChanged(juce::ValueTree& tree,
                                           const juce::Identifier& property)
 {
+    if (property.toString() == PluginIDs::Settings::kContextualHelp)
+    {
+        const int preferenceRaw = static_cast<int>(tree.getProperty(
+            PluginIDs::Settings::kContextualHelp,
+            PluginIDs::Settings::ContextualHelp::kDefault));
+        // HIDE: clear immediately (no popup defer / delayed idle clear).
+        if (TSS::shouldClearContextualHelpOverlayForPreference(preferenceRaw))
+            clearContextualHelpOverlay();
+        return;
+    }
+
     if (property == kMessageTextId
         || property == kMessageSeverityId
         || property == kDeviceDetectedId

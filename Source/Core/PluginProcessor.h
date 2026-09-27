@@ -386,9 +386,11 @@ private:
     void initializeComputerPatchesFolderProperty();
     void initializeComputerPatchesNamesPolicyProperty();
     void initializeUnsavedStatePolicyProperty();
+    void initializeContextualHelpProperty();
     void initializeDeleteWarningPolicyProperty();
     void initializeMatrix1000PatchesNamesModeProperty();
     void initializeEpromTypeProperties();
+    void initializeSettingsPolicyProperties();
     void seedDeviceConnectionDefaultsFromMachine();
     void applyHardwareLatencyToHost();
     void notifyNonParameterStateChanged();
