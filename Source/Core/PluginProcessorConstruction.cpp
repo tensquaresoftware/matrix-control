@@ -304,11 +304,23 @@ void PluginProcessor::initializeContextualHelpProperty()
     }
 }
 
+void PluginProcessor::initializeInfoMessageProperty()
+{
+    if (! apvts.state.hasProperty(PluginIDs::Settings::kInfoMessage))
+    {
+        apvts.state.setProperty(
+            PluginIDs::Settings::kInfoMessage,
+            PluginIDs::Settings::InfoMessage::kDefault,
+            nullptr);
+    }
+}
+
 void PluginProcessor::initializeSettingsPolicyProperties()
 {
     initializeComputerPatchesNamesPolicyProperty();
     initializeUnsavedStatePolicyProperty();
     initializeContextualHelpProperty();
+    initializeInfoMessageProperty();
     initializeDeleteWarningPolicyProperty();
     initializeMatrix1000PatchesNamesModeProperty();
     initializeEpromTypeProperties();

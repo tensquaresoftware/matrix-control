@@ -24,7 +24,8 @@ public:
     // Control column fits UTILITY (LOAD | SAVE AS | INIT) at 44+4+44+4+44.
     // Height sized for INTERFACE + DEVICE (HARDWARE LATENCY + EPROM TYPE) + remaining sections.
     static constexpr int kDesignWidth = 292;
-    static constexpr int kDesignHeight = 527;
+    // One INTERFACE row taller than 527 (+ control height 20 + row gap 8).
+    static constexpr int kDesignHeight = 555;
 
     SettingsPanel(TSS::ISkin& skin, bool isPluginMode);
     ~SettingsPanel() override = default;
@@ -43,6 +44,7 @@ public:
     TSS::ComboBox& getEpromTypeCombo() { return *epromTypeCombo_; }
     TSS::ComboBox& getMatrix1000PatchesCombo() { return *matrix1000PatchesCombo_; }
     TSS::ComboBox& getComputerPatchesCombo() { return *computerPatchesCombo_; }
+    TSS::ComboBox& getInfoMessageCombo() { return *infoMessageCombo_; }
     TSS::ComboBox& getContextualHelpCombo() { return *contextualHelpCombo_; }
     TSS::ComboBox& getUnsavedStateCombo() { return *unsavedStateCombo_; }
     TSS::ComboBox& getDeleteWarningCombo() { return *deleteWarningCombo_; }
@@ -164,6 +166,8 @@ private:
 
     std::unique_ptr<TSS::Label> interfaceSectionLabel_;
     std::unique_ptr<TSS::HorizontalSeparator> interfaceSectionSeparator_;
+    std::unique_ptr<TSS::Label> infoMessageLabel_;
+    std::unique_ptr<TSS::ComboBox> infoMessageCombo_;
     std::unique_ptr<TSS::Label> contextualHelpLabel_;
     std::unique_ptr<TSS::ComboBox> contextualHelpCombo_;
 

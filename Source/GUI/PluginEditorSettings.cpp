@@ -15,6 +15,7 @@
 #include "GUI/Dialogs/MasterM1kmLoadChoiceDialog.h"
 #include "GUI/Dialogs/MutatorHistoryDefragConfirmDialog.h"
 #include "GUI/Helpers/ContextualHelpOverlay.h"
+#include "GUI/Helpers/StickyInfoMessagePolicy.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Settings/SettingsPanel.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
@@ -45,11 +46,6 @@ namespace
             return policyRaw;
 
         return kDefault;
-    }
-
-    int normalizeContextualHelpPreference(int preferenceRaw)
-    {
-        return TSS::normalizeContextualHelpPreference(preferenceRaw);
     }
 
     int normalizeDeleteWarningPolicy(int policyRaw)
@@ -84,11 +80,18 @@ void PluginEditor::restoreSettingsPolicyCombosFromState(SettingsPanel& panel)
 {
     auto& state = pluginProcessor.getApvts().state;
 
+    panel.getInfoMessageCombo().setSelectedId(
+        readNormalizedProperty(state,
+                               PluginIDs::Settings::kInfoMessage,
+                               PluginIDs::Settings::InfoMessage::kDefault,
+                               TSS::normalizeInfoMessagePreference),
+        juce::dontSendNotification);
+
     panel.getContextualHelpCombo().setSelectedId(
         readNormalizedProperty(state,
                                PluginIDs::Settings::kContextualHelp,
                                PluginIDs::Settings::ContextualHelp::kDefault,
-                               normalizeContextualHelpPreference),
+                               TSS::normalizeContextualHelpPreference),
         juce::dontSendNotification);
 
     panel.getMatrix1000PatchesCombo().setSelectedId(
@@ -349,6 +352,14 @@ void PluginEditor::wireSettingsEpromAndLatency(SettingsPanel& panel)
 
 void PluginEditor::wireSettingsContextualHelpCombo(SettingsPanel& panel)
 {
+    panel.getInfoMessageCombo().onChange = [this, &panel]
+    {
+        using namespace PluginIDs::Settings::InfoMessage;
+        const int id = panel.getInfoMessageCombo().getSelectedId();
+        if (id == kKeep || id == kAutoClear)
+            pluginProcessor.getApvts().state.setProperty(PluginIDs::Settings::kInfoMessage, id, nullptr);
+    };
+
     panel.getContextualHelpCombo().onChange = [this, &panel]
     {
         using namespace PluginIDs::Settings::ContextualHelp;

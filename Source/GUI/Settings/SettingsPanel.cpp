@@ -32,6 +32,7 @@ void SettingsPanel::registerContextualHelp(TSS::ContextualHelpBinder::FooterReso
     contextualHelpBinder_ = std::make_unique<TSS::ContextualHelpBinder>(std::move(resolveFooter));
     contextualHelpBinder_->setHostShowingPredicate([this] { return isShowing(); });
 
+    contextualHelpBinder_->bind(infoMessageCombo_.get(), Help::kInfoMessage);
     contextualHelpBinder_->bind(contextualHelpCombo_.get(), Help::kContextualHelp);
     contextualHelpBinder_->bind(hardwareLatencySlider_.get(), Help::kHardwareLatency);
     contextualHelpBinder_->bind(epromTypeCombo_.get(), Help::kEpromType);
@@ -129,6 +130,11 @@ void SettingsPanel::layoutInterfaceSection(juce::Rectangle<int>& bounds, const R
                                                  metrics.controlHeight,
                                                  metrics.separatorHeight,
                                                  metrics.rowGap });
+    layoutLabeledControlRow(bounds,
+                            metrics,
+                            LabeledControlRowArgs{ infoMessageLabel_.get(),
+                                                   infoMessageCombo_.get(),
+                                                   metrics.comboWidth });
     layoutLabeledControlRow(bounds,
                             metrics,
                             LabeledControlRowArgs{ contextualHelpLabel_.get(),

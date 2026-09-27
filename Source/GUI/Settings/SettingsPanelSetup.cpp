@@ -35,12 +35,17 @@ void SettingsPanel::setupInterfaceSection(TSS::ISkin& skin)
     interfaceSectionLabel_ =
         makeLabel(skin, kContentWidth_, PluginDisplayNames::Settings::kInterfaceSection);
     interfaceSectionSeparator_ = makeSeparator(skin);
+    infoMessageLabel_ =
+        makeLabel(skin, kLabelWidth_, PluginDisplayNames::Settings::kInfoMessageLabel);
+    infoMessageCombo_ = makeCombo(skin, kComboWidth_);
     contextualHelpLabel_ =
         makeLabel(skin, kLabelWidth_, PluginDisplayNames::Settings::kContextualHelpLabel);
     contextualHelpCombo_ = makeCombo(skin, kComboWidth_);
 
     addAndMakeVisible(*interfaceSectionLabel_);
     addAndMakeVisible(*interfaceSectionSeparator_);
+    addAndMakeVisible(*infoMessageLabel_);
+    addAndMakeVisible(*infoMessageCombo_);
     addAndMakeVisible(*contextualHelpLabel_);
     addAndMakeVisible(*contextualHelpCombo_);
 }
@@ -153,6 +158,10 @@ void SettingsPanel::setupMasterSection(TSS::ISkin& skin)
 
 void SettingsPanel::populateComboItems()
 {
+    using namespace PluginIDs::Settings::InfoMessage;
+    infoMessageCombo_->addItem(PluginDisplayNames::Settings::kKeep, kKeep);
+    infoMessageCombo_->addItem(PluginDisplayNames::Settings::kAutoClear, kAutoClear);
+
     using namespace PluginIDs::Settings::ContextualHelp;
     contextualHelpCombo_->addItem(PluginDisplayNames::Settings::kShow, kShow);
     contextualHelpCombo_->addItem(PluginDisplayNames::Settings::kHide, kHide);
@@ -181,6 +190,7 @@ void SettingsPanel::populateComboItems()
 void SettingsPanel::applyComboPopupLooks(TSS::ISkin& skin)
 {
     const auto popupLook = TSS::popupMenuLookFromSkin(skin);
+    infoMessageCombo_->setPopupMenuLook(popupLook);
     contextualHelpCombo_->setPopupMenuLook(popupLook);
     epromTypeCombo_->setPopupMenuLook(popupLook);
     matrix1000PatchesCombo_->setPopupMenuLook(popupLook);
@@ -198,6 +208,8 @@ void SettingsPanel::applyChildLooks(TSS::ISkin& skin)
 
     interfaceSectionLabel_->setLook(labelLook);
     interfaceSectionSeparator_->setLook(separatorLook);
+    infoMessageLabel_->setLook(labelLook);
+    infoMessageCombo_->setLook(comboLook);
     contextualHelpLabel_->setLook(labelLook);
     contextualHelpCombo_->setLook(comboLook);
 

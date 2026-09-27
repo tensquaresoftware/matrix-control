@@ -6,6 +6,7 @@
 #include <memory>
 
 #include "GUI/Helpers/ContextualHelpOverlay.h"
+#include "GUI/Helpers/StickyInfoMessagePolicy.h"
 #include "GUI/Layout/PanelDimensions.h"
 
 namespace TSS
@@ -15,7 +16,8 @@ namespace TSS
 }
 
 class FooterPanel : public juce::Component,
-                    public juce::ValueTree::Listener
+                    public juce::ValueTree::Listener,
+                    private juce::Timer
 {
 public:
     FooterPanel(TSS::ISkin& skin,
@@ -50,6 +52,12 @@ private:
         Error
     };
 
+    enum class BadgeChromeMode
+    {
+        TextLabel,
+        SeverityIcon
+    };
+
     struct FooterBandLayout
     {
         juce::Rectangle<int> leftBand;
@@ -67,6 +75,9 @@ private:
         juce::Colour badgeTextColour;
         juce::Colour detailColour;
         juce::Font font;
+        BadgeChromeMode chromeMode = BadgeChromeMode::TextLabel;
+        bool severityBadgeHovered = false;
+        MessageSeverity stickySeverity = MessageSeverity::None;
     };
 
     FooterPanelDimensions dimensions_;
@@ -90,12 +101,17 @@ private:
     static const juce::Identifier kDeviceMidiUnresponsiveId;
 
     MessageSeverity parseSeverity(const juce::String& severityStr) const;
+    TSS::StickyMessageSeverity toStickySeverity(MessageSeverity severity) const;
     juce::Colour getSeverityColour(MessageSeverity severity) const;
     juce::String getSeverityPrefix(MessageSeverity severity) const;
     juce::String buildDeviceDetailText() const;
     bool isDeviceIdentityOk() const;
     FooterBandLayout computeBandLayout() const;
     void paintBadgeAndDetail(juce::Graphics& g, const BadgeDetailPaintArgs& args) const;
+    int paintBadgeChrome(juce::Graphics& g,
+                         const BadgeDetailPaintArgs& args,
+                         int badgeHeight,
+                         int badgePad) const;
     void paintStatusMessage(juce::Graphics& g,
                             juce::Rectangle<int> bounds,
                             const juce::Font& font,
@@ -113,14 +129,60 @@ private:
                              const juce::Font& font) const;
     void syncFromApvtsState(juce::ValueTree& tree);
     void updateDeviceHitAreaBounds();
+    void updateSeverityBadgeHitAreaBounds();
     void registerDeviceContextualHelp();
     bool isContextualHelpEnabled() const;
     void clearContextualHelpOverlayIfPreferenceHidden();
+    bool helpCoversStickyBand() const;
+    int readInfoMessagePreference() const;
+    void syncAutoClearPolicyFromState();
+    void cancelAutoClearTimer();
+    void armAutoClearTimer();
+    void pauseAutoClearTimerForHelp();
+    void resumeAutoClearTimerAfterHelp();
+    void clearStickyMessage();
+    void timerCallback() override;
+    void setSeverityBadgeHovered(bool hovered);
+    void handleSeverityBadgeClick();
+
+    class SeverityBadgeHitArea final : public juce::Component
+    {
+    public:
+        explicit SeverityBadgeHitArea(FooterPanel& owner)
+            : owner_(owner)
+        {
+        }
+
+        void mouseEnter(const juce::MouseEvent&) override
+        {
+            owner_.setSeverityBadgeHovered(true);
+        }
+
+        void mouseExit(const juce::MouseEvent&) override
+        {
+            owner_.setSeverityBadgeHovered(false);
+        }
+
+        void mouseUp(const juce::MouseEvent& event) override
+        {
+            if (event.mouseWasClicked())
+                owner_.handleSeverityBadgeClick();
+        }
+
+    private:
+        FooterPanel& owner_;
+    };
 
     bool midiQueuePressureAlertActive_ = false;
     TSS::ContextualHelpOverlay contextualHelpOverlay_;
     int contextualHelpEpoch_ = 0;
     juce::Component deviceHitArea_;
+    SeverityBadgeHitArea severityBadgeHitArea_ { *this };
+    bool severityBadgeHovered_ = false;
+    bool autoClearArmed_ = false;
+    bool autoClearPaused_ = false;
+    int autoClearRemainingMs_ = 0;
+    juce::uint32 autoClearDeadlineMs_ = 0;
     std::unique_ptr<TSS::ContextualHelpBinder> contextualHelpBinder_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(FooterPanel)

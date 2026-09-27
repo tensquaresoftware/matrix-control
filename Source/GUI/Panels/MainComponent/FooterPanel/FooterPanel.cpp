@@ -3,7 +3,6 @@
 #include "Core/MIDI/EditorOutboundGate.h"
 #include "GUI/Helpers/ContextualHelpBinder.h"
 #include "GUI/Helpers/DeviceVersionDisplayFormat.h"
-#include "GUI/Helpers/TextFitHelpers.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Skins/ColourChart.h"
 #include "GUI/Skins/ISkin.h"
@@ -31,13 +30,18 @@ FooterPanel::FooterPanel(TSS::ISkin& skin,
     setOpaque(true);
     deviceHitArea_.setInterceptsMouseClicks(true, false);
     addAndMakeVisible(deviceHitArea_);
+    severityBadgeHitArea_.setInterceptsMouseClicks(true, false);
+    severityBadgeHitArea_.setMouseCursor(juce::MouseCursor::PointingHandCursor);
+    addAndMakeVisible(severityBadgeHitArea_);
     registerDeviceContextualHelp();
     apvts.state.addListener(this);
     syncFromApvtsState(apvts.state);
+    syncAutoClearPolicyFromState();
 }
 
 FooterPanel::~FooterPanel()
 {
+    stopTimer();
     contextualHelpBinder_.reset();
     apvts.state.removeListener(this);
 }
@@ -69,55 +73,6 @@ FooterPanel::FooterBandLayout FooterPanel::computeBandLayout() const
     return layout;
 }
 
-void FooterPanel::paintBadgeAndDetail(juce::Graphics& g, const BadgeDetailPaintArgs& args) const
-{
-    auto bounds = args.bounds;
-    const int badgeHeight = TSS::ScaledLayout::scaledInt(
-        static_cast<float>(dimensions_.severityBadgeHeight), uiScale_);
-    const int badgePad = TSS::ScaledLayout::scaledInt(
-        static_cast<float>(dimensions_.severityBadgeHorizontalPadding), uiScale_);
-    const int badgeGap = TSS::ScaledLayout::scaledInt(
-        static_cast<float>(dimensions_.severityBadgeToMessageGap), uiScale_);
-    const auto badgeFont = skin_->getBaseFontBold().withHeight(args.font.getHeight());
-
-    g.setFont(badgeFont);
-
-    const int labelWidth = juce::roundToInt(juce::GlyphArrangement::getStringWidth(badgeFont, args.badgeLabel));
-    const int badgeWidth = juce::jmin(bounds.getWidth(), labelWidth + 2 * badgePad);
-    const int badgeY = bounds.getCentreY() - badgeHeight / 2;
-    const juce::Rectangle<int> badgeBounds {
-        bounds.getX(),
-        badgeY,
-        badgeWidth,
-        badgeHeight
-    };
-
-    g.setColour(args.badgeFill);
-    g.fillRect(badgeBounds);
-
-    g.setColour(args.badgeTextColour);
-    g.drawText(args.badgeLabel, badgeBounds, juce::Justification::centred, false);
-
-    bounds.removeFromLeft(badgeWidth + badgeGap);
-    g.setFont(args.font);
-    g.setColour(args.detailColour);
-
-    // Prefer start of status messages; Loaded/Saved / Mutator Export keep head + useful end.
-    // Accept ASCII " - Loaded " (current formatters) and legacy em-dash " — Loaded ".
-    const bool usePathStyleTruncate = args.detailText.startsWith("Loaded ")
-        || args.detailText.startsWith("Saved ")
-        || args.detailText.contains(" - Loaded ")
-        || args.detailText.contains(" — Loaded ")
-        || args.detailText.startsWith(
-               PluginDisplayNames::PatchManagerSection::PatchMutatorModule::Messages::kExportCompleteFooterStem);
-    const auto fittedDetail = TSS::TextFitHelpers::fitWithAsciiEllipsis(
-        args.detailText,
-        args.font,
-        static_cast<float>(bounds.getWidth()),
-        usePathStyleTruncate);
-    g.drawText(fittedDetail, bounds, juce::Justification::centredLeft, false);
-}
-
 void FooterPanel::paintStatusMessage(juce::Graphics& g,
                                      juce::Rectangle<int> bounds,
                                      const juce::Font& font,
@@ -133,7 +88,10 @@ void FooterPanel::paintStatusMessage(juce::Graphics& g,
         getSeverityColour(currentSeverity),
         skin_->getColour(SkinColourId::kFooterPanelBackground),
         detailColour,
-        font
+        font,
+        BadgeChromeMode::SeverityIcon,
+        severityBadgeHovered_,
+        currentSeverity
     });
 }
 
@@ -229,6 +187,7 @@ void FooterPanel::paint(juce::Graphics& g)
 void FooterPanel::resized()
 {
     updateDeviceHitAreaBounds();
+    updateSeverityBadgeHitAreaBounds();
 }
 
 void FooterPanel::setSkin(TSS::ISkin& skin)
@@ -243,6 +202,7 @@ void FooterPanel::setUiScale(float uiScale)
 
     uiScale_ = uiScale;
     updateDeviceHitAreaBounds();
+    updateSeverityBadgeHitAreaBounds();
     repaint();
 }
 
@@ -269,7 +229,13 @@ int FooterPanel::setContextualHelpOverlay(const juce::String& detailText)
     if (contextualHelpOverlay_.getDetail() != detailText)
     {
         contextualHelpOverlay_.setDetail(detailText);
+        pauseAutoClearTimerForHelp();
+        updateSeverityBadgeHitAreaBounds();
         repaint();
+    }
+    else if (helpCoversStickyBand())
+    {
+        pauseAutoClearTimerForHelp();
     }
 
     return contextualHelpEpoch_;
@@ -281,6 +247,8 @@ void FooterPanel::clearContextualHelpOverlay()
         return;
 
     contextualHelpOverlay_.clear();
+    resumeAutoClearTimerAfterHelp();
+    updateSeverityBadgeHitAreaBounds();
     repaint();
 }
 
@@ -291,6 +259,8 @@ void FooterPanel::clearContextualHelpOverlayIfEpoch(int epoch)
                                                        contextualHelpEpoch_))
         return;
 
+    resumeAutoClearTimerAfterHelp();
+    updateSeverityBadgeHitAreaBounds();
     repaint();
 }
 
@@ -322,6 +292,12 @@ void FooterPanel::valueTreePropertyChanged(juce::ValueTree& tree,
         return;
     }
 
+    if (property.toString() == PluginIDs::Settings::kInfoMessage)
+    {
+        syncAutoClearPolicyFromState();
+        return;
+    }
+
     if (property == kMessageTextId
         || property == kMessageSeverityId
         || property == kDeviceDetectedId
@@ -330,14 +306,23 @@ void FooterPanel::valueTreePropertyChanged(juce::ValueTree& tree,
         || property == kDeviceMidiUnresponsiveId)
     {
         syncFromApvtsState(tree);
+        if (property == kMessageTextId || property == kMessageSeverityId)
+            syncAutoClearPolicyFromState();
+        updateSeverityBadgeHitAreaBounds();
         repaint();
     }
 }
 
 void FooterPanel::valueTreeRedirected(juce::ValueTree&)
 {
-    // Host replaceState does not fire per-property changes; drop HELP if restored HIDE.
+    // Host replaceState does not fire per-property changes; cancel stale timer before sync
+    // so a paused remaining-0 arm cannot clearStickyMessage against the old tree.
+    cancelAutoClearTimer();
     clearContextualHelpOverlayIfPreferenceHidden();
+    syncFromApvtsState(apvts.state);
+    syncAutoClearPolicyFromState();
+    updateSeverityBadgeHitAreaBounds();
+    repaint();
 }
 
 void FooterPanel::syncFromApvtsState(juce::ValueTree& tree)
@@ -360,6 +345,22 @@ FooterPanel::MessageSeverity FooterPanel::parseSeverity(const juce::String& seve
         return MessageSeverity::Error;
 
     return MessageSeverity::None;
+}
+
+TSS::StickyMessageSeverity FooterPanel::toStickySeverity(MessageSeverity severity) const
+{
+    switch (severity)
+    {
+        case MessageSeverity::Info:
+            return TSS::StickyMessageSeverity::Info;
+        case MessageSeverity::Warning:
+            return TSS::StickyMessageSeverity::Warning;
+        case MessageSeverity::Error:
+            return TSS::StickyMessageSeverity::Error;
+        case MessageSeverity::None:
+        default:
+            return TSS::StickyMessageSeverity::None;
+    }
 }
 
 juce::Colour FooterPanel::getSeverityColour(MessageSeverity severity) const

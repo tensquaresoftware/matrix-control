@@ -387,6 +387,7 @@ private:
     void initializeComputerPatchesNamesPolicyProperty();
     void initializeUnsavedStatePolicyProperty();
     void initializeContextualHelpProperty();
+    void initializeInfoMessageProperty();
     void initializeDeleteWarningPolicyProperty();
     void initializeMatrix1000PatchesNamesModeProperty();
     void initializeEpromTypeProperties();

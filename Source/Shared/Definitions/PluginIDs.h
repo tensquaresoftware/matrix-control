@@ -26,6 +26,8 @@ namespace PluginIDs
             "settingsUnsavedEditWarningPolicy";
         constexpr const char* kContextualHelp =
             "settingsContextualHelp";
+        constexpr const char* kInfoMessage =
+            "settingsInfoMessage";
         constexpr const char* kDeleteWarningPolicy =
             "settingsMutatorDeleteWarningPolicy";
         constexpr const char* kMatrix1000PatchesNamesMode =
@@ -65,6 +67,14 @@ namespace PluginIDs
             constexpr int kShow = 1;
             constexpr int kHide = 2;
             constexpr int kDefault = kShow;
+        }
+
+        namespace InfoMessage
+        {
+            constexpr int kKeep = 1;
+            constexpr int kAutoClear = 2;
+            constexpr int kDefault = kKeep;
+            constexpr int kAutoClearDurationMs = 5000;
         }
 
         namespace DeleteWarningPolicy

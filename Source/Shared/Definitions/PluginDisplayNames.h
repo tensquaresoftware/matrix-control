@@ -166,7 +166,10 @@ namespace PluginDisplayNames
         constexpr const char* kPatchSection            = "PATCH";
         constexpr const char* kPatchMutatorSection     = "PATCH MUTATOR";
         constexpr const char* kMasterSection           = "MASTER";
+        constexpr const char* kInfoMessageLabel        = "INFO MESSAGE";
         constexpr const char* kContextualHelpLabel     = "CONTEXTUAL HELP";
+        constexpr const char* kKeep                    = "KEEP";
+        constexpr const char* kAutoClear               = "AUTO CLEAR";
         constexpr const char* kEpromTypeLabel          = "EPROM TYPE";
         constexpr const char* kMatrix1000PatchesLabel  = "MATRIX-1000 PATCHES";
         constexpr const char* kComputerPatchesLabel    = "COMPUTER PATCHES";
@@ -228,6 +231,9 @@ namespace PluginDisplayNames
 
         namespace ContextualHelp
         {
+            constexpr const char* kInfoMessage =
+                "SETTINGS: KEEP leaves sticky INFO until replaced; AUTO CLEAR clears INFO after five seconds "
+                "(not WARNING or ERROR). Click the footer severity badge to dismiss any sticky message.";
             constexpr const char* kContextualHelp =
                 "SETTINGS: Shows or hides the furtive HELP overlay in the footer.";
             constexpr const char* kMatrix1000Patches =

@@ -307,6 +307,7 @@ set(PLUGIN_SOURCES
     
     # GUI - Panels
     Source/GUI/Panels/MainComponent/FooterPanel/FooterPanel.cpp
+    Source/GUI/Panels/MainComponent/FooterPanel/FooterPanelStickyMessage.cpp
     Source/GUI/Panels/MainComponent/HeaderPanel/HeaderPanel.cpp
     Source/GUI/Panels/MainComponent/HeaderPanel/HeaderPanelLayout.cpp
     Source/GUI/Panels/MainComponent/HeaderPanel/HeaderPanelSetup.cpp
@@ -489,6 +490,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/EditorOutboundGateTests.cpp
         Tests/Unit/LockDimmingFilmPolicyTests.cpp
         Tests/Unit/ContextualHelpOverlayTests.cpp
+        Tests/Unit/StickyInfoMessagePolicyTests.cpp
         Tests/Unit/InitDefaultsTests.cpp
         Tests/Unit/InitTemplateLoaderTests.cpp
         Tests/Unit/InitTemplateWriterTests.cpp
