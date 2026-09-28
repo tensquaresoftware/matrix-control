@@ -2095,3 +2095,12 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-footer-sticky-severity-badge-chrome.md`
   summary: Unit tests claim “hit square only” via pure geometry helpers, but FooterPanel::updateSeverityBadgeHitAreaBounds wiring is not covered; a full-badge hit-zone regression would still leave StickyInfoMessagePolicyTests green.
   evidence: Verification Gap; CONVENTIONS forbid GUI component / paint unit tests; oneshot relies on manual smoke for click/hand-cursor scope.
+
+## Deferred from: review of spec-patch-drag-load-patch-label.md (2026-09-28)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-drag-load-patch-label.md`
+  summary: Done Master-drag / syx-drag specs still say valid Patch drag keeps header `PATCH NAME`; product now shows temporary `LOAD PATCH`.
+  evidence: Historical done frozen artifacts are not rewritten in oneshot; new oneshot Intent is the live contract for Patch header chrome.
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-drag-load-patch-label.md`
+  summary: No automated coverage that valid patch/selection hover sets header to `LOAD PATCH` and invalid/exit restores `PATCH NAME`.
+  evidence: Same gap as Master drag chrome (already deferred); CONVENTIONS discourage GUI-component unit tests; manual smoke remains the check.

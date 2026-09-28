@@ -1531,6 +1531,8 @@ namespace PluginDisplayNames
         namespace PatchNameModule
         {
             constexpr const char* kName = "PATCH NAME";
+            // Temporary header title while a valid Patch file or selection is dragged over the editor.
+            constexpr const char* kLoadPatchName = "LOAD PATCH";
             // Temporary header title while a valid Master file is dragged over the editor.
             constexpr const char* kLoadMasterName = "LOAD MASTER";
 

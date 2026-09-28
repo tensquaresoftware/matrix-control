@@ -33,14 +33,16 @@ public:
 
     TSS::PatchNameDisplay& getPatchNameDisplay();
 
-    // Drag-drop overlay on PATCH NAME — display-only; does not write APVTS patch name.
+    // Drag-drop feedback on PATCH NAME — display-only; does not write APVTS patch name.
+    // Valid Patch / selection temporarily retitles the module header to LOAD PATCH (Blue line);
+    // valid Master uses LOAD MASTER + Orange. Invalid / exit restore PATCH NAME + Blue.
     enum class DragOverlayKind
     {
         kInvalid,        // one unloadable item → BAD FILE
         kInvalidPlural,  // two or more unloadable items → BAD FILES
-        kValidSingle,
-        kValidSelection,
-        kValidMaster     // Master .syx / .m1km → MASTER + DROP TO LOAD + temporary chrome
+        kValidSingle,    // valid patch → overlay + temporary LOAD PATCH (Blue line)
+        kValidSelection, // multi/folder → PATCHES... + temporary LOAD PATCH (Blue line)
+        kValidMaster     // Master .syx / .m1km → MASTER + DROP TO LOAD + LOAD MASTER (Orange)
     };
 
     void applyDragOverlay(DragOverlayKind kind, const juce::String& previewPrimaryName = {});
@@ -89,9 +91,14 @@ private:
     std::unique_ptr<TSS::ModuleHeader> moduleHeader_;
     std::unique_ptr<TSS::PatchNameDisplay> patchNameDisplay_;
     bool masterDragChromeActive_ = false;
+    // True while LOAD PATCH title is shown. Needed because patch chrome keeps Blue — colour
+    // alone cannot signal that temporary title chrome must be restored on invalid / exit.
+    bool patchDragChromeActive_ = false;
 
     void applyMasterDragChrome();
+    void applyPatchDragChrome();
     void restoreNormalPatchNameChrome();
+    void updateDragChromeForKind(DragOverlayKind kind);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PatchNameDisplayPanel)
 };

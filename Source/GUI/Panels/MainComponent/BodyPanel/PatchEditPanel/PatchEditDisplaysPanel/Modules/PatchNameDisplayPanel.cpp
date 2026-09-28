@@ -89,8 +89,20 @@ void PatchNameDisplayPanel::applyMasterDragChrome()
         return;
 
     masterDragChromeActive_ = true;
+    patchDragChromeActive_ = false;
     moduleHeader_->setText(PluginDisplayNames::PatchEditSection::PatchNameModule::kLoadMasterName);
     moduleHeader_->setColourVariant(TSS::ModuleHeader::ColourVariant::Orange);
+}
+
+void PatchNameDisplayPanel::applyPatchDragChrome()
+{
+    if (moduleHeader_ == nullptr)
+        return;
+
+    patchDragChromeActive_ = true;
+    masterDragChromeActive_ = false;
+    moduleHeader_->setText(PluginDisplayNames::PatchEditSection::PatchNameModule::kLoadPatchName);
+    moduleHeader_->setColourVariant(TSS::ModuleHeader::ColourVariant::Blue);
 }
 
 void PatchNameDisplayPanel::restoreNormalPatchNameChrome()
@@ -99,8 +111,19 @@ void PatchNameDisplayPanel::restoreNormalPatchNameChrome()
         return;
 
     masterDragChromeActive_ = false;
+    patchDragChromeActive_ = false;
     moduleHeader_->setText(PluginDisplayNames::PatchEditSection::PatchNameModule::kName);
     moduleHeader_->setColourVariant(TSS::ModuleHeader::ColourVariant::Blue);
+}
+
+void PatchNameDisplayPanel::updateDragChromeForKind(DragOverlayKind kind)
+{
+    if (kind == DragOverlayKind::kValidMaster)
+        applyMasterDragChrome();
+    else if (kind == DragOverlayKind::kValidSingle || kind == DragOverlayKind::kValidSelection)
+        applyPatchDragChrome();
+    else if (masterDragChromeActive_ || patchDragChromeActive_)
+        restoreNormalPatchNameChrome();
 }
 
 void PatchNameDisplayPanel::applyDragOverlay(DragOverlayKind kind,
@@ -111,10 +134,7 @@ void PatchNameDisplayPanel::applyDragOverlay(DragOverlayKind kind,
 
     namespace Overlay = PluginDisplayNames::PatchEditSection::PatchNameModule::DragDropOverlay;
 
-    if (kind == DragOverlayKind::kValidMaster)
-        applyMasterDragChrome();
-    else if (masterDragChromeActive_)
-        restoreNormalPatchNameChrome();
+    updateDragChromeForKind(kind);
 
     switch (kind)
     {
@@ -147,7 +167,7 @@ void PatchNameDisplayPanel::clearDragOverlay()
     if (patchNameDisplay_ == nullptr)
         return;
 
-    if (masterDragChromeActive_)
+    if (masterDragChromeActive_ || patchDragChromeActive_)
         restoreNormalPatchNameChrome();
 
     patchNameDisplay_->clearDragOverlay();
