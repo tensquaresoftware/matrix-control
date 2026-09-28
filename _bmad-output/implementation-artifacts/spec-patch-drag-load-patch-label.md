@@ -4,7 +4,7 @@ type: 'feature'
 created: '2026-09-28'
 status: 'done'
 route: 'oneshot'
-review_loop_iteration: 0
+review_loop_iteration: 1
 context: []
 baseline_commit: 'fa529b1220f959b65bc20a33aaea8410e331a0d8'
 ---
@@ -40,3 +40,21 @@ baseline_commit: 'fa529b1220f959b65bc20a33aaea8410e331a0d8'
 - Spec notes omit full kind-transition list — **low rejected**: Intent + code paths already cover restore/swap; no user-visible gap.
 - Public panel comment still overlay-only — **medium→patch**: comment updated to describe temporary header titles.
 - Sibling drag UAT guidance outdated — **defer**: same historical-artifact class as Master matrix.
+
+### Review Findings
+
+- [x] [Review][Defer] No automated LOAD PATCH / restore header assert — deferred: same gap as Master chrome; already in `deferred-work.md`; CONVENTIONS discourage GUI-component unit tests; manual smoke remains the check.
+
+#### Rejected
+
+- Spec / notes polish (list deferred-work in Files, soften “keep”, smoke recipe, Intent asymmetry prose, name obsolete sibling UAT rows) — rejected: would edit the oneshot / frozen Intent under review; template and prior triage already settled these.
+- Spec `status: done` while gaps remain deferred — rejected: intentional oneshot practice; gaps already recorded in `deferred-work.md`.
+- `kInvalid` / `kInvalidPlural` enum comments omit chrome restore — false: class-level drag comment already states Invalid / exit restore `PATCH NAME` + Blue.
+- `applyDragOverlay` early-returns on null `patchNameDisplay_` before chrome update — false: both widgets are constructed together as `unique_ptr` and never reset; same gate as pre-existing Master chrome.
+- `kLoadPatchName` comment omits “folder” — false: “selection” already covers multi/folder valid patch hover.
+- Public panel comment omits “drop” — false: drop clear is the exit path already covered by “Invalid / exit restore”.
+- Document two-bool mutual-exclusion invariant — low rejected: prior triage kept twin bools; apply helpers already enforce exclusion; comment churn without everyday harm.
+- ContextualHelp still describes rename-only — rejected: out of scope for this oneshot; same gap already existed for `LOAD MASTER`.
+- Edge: `clearDragOverlay` leaves LOAD PATCH if `patchNameDisplay_` null — false: null guard is first; chrome flags cannot be set when display is null (`applyDragOverlay` returns first).
+- Edge: `restoreNormalPatchNameChrome` leaves flags stuck if `moduleHeader_` null — false: apply helpers never set flags when header is null; header is never reset to null.
+- Edge: null-header kind switch leaves opposite chrome flag — false: unreachable; `moduleHeader_` lifetime matches panel construction.
