@@ -77,7 +77,6 @@ private:
         juce::Font font;
         BadgeChromeMode chromeMode = BadgeChromeMode::TextLabel;
         bool severityBadgeHovered = false;
-        MessageSeverity stickySeverity = MessageSeverity::None;
     };
 
     FooterPanelDimensions dimensions_;

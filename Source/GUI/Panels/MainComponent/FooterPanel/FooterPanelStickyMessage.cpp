@@ -52,11 +52,9 @@ int FooterPanel::paintSeverityIconBadgeChrome(juce::Graphics& g,
     g.setFont(badgeFont);
     const int labelWidth =
         juce::roundToInt(juce::GlyphArrangement::getStringWidth(badgeFont, args.badgeLabel));
-    const int iconInset = TSS::ScaledLayout::scaledInt(
-        static_cast<float>(dimensions_.severityBadgeIconInset), uiScale_);
     const TSS::StickySeverityBadgeMetrics metrics {
-        juce::jmax(0, badgeHeight - 2 * iconInset),
-        iconInset,
+        badgeHeight,
+        TSS::stickySeveritySeparatorThickness(uiScale_),
         labelWidth,
         badgePad,
         badgeHeight
@@ -65,20 +63,31 @@ int FooterPanel::paintSeverityIconBadgeChrome(juce::Graphics& g,
     const int totalWidth = badgeBounds.getWidth();
     const auto fullBadgeBounds = badgeBounds;
 
-    // Label band: severity fill + dark text (same as classic sticky badge).
+    const int stripWidth = juce::jmin(TSS::stickySeverityCloseStripWidth(metrics), totalWidth);
+    badgeBounds.removeFromLeft(stripWidth);
+
+    // Close strip full height first so height-clamped square leaves no footer gutters.
     g.setColour(args.badgeFill);
+    g.fillRect(juce::Rectangle<int> {
+        fullBadgeBounds.getX(),
+        fullBadgeBounds.getY(),
+        stripWidth,
+        metrics.badgeHeight
+    });
+
+    // Label band: severity fill + dark text (unchanged at rest and on close-square hover).
     g.fillRect(badgeBounds);
 
-    const int stripWidth = juce::jmin(TSS::stickySeverityIconStripWidth(metrics), totalWidth);
-    badgeBounds.removeFromLeft(stripWidth);
-    const auto square = TSS::stickySeverityIconSquareBounds(fullBadgeBounds, metrics);
-    // Icon square: dark fill (badge text / footer tone) + severity-coloured glyph.
+    const auto square = TSS::stickySeverityCloseSquareBounds(fullBadgeBounds, metrics);
+    const auto separator = TSS::stickySeveritySeparatorBounds(fullBadgeBounds, metrics);
     g.setColour(args.badgeTextColour);
-    g.fillRect(square);
-    const auto glyph = args.severityBadgeHovered
-        ? TSS::makeSeverityCloseCrossShape()
-        : TSS::severityPictoFor(toStickySeverity(args.stickySeverity));
-    TSS::paintSeverityGlyphInSquare(g, { square, glyph, args.badgeFill });
+    g.fillRect(separator);
+
+    const auto cross = TSS::makeSeverityCloseCrossShape();
+    const auto crossColour = args.severityBadgeHovered
+        ? skin_->getColour(TSS::SkinColourId::kButtonTextHover)
+        : args.badgeTextColour;
+    TSS::paintSeverityCloseGlyphInSquare(g, { square, cross, crossColour });
 
     g.setColour(args.badgeTextColour);
     g.drawText(args.badgeLabel, badgeBounds, juce::Justification::centred, false);
@@ -261,21 +270,21 @@ void FooterPanel::updateSeverityBadgeHitAreaBounds()
         static_cast<float>(dimensions_.severityBadgeHeight), uiScale_);
     const int badgePad = TSS::ScaledLayout::scaledInt(
         static_cast<float>(dimensions_.severityBadgeHorizontalPadding), uiScale_);
-    const int iconInset = TSS::ScaledLayout::scaledInt(
-        static_cast<float>(dimensions_.severityBadgeIconInset), uiScale_);
     // Same face/height as paintBadgeChrome for SeverityIcon (bold at paint() message font height).
     const auto messageFont = skin_->getBaseFont().withHeight(
         skin_->getBaseFont().getHeight() * uiScale_);
     const auto badgeFont = skin_->getBaseFontBold().withHeight(messageFont.getHeight());
     const TSS::StickySeverityBadgeMetrics metrics {
-        juce::jmax(0, badgeHeight - 2 * iconInset),
-        iconInset,
+        badgeHeight,
+        TSS::stickySeveritySeparatorThickness(uiScale_),
         juce::roundToInt(
             juce::GlyphArrangement::getStringWidth(badgeFont, getSeverityPrefix(currentSeverity))),
         badgePad,
         badgeHeight
     };
-    severityBadgeHitArea_.setBounds(TSS::stickySeverityBadgeBounds(leftBounds, metrics));
+    const auto badgeBounds = TSS::stickySeverityBadgeBounds(leftBounds, metrics);
+    // Hit-zone = close square only (not separator, not severity label, not detail text).
+    severityBadgeHitArea_.setBounds(TSS::stickySeverityCloseSquareBounds(badgeBounds, metrics));
 }
 
 void FooterPanel::setSeverityBadgeHovered(bool hovered)

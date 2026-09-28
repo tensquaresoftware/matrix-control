@@ -218,14 +218,13 @@ namespace TSS::Design
             inline constexpr int kBandHeight = 24;
             inline constexpr int kBandVerticalInset = (kHeight - kBandHeight) / 2; // 4 px above/below
             inline constexpr int kPadding = Spacing::kLarge; // 12 — align with Body column / Patch Edit inset
-            // Legacy footer chrome token (÷4 exception); sticky severity square does not use this.
+            // Legacy footer chrome token (÷4 exception); sticky severity close square does not use this.
             inline constexpr int kIconSize = 14;
             inline constexpr int kSeverityBadgeHeight = 16;
-            // Uniform inset border (left / top / bottom) around the sticky severity icon square.
-            inline constexpr int kSeverityBadgeIconInset = 2;
-            // Smoke-validated sticky square: badge height minus the uniform inset on both sides.
-            inline constexpr int kSeverityBadgeIconSide =
-                kSeverityBadgeHeight - 2 * kSeverityBadgeIconInset;
+            // Close square side matches badge height (permanent dismiss chrome).
+            inline constexpr int kSeverityBadgeCloseSide = kSeverityBadgeHeight;
+            // Sticky separator at 100% UI Scale (ladder: 1/2/3/4 px — see stickySeveritySeparatorThickness).
+            inline constexpr int kSeverityBadgeSeparatorThickness = 2;
             inline constexpr int kSeverityBadgeHorizontalPadding = Spacing::kStandard;
             inline constexpr int kSeverityBadgeToMessageGap = Spacing::kMedium;
         }

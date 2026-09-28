@@ -90,8 +90,7 @@ void FooterPanel::paintStatusMessage(juce::Graphics& g,
         detailColour,
         font,
         BadgeChromeMode::SeverityIcon,
-        severityBadgeHovered_,
-        currentSeverity
+        severityBadgeHovered_
     });
 }
 

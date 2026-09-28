@@ -2,95 +2,56 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
-#include "GUI/Helpers/StickyInfoMessagePolicy.h"
+#include "GUI/Layout/Design/DesignPanels.h"
 
 namespace TSS
 {
-    /** Unit-square close cross — same geometry as Settings/About close Path. */
+    /** Unit-square close cross — slightly thicker than Settings/About for footer readability. */
     inline juce::Path makeSeverityCloseCrossShape()
     {
         juce::Path shape;
-        constexpr float crossThickness = 0.15f;
+        constexpr float crossThickness = 0.22f;
         shape.addLineSegment({ 0.0f, 0.0f, 1.0f, 1.0f }, crossThickness);
         shape.addLineSegment({ 1.0f, 0.0f, 0.0f, 1.0f }, crossThickness);
         return shape;
     }
 
-    /** Info picto: stem + top dot in unit square. */
-    inline juce::Path makeSeverityInfoPictoShape()
+    /**
+     * Discrete separator thickness by UI Scale preset (not a floating stroke scale):
+     * 50%/75% → 1 px, 100%/125% → design base (2 px), 150%/175% → 3 px, 200% → 4 px.
+     */
+    inline int stickySeveritySeparatorThickness(float uiScale)
     {
-        juce::Path shape;
-        shape.addEllipse(0.38f, 0.12f, 0.24f, 0.24f);
-        shape.addRectangle(0.42f, 0.42f, 0.16f, 0.46f);
-        return shape;
+        if (uiScale >= 2.0f)
+            return 4;
+        if (uiScale >= 1.5f)
+            return 3;
+        if (uiScale >= 1.0f)
+            return Design::Panels::Footer::kSeverityBadgeSeparatorThickness;
+        return 1;
     }
 
-    /** Warning picto: filled triangle pointing up. */
-    inline juce::Path makeSeverityWarningPictoShape()
-    {
-        juce::Path shape;
-        shape.addTriangle(0.5f, 0.08f, 0.92f, 0.92f, 0.08f, 0.92f);
-        return shape;
-    }
-
-    /** Error picto: octagon outline filled as a regular octagon. */
-    inline juce::Path makeSeverityErrorPictoShape()
-    {
-        juce::Path shape;
-        constexpr float a = 0.12f;
-        constexpr float b = 0.38f;
-        constexpr float c = 0.62f;
-        constexpr float d = 0.88f;
-        shape.startNewSubPath(b, a);
-        shape.lineTo(c, a);
-        shape.lineTo(d, b);
-        shape.lineTo(d, c);
-        shape.lineTo(c, d);
-        shape.lineTo(b, d);
-        shape.lineTo(a, c);
-        shape.lineTo(a, b);
-        shape.closeSubPath();
-        return shape;
-    }
-
-    inline juce::Path severityPictoFor(StickyMessageSeverity severity)
-    {
-        switch (severity)
-        {
-            case StickyMessageSeverity::Info:
-                return makeSeverityInfoPictoShape();
-            case StickyMessageSeverity::Warning:
-                return makeSeverityWarningPictoShape();
-            case StickyMessageSeverity::Error:
-                return makeSeverityErrorPictoShape();
-            case StickyMessageSeverity::None:
-            default:
-                return {};
-        }
-    }
-
-    /** Metrics for sticky severity badge: [inset + icon square][label + horizontal padding]. */
+    /** Metrics for sticky severity chrome: [close square][separator][label + pad]. */
     struct StickySeverityBadgeMetrics
     {
-        int iconSide = 0;
-        int iconInset = 0;
+        int closeSide = 0;
+        int separatorThickness = 0;
         int labelWidth = 0;
         int badgePad = 0;
         int badgeHeight = 0;
     };
 
-    /** Left strip holding the uniform inset + icon square (no right inset before label). */
-    inline int stickySeverityIconStripWidth(const StickySeverityBadgeMetrics& metrics)
+    inline int stickySeverityCloseStripWidth(const StickySeverityBadgeMetrics& metrics)
     {
-        return juce::jmax(0, metrics.iconInset) + juce::jmax(0, metrics.iconSide);
+        return juce::jmax(0, metrics.closeSide) + juce::jmax(0, metrics.separatorThickness);
     }
 
-    /** Hover changes only the glyph inside the square; label width stays fixed. */
+    /** Layout width is hover-stable (no CLOSE label swap). */
     inline int stickySeverityBadgeWidth(const StickySeverityBadgeMetrics& metrics)
     {
         const int textWidth = juce::jmax(0, metrics.labelWidth)
                               + 2 * juce::jmax(0, metrics.badgePad);
-        return stickySeverityIconStripWidth(metrics) + textWidth;
+        return stickySeverityCloseStripWidth(metrics) + textWidth;
     }
 
     inline juce::Rectangle<int> stickySeverityBadgeBounds(juce::Rectangle<int> bandBounds,
@@ -101,38 +62,54 @@ namespace TSS
         return { bandBounds.getX(), y, width, metrics.badgeHeight };
     }
 
-    /** Icon square inset from badge left / top / bottom by the same uniform inset. */
-    inline juce::Rectangle<int> stickySeverityIconSquareBounds(
+    /** Close square — left of chrome, side = badge height when space allows. */
+    inline juce::Rectangle<int> stickySeverityCloseSquareBounds(
         juce::Rectangle<int> badgeBounds,
         const StickySeverityBadgeMetrics& metrics)
     {
-        const int inset = juce::jmax(0, metrics.iconInset);
-        const int side = juce::jmin(juce::jmax(0, metrics.iconSide),
-                                    juce::jmax(0, metrics.badgeHeight - 2 * inset),
-                                    juce::jmax(0, badgeBounds.getWidth() - 2 * inset));
+        const int side = juce::jmin(juce::jmax(0, metrics.closeSide),
+                                    juce::jmax(0, metrics.badgeHeight),
+                                    juce::jmax(0, badgeBounds.getWidth()));
         return {
-            badgeBounds.getX() + inset,
-            badgeBounds.getY() + inset,
+            badgeBounds.getX(),
+            badgeBounds.getY() + (metrics.badgeHeight - side) / 2,
             side,
             side
         };
     }
 
-    struct SeverityIconPaintArgs
+    inline juce::Rectangle<int> stickySeveritySeparatorBounds(
+        juce::Rectangle<int> badgeBounds,
+        const StickySeverityBadgeMetrics& metrics)
+    {
+        const auto square = stickySeverityCloseSquareBounds(badgeBounds, metrics);
+        const int thickness = juce::jmin(juce::jmax(0, metrics.separatorThickness),
+                                         juce::jmax(0, badgeBounds.getRight() - square.getRight()));
+        return {
+            square.getRight(),
+            badgeBounds.getY(),
+            thickness,
+            metrics.badgeHeight
+        };
+    }
+
+    struct SeverityCloseGlyphPaintArgs
     {
         juce::Rectangle<int> square;
         const juce::Path& unitGlyph;
         juce::Colour glyphColour;
     };
 
-    /** Paint picto or close cross inside an already-filled square (no second fill). */
-    inline void paintSeverityGlyphInSquare(juce::Graphics& g, const SeverityIconPaintArgs& args)
+    /** Paint permanent close cross inside an already-filled square (no second fill). */
+    inline void paintSeverityCloseGlyphInSquare(juce::Graphics& g,
+                                                const SeverityCloseGlyphPaintArgs& args)
     {
         if (args.unitGlyph.isEmpty() || args.square.isEmpty())
             return;
 
         auto glyph = args.unitGlyph;
-        const float inset = static_cast<float>(args.square.getWidth()) * 0.18f;
+        // Slightly smaller than the former 0.18 inset so the bold cross reads with margin.
+        const float inset = static_cast<float>(args.square.getWidth()) * 0.26f;
         glyph.scaleToFit(static_cast<float>(args.square.getX()) + inset,
                          static_cast<float>(args.square.getY()) + inset,
                          static_cast<float>(args.square.getWidth()) - 2.0f * inset,

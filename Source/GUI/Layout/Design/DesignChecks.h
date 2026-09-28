@@ -43,17 +43,12 @@ namespace TSS::Design
     static_assert(Panels::Footer::kSeverityBadgeHeight == 16, "Footer severity badge height");
     static_assert(Panels::Footer::kSeverityBadgeHeight % 4 == 0,
                   "Footer severity badge height must be on the design ÷4 grid");
-    static_assert(Panels::Footer::kSeverityBadgeIconInset == 2,
-                  "Footer severity badge icon uniform inset");
-    static_assert(Panels::Footer::kSeverityBadgeIconSide == 12,
-                  "Footer sticky severity icon square is height minus uniform inset");
-    static_assert(Panels::Footer::kSeverityBadgeIconSide
-                      == Panels::Footer::kSeverityBadgeHeight
-                         - 2 * Panels::Footer::kSeverityBadgeIconInset,
-                  "Footer sticky severity icon square must match height - 2 * inset");
-    static_assert(Panels::Footer::kSeverityBadgeHeight
-                      > 2 * Panels::Footer::kSeverityBadgeIconInset,
-                  "Footer severity badge height must leave room for icon inset");
+    static_assert(Panels::Footer::kSeverityBadgeCloseSide == Panels::Footer::kSeverityBadgeHeight,
+                  "Footer sticky close square side matches badge height");
+    static_assert(Panels::Footer::kSeverityBadgeCloseSide % 4 == 0,
+                  "Footer sticky close square must be on the design ÷4 grid");
+    static_assert(Panels::Footer::kSeverityBadgeSeparatorThickness == 2,
+                  "Footer sticky separator thickness at 100% UI Scale");
     static_assert(Panels::Footer::kSeverityBadgeHorizontalPadding == 4,
                   "Footer severity badge horizontal padding");
     static_assert(Panels::Footer::kSeverityBadgeToMessageGap == 8,

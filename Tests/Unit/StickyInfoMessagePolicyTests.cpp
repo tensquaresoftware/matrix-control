@@ -2,6 +2,7 @@
 
 #include "GUI/Helpers/FooterSeverityBadge.h"
 #include "GUI/Helpers/StickyInfoMessagePolicy.h"
+#include "GUI/Layout/Design/DesignPanels.h"
 #include "Shared/Definitions/PluginIDs.h"
 
 class StickyInfoMessagePolicyTests : public juce::UnitTest
@@ -20,6 +21,7 @@ public:
         pauseResumeAndFireGates();
         timerFireWhileHelpDefersClear();
         badgeHitAreaAndStableSquare();
+        separatorThicknessByUiScale();
         autoClearDurationIsFiveSeconds();
     }
 
@@ -110,25 +112,30 @@ private:
 
     void badgeHitAreaAndStableSquare()
     {
-        beginTest("Badge hit area - square + label width stable; HELP hides hit area");
+        beginTest("Badge chrome - close square + separator + label; hit square only; HELP hides");
 
         expect(TSS::shouldShowStickySeverityBadgeHitArea(true, false));
         expect(! TSS::shouldShowStickySeverityBadgeHitArea(true, true));
         expect(! TSS::shouldShowStickySeverityBadgeHitArea(false, false));
 
         const juce::Rectangle<int> band { 10, 20, 200, 18 };
-        // Combined badge = left uniform inset + square + label padding; hover is not an input.
-        const TSS::StickySeverityBadgeMetrics metrics { 12, 2, 40, 4, 16 };
-        expectEquals(TSS::stickySeverityIconStripWidth(metrics), 2 + 12);
-        expectEquals(TSS::stickySeverityBadgeWidth(metrics), 2 + 12 + 40 + 8);
+        // closeSide 16 + sep 1 + label 40 + 2*pad 4 = 65; hover is not an input.
+        const TSS::StickySeverityBadgeMetrics metrics { 16, 1, 40, 4, 16 };
+        expectEquals(TSS::stickySeverityCloseStripWidth(metrics), 16 + 1);
+        expectEquals(TSS::stickySeverityBadgeWidth(metrics), 16 + 1 + 40 + 8);
         const auto badge = TSS::stickySeverityBadgeBounds(band, metrics);
-        expectEquals(badge.getWidth(), 2 + 12 + 40 + 8);
+        expectEquals(badge.getWidth(), 16 + 1 + 40 + 8);
         expectEquals(badge.getX(), 10);
-        const auto square = TSS::stickySeverityIconSquareBounds(badge, metrics);
-        expectEquals(square.getX(), badge.getX() + 2);
-        expectEquals(square.getY(), badge.getY() + 2);
-        expectEquals(square.getWidth(), 12);
-        expectEquals(square.getHeight(), 12);
+        const auto square = TSS::stickySeverityCloseSquareBounds(badge, metrics);
+        expectEquals(square.getX(), badge.getX());
+        expectEquals(square.getY(), badge.getY());
+        expectEquals(square.getWidth(), 16);
+        expectEquals(square.getHeight(), 16);
+        expect(square.getWidth() < badge.getWidth());
+        const auto separator = TSS::stickySeveritySeparatorBounds(badge, metrics);
+        expectEquals(separator.getX(), square.getRight());
+        expectEquals(separator.getWidth(), 1);
+        expectEquals(separator.getHeight(), 16);
         const auto badgeAgain = TSS::stickySeverityBadgeBounds(band, metrics);
         expectEquals(badgeAgain.getWidth(), badge.getWidth());
         expectEquals(badgeAgain.getHeight(), badge.getHeight());
@@ -136,9 +143,24 @@ private:
         const juce::Rectangle<int> narrowBand { 10, 20, 10, 18 };
         const auto narrowBadge = TSS::stickySeverityBadgeBounds(narrowBand, metrics);
         expectEquals(narrowBadge.getWidth(), 10);
-        const auto narrowSquare = TSS::stickySeverityIconSquareBounds(narrowBadge, metrics);
-        expect(narrowSquare.getWidth() <= juce::jmax(0, narrowBadge.getWidth() - 4));
+        const auto narrowSquare = TSS::stickySeverityCloseSquareBounds(narrowBadge, metrics);
+        expect(narrowSquare.getWidth() <= narrowBadge.getWidth());
         expectEquals(narrowSquare.getWidth(), narrowSquare.getHeight());
+    }
+
+    void separatorThicknessByUiScale()
+    {
+        beginTest("Separator thickness discrete by UI Scale");
+
+        expectEquals(TSS::stickySeveritySeparatorThickness(0.5f), 1);
+        expectEquals(TSS::stickySeveritySeparatorThickness(0.75f), 1);
+        expectEquals(TSS::stickySeveritySeparatorThickness(1.0f),
+                     TSS::Design::Panels::Footer::kSeverityBadgeSeparatorThickness);
+        expectEquals(TSS::stickySeveritySeparatorThickness(1.25f),
+                     TSS::Design::Panels::Footer::kSeverityBadgeSeparatorThickness);
+        expectEquals(TSS::stickySeveritySeparatorThickness(1.5f), 3);
+        expectEquals(TSS::stickySeveritySeparatorThickness(1.75f), 3);
+        expectEquals(TSS::stickySeveritySeparatorThickness(2.0f), 4);
     }
 
     void autoClearDurationIsFiveSeconds()

@@ -2083,3 +2083,15 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-settings-interface-info-message.md`
   summary: Leave-clear binder hover-only wiring (focus must not block HELP clear after mouseExit) has no automated check beyond pure `shouldClearContextualHelpOverlay` bools; binder `resolveHoveredControl` / `applyClearIfIdle` are untested.
   evidence: Verification Gap; CONVENTIONS forbid GUI component unit tests; pure gate retitled/covered; sticky/AUTO CLEAR pause depends on HELP actually clearing on leave — covered by manual smoke.
+
+## Deferred from: review of spec-footer-sticky-severity-badge-chrome.md (2026-09-28)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-footer-sticky-severity-badge-chrome.md`
+  summary: Done spec `spec-settings-interface-info-message.md` still documents picto→cross and full-badge hit-zone; product contract text is historically contradictory until that artifact is annotated as superseded for chrome only.
+  evidence: Done frozen specs are not rewritten in oneshot; KEEP/AUTO CLEAR contract there remains valid — chrome clauses only are obsolete. ColourChart close-square hover-fill defer removed in follow-up code review (2026-09-28): shipped hover recolors the cross via SkinColourId::kButtonTextHover only.
+
+## Deferred from: code review of spec-footer-sticky-severity-badge-chrome.md (2026-09-28)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-footer-sticky-severity-badge-chrome.md`
+  summary: Unit tests claim “hit square only” via pure geometry helpers, but FooterPanel::updateSeverityBadgeHitAreaBounds wiring is not covered; a full-badge hit-zone regression would still leave StickyInfoMessagePolicyTests green.
+  evidence: Verification Gap; CONVENTIONS forbid GUI component / paint unit tests; oneshot relies on manual smoke for click/hand-cursor scope.
