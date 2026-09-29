@@ -12,5 +12,8 @@ namespace TSS
         virtual juce::Font getBaseFont() const = 0;
         virtual juce::Font getBaseFontBold() const = 0;
         virtual juce::Font getBrandFontBold() const = 0;
+        /** Embedded Montserrat for readable lowercase modal body copy. */
+        virtual juce::Font getModalBodyFont() const = 0;
+        virtual juce::Font getModalBodyFontBold() const = 0;
     };
 }

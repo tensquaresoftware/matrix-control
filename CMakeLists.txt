@@ -123,6 +123,8 @@ juce_add_binary_data(PluginFonts
         Assets/Fonts/PTSansNarrow-Regular.ttf
         Assets/Fonts/PTSansNarrow-Bold.ttf
         Assets/Fonts/Orbitron-Bold.ttf
+        Assets/Fonts/Montserrat-Regular.ttf
+        Assets/Fonts/Montserrat-Bold.ttf
 )
 
 # ============================================================================
@@ -249,11 +251,14 @@ set(PLUGIN_SOURCES
     Source/GUI/PluginEditorFileDragDrop.cpp
     Source/GUI/About/AboutPanel.cpp
     Source/GUI/About/AboutWindow.cpp
+    Source/GUI/Dialogs/AudioMidiSettingsWindow.cpp
     Source/GUI/Dialogs/BankTransferProgressDialog.cpp
+    Source/GUI/Dialogs/DialogMatrixHelpers.cpp
     Source/GUI/Dialogs/EpromTypePromptDialog.cpp
     Source/GUI/Dialogs/EpromTypePromptDialogLayout.cpp
     Source/GUI/Dialogs/MasterInitConfirmDialog.cpp
     Source/GUI/Dialogs/MasterM1kmLoadChoiceDialog.cpp
+    Source/GUI/Dialogs/MatrixOrderedConfirmDialog.cpp
     Source/GUI/Dialogs/MutatorHistoryDefragConfirmDialog.cpp
     Source/GUI/Factories/WidgetFactory.cpp
     Source/GUI/Factories/DimensionFactory.cpp
@@ -575,6 +580,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/EditorPathTests.cpp
         Tests/Unit/AudioPassthroughProcessorTests.cpp
         Tests/Unit/AudioFromSourceSyncTests.cpp
+        Tests/Unit/AudioDevicePreferredSetupTests.cpp
         Tests/Unit/AudioInputSourceCatalogTests.cpp
         Tests/Unit/HardwareLatencyTests.cpp
         Tests/Unit/InstrumentMidiForwarderTests.cpp

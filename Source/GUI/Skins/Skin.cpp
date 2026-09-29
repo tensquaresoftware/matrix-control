@@ -64,6 +64,24 @@ namespace TSS
         return juce::Font(juce::FontOptions(typeface).withHeight(kBrandFontHeight_));
     }
 
+    juce::Font Skin::getModalBodyFont() const
+    {
+        const auto typeface = juce::Typeface::createSystemTypefaceFor(
+            PluginFontsData::MontserratRegular_ttf,
+            static_cast<size_t>(PluginFontsData::MontserratRegular_ttfSize)
+        );
+        return juce::Font(juce::FontOptions(typeface).withHeight(kSkinBaseFontHeight_));
+    }
+
+    juce::Font Skin::getModalBodyFontBold() const
+    {
+        const auto typeface = juce::Typeface::createSystemTypefaceFor(
+            PluginFontsData::MontserratBold_ttf,
+            static_cast<size_t>(PluginFontsData::MontserratBold_ttfSize)
+        );
+        return juce::Font(juce::FontOptions(typeface).withHeight(kSkinBaseFontHeight_));
+    }
+
     juce::Colour Skin::getToggleBackgroundColour(bool isOn) const
     {
         return getColour(isOn ? SkinColourId::kToggleBackgroundOn : SkinColourId::kToggleBackgroundOff);

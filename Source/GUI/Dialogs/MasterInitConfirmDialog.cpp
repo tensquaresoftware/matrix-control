@@ -1,33 +1,30 @@
 #include "MasterInitConfirmDialog.h"
 
+#include "GUI/Dialogs/DialogMatrixHelpers.h"
 #include "GUI/Skins/Skin.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 
 using TSS::SkinColourId;
 
-namespace
-{
-    constexpr juce::uint32 kDialogBorderColour = 0xff5E5E5E;
-}
-
 MasterInitConfirmDialog::MasterInitConfirmDialog(TSS::ISkin& skin, std::function<void()> onDismissRequested)
     : onDismissRequested_(std::move(onDismissRequested))
     , skin_(&skin)
-    , resetButton_(PluginDisplayNames::Dialogs::MasterInitConfirm::kConfirm)
-    , cancelButton_(PluginDisplayNames::Dialogs::MasterInitConfirm::kCancel)
 {
     setOpaque(false);
     setInterceptsMouseClicks(true, true);
     setWantsKeyboardFocus(true);
 
-    resetButton_.onClick = [this] { confirm(); };
-    cancelButton_.onClick = [this] { dismiss(); };
+    resetButton_ = DialogMatrixHelpers::makeButton(
+        skin, DialogMatrixHelpers::kDefaultButtonWidth, PluginDisplayNames::Dialogs::MasterInitConfirm::kConfirm);
+    cancelButton_ = DialogMatrixHelpers::makeButton(
+        skin, DialogMatrixHelpers::kDefaultButtonWidth, PluginDisplayNames::Dialogs::MasterInitConfirm::kCancel);
+
+    resetButton_->onClick = [this] { confirm(); };
+    cancelButton_->onClick = [this] { dismiss(); };
     // Cancel must not consume Return — Enter always confirms Reset (primary).
-    cancelButton_.setWantsKeyboardFocus(false);
-    cancelButton_.setMouseClickGrabsKeyboardFocus(false);
-    resetButton_.setMouseClickGrabsKeyboardFocus(false);
-    addAndMakeVisible(resetButton_);
-    addAndMakeVisible(cancelButton_);
+    cancelButton_->setWantsKeyboardFocus(false);
+    addAndMakeVisible(*resetButton_);
+    addAndMakeVisible(*cancelButton_);
 }
 
 MasterInitConfirmDialog::~MasterInitConfirmDialog() = default;
@@ -52,6 +49,8 @@ void MasterInitConfirmDialog::prepareForGlobalShow(std::function<void()> onConfi
 void MasterInitConfirmDialog::setSkin(TSS::ISkin& skin)
 {
     skin_ = &skin;
+    DialogMatrixHelpers::applyButtonSkin(*resetButton_, skin);
+    DialogMatrixHelpers::applyButtonSkin(*cancelButton_, skin);
     repaint();
 }
 
@@ -61,6 +60,8 @@ void MasterInitConfirmDialog::setUiScale(float uiScale)
         return;
 
     uiScale_ = uiScale;
+    DialogMatrixHelpers::applyButtonUiScale(*resetButton_, uiScale);
+    DialogMatrixHelpers::applyButtonUiScale(*cancelButton_, uiScale);
     resized();
     repaint();
 }
@@ -106,41 +107,34 @@ void MasterInitConfirmDialog::confirm()
 
 void MasterInitConfirmDialog::paint(juce::Graphics& g)
 {
-    g.fillAll(skin_->getColour(SkinColourId::kBodyPanelBackground).withAlpha(0.85f));
-
     const auto dialogBounds = getDialogBounds();
     const int border = getBorderThickness();
+    const int titleBarHeight = juce::roundToInt(static_cast<float>(kTitleBarHeight_) * uiScale_);
+    const auto title = globalReset_ ? PluginDisplayNames::Dialogs::MasterGlobalInitConfirm::kTitle
+                                    : PluginDisplayNames::Dialogs::MasterInitConfirm::kTitle;
 
-    g.setColour(juce::Colour(kDialogBorderColour));
-    g.fillRect(dialogBounds);
+    DialogMatrixHelpers::paintMatrixOverlayChrome({
+        .g = g,
+        .skin = *skin_,
+        .dialogBounds = dialogBounds,
+        .borderThickness = border,
+        .titleBarHeight = titleBarHeight,
+        .title = title,
+        .uiScale = uiScale_ });
 
     auto inner = dialogBounds.reduced(border);
-    const int titleBarHeight = juce::roundToInt(static_cast<float>(kTitleBarHeight_) * uiScale_);
-    auto titleBar = inner.removeFromTop(titleBarHeight);
-    auto content = inner;
+    inner.removeFromTop(titleBarHeight);
 
-    g.setColour(skin_->getColour(SkinColourId::kHeaderPanelBackground));
-    g.fillRect(titleBar);
-    g.fillRect(content);
-
-    g.setColour(skin_->getColour(SkinColourId::kDarkPanelText));
-    g.setFont(skin_->getBaseFontBold().withHeight(skin_->getBaseFontBold().getHeight() * uiScale_));
-    g.drawText(globalReset_ ? PluginDisplayNames::Dialogs::MasterGlobalInitConfirm::kTitle
-                            : PluginDisplayNames::Dialogs::MasterInitConfirm::kTitle,
-               titleBar,
-               juce::Justification::centred,
-               false);
-
-    // Custom modal scheme: exactly 1em under the title, then body copy (no extra top padding).
-    const auto bodyFont = skin_->getBaseFont().withHeight(skin_->getBaseFont().getHeight() * uiScale_);
+    const auto bodyFont = DialogMatrixHelpers::scaledModalBodyFont(*skin_, uiScale_);
     const int gapUnderTitle = juce::roundToInt(bodyFont.getHeight());
     const int padX = juce::roundToInt(12.0f * uiScale_);
 
-    auto textArea = content;
+    auto textArea = inner;
     textArea.removeFromTop(gapUnderTitle);
     textArea = textArea.withTrimmedLeft(padX).withTrimmedRight(padX);
     textArea.removeFromBottom(juce::roundToInt(36.0f * uiScale_));
 
+    g.setColour(skin_->getColour(SkinColourId::kDarkPanelText));
     g.setFont(bodyFont);
     g.drawFittedText(formatBodyText(), textArea, juce::Justification::topLeft, 6);
 }
@@ -151,15 +145,17 @@ void MasterInitConfirmDialog::resized()
     inner.removeFromTop(juce::roundToInt(static_cast<float>(kTitleBarHeight_) * uiScale_));
 
     const int padding = juce::roundToInt(12.0f * uiScale_);
-    const int buttonHeight = juce::roundToInt(24.0f * uiScale_);
-    const int buttonWidth = juce::roundToInt(72.0f * uiScale_);
+    const int buttonHeight = juce::roundToInt(
+        static_cast<float>(DialogMatrixHelpers::kDefaultButtonHeight) * uiScale_);
+    const int buttonWidth = juce::roundToInt(
+        static_cast<float>(DialogMatrixHelpers::kDefaultButtonWidth) * uiScale_);
     const int buttonGap = juce::roundToInt(8.0f * uiScale_);
 
     auto buttonRow = inner.reduced(padding).removeFromBottom(buttonHeight);
     // LTR: Cancel left, Reset (primary / default) right
-    resetButton_.setBounds(buttonRow.removeFromRight(buttonWidth));
+    resetButton_->setBounds(buttonRow.removeFromRight(buttonWidth));
     buttonRow.removeFromRight(buttonGap);
-    cancelButton_.setBounds(buttonRow.removeFromRight(buttonWidth));
+    cancelButton_->setBounds(buttonRow.removeFromRight(buttonWidth));
 }
 
 void MasterInitConfirmDialog::mouseDown(const juce::MouseEvent& e)

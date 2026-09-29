@@ -23,6 +23,7 @@ class HeaderPanel;
 class SettingsPanel;
 class SettingsWindow;
 class AboutWindow;
+class AudioMidiSettingsWindow;
 class MasterInitConfirmDialog;
 class MasterM1kmLoadChoiceDialog;
 class MutatorHistoryDefragConfirmDialog;
@@ -38,6 +39,9 @@ class PluginEditor : public juce::AudioProcessorEditor,
 public:
     explicit PluginEditor(PluginProcessor&);
     ~PluginEditor() override;
+
+    TSS::ISkin& getActiveSkin() noexcept;
+    float getAppliedUiScale() const noexcept { return appliedUiScale_; }
 
     void paint(juce::Graphics&) override;
     void resized() override;
@@ -175,6 +179,8 @@ private:
 
     void openSettingsWindow();
     void closeSettingsWindow();
+    void openAudioMidiSettingsWindow();
+    void closeAudioMidiSettingsWindow();
     void openAboutWindow();
     void closeAboutWindow();
     void openMasterInitConfirmDialog(const juce::String& moduleDisplayName, std::function<void()> onConfirm);
@@ -215,6 +221,7 @@ private:
     void restoreSettingsPanelFromState(SettingsPanel& panel);
     void restoreHeaderPanelFromState(HeaderPanel& headerPanel);
     void updateSettingsWindowLayout(float uiScale);
+    void updateAudioMidiSettingsWindowLayout(float uiScale);
     void updateAboutWindowLayout(float uiScale);
     void updateMasterInitConfirmDialogLayout(float uiScale);
     void updateMasterM1kmLoadChoiceDialogLayout(float uiScale);
@@ -238,6 +245,7 @@ private:
     bool uiElementsTestVisible_ = false;
 #endif
     std::unique_ptr<SettingsWindow> settingsWindow_;
+    std::unique_ptr<AudioMidiSettingsWindow> audioMidiSettingsWindow_;
     std::unique_ptr<AboutWindow> aboutWindow_;
     std::unique_ptr<MasterInitConfirmDialog> masterInitConfirmDialog_;
     std::unique_ptr<MasterM1kmLoadChoiceDialog> masterM1kmLoadChoiceDialog_;

@@ -6,6 +6,7 @@
 
 #include "GUI/About/AboutWindow.h"
 #include "GUI/About/AboutPanel.h"
+#include "GUI/Dialogs/AudioMidiSettingsWindow.h"
 #include "GUI/Dialogs/BankTransferProgressDialog.h"
 #include "GUI/Dialogs/EpromTypePromptDialog.h"
 #include "GUI/Dialogs/MasterInitConfirmDialog.h"
@@ -69,26 +70,10 @@ void PluginEditor::updateBankTransferProgressDialogLayout(float uiScale)
     bankTransferProgressDialog_->setBounds(getLocalBounds());
 }
 
-bool PluginEditor::isEscapeBlockedByOverlay() const
-{
-    const auto visible = [](const auto& c) { return c != nullptr && c->isVisible(); };
-    return visible(settingsWindow_) || visible(aboutWindow_)
-        || visible(masterInitConfirmDialog_) || isMasterM1kmLoadChoiceDialogVisible()
-        || visible(mutatorHistoryDefragConfirmDialog_)
-        || visible(epromTypePromptDialog_) || visible(bankTransferProgressDialog_);
-}
-
-SettingsPanel* PluginEditor::getSettingsPanelIfOpen()
-{
-    if (settingsWindow_ == nullptr || !settingsWindow_->isVisible())
-        return nullptr;
-
-    return &settingsWindow_->getSettingsPanel();
-}
-
 void PluginEditor::openSettingsWindow()
 {
     closeAboutWindow();
+    closeAudioMidiSettingsWindow();
     closeMutatorHistoryDefragConfirmDialog();
 
     if (settingsWindow_ == nullptr)
@@ -137,6 +122,7 @@ void PluginEditor::closeSettingsWindow()
 void PluginEditor::openAboutWindow()
 {
     closeSettingsWindow();
+    closeAudioMidiSettingsWindow();
     closeMutatorHistoryDefragConfirmDialog();
 
     if (aboutWindow_ == nullptr)

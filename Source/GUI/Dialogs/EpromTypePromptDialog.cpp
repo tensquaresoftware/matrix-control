@@ -1,6 +1,7 @@
 #include "EpromTypePromptDialog.h"
 
 #include "Core/Services/EpromTypePolicy.h"
+#include "GUI/Dialogs/DialogMatrixHelpers.h"
 #include "GUI/Helpers/DeviceVersionDisplayFormat.h"
 #include "GUI/Helpers/MidiPortComboPopulation.h"
 #include "GUI/Looks/LookBuilders.h"
@@ -12,8 +13,6 @@
 EpromTypePromptDialog::EpromTypePromptDialog(TSS::ISkin& skin, std::function<void()> onDismissRequested)
     : onDismissRequested_(std::move(onDismissRequested))
     , skin_(&skin)
-    , confirmButton_(PluginDisplayNames::Dialogs::EpromTypePrompt::kConfirm)
-    , specifyLaterButton_(PluginDisplayNames::Dialogs::EpromTypePrompt::kSpecifyLater)
 {
     setOpaque(false);
     setInterceptsMouseClicks(true, true);
@@ -27,11 +26,15 @@ EpromTypePromptDialog::EpromTypePromptDialog(TSS::ISkin& skin, std::function<voi
             epromComboTouchedByUser_ = true;
     };
 
-    confirmButton_.onClick = [this] { confirm(); };
-    specifyLaterButton_.onClick = [this] { dismissAsLater(); };
-    specifyLaterButton_.setWantsKeyboardFocus(false);
-    specifyLaterButton_.setMouseClickGrabsKeyboardFocus(false);
-    confirmButton_.setMouseClickGrabsKeyboardFocus(false);
+    confirmButton_ = DialogMatrixHelpers::makeButton(
+        skin, kConfirmButtonWidth_, PluginDisplayNames::Dialogs::EpromTypePrompt::kConfirm);
+    specifyLaterButton_ = DialogMatrixHelpers::makeButton(
+        skin, kSpecifyLaterButtonWidth_, PluginDisplayNames::Dialogs::EpromTypePrompt::kSpecifyLater);
+    confirmButton_->onClick = [this] { confirm(); };
+    specifyLaterButton_->onClick = [this] { dismissAsLater(); };
+    specifyLaterButton_->setWantsKeyboardFocus(false);
+    addAndMakeVisible(*confirmButton_);
+    addAndMakeVisible(*specifyLaterButton_);
 }
 
 void EpromTypePromptDialog::buildControls(TSS::ISkin& skin)
@@ -70,8 +73,6 @@ void EpromTypePromptDialog::buildControls(TSS::ISkin& skin)
     addAndMakeVisible(*deviceValueField_);
     addAndMakeVisible(*epromTypeLabel_);
     addAndMakeVisible(*epromTypeCombo_);
-    addAndMakeVisible(confirmButton_);
-    addAndMakeVisible(specifyLaterButton_);
 }
 
 EpromTypePromptDialog::~EpromTypePromptDialog()
@@ -191,6 +192,10 @@ void EpromTypePromptDialog::setSkin(TSS::ISkin& skin)
     epromTypeLabel_->setLook(TSS::labelLookFromSkin(skin));
     epromTypeCombo_->setLook(TSS::comboBoxLookFromSkin(skin));
     epromTypeCombo_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
+    if (confirmButton_ != nullptr)
+        DialogMatrixHelpers::applyButtonSkin(*confirmButton_, skin);
+    if (specifyLaterButton_ != nullptr)
+        DialogMatrixHelpers::applyButtonSkin(*specifyLaterButton_, skin);
     refreshDeviceValueField();
     repaint();
 }
@@ -201,6 +206,10 @@ void EpromTypePromptDialog::setUiScale(float uiScale)
         return;
 
     uiScale_ = uiScale;
+    if (confirmButton_ != nullptr)
+        DialogMatrixHelpers::applyButtonUiScale(*confirmButton_, uiScale);
+    if (specifyLaterButton_ != nullptr)
+        DialogMatrixHelpers::applyButtonUiScale(*specifyLaterButton_, uiScale);
     resized();
     repaint();
 }

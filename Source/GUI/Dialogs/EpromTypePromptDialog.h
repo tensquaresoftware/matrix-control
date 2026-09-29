@@ -9,6 +9,7 @@
 #include "Core/Services/DeviceSetupDeviceRow.h"
 #include "GUI/Widgets/ComboBox.h"
 #include "GUI/Widgets/Label.h"
+#include "GUI/Widgets/Button.h"
 #include "GUI/Widgets/ReadOnlyValueField.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
 
@@ -116,8 +117,8 @@ private:
     std::unique_ptr<TSS::ComboBox> epromTypeCombo_;
     std::vector<juce::String> midiFromPortIdentifiers_;
     std::vector<juce::String> midiToPortIdentifiers_;
-    juce::TextButton confirmButton_;
-    juce::TextButton specifyLaterButton_;
+    std::unique_ptr<TSS::Button> confirmButton_;
+    std::unique_ptr<TSS::Button> specifyLaterButton_;
 
     inline constexpr static int kTitleBarHeight_ = 28;
     inline constexpr static int kBorderThickness_ = 4;

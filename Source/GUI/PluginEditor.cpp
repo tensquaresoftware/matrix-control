@@ -3,6 +3,7 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 
 #include "GUI/About/AboutWindow.h"
+#include "GUI/Dialogs/AudioMidiSettingsWindow.h"
 #include "GUI/Dialogs/BankTransferProgressDialog.h"
 #include "GUI/Dialogs/EpromTypePromptDialog.h"
 #include "GUI/Dialogs/MasterInitConfirmDialog.h"
@@ -35,16 +36,48 @@ namespace
                 cancelActiveSliderDragSessions(*child);
         }
     }
+
+    template <typename T>
+    void updateOverlayBoundsIfVisible(T& overlay, juce::Rectangle<int> bounds)
+    {
+        if (overlay != nullptr && overlay->isVisible())
+            overlay->setBounds(bounds);
+    }
+
+    bool enforceStandaloneFixedSize(PluginEditor& editor,
+                                    const GuiLayoutDimensions& layoutDimensions,
+                                    float appliedUiScale)
+    {
+        const int targetWidth = juce::roundToInt(
+            static_cast<float>(layoutDimensions.editor.width) * appliedUiScale);
+        const int targetHeight = juce::roundToInt(
+            static_cast<float>(layoutDimensions.editor.height) * appliedUiScale);
+
+        editor.setResizeLimits(targetWidth, targetHeight, targetWidth, targetHeight);
+
+        if (editor.getWidth() != targetWidth || editor.getHeight() != targetHeight)
+        {
+            editor.setSize(targetWidth, targetHeight);
+            return true;
+        }
+
+        return false;
+    }
 }
 
 using TSS::SkinColourId;
+
+TSS::ISkin& PluginEditor::getActiveSkin() noexcept
+{
+    jassert(skin_ != nullptr);
+    return *skin_;
+}
 
 PluginEditor::PluginEditor(PluginProcessor& p)
     : AudioProcessorEditor(&p)
     , pluginProcessor(p)
 {
-    // Prefer OS-native alerts where LookAndFeel reports them (macOS/Windows).
-    // On Linux, JUCE forces isUsingNativeAlertWindows() false and draws AlertWindow.
+    // Native alerts remain available for any residual OS paths; product confirms use Matrix chrome.
     juce::LookAndFeel::getDefaultLookAndFeel().setUsingNativeAlertWindows(true);
 
     wirePatchAndMutatorBindings();
@@ -53,10 +86,23 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     setMutatorPanelDefragRecoveryBinding();
     restoreAndWireHeader();
     attachEditorRuntimeListeners();
+
+    if (pluginProcessor.isStandalone())
+    {
+        // Silence when AUDIO FROM is None comes from passthrough, not JUCE muteInput banner.
+        Core::StandaloneAudioInputRouter::enableInputMonitoring();
+        Core::StandaloneAudioInputRouter::setShowAudioMidiSettingsHandler(
+            [safeThis = juce::Component::SafePointer<PluginEditor>(this)]
+            {
+                if (safeThis != nullptr)
+                    safeThis->openAudioMidiSettingsWindow();
+            });
+    }
 }
 
 PluginEditor::~PluginEditor()
 {
+    Core::StandaloneAudioInputRouter::clearShowAudioMidiSettingsHandler();
     removeKeyListener(this);
     pluginProcessor.setMutatorDefragLimitModalGate({});
     pluginProcessor.setMutatorExportCollisionModalGate({});
@@ -76,6 +122,7 @@ PluginEditor::~PluginEditor()
 
     pluginProcessor.getApvts().state.removeListener(this);
     detachStandaloneAudioDeviceListener();
+    closeAudioMidiSettingsWindow();
     closeSettingsWindow();
     closeAboutWindow();
 }
@@ -91,28 +138,19 @@ void PluginEditor::resized()
     if (baseWidth <= 0)
         return;
 
-    if (pluginProcessor.isStandalone())
+    if (pluginProcessor.isStandalone()
+        && enforceStandaloneFixedSize(*this, layoutDimensions_, appliedUiScale_))
     {
-        const int targetWidth = juce::roundToInt(static_cast<float>(layoutDimensions_.editor.width) * appliedUiScale_);
-        const int targetHeight = juce::roundToInt(static_cast<float>(layoutDimensions_.editor.height) * appliedUiScale_);
-
-        setResizeLimits(targetWidth, targetHeight, targetWidth, targetHeight);
-
-        if (getWidth() != targetWidth || getHeight() != targetHeight)
-        {
-            setSize(targetWidth, targetHeight);
-            return;
-        }
+        return;
     }
 
     if (auto* comp = mainComponent_.get())
         comp->setBounds(getLocalBounds());
 
-    if (settingsWindow_ != nullptr && settingsWindow_->isVisible())
-        settingsWindow_->setBounds(getLocalBounds());
-
-    if (aboutWindow_ != nullptr && aboutWindow_->isVisible())
-        aboutWindow_->setBounds(getLocalBounds());
+    const auto bounds = getLocalBounds();
+    updateOverlayBoundsIfVisible(settingsWindow_, bounds);
+    updateOverlayBoundsIfVisible(audioMidiSettingsWindow_, bounds);
+    updateOverlayBoundsIfVisible(aboutWindow_, bounds);
 
 #if JUCE_DEBUG
     layoutUiElementsTestComponent();

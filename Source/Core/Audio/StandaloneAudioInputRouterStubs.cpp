@@ -1,5 +1,7 @@
 #include "Core/Audio/StandaloneAudioInputRouterDetail.h"
 
+#include <functional>
+
 namespace Core::StandaloneAudioInputRouterDetail
 {
     juce::StringArray getInputChannelNames()
@@ -32,6 +34,15 @@ namespace Core::StandaloneAudioInputRouterDetail
     }
 
     void disableInputMonitoring()
+    {
+    }
+
+    void setShowAudioMidiSettingsHandler(std::function<void()> handler)
+    {
+        juce::ignoreUnused(handler);
+    }
+
+    void clearShowAudioMidiSettingsHandler()
     {
     }
 

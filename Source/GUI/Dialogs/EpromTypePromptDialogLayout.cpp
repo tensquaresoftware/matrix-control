@@ -1,14 +1,10 @@
 #include "EpromTypePromptDialog.h"
 
+#include "GUI/Dialogs/DialogMatrixHelpers.h"
 #include "GUI/Skins/Skin.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 
 using TSS::SkinColourId;
-
-namespace
-{
-    constexpr juce::uint32 kDialogBorderColour = 0xff5E5E5E;
-}
 
 int EpromTypePromptDialog::getBorderThickness() const
 {
@@ -44,7 +40,7 @@ EpromTypePromptDialog::ContentLayout EpromTypePromptDialog::computeContentLayout
     layout.buttonRow = content.removeFromBottom(buttonHeight);
     content.removeFromBottom(gapAboveButtons);
 
-    const auto bodyFont = skin_->getBaseFont().withHeight(skin_->getBaseFont().getHeight() * uiScale_);
+    const auto bodyFont = DialogMatrixHelpers::scaledModalBodyFont(*skin_, uiScale_);
     const int gapUnderTitle = juce::roundToInt(bodyFont.getHeight());
     content.removeFromTop(gapUnderTitle);
 
@@ -79,32 +75,22 @@ juce::String EpromTypePromptDialog::searchingDetailWithDots() const
 
 void EpromTypePromptDialog::paint(juce::Graphics& g)
 {
-    g.fillAll(skin_->getColour(SkinColourId::kBodyPanelBackground).withAlpha(0.85f));
-
     const auto dialogBounds = getDialogBounds();
     const int border = getBorderThickness();
-
-    g.setColour(juce::Colour(kDialogBorderColour));
-    g.fillRect(dialogBounds);
-
-    auto inner = dialogBounds.reduced(border);
     const int titleBarHeight = juce::roundToInt(static_cast<float>(kTitleBarHeight_) * uiScale_);
-    auto titleBar = inner.removeFromTop(titleBarHeight);
-    auto contentFill = inner;
 
-    g.setColour(skin_->getColour(SkinColourId::kHeaderPanelBackground));
-    g.fillRect(titleBar);
-    g.fillRect(contentFill);
-
-    g.setColour(skin_->getColour(SkinColourId::kDarkPanelText));
-    g.setFont(skin_->getBaseFontBold().withHeight(skin_->getBaseFontBold().getHeight() * uiScale_));
-    g.drawText(PluginDisplayNames::Dialogs::EpromTypePrompt::kTitle,
-               titleBar,
-               juce::Justification::centred,
-               false);
+    DialogMatrixHelpers::paintMatrixOverlayChrome({
+        .g = g,
+        .skin = *skin_,
+        .dialogBounds = dialogBounds,
+        .borderThickness = border,
+        .titleBarHeight = titleBarHeight,
+        .title = PluginDisplayNames::Dialogs::EpromTypePrompt::kTitle,
+        .uiScale = uiScale_ });
 
     const auto layout = computeContentLayout();
-    const auto bodyFont = skin_->getBaseFont().withHeight(skin_->getBaseFont().getHeight() * uiScale_);
+    const auto bodyFont = DialogMatrixHelpers::scaledModalBodyFont(*skin_, uiScale_);
+    g.setColour(skin_->getColour(SkinColourId::kDarkPanelText));
     g.setFont(bodyFont);
     g.drawFittedText(bodyText(), layout.bodyTextArea, juce::Justification::topLeft, kMaxBodyFittedLines_);
 }
@@ -143,7 +129,7 @@ void EpromTypePromptDialog::resized()
     placeRow(3, *epromTypeLabel_, *epromTypeCombo_);
 
     auto buttonRow = layout.buttonRow;
-    confirmButton_.setBounds(buttonRow.removeFromRight(confirmWidth));
+    confirmButton_->setBounds(buttonRow.removeFromRight(confirmWidth));
     buttonRow.removeFromRight(buttonGap);
-    specifyLaterButton_.setBounds(buttonRow.removeFromRight(laterWidth));
+    specifyLaterButton_->setBounds(buttonRow.removeFromRight(laterWidth));
 }

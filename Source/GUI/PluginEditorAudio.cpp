@@ -6,15 +6,25 @@
 #include "PluginEditorInternal.h"
 
 #include "Core/Audio/StandaloneAudioInputRouter.h"
+#include "Core/Audio/AudioPassthroughProcessor.h"
 #include "Core/MIDI/EditorOutboundGate.h"
 #include "Core/MIDI/MidiManager.h"
 #include "Core/Services/DeviceTypeRegistry.h"
 #include "Core/Services/EpromTypePolicy.h"
+#include "GUI/Dialogs/AudioMidiSettingsWindow.h"
 #include "GUI/Dialogs/EpromTypePromptDialog.h"
+#include "GUI/Dialogs/MasterInitConfirmDialog.h"
+#include "GUI/Dialogs/MasterM1kmLoadChoiceDialog.h"
+#include "GUI/Dialogs/MutatorHistoryDefragConfirmDialog.h"
+#include "GUI/Dialogs/BankTransferProgressDialog.h"
+#include "GUI/About/AboutWindow.h"
 #include "GUI/Panels/MainComponent/HeaderPanel/HeaderPanel.h"
 #include "GUI/Settings/SettingsPanel.h"
+#include "GUI/Settings/SettingsWindow.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
 #include "Shared/Definitions/PluginIDs.h"
+
+#include <juce_audio_plugin_client/Standalone/juce_StandaloneFilterWindow.h>
 
 void PluginEditor::refreshAudioFromCombo(HeaderPanel* headerOverride)
 {
@@ -249,4 +259,82 @@ void PluginEditor::valueTreeRedirected(juce::ValueTree&)
             if (safeThis != nullptr)
                 safeThis->refreshAudioFromCombo();
         });
+}
+
+void PluginEditor::updateAudioMidiSettingsWindowLayout(float uiScale)
+{
+    if (audioMidiSettingsWindow_ == nullptr)
+        return;
+
+    audioMidiSettingsWindow_->setUiScale(uiScale);
+    audioMidiSettingsWindow_->setBounds(getLocalBounds());
+}
+
+void PluginEditor::openAudioMidiSettingsWindow()
+{
+    if (! pluginProcessor.isStandalone())
+        return;
+
+    auto* holder = juce::StandalonePluginHolder::getInstance();
+    if (holder == nullptr)
+        return;
+
+    closeSettingsWindow();
+    closeAboutWindow();
+    closeMasterInitConfirmDialog();
+    closeMasterM1kmLoadChoiceDialog();
+    closeMutatorHistoryDefragConfirmDialog();
+    closeEpromTypePromptDialog();
+    hideBankTransferProgressDialog();
+    closeAudioMidiSettingsWindow();
+
+    int maxInputs = 0;
+    int maxOutputs = 0;
+    if (auto* bus = pluginProcessor.getBus(true, 0))
+        maxInputs = juce::jmax(0, bus->getDefaultLayout().size());
+    if (auto* bus = pluginProcessor.getBus(false, 0))
+        maxOutputs = juce::jmax(0, bus->getDefaultLayout().size());
+
+    // Keep muteInput off so the stock blue feedback banner never appears.
+    Core::StandaloneAudioInputRouter::enableInputMonitoring();
+
+    audioMidiSettingsWindow_ = std::make_unique<AudioMidiSettingsWindow>(
+        AudioMidiSettingsWindow::Config{
+            .skin = skin_,
+            .deviceManager = &holder->deviceManager,
+            .maxInputChannels = maxInputs,
+            .maxOutputChannels = maxOutputs,
+            .peakLevelProvider = [this]
+            {
+                return pluginProcessor.getAudioPassthroughProcessor().getPeakLevel();
+            },
+            .onCloseRequested = [this] { closeAudioMidiSettingsWindow(); }});
+    addChildComponent(*audioMidiSettingsWindow_);
+
+    updateAudioMidiSettingsWindowLayout(appliedUiScale_);
+    audioMidiSettingsWindow_->setVisible(true);
+    audioMidiSettingsWindow_->toFront(true);
+    audioMidiSettingsWindow_->grabKeyboardFocus();
+}
+
+void PluginEditor::closeAudioMidiSettingsWindow()
+{
+    audioMidiSettingsWindow_.reset();
+}
+
+bool PluginEditor::isEscapeBlockedByOverlay() const
+{
+    const auto visible = [](const auto& c) { return c != nullptr && c->isVisible(); };
+    return visible(settingsWindow_) || visible(audioMidiSettingsWindow_) || visible(aboutWindow_)
+        || visible(masterInitConfirmDialog_) || isMasterM1kmLoadChoiceDialogVisible()
+        || visible(mutatorHistoryDefragConfirmDialog_)
+        || visible(epromTypePromptDialog_) || visible(bankTransferProgressDialog_);
+}
+
+SettingsPanel* PluginEditor::getSettingsPanelIfOpen()
+{
+    if (settingsWindow_ == nullptr || !settingsWindow_->isVisible())
+        return nullptr;
+
+    return &settingsWindow_->getSettingsPanel();
 }

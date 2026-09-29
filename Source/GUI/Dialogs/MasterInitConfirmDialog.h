@@ -5,6 +5,8 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
+#include "GUI/Widgets/Button.h"
+
 namespace TSS
 {
     class ISkin;
@@ -44,8 +46,8 @@ private:
     bool globalReset_ = false;
     float uiScale_ = 1.0f;
 
-    juce::TextButton resetButton_;
-    juce::TextButton cancelButton_;
+    std::unique_ptr<TSS::Button> resetButton_;
+    std::unique_ptr<TSS::Button> cancelButton_;
 
     inline constexpr static int kTitleBarHeight_ = 28;
     inline constexpr static int kBorderThickness_ = 4;

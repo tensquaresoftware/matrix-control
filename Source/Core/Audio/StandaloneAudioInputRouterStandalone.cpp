@@ -10,6 +10,12 @@ namespace Core::StandaloneAudioInputRouterDetail
 {
     namespace
     {
+        std::function<void()>& showAudioMidiSettingsHandler()
+        {
+            static std::function<void()> handler;
+            return handler;
+        }
+
         std::vector<Core::AudioInputSourceEntry> buildActiveDeviceCatalogEntries()
         {
             if (auto* holder = juce::StandalonePluginHolder::getInstance())
@@ -79,9 +85,27 @@ namespace Core::StandaloneAudioInputRouterDetail
             holder->getMuteInputValue().setValue(true);
     }
 
+    void setShowAudioMidiSettingsHandler(std::function<void()> handler)
+    {
+        showAudioMidiSettingsHandler() = std::move(handler);
+    }
+
+    void clearShowAudioMidiSettingsHandler()
+    {
+        showAudioMidiSettingsHandler() = {};
+    }
+
     void showAudioMidiSettingsDialog()
     {
+        // Prefer the Matrix-skinned editor overlay when registered.
+        if (showAudioMidiSettingsHandler())
+        {
+            showAudioMidiSettingsHandler()();
+            return;
+        }
+
+        // Fallback for early boot / missing editor: never open stock mute UI path.
         if (auto* holder = juce::StandalonePluginHolder::getInstance())
-            holder->showAudioSettingsDialog();
+            holder->getMuteInputValue().setValue(false);
     }
 }

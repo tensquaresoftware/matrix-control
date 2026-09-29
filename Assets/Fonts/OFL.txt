@@ -8,6 +8,10 @@ Orbitron
 Copyright 2018 The Orbitron Project Authors (https://github.com/theleagueof/orbitron),
 with Reserved Font Name: "Orbitron".
 
+Montserrat
+Copyright 2011 The Montserrat Project Authors (https://github.com/JulietaUla/Montserrat),
+with Reserved Font Name: "Montserrat".
+
 This license is copied below, and is also available with a FAQ at:
 https://openfontlicense.org
 

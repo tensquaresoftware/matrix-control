@@ -5,6 +5,8 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
+#include "GUI/Widgets/Button.h"
+
 namespace TSS
 {
     class ISkin;
@@ -14,7 +16,7 @@ class MutatorHistoryDefragConfirmDialog : public juce::Component
 {
 public:
     static constexpr int kDesignWidth = 420;
-    static constexpr int kDesignHeight = 100;
+    static constexpr int kDesignHeight = 120;
 
     MutatorHistoryDefragConfirmDialog(TSS::ISkin& skin, std::function<void()> onDismissRequested);
     ~MutatorHistoryDefragConfirmDialog() override;
@@ -40,8 +42,8 @@ private:
     TSS::ISkin* skin_;
     float uiScale_ = 1.0f;
 
-    juce::TextButton defragButton_;
-    juce::TextButton cancelButton_;
+    std::unique_ptr<TSS::Button> defragButton_;
+    std::unique_ptr<TSS::Button> cancelButton_;
 
     inline constexpr static int kTitleBarHeight_ = 28;
     inline constexpr static int kBorderThickness_ = 4;

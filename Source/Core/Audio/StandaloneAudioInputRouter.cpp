@@ -39,6 +39,16 @@ namespace Core
         StandaloneAudioInputRouterDetail::disableInputMonitoring();
     }
 
+    void StandaloneAudioInputRouter::setShowAudioMidiSettingsHandler(ShowAudioMidiSettingsHandler handler)
+    {
+        StandaloneAudioInputRouterDetail::setShowAudioMidiSettingsHandler(std::move(handler));
+    }
+
+    void StandaloneAudioInputRouter::clearShowAudioMidiSettingsHandler()
+    {
+        StandaloneAudioInputRouterDetail::clearShowAudioMidiSettingsHandler();
+    }
+
     void StandaloneAudioInputRouter::showAudioMidiSettingsDialog()
     {
         StandaloneAudioInputRouterDetail::showAudioMidiSettingsDialog();

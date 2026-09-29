@@ -2110,3 +2110,12 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-device-setup-welcome-intro.md`
   summary: No automated check that DEVICE SETUP design height / fitted-line budget keeps rows and buttons usable with the longer body (+ firmware suffix).
   evidence: CONVENTIONS §8.5 forbids GUI/paint unit tests; intended coverage is human Standalone smoke with and without the firmware suggestion suffix.
+
+## Deferred from: review of spec-window-modal-look-strategy.md (2026-09-29)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-window-modal-look-strategy.md`
+  summary: Standalone Audio Settings open path (handler registration / no stock fallback) is outside the unit-test binary because tests link router stubs.
+  evidence: CMake unit target uses StandaloneAudioInputRouterStubs; covering show/handler would need a standalone-linked harness beyond this story's test style.
+- source_spec: `_bmad-output/implementation-artifacts/spec-window-modal-look-strategy.md`
+  summary: Matrix confirm Cancel/Escape→0, primary/Return→1, middle→2 mapping has no automated GUI coverage after the restyle.
+  evidence: Core gate tests mock UI gates; CONVENTIONS avoid GUI modal-loop unit tests; manual confirm smoke remains.

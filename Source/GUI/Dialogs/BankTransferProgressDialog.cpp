@@ -1,7 +1,9 @@
 #include "BankTransferProgressDialog.h"
 
+#include "GUI/Dialogs/DialogMatrixHelpers.h"
 #include "GUI/Helpers/TextFitHelpers.h"
 #include "GUI/Skins/Skin.h"
+#include "GUI/Widgets/Button.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 
 using TSS::SkinColourId;
@@ -13,19 +15,21 @@ namespace
 
 BankTransferProgressDialog::BankTransferProgressDialog(TSS::ISkin& skin)
     : skin_(&skin)
-    , cancelButton_(PluginDisplayNames::Dialogs::BankTransferProgress::kCancel)
 {
     setOpaque(false);
     setInterceptsMouseClicks(true, true);
     setWantsKeyboardFocus(true);
 
-    cancelButton_.onClick = [this]
+    cancelButton_ = DialogMatrixHelpers::makeButton(
+        skin,
+        DialogMatrixHelpers::kDefaultButtonWidth,
+        PluginDisplayNames::Dialogs::BankTransferProgress::kCancel);
+    cancelButton_->onClick = [this]
     {
-        if (onCancelRequested_ && cancelButton_.isEnabled())
+        if (onCancelRequested_ && cancelButton_->isEnabled())
             onCancelRequested_();
     };
-    cancelButton_.setMouseClickGrabsKeyboardFocus(false);
-    addAndMakeVisible(cancelButton_);
+    addAndMakeVisible(*cancelButton_);
 }
 
 BankTransferProgressDialog::~BankTransferProgressDialog() = default;
@@ -131,12 +135,13 @@ void BankTransferProgressDialog::setDetail(const juce::String& detail)
 
 void BankTransferProgressDialog::setCancelEnabled(bool enabled)
 {
-    cancelButton_.setEnabled(enabled);
+    cancelButton_->setEnabled(enabled);
 }
 
 void BankTransferProgressDialog::setSkin(TSS::ISkin& skin)
 {
     skin_ = &skin;
+    DialogMatrixHelpers::applyButtonSkin(*cancelButton_, skin);
     repaint();
 }
 
@@ -146,6 +151,7 @@ void BankTransferProgressDialog::setUiScale(float uiScale)
         return;
 
     uiScale_ = uiScale;
+    DialogMatrixHelpers::applyButtonUiScale(*cancelButton_, uiScale);
     resized();
     repaint();
 }
@@ -346,7 +352,7 @@ void BankTransferProgressDialog::paint(juce::Graphics& g)
     g.drawText(title_, titleBar, juce::Justification::centred, false);
 
     // Custom modal scheme: exactly 1em under the title, then content (no extra top padding).
-    const auto bodyFont = skin_->getBaseFont().withHeight(skin_->getBaseFont().getHeight() * uiScale_);
+    const auto bodyFont = DialogMatrixHelpers::scaledModalBodyFont(*skin_, uiScale_);
     const int gapUnderTitle = juce::roundToInt(bodyFont.getHeight());
     const int padX = juce::roundToInt(12.0f * uiScale_);
     const int bottomReserve = juce::roundToInt(40.0f * uiScale_);
@@ -369,15 +375,16 @@ void BankTransferProgressDialog::resized()
 
     const int padding = juce::roundToInt(12.0f * uiScale_);
     const int buttonHeight = juce::roundToInt(24.0f * uiScale_);
-    const int buttonWidth = juce::roundToInt(72.0f * uiScale_);
+    const int buttonWidth = juce::roundToInt(
+        static_cast<float>(DialogMatrixHelpers::kDefaultButtonWidth) * uiScale_);
 
     auto buttonRow = inner.reduced(padding).removeFromBottom(buttonHeight);
-    cancelButton_.setBounds(buttonRow.removeFromRight(buttonWidth));
+    cancelButton_->setBounds(buttonRow.removeFromRight(buttonWidth));
 }
 
 bool BankTransferProgressDialog::keyPressed(const juce::KeyPress& key)
 {
-    if (key == juce::KeyPress::escapeKey && cancelButton_.isEnabled() && onCancelRequested_)
+    if (key == juce::KeyPress::escapeKey && cancelButton_->isEnabled() && onCancelRequested_)
     {
         onCancelRequested_();
         return true;

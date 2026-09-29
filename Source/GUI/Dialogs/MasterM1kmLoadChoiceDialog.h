@@ -1,8 +1,11 @@
 #pragma once
 
 #include <functional>
+#include <memory>
 
 #include <juce_gui_basics/juce_gui_basics.h>
+
+#include "GUI/Widgets/Button.h"
 
 namespace TSS
 {
@@ -43,9 +46,9 @@ private:
     TSS::ISkin* skin_;
     float uiScale_ = 1.0f;
 
-    juce::TextButton masterSettingsOnlyButton_;
-    juce::TextButton fullMasterButton_;
-    juce::TextButton cancelButton_;
+    std::unique_ptr<TSS::Button> masterSettingsOnlyButton_;
+    std::unique_ptr<TSS::Button> fullMasterButton_;
+    std::unique_ptr<TSS::Button> cancelButton_;
 
     inline constexpr static int kTitleBarHeight_ = 28;
     inline constexpr static int kBorderThickness_ = 4;

@@ -1,5 +1,6 @@
 #include "MasterM1kmLoadChoiceDialog.h"
 
+#include "GUI/Dialogs/DialogMatrixHelpers.h"
 #include "GUI/Skins/Skin.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 
@@ -7,7 +8,6 @@ using TSS::SkinColourId;
 
 namespace
 {
-    constexpr juce::uint32 kDialogBorderColour = 0xff5E5E5E;
     namespace Dialog = PluginDisplayNames::Dialogs::MasterM1kmLoadChoice;
 }
 
@@ -15,27 +15,25 @@ MasterM1kmLoadChoiceDialog::MasterM1kmLoadChoiceDialog(TSS::ISkin& skin,
                                                        std::function<void()> onDismissRequested)
     : onDismissRequested_(std::move(onDismissRequested))
     , skin_(&skin)
-    , masterSettingsOnlyButton_(Dialog::kMasterSettingsOnly)
-    , fullMasterButton_(Dialog::kFullMaster)
-    , cancelButton_(Dialog::kCancel)
 {
     setOpaque(false);
     setInterceptsMouseClicks(true, true);
     setWantsKeyboardFocus(true);
 
-    masterSettingsOnlyButton_.onClick = [this] { chooseMasterSettingsOnly(); };
-    fullMasterButton_.onClick = [this] { chooseFullMaster(); };
-    cancelButton_.onClick = [this] { dismiss(); };
+    masterSettingsOnlyButton_ = DialogMatrixHelpers::makeButton(skin, 148, Dialog::kMasterSettingsOnly);
+    fullMasterButton_ = DialogMatrixHelpers::makeButton(skin, 268, Dialog::kFullMaster);
+    cancelButton_ = DialogMatrixHelpers::makeButton(
+        skin, DialogMatrixHelpers::kDefaultButtonWidth, Dialog::kCancel);
+
+    masterSettingsOnlyButton_->onClick = [this] { chooseMasterSettingsOnly(); };
+    fullMasterButton_->onClick = [this] { chooseFullMaster(); };
+    cancelButton_->onClick = [this] { dismiss(); };
 
     // No Return auto-pick: both load options are intentional; Escape / Cancel only.
-    cancelButton_.setWantsKeyboardFocus(false);
-    cancelButton_.setMouseClickGrabsKeyboardFocus(false);
-    masterSettingsOnlyButton_.setMouseClickGrabsKeyboardFocus(false);
-    fullMasterButton_.setMouseClickGrabsKeyboardFocus(false);
-
-    addAndMakeVisible(masterSettingsOnlyButton_);
-    addAndMakeVisible(fullMasterButton_);
-    addAndMakeVisible(cancelButton_);
+    cancelButton_->setWantsKeyboardFocus(false);
+    addAndMakeVisible(*masterSettingsOnlyButton_);
+    addAndMakeVisible(*fullMasterButton_);
+    addAndMakeVisible(*cancelButton_);
 }
 
 MasterM1kmLoadChoiceDialog::~MasterM1kmLoadChoiceDialog() = default;
@@ -51,6 +49,9 @@ void MasterM1kmLoadChoiceDialog::prepareForShow(std::function<void()> onMasterSe
 void MasterM1kmLoadChoiceDialog::setSkin(TSS::ISkin& skin)
 {
     skin_ = &skin;
+    DialogMatrixHelpers::applyButtonSkin(*masterSettingsOnlyButton_, skin);
+    DialogMatrixHelpers::applyButtonSkin(*fullMasterButton_, skin);
+    DialogMatrixHelpers::applyButtonSkin(*cancelButton_, skin);
     repaint();
 }
 
@@ -60,6 +61,9 @@ void MasterM1kmLoadChoiceDialog::setUiScale(float uiScale)
         return;
 
     uiScale_ = uiScale;
+    DialogMatrixHelpers::applyButtonUiScale(*masterSettingsOnlyButton_, uiScale);
+    DialogMatrixHelpers::applyButtonUiScale(*fullMasterButton_, uiScale);
+    DialogMatrixHelpers::applyButtonUiScale(*cancelButton_, uiScale);
     resized();
     repaint();
 }
@@ -113,36 +117,32 @@ void MasterM1kmLoadChoiceDialog::chooseFullMaster()
 
 void MasterM1kmLoadChoiceDialog::paint(juce::Graphics& g)
 {
-    g.fillAll(skin_->getColour(SkinColourId::kBodyPanelBackground).withAlpha(0.85f));
-
     const auto dialogBounds = getDialogBounds();
     const int border = getBorderThickness();
+    const int titleBarHeight = juce::roundToInt(static_cast<float>(kTitleBarHeight_) * uiScale_);
 
-    g.setColour(juce::Colour(kDialogBorderColour));
-    g.fillRect(dialogBounds);
+    DialogMatrixHelpers::paintMatrixOverlayChrome({
+        .g = g,
+        .skin = *skin_,
+        .dialogBounds = dialogBounds,
+        .borderThickness = border,
+        .titleBarHeight = titleBarHeight,
+        .title = Dialog::kTitle,
+        .uiScale = uiScale_ });
 
     auto inner = dialogBounds.reduced(border);
-    const int titleBarHeight = juce::roundToInt(static_cast<float>(kTitleBarHeight_) * uiScale_);
-    auto titleBar = inner.removeFromTop(titleBarHeight);
-    auto content = inner;
+    inner.removeFromTop(titleBarHeight);
 
-    g.setColour(skin_->getColour(SkinColourId::kHeaderPanelBackground));
-    g.fillRect(titleBar);
-    g.fillRect(content);
-
-    g.setColour(skin_->getColour(SkinColourId::kDarkPanelText));
-    g.setFont(skin_->getBaseFontBold().withHeight(skin_->getBaseFontBold().getHeight() * uiScale_));
-    g.drawText(Dialog::kTitle, titleBar, juce::Justification::centred, false);
-
-    const auto bodyFont = skin_->getBaseFont().withHeight(skin_->getBaseFont().getHeight() * uiScale_);
+    const auto bodyFont = DialogMatrixHelpers::scaledModalBodyFont(*skin_, uiScale_);
     const int gapUnderTitle = juce::roundToInt(bodyFont.getHeight());
     const int padX = juce::roundToInt(12.0f * uiScale_);
 
-    auto textArea = content;
+    auto textArea = inner;
     textArea.removeFromTop(gapUnderTitle);
     textArea = textArea.withTrimmedLeft(padX).withTrimmedRight(padX);
     textArea.removeFromBottom(juce::roundToInt(40.0f * uiScale_));
 
+    g.setColour(skin_->getColour(SkinColourId::kDarkPanelText));
     g.setFont(bodyFont);
     g.drawFittedText(Dialog::kBody, textArea, juce::Justification::topLeft, 8);
 }
@@ -153,19 +153,20 @@ void MasterM1kmLoadChoiceDialog::resized()
     inner.removeFromTop(juce::roundToInt(static_cast<float>(kTitleBarHeight_) * uiScale_));
 
     const int padding = juce::roundToInt(12.0f * uiScale_);
-    const int buttonHeight = juce::roundToInt(24.0f * uiScale_);
+    const int buttonHeight = juce::roundToInt(
+        static_cast<float>(DialogMatrixHelpers::kDefaultButtonHeight) * uiScale_);
     const int buttonGap = juce::roundToInt(8.0f * uiScale_);
-    const int cancelWidth = juce::roundToInt(72.0f * uiScale_);
+    const int cancelWidth = juce::roundToInt(
+        static_cast<float>(DialogMatrixHelpers::kDefaultButtonWidth) * uiScale_);
     const int settingsOnlyWidth = juce::roundToInt(148.0f * uiScale_);
     const int fullMasterWidth = juce::roundToInt(268.0f * uiScale_);
 
     auto buttonRow = inner.reduced(padding).removeFromBottom(buttonHeight);
-    // LTR: Cancel left; load options to the right (Full Master farthest right).
-    cancelButton_.setBounds(buttonRow.removeFromLeft(cancelWidth));
+    cancelButton_->setBounds(buttonRow.removeFromLeft(cancelWidth));
     buttonRow.removeFromLeft(buttonGap);
-    masterSettingsOnlyButton_.setBounds(buttonRow.removeFromLeft(settingsOnlyWidth));
+    masterSettingsOnlyButton_->setBounds(buttonRow.removeFromLeft(settingsOnlyWidth));
     buttonRow.removeFromLeft(buttonGap);
-    fullMasterButton_.setBounds(buttonRow.removeFromLeft(fullMasterWidth));
+    fullMasterButton_->setBounds(buttonRow.removeFromLeft(fullMasterWidth));
 }
 
 void MasterM1kmLoadChoiceDialog::mouseDown(const juce::MouseEvent& e)

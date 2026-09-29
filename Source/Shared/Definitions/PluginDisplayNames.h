@@ -286,11 +286,11 @@ namespace PluginDisplayNames
                 "This patch has changes that were not saved as a .syx file.\n\n"
                 "Save As writes a new file. Discard abandons the changes and continues. "
                 "Cancel keeps editing.";
-            constexpr const char* kCancel  = "Cancel";
-            constexpr const char* kDiscard = "Discard";
-            constexpr const char* kStore   = "Store";
-            constexpr const char* kSave    = "Save";
-            constexpr const char* kSaveAs  = "Save As";
+            constexpr const char* kCancel  = "CANCEL";
+            constexpr const char* kDiscard = "DISCARD";
+            constexpr const char* kStore   = "STORE";
+            constexpr const char* kSave    = "SAVE";
+            constexpr const char* kSaveAs  = "SAVE AS";
         }
 
         namespace PatchNameReconciliation
@@ -298,9 +298,9 @@ namespace PluginDisplayNames
             constexpr const char* kTitle = "Patch name mismatch";
             constexpr const char* kBodyTemplate =
                 "Internal name: {INTERNAL}\nFilename: {FILENAME}\n\nWhich name should be used for this load?";
-            constexpr const char* kInternal = "Internal";
-            constexpr const char* kFilename = "Filename";
-            constexpr const char* kCancel   = "Cancel";
+            constexpr const char* kInternal = "INTERNAL";
+            constexpr const char* kFilename = "FILENAME";
+            constexpr const char* kCancel   = "CANCEL";
         }
 
         namespace InvalidSaveAsPatchName
@@ -320,8 +320,8 @@ namespace PluginDisplayNames
             constexpr const char* kTitle = "RESET MASTER MODULE?";
             constexpr const char* kBodyTemplate =
                 "This will reset all parameters in the {MODULE} module to init defaults and send a full master SysEx to the synth. Other master modules will not be changed.";
-            constexpr const char* kConfirm = "Reset";
-            constexpr const char* kCancel  = "Cancel";
+            constexpr const char* kConfirm = "RESET";
+            constexpr const char* kCancel  = "CANCEL";
         }
 
         namespace EpromTypePrompt
@@ -348,8 +348,8 @@ namespace PluginDisplayNames
             constexpr const char* kBody =
                 "This will reset MIDI, VIBRATO, and MISC to the Master init template "
                 "(or built-in defaults) and send a full master SysEx to the synth.";
-            constexpr const char* kConfirm = "Reset";
-            constexpr const char* kCancel  = "Cancel";
+            constexpr const char* kConfirm = "RESET";
+            constexpr const char* kCancel  = "CANCEL";
         }
 
         namespace MutatorHistoryDefrag
@@ -357,8 +357,8 @@ namespace PluginDisplayNames
             constexpr const char* kTitle = "Defrag mutation history?";
             constexpr const char* kBody =
                 "Defrag will compact mutation history and preserve the current selection. Continue?";
-            constexpr const char* kConfirm = "Defrag";
-            constexpr const char* kCancel  = "Cancel";
+            constexpr const char* kConfirm = "DEFRAG";
+            constexpr const char* kCancel  = "CANCEL";
         }
 
         namespace MutatorFlushConfirm
@@ -368,8 +368,8 @@ namespace PluginDisplayNames
                 "This clears the Patch Mutator history for this session.\n"
                 "The initial patch snapshot is kept.\n\n"
                 "Continue to flush, or Cancel to keep the history.";
-            constexpr const char* kCancel   = "Cancel";
-            constexpr const char* kContinue = "Continue";
+            constexpr const char* kCancel   = "CANCEL";
+            constexpr const char* kContinue = "CONTINUE";
         }
 
         namespace MutatorDeleteConfirm
@@ -379,8 +379,8 @@ namespace PluginDisplayNames
                 "This removes the selected mutation or retry from Patch Mutator history.\n"
                 "Deleting a root mutation also removes all of its retries.\n\n"
                 "Delete to remove it, or Cancel to keep the history.";
-            constexpr const char* kCancel        = "Cancel";
-            constexpr const char* kDelete        = "Delete";
+            constexpr const char* kCancel        = "CANCEL";
+            constexpr const char* kDelete        = "DELETE";
             constexpr const char* kDontAskAgain  = "Don't ask again";
         }
 
@@ -395,7 +395,7 @@ namespace PluginDisplayNames
                 "This removes the system Master init template (MasterInit.syx).\n"
                 "The next Master INIT will use the built-in defaults.\n\n"
                 "DELETE to remove it, or Cancel to keep the file.";
-            constexpr const char* kCancel = "Cancel";
+            constexpr const char* kCancel = "CANCEL";
             constexpr const char* kDelete = "DELETE";
         }
 
@@ -405,15 +405,15 @@ namespace PluginDisplayNames
             constexpr const char* kBody =
                 "This overwrites patches on the device with files from the selected folder.\n\n"
                 "Continue to import, or Cancel to keep the device unchanged.";
-            constexpr const char* kCancel   = "Cancel";
-            constexpr const char* kContinue = "Continue";
+            constexpr const char* kCancel   = "CANCEL";
+            constexpr const char* kContinue = "CONTINUE";
         }
 
         namespace BankPasteConfirm
         {
             constexpr const char* kTitle = "Paste bank?";
-            constexpr const char* kCancel   = "Cancel";
-            constexpr const char* kContinue = "Continue";
+            constexpr const char* kCancel   = "CANCEL";
+            constexpr const char* kContinue = "CONTINUE";
 
             inline juce::String formatBody(int sourceBank, int targetBank)
             {
@@ -431,16 +431,16 @@ namespace PluginDisplayNames
                 "Continue will delete that folder completely, recreate it empty, "
                 "then export a fresh copy of the bank.\n\n"
                 "Cancel leaves the existing folder untouched.";
-            constexpr const char* kCancel   = "Cancel";
-            constexpr const char* kContinue = "Continue";
+            constexpr const char* kCancel   = "CANCEL";
+            constexpr const char* kContinue = "CONTINUE";
         }
 
         // SAVE after loading a .m1kp when a same-stem .syx already exists in the folder.
         namespace M1kpSiblingSyxOverwriteConfirm
         {
             constexpr const char* kTitle = "Overwrite existing .syx?";
-            constexpr const char* kCancel   = "Cancel";
-            constexpr const char* kContinue = "Continue";
+            constexpr const char* kCancel   = "CANCEL";
+            constexpr const char* kContinue = "CONTINUE";
 
             inline juce::String formatBody(const juce::String& existingSyxFileName)
             {
@@ -462,9 +462,15 @@ namespace PluginDisplayNames
                 "Choose whether to load Master settings only (Groups/cascade reset) or the full "
                 "master (Groups/cascade kept).\n"
                 "Cancel leaves the current Master unchanged.";
-            constexpr const char* kMasterSettingsOnly = "Master settings only";
-            constexpr const char* kFullMaster = "Full Master (including groups/cascade)";
-            constexpr const char* kCancel = "Cancel";
+            constexpr const char* kMasterSettingsOnly = "MASTER SETTINGS ONLY";
+            constexpr const char* kFullMaster = "FULL MASTER (INCLUDING GROUPS/CASCADE)";
+            constexpr const char* kCancel = "CANCEL";
+        }
+
+        namespace AudioMidiSettings
+        {
+            constexpr const char* kTitle = "AUDIO SETTINGS";
+            constexpr const char* kTestButton = "TEST";
         }
 
         namespace BankTransferProgress
@@ -2105,16 +2111,16 @@ namespace PluginDisplayNames
                 constexpr const char* kHistoryGateMessage =
                     "You have mutations in the current session that are not exported. "
                     "Export them before changing patch?";
-                constexpr const char* kHistoryGateExport = "Export";
-                constexpr const char* kHistoryGateCancel = "Cancel";
-                constexpr const char* kHistoryGateDiscard = "Discard";
+                constexpr const char* kHistoryGateExport = "EXPORT";
+                constexpr const char* kHistoryGateCancel = "CANCEL";
+                constexpr const char* kHistoryGateDiscard = "DISCARD";
 
                 constexpr const char* kExportCollisionTitle = "Export folder exists";
                 constexpr const char* kExportCollisionMessage =
                     "A session folder with this name already exists.";
-                constexpr const char* kExportCollisionOverwrite = "Overwrite";
-                constexpr const char* kExportCollisionKeep = "Keep both";
-                constexpr const char* kExportCollisionCancel = "Cancel";
+                constexpr const char* kExportCollisionOverwrite = "OVERWRITE";
+                constexpr const char* kExportCollisionKeep = "KEEP BOTH";
+                constexpr const char* kExportCollisionCancel = "CANCEL";
 
                 constexpr const char* kExportCancelledFooter = "PATCH MUTATOR: Export cancelled.";
 

@@ -21,16 +21,7 @@ namespace PluginEditorInternal
 
     bool isMessageThread();
 
-    /** True when macOS NSAlert places the first registered button as rightmost default. */
-    bool usesMacOsNativeAlertButtonOrder();
-
-    /** Prevent non-primary AlertWindow buttons from consuming Return when focused. */
-    void configureOrderedAlertButtons(juce::AlertWindow& alert,
-                                      const juce::String& cancelLabel,
-                                      const juce::String& primaryLabel,
-                                      const juce::String& middleLabel);
-
-    // Semantic result codes (stable across platforms): Cancel/Escape/OOR -> 0, primary -> 1, middle -> 2.
+    // Matrix-chrome sync confirm. Semantic codes: Cancel/Escape -> 0, primary -> 1, middle -> 2.
     int showOrderedConfirmAlert(const OrderedConfirmAlertOptions& options);
 
     /** Bring the plugin/standalone UI forward before (or after) a sync OS modal. */
@@ -61,7 +52,7 @@ namespace PluginEditorInternal
         bool dontAskAgain = false;
     };
 
-    // Uses AlertWindow on all platforms (native NSAlert cannot host a checkbox).
+    // Matrix-chrome sync confirm with don't-ask-again toggle.
     // Codes: Cancel/Escape -> confirmed=false, Delete/Return -> confirmed=true.
     MutatorDeleteConfirmResult showMutatorDeleteConfirmAlert(juce::Component* associatedComponent);
 

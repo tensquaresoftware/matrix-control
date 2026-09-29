@@ -1,8 +1,11 @@
 #pragma once
 
 #include <functional>
+#include <memory>
 
 #include <juce_gui_basics/juce_gui_basics.h>
+
+#include "GUI/Widgets/Button.h"
 
 namespace TSS
 {
@@ -111,7 +114,7 @@ private:
     bool secondaryLaneActive_ = false;
 
     float uiScale_ = 1.0f;
-    juce::TextButton cancelButton_;
+    std::unique_ptr<TSS::Button> cancelButton_;
 
     inline constexpr static int kTitleBarHeight_ = 28;
     inline constexpr static int kBorderThickness_ = 4;

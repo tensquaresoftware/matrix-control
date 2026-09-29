@@ -4,10 +4,56 @@
 #include "PluginEditor.h"
 #include "PluginEditorInternal.h"
 
+#include "GUI/Dialogs/MatrixOrderedConfirmDialog.h"
+#include "GUI/Skins/Skin.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 
 namespace PluginEditorInternal
 {
+
+namespace
+{
+    struct ResolvedEditorChrome
+    {
+        TSS::ISkin* skin = nullptr;
+        float uiScale = 1.0f;
+        juce::Component* host = nullptr;
+        std::unique_ptr<TSS::Skin> fallbackSkin;
+    };
+
+    ResolvedEditorChrome resolveEditorChrome(juce::Component* associatedComponent)
+    {
+        ResolvedEditorChrome resolved;
+        resolved.host = associatedComponent;
+
+        if (auto* editor = dynamic_cast<PluginEditor*>(associatedComponent))
+        {
+            resolved.skin = &editor->getActiveSkin();
+            resolved.uiScale = editor->getAppliedUiScale();
+            return resolved;
+        }
+
+        resolved.fallbackSkin = TSS::Skin::create(TSS::Skin::ColourVariant::Black);
+        resolved.skin = resolved.fallbackSkin.get();
+        return resolved;
+    }
+
+    int runMatrixConfirmModal(juce::Component& dialog, juce::Component* host)
+    {
+        jassert(host != nullptr);
+        if (host == nullptr)
+            return 0;
+
+        host->addAndMakeVisible(dialog);
+        dialog.setBounds(host->getLocalBounds());
+        dialog.toFront(true);
+        dialog.enterModalState(true);
+        dialog.grabKeyboardFocus();
+        const int result = dialog.runModalLoop();
+        host->removeChildComponent(&dialog);
+        return result;
+    }
+}
 
 bool isMessageThread()
 {
@@ -15,42 +61,6 @@ bool isMessageThread()
         return mm->isThisTheMessageThread();
 
     return false;
-}
-
-bool usesMacOsNativeAlertButtonOrder()
-{
-   #if JUCE_MAC
-    return juce::LookAndFeel::getDefaultLookAndFeel().isUsingNativeAlertWindows();
-   #else
-    return false;
-   #endif
-}
-
-void configureOrderedAlertButtons(juce::AlertWindow& alert,
-                                  const juce::String& cancelLabel,
-                                  const juce::String& primaryLabel,
-                                  const juce::String& middleLabel)
-{
-    auto* cancel = alert.getButton(cancelLabel);
-    auto* primary = alert.getButton(primaryLabel);
-    jassert(cancel != nullptr);
-    jassert(primary != nullptr);
-
-    if (cancel != nullptr)
-        cancel->setWantsKeyboardFocus(false);
-
-    if (middleLabel.isNotEmpty())
-    {
-        auto* middle = alert.getButton(middleLabel);
-        jassert(middle != nullptr);
-
-        if (middle != nullptr)
-            middle->setWantsKeyboardFocus(false);
-    }
-
-    // Primary keeps keyboard focus so Return activates it; Cancel/middle are click-only.
-    if (primary != nullptr)
-        primary->grabKeyboardFocus();
 }
 
 void raiseUiBeforeModalDialog(juce::Component* associatedComponent)
@@ -140,87 +150,41 @@ juce::File browseForFileToOpenSync(juce::Component* associatedComponent,
 }
 
 /** Visual LTR: Cancel -> [middle] -> primary (rightmost = default).
-    Semantic codes (stable across platforms): Cancel/Escape/OOR -> 0, primary -> 1, middle -> 2.
-
-    macOS native: register primary-first (NSAlert rightmost-first).
-    Windows/Linux: controlled AlertWindow with Cancel-first layout and Return/Escape wired
-    by role -- preferred over TaskDialog so LTR + Enter=primary both hold. */
+    Semantic codes (stable across platforms): Cancel/Escape/OOR -> 0, primary -> 1, middle -> 2. */
 int showOrderedConfirmAlert(const OrderedConfirmAlertOptions& options)
 {
     jassert(options.cancelLabel.isNotEmpty());
     jassert(options.primaryLabel.isNotEmpty());
+    jassert(isMessageThread());
 
-    const bool hasMiddle = options.middleLabel.isNotEmpty();
-
-    // Native FileChooser can leave Matrix-Control behind; raise before the next modal.
     raiseUiBeforeModalDialog(options.associatedComponent);
 
-    if (usesMacOsNativeAlertButtonOrder())
-    {
-        auto messageBoxOptions = juce::MessageBoxOptions()
-                                     .withIconType(options.iconType)
-                                     .withTitle(options.title)
-                                     .withMessage(options.message)
-                                     .withButton(options.primaryLabel);
-
-        if (hasMiddle)
-            messageBoxOptions = messageBoxOptions.withButton(options.middleLabel);
-
-        messageBoxOptions = messageBoxOptions.withButton(options.cancelLabel)
-                                .withAssociatedComponent(options.associatedComponent);
-
-        const int numButtons = messageBoxOptions.getNumButtons();
-        const int raw = juce::NativeMessageBox::show(messageBoxOptions);
-
-        if (raw < 0 || raw >= numButtons)
-            return 0;
-
-        return (raw + 1) % numButtons;
-    }
-
    #if JUCE_MODAL_LOOPS_PERMITTED
-    juce::AlertWindow alert(options.title, options.message, options.iconType, options.associatedComponent);
-    alert.addButton(options.cancelLabel, 0, juce::KeyPress(juce::KeyPress::escapeKey));
+    auto chrome = resolveEditorChrome(options.associatedComponent);
+    if (chrome.host == nullptr || chrome.skin == nullptr)
+        return 0;
 
-    if (hasMiddle)
-        alert.addButton(options.middleLabel, 2);
-
-    alert.addButton(options.primaryLabel, 1, juce::KeyPress(juce::KeyPress::returnKey));
-    configureOrderedAlertButtons(alert, options.cancelLabel, options.primaryLabel, options.middleLabel);
-    return alert.runModalLoop();
+    MatrixOrderedConfirmDialog dialog(*chrome.skin, chrome.uiScale, options);
+    return runMatrixConfirmModal(dialog, chrome.host);
    #else
     jassertfalse;
-    juce::ignoreUnused(options, hasMiddle);
+    juce::ignoreUnused(options);
     return 0;
    #endif
 }
 
 MutatorDeleteConfirmResult showMutatorDeleteConfirmAlert(juce::Component* associatedComponent)
 {
-    namespace Dialog = PluginDisplayNames::Dialogs::MutatorDeleteConfirm;
-
     raiseUiBeforeModalDialog(associatedComponent);
 
    #if JUCE_MODAL_LOOPS_PERMITTED
-    juce::AlertWindow alert(Dialog::kTitle,
-                            Dialog::kBody,
-                            juce::MessageBoxIconType::WarningIcon,
-                            associatedComponent);
-    juce::ToggleButton dontAskAgain(Dialog::kDontAskAgain);
-    dontAskAgain.setSize(360, 24);
-    // AlertWindow paints customComponent->getName() above the control; clear it so
-    // "Don't ask again" appears only once (ToggleButton text), not as a duplicate label.
-    dontAskAgain.setName({});
-    // Keep Enter on Delete (primary); checkbox is click-only, same as Cancel.
-    dontAskAgain.setWantsKeyboardFocus(false);
-    dontAskAgain.setMouseClickGrabsKeyboardFocus(false);
-    alert.addCustomComponent(&dontAskAgain);
-    alert.addButton(Dialog::kCancel, 0, juce::KeyPress(juce::KeyPress::escapeKey));
-    alert.addButton(Dialog::kDelete, 1, juce::KeyPress(juce::KeyPress::returnKey));
-    configureOrderedAlertButtons(alert, Dialog::kCancel, Dialog::kDelete, {});
+    auto chrome = resolveEditorChrome(associatedComponent);
+    if (chrome.host == nullptr || chrome.skin == nullptr)
+        return {};
 
-    const int result = alert.runModalLoop();
-    return { result == 1, dontAskAgain.getToggleState() };
+    MatrixMutatorDeleteConfirmDialog dialog(*chrome.skin, chrome.uiScale);
+    runMatrixConfirmModal(dialog, chrome.host);
+    return dialog.getResult();
    #else
     jassertfalse;
     juce::ignoreUnused(associatedComponent);

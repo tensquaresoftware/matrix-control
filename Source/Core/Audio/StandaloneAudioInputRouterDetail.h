@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <vector>
 
 #include <juce_core/juce_core.h>
@@ -16,5 +17,7 @@ namespace Core::StandaloneAudioInputRouterDetail
     void removeAudioDeviceChangeListener(juce::ChangeListener& listener);
     void enableInputMonitoring();
     void disableInputMonitoring();
+    void setShowAudioMidiSettingsHandler(std::function<void()> handler);
+    void clearShowAudioMidiSettingsHandler();
     void showAudioMidiSettingsDialog();
 }
