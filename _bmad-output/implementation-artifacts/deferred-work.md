@@ -2104,3 +2104,9 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-patch-drag-load-patch-label.md`
   summary: No automated coverage that valid patch/selection hover sets header to `LOAD PATCH` and invalid/exit restores `PATCH NAME`.
   evidence: Same gap as Master drag chrome (already deferred); CONVENTIONS discourage GUI-component unit tests; manual smoke remains the check.
+
+## Deferred from: review of spec-device-setup-welcome-intro.md (2026-09-29)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-device-setup-welcome-intro.md`
+  summary: No automated check that DEVICE SETUP design height / fitted-line budget keeps rows and buttons usable with the longer body (+ firmware suffix).
+  evidence: CONVENTIONS §8.5 forbids GUI/paint unit tests; intended coverage is human Standalone smoke with and without the firmware suggestion suffix.

@@ -24,6 +24,7 @@ public:
         testInquirySuccessShowsConnected();
         testUnresponsiveSettlesNotConnected();
         testConnectedDetailFormat();
+        testAssistantBodyTextWithAndWithoutSuffix();
         testConfirmPersistsEpromAndFinishes();
         testSpecifyLaterFinishFlags();
         testNextEpromPreferredIdBranches();
@@ -249,6 +250,29 @@ private:
                      juce::String(PluginDisplayNames::FooterPanel::kDeviceUnknownDetail));
         expectEquals(Core::buildDeviceSetupConnectedDetail(MatrixDeviceTypes::Type::kMatrix6, {}),
                      juce::String("MATRIX-6"));
+    }
+
+    void testAssistantBodyTextWithAndWithoutSuffix()
+    {
+        beginTest("assistant body - welcome copy with optional firmware suffix");
+
+        namespace Body = PluginDisplayNames::Dialogs::EpromTypePrompt;
+        const juce::String approved(
+            "Welcome to Matrix-Control - a modern SysEx MIDI editor for the Oberheim "
+            "Matrix-1000/6/6R synthesizers. A quick setup is needed so you can use "
+            "Matrix-Control optimally with your synth. Select MIDI ports and the EPROM "
+            "type installed in your synth. This affects MIDI timing and future features.");
+
+        expectEquals(juce::String(Body::kBody), approved);
+        expect(! approved.containsChar(static_cast<juce::juce_wchar>(0x2014)));
+        expect(! approved.containsChar(static_cast<juce::juce_wchar>(0x2013)));
+        expect(! approved.containsChar(static_cast<juce::juce_wchar>(0x2026)));
+
+        expectEquals(Core::buildDeviceSetupAssistantBodyText(false), approved);
+        expectEquals(Core::buildDeviceSetupAssistantBodyText(true),
+                     approved + juce::String(Body::kBodySuggestionSuffix));
+        expectEquals(juce::String(Body::kBodySuggestionSuffix),
+                     juce::String(" A suggestion is preselected from the reported firmware version when possible."));
     }
 
     void testConfirmPersistsEpromAndFinishes()

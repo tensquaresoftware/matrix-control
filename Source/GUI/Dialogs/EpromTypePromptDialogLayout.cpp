@@ -57,7 +57,7 @@ EpromTypePromptDialog::ContentLayout EpromTypePromptDialog::computeContentLayout
                          static_cast<float>(content.getWidth()),
                          static_cast<float>(maxBodyHeight),
                          juce::Justification::topLeft,
-                         5);
+                         kMaxBodyFittedLines_);
     const int bodyHeight = juce::jmax(juce::roundToInt(bodyFont.getHeight()),
                                       juce::roundToInt(glyphs.getBoundingBox(0, glyphs.getNumGlyphs(), true).getHeight()));
 
@@ -106,7 +106,7 @@ void EpromTypePromptDialog::paint(juce::Graphics& g)
     const auto layout = computeContentLayout();
     const auto bodyFont = skin_->getBaseFont().withHeight(skin_->getBaseFont().getHeight() * uiScale_);
     g.setFont(bodyFont);
-    g.drawFittedText(bodyText(), layout.bodyTextArea, juce::Justification::topLeft, 5);
+    g.drawFittedText(bodyText(), layout.bodyTextArea, juce::Justification::topLeft, kMaxBodyFittedLines_);
 }
 
 void EpromTypePromptDialog::resized()

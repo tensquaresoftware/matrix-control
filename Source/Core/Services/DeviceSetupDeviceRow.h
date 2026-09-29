@@ -225,6 +225,15 @@ namespace Core
         return { previous, false };
     }
 
+    /** Assemble DEVICE SETUP assistant body (approved copy + optional firmware hint). */
+    inline juce::String buildDeviceSetupAssistantBodyText(bool includeFirmwareSuggestionHint)
+    {
+        juce::String text(PluginDisplayNames::Dialogs::EpromTypePrompt::kBody);
+        if (includeFirmwareSuggestionHint)
+            text += PluginDisplayNames::Dialogs::EpromTypePrompt::kBodySuggestionSuffix;
+        return text;
+    }
+
     /** Build connected detail using a display-formatted version string (may be empty). */
     inline juce::String buildDeviceSetupConnectedDetail(MatrixDeviceTypes::Type deviceType,
                                                         const juce::String& versionDisplay)

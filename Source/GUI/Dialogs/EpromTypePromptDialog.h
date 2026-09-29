@@ -22,7 +22,7 @@ class EpromTypePromptDialog : public juce::Component,
 {
 public:
     static constexpr int kDesignWidth = 392;
-    static constexpr int kDesignHeight = 280;
+    static constexpr int kDesignHeight = 310;
 
     struct LiveDeviceStatus
     {
@@ -127,6 +127,7 @@ private:
     inline constexpr static int kRowGap_ = 8;
     inline constexpr static int kSpecifyLaterButtonWidth_ = 120;
     inline constexpr static int kConfirmButtonWidth_ = 80;
+    inline constexpr static int kMaxBodyFittedLines_ = 8;
     inline constexpr static int kSearchingDotsIntervalMs_ = 450;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(EpromTypePromptDialog)

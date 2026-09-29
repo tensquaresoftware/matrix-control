@@ -207,10 +207,7 @@ void EpromTypePromptDialog::setUiScale(float uiScale)
 
 juce::String EpromTypePromptDialog::bodyText() const
 {
-    juce::String text(PluginDisplayNames::Dialogs::EpromTypePrompt::kBody);
-    if (includeFirmwareSuggestionHint_)
-        text += PluginDisplayNames::Dialogs::EpromTypePrompt::kBodySuggestionSuffix;
-    return text;
+    return Core::buildDeviceSetupAssistantBodyText(includeFirmwareSuggestionHint_);
 }
 
 void EpromTypePromptDialog::dismissAsLater()

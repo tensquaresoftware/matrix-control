@@ -328,8 +328,10 @@ namespace PluginDisplayNames
         {
             constexpr const char* kTitle = "DEVICE SETUP";
             constexpr const char* kBody =
-                "Select MIDI ports and the EPROM type installed in your synth. "
-                "This affects MIDI timing and future features.";
+                "Welcome to Matrix-Control - a modern SysEx MIDI editor for the Oberheim "
+                "Matrix-1000/6/6R synthesizers. A quick setup is needed so you can use "
+                "Matrix-Control optimally with your synth. Select MIDI ports and the EPROM "
+                "type installed in your synth. This affects MIDI timing and future features.";
             constexpr const char* kBodySuggestionSuffix =
                 " A suggestion is preselected from the reported firmware version when possible.";
             constexpr const char* kMidiFromLabel = "MIDI FROM";
