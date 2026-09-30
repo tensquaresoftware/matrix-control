@@ -151,7 +151,7 @@ Namespace: `PluginDisplayNames::PatchManagerSection::BankUtilityModule` (gates) 
 | `kFolderNotWritableFooterMessage` | Could not create or write to the export folder. | Folder not writable | OK |
 | `kImportRestoreFailedFooterMessage` | Import cancelled - the device could not be fully restored. Check the connection and try again. | Restore fail | OK |
 | `kPasteRestoreFailedFooterMessage` | Paste cancelled - the device could not be fully restored. Check the connection and try again. | Restore fail | OK |
-| `FooterMessages::formatExportSuccess` | Bank `{n}` exported successfully : 100 patches saved to `{path}.` / Patches exported successfully : … | Export OK | "Bank" sentence case |
+| `FooterMessages::formatExportSuccess` | Bank `{n}` exported successfully: 100 patches saved to `{path}.` / Patches exported successfully: … | Export OK | "Bank" sentence case |
 | `FooterMessages::formatImportSuccess` | Import complete - found `{f}`, valid `{v}`, imported `{i}` | Import OK | OK |
 | `FooterMessages::formatImportNoValidFiles` | No valid .syx files to import (found `{n}`) | No valid files | OK |
 | `FooterMessages::formatCopySuccess` | Bank `{n}` copied to clipboard. | Copy OK | "Bank" sentence case |

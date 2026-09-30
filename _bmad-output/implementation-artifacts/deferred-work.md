@@ -2119,3 +2119,12 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-window-modal-look-strategy.md`
   summary: Matrix confirm Cancel/Escape→0, primary/Return→1, middle→2 mapping has no automated GUI coverage after the restyle.
   evidence: Core gate tests mock UI gates; CONVENTIONS avoid GUI modal-loop unit tests; manual confirm smoke remains.
+
+## Deferred from: spec-window-modal-look-strategy.md smoke follow-up (2026-09-30)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-window-modal-look-strategy.md`
+  summary: Lenovo Windows/Linux title-bar + multi-monitor + Audio Settings smoke still open.
+  evidence: Mac smoke done 2026-09-30; hardware checklist remains in guide + Design Notes.
+- source_spec: `_bmad-output/implementation-artifacts/spec-window-modal-look-strategy.md`
+  summary: Smoke follow-ups (Audio From vs Input desync/Larsen, first-run None default, modal layout polish, About Montserrat, combo dismiss on native title bar) await product decisions before a correctifs pass.
+  evidence: Annotated guide `guide-smoke-window-modal-look.md` (2026-09-30); do not auto-patch until Guillaume answers chat questions.

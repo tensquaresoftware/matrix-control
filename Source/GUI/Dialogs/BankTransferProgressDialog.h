@@ -98,7 +98,7 @@ private:
     // COPY / IMPORT: progress first, then detail (read then destination/source).
     // EXPORT / PASTE: detail first, then progress (matches their flow).
     bool detailBelowProgress_ = false;
-    // COPY / PASTE: "Source : Clipboard" on one line. EXPORT / IMPORT: label then path.
+    // COPY / PASTE: "Source: Clipboard" on one line. EXPORT / IMPORT: label then path.
     bool detailInline_ = false;
     juce::String title_;
     juce::String headerLabel_;

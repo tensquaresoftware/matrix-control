@@ -1,0 +1,133 @@
+---
+organization: Ten Square Software
+project: Matrix-Control
+title: Notes
+author: Guillaume DUPONT
+started: 2026-09-29
+updated: 2026-09-30
+---
+
+# Smoke fenêtres et modales — Matrix-Control
+
+Guide de parcours après le look Matrix des fenêtres et modales.
+Ouvre ce fichier dans Typora et coche au fur et à mesure.
+Pour chaque case : look Matrix (chrome, corps Montserrat lisible en minuscules, boutons MAJUSCULES style GUI), Escape ferme ou annule, Enter active le bouton principal quand c’est prévu.
+
+## Avant de commencer
+
+- [x] Build Debug macOS à jour installé (Standalone + AU ou VST3)
+- [x] Synth ou MIDI simulé prêt si tu touches DEVICE SETUP / bank / Master
+
+## Standalone seulement
+
+- [x] Barre de titre native OS (pas une barre dessinée JUCE)
+- [x] Glisser la fenêtre sur un second écran : elle y reste sans revenir d’un coup
+- [x] Logo → Audio/MIDI Settings (ou Cmd/Ctrl+Alt+virgule) : titre AUDIO SETTINGS, chrome Matrix
+- [x] Audio Settings : pas de liste Active MIDI inputs, pas de MIDI Output
+- [x] Audio Settings : pas de Feedback Loop, pas de Mute audio input, pas de bannière bleue
+- [x] Audio Settings : bouton TEST (Matrix, majuscules) joue le son de test
+- [x] Audio Settings : PeakIndicator à droite du TEST réagit au signal (AUDIO FROM actif aide)
+- [x] Audio Settings : changer d’interface audio garde sample rate / buffer si l’appareil les propose encore
+- [x] Audio Settings : Escape ou clic hors cadre ferme ; à la réouverture pas de timer fantôme bizarre
+- [x] AUDIO FROM = None : silence logiciel sans case Mute dans Audio Settings
+
+## Commun Standalone et plugin — overlays
+
+- [x] Settings (engrenage) : chrome Matrix, boutons Matrix majuscules
+- [x] About : chrome Matrix
+- [x] Fermer Settings / About avec Escape ou le bouton fermer
+
+## DEVICE SETUP
+
+- [x] Première session ou reset machine defaults : DEVICE SETUP s’ouvre (chrome Matrix)
+- [x] Boutons CONFIRM et SPECIFY LATER en Matrix majuscules
+- [x] Escape / SPECIFY LATER se comporte comme avant
+
+## Master
+
+- [x] Settings → Master Init d’un module : RESET MASTER MODULE? corps Montserrat, RESET / CANCEL Matrix
+- [x] Settings → reset global Master : RESET ALL MASTER MODULES? même look
+- [x] Charger un fichier .m1km : Load .m1km Master? avec choix MASTER SETTINGS ONLY / FULL MASTER / CANCEL Matrix
+
+## Patch Mutator
+
+- [x] Delete sur une mutation (avec warning actif) : Delete mutation? Matrix + option don’t ask again
+- [x] Delete : CANCEL à gauche, DELETE à droite ; Escape = cancel ; Enter = DELETE
+- [x] Clear history (flush) : Flush mutation history? Matrix, codes inchangés
+- [x] Settings → Defrag history : Defrag mutation history? Matrix, DEFRAG / CANCEL
+
+## Patch et fichiers (confirms Matrix)
+
+- [x] Quitter / changer de patch avec unsaved : Unsaved patch Matrix (CANCEL / DISCARD / STORE ou SAVE…)
+- [x] Reconciliation nom interne vs fichier : Patch name mismatch Matrix
+- [x] Save As avec nom invalide : Invalid patch file name Matrix, bouton OK
+- [x] Delete init template (patch ou master) : Delete init template? Matrix
+
+## Banks
+
+- [x] Import bank : Import bank? Matrix
+- [x] Paste bank : Paste bank? Matrix
+- [x] Export vers dossier existant : Replace export folder? Matrix
+- [x] Overwrite .syx sibling : Overwrite existing .syx? Matrix
+- [x] Pendant un transfert bank : dialogue de progression Matrix, CANCEL Matrix ; Escape annule si activé
+
+## FileChooser OS (ne doit PAS être Matrix)
+
+- [x] Ouvrir un dossier (import bank / export folder) : picker système OS
+- [x] Save As / Open fichier .syx : picker système OS
+- [x] Après Cancel du picker, l’UI Matrix revient correctement au premier plan
+
+## Plugin hôte (AU ou VST3)
+
+- [x] Pas de changement de chrome de fenêtre hôte (titre = hôte)
+- [x] Settings / About / confirms / Mutator Delete / Master Init : même look Matrix que standalone
+- [x] Audio Settings Matrix absent ou inerte (chemin standalone seulement)
+- [x] FileChooser reste OS aussi en plugin
+
+## Raccourcis clavier sur une confirm Matrix
+
+- [x] Escape = cancel (code 0)
+- [x] Enter = action principale (code 1)
+- [x] Si trois boutons : ordre visuel CANCEL → milieu → primaire à droite
+
+## Lenovo plus tard (Windows / Linux)
+
+- [ ] Barre de titre native
+- [ ] Drag multi-écran sans snap-back
+- [ ] Une confirm Matrix + Audio Settings + un FileChooser OS
+
+## Suivi smoke macOS (2026-09-30) — décisions + backlog
+
+### Décisions tranchées
+
+- [x] Ponctuation : règles anglaises partout (supprimer espaces avant ? ! :)
+- [x] Audio safety : paquet scène complet (sync + défaut None + invalidation fantômes)
+- [x] Combos vs barre de titre native : reporter
+- [x] Prochain polish modales : layout commun + copy/wrapping + About Montserrat corps
+- [x] Audio Settings : viser chrome Matrix complet (pas seulement footer) — faisabilité OK (rebuild)
+
+### Audio / sécurité monitoring
+
+- [ ] Corriger désync AUDIO FROM vs Input Audio Settings (Larsen)
+- [ ] Premier démarrage : Input = None et AUDIO FROM = NONE
+- [ ] Invalider / nettoyer les entrées fantômes quand le device Input change
+
+### Audio Settings — rebuild Matrix (chantier dédié)
+
+- [ ] Remplacer labels / combos / toggles canaux exclusifs / TEST / meter JUCE par équivalents Matrix
+- [ ] PeakIndicator à la hauteur de la combo Input ; TEST + Peak dans la rangée Input (pas en bas à droite)
+- [ ] Garder sample rate / buffer / output / type device
+
+### Polish modales (prochain chantier)
+
+- [ ] Layout commun (titres caps, boutons centrés, inset texte ~10%, densité, Don't ask again)
+- [ ] About : Montserrat corps ; titre marque inchangé
+- [ ] Retouches DEVICE SETUP / m1km / Flush / mismatch / Delete init
+- [x] Nettoyage ponctuation anglaise (SKIN: etc.)
+
+### Ordre d'exécution validé (2026-09-30)
+
+1. Ponctuation anglaise
+2. Polish modales + About Montserrat
+3. Audio safety scène
+4. Rebuild Audio Settings Matrix

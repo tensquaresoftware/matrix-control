@@ -156,11 +156,11 @@ namespace PluginDisplayNames
     namespace Settings
     {
         const juce::String kWindowTitle                = "SETTINGS";
-        constexpr const char* kSkinLabel               = "SKIN :";
-        constexpr const char* kUiScaleLabel            = "UI SCALE :";
+        constexpr const char* kSkinLabel               = "SKIN:";
+        constexpr const char* kUiScaleLabel            = "UI SCALE:";
         constexpr const char* kHardwareLatencyLabel    = "HARDWARE LATENCY";
-        constexpr const char* kAudioFromLabel          = "AUDIO FROM :";
-        constexpr const char* kInputGainLabel          = "INPUT GAIN :";
+        constexpr const char* kAudioFromLabel          = "AUDIO FROM:";
+        constexpr const char* kInputGainLabel          = "INPUT GAIN:";
         constexpr const char* kInterfaceSection        = "INTERFACE";
         constexpr const char* kDeviceSection           = "DEVICE";
         constexpr const char* kPatchSection            = "PATCH";
@@ -480,40 +480,40 @@ namespace PluginDisplayNames
             constexpr const char* kCopyTitle   = "COPYING BANK";
             constexpr const char* kPasteTitle  = "PASTING BANK";
             constexpr const char* kCancel      = "CANCEL";
-            constexpr const char* kDestinationFolderLabel = "Destination folder :";
-            constexpr const char* kSourceFolderLabel = "Source folder :";
-            constexpr const char* kDestinationLabel = "Destination :";
-            constexpr const char* kSourceLabel = "Source :";
+            constexpr const char* kDestinationFolderLabel = "Destination folder:";
+            constexpr const char* kSourceFolderLabel = "Source folder:";
+            constexpr const char* kDestinationLabel = "Destination:";
+            constexpr const char* kSourceLabel = "Source:";
             constexpr const char* kClipboardLabel = "Clipboard";
 
             inline juce::String formatExportProgressMessage(int bank)
             {
-                return "Exporting bank " + juce::String(bank) + " :";
+                return "Exporting bank " + juce::String(bank) + ":";
             }
 
             inline juce::String formatExportProgressMessageNoBank()
             {
-                return "Exporting patches :";
+                return "Exporting patches:";
             }
 
             inline juce::String formatCopyProgressMessage(int bank)
             {
-                return "Reading source bank " + juce::String(bank) + " :";
+                return "Reading source bank " + juce::String(bank) + ":";
             }
 
             inline juce::String formatPasteSafetyCopyMessage(int destinationBank)
             {
-                return "Saving safety copy of destination bank " + juce::String(destinationBank) + " :";
+                return "Saving safety copy of destination bank " + juce::String(destinationBank) + ":";
             }
 
             inline juce::String formatPasteWritingMessage(int destinationBank)
             {
-                return "Writing clipboard into destination bank " + juce::String(destinationBank) + " :";
+                return "Writing clipboard into destination bank " + juce::String(destinationBank) + ":";
             }
 
             inline juce::String formatPasteRestoringMessage(int destinationBank)
             {
-                return "Cancelling - restoring destination bank " + juce::String(destinationBank) + " :";
+                return "Cancelling - restoring destination bank " + juce::String(destinationBank) + ":";
             }
         }
     }
@@ -1546,7 +1546,7 @@ namespace PluginDisplayNames
 
             namespace StandaloneWidgets
             {
-                // Patch names are 8 characters long in the Oberheim Matrix-1000 :
+                // Patch names are 8 characters long in the Oberheim Matrix-1000:
                 constexpr const char* kDefaultPatchName = "--------";
                 // Runtime sentinel after Internal Patches INIT (8 chars). Not Matrix-legal for
                 // Computer Patches Save / Save As — user must rename first. Distinct from
@@ -1697,10 +1697,10 @@ namespace PluginDisplayNames
             constexpr const char* kPasteRestoreFailedFooterMessage =
                 "Paste cancelled - the device could not be fully restored. Check the connection and try again.";
             constexpr const char* kExportingMessage = "Exporting bank to disk...";
-            constexpr const char* kImportingReadingMessage = "Reading bank safety copy from device :";
-            constexpr const char* kImportingWritingMessage = "Writing patches to the device :";
-            constexpr const char* kImportingRestoringMessage = "Cancelling - restoring device :";
-            constexpr const char* kPastingWritingMessage = "Writing clipboard into destination bank :";
+            constexpr const char* kImportingReadingMessage = "Reading bank safety copy from device:";
+            constexpr const char* kImportingWritingMessage = "Writing patches to the device:";
+            constexpr const char* kImportingRestoringMessage = "Cancelling - restoring device:";
+            constexpr const char* kPastingWritingMessage = "Writing clipboard into destination bank:";
 
             namespace StandaloneWidgets
             {
@@ -1729,9 +1729,9 @@ namespace PluginDisplayNames
                     const auto savedClause = "100 patches saved to " + folderPath + ".";
 
                     if (hasBankConcept)
-                        return "Bank " + juce::String(bank) + " exported successfully : " + savedClause;
+                        return "Bank " + juce::String(bank) + " exported successfully: " + savedClause;
 
-                    return "Patches exported successfully : " + savedClause;
+                    return "Patches exported successfully: " + savedClause;
                 }
 
                 inline juce::String formatImportSuccess(int found, int valid, int imported)

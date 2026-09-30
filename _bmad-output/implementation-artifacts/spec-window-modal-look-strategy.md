@@ -90,7 +90,9 @@ context:
 - [x] `Source/GUI/Dialogs/*` (+ DEVICE SETUP if in scope) — replace remaining `juce::TextButton` with `TSS::Button` + caps labels in `PluginDisplayNames` — end mixed JUCE/Matrix button look
 - [x] Audio/MIDI Matrix dialog — wrap/rebuild selector UI without MIDI / Feedback Loop / Mute; Matrix Test `TSS::Button`; PeakIndicator; wire show path from `StandaloneAudioInputRouterStandalone.cpp` — remove stock-JUCE sore thumb
 - [x] Sample rate / buffer persistence — diagnose on device switch; fix if low-risk else note defer in Design Notes — reduce painful resets
-- [ ] Manual smoke — Mac external drag; Matrix confirm readability; FileChooser; simplified Audio/MIDI Test+meter; Lenovo checklist — verify product intent
+- [x] Manual smoke — Mac external drag; Matrix confirm readability; FileChooser; simplified Audio/MIDI Test+meter; Lenovo checklist — verify product intent
+  - Mac smoke completed 2026-09-30 (see `guide-smoke-window-modal-look.md`); Lenovo still open
+  - Follow-up findings logged in that guide (Audio From desync/Larsen, modal layout polish, About Montserrat trial) — awaiting product decisions before patch
 
 **Acceptance Criteria:**
 - Given standalone on macOS (and later Win/Linux), when dragged to an external display, then it can rest there without snap-back.
@@ -156,6 +158,25 @@ KEEP_NATIVE locked; no spike. Mute audio input toggles `StandalonePluginHolder` 
 - [ ] FileChooser remains OS chrome
 - [ ] Audio Settings: no MIDI / mute / blue banner; Test + PeakIndicator
 - [ ] Sample rate / buffer restore on interface switch while dialog open
+
+### Smoke macOS (2026-09-30) — outcome
+
+**Passed (story ACs):** native title bar + external display; Matrix confirms/dialogs + caps buttons; FileChooser OS; Audio Settings without MIDI/mute/banner; TEST + PeakIndicator work; plugin host unchanged; Escape/Enter/LTR OK.
+
+**Decisions locked after smoke (2026-09-30 evening):**
+- Punctuation: English rules everywhere — strip unconventional spaces before `?` `!` `:` (including Settings labels like `SKIN :` → `SKIN:`). **Done 2026-09-30** in `PluginDisplayNames` + debug test labels; factory patch name `AW WHY ?` left verbatim.
+- Audio safety: full scene package — fix AUDIO FROM ↔ Input desync / Larsen; first-run default Input + AUDIO FROM to None.
+- Audio Settings chrome: investigate/rebuild toward full Matrix equivalents (not footer-only TEST+Peak); PeakIndicator height = Input combo height; TEST+Peak in JUCE-native row positions — feasibility confirmed in chat (rebuild, not LookAndFeel skin).
+- Native title-bar combo dismiss: deferred.
+- Next polish pass: shared Matrix modal layout + listed copy/wrapping + About Montserrat body (separate from Audio Settings rebuild / audio safety if scoped as multi-chantier).
+
+**Follow-ups still open until implement:**
+- AUDIO FROM combo can disagree with Audio Settings Input device → monitoring / Larsen risk.
+- Wish: first-run default Input / AUDIO FROM to None.
+- Full Matrix Audio Settings body (labels, combos, exclusive channel toggles, TEST, PeakIndicator replacing JUCE meter).
+- Shared Matrix modal layout polish + per-dialog copy wrapping + About Montserrat body.
+- English punctuation cleanup (` :` → `:` etc.).
+- Lenovo Windows/Linux smoke.
 
 ## Verification
 

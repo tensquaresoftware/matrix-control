@@ -11,6 +11,9 @@
 | ASCII hyphen `-` or spaced ` - ` for clause breaks | Em dash `—` (U+2014), en dash `–` (U+2013) |
 | ASCII ellipsis `...` (or paint-time truncation helper) | Unicode ellipsis `…` |
 | Straight ASCII quotes when needed | Curly quotes `“”‘’` |
+| English punctuation: no space before `?` `!` `:` (e.g. `SKIN:`, `Reset?`) | French-style spaced `?` `!` `:` (e.g. `SKIN :`) |
+
+**Exception:** authentic Matrix-1000 factory patch names kept verbatim (e.g. `AW WHY ?`).
 
 ## Approved exceptions (do not “fix” without a story)
 

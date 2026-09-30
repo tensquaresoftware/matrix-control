@@ -149,7 +149,7 @@ void TestComponent::createVisualDebugControls()
 {
     auto& settings = TestVisualDebugSettings::get();
 
-    gridToggle_.setButtonText("GRID :");
+    gridToggle_.setButtonText("GRID:");
     gridToggle_.setToggleState(settings.gridEnabled, juce::dontSendNotification);
     gridToggle_.onClick = [this]
     {
@@ -182,7 +182,7 @@ void TestComponent::createVisualDebugControls()
     };
     addAndMakeVisible(gridColourPicker_);
 
-    boundsToggle_.setButtonText("BOUNDS :");
+    boundsToggle_.setButtonText("BOUNDS:");
     boundsToggle_.setToggleState(settings.boundsEnabled, juce::dontSendNotification);
     boundsToggle_.onClick = [this]
     {
@@ -208,7 +208,7 @@ void TestComponent::updateWidgetLabelLook()
     const auto labelLook = TSS::labelLookFromSkin(*skin_);
 
     if (widgetLabel_ == nullptr)
-        widgetLabel_ = std::make_unique<TSS::Label>(widgetLabelWidth_, kDebugControlHeight_, labelLook, "WIDGET :");
+        widgetLabel_ = std::make_unique<TSS::Label>(widgetLabelWidth_, kDebugControlHeight_, labelLook, "WIDGET:");
     else
         widgetLabel_->setLook(labelLook);
 }
@@ -221,7 +221,7 @@ void TestComponent::layoutHeaderControls(int topRowHeight)
     const int rawLabelWidth = (skin_ != nullptr)
         ? juce::roundToInt(juce::GlyphArrangement::getStringWidth(
             TSS::labelLookFromSkin(*skin_).font,
-            "WIDGET :")) + kGap_
+            "WIDGET:")) + kGap_
         : kGap_;
     widgetLabelWidth_ = juce::jmax(4, alignToMultipleOf4(rawLabelWidth) - kWidgetLabelWidthReduction_ + kWidgetLabelExtraWidth_);
 
