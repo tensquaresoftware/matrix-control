@@ -7,6 +7,7 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 
 #include "Core/Services/DeviceSetupDeviceRow.h"
+#include "GUI/Dialogs/DialogMatrixHelpers.h"
 #include "GUI/Widgets/ComboBox.h"
 #include "GUI/Widgets/Label.h"
 #include "GUI/Widgets/Button.h"
@@ -23,7 +24,6 @@ class EpromTypePromptDialog : public juce::Component,
 {
 public:
     static constexpr int kDesignWidth = 392;
-    static constexpr int kDesignHeight = 310;
 
     struct LiveDeviceStatus
     {
@@ -69,13 +69,12 @@ public:
 private:
     struct ContentLayout
     {
-        juce::Rectangle<int> bodyTextArea;
+        DialogMatrixHelpers::ModalGeometry geometry;
+        juce::Font bodyFont { juce::FontOptions{} };
         juce::Rectangle<int> controlBand;
-        juce::Rectangle<int> buttonRow;
     };
 
-    int getBorderThickness() const;
-    juce::Rectangle<int> getDialogBounds() const;
+    int getRowsHeight() const;
     ContentLayout computeContentLayout() const;
     juce::String bodyText() const;
     void populateComboItems(MatrixDeviceTypes::Type deviceType, int preferredSelectedId);
@@ -120,15 +119,12 @@ private:
     std::unique_ptr<TSS::Button> confirmButton_;
     std::unique_ptr<TSS::Button> specifyLaterButton_;
 
-    inline constexpr static int kTitleBarHeight_ = 28;
-    inline constexpr static int kBorderThickness_ = 4;
     inline constexpr static int kLabelWidth_ = 92;
     inline constexpr static int kComboWidth_ = 140;
     inline constexpr static int kControlHeight_ = 20;
     inline constexpr static int kRowGap_ = 8;
     inline constexpr static int kSpecifyLaterButtonWidth_ = 120;
     inline constexpr static int kConfirmButtonWidth_ = 80;
-    inline constexpr static int kMaxBodyFittedLines_ = 8;
     inline constexpr static int kSearchingDotsIntervalMs_ = 450;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(EpromTypePromptDialog)

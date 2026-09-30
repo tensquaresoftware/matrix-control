@@ -2128,3 +2128,15 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-window-modal-look-strategy.md`
   summary: Smoke follow-ups (Audio From vs Input desync/Larsen, first-run None default, modal layout polish, About Montserrat, combo dismiss on native title bar) await product decisions before a correctifs pass.
   evidence: Annotated guide `guide-smoke-window-modal-look.md` (2026-09-30); do not auto-patch until Guillaume answers chat questions.
+
+## Deferred from: review of spec-matrix-modal-layout-polish.md (2026-09-30)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-matrix-modal-layout-polish.md`
+  summary: Shared Matrix modal layout helpers (inset, measured height, centred buttons, title caps) have no automated GUI observer.
+  evidence: CONVENTIONS forbid paint/component unit tests; Verification routes layout to Standalone smoke; DeviceSetup and MatrixModalCopy tests cover copy only.
+- source_spec: `_bmad-output/implementation-artifacts/spec-matrix-modal-layout-polish.md`
+  summary: Patch name mismatch `valueRows` wiring is unobserved by automated tests.
+  evidence: Core reconciler tests stub the picker; observing Internal/Filename columns needs the Matrix confirm UI path (smoke).
+- source_spec: `_bmad-output/implementation-artifacts/spec-matrix-modal-layout-polish.md`
+  summary: About body Montserrat switch has no automated font observer.
+  evidence: No AboutPanel tests; CONVENTIONS + smoke checklist own About paint fonts.

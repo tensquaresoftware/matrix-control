@@ -10,7 +10,15 @@ using TSS::SkinColourId;
 
 namespace
 {
-    constexpr juce::uint32 kDialogBorderColour = 0xff5E5E5E;
+    int scaledButtonHeight(float uiScale)
+    {
+        return juce::roundToInt(static_cast<float>(DialogMatrixHelpers::kDefaultButtonHeight) * uiScale);
+    }
+
+    int scaledBottomMargin(float uiScale)
+    {
+        return juce::roundToInt(static_cast<float>(DialogMatrixHelpers::kButtonBottomMargin) * uiScale);
+    }
 }
 
 BankTransferProgressDialog::BankTransferProgressDialog(TSS::ISkin& skin)
@@ -330,32 +338,28 @@ void BankTransferProgressDialog::paintDualLaneBody(juce::Graphics& g,
 
 void BankTransferProgressDialog::paint(juce::Graphics& g)
 {
-    g.fillAll(skin_->getColour(SkinColourId::kBodyPanelBackground).withAlpha(0.85f));
-
     const auto dialogBounds = getDialogBounds();
     const int border = getBorderThickness();
-
-    g.setColour(juce::Colour(kDialogBorderColour));
-    g.fillRect(dialogBounds);
-
-    auto inner = dialogBounds.reduced(border);
     const int titleBarHeight = juce::roundToInt(static_cast<float>(kTitleBarHeight_) * uiScale_);
-    auto titleBar = inner.removeFromTop(titleBarHeight);
-    auto content = inner;
 
-    g.setColour(skin_->getColour(SkinColourId::kHeaderPanelBackground));
-    g.fillRect(titleBar);
-    g.fillRect(content);
+    DialogMatrixHelpers::paintMatrixOverlayChrome({
+        .g = g,
+        .skin = *skin_,
+        .dialogBounds = dialogBounds,
+        .borderThickness = border,
+        .titleBarHeight = titleBarHeight,
+        .title = title_,
+        .uiScale = uiScale_ });
 
-    g.setColour(skin_->getColour(SkinColourId::kDarkPanelText));
-    g.setFont(skin_->getBaseFontBold().withHeight(skin_->getBaseFontBold().getHeight() * uiScale_));
-    g.drawText(title_, titleBar, juce::Justification::centred, false);
+    auto content = dialogBounds.reduced(border);
+    content.removeFromTop(titleBarHeight);
 
     // Custom modal scheme: exactly 1em under the title, then content (no extra top padding).
     const auto bodyFont = DialogMatrixHelpers::scaledModalBodyFont(*skin_, uiScale_);
     const int gapUnderTitle = juce::roundToInt(bodyFont.getHeight());
     const int padX = juce::roundToInt(12.0f * uiScale_);
-    const int bottomReserve = juce::roundToInt(40.0f * uiScale_);
+    // Same button height + bottom margin ints as resized() so body never overlaps the button row.
+    const int bottomReserve = scaledButtonHeight(uiScale_) + scaledBottomMargin(uiScale_);
 
     auto body = content;
     body.removeFromTop(gapUnderTitle);
@@ -370,16 +374,21 @@ void BankTransferProgressDialog::paint(juce::Graphics& g)
 
 void BankTransferProgressDialog::resized()
 {
-    auto inner = getDialogBounds().reduced(getBorderThickness());
-    inner.removeFromTop(juce::roundToInt(static_cast<float>(kTitleBarHeight_) * uiScale_));
+    auto content = getDialogBounds().reduced(getBorderThickness());
+    content.removeFromTop(juce::roundToInt(static_cast<float>(kTitleBarHeight_) * uiScale_));
 
-    const int padding = juce::roundToInt(12.0f * uiScale_);
-    const int buttonHeight = juce::roundToInt(24.0f * uiScale_);
-    const int buttonWidth = juce::roundToInt(
-        static_cast<float>(DialogMatrixHelpers::kDefaultButtonWidth) * uiScale_);
+    const int buttonHeight = scaledButtonHeight(uiScale_);
+    const int bottomMargin = scaledBottomMargin(uiScale_);
+    const juce::Rectangle<int> buttonRow { content.getX(),
+                                           content.getBottom() - bottomMargin - buttonHeight,
+                                           content.getWidth(),
+                                           buttonHeight };
 
-    auto buttonRow = inner.reduced(padding).removeFromBottom(buttonHeight);
-    cancelButton_->setBounds(buttonRow.removeFromRight(buttonWidth));
+    DialogMatrixHelpers::layoutCentredButtonRow(
+        buttonRow,
+        uiScale_,
+        { { cancelButton_.get(),
+            DialogMatrixHelpers::estimateButtonWidth(*skin_, cancelButton_->getButtonText(), uiScale_) } });
 }
 
 bool BankTransferProgressDialog::keyPressed(const juce::KeyPress& key)

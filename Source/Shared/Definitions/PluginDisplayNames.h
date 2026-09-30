@@ -276,16 +276,16 @@ namespace PluginDisplayNames
             constexpr const char* kBodyStore =
                 "This patch is not stored in the synth's current RAM slot yet "
                 "(edits and/or an INIT that was never stored).\n\n"
-                "Store writes it to the current RAM location. Discard abandons it and continues. "
-                "Cancel keeps editing.";
+                "STORE writes it to the current RAM location. DISCARD abandons it and continues. "
+                "CANCEL keeps editing.";
             constexpr const char* kBodySave =
                 "This patch has changes that were not saved to a .syx file.\n\n"
-                "Save writes/updates the .syx file (same name). Discard abandons the changes and continues. "
-                "Cancel keeps editing.";
+                "SAVE writes/updates the .syx file (same name). DISCARD abandons the changes and continues. "
+                "CANCEL keeps editing.";
             constexpr const char* kBodySaveAs =
                 "This patch has changes that were not saved as a .syx file.\n\n"
-                "Save As writes a new file. Discard abandons the changes and continues. "
-                "Cancel keeps editing.";
+                "SAVE AS writes a new file. DISCARD abandons the changes and continues. "
+                "CANCEL keeps editing.";
             constexpr const char* kCancel  = "CANCEL";
             constexpr const char* kDiscard = "DISCARD";
             constexpr const char* kStore   = "STORE";
@@ -296,8 +296,10 @@ namespace PluginDisplayNames
         namespace PatchNameReconciliation
         {
             constexpr const char* kTitle = "Patch name mismatch";
-            constexpr const char* kBodyTemplate =
-                "Internal name: {INTERNAL}\nFilename: {FILENAME}\n\nWhich name should be used for this load?";
+            // Internal/filename rows are drawn as label/value columns; kBody follows after a blank line.
+            constexpr const char* kInternalNameLabel = "Internal name:";
+            constexpr const char* kFilenameLabel = "Filename:";
+            constexpr const char* kBody = "Which name should be used for this load?";
             constexpr const char* kInternal = "INTERNAL";
             constexpr const char* kFilename = "FILENAME";
             constexpr const char* kCancel   = "CANCEL";
@@ -329,11 +331,12 @@ namespace PluginDisplayNames
             constexpr const char* kTitle = "DEVICE SETUP";
             constexpr const char* kBody =
                 "Welcome to Matrix-Control - a modern SysEx MIDI editor for the Oberheim "
-                "Matrix-1000/6/6R synthesizers. A quick setup is needed so you can use "
+                "Matrix-1000/6/6R synthesizers.\n\n"
+                "A quick setup is needed so you can use "
                 "Matrix-Control optimally with your synth. Select MIDI ports and the EPROM "
                 "type installed in your synth. This affects MIDI timing and future features.";
             constexpr const char* kBodySuggestionSuffix =
-                " A suggestion is preselected from the reported firmware version when possible.";
+                "\n\nA suggestion is preselected from the reported firmware version when possible.";
             constexpr const char* kMidiFromLabel = "MIDI FROM";
             constexpr const char* kMidiToLabel = "MIDI TO";
             constexpr const char* kSearching = "SEARCHING";
@@ -356,7 +359,8 @@ namespace PluginDisplayNames
         {
             constexpr const char* kTitle = "Defrag mutation history?";
             constexpr const char* kBody =
-                "Defrag will compact mutation history and preserve the current selection. Continue?";
+                "Defrag will compact mutation history and preserve the current selection.\n\n"
+                "DEFRAG to compact it, or CANCEL to keep the history as is.";
             constexpr const char* kConfirm = "DEFRAG";
             constexpr const char* kCancel  = "CANCEL";
         }
@@ -367,7 +371,7 @@ namespace PluginDisplayNames
             constexpr const char* kBody =
                 "This clears the Patch Mutator history for this session.\n"
                 "The initial patch snapshot is kept.\n\n"
-                "Continue to flush, or Cancel to keep the history.";
+                "CONTINUE to flush, or CANCEL to keep the history.";
             constexpr const char* kCancel   = "CANCEL";
             constexpr const char* kContinue = "CONTINUE";
         }
@@ -378,7 +382,7 @@ namespace PluginDisplayNames
             constexpr const char* kBody =
                 "This removes the selected mutation or retry from Patch Mutator history.\n"
                 "Deleting a root mutation also removes all of its retries.\n\n"
-                "Delete to remove it, or Cancel to keep the history.";
+                "DELETE to remove it, or CANCEL to keep the history.";
             constexpr const char* kCancel        = "CANCEL";
             constexpr const char* kDelete        = "DELETE";
             constexpr const char* kDontAskAgain  = "Don't ask again";
@@ -390,11 +394,11 @@ namespace PluginDisplayNames
             constexpr const char* kBodyPatch =
                 "This removes the system Patch init template (PatchInit.syx).\n"
                 "The next Patch INIT will use the built-in defaults.\n\n"
-                "DELETE to remove it, or Cancel to keep the file.";
+                "DELETE to remove it, or CANCEL to keep the file.";
             constexpr const char* kBodyMaster =
                 "This removes the system Master init template (MasterInit.syx).\n"
                 "The next Master INIT will use the built-in defaults.\n\n"
-                "DELETE to remove it, or Cancel to keep the file.";
+                "DELETE to remove it, or CANCEL to keep the file.";
             constexpr const char* kCancel = "CANCEL";
             constexpr const char* kDelete = "DELETE";
         }
@@ -404,7 +408,7 @@ namespace PluginDisplayNames
             constexpr const char* kTitle = "Import bank?";
             constexpr const char* kBody =
                 "This overwrites patches on the device with files from the selected folder.\n\n"
-                "Continue to import, or Cancel to keep the device unchanged.";
+                "CONTINUE to import, or CANCEL to keep the device unchanged.";
             constexpr const char* kCancel   = "CANCEL";
             constexpr const char* kContinue = "CONTINUE";
         }
@@ -419,7 +423,7 @@ namespace PluginDisplayNames
             {
                 return "This overwrites all 100 patches in bank " + juce::String(targetBank)
                     + " with the copied bank " + juce::String(sourceBank) + ".\n\n"
-                    + "Continue to paste, or Cancel to keep the device unchanged.";
+                    + "CONTINUE to paste, or CANCEL to keep the device unchanged.";
             }
         }
 
@@ -428,9 +432,9 @@ namespace PluginDisplayNames
             constexpr const char* kTitle = "Replace export folder?";
             constexpr const char* kBody =
                 "An export folder already exists at this location.\n\n"
-                "Continue will delete that folder completely, recreate it empty, "
+                "CONTINUE will delete that folder completely, recreate it empty, "
                 "then export a fresh copy of the bank.\n\n"
-                "Cancel leaves the existing folder untouched.";
+                "CANCEL leaves the existing folder untouched.";
             constexpr const char* kCancel   = "CANCEL";
             constexpr const char* kContinue = "CONTINUE";
         }
@@ -444,11 +448,11 @@ namespace PluginDisplayNames
 
             inline juce::String formatBody(const juce::String& existingSyxFileName)
             {
-                return "You loaded a .m1kp patch. Save will write "
+                return "You loaded a .m1kp patch. SAVE will write "
                     + existingSyxFileName
                     + ", which already exists in this folder.\n\n"
-                    + "Continue replaces that .syx file. The original .m1kp stays unchanged.\n\n"
-                    + "Cancel keeps editing without saving.";
+                    + "CONTINUE replaces that .syx file. The original .m1kp stays unchanged.\n\n"
+                    + "CANCEL keeps editing without saving.";
             }
         }
 
@@ -459,9 +463,9 @@ namespace PluginDisplayNames
             constexpr const char* kBody =
                 "This .m1km Master file may include Groups and cascade data. "
                 "Matrix-Control does not edit those yet, but the Matrix-1000 still uses them.\n\n"
-                "Choose whether to load Master settings only (Groups/cascade reset) or the full "
-                "master (Groups/cascade kept).\n"
-                "Cancel leaves the current Master unchanged.";
+                "Choose whether to load MASTER SETTINGS ONLY (Groups/cascade reset) or the "
+                "FULL MASTER (Groups/cascade kept).\n"
+                "CANCEL leaves the current Master unchanged.";
             constexpr const char* kMasterSettingsOnly = "MASTER SETTINGS ONLY";
             constexpr const char* kFullMaster = "FULL MASTER (INCLUDING GROUPS/CASCADE)";
             constexpr const char* kCancel = "CANCEL";

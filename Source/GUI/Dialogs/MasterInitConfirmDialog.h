@@ -5,6 +5,7 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
+#include "GUI/Dialogs/DialogMatrixHelpers.h"
 #include "GUI/Widgets/Button.h"
 
 namespace TSS
@@ -16,7 +17,6 @@ class MasterInitConfirmDialog : public juce::Component
 {
 public:
     static constexpr int kDesignWidth = 420;
-    static constexpr int kDesignHeight = 120;
 
     MasterInitConfirmDialog(TSS::ISkin& skin, std::function<void()> onDismissRequested);
     ~MasterInitConfirmDialog() override;
@@ -33,8 +33,7 @@ public:
     bool keyPressed(const juce::KeyPress& key) override;
 
 private:
-    int getBorderThickness() const;
-    juce::Rectangle<int> getDialogBounds() const;
+    DialogMatrixHelpers::TextModalLayout computeLayout() const;
     juce::String formatBodyText() const;
     void dismiss();
     void confirm();
@@ -48,9 +47,6 @@ private:
 
     std::unique_ptr<TSS::Button> resetButton_;
     std::unique_ptr<TSS::Button> cancelButton_;
-
-    inline constexpr static int kTitleBarHeight_ = 28;
-    inline constexpr static int kBorderThickness_ = 4;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MasterInitConfirmDialog)
 };

@@ -595,6 +595,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/SysExDelayProfileTests.cpp
         Tests/Unit/EpromTypePolicyTests.cpp
         Tests/Unit/DeviceSetupDeviceRowTests.cpp
+        Tests/Unit/MatrixModalCopyTests.cpp
         Tests/Unit/DeviceConnectionMachineDefaultsTests.cpp
         Tests/Unit/MidiPortComboPopulationTests.cpp
         Tests/Unit/ComboBoxLiveRefreshTests.cpp

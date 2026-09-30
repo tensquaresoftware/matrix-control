@@ -259,7 +259,7 @@ private:
         namespace Body = PluginDisplayNames::Dialogs::EpromTypePrompt;
         const juce::String approved(
             "Welcome to Matrix-Control - a modern SysEx MIDI editor for the Oberheim "
-            "Matrix-1000/6/6R synthesizers. A quick setup is needed so you can use "
+            "Matrix-1000/6/6R synthesizers.\n\nA quick setup is needed so you can use "
             "Matrix-Control optimally with your synth. Select MIDI ports and the EPROM "
             "type installed in your synth. This affects MIDI timing and future features.");
 
@@ -272,7 +272,7 @@ private:
         expectEquals(Core::buildDeviceSetupAssistantBodyText(true),
                      approved + juce::String(Body::kBodySuggestionSuffix));
         expectEquals(juce::String(Body::kBodySuggestionSuffix),
-                     juce::String(" A suggestion is preselected from the reported firmware version when possible."));
+                     juce::String("\n\nA suggestion is preselected from the reported firmware version when possible."));
     }
 
     void testConfirmPersistsEpromAndFinishes()

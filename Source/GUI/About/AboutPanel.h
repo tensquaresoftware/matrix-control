@@ -73,6 +73,7 @@ private:
         bool leftPressActive_ = false;
     };
 
+    juce::Font getScaledBodyFont() const;
     SpecGridLayout getSpecGridLayout() const;
     BmadCreditLayout getBmadCreditLayout() const;
     juce::Rectangle<int> getSpecRowBounds(int rowIndex, bool labelColumn) const;

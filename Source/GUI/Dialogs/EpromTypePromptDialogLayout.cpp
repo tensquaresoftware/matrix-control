@@ -6,63 +6,29 @@
 
 using TSS::SkinColourId;
 
-int EpromTypePromptDialog::getBorderThickness() const
+int EpromTypePromptDialog::getRowsHeight() const
 {
-    return juce::roundToInt(static_cast<float>(kBorderThickness_) * uiScale_);
-}
-
-juce::Rectangle<int> EpromTypePromptDialog::getDialogBounds() const
-{
-    const int border = getBorderThickness();
-    const int dialogWidth = juce::roundToInt(static_cast<float>(kDesignWidth) * uiScale_) + border * 2;
-    const int dialogHeight = juce::roundToInt(static_cast<float>(kDesignHeight) * uiScale_)
-                             + juce::roundToInt(static_cast<float>(kTitleBarHeight_) * uiScale_)
-                             + border * 2;
-
-    return getLocalBounds().withSizeKeepingCentre(dialogWidth, dialogHeight);
+    const int controlHeight = juce::roundToInt(static_cast<float>(kControlHeight_) * uiScale_);
+    const int rowGap = juce::roundToInt(static_cast<float>(kRowGap_) * uiScale_);
+    return controlHeight * 4 + rowGap * 3;
 }
 
 EpromTypePromptDialog::ContentLayout EpromTypePromptDialog::computeContentLayout() const
 {
+    const auto body = bodyText();
+    const auto textLayout = DialogMatrixHelpers::computeTextModalLayout({ .skin = *skin_,
+                                                                          .bodyText = body,
+                                                                          .hostBounds = getLocalBounds(),
+                                                                          .designWidth = kDesignWidth,
+                                                                          .uiScale = uiScale_,
+                                                                          .extraBandHeight = getRowsHeight() });
     ContentLayout layout;
-
-    auto inner = getDialogBounds().reduced(getBorderThickness());
-    inner.removeFromTop(juce::roundToInt(static_cast<float>(kTitleBarHeight_) * uiScale_));
-
-    const int padding = juce::roundToInt(12.0f * uiScale_);
-    const int buttonHeight = juce::roundToInt(24.0f * uiScale_);
-    const int gapAboveButtons = juce::roundToInt(8.0f * uiScale_);
-    const int controlHeight = juce::roundToInt(static_cast<float>(kControlHeight_) * uiScale_);
-    const int rowGap = juce::roundToInt(static_cast<float>(kRowGap_) * uiScale_);
-    const int rowsHeight = controlHeight * 4 + rowGap * 3;
-
-    auto content = inner.reduced(padding);
-    layout.buttonRow = content.removeFromBottom(buttonHeight);
-    content.removeFromBottom(gapAboveButtons);
-
-    const auto bodyFont = DialogMatrixHelpers::scaledModalBodyFont(*skin_, uiScale_);
-    const int gapUnderTitle = juce::roundToInt(bodyFont.getHeight());
-    content.removeFromTop(gapUnderTitle);
-
-    const int maxBodyHeight = juce::jmax(0, content.getHeight() - rowsHeight - rowGap);
-    juce::GlyphArrangement glyphs;
-    glyphs.addFittedText(bodyFont,
-                         bodyText(),
-                         0.0f,
-                         0.0f,
-                         static_cast<float>(content.getWidth()),
-                         static_cast<float>(maxBodyHeight),
-                         juce::Justification::topLeft,
-                         kMaxBodyFittedLines_);
-    const int bodyHeight = juce::jmax(juce::roundToInt(bodyFont.getHeight()),
-                                      juce::roundToInt(glyphs.getBoundingBox(0, glyphs.getNumGlyphs(), true).getHeight()));
-
-    layout.bodyTextArea = content.removeFromTop(juce::jmin(bodyHeight, maxBodyHeight));
+    layout.geometry = textLayout.geometry;
+    layout.bodyFont = textLayout.bodyFont;
 
     // Vertically centre the four control rows between body text and buttons.
-    const int remainingHeight = content.getHeight();
-    const int controlY = content.getY() + juce::jmax(0, (remainingHeight - rowsHeight) / 2);
-    layout.controlBand = { content.getX(), controlY, content.getWidth(), rowsHeight };
+    layout.controlBand = layout.geometry.band.withSizeKeepingCentre(layout.geometry.band.getWidth(),
+                                                                    getRowsHeight());
     return layout;
 }
 
@@ -75,24 +41,20 @@ juce::String EpromTypePromptDialog::searchingDetailWithDots() const
 
 void EpromTypePromptDialog::paint(juce::Graphics& g)
 {
-    const auto dialogBounds = getDialogBounds();
-    const int border = getBorderThickness();
-    const int titleBarHeight = juce::roundToInt(static_cast<float>(kTitleBarHeight_) * uiScale_);
+    const auto layout = computeContentLayout();
+    const auto& geometry = layout.geometry;
 
     DialogMatrixHelpers::paintMatrixOverlayChrome({
         .g = g,
         .skin = *skin_,
-        .dialogBounds = dialogBounds,
-        .borderThickness = border,
-        .titleBarHeight = titleBarHeight,
+        .dialogBounds = geometry.dialogBounds,
+        .borderThickness = geometry.border,
+        .titleBarHeight = geometry.titleBarHeight,
         .title = PluginDisplayNames::Dialogs::EpromTypePrompt::kTitle,
         .uiScale = uiScale_ });
 
-    const auto layout = computeContentLayout();
-    const auto bodyFont = DialogMatrixHelpers::scaledModalBodyFont(*skin_, uiScale_);
     g.setColour(skin_->getColour(SkinColourId::kDarkPanelText));
-    g.setFont(bodyFont);
-    g.drawFittedText(bodyText(), layout.bodyTextArea, juce::Justification::topLeft, kMaxBodyFittedLines_);
+    DialogMatrixHelpers::paintBodyText(g, layout.bodyFont, bodyText(), geometry.textArea);
 }
 
 void EpromTypePromptDialog::resized()
@@ -101,15 +63,13 @@ void EpromTypePromptDialog::resized()
 
     const int confirmWidth = juce::roundToInt(static_cast<float>(kConfirmButtonWidth_) * uiScale_);
     const int laterWidth = juce::roundToInt(static_cast<float>(kSpecifyLaterButtonWidth_) * uiScale_);
-    const int buttonGap = juce::roundToInt(8.0f * uiScale_);
     const int controlHeight = juce::roundToInt(static_cast<float>(kControlHeight_) * uiScale_);
     const int labelWidth = juce::roundToInt(static_cast<float>(kLabelWidth_) * uiScale_);
     const int comboWidth = juce::roundToInt(static_cast<float>(kComboWidth_) * uiScale_);
     const int rowGap = juce::roundToInt(static_cast<float>(kRowGap_) * uiScale_);
     const int rowWidth = labelWidth + comboWidth;
-    const int rowsHeight = controlHeight * 4 + rowGap * 3;
 
-    const auto centredBand = layout.controlBand.withSizeKeepingCentre(rowWidth, rowsHeight);
+    const auto centredBand = layout.controlBand.withSizeKeepingCentre(rowWidth, getRowsHeight());
 
     auto placeRow = [&](int rowIndex, TSS::Label& label, juce::Component& field)
     {
@@ -128,8 +88,9 @@ void EpromTypePromptDialog::resized()
     placeRow(2, *deviceLabel_, *deviceValueField_);
     placeRow(3, *epromTypeLabel_, *epromTypeCombo_);
 
-    auto buttonRow = layout.buttonRow;
-    confirmButton_->setBounds(buttonRow.removeFromRight(confirmWidth));
-    buttonRow.removeFromRight(buttonGap);
-    specifyLaterButton_->setBounds(buttonRow.removeFromRight(laterWidth));
+    // LTR: SPECIFY LATER, CONFIRM (primary) - the pair is centred.
+    DialogMatrixHelpers::layoutCentredButtonRow(
+        layout.geometry.buttonRow,
+        uiScale_,
+        { { specifyLaterButton_.get(), laterWidth }, { confirmButton_.get(), confirmWidth } });
 }

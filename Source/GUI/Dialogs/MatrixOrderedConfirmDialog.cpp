@@ -7,12 +7,12 @@ using TSS::SkinColourId;
 
 namespace
 {
-    int estimateButtonWidth(const juce::String& text, float uiScale)
+    constexpr float kLabelValueGapEm = 0.5f;
+    constexpr int kLabelWidthSlack = 4;
+
+    int scaled(int designValue, float uiScale)
     {
-        const int base = DialogMatrixHelpers::kDefaultButtonWidth;
-        const int perChar = 8;
-        const int estimated = base + juce::jmax(0, text.length() - 6) * perChar;
-        return juce::roundToInt(static_cast<float>(juce::jlimit(base, 280, estimated)) * uiScale);
+        return juce::roundToInt(static_cast<float>(designValue) * uiScale);
     }
 }
 
@@ -24,6 +24,7 @@ MatrixOrderedConfirmDialog::MatrixOrderedConfirmDialog(
     , uiScale_(uiScale)
     , title_(options.title)
     , message_(options.message)
+    , valueRows_(options.valueRows)
     , hasMiddle_(options.middleLabel.isNotEmpty())
 {
     setOpaque(false);
@@ -57,19 +58,52 @@ MatrixOrderedConfirmDialog::MatrixOrderedConfirmDialog(
         DialogMatrixHelpers::applyButtonUiScale(*middleButton_, uiScale_);
 }
 
-int MatrixOrderedConfirmDialog::getBorderThickness() const
+juce::String MatrixOrderedConfirmDialog::joinedRowColumn(bool labels) const
 {
-    return juce::roundToInt(static_cast<float>(kBorderThickness_) * uiScale_);
+    juce::StringArray lines;
+    for (const auto& row : valueRows_)
+        lines.add(labels ? row.label : row.value);
+
+    // One blank line between rows.
+    return lines.joinIntoString("\n\n");
 }
 
-juce::Rectangle<int> MatrixOrderedConfirmDialog::getDialogBounds() const
+MatrixOrderedConfirmDialog::BodyLayout MatrixOrderedConfirmDialog::computeBodyLayout() const
 {
-    const int border = getBorderThickness();
-    const int dialogWidth = juce::roundToInt(static_cast<float>(kDesignWidth_) * uiScale_) + border * 2;
-    const int dialogHeight = juce::roundToInt(static_cast<float>(kDesignHeight_) * uiScale_)
-                             + juce::roundToInt(static_cast<float>(kTitleBarHeight_) * uiScale_)
-                             + border * 2;
-    return getLocalBounds().withSizeKeepingCentre(dialogWidth, dialogHeight);
+    namespace Helpers = DialogMatrixHelpers;
+
+    BodyLayout layout;
+    layout.bodyFont = Helpers::scaledModalBodyFont(*skin_, uiScale_);
+
+    const int textWidth = Helpers::bodyTextWidthFor(Helpers::contentWidthFor(kDesignWidth_, uiScale_));
+    int bodyHeight = Helpers::measureBodyHeight(layout.bodyFont, message_, textWidth);
+
+    if (! valueRows_.empty())
+    {
+        for (const auto& row : valueRows_)
+            layout.labelColumnWidth = juce::jmax(
+                layout.labelColumnWidth,
+                juce::GlyphArrangement::getStringWidthInt(layout.bodyFont, row.label) + kLabelWidthSlack);
+
+        layout.labelColumnWidth += juce::roundToInt(layout.bodyFont.getHeight() * kLabelValueGapEm);
+        // Keep at least 1 px for the value column.
+        layout.labelColumnWidth = juce::jmin(layout.labelColumnWidth, textWidth - 1);
+
+        // Long values may wrap more than the labels: the taller column decides the block height.
+        const int valueWidth = textWidth - layout.labelColumnWidth;
+        layout.rowsTextHeight = juce::jmax(
+            Helpers::measureBodyHeight(layout.bodyFont, joinedRowColumn(true), layout.labelColumnWidth),
+            Helpers::measureBodyHeight(layout.bodyFont, joinedRowColumn(false), valueWidth));
+        layout.rowsBlockHeight = layout.rowsTextHeight + Helpers::measureLineStep(layout.bodyFont, textWidth);
+        bodyHeight += layout.rowsBlockHeight;
+    }
+
+    layout.geometry = Helpers::computeModalGeometry({ .hostBounds = getLocalBounds(),
+                                                      .designWidth = kDesignWidth_,
+                                                      .uiScale = uiScale_,
+                                                      .bodyEm = layout.bodyFont.getHeight(),
+                                                      .bodyHeight = bodyHeight });
+    return layout;
 }
 
 void MatrixOrderedConfirmDialog::finish(int code)
@@ -78,68 +112,67 @@ void MatrixOrderedConfirmDialog::finish(int code)
         exitModalState(code);
 }
 
+void MatrixOrderedConfirmDialog::paintValueRows(juce::Graphics& g, const BodyLayout& layout) const
+{
+    const auto& textArea = layout.geometry.textArea;
+    const juce::Rectangle<int> labelArea { textArea.getX(),
+                                           textArea.getY(),
+                                           layout.labelColumnWidth,
+                                           layout.rowsTextHeight };
+    const juce::Rectangle<int> valueArea { textArea.getX() + layout.labelColumnWidth,
+                                           textArea.getY(),
+                                           juce::jmax(1, textArea.getWidth() - layout.labelColumnWidth),
+                                           layout.rowsTextHeight };
+
+    DialogMatrixHelpers::paintBodyText(g, layout.bodyFont, joinedRowColumn(true), labelArea);
+    DialogMatrixHelpers::paintBodyText(g, layout.bodyFont, joinedRowColumn(false), valueArea);
+}
+
 void MatrixOrderedConfirmDialog::paint(juce::Graphics& g)
 {
-    const auto dialogBounds = getDialogBounds();
-    const int border = getBorderThickness();
-    const int titleBarHeight = juce::roundToInt(static_cast<float>(kTitleBarHeight_) * uiScale_);
+    const auto layout = computeBodyLayout();
+    const auto& geometry = layout.geometry;
 
     DialogMatrixHelpers::paintMatrixOverlayChrome({
         .g = g,
         .skin = *skin_,
-        .dialogBounds = dialogBounds,
-        .borderThickness = border,
-        .titleBarHeight = titleBarHeight,
+        .dialogBounds = geometry.dialogBounds,
+        .borderThickness = geometry.border,
+        .titleBarHeight = geometry.titleBarHeight,
         .title = title_,
         .uiScale = uiScale_ });
 
-    auto inner = dialogBounds.reduced(border);
-    inner.removeFromTop(titleBarHeight);
-
-    const auto bodyFont = DialogMatrixHelpers::scaledModalBodyFont(*skin_, uiScale_);
-    const int gapUnderTitle = juce::roundToInt(bodyFont.getHeight());
-    const int padX = juce::roundToInt(12.0f * uiScale_);
-
-    auto textArea = inner;
-    textArea.removeFromTop(gapUnderTitle);
-    textArea = textArea.withTrimmedLeft(padX).withTrimmedRight(padX);
-    textArea.removeFromBottom(juce::roundToInt(40.0f * uiScale_));
-
     g.setColour(skin_->getColour(SkinColourId::kDarkPanelText));
-    g.setFont(bodyFont);
-    g.drawFittedText(message_, textArea, juce::Justification::topLeft, 8);
+
+    if (! valueRows_.empty())
+        paintValueRows(g, layout);
+
+    DialogMatrixHelpers::paintBodyText(g,
+                                       layout.bodyFont,
+                                       message_,
+                                       geometry.textArea.withTrimmedTop(layout.rowsBlockHeight));
 }
 
 void MatrixOrderedConfirmDialog::resized()
 {
-    auto inner = getDialogBounds().reduced(getBorderThickness());
-    inner.removeFromTop(juce::roundToInt(static_cast<float>(kTitleBarHeight_) * uiScale_));
+    const auto layout = computeBodyLayout();
 
-    const int padding = juce::roundToInt(12.0f * uiScale_);
-    const int buttonHeight = juce::roundToInt(
-        static_cast<float>(DialogMatrixHelpers::kDefaultButtonHeight) * uiScale_);
-    const int buttonGap = juce::roundToInt(8.0f * uiScale_);
-
-    auto buttonRow = inner.reduced(padding).removeFromBottom(buttonHeight);
-
-    const int primaryWidth = estimateButtonWidth(primaryButton_->getButtonText(), uiScale_);
-    primaryButton_->setBounds(buttonRow.removeFromRight(primaryWidth));
-
+    // LTR: Cancel, [middle], primary - pack is centred in the bottom row.
+    std::vector<DialogMatrixHelpers::ButtonPlacement> buttons;
+    buttons.push_back({ cancelButton_.get(),
+                        DialogMatrixHelpers::estimateButtonWidth(*skin_, cancelButton_->getButtonText(), uiScale_) });
     if (hasMiddle_ && middleButton_ != nullptr)
-    {
-        buttonRow.removeFromRight(buttonGap);
-        const int middleWidth = estimateButtonWidth(middleButton_->getButtonText(), uiScale_);
-        middleButton_->setBounds(buttonRow.removeFromRight(middleWidth));
-    }
+        buttons.push_back({ middleButton_.get(),
+                            DialogMatrixHelpers::estimateButtonWidth(*skin_, middleButton_->getButtonText(), uiScale_) });
+    buttons.push_back({ primaryButton_.get(),
+                        DialogMatrixHelpers::estimateButtonWidth(*skin_, primaryButton_->getButtonText(), uiScale_) });
 
-    buttonRow.removeFromRight(buttonGap);
-    const int cancelWidth = estimateButtonWidth(cancelButton_->getButtonText(), uiScale_);
-    cancelButton_->setBounds(buttonRow.removeFromRight(cancelWidth));
+    DialogMatrixHelpers::layoutCentredButtonRow(layout.geometry.buttonRow, uiScale_, buttons);
 }
 
 void MatrixOrderedConfirmDialog::mouseDown(const juce::MouseEvent& e)
 {
-    if (! getDialogBounds().contains(e.getPosition()))
+    if (! computeBodyLayout().geometry.dialogBounds.contains(e.getPosition()))
         finish(0);
 }
 
@@ -171,6 +204,13 @@ MatrixMutatorDeleteConfirmDialog::MatrixMutatorDeleteConfirmDialog(TSS::ISkin& s
     setInterceptsMouseClicks(true, true);
     setWantsKeyboardFocus(true);
 
+    const auto textColour = skin.getColour(SkinColourId::kDarkPanelText);
+    toggleLook_.setUiScale(uiScale);
+    toggleLook_.setLabelFont(DialogMatrixHelpers::scaledModalBodyFont(skin, uiScale));
+    dontAskAgain_.setLookAndFeel(&toggleLook_);
+    dontAskAgain_.setColour(juce::ToggleButton::textColourId, textColour);
+    dontAskAgain_.setColour(juce::ToggleButton::tickColourId, textColour);
+    dontAskAgain_.setColour(juce::ToggleButton::tickDisabledColourId, textColour);
     dontAskAgain_.setName({});
     dontAskAgain_.setWantsKeyboardFocus(false);
     dontAskAgain_.setMouseClickGrabsKeyboardFocus(false);
@@ -192,19 +232,21 @@ MatrixMutatorDeleteConfirmDialog::MatrixMutatorDeleteConfirmDialog(TSS::ISkin& s
     DialogMatrixHelpers::applyButtonUiScale(*deleteButton_, uiScale_);
 }
 
-int MatrixMutatorDeleteConfirmDialog::getBorderThickness() const
+MatrixMutatorDeleteConfirmDialog::~MatrixMutatorDeleteConfirmDialog()
 {
-    return juce::roundToInt(static_cast<float>(kBorderThickness_) * uiScale_);
+    dontAskAgain_.setLookAndFeel(nullptr);
 }
 
-juce::Rectangle<int> MatrixMutatorDeleteConfirmDialog::getDialogBounds() const
+DialogMatrixHelpers::TextModalLayout MatrixMutatorDeleteConfirmDialog::computeBodyLayout() const
 {
-    const int border = getBorderThickness();
-    const int dialogWidth = juce::roundToInt(static_cast<float>(kDesignWidth_) * uiScale_) + border * 2;
-    const int dialogHeight = juce::roundToInt(static_cast<float>(kDesignHeight_) * uiScale_)
-                             + juce::roundToInt(static_cast<float>(kTitleBarHeight_) * uiScale_)
-                             + border * 2;
-    return getLocalBounds().withSizeKeepingCentre(dialogWidth, dialogHeight);
+    const juce::String body(PluginDisplayNames::Dialogs::MutatorDeleteConfirm::kBody);
+    return DialogMatrixHelpers::computeTextModalLayout(
+        { .skin = *skin_,
+          .bodyText = body,
+          .hostBounds = getLocalBounds(),
+          .designWidth = kDesignWidth_,
+          .uiScale = uiScale_,
+          .extraBandHeight = scaled(DialogMatrixHelpers::kCheckboxHeight, uiScale_) });
 }
 
 void MatrixMutatorDeleteConfirmDialog::finish(bool confirmed)
@@ -218,64 +260,47 @@ void MatrixMutatorDeleteConfirmDialog::paint(juce::Graphics& g)
 {
     namespace Dialog = PluginDisplayNames::Dialogs::MutatorDeleteConfirm;
 
-    const auto dialogBounds = getDialogBounds();
-    const int border = getBorderThickness();
-    const int titleBarHeight = juce::roundToInt(static_cast<float>(kTitleBarHeight_) * uiScale_);
+    const auto layout = computeBodyLayout();
+    const auto& geometry = layout.geometry;
 
     DialogMatrixHelpers::paintMatrixOverlayChrome({
         .g = g,
         .skin = *skin_,
-        .dialogBounds = dialogBounds,
-        .borderThickness = border,
-        .titleBarHeight = titleBarHeight,
+        .dialogBounds = geometry.dialogBounds,
+        .borderThickness = geometry.border,
+        .titleBarHeight = geometry.titleBarHeight,
         .title = Dialog::kTitle,
         .uiScale = uiScale_ });
 
-    auto inner = dialogBounds.reduced(border);
-    inner.removeFromTop(titleBarHeight);
-
-    const auto bodyFont = DialogMatrixHelpers::scaledModalBodyFont(*skin_, uiScale_);
-    const int gapUnderTitle = juce::roundToInt(bodyFont.getHeight());
-    const int padX = juce::roundToInt(12.0f * uiScale_);
-
-    auto textArea = inner;
-    textArea.removeFromTop(gapUnderTitle);
-    textArea = textArea.withTrimmedLeft(padX).withTrimmedRight(padX);
-    textArea.removeFromBottom(juce::roundToInt(72.0f * uiScale_));
-
     g.setColour(skin_->getColour(SkinColourId::kDarkPanelText));
-    g.setFont(bodyFont);
-    g.drawFittedText(Dialog::kBody, textArea, juce::Justification::topLeft, 8);
+    DialogMatrixHelpers::paintBodyText(g, layout.bodyFont, Dialog::kBody, geometry.textArea);
 }
 
 void MatrixMutatorDeleteConfirmDialog::resized()
 {
-    auto inner = getDialogBounds().reduced(getBorderThickness());
-    inner.removeFromTop(juce::roundToInt(static_cast<float>(kTitleBarHeight_) * uiScale_));
+    const auto layout = computeBodyLayout();
+    const auto& geometry = layout.geometry;
 
-    const int padding = juce::roundToInt(12.0f * uiScale_);
-    const int buttonHeight = juce::roundToInt(
-        static_cast<float>(DialogMatrixHelpers::kDefaultButtonHeight) * uiScale_);
-    const int buttonGap = juce::roundToInt(8.0f * uiScale_);
-    const int checkHeight = juce::roundToInt(22.0f * uiScale_);
+    // Don't ask again: vertically centred in the band between body text and buttons.
+    const int checkHeight = scaled(DialogMatrixHelpers::kCheckboxHeight, uiScale_);
+    const int checkWidth = toggleLook_.getPreferredWidth(dontAskAgain_.getButtonText(), checkHeight);
+    dontAskAgain_.setBounds(geometry.textArea.getX(),
+                            geometry.band.getCentreY() - checkHeight / 2,
+                            checkWidth,
+                            checkHeight);
 
-    auto content = inner.reduced(padding);
-    auto buttonRow = content.removeFromBottom(buttonHeight);
-    content.removeFromBottom(buttonGap);
-    auto checkRow = content.removeFromBottom(checkHeight);
-
-    dontAskAgain_.setBounds(checkRow);
-
-    const int deleteWidth = estimateButtonWidth(deleteButton_->getButtonText(), uiScale_);
-    deleteButton_->setBounds(buttonRow.removeFromRight(deleteWidth));
-    buttonRow.removeFromRight(buttonGap);
-    const int cancelWidth = estimateButtonWidth(cancelButton_->getButtonText(), uiScale_);
-    cancelButton_->setBounds(buttonRow.removeFromRight(cancelWidth));
+    DialogMatrixHelpers::layoutCentredButtonRow(
+        geometry.buttonRow,
+        uiScale_,
+        { { cancelButton_.get(),
+            DialogMatrixHelpers::estimateButtonWidth(*skin_, cancelButton_->getButtonText(), uiScale_) },
+          { deleteButton_.get(),
+            DialogMatrixHelpers::estimateButtonWidth(*skin_, deleteButton_->getButtonText(), uiScale_) } });
 }
 
 void MatrixMutatorDeleteConfirmDialog::mouseDown(const juce::MouseEvent& e)
 {
-    if (! getDialogBounds().contains(e.getPosition()))
+    if (! computeBodyLayout().geometry.dialogBounds.contains(e.getPosition()))
         finish(false);
 }
 

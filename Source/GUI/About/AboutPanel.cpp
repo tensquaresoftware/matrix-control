@@ -1,5 +1,6 @@
 #include "AboutPanel.h"
 
+#include "GUI/Dialogs/DialogMatrixHelpers.h"
 #include "GUI/Layout/ScaledDrawing.h"
 #include "GUI/Skins/ColourChart.h"
 #include "GUI/Skins/ISkin.h"
@@ -192,6 +193,12 @@ juce::String AboutPanel::getSpecValue(int rowIndex) const
     }
 }
 
+juce::Font AboutPanel::getScaledBodyFont() const
+{
+    // Body copy uses the modal body face (Montserrat); brand title keeps the Orbitron brand font.
+    return DialogMatrixHelpers::scaledModalBodyFont(*skin_, uiScale_);
+}
+
 AboutPanel::SpecGridLayout AboutPanel::getSpecGridLayout() const
 {
     SpecGridLayout layout;
@@ -202,7 +209,7 @@ AboutPanel::SpecGridLayout AboutPanel::getSpecGridLayout() const
     layout.rowHeight = juce::roundToInt(static_cast<float>(kSpecRowHeight_) * sf);
     layout.firstRowY = padding + titleBlock + taglineBlock;
 
-    const auto baseFont = skin_->getBaseFont().withHeight(skin_->getBaseFont().getHeight() * sf);
+    const auto baseFont = getScaledBodyFont();
     const int columnGap = juce::roundToInt(static_cast<float>(kColumnGapDesign_) * sf);
 
     int maxLabelWidth = 0;
@@ -241,9 +248,7 @@ AboutPanel::BmadCreditLayout AboutPanel::getBmadCreditLayout() const
         sepBand
     };
 
-    const auto italicFont = skin_->getBaseFont()
-                                .withHeight(skin_->getBaseFont().getHeight() * sf)
-                                .italicised();
+    const auto italicFont = getScaledBodyFont().italicised();
     const auto prefix = juce::String(PluginDisplayNames::About::kBmadCreditPrefix);
     const auto linkText = juce::String(PluginDisplayNames::About::kBmadCreditLinkDisplay);
     const auto suffix = juce::String(PluginDisplayNames::About::kBmadCreditSuffix);
@@ -272,7 +277,7 @@ juce::Rectangle<int> AboutPanel::getSpecValueRowBounds(int rowIndex) const
 {
     const auto grid = getSpecGridLayout();
     const float sf = uiScale_;
-    const auto baseFont = skin_->getBaseFont().withHeight(skin_->getBaseFont().getHeight() * sf);
+    const auto baseFont = getScaledBodyFont();
     const int textWidth = measureTextWidth(baseFont, getSpecValue(rowIndex));
     const int slack = juce::roundToInt(2.0f * sf);
     const int y = grid.firstRowY + rowIndex * grid.rowHeight;
@@ -290,7 +295,7 @@ void AboutPanel::paint(juce::Graphics& g)
 
     const auto labelColour = skin_->getColour(SkinColourId::kLabelText);
     const auto valueColour = juce::Colour(kTitleAndValueColour);
-    const auto baseFont = skin_->getBaseFont().withHeight(skin_->getBaseFont().getHeight() * sf);
+    const auto baseFont = getScaledBodyFont();
     const auto titleFont = skin_->getBrandFontBold().withHeight(skin_->getBrandFontBold().getHeight() * sf);
 
     auto titleArea = bounds.removeFromTop(juce::roundToInt(static_cast<float>(kTitleHeight_) * sf));
@@ -333,7 +338,7 @@ void AboutPanel::paintBmadCredit(juce::Graphics& g)
 {
     const float sf = uiScale_;
     const auto labelColour = skin_->getColour(SkinColourId::kLabelText);
-    const auto baseFont = skin_->getBaseFont().withHeight(skin_->getBaseFont().getHeight() * sf);
+    const auto baseFont = getScaledBodyFont();
     const auto credit = getBmadCreditLayout();
 
     constexpr float kSeparatorDesignThickness = 1.0f;
@@ -367,8 +372,7 @@ void AboutPanel::layoutHyperlinkButtons()
     githubLink_.setBounds(getSpecValueRowBounds(3));
     linkedInLink_.setBounds(getSpecValueRowBounds(4));
 
-    const float sf = uiScale_;
-    const auto linkFont = skin_->getBaseFont().withHeight(skin_->getBaseFont().getHeight() * sf);
+    const auto linkFont = getScaledBodyFont();
     emailLink_.setFont(linkFont);
     githubLink_.setFont(linkFont);
     linkedInLink_.setFont(linkFont);

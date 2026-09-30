@@ -1,6 +1,8 @@
 #pragma once
 
 #include <functional>
+#include <memory>
+#include <vector>
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
@@ -28,14 +30,26 @@ public:
     bool keyPressed(const juce::KeyPress& key) override;
 
 private:
-    int getBorderThickness() const;
-    juce::Rectangle<int> getDialogBounds() const;
+    struct BodyLayout
+    {
+        DialogMatrixHelpers::ModalGeometry geometry;
+        juce::Font bodyFont { juce::FontOptions{} };
+        int labelColumnWidth = 0;
+        int rowsTextHeight = 0;
+        /** Rows block plus the blank line before the message (0 without rows). */
+        int rowsBlockHeight = 0;
+    };
+
+    BodyLayout computeBodyLayout() const;
+    juce::String joinedRowColumn(bool labels) const;
+    void paintValueRows(juce::Graphics& g, const BodyLayout& layout) const;
     void finish(int code);
 
     TSS::ISkin* skin_ = nullptr;
     float uiScale_ = 1.0f;
     juce::String title_;
     juce::String message_;
+    std::vector<PluginEditorInternal::LabelledValueRow> valueRows_;
     bool hasMiddle_ = false;
 
     std::unique_ptr<TSS::Button> cancelButton_;
@@ -43,9 +57,6 @@ private:
     std::unique_ptr<TSS::Button> primaryButton_;
 
     inline constexpr static int kDesignWidth_ = 460;
-    inline constexpr static int kDesignHeight_ = 160;
-    inline constexpr static int kTitleBarHeight_ = 28;
-    inline constexpr static int kBorderThickness_ = 4;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MatrixOrderedConfirmDialog)
 };
@@ -55,7 +66,7 @@ class MatrixMutatorDeleteConfirmDialog : public juce::Component
 {
 public:
     MatrixMutatorDeleteConfirmDialog(TSS::ISkin& skin, float uiScale);
-    ~MatrixMutatorDeleteConfirmDialog() override = default;
+    ~MatrixMutatorDeleteConfirmDialog() override;
 
     PluginEditorInternal::MutatorDeleteConfirmResult getResult() const noexcept { return result_; }
 
@@ -65,22 +76,19 @@ public:
     bool keyPressed(const juce::KeyPress& key) override;
 
 private:
-    int getBorderThickness() const;
-    juce::Rectangle<int> getDialogBounds() const;
+    DialogMatrixHelpers::TextModalLayout computeBodyLayout() const;
     void finish(bool confirmed);
 
     TSS::ISkin* skin_ = nullptr;
     float uiScale_ = 1.0f;
     PluginEditorInternal::MutatorDeleteConfirmResult result_{};
 
+    DialogMatrixHelpers::ModalToggleLookAndFeel toggleLook_;
     juce::ToggleButton dontAskAgain_;
     std::unique_ptr<TSS::Button> cancelButton_;
     std::unique_ptr<TSS::Button> deleteButton_;
 
     inline constexpr static int kDesignWidth_ = 460;
-    inline constexpr static int kDesignHeight_ = 188;
-    inline constexpr static int kTitleBarHeight_ = 28;
-    inline constexpr static int kBorderThickness_ = 4;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MatrixMutatorDeleteConfirmDialog)
 };

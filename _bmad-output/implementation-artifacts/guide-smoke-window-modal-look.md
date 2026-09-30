@@ -120,9 +120,9 @@ Pour chaque case : look Matrix (chrome, corps Montserrat lisible en minuscules, 
 
 ### Polish modales (prochain chantier)
 
-- [ ] Layout commun (titres caps, boutons centrés, inset texte ~10%, densité, Don't ask again)
-- [ ] About : Montserrat corps ; titre marque inchangé
-- [ ] Retouches DEVICE SETUP / m1km / Flush / mismatch / Delete init
+- [x] Layout commun (titres caps, boutons centrés, inset texte ~10%, densité, Don't ask again) — implémenté 2026-09-30, smoke visuel à refaire
+- [x] About : Montserrat corps ; titre marque inchangé — implémenté 2026-09-30, smoke visuel à refaire
+- [x] Retouches DEVICE SETUP / m1km / Flush / mismatch / Delete init — implémenté 2026-09-30, smoke visuel à refaire
 - [x] Nettoyage ponctuation anglaise (SKIN: etc.)
 
 ### Ordre d'exécution validé (2026-09-30)

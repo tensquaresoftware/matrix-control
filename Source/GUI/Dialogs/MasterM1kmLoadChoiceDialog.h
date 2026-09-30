@@ -5,6 +5,7 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
+#include "GUI/Dialogs/DialogMatrixHelpers.h"
 #include "GUI/Widgets/Button.h"
 
 namespace TSS
@@ -17,7 +18,6 @@ class MasterM1kmLoadChoiceDialog : public juce::Component
 {
 public:
     static constexpr int kDesignWidth = 560;
-    static constexpr int kDesignHeight = 168;
 
     MasterM1kmLoadChoiceDialog(TSS::ISkin& skin, std::function<void()> onDismissRequested);
     ~MasterM1kmLoadChoiceDialog() override;
@@ -34,8 +34,7 @@ public:
     bool keyPressed(const juce::KeyPress& key) override;
 
 private:
-    int getBorderThickness() const;
-    juce::Rectangle<int> getDialogBounds() const;
+    DialogMatrixHelpers::TextModalLayout computeLayout() const;
     void dismiss();
     void chooseMasterSettingsOnly();
     void chooseFullMaster();
@@ -50,8 +49,8 @@ private:
     std::unique_ptr<TSS::Button> fullMasterButton_;
     std::unique_ptr<TSS::Button> cancelButton_;
 
-    inline constexpr static int kTitleBarHeight_ = 28;
-    inline constexpr static int kBorderThickness_ = 4;
+    inline constexpr static int kSettingsOnlyButtonWidth_ = 148;
+    inline constexpr static int kFullMasterButtonWidth_ = 268;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MasterM1kmLoadChoiceDialog)
 };

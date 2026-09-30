@@ -2,10 +2,19 @@
 
 // Free helpers + options structs shared by PluginEditor.cpp and its companion .cpp files.
 
+#include <vector>
+
 #include <juce_gui_basics/juce_gui_basics.h>
 
 namespace PluginEditorInternal
 {
+    /** "Label: value" row drawn above the message with values aligned on a shared column. */
+    struct LabelledValueRow
+    {
+        juce::String label;
+        juce::String value;
+    };
+
     // ---- Ordered confirm alert: visual LTR Cancel / [middle] / primary (rightmost = default),
     //      Return always activates the primary button. See PluginEditorAlerts.cpp. ----
     struct OrderedConfirmAlertOptions
@@ -17,6 +26,7 @@ namespace PluginEditorInternal
         juce::String primaryLabel;
         juce::Component* associatedComponent = nullptr;
         juce::String middleLabel = {};
+        std::vector<LabelledValueRow> valueRows = {};
     };
 
     bool isMessageThread();

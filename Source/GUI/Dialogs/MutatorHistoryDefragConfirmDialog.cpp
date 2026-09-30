@@ -61,20 +61,14 @@ void MutatorHistoryDefragConfirmDialog::setUiScale(float uiScale)
     repaint();
 }
 
-int MutatorHistoryDefragConfirmDialog::getBorderThickness() const
+DialogMatrixHelpers::TextModalLayout MutatorHistoryDefragConfirmDialog::computeLayout() const
 {
-    return juce::roundToInt(static_cast<float>(kBorderThickness_) * uiScale_);
-}
-
-juce::Rectangle<int> MutatorHistoryDefragConfirmDialog::getDialogBounds() const
-{
-    const int border = getBorderThickness();
-    const int dialogWidth = juce::roundToInt(static_cast<float>(kDesignWidth) * uiScale_) + border * 2;
-    const int dialogHeight = juce::roundToInt(static_cast<float>(kDesignHeight) * uiScale_)
-                             + juce::roundToInt(static_cast<float>(kTitleBarHeight_) * uiScale_)
-                             + border * 2;
-
-    return getLocalBounds().withSizeKeepingCentre(dialogWidth, dialogHeight);
+    const juce::String body(Dialog::kBody);
+    return DialogMatrixHelpers::computeTextModalLayout({ .skin = *skin_,
+                                                         .bodyText = body,
+                                                         .hostBounds = getLocalBounds(),
+                                                         .designWidth = kDesignWidth,
+                                                         .uiScale = uiScale_ });
 }
 
 void MutatorHistoryDefragConfirmDialog::dismiss()
@@ -94,57 +88,37 @@ void MutatorHistoryDefragConfirmDialog::confirm()
 
 void MutatorHistoryDefragConfirmDialog::paint(juce::Graphics& g)
 {
-    const auto dialogBounds = getDialogBounds();
-    const int border = getBorderThickness();
-    const int titleBarHeight = juce::roundToInt(static_cast<float>(kTitleBarHeight_) * uiScale_);
+    const auto layout = computeLayout();
+    const auto& geometry = layout.geometry;
 
     DialogMatrixHelpers::paintMatrixOverlayChrome({
         .g = g,
         .skin = *skin_,
-        .dialogBounds = dialogBounds,
-        .borderThickness = border,
-        .titleBarHeight = titleBarHeight,
+        .dialogBounds = geometry.dialogBounds,
+        .borderThickness = geometry.border,
+        .titleBarHeight = geometry.titleBarHeight,
         .title = Dialog::kTitle,
         .uiScale = uiScale_ });
 
-    auto inner = dialogBounds.reduced(border);
-    inner.removeFromTop(titleBarHeight);
-
-    const auto bodyFont = DialogMatrixHelpers::scaledModalBodyFont(*skin_, uiScale_);
-    const int gapUnderTitle = juce::roundToInt(bodyFont.getHeight());
-    const int padX = juce::roundToInt(12.0f * uiScale_);
-
-    auto textArea = inner;
-    textArea.removeFromTop(gapUnderTitle);
-    textArea = textArea.withTrimmedLeft(padX).withTrimmedRight(padX);
-    textArea.removeFromBottom(juce::roundToInt(36.0f * uiScale_));
-
     g.setColour(skin_->getColour(SkinColourId::kDarkPanelText));
-    g.setFont(bodyFont);
-    g.drawFittedText(Dialog::kBody, textArea, juce::Justification::topLeft, 6);
+    DialogMatrixHelpers::paintBodyText(g, layout.bodyFont, Dialog::kBody, geometry.textArea);
 }
 
 void MutatorHistoryDefragConfirmDialog::resized()
 {
-    auto inner = getDialogBounds().reduced(getBorderThickness());
-    inner.removeFromTop(juce::roundToInt(static_cast<float>(kTitleBarHeight_) * uiScale_));
-
-    const int padding = juce::roundToInt(12.0f * uiScale_);
-    const int buttonHeight = juce::roundToInt(
-        static_cast<float>(DialogMatrixHelpers::kDefaultButtonHeight) * uiScale_);
-    const int buttonWidth = juce::roundToInt(
-        static_cast<float>(DialogMatrixHelpers::kDefaultButtonWidth) * uiScale_);
-    const int buttonGap = juce::roundToInt(8.0f * uiScale_);
-
-    auto buttonRow = inner.reduced(padding).removeFromBottom(buttonHeight);
-    defragButton_->setBounds(buttonRow.removeFromRight(buttonWidth));
-    buttonRow.removeFromRight(buttonGap);
-    cancelButton_->setBounds(buttonRow.removeFromRight(buttonWidth));
+    // LTR: Cancel left, Defrag (primary) right; the pair is centred.
+    DialogMatrixHelpers::layoutCentredButtonRow(
+        computeLayout().geometry.buttonRow,
+        uiScale_,
+        { { cancelButton_.get(),
+            DialogMatrixHelpers::estimateButtonWidth(*skin_, cancelButton_->getButtonText(), uiScale_) },
+          { defragButton_.get(),
+            DialogMatrixHelpers::estimateButtonWidth(*skin_, defragButton_->getButtonText(), uiScale_) } });
 }
 
 void MutatorHistoryDefragConfirmDialog::mouseDown(const juce::MouseEvent& e)
 {
-    if (! getDialogBounds().contains(e.getPosition()))
+    if (! computeLayout().geometry.dialogBounds.contains(e.getPosition()))
         dismiss();
 }
 

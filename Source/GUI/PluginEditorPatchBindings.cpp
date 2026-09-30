@@ -373,18 +373,16 @@ void PluginEditor::setPatchNameReconciliationPickerBinding()
                 return std::nullopt;
 
             namespace Dialog = PluginDisplayNames::Dialogs::PatchNameReconciliation;
-            const auto body = juce::String(Dialog::kBodyTemplate)
-                                  .replace("{INTERNAL}", internalSanitized)
-                                  .replace("{FILENAME}", fileSanitized);
-
             switch (showOrderedConfirmAlert({
                 juce::MessageBoxIconType::QuestionIcon,
                 Dialog::kTitle,
-                body,
+                Dialog::kBody,
                 Dialog::kCancel,
                 Dialog::kFilename,
                 safeThis.getComponent(),
-                Dialog::kInternal
+                Dialog::kInternal,
+                { { Dialog::kInternalNameLabel, internalSanitized },
+                  { Dialog::kFilenameLabel, fileSanitized } }
             }))
             {
                 case 1: return Core::NameReconciliationChoice::kFilename;

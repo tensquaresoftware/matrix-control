@@ -20,8 +20,10 @@ MasterM1kmLoadChoiceDialog::MasterM1kmLoadChoiceDialog(TSS::ISkin& skin,
     setInterceptsMouseClicks(true, true);
     setWantsKeyboardFocus(true);
 
-    masterSettingsOnlyButton_ = DialogMatrixHelpers::makeButton(skin, 148, Dialog::kMasterSettingsOnly);
-    fullMasterButton_ = DialogMatrixHelpers::makeButton(skin, 268, Dialog::kFullMaster);
+    masterSettingsOnlyButton_ = DialogMatrixHelpers::makeButton(
+        skin, kSettingsOnlyButtonWidth_, Dialog::kMasterSettingsOnly);
+    fullMasterButton_ = DialogMatrixHelpers::makeButton(
+        skin, kFullMasterButtonWidth_, Dialog::kFullMaster);
     cancelButton_ = DialogMatrixHelpers::makeButton(
         skin, DialogMatrixHelpers::kDefaultButtonWidth, Dialog::kCancel);
 
@@ -68,20 +70,14 @@ void MasterM1kmLoadChoiceDialog::setUiScale(float uiScale)
     repaint();
 }
 
-int MasterM1kmLoadChoiceDialog::getBorderThickness() const
+DialogMatrixHelpers::TextModalLayout MasterM1kmLoadChoiceDialog::computeLayout() const
 {
-    return juce::roundToInt(static_cast<float>(kBorderThickness_) * uiScale_);
-}
-
-juce::Rectangle<int> MasterM1kmLoadChoiceDialog::getDialogBounds() const
-{
-    const int border = getBorderThickness();
-    const int dialogWidth = juce::roundToInt(static_cast<float>(kDesignWidth) * uiScale_) + border * 2;
-    const int dialogHeight = juce::roundToInt(static_cast<float>(kDesignHeight) * uiScale_)
-                             + juce::roundToInt(static_cast<float>(kTitleBarHeight_) * uiScale_)
-                             + border * 2;
-
-    return getLocalBounds().withSizeKeepingCentre(dialogWidth, dialogHeight);
+    const juce::String body(Dialog::kBody);
+    return DialogMatrixHelpers::computeTextModalLayout({ .skin = *skin_,
+                                                         .bodyText = body,
+                                                         .hostBounds = getLocalBounds(),
+                                                         .designWidth = kDesignWidth,
+                                                         .uiScale = uiScale_ });
 }
 
 void MasterM1kmLoadChoiceDialog::dismiss()
@@ -117,61 +113,44 @@ void MasterM1kmLoadChoiceDialog::chooseFullMaster()
 
 void MasterM1kmLoadChoiceDialog::paint(juce::Graphics& g)
 {
-    const auto dialogBounds = getDialogBounds();
-    const int border = getBorderThickness();
-    const int titleBarHeight = juce::roundToInt(static_cast<float>(kTitleBarHeight_) * uiScale_);
+    const auto layout = computeLayout();
+    const auto& geometry = layout.geometry;
 
     DialogMatrixHelpers::paintMatrixOverlayChrome({
         .g = g,
         .skin = *skin_,
-        .dialogBounds = dialogBounds,
-        .borderThickness = border,
-        .titleBarHeight = titleBarHeight,
+        .dialogBounds = geometry.dialogBounds,
+        .borderThickness = geometry.border,
+        .titleBarHeight = geometry.titleBarHeight,
         .title = Dialog::kTitle,
         .uiScale = uiScale_ });
 
-    auto inner = dialogBounds.reduced(border);
-    inner.removeFromTop(titleBarHeight);
-
-    const auto bodyFont = DialogMatrixHelpers::scaledModalBodyFont(*skin_, uiScale_);
-    const int gapUnderTitle = juce::roundToInt(bodyFont.getHeight());
-    const int padX = juce::roundToInt(12.0f * uiScale_);
-
-    auto textArea = inner;
-    textArea.removeFromTop(gapUnderTitle);
-    textArea = textArea.withTrimmedLeft(padX).withTrimmedRight(padX);
-    textArea.removeFromBottom(juce::roundToInt(40.0f * uiScale_));
-
     g.setColour(skin_->getColour(SkinColourId::kDarkPanelText));
-    g.setFont(bodyFont);
-    g.drawFittedText(Dialog::kBody, textArea, juce::Justification::topLeft, 8);
+    DialogMatrixHelpers::paintBodyText(g, layout.bodyFont, Dialog::kBody, geometry.textArea);
 }
 
 void MasterM1kmLoadChoiceDialog::resized()
 {
-    auto inner = getDialogBounds().reduced(getBorderThickness());
-    inner.removeFromTop(juce::roundToInt(static_cast<float>(kTitleBarHeight_) * uiScale_));
+    const auto scaledWidth = [this](const TSS::Button& button)
+    {
+        return DialogMatrixHelpers::estimateButtonWidth(*skin_, button.getButtonText(), uiScale_);
+    };
 
-    const int padding = juce::roundToInt(12.0f * uiScale_);
-    const int buttonHeight = juce::roundToInt(
-        static_cast<float>(DialogMatrixHelpers::kDefaultButtonHeight) * uiScale_);
-    const int buttonGap = juce::roundToInt(8.0f * uiScale_);
-    const int cancelWidth = juce::roundToInt(
-        static_cast<float>(DialogMatrixHelpers::kDefaultButtonWidth) * uiScale_);
-    const int settingsOnlyWidth = juce::roundToInt(148.0f * uiScale_);
-    const int fullMasterWidth = juce::roundToInt(268.0f * uiScale_);
+    // Long option labels use their design widths (estimate would under-size them).
+    const int settingsOnlyWidth = juce::roundToInt(static_cast<float>(kSettingsOnlyButtonWidth_) * uiScale_);
+    const int fullMasterWidth = juce::roundToInt(static_cast<float>(kFullMasterButtonWidth_) * uiScale_);
 
-    auto buttonRow = inner.reduced(padding).removeFromBottom(buttonHeight);
-    cancelButton_->setBounds(buttonRow.removeFromLeft(cancelWidth));
-    buttonRow.removeFromLeft(buttonGap);
-    masterSettingsOnlyButton_->setBounds(buttonRow.removeFromLeft(settingsOnlyWidth));
-    buttonRow.removeFromLeft(buttonGap);
-    fullMasterButton_->setBounds(buttonRow.removeFromLeft(fullMasterWidth));
+    DialogMatrixHelpers::layoutCentredButtonRow(
+        computeLayout().geometry.buttonRow,
+        uiScale_,
+        { { cancelButton_.get(), scaledWidth(*cancelButton_) },
+          { masterSettingsOnlyButton_.get(), settingsOnlyWidth },
+          { fullMasterButton_.get(), fullMasterWidth } });
 }
 
 void MasterM1kmLoadChoiceDialog::mouseDown(const juce::MouseEvent& e)
 {
-    if (! getDialogBounds().contains(e.getPosition()))
+    if (! computeLayout().geometry.dialogBounds.contains(e.getPosition()))
         dismiss();
 }
 

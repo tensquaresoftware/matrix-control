@@ -130,6 +130,8 @@ void EpromTypePromptDialog::updateLiveDeviceStatus(const LiveDeviceStatus& statu
     includeFirmwareSuggestionHint_ = status.deviceDetected
         && status.deviceVersion.trim().isNotEmpty();
     recomputeDeviceRow();
+    // The firmware suggestion sentence changes the body height.
+    resized();
     repaint();
 }
 
@@ -359,7 +361,7 @@ void EpromTypePromptDialog::timerCallback()
 
 void EpromTypePromptDialog::mouseDown(const juce::MouseEvent& e)
 {
-    if (! getDialogBounds().contains(e.getPosition()))
+    if (! computeContentLayout().geometry.dialogBounds.contains(e.getPosition()))
         dismissAsLater();
 }
 
