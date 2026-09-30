@@ -68,8 +68,6 @@ private:
     std::unique_ptr<TSS::Button> testButton_;
     std::unique_ptr<TSS::PeakIndicator> peakIndicator_;
 
-    inline constexpr static int kTitleBarHeight_ = 28;
-    inline constexpr static int kBorderThickness_ = 4;
     inline constexpr static int kDesignWidth_ = 520;
     inline constexpr static int kDesignContentHeight_ = 420;
     inline constexpr static int kPeakWidth_ = 12;

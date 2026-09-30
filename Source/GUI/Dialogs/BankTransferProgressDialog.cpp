@@ -166,7 +166,7 @@ void BankTransferProgressDialog::setUiScale(float uiScale)
 
 int BankTransferProgressDialog::getBorderThickness() const
 {
-    return juce::roundToInt(static_cast<float>(kBorderThickness_) * uiScale_);
+    return juce::roundToInt(static_cast<float>(DialogMatrixHelpers::kBorderThickness) * uiScale_);
 }
 
 int BankTransferProgressDialog::getDesignContentHeight() const noexcept
@@ -179,7 +179,7 @@ juce::Rectangle<int> BankTransferProgressDialog::getDialogBounds() const
     const int border = getBorderThickness();
     const int dialogWidth = juce::roundToInt(static_cast<float>(kDesignWidth) * uiScale_) + border * 2;
     const int dialogHeight = juce::roundToInt(static_cast<float>(getDesignContentHeight()) * uiScale_)
-                             + juce::roundToInt(static_cast<float>(kTitleBarHeight_) * uiScale_)
+                             + juce::roundToInt(static_cast<float>(DialogMatrixHelpers::kTitleBarHeight) * uiScale_)
                              + border * 2;
 
     return getLocalBounds().withSizeKeepingCentre(dialogWidth, dialogHeight);
@@ -340,7 +340,7 @@ void BankTransferProgressDialog::paint(juce::Graphics& g)
 {
     const auto dialogBounds = getDialogBounds();
     const int border = getBorderThickness();
-    const int titleBarHeight = juce::roundToInt(static_cast<float>(kTitleBarHeight_) * uiScale_);
+    const int titleBarHeight = juce::roundToInt(static_cast<float>(DialogMatrixHelpers::kTitleBarHeight) * uiScale_);
 
     DialogMatrixHelpers::paintMatrixOverlayChrome({
         .g = g,
@@ -354,12 +354,15 @@ void BankTransferProgressDialog::paint(juce::Graphics& g)
     auto content = dialogBounds.reduced(border);
     content.removeFromTop(titleBarHeight);
 
-    // Custom modal scheme: exactly 1em under the title, then content (no extra top padding).
+    // Shared rhythm: kGapAfterTitle under the title band, then content.
     const auto bodyFont = DialogMatrixHelpers::scaledModalBodyFont(*skin_, uiScale_);
-    const int gapUnderTitle = juce::roundToInt(bodyFont.getHeight());
+    const int gapUnderTitle = juce::roundToInt(
+        static_cast<float>(DialogMatrixHelpers::kGapAfterTitle) * uiScale_);
     const int padX = juce::roundToInt(12.0f * uiScale_);
-    // Same button height + bottom margin ints as resized() so body never overlaps the button row.
-    const int bottomReserve = scaledButtonHeight(uiScale_) + scaledBottomMargin(uiScale_);
+    // Last content (progress / detail) → Cancel: shared 24 px gap, then button + bottom margin.
+    const int bottomReserve = scaledButtonHeight(uiScale_)
+                              + scaledBottomMargin(uiScale_)
+                              + juce::roundToInt(static_cast<float>(DialogMatrixHelpers::kGapBeforeButtons) * uiScale_);
 
     auto body = content;
     body.removeFromTop(gapUnderTitle);
@@ -375,7 +378,7 @@ void BankTransferProgressDialog::paint(juce::Graphics& g)
 void BankTransferProgressDialog::resized()
 {
     auto content = getDialogBounds().reduced(getBorderThickness());
-    content.removeFromTop(juce::roundToInt(static_cast<float>(kTitleBarHeight_) * uiScale_));
+    content.removeFromTop(juce::roundToInt(static_cast<float>(DialogMatrixHelpers::kTitleBarHeight) * uiScale_));
 
     const int buttonHeight = scaledButtonHeight(uiScale_);
     const int bottomMargin = scaledBottomMargin(uiScale_);

@@ -369,7 +369,7 @@ namespace PluginDisplayNames
         {
             constexpr const char* kTitle = "Flush mutation history?";
             constexpr const char* kBody =
-                "This clears the Patch Mutator history for this session.\n"
+                "This clears the Patch Mutator history for this session.\n\n"
                 "The initial patch snapshot is kept.\n\n"
                 "CONTINUE to flush, or CANCEL to keep the history.";
             constexpr const char* kCancel   = "CANCEL";
@@ -380,7 +380,7 @@ namespace PluginDisplayNames
         {
             constexpr const char* kTitle = "Delete mutation?";
             constexpr const char* kBody =
-                "This removes the selected mutation or retry from Patch Mutator history.\n"
+                "This removes the selected mutation or retry from Patch Mutator history.\n\n"
                 "Deleting a root mutation also removes all of its retries.\n\n"
                 "DELETE to remove it, or CANCEL to keep the history.";
             constexpr const char* kCancel        = "CANCEL";
@@ -392,11 +392,11 @@ namespace PluginDisplayNames
         {
             constexpr const char* kTitle = "Delete init template?";
             constexpr const char* kBodyPatch =
-                "This removes the system Patch init template (PatchInit.syx).\n"
+                "This removes the system Patch init template (PatchInit.syx).\n\n"
                 "The next Patch INIT will use the built-in defaults.\n\n"
                 "DELETE to remove it, or CANCEL to keep the file.";
             constexpr const char* kBodyMaster =
-                "This removes the system Master init template (MasterInit.syx).\n"
+                "This removes the system Master init template (MasterInit.syx).\n\n"
                 "The next Master INIT will use the built-in defaults.\n\n"
                 "DELETE to remove it, or CANCEL to keep the file.";
             constexpr const char* kCancel = "CANCEL";
@@ -464,10 +464,10 @@ namespace PluginDisplayNames
                 "This .m1km Master file may include Groups and cascade data. "
                 "Matrix-Control does not edit those yet, but the Matrix-1000 still uses them.\n\n"
                 "Choose whether to load MASTER SETTINGS ONLY (Groups/cascade reset) or the "
-                "FULL MASTER (Groups/cascade kept).\n"
+                "FULL MASTER (Groups/cascade kept).\n\n"
                 "CANCEL leaves the current Master unchanged.";
             constexpr const char* kMasterSettingsOnly = "MASTER SETTINGS ONLY";
-            constexpr const char* kFullMaster = "FULL MASTER (INCLUDING GROUPS/CASCADE)";
+            constexpr const char* kFullMaster = "FULL MASTER";
             constexpr const char* kCancel = "CANCEL";
         }
 

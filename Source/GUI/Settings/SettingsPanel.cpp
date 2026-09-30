@@ -294,6 +294,13 @@ void SettingsPanel::setPluginMode(bool isPluginMode)
     resized();
 }
 
+int SettingsPanel::getDesignHeight() const noexcept
+{
+    const int latencyRow = kControlHeight_ + kRowGap_;
+    return kPadding_ * 2 + kContentHeightStandaloneTight_
+           + (isPluginMode_ ? latencyRow : 0);
+}
+
 void SettingsPanel::setDeviceType(MatrixDeviceTypes::Type deviceType)
 {
     if (deviceType_ == deviceType)

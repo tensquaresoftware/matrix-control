@@ -22,10 +22,8 @@ class SettingsPanel : public juce::Component
 public:
     // Content = label column 120 + control column 140 (no gap); outer = content + padding 16*2.
     // Control column fits UTILITY (LOAD | SAVE AS | INIT) at 44+4+44+4+44.
-    // Height sized for INTERFACE + DEVICE (HARDWARE LATENCY + EPROM TYPE) + remaining sections.
+    // Height: use getDesignHeight() (standalone vs plugin; equal top/bottom padding).
     static constexpr int kDesignWidth = 292;
-    // One INTERFACE row taller than 527 (+ control height 20 + row gap 8).
-    static constexpr int kDesignHeight = 555;
 
     SettingsPanel(TSS::ISkin& skin, bool isPluginMode);
     ~SettingsPanel() override = default;
@@ -37,6 +35,9 @@ public:
     void setUiScale(float uiScale);
     void setPluginMode(bool isPluginMode);
     void setDeviceType(MatrixDeviceTypes::Type deviceType);
+
+    /** Design-px panel height: standalone omits HARDWARE LATENCY; bottom padding matches top. */
+    int getDesignHeight() const noexcept;
 
     void registerContextualHelp(TSS::ContextualHelpBinder::FooterResolver resolveFooter);
 
@@ -141,6 +142,8 @@ private:
     inline constexpr static int kControlHeight_ = 20;
     // Match HorizontalSeparator line thickness so the stroke sits at the top of the gap+line stack.
     inline constexpr static int kSeparatorHeight_ = 1;
+    // Standalone content stack without the trailing row gap after the last Master button.
+    inline constexpr static int kContentHeightStandaloneTight_ = 487;
     inline constexpr static int kLabelWidth_ = 120;
     inline constexpr static int kComboWidth_ = 140;
     inline constexpr static int kSliderWidth_ = 72;

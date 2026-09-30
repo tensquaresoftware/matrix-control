@@ -59,8 +59,5 @@ private:
     SettingsCloseButton closeButton_;
     std::unique_ptr<SettingsPanel> settingsPanel_;
 
-    inline constexpr static int kTitleBarHeight_ = 28;
-    inline constexpr static int kBorderThickness_ = 4;
-
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SettingsWindow)
 };

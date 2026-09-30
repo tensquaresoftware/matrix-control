@@ -98,6 +98,7 @@ context:
 - Delete init: the two sentences were already separated by a line break in `PluginDisplayNames`; no text change beyond UPPERCASE `CANCEL`.
 - Matrix audit: DEVICE SETUP body assembly covered by `DeviceSetupDeviceRowTests`; confirm semantic codes unchanged (existing Core gate tests + no gate wiring edits). Visual layout rows (inset, centred buttons, Don't ask again, mismatch columns, About fonts) are manual-smoke only — CONVENTIONS avoid GUI modal-loop unit tests.
 - Review patches (2026-09-30): bottom margin >= side inset; centred button clamp; glyph-based `estimateButtonWidth`; scaled Don't-ask-again gap; mismatch value-column height + label clamp; bank progress shared bottom reserve; Defrag UPPERCASE citations; About uses `scaledModalBodyFont`; `MatrixModalCopyTests` locks frozen confirm bodies.
+- Follow-up chrome (2026-09-30): black 20 px title band + white caps title; button gap / bottom margin fixed at 12 px; Settings/About/Audio/bank progress share `paintMatrixOverlayChrome` metrics; design rules in `guide-matrix-modal-design.md`.
 
 ## Spec Change Log
 
@@ -129,6 +130,7 @@ context:
 - Agent choices (user would not notice): Settings / Audio Settings forms keep their own content grids (no 10% text-block inset). Bank progress keeps phase-lane paint; only shared chrome/button/title rules apply. Prefer measuring mismatch columns in the dialog (label widths + shared value X) over fragile tab characters. Bump dialog design height when `\n` alone cannot prevent clipping.
 - Golden body inset: `sidePad = round(dialogWidth * 0.10f)` inside the chrome content area; buttons: pack widths + gaps, then centre the pack in the bottom row.
 - Cited actions in body must match button labels (e.g. CONTINUE / CANCEL / DELETE), ASCII only.
+- **Chrome metrics (2026-09-30 evening):** black title band **24 px** (= button height), title colour = idle button text (`kButtonTextOff`); gaps title→body, body→buttons, and buttons→bottom border = **24 px**; button gap = **12 px**. Paragraph copy uses `\n\n` between distinct sentences. SSOT: `guide-matrix-modal-design.md`.
 
 ## Verification
 

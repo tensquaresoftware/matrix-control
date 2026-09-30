@@ -382,7 +382,9 @@ void PluginEditor::setPatchNameReconciliationPickerBinding()
                 safeThis.getComponent(),
                 Dialog::kInternal,
                 { { Dialog::kInternalNameLabel, internalSanitized },
-                  { Dialog::kFilenameLabel, fileSanitized } }
+                  { Dialog::kFilenameLabel, fileSanitized } },
+                400,
+                true
             }))
             {
                 case 1: return Core::NameReconciliationChoice::kFilename;

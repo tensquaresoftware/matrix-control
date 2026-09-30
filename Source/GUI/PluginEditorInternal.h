@@ -27,6 +27,10 @@ namespace PluginEditorInternal
         juce::Component* associatedComponent = nullptr;
         juce::String middleLabel = {};
         std::vector<LabelledValueRow> valueRows = {};
+        /** Design px content width; 0 uses MatrixOrderedConfirmDialog default. */
+        int designWidth = 0;
+        /** When true, body left edge matches CANCEL (patch name mismatch). Default: ~10% inset. */
+        bool alignBodyToCancel = false;
     };
 
     bool isMessageThread();

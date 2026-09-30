@@ -56,7 +56,10 @@ private:
     std::unique_ptr<TSS::Button> middleButton_;
     std::unique_ptr<TSS::Button> primaryButton_;
 
-    inline constexpr static int kDesignWidth_ = 460;
+    int designWidth_ = kDefaultDesignWidth_;
+    bool alignBodyToCancel_ = false;
+
+    inline constexpr static int kDefaultDesignWidth_ = 460;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MatrixOrderedConfirmDialog)
 };

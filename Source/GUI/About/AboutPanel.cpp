@@ -199,6 +199,12 @@ juce::Font AboutPanel::getScaledBodyFont() const
     return DialogMatrixHelpers::scaledModalBodyFont(*skin_, uiScale_);
 }
 
+juce::Font AboutPanel::getScaledCreditFont() const
+{
+    const auto body = getScaledBodyFont();
+    return body.withHeight(body.getHeight() * kCreditFontScale_).italicised();
+}
+
 AboutPanel::SpecGridLayout AboutPanel::getSpecGridLayout() const
 {
     SpecGridLayout layout;
@@ -248,7 +254,7 @@ AboutPanel::BmadCreditLayout AboutPanel::getBmadCreditLayout() const
         sepBand
     };
 
-    const auto italicFont = getScaledBodyFont().italicised();
+    const auto italicFont = getScaledCreditFont();
     const auto prefix = juce::String(PluginDisplayNames::About::kBmadCreditPrefix);
     const auto linkText = juce::String(PluginDisplayNames::About::kBmadCreditLinkDisplay);
     const auto suffix = juce::String(PluginDisplayNames::About::kBmadCreditSuffix);
@@ -338,7 +344,6 @@ void AboutPanel::paintBmadCredit(juce::Graphics& g)
 {
     const float sf = uiScale_;
     const auto labelColour = skin_->getColour(SkinColourId::kLabelText);
-    const auto baseFont = getScaledBodyFont();
     const auto credit = getBmadCreditLayout();
 
     constexpr float kSeparatorDesignThickness = 1.0f;
@@ -353,7 +358,7 @@ void AboutPanel::paintBmadCredit(juce::Graphics& g)
     g.setColour(skin_->getColour(SkinColourId::kHorizontalSeparatorLine));
     g.fillRect(separatorLine);
 
-    const auto italicFont = baseFont.italicised();
+    const auto italicFont = getScaledCreditFont();
     g.setFont(italicFont);
     g.setColour(labelColour);
     g.drawText(PluginDisplayNames::About::kBmadCreditPrefix,
@@ -378,7 +383,7 @@ void AboutPanel::layoutHyperlinkButtons()
     linkedInLink_.setFont(linkFont);
 
     const auto credit = getBmadCreditLayout();
-    bmadLink_.setFont(linkFont.italicised());
+    bmadLink_.setFont(getScaledCreditFont());
     bmadLink_.setBounds(credit.linkBounds);
 }
 

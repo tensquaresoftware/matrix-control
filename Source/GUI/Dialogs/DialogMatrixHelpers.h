@@ -17,12 +17,18 @@ namespace DialogMatrixHelpers
     inline constexpr int kDefaultButtonHeight = 24;
     inline constexpr int kDefaultButtonWidth = 88;
     inline constexpr juce::uint32 kDialogBorderColour = 0xff5E5E5E;
+    // Title band fill (full inner width between grey borders).
+    inline constexpr juce::uint32 kModalTitleBandColour = 0xff000000;
 
     // Shared Matrix modal chrome metrics (design pixels at 100% UI scale).
-    inline constexpr int kTitleBarHeight = 28;
+    // Title band matches default button height; title uses skin button text colour (not pure white).
+    inline constexpr int kTitleBarHeight = kDefaultButtonHeight;
     inline constexpr int kBorderThickness = 4;
     inline constexpr int kButtonGap = 12;
-    inline constexpr int kButtonBottomMargin = 16;
+    inline constexpr int kButtonSideMargin = 24;
+    inline constexpr int kButtonBottomMargin = 24;
+    inline constexpr int kGapAfterTitle = 24;
+    inline constexpr int kGapBeforeButtons = 24;
     inline constexpr int kCheckboxHeight = 22;
 
     // Body text sits in an invisible block inset by this fraction of the modal width on each side.
@@ -54,10 +60,23 @@ namespace DialogMatrixHelpers
                                 float uiScale,
                                 const std::vector<ButtonPlacement>& buttons);
 
+    struct CentredButtonPackMetrics
+    {
+        int leftInset = 0;
+        int packWidth = 0;
+    };
+
+    /** Left inset and width of the centred button pack for a content-width row (same shrink rules as layout). */
+    CentredButtonPackMetrics measureCentredButtonPack(int rowWidth,
+                                                      float uiScale,
+                                                      const std::vector<int>& buttonWidths);
+
     // ---- Body text (left-aligned, no horizontal squeeze, measured so nothing clips) ----
 
     int contentWidthFor(int designWidth, float uiScale);
     int bodyTextWidthFor(int contentWidth);
+    /** Explicit side insets (e.g. body left edge aligned with CANCEL). */
+    int bodyTextWidthFor(int contentWidth, int leftInset, int rightInset);
 
     /** Height needed to draw `text` with the shared body settings inside `textWidth` pixels. */
     int measureBodyHeight(const juce::Font& font, const juce::String& text, int textWidth);
@@ -77,10 +96,12 @@ namespace DialogMatrixHelpers
         juce::Rectangle<int> hostBounds;
         int designWidth = 0;
         float uiScale = 1.0f;
-        float bodyEm = 14.0f;
         int bodyHeight = 0;
         /** Pixel height of extra controls (e.g. checkbox, form rows) placed between body and buttons. */
         int extraBandHeight = 0;
+        /** When >= 0, overrides the default ~10% body side inset on that side. */
+        int bodyLeftInset = -1;
+        int bodyRightInset = -1;
     };
 
     struct ModalGeometry
@@ -111,6 +132,8 @@ namespace DialogMatrixHelpers
         int designWidth = 0;
         float uiScale = 1.0f;
         int extraBandHeight = 0;
+        int bodyLeftInset = -1;
+        int bodyRightInset = -1;
     };
 
     TextModalLayout computeTextModalLayout(const TextModalLayoutArgs& args);

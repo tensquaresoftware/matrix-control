@@ -119,7 +119,7 @@ void AudioMidiSettingsWindow::setUiScale(float uiScale)
 
 int AudioMidiSettingsWindow::getBorderThickness() const
 {
-    return juce::roundToInt(static_cast<float>(kBorderThickness_) * uiScale_);
+    return juce::roundToInt(static_cast<float>(DialogMatrixHelpers::kBorderThickness) * uiScale_);
 }
 
 juce::Rectangle<int> AudioMidiSettingsWindow::getDialogBounds() const
@@ -127,7 +127,7 @@ juce::Rectangle<int> AudioMidiSettingsWindow::getDialogBounds() const
     const int border = getBorderThickness();
     const int dialogWidth = juce::roundToInt(static_cast<float>(kDesignWidth_) * uiScale_) + border * 2;
     const int dialogHeight = juce::roundToInt(static_cast<float>(kDesignContentHeight_) * uiScale_)
-                             + juce::roundToInt(static_cast<float>(kTitleBarHeight_) * uiScale_)
+                             + juce::roundToInt(static_cast<float>(DialogMatrixHelpers::kTitleBarHeight) * uiScale_)
                              + juce::roundToInt(static_cast<float>(kFooterControlsHeight_) * uiScale_)
                              + border * 2;
     return getLocalBounds().withSizeKeepingCentre(dialogWidth, dialogHeight);
@@ -137,7 +137,7 @@ void AudioMidiSettingsWindow::paint(juce::Graphics& g)
 {
     const auto dialogBounds = getDialogBounds();
     const int border = getBorderThickness();
-    const int titleBarHeight = juce::roundToInt(static_cast<float>(kTitleBarHeight_) * uiScale_);
+    const int titleBarHeight = juce::roundToInt(static_cast<float>(DialogMatrixHelpers::kTitleBarHeight) * uiScale_);
 
     DialogMatrixHelpers::paintMatrixOverlayChrome({
         .g = g,
@@ -152,7 +152,7 @@ void AudioMidiSettingsWindow::paint(juce::Graphics& g)
 void AudioMidiSettingsWindow::resized()
 {
     auto inner = getDialogBounds().reduced(getBorderThickness());
-    const int titleBarHeight = juce::roundToInt(static_cast<float>(kTitleBarHeight_) * uiScale_);
+    const int titleBarHeight = juce::roundToInt(static_cast<float>(DialogMatrixHelpers::kTitleBarHeight) * uiScale_);
     const int closeButtonWidth = juce::roundToInt(static_cast<float>(titleBarHeight) * 1.2f);
     const int footerHeight = juce::roundToInt(static_cast<float>(kFooterControlsHeight_) * uiScale_);
     const int padding = juce::roundToInt(12.0f * uiScale_);

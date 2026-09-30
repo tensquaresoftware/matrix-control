@@ -26,10 +26,10 @@ public:
     };
 
     static constexpr int kDesignWidth = 420;
-    static constexpr int kDesignHeightSingle = 160;
+    static constexpr int kDesignHeightSingle = 184;
     // Dual = single + section gap (1em) + phase lane (label + 0.5em + bar), keeping the same
     // leftover gap above Cancel as the export modal.
-    static constexpr int kDesignHeightDual = 212;
+    static constexpr int kDesignHeightDual = 236;
 
     explicit BankTransferProgressDialog(TSS::ISkin& skin);
     ~BankTransferProgressDialog() override;
@@ -115,9 +115,6 @@ private:
 
     float uiScale_ = 1.0f;
     std::unique_ptr<TSS::Button> cancelButton_;
-
-    inline constexpr static int kTitleBarHeight_ = 28;
-    inline constexpr static int kBorderThickness_ = 4;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BankTransferProgressDialog)
 };

@@ -26,6 +26,8 @@ MatrixOrderedConfirmDialog::MatrixOrderedConfirmDialog(
     , message_(options.message)
     , valueRows_(options.valueRows)
     , hasMiddle_(options.middleLabel.isNotEmpty())
+    , designWidth_(options.designWidth > 0 ? options.designWidth : kDefaultDesignWidth_)
+    , alignBodyToCancel_(options.alignBodyToCancel)
 {
     setOpaque(false);
     setInterceptsMouseClicks(true, true);
@@ -75,7 +77,29 @@ MatrixOrderedConfirmDialog::BodyLayout MatrixOrderedConfirmDialog::computeBodyLa
     BodyLayout layout;
     layout.bodyFont = Helpers::scaledModalBodyFont(*skin_, uiScale_);
 
-    const int textWidth = Helpers::bodyTextWidthFor(Helpers::contentWidthFor(kDesignWidth_, uiScale_));
+    const int contentWidth = Helpers::contentWidthFor(designWidth_, uiScale_);
+    int leftInset = -1;
+    int rightInset = -1;
+    int textWidth = Helpers::bodyTextWidthFor(contentWidth);
+
+    // Patch name mismatch only: body left edge matches CANCEL. Other confirms keep ~10% inset.
+    if (alignBodyToCancel_)
+    {
+        std::vector<int> buttonWidths;
+        buttonWidths.push_back(
+            Helpers::estimateButtonWidth(*skin_, cancelButton_->getButtonText(), uiScale_));
+        if (hasMiddle_ && middleButton_ != nullptr)
+            buttonWidths.push_back(
+                Helpers::estimateButtonWidth(*skin_, middleButton_->getButtonText(), uiScale_));
+        buttonWidths.push_back(
+            Helpers::estimateButtonWidth(*skin_, primaryButton_->getButtonText(), uiScale_));
+
+        const auto pack = Helpers::measureCentredButtonPack(contentWidth, uiScale_, buttonWidths);
+        leftInset = pack.leftInset;
+        rightInset = scaled(Helpers::kButtonSideMargin, uiScale_);
+        textWidth = Helpers::bodyTextWidthFor(contentWidth, leftInset, rightInset);
+    }
+
     int bodyHeight = Helpers::measureBodyHeight(layout.bodyFont, message_, textWidth);
 
     if (! valueRows_.empty())
@@ -99,10 +123,11 @@ MatrixOrderedConfirmDialog::BodyLayout MatrixOrderedConfirmDialog::computeBodyLa
     }
 
     layout.geometry = Helpers::computeModalGeometry({ .hostBounds = getLocalBounds(),
-                                                      .designWidth = kDesignWidth_,
+                                                      .designWidth = designWidth_,
                                                       .uiScale = uiScale_,
-                                                      .bodyEm = layout.bodyFont.getHeight(),
-                                                      .bodyHeight = bodyHeight });
+                                                      .bodyHeight = bodyHeight,
+                                                      .bodyLeftInset = leftInset,
+                                                      .bodyRightInset = rightInset });
     return layout;
 }
 

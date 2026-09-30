@@ -113,7 +113,10 @@ void PluginEditor::setBankImportConfirmGateBinding()
                        Dialog::kBody,
                        Dialog::kCancel,
                        Dialog::kContinue,
-                       safeThis.getComponent()
+                       safeThis.getComponent(),
+                       {},
+                       {},
+                       360
                    })
                    == 1;
         });

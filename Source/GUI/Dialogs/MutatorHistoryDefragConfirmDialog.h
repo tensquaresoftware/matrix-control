@@ -16,7 +16,7 @@ namespace TSS
 class MutatorHistoryDefragConfirmDialog : public juce::Component
 {
 public:
-    static constexpr int kDesignWidth = 420;
+    static constexpr int kDesignWidth = 460;
 
     MutatorHistoryDefragConfirmDialog(TSS::ISkin& skin, std::function<void()> onDismissRequested);
     ~MutatorHistoryDefragConfirmDialog() override;

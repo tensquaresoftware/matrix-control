@@ -911,6 +911,44 @@ if(APPLE)
 endif()
 
 # =============================================================================
+# DEV TOOL: export Matrix modals to Desktop/Modales PNGs (all UI scales)
+#   cmake --build --preset macos-debug-arm64 --target ExportMatrixModals
+#   ./Builds/macOS/ARM/Debug/ExportMatrixModals_artefacts/Debug/ExportMatrixModals
+# =============================================================================
+juce_add_console_app(ExportMatrixModals PRODUCT_NAME "ExportMatrixModals")
+
+target_sources(ExportMatrixModals PRIVATE
+    Tools/ExportMatrixModals/Main.cpp
+)
+
+target_include_directories(ExportMatrixModals PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/Source
+)
+
+target_compile_definitions(ExportMatrixModals PRIVATE
+    JUCE_WEB_BROWSER=0
+    JUCE_USE_CURL=0
+    JUCE_STANDALONE_APPLICATION=1
+    JUCE_MODAL_LOOPS_PERMITTED=1
+    MATRIX_CONTROL_PROJECT_VERSION="${PROJECT_VERSION}"
+    MATRIX_CONTROL_PRERELEASE_SUFFIX="${MATRIX_CONTROL_PRERELEASE_SUFFIX}"
+    MATRIX_CONTROL_BUILD_DATE="${MATRIX_CONTROL_BUILD_DATE}"
+)
+
+target_link_libraries(ExportMatrixModals PRIVATE
+    Matrix-Control
+    PluginFonts
+    juce::juce_audio_utils
+    juce::juce_dsp
+    juce::juce_gui_extra
+    juce::juce_gui_basics
+    juce::juce_recommended_config_flags
+    juce::juce_recommended_warning_flags
+)
+
+add_dependencies(ExportMatrixModals Matrix-Control)
+
+# ============================================================================
 # COPY TO CENTRAL ARTEFACTS FOLDER
 # When COPY_TO_ARTEFACTS_DIR is ON, copies build outputs to a central custom folder.
 # Paths: ARTEFACTS_DIR_WINDOWS, ARTEFACTS_DIR_MACOS, ARTEFACTS_DIR_LINUX (USER OPTIONS block above).

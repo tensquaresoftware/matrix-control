@@ -14,7 +14,7 @@ namespace TSS
 class AboutPanel : public juce::Component
 {
 public:
-    static constexpr int kDesignWidth = 440;
+    static constexpr int kDesignWidth = 480;
     static constexpr int kDesignHeight = 264;
 
     explicit AboutPanel(TSS::ISkin& skin);
@@ -74,6 +74,7 @@ private:
     };
 
     juce::Font getScaledBodyFont() const;
+    juce::Font getScaledCreditFont() const;
     SpecGridLayout getSpecGridLayout() const;
     BmadCreditLayout getBmadCreditLayout() const;
     juce::Rectangle<int> getSpecRowBounds(int rowIndex, bool labelColumn) const;
@@ -95,7 +96,9 @@ private:
     inline constexpr static int kGapBeforeCreditSeparator_ = 12;
     inline constexpr static int kCreditSeparatorBand_ = 8;
     inline constexpr static int kGapAfterCreditSeparator_ = 8;
-    inline constexpr static int kCreditLineHeight_ = 18;
+    inline constexpr static int kCreditLineHeight_ = 16;
+    /** Italic BMad credit vs body font height (modal body = Montserrat). */
+    inline constexpr static float kCreditFontScale_ = 0.85f;
 
     TSS::ISkin* skin_;
     float uiScale_ = 1.0f;

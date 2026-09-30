@@ -21,9 +21,9 @@ MasterM1kmLoadChoiceDialog::MasterM1kmLoadChoiceDialog(TSS::ISkin& skin,
     setWantsKeyboardFocus(true);
 
     masterSettingsOnlyButton_ = DialogMatrixHelpers::makeButton(
-        skin, kSettingsOnlyButtonWidth_, Dialog::kMasterSettingsOnly);
+        skin, DialogMatrixHelpers::kDefaultButtonWidth, Dialog::kMasterSettingsOnly);
     fullMasterButton_ = DialogMatrixHelpers::makeButton(
-        skin, kFullMasterButtonWidth_, Dialog::kFullMaster);
+        skin, DialogMatrixHelpers::kDefaultButtonWidth, Dialog::kFullMaster);
     cancelButton_ = DialogMatrixHelpers::makeButton(
         skin, DialogMatrixHelpers::kDefaultButtonWidth, Dialog::kCancel);
 
@@ -136,16 +136,12 @@ void MasterM1kmLoadChoiceDialog::resized()
         return DialogMatrixHelpers::estimateButtonWidth(*skin_, button.getButtonText(), uiScale_);
     };
 
-    // Long option labels use their design widths (estimate would under-size them).
-    const int settingsOnlyWidth = juce::roundToInt(static_cast<float>(kSettingsOnlyButtonWidth_) * uiScale_);
-    const int fullMasterWidth = juce::roundToInt(static_cast<float>(kFullMasterButtonWidth_) * uiScale_);
-
     DialogMatrixHelpers::layoutCentredButtonRow(
         computeLayout().geometry.buttonRow,
         uiScale_,
         { { cancelButton_.get(), scaledWidth(*cancelButton_) },
-          { masterSettingsOnlyButton_.get(), settingsOnlyWidth },
-          { fullMasterButton_.get(), fullMasterWidth } });
+          { masterSettingsOnlyButton_.get(), scaledWidth(*masterSettingsOnlyButton_) },
+          { fullMasterButton_.get(), scaledWidth(*fullMasterButton_) } });
 }
 
 void MasterM1kmLoadChoiceDialog::mouseDown(const juce::MouseEvent& e)

@@ -49,8 +49,5 @@ private:
     std::unique_ptr<TSS::Button> fullMasterButton_;
     std::unique_ptr<TSS::Button> cancelButton_;
 
-    inline constexpr static int kSettingsOnlyButtonWidth_ = 148;
-    inline constexpr static int kFullMasterButtonWidth_ = 268;
-
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MasterM1kmLoadChoiceDialog)
 };

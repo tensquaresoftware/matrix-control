@@ -39,11 +39,11 @@ private:
 
         namespace Dialog = PluginDisplayNames::Dialogs;
         expectApprovedAscii(Dialog::MutatorFlushConfirm::kBody,
-                            "This clears the Patch Mutator history for this session.\n"
+                            "This clears the Patch Mutator history for this session.\n\n"
                             "The initial patch snapshot is kept.\n\n"
                             "CONTINUE to flush, or CANCEL to keep the history.");
         expectApprovedAscii(Dialog::MutatorDeleteConfirm::kBody,
-                            "This removes the selected mutation or retry from Patch Mutator history.\n"
+                            "This removes the selected mutation or retry from Patch Mutator history.\n\n"
                             "Deleting a root mutation also removes all of its retries.\n\n"
                             "DELETE to remove it, or CANCEL to keep the history.");
         expectApprovedAscii(Dialog::MutatorHistoryDefrag::kBody,
@@ -57,11 +57,11 @@ private:
 
         namespace Dialog = PluginDisplayNames::Dialogs::DeleteInitTemplateConfirm;
         expectApprovedAscii(Dialog::kBodyPatch,
-                            "This removes the system Patch init template (PatchInit.syx).\n"
+                            "This removes the system Patch init template (PatchInit.syx).\n\n"
                             "The next Patch INIT will use the built-in defaults.\n\n"
                             "DELETE to remove it, or CANCEL to keep the file.");
         expectApprovedAscii(Dialog::kBodyMaster,
-                            "This removes the system Master init template (MasterInit.syx).\n"
+                            "This removes the system Master init template (MasterInit.syx).\n\n"
                             "The next Master INIT will use the built-in defaults.\n\n"
                             "DELETE to remove it, or CANCEL to keep the file.");
     }
@@ -74,7 +74,7 @@ private:
                             "This .m1km Master file may include Groups and cascade data. "
                             "Matrix-Control does not edit those yet, but the Matrix-1000 still uses them.\n\n"
                             "Choose whether to load MASTER SETTINGS ONLY (Groups/cascade reset) or the "
-                            "FULL MASTER (Groups/cascade kept).\n"
+                            "FULL MASTER (Groups/cascade kept).\n\n"
                             "CANCEL leaves the current Master unchanged.");
     }
 

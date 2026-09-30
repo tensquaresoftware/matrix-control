@@ -1,15 +1,13 @@
 #include "AboutWindow.h"
 
 #include "AboutPanel.h"
+#include "GUI/Dialogs/DialogMatrixHelpers.h"
 #include "GUI/Skins/Skin.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
-
-using TSS::SkinColourId;
 
 namespace
 {
     constexpr juce::uint32 kCloseCrossColour = 0xff9A131D;
-    constexpr juce::uint32 kDialogBorderColour = 0xff5E5E5E;
 
     juce::Path makeCloseCrossShape()
     {
@@ -44,9 +42,7 @@ void AboutCloseButton::paintButton(juce::Graphics& g,
                                    bool shouldDrawButtonAsHighlighted,
                                    bool shouldDrawButtonAsDown)
 {
-    const auto titleBarBackground = skin_ != nullptr
-        ? skin_->getColour(SkinColourId::kHeaderPanelBackground)
-        : juce::Colours::darkgrey;
+    const auto titleBandColour = juce::Colour(DialogMatrixHelpers::kModalTitleBandColour);
 
     const auto crossColour = juce::Colour(kCloseCrossColour);
     g.setColour((! isEnabled() || shouldDrawButtonAsDown) ? crossColour.withAlpha(0.6f) : crossColour);
@@ -54,7 +50,7 @@ void AboutCloseButton::paintButton(juce::Graphics& g,
     if (shouldDrawButtonAsHighlighted)
     {
         g.fillAll(crossColour);
-        g.setColour(titleBarBackground);
+        g.setColour(titleBandColour);
     }
 
     const auto reducedRect = juce::Justification(juce::Justification::centred)
@@ -114,7 +110,7 @@ void AboutWindow::setUiScale(float uiScale)
 
 int AboutWindow::getBorderThickness() const
 {
-    return juce::roundToInt(static_cast<float>(kBorderThickness_) * uiScale_);
+    return juce::roundToInt(static_cast<float>(DialogMatrixHelpers::kBorderThickness) * uiScale_);
 }
 
 juce::Rectangle<int> AboutWindow::getDialogBounds() const
@@ -122,7 +118,7 @@ juce::Rectangle<int> AboutWindow::getDialogBounds() const
     const int border = getBorderThickness();
     const int dialogWidth = juce::roundToInt(static_cast<float>(AboutPanel::kDesignWidth) * uiScale_) + border * 2;
     const int dialogHeight = juce::roundToInt(static_cast<float>(AboutPanel::kDesignHeight) * uiScale_)
-                             + juce::roundToInt(static_cast<float>(kTitleBarHeight_) * uiScale_)
+                             + juce::roundToInt(static_cast<float>(DialogMatrixHelpers::kTitleBarHeight) * uiScale_)
                              + border * 2;
 
     return getLocalBounds().withSizeKeepingCentre(dialogWidth, dialogHeight);
@@ -130,34 +126,20 @@ juce::Rectangle<int> AboutWindow::getDialogBounds() const
 
 void AboutWindow::paint(juce::Graphics& g)
 {
-    g.fillAll(skin_->getColour(SkinColourId::kBodyPanelBackground).withAlpha(0.85f));
-
-    const auto dialogBounds = getDialogBounds();
-    const int border = getBorderThickness();
-
-    g.setColour(juce::Colour(kDialogBorderColour));
-    g.fillRect(dialogBounds);
-
-    auto inner = dialogBounds.reduced(border);
-    const int titleBarHeight = juce::roundToInt(static_cast<float>(kTitleBarHeight_) * uiScale_);
-    auto titleBar = inner.removeFromTop(titleBarHeight);
-
-    g.setColour(skin_->getColour(SkinColourId::kHeaderPanelBackground));
-    g.fillRect(titleBar);
-    g.fillRect(inner);
-
-    g.setColour(skin_->getColour(SkinColourId::kDarkPanelText));
-    g.setFont(skin_->getBaseFontBold().withHeight(skin_->getBaseFontBold().getHeight() * uiScale_));
-    g.drawText(PluginDisplayNames::About::kWindowTitle,
-               titleBar,
-               juce::Justification::centred,
-               false);
+    DialogMatrixHelpers::paintMatrixOverlayChrome({
+        .g = g,
+        .skin = *skin_,
+        .dialogBounds = getDialogBounds(),
+        .borderThickness = getBorderThickness(),
+        .titleBarHeight = juce::roundToInt(static_cast<float>(DialogMatrixHelpers::kTitleBarHeight) * uiScale_),
+        .title = PluginDisplayNames::About::kWindowTitle,
+        .uiScale = uiScale_ });
 }
 
 void AboutWindow::resized()
 {
     auto inner = getDialogBounds().reduced(getBorderThickness());
-    const int titleBarHeight = juce::roundToInt(static_cast<float>(kTitleBarHeight_) * uiScale_);
+    const int titleBarHeight = juce::roundToInt(static_cast<float>(DialogMatrixHelpers::kTitleBarHeight) * uiScale_);
     const int closeButtonWidth = juce::roundToInt(static_cast<float>(titleBarHeight) * 1.2f);
 
     auto titleBar = inner.removeFromTop(titleBarHeight);

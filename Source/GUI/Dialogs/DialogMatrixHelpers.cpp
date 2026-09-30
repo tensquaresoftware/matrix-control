@@ -14,9 +14,6 @@ namespace
     constexpr int kBodyHeightSlack = 2;
     constexpr int kButtonLabelPaddingDesign = 12;
     constexpr int kButtonWidthMax = 280;
-    // Breathing room between body and buttons; extra controls get one em above and below.
-    constexpr float kBandEmPlain = 1.5f;
-    constexpr float kBandEmAroundExtra = 2.0f;
     constexpr float kToggleTickFactor = 1.1f;
     constexpr float kToggleTickMaxHeightFraction = 0.75f;
     constexpr int kToggleTextLeadDesign = 10;
@@ -77,26 +74,31 @@ namespace DialogMatrixHelpers
         if (buttons.empty())
             return;
 
-        const int count = static_cast<int>(buttons.size());
-        int widthsSum = 0;
+        std::vector<int> widths;
+        widths.reserve(buttons.size());
         for (const auto& button : buttons)
-            widthsSum += button.width;
+            widths.push_back(button.width);
 
-        // Shrink gaps first, then widths, so the pack never leaves the row.
+        const auto pack = measureCentredButtonPack(row.getWidth(), uiScale, widths);
+        int x = row.getX() + pack.leftInset;
+
+        // Recompute per-button widths with the same shrink factor as measureCentredButtonPack.
+        const int count = static_cast<int>(buttons.size());
+        const int sideMargin = scaled(kButtonSideMargin, uiScale);
+        const int maxPackWidth = juce::jmax(1, row.getWidth() - sideMargin * 2);
+        int widthsSum = 0;
+        for (int width : widths)
+            widthsSum += width;
+
         int gap = scaled(kButtonGap, uiScale);
         float widthFactor = 1.0f;
-        if (widthsSum + gap * (count - 1) > row.getWidth())
+        if (widthsSum + gap * (count - 1) > maxPackWidth)
         {
-            gap = count > 1 ? juce::jmax(0, (row.getWidth() - widthsSum) / (count - 1)) : 0;
-            if (widthsSum > row.getWidth())
-                widthFactor = static_cast<float>(row.getWidth()) / static_cast<float>(juce::jmax(1, widthsSum));
+            gap = count > 1 ? juce::jmax(0, (maxPackWidth - widthsSum) / (count - 1)) : 0;
+            if (widthsSum > maxPackWidth)
+                widthFactor = static_cast<float>(maxPackWidth) / static_cast<float>(juce::jmax(1, widthsSum));
         }
 
-        int packWidth = gap * (count - 1);
-        for (const auto& button : buttons)
-            packWidth += juce::roundToInt(static_cast<float>(button.width) * widthFactor);
-
-        int x = row.getX() + juce::jmax(0, (row.getWidth() - packWidth) / 2);
         for (const auto& button : buttons)
         {
             const int width = juce::roundToInt(static_cast<float>(button.width) * widthFactor);
@@ -104,6 +106,39 @@ namespace DialogMatrixHelpers
                 button.component->setBounds(x, row.getY(), width, row.getHeight());
             x += width + gap;
         }
+    }
+
+    CentredButtonPackMetrics measureCentredButtonPack(int rowWidth,
+                                                      float uiScale,
+                                                      const std::vector<int>& buttonWidths)
+    {
+        CentredButtonPackMetrics metrics;
+        if (buttonWidths.empty())
+            return metrics;
+
+        const int count = static_cast<int>(buttonWidths.size());
+        const int sideMargin = scaled(kButtonSideMargin, uiScale);
+        const int maxPackWidth = juce::jmax(1, rowWidth - sideMargin * 2);
+
+        int widthsSum = 0;
+        for (int width : buttonWidths)
+            widthsSum += width;
+
+        int gap = scaled(kButtonGap, uiScale);
+        float widthFactor = 1.0f;
+        if (widthsSum + gap * (count - 1) > maxPackWidth)
+        {
+            gap = count > 1 ? juce::jmax(0, (maxPackWidth - widthsSum) / (count - 1)) : 0;
+            if (widthsSum > maxPackWidth)
+                widthFactor = static_cast<float>(maxPackWidth) / static_cast<float>(juce::jmax(1, widthsSum));
+        }
+
+        metrics.packWidth = gap * (count - 1);
+        for (int width : buttonWidths)
+            metrics.packWidth += juce::roundToInt(static_cast<float>(width) * widthFactor);
+
+        metrics.leftInset = juce::jmax(sideMargin, (rowWidth - metrics.packWidth) / 2);
+        return metrics;
     }
 
     int contentWidthFor(int designWidth, float uiScale)
@@ -114,7 +149,12 @@ namespace DialogMatrixHelpers
     int bodyTextWidthFor(int contentWidth)
     {
         const int sideInset = juce::roundToInt(static_cast<float>(contentWidth) * kBodySideInsetFraction);
-        return juce::jmax(1, contentWidth - sideInset * 2);
+        return bodyTextWidthFor(contentWidth, sideInset, sideInset);
+    }
+
+    int bodyTextWidthFor(int contentWidth, int leftInset, int rightInset)
+    {
+        return juce::jmax(1, contentWidth - leftInset - rightInset);
     }
 
     int measureBodyHeight(const juce::Font& font, const juce::String& text, int textWidth)
@@ -158,13 +198,19 @@ namespace DialogMatrixHelpers
         geometry.titleBarHeight = scaled(kTitleBarHeight, args.uiScale);
 
         const int contentWidth = contentWidthFor(args.designWidth, args.uiScale);
-        const int sideInset = (contentWidth - bodyTextWidthFor(contentWidth)) / 2;
-        const int gapUnderTitle = juce::roundToInt(args.bodyEm);
+        const int defaultSideInset = juce::roundToInt(
+            static_cast<float>(contentWidth) * kBodySideInsetFraction);
+        const int leftInset = args.bodyLeftInset >= 0 ? args.bodyLeftInset : defaultSideInset;
+        const int rightInset = args.bodyRightInset >= 0 ? args.bodyRightInset : defaultSideInset;
+        const int gapUnderTitle = scaled(kGapAfterTitle, args.uiScale);
         const int buttonHeight = scaled(kDefaultButtonHeight, args.uiScale);
-        // Frozen: bottom margin is never smaller than the side inset.
-        const int bottomMargin = juce::jmax(scaled(kButtonBottomMargin, args.uiScale), sideInset);
-        const float bandEm = args.extraBandHeight > 0 ? kBandEmAroundExtra : kBandEmPlain;
-        const int bandHeight = args.extraBandHeight + juce::roundToInt(args.bodyEm * bandEm);
+        const int bottomMargin = scaled(kButtonBottomMargin, args.uiScale);
+        const int gapBeforeButtons = scaled(kGapBeforeButtons, args.uiScale);
+        // Plain confirms: 24 px last content → buttons. With extra controls (Don't ask again,
+        // DEVICE SETUP rows): keep 24 px above and below those controls.
+        const int bandHeight = args.extraBandHeight > 0
+            ? gapBeforeButtons + args.extraBandHeight + gapBeforeButtons
+            : gapBeforeButtons;
 
         const int contentHeight = gapUnderTitle + args.bodyHeight + bandHeight + buttonHeight + bottomMargin;
         geometry.dialogBounds = args.hostBounds.withSizeKeepingCentre(
@@ -174,9 +220,9 @@ namespace DialogMatrixHelpers
         auto content = geometry.dialogBounds.reduced(geometry.border);
         content.removeFromTop(geometry.titleBarHeight);
 
-        geometry.textArea = { content.getX() + sideInset,
+        geometry.textArea = { content.getX() + leftInset,
                               content.getY() + gapUnderTitle,
-                              content.getWidth() - sideInset * 2,
+                              content.getWidth() - leftInset - rightInset,
                               args.bodyHeight };
         geometry.buttonRow = { content.getX(),
                                content.getBottom() - bottomMargin - buttonHeight,
@@ -194,15 +240,21 @@ namespace DialogMatrixHelpers
         TextModalLayout layout;
         layout.bodyFont = scaledModalBodyFont(args.skin, args.uiScale);
 
-        const int textWidth = bodyTextWidthFor(contentWidthFor(args.designWidth, args.uiScale));
+        const int contentWidth = contentWidthFor(args.designWidth, args.uiScale);
+        const int defaultSideInset = juce::roundToInt(
+            static_cast<float>(contentWidth) * kBodySideInsetFraction);
+        const int leftInset = args.bodyLeftInset >= 0 ? args.bodyLeftInset : defaultSideInset;
+        const int rightInset = args.bodyRightInset >= 0 ? args.bodyRightInset : defaultSideInset;
+        const int textWidth = bodyTextWidthFor(contentWidth, leftInset, rightInset);
         const int bodyHeight = measureBodyHeight(layout.bodyFont, args.bodyText, textWidth);
 
         layout.geometry = computeModalGeometry({ .hostBounds = args.hostBounds,
                                                  .designWidth = args.designWidth,
                                                  .uiScale = args.uiScale,
-                                                 .bodyEm = layout.bodyFont.getHeight(),
                                                  .bodyHeight = bodyHeight,
-                                                 .extraBandHeight = args.extraBandHeight });
+                                                 .extraBandHeight = args.extraBandHeight,
+                                                 .bodyLeftInset = args.bodyLeftInset,
+                                                 .bodyRightInset = args.bodyRightInset });
         return layout;
     }
 
@@ -217,11 +269,16 @@ namespace DialogMatrixHelpers
         auto titleBar = inner.removeFromTop(args.titleBarHeight);
         auto content = inner;
 
+        // Body panel under the title band (skin header grey).
         args.g.setColour(args.skin.getColour(SkinColourId::kHeaderPanelBackground));
-        args.g.fillRect(titleBar);
         args.g.fillRect(content);
 
-        args.g.setColour(args.skin.getColour(SkinColourId::kDarkPanelText));
+        // Black title band spans the full inner width (stops at the grey border).
+        args.g.setColour(juce::Colour(kModalTitleBandColour));
+        args.g.fillRect(titleBar);
+
+        // Same light grey as idle Matrix button labels (not pure white).
+        args.g.setColour(args.skin.getColour(SkinColourId::kButtonTextOff));
         args.g.setFont(scaledTitleFont(args.skin, args.uiScale));
         args.g.drawText(args.title.toUpperCase(), titleBar, juce::Justification::centred, false);
     }

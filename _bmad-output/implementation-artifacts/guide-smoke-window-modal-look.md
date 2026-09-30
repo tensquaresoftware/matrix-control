@@ -120,10 +120,11 @@ Pour chaque case : look Matrix (chrome, corps Montserrat lisible en minuscules, 
 
 ### Polish modales (prochain chantier)
 
-- [x] Layout commun (titres caps, boutons centrés, inset texte ~10%, densité, Don't ask again) — implémenté 2026-09-30, smoke visuel à refaire
+- [x] Layout commun (titres caps, boutons centrés, inset texte ~10% ; mismatch aligné CANCEL, densité, Don't ask again) — implémenté 2026-09-30, smoke visuel à refaire
 - [x] About : Montserrat corps ; titre marque inchangé — implémenté 2026-09-30, smoke visuel à refaire
 - [x] Retouches DEVICE SETUP / m1km / Flush / mismatch / Delete init — implémenté 2026-09-30, smoke visuel à refaire
 - [x] Nettoyage ponctuation anglaise (SKIN: etc.)
+- [x] Chrome détail : bande titre noire 24 px (= bouton), titre gris bouton, gaps 24 px titre / dernier contenu / boutons, paragraphes `\n\n` — 2026-09-30 ; règles SSOT `guide-matrix-modal-design.md`
 
 ### Ordre d'exécution validé (2026-09-30)
 
