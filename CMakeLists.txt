@@ -51,6 +51,15 @@ string(TIMESTAMP MATRIX_CONTROL_BUILD_DATE "%Y-%m-%d" UTC)
 set(MATRIX_CONTROL_PRERELEASE_SUFFIX "alpha"
     CACHE STRING "Pre-release suffix appended to version (empty string for release builds)")
 
+# BUILD_DATE must stay on PluginVersion.cpp only. Putting it on the Matrix-Control
+# target invalidates every TU (including amalgamated JUCE modules) whenever CMake
+# reconfigures on a new UTC day — e.g. Cursor CMake Tools configureOnOpen each morning.
+set_source_files_properties(
+    Source/Shared/Definitions/PluginVersion.cpp
+    PROPERTIES
+        COMPILE_DEFINITIONS "MATRIX_CONTROL_BUILD_DATE=\"${MATRIX_CONTROL_BUILD_DATE}\""
+)
+
 # =============================================================================
 # PLUGIN COPY CONFIGURATION
 # COPY_TO_SYSTEM_FOLDERS: ON/OFF — copies plugins to standard DAW scan locations
@@ -749,7 +758,6 @@ if(MATRIX_BUILD_TESTS)
         MATRIX_TEST_FIXTURES_DIR="${CMAKE_CURRENT_SOURCE_DIR}/Tests/Fixtures"
         MATRIX_CONTROL_PROJECT_VERSION="${PROJECT_VERSION}"
         MATRIX_CONTROL_PRERELEASE_SUFFIX="${MATRIX_CONTROL_PRERELEASE_SUFFIX}"
-        MATRIX_CONTROL_BUILD_DATE="${MATRIX_CONTROL_BUILD_DATE}"
     )
 
     target_link_libraries(Matrix-Control_Tests PRIVATE
@@ -902,7 +910,6 @@ target_compile_definitions(Matrix-Control
     PRIVATE
         MATRIX_CONTROL_PROJECT_VERSION="${PROJECT_VERSION}"
         MATRIX_CONTROL_PRERELEASE_SUFFIX="${MATRIX_CONTROL_PRERELEASE_SUFFIX}"
-        MATRIX_CONTROL_BUILD_DATE="${MATRIX_CONTROL_BUILD_DATE}"
 )
 
 # JUCE links optional ARA/LV2 stub objects with no symbols into the shared-code static library.
@@ -941,7 +948,6 @@ target_compile_definitions(ExportMatrixModals PRIVATE
     JUCE_MODAL_LOOPS_PERMITTED=1
     MATRIX_CONTROL_PROJECT_VERSION="${PROJECT_VERSION}"
     MATRIX_CONTROL_PRERELEASE_SUFFIX="${MATRIX_CONTROL_PRERELEASE_SUFFIX}"
-    MATRIX_CONTROL_BUILD_DATE="${MATRIX_CONTROL_BUILD_DATE}"
 )
 
 target_link_libraries(ExportMatrixModals PRIVATE
