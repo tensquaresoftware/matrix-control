@@ -53,7 +53,7 @@ namespace Core
         computerSelectDebouncer_.cancel();
 
         // After abandon: Internal-nav baseline restore can put Computer focus back.
-        // Claim Internal before capture so failPendingDeviceLoad cannot restore Computer.
+        // Reclaim Internal before capture (KEEP_DISPLAYED: dump fail no longer rewinds focus).
         setNavigationFocus(PluginIDs::PatchManagerSection::NavigationFocus::kInternal);
 
         const auto coords = captureInternalCoordinates(limits);

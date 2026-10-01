@@ -338,10 +338,9 @@ namespace Core
         return snapshot;
     }
 
-    void PatchManagerActionHandler::abortComputerPatchesNavigation()
+    void PatchManagerActionHandler::cancelPendingComputerPatchesWork()
     {
         clearPendingCombinedScanLoadFooter();
-        abandonPendingInternalNavSettle();
         patchNavDebouncer_.cancel();
         computerSelectDebouncer_.cancel();
 
@@ -363,6 +362,12 @@ namespace Core
             PluginIDs::PatchManagerSection::ComputerPatchesModule::StateProperties::kSelectPatchCancelBaseline,
             0,
             nullptr);
+    }
+
+    void PatchManagerActionHandler::abortComputerPatchesNavigation()
+    {
+        abandonPendingInternalNavSettle();
+        cancelPendingComputerPatchesWork();
     }
 
 } // namespace Core

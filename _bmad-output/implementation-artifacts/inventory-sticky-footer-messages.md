@@ -184,7 +184,7 @@ All sticky strings below use prefix **`Patch Mutator: `** (`Core::…::kStickyMo
 | `Messages::kCompareLockedFooter` | Patch Mutator: Compare mode - editing and patch/bank changes are locked. Click C again to exit. | Compare on | Prefix Title Case |
 | `Messages::kExportCancelledFooter` | Patch Mutator: Export cancelled. | Export cancel | Prefix Title Case |
 | `Messages::kDeviceDumpFailedFooter` | Patch Mutator: Could not read the patch from the synth. Keeping the current editor buffer. Check that MIDI FROM is the synth MIDI OUT. | Device load fail | Prefix Title Case; MIDI FROM UPPERCASE OK |
-| `Messages::kDeviceDumpAbortedEditedFooter` | Patch Mutator: Synth patch load cancelled because the editor changed while waiting. Bank and patch numbers were restored; your edits were kept. | Load aborted | Prefix Title Case |
+| `Messages::kDeviceDumpAbortedEditedFooter` | Patch Mutator: Synth patch load cancelled because the editor changed while waiting. The displayed bank and patch numbers were kept; your edits were kept. | Load aborted | Prefix Title Case |
 | Export error passthrough (`kStickyModulePrefix` + `PatchFileExportResult::errorMessage`) | `Patch Mutator: History empty` / `Patch Mutator: Folder not writable` / `Patch Mutator: Write failed` / `Patch Mutator: Encode failed` / `Patch Mutator: Validation failed` / `Patch Mutator: Invalid patch data` / other save `errorMessage` values | Mutator export failure when service returns `errorMessage` | Prefix Title Case; wording can differ from dedicated constants (`kEmptyHistoryFooterMessage`, `kExportFolderNotWritableFooterMessage`) |
 
 Module display name constant: `PatchMutatorModule::kName` = `PATCH MUTATOR` (UPPERCASE — used for UI title, not sticky prefix).

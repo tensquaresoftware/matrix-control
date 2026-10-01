@@ -89,9 +89,9 @@ namespace Core
     void PatchManagerActionHandler::failPendingDeviceLoad(const DeviceMemoryLimits& limits,
                                                           const juce::String& footerMessage)
     {
-        if (pendingDeviceLoad_.has_value())
-            restoreInternalCoordinates(pendingDeviceLoad_->priorCoordinates, limits);
-
+        // KEEP_DISPLAYED: a late/failed dump must not yank NumberBoxes backward while the user
+        // is still stepping Internal Prev/Next (or after bank/NumberBox already advanced).
+        juce::ignoreUnused(limits);
         clearPendingDeviceLoad();
         apvts_.state.setProperty("uiMessageText", footerMessage, nullptr);
         apvts_.state.setProperty("uiMessageSeverity", juce::String("warning"), nullptr);

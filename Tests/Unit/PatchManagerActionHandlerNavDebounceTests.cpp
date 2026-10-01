@@ -18,6 +18,8 @@ public:
         computerSelect_burst_coalescesLoad();
         computerNav_cancelAtSettle_revertsWithoutSysEx();
         crossPath_internalThenComputerSelect_clearsInternalBaseline();
+        crossPath_internalClaim_cancelsPendingComputerSettle();
+        crossPath_dumpFailAfterFurtherInternalSteps_keepsLatestIndex();
     }
 
 private:
@@ -309,6 +311,104 @@ private:
         expectEquals(harness.dumpFakeState->lastRequestedPatch, static_cast<juce::uint8>(0));
 
         tempDir.deleteRecursively();
+    }
+
+    static int selectedComputerPatchId(HandlerHarness& harness)
+    {
+        return static_cast<int>(harness.proc.apvts.state.getProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile));
+    }
+
+    static int currentInternalPatch(HandlerHarness& harness)
+    {
+        return static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentPatchNumber));
+    }
+
+    juce::File prepareThreeFileComputerBrowser(HandlerHarness& harness)
+    {
+        const auto tempDir = createTempScanDir();
+        expect(tempDir.createDirectory());
+        copyFixturePatchToDir(tempDir, "Patch 5.syx");
+        copyFixturePatchToDir(tempDir, "Patch 66.syx");
+        copyFixturePatchToDir(tempDir, "Patch 71.syx");
+        setupComputerPatchesScan(harness, tempDir);
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile, 1, nullptr);
+        simulateSelectPatchFileDispatch(harness);
+        return tempDir;
+    }
+
+    void crossPath_internalClaim_cancelsPendingComputerSettle()
+    {
+        beginTest("crossPath_internalClaim_cancelsPendingComputerSettle");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, 0, 5, true);
+        harness.patchSelectionMidiSync.resetLastSyncedBank(0);
+        harness.useSuccessfulDeviceDump();
+
+        const auto tempDir = prepareThreeFileComputerBrowser(harness);
+        harness.patchLoadHookState->invoked = false;
+        while (! harness.queue.isEmpty())
+            (void) harness.queue.dequeue();
+
+        for (int i = 0; i < 2; ++i)
+            harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kLoadNextPatchFile, juce::var());
+        expectEquals(selectedComputerPatchId(harness), 3);
+
+        harness.handler.handleAction(InternalPatches::kLoadNextPatch, juce::var());
+        expectEquals(currentInternalPatch(harness), 6);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
+                         PatchManager::StateProperties::kNavigationFocus)),
+                     PatchManager::NavigationFocus::kInternal);
+        expectEquals(selectedComputerPatchId(harness), 1);
+        expect(! harness.patchLoadHookState->invoked);
+
+        harness.handler.flushPatchNavDebouncerForTests();
+        harness.handler.flushComputerSelectDebouncerForTests();
+        expectEquals(currentInternalPatch(harness), 6);
+        expectEquals(harness.dumpFakeState->lastRequestedPatch, static_cast<juce::uint8>(6));
+        expectEquals(selectedComputerPatchId(harness), 1);
+        expect(harness.patchLoadHookState->invoked);
+
+        tempDir.deleteRecursively();
+    }
+
+    void crossPath_dumpFailAfterFurtherInternalSteps_keepsLatestIndex()
+    {
+        beginTest("crossPath_dumpFailAfterFurtherInternalSteps_keepsLatestIndex");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, 0, 5, true);
+        harness.patchSelectionMidiSync.resetLastSyncedBank(0);
+        harness.useSuccessfulDeviceDump();
+        harness.dumpFakeState->deferCallback = true;
+
+        fireInternalPatchNavigation(harness, InternalPatches::kLoadNextPatch);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentPatchNumber)), 6);
+        expectEquals(harness.dumpFakeState->lastRequestedPatch, static_cast<juce::uint8>(6));
+        auto pendingDump = std::move(harness.dumpFakeState->pendingCallback);
+        expect(pendingDump != nullptr);
+
+        // User keeps stepping while the dump for 6 is still outstanding.
+        for (int i = 0; i < 3; ++i)
+            harness.handler.handleAction(InternalPatches::kLoadNextPatch, juce::var());
+
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentPatchNumber)), 9);
+
+        // Failed/empty dump for the abandoned target must not yank NumberBoxes backward.
+        pendingDump({});
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentPatchNumber)), 9);
+        expect(! harness.patchLoadHookState->invoked);
+
+        // Settle the newer burst with a failing dump — still KEEP_DISPLAYED at latest index.
+        harness.dumpFakeState->response.clear();
+        harness.dumpFakeState->deferCallback = false;
+        harness.handler.flushPatchNavDebouncerForTests();
+
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentPatchNumber)), 9);
+        expect(harness.proc.apvts.state.getProperty("uiMessageSeverity").toString() == "warning");
+        expect(! harness.patchLoadHookState->invoked);
     }
 };
 

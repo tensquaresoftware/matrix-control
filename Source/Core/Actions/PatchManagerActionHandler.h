@@ -128,9 +128,11 @@ namespace Core
         void rememberCurrentOverlayFromModel();
 
         // Requests the current patch from the synth (async dump) and mirrors it into the editor
-        // (PatchModel + APVTS) as a patch load. Rolls back Internal coordinates on failure.
-        // Prefer the prior-coordinates overload when APVTS / lock state were already advanced
-        // (NumberBox) so failure can restore the true pre-navigation values.
+        // (PatchModel + APVTS) as a patch load. On dump fail/abort, displayed bank/patch stay
+        // (KEEP_DISPLAYED); only a footer warning is published. Mid-wait editor edits abort apply
+        // when bufferAtRequest differs from the live model — not via priorCoordinates.
+        // Prefer the prior-coordinates overload when APVTS was already advanced (NumberBox) so
+        // the pending-load record matches that pre-navigation UI snapshot (no fail rollback).
         void loadCurrentPatchFromDevice(const DeviceMemoryLimits& limits);
         void loadCurrentPatchFromDevice(const DeviceMemoryLimits& limits,
                                         const InternalCoordinatesSnapshot& priorCoordinates);
@@ -192,6 +194,9 @@ namespace Core
         ComputerPatchesBrowserSnapshot captureComputerPatchesBrowserSnapshot() const;
         void restoreComputerPatchesBrowser(const ComputerPatchesBrowserSnapshot& snapshot);
         void restoreComputerPatchesBrowser(const juce::String& folderPath, int selectedId);
+        // Cancel Computer settles / revert unsettled selection without Internal baseline restore.
+        // Internal Prev/Next claim uses this so a late Computer path cannot rewind NumberBoxes.
+        void cancelPendingComputerPatchesWork();
         void abortComputerPatchesNavigation();
         // Returns the id written to APVTS, or nullopt when navigation was a no-op.
         std::optional<int> advanceComputerPatchesSelection(bool isNext);
@@ -214,8 +219,8 @@ namespace Core
         void setNavigationFocus(int focusOwner);
         void clearComputerNavigationFocusIfOwned();
         // Cancel pending Computer/Internal settles, claim Internal focus, sync MIDI slot,
-        // dump into the editor. Focus is set after abandon so a dump-fail restore cannot
-        // put Computer back. Caller still owns the unsaved-gate decision.
+        // dump into the editor. Focus is set after abandon so Internal-nav baseline restore
+        // cannot put Computer back. Caller still owns the unsaved-gate decision.
         void reloadCurrentInternalSlotFromDevice(const DeviceMemoryLimits& limits);
         // First Internal Prev/Next on undefined coordinates lands on the lowest slot instead
         // of stepping, because there is nothing to step from yet.

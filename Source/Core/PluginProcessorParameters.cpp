@@ -305,7 +305,8 @@ void PluginProcessor::applyAcceptedPatchNumberChange(const juce::String& paramet
     lastKnownPatchNumberInitialized_ = true;
 
     // Defer patchLoadContext_ until a successful dump (handler success hook). Updating it here
-    // would leave Mutator Export naming on the failed NumberBox target after dump rollback.
+    // would leave Mutator Export naming on the NumberBox target even when the dump fails and the
+    // editor buffer was never replaced (KEEP_DISPLAYED keeps the shown slot).
 
     sendPatchSelectionForAcceptedChange(clampedPatch);
 
@@ -320,7 +321,8 @@ void PluginProcessor::applyAcceptedPatchNumberChange(const juce::String& paramet
         nullptr);
 
     // Mirror the synth's edit buffer into the editor (clears Mutator history via onPatchLoaded).
-    // Pass the full pre-navigation snapshot so a failed dump rolls the coordinates back.
+    // Pass the pre-navigation UI snapshot with the pending load; dump fail keeps the displayed
+    // NumberBox (KEEP_DISPLAYED). The mid-wait edit abort gate uses bufferAtRequest vs live model.
     if (patchManagerActionHandler_ != nullptr)
     {
         patchManagerActionHandler_->loadCurrentPatchFromDevice(

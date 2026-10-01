@@ -2146,3 +2146,12 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-computer-patches-combo-reselect-reclaim-focus.md`
   summary: No automated test for PopupMenuBase same-id → Computer Patches onSameIdReselected → kHeaderClick wiring.
   evidence: CONVENTIONS discourage GUI popup unit tests; Core reclaim covered by HeaderClick tests; verify via Standalone UAT (Internal nav → reopen combo → reselect same .syx).
+
+## Deferred from: review of spec-internal-patches-prev-next-oscillation.md (2026-10-01)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-internal-patches-prev-next-oscillation.md`
+  summary: PendingDeviceLoad::priorCoordinates is still written but unused after KEEP_DISPLAYED dump-fail stopped restoring coords.
+  evidence: beginPendingDeviceLoad still assigns the field; failPendingDeviceLoad no longer reads it — dead API leftover, cleanup without behavior change.
+- source_spec: `_bmad-output/implementation-artifacts/spec-internal-patches-prev-next-oscillation.md`
+  summary: Internal header / same-bank reclaim still cancels Computer select settle only, not full cancelPendingComputerPatchesWork, so an unsettled Computer button-nav selection can remain.
+  evidence: Intent froze abort-on-claim for Internal Prev/Next; HeaderClick reload path is adjacent and still uses abandonPendingComputerSelectSettle + raw debouncer cancel.

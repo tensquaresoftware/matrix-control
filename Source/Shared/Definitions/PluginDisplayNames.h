@@ -2147,7 +2147,7 @@ namespace PluginDisplayNames
                     "Check that MIDI FROM is the synth MIDI OUT.";
                 constexpr const char* kDeviceDumpAbortedEditedFooter =
                     "PATCH MUTATOR: Synth patch load cancelled because the editor changed while waiting. "
-                    "Bank and patch numbers were restored; your edits were kept.";
+                    "The displayed bank and patch numbers were kept; your edits were kept.";
             }
         }
     } 

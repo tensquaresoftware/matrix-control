@@ -141,8 +141,10 @@ namespace Core
         markPatchCoordinatesEstablished();
         setNavigationFocus(PluginIDs::PatchManagerSection::NavigationFocus::kInternal);
 
+        // Kill pending Computer button/combo settles without Internal baseline restore — that
+        // would rewind the NumberBox we just advanced. Then abandon any in-flight device dump.
+        cancelPendingComputerPatchesWork();
         abandonPendingDeviceLoad();
-        abandonPendingComputerSelectSettle();
 
         patchNavDebouncer_.schedule([this]() { settleInternalPatchNavigation(); });
         return true;
