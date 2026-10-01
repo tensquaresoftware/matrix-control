@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include <juce_gui_basics/juce_gui_basics.h>
 
 #include "IPopupMenuHost.h"
@@ -8,6 +10,7 @@
 namespace TSS
 {
     class ComboBox;
+    class PopupMenuOutsideDismissWatcher;
 
     class PopupMenuBase : public juce::Component
     {
@@ -41,9 +44,12 @@ namespace TSS
 
         int getItemHeightDesign() const;
         float getBorderThicknessDesign() const;
+        void armOutsideDismissWatcher();
 
     private:
         void closePopup();
+
+        std::unique_ptr<PopupMenuOutsideDismissWatcher> outsideDismissWatcher_;
 
         friend class MultiColumnPopupMenu;
         friend class ScrollablePopupMenu;

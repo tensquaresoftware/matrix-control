@@ -2177,3 +2177,12 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-standalone-settings-shortcut-focus.md`
   summary: No automated check that a visible escape-blocking overlay aborts the async editor focus grab (first-run Device Setup race).
   evidence: Verification Gap; same GUI/manual-smoke convention.
+
+## Deferred from: oneshot review of spec-combobox-dismiss-title-bar-click.md (2026-10-02)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-combobox-dismiss-title-bar-click.md`
+  summary: Outside-popup left-press dismiss also closes the menu when clicking another application, not only this window's title bar / host chrome.
+  evidence: Blind Hunter; product may later want a peer-bounds gate if cross-app dismiss feels too aggressive.
+- source_spec: `_bmad-output/implementation-artifacts/spec-combobox-dismiss-title-bar-click.md`
+  summary: No automated coverage or injectable seam for OS-level outside-press chrome dismiss.
+  evidence: Verification Gap; GUI/OS poll is manual-smoke territory (standalone title bar + hosted chrome).

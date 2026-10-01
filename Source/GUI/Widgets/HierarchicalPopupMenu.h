@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include <juce_gui_basics/juce_gui_basics.h>
 
 #include "PopupMenuCustomScrollBar.h"
@@ -8,6 +10,7 @@
 namespace TSS
 {
     class HierarchicalComboBox;
+    class PopupMenuOutsideDismissWatcher;
 
     class HierarchicalPopupMenu : public juce::Component
     {
@@ -56,6 +59,7 @@ namespace TSS
         std::unique_ptr<CallbackPopupMenuScrollModel> secondaryScrollModel_;
         std::unique_ptr<PopupMenuCustomScrollBar> primaryScrollBar_;
         std::unique_ptr<PopupMenuCustomScrollBar> secondaryScrollBar_;
+        std::unique_ptr<PopupMenuOutsideDismissWatcher> outsideDismissWatcher_;
 
         int resolveInitialHighlightedPrimaryIndex() const;
         int resolveInitialHighlightedChildIndex() const;

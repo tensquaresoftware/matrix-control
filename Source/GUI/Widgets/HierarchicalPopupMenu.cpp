@@ -3,6 +3,7 @@
 #include "ComboBox.h"
 #include "HierarchicalComboBox.h"
 #include "PopupMenuModalHelpers.h"
+#include "PopupMenuOutsideDismissWatcher.h"
 #include "PopupMenuPositioner.h"
 
 namespace TSS
@@ -78,6 +79,13 @@ namespace TSS
 
         if (hasSecondaryColumn() && secondaryNeedsScrollbar())
             ensureSecondaryScrollBar();
+
+        outsideDismissWatcher_ = std::make_unique<PopupMenuOutsideDismissWatcher>(
+            *this,
+            [this]
+            {
+                PopupMenuModalHelpers::dismissFromOutsideClick(*this, owner_);
+            });
     }
 
     HierarchicalPopupMenu::~HierarchicalPopupMenu() = default;
@@ -357,5 +365,6 @@ namespace TSS
         rawPtr->toFront(false);
         rawPtr->grabKeyboardFocus();
         rawPtr->enterModalState(false, nullptr, true);
+        rawPtr->outsideDismissWatcher_->arm();
     }
 }

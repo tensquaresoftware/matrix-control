@@ -389,5 +389,6 @@ namespace TSS
         rawPtr->toFront(false);
         rawPtr->grabKeyboardFocus();
         rawPtr->enterModalState(false, nullptr, true);
+        rawPtr->armOutsideDismissWatcher();
     }
 }

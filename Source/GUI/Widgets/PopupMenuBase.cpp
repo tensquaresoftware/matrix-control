@@ -1,6 +1,7 @@
 #include "PopupMenuBase.h"
 #include "ComboBox.h"
 #include "PopupMenuModalHelpers.h"
+#include "PopupMenuOutsideDismissWatcher.h"
 
 namespace TSS
 {
@@ -18,6 +19,13 @@ namespace TSS
         setAlwaysOnTop(true);
         setInterceptsMouseClicks(true, true);
         setOpaque(true);
+
+        outsideDismissWatcher_ = std::make_unique<PopupMenuOutsideDismissWatcher>(
+            *this,
+            [this]
+            {
+                PopupMenuModalHelpers::dismissFromOutsideClick(*this, host_);
+            });
     }
 
     PopupMenuBase::~PopupMenuBase() = default;
@@ -97,6 +105,12 @@ namespace TSS
     void PopupMenuBase::closePopup()
     {
         PopupMenuModalHelpers::dismissAndDelete(*this, host_);
+    }
+
+    void PopupMenuBase::armOutsideDismissWatcher()
+    {
+        if (outsideDismissWatcher_ != nullptr)
+            outsideDismissWatcher_->arm();
     }
 
     bool PopupMenuBase::isValidItemIndex(int itemIndex) const

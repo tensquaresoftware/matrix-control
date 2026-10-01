@@ -1,6 +1,7 @@
 #include "HeaderLogoPopupMenu.h"
 
 #include "Logo.h"
+#include "PopupMenuOutsideDismissWatcher.h"
 #include "PopupMenuPositioner.h"
 #include "PopupMenuRenderer.h"
 #include "ComboBox.h"
@@ -37,6 +38,8 @@ namespace TSS
         setAlwaysOnTop(true);
         setInterceptsMouseClicks(true, true);
         setOpaque(true);
+
+        outsideDismissWatcher_ = std::make_unique<PopupMenuOutsideDismissWatcher>(*this, [this] { closePopup(); });
     }
 
     HeaderLogoPopupMenu::~HeaderLogoPopupMenu() = default;
@@ -458,5 +461,6 @@ namespace TSS
         rawPtr->toFront(false);
         rawPtr->grabKeyboardFocus();
         rawPtr->enterModalState(false, nullptr, true);
+        rawPtr->outsideDismissWatcher_->arm();
     }
 }

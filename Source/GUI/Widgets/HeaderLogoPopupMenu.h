@@ -15,6 +15,7 @@ namespace TSS
     class Logo;
     class PopupMenuRenderer;
     class ContextualHelpBinder;
+    class PopupMenuOutsideDismissWatcher;
 
     class HeaderLogoPopupMenu : public juce::Component
     {
@@ -93,6 +94,7 @@ namespace TSS
         std::unique_ptr<PopupMenuRenderer> renderer_;
         juce::Font cachedFont_;
         std::vector<MenuItem> items_;
+        std::unique_ptr<PopupMenuOutsideDismissWatcher> outsideDismissWatcher_;
 
         void buildItems();
         void appendUiScaleColumnItems();
