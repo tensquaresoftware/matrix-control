@@ -28,6 +28,7 @@ namespace TSS
         juce::Component& popup_;
         std::function<void()> onOutsideDismiss_;
         bool waitingForOpenRelease_ = false;
+        bool previousLeftDown_ = false;
         bool dismissing_ = false;
 
         static constexpr int kPollHz_ = 60;

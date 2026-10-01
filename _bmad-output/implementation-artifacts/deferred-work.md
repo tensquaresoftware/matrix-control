@@ -2186,3 +2186,9 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-combobox-dismiss-title-bar-click.md`
   summary: No automated coverage or injectable seam for OS-level outside-press chrome dismiss.
   evidence: Verification Gap; GUI/OS poll is manual-smoke territory (standalone title bar + hosted chrome).
+
+## Deferred from: code review of spec-combobox-dismiss-title-bar-click.md (2026-10-02)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-combobox-dismiss-title-bar-click.md`
+  summary: Reconfirmed — no automated check that an armed modal popup dismisses on outside / chrome left-press (or that a missing `arm()` after `enterModalState` fails).
+  evidence: Verification Gap layer; still no Tests/ hits for watcher symbols; injectable OS-button seam remains out of oneshot scope; manual smoke is the gate.

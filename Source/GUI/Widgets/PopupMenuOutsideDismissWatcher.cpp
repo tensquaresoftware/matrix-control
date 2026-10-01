@@ -52,6 +52,7 @@ namespace TSS
             return;
 
         waitingForOpenRelease_ = isLeftMouseButtonDownRealtime();
+        previousLeftDown_ = waitingForOpenRelease_;
         startTimerHz(kPollHz_);
     }
 
@@ -73,10 +74,15 @@ namespace TSS
         {
             if (! down)
                 waitingForOpenRelease_ = false;
+
+            previousLeftDown_ = down;
             return;
         }
 
-        if (dismissing_ || onOutsideDismiss_ == nullptr || ! popup_.isCurrentlyModal() || ! down)
+        const bool risingEdge = down && ! previousLeftDown_;
+        previousLeftDown_ = down;
+
+        if (dismissing_ || onOutsideDismiss_ == nullptr || ! popup_.isCurrentlyModal() || ! risingEdge)
             return;
 
         if (popup_.getScreenBounds().toFloat().contains(mouseScreenPosition()))
