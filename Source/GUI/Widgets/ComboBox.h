@@ -53,6 +53,9 @@ namespace TSS
         /** Invoked on the message thread immediately before a popup open is scheduled. */
         std::function<void()> onAboutToShowPopup;
 
+        /** Invoked when the popup commits the already-selected item id (JUCE skips onChange). */
+        std::function<void()> onSameIdReselected;
+
         float getUiScale() const override { return uiScale_; }
         const PopupMenuLook& getPopupMenuLook() const override { return popupLook_; }
         juce::Component& asHostComponent() override { return *this; }

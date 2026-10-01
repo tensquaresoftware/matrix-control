@@ -83,8 +83,14 @@ namespace TSS
             if (! selectable)
                 return;
 
-            const auto id = static_cast<juce::ComboBox&>(comboBox_).getItemId(selectedIndex);
-            static_cast<juce::ComboBox&>(comboBox_).setSelectedId(id, juce::sendNotificationSync);
+            auto& combo = static_cast<juce::ComboBox&>(comboBox_);
+            const auto id = combo.getItemId(selectedIndex);
+            const int previousId = combo.getSelectedId();
+            combo.setSelectedId(id, juce::sendNotificationSync);
+
+            // JUCE ComboBox skips change callbacks when the id is unchanged.
+            if (previousId == id && comboBox_.onSameIdReselected)
+                comboBox_.onSameIdReselected();
         });
     }
 

@@ -210,10 +210,8 @@ void ComputerPatchesPanel::applySelectSentinel(const juce::StringArray& sortedVa
 
 void ComputerPatchesPanel::setNavigationButtonsEnabled(bool enabled)
 {
-    if (loadPreviousPatchFileButton_ != nullptr)
-        loadPreviousPatchFileButton_->setEnabled(enabled);
-    if (loadNextPatchFileButton_ != nullptr)
-        loadNextPatchFileButton_->setEnabled(enabled);
+    if (loadPreviousPatchFileButton_ != nullptr) loadPreviousPatchFileButton_->setEnabled(enabled);
+    if (loadNextPatchFileButton_ != nullptr) loadNextPatchFileButton_->setEnabled(enabled);
 }
 
 void ComputerPatchesPanel::clearPatchFileSelectionProperty()
@@ -435,6 +433,9 @@ void ComputerPatchesPanel::setupSelectPatchFileComboBox(TSS::ISkin& skin)
         TSS::ComboBox::Style::ButtonLike);
     selectPatchFileComboBox_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
     selectPatchFileComboBox_->onChange = [this] { handleSelectPatchFileChanged(); };
+    // Same-id popup pick: JUCE skips onChange; reclaim like the module header.
+    selectPatchFileComboBox_->onSameIdReselected = [this]
+    { dispatchTimestampAction(apvts_, ComputerPatchesIds::StandaloneWidgets::kHeaderClick); };
     addAndMakeVisible(*selectPatchFileComboBox_);
 }
 

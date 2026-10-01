@@ -2140,3 +2140,9 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-matrix-modal-layout-polish.md`
   summary: About body Montserrat switch has no automated font observer.
   evidence: No AboutPanel tests; CONVENTIONS + smoke checklist own About paint fonts.
+
+## Deferred from: oneshot review of spec-computer-patches-combo-reselect-reclaim-focus.md (2026-10-01)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-computer-patches-combo-reselect-reclaim-focus.md`
+  summary: No automated test for PopupMenuBase same-id → Computer Patches onSameIdReselected → kHeaderClick wiring.
+  evidence: CONVENTIONS discourage GUI popup unit tests; Core reclaim covered by HeaderClick tests; verify via Standalone UAT (Internal nav → reopen combo → reselect same .syx).
