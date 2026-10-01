@@ -213,6 +213,9 @@ namespace Core
         void markPatchCoordinatesEstablished();
         void setNavigationFocus(int focusOwner);
         void clearComputerNavigationFocusIfOwned();
+        // Cancel pending Computer/Internal settles, sync MIDI slot, dump into the editor.
+        // Caller owns navigation-focus and unsaved-gate decisions.
+        void reloadCurrentInternalSlotFromDevice(const DeviceMemoryLimits& limits);
         // First Internal Prev/Next on undefined coordinates lands on the lowest slot instead
         // of stepping, because there is nothing to step from yet.
         PatchCoordinates resolveInternalNavigationTarget(bool isNext,
@@ -244,6 +247,9 @@ namespace Core
                                                   const DeviceMemoryLimits& limits);
         bool tryHandleModuleHeaderClicks(const juce::String& propertyId, const DeviceMemoryLimits& limits);
         bool tryHandleBankButtonSelection(const juce::String& propertyId, const DeviceMemoryLimits& limits);
+        // Same-bank Bank Utility click: no-op when Internal owns focus; reclaim when Computer does.
+        // Returns true when the click was a same-bank reclick (caller should return).
+        bool tryHandleSameBankReclick(int clampedBank, const DeviceMemoryLimits& limits);
         bool tryHandleInitPasteStoreActions(const juce::String& propertyId, const DeviceMemoryLimits& limits);
         bool tryHandleComputerFileActions(const juce::String& propertyId, const DeviceMemoryLimits& limits);
         bool tryHandleBankTransferActions(const juce::String& propertyId, const DeviceMemoryLimits& limits);

@@ -313,8 +313,8 @@ namespace Core
 
         const int clampedBank = juce::jlimit(limits.minBankNumber(), limits.maxBankNumber(), bankIndex);
 
-        // Re-clicking the already-current bank must not reset to patch 00 or re-fire load.
-        if (arePatchCoordinatesEstablished() && clampedBank == getCurrentBank(limits))
+        // Same-bank reclick: no-op or Computer→Internal reclaim depending on focus — never force patch 00.
+        if (tryHandleSameBankReclick(clampedBank, limits))
             return true;
 
         if (! confirmPatchContextChange())
