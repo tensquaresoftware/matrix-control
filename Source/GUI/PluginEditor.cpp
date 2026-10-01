@@ -161,6 +161,33 @@ void PluginEditor::resized()
         syncStandaloneWindowSize();
 }
 
+void PluginEditor::visibilityChanged()
+{
+    juce::AudioProcessorEditor::visibilityChanged();
+
+    // Standalone peers often become showing after attachEditorRuntimeListeners' first
+    // deferred focus request, so that grab can no-op and Cmd/Ctrl shortcuts beep.
+    if (pluginProcessor.isStandalone() && isShowing())
+        requestEditorKeyboardFocusIfNeeded();
+}
+
+void PluginEditor::requestEditorKeyboardFocusIfNeeded()
+{
+    juce::MessageManager::callAsync([safeThis = juce::Component::SafePointer<PluginEditor>(this)]
+                                    {
+                                        if (safeThis == nullptr || ! safeThis->isShowing())
+                                            return;
+
+                                        // Visible overlays may not own focus yet (first-run Device Setup).
+                                        if (safeThis->isEscapeBlockedByOverlay())
+                                            return;
+
+                                        // Do not steal focus from a child that already owns it.
+                                        if (! safeThis->hasKeyboardFocus(true))
+                                            safeThis->grabKeyboardFocus();
+                                    });
+}
+
 void PluginEditor::mouseDown(const juce::MouseEvent& event)
 {
 #if JUCE_DEBUG

@@ -298,12 +298,7 @@ void PluginEditor::attachEditorRuntimeListeners()
 
     // Standalone peers sit on the DocumentWindow: with no focused descendant, Cmd/Ctrl
     // shortcuts never reach PluginEditor/MainComponent and the OS beeps instead.
-    juce::MessageManager::callAsync([safeThis = juce::Component::SafePointer<PluginEditor>(this)]
-                                    {
-                                        if (safeThis == nullptr || ! safeThis->isShowing())
-                                            return;
-
-                                        if (! safeThis->hasKeyboardFocus(true))
-                                            safeThis->grabKeyboardFocus();
-                                    });
+    // visibilityChanged also requests focus when the peer becomes showing later.
+    if (pluginProcessor.isStandalone())
+        requestEditorKeyboardFocusIfNeeded();
 }

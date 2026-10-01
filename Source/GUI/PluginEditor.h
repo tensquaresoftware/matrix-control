@@ -45,6 +45,7 @@ public:
 
     void paint(juce::Graphics&) override;
     void resized() override;
+    void visibilityChanged() override;
     void mouseDown(const juce::MouseEvent& e) override;
     bool keyPressed(const juce::KeyPress& key) override;
     bool keyPressed(const juce::KeyPress& key, juce::Component* originatingComponent) override;
@@ -176,6 +177,7 @@ private:
     bool tryHandleEditorialUndoRedoKey(const juce::KeyPress& key);
     bool tryHandleEditorChromeKey(const juce::KeyPress& key);
     bool performEditorChromeShortcut(TSS::EditorChromeShortcut shortcut);
+    void requestEditorKeyboardFocusIfNeeded();
 
     void openSettingsWindow();
     void closeSettingsWindow();

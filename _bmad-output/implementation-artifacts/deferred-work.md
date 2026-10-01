@@ -2161,3 +2161,19 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-internal-patches-prev-next-oscillation.md`
   summary: Sibling done stories (v1-1 unsaved navigation, v1-2 ports) still document dump-fail coordinate rollback after KEEP_DISPLAYED flipped the product contract.
   evidence: Blind Hunter on commit 9c61f646; annotate or supersede those stories outside this bugfix delivery.
+
+## Deferred from: oneshot review of spec-standalone-settings-shortcut-focus.md (2026-10-01)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-standalone-settings-shortcut-focus.md`
+  summary: Closing Settings/About/Audio-MIDI/Device Setup (EPROM prompt) does not restore editor keyboard focus, so chrome shortcuts can beep again until a content click. Overlay early-return in `requestEditorKeyboardFocusIfNeeded` correctly skips steal while open but does not reschedule after hide.
+  evidence: Pre-existing sibling of the launch-focus bug; close paths only hide overlays. Prove by open Settings → Esc/close → Cmd+, without clicking content; or first-run Device Setup → dismiss → Cmd+, without content click.
+
+## Deferred from: code review of spec-standalone-settings-shortcut-focus.md (2026-10-01)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-standalone-settings-shortcut-focus.md`
+  summary: No automated check that standalone show/attach grants editor keyboard focus (or that chrome shortcuts work without a prior content click).
+  evidence: Verification Gap; `EditorChromeShortcutTests` only classify keys; no PluginEditor peer/focus harness; keep manual Standalone smoke.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-standalone-settings-shortcut-focus.md`
+  summary: No automated check that a visible escape-blocking overlay aborts the async editor focus grab (first-run Device Setup race).
+  evidence: Verification Gap; same GUI/manual-smoke convention.
