@@ -39,3 +39,20 @@ context:
 - Blind: shared PopupMenuBase same-id branch needs consumer regression check — **false** (callback optional; unset = no-op).
 - Blind: lambda brace layout inconsistent with header handler — **low** rejected (same file-size budget tradeoff).
 - Blind: gate-cancel focus-to-Computer inherited but implicit — **low** → **patch** (Implementation Notes).
+
+### Review Findings (code review 2026-10-01)
+
+- [x] [Review][Defer] No automated net for same-id combo → header reclaim — deferred: already in `deferred-work.md`; CONVENTIONS forbid GUI popup unit tests; Core HeaderClick coverage + Standalone UAT remain the gate.
+
+#### Rejected (this pass)
+
+- CMake change absent from Intent — **false**: intentionally in review scope (post-smoke warning fix).
+- CMake FILTER brittle / plugin form unproven — **false**: `compile_commands` shows a single `-DJUCE_STANDALONE_APPLICATION=JucePlugin_Build_Standalone`.
+- Dropping explicit `=1` alone would suffice — **false**: `juce_add_console_app` still injects `=1`; FILTER is required.
+- Future JUCE same-id notify would double-fire — **false**: JUCE 9 skips `sendChange` on unchanged id; hypothetical only.
+- Incomplete `onSameIdReselected` contract comment — **low** rejected (comment already states popup same-id commit).
+- Extract shared `reclaimViaHeaderClick` helper — **false**: intentional one-off under useful-line budget.
+- Deferred UAT not hooked into a living checklist — **false**: already recorded in `deferred-work.md` with Standalone steps.
+- Audit other ComboBox consumers for same-id reclaim — **false**: Intent keeps other combos unchanged.
+- Notes omit that `kSelectPatchFile` stays unchanged — **false**: rejected (would edit the spec); code correctly reuses header path.
+- Acceptance “CMake out of scope” — **false**: same as first item (explicit review scope).

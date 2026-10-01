@@ -925,10 +925,18 @@ target_include_directories(ExportMatrixModals PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/Source
 )
 
+# juce_add_console_app sets JUCE_STANDALONE_APPLICATION=1; linking Matrix-Control
+# also injects JUCE_STANDALONE_APPLICATION=JucePlugin_Build_Standalone. Keep the
+# plugin form and drop the console-app duplicate to avoid -Wmacro-redefined.
+get_target_property(_export_matrix_modals_defs ExportMatrixModals COMPILE_DEFINITIONS)
+if(_export_matrix_modals_defs)
+    list(FILTER _export_matrix_modals_defs EXCLUDE REGEX "^JUCE_STANDALONE_APPLICATION(=|$)")
+    set_target_properties(ExportMatrixModals PROPERTIES COMPILE_DEFINITIONS "${_export_matrix_modals_defs}")
+endif()
+
 target_compile_definitions(ExportMatrixModals PRIVATE
     JUCE_WEB_BROWSER=0
     JUCE_USE_CURL=0
-    JUCE_STANDALONE_APPLICATION=1
     JUCE_MODAL_LOOPS_PERMITTED=1
     MATRIX_CONTROL_PROJECT_VERSION="${PROJECT_VERSION}"
     MATRIX_CONTROL_PRERELEASE_SUFFIX="${MATRIX_CONTROL_PRERELEASE_SUFFIX}"
