@@ -2155,3 +2155,9 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-internal-patches-prev-next-oscillation.md`
   summary: Internal header / same-bank reclaim still cancels Computer select settle only, not full cancelPendingComputerPatchesWork, so an unsettled Computer button-nav selection can remain.
   evidence: Intent froze abort-on-claim for Internal Prev/Next; HeaderClick reload path is adjacent and still uses abandonPendingComputerSelectSettle + raw debouncer cancel.
+
+## Deferred from: code review of spec-internal-patches-prev-next-oscillation.md (2026-10-01)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-internal-patches-prev-next-oscillation.md`
+  summary: Sibling done stories (v1-1 unsaved navigation, v1-2 ports) still document dump-fail coordinate rollback after KEEP_DISPLAYED flipped the product contract.
+  evidence: Blind Hunter on commit 9c61f646; annotate or supersede those stories outside this bugfix delivery.

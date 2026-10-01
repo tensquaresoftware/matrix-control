@@ -137,3 +137,20 @@ Prefer the smallest Core change that satisfies the matrix; keep GUI wiring untou
 
 **Manual checks:**
 - Standalone + Matrix-1000: alternate Computer `.syx` ↔ Internal, then rapid Internal `>` / `<` — NumberBox must not oscillate; brief settle lag without wrong-direction snaps is OK.
+
+### Review Findings
+
+- [x] [Review][Patch] Add Internal-claim-over-pending-Computer-combo race test — Mirror `crossPath_internalClaim_cancelsPendingComputerSettle` but arm pending `kSelectPatchFile` / `flushComputerSelectDebouncerForTests`; today only button-nav (`kLoadNextPatchFile`) is covered, so removing `computerSelectDebouncer_.cancel()` from `cancelPendingComputerPatchesWork` would still leave CI green. [Tests/Unit/PatchManagerActionHandlerNavDebounceTests.cpp:341]
+- [x] [Review][Patch] Align dump-fail footer with KEEP_DISPLAYED banking/patch wording — `kDeviceDumpAbortedEditedFooter` now says displayed bank/patch were kept; `kDeviceDumpFailedFooter` still only mentions keeping the editor buffer. Same policy, asymmetric user messaging; also polish abort "were kept ... were kept" redundancy. [Source/Shared/Definitions/PluginDisplayNames.h:2145]
+- [x] [Review][Defer] Dead `PendingDeviceLoad::priorCoordinates` still written, never read — deferred: already recorded 2026-10-01; cleanup without behavior change. [Source/Core/Actions/PatchManagerActionHandlerDeviceLoad.cpp:59]
+- [x] [Review][Defer] Header / same-bank reclaim still select-only Computer abandon — deferred: already recorded 2026-10-01; intent froze abort-on-claim to Internal Prev/Next. [Source/Core/Actions/PatchManagerActionHandlerHeaderClick.cpp:50]
+- [x] [Review][Defer] Sibling done stories still document dump-fail coordinate rollback — deferred: agent-context / other specs (`v1-1`, `v1-2`); annotate or supersede outside this delivery. [_bmad-output/implementation-artifacts/v1-1-unsaved-navigation-consistency.md]
+
+#### Rejected
+
+- Spec Code Map / Design Notes / Change Log still describe pre-fix restore paths — `false` (fixing by editing the spec under review is rejected).
+- Verification commands omit DeferredGate filter — `false` (would only edit this spec's Verification section).
+- `crossPath_dumpFailAfterFurtherInternalSteps` first half may no-op via abandoned generation — `low` rejected (settle-fail half + DeferredGate KEEP_DISPLAYED renames already pin the fail path).
+- Dump-fail race asserts severity not footer text — `low` rejected (DeferredGate already pins abort footer text).
+- Shared `patchNavDebouncer_` cancel on every Internal Prev/Next — `false` (cancel then re-schedule is the coalesce path; `revertComputerPatchesSelectionIfNeeded` is a no-op when selection already matches).
+- Mutator Export / `patchLoadContext_` unasserted under KEEP_DISPLAYED NumberBox after failed dump — `low` rejected (intentional defer-until-success documented in PluginProcessor; everyday Export naming edge case needs its own story if pursued).

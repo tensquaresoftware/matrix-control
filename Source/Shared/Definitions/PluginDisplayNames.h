@@ -2143,11 +2143,11 @@ namespace PluginDisplayNames
                 }
 
                 constexpr const char* kDeviceDumpFailedFooter =
-                    "PATCH MUTATOR: Could not read the patch from the synth. Keeping the current editor buffer. "
-                    "Check that MIDI FROM is the synth MIDI OUT.";
+                    "PATCH MUTATOR: Could not read the patch from the synth. Keeping the displayed bank and patch "
+                    "numbers and the current editor buffer. Check that MIDI FROM is the synth MIDI OUT.";
                 constexpr const char* kDeviceDumpAbortedEditedFooter =
                     "PATCH MUTATOR: Synth patch load cancelled because the editor changed while waiting. "
-                    "The displayed bank and patch numbers were kept; your edits were kept.";
+                    "The displayed bank and patch numbers and your edits were kept.";
             }
         }
     } 

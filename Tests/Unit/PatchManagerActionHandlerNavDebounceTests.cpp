@@ -19,6 +19,7 @@ public:
         computerNav_cancelAtSettle_revertsWithoutSysEx();
         crossPath_internalThenComputerSelect_clearsInternalBaseline();
         crossPath_internalClaim_cancelsPendingComputerSettle();
+        crossPath_internalClaim_cancelsPendingComputerComboSettle();
         crossPath_dumpFailAfterFurtherInternalSteps_keepsLatestIndex();
     }
 
@@ -355,6 +356,44 @@ private:
         for (int i = 0; i < 2; ++i)
             harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kLoadNextPatchFile, juce::var());
         expectEquals(selectedComputerPatchId(harness), 3);
+
+        harness.handler.handleAction(InternalPatches::kLoadNextPatch, juce::var());
+        expectEquals(currentInternalPatch(harness), 6);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
+                         PatchManager::StateProperties::kNavigationFocus)),
+                     PatchManager::NavigationFocus::kInternal);
+        expectEquals(selectedComputerPatchId(harness), 1);
+        expect(! harness.patchLoadHookState->invoked);
+
+        harness.handler.flushPatchNavDebouncerForTests();
+        harness.handler.flushComputerSelectDebouncerForTests();
+        expectEquals(currentInternalPatch(harness), 6);
+        expectEquals(harness.dumpFakeState->lastRequestedPatch, static_cast<juce::uint8>(6));
+        expectEquals(selectedComputerPatchId(harness), 1);
+        expect(harness.patchLoadHookState->invoked);
+
+        tempDir.deleteRecursively();
+    }
+
+    void crossPath_internalClaim_cancelsPendingComputerComboSettle()
+    {
+        beginTest("crossPath_internalClaim_cancelsPendingComputerComboSettle");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, 0, 5, true);
+        harness.patchSelectionMidiSync.resetLastSyncedBank(0);
+        harness.useSuccessfulDeviceDump();
+
+        const auto tempDir = prepareThreeFileComputerBrowser(harness);
+        harness.patchLoadHookState->invoked = false;
+        while (! harness.queue.isEmpty())
+            (void) harness.queue.dequeue();
+
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile, 3, nullptr);
+        harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kSelectPatchFile, juce::var());
+        expectEquals(selectedComputerPatchId(harness), 3);
+        expect(! harness.patchLoadHookState->invoked);
 
         harness.handler.handleAction(InternalPatches::kLoadNextPatch, juce::var());
         expectEquals(currentInternalPatch(harness), 6);
