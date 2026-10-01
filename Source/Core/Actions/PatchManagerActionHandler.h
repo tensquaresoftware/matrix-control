@@ -213,8 +213,9 @@ namespace Core
         void markPatchCoordinatesEstablished();
         void setNavigationFocus(int focusOwner);
         void clearComputerNavigationFocusIfOwned();
-        // Cancel pending Computer/Internal settles, sync MIDI slot, dump into the editor.
-        // Caller owns navigation-focus and unsaved-gate decisions.
+        // Cancel pending Computer/Internal settles, claim Internal focus, sync MIDI slot,
+        // dump into the editor. Focus is set after abandon so a dump-fail restore cannot
+        // put Computer back. Caller still owns the unsaved-gate decision.
         void reloadCurrentInternalSlotFromDevice(const DeviceMemoryLimits& limits);
         // First Internal Prev/Next on undefined coordinates lands on the lowest slot instead
         // of stepping, because there is nothing to step from yet.

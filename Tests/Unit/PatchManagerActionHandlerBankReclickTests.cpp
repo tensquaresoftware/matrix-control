@@ -14,6 +14,7 @@ public:
     {
         testBankSelect_reclickCurrentBank_isNoOp();
         testBankSelect_reclickCurrentBank_whileComputerFocus_reclaimsInternal();
+        testBankSelect_reclickCurrentBank_whileComputerFocus_dumpFailKeepsInternal();
         testBankSelect_reclickCurrentBank_skipsUnsavedGate();
         testBankSelect_differentBank_stillLoadsPatch00();
     }
@@ -110,6 +111,27 @@ private:
         expectInternalSlotReloaded(harness, 2, 17);
 
         tempDir.deleteRecursively();
+    }
+
+    void testBankSelect_reclickCurrentBank_whileComputerFocus_dumpFailKeepsInternal()
+    {
+        beginTest("bankSelect_reclickCurrentBank_whileComputerFocus_dumpFailKeepsInternal");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, 2, 17, true);
+        harness.proc.apvts.state.setProperty(
+            PatchManager::StateProperties::kNavigationFocus,
+            PatchManager::NavigationFocus::kComputer,
+            nullptr);
+        harness.patchSelectionMidiSync.resetLastSyncedBank(2);
+        harness.dumpFakeState->available = false;
+
+        harness.handler.handleAction(BankUtility::StandaloneWidgets::kSelectBank2, juce::var());
+
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentBankNumber)), 2);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentPatchNumber)), 17);
+        expectEquals(navigationFocus(harness), PatchManager::NavigationFocus::kInternal);
+        expectEquals(harness.dumpFakeState->requestCount, 0);
     }
 
     void testBankSelect_reclickCurrentBank_skipsUnsavedGate()

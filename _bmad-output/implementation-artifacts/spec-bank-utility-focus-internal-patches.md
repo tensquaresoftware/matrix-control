@@ -69,6 +69,18 @@ context:
 - Given Internal focus and bank N / patch P, when the user clicks bank N, then behaviour stays a full no-op.
 - Given bank N, when the user clicks a different bank M, then load M/`00` with Internal focus as today.
 
+### Review Findings
+
+- [x] [Review][Patch] Set Internal focus after settle abandon and before pending-load capture so a failed device dump cannot restore Computer focus; pin with an abandon-baseline test [`PatchManagerActionHandlerHeaderClick.cpp:48-81`]
+
+Rejected (this review pass):
+- Blind: duplicate Implementation Notes / Intent wording / `kNone` matrix / frontmatter metadata — rejected (fix would edit the spec under review).
+- Blind: `skipsUnsavedGate` omits Computer focus — false (Computer reclaim test already asserts `gate.calls == 0`).
+- Blind: HeaderClick suite not reminded after shared helper extract — false (existing HeaderClick coverage remains the regression net).
+- Blind: different-bank from Computer focus untested — false (different-bank path unchanged; existing test covers load `00` + Internal).
+- Blind: `syncSelection` not named in asserts — false (queued Set Bank + Program Change assert the sync outcome).
+- Blind: `armPendingComputerSelectSettle` temp-dir leak on early expect fail — low, rejected (rare test-only path; RAII not worth the extra fixture complexity).
+
 ## Implementation Notes
 
 Mirror `tryHandleModuleHeaderClicks` Internal path for Computer-owned same-bank reclaim, except skip `confirmPatchContextChange`. Required steps: `setNavigationFocus(kInternal)`, abandon pending Computer select settle + cancel patch/computer debouncers, `syncSelection(current bank, current patch)`, `beginPendingDeviceLoad` + `loadCurrentPatchFromDevice`. Do not force patch `00`. When Internal already owns focus, keep the unconditional same-bank early-return.
@@ -93,6 +105,8 @@ Mirror `tryHandleModuleHeaderClicks` Internal path for Computer-owned same-bank 
 Mirror `tryHandleModuleHeaderClicks` Internal path for Computer-owned same-bank reclaim, except skip `confirmPatchContextChange`. Required steps: abandon pending Computer/Internal settles + cancel debouncers, `syncSelection(current bank, current patch)`, `beginPendingDeviceLoad` + `loadCurrentPatchFromDevice`, then `setNavigationFocus(kInternal)` after reload so an Internal-nav baseline restore cannot leave Computer focus. Do not force patch `00`. When Internal already owns focus, keep the unconditional same-bank early-return.
 
 Review patches applied: Computer settle cancel asserted in BankReclick tests; Internal focus set after reload on reclaim and Internal header; same-bank call-site comment restored.
+
+Post-review patch (2026-10-01): `reloadCurrentInternalSlotFromDevice` now sets Internal focus after settle abandon and before pending-load capture, so dump-fail restore cannot put Computer back; BankReclick covers dump-unavailable reclaim.
 
 ## Design Notes
 

@@ -52,6 +52,10 @@ namespace Core
         patchNavDebouncer_.cancel();
         computerSelectDebouncer_.cancel();
 
+        // After abandon: Internal-nav baseline restore can put Computer focus back.
+        // Claim Internal before capture so failPendingDeviceLoad cannot restore Computer.
+        setNavigationFocus(PluginIDs::PatchManagerSection::NavigationFocus::kInternal);
+
         const auto coords = captureInternalCoordinates(limits);
         if (patchSelectionMidiSync_ != nullptr)
             patchSelectionMidiSync_->syncSelection(coords.bank, coords.patch, limits, true);
