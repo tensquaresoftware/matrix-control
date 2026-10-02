@@ -4,6 +4,7 @@
 #include "PluginEditor.h"
 #include "PluginEditorInternal.h"
 
+#include "Core/Audio/StandaloneAudioInputRouter.h"
 #include "Core/Services/DeviceConnectionMachineDefaults.h"
 #include "Core/Services/DeviceSetupDeviceRow.h"
 #include "Core/Services/PatchNameEditRules.h"
@@ -171,14 +172,11 @@ void PluginEditor::restoreAndWireHeader()
         headerPanel.selectKeyboardFromPort(
             pluginProcessor.getApvts().state.getProperty("keyboardFromPortId", juce::String()).toString());
 
-        refreshAudioFromCombo(&headerPanel);
+        // First-run criterion C: Input None + AUDIO FROM empty once, then set flag.
+        if (Core::StandaloneAudioInputRouter::applySceneAudioSafetyDefaultsIfNeeded())
+            pluginProcessor.setAudioFromSourceId({});
 
-        const auto savedAudioFromSourceId = pluginProcessor.getApvts().state.getProperty("audioFromSourceId", juce::String()).toString();
-        if (savedAudioFromSourceId.isNotEmpty())
-        {
-            headerPanel.selectAudioFromSourceId(savedAudioFromSourceId);
-            pluginProcessor.setAudioFromSourceId(savedAudioFromSourceId);
-        }
+        refreshAudioFromCombo(&headerPanel);
 
         const float savedInputGainDb = static_cast<float>(
             pluginProcessor.getApvts().state.getProperty("inputGainDb", 0.0f));
@@ -247,12 +245,24 @@ void PluginEditor::wireHeaderRuntimeControls(HeaderPanel& headerPanel)
         pluginProcessor.setInputGainDb(PluginAudioConstants::inputGainIndexToDb(index));
     };
 
+    wireAudioFromComboChange(headerPanel);
+}
+
+void PluginEditor::wireAudioFromComboChange(HeaderPanel& headerPanel)
+{
     headerPanel.getAudioFromComboBox().onChange = [this, &headerPanel]
     {
         if (!pluginProcessor.isStandalone())
             return;
 
-        pluginProcessor.setAudioFromSourceId(headerPanel.getSelectedAudioFromSourceId());
+        const auto sourceId = headerPanel.getSelectedAudioFromSourceId();
+        pluginProcessor.setAudioFromSourceId(sourceId);
+
+        if (sourceId.isNotEmpty())
+        {
+            pluginProcessor.bindAudioFromInputDeviceIdentity(
+                Core::StandaloneAudioInputRouter::getCurrentInputDeviceName());
+        }
     };
 }
 

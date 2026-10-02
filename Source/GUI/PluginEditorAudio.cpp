@@ -7,6 +7,7 @@
 
 #include "Core/Audio/StandaloneAudioInputRouter.h"
 #include "Core/Audio/AudioPassthroughProcessor.h"
+#include "Core/Audio/SceneAudioSafety.h"
 #include "Core/MIDI/EditorOutboundGate.h"
 #include "Core/MIDI/MidiManager.h"
 #include "Core/Services/DeviceTypeRegistry.h"
@@ -56,51 +57,42 @@ void PluginEditor::applyAudioCatalogToHeader(HeaderPanel& header,
                                              const juce::StringArray& ids,
                                              juce::String sourceIdToRestore)
 {
-    if (sourceIdToRestore.isEmpty())
-        sourceIdToRestore = header.getSelectedAudioFromSourceId();
+    const auto currentIdentity = Core::StandaloneAudioInputRouter::getCurrentInputDeviceName();
+    const auto boundIdentity = pluginProcessor.getApvts().state.getProperty(
+        Core::kAudioFromBoundInputDeviceNameProperty, juce::String()).toString();
+    const auto decision = Core::decideAudioFromSelectionSync(
+        sourceIdToRestore, boundIdentity, currentIdentity, ids);
 
     header.populateAudioFromCombo(names, ids);
+    header.selectAudioFromSourceId(decision.sourceIdToApply);
 
-    if (sourceIdToRestore.isNotEmpty() && ids.contains(sourceIdToRestore))
+    if (decision.selectionKept)
     {
-        header.selectAudioFromSourceId(sourceIdToRestore);
-        pluginProcessor.setAudioFromSourceId(sourceIdToRestore);
+        pluginProcessor.setAudioFromSourceId(decision.sourceIdToApply);
+        pluginProcessor.bindAudioFromInputDeviceIdentity(currentIdentity);
         return;
     }
 
-    if (sourceIdToRestore.isEmpty())
-    {
-        const auto effectiveSourceId = header.getSelectedAudioFromSourceId();
-
-        if (effectiveSourceId.isNotEmpty())
-        {
-            header.selectAudioFromSourceId(effectiveSourceId);
-            pluginProcessor.setAudioFromSourceId(effectiveSourceId);
-        }
-        else if (! ids.isEmpty())
-        {
-            header.selectAudioFromSourceId(ids[0]);
-            pluginProcessor.setAudioFromSourceId(ids[0]);
-        }
-        else
-        {
-            header.selectAudioFromSourceId({});
-        }
-    }
-    else
-    {
-        // Stale id not in catalog: keep APVTS preference; avoid writing combo fallback of the wrong kind.
-        header.selectAudioFromSourceId(sourceIdToRestore);
-    }
+    pluginProcessor.setAudioFromSourceId({});
 }
 
-void PluginEditor::applyAudioCatalogWithoutHeader(const juce::StringArray& ids, juce::String sourceIdToRestore)
+void PluginEditor::applyAudioCatalogWithoutHeader(const juce::StringArray& ids,
+                                                  juce::String sourceIdToRestore)
 {
-    if (sourceIdToRestore.isEmpty() && ! ids.isEmpty())
-        sourceIdToRestore = ids[0];
+    const auto currentIdentity = Core::StandaloneAudioInputRouter::getCurrentInputDeviceName();
+    const auto boundIdentity = pluginProcessor.getApvts().state.getProperty(
+        Core::kAudioFromBoundInputDeviceNameProperty, juce::String()).toString();
+    const auto decision = Core::decideAudioFromSelectionSync(
+        sourceIdToRestore, boundIdentity, currentIdentity, ids);
 
-    if (sourceIdToRestore.isNotEmpty() && (ids.isEmpty() || ids.contains(sourceIdToRestore)))
-        pluginProcessor.setAudioFromSourceId(sourceIdToRestore);
+    if (decision.selectionKept)
+    {
+        pluginProcessor.setAudioFromSourceId(decision.sourceIdToApply);
+        pluginProcessor.bindAudioFromInputDeviceIdentity(currentIdentity);
+        return;
+    }
+
+    pluginProcessor.setAudioFromSourceId({});
 }
 
 void PluginEditor::attachStandaloneAudioDeviceListener()

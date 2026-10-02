@@ -170,6 +170,7 @@ public:
     void restoreMidiPortsForHost();
     void setAudioFromChannelMode(int mode);
     void setAudioFromSourceId(const juce::String& sourceId);
+    void bindAudioFromInputDeviceIdentity(const juce::String& deviceName);
     void syncAudioPassthroughFromSourceId(const juce::String& sourceId);
     juce::StringArray getAudioInputSourceNames() const;
     juce::StringArray getAudioInputSourceIds() const;

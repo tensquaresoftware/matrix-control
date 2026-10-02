@@ -150,6 +150,7 @@ private:
 
     // attachEditorRuntimeListeners() sub-binding (PluginEditorUiConstruction.cpp).
     void wireHeaderRuntimeControls(HeaderPanel& headerPanel);
+    void wireAudioFromComboChange(HeaderPanel& headerPanel);
 
     void refreshAudioFromCombo(HeaderPanel* headerOverride = nullptr);
     void applyAudioCatalogToHeader(HeaderPanel& header,

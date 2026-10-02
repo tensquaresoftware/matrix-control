@@ -11,6 +11,7 @@
 #include "Core/Audio/AudioPassthroughProcessor.h"
 #include "Core/Audio/DeviceAudioInputPreference.h"
 #include "Core/Audio/HardwareLatency.h"
+#include "Core/Audio/SceneAudioSafety.h"
 #include "Core/Audio/StandaloneAudioInputRouter.h"
 #include "Core/Services/DeviceTypeRegistry.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
@@ -155,6 +156,10 @@ void PluginProcessor::setAudioFromChannelMode(int mode)
 void PluginProcessor::setAudioFromSourceId(const juce::String& sourceId)
 {
     apvts.state.setProperty("audioFromSourceId", sourceId, nullptr);
+
+    if (sourceId.isEmpty())
+        apvts.state.removeProperty(Core::kAudioFromBoundInputDeviceNameProperty, nullptr);
+
     syncAudioPassthroughFromSourceId(sourceId);
 
     const auto decision = Core::decideAudioFromSourceSync(sourceId);
@@ -165,6 +170,19 @@ void PluginProcessor::setAudioFromSourceId(const juce::String& sourceId)
     apvts.state.setProperty("audioFromChannelMode",
                             static_cast<int>(decision.channelMode),
                             nullptr);
+}
+
+void PluginProcessor::bindAudioFromInputDeviceIdentity(const juce::String& deviceName)
+{
+    const auto sourceId = apvts.state.getProperty("audioFromSourceId", juce::String()).toString();
+
+    if (sourceId.isEmpty() || deviceName.isEmpty())
+    {
+        apvts.state.removeProperty(Core::kAudioFromBoundInputDeviceNameProperty, nullptr);
+        return;
+    }
+
+    apvts.state.setProperty(Core::kAudioFromBoundInputDeviceNameProperty, deviceName, nullptr);
 }
 
 juce::StringArray PluginProcessor::getAudioInputSourceNames() const
@@ -203,23 +221,12 @@ void PluginProcessor::initializeAudioProperties()
     const auto savedGainDb = static_cast<float>(apvts.state.getProperty("inputGainDb", 0.0f));
     setInputGainDb(savedGainDb);
 
-    auto savedSourceId = apvts.state.getProperty("audioFromSourceId", juce::String()).toString();
+    const auto savedSourceId = apvts.state.getProperty("audioFromSourceId", juce::String()).toString();
+    const auto sourceIdToApply = Core::resolveAudioFromSourceIdAtInit(savedSourceId);
 
-    if (savedSourceId.isEmpty())
-    {
-        const auto savedChannelMode = static_cast<int>(apvts.state.getProperty("audioFromChannelMode", 0));
-
-        switch (savedChannelMode)
-        {
-            case 1: savedSourceId = "mono:0"; break;
-            case 2: savedSourceId = "mono:1"; break;
-            case 0:
-            default: savedSourceId = "stereo:0"; break;
-        }
-    }
-
-    if (savedSourceId.isNotEmpty())
-        setAudioFromSourceId(savedSourceId);
+    // Empty id must stay empty — never invent stereo:0 / mono:* from channel mode.
+    if (sourceIdToApply.isNotEmpty())
+        setAudioFromSourceId(sourceIdToApply);
 }
 
 void PluginProcessor::applyPreferredStandaloneAudioFromForDeviceType()
@@ -251,4 +258,6 @@ void PluginProcessor::applyPreferredStandaloneAudioFromForDeviceType()
         return;
 
     setAudioFromSourceId(preferredSourceId);
+    bindAudioFromInputDeviceIdentity(
+        Core::StandaloneAudioInputRouter::getCurrentInputDeviceName());
 }

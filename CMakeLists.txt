@@ -590,6 +590,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/EditorPathTests.cpp
         Tests/Unit/AudioPassthroughProcessorTests.cpp
         Tests/Unit/AudioFromSourceSyncTests.cpp
+        Tests/Unit/SceneAudioSafetyTests.cpp
         Tests/Unit/AudioDevicePreferredSetupTests.cpp
         Tests/Unit/AudioInputSourceCatalogTests.cpp
         Tests/Unit/HardwareLatencyTests.cpp

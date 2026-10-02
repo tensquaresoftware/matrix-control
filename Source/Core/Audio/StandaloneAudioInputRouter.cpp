@@ -19,6 +19,16 @@ namespace Core
         return StandaloneAudioInputRouterDetail::getCatalogEntries();
     }
 
+    juce::String StandaloneAudioInputRouter::getCurrentInputDeviceName()
+    {
+        return StandaloneAudioInputRouterDetail::getCurrentInputDeviceName();
+    }
+
+    bool StandaloneAudioInputRouter::applySceneAudioSafetyDefaultsIfNeeded()
+    {
+        return StandaloneAudioInputRouterDetail::applySceneAudioSafetyDefaultsIfNeeded();
+    }
+
     void StandaloneAudioInputRouter::addAudioDeviceChangeListener(juce::ChangeListener& listener)
     {
         StandaloneAudioInputRouterDetail::addAudioDeviceChangeListener(listener);

@@ -13,6 +13,8 @@ namespace Core::StandaloneAudioInputRouterDetail
     juce::StringArray getInputChannelNames();
     juce::StringArray getInputChannelIds();
     std::vector<Core::AudioInputSourceEntry> getCatalogEntries();
+    juce::String getCurrentInputDeviceName();
+    bool applySceneAudioSafetyDefaultsIfNeeded();
     void addAudioDeviceChangeListener(juce::ChangeListener& listener);
     void removeAudioDeviceChangeListener(juce::ChangeListener& listener);
     void enableInputMonitoring();

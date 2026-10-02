@@ -1,10 +1,12 @@
 #include "Core/Audio/StandaloneAudioInputRouterDetail.h"
 
 #include "Core/Audio/AudioInputSourceCatalog.h"
+#include "Core/Audio/SceneAudioSafety.h"
 
 #include <juce_audio_devices/juce_audio_devices.h>
 #include <juce_audio_utils/juce_audio_utils.h>
 #include <juce_audio_plugin_client/Standalone/juce_StandaloneFilterWindow.h>
+#include <juce_data_structures/juce_data_structures.h>
 
 namespace Core::StandaloneAudioInputRouterDetail
 {
@@ -59,6 +61,46 @@ namespace Core::StandaloneAudioInputRouterDetail
     std::vector<Core::AudioInputSourceEntry> getCatalogEntries()
     {
         return buildActiveDeviceCatalogEntries();
+    }
+
+    juce::String getCurrentInputDeviceName()
+    {
+        if (auto* holder = juce::StandalonePluginHolder::getInstance())
+            return holder->deviceManager.getAudioDeviceSetup().inputDeviceName;
+
+        return {};
+    }
+
+    bool applySceneAudioSafetyDefaultsIfNeeded()
+    {
+        auto* holder = juce::StandalonePluginHolder::getInstance();
+        if (holder == nullptr || holder->settings == nullptr)
+            return false;
+
+        const bool alreadyApplied = holder->settings->getBoolValue(
+            kSceneAudioSafetyDefaultsAppliedProperty, false);
+
+        if (! shouldApplySceneAudioSafetyDefaults(alreadyApplied))
+            return false;
+
+        // Input None without muteInput: empty device + cleared channels, banner stays off.
+        auto setup = holder->deviceManager.getAudioDeviceSetup();
+        setup.inputDeviceName = {};
+        setup.inputChannels.clear();
+        setup.useDefaultInputChannels = false;
+
+        const auto setupError = holder->deviceManager.setAudioDeviceSetup(setup, true);
+
+        if (setupError.isNotEmpty())
+            return false;
+
+        holder->saveAudioDeviceState();
+        holder->settings->setValue(kSceneAudioSafetyDefaultsAppliedProperty, true);
+
+        if (auto* propertiesFile = dynamic_cast<juce::PropertiesFile*>(holder->settings.get()))
+            propertiesFile->saveIfNeeded();
+
+        return true;
     }
 
     void addAudioDeviceChangeListener(juce::ChangeListener& listener)

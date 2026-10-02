@@ -4,6 +4,7 @@
 #include <juce_audio_utils/juce_audio_utils.h>
 #include <juce_gui_extra/juce_gui_extra.h>
 
+#include "Core/Audio/StandaloneAudioInputRouter.h"
 #include "Core/PluginProcessor.h"
 #include "Shared/ProjectPaths.h"
 #include "Standalone/MatrixControlStandaloneFilterWindow.h"
@@ -56,12 +57,20 @@ public:
         const juce::Array<juce::StandalonePluginHolder::PluginInOuts> channelConfig;
        #endif
 
-        return std::make_unique<juce::StandalonePluginHolder> (appProperties.getUserSettings(),
-                                                             false,
-                                                             juce::String{},
-                                                             nullptr,
-                                                             channelConfig,
-                                                             autoOpenMidiDevices);
+        auto holder = std::make_unique<juce::StandalonePluginHolder> (appProperties.getUserSettings(),
+                                                                     false,
+                                                                     juce::String{},
+                                                                     nullptr,
+                                                                     channelConfig,
+                                                                     autoOpenMidiDevices);
+        // Criterion C as early as the holder exists — before the editor window monitors.
+        if (Core::StandaloneAudioInputRouter::applySceneAudioSafetyDefaultsIfNeeded())
+        {
+            if (auto* processor = dynamic_cast<PluginProcessor*>(holder->processor.get()))
+                processor->setAudioFromSourceId({});
+        }
+
+        return holder;
     }
 
     void initialise (const juce::String&) override

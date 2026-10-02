@@ -2192,3 +2192,13 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-combobox-dismiss-title-bar-click.md`
   summary: Reconfirmed — no automated check that an armed modal popup dismisses on outside / chrome left-press (or that a missing `arm()` after `enterModalState` fails).
   evidence: Verification Gap layer; still no Tests/ hits for watcher symbols; injectable OS-button seam remains out of oneshot scope; manual smoke is the gate.
+
+## Deferred from: review of spec-audio-safety-scene.md (2026-10-02)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-audio-safety-scene.md`
+  summary: First-run Input None device setup is not exercised in Matrix-Control_Tests (StandaloneAudioInputRouterStubs always returns false).
+  evidence: Verification Gap; stubs by design (no StandalonePluginHolder / real ADM). Manual cold-start smoke remains the gate.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-audio-safety-scene.md`
+  summary: Editor catalog refresh clear-to-None path is not unit-tested beyond pure SceneAudioSafety helpers (GUI out of test target).
+  evidence: Verification Gap; no Tests/ coverage of applyAudioCatalogToHeader / refreshAudioFromCombo; residual risk is manual Larsen smoke.

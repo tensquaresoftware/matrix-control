@@ -18,6 +18,8 @@ namespace Core
         static juce::StringArray getInputChannelNames();
         static juce::StringArray getInputChannelIds();
         static std::vector<AudioInputSourceEntry> getCatalogEntries();
+        static juce::String getCurrentInputDeviceName();
+        static bool applySceneAudioSafetyDefaultsIfNeeded();
         static void addAudioDeviceChangeListener(juce::ChangeListener& listener);
         static void removeAudioDeviceChangeListener(juce::ChangeListener& listener);
         static void enableInputMonitoring();
