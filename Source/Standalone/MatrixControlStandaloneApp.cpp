@@ -70,6 +70,13 @@ public:
                 processor->setAudioFromSourceId({});
         }
 
+        // Scarlett (etc.) gone: do not keep OS fallback Mic/Speakers — force None endpoints.
+        if (Core::StandaloneAudioInputRouter::applyMissingAudioDeviceNonePolicy())
+        {
+            if (auto* processor = dynamic_cast<PluginProcessor*>(holder->processor.get()))
+                processor->setAudioFromSourceId({});
+        }
+
         return holder;
     }
 

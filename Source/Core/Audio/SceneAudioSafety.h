@@ -84,4 +84,53 @@ namespace Core
     {
         return savedSourceId;
     }
+
+    /**
+        Preferred-after-inquiry must not re-arm monitoring when AUDIO FROM is None
+        (explicit user choice or safety clear after Input identity change).
+        Only remap an existing non-empty selection toward the preferred kind.
+    */
+    inline bool shouldApplyPreferredAudioFrom(const juce::String& currentSourceId) noexcept
+    {
+        return currentSourceId.isNotEmpty();
+    }
+
+    /**
+        When a persisted Input/Output name is non-empty but absent from the live device list
+        (Scarlett powered off, etc.), force that endpoint to None instead of keeping an OS fallback.
+    */
+    inline bool shouldForceAudioEndpointToNone(const juce::String& persistedDeviceName,
+                                               const juce::StringArray& availableDeviceNames) noexcept
+    {
+        return persistedDeviceName.isNotEmpty()
+            && ! availableDeviceNames.contains(persistedDeviceName);
+    }
+
+    /** Endpoint names stored in JUCE AudioDeviceManager state XML (`audioSetup`). */
+    struct PersistedAudioEndpoints
+    {
+        juce::String inputDeviceName;
+        juce::String outputDeviceName;
+    };
+
+    inline PersistedAudioEndpoints readPersistedAudioEndpoints(const juce::XmlElement* audioSetupXml) noexcept
+    {
+        PersistedAudioEndpoints endpoints;
+
+        if (audioSetupXml == nullptr)
+            return endpoints;
+
+        const auto legacyName = audioSetupXml->getStringAttribute("audioDeviceName");
+
+        if (legacyName.isNotEmpty())
+        {
+            endpoints.inputDeviceName = legacyName;
+            endpoints.outputDeviceName = legacyName;
+            return endpoints;
+        }
+
+        endpoints.inputDeviceName = audioSetupXml->getStringAttribute("audioInputDeviceName");
+        endpoints.outputDeviceName = audioSetupXml->getStringAttribute("audioOutputDeviceName");
+        return endpoints;
+    }
 }

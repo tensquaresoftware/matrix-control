@@ -110,6 +110,12 @@ void PluginEditor::detachStandaloneAudioDeviceListener()
 
 void PluginEditor::changeListenerCallback(juce::ChangeBroadcaster*)
 {
+    if (pluginProcessor.isStandalone()
+        && Core::StandaloneAudioInputRouter::applyMissingAudioDeviceNonePolicy())
+    {
+        pluginProcessor.setAudioFromSourceId({});
+    }
+
     refreshAudioFromCombo();
 
     if (! pluginProcessor.isStandalone())

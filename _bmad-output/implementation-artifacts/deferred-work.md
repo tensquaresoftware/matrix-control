@@ -2202,3 +2202,21 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-audio-safety-scene.md`
   summary: Editor catalog refresh clear-to-None path is not unit-tested beyond pure SceneAudioSafety helpers (GUI out of test target).
   evidence: Verification Gap; no Tests/ coverage of applyAudioCatalogToHeader / refreshAudioFromCombo; residual risk is manual Larsen smoke.
+
+## Deferred from: smoke follow-up audio safety scene (2026-10-02)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-audio-safety-scene.md`
+  summary: First-run setup assistant (rename beyond Device Setup): UI Scale default 100%, Skin Black, KEYBOARD FROM, audio interface / Input / Output, Matrix MIDI ports — dedicated chantier after short audio-safety hotfix.
+  evidence: Smoke 2026-10-02; product chose correctif court then First-run setup; Device Setup alone is the wrong vehicle (modal height on UltraWide Hi-DPI).
+
+## Deferred from: review of spec-audio-device-profiles.md (2026-10-02)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-audio-device-profiles.md`
+  summary: Missing-device None policy still keys off persisted audioSetup XML (and legacy single-name attrs); dual-clear / Output-only fallback / empty catalog edges lack Core unit coverage beyond shouldForce helpers.
+  evidence: Pre-profiles scene-safety paths in the same working tree; ADM/stub barrier; smoke checklist rows remain the gate until pure setup-mutation helpers are extracted.
+- source_spec: `_bmad-output/implementation-artifacts/spec-audio-device-profiles.md`
+  summary: Audio Settings profile capture/restore sequencing is only covered by pure Core helpers + manual smoke, not a non-GUI orchestration test.
+  evidence: AudioMidiSettingsWindow is outside Matrix-Control_Tests; guide-smoke profiles bullets are the intended verification.
+- source_spec: `_bmad-output/implementation-artifacts/spec-audio-device-profiles.md`
+  summary: Catalog Input label prefers inputDeviceName and preferred-after-inquiry processor early-return lack call-site unit tests.
+  evidence: Helper-level SceneAudioSafety / preference tests pass; processor/router harness absent; safety smoke covers product risk.

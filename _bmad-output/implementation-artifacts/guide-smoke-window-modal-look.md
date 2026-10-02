@@ -108,9 +108,22 @@ Pour chaque case : look Matrix (chrome, corps Montserrat lisible en minuscules, 
 
 ### Audio / sécurité monitoring
 
-- [x] Corriger désync AUDIO FROM vs Input Audio Settings (Larsen)
+- [x] Corriger désync AUDIO FROM ↔ Input Audio Settings (Larsen)
 - [x] Premier démarrage : Input = None et AUDIO FROM = NONE
 - [x] Invalider / nettoyer les entrées fantômes quand le device Input change
+- [ ] Correctif smoke 2026-10-02 : après Scarlett éteinte, AUDIO FROM reste None (pas de réarmement préféré Matrix) ; labels catalogue = nom Input JUCE (pas « Haut-parleurs » pour un micro) ; Output None au premier lancement si l’OS l’accepte ; **Input/Output Audio Settings → None si le device sauvé a disparu** (pas de repli Micro/Haut-parleurs)
+
+### Profils périphériques audio (après safety)
+
+- [ ] Même Scarlett : régler canaux / sample rate / buffer → éteindre (None) → rallumer → resélectionner → réglages restaurés ; AUDIO FROM reste None
+- [ ] Autre génération / nom OS différent → pas de restauration de profil
+- [ ] Cold start : Input/Output restent None après safety (pas de réouverture auto Scarlett)
+- [ ] Purge manuelle v1 : supprimer `~/Library/Application Support/Ten Square Software/Matrix-Control/AudioDeviceProfiles/` (ou `profiles.xml`)
+
+### First-run setup (chantier dédié — après correctif court)
+
+- [ ] Assistant premier lancement (renommer hors « Device Setup » seul) : UI Scale (défaut 100%), Skin (Black), KEYBOARD FROM, interface / Input / Output audio + ports MIDI Matrix
+- [ ] Maquette hauteur modale UltraWide Hi-DPI avec Scale dès l’ouverture
 
 ### Audio Settings — rebuild Matrix (chantier dédié)
 
@@ -127,9 +140,11 @@ Pour chaque case : look Matrix (chrome, corps Montserrat lisible en minuscules, 
 - [x] Chrome détail : bande titre noire 24 px (= bouton), titre gris bouton, gaps 24 px titre / dernier contenu / boutons, paragraphes `\n\n` — 2026-09-30 ; règles SSOT `guide-matrix-modal-design.md`
 - [x] Combos vs barre de titre native : fermeture au clic titre — livré + testé (conversations parallèles ; n’était plus « reporter »)
 
-### Ordre d'exécution validé (2026-09-30)
+### Ordre d'exécution validé (2026-09-30 / mis à jour 2026-10-02)
 
 1. Ponctuation anglaise
 2. Polish modales + About Montserrat
 3. Audio safety scène
-4. Rebuild Audio Settings Matrix
+4. **Profils périphériques audio** (capture / restore sur resélection explicite)
+5. First-run setup assistant
+6. Rebuild Audio Settings Matrix

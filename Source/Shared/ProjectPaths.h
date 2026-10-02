@@ -23,6 +23,9 @@ namespace ProjectPaths
     juce::PropertiesFile::Options makeProductPropertiesFileOptions(const juce::String& applicationName);
     // Fixed Init/ under application data; creates the directory on demand. Empty File on failure.
     juce::File getInitTemplatesDirectory();
+    // Fixed AudioDeviceProfiles/ under application data; creates the directory on demand.
+    // Empty File on failure. Manual purge = delete this folder (or profiles.xml inside).
+    juce::File getAudioDeviceProfilesDirectory();
     bool isUsingFallbackRoot();
     juce::String getFallbackRootWarning();
 }

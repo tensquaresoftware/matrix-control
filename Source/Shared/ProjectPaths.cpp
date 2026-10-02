@@ -245,18 +245,30 @@ juce::PropertiesFile::Options ProjectPaths::makeProductPropertiesFileOptions(
     return options;
 }
 
+namespace
+{
+    juce::File getOrCreateApplicationDataChildDirectory(const char* folderName)
+    {
+        const juce::File directory = ProjectPaths::getApplicationDataDirectory().getChildFile(folderName);
+
+        if (! directory.exists())
+            directory.createDirectory();
+
+        if (! directory.isDirectory())
+            return {};
+
+        return directory;
+    }
+}
+
 juce::File ProjectPaths::getInitTemplatesDirectory()
 {
-    constexpr const char* kInitFolderName { "Init" };
-    const juce::File initDir = getApplicationDataDirectory().getChildFile(kInitFolderName);
+    return getOrCreateApplicationDataChildDirectory("Init");
+}
 
-    if (! initDir.exists())
-        initDir.createDirectory();
-
-    if (! initDir.isDirectory())
-        return {};
-
-    return initDir;
+juce::File ProjectPaths::getAudioDeviceProfilesDirectory()
+{
+    return getOrCreateApplicationDataChildDirectory("AudioDeviceProfiles");
 }
 
 bool ProjectPaths::isUsingFallbackRoot()

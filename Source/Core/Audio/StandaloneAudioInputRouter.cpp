@@ -29,6 +29,11 @@ namespace Core
         return StandaloneAudioInputRouterDetail::applySceneAudioSafetyDefaultsIfNeeded();
     }
 
+    bool StandaloneAudioInputRouter::applyMissingAudioDeviceNonePolicy()
+    {
+        return StandaloneAudioInputRouterDetail::applyMissingAudioDeviceNonePolicy();
+    }
+
     void StandaloneAudioInputRouter::addAudioDeviceChangeListener(juce::ChangeListener& listener)
     {
         StandaloneAudioInputRouterDetail::addAudioDeviceChangeListener(listener);

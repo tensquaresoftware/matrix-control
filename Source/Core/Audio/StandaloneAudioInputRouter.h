@@ -20,6 +20,8 @@ namespace Core
         static std::vector<AudioInputSourceEntry> getCatalogEntries();
         static juce::String getCurrentInputDeviceName();
         static bool applySceneAudioSafetyDefaultsIfNeeded();
+        /** Force Input/Output to None when persisted devices are missing (no OS fallback keep). */
+        static bool applyMissingAudioDeviceNonePolicy();
         static void addAudioDeviceChangeListener(juce::ChangeListener& listener);
         static void removeAudioDeviceChangeListener(juce::ChangeListener& listener);
         static void enableInputMonitoring();

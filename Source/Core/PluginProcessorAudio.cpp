@@ -242,8 +242,13 @@ void PluginProcessor::applyPreferredStandaloneAudioFromForDeviceType()
     if (kind == Core::PreferredAudioFromKind::kNone)
         return;
 
-    const auto catalogIds = getAudioInputSourceIds();
     const auto currentSourceId = apvts.state.getProperty("audioFromSourceId", juce::String()).toString();
+
+    // Empty = None (user or scene-safety clear): never silent-rearm after Input fallback.
+    if (! Core::shouldApplyPreferredAudioFrom(currentSourceId))
+        return;
+
+    const auto catalogIds = getAudioInputSourceIds();
     const juce::String prefix = (kind == Core::PreferredAudioFromKind::kMono) ? "mono:" : "stereo:";
 
     if (currentSourceId.startsWith(prefix) && catalogIds.contains(currentSourceId))

@@ -14,6 +14,7 @@ public:
         applicationDataDirectory_matchesPropertiesFileProductFolder();
         productOptions_resolveUnderUnifiedProductFolder();
         initPath_isChildOfUnifiedProductFolder();
+        audioDeviceProfilesPath_isChildOfUnifiedProductFolder();
         linuxProductFolder_isNotUnderDotConfig();
     }
 
@@ -81,6 +82,22 @@ private:
 
         expectEquals(initPath.getFileName(), juce::String("Init"));
         expectEquals(initPath.getParentDirectory().getFullPathName(), appData.getFullPathName());
+    }
+
+    void audioDeviceProfilesPath_isChildOfUnifiedProductFolder()
+    {
+        beginTest("AudioDeviceProfiles path is under the unified product folder");
+
+        const auto appData = ProjectPaths::getApplicationDataDirectory();
+        const auto profilesPath = appData.getChildFile("AudioDeviceProfiles");
+
+        expectEquals(profilesPath.getFileName(), juce::String("AudioDeviceProfiles"));
+        expectEquals(profilesPath.getParentDirectory().getFullPathName(),
+                     appData.getFullPathName());
+
+        const auto created = ProjectPaths::getAudioDeviceProfilesDirectory();
+        expect(created.isDirectory());
+        expectEquals(created.getFullPathName(), profilesPath.getFullPathName());
     }
 
     void linuxProductFolder_isNotUnderDotConfig()

@@ -1,6 +1,7 @@
 #include "AudioMidiSettingsWindow.h"
 
 #include "Core/Audio/AudioDevicePreferredSetup.h"
+#include "Core/Audio/AudioDeviceProfiles.h"
 #include "GUI/Dialogs/DialogMatrixHelpers.h"
 #include "GUI/Settings/SettingsWindow.h"
 #include "GUI/Skins/Skin.h"
@@ -35,6 +36,127 @@ namespace
     Core::AudioDeviceIdentity identityFromSetup(const juce::AudioDeviceManager::AudioDeviceSetup& setup)
     {
         return { .outputDeviceName = setup.outputDeviceName, .inputDeviceName = setup.inputDeviceName };
+    }
+
+    Core::AudioDeviceCapabilities capabilitiesFromDevice(juce::AudioIODevice* device)
+    {
+        Core::AudioDeviceCapabilities capabilities;
+        if (device == nullptr)
+            return capabilities;
+
+        capabilities.availableInputChannelCount = device->getInputChannelNames().size();
+        capabilities.availableOutputChannelCount = device->getOutputChannelNames().size();
+        capabilities.sampleRates = device->getAvailableSampleRates();
+        capabilities.bufferSizes = device->getAvailableBufferSizes();
+        return capabilities;
+    }
+
+    Core::AudioDeviceProfileKey profileKeyFromLiveSetup(
+        const juce::AudioDeviceManager& deviceManager,
+        const juce::AudioDeviceManager::AudioDeviceSetup& setup,
+        juce::AudioIODevice* device)
+    {
+        const auto capabilities = capabilitiesFromDevice(device);
+        return Core::buildProfileKey({
+            .driverTypeName = deviceManager.getCurrentAudioDeviceType(),
+            .inputDeviceName = setup.inputDeviceName,
+            .outputDeviceName = setup.outputDeviceName,
+            .availableInputChannelCount = capabilities.availableInputChannelCount,
+            .availableOutputChannelCount = capabilities.availableOutputChannelCount,
+        });
+    }
+
+    void applyValidatedProfileToSetup(juce::AudioDeviceManager::AudioDeviceSetup& setup,
+                                      const Core::ValidatedAudioDeviceProfile& validated)
+    {
+        setup.inputChannels = validated.inputChannels;
+        setup.outputChannels = validated.outputChannels;
+
+        if (validated.applySampleRate)
+            setup.sampleRate = validated.sampleRate;
+
+        if (validated.applyBufferSize)
+            setup.bufferSize = validated.bufferSize;
+    }
+
+    /** Mutates candidateSetup only. Returns false when device is missing or no matching profile. */
+    bool tryRestoreMatchingProfile(const Core::AudioDeviceProfileKey& key,
+                                   juce::AudioIODevice* device,
+                                   juce::AudioDeviceManager::AudioDeviceSetup& candidateSetup)
+    {
+        if (device == nullptr)
+            return false;
+
+        const auto profiles = Core::loadAudioDeviceProfiles();
+        const int index = Core::findProfileIndex(profiles, key);
+        if (index < 0)
+            return false;
+
+        const auto validated = Core::validateProfileAgainstCapabilities(
+            profiles.getReference(index),
+            capabilitiesFromDevice(device));
+        applyValidatedProfileToSetup(candidateSetup, validated);
+        return true;
+    }
+
+    void captureLiveSetupAsProfile(const juce::AudioDeviceManager& deviceManager,
+                                   const juce::AudioDeviceManager::AudioDeviceSetup& setup,
+                                   juce::AudioIODevice* device)
+    {
+        if (device == nullptr)
+            return;
+
+        const auto key = profileKeyFromLiveSetup(deviceManager, setup, device);
+        if (! Core::shouldCaptureAudioDeviceProfile(key))
+            return;
+
+        Core::AudioDeviceProfile profile;
+        profile.key = key;
+        profile.inputChannels = setup.inputChannels;
+        profile.outputChannels = setup.outputChannels;
+        profile.sampleRate = setup.sampleRate;
+        profile.bufferSize = setup.bufferSize;
+        profile.lastUsedUtcMs = juce::Time::currentTimeMillis();
+
+        auto profiles = Core::upsertProfileLru(Core::loadAudioDeviceProfiles(), profile);
+        Core::saveAudioDeviceProfiles(profiles);
+    }
+
+    struct LiveSetupMutation
+    {
+        juce::AudioDeviceManager& deviceManager;
+        juce::AudioDeviceManager::AudioDeviceSetup& setup;
+        juce::AudioIODevice*& device;
+        bool& restoringFlag;
+    };
+
+    bool applySetupWithRestoreGuard(LiveSetupMutation& live,
+                                    const juce::AudioDeviceManager::AudioDeviceSetup& setup)
+    {
+        live.restoringFlag = true;
+        const auto error = live.deviceManager.setAudioDeviceSetup(setup, true);
+        live.restoringFlag = false;
+        return error.isEmpty();
+    }
+
+    void refreshSetupAfterApply(LiveSetupMutation& live)
+    {
+        live.setup = live.deviceManager.getAudioDeviceSetup();
+        live.device = live.deviceManager.getCurrentAudioDevice();
+    }
+
+    bool applyPreferredOverlayIfNeeded(LiveSetupMutation& live,
+                                       const Core::PreferredSetupChangePlan& plan)
+    {
+        if (! plan.shouldRestore)
+            return false;
+
+        auto candidate = live.setup;
+        candidate.sampleRate = plan.sampleRateToApply;
+        candidate.bufferSize = plan.bufferSizeToApply;
+        const bool applied = applySetupWithRestoreGuard(live, candidate);
+        refreshSetupAfterApply(live);
+        return applied;
     }
 }
 
@@ -216,28 +338,46 @@ void AudioMidiSettingsWindow::syncPreferredSetupFromDeviceManager()
     auto setup = deviceManager_.getAudioDeviceSetup();
     auto* device = deviceManager_.getCurrentAudioDevice();
     const auto currentIdentity = identityFromSetup(setup);
+    LiveSetupMutation live { deviceManager_, setup, device, restoringSetup_ };
+    bool restoredFromProfile = false;
 
-    const auto plan = Core::planPreferredSetupChange({
-        .previousIdentity = lastDeviceIdentity_,
-        .currentIdentity = currentIdentity,
-        .preferred = preferred_,
-        .liveSampleRate = setup.sampleRate,
-        .liveBufferSize = setup.bufferSize,
-        .preferredRateSupported = deviceSupportsSampleRate(device, preferred_.sampleRate),
-        .preferredBufferSupported = deviceSupportsBufferSize(device, preferred_.bufferSize),
-    });
-
-    if (plan.shouldRestore)
+    if (Core::shouldRestoreAudioDeviceProfile(hasSeededDeviceIdentity_,
+                                              lastDeviceIdentity_,
+                                              currentIdentity))
     {
-        setup.sampleRate = plan.sampleRateToApply;
-        setup.bufferSize = plan.bufferSizeToApply;
-        restoringSetup_ = true;
-        deviceManager_.setAudioDeviceSetup(setup, true);
-        restoringSetup_ = false;
+        const auto key = profileKeyFromLiveSetup(deviceManager_, setup, device);
+        auto candidate = setup;
+        if (tryRestoreMatchingProfile(key, device, candidate))
+        {
+            if (applySetupWithRestoreGuard(live, candidate))
+                restoredFromProfile = true;
+
+            refreshSetupAfterApply(live);
+        }
     }
 
-    preferred_ = plan.preferredAfterCapture;
-    lastDeviceIdentity_ = plan.identityToStore;
+    if (! restoredFromProfile)
+    {
+        const auto plan = Core::planPreferredSetupChange({
+            .previousIdentity = lastDeviceIdentity_,
+            .currentIdentity = currentIdentity,
+            .preferred = preferred_,
+            .liveSampleRate = setup.sampleRate,
+            .liveBufferSize = setup.bufferSize,
+            .preferredRateSupported = deviceSupportsSampleRate(device, preferred_.sampleRate),
+            .preferredBufferSupported = deviceSupportsBufferSize(device, preferred_.bufferSize),
+        });
+        applyPreferredOverlayIfNeeded(live, plan);
+        preferred_ = plan.preferredAfterCapture;
+    }
+    else
+    {
+        preferred_ = Core::capturePreferredSetup(preferred_, setup.sampleRate, setup.bufferSize);
+    }
+
+    lastDeviceIdentity_ = currentIdentity;
+    hasSeededDeviceIdentity_ = true;
+    captureLiveSetupAsProfile(deviceManager_, setup, device);
 }
 
 void AudioMidiSettingsWindow::playTestSound()

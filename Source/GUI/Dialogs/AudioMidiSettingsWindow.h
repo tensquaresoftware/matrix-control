@@ -62,6 +62,7 @@ private:
     Core::AudioDevicePreferredSetup preferred_;
     Core::AudioDeviceIdentity lastDeviceIdentity_;
     bool restoringSetup_ = false;
+    bool hasSeededDeviceIdentity_ = false;
 
     std::unique_ptr<SettingsCloseButton> closeButton_;
     std::unique_ptr<juce::AudioDeviceSelectorComponent> deviceSelector_;

@@ -16,6 +16,11 @@ public:
         testEmptyBoundIdentityInvalidatesLegacySelection();
         testEmptyCatalogClearsNonEmptySource();
         testInitEmptySourceNeverInventsFromChannelMode();
+        testPreferredSkippedWhenSourceEmpty();
+        testPreferredAllowedWhenSourceNonEmpty();
+        testForceEndpointNoneWhenPersistedMissing();
+        testKeepEndpointWhenPersistedStillAvailable();
+        testReadPersistedEndpointsFromSetupXml();
         testFirstRunGateTrueWhenUnset();
         testFirstRunGateFalseAfterApplied();
     }
@@ -108,6 +113,50 @@ private:
         expect(Core::resolveAudioFromSourceIdAtInit({}).isEmpty());
         expectEquals(Core::resolveAudioFromSourceIdAtInit("mono:0"), juce::String("mono:0"));
         expectEquals(Core::resolveAudioFromSourceIdAtInit("stereo:0"), juce::String("stereo:0"));
+    }
+
+    void testPreferredSkippedWhenSourceEmpty()
+    {
+        beginTest("Preferred-after-inquiry does not apply when AUDIO FROM is None");
+
+        expect(! Core::shouldApplyPreferredAudioFrom({}));
+    }
+
+    void testPreferredAllowedWhenSourceNonEmpty()
+    {
+        beginTest("Preferred-after-inquiry may remap an existing non-empty selection");
+
+        expect(Core::shouldApplyPreferredAudioFrom("mono:0"));
+    }
+
+    void testForceEndpointNoneWhenPersistedMissing()
+    {
+        beginTest("Missing persisted device forces endpoint to None");
+
+        const juce::StringArray available { "Micro MacBook Pro", "Haut-parleurs MacBook Pro" };
+        expect(Core::shouldForceAudioEndpointToNone("Scarlett 2i2", available));
+        expect(! Core::shouldForceAudioEndpointToNone({}, available));
+    }
+
+    void testKeepEndpointWhenPersistedStillAvailable()
+    {
+        beginTest("Persisted device still listed keeps endpoint");
+
+        const juce::StringArray available { "Scarlett 2i2", "Micro MacBook Pro" };
+        expect(! Core::shouldForceAudioEndpointToNone("Scarlett 2i2", available));
+    }
+
+    void testReadPersistedEndpointsFromSetupXml()
+    {
+        beginTest("Persisted audioSetup XML yields input and output names");
+
+        juce::XmlElement xml("DEVICESETUP");
+        xml.setAttribute("audioInputDeviceName", "Scarlett In");
+        xml.setAttribute("audioOutputDeviceName", "Scarlett Out");
+
+        const auto endpoints = Core::readPersistedAudioEndpoints(&xml);
+        expectEquals(endpoints.inputDeviceName, juce::String("Scarlett In"));
+        expectEquals(endpoints.outputDeviceName, juce::String("Scarlett Out"));
     }
 
     void testFirstRunGateTrueWhenUnset()

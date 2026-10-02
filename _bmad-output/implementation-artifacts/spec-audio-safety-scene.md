@@ -107,6 +107,7 @@ context:
 - `initializeAudioProperties` no longer invents `stereo:0`/`mono:*` when id empty.
 - Header refresh clears invalid/stale ids to None (no APVTS keep, no auto-pick `ids[0]`).
 - Review patches (2026-10-02): early first-run apply in `MatrixControlStandaloneApp::createPluginHolder` (Input None + clear AUDIO FROM); refuse empty-device bind; abort one-shot if `setAudioDeviceSetup` errors; `resolveAudioFromSourceIdAtInit` + empty-catalog unit tests.
+- Smoke follow-up (2026-10-02): `shouldApplyPreferredAudioFrom` blocks preferred re-arm when source empty; catalog labels use `inputDeviceName`; first-run also tries Output None (Input-only fallback if OS rejects).
 
 ## Spec Change Log
 
