@@ -13,12 +13,19 @@ public:
         keysMatch_rejectsFingerprintOrNameMismatch();
         shouldCapture_skipsBothEndpointsNone();
         shouldRestore_requiresSeededIdentityChangeToNonNone();
+        shouldPersist_skipsOverwriteAfterFailedRestore();
+        availableProfile_requiresEndpointsPresent();
+        findBestAvailable_picksNewestMatching();
+        fingerprintMatch_requiresLiveChannelCounts();
+        shouldScheduleLaunchRestore_skipsFirstRun();
+        shouldCaptureLive_skipsFirstObservationAndZeroFingerprint();
         validate_truncatesChannelBitsBeyondAvailable();
         validate_skipsUnsupportedRateAndBuffer();
         validate_appliesSupportedRateAndBuffer();
         upsert_evictsLeastRecentlyUsedAtCap();
         collapse_keepsNewestDuplicateByKey();
         roundTrip_xmlLoadSavePreservesPayload();
+        loadXml_collapsesDuplicateKeysKeepingNewest();
     }
 
 private:
@@ -95,6 +102,97 @@ private:
         expect(! Core::shouldRestoreAudioDeviceProfile(true, scarlett, scarlett));
         expect(! Core::shouldRestoreAudioDeviceProfile(true, scarlett, none));
         expect(Core::shouldRestoreAudioDeviceProfile(true, none, scarlett));
+    }
+
+    void shouldPersist_skipsOverwriteAfterFailedRestore()
+    {
+        beginTest("shouldPersist_skipsOverwriteAfterFailedRestore");
+
+        expect(Core::shouldPersistCapturedProfile(false, false, true));
+        expect(Core::shouldPersistCapturedProfile(true, true, true));
+        expect(Core::shouldPersistCapturedProfile(true, false, false));
+        expect(! Core::shouldPersistCapturedProfile(true, false, true));
+    }
+
+    void availableProfile_requiresEndpointsPresent()
+    {
+        beginTest("availableProfile_requiresEndpointsPresent");
+
+        const auto key = makeKey("Scarlett In", "Scarlett Out", 6, 6);
+        juce::StringArray inputs;
+        inputs.add("Scarlett In");
+        juce::StringArray outputs;
+        outputs.add("Scarlett Out");
+
+        expect(Core::areProfileEndpointDevicesAvailable(key, "CoreAudio", inputs, outputs));
+        expect(! Core::areProfileEndpointDevicesAvailable(key, "WASAPI", inputs, outputs));
+        expect(! Core::areProfileEndpointDevicesAvailable(key, {}, inputs, outputs));
+        expect(! Core::areProfileEndpointDevicesAvailable(key, "CoreAudio", {}, outputs));
+    }
+
+    void findBestAvailable_picksNewestMatching()
+    {
+        beginTest("findBestAvailable_picksNewestMatching");
+
+        juce::Array<Core::AudioDeviceProfile> profiles;
+        profiles.add(makeProfile(makeKey("Old", "Old", 2, 2), 100));
+        profiles.add(makeProfile(makeKey("Scarlett", "Scarlett", 6, 6), 200, 88200.0, 32));
+        profiles.add(makeProfile(makeKey("Missing", "Missing", 2, 2), 999));
+
+        juce::StringArray names;
+        names.add("Scarlett");
+        names.add("Old");
+
+        const int best = Core::findBestAvailableProfileIndex(profiles, "CoreAudio", names, names);
+        expectEquals(best, 1);
+        expectEquals(profiles.getReference(best).sampleRate, 88200.0);
+        expectEquals(profiles.getReference(best).bufferSize, 32);
+    }
+
+    void fingerprintMatch_requiresLiveChannelCounts()
+    {
+        beginTest("fingerprintMatch_requiresLiveChannelCounts");
+
+        const auto key = makeKey("In", "Out", 6, 6);
+        expect(Core::doesOpenedDeviceFingerprintMatchProfileKey(key, 6, 6));
+        expect(! Core::doesOpenedDeviceFingerprintMatchProfileKey(key, 2, 6));
+        expect(! Core::doesOpenedDeviceFingerprintMatchProfileKey(key, 6, 2));
+    }
+
+    void shouldScheduleLaunchRestore_skipsFirstRun()
+    {
+        beginTest("shouldScheduleLaunchRestore_skipsFirstRun");
+
+        expect(! Core::shouldScheduleAvailableAudioDeviceProfileRestoreAtLaunch(true));
+        expect(Core::shouldScheduleAvailableAudioDeviceProfileRestoreAtLaunch(false));
+    }
+
+    void shouldCaptureLive_skipsFirstObservationAndZeroFingerprint()
+    {
+        beginTest("shouldCaptureLive_skipsFirstObservationAndZeroFingerprint");
+
+        const auto live = makeKey("In", "Out", 2, 2);
+        const auto unknown = makeKey("In", "Out", 0, 0);
+
+        expect(! Core::shouldCaptureLiveSetupAsProfile(
+            { .hasSeededIdentity = false, .hadExistingProfileForKey = true, .liveKey = live }));
+        expect(! Core::shouldCaptureLiveSetupAsProfile(
+            { .hasSeededIdentity = true, .hadExistingProfileForKey = true, .liveKey = unknown }));
+        expect(Core::shouldCaptureLiveSetupAsProfile(
+            { .hasSeededIdentity = true, .hadExistingProfileForKey = true, .liveKey = live }));
+        expect(! Core::shouldCaptureLiveSetupAsProfile({
+            .hasSeededIdentity = true,
+            .restoreAttempted = true,
+            .hadExistingProfileForKey = true,
+            .liveKey = live,
+        }));
+        expect(Core::shouldCaptureLiveSetupAsProfile({
+            .hasSeededIdentity = true,
+            .restoreAttempted = true,
+            .restoreSucceeded = true,
+            .hadExistingProfileForKey = true,
+            .liveKey = live,
+        }));
     }
 
     void validate_truncatesChannelBitsBeyondAvailable()
@@ -228,6 +326,31 @@ private:
         expectEquals(loaded.getReference(0).sampleRate, 48000.0);
         expectEquals(loaded.getReference(0).bufferSize, 256);
         expectEquals(loaded.getReference(0).lastUsedUtcMs, static_cast<juce::int64>(123456789));
+
+        tempDir.deleteRecursively();
+    }
+
+    void loadXml_collapsesDuplicateKeysKeepingNewest()
+    {
+        beginTest("loadXml_collapsesDuplicateKeysKeepingNewest");
+
+        const auto tempDir = juce::File::getSpecialLocation(juce::File::tempDirectory)
+                                 .getChildFile("MatrixControlAudioDeviceProfilesDupTest");
+        tempDir.deleteRecursively();
+        expect(tempDir.createDirectory());
+
+        const auto storeFile = tempDir.getChildFile("profiles.xml");
+        const auto key = makeKey("In", "Out", 2, 2);
+        juce::Array<Core::AudioDeviceProfile> toSave;
+        toSave.add(makeProfile(key, 1000, 44100.0, 128));
+        toSave.add(makeProfile(key, 2000, 88200.0, 32));
+        expect(Core::saveAudioDeviceProfilesToFile(storeFile, toSave));
+
+        const auto loaded = Core::loadAudioDeviceProfilesFromFile(storeFile);
+        expectEquals(loaded.size(), 1);
+        expectEquals(loaded.getReference(0).lastUsedUtcMs, static_cast<juce::int64>(2000));
+        expectEquals(loaded.getReference(0).sampleRate, 88200.0);
+        expectEquals(loaded.getReference(0).bufferSize, 32);
 
         tempDir.deleteRecursively();
     }

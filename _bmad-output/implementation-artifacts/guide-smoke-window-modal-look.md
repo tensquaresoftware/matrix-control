@@ -115,10 +115,12 @@ Pour chaque case : look Matrix (chrome, corps Montserrat lisible en minuscules, 
 
 ### Profils périphériques audio (après safety)
 
-- [ ] Même Scarlett : régler canaux / sample rate / buffer → éteindre (None) → rallumer → resélectionner → réglages restaurés ; AUDIO FROM reste None
-- [ ] Autre génération / nom OS différent → pas de restauration de profil
-- [ ] Cold start : Input/Output restent None après safety (pas de réouverture auto Scarlett)
+- [ ] Configurer Scarlett (canaux + rate + buffer) → vérifier `AudioDeviceProfiles/profiles.xml` contient ces valeurs
+- [ ] Éteindre Scarlett → relancer → Input/Output None ; AUDIO FROM None
+- [ ] Rallumer Scarlett → relancer → Input/Output + rate/buffer/canaux restaurés automatiquement ; AUDIO FROM reste None
+- [ ] Autre génération / nom OS différent → pas de restauration de ce profil
 - [ ] Purge manuelle v1 : supprimer `~/Library/Application Support/Ten Square Software/Matrix-Control/AudioDeviceProfiles/` (ou `profiles.xml`)
+- [ ] Re-pick dans Audio Settings restaure aussi si besoin ; un restore raté n'écrase pas le profil disque
 
 ### First-run setup (chantier dédié — après correctif court)
 

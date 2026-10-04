@@ -1,5 +1,7 @@
 #pragma once
 
+#include <limits>
+
 #include <juce_core/juce_core.h>
 
 #include "Core/Audio/AudioDevicePreferredSetup.h"
@@ -95,6 +97,126 @@ namespace Core
             return false;
 
         return current.inputDeviceName.isNotEmpty() || current.outputDeviceName.isNotEmpty();
+    }
+
+    /**
+        After an identity-change restore attempt: never overwrite an existing disk profile with
+        live defaults when apply failed. Always persist after success or when no prior profile.
+    */
+    inline bool shouldPersistCapturedProfile(bool restoreAttempted,
+                                             bool restoreSucceeded,
+                                             bool hadExistingProfileForKey) noexcept
+    {
+        if (! restoreAttempted)
+            return true;
+
+        if (restoreSucceeded)
+            return true;
+
+        return ! hadExistingProfileForKey;
+    }
+
+    /** True when every non-empty endpoint name in the key is present in the live device lists. */
+    inline bool areProfileEndpointDevicesAvailable(const AudioDeviceProfileKey& key,
+                                                    const juce::String& currentDriverTypeName,
+                                                    const juce::StringArray& availableInputNames,
+                                                    const juce::StringArray& availableOutputNames) noexcept
+    {
+        if (! shouldCaptureAudioDeviceProfile(key))
+            return false;
+
+        // Live type unknown: wait for another launch retry rather than matching any driver.
+        if (currentDriverTypeName.isEmpty())
+            return false;
+
+        if (key.driverTypeName.isNotEmpty() && key.driverTypeName != currentDriverTypeName)
+            return false;
+
+        if (key.inputDeviceName.isNotEmpty() && ! availableInputNames.contains(key.inputDeviceName))
+            return false;
+
+        if (key.outputDeviceName.isNotEmpty() && ! availableOutputNames.contains(key.outputDeviceName))
+            return false;
+
+        return true;
+    }
+
+    /** After the device is open: same available-channel counts as the stored key. */
+    inline bool doesOpenedDeviceFingerprintMatchProfileKey(const AudioDeviceProfileKey& key,
+                                                           int liveInputChannelCount,
+                                                           int liveOutputChannelCount) noexcept
+    {
+        return key.availableInputChannelCount == juce::jmax(0, liveInputChannelCount)
+            && key.availableOutputChannelCount == juce::jmax(0, liveOutputChannelCount);
+    }
+
+    /** First-run Criterion C already applied None: do not auto-open a remembered interface. */
+    inline bool shouldScheduleAvailableAudioDeviceProfileRestoreAtLaunch(
+        bool appliedFirstRunDefaults) noexcept
+    {
+        return ! appliedFirstRunDefaults;
+    }
+
+    struct CaptureLiveSetupAsProfileInput
+    {
+        bool hasSeededIdentity = false;
+        bool restoreAttempted = false;
+        bool restoreSucceeded = false;
+        bool hadExistingProfileForKey = false;
+        AudioDeviceProfileKey liveKey;
+    };
+
+    /**
+        Skip capture on first Audio Settings observation, when live available counts are still
+        unknown (0/0), or after a failed identity restore that already has a disk row.
+    */
+    inline bool shouldCaptureLiveSetupAsProfile(const CaptureLiveSetupAsProfileInput& input) noexcept
+    {
+        if (! input.hasSeededIdentity)
+            return false;
+
+        if (input.liveKey.availableInputChannelCount <= 0
+            && input.liveKey.availableOutputChannelCount <= 0)
+        {
+            return false;
+        }
+
+        return shouldPersistCapturedProfile(input.restoreAttempted,
+                                            input.restoreSucceeded,
+                                            input.hadExistingProfileForKey);
+    }
+
+    /**
+        Cold-start / launch: among profiles whose endpoints are currently available, pick the
+        most recently used. Returns -1 when none qualify.
+    */
+    inline int findBestAvailableProfileIndex(const juce::Array<AudioDeviceProfile>& profiles,
+                                             const juce::String& currentDriverTypeName,
+                                             const juce::StringArray& availableInputNames,
+                                             const juce::StringArray& availableOutputNames) noexcept
+    {
+        int bestIndex = -1;
+        juce::int64 bestStamp = std::numeric_limits<juce::int64>::min();
+
+        for (int i = 0; i < profiles.size(); ++i)
+        {
+            const auto& profile = profiles.getReference(i);
+            if (! areProfileEndpointDevicesAvailable(profile.key,
+                                                     currentDriverTypeName,
+                                                     availableInputNames,
+                                                     availableOutputNames))
+            {
+                continue;
+            }
+
+            if (bestIndex < 0 || profile.lastUsedUtcMs >= bestStamp)
+            {
+                bestIndex = i;
+                bestStamp = profile.lastUsedUtcMs;
+            }
+        }
+
+        return bestIndex;
     }
 
     inline juce::BigInteger truncateChannelBits(juce::BigInteger bits, int availableCount) noexcept

@@ -34,6 +34,15 @@ namespace Core::StandaloneAudioInputRouterDetail
         return false;
     }
 
+    bool applyAvailableAudioDeviceProfileAtLaunch()
+    {
+        return false;
+    }
+
+    void scheduleAvailableAudioDeviceProfileRestoreAtLaunch()
+    {
+    }
+
     void addAudioDeviceChangeListener(juce::ChangeListener& listener)
     {
         juce::ignoreUnused(listener);

@@ -34,6 +34,16 @@ namespace Core
         return StandaloneAudioInputRouterDetail::applyMissingAudioDeviceNonePolicy();
     }
 
+    bool StandaloneAudioInputRouter::applyAvailableAudioDeviceProfileAtLaunch()
+    {
+        return StandaloneAudioInputRouterDetail::applyAvailableAudioDeviceProfileAtLaunch();
+    }
+
+    void StandaloneAudioInputRouter::scheduleAvailableAudioDeviceProfileRestoreAtLaunch()
+    {
+        StandaloneAudioInputRouterDetail::scheduleAvailableAudioDeviceProfileRestoreAtLaunch();
+    }
+
     void StandaloneAudioInputRouter::addAudioDeviceChangeListener(juce::ChangeListener& listener)
     {
         StandaloneAudioInputRouterDetail::addAudioDeviceChangeListener(listener);

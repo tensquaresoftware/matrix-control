@@ -396,6 +396,7 @@ private:
     void seedDeviceConnectionDefaultsFromMachine();
     void applyHardwareLatencyToHost();
     void notifyNonParameterStateChanged();
+    void scheduleDeferredMidiPortSync();
     void scheduleDeferredMidiPortSyncForPluginHost();
     void syncMidiPortsFromStateImpl(bool reportOpenFailures);
     void syncMidiInputPortFromState(bool reportOpenFailures);

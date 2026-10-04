@@ -16,6 +16,9 @@ namespace Core::StandaloneAudioInputRouterDetail
     juce::String getCurrentInputDeviceName();
     bool applySceneAudioSafetyDefaultsIfNeeded();
     bool applyMissingAudioDeviceNonePolicy();
+    /** When a remembered interface is available, restore its profile (not AUDIO FROM). */
+    bool applyAvailableAudioDeviceProfileAtLaunch();
+    void scheduleAvailableAudioDeviceProfileRestoreAtLaunch();
     void addAudioDeviceChangeListener(juce::ChangeListener& listener);
     void removeAudioDeviceChangeListener(juce::ChangeListener& listener);
     void enableInputMonitoring();

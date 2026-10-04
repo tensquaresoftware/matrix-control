@@ -22,6 +22,14 @@ namespace Core
         static bool applySceneAudioSafetyDefaultsIfNeeded();
         /** Force Input/Output to None when persisted devices are missing (no OS fallback keep). */
         static bool applyMissingAudioDeviceNonePolicy();
+        /**
+            After safety None policies: if a remembered interface is currently available,
+            restore Input/Output + channels/rate/buffer from its disk profile.
+            Does not restore AUDIO FROM.
+        */
+        static bool applyAvailableAudioDeviceProfileAtLaunch();
+        /** Retry launch profile restore after device enumeration settles (message-thread timer). */
+        static void scheduleAvailableAudioDeviceProfileRestoreAtLaunch();
         static void addAudioDeviceChangeListener(juce::ChangeListener& listener);
         static void removeAudioDeviceChangeListener(juce::ChangeListener& listener);
         static void enableInputMonitoring();

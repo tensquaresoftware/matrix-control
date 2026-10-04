@@ -1,7 +1,9 @@
 #include "Core/Audio/StandaloneAudioInputRouterDetail.h"
 
+#include "Core/Audio/AudioDeviceProfiles.h"
 #include "Core/Audio/AudioInputSourceCatalog.h"
 #include "Core/Audio/SceneAudioSafety.h"
+#include "Core/PluginProcessor.h"
 
 #include <juce_audio_devices/juce_audio_devices.h>
 #include <juce_audio_utils/juce_audio_utils.h>
@@ -47,9 +49,13 @@ namespace Core::StandaloneAudioInputRouterDetail
         {
             juce::StringArray names;
 
+            const auto currentTypeName = deviceManager.getCurrentAudioDeviceType();
+            if (currentTypeName.isEmpty())
+                return names;
+
             for (auto* type : deviceManager.getAvailableDeviceTypes())
             {
-                if (type == nullptr)
+                if (type == nullptr || type->getTypeName() != currentTypeName)
                     continue;
 
                 type->scanForDevices();
@@ -212,19 +218,170 @@ namespace Core::StandaloneAudioInputRouterDetail
         if (holder == nullptr || holder->settings == nullptr)
             return false;
 
+        const auto availableInputs = collectAvailableDeviceNames(holder->deviceManager, true);
+        const auto availableOutputs = collectAvailableDeviceNames(holder->deviceManager, false);
+        if (areAudioDeviceNameListsStillIncomplete(availableInputs, availableOutputs))
+            return false;
+
         const auto audioSetupXml = holder->settings->getXmlValue("audioSetup");
         const auto persisted = readPersistedAudioEndpoints(audioSetupXml.get());
-        const bool clearInput = shouldForceAudioEndpointToNone(
-            persisted.inputDeviceName,
-            collectAvailableDeviceNames(holder->deviceManager, true));
-        const bool clearOutput = shouldForceAudioEndpointToNone(
-            persisted.outputDeviceName,
-            collectAvailableDeviceNames(holder->deviceManager, false));
+        const bool clearInput = shouldApplyMissingDeviceNoneForEndpoint(availableInputs)
+            && shouldForceAudioEndpointToNone(persisted.inputDeviceName, availableInputs);
+        const bool clearOutput = shouldApplyMissingDeviceNoneForEndpoint(availableOutputs)
+            && shouldForceAudioEndpointToNone(persisted.outputDeviceName, availableOutputs);
 
         if (! clearInput && ! clearOutput)
             return false;
 
         return applyClearedEndpoints(*holder, clearInput, clearOutput);
+    }
+
+    static juce::AudioDeviceManager::AudioDeviceSetup makeSetupFromProfile(
+        const Core::AudioDeviceProfile& profile,
+        juce::AudioDeviceManager::AudioDeviceSetup setup)
+    {
+        setup.inputDeviceName = profile.key.inputDeviceName;
+        setup.outputDeviceName = profile.key.outputDeviceName;
+        setup.useDefaultInputChannels = false;
+        setup.useDefaultOutputChannels = false;
+        return setup;
+    }
+
+    static Core::AudioDeviceCapabilities capabilitiesFromOpenedDevice(juce::AudioIODevice& device)
+    {
+        Core::AudioDeviceCapabilities capabilities;
+        capabilities.availableInputChannelCount = device.getInputChannelNames().size();
+        capabilities.availableOutputChannelCount = device.getOutputChannelNames().size();
+        capabilities.sampleRates = device.getAvailableSampleRates();
+        capabilities.bufferSizes = device.getAvailableBufferSizes();
+        return capabilities;
+    }
+
+    static void applyValidatedProfileFields(juce::AudioDeviceManager::AudioDeviceSetup& setup,
+                                     const Core::ValidatedAudioDeviceProfile& validated)
+    {
+        setup.inputChannels = validated.inputChannels;
+        setup.outputChannels = validated.outputChannels;
+
+        if (validated.applySampleRate)
+            setup.sampleRate = validated.sampleRate;
+
+        if (validated.applyBufferSize)
+            setup.bufferSize = validated.bufferSize;
+    }
+
+    static void touchProfileLastUsed(juce::Array<Core::AudioDeviceProfile> profiles,
+                              Core::AudioDeviceProfile profile)
+    {
+        profile.lastUsedUtcMs = juce::Time::currentTimeMillis();
+        Core::saveAudioDeviceProfiles(Core::upsertProfileLru(std::move(profiles), profile));
+    }
+
+    static bool refineOpenedProfileSetup(juce::StandalonePluginHolder& holder,
+                                  const Core::AudioDeviceProfile& profile,
+                                  juce::Array<Core::AudioDeviceProfile> profiles)
+    {
+        auto& deviceManager = holder.deviceManager;
+        auto setup = deviceManager.getAudioDeviceSetup();
+        auto* device = deviceManager.getCurrentAudioDevice();
+        if (device == nullptr)
+            return false;
+
+        const auto capabilities = capabilitiesFromOpenedDevice(*device);
+        if (! Core::doesOpenedDeviceFingerprintMatchProfileKey(
+                profile.key,
+                capabilities.availableInputChannelCount,
+                capabilities.availableOutputChannelCount))
+        {
+            persistHolderAudioSetup(holder);
+            return true;
+        }
+
+        applyValidatedProfileFields(setup,
+                                    Core::validateProfileAgainstCapabilities(profile, capabilities));
+
+        if (deviceManager.setAudioDeviceSetup(setup, true).isEmpty())
+            touchProfileLastUsed(std::move(profiles), profile);
+
+        // Keep the opened interface even if the refined apply fails.
+        persistHolderAudioSetup(holder);
+        return true;
+    }
+
+    bool applyAvailableAudioDeviceProfileAtLaunch()
+    {
+        auto* holder = juce::StandalonePluginHolder::getInstance();
+        if (holder == nullptr)
+            return false;
+
+        auto& deviceManager = holder->deviceManager;
+        auto profiles = Core::loadAudioDeviceProfiles();
+        if (profiles.isEmpty())
+            return false;
+
+        const int bestIndex = Core::findBestAvailableProfileIndex(
+            profiles,
+            deviceManager.getCurrentAudioDeviceType(),
+            collectAvailableDeviceNames(deviceManager, true),
+            collectAvailableDeviceNames(deviceManager, false));
+        if (bestIndex < 0)
+            return false;
+
+        const auto profile = profiles.getReference(bestIndex);
+        auto setup = makeSetupFromProfile(profile, deviceManager.getAudioDeviceSetup());
+        if (deviceManager.setAudioDeviceSetup(setup, true).isNotEmpty())
+            return false;
+
+        if (auto* matrixProcessor = dynamic_cast<PluginProcessor*>(holder->processor.get()))
+            matrixProcessor->setAudioFromSourceId({});
+
+        return refineOpenedProfileSetup(*holder, profile, std::move(profiles));
+    }
+
+    class LaunchAudioDeviceProfileRestoreTimer final : public juce::Timer
+    {
+    public:
+        void startSeries()
+        {
+            stopTimer();
+            attemptIndex_ = 0;
+            startTimer(delayMsForAttempt(0));
+        }
+
+    private:
+        static constexpr int kMaxAttempts = 4;
+
+        static int delayMsForAttempt(int attemptIndex) noexcept
+        {
+            constexpr int delaysMs[] = { 800, 1600, 3200, 5000 };
+            return delaysMs[juce::jmin(attemptIndex, kMaxAttempts - 1)];
+        }
+
+        void timerCallback() override
+        {
+            stopTimer();
+
+            if (applyAvailableAudioDeviceProfileAtLaunch())
+                return;
+
+            ++attemptIndex_;
+            if (attemptIndex_ < kMaxAttempts)
+                startTimer(delayMsForAttempt(attemptIndex_));
+        }
+
+        int attemptIndex_ = 0;
+    };
+
+    static LaunchAudioDeviceProfileRestoreTimer& launchProfileRestoreTimer()
+    {
+        static LaunchAudioDeviceProfileRestoreTimer timer;
+        return timer;
+    }
+
+    void scheduleAvailableAudioDeviceProfileRestoreAtLaunch()
+    {
+        // Message-thread timer; safe to call from createPluginHolder on the message thread.
+        launchProfileRestoreTimer().startSeries();
     }
 
     void addAudioDeviceChangeListener(juce::ChangeListener& listener)

@@ -158,6 +158,57 @@ namespace
         refreshSetupAfterApply(live);
         return applied;
     }
+
+    struct ProfileIdentityRestoreResult
+    {
+        bool attempted = false;
+        bool succeeded = false;
+        bool hadExistingProfile = false;
+    };
+
+    struct ProfileIdentityRestoreInput
+    {
+        LiveSetupMutation& live;
+        bool hasSeededIdentity = false;
+        Core::AudioDeviceIdentity previousIdentity;
+        Core::AudioDeviceIdentity currentIdentity;
+        Core::AudioDevicePreferredSetup& preferred;
+    };
+
+    ProfileIdentityRestoreResult tryRestoreProfileOnIdentityChange(
+        ProfileIdentityRestoreInput& input)
+    {
+        ProfileIdentityRestoreResult result;
+        if (! Core::shouldRestoreAudioDeviceProfile(input.hasSeededIdentity,
+                                                    input.previousIdentity,
+                                                    input.currentIdentity))
+        {
+            return result;
+        }
+
+        result.attempted = true;
+        const auto key = profileKeyFromLiveSetup(input.live.deviceManager,
+                                                 input.live.setup,
+                                                 input.live.device);
+        result.hadExistingProfile = Core::findProfileIndex(Core::loadAudioDeviceProfiles(), key) >= 0;
+
+        auto candidate = input.live.setup;
+        if (! tryRestoreMatchingProfile(key, input.live.device, candidate))
+            return result;
+
+        if (applySetupWithRestoreGuard(input.live, candidate))
+            result.succeeded = true;
+
+        refreshSetupAfterApply(input.live);
+        if (result.succeeded)
+        {
+            input.preferred = Core::capturePreferredSetup(input.preferred,
+                                                          input.live.setup.sampleRate,
+                                                          input.live.setup.bufferSize);
+        }
+
+        return result;
+    }
 }
 
 AudioMidiSettingsWindow::AudioMidiSettingsWindow(Config config)
@@ -339,24 +390,15 @@ void AudioMidiSettingsWindow::syncPreferredSetupFromDeviceManager()
     auto* device = deviceManager_.getCurrentAudioDevice();
     const auto currentIdentity = identityFromSetup(setup);
     LiveSetupMutation live { deviceManager_, setup, device, restoringSetup_ };
-    bool restoredFromProfile = false;
 
-    if (Core::shouldRestoreAudioDeviceProfile(hasSeededDeviceIdentity_,
-                                              lastDeviceIdentity_,
-                                              currentIdentity))
-    {
-        const auto key = profileKeyFromLiveSetup(deviceManager_, setup, device);
-        auto candidate = setup;
-        if (tryRestoreMatchingProfile(key, device, candidate))
-        {
-            if (applySetupWithRestoreGuard(live, candidate))
-                restoredFromProfile = true;
-
-            refreshSetupAfterApply(live);
-        }
-    }
-
-    if (! restoredFromProfile)
+    ProfileIdentityRestoreInput restoreInput { live,
+                                               hasSeededDeviceIdentity_,
+                                               lastDeviceIdentity_,
+                                               currentIdentity,
+                                               preferred_ };
+    const bool hadSeededIdentity = hasSeededDeviceIdentity_;
+    const auto restore = tryRestoreProfileOnIdentityChange(restoreInput);
+    if (! restore.succeeded)
     {
         const auto plan = Core::planPreferredSetupChange({
             .previousIdentity = lastDeviceIdentity_,
@@ -370,14 +412,20 @@ void AudioMidiSettingsWindow::syncPreferredSetupFromDeviceManager()
         applyPreferredOverlayIfNeeded(live, plan);
         preferred_ = plan.preferredAfterCapture;
     }
-    else
-    {
-        preferred_ = Core::capturePreferredSetup(preferred_, setup.sampleRate, setup.bufferSize);
-    }
 
     lastDeviceIdentity_ = currentIdentity;
     hasSeededDeviceIdentity_ = true;
-    captureLiveSetupAsProfile(deviceManager_, setup, device);
+
+    if (Core::shouldCaptureLiveSetupAsProfile({
+            .hasSeededIdentity = hadSeededIdentity,
+            .restoreAttempted = restore.attempted,
+            .restoreSucceeded = restore.succeeded,
+            .hadExistingProfileForKey = restore.hadExistingProfile,
+            .liveKey = profileKeyFromLiveSetup(deviceManager_, setup, device),
+        }))
+    {
+        captureLiveSetupAsProfile(deviceManager_, setup, device);
+    }
 }
 
 void AudioMidiSettingsWindow::playTestSound()

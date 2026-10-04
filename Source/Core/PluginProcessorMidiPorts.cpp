@@ -62,6 +62,13 @@ void PluginProcessor::DeferredMidiPortSyncTimer::startRetrySeries()
 
 int PluginProcessor::DeferredMidiPortSyncTimer::delayMsForAttempt(int attemptIndex)
 {
+    // Standalone needs slightly longer gaps: CoreAudio device reopen can stall CoreMIDI briefly.
+    if (isStandaloneWrapper())
+    {
+        constexpr int standaloneDelaysMs[] = { 400, 1200, 2500, 4500 };
+        return standaloneDelaysMs[juce::jmin(attemptIndex, kMaxAttempts_ - 1)];
+    }
+
     if (isVst3Wrapper())
     {
         constexpr int vstDelaysMs[] = { 400, 1200, 3000, 6000 };
@@ -329,24 +336,17 @@ bool PluginProcessor::arePersistedMidiPortsOpen() const
 
 void PluginProcessor::restoreMidiPortsForHost()
 {
-    if (isStandaloneWrapper())
-    {
-        syncMidiPortsFromStateImpl(true);
-        return;
-    }
+    // Soft first: never permanently clear persisted From/To because CoreMIDI is still
+    // settling (especially right after a heavy AudioDeviceManager reopen).
+    syncMidiPortsFromStateImpl(false);
 
-    runSyncOnMessageThread([this]()
-    {
-        syncMidiPortsFromStateImpl(false);
-
-        if (!arePersistedMidiPortsOpen())
-            scheduleDeferredMidiPortSyncForPluginHost();
-    });
+    if (! arePersistedMidiPortsOpen())
+        scheduleDeferredMidiPortSync();
 }
 
-void PluginProcessor::scheduleDeferredMidiPortSyncForPluginHost()
+void PluginProcessor::scheduleDeferredMidiPortSync()
 {
-    if (isStandaloneWrapper() || deferredMidiPortSyncTimer_ == nullptr)
+    if (deferredMidiPortSyncTimer_ == nullptr)
         return;
 
     runSyncOnMessageThread([this]()
@@ -354,6 +354,12 @@ void PluginProcessor::scheduleDeferredMidiPortSyncForPluginHost()
         if (deferredMidiPortSyncTimer_ != nullptr)
             deferredMidiPortSyncTimer_->startRetrySeries();
     });
+}
+
+void PluginProcessor::scheduleDeferredMidiPortSyncForPluginHost()
+{
+    // Kept as a named entry for host-restore call sites; same retry series for standalone.
+    scheduleDeferredMidiPortSync();
 }
 
 void PluginProcessor::installMidiDeviceListConnection()

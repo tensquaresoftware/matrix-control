@@ -2220,3 +2220,18 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-audio-device-profiles.md`
   summary: Catalog Input label prefers inputDeviceName and preferred-after-inquiry processor early-return lack call-site unit tests.
   evidence: Helper-level SceneAudioSafety / preference tests pass; processor/router harness absent; safety smoke covers product risk.
+
+## Deferred from: code review of spec-audio-device-profiles.md (2026-10-04)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-audio-device-profiles.md`
+  summary: Standalone `restoreMidiPortsForHost` is now soft-first plus deferred retries (hard APVTS align only on last attempt); no PluginProcessor harness asserts that sequence.
+  evidence: Verification Gap; `MidiPortStateCoherenceTests` stay on helpers; Decision 10 implemented in PluginProcessorMidiPorts; smoke MIDI retry is the gate.
+- source_spec: `_bmad-output/implementation-artifacts/spec-audio-device-profiles.md`
+  summary: Dual-clear / Output-only fallback can leave OS speakers when combined Input+Output None apply fails.
+  evidence: Reconfirmed scene-safety residual in `applyClearedEndpoints`; already deferred 2026-10-02.
+- source_spec: `_bmad-output/implementation-artifacts/spec-audio-device-profiles.md`
+  summary: `clearEndpointToNone` returns false when name and bits are already empty, so lingering `useDefaultInputChannels` / `useDefaultOutputChannels` may not be cleared.
+  evidence: Reconfirmed; missing-device clears with a persisted name still set the flags; everyday path is named-endpoint wipe.
+- source_spec: `_bmad-output/implementation-artifacts/spec-audio-device-profiles.md`
+  summary: Legacy `audioDeviceName` XML parse and Audio Settings capture/restore sequencing are not unit-tested beyond pure helpers.
+  evidence: Reconfirmed ADM/stub + GUI-out-of-tests; smoke checklist remains the gate.

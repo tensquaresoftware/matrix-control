@@ -4,6 +4,7 @@
 #include <juce_audio_utils/juce_audio_utils.h>
 #include <juce_gui_extra/juce_gui_extra.h>
 
+#include "Core/Audio/AudioDeviceProfiles.h"
 #include "Core/Audio/StandaloneAudioInputRouter.h"
 #include "Core/PluginProcessor.h"
 #include "Shared/ProjectPaths.h"
@@ -64,7 +65,9 @@ public:
                                                                      channelConfig,
                                                                      autoOpenMidiDevices);
         // Criterion C as early as the holder exists — before the editor window monitors.
-        if (Core::StandaloneAudioInputRouter::applySceneAudioSafetyDefaultsIfNeeded())
+        const bool appliedFirstRunDefaults =
+            Core::StandaloneAudioInputRouter::applySceneAudioSafetyDefaultsIfNeeded();
+        if (appliedFirstRunDefaults)
         {
             if (auto* processor = dynamic_cast<PluginProcessor*>(holder->processor.get()))
                 processor->setAudioFromSourceId({});
@@ -76,6 +79,11 @@ public:
             if (auto* processor = dynamic_cast<PluginProcessor*>(holder->processor.get()))
                 processor->setAudioFromSourceId({});
         }
+
+        // Defer profile restore: CoreAudio/USB enumeration is often incomplete in this ctor.
+        // Immediate apply raced MIDI open and sometimes missed Scarlett entirely.
+        if (Core::shouldScheduleAvailableAudioDeviceProfileRestoreAtLaunch(appliedFirstRunDefaults))
+            Core::StandaloneAudioInputRouter::scheduleAvailableAudioDeviceProfileRestoreAtLaunch();
 
         return holder;
     }

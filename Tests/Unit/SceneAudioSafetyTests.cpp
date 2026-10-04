@@ -20,6 +20,8 @@ public:
         testPreferredAllowedWhenSourceNonEmpty();
         testForceEndpointNoneWhenPersistedMissing();
         testKeepEndpointWhenPersistedStillAvailable();
+        testIncompleteListsSkipMissingDevicePolicy();
+        testOneSidedEmptyListSkipsThatEndpoint();
         testReadPersistedEndpointsFromSetupXml();
         testFirstRunGateTrueWhenUnset();
         testFirstRunGateFalseAfterApplied();
@@ -144,6 +146,23 @@ private:
 
         const juce::StringArray available { "Scarlett 2i2", "Micro MacBook Pro" };
         expect(! Core::shouldForceAudioEndpointToNone("Scarlett 2i2", available));
+    }
+
+    void testIncompleteListsSkipMissingDevicePolicy()
+    {
+        beginTest("Empty Input and Output lists are incomplete, not missing");
+
+        expect(Core::areAudioDeviceNameListsStillIncomplete({}, {}));
+        expect(! Core::areAudioDeviceNameListsStillIncomplete({ "Out" }, {}));
+        expect(! Core::areAudioDeviceNameListsStillIncomplete({}, { "In" }));
+    }
+
+    void testOneSidedEmptyListSkipsThatEndpoint()
+    {
+        beginTest("One empty device list does not force that endpoint to None");
+
+        expect(! Core::shouldApplyMissingDeviceNoneForEndpoint({}));
+        expect(Core::shouldApplyMissingDeviceNoneForEndpoint({ "Scarlett 2i2" }));
     }
 
     void testReadPersistedEndpointsFromSetupXml()

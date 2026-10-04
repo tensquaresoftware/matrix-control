@@ -106,6 +106,21 @@ namespace Core
             && ! availableDeviceNames.contains(persistedDeviceName);
     }
 
+    /** Both Input and Output scans empty: enumeration is incomplete, not "every device missing". */
+    inline bool areAudioDeviceNameListsStillIncomplete(
+        const juce::StringArray& availableInputNames,
+        const juce::StringArray& availableOutputNames) noexcept
+    {
+        return availableInputNames.isEmpty() && availableOutputNames.isEmpty();
+    }
+
+    /** One-sided empty list: that endpoint's scan is incomplete, so do not force it to None. */
+    inline bool shouldApplyMissingDeviceNoneForEndpoint(
+        const juce::StringArray& availableNamesForEndpoint) noexcept
+    {
+        return ! availableNamesForEndpoint.isEmpty();
+    }
+
     /** Endpoint names stored in JUCE AudioDeviceManager state XML (`audioSetup`). */
     struct PersistedAudioEndpoints
     {
