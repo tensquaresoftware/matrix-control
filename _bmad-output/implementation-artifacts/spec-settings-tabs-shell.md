@@ -123,3 +123,28 @@ Last tab lives on APVTS `state` like other Settings prefs (not a machine Propert
 **Manual checks (if no CLI):**
 - Standalone and plugin: five tabs, current rows, last tab restored, SETTINGS centred.
 - UI Scale 50 / 100 / 125 / 150 %: integer rule and highlight, columns aligned.
+
+### Review Findings
+
+- [x] [Review][Decision] Unrelated audio-profile smoke notes ride in the same working tree as Settings tab-shell polish — resolved: option 1, reverted `guide-smoke-window-modal-look.md` and `spec-audio-device-profiles.md` out of this delivery.
+- [x] [Review][Patch] Production paint re-derives rule X instead of calling `SettingsShellMetrics::ruleFillX` (helper is test-only today) [`Source/GUI/Settings/SettingsWindow.cpp:186`] — fixed: paint uses clamp-aware `ruleFillX(bodyX, railWidth, gutter, uiScale)`.
+- [x] [Review][Patch] Redundant `syncRailToActiveTab()` after `setActiveTab()` already syncs the rail [`Source/GUI/PluginEditorWindows.cpp:117`] — fixed: removed call and unused API.
+- [x] [Review][Patch] UI Scale test title claims "highlight" but never observes selected-tab fill — rename the `beginTest` string [`Tests/Unit/SettingsTabsShellTests.cpp:160`] — fixed: title is now "integer rule and columns".
+- [x] [Review][Defer] Last-tab reopen path covered only via helpers, not `openSettingsWindow` wiring [`Source/GUI/PluginEditorWindows.cpp:96`] — deferred: GUI/PluginEditor out of unit-suite policy; smoke already validated restore.
+- [x] [Review][Defer] Active page visibility / DEVICE latency layout order not exercised on `SettingsPanel` [`Source/GUI/Settings/SettingsPanel.cpp:126`] — deferred: constructing SettingsPanel needs skin/widgets; outside unit-suite GUI policy.
+- [x] [Review][Defer] Selected-tab fill not asserted (reconfirmed) [`Source/GUI/Settings/SettingsTabRail.cpp:54`] — deferred: paint-only; already listed in deferred-work for this spec.
+
+#### Rejected
+
+- false — Selected tab black vs frozen "lighter": accepted post-smoke polish; not a regression.
+- false — Rule thickness 1→2 px vs frozen `snappedStrokeThicknessFromDesign`: accepted post-smoke decision.
+- false — Persist lives in `PluginEditorWindows` not `PluginEditorSettings`: overlay lifecycle owns save/restore; prefs still persist.
+- false — Spec/Design Notes still mention popup-hover / getDesignHeight: fixing would be editing the spec under review.
+- false — Clamped-short rail empties lower tab hit-targets: intentional after prior clip patch; normal editor sizes fit the shell.
+- false — Null deref if tab click during construction / dangling panel on teardown: JUCE does not fire `onClick` during construction or member destruction; prior review already cleared construction order.
+- false — PATCH MUTATOR clip at 50%: prior maybe-false; Guillaume's visual smoke succeeded.
+- false — Content overflow in ultra-narrow clamp: prior jmin rail/gutter patch; not everyday host size.
+- low rejected — Magic `1` member defaults: ctor already initializes with `LastTab::kDefault` (== 1).
+- low rejected — Transitive `ScaledLayout` include via metrics header: works; adding a direct include is noise without a compile break.
+- low rejected — `kTallestPageRows = 4` vs panel row constants: matches current PATCH; future rows are later stories.
+- false — Unrelated audio smoke edits as acceptance failure: out of Delivery 1 product bar (handled as decision above).

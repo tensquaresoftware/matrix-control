@@ -1,5 +1,3 @@
-#include <cmath>
-
 #include <juce_core/juce_core.h>
 #include <juce_data_structures/juce_data_structures.h>
 
@@ -135,20 +133,16 @@ private:
                          + SettingsShellMetrics::scaledContentWidth(scale));
 
         const juce::Rectangle<int> railInner(0, 16, 148, 100);
-        const float displayScales[] = { 1.0f, 2.0f };
+        const int expectedStroke = scale >= 2.0f
+            ? SettingsShellMetrics::kRuleThicknessAt200
+            : SettingsShellMetrics::kRuleThicknessUntil200;
+        expectEquals(SettingsShellMetrics::ruleStrokeThickness(scale), expectedStroke);
 
-        for (const float displayScale : displayScales)
-        {
-            const float stroke = SettingsShellMetrics::ruleStrokeThickness(scale, displayScale);
-            const float physical = stroke * displayScale;
-            expect(physical >= 1.0f);
-            expect(std::abs(physical - std::round(physical)) < 0.001f);
-
-            const int ruleX = SettingsShellMetrics::ruleFillX(16, scale, displayScale);
-            expect(ruleX >= 16 + SettingsShellMetrics::scaledRailWidth(scale));
-            expect(ruleX < 16 + SettingsShellMetrics::scaledRailWidth(scale)
-                                + SettingsShellMetrics::scaledRuleGutter(scale));
-        }
+        const int ruleX = SettingsShellMetrics::ruleFillX(16, scale);
+        expect(ruleX >= 16 + SettingsShellMetrics::scaledRailWidth(scale));
+        expect(ruleX + expectedStroke
+               <= 16 + SettingsShellMetrics::scaledRailWidth(scale)
+                      + SettingsShellMetrics::scaledRuleGutter(scale));
 
         for (int tab = 0; tab < SettingsShellMetrics::tabCount(); ++tab)
         {
@@ -163,7 +157,7 @@ private:
 
     void uiScaleKeepsIntegerRuleAndColumns()
     {
-        beginTest("UI Scale 50-200 - integer rule, highlight, and columns");
+        beginTest("UI Scale 50-200 - integer rule and columns");
 
         const float scales[] = { 0.5f, 0.75f, 1.0f, 1.25f, 1.5f, 1.75f, 2.0f };
         for (const float scale : scales)

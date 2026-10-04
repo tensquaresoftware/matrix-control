@@ -44,7 +44,6 @@ public:
     void setSkin(TSS::ISkin& skin);
     void setUiScale(float uiScale);
     void setOnTabChanged(std::function<void(int)> onTabChanged);
-    void syncRailToActiveTab();
     void setActiveTab(int tabId);
     int getActiveTab() const;
 

@@ -114,7 +114,6 @@ void PluginEditor::openSettingsWindow()
     restoreSettingsPanelFromState(settingsWindow_->getSettingsPanel());
     settingsWindow_->setActiveTab(SettingsShellMetrics::readAndCoerceLastTab(
         pluginProcessor.getApvts().state));
-    settingsWindow_->syncRailToActiveTab();
     settingsWindow_->toFront(true);
     settingsWindow_->grabKeyboardFocus();
 }

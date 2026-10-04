@@ -4,9 +4,9 @@
 #include "SettingsShellMetrics.h"
 #include "SettingsTabRail.h"
 #include "GUI/Dialogs/DialogMatrixHelpers.h"
-#include "GUI/Layout/ScaledDrawing.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Skins/Skin.h"
+#include "GUI/Skins/SkinValues.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginIDs.h"
 
@@ -130,11 +130,6 @@ void SettingsWindow::setOnTabChanged(std::function<void(int)> onTabChanged)
     onTabChanged_ = std::move(onTabChanged);
 }
 
-void SettingsWindow::syncRailToActiveTab()
-{
-    tabRail_->setSelectedTab(settingsPanel_->getActiveTab());
-}
-
 void SettingsWindow::setActiveTab(int tabId)
 {
     const int normalized = PluginIDs::Settings::LastTab::normalize(tabId);
@@ -180,22 +175,19 @@ void SettingsWindow::paint(juce::Graphics& g)
         static_cast<float>(DialogMatrixHelpers::kTitleBarHeight), uiScale_);
     body.removeFromTop(titleBarHeight);
 
-    const float displayScale = TSS::ScaledDrawing::systemDisplayScaleForComponent(*this);
-    const float thickness = SettingsShellMetrics::ruleStrokeThickness(uiScale_, displayScale);
-    const int thicknessInt = juce::roundToInt(thickness);
+    g.setColour(skin_->getColour(TSS::SkinColourId::kBodyPanelBackground));
+    g.fillRect(body);
+
+    const int thickness = SettingsShellMetrics::ruleStrokeThickness(uiScale_);
     const int railWidth = juce::jmin(SettingsShellMetrics::scaledRailWidth(uiScale_), body.getWidth());
     const int gutter = juce::jmin(SettingsShellMetrics::scaledRuleGutter(uiScale_),
                                   juce::jmax(0, body.getWidth() - railWidth));
-    const int inset = juce::jmax(0, (gutter - thicknessInt) / 2);
-    const int ruleX = body.getX() + railWidth + inset;
+    const int ruleX = SettingsShellMetrics::ruleFillX(body.getX(), railWidth, gutter, uiScale_);
 
-    if (thicknessInt > 0 && ruleX >= body.getX() && ruleX + thicknessInt <= body.getRight())
+    if (thickness > 0 && ruleX >= body.getX() && ruleX + thickness <= body.getRight())
     {
         g.setColour(juce::Colour(DialogMatrixHelpers::kDialogBorderColour));
-        g.fillRect(static_cast<float>(ruleX),
-                   static_cast<float>(body.getY()),
-                   static_cast<float>(thicknessInt),
-                   static_cast<float>(body.getHeight()));
+        g.fillRect(ruleX, body.getY(), thickness, body.getHeight());
     }
 }
 

@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include "GUI/Dialogs/DialogMatrixHelpers.h"
 #include "GUI/Looks/LookBuilders.h"
 #include "GUI/Settings/SettingsShellMetrics.h"
 #include "GUI/Skins/ISkin.h"
@@ -37,9 +38,10 @@ void SettingsTabRail::TabButton::setUiScale(float uiScale)
     repaint();
 }
 
-void SettingsTabRail::TabButton::setHoverFill(juce::Colour colour)
+void SettingsTabRail::TabButton::setSelectedFill(juce::Colour fill, juce::Colour text)
 {
-    hoverFill_ = colour;
+    selectedFill_ = fill;
+    selectedText_ = text;
     repaint();
 }
 
@@ -50,12 +52,12 @@ void SettingsTabRail::TabButton::paintButton(juce::Graphics& g,
     juce::ignoreUnused(shouldDrawButtonAsHighlighted, shouldDrawButtonAsDown);
 
     if (selected_)
-        g.fillAll(hoverFill_);
+        g.fillAll(selectedFill_);
 
     const int inset = TSS::ScaledLayout::scaledInt(8.0f, uiScale_);
     auto textBounds = getLocalBounds().reduced(inset, 0).toFloat();
 
-    g.setColour(look_.text);
+    g.setColour(selected_ ? selectedText_ : look_.text);
     g.setFont(look_.font.withHeight(look_.font.getHeight() * uiScale_));
     g.drawText(getButtonText(), textBounds, juce::Justification::centredLeft, false);
 }
@@ -136,14 +138,15 @@ void SettingsTabRail::resized()
 void SettingsTabRail::rebuildLooks()
 {
     const auto labelLook = TSS::labelLookFromSkin(*skin_);
-    const auto hoverFill = skin_->getPopupMenuBackgroundHooverColour(false);
+    const auto selectedFill = juce::Colour(DialogMatrixHelpers::kModalTitleBandColour);
+    const auto selectedText = skin_->getColour(SkinColourId::kButtonTextOff);
 
     using namespace PluginIDs::Settings::LastTab;
 
     for (int i = 0; i < kCount; ++i)
     {
         tabs_[i]->setLook(labelLook);
-        tabs_[i]->setHoverFill(hoverFill);
+        tabs_[i]->setSelectedFill(selectedFill, selectedText);
         tabs_[i]->setUiScale(uiScale_);
     }
 }

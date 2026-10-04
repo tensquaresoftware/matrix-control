@@ -2240,8 +2240,20 @@ Original review bullets below remain for history; status for U-10-owned residual
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-settings-tabs-shell.md`
   summary: PATCH MUTATOR tab label may clip at 50% UI Scale in the 148 px rail.
-  evidence: maybe-false; would be settled by measuring PT Sans Narrow at 50% against scaled rail width, or a live smoke screenshot.
+  evidence: maybe-false; would be settled by measuring PT Sans Narrow at 50% against scaled rail width, or a live smoke screenshot. **Update 2026-10-04 evening review:** Guillaume visual smoke succeeded — treat as settled unless a later scale/font change reopens it.
 - source_spec: `_bmad-output/implementation-artifacts/spec-settings-tabs-shell.md`
   summary: Selected-tab highlight fill is not asserted; UI Scale tests only pin integer rule and column metrics.
   evidence: Paint-only TabButton fill; unit suite does not construct SettingsTabRail. Close if a selected-fill token is later shared with the rail.
+
+## Deferred from: code review of spec-settings-tabs-shell.md (2026-10-04)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-settings-tabs-shell.md`
+  summary: Last-tab write/restore at `PluginEditor::openSettingsWindow` is only covered via `SettingsShellMetrics` helpers on a bare ValueTree, not the real open/callback path.
+  evidence: Project unit suite does not construct PluginEditor/SettingsWindow; smoke validated reopen. Close only if a tiny pure orchestrator is extracted later.
+- source_spec: `_bmad-output/implementation-artifacts/spec-settings-tabs-shell.md`
+  summary: Active Settings page visibility and plugin DEVICE latency-above-EPROM layout are not unit-tested on SettingsPanel.
+  evidence: Needs skin/widgets; outside GUI-out-of-unit-suite policy. Product check remains smoke.
+- source_spec: `_bmad-output/implementation-artifacts/spec-settings-tabs-shell.md`
+  summary: Selected-tab fill still not asserted (reconfirmed after polish to black title-band fill).
+  evidence: Same paint-only gap as earlier defer; rename of misleading "highlight" test title tracked separately as a patch.
 

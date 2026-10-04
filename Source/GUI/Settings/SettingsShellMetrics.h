@@ -1,8 +1,8 @@
 #pragma once
 
 #include <juce_data_structures/juce_data_structures.h>
+#include <juce_gui_basics/juce_gui_basics.h>
 
-#include "GUI/Layout/ScaledDrawing.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginIDs.h"
@@ -20,7 +20,8 @@ namespace SettingsShellMetrics
     inline constexpr int kLabelWidth = 120;
     inline constexpr int kControlColumnWidth = 140;
     inline constexpr int kTallestPageRows = 4;
-    inline constexpr float kRuleDesignThickness = 1.0f;
+    inline constexpr int kRuleThicknessUntil200 = 1;
+    inline constexpr int kRuleThicknessAt200 = 2;
 
     static_assert(kDesignWidth == 444);
     static_assert(kLabelWidth + kControlColumnWidth + kPadding * 2 == kContentWidth);
@@ -119,21 +120,22 @@ namespace SettingsShellMetrics
         return row.getIntersection(railInner);
     }
 
-    inline float ruleStrokeThickness(float uiScale, float systemDisplayScale) noexcept
+    inline int ruleStrokeThickness(float uiScale) noexcept
     {
-        return TSS::ScaledDrawing::snappedStrokeThicknessFromDesign(
-            kRuleDesignThickness,
-            uiScale,
-            systemDisplayScale,
-            TSS::ScaledDrawing::StrokeSnapPolicy::kRound);
+        using namespace PluginIDs::Settings::ScaleLevels;
+        return uiScale >= kUiScales[k200] ? kRuleThicknessAt200 : kRuleThicknessUntil200;
     }
 
-    inline int ruleFillX(int bodyX, float uiScale, float systemDisplayScale) noexcept
+    inline int ruleFillX(int bodyX, int railWidth, int gutter, float uiScale) noexcept
     {
-        const int gutter = scaledRuleGutter(uiScale);
-        const int thickness = juce::roundToInt(ruleStrokeThickness(uiScale, systemDisplayScale));
+        const int thickness = ruleStrokeThickness(uiScale);
         const int inset = juce::jmax(0, (gutter - thickness) / 2);
-        return bodyX + scaledRailWidth(uiScale) + inset;
+        return bodyX + railWidth + inset;
+    }
+
+    inline int ruleFillX(int bodyX, float uiScale) noexcept
+    {
+        return ruleFillX(bodyX, scaledRailWidth(uiScale), scaledRuleGutter(uiScale), uiScale);
     }
 
     inline juce::Rectangle<int> centredClampedDialog(juce::Rectangle<int> editorBounds,

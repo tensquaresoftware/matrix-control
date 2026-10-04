@@ -37,7 +37,7 @@ private:
         void setLook(const TSS::LabelLook& look);
         void setSelected(bool isSelected);
         void setUiScale(float uiScale);
-        void setHoverFill(juce::Colour colour);
+        void setSelectedFill(juce::Colour fill, juce::Colour text);
 
         void paintButton(juce::Graphics& g,
                          bool shouldDrawButtonAsHighlighted,
@@ -45,7 +45,8 @@ private:
 
     private:
         TSS::LabelLook look_{};
-        juce::Colour hoverFill_{};
+        juce::Colour selectedFill_{};
+        juce::Colour selectedText_{};
         float uiScale_ = 1.0f;
         bool selected_ = false;
     };
