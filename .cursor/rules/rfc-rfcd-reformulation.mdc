@@ -1,0 +1,45 @@
+---
+description: Raccourcis RFC/RFCD — reformuler en français clair, ne pas relancer le chantier
+alwaysApply: true
+---
+
+# RFC / RFCD — raccourcis d’écriture (Guillaume)
+
+Quand Guillaume écrit **RFC**, **RFCD**, ou l’équivalent en toutes lettres (« Reformule en Français Clair » / « … et Développé »), **ce n’est pas une demande d’exécution** : c’est une demande de **reformulation**.
+
+## Lexique (non négociable)
+
+| Raccourci | Signifie | Action attendue |
+|-----------|----------|-----------------|
+| **RFC** | Reformule en **Français Clair**, sans jargon | Réécrire le passage visé, **court**, oral, compréhensible tout de suite |
+| **RFCD** | Reformule en **Français Clair et Développé**, sans jargon | Idem, version **plus complète** : plus de contexte, plus de « pourquoi ça compte » |
+
+**Ne jamais** interpréter RFC / RFCD comme : Request for Comments, document RFC, relance de `/bmad-code-review` / `/bmad-build`, correction du code, ou changement de verdict.
+
+## Cible
+
+Le reste du message indique **quoi** reformuler (ex. « RFC décisions à trancher » → seulement ces décisions).  
+Si la cible manque (« RFC » seul) → reformuler le **dernier** message assistant trop dense ; si plusieurs blocs possibles, **une** question courte, puis la reformulation.
+
+## Comportement
+
+1. **Reformuler uniquement** — ne pas ajouter de nouveaux constats, ne pas changer la recommandation, ne pas coder.
+2. Français parlé, phrases complètes ; jargon d’ingénierie → glose courte ou retrait.
+3. Garder les **noms métier produit** en anglais (`Track Generator`, `Patch Mutator`, …).
+4. Preuves techniques (chemins, classes, IDs) : **une ligne en bas**, pas dans la phrase qui porte le sens.
+5. **RFC** : une passe courte ; pas de redite. Options et reco **conservées**, wording simplifié.
+6. **RFCD** : développer le contexte manquant (enjeu, options, « si on ne tranche pas ») — **pas** répéter trois fois la même idée.
+7. Barème de clarté : `_bmad/custom/clarity-bar-fr.md` (phrase-test « Reformule… »).
+
+## Exemples d’intention
+
+- « RFC décisions à trancher » → les décisions du message précédent, version courte
+- « RFCD le verdict » → le verdict **et** ce qu’il implique, version développée
+- « RFC » seul → tout le dernier message assistant trop jargonneux
+
+## Anti-motifs
+
+- Relancer une revue ou un build parce que le message contient « RFC »
+- Produire un document « Request for Comments »
+- Changer l’option recommandée « en passant »
+- Coller à nouveau le jargon (AC, chemins, classes) dans le corps de la reformulation

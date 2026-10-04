@@ -31,6 +31,8 @@ Pendant les commandes BMad story (`build`, `code-review`), appliquer aussi `.cur
 
 Guillaume ne doit **pas** avoir à demander une reformulation pour comprendre une explication, une question ou une décision. Si la phrase-test « Reformule en langage naturel, sans jargon excessif » ferait réécrire le texte → le réécrire **avant** l’envoi.
 
+S’il demande quand même **RFC** / **RFCD**, c’est un raccourci de reformulation (pas une exécution) : voir `.cursor/rules/rfc-rfcd-reformulation.mdc`.
+
 ## Code dans le chat
 
 - **Ne pas** coller de blocs code complets lors de modifications : les diffs de l'outil suffisent.
