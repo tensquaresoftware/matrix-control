@@ -161,7 +161,7 @@ namespace PluginDisplayNames
         constexpr const char* kHardwareLatencyLabel    = "HARDWARE LATENCY";
         constexpr const char* kAudioFromLabel          = "AUDIO FROM:";
         constexpr const char* kInputGainLabel          = "INPUT GAIN:";
-        constexpr const char* kInterfaceSection        = "INTERFACE";
+        constexpr const char* kUserInterfaceTab        = "USER INTERFACE";
         constexpr const char* kDeviceSection           = "DEVICE";
         constexpr const char* kPatchSection            = "PATCH";
         constexpr const char* kPatchMutatorSection     = "PATCH MUTATOR";

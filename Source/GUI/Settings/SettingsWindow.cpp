@@ -1,9 +1,14 @@
 #include "SettingsWindow.h"
 
 #include "SettingsPanel.h"
+#include "SettingsShellMetrics.h"
+#include "SettingsTabRail.h"
 #include "GUI/Dialogs/DialogMatrixHelpers.h"
+#include "GUI/Layout/ScaledDrawing.h"
+#include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Skins/Skin.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
+#include "Shared/Definitions/PluginIDs.h"
 
 namespace
 {
@@ -80,6 +85,15 @@ SettingsWindow::SettingsWindow(TSS::ISkin& skin,
     closeButton_.setSkin(skin);
     addAndMakeVisible(closeButton_);
 
+    tabRail_ = std::make_unique<SettingsTabRail>(skin, [this](int tabId)
+    {
+        settingsPanel_->setActiveTab(tabId);
+
+        if (onTabChanged_)
+            onTabChanged_(tabId);
+    });
+    addAndMakeVisible(*tabRail_);
+
     settingsPanel_ = std::make_unique<SettingsPanel>(skin, isPluginMode);
     addAndMakeVisible(*settingsPanel_);
 
@@ -87,10 +101,13 @@ SettingsWindow::SettingsWindow(TSS::ISkin& skin,
         onPanelReady(*settingsPanel_);
 }
 
+SettingsWindow::~SettingsWindow() = default;
+
 void SettingsWindow::setSkin(TSS::ISkin& skin)
 {
     skin_ = &skin;
     closeButton_.setSkin(skin);
+    tabRail_->setSkin(skin);
     settingsPanel_->setSkin(skin);
     repaint();
 }
@@ -102,25 +119,48 @@ void SettingsWindow::setUiScale(float uiScale)
 
     uiScale_ = uiScale;
     closeButton_.setUiScale(uiScale);
+    tabRail_->setUiScale(uiScale);
     settingsPanel_->setUiScale(uiScale);
     resized();
     repaint();
 }
 
+void SettingsWindow::setOnTabChanged(std::function<void(int)> onTabChanged)
+{
+    onTabChanged_ = std::move(onTabChanged);
+}
+
+void SettingsWindow::syncRailToActiveTab()
+{
+    tabRail_->setSelectedTab(settingsPanel_->getActiveTab());
+}
+
+void SettingsWindow::setActiveTab(int tabId)
+{
+    const int normalized = PluginIDs::Settings::LastTab::normalize(tabId);
+    tabRail_->setSelectedTab(normalized);
+    settingsPanel_->setActiveTab(normalized);
+}
+
+int SettingsWindow::getActiveTab() const
+{
+    return settingsPanel_->getActiveTab();
+}
+
 int SettingsWindow::getBorderThickness() const
 {
-    return juce::roundToInt(static_cast<float>(DialogMatrixHelpers::kBorderThickness) * uiScale_);
+    return TSS::ScaledLayout::scaledInt(static_cast<float>(DialogMatrixHelpers::kBorderThickness), uiScale_);
 }
 
 juce::Rectangle<int> SettingsWindow::getDialogBounds() const
 {
     const int border = getBorderThickness();
-    const int dialogWidth = juce::roundToInt(static_cast<float>(SettingsPanel::kDesignWidth) * uiScale_) + border * 2;
-    const int dialogHeight = juce::roundToInt(static_cast<float>(settingsPanel_->getDesignHeight()) * uiScale_)
-                             + juce::roundToInt(static_cast<float>(DialogMatrixHelpers::kTitleBarHeight) * uiScale_)
-                             + border * 2;
+    const int titleBarHeight = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(DialogMatrixHelpers::kTitleBarHeight), uiScale_);
+    const int dialogWidth = SettingsShellMetrics::scaledBodyWidth(uiScale_) + border * 2;
+    const int dialogHeight = SettingsShellMetrics::scaledBodyHeight(uiScale_) + titleBarHeight + border * 2;
 
-    return getLocalBounds().withSizeKeepingCentre(dialogWidth, dialogHeight);
+    return SettingsShellMetrics::centredClampedDialog(getLocalBounds(), dialogWidth, dialogHeight);
 }
 
 void SettingsWindow::paint(juce::Graphics& g)
@@ -130,20 +170,52 @@ void SettingsWindow::paint(juce::Graphics& g)
         .skin = *skin_,
         .dialogBounds = getDialogBounds(),
         .borderThickness = getBorderThickness(),
-        .titleBarHeight = juce::roundToInt(static_cast<float>(DialogMatrixHelpers::kTitleBarHeight) * uiScale_),
+        .titleBarHeight = TSS::ScaledLayout::scaledInt(
+            static_cast<float>(DialogMatrixHelpers::kTitleBarHeight), uiScale_),
         .title = PluginDisplayNames::Settings::kWindowTitle,
         .uiScale = uiScale_ });
+
+    auto body = getDialogBounds().reduced(getBorderThickness());
+    const int titleBarHeight = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(DialogMatrixHelpers::kTitleBarHeight), uiScale_);
+    body.removeFromTop(titleBarHeight);
+
+    const float displayScale = TSS::ScaledDrawing::systemDisplayScaleForComponent(*this);
+    const float thickness = SettingsShellMetrics::ruleStrokeThickness(uiScale_, displayScale);
+    const int thicknessInt = juce::roundToInt(thickness);
+    const int railWidth = juce::jmin(SettingsShellMetrics::scaledRailWidth(uiScale_), body.getWidth());
+    const int gutter = juce::jmin(SettingsShellMetrics::scaledRuleGutter(uiScale_),
+                                  juce::jmax(0, body.getWidth() - railWidth));
+    const int inset = juce::jmax(0, (gutter - thicknessInt) / 2);
+    const int ruleX = body.getX() + railWidth + inset;
+
+    if (thicknessInt > 0 && ruleX >= body.getX() && ruleX + thicknessInt <= body.getRight())
+    {
+        g.setColour(juce::Colour(DialogMatrixHelpers::kDialogBorderColour));
+        g.fillRect(static_cast<float>(ruleX),
+                   static_cast<float>(body.getY()),
+                   static_cast<float>(thicknessInt),
+                   static_cast<float>(body.getHeight()));
+    }
 }
 
 void SettingsWindow::resized()
 {
     auto inner = getDialogBounds().reduced(getBorderThickness());
-    const int titleBarHeight = juce::roundToInt(static_cast<float>(DialogMatrixHelpers::kTitleBarHeight) * uiScale_);
-    const int closeButtonWidth = juce::roundToInt(static_cast<float>(titleBarHeight) * 1.2f);
+    const int titleBarHeight = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(DialogMatrixHelpers::kTitleBarHeight), uiScale_);
+    const int closeButtonWidth = TSS::ScaledLayout::scaledInt(static_cast<float>(titleBarHeight) * 1.2f, 1.0f);
 
     auto titleBar = inner.removeFromTop(titleBarHeight);
     closeButton_.setBounds(titleBar.removeFromRight(closeButtonWidth));
-    settingsPanel_->setBounds(inner);
+
+    auto body = inner;
+    const int railWidth = juce::jmin(SettingsShellMetrics::scaledRailWidth(uiScale_), body.getWidth());
+    const int gutter = juce::jmin(SettingsShellMetrics::scaledRuleGutter(uiScale_),
+                                  juce::jmax(0, body.getWidth() - railWidth));
+    tabRail_->setBounds(body.removeFromLeft(railWidth));
+    body.removeFromLeft(gutter);
+    settingsPanel_->setBounds(body);
 }
 
 void SettingsWindow::mouseDown(const juce::MouseEvent& e)

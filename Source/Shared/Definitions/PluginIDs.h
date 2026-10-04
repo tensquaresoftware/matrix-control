@@ -36,6 +36,7 @@ namespace PluginIDs
         constexpr const char* kEpromTypePromptDone = "settingsEpromTypePromptDone";
         // Transient: Core requests a one-time editor prompt; editor clears after show/handle.
         constexpr const char* kEpromTypePromptPending = "settingsEpromTypePromptPending";
+        constexpr const char* kLastSettingsTab = "settingsLastTab";
 
         namespace ComputerPatchesNamesPolicy
         {
@@ -89,6 +90,27 @@ namespace PluginIDs
             constexpr int kDisplayMusicalNames = 1;
             constexpr int kDisplayHardwareNames = 2;
             constexpr int kDefault = kDisplayMusicalNames;
+        }
+
+        namespace LastTab
+        {
+            constexpr int kUserInterface = 1;
+            constexpr int kDevice = 2;
+            constexpr int kPatch = 3;
+            constexpr int kPatchMutator = 4;
+            constexpr int kMaster = 5;
+            constexpr int kDefault = kUserInterface;
+            constexpr int kFirst = kUserInterface;
+            constexpr int kLast = kMaster;
+            constexpr int kCount = 5;
+
+            inline int normalize(int raw)
+            {
+                if (raw >= kFirst && raw <= kLast)
+                    return raw;
+
+                return kDefault;
+            }
         }
 
         namespace SkinVariants

@@ -1,15 +1,19 @@
 #include "SettingsPanel.h"
 
 #include "Core/Services/EpromTypePolicy.h"
+#include "GUI/Layout/ScaledLayout.h"
+#include "GUI/Settings/SettingsShellMetrics.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinValues.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
+#include "Shared/Definitions/PluginIDs.h"
 
 using TSS::SkinColourId;
 
 SettingsPanel::SettingsPanel(TSS::ISkin& skin, bool isPluginMode)
     : skin_(&skin)
     , isPluginMode_(isPluginMode)
+    , activeTabId_(PluginIDs::Settings::LastTab::kDefault)
 {
     setOpaque(true);
 
@@ -58,31 +62,14 @@ void SettingsPanel::paint(juce::Graphics& g)
 
 void SettingsPanel::resized()
 {
-    const float sf = uiScale_;
-    const int padding = juce::roundToInt(static_cast<float>(kPadding_) * sf);
+    const int padding = TSS::ScaledLayout::scaledInt(static_cast<float>(kPadding_), uiScale_);
     layoutContent(getLocalBounds().reduced(padding));
-}
-
-void SettingsPanel::layoutSectionHeader(juce::Rectangle<int>& bounds, const SectionHeaderLayoutArgs& args)
-{
-    const int titleGap = juce::roundToInt(static_cast<float>(kSectionTitleGap_) * uiScale_);
-
-    auto titleRow = bounds.removeFromTop(args.controlHeight);
-    args.title->setBounds(titleRow);
-    args.title->setUiScale(uiScale_);
-    bounds.removeFromTop(titleGap);
-
-    auto sepRow = bounds.removeFromTop(args.separatorHeight);
-    args.separator->setBounds(sepRow);
-    args.separator->setUiScale(uiScale_);
-    bounds.removeFromTop(args.rowGap);
 }
 
 void SettingsPanel::layoutLabeledControlRow(juce::Rectangle<int>& bounds,
                                             const RowLayoutMetrics& metrics,
                                             const LabeledControlRowArgs& args)
 {
-    // Match ParameterCell: label column, then control immediately at labelWidth (no gap).
     auto row = bounds.removeFromTop(metrics.controlHeight);
     const int x = row.getX();
     const int y = row.getY();
@@ -124,12 +111,6 @@ void SettingsPanel::layoutButtonRow(juce::Rectangle<int>& bounds,
 
 void SettingsPanel::layoutInterfaceSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics)
 {
-    layoutSectionHeader(bounds,
-                        SectionHeaderLayoutArgs{ interfaceSectionLabel_.get(),
-                                                 interfaceSectionSeparator_.get(),
-                                                 metrics.controlHeight,
-                                                 metrics.separatorHeight,
-                                                 metrics.rowGap });
     layoutLabeledControlRow(bounds,
                             metrics,
                             LabeledControlRowArgs{ infoMessageLabel_.get(),
@@ -144,20 +125,7 @@ void SettingsPanel::layoutInterfaceSection(juce::Rectangle<int>& bounds, const R
 
 void SettingsPanel::layoutDeviceSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics)
 {
-    layoutSectionHeader(bounds,
-                        SectionHeaderLayoutArgs{ deviceSectionLabel_.get(),
-                                                 deviceSectionSeparator_.get(),
-                                                 metrics.controlHeight,
-                                                 metrics.separatorHeight,
-                                                 metrics.rowGap });
-
-    layoutLabeledControlRow(bounds,
-                            metrics,
-                            LabeledControlRowArgs{ epromTypeLabel_.get(),
-                                                   epromTypeCombo_.get(),
-                                                   metrics.comboWidth });
-
-    if (isPluginMode_)
+    if (SettingsShellMetrics::deviceShowsHardwareLatency(isPluginMode_))
     {
         layoutLabeledControlRow(bounds,
                                 metrics,
@@ -165,16 +133,16 @@ void SettingsPanel::layoutDeviceSection(juce::Rectangle<int>& bounds, const RowL
                                                        hardwareLatencySlider_.get(),
                                                        metrics.sliderWidth });
     }
+
+    layoutLabeledControlRow(bounds,
+                            metrics,
+                            LabeledControlRowArgs{ epromTypeLabel_.get(),
+                                                   epromTypeCombo_.get(),
+                                                   metrics.comboWidth });
 }
 
 void SettingsPanel::layoutPatchSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics)
 {
-    layoutSectionHeader(bounds,
-                        SectionHeaderLayoutArgs{ patchSectionLabel_.get(),
-                                                 patchSectionSeparator_.get(),
-                                                 metrics.controlHeight,
-                                                 metrics.separatorHeight,
-                                                 metrics.rowGap });
     layoutLabeledControlRow(bounds,
                             metrics,
                             LabeledControlRowArgs{ matrix1000PatchesLabel_.get(),
@@ -199,12 +167,6 @@ void SettingsPanel::layoutPatchSection(juce::Rectangle<int>& bounds, const RowLa
 
 void SettingsPanel::layoutPatchMutatorSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics)
 {
-    layoutSectionHeader(bounds,
-                        SectionHeaderLayoutArgs{ patchMutatorSectionLabel_.get(),
-                                                 patchMutatorSectionSeparator_.get(),
-                                                 metrics.controlHeight,
-                                                 metrics.separatorHeight,
-                                                 metrics.rowGap });
     layoutLabeledControlRow(bounds,
                             metrics,
                             LabeledControlRowArgs{ deleteWarningLabel_.get(),
@@ -219,13 +181,6 @@ void SettingsPanel::layoutPatchMutatorSection(juce::Rectangle<int>& bounds, cons
 
 void SettingsPanel::layoutMasterSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics)
 {
-    layoutSectionHeader(bounds,
-                        SectionHeaderLayoutArgs{ masterSectionLabel_.get(),
-                                                 masterSectionSeparator_.get(),
-                                                 metrics.controlHeight,
-                                                 metrics.separatorHeight,
-                                                 metrics.rowGap });
-
     layoutButtonRow(bounds,
                     metrics,
                     ButtonRowLayoutArgs{ masterUtilityLabel_.get(),
@@ -245,29 +200,40 @@ void SettingsPanel::layoutMasterSection(juce::Rectangle<int>& bounds, const RowL
 void SettingsPanel::layoutContent(juce::Rectangle<int> bounds)
 {
     RowLayoutMetrics metrics;
-    metrics.rowGap = juce::roundToInt(static_cast<float>(kRowGap_) * uiScale_);
-    metrics.labelWidth = juce::roundToInt(static_cast<float>(kLabelWidth_) * uiScale_);
-    metrics.sliderWidth = juce::roundToInt(static_cast<float>(kSliderWidth_) * uiScale_);
-    metrics.controlHeight = juce::roundToInt(static_cast<float>(kControlHeight_) * uiScale_);
-    metrics.separatorHeight = juce::roundToInt(static_cast<float>(kSeparatorHeight_) * uiScale_);
-    metrics.comboWidth = juce::roundToInt(static_cast<float>(kComboWidth_) * uiScale_);
-    metrics.buttonGap = juce::roundToInt(static_cast<float>(kButtonGap_) * uiScale_);
-    metrics.utilityLoadWidth = juce::roundToInt(static_cast<float>(kUtilityLoadWidth_) * uiScale_);
-    metrics.utilitySaveAsWidth = juce::roundToInt(static_cast<float>(kUtilitySaveAsWidth_) * uiScale_);
-    metrics.utilityInitWidth = juce::roundToInt(static_cast<float>(kUtilityInitWidth_) * uiScale_);
-    metrics.saveAsInitWidth = juce::roundToInt(static_cast<float>(kSaveAsInitWidth_) * uiScale_);
-    metrics.deleteInitWidth = juce::roundToInt(static_cast<float>(kDeleteInitWidth_) * uiScale_);
-    metrics.defragButtonWidth = juce::roundToInt(static_cast<float>(kDefragButtonWidth_) * uiScale_);
+    metrics.rowGap = TSS::ScaledLayout::scaledInt(static_cast<float>(kRowGap_), uiScale_);
+    metrics.labelWidth = TSS::ScaledLayout::scaledInt(static_cast<float>(kLabelWidth_), uiScale_);
+    metrics.sliderWidth = TSS::ScaledLayout::scaledInt(static_cast<float>(kSliderWidth_), uiScale_);
+    metrics.controlHeight = TSS::ScaledLayout::scaledInt(static_cast<float>(kControlHeight_), uiScale_);
+    metrics.comboWidth = TSS::ScaledLayout::scaledInt(static_cast<float>(kComboWidth_), uiScale_);
+    metrics.buttonGap = TSS::ScaledLayout::scaledInt(static_cast<float>(kButtonGap_), uiScale_);
+    metrics.utilityLoadWidth = TSS::ScaledLayout::scaledInt(static_cast<float>(kUtilityLoadWidth_), uiScale_);
+    metrics.utilitySaveAsWidth = TSS::ScaledLayout::scaledInt(static_cast<float>(kUtilitySaveAsWidth_), uiScale_);
+    metrics.utilityInitWidth = TSS::ScaledLayout::scaledInt(static_cast<float>(kUtilityInitWidth_), uiScale_);
+    metrics.saveAsInitWidth = TSS::ScaledLayout::scaledInt(static_cast<float>(kSaveAsInitWidth_), uiScale_);
+    metrics.deleteInitWidth = TSS::ScaledLayout::scaledInt(static_cast<float>(kDeleteInitWidth_), uiScale_);
+    metrics.defragButtonWidth = TSS::ScaledLayout::scaledInt(static_cast<float>(kDefragButtonWidth_), uiScale_);
 
-    layoutInterfaceSection(bounds, metrics);
-    bounds.removeFromTop(metrics.rowGap);
-    layoutDeviceSection(bounds, metrics);
-    bounds.removeFromTop(metrics.rowGap);
-    layoutPatchSection(bounds, metrics);
-    bounds.removeFromTop(metrics.rowGap);
-    layoutPatchMutatorSection(bounds, metrics);
-    bounds.removeFromTop(metrics.rowGap);
-    layoutMasterSection(bounds, metrics);
+    using namespace PluginIDs::Settings::LastTab;
+
+    switch (activeTabId_)
+    {
+        case kDevice:
+            layoutDeviceSection(bounds, metrics);
+            break;
+        case kPatch:
+            layoutPatchSection(bounds, metrics);
+            break;
+        case kPatchMutator:
+            layoutPatchMutatorSection(bounds, metrics);
+            break;
+        case kMaster:
+            layoutMasterSection(bounds, metrics);
+            break;
+        case kUserInterface:
+        default:
+            layoutInterfaceSection(bounds, metrics);
+            break;
+    }
 }
 
 void SettingsPanel::setSkin(TSS::ISkin& skin)
@@ -290,15 +256,22 @@ void SettingsPanel::setUiScale(float uiScale)
 void SettingsPanel::setPluginMode(bool isPluginMode)
 {
     isPluginMode_ = isPluginMode;
-    updateModeSpecificVisibility();
+    updatePageVisibility();
     resized();
 }
 
-int SettingsPanel::getDesignHeight() const noexcept
+void SettingsPanel::setActiveTab(int tabId)
 {
-    const int latencyRow = kControlHeight_ + kRowGap_;
-    return kPadding_ * 2 + kContentHeightStandaloneTight_
-           + (isPluginMode_ ? latencyRow : 0);
+    const int normalized = PluginIDs::Settings::LastTab::normalize(tabId);
+    if (activeTabId_ == normalized)
+    {
+        updatePageVisibility();
+        return;
+    }
+
+    activeTabId_ = normalized;
+    updatePageVisibility();
+    resized();
 }
 
 void SettingsPanel::setDeviceType(MatrixDeviceTypes::Type deviceType)
@@ -311,12 +284,50 @@ void SettingsPanel::setDeviceType(MatrixDeviceTypes::Type deviceType)
     refreshEpromTypeItems(currentId > 0 ? currentId : PluginIDs::Settings::EpromType::kDefault);
 }
 
-void SettingsPanel::updateModeSpecificVisibility()
+void SettingsPanel::updatePageVisibility()
 {
-    const bool showPluginControls = isPluginMode_;
+    using namespace PluginIDs::Settings::LastTab;
 
-    hardwareLatencyLabel_->setVisible(showPluginControls);
-    hardwareLatencySlider_->setVisible(showPluginControls);
+    const bool showUi = activeTabId_ == kUserInterface;
+    const bool showDevice = activeTabId_ == kDevice;
+    const bool showPatch = activeTabId_ == kPatch;
+    const bool showMutator = activeTabId_ == kPatchMutator;
+    const bool showMaster = activeTabId_ == kMaster;
+    const bool showLatency = showDevice
+                             && SettingsShellMetrics::deviceShowsHardwareLatency(isPluginMode_);
+
+    infoMessageLabel_->setVisible(showUi);
+    infoMessageCombo_->setVisible(showUi);
+    contextualHelpLabel_->setVisible(showUi);
+    contextualHelpCombo_->setVisible(showUi);
+
+    hardwareLatencyLabel_->setVisible(showLatency);
+    hardwareLatencySlider_->setVisible(showLatency);
+    epromTypeLabel_->setVisible(showDevice);
+    epromTypeCombo_->setVisible(showDevice);
+
+    matrix1000PatchesLabel_->setVisible(showPatch);
+    matrix1000PatchesCombo_->setVisible(showPatch);
+    computerPatchesLabel_->setVisible(showPatch);
+    computerPatchesCombo_->setVisible(showPatch);
+    unsavedStateLabel_->setVisible(showPatch);
+    unsavedStateCombo_->setVisible(showPatch);
+    patchInitTemplateLabel_->setVisible(showPatch);
+    patchSaveAsInitButton_->setVisible(showPatch);
+    patchDeleteInitButton_->setVisible(showPatch);
+
+    deleteWarningLabel_->setVisible(showMutator);
+    deleteWarningCombo_->setVisible(showMutator);
+    defragHistoryLabel_->setVisible(showMutator);
+    defragHistoryButton_->setVisible(showMutator);
+
+    masterUtilityLabel_->setVisible(showMaster);
+    masterLoadButton_->setVisible(showMaster);
+    masterSaveAsButton_->setVisible(showMaster);
+    masterInitButton_->setVisible(showMaster);
+    masterInitTemplateLabel_->setVisible(showMaster);
+    masterSaveAsInitButton_->setVisible(showMaster);
+    masterDeleteInitButton_->setVisible(showMaster);
 }
 
 int SettingsPanel::refreshEpromTypeItems(int preferredSelectedId)

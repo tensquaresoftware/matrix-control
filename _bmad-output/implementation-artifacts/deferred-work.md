@@ -2235,3 +2235,13 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-audio-device-profiles.md`
   summary: Legacy `audioDeviceName` XML parse and Audio Settings capture/restore sequencing are not unit-tested beyond pure helpers.
   evidence: Reconfirmed ADM/stub + GUI-out-of-tests; smoke checklist remains the gate.
+
+## Deferred from: review of spec-settings-tabs-shell.md (2026-10-04)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-settings-tabs-shell.md`
+  summary: PATCH MUTATOR tab label may clip at 50% UI Scale in the 148 px rail.
+  evidence: maybe-false; would be settled by measuring PT Sans Narrow at 50% against scaled rail width, or a live smoke screenshot.
+- source_spec: `_bmad-output/implementation-artifacts/spec-settings-tabs-shell.md`
+  summary: Selected-tab highlight fill is not asserted; UI Scale tests only pin integer rule and column metrics.
+  evidence: Paint-only TabButton fill; unit suite does not construct SettingsTabRail. Close if a selected-fill token is later shared with the rail.
+

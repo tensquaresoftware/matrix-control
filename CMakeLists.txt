@@ -328,6 +328,7 @@ set(PLUGIN_SOURCES
     Source/GUI/Panels/MainComponent/HeaderPanel/HeaderPanelSetup.cpp
     Source/GUI/Settings/SettingsPanel.cpp
     Source/GUI/Settings/SettingsPanelSetup.cpp
+    Source/GUI/Settings/SettingsTabRail.cpp
     Source/GUI/Settings/SettingsWindow.cpp
     Source/GUI/Panels/MainComponent/BodyPanel/BodyPanel.cpp
     Source/GUI/Panels/MainComponent/BodyPanel/MasterEditPanel/MasterEditPanel.cpp
@@ -609,6 +610,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/EpromTypePolicyTests.cpp
         Tests/Unit/DeviceSetupDeviceRowTests.cpp
         Tests/Unit/MatrixModalCopyTests.cpp
+        Tests/Unit/SettingsTabsShellTests.cpp
         Tests/Unit/DeviceConnectionMachineDefaultsTests.cpp
         Tests/Unit/MidiPortComboPopulationTests.cpp
         Tests/Unit/ComboBoxLiveRefreshTests.cpp

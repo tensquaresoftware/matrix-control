@@ -11,6 +11,7 @@ namespace TSS
 }
 
 class SettingsPanel;
+class SettingsTabRail;
 
 class SettingsCloseButton : public juce::Button
 {
@@ -36,12 +37,16 @@ public:
                    bool isPluginMode,
                    std::function<void(SettingsPanel&)> onPanelReady,
                    std::function<void()> onCloseRequested);
-    ~SettingsWindow() override = default;
+    ~SettingsWindow() override;
 
     SettingsPanel& getSettingsPanel() { return *settingsPanel_; }
 
     void setSkin(TSS::ISkin& skin);
     void setUiScale(float uiScale);
+    void setOnTabChanged(std::function<void(int)> onTabChanged);
+    void syncRailToActiveTab();
+    void setActiveTab(int tabId);
+    int getActiveTab() const;
 
     void paint(juce::Graphics& g) override;
     void resized() override;
@@ -57,7 +62,9 @@ private:
     float uiScale_ = 1.0f;
 
     SettingsCloseButton closeButton_;
+    std::unique_ptr<SettingsTabRail> tabRail_;
     std::unique_ptr<SettingsPanel> settingsPanel_;
+    std::function<void(int)> onTabChanged_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SettingsWindow)
 };

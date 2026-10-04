@@ -15,6 +15,7 @@
 #include "GUI/MainComponent.h"
 #include "GUI/Panels/MainComponent/FooterPanel/FooterPanel.h"
 #include "GUI/Settings/SettingsPanel.h"
+#include "GUI/Settings/SettingsShellMetrics.h"
 #include "GUI/Settings/SettingsWindow.h"
 #include "Core/MIDI/EditorOutboundGate.h"
 #include "Core/Services/DeviceConnectionMachineDefaults.h"
@@ -92,6 +93,10 @@ void PluginEditor::openSettingsWindow()
                 wireSettingsPanel(panel);
             },
             [this] { closeSettingsWindow(); });
+        settingsWindow_->setOnTabChanged([this](int tabId)
+        {
+            SettingsShellMetrics::writeLastTab(pluginProcessor.getApvts().state, tabId);
+        });
         addChildComponent(*settingsWindow_);
     }
     else
@@ -107,6 +112,9 @@ void PluginEditor::openSettingsWindow()
 
     settingsWindow_->setVisible(true);
     restoreSettingsPanelFromState(settingsWindow_->getSettingsPanel());
+    settingsWindow_->setActiveTab(SettingsShellMetrics::readAndCoerceLastTab(
+        pluginProcessor.getApvts().state));
+    settingsWindow_->syncRailToActiveTab();
     settingsWindow_->toFront(true);
     settingsWindow_->grabKeyboardFocus();
 }

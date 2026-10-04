@@ -24,17 +24,8 @@ std::unique_ptr<TSS::Button> SettingsPanel::makeButton(TSS::ISkin& skin, int wid
     return std::make_unique<TSS::Button>(width, kControlHeight_, TSS::buttonLookFromSkin(skin), text);
 }
 
-std::unique_ptr<TSS::HorizontalSeparator> SettingsPanel::makeSeparator(TSS::ISkin& skin)
-{
-    return std::make_unique<TSS::HorizontalSeparator>(
-        kContentWidth_, kSeparatorHeight_, TSS::horizontalSeparatorLookFromSkin(skin));
-}
-
 void SettingsPanel::setupInterfaceSection(TSS::ISkin& skin)
 {
-    interfaceSectionLabel_ =
-        makeLabel(skin, kContentWidth_, PluginDisplayNames::Settings::kInterfaceSection);
-    interfaceSectionSeparator_ = makeSeparator(skin);
     infoMessageLabel_ =
         makeLabel(skin, kLabelWidth_, PluginDisplayNames::Settings::kInfoMessageLabel);
     infoMessageCombo_ = makeCombo(skin, kComboWidth_);
@@ -42,8 +33,6 @@ void SettingsPanel::setupInterfaceSection(TSS::ISkin& skin)
         makeLabel(skin, kLabelWidth_, PluginDisplayNames::Settings::kContextualHelpLabel);
     contextualHelpCombo_ = makeCombo(skin, kComboWidth_);
 
-    addAndMakeVisible(*interfaceSectionLabel_);
-    addAndMakeVisible(*interfaceSectionSeparator_);
     addAndMakeVisible(*infoMessageLabel_);
     addAndMakeVisible(*infoMessageCombo_);
     addAndMakeVisible(*contextualHelpLabel_);
@@ -52,8 +41,6 @@ void SettingsPanel::setupInterfaceSection(TSS::ISkin& skin)
 
 void SettingsPanel::setupDeviceSection(TSS::ISkin& skin)
 {
-    deviceSectionLabel_ = makeLabel(skin, kContentWidth_, PluginDisplayNames::Settings::kDeviceSection);
-    deviceSectionSeparator_ = makeSeparator(skin);
     hardwareLatencyLabel_ =
         makeLabel(skin, kLabelWidth_, PluginDisplayNames::Settings::kHardwareLatencyLabel);
     hardwareLatencySlider_ = std::make_unique<TSS::Slider>(
@@ -69,8 +56,6 @@ void SettingsPanel::setupDeviceSection(TSS::ISkin& skin)
     epromTypeLabel_ = makeLabel(skin, kLabelWidth_, PluginDisplayNames::Settings::kEpromTypeLabel);
     epromTypeCombo_ = makeCombo(skin, kComboWidth_);
 
-    addAndMakeVisible(*deviceSectionLabel_);
-    addAndMakeVisible(*deviceSectionSeparator_);
     addAndMakeVisible(*hardwareLatencyLabel_);
     addAndMakeVisible(*hardwareLatencySlider_);
     addAndMakeVisible(*epromTypeLabel_);
@@ -79,8 +64,6 @@ void SettingsPanel::setupDeviceSection(TSS::ISkin& skin)
 
 void SettingsPanel::setupPatchSection(TSS::ISkin& skin)
 {
-    patchSectionLabel_ = makeLabel(skin, kContentWidth_, PluginDisplayNames::Settings::kPatchSection);
-    patchSectionSeparator_ = makeSeparator(skin);
     matrix1000PatchesLabel_ =
         makeLabel(skin, kLabelWidth_, PluginDisplayNames::Settings::kMatrix1000PatchesLabel);
     matrix1000PatchesCombo_ = makeCombo(skin, kComboWidth_);
@@ -96,8 +79,6 @@ void SettingsPanel::setupPatchSection(TSS::ISkin& skin)
     patchDeleteInitButton_ =
         makeButton(skin, kDeleteInitWidth_, PluginDisplayNames::Settings::kDeleteButton);
 
-    addAndMakeVisible(*patchSectionLabel_);
-    addAndMakeVisible(*patchSectionSeparator_);
     addAndMakeVisible(*matrix1000PatchesLabel_);
     addAndMakeVisible(*matrix1000PatchesCombo_);
     addAndMakeVisible(*computerPatchesLabel_);
@@ -111,9 +92,6 @@ void SettingsPanel::setupPatchSection(TSS::ISkin& skin)
 
 void SettingsPanel::setupPatchMutatorSection(TSS::ISkin& skin)
 {
-    patchMutatorSectionLabel_ =
-        makeLabel(skin, kContentWidth_, PluginDisplayNames::Settings::kPatchMutatorSection);
-    patchMutatorSectionSeparator_ = makeSeparator(skin);
     deleteWarningLabel_ = makeLabel(skin, kLabelWidth_, PluginDisplayNames::Settings::kDeleteWarningLabel);
     deleteWarningCombo_ = makeCombo(skin, kComboWidth_);
     defragHistoryLabel_ = makeLabel(skin, kLabelWidth_, PluginDisplayNames::Settings::kDefragHistoryLabel);
@@ -121,8 +99,6 @@ void SettingsPanel::setupPatchMutatorSection(TSS::ISkin& skin)
         makeButton(skin, kDefragButtonWidth_, PluginDisplayNames::Settings::kDefragButton);
     defragHistoryButton_->setEnabled(false);
 
-    addAndMakeVisible(*patchMutatorSectionLabel_);
-    addAndMakeVisible(*patchMutatorSectionSeparator_);
     addAndMakeVisible(*deleteWarningLabel_);
     addAndMakeVisible(*deleteWarningCombo_);
     addAndMakeVisible(*defragHistoryLabel_);
@@ -131,8 +107,6 @@ void SettingsPanel::setupPatchMutatorSection(TSS::ISkin& skin)
 
 void SettingsPanel::setupMasterSection(TSS::ISkin& skin)
 {
-    masterSectionLabel_ = makeLabel(skin, kContentWidth_, PluginDisplayNames::Settings::kMasterSection);
-    masterSectionSeparator_ = makeSeparator(skin);
     masterUtilityLabel_ = makeLabel(skin, kLabelWidth_, PluginDisplayNames::Settings::kUtilityLabel);
     masterLoadButton_ = makeButton(skin, kUtilityLoadWidth_, PluginDisplayNames::Settings::kLoadButton);
     masterSaveAsButton_ =
@@ -145,8 +119,6 @@ void SettingsPanel::setupMasterSection(TSS::ISkin& skin)
     masterDeleteInitButton_ =
         makeButton(skin, kDeleteInitWidth_, PluginDisplayNames::Settings::kDeleteButton);
 
-    addAndMakeVisible(*masterSectionLabel_);
-    addAndMakeVisible(*masterSectionSeparator_);
     addAndMakeVisible(*masterUtilityLabel_);
     addAndMakeVisible(*masterLoadButton_);
     addAndMakeVisible(*masterSaveAsButton_);
@@ -202,26 +174,19 @@ void SettingsPanel::applyComboPopupLooks(TSS::ISkin& skin)
 void SettingsPanel::applyChildLooks(TSS::ISkin& skin)
 {
     const auto labelLook = TSS::labelLookFromSkin(skin);
-    const auto separatorLook = TSS::horizontalSeparatorLookFromSkin(skin);
     const auto comboLook = TSS::comboBoxLookFromSkin(skin);
     const auto buttonLook = TSS::buttonLookFromSkin(skin);
 
-    interfaceSectionLabel_->setLook(labelLook);
-    interfaceSectionSeparator_->setLook(separatorLook);
     infoMessageLabel_->setLook(labelLook);
     infoMessageCombo_->setLook(comboLook);
     contextualHelpLabel_->setLook(labelLook);
     contextualHelpCombo_->setLook(comboLook);
 
-    deviceSectionLabel_->setLook(labelLook);
-    deviceSectionSeparator_->setLook(separatorLook);
     hardwareLatencyLabel_->setLook(labelLook);
     hardwareLatencySlider_->setLook(TSS::sliderLookFromSkin(skin));
     epromTypeLabel_->setLook(labelLook);
     epromTypeCombo_->setLook(comboLook);
 
-    patchSectionLabel_->setLook(labelLook);
-    patchSectionSeparator_->setLook(separatorLook);
     matrix1000PatchesLabel_->setLook(labelLook);
     matrix1000PatchesCombo_->setLook(comboLook);
     computerPatchesLabel_->setLook(labelLook);
@@ -232,15 +197,11 @@ void SettingsPanel::applyChildLooks(TSS::ISkin& skin)
     patchSaveAsInitButton_->setLook(buttonLook);
     patchDeleteInitButton_->setLook(buttonLook);
 
-    patchMutatorSectionLabel_->setLook(labelLook);
-    patchMutatorSectionSeparator_->setLook(separatorLook);
     deleteWarningLabel_->setLook(labelLook);
     deleteWarningCombo_->setLook(comboLook);
     defragHistoryLabel_->setLook(labelLook);
     defragHistoryButton_->setLook(buttonLook);
 
-    masterSectionLabel_->setLook(labelLook);
-    masterSectionSeparator_->setLook(separatorLook);
     masterUtilityLabel_->setLook(labelLook);
     masterLoadButton_->setLook(buttonLook);
     masterSaveAsButton_->setLook(buttonLook);
