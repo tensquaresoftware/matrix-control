@@ -17,7 +17,6 @@ struct HeaderPanelDimensions
     int height;
     int logoWidth;
     int logoHeight;
-    int logoVerticalOffset;
     int contentVerticalOffset;
     int logoGapAfter;
     int logoPopupColumnWidth;
@@ -35,6 +34,13 @@ struct HeaderPanelDimensions
     int audioCartoucheWidth;
     int audioCartoucheInset;
     int audioCartoucheStrokeThickness;
+    int editCartoucheWidth;
+    int editCartoucheInset;
+    int editCartoucheStrokeThickness;
+    int cartoucheBadgeContentGap;
+    int cartoucheGap;
+    int midiLabelToNextLedGap;
+    int midiToPanicGap;
     int inputGainLabelWidth;
     int inputGainLabelToSliderGap;
     int inputGainSliderWidth;
@@ -43,7 +49,6 @@ struct HeaderPanelDimensions
     int panicButtonWidth;
     int undoButtonWidth;
     int redoButtonWidth;
-    int redoToPanicGap;
 };
 
 struct FooterPanelDimensions

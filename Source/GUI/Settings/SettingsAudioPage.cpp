@@ -6,7 +6,6 @@
 #include "GUI/Looks/LookBuilders.h"
 #include "GUI/Settings/SettingsShellMetrics.h"
 #include "GUI/Skins/ISkin.h"
-#include "GUI/Widgets/RadioButtonGroupLayout.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 
 namespace
@@ -56,9 +55,7 @@ void SettingsAudioPage::buildWidgets()
     bufferSizeLabel_ = makeLabel(*skin_, PluginDisplayNames::Settings::kBufferSizeLabel);
     bufferSizeCombo_ = makeCombo(*skin_);
     inputChannelsLabel_ = makeLabel(*skin_, PluginDisplayNames::Settings::kInputChannelsLabel);
-    inputChannelsGroup_ = std::make_unique<TSS::RadioButtonGroup>();
-    inputChannelsGroup_->setSkin(*skin_);
-    addAndMakeVisible(*inputChannelsGroup_);
+    inputChannelsCombo_ = makeCombo(*skin_);
     synthFromLabel_ = makeLabel(*skin_, PluginDisplayNames::Settings::kSynthFromLabel);
     synthFromCombo_ = makeCombo(*skin_);
     synthFromCombo_->setUsesPortSentinelPopupChrome(true);
@@ -67,9 +64,7 @@ void SettingsAudioPage::buildWidgets()
     peakIndicator_->setSkin(*skin_);
     addAndMakeVisible(*peakIndicator_);
     outputChannelsLabel_ = makeLabel(*skin_, PluginDisplayNames::Settings::kOutputChannelsLabel);
-    outputChannelsGroup_ = std::make_unique<TSS::RadioButtonGroup>();
-    outputChannelsGroup_->setSkin(*skin_);
-    addAndMakeVisible(*outputChannelsGroup_);
+    outputChannelsCombo_ = makeCombo(*skin_);
     playTestToneButton_ = std::make_unique<TSS::Button>(
         SettingsShellMetrics::kControlColumnWidth,
         SettingsShellMetrics::kControlHeight,
@@ -101,26 +96,12 @@ void SettingsAudioPage::wireCallbacks()
         pendingEndpointChange_ = EndpointChange::kOutput;
         applySetupFromUi();
     };
-    sampleRateCombo_->onChange = [this]
+    sampleRateCombo_->onChange = bufferSizeCombo_->onChange = [this]
     {
         if (! updatingUi_)
             applySetupFromUi();
     };
-    bufferSizeCombo_->onChange = [this]
-    {
-        if (! updatingUi_)
-            applySetupFromUi();
-    };
-    inputChannelsGroup_->onSelectionChanged = [this]
-    {
-        if (! updatingUi_)
-            applyChannelPair(true, inputChannelsGroup_->getSelectedIndex());
-    };
-    outputChannelsGroup_->onSelectionChanged = [this]
-    {
-        if (! updatingUi_)
-            applyChannelPair(false, outputChannelsGroup_->getSelectedIndex());
-    };
+    wireChannelPairComboCallbacks();
     playTestToneButton_->onClick = [this] { playTestSound(); };
     synthFromCombo_->onChange = [this]
     {
@@ -152,14 +133,13 @@ void SettingsAudioPage::setSkin(TSS::ISkin& skin)
     outputChannelsLabel_->setLook(labelLook);
 
     for (auto* combo : { driverTypeCombo_.get(), inputDeviceCombo_.get(), outputDeviceCombo_.get(),
-                         sampleRateCombo_.get(), bufferSizeCombo_.get(), synthFromCombo_.get() })
+                         sampleRateCombo_.get(), bufferSizeCombo_.get(), inputChannelsCombo_.get(),
+                         synthFromCombo_.get(), outputChannelsCombo_.get() })
     {
         combo->setLook(comboLook);
         combo->setPopupMenuLook(popupLook);
     }
 
-    inputChannelsGroup_->setSkin(skin);
-    outputChannelsGroup_->setSkin(skin);
     peakIndicator_->setSkin(skin);
     playTestToneButton_->setLook(buttonLook);
     repaint();
@@ -171,8 +151,6 @@ void SettingsAudioPage::setUiScale(float uiScale)
         return;
 
     uiScale_ = uiScale;
-    inputChannelsGroup_->setUiScale(uiScale);
-    outputChannelsGroup_->setUiScale(uiScale);
     peakIndicator_->setUiScale(uiScale);
     resized();
     repaint();
@@ -214,10 +192,10 @@ void SettingsAudioPage::registerContextualHelp(TSS::ContextualHelpBinder& binder
     binder.bind(outputDeviceCombo_.get(), Help::kOutputDevice);
     binder.bind(sampleRateCombo_.get(), Help::kSampleRate);
     binder.bind(bufferSizeCombo_.get(), Help::kBufferSize);
-    binder.bind(inputChannelsGroup_.get(), Help::kInputChannels);
+    binder.bind(inputChannelsCombo_.get(), Help::kInputChannels);
     binder.bind(synthFromCombo_.get(), Help::kSynthFrom);
     binder.bind(peakIndicator_.get(), Help::kAudioPeakIndicator);
-    binder.bind(outputChannelsGroup_.get(), Help::kOutputChannels);
+    binder.bind(outputChannelsCombo_.get(), Help::kOutputChannels);
     binder.bind(playTestToneButton_.get(), Help::kPlayTestTone);
 }
 

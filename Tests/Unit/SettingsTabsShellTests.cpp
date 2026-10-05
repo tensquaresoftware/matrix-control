@@ -27,8 +27,9 @@ public:
         standaloneIncludesMidiAndAudioTabs();
         writeAndCoerceLastTab();
         pluginCoercesStaleAudioLastTab();
-        radioButtonGroupWrapPolicy();
+        stereoPairLabelsAndCount();
         stereoPairMaskRoundTrip();
+        channelPairComboItemIdRoundTrip();
         applyStereoPairClearsUseDefaultFlags();
         asioDeviceListsStayLinked();
         asioApplyPathResolvesEndpointNames();
@@ -183,26 +184,20 @@ private:
                      PluginIDs::Settings::LastTab::kUserInterface);
     }
 
-    void radioButtonGroupWrapPolicy()
+    void stereoPairLabelsAndCount()
     {
-        beginTest("RadioButtonGroup - wrap stays in control column width");
+        beginTest("Stereo channel pairs - labels and count");
 
-        const TSS::RadioButtonGroupLayout::OptionMetrics metrics { 64, 20, 8, 4 };
         expectEquals(TSS::RadioButtonGroupLayout::stereoPairCount(6), 3);
+        expectEquals(TSS::RadioButtonGroupLayout::stereoPairCount(1), 0);
         expectEquals(TSS::RadioButtonGroupLayout::stereoPairLabel(0), juce::String("1 + 2"));
         expectEquals(TSS::RadioButtonGroupLayout::stereoPairLabel(1), juce::String("3 + 4"));
         expectEquals(TSS::RadioButtonGroupLayout::stereoPairLabel(2), juce::String("5 + 6"));
-        // Two 64 px options + gap fit in 140 px; three options wrap.
-        expectEquals(TSS::RadioButtonGroupLayout::preferredHeight(2, 140, metrics), 20);
-        expect(TSS::RadioButtonGroupLayout::preferredHeight(3, 140, metrics) > 20);
-        expect(TSS::RadioButtonGroupLayout::preferredHeight(6, 140, metrics) > 20);
-        const auto second = TSS::RadioButtonGroupLayout::optionBounds(2, 6, { 0, 0, 140, 48 }, metrics);
-        expect(second.getY() > 0);
     }
 
     void stereoPairMaskRoundTrip()
     {
-        beginTest("RadioButtonGroup - stereo pair mask encode/decode");
+        beginTest("Stereo channel pairs - mask encode/decode");
 
         const auto mask2 = TSS::RadioButtonGroupLayout::stereoPairMask(2);
         expect(mask2[4]);
@@ -220,6 +215,26 @@ private:
         juce::BigInteger multi = TSS::RadioButtonGroupLayout::stereoPairMask(0);
         multi |= TSS::RadioButtonGroupLayout::stereoPairMask(1);
         expectEquals(TSS::RadioButtonGroupLayout::selectedStereoPairIndex(multi, 3), -1);
+    }
+
+    void channelPairComboItemIdRoundTrip()
+    {
+        beginTest("Stereo channel pairs - combo item id encode/decode");
+
+        expectEquals(TSS::RadioButtonGroupLayout::channelPairComboItemId(0),
+                     TSS::RadioButtonGroupLayout::kFirstChannelPairComboItemId);
+        expectEquals(TSS::RadioButtonGroupLayout::channelPairComboItemId(2),
+                     TSS::RadioButtonGroupLayout::kFirstChannelPairComboItemId + 2);
+        expectEquals(TSS::RadioButtonGroupLayout::channelPairIndexFromComboItemId(
+                         TSS::RadioButtonGroupLayout::channelPairComboItemId(0)),
+                     0);
+        expectEquals(TSS::RadioButtonGroupLayout::channelPairIndexFromComboItemId(
+                         TSS::RadioButtonGroupLayout::channelPairComboItemId(2)),
+                     2);
+        expect(TSS::RadioButtonGroupLayout::isChannelPairComboItemId(
+            TSS::RadioButtonGroupLayout::kFirstChannelPairComboItemId));
+        expect(! TSS::RadioButtonGroupLayout::isChannelPairComboItemId(
+            TSS::RadioButtonGroupLayout::kFirstChannelPairComboItemId - 1));
     }
 
     void applyStereoPairClearsUseDefaultFlags()
@@ -418,6 +433,7 @@ private:
         expect(SettingsShellMetrics::paddedBodyDesignHeight(false)
                == SettingsShellMetrics::kPadding * 2
                       + SettingsShellMetrics::tallestPageContentHeight());
+        expectEquals(SettingsShellMetrics::kTallestPageRows, 11);
         expect(SettingsShellMetrics::tallestPageContentHeight()
                > SettingsShellMetrics::railLabelStackHeight(false));
     }

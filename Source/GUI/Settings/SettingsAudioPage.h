@@ -13,7 +13,6 @@
 #include "GUI/Widgets/ComboBox.h"
 #include "GUI/Widgets/Label.h"
 #include "GUI/Widgets/PeakIndicator.h"
-#include "GUI/Widgets/RadioButtonGroup.h"
 
 namespace TSS
 {
@@ -68,7 +67,8 @@ private:
     void refreshDriverTypeCombo();
     void refreshDeviceCombos();
     void refreshSampleRateAndBufferCombos();
-    void refreshChannelGroups();
+    void refreshChannelCombos();
+    void wireChannelPairComboCallbacks();
     void applySetupFromUi();
     void applyChannelPair(bool isInput, int pairIndex);
     void playTestSound();
@@ -97,12 +97,12 @@ private:
     std::unique_ptr<TSS::Label> bufferSizeLabel_;
     std::unique_ptr<TSS::ComboBox> bufferSizeCombo_;
     std::unique_ptr<TSS::Label> inputChannelsLabel_;
-    std::unique_ptr<TSS::RadioButtonGroup> inputChannelsGroup_;
+    std::unique_ptr<TSS::ComboBox> inputChannelsCombo_;
     std::unique_ptr<TSS::Label> synthFromLabel_;
     std::unique_ptr<TSS::ComboBox> synthFromCombo_;
     std::unique_ptr<TSS::PeakIndicator> peakIndicator_;
     std::unique_ptr<TSS::Label> outputChannelsLabel_;
-    std::unique_ptr<TSS::RadioButtonGroup> outputChannelsGroup_;
+    std::unique_ptr<TSS::ComboBox> outputChannelsCombo_;
     std::unique_ptr<TSS::Button> playTestToneButton_;
 
     std::vector<juce::String> synthFromSourceIdentifiers_;

@@ -35,13 +35,31 @@ namespace
     }
 }
 
+void SettingsAudioPage::wireChannelPairComboCallbacks()
+{
+    const auto wireOne = [this](TSS::ComboBox& combo, bool isInput)
+    {
+        combo.onChange = [this, &combo, isInput]
+        {
+            if (updatingUi_)
+                return;
+            const int id = combo.getSelectedId();
+            if (TSS::RadioButtonGroupLayout::isChannelPairComboItemId(id))
+                applyChannelPair(isInput,
+                                 TSS::RadioButtonGroupLayout::channelPairIndexFromComboItemId(id));
+        };
+    };
+    wireOne(*inputChannelsCombo_, true);
+    wireOne(*outputChannelsCombo_, false);
+}
+
 void SettingsAudioPage::refreshAllFromDeviceManager()
 {
     const juce::ScopedValueSetter<bool> guard(updatingUi_, true);
     refreshDriverTypeCombo();
     refreshDeviceCombos();
     refreshSampleRateAndBufferCombos();
-    refreshChannelGroups();
+    refreshChannelCombos();
     resized();
 }
 
@@ -116,7 +134,7 @@ void SettingsAudioPage::refreshSampleRateAndBufferCombos()
         bufferSizeCombo_->setSelectedId(selectedBufferId, juce::dontSendNotification);
 }
 
-void SettingsAudioPage::refreshChannelGroups()
+void SettingsAudioPage::refreshChannelCombos()
 {
     auto* device = deviceManager_.getCurrentAudioDevice();
     const auto setup = deviceManager_.getAudioDeviceSetup();
@@ -127,21 +145,27 @@ void SettingsAudioPage::refreshChannelGroups()
         ? TSS::RadioButtonGroupLayout::stereoPairCount(device->getOutputChannelNames().size())
         : 0;
 
-    juce::StringArray inLabels;
-    for (int i = 0; i < inPairs; ++i)
-        inLabels.add(TSS::RadioButtonGroupLayout::stereoPairLabel(i));
-    juce::StringArray outLabels;
-    for (int i = 0; i < outPairs; ++i)
-        outLabels.add(TSS::RadioButtonGroupLayout::stereoPairLabel(i));
+    const auto populatePairCombo = [](TSS::ComboBox& combo, int pairCount, int selectedPair)
+    {
+        combo.clear(juce::dontSendNotification);
+        for (int i = 0; i < pairCount; ++i)
+            combo.addItem(TSS::RadioButtonGroupLayout::stereoPairLabel(i),
+                          TSS::RadioButtonGroupLayout::channelPairComboItemId(i));
 
-    inputChannelsGroup_->setOptions(inLabels);
-    outputChannelsGroup_->setOptions(outLabels);
-    inputChannelsGroup_->setSelectedIndex(
-        TSS::RadioButtonGroupLayout::selectedStereoPairIndex(setup.inputChannels, inPairs),
-        juce::dontSendNotification);
-    outputChannelsGroup_->setSelectedIndex(
-        TSS::RadioButtonGroupLayout::selectedStereoPairIndex(setup.outputChannels, outPairs),
-        juce::dontSendNotification);
+        combo.setEnabled(pairCount > 0);
+        if (selectedPair >= 0 && selectedPair < pairCount)
+        {
+            combo.setSelectedId(TSS::RadioButtonGroupLayout::channelPairComboItemId(selectedPair),
+                                juce::dontSendNotification);
+        }
+    };
+
+    populatePairCombo(*inputChannelsCombo_,
+                      inPairs,
+                      TSS::RadioButtonGroupLayout::selectedStereoPairIndex(setup.inputChannels, inPairs));
+    populatePairCombo(*outputChannelsCombo_,
+                      outPairs,
+                      TSS::RadioButtonGroupLayout::selectedStereoPairIndex(setup.outputChannels, outPairs));
 }
 
 namespace

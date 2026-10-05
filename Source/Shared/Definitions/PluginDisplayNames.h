@@ -19,6 +19,7 @@ namespace PluginDisplayNames
         constexpr const char* kToSynthLabel        = "TO SYNTH";
         constexpr const char* kMidiCartoucheLabel  = "MIDI";
         constexpr const char* kAudioCartoucheLabel = "AUDIO";
+        constexpr const char* kEditCartoucheLabel  = "EDIT";
         constexpr const char* kInputGainLabel      = "INPUT GAIN";
         constexpr const char* kNoInputSentinel     = "NO INPUT";
         constexpr const char* kNoOutputSentinel    = "NO OUTPUT";

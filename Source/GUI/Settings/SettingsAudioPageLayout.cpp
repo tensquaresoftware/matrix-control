@@ -64,21 +64,6 @@ namespace
             combo->setUiScale(metrics.uiScale);
         bounds.removeFromTop(metrics.rowGap);
     }
-
-    void placeChannelGroupRow(juce::Rectangle<int>& bounds,
-                              const AudioPageLayoutMetrics& metrics,
-                              TSS::Label& label,
-                              TSS::RadioButtonGroup& group)
-    {
-        const int groupHeight = juce::jmax(metrics.controlHeight,
-                                           group.getPreferredHeight(metrics.comboWidth));
-        auto row = bounds.removeFromTop(groupHeight);
-        label.setBounds(row.getX(), row.getY(), metrics.labelWidth, metrics.controlHeight);
-        label.setUiScale(metrics.uiScale);
-        group.setBounds(row.getX() + metrics.labelWidth, row.getY(), metrics.comboWidth, groupHeight);
-        group.setUiScale(metrics.uiScale);
-        bounds.removeFromTop(metrics.rowGap);
-    }
 }
 
 void SettingsAudioPage::resized()
@@ -93,7 +78,7 @@ void SettingsAudioPage::resized()
     placeLabeledRow(bounds, metrics, { bufferSizeLabel_.get(), bufferSizeCombo_.get(), metrics.comboWidth });
     bounds.removeFromTop(metrics.controlHeight + metrics.rowGap);
 
-    placeChannelGroupRow(bounds, metrics, *inputChannelsLabel_, *inputChannelsGroup_);
+    placeLabeledRow(bounds, metrics, { inputChannelsLabel_.get(), inputChannelsCombo_.get(), metrics.comboWidth });
 
     {
         auto row = bounds.removeFromTop(metrics.controlHeight);
@@ -111,7 +96,7 @@ void SettingsAudioPage::resized()
     }
 
     bounds.removeFromTop(metrics.controlHeight + metrics.rowGap);
-    placeChannelGroupRow(bounds, metrics, *outputChannelsLabel_, *outputChannelsGroup_);
+    placeLabeledRow(bounds, metrics, { outputChannelsLabel_.get(), outputChannelsCombo_.get(), metrics.comboWidth });
 
     auto row = bounds.removeFromTop(metrics.controlHeight);
     playTestToneButton_->setBounds(row.getX() + metrics.labelWidth,

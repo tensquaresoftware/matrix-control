@@ -32,17 +32,19 @@ namespace TSS
         static int getBaseWidth() { return kDefaultWidth_; }
         static int getBaseHeight() { return kDefaultHeight_; }
 
+    protected:
+        LabelLook look_{};
+        juce::String labelText_;
+        float uiScale_ = 1.0f;
+
     private:
         static constexpr int kDefaultWidth_ = 50;
         static constexpr int kDefaultHeight_ = 20;
         static constexpr int kTextLeftPadding_ = 0;
 
-        LabelLook look_{};
         int width_;
         int height_;
-        juce::String labelText_;
         LabelStyle style_;
-        float uiScale_ = 1.0f;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Label)
     };

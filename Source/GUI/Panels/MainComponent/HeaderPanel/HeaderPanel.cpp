@@ -5,6 +5,7 @@
 #include "GUI/Helpers/ContextualHelpBindingSupport.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Widgets/HeaderLogoPopupMenu.h"
+#include "GUI/Skins/ColourChart.h"
 #include "GUI/Skins/Skin.h"
 #include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Looks/LookBuilders.h"
@@ -44,15 +45,16 @@ namespace
         if (args.skin == nullptr || args.frameBounds.isEmpty())
             return;
 
-        const auto cartoucheChrome = args.skin->getColour(SkinColourId::kDarkPanelText);
-        const auto headerBg = args.skin->getColour(SkinColourId::kHeaderPanelBackground);
+        // Badge/frame: LightGrey1; title text: header background (reads as cut-out on the badge).
+        const auto cartoucheChrome = juce::Colour(ColourChart::kLightGrey1);
+        const auto badgeTextColour = args.skin->getColour(SkinColourId::kHeaderPanelBackground);
         const int stroke = juce::jmax(1, args.strokePx);
 
         g.setColour(cartoucheChrome);
         g.fillRect(args.badgeBounds);
 
         auto look = TSS::darkPanelLabelLookFromSkin(*args.skin);
-        look.text = headerBg;
+        look.text = badgeTextColour;
         g.setColour(look.text);
         g.setFont(look.font.withHeight(look.font.getHeight() * args.uiScale).boldened());
         g.drawText(args.badgeText, args.badgeBounds, juce::Justification::centred, false);
@@ -147,6 +149,7 @@ void HeaderPanel::paint(juce::Graphics& g)
     g.fillAll(skin_->getColour(SkinColourId::kHeaderPanelBackground));
     paintMidiCartouche(g);
     paintAudioCartouche(g);
+    paintEditCartouche(g);
 }
 
 void HeaderPanel::paintMidiCartouche(juce::Graphics& g)
@@ -174,6 +177,18 @@ void HeaderPanel::paintAudioCartouche(juce::Graphics& g)
                              .frameBounds = audioCartoucheFrameBounds_,
                              .strokePx = audioCartoucheStrokePx_,
                              .badgeText = PluginDisplayNames::HeaderPanel::kAudioCartoucheLabel });
+}
+
+void HeaderPanel::paintEditCartouche(juce::Graphics& g)
+{
+    paintCartoucheChrome(g,
+                         CartouchePaintArgs{
+                             .skin = skin_,
+                             .uiScale = uiScale_,
+                             .badgeBounds = editCartoucheBadgeBounds_,
+                             .frameBounds = editCartoucheFrameBounds_,
+                             .strokePx = editCartoucheStrokePx_,
+                             .badgeText = PluginDisplayNames::HeaderPanel::kEditCartoucheLabel });
 }
 
 void HeaderPanel::showLogoPopup()

@@ -46,6 +46,29 @@ namespace TSS
         setLook(look);
     }
 
+    void Logo::paint(juce::Graphics& g)
+    {
+        if (labelText_.isEmpty())
+            return;
+
+        // Centre glyph ink in the component so the visual "M" stays stable across UI Scale
+        // (Justification::centred uses the em-box, which drifts optically for this brand face).
+        const auto font = look_.font.withHeight(look_.font.getHeight() * uiScale_);
+        juce::GlyphArrangement measure;
+        measure.addLineOfText(font, labelText_, 0.0f, 0.0f);
+        const auto ink = measure.getBoundingBox(0, measure.getNumGlyphs(), true);
+        if (ink.isEmpty())
+            return;
+
+        const auto area = getLocalBounds().toFloat();
+        const float baselineY = area.getCentreY() - ink.getCentreY();
+
+        juce::GlyphArrangement glyphs;
+        glyphs.addLineOfText(font, labelText_, area.getX(), baselineY);
+        g.setColour(look_.text);
+        glyphs.draw(g);
+    }
+
     void Logo::mouseUp(const juce::MouseEvent& e)
     {
         if (e.getNumberOfClicks() > 1)

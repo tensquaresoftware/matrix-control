@@ -2284,3 +2284,27 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-settings-midi-tab-header-monitoring.md`
   summary: Contextual-help inventory markdown still lists pre-cutover header MIDI FROM/TO combo help strings.
   evidence: Product copy in PluginDisplayNames.h already updated; inventory doc sync is a separate docs pass.
+
+## Deferred from: review of spec-settings-audio-channel-pair-combos.md (2026-10-05)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-settings-audio-channel-pair-combos.md`
+  summary: INPUT/OUTPUT CHANNELS combos rebuild without ComboBoxLiveRefresh while a popup is open.
+  evidence: SYNTH FROM already uses live-refresh; channel lists change less often mid-popup; mirror that path if hotplug-during-menu becomes noisy.
+- source_spec: `_bmad-output/implementation-artifacts/spec-settings-audio-channel-pair-combos.md`
+  summary: Stereo pair helpers still live under the RadioButtonGroupLayout name/path after the widget was deleted.
+  evidence: Rename is a mechanical cleanup across Settings, AudioDeviceSetupSync, and tests; not required for combo behaviour.
+- source_spec: `_bmad-output/implementation-artifacts/spec-settings-audio-channel-pair-combos.md`
+  summary: Older Settings/AUDIO plans still describe wrapping RadioButtonGroup as the channel UI.
+  evidence: Code and channel-combo spec supersede; docs pass outside this delivery.
+
+## Deferred from: code review of spec-settings-audio-channel-pair-combos.md (2026-10-05)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-settings-audio-channel-pair-combos.md`
+  summary: SettingsTabsShellTests assert `kTallestPageRows == 11` and padded-height identity only — they do not prove AUDIO page content still fits the shell budget if rows are re-added while the constant stays 11.
+  evidence: Verification Gap; live SettingsAudioPage layout fit remains Standalone/manual.
+- source_spec: `_bmad-output/implementation-artifacts/spec-settings-audio-channel-pair-combos.md`
+  summary: Header monitoring label widths still carry an in-source “truncation TBD” note after the −8 trial.
+  evidence: Blind Hunter; prior header polish; measure/clip/tooltip follow-up outside this pass.
+- source_spec: `_bmad-output/implementation-artifacts/spec-settings-audio-channel-pair-combos.md`
+  summary: `kCartoucheClusterNudgeX` is scaled directly from DesignPanels in HeaderPanel::resized instead of flowing through HeaderPanelDimensions / DimensionFactory like sibling cartouche tokens.
+  evidence: Blind Hunter; behaviour correct; SSOT path incomplete for future token edits.

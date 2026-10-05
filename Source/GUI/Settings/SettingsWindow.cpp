@@ -5,6 +5,7 @@
 #include "SettingsTabRail.h"
 #include "GUI/Dialogs/DialogMatrixHelpers.h"
 #include "GUI/Layout/ScaledLayout.h"
+#include "GUI/Skins/ColourChart.h"
 #include "GUI/Skins/Skin.h"
 #include "GUI/Skins/SkinValues.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
@@ -188,7 +189,7 @@ void SettingsWindow::paint(juce::Graphics& g)
 
     if (thickness > 0 && ruleX >= body.getX() && ruleX + thickness <= body.getRight())
     {
-        g.setColour(juce::Colour(DialogMatrixHelpers::kDialogBorderColour));
+        g.setColour(juce::Colour(ColourChart::kDarkGrey4));
         g.fillRect(ruleX, body.getY(), thickness, body.getHeight());
     }
 }

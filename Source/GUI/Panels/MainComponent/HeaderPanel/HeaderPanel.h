@@ -68,6 +68,7 @@ private:
     void registerContextualHelp();
     void paintMidiCartouche(juce::Graphics& g);
     void paintAudioCartouche(juce::Graphics& g);
+    void paintEditCartouche(juce::Graphics& g);
     void updateAudioControlsVisibility();
 
     HeaderPanelDimensions dimensions_;
@@ -83,6 +84,9 @@ private:
     juce::Rectangle<int> audioCartoucheBadgeBounds_;
     juce::Rectangle<int> audioCartoucheFrameBounds_;
     int audioCartoucheStrokePx_ = 1;
+    juce::Rectangle<int> editCartoucheBadgeBounds_;
+    juce::Rectangle<int> editCartoucheFrameBounds_;
+    int editCartoucheStrokePx_ = 1;
 
     TSS::Logo logo_;
     TSS::Led instrumentActivityLed_;

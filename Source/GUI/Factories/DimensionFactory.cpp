@@ -176,7 +176,6 @@ namespace
             .height = Panels::Header::kHeight,
             .logoWidth = Panels::Header::kLogoWidth,
             .logoHeight = Panels::Header::kLogoHeight,
-            .logoVerticalOffset = Panels::Header::kLogoVerticalOffset,
             .contentVerticalOffset = Panels::Header::kContentVerticalOffset,
             .logoGapAfter = Panels::Header::kLogoGapAfter,
             .logoPopupColumnWidth = Panels::Header::kLogoPopupColumnWidth,
@@ -194,6 +193,13 @@ namespace
             .audioCartoucheWidth = Panels::Header::kAudioCartoucheWidth,
             .audioCartoucheInset = Panels::Header::kAudioCartoucheInset,
             .audioCartoucheStrokeThickness = Panels::Header::kAudioCartoucheStrokeThickness,
+            .editCartoucheWidth = Panels::Header::kEditCartoucheWidth,
+            .editCartoucheInset = Panels::Header::kEditCartoucheInset,
+            .editCartoucheStrokeThickness = Panels::Header::kEditCartoucheStrokeThickness,
+            .cartoucheBadgeContentGap = Panels::Header::kCartoucheBadgeContentGap,
+            .cartoucheGap = Panels::Header::kCartoucheGap,
+            .midiLabelToNextLedGap = Panels::Header::kMidiLabelToNextLedGap,
+            .midiToPanicGap = Panels::Header::kMidiToPanicGap,
             .inputGainLabelWidth = Panels::Header::kInputGainLabelWidth,
             .inputGainLabelToSliderGap = Panels::Header::kInputGainLabelToSliderGap,
             .inputGainSliderWidth = Panels::Header::kInputGainSliderWidth,
@@ -202,7 +208,6 @@ namespace
             .panicButtonWidth = Panels::Header::kPanicButtonWidth,
             .undoButtonWidth = Panels::Header::kUndoButtonWidth,
             .redoButtonWidth = Panels::Header::kRedoButtonWidth,
-            .redoToPanicGap = Panels::Header::kRedoToPanicGap,
         };
     }
 

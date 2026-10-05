@@ -8,8 +8,8 @@
 namespace TSS::Design
 {
     static_assert(GUI::kWidth == 1308, "MainComponent width");
-    static_assert(GUI::kHeight == 800, "MainComponent height");
-    static_assert(Panels::Header::kHeight == 40, "HeaderPanel height");
+    static_assert(GUI::kHeight == 808, "MainComponent height");
+    static_assert(Panels::Header::kHeight == 48, "HeaderPanel height");
     static_assert(Panels::Header::kLogoWidth % 4 == 0, "Header logo width must be on the design ÷4 grid");
     static_assert(Panels::Header::kLogoHeight % 4 == 0, "Header logo height must be on the design ÷4 grid");
     static_assert(Panels::Header::kLogoFontHeight % 4 == 0, "Header logo font height must be on the design ÷4 grid");
@@ -22,10 +22,26 @@ namespace TSS::Design
                   "Header TO SYNTH label width must be on the design ÷4 grid");
     static_assert(Panels::Header::kMidiCartoucheWidth % 4 == 0,
                   "Header MIDI cartouche width must be on the design ÷4 grid");
+    static_assert(Panels::Header::kMidiCartoucheInset % 4 == 0,
+                  "Header MIDI cartouche inset must be on the design ÷4 grid");
+    static_assert(Panels::Header::kAudioCartoucheInset % 4 == 0,
+                  "Header AUDIO cartouche inset must be on the design ÷4 grid");
+    static_assert(Panels::Header::kEditCartoucheInset % 4 == 0,
+                  "Header EDIT cartouche inset must be on the design ÷4 grid");
+    static_assert(Panels::Header::kCartoucheBadgeContentGap % 4 == 0,
+                  "Header cartouche badge-content gap must be on the design ÷4 grid");
+    static_assert(Panels::Header::kCartoucheGap % 4 == 0,
+                  "Header EDIT/MIDI/AUDIO cartouche gap must be on the design ÷4 grid");
+    static_assert(Panels::Header::kCartoucheClusterNudgeX % 4 == 0,
+                  "Header cartouche cluster nudge X must be on the design ÷4 grid");
+    static_assert(Panels::Header::kMidiLabelToNextLedGap % 4 == 0,
+                  "Header MIDI label-to-LED gap must be on the design ÷4 grid");
+    static_assert(Panels::Header::kMidiToPanicGap % 4 == 0,
+                  "Header MIDI-to-PANIC gap must be on the design ÷4 grid");
+    static_assert(Panels::Header::kEditCartoucheWidth % 4 == 0,
+                  "Header EDIT cartouche width must be on the design ÷4 grid");
     static_assert(Panels::Header::kInputGainLabelToSliderGap % 4 == 0,
                   "Header input gain label-to-slider gap must be on the design ÷4 grid");
-    static_assert(Panels::Header::kRedoToPanicGap % 4 == 0,
-                  "Header redo-to-panic gap must be on the design ÷4 grid");
     static_assert(Panels::Header::kPanicButtonWidth % 4 == 0,
                   "Header panic button width must be on the design ÷4 grid");
     static_assert(Panels::Header::kUndoButtonWidth % 4 == 0,

@@ -179,13 +179,12 @@ namespace TSS::Design
 
         namespace Header
         {
-            inline constexpr int kHeight = 40;
-            inline constexpr int kLogoWidth = 172;
-            inline constexpr int kLogoHeight = 20;
-            inline constexpr int kLogoVerticalOffset = -1;
-            // Keep 0: controls + AUDIO cartouche stay vertically centered in kHeight.
+            inline constexpr int kHeight = 48;
+            inline constexpr int kLogoWidth = 276;
+            inline constexpr int kLogoHeight = 32;
+            // Keep 0: controls + cartouches stay vertically centered in kHeight.
             inline constexpr int kContentVerticalOffset = 0;
-            inline constexpr int kLogoFontHeight = 20;
+            inline constexpr int kLogoFontHeight = 32;
             inline constexpr int kLogoGapAfter = 12;
             inline constexpr int kLogoPopupColumnWidth = 100;
             inline constexpr int kLogoPopupActionColumnWidth = 100;
@@ -197,23 +196,36 @@ namespace TSS::Design
             inline constexpr int kLabelToControlGap = 0;
             inline constexpr int kInputGainLabelToSliderGap = kLabelToControlGap - kGap;
             // Monitoring labels (LED + label only) after MIDI cartouche cutover.
-            inline constexpr int kFromKeyboardLabelWidth = 84;
-            inline constexpr int kFromSynthLabelWidth = 64;
-            inline constexpr int kToSynthLabelWidth = 52;
+            // Widths = ceil÷4 of PT Sans Narrow 14 px advances, then -8 trial (truncation TBD).
+            inline constexpr int kFromKeyboardLabelWidth = 80;
+            inline constexpr int kFromSynthLabelWidth = 60;
+            inline constexpr int kToSynthLabelWidth = 44;
             inline constexpr int kMidiCartoucheWidth = 36;
+            // Vertical air between frame hairlines and control row (Y only).
             inline constexpr int kMidiCartoucheInset = 4;
             inline constexpr int kMidiCartoucheStrokeThickness = 1;
             inline constexpr int kAudioCartoucheWidth = 44;
-            // Gap badge→content, and air between frame hairlines and content (slider / peak).
             inline constexpr int kAudioCartoucheInset = 4;
             inline constexpr int kAudioCartoucheStrokeThickness = 1;
+            inline constexpr int kEditCartoucheWidth = 36; // same length token as MIDI
+            inline constexpr int kEditCartoucheInset = 4;
+            inline constexpr int kEditCartoucheStrokeThickness = 1;
+            // Horizontal: badge right → first control, and last control → frame right.
+            inline constexpr int kCartoucheBadgeContentGap = Spacing::kMedium; // 8
+            // Clearance between EDIT / MIDI / AUDIO cartouche frames (left-to-right flow).
+            inline constexpr int kCartoucheGap = Spacing::kMedium * 2; // 16
+            // Extra shift after aligning AUDIO to the SharedPanel left (visual nudge).
+            inline constexpr int kCartoucheClusterNudgeX = 12;
+            // End of MIDI monitoring label → next activity LED.
+            inline constexpr int kMidiLabelToNextLedGap = Spacing::kMedium; // 8
+            // Monitoring cluster → PANIC inside the MIDI cartouche.
+            inline constexpr int kMidiToPanicGap = Spacing::kMedium * 2; // 16
             inline constexpr int kInputGainLabelWidth = 60;
             inline constexpr int kInputGainSliderWidth = 60;
             inline constexpr int kPeakIndicatorWidth = 12;
             inline constexpr int kPanicButtonWidth = 44;
             inline constexpr int kUndoButtonWidth = 44;
             inline constexpr int kRedoButtonWidth = 44;
-            inline constexpr int kRedoToPanicGap = 16;
         }
 
         namespace Footer
