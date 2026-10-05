@@ -9,8 +9,12 @@
 #include "Core/MIDI/MidiActivityTracker.h"
 #include "Core/MIDI/MidiManager.h"
 #include "Core/MIDI/Queue/RealtimeQueuePressureMonitor.h"
+#include "GUI/Helpers/MidiActivityLedLevels.h"
 #include "GUI/Panels/MainComponent/FooterPanel/FooterPanel.h"
 #include "GUI/Panels/MainComponent/HeaderPanel/HeaderPanel.h"
+#include "GUI/Settings/SettingsMidiPage.h"
+#include "GUI/Settings/SettingsPanel.h"
+#include "GUI/Settings/SettingsWindow.h"
 #include "Shared/Definitions/PluginIDs.h"
 
 PluginEditor::HeaderRefreshTimer::HeaderRefreshTimer(PluginProcessor& processor,
@@ -32,9 +36,10 @@ void PluginEditor::HeaderRefreshTimer::pollOpenMidiPopups()
         return;
 
     midiPopupPollTicks_ = 0;
-    if (headerPanel_.getMidiFromComboBox().isPopupOpen()
-        || headerPanel_.getMidiToComboBox().isPopupOpen()
-        || headerPanel_.getKeyboardFromComboBox().isPopupOpen())
+
+    auto* panel = owner_.getSettingsPanelIfOpen();
+    auto* midiPage = panel != nullptr ? panel->getMidiPage() : nullptr;
+    if (midiPage != nullptr && midiPage->isAnyPortPopupOpen())
     {
         // List-only: do not force-reopen ports while the user is browsing the menu.
         owner_.refreshMidiPortListsFromOsChange(false);
@@ -62,13 +67,10 @@ void PluginEditor::HeaderRefreshTimer::timerCallback()
 
     pollOpenMidiPopups();
 
-    const auto& tracker = processor_.getMidiActivityTracker();
-    headerPanel_.getInstrumentActivityLed().setLevel(
-        tracker.getActivityLevel(Core::MidiActivityTracker::Path::kInstrument));
-    headerPanel_.getEditorActivityLed().setLevel(
-        tracker.getActivityLevel(Core::MidiActivityTracker::Path::kMidiFromInbound));
-    headerPanel_.getMidiToActivityLed().setLevel(
-        tracker.getActivityLevel(Core::MidiActivityTracker::Path::kOutbound));
+    TSS::MidiActivityLedLevels::apply(processor_.getMidiActivityTracker(),
+                                      headerPanel_.getInstrumentActivityLed(),
+                                      headerPanel_.getEditorActivityLed(),
+                                      headerPanel_.getMidiToActivityLed());
 
     const bool editorialUndoRedoBlocked = owner_.isEditorialUndoBlockedByTextFocus()
                                           || owner_.isEditorialUndoBlockedByModalOverlay();

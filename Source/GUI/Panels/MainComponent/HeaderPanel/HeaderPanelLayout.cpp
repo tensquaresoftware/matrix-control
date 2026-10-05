@@ -5,7 +5,6 @@
 
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Widgets/Button.h"
-#include "GUI/Widgets/ComboBox.h"
 #include "GUI/Widgets/Label.h"
 #include "GUI/Widgets/Led.h"
 #include "GUI/Widgets/PeakIndicator.h"
@@ -23,18 +22,19 @@ namespace
         int ledY = 0;
         float ledSize = 0.0f;
         int ledSizePx = 0;
-        float editorMidiFromLabelWidth = 0.0f;
-        float midiToLabelWidth = 0.0f;
-        float keyboardFromLabelWidth = 0.0f;
+        float fromKeyboardLabelWidth = 0.0f;
+        float fromSynthLabelWidth = 0.0f;
+        float toSynthLabelWidth = 0.0f;
+        float midiCartoucheWidth = 0.0f;
+        float midiCartoucheInset = 0.0f;
+        int midiCartoucheStrokePx = 1;
+        int midiCartoucheStrokeOutwardPx = 0;
         float audioCartoucheWidth = 0.0f;
         float audioCartoucheInset = 0.0f;
         int audioCartoucheStrokePx = 1;
         int audioCartoucheStrokeOutwardPx = 0;
         float inputGainLabelWidth = 0.0f;
-        float labelToControlGap = 0.0f;
-        float keyboardFromLabelToComboGap = 0.0f;
         float inputGainLabelToSliderGap = 0.0f;
-        float portComboWidth = 0.0f;
         float inputGainSliderWidth = 0.0f;
         float peakIndicatorWidth = 0.0f;
         float undoButtonWidth = 0.0f;
@@ -59,22 +59,26 @@ namespace
                 static_cast<float>(dimensions.contentVerticalOffset), sf);
             m.controlY = bounds.getY() + (bounds.getHeight() - m.controlHeightPx) / 2 + contentYOffset;
 
-            m.editorMidiFromLabelWidth = static_cast<float>(dimensions.editorMidiFromLabelWidth) * sf;
-            m.midiToLabelWidth = static_cast<float>(dimensions.midiToLabelWidth) * sf;
-            m.keyboardFromLabelWidth = static_cast<float>(dimensions.keyboardFromLabelWidth) * sf;
+            m.fromKeyboardLabelWidth = static_cast<float>(dimensions.fromKeyboardLabelWidth) * sf;
+            m.fromSynthLabelWidth = static_cast<float>(dimensions.fromSynthLabelWidth) * sf;
+            m.toSynthLabelWidth = static_cast<float>(dimensions.toSynthLabelWidth) * sf;
+            m.midiCartoucheWidth = static_cast<float>(dimensions.midiCartoucheWidth) * sf;
+            m.midiCartoucheInset = static_cast<float>(dimensions.midiCartoucheInset) * sf;
             m.audioCartoucheWidth = static_cast<float>(dimensions.audioCartoucheWidth) * sf;
             m.audioCartoucheInset = static_cast<float>(dimensions.audioCartoucheInset) * sf;
             // Layout air was calibrated to a 1 px design stroke; extra thickness grows outward.
             constexpr float kStrokeBaselineDesign = 1.0f;
+            const int strokeBaselinePx = juce::jmax(1, TSS::ScaledLayout::scaledInt(kStrokeBaselineDesign, sf));
+
+            m.midiCartoucheStrokePx = juce::jmax(
+                1, TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions.midiCartoucheStrokeThickness), sf));
+            m.midiCartoucheStrokeOutwardPx = juce::jmax(0, m.midiCartoucheStrokePx - strokeBaselinePx);
             m.audioCartoucheStrokePx = juce::jmax(
                 1, TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions.audioCartoucheStrokeThickness), sf));
-            const int strokeBaselinePx = juce::jmax(1, TSS::ScaledLayout::scaledInt(kStrokeBaselineDesign, sf));
             m.audioCartoucheStrokeOutwardPx = juce::jmax(0, m.audioCartoucheStrokePx - strokeBaselinePx);
+
             m.inputGainLabelWidth = static_cast<float>(dimensions.inputGainLabelWidth) * sf;
-            m.labelToControlGap = static_cast<float>(dimensions.labelToControlGap) * sf;
-            m.keyboardFromLabelToComboGap = static_cast<float>(dimensions.keyboardFromLabelToComboGap) * sf;
             m.inputGainLabelToSliderGap = static_cast<float>(dimensions.inputGainLabelToSliderGap) * sf;
-            m.portComboWidth = static_cast<float>(dimensions.portComboBoxWidth) * sf;
             m.inputGainSliderWidth = static_cast<float>(dimensions.inputGainSliderWidth) * sf;
             m.peakIndicatorWidth = static_cast<float>(dimensions.peakIndicatorWidth) * sf;
             m.undoButtonWidth = static_cast<float>(dimensions.undoButtonWidth) * sf;
@@ -115,13 +119,6 @@ namespace
             label.setUiScale(uiScale_);
             const float gapAfter = juce::approximatelyEqual(followingGap, -1.0f) ? gap_ : followingGap;
             x_ += labelWidth + gapAfter;
-        }
-
-        void placeCombo(TSS::ComboBox& combo, float comboWidth)
-        {
-            combo.setBounds(juce::roundToInt(x_), y_, juce::roundToInt(comboWidth), h_);
-            combo.setUiScale(uiScale_);
-            x_ += comboWidth + gap_;
         }
 
         void placeLed(TSS::Led& led)
@@ -200,6 +197,86 @@ namespace
         cluster.undo.setUiScale(cluster.uiScale);
     }
 
+    struct CartoucheBounds
+    {
+        juce::Rectangle<int> badge;
+        juce::Rectangle<int> frame;
+        int strokePx = 1;
+        float nextX = 0.0f;
+    };
+
+    struct MidiMonitoringWidgets
+    {
+        TSS::Led* keyboardLed = nullptr;
+        TSS::Label* keyboardLabel = nullptr;
+        TSS::Led* synthFromLed = nullptr;
+        TSS::Label* synthFromLabel = nullptr;
+        TSS::Led* synthToLed = nullptr;
+        TSS::Label* synthToLabel = nullptr;
+    };
+
+    CartoucheBounds layoutMidiCartouche(const HeaderLayoutMetrics& metrics,
+                                        float uiScale,
+                                        const MidiMonitoringWidgets& widgets)
+    {
+        const int badgeX = juce::roundToInt(metrics.contentStartX);
+        const int badgeW = juce::roundToInt(metrics.midiCartoucheWidth);
+        const int inset = juce::roundToInt(metrics.midiCartoucheInset);
+        const int outward = metrics.midiCartoucheStrokeOutwardPx;
+        const int frameY = metrics.controlY - inset - outward;
+        const int frameH = metrics.controlHeightPx + 2 * inset + 2 * outward;
+
+        PacketPlacer placer(static_cast<float>(badgeX + badgeW + inset), metrics, uiScale);
+        placer.placeLed(*widgets.keyboardLed);
+        placer.placeLabel(*widgets.keyboardLabel, metrics.fromKeyboardLabelWidth);
+        placer.endPacket();
+        placer.placeLed(*widgets.synthFromLed);
+        placer.placeLabel(*widgets.synthFromLabel, metrics.fromSynthLabelWidth);
+        placer.endPacket();
+        placer.placeLed(*widgets.synthToLed);
+        placer.placeLabel(*widgets.synthToLabel, metrics.toSynthLabelWidth);
+
+        const int frameRight = juce::roundToInt(placer.x()) + outward;
+        return {
+            .badge = { badgeX, frameY, badgeW, frameH },
+            .frame = { badgeX, frameY, juce::jmax(badgeW, frameRight - badgeX), frameH },
+            .strokePx = metrics.midiCartoucheStrokePx,
+            .nextX = placer.x()
+        };
+    }
+
+    struct AudioCartoucheWidgets
+    {
+        TSS::Label* gainLabel = nullptr;
+        TSS::Slider* gainSlider = nullptr;
+        TSS::PeakIndicator* peak = nullptr;
+    };
+
+    CartoucheBounds layoutAudioCartouche(const HeaderLayoutMetrics& metrics,
+                                         float uiScale,
+                                         float startX,
+                                         const AudioCartoucheWidgets& widgets)
+    {
+        const int badgeX = juce::roundToInt(startX);
+        const int badgeW = juce::roundToInt(metrics.audioCartoucheWidth);
+        const int inset = juce::roundToInt(metrics.audioCartoucheInset);
+        const int outward = metrics.audioCartoucheStrokeOutwardPx;
+        const int frameY = metrics.controlY - inset - outward;
+        const int frameH = metrics.controlHeightPx + 2 * inset + 2 * outward;
+
+        PacketPlacer placer(static_cast<float>(badgeX + badgeW + inset), metrics, uiScale);
+        placer.placeLabel(*widgets.gainLabel, metrics.inputGainLabelWidth, metrics.inputGainLabelToSliderGap);
+        placer.placeSlider(*widgets.gainSlider, metrics.inputGainSliderWidth);
+        placer.placePeak(*widgets.peak, metrics.peakIndicatorWidth);
+
+        const int frameRight = juce::roundToInt(placer.x()) + outward;
+        return {
+            .badge = { badgeX, frameY, badgeW, frameH },
+            .frame = { badgeX, frameY, juce::jmax(badgeW, frameRight - badgeX), frameH },
+            .strokePx = metrics.audioCartoucheStrokePx,
+            .nextX = placer.x()
+        };
+    }
 }
 
 void HeaderPanel::resized()
@@ -212,57 +289,39 @@ void HeaderPanel::resized()
                     metrics.logoHeight);
     logo_.setUiScale(uiScale_);
 
-    PacketPlacer placer(metrics.contentStartX, metrics, uiScale_);
-
-    placer.placeLed(instrumentActivityLed_);
-    placer.placeLabel(keyboardFromLabel_, metrics.keyboardFromLabelWidth, metrics.keyboardFromLabelToComboGap);
-    placer.placeCombo(keyboardFromComboBox_, metrics.portComboWidth);
-    placer.endPacket();
-
-    placer.placeLed(editorActivityLed_);
-    placer.placeLabel(midiFromLabel_, metrics.editorMidiFromLabelWidth);
-    placer.placeCombo(midiFromComboBox_, metrics.portComboWidth);
-    placer.endPacket();
-
-    placer.placeLed(midiToActivityLed_);
-    placer.placeLabel(midiToLabel_, metrics.midiToLabelWidth, metrics.labelToControlGap);
-    placer.placeCombo(midiToComboBox_, metrics.portComboWidth);
-    placer.endPacket();
+    const auto midi = layoutMidiCartouche(
+        metrics,
+        uiScale_,
+        MidiMonitoringWidgets{ &instrumentActivityLed_,
+                               &keyboardFromLabel_,
+                               &editorActivityLed_,
+                               &midiFromLabel_,
+                               &midiToActivityLed_,
+                               &midiToLabel_ });
+    midiCartoucheBadgeBounds_ = midi.badge;
+    midiCartoucheFrameBounds_ = midi.frame;
+    midiCartoucheStrokePx_ = midi.strokePx;
 
     audioCartoucheBadgeBounds_ = {};
     audioCartoucheFrameBounds_ = {};
     audioCartoucheStrokePx_ = 1;
-
-    if (!isPluginMode_)
+    if (! isPluginMode_)
     {
-        const int badgeX = juce::roundToInt(placer.x());
-        const int badgeW = juce::roundToInt(metrics.audioCartoucheWidth);
-        const int inset = juce::roundToInt(metrics.audioCartoucheInset);
-        const int outward = metrics.audioCartoucheStrokeOutwardPx;
-        const int frameY = placer.y() - inset - outward;
-        const int frameH = placer.h() + 2 * inset + 2 * outward;
-        audioCartoucheBadgeBounds_ = { badgeX, frameY, badgeW, frameH };
-        audioCartoucheStrokePx_ = metrics.audioCartoucheStrokePx;
-
-        PacketPlacer audioPlacer(static_cast<float>(badgeX + badgeW + inset), metrics, uiScale_);
-        audioPlacer.placeLabel(inputGainLabel_, metrics.inputGainLabelWidth, metrics.inputGainLabelToSliderGap);
-        audioPlacer.placeSlider(inputGainSlider_, metrics.inputGainSliderWidth);
-        audioPlacer.placePeak(peakIndicator_, metrics.peakIndicatorWidth);
-
-        // Keep the post-peak gap as air before the closing vertical hairline; grow stroke outward.
-        const int frameRight = juce::roundToInt(audioPlacer.x()) + outward;
-        audioCartoucheFrameBounds_ = {
-            badgeX,
-            frameY,
-            juce::jmax(badgeW, frameRight - badgeX),
-            frameH
-        };
+        const auto audio = layoutAudioCartouche(
+            metrics,
+            uiScale_,
+            midi.nextX,
+            AudioCartoucheWidgets{ &inputGainLabel_, &inputGainSlider_, &peakIndicator_ });
+        audioCartoucheBadgeBounds_ = audio.badge;
+        audioCartoucheFrameBounds_ = audio.frame;
+        audioCartoucheStrokePx_ = audio.strokePx;
     }
 
-    const HeaderActionButtonCluster actionButtons {
-        dimensions_, metrics, uiScale_, getLocalBounds().getRight(), undoButton_, redoButton_, panicButton_ };
-
-    // Standalone and plugin: pin UNDO/REDO/PANIC from the right so logo-gap changes
-    // only shift the left control train and leave breathing room before UNDO.
-    placeActionButtonsFromRight(actionButtons);
+    placeActionButtonsFromRight({ dimensions_,
+                                  metrics,
+                                  uiScale_,
+                                  getLocalBounds().getRight(),
+                                  undoButton_,
+                                  redoButton_,
+                                  panicButton_ });
 }

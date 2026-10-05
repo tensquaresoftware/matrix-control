@@ -94,18 +94,21 @@ namespace PluginIDs
 
         namespace LastTab
         {
+            // Absolute ids after MIDI insert (delivery 3). Delivery-2 stored AUDIO=3 is now
+            // MIDI (same raw id) — not remapped; invalid / plugin-stale ids still coerce.
             constexpr int kUserInterface = 1;
             constexpr int kDevice = 2;
-            constexpr int kAudio = 3;
-            constexpr int kPatch = 4;
-            constexpr int kPatchMutator = 5;
-            constexpr int kMaster = 6;
+            constexpr int kMidi = 3;
+            constexpr int kAudio = 4;
+            constexpr int kPatch = 5;
+            constexpr int kPatchMutator = 6;
+            constexpr int kMaster = 7;
             constexpr int kDefault = kUserInterface;
             constexpr int kFirst = kUserInterface;
             constexpr int kLast = kMaster;
-            constexpr int kMaxCount = 6;
-            constexpr int kStandaloneCount = 6;
-            constexpr int kPluginCount = 5;
+            constexpr int kMaxCount = 7;
+            constexpr int kStandaloneCount = 7;
+            constexpr int kPluginCount = 6;
 
             inline int count(bool isPluginMode) noexcept
             {
@@ -126,10 +129,10 @@ namespace PluginIDs
             inline int idAt(int index, bool isPluginMode) noexcept
             {
                 static constexpr int kStandaloneIds[] = {
-                    kUserInterface, kDevice, kAudio, kPatch, kPatchMutator, kMaster
+                    kUserInterface, kDevice, kMidi, kAudio, kPatch, kPatchMutator, kMaster
                 };
                 static constexpr int kPluginIds[] = {
-                    kUserInterface, kDevice, kPatch, kPatchMutator, kMaster
+                    kUserInterface, kDevice, kMidi, kPatch, kPatchMutator, kMaster
                 };
 
                 if (isPluginMode)

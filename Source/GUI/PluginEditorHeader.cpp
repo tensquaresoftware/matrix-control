@@ -8,6 +8,8 @@
 #include "Core/MIDI/MidiManager.h"
 #include "GUI/About/AboutWindow.h"
 #include "GUI/Panels/MainComponent/HeaderPanel/HeaderPanel.h"
+#include "GUI/Settings/SettingsMidiPage.h"
+#include "GUI/Settings/SettingsPanel.h"
 #include "GUI/Settings/SettingsWindow.h"
 #include "Shared/Definitions/PluginIDs.h"
 
@@ -100,29 +102,31 @@ void PluginEditor::restoreHeaderPanelFromState(HeaderPanel& headerPanel)
 
 void PluginEditor::refreshMidiPortListsFromOsChange(bool revalidateOpenPorts)
 {
-    if (mainComponent_ == nullptr)
-        return;
-
-    auto& headerPanel = mainComponent_->getHeaderPanel();
-
     // Soft dead-port clear: only when presence says not live (skipped on list-only poll).
     if (revalidateOpenPorts)
         pluginProcessor.revalidateOpenMidiPortsForUiRefresh();
 
-    headerPanel.populateMidiPortLists(
-        pluginProcessor.getMidiManager().getOpenInputDeviceId(),
-        pluginProcessor.getMidiManager().getOpenOutputDeviceId(),
-        pluginProcessor.getKeyboardFromOpenDeviceId());
-    headerPanel.selectMidiFromPort(
-        pluginProcessor.getApvts().state.getProperty("midiInputPortId", juce::String()).toString());
-    headerPanel.selectMidiToPort(
-        pluginProcessor.getApvts().state.getProperty("midiOutputPortId", juce::String()).toString());
-
-    if (pluginProcessor.isStandalone())
+    if (auto* panel = getSettingsPanelIfOpen())
     {
-        headerPanel.selectKeyboardFromPort(
-            pluginProcessor.getApvts().state.getProperty("keyboardFromPortId", juce::String()).toString());
+        if (auto* midiPage = panel->getMidiPage())
+        {
+            midiPage->populatePortLists(
+                pluginProcessor.getMidiManager().getOpenInputDeviceId(),
+                pluginProcessor.getMidiManager().getOpenOutputDeviceId(),
+                pluginProcessor.getKeyboardFromOpenDeviceId());
+            midiPage->selectSynthFromPort(
+                pluginProcessor.getApvts().state.getProperty("midiInputPortId", juce::String()).toString());
+            midiPage->selectSynthToPort(
+                pluginProcessor.getApvts().state.getProperty("midiOutputPortId", juce::String()).toString());
+
+            if (pluginProcessor.isStandalone())
+            {
+                midiPage->selectKeyboardFromPort(
+                    pluginProcessor.getApvts().state.getProperty("keyboardFromPortId", juce::String()).toString());
+            }
+        }
     }
 
+    syncPanicFromMidiOutputState();
     refreshEpromTypePromptDialogPorts();
 }

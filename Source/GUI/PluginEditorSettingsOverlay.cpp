@@ -1,14 +1,18 @@
-// Settings overlay lifecycle (open/close + standalone AUDIO page attach).
+// Settings overlay lifecycle (open/close + MIDI / standalone AUDIO page attach).
 
 #include "PluginEditor.h"
 #include "PluginEditorInternal.h"
 
 #include "Core/Audio/AudioPassthroughProcessor.h"
 #include "Core/Audio/StandaloneAudioInputRouter.h"
+#include "Core/MIDI/MidiActivityTracker.h"
+#include "Core/MIDI/MidiManager.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/MainComponent.h"
 #include "GUI/Panels/MainComponent/FooterPanel/FooterPanel.h"
+#include "GUI/Panels/MainComponent/HeaderPanel/HeaderPanel.h"
 #include "GUI/Settings/SettingsAudioPage.h"
+#include "GUI/Settings/SettingsMidiPage.h"
 #include "GUI/Settings/SettingsPanel.h"
 #include "GUI/Settings/SettingsShellMetrics.h"
 #include "GUI/Settings/SettingsWindow.h"
@@ -31,6 +35,108 @@ void PluginEditor::attachStandaloneAudioSettingsPage(SettingsPanel& panel)
         wireSynthFromComboChange(*audioPage);
 }
 
+void PluginEditor::attachMidiSettingsPage(SettingsPanel& panel)
+{
+    const bool isNewPage = panel.getMidiPage() == nullptr;
+    if (isNewPage)
+    {
+        panel.attachMidiPage(SettingsMidiPage::Config{
+            .skin = skin_,
+            .isPluginMode = ! pluginProcessor.isStandalone(),
+            .activityTrackerProvider = [this]() -> const Core::MidiActivityTracker&
+            {
+                return pluginProcessor.getMidiActivityTracker();
+            },
+            .onPortListsRefreshRequested = [this] { refreshMidiPortListsFromOsChange(); }});
+    }
+
+    auto* midiPage = panel.getMidiPage();
+    if (midiPage == nullptr)
+        return;
+
+    if (isNewPage)
+        wireMidiPagePortChanges(*midiPage);
+
+    midiPage->populatePortLists(
+        pluginProcessor.getMidiManager().getOpenInputDeviceId(),
+        pluginProcessor.getMidiManager().getOpenOutputDeviceId(),
+        pluginProcessor.getKeyboardFromOpenDeviceId());
+    midiPage->selectSynthFromPort(
+        pluginProcessor.getApvts().state.getProperty("midiInputPortId", juce::String()).toString());
+    midiPage->selectSynthToPort(
+        pluginProcessor.getApvts().state.getProperty("midiOutputPortId", juce::String()).toString());
+    if (pluginProcessor.isStandalone())
+    {
+        midiPage->selectKeyboardFromPort(
+            pluginProcessor.getApvts().state.getProperty("keyboardFromPortId", juce::String()).toString());
+    }
+}
+
+void PluginEditor::wireMidiPagePortChanges(SettingsMidiPage& midiPage)
+{
+    midiPage.getSynthFromCombo().onChange = [this, &midiPage]
+    {
+        const auto previousPortId =
+            pluginProcessor.getApvts().state.getProperty("midiInputPortId", juce::String()).toString();
+        const auto selectedPortId = midiPage.getSelectedSynthFromPortId();
+
+        if (pluginProcessor.setMidiInputPort(selectedPortId))
+            return;
+
+        midiPage.selectSynthFromPort(previousPortId);
+        if (previousPortId.isNotEmpty())
+            pluginProcessor.setMidiInputPort(previousPortId);
+    };
+
+    midiPage.getSynthToCombo().onChange = [this, &midiPage]
+    {
+        const auto previousPortId =
+            pluginProcessor.getApvts().state.getProperty("midiOutputPortId", juce::String()).toString();
+        const auto selectedPortId = midiPage.getSelectedSynthToPortId();
+
+        if (pluginProcessor.setMidiOutputPort(selectedPortId))
+        {
+            syncPanicFromMidiOutputState();
+            return;
+        }
+
+        midiPage.selectSynthToPort(previousPortId);
+        if (previousPortId.isNotEmpty())
+            pluginProcessor.setMidiOutputPort(previousPortId);
+        syncPanicFromMidiOutputState();
+    };
+
+    if (auto* keyboardCombo = midiPage.getKeyboardFromCombo())
+    {
+        keyboardCombo->onChange = [this, &midiPage]
+        {
+            if (! pluginProcessor.isStandalone())
+                return;
+
+            const auto previousPortId =
+                pluginProcessor.getApvts().state.getProperty("keyboardFromPortId", juce::String()).toString();
+            const auto selectedPortId = midiPage.getSelectedKeyboardFromPortId();
+
+            if (pluginProcessor.setKeyboardFromPort(selectedPortId))
+                return;
+
+            midiPage.selectKeyboardFromPort(previousPortId);
+            if (previousPortId.isNotEmpty())
+                pluginProcessor.setKeyboardFromPort(previousPortId);
+        };
+    }
+}
+
+void PluginEditor::syncPanicFromMidiOutputState()
+{
+    if (mainComponent_ == nullptr)
+        return;
+
+    const auto outputId =
+        pluginProcessor.getApvts().state.getProperty("midiOutputPortId", juce::String()).toString();
+    mainComponent_->getHeaderPanel().setPanicMidiOutputAvailable(outputId.isNotEmpty());
+}
+
 void PluginEditor::openSettingsWindow()
 {
     closeAboutWindow();
@@ -44,6 +150,7 @@ void PluginEditor::openSettingsWindow()
             isPluginMode,
             [this, isPluginMode](SettingsPanel& panel)
             {
+                attachMidiSettingsPage(panel);
                 if (! isPluginMode)
                     attachStandaloneAudioSettingsPage(panel);
                 panel.registerContextualHelp([this]() -> FooterPanel*
@@ -66,6 +173,7 @@ void PluginEditor::openSettingsWindow()
     }
 
     auto& panel = settingsWindow_->getSettingsPanel();
+    attachMidiSettingsPage(panel);
     if (! isPluginMode && panel.getAudioPage() == nullptr)
         attachStandaloneAudioSettingsPage(panel);
 
@@ -94,9 +202,10 @@ void PluginEditor::closeSettingsWindow()
 
     if (settingsWindow_ != nullptr)
     {
+        if (auto* midiPage = settingsWindow_->getSettingsPanel().getMidiPage())
+            midiPage->setMonitoringActive(false);
         if (auto* audioPage = settingsWindow_->getSettingsPanel().getAudioPage())
             audioPage->setMonitoringActive(false);
         settingsWindow_->setVisible(false);
     }
 }
-

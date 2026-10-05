@@ -1,6 +1,8 @@
 #include <juce_core/juce_core.h>
 #include <juce_data_structures/juce_data_structures.h>
 
+#include "Core/MIDI/MidiActivityTracker.h"
+#include "GUI/Helpers/MidiActivityLedLevels.h"
 #include "GUI/Settings/AudioDeviceSetupSync.h"
 #include "GUI/Settings/SettingsShellMetrics.h"
 #include "GUI/Widgets/RadioButtonGroupLayout.h"
@@ -20,8 +22,9 @@ public:
         firstOpenDefaultsToUserInterface();
         reopenRestoresPatchTab();
         reopenRestoresAudioTab();
+        reopenRestoresMidiTab();
         pluginDeviceShowsLatencyWithoutAudioTab();
-        standaloneIncludesAudioTab();
+        standaloneIncludesMidiAndAudioTabs();
         writeAndCoerceLastTab();
         pluginCoercesStaleAudioLastTab();
         radioButtonGroupWrapPolicy();
@@ -30,6 +33,9 @@ public:
         asioDeviceListsStayLinked();
         asioApplyPathResolvesEndpointNames();
         headerAudioProductCopy();
+        headerMidiProductCopy();
+        settingsMidiKeyboardFromHostPolicy();
+        midiActivityLedPathContract();
         tightHostClampsAndCentresDialog();
         uiScaleKeepsIntegerRuleAndColumns();
     }
@@ -79,37 +85,61 @@ private:
                      PluginIDs::Settings::LastTab::kAudio);
     }
 
+    void reopenRestoresMidiTab()
+    {
+        beginTest("Reopen - last MIDI tab is restored");
+
+        auto state = makeState();
+        SettingsShellMetrics::writeLastTab(state, PluginIDs::Settings::LastTab::kMidi, false);
+
+        expectEquals(SettingsShellMetrics::readAndCoerceLastTab(state, false),
+                     PluginIDs::Settings::LastTab::kMidi);
+        expectEquals(static_cast<int>(state.getProperty(PluginIDs::Settings::kLastSettingsTab)),
+                     PluginIDs::Settings::LastTab::kMidi);
+    }
+
     void pluginDeviceShowsLatencyWithoutAudioTab()
     {
-        beginTest("Plugin DEVICE - latency helper; five tabs without AUDIO");
+        beginTest("Plugin DEVICE - latency helper; six tabs with MIDI without AUDIO");
 
         expect(SettingsShellMetrics::deviceShowsHardwareLatency(true));
         expect(! SettingsShellMetrics::showsAudioTab(true));
         expectEquals(SettingsShellMetrics::tabCount(true), PluginIDs::Settings::LastTab::kPluginCount);
         expectEquals(juce::String(SettingsShellMetrics::tabLabel(0, true)), juce::String("USER INTERFACE"));
         expectEquals(juce::String(SettingsShellMetrics::tabLabel(1, true)), juce::String("DEVICE"));
-        expectEquals(juce::String(SettingsShellMetrics::tabLabel(2, true)), juce::String("PATCH"));
-        expectEquals(juce::String(SettingsShellMetrics::tabLabel(3, true)), juce::String("PATCH MUTATOR"));
-        expectEquals(juce::String(SettingsShellMetrics::tabLabel(4, true)), juce::String("MASTER"));
-        expectEquals(juce::String(SettingsShellMetrics::tabLabel(5, true)), juce::String());
+        expectEquals(juce::String(SettingsShellMetrics::tabLabel(2, true)), juce::String("MIDI"));
+        expectEquals(juce::String(SettingsShellMetrics::tabLabel(3, true)), juce::String("PATCH"));
+        expectEquals(juce::String(SettingsShellMetrics::tabLabel(4, true)), juce::String("PATCH MUTATOR"));
+        expectEquals(juce::String(SettingsShellMetrics::tabLabel(5, true)), juce::String("MASTER"));
+        expectEquals(juce::String(SettingsShellMetrics::tabLabel(6, true)), juce::String());
         expectEquals(juce::String(PluginDisplayNames::Settings::kHardwareLatencyLabel),
                      juce::String("HARDWARE LATENCY"));
     }
 
-    void standaloneIncludesAudioTab()
+    void standaloneIncludesMidiAndAudioTabs()
     {
-        beginTest("Standalone - AUDIO tab after DEVICE");
+        beginTest("Standalone - MIDI then AUDIO after DEVICE");
 
         expect(SettingsShellMetrics::showsAudioTab(false));
         expectEquals(SettingsShellMetrics::tabCount(false), PluginIDs::Settings::LastTab::kStandaloneCount);
         expectEquals(juce::String(SettingsShellMetrics::tabLabel(0, false)), juce::String("USER INTERFACE"));
         expectEquals(juce::String(SettingsShellMetrics::tabLabel(1, false)), juce::String("DEVICE"));
-        expectEquals(juce::String(SettingsShellMetrics::tabLabel(2, false)), juce::String("AUDIO"));
-        expectEquals(juce::String(SettingsShellMetrics::tabLabel(3, false)), juce::String("PATCH"));
-        expectEquals(juce::String(SettingsShellMetrics::tabLabel(4, false)), juce::String("PATCH MUTATOR"));
-        expectEquals(juce::String(SettingsShellMetrics::tabLabel(5, false)), juce::String("MASTER"));
+        expectEquals(juce::String(SettingsShellMetrics::tabLabel(2, false)), juce::String("MIDI"));
+        expectEquals(juce::String(SettingsShellMetrics::tabLabel(3, false)), juce::String("AUDIO"));
+        expectEquals(juce::String(SettingsShellMetrics::tabLabel(4, false)), juce::String("PATCH"));
+        expectEquals(juce::String(SettingsShellMetrics::tabLabel(5, false)), juce::String("PATCH MUTATOR"));
+        expectEquals(juce::String(SettingsShellMetrics::tabLabel(6, false)), juce::String("MASTER"));
         expectEquals(PluginIDs::Settings::LastTab::idAt(2, false),
+                     PluginIDs::Settings::LastTab::kMidi);
+        expectEquals(PluginIDs::Settings::LastTab::idAt(3, false),
                      PluginIDs::Settings::LastTab::kAudio);
+        expectEquals(PluginIDs::Settings::LastTab::kMidi, 3);
+        expectEquals(PluginIDs::Settings::LastTab::normalize(3, false),
+                     PluginIDs::Settings::LastTab::kMidi);
+        expectEquals(PluginIDs::Settings::LastTab::kAudio, 4);
+        expectEquals(PluginIDs::Settings::LastTab::kPatch, 5);
+        expectEquals(PluginIDs::Settings::LastTab::kPatchMutator, 6);
+        expectEquals(PluginIDs::Settings::LastTab::kMaster, 7);
     }
 
     void writeAndCoerceLastTab()
@@ -258,6 +288,53 @@ private:
         AudioDeviceSetupSync::resolveEndpointNamesForApply("ASIO Fireface", input, output, true);
         expect(input.isEmpty());
         expect(output.isEmpty());
+    }
+
+    void headerMidiProductCopy()
+    {
+        beginTest("Header MIDI - monitoring labels and Settings cabling vocabulary");
+
+        expectEquals(juce::String(PluginDisplayNames::HeaderPanel::kMidiCartoucheLabel),
+                     juce::String("MIDI"));
+        expectEquals(juce::String(PluginDisplayNames::HeaderPanel::kFromKeyboardLabel),
+                     juce::String("FROM KEYBOARD"));
+        expectEquals(juce::String(PluginDisplayNames::HeaderPanel::kFromSynthLabel),
+                     juce::String("FROM SYNTH"));
+        expectEquals(juce::String(PluginDisplayNames::HeaderPanel::kToSynthLabel),
+                     juce::String("TO SYNTH"));
+        expectEquals(juce::String(PluginDisplayNames::Settings::kMidiTab),
+                     juce::String("MIDI"));
+        expectEquals(juce::String(PluginDisplayNames::Settings::kKeyboardFromLabel),
+                     juce::String("KEYBOARD FROM"));
+        expectEquals(juce::String(PluginDisplayNames::Settings::kSynthFromLabel),
+                     juce::String("SYNTH FROM"));
+        expectEquals(juce::String(PluginDisplayNames::Settings::kSynthToLabel),
+                     juce::String("SYNTH TO"));
+        expectEquals(juce::String(PluginDisplayNames::FooterPanel::kMidiFromKeyboardFromConflictFooter),
+                     juce::String("SYNTH FROM and KEYBOARD FROM must use different MIDI input devices."));
+    }
+
+    void settingsMidiKeyboardFromHostPolicy()
+    {
+        beginTest("Settings MIDI - KEYBOARD FROM row is standalone-only");
+
+        expect(SettingsShellMetrics::showsKeyboardFromRow(false));
+        expect(! SettingsShellMetrics::showsKeyboardFromRow(true));
+        expect(SettingsShellMetrics::showsAudioTab(false));
+        expect(! SettingsShellMetrics::showsAudioTab(true));
+    }
+
+    void midiActivityLedPathContract()
+    {
+        beginTest("MIDI LEDs - shared tracker paths for keyboard / synth-from / synth-to");
+
+        using namespace TSS::MidiActivityLedLevels;
+        expect(kKeyboardPath == Core::MidiActivityTracker::Path::kInstrument);
+        expect(kSynthFromPath == Core::MidiActivityTracker::Path::kMidiFromInbound);
+        expect(kSynthToPath == Core::MidiActivityTracker::Path::kOutbound);
+        expect(kKeyboardPath != Core::MidiActivityTracker::Path::kEditor);
+        expect(kSynthFromPath != Core::MidiActivityTracker::Path::kEditor);
+        expect(kSynthToPath != Core::MidiActivityTracker::Path::kEditor);
     }
 
     void headerAudioProductCopy()

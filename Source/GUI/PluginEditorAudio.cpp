@@ -20,6 +20,7 @@
 #include "GUI/About/AboutWindow.h"
 #include "GUI/Panels/MainComponent/HeaderPanel/HeaderPanel.h"
 #include "GUI/Settings/SettingsAudioPage.h"
+#include "GUI/Settings/SettingsMidiPage.h"
 #include "GUI/Settings/SettingsPanel.h"
 #include "GUI/Settings/SettingsWindow.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
@@ -212,19 +213,34 @@ void PluginEditor::syncMidiPortSelectionFromState(const juce::String& propertyNa
     juce::MessageManager::callAsync(
         [safeThis = juce::Component::SafePointer<PluginEditor>(this), propertyName]
         {
-            if (safeThis == nullptr || safeThis->mainComponent_ == nullptr)
+            if (safeThis == nullptr)
                 return;
 
-            auto& header = safeThis->mainComponent_->getHeaderPanel();
             auto& state = safeThis->pluginProcessor.getApvts().state;
+            if (auto* panel = safeThis->getSettingsPanelIfOpen())
+            {
+                if (auto* midiPage = panel->getMidiPage())
+                {
+                    if (propertyName == "midiInputPortId")
+                    {
+                        midiPage->selectSynthFromPort(
+                            state.getProperty("midiInputPortId", juce::String()).toString());
+                    }
+                    else if (propertyName == "midiOutputPortId")
+                    {
+                        midiPage->selectSynthToPort(
+                            state.getProperty("midiOutputPortId", juce::String()).toString());
+                    }
+                    else if (safeThis->pluginProcessor.isStandalone())
+                    {
+                        midiPage->selectKeyboardFromPort(
+                            state.getProperty("keyboardFromPortId", juce::String()).toString());
+                    }
+                }
+            }
 
-            if (propertyName == "midiInputPortId")
-                header.selectMidiFromPort(state.getProperty("midiInputPortId", juce::String()).toString());
-            else if (propertyName == "midiOutputPortId")
-                header.selectMidiToPort(state.getProperty("midiOutputPortId", juce::String()).toString());
-            else if (safeThis->pluginProcessor.isStandalone())
-                header.selectKeyboardFromPort(
-                    state.getProperty("keyboardFromPortId", juce::String()).toString());
+            if (propertyName == "midiOutputPortId")
+                safeThis->syncPanicFromMidiOutputState();
         });
 }
 

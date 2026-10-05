@@ -2278,3 +2278,9 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-settings-audio-tab.md`
   summary: headerAudioProductCopy only asserts display-name constants, not logo menu item kinds excluding Audio/MIDI (reconfirmed).
   evidence: Already deferred 2026-10-04; shortcut rejection covers Cmd/Ctrl+Alt+,; menu structure stays smoke/manual.
+
+## Deferred from: review of spec-settings-midi-tab-header-monitoring.md (2026-10-05)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-settings-midi-tab-header-monitoring.md`
+  summary: Contextual-help inventory markdown still lists pre-cutover header MIDI FROM/TO combo help strings.
+  evidence: Product copy in PluginDisplayNames.h already updated; inventory doc sync is a separate docs pass.

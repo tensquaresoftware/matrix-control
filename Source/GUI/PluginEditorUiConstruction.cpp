@@ -150,15 +150,9 @@ void PluginEditor::restoreAndWireHeader()
     wireHeaderPanel(headerPanel);
 
     headerPanel.setPluginMode(!pluginProcessor.isStandalone());
-    headerPanel.refreshPortLists();
 
     pluginProcessor.restoreMidiPortsForHost();
-
-    // Combo must mirror open reality after restore/sync (APVTS may have been cleared on failure).
-    headerPanel.selectMidiFromPort(
-        pluginProcessor.getApvts().state.getProperty("midiInputPortId", juce::String()).toString());
-    headerPanel.selectMidiToPort(
-        pluginProcessor.getApvts().state.getProperty("midiOutputPortId", juce::String()).toString());
+    syncPanicFromMidiOutputState();
 
     if (pluginProcessor.isStandalone())
     {
@@ -169,9 +163,6 @@ void PluginEditor::restoreAndWireHeader()
             // Open failure or MIDI From conflict — drop the dead selection.
             pluginProcessor.setKeyboardFromPort({});
         }
-
-        headerPanel.selectKeyboardFromPort(
-            pluginProcessor.getApvts().state.getProperty("keyboardFromPortId", juce::String()).toString());
 
         // First-run criterion C: Input None + AUDIO FROM empty once, then set flag.
         if (Core::StandaloneAudioInputRouter::applySceneAudioSafetyDefaultsIfNeeded())
@@ -193,50 +184,6 @@ void PluginEditor::restoreAndWireHeader()
 
 void PluginEditor::wireHeaderRuntimeControls(HeaderPanel& headerPanel)
 {
-    headerPanel.onMidiPortListsRefreshRequested = [this] { refreshMidiPortListsFromOsChange(); };
-
-    headerPanel.getMidiFromComboBox().onChange = [this, &headerPanel]
-    {
-        const auto previousPortId = pluginProcessor.getApvts().state.getProperty("midiInputPortId", juce::String()).toString();
-        const auto selectedPortId = headerPanel.getSelectedMidiFromPortIdentifier();
-
-        if (pluginProcessor.setMidiInputPort(selectedPortId))
-            return;
-
-        headerPanel.selectMidiFromPort(previousPortId);
-        if (previousPortId.isNotEmpty())
-            pluginProcessor.setMidiInputPort(previousPortId);
-    };
-
-    headerPanel.getMidiToComboBox().onChange = [this, &headerPanel]
-    {
-        const auto previousPortId = pluginProcessor.getApvts().state.getProperty("midiOutputPortId", juce::String()).toString();
-        const auto selectedPortId = headerPanel.getSelectedMidiToPortIdentifier();
-
-        if (pluginProcessor.setMidiOutputPort(selectedPortId))
-            return;
-
-        headerPanel.selectMidiToPort(previousPortId);
-        if (previousPortId.isNotEmpty())
-            pluginProcessor.setMidiOutputPort(previousPortId);
-    };
-
-    headerPanel.getKeyboardFromComboBox().onChange = [this, &headerPanel]
-    {
-        if (!pluginProcessor.isStandalone())
-            return;
-
-        const auto previousPortId = pluginProcessor.getApvts().state.getProperty("keyboardFromPortId", juce::String()).toString();
-        const auto selectedPortId = headerPanel.getSelectedKeyboardFromPortIdentifier();
-
-        if (pluginProcessor.setKeyboardFromPort(selectedPortId))
-            return;
-
-        headerPanel.selectKeyboardFromPort(previousPortId);
-        if (previousPortId.isNotEmpty())
-            pluginProcessor.setKeyboardFromPort(previousPortId);
-    };
-
     headerPanel.getInputGainSlider().onValueChange = [this, &headerPanel]
     {
         if (!pluginProcessor.isStandalone())
@@ -245,7 +192,6 @@ void PluginEditor::wireHeaderRuntimeControls(HeaderPanel& headerPanel)
         const int index = static_cast<int>(std::round(headerPanel.getInputGainSlider().getValue()));
         pluginProcessor.setInputGainDb(PluginAudioConstants::inputGainIndexToDb(index));
     };
-
 }
 
 void PluginEditor::wireSynthFromComboChange(SettingsAudioPage& audioPage)

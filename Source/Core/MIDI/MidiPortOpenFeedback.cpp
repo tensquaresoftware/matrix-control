@@ -49,8 +49,8 @@ juce::String formatFooterMessage(bool isInput,
                                  MidiPortOpenFailureReason reason)
 {
     const juce::String direction = isInput
-                                       ? PluginDisplayNames::HeaderPanel::kEditorMidiFromLabel
-                                       : PluginDisplayNames::HeaderPanel::kMidiToLabel;
+                                       ? PluginDisplayNames::Settings::kSynthFromLabel
+                                       : PluginDisplayNames::Settings::kSynthToLabel;
     const juce::String displayName = portDisplayName.isNotEmpty() ? portDisplayName : "Unknown port";
 
     if (reason == MidiPortOpenFailureReason::kNotFound)

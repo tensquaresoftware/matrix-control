@@ -330,6 +330,7 @@ set(PLUGIN_SOURCES
     Source/GUI/Settings/SettingsAudioPage.cpp
     Source/GUI/Settings/SettingsAudioPageDevices.cpp
     Source/GUI/Settings/SettingsAudioPageLayout.cpp
+    Source/GUI/Settings/SettingsMidiPage.cpp
     Source/GUI/Settings/SettingsPanel.cpp
     Source/GUI/Widgets/RadioButtonGroup.cpp
     Source/GUI/Settings/SettingsPanelSetup.cpp

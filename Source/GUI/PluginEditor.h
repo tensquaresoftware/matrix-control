@@ -21,9 +21,10 @@
 class WidgetFactory;
 class HeaderPanel;
 class SettingsPanel;
+class SettingsAudioPage;
+class SettingsMidiPage;
 class SettingsWindow;
 class AboutWindow;
-class SettingsAudioPage;
 class MasterInitConfirmDialog;
 class MasterM1kmLoadChoiceDialog;
 class MutatorHistoryDefragConfirmDialog;
@@ -56,7 +57,7 @@ public:
     void fileDragExit(const juce::StringArray& files) override;
     void filesDropped(const juce::StringArray& files, int x, int y) override;
 
-    /** Refresh header MIDI port combos after an OS MIDI device-list change.
+    /** Refresh Settings MIDI page port lists after an OS MIDI device-list change.
         When revalidateOpenPorts is false (open-menu poll), only rebuild lists — no force-reopen. */
     void refreshMidiPortListsFromOsChange(bool revalidateOpenPorts = true);
 
@@ -151,6 +152,9 @@ private:
     // attachEditorRuntimeListeners() sub-binding (PluginEditorUiConstruction.cpp).
     void wireHeaderRuntimeControls(HeaderPanel& headerPanel);
     void wireSynthFromComboChange(SettingsAudioPage& audioPage);
+    void wireMidiPagePortChanges(SettingsMidiPage& midiPage);
+    void syncPanicFromMidiOutputState();
+    void attachMidiSettingsPage(SettingsPanel& panel);
 
     void refreshAudioFromCombo();
     void applyAudioCatalogToSettings(SettingsAudioPage& audioPage,

@@ -195,17 +195,19 @@ namespace TSS::Design
             inline constexpr int kGap = 4;
             inline constexpr int kPacketExternalGap = kGap * 4;
             inline constexpr int kLabelToControlGap = 0;
-            inline constexpr int kKeyboardFromLabelToComboGap = kLabelToControlGap - kGap;
-            inline constexpr int kEditorMidiFromLabelWidth = 48;
             inline constexpr int kInputGainLabelToSliderGap = kLabelToControlGap - kGap;
-            inline constexpr int kMidiToLabelWidth = 40;
-            inline constexpr int kKeyboardFromLabelWidth = 84;
+            // Monitoring labels (LED + label only) after MIDI cartouche cutover.
+            inline constexpr int kFromKeyboardLabelWidth = 84;
+            inline constexpr int kFromSynthLabelWidth = 64;
+            inline constexpr int kToSynthLabelWidth = 52;
+            inline constexpr int kMidiCartoucheWidth = 36;
+            inline constexpr int kMidiCartoucheInset = 4;
+            inline constexpr int kMidiCartoucheStrokeThickness = 1;
             inline constexpr int kAudioCartoucheWidth = 44;
             // Gap badge→content, and air between frame hairlines and content (slider / peak).
             inline constexpr int kAudioCartoucheInset = 4;
             inline constexpr int kAudioCartoucheStrokeThickness = 1;
             inline constexpr int kInputGainLabelWidth = 60;
-            inline constexpr int kPortComboBoxWidth = 112;
             inline constexpr int kInputGainSliderWidth = 60;
             inline constexpr int kPeakIndicatorWidth = 12;
             inline constexpr int kPanicButtonWidth = 44;

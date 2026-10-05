@@ -55,6 +55,7 @@ namespace SettingsShellMetrics
         {
             case kUserInterface: return kUserInterfaceTab;
             case kDevice: return kDeviceSection;
+            case kMidi: return kMidiTab;
             case kAudio: return kAudioTab;
             case kPatch: return kPatchSection;
             case kPatchMutator: return kPatchMutatorSection;
@@ -82,6 +83,12 @@ namespace SettingsShellMetrics
     }
 
     inline bool showsAudioTab(bool isPluginMode) noexcept
+    {
+        return ! isPluginMode;
+    }
+
+    /** Settings MIDI cabling: KEYBOARD FROM is standalone-only (plugin keyboard is HOST). */
+    inline bool showsKeyboardFromRow(bool isPluginMode) noexcept
     {
         return ! isPluginMode;
     }

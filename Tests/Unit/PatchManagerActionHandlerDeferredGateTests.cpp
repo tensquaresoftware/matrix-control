@@ -53,7 +53,7 @@ private:
         expect(harness.proc.apvts.state.getProperty("uiMessageSeverity").toString() == "warning");
         expectEquals(harness.proc.apvts.state.getProperty("uiMessageText").toString(),
                      juce::String("PATCH MUTATOR: Could not read the patch from the synth. Keeping the displayed bank and patch "
-                                  "numbers and the current editor buffer. Check that MIDI FROM is the synth MIDI OUT."));
+                                  "numbers and the current editor buffer. Check that SYNTH FROM is the synth MIDI OUT."));
         expect(harness.model.getName() == "DIRTY!!!");
     }
 

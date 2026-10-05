@@ -10,6 +10,7 @@
 #include "GUI/Widgets/Slider.h"
 #include "GUI/Helpers/ContextualHelpBinder.h"
 #include "GUI/Settings/SettingsAudioPage.h"
+#include "GUI/Settings/SettingsMidiPage.h"
 #include "GUI/Settings/SettingsShellMetrics.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
 
@@ -38,6 +39,9 @@ public:
 
     void attachAudioPage(SettingsAudioPage::Config config);
     SettingsAudioPage* getAudioPage() const noexcept { return audioPage_.get(); }
+
+    void attachMidiPage(SettingsMidiPage::Config config);
+    SettingsMidiPage* getMidiPage() const noexcept { return midiPage_.get(); }
 
     void registerContextualHelp(TSS::ContextualHelpBinder::FooterResolver resolveFooter);
 
@@ -106,6 +110,7 @@ private:
     void layoutContent(juce::Rectangle<int> bounds);
     void layoutInterfaceSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics);
     void layoutDeviceSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics);
+    void layoutMidiSection(juce::Rectangle<int>& bounds);
     void layoutAudioSection(juce::Rectangle<int>& bounds);
     void layoutPatchSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics);
     void layoutPatchMutatorSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics);
@@ -184,6 +189,7 @@ private:
     std::unique_ptr<TSS::Button> masterSaveAsInitButton_;
     std::unique_ptr<TSS::Button> masterDeleteInitButton_;
 
+    std::unique_ptr<SettingsMidiPage> midiPage_;
     std::unique_ptr<SettingsAudioPage> audioPage_;
     std::unique_ptr<TSS::ContextualHelpBinder> contextualHelpBinder_;
 

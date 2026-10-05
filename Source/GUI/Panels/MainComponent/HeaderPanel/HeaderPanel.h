@@ -1,12 +1,10 @@
 #pragma once
 
 #include <functional>
-#include <vector>
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
 #include "GUI/Widgets/Led.h"
-#include "GUI/Widgets/ComboBox.h"
 #include "GUI/Widgets/Label.h"
 #include "GUI/Widgets/Logo.h"
 #include "GUI/Widgets/PeakIndicator.h"
@@ -21,17 +19,11 @@
 namespace TSS
 {
     class ISkin;
-    class Label;
-    class ComboBox;
 }
 
 class HeaderPanel : public juce::Component
 {
 public:
-    static constexpr int kPortSentinelItemId = 1;
-    static constexpr int kFirstDeviceItemId = 2;
-    static constexpr int kPluginHostItemId = 2;
-
     HeaderPanel(TSS::ISkin& skin, const HeaderPanelDimensions& dimensions);
     ~HeaderPanel() override;
 
@@ -40,15 +32,6 @@ public:
     void setSkin(TSS::ISkin& skin);
     void setUiScale(float uiScale);
     void setPluginMode(bool isPlugin);
-
-    void populateMidiPortLists();
-    void populateMidiPortLists(const juce::String& keepOpenInputId,
-                               const juce::String& keepOpenOutputId,
-                               const juce::String& keepOpenKeyboardFromId);
-    void refreshPortLists() { populateMidiPortLists(); }
-
-    /** When set, MIDI combo about-to-show uses this instead of a bare refreshPortLists(). */
-    std::function<void()> onMidiPortListsRefreshRequested;
 
     void setCurrentSkinItemId(int skinItemId) { currentSkinItemId_ = skinItemId; }
     void setCurrentUiScaleId(int scaleId) { currentUiScaleId_ = scaleId; }
@@ -63,22 +46,10 @@ public:
     std::function<void()> onUiTestsToggleRequested;
 #endif
 
-    juce::String getSelectedMidiFromPortIdentifier() const;
-    juce::String getSelectedMidiToPortIdentifier() const;
-    juce::String getSelectedKeyboardFromPortIdentifier() const;
-
-    void selectMidiFromPort(const juce::String& deviceId);
-    void selectMidiToPort(const juce::String& deviceId);
-    void selectKeyboardFromPort(const juce::String& deviceId);
-
     void setPanicQueuePressureAlert(bool active);
     void setPanicMidiOutputAvailable(bool available);
-    void syncPanicEnabledFromMidiToSelection();
     void syncEditorialUndoRedoAvailability(bool canUndo, bool canRedo);
 
-    TSS::ComboBox& getMidiFromComboBox() { return midiFromComboBox_; }
-    TSS::ComboBox& getMidiToComboBox() { return midiToComboBox_; }
-    TSS::ComboBox& getKeyboardFromComboBox() { return keyboardFromComboBox_; }
     TSS::Led& getInstrumentActivityLed() { return instrumentActivityLed_; }
     TSS::Led& getEditorActivityLed() { return editorActivityLed_; }
     TSS::Led& getMidiToActivityLed() { return midiToActivityLed_; }
@@ -95,16 +66,9 @@ private:
     void addChildControls(TSS::ISkin& skin);
     void applyPanicButtonLook();
     void registerContextualHelp();
+    void paintMidiCartouche(juce::Graphics& g);
     void paintAudioCartouche(juce::Graphics& g);
-
-    void updateKeyboardFromVisibility();
     void updateAudioControlsVisibility();
-    void configureStandaloneKeyboardFrom();
-    void configurePluginKeyboardFrom();
-    int findItemIdForIdentifier(const std::vector<juce::String>& identifiers,
-                                const juce::String& deviceId) const;
-    juce::String getSelectedPortIdentifier(const TSS::ComboBox& combo,
-                                           const std::vector<juce::String>& identifiers) const;
 
     HeaderPanelDimensions dimensions_;
     TSS::ISkin* skin_;
@@ -113,30 +77,26 @@ private:
     bool panicAlertActive_ = false;
     int currentSkinItemId_ = static_cast<int>(TSS::Skin::SkinComboBoxItemId::kBlack);
     int currentUiScaleId_ = PluginIDs::Settings::ScaleLevels::kDefault;
+    juce::Rectangle<int> midiCartoucheBadgeBounds_;
+    juce::Rectangle<int> midiCartoucheFrameBounds_;
+    int midiCartoucheStrokePx_ = 1;
     juce::Rectangle<int> audioCartoucheBadgeBounds_;
     juce::Rectangle<int> audioCartoucheFrameBounds_;
     int audioCartoucheStrokePx_ = 1;
 
     TSS::Logo logo_;
-    TSS::Label midiFromLabel_;
-    TSS::ComboBox midiFromComboBox_;
-    TSS::Led editorActivityLed_;
-    TSS::Label midiToLabel_;
-    TSS::ComboBox midiToComboBox_;
-    TSS::Led midiToActivityLed_;
-    TSS::Label keyboardFromLabel_;
-    TSS::ComboBox keyboardFromComboBox_;
     TSS::Led instrumentActivityLed_;
+    TSS::Label keyboardFromLabel_;
+    TSS::Led editorActivityLed_;
+    TSS::Label midiFromLabel_;
+    TSS::Led midiToActivityLed_;
+    TSS::Label midiToLabel_;
     TSS::Label inputGainLabel_;
     TSS::Slider inputGainSlider_;
     TSS::PeakIndicator peakIndicator_;
     TSS::Button undoButton_;
     TSS::Button redoButton_;
     TSS::Button panicButton_;
-
-    std::vector<juce::String> midiFromPortIdentifiers_;
-    std::vector<juce::String> midiToPortIdentifiers_;
-    std::vector<juce::String> keyboardFromPortIdentifiers_;
 
     std::unique_ptr<TSS::ContextualHelpBinder> contextualHelpBinder_;
 

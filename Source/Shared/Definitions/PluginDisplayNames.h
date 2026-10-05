@@ -13,14 +13,15 @@ namespace PluginDisplayNames
 
     namespace HeaderPanel
     {
-        constexpr const char* kEditorMidiFromLabel = "MIDI FROM";
-        constexpr const char* kMidiToLabel         = "MIDI TO";
-        constexpr const char* kKeyboardFromLabel   = "KEYBOARD FROM";
+        // Monitoring labels (header) — Settings cabling uses KEYBOARD FROM / SYNTH FROM / SYNTH TO.
+        constexpr const char* kFromKeyboardLabel   = "FROM KEYBOARD";
+        constexpr const char* kFromSynthLabel      = "FROM SYNTH";
+        constexpr const char* kToSynthLabel        = "TO SYNTH";
+        constexpr const char* kMidiCartoucheLabel  = "MIDI";
         constexpr const char* kAudioCartoucheLabel = "AUDIO";
         constexpr const char* kInputGainLabel      = "INPUT GAIN";
         constexpr const char* kNoInputSentinel     = "NO INPUT";
         constexpr const char* kNoOutputSentinel    = "NO OUTPUT";
-        constexpr const char* kHostDisplay         = "HOST";
         constexpr const char* kSettingsButton      = "SETTINGS...";
         constexpr const char* kAboutButton         = "ABOUT...";
         constexpr const char* kLogoSkinSection     = "SKIN";
@@ -31,14 +32,6 @@ namespace PluginDisplayNames
 
         namespace ContextualHelp
         {
-            constexpr const char* kMidiFrom =
-                "SESSION: Selects the MIDI input that receives SysEx and notes from the synthesizer.";
-            constexpr const char* kMidiTo =
-                "SESSION: Selects the MIDI output that sends edits and notes to the synthesizer.";
-            constexpr const char* kKeyboardFrom =
-                "SESSION: Selects a separate MIDI keyboard input for playing (Standalone application only).";
-            constexpr const char* kHost =
-                "SESSION: Keyboard MIDI comes from the DAW host (Plugin only).";
             constexpr const char* kInputGain =
                 "SESSION: Sets monitoring level for the selected audio input. Choose the listen source in Settings > AUDIO > SYNTH FROM.";
             constexpr const char* kUndo =
@@ -50,19 +43,19 @@ namespace PluginDisplayNames
             constexpr const char* kLogo =
                 "SESSION: Opens the logo menu for Settings, About, Skin, and UI Scale.";
             constexpr const char* kSettings =
-                "SESSION: Opens Settings (standalone audio, paths, warnings, master utility, shortcuts).";
+                "SESSION: Opens Settings (MIDI ports, standalone audio, paths, warnings, master utility, shortcuts).";
             constexpr const char* kAbout =
                 "SESSION: Shows product version, links, and credits.";
             constexpr const char* kSkin =
                 "SESSION: Chooses the visual skin for the editor.";
             constexpr const char* kUiScale =
                 "SESSION: Sets the user interface scale.";
-            constexpr const char* kKeyboardFromActivityLed =
-                "SESSION: Lights when MIDI activity arrives on Keyboard From or Host.";
-            constexpr const char* kMidiFromActivityLed =
-                "SESSION: Lights when MIDI activity arrives from the synthesizer on MIDI From.";
-            constexpr const char* kMidiToActivityLed =
-                "SESSION: Lights when MIDI activity is sent to the synthesizer on MIDI To.";
+            constexpr const char* kFromKeyboardActivityLed =
+                "SESSION: Lights when MIDI activity arrives from the keyboard (or host in Plugin).";
+            constexpr const char* kFromSynthActivityLed =
+                "SESSION: Lights when MIDI activity arrives from the synthesizer.";
+            constexpr const char* kToSynthActivityLed =
+                "SESSION: Lights when MIDI activity is sent to the synthesizer.";
             constexpr const char* kAudioPeakIndicator =
                 "SESSION: Shows the peak level of the monitored audio input.";
         }
@@ -95,7 +88,7 @@ namespace PluginDisplayNames
 
         // Left-zone guidance while FR-2 device lock is active (D-038 — footer only, no modal).
         constexpr const char* kDeviceLockGuidance =
-            "No synth detected - check MIDI cables, MIDI FROM / MIDI TO options, and power-cycle your Matrix synth.";
+            "No synth detected - check MIDI cables, Settings > MIDI SYNTH FROM / SYNTH TO, and power-cycle your Matrix synth.";
 
         // Presence inquiry timed out while still detected — synth likely overloaded, not unplugged.
         constexpr const char* kDeviceUnresponsiveGuidance =
@@ -103,11 +96,11 @@ namespace PluginDisplayNames
 
         // Connected Oberheim Matrix-family device whose member is not Matrix-1000 / Matrix-6/6R.
         constexpr const char* kUnsupportedMatrixDeviceFooter =
-            "Connected Matrix device is not supported - editing is locked. Use MIDI FROM / MIDI TO to change ports.";
+            "Connected Matrix device is not supported - editing is locked. Use Settings > MIDI SYNTH FROM / SYNTH TO to change ports.";
 
-        // Standalone: MIDI FROM and KEYBOARD FROM must open distinct input devices.
+        // Standalone: SYNTH FROM and KEYBOARD FROM must open distinct input devices.
         constexpr const char* kMidiFromKeyboardFromConflictFooter =
-            "MIDI FROM and KEYBOARD FROM must use different MIDI input devices.";
+            "SYNTH FROM and KEYBOARD FROM must use different MIDI input devices.";
     }
 
     namespace About
@@ -157,6 +150,7 @@ namespace PluginDisplayNames
         constexpr const char* kInputGainLabel          = "INPUT GAIN:";
         constexpr const char* kUserInterfaceTab        = "USER INTERFACE";
         constexpr const char* kDeviceSection           = "DEVICE";
+        constexpr const char* kMidiTab                 = "MIDI";
         constexpr const char* kAudioTab                = "AUDIO";
         constexpr const char* kPatchSection            = "PATCH";
         constexpr const char* kPatchMutatorSection     = "PATCH MUTATOR";
@@ -169,7 +163,9 @@ namespace PluginDisplayNames
         constexpr const char* kBufferSizeLabel         = "BUFFER SIZE";
         constexpr const char* kInputChannelsLabel      = "INPUT CHANNELS";
         constexpr const char* kOutputChannelsLabel     = "OUTPUT CHANNELS";
+        constexpr const char* kKeyboardFromLabel       = "KEYBOARD FROM";
         constexpr const char* kSynthFromLabel          = "SYNTH FROM";
+        constexpr const char* kSynthToLabel            = "SYNTH TO";
         constexpr const char* kPlayTestToneButton      = "PLAY TEST TONE";
         constexpr const char* kInfoMessageLabel        = "INFO MESSAGE";
         constexpr const char* kContextualHelpLabel     = "CONTEXTUAL HELP";
@@ -229,7 +225,7 @@ namespace PluginDisplayNames
                 "Drop rejected: drop one Master file at a time";
             constexpr const char* kMasterPullFailed =
                 "MASTER: Could not read Master parameters from the synth. Keeping current Master Edit settings. "
-                "Check that MIDI FROM is the synth MIDI OUT.";
+                "Check that SYNTH FROM is the synth MIDI OUT.";
             constexpr const char* kRenameBeforeSave =
                 "Rename patch (replace * INIT *) before SAVE / SAVE AS";
         }
@@ -289,6 +285,18 @@ namespace PluginDisplayNames
                 "SETTINGS: Plays a short test tone on the selected output channels.";
             constexpr const char* kAudioPeakIndicator =
                 "SETTINGS: Shows the peak level of the monitored audio input.";
+            constexpr const char* kKeyboardFrom =
+                "SETTINGS: Selects a separate MIDI keyboard input for playing (Standalone only).";
+            constexpr const char* kMidiSynthFrom =
+                "SETTINGS: Selects the MIDI input that receives SysEx and notes from the synthesizer.";
+            constexpr const char* kMidiSynthTo =
+                "SETTINGS: Selects the MIDI output that sends edits and notes to the synthesizer.";
+            constexpr const char* kKeyboardFromActivityLed =
+                "SETTINGS: Lights when MIDI activity arrives on KEYBOARD FROM.";
+            constexpr const char* kMidiSynthFromActivityLed =
+                "SETTINGS: Lights when MIDI activity arrives from the synthesizer on SYNTH FROM.";
+            constexpr const char* kMidiSynthToActivityLed =
+                "SETTINGS: Lights when MIDI activity is sent to the synthesizer on SYNTH TO.";
         }
 
     }
@@ -2163,7 +2171,7 @@ namespace PluginDisplayNames
 
                 constexpr const char* kDeviceDumpFailedFooter =
                     "PATCH MUTATOR: Could not read the patch from the synth. Keeping the displayed bank and patch "
-                    "numbers and the current editor buffer. Check that MIDI FROM is the synth MIDI OUT.";
+                    "numbers and the current editor buffer. Check that SYNTH FROM is the synth MIDI OUT.";
                 constexpr const char* kDeviceDumpAbortedEditedFooter =
                     "PATCH MUTATOR: Synth patch load cancelled because the editor changed while waiting. "
                     "The displayed bank and patch numbers and your edits were kept.";
