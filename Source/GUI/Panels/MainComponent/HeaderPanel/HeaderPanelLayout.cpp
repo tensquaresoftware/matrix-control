@@ -21,14 +21,21 @@ namespace
              + TSS::ScaledLayout::scaledInt(static_cast<float>(kInterColumnGap), uiScale);
     }
 
-    void scaleCartoucheStroke(int designThickness,
-                              float scaleFactor,
-                              int strokeBaselinePx,
-                              int& strokePx,
-                              int& outwardPx) noexcept
+    struct CartoucheStrokePx
     {
-        strokePx = juce::jmax(1, TSS::ScaledLayout::scaledInt(static_cast<float>(designThickness), scaleFactor));
-        outwardPx = juce::jmax(0, strokePx - strokeBaselinePx);
+        int strokePx = 1;
+        int outwardPx = 0;
+    };
+
+    CartoucheStrokePx scaleCartoucheStroke(int designThickness,
+                                           float scaleFactor,
+                                           int strokeBaselinePx) noexcept
+    {
+        CartoucheStrokePx out;
+        out.strokePx = juce::jmax(
+            1, TSS::ScaledLayout::scaledInt(static_cast<float>(designThickness), scaleFactor));
+        out.outwardPx = juce::jmax(0, out.strokePx - strokeBaselinePx);
+        return out;
     }
 
     struct HeaderLayoutMetrics
@@ -73,6 +80,40 @@ namespace
         int logoHeight = 0;
         float contentStartX = 0.0f;
 
+        void applyLogoPlacement(const HeaderPanelDimensions& dimensions,
+                                float scaleFactor,
+                                juce::Rectangle<int> bounds) noexcept
+        {
+            const float leftPadding = static_cast<float>(dimensions.leftPadding) * scaleFactor;
+            const float logoGapAfter = static_cast<float>(dimensions.logoGapAfter) * scaleFactor;
+            logoWidth = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions.logoWidth), scaleFactor);
+            logoHeight = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions.logoHeight), scaleFactor);
+            logoX = juce::roundToInt(static_cast<float>(bounds.getX()) + leftPadding);
+            // Centre the logo box in the header (not relative to the control row / unscaled nudge).
+            logoY = bounds.getY() + (bounds.getHeight() - logoHeight) / 2;
+            contentStartX = static_cast<float>(logoX + logoWidth) + logoGapAfter;
+        }
+
+        void applyCartoucheStrokes(const HeaderPanelDimensions& dimensions, float scaleFactor) noexcept
+        {
+            // Layout air was calibrated to a 1 px design stroke; extra thickness grows outward.
+            constexpr float kStrokeBaselineDesign = 1.0f;
+            const int strokeBaselinePx = juce::jmax(
+                1, TSS::ScaledLayout::scaledInt(kStrokeBaselineDesign, scaleFactor));
+            const auto midiStroke = scaleCartoucheStroke(
+                dimensions.midiCartoucheStrokeThickness, scaleFactor, strokeBaselinePx);
+            midiCartoucheStrokePx = midiStroke.strokePx;
+            midiCartoucheStrokeOutwardPx = midiStroke.outwardPx;
+            const auto audioStroke = scaleCartoucheStroke(
+                dimensions.audioCartoucheStrokeThickness, scaleFactor, strokeBaselinePx);
+            audioCartoucheStrokePx = audioStroke.strokePx;
+            audioCartoucheStrokeOutwardPx = audioStroke.outwardPx;
+            const auto editStroke = scaleCartoucheStroke(
+                dimensions.editCartoucheStrokeThickness, scaleFactor, strokeBaselinePx);
+            editCartoucheStrokePx = editStroke.strokePx;
+            editCartoucheStrokeOutwardPx = editStroke.outwardPx;
+        }
+
         static HeaderLayoutMetrics make(const HeaderPanelDimensions& dimensions,
                                         float uiScale,
                                         juce::Rectangle<int> bounds)
@@ -101,16 +142,7 @@ namespace
             m.cartoucheGap = static_cast<float>(dimensions.cartoucheGap) * sf;
             m.midiLabelToNextLedGap = static_cast<float>(dimensions.midiLabelToNextLedGap) * sf;
             m.midiToPanicGap = static_cast<float>(dimensions.midiToPanicGap) * sf;
-
-            // Layout air was calibrated to a 1 px design stroke; extra thickness grows outward.
-            constexpr float kStrokeBaselineDesign = 1.0f;
-            const int strokeBaselinePx = juce::jmax(1, TSS::ScaledLayout::scaledInt(kStrokeBaselineDesign, sf));
-            scaleCartoucheStroke(dimensions.midiCartoucheStrokeThickness, sf, strokeBaselinePx,
-                                 m.midiCartoucheStrokePx, m.midiCartoucheStrokeOutwardPx);
-            scaleCartoucheStroke(dimensions.audioCartoucheStrokeThickness, sf, strokeBaselinePx,
-                                 m.audioCartoucheStrokePx, m.audioCartoucheStrokeOutwardPx);
-            scaleCartoucheStroke(dimensions.editCartoucheStrokeThickness, sf, strokeBaselinePx,
-                                 m.editCartoucheStrokePx, m.editCartoucheStrokeOutwardPx);
+            m.applyCartoucheStrokes(dimensions, sf);
 
             m.inputGainLabelWidth = static_cast<float>(dimensions.inputGainLabelWidth) * sf;
             m.inputGainLabelToSliderGap = static_cast<float>(dimensions.inputGainLabelToSliderGap) * sf;
@@ -122,15 +154,7 @@ namespace
             m.ledSize = static_cast<float>(dimensions.ledSize) * sf;
             m.ledSizePx = juce::roundToInt(m.ledSize);
             m.ledY = bounds.getY() + (bounds.getHeight() - m.ledSizePx) / 2 + contentYOffset;
-
-            const float leftPadding = static_cast<float>(dimensions.leftPadding) * sf;
-            const float logoGapAfter = static_cast<float>(dimensions.logoGapAfter) * sf;
-            m.logoWidth = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions.logoWidth), sf);
-            m.logoHeight = TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions.logoHeight), sf);
-            m.logoX = juce::roundToInt(static_cast<float>(bounds.getX()) + leftPadding);
-            // Centre the logo box in the header (not relative to the control row / unscaled nudge).
-            m.logoY = bounds.getY() + (bounds.getHeight() - m.logoHeight) / 2;
-            m.contentStartX = static_cast<float>(m.logoX + m.logoWidth) + logoGapAfter;
+            m.applyLogoPlacement(dimensions, sf, bounds);
             return m;
         }
     };
