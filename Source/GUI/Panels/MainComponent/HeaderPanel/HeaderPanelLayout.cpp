@@ -20,6 +20,17 @@ namespace
         return TSS::ScaledLayout::scaledInt(static_cast<float>(PatchEditSection::kPanelWidth), uiScale)
              + TSS::ScaledLayout::scaledInt(static_cast<float>(kInterColumnGap), uiScale);
     }
+
+    void scaleCartoucheStroke(int designThickness,
+                              float scaleFactor,
+                              int strokeBaselinePx,
+                              int& strokePx,
+                              int& outwardPx) noexcept
+    {
+        strokePx = juce::jmax(1, TSS::ScaledLayout::scaledInt(static_cast<float>(designThickness), scaleFactor));
+        outwardPx = juce::jmax(0, strokePx - strokeBaselinePx);
+    }
+
     struct HeaderLayoutMetrics
     {
         float gap = 0.0f;
@@ -90,19 +101,16 @@ namespace
             m.cartoucheGap = static_cast<float>(dimensions.cartoucheGap) * sf;
             m.midiLabelToNextLedGap = static_cast<float>(dimensions.midiLabelToNextLedGap) * sf;
             m.midiToPanicGap = static_cast<float>(dimensions.midiToPanicGap) * sf;
+
             // Layout air was calibrated to a 1 px design stroke; extra thickness grows outward.
             constexpr float kStrokeBaselineDesign = 1.0f;
             const int strokeBaselinePx = juce::jmax(1, TSS::ScaledLayout::scaledInt(kStrokeBaselineDesign, sf));
-
-            m.midiCartoucheStrokePx = juce::jmax(
-                1, TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions.midiCartoucheStrokeThickness), sf));
-            m.midiCartoucheStrokeOutwardPx = juce::jmax(0, m.midiCartoucheStrokePx - strokeBaselinePx);
-            m.audioCartoucheStrokePx = juce::jmax(
-                1, TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions.audioCartoucheStrokeThickness), sf));
-            m.audioCartoucheStrokeOutwardPx = juce::jmax(0, m.audioCartoucheStrokePx - strokeBaselinePx);
-            m.editCartoucheStrokePx = juce::jmax(
-                1, TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions.editCartoucheStrokeThickness), sf));
-            m.editCartoucheStrokeOutwardPx = juce::jmax(0, m.editCartoucheStrokePx - strokeBaselinePx);
+            scaleCartoucheStroke(dimensions.midiCartoucheStrokeThickness, sf, strokeBaselinePx,
+                                 m.midiCartoucheStrokePx, m.midiCartoucheStrokeOutwardPx);
+            scaleCartoucheStroke(dimensions.audioCartoucheStrokeThickness, sf, strokeBaselinePx,
+                                 m.audioCartoucheStrokePx, m.audioCartoucheStrokeOutwardPx);
+            scaleCartoucheStroke(dimensions.editCartoucheStrokeThickness, sf, strokeBaselinePx,
+                                 m.editCartoucheStrokePx, m.editCartoucheStrokeOutwardPx);
 
             m.inputGainLabelWidth = static_cast<float>(dimensions.inputGainLabelWidth) * sf;
             m.inputGainLabelToSliderGap = static_cast<float>(dimensions.inputGainLabelToSliderGap) * sf;
