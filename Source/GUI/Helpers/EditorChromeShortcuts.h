@@ -4,12 +4,11 @@
 
 namespace TSS
 {
-    /** Classification of Settings / Audio-MIDI / UI Scale chrome shortcuts. */
+    /** Classification of Settings / UI Scale chrome shortcuts. */
     enum class EditorChromeShortcut
     {
         kNone,
         kOpenSettings,
-        kOpenAudioMidiSettings,
         kUiScaleIncrease,
         kUiScaleDecrease,
         kUiScaleReset
@@ -29,10 +28,6 @@ namespace TSS
         {
             using juce::ModifierKeys;
             const auto command = ModifierKeys::commandModifier;
-            const auto commandAlt = command | ModifierKeys::altModifier;
-
-            if (matchesKey(key, ',', commandAlt) || matchesKey(key, ',', commandAlt, ','))
-                return EditorChromeShortcut::kOpenAudioMidiSettings;
 
             if (matchesKey(key, ',', command) || matchesKey(key, ',', command, ','))
                 return EditorChromeShortcut::kOpenSettings;
@@ -214,15 +209,6 @@ namespace TSS
             return macCommandGlyph() + " ,";
 #else
             return "Ctrl+,";
-#endif
-        }
-
-        inline juce::String openAudioMidi()
-        {
-#if JUCE_MAC
-            return macOptionGlyph() + " " + macCommandGlyph() + " ,";
-#else
-            return "Ctrl+Alt+,";
 #endif
         }
 

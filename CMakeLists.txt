@@ -254,6 +254,7 @@ set(PLUGIN_SOURCES
     Source/GUI/PluginEditorBankBindings.cpp
     Source/GUI/PluginEditorUiConstruction.cpp
     Source/GUI/PluginEditorWindows.cpp
+    Source/GUI/PluginEditorSettingsOverlay.cpp
     Source/GUI/PluginEditorSettings.cpp
     Source/GUI/PluginEditorSkinScale.cpp
     Source/GUI/PluginEditorHeader.cpp
@@ -261,7 +262,6 @@ set(PLUGIN_SOURCES
     Source/GUI/PluginEditorFileDragDrop.cpp
     Source/GUI/About/AboutPanel.cpp
     Source/GUI/About/AboutWindow.cpp
-    Source/GUI/Dialogs/AudioMidiSettingsWindow.cpp
     Source/GUI/Dialogs/BankTransferProgressDialog.cpp
     Source/GUI/Dialogs/DialogMatrixHelpers.cpp
     Source/GUI/Dialogs/EpromTypePromptDialog.cpp
@@ -326,7 +326,12 @@ set(PLUGIN_SOURCES
     Source/GUI/Panels/MainComponent/HeaderPanel/HeaderPanel.cpp
     Source/GUI/Panels/MainComponent/HeaderPanel/HeaderPanelLayout.cpp
     Source/GUI/Panels/MainComponent/HeaderPanel/HeaderPanelSetup.cpp
+    Source/GUI/Settings/AudioDeviceSetupSync.cpp
+    Source/GUI/Settings/SettingsAudioPage.cpp
+    Source/GUI/Settings/SettingsAudioPageDevices.cpp
+    Source/GUI/Settings/SettingsAudioPageLayout.cpp
     Source/GUI/Settings/SettingsPanel.cpp
+    Source/GUI/Widgets/RadioButtonGroup.cpp
     Source/GUI/Settings/SettingsPanelSetup.cpp
     Source/GUI/Settings/SettingsTabRail.cpp
     Source/GUI/Settings/SettingsWindow.cpp

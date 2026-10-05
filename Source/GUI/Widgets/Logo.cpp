@@ -56,7 +56,6 @@ namespace TSS
         if (e.mods.isShiftDown() && e.mods.isCtrlDown())
         {
             stopTimer();
-            pendingAudioMidiSettings_ = false;
 #if JUCE_DEBUG
             if (onUiTestsToggleRequested)
                 onUiTestsToggleRequested();
@@ -67,23 +66,22 @@ namespace TSS
         if (e.mods.isShiftDown())
         {
             stopTimer();
-            pendingAudioMidiSettings_ = false;
 
             if (onSettingsRequested)
                 onSettingsRequested();
             return;
         }
 
-        // Alt (Windows/Linux) / Option (macOS): defer via the same click/double-click
-        // timer so Alt+double-click only resets UI scale (does not also open Audio/MIDI).
-        pendingAudioMidiSettings_ = e.mods.isAltDown();
+        // Alt/Option intentionally does nothing (Settings is the only prefs door).
+        if (e.mods.isAltDown())
+            return;
+
         startTimer(200);
     }
 
     void Logo::mouseDoubleClick(const juce::MouseEvent&)
     {
         stopTimer();
-        pendingAudioMidiSettings_ = false;
 
         if (onUiScaleReset)
             onUiScaleReset();
@@ -92,16 +90,6 @@ namespace TSS
     void Logo::timerCallback()
     {
         stopTimer();
-
-        if (pendingAudioMidiSettings_)
-        {
-            pendingAudioMidiSettings_ = false;
-
-            if (onAudioMidiSettingsRequested)
-                onAudioMidiSettingsRequested();
-
-            return;
-        }
 
         if (onPopupRequested)
             onPopupRequested();

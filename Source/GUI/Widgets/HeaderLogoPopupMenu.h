@@ -28,7 +28,6 @@ namespace TSS
             ContextualHelpBinder* contextualHelpBinder = nullptr;
             std::function<void(int skinItemId)> onSkinSelected;
             std::function<void(int scaleId)> onUiScaleSelected;
-            std::function<void()> onAudioMidiSettingsRequested;
             std::function<void()> onSettingsRequested;
             std::function<void()> onAboutRequested;
         };
@@ -54,7 +53,6 @@ namespace TSS
             Skin,
             UiScale,
             Settings,
-            AudioMidiDevices,
             About,
             Spacer,
             HorizontalRule
@@ -84,11 +82,9 @@ namespace TSS
 
         std::function<void(int skinItemId)> onSkinSelected_;
         std::function<void(int scaleId)> onUiScaleSelected_;
-        std::function<void()> onAudioMidiSettingsRequested_;
         std::function<void()> onSettingsRequested_;
         std::function<void()> onAboutRequested_;
         ContextualHelpBinder* contextualHelpBinder_ = nullptr;
-        bool showAudioMidiDevices_ = false;
 
         PopupMenuLook look_{};
         std::unique_ptr<PopupMenuRenderer> renderer_;

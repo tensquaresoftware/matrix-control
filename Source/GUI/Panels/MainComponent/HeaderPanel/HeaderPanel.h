@@ -57,7 +57,6 @@ public:
     std::function<void(int scaleId)> onUiScaleSelected;
     std::function<void()> onUiScaleReset;
     std::function<void()> onSettingsRequested;
-    std::function<void()> onAudioMidiSettingsRequested;
     std::function<void()> onAboutRequested;
     std::function<void()> onPanicRequested;
 #if JUCE_DEBUG
@@ -72,11 +71,6 @@ public:
     void selectMidiToPort(const juce::String& deviceId);
     void selectKeyboardFromPort(const juce::String& deviceId);
 
-    void populateAudioFromCombo(const juce::StringArray& channelNames,
-                                const juce::StringArray& channelIds);
-    juce::String getSelectedAudioFromSourceId() const;
-    void selectAudioFromSourceId(const juce::String& sourceId);
-
     void setPanicQueuePressureAlert(bool active);
     void setPanicMidiOutputAvailable(bool available);
     void syncPanicEnabledFromMidiToSelection();
@@ -88,7 +82,6 @@ public:
     TSS::Led& getInstrumentActivityLed() { return instrumentActivityLed_; }
     TSS::Led& getEditorActivityLed() { return editorActivityLed_; }
     TSS::Led& getMidiToActivityLed() { return midiToActivityLed_; }
-    TSS::ComboBox& getAudioFromComboBox() { return audioFromComboBox_; }
     TSS::Slider& getInputGainSlider() { return inputGainSlider_; }
     TSS::PeakIndicator& getPeakIndicator() { return peakIndicator_; }
     TSS::Button& getUndoButton() { return undoButton_; }
@@ -102,6 +95,7 @@ private:
     void addChildControls(TSS::ISkin& skin);
     void applyPanicButtonLook();
     void registerContextualHelp();
+    void paintAudioCartouche(juce::Graphics& g);
 
     void updateKeyboardFromVisibility();
     void updateAudioControlsVisibility();
@@ -119,6 +113,9 @@ private:
     bool panicAlertActive_ = false;
     int currentSkinItemId_ = static_cast<int>(TSS::Skin::SkinComboBoxItemId::kBlack);
     int currentUiScaleId_ = PluginIDs::Settings::ScaleLevels::kDefault;
+    juce::Rectangle<int> audioCartoucheBadgeBounds_;
+    juce::Rectangle<int> audioCartoucheFrameBounds_;
+    int audioCartoucheStrokePx_ = 1;
 
     TSS::Logo logo_;
     TSS::Label midiFromLabel_;
@@ -130,8 +127,6 @@ private:
     TSS::Label keyboardFromLabel_;
     TSS::ComboBox keyboardFromComboBox_;
     TSS::Led instrumentActivityLed_;
-    TSS::Label audioFromLabel_;
-    TSS::ComboBox audioFromComboBox_;
     TSS::Label inputGainLabel_;
     TSS::Slider inputGainSlider_;
     TSS::PeakIndicator peakIndicator_;
@@ -142,7 +137,6 @@ private:
     std::vector<juce::String> midiFromPortIdentifiers_;
     std::vector<juce::String> midiToPortIdentifiers_;
     std::vector<juce::String> keyboardFromPortIdentifiers_;
-    std::vector<juce::String> audioFromSourceIdentifiers_;
 
     std::unique_ptr<TSS::ContextualHelpBinder> contextualHelpBinder_;
 

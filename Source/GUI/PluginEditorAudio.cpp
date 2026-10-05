@@ -1,5 +1,5 @@
 // Extracted from PluginEditor.cpp for modular maintenance.
-// Standalone audio-from-source combo refresh, audio device change listener, and
+// Standalone SYNTH FROM refresh, audio device change listener, and
 // APVTS property/redirect sync for MIDI ports and audio-from source id.
 
 #include "PluginEditor.h"
@@ -12,7 +12,6 @@
 #include "Core/MIDI/MidiManager.h"
 #include "Core/Services/DeviceTypeRegistry.h"
 #include "Core/Services/EpromTypePolicy.h"
-#include "GUI/Dialogs/AudioMidiSettingsWindow.h"
 #include "GUI/Dialogs/EpromTypePromptDialog.h"
 #include "GUI/Dialogs/MasterInitConfirmDialog.h"
 #include "GUI/Dialogs/MasterM1kmLoadChoiceDialog.h"
@@ -20,42 +19,38 @@
 #include "GUI/Dialogs/BankTransferProgressDialog.h"
 #include "GUI/About/AboutWindow.h"
 #include "GUI/Panels/MainComponent/HeaderPanel/HeaderPanel.h"
+#include "GUI/Settings/SettingsAudioPage.h"
 #include "GUI/Settings/SettingsPanel.h"
 #include "GUI/Settings/SettingsWindow.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
 #include "Shared/Definitions/PluginIDs.h"
 
-#include <juce_audio_plugin_client/Standalone/juce_StandaloneFilterWindow.h>
-
-void PluginEditor::refreshAudioFromCombo(HeaderPanel* headerOverride)
+void PluginEditor::refreshAudioFromCombo()
 {
     if (!pluginProcessor.isStandalone())
         return;
 
     const auto names = pluginProcessor.getAudioInputSourceNames();
     const auto ids = pluginProcessor.getAudioInputSourceIds();
-
-    auto* header = headerOverride;
-
-    if (header == nullptr && mainComponent_ != nullptr)
-        header = &mainComponent_->getHeaderPanel();
-
     const auto sourceIdToRestore = pluginProcessor.getApvts().state.getProperty(
         "audioFromSourceId", juce::String()).toString();
 
-    if (header != nullptr)
+    if (auto* panel = getSettingsPanelIfOpen())
     {
-        applyAudioCatalogToHeader(*header, names, ids, sourceIdToRestore);
-        return;
+        if (auto* audioPage = panel->getAudioPage())
+        {
+            applyAudioCatalogToSettings(*audioPage, names, ids, sourceIdToRestore);
+            return;
+        }
     }
 
-    applyAudioCatalogWithoutHeader(ids, sourceIdToRestore);
+    applyAudioCatalogSelectionOnly(ids, sourceIdToRestore);
 }
 
-void PluginEditor::applyAudioCatalogToHeader(HeaderPanel& header,
-                                             const juce::StringArray& names,
-                                             const juce::StringArray& ids,
-                                             juce::String sourceIdToRestore)
+void PluginEditor::applyAudioCatalogToSettings(SettingsAudioPage& audioPage,
+                                               const juce::StringArray& names,
+                                               const juce::StringArray& ids,
+                                               juce::String sourceIdToRestore)
 {
     const auto currentIdentity = Core::StandaloneAudioInputRouter::getCurrentInputDeviceName();
     const auto boundIdentity = pluginProcessor.getApvts().state.getProperty(
@@ -63,8 +58,8 @@ void PluginEditor::applyAudioCatalogToHeader(HeaderPanel& header,
     const auto decision = Core::decideAudioFromSelectionSync(
         sourceIdToRestore, boundIdentity, currentIdentity, ids);
 
-    header.populateAudioFromCombo(names, ids);
-    header.selectAudioFromSourceId(decision.sourceIdToApply);
+    audioPage.populateSynthFromCombo(names, ids);
+    audioPage.selectSynthFromSourceId(decision.sourceIdToApply);
 
     if (decision.selectionKept)
     {
@@ -76,7 +71,7 @@ void PluginEditor::applyAudioCatalogToHeader(HeaderPanel& header,
     pluginProcessor.setAudioFromSourceId({});
 }
 
-void PluginEditor::applyAudioCatalogWithoutHeader(const juce::StringArray& ids,
+void PluginEditor::applyAudioCatalogSelectionOnly(const juce::StringArray& ids,
                                                   juce::String sourceIdToRestore)
 {
     const auto currentIdentity = Core::StandaloneAudioInputRouter::getCurrentInputDeviceName();
@@ -259,71 +254,10 @@ void PluginEditor::valueTreeRedirected(juce::ValueTree&)
         });
 }
 
-void PluginEditor::updateAudioMidiSettingsWindowLayout(float uiScale)
-{
-    if (audioMidiSettingsWindow_ == nullptr)
-        return;
-
-    audioMidiSettingsWindow_->setUiScale(uiScale);
-    audioMidiSettingsWindow_->setBounds(getLocalBounds());
-}
-
-void PluginEditor::openAudioMidiSettingsWindow()
-{
-    if (! pluginProcessor.isStandalone())
-        return;
-
-    auto* holder = juce::StandalonePluginHolder::getInstance();
-    if (holder == nullptr)
-        return;
-
-    closeSettingsWindow();
-    closeAboutWindow();
-    closeMasterInitConfirmDialog();
-    closeMasterM1kmLoadChoiceDialog();
-    closeMutatorHistoryDefragConfirmDialog();
-    closeEpromTypePromptDialog();
-    hideBankTransferProgressDialog();
-    closeAudioMidiSettingsWindow();
-
-    int maxInputs = 0;
-    int maxOutputs = 0;
-    if (auto* bus = pluginProcessor.getBus(true, 0))
-        maxInputs = juce::jmax(0, bus->getDefaultLayout().size());
-    if (auto* bus = pluginProcessor.getBus(false, 0))
-        maxOutputs = juce::jmax(0, bus->getDefaultLayout().size());
-
-    // Keep muteInput off so the stock blue feedback banner never appears.
-    Core::StandaloneAudioInputRouter::enableInputMonitoring();
-
-    audioMidiSettingsWindow_ = std::make_unique<AudioMidiSettingsWindow>(
-        AudioMidiSettingsWindow::Config{
-            .skin = skin_,
-            .deviceManager = &holder->deviceManager,
-            .maxInputChannels = maxInputs,
-            .maxOutputChannels = maxOutputs,
-            .peakLevelProvider = [this]
-            {
-                return pluginProcessor.getAudioPassthroughProcessor().getPeakLevel();
-            },
-            .onCloseRequested = [this] { closeAudioMidiSettingsWindow(); }});
-    addChildComponent(*audioMidiSettingsWindow_);
-
-    updateAudioMidiSettingsWindowLayout(appliedUiScale_);
-    audioMidiSettingsWindow_->setVisible(true);
-    audioMidiSettingsWindow_->toFront(true);
-    audioMidiSettingsWindow_->grabKeyboardFocus();
-}
-
-void PluginEditor::closeAudioMidiSettingsWindow()
-{
-    audioMidiSettingsWindow_.reset();
-}
-
 bool PluginEditor::isEscapeBlockedByOverlay() const
 {
     const auto visible = [](const auto& c) { return c != nullptr && c->isVisible(); };
-    return visible(settingsWindow_) || visible(audioMidiSettingsWindow_) || visible(aboutWindow_)
+    return visible(settingsWindow_) || visible(aboutWindow_)
         || visible(masterInitConfirmDialog_) || isMasterM1kmLoadChoiceDialogVisible()
         || visible(mutatorHistoryDefragConfirmDialog_)
         || visible(epromTypePromptDialog_) || visible(bankTransferProgressDialog_);

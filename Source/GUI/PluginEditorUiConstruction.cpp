@@ -13,6 +13,7 @@
 #include "GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditDisplaysPanel/PatchEditDisplaysPanel.h"
 #include "GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditDisplaysPanel/Modules/PatchNameDisplayPanel.h"
 #include "GUI/Panels/MainComponent/HeaderPanel/HeaderPanel.h"
+#include "GUI/Settings/SettingsAudioPage.h"
 #include "GUI/Widgets/ComboBox.h"
 #include "Shared/Definitions/PluginAudioConstants.h"
 #include "Shared/Definitions/PluginIDs.h"
@@ -176,7 +177,7 @@ void PluginEditor::restoreAndWireHeader()
         if (Core::StandaloneAudioInputRouter::applySceneAudioSafetyDefaultsIfNeeded())
             pluginProcessor.setAudioFromSourceId({});
 
-        refreshAudioFromCombo(&headerPanel);
+        refreshAudioFromCombo();
 
         const float savedInputGainDb = static_cast<float>(
             pluginProcessor.getApvts().state.getProperty("inputGainDb", 0.0f));
@@ -245,17 +246,16 @@ void PluginEditor::wireHeaderRuntimeControls(HeaderPanel& headerPanel)
         pluginProcessor.setInputGainDb(PluginAudioConstants::inputGainIndexToDb(index));
     };
 
-    wireAudioFromComboChange(headerPanel);
 }
 
-void PluginEditor::wireAudioFromComboChange(HeaderPanel& headerPanel)
+void PluginEditor::wireSynthFromComboChange(SettingsAudioPage& audioPage)
 {
-    headerPanel.getAudioFromComboBox().onChange = [this, &headerPanel]
+    audioPage.getSynthFromCombo().onChange = [this, &audioPage]
     {
         if (!pluginProcessor.isStandalone())
             return;
 
-        const auto sourceId = headerPanel.getSelectedAudioFromSourceId();
+        const auto sourceId = audioPage.getSelectedSynthFromSourceId();
         pluginProcessor.setAudioFromSourceId(sourceId);
 
         if (sourceId.isNotEmpty())

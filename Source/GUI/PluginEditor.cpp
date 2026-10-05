@@ -3,7 +3,6 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 
 #include "GUI/About/AboutWindow.h"
-#include "GUI/Dialogs/AudioMidiSettingsWindow.h"
 #include "GUI/Dialogs/BankTransferProgressDialog.h"
 #include "GUI/Dialogs/EpromTypePromptDialog.h"
 #include "GUI/Dialogs/MasterInitConfirmDialog.h"
@@ -91,18 +90,11 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     {
         // Silence when AUDIO FROM is None comes from passthrough, not JUCE muteInput banner.
         Core::StandaloneAudioInputRouter::enableInputMonitoring();
-        Core::StandaloneAudioInputRouter::setShowAudioMidiSettingsHandler(
-            [safeThis = juce::Component::SafePointer<PluginEditor>(this)]
-            {
-                if (safeThis != nullptr)
-                    safeThis->openAudioMidiSettingsWindow();
-            });
     }
 }
 
 PluginEditor::~PluginEditor()
 {
-    Core::StandaloneAudioInputRouter::clearShowAudioMidiSettingsHandler();
     removeKeyListener(this);
     pluginProcessor.setMutatorDefragLimitModalGate({});
     pluginProcessor.setMutatorExportCollisionModalGate({});
@@ -122,7 +114,6 @@ PluginEditor::~PluginEditor()
 
     pluginProcessor.getApvts().state.removeListener(this);
     detachStandaloneAudioDeviceListener();
-    closeAudioMidiSettingsWindow();
     closeSettingsWindow();
     closeAboutWindow();
 }
@@ -149,7 +140,6 @@ void PluginEditor::resized()
 
     const auto bounds = getLocalBounds();
     updateOverlayBoundsIfVisible(settingsWindow_, bounds);
-    updateOverlayBoundsIfVisible(audioMidiSettingsWindow_, bounds);
     updateOverlayBoundsIfVisible(aboutWindow_, bounds);
 
 #if JUCE_DEBUG
@@ -328,13 +318,6 @@ bool PluginEditor::performEditorChromeShortcut(TSS::EditorChromeShortcut shortcu
     {
         case TSS::EditorChromeShortcut::kOpenSettings:
             openSettingsWindow();
-            return true;
-
-        case TSS::EditorChromeShortcut::kOpenAudioMidiSettings:
-            if (! pluginProcessor.isStandalone())
-                return false;
-
-            Core::StandaloneAudioInputRouter::showAudioMidiSettingsDialog();
             return true;
 
         case TSS::EditorChromeShortcut::kUiScaleIncrease:

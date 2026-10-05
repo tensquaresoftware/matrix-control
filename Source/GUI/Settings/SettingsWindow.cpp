@@ -72,6 +72,7 @@ SettingsWindow::SettingsWindow(TSS::ISkin& skin,
                                std::function<void()> onCloseRequested)
     : onCloseRequested_(std::move(onCloseRequested))
     , skin_(&skin)
+    , isPluginMode_(isPluginMode)
 {
     setOpaque(false);
     setInterceptsMouseClicks(true, true);
@@ -85,7 +86,7 @@ SettingsWindow::SettingsWindow(TSS::ISkin& skin,
     closeButton_.setSkin(skin);
     addAndMakeVisible(closeButton_);
 
-    tabRail_ = std::make_unique<SettingsTabRail>(skin, [this](int tabId)
+    tabRail_ = std::make_unique<SettingsTabRail>(skin, isPluginMode_, [this](int tabId)
     {
         settingsPanel_->setActiveTab(tabId);
 
@@ -94,7 +95,7 @@ SettingsWindow::SettingsWindow(TSS::ISkin& skin,
     });
     addAndMakeVisible(*tabRail_);
 
-    settingsPanel_ = std::make_unique<SettingsPanel>(skin, isPluginMode);
+    settingsPanel_ = std::make_unique<SettingsPanel>(skin, isPluginMode_);
     addAndMakeVisible(*settingsPanel_);
 
     if (onPanelReady)
@@ -132,7 +133,7 @@ void SettingsWindow::setOnTabChanged(std::function<void(int)> onTabChanged)
 
 void SettingsWindow::setActiveTab(int tabId)
 {
-    const int normalized = PluginIDs::Settings::LastTab::normalize(tabId);
+    const int normalized = PluginIDs::Settings::LastTab::normalize(tabId, isPluginMode_);
     tabRail_->setSelectedTab(normalized);
     settingsPanel_->setActiveTab(normalized);
 }
@@ -153,7 +154,8 @@ juce::Rectangle<int> SettingsWindow::getDialogBounds() const
     const int titleBarHeight = TSS::ScaledLayout::scaledInt(
         static_cast<float>(DialogMatrixHelpers::kTitleBarHeight), uiScale_);
     const int dialogWidth = SettingsShellMetrics::scaledBodyWidth(uiScale_) + border * 2;
-    const int dialogHeight = SettingsShellMetrics::scaledBodyHeight(uiScale_) + titleBarHeight + border * 2;
+    const int dialogHeight = SettingsShellMetrics::scaledBodyHeight(uiScale_, isPluginMode_)
+                             + titleBarHeight + border * 2;
 
     return SettingsShellMetrics::centredClampedDialog(getLocalBounds(), dialogWidth, dialogHeight);
 }

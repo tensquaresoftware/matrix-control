@@ -73,4 +73,9 @@ namespace Core::StandaloneAudioInputRouterDetail
     void showAudioMidiSettingsDialog()
     {
     }
+
+    juce::AudioDeviceManager* getAudioDeviceManager()
+    {
+        return nullptr;
+    }
 }

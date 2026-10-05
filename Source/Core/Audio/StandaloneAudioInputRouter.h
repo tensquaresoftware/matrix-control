@@ -3,6 +3,7 @@
 #include <functional>
 #include <vector>
 
+#include <juce_audio_devices/juce_audio_devices.h>
 #include <juce_core/juce_core.h>
 #include <juce_events/juce_events.h>
 
@@ -19,6 +20,8 @@ namespace Core
         static juce::StringArray getInputChannelIds();
         static std::vector<AudioInputSourceEntry> getCatalogEntries();
         static juce::String getCurrentInputDeviceName();
+        /** Standalone only; nullptr in plugin / when no holder. */
+        static juce::AudioDeviceManager* getAudioDeviceManager();
         static bool applySceneAudioSafetyDefaultsIfNeeded();
         /** Force Input/Output to None when persisted devices are missing (no OS fallback keep). */
         static bool applyMissingAudioDeviceNonePolicy();

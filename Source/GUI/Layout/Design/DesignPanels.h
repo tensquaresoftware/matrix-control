@@ -183,8 +183,8 @@ namespace TSS::Design
             inline constexpr int kLogoWidth = 172;
             inline constexpr int kLogoHeight = 20;
             inline constexpr int kLogoVerticalOffset = -1;
-            // Half of the former 4 px bottom edge border (removed): nudge content down to re-center.
-            inline constexpr int kContentVerticalOffset = 2;
+            // Keep 0: controls + AUDIO cartouche stay vertically centered in kHeight.
+            inline constexpr int kContentVerticalOffset = 0;
             inline constexpr int kLogoFontHeight = 20;
             inline constexpr int kLogoGapAfter = 12;
             inline constexpr int kLogoPopupColumnWidth = 100;
@@ -196,12 +196,14 @@ namespace TSS::Design
             inline constexpr int kPacketExternalGap = kGap * 4;
             inline constexpr int kLabelToControlGap = 0;
             inline constexpr int kKeyboardFromLabelToComboGap = kLabelToControlGap - kGap;
-            inline constexpr int kAudioFromLabelToComboGap = kLabelToControlGap - kGap;
             inline constexpr int kEditorMidiFromLabelWidth = 48;
             inline constexpr int kInputGainLabelToSliderGap = kLabelToControlGap - kGap;
             inline constexpr int kMidiToLabelWidth = 40;
             inline constexpr int kKeyboardFromLabelWidth = 84;
-            inline constexpr int kAudioFromLabelWidth = 64;
+            inline constexpr int kAudioCartoucheWidth = 44;
+            // Gap badge→content, and air between frame hairlines and content (slider / peak).
+            inline constexpr int kAudioCartoucheInset = 4;
+            inline constexpr int kAudioCartoucheStrokeThickness = 1;
             inline constexpr int kInputGainLabelWidth = 60;
             inline constexpr int kPortComboBoxWidth = 112;
             inline constexpr int kInputGainSliderWidth = 60;

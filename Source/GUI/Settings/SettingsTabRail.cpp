@@ -54,7 +54,8 @@ void SettingsTabRail::TabButton::paintButton(juce::Graphics& g,
     if (selected_)
         g.fillAll(selectedFill_);
 
-    const int inset = TSS::ScaledLayout::scaledInt(8.0f, uiScale_);
+    const int inset = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(SettingsShellMetrics::kPadding), uiScale_);
     auto textBounds = getLocalBounds().reduced(inset, 0).toFloat();
 
     g.setColour(selected_ ? selectedText_ : look_.text);
@@ -62,24 +63,31 @@ void SettingsTabRail::TabButton::paintButton(juce::Graphics& g,
     g.drawText(getButtonText(), textBounds, juce::Justification::centredLeft, false);
 }
 
-SettingsTabRail::SettingsTabRail(TSS::ISkin& skin, std::function<void(int)> onTabSelected)
+SettingsTabRail::SettingsTabRail(TSS::ISkin& skin,
+                                 bool isPluginMode,
+                                 std::function<void(int)> onTabSelected)
     : skin_(&skin)
+    , isPluginMode_(isPluginMode)
     , onTabSelected_(std::move(onTabSelected))
 {
     using namespace PluginIDs::Settings::LastTab;
 
-    for (int i = 0; i < kCount; ++i)
+    const int n = count(isPluginMode_);
+    tabs_.reserve(static_cast<size_t>(n));
+
+    for (int i = 0; i < n; ++i)
     {
-        const int tabId = kFirst + i;
-        tabs_[i] = std::make_unique<TabButton>(SettingsShellMetrics::tabLabel(i));
-        tabs_[i]->onClick = [this, tabId]
+        const int tabId = idAt(i, isPluginMode_);
+        auto button = std::make_unique<TabButton>(SettingsShellMetrics::tabLabel(i, isPluginMode_));
+        button->onClick = [this, tabId]
         {
             setSelectedTab(tabId);
 
             if (onTabSelected_)
                 onTabSelected_(tabId);
         };
-        addAndMakeVisible(*tabs_[i]);
+        addAndMakeVisible(*button);
+        tabs_.push_back(std::move(button));
     }
 
     rebuildLooks();
@@ -106,12 +114,12 @@ void SettingsTabRail::setUiScale(float uiScale)
 
 void SettingsTabRail::setSelectedTab(int tabId)
 {
-    selectedTabId_ = PluginIDs::Settings::LastTab::normalize(tabId);
+    selectedTabId_ = PluginIDs::Settings::LastTab::normalize(tabId, isPluginMode_);
 
     using namespace PluginIDs::Settings::LastTab;
 
-    for (int i = 0; i < kCount; ++i)
-        tabs_[i]->setSelected((kFirst + i) == selectedTabId_);
+    for (int i = 0; i < static_cast<int>(tabs_.size()); ++i)
+        tabs_[static_cast<size_t>(i)]->setSelected(idAt(i, isPluginMode_) == selectedTabId_);
 }
 
 void SettingsTabRail::paint(juce::Graphics& g)
@@ -126,12 +134,10 @@ void SettingsTabRail::resized()
         static_cast<float>(SettingsShellMetrics::kPadding), uiScale_);
     inner.removeFromTop(topPad);
 
-    using namespace PluginIDs::Settings::LastTab;
-
-    for (int i = 0; i < kCount; ++i)
+    for (int i = 0; i < static_cast<int>(tabs_.size()); ++i)
     {
-        tabs_[i]->setBounds(SettingsShellMetrics::tabRowBounds(i, inner, uiScale_));
-        tabs_[i]->setUiScale(uiScale_);
+        tabs_[static_cast<size_t>(i)]->setBounds(SettingsShellMetrics::tabRowBounds(i, inner, uiScale_));
+        tabs_[static_cast<size_t>(i)]->setUiScale(uiScale_);
     }
 }
 
@@ -141,12 +147,10 @@ void SettingsTabRail::rebuildLooks()
     const auto selectedFill = juce::Colour(DialogMatrixHelpers::kModalTitleBandColour);
     const auto selectedText = skin_->getColour(SkinColourId::kButtonTextOff);
 
-    using namespace PluginIDs::Settings::LastTab;
-
-    for (int i = 0; i < kCount; ++i)
+    for (auto& tab : tabs_)
     {
-        tabs_[i]->setLook(labelLook);
-        tabs_[i]->setSelectedFill(selectedFill, selectedText);
-        tabs_[i]->setUiScale(uiScale_);
+        tab->setLook(labelLook);
+        tab->setSelectedFill(selectedFill, selectedText);
+        tab->setUiScale(uiScale_);
     }
 }

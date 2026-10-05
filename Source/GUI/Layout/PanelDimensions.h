@@ -28,11 +28,12 @@ struct HeaderPanelDimensions
     int packetExternalGap;
     int labelToControlGap;
     int keyboardFromLabelToComboGap;
-    int audioFromLabelToComboGap;
     int editorMidiFromLabelWidth;
     int midiToLabelWidth;
     int keyboardFromLabelWidth;
-    int audioFromLabelWidth;
+    int audioCartoucheWidth;
+    int audioCartoucheInset;
+    int audioCartoucheStrokeThickness;
     int inputGainLabelWidth;
     int inputGainLabelToSliderGap;
     int portComboBoxWidth;

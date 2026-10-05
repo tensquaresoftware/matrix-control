@@ -4,10 +4,9 @@
 
 #include <juce_audio_devices/juce_audio_devices.h>
 
-#include "GUI/Helpers/AudioFromComboItemSet.h"
-#include "GUI/Helpers/ComboBoxLiveRefresh.h"
 #include "GUI/Helpers/ContextualHelpBindingSupport.h"
 #include "GUI/Helpers/MidiPortComboPopulation.h"
+#include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Widgets/HeaderLogoPopupMenu.h"
 #include "GUI/Skins/Skin.h"
 #include "GUI/Skins/SkinHelpers.h"
@@ -32,21 +31,6 @@ namespace
             }
         }
     }
-
-    [[nodiscard]] bool audioFromItemSetUnchanged(const TSS::ComboBox& combo,
-                                                 const std::vector<juce::String>& currentIds,
-                                                 const std::vector<juce::String>& nextIds,
-                                                 const juce::StringArray& channelNames)
-    {
-        TSS::AudioFromComboItemSet::ComboTexts texts;
-        texts.numItems = combo.getNumItems();
-        texts.itemTexts.reserve(static_cast<size_t>(texts.numItems));
-        for (int i = 0; i < texts.numItems; ++i)
-            texts.itemTexts.push_back(combo.getItemText(i));
-
-        return TSS::AudioFromComboItemSet::itemSetUnchanged(
-            currentIds, nextIds, channelNames, texts);
-    }
 }
 
 HeaderPanel::~HeaderPanel()
@@ -68,8 +52,6 @@ HeaderPanel::HeaderPanel(TSS::ISkin& skin, const HeaderPanelDimensions& dimensio
     , keyboardFromLabel_(dimensions.keyboardFromLabelWidth, dimensions.controlHeight, TSS::darkPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kKeyboardFromLabel)
     , keyboardFromComboBox_(dimensions.portComboBoxWidth, dimensions.controlHeight, TSS::comboBoxLookFromSkin(skin), TSS::ComboBox::Style::ButtonLike)
     , instrumentActivityLed_(dimensions.ledSize, dimensions.ledSize)
-    , audioFromLabel_(dimensions.audioFromLabelWidth, dimensions.controlHeight, TSS::darkPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kAudioFromLabel)
-    , audioFromComboBox_(dimensions.portComboBoxWidth, dimensions.controlHeight, TSS::comboBoxLookFromSkin(skin), TSS::ComboBox::Style::ButtonLike)
     , inputGainLabel_(dimensions.inputGainLabelWidth, dimensions.controlHeight, TSS::darkPanelLabelLookFromSkin(skin), PluginDisplayNames::HeaderPanel::kInputGainLabel)
     , inputGainSlider_(dimensions.inputGainSliderWidth, dimensions.controlHeight, TSS::sliderLookFromSkin(skin),
                        TSS::makeInputGainSliderConfig())
@@ -107,7 +89,6 @@ void HeaderPanel::registerContextualHelp()
     contextualHelpBinder_->bind(&midiToComboBox_, Help::kMidiTo);
     contextualHelpBinder_->bind(&keyboardFromComboBox_,
                                 isPluginMode_ ? Help::kHost : Help::kKeyboardFrom);
-    contextualHelpBinder_->bind(&audioFromComboBox_, Help::kAudioFrom);
     contextualHelpBinder_->bind(&inputGainSlider_, Help::kInputGain);
     contextualHelpBinder_->bind(&undoButton_, Help::kUndo);
     contextualHelpBinder_->bind(&redoButton_, Help::kRedo);
@@ -122,6 +103,44 @@ void HeaderPanel::registerContextualHelp()
 void HeaderPanel::paint(juce::Graphics& g)
 {
     g.fillAll(skin_->getColour(SkinColourId::kHeaderPanelBackground));
+    paintAudioCartouche(g);
+}
+
+void HeaderPanel::paintAudioCartouche(juce::Graphics& g)
+{
+    if (isPluginMode_ || audioCartoucheFrameBounds_.isEmpty())
+        return;
+
+    // Light cartouche chrome on dark header (same as DarkPanel text).
+    const auto cartoucheChrome = skin_->getColour(SkinColourId::kDarkPanelText);
+    const auto headerBg = skin_->getColour(SkinColourId::kHeaderPanelBackground);
+    const int stroke = juce::jmax(1, audioCartoucheStrokePx_);
+
+    g.setColour(cartoucheChrome);
+    g.fillRect(audioCartoucheBadgeBounds_);
+
+    auto look = TSS::darkPanelLabelLookFromSkin(*skin_);
+    look.text = headerBg;
+    g.setColour(look.text);
+    g.setFont(look.font.withHeight(look.font.getHeight() * uiScale_).boldened());
+    g.drawText(PluginDisplayNames::HeaderPanel::kAudioCartoucheLabel,
+               audioCartoucheBadgeBounds_,
+               juce::Justification::centred,
+               false);
+
+    g.setColour(cartoucheChrome);
+    g.fillRect(audioCartoucheFrameBounds_.getX(),
+               audioCartoucheFrameBounds_.getY(),
+               audioCartoucheFrameBounds_.getWidth(),
+               stroke);
+    g.fillRect(audioCartoucheFrameBounds_.getX(),
+               audioCartoucheFrameBounds_.getBottom() - stroke,
+               audioCartoucheFrameBounds_.getWidth(),
+               stroke);
+    g.fillRect(audioCartoucheFrameBounds_.getRight() - stroke,
+               audioCartoucheFrameBounds_.getY(),
+               stroke,
+               audioCartoucheFrameBounds_.getHeight());
 }
 
 void HeaderPanel::showLogoPopup()
@@ -145,7 +164,6 @@ void HeaderPanel::showLogoPopup()
         if (onUiScaleSelected)
             onUiScaleSelected(scaleId);
     };
-    config.onAudioMidiSettingsRequested = isPluginMode_ ? nullptr : onAudioMidiSettingsRequested;
     config.onSettingsRequested = [this]
     {
         if (onSettingsRequested)
@@ -200,8 +218,6 @@ void HeaderPanel::updateAudioControlsVisibility()
 {
     const bool showAudioControls = !isPluginMode_;
 
-    audioFromLabel_.setVisible(showAudioControls);
-    audioFromComboBox_.setVisible(showAudioControls);
     inputGainLabel_.setVisible(showAudioControls);
     inputGainSlider_.setVisible(showAudioControls);
     peakIndicator_.setVisible(showAudioControls);
@@ -305,96 +321,4 @@ juce::String HeaderPanel::getSelectedPortIdentifier(const TSS::ComboBox& combo,
                                                     const std::vector<juce::String>& identifiers) const
 {
     return TSS::MidiPortComboPopulation::selectedPortId(combo, identifiers);
-}
-
-void HeaderPanel::populateAudioFromCombo(const juce::StringArray& channelNames,
-                                         const juce::StringArray& channelIds)
-{
-    audioFromComboBox_.setUsesPortSentinelPopupChrome(true);
-
-    const auto previousSourceId = getSelectedAudioFromSourceId();
-    const int count = juce::jmin(channelNames.size(), channelIds.size());
-
-    std::vector<juce::String> nextIds;
-    nextIds.reserve(static_cast<size_t>(count));
-    for (int i = 0; i < count; ++i)
-        nextIds.push_back(channelIds[i]);
-
-    const bool itemSetUnchanged = audioFromItemSetUnchanged(
-        audioFromComboBox_, audioFromSourceIdentifiers_, nextIds, channelNames);
-    const auto action = TSS::ComboBoxLiveRefresh::planRefresh(
-        audioFromComboBox_.isPopupOpen(), itemSetUnchanged);
-
-    if (action == TSS::ComboBoxLiveRefresh::Action::kSkipRebuild)
-    {
-        if (count == 0)
-            audioFromComboBox_.setSelectedId(kPortSentinelItemId, juce::dontSendNotification);
-        else
-            selectAudioFromSourceId(previousSourceId);
-        return;
-    }
-
-    const auto rebuild = [this, &channelNames, &nextIds, count, &previousSourceId]()
-    {
-        audioFromComboBox_.clear(juce::dontSendNotification);
-        audioFromSourceIdentifiers_ = nextIds;
-
-        audioFromComboBox_.addItem(PluginDisplayNames::HeaderPanel::kNoInputSentinel,
-                                   kPortSentinelItemId);
-
-        for (int i = 0; i < count; ++i)
-        {
-            const int itemId = i + kFirstDeviceItemId;
-            audioFromComboBox_.addItem(channelNames[i].toUpperCase(), itemId);
-        }
-
-        if (count == 0)
-        {
-            audioFromComboBox_.setSelectedId(kPortSentinelItemId, juce::dontSendNotification);
-            return;
-        }
-
-        selectAudioFromSourceId(previousSourceId);
-    };
-
-    if (action == TSS::ComboBoxLiveRefresh::Action::kDismissRebuildReopen)
-        TSS::ComboBoxLiveRefresh::rebuildPreservingOpenPopup(audioFromComboBox_, rebuild);
-    else
-        rebuild();
-}
-
-juce::String HeaderPanel::getSelectedAudioFromSourceId() const
-{
-    const int itemId = audioFromComboBox_.getSelectedId();
-    if (itemId < kFirstDeviceItemId)
-        return {};
-
-    const auto index = static_cast<size_t>(itemId - kFirstDeviceItemId);
-    if (index >= audioFromSourceIdentifiers_.size())
-        return {};
-
-    return audioFromSourceIdentifiers_[index];
-}
-
-void HeaderPanel::selectAudioFromSourceId(const juce::String& sourceId)
-{
-    if (sourceId.isEmpty())
-    {
-        audioFromComboBox_.setSelectedId(kPortSentinelItemId, juce::dontSendNotification);
-        return;
-    }
-
-    for (size_t i = 0; i < audioFromSourceIdentifiers_.size(); ++i)
-    {
-        if (audioFromSourceIdentifiers_[i] == sourceId)
-        {
-            audioFromComboBox_.setSelectedId(static_cast<int>(i) + kFirstDeviceItemId,
-                                             juce::dontSendNotification);
-            return;
-        }
-    }
-
-    // Missing id: do not fall back to catalog[0] (can flip mono/stereo kind).
-    // Keep sentinel selected so the UI does not pretend a different source is active.
-    audioFromComboBox_.setSelectedId(kPortSentinelItemId, juce::dontSendNotification);
 }

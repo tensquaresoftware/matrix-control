@@ -23,11 +23,9 @@ namespace TSS
         , currentUiScaleId_(config.currentUiScaleId)
         , onSkinSelected_(std::move(config.onSkinSelected))
         , onUiScaleSelected_(std::move(config.onUiScaleSelected))
-        , onAudioMidiSettingsRequested_(std::move(config.onAudioMidiSettingsRequested))
         , onSettingsRequested_(std::move(config.onSettingsRequested))
         , onAboutRequested_(std::move(config.onAboutRequested))
         , contextualHelpBinder_(config.contextualHelpBinder)
-        , showAudioMidiDevices_(onAudioMidiSettingsRequested_ != nullptr)
         , look_(popupMenuLookFromSkin(skin))
         , renderer_(std::make_unique<PopupMenuRenderer>(true, uiScale_))
         , cachedFont_(look_.font.withHeight(look_.font.getHeight() * uiScale_))
@@ -92,26 +90,16 @@ namespace TSS
         items_.push_back({ ItemKind::Spacer, 0, {}, {}, 1, 3 });
         items_.push_back({ ItemKind::HorizontalRule, 0, {}, {}, 1, 4 });
 
-        int actionRow = 5;
-        if (showAudioMidiDevices_)
-        {
-            items_.push_back({ ItemKind::AudioMidiDevices,
-                               0,
-                               PluginDisplayNames::HeaderPanel::kAudioMidiButton,
-                               TSS::EditorChromeShortcutLabels::openAudioMidi(),
-                               1, actionRow++ });
-        }
-
         items_.push_back({ ItemKind::Settings,
                            0,
                            PluginDisplayNames::HeaderPanel::kSettingsButton,
                            TSS::EditorChromeShortcutLabels::openSettings(),
-                           1, actionRow++ });
+                           1, 5 });
         items_.push_back({ ItemKind::About,
                            0,
                            PluginDisplayNames::HeaderPanel::kAboutButton,
                            {},
-                           1, actionRow++ });
+                           1, 6 });
     }
 
     int HeaderLogoPopupMenu::getItemHeightPx() const
@@ -177,7 +165,7 @@ namespace TSS
             return false;
 
         const auto kind = items_[static_cast<size_t>(flatIndex)].kind;
-        return kind == ItemKind::Skin || kind == ItemKind::UiScale || kind == ItemKind::AudioMidiDevices
+        return kind == ItemKind::Skin || kind == ItemKind::UiScale
             || kind == ItemKind::Settings || kind == ItemKind::About;
     }
 
@@ -187,7 +175,7 @@ namespace TSS
             return false;
 
         const auto& item = items_[static_cast<size_t>(flatIndex)];
-        if (item.kind == ItemKind::Settings || item.kind == ItemKind::About || item.kind == ItemKind::AudioMidiDevices)
+        if (item.kind == ItemKind::Settings || item.kind == ItemKind::About)
             return false;
 
         if (item.kind == ItemKind::Skin)
@@ -217,7 +205,6 @@ namespace TSS
         switch (items_[static_cast<size_t>(flatIndex)].kind)
         {
             case ItemKind::Settings:         return Help::kSettings;
-            case ItemKind::AudioMidiDevices: return Help::kAudioMidi;
             case ItemKind::About:            return Help::kAbout;
             case ItemKind::Skin:             return Help::kSkin;
             case ItemKind::UiScale:          return Help::kUiScale;
@@ -263,11 +250,6 @@ namespace TSS
         {
             if (onUiScaleSelected_)
                 onUiScaleSelected_(item.valueId);
-        }
-        else if (item.kind == ItemKind::AudioMidiDevices)
-        {
-            if (onAudioMidiSettingsRequested_)
-                onAudioMidiSettingsRequested_();
         }
         else if (item.kind == ItemKind::Settings)
         {
@@ -428,7 +410,7 @@ namespace TSS
             systemDisplayScale,
             ScaledDrawing::StrokeSnapPolicy::kRound);
         const int insetPx = juce::roundToInt(borderThickness);
-        const int maxRows = showAudioMidiDevices_ ? 9 : 8;
+        const int maxRows = 8;
         const int separatorPx = juce::roundToInt(getSeparatorWidth());
         const int popupWidth = juce::roundToInt(getColumnWidth(0))
             + separatorPx

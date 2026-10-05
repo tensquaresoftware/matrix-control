@@ -6,7 +6,6 @@
 
 #include "GUI/About/AboutWindow.h"
 #include "GUI/About/AboutPanel.h"
-#include "GUI/Dialogs/AudioMidiSettingsWindow.h"
 #include "GUI/Dialogs/BankTransferProgressDialog.h"
 #include "GUI/Dialogs/EpromTypePromptDialog.h"
 #include "GUI/Dialogs/MasterInitConfirmDialog.h"
@@ -15,7 +14,6 @@
 #include "GUI/MainComponent.h"
 #include "GUI/Panels/MainComponent/FooterPanel/FooterPanel.h"
 #include "GUI/Settings/SettingsPanel.h"
-#include "GUI/Settings/SettingsShellMetrics.h"
 #include "GUI/Settings/SettingsWindow.h"
 #include "Core/MIDI/EditorOutboundGate.h"
 #include "Core/Services/DeviceConnectionMachineDefaults.h"
@@ -71,65 +69,9 @@ void PluginEditor::updateBankTransferProgressDialogLayout(float uiScale)
     bankTransferProgressDialog_->setBounds(getLocalBounds());
 }
 
-void PluginEditor::openSettingsWindow()
-{
-    closeAboutWindow();
-    closeAudioMidiSettingsWindow();
-    closeMutatorHistoryDefragConfirmDialog();
-
-    if (settingsWindow_ == nullptr)
-    {
-        const bool isPluginMode = !pluginProcessor.isStandalone();
-        settingsWindow_ = std::make_unique<SettingsWindow>(
-            *skin_,
-            isPluginMode,
-            [this](SettingsPanel& panel)
-            {
-                panel.registerContextualHelp([this]() -> FooterPanel*
-                {
-                    return mainComponent_ != nullptr ? &mainComponent_->getFooterPanel()
-                                                     : nullptr;
-                });
-                wireSettingsPanel(panel);
-            },
-            [this] { closeSettingsWindow(); });
-        settingsWindow_->setOnTabChanged([this](int tabId)
-        {
-            SettingsShellMetrics::writeLastTab(pluginProcessor.getApvts().state, tabId);
-        });
-        addChildComponent(*settingsWindow_);
-    }
-    else
-    {
-        settingsWindow_->setSkin(*skin_);
-    }
-
-    const int baseWidth = layoutDimensions_.editor.width;
-    const float uiScale = (baseWidth > 0)
-        ? TSS::ScaledLayout::uiScaleFromEditorBounds(getWidth(), baseWidth)
-        : 1.0f;
-    updateSettingsWindowLayout(uiScale);
-
-    settingsWindow_->setVisible(true);
-    restoreSettingsPanelFromState(settingsWindow_->getSettingsPanel());
-    settingsWindow_->setActiveTab(SettingsShellMetrics::readAndCoerceLastTab(
-        pluginProcessor.getApvts().state));
-    settingsWindow_->toFront(true);
-    settingsWindow_->grabKeyboardFocus();
-}
-
-void PluginEditor::closeSettingsWindow()
-{
-    closeMasterM1kmLoadChoiceDialog();
-
-    if (settingsWindow_ != nullptr)
-        settingsWindow_->setVisible(false);
-}
-
 void PluginEditor::openAboutWindow()
 {
     closeSettingsWindow();
-    closeAudioMidiSettingsWindow();
     closeMutatorHistoryDefragConfirmDialog();
 
     if (aboutWindow_ == nullptr)

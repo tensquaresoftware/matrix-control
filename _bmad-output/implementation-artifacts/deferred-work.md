@@ -2257,3 +2257,15 @@ Original review bullets below remain for history; status for U-10-owned residual
   summary: Selected-tab fill still not asserted (reconfirmed after polish to black title-band fill).
   evidence: Same paint-only gap as earlier defer; rename of misleading "highlight" test title tracked separately as a patch.
 
+
+## Deferred from: review of spec-settings-audio-tab.md (2026-10-04)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-settings-audio-tab.md`
+  summary: Settings AUDIO still calls scanForDevices() on every refresh path; may stall UI or disturb drivers under frequent ChangeListener churn.
+  evidence: Needs driver/smoke timing before caching; old JUCE selector also rescanned.
+- source_spec: `_bmad-output/implementation-artifacts/spec-settings-audio-tab.md`
+  summary: Core showAudioMidiSettingsDialog / handler set-clear APIs remain as no-ops after Audio/MIDI overlay cutover.
+  evidence: Harmless leftover; broader Core cleanup is outside this delivery's Settings door cut.
+- source_spec: `_bmad-output/implementation-artifacts/spec-settings-audio-tab.md`
+  summary: headerAudioProductCopy only asserts display-name constants, not logo menu item kinds excluding Audio/MIDI.
+  evidence: CONVENTIONS avoid GUI component tests; shortcut rejection already covers Cmd/Ctrl+Alt+,; menu structure stays smoke/manual.

@@ -5,7 +5,6 @@
 #include "PluginEditorInternal.h"
 
 #include "GUI/About/AboutWindow.h"
-#include "GUI/Dialogs/AudioMidiSettingsWindow.h"
 #include "GUI/Dialogs/BankTransferProgressDialog.h"
 #include "GUI/Dialogs/EpromTypePromptDialog.h"
 #include "GUI/Dialogs/MasterInitConfirmDialog.h"
@@ -37,9 +36,6 @@ void PluginEditor::updateSkin()
 
     if (settingsWindow_ != nullptr)
         settingsWindow_->setSkin(*skin_);
-
-    if (audioMidiSettingsWindow_ != nullptr)
-        audioMidiSettingsWindow_->setSkin(*skin_);
 
     if (aboutWindow_ != nullptr)
         aboutWindow_->setSkin(*skin_);
@@ -118,8 +114,6 @@ void PluginEditor::updateOverlayLayoutsForUiScale(float uiScale)
     };
 
     layoutIfVisible(settingsWindow_, [this](float scale) { updateSettingsWindowLayout(scale); });
-    layoutIfVisible(audioMidiSettingsWindow_,
-                    [this](float scale) { updateAudioMidiSettingsWindowLayout(scale); });
     layoutIfVisible(aboutWindow_, [this](float scale) { updateAboutWindowLayout(scale); });
     layoutIfVisible(masterInitConfirmDialog_,
                     [this](float scale) { updateMasterInitConfirmDialogLayout(scale); });

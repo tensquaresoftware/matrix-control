@@ -7,15 +7,16 @@
 #include <juce_graphics/juce_graphics.h>
 
 #include "GUI/About/AboutWindow.h"
-#include "GUI/Dialogs/AudioMidiSettingsWindow.h"
 #include "GUI/Dialogs/BankTransferProgressDialog.h"
 #include "GUI/Dialogs/EpromTypePromptDialog.h"
 #include "GUI/Dialogs/MasterInitConfirmDialog.h"
 #include "GUI/Dialogs/MasterM1kmLoadChoiceDialog.h"
 #include "GUI/Dialogs/MatrixOrderedConfirmDialog.h"
 #include "GUI/Dialogs/MutatorHistoryDefragConfirmDialog.h"
+#include "GUI/Settings/SettingsAudioPage.h"
 #include "GUI/Settings/SettingsPanel.h"
 #include "GUI/Settings/SettingsWindow.h"
+#include "Shared/Definitions/PluginIDs.h"
 #include "GUI/Skins/Skin.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
@@ -269,16 +270,19 @@ namespace
         }
 
         {
-            AudioMidiSettingsWindow::Config config;
-            config.skin = &skin;
-            config.deviceManager = &deviceManager;
-            config.maxInputChannels = 2;
-            config.maxOutputChannels = 2;
-            config.peakLevelProvider = [] { return 0.35f; };
-            config.onCloseRequested = [] {};
-            AudioMidiSettingsWindow audio(std::move(config));
-            audio.setUiScale(uiScale);
-            snapshotComponent(audio, uiScale, "19-audio-settings");
+            SettingsWindow settings(skin,
+                                   false,
+                                   [&](SettingsPanel& panel)
+                                   {
+                                       panel.attachAudioPage(SettingsAudioPage::Config{
+                                           .skin = &skin,
+                                           .deviceManager = &deviceManager,
+                                           .peakLevelProvider = [] { return 0.35f; }});
+                                   },
+                                   [] {});
+            settings.setUiScale(uiScale);
+            settings.setActiveTab(PluginIDs::Settings::LastTab::kAudio);
+            snapshotComponent(settings, uiScale, "19-settings-audio");
         }
     }
 }

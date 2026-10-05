@@ -431,4 +431,12 @@ namespace Core::StandaloneAudioInputRouterDetail
         if (auto* holder = juce::StandalonePluginHolder::getInstance())
             holder->getMuteInputValue().setValue(false);
     }
+
+    juce::AudioDeviceManager* getAudioDeviceManager()
+    {
+        if (auto* holder = juce::StandalonePluginHolder::getInstance())
+            return &holder->deviceManager;
+
+        return nullptr;
+    }
 }

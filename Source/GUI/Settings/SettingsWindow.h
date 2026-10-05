@@ -59,6 +59,7 @@ private:
     std::function<void()> onCloseRequested_;
     TSS::ISkin* skin_;
     float uiScale_ = 1.0f;
+    bool isPluginMode_ = false;
 
     SettingsCloseButton closeButton_;
     std::unique_ptr<SettingsTabRail> tabRail_;

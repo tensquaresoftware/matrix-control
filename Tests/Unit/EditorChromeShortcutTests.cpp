@@ -10,7 +10,7 @@ public:
     void runTest() override
     {
         matchesCommandCommaAsSettings();
-        matchesCommandAltCommaAsAudioMidi();
+        rejectsCommandAltComma();
         matchesCommaWithNonZeroTextCharacter();
         matchesZoomKeysIncludingEqualsAndNumPad();
         matchesZoomKeysWithNonZeroTextCharacter();
@@ -34,9 +34,9 @@ private:
                      static_cast<int>(TSS::EditorChromeShortcut::kOpenSettings));
     }
 
-    void matchesCommandAltCommaAsAudioMidi()
+    void rejectsCommandAltComma()
     {
-        beginTest("matchesCommandAltCommaAsAudioMidi");
+        beginTest("rejectsCommandAltComma");
 
         using juce::ModifierKeys;
         const juce::KeyPress key(',',
@@ -44,7 +44,7 @@ private:
                                  0);
 
         expectEquals(static_cast<int>(TSS::classifyEditorChromeShortcut(key)),
-                     static_cast<int>(TSS::EditorChromeShortcut::kOpenAudioMidiSettings));
+                     static_cast<int>(TSS::EditorChromeShortcut::kNone));
     }
 
     void matchesCommaWithNonZeroTextCharacter()
@@ -53,14 +53,14 @@ private:
 
         using juce::ModifierKeys;
         const juce::KeyPress settings(',', ModifierKeys::commandModifier, ',');
-        const juce::KeyPress audioMidi(',',
-                                       ModifierKeys::commandModifier | ModifierKeys::altModifier,
-                                       ',');
+        const juce::KeyPress commandAlt(',',
+                                        ModifierKeys::commandModifier | ModifierKeys::altModifier,
+                                        ',');
 
         expectEquals(static_cast<int>(TSS::classifyEditorChromeShortcut(settings)),
                      static_cast<int>(TSS::EditorChromeShortcut::kOpenSettings));
-        expectEquals(static_cast<int>(TSS::classifyEditorChromeShortcut(audioMidi)),
-                     static_cast<int>(TSS::EditorChromeShortcut::kOpenAudioMidiSettings));
+        expectEquals(static_cast<int>(TSS::classifyEditorChromeShortcut(commandAlt)),
+                     static_cast<int>(TSS::EditorChromeShortcut::kNone));
     }
 
     void matchesZoomKeysIncludingEqualsAndNumPad()
@@ -217,15 +217,12 @@ private:
 
 #if JUCE_MAC
         const auto settings = TSS::EditorChromeShortcutLabels::openSettings();
-        const auto audioMidi = TSS::EditorChromeShortcutLabels::openAudioMidi();
         const auto step = TSS::EditorChromeShortcutLabels::uiScaleStep();
         const auto reset = TSS::EditorChromeShortcutLabels::uiScaleReset();
 
         expectEquals(static_cast<int>(settings[0]), 0x2318);
         expectEquals(static_cast<int>(step[0]), 0x2318);
         expectEquals(static_cast<int>(reset[0]), 0x2318);
-        expectEquals(static_cast<int>(audioMidi[0]), 0x2325);
-        expect(audioMidi.contains(TSS::EditorChromeShortcutLabels::macCommandGlyph()));
         expect(! settings.containsChar(static_cast<juce::juce_wchar>(0x00e2))); // not Latin-1 â
 #else
         expect(TSS::EditorChromeShortcutLabels::openSettings() == "Ctrl+,");

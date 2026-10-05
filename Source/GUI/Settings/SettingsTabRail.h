@@ -2,6 +2,7 @@
 
 #include <functional>
 #include <memory>
+#include <vector>
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
@@ -16,7 +17,7 @@ namespace TSS
 class SettingsTabRail : public juce::Component
 {
 public:
-    SettingsTabRail(TSS::ISkin& skin, std::function<void(int)> onTabSelected);
+    SettingsTabRail(TSS::ISkin& skin, bool isPluginMode, std::function<void(int)> onTabSelected);
     ~SettingsTabRail() override = default;
 
     void setSkin(TSS::ISkin& skin);
@@ -32,7 +33,6 @@ private:
     {
     public:
         TabButton(const juce::String& text);
-
 
         void setLook(const TSS::LabelLook& look);
         void setSelected(bool isSelected);
@@ -55,9 +55,10 @@ private:
 
     TSS::ISkin* skin_ = nullptr;
     float uiScale_ = 1.0f;
+    bool isPluginMode_ = false;
     int selectedTabId_ = 1;
     std::function<void(int)> onTabSelected_;
-    std::unique_ptr<TabButton> tabs_[PluginIDs::Settings::LastTab::kCount];
+    std::vector<std::unique_ptr<TabButton>> tabs_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SettingsTabRail)
 };

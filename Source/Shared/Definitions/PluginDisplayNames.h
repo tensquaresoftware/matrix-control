@@ -16,13 +16,12 @@ namespace PluginDisplayNames
         constexpr const char* kEditorMidiFromLabel = "MIDI FROM";
         constexpr const char* kMidiToLabel         = "MIDI TO";
         constexpr const char* kKeyboardFromLabel   = "KEYBOARD FROM";
-        constexpr const char* kAudioFromLabel      = "AUDIO FROM";
+        constexpr const char* kAudioCartoucheLabel = "AUDIO";
         constexpr const char* kInputGainLabel      = "INPUT GAIN";
         constexpr const char* kNoInputSentinel     = "NO INPUT";
         constexpr const char* kNoOutputSentinel    = "NO OUTPUT";
         constexpr const char* kHostDisplay         = "HOST";
         constexpr const char* kSettingsButton      = "SETTINGS...";
-        constexpr const char* kAudioMidiButton     = "AUDIO/MIDI...";
         constexpr const char* kAboutButton         = "ABOUT...";
         constexpr const char* kLogoSkinSection     = "SKIN";
         constexpr const char* kLogoUiScaleSection  = "UI SCALE";
@@ -40,10 +39,8 @@ namespace PluginDisplayNames
                 "SESSION: Selects a separate MIDI keyboard input for playing (Standalone application only).";
             constexpr const char* kHost =
                 "SESSION: Keyboard MIDI comes from the DAW host (Plugin only).";
-            constexpr const char* kAudioFrom =
-                "SESSION: Selects the audio input used for monitoring through the plugin.";
             constexpr const char* kInputGain =
-                "SESSION: Sets monitoring level for the selected audio input.";
+                "SESSION: Sets monitoring level for the selected audio input. Choose the listen source in Settings > AUDIO > SYNTH FROM.";
             constexpr const char* kUndo =
                 "SESSION: Undoes the last Patch or master edit in this session.";
             constexpr const char* kRedo =
@@ -51,11 +48,9 @@ namespace PluginDisplayNames
             constexpr const char* kPanic =
                 "SESSION: Sends MIDI panic to clear stuck notes and ease a backed-up send queue.";
             constexpr const char* kLogo =
-                "SESSION: Opens the logo menu for Settings, Audio/MIDI, About, Skin, and UI Scale.";
+                "SESSION: Opens the logo menu for Settings, About, Skin, and UI Scale.";
             constexpr const char* kSettings =
                 "SESSION: Opens plugin Settings (paths, warnings, master utility, shortcuts).";
-            constexpr const char* kAudioMidi =
-                "SESSION: Opens the host Audio/MIDI device settings (Standalone application only).";
             constexpr const char* kAbout =
                 "SESSION: Shows product version, links, and credits.";
             constexpr const char* kSkin =
@@ -159,13 +154,23 @@ namespace PluginDisplayNames
         constexpr const char* kSkinLabel               = "SKIN:";
         constexpr const char* kUiScaleLabel            = "UI SCALE:";
         constexpr const char* kHardwareLatencyLabel    = "HARDWARE LATENCY";
-        constexpr const char* kAudioFromLabel          = "AUDIO FROM:";
         constexpr const char* kInputGainLabel          = "INPUT GAIN:";
         constexpr const char* kUserInterfaceTab        = "USER INTERFACE";
         constexpr const char* kDeviceSection           = "DEVICE";
+        constexpr const char* kAudioTab                = "AUDIO";
         constexpr const char* kPatchSection            = "PATCH";
         constexpr const char* kPatchMutatorSection     = "PATCH MUTATOR";
         constexpr const char* kMasterSection           = "MASTER";
+        constexpr const char* kDriverTypeLabel         = "DRIVER TYPE";
+        constexpr const char* kInputDeviceLabel        = "INPUT DEVICE";
+        constexpr const char* kOutputDeviceLabel       = "OUTPUT DEVICE";
+        constexpr const char* kNoDeviceSentinel        = "NONE";
+        constexpr const char* kSampleRateLabel         = "SAMPLE RATE";
+        constexpr const char* kBufferSizeLabel         = "BUFFER SIZE";
+        constexpr const char* kInputChannelsLabel      = "INPUT CHANNELS";
+        constexpr const char* kOutputChannelsLabel     = "OUTPUT CHANNELS";
+        constexpr const char* kSynthFromLabel          = "SYNTH FROM";
+        constexpr const char* kPlayTestToneButton      = "PLAY TEST TONE";
         constexpr const char* kInfoMessageLabel        = "INFO MESSAGE";
         constexpr const char* kContextualHelpLabel     = "CONTEXTUAL HELP";
         constexpr const char* kKeep                    = "KEEP";
@@ -264,6 +269,26 @@ namespace PluginDisplayNames
                 "SETTINGS: Saves current Master settings as the master init template.";
             constexpr const char* kMasterDeleteInit =
                 "SETTINGS: Deletes the saved master init template.";
+            constexpr const char* kDriverType =
+                "SETTINGS: Chooses the audio driver type for this standalone session.";
+            constexpr const char* kInputDevice =
+                "SETTINGS: Chooses the audio input device.";
+            constexpr const char* kOutputDevice =
+                "SETTINGS: Chooses the audio output device.";
+            constexpr const char* kSampleRate =
+                "SETTINGS: Chooses the audio sample rate.";
+            constexpr const char* kBufferSize =
+                "SETTINGS: Chooses the audio buffer size.";
+            constexpr const char* kInputChannels =
+                "SETTINGS: Chooses which stereo input pair is open.";
+            constexpr const char* kOutputChannels =
+                "SETTINGS: Chooses which stereo output pair is open.";
+            constexpr const char* kSynthFrom =
+                "SETTINGS: Chooses which open input wire is monitored (SYNTH FROM).";
+            constexpr const char* kPlayTestTone =
+                "SETTINGS: Plays a short test tone on the selected output channels.";
+            constexpr const char* kAudioPeakIndicator =
+                "SETTINGS: Shows the peak level of the monitored audio input.";
         }
 
     }
@@ -469,12 +494,6 @@ namespace PluginDisplayNames
             constexpr const char* kMasterSettingsOnly = "MASTER SETTINGS ONLY";
             constexpr const char* kFullMaster = "FULL MASTER";
             constexpr const char* kCancel = "CANCEL";
-        }
-
-        namespace AudioMidiSettings
-        {
-            constexpr const char* kTitle = "AUDIO SETTINGS";
-            constexpr const char* kTestButton = "TEST";
         }
 
         namespace BankTransferProgress

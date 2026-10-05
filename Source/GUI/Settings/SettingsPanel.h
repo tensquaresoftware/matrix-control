@@ -9,6 +9,8 @@
 #include "GUI/Widgets/Label.h"
 #include "GUI/Widgets/Slider.h"
 #include "GUI/Helpers/ContextualHelpBinder.h"
+#include "GUI/Settings/SettingsAudioPage.h"
+#include "GUI/Settings/SettingsShellMetrics.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
 
 namespace TSS
@@ -19,7 +21,7 @@ namespace TSS
 class SettingsPanel : public juce::Component
 {
 public:
-    static constexpr int kDesignWidth = 292;
+    static constexpr int kDesignWidth = SettingsShellMetrics::kContentWidth;
 
     SettingsPanel(TSS::ISkin& skin, bool isPluginMode);
     ~SettingsPanel() override = default;
@@ -33,6 +35,9 @@ public:
     void setDeviceType(MatrixDeviceTypes::Type deviceType);
     void setActiveTab(int tabId);
     int getActiveTab() const noexcept { return activeTabId_; }
+
+    void attachAudioPage(SettingsAudioPage::Config config);
+    SettingsAudioPage* getAudioPage() const noexcept { return audioPage_.get(); }
 
     void registerContextualHelp(TSS::ContextualHelpBinder::FooterResolver resolveFooter);
 
@@ -101,6 +106,7 @@ private:
     void layoutContent(juce::Rectangle<int> bounds);
     void layoutInterfaceSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics);
     void layoutDeviceSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics);
+    void layoutAudioSection(juce::Rectangle<int>& bounds);
     void layoutPatchSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics);
     void layoutPatchMutatorSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics);
     void layoutMasterSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics);
@@ -118,11 +124,11 @@ private:
                          const RowLayoutMetrics& metrics,
                          const ButtonRowLayoutArgs& args);
 
-    inline constexpr static int kPadding_ = 16;
+    inline constexpr static int kPadding_ = SettingsShellMetrics::kPadding;
     inline constexpr static int kRowGap_ = 8;
     inline constexpr static int kControlHeight_ = 20;
-    inline constexpr static int kLabelWidth_ = 120;
-    inline constexpr static int kComboWidth_ = 140;
+    inline constexpr static int kLabelWidth_ = SettingsShellMetrics::kLabelWidth;
+    inline constexpr static int kComboWidth_ = SettingsShellMetrics::kControlColumnWidth;
     inline constexpr static int kSliderWidth_ = 72;
     inline constexpr static int kButtonGap_ = 4;
     inline constexpr static int kUtilityLoadWidth_ = 44;
@@ -178,6 +184,7 @@ private:
     std::unique_ptr<TSS::Button> masterSaveAsInitButton_;
     std::unique_ptr<TSS::Button> masterDeleteInitButton_;
 
+    std::unique_ptr<SettingsAudioPage> audioPage_;
     std::unique_ptr<TSS::ContextualHelpBinder> contextualHelpBinder_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SettingsPanel)

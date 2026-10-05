@@ -44,11 +44,6 @@ void PluginEditor::wireHeaderPanel(HeaderPanel& headerPanel)
             openAboutWindow();
     };
 
-    headerPanel.onAudioMidiSettingsRequested = []
-    {
-        Core::StandaloneAudioInputRouter::showAudioMidiSettingsDialog();
-    };
-
     headerPanel.onPanicRequested = [this]
     {
         pluginProcessor.getMidiManager().sendPanic();

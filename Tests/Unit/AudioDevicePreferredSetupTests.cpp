@@ -14,7 +14,6 @@ public:
         restoresBufferWhenSupportedAndChanged();
         skipsBufferWhenUnsupportedOrAlreadyMatched();
         captureIgnoresInvalidZeros();
-        matrixSelectorPolicyHidesMidiAndKeepsAdvanced();
         sameDeviceChangeCapturesWithoutRestore();
         deviceIdentityChangeRestoresThenCaptures();
         deviceIdentityChangeSkipsUnsupportedPreferred();
@@ -66,17 +65,6 @@ private:
         const auto updated = Core::capturePreferredSetup(previous, 44100.0, 128);
         expectEquals(updated.sampleRate, 44100.0);
         expectEquals(updated.bufferSize, 128);
-    }
-
-    void matrixSelectorPolicyHidesMidiAndKeepsAdvanced()
-    {
-        beginTest("matrixSelectorPolicyHidesMidiAndKeepsAdvanced");
-
-        const auto policy = Core::matrixAudioMidiSettingsSelectorPolicy();
-        expect(! policy.showMidiInputOptions);
-        expect(! policy.showMidiOutputSelector);
-        expect(policy.showChannelsAsStereoPairs);
-        expect(! policy.hideAdvancedOptionsWithButton);
     }
 
     void sameDeviceChangeCapturesWithoutRestore()

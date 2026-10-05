@@ -29,6 +29,17 @@ SettingsPanel::SettingsPanel(TSS::ISkin& skin, bool isPluginMode)
     refreshEpromTypeItems(PluginIDs::Settings::EpromType::kDefault);
 }
 
+void SettingsPanel::attachAudioPage(SettingsAudioPage::Config config)
+{
+    if (isPluginMode_ || audioPage_ != nullptr)
+        return;
+
+    audioPage_ = std::make_unique<SettingsAudioPage>(std::move(config));
+    addChildComponent(*audioPage_);
+    updatePageVisibility();
+    resized();
+}
+
 void SettingsPanel::registerContextualHelp(TSS::ContextualHelpBinder::FooterResolver resolveFooter)
 {
     namespace Help = PluginDisplayNames::Settings::ContextualHelp;
@@ -53,6 +64,9 @@ void SettingsPanel::registerContextualHelp(TSS::ContextualHelpBinder::FooterReso
     contextualHelpBinder_->bind(masterInitButton_.get(), Help::kMasterInit);
     contextualHelpBinder_->bind(masterSaveAsInitButton_.get(), Help::kMasterSaveAsInit);
     contextualHelpBinder_->bind(masterDeleteInitButton_.get(), Help::kMasterDeleteInit);
+
+    if (audioPage_ != nullptr)
+        audioPage_->registerContextualHelp(*contextualHelpBinder_);
 }
 
 void SettingsPanel::paint(juce::Graphics& g)
@@ -197,6 +211,15 @@ void SettingsPanel::layoutMasterSection(juce::Rectangle<int>& bounds, const RowL
                                          { metrics.saveAsInitWidth, metrics.deleteInitWidth } });
 }
 
+void SettingsPanel::layoutAudioSection(juce::Rectangle<int>& bounds)
+{
+    if (audioPage_ == nullptr)
+        return;
+
+    audioPage_->setBounds(bounds);
+    audioPage_->setUiScale(uiScale_);
+}
+
 void SettingsPanel::layoutContent(juce::Rectangle<int> bounds)
 {
     RowLayoutMetrics metrics;
@@ -220,6 +243,9 @@ void SettingsPanel::layoutContent(juce::Rectangle<int> bounds)
         case kDevice:
             layoutDeviceSection(bounds, metrics);
             break;
+        case kAudio:
+            layoutAudioSection(bounds);
+            break;
         case kPatch:
             layoutPatchSection(bounds, metrics);
             break;
@@ -240,6 +266,8 @@ void SettingsPanel::setSkin(TSS::ISkin& skin)
 {
     skin_ = &skin;
     applyChildLooks(skin);
+    if (audioPage_ != nullptr)
+        audioPage_->setSkin(skin);
     repaint();
 }
 
@@ -262,7 +290,7 @@ void SettingsPanel::setPluginMode(bool isPluginMode)
 
 void SettingsPanel::setActiveTab(int tabId)
 {
-    const int normalized = PluginIDs::Settings::LastTab::normalize(tabId);
+    const int normalized = PluginIDs::Settings::LastTab::normalize(tabId, isPluginMode_);
     if (activeTabId_ == normalized)
     {
         updatePageVisibility();
@@ -290,6 +318,7 @@ void SettingsPanel::updatePageVisibility()
 
     const bool showUi = activeTabId_ == kUserInterface;
     const bool showDevice = activeTabId_ == kDevice;
+    const bool showAudio = activeTabId_ == kAudio && audioPage_ != nullptr;
     const bool showPatch = activeTabId_ == kPatch;
     const bool showMutator = activeTabId_ == kPatchMutator;
     const bool showMaster = activeTabId_ == kMaster;
@@ -305,6 +334,9 @@ void SettingsPanel::updatePageVisibility()
     hardwareLatencySlider_->setVisible(showLatency);
     epromTypeLabel_->setVisible(showDevice);
     epromTypeCombo_->setVisible(showDevice);
+
+    if (audioPage_ != nullptr)
+        audioPage_->setVisible(showAudio);
 
     matrix1000PatchesLabel_->setVisible(showPatch);
     matrix1000PatchesCombo_->setVisible(showPatch);

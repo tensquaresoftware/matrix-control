@@ -26,11 +26,13 @@ namespace
         float editorMidiFromLabelWidth = 0.0f;
         float midiToLabelWidth = 0.0f;
         float keyboardFromLabelWidth = 0.0f;
-        float audioFromLabelWidth = 0.0f;
+        float audioCartoucheWidth = 0.0f;
+        float audioCartoucheInset = 0.0f;
+        int audioCartoucheStrokePx = 1;
+        int audioCartoucheStrokeOutwardPx = 0;
         float inputGainLabelWidth = 0.0f;
         float labelToControlGap = 0.0f;
         float keyboardFromLabelToComboGap = 0.0f;
-        float audioFromLabelToComboGap = 0.0f;
         float inputGainLabelToSliderGap = 0.0f;
         float portComboWidth = 0.0f;
         float inputGainSliderWidth = 0.0f;
@@ -60,11 +62,17 @@ namespace
             m.editorMidiFromLabelWidth = static_cast<float>(dimensions.editorMidiFromLabelWidth) * sf;
             m.midiToLabelWidth = static_cast<float>(dimensions.midiToLabelWidth) * sf;
             m.keyboardFromLabelWidth = static_cast<float>(dimensions.keyboardFromLabelWidth) * sf;
-            m.audioFromLabelWidth = static_cast<float>(dimensions.audioFromLabelWidth) * sf;
+            m.audioCartoucheWidth = static_cast<float>(dimensions.audioCartoucheWidth) * sf;
+            m.audioCartoucheInset = static_cast<float>(dimensions.audioCartoucheInset) * sf;
+            // Layout air was calibrated to a 1 px design stroke; extra thickness grows outward.
+            constexpr float kStrokeBaselineDesign = 1.0f;
+            m.audioCartoucheStrokePx = juce::jmax(
+                1, TSS::ScaledLayout::scaledInt(static_cast<float>(dimensions.audioCartoucheStrokeThickness), sf));
+            const int strokeBaselinePx = juce::jmax(1, TSS::ScaledLayout::scaledInt(kStrokeBaselineDesign, sf));
+            m.audioCartoucheStrokeOutwardPx = juce::jmax(0, m.audioCartoucheStrokePx - strokeBaselinePx);
             m.inputGainLabelWidth = static_cast<float>(dimensions.inputGainLabelWidth) * sf;
             m.labelToControlGap = static_cast<float>(dimensions.labelToControlGap) * sf;
             m.keyboardFromLabelToComboGap = static_cast<float>(dimensions.keyboardFromLabelToComboGap) * sf;
-            m.audioFromLabelToComboGap = static_cast<float>(dimensions.audioFromLabelToComboGap) * sf;
             m.inputGainLabelToSliderGap = static_cast<float>(dimensions.inputGainLabelToSliderGap) * sf;
             m.portComboWidth = static_cast<float>(dimensions.portComboBoxWidth) * sf;
             m.inputGainSliderWidth = static_cast<float>(dimensions.inputGainSliderWidth) * sf;
@@ -136,6 +144,10 @@ namespace
             peak.setUiScale(uiScale_);
             x_ += peakWidth + gap_;
         }
+
+        [[nodiscard]] float x() const noexcept { return x_; }
+        [[nodiscard]] int y() const noexcept { return y_; }
+        [[nodiscard]] int h() const noexcept { return h_; }
 
         void endPacket()
         {
@@ -217,16 +229,34 @@ void HeaderPanel::resized()
     placer.placeCombo(midiToComboBox_, metrics.portComboWidth);
     placer.endPacket();
 
+    audioCartoucheBadgeBounds_ = {};
+    audioCartoucheFrameBounds_ = {};
+    audioCartoucheStrokePx_ = 1;
+
     if (!isPluginMode_)
     {
-        placer.placeLabel(audioFromLabel_, metrics.audioFromLabelWidth, metrics.audioFromLabelToComboGap);
-        placer.placeCombo(audioFromComboBox_, metrics.portComboWidth);
-        placer.endPacket();
+        const int badgeX = juce::roundToInt(placer.x());
+        const int badgeW = juce::roundToInt(metrics.audioCartoucheWidth);
+        const int inset = juce::roundToInt(metrics.audioCartoucheInset);
+        const int outward = metrics.audioCartoucheStrokeOutwardPx;
+        const int frameY = placer.y() - inset - outward;
+        const int frameH = placer.h() + 2 * inset + 2 * outward;
+        audioCartoucheBadgeBounds_ = { badgeX, frameY, badgeW, frameH };
+        audioCartoucheStrokePx_ = metrics.audioCartoucheStrokePx;
 
-        placer.placeLabel(inputGainLabel_, metrics.inputGainLabelWidth, metrics.inputGainLabelToSliderGap);
-        placer.placeSlider(inputGainSlider_, metrics.inputGainSliderWidth);
-        placer.placePeak(peakIndicator_, metrics.peakIndicatorWidth);
-        placer.endPacket();
+        PacketPlacer audioPlacer(static_cast<float>(badgeX + badgeW + inset), metrics, uiScale_);
+        audioPlacer.placeLabel(inputGainLabel_, metrics.inputGainLabelWidth, metrics.inputGainLabelToSliderGap);
+        audioPlacer.placeSlider(inputGainSlider_, metrics.inputGainSliderWidth);
+        audioPlacer.placePeak(peakIndicator_, metrics.peakIndicatorWidth);
+
+        // Keep the post-peak gap as air before the closing vertical hairline; grow stroke outward.
+        const int frameRight = juce::roundToInt(audioPlacer.x()) + outward;
+        audioCartoucheFrameBounds_ = {
+            badgeX,
+            frameY,
+            juce::jmax(badgeW, frameRight - badgeX),
+            frameH
+        };
     }
 
     const HeaderActionButtonCluster actionButtons {

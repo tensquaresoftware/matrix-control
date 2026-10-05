@@ -96,17 +96,71 @@ namespace PluginIDs
         {
             constexpr int kUserInterface = 1;
             constexpr int kDevice = 2;
-            constexpr int kPatch = 3;
-            constexpr int kPatchMutator = 4;
-            constexpr int kMaster = 5;
+            constexpr int kAudio = 3;
+            constexpr int kPatch = 4;
+            constexpr int kPatchMutator = 5;
+            constexpr int kMaster = 6;
             constexpr int kDefault = kUserInterface;
             constexpr int kFirst = kUserInterface;
             constexpr int kLast = kMaster;
-            constexpr int kCount = 5;
+            constexpr int kMaxCount = 6;
+            constexpr int kStandaloneCount = 6;
+            constexpr int kPluginCount = 5;
 
-            inline int normalize(int raw)
+            inline int count(bool isPluginMode) noexcept
             {
-                if (raw >= kFirst && raw <= kLast)
+                return isPluginMode ? kPluginCount : kStandaloneCount;
+            }
+
+            inline bool isValid(int raw, bool isPluginMode) noexcept
+            {
+                if (raw < kFirst || raw > kLast)
+                    return false;
+
+                if (isPluginMode && raw == kAudio)
+                    return false;
+
+                return true;
+            }
+
+            inline int idAt(int index, bool isPluginMode) noexcept
+            {
+                static constexpr int kStandaloneIds[] = {
+                    kUserInterface, kDevice, kAudio, kPatch, kPatchMutator, kMaster
+                };
+                static constexpr int kPluginIds[] = {
+                    kUserInterface, kDevice, kPatch, kPatchMutator, kMaster
+                };
+
+                if (isPluginMode)
+                {
+                    if (index < 0 || index >= kPluginCount)
+                        return kDefault;
+
+                    return kPluginIds[index];
+                }
+
+                if (index < 0 || index >= kStandaloneCount)
+                    return kDefault;
+
+                return kStandaloneIds[index];
+            }
+
+            inline int indexOf(int tabId, bool isPluginMode) noexcept
+            {
+                const int n = count(isPluginMode);
+                for (int i = 0; i < n; ++i)
+                {
+                    if (idAt(i, isPluginMode) == tabId)
+                        return i;
+                }
+
+                return 0;
+            }
+
+            inline int normalize(int raw, bool isPluginMode = false) noexcept
+            {
+                if (isValid(raw, isPluginMode))
                     return raw;
 
                 return kDefault;

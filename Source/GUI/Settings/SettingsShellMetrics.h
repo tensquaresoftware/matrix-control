@@ -9,49 +9,63 @@
 
 namespace SettingsShellMetrics
 {
-    inline constexpr int kRailWidth = 148;
+    // Edge inset matches tab-label inset (body left → tab text) and content right gap.
+    inline constexpr int kPadding = 8;
+    inline constexpr int kRailWidth = 120;
     inline constexpr int kRuleGutter = 4;
-    inline constexpr int kContentWidth = 292;
+    inline constexpr int kLabelWidth = 120;
+    // Matches widest MASTER button pack (three 44 + gaps, or SAVE AS INIT + DELETE).
+    inline constexpr int kControlColumnWidth = 140;
+    inline constexpr int kContentWidth = kLabelWidth + kControlColumnWidth + kPadding * 2;
     inline constexpr int kDesignWidth = kRailWidth + kRuleGutter + kContentWidth;
-    inline constexpr int kPadding = 16;
     inline constexpr int kRowGap = 8;
     inline constexpr int kControlHeight = 20;
     inline constexpr int kTabRowHeight = 20;
-    inline constexpr int kLabelWidth = 120;
-    inline constexpr int kControlColumnWidth = 140;
-    inline constexpr int kTallestPageRows = 4;
+    inline constexpr int kPeakWidth = 12;
+    inline constexpr int kPeakGap = 8;
+    inline constexpr int kSynthFromComboWidth = kControlColumnWidth - kPeakWidth - kPeakGap;
+    // AUDIO: 9 control rows + 2 blanks + up to two wrapped channel-row budgets.
+    inline constexpr int kTallestPageRows = 14;
     inline constexpr int kRuleThicknessUntil200 = 1;
     inline constexpr int kRuleThicknessAt200 = 2;
 
-    static_assert(kDesignWidth == 444);
+    static_assert(kDesignWidth == 400);
     static_assert(kLabelWidth + kControlColumnWidth + kPadding * 2 == kContentWidth);
+    static_assert(kSynthFromComboWidth + kPeakGap + kPeakWidth == kControlColumnWidth);
+    static_assert(kPadding % 4 == 0);
+    static_assert(kRailWidth % 4 == 0);
+    static_assert(kLabelWidth % 4 == 0);
+    static_assert(kControlColumnWidth % 4 == 0);
+    static_assert(kSynthFromComboWidth % 4 == 0);
 
-    inline int tabCount() noexcept
+    inline int tabCount(bool isPluginMode) noexcept
     {
-        return PluginIDs::Settings::LastTab::kCount;
+        return PluginIDs::Settings::LastTab::count(isPluginMode);
     }
 
-    inline const char* tabLabel(int index) noexcept
+    inline const char* tabLabel(int index, bool isPluginMode) noexcept
     {
         using namespace PluginDisplayNames::Settings;
-        constexpr const char* labels[] = {
-            kUserInterfaceTab,
-            kDeviceSection,
-            kPatchSection,
-            kPatchMutatorSection,
-            kMasterSection
-        };
-        static_assert(sizeof(labels) / sizeof(labels[0]) == PluginIDs::Settings::LastTab::kCount);
+        using namespace PluginIDs::Settings::LastTab;
 
-        if (index < 0 || index >= tabCount())
+        if (index < 0 || index >= count(isPluginMode))
             return "";
 
-        return labels[index];
+        switch (idAt(index, isPluginMode))
+        {
+            case kUserInterface: return kUserInterfaceTab;
+            case kDevice: return kDeviceSection;
+            case kAudio: return kAudioTab;
+            case kPatch: return kPatchSection;
+            case kPatchMutator: return kPatchMutatorSection;
+            case kMaster: return kMasterSection;
+            default: return "";
+        }
     }
 
-    inline int railLabelStackHeight() noexcept
+    inline int railLabelStackHeight(bool isPluginMode) noexcept
     {
-        return tabCount() * kTabRowHeight;
+        return tabCount(isPluginMode) * kTabRowHeight;
     }
 
     inline int pageContentHeight(int rowCount) noexcept
@@ -67,14 +81,19 @@ namespace SettingsShellMetrics
         return isPluginMode;
     }
 
+    inline bool showsAudioTab(bool isPluginMode) noexcept
+    {
+        return ! isPluginMode;
+    }
+
     inline int tallestPageContentHeight() noexcept
     {
         return pageContentHeight(kTallestPageRows);
     }
 
-    inline int paddedBodyDesignHeight() noexcept
+    inline int paddedBodyDesignHeight(bool isPluginMode) noexcept
     {
-        return kPadding * 2 + juce::jmax(railLabelStackHeight(), tallestPageContentHeight());
+        return kPadding * 2 + juce::jmax(railLabelStackHeight(isPluginMode), tallestPageContentHeight());
     }
 
     inline int scaledRailWidth(float uiScale) noexcept
@@ -97,9 +116,9 @@ namespace SettingsShellMetrics
         return scaledRailWidth(uiScale) + scaledRuleGutter(uiScale) + scaledContentWidth(uiScale);
     }
 
-    inline int scaledBodyHeight(float uiScale) noexcept
+    inline int scaledBodyHeight(float uiScale, bool isPluginMode) noexcept
     {
-        return TSS::ScaledLayout::scaledInt(static_cast<float>(paddedBodyDesignHeight()), uiScale);
+        return TSS::ScaledLayout::scaledInt(static_cast<float>(paddedBodyDesignHeight(isPluginMode)), uiScale);
     }
 
     inline int scaledLabelWidth(float uiScale) noexcept
@@ -147,7 +166,7 @@ namespace SettingsShellMetrics
         return editorBounds.withSizeKeepingCentre(width, height);
     }
 
-    inline int readAndCoerceLastTab(juce::ValueTree& state)
+    inline int readAndCoerceLastTab(juce::ValueTree& state, bool isPluginMode)
     {
         using namespace PluginIDs::Settings;
 
@@ -155,7 +174,7 @@ namespace SettingsShellMetrics
             return LastTab::kDefault;
 
         const int raw = static_cast<int>(state.getProperty(kLastSettingsTab, LastTab::kDefault));
-        const int normalized = LastTab::normalize(raw);
+        const int normalized = LastTab::normalize(raw, isPluginMode);
 
         if (normalized != raw)
             state.setProperty(kLastSettingsTab, normalized, nullptr);
@@ -163,9 +182,9 @@ namespace SettingsShellMetrics
         return normalized;
     }
 
-    inline void writeLastTab(juce::ValueTree& state, int tabId)
+    inline void writeLastTab(juce::ValueTree& state, int tabId, bool isPluginMode)
     {
         using namespace PluginIDs::Settings;
-        state.setProperty(kLastSettingsTab, LastTab::normalize(tabId), nullptr);
+        state.setProperty(kLastSettingsTab, LastTab::normalize(tabId, isPluginMode), nullptr);
     }
 }

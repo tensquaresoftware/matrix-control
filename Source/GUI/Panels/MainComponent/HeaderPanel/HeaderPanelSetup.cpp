@@ -13,14 +13,6 @@ void HeaderPanel::wireLogoCallbacks()
         if (onSettingsRequested)
             onSettingsRequested();
     };
-    logo_.onAudioMidiSettingsRequested = [this]
-    {
-        if (isPluginMode_)
-            return;
-
-        if (onAudioMidiSettingsRequested)
-            onAudioMidiSettingsRequested();
-    };
 #if JUCE_DEBUG
     logo_.onUiTestsToggleRequested = [this]
     {
@@ -69,9 +61,6 @@ void HeaderPanel::addChildControls(TSS::ISkin& skin)
     midiToComboBox_.setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
     addAndMakeVisible(midiToComboBox_);
 
-    addAndMakeVisible(audioFromLabel_);
-    audioFromComboBox_.setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
-    addAndMakeVisible(audioFromComboBox_);
     addAndMakeVisible(inputGainLabel_);
     addAndMakeVisible(inputGainSlider_);
     peakIndicator_.setSkin(skin);
@@ -139,9 +128,6 @@ void HeaderPanel::setSkin(TSS::ISkin& skin)
     editorActivityLed_.setSkin(skin);
     midiToActivityLed_.setSkin(skin);
     instrumentActivityLed_.setSkin(skin);
-    audioFromLabel_.setLook(TSS::darkPanelLabelLookFromSkin(skin));
-    audioFromComboBox_.setLook(TSS::comboBoxLookFromSkin(skin));
-    audioFromComboBox_.setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
     inputGainLabel_.setLook(TSS::darkPanelLabelLookFromSkin(skin));
     inputGainSlider_.setLook(TSS::sliderLookFromSkin(skin));
     peakIndicator_.setSkin(skin);
