@@ -83,8 +83,6 @@ void PluginEditor::showReadySettingsWindow(SettingsPanel& panel, bool isPluginMo
     restoreSettingsPanelFromState(panel);
     settingsWindow_->setActiveTab(SettingsShellMetrics::readAndCoerceLastTab(
         pluginProcessor.getApvts().state, isPluginMode));
-    if (auto* audioPage = panel.getAudioPage())
-        audioPage->setMonitoringActive(true);
     refreshAudioFromCombo();
     settingsWindow_->toFront(true);
     settingsWindow_->grabKeyboardFocus();

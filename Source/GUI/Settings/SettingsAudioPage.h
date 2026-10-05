@@ -40,7 +40,7 @@ public:
     void setSkin(TSS::ISkin& skin);
     void setUiScale(float uiScale);
     void setVisible(bool shouldBeVisible) override;
-    /** Start/stop peak timer + device ChangeListener while Settings is shown. */
+    /** Start/stop peak timer + device ChangeListener while the AUDIO tab is visible. */
     void setMonitoringActive(bool shouldBeActive);
 
     void populateSynthFromCombo(const juce::StringArray& channelNames,

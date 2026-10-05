@@ -50,7 +50,7 @@ namespace PluginDisplayNames
             constexpr const char* kLogo =
                 "SESSION: Opens the logo menu for Settings, About, Skin, and UI Scale.";
             constexpr const char* kSettings =
-                "SESSION: Opens plugin Settings (paths, warnings, master utility, shortcuts).";
+                "SESSION: Opens Settings (standalone audio, paths, warnings, master utility, shortcuts).";
             constexpr const char* kAbout =
                 "SESSION: Shows product version, links, and credits.";
             constexpr const char* kSkin =

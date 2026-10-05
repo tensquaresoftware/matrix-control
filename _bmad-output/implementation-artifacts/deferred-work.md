@@ -2269,3 +2269,12 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-settings-audio-tab.md`
   summary: headerAudioProductCopy only asserts display-name constants, not logo menu item kinds excluding Audio/MIDI.
   evidence: CONVENTIONS avoid GUI component tests; shortcut rejection already covers Cmd/Ctrl+Alt+,; menu structure stays smoke/manual.
+
+## Deferred from: code review of spec-settings-audio-tab.md (2026-10-05)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-settings-audio-tab.md`
+  summary: User manual still documents Audio/MIDI door, AUDIO FROM, Alt/Option+logo, and Cmd/Ctrl+Alt+, shortcuts.
+  evidence: Cutover is complete in code; Documentation/User/manuel-utilisateur.md is a separate docs pass outside this delivery.
+- source_spec: `_bmad-output/implementation-artifacts/spec-settings-audio-tab.md`
+  summary: headerAudioProductCopy only asserts display-name constants, not logo menu item kinds excluding Audio/MIDI (reconfirmed).
+  evidence: Already deferred 2026-10-04; shortcut rejection covers Cmd/Ctrl+Alt+,; menu structure stays smoke/manual.

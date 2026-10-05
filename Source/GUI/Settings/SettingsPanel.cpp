@@ -36,6 +36,8 @@ void SettingsPanel::attachAudioPage(SettingsAudioPage::Config config)
 
     audioPage_ = std::make_unique<SettingsAudioPage>(std::move(config));
     addChildComponent(*audioPage_);
+    if (contextualHelpBinder_ != nullptr)
+        audioPage_->registerContextualHelp(*contextualHelpBinder_);
     updatePageVisibility();
     resized();
 }

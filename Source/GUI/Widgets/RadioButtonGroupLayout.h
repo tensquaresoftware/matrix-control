@@ -85,12 +85,12 @@ namespace TSS
             return mask;
         }
 
-        /** Returns matching pair index, or -1 when no channel bits are set / pairCount is 0. */
+        /** Returns pair index when `channels` matches that exclusive stereo mask; else -1. */
         inline int selectedStereoPairIndex(const juce::BigInteger& channels, int pairCount) noexcept
         {
             for (int i = 0; i < pairCount; ++i)
             {
-                if (channels[i * 2] || channels[i * 2 + 1])
+                if (channels == stereoPairMask(i))
                     return i;
             }
             return -1;

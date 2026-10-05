@@ -144,3 +144,25 @@ Header AUDIO cartouche: filled left badge "AUDIO", hairlines top/bottom continui
 **Manual checks (if no CLI):**
 - Standalone: Settings AUDIO functional; no Audio/MIDI menu; header cartouche; profiles still restore.
 - Plugin: no AUDIO tab; header MIDI unchanged; no audio Settings page.
+
+### Review Findings
+
+- [x] [Review][Patch] Monitoring only while AUDIO tab is visible (decision: option 1) — remove force-on in `showReadySettingsWindow`; keep `setVisible` + Settings close as the sole start/stop; sync preferred on show [`Source/GUI/PluginEditorSettingsOverlay.cpp:86`]
+- [x] [Review][Patch] UI device/channel applies skip preferred-setup and profile sync [`Source/GUI/Settings/SettingsAudioPageDevices.cpp:191`]
+- [x] [Review][Patch] Late AUDIO attach does not re-register contextual help [`Source/GUI/PluginEditorSettingsOverlay.cpp:69`]
+- [x] [Review][Patch] `selectedStereoPairIndex` treats any set bit as the pair [`Source/GUI/Widgets/RadioButtonGroupLayout.h:89`]
+- [x] [Review][Patch] `applyChannelPair` does not refresh UI after `setAudioDeviceSetup` [`Source/GUI/Settings/SettingsAudioPageDevices.cpp:197`]
+- [x] [Review][Patch] Device change keeps prior channel masks without revalidation [`Source/GUI/Settings/SettingsAudioPageDevices.cpp:163`]
+- [x] [Review][Patch] Shell height budget can clip when both channel groups wrap to three rows [`Source/GUI/Settings/SettingsShellMetrics.h:28`]
+- [x] [Review][Patch] Logo Settings help copy omits standalone AUDIO wiring [`Source/Shared/Definitions/PluginDisplayNames.h:52`]
+- [x] [Review][Patch] No unit test that channel-pair apply clears `useDefault*Channels` [`Tests/Unit/SettingsTabsShellTests.cpp`]
+- [x] [Review][Patch] ASIO link verified only as free helpers, not on apply-path resolution [`Tests/Unit/SettingsTabsShellTests.cpp`]
+- [x] [Review][Defer] User manual still documents Audio/MIDI door / AUDIO FROM / Alt+logo [`Documentation/User/manuel-utilisateur.md`] — deferred: docs pass outside this delivery cutover
+- [x] [Review][Defer] `headerAudioProductCopy` only asserts display-name constants [`Tests/Unit/SettingsTabsShellTests.cpp`] — deferred: already recorded; GUI menu structure stays smoke/manual
+
+Rejected:
+- false — Cartouche top/bottom hairlines through badge: matches Design Notes continuous chrome from badge across gain/peak.
+- false (spec-edit) — Implementation Notes claim 200/504 vs shipped 140/400: frozen Always reuses delivery-1 column width; notes are stale, not an AC miss.
+- low rejected — Ignored `setAudioDeviceSetup` errors: pre-existing; already rejected in prior triage log.
+- rejected (re-litigate) — `scanForDevices` every refresh: already deferred.
+- rejected (re-litigate) — Core `showAudioMidiSettingsDialog` no-op APIs: already deferred.

@@ -4,6 +4,7 @@
 
 #include "Core/Audio/AudioDevicePreferredSetup.h"
 #include "Core/Audio/AudioDeviceProfiles.h"
+#include "GUI/Widgets/RadioButtonGroupLayout.h"
 
 namespace AudioDeviceSetupSync
 {
@@ -51,5 +52,32 @@ namespace AudioDeviceSetupSync
 
         inputName = preferred;
         outputName = preferred;
+    }
+
+    /** Resolve input/output names for a UI apply (ASIO link, or leave independent). */
+    inline void resolveEndpointNamesForApply(const juce::String& deviceTypeName,
+                                             juce::String& inputName,
+                                             juce::String& outputName,
+                                             bool preferOutput) noexcept
+    {
+        if (isAsioDeviceType(deviceTypeName))
+            linkAsioDeviceNames(inputName, outputName, preferOutput);
+    }
+
+    /** Write an exclusive stereo-pair mask and clear the matching useDefault* flag. */
+    inline void applyStereoPairToSetup(juce::AudioDeviceManager::AudioDeviceSetup& setup,
+                                       bool isInput,
+                                       int pairIndex)
+    {
+        const auto mask = TSS::RadioButtonGroupLayout::stereoPairMask(pairIndex);
+        if (isInput)
+        {
+            setup.inputChannels = mask;
+            setup.useDefaultInputChannels = false;
+            return;
+        }
+
+        setup.outputChannels = mask;
+        setup.useDefaultOutputChannels = false;
     }
 }

@@ -183,7 +183,10 @@ void SettingsAudioPage::setVisible(bool shouldBeVisible)
     Component::setVisible(shouldBeVisible);
     setMonitoringActive(shouldBeVisible);
     if (shouldBeVisible)
+    {
+        AudioDeviceSetupSync::syncPreferredSetupFromDeviceManager(deviceManager_, syncState_);
         refreshAllFromDeviceManager();
+    }
 }
 
 void SettingsAudioPage::setMonitoringActive(bool shouldBeActive)

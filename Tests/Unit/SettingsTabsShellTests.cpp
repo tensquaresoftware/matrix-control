@@ -26,7 +26,9 @@ public:
         pluginCoercesStaleAudioLastTab();
         radioButtonGroupWrapPolicy();
         stereoPairMaskRoundTrip();
+        applyStereoPairClearsUseDefaultFlags();
         asioDeviceListsStayLinked();
+        asioApplyPathResolvesEndpointNames();
         headerAudioProductCopy();
         tightHostClampsAndCentresDialog();
         uiScaleKeepsIntegerRuleAndColumns();
@@ -183,7 +185,29 @@ private:
 
         juce::BigInteger mid;
         mid.setBit(2);
-        expectEquals(TSS::RadioButtonGroupLayout::selectedStereoPairIndex(mid, 3), 1);
+        expectEquals(TSS::RadioButtonGroupLayout::selectedStereoPairIndex(mid, 3), -1);
+
+        juce::BigInteger multi = TSS::RadioButtonGroupLayout::stereoPairMask(0);
+        multi |= TSS::RadioButtonGroupLayout::stereoPairMask(1);
+        expectEquals(TSS::RadioButtonGroupLayout::selectedStereoPairIndex(multi, 3), -1);
+    }
+
+    void applyStereoPairClearsUseDefaultFlags()
+    {
+        beginTest("AUDIO apply - stereo pair clears useDefault channel flags");
+
+        juce::AudioDeviceManager::AudioDeviceSetup setup;
+        setup.useDefaultInputChannels = true;
+        setup.useDefaultOutputChannels = true;
+
+        AudioDeviceSetupSync::applyStereoPairToSetup(setup, true, 1);
+        expect(! setup.useDefaultInputChannels);
+        expect(setup.useDefaultOutputChannels);
+        expectEquals(TSS::RadioButtonGroupLayout::selectedStereoPairIndex(setup.inputChannels, 4), 1);
+
+        AudioDeviceSetupSync::applyStereoPairToSetup(setup, false, 2);
+        expect(! setup.useDefaultOutputChannels);
+        expectEquals(TSS::RadioButtonGroupLayout::selectedStereoPairIndex(setup.outputChannels, 4), 2);
     }
 
     void asioDeviceListsStayLinked()
@@ -209,6 +233,29 @@ private:
         input = "Keep";
         output = {};
         AudioDeviceSetupSync::linkAsioDeviceNames(input, output, true);
+        expect(input.isEmpty());
+        expect(output.isEmpty());
+    }
+
+    void asioApplyPathResolvesEndpointNames()
+    {
+        beginTest("AUDIO apply - ASIO resolve links prefer-output; non-ASIO stays independent");
+
+        juce::String input = "In A";
+        juce::String output = "Out B";
+        AudioDeviceSetupSync::resolveEndpointNamesForApply("ASIO", input, output, true);
+        expectEquals(input, juce::String("Out B"));
+        expectEquals(output, juce::String("Out B"));
+
+        input = "In A";
+        output = "Out B";
+        AudioDeviceSetupSync::resolveEndpointNamesForApply("CoreAudio", input, output, true);
+        expectEquals(input, juce::String("In A"));
+        expectEquals(output, juce::String("Out B"));
+
+        input = "Keep";
+        output = {};
+        AudioDeviceSetupSync::resolveEndpointNamesForApply("ASIO Fireface", input, output, true);
         expect(input.isEmpty());
         expect(output.isEmpty());
     }

@@ -170,15 +170,24 @@ void SettingsAudioPage::applySetupFromUi()
     juce::String inputName = selectedDeviceName(*inputDeviceCombo_, type->getDeviceNames(true));
     juce::String outputName = selectedDeviceName(*outputDeviceCombo_, type->getDeviceNames(false));
 
-    if (AudioDeviceSetupSync::isAsioDeviceType(deviceManager_.getCurrentAudioDeviceType()))
-        AudioDeviceSetupSync::linkAsioDeviceNames(
-            inputName, outputName, pendingEndpointChange_ == EndpointChange::kOutput);
+    AudioDeviceSetupSync::resolveEndpointNamesForApply(
+        deviceManager_.getCurrentAudioDeviceType(),
+        inputName,
+        outputName,
+        pendingEndpointChange_ == EndpointChange::kOutput);
     pendingEndpointChange_ = EndpointChange::kNone;
 
+    const bool inputDeviceChanged = setup.inputDeviceName != inputName;
+    const bool outputDeviceChanged = setup.outputDeviceName != outputName;
     setup.inputDeviceName = inputName;
     setup.outputDeviceName = outputName;
     setup.useDefaultInputChannels = false;
     setup.useDefaultOutputChannels = false;
+
+    if (inputDeviceChanged)
+        AudioDeviceSetupSync::applyStereoPairToSetup(setup, true, 0);
+    if (outputDeviceChanged)
+        AudioDeviceSetupSync::applyStereoPairToSetup(setup, false, 0);
 
     const int rateId = sampleRateCombo_->getSelectedId();
     if (rateId > 0 && rateId <= sampleRateValues_.size())
@@ -188,9 +197,8 @@ void SettingsAudioPage::applySetupFromUi()
     if (bufferId > 0 && bufferId <= bufferSizeValues_.size())
         setup.bufferSize = bufferSizeValues_[bufferId - 1];
 
-    syncState_.restoringSetup = true;
     deviceManager_.setAudioDeviceSetup(setup, true);
-    syncState_.restoringSetup = false;
+    AudioDeviceSetupSync::syncPreferredSetupFromDeviceManager(deviceManager_, syncState_);
     refreshAllFromDeviceManager();
 }
 
@@ -200,21 +208,10 @@ void SettingsAudioPage::applyChannelPair(bool isInput, int pairIndex)
         return;
 
     auto setup = deviceManager_.getAudioDeviceSetup();
-    const auto mask = TSS::RadioButtonGroupLayout::stereoPairMask(pairIndex);
-    if (isInput)
-    {
-        setup.inputChannels = mask;
-        setup.useDefaultInputChannels = false;
-    }
-    else
-    {
-        setup.outputChannels = mask;
-        setup.useDefaultOutputChannels = false;
-    }
-
-    syncState_.restoringSetup = true;
+    AudioDeviceSetupSync::applyStereoPairToSetup(setup, isInput, pairIndex);
     deviceManager_.setAudioDeviceSetup(setup, true);
-    syncState_.restoringSetup = false;
+    AudioDeviceSetupSync::syncPreferredSetupFromDeviceManager(deviceManager_, syncState_);
+    refreshAllFromDeviceManager();
 }
 
 void SettingsAudioPage::playTestSound()
