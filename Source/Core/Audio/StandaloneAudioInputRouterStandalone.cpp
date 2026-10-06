@@ -3,7 +3,6 @@
 #include "Core/Audio/AudioDeviceProfiles.h"
 #include "Core/Audio/AudioInputSourceCatalog.h"
 #include "Core/Audio/SceneAudioSafety.h"
-#include "Core/PluginProcessor.h"
 
 #include <juce_audio_devices/juce_audio_devices.h>
 #include <juce_audio_utils/juce_audio_utils.h>
@@ -332,9 +331,8 @@ namespace Core::StandaloneAudioInputRouterDetail
         if (deviceManager.setAudioDeviceSetup(setup, true).isNotEmpty())
             return false;
 
-        if (auto* matrixProcessor = dynamic_cast<PluginProcessor*>(holder->processor.get()))
-            matrixProcessor->setAudioFromSourceId({});
-
+        // Do not wipe APVTS audioFromSourceId here. Profile payload never stores SYNTH FROM;
+        // scene-safety sync (editor ADM listener) keeps a still-valid selection or clears it.
         return refineOpenedProfileSetup(*holder, profile, std::move(profiles));
     }
 

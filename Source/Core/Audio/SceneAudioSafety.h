@@ -36,10 +36,19 @@ namespace Core
         juce::String sourceIdToApply;
         bool selectionKept = false;
         bool shouldClearBoundIdentity = false;
+        /**
+            Catalog not ready yet — leave APVTS untouched; retry when channels appear.
+            Callers must check shouldDefer before treating !selectionKept as a clear.
+        */
+        bool shouldDefer = false;
     };
 
     /**
         Keep the saved id only when still valid for the current Input identity + catalog.
+        Empty active-channel catalog while a non-empty id is saved: defer (do not clear) —
+        CoreAudio often enumerates channels after the first editor refresh / profile restore.
+        If both Input identities are already known and differ, clear even when the catalog
+        is still empty — never keep a channel selection across interfaces.
         Otherwise clear to empty (None) — never silent-remap channel indices across devices.
     */
     inline AudioFromSelectionSyncDecision decideAudioFromSelectionSync(
@@ -53,6 +62,21 @@ namespace Core
         if (savedSourceId.isEmpty())
         {
             decision.shouldClearBoundIdentity = boundInputDeviceIdentity.isNotEmpty();
+            return decision;
+        }
+
+        if (boundInputDeviceIdentity.isNotEmpty()
+            && currentInputDeviceIdentity.isNotEmpty()
+            && boundInputDeviceIdentity != currentInputDeviceIdentity)
+        {
+            decision.shouldClearBoundIdentity = true;
+            return decision;
+        }
+
+        if (catalogIds.isEmpty())
+        {
+            decision.sourceIdToApply = savedSourceId;
+            decision.shouldDefer = true;
             return decision;
         }
 

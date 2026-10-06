@@ -2357,3 +2357,13 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-panic-note-off-spray.md`
   summary: Older done specs still describe Panic as CC-only and list full Note Off spray as out of scope.
   evidence: Blind Hunter; sibling docs (`spec-device-unresponsive-presence-sysex-brake`, `spec-bug-midi-01-residual-panic-alert`) are historical; refresh only if someone revisits those artifacts.
+
+## Deferred from: oneshot review of spec-synth-from-audio-input-persistence.md (2026-10-06)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-synth-from-audio-input-persistence.md`
+  summary: Empty-catalog defer cannot tell cold-start (Scarlett not open yet) from a lasting Input None / zero-channel open, so a saved SYNTH FROM id may stay in APVTS until a later non-empty catalog sync.
+  evidence: Blind Hunter; clearing on empty current identity would re-break launch persistence before profile restore; needs a settled-enumeration signal or an explicit Input-None clear path.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-synth-from-audio-input-persistence.md`
+  summary: If active input channels appear without an AudioDeviceManager change notification after HeaderRefreshTimer stops empty retries, deferred SYNTH FROM sync might not re-run.
+  evidence: Blind Hunter maybe-false (unverified medium); settle with a live harness that fills the catalog without a change broadcast after 60 empty timer ticks.

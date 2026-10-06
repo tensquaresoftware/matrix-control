@@ -62,6 +62,9 @@ void PluginEditor::applyAudioCatalogToSettings(SettingsAudioPage& audioPage,
     audioPage.populateSynthFromCombo(names, ids);
     audioPage.selectSynthFromSourceId(decision.sourceIdToApply);
 
+    if (decision.shouldDefer)
+        return;
+
     if (decision.selectionKept)
     {
         pluginProcessor.setAudioFromSourceId(decision.sourceIdToApply);
@@ -80,6 +83,9 @@ void PluginEditor::applyAudioCatalogSelectionOnly(const juce::StringArray& ids,
         Core::kAudioFromBoundInputDeviceNameProperty, juce::String()).toString();
     const auto decision = Core::decideAudioFromSelectionSync(
         sourceIdToRestore, boundIdentity, currentIdentity, ids);
+
+    if (decision.shouldDefer)
+        return;
 
     if (decision.selectionKept)
     {

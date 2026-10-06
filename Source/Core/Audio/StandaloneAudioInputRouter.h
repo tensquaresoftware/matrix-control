@@ -28,7 +28,8 @@ namespace Core
         /**
             After safety None policies: if a remembered interface is currently available,
             restore Input/Output + channels/rate/buffer from its disk profile.
-            Does not restore AUDIO FROM.
+            Does not invent AUDIO FROM from the profile, and must not clear a persisted
+            APVTS selection — scene-safety sync decides keep vs clear after the setup settles.
         */
         static bool applyAvailableAudioDeviceProfileAtLaunch();
         /** Retry launch profile restore after device enumeration settles (message-thread timer). */

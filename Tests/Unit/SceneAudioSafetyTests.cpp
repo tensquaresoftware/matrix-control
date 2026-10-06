@@ -14,7 +14,8 @@ public:
         testIdentityChangeClearsEvenWhenIdStillListed();
         testSameDeviceKeepsValidSelection();
         testEmptyBoundIdentityInvalidatesLegacySelection();
-        testEmptyCatalogClearsNonEmptySource();
+        testEmptyCatalogDefersNonEmptySource();
+        testEmptyCatalogClearsOnKnownIdentityMismatch();
         testInitEmptySourceNeverInventsFromChannelMode();
         testPreferredSkippedWhenSourceEmpty();
         testPreferredAllowedWhenSourceNonEmpty();
@@ -95,15 +96,30 @@ private:
         expect(decision.shouldClearBoundIdentity);
     }
 
-    void testEmptyCatalogClearsNonEmptySource()
+    void testEmptyCatalogDefersNonEmptySource()
     {
-        beginTest("Empty active-channel catalog clears non-empty saved source id");
+        beginTest("Empty active-channel catalog defers non-empty saved source id");
 
         const juce::StringArray catalog;
         const auto decision = Core::decideAudioFromSelectionSync(
             "mono:0", "Scarlett", "Scarlett", catalog);
 
+        expectEquals(decision.sourceIdToApply, juce::String("mono:0"));
+        expect(decision.shouldDefer);
+        expect(! decision.selectionKept);
+        expect(! decision.shouldClearBoundIdentity);
+    }
+
+    void testEmptyCatalogClearsOnKnownIdentityMismatch()
+    {
+        beginTest("Empty catalog still clears when Input identity already changed");
+
+        const juce::StringArray catalog;
+        const auto decision = Core::decideAudioFromSelectionSync(
+            "mono:0", "Scarlett", "MacBook Mic", catalog);
+
         expect(decision.sourceIdToApply.isEmpty());
+        expect(! decision.shouldDefer);
         expect(! decision.selectionKept);
         expect(decision.shouldClearBoundIdentity);
     }
