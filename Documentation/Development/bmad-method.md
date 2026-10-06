@@ -21,7 +21,7 @@ Recommended setup: chat in your preferred language with the AI assistant; delive
 
 **Command syntax**: `/bmad-help`, `/bmad-build`, `/bmad-code-review`, etc. Natural-language requests work too when they clearly match a skill.
 
-**Matrix-Control install:** BMad **6.11.0** (`_bmad/_config/manifest.yaml`).
+**Matrix-Control install:** BMad **6.12.1** (`_bmad/_config/manifest.yaml`).
 
 ---
 
