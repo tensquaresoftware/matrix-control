@@ -77,9 +77,10 @@ public:
                                  juce::uint8 amount,
                                  juce::uint8 destination);
 
-    // Held-note Note Offs (when ActiveNoteRegistry is wired) plus All Sound Off (CC 120),
-    // All Notes Off (CC 123), Reset All Controllers (CC 121) on the active midiChannel (or all
-    // 16 for Omni/Mono), via realtime front. Coalesces while realtime depth is already high.
+    // Held-note Note Offs (when ActiveNoteRegistry is wired) plus All Notes Off (CC 123) and
+    // Reset All Controllers (CC 121) on the active midiChannel (or all 16 for Omni/Mono), via
+    // realtime front. No All Sound Off (CC 120) — not in the Matrix-1000 MIDI SUMMARY.
+    // Coalesces while realtime depth is already high.
     void sendPanic();
 
     void setActiveNoteRegistry(Core::ActiveNoteRegistry* registry) noexcept;

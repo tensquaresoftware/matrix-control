@@ -1,5 +1,5 @@
 // Extracted from MidiManager.cpp for modular maintenance.
-// PANIC: Note Offs for held notes + CC 120/123/121 (never a 16×128 flood).
+// PANIC: Note Offs for held notes + CC 123/121 (Matrix-era channel modes; no CC 120).
 
 #include "MidiManager.h"
 
@@ -25,7 +25,7 @@ namespace
 
     void appendControllersForChannel(std::vector<juce::MidiMessage>& burst, int channel)
     {
-        burst.push_back(juce::MidiMessage::controllerEvent(channel, 120, 0));
+        // Matrix-1000 MIDI SUMMARY lists All Notes Off + Reset All Controllers, not All Sound Off.
         burst.push_back(juce::MidiMessage::controllerEvent(channel, 123, 0));
         burst.push_back(juce::MidiMessage::controllerEvent(channel, 121, 0));
     }

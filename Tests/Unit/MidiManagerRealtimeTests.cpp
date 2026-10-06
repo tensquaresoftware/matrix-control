@@ -72,13 +72,6 @@ namespace
                                           Core::MidiOutboundQueue& queue,
                                           int channel)
     {
-        auto allSoundOff = queue.dequeue();
-        test.expect(allSoundOff.has_value());
-        test.expect(allSoundOff->midiMessage.isController());
-        test.expectEquals(allSoundOff->midiMessage.getControllerNumber(), 120);
-        test.expectEquals(allSoundOff->midiMessage.getControllerValue(), 0);
-        test.expectEquals(allSoundOff->midiMessage.getChannel(), channel);
-
         auto notesOff = queue.dequeue();
         test.expect(notesOff.has_value());
         test.expect(notesOff->midiMessage.isController());
@@ -347,7 +340,7 @@ private:
 
         manager.sendPanic();
 
-        expectEquals(static_cast<int>(queue.realtimeDepth()), 128 + (16 * 3));
+        expectEquals(static_cast<int>(queue.realtimeDepth()), 128 + (16 * 2));
         expectFallbackNoteOffSpray(*this, queue, 1);
         for (int channel = 1; channel <= 16; ++channel)
             expectPanicControllersForChannel(*this, queue, channel);
@@ -370,7 +363,7 @@ private:
 
         manager.sendPanic();
 
-        expectEquals(static_cast<int>(queue.realtimeDepth()), 2 + 3);
+        expectEquals(static_cast<int>(queue.realtimeDepth()), 2 + 2);
         expectEquals(static_cast<int>(notes.count()), 0);
 
         auto first = queue.dequeue();
@@ -398,7 +391,7 @@ private:
 
         manager.sendPanic();
 
-        expectEquals(static_cast<int>(queue.realtimeDepth()), 128 + 3);
+        expectEquals(static_cast<int>(queue.realtimeDepth()), 128 + 2);
         expectFallbackNoteOffSpray(*this, queue, 3);
         expectPanicControllersForChannel(*this, queue, 3);
         expect(queue.isEmpty());

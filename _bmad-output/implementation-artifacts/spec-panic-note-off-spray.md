@@ -21,7 +21,7 @@ context:
 
 **Problem:** PANIC already sends All Sound Off / All Notes Off / Reset All Controllers on the panic channel(s), but a Matrix-1000 with a held pad chord does not silence — MIDI Monitor confirms the CCs leave the host while audio continues until key Note Offs. Users expect PANIC to cut sound immediately.
 
-**Approach:** Keep CC 120 → 123 → 121 and channel rules. Emit Note Offs for notes currently held on the instrument path (ActiveNoteRegistry). Never flood 16×128 Note Offs. Coalesce while realtime depth is already high so repeated PANIC clicks cannot wedge Device Inquiry / lock the UI. Fallback when nothing is tracked: single-channel 0–127 spray only.
+**Approach:** Keep All Notes Off (CC 123) and Reset All Controllers (CC 121) with Matrix channel rules. Emit Note Offs for notes currently held on the instrument path (ActiveNoteRegistry). Do not send All Sound Off (CC 120). Never flood 16×128 Note Offs. Coalesce while realtime depth is already high so repeated PANIC clicks cannot wedge Device Inquiry / lock the UI. Fallback when nothing is tracked: single-channel 0–127 spray only.
 
 **Decisions locked:** (2026-10-06) Started as full 0–127×channels spray; UAT proved Omni flood locks GUI and still does not hard-mute long releases on Matrix-1000 — renegotiated to held-note Note Offs + coalesce + single-channel fallback.
 
@@ -47,11 +47,10 @@ Done 2026-10-06:
 - Tests: missing-param Omni, choice Omni index 0, basic channel 3, FrontMany prepend. Lint OK after extract.
 - Expect brief queue-pressure alert flash on Omni Panic (depth ≫ 32) — accepted in Intent.
 
-Hotfix 2026-10-06 (UAT regression):
+Hotfix 2026-10-06 (simplify to Matrix-era messages):
 
-- Omni 16×128 spray + multi-click stacked bursts saturated DIN MIDI → Device Inquiry timeout → UI lock (`deviceMidiUnresponsive` / connection error).
-- Replaced full spray with `ActiveNoteRegistry` held-note Note Offs; Omni fallback = ch1 0–127 only; coalesce when `realtimeDepth >= 32`.
-- Product note: Matrix ignores All Sound Off — a pad with long release will still ring after Note Off (same as lifting keys).
+- Dropped All Sound Off (CC 120) — not in Matrix-1000 MIDI SUMMARY; no hard-mute on these instruments.
+- Panic CCs are now All Notes Off (123) then Reset All Controllers (121) only, plus held-note Note Offs / single-channel fallback.
 
 ## Review Triage Log
 
