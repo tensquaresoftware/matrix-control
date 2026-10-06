@@ -109,3 +109,18 @@ track → `kBlack`, focus → `kDarkGrey3`, value bar → `kDarkGrey5`, text →
 
 **Manual checks (if no CLI):**
 - Plugin: Settings > DEVICE > HARDWARE LATENCY looks monochrome next to ButtonLike combos; Patch/Master sliders still green. Standalone: no latency row.
+
+### Review Findings
+
+- [x] [Review][Patch] Extend ButtonLike look asserts to disabled + editor roles [`Tests/Unit/SliderButtonLikeColourTests.cpp:50`]
+- [x] [Review][Defer] SettingsPanel HARDWARE LATENCY create/refresh look wiring untested [`Source/GUI/Settings/SettingsPanelSetup.cpp:52`] — deferred: GUI panel construction outside usual unit-test style; already recorded for this spec; manual Settings DEVICE smoke remains the gate
+
+#### Rejected
+
+- Blind: Execution task text overstates “plugin-only latency gate” coverage — `false` / rejected — fix would only edit the spec checklist wording.
+- Blind: Slider ButtonLike greys not aliased to ComboBox ButtonLike constants — `false` / rejected — approved SSOT is ColourChart; both charts already share the same greys; coupling widgets adds complexity without a demonstrated break.
+- Blind: Disabled HARDWARE LATENCY should use ComboBox ButtonLike-disabled tokens — `false` — intentional: shared slider disabled tokens (human decision + builder comment); prior triage already cleared the frozen “where a role is missing” wording.
+- Blind: Manual Verification omits edit-mode / disabled checks — rejected — fix would only edit the spec Verification section.
+- Blind: `standardSliderEnabled_stillGreen` asserts only Black — `low` / rejected — green chart values are identical for Cream and were not retinted; everyday regression risk is negligible.
+- Blind: `review_loop_iteration: 0` / empty Spec Change Log after done — rejected — fix would only edit agent-facing spec metadata.
+- Blind: frontmatter `context` still cites Selection.h — rejected — spec-only index; Code Map already points at Controls.h; prior triage dismissed the same point.

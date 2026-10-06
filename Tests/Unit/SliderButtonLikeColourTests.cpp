@@ -56,6 +56,14 @@ private:
         expect(look.focusBorder == juce::Colour(ColourChart::kDarkGrey3));
         expect(look.valueBarEnabled == juce::Colour(ColourChart::kDarkGrey5));
         expect(look.textEnabled == juce::Colour(ColourChart::kLightGrey2));
+
+        // Disabled roles reuse the shared slider tokens; editor stays high-contrast white.
+        expect(look.trackDisabled == skin->getSliderTrackColour(false));
+        expect(look.backgroundDisabled == skin->getColour(TSS::SkinColourId::kSliderBackgroundDisabled));
+        expect(look.valueBarDisabled == skin->getSliderValueBarColour(false));
+        expect(look.textDisabled == skin->getSliderTextColour(false));
+        expect(look.editorText == skin->getColour(TSS::SkinColourId::kNumberBoxEditorText));
+        expect(look.editorCaret == skin->getColour(TSS::SkinColourId::kNumberBoxEditorText));
     }
 };
 

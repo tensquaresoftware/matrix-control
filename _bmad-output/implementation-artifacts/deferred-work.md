@@ -2323,3 +2323,9 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-hardware-latency-slider-monochrome.md`
   summary: No automated test that SettingsPanel HARDWARE LATENCY create/refresh call sites use sliderLookButtonLikeFromSkin (vs green sliderLookFromSkin).
   evidence: Verification Gap; colour unit tests pin chart + Skin/look mapping; SettingsPanel GUI wiring left to manual plugin Settings DEVICE smoke.
+
+## Deferred from: code review of spec-hardware-latency-slider-monochrome.md (2026-10-06)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-hardware-latency-slider-monochrome.md`
+  summary: Reaffirmed — no automated test that SettingsPanel HARDWARE LATENCY create/refresh use sliderLookButtonLikeFromSkin (vs green default).
+  evidence: Code review Verification Gap; same defer as prior build triage; manual plugin Settings DEVICE smoke remains the gate.
