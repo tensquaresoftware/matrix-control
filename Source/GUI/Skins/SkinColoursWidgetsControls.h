@@ -177,6 +177,34 @@ namespace TSS::SkinColours
                 Common::kContentDisabled,
                 Common::kContentDisabled,
             };
+
+            // Settings monochrome plate — greys aligned with ComboBox ButtonLike.
+            namespace ButtonLike
+            {
+                inline constexpr ColourElement kTrack = {
+                    "SliderButtonLikeTrack",
+                    ColourChart::kBlack,
+                    ColourChart::kBlack
+                };
+
+                inline constexpr ColourElement kFocusBorder = {
+                    "SliderButtonLikeFocusBorder",
+                    ColourChart::kDarkGrey3,
+                    ColourChart::kDarkGrey3
+                };
+
+                inline constexpr ColourElement kValueBar = {
+                    "SliderButtonLikeValueBar",
+                    ColourChart::kDarkGrey5,
+                    ColourChart::kDarkGrey5
+                };
+
+                inline constexpr ColourElement kText = {
+                    "SliderButtonLikeText",
+                    ColourChart::kLightGrey2,
+                    ColourChart::kLightGrey2,
+                };
+            }
         }
     }
 }

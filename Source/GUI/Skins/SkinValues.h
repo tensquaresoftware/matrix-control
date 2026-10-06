@@ -69,6 +69,10 @@ namespace TSS
         kSliderTextEnabled,
         kSliderTextDisabled,
         kSliderFocusBorder,
+        kSliderButtonLikeTrack,
+        kSliderButtonLikeFocusBorder,
+        kSliderButtonLikeValueBar,
+        kSliderButtonLikeText,
         
         // ComboBox colours
         kComboBoxBackgroundEnabled,

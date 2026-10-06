@@ -281,6 +281,14 @@ namespace TSS
         colours_[SkinColourId::kSliderTextEnabled] = juce::Colour(accessColour(Widgets::Slider::kText));
         colours_[SkinColourId::kSliderTextDisabled] = juce::Colour(accessColour(Widgets::Slider::kTextDisabled));
         colours_[SkinColourId::kSliderFocusBorder] = juce::Colour(accessColour(Widgets::Slider::kFocusBorder));
+        colours_[SkinColourId::kSliderButtonLikeTrack] =
+            juce::Colour(accessColour(Widgets::Slider::ButtonLike::kTrack));
+        colours_[SkinColourId::kSliderButtonLikeFocusBorder] =
+            juce::Colour(accessColour(Widgets::Slider::ButtonLike::kFocusBorder));
+        colours_[SkinColourId::kSliderButtonLikeValueBar] =
+            juce::Colour(accessColour(Widgets::Slider::ButtonLike::kValueBar));
+        colours_[SkinColourId::kSliderButtonLikeText] =
+            juce::Colour(accessColour(Widgets::Slider::ButtonLike::kText));
     }
     
     template <typename Accessor>

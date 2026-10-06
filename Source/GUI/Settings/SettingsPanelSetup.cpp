@@ -49,7 +49,7 @@ void SettingsPanel::setupDeviceSection(TSS::ISkin& skin)
     hardwareLatencySlider_ = std::make_unique<TSS::Slider>(
         kSliderWidth_,
         kControlHeight_,
-        TSS::sliderLookFromSkin(skin),
+        TSS::sliderLookButtonLikeFromSkin(skin),
         TSS::SliderConfig{
             .minValue = Core::HardwareLatency::kMinMs,
             .maxValue = Core::HardwareLatency::kMaxMs,
@@ -186,7 +186,7 @@ void SettingsPanel::applyChildLooks(TSS::ISkin& skin)
     contextualHelpCombo_->setLook(comboLook);
 
     hardwareLatencyLabel_->setLook(labelLook);
-    hardwareLatencySlider_->setLook(TSS::sliderLookFromSkin(skin));
+    hardwareLatencySlider_->setLook(TSS::sliderLookButtonLikeFromSkin(skin));
     epromTypeLabel_->setLook(labelLook);
     epromTypeCombo_->setLook(comboLook);
 

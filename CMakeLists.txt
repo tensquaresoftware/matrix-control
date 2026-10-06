@@ -559,6 +559,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/PatchManagerActionHandlerHeaderClickTests.cpp
         Tests/Unit/ModuleHeaderTitleColourTests.cpp
         Tests/Unit/NumberBoxDisabledBackgroundColourTests.cpp
+        Tests/Unit/SliderButtonLikeColourTests.cpp
         Tests/Unit/PatchManagerActionHandlerComputerNavigationTests.cpp
         Tests/Unit/PatchManagerActionHandlerNavDebounceTests.cpp
         Tests/Unit/PatchFileServiceTests.cpp
@@ -626,7 +627,10 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/ActionDispatcherTests.cpp
 
         Source/GUI/Layout/WidgetDimensionRegistry.cpp
+        Source/GUI/Looks/LookBuilders.cpp
+        Source/GUI/Looks/TypographyStyles.cpp
         Source/GUI/Panels/Reusable/ModulePanelConfigBuilder.cpp
+        Source/GUI/Skins/Skin.cpp
         Source/GUI/Widgets/Slider.cpp
         Source/GUI/Widgets/SliderEditing.cpp
         Source/GUI/Helpers/ApvtsUndoableParameterAttachments.cpp
@@ -772,6 +776,7 @@ if(MATRIX_BUILD_TESTS)
     )
 
     target_link_libraries(Matrix-Control_Tests PRIVATE
+        PluginFonts
         juce::juce_audio_processors
         juce::juce_audio_devices
         juce::juce_core

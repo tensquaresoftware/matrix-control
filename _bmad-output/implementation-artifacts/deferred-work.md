@@ -2317,3 +2317,9 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-settings-audio-combo-uppercase-cartouche-gap.md`
   summary: Widening EDIT/MIDI/AUDIO cartouche gaps by 12 design px may need a quick logo-side layout smoke at 50% UI Scale.
   evidence: HeaderPanelLayout clamps cluster start; visual check not automated in this change set.
+
+## Deferred from: review of spec-hardware-latency-slider-monochrome.md (2026-10-06)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-hardware-latency-slider-monochrome.md`
+  summary: No automated test that SettingsPanel HARDWARE LATENCY create/refresh call sites use sliderLookButtonLikeFromSkin (vs green sliderLookFromSkin).
+  evidence: Verification Gap; colour unit tests pin chart + Skin/look mapping; SettingsPanel GUI wiring left to manual plugin Settings DEVICE smoke.

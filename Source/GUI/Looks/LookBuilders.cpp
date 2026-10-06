@@ -75,6 +75,25 @@ namespace TSS
         return look;
     }
 
+    SliderLook sliderLookButtonLikeFromSkin(const ISkin& skin)
+    {
+        SliderLook look;
+        look.trackEnabled = skin.getColour(SkinColourId::kSliderButtonLikeTrack);
+        look.focusBorder = skin.getColour(SkinColourId::kSliderButtonLikeFocusBorder);
+        look.valueBarEnabled = skin.getColour(SkinColourId::kSliderButtonLikeValueBar);
+        look.textEnabled = skin.getColour(SkinColourId::kSliderButtonLikeText);
+        // Disabled roles keep the shared slider disabled tokens.
+        look.trackDisabled = skin.getSliderTrackColour(false);
+        look.backgroundDisabled = skin.getColour(SkinColourId::kSliderBackgroundDisabled);
+        look.valueBarDisabled = skin.getSliderValueBarColour(false);
+        look.textDisabled = skin.getSliderTextColour(false);
+        // High-contrast editor digits/caret on the dark ButtonLike plate.
+        look.editorText = skin.getColour(SkinColourId::kNumberBoxEditorText);
+        look.editorCaret = skin.getColour(SkinColourId::kNumberBoxEditorText);
+        look.font = resolvedTypographyFont(skin, TypographyStyleId::kDefault);
+        return look;
+    }
+
     LabelLook labelLookFromSkin(const ISkin& skin)
     {
         LabelLook look;
