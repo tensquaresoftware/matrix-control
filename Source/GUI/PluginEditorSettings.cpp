@@ -58,11 +58,6 @@ namespace
         return kDefault;
     }
 
-    int normalizeEpromType(int raw)
-    {
-        return Core::EpromTypePolicy::normalize(raw);
-    }
-
     int readNormalizedProperty(juce::ValueTree& state,
                                const char* propertyId,
                                int defaultValue,
@@ -137,7 +132,7 @@ void PluginEditor::restoreSettingsPanelFromState(SettingsPanel& panel)
     const int epromType = readNormalizedProperty(state,
                                                  PluginIDs::Settings::kEpromType,
                                                  PluginIDs::Settings::EpromType::kDefault,
-                                                 normalizeEpromType);
+                                                 [](int raw) { return Core::EpromTypePolicy::normalize(raw); });
     const int coerced = panel.refreshEpromTypeItems(epromType);
     if (coerced != epromType)
     {
@@ -322,6 +317,8 @@ void PluginEditor::closeMasterM1kmLoadChoiceDialog()
 {
     if (masterM1kmLoadChoiceDialog_ != nullptr)
         masterM1kmLoadChoiceDialog_->setVisible(false);
+
+    requestEditorKeyboardFocusIfNeeded();
 }
 
 bool PluginEditor::isMasterM1kmLoadChoiceDialogVisible() const
@@ -474,4 +471,6 @@ void PluginEditor::closeMutatorHistoryDefragConfirmDialog()
 {
     if (mutatorHistoryDefragConfirmDialog_ != nullptr)
         mutatorHistoryDefragConfirmDialog_->setVisible(false);
+
+    requestEditorKeyboardFocusIfNeeded();
 }

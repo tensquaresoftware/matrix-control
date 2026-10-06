@@ -208,4 +208,6 @@ void PluginEditor::closeSettingsWindow()
             audioPage->setMonitoringActive(false);
         settingsWindow_->setVisible(false);
     }
+
+    requestEditorKeyboardFocusIfNeeded();
 }

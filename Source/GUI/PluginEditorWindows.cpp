@@ -107,6 +107,8 @@ void PluginEditor::closeAboutWindow()
 
     if (aboutWindow_ != nullptr)
         aboutWindow_->setVisible(false);
+
+    requestEditorKeyboardFocusIfNeeded();
 }
 
 void PluginEditor::openMasterInitConfirmDialog(const juce::String& moduleDisplayName,
@@ -174,6 +176,8 @@ void PluginEditor::closeMasterInitConfirmDialog()
 {
     if (masterInitConfirmDialog_ != nullptr)
         masterInitConfirmDialog_->setVisible(false);
+
+    requestEditorKeyboardFocusIfNeeded();
 }
 
 namespace
@@ -359,6 +363,8 @@ void PluginEditor::closeEpromTypePromptDialog()
 {
     if (epromTypePromptDialog_ != nullptr)
         epromTypePromptDialog_->setVisible(false);
+
+    requestEditorKeyboardFocusIfNeeded();
 }
 
 void PluginEditor::showBankTransferProgressDialog(const BankTransferProgressShowRequest& request)
@@ -400,4 +406,6 @@ void PluginEditor::hideBankTransferProgressDialog()
 {
     if (bankTransferProgressDialog_ != nullptr)
         bankTransferProgressDialog_->setVisible(false);
+
+    requestEditorKeyboardFocusIfNeeded();
 }

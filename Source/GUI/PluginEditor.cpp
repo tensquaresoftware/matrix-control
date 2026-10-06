@@ -155,9 +155,13 @@ void PluginEditor::visibilityChanged()
 {
     juce::AudioProcessorEditor::visibilityChanged();
 
-    // Standalone peers often become showing after attachEditorRuntimeListeners' first
-    // deferred focus request, so that grab can no-op and Cmd/Ctrl shortcuts beep.
-    if (pluginProcessor.isStandalone() && isShowing())
+    // Peers often become showing after attachEditorRuntimeListeners' first deferred
+    // focus request (Standalone DocumentWindow; some hosts delay editor show). That
+    // first grab can no-op and Cmd/Ctrl shortcuts beep until a content click.
+    // Each visibilityChanged while showing reschedules the helper (Standalone +
+    // hosted) as the follow-up when an earlier async ran while !isShowing(); the
+    // helper no-ops when focus is already owned — not an infinite retry loop.
+    if (isShowing())
         requestEditorKeyboardFocusIfNeeded();
 }
 

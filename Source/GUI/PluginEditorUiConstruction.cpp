@@ -252,9 +252,8 @@ void PluginEditor::attachEditorRuntimeListeners()
 #endif
     repaint();
 
-    // Standalone peers sit on the DocumentWindow: with no focused descendant, Cmd/Ctrl
-    // shortcuts never reach PluginEditor/MainComponent and the OS beeps instead.
-    // visibilityChanged also requests focus when the peer becomes showing later.
-    if (pluginProcessor.isStandalone())
-        requestEditorKeyboardFocusIfNeeded();
+    // With no focused descendant, Cmd/Ctrl shortcuts never reach PluginEditor /
+    // MainComponent and the OS beeps instead. Request for Standalone and hosted;
+    // visibilityChanged retries when the peer becomes showing later (cold-show race).
+    requestEditorKeyboardFocusIfNeeded();
 }

@@ -2329,3 +2329,25 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-hardware-latency-slider-monochrome.md`
   summary: Reaffirmed — no automated test that SettingsPanel HARDWARE LATENCY create/refresh use sliderLookButtonLikeFromSkin (vs green default).
   evidence: Code review Verification Gap; same defer as prior build triage; manual plugin Settings DEVICE smoke remains the gate.
+
+## Deferred from: review of spec-settings-shortcut-focus-intermittent.md (2026-10-06)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-settings-shortcut-focus-intermittent.md`
+  summary: Already-showing editor that loses OS/host keyboard focus without a hide→show cycle still has no reactivation path for chrome shortcuts.
+  evidence: Blind Hunter; frozen Approach covers show + overlay hide only; mid-session host focus steal is a sibling beyond this ticket.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-settings-shortcut-focus-intermittent.md`
+  summary: If grabKeyboardFocus() returns false while the editor is showing, there is still no show-gated retry — cold or post-overlay Cmd/Ctrl+, could still beep.
+  evidence: Edge Case Hunter (maybe-false / unverified medium); settle by reproducing grab failure on a real peer then measuring whether a single false-return retry helps without looping.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-settings-shortcut-focus-intermittent.md`
+  summary: No automated check that attach / show schedules editor keyboard focus so chrome shortcuts work without a content click (Standalone or hosted).
+  evidence: Verification Gap; EditorChromeShortcutTests classify KeyPress only; peer/focus stays manual smoke per frozen Never + human Matrix Test Audit choice.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-settings-shortcut-focus-intermittent.md`
+  summary: No automated check that overlay hide paths restore editor keyboard focus for chrome shortcuts without a content click.
+  evidence: Verification Gap; same manual-smoke policy; closeSettingsWindow and sibling closes are the only hide sites for isEscapeBlockedByOverlay members.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-settings-shortcut-focus-intermittent.md`
+  summary: Spec Verification command running EditorChromeShortcut tests does not observe focus acquisition/restore regressions.
+  evidence: Verification Gap; classifier green while deleting all requestEditorKeyboardFocusIfNeeded call sites would still pass those tests; treat manual smoke as the real gate.
