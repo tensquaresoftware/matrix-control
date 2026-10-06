@@ -70,6 +70,8 @@ private:
     void paintAudioCartouche(juce::Graphics& g);
     void paintEditCartouche(juce::Graphics& g);
     void updateAudioControlsVisibility();
+    void layoutLogo();
+    void layoutCartouches();
 
     HeaderPanelDimensions dimensions_;
     TSS::ISkin* skin_;

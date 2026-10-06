@@ -180,11 +180,11 @@ namespace TSS::Design
         namespace Header
         {
             inline constexpr int kHeight = 48;
-            inline constexpr int kLogoWidth = 276;
+            inline constexpr int kLogoWidth = 240;
             inline constexpr int kLogoHeight = 32;
             // Keep 0: controls + cartouches stay vertically centered in kHeight.
             inline constexpr int kContentVerticalOffset = 0;
-            inline constexpr int kLogoFontHeight = 32;
+            inline constexpr int kLogoFontHeight = 27; // optical size; ÷4 grid exception for brand face
             inline constexpr int kLogoGapAfter = 12;
             inline constexpr int kLogoPopupColumnWidth = 100;
             inline constexpr int kLogoPopupActionColumnWidth = 100;
@@ -211,11 +211,16 @@ namespace TSS::Design
             inline constexpr int kEditCartoucheInset = 4;
             inline constexpr int kEditCartoucheStrokeThickness = 1;
             // Horizontal: badge right → first control, and last control → frame right.
+            // Frame layout width omits the 1px right stroke (painted inset) so totals stay ÷4.
             inline constexpr int kCartoucheBadgeContentGap = Spacing::kMedium; // 8
             // Clearance between EDIT / MIDI / AUDIO cartouche frames (left-to-right flow).
-            inline constexpr int kCartoucheGap = Spacing::kMedium * 2; // 16
-            // Extra shift after aligning AUDIO to the SharedPanel left (visual nudge).
-            inline constexpr int kCartoucheClusterNudgeX = 12;
+            inline constexpr int kCartoucheGap = 28;
+            // Body SectionHeader blue-line anchors (same canvas as BodyPanel columns).
+            inline constexpr int kPatchEditSectionHeaderRightX =
+                Body::PatchEditSection::kPanelWidth - Body::kColumnPadding; // 820
+            inline constexpr int kMatrixModulationSectionHeaderLeftX =
+                Body::PatchEditSection::kPanelWidth + Body::kInterColumnGap
+                + Body::kColumnPadding; // 848
             // End of MIDI monitoring label → next activity LED.
             inline constexpr int kMidiLabelToNextLedGap = Spacing::kMedium; // 8
             // Monitoring cluster → PANIC inside the MIDI cartouche.

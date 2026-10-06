@@ -79,7 +79,12 @@ void SettingsAudioPage::wireCallbacks()
     {
         if (updatingUi_)
             return;
-        deviceManager_.setCurrentAudioDeviceType(driverTypeCombo_->getText(), true);
+        const int selectedId = driverTypeCombo_->getSelectedId();
+        const auto& types = deviceManager_.getAvailableDeviceTypes();
+        if (selectedId < 1 || selectedId > types.size())
+            return;
+        deviceManager_.setCurrentAudioDeviceType(types.getUnchecked(selectedId - 1)->getTypeName(),
+                                                 true);
         refreshAllFromDeviceManager();
     };
     inputDeviceCombo_->onChange = [this]

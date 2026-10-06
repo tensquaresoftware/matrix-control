@@ -5,9 +5,24 @@
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinValues.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
+#include "Shared/Definitions/PluginIDs.h"
 
 namespace TSS
 {
+    namespace
+    {
+        /** Per-UI-Scale optical Y nudge in whole component pixels (negative = up). */
+        int logoOpticalNudgeYPx(float uiScale) noexcept
+        {
+            namespace Scale = PluginIDs::Settings::ScaleLevels;
+            // 150%/175% half-pixel asks dropped (prefer crisp integer baselines).
+            // 200%: -1 — prior -2.5 overshot (15px above / 17.5px below with that nudge).
+            if (juce::approximatelyEqual(uiScale, Scale::kUiScales[Scale::k200]))
+                return -1;
+            return 0;
+        }
+    }
+
     Logo::Logo(ISkin& skin, int width, int height)
         : Label(width,
                 height,
@@ -51,8 +66,7 @@ namespace TSS
         if (labelText_.isEmpty())
             return;
 
-        // Centre glyph ink in the component so the visual "M" stays stable across UI Scale
-        // (Justification::centred uses the em-box, which drifts optically for this brand face).
+        // Centre glyph ink, then apply a per-scale integer Y nudge (crisp pixel baseline).
         const auto font = look_.font.withHeight(look_.font.getHeight() * uiScale_);
         juce::GlyphArrangement measure;
         measure.addLineOfText(font, labelText_, 0.0f, 0.0f);
@@ -61,7 +75,8 @@ namespace TSS
             return;
 
         const auto area = getLocalBounds().toFloat();
-        const float baselineY = area.getCentreY() - ink.getCentreY();
+        const float baselineY = static_cast<float>(
+            juce::roundToInt(area.getCentreY() - ink.getCentreY()) + logoOpticalNudgeYPx(uiScale_));
 
         juce::GlyphArrangement glyphs;
         glyphs.addLineOfText(font, labelText_, area.getX(), baselineY);

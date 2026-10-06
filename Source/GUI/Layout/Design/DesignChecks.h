@@ -12,7 +12,8 @@ namespace TSS::Design
     static_assert(Panels::Header::kHeight == 48, "HeaderPanel height");
     static_assert(Panels::Header::kLogoWidth % 4 == 0, "Header logo width must be on the design ÷4 grid");
     static_assert(Panels::Header::kLogoHeight % 4 == 0, "Header logo height must be on the design ÷4 grid");
-    static_assert(Panels::Header::kLogoFontHeight % 4 == 0, "Header logo font height must be on the design ÷4 grid");
+    static_assert(Panels::Header::kLogoFontHeight == 27,
+                  "Header logo font height must be 27 design px");
     static_assert(Panels::Header::kLogoGapAfter % 4 == 0, "Header logo gap must be on the design ÷4 grid");
     static_assert(Panels::Header::kFromSynthLabelWidth % 4 == 0,
                   "Header FROM SYNTH label width must be on the design ÷4 grid");
@@ -32,8 +33,16 @@ namespace TSS::Design
                   "Header cartouche badge-content gap must be on the design ÷4 grid");
     static_assert(Panels::Header::kCartoucheGap % 4 == 0,
                   "Header EDIT/MIDI/AUDIO cartouche gap must be on the design ÷4 grid");
-    static_assert(Panels::Header::kCartoucheClusterNudgeX % 4 == 0,
-                  "Header cartouche cluster nudge X must be on the design ÷4 grid");
+    static_assert(Panels::Header::kCartoucheGap == 28,
+                  "Header EDIT/MIDI/AUDIO cartouche gap must be 28 design px");
+    static_assert(Panels::Header::kPatchEditSectionHeaderRightX == 820,
+                  "PATCH EDIT SectionHeader right edge must be 820 design px");
+    static_assert(Panels::Header::kMatrixModulationSectionHeaderLeftX == 848,
+                  "MATRIX MODULATION SectionHeader left edge must be 848 design px");
+    static_assert(Panels::Header::kMatrixModulationSectionHeaderLeftX
+                      - Panels::Header::kPatchEditSectionHeaderRightX
+                      == Panels::Header::kCartoucheGap,
+                  "Cartouche gap must match PATCH EDIT → MATRIX MODULATION SectionHeader gap");
     static_assert(Panels::Header::kMidiLabelToNextLedGap % 4 == 0,
                   "Header MIDI label-to-LED gap must be on the design ÷4 grid");
     static_assert(Panels::Header::kMidiToPanicGap % 4 == 0,

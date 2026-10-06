@@ -13,14 +13,6 @@
 
 namespace
 {
-    /** Same X as the SharedPanel outer left (Matrix Modulation column), matching BodyPanel. */
-    int matrixModulationPanelLeftX(float uiScale) noexcept
-    {
-        using namespace TSS::Design::Panels::Body;
-        return TSS::ScaledLayout::scaledInt(static_cast<float>(PatchEditSection::kPanelWidth), uiScale)
-             + TSS::ScaledLayout::scaledInt(static_cast<float>(kInterColumnGap), uiScale);
-    }
-
     struct CartoucheStrokePx
     {
         int strokePx = 1;
@@ -280,8 +272,7 @@ namespace
         placer.placeLabel(*widgets.synthToLabel, metrics.toSynthLabelWidth, metrics.midiToPanicGap);
         placer.placeButton(*widgets.panic, metrics.panicButtonWidth, 0.0f);
 
-        const int frameRight = juce::roundToInt(placer.x()) + badgeContentGap
-                               + metrics.midiCartoucheStrokePx;
+        const int frameRight = juce::roundToInt(placer.x()) + badgeContentGap;
         return {
             .badge = { badgeX, frameY, badgeW, frameH },
             .frame = { badgeX, frameY, juce::jmax(badgeW, frameRight - badgeX), frameH },
@@ -315,8 +306,7 @@ namespace
         placer.placeSlider(*widgets.gainSlider, metrics.inputGainSliderWidth, metrics.cartoucheBadgeContentGap);
         placer.placePeak(*widgets.peak, metrics.peakIndicatorWidth, 0.0f);
 
-        const int frameRight = juce::roundToInt(placer.x()) + badgeContentGap
-                               + metrics.audioCartoucheStrokePx;
+        const int frameRight = juce::roundToInt(placer.x()) + badgeContentGap;
         return {
             .badge = { badgeX, frameY, badgeW, frameH },
             .frame = { badgeX, frameY, juce::jmax(badgeW, frameRight - badgeX), frameH },
@@ -348,8 +338,7 @@ namespace
         placer.placeButton(*widgets.undo, metrics.undoButtonWidth);
         placer.placeButton(*widgets.redo, metrics.redoButtonWidth, 0.0f);
 
-        const int frameRight = juce::roundToInt(placer.x()) + badgeContentGap
-                               + metrics.editCartoucheStrokePx;
+        const int frameRight = juce::roundToInt(placer.x()) + badgeContentGap;
         return {
             .badge = { badgeX, frameY, badgeW, frameH },
             .frame = { badgeX, frameY, juce::jmax(badgeW, frameRight - badgeX), frameH },
@@ -357,17 +346,39 @@ namespace
             .nextX = static_cast<float>(frameRight)
         };
     }
+
+    /** Places EDIT so a measured distance from its left lands on a Body SectionHeader anchor X. */
+    float cartoucheClusterStartX(float panelOriginX,
+                                 float uiScale,
+                                 int anchorDesignX,
+                                 float distanceFromEditStartToAnchor) noexcept
+    {
+        return panelOriginX
+             + static_cast<float>(TSS::ScaledLayout::scaledInt(static_cast<float>(anchorDesignX),
+                                                               uiScale))
+             - distanceFromEditStartToAnchor;
+    }
 }
 
 void HeaderPanel::resized()
 {
-    const auto metrics = HeaderLayoutMetrics::make(dimensions_, uiScale_, getLocalBounds());
+    layoutLogo();
+    layoutCartouches();
+}
 
+void HeaderPanel::layoutLogo()
+{
+    const auto metrics = HeaderLayoutMetrics::make(dimensions_, uiScale_, getLocalBounds());
     logo_.setBounds(metrics.logoX,
                     metrics.logoY,
                     metrics.logoWidth,
                     metrics.logoHeight);
     logo_.setUiScale(uiScale_);
+}
+
+void HeaderPanel::layoutCartouches()
+{
+    const auto metrics = HeaderLayoutMetrics::make(dimensions_, uiScale_, getLocalBounds());
 
     const EditCartoucheWidgets editWidgets{ &undoButton_, &redoButton_ };
     const MidiCartoucheWidgets midiWidgets{ &instrumentActivityLed_,
@@ -378,18 +389,21 @@ void HeaderPanel::resized()
                                             &midiToLabel_,
                                             &panicButton_ };
 
-    // EDIT → MIDI → AUDIO: shift the cluster so AUDIO's left edge matches Matrix Modulation
-    // (same scale tokens as BodyPanel + SharedPanel). Probe widths at x=0, then place for real.
+    // Probe at x=0 (layout width omits inset 1px stroke → ÷4), then place on SectionHeader anchors.
+    namespace HeaderTokens = TSS::Design::Panels::Header;
     const auto editProbe = layoutEditCartouche(metrics, uiScale_, 0.0f, editWidgets);
     const auto midiProbe = layoutMidiCartouche(
         metrics, uiScale_, editProbe.nextX + metrics.cartoucheGap, midiWidgets);
-    const float audioStartIfClusterAtZero = midiProbe.nextX + metrics.cartoucheGap;
-    const float alignedStartX = static_cast<float>(matrixModulationPanelLeftX(uiScale_))
-                                - audioStartIfClusterAtZero
-                                + static_cast<float>(TSS::ScaledLayout::scaledInt(
-                                      static_cast<float>(TSS::Design::Panels::Header::kCartoucheClusterNudgeX),
-                                      uiScale_));
-    const float clusterStartX = juce::jmax(metrics.contentStartX, alignedStartX);
+    const int anchorDesignX = isPluginMode_ ? HeaderTokens::kPatchEditSectionHeaderRightX
+                                            : HeaderTokens::kMatrixModulationSectionHeaderLeftX;
+    const float distanceToAnchor = isPluginMode_
+                                       ? midiProbe.nextX
+                                       : midiProbe.nextX + metrics.cartoucheGap;
+    const float clusterStartX = cartoucheClusterStartX(
+        static_cast<float>(getLocalBounds().getX()),
+        uiScale_,
+        anchorDesignX,
+        distanceToAnchor);
 
     const auto edit = layoutEditCartouche(metrics, uiScale_, clusterStartX, editWidgets);
     editCartoucheBadgeBounds_ = edit.badge;

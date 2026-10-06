@@ -2308,3 +2308,12 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-settings-audio-channel-pair-combos.md`
   summary: `kCartoucheClusterNudgeX` is scaled directly from DesignPanels in HeaderPanel::resized instead of flowing through HeaderPanelDimensions / DimensionFactory like sibling cartouche tokens.
   evidence: Blind Hunter; behaviour correct; SSOT path incomplete for future token edits.
+
+## Deferred from: oneshot review of spec-settings-audio-combo-uppercase-cartouche-gap.md (2026-10-06)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-settings-audio-combo-uppercase-cartouche-gap.md`
+  summary: No automated test for driver type resolve-by-id or orphan device apply keeping original-case live setup names.
+  evidence: GUI message-thread AudioDeviceManager harness is heavier than this visual polish pass; smoke Settings AUDIO manually.
+- source_spec: `_bmad-output/implementation-artifacts/spec-settings-audio-combo-uppercase-cartouche-gap.md`
+  summary: Widening EDIT/MIDI/AUDIO cartouche gaps by 12 design px may need a quick logo-side layout smoke at 50% UI Scale.
+  evidence: HeaderPanelLayout clamps cluster start; visual check not automated in this change set.

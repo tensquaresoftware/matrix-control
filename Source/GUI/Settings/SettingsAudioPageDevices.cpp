@@ -26,10 +26,10 @@ namespace
         combo.clear(juce::dontSendNotification);
         combo.addItem(PluginDisplayNames::Settings::kNoDeviceSentinel, 1);
         for (int i = 0; i < names.size(); ++i)
-            combo.addItem(names[i], i + 2);
+            combo.addItem(names[i].toUpperCase(), i + 2);
 
         if (selectedName.isNotEmpty() && ! names.contains(selectedName))
-            combo.addItem(selectedName, names.size() + 2);
+            combo.addItem(selectedName.toUpperCase(), names.size() + 2);
 
         combo.setSelectedId(deviceComboIdForName(names, selectedName), juce::dontSendNotification);
     }
@@ -72,7 +72,7 @@ void SettingsAudioPage::refreshDriverTypeCombo()
     for (int i = 0; i < types.size(); ++i)
     {
         const int id = i + 1;
-        driverTypeCombo_->addItem(types.getUnchecked(i)->getTypeName(), id);
+        driverTypeCombo_->addItem(types.getUnchecked(i)->getTypeName().toUpperCase(), id);
         if (types.getUnchecked(i)->getTypeName() == current)
             selectedId = id;
     }
@@ -170,7 +170,9 @@ void SettingsAudioPage::refreshChannelCombos()
 
 namespace
 {
-    juce::String selectedDeviceName(const TSS::ComboBox& combo, const juce::StringArray& scannedNames)
+    juce::String selectedDeviceName(const TSS::ComboBox& combo,
+                                    const juce::StringArray& scannedNames,
+                                    const juce::String& liveSetupName)
     {
         const int id = combo.getSelectedId();
         if (id <= 1)
@@ -179,7 +181,10 @@ namespace
         if (id >= 2 && id - 2 < scannedNames.size())
             return scannedNames[id - 2];
 
-        return combo.getText();
+        // Orphan combo item is display-uppercased; keep the live setup spelling for apply.
+        // Unexpected ids (stale selection after a scan shrink) also keep the live name
+        // instead of clearing the endpoint or applying uppercased display text.
+        return liveSetupName;
     }
 
 }
@@ -191,8 +196,12 @@ void SettingsAudioPage::applySetupFromUi()
     if (type == nullptr)
         return;
 
-    juce::String inputName = selectedDeviceName(*inputDeviceCombo_, type->getDeviceNames(true));
-    juce::String outputName = selectedDeviceName(*outputDeviceCombo_, type->getDeviceNames(false));
+    juce::String inputName = selectedDeviceName(*inputDeviceCombo_,
+                                                type->getDeviceNames(true),
+                                                setup.inputDeviceName);
+    juce::String outputName = selectedDeviceName(*outputDeviceCombo_,
+                                                 type->getDeviceNames(false),
+                                                 setup.outputDeviceName);
 
     AudioDeviceSetupSync::resolveEndpointNamesForApply(
         deviceManager_.getCurrentAudioDeviceType(),
