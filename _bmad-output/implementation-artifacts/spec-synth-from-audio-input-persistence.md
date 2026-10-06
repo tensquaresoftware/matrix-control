@@ -38,5 +38,7 @@ context:
 - Catalog fill without ADM change after timer stops — maybe-false — deferred (unverified medium; needs live harness).
 - Spec still `in-progress` / no acceptance block — false — oneshot finalize sets `done`; route intentionally omits full AC sections.
 - Spec Verification omits manual Scarlett relaunch — low — rejected (human smoke remains the product gate; noted in Present).
+- Launch profile restore wipe regression untested — medium — deferred (2026-10-07 code review; StandalonePluginHolder harness; smoke gate).
+- Editor honor of `shouldDefer` untested — medium — deferred (2026-10-07 code review; GUI glue; same smoke gate).
 - AUDIO FROM / SYNTH FROM naming mix in comments — low — rejected (pre-existing dual names; not worth churn).
 - No structural guard that callers check `shouldDefer` — low — patched (struct + function comments state the contract).

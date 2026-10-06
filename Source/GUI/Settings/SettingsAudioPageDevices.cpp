@@ -255,17 +255,21 @@ void SettingsAudioPage::applySetupFromUi()
     const bool opened = AudioDeviceSetupSync::tryApplySetupWithBufferFallback(deviceManager_,
                                                                               setup,
                                                                               bufferTryOrder);
+    bool shouldSyncPreferred = opened;
     if (Core::shouldRestorePreviousSetupAfterBufferFallback(opened))
     {
-        if (deviceManager_.setAudioDeviceSetup(previousSetup, true).isNotEmpty())
+        shouldSyncPreferred = deviceManager_.setAudioDeviceSetup(previousSetup, true).isEmpty();
+        if (! shouldSyncPreferred)
         {
             // Last resort: reopen previous endpoints at previous rate/buffer once more.
-            deviceManager_.setAudioDeviceSetup(previousSetup, true);
+            shouldSyncPreferred = deviceManager_.setAudioDeviceSetup(previousSetup, true).isEmpty();
         }
     }
     syncState_.restoringSetup = false;
 
-    AudioDeviceSetupSync::syncPreferredSetupFromDeviceManager(deviceManager_, syncState_);
+    // Skip preferred/profile capture when snap-back failed — avoid learning a broken half-state.
+    if (shouldSyncPreferred)
+        AudioDeviceSetupSync::syncPreferredSetupFromDeviceManager(deviceManager_, syncState_);
     refreshAllFromDeviceManager();
 }
 

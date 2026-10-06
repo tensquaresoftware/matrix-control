@@ -20,7 +20,7 @@ public:
         bufferTryOrderPutsRequestedThenDefaultThenRemaining();
         bufferTryOrderSkipsNonPositiveAndDedupes();
         bufferFallbackTrySucceedsOnlyWhenLiveRateMatches();
-        bufferFallbackRestoresPreviousWhenAllTriesFail();
+        shouldRestorePreviousSetupWhenFallbackDidNotOpen();
         bufferTryOrderKeepsComfortableRequestedFirst();
     }
 
@@ -182,9 +182,9 @@ private:
         expect(Core::didBufferFallbackTrySucceed(true, true, 48000.0, 48000.0));
     }
 
-    void bufferFallbackRestoresPreviousWhenAllTriesFail()
+    void shouldRestorePreviousSetupWhenFallbackDidNotOpen()
     {
-        beginTest("bufferFallbackRestoresPreviousWhenAllTriesFail");
+        beginTest("shouldRestorePreviousSetupWhenFallbackDidNotOpen");
 
         expect(Core::shouldRestorePreviousSetupAfterBufferFallback(false));
         expect(! Core::shouldRestorePreviousSetupAfterBufferFallback(true));

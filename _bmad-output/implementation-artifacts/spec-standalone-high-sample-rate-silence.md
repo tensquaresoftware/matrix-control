@@ -71,6 +71,14 @@ context:
 - Given the same pick when no buffer opens at that rate, when apply finishes, then SAMPLE RATE / BUFFER SIZE snap to the still-working live setup and PLAY TEST TONE works again at that live rate.
 - Given an apply that cannot open any buffer at the chosen rate, when apply finishes, then the UI rate/buffer match the still-running live setup (no fake selection).
 
+### Review Findings
+
+- [x] [Review][Patch] Honor second previous-setup restore result before preferred/profile sync; prefer live rate/buffer when capturing preferred [`SettingsAudioPageDevices.cpp:258-269`, `AudioDeviceSetupSync.cpp:231-258`]
+- [x] [Review][Patch] Rename `bufferFallbackRestoresPreviousWhenAllTriesFail` so it does not imply `applySetupFromUi` snap-back is covered [`AudioDevicePreferredSetupTests.cpp:185-190`]
+- [x] [Review][Defer] Buffer try-order taken before new sample rate / endpoints settle — deferred: already tracked 2026-10-07; CoreAudio list usually shared; Scarlett smoke remains gate
+- [x] [Review][Defer] Silent CoreAudio “open OK + matching live rate” with mute PLAY TEST TONE — deferred: already tracked; Ableton Live 12 also mute on same hardware; no audible probe in scope
+- [x] [Review][Defer] No unit test executes `tryApplySetupWithBufferFallback` / Settings snap-back against AudioDeviceManager — deferred: already tracked; no ADM fake in current practice
+
 ## Implementation Notes
 
 - `Core::buildBufferSizeTryOrder` / `didBufferFallbackTrySucceed` / `shouldRestorePreviousSetupAfterBufferFallback` in `AudioDevicePreferredSetup.h` — pure policy for try order, try acceptance, and snap-back; covered by `AudioDevicePreferredSetupTests` (matrix rows).
@@ -78,6 +86,7 @@ context:
 - `SettingsAudioPage::applySetupFromUi` — on total failure restores the previous live setup, then always refreshes combos from the device so coerced/snapped values show.
 - Verification: `AudioDevicePreferredSetup` unit tests 0 failures; Standalone Debug build; `lint_touched.py` OK. Hardware Scarlett smoke still required for AC.
 - Review patches: combos select from live `getCurrentSampleRate` / `getCurrentBufferSizeSamples`; `restoringSetup` guard around fallback apply + restore; restore checks error and retries previous setup once; comment fix on `tryApplySetupWithBufferFallback`.
+- Code-review patches (2026-10-07): skip preferred/profile sync when previous-setup snap-back fails; `syncPreferredSetupFromDeviceManager` overlays live rate/buffer before capture; rename restore policy unit test.
 
 ## Spec Change Log
 
@@ -96,3 +105,6 @@ context:
 - Named restore test does not pin `applySetupFromUi` — medium — deferred (Verification Gap; same perimeter).
 - Nested ChangeListener during fallback without restoringSetup — medium — patched (`syncState_.restoringSetup` around try + restore).
 - Endpoint change uses prior device buffer catalog — medium — deferred (grouped with pre-rate buffer list; user’s Scarlett case is rate-only on same interface).
+- Second restore result ignored + preferred capture from setup not live — medium — patched (skip preferred/profile sync when snap-back fails; sync prefers live rate/buffer).
+- Misleading restore unit-test name — low — patched (`shouldRestorePreviousSetupWhenFallbackDidNotOpen`).
+- Ableton/Focusrite mute at 176.4/192 despite open OK — medium — deferred reconfirmed (hardware; out of Matrix-Control scope per owner).

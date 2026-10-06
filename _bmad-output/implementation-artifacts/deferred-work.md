@@ -2381,3 +2381,13 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-standalone-high-sample-rate-silence.md`
   summary: No automated test executes tryApplySetupWithBufferFallback or applySetupFromUi snap-back against AudioDeviceManager.
   evidence: Verification Gap; Core policy helpers are covered; adding a device-manager fake is outside current Settings AUDIO test practice — Scarlett smoke is the AC gate.
+
+## Deferred from: code review of spec-synth-from-audio-input-persistence.md + spec-standalone-high-sample-rate-silence.md (2026-10-07)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-synth-from-audio-input-persistence.md`
+  summary: No unit/integration test asserts that `applyAvailableAudioDeviceProfileAtLaunch` leaves a non-empty APVTS `audioFromSourceId` intact after a successful profile open (re-adding the wipe would stay green).
+  evidence: Verification Gap; launch path needs StandalonePluginHolder / device-manager harness; Scarlett relaunch smoke remains the product gate.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-synth-from-audio-input-persistence.md`
+  summary: Editor paths that honor `shouldDefer` (`applyAudioCatalogToSettings` / `applyAudioCatalogSelectionOnly`) are not covered by tests — only the pure `decideAudioFromSelectionSync` decision is.
+  evidence: Verification Gap; GUI glue without existing harness; same relaunch / catalog-settle smoke as the persistence fix.

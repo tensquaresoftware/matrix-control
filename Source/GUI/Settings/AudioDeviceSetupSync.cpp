@@ -232,6 +232,12 @@ namespace AudioDeviceSetupSync
     {
         auto setup = deviceManager.getAudioDeviceSetup();
         auto* device = deviceManager.getCurrentAudioDevice();
+        // Prefer live clock/buffer so preferred + profile capture match the stream (same as combos).
+        if (device != nullptr)
+        {
+            setup.sampleRate = device->getCurrentSampleRate();
+            setup.bufferSize = device->getCurrentBufferSizeSamples();
+        }
         const auto currentIdentity = identityFromSetup(setup);
         LiveSetupMutation live { deviceManager, setup, device, state.restoringSetup };
 
