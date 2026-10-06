@@ -2,6 +2,7 @@
 
 #include <juce_audio_basics/juce_audio_basics.h>
 
+#include "Core/MIDI/ActiveNoteRegistry.h"
 #include "Core/MIDI/Queue/MidiOutboundQueue.h"
 #include "Core/MIDI/MidiActivityTracker.h"
 
@@ -14,9 +15,14 @@ namespace Core
     class InstrumentMidiForwarder
     {
     public:
+        explicit InstrumentMidiForwarder(ActiveNoteRegistry& activeNotes);
+
         void forward(const juce::MidiBuffer& midiMessages,
                      bool instrumentPathEnabled,
                      MidiOutboundQueue& queue,
                      MidiActivityTracker& tracker) const;
+
+    private:
+        ActiveNoteRegistry& activeNotes_;
     };
 }

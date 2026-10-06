@@ -15,9 +15,12 @@ namespace Core
         }
     }
 
-    KeyboardFromMidiInput::KeyboardFromMidiInput(MidiOutboundQueue& queue, MidiActivityTracker& tracker)
+    KeyboardFromMidiInput::KeyboardFromMidiInput(MidiOutboundQueue& queue,
+                                                 MidiActivityTracker& tracker,
+                                                 ActiveNoteRegistry& activeNotes)
         : queue_(queue)
         , tracker_(tracker)
+        , activeNotes_(activeNotes)
     {
     }
 
@@ -70,6 +73,7 @@ namespace Core
     {
         if (isAllowedInstrumentMessage(message))
         {
+            activeNotes_.apply(message);
             queue_.enqueueRealtime(message);
             tracker_.notifyActivity(MidiActivityTracker::Path::kInstrument);
         }

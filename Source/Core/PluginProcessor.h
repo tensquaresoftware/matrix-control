@@ -46,6 +46,7 @@ namespace Core
     struct InitTemplateLoadResult;
     class PatchParameterSysExDispatcher;
     class MidiOutboundQueue;
+    class ActiveNoteRegistry;
     class InstrumentMidiForwarder;
     class KeyboardFromMidiInput;
     class AudioPassthroughProcessor;
@@ -489,6 +490,7 @@ private:
     juce::AudioProcessorValueTreeState apvts;
     std::unique_ptr<Core::MidiActivityTracker> midiActivityTracker_;
     std::unique_ptr<Core::MidiOutboundQueue> outboundQueue_;
+    std::unique_ptr<Core::ActiveNoteRegistry> activeNoteRegistry_;
     std::unique_ptr<Core::InstrumentMidiForwarder> instrumentForwarder_;
     std::unique_ptr<Core::AudioPassthroughProcessor> audioPassthroughProcessor_;
     std::unique_ptr<Core::KeyboardFromMidiInput> keyboardFromMidiInput_;

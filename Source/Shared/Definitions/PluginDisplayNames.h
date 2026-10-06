@@ -40,7 +40,7 @@ namespace PluginDisplayNames
             constexpr const char* kRedo =
                 "SESSION: Redoes the last undone edit.";
             constexpr const char* kPanic =
-                "SESSION: Sends MIDI Note Offs and panic CCs to clear stuck notes on the synth.";
+                "SESSION: Sends Note Offs for held notes plus panic CCs. Long releases may still ring out.";
             constexpr const char* kLogo =
                 "SESSION: Opens the logo menu for Settings, About, Skin, and UI Scale.";
             constexpr const char* kSettings =

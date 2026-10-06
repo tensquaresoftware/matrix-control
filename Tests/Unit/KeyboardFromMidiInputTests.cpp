@@ -1,5 +1,6 @@
 #include <juce_core/juce_core.h>
 
+#include "Core/MIDI/ActiveNoteRegistry.h"
 #include "Core/MIDI/KeyboardFromMidiInput.h"
 #include "Core/MIDI/MidiActivityTracker.h"
 #include "Core/MIDI/Queue/MidiOutboundQueue.h"
@@ -24,7 +25,8 @@ private:
 
         Core::MidiOutboundQueue queue;
         Core::MidiActivityTracker tracker;
-        Core::KeyboardFromMidiInput input(queue, tracker);
+        Core::ActiveNoteRegistry notes;
+        Core::KeyboardFromMidiInput input(queue, tracker, notes);
 
         expect(!input.isPortOpen());
         expect(input.setPort({}));
@@ -38,11 +40,14 @@ private:
 
         Core::MidiOutboundQueue queue;
         Core::MidiActivityTracker tracker;
-        Core::KeyboardFromMidiInput input(queue, tracker);
+        Core::ActiveNoteRegistry notes;
+        Core::KeyboardFromMidiInput input(queue, tracker, notes);
 
         input.processIncomingMessage(juce::MidiMessage::noteOn(1, 60, 0.8f));
         input.processIncomingMessage(juce::MidiMessage::controllerEvent(1, 7, 100));
         input.processIncomingMessage(juce::MidiMessage::pitchWheel(1, 8192));
+
+        expectEquals(static_cast<int>(notes.count()), 1);
 
         auto note = queue.dequeue();
         expect(note.has_value());
@@ -65,7 +70,8 @@ private:
 
         Core::MidiOutboundQueue queue;
         Core::MidiActivityTracker tracker;
-        Core::KeyboardFromMidiInput input(queue, tracker);
+        Core::ActiveNoteRegistry notes;
+        Core::KeyboardFromMidiInput input(queue, tracker, notes);
 
         input.processIncomingMessage(juce::MidiMessage::programChange(1, 42));
         input.processIncomingMessage(juce::MidiMessage::noteOn(1, 60, 0.8f));
@@ -88,7 +94,8 @@ private:
 
         Core::MidiOutboundQueue queue;
         Core::MidiActivityTracker tracker;
-        Core::KeyboardFromMidiInput input(queue, tracker);
+        Core::ActiveNoteRegistry notes;
+        Core::KeyboardFromMidiInput input(queue, tracker, notes);
 
         input.processIncomingMessage(juce::MidiMessage::channelPressureChange(1, 80));
         input.processIncomingMessage(juce::MidiMessage::aftertouchChange(1, 60, 90));

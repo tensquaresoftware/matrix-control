@@ -10,6 +10,11 @@ namespace Core
         }
     }
 
+    InstrumentMidiForwarder::InstrumentMidiForwarder(ActiveNoteRegistry& activeNotes)
+        : activeNotes_(activeNotes)
+    {
+    }
+
     void InstrumentMidiForwarder::forward(const juce::MidiBuffer& midiMessages,
                                             bool instrumentPathEnabled,
                                             MidiOutboundQueue& queue,
@@ -23,6 +28,7 @@ namespace Core
             const auto message = metadata.getMessage();
             if (isAllowedInstrumentMessage(message))
             {
+                activeNotes_.apply(message);
                 queue.enqueueRealtime(message);
                 tracker.notifyActivity(MidiActivityTracker::Path::kInstrument);
             }

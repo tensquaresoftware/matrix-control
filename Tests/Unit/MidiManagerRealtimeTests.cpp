@@ -1,6 +1,7 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_core/juce_core.h>
 
+#include "Core/MIDI/ActiveNoteRegistry.h"
 #include "Core/MIDI/MidiActivityTracker.h"
 #include "Core/MIDI/MidiManager.h"
 #include "Core/MIDI/Queue/MidiOutboundQueue.h"
@@ -93,7 +94,7 @@ namespace
         test.expectEquals(reset->midiMessage.getChannel(), channel);
     }
 
-    void expectPanicPayloadForChannel(juce::UnitTest& test, Core::MidiOutboundQueue& queue, int channel)
+    void expectFallbackNoteOffSpray(juce::UnitTest& test, Core::MidiOutboundQueue& queue, int channel)
     {
         for (int note = 0; note < 128; ++note)
         {
@@ -103,26 +104,6 @@ namespace
             test.expectEquals(noteOff->midiMessage.getNoteNumber(), note);
             test.expectEquals(noteOff->midiMessage.getChannel(), channel);
         }
-
-        expectPanicControllersForChannel(test, queue, channel);
-    }
-
-    void expectInterleavedOmniPanicPayload(juce::UnitTest& test, Core::MidiOutboundQueue& queue)
-    {
-        for (int note = 0; note < 128; ++note)
-        {
-            for (int channel = 1; channel <= 16; ++channel)
-            {
-                auto noteOff = queue.dequeue();
-                test.expect(noteOff.has_value());
-                test.expect(noteOff->midiMessage.isNoteOff());
-                test.expectEquals(noteOff->midiMessage.getNoteNumber(), note);
-                test.expectEquals(noteOff->midiMessage.getChannel(), channel);
-            }
-        }
-
-        for (int channel = 1; channel <= 16; ++channel)
-            expectPanicControllersForChannel(test, queue, channel);
     }
 }
 
@@ -140,9 +121,10 @@ public:
         testRealtimeDispatchesAfterOutputPortOpened();
         testEmptySysExPayloadSkipped();
         testRealtimeNotStarvedDuringSysExGate();
-        testSendPanicEnqueuesNoteOffSprayOnAllChannelsWhenChannelParamMissing();
-        testSendPanicEnqueuesNoteOffSprayOnOmniChoice();
+        testSendPanicFallbackOmniUsesChannel1NoteOffsNotFullSpray();
+        testSendPanicEnqueuesHeldNotesThenControllers();
         testSendPanicEnqueuesNoteOffSprayOnBasicChannel();
+        testSendPanicCoalescesWhileRealtimeDepthHigh();
         testDrainRealtimeDoesNotReorderSysEx();
     }
 
@@ -354,9 +336,9 @@ private:
         manager.stopThread(2000);
     }
 
-    void testSendPanicEnqueuesNoteOffSprayOnAllChannelsWhenChannelParamMissing()
+    void testSendPanicFallbackOmniUsesChannel1NoteOffsNotFullSpray()
     {
-        beginTest("sendPanic without midiChannel param clears all 16 channels (interleaved Note Offs, then CCs)");
+        beginTest("sendPanic Omni fallback sprays Note Off 0-127 on ch1 only, then CC on all 16");
 
         Core::MidiOutboundQueue queue;
         Core::MidiActivityTracker tracker;
@@ -365,32 +347,49 @@ private:
 
         manager.sendPanic();
 
-        constexpr int kMessagesPerChannel = 128 + 3;
-        expectEquals(static_cast<int>(queue.realtimeDepth()), 16 * kMessagesPerChannel);
-        expectInterleavedOmniPanicPayload(*this, queue);
+        expectEquals(static_cast<int>(queue.realtimeDepth()), 128 + (16 * 3));
+        expectFallbackNoteOffSpray(*this, queue, 1);
+        for (int channel = 1; channel <= 16; ++channel)
+            expectPanicControllersForChannel(*this, queue, channel);
         expect(queue.isEmpty());
     }
 
-    void testSendPanicEnqueuesNoteOffSprayOnOmniChoice()
+    void testSendPanicEnqueuesHeldNotesThenControllers()
     {
-        beginTest("sendPanic with Omni choice index 0 clears all 16 channels (interleaved Note Offs, then CCs)");
+        beginTest("sendPanic with registry emits Note Offs for held notes only, then CCs");
 
         Core::MidiOutboundQueue queue;
         Core::MidiActivityTracker tracker;
-        MidiChannelAudioProcessor proc(0); // Omni
+        Core::ActiveNoteRegistry notes;
+        MidiChannelAudioProcessor proc(1);
         MidiManager manager(proc.apvts, queue, tracker);
+        manager.setActiveNoteRegistry(&notes);
+
+        notes.apply(juce::MidiMessage::noteOn(1, 60, 0.8f));
+        notes.apply(juce::MidiMessage::noteOn(1, 64, 0.8f));
 
         manager.sendPanic();
 
-        constexpr int kMessagesPerChannel = 128 + 3;
-        expectEquals(static_cast<int>(queue.realtimeDepth()), 16 * kMessagesPerChannel);
-        expectInterleavedOmniPanicPayload(*this, queue);
+        expectEquals(static_cast<int>(queue.realtimeDepth()), 2 + 3);
+        expectEquals(static_cast<int>(notes.count()), 0);
+
+        auto first = queue.dequeue();
+        expect(first.has_value());
+        expect(first->midiMessage.isNoteOff());
+        expectEquals(first->midiMessage.getNoteNumber(), 60);
+
+        auto second = queue.dequeue();
+        expect(second.has_value());
+        expect(second->midiMessage.isNoteOff());
+        expectEquals(second->midiMessage.getNoteNumber(), 64);
+
+        expectPanicControllersForChannel(*this, queue, 1);
         expect(queue.isEmpty());
     }
 
     void testSendPanicEnqueuesNoteOffSprayOnBasicChannel()
     {
-        beginTest("sendPanic on basic channel 3 sprays Note Off 0-127 then CC 120/123/121 on that channel only");
+        beginTest("sendPanic on basic channel 3 without held notes sprays Note Off 0-127 then CCs");
 
         Core::MidiOutboundQueue queue;
         Core::MidiActivityTracker tracker;
@@ -399,10 +398,27 @@ private:
 
         manager.sendPanic();
 
-        constexpr int kMessagesPerChannel = 128 + 3;
-        expectEquals(static_cast<int>(queue.realtimeDepth()), kMessagesPerChannel);
-        expectPanicPayloadForChannel(*this, queue, 3);
+        expectEquals(static_cast<int>(queue.realtimeDepth()), 128 + 3);
+        expectFallbackNoteOffSpray(*this, queue, 3);
+        expectPanicControllersForChannel(*this, queue, 3);
         expect(queue.isEmpty());
+    }
+
+    void testSendPanicCoalescesWhileRealtimeDepthHigh()
+    {
+        beginTest("sendPanic no-ops while realtime depth is already high");
+
+        Core::MidiOutboundQueue queue;
+        Core::MidiActivityTracker tracker;
+        MinimalAudioProcessor proc;
+        MidiManager manager(proc.apvts, queue, tracker);
+
+        for (int i = 0; i < 32; ++i)
+            queue.enqueueRealtime(juce::MidiMessage::noteOn(1, i, 0.5f));
+
+        const auto depthBefore = queue.realtimeDepth();
+        manager.sendPanic();
+        expectEquals(static_cast<int>(queue.realtimeDepth()), static_cast<int>(depthBefore));
     }
 
     void testDrainRealtimeDoesNotReorderSysEx()

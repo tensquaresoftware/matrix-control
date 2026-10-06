@@ -14,6 +14,7 @@
 #include "Core/Init/MatrixModInitService.h"
 #include "Core/Init/PatchInitService.h"
 #include "Core/Init/PatchModuleInitService.h"
+#include "Core/MIDI/ActiveNoteRegistry.h"
 #include "Core/MIDI/KeyboardFromMidiInput.h"
 #include "Core/MIDI/MasterParameterSysExDispatcher.h"
 #include "Core/MIDI/MatrixModBusParameterSysExDispatcher.h"
@@ -63,9 +64,11 @@ PluginProcessor::PluginProcessor()
     , apvts(*this, &undoManager_, "PARAMETERS", createParameterLayout())
     , midiActivityTracker_{ std::make_unique<Core::MidiActivityTracker>() }
     , outboundQueue_{ std::make_unique<Core::MidiOutboundQueue>() }
-    , instrumentForwarder_{ std::make_unique<Core::InstrumentMidiForwarder>() }
+    , activeNoteRegistry_{ std::make_unique<Core::ActiveNoteRegistry>() }
+    , instrumentForwarder_{ std::make_unique<Core::InstrumentMidiForwarder>(*activeNoteRegistry_) }
     , audioPassthroughProcessor_{ std::make_unique<Core::AudioPassthroughProcessor>() }
-    , keyboardFromMidiInput_{ std::make_unique<Core::KeyboardFromMidiInput>(*outboundQueue_, *midiActivityTracker_) }
+    , keyboardFromMidiInput_{ std::make_unique<Core::KeyboardFromMidiInput>(
+          *outboundQueue_, *midiActivityTracker_, *activeNoteRegistry_) }
     , midiManager(std::make_unique<MidiManager>(apvts, *outboundQueue_, *midiActivityTracker_))
     , patchModel_{ std::make_unique<Core::PatchModel>() }
     , apvtsPatchMapper_{ std::make_unique<Core::ApvtsPatchMapper>(apvts, *patchModel_) }
@@ -75,6 +78,7 @@ PluginProcessor::PluginProcessor()
     , clipboardService_{ std::make_unique<Core::ClipboardService>() }
     , dirtyPatchTracker_{ std::make_unique<Core::DirtyPatchTracker>() }
 {
+    midiManager->setActiveNoteRegistry(activeNoteRegistry_.get());
     createSysExDispatchers();
     createInitAndFileServices();
     createActionSubsystem();
@@ -231,7 +235,10 @@ void PluginProcessor::stopMidiThread()
 void PluginProcessor::processBlock(juce::AudioBuffer<float>& audioBuffer,
                                    juce::MidiBuffer& midiMessages)
 {
-    instrumentForwarder_->forward(midiMessages, getInstrumentPathEnabled(midiMessages), *outboundQueue_, *midiActivityTracker_);
+    instrumentForwarder_->forward(midiMessages,
+                                  getInstrumentPathEnabled(midiMessages),
+                                  *outboundQueue_,
+                                  *midiActivityTracker_);
 
     auto inputBusBuffer = getBusBuffer(audioBuffer, true, 0);
     auto outputBusBuffer = getBusBuffer(audioBuffer, false, 0);

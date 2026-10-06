@@ -21,9 +21,9 @@ context:
 
 **Problem:** PANIC already sends All Sound Off / All Notes Off / Reset All Controllers on the panic channel(s), but a Matrix-1000 with a held pad chord does not silence — MIDI Monitor confirms the CCs leave the host while audio continues until key Note Offs. Users expect PANIC to cut sound immediately.
 
-**Approach:** Keep the existing CC 120 → 123 → 121 triple and channel rules (1–16 vs Omni/Mono → all 16). On each panic channel, also enqueue Note Off for pitches 0–127 via the realtime front path. Do not track held notes; full spray is the safety net. Accept a brief queue-pressure alert flash from the burst depth.
+**Approach:** Keep CC 120 → 123 → 121 and channel rules. Emit Note Offs for notes currently held on the instrument path (ActiveNoteRegistry). Never flood 16×128 Note Offs. Coalesce while realtime depth is already high so repeated PANIC clicks cannot wedge Device Inquiry / lock the UI. Fallback when nothing is tracked: single-channel 0–127 spray only.
 
-**Decisions locked:** Full 0–127 Note Off spray (option 1, 2026-10-06) in addition to the CC triple; same channel resolution as today.
+**Decisions locked:** (2026-10-06) Started as full 0–127×channels spray; UAT proved Omni flood locks GUI and still does not hard-mute long releases on Matrix-1000 — renegotiated to held-note Note Offs + coalesce + single-channel fallback.
 
 </frozen-after-approval>
 
@@ -46,6 +46,12 @@ Done 2026-10-06:
 - Help copy updated (no longer claims easing a backed-up queue).
 - Tests: missing-param Omni, choice Omni index 0, basic channel 3, FrontMany prepend. Lint OK after extract.
 - Expect brief queue-pressure alert flash on Omni Panic (depth ≫ 32) — accepted in Intent.
+
+Hotfix 2026-10-06 (UAT regression):
+
+- Omni 16×128 spray + multi-click stacked bursts saturated DIN MIDI → Device Inquiry timeout → UI lock (`deviceMidiUnresponsive` / connection error).
+- Replaced full spray with `ActiveNoteRegistry` held-note Note Offs; Omni fallback = ch1 0–127 only; coalesce when `realtimeDepth >= 32`.
+- Product note: Matrix ignores All Sound Off — a pad with long release will still ring after Note Off (same as lifting keys).
 
 ## Review Triage Log
 

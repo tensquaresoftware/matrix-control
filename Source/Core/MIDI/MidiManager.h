@@ -22,6 +22,7 @@
 #include "SysEx/SysExEncoder.h"
 #include "Exceptions/Exceptions.h"
 #include "SysEx/SysExConstants.h"
+#include "Core/MIDI/ActiveNoteRegistry.h"
 #include "Core/MIDI/EditorPath.h"
 #include "Core/MIDI/MidiActivityTracker.h"
 #include "Core/MIDI/Queue/MidiOutboundQueue.h"
@@ -76,10 +77,12 @@ public:
                                  juce::uint8 amount,
                                  juce::uint8 destination);
 
-    // Note Off 0-127 then All Sound Off (CC 120), All Notes Off (CC 123), Reset All Controllers
-    // (CC 121) on the active midiChannel (or all 16 for Omni/Mono), via realtime front (never
-    // bypasses the queue).
+    // Held-note Note Offs (when ActiveNoteRegistry is wired) plus All Sound Off (CC 120),
+    // All Notes Off (CC 123), Reset All Controllers (CC 121) on the active midiChannel (or all
+    // 16 for Omni/Mono), via realtime front. Coalesces while realtime depth is already high.
     void sendPanic();
+
+    void setActiveNoteRegistry(Core::ActiveNoteRegistry* registry) noexcept;
 
     // Unison Detune (CC 94) when Settings EPROM TYPE is optimised; suppressed otherwise.
     // Channel resolution matches sendPanic (midiChannel 1-16, or all channels for Omni/Mono).
@@ -178,6 +181,7 @@ private:
     std::unique_ptr<SysExEncoder> sysExEncoder;
     Core::MidiOutboundQueue& outboundQueue_;
     Core::MidiActivityTracker& activityTracker_;
+    Core::ActiveNoteRegistry* activeNoteRegistry_ = nullptr;
     Core::EditorPath editorPath_;
     Core::SysExInterMessageDelay sysExDelay_;
 

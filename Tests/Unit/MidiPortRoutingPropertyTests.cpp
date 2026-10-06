@@ -1,6 +1,7 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_core/juce_core.h>
 
+#include "Core/MIDI/ActiveNoteRegistry.h"
 #include "Core/MIDI/KeyboardFromMidiInput.h"
 #include "Core/MIDI/MidiActivityTracker.h"
 #include "Core/MIDI/MidiManager.h"
@@ -164,7 +165,8 @@ private:
 
         Core::MidiOutboundQueue queue;
         Core::MidiActivityTracker tracker;
-        Core::KeyboardFromMidiInput keyboardFrom(queue, tracker);
+        Core::ActiveNoteRegistry notes;
+        Core::KeyboardFromMidiInput keyboardFrom(queue, tracker, notes);
         juce::ValueTree state { "TEST" };
 
         state.setProperty("keyboardFromEnabled", true, nullptr);
@@ -182,7 +184,8 @@ private:
 
         Core::MidiOutboundQueue queue;
         Core::MidiActivityTracker tracker;
-        Core::KeyboardFromMidiInput keyboardFrom(queue, tracker);
+        Core::ActiveNoteRegistry notes;
+        Core::KeyboardFromMidiInput keyboardFrom(queue, tracker, notes);
         juce::ValueTree state { "TEST" };
 
         state.setProperty("keyboardFromEnabled", true, nullptr);
@@ -209,7 +212,8 @@ private:
 
         Core::MidiOutboundQueue queue;
         Core::MidiActivityTracker tracker;
-        Core::KeyboardFromMidiInput keyboardFrom(queue, tracker);
+        Core::ActiveNoteRegistry notes;
+        Core::KeyboardFromMidiInput keyboardFrom(queue, tracker, notes);
         juce::ValueTree state { "TEST" };
 
         expect(setKeyboardFromPortLikeProcessor(state, keyboardFrom, deviceId));

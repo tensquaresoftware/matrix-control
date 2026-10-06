@@ -1,6 +1,7 @@
 #include <juce_core/juce_core.h>
 
 #include "Core/Audio/InstrumentMidiForwarder.h"
+#include "Core/MIDI/ActiveNoteRegistry.h"
 #include "Core/MIDI/MidiActivityTracker.h"
 #include "Core/MIDI/Queue/MidiOutboundQueue.h"
 
@@ -25,7 +26,8 @@ private:
 
         Core::MidiOutboundQueue queue;
         Core::MidiActivityTracker tracker;
-        Core::InstrumentMidiForwarder forwarder;
+        Core::ActiveNoteRegistry notes;
+        Core::InstrumentMidiForwarder forwarder(notes);
         juce::MidiBuffer buffer;
         buffer.addEvent(juce::MidiMessage::noteOn(1, 60, 0.8f), 0);
 
@@ -42,7 +44,8 @@ private:
 
         Core::MidiOutboundQueue queue;
         Core::MidiActivityTracker tracker;
-        Core::InstrumentMidiForwarder forwarder;
+        Core::ActiveNoteRegistry notes;
+        Core::InstrumentMidiForwarder forwarder(notes);
         juce::MidiBuffer buffer;
         buffer.addEvent(juce::MidiMessage::noteOn(1, 60, 0.8f), 0);
         buffer.addEvent(juce::MidiMessage::controllerEvent(1, 7, 100), 0);
@@ -71,7 +74,8 @@ private:
 
         Core::MidiOutboundQueue queue;
         Core::MidiActivityTracker tracker;
-        Core::InstrumentMidiForwarder forwarder;
+        Core::ActiveNoteRegistry notes;
+        Core::InstrumentMidiForwarder forwarder(notes);
         juce::MidiBuffer buffer;
         buffer.addEvent(juce::MidiMessage::programChange(1, 42), 0);
         buffer.addEvent(juce::MidiMessage::noteOn(1, 60, 0.8f), 0);
@@ -95,7 +99,8 @@ private:
 
         Core::MidiOutboundQueue queue;
         Core::MidiActivityTracker tracker;
-        Core::InstrumentMidiForwarder forwarder;
+        Core::ActiveNoteRegistry notes;
+        Core::InstrumentMidiForwarder forwarder(notes);
         juce::MidiBuffer buffer;
         buffer.addEvent(juce::MidiMessage::channelPressureChange(1, 80), 0);
         buffer.addEvent(juce::MidiMessage::aftertouchChange(1, 60, 90), 0);
@@ -117,7 +122,8 @@ private:
 
         Core::MidiOutboundQueue queue;
         Core::MidiActivityTracker tracker;
-        Core::InstrumentMidiForwarder forwarder;
+        Core::ActiveNoteRegistry notes;
+        Core::InstrumentMidiForwarder forwarder(notes);
         juce::MidiBuffer buffer;
         buffer.addEvent(juce::MidiMessage::noteOn(1, 60, 0.8f), 0);
 
