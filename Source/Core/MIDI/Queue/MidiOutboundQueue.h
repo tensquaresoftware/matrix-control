@@ -4,6 +4,7 @@
 #include <mutex>
 #include <optional>
 #include <queue>
+#include <vector>
 
 #include <juce_audio_basics/juce_audio_basics.h>
 #include <juce_core/juce_core.h>
@@ -59,6 +60,11 @@ namespace Core
 
         // Insert at the front of the realtime queue (Panic / urgent voice-clear).
         void enqueueRealtimeFront(juce::MidiMessage message);
+
+        // Prepend an ordered burst in one lock (messages[0] dequeues first). Prefer this over
+        // repeated enqueueRealtimeFront for large Panic payloads — each single front-insert
+        // rebuilds the whole realtime queue.
+        void enqueueRealtimeFrontMany(std::vector<juce::MidiMessage> messages);
 
         std::optional<Message> dequeue();
         bool isEmpty() const noexcept;

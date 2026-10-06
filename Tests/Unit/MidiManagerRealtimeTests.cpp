@@ -1,3 +1,4 @@
+#include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_core/juce_core.h>
 
 #include "Core/MIDI/MidiActivityTracker.h"
@@ -5,11 +6,125 @@
 #include "Core/MIDI/Queue/MidiOutboundQueue.h"
 #include "MidiManagerTestSupport.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
+#include "Shared/Definitions/PluginDescriptors.h"
+#include "Shared/Definitions/PluginIDs.h"
 
 using MidiManagerTestSupport::MinimalAudioProcessor;
 using MidiManagerTestSupport::firstAvailableOutputDeviceId;
 using MidiManagerTestSupport::openFirstAvailableOutputOrSkip;
 using MidiManagerTestSupport::waitForQueueEmpty;
+
+namespace
+{
+    class MidiChannelAudioProcessor : public juce::AudioProcessor
+    {
+    public:
+        explicit MidiChannelAudioProcessor(int channelChoiceIndex)
+            : juce::AudioProcessor(BusesProperties())
+            , apvts(*this, nullptr, "P", makeLayout(channelChoiceIndex))
+        {
+        }
+
+        juce::AudioProcessorValueTreeState apvts;
+
+        const juce::String getName() const override { return "Test"; }
+        void prepareToPlay(double, int) override {}
+        void releaseResources() override {}
+        void processBlock(juce::AudioBuffer<float>&, juce::MidiBuffer&) override {}
+        juce::AudioProcessorEditor* createEditor() override { return nullptr; }
+        bool hasEditor() const override { return false; }
+        bool acceptsMidi() const override { return false; }
+        bool producesMidi() const override { return false; }
+        bool isMidiEffect() const override { return false; }
+        double getTailLengthSeconds() const override { return 0.0; }
+        int getNumPrograms() override { return 1; }
+        int getCurrentProgram() override { return 0; }
+        void setCurrentProgram(int) override {}
+        const juce::String getProgramName(int) override { return {}; }
+        void changeProgramName(int, const juce::String&) override {}
+        void getStateInformation(juce::MemoryBlock&) override {}
+        void setStateInformation(const void*, int) override {}
+
+    private:
+        static juce::AudioProcessorValueTreeState::ParameterLayout makeLayout(int channelChoiceIndex)
+        {
+            juce::AudioProcessorValueTreeState::ParameterLayout layout;
+
+            for (const auto& d : PluginDescriptors::MasterEditSection::MidiModule::kChoiceParameters)
+            {
+                if (d.parameterId
+                    != PluginIDs::MasterEditSection::MidiModule::ParameterWidgets::kChannel)
+                    continue;
+
+                layout.add(std::make_unique<juce::AudioParameterChoice>(
+                    juce::ParameterID(d.parameterId, 1),
+                    d.displayName,
+                    d.choices,
+                    channelChoiceIndex));
+            }
+
+            return layout;
+        }
+    };
+
+    void expectPanicControllersForChannel(juce::UnitTest& test,
+                                          Core::MidiOutboundQueue& queue,
+                                          int channel)
+    {
+        auto allSoundOff = queue.dequeue();
+        test.expect(allSoundOff.has_value());
+        test.expect(allSoundOff->midiMessage.isController());
+        test.expectEquals(allSoundOff->midiMessage.getControllerNumber(), 120);
+        test.expectEquals(allSoundOff->midiMessage.getControllerValue(), 0);
+        test.expectEquals(allSoundOff->midiMessage.getChannel(), channel);
+
+        auto notesOff = queue.dequeue();
+        test.expect(notesOff.has_value());
+        test.expect(notesOff->midiMessage.isController());
+        test.expectEquals(notesOff->midiMessage.getControllerNumber(), 123);
+        test.expectEquals(notesOff->midiMessage.getControllerValue(), 0);
+        test.expectEquals(notesOff->midiMessage.getChannel(), channel);
+
+        auto reset = queue.dequeue();
+        test.expect(reset.has_value());
+        test.expect(reset->midiMessage.isController());
+        test.expectEquals(reset->midiMessage.getControllerNumber(), 121);
+        test.expectEquals(reset->midiMessage.getControllerValue(), 0);
+        test.expectEquals(reset->midiMessage.getChannel(), channel);
+    }
+
+    void expectPanicPayloadForChannel(juce::UnitTest& test, Core::MidiOutboundQueue& queue, int channel)
+    {
+        for (int note = 0; note < 128; ++note)
+        {
+            auto noteOff = queue.dequeue();
+            test.expect(noteOff.has_value());
+            test.expect(noteOff->midiMessage.isNoteOff());
+            test.expectEquals(noteOff->midiMessage.getNoteNumber(), note);
+            test.expectEquals(noteOff->midiMessage.getChannel(), channel);
+        }
+
+        expectPanicControllersForChannel(test, queue, channel);
+    }
+
+    void expectInterleavedOmniPanicPayload(juce::UnitTest& test, Core::MidiOutboundQueue& queue)
+    {
+        for (int note = 0; note < 128; ++note)
+        {
+            for (int channel = 1; channel <= 16; ++channel)
+            {
+                auto noteOff = queue.dequeue();
+                test.expect(noteOff.has_value());
+                test.expect(noteOff->midiMessage.isNoteOff());
+                test.expectEquals(noteOff->midiMessage.getNoteNumber(), note);
+                test.expectEquals(noteOff->midiMessage.getChannel(), channel);
+            }
+        }
+
+        for (int channel = 1; channel <= 16; ++channel)
+            expectPanicControllersForChannel(test, queue, channel);
+    }
+}
 
 class MidiManagerRealtimeTests : public juce::UnitTest
 {
@@ -25,7 +140,9 @@ public:
         testRealtimeDispatchesAfterOutputPortOpened();
         testEmptySysExPayloadSkipped();
         testRealtimeNotStarvedDuringSysExGate();
-        testSendPanicEnqueuesAllNotesOffThenResetControllers();
+        testSendPanicEnqueuesNoteOffSprayOnAllChannelsWhenChannelParamMissing();
+        testSendPanicEnqueuesNoteOffSprayOnOmniChoice();
+        testSendPanicEnqueuesNoteOffSprayOnBasicChannel();
         testDrainRealtimeDoesNotReorderSysEx();
     }
 
@@ -237,9 +354,9 @@ private:
         manager.stopThread(2000);
     }
 
-    void testSendPanicEnqueuesAllNotesOffThenResetControllers()
+    void testSendPanicEnqueuesNoteOffSprayOnAllChannelsWhenChannelParamMissing()
     {
-        beginTest("sendPanic without midiChannel param clears all 16 channels (120, 123, 121)");
+        beginTest("sendPanic without midiChannel param clears all 16 channels (interleaved Note Offs, then CCs)");
 
         Core::MidiOutboundQueue queue;
         Core::MidiActivityTracker tracker;
@@ -248,32 +365,43 @@ private:
 
         manager.sendPanic();
 
-        expectEquals(static_cast<int>(queue.realtimeDepth()), 48);
+        constexpr int kMessagesPerChannel = 128 + 3;
+        expectEquals(static_cast<int>(queue.realtimeDepth()), 16 * kMessagesPerChannel);
+        expectInterleavedOmniPanicPayload(*this, queue);
+        expect(queue.isEmpty());
+    }
 
-        for (int channel = 1; channel <= 16; ++channel)
-        {
-            auto allSoundOff = queue.dequeue();
-            expect(allSoundOff.has_value());
-            expect(allSoundOff->midiMessage.isController());
-            expectEquals(allSoundOff->midiMessage.getControllerNumber(), 120);
-            expectEquals(allSoundOff->midiMessage.getControllerValue(), 0);
-            expectEquals(allSoundOff->midiMessage.getChannel(), channel);
+    void testSendPanicEnqueuesNoteOffSprayOnOmniChoice()
+    {
+        beginTest("sendPanic with Omni choice index 0 clears all 16 channels (interleaved Note Offs, then CCs)");
 
-            auto notesOff = queue.dequeue();
-            expect(notesOff.has_value());
-            expect(notesOff->midiMessage.isController());
-            expectEquals(notesOff->midiMessage.getControllerNumber(), 123);
-            expectEquals(notesOff->midiMessage.getControllerValue(), 0);
-            expectEquals(notesOff->midiMessage.getChannel(), channel);
+        Core::MidiOutboundQueue queue;
+        Core::MidiActivityTracker tracker;
+        MidiChannelAudioProcessor proc(0); // Omni
+        MidiManager manager(proc.apvts, queue, tracker);
 
-            auto reset = queue.dequeue();
-            expect(reset.has_value());
-            expect(reset->midiMessage.isController());
-            expectEquals(reset->midiMessage.getControllerNumber(), 121);
-            expectEquals(reset->midiMessage.getControllerValue(), 0);
-            expectEquals(reset->midiMessage.getChannel(), channel);
-        }
+        manager.sendPanic();
 
+        constexpr int kMessagesPerChannel = 128 + 3;
+        expectEquals(static_cast<int>(queue.realtimeDepth()), 16 * kMessagesPerChannel);
+        expectInterleavedOmniPanicPayload(*this, queue);
+        expect(queue.isEmpty());
+    }
+
+    void testSendPanicEnqueuesNoteOffSprayOnBasicChannel()
+    {
+        beginTest("sendPanic on basic channel 3 sprays Note Off 0-127 then CC 120/123/121 on that channel only");
+
+        Core::MidiOutboundQueue queue;
+        Core::MidiActivityTracker tracker;
+        MidiChannelAudioProcessor proc(3); // choice index 3 → MIDI channel 3
+        MidiManager manager(proc.apvts, queue, tracker);
+
+        manager.sendPanic();
+
+        constexpr int kMessagesPerChannel = 128 + 3;
+        expectEquals(static_cast<int>(queue.realtimeDepth()), kMessagesPerChannel);
+        expectPanicPayloadForChannel(*this, queue, 3);
         expect(queue.isEmpty());
     }
 

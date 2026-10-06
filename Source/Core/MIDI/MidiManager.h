@@ -76,8 +76,9 @@ public:
                                  juce::uint8 amount,
                                  juce::uint8 destination);
 
-    // All Notes Off (CC 123) then Reset All Controllers (CC 121) on the active midiChannel,
-    // via the normal realtime outbound path (never bypasses the queue).
+    // Note Off 0-127 then All Sound Off (CC 120), All Notes Off (CC 123), Reset All Controllers
+    // (CC 121) on the active midiChannel (or all 16 for Omni/Mono), via realtime front (never
+    // bypasses the queue).
     void sendPanic();
 
     // Unison Detune (CC 94) when Settings EPROM TYPE is optimised; suppressed otherwise.

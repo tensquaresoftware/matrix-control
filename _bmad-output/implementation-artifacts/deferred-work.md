@@ -2351,3 +2351,9 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-settings-shortcut-focus-intermittent.md`
   summary: Spec Verification command running EditorChromeShortcut tests does not observe focus acquisition/restore regressions.
   evidence: Verification Gap; classifier green while deleting all requestEditorKeyboardFocusIfNeeded call sites would still pass those tests; treat manual smoke as the real gate.
+
+## Deferred from: oneshot review of spec-panic-note-off-spray.md (2026-10-06)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-panic-note-off-spray.md`
+  summary: Older done specs still describe Panic as CC-only and list full Note Off spray as out of scope.
+  evidence: Blind Hunter; sibling docs (`spec-device-unresponsive-presence-sysex-brake`, `spec-bug-midi-01-residual-panic-alert`) are historical; refresh only if someone revisits those artifacts.

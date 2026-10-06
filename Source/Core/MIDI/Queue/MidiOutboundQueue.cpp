@@ -48,6 +48,28 @@ namespace Core
         wakeConsumerIfNeeded();
     }
 
+    void MidiOutboundQueue::enqueueRealtimeFrontMany(std::vector<juce::MidiMessage> messages)
+    {
+        if (messages.empty())
+            return;
+
+        {
+            std::lock_guard<std::mutex> lock(queueMutex_);
+            // std::queue has no push_front — rebuild with the burst first (dequeue order preserved).
+            std::queue<juce::MidiMessage> rebuilt;
+            for (auto& message : messages)
+                rebuilt.push(std::move(message));
+            while (! realtimeQueue_.empty())
+            {
+                rebuilt.push(std::move(realtimeQueue_.front()));
+                realtimeQueue_.pop();
+            }
+            realtimeQueue_ = std::move(rebuilt);
+        }
+
+        wakeConsumerIfNeeded();
+    }
+
     void MidiOutboundQueue::enqueueSysEx(juce::MemoryBlock sysEx)
     {
         {

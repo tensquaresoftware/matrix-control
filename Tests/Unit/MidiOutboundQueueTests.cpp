@@ -4,6 +4,7 @@
 #include <mutex>
 #include <set>
 #include <thread>
+#include <vector>
 
 #include "Core/MIDI/Queue/MidiOutboundQueue.h"
 
@@ -135,6 +136,7 @@ public:
         testInterleavedPriority();
         testEmptyQueue();
         testRealtimeDepth();
+        testEnqueueRealtimeFrontManyPreservesOrderAndPrepends();
         testDualProducerConsumerStress();
     }
 
@@ -239,6 +241,44 @@ private:
         (void) queue.dequeue();
         expectEquals(static_cast<int>(queue.realtimeDepth()), 1);
         expectEquals(static_cast<int>(queue.sysExDepth()), 1);
+    }
+
+    void testEnqueueRealtimeFrontManyPreservesOrderAndPrepends()
+    {
+        beginTest("enqueueRealtimeFrontMany prepends burst in order ahead of existing realtime");
+
+        Core::MidiOutboundQueue queue;
+        queue.enqueueRealtime(juce::MidiMessage::noteOn(1, 60, 0.5f));
+
+        std::vector<juce::MidiMessage> burst;
+        burst.push_back(juce::MidiMessage::noteOff(2, 10));
+        burst.push_back(juce::MidiMessage::noteOff(2, 11));
+        burst.push_back(juce::MidiMessage::controllerEvent(2, 120, 0));
+        queue.enqueueRealtimeFrontMany(std::move(burst));
+
+        expectEquals(static_cast<int>(queue.realtimeDepth()), 4);
+
+        auto first = queue.dequeue();
+        expect(first.has_value());
+        expect(first->midiMessage.isNoteOff());
+        expectEquals(first->midiMessage.getChannel(), 2);
+        expectEquals(first->midiMessage.getNoteNumber(), 10);
+
+        auto second = queue.dequeue();
+        expect(second.has_value());
+        expectEquals(second->midiMessage.getNoteNumber(), 11);
+
+        auto third = queue.dequeue();
+        expect(third.has_value());
+        expect(third->midiMessage.isController());
+        expectEquals(third->midiMessage.getControllerNumber(), 120);
+
+        auto fourth = queue.dequeue();
+        expect(fourth.has_value());
+        expect(fourth->midiMessage.isNoteOn());
+        expectEquals(fourth->midiMessage.getNoteNumber(), 60);
+
+        expect(queue.isEmpty());
     }
 
     void testDualProducerConsumerStress()
