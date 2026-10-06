@@ -17,6 +17,11 @@ public:
         sameDeviceChangeCapturesWithoutRestore();
         deviceIdentityChangeRestoresThenCaptures();
         deviceIdentityChangeSkipsUnsupportedPreferred();
+        bufferTryOrderPutsRequestedThenDefaultThenRemaining();
+        bufferTryOrderSkipsNonPositiveAndDedupes();
+        bufferFallbackTrySucceedsOnlyWhenLiveRateMatches();
+        bufferFallbackRestoresPreviousWhenAllTriesFail();
+        bufferTryOrderKeepsComfortableRequestedFirst();
     }
 
 private:
@@ -129,6 +134,73 @@ private:
         expect(! plan.shouldRestore);
         expectEquals(plan.preferredAfterCapture.sampleRate, 44100.0);
         expectEquals(plan.preferredAfterCapture.bufferSize, 512);
+    }
+
+    void bufferTryOrderPutsRequestedThenDefaultThenRemaining()
+    {
+        beginTest("bufferTryOrderPutsRequestedThenDefaultThenRemaining");
+
+        const juce::Array<int> available { 64, 128, 256, 512, 1024 };
+        const auto order = Core::buildBufferSizeTryOrder(256, 512, available);
+
+        expectEquals(order.size(), 5);
+        expectEquals(order[0], 256);
+        expectEquals(order[1], 512);
+        expectEquals(order[2], 64);
+        expectEquals(order[3], 128);
+        expectEquals(order[4], 1024);
+    }
+
+    void bufferTryOrderSkipsNonPositiveAndDedupes()
+    {
+        beginTest("bufferTryOrderSkipsNonPositiveAndDedupes");
+
+        const juce::Array<int> available { 0, 128, 256, -1 };
+        const auto order = Core::buildBufferSizeTryOrder(128, 0, available);
+
+        expectEquals(order.size(), 2);
+        expectEquals(order[0], 128);
+        expectEquals(order[1], 256);
+
+        const auto requestedOnly = Core::buildBufferSizeTryOrder(512, 512, {});
+        expectEquals(requestedOnly.size(), 1);
+        expectEquals(requestedOnly[0], 512);
+    }
+
+    void bufferFallbackTrySucceedsOnlyWhenLiveRateMatches()
+    {
+        beginTest("bufferFallbackTrySucceedsOnlyWhenLiveRateMatches");
+
+        // High SR + stale/coerced buffer: open OK only when live rate matches request.
+        expect(Core::didBufferFallbackTrySucceed(true, true, 192000.0, 192000.0));
+        expect(! Core::didBufferFallbackTrySucceed(true, true, 192000.0, 48000.0));
+        expect(! Core::didBufferFallbackTrySucceed(false, true, 192000.0, 192000.0));
+        expect(! Core::didBufferFallbackTrySucceed(true, false, 192000.0, 192000.0));
+
+        // Lower rates / buffer-only: non-positive requested rate accepts any live rate.
+        expect(Core::didBufferFallbackTrySucceed(true, true, 0.0, 48000.0));
+        expect(Core::didBufferFallbackTrySucceed(true, true, 48000.0, 48000.0));
+    }
+
+    void bufferFallbackRestoresPreviousWhenAllTriesFail()
+    {
+        beginTest("bufferFallbackRestoresPreviousWhenAllTriesFail");
+
+        expect(Core::shouldRestorePreviousSetupAfterBufferFallback(false));
+        expect(! Core::shouldRestorePreviousSetupAfterBufferFallback(true));
+    }
+
+    void bufferTryOrderKeepsComfortableRequestedFirst()
+    {
+        beginTest("bufferTryOrderKeepsComfortableRequestedFirst");
+
+        // High SR + buffer 512: requested 512 stays first, then default, then remainder.
+        const juce::Array<int> available { 64, 128, 256, 512, 1024 };
+        const auto order = Core::buildBufferSizeTryOrder(512, 256, available);
+
+        expectEquals(order[0], 512);
+        expectEquals(order[1], 256);
+        expect(order.contains(1024));
     }
 };
 

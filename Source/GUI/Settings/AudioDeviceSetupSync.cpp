@@ -147,6 +147,31 @@ namespace AudioDeviceSetupSync
         return device->getAvailableBufferSizes().contains(bufferSize);
     }
 
+    bool tryApplySetupWithBufferFallback(juce::AudioDeviceManager& deviceManager,
+                                         juce::AudioDeviceManager::AudioDeviceSetup setup,
+                                         const juce::Array<int>& bufferTryOrder)
+    {
+        const double requestedRate = setup.sampleRate;
+
+        for (const int bufferSize : bufferTryOrder)
+        {
+            setup.bufferSize = bufferSize;
+            const bool setSucceeded = deviceManager.setAudioDeviceSetup(setup, true).isEmpty();
+            auto* live = deviceManager.getCurrentAudioDevice();
+            const double liveRate = live != nullptr ? live->getCurrentSampleRate() : 0.0;
+
+            if (Core::didBufferFallbackTrySucceed(setSucceeded,
+                                                  live != nullptr,
+                                                  requestedRate,
+                                                  liveRate))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     Core::AudioDeviceIdentity identityFromSetup(const juce::AudioDeviceManager::AudioDeviceSetup& setup)
     {
         return { .outputDeviceName = setup.outputDeviceName, .inputDeviceName = setup.inputDeviceName };

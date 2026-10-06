@@ -11,6 +11,15 @@ namespace AudioDeviceSetupSync
     bool deviceSupportsSampleRate(juce::AudioIODevice* device, double sampleRate);
     bool deviceSupportsBufferSize(juce::AudioIODevice* device, int bufferSize);
 
+    /**
+        Try opening `setup` with each buffer in `bufferTryOrder` until setAudioDeviceSetup
+        succeeds and the live device sample rate matches `setup.sampleRate`.
+        Returns true when a try succeeds; does not restore a prior setup on failure.
+    */
+    bool tryApplySetupWithBufferFallback(juce::AudioDeviceManager& deviceManager,
+                                         juce::AudioDeviceManager::AudioDeviceSetup setup,
+                                         const juce::Array<int>& bufferTryOrder);
+
     Core::AudioDeviceIdentity identityFromSetup(const juce::AudioDeviceManager::AudioDeviceSetup& setup);
     Core::AudioDeviceCapabilities capabilitiesFromDevice(juce::AudioIODevice* device);
 

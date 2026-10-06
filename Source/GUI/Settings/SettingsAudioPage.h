@@ -69,6 +69,7 @@ private:
     void refreshSampleRateAndBufferCombos();
     void refreshChannelCombos();
     void wireChannelPairComboCallbacks();
+    void applySelectedRateAndBufferFromCombos(juce::AudioDeviceManager::AudioDeviceSetup& setup);
     void applySetupFromUi();
     void applyChannelPair(bool isInput, int pairIndex);
     void playTestSound();

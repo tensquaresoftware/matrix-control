@@ -136,4 +136,53 @@ namespace Core
     {
         return {};
     }
+
+    /**
+        Ordered buffer sizes to try when opening a sample rate: requested first, then the
+        device default, then every other size from the device's available list (deduped).
+        Pure / hardware-free — used by Settings AUDIO apply fallback.
+    */
+    inline juce::Array<int> buildBufferSizeTryOrder(int requestedBufferSize,
+                                                    int deviceDefaultBufferSize,
+                                                    const juce::Array<int>& availableBufferSizes)
+    {
+        juce::Array<int> order;
+
+        const auto appendUniquePositive = [&order](int size)
+        {
+            if (size > 0 && ! order.contains(size))
+                order.add(size);
+        };
+
+        appendUniquePositive(requestedBufferSize);
+        appendUniquePositive(deviceDefaultBufferSize);
+        for (const auto size : availableBufferSizes)
+            appendUniquePositive(size);
+
+        return order;
+    }
+
+    /**
+        One buffer-try outcome: setup applied with no error, live device present, and
+        live sample rate matches the requested rate (when a positive rate was requested).
+    */
+    inline bool didBufferFallbackTrySucceed(bool setSetupSucceeded,
+                                            bool liveDevicePresent,
+                                            double requestedSampleRate,
+                                            double liveSampleRate) noexcept
+    {
+        if (! setSetupSucceeded || ! liveDevicePresent)
+            return false;
+
+        if (requestedSampleRate <= 0.0)
+            return true;
+
+        return juce::approximatelyEqual(liveSampleRate, requestedSampleRate);
+    }
+
+    /** After every buffer try failed, restore the setup that was live before the apply. */
+    inline bool shouldRestorePreviousSetupAfterBufferFallback(bool fallbackOpened) noexcept
+    {
+        return ! fallbackOpened;
+    }
 }

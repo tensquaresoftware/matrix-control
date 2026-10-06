@@ -105,9 +105,12 @@ void SettingsAudioPage::refreshSampleRateAndBufferCombos()
     bufferSizeValues_.clear();
 
     auto* device = deviceManager_.getCurrentAudioDevice();
-    const auto setup = deviceManager_.getAudioDeviceSetup();
     if (device == nullptr)
         return;
+
+    // Prefer live device clock/buffer so combos match the stream after coerce or snap-back.
+    const double liveSampleRate = device->getCurrentSampleRate();
+    const int liveBufferSize = device->getCurrentBufferSizeSamples();
 
     int selectedRateId = 0;
     for (const auto rate : device->getAvailableSampleRates())
@@ -115,7 +118,7 @@ void SettingsAudioPage::refreshSampleRateAndBufferCombos()
         sampleRateValues_.add(juce::String(rate, 0));
         const int id = sampleRateValues_.size();
         sampleRateCombo_->addItem(sampleRateValues_[id - 1], id);
-        if (juce::approximatelyEqual(rate, setup.sampleRate))
+        if (juce::approximatelyEqual(rate, liveSampleRate))
             selectedRateId = id;
     }
     if (selectedRateId > 0)
@@ -127,7 +130,7 @@ void SettingsAudioPage::refreshSampleRateAndBufferCombos()
         bufferSizeValues_.add(size);
         const int id = bufferSizeValues_.size();
         bufferSizeCombo_->addItem(juce::String(size), id);
-        if (size == setup.bufferSize)
+        if (size == liveBufferSize)
             selectedBufferId = id;
     }
     if (selectedBufferId > 0)
@@ -187,11 +190,34 @@ namespace
         return liveSetupName;
     }
 
+    juce::Array<int> bufferTryOrderForCurrentDevice(juce::AudioDeviceManager& deviceManager,
+                                                    int requestedBufferSize)
+    {
+        auto* device = deviceManager.getCurrentAudioDevice();
+        const int deviceDefault = device != nullptr ? device->getDefaultBufferSize() : 0;
+        const auto available = device != nullptr ? device->getAvailableBufferSizes()
+                                                 : juce::Array<int>{};
+        return Core::buildBufferSizeTryOrder(requestedBufferSize, deviceDefault, available);
+    }
+
+}
+
+void SettingsAudioPage::applySelectedRateAndBufferFromCombos(
+    juce::AudioDeviceManager::AudioDeviceSetup& setup)
+{
+    const int rateId = sampleRateCombo_->getSelectedId();
+    if (rateId > 0 && rateId <= sampleRateValues_.size())
+        setup.sampleRate = sampleRateValues_[rateId - 1].getDoubleValue();
+
+    const int bufferId = bufferSizeCombo_->getSelectedId();
+    if (bufferId > 0 && bufferId <= bufferSizeValues_.size())
+        setup.bufferSize = bufferSizeValues_[bufferId - 1];
 }
 
 void SettingsAudioPage::applySetupFromUi()
 {
-    auto setup = deviceManager_.getAudioDeviceSetup();
+    const auto previousSetup = deviceManager_.getAudioDeviceSetup();
+    auto setup = previousSetup;
     auto* type = deviceManager_.getCurrentDeviceTypeObject();
     if (type == nullptr)
         return;
@@ -222,15 +248,23 @@ void SettingsAudioPage::applySetupFromUi()
     if (outputDeviceChanged)
         AudioDeviceSetupSync::applyStereoPairToSetup(setup, false, 0);
 
-    const int rateId = sampleRateCombo_->getSelectedId();
-    if (rateId > 0 && rateId <= sampleRateValues_.size())
-        setup.sampleRate = sampleRateValues_[rateId - 1].getDoubleValue();
+    applySelectedRateAndBufferFromCombos(setup);
 
-    const int bufferId = bufferSizeCombo_->getSelectedId();
-    if (bufferId > 0 && bufferId <= bufferSizeValues_.size())
-        setup.bufferSize = bufferSizeValues_[bufferId - 1];
+    const auto bufferTryOrder = bufferTryOrderForCurrentDevice(deviceManager_, setup.bufferSize);
+    syncState_.restoringSetup = true;
+    const bool opened = AudioDeviceSetupSync::tryApplySetupWithBufferFallback(deviceManager_,
+                                                                              setup,
+                                                                              bufferTryOrder);
+    if (Core::shouldRestorePreviousSetupAfterBufferFallback(opened))
+    {
+        if (deviceManager_.setAudioDeviceSetup(previousSetup, true).isNotEmpty())
+        {
+            // Last resort: reopen previous endpoints at previous rate/buffer once more.
+            deviceManager_.setAudioDeviceSetup(previousSetup, true);
+        }
+    }
+    syncState_.restoringSetup = false;
 
-    deviceManager_.setAudioDeviceSetup(setup, true);
     AudioDeviceSetupSync::syncPreferredSetupFromDeviceManager(deviceManager_, syncState_);
     refreshAllFromDeviceManager();
 }

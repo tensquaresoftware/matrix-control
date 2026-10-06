@@ -2367,3 +2367,17 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-synth-from-audio-input-persistence.md`
   summary: If active input channels appear without an AudioDeviceManager change notification after HeaderRefreshTimer stops empty retries, deferred SYNTH FROM sync might not re-run.
   evidence: Blind Hunter maybe-false (unverified medium); settle with a live harness that fills the catalog without a change broadcast after 60 empty timer ticks.
+
+## Deferred from: review of spec-standalone-high-sample-rate-silence.md (2026-10-07)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-standalone-high-sample-rate-silence.md`
+  summary: If CoreAudio reports a successful open at 176.4/192 kHz with a matching live rate but PLAY TEST TONE stays silent, buffer fallback does not keep retrying.
+  evidence: Blind Hunter; would need an audible probe or driver-level health check beyond setAudioDeviceSetup + getCurrentSampleRate.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-standalone-high-sample-rate-silence.md`
+  summary: Buffer try-order is taken from the device before the new sample rate (and before new endpoints settle), so high-rate-only sizes may be missing from the first try list.
+  evidence: Blind Hunter + Edge Case Hunter; CoreAudio often shares one buffer list across rates; settle with a Scarlett open that exposes different sizes only after the high rate sticks.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-standalone-high-sample-rate-silence.md`
+  summary: No automated test executes tryApplySetupWithBufferFallback or applySetupFromUi snap-back against AudioDeviceManager.
+  evidence: Verification Gap; Core policy helpers are covered; adding a device-manager fake is outside current Settings AUDIO test practice — Scarlett smoke is the AC gate.
