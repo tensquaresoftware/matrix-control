@@ -78,7 +78,7 @@ When Settings combo = `SHOW WHEN INCOMPLETE` and at least one **applicable** ste
 - Later first Standalone use with Audio applicable + incomplete → targeted open at STEP 4 (resume copy in `ui-copy.md`).
 - All applicable done → no auto-open.
 
-When combo = `NEVER AT LAUNCH`: never auto-open; entry only via Settings / `RUN SETUP AGAIN`.
+When combo = `NEVER SHOW AT LAUNCH`: never auto-open; entry only via Settings / `RUN SETUP AGAIN`.
 
 ### `RUN SETUP AGAIN`
 

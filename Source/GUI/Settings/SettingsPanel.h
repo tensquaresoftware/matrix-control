@@ -1,12 +1,15 @@
 #pragma once
 
+#include <functional>
 #include <memory>
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
+#include "Core/Services/DeviceSetupDeviceRow.h"
 #include "GUI/Widgets/Button.h"
 #include "GUI/Widgets/ComboBox.h"
 #include "GUI/Widgets/Label.h"
+#include "GUI/Widgets/ReadOnlyValueField.h"
 #include "GUI/Widgets/Slider.h"
 #include "GUI/Helpers/ContextualHelpBinder.h"
 #include "GUI/Settings/SettingsAudioPage.h"
@@ -19,13 +22,22 @@ namespace TSS
     class ISkin;
 }
 
-class SettingsPanel : public juce::Component
+class SettingsPanel : public juce::Component,
+                      private juce::Timer
 {
 public:
     static constexpr int kDesignWidth = SettingsShellMetrics::kContentWidth;
 
+    struct LiveDeviceStatus
+    {
+        bool deviceDetected = false;
+        bool deviceMidiUnresponsive = false;
+        MatrixDeviceTypes::Type deviceType = MatrixDeviceTypes::Type::kUnknown;
+        juce::String deviceVersion;
+    };
+
     SettingsPanel(TSS::ISkin& skin, bool isPluginMode);
-    ~SettingsPanel() override = default;
+    ~SettingsPanel() override;
 
     void paint(juce::Graphics& g) override;
     void resized() override;
@@ -44,6 +56,18 @@ public:
     SettingsMidiPage* getMidiPage() const noexcept { return midiPage_.get(); }
 
     void registerContextualHelp(TSS::ContextualHelpBinder::FooterResolver resolveFooter);
+
+    /** Refresh DEVICE read-only strip (Inquiry / port readiness). */
+    void updateLiveDeviceStatus(const LiveDeviceStatus& status);
+
+    /** Re-evaluate DEVICE row after MIDI cabling changes (ports already applied). */
+    void refreshDeviceRow();
+
+    /** Fired when the DEVICE searching window starts and Inquiry should be kicked. */
+    void setOnSearchingWindowStarted(std::function<void()> callback);
+
+    /** Stop DEVICE searching animation when Settings closes. */
+    void stopLiveTimers();
 
     TSS::Slider& getHardwareLatencySlider() { return *hardwareLatencySlider_; }
     TSS::ComboBox& getEpromTypeCombo() { return *epromTypeCombo_; }
@@ -70,8 +94,9 @@ public:
     void refreshInitTemplateDeleteEnablement(bool patchInitExists, bool masterInitExists);
     void refreshDefragHistoryEnablement(bool hasMutationHistory);
 
-    /** Rebuild EPROM TYPE items for the current device family; returns selected id after coerce. */
-    int refreshEpromTypeItems(int preferredSelectedId);
+    /** Rebuild EPROM TYPE items for the current device family; returns selected id after coerce.
+        popupMarkerItemId marks Inquiry suggestion in the open list only (0 = none). */
+    int refreshEpromTypeItems(int preferredSelectedId, int popupMarkerItemId = 0);
 
 private:
     struct RowLayoutMetrics
@@ -98,6 +123,7 @@ private:
     };
 
     void setupInterfaceSection(TSS::ISkin& skin);
+    void setupGettingStartedSection(TSS::ISkin& skin);
     void setupDeviceSection(TSS::ISkin& skin);
     void setupPatchSection(TSS::ISkin& skin);
     void setupPatchMutatorSection(TSS::ISkin& skin);
@@ -112,10 +138,11 @@ private:
 
     void updatePageVisibility();
     void setInterfaceSectionVisible(bool visible);
+    void setGettingStartedSectionVisible(bool visible);
     void layoutContent(juce::Rectangle<int> bounds);
     void layoutInterfaceSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics);
-    void layoutDeviceSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics);
-    void layoutMidiSection(juce::Rectangle<int>& bounds);
+    void layoutGettingStartedSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics);
+    void layoutMidiAndDeviceSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics);
     void layoutAudioSection(juce::Rectangle<int>& bounds);
     void layoutPatchSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics);
     void layoutPatchMutatorSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics);
@@ -138,6 +165,13 @@ private:
                              TSS::Button& button,
                              int buttonWidth);
 
+    void timerCallback() override;
+    void recomputeDeviceRow();
+    void applySearchingWindowUpdate(const Core::DeviceSetupSearchingWindowUpdate& update);
+    void refreshDeviceValueField();
+    void syncDeviceAnimationTimer();
+
+    inline constexpr static int kSearchingDotsIntervalMs_ = 450;
     inline constexpr static int kPadding_ = SettingsShellMetrics::kPadding;
     inline constexpr static int kRowGap_ = 8;
     inline constexpr static int kControlHeight_ = 20;
@@ -164,6 +198,11 @@ private:
     bool isPluginMode_ = false;
     int activeTabId_ = 1;
     MatrixDeviceTypes::Type deviceType_ = MatrixDeviceTypes::Type::kUnknown;
+    LiveDeviceStatus liveStatus_ {};
+    Core::DeviceSetupSearchingWindowState searchingWindow_ {};
+    Core::DeviceSetupDeviceRowView deviceRowView_ {};
+    int searchingDotFrame_ = 0;
+    std::function<void()> onSearchingWindowStarted_;
 
     std::unique_ptr<TSS::Label> uiScaleLabel_;
     std::unique_ptr<TSS::ComboBox> uiScaleCombo_;
@@ -173,10 +212,12 @@ private:
     std::unique_ptr<TSS::ComboBox> infoMessageCombo_;
     std::unique_ptr<TSS::Label> contextualHelpLabel_;
     std::unique_ptr<TSS::ComboBox> contextualHelpCombo_;
-    std::unique_ptr<TSS::Label> gettingStartedLabel_;
+    std::unique_ptr<TSS::Label> setupWizardLabel_;
     std::unique_ptr<TSS::ComboBox> gettingStartedAutoOpenCombo_;
     std::unique_ptr<TSS::Button> runSetupAgainButton_;
 
+    std::unique_ptr<TSS::Label> deviceLabel_;
+    std::unique_ptr<TSS::ReadOnlyValueField> deviceValueField_;
     std::unique_ptr<TSS::Label> hardwareLatencyLabel_;
     std::unique_ptr<TSS::Slider> hardwareLatencySlider_;
     std::unique_ptr<TSS::Label> epromTypeLabel_;

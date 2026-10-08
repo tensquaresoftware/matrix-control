@@ -74,57 +74,61 @@ void PluginEditor::attachMidiSettingsPage(SettingsPanel& panel)
 
 void PluginEditor::wireMidiPagePortChanges(SettingsMidiPage& midiPage)
 {
-    midiPage.getSynthFromCombo().onChange = [this, &midiPage]
+    const auto refreshDeviceRow = [this]
+    {
+        if (auto* panel = getSettingsPanelIfOpen())
+            panel->refreshDeviceRow();
+    };
+
+    midiPage.getSynthFromCombo().onChange = [this, &midiPage, refreshDeviceRow]
     {
         const auto previousPortId =
             pluginProcessor.getApvts().state.getProperty("midiInputPortId", juce::String()).toString();
         const auto selectedPortId = midiPage.getSelectedSynthFromPortId();
 
-        if (pluginProcessor.setMidiInputPort(selectedPortId))
-            return;
-
-        midiPage.selectSynthFromPort(previousPortId);
-        if (previousPortId.isNotEmpty())
-            pluginProcessor.setMidiInputPort(previousPortId);
+        if (! pluginProcessor.setMidiInputPort(selectedPortId))
+        {
+            midiPage.selectSynthFromPort(previousPortId);
+            if (previousPortId.isNotEmpty())
+                pluginProcessor.setMidiInputPort(previousPortId);
+        }
+        refreshDeviceRow();
     };
 
-    midiPage.getSynthToCombo().onChange = [this, &midiPage]
+    midiPage.getSynthToCombo().onChange = [this, &midiPage, refreshDeviceRow]
     {
         const auto previousPortId =
             pluginProcessor.getApvts().state.getProperty("midiOutputPortId", juce::String()).toString();
         const auto selectedPortId = midiPage.getSelectedSynthToPortId();
 
-        if (pluginProcessor.setMidiOutputPort(selectedPortId))
+        if (! pluginProcessor.setMidiOutputPort(selectedPortId))
         {
-            syncPanicFromMidiOutputState();
-            return;
+            midiPage.selectSynthToPort(previousPortId);
+            if (previousPortId.isNotEmpty())
+                pluginProcessor.setMidiOutputPort(previousPortId);
         }
-
-        midiPage.selectSynthToPort(previousPortId);
-        if (previousPortId.isNotEmpty())
-            pluginProcessor.setMidiOutputPort(previousPortId);
         syncPanicFromMidiOutputState();
+        refreshDeviceRow();
     };
 
-    if (auto* keyboardCombo = midiPage.getKeyboardFromCombo())
+    auto* keyboardCombo = midiPage.getKeyboardFromCombo();
+    if (keyboardCombo == nullptr)
+        return;
+
+    keyboardCombo->onChange = [this, &midiPage]
     {
-        keyboardCombo->onChange = [this, &midiPage]
-        {
-            if (! pluginProcessor.isStandalone())
-                return;
+        if (! pluginProcessor.isStandalone())
+            return;
 
-            const auto previousPortId =
-                pluginProcessor.getApvts().state.getProperty("keyboardFromPortId", juce::String()).toString();
-            const auto selectedPortId = midiPage.getSelectedKeyboardFromPortId();
+        const auto previousPortId =
+            pluginProcessor.getApvts().state.getProperty("keyboardFromPortId", juce::String()).toString();
+        if (pluginProcessor.setKeyboardFromPort(midiPage.getSelectedKeyboardFromPortId()))
+            return;
 
-            if (pluginProcessor.setKeyboardFromPort(selectedPortId))
-                return;
-
-            midiPage.selectKeyboardFromPort(previousPortId);
-            if (previousPortId.isNotEmpty())
-                pluginProcessor.setKeyboardFromPort(previousPortId);
-        };
-    }
+        midiPage.selectKeyboardFromPort(previousPortId);
+        if (previousPortId.isNotEmpty())
+            pluginProcessor.setKeyboardFromPort(previousPortId);
+    };
 }
 
 void PluginEditor::syncPanicFromMidiOutputState()
@@ -159,6 +163,10 @@ void PluginEditor::openSettingsWindow()
                     return mainComponent_ != nullptr ? &mainComponent_->getFooterPanel()
                                                      : nullptr;
                 });
+                panel.setOnSearchingWindowStarted([this]
+                {
+                    pluginProcessor.getMidiManager().refreshDeviceInquiryAfterPortSync();
+                });
                 wireSettingsPanel(panel);
             },
             [this] { closeSettingsWindow(); });
@@ -192,6 +200,7 @@ void PluginEditor::showReadySettingsWindow(SettingsPanel& panel, bool isPluginMo
     restoreSettingsPanelFromState(panel);
     settingsWindow_->setActiveTab(SettingsShellMetrics::readAndCoerceLastTab(
         pluginProcessor.getApvts().state, isPluginMode));
+    refreshSettingsLiveDeviceStatus();
     refreshAudioFromCombo();
     settingsWindow_->toFront(true);
     settingsWindow_->grabKeyboardFocus();
@@ -203,9 +212,11 @@ void PluginEditor::closeSettingsWindow()
 
     if (settingsWindow_ != nullptr)
     {
-        if (auto* midiPage = settingsWindow_->getSettingsPanel().getMidiPage())
+        auto& panel = settingsWindow_->getSettingsPanel();
+        panel.stopLiveTimers();
+        if (auto* midiPage = panel.getMidiPage())
             midiPage->setMonitoringActive(false);
-        if (auto* audioPage = settingsWindow_->getSettingsPanel().getAudioPage())
+        if (auto* audioPage = panel.getAudioPage())
             audioPage->setMonitoringActive(false);
         settingsWindow_->setVisible(false);
     }

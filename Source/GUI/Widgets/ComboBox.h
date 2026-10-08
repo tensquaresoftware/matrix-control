@@ -40,6 +40,12 @@ namespace TSS
         void setUsesPortSentinelPopupChrome(bool shouldUse) noexcept;
         [[nodiscard]] bool usesPortSentinelPopupChrome() const noexcept { return usesPortSentinelPopupChrome_; }
 
+        /** Optional popup-only mark on one item id (closed face stays unmarked). itemId 0 clears. */
+        void setPopupOnlyMarkedItem(int itemId, juce::String suffix = " *");
+        [[nodiscard]] int getPopupOnlyMarkedItemId() const noexcept { return popupOnlyMarkedItemId_; }
+        /** Item label for open popup rows (may append the popup-only mark). */
+        [[nodiscard]] juce::String popupListLabelForItemIndex(int itemIndex) const;
+
         void paint(juce::Graphics& g) override;
         void showPopup() override;
         /** Programmatic reopen after live item rebuild — skips onAboutToShowPopup. */
@@ -90,6 +96,8 @@ namespace TSS
         bool hasFocus_ = false;
         bool suppressNextPopupOpen_ = false;
         bool usesPortSentinelPopupChrome_ = false;
+        int popupOnlyMarkedItemId_ = 0;
+        juce::String popupOnlyMarkSuffix_;
         float uiScale_ = 1.0f;
         PopupVerticalPlacement popupVerticalPlacement_ = PopupVerticalPlacement::Auto;
         juce::Component::SafePointer<juce::Component> activePopup_;

@@ -20,6 +20,8 @@ public:
         testInquirySuggestionMatrix6();
         testInquirySuggestionAmbiguous();
         testPreferredForPrompt();
+        testInquiryPopupMarkerId();
+        testStoredTypeAfterInquirySuccess();
         testForEachValidItemSizesAndContents();
         testDeviceFamilyFromType();
     }
@@ -129,6 +131,36 @@ private:
         expectEquals(Core::EpromTypePolicy::preferredForPrompt(kUnknown, kGligli), kGligli);
         expectEquals(Core::EpromTypePolicy::preferredForPrompt(kUnknown, kUnknown), kUnknown);
         expectEquals(Core::EpromTypePolicy::preferredForPrompt(99, kFactory), kFactory);
+    }
+
+    void testInquiryPopupMarkerId()
+    {
+        beginTest("inquiryPopupMarkerId - none until detected; mapped or UNKNOWN when detected");
+
+        using namespace PluginIDs::Settings::EpromType;
+        const auto family = Core::MatrixDeviceFamily::kMatrix1000;
+
+        expectEquals(Core::EpromTypePolicy::inquiryPopupMarkerId(false, "1.20", family), 0);
+        expectEquals(Core::EpromTypePolicy::inquiryPopupMarkerId(true, "1.20", family), kTauntek);
+        expectEquals(Core::EpromTypePolicy::inquiryPopupMarkerId(true, "9.99", family), kUnknown);
+        expectEquals(Core::EpromTypePolicy::inquiryPopupMarkerId(true, {}, family), kUnknown);
+    }
+
+    void testStoredTypeAfterInquirySuccess()
+    {
+        beginTest("storedTypeAfterInquirySuccess - maps firmware and coerces for family");
+
+        using namespace PluginIDs::Settings::EpromType;
+
+        expectEquals(Core::EpromTypePolicy::storedTypeAfterInquirySuccess(
+                         "1.20", MatrixDeviceTypes::Type::kMatrix1000),
+                     kTauntek);
+        expectEquals(Core::EpromTypePolicy::storedTypeAfterInquirySuccess(
+                         "1.16", MatrixDeviceTypes::Type::kMatrix6),
+                     kUnknown);
+        expectEquals(Core::EpromTypePolicy::storedTypeAfterInquirySuccess(
+                         "2.15", MatrixDeviceTypes::Type::kMatrix6R),
+                     kTauntek);
     }
 
     void testForEachValidItemSizesAndContents()

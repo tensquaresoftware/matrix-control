@@ -94,18 +94,22 @@ namespace PluginIDs
 
         namespace LastTab
         {
-            // Absolute ids after MIDI insert (delivery 3). Delivery-2 stored AUDIO=3 is now
-            // MIDI (same raw id) — not remapped; invalid / plugin-stale ids still coerce.
+            // Tabs after GETTING STARTED insert + MIDI&DEVICE merge (2026-10-09).
+            // Legacy: UI=1 Device=2 Midi=3 Audio=4 Patch=5 Mutator=6 Master=7.
+            // New: GS=8 UI=1 MidiDevice=2 Audio=4 Patch=5 Mutator=6 Master=7.
+            // Legacy Device(2) keeps MidiDevice(2). Legacy Midi(3) remaps → MidiDevice(2).
             constexpr int kUserInterface = 1;
-            constexpr int kDevice = 2;
-            constexpr int kMidi = 3;
+            constexpr int kMidiAndDevice = 2;
             constexpr int kAudio = 4;
             constexpr int kPatch = 5;
             constexpr int kPatchMutator = 6;
             constexpr int kMaster = 7;
+            constexpr int kGettingStarted = 8;
+            /** @deprecated Prefer kMidiAndDevice (same value as legacy Device). */
+            constexpr int kDevice = kMidiAndDevice;
+            /** @deprecated Legacy MIDI tab id — normalize() remaps to kMidiAndDevice. */
+            constexpr int kMidi = 3;
             constexpr int kDefault = kUserInterface;
-            constexpr int kFirst = kUserInterface;
-            constexpr int kLast = kMaster;
             constexpr int kMaxCount = 7;
             constexpr int kStandaloneCount = 7;
             constexpr int kPluginCount = 6;
@@ -117,22 +121,31 @@ namespace PluginIDs
 
             inline bool isValid(int raw, bool isPluginMode) noexcept
             {
-                if (raw < kFirst || raw > kLast)
-                    return false;
-
-                if (isPluginMode && raw == kAudio)
-                    return false;
-
-                return true;
+                switch (raw)
+                {
+                    case kGettingStarted:
+                    case kUserInterface:
+                    case kMidiAndDevice:
+                    case kPatch:
+                    case kPatchMutator:
+                    case kMaster:
+                        return true;
+                    case kAudio:
+                        return ! isPluginMode;
+                    default:
+                        return false;
+                }
             }
 
             inline int idAt(int index, bool isPluginMode) noexcept
             {
                 static constexpr int kStandaloneIds[] = {
-                    kUserInterface, kDevice, kMidi, kAudio, kPatch, kPatchMutator, kMaster
+                    kGettingStarted, kUserInterface, kMidiAndDevice, kAudio, kPatch,
+                    kPatchMutator, kMaster
                 };
                 static constexpr int kPluginIds[] = {
-                    kUserInterface, kDevice, kMidi, kPatch, kPatchMutator, kMaster
+                    kGettingStarted, kUserInterface, kMidiAndDevice, kPatch, kPatchMutator,
+                    kMaster
                 };
 
                 if (isPluginMode)
@@ -163,6 +176,9 @@ namespace PluginIDs
 
             inline int normalize(int raw, bool isPluginMode = false) noexcept
             {
+                if (raw == kMidi)
+                    return kMidiAndDevice;
+
                 if (isValid(raw, isPluginMode))
                     return raw;
 

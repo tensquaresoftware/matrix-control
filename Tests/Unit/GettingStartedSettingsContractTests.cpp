@@ -51,13 +51,15 @@ private:
                      juce::String("INFO MESSAGE"));
         expectEquals(juce::String(PluginDisplayNames::Settings::kContextualHelpLabel),
                      juce::String("CONTEXTUAL HELP"));
-        expectEquals(juce::String(PluginDisplayNames::Settings::kGettingStartedLabel),
+        expectEquals(juce::String(PluginDisplayNames::Settings::kGettingStartedTab),
                      juce::String("GETTING STARTED"));
+        expectEquals(juce::String(PluginDisplayNames::Settings::kSetupWizardLabel),
+                     juce::String("SETUP WIZARD"));
 
         expectEquals(juce::String(PluginDisplayNames::Settings::kShowWhenIncomplete),
                      juce::String("SHOW WHEN INCOMPLETE"));
         expectEquals(juce::String(PluginDisplayNames::Settings::kNeverAtLaunch),
-                     juce::String("NEVER AT LAUNCH"));
+                     juce::String("NEVER SHOW AT LAUNCH"));
         expectEquals(juce::String(PluginDisplayNames::Settings::kRunSetupAgainButton),
                      juce::String("RUN SETUP AGAIN"));
 

@@ -225,7 +225,9 @@ void PluginEditor::applyEpromTypePromptSelection(int selectedId)
     {
         panel->setDeviceType(Core::DeviceTypeRegistry::fromApvtsProperty(
             apvtsState.getProperty(MatrixDeviceTypes::kApvtsPropertyName)));
-        panel->refreshEpromTypeItems(result.epromTypeId);
+        panel->refreshEpromTypeItems(
+            result.epromTypeId,
+            PluginEditorInternal::epromInquiryPopupMarkerFromState(apvtsState));
     }
 }
 

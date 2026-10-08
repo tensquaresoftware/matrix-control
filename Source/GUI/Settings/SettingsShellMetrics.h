@@ -53,9 +53,9 @@ namespace SettingsShellMetrics
 
         switch (idAt(index, isPluginMode))
         {
+            case kGettingStarted: return kGettingStartedTab;
             case kUserInterface: return kUserInterfaceTab;
-            case kDevice: return kDeviceSection;
-            case kMidi: return kMidiTab;
+            case kMidiAndDevice: return kMidiAndDeviceTab;
             case kAudio: return kAudioTab;
             case kPatch: return kPatchSection;
             case kPatchMutator: return kPatchMutatorSection;
@@ -91,6 +91,27 @@ namespace SettingsShellMetrics
     inline bool showsKeyboardFromRow(bool isPluginMode) noexcept
     {
         return ! isPluginMode;
+    }
+
+    inline int midiPageRowCount(bool isPluginMode) noexcept
+    {
+        return showsKeyboardFromRow(isPluginMode) ? 3 : 2;
+    }
+
+    inline int midiPageContentHeight(bool isPluginMode) noexcept
+    {
+        return pageContentHeight(midiPageRowCount(isPluginMode));
+    }
+
+    /** MIDI cabling rows + DEVICE + EPROM TYPE (+ HARDWARE LATENCY in plugin). */
+    inline int midiAndDevicePageRowCount(bool isPluginMode) noexcept
+    {
+        return midiPageRowCount(isPluginMode) + 2 + (deviceShowsHardwareLatency(isPluginMode) ? 1 : 0);
+    }
+
+    inline int midiAndDevicePageContentHeight(bool isPluginMode) noexcept
+    {
+        return pageContentHeight(midiAndDevicePageRowCount(isPluginMode));
     }
 
     inline int tallestPageContentHeight() noexcept

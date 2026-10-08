@@ -4,7 +4,14 @@
 
 #include <vector>
 
+#include <juce_data_structures/juce_data_structures.h>
 #include <juce_gui_basics/juce_gui_basics.h>
+
+#include "Core/MIDI/EditorOutboundGate.h"
+#include "Core/Services/DeviceTypeRegistry.h"
+#include "Core/Services/EpromTypePolicy.h"
+#include "GUI/Settings/SettingsPanel.h"
+#include "Shared/Definitions/MatrixDeviceTypes.h"
 
 namespace PluginEditorInternal
 {
@@ -73,5 +80,29 @@ namespace PluginEditorInternal
     // Nearest preset scale id (PluginIDs::Settings::ScaleLevels) matching a computed UI scale,
     // or 0 when no preset matches within rounding.
     int matchingScaleIdForUiScale(float uiScale);
+
+    /** EPROM TYPE popup-only Inquiry mark id from APVTS device properties (0 = none). */
+    inline int epromInquiryPopupMarkerFromState(const juce::ValueTree& state)
+    {
+        const bool detected = static_cast<bool>(state.getProperty("deviceDetected", false));
+        const auto version = state.getProperty("deviceVersion", juce::String()).toString();
+        const auto deviceType = Core::DeviceTypeRegistry::fromApvtsProperty(
+            state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
+        return Core::EpromTypePolicy::inquiryPopupMarkerId(
+            detected, version, Core::EpromTypePolicy::deviceFamilyFromType(deviceType));
+    }
+
+    inline SettingsPanel::LiveDeviceStatus settingsLiveDeviceStatusFromState(
+        const juce::ValueTree& state)
+    {
+        return {
+            .deviceDetected = static_cast<bool>(state.getProperty("deviceDetected", false)),
+            .deviceMidiUnresponsive = static_cast<bool>(
+                state.getProperty(Core::kDeviceMidiUnresponsiveProperty, false)),
+            .deviceType = Core::DeviceTypeRegistry::fromApvtsProperty(
+                state.getProperty(MatrixDeviceTypes::kApvtsPropertyName)),
+            .deviceVersion = state.getProperty("deviceVersion", juce::String()).toString(),
+        };
+    }
 
 } // namespace PluginEditorInternal

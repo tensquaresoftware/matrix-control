@@ -103,14 +103,11 @@ namespace Core
         };
     }
 
-    /** Prefer Inquiry suggestion unless the user already touched the combo. */
-    inline int nextDeviceSetupEpromPreferredId(bool userTouched,
-                                               int currentId,
+    /** Inquiry-driven refresh always follows the preferred suggestion (combo auto-tracks). */
+    inline int nextDeviceSetupEpromPreferredId(bool /*userTouched*/,
+                                               int /*currentId*/,
                                                int preferredId) noexcept
     {
-        if (userTouched)
-            return currentId > 0 ? currentId : preferredId;
-
         return preferredId;
     }
 

@@ -80,6 +80,24 @@ namespace TSS
         usesPortSentinelPopupChrome_ = shouldUse;
     }
 
+    void ComboBox::setPopupOnlyMarkedItem(int itemId, juce::String suffix)
+    {
+        popupOnlyMarkedItemId_ = itemId;
+        popupOnlyMarkSuffix_ = itemId != 0 ? std::move(suffix) : juce::String();
+    }
+
+    juce::String ComboBox::popupListLabelForItemIndex(int itemIndex) const
+    {
+        auto text = getItemText(itemIndex);
+        if (popupOnlyMarkedItemId_ == 0 || popupOnlyMarkSuffix_.isEmpty())
+            return text;
+
+        if (getItemId(itemIndex) == popupOnlyMarkedItemId_)
+            text += popupOnlyMarkSuffix_;
+
+        return text;
+    }
+
     void ComboBox::paint(juce::Graphics& g)
     {
         const auto style = style_ == Style::ButtonLike

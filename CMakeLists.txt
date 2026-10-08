@@ -340,6 +340,7 @@ set(PLUGIN_SOURCES
     Source/GUI/Settings/SettingsMidiPage.cpp
     Source/GUI/Settings/SettingsPanel.cpp
     Source/GUI/Settings/SettingsPanelSetup.cpp
+    Source/GUI/Settings/SettingsPanelDevice.cpp
     Source/GUI/Settings/SettingsTabRail.cpp
     Source/GUI/Settings/SettingsWindow.cpp
     Source/GUI/Panels/MainComponent/BodyPanel/BodyPanel.cpp

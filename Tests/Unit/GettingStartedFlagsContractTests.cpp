@@ -79,7 +79,7 @@ private:
 
     void autoOpenResumeAndNeverAtLaunch()
     {
-        beginTest("Auto-open - resume at first incomplete; NEVER AT LAUNCH suppresses");
+        beginTest("Auto-open - resume at first incomplete; NEVER SHOW AT LAUNCH suppresses");
 
         using namespace PluginIDs::Settings::GettingStartedAutoOpen;
 

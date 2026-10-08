@@ -133,6 +133,23 @@ namespace Core
         return normalize(storedId);
     }
 
+    int EpromTypePolicy::inquiryPopupMarkerId(bool deviceDetected,
+                                              const juce::String& deviceVersion,
+                                              MatrixDeviceFamily family) noexcept
+    {
+        if (! deviceDetected)
+            return 0;
+
+        return suggestFromInquiryVersion(deviceVersion, family);
+    }
+
+    int EpromTypePolicy::storedTypeAfterInquirySuccess(const juce::String& deviceVersion,
+                                                       MatrixDeviceTypes::Type deviceType) noexcept
+    {
+        const auto family = deviceFamilyFromType(deviceType);
+        return coerceForDeviceFamily(suggestFromInquiryVersion(deviceVersion, family), family);
+    }
+
     const char* EpromTypePolicy::displayNameForId(int typeId) noexcept
     {
         using namespace PluginIDs::Settings::EpromType;

@@ -53,6 +53,16 @@ namespace Core
         /** Prefer a mapped Inquiry suggestion; otherwise keep the stored Settings value. */
         static int preferredForPrompt(int suggestedId, int storedId) noexcept;
 
+        /** Popup-only list mark target when Inquiry has detected a device; 0 = none.
+            Mapped firmware → that type id; unmapped/failed mapping → UNKNOWN. */
+        static int inquiryPopupMarkerId(bool deviceDetected,
+                                        const juce::String& deviceVersion,
+                                        MatrixDeviceFamily family) noexcept;
+
+        /** Stored EPROM TYPE after a successful Device Inquiry (suggestion coerced for family). */
+        static int storedTypeAfterInquirySuccess(const juce::String& deviceVersion,
+                                                 MatrixDeviceTypes::Type deviceType) noexcept;
+
         static const char* displayNameForId(int typeId) noexcept;
 
         template <typename Fn>

@@ -232,6 +232,7 @@ private:
     void showBankTransferProgressDialog(const BankTransferProgressShowRequest& request);
     void hideBankTransferProgressDialog();
     SettingsPanel* getSettingsPanelIfOpen();
+    void refreshSettingsLiveDeviceStatus();
     void wireSettingsPanel(SettingsPanel& panel);
     void wireSettingsEpromAndLatency(SettingsPanel& panel);
     void wireSettingsAppearanceCombos(SettingsPanel& panel);

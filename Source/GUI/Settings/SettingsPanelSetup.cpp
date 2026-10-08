@@ -39,12 +39,6 @@ void SettingsPanel::setupInterfaceSection(TSS::ISkin& skin)
     contextualHelpLabel_ =
         makeLabel(skin, kLabelWidth_, PluginDisplayNames::Settings::kContextualHelpLabel);
     contextualHelpCombo_ = makeCombo(skin, kComboWidth_);
-    gettingStartedLabel_ =
-        makeLabel(skin, kLabelWidth_, PluginDisplayNames::Settings::kGettingStartedLabel);
-    gettingStartedAutoOpenCombo_ = makeCombo(skin, kComboWidth_);
-    runSetupAgainButton_ =
-        makeButton(skin, kComboWidth_, PluginDisplayNames::Settings::kRunSetupAgainButton);
-
     addAndMakeVisible(*uiScaleLabel_);
     addAndMakeVisible(*uiScaleCombo_);
     addAndMakeVisible(*skinLabel_);
@@ -53,13 +47,25 @@ void SettingsPanel::setupInterfaceSection(TSS::ISkin& skin)
     addAndMakeVisible(*infoMessageCombo_);
     addAndMakeVisible(*contextualHelpLabel_);
     addAndMakeVisible(*contextualHelpCombo_);
-    addAndMakeVisible(*gettingStartedLabel_);
+}
+
+void SettingsPanel::setupGettingStartedSection(TSS::ISkin& skin)
+{
+    setupWizardLabel_ =
+        makeLabel(skin, kLabelWidth_, PluginDisplayNames::Settings::kSetupWizardLabel);
+    gettingStartedAutoOpenCombo_ = makeCombo(skin, kComboWidth_);
+    runSetupAgainButton_ =
+        makeButton(skin, kComboWidth_, PluginDisplayNames::Settings::kRunSetupAgainButton);
+
+    addAndMakeVisible(*setupWizardLabel_);
     addAndMakeVisible(*gettingStartedAutoOpenCombo_);
     addAndMakeVisible(*runSetupAgainButton_);
 }
 
 void SettingsPanel::setupDeviceSection(TSS::ISkin& skin)
 {
+    deviceLabel_ = makeLabel(skin, kLabelWidth_, PluginDisplayNames::FooterPanel::kDeviceLabel);
+    deviceValueField_ = std::make_unique<TSS::ReadOnlyValueField>(skin);
     hardwareLatencyLabel_ =
         makeLabel(skin, kLabelWidth_, PluginDisplayNames::Settings::kHardwareLatencyLabel);
     hardwareLatencySlider_ = std::make_unique<TSS::Slider>(
@@ -75,6 +81,8 @@ void SettingsPanel::setupDeviceSection(TSS::ISkin& skin)
     epromTypeLabel_ = makeLabel(skin, kLabelWidth_, PluginDisplayNames::Settings::kEpromTypeLabel);
     epromTypeCombo_ = makeCombo(skin, kComboWidth_);
 
+    addAndMakeVisible(*deviceLabel_);
+    addChildComponent(*deviceValueField_);
     addAndMakeVisible(*hardwareLatencyLabel_);
     addAndMakeVisible(*hardwareLatencySlider_);
     addAndMakeVisible(*epromTypeLabel_);
@@ -226,10 +234,13 @@ void SettingsPanel::applyChildLooks(TSS::ISkin& skin)
     infoMessageCombo_->setLook(comboLook);
     contextualHelpLabel_->setLook(labelLook);
     contextualHelpCombo_->setLook(comboLook);
-    gettingStartedLabel_->setLook(labelLook);
+    setupWizardLabel_->setLook(labelLook);
     gettingStartedAutoOpenCombo_->setLook(comboLook);
     runSetupAgainButton_->setLook(buttonLook);
 
+    deviceLabel_->setLook(labelLook);
+    if (deviceValueField_ != nullptr)
+        deviceValueField_->setSkin(skin);
     hardwareLatencyLabel_->setLook(labelLook);
     hardwareLatencySlider_->setLook(TSS::sliderLookButtonLikeFromSkin(skin));
     epromTypeLabel_->setLook(labelLook);
@@ -294,9 +305,14 @@ void SettingsPanel::layoutInterfaceSection(juce::Rectangle<int>& bounds, const R
                             LabeledControlRowArgs{ contextualHelpLabel_.get(),
                                                    contextualHelpCombo_.get(),
                                                    metrics.comboWidth });
+}
+
+void SettingsPanel::layoutGettingStartedSection(juce::Rectangle<int>& bounds,
+                                                const RowLayoutMetrics& metrics)
+{
     layoutLabeledControlRow(bounds,
                             metrics,
-                            LabeledControlRowArgs{ gettingStartedLabel_.get(),
+                            LabeledControlRowArgs{ setupWizardLabel_.get(),
                                                    gettingStartedAutoOpenCombo_.get(),
                                                    metrics.comboWidth });
     layoutButtonOnlyRow(bounds, metrics, *runSetupAgainButton_, metrics.comboWidth);
@@ -312,7 +328,11 @@ void SettingsPanel::setInterfaceSectionVisible(bool visible)
     infoMessageCombo_->setVisible(visible);
     contextualHelpLabel_->setVisible(visible);
     contextualHelpCombo_->setVisible(visible);
-    gettingStartedLabel_->setVisible(visible);
+}
+
+void SettingsPanel::setGettingStartedSectionVisible(bool visible)
+{
+    setupWizardLabel_->setVisible(visible);
     gettingStartedAutoOpenCombo_->setVisible(visible);
     runSetupAgainButton_->setVisible(visible);
 }

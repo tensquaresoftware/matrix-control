@@ -119,7 +119,7 @@ namespace TSS
         const auto isSelectable = itemId != 0 && args.comboBox.isItemEnabled(itemId);
         const auto isHighlighted = (args.highlightedItemIndex == args.itemIndex) && isSelectable;
         drawLabelItem(g, {
-            .text = args.comboBox.getItemText(args.itemIndex),
+            .text = args.comboBox.popupListLabelForItemIndex(args.itemIndex),
             .itemBounds = args.itemBounds,
             .isHighlighted = isHighlighted,
             .isEnabled = isSelectable,

@@ -207,9 +207,11 @@ void MidiManager::finishAsyncDeviceInquirySuccess(std::uint64_t token,
     const auto previousType = Core::DeviceTypeRegistry::fromApvtsProperty(
         apvts.state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
 
-    const int epromType = Core::EpromTypePolicy::normalize(static_cast<int>(
-        apvts.state.getProperty(PluginIDs::Settings::kEpromType,
-                               PluginIDs::Settings::EpromType::kDefault)));
+    // Keep EPROM TYPE (and Timing) aligned with the newly identified synth / firmware.
+    // Machine-defaults persistence is applied by the editor on the APVTS property change.
+    const int epromType =
+        Core::EpromTypePolicy::storedTypeAfterInquirySuccess(info.version, deviceType);
+    apvts.state.setProperty(PluginIDs::Settings::kEpromType, epromType, nullptr);
     sysExDelay_.setProfile(Core::SysExDelayProfile::fromDeviceInquiry(info, epromType));
     updateDeviceStatus(true, info.version, deviceType);
 

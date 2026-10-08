@@ -322,12 +322,15 @@ void GettingStartedWizardDialog::populateEpromItems(MatrixDeviceTypes::Type devi
 {
     const auto family = Core::EpromTypePolicy::deviceFamilyFromType(deviceType);
     const int selectedId = Core::EpromTypePolicy::coerceForDeviceFamily(preferredSelectedId, family);
+    const int markerId = Core::EpromTypePolicy::inquiryPopupMarkerId(
+        liveStatus_.deviceDetected, liveStatus_.deviceVersion, family);
     const juce::ScopedValueSetter<bool> guard(suppressControlCallbacks_, true);
     epromTypeCombo_->clear(juce::dontSendNotification);
     Core::EpromTypePolicy::forEachValidItem(family, [this](int id)
     {
         epromTypeCombo_->addItem(Core::EpromTypePolicy::displayNameForId(id), id);
     });
+    epromTypeCombo_->setPopupOnlyMarkedItem(markerId);
     epromTypeCombo_->setSelectedId(selectedId, juce::dontSendNotification);
 }
 

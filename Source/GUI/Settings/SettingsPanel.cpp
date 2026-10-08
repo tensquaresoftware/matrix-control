@@ -18,6 +18,7 @@ SettingsPanel::SettingsPanel(TSS::ISkin& skin, bool isPluginMode)
     setOpaque(true);
 
     setupInterfaceSection(skin);
+    setupGettingStartedSection(skin);
     setupDeviceSection(skin);
     setupPatchSection(skin);
     setupPatchMutatorSection(skin);
@@ -27,6 +28,11 @@ SettingsPanel::SettingsPanel(TSS::ISkin& skin, bool isPluginMode)
 
     setPluginMode(isPluginMode);
     refreshEpromTypeItems(PluginIDs::Settings::EpromType::kDefault);
+}
+
+SettingsPanel::~SettingsPanel()
+{
+    stopTimer();
 }
 
 void SettingsPanel::attachAudioPage(SettingsAudioPage::Config config)
@@ -68,9 +74,13 @@ void SettingsPanel::registerContextualHelp(TSS::ContextualHelpBinder::FooterReso
     contextualHelpBinder_->bind(skinCombo_.get(), Help::kSkin);
     contextualHelpBinder_->bind(infoMessageCombo_.get(), Help::kInfoMessage);
     contextualHelpBinder_->bind(contextualHelpCombo_.get(), Help::kContextualHelp);
-    contextualHelpBinder_->bind(gettingStartedLabel_.get(), Help::kGettingStartedAutoOpen);
+    contextualHelpBinder_->bind(setupWizardLabel_.get(), Help::kGettingStartedAutoOpen);
     contextualHelpBinder_->bind(gettingStartedAutoOpenCombo_.get(), Help::kGettingStartedAutoOpen);
     contextualHelpBinder_->bind(runSetupAgainButton_.get(), Help::kRunSetupAgain);
+    contextualHelpBinder_->bind(deviceLabel_.get(),
+                                PluginDisplayNames::FooterPanel::ContextualHelp::kDevice);
+    contextualHelpBinder_->bind(deviceValueField_.get(),
+                                PluginDisplayNames::FooterPanel::ContextualHelp::kDevice);
     contextualHelpBinder_->bind(hardwareLatencySlider_.get(), Help::kHardwareLatency);
     contextualHelpBinder_->bind(epromTypeCombo_.get(), Help::kEpromType);
     contextualHelpBinder_->bind(matrix1000PatchesCombo_.get(), Help::kMatrix1000Patches);
@@ -119,6 +129,8 @@ void SettingsPanel::layoutLabeledControlRow(juce::Rectangle<int>& bounds,
         slider->setUiScale(uiScale_);
     else if (auto* combo = dynamic_cast<TSS::ComboBox*>(args.control))
         combo->setUiScale(uiScale_);
+    else if (auto* field = dynamic_cast<TSS::ReadOnlyValueField*>(args.control))
+        field->setUiScale(uiScale_);
     bounds.removeFromTop(metrics.rowGap);
 }
 
@@ -147,8 +159,30 @@ void SettingsPanel::layoutButtonRow(juce::Rectangle<int>& bounds,
     bounds.removeFromTop(metrics.rowGap);
 }
 
-void SettingsPanel::layoutDeviceSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics)
+void SettingsPanel::layoutMidiAndDeviceSection(juce::Rectangle<int>& bounds,
+                                               const RowLayoutMetrics& metrics)
 {
+    if (midiPage_ != nullptr)
+    {
+        const int midiHeight = TSS::ScaledLayout::scaledInt(
+            static_cast<float>(SettingsShellMetrics::midiPageContentHeight(isPluginMode_)),
+            uiScale_);
+        midiPage_->setBounds(bounds.removeFromTop(midiHeight));
+        midiPage_->setUiScale(uiScale_);
+        bounds.removeFromTop(metrics.rowGap);
+    }
+
+    layoutLabeledControlRow(bounds,
+                            metrics,
+                            LabeledControlRowArgs{ deviceLabel_.get(),
+                                                   deviceValueField_.get(),
+                                                   metrics.comboWidth });
+    layoutLabeledControlRow(bounds,
+                            metrics,
+                            LabeledControlRowArgs{ epromTypeLabel_.get(),
+                                                   epromTypeCombo_.get(),
+                                                   metrics.comboWidth });
+
     if (SettingsShellMetrics::deviceShowsHardwareLatency(isPluginMode_))
     {
         layoutLabeledControlRow(bounds,
@@ -157,12 +191,6 @@ void SettingsPanel::layoutDeviceSection(juce::Rectangle<int>& bounds, const RowL
                                                        hardwareLatencySlider_.get(),
                                                        metrics.sliderWidth });
     }
-
-    layoutLabeledControlRow(bounds,
-                            metrics,
-                            LabeledControlRowArgs{ epromTypeLabel_.get(),
-                                                   epromTypeCombo_.get(),
-                                                   metrics.comboWidth });
 }
 
 void SettingsPanel::layoutPatchSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics)
@@ -221,15 +249,6 @@ void SettingsPanel::layoutMasterSection(juce::Rectangle<int>& bounds, const RowL
                                          { metrics.saveAsInitWidth, metrics.deleteInitWidth } });
 }
 
-void SettingsPanel::layoutMidiSection(juce::Rectangle<int>& bounds)
-{
-    if (midiPage_ == nullptr)
-        return;
-
-    midiPage_->setBounds(bounds);
-    midiPage_->setUiScale(uiScale_);
-}
-
 void SettingsPanel::layoutAudioSection(juce::Rectangle<int>& bounds)
 {
     if (audioPage_ == nullptr)
@@ -259,11 +278,11 @@ void SettingsPanel::layoutContent(juce::Rectangle<int> bounds)
 
     switch (activeTabId_)
     {
-        case kDevice:
-            layoutDeviceSection(bounds, metrics);
+        case kGettingStarted:
+            layoutGettingStartedSection(bounds, metrics);
             break;
-        case kMidi:
-            layoutMidiSection(bounds);
+        case kMidiAndDevice:
+            layoutMidiAndDeviceSection(bounds, metrics);
             break;
         case kAudio:
             layoutAudioSection(bounds);
@@ -292,6 +311,7 @@ void SettingsPanel::setSkin(TSS::ISkin& skin)
         midiPage_->setSkin(skin);
     if (audioPage_ != nullptr)
         audioPage_->setSkin(skin);
+    refreshDeviceValueField();
     repaint();
 }
 
@@ -340,25 +360,30 @@ void SettingsPanel::updatePageVisibility()
 {
     using namespace PluginIDs::Settings::LastTab;
 
+    const bool showGettingStarted = activeTabId_ == kGettingStarted;
     const bool showUi = activeTabId_ == kUserInterface;
-    const bool showDevice = activeTabId_ == kDevice;
-    const bool showMidi = activeTabId_ == kMidi && midiPage_ != nullptr;
+    const bool showMidiAndDevice = activeTabId_ == kMidiAndDevice;
+    const bool showMidiPage = showMidiAndDevice && midiPage_ != nullptr;
     const bool showAudio = activeTabId_ == kAudio && audioPage_ != nullptr;
     const bool showPatch = activeTabId_ == kPatch;
     const bool showMutator = activeTabId_ == kPatchMutator;
     const bool showMaster = activeTabId_ == kMaster;
-    const bool showLatency = showDevice
+    const bool showLatency = showMidiAndDevice
                              && SettingsShellMetrics::deviceShowsHardwareLatency(isPluginMode_);
 
+    setGettingStartedSectionVisible(showGettingStarted);
     setInterfaceSectionVisible(showUi);
 
+    deviceLabel_->setVisible(showMidiAndDevice);
+    if (deviceValueField_ != nullptr)
+        deviceValueField_->setVisible(showMidiAndDevice);
     hardwareLatencyLabel_->setVisible(showLatency);
     hardwareLatencySlider_->setVisible(showLatency);
-    epromTypeLabel_->setVisible(showDevice);
-    epromTypeCombo_->setVisible(showDevice);
+    epromTypeLabel_->setVisible(showMidiAndDevice);
+    epromTypeCombo_->setVisible(showMidiAndDevice);
 
     if (midiPage_ != nullptr)
-        midiPage_->setVisible(showMidi);
+        midiPage_->setVisible(showMidiPage);
 
     if (audioPage_ != nullptr)
         audioPage_->setVisible(showAudio);
@@ -385,9 +410,11 @@ void SettingsPanel::updatePageVisibility()
     masterInitTemplateLabel_->setVisible(showMaster);
     masterSaveAsInitButton_->setVisible(showMaster);
     masterDeleteInitButton_->setVisible(showMaster);
+
+    syncDeviceAnimationTimer();
 }
 
-int SettingsPanel::refreshEpromTypeItems(int preferredSelectedId)
+int SettingsPanel::refreshEpromTypeItems(int preferredSelectedId, int popupMarkerItemId)
 {
     const auto family = Core::EpromTypePolicy::deviceFamilyFromType(deviceType_);
     const int selectedId = Core::EpromTypePolicy::coerceForDeviceFamily(preferredSelectedId, family);
@@ -397,6 +424,7 @@ int SettingsPanel::refreshEpromTypeItems(int preferredSelectedId)
     {
         epromTypeCombo_->addItem(Core::EpromTypePolicy::displayNameForId(id), id);
     });
+    epromTypeCombo_->setPopupOnlyMarkedItem(popupMarkerItemId);
     epromTypeCombo_->setSelectedId(selectedId, juce::dontSendNotification);
     return selectedId;
 }

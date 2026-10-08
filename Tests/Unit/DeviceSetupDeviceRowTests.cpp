@@ -305,7 +305,7 @@ private:
 
     void testNextEpromPreferredIdBranches()
     {
-        beginTest("nextDeviceSetupEpromPreferredId - userTouched keeps current; else preferred");
+        beginTest("nextDeviceSetupEpromPreferredId - always follows preferred suggestion");
 
         expectEquals(Core::nextDeviceSetupEpromPreferredId(
                          false, PluginIDs::Settings::EpromType::kFactory,
@@ -314,7 +314,7 @@ private:
         expectEquals(Core::nextDeviceSetupEpromPreferredId(
                          true, PluginIDs::Settings::EpromType::kGligli,
                          PluginIDs::Settings::EpromType::kTauntek),
-                     PluginIDs::Settings::EpromType::kGligli);
+                     PluginIDs::Settings::EpromType::kTauntek);
         expectEquals(Core::nextDeviceSetupEpromPreferredId(
                          true, 0, PluginIDs::Settings::EpromType::kTauntek),
                      PluginIDs::Settings::EpromType::kTauntek);

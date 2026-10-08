@@ -1,5 +1,6 @@
 #include "GettingStartedWizardDialog.h"
 
+#include "Core/Services/EpromTypePolicy.h"
 #include "GUI/Helpers/DeviceVersionDisplayFormat.h"
 #include "GUI/Helpers/MidiPortComboPopulation.h"
 #include "GUI/Settings/AudioDeviceSetupSync.h"
@@ -56,6 +57,12 @@ void GettingStartedWizardDialog::updateLiveDeviceStatus(const LiveDeviceStatus& 
     liveStatus_ = status;
     includeFirmwareSuggestionHint_ = status.deviceDetected
         && status.deviceVersion.trim().isNotEmpty();
+    if (epromTypeCombo_ != nullptr)
+    {
+        const auto family = Core::EpromTypePolicy::deviceFamilyFromType(status.deviceType);
+        epromTypeCombo_->setPopupOnlyMarkedItem(Core::EpromTypePolicy::inquiryPopupMarkerId(
+            status.deviceDetected, status.deviceVersion, family));
+    }
     recomputeDeviceRow();
     resized();
     repaint();

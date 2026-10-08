@@ -151,14 +151,17 @@ namespace PluginDisplayNames
         constexpr const char* kUiScaleRowLabel         = "UI SCALE";
         constexpr const char* kSkinRowLabel            = "SKIN";
         constexpr const char* kGettingStartedLabel     = "GETTING STARTED";
+        constexpr const char* kSetupWizardLabel        = "SETUP WIZARD";
         constexpr const char* kShowWhenIncomplete      = "SHOW WHEN INCOMPLETE";
-        constexpr const char* kNeverAtLaunch           = "NEVER AT LAUNCH";
+        constexpr const char* kNeverAtLaunch           = "NEVER SHOW AT LAUNCH";
         constexpr const char* kRunSetupAgainButton     = "RUN SETUP AGAIN";
         constexpr const char* kHardwareLatencyLabel    = "HARDWARE LATENCY";
         constexpr const char* kInputGainLabel          = "INPUT GAIN:";
+        constexpr const char* kGettingStartedTab       = "GETTING STARTED";
         constexpr const char* kUserInterfaceTab        = "USER INTERFACE";
         constexpr const char* kDeviceSection           = "DEVICE";
         constexpr const char* kMidiTab                 = "MIDI";
+        constexpr const char* kMidiAndDeviceTab        = "MIDI & DEVICE";
         constexpr const char* kAudioTab                = "AUDIO";
         constexpr const char* kPatchSection            = "PATCH";
         constexpr const char* kPatchMutatorSection     = "PATCH MUTATOR";
@@ -271,7 +274,9 @@ namespace PluginDisplayNames
             constexpr const char* kHardwareLatency =
                 "SETTINGS: Sets host audio latency compensation for this plugin instance.";
             constexpr const char* kEpromType =
-                "SETTINGS: Declares the synth EPROM type used for MIDI timing and future features.";
+                "SETTINGS: Declares the synth EPROM type used for MIDI timing and future features. "
+                "Follows Device Inquiry automatically when a synth is detected; in the open list, "
+                "* marks that suggestion (UNKNOWN * if the firmware is not mapped).";
             constexpr const char* kMasterLoad =
                 "SETTINGS: Loads a Master .syx or legacy .m1km file into the editor.";
             constexpr const char* kMasterSaveAs =

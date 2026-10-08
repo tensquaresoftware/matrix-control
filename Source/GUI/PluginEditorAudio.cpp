@@ -10,6 +10,7 @@
 #include "Core/Audio/SceneAudioSafety.h"
 #include "Core/MIDI/EditorOutboundGate.h"
 #include "Core/MIDI/MidiManager.h"
+#include "Core/Services/DeviceConnectionMachineDefaults.h"
 #include "Core/Services/DeviceTypeRegistry.h"
 #include "Core/Services/EpromTypePolicy.h"
 #include "GUI/Dialogs/EpromTypePromptDialog.h"
@@ -157,6 +158,16 @@ void PluginEditor::valueTreePropertyChanged(juce::ValueTree&,
         return;
     }
 
+    if (propertyName == PluginIDs::Settings::kEpromType)
+    {
+        const int epromType = Core::EpromTypePolicy::normalize(static_cast<int>(
+            pluginProcessor.getApvts().state.getProperty(
+                PluginIDs::Settings::kEpromType,
+                PluginIDs::Settings::EpromType::kDefault)));
+        Core::DeviceConnectionMachineDefaults::writeEpromType(epromType);
+        pluginProcessor.getMidiManager().refreshSysExDelayFromSettings();
+    }
+
     handleDeviceSetupAssistantProperty(propertyName);
 
     if (propertyName == MatrixDeviceTypes::kApvtsPropertyName)
@@ -197,6 +208,18 @@ void PluginEditor::handleDeviceSetupAssistantProperty(const juce::String& proper
         refreshEpromTypePromptDialogSuggestion();
         refreshGettingStartedWizardSuggestion();
     }
+
+    refreshSettingsLiveDeviceStatus();
+
+    if (auto* panel = getSettingsPanelIfOpen())
+    {
+        auto& state = pluginProcessor.getApvts().state;
+        const int epromType = Core::EpromTypePolicy::normalize(static_cast<int>(
+            state.getProperty(PluginIDs::Settings::kEpromType,
+                              PluginIDs::Settings::EpromType::kDefault)));
+        panel->refreshEpromTypeItems(
+            epromType, PluginEditorInternal::epromInquiryPopupMarkerFromState(state));
+    }
 }
 
 void PluginEditor::coerceEpromTypeForCurrentDeviceFamily()
@@ -230,7 +253,8 @@ void PluginEditor::coerceEpromTypeForCurrentDeviceFamily()
     if (auto* panel = getSettingsPanelIfOpen())
     {
         panel->setDeviceType(deviceType);
-        panel->refreshEpromTypeItems(coerced);
+        panel->refreshEpromTypeItems(
+            coerced, PluginEditorInternal::epromInquiryPopupMarkerFromState(state));
     }
 }
 
@@ -263,6 +287,9 @@ void PluginEditor::syncMidiPortSelectionFromState(const juce::String& propertyNa
                             state.getProperty("keyboardFromPortId", juce::String()).toString());
                     }
                 }
+
+                if (propertyName == "midiInputPortId" || propertyName == "midiOutputPortId")
+                    panel->refreshDeviceRow();
             }
 
             if (propertyName == "midiOutputPortId")
@@ -312,4 +339,14 @@ SettingsPanel* PluginEditor::getSettingsPanelIfOpen()
         return nullptr;
 
     return &settingsWindow_->getSettingsPanel();
+}
+
+void PluginEditor::refreshSettingsLiveDeviceStatus()
+{
+    auto* panel = getSettingsPanelIfOpen();
+    if (panel == nullptr)
+        return;
+
+    panel->updateLiveDeviceStatus(PluginEditorInternal::settingsLiveDeviceStatusFromState(
+        pluginProcessor.getApvts().state));
 }

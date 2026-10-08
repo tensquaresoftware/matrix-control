@@ -130,7 +130,7 @@ void PluginEditor::restoreSettingsPanelFromState(SettingsPanel& panel)
                                                  PluginIDs::Settings::kEpromType,
                                                  PluginIDs::Settings::EpromType::kDefault,
                                                  [](int raw) { return Core::EpromTypePolicy::normalize(raw); });
-    const int coerced = panel.refreshEpromTypeItems(epromType);
+    const int coerced = panel.refreshEpromTypeItems(epromType, PluginEditorInternal::epromInquiryPopupMarkerFromState(state));
     if (coerced != epromType)
     {
         state.setProperty(PluginIDs::Settings::kEpromType, coerced, nullptr);

@@ -88,59 +88,77 @@ private:
 
     void reopenRestoresMidiTab()
     {
-        beginTest("Reopen - last MIDI tab is restored");
+        beginTest("Reopen - legacy MIDI last-tab remaps to MIDI & DEVICE");
 
         auto state = makeState();
         SettingsShellMetrics::writeLastTab(state, PluginIDs::Settings::LastTab::kMidi, false);
 
         expectEquals(SettingsShellMetrics::readAndCoerceLastTab(state, false),
-                     PluginIDs::Settings::LastTab::kMidi);
+                     PluginIDs::Settings::LastTab::kMidiAndDevice);
         expectEquals(static_cast<int>(state.getProperty(PluginIDs::Settings::kLastSettingsTab)),
-                     PluginIDs::Settings::LastTab::kMidi);
+                     PluginIDs::Settings::LastTab::kMidiAndDevice);
+
+        auto legacy = makeState();
+        legacy.setProperty(PluginIDs::Settings::kLastSettingsTab,
+                           PluginIDs::Settings::LastTab::kMidi,
+                           nullptr);
+        expectEquals(SettingsShellMetrics::readAndCoerceLastTab(legacy, false),
+                     PluginIDs::Settings::LastTab::kMidiAndDevice);
+        expectEquals(static_cast<int>(legacy.getProperty(PluginIDs::Settings::kLastSettingsTab)),
+                     PluginIDs::Settings::LastTab::kMidiAndDevice);
     }
 
     void pluginDeviceShowsLatencyWithoutAudioTab()
     {
-        beginTest("Plugin DEVICE - latency helper; six tabs with MIDI without AUDIO");
+        beginTest("Plugin - GETTING STARTED then UI then MIDI & DEVICE; latency on merged page");
 
         expect(SettingsShellMetrics::deviceShowsHardwareLatency(true));
         expect(! SettingsShellMetrics::showsAudioTab(true));
         expectEquals(SettingsShellMetrics::tabCount(true), PluginIDs::Settings::LastTab::kPluginCount);
-        expectEquals(juce::String(SettingsShellMetrics::tabLabel(0, true)), juce::String("USER INTERFACE"));
-        expectEquals(juce::String(SettingsShellMetrics::tabLabel(1, true)), juce::String("DEVICE"));
-        expectEquals(juce::String(SettingsShellMetrics::tabLabel(2, true)), juce::String("MIDI"));
+        expectEquals(juce::String(SettingsShellMetrics::tabLabel(0, true)), juce::String("GETTING STARTED"));
+        expectEquals(juce::String(SettingsShellMetrics::tabLabel(1, true)), juce::String("USER INTERFACE"));
+        expectEquals(juce::String(SettingsShellMetrics::tabLabel(2, true)), juce::String("MIDI & DEVICE"));
         expectEquals(juce::String(SettingsShellMetrics::tabLabel(3, true)), juce::String("PATCH"));
         expectEquals(juce::String(SettingsShellMetrics::tabLabel(4, true)), juce::String("PATCH MUTATOR"));
         expectEquals(juce::String(SettingsShellMetrics::tabLabel(5, true)), juce::String("MASTER"));
         expectEquals(juce::String(SettingsShellMetrics::tabLabel(6, true)), juce::String());
+        expectEquals(SettingsShellMetrics::midiAndDevicePageRowCount(true), 5);
         expectEquals(juce::String(PluginDisplayNames::Settings::kHardwareLatencyLabel),
                      juce::String("HARDWARE LATENCY"));
+        expectEquals(juce::String(PluginDisplayNames::Settings::kMidiAndDeviceTab),
+                     juce::String("MIDI & DEVICE"));
+        expectEquals(juce::String(PluginDisplayNames::Settings::kSetupWizardLabel),
+                     juce::String("SETUP WIZARD"));
     }
 
     void standaloneIncludesMidiAndAudioTabs()
     {
-        beginTest("Standalone - MIDI then AUDIO after DEVICE");
+        beginTest("Standalone - GETTING STARTED, UI, MIDI & DEVICE, then AUDIO");
 
         expect(SettingsShellMetrics::showsAudioTab(false));
         expectEquals(SettingsShellMetrics::tabCount(false), PluginIDs::Settings::LastTab::kStandaloneCount);
-        expectEquals(juce::String(SettingsShellMetrics::tabLabel(0, false)), juce::String("USER INTERFACE"));
-        expectEquals(juce::String(SettingsShellMetrics::tabLabel(1, false)), juce::String("DEVICE"));
-        expectEquals(juce::String(SettingsShellMetrics::tabLabel(2, false)), juce::String("MIDI"));
+        expectEquals(juce::String(SettingsShellMetrics::tabLabel(0, false)), juce::String("GETTING STARTED"));
+        expectEquals(juce::String(SettingsShellMetrics::tabLabel(1, false)), juce::String("USER INTERFACE"));
+        expectEquals(juce::String(SettingsShellMetrics::tabLabel(2, false)), juce::String("MIDI & DEVICE"));
         expectEquals(juce::String(SettingsShellMetrics::tabLabel(3, false)), juce::String("AUDIO"));
         expectEquals(juce::String(SettingsShellMetrics::tabLabel(4, false)), juce::String("PATCH"));
         expectEquals(juce::String(SettingsShellMetrics::tabLabel(5, false)), juce::String("PATCH MUTATOR"));
         expectEquals(juce::String(SettingsShellMetrics::tabLabel(6, false)), juce::String("MASTER"));
+        expectEquals(PluginIDs::Settings::LastTab::idAt(0, false),
+                     PluginIDs::Settings::LastTab::kGettingStarted);
         expectEquals(PluginIDs::Settings::LastTab::idAt(2, false),
-                     PluginIDs::Settings::LastTab::kMidi);
+                     PluginIDs::Settings::LastTab::kMidiAndDevice);
         expectEquals(PluginIDs::Settings::LastTab::idAt(3, false),
                      PluginIDs::Settings::LastTab::kAudio);
         expectEquals(PluginIDs::Settings::LastTab::kMidi, 3);
         expectEquals(PluginIDs::Settings::LastTab::normalize(3, false),
-                     PluginIDs::Settings::LastTab::kMidi);
+                     PluginIDs::Settings::LastTab::kMidiAndDevice);
         expectEquals(PluginIDs::Settings::LastTab::kAudio, 4);
         expectEquals(PluginIDs::Settings::LastTab::kPatch, 5);
         expectEquals(PluginIDs::Settings::LastTab::kPatchMutator, 6);
         expectEquals(PluginIDs::Settings::LastTab::kMaster, 7);
+        expectEquals(PluginIDs::Settings::LastTab::kGettingStarted, 8);
+        expectEquals(SettingsShellMetrics::midiAndDevicePageRowCount(false), 5);
     }
 
     void writeAndCoerceLastTab()

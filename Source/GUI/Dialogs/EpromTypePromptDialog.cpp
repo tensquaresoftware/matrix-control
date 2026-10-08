@@ -129,6 +129,12 @@ void EpromTypePromptDialog::updateLiveDeviceStatus(const LiveDeviceStatus& statu
     liveStatus_ = status;
     includeFirmwareSuggestionHint_ = status.deviceDetected
         && status.deviceVersion.trim().isNotEmpty();
+    if (epromTypeCombo_ != nullptr)
+    {
+        const auto family = Core::EpromTypePolicy::deviceFamilyFromType(status.deviceType);
+        epromTypeCombo_->setPopupOnlyMarkedItem(Core::EpromTypePolicy::inquiryPopupMarkerId(
+            status.deviceDetected, status.deviceVersion, family));
+    }
     recomputeDeviceRow();
     // The firmware suggestion sentence changes the body height.
     resized();
@@ -164,6 +170,8 @@ void EpromTypePromptDialog::populateComboItems(MatrixDeviceTypes::Type deviceTyp
 {
     const auto family = Core::EpromTypePolicy::deviceFamilyFromType(deviceType);
     const int selectedId = Core::EpromTypePolicy::coerceForDeviceFamily(preferredSelectedId, family);
+    const int markerId = Core::EpromTypePolicy::inquiryPopupMarkerId(
+        liveStatus_.deviceDetected, liveStatus_.deviceVersion, family);
 
     const juce::ScopedValueSetter<bool> guard(suppressMidiCallbacks_, true);
     epromTypeCombo_->clear(juce::dontSendNotification);
@@ -171,6 +179,7 @@ void EpromTypePromptDialog::populateComboItems(MatrixDeviceTypes::Type deviceTyp
     {
         epromTypeCombo_->addItem(Core::EpromTypePolicy::displayNameForId(id), id);
     });
+    epromTypeCombo_->setPopupOnlyMarkedItem(markerId);
     epromTypeCombo_->setSelectedId(selectedId, juce::dontSendNotification);
 }
 
