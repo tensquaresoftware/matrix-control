@@ -1,5 +1,5 @@
 # generated: 2026-05-29
-# last_updated: 10-08-2026 23:50
+# last_updated: 10-09-2026 00:03
 # project: Matrix-Control
 # project_key: NOKEY
 # tracking_system: file-system
@@ -41,7 +41,7 @@
 # - Retrospective appends its action items to action_items; sprint-status surfaces open ones
 
 generated: 2026-05-29
-last_updated: 10-08-2026 23:50
+last_updated: 10-09-2026 00:03
 project: Matrix-Control
 project_key: NOKEY
 tracking_system: file-system
@@ -234,4 +234,4 @@ development_status:
   gs-1-settings-ui-scale-skin-getting-started-block: done
   gs-2-getting-started-wizard-shell-and-navigation: done
   gs-3-getting-started-steps-flags-plugin-standalone: done
-  gs-4-manual-first-launch-and-host-keyboard: backlog
+  gs-4-manual-first-launch-and-host-keyboard: review
