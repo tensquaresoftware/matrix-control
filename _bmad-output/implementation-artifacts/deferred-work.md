@@ -2433,3 +2433,15 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-gs-2-getting-started-wizard-shell-and-navigation.md`
   summary: Product companion ui-copy.md still shows em dashes / spaced colons while PluginDisplayNames freezes ASCII forms required by the display-string rule.
   evidence: ASCII display SSOT wins for painted strings; syncing the companion markdown is a doc follow-up, not a runtime defect.
+
+## Deferred from: code review of spec-gs-2-getting-started-wizard-shell-and-navigation.md (2026-10-08)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-gs-2-getting-started-wizard-shell-and-navigation.md`
+  summary: GS-1 implementation artifact still documents RUN SETUP AGAIN → runSetupAgainNoOp after GS-2 removed that API and rewired Settings to open the wizard.
+  evidence: Blind Hunter; sibling-spec doc drift only — production onClick uses GettingStartedWizard::runSetupAgain.
+- source_spec: `_bmad-output/implementation-artifacts/spec-gs-2-getting-started-wizard-shell-and-navigation.md`
+  summary: Reconfirmed/extended — Settings RUN SETUP AGAIN onClick is not fired by unit tests (Flow collaborator only); overlay Escape / outside / peer exclusion remain smoke-only.
+  evidence: Verification Gap + Blind Hunter; same PluginEditor harness absence as build-review deferral.
+- source_spec: `_bmad-output/implementation-artifacts/spec-gs-2-getting-started-wizard-shell-and-navigation.md`
+  summary: Reconfirmed — ui-copy.md typographic dashes vs ASCII PluginDisplayNames.
+  evidence: Code review Blind Hunter; runtime ASCII SSOT unchanged.

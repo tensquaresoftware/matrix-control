@@ -114,6 +114,21 @@ context:
 - [x] [Review][Patch] Run Setup Again coverage was constant-only [Tests/Unit/GettingStartedWizardContractTests.cpp] — `runSetupAgain` collaborator asserts intro open + unchanged auto-open preference.
 - [x] [Review][Defer] Overlay lifecycle / Escape / outside smoke unharnessed — deferred-work.
 - [x] [Review][Defer] ui-copy.md still shows typographic dashes vs ASCII PluginDisplayNames — deferred-work.
+- [x] [Review][Defer] GS-1 artifact still documents RUN SETUP AGAIN → runSetupAgainNoOp [spec-gs-1-settings-ui-scale-skin-getting-started-block.md] — deferred: sibling-spec doc drift after GS-2 rewire; runtime path is correct.
+- [x] [Review][Defer] Settings RUN SETUP AGAIN onClick not fired by contract test [Tests/Unit/GettingStartedWizardContractTests.cpp] — deferred: Flow collaborator pins step 0 + pref non-mutation; PluginEditor/Settings harness absent (extends build-review overlay gap).
+- [x] [Review][Defer] Overlay lifecycle / Escape / peer exclusion unharnessed — deferred: reconfirmed code review 2026-10-08; same as build-review deferral.
+- [x] [Review][Defer] ui-copy.md typographic dashes vs ASCII PluginDisplayNames — deferred: reconfirmed code review 2026-10-08; runtime ASCII SSOT wins.
+
+#### Rejected (code review 2026-10-08)
+- BH: exact heights claimed pinned but tests only compare `< Settings` — low / reject: AC requires lower-than-Settings (tested); softening Implementation Notes would edit the spec under review; exact pins add brittle surface.
+- BH: sprint `review` vs spec `done` — false: expected bookkeeping while this code review runs.
+- BH: Review Triage Log says `in-review` — false / reject: vocabulary typo in build triage log; project status key is `review`; fixing would edit the spec under review.
+- BH: Code Map omits PluginEditorGettingStarted.cpp — reject: fix edits the spec under review; Implementation Notes already name the owner file.
+- BH: bodyFor never selects Audio resume / firmware suffix — false: intentional GS-3; strings defined, selection needs flags/live state.
+- BH: body-copy exact expects one-sided for format-invariant steps — false: Intro/UI/Synth share one return path; Keyboard (format-sensitive) is dual-tested; ASCII non-empty loop covers both formats.
+- BH: targetStepForNavButton advances any non-Previous non-closing button — false: Continue / Next / Skip all must advance; current enum has no other advance-like button.
+- BH: kNavButtonCount without static_assert — low / reject: unlikely everyday break; speculative enum growth; YAGNI vs current six-button row.
+- AA: no open AC violations against frozen GS-2 scope.
 
 ## Implementation Notes
 
