@@ -89,6 +89,7 @@ context:
 - Parent-pass fix: removed developer wording “one-shot Device Setup” from §5 intro (redaction SSOT).
 - Matrix rows covered by manual content inspection (docs chore — no unit tests).
 - Build review patches (manuel only): resume-at-incomplete, SKIP completion, SYNTH FROM MIDI vs audio, CONFIGURE LATER intro-only, silence/Esc policy, Reason steps, lexicon order, DAW screenshot placeholder, §4 wording align, drop duplicate Windows note.
+- Code-review patches (2026-10-09): CONTINUE-only leave-intro; step-done honesty; FINISH Audio wording; NEVER vs newly-applicable; §4 MIDI vs AUDIO; DEVICE tab for EPROM/latency; INPUT GAIN comparison row; lexicon SYNTH FROM order.
 
 ## Spec Change Log
 
@@ -126,3 +127,32 @@ context:
 - Standalone path: Audio step and Settings Audio/MIDI still consistent
 - §14 no longer contradicts Settings User Interface (Scale/Skin/Getting Started)
 - No developer paths or build jargon in user-facing sections
+
+### Review Findings
+
+Code review (2026-10-09) — layers: blind-hunter, edge-case-hunter, verification-gap, acceptance-auditor.
+
+1. **decision-needed:** none
+
+2. **patch** (applied 2026-10-09):
+- [x] [Review][Patch] Remove opaque « CONTINUE ou équivalent » — only `CONTINUE` leaves intro [`Documentation/User/manuel-utilisateur.md:147`]
+- [x] [Review][Patch] Reword Standalone `FINISH` so it does not claim audio must already be configured [`Documentation/User/manuel-utilisateur.md:180`]
+- [x] [Review][Patch] Document that `NEXT` / `SKIP` / `FINISH` mark the current step done for auto-open without validating ports / DEVICE [`Documentation/User/manuel-utilisateur.md:§5`]
+- [x] [Review][Patch] Clarify newly-applicable-step exception does not bypass `NEVER AT LAUNCH` [`Documentation/User/manuel-utilisateur.md:192`]
+- [x] [Review][Patch] §4 Standalone: header lists are MIDI (and gain/monitoring), not audio interface / listen channels [`Documentation/User/manuel-utilisateur.md:134`]
+- [x] [Review][Patch] Place `EPROM TYPE` and `HARDWARE LATENCY` under Settings → `DEVICE` (not MIDI) [`Documentation/User/manuel-utilisateur.md:221,630-632`]
+- [x] [Review][Patch] Restore Standalone `INPUT GAIN` / monitoring row in plugin vs Standalone table [`Documentation/User/manuel-utilisateur.md:652-660`]
+- [x] [Review][Patch] Reorder lexicon entry `SYNTH FROM / SYNTH TO` alphabetically [`Documentation/User/manuel-utilisateur.md:709`]
+
+3. **defer:** none
+
+4. **Rejected:**
+- Separate plugin/Standalone progress tracks — product shares step flags; Audio-only Standalone gap already covered by exception + step tables
+- Thin DEVICE/EPROM state catalog — out of GS-4 ACs; detection already in §6 / troubleshooting
+- Extra per-step screenshot placeholders — intro + DAW + Settings UI placeholders sufficient for this chore
+- No “re-read wizard without reset” path — `RUN SETUP AGAIN` already states it resets applicable steps
+- Reason examples still too vague — post–Build-patch steps parallel Live/Logic adequately
+- HARDWARE LATENCY “lost” tab only — subsumed by DEVICE-tab honesty patch (baseline also omitted tab)
+- Spec frontmatter `done` vs sprint `review` / stale Code Map §14 / stale Build Review Triage Log — tracking hygiene; fix-by-editing-this-spec rejected for product defects
+- Missing dedicated lexicon row for `MIDI FROM` / `MIDI TO` — already glossed under `SYNTH FROM / SYNTH TO`
+- Verification Gap: no gaps — docs-only change; no runtime tests expected
