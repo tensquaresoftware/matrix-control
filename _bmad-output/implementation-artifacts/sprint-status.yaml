@@ -230,8 +230,9 @@ development_status:
   epic-12-retrospective: optional
 
   # Epic GS: Getting Started wizard (Correct Course 2026-10-08)
-  epic-gs: in-progress
+  epic-gs: done
   gs-1-settings-ui-scale-skin-getting-started-block: done
   gs-2-getting-started-wizard-shell-and-navigation: done
   gs-3-getting-started-steps-flags-plugin-standalone: done
   gs-4-manual-first-launch-and-host-keyboard: done
+  epic-gs-retrospective: optional

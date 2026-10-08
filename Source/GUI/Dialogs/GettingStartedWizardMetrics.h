@@ -5,18 +5,18 @@
 #include "GUI/Settings/SettingsShellMetrics.h"
 
 /** GETTING STARTED geometry (design px at 100% UI scale).
-    Width matches Settings. Non-Audio steps stay shorter than the Settings dialog; STEP 4 Audio
-    embeds the full Settings AUDIO page and may exceed that height.
-    Per-step height = chrome + gap + body text budget + optional reserved control band + buttons. */
+    Width matches Settings. Planning floors keep most steps below the Settings dialog; runtime
+    body height follows measured copy and may grow (STEP 2 with firmware suggestion, STEP 4 Audio).
+    Per-step height = chrome + gap + body text + optional reserved control band + buttons. */
 namespace GettingStartedWizardMetrics
 {
     // Same design width as Settings (never a second width SSOT).
     inline constexpr int kDesignWidth = SettingsShellMetrics::kDesignWidth;
 
-    // Body help text budgets (design px): frozen copy at the shared modal body font (~13 px line step)
-    // plus about half a line of slack. The Synth Communication firmware-suggestion suffix is not included.
-    // Intro: three paragraphs (welcome / setup framing / Continue CTA) with two blank separators;
-    // budget covers wrap at Settings-width body inset (~10% sides) plus ~1.5 line slack.
+    // Body help text planning floors (design px) for dialogDesignHeight / Settings ceiling checks.
+    // Runtime body height follows measured copy so short variants do not pad a second blank above
+    // the control band (the single visual gap is DialogMatrixHelpers::kGapBeforeButtons).
+    // Intro: three paragraphs with two blank separators; floor covers wrap at Settings-width inset.
     inline constexpr int kBodyIntroDesignHeight = 156;
     inline constexpr int kBodyUserInterfaceDesignHeight = 46;
     inline constexpr int kBodySynthCommunicationDesignHeight = 58;

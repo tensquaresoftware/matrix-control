@@ -198,12 +198,14 @@ DialogMatrixHelpers::ModalGeometry GettingStartedWizardDialog::computeGeometry()
     const auto body = bodyText();
     const int bodyWidth = DialogMatrixHelpers::bodyTextWidthFor(
         DialogMatrixHelpers::contentWidthFor(Metrics::kDesignWidth, uiScale_));
+    // Use measured text height (not the per-step planning floor). Short variants must not invent
+    // a second blank below the copy; the single gap before controls is kGapBeforeButtons (24 px).
+    // Do not clamp to maxBodyDesignHeightBelowSettings: STEP 2 with the firmware-suggestion
+    // suffix is the tallest body and that ceiling (~91 px) squeezes fitted text, which visually
+    // shortens the gap above MIDI FROM compared with other steps.
     const int measuredBody = DialogMatrixHelpers::measureBodyHeight(
         DialogMatrixHelpers::scaledModalBodyFont(*skin_, uiScale_), body, bodyWidth);
-    const int minBody = scaledDesign(Metrics::bodyDesignHeight(step_, isPluginMode_), uiScale_);
-    const int maxBody = scaledDesign(
-        Metrics::maxBodyDesignHeightBelowSettings(step_, isPluginMode_), uiScale_);
-    const int bodyHeight = juce::jmin(juce::jmax(minBody, measuredBody), maxBody);
+    const int bodyHeight = juce::jmax(measuredBody, 1);
 
     return DialogMatrixHelpers::computeModalGeometry({
         .hostBounds = getLocalBounds(),
