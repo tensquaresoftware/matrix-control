@@ -270,6 +270,8 @@ set(PLUGIN_SOURCES
     Source/GUI/Dialogs/EpromTypePromptDialog.cpp
     Source/GUI/Dialogs/EpromTypePromptDialogLayout.cpp
     Source/GUI/Dialogs/GettingStartedWizardDialog.cpp
+    Source/GUI/Dialogs/GettingStartedWizardDialogControls.cpp
+    Source/GUI/Dialogs/GettingStartedWizardDialogDevice.cpp
     Source/GUI/Dialogs/MasterInitConfirmDialog.cpp
     Source/GUI/Dialogs/MasterM1kmLoadChoiceDialog.cpp
     Source/GUI/Dialogs/MatrixOrderedConfirmDialog.cpp
@@ -625,6 +627,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/DeviceConnectionMachineDefaultsTests.cpp
         Tests/Unit/GettingStartedSettingsContractTests.cpp
         Tests/Unit/GettingStartedWizardContractTests.cpp
+        Tests/Unit/GettingStartedFlagsContractTests.cpp
         Tests/Unit/MidiPortComboPopulationTests.cpp
         Tests/Unit/ComboBoxLiveRefreshTests.cpp
         Tests/Unit/SysExInterMessageDelayTests.cpp

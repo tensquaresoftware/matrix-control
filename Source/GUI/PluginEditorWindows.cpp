@@ -8,6 +8,7 @@
 #include "GUI/About/AboutPanel.h"
 #include "GUI/Dialogs/BankTransferProgressDialog.h"
 #include "GUI/Dialogs/EpromTypePromptDialog.h"
+#include "GUI/Dialogs/GettingStartedWizardDialog.h"
 #include "GUI/Dialogs/MasterInitConfirmDialog.h"
 #include "GUI/Dialogs/MutatorHistoryDefragConfirmDialog.h"
 #include "GUI/Layout/ScaledLayout.h"
@@ -285,14 +286,14 @@ void PluginEditor::applyEpromTypePromptMidiPortChange(bool isInput, const juce::
     if (opened)
         return;
 
+    const auto fromId = isInput ? previousPortId
+                                : state.getProperty("midiInputPortId", juce::String()).toString();
+    const auto toId = isInput ? state.getProperty("midiOutputPortId", juce::String()).toString()
+                              : previousPortId;
     if (epromTypePromptDialog_ != nullptr)
-    {
-        const auto fromId = isInput ? previousPortId
-                                    : state.getProperty("midiInputPortId", juce::String()).toString();
-        const auto toId = isInput ? state.getProperty("midiOutputPortId", juce::String()).toString()
-                                  : previousPortId;
         epromTypePromptDialog_->syncPortsFromHost(fromId, toId, false);
-    }
+    if (gettingStartedWizardDialog_ != nullptr && gettingStartedWizardDialog_->isVisible())
+        gettingStartedWizardDialog_->syncPortsFromHost(fromId, toId, false);
     if (previousPortId.isEmpty())
         return;
 
@@ -313,54 +314,8 @@ void PluginEditor::applyEpromTypePromptSpecifyLater()
 
 void PluginEditor::openEpromTypePromptDialog()
 {
-    auto& state = pluginProcessor.getApvts().state;
-    if (! Core::shouldOpenDeviceSetupAssistant(
-            static_cast<bool>(state.getProperty(PluginIDs::Settings::kEpromTypePromptDone, false)),
-            epromTypePromptDialog_ != nullptr && epromTypePromptDialog_->isVisible(),
-            Core::DeviceConnectionMachineDefaults::load().promptDone))
-        return;
-
-    const auto deviceType = Core::DeviceTypeRegistry::fromApvtsProperty(
-        state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
-    const int preferred = preferredEpromTypeForPrompt(state, deviceType);
-    const juce::String deviceVersion = state.getProperty("deviceVersion", juce::String()).toString().trim();
-
-    closeMasterM1kmLoadChoiceDialog();
-    closeGettingStartedWizard();
-
-    ensureEpromTypePromptDialog();
-    epromTypePromptDialog_->prepareForShow({
-        .deviceType = deviceType,
-        .preferredSelectedId = preferred,
-        .includeFirmwareSuggestionHint = deviceVersion.isNotEmpty()
-            && static_cast<bool>(state.getProperty("deviceDetected", false)),
-        .midiFromPortId = state.getProperty("midiInputPortId", juce::String()).toString(),
-        .midiToPortId = state.getProperty("midiOutputPortId", juce::String()).toString(),
-        .deviceStatus = makeEpromTypePromptLiveStatus(state),
-        .onConfirm = [this](int selectedId) { applyEpromTypePromptSelection(selectedId); },
-        .onLater = [this] { applyEpromTypePromptSpecifyLater(); },
-        .onMidiFromChanged = [this](const juce::String& portId)
-        {
-            applyEpromTypePromptMidiPortChange(true, portId);
-        },
-        .onMidiToChanged = [this](const juce::String& portId)
-        {
-            applyEpromTypePromptMidiPortChange(false, portId);
-        },
-        .onSearchingWindowStarted = [this]
-        {
-            pluginProcessor.getMidiManager().refreshDeviceInquiryAfterPortSync();
-        },
-    });
-
-    const int baseWidth = layoutDimensions_.editor.width;
-    const float uiScale = (baseWidth > 0)
-        ? TSS::ScaledLayout::uiScaleFromEditorBounds(getWidth(), baseWidth)
-        : 1.0f;
-    updateEpromTypePromptDialogLayout(uiScale);
-    epromTypePromptDialog_->setVisible(true);
-    epromTypePromptDialog_->toFront(true);
-    epromTypePromptDialog_->grabKeyboardFocus();
+    // GS-3: Device Setup onboarding is absorbed into GETTING STARTED STEP 2.
+    // Keep dialog sources/helpers; do not show Device Setup as a first-run vehicle.
 }
 
 void PluginEditor::closeEpromTypePromptDialog()

@@ -65,15 +65,15 @@ private:
         expect(! juce::String(PluginDisplayNames::Settings::kUiScaleRowLabel).containsChar(':'));
         expect(! juce::String(PluginDisplayNames::Settings::kSkinRowLabel).containsChar(':'));
 
-        // GS-1 tempered HELP: preference save + wizard-gated re-run (no false "opens now").
         expectEquals(
             juce::String(PluginDisplayNames::Settings::ContextualHelp::kGettingStartedAutoOpen),
             juce::String(
-                "SETTINGS: Saves whether Getting Started should open at launch when steps are incomplete."));
+                "SETTINGS: Chooses whether Getting Started may open at launch when applicable steps "
+                "are still incomplete."));
         expectEquals(
             juce::String(PluginDisplayNames::Settings::ContextualHelp::kRunSetupAgain),
             juce::String(
-                "SETTINGS: Re-runs Getting Started from the beginning when the wizard is available."));
+                "SETTINGS: Resets Getting Started progress for this format and opens the wizard from the beginning."));
     }
 
     void scaleAndSkinSettingsShareLogoApvtsKeys()

@@ -34,7 +34,8 @@ public:
 private:
     void testShouldOpenAssistant()
     {
-        beginTest("shouldOpenDeviceSetupAssistant - promptDone or visible blocks");
+        // Legacy pure helper (Confirm-era). Product launch absorb is shouldAutoOpenDeviceSetupAtEditorAttach.
+        beginTest("shouldOpenDeviceSetupAssistant - legacy pure gate (not product auto-open)");
 
         expect(Core::shouldOpenDeviceSetupAssistant(false, false));
         expect(! Core::shouldOpenDeviceSetupAssistant(true, false));
@@ -42,6 +43,7 @@ private:
         expect(! Core::shouldOpenDeviceSetupAssistant(true, true));
         expect(! Core::shouldOpenDeviceSetupAssistant(false, false, true));
         expect(Core::shouldOpenDeviceSetupAssistant(false, false, false));
+        expect(! Core::shouldAutoOpenDeviceSetupAtEditorAttach());
     }
 
     void testPartialPortsStayNotConnected()

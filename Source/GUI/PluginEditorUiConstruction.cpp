@@ -223,19 +223,10 @@ void PluginEditor::attachEditorRuntimeListeners()
     attachStandaloneAudioDeviceListener();
     pluginProcessor.getApvts().state.addListener(this);
 
-    if (Core::shouldOpenDeviceSetupAssistant(
-            static_cast<bool>(pluginProcessor.getApvts().state.getProperty(
-                PluginIDs::Settings::kEpromTypePromptDone, false)),
-            false,
-            Core::DeviceConnectionMachineDefaults::load().promptDone))
-    {
-        juce::MessageManager::callAsync(
-            [safeThis = juce::Component::SafePointer<PluginEditor>(this)]
-            {
-                if (safeThis != nullptr)
-                    safeThis->openEpromTypePromptDialog();
-            });
-    }
+    // GS-3: GETTING STARTED owns first-run onboarding (Device Setup no longer auto-opens).
+    if (Core::shouldAutoOpenDeviceSetupAtEditorAttach())
+        openEpromTypePromptDialog();
+    maybeAutoOpenGettingStartedWizard();
 
     setWantsKeyboardFocus(true);
     setFocusContainerType(juce::Component::FocusContainerType::keyboardFocusContainer);

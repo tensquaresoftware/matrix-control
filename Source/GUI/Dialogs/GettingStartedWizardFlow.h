@@ -3,10 +3,13 @@
 #include <optional>
 #include <vector>
 
+#include <juce_core/juce_core.h>
+
+#include "Core/Services/GettingStartedMachineDefaults.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 
-/** GETTING STARTED step flow (GS-2 shell): applicable steps, navigation, titles, copy, button sets.
-    Pure data and rules, no GUI types, so unit tests can pin the product contract
+/** GETTING STARTED step flow: applicable steps, navigation, titles, copy, button sets,
+    resume / Configure-later helpers. Pure data and rules, no GUI types.
     (`_bmad-output/specs/spec-getting-started/journey-and-flags.md`, `ui-copy.md`). */
 namespace GettingStartedWizard
 {
@@ -129,22 +132,67 @@ namespace GettingStartedWizard
         return "";
     }
 
-    /** Frozen help copy for the step. Firmware-suggestion suffix and the Audio resume variant
-        depend on live state and flags, so they are chosen by GS-3. */
-    inline const char* bodyFor(Step step, bool isPluginMode) noexcept
+    struct BodyOptions
+    {
+        bool includeFirmwareSuggestionSuffix = false;
+        bool useAudioResumeCopy = false;
+    };
+
+    /** Frozen help copy for the step. Firmware suffix and Audio resume are opt-in. */
+    inline juce::String bodyFor(Step step, bool isPluginMode, BodyOptions options = {}) 
     {
         namespace Copy = PluginDisplayNames::Dialogs::GettingStarted;
         switch (step)
         {
             case Step::kIntro: return Copy::kBodyIntro;
             case Step::kUserInterface: return Copy::kBodyUserInterface;
-            case Step::kSynthCommunication: return Copy::kBodySynthCommunication;
+            case Step::kSynthCommunication:
+            {
+                juce::String text(Copy::kBodySynthCommunication);
+                if (options.includeFirmwareSuggestionSuffix)
+                    text += Copy::kBodySynthCommunicationSuggestionSuffix;
+                return text;
+            }
             case Step::kMidiKeyboard:
                 return isPluginMode ? Copy::kBodyMidiKeyboardPlugin : Copy::kBodyMidiKeyboardStandalone;
-            case Step::kAudio: return Copy::kBodyAudioFirstPass;
+            case Step::kAudio:
+                return options.useAudioResumeCopy ? Copy::kBodyAudioResume : Copy::kBodyAudioFirstPass;
         }
 
-        return "";
+        return {};
+    }
+
+    /** True when Next / Skip / Finish should mark the current content step done. */
+    inline constexpr bool marksStepDone(Step step, NavButton button) noexcept
+    {
+        if (step == Step::kIntro || button == NavButton::kPrevious
+            || button == NavButton::kConfigureLater || button == NavButton::kContinue)
+            return false;
+
+        if (button == NavButton::kNext || button == NavButton::kSkip || button == NavButton::kFinish)
+            return step != Step::kIntro;
+
+        return false;
+    }
+
+    inline std::optional<Step> firstIncompleteApplicableStep(
+        const Core::GettingStartedMachineDefaults::StepFlags& flags,
+        bool isPluginMode) noexcept
+    {
+        const auto index = Core::GettingStartedMachineDefaults::firstIncompleteApplicableStepIndex(
+            flags, isPluginMode);
+        if (! index.has_value())
+            return std::nullopt;
+
+        return static_cast<Step>(*index);
+    }
+
+    /** Resume copy for Audio when UI+Synth+Keyboard are done and Audio is incomplete. */
+    inline bool shouldUseAudioResumeCopy(
+        const Core::GettingStartedMachineDefaults::StepFlags& flags) noexcept
+    {
+        return flags.userInterfaceDone && flags.synthCommunicationDone && flags.midiKeyboardDone
+            && ! flags.audioDone;
     }
 
     inline const char* labelFor(NavButton button) noexcept
@@ -180,10 +228,11 @@ namespace GettingStartedWizard
                                               : nextApplicableStep(step, isPluginMode);
     }
 
-    /** RUN SETUP AGAIN: opens the wizard at the intro. Flag reset is GS-3. */
-    template <typename OpenWizardFn>
-    void runSetupAgain(OpenWizardFn&& openWizard)
+    /** RUN SETUP AGAIN: reset applicable flags (via caller), then open at the intro. */
+    template <typename ResetFlagsFn, typename OpenWizardFn>
+    void runSetupAgain(ResetFlagsFn&& resetFlags, OpenWizardFn&& openWizard)
     {
+        resetFlags();
         openWizard(runSetupAgainStartStep());
     }
 

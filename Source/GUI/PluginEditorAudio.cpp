@@ -40,13 +40,16 @@ void PluginEditor::refreshAudioFromCombo()
     if (auto* panel = getSettingsPanelIfOpen())
     {
         if (auto* audioPage = panel->getAudioPage())
-        {
             applyAudioCatalogToSettings(*audioPage, names, ids, sourceIdToRestore);
-            return;
-        }
+        else
+            applyAudioCatalogSelectionOnly(ids, sourceIdToRestore);
+    }
+    else
+    {
+        applyAudioCatalogSelectionOnly(ids, sourceIdToRestore);
     }
 
-    applyAudioCatalogSelectionOnly(ids, sourceIdToRestore);
+    refreshGettingStartedWizardSynthFrom();
 }
 
 void PluginEditor::applyAudioCatalogToSettings(SettingsAudioPage& audioPage,
@@ -138,8 +141,13 @@ void PluginEditor::valueTreePropertyChanged(juce::ValueTree&,
         || propertyName == "keyboardFromPortId")
     {
         syncMidiPortSelectionFromState(propertyName);
-        if (propertyName != "keyboardFromPortId")
+        if (propertyName == "keyboardFromPortId")
+            refreshGettingStartedWizardKeyboardFrom();
+        else
+        {
             refreshEpromTypePromptDialogPorts();
+            refreshGettingStartedWizardPorts();
+        }
         return;
     }
 
@@ -162,18 +170,15 @@ void PluginEditor::valueTreePropertyChanged(juce::ValueTree&,
 
 void PluginEditor::handleEpromTypePromptPendingProperty()
 {
+    // GS-3 absorb: inquiry must not reopen Device Setup. Clear the legacy pending flag.
     const bool pending = static_cast<bool>(
         pluginProcessor.getApvts().state.getProperty(
             PluginIDs::Settings::kEpromTypePromptPending, false));
     if (! pending)
         return;
 
-    juce::MessageManager::callAsync(
-        [safeThis = juce::Component::SafePointer<PluginEditor>(this)]
-        {
-            if (safeThis != nullptr)
-                safeThis->openEpromTypePromptDialog();
-        });
+    pluginProcessor.getApvts().state.setProperty(
+        PluginIDs::Settings::kEpromTypePromptPending, false, nullptr);
 }
 
 void PluginEditor::handleDeviceSetupAssistantProperty(const juce::String& propertyName)
@@ -186,8 +191,12 @@ void PluginEditor::handleDeviceSetupAssistantProperty(const juce::String& proper
         return;
 
     refreshEpromTypePromptDialogLiveState();
+    refreshGettingStartedWizardLiveState();
     if (propertyName != Core::kDeviceMidiUnresponsiveProperty)
+    {
         refreshEpromTypePromptDialogSuggestion();
+        refreshGettingStartedWizardSuggestion();
+    }
 }
 
 void PluginEditor::coerceEpromTypeForCurrentDeviceFamily()
@@ -202,9 +211,19 @@ void PluginEditor::coerceEpromTypeForCurrentDeviceFamily()
     const int coerced = Core::EpromTypePolicy::coerceForDeviceFamily(stored, family);
     const bool assistantOpen = epromTypePromptDialog_ != nullptr
         && epromTypePromptDialog_->isVisible();
-    // DEVICE SETUP owns EPROM persistence until CONFIRM; do not rewrite APVTS while open.
-    if (coerced != stored && ! assistantOpen)
+    const bool wizardOpen = gettingStartedWizardDialog_ != nullptr
+        && gettingStartedWizardDialog_->isVisible();
+    const bool wizardSynthOpen = wizardOpen
+        && gettingStartedWizardDialog_->getCurrentStep()
+            == GettingStartedWizard::Step::kSynthCommunication;
+    // Live STEP 2 / Device Setup owns EPROM until the user moves on; do not rewrite while open.
+    if (coerced != stored && ! assistantOpen && ! wizardSynthOpen)
+    {
         state.setProperty(PluginIDs::Settings::kEpromType, coerced, nullptr);
+        // Keep the (possibly hidden) STEP 2 combo aligned when family changes on another step.
+        if (wizardOpen)
+            refreshGettingStartedWizardSuggestion();
+    }
 
     pluginProcessor.getMidiManager().refreshSysExDelayFromSettings();
 

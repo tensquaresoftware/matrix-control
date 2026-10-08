@@ -87,4 +87,19 @@ namespace GettingStartedWizardMetrics
         return SettingsShellMetrics::paddedBodyDesignHeight(isPluginMode)
                + DialogMatrixHelpers::kTitleBarHeight + DialogMatrixHelpers::kBorderThickness * 2;
     }
+
+    /** Max body design height so dialogDesignHeight stays strictly below Settings. */
+    inline int maxBodyDesignHeightBelowSettings(GettingStartedWizard::Step step,
+                                                bool isPluginMode) noexcept
+    {
+        namespace Helpers = DialogMatrixHelpers;
+        const int band = reservedControlBandDesignHeight(step, isPluginMode);
+        const int bandWithGaps = band > 0
+            ? Helpers::kGapBeforeButtons + band + Helpers::kGapBeforeButtons
+            : Helpers::kGapBeforeButtons;
+        const int chrome = Helpers::kGapAfterTitle + bandWithGaps + Helpers::kDefaultButtonHeight
+                           + Helpers::kButtonBottomMargin + Helpers::kTitleBarHeight
+                           + Helpers::kBorderThickness * 2;
+        return juce::jmax(0, settingsDialogDesignHeight(isPluginMode) - 1 - chrome);
+    }
 }

@@ -9,6 +9,7 @@
 #include "Core/MIDI/EditorOutboundGate.h"
 #include "Core/MIDI/MasterPullOnConnectPolicy.h"
 #include "Core/MIDI/Queue/SysExDelayProfile.h"
+#include "Core/Services/DeviceSetupDeviceRow.h"
 #include "Core/Services/DeviceTypeRegistry.h"
 #include "Core/Services/EpromTypePolicy.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
@@ -214,7 +215,7 @@ void MidiManager::finishAsyncDeviceInquirySuccess(std::uint64_t token,
 
     const bool promptDone = static_cast<bool>(
         apvts.state.getProperty(PluginIDs::Settings::kEpromTypePromptDone, false));
-    if (! promptDone)
+    if (Core::shouldArmDeviceSetupPromptPendingAfterInquiry(promptDone))
         apvts.state.setProperty(PluginIDs::Settings::kEpromTypePromptPending, true, nullptr);
 
     const auto pullSnapshot = Core::consumeMasterPullInquirySnapshot(

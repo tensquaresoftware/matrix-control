@@ -166,15 +166,17 @@ private:
 
     void testOpenBlockedWhenMachinePromptDoneEvenIfSessionFalse()
     {
-        beginTest("shouldOpen - machine promptDone blocks restored empty-port sessions");
+        // Legacy pure helper semantics only — GS-3 product attach uses shouldAutoOpenDeviceSetupAtEditorAttach.
+        beginTest("shouldOpen (legacy) - machine promptDone blocks restored empty-port sessions");
 
         expect(! Core::shouldOpenDeviceSetupAssistant(false, false, true));
         expect(Core::shouldOpenDeviceSetupAssistant(false, false, false));
+        expect(! Core::shouldAutoOpenDeviceSetupAtEditorAttach());
     }
 
     void testOpenBlockedWhenSessionPromptDoneWithEmptyPorts()
     {
-        beginTest("shouldOpen - session promptDone blocks even with empty ports");
+        beginTest("shouldOpen (legacy) - session promptDone blocks even with empty ports");
 
         expect(! Core::shouldOpenDeviceSetupAssistant(true, false, false));
         expect(! Core::shouldOpenDeviceSetupAssistant(true, false, true));

@@ -9,6 +9,7 @@
 #include "Core/PluginProcessor.h"
 #include "MainComponent.h"
 #include "GUI/Dialogs/BankTransferProgressDialog.h"
+#include "GUI/Dialogs/GettingStartedWizardDialog.h"
 #include "GUI/Dialogs/GettingStartedWizardFlow.h"
 #include "GUI/Helpers/EditorChromeShortcuts.h"
 #include "GUI/Layout/PanelDimensions.h"
@@ -30,7 +31,6 @@ class MasterInitConfirmDialog;
 class MasterM1kmLoadChoiceDialog;
 class MutatorHistoryDefragConfirmDialog;
 class EpromTypePromptDialog;
-class GettingStartedWizardDialog;
 class PatchNameDisplayPanel;
 
 class PluginEditor : public juce::AudioProcessorEditor,
@@ -206,6 +206,20 @@ private:
     void ensureEpromTypePromptDialog();
     void openGettingStartedWizard(GettingStartedWizard::Step startStep);
     void closeGettingStartedWizard();
+    void maybeAutoOpenGettingStartedWizard();
+    void refreshGettingStartedWizardLiveState();
+    void refreshGettingStartedWizardPorts();
+    void refreshGettingStartedWizardKeyboardFrom();
+    void refreshGettingStartedWizardSuggestion();
+    void refreshGettingStartedWizardSynthFrom();
+    void markGettingStartedStepDone(GettingStartedWizard::Step step);
+    void handleGettingStartedConfigureLater();
+    GettingStartedWizardDialog::HostBindings makeGettingStartedHostBindings();
+    void fillGettingStartedBindingState(GettingStartedWizardDialog::HostBindings& bindings);
+    void wireGettingStartedBindingCallbacks(GettingStartedWizardDialog::HostBindings& bindings);
+    void wireGettingStartedAppearanceCallbacks(GettingStartedWizardDialog::HostBindings& bindings);
+    void wireGettingStartedPortCallbacks(GettingStartedWizardDialog::HostBindings& bindings);
+    void wireGettingStartedNavCallbacks(GettingStartedWizardDialog::HostBindings& bindings);
     void applyEpromTypePromptSelection(int selectedId);
     void applyEpromTypePromptSpecifyLater();
     void refreshEpromTypePromptDialogLiveState();

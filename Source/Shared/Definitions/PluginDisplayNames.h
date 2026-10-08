@@ -244,11 +244,11 @@ namespace PluginDisplayNames
                 "SETTINGS: Sets the user interface scale.";
             constexpr const char* kSkin =
                 "SETTINGS: Chooses the visual skin for the editor.";
-            // GS-1: preference persist only; launch enforcement + wizard re-run arrive in GS-2/GS-3.
             constexpr const char* kGettingStartedAutoOpen =
-                "SETTINGS: Saves whether Getting Started should open at launch when steps are incomplete.";
+                "SETTINGS: Chooses whether Getting Started may open at launch when applicable steps "
+                "are still incomplete.";
             constexpr const char* kRunSetupAgain =
-                "SETTINGS: Re-runs Getting Started from the beginning when the wizard is available.";
+                "SETTINGS: Resets Getting Started progress for this format and opens the wizard from the beginning.";
             constexpr const char* kInfoMessage =
                 "SETTINGS: KEEP leaves sticky INFO until replaced; AUTO CLEAR clears INFO after five seconds "
                 "(not WARNING or ERROR). Click the footer severity badge to dismiss any sticky message.";

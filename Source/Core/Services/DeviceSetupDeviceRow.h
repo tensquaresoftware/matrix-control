@@ -1,6 +1,7 @@
 #pragma once
 
 #include <juce_core/juce_core.h>
+#include <juce_data_structures/juce_data_structures.h>
 
 #include "Core/MIDI/SysEx/SysExConstants.h"
 #include "Core/Services/EpromTypePolicy.h"
@@ -45,6 +46,32 @@ namespace Core
                                                bool machinePromptDone = false) noexcept
     {
         return ! sessionPromptDone && ! machinePromptDone && ! dialogAlreadyVisible;
+    }
+
+    /**
+     * GS-3 absorb: inquiry success must not re-arm Device Setup promptPending.
+     * GETTING STARTED owns onboarding; session promptDone is ignored for this gate.
+     */
+    inline constexpr bool shouldArmDeviceSetupPromptPendingAfterInquiry(
+        bool /*sessionPromptDone*/) noexcept
+    {
+        return false;
+    }
+
+    /**
+     * GS-3 absorb: Device Setup must not auto-open at editor attach.
+     * GETTING STARTED owns first-run; `shouldOpenDeviceSetupAssistant` is legacy pure logic only.
+     */
+    inline constexpr bool shouldAutoOpenDeviceSetupAtEditorAttach() noexcept
+    {
+        return false;
+    }
+
+    /** Session flags after GETTING STARTED STEP 2 marks Synth Communication done (Confirm bridge). */
+    inline void markSessionDeviceSetupCompleteAfterWizardSynthDone(juce::ValueTree& state) noexcept
+    {
+        state.setProperty(PluginIDs::Settings::kEpromTypePromptDone, true, nullptr);
+        state.setProperty(PluginIDs::Settings::kEpromTypePromptPending, false, nullptr);
     }
 
     struct DeviceSetupFinishFlags

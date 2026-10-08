@@ -55,17 +55,25 @@ void PluginEditor::wireSettingsGettingStartedControls(SettingsPanel& panel)
     panel.getGettingStartedAutoOpenCombo().onChange = [&panel]
     {
         using namespace PluginIDs::Settings::GettingStartedAutoOpen;
+        using namespace Core::GettingStartedMachineDefaults;
+
         const int selectedId = panel.getGettingStartedAutoOpenCombo().getSelectedId();
         if (selectedId != kShowWhenIncomplete && selectedId != kNeverAtLaunch)
             return;
 
-        Core::GettingStartedMachineDefaults::writeAutoOpenPreference(selectedId);
+        writeAutoOpenPreference(selectedId);
+        if (clearsConfigureLaterSilenceOnAutoOpenPreference(selectedId))
+            persistConfigureLaterArm(ConfigureLaterArm::kNormal, false);
     };
 
-    // GS-2: opens the wizard at the intro; flag reset is GS-3.
     panel.getRunSetupAgainButton().onClick = [this]
     {
+        const bool isPluginMode = ! pluginProcessor.isStandalone();
         GettingStartedWizard::runSetupAgain(
+            [isPluginMode]
+            {
+                Core::GettingStartedMachineDefaults::resetForRunSetupAgain(isPluginMode);
+            },
             [this](GettingStartedWizard::Step step) { openGettingStartedWizard(step); });
     };
 }

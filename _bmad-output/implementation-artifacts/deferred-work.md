@@ -2445,3 +2445,12 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-gs-2-getting-started-wizard-shell-and-navigation.md`
   summary: Reconfirmed — ui-copy.md typographic dashes vs ASCII PluginDisplayNames.
   evidence: Code review Blind Hunter; runtime ASCII SSOT unchanged.
+
+## Deferred from: code review of spec-gs-3-getting-started-steps-flags-plugin-standalone.md (2026-10-08)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-gs-3-getting-started-steps-flags-plugin-standalone.md`
+  summary: Null AudioDeviceManager at Getting Started wizard bind can leave digeste Audio combos empty until reopen.
+  evidence: Edge Case Hunter maybe-false — StandalonePluginHolder timing at editor-ready auto-open not settled from diff alone.
+- source_spec: `_bmad-output/implementation-artifacts/spec-gs-3-getting-started-steps-flags-plugin-standalone.md`
+  summary: ExportMatrixModals Getting Started frames open with empty HostBindings (no ports / DEVICE / digeste audio).
+  evidence: Blind Hunter — tooling export pack gap, not the product onboarding path.

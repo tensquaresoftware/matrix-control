@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include "GUI/Dialogs/GettingStartedWizardMetrics.h"
+#include "GUI/Helpers/MidiPortComboPopulation.h"
 #include "GUI/Skins/Skin.h"
 
 using GettingStartedWizard::NavButton;
@@ -44,7 +45,14 @@ GettingStartedWizardDialog::GettingStartedWizardDialog(TSS::ISkin& skin,
         buttons_[static_cast<size_t>(navButton)] = std::move(button);
     }
 
+    buildStepControls(skin);
+    wireControlCallbacks();
     showStep(Step::kIntro);
+}
+
+GettingStartedWizardDialog::~GettingStartedWizardDialog()
+{
+    stopTimer();
 }
 
 TSS::Button& GettingStartedWizardDialog::buttonFor(NavButton button) const
@@ -52,9 +60,51 @@ TSS::Button& GettingStartedWizardDialog::buttonFor(NavButton button) const
     return *buttons_[static_cast<size_t>(button)];
 }
 
-void GettingStartedWizardDialog::prepareForShow(Step startStep)
+void GettingStartedWizardDialog::prepareForShow(Step startStep, HostBindings bindings)
 {
+    bindings_ = std::move(bindings);
+    includeFirmwareSuggestionHint_ = bindings_.includeFirmwareSuggestionHint;
+    useAudioResumeCopy_ = bindings_.useAudioResumeCopy;
+    liveStatus_ = bindings_.deviceStatus;
+    searchingWindow_ = {};
+    searchingDotFrame_ = 0;
+    epromComboTouchedByUser_ = false;
+    stopTimer();
+
+    {
+        const juce::ScopedValueSetter<bool> guard(suppressControlCallbacks_, true);
+        if (scaleCombo_ != nullptr)
+            scaleCombo_->setSelectedId(bindings_.scaleId, juce::dontSendNotification);
+        if (skinCombo_ != nullptr)
+            skinCombo_->setSelectedId(bindings_.skinId, juce::dontSendNotification);
+    }
+
+    syncPortsFromHost(bindings_.midiFromPortId, bindings_.midiToPortId, true);
+    populateEpromItems(liveStatus_.deviceType, bindings_.preferredEpromTypeId);
+
+    if (keyboardFromCombo_ != nullptr)
+    {
+        const juce::ScopedValueSetter<bool> guard(suppressControlCallbacks_, true);
+        TSS::MidiPortComboPopulation::populateInputPortCombo(*keyboardFromCombo_,
+                                                             keyboardFromPortIdentifiers_);
+        TSS::MidiPortComboPopulation::selectPortInCombo(
+            *keyboardFromCombo_, keyboardFromPortIdentifiers_, bindings_.keyboardFromPortId);
+    }
+
+    if (bindings_.audioDeviceManager != nullptr)
+        refreshDigesteAudioFromDeviceManager();
+
+    populateSynthFromChannels(bindings_.synthFromChannelNames,
+                              bindings_.synthFromChannelIds,
+                              bindings_.selectedSynthFromSourceId);
+
     showStep(startStep);
+}
+
+void GettingStartedWizardDialog::stopLiveTimers()
+{
+    stopTimer();
+    searchingDotFrame_ = 0;
 }
 
 void GettingStartedWizardDialog::showStep(Step step)
@@ -68,12 +118,39 @@ void GettingStartedWizardDialog::showStep(Step step)
         buttonFor(navButton).setVisible(isShown);
     }
 
+    if (step_ == Step::kSynthCommunication)
+        refreshEpromSuggestion(liveStatus_.deviceType, bindings_.preferredEpromTypeId);
+
+    if (step_ == Step::kAudio && ! isPluginMode_)
+    {
+        if (bindings_.audioDeviceManager != nullptr)
+            refreshDigesteAudioFromDeviceManager();
+        populateSynthFromChannels(bindings_.synthFromChannelNames,
+                                  bindings_.synthFromChannelIds,
+                                  bindings_.selectedSynthFromSourceId);
+    }
+
+    updateControlVisibility();
     resized();
     repaint();
 }
 
 void GettingStartedWizardDialog::handleButton(NavButton button)
 {
+    if (button == NavButton::kConfigureLater)
+    {
+        if (bindings_.onConfigureLater)
+            bindings_.onConfigureLater();
+        requestDismiss();
+        return;
+    }
+
+    if (button == NavButton::kContinue && step_ == Step::kIntro && bindings_.onContinuedFromIntro)
+        bindings_.onContinuedFromIntro();
+
+    if (GettingStartedWizard::marksStepDone(step_, button) && bindings_.onContentStepCompleted)
+        bindings_.onContentStepCompleted(step_);
+
     if (GettingStartedWizard::closesWizard(button))
     {
         requestDismiss();
@@ -87,6 +164,7 @@ void GettingStartedWizardDialog::handleButton(NavButton button)
 
 void GettingStartedWizardDialog::requestDismiss()
 {
+    stopTimer();
     if (onDismissRequested_)
         onDismissRequested_();
 }
@@ -97,6 +175,7 @@ void GettingStartedWizardDialog::setSkin(TSS::ISkin& skin)
     for (const auto navButton : kAllNavButtons)
         DialogMatrixHelpers::applyButtonSkin(buttonFor(navButton), skin);
 
+    applyControlLooks(skin);
     resized();
     repaint();
 }
@@ -117,13 +196,32 @@ void GettingStartedWizardDialog::setUiScale(float uiScale)
 DialogMatrixHelpers::ModalGeometry GettingStartedWizardDialog::computeGeometry() const
 {
     namespace Metrics = GettingStartedWizardMetrics;
+    const auto body = bodyText();
+    const int bodyWidth = DialogMatrixHelpers::bodyTextWidthFor(
+        DialogMatrixHelpers::contentWidthFor(Metrics::kDesignWidth, uiScale_));
+    const int measuredBody = DialogMatrixHelpers::measureBodyHeight(
+        DialogMatrixHelpers::scaledModalBodyFont(*skin_, uiScale_), body, bodyWidth);
+    const int minBody = scaledDesign(Metrics::bodyDesignHeight(step_, isPluginMode_), uiScale_);
+    const int maxBody = scaledDesign(
+        Metrics::maxBodyDesignHeightBelowSettings(step_, isPluginMode_), uiScale_);
+    const int bodyHeight = juce::jmin(juce::jmax(minBody, measuredBody), maxBody);
+
     return DialogMatrixHelpers::computeModalGeometry({
         .hostBounds = getLocalBounds(),
         .designWidth = Metrics::kDesignWidth,
         .uiScale = uiScale_,
-        .bodyHeight = scaledDesign(Metrics::bodyDesignHeight(step_, isPluginMode_), uiScale_),
+        .bodyHeight = bodyHeight,
         .extraBandHeight = scaledDesign(
             Metrics::reservedControlBandDesignHeight(step_, isPluginMode_), uiScale_),
+    });
+}
+
+juce::String GettingStartedWizardDialog::bodyText() const
+{
+    return GettingStartedWizard::bodyFor(step_, isPluginMode_, {
+        .includeFirmwareSuggestionSuffix = includeFirmwareSuggestionHint_
+            && step_ == Step::kSynthCommunication,
+        .useAudioResumeCopy = useAudioResumeCopy_ && step_ == Step::kAudio,
     });
 }
 
@@ -144,12 +242,14 @@ void GettingStartedWizardDialog::paint(juce::Graphics& g)
     g.setColour(skin_->getColour(TSS::SkinColourId::kDarkPanelText));
     DialogMatrixHelpers::paintBodyText(g,
                                        DialogMatrixHelpers::scaledModalBodyFont(*skin_, uiScale_),
-                                       GettingStartedWizard::bodyFor(step_, isPluginMode_),
+                                       bodyText(),
                                        geometry.textArea);
 }
 
 void GettingStartedWizardDialog::resized()
 {
+    const auto geometry = computeGeometry();
+
     std::vector<DialogMatrixHelpers::ButtonPlacement> placements;
     for (const auto navButton : GettingStartedWizard::buttonsFor(step_, isPluginMode_))
     {
@@ -160,7 +260,8 @@ void GettingStartedWizardDialog::resized()
         });
     }
 
-    DialogMatrixHelpers::layoutCentredButtonRow(computeGeometry().buttonRow, uiScale_, placements);
+    DialogMatrixHelpers::layoutCentredButtonRow(geometry.buttonRow, uiScale_, placements);
+    layoutStepControls(controlBandBounds(geometry));
 }
 
 void GettingStartedWizardDialog::mouseDown(const juce::MouseEvent& e)

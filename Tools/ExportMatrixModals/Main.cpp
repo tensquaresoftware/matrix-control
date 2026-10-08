@@ -111,7 +111,7 @@ namespace
             {
                 GettingStartedWizardDialog dialog(skin, isPluginMode, [] {});
                 dialog.setUiScale(uiScale);
-                dialog.prepareForShow(step);
+                dialog.prepareForShow(step, {});
                 snapshotComponent(dialog,
                                   uiScale,
                                   juce::String("20-getting-started-") + (isPluginMode ? "plugin" : "standalone")

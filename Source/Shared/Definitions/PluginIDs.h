@@ -236,6 +236,20 @@ namespace PluginIDs
         constexpr const char* kEpromType = "settingsEpromType";
         // Getting Started auto-open preference (machine-scoped; not Device Setup promptDone).
         constexpr const char* kGettingStartedAutoOpen = "gettingStartedAutoOpen";
+        // Per-step durable completion (machine-scoped; plugin and Standalone share keys,
+        // applicability decides which matter). Never merge with sceneAudioSafetyDefaultsApplied.
+        constexpr const char* kGettingStartedUserInterfaceDone = "gettingStartedUserInterfaceDone";
+        constexpr const char* kGettingStartedSynthCommunicationDone =
+            "gettingStartedSynthCommunicationDone";
+        constexpr const char* kGettingStartedMidiKeyboardDone = "gettingStartedMidiKeyboardDone";
+        constexpr const char* kGettingStartedAudioDone = "gettingStartedAudioDone";
+        // Configure-later arm: 0 = normal auto-open, 1 = one reminder left, 2 = silenced.
+        constexpr const char* kGettingStartedConfigureLaterArm = "gettingStartedConfigureLaterArm";
+        // Last format seen while silenced (true = plugin); used to rearm when Audio becomes applicable.
+        constexpr const char* kGettingStartedLastSilencedWasPlugin =
+            "gettingStartedLastSilencedWasPlugin";
+        // True after Continue from intro (or migrated legacy setup); false → auto-open at intro.
+        constexpr const char* kGettingStartedHasLeftIntro = "gettingStartedHasLeftIntro";
     }
 
     namespace Mode

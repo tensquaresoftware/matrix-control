@@ -323,9 +323,13 @@ private:
         Core::GettingStartedMachineDefaults::writeAutoOpenPreference(store, kNeverAtLaunch);
 
         std::vector<Step> openedAt;
+        bool resetCalled = false;
         // Same collaborator the Settings RUN SETUP AGAIN onClick calls in PluginEditor.
-        GettingStartedWizard::runSetupAgain([&openedAt](Step step) { openedAt.push_back(step); });
+        GettingStartedWizard::runSetupAgain(
+            [&resetCalled] { resetCalled = true; },
+            [&openedAt](Step step) { openedAt.push_back(step); });
 
+        expect(resetCalled);
         expect(openedAt == std::vector<Step>({ Step::kIntro }));
         expect(GettingStartedWizard::runSetupAgainStartStep() == Step::kIntro);
         expectEquals(Core::GettingStartedMachineDefaults::readAutoOpenPreference(store), kNeverAtLaunch);
