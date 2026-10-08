@@ -147,9 +147,9 @@ private:
                                   "Matrix-Control - not in this window. See the user manual for host "
                                   "examples."));
         expectEquals(juce::String(GettingStartedWizard::bodyFor(Step::kAudio, false)),
-                     juce::String("Choose the audio interface and input so you can hear your synth in "
-                                  "Matrix-Control. Pick the SYNTH FROM channel(s) that carry the synth "
-                                  "output."));
+                     juce::String("Choose the audio interface, channels, and SYNTH FROM so you can hear "
+                                  "your synth in Matrix-Control. These are the same audio settings as "
+                                  "in Settings."));
 
         variantCopyIsFrozenAndAllBodiesAreAscii();
     }
@@ -161,8 +161,8 @@ private:
                      juce::String("\n\nA suggestion is preselected from the reported firmware version "
                                   "when possible."));
         expectEquals(juce::String(Copy::kBodyAudioResume),
-                     juce::String("MIDI is already set. One more step: route audio so the standalone "
-                                  "application can monitor your synth."));
+                     juce::String("MIDI is already set. One more step: finish audio routing so the "
+                                  "standalone application can monitor your synth."));
 
         for (const bool isPluginMode : { true, false })
         {

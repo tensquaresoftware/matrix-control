@@ -435,11 +435,11 @@ namespace PluginDisplayNames
                 "master keyboard on a DAW track (or MIDI input) to Matrix-Control - not in this "
                 "window. See the user manual for host examples.";
             constexpr const char* kBodyAudioFirstPass =
-                "Choose the audio interface and input so you can hear your synth in "
-                "Matrix-Control. Pick the SYNTH FROM channel(s) that carry the synth output.";
+                "Choose the audio interface, channels, and SYNTH FROM so you can hear your synth in "
+                "Matrix-Control. These are the same audio settings as in Settings.";
             constexpr const char* kBodyAudioResume =
-                "MIDI is already set. One more step: route audio so the standalone application "
-                "can monitor your synth.";
+                "MIDI is already set. One more step: finish audio routing so the standalone "
+                "application can monitor your synth.";
 
             constexpr const char* kConfigureLater = "CONFIGURE LATER";
             constexpr const char* kContinue = "CONTINUE";
