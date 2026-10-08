@@ -140,6 +140,7 @@ void PluginEditor::restoreSettingsPanelFromState(SettingsPanel& panel)
         pluginProcessor.getMidiManager().refreshSysExDelayFromSettings();
     }
 
+    restoreSettingsAppearanceFromState(panel);
     restoreSettingsPolicyCombosFromState(panel);
     refreshInitTemplateDeleteButtons(panel);
     panel.refreshDefragHistoryEnablement(pluginProcessor.hasMutationHistory());
@@ -421,7 +422,9 @@ void PluginEditor::wireSettingsPolicyCombos(SettingsPanel& panel)
 void PluginEditor::wireSettingsPanel(SettingsPanel& panel)
 {
     wireSettingsEpromAndLatency(panel);
+    wireSettingsAppearanceCombos(panel);
     wireSettingsContextualHelpCombo(panel);
+    wireSettingsGettingStartedControls(panel);
     wireSettingsPolicyCombos(panel);
     wireSettingsInitAndMasterActions(panel);
 }

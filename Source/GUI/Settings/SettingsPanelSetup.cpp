@@ -29,17 +29,33 @@ std::unique_ptr<TSS::Button> SettingsPanel::makeButton(TSS::ISkin& skin, int wid
 
 void SettingsPanel::setupInterfaceSection(TSS::ISkin& skin)
 {
+    uiScaleLabel_ = makeLabel(skin, kLabelWidth_, PluginDisplayNames::Settings::kUiScaleRowLabel);
+    uiScaleCombo_ = makeCombo(skin, kComboWidth_);
+    skinLabel_ = makeLabel(skin, kLabelWidth_, PluginDisplayNames::Settings::kSkinRowLabel);
+    skinCombo_ = makeCombo(skin, kComboWidth_);
     infoMessageLabel_ =
         makeLabel(skin, kLabelWidth_, PluginDisplayNames::Settings::kInfoMessageLabel);
     infoMessageCombo_ = makeCombo(skin, kComboWidth_);
     contextualHelpLabel_ =
         makeLabel(skin, kLabelWidth_, PluginDisplayNames::Settings::kContextualHelpLabel);
     contextualHelpCombo_ = makeCombo(skin, kComboWidth_);
+    gettingStartedLabel_ =
+        makeLabel(skin, kLabelWidth_, PluginDisplayNames::Settings::kGettingStartedLabel);
+    gettingStartedAutoOpenCombo_ = makeCombo(skin, kComboWidth_);
+    runSetupAgainButton_ =
+        makeButton(skin, kComboWidth_, PluginDisplayNames::Settings::kRunSetupAgainButton);
 
+    addAndMakeVisible(*uiScaleLabel_);
+    addAndMakeVisible(*uiScaleCombo_);
+    addAndMakeVisible(*skinLabel_);
+    addAndMakeVisible(*skinCombo_);
     addAndMakeVisible(*infoMessageLabel_);
     addAndMakeVisible(*infoMessageCombo_);
     addAndMakeVisible(*contextualHelpLabel_);
     addAndMakeVisible(*contextualHelpCombo_);
+    addAndMakeVisible(*gettingStartedLabel_);
+    addAndMakeVisible(*gettingStartedAutoOpenCombo_);
+    addAndMakeVisible(*runSetupAgainButton_);
 }
 
 void SettingsPanel::setupDeviceSection(TSS::ISkin& skin)
@@ -133,6 +149,19 @@ void SettingsPanel::setupMasterSection(TSS::ISkin& skin)
 
 void SettingsPanel::populateComboItems()
 {
+    using namespace PluginIDs::Settings::ScaleLevels;
+    uiScaleCombo_->addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k50, k50);
+    uiScaleCombo_->addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k75, k75);
+    uiScaleCombo_->addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k100, k100);
+    uiScaleCombo_->addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k125, k125);
+    uiScaleCombo_->addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k150, k150);
+    uiScaleCombo_->addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k175, k175);
+    uiScaleCombo_->addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k200, k200);
+
+    using namespace PluginIDs::Settings::SkinVariants;
+    skinCombo_->addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kBlack, kBlack);
+    skinCombo_->addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kCream, kCream);
+
     using namespace PluginIDs::Settings::InfoMessage;
     infoMessageCombo_->addItem(PluginDisplayNames::Settings::kKeep, kKeep);
     infoMessageCombo_->addItem(PluginDisplayNames::Settings::kAutoClear, kAutoClear);
@@ -140,6 +169,12 @@ void SettingsPanel::populateComboItems()
     using namespace PluginIDs::Settings::ContextualHelp;
     contextualHelpCombo_->addItem(PluginDisplayNames::Settings::kShow, kShow);
     contextualHelpCombo_->addItem(PluginDisplayNames::Settings::kHide, kHide);
+
+    using namespace PluginIDs::Settings::GettingStartedAutoOpen;
+    gettingStartedAutoOpenCombo_->addItem(PluginDisplayNames::Settings::kShowWhenIncomplete,
+                                          kShowWhenIncomplete);
+    gettingStartedAutoOpenCombo_->addItem(PluginDisplayNames::Settings::kNeverAtLaunch,
+                                          kNeverAtLaunch);
 
     using namespace PluginIDs::Settings::Matrix1000PatchesNamesMode;
     matrix1000PatchesCombo_->addItem(PluginDisplayNames::Settings::kDisplayMusicalNames,
@@ -165,8 +200,11 @@ void SettingsPanel::populateComboItems()
 void SettingsPanel::applyComboPopupLooks(TSS::ISkin& skin)
 {
     const auto popupLook = TSS::popupMenuLookFromSkin(skin);
+    uiScaleCombo_->setPopupMenuLook(popupLook);
+    skinCombo_->setPopupMenuLook(popupLook);
     infoMessageCombo_->setPopupMenuLook(popupLook);
     contextualHelpCombo_->setPopupMenuLook(popupLook);
+    gettingStartedAutoOpenCombo_->setPopupMenuLook(popupLook);
     epromTypeCombo_->setPopupMenuLook(popupLook);
     matrix1000PatchesCombo_->setPopupMenuLook(popupLook);
     computerPatchesCombo_->setPopupMenuLook(popupLook);
@@ -180,10 +218,17 @@ void SettingsPanel::applyChildLooks(TSS::ISkin& skin)
     const auto comboLook = TSS::comboBoxLookFromSkin(skin);
     const auto buttonLook = TSS::buttonLookFromSkin(skin);
 
+    uiScaleLabel_->setLook(labelLook);
+    uiScaleCombo_->setLook(comboLook);
+    skinLabel_->setLook(labelLook);
+    skinCombo_->setLook(comboLook);
     infoMessageLabel_->setLook(labelLook);
     infoMessageCombo_->setLook(comboLook);
     contextualHelpLabel_->setLook(labelLook);
     contextualHelpCombo_->setLook(comboLook);
+    gettingStartedLabel_->setLook(labelLook);
+    gettingStartedAutoOpenCombo_->setLook(comboLook);
+    runSetupAgainButton_->setLook(buttonLook);
 
     hardwareLatencyLabel_->setLook(labelLook);
     hardwareLatencySlider_->setLook(TSS::sliderLookButtonLikeFromSkin(skin));
@@ -214,4 +259,60 @@ void SettingsPanel::applyChildLooks(TSS::ISkin& skin)
     masterDeleteInitButton_->setLook(buttonLook);
 
     applyComboPopupLooks(skin);
+}
+
+void SettingsPanel::layoutButtonOnlyRow(juce::Rectangle<int>& bounds,
+                                        const RowLayoutMetrics& metrics,
+                                        TSS::Button& button,
+                                        int buttonWidth)
+{
+    auto row = bounds.removeFromTop(metrics.controlHeight);
+    button.setBounds(row.getX() + metrics.labelWidth, row.getY(), buttonWidth, metrics.controlHeight);
+    button.setUiScale(uiScale_);
+    bounds.removeFromTop(metrics.rowGap);
+}
+
+void SettingsPanel::layoutInterfaceSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics)
+{
+    layoutLabeledControlRow(bounds,
+                            metrics,
+                            LabeledControlRowArgs{ uiScaleLabel_.get(),
+                                                   uiScaleCombo_.get(),
+                                                   metrics.comboWidth });
+    layoutLabeledControlRow(bounds,
+                            metrics,
+                            LabeledControlRowArgs{ skinLabel_.get(),
+                                                   skinCombo_.get(),
+                                                   metrics.comboWidth });
+    layoutLabeledControlRow(bounds,
+                            metrics,
+                            LabeledControlRowArgs{ infoMessageLabel_.get(),
+                                                   infoMessageCombo_.get(),
+                                                   metrics.comboWidth });
+    layoutLabeledControlRow(bounds,
+                            metrics,
+                            LabeledControlRowArgs{ contextualHelpLabel_.get(),
+                                                   contextualHelpCombo_.get(),
+                                                   metrics.comboWidth });
+    layoutLabeledControlRow(bounds,
+                            metrics,
+                            LabeledControlRowArgs{ gettingStartedLabel_.get(),
+                                                   gettingStartedAutoOpenCombo_.get(),
+                                                   metrics.comboWidth });
+    layoutButtonOnlyRow(bounds, metrics, *runSetupAgainButton_, metrics.comboWidth);
+}
+
+void SettingsPanel::setInterfaceSectionVisible(bool visible)
+{
+    uiScaleLabel_->setVisible(visible);
+    uiScaleCombo_->setVisible(visible);
+    skinLabel_->setVisible(visible);
+    skinCombo_->setVisible(visible);
+    infoMessageLabel_->setVisible(visible);
+    infoMessageCombo_->setVisible(visible);
+    contextualHelpLabel_->setVisible(visible);
+    contextualHelpCombo_->setVisible(visible);
+    gettingStartedLabel_->setVisible(visible);
+    gettingStartedAutoOpenCombo_->setVisible(visible);
+    runSetupAgainButton_->setVisible(visible);
 }

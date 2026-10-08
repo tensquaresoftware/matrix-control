@@ -49,8 +49,12 @@ public:
     TSS::ComboBox& getEpromTypeCombo() { return *epromTypeCombo_; }
     TSS::ComboBox& getMatrix1000PatchesCombo() { return *matrix1000PatchesCombo_; }
     TSS::ComboBox& getComputerPatchesCombo() { return *computerPatchesCombo_; }
+    TSS::ComboBox& getUiScaleCombo() { return *uiScaleCombo_; }
+    TSS::ComboBox& getSkinCombo() { return *skinCombo_; }
     TSS::ComboBox& getInfoMessageCombo() { return *infoMessageCombo_; }
     TSS::ComboBox& getContextualHelpCombo() { return *contextualHelpCombo_; }
+    TSS::ComboBox& getGettingStartedAutoOpenCombo() { return *gettingStartedAutoOpenCombo_; }
+    TSS::Button& getRunSetupAgainButton() { return *runSetupAgainButton_; }
     TSS::ComboBox& getUnsavedStateCombo() { return *unsavedStateCombo_; }
     TSS::ComboBox& getDeleteWarningCombo() { return *deleteWarningCombo_; }
 
@@ -107,6 +111,7 @@ private:
     std::unique_ptr<TSS::Button> makeButton(TSS::ISkin& skin, int width, const juce::String& text);
 
     void updatePageVisibility();
+    void setInterfaceSectionVisible(bool visible);
     void layoutContent(juce::Rectangle<int> bounds);
     void layoutInterfaceSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics);
     void layoutDeviceSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics);
@@ -128,6 +133,10 @@ private:
     void layoutButtonRow(juce::Rectangle<int>& bounds,
                          const RowLayoutMetrics& metrics,
                          const ButtonRowLayoutArgs& args);
+    void layoutButtonOnlyRow(juce::Rectangle<int>& bounds,
+                             const RowLayoutMetrics& metrics,
+                             TSS::Button& button,
+                             int buttonWidth);
 
     inline constexpr static int kPadding_ = SettingsShellMetrics::kPadding;
     inline constexpr static int kRowGap_ = 8;
@@ -156,10 +165,17 @@ private:
     int activeTabId_ = 1;
     MatrixDeviceTypes::Type deviceType_ = MatrixDeviceTypes::Type::kUnknown;
 
+    std::unique_ptr<TSS::Label> uiScaleLabel_;
+    std::unique_ptr<TSS::ComboBox> uiScaleCombo_;
+    std::unique_ptr<TSS::Label> skinLabel_;
+    std::unique_ptr<TSS::ComboBox> skinCombo_;
     std::unique_ptr<TSS::Label> infoMessageLabel_;
     std::unique_ptr<TSS::ComboBox> infoMessageCombo_;
     std::unique_ptr<TSS::Label> contextualHelpLabel_;
     std::unique_ptr<TSS::ComboBox> contextualHelpCombo_;
+    std::unique_ptr<TSS::Label> gettingStartedLabel_;
+    std::unique_ptr<TSS::ComboBox> gettingStartedAutoOpenCombo_;
+    std::unique_ptr<TSS::Button> runSetupAgainButton_;
 
     std::unique_ptr<TSS::Label> hardwareLatencyLabel_;
     std::unique_ptr<TSS::Slider> hardwareLatencySlider_;

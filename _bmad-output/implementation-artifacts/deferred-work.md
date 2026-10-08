@@ -2391,3 +2391,21 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-synth-from-audio-input-persistence.md`
   summary: Editor paths that honor `shouldDefer` (`applyAudioCatalogToSettings` / `applyAudioCatalogSelectionOnly`) are not covered by tests — only the pure `decideAudioFromSelectionSync` decision is.
   evidence: Verification Gap; GUI glue without existing harness; same relaunch / catalog-settle smoke as the persistence fix.
+
+## Deferred from: review of spec-gs-1-settings-ui-scale-skin-getting-started-block.md (2026-10-08)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-gs-1-settings-ui-scale-skin-getting-started-block.md`
+  summary: Production Getting Started auto-open load/write via the real Matrix-Control-GettingStarted PropertiesFile (openStore) is not unit-tested.
+  evidence: Verification Gap; injected PropertiesFile& round-trip is covered; isolating Application Support openStore needs a DI surface beyond this story.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-gs-1-settings-ui-scale-skin-getting-started-block.md`
+  summary: Settings User Interface row order and RUN SETUP AGAIN placement are not asserted via live SettingsPanel layout bounds.
+  evidence: Verification Gap; repo unit-test convention leaves Settings layout to human smoke; copy/contract tests only pin display strings.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-gs-1-settings-ui-scale-skin-getting-started-block.md`
+  summary: Settings Scale/Skin apply/restore wiring through PluginEditor is not executed by automated tests.
+  evidence: Verification Gap; Core ID helpers and machine combo persist are covered; editor glue needs a Settings harness or manual Settings↔logo smoke.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-gs-1-settings-ui-scale-skin-getting-started-block.md`
+  summary: Logo menu Scale/Skin item construction is not observed by unit tests (only HeaderPanel section copy strings).
+  evidence: Verification Gap; HeaderLogoPopupMenu is outside current Tests/ linkage; deleting logo columns would not fail the suite.

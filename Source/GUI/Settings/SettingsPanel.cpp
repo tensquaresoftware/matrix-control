@@ -62,8 +62,15 @@ void SettingsPanel::registerContextualHelp(TSS::ContextualHelpBinder::FooterReso
     contextualHelpBinder_ = std::make_unique<TSS::ContextualHelpBinder>(std::move(resolveFooter));
     contextualHelpBinder_->setHostShowingPredicate([this] { return isShowing(); });
 
+    contextualHelpBinder_->bind(uiScaleLabel_.get(), Help::kUiScale);
+    contextualHelpBinder_->bind(uiScaleCombo_.get(), Help::kUiScale);
+    contextualHelpBinder_->bind(skinLabel_.get(), Help::kSkin);
+    contextualHelpBinder_->bind(skinCombo_.get(), Help::kSkin);
     contextualHelpBinder_->bind(infoMessageCombo_.get(), Help::kInfoMessage);
     contextualHelpBinder_->bind(contextualHelpCombo_.get(), Help::kContextualHelp);
+    contextualHelpBinder_->bind(gettingStartedLabel_.get(), Help::kGettingStartedAutoOpen);
+    contextualHelpBinder_->bind(gettingStartedAutoOpenCombo_.get(), Help::kGettingStartedAutoOpen);
+    contextualHelpBinder_->bind(runSetupAgainButton_.get(), Help::kRunSetupAgain);
     contextualHelpBinder_->bind(hardwareLatencySlider_.get(), Help::kHardwareLatency);
     contextualHelpBinder_->bind(epromTypeCombo_.get(), Help::kEpromType);
     contextualHelpBinder_->bind(matrix1000PatchesCombo_.get(), Help::kMatrix1000Patches);
@@ -138,20 +145,6 @@ void SettingsPanel::layoutButtonRow(juce::Rectangle<int>& bounds,
     }
 
     bounds.removeFromTop(metrics.rowGap);
-}
-
-void SettingsPanel::layoutInterfaceSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics)
-{
-    layoutLabeledControlRow(bounds,
-                            metrics,
-                            LabeledControlRowArgs{ infoMessageLabel_.get(),
-                                                   infoMessageCombo_.get(),
-                                                   metrics.comboWidth });
-    layoutLabeledControlRow(bounds,
-                            metrics,
-                            LabeledControlRowArgs{ contextualHelpLabel_.get(),
-                                                   contextualHelpCombo_.get(),
-                                                   metrics.comboWidth });
 }
 
 void SettingsPanel::layoutDeviceSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics)
@@ -357,10 +350,7 @@ void SettingsPanel::updatePageVisibility()
     const bool showLatency = showDevice
                              && SettingsShellMetrics::deviceShowsHardwareLatency(isPluginMode_);
 
-    infoMessageLabel_->setVisible(showUi);
-    infoMessageCombo_->setVisible(showUi);
-    contextualHelpLabel_->setVisible(showUi);
-    contextualHelpCombo_->setVisible(showUi);
+    setInterfaceSectionVisible(showUi);
 
     hardwareLatencyLabel_->setVisible(showLatency);
     hardwareLatencySlider_->setVisible(showLatency);

@@ -147,6 +147,13 @@ namespace PluginDisplayNames
         const juce::String kWindowTitle                = "SETTINGS";
         constexpr const char* kSkinLabel               = "SKIN:";
         constexpr const char* kUiScaleLabel            = "UI SCALE:";
+        // User Interface row labels (no colon — peers of INFO MESSAGE / CONTEXTUAL HELP).
+        constexpr const char* kUiScaleRowLabel         = "UI SCALE";
+        constexpr const char* kSkinRowLabel            = "SKIN";
+        constexpr const char* kGettingStartedLabel     = "GETTING STARTED";
+        constexpr const char* kShowWhenIncomplete      = "SHOW WHEN INCOMPLETE";
+        constexpr const char* kNeverAtLaunch           = "NEVER AT LAUNCH";
+        constexpr const char* kRunSetupAgainButton     = "RUN SETUP AGAIN";
         constexpr const char* kHardwareLatencyLabel    = "HARDWARE LATENCY";
         constexpr const char* kInputGainLabel          = "INPUT GAIN:";
         constexpr const char* kUserInterfaceTab        = "USER INTERFACE";
@@ -233,6 +240,14 @@ namespace PluginDisplayNames
 
         namespace ContextualHelp
         {
+            constexpr const char* kUiScale =
+                "SETTINGS: Sets the user interface scale.";
+            constexpr const char* kSkin =
+                "SETTINGS: Chooses the visual skin for the editor.";
+            constexpr const char* kGettingStartedAutoOpen =
+                "SETTINGS: Chooses whether Getting Started opens at launch when steps are incomplete.";
+            constexpr const char* kRunSetupAgain =
+                "SETTINGS: Runs Getting Started again from the beginning.";
             constexpr const char* kInfoMessage =
                 "SETTINGS: KEEP leaves sticky INFO until replaced; AUTO CLEAR clears INFO after five seconds "
                 "(not WARNING or ERROR). Click the footer severity badge to dismiss any sticky message.";

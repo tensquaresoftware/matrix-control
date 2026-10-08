@@ -209,6 +209,22 @@ namespace PluginIDs
                 return kUiScales[kDefault];
             }
         }
+
+        /** Settings → User Interface Getting Started auto-open combo (machine-scoped). */
+        namespace GettingStartedAutoOpen
+        {
+            constexpr int kShowWhenIncomplete = 1;
+            constexpr int kNeverAtLaunch = 2;
+            constexpr int kDefault = kShowWhenIncomplete;
+
+            constexpr int normalize(int raw) noexcept
+            {
+                if (raw == kShowWhenIncomplete || raw == kNeverAtLaunch)
+                    return raw;
+
+                return kDefault;
+            }
+        }
     }
 
     // PropertiesFile keys for machine-global DEVICE SETUP defaults (not APVTS session ids).
@@ -218,6 +234,8 @@ namespace PluginIDs
         constexpr const char* kMidiInputPortId = "midiInputPortId";
         constexpr const char* kMidiOutputPortId = "midiOutputPortId";
         constexpr const char* kEpromType = "settingsEpromType";
+        // Getting Started auto-open preference (machine-scoped; not Device Setup promptDone).
+        constexpr const char* kGettingStartedAutoOpen = "gettingStartedAutoOpen";
     }
 
     namespace Mode

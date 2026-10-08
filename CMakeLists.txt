@@ -200,6 +200,7 @@ set(PLUGIN_SOURCES
     Source/Core/Services/DeviceMemoryLimits.cpp
     Source/Core/Services/DeviceTypeRegistry.cpp
     Source/Core/Services/DeviceConnectionMachineDefaults.cpp
+    Source/Core/Services/GettingStartedMachineDefaults.cpp
     Source/Core/Services/EpromTypePolicy.cpp
     Source/Core/Services/PatchFileService.cpp
     Source/Core/Services/PatchFileServiceSelection.cpp
@@ -256,6 +257,7 @@ set(PLUGIN_SOURCES
     Source/GUI/PluginEditorWindows.cpp
     Source/GUI/PluginEditorSettingsOverlay.cpp
     Source/GUI/PluginEditorSettings.cpp
+    Source/GUI/PluginEditorSettingsAppearance.cpp
     Source/GUI/PluginEditorSkinScale.cpp
     Source/GUI/PluginEditorHeader.cpp
     Source/GUI/PluginEditorAudio.cpp
@@ -619,6 +621,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/MatrixModalCopyTests.cpp
         Tests/Unit/SettingsTabsShellTests.cpp
         Tests/Unit/DeviceConnectionMachineDefaultsTests.cpp
+        Tests/Unit/GettingStartedSettingsContractTests.cpp
         Tests/Unit/MidiPortComboPopulationTests.cpp
         Tests/Unit/ComboBoxLiveRefreshTests.cpp
         Tests/Unit/SysExInterMessageDelayTests.cpp
@@ -676,6 +679,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/Services/DeviceMemoryLimits.cpp
         Source/Core/Services/DeviceTypeRegistry.cpp
     Source/Core/Services/EpromTypePolicy.cpp
+        Source/Core/Services/GettingStartedMachineDefaults.cpp
         Source/Core/Services/PatchFileService.cpp
     Source/Core/Services/PatchFileServiceSelection.cpp
         Source/Core/Services/PatchFileServiceMutatorExport.cpp
