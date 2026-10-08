@@ -203,17 +203,22 @@ void PluginEditor::openGettingStartedWizard(GettingStartedWizard::Step startStep
     closeEpromTypePromptDialog();
     hideBankTransferProgressDialog();
 
+    // Matrix monochrome chrome only — never follow the live product skin. Cream's
+    // kLabelText is dark (body text); Matrix modal plate stays dark, so those labels
+    // vanish unless the wizard keeps Black chrome (+ dark-panel label looks).
+    auto& matrixChromeSkin = *skinBlack_;
+
     if (gettingStartedWizardDialog_ == nullptr)
     {
         gettingStartedWizardDialog_ = std::make_unique<GettingStartedWizardDialog>(
-            *skin_,
+            matrixChromeSkin,
             ! pluginProcessor.isStandalone(),
             [this] { closeGettingStartedWizard(); });
         addChildComponent(*gettingStartedWizardDialog_);
     }
     else
     {
-        gettingStartedWizardDialog_->setSkin(*skin_);
+        gettingStartedWizardDialog_->setSkin(matrixChromeSkin);
     }
 
     gettingStartedWizardDialog_->prepareForShow(startStep, makeGettingStartedHostBindings());

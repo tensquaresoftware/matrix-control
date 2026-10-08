@@ -56,8 +56,9 @@ void PluginEditor::updateSkin()
     if (epromTypePromptDialog_ != nullptr)
         epromTypePromptDialog_->setSkin(*skin_);
 
+    // GETTING STARTED keeps Matrix monochrome chrome regardless of Black/Cream product skin.
     if (gettingStartedWizardDialog_ != nullptr)
-        gettingStartedWizardDialog_->setSkin(*skin_);
+        gettingStartedWizardDialog_->setSkin(*skinBlack_);
 
 #if JUCE_DEBUG
     if (testComponent_ != nullptr)

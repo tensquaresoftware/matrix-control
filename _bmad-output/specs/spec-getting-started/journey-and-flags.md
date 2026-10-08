@@ -7,10 +7,10 @@ Companion to `SPEC-getting-started`. Product SSOT absorbed from the 2026-10-08 d
 | ID | Title band | Body controls | Applicability |
 |----|------------|---------------|---------------|
 | 0 | `GETTING STARTED` | Intro copy only — no controls | All formats — first contact / Run Setup Again |
-| 1 | `GETTING STARTED — STEP 1 : USER INTERFACE` | UI Scale, Skin | All |
-| 2 | `GETTING STARTED — STEP 2 : SYNTH COMMUNICATION` | Synth From, Synth To, DEVICE, EPROM (+ firmware suggestion suffix when relevant) | All |
-| 3 | `GETTING STARTED — STEP 3 : MIDI KEYBOARD` | See below | All (content differs) |
-| 4 | `GETTING STARTED — STEP 4 : AUDIO` | Digeste audio (see below) | **Standalone only** |
+| 1 | `GETTING STARTED | STEP 1: USER INTERFACE` | UI Scale, Skin | All |
+| 2 | `GETTING STARTED | STEP 2: SYNTH COMMUNICATION` | Synth From, Synth To, DEVICE, EPROM (+ firmware suggestion suffix when relevant) | All |
+| 3 | `GETTING STARTED | STEP 3: MIDI KEYBOARD` | See below | All (content differs) |
+| 4 | `GETTING STARTED | STEP 4: AUDIO` | Digeste audio (see below) | **Standalone only** |
 
 Body help copy: `ui-copy.md`.
 

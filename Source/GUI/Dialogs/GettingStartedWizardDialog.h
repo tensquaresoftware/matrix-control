@@ -22,7 +22,8 @@ namespace TSS
     class ISkin;
 }
 
-/** GETTING STARTED wizard: Matrix chrome, live step controls, nav marking durable flags. */
+/** GETTING STARTED wizard: Matrix monochrome chrome (pass Black skin; ignore Cream),
+    live step controls, nav marking durable flags. */
 class GettingStartedWizardDialog : public juce::Component,
                                    private juce::Timer
 {

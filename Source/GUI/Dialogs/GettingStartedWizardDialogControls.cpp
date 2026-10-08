@@ -13,7 +13,8 @@ using GettingStartedWizard::Step;
 void GettingStartedWizardDialog::buildStepControls(TSS::ISkin& skin)
 {
     const auto comboStyle = TSS::ComboBox::Style::ButtonLike;
-    const auto labelLook = TSS::labelLookFromSkin(skin);
+    // Dark-panel label colour — Matrix chrome body is always a dark plate.
+    const auto labelLook = TSS::darkPanelLabelLookFromSkin(skin);
     const auto comboLook = TSS::comboBoxLookFromSkin(skin);
     const auto popupLook = TSS::popupMenuLookFromSkin(skin);
 
@@ -80,7 +81,7 @@ void GettingStartedWizardDialog::populateScaleAndSkinItems()
 
 void GettingStartedWizardDialog::applyControlLooks(TSS::ISkin& skin)
 {
-    const auto labelLook = TSS::labelLookFromSkin(skin);
+    const auto labelLook = TSS::darkPanelLabelLookFromSkin(skin);
     const auto comboLook = TSS::comboBoxLookFromSkin(skin);
     const auto popupLook = TSS::popupMenuLookFromSkin(skin);
 

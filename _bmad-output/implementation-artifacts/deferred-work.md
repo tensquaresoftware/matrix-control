@@ -2454,3 +2454,15 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-gs-3-getting-started-steps-flags-plugin-standalone.md`
   summary: ExportMatrixModals Getting Started frames open with empty HostBindings (no ports / DEVICE / digeste audio).
   evidence: Blind Hunter — tooling export pack gap, not the product onboarding path.
+
+## Deferred from: oneshot review of spec-getting-started-intro-copy.md (2026-10-09)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-getting-started-intro-copy.md`
+  summary: Done GS-2 artifact still lists intro body budget 110 / dialog height 238 after the three-paragraph intro metrics bump.
+  evidence: Historical done-spec geometry summary drift only; runtime uses GettingStartedWizardMetrics.
+- source_spec: `_bmad-output/implementation-artifacts/spec-getting-started-intro-copy.md`
+  summary: Decisions plan archive §6 still quotes the pre-framing single-paragraph intro; ui-copy.md is the live frozen companion.
+  evidence: Intentionally left archive unchanged; ui-copy provenance note now states supersession.
+- source_spec: `_bmad-output/implementation-artifacts/spec-getting-started-intro-copy.md`
+  summary: No automated assert that Getting Started stays on skinBlack_ when product skin is Cream.
+  evidence: Policy lives at PluginEditor bind sites + darkPanelLabelLook; PluginEditor harness out of unit-test style.

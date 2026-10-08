@@ -91,13 +91,13 @@ private:
         expectEquals(juce::String(GettingStartedWizard::titleFor(Step::kIntro)),
                      juce::String("GETTING STARTED"));
         expectEquals(juce::String(GettingStartedWizard::titleFor(Step::kUserInterface)),
-                     juce::String("GETTING STARTED - STEP 1: USER INTERFACE"));
+                     juce::String("GETTING STARTED | STEP 1: USER INTERFACE"));
         expectEquals(juce::String(GettingStartedWizard::titleFor(Step::kSynthCommunication)),
-                     juce::String("GETTING STARTED - STEP 2: SYNTH COMMUNICATION"));
+                     juce::String("GETTING STARTED | STEP 2: SYNTH COMMUNICATION"));
         expectEquals(juce::String(GettingStartedWizard::titleFor(Step::kMidiKeyboard)),
-                     juce::String("GETTING STARTED - STEP 3: MIDI KEYBOARD"));
+                     juce::String("GETTING STARTED | STEP 3: MIDI KEYBOARD"));
         expectEquals(juce::String(GettingStartedWizard::titleFor(Step::kAudio)),
-                     juce::String("GETTING STARTED - STEP 4: AUDIO"));
+                     juce::String("GETTING STARTED | STEP 4: AUDIO"));
 
         for (const auto step : kAllSteps)
         {
@@ -111,12 +111,16 @@ private:
     {
         beginTest("Body copy - ui-copy.md text per step and format");
 
-        expectEquals(juce::String(GettingStartedWizard::bodyFor(Step::kIntro, false)),
-                     juce::String("Welcome to Matrix-Control, a modern SysEx editor for the Oberheim "
-                                  "Matrix-1000, 6, and 6R synthesizers.\n\n"
-                                  "We'll set appearance, MIDI connection, optional keyboard input, and audio "
-                                  "monitoring (standalone application only) so you can edit, play, and hear "
-                                  "your synth. Continue, or choose Configure later and finish in Settings."));
+        const juce::String introBody(
+            "Welcome to Matrix-Control, a modern SysEx editor for the Oberheim "
+            "Matrix-1000, 6, and 6R synthesizers.\n\n"
+            "During this setup, we'll set appearance, MIDI connection, optional keyboard "
+            "input, and audio monitoring (standalone application only) so you can edit, "
+            "play, and hear your synth.\n\n"
+            "Continue, or choose Configure later and finish in Settings.");
+        expectEquals(juce::String(GettingStartedWizard::bodyFor(Step::kIntro, false)), introBody);
+        expectEquals(juce::String(GettingStartedWizard::bodyFor(Step::kIntro, true)), introBody);
+        expectEquals(GettingStartedWizardMetrics::kBodyIntroDesignHeight, 156);
         expectEquals(juce::String(GettingStartedWizard::bodyFor(Step::kUserInterface, true)),
                      juce::String("Start with UI scale and skin so the next steps stay readable on your "
                                   "screen. You can change these anytime from the logo menu or Settings."));

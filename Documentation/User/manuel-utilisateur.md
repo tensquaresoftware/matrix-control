@@ -154,9 +154,9 @@ Une fois que vous avez quitté l’introduction avec `CONTINUE`, une réouvertur
 | Étape | Titre à l’écran | Ce que vous réglez |
 |-------|-----------------|--------------------|
 | 0 | `GETTING STARTED` | Introduction — aucun contrôle, seulement `CONFIGURE LATER` ou `CONTINUE` |
-| 1 | `GETTING STARTED - STEP 1: USER INTERFACE` | `UI SCALE` et `SKIN` (lisibilité sur votre écran) |
-| 2 | `GETTING STARTED - STEP 2: SYNTH COMMUNICATION` | Ports MIDI vers / depuis le synthé (`MIDI FROM` / `MIDI TO`, même rôle que `SYNTH FROM` / `SYNTH TO` dans Settings → `MIDI`), badge `DEVICE`, type `EPROM TYPE` |
-| 3 | `GETTING STARTED - STEP 3: MIDI KEYBOARD` | Clavier — contenu différent en plugin et en Standalone (voir ci-dessous) |
+| 1 | `GETTING STARTED | STEP 1: USER INTERFACE` | `UI SCALE` et `SKIN` (lisibilité sur votre écran) |
+| 2 | `GETTING STARTED | STEP 2: SYNTH COMMUNICATION` | Ports MIDI vers / depuis le synthé (`MIDI FROM` / `MIDI TO`, même rôle que `SYNTH FROM` / `SYNTH TO` dans Settings → `MIDI`), badge `DEVICE`, type `EPROM TYPE` |
+| 3 | `GETTING STARTED | STEP 3: MIDI KEYBOARD` | Clavier — contenu différent en plugin et en Standalone (voir ci-dessous) |
 
 `CONFIGURE LATER` et `CONTINUE` n’apparaissent que sur l’**introduction**. Les étapes suivantes utilisent `PREVIOUS`, `NEXT`, éventuellement `SKIP` (clavier Standalone), et `FINISH` sur la dernière étape applicable.
 
@@ -176,7 +176,7 @@ En application autonome, l’assistant ajoute une quatrième étape :
 
 | Étape | Titre à l’écran | Ce que vous réglez |
 |-------|-----------------|--------------------|
-| 4 | `GETTING STARTED - STEP 4: AUDIO` | Interface / entrée audio pour écouter le synthé, et canaux d’écoute `SYNTH FROM` (Settings → `AUDIO` — distincts du port MIDI du même nom) |
+| 4 | `GETTING STARTED | STEP 4: AUDIO` | Interface / entrée audio pour écouter le synthé, et canaux d’écoute `SYNTH FROM` (Settings → `AUDIO` — distincts du port MIDI du même nom) |
 
 - À l’étape clavier : liste `KEYBOARD FROM` ; vous pouvez `SKIP` si vous jouez sur le clavier intégré d’un Matrix-6, ou si vous n’avez pas encore de clavier maître. `SKIP` marque l’étape clavier comme **terminée** pour l’ouverture automatique et les rappels, sans choisir de port
 - La dernière étape est l’Audio : `FINISH` ferme l’assistant et marque cette étape comme terminée pour l’ouverture automatique (même si l’écoute n’est pas encore parfaite)

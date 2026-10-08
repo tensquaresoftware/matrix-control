@@ -14,7 +14,9 @@ namespace GettingStartedWizardMetrics
 
     // Body help text budgets (design px): frozen copy at the shared modal body font (~13 px line step)
     // plus about half a line of slack. The Synth Communication firmware-suggestion suffix is not included.
-    inline constexpr int kBodyIntroDesignHeight = 110;
+    // Intro: three paragraphs (welcome / setup framing / Continue CTA) with two blank separators;
+    // budget covers wrap at Settings-width body inset (~10% sides) plus ~1.5 line slack.
+    inline constexpr int kBodyIntroDesignHeight = 156;
     inline constexpr int kBodyUserInterfaceDesignHeight = 46;
     inline constexpr int kBodySynthCommunicationDesignHeight = 58;
     inline constexpr int kBodyMidiKeyboardStandaloneDesignHeight = 46;

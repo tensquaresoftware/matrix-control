@@ -1,18 +1,23 @@
 # Frozen English UI copy (GETTING STARTED)
 
-Absorbed from decisions plan §6. Do not invent alternate wording in Build without updating this companion and the product SSOT together.
+Product SSOT for wizard titles/body (with `PluginDisplayNames::Dialogs::GettingStarted`).
+Originally absorbed from decisions plan §6; intro framing and step title `|` separator supersede
+that archive quote — update this file and the code together, not the historical plan.
 
 Button / title labels (ASCII):
 
-- Titles: `GETTING STARTED`; `GETTING STARTED — STEP 1 : USER INTERFACE`; `GETTING STARTED — STEP 2 : SYNTH COMMUNICATION`; `GETTING STARTED — STEP 3 : MIDI KEYBOARD`; `GETTING STARTED — STEP 4 : AUDIO`
+- Titles: `GETTING STARTED`; `GETTING STARTED | STEP 1: USER INTERFACE`; `GETTING STARTED | STEP 2: SYNTH COMMUNICATION`; `GETTING STARTED | STEP 3: MIDI KEYBOARD`; `GETTING STARTED | STEP 4: AUDIO`
 - Buttons: `CONFIGURE LATER`, `CONTINUE`, `PREVIOUS`, `NEXT`, `SKIP`, `FINISH`
 - Settings: `GETTING STARTED`, `SHOW WHEN INCOMPLETE`, `NEVER AT LAUNCH`, `RUN SETUP AGAIN`
 - Settings order labels: `UI SCALE`, `SKIN`, `INFO MESSAGE`, `CONTEXTUAL HELP` (existing)
 
-## Étape 0 — GETTING STARTED
+## STEP 0 — GETTING STARTED
 
 > Welcome to Matrix-Control, a modern SysEx editor for the Oberheim Matrix-1000, 6, and 6R synthesizers.  
-> We'll set appearance, MIDI connection, optional keyboard input, and audio monitoring (standalone application only) so you can edit, play, and hear your synth. Continue, or choose Configure later and finish in Settings.
+>
+> During this setup, we'll set appearance, MIDI connection, optional keyboard input, and audio monitoring (standalone application only) so you can edit, play, and hear your synth.  
+>
+> Continue, or choose Configure later and finish in Settings.
 
 ## STEP 1 — USER INTERFACE
 

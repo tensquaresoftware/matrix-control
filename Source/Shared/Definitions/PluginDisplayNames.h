@@ -400,18 +400,19 @@ namespace PluginDisplayNames
         namespace GettingStarted
         {
             constexpr const char* kTitleIntro = "GETTING STARTED";
-            constexpr const char* kTitleUserInterface = "GETTING STARTED - STEP 1: USER INTERFACE";
+            constexpr const char* kTitleUserInterface = "GETTING STARTED | STEP 1: USER INTERFACE";
             constexpr const char* kTitleSynthCommunication =
-                "GETTING STARTED - STEP 2: SYNTH COMMUNICATION";
-            constexpr const char* kTitleMidiKeyboard = "GETTING STARTED - STEP 3: MIDI KEYBOARD";
-            constexpr const char* kTitleAudio = "GETTING STARTED - STEP 4: AUDIO";
+                "GETTING STARTED | STEP 2: SYNTH COMMUNICATION";
+            constexpr const char* kTitleMidiKeyboard = "GETTING STARTED | STEP 3: MIDI KEYBOARD";
+            constexpr const char* kTitleAudio = "GETTING STARTED | STEP 4: AUDIO";
 
             constexpr const char* kBodyIntro =
                 "Welcome to Matrix-Control, a modern SysEx editor for the Oberheim "
                 "Matrix-1000, 6, and 6R synthesizers.\n\n"
-                "We'll set appearance, MIDI connection, optional keyboard input, and audio "
-                "monitoring (standalone application only) so you can edit, play, and hear your "
-                "synth. Continue, or choose Configure later and finish in Settings.";
+                "During this setup, we'll set appearance, MIDI connection, optional keyboard "
+                "input, and audio monitoring (standalone application only) so you can edit, "
+                "play, and hear your synth.\n\n"
+                "Continue, or choose Configure later and finish in Settings.";
             constexpr const char* kBodyUserInterface =
                 "Start with UI scale and skin so the next steps stay readable on your screen. "
                 "You can change these anytime from the logo menu or Settings.";
