@@ -7,6 +7,7 @@
 #include "GUI/About/AboutWindow.h"
 #include "GUI/Dialogs/BankTransferProgressDialog.h"
 #include "GUI/Dialogs/EpromTypePromptDialog.h"
+#include "GUI/Dialogs/GettingStartedWizardDialog.h"
 #include "GUI/Dialogs/MasterInitConfirmDialog.h"
 #include "GUI/Dialogs/MasterM1kmLoadChoiceDialog.h"
 #include "GUI/Dialogs/MutatorHistoryDefragConfirmDialog.h"
@@ -54,6 +55,9 @@ void PluginEditor::updateSkin()
 
     if (epromTypePromptDialog_ != nullptr)
         epromTypePromptDialog_->setSkin(*skin_);
+
+    if (gettingStartedWizardDialog_ != nullptr)
+        gettingStartedWizardDialog_->setSkin(*skin_);
 
 #if JUCE_DEBUG
     if (testComponent_ != nullptr)
@@ -123,6 +127,8 @@ void PluginEditor::updateOverlayLayoutsForUiScale(float uiScale)
                     [this](float scale) { updateMutatorHistoryDefragConfirmDialogLayout(scale); });
     layoutIfVisible(epromTypePromptDialog_,
                     [this](float scale) { updateEpromTypePromptDialogLayout(scale); });
+    layoutIfVisible(gettingStartedWizardDialog_,
+                    [this](float scale) { updateGettingStartedWizardLayout(scale); });
     layoutIfVisible(bankTransferProgressDialog_,
                     [this](float scale) { updateBankTransferProgressDialogLayout(scale); });
 }

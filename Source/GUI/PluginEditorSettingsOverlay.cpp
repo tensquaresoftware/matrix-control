@@ -139,6 +139,7 @@ void PluginEditor::syncPanicFromMidiOutputState()
 
 void PluginEditor::openSettingsWindow()
 {
+    closeGettingStartedWizard();
     closeAboutWindow();
     closeMutatorHistoryDefragConfirmDialog();
 

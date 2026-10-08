@@ -2424,3 +2424,12 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-gs-1-settings-ui-scale-skin-getting-started-block.md`
   summary: Reconfirmed — Logo menu Scale/Skin item construction is not observed by unit tests (only section copy strings).
   evidence: Code review Verification Gap; same as build-review deferral above.
+
+## Deferred from: build review of spec-gs-2-getting-started-wizard-shell-and-navigation.md (2026-10-08)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-gs-2-getting-started-wizard-shell-and-navigation.md`
+  summary: Getting Started wizard overlay lifecycle (open from Settings, Escape / outside dismiss, peer mutual exclusion) has no automated PluginEditor harness coverage.
+  evidence: Verification Gap; Flow/metrics contract tests match project GUI unit-test convention; interactive in-editor smoke still recommended.
+- source_spec: `_bmad-output/implementation-artifacts/spec-gs-2-getting-started-wizard-shell-and-navigation.md`
+  summary: Product companion ui-copy.md still shows em dashes / spaced colons while PluginDisplayNames freezes ASCII forms required by the display-string rule.
+  evidence: ASCII display SSOT wins for painted strings; syncing the companion markdown is a doc follow-up, not a runtime defect.

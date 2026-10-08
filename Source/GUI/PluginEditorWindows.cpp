@@ -71,6 +71,7 @@ void PluginEditor::updateBankTransferProgressDialogLayout(float uiScale)
 
 void PluginEditor::openAboutWindow()
 {
+    closeGettingStartedWizard();
     closeSettingsWindow();
     closeMutatorHistoryDefragConfirmDialog();
 
@@ -114,6 +115,7 @@ void PluginEditor::closeAboutWindow()
 void PluginEditor::openMasterInitConfirmDialog(const juce::String& moduleDisplayName,
                                                std::function<void()> onConfirm)
 {
+    closeGettingStartedWizard();
     closeSettingsWindow();
     closeAboutWindow();
 
@@ -144,6 +146,7 @@ void PluginEditor::openMasterInitConfirmDialog(const juce::String& moduleDisplay
 
 void PluginEditor::openMasterGlobalInitConfirmDialog(std::function<void()> onConfirm)
 {
+    closeGettingStartedWizard();
     closeSettingsWindow();
     closeAboutWindow();
 
@@ -323,6 +326,7 @@ void PluginEditor::openEpromTypePromptDialog()
     const juce::String deviceVersion = state.getProperty("deviceVersion", juce::String()).toString().trim();
 
     closeMasterM1kmLoadChoiceDialog();
+    closeGettingStartedWizard();
 
     ensureEpromTypePromptDialog();
     epromTypePromptDialog_->prepareForShow({
@@ -369,6 +373,7 @@ void PluginEditor::closeEpromTypePromptDialog()
 
 void PluginEditor::showBankTransferProgressDialog(const BankTransferProgressShowRequest& request)
 {
+    closeGettingStartedWizard();
     closeSettingsWindow();
     closeAboutWindow();
 

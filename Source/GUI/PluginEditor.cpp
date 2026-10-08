@@ -5,6 +5,7 @@
 #include "GUI/About/AboutWindow.h"
 #include "GUI/Dialogs/BankTransferProgressDialog.h"
 #include "GUI/Dialogs/EpromTypePromptDialog.h"
+#include "GUI/Dialogs/GettingStartedWizardDialog.h"
 #include "GUI/Dialogs/MasterInitConfirmDialog.h"
 #include "GUI/Dialogs/MasterM1kmLoadChoiceDialog.h"
 #include "GUI/Dialogs/MutatorHistoryDefragConfirmDialog.h"
@@ -245,6 +246,7 @@ bool PluginEditor::isEditorialUndoBlockedByModalOverlay() const
         || visible(masterM1kmLoadChoiceDialog_)
         || visible(mutatorHistoryDefragConfirmDialog_)
         || visible(epromTypePromptDialog_)
+        || visible(gettingStartedWizardDialog_)
         || visible(bankTransferProgressDialog_);
 }
 

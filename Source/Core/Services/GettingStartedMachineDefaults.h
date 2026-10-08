@@ -12,7 +12,4 @@ namespace Core::GettingStartedMachineDefaults
 
     int loadAutoOpenPreference();
     void writeAutoOpenPreference(int autoOpenId);
-
-    /** GS-1 RUN SETUP AGAIN: intentional no-op until GS-2/GS-3 open the wizard. */
-    inline void runSetupAgainNoOp() noexcept {}
 }

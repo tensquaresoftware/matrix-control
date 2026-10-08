@@ -19,7 +19,6 @@ public:
         scaleAndSkinSettingsShareLogoApvtsKeys();
         logoMenuScaleAndSkinSectionCopy();
         autoOpenPreferencePersistsAndDefaults();
-        runSetupAgainDoesNotMutateGettingStartedPreference();
     }
 
 private:
@@ -149,31 +148,6 @@ private:
             expectEquals(Core::GettingStartedMachineDefaults::readAutoOpenPreference(*reopened),
                          kDefault);
         }
-
-        prefsFile.getParentDirectory().deleteRecursively();
-    }
-
-    void runSetupAgainDoesNotMutateGettingStartedPreference()
-    {
-        beginTest("Run Setup Again - Settings onClick handler does not change auto-open preference");
-
-        using namespace PluginIDs::Settings::GettingStartedAutoOpen;
-
-        const auto prefsFile = makeTempPrefsFile();
-        auto store = openTempStore(prefsFile);
-        expect(store != nullptr);
-        if (store == nullptr)
-            return;
-
-        Core::GettingStartedMachineDefaults::writeAutoOpenPreference(*store, kNeverAtLaunch);
-        const auto before = Core::GettingStartedMachineDefaults::readAutoOpenPreference(*store);
-        expectEquals(before, kNeverAtLaunch);
-
-        // Same callable assigned to Settings RUN SETUP AGAIN onClick in PluginEditor.
-        const auto onClickHandler = Core::GettingStartedMachineDefaults::runSetupAgainNoOp;
-        onClickHandler();
-
-        expectEquals(Core::GettingStartedMachineDefaults::readAutoOpenPreference(*store), before);
 
         prefsFile.getParentDirectory().deleteRecursively();
     }

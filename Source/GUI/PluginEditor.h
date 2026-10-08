@@ -9,6 +9,7 @@
 #include "Core/PluginProcessor.h"
 #include "MainComponent.h"
 #include "GUI/Dialogs/BankTransferProgressDialog.h"
+#include "GUI/Dialogs/GettingStartedWizardFlow.h"
 #include "GUI/Helpers/EditorChromeShortcuts.h"
 #include "GUI/Layout/PanelDimensions.h"
 #include "Skins/Skin.h"
@@ -29,6 +30,7 @@ class MasterInitConfirmDialog;
 class MasterM1kmLoadChoiceDialog;
 class MutatorHistoryDefragConfirmDialog;
 class EpromTypePromptDialog;
+class GettingStartedWizardDialog;
 class PatchNameDisplayPanel;
 
 class PluginEditor : public juce::AudioProcessorEditor,
@@ -202,6 +204,8 @@ private:
     void openEpromTypePromptDialog();
     void closeEpromTypePromptDialog();
     void ensureEpromTypePromptDialog();
+    void openGettingStartedWizard(GettingStartedWizard::Step startStep);
+    void closeGettingStartedWizard();
     void applyEpromTypePromptSelection(int selectedId);
     void applyEpromTypePromptSpecifyLater();
     void refreshEpromTypePromptDialogLiveState();
@@ -236,6 +240,7 @@ private:
     void updateMasterM1kmLoadChoiceDialogLayout(float uiScale);
     void updateMutatorHistoryDefragConfirmDialogLayout(float uiScale);
     void updateEpromTypePromptDialogLayout(float uiScale);
+    void updateGettingStartedWizardLayout(float uiScale);
     void updateBankTransferProgressDialogLayout(float uiScale);
 
     void applySkinFromItemId(int skinItemId, bool persistToState = true);
@@ -259,6 +264,7 @@ private:
     std::unique_ptr<MasterM1kmLoadChoiceDialog> masterM1kmLoadChoiceDialog_;
     std::unique_ptr<MutatorHistoryDefragConfirmDialog> mutatorHistoryDefragConfirmDialog_;
     std::unique_ptr<EpromTypePromptDialog> epromTypePromptDialog_;
+    std::unique_ptr<GettingStartedWizardDialog> gettingStartedWizardDialog_;
     std::unique_ptr<BankTransferProgressDialog> bankTransferProgressDialog_;
     float appliedUiScale_ = 1.0f;
     std::unique_ptr<HeaderRefreshTimer> headerRefreshTimer_;

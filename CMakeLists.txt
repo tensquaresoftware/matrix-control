@@ -258,6 +258,7 @@ set(PLUGIN_SOURCES
     Source/GUI/PluginEditorSettingsOverlay.cpp
     Source/GUI/PluginEditorSettings.cpp
     Source/GUI/PluginEditorSettingsAppearance.cpp
+    Source/GUI/PluginEditorGettingStarted.cpp
     Source/GUI/PluginEditorSkinScale.cpp
     Source/GUI/PluginEditorHeader.cpp
     Source/GUI/PluginEditorAudio.cpp
@@ -268,6 +269,7 @@ set(PLUGIN_SOURCES
     Source/GUI/Dialogs/DialogMatrixHelpers.cpp
     Source/GUI/Dialogs/EpromTypePromptDialog.cpp
     Source/GUI/Dialogs/EpromTypePromptDialogLayout.cpp
+    Source/GUI/Dialogs/GettingStartedWizardDialog.cpp
     Source/GUI/Dialogs/MasterInitConfirmDialog.cpp
     Source/GUI/Dialogs/MasterM1kmLoadChoiceDialog.cpp
     Source/GUI/Dialogs/MatrixOrderedConfirmDialog.cpp
@@ -622,6 +624,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/SettingsTabsShellTests.cpp
         Tests/Unit/DeviceConnectionMachineDefaultsTests.cpp
         Tests/Unit/GettingStartedSettingsContractTests.cpp
+        Tests/Unit/GettingStartedWizardContractTests.cpp
         Tests/Unit/MidiPortComboPopulationTests.cpp
         Tests/Unit/ComboBoxLiveRefreshTests.cpp
         Tests/Unit/SysExInterMessageDelayTests.cpp

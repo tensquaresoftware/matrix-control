@@ -13,6 +13,7 @@
 #include "Core/Services/DeviceTypeRegistry.h"
 #include "Core/Services/EpromTypePolicy.h"
 #include "GUI/Dialogs/EpromTypePromptDialog.h"
+#include "GUI/Dialogs/GettingStartedWizardDialog.h"
 #include "GUI/Dialogs/MasterInitConfirmDialog.h"
 #include "GUI/Dialogs/MasterM1kmLoadChoiceDialog.h"
 #include "GUI/Dialogs/MutatorHistoryDefragConfirmDialog.h"
@@ -282,7 +283,8 @@ bool PluginEditor::isEscapeBlockedByOverlay() const
     return visible(settingsWindow_) || visible(aboutWindow_)
         || visible(masterInitConfirmDialog_) || isMasterM1kmLoadChoiceDialogVisible()
         || visible(mutatorHistoryDefragConfirmDialog_)
-        || visible(epromTypePromptDialog_) || visible(bankTransferProgressDialog_);
+        || visible(epromTypePromptDialog_) || visible(gettingStartedWizardDialog_)
+        || visible(bankTransferProgressDialog_);
 }
 
 SettingsPanel* PluginEditor::getSettingsPanelIfOpen()

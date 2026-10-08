@@ -4,9 +4,6 @@
 #include "PluginEditor.h"
 #include "PluginEditorInternal.h"
 
-#include <array>
-#include <memory>
-
 #include "Core/Services/DeviceConnectionMachineDefaults.h"
 #include "Core/Services/DeviceTypeRegistry.h"
 #include "Core/Services/EpromTypePolicy.h"
@@ -283,6 +280,7 @@ void PluginEditor::openMasterM1kmLoadChoiceDialog(std::function<void()> onMaster
                                                   std::function<void()> onFullMaster)
 {
     closeAboutWindow();
+    closeGettingStartedWizard();
     closeMasterInitConfirmDialog();
     closeMutatorHistoryDefragConfirmDialog();
     closeEpromTypePromptDialog();
@@ -440,6 +438,7 @@ void PluginEditor::updateMutatorHistoryDefragConfirmDialogLayout(float uiScale)
 
 void PluginEditor::openMutatorHistoryDefragConfirmDialog(std::function<void()> onConfirm)
 {
+    closeGettingStartedWizard();
     closeSettingsWindow();
     closeAboutWindow();
     closeMasterInitConfirmDialog();

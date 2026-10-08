@@ -9,6 +9,8 @@
 #include "GUI/About/AboutWindow.h"
 #include "GUI/Dialogs/BankTransferProgressDialog.h"
 #include "GUI/Dialogs/EpromTypePromptDialog.h"
+#include "GUI/Dialogs/GettingStartedWizardDialog.h"
+#include "GUI/Dialogs/GettingStartedWizardFlow.h"
 #include "GUI/Dialogs/MasterInitConfirmDialog.h"
 #include "GUI/Dialogs/MasterM1kmLoadChoiceDialog.h"
 #include "GUI/Dialogs/MatrixOrderedConfirmDialog.h"
@@ -99,6 +101,23 @@ namespace
     {
         MatrixOrderedConfirmDialog dialog(skin, uiScale, options);
         snapshotComponent(dialog, uiScale, baseName);
+    }
+
+    void exportGettingStartedWizard(TSS::ISkin& skin, float uiScale)
+    {
+        for (const bool isPluginMode : { true, false })
+        {
+            for (const auto step : GettingStartedWizard::applicableSteps(isPluginMode))
+            {
+                GettingStartedWizardDialog dialog(skin, isPluginMode, [] {});
+                dialog.setUiScale(uiScale);
+                dialog.prepareForShow(step);
+                snapshotComponent(dialog,
+                                  uiScale,
+                                  juce::String("20-getting-started-") + (isPluginMode ? "plugin" : "standalone")
+                                      + "-step" + juce::String(static_cast<int>(step)));
+            }
+        }
     }
 
     void exportAllAtScale(TSS::ISkin& skin, float uiScale, juce::AudioDeviceManager& deviceManager)
@@ -284,6 +303,8 @@ namespace
             settings.setActiveTab(PluginIDs::Settings::LastTab::kAudio);
             snapshotComponent(settings, uiScale, "19-settings-audio");
         }
+
+        exportGettingStartedWizard(skin, uiScale);
     }
 }
 

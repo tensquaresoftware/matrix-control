@@ -395,6 +395,54 @@ namespace PluginDisplayNames
             constexpr const char* kSpecifyLater = "SPECIFY LATER";
         }
 
+        // GETTING STARTED wizard (frozen copy: _bmad-output/specs/spec-getting-started/ui-copy.md).
+        // ASCII only: dash and colon follow _bmad/custom/ascii-display-strings.md.
+        namespace GettingStarted
+        {
+            constexpr const char* kTitleIntro = "GETTING STARTED";
+            constexpr const char* kTitleUserInterface = "GETTING STARTED - STEP 1: USER INTERFACE";
+            constexpr const char* kTitleSynthCommunication =
+                "GETTING STARTED - STEP 2: SYNTH COMMUNICATION";
+            constexpr const char* kTitleMidiKeyboard = "GETTING STARTED - STEP 3: MIDI KEYBOARD";
+            constexpr const char* kTitleAudio = "GETTING STARTED - STEP 4: AUDIO";
+
+            constexpr const char* kBodyIntro =
+                "Welcome to Matrix-Control, a modern SysEx editor for the Oberheim "
+                "Matrix-1000, 6, and 6R synthesizers.\n\n"
+                "We'll set appearance, MIDI connection, optional keyboard input, and audio "
+                "monitoring (standalone application only) so you can edit, play, and hear your "
+                "synth. Continue, or choose Configure later and finish in Settings.";
+            constexpr const char* kBodyUserInterface =
+                "Start with UI scale and skin so the next steps stay readable on your screen. "
+                "You can change these anytime from the logo menu or Settings.";
+            constexpr const char* kBodySynthCommunication =
+                "Select the MIDI ports wired to your synth and the EPROM type installed in it. "
+                "Wait until the device is recognized when possible - this unlocks reliable "
+                "editing and timing.";
+            constexpr const char* kBodySynthCommunicationSuggestionSuffix =
+                "\n\nA suggestion is preselected from the reported firmware version when possible.";
+            constexpr const char* kBodyMidiKeyboardStandalone =
+                "If you use a separate MIDI keyboard, choose it here. Matrix-6 owners who play "
+                "the built-in keys can skip this step.";
+            constexpr const char* kBodyMidiKeyboardPlugin =
+                "When Matrix-Control runs as a plugin, MIDI notes come from the host. Route your "
+                "master keyboard on a DAW track (or MIDI input) to Matrix-Control - not in this "
+                "window. See the user manual for host examples.";
+            constexpr const char* kBodyAudioFirstPass =
+                "Choose the audio interface and input so you can hear your synth in "
+                "Matrix-Control. Pick the SYNTH FROM channel(s) that carry the synth output.";
+            constexpr const char* kBodyAudioResume =
+                "MIDI is already set. One more step: route audio so the standalone application "
+                "can monitor your synth.";
+
+            constexpr const char* kConfigureLater = "CONFIGURE LATER";
+            constexpr const char* kContinue = "CONTINUE";
+            constexpr const char* kPrevious = "PREVIOUS";
+            constexpr const char* kNext = "NEXT";
+            constexpr const char* kSkip = "SKIP";
+            constexpr const char* kFinish = "FINISH";
+        }
+
         namespace MasterGlobalInitConfirm
         {
             constexpr const char* kTitle = "RESET ALL MASTER MODULES?";
