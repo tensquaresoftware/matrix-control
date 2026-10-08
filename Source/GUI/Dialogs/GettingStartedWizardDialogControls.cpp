@@ -4,6 +4,7 @@
 #include "GUI/Dialogs/GettingStartedWizardMetrics.h"
 #include "GUI/Helpers/MidiPortComboPopulation.h"
 #include "GUI/Looks/LookBuilders.h"
+#include "GUI/Settings/SettingsShellMetrics.h"
 #include "GUI/Skins/Skin.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginIDs.h"
@@ -51,14 +52,6 @@ void GettingStartedWizardDialog::buildStepControls(TSS::ISkin& skin)
 
     keyboardFromLabel_ = makeLabel(PluginDisplayNames::Settings::kKeyboardFromLabel);
     keyboardFromCombo_ = makeCombo();
-
-    driverTypeLabel_ = makeLabel(PluginDisplayNames::Settings::kDriverTypeLabel);
-    driverTypeCombo_ = makeCombo();
-    inputDeviceLabel_ = makeLabel(PluginDisplayNames::Settings::kInputDeviceLabel);
-    inputDeviceCombo_ = makeCombo();
-    synthFromLabel_ = makeLabel(PluginDisplayNames::Settings::kSynthFromLabel);
-    synthFromCombo_ = makeCombo();
-    synthFromCombo_->setUsesPortSentinelPopupChrome(true);
 }
 
 void GettingStartedWizardDialog::populateScaleAndSkinItems()
@@ -105,9 +98,8 @@ void GettingStartedWizardDialog::applyControlLooks(TSS::ISkin& skin)
         deviceValueField_->setSkin(skin);
     apply(epromTypeLabel_.get(), epromTypeCombo_.get());
     apply(keyboardFromLabel_.get(), keyboardFromCombo_.get());
-    apply(driverTypeLabel_.get(), driverTypeCombo_.get());
-    apply(inputDeviceLabel_.get(), inputDeviceCombo_.get());
-    apply(synthFromLabel_.get(), synthFromCombo_.get());
+    if (audioPage_ != nullptr)
+        audioPage_->setSkin(skin);
     refreshDeviceValueField();
 }
 
@@ -115,7 +107,6 @@ void GettingStartedWizardDialog::wireControlCallbacks()
 {
     wireAppearanceControlCallbacks();
     wireMidiControlCallbacks();
-    wireAudioControlCallbacks();
 }
 
 void GettingStartedWizardDialog::wireAppearanceControlCallbacks()
@@ -169,33 +160,26 @@ void GettingStartedWizardDialog::wireMidiControlCallbacks()
     };
 }
 
-void GettingStartedWizardDialog::wireAudioControlCallbacks()
+void GettingStartedWizardDialog::ensureAudioPage()
 {
-    driverTypeCombo_->onChange = [this]
-    {
-        if (updatingAudioUi_ || bindings_.audioDeviceManager == nullptr)
-            return;
-        const int selectedId = driverTypeCombo_->getSelectedId();
-        const auto& types = bindings_.audioDeviceManager->getAvailableDeviceTypes();
-        if (selectedId < 1 || selectedId > types.size())
-            return;
-        bindings_.audioDeviceManager->setCurrentAudioDeviceType(
-            types.getUnchecked(selectedId - 1)->getTypeName(), true);
-        refreshDigesteAudioFromDeviceManager();
-    };
-    inputDeviceCombo_->onChange = [this]
-    {
-        if (updatingAudioUi_)
-            return;
-        applyDigesteAudioFromUi(false);
-    };
-    synthFromCombo_->onChange = [this]
-    {
-        if (suppressControlCallbacks_ || bindings_.onSynthFromChanged == nullptr)
-            return;
-        bindings_.onSynthFromChanged(TSS::MidiPortComboPopulation::selectedPortId(
-            *synthFromCombo_, synthFromSourceIdentifiers_));
-    };
+    if (isPluginMode_ || bindings_.audioDeviceManager == nullptr || audioPage_ != nullptr)
+        return;
+
+    audioPage_ = std::make_unique<SettingsAudioPage>(SettingsAudioPage::Config{
+        .skin = skin_,
+        .deviceManager = bindings_.audioDeviceManager,
+        .peakLevelProvider = [this]() -> float
+        {
+            return bindings_.peakLevelProvider != nullptr ? bindings_.peakLevelProvider() : 0.0f;
+        },
+        .onSynthFromChanged = [this]
+        {
+            if (bindings_.onSynthFromChanged == nullptr || audioPage_ == nullptr)
+                return;
+            bindings_.onSynthFromChanged(audioPage_->getSelectedSynthFromSourceId());
+        },
+    });
+    addChildComponent(*audioPage_);
 }
 
 void GettingStartedWizardDialog::updateControlVisibility()
@@ -228,12 +212,9 @@ void GettingStartedWizardDialog::updateControlVisibility()
     setVisible(keyboardFromLabel_.get(), showKeyboard);
     setVisible(keyboardFromCombo_.get(), showKeyboard);
 
-    setVisible(driverTypeLabel_.get(), showAudio);
-    setVisible(driverTypeCombo_.get(), showAudio);
-    setVisible(inputDeviceLabel_.get(), showAudio);
-    setVisible(inputDeviceCombo_.get(), showAudio);
-    setVisible(synthFromLabel_.get(), showAudio);
-    setVisible(synthFromCombo_.get(), showAudio);
+    if (showAudio)
+        ensureAudioPage();
+    setVisible(audioPage_.get(), showAudio);
 
     if (showSynth)
         recomputeDeviceRow();
@@ -303,11 +284,14 @@ void GettingStartedWizardDialog::layoutStepControls(juce::Rectangle<int> band)
         return;
     }
 
-    if (step_ == Step::kAudio && ! isPluginMode_)
+    if (step_ == Step::kAudio && ! isPluginMode_ && audioPage_ != nullptr)
     {
-        placeControlRow(band, 0, *driverTypeLabel_, *driverTypeCombo_);
-        placeControlRow(band, 1, *inputDeviceLabel_, *inputDeviceCombo_);
-        placeControlRow(band, 2, *synthFromLabel_, *synthFromCombo_);
+        const int pageWidth = juce::roundToInt(
+            static_cast<float>(SettingsShellMetrics::kLabelWidth
+                               + SettingsShellMetrics::kControlColumnWidth)
+            * uiScale_);
+        audioPage_->setBounds(band.withSizeKeepingCentre(pageWidth, band.getHeight()));
+        audioPage_->setUiScale(uiScale_);
     }
 }
 

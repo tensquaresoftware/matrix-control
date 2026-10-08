@@ -63,9 +63,10 @@ private:
 
     void geometryMatchesSettingsWidthAndStaysLower()
     {
-        beginTest("Geometry - Settings width, per-step height below Settings");
+        beginTest("Geometry - Settings width; non-Audio steps below Settings; Audio matches Settings rows");
 
         expectEquals(GettingStartedWizardMetrics::kDesignWidth, SettingsShellMetrics::kDesignWidth);
+        expectEquals(GettingStartedWizardMetrics::kRowsAudio, SettingsShellMetrics::kTallestPageRows);
 
         for (const bool isPluginMode : { true, false })
         {
@@ -76,10 +77,19 @@ private:
                     continue;
 
                 const int height = GettingStartedWizardMetrics::dialogDesignHeight(step, isPluginMode);
+                expect(height > 0);
+                if (GettingStartedWizardMetrics::mayExceedSettingsDialogHeight(step))
+                {
+                    expect(step == Step::kAudio);
+                    expectEquals(GettingStartedWizardMetrics::reservedControlRows(step, isPluginMode),
+                                 SettingsShellMetrics::kTallestPageRows);
+                    expect(height > settingsHeight);
+                    continue;
+                }
+
                 expect(height < settingsHeight,
                        "step " + juce::String(static_cast<int>(step)) + " height " + juce::String(height)
                            + " must be below Settings " + juce::String(settingsHeight));
-                expect(height > 0);
             }
         }
     }

@@ -63,7 +63,7 @@ Matrix-Control users must unlock **edit, play, and hear** on first useful contac
 - Plugin ≠ Standalone applicability must be reflected in navigation, flags, and AC (Keyboard From / Audio Standalone-only; plugin STEP 3 informative).
 - Wizard per-step flags must **not** be merged with audio-safety first-run `sceneAudioSafetyDefaultsApplied` (Input None gate).
 - No second “full setup” button; `RUN SETUP AGAIN` is the sole re-run control.
-- STEP 4 shows the maximum digeste set: driver/type, I/O, SYNTH FROM, then sample rate + buffer only if layout allows; drop FE/buffer first if cramped.
+- STEP 4 shows the same controls as Settings → AUDIO (full order including blank spacers); the wizard may grow taller than Settings for this step.
 - Implementation order: **GS-1** (Settings UI) before or as opening work of the wizard Build; then shell (GS-2); then steps/flags/absorb (GS-3). See `code-map.md`.
 - GS-4 (user manual first launch + host keyboard examples) is a **doc dependency**, not a code deliverable of this Spec.
 - Historical Device Setup specs remain implementation record only — superseded for future work by this Spec / Epic GS.

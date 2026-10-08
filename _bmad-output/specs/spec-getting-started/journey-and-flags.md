@@ -10,7 +10,7 @@ Companion to `SPEC-getting-started`. Product SSOT absorbed from the 2026-10-08 d
 | 1 | `GETTING STARTED | STEP 1: USER INTERFACE` | UI Scale, Skin | All |
 | 2 | `GETTING STARTED | STEP 2: SYNTH COMMUNICATION` | Synth From, Synth To, DEVICE, EPROM (+ firmware suggestion suffix when relevant) | All |
 | 3 | `GETTING STARTED | STEP 3: MIDI KEYBOARD` | See below | All (content differs) |
-| 4 | `GETTING STARTED | STEP 4: AUDIO` | Digeste audio (see below) | **Standalone only** |
+| 4 | `GETTING STARTED | STEP 4: AUDIO` | Same controls as Settings → AUDIO (see below) | **Standalone only** |
 
 Body help copy: `ui-copy.md`.
 
@@ -25,16 +25,22 @@ Body help copy: `ui-copy.md`.
 
 ### STEP 4 — AUDIO (Standalone)
 
-Show the **maximum digeste** set. Drop sample rate + buffer first if the page is cramped.
+Show the **same controls as Settings → AUDIO**, in the same order, including blank spacer rows.
+The wizard dialog may grow taller than the Settings modal for this step.
 
-Keep order:
+Order (matches Settings → AUDIO):
 
-1. Driver / type (as Settings Audio, if space)
-2. Input (+ output if space)
-3. SYNTH FROM (listen channels)
-4. Sample rate + buffer only if layout allows
-
-Otherwise FE / buffer remain available in Settings once signal is audible.
+1. Driver / type
+2. Input device
+3. Output device
+4. Sample rate
+5. Buffer size
+6. *(blank spacer)*
+7. Input channels
+8. SYNTH FROM (+ peak indicator)
+9. *(blank spacer)*
+10. Output channels
+11. PLAY TEST TONE
 
 ## Buttons
 

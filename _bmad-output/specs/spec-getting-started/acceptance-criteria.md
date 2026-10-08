@@ -94,7 +94,7 @@ Mapped to Epic GS stories and SPEC capabilities. Prefer demonstrable Given/When/
 **AC-GS3-5 — STEP 4 Standalone only**  
 **Given** Standalone last steps  
 **When** the user reaches Audio  
-**Then** digeste controls appear per `journey-and-flags.md` (driver/I/O/SYNTH FROM; FE/buffer only if space)  
+**Then** the same controls as Settings → AUDIO appear per `journey-and-flags.md` (full page order, including blank spacers)  
 **And** Finish marks Audio done  
 **Given** plugin path  
 **When** the user completes Keyboard  

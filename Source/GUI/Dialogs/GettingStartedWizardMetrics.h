@@ -5,7 +5,8 @@
 #include "GUI/Settings/SettingsShellMetrics.h"
 
 /** GETTING STARTED geometry (design px at 100% UI scale).
-    Width is the Settings width; height is per step and always lower than the Settings dialog.
+    Width matches Settings. Non-Audio steps stay shorter than the Settings dialog; STEP 4 Audio
+    embeds the full Settings AUDIO page and may exceed that height.
     Per-step height = chrome + gap + body text budget + optional reserved control band + buttons. */
 namespace GettingStartedWizardMetrics
 {
@@ -23,11 +24,13 @@ namespace GettingStartedWizardMetrics
     inline constexpr int kBodyMidiKeyboardPluginDesignHeight = 58;
     inline constexpr int kBodyAudioDesignHeight = 58;
 
-    // Control rows GS-3 will place in each step (reserved empty in GS-2: no stub widgets).
+    // Control rows per step. STEP 4 Audio = Settings AUDIO row count (kTallestPageRows SSOT).
     inline constexpr int kRowsUserInterface = 2;
     inline constexpr int kRowsSynthCommunication = 4;
     inline constexpr int kRowsMidiKeyboardStandalone = 1;
-    inline constexpr int kRowsAudio = 3;
+    inline constexpr int kRowsAudio = SettingsShellMetrics::kTallestPageRows;
+    /** Extra body wrap budget when STEP 4 may grow past the Settings-height ceiling. */
+    inline constexpr int kAudioBodyWrapSlackDesignPx = 240;
 
     inline constexpr int bodyDesignHeight(GettingStartedWizard::Step step, bool isPluginMode) noexcept
     {
@@ -83,17 +86,26 @@ namespace GettingStartedWizardMetrics
         return content + Helpers::kTitleBarHeight + Helpers::kBorderThickness * 2;
     }
 
-    /** Settings dialog height (tallest page) the wizard must stay below. */
+    /** Settings dialog height (tallest page). Non-Audio wizard steps stay below this. */
     inline int settingsDialogDesignHeight(bool isPluginMode) noexcept
     {
         return SettingsShellMetrics::paddedBodyDesignHeight(isPluginMode)
                + DialogMatrixHelpers::kTitleBarHeight + DialogMatrixHelpers::kBorderThickness * 2;
     }
 
-    /** Max body design height so dialogDesignHeight stays strictly below Settings. */
+    /** STEP 4 embeds the full Settings AUDIO page; dialog may exceed Settings height. */
+    inline constexpr bool mayExceedSettingsDialogHeight(GettingStartedWizard::Step step) noexcept
+    {
+        return step == GettingStartedWizard::Step::kAudio;
+    }
+
+    /** Max body design height. Non-Audio steps stay strictly below Settings dialog height. */
     inline int maxBodyDesignHeightBelowSettings(GettingStartedWizard::Step step,
                                                 bool isPluginMode) noexcept
     {
+        if (mayExceedSettingsDialogHeight(step))
+            return bodyDesignHeight(step, isPluginMode) + kAudioBodyWrapSlackDesignPx;
+
         namespace Helpers = DialogMatrixHelpers;
         const int band = reservedControlBandDesignHeight(step, isPluginMode);
         const int bandWithGaps = band > 0

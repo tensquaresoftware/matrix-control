@@ -11,6 +11,7 @@
 #include "Core/Services/DeviceSetupDeviceRow.h"
 #include "GUI/Dialogs/DialogMatrixHelpers.h"
 #include "GUI/Dialogs/GettingStartedWizardFlow.h"
+#include "GUI/Settings/SettingsAudioPage.h"
 #include "GUI/Widgets/Button.h"
 #include "GUI/Widgets/ComboBox.h"
 #include "GUI/Widgets/Label.h"
@@ -48,6 +49,7 @@ public:
         bool useAudioResumeCopy = false;
         LiveDeviceStatus deviceStatus;
         juce::AudioDeviceManager* audioDeviceManager = nullptr;
+        std::function<float()> peakLevelProvider;
         juce::StringArray synthFromChannelNames;
         juce::StringArray synthFromChannelIds;
         juce::String selectedSynthFromSourceId;
@@ -83,6 +85,7 @@ public:
     void populateSynthFromChannels(const juce::StringArray& names,
                                    const juce::StringArray& ids,
                                    const juce::String& selectedId);
+    SettingsAudioPage* getAudioPage() const noexcept { return audioPage_.get(); }
 
     GettingStartedWizard::Step getCurrentStep() const noexcept { return step_; }
 
@@ -122,14 +125,12 @@ private:
     void wireControlCallbacks();
     void wireAppearanceControlCallbacks();
     void wireMidiControlCallbacks();
-    void wireAudioControlCallbacks();
+    void ensureAudioPage();
     void recomputeDeviceRow();
     void applySearchingWindowUpdate(const Core::DeviceSetupSearchingWindowUpdate& update);
     void refreshDeviceValueField();
     void syncAnimationTimer();
     void timerCallback() override;
-    void refreshDigesteAudioFromDeviceManager();
-    void applyDigesteAudioFromUi(bool preferOutputEndpoint);
     juce::String bodyText() const;
 
     std::function<void()> onDismissRequested_;
@@ -169,14 +170,7 @@ private:
     std::unique_ptr<TSS::ComboBox> keyboardFromCombo_;
     std::vector<juce::String> keyboardFromPortIdentifiers_;
 
-    std::unique_ptr<TSS::Label> driverTypeLabel_;
-    std::unique_ptr<TSS::ComboBox> driverTypeCombo_;
-    std::unique_ptr<TSS::Label> inputDeviceLabel_;
-    std::unique_ptr<TSS::ComboBox> inputDeviceCombo_;
-    std::unique_ptr<TSS::Label> synthFromLabel_;
-    std::unique_ptr<TSS::ComboBox> synthFromCombo_;
-    std::vector<juce::String> synthFromSourceIdentifiers_;
-    bool updatingAudioUi_ = false;
+    std::unique_ptr<SettingsAudioPage> audioPage_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(GettingStartedWizardDialog)
 };

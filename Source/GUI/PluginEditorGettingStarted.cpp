@@ -2,6 +2,7 @@
 
 #include "PluginEditor.h"
 
+#include "Core/Audio/AudioPassthroughProcessor.h"
 #include "Core/Audio/StandaloneAudioInputRouter.h"
 #include "Core/MIDI/MidiManager.h"
 #include "Core/Services/DeviceConnectionMachineDefaults.h"
@@ -103,6 +104,10 @@ void PluginEditor::fillGettingStartedBindingState(GettingStartedWizardDialog::Ho
         return;
 
     bindings.audioDeviceManager = Core::StandaloneAudioInputRouter::getAudioDeviceManager();
+    bindings.peakLevelProvider = [this]
+    {
+        return pluginProcessor.getAudioPassthroughProcessor().getPeakLevel();
+    };
     bindings.synthFromChannelNames = pluginProcessor.getAudioInputSourceNames();
     bindings.synthFromChannelIds = pluginProcessor.getAudioInputSourceIds();
     bindings.selectedSynthFromSourceId =
@@ -221,6 +226,9 @@ void PluginEditor::openGettingStartedWizard(GettingStartedWizard::Step startStep
         gettingStartedWizardDialog_->setSkin(matrixChromeSkin);
     }
 
+    if (pluginProcessor.isStandalone())
+        Core::StandaloneAudioInputRouter::enableInputMonitoring();
+
     gettingStartedWizardDialog_->prepareForShow(startStep, makeGettingStartedHostBindings());
 
     const int baseWidth = layoutDimensions_.editor.width;
@@ -232,6 +240,7 @@ void PluginEditor::openGettingStartedWizard(GettingStartedWizard::Step startStep
     gettingStartedWizardDialog_->setVisible(true);
     gettingStartedWizardDialog_->toFront(true);
     gettingStartedWizardDialog_->grabKeyboardFocus();
+    refreshGettingStartedWizardSynthFrom();
 }
 
 void PluginEditor::closeGettingStartedWizard()
@@ -297,11 +306,15 @@ void PluginEditor::refreshGettingStartedWizardSynthFrom()
     if (! pluginProcessor.isStandalone())
         return;
 
-    auto& state = pluginProcessor.getApvts().state;
-    gettingStartedWizardDialog_->populateSynthFromChannels(
-        pluginProcessor.getAudioInputSourceNames(),
-        pluginProcessor.getAudioInputSourceIds(),
-        state.getProperty("audioFromSourceId", juce::String()).toString());
+    const auto names = pluginProcessor.getAudioInputSourceNames();
+    const auto ids = pluginProcessor.getAudioInputSourceIds();
+    const auto sourceId = pluginProcessor.getApvts().state.getProperty(
+        "audioFromSourceId", juce::String()).toString();
+
+    if (auto* audioPage = gettingStartedWizardDialog_->getAudioPage())
+        applyAudioCatalogToSettings(*audioPage, names, ids, sourceId);
+    else
+        gettingStartedWizardDialog_->populateSynthFromChannels(names, ids, sourceId);
 }
 
 void PluginEditor::maybeAutoOpenGettingStartedWizard()

@@ -369,7 +369,7 @@ private:
 
     void geometryBodyCapStaysBelowSettings()
     {
-        beginTest("Geometry - body cap keeps dialogDesignHeight below Settings");
+        beginTest("Geometry - body cap keeps non-Audio dialogs below Settings; Audio may exceed");
 
         for (const bool isPluginMode : { true, false })
         {
@@ -400,7 +400,10 @@ private:
                                     + Helpers::kDefaultButtonHeight + Helpers::kButtonBottomMargin;
                 const int dialogH = content + Helpers::kTitleBarHeight
                                     + Helpers::kBorderThickness * 2;
-                expect(dialogH < settingsHeight);
+                if (GettingStartedWizardMetrics::mayExceedSettingsDialogHeight(step))
+                    expect(dialogH > 0);
+                else
+                    expect(dialogH < settingsHeight);
             }
         }
     }

@@ -91,9 +91,7 @@ void GettingStartedWizardDialog::prepareForShow(Step startStep, HostBindings bin
             *keyboardFromCombo_, keyboardFromPortIdentifiers_, bindings_.keyboardFromPortId);
     }
 
-    if (bindings_.audioDeviceManager != nullptr)
-        refreshDigesteAudioFromDeviceManager();
-
+    ensureAudioPage();
     populateSynthFromChannels(bindings_.synthFromChannelNames,
                               bindings_.synthFromChannelIds,
                               bindings_.selectedSynthFromSourceId);
@@ -105,6 +103,8 @@ void GettingStartedWizardDialog::stopLiveTimers()
 {
     stopTimer();
     searchingDotFrame_ = 0;
+    if (audioPage_ != nullptr)
+        audioPage_->setMonitoringActive(false);
 }
 
 void GettingStartedWizardDialog::showStep(Step step)
@@ -123,8 +123,7 @@ void GettingStartedWizardDialog::showStep(Step step)
 
     if (step_ == Step::kAudio && ! isPluginMode_)
     {
-        if (bindings_.audioDeviceManager != nullptr)
-            refreshDigesteAudioFromDeviceManager();
+        ensureAudioPage();
         populateSynthFromChannels(bindings_.synthFromChannelNames,
                                   bindings_.synthFromChannelIds,
                                   bindings_.selectedSynthFromSourceId);

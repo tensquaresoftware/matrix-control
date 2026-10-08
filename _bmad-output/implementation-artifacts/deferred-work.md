@@ -2466,3 +2466,9 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-getting-started-intro-copy.md`
   summary: No automated assert that Getting Started stays on skinBlack_ when product skin is Cream.
   evidence: Policy lives at PluginEditor bind sites + darkPanelLabelLook; PluginEditor harness out of unit-test style.
+
+## Deferred from: oneshot review of spec-getting-started-audio-parity.md (2026-10-09)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-getting-started-audio-parity.md`
+  summary: Embedded Settings AUDIO page in Getting Started STEP 4 does not register contextual help the way Settings does.
+  evidence: Blind Hunter — other wizard steps also lack Settings ContextualHelpBinder; footer CH parity deferred.

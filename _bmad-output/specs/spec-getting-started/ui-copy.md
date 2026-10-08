@@ -45,8 +45,8 @@ Firmware suggestion suffix (when relevant):
 
 **First Standalone pass:**
 
-> Choose the audio interface and input so you can hear your synth in Matrix-Control. Pick the SYNTH FROM channel(s) that carry the synth output.
+> Choose the audio interface, channels, and SYNTH FROM so you can hear your synth in Matrix-Control. These are the same audio settings as in Settings.
 
 **Resume (e.g. after plugin path already done):**
 
-> MIDI is already set. One more step: route audio so the standalone application can monitor your synth.
+> MIDI is already set. One more step: finish audio routing so the standalone application can monitor your synth.
