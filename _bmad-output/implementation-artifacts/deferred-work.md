@@ -78,7 +78,7 @@
 - **Release diagnostic logging toggle** — Settings no longer shows a LOGGING row (hidden until designed). Revisit later: optional user-facing Support/Diagnostic log (single on/off for MIDI + APVTS + future loggers), file location, size/rotation limits, and release performance cost before exposing in the Settings modal.
 - **Ask-once / footer vocabulary vs Settings** — Settings now says SYSEX / FILE NAMES; the ask-once dialog and Computer Patches load footer still say “Internal name” / “Filename”. Align product copy in a follow-up.
 - **Core policy header filenames** — `UnsavedEditWarningPolicy.h`, `MutatorDeleteWarningPolicy.h`, `PatchNameDisplayMode.h` still use older names while Settings IDs speak Unsaved State / Delete Warning / Matrix-1000 Patches Names. Rename files/namespaces when convenient.
-- **Unused Settings display strings** — SKIN / UI SCALE (and related) remain in `PluginDisplayNames::Settings` but are not shown in the reorganized modal; cleanup with the next Settings surface pass.
+- **Unused Settings display strings** — ~~SKIN / UI SCALE (and related) remain in `PluginDisplayNames::Settings` but are not shown in the reorganized modal; cleanup with the next Settings surface pass.~~ **Superseded 2026-10-08 (Correct Course GETTING STARTED):** Epic GS-1 surfaces UI SCALE + SKIN (and Getting Started block) under Settings → User Interface; string cleanup rides that chantier — do not treat as a separate open deferral.
 - **Settings GUI regression tests** — no automated coverage for section order, combo labels/IDs, or design width/height.
 
 ## Deferred from: code review of spec-settings-modal-sections-and-naming.md (2026-09-03)
@@ -2206,8 +2206,8 @@ Original review bullets below remain for history; status for U-10-owned residual
 ## Deferred from: smoke follow-up audio safety scene (2026-10-02)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-audio-safety-scene.md`
-  summary: First-run setup assistant (rename beyond Device Setup): UI Scale default 100%, Skin Black, KEYBOARD FROM, audio interface / Input / Output, Matrix MIDI ports — dedicated chantier after short audio-safety hotfix.
-  evidence: Smoke 2026-10-02; product chose correctif court then First-run setup; Device Setup alone is the wrong vehicle (modal height on UltraWide Hi-DPI).
+  summary: GETTING STARTED multi-step wizard (absorbs Device Setup one-shot): steps 0 intro → 1 UI Scale/Skin → 2 Synth MIDI/DEVICE/EPROM → 3 Keyboard (Standalone combo / plugin informative) → 4 Audio (Standalone only); per-step flags + Settings UI block (SHOW WHEN INCOMPLETE / NEVER AT LAUNCH + RUN SETUP AGAIN); Settings User Interface also exposes UI SCALE + SKIN. Product SSOT: Documentation/Development/Plans/2026/10/2026-10-08-Getting-Started-Wizard-Decisions.md. Tracked as Epic GS stories — not a single mega-modal.
+  evidence: Smoke 2026-10-02 deferred First-run; Correct Course 2026-10-08 superseded vague First-run / Device Setup-only scope; UltraWide Scale remains STEP 1, not a overloaded one-shot modal.
 
 ## Deferred from: review of spec-audio-device-profiles.md (2026-10-02)
 

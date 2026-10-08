@@ -10,7 +10,7 @@ sources:
   - .decision-log.md
   - ../../reference-docs/oberheim/index.md
 created: 2026-05-25
-updated: 2026-05-29
+updated: 2026-10-08
 ---
 
 # PRD Addendum
@@ -437,4 +437,17 @@ Amount, Random, module toggles = APVTS prefs (persisted). History = session-only
 
 ---
 
-*Addendum v1.0 — supports PRD v1.0 final (2026-05-29); Architecture may extend without duplicating FR narrative.*
+## Getting Started wizard (Correct Course 2026-10-08)
+
+Product SSOT: `Documentation/Development/Plans/2026/10/2026-10-08-Getting-Started-Wizard-Decisions.md`.
+
+- Multi-step **GETTING STARTED** assistant (Previous/Next) replaces the Device Setup one-shot for first useful configuration.
+- Unlocks edit / play / hear by **format**: plugin omits Audio step; Keyboard From is Standalone-only (plugin STEP 3 is host/DAW informative).
+- UI Scale + Skin also appear under Settings → User Interface (logo shortcuts kept). Getting Started auto-open preference + Run Setup Again live in that Settings block.
+- Completion is **per applicable step** (not a single setup-done flag for plugin and Standalone).
+- Detailed DAW keyboard routing examples belong in the **user manual**, not in the wizard body.
+- Epic GS tracks implementation; does not reopen Epic 7/8 as incomplete.
+
+---
+
+*Addendum v1.0 — supports PRD v1.0 final (2026-05-29); Architecture may extend without duplicating FR narrative. Getting Started note added 2026-10-08.*

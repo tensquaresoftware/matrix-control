@@ -362,6 +362,7 @@ GUI **never** calls handler methods directly — timestamp change on property �
 - Catch at `PluginProcessor` or handler boundary → `ExceptionPropagator` → footer (`uiMessageText`)
 - **No silent failures** — log via `MidiLogger` / `ApvtsLogger` when enabled
 - User modals **only** where PRD requires: FR-51 unsaved warning, FR-59 Defrag confirm, MASTER init confirm
+- Product overlays also include Settings, About, and **GETTING STARTED** (replacing DEVICE SETUP one-shot). Getting Started completion uses **per-step machine flags** with plugin vs Standalone applicability — never a single shared "setup done" for both formats. Do not duplicate Settings/header device list population in the wizard.
 
 **Sync RPC (blocking OK):** Device Inquiry, `requestCurrentPatch`, `requestMaster` — MIDI thread only, never audio.
 
@@ -591,7 +592,7 @@ Execute in order; one thematic commit per bullet recommended:
 | PATCH / MASTER / Matrix Mod | `Core/Models/`, `Core/MIDI/SysEx/`, `GUI/Panels/...` |
 | Patch Manager | `Core/Services/`, `Core/Actions/`, `GUI/.../PatchManagerPanel/` |
 | Mutator | `Core/Services/PatchMutator/`, `PatchMutatorPanel` |
-| Settings / Defrag | `GUI/Settings/` (or panel TBD), `HistoryDefragService` |
+| Settings / Defrag / Getting Started | `GUI/Settings/`, Getting Started wizard dialog (shared MIDI/audio bricks with header/Settings; machine prefs for per-step flags), `HistoryDefragService` |
 
 ---
 

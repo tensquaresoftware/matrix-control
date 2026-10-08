@@ -10,6 +10,8 @@ context:
   - '{project-root}/_bmad/custom/ascii-display-strings.md'
 ---
 
+> **Superseded for future work (Correct Course 2026-10-08):** Product direction is multi-step **GETTING STARTED** (see `Documentation/Development/Plans/2026/10/2026-10-08-Getting-Started-Wizard-Decisions.md` and Epic GS). Keep this spec as historical implementation record of the Device Setup one-shot; do not extend it as the First-run / mega-modal vehicle.
+
 <frozen-after-approval reason="human-owned intent — do not modify unless human renegotiates">
 
 ## Intent

@@ -122,10 +122,15 @@ Pour chaque case : look Matrix (chrome, corps Montserrat lisible en minuscules, 
 - [ ] Purge manuelle v1 : supprimer `~/Library/Application Support/Ten Square Software/Matrix-Control/AudioDeviceProfiles/` (ou `profiles.xml`)
 - [ ] Re-pick dans Audio Settings restaure aussi si besoin ; un restore raté n'écrase pas le profil disque
 
-### First-run setup (chantier dédié — après correctif court)
+### GETTING STARTED (wizard multi-étapes — remplace Device Setup one-shot)
 
-- [ ] Assistant premier lancement (renommer hors « Device Setup » seul) : UI Scale (défaut 100%), Skin (Black), KEYBOARD FROM, interface / Input / Output audio + ports MIDI Matrix
-- [ ] Maquette hauteur modale UltraWide Hi-DPI avec Scale dès l’ouverture
+SSOT produit : `Documentation/Development/Plans/2026/10/2026-10-08-Getting-Started-Wizard-Decisions.md`
+
+- [ ] Chrome Matrix monochrome, largeur = Settings, hauteur revue à la baisse (peu de contrôles / étape)
+- [ ] Étapes : 0 intro → 1 UI Scale + Skin → 2 Synth From/To + DEVICE + EPROM → 3 Keyboard (Standalone : combo + Skip ; plugin : informatif, pas de combo) → 4 Audio Standalone only (driver / I/O / SYNTH FROM ; FE+buffer si place)
+- [ ] Flags par étape + reprise ciblée ; Settings → User Interface : UI SCALE, SKIN, …, GETTING STARTED (combo SHOW WHEN INCOMPLETE / NEVER AT LAUNCH + RUN SETUP AGAIN)
+- [ ] Configure later : un rappel puis silence ; réarmement si nouvel applicable (ex. premier Standalone / Audio)
+- [ ] Smoke UltraWide / HiDPI : Scale en STEP 1 avant les étapes denses
 
 ### Audio Settings — rebuild Matrix (chantier dédié)
 
@@ -148,5 +153,5 @@ Pour chaque case : look Matrix (chrome, corps Montserrat lisible en minuscules, 
 2. Polish modales + About Montserrat
 3. Audio safety scène
 4. **Profils périphériques audio** (capture / restore sur resélection explicite)
-5. First-run setup assistant
+5. GETTING STARTED (wizard + Settings UI Scale/Skin/bloc)
 6. Rebuild Audio Settings Matrix

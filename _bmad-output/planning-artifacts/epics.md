@@ -359,9 +359,21 @@ Users undo and redo editorial patch, master, and Matrix Mod changes with standar
 
 ---
 
-**Implementation sequence (D-058):** E0 → E1 → E2 → E3 → E4 → E5 → E6 → E7 → E8 → E9 → E10 · **Parallel track:** Epic U (GUI scale audit) · **Infrastructure gate:** Epic 11 Story 11.1 (2026-07-11) · **Post-v1 editorial:** Epic 12 (2026-08 spec)
+### Epic GS: Getting Started (Correct Course 2026-10-08)
 
-**Total:** 14 epics (incl. Epic U, Epic 11, Epic 12) · **73 stories** · Epic U = layout audit overlay (FR-43 geometry) · Epic U stories: U-IDs, U-0, U-0b, U-1…U-10 · Epic 11 = CI/CD infrastructure · Epic 12 = editorial undo/redo (5 stories)
+Users complete a short multi-step **GETTING STARTED** wizard (Previous/Next) that unlocks edit / play / hear for their format (plugin vs Standalone), with Scale/Skin early, shared Settings bricks (no duplicated MIDI/audio lists), per-step flags, and Settings controls to show again or suppress auto-open. Absorbs the Device Setup one-shot.
+
+**Product SSOT:** `Documentation/Development/Plans/2026/10/2026-10-08-Getting-Started-Wizard-Decisions.md`
+
+**Does not reopen:** Epic 7 / Epic 8 as incomplete.
+
+**Story order:** GS-1 (Settings UI) → GS-2 (wizard shell) → GS-3 (steps/flags) · GS-4 (manual) parallel/after
+
+---
+
+**Implementation sequence (D-058):** E0 → E1 → E2 → E3 → E4 → E5 → E6 → E7 → E8 → E9 → E10 · **Parallel track:** Epic U (GUI scale audit) · **Infrastructure gate:** Epic 11 Story 11.1 (2026-07-11) · **Post-v1 editorial:** Epic 12 (2026-08 spec) · **Post-sprint onboarding:** Epic GS (2026-10-08)
+
+**Total:** 15 epics (incl. Epic U, Epic 11, Epic 12, Epic GS) · **77 stories** (incl. GS-1…GS-4) · Epic U = layout audit overlay (FR-43 geometry) · Epic 11 = CI/CD · Epic 12 = editorial undo/redo · Epic GS = Getting Started wizard
 
 ---
 
@@ -1915,5 +1927,66 @@ UX-DR1–UX-DR8 covered by stories 10.2, 10.3, 2.7/2.8, 6.8, 7.9, 6.6, 7.8.
 
 ---
 
-*Epics & Stories workflow complete — 2026-05-29.*
+## Epic GS: Getting Started wizard
+
+Post-sprint onboarding. Product SSOT: `Documentation/Development/Plans/2026/10/2026-10-08-Getting-Started-Wizard-Decisions.md`. Sprint Change Proposal: `sprint-change-proposal-2026-10-08-getting-started.md`.
+
+### Story GS-1: Settings User Interface — Scale, Skin, Getting Started block
+
+As a user,
+I want UI Scale, Skin, and Getting Started controls in Settings → User Interface,
+So that I can change appearance and re-run or suppress the setup wizard without relying only on the logo menu.
+
+**Acceptance Criteria:**
+
+**Given** Settings User Interface section
+**When** the user opens that section
+**Then** option order is UI SCALE, SKIN, INFO MESSAGE, CONTEXTUAL HELP, GETTING STARTED
+**And** GETTING STARTED has combo `SHOW WHEN INCOMPLETE` / `NEVER AT LAUNCH` and button `RUN SETUP AGAIN` below the combo
+**And** logo menu shortcuts for UI Scale / Skin remain available
+
+### Story GS-2: Getting Started wizard shell and navigation
+
+As a first-time or incomplete-setup user,
+I want a Matrix-chrome multi-step GETTING STARTED dialog,
+So that each step stays readable with few controls and clear Previous / Next navigation.
+
+**Acceptance Criteria:**
+
+**Given** auto-open or Run Setup Again
+**When** the wizard opens
+**Then** chrome matches Settings (monochrome Matrix), design width equals Settings, per-step height is lower than Settings
+**And** step titles appear in the title band; body copy matches decisions plan §6
+**And** buttons are CONFIGURE LATER / CONTINUE / PREVIOUS / NEXT / SKIP / FINISH as specified (no QUIT, no SPECIFY LATER)
+
+### Story GS-3: Getting Started steps, flags, plugin vs Standalone
+
+As a user on plugin or Standalone,
+I want only applicable steps and durable per-step progress,
+So that setup unlocks edit / play / hear for my format without a single shared "setup done" flag.
+
+**Acceptance Criteria:**
+
+**Given** plugin vs Standalone
+**When** the user progresses through steps 0–4
+**Then** STEP 1 = Scale/Skin; STEP 2 = Synth From/To, DEVICE, EPROM (live, shared bricks; absorbs Device Setup one-shot); STEP 3 Standalone = Keyboard From + Skip; STEP 3 plugin = informative host/DAW (no combo); STEP 4 Audio = Standalone only
+**And** per-step flags drive auto-open / targeted resume; Configure later = one reminder then silence unless a new applicable step appears
+**And** audio-safety first-run Input None gate remains a separate flag
+
+### Story GS-4: Manual — first launch and host keyboard
+
+As a user reading the product manual,
+I want first-launch and DAW keyboard routing guidance,
+So that plugin STEP 3 can stay short and point to the manual for host examples.
+
+**Acceptance Criteria:**
+
+**Given** user manual EN (and FR if in process)
+**When** Getting Started ships
+**Then** manual covers first launch / Getting Started and master-keyboard routing via host for plugin use
+**And** detailed DAW examples are manual-only (not wizard body)
+
+---
+
+*Epics & Stories workflow complete — 2026-05-29. Epic GS appended 2026-10-08 (Correct Course).*
 

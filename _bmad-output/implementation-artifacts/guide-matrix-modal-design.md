@@ -4,7 +4,7 @@ project: Matrix-Control
 title: Matrix modal design rules
 author: BMad Agent
 created: 2026-09-30
-updated: 2026-09-30
+updated: 2026-10-08
 sources:
   - implementation-artifacts/spec-matrix-modal-layout-polish.md
   - implementation-artifacts/spec-window-modal-look-strategy.md
@@ -27,7 +27,9 @@ SSOT for product dialogs / overlays that use Matrix-Control chrome (not OS FileC
 | Body panel fill | Skin `kHeaderPanelBackground` | Under the title band |
 | Dim behind dialog | Body panel colour @ ~85% alpha | Host editor behind |
 
-Settings, About, Audio Settings, bank progress, confirms, DEVICE SETUP — all use `paintMatrixOverlayChrome` (or must match it).
+Settings, About, Audio Settings, bank progress, confirms, GETTING STARTED (and legacy DEVICE SETUP until absorbed) — all use `paintMatrixOverlayChrome` (or must match it).
+
+GETTING STARTED: same design width as Settings; per-step height lower than Settings (few controls per step). Step titles live in the title band. Form steps reuse Settings/header control bricks — do not duplicate MIDI/audio device list logic.
 
 ## Vertical rhythm (text / confirm dialogs)
 
@@ -35,7 +37,7 @@ Settings, About, Audio Settings, bank progress, confirms, DEVICE SETUP — all u
 |------|-------|--------|
 | Gap title band → first body line | **24 px** | `kGapAfterTitle` |
 | Gap last content → button row | **24 px** | `kGapBeforeButtons` — last element of any kind (body text, checkbox, progress bar, form row, …) |
-| Extra controls in that zone | + control height + **24 px** again | Don't ask again / DEVICE SETUP rows: 24 px above **and** below the control block |
+| Extra controls in that zone | + control height + **24 px** again | Don't ask again / form-row dialogs (Settings / GETTING STARTED): 24 px above **and** below the control block |
 | Gap above bottom border | **24 px** | `kButtonBottomMargin` |
 | Gap side border → nearest button | **≥ 24 px** | `kButtonSideMargin`; pack shrinks if needed |
 | Gap between buttons | **12 px** | `kButtonGap` |
