@@ -62,9 +62,6 @@ void PluginEditor::wireSettingsGettingStartedControls(SettingsPanel& panel)
         Core::GettingStartedMachineDefaults::writeAutoOpenPreference(selectedId);
     };
 
-    // GS-1: visible and clickable; wizard open + flag reset deferred to GS-2/GS-3.
-    panel.getRunSetupAgainButton().onClick = []
-    {
-        Core::GettingStartedMachineDefaults::runSetupAgainNoOp();
-    };
+    // GS-1: same named handler the contract test invokes (wizard open deferred to GS-2/GS-3).
+    panel.getRunSetupAgainButton().onClick = Core::GettingStartedMachineDefaults::runSetupAgainNoOp;
 }

@@ -1,5 +1,5 @@
 # generated: 2026-05-29
-# last_updated: 10-08-2026 21:50
+# last_updated: 10-08-2026 22:05
 # project: Matrix-Control
 # project_key: NOKEY
 # tracking_system: file-system
@@ -231,7 +231,7 @@ development_status:
 
   # Epic GS: Getting Started wizard (Correct Course 2026-10-08)
   epic-gs: in-progress
-  gs-1-settings-ui-scale-skin-getting-started-block: review
+  gs-1-settings-ui-scale-skin-getting-started-block: done
   gs-2-getting-started-wizard-shell-and-navigation: backlog
   gs-3-getting-started-steps-flags-plugin-standalone: backlog
   gs-4-manual-first-launch-and-host-keyboard: backlog

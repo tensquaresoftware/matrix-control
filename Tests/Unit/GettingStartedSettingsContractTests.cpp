@@ -65,6 +65,16 @@ private:
         // Settings rows: no colon (peers of INFO MESSAGE).
         expect(! juce::String(PluginDisplayNames::Settings::kUiScaleRowLabel).containsChar(':'));
         expect(! juce::String(PluginDisplayNames::Settings::kSkinRowLabel).containsChar(':'));
+
+        // GS-1 tempered HELP: preference save + wizard-gated re-run (no false "opens now").
+        expectEquals(
+            juce::String(PluginDisplayNames::Settings::ContextualHelp::kGettingStartedAutoOpen),
+            juce::String(
+                "SETTINGS: Saves whether Getting Started should open at launch when steps are incomplete."));
+        expectEquals(
+            juce::String(PluginDisplayNames::Settings::ContextualHelp::kRunSetupAgain),
+            juce::String(
+                "SETTINGS: Re-runs Getting Started from the beginning when the wizard is available."));
     }
 
     void scaleAndSkinSettingsShareLogoApvtsKeys()
@@ -145,7 +155,7 @@ private:
 
     void runSetupAgainDoesNotMutateGettingStartedPreference()
     {
-        beginTest("Run Setup Again - GS-1 no-op does not change auto-open preference");
+        beginTest("Run Setup Again - Settings onClick handler does not change auto-open preference");
 
         using namespace PluginIDs::Settings::GettingStartedAutoOpen;
 
@@ -159,7 +169,9 @@ private:
         const auto before = Core::GettingStartedMachineDefaults::readAutoOpenPreference(*store);
         expectEquals(before, kNeverAtLaunch);
 
-        Core::GettingStartedMachineDefaults::runSetupAgainNoOp();
+        // Same callable assigned to Settings RUN SETUP AGAIN onClick in PluginEditor.
+        const auto onClickHandler = Core::GettingStartedMachineDefaults::runSetupAgainNoOp;
+        onClickHandler();
 
         expectEquals(Core::GettingStartedMachineDefaults::readAutoOpenPreference(*store), before);
 

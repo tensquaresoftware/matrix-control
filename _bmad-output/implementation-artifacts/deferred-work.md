@@ -2409,3 +2409,18 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-gs-1-settings-ui-scale-skin-getting-started-block.md`
   summary: Logo menu Scale/Skin item construction is not observed by unit tests (only HeaderPanel section copy strings).
   evidence: Verification Gap; HeaderLogoPopupMenu is outside current Tests/ linkage; deleting logo columns would not fail the suite.
+
+## Deferred from: code review of spec-gs-1-settings-ui-scale-skin-getting-started-block.md (2026-10-08)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-gs-1-settings-ui-scale-skin-getting-started-block.md`
+  summary: Reconfirmed — production Getting Started auto-open load/write via real Matrix-Control-GettingStarted PropertiesFile (openStore) is not unit-tested.
+  evidence: Code review Verification Gap; same as build-review deferral above.
+- source_spec: `_bmad-output/implementation-artifacts/spec-gs-1-settings-ui-scale-skin-getting-started-block.md`
+  summary: Reconfirmed — Settings User Interface row order and RUN SETUP AGAIN placement not asserted via live layout bounds.
+  evidence: Code review Verification Gap; same as build-review deferral above.
+- source_spec: `_bmad-output/implementation-artifacts/spec-gs-1-settings-ui-scale-skin-getting-started-block.md`
+  summary: Reconfirmed — Settings Scale/Skin apply/restore wiring through PluginEditor is not executed by automated tests.
+  evidence: Code review Verification Gap; same as build-review deferral above.
+- source_spec: `_bmad-output/implementation-artifacts/spec-gs-1-settings-ui-scale-skin-getting-started-block.md`
+  summary: Reconfirmed — Logo menu Scale/Skin item construction is not observed by unit tests (only section copy strings).
+  evidence: Code review Verification Gap; same as build-review deferral above.

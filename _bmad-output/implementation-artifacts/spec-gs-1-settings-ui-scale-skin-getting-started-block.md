@@ -95,6 +95,27 @@ context:
 - Given the auto-open combo is changed, when the app is quit and relaunched, then the combo selection is restored from machine preference.
 - Given RUN SETUP AGAIN is clicked, when GS-1 is shipped alone, then nothing opens and no wizard step is marked complete (no crash).
 
+### Review Findings
+
+- [x] [Review][Patch] Temper Getting Started contextual help to GS-1 behavior [Source/Shared/Definitions/PluginDisplayNames.h:247] — Decision: adapt help (option 1). Combo help = preference only (no launch enforcement claim); RUN SETUP AGAIN help = not active yet / no false re-run claim. Restore product-final copy in GS-2/GS-3 when wired.
+- [x] [Review][Patch] RUN SETUP AGAIN contract test never executes the Settings onClick handler [Source/GUI/PluginEditorSettingsAppearance.cpp:66] — test calls `runSetupAgainNoOp()` directly; a divergent onClick would still pass.
+- [x] [Review][Defer] Production openStore load/write auto-open path untested [Source/Core/Services/GettingStartedMachineDefaults.cpp:40] — deferred: already in deferred-work from build review 2026-10-08 (Application Support / DI seam).
+- [x] [Review][Defer] Settings User Interface row order not asserted via live layout [Source/GUI/Settings/SettingsPanelSetup.cpp:275] — deferred: already in deferred-work; human smoke / copy-contract only.
+- [x] [Review][Defer] Settings Scale/Skin editor apply/restore wiring unexecuted by tests [Source/GUI/PluginEditorSettingsAppearance.cpp:30] — deferred: already in deferred-work; Settings harness or manual smoke.
+- [x] [Review][Defer] Logo menu Scale/Skin construction not observed by tests [Source/GUI/Widgets/HeaderLogoPopupMenu.cpp] — deferred: already in deferred-work; string constants only.
+
+#### Rejected
+
+- BH: Tasks checklist overclaims “order/copy” coverage — reject: fix would edit this spec under review.
+- BH: Code Map still cites PluginEditorSettings.cpp after Appearance split — reject: fix would edit this spec under review.
+- BH: Design Notes still say property key names are open — reject: fix would edit this spec under review.
+- BH: Spec Change Log empty — reject: fix would edit this spec under review / cosmetic.
+- BH: Verification Commands omit Matrix-Control_Tests — reject: fix would edit this spec under review.
+- BH: legacy kUiScaleLabel / kSkinLabel unused — low: leftover constants; everyday harm negligible (build triage already rejected cleanup chore).
+- BH: contract tests do not pin gettingStartedAutoOpen key string — low: key documented in Implementation Notes; silent rename unlikely in everyday use.
+- BH+EC: Settings Scale/Skin stale while logo changes with Settings open — false: Code Map marks live sync optional/nice-to-have; restore on reopen covers AC; out of review scope.
+- EC: PropertiesFile saveIfNeeded return ignored — low: same pattern as DeviceConnectionMachineDefaults; unlikely everyday disk-fail path.
+
 ## Implementation Notes
 
 - Machine property key: `PluginIDs::MachineDefaults::kGettingStartedAutoOpen` = `"gettingStartedAutoOpen"` (int).
