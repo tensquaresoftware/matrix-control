@@ -67,10 +67,9 @@ context: []
 
 ## Implementation Notes
 
-- Intro-only: `bandHeightOverride` on `DialogMatrixHelpers::ModalGeometryArgs` sizes the band via shared `introFooterRuleMetrics()` (`measureLineStep` + snapped rule slot + `measureLineStep`). Paint uses the same helper and `SkinColourId::kHorizontalSeparatorLine` at `textArea` width. Other GS steps unchanged.
-- Review patch: rule slot derived from snapped stroke thickness so slot and paint cannot diverge across UI/display scales.
-- Metrics comments document that intro planning still uses `kGapBeforeButtons` while runtime uses the taller footer band.
-- Manual visual check still pending (human): open Getting Started intro at default and higher UI scale.
+- Shared `DialogMatrixHelpers` action-footer separator (gaps = `kGapAfterTitle` / `kButtonBottomMargin`, colour `kHorizontalSeparatorLine`) applied to all Matrix chrome button-row modals including all Getting Started steps.
+- Settings vertical rail and logo-menu ButtonLike column separator unified to the same HorizontalSeparator grey (`kDarkGrey5`).
+- Manual visual check: spot-check Getting Started, a confirm dialog, Settings rail, and logo menu.
 
 ## Spec Change Log
 

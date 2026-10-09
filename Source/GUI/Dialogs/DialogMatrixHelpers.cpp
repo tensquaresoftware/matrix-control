@@ -2,6 +2,7 @@
 
 #include <cmath>
 
+#include "GUI/Layout/ScaledDrawing.h"
 #include "GUI/Looks/LookBuilders.h"
 #include "GUI/Skins/Skin.h"
 
@@ -191,6 +192,20 @@ namespace DialogMatrixHelpers
         g.drawFittedText(text, textArea, juce::Justification::topLeft, kMaxBodyLines, 1.0f);
     }
 
+    ActionFooterSeparatorMetrics measureActionFooterSeparator(float uiScale, float systemDisplayScale)
+    {
+        ActionFooterSeparatorMetrics metrics;
+        metrics.lineThickness = TSS::ScaledDrawing::snappedStrokeThicknessFromDesign(
+            kActionFooterRuleDesignThickness,
+            uiScale,
+            systemDisplayScale,
+            TSS::ScaledDrawing::StrokeSnapPolicy::kRound);
+        metrics.ruleSlot = juce::jmax(1, juce::roundToInt(metrics.lineThickness));
+        metrics.gapAboveRule = scaled(kGapAfterTitle, uiScale);
+        metrics.gapBelowRule = scaled(kButtonBottomMargin, uiScale);
+        return metrics;
+    }
+
     ModalGeometry computeModalGeometry(const ModalGeometryArgs& args)
     {
         ModalGeometry geometry;
@@ -206,12 +221,18 @@ namespace DialogMatrixHelpers
         const int buttonHeight = scaled(kDefaultButtonHeight, args.uiScale);
         const int bottomMargin = scaled(kButtonBottomMargin, args.uiScale);
         const int gapBeforeButtons = scaled(kGapBeforeButtons, args.uiScale);
-        // Plain confirms: 24 px last content → buttons. With extra controls (Don't ask again,
-        // DEVICE SETUP rows): keep 24 px above and below those controls.
-        // bandHeightOverride: e.g. intro footer air + 1px rule + air (pilot).
+
+        const ActionFooterSeparatorMetrics footer = args.reserveActionFooterSeparator
+            ? measureActionFooterSeparator(args.uiScale, args.systemDisplayScale)
+            : ActionFooterSeparatorMetrics{};
+        const int footerHeight = footer.totalHeight();
+
+        // Plain confirms: footer separator band (title→text gap + rule + buttons→bottom gap).
+        // With extra controls: 24 px above controls, then controls, then the footer separator band.
         const int bandHeight = args.extraBandHeight > 0
-            ? gapBeforeButtons + args.extraBandHeight + gapBeforeButtons
-            : (args.bandHeightOverride >= 0 ? args.bandHeightOverride : gapBeforeButtons);
+            ? gapBeforeButtons + args.extraBandHeight
+                  + (args.reserveActionFooterSeparator ? footerHeight : gapBeforeButtons)
+            : (args.reserveActionFooterSeparator ? footerHeight : gapBeforeButtons);
 
         const int contentHeight = gapUnderTitle + args.bodyHeight + bandHeight + buttonHeight + bottomMargin;
         geometry.dialogBounds = args.hostBounds.withSizeKeepingCentre(
@@ -233,7 +254,36 @@ namespace DialogMatrixHelpers
                           geometry.textArea.getBottom(),
                           content.getWidth(),
                           geometry.buttonRow.getY() - geometry.textArea.getBottom() };
+        if (args.reserveActionFooterSeparator && footerHeight > 0)
+            geometry.actionFooterBand = { geometry.band.getX(),
+                                          geometry.band.getBottom() - footerHeight,
+                                          geometry.band.getWidth(),
+                                          footerHeight };
         return geometry;
+    }
+
+    juce::Rectangle<int> controlBandArea(const ModalGeometry& geometry)
+    {
+        if (geometry.actionFooterBand.isEmpty())
+            return geometry.band;
+
+        return geometry.band.withTrimmedBottom(geometry.actionFooterBand.getHeight());
+    }
+
+    void paintActionFooterSeparator(const ActionFooterPaintArgs& args)
+    {
+        if (args.geometry.actionFooterBand.isEmpty() || args.geometry.textArea.getWidth() <= 0)
+            return;
+
+        const auto footer = measureActionFooterSeparator(args.uiScale, args.systemDisplayScale);
+        const float ruleY = static_cast<float>(args.geometry.actionFooterBand.getY() + footer.gapAboveRule)
+                            + (static_cast<float>(footer.ruleSlot) - footer.lineThickness) * 0.5f;
+
+        args.g.setColour(args.skin.getColour(SkinColourId::kHorizontalSeparatorLine));
+        args.g.fillRect(static_cast<float>(args.geometry.textArea.getX()),
+                        ruleY,
+                        static_cast<float>(args.geometry.textArea.getWidth()),
+                        footer.lineThickness);
     }
 
     TextModalLayout computeTextModalLayout(const TextModalLayoutArgs& args)
@@ -252,8 +302,10 @@ namespace DialogMatrixHelpers
         layout.geometry = computeModalGeometry({ .hostBounds = args.hostBounds,
                                                  .designWidth = args.designWidth,
                                                  .uiScale = args.uiScale,
+                                                 .systemDisplayScale = args.systemDisplayScale,
                                                  .bodyHeight = bodyHeight,
                                                  .extraBandHeight = args.extraBandHeight,
+                                                 .reserveActionFooterSeparator = args.reserveActionFooterSeparator,
                                                  .bodyLeftInset = args.bodyLeftInset,
                                                  .bodyRightInset = args.bodyRightInset });
         return layout;

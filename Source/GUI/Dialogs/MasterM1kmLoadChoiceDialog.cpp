@@ -1,6 +1,7 @@
 #include "MasterM1kmLoadChoiceDialog.h"
 
 #include "GUI/Dialogs/DialogMatrixHelpers.h"
+#include "GUI/Layout/ScaledDrawing.h"
 #include "GUI/Skins/Skin.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 
@@ -73,11 +74,14 @@ void MasterM1kmLoadChoiceDialog::setUiScale(float uiScale)
 DialogMatrixHelpers::TextModalLayout MasterM1kmLoadChoiceDialog::computeLayout() const
 {
     const juce::String body(Dialog::kBody);
-    return DialogMatrixHelpers::computeTextModalLayout({ .skin = *skin_,
-                                                         .bodyText = body,
-                                                         .hostBounds = getLocalBounds(),
-                                                         .designWidth = kDesignWidth,
-                                                         .uiScale = uiScale_ });
+    return DialogMatrixHelpers::computeTextModalLayout({
+        .skin = *skin_,
+        .bodyText = body,
+        .hostBounds = getLocalBounds(),
+        .designWidth = kDesignWidth,
+        .uiScale = uiScale_,
+        .systemDisplayScale = TSS::ScaledDrawing::systemDisplayScaleForComponent(*this),
+    });
 }
 
 void MasterM1kmLoadChoiceDialog::dismiss()
@@ -127,6 +131,13 @@ void MasterM1kmLoadChoiceDialog::paint(juce::Graphics& g)
 
     g.setColour(skin_->getColour(SkinColourId::kDarkPanelText));
     DialogMatrixHelpers::paintBodyText(g, layout.bodyFont, Dialog::kBody, geometry.textArea);
+    DialogMatrixHelpers::paintActionFooterSeparator({
+        .g = g,
+        .skin = *skin_,
+        .geometry = geometry,
+        .uiScale = uiScale_,
+        .systemDisplayScale = TSS::ScaledDrawing::systemDisplayScaleForComponent(*this),
+    });
 }
 
 void MasterM1kmLoadChoiceDialog::resized()

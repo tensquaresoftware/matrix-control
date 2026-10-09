@@ -1,5 +1,6 @@
 #include "MatrixOrderedConfirmDialog.h"
 
+#include "GUI/Layout/ScaledDrawing.h"
 #include "GUI/Skins/Skin.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 
@@ -122,12 +123,15 @@ MatrixOrderedConfirmDialog::BodyLayout MatrixOrderedConfirmDialog::computeBodyLa
         bodyHeight += layout.rowsBlockHeight;
     }
 
-    layout.geometry = Helpers::computeModalGeometry({ .hostBounds = getLocalBounds(),
-                                                      .designWidth = designWidth_,
-                                                      .uiScale = uiScale_,
-                                                      .bodyHeight = bodyHeight,
-                                                      .bodyLeftInset = leftInset,
-                                                      .bodyRightInset = rightInset });
+    layout.geometry = Helpers::computeModalGeometry({
+        .hostBounds = getLocalBounds(),
+        .designWidth = designWidth_,
+        .uiScale = uiScale_,
+        .systemDisplayScale = TSS::ScaledDrawing::systemDisplayScaleForComponent(*this),
+        .bodyHeight = bodyHeight,
+        .bodyLeftInset = leftInset,
+        .bodyRightInset = rightInset,
+    });
     return layout;
 }
 
@@ -176,6 +180,13 @@ void MatrixOrderedConfirmDialog::paint(juce::Graphics& g)
                                        layout.bodyFont,
                                        message_,
                                        geometry.textArea.withTrimmedTop(layout.rowsBlockHeight));
+    DialogMatrixHelpers::paintActionFooterSeparator({
+        .g = g,
+        .skin = *skin_,
+        .geometry = geometry,
+        .uiScale = uiScale_,
+        .systemDisplayScale = TSS::ScaledDrawing::systemDisplayScaleForComponent(*this),
+    });
 }
 
 void MatrixOrderedConfirmDialog::resized()
@@ -265,13 +276,15 @@ MatrixMutatorDeleteConfirmDialog::~MatrixMutatorDeleteConfirmDialog()
 DialogMatrixHelpers::TextModalLayout MatrixMutatorDeleteConfirmDialog::computeBodyLayout() const
 {
     const juce::String body(PluginDisplayNames::Dialogs::MutatorDeleteConfirm::kBody);
-    return DialogMatrixHelpers::computeTextModalLayout(
-        { .skin = *skin_,
-          .bodyText = body,
-          .hostBounds = getLocalBounds(),
-          .designWidth = kDesignWidth_,
-          .uiScale = uiScale_,
-          .extraBandHeight = scaled(DialogMatrixHelpers::kCheckboxHeight, uiScale_) });
+    return DialogMatrixHelpers::computeTextModalLayout({
+        .skin = *skin_,
+        .bodyText = body,
+        .hostBounds = getLocalBounds(),
+        .designWidth = kDesignWidth_,
+        .uiScale = uiScale_,
+        .systemDisplayScale = TSS::ScaledDrawing::systemDisplayScaleForComponent(*this),
+        .extraBandHeight = scaled(DialogMatrixHelpers::kCheckboxHeight, uiScale_),
+    });
 }
 
 void MatrixMutatorDeleteConfirmDialog::finish(bool confirmed)
@@ -299,6 +312,13 @@ void MatrixMutatorDeleteConfirmDialog::paint(juce::Graphics& g)
 
     g.setColour(skin_->getColour(SkinColourId::kDarkPanelText));
     DialogMatrixHelpers::paintBodyText(g, layout.bodyFont, Dialog::kBody, geometry.textArea);
+    DialogMatrixHelpers::paintActionFooterSeparator({
+        .g = g,
+        .skin = *skin_,
+        .geometry = geometry,
+        .uiScale = uiScale_,
+        .systemDisplayScale = TSS::ScaledDrawing::systemDisplayScaleForComponent(*this),
+    });
 }
 
 void MatrixMutatorDeleteConfirmDialog::resized()
@@ -306,11 +326,12 @@ void MatrixMutatorDeleteConfirmDialog::resized()
     const auto layout = computeBodyLayout();
     const auto& geometry = layout.geometry;
 
-    // Don't ask again: vertically centred in the band between body text and buttons.
+    // Don't ask again: vertically centred in the control band (above the action-footer rule).
+    const auto controlBand = DialogMatrixHelpers::controlBandArea(geometry);
     const int checkHeight = scaled(DialogMatrixHelpers::kCheckboxHeight, uiScale_);
     const int checkWidth = toggleLook_.getPreferredWidth(dontAskAgain_.getButtonText(), checkHeight);
     dontAskAgain_.setBounds(geometry.textArea.getX(),
-                            geometry.band.getCentreY() - checkHeight / 2,
+                            controlBand.getCentreY() - checkHeight / 2,
                             checkWidth,
                             checkHeight);
 

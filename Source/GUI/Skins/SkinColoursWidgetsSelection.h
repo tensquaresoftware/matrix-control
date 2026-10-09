@@ -163,8 +163,8 @@ namespace TSS::SkinColours
 
                 inline constexpr ColourElement kSeparator = {
                     "PopupMenuButtonLikeSeparator",
-                    ColourChart::kDarkGrey3,
-                    ColourChart::kDarkGrey3
+                    ColourChart::kDarkGrey5,
+                    ColourChart::kDarkGrey5
                 };
 
                 inline constexpr ColourElement kText = {

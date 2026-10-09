@@ -26,10 +26,10 @@ public:
     };
 
     static constexpr int kDesignWidth = 420;
-    static constexpr int kDesignHeightSingle = 184;
-    // Dual = single + section gap (1em) + phase lane (label + 0.5em + bar), keeping the same
-    // leftover gap above Cancel as the export modal.
-    static constexpr int kDesignHeightDual = 236;
+    // Content height includes action-footer separator (24 + 1px rule + 24) above Cancel.
+    static constexpr int kDesignHeightSingle = 209;
+    // Dual = single + section gap (1em) + phase lane (label + 0.5em + bar).
+    static constexpr int kDesignHeightDual = 261;
 
     explicit BankTransferProgressDialog(TSS::ISkin& skin);
     ~BankTransferProgressDialog() override;

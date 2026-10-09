@@ -2,6 +2,7 @@
 
 #include "GUI/Dialogs/DialogMatrixHelpers.h"
 #include "GUI/Helpers/TextFitHelpers.h"
+#include "GUI/Layout/ScaledDrawing.h"
 #include "GUI/Skins/Skin.h"
 #include "GUI/Widgets/Button.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
@@ -354,15 +355,16 @@ void BankTransferProgressDialog::paint(juce::Graphics& g)
     auto content = dialogBounds.reduced(border);
     content.removeFromTop(titleBarHeight);
 
-    // Shared rhythm: kGapAfterTitle under the title band, then content.
+    // Shared rhythm: kGapAfterTitle under the title band, then content, then action-footer rule.
     const auto bodyFont = DialogMatrixHelpers::scaledModalBodyFont(*skin_, uiScale_);
     const int gapUnderTitle = juce::roundToInt(
         static_cast<float>(DialogMatrixHelpers::kGapAfterTitle) * uiScale_);
     const int padX = juce::roundToInt(12.0f * uiScale_);
-    // Last content (progress / detail) → Cancel: shared 24 px gap, then button + bottom margin.
+    const float displayScale = TSS::ScaledDrawing::systemDisplayScaleForComponent(*this);
+    const auto footer = DialogMatrixHelpers::measureActionFooterSeparator(uiScale_, displayScale);
     const int bottomReserve = scaledButtonHeight(uiScale_)
                               + scaledBottomMargin(uiScale_)
-                              + juce::roundToInt(static_cast<float>(DialogMatrixHelpers::kGapBeforeButtons) * uiScale_);
+                              + footer.totalHeight();
 
     auto body = content;
     body.removeFromTop(gapUnderTitle);
@@ -373,6 +375,14 @@ void BankTransferProgressDialog::paint(juce::Graphics& g)
         paintSingleLaneBody(g, body, bodyFont);
     else
         paintDualLaneBody(g, body, bodyFont);
+
+    const float ruleY = static_cast<float>(body.getBottom() + footer.gapAboveRule)
+                        + (static_cast<float>(footer.ruleSlot) - footer.lineThickness) * 0.5f;
+    g.setColour(skin_->getColour(SkinColourId::kHorizontalSeparatorLine));
+    g.fillRect(static_cast<float>(body.getX()),
+               ruleY,
+               static_cast<float>(body.getWidth()),
+               footer.lineThickness);
 }
 
 void BankTransferProgressDialog::resized()

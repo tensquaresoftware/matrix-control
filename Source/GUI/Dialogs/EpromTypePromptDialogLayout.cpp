@@ -1,6 +1,7 @@
 #include "EpromTypePromptDialog.h"
 
 #include "GUI/Dialogs/DialogMatrixHelpers.h"
+#include "GUI/Layout/ScaledDrawing.h"
 #include "GUI/Skins/Skin.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 
@@ -16,19 +17,22 @@ int EpromTypePromptDialog::getRowsHeight() const
 EpromTypePromptDialog::ContentLayout EpromTypePromptDialog::computeContentLayout() const
 {
     const auto body = bodyText();
-    const auto textLayout = DialogMatrixHelpers::computeTextModalLayout({ .skin = *skin_,
-                                                                          .bodyText = body,
-                                                                          .hostBounds = getLocalBounds(),
-                                                                          .designWidth = kDesignWidth,
-                                                                          .uiScale = uiScale_,
-                                                                          .extraBandHeight = getRowsHeight() });
+    const auto textLayout = DialogMatrixHelpers::computeTextModalLayout({
+        .skin = *skin_,
+        .bodyText = body,
+        .hostBounds = getLocalBounds(),
+        .designWidth = kDesignWidth,
+        .uiScale = uiScale_,
+        .systemDisplayScale = TSS::ScaledDrawing::systemDisplayScaleForComponent(*this),
+        .extraBandHeight = getRowsHeight(),
+    });
     ContentLayout layout;
     layout.geometry = textLayout.geometry;
     layout.bodyFont = textLayout.bodyFont;
 
-    // Vertically centre the four control rows between body text and buttons.
-    layout.controlBand = layout.geometry.band.withSizeKeepingCentre(layout.geometry.band.getWidth(),
-                                                                    getRowsHeight());
+    // Vertically centre the four control rows above the action-footer separator.
+    const auto controlArea = DialogMatrixHelpers::controlBandArea(layout.geometry);
+    layout.controlBand = controlArea.withSizeKeepingCentre(controlArea.getWidth(), getRowsHeight());
     return layout;
 }
 
@@ -55,6 +59,13 @@ void EpromTypePromptDialog::paint(juce::Graphics& g)
 
     g.setColour(skin_->getColour(SkinColourId::kDarkPanelText));
     DialogMatrixHelpers::paintBodyText(g, layout.bodyFont, bodyText(), geometry.textArea);
+    DialogMatrixHelpers::paintActionFooterSeparator({
+        .g = g,
+        .skin = *skin_,
+        .geometry = geometry,
+        .uiScale = uiScale_,
+        .systemDisplayScale = TSS::ScaledDrawing::systemDisplayScaleForComponent(*this),
+    });
 }
 
 void EpromTypePromptDialog::resized()

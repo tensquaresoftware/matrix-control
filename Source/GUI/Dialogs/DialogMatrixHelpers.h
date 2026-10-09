@@ -89,6 +89,26 @@ namespace DialogMatrixHelpers
                        const juce::String& text,
                        juce::Rectangle<int> textArea);
 
+    // ---- Action-footer H-separator (above bottom button row) ----
+
+    inline constexpr float kActionFooterRuleDesignThickness = 1.0f;
+
+    /** Design-pixel height of gapAbove + 1px rule + gapBelow (planning / fixed-height dialogs). */
+    inline constexpr int kActionFooterSeparatorDesignHeight =
+        kGapAfterTitle + 1 + kButtonBottomMargin;
+
+    struct ActionFooterSeparatorMetrics
+    {
+        int gapAboveRule = 0;  // matches kGapAfterTitle
+        int gapBelowRule = 0;  // matches kButtonBottomMargin
+        int ruleSlot = 0;
+        float lineThickness = 0.0f;
+
+        int totalHeight() const noexcept { return gapAboveRule + ruleSlot + gapBelowRule; }
+    };
+
+    ActionFooterSeparatorMetrics measureActionFooterSeparator(float uiScale, float systemDisplayScale);
+
     // ---- Shared modal frame geometry ----
 
     struct ModalGeometryArgs
@@ -96,11 +116,12 @@ namespace DialogMatrixHelpers
         juce::Rectangle<int> hostBounds;
         int designWidth = 0;
         float uiScale = 1.0f;
+        float systemDisplayScale = 1.0f;
         int bodyHeight = 0;
         /** Pixel height of extra controls (e.g. checkbox, form rows) placed between body and buttons. */
         int extraBandHeight = 0;
-        /** When >= 0 and there is no extraBandHeight, replaces the default kGapBeforeButtons band. */
-        int bandHeightOverride = -1;
+        /** When true, reserve title→text / rule / buttons→bottom gaps above the button row. */
+        bool reserveActionFooterSeparator = true;
         /** When >= 0, overrides the default ~10% body side inset on that side. */
         int bodyLeftInset = -1;
         int bodyRightInset = -1;
@@ -112,12 +133,29 @@ namespace DialogMatrixHelpers
         int border = 0;
         int titleBarHeight = 0;
         juce::Rectangle<int> textArea;
-        /** Space between the body text and the button row (extra controls are centred here). */
+        /** Space between the body text and the button row (extra controls + optional footer). */
         juce::Rectangle<int> band;
+        /** Bottom slice of `band` for the action-footer separator; empty when not reserved. */
+        juce::Rectangle<int> actionFooterBand;
         juce::Rectangle<int> buttonRow;
     };
 
     ModalGeometry computeModalGeometry(const ModalGeometryArgs& args);
+
+    /** Band region available for extra controls (excludes the action-footer slice). */
+    juce::Rectangle<int> controlBandArea(const ModalGeometry& geometry);
+
+    struct ActionFooterPaintArgs
+    {
+        juce::Graphics& g;
+        const TSS::ISkin& skin;
+        const ModalGeometry& geometry;
+        float uiScale = 1.0f;
+        float systemDisplayScale = 1.0f;
+    };
+
+    /** Paint the action-footer H-rule at body text-column width inside `geometry.actionFooterBand`. */
+    void paintActionFooterSeparator(const ActionFooterPaintArgs& args);
 
     /** Geometry plus the scaled body font, for dialogs whose body is a single text block. */
     struct TextModalLayout
@@ -133,7 +171,9 @@ namespace DialogMatrixHelpers
         juce::Rectangle<int> hostBounds;
         int designWidth = 0;
         float uiScale = 1.0f;
+        float systemDisplayScale = 1.0f;
         int extraBandHeight = 0;
+        bool reserveActionFooterSeparator = true;
         int bodyLeftInset = -1;
         int bodyRightInset = -1;
     };

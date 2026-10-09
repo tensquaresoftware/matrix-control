@@ -398,8 +398,8 @@ private:
                 const int band =
                     GettingStartedWizardMetrics::reservedControlBandDesignHeight(step, isPluginMode);
                 const int bandWithGaps = band > 0
-                    ? Helpers::kGapBeforeButtons + band + Helpers::kGapBeforeButtons
-                    : Helpers::kGapBeforeButtons;
+                    ? Helpers::kGapBeforeButtons + band + Helpers::kActionFooterSeparatorDesignHeight
+                    : Helpers::kActionFooterSeparatorDesignHeight;
                 const int content = Helpers::kGapAfterTitle + capped + bandWithGaps
                                     + Helpers::kDefaultButtonHeight + Helpers::kButtonBottomMargin;
                 const int dialogH = content + Helpers::kTitleBarHeight

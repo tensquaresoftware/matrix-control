@@ -1,6 +1,7 @@
 #include "MasterInitConfirmDialog.h"
 
 #include "GUI/Dialogs/DialogMatrixHelpers.h"
+#include "GUI/Layout/ScaledDrawing.h"
 #include "GUI/Skins/Skin.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 
@@ -69,11 +70,14 @@ void MasterInitConfirmDialog::setUiScale(float uiScale)
 DialogMatrixHelpers::TextModalLayout MasterInitConfirmDialog::computeLayout() const
 {
     const auto body = formatBodyText();
-    return DialogMatrixHelpers::computeTextModalLayout({ .skin = *skin_,
-                                                         .bodyText = body,
-                                                         .hostBounds = getLocalBounds(),
-                                                         .designWidth = kDesignWidth,
-                                                         .uiScale = uiScale_ });
+    return DialogMatrixHelpers::computeTextModalLayout({
+        .skin = *skin_,
+        .bodyText = body,
+        .hostBounds = getLocalBounds(),
+        .designWidth = kDesignWidth,
+        .uiScale = uiScale_,
+        .systemDisplayScale = TSS::ScaledDrawing::systemDisplayScaleForComponent(*this),
+    });
 }
 
 juce::String MasterInitConfirmDialog::formatBodyText() const
@@ -117,6 +121,13 @@ void MasterInitConfirmDialog::paint(juce::Graphics& g)
 
     g.setColour(skin_->getColour(SkinColourId::kDarkPanelText));
     DialogMatrixHelpers::paintBodyText(g, layout.bodyFont, formatBodyText(), geometry.textArea);
+    DialogMatrixHelpers::paintActionFooterSeparator({
+        .g = g,
+        .skin = *skin_,
+        .geometry = geometry,
+        .uiScale = uiScale_,
+        .systemDisplayScale = TSS::ScaledDrawing::systemDisplayScaleForComponent(*this),
+    });
 }
 
 void MasterInitConfirmDialog::resized()

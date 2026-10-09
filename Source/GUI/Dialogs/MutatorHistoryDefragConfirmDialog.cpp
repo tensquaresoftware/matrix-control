@@ -1,6 +1,7 @@
 #include "MutatorHistoryDefragConfirmDialog.h"
 
 #include "GUI/Dialogs/DialogMatrixHelpers.h"
+#include "GUI/Layout/ScaledDrawing.h"
 #include "GUI/Skins/Skin.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 
@@ -64,11 +65,14 @@ void MutatorHistoryDefragConfirmDialog::setUiScale(float uiScale)
 DialogMatrixHelpers::TextModalLayout MutatorHistoryDefragConfirmDialog::computeLayout() const
 {
     const juce::String body(Dialog::kBody);
-    return DialogMatrixHelpers::computeTextModalLayout({ .skin = *skin_,
-                                                         .bodyText = body,
-                                                         .hostBounds = getLocalBounds(),
-                                                         .designWidth = kDesignWidth,
-                                                         .uiScale = uiScale_ });
+    return DialogMatrixHelpers::computeTextModalLayout({
+        .skin = *skin_,
+        .bodyText = body,
+        .hostBounds = getLocalBounds(),
+        .designWidth = kDesignWidth,
+        .uiScale = uiScale_,
+        .systemDisplayScale = TSS::ScaledDrawing::systemDisplayScaleForComponent(*this),
+    });
 }
 
 void MutatorHistoryDefragConfirmDialog::dismiss()
@@ -102,6 +106,13 @@ void MutatorHistoryDefragConfirmDialog::paint(juce::Graphics& g)
 
     g.setColour(skin_->getColour(SkinColourId::kDarkPanelText));
     DialogMatrixHelpers::paintBodyText(g, layout.bodyFont, Dialog::kBody, geometry.textArea);
+    DialogMatrixHelpers::paintActionFooterSeparator({
+        .g = g,
+        .skin = *skin_,
+        .geometry = geometry,
+        .uiScale = uiScale_,
+        .systemDisplayScale = TSS::ScaledDrawing::systemDisplayScaleForComponent(*this),
+    });
 }
 
 void MutatorHistoryDefragConfirmDialog::resized()

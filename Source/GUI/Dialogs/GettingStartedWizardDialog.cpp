@@ -17,34 +17,9 @@ namespace
         NavButton::kNext,           NavButton::kSkip,     NavButton::kFinish,
     };
 
-    constexpr float kIntroFooterRuleDesignThickness = 1.0f;
-
     int scaledDesign(int designValue, float uiScale)
     {
         return juce::roundToInt(static_cast<float>(designValue) * uiScale);
-    }
-
-    struct IntroFooterRuleMetrics
-    {
-        int lineStep = 0;
-        int ruleSlot = 0;
-        float lineThickness = 0.0f;
-    };
-
-    IntroFooterRuleMetrics introFooterRuleMetrics(const juce::Font& bodyFont,
-                                                  int textWidth,
-                                                  float uiScale,
-                                                  float systemDisplayScale)
-    {
-        IntroFooterRuleMetrics metrics;
-        metrics.lineThickness = TSS::ScaledDrawing::snappedStrokeThicknessFromDesign(
-            kIntroFooterRuleDesignThickness,
-            uiScale,
-            systemDisplayScale,
-            TSS::ScaledDrawing::StrokeSnapPolicy::kRound);
-        metrics.ruleSlot = juce::jmax(1, juce::roundToInt(metrics.lineThickness));
-        metrics.lineStep = DialogMatrixHelpers::measureLineStep(bodyFont, textWidth);
-        return metrics;
     }
 }
 
@@ -234,34 +209,21 @@ DialogMatrixHelpers::ModalGeometry GettingStartedWizardDialog::computeGeometry()
         DialogMatrixHelpers::contentWidthFor(Metrics::kDesignWidth, uiScale_));
     const auto bodyFont = DialogMatrixHelpers::scaledModalBodyFont(*skin_, uiScale_);
     // Use measured text height (not the per-step planning floor). Short variants must not invent
-    // a second blank below the copy. Non-intro steps keep kGapBeforeButtons (24 px) before
-    // controls; intro reserves air + rule + air via bandHeightOverride.
+    // a second blank below the copy. Shared action-footer separator sits above the button row.
     // Do not clamp to maxBodyDesignHeightBelowSettings: STEP 2 with the firmware-suggestion
     // suffix is the tallest body and that ceiling (~91 px) squeezes fitted text, which visually
     // shortens the gap above SYNTH FROM compared with other steps.
     const int measuredBody = DialogMatrixHelpers::measureBodyHeight(bodyFont, body, bodyWidth);
     const int bodyHeight = juce::jmax(measuredBody, 1);
 
-    // Intro pilot: reserve air + snapped rule slot + air above the button row.
-    int bandHeightOverride = -1;
-    if (step_ == Step::kIntro)
-    {
-        const auto footer = introFooterRuleMetrics(
-            bodyFont,
-            bodyWidth,
-            uiScale_,
-            TSS::ScaledDrawing::systemDisplayScaleForComponent(*this));
-        bandHeightOverride = footer.lineStep + footer.ruleSlot + footer.lineStep;
-    }
-
     return DialogMatrixHelpers::computeModalGeometry({
         .hostBounds = getLocalBounds(),
         .designWidth = Metrics::kDesignWidth,
         .uiScale = uiScale_,
+        .systemDisplayScale = TSS::ScaledDrawing::systemDisplayScaleForComponent(*this),
         .bodyHeight = bodyHeight,
         .extraBandHeight = scaledDesign(
             Metrics::reservedControlBandDesignHeight(step_, isPluginMode_), uiScale_),
-        .bandHeightOverride = bandHeightOverride,
     });
 }
 
@@ -292,23 +254,13 @@ void GettingStartedWizardDialog::paint(juce::Graphics& g)
     g.setColour(skin_->getColour(TSS::SkinColourId::kDarkPanelText));
     DialogMatrixHelpers::paintBodyText(g, bodyFont, bodyText(), geometry.textArea);
 
-    if (step_ == Step::kIntro)
-    {
-        // Same text width as computeGeometry bodyWidth (textArea width == body column).
-        const auto footer = introFooterRuleMetrics(
-            bodyFont,
-            geometry.textArea.getWidth(),
-            uiScale_,
-            TSS::ScaledDrawing::systemDisplayScaleForComponent(*this));
-        const float ruleY = static_cast<float>(geometry.textArea.getBottom() + footer.lineStep)
-                            + (static_cast<float>(footer.ruleSlot) - footer.lineThickness) * 0.5f;
-
-        g.setColour(skin_->getColour(TSS::SkinColourId::kHorizontalSeparatorLine));
-        g.fillRect(static_cast<float>(geometry.textArea.getX()),
-                   ruleY,
-                   static_cast<float>(geometry.textArea.getWidth()),
-                   footer.lineThickness);
-    }
+    DialogMatrixHelpers::paintActionFooterSeparator({
+        .g = g,
+        .skin = *skin_,
+        .geometry = geometry,
+        .uiScale = uiScale_,
+        .systemDisplayScale = TSS::ScaledDrawing::systemDisplayScaleForComponent(*this),
+    });
 }
 
 void GettingStartedWizardDialog::resized()

@@ -15,9 +15,9 @@ namespace GettingStartedWizardMetrics
 
     // Body help text planning floors (design px) for dialogDesignHeight / Settings ceiling checks.
     // Runtime body height follows measured copy so short variants do not pad a second blank above
-    // the control band. Non-intro steps: the single visual gap is DialogMatrixHelpers::kGapBeforeButtons.
-    // Intro runtime uses a taller air + rule + air band (bandHeightOverride); planning below still
-    // counts only kGapBeforeButtons for the intro gap (pilot divergence, no formula rewrite yet).
+    // the control band. Every step reserves DialogMatrixHelpers::kActionFooterSeparatorDesignHeight
+    // above the button row (title→text gap + 1px rule + buttons→bottom gap); steps with controls
+    // also keep kGapBeforeButtons above the control block.
     // Intro: three paragraphs with two blank separators; floor covers wrap at Settings-width inset.
     inline constexpr int kBodyIntroDesignHeight = 156;
     inline constexpr int kBodyUserInterfaceDesignHeight = 46;
@@ -76,15 +76,14 @@ namespace GettingStartedWizardMetrics
         return rows * SettingsShellMetrics::kControlHeight + (rows - 1) * SettingsShellMetrics::kRowGap;
     }
 
-    /** Full dialog height including border and title band (planning mirror of computeModalGeometry
-        for non-intro steps). Intro runtime band is taller (air + rule + air); this formula still
-        uses kGapBeforeButtons only for the intro gap. */
+    /** Full dialog height including border and title band (mirrors DialogMatrixHelpers::computeModalGeometry). */
     inline constexpr int dialogDesignHeight(GettingStartedWizard::Step step, bool isPluginMode) noexcept
     {
         namespace Helpers = DialogMatrixHelpers;
         const int band = reservedControlBandDesignHeight(step, isPluginMode);
-        const int bandWithGaps = band > 0 ? Helpers::kGapBeforeButtons + band + Helpers::kGapBeforeButtons
-                                          : Helpers::kGapBeforeButtons;
+        const int bandWithGaps = band > 0
+            ? Helpers::kGapBeforeButtons + band + Helpers::kActionFooterSeparatorDesignHeight
+            : Helpers::kActionFooterSeparatorDesignHeight;
         const int content = Helpers::kGapAfterTitle + bodyDesignHeight(step, isPluginMode) + bandWithGaps
                             + Helpers::kDefaultButtonHeight + Helpers::kButtonBottomMargin;
         return content + Helpers::kTitleBarHeight + Helpers::kBorderThickness * 2;
@@ -113,8 +112,8 @@ namespace GettingStartedWizardMetrics
         namespace Helpers = DialogMatrixHelpers;
         const int band = reservedControlBandDesignHeight(step, isPluginMode);
         const int bandWithGaps = band > 0
-            ? Helpers::kGapBeforeButtons + band + Helpers::kGapBeforeButtons
-            : Helpers::kGapBeforeButtons;
+            ? Helpers::kGapBeforeButtons + band + Helpers::kActionFooterSeparatorDesignHeight
+            : Helpers::kActionFooterSeparatorDesignHeight;
         const int chrome = Helpers::kGapAfterTitle + bandWithGaps + Helpers::kDefaultButtonHeight
                            + Helpers::kButtonBottomMargin + Helpers::kTitleBarHeight
                            + Helpers::kBorderThickness * 2;

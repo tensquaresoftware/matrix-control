@@ -232,7 +232,8 @@ juce::Rectangle<int> GettingStartedWizardDialog::controlBandBounds(
     if (rowsHeight <= 0)
         return {};
 
-    return geometry.band.withSizeKeepingCentre(geometry.band.getWidth(), rowsHeight);
+    const auto area = DialogMatrixHelpers::controlBandArea(geometry);
+    return area.withSizeKeepingCentre(area.getWidth(), rowsHeight);
 }
 
 void GettingStartedWizardDialog::placeControlRow(juce::Rectangle<int> band,
