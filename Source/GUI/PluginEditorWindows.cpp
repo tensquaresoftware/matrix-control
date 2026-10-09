@@ -308,9 +308,9 @@ void PluginEditor::applyEpromTypePromptMidiPortChange(bool isInput, const juce::
 void PluginEditor::applyEpromTypePromptSpecifyLater()
 {
     auto& state = pluginProcessor.getApvts().state;
-    const auto flags = Core::deviceSetupSpecifyLaterFlags();
-    state.setProperty(PluginIDs::Settings::kEpromTypePromptDone, flags.promptDone, nullptr);
-    state.setProperty(PluginIDs::Settings::kEpromTypePromptPending, flags.promptPending, nullptr);
+    const auto specifyLaterFlags = Core::deviceSetupSpecifyLaterFlags();
+    state.setProperty(PluginIDs::Settings::kEpromTypePromptDone, specifyLaterFlags.promptDone, nullptr);
+    state.setProperty(PluginIDs::Settings::kEpromTypePromptPending, specifyLaterFlags.promptPending, nullptr);
     Core::DeviceConnectionMachineDefaults::writeAfterSpecifyLaterFromState(state);
 }
 

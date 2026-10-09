@@ -65,9 +65,9 @@ namespace TSS
         private:
             void clearSelectionKeepCaret()
             {
-                const int caret = getCaretPosition();
+                const int caretPosition = getCaretPosition();
                 setHighlightedRegion({});
-                setCaretPosition(caret);
+                setCaretPosition(caretPosition);
 
                 if (onCaretOrTextChanged)
                     onCaretOrTextChanged();

@@ -2481,3 +2481,13 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/specs/spec-getting-started/SPEC.md`
   summary: STEP 4 Finish with null SettingsAudioPage when AudioDeviceManager is null could mark Audio done without setup UI.
   evidence: Edge Case Hunter maybe-false; overlaps GS-3 null AudioDeviceManager deferral.
+
+## Deferred from: oneshot review of spec-windows-msvc-six-warnings.md (2026-09-22)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-windows-msvc-six-warnings.md`
+  summary: NumberBox and Slider edit-field TextEditor helpers remain near-duplicates; a shared helper would prevent twin shadowing patches.
+  evidence: Pre-existing duplication; this change only renamed locals in both copies.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-windows-msvc-six-warnings.md`
+  summary: No unit test covers getWidgetTypeString default/unknown return contract.
+  evidence: GUI factory string helper; project unit tests stay on Core; regression risk is low with exhaustive enum switch.

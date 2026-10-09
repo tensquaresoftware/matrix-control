@@ -169,5 +169,8 @@ juce::String WidgetFactoryValidator::getWidgetTypeString(PluginDescriptors::Stan
         case PluginDescriptors::StandaloneWidgetType::kLabel:
             return "Label";
     }
+
+    jassertfalse;
+    return "Unknown";
 }
 

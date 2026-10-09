@@ -141,8 +141,8 @@ void PluginProcessor::applyHardwareLatencyToHost()
 {
     const double sampleRate = audioPassthroughSampleRate_ > 0.0 ? audioPassthroughSampleRate_ : 44100.0;
     const float latencyMs = getHardwareLatencyMs();
-    const int latencySamples = Core::HardwareLatency::msToSamples(latencyMs, sampleRate);
-    setLatencySamples(latencySamples);
+    const int latencyInSamples = Core::HardwareLatency::msToSamples(latencyMs, sampleRate);
+    setLatencySamples(latencyInSamples);
     updateHostDisplay();
 }
 

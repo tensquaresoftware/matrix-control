@@ -32,7 +32,6 @@ namespace TSS
     void Toggle::paintButton(juce::Graphics& g, bool /*shouldDrawButtonAsHighlighted*/, bool /*shouldDrawButtonAsDown*/)
     {
         const auto bounds = getLocalBounds().toFloat();
-        const bool isOn = getToggleState();
         const bool enabled = isEnabled();
         const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
         const float borderThickness = ScaledDrawing::snappedStrokeThicknessFromDesign(
@@ -60,7 +59,7 @@ namespace TSS
             return;
         }
 
-        g.setColour(isOn ? look_.backgroundOn : look_.backgroundOff);
+        g.setColour(getToggleState() ? look_.backgroundOn : look_.backgroundOff);
         g.fillRect(bounds);
 
         g.setColour(look_.border);
@@ -69,7 +68,7 @@ namespace TSS
         const auto buttonText = getButtonText();
         if (!buttonText.isEmpty())
         {
-            g.setColour(isOn ? look_.textOn : look_.textOff);
+            g.setColour(getToggleState() ? look_.textOn : look_.textOff);
             g.setFont(look_.font.withHeight(look_.font.getHeight() * uiScale_));
             g.drawText(buttonText, bounds, juce::Justification::centred, false);
         }
