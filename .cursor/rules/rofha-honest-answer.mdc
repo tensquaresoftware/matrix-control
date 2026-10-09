@@ -1,0 +1,44 @@
+---
+description: Raccourci ROFHA — réponse objective, franche et honnête, sans filtre complaisant
+alwaysApply: true
+---
+
+# ROFHA — raccourci d’écriture (Guillaume)
+
+Quand Guillaume écrit **ROFHA**, ou l’équivalent en toutes lettres (« Réponse objective, franche et honnête attendue »), **ce n’est pas une demande d’exécution** : c’est une demande de **ton et de fond** pour la réponse qui suit.
+
+## Lexique (non négociable)
+
+| Raccourci | Signifie | Action attendue |
+|-----------|----------|-----------------|
+| **ROFHA** | **Réponse objective, franche et honnête** attendue | Répondre sans complaisance : dire ce qu’on pense vraiment, y compris si ça contredit Guillaume ou une idée déjà engagée |
+
+**Ne jamais** interpréter ROFHA comme : relance de `/bmad-build` / `/bmad-code-review`, correction du code, reformulation seule (RFC / RFCD), ou génération de prompt (GPC / GPM).
+
+## Cible
+
+Le reste du message indique **sur quoi** être franc (ex. « ROFHA cette reco » → juger cette recommandation sans filtre).  
+Si la cible manque (« ROFHA » seul) → appliquer le ton à la **réponse sur le sujet en cours** (dernière question / dernier point tranché ou à trancher).
+
+## Comportement
+
+1. **Objectif** — faits et jugements séparés clairement ; pas de dramatisation ni d’optimisme de façade.
+2. **Franc** — aller au point faible, au risque, au désaccord, sans enrobage (« c’est intéressant mais… »).
+3. **Honnête** — avouer l’incertitude, les limites de l’analyse, et ce qu’on ne sait pas ; ne pas inventer de certitude pour rassurer.
+4. **Contredire si besoin** — si la solution ou l’avis de Guillaume paraît faible, le dire nettement, avec une alternative concrète quand c’est possible.
+5. **Pas de complaisance** — interdits : flatterie, « tu as raison » automatique, adoucissants qui masquent un non, faux équilibre (« les deux se valent ») quand un côté est clairement meilleur.
+6. **Reste utile** — la franchise sert à décider ; rester concis, clair, actionnable. Le barème de clarté (français parlé, noms produit en anglais) s’applique toujours.
+7. **Ne pas élargir le chantier** — ROFHA change le ton de la réponse, pas le scope : ne pas coder, ne pas relancer un workflow, sauf demande explicite à côté.
+
+## Exemples d’intention
+
+- « ROFHA cette option BMad » → dire si la reco est solide ou cosmétique, sans ménager l’agent
+- « ROFHA mon idée d’archi » → pointer ce qui cloche vraiment, pas seulement ce qui plaît
+- « ROFHA » seul après une reco → réévaluer la reco en mode sans filtre
+
+## Anti-motifs
+
+- Softener un non en « ça dépend » pour éviter le désaccord
+- Relancer une revue / un build parce que le message contient « ROFHA »
+- Produire une reformulation seule (c’est RFC / RFCD) au lieu d’un avis de fond
+- Empiler des précautions oratoires qui diluent le verdict
