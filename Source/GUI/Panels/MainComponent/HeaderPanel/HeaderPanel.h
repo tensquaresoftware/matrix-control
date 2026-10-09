@@ -72,6 +72,7 @@ private:
     void updateAudioControlsVisibility();
     void layoutLogo();
     void layoutCartouches();
+    void layoutCartoucheBadgeHitAreas();
 
     HeaderPanelDimensions dimensions_;
     TSS::ISkin* skin_;
@@ -103,6 +104,9 @@ private:
     TSS::Button undoButton_;
     TSS::Button redoButton_;
     TSS::Button panicButton_;
+    juce::Component editCartoucheBadgeHitArea_;
+    juce::Component midiCartoucheBadgeHitArea_;
+    juce::Component audioCartoucheBadgeHitArea_;
 
     std::unique_ptr<TSS::ContextualHelpBinder> contextualHelpBinder_;
 

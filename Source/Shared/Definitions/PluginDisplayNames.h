@@ -33,32 +33,44 @@ namespace PluginDisplayNames
 
         namespace ContextualHelp
         {
+            constexpr const char* kEditBadge =
+                "EDIT: Undo, redo, panic, and the logo menu for Settings, About, Skin, and UI Scale.";
+            constexpr const char* kMidiBadge =
+                "MIDI: Monitors MIDI activity from the keyboard (or host), the synthesizer, and to the synthesizer.";
+            constexpr const char* kAudioBadge =
+                "AUDIO: Monitors the selected audio input level and sets INPUT GAIN (Standalone).";
+            constexpr const char* kFromKeyboardLabel =
+                "MIDI: Labels the keyboard (or host) MIDI activity lane. Set the device in Settings > MIDI & DEVICE.";
+            constexpr const char* kFromSynthLabel =
+                "MIDI: Labels the synthesizer MIDI input activity lane. Set SYNTH FROM in Settings > MIDI & DEVICE.";
+            constexpr const char* kToSynthLabel =
+                "MIDI: Labels the synthesizer MIDI output activity lane. Set SYNTH TO in Settings > MIDI & DEVICE.";
             constexpr const char* kInputGain =
-                "SESSION: Sets monitoring level for the selected audio input. Choose the listen source in Settings > AUDIO > SYNTH FROM.";
+                "AUDIO: Sets monitoring level for the selected audio input. Choose the listen source in Settings > AUDIO > SYNTH FROM.";
             constexpr const char* kUndo =
-                "SESSION: Undoes the last Patch or master edit in this session.";
+                "EDIT: Undoes the last Patch or master edit in this session.";
             constexpr const char* kRedo =
-                "SESSION: Redoes the last undone edit.";
+                "EDIT: Redoes the last undone edit.";
             constexpr const char* kPanic =
-                "SESSION: Sends Note Offs for held notes, plus All Notes Off and Reset Controllers.";
+                "EDIT: Sends Note Offs for held notes, plus All Notes Off and Reset Controllers.";
             constexpr const char* kLogo =
-                "SESSION: Opens the logo menu for Settings, About, Skin, and UI Scale.";
+                "EDIT: Opens the logo menu for Settings, About, Skin, and UI Scale.";
             constexpr const char* kSettings =
-                "SESSION: Opens Settings (MIDI ports, standalone audio, paths, warnings, master utility, shortcuts).";
+                "EDIT: Opens Settings (MIDI ports, standalone audio, paths, warnings, master utility, shortcuts).";
             constexpr const char* kAbout =
-                "SESSION: Shows product version, links, and credits.";
+                "EDIT: Shows product version, links, and credits.";
             constexpr const char* kSkin =
-                "SESSION: Chooses the visual skin for the editor.";
+                "EDIT: Chooses the visual skin for the editor.";
             constexpr const char* kUiScale =
-                "SESSION: Sets the user interface scale.";
+                "EDIT: Sets the user interface scale.";
             constexpr const char* kFromKeyboardActivityLed =
-                "SESSION: Lights when MIDI activity arrives from the keyboard (or host in Plugin).";
+                "MIDI: Lights when MIDI activity arrives from the keyboard (or host in Plugin).";
             constexpr const char* kFromSynthActivityLed =
-                "SESSION: Lights when MIDI activity arrives from the synthesizer.";
+                "MIDI: Lights when MIDI activity arrives from the synthesizer.";
             constexpr const char* kToSynthActivityLed =
-                "SESSION: Lights when MIDI activity is sent to the synthesizer.";
+                "MIDI: Lights when MIDI activity is sent to the synthesizer.";
             constexpr const char* kAudioPeakIndicator =
-                "SESSION: Shows the peak level of the monitored audio input.";
+                "AUDIO: Shows the peak level of the monitored audio input.";
         }
     }
 
@@ -1719,6 +1731,8 @@ namespace PluginDisplayNames
 
         namespace ContextualHelp
         {
+            constexpr const char* kColumnHeader =
+                "MATRIX MODULATION: Column guide for bus number, source, amount, and destination. Drag a bus number to reorder.";
             constexpr const char* kSectionInit =
                 "MATRIX MODULATION: Resets all modulation buses to init.";
             constexpr const char* kSectionCopy =

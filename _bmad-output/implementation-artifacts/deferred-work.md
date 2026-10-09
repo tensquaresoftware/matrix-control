@@ -2497,3 +2497,12 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-modal-action-footer-separator.md`
   summary: bandHeightOverride is ignored when extraBandHeight > 0, so control-band Matrix dialogs cannot yet reserve an action-footer separator band the same way.
   evidence: Intentional intro-only pilot; needed when extending the rule above buttons on steps/dialogs that already place controls in the band.
+
+## Deferred from: review of spec-header-matrix-modulation-contextual-help.md (2026-10-09)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-header-matrix-modulation-contextual-help.md`
+  summary: Bus-number label mouse intercept + listener forward path has no automated GUI test; Core MatrixModBusReorderService tests do not cover ModulationBusCell.
+  evidence: Verification Gap — project unit tests stay off GUI components; Standalone UAT (hover + drag past threshold) is the gate for this path.
+- source_spec: `_bmad-output/implementation-artifacts/spec-header-matrix-modulation-contextual-help.md`
+  summary: Wave 1 Header badge hit areas and new ContextualHelpBinder binds have no CI observer beyond planned human UAT.
+  evidence: Verification Gap — ContextualHelpOverlayTests cover overlay helpers/Mutator constants only; Header/Matrix binder registration is out of Core unit-test style for this wave.

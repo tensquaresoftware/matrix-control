@@ -7,7 +7,7 @@ status: archived
 sources:
   - Desktop draft Matrix-Control-aide-contextuelle-messages.md
 created: 2026-09-16
-updated: 2026-09-17
+updated: 2026-10-09
 ---
 
 # Matrix-Control — Aide contextuelle (brouillon de messages)
@@ -16,53 +16,48 @@ updated: 2026-09-17
 **Format affiché :** badge `HELP` + texte blanc furtif : `MODULE: message`
 **Langue UI :** anglais (ASCII seulement : tiret `-`, ellipsis `...` — pas de tiret cadratin).
 **Déjà en production :** table Patch Mutator (reference, ne pas réinventer sauf ajustement volontaire).
-**Préfixe Header (decide) :** `SESSION`.
+**Préfixe Header (locked) :** cartouche — `EDIT:` / `MIDI:` / `AUDIO:` (plus `SESSION`).
 
 Comment editer : change la colonne **Message proposé** ; laisse **Contrôle** tel quel.
 Quand c'est prêt, dis-moi dans le chat Build quelles tables tu as touchées (ou renvoie le fichier).
 
 ---
 
-## Idées de préfixe pour le Header (pas HEADER)
+## Préfixes Header par cartouche (locked)
 
-| Option | Exemple | Ton |
-|--------|---------|-----|
-| **MAIN** | `MAIN: Selects the MIDI input from the synth.` | Neutre, court, aligne sur "zone principale" |
-| **GLOBAL** | `GLOBAL: ...` | Réglages transverses au plugin |
-| **SESSION** | `SESSION: ...` | Ports / undo / panic = session de travail |
-| **STUDIO** | `STUDIO: ...` | Un peu plus "produit", moins technique |
-| **CONSOLE** | `CONSOLE: ...` | Barre de commande / cockpit |
-| **BRIDGE** | `BRIDGE: ...` | Pont MIDI/audio entre hôte et Matrix |
-| **PLUGIN** | `PLUGIN: ...` | Clair en hote DAW, un peu froid |
-| **SHELL** | `SHELL: ...` | Coque UI autour de l'editeur |
+| Cartouche | Préfixe | Cible typique |
+|-----------|---------|---------------|
+| **EDIT** | `EDIT:` | Badge EDIT, logo, menu logo, UNDO / REDO / PANIC |
+| **MIDI** | `MIDI:` | Badge MIDI, labels FROM KEYBOARD / FROM SYNTH / TO SYNTH, LEDs |
+| **AUDIO** | `AUDIO:` | Badge AUDIO, INPUT GAIN (label + slider), peak (Standalone) |
 
-**Decide :** **SESSION**.
+Ancienne option figee `SESSION` : retiree — ne plus l'utiliser pour le Header.
 
 ---
 
-## 1. SESSION (Header)
+## 1. Header (EDIT / MIDI / AUDIO)
 
 | Contrôle | Message proposé |
 |----------|-----------------|
-| MIDI FROM | SESSION: Selects the MIDI input that receives SysEx and notes from the synthesizer. |
-| MIDI TO | SESSION: Selects the MIDI output that sends edits and notes to the synthesizer. |
-| KEYBOARD FROM | SESSION: Selects a separate MIDI keyboard input for playing (Standalone application only). |
-| HOST | SESSION: Keyboard MIDI comes from the DAW host (Plugin only). |
-| AUDIO FROM | SESSION: Selects the audio input used for monitoring through the plugin. |
-| INPUT GAIN | SESSION: Sets monitoring level for the selected audio input. |
-| UNDO | SESSION: Undoes the last Patch or master edit in this session. |
-| REDO | SESSION: Redoes the last undone edit. |
-| PANIC | SESSION: Sends MIDI panic to clear stuck notes and ease a backed-up send queue. |
-| LOGO | SESSION: Opens the logo menu for Settings, Audio/MIDI, About, Skin, and UI Scale. |
-| SETTINGS... | SESSION: Opens plugin Settings (paths, warnings, master utility, shortcuts). |
-| AUDIO/MIDI... | SESSION: Opens the host Audio/MIDI device settings (Standalone application only). |
-| ABOUT... | SESSION: Shows product version, links, and credits. |
-| SKIN | SESSION: Chooses the visual skin for the editor. |
-| UI SCALE | SESSION: Sets the user interface scale. |
-| LED (KEYBOARD FROM / HOST) | SESSION: Lights when MIDI activity arrives on Keyboard From or Host. |
-| LED (MIDI FROM) | SESSION: Lights when MIDI activity arrives from the synthesizer on MIDI From. |
-| LED (MIDI TO) | SESSION: Lights when MIDI activity is sent to the synthesizer on MIDI To. |
-| AUDIO PEAK | SESSION: Shows the peak level of the monitored audio input. |
+| EDIT (badge) | EDIT: Undo, redo, panic, and the logo menu for Settings, About, Skin, and UI Scale. |
+| MIDI (badge) | MIDI: Monitors MIDI activity from the keyboard (or host), the synthesizer, and to the synthesizer. |
+| AUDIO (badge) | AUDIO: Monitors the selected audio input level and sets INPUT GAIN (Standalone). |
+| FROM KEYBOARD | MIDI: Labels the keyboard (or host) MIDI activity lane. Set the device in Settings > MIDI & DEVICE. |
+| FROM SYNTH | MIDI: Labels the synthesizer MIDI input activity lane. Set SYNTH FROM in Settings > MIDI & DEVICE. |
+| TO SYNTH | MIDI: Labels the synthesizer MIDI output activity lane. Set SYNTH TO in Settings > MIDI & DEVICE. |
+| INPUT GAIN | AUDIO: Sets monitoring level for the selected audio input. Choose the listen source in Settings > AUDIO > SYNTH FROM. |
+| UNDO | EDIT: Undoes the last Patch or master edit in this session. |
+| REDO | EDIT: Redoes the last undone edit. |
+| PANIC | EDIT: Sends Note Offs for held notes, plus All Notes Off and Reset Controllers. |
+| LOGO | EDIT: Opens the logo menu for Settings, About, Skin, and UI Scale. |
+| SETTINGS... | EDIT: Opens Settings (MIDI ports, standalone audio, paths, warnings, master utility, shortcuts). |
+| ABOUT... | EDIT: Shows product version, links, and credits. |
+| SKIN | EDIT: Chooses the visual skin for the editor. |
+| UI SCALE | EDIT: Sets the user interface scale. |
+| LED (FROM KEYBOARD) | MIDI: Lights when MIDI activity arrives from the keyboard (or host in Plugin). |
+| LED (FROM SYNTH) | MIDI: Lights when MIDI activity arrives from the synthesizer. |
+| LED (TO SYNTH) | MIDI: Lights when MIDI activity is sent to the synthesizer. |
+| AUDIO PEAK | AUDIO: Shows the peak level of the monitored audio input. |
 
 ---
 
@@ -272,6 +267,7 @@ Quand c'est prêt, dis-moi dans le chat Build quelles tables tu as touchées (ou
 
 | Contrôle | Message proposé |
 |----------|-----------------|
+| Column header (# / SOURCE / AMOUNT / DESTINATION) | MATRIX MODULATION: Column guide for bus number, source, amount, and destination. Drag a bus number to reorder. |
 | I (section) | MATRIX MODULATION: Resets all modulation buses to init. |
 | C (section) | MATRIX MODULATION: Copies all modulation buses to the clipboard. |
 | P (section) | MATRIX MODULATION: Pastes compatible clipboard data into all modulation buses. |

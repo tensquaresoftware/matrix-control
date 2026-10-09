@@ -5,6 +5,7 @@
 #include "GUI/Widgets/ComboBox.h"
 #include "GUI/Widgets/Label.h"
 #include "GUI/Widgets/ModulationBusCell.h"
+#include "GUI/Widgets/ModulationBusHeader.h"
 #include "GUI/Widgets/Slider.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 
@@ -18,6 +19,7 @@ void MatrixModulationPanel::registerContextualHelp()
     contextualHelpBinder_->bind(initButton_.get(), Help::kSectionInit);
     contextualHelpBinder_->bind(copyButton_.get(), Help::kSectionCopy);
     contextualHelpBinder_->bind(pasteButton_.get(), Help::kSectionPaste);
+    contextualHelpBinder_->bind(modulationBusHeader_.get(), Help::kColumnHeader);
 
     for (auto& bus : modulationBuses_)
     {
