@@ -65,6 +65,11 @@ Note that Matrix-Control is primarily designed for the **Matrix-1000**. Features
 
 ## Contributing Code
 
+By submitting a contribution, you agree that your work is licensed under the same
+terms as the project ([`LICENSE`](LICENSE) — PolyForm Noncommercial 1.0.0 plus the
+additional end-user grant for official binaries), and that Ten Square Software may
+relicense or dual-license that contribution as part of Matrix-Control.
+
 ### Prerequisites
 
 Please make sure you are comfortable with the project's build setup before contributing. See the [Build Instructions](https://claude.ai/chat/README.md#build-instructions) in the README.
@@ -262,7 +267,7 @@ Configure in **Settings → Secrets and variables → Actions** (names only — 
 
 The macOS release leg **fails** if any of these are missing — there is no silent skip of signing/notarization.
 
-**Windows Authenticode** signing is optional for v1 (unsigned VST3/Standalone is acceptable for MIT open-source distribution).
+**Windows Authenticode** signing is optional for v1 (unsigned VST3/Standalone is acceptable for free / source-available distribution).
 
 ### Local packaging (fallback)
 
