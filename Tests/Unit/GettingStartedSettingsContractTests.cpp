@@ -70,8 +70,9 @@ private:
         expectEquals(
             juce::String(PluginDisplayNames::Settings::ContextualHelp::kGettingStartedAutoOpen),
             juce::String(
-                "SETTINGS: Chooses whether Getting Started may open at launch when applicable steps "
-                "are still incomplete."));
+                "SETTINGS: SHOW WHEN INCOMPLETE opens Getting Started at launch when applicable steps "
+                "are still incomplete. NEVER SHOW AT LAUNCH blocks auto-open. Returning to "
+                "SHOW WHEN INCOMPLETE also clears Configure later silence."));
         expectEquals(
             juce::String(PluginDisplayNames::Settings::ContextualHelp::kRunSetupAgain),
             juce::String(
