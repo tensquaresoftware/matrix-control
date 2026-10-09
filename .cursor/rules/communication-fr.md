@@ -33,6 +33,8 @@ Guillaume ne doit **pas** avoir à demander une reformulation pour comprendre un
 
 S’il demande quand même **RFC** / **RFCD**, c’est un raccourci de reformulation (pas une exécution) : voir `.cursor/rules/rfc-rfcd-reformulation.mdc`.
 
+S’il demande **ROFHA**, c’est un raccourci de ton (réponse objective, franche et honnête — pas une exécution) : voir `.cursor/rules/rofha-honest-answer.mdc`.
+
 ## Code dans le chat
 
 - **Ne pas** coller de blocs code complets lors de modifications : les diffs de l'outil suffisent.
