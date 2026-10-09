@@ -71,6 +71,46 @@ juce::String MatrixOrderedConfirmDialog::joinedRowColumn(bool labels) const
     return lines.joinIntoString("\n\n");
 }
 
+namespace
+{
+    struct BodySideInsets
+    {
+        int leftInset = -1;
+        int rightInset = -1;
+        int textWidth = 0;
+    };
+
+    struct CancelAlignInsetArgs
+    {
+        TSS::ISkin& skin;
+        float uiScale = 1.0f;
+        int contentWidth = 0;
+        TSS::Button& cancelButton;
+        TSS::Button* middleButton = nullptr;
+        TSS::Button& primaryButton;
+    };
+
+    BodySideInsets bodySideInsetsForCancelAlign(const CancelAlignInsetArgs& args)
+    {
+        namespace Helpers = DialogMatrixHelpers;
+        std::vector<int> buttonWidths;
+        buttonWidths.push_back(
+            Helpers::estimateButtonWidth(args.skin, args.cancelButton.getButtonText(), args.uiScale));
+        if (args.middleButton != nullptr)
+            buttonWidths.push_back(
+                Helpers::estimateButtonWidth(args.skin, args.middleButton->getButtonText(), args.uiScale));
+        buttonWidths.push_back(
+            Helpers::estimateButtonWidth(args.skin, args.primaryButton.getButtonText(), args.uiScale));
+
+        const auto pack = Helpers::measureCentredButtonPack(args.contentWidth, args.uiScale, buttonWidths);
+        BodySideInsets insets;
+        insets.leftInset = pack.leftInset;
+        insets.rightInset = scaled(Helpers::kButtonSideMargin, args.uiScale);
+        insets.textWidth = Helpers::bodyTextWidthFor(args.contentWidth, insets.leftInset, insets.rightInset);
+        return insets;
+    }
+}
+
 MatrixOrderedConfirmDialog::BodyLayout MatrixOrderedConfirmDialog::computeBodyLayout() const
 {
     namespace Helpers = DialogMatrixHelpers;
@@ -79,29 +119,21 @@ MatrixOrderedConfirmDialog::BodyLayout MatrixOrderedConfirmDialog::computeBodyLa
     layout.bodyFont = Helpers::scaledModalBodyFont(*skin_, uiScale_);
 
     const int contentWidth = Helpers::contentWidthFor(designWidth_, uiScale_);
-    int leftInset = -1;
-    int rightInset = -1;
-    int textWidth = Helpers::bodyTextWidthFor(contentWidth);
+    BodySideInsets insets;
+    insets.textWidth = Helpers::bodyTextWidthFor(contentWidth);
 
     // Patch name mismatch only: body left edge matches CANCEL. Other confirms keep ~10% inset.
     if (alignBodyToCancel_)
-    {
-        std::vector<int> buttonWidths;
-        buttonWidths.push_back(
-            Helpers::estimateButtonWidth(*skin_, cancelButton_->getButtonText(), uiScale_));
-        if (hasMiddle_ && middleButton_ != nullptr)
-            buttonWidths.push_back(
-                Helpers::estimateButtonWidth(*skin_, middleButton_->getButtonText(), uiScale_));
-        buttonWidths.push_back(
-            Helpers::estimateButtonWidth(*skin_, primaryButton_->getButtonText(), uiScale_));
+        insets = bodySideInsetsForCancelAlign({
+            .skin = *skin_,
+            .uiScale = uiScale_,
+            .contentWidth = contentWidth,
+            .cancelButton = *cancelButton_,
+            .middleButton = hasMiddle_ ? middleButton_.get() : nullptr,
+            .primaryButton = *primaryButton_,
+        });
 
-        const auto pack = Helpers::measureCentredButtonPack(contentWidth, uiScale_, buttonWidths);
-        leftInset = pack.leftInset;
-        rightInset = scaled(Helpers::kButtonSideMargin, uiScale_);
-        textWidth = Helpers::bodyTextWidthFor(contentWidth, leftInset, rightInset);
-    }
-
-    int bodyHeight = Helpers::measureBodyHeight(layout.bodyFont, message_, textWidth);
+    int bodyHeight = Helpers::measureBodyHeight(layout.bodyFont, message_, insets.textWidth);
 
     if (! valueRows_.empty())
     {
@@ -111,15 +143,14 @@ MatrixOrderedConfirmDialog::BodyLayout MatrixOrderedConfirmDialog::computeBodyLa
                 juce::GlyphArrangement::getStringWidthInt(layout.bodyFont, row.label) + kLabelWidthSlack);
 
         layout.labelColumnWidth += juce::roundToInt(layout.bodyFont.getHeight() * kLabelValueGapEm);
-        // Keep at least 1 px for the value column.
-        layout.labelColumnWidth = juce::jmin(layout.labelColumnWidth, textWidth - 1);
+        layout.labelColumnWidth = juce::jmin(layout.labelColumnWidth, insets.textWidth - 1);
 
-        // Long values may wrap more than the labels: the taller column decides the block height.
-        const int valueWidth = textWidth - layout.labelColumnWidth;
+        const int valueWidth = insets.textWidth - layout.labelColumnWidth;
         layout.rowsTextHeight = juce::jmax(
             Helpers::measureBodyHeight(layout.bodyFont, joinedRowColumn(true), layout.labelColumnWidth),
             Helpers::measureBodyHeight(layout.bodyFont, joinedRowColumn(false), valueWidth));
-        layout.rowsBlockHeight = layout.rowsTextHeight + Helpers::measureLineStep(layout.bodyFont, textWidth);
+        layout.rowsBlockHeight = layout.rowsTextHeight
+                                 + Helpers::measureLineStep(layout.bodyFont, insets.textWidth);
         bodyHeight += layout.rowsBlockHeight;
     }
 
@@ -129,8 +160,8 @@ MatrixOrderedConfirmDialog::BodyLayout MatrixOrderedConfirmDialog::computeBodyLa
         .uiScale = uiScale_,
         .systemDisplayScale = TSS::ScaledDrawing::systemDisplayScaleForComponent(*this),
         .bodyHeight = bodyHeight,
-        .bodyLeftInset = leftInset,
-        .bodyRightInset = rightInset,
+        .bodyLeftInset = insets.leftInset,
+        .bodyRightInset = insets.rightInset,
     });
     return layout;
 }
