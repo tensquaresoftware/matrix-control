@@ -159,13 +159,23 @@ namespace Core::GettingStartedMachineDefaults
         if (prefs.configureLaterArm == ConfigureLaterArm::kSilenced)
             return decision;
 
+        // CAP-5: OneReminder is format-scoped — do not auto-open on the other format.
+        if (prefs.configureLaterArm == ConfigureLaterArm::kOneReminder
+            && prefs.lastSilencedWasPlugin != isPluginMode)
+            return decision;
+
         decision.shouldOpen = true;
         // True first contact / never Continued → intro (0); otherwise resume at first incomplete.
         decision.startStepIndex = prefs.hasLeftIntro ? *incomplete : 0;
-        // CAP-5: consume the one reminder only on the same format that armed it.
-        decision.consumeOneReminder = prefs.configureLaterArm == ConfigureLaterArm::kOneReminder
-            && prefs.lastSilencedWasPlugin == isPluginMode;
+        decision.consumeOneReminder = prefs.configureLaterArm == ConfigureLaterArm::kOneReminder;
         return decision;
+    }
+
+    /** Prefs arm after an auto-open decision (OneReminder → Silenced when consumed). */
+    inline ConfigureLaterArm configureLaterArmAfterAutoOpen(ConfigureLaterArm current,
+                                                            bool consumeOneReminder) noexcept
+    {
+        return consumeOneReminder ? ConfigureLaterArm::kSilenced : current;
     }
 
     inline ConfigureLaterArm advanceConfigureLaterArm(ConfigureLaterArm current) noexcept

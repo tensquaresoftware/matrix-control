@@ -5,6 +5,7 @@
 #include "PopupMenuModalHelpers.h"
 #include "ScrollablePopupMenu.h"
 
+#include "GUI/Helpers/ComboBoxPopupMark.h"
 #include "GUI/Skins/ColourChart.h"
 
 namespace TSS
@@ -88,14 +89,10 @@ namespace TSS
 
     juce::String ComboBox::popupListLabelForItemIndex(int itemIndex) const
     {
-        auto text = getItemText(itemIndex);
-        if (popupOnlyMarkedItemId_ == 0 || popupOnlyMarkSuffix_.isEmpty())
-            return text;
-
-        if (getItemId(itemIndex) == popupOnlyMarkedItemId_)
-            text += popupOnlyMarkSuffix_;
-
-        return text;
+        return ComboBoxPopupMark::labelForItem(getItemText(itemIndex),
+                                               getItemId(itemIndex),
+                                               popupOnlyMarkedItemId_,
+                                               popupOnlyMarkSuffix_);
     }
 
     void ComboBox::paint(juce::Graphics& g)

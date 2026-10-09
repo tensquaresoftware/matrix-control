@@ -183,11 +183,24 @@ void PluginEditor::wireGettingStartedNavCallbacks(GettingStartedWizardDialog::Ho
     };
 }
 
+void PluginEditor::wireGettingStartedLiveResolvers(GettingStartedWizardDialog::HostBindings& bindings)
+{
+    bindings.resolvePreferredEpromTypeId = [this]
+    {
+        auto& state = pluginProcessor.getApvts().state;
+        const auto deviceType = Core::DeviceTypeRegistry::fromApvtsProperty(
+            state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
+        return preferredEpromTypeForWizard(state, deviceType);
+    };
+    bindings.refreshSynthFromCatalog = [this] { refreshGettingStartedWizardSynthFrom(); };
+}
+
 void PluginEditor::wireGettingStartedBindingCallbacks(GettingStartedWizardDialog::HostBindings& bindings)
 {
     wireGettingStartedAppearanceCallbacks(bindings);
     wireGettingStartedPortCallbacks(bindings);
     wireGettingStartedNavCallbacks(bindings);
+    wireGettingStartedLiveResolvers(bindings);
 }
 
 GettingStartedWizardDialog::HostBindings PluginEditor::makeGettingStartedHostBindings()
@@ -342,8 +355,10 @@ void PluginEditor::maybeAutoOpenGettingStartedWizard()
     if (! decision.shouldOpen)
         return;
 
-    if (decision.consumeOneReminder)
-        persistConfigureLaterArm(ConfigureLaterArm::kSilenced, isPluginMode);
+    const auto nextArm = configureLaterArmAfterAutoOpen(prefs.configureLaterArm,
+                                                        decision.consumeOneReminder);
+    if (nextArm != prefs.configureLaterArm)
+        persistConfigureLaterArm(nextArm, isPluginMode);
 
     const auto startStep = static_cast<GettingStartedWizard::Step>(decision.startStepIndex);
     juce::MessageManager::callAsync(

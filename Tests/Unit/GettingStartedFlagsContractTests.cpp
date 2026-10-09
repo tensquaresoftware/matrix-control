@@ -151,11 +151,15 @@ private:
         auto decision = decideAutoOpen(prefs, true);
         expect(decision.shouldOpen);
         expect(decision.consumeOneReminder);
+        expect(configureLaterArmAfterAutoOpen(prefs.configureLaterArm, decision.consumeOneReminder)
+               == ConfigureLaterArm::kSilenced);
 
-        // Cross-format: Standalone may open but must not consume the plugin reminder.
+        // Cross-format: OneReminder armed in plugin must not auto-open Standalone.
         decision = decideAutoOpen(prefs, false);
-        expect(decision.shouldOpen);
+        expect(! decision.shouldOpen);
         expect(! decision.consumeOneReminder);
+        expect(configureLaterArmAfterAutoOpen(prefs.configureLaterArm, decision.consumeOneReminder)
+               == ConfigureLaterArm::kOneReminder);
 
         prefs.configureLaterArm = ConfigureLaterArm::kSilenced;
         decision = decideAutoOpen(prefs, true);

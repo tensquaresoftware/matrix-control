@@ -40,9 +40,9 @@ void GettingStartedWizardDialog::buildStepControls(TSS::ISkin& skin)
     skinCombo_ = makeCombo();
     populateScaleAndSkinItems();
 
-    midiFromLabel_ = makeLabel(PluginDisplayNames::Dialogs::EpromTypePrompt::kMidiFromLabel);
+    midiFromLabel_ = makeLabel(PluginDisplayNames::Settings::kSynthFromLabel);
     midiFromCombo_ = makeCombo();
-    midiToLabel_ = makeLabel(PluginDisplayNames::Dialogs::EpromTypePrompt::kMidiToLabel);
+    midiToLabel_ = makeLabel(PluginDisplayNames::Settings::kSynthToLabel);
     midiToCombo_ = makeCombo();
     deviceLabel_ = makeLabel(PluginDisplayNames::FooterPanel::kDeviceLabel);
     deviceValueField_ = std::make_unique<TSS::ReadOnlyValueField>(skin);

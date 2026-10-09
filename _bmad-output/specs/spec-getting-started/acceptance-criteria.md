@@ -2,17 +2,17 @@
 
 Mapped to Epic GS stories and SPEC capabilities. Prefer demonstrable Given/When/Then for Build and review.
 
-## GS-1 — Settings User Interface (CAP-1)
+## GS-1 — Settings (CAP-1)
 
-**AC-GS1-1 — Order**  
+**AC-GS1-1 — User Interface order**  
 **Given** Settings → User Interface  
 **When** the section is visible  
-**Then** options appear in order: UI SCALE, SKIN, INFO MESSAGE, CONTEXTUAL HELP, GETTING STARTED
+**Then** options appear in order: UI SCALE, SKIN, INFO MESSAGE, CONTEXTUAL HELP
 
-**AC-GS1-2 — Getting Started controls**  
-**Given** the GETTING STARTED block  
-**When** the user inspects it  
-**Then** a combo offers `SHOW WHEN INCOMPLETE` (default) and `NEVER AT LAUNCH`  
+**AC-GS1-2 — Getting Started tab**  
+**Given** Settings → GETTING STARTED (first tab)  
+**When** the user inspects the SETUP WIZARD row  
+**Then** a combo offers `SHOW WHEN INCOMPLETE` (default) and `NEVER SHOW AT LAUNCH`  
 **And** `RUN SETUP AGAIN` appears below the combo (no second label beside the button)
 
 **AC-GS1-3 — Logo shortcuts**  
@@ -26,10 +26,15 @@ Mapped to Epic GS stories and SPEC capabilities. Prefer demonstrable Given/When/
 **Then** applicable-to-format step flags reset to incomplete  
 **And** the wizard opens at step 0
 
-**AC-GS1-5 — Never at launch**  
-**Given** combo = `NEVER AT LAUNCH` and incomplete applicable steps  
+**AC-GS1-5 — Never show at launch**  
+**Given** combo = `NEVER SHOW AT LAUNCH` and incomplete applicable steps  
 **When** the editor becomes ready  
 **Then** GETTING STARTED does not auto-open
+
+**AC-GS1-6 — MIDI & DEVICE**  
+**Given** Settings  
+**When** the user opens MIDI & DEVICE  
+**Then** synth MIDI ports, DEVICE (read-only), EPROM TYPE, and (plugin) HARDWARE LATENCY appear on that merged tab
 
 ---
 
@@ -40,7 +45,7 @@ Mapped to Epic GS stories and SPEC capabilities. Prefer demonstrable Given/When/
 **When** the user compares it to Settings  
 **Then** chrome is Matrix monochrome matching Settings overlay rules  
 **And** design width equals Settings (`SettingsShellMetrics::kDesignWidth`)  
-**And** per-step height is lower than Settings tallest page
+**And** per-step height is lower than Settings tallest page, **except** STEP 4 (full AUDIO embed) and STEP 2 when the firmware-suggestion body suffix is shown, which may exceed Settings height
 
 **AC-GS2-2 — Titles and copy**  
 **Given** any step  
@@ -115,8 +120,8 @@ Mapped to Epic GS stories and SPEC capabilities. Prefer demonstrable Given/When/
 **AC-GS3-8 — Configure later policy**  
 **Given** step 0 CONFIGURE LATER  
 **When** dismissed once  
-**Then** unvisited steps stay incomplete and one later auto reminder is allowed  
-**When** Configure later a second time (or silence arm)  
+**Then** unvisited steps stay incomplete and one later auto reminder is allowed on the **same format** only (the other format does not auto-open while that reminder is armed)  
+**When** Configure later a second time (or the reminder opens and is consumed)  
 **Then** auto-open stops until `RUN SETUP AGAIN` or combo → `SHOW WHEN INCOMPLETE`  
 **When** a newly applicable step appears  
 **Then** one targeted open is rearmed

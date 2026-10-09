@@ -96,21 +96,24 @@ When combo = `NEVER SHOW AT LAUNCH`: never auto-open; entry only via Settings / 
 
 1. Close modal.
 2. Do **not** mark unvisited steps done.
-3. Allow **one** auto reminder on next launch (same format) while applicable incomplete work remains.
-4. Second Configure later (or equivalent) → silence until `RUN SETUP AGAIN` or combo set back to `SHOW WHEN INCOMPLETE`.
+3. Allow **one** auto reminder on next launch (**same format only**) while applicable incomplete work remains. While that reminder is armed, the **other** format does **not** auto-open.
+4. Consuming the reminder (auto-open on that format) or a second Configure later → silence until `RUN SETUP AGAIN` or combo set back to `SHOW WHEN INCOMPLETE`.
 5. **Exception:** a newly applicable incomplete step (e.g. first Standalone, only Audio left) **rearms** one targeted open.
 
-## Settings — User Interface block
+## Settings — tabs and controls
 
-Order:
+**GETTING STARTED** (first tab) — SETUP WIZARD row: combo then `RUN SETUP AGAIN` below (no second label beside the button).
+
+**USER INTERFACE** order:
 
 1. UI SCALE  
 2. SKIN  
 3. INFO MESSAGE  
 4. CONTEXTUAL HELP  
-5. GETTING STARTED  
 
-GETTING STARTED row: combo then `RUN SETUP AGAIN` below (no second label beside the button). Logo menu keeps Scale/Skin shortcuts.
+**MIDI & DEVICE** — SYNTH FROM / SYNTH TO, DEVICE (read-only), EPROM TYPE, HARDWARE LATENCY (plugin only).
+
+Logo menu keeps Scale/Skin shortcuts.
 
 ## Distinct first-run: audio safety
 

@@ -155,7 +155,7 @@ Une fois que vous avez quitté l’introduction avec `CONTINUE`, une réouvertur
 |-------|-----------------|--------------------|
 | 0 | `GETTING STARTED` | Introduction — aucun contrôle, seulement `CONFIGURE LATER` ou `CONTINUE` |
 | 1 | `GETTING STARTED | STEP 1: USER INTERFACE` | `UI SCALE` et `SKIN` (lisibilité sur votre écran) |
-| 2 | `GETTING STARTED | STEP 2: SYNTH COMMUNICATION` | Ports MIDI vers / depuis le synthé (`MIDI FROM` / `MIDI TO`, même rôle que `SYNTH FROM` / `SYNTH TO` dans Settings → `MIDI & DEVICE`), badge `DEVICE`, type `EPROM TYPE` |
+| 2 | `GETTING STARTED | STEP 2: SYNTH COMMUNICATION` | Ports MIDI vers / depuis le synthé (`SYNTH FROM` / `SYNTH TO`, comme Settings → `MIDI & DEVICE`), badge `DEVICE`, type `EPROM TYPE` |
 | 3 | `GETTING STARTED | STEP 3: MIDI KEYBOARD` | Clavier — contenu différent en plugin et en Standalone (voir ci-dessous) |
 
 `CONFIGURE LATER` et `CONTINUE` n’apparaissent que sur l’**introduction**. Les étapes suivantes utilisent `PREVIOUS`, `NEXT`, éventuellement `SKIP` (clavier Standalone), et `FINISH` sur la dernière étape applicable.
@@ -188,7 +188,7 @@ Sur l’introduction, `CONFIGURE LATER` ferme l’assistant sans marquer comme t
 
 Comportement de rappel et de silence :
 
-- Le premier `CONFIGURE LATER` **arme un seul rappel** au prochain lancement, pour le **même format** (plugin ou Standalone), s’il reste une étape applicable incomplète
+- Le premier `CONFIGURE LATER` **arme un seul rappel** au prochain lancement, pour le **même format** (plugin ou Standalone), s’il reste une étape applicable incomplète. Pendant que ce rappel est armé, l’**autre** format ne s’ouvre pas automatiquement
 - Le silence s’installe ensuite dans l’un de ces cas : ce rappel s’est déjà ouvert automatiquement, **ou** vous avez choisi `CONFIGURE LATER` une seconde fois. Plus d’ouverture auto jusqu’à `RUN SETUP AGAIN`, ou jusqu’à ce que vous remettiez la combo sur `SHOW WHEN INCOMPLETE`
 - Fermer avec **Échap** ou un clic à l’extérieur **ne compte pas** comme `CONFIGURE LATER` : l’assistant peut encore se rouvrir au prochain lancement selon les règles normales
 - **Exception :** une étape qui devient applicable pour la première fois (par exemple le premier passage en Standalone alors que seul l’Audio manque) peut réarmer une ouverture ciblée — **sauf** si la combo est sur `NEVER SHOW AT LAUNCH`, qui bloque toute ouverture automatique
@@ -236,7 +236,7 @@ Dans la liste déroulante `EPROM TYPE` (assistant et Settings → `MIDI & DEVICE
 
 **Dans le bandeau supérieur**, les mêmes sens MIDI apparaissent sous les libellés `FROM SYNTH`, `TO SYNTH` et `FROM KEYBOARD`.
 
-**Dans l’assistant `GETTING STARTED`**, l’étape communication synthé affiche pour l’instant les libellés `MIDI FROM` / `MIDI TO` (même rôle que les ports `SYNTH FROM` / `SYNTH TO` de Settings → `MIDI & DEVICE`), plus le badge `DEVICE` et `EPROM TYPE`.
+**Dans l’assistant `GETTING STARTED`**, l’étape communication synthé affiche les mêmes libellés de ports que Settings → `MIDI & DEVICE` (`SYNTH FROM` / `SYNTH TO`), plus le badge `DEVICE` et `EPROM TYPE`.
 
 Des voyants situés à côté des listes clignotent lorsque des messages MIDI circulent.
 
@@ -589,7 +589,7 @@ Un clic sur le logo (en haut à gauche) ouvre le menu suivant :
 |--------|---------|
 | `UI SCALE` | Taille de l’interface : 50 % à 200 % (raccourci ; même réglage que dans Settings) |
 | `SKIN` | Apparence `BLACK` ou `CREAM` (petit clin d’œil aux versions Black et Cream du Matrix-1000) |
-| `SETTINGS...` | Préférences (onglets `USER INTERFACE`, `DEVICE`, `MIDI`, `AUDIO` en Standalone, etc.) |
+| `SETTINGS...` | Préférences (onglets `GETTING STARTED`, `USER INTERFACE`, `MIDI & DEVICE`, `AUDIO` en Standalone, etc.) |
 | `ABOUT...` | Version, crédits, liens |
 
 Raccourcis sur le logo :
@@ -688,7 +688,7 @@ En général **non** conservé tel quel : le contenu du patch en cours d’édit
 | Pas de notes en plugin | Router le clavier maître vers la piste Matrix-Control dans le DAW ([exemples](#clavier-maître-via-le-daw-plugin)) ; `KEYBOARD FROM` reste sur `HOST` |
 | Assistant `GETTING STARTED` ne s’ouvre plus | Dans Settings → `GETTING STARTED` → `SETUP WIZARD`, choisir `SHOW WHEN INCOMPLETE` ou cliquer `RUN SETUP AGAIN` |
 | Pas de son en Standalone | Vérifier Settings → `AUDIO` (interface, entrée, canaux d’écoute `SYNTH FROM` — pas le port MIDI) et le câblage vers l’interface audio |
-| Audio en retard dans le DAW | Ajuster `HARDWARE LATENCY` dans Settings → `DEVICE` (plugin) ; et la taille de buffer du DAW / de l’interface audio |
+| Audio en retard dans le DAW | Ajuster `HARDWARE LATENCY` dans Settings → `MIDI & DEVICE` (plugin) ; et la taille de buffer du DAW / de l’interface audio |
 
 ---
 
@@ -724,7 +724,7 @@ Définitions courtes. Les libellés entre guillemets sont ceux de l’écran (an
 | **Section** | Grand ensemble de l’interface (`PATCH EDIT`, `MATRIX MODULATION`, `PATCH MANAGER`, `MASTER EDIT`). |
 | **Standalone** | Application autonome, sans DAW. |
 | **STORE** | Enregistrer le patch courant dans la mémoire du synthé. |
-| **SYNTH FROM / SYNTH TO** | **Ports MIDI** dans Settings → `MIDI & DEVICE` (ce qui arrive du synthé / part vers le synthé) ; bandeau `FROM SYNTH` / `TO SYNTH` ; assistant `MIDI FROM` / `MIDI TO`. **Aussi** canaux d’écoute audio `SYNTH FROM` dans Settings → `AUDIO` / étape Audio Standalone — ne pas confondre avec le port MIDI. |
+| **SYNTH FROM / SYNTH TO** | **Ports MIDI** dans Settings → `MIDI & DEVICE` et l’étape synthé de l’assistant (ce qui arrive du synthé / part vers le synthé) ; bandeau `FROM SYNTH` / `TO SYNTH`. **Aussi** canaux d’écoute audio `SYNTH FROM` dans Settings → `AUDIO` / étape Audio Standalone — ne pas confondre avec le port MIDI. |
 | **SysEx** | Messages MIDI détaillés propres à une marque / un modèle, utilisés pour éditer le synthé en profondeur. |
 | **`.syx`** | Fichier qui contient un patch au format SysEx. |
 | **Track Generator** | Courbe qui transforme la position sur le clavier en valeur de modulation (afficheur interactif). |

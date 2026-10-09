@@ -4,7 +4,7 @@
 
 ## Goal
 
-Ship a dedicated multi-step **GETTING STARTED** assistant that unlocks edit, play, and hear on first useful contact — by format (plugin vs Standalone) — and replace the Device Setup one-shot as the first-run path. Settings → User Interface gains UI Scale, Skin, and Getting Started controls so users can change appearance and re-run or suppress auto-open without relying only on the logo menu. Completion is tracked per applicable step, not one shared “setup done” flag for both formats.
+Ship a dedicated multi-step **GETTING STARTED** assistant that unlocks edit, play, and hear on first useful contact — by format (plugin vs Standalone) — and replace the Device Setup one-shot as the first-run path. Settings → User Interface gains UI Scale and Skin; Settings → GETTING STARTED holds SETUP WIZARD (auto-open / RUN SETUP AGAIN); MIDI & DEVICE merges ports, DEVICE, and EPROM. Completion is tracked per applicable step, not one shared “setup done” flag for both formats.
 
 ## Stories
 
@@ -16,11 +16,12 @@ Ship a dedicated multi-step **GETTING STARTED** assistant that unlocks edit, pla
 ## Requirements & Constraints
 
 - Unlock usage by format: Standalone needs appearance, synth MIDI/EPROM, optional keyboard, and audio monitoring; plugin must not walk OS Audio or Keyboard From like Standalone.
-- Settings → User Interface option order: UI SCALE, SKIN, INFO MESSAGE, CONTEXTUAL HELP, GETTING STARTED. Logo menu Scale/Skin shortcuts remain.
-- Getting Started block: combo `SHOW WHEN INCOMPLETE` (default) / `NEVER AT LAUNCH`, with `RUN SETUP AGAIN` below the combo (sole re-run control — no second “full setup” button).
-- Wizard steps (high level): 0 intro → 1 Scale/Skin → 2 Synth From/To + DEVICE + EPROM → 3 keyboard (Standalone combo+Skip vs plugin host-informative) → 4 Audio Standalone only.
+- Settings → User Interface option order: UI SCALE, SKIN, INFO MESSAGE, CONTEXTUAL HELP. Logo menu Scale/Skin shortcuts remain.
+- Settings → GETTING STARTED (first tab): SETUP WIZARD combo `SHOW WHEN INCOMPLETE` (default) / `NEVER SHOW AT LAUNCH`, with `RUN SETUP AGAIN` below (sole re-run control).
+- Settings → MIDI & DEVICE merges synth ports, DEVICE (read-only), EPROM TYPE, and plugin HARDWARE LATENCY.
+- Wizard steps (high level): 0 intro → 1 Scale/Skin → 2 SYNTH FROM/TO + DEVICE + EPROM → 3 keyboard (Standalone combo+Skip vs plugin host-informative) → 4 Audio Standalone only (Settings AUDIO embed).
 - Per-step durable flags drive auto-open and targeted resume; plugin and Standalone must not share a single setup-done flag. Distinct from the audio-safety first-run Input None gate.
-- Configure later from intro: one auto reminder then silence unless a newly applicable step appears (e.g. first Standalone Audio).
+- Configure later from intro: one same-format auto reminder then silence (other format does not open while armed) unless a newly applicable step appears (e.g. first Standalone Audio).
 - Product direction is frozen: no pastilles, mega-modal, Settings-only auto-open, manual-only, or Device Setup-only Standalone paths. No detailed DAW examples in the wizard body (manual only).
 - English UI strings only; ASCII display-string rules apply. Frozen button vocabulary: CONFIGURE LATER / CONTINUE / PREVIOUS / NEXT / SKIP / FINISH — no QUIT, no SPECIFY LATER.
 - GS-4 is a documentation deliverable (first launch + host keyboard routing); not a code Spec detail. Audio Settings Matrix rebuild stays a separate chantier. Do not reopen Epic 7/8 as incomplete.
@@ -35,9 +36,9 @@ Ship a dedicated multi-step **GETTING STARTED** assistant that unlocks edit, pla
 
 ## UX & Interaction Patterns
 
-- Chrome matches Settings (Matrix monochrome); design width equals Settings; per-step height is lower than Settings. Step titles live in the title band; body carries short help copy and few controls.
+- Chrome matches Settings (Matrix monochrome); design width equals Settings; per-step height is normally lower than Settings (STEP 2 with firmware suffix and STEP 4 AUDIO embed may exceed). Step titles live in the title band; body carries short help copy and few controls.
 - STEP 1 exists so UltraWide/HiDPI users can fix Scale before denser steps.
-- STEP 4 shows the most digestible audio set first (driver/type, I/O, SYNTH FROM); drop sample rate + buffer first if the layout is cramped — those remain in Settings once signal is audible.
+- STEP 4 embeds the same controls as Settings → AUDIO (full order including blank spacers).
 - Last applicable step uses FINISH (plugin ends at STEP 3; Standalone at STEP 4).
 
 ## Cross-Story Dependencies

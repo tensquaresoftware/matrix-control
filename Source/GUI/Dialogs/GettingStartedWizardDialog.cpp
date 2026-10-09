@@ -119,14 +119,22 @@ void GettingStartedWizardDialog::showStep(Step step)
     }
 
     if (step_ == Step::kSynthCommunication)
-        refreshEpromSuggestion(liveStatus_.deviceType, bindings_.preferredEpromTypeId);
+    {
+        const int preferred = bindings_.resolvePreferredEpromTypeId != nullptr
+            ? bindings_.resolvePreferredEpromTypeId()
+            : bindings_.preferredEpromTypeId;
+        refreshEpromSuggestion(liveStatus_.deviceType, preferred);
+    }
 
     if (step_ == Step::kAudio && ! isPluginMode_)
     {
         ensureAudioPage();
-        populateSynthFromChannels(bindings_.synthFromChannelNames,
-                                  bindings_.synthFromChannelIds,
-                                  bindings_.selectedSynthFromSourceId);
+        if (bindings_.refreshSynthFromCatalog != nullptr)
+            bindings_.refreshSynthFromCatalog();
+        else
+            populateSynthFromChannels(bindings_.synthFromChannelNames,
+                                      bindings_.synthFromChannelIds,
+                                      bindings_.selectedSynthFromSourceId);
     }
 
     updateControlVisibility();
@@ -202,7 +210,7 @@ DialogMatrixHelpers::ModalGeometry GettingStartedWizardDialog::computeGeometry()
     // a second blank below the copy; the single gap before controls is kGapBeforeButtons (24 px).
     // Do not clamp to maxBodyDesignHeightBelowSettings: STEP 2 with the firmware-suggestion
     // suffix is the tallest body and that ceiling (~91 px) squeezes fitted text, which visually
-    // shortens the gap above MIDI FROM compared with other steps.
+    // shortens the gap above SYNTH FROM compared with other steps.
     const int measuredBody = DialogMatrixHelpers::measureBodyHeight(
         DialogMatrixHelpers::scaledModalBodyFont(*skin_, uiScale_), body, bodyWidth);
     const int bodyHeight = juce::jmax(measuredBody, 1);

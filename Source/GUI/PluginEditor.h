@@ -220,6 +220,7 @@ private:
     void wireGettingStartedAppearanceCallbacks(GettingStartedWizardDialog::HostBindings& bindings);
     void wireGettingStartedPortCallbacks(GettingStartedWizardDialog::HostBindings& bindings);
     void wireGettingStartedNavCallbacks(GettingStartedWizardDialog::HostBindings& bindings);
+    void wireGettingStartedLiveResolvers(GettingStartedWizardDialog::HostBindings& bindings);
     void applyEpromTypePromptSelection(int selectedId);
     void applyEpromTypePromptSpecifyLater();
     void refreshEpromTypePromptDialogLiveState();

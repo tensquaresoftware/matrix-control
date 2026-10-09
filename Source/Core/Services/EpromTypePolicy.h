@@ -4,6 +4,7 @@
 #include <cstddef>
 
 #include <juce_core/juce_core.h>
+#include <juce_data_structures/juce_data_structures.h>
 
 #include "Core/MIDI/Queue/SysExDelayProfile.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
@@ -62,6 +63,11 @@ namespace Core
         /** Stored EPROM TYPE after a successful Device Inquiry (suggestion coerced for family). */
         static int storedTypeAfterInquirySuccess(const juce::String& deviceVersion,
                                                  MatrixDeviceTypes::Type deviceType) noexcept;
+
+        /** Writes Settings kEpromType from storedTypeAfterInquirySuccess (Inquiry success path). */
+        static void writeStoredTypeAfterInquirySuccess(juce::ValueTree& state,
+                                                       const juce::String& deviceVersion,
+                                                       MatrixDeviceTypes::Type deviceType);
 
         static const char* displayNameForId(int typeId) noexcept;
 

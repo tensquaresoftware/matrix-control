@@ -150,6 +150,15 @@ namespace Core
         return coerceForDeviceFamily(suggestFromInquiryVersion(deviceVersion, family), family);
     }
 
+    void EpromTypePolicy::writeStoredTypeAfterInquirySuccess(juce::ValueTree& state,
+                                                             const juce::String& deviceVersion,
+                                                             MatrixDeviceTypes::Type deviceType)
+    {
+        state.setProperty(PluginIDs::Settings::kEpromType,
+                          storedTypeAfterInquirySuccess(deviceVersion, deviceType),
+                          nullptr);
+    }
+
     const char* EpromTypePolicy::displayNameForId(int typeId) noexcept
     {
         using namespace PluginIDs::Settings::EpromType;

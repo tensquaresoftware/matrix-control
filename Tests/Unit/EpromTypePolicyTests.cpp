@@ -22,6 +22,7 @@ public:
         testPreferredForPrompt();
         testInquiryPopupMarkerId();
         testStoredTypeAfterInquirySuccess();
+        testWriteStoredTypeAfterInquirySuccess();
         testForEachValidItemSizesAndContents();
         testDeviceFamilyFromType();
     }
@@ -161,6 +162,23 @@ private:
         expectEquals(Core::EpromTypePolicy::storedTypeAfterInquirySuccess(
                          "2.15", MatrixDeviceTypes::Type::kMatrix6R),
                      kTauntek);
+    }
+
+    void testWriteStoredTypeAfterInquirySuccess()
+    {
+        beginTest("writeStoredTypeAfterInquirySuccess - sets Settings kEpromType on ValueTree");
+
+        using namespace PluginIDs::Settings::EpromType;
+
+        juce::ValueTree state("test");
+        state.setProperty(PluginIDs::Settings::kEpromType, kFactory, nullptr);
+        Core::EpromTypePolicy::writeStoredTypeAfterInquirySuccess(
+            state, "1.20", MatrixDeviceTypes::Type::kMatrix1000);
+        expectEquals(static_cast<int>(state.getProperty(PluginIDs::Settings::kEpromType)), kTauntek);
+
+        Core::EpromTypePolicy::writeStoredTypeAfterInquirySuccess(
+            state, "9.99", MatrixDeviceTypes::Type::kMatrix1000);
+        expectEquals(static_cast<int>(state.getProperty(PluginIDs::Settings::kEpromType)), kUnknown);
     }
 
     void testForEachValidItemSizesAndContents()

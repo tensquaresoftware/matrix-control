@@ -53,6 +53,10 @@ public:
         juce::StringArray synthFromChannelNames;
         juce::StringArray synthFromChannelIds;
         juce::String selectedSynthFromSourceId;
+        /** Live preferred EPROM id (APVTS); avoids stale prepare-time snapshot on step re-entry. */
+        std::function<int()> resolvePreferredEpromTypeId;
+        /** Live SYNTH FROM catalog refresh; avoids overwriting a fresher catalog on STEP 4 entry. */
+        std::function<void()> refreshSynthFromCatalog;
 
         std::function<void(int scaleId)> onScaleChanged;
         std::function<void(int skinId)> onSkinChanged;

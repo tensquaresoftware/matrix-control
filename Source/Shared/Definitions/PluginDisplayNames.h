@@ -89,7 +89,7 @@ namespace PluginDisplayNames
 
         // Left-zone guidance while FR-2 device lock is active (D-038 — footer only, no modal).
         constexpr const char* kDeviceLockGuidance =
-            "No synth detected - check MIDI cables, Settings > MIDI SYNTH FROM / SYNTH TO, and power-cycle your Matrix synth.";
+            "No synth detected - check MIDI cables, Settings > MIDI & DEVICE > SYNTH FROM / SYNTH TO, and power-cycle your Matrix synth.";
 
         // Presence inquiry timed out while still detected — synth likely overloaded, not unplugged.
         constexpr const char* kDeviceUnresponsiveGuidance =
@@ -97,7 +97,7 @@ namespace PluginDisplayNames
 
         // Connected Oberheim Matrix-family device whose member is not Matrix-1000 / Matrix-6/6R.
         constexpr const char* kUnsupportedMatrixDeviceFooter =
-            "Connected Matrix device is not supported - editing is locked. Use Settings > MIDI SYNTH FROM / SYNTH TO to change ports.";
+            "Connected Matrix device is not supported - editing is locked. Use Settings > MIDI & DEVICE > SYNTH FROM / SYNTH TO to change ports.";
 
         // Standalone: SYNTH FROM and KEYBOARD FROM must open distinct input devices.
         constexpr const char* kMidiFromKeyboardFromConflictFooter =
@@ -248,8 +248,9 @@ namespace PluginDisplayNames
             constexpr const char* kSkin =
                 "SETTINGS: Chooses the visual skin for the editor.";
             constexpr const char* kGettingStartedAutoOpen =
-                "SETTINGS: Chooses whether Getting Started may open at launch when applicable steps "
-                "are still incomplete.";
+                "SETTINGS: SHOW WHEN INCOMPLETE opens Getting Started at launch when applicable steps "
+                "are still incomplete. NEVER SHOW AT LAUNCH blocks auto-open. Returning to "
+                "SHOW WHEN INCOMPLETE also clears Configure later silence.";
             constexpr const char* kRunSetupAgain =
                 "SETTINGS: Resets Getting Started progress for this format and opens the wizard from the beginning.";
             constexpr const char* kInfoMessage =

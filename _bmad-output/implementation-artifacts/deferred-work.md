@@ -2472,3 +2472,12 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-getting-started-audio-parity.md`
   summary: Embedded Settings AUDIO page in Getting Started STEP 4 does not register contextual help the way Settings does.
   evidence: Blind Hunter — other wizard steps also lack Settings ContextualHelpBinder; footer CH parity deferred.
+
+## Deferred from: code review of SPEC.md (epic GS, 2026-10-09)
+
+- source_spec: `_bmad-output/specs/spec-getting-started/SPEC.md`
+  summary: Escape / outside-click dismiss of GETTING STARTED does not advance Configure-later arm (unlike CONFIGURE LATER); no automated assert on that dismiss path.
+  evidence: Verification Gap — GUI keyPressed / outside hit-test; NavButton closeSemanticsAreDismissOnly already covers button vocabulary.
+- source_spec: `_bmad-output/specs/spec-getting-started/SPEC.md`
+  summary: STEP 4 Finish with null SettingsAudioPage when AudioDeviceManager is null could mark Audio done without setup UI.
+  evidence: Edge Case Hunter maybe-false; overlaps GS-3 null AudioDeviceManager deferral.
