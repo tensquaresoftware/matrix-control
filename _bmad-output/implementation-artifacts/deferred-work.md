@@ -2491,3 +2491,9 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-windows-msvc-six-warnings.md`
   summary: No unit test covers getWidgetTypeString default/unknown return contract.
   evidence: GUI factory string helper; project unit tests stay on Core; regression risk is low with exhaustive enum switch.
+
+## Deferred from: review of spec-modal-action-footer-separator.md (2026-10-09)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-modal-action-footer-separator.md`
+  summary: bandHeightOverride is ignored when extraBandHeight > 0, so control-band Matrix dialogs cannot yet reserve an action-footer separator band the same way.
+  evidence: Intentional intro-only pilot; needed when extending the rule above buttons on steps/dialogs that already place controls in the band.

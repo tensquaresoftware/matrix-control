@@ -15,7 +15,9 @@ namespace GettingStartedWizardMetrics
 
     // Body help text planning floors (design px) for dialogDesignHeight / Settings ceiling checks.
     // Runtime body height follows measured copy so short variants do not pad a second blank above
-    // the control band (the single visual gap is DialogMatrixHelpers::kGapBeforeButtons).
+    // the control band. Non-intro steps: the single visual gap is DialogMatrixHelpers::kGapBeforeButtons.
+    // Intro runtime uses a taller air + rule + air band (bandHeightOverride); planning below still
+    // counts only kGapBeforeButtons for the intro gap (pilot divergence, no formula rewrite yet).
     // Intro: three paragraphs with two blank separators; floor covers wrap at Settings-width inset.
     inline constexpr int kBodyIntroDesignHeight = 156;
     inline constexpr int kBodyUserInterfaceDesignHeight = 46;
@@ -74,7 +76,9 @@ namespace GettingStartedWizardMetrics
         return rows * SettingsShellMetrics::kControlHeight + (rows - 1) * SettingsShellMetrics::kRowGap;
     }
 
-    /** Full dialog height including border and title band (mirrors DialogMatrixHelpers::computeModalGeometry). */
+    /** Full dialog height including border and title band (planning mirror of computeModalGeometry
+        for non-intro steps). Intro runtime band is taller (air + rule + air); this formula still
+        uses kGapBeforeButtons only for the intro gap. */
     inline constexpr int dialogDesignHeight(GettingStartedWizard::Step step, bool isPluginMode) noexcept
     {
         namespace Helpers = DialogMatrixHelpers;

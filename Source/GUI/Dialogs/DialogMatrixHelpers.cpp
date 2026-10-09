@@ -208,9 +208,10 @@ namespace DialogMatrixHelpers
         const int gapBeforeButtons = scaled(kGapBeforeButtons, args.uiScale);
         // Plain confirms: 24 px last content → buttons. With extra controls (Don't ask again,
         // DEVICE SETUP rows): keep 24 px above and below those controls.
+        // bandHeightOverride: e.g. intro footer air + 1px rule + air (pilot).
         const int bandHeight = args.extraBandHeight > 0
             ? gapBeforeButtons + args.extraBandHeight + gapBeforeButtons
-            : gapBeforeButtons;
+            : (args.bandHeightOverride >= 0 ? args.bandHeightOverride : gapBeforeButtons);
 
         const int contentHeight = gapUnderTitle + args.bodyHeight + bandHeight + buttonHeight + bottomMargin;
         geometry.dialogBounds = args.hostBounds.withSizeKeepingCentre(

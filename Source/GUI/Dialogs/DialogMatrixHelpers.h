@@ -99,6 +99,8 @@ namespace DialogMatrixHelpers
         int bodyHeight = 0;
         /** Pixel height of extra controls (e.g. checkbox, form rows) placed between body and buttons. */
         int extraBandHeight = 0;
+        /** When >= 0 and there is no extraBandHeight, replaces the default kGapBeforeButtons band. */
+        int bandHeightOverride = -1;
         /** When >= 0, overrides the default ~10% body side inset on that side. */
         int bodyLeftInset = -1;
         int bodyRightInset = -1;
