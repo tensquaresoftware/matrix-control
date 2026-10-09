@@ -34,9 +34,9 @@ Matrix-Control is a cross-platform JUCE **virtual instrument** and standalone ap
 
 It combines **two roles in one product**: play the hardware (MIDI notes/CC when the instrument track is armed) and **always-on bidirectional patch editing** (SysEx independent of track arming). One **instrument track** hosts Matrix-Control for MIDI editing and performance; a **separate audio track** monitors the synth hardware return — the standard cross-DAW pattern for external instruments. Standalone mode provides integrated audio input selection via `AudioDeviceManager`. This replaces the Ableton Live External Instrument + separate Max for Live editor workflow that frustrated users of the original editor.
 
-The product promise is professional craftsmanship and **trust**: users must edit for hours without the Matrix-1000 hanging because the editor flooded it with MIDI. Everything else — pixel UI, Patch Manager, Mutator, open-source quality — serves that reliability.
+The product promise is professional craftsmanship and **trust**: users must edit for hours without the Matrix-1000 hanging because the editor flooded it with MIDI. Everything else — pixel UI, Patch Manager, Mutator, public reference-repo quality — serves that reliability.
 
-Matrix-Control v1 ships **free (MIT)** with aspirational release Christmas 2026. Full Matrix-6/6R compatibility beyond PATCH mode is planned for v2.
+Matrix-Control v1 ships **free official binaries** with **source under PolyForm Noncommercial** (plus end-user grant) and aspirational release Christmas 2026. Full Matrix-6/6R compatibility beyond PATCH mode is planned for v2.
 
 ---
 
@@ -552,7 +552,7 @@ Core maintains packed buffers synced with APVTS via descriptor-driven mappers; n
 
 ### 6.1 In Scope
 
-Full ambitious v1 per brief § Scope: virtual instrument dual-role, PATCH + MASTER + MATRIX MOD (incl. bus reorder FR-50) + full PATCH MANAGER incl. **Patch Mutator** (FR-30–FR-34, FR-54–FR-60), module I/C/P, type-aware clipboard, automation with throttling, device diagnostics (multi-model Device Inquiry), Black/Cream skins, UI scale 50–200%, user manual EN/FR, MIT open source, official DAW test matrix.
+Full ambitious v1 per brief § Scope: virtual instrument dual-role, PATCH + MASTER + MATRIX MOD (incl. bus reorder FR-50) + full PATCH MANAGER incl. **Patch Mutator** (FR-30–FR-34, FR-54–FR-60), module I/C/P, type-aware clipboard, automation with throttling, device diagnostics (multi-model Device Inquiry), Black/Cream skins, UI scale 50–200%, user manual EN/FR, PolyForm Noncommercial source-available, official DAW test matrix.
 
 ### 6.2 Out of Scope for v1
 

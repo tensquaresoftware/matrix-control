@@ -158,7 +158,7 @@ EOF
 
 Each leg:
 
-1. Checks out JUCE **9.0.1** (cached between runs)
+1. Checks out JUCE **9.0.3** (cached between runs)
 2. Configures with `MATRIX_BUILD_TESTS=ON` and plugin copy disabled (`USER_COPY_TO_*=OFF`)
 3. Builds the `Matrix-Control` plugin target and `Matrix-Control_Tests`
 4. Runs the `Matrix-Control_Tests` console binary (headless Core unit tests — no MIDI hardware)
@@ -167,7 +167,7 @@ The matrix uses `fail-fast: false` so all three OS results appear in one run.
 
 ### Reproduce CI locally
 
-Set `JUCE_DIR` to your JUCE 9.0.1 install, then configure with the preset for your platform and the same CI flags:
+Set `JUCE_DIR` to your JUCE 9.0.3 install, then configure with the preset for your platform and the same CI flags:
 
 **macOS (Apple Silicon):**
 

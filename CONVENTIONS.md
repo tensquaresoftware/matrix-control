@@ -200,7 +200,7 @@ It runs the same `lint_touched.py` logic as CI before `git push`; bypass with
 - **Compiler:** Xcode 26
 - **Build system:** CMake
 - **Build directory:** `Builds/` (subfolders `macOS/`, `Windows/`, `Linux/`) — do not use `build/` at root
-- **Audio framework:** JUCE 9.0.1
+- **Audio framework:** JUCE 9.0.3
 
 ### 5.2 JUCE reference
 

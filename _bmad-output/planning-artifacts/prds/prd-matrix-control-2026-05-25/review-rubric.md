@@ -38,7 +38,7 @@ Glossary includes Mi, Mi-Rj, initial snapshot. FR-54–FR-60 cross-reference add
 
 ## Shape fit — strong
 
-Brownfield PRD with decision-log traceability; coaching-path depth appropriate for launch-aspiring open-source plugin. Mutator section depth matches feature novelty.
+Brownfield PRD with decision-log traceability; coaching-path depth appropriate for launch-aspiring free / source-available plugin. Mutator section depth matches feature novelty.
 
 ## Mechanical notes
 

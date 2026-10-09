@@ -1756,7 +1756,7 @@ So that cross-platform compile regressions and logic failures are caught before 
 **Given** a push or pull request targeting `main`
 **When** GitHub Actions runs
 **Then** `.github/workflows/build-and-test.yml` executes on `macos-latest`, `windows-latest`, and `ubuntu-latest`
-**And** each leg checks out JUCE 9.0.1, configures with `MATRIX_BUILD_TESTS=ON`, builds plugin + `Matrix-Control_Tests`, runs the test binary
+**And** each leg checks out JUCE 9.0.3, configures with `MATRIX_BUILD_TESTS=ON`, builds plugin + `Matrix-Control_Tests`, runs the test binary
 **And** `COPY_TO_SYSTEM_FOLDERS=OFF` and `COPY_TO_ARTEFACTS_DIR=OFF` in CI
 **And** `CONTRIBUTING.md` and `README.md` document CI accurately
 

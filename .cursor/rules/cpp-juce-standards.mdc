@@ -55,7 +55,7 @@ Séparer chaque groupe par une ligne vide. Forward declarations dans `.h`, inclu
 - `setPlayConfigDetails()` → `setBusesLayout()`
 - Ancien `Timer` callback → `juce::HighResolutionTimer`
 
-Vérifier toute API contre JUCE 9.0.1 ; signaler l'incertitude.
+Vérifier toute API contre JUCE 9.0.3 ; signaler l'incertitude.
 
 ## Plugin
 

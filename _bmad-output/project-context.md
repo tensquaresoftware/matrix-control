@@ -92,7 +92,7 @@ When finalizing a PRD (`bmad-prd` Finalize), set `version: "1.0"` alongside `sta
 Matrix-Control is a cross-platform **JUCE 9** VST3/AU/Standalone MIDI editor for the **Oberheim Matrix-1000**. The project has two goals:
 
 1. **Product:** Professional UX/UI plugin that fully exploits the Matrix-1000 via SysEx.
-2. **Reference repo:** Exemplary open-source JUCE plugin — Clean Code, Clean Architecture, SOLID, tests, and thorough public documentation.
+2. **Reference repo:** Exemplary source-available JUCE plugin (PolyForm Noncommercial + free official binaries) — Clean Code, Clean Architecture, SOLID, tests, and thorough public documentation.
 
 This is a **brownfield** project. Do **not** restart from scratch. Extend and refine existing architecture.
 
@@ -103,7 +103,7 @@ This is a **brownfield** project. Do **not** restart from scratch. Extend and re
 | Layer | Choice |
 |---|---|
 | Language | C++17 minimum |
-| Framework | JUCE 9.0.1 (`/Volumes/Guillaume/Dev/SDKs/JUCE-9`) |
+| Framework | JUCE 9.0.3 (`/Volumes/Guillaume/Dev/SDKs/JUCE-9`) |
 | Build | CMake presets; outputs under `Builds/` (`macOS/ARM`, `macOS/Intel`, `Windows`, `Linux`) — gitignored |
 | Compiler (macOS) | Xcode 26 |
 | Plugin formats | AU, VST3, Standalone |

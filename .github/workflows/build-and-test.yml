@@ -22,7 +22,7 @@ on:
     types: [opened, synchronize, reopened, ready_for_review, labeled, unlabeled]
 
 env:
-  JUCE_VERSION: "9.0.1"
+  JUCE_VERSION: "9.0.3"
 
 jobs:
   release-script-tests:

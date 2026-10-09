@@ -49,7 +49,7 @@ _Brownfield JUCE 9 plugin — extends existing descriptor-driven GUI and partial
 
 | Constraint | Source |
 |---|---|
-| JUCE 9.0.1, C++20, CMake → `Builds/` | project-context |
+| JUCE 9.0.3, C++20, CMake → `Builds/` | project-context |
 | GUI → Core dependency direction (strict) | project-context, PRD NFR-4 |
 | Descriptor-driven APVTS; no parallel SysEx offset tables | D-057, FR-49 |
 | Brownfield: extend `Source/`, no tree migration until P-001 | D-001, project-context |

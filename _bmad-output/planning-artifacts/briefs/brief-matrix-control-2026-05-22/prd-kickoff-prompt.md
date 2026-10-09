@@ -82,7 +82,7 @@ Ne passe à la rédaction des FR qu'une fois la Phase 0 terminée (ou que j'indi
 
 ## Calibrage enjeux
 
-- **Launch** — produit open-source public (MIT), référence JUCE, release aspirational Noël 2026
+- **Launch** — produit gratuit (binaires) + source visible PolyForm Noncommercial, référence JUCE, release aspirational Noël 2026
 - Audience PRD : moi (PO/dev solo expert) + futurs contributeurs + workflows BMad downstream (UX, Architecture, Epics)
 - Langue conversation : **français** ; document PRD : **anglais**
 

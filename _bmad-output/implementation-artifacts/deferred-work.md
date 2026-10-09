@@ -457,7 +457,7 @@ Original review bullets below remain for history; status for U-10-owned residual
 ## Deferred from: code review of 11-2-cd-release-pipeline (2026-07-11)
 
 - **Dry-run E2E (push tag réel + assets GitHub Release)** — post-merge maintainer après configuration des secrets ; déjà documenté story L187.
-- **Windows Authenticode non signé pour v1** — choix spec ; documenté CONTRIBUTING comme acceptable MIT open-source.
+- **Windows Authenticode non signé pour v1** — choix spec ; documenté CONTRIBUTING comme acceptable pour distribution gratuite / source-available.
 - **macOS arm64-only en CI (pas universal)** — décision spec Dev Notes ; universal optionnel documenté.
 - **Pins pytest/PyYAML sans borne supérieure** — dette mineure reproductibilité locale/CI.
 

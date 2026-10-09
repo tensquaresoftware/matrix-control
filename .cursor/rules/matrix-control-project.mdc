@@ -9,7 +9,7 @@ Source complète : `CONVENTIONS.md` §5–§6.2, §9. Constitution BMad : `_bmad
 
 ## Environnement
 
-- macOS Tahoe, Xcode 26, CMake, **JUCE 9.0.1** (`/Volumes/Guillaume/Dev/SDKs/JUCE-9`)
+- macOS Tahoe, Xcode 26, CMake, **JUCE 9.0.3** (`/Volumes/Guillaume/Dev/SDKs/JUCE-9`)
 - Builds dans `Builds/` (`macOS/`, `Windows/`, `Linux/`) — **pas** `build/` à la racine
 - IDE / agent : **Cursor Pro+**
 
