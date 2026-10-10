@@ -9,6 +9,7 @@
 #include "Core/PluginProcessor.h"
 #include "Shared/ProjectPaths.h"
 #include "Standalone/MatrixControlStandaloneFilterWindow.h"
+#include "Standalone/StandaloneQuitCommands.h"
 
 namespace
 {
@@ -98,8 +99,29 @@ public:
             juce::Desktop::getInstance().setKioskModeComponent (mainWindow.get(), false);
            #endif
 
+            MatrixStandalone::bindStandaloneQuitCommands (commandManager, *this, *mainWindow);
+
             mainWindow->setVisible (true);
             mainWindow->fitWindowToContent();
+            // After real content size: one placement pass (not on every resized — multi-monitor drag).
+            mainWindow->ensureLaunchTitleBarOnScreen();
+            // Placement may SetWindowPos without activation; bring forward after show so the
+            // window is not left under the IDE / terminal that launched the process.
+            mainWindow->toFront (true);
+
+            // juce_IncludeModuleHeaders.h #defines Component as juce::Component — use bare Component::.
+            // Second async pass: native frame top may be unknown on the first ensure.
+            const Component::SafePointer<MatrixControlStandaloneFilterWindow> safeWindow (mainWindow.get());
+            juce::MessageManager::callAsync ([safeWindow]
+            {
+                if (safeWindow != nullptr)
+                {
+                    safeWindow->ensureLaunchTitleBarOnScreen();
+                   #if JUCE_WINDOWS
+                    safeWindow->toFront (true);
+                   #endif
+                }
+            });
         }
         else
         {
@@ -155,6 +177,7 @@ public:
 
 private:
     juce::ApplicationProperties appProperties;
+    juce::ApplicationCommandManager commandManager;
     std::unique_ptr<MatrixControlStandaloneFilterWindow> mainWindow;
     std::unique_ptr<juce::StandalonePluginHolder> pluginHolder;
 };
