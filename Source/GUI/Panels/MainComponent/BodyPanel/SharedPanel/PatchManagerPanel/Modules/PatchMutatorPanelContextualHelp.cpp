@@ -6,6 +6,7 @@
 #include "GUI/Widgets/Button.h"
 #include "GUI/Widgets/ComboBox.h"
 #include "GUI/Widgets/HierarchicalComboBox.h"
+#include "GUI/Widgets/Label.h"
 #include "GUI/Widgets/Toggle.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 
@@ -17,8 +18,13 @@ void PatchMutatorPanel::registerContextualHelp()
         TSS::makeMainComponentFooterResolver(*this));
     contextualHelpBinder_->setHostShowingPredicate([this] { return isShowing(); });
 
+    // Labels sit beside the combos; bind both so hover on either shows the same help
+    // (SettingsPanel uses the same label+control pattern).
+    contextualHelpBinder_->bind(modeLabel_.get(), MutatorHelp::kMode);
     contextualHelpBinder_->bind(modeComboBox_.get(), MutatorHelp::kMode);
+    contextualHelpBinder_->bind(pitchLabel_.get(), MutatorHelp::kPitch);
     contextualHelpBinder_->bind(pitchComboBox_.get(), MutatorHelp::kPitch);
+    contextualHelpBinder_->bind(historyLabel_.get(), MutatorHelp::kHistory);
     contextualHelpBinder_->bind(historyComboBox_.get(), MutatorHelp::kHistory);
     contextualHelpBinder_->bind(mutateButton_.get(), MutatorHelp::kMutate);
     contextualHelpBinder_->bind(retryButton_.get(), MutatorHelp::kRetry);

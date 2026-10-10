@@ -6,7 +6,7 @@
 [![Language: C++](https://img.shields.io/badge/Language-C%2B%2B-00599C?style=for-the-badge&logo=c%2B%2B&logoColor=white)](https://github.com/tensquaresoftware/matrix-control)
 [![Framework: JUCE 9](https://img.shields.io/badge/Framework-JUCE%209-5765A4?style=for-the-badge)](https://juce.com)
 [![Formats: AU / VST3 / Standalone](https://img.shields.io/badge/Formats-AU%20%7C%20VST3%20%7C%20Standalone-2E86AB?style=for-the-badge)](https://github.com/tensquaresoftware/matrix-control)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
+[![License: PolyForm Noncommercial](https://img.shields.io/badge/License-PolyForm%20Noncommercial-blue?style=for-the-badge)](LICENSE)
 [![Sponsor](https://img.shields.io/badge/Sponsor-Ten%20Square%20Software-ff69b4?style=for-the-badge&logo=github-sponsors&logoColor=white)](https://github.com/sponsors/tensquaresoftware)
 
 > 💛 If you find this project useful or inspiring, consider [sponsoring its development](https://github.com/sponsors/tensquaresoftware) — every contribution helps keep the work going!
@@ -88,7 +88,7 @@ Also see **[Luthier](https://github.com/tensquaresoftware/luthier)** — a Proju
 - **Cursor** or **VS Code** (with the CMake Tools and C/C++ extensions)
 - CMake 3.22+
 - Ninja build system
-- JUCE 9.0.1 installed (set `JUCE_DIR` to your JUCE checkout, e.g. `/Volumes/Guillaume/Dev/SDKs/JUCE-9`)
+- JUCE 9.0.3 installed (set `JUCE_DIR` to your JUCE checkout, e.g. `/Volumes/Guillaume/Dev/SDKs/JUCE-9`)
 
 #### Windows
 
@@ -96,7 +96,7 @@ Also see **[Luthier](https://github.com/tensquaresoftware/luthier)** — a Proju
 - **Cursor** or **VS Code** (with the CMake Tools and C/C++ extensions)
 - CMake 3.22+ (add to system PATH during installation)
 - Visual Studio 2022 with "Desktop development with C++" workload
-- JUCE 9.0.1 installed (set `JUCE_DIR` to your JUCE checkout, e.g. `C:\Users\Guillaume\Dev\SDKs\JUCE-9`)
+- JUCE 9.0.3 installed (set `JUCE_DIR` to your JUCE checkout, e.g. `C:\Users\Guillaume\Dev\SDKs\JUCE-9`)
 
 ### Environment Setup
 
@@ -190,6 +190,23 @@ Debug configurations are available in `.vscode/launch.json`:
 - **Windows**: Standalone, VST3 in Reaper
 
 Press `F5` in **Cursor** or **VS Code** to start debugging.
+
+---
+
+## License
+
+Matrix-Control source code is licensed under the
+[PolyForm Noncommercial License 1.0.0](https://polyformproject.org/licenses/noncommercial/1.0.0),
+with an **additional end-user grant** for official binaries. See [`LICENSE`](LICENSE).
+
+In plain terms:
+
+- **Official binaries** (website / GitHub Releases) are **free to use**, including for commercial music production.
+- **Source code** is public so others can learn from the project (students, hobbyists, non-commercial experiments).
+- **Commercial reuse of the source**, commercial redistribution, or competing products based on this work require a **separate agreement** with Ten Square Software.
+- Optional support via [GitHub Sponsors](https://github.com/sponsors/tensquaresoftware) / donations is welcome and does not change these terms.
+
+This is **source-available**, not OSI open source. Third-party fonts remain under their own licenses (see below).
 
 ---
 

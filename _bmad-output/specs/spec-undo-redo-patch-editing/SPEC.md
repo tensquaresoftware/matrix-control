@@ -59,7 +59,7 @@ Matrix-Control users edit Oberheim Matrix patches in real time with every slider
 - Stack depth counts **transactions** (`beginNewTransaction`), not raw parameter writes. Default **100** transactions with oldest eviction; no user-configurable depth UI in v1.
 - v1 delivers keyboard shortcuts only — no Undo/Redo menu items or toolbar buttons unless explicitly added in a later spec revision.
 - No host DAW automation undo integration in v1; plugin-internal undo only.
-- English-only source; English UI strings; JUCE 9.0.1; builds under `Builds/`; quality gate via `Scripts/quality/lint_touched.py`.
+- English-only source; English UI strings; JUCE 9.0.3; builds under `Builds/`; quality gate via `Scripts/quality/lint_touched.py`.
 - Update `Documentation/User/manuel-utilisateur.md` §7: remove the no-undo statement; document shortcuts and grouping behavior.
 
 ## Non-goals

@@ -30,11 +30,11 @@ The product promise is twofold:
 
 1. **For musicians:** A professional MIDI editor that makes users say *"Wow — I finally understand what this synth can do."* Complete PATCH and MASTER editing, an original PATCH MANAGER (internal memory, computer library, Patch Mutator), DAW automation with SysEx rate limiting, and a pixel-crafted UI with interactive envelope and track displays.
 
-2. **For developers:** An exemplary open-source JUCE reference repository — Clean Code, Clean Architecture, SOLID, tests, and thorough public documentation in English.
+2. **For developers:** An exemplary source-available JUCE reference repository — Clean Code, Clean Architecture, SOLID, tests, and thorough public documentation in English.
 
 The non-negotiable success criterion is **rock-solid SysEx reliability**: hours of uninterrupted editing without the Matrix-1000 hanging or crashing because the editor flooded it with MIDI. Everything else serves that trust.
 
-Matrix-Control v1 will be **free (MIT)** with optional GitHub Sponsors support. Full Matrix-6/6R compatibility (including SPLIT mode) is planned for v2.
+Matrix-Control v1 will be **free to use** (official binaries) with **source visible under PolyForm Noncommercial** and optional GitHub Sponsors support. Full Matrix-6/6R compatibility (including SPLIT mode) is planned for v2.
 
 ---
 
@@ -283,7 +283,7 @@ Christmas 2026 — echo of the M4L editor launch (2020-12-21). No hard deadline;
 
 If Matrix-Control succeeds:
 
-**Year 1:** Matrix-1000 owners worldwide treat it as the definitive editor. The open-source repo becomes a cited JUCE learning resource. Sponsors and press validate the craft.
+**Year 1:** Matrix-1000 owners worldwide treat it as the definitive editor. The public source-available repo becomes a cited JUCE learning resource. Sponsors and press validate the craft.
 
 **Year 2–3:** Matrix-6/6R full compatibility (v2). Possible extended or companion products. Guillaume's portfolio opens doors to paid audio tools — but Matrix-Control v1 remains the gift that rebuilt community trust.
 

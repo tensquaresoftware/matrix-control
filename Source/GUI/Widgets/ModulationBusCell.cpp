@@ -16,7 +16,11 @@
 #include "Shared/Definitions/PluginDisplayNames.h"
 #include "GUI/Factories/WidgetFactory.h"
 
-ModulationBusCell::~ModulationBusCell() = default;
+ModulationBusCell::~ModulationBusCell()
+{
+    if (busNumberLabel_ != nullptr)
+        busNumberLabel_->removeMouseListener(this);
+}
 
 ModulationBusCell::ModulationBusCell(const Config& config)
     : busNumber_(config.busNumber)
@@ -46,7 +50,9 @@ void ModulationBusCell::createBusNumberLabel()
         dimensions_.busNumberLabelHeight,
         TSS::labelLookFromSkin(*skin_),
         juce::String(busNumber_));
-    busNumberLabel_->setInterceptsMouseClicks(false, false);
+    // Intercept so ContextualHelpBinder can see hover; forward reorder via mouse listener.
+    busNumberLabel_->setInterceptsMouseClicks(true, false);
+    busNumberLabel_->addMouseListener(this, false);
     addAndMakeVisible(*busNumberLabel_);
 }
 
@@ -210,12 +216,13 @@ void ModulationBusCell::paint(juce::Graphics& g)
 
 void ModulationBusCell::mouseDown(const juce::MouseEvent& e)
 {
-    if (!isBusNumberLabelHit(e.getPosition()))
+    const auto pos = e.getEventRelativeTo(this).getPosition();
+    if (!isBusNumberLabelHit(pos))
         return;
 
     reorderDragPending_ = true;
     reorderDragActive_ = false;
-    dragStartPosition_ = e.getPosition();
+    dragStartPosition_ = pos;
 }
 
 void ModulationBusCell::mouseDrag(const juce::MouseEvent& e)
@@ -223,8 +230,10 @@ void ModulationBusCell::mouseDrag(const juce::MouseEvent& e)
     if (!reorderDragPending_ && !reorderDragActive_)
         return;
 
+    const auto pos = e.getEventRelativeTo(this).getPosition();
+
     if (!reorderDragActive_
-        && e.getPosition().toFloat().getDistanceFrom(dragStartPosition_.toFloat())
+        && pos.toFloat().getDistanceFrom(dragStartPosition_.toFloat())
             < static_cast<float>(dimensions_.reorderDragThreshold) * uiScale_)
     {
         return;
@@ -238,12 +247,12 @@ void ModulationBusCell::mouseDrag(const juce::MouseEvent& e)
     }
 
     if (onReorderDragMove_)
-        onReorderDragMove_(toPanelPosition(e.getPosition()));
+        onReorderDragMove_(toPanelPosition(pos));
 }
 
 void ModulationBusCell::mouseUp(const juce::MouseEvent& e)
 {
-    finishReorderDrag(e.getPosition());
+    finishReorderDrag(e.getEventRelativeTo(this).getPosition());
 }
 
 void ModulationBusCell::finishReorderDrag(juce::Point<int> localPosition)

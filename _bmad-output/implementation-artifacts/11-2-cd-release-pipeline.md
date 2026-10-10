@@ -270,20 +270,20 @@ Do **not** merge release workflow into 11.1 — separation keeps PR CI fast (Sto
 - **macOS signing in CI:** Import `.p12` into ephemeral keychain; `codesign --force -s "$DEVELOPER_ID_APPLICATION" --options=runtime --timestamp` on each bundle ([Melatonin guide](https://melatonin.dev/blog/how-to-code-sign-and-notarize-macos-audio-plugins-in-ci/)).
 - **Notarization:** Prefer `xcrun notarytool submit` with app-specific password + `--wait`; staple with `xcrun stapler staple`. Zip bundles before submit if using zip workflow.
 - **Reference implementation:** [Pamplejuce](https://github.com/sudara/pamplejuce) GitHub Actions + `sudara/basic-macos- codesign` action patterns (adapt to Matrix-Control secret names).
-- **Windows v1:** Unsigned VST3/Standalone is common for open-source MIT plugins; Authenticode via Azure Trusted Signing is optional follow-up — document in CONTRIBUTING if deferred.
+- **Windows v1:** Unsigned VST3/Standalone is common for free / source-available plugins; Authenticode via Azure Trusted Signing is optional follow-up — document in CONTRIBUTING if deferred.
 - **JUCE 8.0.12:** Pin same tag as 11.1; no JUCE upgrade in this story.
 
 ### Project context reference
 
 - Tags: annotated, `v0.0.xx-alpha[-suffix]` format (`project-context.md` § Git & Release Conventions).
-- Distribution v1: **free MIT** + GitHub Releases (`brief` addendum § Distribution).
+- Distribution v1: **free official binaries** + PolyForm Noncommercial source + GitHub Releases (`brief` addendum § Distribution).
 - Target release: Christmas 2026 aspirational — CD pipeline enables RC tags before v1.0.0.
 
 ### Out of scope
 
 - Story **11.3** CI build-time optimizations (Debug PR workflow only)
 - Linux VST3/Standalone **format enablement** in README (still 🔜) — CD can still build Linux targets if CMake produces them
-- Windows `.msi` / macOS `.pkg` **installers** (raw zip sufficient for v1 — match brief open-source distribution)
+- Windows `.msi` / macOS `.pkg` **installers** (raw zip sufficient for v1 — match brief free / source-available distribution)
 - **`workflow_dispatch`** manual releases
 - App Store / AAX / CLAP
 - Automated hardware smoke tests post-release

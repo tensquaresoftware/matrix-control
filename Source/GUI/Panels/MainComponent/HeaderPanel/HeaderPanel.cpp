@@ -133,14 +133,21 @@ void HeaderPanel::registerContextualHelp()
     contextualHelpBinder_ = std::make_unique<TSS::ContextualHelpBinder>(
         TSS::makeMainComponentFooterResolver(*this));
 
+    contextualHelpBinder_->bind(&editCartoucheBadgeHitArea_, Help::kEditBadge);
+    contextualHelpBinder_->bind(&midiCartoucheBadgeHitArea_, Help::kMidiBadge);
+    contextualHelpBinder_->bind(&audioCartoucheBadgeHitArea_, Help::kAudioBadge);
+    contextualHelpBinder_->bind(&keyboardFromLabel_, Help::kFromKeyboardActivityLed);
+    contextualHelpBinder_->bind(&instrumentActivityLed_, Help::kFromKeyboardActivityLed);
+    contextualHelpBinder_->bind(&midiFromLabel_, Help::kFromSynthActivityLed);
+    contextualHelpBinder_->bind(&editorActivityLed_, Help::kFromSynthActivityLed);
+    contextualHelpBinder_->bind(&midiToLabel_, Help::kToSynthActivityLed);
+    contextualHelpBinder_->bind(&midiToActivityLed_, Help::kToSynthActivityLed);
+    contextualHelpBinder_->bind(&inputGainLabel_, Help::kInputGain);
     contextualHelpBinder_->bind(&inputGainSlider_, Help::kInputGain);
     contextualHelpBinder_->bind(&undoButton_, Help::kUndo);
     contextualHelpBinder_->bind(&redoButton_, Help::kRedo);
     contextualHelpBinder_->bind(&panicButton_, Help::kPanic);
     contextualHelpBinder_->bind(&logo_, Help::kLogo);
-    contextualHelpBinder_->bind(&instrumentActivityLed_, Help::kFromKeyboardActivityLed);
-    contextualHelpBinder_->bind(&editorActivityLed_, Help::kFromSynthActivityLed);
-    contextualHelpBinder_->bind(&midiToActivityLed_, Help::kToSynthActivityLed);
     contextualHelpBinder_->bind(&peakIndicator_, Help::kAudioPeakIndicator);
 }
 
@@ -251,4 +258,5 @@ void HeaderPanel::updateAudioControlsVisibility()
     inputGainLabel_.setVisible(showAudioControls);
     inputGainSlider_.setVisible(showAudioControls);
     peakIndicator_.setVisible(showAudioControls);
+    audioCartoucheBadgeHitArea_.setVisible(showAudioControls);
 }

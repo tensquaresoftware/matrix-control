@@ -364,6 +364,7 @@ void HeaderPanel::resized()
 {
     layoutLogo();
     layoutCartouches();
+    layoutCartoucheBadgeHitAreas();
 }
 
 void HeaderPanel::layoutLogo()
@@ -430,4 +431,11 @@ void HeaderPanel::layoutCartouches()
         audioCartoucheFrameBounds_ = audio.frame;
         audioCartoucheStrokePx_ = audio.strokePx;
     }
+}
+
+void HeaderPanel::layoutCartoucheBadgeHitAreas()
+{
+    editCartoucheBadgeHitArea_.setBounds(editCartoucheBadgeBounds_);
+    midiCartoucheBadgeHitArea_.setBounds(midiCartoucheBadgeBounds_);
+    audioCartoucheBadgeHitArea_.setBounds(audioCartoucheBadgeBounds_);
 }

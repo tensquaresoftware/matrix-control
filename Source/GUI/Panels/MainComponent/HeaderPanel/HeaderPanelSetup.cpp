@@ -62,6 +62,13 @@ void HeaderPanel::addChildControls(TSS::ISkin& skin)
     addAndMakeVisible(undoButton_);
     addAndMakeVisible(redoButton_);
     addAndMakeVisible(panicButton_);
+
+    editCartoucheBadgeHitArea_.setInterceptsMouseClicks(true, false);
+    midiCartoucheBadgeHitArea_.setInterceptsMouseClicks(true, false);
+    audioCartoucheBadgeHitArea_.setInterceptsMouseClicks(true, false);
+    addAndMakeVisible(editCartoucheBadgeHitArea_);
+    addAndMakeVisible(midiCartoucheBadgeHitArea_);
+    addAndMakeVisible(audioCartoucheBadgeHitArea_);
 }
 
 void HeaderPanel::applyPanicButtonLook()

@@ -67,7 +67,7 @@ Matrix-Control users must unlock **edit, play, and hear** on first useful contac
 - Implementation order: **GS-1** (Settings UI) before or as opening work of the wizard Build; then shell (GS-2); then steps/flags/absorb (GS-3). See `code-map.md`.
 - GS-4 (user manual first launch + host keyboard examples) is a **doc dependency**, not a code deliverable of this Spec.
 - Historical Device Setup specs remain implementation record only — superseded for future work by this Spec / Epic GS.
-- Quality: JUCE 9.0.1; builds under `Builds/`; `Scripts/quality/lint_touched.py` on touched C++.
+- Quality: JUCE 9.0.3; builds under `Builds/`; `Scripts/quality/lint_touched.py` on touched C++.
 
 ## Non-goals
 

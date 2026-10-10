@@ -26,7 +26,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  JUCE_VERSION: "9.0.1"
+  JUCE_VERSION: "9.0.3"
 
 jobs:
   validate-tag:

@@ -457,7 +457,7 @@ Original review bullets below remain for history; status for U-10-owned residual
 ## Deferred from: code review of 11-2-cd-release-pipeline (2026-07-11)
 
 - **Dry-run E2E (push tag réel + assets GitHub Release)** — post-merge maintainer après configuration des secrets ; déjà documenté story L187.
-- **Windows Authenticode non signé pour v1** — choix spec ; documenté CONTRIBUTING comme acceptable MIT open-source.
+- **Windows Authenticode non signé pour v1** — choix spec ; documenté CONTRIBUTING comme acceptable pour distribution gratuite / source-available.
 - **macOS arm64-only en CI (pas universal)** — décision spec Dev Notes ; universal optionnel documenté.
 - **Pins pytest/PyYAML sans borne supérieure** — dette mineure reproductibilité locale/CI.
 
@@ -2517,3 +2517,27 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-standalone-quit-and-window-placement.md`
   summary: No Displays::Listener (or equivalent) re-runs title-bar on-screen ensure after display disconnect / topology change; launch-only matrix leaves a window on removed-monitor coordinates without recovery in this lot.
   evidence: Blind Hunter; out of frozen launch placement scope; revisit if monitor-hotplug recovery becomes a product need.
+
+## Deferred from: review of spec-header-matrix-modulation-contextual-help.md (2026-10-09)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-header-matrix-modulation-contextual-help.md`
+  summary: Bus-number label mouse intercept + listener forward path has no automated GUI test; Core MatrixModBusReorderService tests do not cover ModulationBusCell.
+  evidence: Verification Gap — project unit tests stay off GUI components; Standalone UAT (hover + drag past threshold) is the gate for this path.
+- source_spec: `_bmad-output/implementation-artifacts/spec-header-matrix-modulation-contextual-help.md`
+  summary: Wave 1 Header badge hit areas and new ContextualHelpBinder binds have no CI observer beyond human UAT.
+  evidence: Verification Gap — ContextualHelpOverlayTests cover overlay helpers/Mutator constants only; Header/Matrix binder registration is out of Core unit-test style for this wave.
+
+## Deferred from: code review of spec-header-matrix-modulation-contextual-help.md (2026-10-10)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-header-matrix-modulation-contextual-help.md`
+  summary: Reconfirmed — bus-number label mouse/reorder path still has no automated GUI observer (post-smoke copy review).
+  evidence: Same Verification Gap disposition as 2026-10-09; Core reorder suites still do not drive ModulationBusCell.
+- source_spec: `_bmad-output/implementation-artifacts/spec-header-matrix-modulation-contextual-help.md`
+  summary: Reconfirmed — Wave 1 Header/Matrix HELP binds and badge hit areas still lack CI coverage beyond human UAT.
+  evidence: Same Verification Gap disposition as 2026-10-09; binder registration remains outside Core unit-test style.
+
+## Deferred from: oneshot review of spec-patch-mutator-labels-contextual-help.md (2026-10-09)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-mutator-labels-contextual-help.md`
+  summary: When PITCH is disabled (Compare or no mutable audible DCO), pitchLabel_/pitchComboBox_ use setEnabled(false), so JUCE may not deliver mouse enter and footer help stays unavailable on that row.
+  evidence: Pre-existing enablement path in refreshPitchControlEnabled; parent Mutator help Always asked for help on disabled controls; fixing needs hittable-when-disabled policy beyond this three-bind oneshot.

@@ -152,7 +152,7 @@ Not yet documented. Brief should name alternatives users compare against:
 
 ### Distribution (v1)
 
-- **Free**, MIT license (consistent with current repo).
+- **Free** binaries; source under PolyForm Noncommercial 1.0.0 (plus end-user grant for official binaries — consistent with current repo).
 - **GitHub Sponsors / donations** — not paid plugin v1; possible paid extended edition later.
 - Niche market: estimated few thousand Matrix-1000 units worldwide still operational.
 - Sponsorship setup in progress; first willing sponsor (Mike Ford, Apr 2026) blocked by missing Sponsor button on profile.
