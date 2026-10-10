@@ -2515,3 +2515,9 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-header-matrix-modulation-contextual-help.md`
   summary: Reconfirmed — Wave 1 Header/Matrix HELP binds and badge hit areas still lack CI coverage beyond human UAT.
   evidence: Same Verification Gap disposition as 2026-10-09; binder registration remains outside Core unit-test style.
+
+## Deferred from: oneshot review of spec-patch-mutator-labels-contextual-help.md (2026-10-09)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-mutator-labels-contextual-help.md`
+  summary: When PITCH is disabled (Compare or no mutable audible DCO), pitchLabel_/pitchComboBox_ use setEnabled(false), so JUCE may not deliver mouse enter and footer help stays unavailable on that row.
+  evidence: Pre-existing enablement path in refreshPitchControlEnabled; parent Mutator help Always asked for help on disabled controls; fixing needs hittable-when-disabled policy beyond this three-bind oneshot.
