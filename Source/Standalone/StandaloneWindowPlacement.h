@@ -65,6 +65,36 @@ inline juce::Rectangle<int> ensureClientBoundsTitleBarOnScreen (
     return frame.subtractedFrom (fullBounds.withCentre (preferredLimits.getCentre()));
 }
 
+/** Index of the area whose closest point is nearest to bounds centre; -1 if areas empty. */
+inline int indexOfNearestUserAreaByCentreDistance (
+    const juce::Array<juce::Rectangle<int>>& userAreas,
+    juce::Rectangle<int> bounds,
+    int fallbackIndex = 0) noexcept
+{
+    if (userAreas.isEmpty())
+        return -1;
+
+    const auto centre = bounds.getCentre();
+    auto nearestIndex = juce::jlimit (0, userAreas.size() - 1, fallbackIndex);
+    auto bestDistanceSquared = std::numeric_limits<double>::max();
+
+    for (int i = 0; i < userAreas.size(); ++i)
+    {
+        const auto nearestPoint = userAreas.getReference (i).getConstrainedPoint (centre);
+        const auto dx = static_cast<double> (centre.x - nearestPoint.x);
+        const auto dy = static_cast<double> (centre.y - nearestPoint.y);
+        const auto distanceSquared = dx * dx + dy * dy;
+
+        if (distanceSquared < bestDistanceSquared)
+        {
+            bestDistanceSquared = distanceSquared;
+            nearestIndex = i;
+        }
+    }
+
+    return nearestIndex;
+}
+
 inline const juce::Displays::Display* findNearestDisplayForBounds (
     const juce::Displays& displays,
     juce::Rectangle<int> bounds) noexcept
@@ -81,24 +111,25 @@ inline const juce::Displays::Display* findNearestDisplayForBounds (
             return hit;
     }
 
-    const auto centre = bounds.getCentre();
-    const juce::Displays::Display* nearest = displays.getPrimaryDisplay();
-    auto bestDistanceSquared = std::numeric_limits<double>::max();
+    juce::Array<juce::Rectangle<int>> userAreas;
+    userAreas.ensureStorageAllocated (displays.displays.size());
 
-    for (const auto& display : displays.displays)
+    int primaryIndex = 0;
+
+    for (int i = 0; i < displays.displays.size(); ++i)
     {
-        const auto nearestPoint = display.userBounds.toNearestInt().getConstrainedPoint (centre);
-        const auto dx = static_cast<double> (centre.x - nearestPoint.x);
-        const auto dy = static_cast<double> (centre.y - nearestPoint.y);
-        const auto distanceSquared = dx * dx + dy * dy;
+        const auto& display = displays.displays.getReference (i);
+        userAreas.add (display.userBounds.toNearestInt());
 
-        if (distanceSquared < bestDistanceSquared)
-        {
-            bestDistanceSquared = distanceSquared;
-            nearest = &display;
-        }
+        if (&display == displays.getPrimaryDisplay())
+            primaryIndex = i;
     }
 
-    return nearest;
+    const auto nearestIndex = indexOfNearestUserAreaByCentreDistance (userAreas, bounds, primaryIndex);
+
+    if (nearestIndex < 0 || nearestIndex >= displays.displays.size())
+        return displays.getPrimaryDisplay();
+
+    return &displays.displays.getReference (nearestIndex);
 }
 } // namespace MatrixStandalone

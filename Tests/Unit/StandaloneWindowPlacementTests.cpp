@@ -182,10 +182,32 @@ private:
 
     void testFindNearestDisplayForBounds()
     {
-        beginTest ("nearest display hits intersecting display then falls back by distance");
+        beginTest ("nearest user area by centre distance (headless-safe)");
 
+        juce::Array<juce::Rectangle<int>> areas;
+        expect (MatrixStandalone::indexOfNearestUserAreaByCentreDistance (areas, { 0, 0, 10, 10 }) == -1);
+
+        areas.add ({ 0, 0, 1920, 1080 });
+        areas.add ({ 1920, 0, 1920, 1080 });
+
+        expect (MatrixStandalone::indexOfNearestUserAreaByCentreDistance (
+                    areas, { 100, 100, 120, 80 })
+                == 0);
+        expect (MatrixStandalone::indexOfNearestUserAreaByCentreDistance (
+                    areas, { 2200, 100, 120, 80 })
+                == 1);
+        expect (MatrixStandalone::indexOfNearestUserAreaByCentreDistance (
+                    areas, { -80000, -80000, 200, 150 })
+                == 0);
+
+        // Live Displays path only when the host exposes a monitor (skipped on headless Linux CI).
         const auto& displays = juce::Desktop::getInstance().getDisplays();
-        expect (! displays.displays.isEmpty());
+
+        if (displays.displays.isEmpty())
+        {
+            expect (MatrixStandalone::findNearestDisplayForBounds (displays, { 0, 0, 10, 10 }) == nullptr);
+            return;
+        }
 
         const auto* primary = displays.getPrimaryDisplay();
         expect (primary != nullptr);
@@ -195,12 +217,10 @@ private:
 
         const auto user = primary->userBounds.toNearestInt();
         const juce::Rectangle<int> onPrimary { user.getX() + 40, user.getY() + 40, 120, 80 };
-        const auto* hit = MatrixStandalone::findNearestDisplayForBounds (displays, onPrimary);
-        expect (hit == primary);
+        expect (MatrixStandalone::findNearestDisplayForBounds (displays, onPrimary) == primary);
 
         const juce::Rectangle<int> farOffScreen { -80000, -80000, 200, 150 };
-        const auto* nearest = MatrixStandalone::findNearestDisplayForBounds (displays, farOffScreen);
-        expect (nearest != nullptr);
+        expect (MatrixStandalone::findNearestDisplayForBounds (displays, farOffScreen) != nullptr);
     }
 };
 
