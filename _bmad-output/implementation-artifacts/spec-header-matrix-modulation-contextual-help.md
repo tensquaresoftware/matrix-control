@@ -24,7 +24,9 @@ context:
 ## Boundaries & Constraints
 
 **Always:**
-- Prefix map (Header): EDIT cartouche + logo + logo-menu items → `EDIT:`; MIDI cartouche (labels, LEDs, MIDI badge) → `MIDI:`; AUDIO cartouche (INPUT GAIN label/slider, peak, AUDIO badge) → `AUDIO:`.
+- Prefix map (Header, on-screen cartouches): EDIT cartouche (UNDO/REDO) + logo + logo-menu → `EDIT:`; MIDI cartouche (LED labels + LEDs + PANIC + MIDI badge) → `MIDI:`; AUDIO cartouche (INPUT GAIN label/slider, peak, AUDIO badge) → `AUDIO:`.
+- LED face labels share the same HELP string as their LED (no separate monitoring-lane copy).
+- When HELP mentions the Settings window, spell it `SETTINGS` (ASCII uppercase product path).
 - ASCII-only help copy in `PluginDisplayNames` (hyphen `-`, ellipsis `...`).
 - Existing `ContextualHelpBinder` + footer overlay; Settings CONTEXTUAL HELP = HIDE must still suppress all help.
 - Cartouche badge hover via transparent child hit targets sized to existing `*CartoucheBadgeBounds_` (Footer `deviceHitArea_` pattern) — do not move painted chrome out of `paintCartoucheChrome`.
@@ -32,16 +34,17 @@ context:
 - Agent-owned mouse strategy for bus numbers (forward events or equivalent) as long as both HELP and reorder work.
 - Inventory Header section: retire the frozen `SESSION` decision; document cartouche prefixes.
 - Scope keep (decided): ship full Wave 1 (Header + Matrix Modulation hits) in this spec despite ~1900-token length.
-- Approved new HELP copy (ASCII); existing Header bodies keep wording with prefix retarget only:
+- Approved HELP copy (ASCII; renegotiated 2026-10-10 to match on-screen cartouche contents):
 
 | Target | Help text |
 |--------|-----------|
-| EDIT badge | EDIT: Undo, redo, panic, and the logo menu for Settings, About, Skin, and UI Scale. |
-| MIDI badge | MIDI: Monitors MIDI activity from the keyboard (or host), the synthesizer, and to the synthesizer. |
+| EDIT badge | EDIT: Undo and redo the last PATCH or MASTER edit. |
+| MIDI badge | MIDI: Activity lights for MIDI keyboard (or host in Plugin), synthesizer MIDI in and out, plus PANIC. |
 | AUDIO badge | AUDIO: Monitors the selected audio input level and sets INPUT GAIN (Standalone). |
-| FROM KEYBOARD | MIDI: Labels the keyboard (or host) MIDI activity lane. Set the device in Settings > MIDI & DEVICE. |
-| FROM SYNTH | MIDI: Labels the synthesizer MIDI input activity lane. Set SYNTH FROM in Settings > MIDI & DEVICE. |
-| TO SYNTH | MIDI: Labels the synthesizer MIDI output activity lane. Set SYNTH TO in Settings > MIDI & DEVICE. |
+| FROM KEYBOARD label + LED | MIDI: Lights when MIDI activity arrives from the MIDI keyboard (or host in Plugin). |
+| FROM SYNTH label + LED | MIDI: Lights when MIDI activity arrives from the synthesizer. |
+| TO SYNTH label + LED | MIDI: Lights when MIDI activity is sent to the synthesizer. |
+| PANIC | MIDI: Sends Note Offs for held notes, plus All Notes Off and Reset Controllers. |
 | ModulationBusHeader | MATRIX MODULATION: Column guide for bus number, source, amount, and destination. Drag a bus number to reorder. |
 
 **Never:**
@@ -100,10 +103,31 @@ context:
 - Given CONTEXTUAL HELP = HIDE, when the user hovers any Wave 1 target, then no HELP overlay appears.
 - Given the inventory Header section, when Wave 1 lands, then it no longer freezes `SESSION` as the Header prefix decision.
 
+### Review Findings
+
+- [x] [Review][Defer] Bus-number label mouse path has no automated GUI observer [`ModulationBusCell.cpp`] — deferred: pre-existing / project GUI unit-test boundary; already in `deferred-work.md` (2026-10-09); reconfirmed post-smoke review 2026-10-10; Standalone UAT remains the gate.
+- [x] [Review][Defer] Wave 1 Header/Matrix HELP binds and badge hit areas lack CI coverage [`HeaderPanel.cpp` / `MatrixModulationPanelContextualHelp.cpp`] — deferred: same Core-test convention; already in `deferred-work.md` (2026-10-09); reconfirmed 2026-10-10.
+
+**Rejected**
+- Blind: Spec Review Triage Log still claims PANIC belongs to the EDIT HELP family — rejected (fix would edit this spec); code + frozen Intent + inventory correctly use `MIDI:` after 2026-10-10 renegotiation; the 2026-10-09 triage bullet is stale narrative only.
+- Blind: Spec Code Map says badge hit areas inside `layoutCartouches()` vs `layoutCartoucheBadgeHitAreas()` — rejected (edit-spec rule); Implementation Notes match code.
+- Blind: Frozen approved HELP table omits retargeted UNDO/REDO/logo/SETTINGS strings — rejected (edit-spec rule); those constants are present and cartouche-prefixed in `PluginDisplayNames`.
+- Blind: Spec `status: done` while UAT task unchecked — rejected (edit-spec rule); human smoke was reported validated in the review request; checkbox lag is process-only.
+- Blind: Inventory frontmatter `updated` not bumped for 2026-10-10 copy pass — rejected (low / unlikely everyday harm).
+- Blind: Header `MIDI:` prefix collides with Master Edit module `MIDI:` — false; cartouche prefix map is an explicit Wave 1 Always decision (do not reopen).
+- Blind: Inventory dropped old Header port-select rows without Settings homes — false; Wave 1 only realigns current Header chrome; ports are not Header targets.
+- Blind: Inventory still framed as editable brouillon while Wave 1 Header rows are locked — rejected (low); whole-inventory draft framing is pre-existing process text, not a Wave 1 product defect.
+- Blind: `kColumnHeader` also teaches drag-to-reorder beside `kBusHandle` — false; approved frozen copy for ModulationBusHeader.
+- Blind: I/O matrix omits mid-drag HELP behavior — rejected (edit-spec rule); prior triage already dismissed; UAT can observe.
+- Blind: Badge hit areas never call `setOpaque(false)` — false; JUCE `Component` defaults to non-opaque; Footer `deviceHitArea_` uses the same pattern.
+- Blind: Missing on-disk `spec-patch-mutator-labels-contextual-help.md` context — rejected (low / pre-existing stash gap already noted in Implementation Notes).
+- Edge Case Hunter: empty `[]` — layer recorded as failed/empty for this run; no actionable findings.
+- Acceptance Auditor: no AC violations.
+
 ## Implementation Notes
 
 - Header: three transparent `juce::Component` badge hit areas (`edit/midi/audioCartoucheBadgeHitArea_`), bounds synced in `layoutCartoucheBadgeHitAreas()`; AUDIO hit area hidden with audio controls in Plugin mode.
-- Header binds: badges, FROM KEYBOARD / FROM SYNTH / TO SYNTH labels, INPUT GAIN label (+ existing slider/LEDs/peak/logo/buttons) with cartouche-prefixed `PluginDisplayNames` strings.
+- Header binds: badges; each monitoring label shares its LED help string; INPUT GAIN label (+ slider/peak/logo/UNDO/REDO); PANIC uses `MIDI:`; copy renegotiated 2026-10-10 to match cartouche contents + `SETTINGS` spelling.
 - Bus number: `setInterceptsMouseClicks(true, false)` + `addMouseListener(this)`; reorder handlers use `getEventRelativeTo(this)`; dtor removes listener.
 - `ModulationBusHeader` bound to `Help::kColumnHeader` (whole component receives hover by default).
 - Inventory Header section retargeted away from frozen `SESSION`.
@@ -111,6 +135,8 @@ context:
 - Context file `spec-patch-mutator-labels-contextual-help.md` was in stash (pre-Wave-1 clean tree), not on disk during implement.
 
 ## Spec Change Log
+
+- 2026-10-10 human renegotiation: align Header HELP with on-screen cartouches (EDIT badge = UNDO/REDO only; MIDI badge mentions PANIC; PANIC prefix `MIDI:`; LED labels share LED strings; `SETTINGS` uppercase in Header HELP paths). Avoided prior SESSION-era mismatch where PANIC/logo were bundled into EDIT chrome copy.
 
 ## Review Triage Log
 

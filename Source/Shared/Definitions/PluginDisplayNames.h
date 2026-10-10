@@ -33,38 +33,35 @@ namespace PluginDisplayNames
 
         namespace ContextualHelp
         {
+            // Prefixes follow on-screen cartouches: EDIT = UNDO/REDO; MIDI = LEDs + labels + PANIC;
+            // AUDIO = INPUT GAIN + peak; logo (outside cartouches) stays EDIT:.
             constexpr const char* kEditBadge =
-                "EDIT: Undo, redo, panic, and the logo menu for Settings, About, Skin, and UI Scale.";
+                "EDIT: Undo and redo the last PATCH or MASTER edit.";
             constexpr const char* kMidiBadge =
-                "MIDI: Monitors MIDI activity from the keyboard (or host), the synthesizer, and to the synthesizer.";
+                "MIDI: Activity lights for MIDI keyboard (or host in Plugin), synthesizer MIDI in and out, plus PANIC.";
             constexpr const char* kAudioBadge =
                 "AUDIO: Monitors the selected audio input level and sets INPUT GAIN (Standalone).";
-            constexpr const char* kFromKeyboardLabel =
-                "MIDI: Labels the keyboard (or host) MIDI activity lane. Set the device in Settings > MIDI & DEVICE.";
-            constexpr const char* kFromSynthLabel =
-                "MIDI: Labels the synthesizer MIDI input activity lane. Set SYNTH FROM in Settings > MIDI & DEVICE.";
-            constexpr const char* kToSynthLabel =
-                "MIDI: Labels the synthesizer MIDI output activity lane. Set SYNTH TO in Settings > MIDI & DEVICE.";
             constexpr const char* kInputGain =
-                "AUDIO: Sets monitoring level for the selected audio input. Choose the listen source in Settings > AUDIO > SYNTH FROM.";
+                "AUDIO: Sets monitoring level for the selected audio input. Choose the listen source in SETTINGS > AUDIO > SYNTH FROM.";
             constexpr const char* kUndo =
-                "EDIT: Undoes the last Patch or master edit in this session.";
+                "EDIT: Undoes the last PATCH or MASTER edit in this session.";
             constexpr const char* kRedo =
-                "EDIT: Redoes the last undone edit.";
+                "EDIT: Redoes the last undone PATCH or MASTER edit.";
             constexpr const char* kPanic =
-                "EDIT: Sends Note Offs for held notes, plus All Notes Off and Reset Controllers.";
+                "MIDI: Sends Note Offs for held notes, plus All Notes Off and Reset Controllers.";
             constexpr const char* kLogo =
-                "EDIT: Opens the logo menu for Settings, About, Skin, and UI Scale.";
+                "EDIT: Opens the logo menu for SETTINGS, About, Skin, and UI Scale.";
             constexpr const char* kSettings =
-                "EDIT: Opens Settings (MIDI ports, standalone audio, paths, warnings, master utility, shortcuts).";
+                "EDIT: Opens SETTINGS (MIDI ports, standalone audio, paths, warnings, master utility, shortcuts).";
             constexpr const char* kAbout =
                 "EDIT: Shows product version, links, and credits.";
             constexpr const char* kSkin =
                 "EDIT: Chooses the visual skin for the editor.";
             constexpr const char* kUiScale =
                 "EDIT: Sets the user interface scale.";
+            // Shared by each LED and its face label (same cartouche lane).
             constexpr const char* kFromKeyboardActivityLed =
-                "MIDI: Lights when MIDI activity arrives from the keyboard (or host in Plugin).";
+                "MIDI: Lights when MIDI activity arrives from the MIDI keyboard (or host in Plugin).";
             constexpr const char* kFromSynthActivityLed =
                 "MIDI: Lights when MIDI activity arrives from the synthesizer.";
             constexpr const char* kToSynthActivityLed =

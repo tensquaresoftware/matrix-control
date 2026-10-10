@@ -2506,3 +2506,12 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-header-matrix-modulation-contextual-help.md`
   summary: Wave 1 Header badge hit areas and new ContextualHelpBinder binds have no CI observer beyond planned human UAT.
   evidence: Verification Gap — ContextualHelpOverlayTests cover overlay helpers/Mutator constants only; Header/Matrix binder registration is out of Core unit-test style for this wave.
+
+## Deferred from: code review of spec-header-matrix-modulation-contextual-help.md (2026-10-10)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-header-matrix-modulation-contextual-help.md`
+  summary: Reconfirmed — bus-number label mouse/reorder path still has no automated GUI observer (post-smoke copy review).
+  evidence: Same Verification Gap disposition as 2026-10-09; Core reorder suites still do not drive ModulationBusCell.
+- source_spec: `_bmad-output/implementation-artifacts/spec-header-matrix-modulation-contextual-help.md`
+  summary: Reconfirmed — Wave 1 Header/Matrix HELP binds and badge hit areas still lack CI coverage beyond human UAT.
+  evidence: Same Verification Gap disposition as 2026-10-09; binder registration remains outside Core unit-test style.

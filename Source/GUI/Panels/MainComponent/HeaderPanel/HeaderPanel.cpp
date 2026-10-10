@@ -136,18 +136,18 @@ void HeaderPanel::registerContextualHelp()
     contextualHelpBinder_->bind(&editCartoucheBadgeHitArea_, Help::kEditBadge);
     contextualHelpBinder_->bind(&midiCartoucheBadgeHitArea_, Help::kMidiBadge);
     contextualHelpBinder_->bind(&audioCartoucheBadgeHitArea_, Help::kAudioBadge);
-    contextualHelpBinder_->bind(&keyboardFromLabel_, Help::kFromKeyboardLabel);
-    contextualHelpBinder_->bind(&midiFromLabel_, Help::kFromSynthLabel);
-    contextualHelpBinder_->bind(&midiToLabel_, Help::kToSynthLabel);
+    contextualHelpBinder_->bind(&keyboardFromLabel_, Help::kFromKeyboardActivityLed);
+    contextualHelpBinder_->bind(&instrumentActivityLed_, Help::kFromKeyboardActivityLed);
+    contextualHelpBinder_->bind(&midiFromLabel_, Help::kFromSynthActivityLed);
+    contextualHelpBinder_->bind(&editorActivityLed_, Help::kFromSynthActivityLed);
+    contextualHelpBinder_->bind(&midiToLabel_, Help::kToSynthActivityLed);
+    contextualHelpBinder_->bind(&midiToActivityLed_, Help::kToSynthActivityLed);
     contextualHelpBinder_->bind(&inputGainLabel_, Help::kInputGain);
     contextualHelpBinder_->bind(&inputGainSlider_, Help::kInputGain);
     contextualHelpBinder_->bind(&undoButton_, Help::kUndo);
     contextualHelpBinder_->bind(&redoButton_, Help::kRedo);
     contextualHelpBinder_->bind(&panicButton_, Help::kPanic);
     contextualHelpBinder_->bind(&logo_, Help::kLogo);
-    contextualHelpBinder_->bind(&instrumentActivityLed_, Help::kFromKeyboardActivityLed);
-    contextualHelpBinder_->bind(&editorActivityLed_, Help::kFromSynthActivityLed);
-    contextualHelpBinder_->bind(&midiToActivityLed_, Help::kToSynthActivityLed);
     contextualHelpBinder_->bind(&peakIndicator_, Help::kAudioPeakIndicator);
 }
 

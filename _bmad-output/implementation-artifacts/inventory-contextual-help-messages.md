@@ -27,8 +27,8 @@ Quand c'est prêt, dis-moi dans le chat Build quelles tables tu as touchées (ou
 
 | Cartouche | Préfixe | Cible typique |
 |-----------|---------|---------------|
-| **EDIT** | `EDIT:` | Badge EDIT, logo, menu logo, UNDO / REDO / PANIC |
-| **MIDI** | `MIDI:` | Badge MIDI, labels FROM KEYBOARD / FROM SYNTH / TO SYNTH, LEDs |
+| **EDIT** | `EDIT:` | Badge EDIT, UNDO / REDO; logo + menu logo (hors cartouche, meme famille) |
+| **MIDI** | `MIDI:` | Badge MIDI, labels + LEDs FROM KEYBOARD / FROM SYNTH / TO SYNTH, PANIC |
 | **AUDIO** | `AUDIO:` | Badge AUDIO, INPUT GAIN (label + slider), peak (Standalone) |
 
 Ancienne option figee `SESSION` : retiree — ne plus l'utiliser pour le Header.
@@ -39,24 +39,21 @@ Ancienne option figee `SESSION` : retiree — ne plus l'utiliser pour le Header.
 
 | Contrôle | Message proposé |
 |----------|-----------------|
-| EDIT (badge) | EDIT: Undo, redo, panic, and the logo menu for Settings, About, Skin, and UI Scale. |
-| MIDI (badge) | MIDI: Monitors MIDI activity from the keyboard (or host), the synthesizer, and to the synthesizer. |
+| EDIT (badge) | EDIT: Undo and redo the last PATCH or MASTER edit. |
+| MIDI (badge) | MIDI: Activity lights for MIDI keyboard (or host in Plugin), synthesizer MIDI in and out, plus PANIC. |
 | AUDIO (badge) | AUDIO: Monitors the selected audio input level and sets INPUT GAIN (Standalone). |
-| FROM KEYBOARD | MIDI: Labels the keyboard (or host) MIDI activity lane. Set the device in Settings > MIDI & DEVICE. |
-| FROM SYNTH | MIDI: Labels the synthesizer MIDI input activity lane. Set SYNTH FROM in Settings > MIDI & DEVICE. |
-| TO SYNTH | MIDI: Labels the synthesizer MIDI output activity lane. Set SYNTH TO in Settings > MIDI & DEVICE. |
-| INPUT GAIN | AUDIO: Sets monitoring level for the selected audio input. Choose the listen source in Settings > AUDIO > SYNTH FROM. |
-| UNDO | EDIT: Undoes the last Patch or master edit in this session. |
-| REDO | EDIT: Redoes the last undone edit. |
-| PANIC | EDIT: Sends Note Offs for held notes, plus All Notes Off and Reset Controllers. |
-| LOGO | EDIT: Opens the logo menu for Settings, About, Skin, and UI Scale. |
-| SETTINGS... | EDIT: Opens Settings (MIDI ports, standalone audio, paths, warnings, master utility, shortcuts). |
+| FROM KEYBOARD (label + LED) | MIDI: Lights when MIDI activity arrives from the MIDI keyboard (or host in Plugin). |
+| FROM SYNTH (label + LED) | MIDI: Lights when MIDI activity arrives from the synthesizer. |
+| TO SYNTH (label + LED) | MIDI: Lights when MIDI activity is sent to the synthesizer. |
+| INPUT GAIN | AUDIO: Sets monitoring level for the selected audio input. Choose the listen source in SETTINGS > AUDIO > SYNTH FROM. |
+| UNDO | EDIT: Undoes the last PATCH or MASTER edit in this session. |
+| REDO | EDIT: Redoes the last undone PATCH or MASTER edit. |
+| PANIC | MIDI: Sends Note Offs for held notes, plus All Notes Off and Reset Controllers. |
+| LOGO | EDIT: Opens the logo menu for SETTINGS, About, Skin, and UI Scale. |
+| SETTINGS... | EDIT: Opens SETTINGS (MIDI ports, standalone audio, paths, warnings, master utility, shortcuts). |
 | ABOUT... | EDIT: Shows product version, links, and credits. |
 | SKIN | EDIT: Chooses the visual skin for the editor. |
 | UI SCALE | EDIT: Sets the user interface scale. |
-| LED (FROM KEYBOARD) | MIDI: Lights when MIDI activity arrives from the keyboard (or host in Plugin). |
-| LED (FROM SYNTH) | MIDI: Lights when MIDI activity arrives from the synthesizer. |
-| LED (TO SYNTH) | MIDI: Lights when MIDI activity is sent to the synthesizer. |
 | AUDIO PEAK | AUDIO: Shows the peak level of the monitored audio input. |
 
 ---
