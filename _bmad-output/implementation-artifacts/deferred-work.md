@@ -2498,13 +2498,33 @@ Original review bullets below remain for history; status for U-10-owned residual
   summary: bandHeightOverride is ignored when extraBandHeight > 0, so control-band Matrix dialogs cannot yet reserve an action-footer separator band the same way.
   evidence: Intentional intro-only pilot; needed when extending the rule above buttons on steps/dialogs that already place controls in the band.
 
+## Deferred from: Build — standalone window quit and placement (2026-10-09)
+
+- source_spec: none
+  summary: Double-click native title bar recentres the standalone window on Windows and Linux (and optionally unify with macOS if OS zoom is not enough).
+  evidence: Split from the same freeform Build intent; first ship is Alt+F4 quit + on-screen launch placement; title-bar double-click recenter follows on a later branch.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-standalone-quit-and-window-placement.md`
+  summary: Linux Standalone Alt+F4 is not explicitly routed through closeButtonPressed / systemRequestedQuit (Windows-only handler in this lot).
+  evidence: Review Edge Case Hunter; frozen intent scoped this ship to Windows; Linux may still rely on WM-equivalent close paths.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-standalone-quit-and-window-placement.md`
+  summary: No automated harness asserts FilterWindow keyPressed→closeButtonPressed or fitWindowToContent→ensure call-site adoption.
+  evidence: Verification Gap Reviewer; helper-boundary and CloseGate tests cover matrix math/gate; end-to-end remains Manual UAT.
+
+## Deferred from: code review of spec-standalone-quit-and-window-placement.md (2026-10-10)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-standalone-quit-and-window-placement.md`
+  summary: No Displays::Listener (or equivalent) re-runs title-bar on-screen ensure after display disconnect / topology change; launch-only matrix leaves a window on removed-monitor coordinates without recovery in this lot.
+  evidence: Blind Hunter; out of frozen launch placement scope; revisit if monitor-hotplug recovery becomes a product need.
+
 ## Deferred from: review of spec-header-matrix-modulation-contextual-help.md (2026-10-09)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-header-matrix-modulation-contextual-help.md`
   summary: Bus-number label mouse intercept + listener forward path has no automated GUI test; Core MatrixModBusReorderService tests do not cover ModulationBusCell.
   evidence: Verification Gap — project unit tests stay off GUI components; Standalone UAT (hover + drag past threshold) is the gate for this path.
 - source_spec: `_bmad-output/implementation-artifacts/spec-header-matrix-modulation-contextual-help.md`
-  summary: Wave 1 Header badge hit areas and new ContextualHelpBinder binds have no CI observer beyond planned human UAT.
+  summary: Wave 1 Header badge hit areas and new ContextualHelpBinder binds have no CI observer beyond human UAT.
   evidence: Verification Gap — ContextualHelpOverlayTests cover overlay helpers/Mutator constants only; Header/Matrix binder registration is out of Core unit-test style for this wave.
 
 ## Deferred from: code review of spec-header-matrix-modulation-contextual-help.md (2026-10-10)
