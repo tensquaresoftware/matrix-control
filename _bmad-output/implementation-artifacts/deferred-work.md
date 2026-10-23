@@ -2727,3 +2727,11 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor.md`
   summary: Rapid auto-push coalescing / revision gating on the thin bridge is unsettled for V1.
   evidence: Review maybe-false; settle with manual rapid-edit soak if apply storms appear.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-ui-panels.md`
+  summary: SkinEditorMainComponent.cpp remains well above the ~400-line useful-file norm after panel extraction.
+  evidence: Build review defer; further split of session/quit/IO glue left for a follow-up.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-ui-panels.md`
+  summary: Mappings and Unbound panels each embed a near-identical askPastille modal helper.
+  evidence: Build review low DRY; extract shared chooser when a third caller appears.

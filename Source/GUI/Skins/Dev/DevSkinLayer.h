@@ -36,6 +36,11 @@ namespace TSS::DevSkin
         juce::Result addPastille(const juce::String& skinId,
                                  const juce::String& pastilleName,
                                  juce::uint32 argb);
+        /** Dev-only pastille names. Product ColourChart names cannot be deleted. */
+        juce::Result deletePastille(const juce::String& skinId,
+                                    const juce::String& pastilleName,
+                                    bool removeReferencingMappings);
+
         juce::Result setMapping(const juce::String& skinId,
                                 SkinColourKey key,
                                 const juce::String& pastilleName);
@@ -44,8 +49,17 @@ namespace TSS::DevSkin
                                  const juce::String& pastilleName);
 
         std::vector<SkinColourKey> unboundKeys(const juce::String& skinId) const;
+        int unboundCount(const juce::String& skinId) const;
+        bool isEditorSkinExportAllowed(const juce::String& skinId) const;
+        bool isProductPastilleName(const juce::String& pastilleName) const;
+        int countMappingsReferencing(const juce::String& skinId,
+                                     const juce::String& pastilleName) const;
+
+        /** Append a Dev skin, reminting id/name on collision. Returns new id. */
+        juce::Result appendDevSkin(NamedSkin skin, juce::String* outId = nullptr);
 
         PushPayload makePushPayload() const;
+        PushPayload makePushPayloadForSkin(const juce::String& skinId) const;
 
         /** Walk derivedFrom until compiled Black/Cream (Dev-from-Dev safe). */
         juce::String resolveCompiledAncestorId(const NamedSkin& skin) const;

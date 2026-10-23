@@ -489,6 +489,7 @@ set(MATRIX_SKIN_DEV_LAYER_SOURCES
     Source/GUI/Skins/Dev/DevSkinKeyNames.cpp
     Source/GUI/Skins/Dev/DevSkinLayer.cpp
     Source/GUI/Skins/Dev/DevSkinPaletteCatalog.cpp
+    Source/GUI/Skins/Dev/DevSkinSession.cpp
     Source/GUI/Skins/Dev/DevSkinSsotSeed.cpp
     Source/GUI/Skins/Dev/DevSkinStandalonePaintState.cpp
 )
@@ -683,6 +684,7 @@ if(MATRIX_BUILD_TESTS)
         Source/GUI/Skins/Dev/DevSkinKeyNames.cpp
         Source/GUI/Skins/Dev/DevSkinLayer.cpp
         Source/GUI/Skins/Dev/DevSkinPaletteCatalog.cpp
+        Source/GUI/Skins/Dev/DevSkinSession.cpp
         Source/GUI/Skins/Dev/DevSkinSsotSeed.cpp
         Source/GUI/Skins/Dev/DevSkinStandalonePaintState.cpp
         Source/GUI/Widgets/Label.cpp
@@ -1085,8 +1087,13 @@ if(MATRIX_BUILD_SKIN_EDITOR)
     target_sources(Matrix-Control_SkinEditor PRIVATE
         Tools/SkinEditor/Main.cpp
         Tools/SkinEditor/SkinEditorMainComponent.cpp
+        Tools/SkinEditor/SkinEditorColourPicker.cpp
+        Tools/SkinEditor/SkinEditorPalettePanel.cpp
+        Tools/SkinEditor/SkinEditorMappingsPanel.cpp
+        Tools/SkinEditor/SkinEditorUnboundPanel.cpp
         ${MATRIX_SKIN_DEV_LAYER_SOURCES}
         Source/GUI/Skins/Skin.cpp
+        Source/Shared/ProjectPaths.cpp
     )
 
     target_include_directories(Matrix-Control_SkinEditor PRIVATE

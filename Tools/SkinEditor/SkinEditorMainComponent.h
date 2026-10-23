@@ -3,74 +3,92 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 
 #include "GUI/Skins/Dev/DevSkinBridgeClient.h"
+#include "GUI/Skins/Dev/DevSkinJson.h"
 #include "GUI/Skins/Dev/DevSkinLayer.h"
+#include "GUI/Skins/Dev/DevSkinSession.h"
+#include "Tools/SkinEditor/SkinEditorColourPicker.h"
+#include "Tools/SkinEditor/SkinEditorMappingsPanel.h"
+#include "Tools/SkinEditor/SkinEditorPalettePanel.h"
+#include "Tools/SkinEditor/SkinEditorUnboundPanel.h"
 
 class SkinEditorMainComponent final : public juce::Component,
-                                      private juce::ListBoxModel
+                                      private juce::ComboBox::Listener,
+                                      private juce::Timer
 {
 public:
     SkinEditorMainComponent();
     ~SkinEditorMainComponent() override;
 
+    /** Returns false if the user cancelled quit. */
+    bool tryQuitWithDirtyGate();
+    bool isSessionDirty() const noexcept { return sessionDirty_; }
+
+    void paint(juce::Graphics& g) override;
     void resized() override;
 
 private:
-    enum class ListMode
-    {
-        kSkins,
-        kPalette,
-        kMappings,
-        kUnbound
-    };
-
-    int getNumRows() override;
-    void paintListBoxItem(int rowNumber, juce::Graphics& g, int width, int height, bool rowIsSelected) override;
-    void selectedRowsChanged(int lastRowSelected) override;
+    void comboBoxChanged(juce::ComboBox*) override;
+    void timerCallback() override;
 
     void refreshAll();
+    void refreshCombos();
     void refreshStatus();
-    void pushActive();
+    void refreshExportEnabled();
+    void pushVisible();
     void setStatusMessage(const juce::String& text);
+    void markDirty();
+    void markClean();
+    void autosaveSession();
+    void loadSessionOrBaseline();
+
+    juce::String visibleSkinId() const;
+    bool isCompareProductView() const;
+    bool canEditEditorSkin() const;
 
     void onDuplicate();
+    void onNew();
     void onDelete();
     void onRename();
-    void onAddPastille();
-    void onEditPastille();
-    void onEditMapping();
-    void onBindUnbound();
+    void onCompareToggle();
+    void onPush();
     void onExportJson();
     void onImportJson();
+    void onAddPastille();
+    void onDeletePastille();
+    void onColourChanged(juce::Colour colour);
+    void onPastilleSelected(const juce::String& name);
 
-    juce::String rowText(int row) const;
-    ListMode currentListMode() const;
+    /** Export current Editor skin; returns true on successful write. */
+    bool exportCurrentEditorSkinToFile(const juce::File& file);
 
     TSS::DevSkin::Layer layer_;
     TSS::DevSkin::BridgeClient bridge_;
+    TSS::DevSkin::EditorSessionState sessionState_;
+    bool sessionDirty_ = false;
+    juce::String selectedPastille_;
+    juce::String statusDetail_;
+    bool suppressCombo_ = false;
 
     juce::Label titleLabel_;
     juce::Label connectionLabel_;
     juce::Label lastPushLabel_;
-    juce::Label readOnlyLabel_;
 
-    juce::TextButton skinsTab_ { "Skins" };
-    juce::TextButton paletteTab_ { "Palette" };
-    juce::TextButton mappingsTab_ { "Mappings" };
-    juce::TextButton unboundTab_ { "Unbound" };
-
-    juce::ListBox listBox_ { "SkinEditorList", this };
+    juce::Label productLabel_ { {}, "Product skin" };
+    juce::ComboBox productCombo_;
+    juce::Label editorLabel_ { {}, "Editor skin" };
+    juce::ComboBox editorCombo_;
 
     juce::TextButton duplicateButton_ { "Duplicate" };
-    juce::TextButton deleteButton_ { "Delete Dev" };
-    juce::TextButton renameButton_ { "Rename Dev" };
-    juce::TextButton addPastilleButton_ { "Add Pastille" };
-    juce::TextButton editPastilleButton_ { "Edit Pastille Hex" };
-    juce::TextButton editMappingButton_ { "Set Mapping" };
-    juce::TextButton bindUnboundButton_ { "Bind Unbound" };
+    juce::TextButton newButton_ { "New" };
+    juce::TextButton renameButton_ { "Rename" };
+    juce::TextButton deleteButton_ { "Delete" };
+    juce::TextButton compareButton_ { "Compare" };
     juce::TextButton pushButton_ { "Push" };
-    juce::TextButton exportButton_ { "Export JSON" };
-    juce::TextButton importButton_ { "Import JSON" };
+    juce::TextButton exportButton_ { "Export" };
+    juce::TextButton importButton_ { "Import" };
 
-    ListMode listMode_ = ListMode::kSkins;
-    juce::String statusDetail_;
+    SkinEditorColourPicker colourPicker_;
+    SkinEditorPalettePanel palettePanel_;
+    SkinEditorMappingsPanel mappingsPanel_;
+    SkinEditorUnboundPanel unboundPanel_;
 };

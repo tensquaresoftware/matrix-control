@@ -170,6 +170,45 @@ namespace TSS::DevSkin
         return juce::Result::ok();
     }
 
+    juce::Result Layer::deletePastille(const juce::String& skinId,
+                                       const juce::String& pastilleName,
+                                       bool removeReferencingMappings)
+    {
+        if (isCompiledId(skinId))
+            return juce::Result::fail("Compiled Black/Cream are read-only; Duplicate first");
+
+        if (isProductPastilleName(pastilleName))
+            return juce::Result::fail("Product colours cannot be deleted");
+
+        auto* skin = findSkinMutable(skinId);
+        if (skin == nullptr)
+            return juce::Result::fail("Dev skin not found");
+
+        const auto pastilleIt = std::find_if(skin->palette.begin(), skin->palette.end(),
+                                             [&](const Pastille& p) { return p.name == pastilleName; });
+        if (pastilleIt == skin->palette.end())
+            return juce::Result::fail("Pastille not found");
+
+        const auto refs = countMappingsReferencing(skinId, pastilleName);
+        if (refs > 0 && ! removeReferencingMappings)
+            return juce::Result::fail("Pastille is referenced by mappings");
+
+        if (removeReferencingMappings)
+        {
+            for (auto it = skin->mappings.begin(); it != skin->mappings.end();)
+            {
+                if (it->second == pastilleName)
+                    it = skin->mappings.erase(it);
+                else
+                    ++it;
+            }
+        }
+
+        skin->palette.erase(pastilleIt);
+        bump();
+        return juce::Result::ok();
+    }
+
     juce::Result Layer::setMapping(const juce::String& skinId,
                                    SkinColourKey key,
                                    const juce::String& pastilleName)
@@ -237,6 +276,88 @@ namespace TSS::DevSkin
         return unbound;
     }
 
+    int Layer::unboundCount(const juce::String& skinId) const
+    {
+        return static_cast<int>(unboundKeys(skinId).size());
+    }
+
+    bool Layer::isEditorSkinExportAllowed(const juce::String& skinId) const
+    {
+        const auto* skin = findSkin(skinId);
+        if (skin == nullptr || skin->kind != SkinKind::kDev)
+            return false;
+        return unboundCount(skinId) == 0;
+    }
+
+    bool Layer::isProductPastilleName(const juce::String& pastilleName) const
+    {
+        for (const auto& pastille : colourChartPastilles())
+            if (pastille.name == pastilleName)
+                return true;
+        return false;
+    }
+
+    int Layer::countMappingsReferencing(const juce::String& skinId,
+                                        const juce::String& pastilleName) const
+    {
+        const auto* skin = findSkin(skinId);
+        if (skin == nullptr)
+            return 0;
+
+        int count = 0;
+        for (const auto& [key, name] : skin->mappings)
+        {
+            juce::ignoreUnused(key);
+            if (name == pastilleName)
+                ++count;
+        }
+        return count;
+    }
+
+    juce::Result Layer::appendDevSkin(NamedSkin skin, juce::String* outId)
+    {
+        if (skin.kind != SkinKind::kDev)
+            return juce::Result::fail("Only Editor skins can be appended");
+
+        auto trimmedName = skin.name.trim();
+        if (trimmedName.isEmpty())
+            return juce::Result::fail("Editor skin name cannot be empty");
+
+        if (nameTaken(trimmedName) || isCompiledId(skin.id) || findSkin(skin.id) != nullptr)
+        {
+            if (nameTaken(trimmedName))
+            {
+                int suffix = 2;
+                auto candidate = trimmedName + " " + juce::String(suffix);
+                while (nameTaken(candidate))
+                {
+                    ++suffix;
+                    candidate = trimmedName + " " + juce::String(suffix);
+                }
+                trimmedName = candidate;
+            }
+            skin.id = makeUniqueDevId(trimmedName);
+            skin.name = trimmedName;
+        }
+        else if (skin.id.isEmpty())
+        {
+            skin.id = makeUniqueDevId(trimmedName);
+            skin.name = trimmedName;
+        }
+        else
+        {
+            skin.name = trimmedName;
+        }
+
+        skin.kind = SkinKind::kDev;
+        skins_.push_back(std::move(skin));
+        activeSkinId_ = skins_.back().id;
+        if (outId != nullptr)
+            *outId = activeSkinId_;
+        bump();
+        return juce::Result::ok();
+    }
+
     juce::String Layer::resolveCompiledAncestorId(const NamedSkin& skin) const
     {
         if (skin.kind == SkinKind::kCompiledBlack)
@@ -266,11 +387,16 @@ namespace TSS::DevSkin
 
     PushPayload Layer::makePushPayload() const
     {
+        return makePushPayloadForSkin(activeSkinId_);
+    }
+
+    PushPayload Layer::makePushPayloadForSkin(const juce::String& skinId) const
+    {
         PushPayload payload;
         payload.revision = revision_;
-        payload.activeSkinId = activeSkinId_;
+        payload.activeSkinId = skinId;
 
-        const auto* skin = findSkin(activeSkinId_);
+        const auto* skin = findSkin(skinId);
         if (skin == nullptr)
         {
             payload.kind = SkinKind::kCompiledCream;

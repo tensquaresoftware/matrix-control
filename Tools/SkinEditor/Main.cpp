@@ -1,5 +1,6 @@
 #include <juce_gui_extra/juce_gui_extra.h>
 
+#include "Tools/SkinEditor/SkinEditorChrome.h"
 #include "Tools/SkinEditor/SkinEditorMainComponent.h"
 
 namespace
@@ -34,6 +35,14 @@ namespace
 
         void systemRequestedQuit() override
         {
+            if (mainWindow_ != nullptr)
+            {
+                if (auto* editor = dynamic_cast<SkinEditorMainComponent*>(mainWindow_->getContentComponent()))
+                {
+                    if (! editor->tryQuitWithDirtyGate())
+                        return;
+                }
+            }
             quit();
         }
 
@@ -43,14 +52,13 @@ namespace
         public:
             explicit MainWindow(const juce::String& name)
                 : DocumentWindow(name,
-                                 juce::Desktop::getInstance().getDefaultLookAndFeel()
-                                     .findColour(juce::ResizableWindow::backgroundColourId),
+                                 SkinEditorChrome::surfaceApp(),
                                  DocumentWindow::allButtons)
             {
                 setUsingNativeTitleBar(true);
                 setContentOwned(new SkinEditorMainComponent(), true);
                 setResizable(true, true);
-                centreWithSize(1100, 720);
+                centreWithSize(1280, 820);
                 setVisible(true);
             }
 

@@ -15,4 +15,7 @@ namespace TSS::DevSkin
     bool parseState(const juce::String& text, SkinColourState& out);
 
     juce::String keyLabel(const SkinColourKey& key);
+
+    juce::StringArray allObjectTypeNames();
+    juce::StringArray allColourStateNames();
 }

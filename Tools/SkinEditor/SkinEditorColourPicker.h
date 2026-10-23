@@ -1,0 +1,54 @@
+#pragma once
+
+#include <functional>
+
+#include <juce_gui_basics/juce_gui_basics.h>
+
+/** Photoshop-style SV square + vertical hue + #hex + R/G/B (no preview swatch). */
+class SkinEditorColourPicker final : public juce::Component,
+                                     private juce::TextEditor::Listener
+{
+public:
+    SkinEditorColourPicker();
+
+    void setColour(juce::Colour colour, juce::NotificationType notification);
+    juce::Colour getColour() const noexcept { return colour_; }
+    void setEnabledEditing(bool canEdit);
+
+    std::function<void(juce::Colour)> onColourChanged;
+
+    void paint(juce::Graphics& g) override;
+    void resized() override;
+    void mouseDown(const juce::MouseEvent& e) override;
+    void mouseDrag(const juce::MouseEvent& e) override;
+
+private:
+    void textEditorTextChanged(juce::TextEditor&) override;
+    void textEditorReturnKeyPressed(juce::TextEditor&) override;
+    void textEditorFocusLost(juce::TextEditor&) override;
+
+    void syncEditorsFromColour(bool notify);
+    void applyHexFromEditor();
+    void applyRgbFromEditors();
+    void updateFromSvOrHue(juce::Point<float> pos, bool isHue);
+    void notifyChanged();
+
+    juce::Colour colour_ { juce::Colours::white };
+    float hue_ = 0.0f;
+    float sat_ = 1.0f;
+    float val_ = 1.0f;
+    bool suppressEditorCallback_ = false;
+    bool editingEnabled_ = true;
+
+    juce::Rectangle<int> svBounds_;
+    juce::Rectangle<int> hueBounds_;
+
+    juce::Label hexLabel_ { {}, "#" };
+    juce::TextEditor hexEditor_;
+    juce::Label rLabel_ { {}, "R" };
+    juce::Label gLabel_ { {}, "G" };
+    juce::Label bLabel_ { {}, "B" };
+    juce::TextEditor rEditor_;
+    juce::TextEditor gEditor_;
+    juce::TextEditor bEditor_;
+};

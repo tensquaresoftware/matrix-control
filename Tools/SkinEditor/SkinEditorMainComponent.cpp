@@ -1,12 +1,10 @@
 #include "Tools/SkinEditor/SkinEditorMainComponent.h"
 
-#include "GUI/Skins/Dev/DevSkinJson.h"
-#include "GUI/Skins/Dev/DevSkinKeyNames.h"
+#include "Tools/SkinEditor/SkinEditorChrome.h"
 
 namespace
 {
-    juce::String askText(juce::Component* /*parent*/,
-                         const juce::String& title,
+    juce::String askText(const juce::String& title,
                          const juce::String& message,
                          const juce::String& initial)
     {
@@ -18,46 +16,28 @@ namespace
             return {};
         return window.getTextEditorContents("value").trim();
     }
-
-    juce::uint32 parseArgb(const juce::String& text, bool& ok)
-    {
-        auto cleaned = text.trim().trimCharactersAtStart("#");
-        if (cleaned.startsWithIgnoreCase("0x"))
-            cleaned = cleaned.substring(2);
-        if (cleaned.length() == 6)
-            cleaned = "FF" + cleaned;
-        ok = cleaned.length() == 8;
-        if (! ok)
-            return 0;
-        return static_cast<juce::uint32>(cleaned.getHexValue64());
-    }
 }
 
 SkinEditorMainComponent::SkinEditorMainComponent()
 {
     titleLabel_.setText("Matrix-Control Skin Editor", juce::dontSendNotification);
     titleLabel_.setFont(juce::Font(juce::FontOptions(18.0f)).boldened());
+    titleLabel_.setColour(juce::Label::textColourId, SkinEditorChrome::textPrimary());
     addAndMakeVisible(titleLabel_);
+    connectionLabel_.setColour(juce::Label::textColourId, SkinEditorChrome::textMuted());
+    lastPushLabel_.setColour(juce::Label::textColourId, SkinEditorChrome::textMuted());
     addAndMakeVisible(connectionLabel_);
     addAndMakeVisible(lastPushLabel_);
-    addAndMakeVisible(readOnlyLabel_);
 
-    auto wireTab = [this](juce::TextButton& button, ListMode mode)
+    for (auto* label : { &productLabel_, &editorLabel_ })
     {
-        addAndMakeVisible(button);
-        button.onClick = [this, mode]
-        {
-            listMode_ = mode;
-            refreshAll();
-        };
-    };
-    wireTab(skinsTab_, ListMode::kSkins);
-    wireTab(paletteTab_, ListMode::kPalette);
-    wireTab(mappingsTab_, ListMode::kMappings);
-    wireTab(unboundTab_, ListMode::kUnbound);
-
-    listBox_.setRowHeight(22);
-    addAndMakeVisible(listBox_);
+        label->setColour(juce::Label::textColourId, SkinEditorChrome::textMuted());
+        addAndMakeVisible(*label);
+    }
+    productCombo_.addListener(this);
+    editorCombo_.addListener(this);
+    addAndMakeVisible(productCombo_);
+    addAndMakeVisible(editorCombo_);
 
     auto wire = [this](juce::TextButton& button, auto handler)
     {
@@ -65,28 +45,61 @@ SkinEditorMainComponent::SkinEditorMainComponent()
         button.onClick = handler;
     };
     wire(duplicateButton_, [this] { onDuplicate(); });
-    wire(deleteButton_, [this] { onDelete(); });
+    wire(newButton_, [this] { onNew(); });
     wire(renameButton_, [this] { onRename(); });
-    wire(addPastilleButton_, [this] { onAddPastille(); });
-    wire(editPastilleButton_, [this] { onEditPastille(); });
-    wire(editMappingButton_, [this] { onEditMapping(); });
-    wire(bindUnboundButton_, [this] { onBindUnbound(); });
-    wire(pushButton_, [this] { pushActive(); });
+    wire(deleteButton_, [this] { onDelete(); });
+    wire(compareButton_, [this] { onCompareToggle(); });
+    wire(pushButton_, [this] { onPush(); });
     wire(exportButton_, [this] { onExportJson(); });
     wire(importButton_, [this] { onImportJson(); });
 
+    colourPicker_.onColourChanged = [this](juce::Colour c) { onColourChanged(c); };
+    addAndMakeVisible(colourPicker_);
+
+    palettePanel_.setLayer(&layer_);
+    palettePanel_.onPastilleSelected = [this](const juce::String& name) { onPastilleSelected(name); };
+    palettePanel_.onAddRequested = [this] { onAddPastille(); };
+    palettePanel_.onDeleteRequested = [this] { onDeletePastille(); };
+    addAndMakeVisible(palettePanel_);
+
+    mappingsPanel_.setLayer(&layer_);
+    mappingsPanel_.onBindRequested = [this](TSS::SkinColourKey key, const juce::String& pastille)
+    {
+        if (! canEditEditorSkin())
+            return;
+        const auto result = layer_.setMapping(sessionState_.editorSkinId, key, pastille);
+        if (result.failed())
+            juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon,
+                                                   "Mapping failed", result.getErrorMessage());
+    };
+    addAndMakeVisible(mappingsPanel_);
+
+    unboundPanel_.setLayer(&layer_);
+    unboundPanel_.onBindRequested = [this](TSS::SkinColourKey key, const juce::String& pastille)
+    {
+        if (! canEditEditorSkin())
+            return;
+        const auto result = layer_.bindUnbound(sessionState_.editorSkinId, key, pastille);
+        if (result.failed())
+            juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon,
+                                                   "Bind failed", result.getErrorMessage());
+    };
+    addAndMakeVisible(unboundPanel_);
+
     layer_.onChanged = [this]
     {
+        markDirty();
         refreshAll();
-        if (bridge_.isConnected())
-            pushActive();
+        if (bridge_.isConnected() && ! isCompareProductView() && canEditEditorSkin())
+            pushVisible();
+        startTimer(400);
     };
 
     bridge_.onConnectionChanged = [this](bool)
     {
         refreshStatus();
         if (bridge_.isConnected())
-            pushActive();
+            pushVisible();
     };
     bridge_.onApplyResult = [this](const TSS::DevSkin::ApplyResult& result)
     {
@@ -97,176 +110,291 @@ SkinEditorMainComponent::SkinEditorMainComponent()
         refreshStatus();
     };
 
+    loadSessionOrBaseline();
     bridge_.start();
     refreshAll();
 }
 
 SkinEditorMainComponent::~SkinEditorMainComponent()
 {
+    stopTimer();
     bridge_.stop();
-    listBox_.setModel(nullptr);
+}
+
+bool SkinEditorMainComponent::tryQuitWithDirtyGate()
+{
+    stopTimer();
+
+    if (! sessionDirty_)
+        return true;
+
+    juce::AlertWindow window("Unsaved Editor changes",
+                             "Export the current Editor skin, discard changes, or cancel?",
+                             juce::MessageBoxIconType::QuestionIcon);
+    window.addButton("Export", 1);
+    window.addButton("Discard", 2);
+    window.addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey));
+    const int choice = window.runModalLoop();
+    if (choice == 0)
+    {
+        autosaveSession();
+        return false;
+    }
+    if (choice == 2)
+    {
+        stopTimer();
+        TSS::DevSkin::skinEditorSessionFile().deleteFile();
+        markClean();
+        return true;
+    }
+
+    // Export then quit if successful
+    if (sessionState_.editorSkinId.isEmpty()
+        || ! layer_.isEditorSkinExportAllowed(sessionState_.editorSkinId))
+    {
+        juce::AlertWindow::showMessageBoxAsync(
+            juce::MessageBoxIconType::WarningIcon,
+            "Export blocked",
+            "Export needs an Editor skin with Unbound = 0.");
+        return false;
+    }
+
+    auto chooser = std::make_shared<juce::FileChooser>(
+        "Export Editor skin JSON",
+        juce::File::getSpecialLocation(juce::File::userDocumentsDirectory)
+            .getChildFile("matrix-control-editor-skin.json"),
+        "*.json");
+
+    // Modal sync chooser for quit path
+    if (chooser->browseForFileToSave(true))
+    {
+        if (exportCurrentEditorSkinToFile(chooser->getResult()))
+        {
+            markClean();
+            return true;
+        }
+    }
+    return false;
+}
+
+void SkinEditorMainComponent::paint(juce::Graphics& g)
+{
+    g.fillAll(SkinEditorChrome::surfaceApp());
+    auto band = getLocalBounds().removeFromTop(SkinEditorChrome::kBandHeight);
+    g.setColour(SkinEditorChrome::surfaceBand());
+    g.fillRect(band);
 }
 
 void SkinEditorMainComponent::resized()
 {
-    auto bounds = getLocalBounds().reduced(12);
-    titleLabel_.setBounds(bounds.removeFromTop(28));
-    connectionLabel_.setBounds(bounds.removeFromTop(22));
-    lastPushLabel_.setBounds(bounds.removeFromTop(22));
-    readOnlyLabel_.setBounds(bounds.removeFromTop(22));
-    bounds.removeFromTop(8);
+    auto bounds = getLocalBounds();
+    auto band = bounds.removeFromTop(SkinEditorChrome::kBandHeight).reduced(SkinEditorChrome::kPanelPad);
 
-    auto tabs = bounds.removeFromTop(28);
-    const int tabW = tabs.getWidth() / 4;
-    skinsTab_.setBounds(tabs.removeFromLeft(tabW).reduced(2, 0));
-    paletteTab_.setBounds(tabs.removeFromLeft(tabW).reduced(2, 0));
-    mappingsTab_.setBounds(tabs.removeFromLeft(tabW).reduced(2, 0));
-    unboundTab_.setBounds(tabs.reduced(2, 0));
-    bounds.removeFromTop(8);
+    auto titleRow = band.removeFromTop(26);
+    titleLabel_.setBounds(titleRow.removeFromLeft(320));
+    connectionLabel_.setBounds(titleRow.removeFromLeft(220));
+    lastPushLabel_.setBounds(titleRow);
 
-    auto actions = bounds.removeFromBottom(96);
-    auto row1 = actions.removeFromTop(30);
-    auto place = [&row1](juce::TextButton& b, int w)
+    auto comboRow = band.removeFromTop(28);
+    productLabel_.setBounds(comboRow.removeFromLeft(90));
+    productCombo_.setBounds(comboRow.removeFromLeft(140).reduced(2, 0));
+    comboRow.removeFromLeft(12);
+    editorLabel_.setBounds(comboRow.removeFromLeft(80));
+    editorCombo_.setBounds(comboRow.removeFromLeft(180).reduced(2, 0));
+
+    auto actions = band;
+    auto place = [&actions](juce::TextButton& b, int w)
     {
-        b.setBounds(row1.removeFromLeft(w).reduced(2, 0));
+        b.setBounds(actions.removeFromLeft(w).reduced(2, 0));
     };
-    place(duplicateButton_, 110);
-    place(deleteButton_, 110);
-    place(renameButton_, 110);
-    place(pushButton_, 80);
-    place(exportButton_, 110);
-    place(importButton_, 110);
+    place(duplicateButton_, 90);
+    place(newButton_, 60);
+    place(renameButton_, 80);
+    place(deleteButton_, 70);
+    place(compareButton_, 90);
+    place(pushButton_, 70);
+    place(exportButton_, 80);
+    place(importButton_, 80);
 
-    auto row2 = actions.removeFromTop(30);
-    auto place2 = [&row2](juce::TextButton& b, int w)
+    bounds.reduce(0, SkinEditorChrome::kGutter);
+    const int gutter = SkinEditorChrome::kGutter;
+    const int colW = (bounds.getWidth() - gutter * 3) / 4;
+    auto placeCol = [&bounds, colW](juce::Component& c)
     {
-        b.setBounds(row2.removeFromLeft(w).reduced(2, 0));
+        c.setBounds(bounds.removeFromLeft(colW));
+        bounds.removeFromLeft(SkinEditorChrome::kGutter);
     };
-    place2(addPastilleButton_, 120);
-    place2(editPastilleButton_, 140);
-    place2(editMappingButton_, 120);
-    place2(bindUnboundButton_, 120);
-
-    listBox_.setBounds(bounds);
+    placeCol(colourPicker_);
+    placeCol(palettePanel_);
+    placeCol(mappingsPanel_);
+    unboundPanel_.setBounds(bounds);
 }
 
-int SkinEditorMainComponent::getNumRows()
+void SkinEditorMainComponent::comboBoxChanged(juce::ComboBox* box)
 {
-    switch (listMode_)
+    if (suppressCombo_)
+        return;
+
+    if (box == &productCombo_)
     {
-        case ListMode::kSkins:    return static_cast<int>(layer_.skins().size());
-        case ListMode::kPalette:
-            if (auto* skin = layer_.findSkin(layer_.activeSkinId()))
-                return static_cast<int>(skin->palette.size());
-            return 0;
-        case ListMode::kMappings:
-            if (auto* skin = layer_.findSkin(layer_.activeSkinId()))
-                return static_cast<int>(skin->mappings.size());
-            return 0;
-        case ListMode::kUnbound:
-            return static_cast<int>(layer_.unboundKeys(layer_.activeSkinId()).size());
+        const int id = productCombo_.getSelectedId();
+        sessionState_.productSkinId = (id == 1) ? TSS::DevSkin::kCompiledBlackId
+                                                : TSS::DevSkin::kCompiledCreamId;
+        markDirty();
+        refreshAll();
+        if (bridge_.isConnected() && isCompareProductView())
+            pushVisible();
+        startTimer(400);
+        return;
     }
-    return 0;
-}
 
-void SkinEditorMainComponent::paintListBoxItem(int rowNumber, juce::Graphics& g,
-                                               int width, int height, bool rowIsSelected)
-{
-    if (rowIsSelected)
-        g.fillAll(juce::Colours::darkgrey);
-    g.setColour(juce::Colours::white);
-    g.drawText(rowText(rowNumber), 4, 0, width - 8, height, juce::Justification::centredLeft);
-}
-
-void SkinEditorMainComponent::selectedRowsChanged(int)
-{
-    if (listMode_ != ListMode::kSkins)
-        return;
-
-    const int row = listBox_.getSelectedRow();
-    if (row < 0 || row >= static_cast<int>(layer_.skins().size()))
-        return;
-
-    layer_.selectSkin(layer_.skins()[static_cast<size_t>(row)].id);
-}
-
-juce::String SkinEditorMainComponent::rowText(int row) const
-{
-    switch (listMode_)
+    if (box == &editorCombo_)
     {
-        case ListMode::kSkins:
+        const auto id = editorCombo_.getText();
+        for (const auto& skin : layer_.skins())
         {
-            const auto& skin = layer_.skins()[static_cast<size_t>(row)];
-            juce::String badge = (skin.kind == TSS::DevSkin::SkinKind::kDev) ? "[Dev] "
-                                                                            : "[Read-only] ";
-            const juce::String active = (skin.id == layer_.activeSkinId()) ? " *" : "";
-            return badge + skin.name + active;
-        }
-        case ListMode::kPalette:
-        {
-            const auto* skin = layer_.findSkin(layer_.activeSkinId());
-            if (skin == nullptr || row >= static_cast<int>(skin->palette.size()))
-                return {};
-            const auto& pastille = skin->palette[static_cast<size_t>(row)];
-            return pastille.name + "  #" + juce::String::toHexString(static_cast<int>(pastille.argb)).paddedLeft('0', 8);
-        }
-        case ListMode::kMappings:
-        {
-            const auto* skin = layer_.findSkin(layer_.activeSkinId());
-            if (skin == nullptr)
-                return {};
-            int i = 0;
-            for (const auto& [key, name] : skin->mappings)
+            if (skin.kind == TSS::DevSkin::SkinKind::kDev && skin.name == id)
             {
-                if (i == row)
-                    return TSS::DevSkin::keyLabel(key) + "  ->  " + name;
-                ++i;
+                if (sessionState_.editorSkinId != skin.id)
+                    selectedPastille_.clear();
+                sessionState_.editorSkinId = skin.id;
+                layer_.selectSkin(skin.id);
+                markDirty();
+                refreshAll();
+                if (bridge_.isConnected() && ! isCompareProductView())
+                    pushVisible();
+                startTimer(400);
+                return;
             }
-            return {};
-        }
-        case ListMode::kUnbound:
-        {
-            const auto keys = layer_.unboundKeys(layer_.activeSkinId());
-            if (row < 0 || row >= static_cast<int>(keys.size()))
-                return {};
-            return TSS::DevSkin::keyLabel(keys[static_cast<size_t>(row)]);
         }
     }
-    return {};
 }
 
-SkinEditorMainComponent::ListMode SkinEditorMainComponent::currentListMode() const
+void SkinEditorMainComponent::timerCallback()
 {
-    return listMode_;
+    stopTimer();
+    autosaveSession();
 }
 
 void SkinEditorMainComponent::refreshAll()
 {
-    listBox_.updateContent();
-    listBox_.repaint();
+    refreshCombos();
     refreshStatus();
+    refreshExportEnabled();
 
-    const bool readOnly = layer_.isActiveReadOnly();
-    readOnlyLabel_.setText(readOnly
-                               ? "Active skin is compiled Black/Cream (read-only). Duplicate to edit."
-                               : "Active skin is a Dev skin (editable).",
-                           juce::dontSendNotification);
+    const auto visibleId = visibleSkinId();
+    const bool compareProduct = isCompareProductView();
+    const bool editable = canEditEditorSkin();
 
-    deleteButton_.setEnabled(! readOnly);
-    renameButton_.setEnabled(! readOnly);
-    addPastilleButton_.setEnabled(! readOnly);
-    editPastilleButton_.setEnabled(! readOnly);
-    editMappingButton_.setEnabled(! readOnly);
-    bindUnboundButton_.setEnabled(! readOnly);
+    compareButton_.setToggleState(sessionState_.compareOn, juce::dontSendNotification);
+    compareButton_.setButtonText(sessionState_.compareOn ? "Compare: ON" : "Compare");
+
+    renameButton_.setEnabled(editable);
+    deleteButton_.setEnabled(editable);
+    newButton_.setEnabled(true);
+    duplicateButton_.setEnabled(true);
+
+    palettePanel_.setActiveSkinId(visibleId);
+    palettePanel_.setReadOnly(! editable);
+    palettePanel_.refresh();
+
+    mappingsPanel_.setActiveSkinId(visibleId);
+    mappingsPanel_.setReadOnly(compareProduct || ! editable);
+    mappingsPanel_.refresh();
+
+    unboundPanel_.setActiveSkinId(visibleId);
+    unboundPanel_.setForcedEmpty(compareProduct);
+    unboundPanel_.setReadOnly(compareProduct || ! editable);
+    unboundPanel_.refresh();
+
+    if (selectedPastille_.isNotEmpty())
+    {
+        bool found = false;
+        if (const auto* skin = layer_.findSkin(visibleId))
+        {
+            for (const auto& pastille : skin->palette)
+            {
+                if (pastille.name == selectedPastille_)
+                {
+                    colourPicker_.setColour(juce::Colour(pastille.argb), juce::dontSendNotification);
+                    found = true;
+                    break;
+                }
+            }
+        }
+        if (found)
+            palettePanel_.selectPastille(selectedPastille_);
+        else
+            selectedPastille_.clear();
+    }
+    colourPicker_.setEnabledEditing(editable && selectedPastille_.isNotEmpty());
+}
+
+void SkinEditorMainComponent::refreshCombos()
+{
+    const juce::ScopedValueSetter<bool> scope(suppressCombo_, true);
+    productCombo_.clear(juce::dontSendNotification);
+    productCombo_.addItem("Black", 1);
+    productCombo_.addItem("Cream", 2);
+    productCombo_.setSelectedId(sessionState_.productSkinId == TSS::DevSkin::kCompiledBlackId ? 1 : 2,
+                                juce::dontSendNotification);
+
+    editorCombo_.clear(juce::dontSendNotification);
+    int selected = 0;
+    int index = 1;
+    for (const auto& skin : layer_.skins())
+    {
+        if (skin.kind != TSS::DevSkin::SkinKind::kDev)
+            continue;
+        editorCombo_.addItem(skin.name, index);
+        if (skin.id == sessionState_.editorSkinId)
+            selected = index;
+        ++index;
+    }
+    if (selected > 0)
+    {
+        editorCombo_.setSelectedId(selected, juce::dontSendNotification);
+    }
+    else if (editorCombo_.getNumItems() > 0)
+    {
+        editorCombo_.setSelectedItemIndex(0, juce::dontSendNotification);
+        for (const auto& skin : layer_.skins())
+        {
+            if (skin.kind == TSS::DevSkin::SkinKind::kDev && skin.name == editorCombo_.getText())
+            {
+                if (sessionState_.editorSkinId != skin.id)
+                    selectedPastille_.clear();
+                sessionState_.editorSkinId = skin.id;
+                break;
+            }
+        }
+    }
+    else
+    {
+        if (sessionState_.editorSkinId.isNotEmpty())
+            selectedPastille_.clear();
+        sessionState_.editorSkinId = {};
+    }
 }
 
 void SkinEditorMainComponent::refreshStatus()
 {
-    connectionLabel_.setText(bridge_.session().connectionStatusText(),
-                             juce::dontSendNotification);
-    lastPushLabel_.setText(statusDetail_.isNotEmpty() ? statusDetail_
-                                                      : "Last push: none",
+    connectionLabel_.setText(bridge_.session().connectionStatusText(), juce::dontSendNotification);
+    lastPushLabel_.setText(statusDetail_.isNotEmpty() ? statusDetail_ : "Last push: none",
                            juce::dontSendNotification);
+}
+
+void SkinEditorMainComponent::refreshExportEnabled()
+{
+    exportButton_.setEnabled(layer_.isEditorSkinExportAllowed(sessionState_.editorSkinId));
+}
+
+void SkinEditorMainComponent::pushVisible()
+{
+    bridge_.push(layer_.makePushPayloadForSkin(visibleSkinId()));
+    if (! bridge_.isConnected())
+        setStatusMessage("Last push: queued until Standalone Dev connects");
+    refreshStatus();
 }
 
 void SkinEditorMainComponent::setStatusMessage(const juce::String& text)
@@ -274,46 +402,135 @@ void SkinEditorMainComponent::setStatusMessage(const juce::String& text)
     statusDetail_ = text;
 }
 
-void SkinEditorMainComponent::pushActive()
+void SkinEditorMainComponent::markDirty()
 {
-    bridge_.push(layer_.makePushPayload());
-    if (! bridge_.isConnected())
-        setStatusMessage("Last push: queued until Standalone Dev connects");
-    refreshStatus();
+    sessionDirty_ = true;
+}
+
+void SkinEditorMainComponent::markClean()
+{
+    sessionDirty_ = false;
+}
+
+void SkinEditorMainComponent::autosaveSession()
+{
+    juce::String error;
+    if (! TSS::DevSkin::saveSessionFile(layer_, sessionState_, error))
+        setStatusMessage("Session autosave failed: " + error);
+}
+
+void SkinEditorMainComponent::loadSessionOrBaseline()
+{
+    const auto loaded = TSS::DevSkin::loadSessionFile(layer_, sessionState_);
+    if (! loaded.ok)
+    {
+        if (loaded.message != "No session file")
+            setStatusMessage(loaded.message);
+        sessionState_.productSkinId = TSS::DevSkin::kCompiledCreamId;
+        sessionState_.editorSkinId = {};
+        sessionState_.compareOn = false;
+    }
+    if (sessionState_.editorSkinId.isNotEmpty())
+        layer_.selectSkin(sessionState_.editorSkinId);
+    markClean();
+}
+
+juce::String SkinEditorMainComponent::visibleSkinId() const
+{
+    if (isCompareProductView())
+        return sessionState_.productSkinId;
+    if (sessionState_.editorSkinId.isNotEmpty())
+        return sessionState_.editorSkinId;
+    return sessionState_.productSkinId;
+}
+
+bool SkinEditorMainComponent::isCompareProductView() const
+{
+    return sessionState_.compareOn;
+}
+
+bool SkinEditorMainComponent::canEditEditorSkin() const
+{
+    if (isCompareProductView() || sessionState_.editorSkinId.isEmpty())
+        return false;
+    const auto* skin = layer_.findSkin(sessionState_.editorSkinId);
+    return skin != nullptr && skin->kind == TSS::DevSkin::SkinKind::kDev;
 }
 
 void SkinEditorMainComponent::onDuplicate()
 {
-    const auto name = askText(this, "Duplicate Skin",
-                              "New Dev skin name (prefer future Matrix-Control display name):",
-                              "My Skin");
+    const auto sourceId = isCompareProductView() ? sessionState_.productSkinId
+                                                 : (sessionState_.editorSkinId.isNotEmpty()
+                                                        ? sessionState_.editorSkinId
+                                                        : sessionState_.productSkinId);
+    const auto name = askText("Duplicate", "New Editor skin name:", "My Skin");
     if (name.isEmpty())
         return;
-
-    const auto result = layer_.duplicateSkin(layer_.activeSkinId(), name);
+    const auto result = layer_.duplicateSkin(sourceId, name);
     if (result.failed())
+    {
         juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon,
                                                "Duplicate failed", result.getErrorMessage());
+        return;
+    }
+    sessionState_.editorSkinId = layer_.activeSkinId();
+    sessionState_.compareOn = false;
+    selectedPastille_.clear();
+}
+
+void SkinEditorMainComponent::onNew()
+{
+    const auto name = askText("New Editor skin", "Name:", "New Skin");
+    if (name.isEmpty())
+        return;
+    const auto result = layer_.createEmptyDevSkin(name);
+    if (result.failed())
+    {
+        juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon,
+                                               "New failed", result.getErrorMessage());
+        return;
+    }
+    sessionState_.editorSkinId = layer_.activeSkinId();
+    sessionState_.compareOn = false;
+    selectedPastille_.clear();
 }
 
 void SkinEditorMainComponent::onDelete()
 {
-    if (layer_.isActiveReadOnly())
+    if (! canEditEditorSkin())
         return;
-    const auto result = layer_.deleteDevSkin(layer_.activeSkinId());
+
+    const auto* skin = layer_.findSkin(sessionState_.editorSkinId);
+    if (skin == nullptr)
+        return;
+
+    juce::AlertWindow confirm("Delete Editor skin",
+                              "Delete \"" + skin->name + "\"? This cannot be undone.",
+                              juce::MessageBoxIconType::WarningIcon);
+    confirm.addButton("Delete", 1);
+    confirm.addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey));
+    if (confirm.runModalLoop() != 1)
+        return;
+
+    const auto result = layer_.deleteDevSkin(sessionState_.editorSkinId);
     if (result.failed())
+    {
         juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon,
                                                "Delete failed", result.getErrorMessage());
+        return;
+    }
+    sessionState_.editorSkinId = {};
+    selectedPastille_.clear();
 }
 
 void SkinEditorMainComponent::onRename()
 {
-    if (layer_.isActiveReadOnly())
+    if (! canEditEditorSkin())
         return;
-    const auto* skin = layer_.findSkin(layer_.activeSkinId());
+    const auto* skin = layer_.findSkin(sessionState_.editorSkinId);
     if (skin == nullptr)
         return;
-    const auto name = askText(this, "Rename Dev Skin", "New name:", skin->name);
+    const auto name = askText("Rename Editor skin", "New name:", skin->name);
     if (name.isEmpty())
         return;
     const auto result = layer_.renameDevSkin(skin->id, name);
@@ -322,120 +539,30 @@ void SkinEditorMainComponent::onRename()
                                                "Rename failed", result.getErrorMessage());
 }
 
-void SkinEditorMainComponent::onAddPastille()
+void SkinEditorMainComponent::onCompareToggle()
 {
-    if (layer_.isActiveReadOnly())
-        return;
-    const auto name = askText(this, "Add Pastille", "Pastille name:", "kCustomAccent");
-    if (name.isEmpty())
-        return;
-    const auto hex = askText(this, "Add Pastille", "ARGB hex (e.g. FFFF0000 or #FF0000):", "FFFF0000");
-    bool ok = false;
-    const auto argb = parseArgb(hex, ok);
-    if (! ok)
-    {
-        juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon,
-                                               "Invalid colour", "Could not parse ARGB hex");
-        return;
-    }
-    const auto result = layer_.addPastille(layer_.activeSkinId(), name, argb);
-    if (result.failed())
-        juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon,
-                                               "Add pastille failed", result.getErrorMessage());
+    sessionState_.compareOn = ! sessionState_.compareOn;
+    markDirty();
+    refreshAll();
+    if (bridge_.isConnected())
+        pushVisible();
+    startTimer(400);
 }
 
-void SkinEditorMainComponent::onEditPastille()
+void SkinEditorMainComponent::onPush()
 {
-    if (layer_.isActiveReadOnly() || listMode_ != ListMode::kPalette)
-        return;
-    const int row = listBox_.getSelectedRow();
-    const auto* skin = layer_.findSkin(layer_.activeSkinId());
-    if (skin == nullptr || row < 0 || row >= static_cast<int>(skin->palette.size()))
-        return;
-
-    const auto& pastille = skin->palette[static_cast<size_t>(row)];
-    const auto hex = askText(this, "Edit Pastille",
-                             "ARGB hex for " + pastille.name + ":",
-                             juce::String::toHexString(static_cast<int>(pastille.argb)).paddedLeft('0', 8));
-    bool ok = false;
-    const auto argb = parseArgb(hex, ok);
-    if (! ok)
-    {
-        juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon,
-                                               "Invalid colour", "Could not parse ARGB hex");
-        return;
-    }
-    const auto result = layer_.setPastilleArgb(skin->id, pastille.name, argb);
-    if (result.failed())
-        juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon,
-                                               "Edit failed", result.getErrorMessage());
-}
-
-void SkinEditorMainComponent::onEditMapping()
-{
-    if (layer_.isActiveReadOnly() || listMode_ != ListMode::kMappings)
-        return;
-    const int row = listBox_.getSelectedRow();
-    const auto* skin = layer_.findSkin(layer_.activeSkinId());
-    if (skin == nullptr || row < 0)
-        return;
-
-    int i = 0;
-    TSS::SkinColourKey key {};
-    juce::String current;
-    for (const auto& entry : skin->mappings)
-    {
-        if (i == row)
-        {
-            key = entry.first;
-            current = entry.second;
-            break;
-        }
-        ++i;
-    }
-    if (current.isEmpty() && i != row)
-        return;
-
-    const auto pastille = askText(this, "Set Mapping",
-                                  TSS::DevSkin::keyLabel(key) + "\nPastille name:",
-                                  current);
-    if (pastille.isEmpty())
-        return;
-    const auto result = layer_.setMapping(skin->id, key, pastille);
-    if (result.failed())
-        juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon,
-                                               "Mapping failed", result.getErrorMessage());
-}
-
-void SkinEditorMainComponent::onBindUnbound()
-{
-    if (layer_.isActiveReadOnly() || listMode_ != ListMode::kUnbound)
-        return;
-    const int row = listBox_.getSelectedRow();
-    const auto keys = layer_.unboundKeys(layer_.activeSkinId());
-    if (row < 0 || row >= static_cast<int>(keys.size()))
-        return;
-
-    const auto pastille = askText(this, "Bind Unbound",
-                                  TSS::DevSkin::keyLabel(keys[static_cast<size_t>(row)])
-                                      + "\nPastille name:",
-                                  "kGrey500");
-    if (pastille.isEmpty())
-        return;
-    const auto result = layer_.bindUnbound(layer_.activeSkinId(),
-                                           keys[static_cast<size_t>(row)],
-                                           pastille);
-    if (result.failed())
-        juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon,
-                                               "Bind failed", result.getErrorMessage());
+    pushVisible();
 }
 
 void SkinEditorMainComponent::onExportJson()
 {
+    if (! layer_.isEditorSkinExportAllowed(sessionState_.editorSkinId))
+        return;
+
     auto chooser = std::make_shared<juce::FileChooser>(
-        "Export Dev layer JSON",
+        "Export Editor skin JSON",
         juce::File::getSpecialLocation(juce::File::userDocumentsDirectory)
-            .getChildFile("matrix-control-dev-skins.json"),
+            .getChildFile("matrix-control-editor-skin.json"),
         "*.json");
     chooser->launchAsync(juce::FileBrowserComponent::saveMode
                              | juce::FileBrowserComponent::canSelectFiles
@@ -445,23 +572,19 @@ void SkinEditorMainComponent::onExportJson()
                              const auto file = fc.getResult();
                              if (file == juce::File())
                                  return;
-                             if (! file.replaceWithText(TSS::DevSkin::exportToJson(layer_)))
+                             if (exportCurrentEditorSkinToFile(file))
                              {
-                                 juce::AlertWindow::showMessageBoxAsync(
-                                     juce::MessageBoxIconType::WarningIcon,
-                                     "Export failed",
-                                     "Could not write file");
-                                 return;
+                                 markClean();
+                                 setStatusMessage("Exported: " + file.getFullPathName());
+                                 refreshStatus();
                              }
-                             setStatusMessage("Exported: " + file.getFullPathName());
-                             refreshStatus();
                          });
 }
 
 void SkinEditorMainComponent::onImportJson()
 {
     auto chooser = std::make_shared<juce::FileChooser>(
-        "Import Dev layer JSON",
+        "Import Editor skin JSON",
         juce::File::getSpecialLocation(juce::File::userDocumentsDirectory),
         "*.json");
     chooser->launchAsync(juce::FileBrowserComponent::openMode
@@ -471,8 +594,8 @@ void SkinEditorMainComponent::onImportJson()
                              const auto file = fc.getResult();
                              if (file == juce::File())
                                  return;
-                             const auto text = file.loadFileAsString();
-                             const auto result = TSS::DevSkin::importFromJson(layer_, text);
+                             const auto result = TSS::DevSkin::appendEditorSkinsFromJson(
+                                 layer_, file.loadFileAsString());
                              if (! result.ok)
                              {
                                  juce::AlertWindow::showMessageBoxAsync(
@@ -481,9 +604,106 @@ void SkinEditorMainComponent::onImportJson()
                                      result.message);
                                  return;
                              }
+                             if (result.importedSkinIds.size() > 0)
+                                 sessionState_.editorSkinId = result.importedSkinIds[0];
+                             sessionState_.compareOn = false;
                              setStatusMessage("Imported: " + file.getFullPathName());
                              refreshAll();
                              if (bridge_.isConnected())
-                                 pushActive();
+                                 pushVisible();
                          });
+}
+
+void SkinEditorMainComponent::onAddPastille()
+{
+    if (! canEditEditorSkin())
+        return;
+    const auto name = askText("Add colour", "Pastille name:", "kCustomAccent");
+    if (name.isEmpty())
+        return;
+    const auto result = layer_.addPastille(sessionState_.editorSkinId, name, 0xffff0000);
+    if (result.failed())
+    {
+        juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon,
+                                               "Add failed", result.getErrorMessage());
+        return;
+    }
+    selectedPastille_ = name;
+}
+
+void SkinEditorMainComponent::onDeletePastille()
+{
+    if (! canEditEditorSkin())
+        return;
+    const auto name = palettePanel_.getSelectedPastilleName();
+    if (name.isEmpty() || layer_.isProductPastilleName(name))
+        return;
+
+    bool removeRefs = false;
+    const int refs = layer_.countMappingsReferencing(sessionState_.editorSkinId, name);
+    if (refs > 0)
+    {
+        juce::AlertWindow window("Delete colour",
+                                 name + " is used by " + juce::String(refs)
+                                     + " mapping(s). Delete and clear those mappings?",
+                                 juce::MessageBoxIconType::WarningIcon);
+        window.addButton("Delete", 1);
+        window.addButton("Cancel", 0);
+        if (window.runModalLoop() != 1)
+            return;
+        removeRefs = true;
+    }
+
+    const auto result = layer_.deletePastille(sessionState_.editorSkinId, name, removeRefs);
+    if (result.failed())
+    {
+        juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon,
+                                               "Delete failed", result.getErrorMessage());
+        return;
+    }
+    if (selectedPastille_ == name)
+        selectedPastille_.clear();
+}
+
+void SkinEditorMainComponent::onColourChanged(juce::Colour colour)
+{
+    if (! canEditEditorSkin() || selectedPastille_.isEmpty())
+        return;
+    const auto result = layer_.setPastilleArgb(sessionState_.editorSkinId,
+                                               selectedPastille_,
+                                               colour.getARGB());
+    if (result.failed())
+        setStatusMessage(result.getErrorMessage());
+}
+
+void SkinEditorMainComponent::onPastilleSelected(const juce::String& name)
+{
+    selectedPastille_ = name;
+    if (const auto* skin = layer_.findSkin(visibleSkinId()))
+    {
+        for (const auto& pastille : skin->palette)
+        {
+            if (pastille.name == name)
+            {
+                colourPicker_.setColour(juce::Colour(pastille.argb), juce::dontSendNotification);
+                colourPicker_.setEnabledEditing(canEditEditorSkin());
+                break;
+            }
+        }
+    }
+}
+
+bool SkinEditorMainComponent::exportCurrentEditorSkinToFile(const juce::File& file)
+{
+    if (! layer_.isEditorSkinExportAllowed(sessionState_.editorSkinId))
+        return false;
+    const auto json = TSS::DevSkin::exportEditorSkinToJson(layer_, sessionState_.editorSkinId);
+    if (json.isEmpty() || ! file.replaceWithText(json))
+    {
+        juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon,
+                                               "Export failed",
+                                               "Could not write file");
+        return false;
+    }
+    return true;
 }

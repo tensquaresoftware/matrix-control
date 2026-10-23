@@ -135,4 +135,20 @@ namespace TSS::DevSkin
     {
         return toString(key.object) + " / " + toString(key.property) + " / " + toString(key.state);
     }
+
+    juce::StringArray allObjectTypeNames()
+    {
+        juce::StringArray names;
+        for (const auto& entry : kObjects)
+            names.add(entry.name);
+        return names;
+    }
+
+    juce::StringArray allColourStateNames()
+    {
+        juce::StringArray names;
+        for (const auto& entry : kStates)
+            names.add(entry.name);
+        return names;
+    }
 }
