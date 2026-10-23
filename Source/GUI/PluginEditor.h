@@ -16,6 +16,10 @@
 #include "Skins/Skin.h"
 #include "Core/MIDI/Queue/RealtimeQueuePressureMonitor.h"
 
+#if defined(MATRIX_SKIN_EDITOR_DEV_LAYER)
+#include "GUI/Skins/Dev/DevSkinTypes.h"
+#endif
+
 #if JUCE_DEBUG
 #include "Tests/TestComponent.h"
 #endif
@@ -48,6 +52,11 @@ public:
 
     TSS::ISkin& getActiveSkin() noexcept;
     float getAppliedUiScale() const noexcept { return appliedUiScale_; }
+
+#if defined(MATRIX_SKIN_EDITOR_DEV_LAYER)
+    TSS::DevSkin::ApplyResult applyDevSkinPush(const TSS::DevSkin::PushPayload& payload);
+    void clearDevSkinOverlay();
+#endif
 
     void paint(juce::Graphics&) override;
     void resized() override;
@@ -277,6 +286,9 @@ private:
 
     std::unique_ptr<TSS::Skin> skinBlack_;
     std::unique_ptr<TSS::Skin> skinCream_;
+#if defined(MATRIX_SKIN_EDITOR_DEV_LAYER)
+    std::unique_ptr<TSS::Skin> skinDevOverlay_;
+#endif
     TSS::Skin* skin_ = nullptr;
     std::unique_ptr<WidgetFactory> widgetFactory_;
     GuiLayoutDimensions layoutDimensions_;

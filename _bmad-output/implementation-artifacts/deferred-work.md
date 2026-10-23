@@ -2715,3 +2715,15 @@ Original review bullets below remain for history; status for U-10-owned residual
   summary: Reconfirmed — CAP-5 pytest paint checks remain source-text greps only (Footer / ModBus / popup / alert file substrings), not executable paint observation.
   evidence: External code review Verification Gap + Blind Hunter; already deferred in Build; CONVENTIONS forbid GUI paint unit tests; absolute Look/Skin pins are the hardening path.
 
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor.md`
+  summary: README / contributor docs do not yet document MATRIX_BUILD_SKIN_EDITOR, Skin Editor build, or Cursor compound launch.
+  evidence: Build review deferred discoverability; V1 done criteria covered by CMake comments, launch.json, and BMad artifacts.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor.md`
+  summary: check_skin_editor_packaging.py still assumes Ninja + local JUCE_DIR rather than every generator/CI shape.
+  evidence: Build review; Release presets OFF are guarded by pytest; full configure audit remains a local/optional script.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor.md`
+  summary: Rapid auto-push coalescing / revision gating on the thin bridge is unsettled for V1.
+  evidence: Review maybe-false; settle with manual rapid-edit soak if apply storms appear.

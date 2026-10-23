@@ -13,7 +13,8 @@
         "JUCE_DIR": "$env{JUCE_DIR}",
         "ARTEFACTS_DIR_MACOS": "/Users/Guillaume/Library/CloudStorage/Dropbox/Dev/Artefacts",
         "USER_COPY_TO_SYSTEM_FOLDERS": "ON",
-        "USER_COPY_TO_ARTEFACTS_DIR": "ON"
+        "USER_COPY_TO_ARTEFACTS_DIR": "ON",
+        "MATRIX_BUILD_SKIN_EDITOR": "ON"
       }
     },
     {
@@ -28,7 +29,8 @@
         "JUCE_DIR": "$env{JUCE_DIR}",
         "ARTEFACTS_DIR_MACOS": "/Users/Guillaume/Library/CloudStorage/Dropbox/Dev/Artefacts",
         "USER_COPY_TO_SYSTEM_FOLDERS": "ON",
-        "USER_COPY_TO_ARTEFACTS_DIR": "ON"
+        "USER_COPY_TO_ARTEFACTS_DIR": "ON",
+        "MATRIX_BUILD_SKIN_EDITOR": "OFF"
       }
     },
     {
@@ -43,7 +45,8 @@
         "JUCE_DIR": "$env{JUCE_DIR}",
         "ARTEFACTS_DIR_MACOS": "/Users/Guillaume/Library/CloudStorage/Dropbox/Dev/Artefacts",
         "USER_COPY_TO_SYSTEM_FOLDERS": "ON",
-        "USER_COPY_TO_ARTEFACTS_DIR": "ON"
+        "USER_COPY_TO_ARTEFACTS_DIR": "ON",
+        "MATRIX_BUILD_SKIN_EDITOR": "ON"
       }
     },
     {
@@ -58,7 +61,8 @@
         "JUCE_DIR": "$env{JUCE_DIR}",
         "ARTEFACTS_DIR_MACOS": "/Users/Guillaume/Library/CloudStorage/Dropbox/Dev/Artefacts",
         "USER_COPY_TO_SYSTEM_FOLDERS": "ON",
-        "USER_COPY_TO_ARTEFACTS_DIR": "ON"
+        "USER_COPY_TO_ARTEFACTS_DIR": "ON",
+        "MATRIX_BUILD_SKIN_EDITOR": "OFF"
       }
     },
     {
@@ -73,7 +77,8 @@
         "JUCE_DIR": "$env{JUCE_DIR}",
         "ARTEFACTS_DIR_MACOS": "/Users/Guillaume/Library/CloudStorage/Dropbox/Dev/Artefacts",
         "USER_COPY_TO_SYSTEM_FOLDERS": "ON",
-        "USER_COPY_TO_ARTEFACTS_DIR": "ON"
+        "USER_COPY_TO_ARTEFACTS_DIR": "ON",
+        "MATRIX_BUILD_SKIN_EDITOR": "ON"
       }
     },
     {
@@ -88,7 +93,8 @@
         "JUCE_DIR": "$env{JUCE_DIR}",
         "ARTEFACTS_DIR_MACOS": "/Users/Guillaume/Library/CloudStorage/Dropbox/Dev/Artefacts",
         "USER_COPY_TO_SYSTEM_FOLDERS": "ON",
-        "USER_COPY_TO_ARTEFACTS_DIR": "ON"
+        "USER_COPY_TO_ARTEFACTS_DIR": "ON",
+        "MATRIX_BUILD_SKIN_EDITOR": "OFF"
       }
     },
     {
@@ -101,7 +107,8 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "JUCE_DIR": "$env{JUCE_DIR}",
-        "ARTEFACTS_DIR_WINDOWS": "C:/Users/Guillaume/Dropbox/Dev/Artefacts"
+        "ARTEFACTS_DIR_WINDOWS": "C:/Users/Guillaume/Dropbox/Dev/Artefacts",
+        "MATRIX_BUILD_SKIN_EDITOR": "ON"
       }
     },
     {
@@ -114,7 +121,8 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
         "JUCE_DIR": "$env{JUCE_DIR}",
-        "ARTEFACTS_DIR_WINDOWS": "C:/Users/Guillaume/Dropbox/Dev/Artefacts"
+        "ARTEFACTS_DIR_WINDOWS": "C:/Users/Guillaume/Dropbox/Dev/Artefacts",
+        "MATRIX_BUILD_SKIN_EDITOR": "OFF"
       }
     },
     {
@@ -127,7 +135,8 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "JUCE_DIR": "$env{JUCE_DIR}",
-        "ARTEFACTS_DIR_WINDOWS": "C:/Users/Guillaume/Dropbox/Dev/Artefacts"
+        "ARTEFACTS_DIR_WINDOWS": "C:/Users/Guillaume/Dropbox/Dev/Artefacts",
+        "MATRIX_BUILD_SKIN_EDITOR": "ON"
       }
     },
     {
@@ -140,7 +149,8 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
         "JUCE_DIR": "$env{JUCE_DIR}",
-        "ARTEFACTS_DIR_WINDOWS": "C:/Users/Guillaume/Dropbox/Dev/Artefacts"
+        "ARTEFACTS_DIR_WINDOWS": "C:/Users/Guillaume/Dropbox/Dev/Artefacts",
+        "MATRIX_BUILD_SKIN_EDITOR": "OFF"
       }
     },
     {
@@ -152,7 +162,8 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "JUCE_DIR": "$env{JUCE_DIR}",
-        "ARTEFACTS_DIR_LINUX": "/home/guillaume/Dropbox/Dev/Artefacts"
+        "ARTEFACTS_DIR_LINUX": "/home/guillaume/Dropbox/Dev/Artefacts",
+        "MATRIX_BUILD_SKIN_EDITOR": "ON"
       }
     },
     {
@@ -164,7 +175,8 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
         "JUCE_DIR": "$env{JUCE_DIR}",
-        "ARTEFACTS_DIR_LINUX": "/home/guillaume/Dropbox/Dev/Artefacts"
+        "ARTEFACTS_DIR_LINUX": "/home/guillaume/Dropbox/Dev/Artefacts",
+        "MATRIX_BUILD_SKIN_EDITOR": "OFF"
       }
     }
   ],

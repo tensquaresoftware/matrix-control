@@ -11,6 +11,10 @@
 #include "Standalone/MatrixControlStandaloneFilterWindow.h"
 #include "Standalone/StandaloneQuitCommands.h"
 
+#if defined(MATRIX_SKIN_EDITOR_RECEIVER)
+#include "Standalone/SkinEditorReceiverStandalone.h"
+#endif
+
 namespace
 {
 class MatrixControlStandaloneApp final : public juce::JUCEApplication
@@ -122,6 +126,17 @@ public:
                    #endif
                 }
             });
+
+           #if defined(MATRIX_SKIN_EDITOR_RECEIVER)
+            juce::MessageManager::callAsync ([this]
+            {
+                if (mainWindow == nullptr)
+                    return;
+                MatrixStandalone::attachSkinEditorReceiverIfNeeded(
+                    skinEditorReceiverHost_,
+                    mainWindow->getAudioProcessor());
+            });
+           #endif
         }
         else
         {
@@ -131,6 +146,9 @@ public:
 
     void shutdown() override
     {
+       #if defined(MATRIX_SKIN_EDITOR_RECEIVER)
+        skinEditorReceiverHost_.reset();
+       #endif
         pluginHolder = nullptr;
         mainWindow = nullptr;
         appProperties.saveIfNeeded();
@@ -180,6 +198,9 @@ private:
     juce::ApplicationCommandManager commandManager;
     std::unique_ptr<MatrixControlStandaloneFilterWindow> mainWindow;
     std::unique_ptr<juce::StandalonePluginHolder> pluginHolder;
+   #if defined(MATRIX_SKIN_EDITOR_RECEIVER)
+    MatrixStandalone::SkinEditorReceiverHost skinEditorReceiverHost_;
+   #endif
 };
 } // namespace
 

@@ -472,6 +472,31 @@ set(TEST_SANDBOX_SOURCES
 # ============================================================================
 option(MATRIX_BUILD_TESTS "Build the Matrix-Control unit test runner" OFF)
 
+# Dev author tool: Matrix-Control Skin Editor + Standalone Dev thin-bridge receiver.
+# Keep OFF for Release user packaging / AU / VST3. Enable for local invent work:
+#   cmake --preset macos-debug-arm64 -DMATRIX_BUILD_SKIN_EDITOR=ON
+option(MATRIX_BUILD_SKIN_EDITOR "Build Skin Editor app and Standalone Dev skin receiver" OFF)
+
+# Shared Dev-layer + editor client sources (no BridgeServer — Standalone-only).
+set(MATRIX_SKIN_DEV_LAYER_SOURCES
+    Source/GUI/Skins/Dev/DevSkinApplier.cpp
+    Source/GUI/Skins/Dev/DevSkinBridgeClient.cpp
+    Source/GUI/Skins/Dev/DevSkinBridgeProtocol.cpp
+    Source/GUI/Skins/Dev/DevSkinBridgeSession.cpp
+    Source/GUI/Skins/Dev/DevSkinColourElementList.cpp
+    Source/GUI/Skins/Dev/DevSkinInventory.cpp
+    Source/GUI/Skins/Dev/DevSkinJson.cpp
+    Source/GUI/Skins/Dev/DevSkinKeyNames.cpp
+    Source/GUI/Skins/Dev/DevSkinLayer.cpp
+    Source/GUI/Skins/Dev/DevSkinPaletteCatalog.cpp
+    Source/GUI/Skins/Dev/DevSkinSsotSeed.cpp
+    Source/GUI/Skins/Dev/DevSkinStandalonePaintState.cpp
+)
+
+set(MATRIX_SKIN_DEV_RECEIVER_SOURCES
+    Source/GUI/Skins/Dev/DevSkinReceiverController.cpp
+)
+
 if(MATRIX_BUILD_TESTS)
     juce_add_console_app(Matrix-Control_Tests PRODUCT_NAME "Matrix-Control Tests")
 
@@ -570,6 +595,8 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/ModuleHeaderTitleColourTests.cpp
         Tests/Unit/NumberBoxDisabledBackgroundColourTests.cpp
         Tests/Unit/SkinColourSubstrateTests.cpp
+        Tests/Unit/DevSkinLayerJsonTests.cpp
+        Tests/Unit/DevSkinMatrixTests.cpp
         Tests/Unit/SliderButtonLikeColourTests.cpp
         Tests/Unit/PatchManagerActionHandlerComputerNavigationTests.cpp
         Tests/Unit/PatchManagerActionHandlerNavDebounceTests.cpp
@@ -647,6 +674,17 @@ if(MATRIX_BUILD_TESTS)
         Source/GUI/Looks/TypographyStyles.cpp
         Source/GUI/Panels/Reusable/ModulePanelConfigBuilder.cpp
         Source/GUI/Skins/Skin.cpp
+        Source/GUI/Skins/Dev/DevSkinApplier.cpp
+        Source/GUI/Skins/Dev/DevSkinBridgeProtocol.cpp
+        Source/GUI/Skins/Dev/DevSkinBridgeSession.cpp
+        Source/GUI/Skins/Dev/DevSkinColourElementList.cpp
+        Source/GUI/Skins/Dev/DevSkinInventory.cpp
+        Source/GUI/Skins/Dev/DevSkinJson.cpp
+        Source/GUI/Skins/Dev/DevSkinKeyNames.cpp
+        Source/GUI/Skins/Dev/DevSkinLayer.cpp
+        Source/GUI/Skins/Dev/DevSkinPaletteCatalog.cpp
+        Source/GUI/Skins/Dev/DevSkinSsotSeed.cpp
+        Source/GUI/Skins/Dev/DevSkinStandalonePaintState.cpp
         Source/GUI/Widgets/Label.cpp
         Source/GUI/Widgets/Led.cpp
         Source/GUI/Widgets/Logo.cpp
@@ -912,6 +950,35 @@ target_compile_definitions(Matrix-Control_Standalone PRIVATE
     JUCE_USE_CUSTOM_PLUGIN_STANDALONE_APP=1
 )
 
+if(MATRIX_BUILD_SKIN_EDITOR)
+    # Shared apply helpers for PluginEditor overlay (no receiver listen socket in AU/VST3).
+    target_sources(Matrix-Control PRIVATE
+        Source/GUI/Skins/Dev/DevSkinApplier.cpp
+        Source/GUI/Skins/Dev/DevSkinBridgeProtocol.cpp
+        Source/GUI/Skins/Dev/DevSkinBridgeSession.cpp
+        Source/GUI/Skins/Dev/DevSkinColourElementList.cpp
+        Source/GUI/Skins/Dev/DevSkinInventory.cpp
+        Source/GUI/Skins/Dev/DevSkinJson.cpp
+        Source/GUI/Skins/Dev/DevSkinKeyNames.cpp
+        Source/GUI/Skins/Dev/DevSkinLayer.cpp
+        Source/GUI/Skins/Dev/DevSkinPaletteCatalog.cpp
+        Source/GUI/Skins/Dev/DevSkinSsotSeed.cpp
+        Source/GUI/Skins/Dev/DevSkinStandalonePaintState.cpp
+    )
+    target_compile_definitions(Matrix-Control PRIVATE
+        MATRIX_SKIN_EDITOR_DEV_LAYER=1
+    )
+    target_sources(Matrix-Control_Standalone PRIVATE
+        Source/GUI/Skins/Dev/DevSkinBridgeServer.cpp
+        ${MATRIX_SKIN_DEV_RECEIVER_SOURCES}
+        Source/Standalone/SkinEditorReceiverStandalone.cpp
+    )
+    target_compile_definitions(Matrix-Control_Standalone PRIVATE
+        MATRIX_SKIN_EDITOR_DEV_LAYER=1
+        MATRIX_SKIN_EDITOR_RECEIVER=1
+    )
+endif()
+
 # Plugin format targets (not Standalone) link no-op router stubs.
 set(_MATRIX_STANDALONE_ROUTER_STUBS Source/Core/Audio/StandaloneAudioInputRouterStubs.cpp)
 if(TARGET Matrix-Control_VST3)
@@ -1001,6 +1068,52 @@ target_link_libraries(ExportMatrixModals PRIVATE
 )
 
 add_dependencies(ExportMatrixModals Matrix-Control)
+
+# =============================================================================
+# DEV TOOL: Matrix-Control Skin Editor (native JUCE GUI app)
+#   cmake --preset macos-debug-arm64 -DMATRIX_BUILD_SKIN_EDITOR=ON
+#   cmake --build --preset macos-debug-arm64 --target Matrix-Control_SkinEditor
+# Absent from Release user packaging when MATRIX_BUILD_SKIN_EDITOR=OFF.
+# =============================================================================
+if(MATRIX_BUILD_SKIN_EDITOR)
+    juce_add_gui_app(Matrix-Control_SkinEditor
+        PRODUCT_NAME "Matrix-Control Skin Editor"
+        COMPANY_NAME "Ten Square Software"
+        BUNDLE_ID "com.TenSquareSoftware.Matrix-Control-SkinEditor"
+    )
+
+    target_sources(Matrix-Control_SkinEditor PRIVATE
+        Tools/SkinEditor/Main.cpp
+        Tools/SkinEditor/SkinEditorMainComponent.cpp
+        ${MATRIX_SKIN_DEV_LAYER_SOURCES}
+        Source/GUI/Skins/Skin.cpp
+    )
+
+    target_include_directories(Matrix-Control_SkinEditor PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/Source
+    )
+
+    target_compile_definitions(Matrix-Control_SkinEditor PRIVATE
+        JUCE_WEB_BROWSER=0
+        JUCE_USE_CURL=0
+        JUCE_MODAL_LOOPS_PERMITTED=1
+        JUCE_APPLICATION_NAME_STRING="$<TARGET_PROPERTY:Matrix-Control_SkinEditor,JUCE_PRODUCT_NAME>"
+        JUCE_APPLICATION_VERSION_STRING="${PROJECT_VERSION}"
+    )
+
+    target_link_libraries(Matrix-Control_SkinEditor PRIVATE
+        PluginFonts
+        juce::juce_gui_extra
+        juce::juce_gui_basics
+        juce::juce_graphics
+        juce::juce_events
+        juce::juce_core
+        juce::juce_data_structures
+        juce::juce_recommended_config_flags
+        juce::juce_recommended_warning_flags
+    )
+endif()
 
 # ============================================================================
 # COPY TO CENTRAL ARTEFACTS FOLDER

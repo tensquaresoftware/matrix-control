@@ -31,6 +31,7 @@ namespace TSS
         static std::unique_ptr<Skin> create(ColourVariant variant);
 
         ColourVariant getColourVariant() const { return currentVariant_; }
+        size_t getMappedColourCount() const noexcept { return colours_.size(); }
 
         juce::Colour getColour(SkinObjectType object,
                                SkinColourProperty property,

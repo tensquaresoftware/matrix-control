@@ -64,6 +64,29 @@
             "problemMatcher": []
         },
         {
+            "label": "Build: Skin Editor",
+            "type": "shell",
+            "dependsOn": ["CMake: Configure if needed"],
+            "command": "cmake",
+            "args": [
+                "--build", "${command:cmake.buildDirectory}",
+                "--target", "Matrix-Control_SkinEditor",
+                "--config", "${command:cmake.buildType}"
+            ],
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Build: Skin Editor + Standalone",
+            "dependsOn": [
+                "Build: Standalone",
+                "Build: Skin Editor"
+            ],
+            "dependsOrder": "parallel",
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
             "label": "Build: AU",
             "type": "shell",
             "dependsOn": ["CMake: Configure if needed"],
