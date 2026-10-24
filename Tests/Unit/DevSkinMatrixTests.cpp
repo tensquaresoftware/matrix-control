@@ -94,7 +94,7 @@ private:
         TSS::DevSkin::BridgeSession session;
         expect(! session.isConnected());
         expect(session.connectionStatusText().containsIgnoreCase("disconnected"));
-        expect(session.connectionStatusText().containsIgnoreCase("no fake preview"));
+        expect(! session.connectionStatusText().containsIgnoreCase("offline"));
 
         const auto payload = layer.makePushPayload();
         const auto outbound = session.queuePush(payload);

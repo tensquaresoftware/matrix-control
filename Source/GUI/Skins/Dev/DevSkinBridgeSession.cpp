@@ -38,7 +38,7 @@ namespace TSS::DevSkin
     juce::String BridgeSession::connectionStatusText() const
     {
         if (connected_)
-            return "Connection: connected to Standalone Dev";
-        return "Connection: disconnected (offline edit OK; no fake preview)";
+            return "Connection: connected";
+        return "Connection: disconnected";
     }
 }
