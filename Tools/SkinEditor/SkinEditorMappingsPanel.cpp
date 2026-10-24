@@ -100,6 +100,36 @@ void SkinEditorMappingsPanel::refresh()
     content_.repaint();
 }
 
+// Rebuild (row builders live in SkinEditorMappingsPanelRows.cpp)
+
+void SkinEditorMappingsPanel::rebuildObjectCombo(const juce::String& preferName)
+{
+    updatingObjectCombo_ = true;
+    objectCombo_.clear(juce::dontSendNotification);
+
+    int select = 0;
+    for (int i = 0; i < static_cast<int>(objects_.size()); ++i)
+    {
+        objectCombo_.addItem(objects_[static_cast<size_t>(i)].name, i + 1);
+        if (preferName.isNotEmpty() && objects_[static_cast<size_t>(i)].name == preferName)
+            select = i;
+    }
+
+    if (! objects_.empty())
+    {
+        objectCombo_.setSelectedItemIndex(select, juce::dontSendNotification);
+        focusedObject_ = select;
+    }
+    else
+    {
+        focusedObject_ = -1;
+    }
+
+    updatingObjectCombo_ = false;
+}
+
+// Paint
+
 void SkinEditorMappingsPanel::paintStickyLegend(juce::Graphics& g, juce::Rectangle<int> area) const
 {
     SkinEditorChrome::fillTableRow(g, { area.toFloat(), SkinEditorChrome::surfaceSection(),
@@ -126,6 +156,197 @@ void SkinEditorMappingsPanel::paint(juce::Graphics& g)
     if (! stickyLegendBounds_.isEmpty())
         paintStickyLegend(g, stickyLegendBounds_);
 }
+
+void SkinEditorMappingsPanel::paintMappingCells(juce::Graphics& g,
+                                                const Row& item,
+                                                juce::Rectangle<int> cellArea) const
+{
+    const int x0 = cellArea.getX();
+    const int contentY = cellArea.getY();
+    const int contentH = cellArea.getHeight();
+    const auto cols = columnsForWidth(cellArea.getWidth());
+    g.setFont(SkinEditorChrome::fontRegular());
+    g.setColour(SkinEditorChrome::textTableBody());
+    g.drawText(item.propertyLabel, x0 + kColPad, contentY, juce::jmax(0, cols.propertyW - 4), contentH,
+               juce::Justification::centredLeft, false);
+    g.drawText(item.stateLabel, x0 + kColPad + cols.propertyW, contentY, juce::jmax(0, cols.stateW - 4),
+               contentH, juce::Justification::centredLeft, false);
+
+    if (item.unbound)
+    {
+        g.setColour(juce::Colour(0xffe0a020));
+        g.drawText("Unbound", x0 + cols.mappedX, contentY, cols.mappedW, contentH,
+                   juce::Justification::centredLeft, false);
+        return;
+    }
+
+    SkinEditorChrome::paintColourSwatch(g,
+                                        juce::Rectangle<int>(x0 + cols.mappedX, contentY + kMidInset,
+                                                             kSwatchSize, kSwatchSize),
+                                        juce::Colour(item.pastilleArgb));
+    g.setColour(SkinEditorChrome::textTableBody());
+    g.drawText(item.pastilleName,
+               x0 + cols.mappedX + kSwatchSize + 6, contentY,
+               juce::jmax(0, cols.mappedW - kSwatchSize - 8), contentH,
+               juce::Justification::centredLeft, false);
+}
+
+void SkinEditorMappingsPanel::paintRow(juce::Graphics& g, PaintRowSpec spec) const
+{
+    const auto& item = *spec.item;
+
+    if (item.kind == RowKind::kSection)
+    {
+        SkinEditorChrome::paintTableSectionHeader(g, spec.rowArea, item.sectionTitle);
+        return;
+    }
+
+    SkinEditorChrome::fillTableRow(g, { spec.rowArea, SkinEditorChrome::surfaceTable(),
+                                        false, spec.roundBottom });
+    if (spec.highlighted)
+        SkinEditorChrome::fillTableRow(g, { spec.rowArea, SkinEditorChrome::surfaceTableRowHighlight(),
+                                            false, spec.roundBottom });
+
+    // Table-local cell origin (x = 0): fills use rowArea (inset by kFocusPad); text stays aligned to columns.
+    const int contentY = (int) spec.rowArea.getY() + (item.thickenTop ? kEdgeExtra : 0);
+    paintMappingCells(g, item, { 0, contentY, (int) spec.rowArea.getWidth(),
+                                 SkinEditorChrome::kColumnHeaderHeight });
+}
+
+void SkinEditorMappingsPanel::paintFocusedObjectOutline(juce::Graphics& g,
+                                                        int tableX,
+                                                        int tableWidth) const
+{
+    if (focusedObject_ < 0 || focusedObject_ >= static_cast<int>(objects_.size()))
+        return;
+
+    const auto& table = objects_[static_cast<size_t>(focusedObject_)];
+    if (table.tableBottom <= table.sectionY)
+        return;
+
+    const auto sectionRow = juce::Rectangle<float>(
+        (float) tableX, (float) table.sectionY, (float) tableWidth,
+        (float) SkinEditorChrome::kColumnHeaderHeight);
+    SkinEditorChrome::strokeObjectTableFocusOutside(g, sectionRow,
+                                                    (float) table.tableBottom,
+                                                    table.name);
+}
+
+void SkinEditorMappingsPanel::Content::paint(juce::Graphics& g)
+{
+    const int width = owner_.paintWidth();
+    const int x0 = kFocusPad;
+    const auto clip = g.getClipBounds();
+    int y = 0;
+    for (int i = 0; i < static_cast<int>(owner_.rows_.size()); ++i)
+    {
+        const auto& item = owner_.rows_[static_cast<size_t>(i)];
+        const int nextY = y + item.heightPx;
+        if (nextY <= clip.getY())
+        {
+            y = nextY;
+            continue;
+        }
+        if (y >= clip.getBottom())
+            break;
+
+        if (item.kind != RowKind::kGap)
+        {
+            const bool roundBottom = (item.kind == RowKind::kMapping)
+                                     && (i + 1 >= static_cast<int>(owner_.rows_.size())
+                                         || owner_.rows_[static_cast<size_t>(i + 1)].kind != RowKind::kMapping);
+            const auto rowArea = juce::Rectangle<float>((float) x0, (float) y, (float) width,
+                                                        (float) item.heightPx);
+            owner_.paintRow(g, { &item, rowArea, roundBottom, i == owner_.selectedRow_ });
+        }
+        y = nextY;
+    }
+
+    owner_.paintFocusedObjectOutline(g, x0, width);
+}
+
+// Bind / focus
+
+void SkinEditorMappingsPanel::tryBindRow(int row)
+{
+    if (readOnly_ || onBindRequested == nullptr)
+        return;
+    if (row < 0 || row >= static_cast<int>(rows_.size()))
+        return;
+    if (rows_[static_cast<size_t>(row)].kind != RowKind::kMapping)
+        return;
+
+    if (selectedPastille_.isEmpty())
+    {
+        if (onBindNeedsPastille)
+            onBindNeedsPastille();
+        return;
+    }
+
+    onBindRequested(rows_[static_cast<size_t>(row)].key, selectedPastille_);
+}
+
+void SkinEditorMappingsPanel::setFocusedObject(int objectIndex, bool scrollIntoPlace)
+{
+    if (objectIndex < 0 || objectIndex >= static_cast<int>(objects_.size()))
+        return;
+
+    focusedObject_ = objectIndex;
+
+    updatingObjectCombo_ = true;
+    objectCombo_.setSelectedItemIndex(objectIndex, juce::dontSendNotification);
+    updatingObjectCombo_ = false;
+
+    if (scrollIntoPlace)
+        scrollFocusedObjectIntoPlace();
+
+    content_.repaint();
+}
+
+void SkinEditorMappingsPanel::scrollFocusedObjectIntoPlace()
+{
+    if (focusedObject_ < 0 || focusedObject_ >= static_cast<int>(objects_.size()))
+        return;
+
+    // Pin tab under sticky legend + gap, keeping the 1 px focus ring above the tab visible.
+    const int targetY = juce::jmax(0, objects_[static_cast<size_t>(focusedObject_)].sectionY
+                                          - kFocusPad);
+    const int maxY = juce::jmax(0, content_.getHeight() - viewport_.getHeight());
+    viewport_.setViewPosition(0, juce::jlimit(0, maxY, targetY));
+}
+
+bool SkinEditorMappingsPanel::isMappedColumnClick(int contentX) const noexcept
+{
+    // Content is inset by kFocusPad; map into table-local coordinates before the column test.
+    return contentX - kFocusPad >= columnsForWidth(paintWidth()).mappedX;
+}
+
+void SkinEditorMappingsPanel::Content::mouseUp(const juce::MouseEvent& e)
+{
+    const int row = owner_.rowIndexAtY(e.y);
+    if (row < 0)
+        return;
+
+    const auto& item = owner_.rows_[static_cast<size_t>(row)];
+    if (item.kind == RowKind::kGap)
+        return;
+
+    if (item.objectIndex >= 0)
+        owner_.setFocusedObject(item.objectIndex, false);
+
+    if (item.kind != RowKind::kMapping)
+        return;
+
+    owner_.selectedRow_ = row;
+    repaint();
+
+    if (! owner_.isMappedColumnClick(e.x))
+        return;
+
+    owner_.tryBindRow(row);
+}
+
+// Layout
 
 void SkinEditorMappingsPanel::resized()
 {
@@ -190,197 +411,4 @@ int SkinEditorMappingsPanel::rowIndexAtY(int y) const noexcept
         cursor = next;
     }
     return -1;
-}
-
-void SkinEditorMappingsPanel::setFocusedObject(int objectIndex, bool scrollIntoPlace)
-{
-    if (objectIndex < 0 || objectIndex >= static_cast<int>(objects_.size()))
-        return;
-
-    focusedObject_ = objectIndex;
-
-    updatingObjectCombo_ = true;
-    objectCombo_.setSelectedItemIndex(objectIndex, juce::dontSendNotification);
-    updatingObjectCombo_ = false;
-
-    if (scrollIntoPlace)
-        scrollFocusedObjectIntoPlace();
-
-    content_.repaint();
-}
-
-void SkinEditorMappingsPanel::scrollFocusedObjectIntoPlace()
-{
-    if (focusedObject_ < 0 || focusedObject_ >= static_cast<int>(objects_.size()))
-        return;
-
-    // Pin tab under sticky legend + gap, keeping the 1 px focus ring above the tab visible.
-    const int targetY = juce::jmax(0, objects_[static_cast<size_t>(focusedObject_)].sectionY
-                                          - kFocusPad);
-    const int maxY = juce::jmax(0, content_.getHeight() - viewport_.getHeight());
-    viewport_.setViewPosition(0, juce::jlimit(0, maxY, targetY));
-}
-
-void SkinEditorMappingsPanel::paintRow(juce::Graphics& g, PaintRowSpec spec) const
-{
-    const auto& item = *spec.item;
-    const int y = (int) spec.rowArea.getY();
-    const int width = (int) spec.rowArea.getWidth();
-
-    if (item.kind == RowKind::kSection)
-    {
-        SkinEditorChrome::paintTableSectionHeader(g, spec.rowArea, item.sectionTitle);
-        return;
-    }
-
-    SkinEditorChrome::fillTableRow(g, { spec.rowArea, SkinEditorChrome::surfaceTable(),
-                                        false, spec.roundBottom });
-    if (spec.highlighted)
-        SkinEditorChrome::fillTableRow(g, { spec.rowArea, SkinEditorChrome::surfaceTableRowHighlight(),
-                                            false, spec.roundBottom });
-
-    const int contentY = y + (item.thickenTop ? kEdgeExtra : 0);
-    const int contentH = SkinEditorChrome::kColumnHeaderHeight;
-    const auto cols = columnsForWidth(width);
-    g.setFont(SkinEditorChrome::fontRegular());
-    g.setColour(SkinEditorChrome::textTableBody());
-    g.drawText(item.propertyLabel, kColPad, contentY, juce::jmax(0, cols.propertyW - 4), contentH,
-               juce::Justification::centredLeft, false);
-    g.drawText(item.stateLabel, kColPad + cols.propertyW, contentY, juce::jmax(0, cols.stateW - 4),
-               contentH, juce::Justification::centredLeft, false);
-
-    if (item.unbound)
-    {
-        g.setColour(juce::Colour(0xffe0a020));
-        g.drawText("Unbound", cols.mappedX, contentY, cols.mappedW, contentH,
-                   juce::Justification::centredLeft, false);
-        return;
-    }
-
-    SkinEditorChrome::paintColourSwatch(g,
-                                        juce::Rectangle<int>(cols.mappedX, contentY + kMidInset,
-                                                             kSwatchSize, kSwatchSize),
-                                        juce::Colour(item.pastilleArgb));
-    g.setColour(SkinEditorChrome::textTableBody());
-    g.drawText(item.pastilleName,
-               cols.mappedX + kSwatchSize + 6, contentY,
-               juce::jmax(0, cols.mappedW - kSwatchSize - 8), contentH,
-               juce::Justification::centredLeft, false);
-}
-
-void SkinEditorMappingsPanel::Content::paint(juce::Graphics& g)
-{
-    const int width = owner_.paintWidth();
-    const int x0 = kFocusPad;
-    const auto clip = g.getClipBounds();
-    int y = 0;
-    for (int i = 0; i < static_cast<int>(owner_.rows_.size()); ++i)
-    {
-        const auto& item = owner_.rows_[static_cast<size_t>(i)];
-        const int nextY = y + item.heightPx;
-        if (nextY <= clip.getY())
-        {
-            y = nextY;
-            continue;
-        }
-        if (y >= clip.getBottom())
-            break;
-
-        if (item.kind != RowKind::kGap)
-        {
-            const bool roundBottom = (item.kind == RowKind::kMapping)
-                                     && (i + 1 >= static_cast<int>(owner_.rows_.size())
-                                         || owner_.rows_[static_cast<size_t>(i + 1)].kind != RowKind::kMapping);
-            const auto rowArea = juce::Rectangle<float>((float) x0, (float) y, (float) width,
-                                                        (float) item.heightPx);
-            owner_.paintRow(g, { &item, rowArea, roundBottom, i == owner_.selectedRow_ });
-        }
-        y = nextY;
-    }
-
-    if (owner_.focusedObject_ >= 0
-        && owner_.focusedObject_ < static_cast<int>(owner_.objects_.size()))
-    {
-        const auto& table = owner_.objects_[static_cast<size_t>(owner_.focusedObject_)];
-        if (table.tableBottom > table.sectionY)
-        {
-            const auto sectionRow = juce::Rectangle<float>(
-                (float) x0, (float) table.sectionY, (float) width,
-                (float) SkinEditorChrome::kColumnHeaderHeight);
-            SkinEditorChrome::strokeObjectTableFocusOutside(g, sectionRow,
-                                                            (float) table.tableBottom,
-                                                            table.name);
-        }
-    }
-}
-
-void SkinEditorMappingsPanel::Content::mouseUp(const juce::MouseEvent& e)
-{
-    const int row = owner_.rowIndexAtY(e.y);
-    if (row < 0)
-        return;
-
-    const auto& item = owner_.rows_[static_cast<size_t>(row)];
-    if (item.kind == RowKind::kGap)
-        return;
-
-    if (item.objectIndex >= 0)
-        owner_.setFocusedObject(item.objectIndex, false);
-
-    if (item.kind != RowKind::kMapping)
-        return;
-
-    owner_.selectedRow_ = row;
-    repaint();
-
-    // Map click x into table-local coordinates (content is inset by kFocusPad).
-    if (e.x - kFocusPad < columnsForWidth(owner_.paintWidth()).mappedX)
-        return;
-
-    owner_.tryBindRow(row);
-}
-
-void SkinEditorMappingsPanel::rebuildObjectCombo(const juce::String& preferName)
-{
-    updatingObjectCombo_ = true;
-    objectCombo_.clear(juce::dontSendNotification);
-
-    int select = 0;
-    for (int i = 0; i < static_cast<int>(objects_.size()); ++i)
-    {
-        objectCombo_.addItem(objects_[static_cast<size_t>(i)].name, i + 1);
-        if (preferName.isNotEmpty() && objects_[static_cast<size_t>(i)].name == preferName)
-            select = i;
-    }
-
-    if (! objects_.empty())
-    {
-        objectCombo_.setSelectedItemIndex(select, juce::dontSendNotification);
-        focusedObject_ = select;
-    }
-    else
-    {
-        focusedObject_ = -1;
-    }
-
-    updatingObjectCombo_ = false;
-}
-
-void SkinEditorMappingsPanel::tryBindRow(int row)
-{
-    if (readOnly_ || onBindRequested == nullptr)
-        return;
-    if (row < 0 || row >= static_cast<int>(rows_.size()))
-        return;
-    if (rows_[static_cast<size_t>(row)].kind != RowKind::kMapping)
-        return;
-
-    if (selectedPastille_.isEmpty())
-    {
-        if (onBindNeedsPastille)
-            onBindNeedsPastille();
-        return;
-    }
-
-    onBindRequested(rows_[static_cast<size_t>(row)].key, selectedPastille_);
 }

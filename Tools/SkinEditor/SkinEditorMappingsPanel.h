@@ -1,7 +1,6 @@
 #pragma once
 
 #include <functional>
-#include <optional>
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
@@ -72,6 +71,7 @@ private:
         SkinEditorMappingsPanel& owner_;
     };
 
+    /** Packs paintRow arguments so the method stays within the parameter gate. */
     struct PaintRowSpec
     {
         const Row* item = nullptr;
@@ -80,6 +80,7 @@ private:
         bool highlighted = false;
     };
 
+    // Rebuild
     void rebuildRows();
     /** Appends one object section + mapping rows; returns content Y after the table. */
     int appendObjectTable(const TSS::DevSkin::NamedSkin& skin,
@@ -90,11 +91,23 @@ private:
                        const TSS::SkinColourKey& key,
                        int objectIndex) const;
     void rebuildObjectCombo(const juce::String& preferName);
+
+    // Paint
+    void paintStickyLegend(juce::Graphics& g, juce::Rectangle<int> area) const;
+    void paintRow(juce::Graphics& g, PaintRowSpec spec) const;
+    void paintMappingCells(juce::Graphics& g,
+                           const Row& item,
+                           juce::Rectangle<int> cellArea) const;
+    void paintFocusedObjectOutline(juce::Graphics& g, int tableX, int tableWidth) const;
+
+    // Bind / focus
     void tryBindRow(int row);
     void setFocusedObject(int objectIndex, bool scrollIntoPlace);
     void scrollFocusedObjectIntoPlace();
-    void paintStickyLegend(juce::Graphics& g, juce::Rectangle<int> area) const;
-    void paintRow(juce::Graphics& g, PaintRowSpec spec) const;
+    /** True when content-local x hits the Mapped colour column (applies focus-pad inset). */
+    bool isMappedColumnClick(int contentX) const noexcept;
+
+    // Layout
     void layoutContent();
     int rowIndexAtY(int y) const noexcept;
     int paintWidth() const noexcept;
