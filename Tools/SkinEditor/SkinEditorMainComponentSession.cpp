@@ -240,12 +240,16 @@ void SkinEditorMainComponent::refreshCombos()
 
 void SkinEditorMainComponent::refreshStatus()
 {
-    connectionLabel_.setText(bridge_.isConnected() ? "Connected to Matrix-Control"
-                                                   : "Disconnected",
-                             juce::dontSendNotification);
-    lastPushLabel_.setText(statusDetail_.isNotEmpty() ? statusDetail_ : "none",
-                           juce::dontSendNotification);
-    // Re-layout status-bar zones for the new string widths.
+    const auto connectionText = bridge_.isConnected() ? "Connected to Matrix-Control"
+                                                      : "Disconnected";
+    connectionLabel_.setTooltip(connectionText);
+    connectionLabel_.setText(connectionText, juce::dontSendNotification);
+
+    const auto pushText = statusDetail_.isNotEmpty() ? statusDetail_ : "none";
+    lastPushLabel_.setTooltip(pushText);
+    lastPushLabel_.setText(pushText, juce::dontSendNotification);
+
+    // Re-layout: fixed badges + elided labels in the slots between them.
     resized();
 }
 

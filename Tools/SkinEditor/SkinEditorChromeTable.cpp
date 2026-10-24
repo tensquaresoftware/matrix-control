@@ -231,6 +231,7 @@ namespace SkinEditorChrome
 
     int chromeBadgeWidth(const juce::String& text)
     {
-        return measureTextWidth(fontBold(kMappingBadgeFont), text) + kMappingBadgePadH * 2;
+        // +2: GlyphArrangement int width can sit 1px under drawText advance.
+        return measureTextWidth(fontBold(kMappingBadgeFont), text) + kMappingBadgePadH * 2 + 2;
     }
 }

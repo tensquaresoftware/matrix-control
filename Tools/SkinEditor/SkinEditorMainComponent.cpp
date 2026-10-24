@@ -7,6 +7,7 @@ SkinEditorMainComponent::SkinEditorMainComponent()
 {
     setWantsKeyboardFocus(true);
     setLookAndFeel(&lookAndFeel_);
+    SkinEditorChrome::warmFonts();
     setupTitleBarChrome();
     setupStatusBarChrome();
     setupSkinsBar();
@@ -15,6 +16,16 @@ SkinEditorMainComponent::SkinEditorMainComponent()
     loadSessionOrBaseline();
     bridge_.start();
     refreshAll();
+    // Second layout after the first visible size settle — catches any remaining
+    // cold glyph-metric drift that warmFonts alone does not clear on some hosts.
+    juce::MessageManager::callAsync([safe = juce::Component::SafePointer(this)]
+    {
+        if (safe != nullptr)
+        {
+            safe->resized();
+            safe->repaint();
+        }
+    });
 }
 
 SkinEditorMainComponent::~SkinEditorMainComponent()
@@ -275,19 +286,32 @@ void SkinEditorMainComponent::layoutStatusBar(juce::Rectangle<int> statusBar)
     const int pushBadgeW = SkinEditorChrome::chromeBadgeWidth("LAST PUSH");
     const int appBadgeW = SkinEditorChrome::chromeBadgeWidth("APP");
     const int versionW = SkinEditorChrome::measureTextWidth(statusFont, versionLabel_.getText()) + 4;
-    const int connTextW = SkinEditorChrome::measureTextWidth(statusFont, connectionLabel_.getText()) + 4;
-    const int pushTextW = SkinEditorChrome::measureTextWidth(statusFont, lastPushLabel_.getText()) + 4;
 
-    connectionBadgeBounds_ = { statusBar.getX(), rowY, connBadgeW, rowH };
-    connectionLabel_.setBounds(statusBar.getX() + connBadgeW + kGap, rowY, connTextW, rowH);
-
-    const int pushClusterW = pushBadgeW + kGap + pushTextW;
-    const int pushX = statusBar.getCentreX() - pushClusterW / 2;
-    lastPushBadgeBounds_ = { pushX, rowY, pushBadgeW, rowH };
-    lastPushLabel_.setBounds(pushX + pushBadgeW + kGap, rowY, pushTextW, rowH);
-
+    // Fixed badge anchors: left / centre / right. Labels use the slots between them.
+    const int leftX = statusBar.getX();
+    connectionBadgeBounds_ = { leftX, rowY, connBadgeW, rowH };
+    lastPushBadgeBounds_ = { statusBar.getCentreX() - pushBadgeW / 2, rowY, pushBadgeW, rowH };
     const int appX = statusBar.getRight() - appBadgeW - kGap - versionW;
     appBadgeBounds_ = { appX, rowY, appBadgeW, rowH };
+
+    const int connLabelX = connectionBadgeBounds_.getRight() + kGap;
+    const int connLabelMaxW = juce::jmax(0, lastPushBadgeBounds_.getX() - kGap - connLabelX);
+    const auto connFull = connectionLabel_.getTooltip().isNotEmpty()
+                              ? connectionLabel_.getTooltip()
+                              : connectionLabel_.getText();
+    connectionLabel_.setText(SkinEditorChrome::elideToWidth(statusFont, connFull, connLabelMaxW),
+                             juce::dontSendNotification);
+    connectionLabel_.setBounds(connLabelX, rowY, connLabelMaxW, rowH);
+
+    const int pushLabelX = lastPushBadgeBounds_.getRight() + kGap;
+    const int pushLabelMaxW = juce::jmax(0, appBadgeBounds_.getX() - kGap - pushLabelX);
+    const auto pushFull = lastPushLabel_.getTooltip().isNotEmpty()
+                              ? lastPushLabel_.getTooltip()
+                              : lastPushLabel_.getText();
+    lastPushLabel_.setText(SkinEditorChrome::elideToWidth(statusFont, pushFull, pushLabelMaxW),
+                           juce::dontSendNotification);
+    lastPushLabel_.setBounds(pushLabelX, rowY, pushLabelMaxW, rowH);
+
     versionLabel_.setBounds(appX + appBadgeW + kGap, rowY, versionW, rowH);
 }
 

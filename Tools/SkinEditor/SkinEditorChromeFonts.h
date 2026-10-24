@@ -102,6 +102,39 @@ namespace SkinEditorChrome
         return juce::GlyphArrangement::getStringWidthInt(font, text);
     }
 
+    /** Truncate with "..." so text fits maxWidth pixels (bold/regular advance). */
+    inline juce::String elideToWidth(const juce::Font& font, juce::String text, int maxWidth)
+    {
+        if (maxWidth <= 0)
+            return {};
+        if (measureTextWidth(font, text) <= maxWidth)
+            return text;
+
+        constexpr auto kEllipsis = "...";
+        const int ellipsisW = measureTextWidth(font, kEllipsis);
+        if (ellipsisW > maxWidth)
+            return {};
+
+        while (text.isNotEmpty()
+               && measureTextWidth(font, text) + ellipsisW > maxWidth)
+            text = text.dropLastCharacters(1);
+        return text + kEllipsis;
+    }
+
+    /**
+     * Force typeface load + glyph metrics before the first resized/layout.
+     * Avoids truncated chrome (Push, LAST PUSH, …) on cold launch.
+     */
+    inline void warmFonts()
+    {
+        constexpr auto kProbe = "LAST PUSH";
+        juce::ignoreUnused(measureTextWidth(fontRegular(), kProbe),
+                           measureTextWidth(fontBold(kMappingBadgeFont), kProbe),
+                           measureTextWidth(fontTitle(), kProbe),
+                           measureTextWidth(fontAppTitle(), kProbe),
+                           measureTextWidth(fontMono(), kProbe));
+    }
+
     inline int measureButtonWidth(const juce::TextButton& button, int pad = 18)
     {
         return juce::jmax(52, measureTextWidth(fontRegular(), button.getButtonText()) + pad);
