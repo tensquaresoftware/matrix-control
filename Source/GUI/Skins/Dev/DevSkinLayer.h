@@ -23,10 +23,25 @@ namespace TSS::DevSkin
         bool selectSkin(const juce::String& id);
         bool isActiveReadOnly() const;
 
-        /** Duplicate active (or named source) into a new free-text Dev skin. */
-        juce::Result duplicateSkin(const juce::String& sourceId, const juce::String& newName);
+        /** Duplicate source into a new free-text Dev skin (palette + optional mappings). */
+        juce::Result duplicateSkin(const juce::String& sourceId,
+                                   const juce::String& newName,
+                                   bool copyMappings = true);
 
-        juce::Result createEmptyDevSkin(const juce::String& newName);
+        /**
+         * New Editor skin: Product palette / ancestry, mappings cleared (full Unbound).
+         * Optionally appends non-product pastilles from another Editor skin (no name dupes).
+         */
+        juce::Result createEditorSkinWithUnboundMappings(
+            const juce::String& sourceId,
+            const juce::String& newName,
+            const juce::String& mergeCustomPastillesFromId = {});
+
+        /** Same as createEditorSkinWithUnboundMappings from compiled Cream. */
+        juce::Result createEmptyDevSkin(const juce::String& newName)
+        {
+            return createEditorSkinWithUnboundMappings(kCompiledCreamId, newName);
+        }
         juce::Result deleteDevSkin(const juce::String& id);
         juce::Result renameDevSkin(const juce::String& id, const juce::String& newName);
 
@@ -73,6 +88,8 @@ namespace TSS::DevSkin
         juce::String makeUniqueDevId(const juce::String& name) const;
         bool isCompiledId(const juce::String& id) const;
         bool nameTaken(const juce::String& name, const juce::String& exceptId = {}) const;
+        /** Append non-product pastilles from source when dest has no same name (ignore case). */
+        void appendCustomPastillesFrom(NamedSkin& dest, const NamedSkin& source) const;
 
         std::vector<NamedSkin> skins_;
         juce::String activeSkinId_;

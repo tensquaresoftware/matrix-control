@@ -42,12 +42,13 @@ void SkinEditorMainComponent::duplicateFromSkin(const juce::String& sourceId)
 
 void SkinEditorMainComponent::onNew()
 {
-    // Fresh Editor skin seeded from the Product currently selected in the bar.
+    // Product palette + custom Editor pastilles; mappings cleared → full Unbound list.
     const auto name = SkinEditorUi::askText("New Editor skin", "Name:",
                                             SkinEditorUi::suggestUniqueSkinName(layer_, "New Skin"));
     if (name.isEmpty())
         return;
-    const auto result = layer_.duplicateSkin(sessionState_.productSkinId, name);
+    const auto result = layer_.createEditorSkinWithUnboundMappings(
+        sessionState_.productSkinId, name, sessionState_.editorSkinId);
     if (result.failed())
     {
         juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon,
@@ -241,7 +242,8 @@ void SkinEditorMainComponent::onAddPastille()
     const auto name = SkinEditorUi::askText("Add colour", "Pastille name:", "kCustomAccent");
     if (name.isEmpty())
         return;
-    const auto result = layer_.addPastille(sessionState_.editorSkinId, name, 0xffff0000);
+    // Seed colour must not collide with ColourChart ARGB (e.g. kRed500 = 0xffff0000).
+    const auto result = layer_.addPastille(sessionState_.editorSkinId, name, 0xffaa00ff);
     if (result.failed())
     {
         juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon,

@@ -54,7 +54,9 @@ namespace TSS::DevSkin
         return isCompiledId(activeSkinId_);
     }
 
-    juce::Result Layer::duplicateSkin(const juce::String& sourceId, const juce::String& newName)
+    juce::Result Layer::duplicateSkin(const juce::String& sourceId,
+                                      const juce::String& newName,
+                                      bool copyMappings)
     {
         const auto trimmed = newName.trim();
         if (trimmed.isEmpty())
@@ -73,16 +75,13 @@ namespace TSS::DevSkin
         copy.derivedFrom = source->id;
         if (source->kind == SkinKind::kDev && source->palette.empty())
             seedFromCompiled(copy, SkinKind::kCompiledCream);
+        if (! copyMappings)
+            copy.mappings.clear();
 
         skins_.push_back(std::move(copy));
         activeSkinId_ = skins_.back().id;
         bump();
         return juce::Result::ok();
-    }
-
-    juce::Result Layer::createEmptyDevSkin(const juce::String& newName)
-    {
-        return duplicateSkin(kCompiledCreamId, newName);
     }
 
     juce::Result Layer::deleteDevSkin(const juce::String& id)
@@ -162,8 +161,12 @@ namespace TSS::DevSkin
             return juce::Result::fail("Dev skin not found");
 
         for (const auto& pastille : skin->palette)
-            if (pastille.name == trimmed)
+        {
+            if (pastille.name.equalsIgnoreCase(trimmed))
                 return juce::Result::fail("Pastille already exists");
+            if (pastille.argb == argb)
+                return juce::Result::fail("A pastille with that colour already exists");
+        }
 
         skin->palette.push_back({ trimmed, argb });
         bump();

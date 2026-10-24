@@ -46,6 +46,15 @@ public:
         beginTest("exportBlocked_whenEditorSkinHasUnbound");
         assertExportBlockedWhenUnbound();
 
+        beginTest("newEditorSkin_clearsMappings_unboundEqualsInventory");
+        assertNewEditorSkinStartsFullyUnbound();
+
+        beginTest("newEditorSkin_mergesCustomPastillesFromCurrentEditor");
+        assertNewEditorSkinMergesCustomPastilles();
+
+        beginTest("addPastille_rejectsDuplicateNameOrArgb");
+        assertAddPastilleRejectsDuplicateNameOrArgb();
+
         beginTest("appendImport_remintsDuplicateExport_withDistinctIds");
         assertAppendRemintDistinctIds();
 
@@ -281,6 +290,61 @@ private:
         expect(layer.bindUnbound(skin->id, key, "kGrey500").wasOk());
         expectEquals(layer.unboundCount(skin->id), 0);
         expect(layer.isEditorSkinExportAllowed(skin->id));
+    }
+
+    void assertNewEditorSkinStartsFullyUnbound()
+    {
+        TSS::DevSkin::Layer layer;
+        expect(layer.createEditorSkinWithUnboundMappings(TSS::DevSkin::kCompiledBlackId,
+                                                         "Blank Map").wasOk());
+        const auto id = layer.activeSkinId();
+        const auto* skin = layer.findSkin(id);
+        expect(skin != nullptr);
+        expect(skin->mappings.empty());
+        expect(skin->palette.size() > 0);
+        expectEquals(layer.unboundCount(id),
+                     static_cast<int>(TSS::DevSkin::allStructuredKeys().size()));
+        expect(! layer.isEditorSkinExportAllowed(id));
+
+        // Duplicate still copies full Product mappings (contrast with New).
+        expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Full Copy").wasOk());
+        expectEquals(layer.unboundCount(layer.activeSkinId()), 0);
+    }
+
+    void assertNewEditorSkinMergesCustomPastilles()
+    {
+        TSS::DevSkin::Layer layer;
+        expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Donor").wasOk());
+        const auto donorId = layer.activeSkinId();
+        expect(layer.addPastille(donorId, "kCustomAccent", 0xffff00aa).wasOk());
+
+        expect(layer.createEditorSkinWithUnboundMappings(TSS::DevSkin::kCompiledBlackId,
+                                                         "Merged New",
+                                                         donorId).wasOk());
+        const auto* skin = layer.findSkin(layer.activeSkinId());
+        expect(skin != nullptr);
+        expect(skin->mappings.empty());
+
+        bool foundCustom = false;
+        for (const auto& pastille : skin->palette)
+            if (pastille.name == "kCustomAccent" && pastille.argb == 0xffff00aa)
+                foundCustom = true;
+        expect(foundCustom);
+    }
+
+    void assertAddPastilleRejectsDuplicateNameOrArgb()
+    {
+        TSS::DevSkin::Layer layer;
+        expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Dup Colour").wasOk());
+        const auto id = layer.activeSkinId();
+        constexpr juce::uint32 kUnique = 0xffaa00ff;
+        expect(layer.addPastille(id, "kCustomAccent", kUnique).wasOk());
+        expect(layer.addPastille(id, "kcustomaccent", 0xff12ab34).failed());
+        expect(layer.addPastille(id, "KCUSTOMACCENT", 0xff56cd78).failed());
+        // Same ARGB, different name — still a duplicate colour.
+        expect(layer.addPastille(id, "kOtherMagenta", kUnique).failed());
+        // Product chart colour (kRed500) cannot be re-added under a new name.
+        expect(layer.addPastille(id, "kMyRed", 0xffff0000).failed());
     }
 
     void assertSessionRoundTrip()
