@@ -2766,3 +2766,13 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/specs/spec-skin-editor-clean-code-cleanup/stories/3-clarify-skineditormaincomponent-boundaries.md`
   summary: SkinEditorLookAndFeel.h still includes the full Chrome umbrella, so MainComponent (and Session) keep transitive Panel/Table Chrome symbols despite story 3’s narrower direct includes.
   evidence: Story 3 must not touch LookAndFeel (story 5); thinning LookAndFeel includes closes the remaining include-graph gap for H3.
+
+## Resolved at close-out (2026-10-24) — Skin Editor clean-code cleanup story 6
+
+- source_spec: `_bmad-output/specs/spec-skin-editor-clean-code-cleanup/stories/3-clarify-skineditormaincomponent-boundaries.md`
+  summary: RESOLVED by story 5 — SkinEditorLookAndFeel.h no longer includes the Chrome umbrella (juce_gui_basics only; Fonts include in .cpp).
+  evidence: Close-out CAP-7 reconciliation; see inventory.md residual table and story 5 Implementation Notes.
+
+- source_spec: `_bmad-output/specs/spec-skin-editor-clean-code-cleanup/stories/1-split-skineditorchrome-monolith.md`
+  summary: STILL DEFERRED — count-badge width/clamp DRY remains optional Boy Scout (explicit in close-out residual table; not a must-fix hotspot).
+  evidence: Confirmed still open at story 6; listed as defer in inventory.md § Close-out residual debt.
