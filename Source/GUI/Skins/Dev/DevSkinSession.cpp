@@ -4,6 +4,21 @@
 
 namespace TSS::DevSkin
 {
+    namespace
+    {
+        juce::String readExistingDirectoryProperty(const juce::DynamicObject& root,
+                                                   const juce::Identifier& primary,
+                                                   const juce::Identifier& legacy)
+        {
+            auto path = root.getProperty(primary).toString();
+            if (path.isEmpty())
+                path = root.getProperty(legacy).toString();
+            if (path.isNotEmpty() && ! juce::File(path).isDirectory())
+                return {};
+            return path;
+        }
+    }
+
     juce::String exportSessionToJson(const Layer& layer, const EditorSessionState& state)
     {
         const auto parsed = juce::JSON::parse(exportToJson(layer));
@@ -15,6 +30,7 @@ namespace TSS::DevSkin
         root->setProperty("productSkinId", state.productSkinId);
         root->setProperty("editorSkinId", state.editorSkinId);
         root->setProperty("compareOn", state.compareOn);
+        root->setProperty("lastSkinJsonDirectory", state.lastSkinJsonDirectory);
         return juce::JSON::toString(parsed, true);
     }
 
@@ -54,6 +70,9 @@ namespace TSS::DevSkin
         }
 
         state.compareOn = static_cast<bool>(root->getProperty("compareOn"));
+        state.lastSkinJsonDirectory = readExistingDirectoryProperty(*root,
+                                                                    "lastSkinJsonDirectory",
+                                                                    "lastExportDirectory");
         return JsonIoResult::success();
     }
 

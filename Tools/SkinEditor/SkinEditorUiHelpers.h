@@ -85,10 +85,23 @@ namespace SkinEditorUi
         return out.isNotEmpty() ? out : juce::String("Untitled");
     }
 
-    /** Suggested Documents path: "Matrix-Control Skin Editor - {name}.json". */
-    inline juce::File defaultEditorSkinExportFile(const juce::String& skinName)
+    /** Existing directory, or Documents when preferredParentPath is missing/invalid. */
+    inline juce::File resolveSkinJsonDirectory(const juce::String& preferredParentPath = {})
     {
-        return juce::File::getSpecialLocation(juce::File::userDocumentsDirectory)
+        juce::File parent(preferredParentPath);
+        if (parent.isDirectory())
+            return parent;
+        return juce::File::getSpecialLocation(juce::File::userDocumentsDirectory);
+    }
+
+    /**
+     * Suggested export path: "Matrix-Control Skin Editor - {name}.json".
+     * Uses preferredParentPath when it is an existing directory; else Documents.
+     */
+    inline juce::File defaultEditorSkinExportFile(const juce::String& skinName,
+                                                  const juce::String& preferredParentPath = {})
+    {
+        return resolveSkinJsonDirectory(preferredParentPath)
             .getChildFile("Matrix-Control Skin Editor - "
                           + sanitizeSkinNameForExportFileStem(skinName) + ".json");
     }

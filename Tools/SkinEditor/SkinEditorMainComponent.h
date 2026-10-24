@@ -75,6 +75,12 @@ private:
     void tickCompareBlink();
     /** Export current Editor skin; returns true on successful write. */
     bool exportCurrentEditorSkinToFile(const juce::File& file);
+    /** Suggested Export path using lastSkinJsonDirectory when still valid. */
+    juce::File suggestedEditorSkinExportFile() const;
+    /** Starting folder for Import (lastSkinJsonDirectory or Documents). */
+    juce::File suggestedSkinJsonDirectory() const;
+    /** Remember parent of a successful Export/Import and autosave session. */
+    void rememberSkinJsonDirectory(const juce::File& file);
 
     // Mapping modes (SkinEditorMainComponentMapping.cpp)
     void onPastilleSelected(const juce::String& name);

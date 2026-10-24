@@ -1,7 +1,5 @@
 #include "Tools/SkinEditor/SkinEditorMainComponent.h"
 
-#include "Tools/SkinEditor/SkinEditorUiHelpers.h"
-
 bool SkinEditorMainComponent::tryQuitWithDirtyGate()
 {
     stopTimer();
@@ -40,13 +38,9 @@ bool SkinEditorMainComponent::tryQuitWithDirtyGate()
         return false;
     }
 
-    const auto* skin = layer_.findSkin(sessionState_.editorSkinId);
-    const auto suggested = SkinEditorUi::defaultEditorSkinExportFile(
-        skin != nullptr ? skin->name : juce::String());
-
     auto chooser = std::make_shared<juce::FileChooser>(
         "Export Editor skin JSON",
-        suggested,
+        suggestedEditorSkinExportFile(),
         "*.json");
 
     // Modal sync chooser for quit path

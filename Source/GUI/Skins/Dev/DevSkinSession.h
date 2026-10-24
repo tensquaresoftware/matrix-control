@@ -9,6 +9,8 @@ namespace TSS::DevSkin
         juce::String productSkinId = kCompiledCreamId;
         juce::String editorSkinId;
         bool compareOn = false;
+        /** Absolute path of last Export/Import parent folder (empty = Documents). */
+        juce::String lastSkinJsonDirectory;
     };
 
     juce::String exportSessionToJson(const Layer& layer, const EditorSessionState& state);

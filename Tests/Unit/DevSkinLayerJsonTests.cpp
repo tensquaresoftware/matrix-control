@@ -293,9 +293,12 @@ private:
         state.productSkinId = TSS::DevSkin::kCompiledBlackId;
         state.editorSkinId = editorId;
         state.compareOn = true;
+        state.lastSkinJsonDirectory = juce::File::getSpecialLocation(juce::File::userDocumentsDirectory)
+                                          .getFullPathName();
 
         const auto json = TSS::DevSkin::exportSessionToJson(layer, state);
         expect(json.contains("skinEditorSession"));
+        expect(json.contains("lastSkinJsonDirectory"));
 
         TSS::DevSkin::Layer restored;
         TSS::DevSkin::EditorSessionState restoredState;
@@ -305,6 +308,7 @@ private:
         expectEquals(restoredState.productSkinId, juce::String(TSS::DevSkin::kCompiledBlackId));
         expectEquals(restoredState.editorSkinId, editorId);
         expect(restoredState.compareOn);
+        expectEquals(restoredState.lastSkinJsonDirectory, state.lastSkinJsonDirectory);
     }
 
     void assertCorruptSessionRestoresBaseline()

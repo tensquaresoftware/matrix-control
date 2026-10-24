@@ -179,13 +179,9 @@ void SkinEditorMainComponent::onExportJson()
     if (! layer_.isEditorSkinExportAllowed(sessionState_.editorSkinId))
         return;
 
-    const auto* skin = layer_.findSkin(sessionState_.editorSkinId);
-    const auto suggested = SkinEditorUi::defaultEditorSkinExportFile(
-        skin != nullptr ? skin->name : juce::String());
-
     auto chooser = std::make_shared<juce::FileChooser>(
         "Export Editor skin JSON",
-        suggested,
+        suggestedEditorSkinExportFile(),
         "*.json");
     chooser->launchAsync(juce::FileBrowserComponent::saveMode
                              | juce::FileBrowserComponent::canSelectFiles
@@ -208,7 +204,7 @@ void SkinEditorMainComponent::onImportJson()
 {
     auto chooser = std::make_shared<juce::FileChooser>(
         "Import Editor skin JSON",
-        juce::File::getSpecialLocation(juce::File::userDocumentsDirectory),
+        suggestedSkinJsonDirectory(),
         "*.json");
     chooser->launchAsync(juce::FileBrowserComponent::openMode
                              | juce::FileBrowserComponent::canSelectFiles,
@@ -227,6 +223,7 @@ void SkinEditorMainComponent::onImportJson()
                                      result.message);
                                  return;
                              }
+                             rememberSkinJsonDirectory(file);
                              if (result.importedSkinIds.size() > 0)
                                  sessionState_.editorSkinId = result.importedSkinIds[0];
                              sessionState_.compareOn = false;
@@ -318,5 +315,28 @@ bool SkinEditorMainComponent::exportCurrentEditorSkinToFile(const juce::File& fi
                                                "Could not write file");
         return false;
     }
+    rememberSkinJsonDirectory(file);
     return true;
+}
+
+juce::File SkinEditorMainComponent::suggestedEditorSkinExportFile() const
+{
+    const auto* skin = layer_.findSkin(sessionState_.editorSkinId);
+    return SkinEditorUi::defaultEditorSkinExportFile(
+        skin != nullptr ? skin->name : juce::String(),
+        sessionState_.lastSkinJsonDirectory);
+}
+
+juce::File SkinEditorMainComponent::suggestedSkinJsonDirectory() const
+{
+    return SkinEditorUi::resolveSkinJsonDirectory(sessionState_.lastSkinJsonDirectory);
+}
+
+void SkinEditorMainComponent::rememberSkinJsonDirectory(const juce::File& file)
+{
+    const auto parent = file.getParentDirectory();
+    if (! parent.isDirectory())
+        return;
+    sessionState_.lastSkinJsonDirectory = parent.getFullPathName();
+    autosaveSession();
 }
