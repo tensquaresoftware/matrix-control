@@ -2762,3 +2762,7 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/specs/spec-skin-editor-clean-code-cleanup/stories/1-split-skineditorchrome-monolith.md`
   summary: Extract shared private helper for duplicated count-badge width/clamp math in drawCountBadge and countBadgeWidth.
   evidence: Pre-existed identically in the SkinEditorChrome monolith; Story 1 was move-only and did not introduce the duplication.
+
+- source_spec: `_bmad-output/specs/spec-skin-editor-clean-code-cleanup/stories/3-clarify-skineditormaincomponent-boundaries.md`
+  summary: SkinEditorLookAndFeel.h still includes the full Chrome umbrella, so MainComponent (and Session) keep transitive Panel/Table Chrome symbols despite story 3’s narrower direct includes.
+  evidence: Story 3 must not touch LookAndFeel (story 5); thinning LookAndFeel includes closes the remaining include-graph gap for H3.

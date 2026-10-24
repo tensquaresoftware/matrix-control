@@ -3,10 +3,8 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 
 #include "GUI/Skins/Dev/DevSkinBridgeClient.h"
-#include "GUI/Skins/Dev/DevSkinJson.h"
 #include "GUI/Skins/Dev/DevSkinLayer.h"
 #include "GUI/Skins/Dev/DevSkinSession.h"
-#include "Tools/SkinEditor/SkinEditorChrome.h"
 #include "Tools/SkinEditor/SkinEditorLookAndFeel.h"
 #include "Tools/SkinEditor/SkinEditorColourPicker.h"
 #include "Tools/SkinEditor/SkinEditorMappingsPanel.h"
@@ -30,9 +28,9 @@ public:
     bool keyPressed(const juce::KeyPress& key) override;
 
 private:
+    // Session (SkinEditorMainComponentSession.cpp)
     void comboBoxChanged(juce::ComboBox*) override;
     void timerCallback() override;
-
     void refreshAll();
     void refreshCombos();
     void refreshStatus();
@@ -43,11 +41,13 @@ private:
     void markClean();
     void autosaveSession();
     void loadSessionOrBaseline();
-
     juce::String visibleSkinId() const;
     bool isCompareProductView() const;
     bool canEditEditorSkin() const;
+    void applyProductComboChange();
+    void applyEditorComboChange();
 
+    // Actions (SkinEditorMainComponentActions.cpp)
     void onDuplicate();
     void onNew();
     void onDelete();
@@ -62,10 +62,12 @@ private:
     void onPastilleSelected(const juce::String& name);
     void onUndo();
     void onRedo();
-
     void syncCompareButtonChrome();
     void tickCompareBlink();
+    /** Export current Editor skin; returns true on successful write. */
+    bool exportCurrentEditorSkinToFile(const juce::File& file);
 
+    // Layout / setup (SkinEditorMainComponent.cpp)
     void setupTitleBarChrome();
     void setupSkinsBar();
     void setupBodyPanels();
@@ -74,11 +76,6 @@ private:
     void layoutSkinsBar(juce::Rectangle<int> skins);
     void layoutSkinsActionButtons(juce::Rectangle<int>& row);
     void layoutBodyPanels(juce::Rectangle<int> bounds);
-    void applyProductComboChange();
-    void applyEditorComboChange();
-
-    /** Export current Editor skin; returns true on successful write. */
-    bool exportCurrentEditorSkinToFile(const juce::File& file);
 
     SkinEditorChrome::LookAndFeel lookAndFeel_;
 
@@ -132,7 +129,7 @@ private:
     SkinEditorMappingsPanel mappingsPanel_;
     SkinEditorUnboundPanel unboundPanel_;
 
-    std::vector<int> separatorXs_;
-    int separatorY_ = 0;
-    int separatorH_ = SkinEditorChrome::kButtonHeight;
+    std::vector<int> skinsBarSeparatorXs_;
+    int skinsBarSeparatorY_ = 0;
+    int skinsBarSeparatorH_ = 0;
 };

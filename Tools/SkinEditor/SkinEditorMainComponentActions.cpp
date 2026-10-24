@@ -1,6 +1,7 @@
 #include "Tools/SkinEditor/SkinEditorMainComponent.h"
 
-#include "Tools/SkinEditor/SkinEditorChrome.h"
+#include "GUI/Skins/Dev/DevSkinJson.h"
+#include "Tools/SkinEditor/SkinEditorChromeTokens.h"
 
 namespace
 {

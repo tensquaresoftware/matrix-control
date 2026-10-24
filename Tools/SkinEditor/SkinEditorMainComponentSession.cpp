@@ -1,7 +1,5 @@
 #include "Tools/SkinEditor/SkinEditorMainComponent.h"
 
-#include "Tools/SkinEditor/SkinEditorChrome.h"
-
 bool SkinEditorMainComponent::tryQuitWithDirtyGate()
 {
     stopTimer();

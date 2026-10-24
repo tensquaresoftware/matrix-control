@@ -1,6 +1,6 @@
 #include "Tools/SkinEditor/SkinEditorMainComponent.h"
 
-#include "Tools/SkinEditor/SkinEditorChrome.h"
+#include "Tools/SkinEditor/SkinEditorChromeFonts.h"
 
 SkinEditorMainComponent::SkinEditorMainComponent()
 {
@@ -177,9 +177,9 @@ void SkinEditorMainComponent::paint(juce::Graphics& g)
     g.fillRoundedRectangle(skins.toFloat(), SkinEditorChrome::kControlCorner);
 
     g.setColour(SkinEditorChrome::separatorLine().withAlpha(0.85f));
-    for (const int x : separatorXs_)
+    for (const int x : skinsBarSeparatorXs_)
         if (x > 0)
-            g.fillRect(x, separatorY_, 1, separatorH_);
+            g.fillRect(x, skinsBarSeparatorY_, 1, skinsBarSeparatorH_);
 }
 
 void SkinEditorMainComponent::layoutTitleBar(juce::Rectangle<int> titleBar)
@@ -225,8 +225,8 @@ void SkinEditorMainComponent::layoutSkinsBar(juce::Rectangle<int> skins)
                                     buttonY,
                                     titleRow.getWidth(),
                                     SkinEditorChrome::kButtonHeight);
-    separatorY_ = row.getY();
-    separatorH_ = row.getHeight();
+    skinsBarSeparatorY_ = row.getY();
+    skinsBarSeparatorH_ = row.getHeight();
 
     const auto labelFont = SkinEditorChrome::fontRegular();
     const int skinsTitleW = SkinEditorChrome::titleTabWidth("SKINS");
@@ -252,17 +252,17 @@ void SkinEditorMainComponent::layoutSkinsActionButtons(juce::Rectangle<int>& row
         const int w = SkinEditorChrome::measureButtonWidth(b);
         b.setBounds(row.removeFromLeft(w).withHeight(SkinEditorChrome::kButtonHeight));
     };
-    auto placeSep = [this, &row, &placeGap]()
+    auto placeSkinsBarSeparator = [this, &row, &placeGap]()
     {
         placeGap();
         placeGap();
-        separatorXs_.push_back(row.getX());
+        skinsBarSeparatorXs_.push_back(row.getX());
         row.removeFromLeft(1);
         placeGap();
         placeGap();
     };
 
-    placeSep();
+    placeSkinsBarSeparator();
     placeButton(newButton_);
     placeGap();
     placeButton(duplicateButton_);
@@ -270,15 +270,15 @@ void SkinEditorMainComponent::layoutSkinsActionButtons(juce::Rectangle<int>& row
     placeButton(renameButton_);
     placeGap();
     placeButton(deleteButton_);
-    placeSep();
+    placeSkinsBarSeparator();
     placeButton(undoButton_);
     placeGap();
     placeButton(redoButton_);
-    placeSep();
+    placeSkinsBarSeparator();
     placeButton(compareButton_);
     placeGap();
     placeButton(pushButton_);
-    placeSep();
+    placeSkinsBarSeparator();
     placeButton(exportButton_);
     placeGap();
     placeButton(importButton_);
@@ -299,7 +299,7 @@ void SkinEditorMainComponent::layoutBodyPanels(juce::Rectangle<int> bounds)
 
 void SkinEditorMainComponent::resized()
 {
-    separatorXs_.clear();
+    skinsBarSeparatorXs_.clear();
     titleBarSeparatorX_ = -1;
 
     auto bounds = getLocalBounds();
