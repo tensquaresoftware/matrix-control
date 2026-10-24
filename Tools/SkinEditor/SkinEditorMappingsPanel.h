@@ -18,10 +18,13 @@ public:
     void setSelectedPastilleName(const juce::String& name);
     void refresh();
 
+    /** When true, keep the Palette colour selected after a successful map (multi-map). */
+    bool isHoldColour() const noexcept { return holdColourToggle_.getToggleState(); }
+
     /** Bind using the Palette selection (pastilleName may be empty → ignored). */
     std::function<void(TSS::SkinColourKey key, const juce::String& pastilleName)> onBindRequested;
-    /** Fired when the user tries to bind without a Palette pastille selected. */
-    std::function<void()> onBindNeedsPastille;
+    /** Fired when the user clicks a mapping row without a Palette pastille selected (arm reverse map). */
+    std::function<void(TSS::SkinColourKey key)> onBindNeedsPastille;
 
     void paint(juce::Graphics& g) override;
     void resized() override;
@@ -104,8 +107,6 @@ private:
     void tryBindRow(int row);
     void setFocusedObject(int objectIndex, bool scrollIntoPlace);
     void scrollFocusedObjectIntoPlace();
-    /** True when content-local x hits the Mapped colour column (applies focus-pad inset). */
-    bool isMappedColumnClick(int contentX) const noexcept;
 
     // Layout
     void layoutContent();
@@ -129,6 +130,7 @@ private:
     juce::Rectangle<int> stickyBandBounds_;
     juce::Label objectLabel_ { {}, "Object:" };
     juce::ComboBox objectCombo_;
+    juce::ToggleButton holdColourToggle_ { "Hold colour" };
     juce::Viewport viewport_;
     Content content_ { *this };
 };

@@ -108,6 +108,54 @@ namespace SkinEditorChrome
         g.drawRoundedRectangle(bounds, kControlCorner, 1.0f);
     }
 
+    void LookAndFeel::drawToggleButton(juce::Graphics& g,
+                                       juce::ToggleButton& button,
+                                       bool shouldDrawButtonAsHighlighted,
+                                       bool shouldDrawButtonAsDown)
+    {
+        const auto font = fontRegular();
+        const float boxSide = (float) juce::jmin(button.getHeight() - 2, 16);
+        auto box = juce::Rectangle<float>(0.5f,
+                                          ((float) button.getHeight() - boxSide) * 0.5f,
+                                          boxSide,
+                                          boxSide);
+
+        auto fill = controlFill();
+        if (! button.isEnabled())
+            fill = controlFill().withMultipliedAlpha(0.55f);
+        else if (shouldDrawButtonAsDown)
+            fill = controlFillDown();
+        else if (shouldDrawButtonAsHighlighted)
+            fill = controlFillHover();
+
+        g.setColour(fill);
+        g.fillRoundedRectangle(box, kControlCorner);
+        g.setColour(controlOutline());
+        g.drawRoundedRectangle(box, kControlCorner, 1.0f);
+
+        if (button.getToggleState())
+        {
+            juce::Path tick;
+            tick.startNewSubPath(box.getX() + boxSide * 0.22f, box.getCentreY());
+            tick.lineTo(box.getX() + boxSide * 0.42f, box.getY() + boxSide * 0.72f);
+            tick.lineTo(box.getX() + boxSide * 0.78f, box.getY() + boxSide * 0.28f);
+            g.setColour(button.isEnabled() ? textPrimary() : textMuted());
+            g.strokePath(tick, juce::PathStrokeType(1.4f, juce::PathStrokeType::curved,
+                                                    juce::PathStrokeType::rounded));
+        }
+
+        auto textColour = button.findColour(juce::ToggleButton::textColourId);
+        if (! button.isEnabled())
+            textColour = textColour.withMultipliedAlpha(0.5f);
+        g.setColour(textColour);
+        g.setFont(font);
+        const int textX = juce::roundToInt(box.getRight()) + 6;
+        g.drawText(button.getButtonText(),
+                   juce::Rectangle<int>(textX, 0, juce::jmax(0, button.getWidth() - textX),
+                                        button.getHeight()),
+                   juce::Justification::centredLeft, false);
+    }
+
     void LookAndFeel::drawComboBox(juce::Graphics& g,
                                    int width,
                                    int height,

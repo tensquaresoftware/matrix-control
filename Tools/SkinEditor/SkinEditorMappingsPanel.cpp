@@ -59,6 +59,13 @@ SkinEditorMappingsPanel::SkinEditorMappingsPanel()
     };
     addAndMakeVisible(objectCombo_);
 
+    holdColourToggle_.setClickingTogglesState(true);
+    holdColourToggle_.setToggleState(false, juce::dontSendNotification);
+    holdColourToggle_.setTooltip("Keep the Palette colour selected to map several rows");
+    // Same muted label colour as "Object:" — box chrome comes from LookAndFeel::drawToggleButton.
+    holdColourToggle_.setColour(juce::ToggleButton::textColourId, SkinEditorChrome::textMuted());
+    addAndMakeVisible(holdColourToggle_);
+
     viewport_.setViewedComponent(&content_, false);
     viewport_.setScrollBarsShown(true, false);
     viewport_.setScrollBarThickness(SkinEditorChrome::kScrollTrackWidth);
@@ -80,6 +87,7 @@ void SkinEditorMappingsPanel::setActiveSkinId(const juce::String& skinId)
 void SkinEditorMappingsPanel::setReadOnly(bool readOnly)
 {
     readOnly_ = readOnly;
+    holdColourToggle_.setEnabled(! readOnly);
 }
 
 void SkinEditorMappingsPanel::setSelectedPastilleName(const juce::String& name)
@@ -203,13 +211,18 @@ void SkinEditorMappingsPanel::paintRow(juce::Graphics& g, PaintRowSpec spec) con
 
     SkinEditorChrome::fillTableRow(g, { spec.rowArea, SkinEditorChrome::surfaceTable(),
                                         false, spec.roundBottom });
+
+    // Highlight matches mid-row height only — first/last thicken padding stays unhighlighted.
+    const float contentY = spec.rowArea.getY() + (item.thickenTop ? (float) kEdgeExtra : 0.0f);
+    const auto contentArea = juce::Rectangle<float>(spec.rowArea.getX(), contentY,
+                                                    spec.rowArea.getWidth(),
+                                                    (float) SkinEditorChrome::kColumnHeaderHeight);
     if (spec.highlighted)
-        SkinEditorChrome::fillTableRow(g, { spec.rowArea, SkinEditorChrome::surfaceTableRowHighlight(),
-                                            false, spec.roundBottom });
+        SkinEditorChrome::fillTableRow(g, { contentArea, SkinEditorChrome::surfaceTableRowHighlight(),
+                                            false, false });
 
     // Table-local cell origin (x = 0): fills use rowArea (inset by kFocusPad); text stays aligned to columns.
-    const int contentY = (int) spec.rowArea.getY() + (item.thickenTop ? kEdgeExtra : 0);
-    paintMappingCells(g, item, { 0, contentY, (int) spec.rowArea.getWidth(),
+    paintMappingCells(g, item, { 0, (int) contentY, (int) spec.rowArea.getWidth(),
                                  SkinEditorChrome::kColumnHeaderHeight });
 }
 
@@ -276,14 +289,15 @@ void SkinEditorMappingsPanel::tryBindRow(int row)
     if (rows_[static_cast<size_t>(row)].kind != RowKind::kMapping)
         return;
 
+    const auto key = rows_[static_cast<size_t>(row)].key;
     if (selectedPastille_.isEmpty())
     {
         if (onBindNeedsPastille)
-            onBindNeedsPastille();
+            onBindNeedsPastille(key);
         return;
     }
 
-    onBindRequested(rows_[static_cast<size_t>(row)].key, selectedPastille_);
+    onBindRequested(key, selectedPastille_);
 }
 
 void SkinEditorMappingsPanel::setFocusedObject(int objectIndex, bool scrollIntoPlace)
@@ -315,12 +329,6 @@ void SkinEditorMappingsPanel::scrollFocusedObjectIntoPlace()
     viewport_.setViewPosition(0, juce::jlimit(0, maxY, targetY));
 }
 
-bool SkinEditorMappingsPanel::isMappedColumnClick(int contentX) const noexcept
-{
-    // Content is inset by kFocusPad; map into table-local coordinates before the column test.
-    return contentX - kFocusPad >= columnsForWidth(paintWidth()).mappedX;
-}
-
 void SkinEditorMappingsPanel::Content::mouseUp(const juce::MouseEvent& e)
 {
     const int row = owner_.rowIndexAtY(e.y);
@@ -339,10 +347,6 @@ void SkinEditorMappingsPanel::Content::mouseUp(const juce::MouseEvent& e)
 
     owner_.selectedRow_ = row;
     repaint();
-
-    if (! owner_.isMappedColumnClick(e.x))
-        return;
-
     owner_.tryBindRow(row);
 }
 
@@ -380,6 +384,13 @@ void SkinEditorMappingsPanel::resized()
     const int labelW = SkinEditorChrome::measureLabelWidth(objectLabel_.getText(),
                                                           SkinEditorChrome::fontRegular());
     objectLabel_.setBounds(actionRow.removeFromLeft(labelW));
+
+    const int holdW = SkinEditorChrome::measureTextWidth(SkinEditorChrome::fontRegular(),
+                                                        holdColourToggle_.getButtonText())
+                      + 16 + 6; // button-styled tick box + gap to label
+    auto holdBounds = actionRow.removeFromRight(holdW);
+    actionRow.removeFromRight(SkinEditorChrome::kButtonGap);
+    holdColourToggle_.setBounds(holdBounds);
     objectCombo_.setBounds(actionRow);
 }
 

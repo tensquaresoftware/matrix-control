@@ -137,7 +137,8 @@ void SkinEditorMainComponent::refreshAll()
     renameButton_.setEnabled(editable);
     deleteButton_.setEnabled(editable);
     newButton_.setEnabled(true);
-    duplicateButton_.setEnabled(true);
+    productDuplicateButton_.setEnabled(true);
+    editorDuplicateButton_.setEnabled(sessionState_.editorSkinId.isNotEmpty());
 
     palettePanel_.setActiveSkinId(visibleId);
     palettePanel_.setReadOnly(! editable);
@@ -163,7 +164,6 @@ void SkinEditorMainComponent::refreshAll()
             {
                 if (pastille.name == selectedPastille_)
                 {
-                    colourPicker_.setColour(juce::Colour(pastille.argb), juce::dontSendNotification);
                     found = true;
                     break;
                 }
@@ -174,7 +174,7 @@ void SkinEditorMainComponent::refreshAll()
         else
             selectedPastille_.clear();
     }
-    colourPicker_.setEnabledEditing(editable && selectedPastille_.isNotEmpty());
+    syncColourPickerToSelection();
 }
 
 void SkinEditorMainComponent::refreshCombos()

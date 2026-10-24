@@ -2,29 +2,28 @@
 
 #include "GUI/Skins/Dev/DevSkinJson.h"
 #include "Tools/SkinEditor/SkinEditorChromeTokens.h"
+#include "Tools/SkinEditor/SkinEditorUiHelpers.h"
 
-namespace
+void SkinEditorMainComponent::onDuplicateProduct()
 {
-    juce::String askText(const juce::String& title,
-                         const juce::String& message,
-                         const juce::String& initial)
-    {
-        juce::AlertWindow window(title, message, juce::MessageBoxIconType::QuestionIcon);
-        window.addTextEditor("value", initial, "Value");
-        window.addButton("OK", 1, juce::KeyPress(juce::KeyPress::returnKey));
-        window.addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey));
-        if (window.runModalLoop() != 1)
-            return {};
-        return window.getTextEditorContents("value").trim();
-    }
+    duplicateFromSkin(sessionState_.productSkinId);
 }
-void SkinEditorMainComponent::onDuplicate()
+
+void SkinEditorMainComponent::onDuplicateEditor()
 {
-    const auto sourceId = isCompareProductView() ? sessionState_.productSkinId
-                                                 : (sessionState_.editorSkinId.isNotEmpty()
-                                                        ? sessionState_.editorSkinId
-                                                        : sessionState_.productSkinId);
-    const auto name = askText("Duplicate", "New Editor skin name:", "My Skin");
+    if (sessionState_.editorSkinId.isEmpty())
+        return;
+    duplicateFromSkin(sessionState_.editorSkinId);
+}
+
+void SkinEditorMainComponent::duplicateFromSkin(const juce::String& sourceId)
+{
+    const auto* source = layer_.findSkin(sourceId);
+    const auto sourceName = source != nullptr ? source->name : juce::String("My Skin");
+    const auto suggested = SkinEditorUi::suggestUniqueSkinName(layer_, sourceName);
+    const auto name = SkinEditorUi::askText("Duplicate",
+                                            "Duplicate \"" + sourceName + "\" as:",
+                                            suggested);
     if (name.isEmpty())
         return;
     const auto result = layer_.duplicateSkin(sourceId, name);
@@ -37,14 +36,19 @@ void SkinEditorMainComponent::onDuplicate()
     sessionState_.editorSkinId = layer_.activeSkinId();
     sessionState_.compareOn = false;
     selectedPastille_.clear();
+    hasPendingMapping_ = false;
+    // onChanged already refreshed with the previous Editor id — select the new skin now.
+    refreshAll();
 }
 
 void SkinEditorMainComponent::onNew()
 {
-    const auto name = askText("New Editor skin", "Name:", "New Skin");
+    // Fresh Editor skin seeded from the Product currently selected in the bar.
+    const auto name = SkinEditorUi::askText("New Editor skin", "Name:",
+                                            SkinEditorUi::suggestUniqueSkinName(layer_, "New Skin"));
     if (name.isEmpty())
         return;
-    const auto result = layer_.createEmptyDevSkin(name);
+    const auto result = layer_.duplicateSkin(sessionState_.productSkinId, name);
     if (result.failed())
     {
         juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon,
@@ -54,6 +58,8 @@ void SkinEditorMainComponent::onNew()
     sessionState_.editorSkinId = layer_.activeSkinId();
     sessionState_.compareOn = false;
     selectedPastille_.clear();
+    hasPendingMapping_ = false;
+    refreshAll();
 }
 
 void SkinEditorMainComponent::onDelete()
@@ -91,7 +97,7 @@ void SkinEditorMainComponent::onRename()
     const auto* skin = layer_.findSkin(sessionState_.editorSkinId);
     if (skin == nullptr)
         return;
-    const auto name = askText("Rename Editor skin", "New name:", skin->name);
+    const auto name = SkinEditorUi::askText("Rename Editor skin", "New name:", skin->name);
     if (name.isEmpty())
         return;
     const auto result = layer_.renameDevSkin(skin->id, name);
@@ -234,7 +240,7 @@ void SkinEditorMainComponent::onAddPastille()
 {
     if (! canEditEditorSkin())
         return;
-    const auto name = askText("Add colour", "Pastille name:", "kCustomAccent");
+    const auto name = SkinEditorUi::askText("Add colour", "Pastille name:", "kCustomAccent");
     if (name.isEmpty())
         return;
     const auto result = layer_.addPastille(sessionState_.editorSkinId, name, 0xffff0000);
@@ -297,9 +303,91 @@ void SkinEditorMainComponent::onPastilleSelected(const juce::String& name)
     selectedPastille_ = name;
     mappingsPanel_.setSelectedPastilleName(selectedPastille_);
     unboundPanel_.setSelectedPastilleName(selectedPastille_);
+    syncColourPickerToSelection();
 
-    if (name.isEmpty())
+    if (name.isEmpty() || ! hasPendingMapping_ || ! canEditEditorSkin())
+        return;
+
+    // Hold colour: further Palette clicks re-map the same armed row (try colours in one gesture).
+    applyMapping(pendingMappingKey_, name, false);
+}
+
+void SkinEditorMainComponent::armPendingMapping(TSS::SkinColourKey key)
+{
+    if (! canEditEditorSkin())
+        return;
+
+    pendingMappingKey_ = key;
+    hasPendingMapping_ = true;
+    setStatusMessage(mappingsPanel_.isHoldColour()
+                         ? "Select Palette colours to map (Hold colour keeps the target row)"
+                         : "Select a Palette colour to complete the mapping");
+    refreshStatus();
+}
+
+void SkinEditorMainComponent::applyMapping(TSS::SkinColourKey key,
+                                           const juce::String& pastilleName,
+                                           bool fromUnbound)
+{
+    if (! canEditEditorSkin() || pastilleName.isEmpty())
+        return;
+
+    const bool hold = mappingsPanel_.isHoldColour();
+
+    // Same pastille already on this key (e.g. refresh re-selects Palette) — keep Hold target, skip write.
+    if (const auto* skin = layer_.findSkin(sessionState_.editorSkinId))
     {
+        const auto it = skin->mappings.find(key);
+        if (it != skin->mappings.end() && it->second == pastilleName)
+        {
+            if (hold)
+            {
+                pendingMappingKey_ = key;
+                hasPendingMapping_ = true;
+            }
+            return;
+        }
+    }
+
+    const auto result = fromUnbound
+                            ? layer_.bindUnbound(sessionState_.editorSkinId, key, pastilleName)
+                            : layer_.setMapping(sessionState_.editorSkinId, key, pastilleName);
+    if (result.failed())
+    {
+        juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon,
+                                               fromUnbound ? "Bind failed" : "Mapping failed",
+                                               result.getErrorMessage());
+        return;
+    }
+
+    if (hold)
+    {
+        // Keep the row armed so the next Palette click updates the same mapping.
+        pendingMappingKey_ = key;
+        hasPendingMapping_ = true;
+    }
+    else
+    {
+        clearPastilleSelectionAfterOneShot();
+    }
+}
+
+void SkinEditorMainComponent::clearPastilleSelectionAfterOneShot()
+{
+    selectedPastille_.clear();
+    hasPendingMapping_ = false;
+    palettePanel_.clearSelection();
+    mappingsPanel_.setSelectedPastilleName({});
+    unboundPanel_.setSelectedPastilleName({});
+    colourPicker_.clearActiveColour();
+    colourPicker_.setEnabledEditing(false);
+}
+
+void SkinEditorMainComponent::syncColourPickerToSelection()
+{
+    if (selectedPastille_.isEmpty())
+    {
+        colourPicker_.clearActiveColour();
         colourPicker_.setEnabledEditing(false);
         return;
     }
@@ -308,14 +396,17 @@ void SkinEditorMainComponent::onPastilleSelected(const juce::String& name)
     {
         for (const auto& pastille : skin->palette)
         {
-            if (pastille.name == name)
+            if (pastille.name == selectedPastille_)
             {
                 colourPicker_.setColour(juce::Colour(pastille.argb), juce::dontSendNotification);
                 colourPicker_.setEnabledEditing(canEditEditorSkin());
-                break;
+                return;
             }
         }
     }
+
+    colourPicker_.clearActiveColour();
+    colourPicker_.setEnabledEditing(false);
 }
 
 bool SkinEditorMainComponent::exportCurrentEditorSkinToFile(const juce::File& file)

@@ -36,11 +36,13 @@ SkinEditorColourPicker::SkinEditorColourPicker()
     styleEditor(gEditor_);
     styleEditor(bEditor_);
 
-    syncEditorsFromColour();
+    clearEditors();
+    setEnabledEditing(false);
 }
 
 void SkinEditorColourPicker::setColour(juce::Colour colour, juce::NotificationType notification)
 {
+    hasActiveColour_ = true;
     colour_ = colour; // keep alpha so the damier preview can show transparency
     auto opaque = colour_.withAlpha(1.0f);
     opaque.getHSB(hue_, sat_, val_);
@@ -50,53 +52,80 @@ void SkinEditorColourPicker::setColour(juce::Colour colour, juce::NotificationTy
         notifyChanged();
 }
 
+void SkinEditorColourPicker::clearActiveColour()
+{
+    hasActiveColour_ = false;
+    colour_ = juce::Colours::black;
+    hue_ = sat_ = val_ = 0.0f;
+    clearEditors();
+    repaint();
+}
+
 void SkinEditorColourPicker::setEnabledEditing(bool canEdit)
 {
-    editingEnabled_ = canEdit;
-    hexEditor_.setEnabled(canEdit);
-    rEditor_.setEnabled(canEdit);
-    gEditor_.setEnabled(canEdit);
-    bEditor_.setEnabled(canEdit);
+    editingEnabled_ = canEdit && hasActiveColour_;
+    hexEditor_.setEnabled(editingEnabled_);
+    rEditor_.setEnabled(editingEnabled_);
+    gEditor_.setEnabled(editingEnabled_);
+    bEditor_.setEnabled(editingEnabled_);
     repaint();
 }
 
 void SkinEditorColourPicker::paint(juce::Graphics& g)
 {
     SkinEditorChrome::paintPanelFrame(g, getLocalBounds(), titleTabBounds_);
-
     if (! svBounds_.isEmpty())
-    {
-        juce::ColourGradient satGrad(juce::Colours::white, (float) svBounds_.getX(), (float) svBounds_.getY(),
-                                     juce::Colour::fromHSV(hue_, 1.0f, 1.0f, 1.0f),
-                                     (float) svBounds_.getRight(), (float) svBounds_.getY(), false);
-        g.setGradientFill(satGrad);
-        g.fillRect(svBounds_);
-
-        juce::ColourGradient valGrad(juce::Colours::transparentBlack, (float) svBounds_.getX(), (float) svBounds_.getY(),
-                                     juce::Colours::black, (float) svBounds_.getX(), (float) svBounds_.getBottom(), false);
-        g.setGradientFill(valGrad);
-        g.fillRect(svBounds_);
-
-        const int cx = svBounds_.getX() + juce::roundToInt(sat_ * (float) (svBounds_.getWidth() - 1));
-        const int cy = svBounds_.getY() + juce::roundToInt((1.0f - val_) * (float) (svBounds_.getHeight() - 1));
-        g.setColour(juce::Colours::white);
-        g.drawEllipse((float) cx - 5.0f, (float) cy - 5.0f, 10.0f, 10.0f, 1.5f);
-        g.setColour(juce::Colours::black);
-        g.drawEllipse((float) cx - 4.0f, (float) cy - 4.0f, 8.0f, 8.0f, 1.0f);
-    }
-
+        paintSvWell(g);
     if (! hueBounds_.isEmpty())
+        paintHueBar(g);
+}
+
+void SkinEditorColourPicker::paintSvWell(juce::Graphics& g) const
+{
+    if (! hasActiveColour_)
     {
-        for (int y = 0; y < hueBounds_.getHeight(); ++y)
-        {
-            const float h = (float) y / (float) juce::jmax(1, hueBounds_.getHeight() - 1);
-            g.setColour(juce::Colour::fromHSV(h, 1.0f, 1.0f, 1.0f));
-            g.drawHorizontalLine(hueBounds_.getY() + y, (float) hueBounds_.getX(), (float) hueBounds_.getRight());
-        }
-        const int hy = hueBounds_.getY() + juce::roundToInt(hue_ * (float) (hueBounds_.getHeight() - 1));
-        g.setColour(juce::Colours::white);
-        g.drawRect(hueBounds_.getX() - 1, hy - 2, hueBounds_.getWidth() + 2, 5, 1);
+        g.setColour(juce::Colour(0xff151515));
+        g.fillRect(svBounds_);
+        return;
     }
+
+    juce::ColourGradient satGrad(juce::Colours::white, (float) svBounds_.getX(), (float) svBounds_.getY(),
+                                 juce::Colour::fromHSV(hue_, 1.0f, 1.0f, 1.0f),
+                                 (float) svBounds_.getRight(), (float) svBounds_.getY(), false);
+    g.setGradientFill(satGrad);
+    g.fillRect(svBounds_);
+
+    juce::ColourGradient valGrad(juce::Colours::transparentBlack, (float) svBounds_.getX(), (float) svBounds_.getY(),
+                                 juce::Colours::black, (float) svBounds_.getX(), (float) svBounds_.getBottom(), false);
+    g.setGradientFill(valGrad);
+    g.fillRect(svBounds_);
+
+    const int cx = svBounds_.getX() + juce::roundToInt(sat_ * (float) (svBounds_.getWidth() - 1));
+    const int cy = svBounds_.getY() + juce::roundToInt((1.0f - val_) * (float) (svBounds_.getHeight() - 1));
+    g.setColour(juce::Colours::white);
+    g.drawEllipse((float) cx - 5.0f, (float) cy - 5.0f, 10.0f, 10.0f, 1.5f);
+    g.setColour(juce::Colours::black);
+    g.drawEllipse((float) cx - 4.0f, (float) cy - 4.0f, 8.0f, 8.0f, 1.0f);
+}
+
+void SkinEditorColourPicker::paintHueBar(juce::Graphics& g) const
+{
+    if (! hasActiveColour_)
+    {
+        g.setColour(juce::Colour(0xff151515));
+        g.fillRect(hueBounds_);
+        return;
+    }
+
+    for (int y = 0; y < hueBounds_.getHeight(); ++y)
+    {
+        const float h = (float) y / (float) juce::jmax(1, hueBounds_.getHeight() - 1);
+        g.setColour(juce::Colour::fromHSV(h, 1.0f, 1.0f, 1.0f));
+        g.drawHorizontalLine(hueBounds_.getY() + y, (float) hueBounds_.getX(), (float) hueBounds_.getRight());
+    }
+    const int hy = hueBounds_.getY() + juce::roundToInt(hue_ * (float) (hueBounds_.getHeight() - 1));
+    g.setColour(juce::Colours::white);
+    g.drawRect(hueBounds_.getX() - 1, hy - 2, hueBounds_.getWidth() + 2, 5, 1);
 }
 
 void SkinEditorColourPicker::resized()
@@ -152,7 +181,7 @@ void SkinEditorColourPicker::mouseDown(const juce::MouseEvent& e)
 
 void SkinEditorColourPicker::mouseDrag(const juce::MouseEvent& e)
 {
-    if (! editingEnabled_)
+    if (! editingEnabled_ || ! hasActiveColour_)
         return;
 
     if (svBounds_.contains(e.getPosition()))
@@ -192,6 +221,15 @@ void SkinEditorColourPicker::syncEditorsFromColour()
     rEditor_.setText(juce::String(colour_.getRed()), false);
     gEditor_.setText(juce::String(colour_.getGreen()), false);
     bEditor_.setText(juce::String(colour_.getBlue()), false);
+}
+
+void SkinEditorColourPicker::clearEditors()
+{
+    const juce::ScopedValueSetter<bool> scope(isSyncingEditors_, true);
+    hexEditor_.clear();
+    rEditor_.clear();
+    gEditor_.clear();
+    bEditor_.clear();
 }
 
 void SkinEditorColourPicker::applyHexFromEditor()

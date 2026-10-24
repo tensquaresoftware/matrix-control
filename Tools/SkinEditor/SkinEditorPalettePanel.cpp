@@ -77,6 +77,11 @@ void SkinEditorPalettePanel::selectPastille(const juce::String& name)
     }
 }
 
+void SkinEditorPalettePanel::clearSelection()
+{
+    list_.deselectAllRows();
+}
+
 void SkinEditorPalettePanel::paint(juce::Graphics& g)
 {
     SkinEditorChrome::paintPanelFrame(g, getLocalBounds(), titleTabBounds_);
@@ -217,6 +222,10 @@ void SkinEditorPalettePanel::paintListBoxItem(int row, juce::Graphics& g, int wi
 
 void SkinEditorPalettePanel::selectedRowsChanged(int)
 {
+    // Split rows paint a full visual line across two ListBox slots; JUCE only
+    // invalidates the selected index, so force a full list repaint for highlight.
+    list_.repaint();
+
     const auto name = getSelectedPastilleName();
     deleteButton_.setEnabled(! readOnly_ && name.isNotEmpty()
                              && layer_ != nullptr

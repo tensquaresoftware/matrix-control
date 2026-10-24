@@ -12,6 +12,8 @@ public:
     SkinEditorColourPicker();
 
     void setColour(juce::Colour colour, juce::NotificationType notification);
+    /** Idle SV/hue wells (#151515) and empty #/R/G/B until a Palette colour is selected. */
+    void clearActiveColour();
     juce::Colour getColour() const noexcept { return colour_; }
     void setEnabledEditing(bool canEdit);
 
@@ -27,6 +29,9 @@ private:
     void textEditorFocusLost(juce::TextEditor&) override;
 
     void syncEditorsFromColour();
+    void clearEditors();
+    void paintSvWell(juce::Graphics& g) const;
+    void paintHueBar(juce::Graphics& g) const;
     void applyHexFromEditor();
     void applyRgbFromEditors();
     void updateFromSvDrag(juce::Point<float> pos);
@@ -34,12 +39,13 @@ private:
     void applyHsvaFromDrag();
     void notifyChanged();
 
-    juce::Colour colour_ { juce::Colours::white };
+    juce::Colour colour_ { juce::Colours::black };
     float hue_ = 0.0f;
-    float sat_ = 1.0f;
-    float val_ = 1.0f;
+    float sat_ = 0.0f;
+    float val_ = 0.0f;
+    bool hasActiveColour_ = false;
     bool isSyncingEditors_ = false;
-    bool editingEnabled_ = true;
+    bool editingEnabled_ = false;
 
     juce::Rectangle<int> svBounds_;
     juce::Rectangle<int> hueBounds_;

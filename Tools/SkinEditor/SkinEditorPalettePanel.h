@@ -19,6 +19,7 @@ public:
 
     juce::String getSelectedPastilleName() const;
     void selectPastille(const juce::String& name);
+    void clearSelection();
 
     std::function<void(const juce::String& pastilleName)> onPastilleSelected;
     std::function<void()> onAddRequested;

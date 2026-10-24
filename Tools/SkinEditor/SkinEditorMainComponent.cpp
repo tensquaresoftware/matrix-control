@@ -70,8 +70,9 @@ void SkinEditorMainComponent::setupSkinsBar()
         addAndMakeVisible(button);
         button.onClick = handler;
     };
+    wire(productDuplicateButton_, [this] { onDuplicateProduct(); });
+    wire(editorDuplicateButton_, [this] { onDuplicateEditor(); });
     wire(newButton_, [this] { onNew(); });
-    wire(duplicateButton_, [this] { onDuplicate(); });
     wire(renameButton_, [this] { onRename(); });
     wire(deleteButton_, [this] { onDelete(); });
     wire(undoButton_, [this] { onUndo(); });
@@ -99,32 +100,22 @@ void SkinEditorMainComponent::setupBodyPanels()
     mappingsPanel_.setLayer(&layer_);
     mappingsPanel_.onBindRequested = [this](TSS::SkinColourKey key, const juce::String& pastille)
     {
-        if (! canEditEditorSkin())
-            return;
-        const auto result = layer_.setMapping(sessionState_.editorSkinId, key, pastille);
-        if (result.failed())
-            juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon,
-                                                   "Mapping failed", result.getErrorMessage());
+        applyMapping(key, pastille, false);
     };
-    mappingsPanel_.onBindNeedsPastille = [this]
+    mappingsPanel_.onBindNeedsPastille = [this](TSS::SkinColourKey key)
     {
-        setStatusMessage("Select a Palette colour before binding");
+        armPendingMapping(key);
     };
     addAndMakeVisible(mappingsPanel_);
 
     unboundPanel_.setLayer(&layer_);
     unboundPanel_.onBindRequested = [this](TSS::SkinColourKey key, const juce::String& pastille)
     {
-        if (! canEditEditorSkin())
-            return;
-        const auto result = layer_.bindUnbound(sessionState_.editorSkinId, key, pastille);
-        if (result.failed())
-            juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon,
-                                                   "Bind failed", result.getErrorMessage());
+        applyMapping(key, pastille, true);
     };
-    unboundPanel_.onBindNeedsPastille = [this]
+    unboundPanel_.onBindNeedsPastille = [this](TSS::SkinColourKey key)
     {
-        setStatusMessage("Select a Palette colour before binding");
+        armPendingMapping(key);
     };
     addAndMakeVisible(unboundPanel_);
 }
@@ -228,19 +219,47 @@ void SkinEditorMainComponent::layoutSkinsBar(juce::Rectangle<int> skins)
     skinsBarSeparatorY_ = row.getY();
     skinsBarSeparatorH_ = row.getHeight();
 
+    // Equal combos; width chosen so Import's right edge matches the pre-dual-Duplicate bar.
+    constexpr int kSkinComboWidth = 100;
     const auto labelFont = SkinEditorChrome::fontRegular();
     const int skinsTitleW = SkinEditorChrome::titleTabWidth("SKINS");
     const int productLabelW = SkinEditorChrome::measureLabelWidth(productLabel_.getText(), labelFont);
     const int editorLabelW = SkinEditorChrome::measureLabelWidth(editorLabel_.getText(), labelFont);
 
+    auto placeGap = [&row]() { row.removeFromLeft(SkinEditorChrome::kButtonGap); };
+    auto placeButton = [&row](juce::TextButton& b)
+    {
+        const int w = SkinEditorChrome::measureButtonWidth(b);
+        b.setBounds(row.removeFromLeft(w).withHeight(SkinEditorChrome::kButtonHeight));
+    };
+    auto placeSkinsBarSeparator = [this, &row, &placeGap]()
+    {
+        placeGap();
+        placeGap();
+        skinsBarSeparatorXs_.push_back(row.getX());
+        row.removeFromLeft(1);
+        placeGap();
+        placeGap();
+    };
+
     skinsTitleLabel_.setBounds(titleRow.getX(), titleRow.getY() - 1, skinsTitleW, titleRow.getHeight());
     row.removeFromLeft(skinsTitleW);
-    row.removeFromLeft(SkinEditorChrome::kButtonGap);
+    placeGap();
     productLabel_.setBounds(row.removeFromLeft(productLabelW));
-    productCombo_.setBounds(row.removeFromLeft(120));
-    row.removeFromLeft(12);
+    productCombo_.setBounds(row.removeFromLeft(kSkinComboWidth));
+    placeGap();
+    placeButton(productDuplicateButton_);
+    placeSkinsBarSeparator();
     editorLabel_.setBounds(row.removeFromLeft(editorLabelW));
-    editorCombo_.setBounds(row.removeFromLeft(160));
+    editorCombo_.setBounds(row.removeFromLeft(kSkinComboWidth));
+    placeGap();
+    placeButton(editorDuplicateButton_);
+    placeGap();
+    placeButton(newButton_);
+    placeGap();
+    placeButton(renameButton_);
+    placeGap();
+    placeButton(deleteButton_);
     layoutSkinsActionButtons(row);
 }
 
@@ -262,14 +281,6 @@ void SkinEditorMainComponent::layoutSkinsActionButtons(juce::Rectangle<int>& row
         placeGap();
     };
 
-    placeSkinsBarSeparator();
-    placeButton(newButton_);
-    placeGap();
-    placeButton(duplicateButton_);
-    placeGap();
-    placeButton(renameButton_);
-    placeGap();
-    placeButton(deleteButton_);
     placeSkinsBarSeparator();
     placeButton(undoButton_);
     placeGap();

@@ -120,12 +120,13 @@ void SkinEditorUnboundPanel::tryBindRow(int row)
     if (row < 0 || row >= static_cast<int>(keys_.size()))
         return;
 
+    const auto key = keys_[static_cast<size_t>(row)];
     if (selectedPastille_.isEmpty())
     {
         if (onBindNeedsPastille)
-            onBindNeedsPastille();
+            onBindNeedsPastille(key);
         return;
     }
 
-    onBindRequested(keys_[static_cast<size_t>(row)], selectedPastille_);
+    onBindRequested(key, selectedPastille_);
 }

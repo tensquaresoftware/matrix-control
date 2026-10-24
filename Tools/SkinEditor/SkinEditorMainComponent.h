@@ -48,8 +48,11 @@ private:
     void applyEditorComboChange();
 
     // Actions (SkinEditorMainComponentActions.cpp)
-    void onDuplicate();
+    void onDuplicateProduct();
+    void onDuplicateEditor();
     void onNew();
+    /** Shared Duplicate flow; sourceId is Product or current Editor. */
+    void duplicateFromSkin(const juce::String& sourceId);
     void onDelete();
     void onRename();
     void onCompareToggle();
@@ -66,6 +69,10 @@ private:
     void tickCompareBlink();
     /** Export current Editor skin; returns true on successful write. */
     bool exportCurrentEditorSkinToFile(const juce::File& file);
+    void armPendingMapping(TSS::SkinColourKey key);
+    void applyMapping(TSS::SkinColourKey key, const juce::String& pastilleName, bool fromUnbound);
+    void clearPastilleSelectionAfterOneShot();
+    void syncColourPickerToSelection();
 
     // Layout / setup (SkinEditorMainComponent.cpp)
     void setupTitleBarChrome();
@@ -96,6 +103,8 @@ private:
     TSS::DevSkin::EditorSessionState sessionState_;
     bool sessionDirty_ = false;
     juce::String selectedPastille_;
+    TSS::SkinColourKey pendingMappingKey_ {};
+    bool hasPendingMapping_ = false;
     juce::String statusDetail_;
     bool suppressCombo_ = false;
 
@@ -113,8 +122,9 @@ private:
     juce::Label editorLabel_ { {}, "Editor:" };
     juce::ComboBox editorCombo_;
 
+    juce::TextButton productDuplicateButton_ { "Duplicate" };
+    juce::TextButton editorDuplicateButton_ { "Duplicate" };
     juce::TextButton newButton_ { "New" };
-    juce::TextButton duplicateButton_ { "Duplicate" };
     juce::TextButton renameButton_ { "Rename" };
     juce::TextButton deleteButton_ { "Delete" };
     juce::TextButton undoButton_ { "Undo" };
