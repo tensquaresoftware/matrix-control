@@ -242,7 +242,7 @@ Do not route editor SysEx through `processBlock()` midiBuffer.
 
 ## Code quality gate (realistic — instrumented)
 
-> SSOT: `CONVENTIONS.md` §3. Day-to-day: `python3 Scripts/quality/lint_touched.py` (touched files only). Optional: `.clang-tidy`. Agent summary: `.cursor/rules/clean-code.mdc` (not always-on).
+> SSOT: `CONVENTIONS.md` §3. Day-to-day: `python3 Scripts/quality/lint_touched.py` (touched files only under `Source/`, `Tests/`, and **`Tools/SkinEditor/`**). Optional: `.clang-tidy`. Agent summary: `.cursor/rules/clean-code.mdc` (not always-on).
 
 | Metric | Maximum |
 |---|---|

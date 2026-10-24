@@ -29,7 +29,7 @@ Source complète : `CONVENTIONS.md` §5–§6.2, §9. Constitution BMad : `_bmad
 ## Fichiers clés (lire avant d'implémenter)
 
 - `CONVENTIONS.md` — standards complets (autoritaire pour litiges de style) ; §3 = porte qualité chiffrée
-- `Scripts/quality/lint_touched.py` — analyseur sur fichiers C++ touchés (critère de fin de tâche)
+- `Scripts/quality/lint_touched.py` — analyseur sur fichiers C++ touchés sous `Source/`, `Tests/`, et **`Tools/SkinEditor/`** (Skin Editor inclus dans la porte Clean Code ; critère de fin de tâche)
 - `.cursor/rules/clean-code.mdc` — guidance légère (pas always-on)
 - `Documentation/Development/software-development-quality-principles.md` — complete design principles reference
 - `Source/Shared/Definitions/PluginDescriptors.h`
