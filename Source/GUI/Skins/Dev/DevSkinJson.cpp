@@ -201,7 +201,8 @@ namespace TSS::DevSkin
         }
         root->setProperty("skins", skins);
 
-        return juce::JSON::toString(juce::var(root), true);
+        // Human-readable indent — Import parses either form.
+        return juce::JSON::toString(juce::var(root), false);
     }
 
     juce::String exportEditorSkinToJson(const NamedSkin& skin)
@@ -212,7 +213,8 @@ namespace TSS::DevSkin
         juce::Array<juce::var> skins;
         skins.add(skinToVar(skin));
         root->setProperty("skins", skins);
-        return juce::JSON::toString(juce::var(root), true);
+        // Human-readable indent — Import parses either form.
+        return juce::JSON::toString(juce::var(root), false);
     }
 
     juce::String exportEditorSkinToJson(const Layer& layer, const juce::String& skinId)
