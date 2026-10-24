@@ -223,7 +223,7 @@ namespace SkinEditorChrome
                                (float) area.getY(),
                                (float) area.getWidth(),
                                (float) area.getHeight(),
-                               kControlCorner);
+                               kChromeBadgeCorner);
         g.setColour(surfaceApp());
         g.setFont(fontBold(kMappingBadgeFont));
         g.drawText(text, area, juce::Justification::centred, false);

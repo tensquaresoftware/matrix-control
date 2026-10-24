@@ -94,6 +94,11 @@ namespace SkinEditorChrome
     inline constexpr float kBodyFont = 13.0f;
     /** Match ComboBox corner radius (LookAndFeel_V4 default is 3). */
     inline constexpr float kControlCorner = 3.0f;
+    /**
+     * Badge corner — shorter than buttons (16 vs 24), so use a smaller radius
+     * to keep the same optical roundness as kControlCorner on controls.
+     */
+    inline constexpr float kChromeBadgeCorner = 2.0f;
     /** Visible scrollbar thumb thickness (centred in the track). */
     inline constexpr int kScrollThumbThickness = 6;
     /**
