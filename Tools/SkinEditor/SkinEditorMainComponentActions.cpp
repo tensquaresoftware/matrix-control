@@ -179,10 +179,13 @@ void SkinEditorMainComponent::onExportJson()
     if (! layer_.isEditorSkinExportAllowed(sessionState_.editorSkinId))
         return;
 
+    const auto* skin = layer_.findSkin(sessionState_.editorSkinId);
+    const auto suggested = SkinEditorUi::defaultEditorSkinExportFile(
+        skin != nullptr ? skin->name : juce::String());
+
     auto chooser = std::make_shared<juce::FileChooser>(
         "Export Editor skin JSON",
-        juce::File::getSpecialLocation(juce::File::userDocumentsDirectory)
-            .getChildFile("matrix-control-editor-skin.json"),
+        suggested,
         "*.json");
     chooser->launchAsync(juce::FileBrowserComponent::saveMode
                              | juce::FileBrowserComponent::canSelectFiles

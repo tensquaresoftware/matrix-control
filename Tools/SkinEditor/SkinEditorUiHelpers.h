@@ -44,4 +44,52 @@ namespace SkinEditorUi
                 return candidate;
         }
     }
+
+    inline bool isOsForbiddenFileNameChar(juce::juce_wchar character) noexcept
+    {
+        constexpr juce::juce_wchar kForbidden[] = {
+            '/', '\\', ':', '*', '?', '"', '<', '>', '|'
+        };
+        if (character < 32)
+            return true;
+        for (const auto forbidden : kForbidden)
+            if (character == forbidden)
+                return true;
+        return false;
+    }
+
+    inline juce::String collapseSpacesAndTrimDots(juce::String text)
+    {
+        while (text.contains("  "))
+            text = text.replace("  ", " ");
+        text = text.trim();
+        while (text.endsWithChar('.'))
+            text = text.dropLastCharacters(1).trimEnd();
+        return text;
+    }
+
+    /**
+     * OS-safe file-stem fragment from a free-text skin name.
+     * Forbidden path chars become spaces (e.g. "Skin: Night" -> "Skin Night");
+     * whitespace is collapsed. Empty result falls back to "Untitled".
+     */
+    inline juce::String sanitizeSkinNameForExportFileStem(juce::String name)
+    {
+        name = name.trim();
+        juce::String out;
+        out.preallocateBytes(static_cast<size_t>(name.length()));
+        for (int i = 0; i < name.length(); ++i)
+            out += isOsForbiddenFileNameChar(name[i]) ? juce::juce_wchar(' ') : name[i];
+
+        out = collapseSpacesAndTrimDots(std::move(out));
+        return out.isNotEmpty() ? out : juce::String("Untitled");
+    }
+
+    /** Suggested Documents path: "Matrix-Control Skin Editor - {name}.json". */
+    inline juce::File defaultEditorSkinExportFile(const juce::String& skinName)
+    {
+        return juce::File::getSpecialLocation(juce::File::userDocumentsDirectory)
+            .getChildFile("Matrix-Control Skin Editor - "
+                          + sanitizeSkinNameForExportFileStem(skinName) + ".json");
+    }
 }
