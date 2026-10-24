@@ -114,10 +114,17 @@ void SkinEditorUnboundPanel::listBoxItemClicked(int row, const juce::MouseEvent&
 
 void SkinEditorUnboundPanel::tryBindRow(int row)
 {
-    if (readOnly_ || forcedEmpty_ || selectedPastille_.isEmpty() || onBindRequested == nullptr)
+    if (readOnly_ || forcedEmpty_ || onBindRequested == nullptr)
         return;
     if (row < 0 || row >= static_cast<int>(keys_.size()))
         return;
+
+    if (selectedPastille_.isEmpty())
+    {
+        if (onBindNeedsPastille)
+            onBindNeedsPastille();
+        return;
+    }
 
     onBindRequested(keys_[static_cast<size_t>(row)], selectedPastille_);
 }

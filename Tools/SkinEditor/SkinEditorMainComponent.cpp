@@ -44,7 +44,8 @@ void SkinEditorMainComponent::setupTitleBarChrome()
     connectionLabel_.setJustificationType(juce::Justification::centredRight);
     lastPushLabel_.setJustificationType(juce::Justification::centredLeft);
     versionLabel_.setJustificationType(juce::Justification::centredRight);
-    versionLabel_.setText(SkinEditorChrome::kAppVersionLabel, juce::dontSendNotification);
+    versionLabel_.setText("v" + juce::String(JUCE_APPLICATION_VERSION_STRING),
+                          juce::dontSendNotification);
 }
 
 void SkinEditorMainComponent::setupSkinsBar()
@@ -105,6 +106,10 @@ void SkinEditorMainComponent::setupBodyPanels()
             juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon,
                                                    "Mapping failed", result.getErrorMessage());
     };
+    mappingsPanel_.onBindNeedsPastille = [this]
+    {
+        setStatusMessage("Select a Palette colour before binding");
+    };
     addAndMakeVisible(mappingsPanel_);
 
     unboundPanel_.setLayer(&layer_);
@@ -116,6 +121,10 @@ void SkinEditorMainComponent::setupBodyPanels()
         if (result.failed())
             juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon,
                                                    "Bind failed", result.getErrorMessage());
+    };
+    unboundPanel_.onBindNeedsPastille = [this]
+    {
+        setStatusMessage("Select a Palette colour before binding");
     };
     addAndMakeVisible(unboundPanel_);
 }

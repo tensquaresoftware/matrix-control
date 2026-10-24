@@ -368,12 +368,19 @@ void SkinEditorMappingsPanel::rebuildObjectCombo(const juce::String& preferName)
 
 void SkinEditorMappingsPanel::tryBindRow(int row)
 {
-    if (readOnly_ || selectedPastille_.isEmpty() || onBindRequested == nullptr)
+    if (readOnly_ || onBindRequested == nullptr)
         return;
     if (row < 0 || row >= static_cast<int>(rows_.size()))
         return;
     if (rows_[static_cast<size_t>(row)].kind != RowKind::kMapping)
         return;
+
+    if (selectedPastille_.isEmpty())
+    {
+        if (onBindNeedsPastille)
+            onBindNeedsPastille();
+        return;
+    }
 
     onBindRequested(rows_[static_cast<size_t>(row)].key, selectedPastille_);
 }

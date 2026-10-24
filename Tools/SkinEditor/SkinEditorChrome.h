@@ -42,9 +42,6 @@ namespace SkinEditorChrome
     inline juce::Colour controlFillHover() { return juce::Colour(0xff4a4a4a); }
     inline juce::Colour controlFillDown() { return juce::Colour(0xff3a3a3a); }
 
-    /** Skin Editor marketing / chrome version label (keep in sync with project VERSION). */
-    inline constexpr const char* kAppVersionLabel = "v1.0.0";
-
     /** Window / inter-panel gutters only — never reuse as in-panel content inset. */
     inline constexpr int kGutter = 6;
     /** Fixed body-column widths — Mappings / Unbound share the leftover. */

@@ -215,7 +215,8 @@ void SkinEditorColourPicker::applyHexFromEditor()
             return;
         }
 
-    setColour(juce::Colour::fromString("FF" + text), juce::sendNotification);
+    const auto alpha = colour_.getFloatAlpha();
+    setColour(juce::Colour::fromString("FF" + text).withAlpha(alpha), juce::sendNotification);
 }
 
 void SkinEditorColourPicker::applyRgbFromEditors()
@@ -223,7 +224,9 @@ void SkinEditorColourPicker::applyRgbFromEditors()
     const int r = juce::jlimit(0, 255, rEditor_.getText().getIntValue());
     const int g = juce::jlimit(0, 255, gEditor_.getText().getIntValue());
     const int b = juce::jlimit(0, 255, bEditor_.getText().getIntValue());
-    setColour(juce::Colour((juce::uint8) r, (juce::uint8) g, (juce::uint8) b), juce::sendNotification);
+    const auto alpha = colour_.getFloatAlpha();
+    setColour(juce::Colour((juce::uint8) r, (juce::uint8) g, (juce::uint8) b).withAlpha(alpha),
+              juce::sendNotification);
 }
 
 void SkinEditorColourPicker::updateFromSvOrHue(juce::Point<float> pos, bool isHue)
@@ -243,7 +246,7 @@ void SkinEditorColourPicker::updateFromSvOrHue(juce::Point<float> pos, bool isHu
                             1.0f - (pos.y - (float) svBounds_.getY())
                                        / (float) juce::jmax(1, svBounds_.getHeight() - 1));
     }
-    colour_ = juce::Colour::fromHSV(hue_, sat_, val_, 1.0f);
+    colour_ = juce::Colour::fromHSV(hue_, sat_, val_, colour_.getFloatAlpha());
     syncEditorsFromColour(false);
     repaint();
     notifyChanged();

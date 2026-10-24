@@ -296,6 +296,13 @@ void SkinEditorMainComponent::onPastilleSelected(const juce::String& name)
     selectedPastille_ = name;
     mappingsPanel_.setSelectedPastilleName(selectedPastille_);
     unboundPanel_.setSelectedPastilleName(selectedPastille_);
+
+    if (name.isEmpty())
+    {
+        colourPicker_.setEnabledEditing(false);
+        return;
+    }
+
     if (const auto* skin = layer_.findSkin(visibleSkinId()))
     {
         for (const auto& pastille : skin->palette)

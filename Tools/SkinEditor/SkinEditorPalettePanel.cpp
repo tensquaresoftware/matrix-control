@@ -222,7 +222,7 @@ void SkinEditorPalettePanel::selectedRowsChanged(int)
     deleteButton_.setEnabled(! readOnly_ && name.isNotEmpty()
                              && layer_ != nullptr
                              && ! layer_->isProductPastilleName(name));
-    if (name.isNotEmpty() && onPastilleSelected)
+    if (onPastilleSelected)
         onPastilleSelected(name);
 }
 

@@ -59,7 +59,7 @@ namespace
 
     private:
         /**
-         * Height is user-resizable; width stays at kWindowMaxWidth.
+         * Height is user-resizable within the nearest display; width stays at kWindowMaxWidth.
          * Position/size persist in Application Support (skin-editor-window.state).
          */
         class MainWindow final : public juce::DocumentWindow,
@@ -73,15 +73,18 @@ namespace
             {
                 setUsingNativeTitleBar(true);
                 setContentOwned(new SkinEditorMainComponent(), true);
+
+                updateSizeLimits();
+                setConstrainer(&constrainer_);
                 setResizable(true, true);
-                setConstrainer(nullptr);
+
                 centreWithSize(SkinEditorChrome::kWindowMaxWidth, 820);
                 setVisible(true);
 
                 if (! restoreWindowState())
                     centreWithSize(SkinEditorChrome::kWindowMaxWidth, 820);
 
-                clampWidthAndMinHeight();
+                normalizeClientSize();
                 ensureTitleBarOnScreen();
                 attachTitleBarDoubleClickZoom();
             }
@@ -111,13 +114,13 @@ namespace
             void resized() override
             {
                 DocumentWindow::resized();
-                clampWidthAndMinHeight();
                 schedulePersist();
             }
 
             void moved() override
             {
                 DocumentWindow::moved();
+                updateSizeLimits();
                 schedulePersist();
             }
 
@@ -127,14 +130,16 @@ namespace
 
                 if (isShowing())
                 {
-                    setConstrainer(nullptr);
+                    updateSizeLimits();
+                    setConstrainer(&constrainer_);
+                    ensureTitleBarOnScreen();
                     attachTitleBarDoubleClickZoom();
                 }
             }
 
             void zoomToMaxHeightAndCentre()
             {
-                setConstrainer(nullptr);
+                updateSizeLimits();
 
                 const auto frame = getNativeFrameSize();
                 const auto& displays = juce::Desktop::getInstance().getDisplays();
@@ -147,11 +152,12 @@ namespace
                 if (area.isEmpty())
                     return;
 
-                const int contentH = juce::jmax(1, area.getHeight() - juce::jmax(0, frame.getTopAndBottom()));
+                const int contentH = juce::jmax(480,
+                                                area.getHeight() - juce::jmax(0, frame.getTopAndBottom()));
 
-                ignoreClamp_ = true;
+                ignorePersist_ = true;
                 setSize(SkinEditorChrome::kWindowMaxWidth, contentH);
-                ignoreClamp_ = false;
+                ignorePersist_ = false;
 
                 auto nextBounds = MatrixStandalone::recentreClientBoundsOnNearestDisplayUserArea(
                     getBounds(),
@@ -166,9 +172,9 @@ namespace
 
                 if (nextBounds != getBounds())
                 {
-                    ignoreClamp_ = true;
+                    ignorePersist_ = true;
                     setBounds(nextBounds);
-                    ignoreClamp_ = false;
+                    ignorePersist_ = false;
 
                     if (isShowing())
                         toFront(true);
@@ -185,7 +191,7 @@ namespace
 
             void schedulePersist()
             {
-                if (ignoreClamp_)
+                if (ignorePersist_)
                     return;
                 startTimer(400);
             }
@@ -200,14 +206,64 @@ namespace
                 if (state.isEmpty())
                     return false;
 
-                ignoreClamp_ = true;
+                ignorePersist_ = true;
                 const bool ok = restoreWindowStateFromString(state);
-                ignoreClamp_ = false;
+                ignorePersist_ = false;
                 return ok;
+            }
+
+            void updateSizeLimits()
+            {
+                constexpr int kMinH = 480;
+                int maxH = 4096;
+
+                const auto& displays = juce::Desktop::getInstance().getDisplays();
+                if (! displays.displays.isEmpty())
+                {
+                    const auto* display = MatrixStandalone::findNearestDisplayForBounds(displays, getBounds());
+                    if (display != nullptr)
+                    {
+                        const auto area = display->userBounds.toNearestInt();
+                        const auto frame = getNativeFrameSize();
+                        maxH = juce::jmax(kMinH,
+                                          area.getHeight() - juce::jmax(0, frame.getTopAndBottom()));
+                    }
+                }
+
+                constrainer_.setMinimumWidth(SkinEditorChrome::kWindowMaxWidth);
+                constrainer_.setMaximumWidth(SkinEditorChrome::kWindowMaxWidth);
+                constrainer_.setMinimumHeight(kMinH);
+                constrainer_.setMaximumHeight(maxH);
+                maxContentHeight_ = maxH;
+            }
+
+            void normalizeClientSize()
+            {
+                updateSizeLimits();
+
+                const int w = SkinEditorChrome::kWindowMaxWidth;
+                const int h = juce::jlimit(480, maxContentHeight_, getHeight());
+
+                if (getWidth() == w && getHeight() == h)
+                    return;
+
+                ignorePersist_ = true;
+                setSize(w, h);
+                ignorePersist_ = false;
             }
 
             void ensureTitleBarOnScreen()
             {
+                const auto frame = getNativeFrameSize();
+                if (frame.getTop() <= 0)
+                {
+                    scheduleEnsureTitleBarRetry();
+                    return;
+                }
+
+                titleBarEnsureRetries_ = 0;
+                normalizeClientSize();
+
                 const auto& displays = juce::Desktop::getInstance().getDisplays();
                 if (displays.displays.isEmpty())
                     return;
@@ -222,16 +278,34 @@ namespace
 
                 const auto nextBounds = MatrixStandalone::ensureClientBoundsTitleBarOnScreen(
                     getBounds(),
-                    getNativeFrameSize(),
+                    frame,
                     userAreas,
                     display->userBounds.toNearestInt());
 
                 if (nextBounds != getBounds())
                 {
-                    ignoreClamp_ = true;
+                    ignorePersist_ = true;
                     setBounds(nextBounds);
-                    ignoreClamp_ = false;
+                    ignorePersist_ = false;
+
+                    if (isShowing())
+                        toFront(true);
                 }
+            }
+
+            void scheduleEnsureTitleBarRetry()
+            {
+                constexpr int kMaxRetries = 12;
+                if (titleBarEnsureRetries_ >= kMaxRetries)
+                    return;
+
+                ++titleBarEnsureRetries_;
+                const juce::Component::SafePointer<MainWindow> safe(this);
+                juce::Timer::callAfterDelay(50, [safe]
+                {
+                    if (safe != nullptr && safe->isShowing())
+                        safe->ensureTitleBarOnScreen();
+                });
             }
 
             juce::BorderSize<int> getNativeFrameSize() const
@@ -241,22 +315,6 @@ namespace
                         return *frameSize;
 
                 return {};
-            }
-
-            void clampWidthAndMinHeight()
-            {
-                if (ignoreClamp_)
-                    return;
-
-                const int w = SkinEditorChrome::kWindowMaxWidth;
-                const int h = juce::jmax(480, getHeight());
-
-                if (getWidth() == w && getHeight() == h)
-                    return;
-
-                ignoreClamp_ = true;
-                setSize(w, h);
-                ignoreClamp_ = false;
             }
 
             void attachTitleBarDoubleClickZoom()
@@ -271,8 +329,11 @@ namespace
                #endif
             }
 
+            juce::ComponentBoundsConstrainer constrainer_;
             MatrixStandalone::TitleBarDoubleClickHook titleBarDoubleClickHook_;
-            bool ignoreClamp_ = false;
+            int maxContentHeight_ = 4096;
+            int titleBarEnsureRetries_ = 0;
+            bool ignorePersist_ = false;
         };
 
         std::unique_ptr<MainWindow> mainWindow_;

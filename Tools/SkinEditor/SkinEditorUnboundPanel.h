@@ -21,6 +21,8 @@ public:
     void refresh();
 
     std::function<void(TSS::SkinColourKey key, const juce::String& pastilleName)> onBindRequested;
+    /** Fired when the user tries to bind without a Palette pastille selected. */
+    std::function<void()> onBindNeedsPastille;
 
     void paint(juce::Graphics& g) override;
     void resized() override;

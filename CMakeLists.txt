@@ -137,8 +137,6 @@ juce_add_binary_data(PluginFonts
         Assets/Fonts/Inter-Regular.ttf
         Assets/Fonts/Inter-Medium.ttf
         Assets/Fonts/Inter-Bold.ttf
-        Assets/Fonts/Inter-ExtraBold.ttf
-        Assets/Fonts/Inter-Black.ttf
         Assets/Fonts/JetBrainsMono-Regular.ttf
 )
 

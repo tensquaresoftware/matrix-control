@@ -2735,3 +2735,26 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-ui-panels.md`
   summary: Mappings and Unbound panels each embed a near-identical askPastille modal helper.
   evidence: Build review low DRY; extract shared chooser when a third caller appears.
+
+## Deferred from: code review (2026-10-24) — Skin Editor polish `dff5088d`
+
+- summary: Bind by Mapped-column click can overwrite without confirm (replaces old pastille dialog).
+  evidence: Intentional polish workflow; confirm step would be a product/scope change, not a correctness fix.
+- summary: Undo/Redo buttons stay disabled; shortcuts only show "not implemented yet".
+  evidence: Explicit placeholder for a dedicated history chantier in SkinEditorMainComponent.
+- summary: Cmd/Ctrl+Z may not reach keyPressed when a combo/list/editor holds focus.
+  evidence: setWantsKeyboardFocus(true) without grab/key listener; couple with Undo chantier.
+- summary: Full build copies Skin Editor twice (CopyToArtefactsDir + POST_BUILD); ALL path hard-codes artefacts layout vs TARGET_BUNDLE_DIR.
+  evidence: Dual path intentional for solo `--target`; unify later if a layout mismatch appears.
+- summary: Windows/Linux artefacts copy does not remove_directory/replace like macOS.
+  evidence: Primary authoring path is macOS; align when Windows/Linux Skin Editor packaging is exercised.
+- summary: Mappings refresh() always clears selectedRow_ after bind/session refresh.
+  evidence: UX annoyance, not data loss; preserve selection in a small follow-up if it bites in daily use.
+- summary: Clicking a Mappings section header leaves the previous mapping row highlighted.
+  evidence: Low everyday impact; clear selectedRow_ when non-mapping row is clicked if it confuses authors.
+- summary: No ON-path packaging test that Skin Editor still copies into Standalone artefacts when options are ON.
+  evidence: Verification Gap; OFF-graph audit exists; extend check_skin_editor_packaging when hardening packaging CI.
+- summary: No unit test that Skin Editor launch normalizes restored bounds (fixed width + title-bar-on-screen).
+  evidence: Verification Gap; Core StandaloneWindowPlacementTests cover helpers only; extract normalize helper when adding coverage.
+- summary: No unit test that empty Palette selection cannot call setMapping with "".
+  evidence: Verification Gap; UI guards exist today; Layer empty setMapping erases — worth a pin when touching bind again.
