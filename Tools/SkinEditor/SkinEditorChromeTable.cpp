@@ -173,7 +173,10 @@ namespace SkinEditorChrome
 
     void paintColourSwatch(juce::Graphics& g, juce::Rectangle<int> area, juce::Colour colour)
     {
-        paintCheckerboard(g, area);
+        // Exact N×N checker when side divides evenly (12 → 3 px cells → 4×4).
+        const int side = juce::jmin(area.getWidth(), area.getHeight());
+        const int cell = juce::jmax(1, side / kColourSwatchCheckerDivisions);
+        paintCheckerboard(g, area, cell);
         g.setColour(colour);
         g.fillRect(area);
     }

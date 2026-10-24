@@ -62,7 +62,10 @@ namespace SkinEditorChrome
     inline constexpr int kMappingBadgeHeight = 16;
     inline constexpr float kMappingBadgeFont = 11.0f;
     inline constexpr int kMappingBadgePadH = 8;
-    inline constexpr int kMappingWitnessSwatch = 12;
+    /** Palette / Mappings / MAPPING witness colour square. */
+    inline constexpr int kColourSwatchSize = 12;
+    /** Checker cells across one swatch side (12 / 4 = 3 px cells, exact 4x4). */
+    inline constexpr int kColourSwatchCheckerDivisions = 4;
     /** Integer optical nudges (barY + (barH - rowH) / 2 + nudge) — keep even/odd consistent. */
     inline constexpr int kLogoTitleNudgeY = 2;
     inline constexpr int kLogoChromeNudgeY = 3;

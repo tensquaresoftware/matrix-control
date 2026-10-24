@@ -9,8 +9,7 @@ namespace
     constexpr int kMappedSwatchToTableRight = SkinEditorChrome::kPalettePanelWidth
                                              - SkinEditorChrome::kPanelContentPad
                                              - 4;
-    constexpr int kSwatchSize = 14;
-    constexpr int kMidInset = 4;
+    constexpr int kSwatchSize = SkinEditorChrome::kColourSwatchSize;
     constexpr int kEdgeExtra = 4; // first/last row air so edge gaps match inter-swatch 8px
     constexpr int kFocusPad = 1;  // keep 1px outside focus ring inside the viewport
 
@@ -183,8 +182,9 @@ void SkinEditorMappingsPanel::paintMappingCells(juce::Graphics& g,
         return;
     }
 
+    const int swY = contentY + (contentH - kSwatchSize) / 2;
     SkinEditorChrome::paintColourSwatch(g,
-                                        juce::Rectangle<int>(x0 + cols.mappedX, contentY + kMidInset,
+                                        juce::Rectangle<int>(x0 + cols.mappedX, swY,
                                                              kSwatchSize, kSwatchSize),
                                         juce::Colour(item.pastilleArgb));
     g.setColour(SkinEditorChrome::textTableBody());

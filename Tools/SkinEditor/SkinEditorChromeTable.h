@@ -69,7 +69,7 @@ namespace SkinEditorChrome
                                        const juce::String& title);
 
     /** Classic transparency checkerboard (light / mid grey cells). */
-    void paintCheckerboard(juce::Graphics& g, juce::Rectangle<int> area, int cell = 4);
+    void paintCheckerboard(juce::Graphics& g, juce::Rectangle<int> area, int cell = 3);
 
     /** Checkerboard then colour on top — shows alpha / fully transparent as checkerboard. */
     void paintColourSwatch(juce::Graphics& g, juce::Rectangle<int> area, juce::Colour colour);

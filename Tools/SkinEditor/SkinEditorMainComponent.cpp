@@ -239,7 +239,7 @@ void SkinEditorMainComponent::layoutMappingWitness(int rowY, int rowH, int right
 {
     constexpr int kGap = 8;
     const int badgeW = SkinEditorChrome::mappingModeBadgeWidth();
-    const int sw = SkinEditorChrome::kMappingWitnessSwatch;
+    const int sw = SkinEditorChrome::kColourSwatchSize;
     const auto bodyFont = SkinEditorChrome::fontRegular();
     const int prefixW = SkinEditorChrome::measureTextWidth(bodyFont, mappingPrefixLabel_.getText()) + 2;
     const int detailW = SkinEditorChrome::measureTextWidth(bodyFont, mappingDetailLabel_.getText()) + 4;

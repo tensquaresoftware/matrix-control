@@ -48,7 +48,7 @@ private:
         juce::uint32 pastilleArgb = 0;
         bool unbound = false;
         int heightPx = 1;
-        /** Thicken mapping row: +4px top and/or bottom (swatch stays 14px). */
+        /** Thicken mapping row: +4px top and/or bottom (swatch stays 12px). */
         bool thickenTop = false;
         bool thickenBottom = false;
     };

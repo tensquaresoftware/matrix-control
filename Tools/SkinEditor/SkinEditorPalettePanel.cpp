@@ -220,12 +220,16 @@ void SkinEditorPalettePanel::paintListBoxItem(int row, juce::Graphics& g, int wi
     if (isRowSelectedVisually(row))
         SkinEditorChrome::fillTableRow(g, { rowArea, juce::Colour(0xff303030), roundTop, roundBottom });
 
+    const int sw = SkinEditorChrome::kColourSwatchSize;
+    const int swX = 4;
+    const int swY = yOff + (fullH - sw) / 2;
     SkinEditorChrome::paintColourSwatch(g,
-                                        juce::Rectangle<int>(4, yOff + 4, fullH - 8, fullH - 8),
+                                        juce::Rectangle<int>(swX, swY, sw, sw),
                                         juce::Colour(item.argb));
     g.setColour(SkinEditorChrome::textTableBody());
     g.setFont(SkinEditorChrome::fontRegular());
-    g.drawText(item.name, fullH + 4, yOff, paintW - fullH - 8, fullH, juce::Justification::centredLeft);
+    g.drawText(item.name, swX + sw + 8, yOff, paintW - swX - sw - 8, fullH,
+               juce::Justification::centredLeft);
 }
 
 void SkinEditorPalettePanel::selectedRowsChanged(int)
