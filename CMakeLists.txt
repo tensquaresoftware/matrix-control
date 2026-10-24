@@ -602,6 +602,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/SkinColourSubstrateTests.cpp
         Tests/Unit/DevSkinLayerJsonTests.cpp
         Tests/Unit/DevSkinMatrixTests.cpp
+        Tests/Unit/SkinEditorMappingModePolicyTests.cpp
         Tests/Unit/SliderButtonLikeColourTests.cpp
         Tests/Unit/PatchManagerActionHandlerComputerNavigationTests.cpp
         Tests/Unit/PatchManagerActionHandlerNavDebounceTests.cpp
@@ -827,6 +828,7 @@ if(MATRIX_BUILD_TESTS)
     )
 
     target_include_directories(Matrix-Control_Tests PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/Source
         ${CMAKE_CURRENT_SOURCE_DIR}/Tests/Unit
     )
@@ -1096,6 +1098,7 @@ if(MATRIX_BUILD_SKIN_EDITOR)
         Tools/SkinEditor/SkinEditorLookAndFeel.cpp
         Tools/SkinEditor/SkinEditorMainComponent.cpp
         Tools/SkinEditor/SkinEditorMainComponentActions.cpp
+        Tools/SkinEditor/SkinEditorMainComponentMapping.cpp
         Tools/SkinEditor/SkinEditorMainComponentSession.cpp
         Tools/SkinEditor/SkinEditorColourPicker.cpp
         Tools/SkinEditor/SkinEditorPalettePanel.cpp

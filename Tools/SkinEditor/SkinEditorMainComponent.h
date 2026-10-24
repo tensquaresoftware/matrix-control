@@ -28,6 +28,13 @@ public:
     bool keyPressed(const juce::KeyPress& key) override;
 
 private:
+    enum class MappingMode
+    {
+        kIdle,
+        kHeldColour,
+        kArmedRow
+    };
+
     // Session (SkinEditorMainComponentSession.cpp)
     void comboBoxChanged(juce::ComboBox*) override;
     void timerCallback() override;
@@ -62,24 +69,33 @@ private:
     void onAddPastille();
     void onDeletePastille();
     void onColourChanged(juce::Colour colour);
-    void onPastilleSelected(const juce::String& name);
     void onUndo();
     void onRedo();
     void syncCompareButtonChrome();
     void tickCompareBlink();
     /** Export current Editor skin; returns true on successful write. */
     bool exportCurrentEditorSkinToFile(const juce::File& file);
-    void armPendingMapping(TSS::SkinColourKey key);
+
+    // Mapping modes (SkinEditorMainComponentMapping.cpp)
+    void onPastilleSelected(const juce::String& name);
+    void onMappingRowActivated(TSS::SkinColourKey key, bool fromUnbound);
+    void enterHeldColour(const juce::String& pastilleName);
+    void enterArmedRow(TSS::SkinColourKey key, bool fromUnbound);
+    void clearMappingModeToIdle();
+    void retainMappingModeAfterWrite(TSS::SkinColourKey key, bool fromUnbound);
     void applyMapping(TSS::SkinColourKey key, const juce::String& pastilleName, bool fromUnbound);
-    void clearPastilleSelectionAfterOneShot();
     void syncColourPickerToSelection();
+    void updateMappingWitness();
 
     // Layout / setup (SkinEditorMainComponent.cpp)
     void setupTitleBarChrome();
+    void setupStatusBarChrome();
     void setupSkinsBar();
     void setupBodyPanels();
     void setupLayerAndBridgeCallbacks();
     void layoutTitleBar(juce::Rectangle<int> titleBar);
+    void layoutMappingWitness(juce::Rectangle<int> titleBar, int leftLimit);
+    void layoutStatusBar(juce::Rectangle<int> statusBar);
     void layoutSkinsBar(juce::Rectangle<int> skins);
     void layoutSkinsActionButtons(juce::Rectangle<int>& row);
     void layoutBodyPanels(juce::Rectangle<int> bounds);
@@ -103,18 +119,26 @@ private:
     TSS::DevSkin::EditorSessionState sessionState_;
     bool sessionDirty_ = false;
     juce::String selectedPastille_;
-    TSS::SkinColourKey pendingMappingKey_ {};
-    bool hasPendingMapping_ = false;
+    MappingMode mappingMode_ = MappingMode::kIdle;
+    TSS::SkinColourKey armedKey_ {};
+    bool armedFromUnbound_ = false;
     juce::String statusDetail_;
     bool suppressCombo_ = false;
 
     juce::Label titleLabel_;
+    juce::Label mappingDetailLabel_;
+    juce::Rectangle<int> mappingBadgeBounds_;
+    juce::Rectangle<int> mappingSwatchBounds_;
+    bool mappingWitnessActive_ = false;
+    bool mappingWitnessShowSwatch_ = false;
+    juce::Colour mappingWitnessColour_;
+
     juce::Label connectionLabel_;
     juce::Label lastPushLabel_;
     juce::Label versionLabel_;
-    int titleBarSeparatorX_ = -1;
-    int titleBarSeparatorY_ = 0;
-    int titleBarSeparatorH_ = 0;
+    int statusBarSeparatorX_ = -1;
+    int statusBarSeparatorY_ = 0;
+    int statusBarSeparatorH_ = 0;
 
     juce::Label skinsTitleLabel_;
     juce::Label productLabel_ { {}, "Product:" };

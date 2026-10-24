@@ -10,6 +10,9 @@ SkinEditorPalettePanel::SkinEditorPalettePanel()
     // Same slot height as Mappings so section→content gaps can be kColumnHeaderGap (11).
     list_.setRowHeight(SkinEditorChrome::kTableGapHeight);
     list_.setColour(juce::ListBox::backgroundColourId, juce::Colours::transparentBlack);
+    list_.setWantsKeyboardFocus(true);
+    escapeForwarder_.handler = &onEscapeRequested;
+    list_.addKeyListener(&escapeForwarder_);
     addAndMakeVisible(list_);
     addAndMakeVisible(addButton_);
     addAndMakeVisible(deleteButton_);
@@ -23,6 +26,11 @@ SkinEditorPalettePanel::SkinEditorPalettePanel()
         if (onDeleteRequested)
             onDeleteRequested();
     };
+}
+
+SkinEditorPalettePanel::~SkinEditorPalettePanel()
+{
+    list_.removeKeyListener(&escapeForwarder_);
 }
 
 void SkinEditorPalettePanel::setLayer(TSS::DevSkin::Layer* layer)

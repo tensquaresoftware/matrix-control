@@ -2776,3 +2776,7 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/specs/spec-skin-editor-clean-code-cleanup/stories/1-split-skineditorchrome-monolith.md`
   summary: STILL DEFERRED — count-badge width/clamp DRY remains optional Boy Scout (explicit in close-out residual table; not a must-fix hotspot).
   evidence: Confirmed still open at story 6; listed as defer in inventory.md § Close-out residual debt.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-hold-mapping-chrome.md`
+  summary: MainComponent bind vs re-arm orchestration (intent switch to applyMapping / enterHeldColour) is only covered indirectly by SkinEditorMappingModePolicy unit tests, not by a non-GUI driver of the MainComponent switches.
+  evidence: Verification-gap review; repo keeps Skin Editor GUI out of unit tests; Hold return-click remains a manual chrome check.

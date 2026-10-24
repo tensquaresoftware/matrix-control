@@ -61,8 +61,8 @@ SkinEditorMappingsPanel::SkinEditorMappingsPanel()
 
     holdColourToggle_.setClickingTogglesState(true);
     holdColourToggle_.setToggleState(false, juce::dontSendNotification);
-    holdColourToggle_.setTooltip("Keep the Palette colour selected to map several rows");
-    // Same muted label colour as "Object:" — box chrome comes from LookAndFeel::drawToggleButton.
+    holdColourToggle_.setTooltip("Hold the current mapping gesture to map several targets");
+    // Same muted label colour as "Object:" - box chrome comes from LookAndFeel::drawToggleButton.
     holdColourToggle_.setColour(juce::ToggleButton::textColourId, SkinEditorChrome::textMuted());
     addAndMakeVisible(holdColourToggle_);
 
@@ -88,11 +88,6 @@ void SkinEditorMappingsPanel::setReadOnly(bool readOnly)
 {
     readOnly_ = readOnly;
     holdColourToggle_.setEnabled(! readOnly);
-}
-
-void SkinEditorMappingsPanel::setSelectedPastilleName(const juce::String& name)
-{
-    selectedPastille_ = name;
 }
 
 void SkinEditorMappingsPanel::refresh()
@@ -282,22 +277,14 @@ void SkinEditorMappingsPanel::Content::paint(juce::Graphics& g)
 
 void SkinEditorMappingsPanel::tryBindRow(int row)
 {
-    if (readOnly_ || onBindRequested == nullptr)
+    if (readOnly_ || onRowActivated == nullptr)
         return;
     if (row < 0 || row >= static_cast<int>(rows_.size()))
         return;
     if (rows_[static_cast<size_t>(row)].kind != RowKind::kMapping)
         return;
 
-    const auto key = rows_[static_cast<size_t>(row)].key;
-    if (selectedPastille_.isEmpty())
-    {
-        if (onBindNeedsPastille)
-            onBindNeedsPastille(key);
-        return;
-    }
-
-    onBindRequested(key, selectedPastille_);
+    onRowActivated(rows_[static_cast<size_t>(row)].key);
 }
 
 void SkinEditorMappingsPanel::setFocusedObject(int objectIndex, bool scrollIntoPlace)
@@ -346,8 +333,16 @@ void SkinEditorMappingsPanel::Content::mouseUp(const juce::MouseEvent& e)
         return;
 
     owner_.selectedRow_ = row;
+    grabKeyboardFocus();
     repaint();
     owner_.tryBindRow(row);
+}
+
+bool SkinEditorMappingsPanel::Content::keyPressed(const juce::KeyPress& key)
+{
+    if (key == juce::KeyPress::escapeKey && owner_.onEscapeRequested != nullptr)
+        return owner_.onEscapeRequested();
+    return false;
 }
 
 // Layout

@@ -15,16 +15,15 @@ public:
     void setLayer(TSS::DevSkin::Layer* layer);
     void setActiveSkinId(const juce::String& skinId);
     void setReadOnly(bool readOnly);
-    void setSelectedPastilleName(const juce::String& name);
     void refresh();
 
-    /** When true, keep the Palette colour selected after a successful map (multi-map). */
+    /** When true, batch maps stay in the current gesture direction after a successful write. */
     bool isHoldColour() const noexcept { return holdColourToggle_.getToggleState(); }
 
-    /** Bind using the Palette selection (pastilleName may be empty → ignored). */
-    std::function<void(TSS::SkinColourKey key, const juce::String& pastilleName)> onBindRequested;
-    /** Fired when the user clicks a mapping row without a Palette pastille selected (arm reverse map). */
-    std::function<void(TSS::SkinColourKey key)> onBindNeedsPastille;
+    /** Row click - main owns Idle / HeldColour / ArmedRow (bind vs re-arm). */
+    std::function<void(TSS::SkinColourKey key)> onRowActivated;
+    /** Escape while the table content has focus - clear mapping mode in main. */
+    std::function<bool()> onEscapeRequested;
 
     void paint(juce::Graphics& g) override;
     void resized() override;
@@ -66,9 +65,13 @@ private:
     class Content final : public juce::Component
     {
     public:
-        explicit Content(SkinEditorMappingsPanel& owner) : owner_(owner) {}
+        explicit Content(SkinEditorMappingsPanel& owner) : owner_(owner)
+        {
+            setWantsKeyboardFocus(true);
+        }
         void paint(juce::Graphics& g) override;
         void mouseUp(const juce::MouseEvent& e) override;
+        bool keyPressed(const juce::KeyPress& key) override;
 
     private:
         SkinEditorMappingsPanel& owner_;
@@ -115,7 +118,6 @@ private:
 
     TSS::DevSkin::Layer* layer_ = nullptr;
     juce::String skinId_;
-    juce::String selectedPastille_;
     bool readOnly_ = true;
     bool updatingObjectCombo_ = false;
     int selectedRow_ = -1;

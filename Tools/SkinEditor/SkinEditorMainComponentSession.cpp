@@ -58,6 +58,16 @@ bool SkinEditorMainComponent::tryQuitWithDirtyGate()
 
 bool SkinEditorMainComponent::keyPressed(const juce::KeyPress& key)
 {
+    if (key == juce::KeyPress::escapeKey)
+    {
+        if (mappingMode_ != MappingMode::kIdle)
+        {
+            clearMappingModeToIdle();
+            return true;
+        }
+        return false;
+    }
+
     const auto mods = key.getModifiers();
     if (mods.isCommandDown() && ! mods.isAltDown())
     {
@@ -94,7 +104,7 @@ void SkinEditorMainComponent::applyEditorComboChange()
             continue;
 
         if (sessionState_.editorSkinId != skin.id)
-            selectedPastille_.clear();
+            clearMappingModeToIdle();
         sessionState_.editorSkinId = skin.id;
         layer_.selectSkin(skin.id);
         markDirty();
@@ -146,14 +156,15 @@ void SkinEditorMainComponent::refreshAll()
 
     mappingsPanel_.setActiveSkinId(visibleId);
     mappingsPanel_.setReadOnly(compareProduct || ! editable);
-    mappingsPanel_.setSelectedPastilleName(selectedPastille_);
     mappingsPanel_.refresh();
 
     unboundPanel_.setActiveSkinId(visibleId);
     unboundPanel_.setEmptyForCompareProduct(compareProduct);
     unboundPanel_.setReadOnly(compareProduct || ! editable);
-    unboundPanel_.setSelectedPastilleName(selectedPastille_);
     unboundPanel_.refresh();
+
+    if (! editable && mappingMode_ != MappingMode::kIdle)
+        clearMappingModeToIdle();
 
     if (selectedPastille_.isNotEmpty())
     {
@@ -171,10 +182,13 @@ void SkinEditorMainComponent::refreshAll()
         }
         if (found)
             palettePanel_.selectPastille(selectedPastille_);
+        else if (mappingMode_ == MappingMode::kHeldColour)
+            clearMappingModeToIdle();
         else
             selectedPastille_.clear();
     }
     syncColourPickerToSelection();
+    updateMappingWitness();
 }
 
 void SkinEditorMainComponent::refreshCombos()
@@ -211,7 +225,7 @@ void SkinEditorMainComponent::refreshCombos()
                 && skin.name.equalsIgnoreCase(editorCombo_.getText()))
             {
                 if (sessionState_.editorSkinId != skin.id)
-                    selectedPastille_.clear();
+                    clearMappingModeToIdle();
                 sessionState_.editorSkinId = skin.id;
                 break;
             }
@@ -220,7 +234,7 @@ void SkinEditorMainComponent::refreshCombos()
     else
     {
         if (sessionState_.editorSkinId.isNotEmpty())
-            selectedPastille_.clear();
+            clearMappingModeToIdle();
         sessionState_.editorSkinId = {};
     }
 }
@@ -230,7 +244,7 @@ void SkinEditorMainComponent::refreshStatus()
     connectionLabel_.setText(bridge_.session().connectionStatusText(), juce::dontSendNotification);
     lastPushLabel_.setText(statusDetail_.isNotEmpty() ? statusDetail_ : "Last push: none",
                            juce::dontSendNotification);
-    // Re-centre the Connection | Last push cluster for the new string widths.
+    // Re-layout status-bar zones for the new string widths.
     resized();
 }
 

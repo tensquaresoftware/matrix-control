@@ -54,6 +54,13 @@ namespace SkinEditorChrome
      */
     inline constexpr int kPanelContentPad = 10;
     inline constexpr int kTitleBarHeight = 32;
+    /** Bottom status bar - same height / fill spirit as the logo title bar. */
+    inline constexpr int kStatusBarHeight = kTitleBarHeight;
+    /** Rectangle MAPPING witness badge (not the Unbound count capsule). */
+    inline constexpr int kMappingBadgeHeight = 16;
+    inline constexpr float kMappingBadgeFont = 11.0f;
+    inline constexpr int kMappingBadgePadH = 8;
+    inline constexpr int kMappingWitnessSwatch = 12;
     inline constexpr int kButtonHeight = 24;
     inline constexpr int kButtonGap = 8;
     inline constexpr int kPanelTitleHeight = 26;

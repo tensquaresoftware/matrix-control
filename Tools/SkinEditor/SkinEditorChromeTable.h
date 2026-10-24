@@ -80,4 +80,12 @@ namespace SkinEditorChrome
                         int count);
 
     int countBadgeWidth(int count);
+
+    /**
+     * Mapping-mode witness badge - Inter rectangle with "MAPPING" (ASCII).
+     * Do not reuse plugin FooterPanel badge APIs or the Unbound count capsule.
+     */
+    void drawMappingModeBadge(juce::Graphics& g, juce::Rectangle<int> area);
+
+    int mappingModeBadgeWidth();
 }

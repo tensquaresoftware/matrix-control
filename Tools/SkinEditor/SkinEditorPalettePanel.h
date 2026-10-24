@@ -11,6 +11,7 @@ class SkinEditorPalettePanel final : public juce::Component,
 {
 public:
     SkinEditorPalettePanel();
+    ~SkinEditorPalettePanel() override;
 
     void setLayer(TSS::DevSkin::Layer* layer);
     void setActiveSkinId(const juce::String& skinId);
@@ -24,11 +25,24 @@ public:
     std::function<void(const juce::String& pastilleName)> onPastilleSelected;
     std::function<void()> onAddRequested;
     std::function<void()> onDeleteRequested;
+    /** Escape while the palette list has focus - clear mapping mode in main. */
+    std::function<bool()> onEscapeRequested;
 
     void paint(juce::Graphics& g) override;
     void resized() override;
 
 private:
+    struct EscapeKeyForwarder final : public juce::KeyListener
+    {
+        std::function<bool()>* handler = nullptr;
+        bool keyPressed(const juce::KeyPress& key, juce::Component*) override
+        {
+            if (key == juce::KeyPress::escapeKey && handler != nullptr && *handler != nullptr)
+                return (*handler)();
+            return false;
+        }
+    };
+
     enum class RowKind
     {
         kGap,
@@ -65,6 +79,7 @@ private:
     juce::String skinId_;
     bool readOnly_ = true;
     std::vector<Row> rows_;
+    EscapeKeyForwarder escapeForwarder_;
 
     juce::Label titleLabel_;
     juce::Rectangle<int> titleTabBounds_;

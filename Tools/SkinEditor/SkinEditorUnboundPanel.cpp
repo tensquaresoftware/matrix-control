@@ -17,7 +17,15 @@ SkinEditorUnboundPanel::SkinEditorUnboundPanel()
     // Same body-row height as Mappings / Palette visual rows (token name is historical).
     list_.setRowHeight(SkinEditorChrome::kColumnHeaderHeight);
     list_.setColour(juce::ListBox::backgroundColourId, juce::Colours::transparentBlack);
+    list_.setWantsKeyboardFocus(true);
+    escapeForwarder_.handler = &onEscapeRequested;
+    list_.addKeyListener(&escapeForwarder_);
     addAndMakeVisible(list_);
+}
+
+SkinEditorUnboundPanel::~SkinEditorUnboundPanel()
+{
+    list_.removeKeyListener(&escapeForwarder_);
 }
 
 void SkinEditorUnboundPanel::setLayer(TSS::DevSkin::Layer* layer)
@@ -38,11 +46,6 @@ void SkinEditorUnboundPanel::setReadOnly(bool readOnly)
 void SkinEditorUnboundPanel::setEmptyForCompareProduct(bool empty)
 {
     emptyForCompareProduct_ = empty;
-}
-
-void SkinEditorUnboundPanel::setSelectedPastilleName(const juce::String& name)
-{
-    selectedPastille_ = name;
 }
 
 void SkinEditorUnboundPanel::refresh()
@@ -115,18 +118,10 @@ void SkinEditorUnboundPanel::listBoxItemClicked(int row, const juce::MouseEvent&
 
 void SkinEditorUnboundPanel::tryBindRow(int row)
 {
-    if (readOnly_ || emptyForCompareProduct_ || onBindRequested == nullptr)
+    if (readOnly_ || emptyForCompareProduct_ || onRowActivated == nullptr)
         return;
     if (row < 0 || row >= static_cast<int>(keys_.size()))
         return;
 
-    const auto key = keys_[static_cast<size_t>(row)];
-    if (selectedPastille_.isEmpty())
-    {
-        if (onBindNeedsPastille)
-            onBindNeedsPastille(key);
-        return;
-    }
-
-    onBindRequested(key, selectedPastille_);
+    onRowActivated(keys_[static_cast<size_t>(row)]);
 }

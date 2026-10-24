@@ -35,8 +35,7 @@ void SkinEditorMainComponent::duplicateFromSkin(const juce::String& sourceId)
     }
     sessionState_.editorSkinId = layer_.activeSkinId();
     sessionState_.compareOn = false;
-    selectedPastille_.clear();
-    hasPendingMapping_ = false;
+    clearMappingModeToIdle();
     // onChanged already refreshed with the previous Editor id — select the new skin now.
     refreshAll();
 }
@@ -57,8 +56,7 @@ void SkinEditorMainComponent::onNew()
     }
     sessionState_.editorSkinId = layer_.activeSkinId();
     sessionState_.compareOn = false;
-    selectedPastille_.clear();
-    hasPendingMapping_ = false;
+    clearMappingModeToIdle();
     refreshAll();
 }
 
@@ -87,7 +85,7 @@ void SkinEditorMainComponent::onDelete()
         return;
     }
     sessionState_.editorSkinId = {};
-    selectedPastille_.clear();
+    clearMappingModeToIdle();
 }
 
 void SkinEditorMainComponent::onRename()
@@ -284,7 +282,12 @@ void SkinEditorMainComponent::onDeletePastille()
         return;
     }
     if (selectedPastille_ == name)
-        selectedPastille_.clear();
+    {
+        if (mappingMode_ == MappingMode::kHeldColour)
+            clearMappingModeToIdle();
+        else
+            selectedPastille_.clear();
+    }
 }
 
 void SkinEditorMainComponent::onColourChanged(juce::Colour colour)
@@ -296,117 +299,8 @@ void SkinEditorMainComponent::onColourChanged(juce::Colour colour)
                                                colour.getARGB());
     if (result.failed())
         setStatusMessage(result.getErrorMessage());
-}
-
-void SkinEditorMainComponent::onPastilleSelected(const juce::String& name)
-{
-    selectedPastille_ = name;
-    mappingsPanel_.setSelectedPastilleName(selectedPastille_);
-    unboundPanel_.setSelectedPastilleName(selectedPastille_);
-    syncColourPickerToSelection();
-
-    if (name.isEmpty() || ! hasPendingMapping_ || ! canEditEditorSkin())
-        return;
-
-    // Hold colour: further Palette clicks re-map the same armed row (try colours in one gesture).
-    applyMapping(pendingMappingKey_, name, false);
-}
-
-void SkinEditorMainComponent::armPendingMapping(TSS::SkinColourKey key)
-{
-    if (! canEditEditorSkin())
-        return;
-
-    pendingMappingKey_ = key;
-    hasPendingMapping_ = true;
-    setStatusMessage(mappingsPanel_.isHoldColour()
-                         ? "Select Palette colours to map (Hold colour keeps the target row)"
-                         : "Select a Palette colour to complete the mapping");
-    refreshStatus();
-}
-
-void SkinEditorMainComponent::applyMapping(TSS::SkinColourKey key,
-                                           const juce::String& pastilleName,
-                                           bool fromUnbound)
-{
-    if (! canEditEditorSkin() || pastilleName.isEmpty())
-        return;
-
-    const bool hold = mappingsPanel_.isHoldColour();
-
-    // Same pastille already on this key (e.g. refresh re-selects Palette) — keep Hold target, skip write.
-    if (const auto* skin = layer_.findSkin(sessionState_.editorSkinId))
-    {
-        const auto it = skin->mappings.find(key);
-        if (it != skin->mappings.end() && it->second == pastilleName)
-        {
-            if (hold)
-            {
-                pendingMappingKey_ = key;
-                hasPendingMapping_ = true;
-            }
-            return;
-        }
-    }
-
-    const auto result = fromUnbound
-                            ? layer_.bindUnbound(sessionState_.editorSkinId, key, pastilleName)
-                            : layer_.setMapping(sessionState_.editorSkinId, key, pastilleName);
-    if (result.failed())
-    {
-        juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon,
-                                               fromUnbound ? "Bind failed" : "Mapping failed",
-                                               result.getErrorMessage());
-        return;
-    }
-
-    if (hold)
-    {
-        // Keep the row armed so the next Palette click updates the same mapping.
-        pendingMappingKey_ = key;
-        hasPendingMapping_ = true;
-    }
-    else
-    {
-        clearPastilleSelectionAfterOneShot();
-    }
-}
-
-void SkinEditorMainComponent::clearPastilleSelectionAfterOneShot()
-{
-    selectedPastille_.clear();
-    hasPendingMapping_ = false;
-    palettePanel_.clearSelection();
-    mappingsPanel_.setSelectedPastilleName({});
-    unboundPanel_.setSelectedPastilleName({});
-    colourPicker_.clearActiveColour();
-    colourPicker_.setEnabledEditing(false);
-}
-
-void SkinEditorMainComponent::syncColourPickerToSelection()
-{
-    if (selectedPastille_.isEmpty())
-    {
-        colourPicker_.clearActiveColour();
-        colourPicker_.setEnabledEditing(false);
-        return;
-    }
-
-    if (const auto* skin = layer_.findSkin(visibleSkinId()))
-    {
-        for (const auto& pastille : skin->palette)
-        {
-            if (pastille.name == selectedPastille_)
-            {
-                colourPicker_.setColour(juce::Colour(pastille.argb), juce::dontSendNotification);
-                colourPicker_.setEnabledEditing(canEditEditorSkin());
-                return;
-            }
-        }
-    }
-
-    colourPicker_.clearActiveColour();
-    colourPicker_.setEnabledEditing(false);
+    else if (mappingMode_ == MappingMode::kHeldColour)
+        updateMappingWitness();
 }
 
 bool SkinEditorMainComponent::exportCurrentEditorSkinToFile(const juce::File& file)
