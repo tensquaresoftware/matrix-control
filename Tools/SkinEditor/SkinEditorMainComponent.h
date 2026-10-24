@@ -66,6 +66,17 @@ private:
     void syncCompareButtonChrome();
     void tickCompareBlink();
 
+    void setupTitleBarChrome();
+    void setupSkinsBar();
+    void setupBodyPanels();
+    void setupLayerAndBridgeCallbacks();
+    void layoutTitleBar(juce::Rectangle<int> titleBar);
+    void layoutSkinsBar(juce::Rectangle<int> skins);
+    void layoutSkinsActionButtons(juce::Rectangle<int>& row);
+    void layoutBodyPanels(juce::Rectangle<int> bounds);
+    void applyProductComboChange();
+    void applyEditorComboChange();
+
     /** Export current Editor skin; returns true on successful write. */
     bool exportCurrentEditorSkinToFile(const juce::File& file);
 

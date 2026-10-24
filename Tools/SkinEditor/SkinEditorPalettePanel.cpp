@@ -152,6 +152,31 @@ int SkinEditorPalettePanel::getNumRows()
     return static_cast<int>(rows_.size());
 }
 
+bool SkinEditorPalettePanel::isBlockBoundary(RowKind kind) noexcept
+{
+    return kind == RowKind::kGap || kind == RowKind::kSection;
+}
+
+void SkinEditorPalettePanel::roundFlagsForRow(int row, bool& roundTop, bool& roundBottom) const noexcept
+{
+    const auto& item = rows_[static_cast<size_t>(row)];
+    const int contentRow = item.isBottomHalf ? row - 1 : row;
+    const int next = nextContentRow(contentRow);
+    const auto nextKind = (next < static_cast<int>(rows_.size()))
+                              ? rows_[static_cast<size_t>(next)].kind
+                              : RowKind::kGap;
+
+    int prev = contentRow - 1;
+    while (prev >= 0 && rows_[static_cast<size_t>(prev)].isBottomHalf)
+        --prev;
+    const bool startsBlock = prev < 0 || isBlockBoundary(rows_[static_cast<size_t>(prev)].kind);
+
+    roundTop = item.kind == RowKind::kSection
+               || (item.kind == RowKind::kColour && startsBlock);
+    roundBottom = (item.kind == RowKind::kColour && isBlockBoundary(nextKind))
+                  || (item.kind == RowKind::kSection && nextKind != RowKind::kColour);
+}
+
 void SkinEditorPalettePanel::paintListBoxItem(int row, juce::Graphics& g, int width, int height, bool selected)
 {
     juce::ignoreUnused(selected, width);
@@ -166,28 +191,14 @@ void SkinEditorPalettePanel::paintListBoxItem(int row, juce::Graphics& g, int wi
     const int fullH = SkinEditorChrome::kColumnHeaderHeight;
     const int yOff = item.isBottomHalf ? -height : 0;
     const auto rowArea = juce::Rectangle<float>(0.0f, (float) yOff, (float) paintW, (float) fullH);
-
-    const int contentRow = item.isBottomHalf ? row - 1 : row;
-    const int next = nextContentRow(contentRow);
-    const auto nextKind = next < static_cast<int>(rows_.size())
-                              ? rows_[static_cast<size_t>(next)].kind
-                              : RowKind::kGap;
-    int prev = contentRow - 1;
-    while (prev >= 0 && rows_[static_cast<size_t>(prev)].isBottomHalf)
-        --prev;
-    const auto prevKind = prev >= 0 ? rows_[static_cast<size_t>(prev)].kind : RowKind::kGap;
-    // Section is its own chip; colour tables start after the 11px gap under the title.
-    const bool roundTop = item.kind == RowKind::kSection
-                          || (item.kind == RowKind::kColour
-                              && (prev < 0 || prevKind == RowKind::kGap || prevKind == RowKind::kSection));
-    const bool roundBottom = (item.kind == RowKind::kColour
-                              && (nextKind == RowKind::kGap || nextKind == RowKind::kSection))
-                             || (item.kind == RowKind::kSection && nextKind != RowKind::kColour);
+    bool roundTop = false;
+    bool roundBottom = false;
+    roundFlagsForRow(row, roundTop, roundBottom);
 
     if (item.kind == RowKind::kSection)
     {
-        SkinEditorChrome::fillTableRow(g, rowArea, SkinEditorChrome::surfaceSection(),
-                                       roundTop, roundBottom);
+        SkinEditorChrome::fillTableRow(g, { rowArea, SkinEditorChrome::surfaceSection(),
+                                            roundTop, roundBottom });
         g.setColour(SkinEditorChrome::textTableHeader());
         g.setFont(SkinEditorChrome::fontBold());
         g.drawText(item.headerText, 6, yOff, paintW - 12, fullH, juce::Justification::centredLeft);
@@ -195,8 +206,7 @@ void SkinEditorPalettePanel::paintListBoxItem(int row, juce::Graphics& g, int wi
     }
 
     if (isRowSelectedVisually(row))
-        SkinEditorChrome::fillTableRow(g, rowArea, juce::Colour(0xff303030),
-                                       roundTop, roundBottom);
+        SkinEditorChrome::fillTableRow(g, { rowArea, juce::Colour(0xff303030), roundTop, roundBottom });
 
     SkinEditorChrome::paintColourSwatch(g,
                                         juce::Rectangle<int>(4, yOff + 4, fullH - 8, fullH - 8),
@@ -241,34 +251,30 @@ void SkinEditorPalettePanel::rebuildRows()
             editor.push_back(row);
     }
 
-    auto pushSection = [this](const juce::String& title)
+    if (! product.empty())
+        appendPaletteGroup("Product colours", product, false);
+    if (! editor.empty() || ! readOnly_)
+        appendPaletteGroup("Editor colours", editor, ! product.empty());
+}
+
+void SkinEditorPalettePanel::appendPaletteGroup(const juce::String& title,
+                                                std::vector<Row>& colours,
+                                                bool leadGap)
+{
+    if (leadGap)
     {
-        Row section;
-        section.kind = RowKind::kSection;
-        section.headerText = title;
-        pushContentRow(section);
-        // Same 11px air as under Mappings "Property / State / Mapped colour".
         Row gap;
         gap.kind = RowKind::kGap;
         rows_.push_back(gap);
-    };
+    }
 
-    if (! product.empty())
-    {
-        pushSection("Product colours");
-        for (auto& row : product)
-            pushContentRow(row);
-    }
-    if (! editor.empty() || ! readOnly_)
-    {
-        if (! product.empty())
-        {
-            Row gap;
-            gap.kind = RowKind::kGap;
-            rows_.push_back(gap);
-        }
-        pushSection("Editor colours");
-        for (auto& row : editor)
-            pushContentRow(row);
-    }
+    Row section;
+    section.kind = RowKind::kSection;
+    section.headerText = title;
+    pushContentRow(section);
+    Row gap;
+    gap.kind = RowKind::kGap;
+    rows_.push_back(gap);
+    for (auto& row : colours)
+        pushContentRow(row);
 }

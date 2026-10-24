@@ -70,14 +70,29 @@ private:
         SkinEditorMappingsPanel& owner_;
     };
 
+    struct PaintRowSpec
+    {
+        const Row* item = nullptr;
+        juce::Rectangle<float> rowArea;
+        bool roundBottom = false;
+        bool highlighted = false;
+    };
+
     void rebuildRows();
+    /** Appends one object section + mapping rows; returns content Y after the table. */
+    int appendObjectTable(const TSS::DevSkin::NamedSkin& skin,
+                          TSS::SkinObjectType object,
+                          const std::vector<TSS::SkinColourKey>& objectKeys,
+                          int y);
+    Row makeMappingRow(const TSS::DevSkin::NamedSkin& skin,
+                       const TSS::SkinColourKey& key,
+                       int objectIndex) const;
     void rebuildObjectCombo(const juce::String& preferName);
     void tryBindRow(int row);
     void setFocusedObject(int objectIndex, bool scrollIntoPlace);
     void scrollFocusedObjectIntoPlace();
     void paintStickyLegend(juce::Graphics& g, juce::Rectangle<int> area) const;
-    void paintRow(juce::Graphics& g, const Row& item, juce::Rectangle<float> rowArea,
-                  bool roundBottom, bool highlighted) const;
+    void paintRow(juce::Graphics& g, PaintRowSpec spec) const;
     void layoutContent();
     int rowIndexAtY(int y) const noexcept;
     int paintWidth() const noexcept;

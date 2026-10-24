@@ -54,6 +54,9 @@ private:
     int nextContentRow(int row) const noexcept;
     bool isRowSelectedVisually(int row) const noexcept;
     int paintWidthForRow(int listRowWidth) const noexcept;
+    void roundFlagsForRow(int row, bool& roundTop, bool& roundBottom) const noexcept;
+    static bool isBlockBoundary(RowKind kind) noexcept;
+    void appendPaletteGroup(const juce::String& title, std::vector<Row>& colours, bool leadGap);
 
     TSS::DevSkin::Layer* layer_ = nullptr;
     juce::String skinId_;

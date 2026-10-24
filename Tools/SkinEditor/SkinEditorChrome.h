@@ -284,18 +284,23 @@ namespace SkinEditorChrome
         g.fillRoundedRectangle(area.toFloat(), kControlCorner);
     }
 
+    struct TableRowFill
+    {
+        juce::Rectangle<float> area;
+        juce::Colour fill;
+        bool roundTop = false;
+        bool roundBottom = false;
+    };
+
     /** Fill a table row; only outer corners of the whole table are rounded. */
-    inline void fillTableRow(juce::Graphics& g,
-                             juce::Rectangle<float> area,
-                             juce::Colour fill,
-                             bool roundTop,
-                             bool roundBottom)
+    inline void fillTableRow(juce::Graphics& g, TableRowFill spec)
     {
         juce::Path path;
-        path.addRoundedRectangle(area.getX(), area.getY(), area.getWidth(), area.getHeight(),
+        path.addRoundedRectangle(spec.area.getX(), spec.area.getY(),
+                                 spec.area.getWidth(), spec.area.getHeight(),
                                  kControlCorner, kControlCorner,
-                                 roundTop, roundTop, roundBottom, roundBottom);
-        g.setColour(fill);
+                                 spec.roundTop, spec.roundTop, spec.roundBottom, spec.roundBottom);
+        g.setColour(spec.fill);
         g.fillPath(path);
     }
 

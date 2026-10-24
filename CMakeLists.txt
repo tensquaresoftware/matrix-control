@@ -1094,9 +1094,12 @@ if(MATRIX_BUILD_SKIN_EDITOR)
         Tools/SkinEditor/Main.cpp
         Tools/SkinEditor/SkinEditorLookAndFeel.cpp
         Tools/SkinEditor/SkinEditorMainComponent.cpp
+        Tools/SkinEditor/SkinEditorMainComponentActions.cpp
+        Tools/SkinEditor/SkinEditorMainComponentSession.cpp
         Tools/SkinEditor/SkinEditorColourPicker.cpp
         Tools/SkinEditor/SkinEditorPalettePanel.cpp
         Tools/SkinEditor/SkinEditorMappingsPanel.cpp
+        Tools/SkinEditor/SkinEditorMappingsPanelRows.cpp
         Tools/SkinEditor/SkinEditorUnboundPanel.cpp
         ${MATRIX_SKIN_DEV_LAYER_SOURCES}
         Source/GUI/Skins/Skin.cpp

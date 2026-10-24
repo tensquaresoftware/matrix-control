@@ -1,28 +1,18 @@
 #include "Tools/SkinEditor/SkinEditorMappingsPanel.h"
 
-#include <map>
-
-#include "GUI/Skins/Dev/DevSkinInventory.h"
-#include "GUI/Skins/Dev/DevSkinKeyNames.h"
 #include "Tools/SkinEditor/SkinEditorChrome.h"
 
 namespace
 {
     constexpr int kColPad = 6;
-    /** Same as Palette: swatch left (x=4) → panel right = panelW - contentPad - 4. */
+    // Align Mapped column with Palette swatch→right inset.
     constexpr int kMappedSwatchToTableRight = SkinEditorChrome::kPalettePanelWidth
                                              - SkinEditorChrome::kPanelContentPad
                                              - 4;
-    /** Original swatch size in a 22px row with 4px insets. */
     constexpr int kSwatchSize = 14;
     constexpr int kMidInset = 4;
-    /** Extra air on first/last mapping rows so edge gaps match the 8px between swatches. */
-    constexpr int kEdgeExtra = 4;
-    /**
-     * Inset around each table so the 1 px outside focus ring is drawn inside the
-     * viewport (verticals were clipped at x = 0 / right edge).
-     */
-    constexpr int kFocusPad = 1;
+    constexpr int kEdgeExtra = 4; // first/last row air so edge gaps match inter-swatch 8px
+    constexpr int kFocusPad = 1;  // keep 1px outside focus ring inside the viewport
 
     struct ColumnLayout
     {
@@ -112,8 +102,8 @@ void SkinEditorMappingsPanel::refresh()
 
 void SkinEditorMappingsPanel::paintStickyLegend(juce::Graphics& g, juce::Rectangle<int> area) const
 {
-    SkinEditorChrome::fillTableRow(g, area.toFloat(), SkinEditorChrome::surfaceSection(),
-                                   true, true);
+    SkinEditorChrome::fillTableRow(g, { area.toFloat(), SkinEditorChrome::surfaceSection(),
+                                        true, true });
     const auto cols = columnsForWidth(area.getWidth());
     g.setColour(SkinEditorChrome::textTableHeader());
     g.setFont(SkinEditorChrome::fontBold());
@@ -231,29 +221,24 @@ void SkinEditorMappingsPanel::scrollFocusedObjectIntoPlace()
     viewport_.setViewPosition(0, juce::jlimit(0, maxY, targetY));
 }
 
-void SkinEditorMappingsPanel::paintRow(juce::Graphics& g,
-                                       const Row& item,
-                                       juce::Rectangle<float> rowArea,
-                                       bool roundBottom,
-                                       bool highlighted) const
+void SkinEditorMappingsPanel::paintRow(juce::Graphics& g, PaintRowSpec spec) const
 {
-    const int y = (int) rowArea.getY();
-    const int width = (int) rowArea.getWidth();
+    const auto& item = *spec.item;
+    const int y = (int) spec.rowArea.getY();
+    const int width = (int) spec.rowArea.getWidth();
 
     if (item.kind == RowKind::kSection)
     {
-        SkinEditorChrome::paintTableSectionHeader(g, rowArea, item.sectionTitle);
+        SkinEditorChrome::paintTableSectionHeader(g, spec.rowArea, item.sectionTitle);
         return;
     }
 
-    SkinEditorChrome::fillTableRow(g, rowArea, SkinEditorChrome::surfaceTable(),
-                                   false, roundBottom);
+    SkinEditorChrome::fillTableRow(g, { spec.rowArea, SkinEditorChrome::surfaceTable(),
+                                        false, spec.roundBottom });
+    if (spec.highlighted)
+        SkinEditorChrome::fillTableRow(g, { spec.rowArea, SkinEditorChrome::surfaceTableRowHighlight(),
+                                            false, spec.roundBottom });
 
-    if (highlighted)
-        SkinEditorChrome::fillTableRow(g, rowArea, SkinEditorChrome::surfaceTableRowHighlight(),
-                                       false, roundBottom);
-
-    // Text + swatch share the 22 px content band (edge extras sit outside it).
     const int contentY = y + (item.thickenTop ? kEdgeExtra : 0);
     const int contentH = SkinEditorChrome::kColumnHeaderHeight;
     const auto cols = columnsForWidth(width);
@@ -269,19 +254,18 @@ void SkinEditorMappingsPanel::paintRow(juce::Graphics& g,
         g.setColour(juce::Colour(0xffe0a020));
         g.drawText("Unbound", cols.mappedX, contentY, cols.mappedW, contentH,
                    juce::Justification::centredLeft, false);
+        return;
     }
-    else
-    {
-        SkinEditorChrome::paintColourSwatch(g,
-                                            juce::Rectangle<int>(cols.mappedX, contentY + kMidInset,
-                                                                 kSwatchSize, kSwatchSize),
-                                            juce::Colour(item.pastilleArgb));
-        g.setColour(SkinEditorChrome::textTableBody());
-        g.drawText(item.pastilleName,
-                   cols.mappedX + kSwatchSize + 6, contentY,
-                   juce::jmax(0, cols.mappedW - kSwatchSize - 8), contentH,
-                   juce::Justification::centredLeft, false);
-    }
+
+    SkinEditorChrome::paintColourSwatch(g,
+                                        juce::Rectangle<int>(cols.mappedX, contentY + kMidInset,
+                                                             kSwatchSize, kSwatchSize),
+                                        juce::Colour(item.pastilleArgb));
+    g.setColour(SkinEditorChrome::textTableBody());
+    g.drawText(item.pastilleName,
+               cols.mappedX + kSwatchSize + 6, contentY,
+               juce::jmax(0, cols.mappedW - kSwatchSize - 8), contentH,
+               juce::Justification::centredLeft, false);
 }
 
 void SkinEditorMappingsPanel::Content::paint(juce::Graphics& g)
@@ -309,7 +293,7 @@ void SkinEditorMappingsPanel::Content::paint(juce::Graphics& g)
                                          || owner_.rows_[static_cast<size_t>(i + 1)].kind != RowKind::kMapping);
             const auto rowArea = juce::Rectangle<float>((float) x0, (float) y, (float) width,
                                                         (float) item.heightPx);
-            owner_.paintRow(g, item, rowArea, roundBottom, i == owner_.selectedRow_);
+            owner_.paintRow(g, { &item, rowArea, roundBottom, i == owner_.selectedRow_ });
         }
         y = nextY;
     }
@@ -380,99 +364,6 @@ void SkinEditorMappingsPanel::rebuildObjectCombo(const juce::String& preferName)
     }
 
     updatingObjectCombo_ = false;
-}
-
-void SkinEditorMappingsPanel::rebuildRows()
-{
-    rows_.clear();
-    objects_.clear();
-    if (layer_ == nullptr)
-        return;
-
-    const auto* skin = layer_->findSkin(skinId_);
-    if (skin == nullptr)
-        return;
-
-    const auto keys = TSS::DevSkin::allStructuredKeys();
-    std::vector<TSS::SkinObjectType> objectOrder;
-    std::map<TSS::SkinObjectType, std::vector<TSS::SkinColourKey>> keysByObject;
-
-    for (const auto& key : keys)
-    {
-        auto& bucket = keysByObject[key.object];
-        if (bucket.empty())
-            objectOrder.push_back(key.object);
-        bucket.push_back(key);
-    }
-
-    bool firstObject = true;
-    int y = kFocusPad; // leave room for the outside focus ring above the first table
-    for (const auto object : objectOrder)
-    {
-        if (! firstObject)
-        {
-            Row gap;
-            gap.kind = RowKind::kGap;
-            gap.heightPx = SkinEditorChrome::kTableGapHeight;
-            rows_.push_back(gap);
-            y += gap.heightPx;
-        }
-        firstObject = false;
-
-        const int objectIndex = static_cast<int>(objects_.size());
-        ObjectTable table;
-        table.name = TSS::DevSkin::toString(object);
-        table.sectionY = y;
-
-        Row section;
-        section.kind = RowKind::kSection;
-        section.sectionTitle = table.name;
-        section.objectIndex = objectIndex;
-        section.heightPx = SkinEditorChrome::kColumnHeaderHeight;
-        rows_.push_back(section);
-        y += section.heightPx;
-
-        table.tableTop = y;
-        const auto& objectKeys = keysByObject[object];
-        for (size_t i = 0; i < objectKeys.size(); ++i)
-        {
-            const auto& key = objectKeys[i];
-            Row row;
-            row.kind = RowKind::kMapping;
-            row.objectIndex = objectIndex;
-            row.key = key;
-            row.propertyLabel = TSS::DevSkin::toString(key.property);
-            row.stateLabel = TSS::DevSkin::toString(key.state);
-            row.thickenTop = (i == 0);
-            row.thickenBottom = (i + 1 == objectKeys.size());
-            row.heightPx = SkinEditorChrome::kColumnHeaderHeight
-                           + (row.thickenTop ? kEdgeExtra : 0)
-                           + (row.thickenBottom ? kEdgeExtra : 0);
-
-            const auto it = skin->mappings.find(key);
-            if (it == skin->mappings.end() || it->second.isEmpty())
-            {
-                row.unbound = true;
-            }
-            else
-            {
-                row.pastilleName = it->second;
-                for (const auto& pastille : skin->palette)
-                {
-                    if (pastille.name == row.pastilleName)
-                    {
-                        row.pastilleArgb = pastille.argb;
-                        break;
-                    }
-                }
-            }
-
-            rows_.push_back(row);
-            y += row.heightPx;
-        }
-        table.tableBottom = y;
-        objects_.push_back(table);
-    }
 }
 
 void SkinEditorMappingsPanel::tryBindRow(int row)
