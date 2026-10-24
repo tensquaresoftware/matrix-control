@@ -1,0 +1,66 @@
+- id: "1"
+  title: Split SkinEditorChrome monolith
+  description: >-
+    CAP-3 / Slice 1: extract tokens, fonts/measure, panel paint, and table paint
+    from SkinEditorChrome.h into content-typed units without changing visuals.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Behavior-preserving only. Prefer thin umbrella header to keep call sites stable.
+    Register any new .cpp in Matrix-Control_SkinEditor target_sources. Smoke panel
+    silhouettes, mappings tabs, focus stroke, swatches, badges. See slices.md Slice 1.
+
+- id: "2"
+  title: Extract Skin Editor MainWindow shell
+  description: >-
+    CAP-4 / Slice 2: lift nested MainWindow and window placement/persist/zoom glue
+    out of Main.cpp into named units; keep restore and dirty-quit behavior identical.
+  spec_checkpoint: false
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Extra smoke: resize height, move, relaunch restore, maximise / title-bar double-click
+    zoom, dirty quit gate. See slices.md Slice 2 and inventory H2.
+
+- id: "3"
+  title: Clarify SkinEditorMainComponent boundaries
+  description: >-
+    CAP-5 / Slice 3: tighten includes and naming across MainComponent layout/actions/session
+    after Chrome split; no UX change; keep Actions/Session file split.
+  spec_checkpoint: false
+  done_checkpoint: false
+  invoke_dev_with: >-
+    Smoke New/Duplicate/Rename/Delete, Compare, Push, Export/Import, Undo/Redo, pastille
+    and colour→mappings refresh. See slices.md Slice 3.
+
+- id: "4"
+  title: Structure SkinEditorMappingsPanel
+  description: >-
+    CAP-6 / Slice 4: clarify paint/rebuild/bind boundaries and thin header nesting while
+    keeping bind, sticky legend, and focus silhouette behavior unchanged.
+  spec_checkpoint: false
+  done_checkpoint: false
+  invoke_dev_with: >-
+    Keep .cpp under ~400 useful lines. Smoke scroll, sticky legend, object combo, bind
+    with/without pastille, focus outline. See slices.md Slice 4.
+
+- id: "5"
+  title: Light pass on remaining panels and LookAndFeel
+  description: >-
+    CAP-6 / Slice 5: Palette, Unbound, ColourPicker, LookAndFeel — intentful names and
+    stable DRY only; no premature abstraction.
+  spec_checkpoint: false
+  done_checkpoint: false
+  invoke_dev_with: >-
+    Extract only 2nd–3rd stable duplication. Smoke palette, unbound, picker HSV/hex/RGB,
+    control look. See slices.md Slice 5.
+
+- id: "6"
+  title: Cleanup campaign close-out
+  description: >-
+    CAP-7 / Slice 6: confirm must-fix hotspots closed; document wontfix/defer leftovers;
+    verify zero Skin Editor findings on lint_touched.py --all.
+  spec_checkpoint: false
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Code only if a must-fix leftover was missed. Update residual debt table. Do not start
+    plugin-tree cleanup. See slices.md Slice 6.

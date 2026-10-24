@@ -1090,6 +1090,8 @@ if(MATRIX_BUILD_SKIN_EDITOR)
 
     target_sources(Matrix-Control_SkinEditor PRIVATE
         Tools/SkinEditor/Main.cpp
+        Tools/SkinEditor/SkinEditorChromePanel.cpp
+        Tools/SkinEditor/SkinEditorChromeTable.cpp
         Tools/SkinEditor/SkinEditorLookAndFeel.cpp
         Tools/SkinEditor/SkinEditorMainComponent.cpp
         Tools/SkinEditor/SkinEditorMainComponentActions.cpp

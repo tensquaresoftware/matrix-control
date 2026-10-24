@@ -2758,3 +2758,7 @@ Original review bullets below remain for history; status for U-10-owned residual
   evidence: Verification Gap; Core StandaloneWindowPlacementTests cover helpers only; extract normalize helper when adding coverage.
 - summary: No unit test that empty Palette selection cannot call setMapping with "".
   evidence: Verification Gap; UI guards exist today; Layer empty setMapping erases — worth a pin when touching bind again.
+
+- source_spec: `_bmad-output/specs/spec-skin-editor-clean-code-cleanup/stories/1-split-skineditorchrome-monolith.md`
+  summary: Extract shared private helper for duplicated count-badge width/clamp math in drawCountBadge and countBadgeWidth.
+  evidence: Pre-existed identically in the SkinEditorChrome monolith; Story 1 was move-only and did not introduce the duplication.
