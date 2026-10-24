@@ -4,7 +4,7 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
-/** Photoshop-style SV square + vertical hue + #hex + R/G/B (no preview swatch). */
+/** Photoshop-style SV square + vertical hue + #hex + R/G/B. */
 class SkinEditorColourPicker final : public juce::Component,
                                      private juce::TextEditor::Listener
 {
@@ -42,7 +42,9 @@ private:
 
     juce::Rectangle<int> svBounds_;
     juce::Rectangle<int> hueBounds_;
+    juce::Rectangle<int> titleTabBounds_;
 
+    juce::Label titleLabel_;
     juce::Label hexLabel_ { {}, "#" };
     juce::TextEditor hexEditor_;
     juce::Label rLabel_ { {}, "R" };

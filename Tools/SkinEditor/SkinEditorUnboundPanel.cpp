@@ -5,28 +5,18 @@
 
 namespace
 {
-    juce::String askPastille(const juce::StringArray& names)
-    {
-        juce::AlertWindow window("Bind Unbound", "Choose a Palette pastille id:",
-                                 juce::MessageBoxIconType::QuestionIcon);
-        window.addComboBox("pastille", names, "Pastille");
-        window.addButton("OK", 1, juce::KeyPress(juce::KeyPress::returnKey));
-        window.addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey));
-        if (window.runModalLoop() != 1)
-            return {};
-        if (auto* box = window.getComboBoxComponent("pastille"))
-            return box->getText();
-        return {};
-    }
+    /** Air between title glyphs and the count badge (tab side pads use kTitleTabPadH). */
+    constexpr int kTitleBadgeGap = 4;
 }
 
 SkinEditorUnboundPanel::SkinEditorUnboundPanel()
 {
+    SkinEditorChrome::stylePanelTitle(titleLabel_, "UNBOUND");
+    addAndMakeVisible(titleLabel_);
+
     list_.setRowHeight(22);
-    list_.setColour(juce::ListBox::backgroundColourId, SkinEditorChrome::surfacePanel());
+    list_.setColour(juce::ListBox::backgroundColourId, juce::Colours::transparentBlack);
     addAndMakeVisible(list_);
-    addAndMakeVisible(bindButton_);
-    bindButton_.onClick = [this] { promptBind(list_.getSelectedRow()); };
 }
 
 void SkinEditorUnboundPanel::setLayer(TSS::DevSkin::Layer* layer)
@@ -42,13 +32,16 @@ void SkinEditorUnboundPanel::setActiveSkinId(const juce::String& skinId)
 void SkinEditorUnboundPanel::setReadOnly(bool readOnly)
 {
     readOnly_ = readOnly;
-    bindButton_.setEnabled(! readOnly_ && ! forcedEmpty_);
 }
 
 void SkinEditorUnboundPanel::setForcedEmpty(bool forcedEmpty)
 {
     forcedEmpty_ = forcedEmpty;
-    bindButton_.setEnabled(! readOnly_ && ! forcedEmpty_);
+}
+
+void SkinEditorUnboundPanel::setSelectedPastilleName(const juce::String& name)
+{
+    selectedPastille_ = name;
 }
 
 void SkinEditorUnboundPanel::refresh()
@@ -60,27 +53,37 @@ void SkinEditorUnboundPanel::refresh()
     list_.deselectAllRows();
     list_.updateContent();
     list_.repaint();
-    bindButton_.setEnabled(false);
+    resized();
     repaint();
 }
 
 void SkinEditorUnboundPanel::paint(juce::Graphics& g)
 {
-    g.fillAll(SkinEditorChrome::surfacePanel());
-    g.setColour(SkinEditorChrome::textPrimary());
-    const auto count = forcedEmpty_ ? 0 : static_cast<int>(keys_.size());
-    g.drawText("Unbound (" + juce::String(count) + ")",
-               getLocalBounds().removeFromTop(22).reduced(SkinEditorChrome::kPanelPad, 0),
-               juce::Justification::centredLeft, false);
+    SkinEditorChrome::paintPanelFrame(g, getLocalBounds(), titleTabBounds_);
+    SkinEditorChrome::paintRoundedWell(g, list_.getBounds(), SkinEditorChrome::surfacePanel());
+    const int count = forcedEmpty_ ? 0 : static_cast<int>(keys_.size());
+    SkinEditorChrome::drawCountBadge(g, badgeBounds_, count);
 }
 
 void SkinEditorUnboundPanel::resized()
 {
-    auto bounds = getLocalBounds().reduced(SkinEditorChrome::kPanelPad);
-    bounds.removeFromTop(24);
-    auto actions = bounds.removeFromBottom(28);
-    bindButton_.setBounds(actions.removeFromLeft(80).reduced(1));
-    list_.setBounds(bounds);
+    const int count = forcedEmpty_ ? 0 : static_cast<int>(keys_.size());
+    const int badgeW = SkinEditorChrome::countBadgeWidth(count);
+    const int pad = SkinEditorChrome::kTitleTabPadH;
+    const int textW = SkinEditorChrome::measureTextWidth(SkinEditorChrome::fontTitle(), "UNBOUND");
+    // | pad | UNBOUND | gap | badge | pad | — right pad matches left; tab grows with badge.
+    const int tabW = pad + textW + kTitleBadgeGap + badgeW + pad;
+    const auto chrome = SkinEditorChrome::layoutPanel(getLocalBounds(), tabW);
+    titleTabBounds_ = chrome.tab;
+
+    auto tab = chrome.tab;
+    tab.removeFromLeft(pad);
+    titleLabel_.setBounds(tab.removeFromLeft(textW));
+    tab.removeFromLeft(kTitleBadgeGap);
+    badgeBounds_ = tab.removeFromLeft(badgeW)
+                       .withSizeKeepingCentre(badgeW, SkinEditorChrome::kCountBadgeDiameter)
+                       .translated(0, 1);
+    list_.setBounds(chrome.content);
 }
 
 int SkinEditorUnboundPanel::getNumRows()
@@ -93,39 +96,28 @@ void SkinEditorUnboundPanel::paintListBoxItem(int row, juce::Graphics& g, int wi
     if (row < 0 || row >= static_cast<int>(keys_.size()))
         return;
     if (selected)
-        g.fillAll(juce::Colour(0xff303030));
-    g.setColour(SkinEditorChrome::textPrimary());
+    {
+        g.setColour(juce::Colour(0xff303030));
+        g.fillRoundedRectangle(0.0f, 0.0f, (float) width, (float) height,
+                               SkinEditorChrome::kControlCorner);
+    }
+    g.setColour(SkinEditorChrome::textTableBody());
+    g.setFont(SkinEditorChrome::fontRegular());
     g.drawText(TSS::DevSkin::keyLabel(keys_[static_cast<size_t>(row)]),
-               6, 0, width - 12, height, juce::Justification::centredLeft);
+               6, 0, width - 12, height, juce::Justification::centredLeft, false);
 }
 
-void SkinEditorUnboundPanel::selectedRowsChanged(int)
+void SkinEditorUnboundPanel::listBoxItemClicked(int row, const juce::MouseEvent&)
 {
-    bindButton_.setEnabled(! readOnly_ && ! forcedEmpty_ && list_.getSelectedRow() >= 0);
+    tryBindRow(row);
 }
 
-void SkinEditorUnboundPanel::listBoxItemDoubleClicked(int row, const juce::MouseEvent&)
+void SkinEditorUnboundPanel::tryBindRow(int row)
 {
-    promptBind(row);
-}
-
-void SkinEditorUnboundPanel::promptBind(int row)
-{
-    if (readOnly_ || forcedEmpty_ || layer_ == nullptr || row < 0 || row >= static_cast<int>(keys_.size()))
+    if (readOnly_ || forcedEmpty_ || selectedPastille_.isEmpty() || onBindRequested == nullptr)
+        return;
+    if (row < 0 || row >= static_cast<int>(keys_.size()))
         return;
 
-    const auto* skin = layer_->findSkin(skinId_);
-    if (skin == nullptr)
-        return;
-
-    juce::StringArray names;
-    for (const auto& pastille : skin->palette)
-        names.add(pastille.name);
-    if (names.isEmpty())
-        return;
-
-    const auto chosen = askPastille(names);
-    if (chosen.isEmpty() || onBindRequested == nullptr)
-        return;
-    onBindRequested(keys_[static_cast<size_t>(row)], chosen);
+    onBindRequested(keys_[static_cast<size_t>(row)], selectedPastille_);
 }

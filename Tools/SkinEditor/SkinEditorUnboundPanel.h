@@ -17,6 +17,7 @@ public:
     void setReadOnly(bool readOnly);
     /** When Compare shows Product, Unbound must be empty. */
     void setForcedEmpty(bool forcedEmpty);
+    void setSelectedPastilleName(const juce::String& name);
     void refresh();
 
     std::function<void(TSS::SkinColourKey key, const juce::String& pastilleName)> onBindRequested;
@@ -27,17 +28,19 @@ public:
 private:
     int getNumRows() override;
     void paintListBoxItem(int row, juce::Graphics& g, int width, int height, bool selected) override;
-    void selectedRowsChanged(int lastRowSelected) override;
-    void listBoxItemDoubleClicked(int row, const juce::MouseEvent&) override;
+    void listBoxItemClicked(int row, const juce::MouseEvent&) override;
 
-    void promptBind(int row);
+    void tryBindRow(int row);
 
     TSS::DevSkin::Layer* layer_ = nullptr;
     juce::String skinId_;
+    juce::String selectedPastille_;
     bool readOnly_ = true;
     bool forcedEmpty_ = false;
     std::vector<TSS::SkinColourKey> keys_;
 
+    juce::Label titleLabel_;
     juce::ListBox list_ { "Unbound", this };
-    juce::TextButton bindButton_ { "Bind..." };
+    juce::Rectangle<int> titleTabBounds_;
+    juce::Rectangle<int> badgeBounds_;
 };

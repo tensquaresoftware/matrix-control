@@ -134,6 +134,12 @@ juce_add_binary_data(PluginFonts
         Assets/Fonts/Orbitron-Bold.ttf
         Assets/Fonts/Montserrat-Regular.ttf
         Assets/Fonts/Montserrat-Bold.ttf
+        Assets/Fonts/Inter-Regular.ttf
+        Assets/Fonts/Inter-Medium.ttf
+        Assets/Fonts/Inter-Bold.ttf
+        Assets/Fonts/Inter-ExtraBold.ttf
+        Assets/Fonts/Inter-Black.ttf
+        Assets/Fonts/JetBrainsMono-Regular.ttf
 )
 
 # ============================================================================
@@ -1086,6 +1092,7 @@ if(MATRIX_BUILD_SKIN_EDITOR)
 
     target_sources(Matrix-Control_SkinEditor PRIVATE
         Tools/SkinEditor/Main.cpp
+        Tools/SkinEditor/SkinEditorLookAndFeel.cpp
         Tools/SkinEditor/SkinEditorMainComponent.cpp
         Tools/SkinEditor/SkinEditorColourPicker.cpp
         Tools/SkinEditor/SkinEditorPalettePanel.cpp
@@ -1094,6 +1101,7 @@ if(MATRIX_BUILD_SKIN_EDITOR)
         ${MATRIX_SKIN_DEV_LAYER_SOURCES}
         Source/GUI/Skins/Skin.cpp
         Source/Shared/ProjectPaths.cpp
+        Source/Standalone/StandaloneTitleBarDoubleClick.cpp
     )
 
     target_include_directories(Matrix-Control_SkinEditor PRIVATE
@@ -1129,7 +1137,8 @@ endif()
 # Structure: {ARTEFACTS_DIR}/{OS}/{arch}/{format}/
 # - macOS: ARM/, Intel/, Intel-Rosetta/, Universal/
 # - Windows/Linux: no arch subfolder
-# Formats: VST3/, AU/ (macOS only), Standalone/. CLAP/ (Linux, future).
+# Formats: VST3/, AU/ (macOS only), Standalone/ (Matrix-Control + Skin Editor when enabled).
+# CLAP/ (Linux, future).
 # Intel = x86_64 native (Mac Intel). Intel-Rosetta = x86_64 cross-compiled on Apple Silicon.
 # Only copies formats selected for the project.
 # =============================================================================
@@ -1233,6 +1242,37 @@ if(COPY_TO_ARTEFACTS_DIR)
             COMMAND ${CMAKE_COMMAND} -E copy_directory "${AU_SOURCE_DIR}" "${AU_DEST_DIR}"
         )
     endif()
+
+    # Skin Editor (dev author tool — lands next to Matrix-Control in Standalone/)
+    if(MATRIX_BUILD_SKIN_EDITOR AND TARGET Matrix-Control_SkinEditor)
+        list(APPEND ALL_PLUGIN_TARGETS "Matrix-Control_SkinEditor")
+        if(APPLE)
+            set(SKIN_EDITOR_SOURCE "${CMAKE_BINARY_DIR}/Matrix-Control_SkinEditor_artefacts/$<CONFIG>/Matrix-Control Skin Editor.app")
+            set(SKIN_EDITOR_DEST_DIR "${ARTEFACTS_DEST}/Standalone/Matrix-Control Skin Editor.app")
+            list(APPEND COPY_COMMANDS
+                COMMAND ${CMAKE_COMMAND} -E echo "Copying Skin Editor to ${ARTEFACTS_DEST}/Standalone/"
+                COMMAND ${CMAKE_COMMAND} -E make_directory "${ARTEFACTS_DEST}/Standalone"
+                COMMAND ${CMAKE_COMMAND} -E remove_directory "${SKIN_EDITOR_DEST_DIR}"
+                COMMAND ${CMAKE_COMMAND} -E copy_directory "${SKIN_EDITOR_SOURCE}" "${SKIN_EDITOR_DEST_DIR}"
+            )
+        elseif(WIN32)
+            set(SKIN_EDITOR_SOURCE "${CMAKE_BINARY_DIR}/Matrix-Control_SkinEditor_artefacts/$<CONFIG>/Matrix-Control Skin Editor.exe")
+            set(SKIN_EDITOR_DEST "${ARTEFACTS_DEST}/Standalone/Matrix-Control Skin Editor.exe")
+            list(APPEND COPY_COMMANDS
+                COMMAND ${CMAKE_COMMAND} -E echo "Copying Skin Editor to ${ARTEFACTS_DEST}/Standalone/"
+                COMMAND ${CMAKE_COMMAND} -E make_directory "${ARTEFACTS_DEST}/Standalone"
+                COMMAND ${CMAKE_COMMAND} -E copy "${SKIN_EDITOR_SOURCE}" "${SKIN_EDITOR_DEST}"
+            )
+        else()
+            set(SKIN_EDITOR_SOURCE "${CMAKE_BINARY_DIR}/Matrix-Control_SkinEditor_artefacts/$<CONFIG>/Matrix-Control Skin Editor")
+            set(SKIN_EDITOR_DEST "${ARTEFACTS_DEST}/Standalone/Matrix-Control Skin Editor")
+            list(APPEND COPY_COMMANDS
+                COMMAND ${CMAKE_COMMAND} -E echo "Copying Skin Editor to ${ARTEFACTS_DEST}/Standalone/"
+                COMMAND ${CMAKE_COMMAND} -E make_directory "${ARTEFACTS_DEST}/Standalone"
+                COMMAND ${CMAKE_COMMAND} -E copy "${SKIN_EDITOR_SOURCE}" "${SKIN_EDITOR_DEST}"
+            )
+        endif()
+    endif()
     
     # Create the custom target with all copy commands
     add_custom_target(CopyToArtefactsDir ALL
@@ -1241,6 +1281,42 @@ if(COPY_TO_ARTEFACTS_DIR)
         COMMENT "Copying all plugin artefacts to ${ARTEFACTS_DEST}"
         VERBATIM
     )
+
+    # Skin Editor solo builds (`--target Matrix-Control_SkinEditor`) also land in Dropbox.
+    if(MATRIX_BUILD_SKIN_EDITOR AND TARGET Matrix-Control_SkinEditor)
+        if(APPLE)
+            add_custom_command(TARGET Matrix-Control_SkinEditor POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E echo "Copying Skin Editor to ${ARTEFACTS_DEST}/Standalone/"
+                COMMAND ${CMAKE_COMMAND} -E make_directory "${ARTEFACTS_DEST}/Standalone"
+                COMMAND ${CMAKE_COMMAND} -E remove_directory "${ARTEFACTS_DEST}/Standalone/Matrix-Control Skin Editor.app"
+                COMMAND ${CMAKE_COMMAND} -E copy_directory
+                    "$<TARGET_BUNDLE_DIR:Matrix-Control_SkinEditor>"
+                    "${ARTEFACTS_DEST}/Standalone/Matrix-Control Skin Editor.app"
+                COMMENT "Copy Skin Editor app to artefacts"
+                VERBATIM
+            )
+        elseif(WIN32)
+            add_custom_command(TARGET Matrix-Control_SkinEditor POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E echo "Copying Skin Editor to ${ARTEFACTS_DEST}/Standalone/"
+                COMMAND ${CMAKE_COMMAND} -E make_directory "${ARTEFACTS_DEST}/Standalone"
+                COMMAND ${CMAKE_COMMAND} -E copy
+                    "$<TARGET_FILE:Matrix-Control_SkinEditor>"
+                    "${ARTEFACTS_DEST}/Standalone/Matrix-Control Skin Editor.exe"
+                COMMENT "Copy Skin Editor exe to artefacts"
+                VERBATIM
+            )
+        else()
+            add_custom_command(TARGET Matrix-Control_SkinEditor POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E echo "Copying Skin Editor to ${ARTEFACTS_DEST}/Standalone/"
+                COMMAND ${CMAKE_COMMAND} -E make_directory "${ARTEFACTS_DEST}/Standalone"
+                COMMAND ${CMAKE_COMMAND} -E copy
+                    "$<TARGET_FILE:Matrix-Control_SkinEditor>"
+                    "${ARTEFACTS_DEST}/Standalone/Matrix-Control Skin Editor"
+                COMMENT "Copy Skin Editor binary to artefacts"
+                VERBATIM
+            )
+        endif()
+    endif()
 endif()
 
 # =============================================================================

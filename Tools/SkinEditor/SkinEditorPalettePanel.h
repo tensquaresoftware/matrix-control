@@ -28,27 +28,41 @@ public:
     void resized() override;
 
 private:
+    enum class RowKind
+    {
+        kGap,
+        kSection,
+        kColour
+    };
+
+    struct Row
+    {
+        RowKind kind = RowKind::kColour;
+        juce::String name;
+        juce::uint32 argb = 0;
+        bool product = false;
+        juce::String headerText;
+        bool isBottomHalf = false;
+    };
+
     int getNumRows() override;
     void paintListBoxItem(int row, juce::Graphics& g, int width, int height, bool selected) override;
     void selectedRowsChanged(int lastRowSelected) override;
 
-    struct Row
-    {
-        juce::String name;
-        juce::uint32 argb = 0;
-        bool product = false;
-        bool sectionHeader = false;
-        juce::String headerText;
-    };
-
     void rebuildRows();
+    void pushContentRow(Row row);
+    int nextContentRow(int row) const noexcept;
+    bool isRowSelectedVisually(int row) const noexcept;
+    int paintWidthForRow(int listRowWidth) const noexcept;
 
     TSS::DevSkin::Layer* layer_ = nullptr;
     juce::String skinId_;
     bool readOnly_ = true;
     std::vector<Row> rows_;
 
+    juce::Label titleLabel_;
+    juce::Rectangle<int> titleTabBounds_;
     juce::ListBox list_ { "Palette", this };
-    juce::TextButton addButton_ { "+ Add" };
-    juce::TextButton deleteButton_ { "Delete..." };
+    juce::TextButton addButton_ { "Add" };
+    juce::TextButton deleteButton_ { "Delete" };
 };

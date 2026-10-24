@@ -4,17 +4,26 @@
 
 SkinEditorColourPicker::SkinEditorColourPicker()
 {
+    SkinEditorChrome::stylePanelTitle(titleLabel_, "COLOR");
+    addAndMakeVisible(titleLabel_);
+
     for (auto* label : { &hexLabel_, &rLabel_, &gLabel_, &bLabel_ })
     {
+        label->setFont(SkinEditorChrome::fontRegular());
         label->setColour(juce::Label::textColourId, SkinEditorChrome::textMuted());
+        SkinEditorChrome::preventTextSquish(*label);
         addAndMakeVisible(*label);
     }
+    // Sit the letter against its field (gap lives to the left of the label).
+    for (auto* label : { &rLabel_, &gLabel_, &bLabel_ })
+        label->setJustificationType(juce::Justification::centredRight);
 
     auto styleEditor = [this](juce::TextEditor& ed)
     {
+        ed.setFont(SkinEditorChrome::fontMono());
         ed.setColour(juce::TextEditor::backgroundColourId, SkinEditorChrome::surfaceApp());
         ed.setColour(juce::TextEditor::textColourId, SkinEditorChrome::textPrimary());
-        ed.setColour(juce::TextEditor::outlineColourId, SkinEditorChrome::textMuted());
+        ed.setColour(juce::TextEditor::outlineColourId, SkinEditorChrome::controlOutline());
         ed.addListener(this);
         addAndMakeVisible(ed);
     };
@@ -32,8 +41,9 @@ SkinEditorColourPicker::SkinEditorColourPicker()
 
 void SkinEditorColourPicker::setColour(juce::Colour colour, juce::NotificationType notification)
 {
-    colour_ = colour.withAlpha(1.0f);
-    colour_.getHSB(hue_, sat_, val_);
+    colour_ = colour; // keep alpha so the damier preview can show transparency
+    auto opaque = colour_.withAlpha(1.0f);
+    opaque.getHSB(hue_, sat_, val_);
     syncEditorsFromColour(false);
     repaint();
     if (notification != juce::dontSendNotification)
@@ -52,12 +62,8 @@ void SkinEditorColourPicker::setEnabledEditing(bool canEdit)
 
 void SkinEditorColourPicker::paint(juce::Graphics& g)
 {
-    g.fillAll(SkinEditorChrome::surfacePanel());
-    g.setColour(SkinEditorChrome::textPrimary());
-    g.drawText("Color", getLocalBounds().removeFromTop(22).reduced(SkinEditorChrome::kPanelPad, 0),
-               juce::Justification::centredLeft, false);
+    SkinEditorChrome::paintPanelFrame(g, getLocalBounds(), titleTabBounds_);
 
-    // SV square
     if (! svBounds_.isEmpty())
     {
         juce::ColourGradient satGrad(juce::Colours::white, (float) svBounds_.getX(), (float) svBounds_.getY(),
@@ -79,7 +85,6 @@ void SkinEditorColourPicker::paint(juce::Graphics& g)
         g.drawEllipse((float) cx - 4.0f, (float) cy - 4.0f, 8.0f, 8.0f, 1.0f);
     }
 
-    // Hue strip
     if (! hueBounds_.isEmpty())
     {
         for (int y = 0; y < hueBounds_.getHeight(); ++y)
@@ -96,29 +101,48 @@ void SkinEditorColourPicker::paint(juce::Graphics& g)
 
 void SkinEditorColourPicker::resized()
 {
-    auto bounds = getLocalBounds().reduced(SkinEditorChrome::kPanelPad);
-    bounds.removeFromTop(24);
+    const auto chrome = SkinEditorChrome::layoutPanel(getLocalBounds(),
+                                                      SkinEditorChrome::titleTabWidth("COLOR"));
+    titleTabBounds_ = chrome.tab;
+    titleLabel_.setBounds(chrome.tab);
+    auto bounds = chrome.content;
 
-    auto bottom = bounds.removeFromBottom(72);
-    auto hexRow = bottom.removeFromTop(24);
-    hexLabel_.setBounds(hexRow.removeFromLeft(16));
-    hexEditor_.setBounds(hexRow.removeFromLeft(72));
-    hexRow.removeFromLeft(8);
-    auto placeRgb = [&hexRow](juce::Label& lab, juce::TextEditor& ed)
-    {
-        lab.setBounds(hexRow.removeFromLeft(14));
-        ed.setBounds(hexRow.removeFromLeft(40));
-        hexRow.removeFromLeft(4);
-    };
-    placeRgb(rLabel_, rEditor_);
-    placeRgb(gLabel_, gEditor_);
-    placeRgb(bLabel_, bEditor_);
-
-    bounds.removeFromBottom(8);
+    constexpr int kFieldRowH = 24;
     const int hueW = 18;
-    hueBounds_ = bounds.removeFromRight(hueW);
-    bounds.removeFromRight(8);
-    svBounds_ = bounds;
+    const int side = juce::jmin(bounds.getWidth() - hueW - 8,
+                                bounds.getHeight() - kFieldRowH - SkinEditorChrome::kPanelContentPad);
+    svBounds_ = { bounds.getX(), bounds.getY(), side, side };
+    hueBounds_ = { svBounds_.getRight() + 8, svBounds_.getY(), hueW, side };
+
+    // Fixed control widths (font-based only) — do not shrink with the panel / window.
+    const auto labelFont = SkinEditorChrome::fontRegular();
+    const auto monoFont = SkinEditorChrome::fontMono();
+    const int hashW = SkinEditorChrome::measureLabelWidth("#", labelFont);
+    const int rgbLabW = SkinEditorChrome::measureTextWidth(labelFont, "R") + 2;
+    constexpr int kLabelToField = 4;
+    constexpr int kRgbGap = 9;
+    const int hexW0 = SkinEditorChrome::measureTextWidth(monoFont, "FFFFFF") + 8;
+    const int hexW = juce::jmax(24, juce::roundToInt((float) hexW0 * 1.2f) - 8 + 4 - 3);
+    const int edW = juce::jmax(28, SkinEditorChrome::measureTextWidth(monoFont, "255") + 12 - 2);
+    const int rgbGroupW = 3 * (rgbLabW + kLabelToField + edW) + 2 * kRgbGap;
+
+    const int rowY = svBounds_.getBottom() + SkinEditorChrome::kPanelContentPad;
+    // # / hex stay left under the SV; R/G/B pack to the right so B aligns with SV right.
+    hexLabel_.setBounds(svBounds_.getX(), rowY, hashW, kFieldRowH);
+    hexEditor_.setBounds(svBounds_.getX() + hashW, rowY, hexW, kFieldRowH);
+
+    auto rgbRow = juce::Rectangle<int>(svBounds_.getRight() - rgbGroupW, rowY, rgbGroupW, kFieldRowH);
+    auto placeRgb = [&rgbRow, rgbLabW, edW](juce::Label& lab, juce::TextEditor& ed, bool last)
+    {
+        lab.setBounds(rgbRow.removeFromLeft(rgbLabW));
+        rgbRow.removeFromLeft(kLabelToField);
+        ed.setBounds(rgbRow.removeFromLeft(edW));
+        if (! last)
+            rgbRow.removeFromLeft(kRgbGap);
+    };
+    placeRgb(rLabel_, rEditor_, false);
+    placeRgb(gLabel_, gEditor_, false);
+    placeRgb(bLabel_, bEditor_, true);
 }
 
 void SkinEditorColourPicker::mouseDown(const juce::MouseEvent& e)

@@ -6,6 +6,8 @@
 #include "GUI/Skins/Dev/DevSkinJson.h"
 #include "GUI/Skins/Dev/DevSkinLayer.h"
 #include "GUI/Skins/Dev/DevSkinSession.h"
+#include "Tools/SkinEditor/SkinEditorChrome.h"
+#include "Tools/SkinEditor/SkinEditorLookAndFeel.h"
 #include "Tools/SkinEditor/SkinEditorColourPicker.h"
 #include "Tools/SkinEditor/SkinEditorMappingsPanel.h"
 #include "Tools/SkinEditor/SkinEditorPalettePanel.h"
@@ -25,6 +27,7 @@ public:
 
     void paint(juce::Graphics& g) override;
     void resized() override;
+    bool keyPressed(const juce::KeyPress& key) override;
 
 private:
     void comboBoxChanged(juce::ComboBox*) override;
@@ -57,9 +60,28 @@ private:
     void onDeletePastille();
     void onColourChanged(juce::Colour colour);
     void onPastilleSelected(const juce::String& name);
+    void onUndo();
+    void onRedo();
+
+    void syncCompareButtonChrome();
+    void tickCompareBlink();
 
     /** Export current Editor skin; returns true on successful write. */
     bool exportCurrentEditorSkinToFile(const juce::File& file);
+
+    SkinEditorChrome::LookAndFeel lookAndFeel_;
+
+    struct BlinkTimer final : juce::Timer
+    {
+        std::function<void()> onTick;
+        void timerCallback() override
+        {
+            if (onTick != nullptr)
+                onTick();
+        }
+    };
+    BlinkTimer compareBlinkTimer_;
+    bool compareBlinkLit_ = true;
 
     TSS::DevSkin::Layer layer_;
     TSS::DevSkin::BridgeClient bridge_;
@@ -72,16 +94,23 @@ private:
     juce::Label titleLabel_;
     juce::Label connectionLabel_;
     juce::Label lastPushLabel_;
+    juce::Label versionLabel_;
+    int titleBarSeparatorX_ = -1;
+    int titleBarSeparatorY_ = 0;
+    int titleBarSeparatorH_ = 0;
 
-    juce::Label productLabel_ { {}, "Product skin" };
+    juce::Label skinsTitleLabel_;
+    juce::Label productLabel_ { {}, "Product:" };
     juce::ComboBox productCombo_;
-    juce::Label editorLabel_ { {}, "Editor skin" };
+    juce::Label editorLabel_ { {}, "Editor:" };
     juce::ComboBox editorCombo_;
 
-    juce::TextButton duplicateButton_ { "Duplicate" };
     juce::TextButton newButton_ { "New" };
+    juce::TextButton duplicateButton_ { "Duplicate" };
     juce::TextButton renameButton_ { "Rename" };
     juce::TextButton deleteButton_ { "Delete" };
+    juce::TextButton undoButton_ { "Undo" };
+    juce::TextButton redoButton_ { "Redo" };
     juce::TextButton compareButton_ { "Compare" };
     juce::TextButton pushButton_ { "Push" };
     juce::TextButton exportButton_ { "Export" };
@@ -91,4 +120,8 @@ private:
     SkinEditorPalettePanel palettePanel_;
     SkinEditorMappingsPanel mappingsPanel_;
     SkinEditorUnboundPanel unboundPanel_;
+
+    std::vector<int> separatorXs_;
+    int separatorY_ = 0;
+    int separatorH_ = SkinEditorChrome::kButtonHeight;
 };

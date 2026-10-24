@@ -123,6 +123,8 @@ namespace
 {
 // JUCE sets the NSWindow as its own NSWindowDelegate; title-bar double-click / zoom
 // asks windowShouldZoom:toFrame:. Return NO and recentre so OS zoom is not product behaviour.
+// (Do not swizzle windowWillUseStandardFrame:defaultFrame: — CGRect IMP replace is
+// ABI-fragile and was observed to pin windows at 0,0.)
 using WindowShouldZoomFn = BOOL (*) (id, SEL, id, CGRect);
 
 std::unordered_map<const void*, TitleBarDoubleClickHook::Callback>& macZoomCallbacks()
