@@ -149,7 +149,7 @@ void SkinEditorMainComponent::refreshAll()
     mappingsPanel_.refresh();
 
     unboundPanel_.setActiveSkinId(visibleId);
-    unboundPanel_.setForcedEmpty(compareProduct);
+    unboundPanel_.setEmptyForCompareProduct(compareProduct);
     unboundPanel_.setReadOnly(compareProduct || ! editable);
     unboundPanel_.setSelectedPastilleName(selectedPastille_);
     unboundPanel_.refresh();

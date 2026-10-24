@@ -14,7 +14,8 @@ SkinEditorUnboundPanel::SkinEditorUnboundPanel()
     SkinEditorChrome::stylePanelTitle(titleLabel_, "UNBOUND");
     addAndMakeVisible(titleLabel_);
 
-    list_.setRowHeight(22);
+    // Same body-row height as Mappings / Palette visual rows (token name is historical).
+    list_.setRowHeight(SkinEditorChrome::kColumnHeaderHeight);
     list_.setColour(juce::ListBox::backgroundColourId, juce::Colours::transparentBlack);
     addAndMakeVisible(list_);
 }
@@ -34,9 +35,9 @@ void SkinEditorUnboundPanel::setReadOnly(bool readOnly)
     readOnly_ = readOnly;
 }
 
-void SkinEditorUnboundPanel::setForcedEmpty(bool forcedEmpty)
+void SkinEditorUnboundPanel::setEmptyForCompareProduct(bool empty)
 {
-    forcedEmpty_ = forcedEmpty;
+    emptyForCompareProduct_ = empty;
 }
 
 void SkinEditorUnboundPanel::setSelectedPastilleName(const juce::String& name)
@@ -47,7 +48,7 @@ void SkinEditorUnboundPanel::setSelectedPastilleName(const juce::String& name)
 void SkinEditorUnboundPanel::refresh()
 {
     keys_.clear();
-    if (! forcedEmpty_ && layer_ != nullptr)
+    if (! emptyForCompareProduct_ && layer_ != nullptr)
         keys_ = layer_->unboundKeys(skinId_);
 
     list_.deselectAllRows();
@@ -61,13 +62,13 @@ void SkinEditorUnboundPanel::paint(juce::Graphics& g)
 {
     SkinEditorChrome::paintPanelFrame(g, getLocalBounds(), titleTabBounds_);
     SkinEditorChrome::paintRoundedWell(g, list_.getBounds(), SkinEditorChrome::surfacePanel());
-    const int count = forcedEmpty_ ? 0 : static_cast<int>(keys_.size());
+    const int count = emptyForCompareProduct_ ? 0 : static_cast<int>(keys_.size());
     SkinEditorChrome::drawCountBadge(g, badgeBounds_, count);
 }
 
 void SkinEditorUnboundPanel::resized()
 {
-    const int count = forcedEmpty_ ? 0 : static_cast<int>(keys_.size());
+    const int count = emptyForCompareProduct_ ? 0 : static_cast<int>(keys_.size());
     const int badgeW = SkinEditorChrome::countBadgeWidth(count);
     const int pad = SkinEditorChrome::kTitleTabPadH;
     const int textW = SkinEditorChrome::measureTextWidth(SkinEditorChrome::fontTitle(), "UNBOUND");
@@ -114,7 +115,7 @@ void SkinEditorUnboundPanel::listBoxItemClicked(int row, const juce::MouseEvent&
 
 void SkinEditorUnboundPanel::tryBindRow(int row)
 {
-    if (readOnly_ || forcedEmpty_ || onBindRequested == nullptr)
+    if (readOnly_ || emptyForCompareProduct_ || onBindRequested == nullptr)
         return;
     if (row < 0 || row >= static_cast<int>(keys_.size()))
         return;

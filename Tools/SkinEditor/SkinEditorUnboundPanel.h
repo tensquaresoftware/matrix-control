@@ -15,8 +15,8 @@ public:
     void setLayer(TSS::DevSkin::Layer* layer);
     void setActiveSkinId(const juce::String& skinId);
     void setReadOnly(bool readOnly);
-    /** When Compare shows Product, Unbound must be empty. */
-    void setForcedEmpty(bool forcedEmpty);
+    /** When Compare shows Product, Unbound must show an empty list. */
+    void setEmptyForCompareProduct(bool empty);
     void setSelectedPastilleName(const juce::String& name);
     void refresh();
 
@@ -38,7 +38,7 @@ private:
     juce::String skinId_;
     juce::String selectedPastille_;
     bool readOnly_ = true;
-    bool forcedEmpty_ = false;
+    bool emptyForCompareProduct_ = false;
     std::vector<TSS::SkinColourKey> keys_;
 
     juce::Label titleLabel_;

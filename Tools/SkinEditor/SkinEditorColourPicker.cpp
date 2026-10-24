@@ -36,7 +36,7 @@ SkinEditorColourPicker::SkinEditorColourPicker()
     styleEditor(gEditor_);
     styleEditor(bEditor_);
 
-    syncEditorsFromColour(false);
+    syncEditorsFromColour();
 }
 
 void SkinEditorColourPicker::setColour(juce::Colour colour, juce::NotificationType notification)
@@ -44,7 +44,7 @@ void SkinEditorColourPicker::setColour(juce::Colour colour, juce::NotificationTy
     colour_ = colour; // keep alpha so the damier preview can show transparency
     auto opaque = colour_.withAlpha(1.0f);
     opaque.getHSB(hue_, sat_, val_);
-    syncEditorsFromColour(false);
+    syncEditorsFromColour();
     repaint();
     if (notification != juce::dontSendNotification)
         notifyChanged();
@@ -156,15 +156,9 @@ void SkinEditorColourPicker::mouseDrag(const juce::MouseEvent& e)
         return;
 
     if (svBounds_.contains(e.getPosition()))
-        updateFromSvOrHue(e.position, false);
+        updateFromSvDrag(e.position);
     else if (hueBounds_.contains(e.getPosition()))
-        updateFromSvOrHue(e.position, true);
-}
-
-void SkinEditorColourPicker::textEditorTextChanged(juce::TextEditor&)
-{
-    if (suppressEditorCallback_ || ! editingEnabled_)
-        return;
+        updateFromHueDrag(e.position);
 }
 
 void SkinEditorColourPicker::textEditorReturnKeyPressed(juce::TextEditor& ed)
@@ -179,7 +173,7 @@ void SkinEditorColourPicker::textEditorReturnKeyPressed(juce::TextEditor& ed)
 
 void SkinEditorColourPicker::textEditorFocusLost(juce::TextEditor& ed)
 {
-    if (! editingEnabled_ || suppressEditorCallback_)
+    if (! editingEnabled_ || isSyncingEditors_)
         return;
     if (&ed == &hexEditor_)
         applyHexFromEditor();
@@ -187,9 +181,9 @@ void SkinEditorColourPicker::textEditorFocusLost(juce::TextEditor& ed)
         applyRgbFromEditors();
 }
 
-void SkinEditorColourPicker::syncEditorsFromColour(bool)
+void SkinEditorColourPicker::syncEditorsFromColour()
 {
-    const juce::ScopedValueSetter<bool> scope(suppressEditorCallback_, true);
+    const juce::ScopedValueSetter<bool> scope(isSyncingEditors_, true);
     hexEditor_.setText(juce::String::formatted("%02X%02X%02X",
                                                colour_.getRed(),
                                                colour_.getGreen(),
@@ -205,13 +199,13 @@ void SkinEditorColourPicker::applyHexFromEditor()
     auto text = hexEditor_.getText().trim().trimCharactersAtStart("#");
     if (text.length() != 6)
     {
-        syncEditorsFromColour(false);
+        syncEditorsFromColour();
         return;
     }
     for (int i = 0; i < text.length(); ++i)
         if (juce::CharacterFunctions::getHexDigitValue(text[i]) < 0)
         {
-            syncEditorsFromColour(false);
+            syncEditorsFromColour();
             return;
         }
 
@@ -229,25 +223,29 @@ void SkinEditorColourPicker::applyRgbFromEditors()
               juce::sendNotification);
 }
 
-void SkinEditorColourPicker::updateFromSvOrHue(juce::Point<float> pos, bool isHue)
+void SkinEditorColourPicker::updateFromSvDrag(juce::Point<float> pos)
 {
-    if (isHue)
-    {
-        hue_ = juce::jlimit(0.0f, 1.0f,
-                            (pos.y - (float) hueBounds_.getY())
-                                / (float) juce::jmax(1, hueBounds_.getHeight() - 1));
-    }
-    else
-    {
-        sat_ = juce::jlimit(0.0f, 1.0f,
-                            (pos.x - (float) svBounds_.getX())
-                                / (float) juce::jmax(1, svBounds_.getWidth() - 1));
-        val_ = juce::jlimit(0.0f, 1.0f,
-                            1.0f - (pos.y - (float) svBounds_.getY())
-                                       / (float) juce::jmax(1, svBounds_.getHeight() - 1));
-    }
+    sat_ = juce::jlimit(0.0f, 1.0f,
+                        (pos.x - (float) svBounds_.getX())
+                            / (float) juce::jmax(1, svBounds_.getWidth() - 1));
+    val_ = juce::jlimit(0.0f, 1.0f,
+                        1.0f - (pos.y - (float) svBounds_.getY())
+                                   / (float) juce::jmax(1, svBounds_.getHeight() - 1));
+    applyHsvaFromDrag();
+}
+
+void SkinEditorColourPicker::updateFromHueDrag(juce::Point<float> pos)
+{
+    hue_ = juce::jlimit(0.0f, 1.0f,
+                        (pos.y - (float) hueBounds_.getY())
+                            / (float) juce::jmax(1, hueBounds_.getHeight() - 1));
+    applyHsvaFromDrag();
+}
+
+void SkinEditorColourPicker::applyHsvaFromDrag()
+{
     colour_ = juce::Colour::fromHSV(hue_, sat_, val_, colour_.getFloatAlpha());
-    syncEditorsFromColour(false);
+    syncEditorsFromColour();
     repaint();
     notifyChanged();
 }

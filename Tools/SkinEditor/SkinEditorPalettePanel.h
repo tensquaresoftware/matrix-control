@@ -40,9 +40,10 @@ private:
         RowKind kind = RowKind::kColour;
         juce::String name;
         juce::uint32 argb = 0;
-        bool product = false;
+        bool isProduct = false;
         juce::String headerText;
-        bool isBottomHalf = false;
+        /** Second ListBox row of a visual pair (half of kColumnHeaderHeight). */
+        bool isLowerListHalf = false;
     };
 
     int getNumRows() override;
@@ -50,10 +51,11 @@ private:
     void selectedRowsChanged(int lastRowSelected) override;
 
     void rebuildRows();
-    void pushContentRow(Row row);
-    int nextContentRow(int row) const noexcept;
+    /** Push upper + lower half-height ListBox rows for one visual content row. */
+    void pushSplitListRow(Row row);
+    int nextUpperListRow(int row) const noexcept;
     bool isRowSelectedVisually(int row) const noexcept;
-    int paintWidthForRow(int listRowWidth) const noexcept;
+    int paintWidth() const noexcept;
     void roundFlagsForRow(int row, bool& roundTop, bool& roundBottom) const noexcept;
     static bool isBlockBoundary(RowKind kind) noexcept;
     void appendPaletteGroup(const juce::String& title, std::vector<Row>& colours, bool leadGap);

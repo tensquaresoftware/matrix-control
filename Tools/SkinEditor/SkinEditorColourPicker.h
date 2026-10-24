@@ -23,21 +23,22 @@ public:
     void mouseDrag(const juce::MouseEvent& e) override;
 
 private:
-    void textEditorTextChanged(juce::TextEditor&) override;
     void textEditorReturnKeyPressed(juce::TextEditor&) override;
     void textEditorFocusLost(juce::TextEditor&) override;
 
-    void syncEditorsFromColour(bool notify);
+    void syncEditorsFromColour();
     void applyHexFromEditor();
     void applyRgbFromEditors();
-    void updateFromSvOrHue(juce::Point<float> pos, bool isHue);
+    void updateFromSvDrag(juce::Point<float> pos);
+    void updateFromHueDrag(juce::Point<float> pos);
+    void applyHsvaFromDrag();
     void notifyChanged();
 
     juce::Colour colour_ { juce::Colours::white };
     float hue_ = 0.0f;
     float sat_ = 1.0f;
     float val_ = 1.0f;
-    bool suppressEditorCallback_ = false;
+    bool isSyncingEditors_ = false;
     bool editingEnabled_ = true;
 
     juce::Rectangle<int> svBounds_;

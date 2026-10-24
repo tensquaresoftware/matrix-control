@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Tools/SkinEditor/SkinEditorChrome.h"
+#include <juce_gui_basics/juce_gui_basics.h>
 
 namespace SkinEditorChrome
 {

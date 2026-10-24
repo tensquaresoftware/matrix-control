@@ -1,5 +1,7 @@
 #include "Tools/SkinEditor/SkinEditorLookAndFeel.h"
 
+#include "Tools/SkinEditor/SkinEditorChromeFonts.h"
+
 namespace SkinEditorChrome
 {
     LookAndFeel::LookAndFeel()

@@ -69,7 +69,7 @@ void SkinEditorPalettePanel::selectPastille(const juce::String& name)
 {
     for (size_t i = 0; i < rows_.size(); ++i)
     {
-        if (rows_[i].kind == RowKind::kColour && ! rows_[i].isBottomHalf && rows_[i].name == name)
+        if (rows_[i].kind == RowKind::kColour && ! rows_[i].isLowerListHalf && rows_[i].name == name)
         {
             list_.selectRow(static_cast<int>(i));
             return;
@@ -103,7 +103,7 @@ void SkinEditorPalettePanel::resized()
         vp->setScrollBarThickness(SkinEditorChrome::kScrollTrackWidth);
 
     // Align Add/Delete with the table paint width (not the scroll track).
-    const int tableW = paintWidthForRow(list_.getWidth());
+    const int tableW = paintWidth();
     auto actionRow = juce::Rectangle<int>(list_.getX(), actions.getY(), tableW, actions.getHeight());
     const int half = (actionRow.getWidth() - SkinEditorChrome::kButtonGap) / 2;
     addButton_.setBounds(actionRow.removeFromLeft(juce::jmax(1, half)));
@@ -111,25 +111,24 @@ void SkinEditorPalettePanel::resized()
     deleteButton_.setBounds(actionRow);
 }
 
-int SkinEditorPalettePanel::paintWidthForRow(int listRowWidth) const noexcept
+int SkinEditorPalettePanel::paintWidth() const noexcept
 {
     // Keep table fills out of the scroll-track band even when the bar is hidden.
-    juce::ignoreUnused(listRowWidth);
     return juce::jmax(1, list_.getWidth() - SkinEditorChrome::kScrollTrackWidth);
 }
 
-void SkinEditorPalettePanel::pushContentRow(Row row)
+void SkinEditorPalettePanel::pushSplitListRow(Row row)
 {
-    row.isBottomHalf = false;
+    row.isLowerListHalf = false;
     rows_.push_back(row);
-    row.isBottomHalf = true;
+    row.isLowerListHalf = true;
     rows_.push_back(row);
 }
 
-int SkinEditorPalettePanel::nextContentRow(int row) const noexcept
+int SkinEditorPalettePanel::nextUpperListRow(int row) const noexcept
 {
     int i = row + 1;
-    while (i < static_cast<int>(rows_.size()) && rows_[static_cast<size_t>(i)].isBottomHalf)
+    while (i < static_cast<int>(rows_.size()) && rows_[static_cast<size_t>(i)].isLowerListHalf)
         ++i;
     return i;
 }
@@ -140,9 +139,9 @@ bool SkinEditorPalettePanel::isRowSelectedVisually(int row) const noexcept
         return true;
     if (row < 0 || row >= static_cast<int>(rows_.size()))
         return false;
-    if (rows_[static_cast<size_t>(row)].isBottomHalf)
+    if (rows_[static_cast<size_t>(row)].isLowerListHalf)
         return list_.isRowSelected(row - 1);
-    if (row + 1 < static_cast<int>(rows_.size()) && rows_[static_cast<size_t>(row + 1)].isBottomHalf)
+    if (row + 1 < static_cast<int>(rows_.size()) && rows_[static_cast<size_t>(row + 1)].isLowerListHalf)
         return list_.isRowSelected(row + 1);
     return false;
 }
@@ -160,14 +159,14 @@ bool SkinEditorPalettePanel::isBlockBoundary(RowKind kind) noexcept
 void SkinEditorPalettePanel::roundFlagsForRow(int row, bool& roundTop, bool& roundBottom) const noexcept
 {
     const auto& item = rows_[static_cast<size_t>(row)];
-    const int contentRow = item.isBottomHalf ? row - 1 : row;
-    const int next = nextContentRow(contentRow);
+    const int upperListRow = item.isLowerListHalf ? row - 1 : row;
+    const int next = nextUpperListRow(upperListRow);
     const auto nextKind = (next < static_cast<int>(rows_.size()))
                               ? rows_[static_cast<size_t>(next)].kind
                               : RowKind::kGap;
 
-    int prev = contentRow - 1;
-    while (prev >= 0 && rows_[static_cast<size_t>(prev)].isBottomHalf)
+    int prev = upperListRow - 1;
+    while (prev >= 0 && rows_[static_cast<size_t>(prev)].isLowerListHalf)
         --prev;
     const bool startsBlock = prev < 0 || isBlockBoundary(rows_[static_cast<size_t>(prev)].kind);
 
@@ -187,9 +186,9 @@ void SkinEditorPalettePanel::paintListBoxItem(int row, juce::Graphics& g, int wi
     if (item.kind == RowKind::kGap)
         return;
 
-    const int paintW = paintWidthForRow(width);
+    const int paintW = paintWidth();
     const int fullH = SkinEditorChrome::kColumnHeaderHeight;
-    const int yOff = item.isBottomHalf ? -height : 0;
+    const int yOff = item.isLowerListHalf ? -height : 0;
     const auto rowArea = juce::Rectangle<float>(0.0f, (float) yOff, (float) paintW, (float) fullH);
     bool roundTop = false;
     bool roundBottom = false;
@@ -244,8 +243,8 @@ void SkinEditorPalettePanel::rebuildRows()
         row.kind = RowKind::kColour;
         row.name = pastille.name;
         row.argb = pastille.argb;
-        row.product = layer_->isProductPastilleName(pastille.name);
-        if (row.product)
+        row.isProduct = layer_->isProductPastilleName(pastille.name);
+        if (row.isProduct)
             product.push_back(row);
         else
             editor.push_back(row);
@@ -271,10 +270,10 @@ void SkinEditorPalettePanel::appendPaletteGroup(const juce::String& title,
     Row section;
     section.kind = RowKind::kSection;
     section.headerText = title;
-    pushContentRow(section);
+    pushSplitListRow(section);
     Row gap;
     gap.kind = RowKind::kGap;
     rows_.push_back(gap);
     for (auto& row : colours)
-        pushContentRow(row);
+        pushSplitListRow(row);
 }
