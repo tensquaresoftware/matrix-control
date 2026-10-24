@@ -160,7 +160,11 @@ void SkinEditorMainComponent::updateMappingWitness()
 
     if (mappingMode_ == MappingMode::kHeldColour)
     {
-        mappingDetailLabel_.setText("Colour: " + selectedPastille_, juce::dontSendNotification);
+        const bool productColour = layer_.isProductPastilleName(selectedPastille_);
+        // No trailing space — layoutMappingWitness inserts kGap before the swatch.
+        mappingPrefixLabel_.setText(productColour ? "Product colour:" : "Editor colour:",
+                                    juce::dontSendNotification);
+        mappingDetailLabel_.setText(selectedPastille_, juce::dontSendNotification);
         if (const auto* skin = layer_.findSkin(visibleSkinId()))
         {
             for (const auto& pastille : skin->palette)
@@ -176,15 +180,19 @@ void SkinEditorMainComponent::updateMappingWitness()
     }
     else if (mappingMode_ == MappingMode::kArmedRow)
     {
-        const auto target = TSS::DevSkin::toString(armedKey_.object) + " / "
-                            + TSS::DevSkin::toString(armedKey_.property);
-        mappingDetailLabel_.setText("Target: " + target, juce::dontSendNotification);
+        mappingPrefixLabel_.setText("Target:", juce::dontSendNotification);
+        mappingDetailLabel_.setText(TSS::DevSkin::toString(armedKey_.object) + " > "
+                                        + TSS::DevSkin::toString(armedKey_.property) + " > "
+                                        + TSS::DevSkin::toString(armedKey_.state),
+                                    juce::dontSendNotification);
     }
     else
     {
+        mappingPrefixLabel_.setText({}, juce::dontSendNotification);
         mappingDetailLabel_.setText({}, juce::dontSendNotification);
     }
 
+    mappingPrefixLabel_.setVisible(mappingWitnessActive_);
     mappingDetailLabel_.setVisible(mappingWitnessActive_);
     resized();
     repaint();

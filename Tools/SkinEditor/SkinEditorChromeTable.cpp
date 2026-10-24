@@ -212,20 +212,22 @@ namespace SkinEditorChrome
                                     : juce::jmax(diameter, textW + kCountBadgeCapsulePad);
     }
 
-    void drawMappingModeBadge(juce::Graphics& g, juce::Rectangle<int> area)
+    void drawChromeBadge(juce::Graphics& g, juce::Rectangle<int> area, const juce::String& text)
     {
-        constexpr auto kText = "MAPPING";
-        const auto font = fontBold(kMappingBadgeFont);
-        g.setColour(textPrimary());
-        g.fillRoundedRectangle(area.toFloat(), kControlCorner);
+        // Integer pixel rect — avoid 0.5 offsets that soften vertical alignment vs Labels.
+        g.setColour(textMuted());
+        g.fillRoundedRectangle((float) area.getX(),
+                               (float) area.getY(),
+                               (float) area.getWidth(),
+                               (float) area.getHeight(),
+                               kControlCorner);
         g.setColour(surfaceApp());
-        g.setFont(font);
-        g.drawText(kText, area, juce::Justification::centred, false);
+        g.setFont(fontBold(kMappingBadgeFont));
+        g.drawText(text, area, juce::Justification::centred, false);
     }
 
-    int mappingModeBadgeWidth()
+    int chromeBadgeWidth(const juce::String& text)
     {
-        constexpr auto kText = "MAPPING";
-        return measureTextWidth(fontBold(kMappingBadgeFont), kText) + kMappingBadgePadH * 2;
+        return measureTextWidth(fontBold(kMappingBadgeFont), text) + kMappingBadgePadH * 2;
     }
 }

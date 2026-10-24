@@ -56,13 +56,19 @@ namespace SkinEditorChrome
     inline constexpr int kTitleBarHeight = 32;
     /** Bottom status bar - same height / fill spirit as the logo title bar. */
     inline constexpr int kStatusBarHeight = kTitleBarHeight;
-    /** Rectangle MAPPING witness badge (not the Unbound count capsule). */
+    inline constexpr int kButtonHeight = 24;
+    inline constexpr int kButtonGap = 8;
+    /** Chrome text badges (MAPPING / CONNECTION / …) — thinner than TextButton. */
     inline constexpr int kMappingBadgeHeight = 16;
     inline constexpr float kMappingBadgeFont = 11.0f;
     inline constexpr int kMappingBadgePadH = 8;
     inline constexpr int kMappingWitnessSwatch = 12;
-    inline constexpr int kButtonHeight = 24;
-    inline constexpr int kButtonGap = 8;
+    /** Integer optical nudges (barY + (barH - rowH) / 2 + nudge) — keep even/odd consistent. */
+    inline constexpr int kLogoTitleNudgeY = 2;
+    inline constexpr int kLogoChromeNudgeY = 3;
+    inline constexpr int kStatusChromeNudgeY = -6;
+    /** MAPPING witness inset from Mappings panel left edge. */
+    inline constexpr int kMappingWitnessInsetX = 11;
     inline constexpr int kPanelTitleHeight = 26;
     /** Top gutter + title band + bottom gutter — matches other panels' title offset. */
     inline constexpr int kSkinsPanelHeight = kGutter + kPanelTitleHeight + kGutter;

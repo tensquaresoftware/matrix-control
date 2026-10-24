@@ -241,8 +241,10 @@ void SkinEditorMainComponent::refreshCombos()
 
 void SkinEditorMainComponent::refreshStatus()
 {
-    connectionLabel_.setText(bridge_.session().connectionStatusText(), juce::dontSendNotification);
-    lastPushLabel_.setText(statusDetail_.isNotEmpty() ? statusDetail_ : "Last push: none",
+    connectionLabel_.setText(bridge_.isConnected() ? "Connected to Matrix-Control"
+                                                   : "Disconnected",
+                             juce::dontSendNotification);
+    lastPushLabel_.setText(statusDetail_.isNotEmpty() ? statusDetail_ : "none",
                            juce::dontSendNotification);
     // Re-layout status-bar zones for the new string widths.
     resized();
@@ -257,7 +259,7 @@ void SkinEditorMainComponent::pushVisible()
 {
     bridge_.push(layer_.makePushPayloadForSkin(visibleSkinId()));
     if (! bridge_.isConnected())
-        setStatusMessage("Last push: queued until Standalone Dev connects");
+        setStatusMessage("queued until Standalone Dev connects");
     refreshStatus();
 }
 

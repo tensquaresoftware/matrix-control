@@ -1100,6 +1100,7 @@ if(MATRIX_BUILD_SKIN_EDITOR)
         Tools/SkinEditor/SkinEditorMainComponentActions.cpp
         Tools/SkinEditor/SkinEditorMainComponentMapping.cpp
         Tools/SkinEditor/SkinEditorMainComponentSession.cpp
+        Tools/SkinEditor/SkinEditorMainComponentSkins.cpp
         Tools/SkinEditor/SkinEditorColourPicker.cpp
         Tools/SkinEditor/SkinEditorPalettePanel.cpp
         Tools/SkinEditor/SkinEditorMappingsPanel.cpp

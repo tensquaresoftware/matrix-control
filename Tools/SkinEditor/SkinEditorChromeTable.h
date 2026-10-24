@@ -82,10 +82,17 @@ namespace SkinEditorChrome
     int countBadgeWidth(int count);
 
     /**
-     * Mapping-mode witness badge - Inter rectangle with "MAPPING" (ASCII).
+     * Chrome text badge - Inter rectangle (MAPPING / CONNECTION / LAST PUSH / APP).
      * Do not reuse plugin FooterPanel badge APIs or the Unbound count capsule.
      */
-    void drawMappingModeBadge(juce::Graphics& g, juce::Rectangle<int> area);
+    void drawChromeBadge(juce::Graphics& g, juce::Rectangle<int> area, const juce::String& text);
 
-    int mappingModeBadgeWidth();
+    int chromeBadgeWidth(const juce::String& text);
+
+    inline void drawMappingModeBadge(juce::Graphics& g, juce::Rectangle<int> area)
+    {
+        drawChromeBadge(g, area, "MAPPING");
+    }
+
+    inline int mappingModeBadgeWidth() { return chromeBadgeWidth("MAPPING"); }
 }

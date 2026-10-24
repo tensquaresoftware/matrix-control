@@ -94,9 +94,15 @@ private:
     void setupBodyPanels();
     void setupLayerAndBridgeCallbacks();
     void layoutTitleBar(juce::Rectangle<int> titleBar);
-    void layoutMappingWitness(juce::Rectangle<int> titleBar, int leftLimit);
+    /** Places MAPPING witness in the logo bar; badge left edge matches Mappings panel. */
+    void layoutMappingWitness(int rowY, int rowH, int rightLimit);
     void layoutStatusBar(juce::Rectangle<int> statusBar);
+    /** Integer row top inside a bar — never half-pixel. */
+    static int chromeRowY(int barY, int barH, int rowH, int opticalNudgeY) noexcept;
+    static int mappingsPanelLeftX() noexcept;
     void layoutSkinsBar(juce::Rectangle<int> skins);
+    int skinsBarComboWidth(int rowWidthSansTrailingGap) const;
+    void layoutSkinsSkinSelectors(juce::Rectangle<int>& row, int comboWidth);
     void layoutSkinsActionButtons(juce::Rectangle<int>& row);
     void layoutBodyPanels(juce::Rectangle<int> bounds);
 
@@ -126,6 +132,7 @@ private:
     bool suppressCombo_ = false;
 
     juce::Label titleLabel_;
+    juce::Label mappingPrefixLabel_;
     juce::Label mappingDetailLabel_;
     juce::Rectangle<int> mappingBadgeBounds_;
     juce::Rectangle<int> mappingSwatchBounds_;
@@ -136,9 +143,9 @@ private:
     juce::Label connectionLabel_;
     juce::Label lastPushLabel_;
     juce::Label versionLabel_;
-    int statusBarSeparatorX_ = -1;
-    int statusBarSeparatorY_ = 0;
-    int statusBarSeparatorH_ = 0;
+    juce::Rectangle<int> connectionBadgeBounds_;
+    juce::Rectangle<int> lastPushBadgeBounds_;
+    juce::Rectangle<int> appBadgeBounds_;
 
     juce::Label skinsTitleLabel_;
     juce::Label productLabel_ { {}, "Product:" };
