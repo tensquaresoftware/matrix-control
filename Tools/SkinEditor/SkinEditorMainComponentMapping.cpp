@@ -159,7 +159,7 @@ void SkinEditorMainComponent::fillHeldColourWitness()
 {
     const bool productColour = layer_.isProductPastilleName(selectedPastille_);
     // No trailing space — layoutOperationWell inserts kChromeBadgeGap before the swatch.
-    const auto prefix = productColour ? "Product colour:" : "Editor colour:";
+    const auto prefix = productColour ? "Palette > Product colour:" : "Editor colour:";
     mappingPrefixLabel_.setTooltip(prefix);
     mappingPrefixLabel_.setText(prefix, juce::dontSendNotification);
     mappingDetailLabel_.setTooltip(selectedPastille_);
