@@ -24,16 +24,15 @@ public:
 
     /** Preferred height at kColorPanelWidth (includes outer gutters). */
     static int preferredHeight() noexcept;
+    /** Same as preferredHeight — SKINS no longer budgets a wrap row. */
+    static int preferredHeightForMinWindow() noexcept;
 
     void paint(juce::Graphics& g) override;
     void resized() override;
 
 private:
-    void layoutProductRows(juce::Rectangle<int>& content, int labelColW, int comboW);
-    void layoutEditorRows(juce::Rectangle<int>& content, int labelColW, int comboW);
-    void placeActionButton(juce::Rectangle<int>& row, juce::TextButton& button);
     static int labelColumnWidth() noexcept;
-    static int comboWidthForContent(int contentW, int labelColW) noexcept;
+    static int comboWidthForContent(int contentW, int labelColW, int trailingButtonW) noexcept;
 
     juce::Label titleLabel_;
     juce::Label productLabel_ { {}, "Product:" };

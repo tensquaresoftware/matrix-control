@@ -41,23 +41,37 @@ namespace SkinEditorChrome
 
     /** Window / inter-panel gutters only — never reuse as in-panel content inset. */
     inline constexpr int kGutter = 6;
+    /** Stack gap between chrome wells / panels (SESSION↔OPERATION, OPERATION↔SKINS, SKINS↔COLOR). */
+    inline constexpr int kChromeStackGap = kGutter * 2; // 12
+    /** Left/right margin of the app window (logo / OPERATION / body / status). */
+    inline constexpr int kWindowEdgeGutter = kChromeStackGap; // 12
+    /** Gap on both sides of Palette (Color|Palette and Palette|Mappings). */
+    inline constexpr int kPaletteSideGap = kChromeStackGap; // 12
     /** Title-bar chrome inset (not panel body content). */
     inline constexpr int kPanelPad = 8;
     inline constexpr int kButtonGap = 8;
-    /** Fixed left-column and Palette widths — Mappings takes the leftover. */
+    /** Fixed body-column widths — window width fits these; Mappings does not grow. */
     inline constexpr int kColorPanelWidth = 260;
     inline constexpr int kPalettePanelWidth = 150;
-    /** Practical Mappings floor so object tables stay readable when the window shrinks. */
-    inline constexpr int kMappingsMinWidth = 320;
     /**
-     * Body-column floor: gutters + Color + Palette + Mappings min.
-     * Live window min = max(body, measured title + SESSION) — see windowMinWidth().
+     * Former Mappings half-share when Color|Palette|Mappings|Unbound filled the
+     * legacy 1210-wide window (Unbound removed; Mappings keeps this width).
      */
-    inline constexpr int kWindowBodyMinWidth = kGutter + kColorPanelWidth + kGutter
-                                              + kPalettePanelWidth + kGutter
-                                              + kMappingsMinWidth + kGutter;
-    /** Document window maximum width (height unconstrained here). Default launch uses max. */
-    inline constexpr int kWindowMaxWidth = 1210;
+    inline constexpr int kLegacyWindowMaxWidth = 1210;
+    inline constexpr int kMappingsPanelWidth =
+        (kLegacyWindowMaxWidth - 2 * kGutter - kColorPanelWidth - kGutter
+         - kPalettePanelWidth - kGutter - kGutter)
+        / 2;
+    /**
+     * Exact body width: edge gutters + Color + Palette side gaps + fixed Mappings.
+     * Live window width = max(body, measured title + SESSION) — see windowContentWidth().
+     */
+    inline constexpr int kWindowBodyWidth = kWindowEdgeGutter + kColorPanelWidth
+                                            + kPaletteSideGap + kPalettePanelWidth
+                                            + kPaletteSideGap + kMappingsPanelWidth
+                                            + kWindowEdgeGutter;
+    /** Constexpr body floor; runtime max/min prefer windowContentWidth(). */
+    inline constexpr int kWindowMaxWidth = kWindowBodyWidth;
     /** Orbitron logo title in the Skin Editor title bar. */
     inline constexpr const char* kAppTitleText = "MATRIX-CONTROL SKIN EDITOR";
     /**
@@ -65,26 +79,42 @@ namespace SkinEditorChrome
      * and left / right / bottom inside the silhouette). Do not use kGutter here.
      */
     inline constexpr int kPanelContentPad = 10;
-    inline constexpr int kTitleBarHeight = 32;
-    /** Bottom status bar - same height / fill spirit as the logo title bar. */
-    inline constexpr int kStatusBarHeight = kTitleBarHeight;
-    /** Nude mapping-help band under the logo (status-bar spirit, no SKINS well). */
-    inline constexpr int kMappingBandHeight = kStatusBarHeight;
+    /**
+     * SESSION well: kButtonHeight with kGutter air above/below (was 38px SKINS strip;
+     * 36px aligns the air with standard gutters).
+     */
+    inline constexpr int kButtonHeight = 24;
+    inline constexpr int kSessionWellHeight = kGutter + kButtonHeight + kGutter; // 36
+    /**
+     * Logo bar: kChromeStackGap above SESSION + well + kGutter below
+     * (bottom gutter + following strip = kChromeStackGap before OPERATION).
+     */
+    inline constexpr int kTitleBarHeight = kChromeStackGap + kSessionWellHeight + kGutter; // 54
+    /** Bottom status bar — same height as SESSION / OPERATION wells. */
+    inline constexpr int kStatusBarHeight = kSessionWellHeight; // 36
+    /**
+     * OPERATION well under the logo — same height as SESSION (title + dark content
+     * pocket for the mapping witness; idle = empty dark rect).
+     */
+    inline constexpr int kMappingBandHeight = kSessionWellHeight;
     /** Badge → label gap for CONNECTION / MAPPING / LAST PUSH chrome. */
     inline constexpr int kChromeBadgeGap = 8;
-    inline constexpr int kButtonHeight = 24;
     /** Chrome text badges (MAPPING / CONNECTION / …) — thinner than TextButton. */
     inline constexpr int kMappingBadgeHeight = 16;
     inline constexpr float kMappingBadgeFont = 11.0f;
     inline constexpr int kMappingBadgePadH = 8;
+    /** Inset from OPERATION dark pocket to MAPPING badge — equals vertical centre air. */
+    inline constexpr int kOperationWitnessPad = (kButtonHeight - kMappingBadgeHeight) / 2; // 4
     /** Palette / Mappings / MAPPING witness colour square. */
     inline constexpr int kColourSwatchSize = 12;
     /** Checker cells across one swatch side (12 / 4 = 3 px cells, exact 4x4). */
     inline constexpr int kColourSwatchCheckerDivisions = 4;
     /** Integer optical nudges (barY + (barH - rowH) / 2 + nudge) — keep even/odd consistent. */
-    inline constexpr int kLogoTitleNudgeY = 2;
+    /** Logo dropped 3px from geometric centre in the 54px logo bar. */
+    inline constexpr int kLogoTitleNudgeY = 3;
     inline constexpr int kLogoChromeNudgeY = 3;
-    inline constexpr int kStatusChromeNudgeY = -6;
+    /** Geometric centre in the 36px status bar. */
+    inline constexpr int kStatusChromeNudgeY = 0;
     inline constexpr int kPanelTitleHeight = 26;
     inline constexpr int kTitleTabPadH = 10;
     /** Sticky column-legend / table content row height. */

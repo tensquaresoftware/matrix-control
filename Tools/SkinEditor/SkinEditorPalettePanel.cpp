@@ -92,14 +92,15 @@ void SkinEditorPalettePanel::clearSelection()
 
 void SkinEditorPalettePanel::paint(juce::Graphics& g)
 {
-    SkinEditorChrome::paintPanelFrame(g, getLocalBounds(), titleTabBounds_);
+    SkinEditorChrome::paintPanelFrame(g, getLocalBounds(), titleTabBounds_, 0);
     SkinEditorChrome::paintRoundedWell(g, list_.getBounds(), SkinEditorChrome::surfacePanel());
 }
 
 void SkinEditorPalettePanel::resized()
 {
     const auto chrome = SkinEditorChrome::layoutPanel(getLocalBounds(),
-                                                      SkinEditorChrome::titleTabWidth("PALETTE"));
+                                                      SkinEditorChrome::titleTabWidth("PALETTE"),
+                                                      0);
     titleTabBounds_ = chrome.tab;
     titleLabel_.setBounds(chrome.tab);
     auto bounds = chrome.content;

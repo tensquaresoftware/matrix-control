@@ -92,7 +92,7 @@ namespace SkinEditorChrome
         label.setText(titleUpper, juce::dontSendNotification);
         label.setFont(fontTitle());
         label.setColour(juce::Label::backgroundColourId, juce::Colours::transparentBlack);
-        label.setColour(juce::Label::textColourId, textPrimary());
+        label.setColour(juce::Label::textColourId, textBrand());
         label.setJustificationType(juce::Justification::centred);
         preventTextSquish(label);
     }
@@ -150,7 +150,10 @@ namespace SkinEditorChrome
         return measureTextWidth(fontTitle(), title) + kTitleTabPadH * 2 + extraInsideTab;
     }
 
-    /** SESSION well width: title tab + Undo/Redo | Compare/Push | Export/Import. */
+    /**
+     * SESSION well width: title tab + Undo/Redo | Compare/Push | Export/Import
+     * + trailing kGutter after Import (inner right air).
+     */
     inline int sessionWellPreferredWidth() noexcept
     {
         const int titleW = titleTabWidth("SESSION");
@@ -164,7 +167,8 @@ namespace SkinEditorChrome
                + kSep
                + measure("Compare") + kButtonGap + measure("Push")
                + kSep
-               + measure("Export") + kButtonGap + measure("Import");
+               + measure("Export") + kButtonGap + measure("Import")
+               + kGutter;
     }
 
     /** Measured Orbitron title advance (+ layout pad matching layoutTitleBar). */
@@ -173,16 +177,23 @@ namespace SkinEditorChrome
         return measureTextWidth(fontAppTitle(), kAppTitleText) + 8;
     }
 
-    /** Title-bar pads + measured app title + SESSION well. */
+    /** Edge gutters + app title + gap + SESSION controls. */
     inline int windowTitleSessionMinWidth() noexcept
     {
-        return kPanelPad + appTitlePreferredWidth() + kButtonGap
-               + sessionWellPreferredWidth() + kPanelPad;
+        return kWindowEdgeGutter + appTitlePreferredWidth() + kButtonGap
+               + sessionWellPreferredWidth() + kWindowEdgeGutter;
     }
 
-    /** Constrainer / normalize floor: body columns vs title + SESSION (whichever is wider). */
-    inline int windowMinWidth() noexcept
+    /**
+     * Fitted client width: fixed body columns vs measured title + SESSION.
+     * Mappings keeps kMappingsPanelWidth; the window shrinks instead of stretching Mappings.
+     */
+    inline int windowContentWidth() noexcept
     {
-        return juce::jmax(kWindowBodyMinWidth, windowTitleSessionMinWidth());
+        return juce::jmax(kWindowBodyWidth, windowTitleSessionMinWidth());
     }
+
+    inline int windowMinWidth() noexcept { return windowContentWidth(); }
+
+    inline int windowMaxWidth() noexcept { return windowContentWidth(); }
 }

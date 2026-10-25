@@ -153,7 +153,7 @@ void SkinEditorMappingsPanel::paintStickyLegend(juce::Graphics& g, juce::Rectang
 
 void SkinEditorMappingsPanel::paint(juce::Graphics& g)
 {
-    SkinEditorChrome::paintPanelFrame(g, getLocalBounds(), titleTabBounds_);
+    SkinEditorChrome::paintPanelFrame(g, getLocalBounds(), titleTabBounds_, 0);
     SkinEditorChrome::paintRoundedWell(g, viewport_.getBounds(), SkinEditorChrome::surfacePanel());
     if (! stickyLegendBounds_.isEmpty())
         paintStickyLegend(g, stickyLegendBounds_);
@@ -350,7 +350,8 @@ bool SkinEditorMappingsPanel::Content::keyPressed(const juce::KeyPress& key)
 void SkinEditorMappingsPanel::resized()
 {
     const auto chrome = SkinEditorChrome::layoutPanel(getLocalBounds(),
-                                                      SkinEditorChrome::titleTabWidth("MAPPINGS"));
+                                                      SkinEditorChrome::titleTabWidth("MAPPINGS"),
+                                                      0);
     titleTabBounds_ = chrome.tab;
     titleLabel_.setBounds(chrome.tab);
     auto bounds = chrome.content;

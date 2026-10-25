@@ -79,23 +79,15 @@ void SkinEditorMainComponent::setupSessionWell()
     redoButton_.setEnabled(false);
 }
 
-void SkinEditorMainComponent::layoutSessionWell(juce::Rectangle<int> titleBar, int titleRight)
+void SkinEditorMainComponent::setupOperationWell()
 {
-    sessionSeparatorXs_.clear();
-    sessionWellBounds_ = {};
+    SkinEditorChrome::stylePanelTitle(operationTitleLabel_, "OPERATION");
+    addAndMakeVisible(operationTitleLabel_);
+}
 
-    const int wellW = SkinEditorChrome::sessionWellPreferredWidth();
-    const int wellX = juce::jmax(titleRight + SkinEditorChrome::kButtonGap,
-                                 titleBar.getRight() - wellW);
-    sessionWellBounds_ = { wellX, titleBar.getY() + 2,
-                           juce::jmin(wellW, titleBar.getRight() - wellX),
-                           titleBar.getHeight() - 4 };
-
-    const auto well = sessionWellBounds_;
-    const int buttonY = well.getY()
-                        + (well.getHeight() - SkinEditorChrome::kButtonHeight) / 2;
-    auto row = juce::Rectangle<int>(well.getX(), buttonY, well.getWidth(),
-                                    SkinEditorChrome::kButtonHeight);
+void SkinEditorMainComponent::layoutSessionControls(juce::Rectangle<int> well,
+                                                    juce::Rectangle<int> row)
+{
     sessionSeparatorY_ = row.getY();
     sessionSeparatorH_ = row.getHeight();
 
@@ -125,4 +117,31 @@ void SkinEditorMainComponent::layoutSessionWell(juce::Rectangle<int> titleBar, i
     place.button(exportButton_);
     place.gap();
     place.button(importButton_);
+    if (place.fits && row.getWidth() >= SkinEditorChrome::kGutter)
+        row.removeFromLeft(SkinEditorChrome::kGutter);
+}
+
+void SkinEditorMainComponent::layoutSessionWell(juce::Rectangle<int> titleBar, int titleRight)
+{
+    sessionSeparatorXs_.clear();
+    sessionWellBounds_ = {};
+
+    // Compact well on the right (logo stays outside on dark fill). titleBar is
+    // already kGutter-inset so the well's right edge matches OPERATION / SKINS column.
+    const int wellH = SkinEditorChrome::kSessionWellHeight;
+    const int wellY = titleBar.getY() + SkinEditorChrome::kChromeStackGap;
+    const int wellW = SkinEditorChrome::sessionWellPreferredWidth();
+    const int wellX = juce::jmax(titleRight + SkinEditorChrome::kButtonGap,
+                                 titleBar.getRight() - wellW);
+    sessionWellBounds_ = { wellX, wellY,
+                           juce::jmin(wellW, titleBar.getRight() - wellX),
+                           wellH };
+    if (sessionWellBounds_.isEmpty())
+        return;
+
+    layoutSessionControls(sessionWellBounds_,
+                          { sessionWellBounds_.getX(),
+                            sessionWellBounds_.getY() + SkinEditorChrome::kGutter,
+                            sessionWellBounds_.getWidth(),
+                            SkinEditorChrome::kButtonHeight });
 }

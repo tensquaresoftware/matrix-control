@@ -14,10 +14,13 @@ namespace SkinEditorChrome
     };
 
     /**
-     * Outer kGutter above/below the silhouette (window bg). Créneau flush left.
+     * Outer gutters above/below the silhouette (window bg). Créneau flush left.
      * Body content inset with kPanelContentPad on top (under title), left, right, bottom.
+     * bottomGutter: kGutter for stacked panels (SKINS); 0 when flush to the status bar.
      */
-    PanelChrome layoutPanel(juce::Rectangle<int> bounds, int tabWidth);
+    PanelChrome layoutPanel(juce::Rectangle<int> bounds,
+                            int tabWidth,
+                            int bottomGutter = kGutter);
 
     /**
      * Panel silhouette: folder-tab title (45° shoulder, same language as table section
@@ -25,7 +28,8 @@ namespace SkinEditorChrome
      */
     void paintPanelFrame(juce::Graphics& g,
                          juce::Rectangle<int> panelBounds,
-                         juce::Rectangle<int> tab);
+                         juce::Rectangle<int> tab,
+                         int bottomGutter = kGutter);
 
     void paintRoundedWell(juce::Graphics& g, juce::Rectangle<int> area, juce::Colour fill);
 }

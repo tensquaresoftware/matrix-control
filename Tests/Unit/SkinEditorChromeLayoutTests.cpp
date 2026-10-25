@@ -23,43 +23,46 @@ public:
     {
         SkinEditorChrome::warmFonts();
 
-        mappingBandMatchesStatusAndSharedBadgeGap();
-        windowMinCoversBodyAndMeasuredTitleSession();
+        operationWellMatchesSessionAndSharedBadgeGap();
+        windowFitsFixedMappingsNotStretch();
         idleWitnessHiddenHoldWitnessVisible();
-        bodyColumnsLeaveMappingsFloorWithoutUnbound();
-        skinsPanelWrapUsesProductionButtonWidths();
+        mappingsKeepsLegacyHalfShareWidth();
+        skinsPanelEditorActionsFitOneRow();
     }
 
 private:
-    void mappingBandMatchesStatusAndSharedBadgeGap()
+    void operationWellMatchesSessionAndSharedBadgeGap()
     {
-        beginTest("Mapping band height matches status; badge gap shared with CONNECTION");
+        beginTest("OPERATION well matches SESSION height; badge gap shared with CONNECTION");
 
-        expectEquals(SkinEditorChrome::kMappingBandHeight, SkinEditorChrome::kStatusBarHeight);
+        expectEquals(SkinEditorChrome::kMappingBandHeight, SkinEditorChrome::kSessionWellHeight);
+        expectEquals(SkinEditorChrome::kTitleBarHeight,
+                     SkinEditorChrome::kChromeStackGap + SkinEditorChrome::kSessionWellHeight
+                         + SkinEditorChrome::kGutter);
+        expectEquals(SkinEditorChrome::kStatusBarHeight, SkinEditorChrome::kSessionWellHeight);
+        expectEquals(SkinEditorChrome::kChromeStackGap, 12);
+        expectEquals(SkinEditorChrome::kWindowEdgeGutter, 12);
+        expectEquals(SkinEditorChrome::kPaletteSideGap, 12);
+        expectEquals(SkinEditorChrome::kOperationWitnessPad, 4);
         expectEquals(SkinEditorChrome::kChromeBadgeGap, 8);
     }
 
-    void windowMinCoversBodyAndMeasuredTitleSession()
+    void windowFitsFixedMappingsNotStretch()
     {
-        beginTest("Window min is max(body, measured title+SESSION); used by MainWindow floor");
+        beginTest("Window content width fits fixed columns; does not stretch Mappings");
 
         const int titleSession = SkinEditorChrome::windowTitleSessionMinWidth();
-        const int measuredFloor = SkinEditorChrome::windowMinWidth();
-        expectEquals(titleSession,
-                     SkinEditorChrome::kPanelPad + SkinEditorChrome::appTitlePreferredWidth()
-                         + SkinEditorChrome::kButtonGap
-                         + SkinEditorChrome::sessionWellPreferredWidth()
-                         + SkinEditorChrome::kPanelPad);
-        expectEquals(measuredFloor,
-                     juce::jmax(SkinEditorChrome::kWindowBodyMinWidth, titleSession));
-        expect(measuredFloor < SkinEditorChrome::kWindowMaxWidth);
-        expectEquals(SkinEditorChrome::kWindowBodyMinWidth,
-                     SkinEditorChrome::kGutter + SkinEditorChrome::kColorPanelWidth
-                         + SkinEditorChrome::kGutter + SkinEditorChrome::kPalettePanelWidth
-                         + SkinEditorChrome::kGutter + SkinEditorChrome::kMappingsMinWidth
-                         + SkinEditorChrome::kGutter);
-        // Title + SESSION pad budget must be covered by the same helper MainWindow uses.
-        expect(measuredFloor >= titleSession);
+        const int contentW = SkinEditorChrome::windowContentWidth();
+        expectEquals(contentW,
+                     juce::jmax(SkinEditorChrome::kWindowBodyWidth, titleSession));
+        expectEquals(SkinEditorChrome::windowMinWidth(), contentW);
+        expectEquals(SkinEditorChrome::windowMaxWidth(), contentW);
+        expectEquals(SkinEditorChrome::kWindowBodyWidth,
+                     SkinEditorChrome::kWindowEdgeGutter + SkinEditorChrome::kColorPanelWidth
+                         + SkinEditorChrome::kPaletteSideGap + SkinEditorChrome::kPalettePanelWidth
+                         + SkinEditorChrome::kPaletteSideGap + SkinEditorChrome::kMappingsPanelWidth
+                         + SkinEditorChrome::kWindowEdgeGutter);
+        expect(contentW < SkinEditorChrome::kLegacyWindowMaxWidth);
     }
 
     void idleWitnessHiddenHoldWitnessVisible()
@@ -72,30 +75,36 @@ private:
         expect(mappingWitnessVisible(Mode::kArmedRow));
     }
 
-    void bodyColumnsLeaveMappingsFloorWithoutUnbound()
+    void mappingsKeepsLegacyHalfShareWidth()
     {
-        beginTest("Body is Color|Palette|Mappings (no Unbound half-split)");
+        beginTest("Mappings width equals former Unbound half-split at legacy 1210");
 
-        expect(SkinEditorChrome::kMappingsMinWidth >= 320);
-        expect(SkinEditorChrome::kWindowBodyMinWidth < SkinEditorChrome::kWindowMaxWidth);
+        expectEquals(SkinEditorChrome::kMappingsPanelWidth, 385);
+        expect(SkinEditorChrome::kMappingsPanelWidth
+               < SkinEditorChrome::kLegacyWindowMaxWidth / 2);
     }
 
-    void skinsPanelWrapUsesProductionButtonWidths()
+    void skinsPanelEditorActionsFitOneRow()
     {
-        beginTest("SKINS wrap decision uses measureButtonWidth on Dup/New/Rename/Delete");
+        beginTest("SKINS Delete matches Duplicate; New/Rename/Delete fit combo-to-Duplicate span");
 
         const int contentW = SkinEditorChrome::kColorPanelWidth
                              - 2 * SkinEditorChrome::kPanelContentPad;
-        const int fourButtons =
-            SkinEditorChrome::measureButtonWidth(juce::TextButton("Duplicate"))
-            + SkinEditorChrome::kButtonGap
-            + SkinEditorChrome::measureButtonWidth(juce::TextButton("New"))
-            + SkinEditorChrome::kButtonGap
-            + SkinEditorChrome::measureButtonWidth(juce::TextButton("Rename"))
-            + SkinEditorChrome::kButtonGap
-            + SkinEditorChrome::measureButtonWidth(juce::TextButton("Delete"));
+        const int labelColW = SkinEditorChrome::measureLabelWidth(
+            "Product:", SkinEditorChrome::fontRegular());
+        // Prefer Editor: if wider — labelColumnWidth takes max of both.
+        const int editorLabelW = SkinEditorChrome::measureLabelWidth(
+            "Editor:", SkinEditorChrome::fontRegular());
+        const int labelsW = juce::jmax(labelColW, editorLabelW);
+        const int dupW = SkinEditorChrome::measureButtonWidth(juce::TextButton("Duplicate"));
+        const int renameW = SkinEditorChrome::measureButtonWidth(juce::TextButton("Rename"));
+        const int gaps = 2 * SkinEditorChrome::kButtonGap;
+        const int comboW = juce::jmax(72, contentW - labelsW - SkinEditorChrome::kButtonGap - dupW);
+        const int spanW = comboW + SkinEditorChrome::kButtonGap + dupW;
+        const int newW = spanW - gaps - renameW - dupW;
         expectEquals(contentW, 240);
-        expect(fourButtons > contentW);
+        expect(newW >= 1);
+        expectEquals(newW + gaps + renameW + dupW, spanW);
     }
 };
 

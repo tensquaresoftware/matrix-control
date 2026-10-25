@@ -100,14 +100,18 @@ private:
     void setupTitleBarChrome();
     void setupStatusBarChrome();
     void setupSessionWell();
+    void setupOperationWell();
     void setupSkinsPanel();
     void setupBodyPanels();
     void setupLayerAndBridgeCallbacks();
     void layoutTitleBar(juce::Rectangle<int> titleBar);
     void layoutSessionWell(juce::Rectangle<int> titleBar, int titleRight);
-    void layoutMappingBand(juce::Rectangle<int> band);
+    void layoutSessionControls(juce::Rectangle<int> well, juce::Rectangle<int> row);
+    void layoutOperationWell(juce::Rectangle<int> band);
+    void layoutOperationWitness(juce::Rectangle<int> content);
     void layoutStatusBar(juce::Rectangle<int> statusBar);
     void layoutBodyPanels(juce::Rectangle<int> bounds);
+    void paintChromeWells(juce::Graphics& g) const;
     /** Integer row top inside a bar — never half-pixel. */
     static int chromeRowY(int barY, int barH, int rowH, int opticalNudgeY) noexcept;
 
@@ -137,8 +141,11 @@ private:
     bool suppressCombo_ = false;
 
     juce::Label titleLabel_;
+    juce::Label operationTitleLabel_;
     juce::Label mappingPrefixLabel_;
     juce::Label mappingDetailLabel_;
+    juce::Rectangle<int> operationWellBounds_;
+    juce::Rectangle<int> operationContentBounds_;
     juce::Rectangle<int> mappingBadgeBounds_;
     juce::Rectangle<int> mappingSwatchBounds_;
     bool mappingWitnessActive_ = false;

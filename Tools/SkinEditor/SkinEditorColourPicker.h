@@ -11,6 +11,12 @@ class SkinEditorColourPicker final : public juce::Component,
 public:
     SkinEditorColourPicker();
 
+    /**
+     * Panel height at `panelWidth` so the gap under #/R/G/B matches the gap above
+     * them (kPanelContentPad), with the SV well sized from content width.
+     */
+    static int preferredHeightForWidth(int panelWidth) noexcept;
+
     void setColour(juce::Colour colour, juce::NotificationType notification);
     /** Idle SV/hue wells (#151515) and empty #/R/G/B until a Palette colour is selected. */
     void clearActiveColour();

@@ -4,15 +4,33 @@
 #include "Standalone/StandaloneWindowPlacement.h"
 #include "Tools/SkinEditor/SkinEditorChromeFonts.h"
 #include "Tools/SkinEditor/SkinEditorChromeTokens.h"
+#include "Tools/SkinEditor/SkinEditorColourPicker.h"
 #include "Tools/SkinEditor/SkinEditorMainComponent.h"
+#include "Tools/SkinEditor/SkinEditorSkinsPanel.h"
 
 namespace
 {
-    constexpr int kMinContentHeight = 480;
-
     juce::File skinEditorWindowStateFile()
     {
         return ProjectPaths::getApplicationDataDirectory().getChildFile("skin-editor-window.state");
+    }
+
+    /**
+     * Min MainComponent / content-view height: fixed SKINS + COLOR stack with
+     * equal kPanelContentPad above and below the #/R/G/B row.
+     * Mirrors SkinEditorMainComponent::resized + layoutBodyPanels.
+     */
+    int skinEditorMinContentHeight() noexcept
+    {
+        const int skinsH = juce::jmax(SkinEditorSkinsPanel::preferredHeight(),
+                                      SkinEditorSkinsPanel::preferredHeightForMinWindow());
+        const int colorH = SkinEditorColourPicker::preferredHeightForWidth(
+            SkinEditorChrome::kColorPanelWidth);
+        const int leftColumn = skinsH + colorH;
+        // title | stack | OPERATION | stack | body | status (no gutter above status)
+        return SkinEditorChrome::kTitleBarHeight + SkinEditorChrome::kGutter
+               + SkinEditorChrome::kMappingBandHeight + SkinEditorChrome::kGutter
+               + leftColumn + SkinEditorChrome::kStatusBarHeight;
     }
 }
 
@@ -24,15 +42,17 @@ SkinEditorMainWindow::SkinEditorMainWindow(const juce::String& name)
     setUsingNativeTitleBar(true);
     setContentOwned(new SkinEditorMainComponent(), true);
 
+    SkinEditorChrome::warmFonts();
     updateSizeLimits();
     setConstrainer(&constrainer_);
     setResizable(true, true);
 
-    centreWithSize(SkinEditorChrome::kWindowMaxWidth, 820);
+    const int contentW = SkinEditorChrome::windowContentWidth();
+    centreWithSize(contentW, 820);
     setVisible(true);
 
     if (! restoreWindowState())
-        centreWithSize(SkinEditorChrome::kWindowMaxWidth, 820);
+        centreWithSize(contentW, 820);
 
     normalizeClientSize();
     ensureTitleBarOnScreen();
@@ -102,11 +122,11 @@ void SkinEditorMainWindow::zoomToMaxHeightAndCentre()
     if (area.isEmpty())
         return;
 
-    const int contentH = juce::jmax(kMinContentHeight,
+    const int contentH = juce::jmax(skinEditorMinContentHeight(),
                                     area.getHeight() - juce::jmax(0, frame.getTopAndBottom()));
 
     ignorePersist_ = true;
-    setSize(SkinEditorChrome::kWindowMaxWidth, contentH);
+    setSize(SkinEditorChrome::windowContentWidth(), contentH);
     ignorePersist_ = false;
 
     auto nextBounds = MatrixStandalone::recentreClientBoundsOnNearestDisplayUserArea(
@@ -163,7 +183,11 @@ bool SkinEditorMainWindow::restoreWindowState()
 
 void SkinEditorMainWindow::updateSizeLimits()
 {
-    int maxH = 4096;
+    const int clientMinH = skinEditorMinContentHeight();
+    int clientMaxH = 4096;
+
+    const auto frame = getNativeFrameSize();
+    const int frameTB = juce::jmax(0, frame.getTopAndBottom());
 
     const auto& displays = juce::Desktop::getInstance().getDisplays();
     if (! displays.displays.isEmpty())
@@ -172,27 +196,29 @@ void SkinEditorMainWindow::updateSizeLimits()
         if (display != nullptr)
         {
             const auto area = display->userBounds.toNearestInt();
-            const auto frame = getNativeFrameSize();
-            maxH = juce::jmax(kMinContentHeight,
-                              area.getHeight() - juce::jmax(0, frame.getTopAndBottom()));
+            // Max content height that still fits the display's user area.
+            clientMaxH = juce::jmax(clientMinH,
+                                    area.getHeight() - frameTB);
         }
     }
 
-    constrainer_.setMinimumWidth(SkinEditorChrome::windowMinWidth());
-    constrainer_.setMaximumWidth(SkinEditorChrome::kWindowMaxWidth);
-    constrainer_.setMinimumHeight(kMinContentHeight);
-    constrainer_.setMaximumHeight(maxH);
-    maxContentHeight_ = maxH;
+    const int contentW = SkinEditorChrome::windowContentWidth();
+    // macOS live-resize constrainRect feeds the constrainer the NSWindow frame
+    // (native title bar included), not the content view — add frameTB so the
+    // content view still reaches clientMinH (≈658 outer when title bar ≈31).
+    constrainer_.setMinimumWidth(contentW);
+    constrainer_.setMaximumWidth(contentW);
+    constrainer_.setMinimumHeight(clientMinH + frameTB);
+    constrainer_.setMaximumHeight(clientMaxH + frameTB);
+    maxContentHeight_ = clientMaxH;
 }
 
 void SkinEditorMainWindow::normalizeClientSize()
 {
     updateSizeLimits();
 
-    const int w = juce::jlimit(SkinEditorChrome::windowMinWidth(),
-                               SkinEditorChrome::kWindowMaxWidth,
-                               getWidth());
-    const int h = juce::jlimit(kMinContentHeight, maxContentHeight_, getHeight());
+    const int w = SkinEditorChrome::windowContentWidth();
+    const int h = juce::jlimit(skinEditorMinContentHeight(), maxContentHeight_, getHeight());
 
     if (getWidth() == w && getHeight() == h)
         return;

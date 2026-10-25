@@ -158,7 +158,7 @@ void SkinEditorMainComponent::applyMapping(TSS::SkinColourKey key,
 void SkinEditorMainComponent::fillHeldColourWitness()
 {
     const bool productColour = layer_.isProductPastilleName(selectedPastille_);
-    // No trailing space — layoutMappingBand inserts kChromeBadgeGap before the swatch.
+    // No trailing space — layoutOperationWell inserts kChromeBadgeGap before the swatch.
     const auto prefix = productColour ? "Product colour:" : "Editor colour:";
     mappingPrefixLabel_.setTooltip(prefix);
     mappingPrefixLabel_.setText(prefix, juce::dontSendNotification);

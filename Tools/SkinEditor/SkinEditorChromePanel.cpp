@@ -2,9 +2,9 @@
 
 namespace SkinEditorChrome
 {
-    PanelChrome layoutPanel(juce::Rectangle<int> bounds, int tabWidth)
+    PanelChrome layoutPanel(juce::Rectangle<int> bounds, int tabWidth, int bottomGutter)
     {
-        bounds.removeFromBottom(kGutter);
+        bounds.removeFromBottom(juce::jmax(0, bottomGutter));
         bounds.removeFromTop(kGutter);
         auto titleRow = bounds.removeFromTop(kPanelTitleHeight);
         bounds.removeFromTop(kPanelContentPad);
@@ -18,13 +18,14 @@ namespace SkinEditorChrome
 
     void paintPanelFrame(juce::Graphics& g,
                          juce::Rectangle<int> panelBounds,
-                         juce::Rectangle<int> tab)
+                         juce::Rectangle<int> tab,
+                         int bottomGutter)
     {
         const float r = kControlCorner;
         const float left = (float) panelBounds.getX();
         const float right = (float) panelBounds.getRight();
         const float top = (float) (panelBounds.getY() + kGutter);
-        const float bottom = (float) (panelBounds.getBottom() - kGutter);
+        const float bottom = (float) (panelBounds.getBottom() - juce::jmax(0, bottomGutter));
         // Same rhythm as table section tabs: rail top (= body shoulder) lines up with
         // the title baseline, not the full title-band bottom.
         const float titleBottom = top + (float) kPanelTitleHeight

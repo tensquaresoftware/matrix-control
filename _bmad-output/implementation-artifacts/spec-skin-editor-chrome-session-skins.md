@@ -105,6 +105,7 @@ Implementation (2026-10-25):
 - Unbound binds via `isKeyUnboundOnEditor` → `bindUnbound` from Mappings rows.
 - Added `Tests/Unit/SkinEditorChromeLayoutTests.cpp` for token/matrix locks; existing DevSkin + MappingModePolicy tests cover bind/export/witness/compare session.
 - Build Skin Editor OK; lint_touched OK; SkinEditorChromeLayout / MappingModePolicy / DevSkinLayerJson tests passed.
+- Smoke fix: Mappings keeps former half-share width (`kMappingsPanelWidth` = 385 at legacy 1210); window width fits columns via `windowContentWidth()` instead of stretching Mappings into the Unbound gap.
 
 ## Spec Change Log
 

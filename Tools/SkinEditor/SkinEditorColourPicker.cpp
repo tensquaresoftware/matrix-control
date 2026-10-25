@@ -2,6 +2,23 @@
 
 #include "Tools/SkinEditor/SkinEditorChrome.h"
 
+namespace
+{
+    constexpr int kFieldRowH = 24;
+    constexpr int kHueBarW = 18;
+    constexpr int kSvHueGap = 8;
+}
+
+int SkinEditorColourPicker::preferredHeightForWidth(int panelWidth) noexcept
+{
+    const int contentW = panelWidth - 2 * SkinEditorChrome::kPanelContentPad;
+    const int side = juce::jmax(0, contentW - kHueBarW - kSvHueGap);
+    // layoutPanel chrome + content filled by SV + pad + fields; flush to status (no bottom gutter).
+    return SkinEditorChrome::kGutter + SkinEditorChrome::kPanelTitleHeight
+           + SkinEditorChrome::kPanelContentPad + side + SkinEditorChrome::kPanelContentPad
+           + kFieldRowH + SkinEditorChrome::kPanelContentPad;
+}
+
 SkinEditorColourPicker::SkinEditorColourPicker()
 {
     SkinEditorChrome::stylePanelTitle(titleLabel_, "COLOR");
@@ -73,7 +90,7 @@ void SkinEditorColourPicker::setEnabledEditing(bool canEdit)
 
 void SkinEditorColourPicker::paint(juce::Graphics& g)
 {
-    SkinEditorChrome::paintPanelFrame(g, getLocalBounds(), titleTabBounds_);
+    SkinEditorChrome::paintPanelFrame(g, getLocalBounds(), titleTabBounds_, 0);
     if (! svBounds_.isEmpty())
         paintSvWell(g);
     if (! hueBounds_.isEmpty())
@@ -131,17 +148,17 @@ void SkinEditorColourPicker::paintHueBar(juce::Graphics& g) const
 void SkinEditorColourPicker::resized()
 {
     const auto chrome = SkinEditorChrome::layoutPanel(getLocalBounds(),
-                                                      SkinEditorChrome::titleTabWidth("COLOR"));
+                                                      SkinEditorChrome::titleTabWidth("COLOR"),
+                                                      0);
     titleTabBounds_ = chrome.tab;
     titleLabel_.setBounds(chrome.tab);
     auto bounds = chrome.content;
 
-    constexpr int kFieldRowH = 24;
-    const int hueW = 18;
-    const int side = juce::jmin(bounds.getWidth() - hueW - 8,
-                                bounds.getHeight() - kFieldRowH - SkinEditorChrome::kPanelContentPad);
+    // Size from panel width only — never shrink with window height (R/G/B stay put).
+    // Window min height must keep this layout fully inside the panel.
+    const int side = juce::jmax(0, bounds.getWidth() - kHueBarW - kSvHueGap);
     svBounds_ = { bounds.getX(), bounds.getY(), side, side };
-    hueBounds_ = { svBounds_.getRight() + 8, svBounds_.getY(), hueW, side };
+    hueBounds_ = { svBounds_.getRight() + kSvHueGap, svBounds_.getY(), kHueBarW, side };
 
     // Fixed control widths (font-based only) — do not shrink with the panel / window.
     const auto labelFont = SkinEditorChrome::fontRegular();
