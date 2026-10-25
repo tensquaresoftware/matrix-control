@@ -2814,3 +2814,7 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-chrome-session-skins.md`
   summary: On short displays, `skinEditorMinContentHeight` may exceed usable height; constrainer min is content-driven.
   evidence: Edge Case Hunter; settle with live smoke on a short display / scaled desktop.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-logo-font-height-30px.md`
+  summary: Smoke-check header logo at 30 px font in the 32 px box across UI scales (fit, nudge, width vs neighbours).
+  evidence: Blind Hunter; font height ≠ ink height so clip/width risks are unverified without a live look; Intent kept box size unchanged.

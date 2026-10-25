@@ -12,8 +12,8 @@ namespace TSS::Design
     static_assert(Panels::Header::kHeight == 48, "HeaderPanel height");
     static_assert(Panels::Header::kLogoWidth % 4 == 0, "Header logo width must be on the design ÷4 grid");
     static_assert(Panels::Header::kLogoHeight % 4 == 0, "Header logo height must be on the design ÷4 grid");
-    static_assert(Panels::Header::kLogoFontHeight == 27,
-                  "Header logo font height must be 27 design px");
+    static_assert(Panels::Header::kLogoFontHeight == 30,
+                  "Header logo font height must be 30 design px");
     static_assert(Panels::Header::kLogoGapAfter % 4 == 0, "Header logo gap must be on the design ÷4 grid");
     static_assert(Panels::Header::kFromSynthLabelWidth % 4 == 0,
                   "Header FROM SYNTH label width must be on the design ÷4 grid");

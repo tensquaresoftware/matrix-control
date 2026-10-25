@@ -129,7 +129,7 @@ namespace SkinEditorChrome
     /** Empty space between object tables (ListBox slot = half a content row). */
     inline constexpr int kTableGapHeight = 11;
     inline constexpr float kPanelTitleFont = 15.0f;
-    /** App chrome title — same face as plugin logo (Orbitron Bold), smaller than kLogoFontHeight 27. */
+    /** App chrome title — same face as plugin logo (Orbitron Bold), smaller than kLogoFontHeight 30. */
     inline constexpr float kAppTitleFont = 18.0f;
     inline constexpr float kBodyFont = 13.0f;
     /** Match ComboBox corner radius (LookAndFeel_V4 default is 3). */

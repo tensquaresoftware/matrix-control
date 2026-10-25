@@ -184,7 +184,7 @@ namespace TSS::Design
             inline constexpr int kLogoHeight = 32;
             // Keep 0: controls + cartouches stay vertically centered in kHeight.
             inline constexpr int kContentVerticalOffset = 0;
-            inline constexpr int kLogoFontHeight = 27; // optical size; ÷4 grid exception for brand face
+            inline constexpr int kLogoFontHeight = 30; // optical size; ÷4 grid exception for brand face
             inline constexpr int kLogoGapAfter = 12;
             inline constexpr int kLogoPopupColumnWidth = 100;
             inline constexpr int kLogoPopupActionColumnWidth = 100;
