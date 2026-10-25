@@ -605,6 +605,8 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/DevSkinMatrixTests.cpp
         Tests/Unit/SkinEditorMappingModePolicyTests.cpp
         Tests/Unit/SkinEditorChromeLayoutTests.cpp
+        Tools/SkinEditor/SkinEditorChromePanel.cpp
+        Tools/SkinEditor/SkinEditorSkinsPanel.cpp
         Tests/Unit/SliderButtonLikeColourTests.cpp
         Tests/Unit/PatchManagerActionHandlerComputerNavigationTests.cpp
         Tests/Unit/PatchManagerActionHandlerNavDebounceTests.cpp

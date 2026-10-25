@@ -3,10 +3,12 @@
 
 #include "Tools/SkinEditor/SkinEditorChromeFonts.h"
 #include "Tools/SkinEditor/SkinEditorChromeTokens.h"
+#include "Tools/SkinEditor/SkinEditorColourPicker.h"
 #include "Tools/SkinEditor/SkinEditorMappingModePolicy.h"
+#include "Tools/SkinEditor/SkinEditorSkinsPanel.h"
 
 /**
- * Locks Skin Editor chrome layout tokens for SESSION / SKINS / mapping-band
+ * Locks Skin Editor chrome layout tokens for SESSION / SKINS / OPERATION
  * (no Unbound column). Witness Idle/Hold visibility uses MappingModePolicy SSOT.
  * Export unboundCount == 0 gate: DevSkinLayerJsonTests.
  * Bind unbound keys: DevSkinLayerJsonTests / DevSkinMatrixTests.
@@ -28,6 +30,7 @@ public:
         idleWitnessHiddenHoldWitnessVisible();
         mappingsKeepsLegacyHalfShareWidth();
         skinsPanelEditorActionsFitOneRow();
+        minContentHeightStacksSkinsAndColor();
     }
 
 private:
@@ -84,27 +87,104 @@ private:
                < SkinEditorChrome::kLegacyWindowMaxWidth / 2);
     }
 
+    static juce::TextButton* findButton(juce::Component& root, const juce::String& text)
+    {
+        for (auto* c : root.getChildren())
+            if (auto* b = dynamic_cast<juce::TextButton*>(c))
+                if (b->getButtonText() == text)
+                    return b;
+        return nullptr;
+    }
+
+    static juce::TextButton* findLowerDuplicate(juce::Component& root)
+    {
+        juce::TextButton* lower = nullptr;
+        for (auto* c : root.getChildren())
+        {
+            auto* b = dynamic_cast<juce::TextButton*>(c);
+            if (b == nullptr || b->getButtonText() != "Duplicate")
+                continue;
+            if (lower == nullptr || b->getY() > lower->getY())
+                lower = b;
+        }
+        return lower;
+    }
+
+    static juce::ComboBox* findLowerCombo(juce::Component& root)
+    {
+        juce::ComboBox* lower = nullptr;
+        for (auto* c : root.getChildren())
+        {
+            auto* box = dynamic_cast<juce::ComboBox*>(c);
+            if (box == nullptr)
+                continue;
+            if (lower == nullptr || box->getY() > lower->getY())
+                lower = box;
+        }
+        return lower;
+    }
+
     void skinsPanelEditorActionsFitOneRow()
     {
         beginTest("SKINS Delete matches Duplicate; New/Rename/Delete fit combo-to-Duplicate span");
 
+        SkinEditorSkinsPanel panel;
+        panel.setSize(SkinEditorChrome::kColorPanelWidth, SkinEditorSkinsPanel::preferredHeight());
+
+        auto* editorCombo = findLowerCombo(panel);
+        auto* editorDup = findLowerDuplicate(panel);
+        auto* newBtn = findButton(panel, "New");
+        auto* renameBtn = findButton(panel, "Rename");
+        auto* deleteBtn = findButton(panel, "Delete");
+
+        expect(editorCombo != nullptr);
+        expect(editorDup != nullptr);
+        expect(newBtn != nullptr);
+        expect(renameBtn != nullptr);
+        expect(deleteBtn != nullptr);
+        if (editorCombo == nullptr || editorDup == nullptr || newBtn == nullptr
+            || renameBtn == nullptr || deleteBtn == nullptr)
+            return;
+
+        expectEquals(deleteBtn->getWidth(), editorDup->getWidth());
+        expectEquals(newBtn->getY(), renameBtn->getY());
+        expectEquals(renameBtn->getY(), deleteBtn->getY());
+        expectEquals(newBtn->getX(), editorCombo->getX());
+        expectEquals(deleteBtn->getRight(), editorDup->getRight());
+        expect(newBtn->getWidth() >= 1);
+    }
+
+    void minContentHeightStacksSkinsAndColor()
+    {
+        beginTest("Min content height stacks title, OPERATION, SKINS, COLOR, status");
+
+        const int skinsH = SkinEditorSkinsPanel::preferredHeight();
+        const int colorH = SkinEditorColourPicker::preferredHeightForWidth(
+            SkinEditorChrome::kColorPanelWidth);
+        // Mirrors SkinEditorMainWindow::skinEditorMinContentHeight (anonymous).
+        const int minH = SkinEditorChrome::kTitleBarHeight + SkinEditorChrome::kGutter
+                         + SkinEditorChrome::kMappingBandHeight + SkinEditorChrome::kGutter
+                         + skinsH + colorH + SkinEditorChrome::kStatusBarHeight;
+
+        expect(skinsH > 0);
+        expect(colorH > 0);
+        expect(minH > skinsH + colorH);
+        // COLOR flush: preferred height has top gutter + content pads, no trailing kGutter.
+        constexpr int kFieldRowH = 24;
+        constexpr int kHueBarW = 18;
+        constexpr int kSvHueGap = 8;
         const int contentW = SkinEditorChrome::kColorPanelWidth
                              - 2 * SkinEditorChrome::kPanelContentPad;
-        const int labelColW = SkinEditorChrome::measureLabelWidth(
-            "Product:", SkinEditorChrome::fontRegular());
-        // Prefer Editor: if wider — labelColumnWidth takes max of both.
-        const int editorLabelW = SkinEditorChrome::measureLabelWidth(
-            "Editor:", SkinEditorChrome::fontRegular());
-        const int labelsW = juce::jmax(labelColW, editorLabelW);
-        const int dupW = SkinEditorChrome::measureButtonWidth(juce::TextButton("Duplicate"));
-        const int renameW = SkinEditorChrome::measureButtonWidth(juce::TextButton("Rename"));
-        const int gaps = 2 * SkinEditorChrome::kButtonGap;
-        const int comboW = juce::jmax(72, contentW - labelsW - SkinEditorChrome::kButtonGap - dupW);
-        const int spanW = comboW + SkinEditorChrome::kButtonGap + dupW;
-        const int newW = spanW - gaps - renameW - dupW;
-        expectEquals(contentW, 240);
-        expect(newW >= 1);
-        expectEquals(newW + gaps + renameW + dupW, spanW);
+        const int side = juce::jmax(0, contentW - kHueBarW - kSvHueGap);
+        expectEquals(colorH,
+                     SkinEditorChrome::kGutter + SkinEditorChrome::kPanelTitleHeight
+                         + SkinEditorChrome::kPanelContentPad + side
+                         + SkinEditorChrome::kPanelContentPad + kFieldRowH
+                         + SkinEditorChrome::kPanelContentPad);
+        // SKINS keeps top + bottom gutters (bottom contributes to SKINS↔COLOR gap).
+        expect(skinsH
+               >= SkinEditorChrome::kGutter + SkinEditorChrome::kPanelTitleHeight
+                      + SkinEditorChrome::kGutter);
     }
 };
 

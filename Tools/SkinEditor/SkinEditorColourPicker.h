@@ -4,6 +4,8 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
+#include "Tools/SkinEditor/SkinEditorChromeTokens.h"
+
 /** Photoshop-style SV square + vertical hue + #hex + R/G/B. */
 class SkinEditorColourPicker final : public juce::Component,
                                      private juce::TextEditor::Listener
@@ -14,8 +16,19 @@ public:
     /**
      * Panel height at `panelWidth` so the gap under #/R/G/B matches the gap above
      * them (kPanelContentPad), with the SV well sized from content width.
+     * Flush to status (no trailing panel gutter).
      */
-    static int preferredHeightForWidth(int panelWidth) noexcept;
+    static int preferredHeightForWidth(int panelWidth) noexcept
+    {
+        constexpr int kFieldRowH = 24;
+        constexpr int kHueBarW = 18;
+        constexpr int kSvHueGap = 8;
+        const int contentW = panelWidth - 2 * SkinEditorChrome::kPanelContentPad;
+        const int side = juce::jmax(0, contentW - kHueBarW - kSvHueGap);
+        return SkinEditorChrome::kGutter + SkinEditorChrome::kPanelTitleHeight
+               + SkinEditorChrome::kPanelContentPad + side + SkinEditorChrome::kPanelContentPad
+               + kFieldRowH + SkinEditorChrome::kPanelContentPad;
+    }
 
     void setColour(juce::Colour colour, juce::NotificationType notification);
     /** Idle SV/hue wells (#151515) and empty #/R/G/B until a Palette colour is selected. */

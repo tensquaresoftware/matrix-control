@@ -9,16 +9,6 @@ namespace
     constexpr int kSvHueGap = 8;
 }
 
-int SkinEditorColourPicker::preferredHeightForWidth(int panelWidth) noexcept
-{
-    const int contentW = panelWidth - 2 * SkinEditorChrome::kPanelContentPad;
-    const int side = juce::jmax(0, contentW - kHueBarW - kSvHueGap);
-    // layoutPanel chrome + content filled by SV + pad + fields; flush to status (no bottom gutter).
-    return SkinEditorChrome::kGutter + SkinEditorChrome::kPanelTitleHeight
-           + SkinEditorChrome::kPanelContentPad + side + SkinEditorChrome::kPanelContentPad
-           + kFieldRowH + SkinEditorChrome::kPanelContentPad;
-}
-
 SkinEditorColourPicker::SkinEditorColourPicker()
 {
     SkinEditorChrome::stylePanelTitle(titleLabel_, "COLOR");

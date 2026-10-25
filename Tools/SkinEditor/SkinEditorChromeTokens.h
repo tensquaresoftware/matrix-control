@@ -112,7 +112,6 @@ namespace SkinEditorChrome
     /** Integer optical nudges (barY + (barH - rowH) / 2 + nudge) — keep even/odd consistent. */
     /** Logo dropped 3px from geometric centre in the 54px logo bar. */
     inline constexpr int kLogoTitleNudgeY = 3;
-    inline constexpr int kLogoChromeNudgeY = 3;
     /** Geometric centre in the 36px status bar. */
     inline constexpr int kStatusChromeNudgeY = 0;
     inline constexpr int kPanelTitleHeight = 26;

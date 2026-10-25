@@ -24,8 +24,6 @@ public:
 
     /** Preferred height at kColorPanelWidth (includes outer gutters). */
     static int preferredHeight() noexcept;
-    /** Same as preferredHeight — SKINS no longer budgets a wrap row. */
-    static int preferredHeightForMinWindow() noexcept;
 
     void paint(juce::Graphics& g) override;
     void resized() override;

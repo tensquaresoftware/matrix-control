@@ -2800,3 +2800,17 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-chrome-session-skins.md`
   summary: Companion Skin Editor clean-code inventory/docs still mention SkinEditorUnboundPanel as live.
   evidence: Blind Hunter; documentation refresh outside this chrome restructure ship.
+
+## Deferred from: code review of spec-skin-editor-chrome-session-skins.md (2026-10-25)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-chrome-session-skins.md`
+  summary: Skin Editor shell/body geometry (MainWindow constrainer adoption, layoutBodyPanels / layoutOperationWell) is not unit-tested beyond token and policy helpers.
+  evidence: Verification Gap; project keeps Skin Editor GUI out of Matrix-Control_Tests; manual smoke remains.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-chrome-session-skins.md`
+  summary: `drawCountBadge` / count-badge tokens remain unused after Unbound panel deletion.
+  evidence: Edge Case Hunter; optional Boy Scout; already tracked in Skin Editor clean-code close-out residual.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-chrome-session-skins.md`
+  summary: On short displays, `skinEditorMinContentHeight` may exceed usable height; constrainer min is content-driven.
+  evidence: Edge Case Hunter; settle with live smoke on a short display / scaled desktop.

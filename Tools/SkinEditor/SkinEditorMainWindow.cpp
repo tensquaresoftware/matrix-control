@@ -22,8 +22,7 @@ namespace
      */
     int skinEditorMinContentHeight() noexcept
     {
-        const int skinsH = juce::jmax(SkinEditorSkinsPanel::preferredHeight(),
-                                      SkinEditorSkinsPanel::preferredHeightForMinWindow());
+        const int skinsH = SkinEditorSkinsPanel::preferredHeight();
         const int colorH = SkinEditorColourPicker::preferredHeightForWidth(
             SkinEditorChrome::kColorPanelWidth);
         const int leftColumn = skinsH + colorH;

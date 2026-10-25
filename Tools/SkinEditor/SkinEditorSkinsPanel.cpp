@@ -105,11 +105,6 @@ int SkinEditorSkinsPanel::preferredHeight() noexcept
            + SkinEditorChrome::kPanelContentPad + SkinEditorChrome::kGutter;
 }
 
-int SkinEditorSkinsPanel::preferredHeightForMinWindow() noexcept
-{
-    return preferredHeight();
-}
-
 int SkinEditorSkinsPanel::labelColumnWidth() noexcept
 {
     const auto font = SkinEditorChrome::fontRegular();
