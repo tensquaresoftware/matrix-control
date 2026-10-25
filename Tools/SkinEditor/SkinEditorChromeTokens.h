@@ -41,13 +41,25 @@ namespace SkinEditorChrome
 
     /** Window / inter-panel gutters only — never reuse as in-panel content inset. */
     inline constexpr int kGutter = 6;
-    /** Fixed body-column widths — Mappings / Unbound share the leftover. */
-    inline constexpr int kColorPanelWidth = 260;
-    inline constexpr int kPalettePanelWidth = 150;
-    /** Document window maximum width (height unconstrained here). */
-    inline constexpr int kWindowMaxWidth = 1210;
     /** Title-bar chrome inset (not panel body content). */
     inline constexpr int kPanelPad = 8;
+    inline constexpr int kButtonGap = 8;
+    /** Fixed left-column and Palette widths — Mappings takes the leftover. */
+    inline constexpr int kColorPanelWidth = 260;
+    inline constexpr int kPalettePanelWidth = 150;
+    /** Practical Mappings floor so object tables stay readable when the window shrinks. */
+    inline constexpr int kMappingsMinWidth = 320;
+    /**
+     * Body-column floor: gutters + Color + Palette + Mappings min.
+     * Live window min = max(body, measured title + SESSION) — see windowMinWidth().
+     */
+    inline constexpr int kWindowBodyMinWidth = kGutter + kColorPanelWidth + kGutter
+                                              + kPalettePanelWidth + kGutter
+                                              + kMappingsMinWidth + kGutter;
+    /** Document window maximum width (height unconstrained here). Default launch uses max. */
+    inline constexpr int kWindowMaxWidth = 1210;
+    /** Orbitron logo title in the Skin Editor title bar. */
+    inline constexpr const char* kAppTitleText = "MATRIX-CONTROL SKIN EDITOR";
     /**
      * In-panel content inset on all four sides of the body (below the title tab,
      * and left / right / bottom inside the silhouette). Do not use kGutter here.
@@ -56,8 +68,11 @@ namespace SkinEditorChrome
     inline constexpr int kTitleBarHeight = 32;
     /** Bottom status bar - same height / fill spirit as the logo title bar. */
     inline constexpr int kStatusBarHeight = kTitleBarHeight;
+    /** Nude mapping-help band under the logo (status-bar spirit, no SKINS well). */
+    inline constexpr int kMappingBandHeight = kStatusBarHeight;
+    /** Badge → label gap for CONNECTION / MAPPING / LAST PUSH chrome. */
+    inline constexpr int kChromeBadgeGap = 8;
     inline constexpr int kButtonHeight = 24;
-    inline constexpr int kButtonGap = 8;
     /** Chrome text badges (MAPPING / CONNECTION / …) — thinner than TextButton. */
     inline constexpr int kMappingBadgeHeight = 16;
     inline constexpr float kMappingBadgeFont = 11.0f;
@@ -70,11 +85,7 @@ namespace SkinEditorChrome
     inline constexpr int kLogoTitleNudgeY = 2;
     inline constexpr int kLogoChromeNudgeY = 3;
     inline constexpr int kStatusChromeNudgeY = -6;
-    /** MAPPING witness inset from Mappings panel left edge. */
-    inline constexpr int kMappingWitnessInsetX = 11;
     inline constexpr int kPanelTitleHeight = 26;
-    /** Top gutter + title band + bottom gutter — matches other panels' title offset. */
-    inline constexpr int kSkinsPanelHeight = kGutter + kPanelTitleHeight + kGutter;
     inline constexpr int kTitleTabPadH = 10;
     /** Sticky column-legend / table content row height. */
     inline constexpr int kColumnHeaderHeight = 22;

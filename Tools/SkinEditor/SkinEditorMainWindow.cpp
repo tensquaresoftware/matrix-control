@@ -2,6 +2,7 @@
 
 #include "Shared/ProjectPaths.h"
 #include "Standalone/StandaloneWindowPlacement.h"
+#include "Tools/SkinEditor/SkinEditorChromeFonts.h"
 #include "Tools/SkinEditor/SkinEditorChromeTokens.h"
 #include "Tools/SkinEditor/SkinEditorMainComponent.h"
 
@@ -177,7 +178,7 @@ void SkinEditorMainWindow::updateSizeLimits()
         }
     }
 
-    constrainer_.setMinimumWidth(SkinEditorChrome::kWindowMaxWidth);
+    constrainer_.setMinimumWidth(SkinEditorChrome::windowMinWidth());
     constrainer_.setMaximumWidth(SkinEditorChrome::kWindowMaxWidth);
     constrainer_.setMinimumHeight(kMinContentHeight);
     constrainer_.setMaximumHeight(maxH);
@@ -188,7 +189,9 @@ void SkinEditorMainWindow::normalizeClientSize()
 {
     updateSizeLimits();
 
-    const int w = SkinEditorChrome::kWindowMaxWidth;
+    const int w = juce::jlimit(SkinEditorChrome::windowMinWidth(),
+                               SkinEditorChrome::kWindowMaxWidth,
+                               getWidth());
     const int h = juce::jlimit(kMinContentHeight, maxContentHeight_, getHeight());
 
     if (getWidth() == w && getHeight() == h)

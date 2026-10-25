@@ -2780,3 +2780,23 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-hold-mapping-chrome.md`
   summary: MainComponent bind vs re-arm orchestration (intent switch to applyMapping / enterHeldColour) is only covered indirectly by SkinEditorMappingModePolicy unit tests, not by a non-GUI driver of the MainComponent switches.
   evidence: Verification-gap review; repo keeps Skin Editor GUI out of unit tests; Hold return-click remains a manual chrome check.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-chrome-session-skins.md`
+  summary: Skin Editor MainWindow min-width unlock (`windowMinWidth` constrainer) has no unit test in Matrix-Control_Tests.
+  evidence: Verification-gap review; GUI DocumentWindow shell is not linked into the unit runner; manual narrow-resize remains the AC check.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-chrome-session-skins.md`
+  summary: Mapping-band / body column placement (no Unbound half-split, witness only in nude band) is not asserted via component geometry tests.
+  evidence: Verification-gap review; project keeps Skin Editor GUI layout out of unit tests; Idle/Hold witness policy remains covered by MappingModePolicy + chrome token tests.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-chrome-session-skins.md`
+  summary: `kMinContentHeight` (480) may leave COLOR too short after adding mapping band + taller left SKINS stack.
+  evidence: Blind Hunter; needs live smoke at minimum height to confirm whether a higher floor is required.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-chrome-session-skins.md`
+  summary: `drawCountBadge` / count-badge tokens remain after Unbound panel deletion with no callers.
+  evidence: Edge Case Hunter; optional Boy Scout; count-badge DRY already deferred in Skin Editor clean-code close-out.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-chrome-session-skins.md`
+  summary: Companion Skin Editor clean-code inventory/docs still mention SkinEditorUnboundPanel as live.
+  evidence: Blind Hunter; documentation refresh outside this chrome restructure ship.

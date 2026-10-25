@@ -1,6 +1,7 @@
 #include "Tools/SkinEditor/SkinEditorMainComponent.h"
 
 #include "Tools/SkinEditor/SkinEditorChromeFonts.h"
+#include "Tools/SkinEditor/SkinEditorChromePanel.h"
 #include "Tools/SkinEditor/SkinEditorChromeTable.h"
 
 SkinEditorMainComponent::SkinEditorMainComponent()
@@ -10,7 +11,8 @@ SkinEditorMainComponent::SkinEditorMainComponent()
     SkinEditorChrome::warmFonts();
     setupTitleBarChrome();
     setupStatusBarChrome();
-    setupSkinsBar();
+    setupSessionWell();
+    setupSkinsPanel();
     setupBodyPanels();
     setupLayerAndBridgeCallbacks();
     loadSessionOrBaseline();
@@ -38,7 +40,7 @@ SkinEditorMainComponent::~SkinEditorMainComponent()
 
 void SkinEditorMainComponent::setupTitleBarChrome()
 {
-    titleLabel_.setText("MATRIX-CONTROL SKIN EDITOR", juce::dontSendNotification);
+    titleLabel_.setText(SkinEditorChrome::kAppTitleText, juce::dontSendNotification);
     titleLabel_.setFont(SkinEditorChrome::fontAppTitle());
     titleLabel_.setColour(juce::Label::textColourId, SkinEditorChrome::textBrand());
     titleLabel_.setJustificationType(juce::Justification::centredLeft);
@@ -73,42 +75,16 @@ void SkinEditorMainComponent::setupStatusBarChrome()
                           juce::dontSendNotification);
 }
 
-void SkinEditorMainComponent::setupSkinsBar()
+void SkinEditorMainComponent::setupSkinsPanel()
 {
-    SkinEditorChrome::stylePanelTitle(skinsTitleLabel_, "SKINS");
-    addAndMakeVisible(skinsTitleLabel_);
-
-    for (auto* label : { &productLabel_, &editorLabel_ })
-    {
-        label->setFont(SkinEditorChrome::fontRegular());
-        label->setColour(juce::Label::textColourId, SkinEditorChrome::textMuted());
-        SkinEditorChrome::preventTextSquish(*label);
-        addAndMakeVisible(*label);
-    }
-    productCombo_.addListener(this);
-    editorCombo_.addListener(this);
-    addAndMakeVisible(productCombo_);
-    addAndMakeVisible(editorCombo_);
-
-    auto wire = [this](juce::TextButton& button, auto handler)
-    {
-        addAndMakeVisible(button);
-        button.onClick = handler;
-    };
-    wire(productDuplicateButton_, [this] { onDuplicateProduct(); });
-    wire(editorDuplicateButton_, [this] { onDuplicateEditor(); });
-    wire(newButton_, [this] { onNew(); });
-    wire(renameButton_, [this] { onRename(); });
-    wire(deleteButton_, [this] { onDelete(); });
-    wire(undoButton_, [this] { onUndo(); });
-    wire(redoButton_, [this] { onRedo(); });
-    wire(compareButton_, [this] { onCompareToggle(); });
-    wire(pushButton_, [this] { onPush(); });
-    wire(exportButton_, [this] { onExportJson(); });
-    wire(importButton_, [this] { onImportJson(); });
-    compareBlinkTimer_.onTick = [this] { tickCompareBlink(); };
-    undoButton_.setEnabled(false);
-    redoButton_.setEnabled(false);
+    skinsPanel_.onDuplicateProduct = [this] { onDuplicateProduct(); };
+    skinsPanel_.onDuplicateEditor = [this] { onDuplicateEditor(); };
+    skinsPanel_.onNew = [this] { onNew(); };
+    skinsPanel_.onRename = [this] { onRename(); };
+    skinsPanel_.onDelete = [this] { onDelete(); };
+    skinsPanel_.productCombo().addListener(this);
+    skinsPanel_.editorCombo().addListener(this);
+    addAndMakeVisible(skinsPanel_);
 }
 
 void SkinEditorMainComponent::setupBodyPanels()
@@ -133,18 +109,10 @@ void SkinEditorMainComponent::setupBodyPanels()
     mappingsPanel_.setLayer(&layer_);
     mappingsPanel_.onRowActivated = [this](TSS::SkinColourKey key)
     {
-        onMappingRowActivated(key, false);
+        onMappingRowActivated(key);
     };
     mappingsPanel_.onEscapeRequested = escapeMapping;
     addAndMakeVisible(mappingsPanel_);
-
-    unboundPanel_.setLayer(&layer_);
-    unboundPanel_.onRowActivated = [this](TSS::SkinColourKey key)
-    {
-        onMappingRowActivated(key, true);
-    };
-    unboundPanel_.onEscapeRequested = escapeMapping;
-    addAndMakeVisible(unboundPanel_);
 }
 
 void SkinEditorMainComponent::setupLayerAndBridgeCallbacks()
@@ -178,9 +146,13 @@ void SkinEditorMainComponent::paint(juce::Graphics& g)
 {
     g.fillAll(SkinEditorChrome::surfaceApp());
 
-    auto bounds = getLocalBounds();
-    bounds.removeFromTop(SkinEditorChrome::kTitleBarHeight);
-    bounds.removeFromBottom(SkinEditorChrome::kStatusBarHeight);
+    if (! sessionWellBounds_.isEmpty())
+        SkinEditorChrome::paintRoundedWell(g, sessionWellBounds_, SkinEditorChrome::surfacePanel());
+
+    g.setColour(SkinEditorChrome::separatorLine().withAlpha(0.85f));
+    for (const int x : sessionSeparatorXs_)
+        if (x > 0)
+            g.fillRect(x, sessionSeparatorY_, 1, sessionSeparatorH_);
 
     if (mappingWitnessActive_ && ! mappingBadgeBounds_.isEmpty())
         SkinEditorChrome::drawMappingModeBadge(g, mappingBadgeBounds_);
@@ -194,18 +166,6 @@ void SkinEditorMainComponent::paint(juce::Graphics& g)
         SkinEditorChrome::drawChromeBadge(g, lastPushBadgeBounds_, "LAST PUSH");
     if (! appBadgeBounds_.isEmpty())
         SkinEditorChrome::drawChromeBadge(g, appBadgeBounds_, "APP");
-
-    bounds.removeFromTop(SkinEditorChrome::kGutter);
-    bounds.removeFromLeft(SkinEditorChrome::kGutter);
-    bounds.removeFromRight(SkinEditorChrome::kGutter);
-    auto skins = bounds.removeFromTop(SkinEditorChrome::kSkinsPanelHeight);
-    g.setColour(SkinEditorChrome::surfacePanel());
-    g.fillRoundedRectangle(skins.toFloat(), SkinEditorChrome::kControlCorner);
-
-    g.setColour(SkinEditorChrome::separatorLine().withAlpha(0.85f));
-    for (const int x : skinsBarSeparatorXs_)
-        if (x > 0)
-            g.fillRect(x, skinsBarSeparatorY_, 1, skinsBarSeparatorH_);
 }
 
 int SkinEditorMainComponent::chromeRowY(int barY, int barH, int rowH, int opticalNudgeY) noexcept
@@ -213,19 +173,8 @@ int SkinEditorMainComponent::chromeRowY(int barY, int barH, int rowH, int optica
     return barY + (barH - rowH) / 2 + opticalNudgeY;
 }
 
-int SkinEditorMainComponent::mappingsPanelLeftX() noexcept
-{
-    // Matches layoutBodyPanels after left gutter (see resized).
-    return SkinEditorChrome::kGutter
-           + SkinEditorChrome::kColorPanelWidth
-           + SkinEditorChrome::kGutter
-           + SkinEditorChrome::kPalettePanelWidth
-           + SkinEditorChrome::kGutter;
-}
-
 void SkinEditorMainComponent::layoutTitleBar(juce::Rectangle<int> titleBar)
 {
-    const int rowH = SkinEditorChrome::kMappingBadgeHeight;
     const int titleH = juce::roundToInt(SkinEditorChrome::kAppTitleFont);
     const int titleW = SkinEditorChrome::measureTextWidth(SkinEditorChrome::fontAppTitle(),
                                                          titleLabel_.getText())
@@ -233,51 +182,68 @@ void SkinEditorMainComponent::layoutTitleBar(juce::Rectangle<int> titleBar)
     const int titleY = chromeRowY(titleBar.getY(), titleBar.getHeight(), titleH,
                                   SkinEditorChrome::kLogoTitleNudgeY);
     titleLabel_.setBounds(titleBar.getX(), titleY, titleW, titleH);
+    layoutSessionWell(titleBar, titleBar.getX() + titleW);
+}
 
+void SkinEditorMainComponent::layoutMappingBand(juce::Rectangle<int> band)
+{
     mappingBadgeBounds_ = {};
     mappingSwatchBounds_ = {};
     mappingPrefixLabel_.setBounds({});
     mappingDetailLabel_.setBounds({});
-    if (mappingWitnessActive_)
-    {
-        const int rowY = chromeRowY(titleBar.getY(), titleBar.getHeight(), rowH,
-                                    SkinEditorChrome::kLogoChromeNudgeY);
-        layoutMappingWitness(rowY, rowH, titleBar.getRight());
-    }
-}
+    if (! mappingWitnessActive_)
+        return;
 
-void SkinEditorMainComponent::layoutMappingWitness(int rowY, int rowH, int rightLimit)
-{
-    constexpr int kGap = 8;
+    const int rowH = SkinEditorChrome::kMappingBadgeHeight;
+    const int rowY = chromeRowY(band.getY(), band.getHeight(), rowH,
+                                SkinEditorChrome::kLogoChromeNudgeY);
     const int badgeW = SkinEditorChrome::mappingModeBadgeWidth();
     const int sw = SkinEditorChrome::kColourSwatchSize;
     const auto bodyFont = SkinEditorChrome::fontRegular();
-    const int prefixW = SkinEditorChrome::measureTextWidth(bodyFont, mappingPrefixLabel_.getText()) + 2;
-    const int detailW = SkinEditorChrome::measureTextWidth(bodyFont, mappingDetailLabel_.getText()) + 4;
+    const int gap = SkinEditorChrome::kChromeBadgeGap;
+    const auto prefixFull = mappingPrefixLabel_.getTooltip().isNotEmpty()
+                                ? mappingPrefixLabel_.getTooltip()
+                                : mappingPrefixLabel_.getText();
+    const auto detailFull = mappingDetailLabel_.getTooltip().isNotEmpty()
+                                ? mappingDetailLabel_.getTooltip()
+                                : mappingDetailLabel_.getText();
 
-    // Start at Mappings panel left + inset. Shared integer rowY for all.
-    int x = mappingsPanelLeftX() + SkinEditorChrome::kMappingWitnessInsetX;
-    if (x + badgeW > rightLimit)
+    int x = band.getX();
+    if (x + badgeW > band.getRight())
         return;
 
     mappingBadgeBounds_ = { x, rowY, badgeW, rowH };
-    x += badgeW + kGap;
+    x += badgeW + gap;
 
+    const int swatchReserve = mappingWitnessShowSwatch_ ? (sw + gap) : 0;
+    const int prefixMax = juce::jmax(0, band.getRight() - x - gap - swatchReserve);
+    const auto prefixShown = SkinEditorChrome::elideToWidth(bodyFont, prefixFull, prefixMax);
+    const int prefixW = juce::jmin(prefixMax,
+                                   SkinEditorChrome::measureTextWidth(bodyFont, prefixShown) + 2);
+    mappingPrefixLabel_.setText(prefixShown, juce::dontSendNotification);
     mappingPrefixLabel_.setBounds(x, rowY, prefixW, rowH);
-    x += prefixW + kGap;
+    x += prefixW + gap;
 
     if (mappingWitnessShowSwatch_)
     {
-        mappingSwatchBounds_ = { x, rowY + (rowH - sw) / 2, sw, sw };
-        x += sw + kGap;
+        if (x + sw <= band.getRight())
+        {
+            mappingSwatchBounds_ = { x, rowY + (rowH - sw) / 2, sw, sw };
+            x += sw + gap;
+        }
     }
 
+    const int detailMax = juce::jmax(0, band.getRight() - x);
+    const auto detailShown = SkinEditorChrome::elideToWidth(bodyFont, detailFull, detailMax);
+    const int detailW = juce::jmin(detailMax,
+                                   SkinEditorChrome::measureTextWidth(bodyFont, detailShown) + 4);
+    mappingDetailLabel_.setText(detailShown, juce::dontSendNotification);
     mappingDetailLabel_.setBounds(x, rowY, detailW, rowH);
 }
 
 void SkinEditorMainComponent::layoutStatusBar(juce::Rectangle<int> statusBar)
 {
-    constexpr int kGap = 8;
+    const int gap = SkinEditorChrome::kChromeBadgeGap;
     const int rowH = SkinEditorChrome::kMappingBadgeHeight;
     const int rowY = chromeRowY(statusBar.getY(), statusBar.getHeight(), rowH,
                                 SkinEditorChrome::kStatusChromeNudgeY);
@@ -287,15 +253,14 @@ void SkinEditorMainComponent::layoutStatusBar(juce::Rectangle<int> statusBar)
     const int appBadgeW = SkinEditorChrome::chromeBadgeWidth("APP");
     const int versionW = SkinEditorChrome::measureTextWidth(statusFont, versionLabel_.getText()) + 4;
 
-    // Fixed badge anchors: left / centre / right. Labels use the slots between them.
     const int leftX = statusBar.getX();
     connectionBadgeBounds_ = { leftX, rowY, connBadgeW, rowH };
     lastPushBadgeBounds_ = { statusBar.getCentreX() - pushBadgeW / 2, rowY, pushBadgeW, rowH };
-    const int appX = statusBar.getRight() - appBadgeW - kGap - versionW;
+    const int appX = statusBar.getRight() - appBadgeW - gap - versionW;
     appBadgeBounds_ = { appX, rowY, appBadgeW, rowH };
 
-    const int connLabelX = connectionBadgeBounds_.getRight() + kGap;
-    const int connLabelMaxW = juce::jmax(0, lastPushBadgeBounds_.getX() - kGap - connLabelX);
+    const int connLabelX = connectionBadgeBounds_.getRight() + gap;
+    const int connLabelMaxW = juce::jmax(0, lastPushBadgeBounds_.getX() - gap - connLabelX);
     const auto connFull = connectionLabel_.getTooltip().isNotEmpty()
                               ? connectionLabel_.getTooltip()
                               : connectionLabel_.getText();
@@ -303,8 +268,8 @@ void SkinEditorMainComponent::layoutStatusBar(juce::Rectangle<int> statusBar)
                              juce::dontSendNotification);
     connectionLabel_.setBounds(connLabelX, rowY, connLabelMaxW, rowH);
 
-    const int pushLabelX = lastPushBadgeBounds_.getRight() + kGap;
-    const int pushLabelMaxW = juce::jmax(0, appBadgeBounds_.getX() - kGap - pushLabelX);
+    const int pushLabelX = lastPushBadgeBounds_.getRight() + gap;
+    const int pushLabelMaxW = juce::jmax(0, appBadgeBounds_.getX() - gap - pushLabelX);
     const auto pushFull = lastPushLabel_.getTooltip().isNotEmpty()
                               ? lastPushLabel_.getTooltip()
                               : lastPushLabel_.getText();
@@ -312,25 +277,28 @@ void SkinEditorMainComponent::layoutStatusBar(juce::Rectangle<int> statusBar)
                            juce::dontSendNotification);
     lastPushLabel_.setBounds(pushLabelX, rowY, pushLabelMaxW, rowH);
 
-    versionLabel_.setBounds(appX + appBadgeW + kGap, rowY, versionW, rowH);
+    versionLabel_.setBounds(appX + appBadgeW + gap, rowY, versionW, rowH);
 }
 
 void SkinEditorMainComponent::layoutBodyPanels(juce::Rectangle<int> bounds)
 {
     const int gutter = SkinEditorChrome::kGutter;
-    colourPicker_.setBounds(bounds.removeFromLeft(SkinEditorChrome::kColorPanelWidth));
+    auto left = bounds.removeFromLeft(SkinEditorChrome::kColorPanelWidth);
+    const int skinsH = SkinEditorSkinsPanel::preferredHeight();
+    skinsPanel_.setBounds(left.removeFromTop(skinsH));
+    left.removeFromTop(gutter);
+    colourPicker_.setBounds(left);
+
     bounds.removeFromLeft(gutter);
     palettePanel_.setBounds(bounds.removeFromLeft(SkinEditorChrome::kPalettePanelWidth));
     bounds.removeFromLeft(gutter);
-    const int mapW = juce::jmax(0, (bounds.getWidth() - gutter) / 2);
-    mappingsPanel_.setBounds(bounds.removeFromLeft(mapW));
-    bounds.removeFromLeft(gutter);
-    unboundPanel_.setBounds(bounds);
+    mappingsPanel_.setBounds(bounds);
 }
 
 void SkinEditorMainComponent::resized()
 {
-    skinsBarSeparatorXs_.clear();
+    sessionSeparatorXs_.clear();
+    sessionWellBounds_ = {};
     connectionBadgeBounds_ = {};
     lastPushBadgeBounds_ = {};
     appBadgeBounds_ = {};
@@ -343,6 +311,11 @@ void SkinEditorMainComponent::resized()
                               .withTrimmedRight(SkinEditorChrome::kPanelPad);
     layoutTitleBar(titleBar);
 
+    const auto mappingBand = bounds.removeFromTop(SkinEditorChrome::kMappingBandHeight)
+                                 .withTrimmedLeft(SkinEditorChrome::kPanelPad)
+                                 .withTrimmedRight(SkinEditorChrome::kPanelPad);
+    layoutMappingBand(mappingBand);
+
     const auto statusBar = bounds.removeFromBottom(SkinEditorChrome::kStatusBarHeight)
                                .withTrimmedLeft(SkinEditorChrome::kPanelPad)
                                .withTrimmedRight(SkinEditorChrome::kPanelPad);
@@ -352,8 +325,5 @@ void SkinEditorMainComponent::resized()
     bounds.removeFromBottom(SkinEditorChrome::kGutter);
     bounds.removeFromLeft(SkinEditorChrome::kGutter);
     bounds.removeFromRight(SkinEditorChrome::kGutter);
-    layoutSkinsBar(bounds.removeFromTop(SkinEditorChrome::kSkinsPanelHeight));
-
-    bounds.removeFromTop(SkinEditorChrome::kGutter);
     layoutBodyPanels(bounds);
 }

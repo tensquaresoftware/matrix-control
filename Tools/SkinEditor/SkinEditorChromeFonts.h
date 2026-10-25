@@ -149,4 +149,40 @@ namespace SkinEditorChrome
     {
         return measureTextWidth(fontTitle(), title) + kTitleTabPadH * 2 + extraInsideTab;
     }
+
+    /** SESSION well width: title tab + Undo/Redo | Compare/Push | Export/Import. */
+    inline int sessionWellPreferredWidth() noexcept
+    {
+        const int titleW = titleTabWidth("SESSION");
+        const auto measure = [](const char* text)
+        {
+            return measureButtonWidth(juce::TextButton(text));
+        };
+        constexpr int kSep = kButtonGap * 4 + 1;
+        return titleW + kButtonGap
+               + measure("Undo") + kButtonGap + measure("Redo")
+               + kSep
+               + measure("Compare") + kButtonGap + measure("Push")
+               + kSep
+               + measure("Export") + kButtonGap + measure("Import");
+    }
+
+    /** Measured Orbitron title advance (+ layout pad matching layoutTitleBar). */
+    inline int appTitlePreferredWidth() noexcept
+    {
+        return measureTextWidth(fontAppTitle(), kAppTitleText) + 8;
+    }
+
+    /** Title-bar pads + measured app title + SESSION well. */
+    inline int windowTitleSessionMinWidth() noexcept
+    {
+        return kPanelPad + appTitlePreferredWidth() + kButtonGap
+               + sessionWellPreferredWidth() + kPanelPad;
+    }
+
+    /** Constrainer / normalize floor: body columns vs title + SESSION (whichever is wider). */
+    inline int windowMinWidth() noexcept
+    {
+        return juce::jmax(kWindowBodyMinWidth, windowTitleSessionMinWidth());
+    }
 }

@@ -9,7 +9,7 @@
 #include "Tools/SkinEditor/SkinEditorColourPicker.h"
 #include "Tools/SkinEditor/SkinEditorMappingsPanel.h"
 #include "Tools/SkinEditor/SkinEditorPalettePanel.h"
-#include "Tools/SkinEditor/SkinEditorUnboundPanel.h"
+#include "Tools/SkinEditor/SkinEditorSkinsPanel.h"
 
 class SkinEditorMainComponent final : public juce::Component,
                                       private juce::ComboBox::Listener,
@@ -84,33 +84,32 @@ private:
 
     // Mapping modes (SkinEditorMainComponentMapping.cpp)
     void onPastilleSelected(const juce::String& name);
-    void onMappingRowActivated(TSS::SkinColourKey key, bool fromUnbound);
+    void onMappingRowActivated(TSS::SkinColourKey key);
     void enterHeldColour(const juce::String& pastilleName);
     void enterArmedRow(TSS::SkinColourKey key, bool fromUnbound);
     void clearMappingModeToIdle();
     void retainMappingModeAfterWrite(TSS::SkinColourKey key, bool fromUnbound);
     void applyMapping(TSS::SkinColourKey key, const juce::String& pastilleName, bool fromUnbound);
+    bool isKeyUnboundOnEditor(TSS::SkinColourKey key) const;
     void syncColourPickerToSelection();
+    void fillHeldColourWitness();
+    void fillArmedRowWitness();
     void updateMappingWitness();
 
-    // Layout / setup (SkinEditorMainComponent.cpp)
+    // Layout / setup (SkinEditorMainComponent.cpp + Skins.cpp)
     void setupTitleBarChrome();
     void setupStatusBarChrome();
-    void setupSkinsBar();
+    void setupSessionWell();
+    void setupSkinsPanel();
     void setupBodyPanels();
     void setupLayerAndBridgeCallbacks();
     void layoutTitleBar(juce::Rectangle<int> titleBar);
-    /** Places MAPPING witness in the logo bar; badge left edge matches Mappings panel. */
-    void layoutMappingWitness(int rowY, int rowH, int rightLimit);
+    void layoutSessionWell(juce::Rectangle<int> titleBar, int titleRight);
+    void layoutMappingBand(juce::Rectangle<int> band);
     void layoutStatusBar(juce::Rectangle<int> statusBar);
+    void layoutBodyPanels(juce::Rectangle<int> bounds);
     /** Integer row top inside a bar — never half-pixel. */
     static int chromeRowY(int barY, int barH, int rowH, int opticalNudgeY) noexcept;
-    static int mappingsPanelLeftX() noexcept;
-    void layoutSkinsBar(juce::Rectangle<int> skins);
-    int skinsBarComboWidth(int rowWidthSansTrailingGap) const;
-    void layoutSkinsSkinSelectors(juce::Rectangle<int>& row, int comboWidth);
-    void layoutSkinsActionButtons(juce::Rectangle<int>& row);
-    void layoutBodyPanels(juce::Rectangle<int> bounds);
 
     SkinEditorChrome::LookAndFeel lookAndFeel_;
 
@@ -153,30 +152,20 @@ private:
     juce::Rectangle<int> lastPushBadgeBounds_;
     juce::Rectangle<int> appBadgeBounds_;
 
-    juce::Label skinsTitleLabel_;
-    juce::Label productLabel_ { {}, "Product:" };
-    juce::ComboBox productCombo_;
-    juce::Label editorLabel_ { {}, "Editor:" };
-    juce::ComboBox editorCombo_;
-
-    juce::TextButton productDuplicateButton_ { "Duplicate" };
-    juce::TextButton editorDuplicateButton_ { "Duplicate" };
-    juce::TextButton newButton_ { "New" };
-    juce::TextButton renameButton_ { "Rename" };
-    juce::TextButton deleteButton_ { "Delete" };
+    juce::Label sessionTitleLabel_;
     juce::TextButton undoButton_ { "Undo" };
     juce::TextButton redoButton_ { "Redo" };
     juce::TextButton compareButton_ { "Compare" };
     juce::TextButton pushButton_ { "Push" };
     juce::TextButton exportButton_ { "Export" };
     juce::TextButton importButton_ { "Import" };
+    juce::Rectangle<int> sessionWellBounds_;
+    std::vector<int> sessionSeparatorXs_;
+    int sessionSeparatorY_ = 0;
+    int sessionSeparatorH_ = 0;
 
+    SkinEditorSkinsPanel skinsPanel_;
     SkinEditorColourPicker colourPicker_;
     SkinEditorPalettePanel palettePanel_;
     SkinEditorMappingsPanel mappingsPanel_;
-    SkinEditorUnboundPanel unboundPanel_;
-
-    std::vector<int> skinsBarSeparatorXs_;
-    int skinsBarSeparatorY_ = 0;
-    int skinsBarSeparatorH_ = 0;
 };

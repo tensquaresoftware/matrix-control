@@ -35,7 +35,15 @@ void SkinEditorMainComponent::onPastilleSelected(const juce::String& name)
     }
 }
 
-void SkinEditorMainComponent::onMappingRowActivated(TSS::SkinColourKey key, bool fromUnbound)
+bool SkinEditorMainComponent::isKeyUnboundOnEditor(TSS::SkinColourKey key) const
+{
+    const auto* skin = layer_.findSkin(sessionState_.editorSkinId);
+    if (skin == nullptr)
+        return false;
+    return skin->mappings.find(key) == skin->mappings.end();
+}
+
+void SkinEditorMainComponent::onMappingRowActivated(TSS::SkinColourKey key)
 {
     using Intent = SkinEditorMappingPolicy::RowIntent;
 
@@ -45,6 +53,7 @@ void SkinEditorMainComponent::onMappingRowActivated(TSS::SkinColourKey key, bool
     else if (mappingMode_ == MappingMode::kArmedRow)
         policyMode = SkinEditorMappingPolicy::Mode::kArmedRow;
 
+    const bool fromUnbound = isKeyUnboundOnEditor(key);
     const auto intent = SkinEditorMappingPolicy::rowClick(policyMode, canEditEditorSkin());
     switch (intent)
     {
@@ -146,6 +155,40 @@ void SkinEditorMainComponent::applyMapping(TSS::SkinColourKey key,
     retainMappingModeAfterWrite(key, fromUnbound);
 }
 
+void SkinEditorMainComponent::fillHeldColourWitness()
+{
+    const bool productColour = layer_.isProductPastilleName(selectedPastille_);
+    // No trailing space — layoutMappingBand inserts kChromeBadgeGap before the swatch.
+    const auto prefix = productColour ? "Product colour:" : "Editor colour:";
+    mappingPrefixLabel_.setTooltip(prefix);
+    mappingPrefixLabel_.setText(prefix, juce::dontSendNotification);
+    mappingDetailLabel_.setTooltip(selectedPastille_);
+    mappingDetailLabel_.setText(selectedPastille_, juce::dontSendNotification);
+    if (const auto* skin = layer_.findSkin(visibleSkinId()))
+    {
+        for (const auto& pastille : skin->palette)
+        {
+            if (pastille.name == selectedPastille_)
+            {
+                mappingWitnessShowSwatch_ = true;
+                mappingWitnessColour_ = juce::Colour(pastille.argb);
+                break;
+            }
+        }
+    }
+}
+
+void SkinEditorMainComponent::fillArmedRowWitness()
+{
+    mappingPrefixLabel_.setTooltip("Target:");
+    mappingPrefixLabel_.setText("Target:", juce::dontSendNotification);
+    const auto detail = TSS::DevSkin::toString(armedKey_.object) + " > "
+                        + TSS::DevSkin::toString(armedKey_.property) + " > "
+                        + TSS::DevSkin::toString(armedKey_.state);
+    mappingDetailLabel_.setTooltip(detail);
+    mappingDetailLabel_.setText(detail, juce::dontSendNotification);
+}
+
 void SkinEditorMainComponent::updateMappingWitness()
 {
     auto policyMode = SkinEditorMappingPolicy::Mode::kIdle;
@@ -159,36 +202,14 @@ void SkinEditorMainComponent::updateMappingWitness()
     mappingWitnessColour_ = juce::Colours::transparentBlack;
 
     if (mappingMode_ == MappingMode::kHeldColour)
-    {
-        const bool productColour = layer_.isProductPastilleName(selectedPastille_);
-        // No trailing space — layoutMappingWitness inserts kGap before the swatch.
-        mappingPrefixLabel_.setText(productColour ? "Product colour:" : "Editor colour:",
-                                    juce::dontSendNotification);
-        mappingDetailLabel_.setText(selectedPastille_, juce::dontSendNotification);
-        if (const auto* skin = layer_.findSkin(visibleSkinId()))
-        {
-            for (const auto& pastille : skin->palette)
-            {
-                if (pastille.name == selectedPastille_)
-                {
-                    mappingWitnessShowSwatch_ = true;
-                    mappingWitnessColour_ = juce::Colour(pastille.argb);
-                    break;
-                }
-            }
-        }
-    }
+        fillHeldColourWitness();
     else if (mappingMode_ == MappingMode::kArmedRow)
-    {
-        mappingPrefixLabel_.setText("Target:", juce::dontSendNotification);
-        mappingDetailLabel_.setText(TSS::DevSkin::toString(armedKey_.object) + " > "
-                                        + TSS::DevSkin::toString(armedKey_.property) + " > "
-                                        + TSS::DevSkin::toString(armedKey_.state),
-                                    juce::dontSendNotification);
-    }
+        fillArmedRowWitness();
     else
     {
+        mappingPrefixLabel_.setTooltip({});
         mappingPrefixLabel_.setText({}, juce::dontSendNotification);
+        mappingDetailLabel_.setTooltip({});
         mappingDetailLabel_.setText({}, juce::dontSendNotification);
     }
 

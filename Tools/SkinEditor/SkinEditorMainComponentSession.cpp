@@ -84,7 +84,7 @@ bool SkinEditorMainComponent::keyPressed(const juce::KeyPress& key)
 
 void SkinEditorMainComponent::applyProductComboChange()
 {
-    const int id = productCombo_.getSelectedId();
+    const int id = skinsPanel_.productCombo().getSelectedId();
     sessionState_.productSkinId = (id == 1) ? TSS::DevSkin::kCompiledBlackId
                                             : TSS::DevSkin::kCompiledCreamId;
     markDirty();
@@ -96,7 +96,7 @@ void SkinEditorMainComponent::applyProductComboChange()
 
 void SkinEditorMainComponent::applyEditorComboChange()
 {
-    const auto label = editorCombo_.getText();
+    const auto label = skinsPanel_.editorCombo().getText();
     for (const auto& skin : layer_.skins())
     {
         if (skin.kind != TSS::DevSkin::SkinKind::kDev || ! skin.name.equalsIgnoreCase(label))
@@ -119,9 +119,9 @@ void SkinEditorMainComponent::comboBoxChanged(juce::ComboBox* box)
 {
     if (suppressCombo_)
         return;
-    if (box == &productCombo_)
+    if (box == &skinsPanel_.productCombo())
         applyProductComboChange();
-    else if (box == &editorCombo_)
+    else if (box == &skinsPanel_.editorCombo())
         applyEditorComboChange();
 }
 
@@ -143,11 +143,10 @@ void SkinEditorMainComponent::refreshAll()
 
     syncCompareButtonChrome();
 
-    renameButton_.setEnabled(editable);
-    deleteButton_.setEnabled(editable);
-    newButton_.setEnabled(true);
-    productDuplicateButton_.setEnabled(true);
-    editorDuplicateButton_.setEnabled(sessionState_.editorSkinId.isNotEmpty());
+    skinsPanel_.setProductDuplicateEnabled(true);
+    skinsPanel_.setEditorActionsEnabled(sessionState_.editorSkinId.isNotEmpty(),
+                                        editable,
+                                        true);
 
     palettePanel_.setActiveSkinId(visibleId);
     palettePanel_.setReadOnly(! editable);
@@ -156,11 +155,6 @@ void SkinEditorMainComponent::refreshAll()
     mappingsPanel_.setActiveSkinId(visibleId);
     mappingsPanel_.setReadOnly(compareProduct || ! editable);
     mappingsPanel_.refresh();
-
-    unboundPanel_.setActiveSkinId(visibleId);
-    unboundPanel_.setEmptyForCompareProduct(compareProduct);
-    unboundPanel_.setReadOnly(compareProduct || ! editable);
-    unboundPanel_.refresh();
 
     if (! editable && mappingMode_ != MappingMode::kIdle)
         clearMappingModeToIdle();
@@ -193,35 +187,37 @@ void SkinEditorMainComponent::refreshAll()
 void SkinEditorMainComponent::refreshCombos()
 {
     const juce::ScopedValueSetter<bool> scope(suppressCombo_, true);
-    productCombo_.clear(juce::dontSendNotification);
-    productCombo_.addItem("BLACK", 1);
-    productCombo_.addItem("CREAM", 2);
-    productCombo_.setSelectedId(sessionState_.productSkinId == TSS::DevSkin::kCompiledBlackId ? 1 : 2,
-                                juce::dontSendNotification);
+    auto& productCombo = skinsPanel_.productCombo();
+    auto& editorCombo = skinsPanel_.editorCombo();
+    productCombo.clear(juce::dontSendNotification);
+    productCombo.addItem("BLACK", 1);
+    productCombo.addItem("CREAM", 2);
+    productCombo.setSelectedId(sessionState_.productSkinId == TSS::DevSkin::kCompiledBlackId ? 1 : 2,
+                               juce::dontSendNotification);
 
-    editorCombo_.clear(juce::dontSendNotification);
+    editorCombo.clear(juce::dontSendNotification);
     int selected = 0;
     int index = 1;
     for (const auto& skin : layer_.skins())
     {
         if (skin.kind != TSS::DevSkin::SkinKind::kDev)
             continue;
-        editorCombo_.addItem(skin.name.toUpperCase(), index);
+        editorCombo.addItem(skin.name.toUpperCase(), index);
         if (skin.id == sessionState_.editorSkinId)
             selected = index;
         ++index;
     }
     if (selected > 0)
     {
-        editorCombo_.setSelectedId(selected, juce::dontSendNotification);
+        editorCombo.setSelectedId(selected, juce::dontSendNotification);
     }
-    else if (editorCombo_.getNumItems() > 0)
+    else if (editorCombo.getNumItems() > 0)
     {
-        editorCombo_.setSelectedItemIndex(0, juce::dontSendNotification);
+        editorCombo.setSelectedItemIndex(0, juce::dontSendNotification);
         for (const auto& skin : layer_.skins())
         {
             if (skin.kind == TSS::DevSkin::SkinKind::kDev
-                && skin.name.equalsIgnoreCase(editorCombo_.getText()))
+                && skin.name.equalsIgnoreCase(editorCombo.getText()))
             {
                 if (sessionState_.editorSkinId != skin.id)
                     clearMappingModeToIdle();

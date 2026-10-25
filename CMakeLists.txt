@@ -604,6 +604,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/DevSkinLayerJsonTests.cpp
         Tests/Unit/DevSkinMatrixTests.cpp
         Tests/Unit/SkinEditorMappingModePolicyTests.cpp
+        Tests/Unit/SkinEditorChromeLayoutTests.cpp
         Tests/Unit/SliderButtonLikeColourTests.cpp
         Tests/Unit/PatchManagerActionHandlerComputerNavigationTests.cpp
         Tests/Unit/PatchManagerActionHandlerNavDebounceTests.cpp
@@ -1108,7 +1109,7 @@ if(MATRIX_BUILD_SKIN_EDITOR)
         Tools/SkinEditor/SkinEditorPalettePanel.cpp
         Tools/SkinEditor/SkinEditorMappingsPanel.cpp
         Tools/SkinEditor/SkinEditorMappingsPanelRows.cpp
-        Tools/SkinEditor/SkinEditorUnboundPanel.cpp
+        Tools/SkinEditor/SkinEditorSkinsPanel.cpp
         ${MATRIX_SKIN_DEV_LAYER_SOURCES}
         Source/GUI/Skins/Skin.cpp
         Source/Shared/ProjectPaths.cpp

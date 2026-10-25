@@ -2,125 +2,127 @@
 
 #include "Tools/SkinEditor/SkinEditorChromeFonts.h"
 
-void SkinEditorMainComponent::layoutSkinsBar(juce::Rectangle<int> skins)
+namespace
 {
-    skins.removeFromTop(SkinEditorChrome::kGutter);
-    auto titleRow = skins.removeFromTop(SkinEditorChrome::kPanelTitleHeight);
-    const int buttonY = titleRow.getY()
-                        + (titleRow.getHeight() - SkinEditorChrome::kButtonHeight) / 2;
-    auto row = juce::Rectangle<int>(titleRow.getX(), buttonY, titleRow.getWidth(),
+    struct SessionWellPlacer
+    {
+        juce::Rectangle<int>& row;
+        bool fits = true;
+        std::vector<int>* separatorXs = nullptr;
+
+        void stop() noexcept { fits = false; }
+
+        void gap()
+        {
+            if (! fits || row.getWidth() < SkinEditorChrome::kButtonGap)
+            {
+                stop();
+                return;
+            }
+            row.removeFromLeft(SkinEditorChrome::kButtonGap);
+        }
+
+        void button(juce::TextButton& b)
+        {
+            if (! fits)
+            {
+                b.setBounds({});
+                return;
+            }
+            const int w = SkinEditorChrome::measureButtonWidth(b);
+            if (row.getWidth() < w)
+            {
+                b.setBounds({});
+                stop();
+                return;
+            }
+            b.setBounds(row.removeFromLeft(w).withHeight(SkinEditorChrome::kButtonHeight));
+        }
+
+        void separator()
+        {
+            constexpr int kSep = SkinEditorChrome::kButtonGap * 4 + 1;
+            if (! fits || row.getWidth() < kSep)
+            {
+                stop();
+                return;
+            }
+            gap();
+            gap();
+            if (separatorXs != nullptr)
+                separatorXs->push_back(row.getX());
+            row.removeFromLeft(1);
+            gap();
+            gap();
+        }
+    };
+}
+
+void SkinEditorMainComponent::setupSessionWell()
+{
+    SkinEditorChrome::stylePanelTitle(sessionTitleLabel_, "SESSION");
+    addAndMakeVisible(sessionTitleLabel_);
+
+    auto wire = [this](juce::TextButton& button, auto handler)
+    {
+        addAndMakeVisible(button);
+        button.onClick = handler;
+    };
+    wire(undoButton_, [this] { onUndo(); });
+    wire(redoButton_, [this] { onRedo(); });
+    wire(compareButton_, [this] { onCompareToggle(); });
+    wire(pushButton_, [this] { onPush(); });
+    wire(exportButton_, [this] { onExportJson(); });
+    wire(importButton_, [this] { onImportJson(); });
+    compareBlinkTimer_.onTick = [this] { tickCompareBlink(); };
+    undoButton_.setEnabled(false);
+    redoButton_.setEnabled(false);
+}
+
+void SkinEditorMainComponent::layoutSessionWell(juce::Rectangle<int> titleBar, int titleRight)
+{
+    sessionSeparatorXs_.clear();
+    sessionWellBounds_ = {};
+
+    const int wellW = SkinEditorChrome::sessionWellPreferredWidth();
+    const int wellX = juce::jmax(titleRight + SkinEditorChrome::kButtonGap,
+                                 titleBar.getRight() - wellW);
+    sessionWellBounds_ = { wellX, titleBar.getY() + 2,
+                           juce::jmin(wellW, titleBar.getRight() - wellX),
+                           titleBar.getHeight() - 4 };
+
+    const auto well = sessionWellBounds_;
+    const int buttonY = well.getY()
+                        + (well.getHeight() - SkinEditorChrome::kButtonHeight) / 2;
+    auto row = juce::Rectangle<int>(well.getX(), buttonY, well.getWidth(),
                                     SkinEditorChrome::kButtonHeight);
-    skinsBarSeparatorY_ = row.getY();
-    skinsBarSeparatorH_ = row.getHeight();
+    sessionSeparatorY_ = row.getY();
+    sessionSeparatorH_ = row.getHeight();
 
-    const int skinsTitleW = SkinEditorChrome::titleTabWidth("SKINS");
-    skinsTitleLabel_.setBounds(titleRow.getX(), titleRow.getY() - 1, skinsTitleW, titleRow.getHeight());
-    row.removeFromLeft(skinsTitleW);
-    // Same trailing gap after Import as leading gap after SKINS title.
-    row.removeFromLeft(SkinEditorChrome::kButtonGap);
-    const int trailingGap = SkinEditorChrome::kButtonGap;
-    const int comboW = skinsBarComboWidth(row.getWidth() - trailingGap);
-    layoutSkinsSkinSelectors(row, comboW);
-
-    auto placeGap = [&row]() { row.removeFromLeft(SkinEditorChrome::kButtonGap); };
-    auto placeButton = [&row](juce::TextButton& b)
+    SessionWellPlacer place { row, true, &sessionSeparatorXs_ };
+    const int sessionTitleW = SkinEditorChrome::titleTabWidth("SESSION");
+    if (row.getWidth() < sessionTitleW)
     {
-        b.setBounds(row.removeFromLeft(SkinEditorChrome::measureButtonWidth(b))
-                        .withHeight(SkinEditorChrome::kButtonHeight));
-    };
-    placeButton(newButton_);
-    placeGap();
-    placeButton(renameButton_);
-    placeGap();
-    placeButton(deleteButton_);
-    layoutSkinsActionButtons(row);
-}
-
-int SkinEditorMainComponent::skinsBarComboWidth(int rowWidthSansTrailingGap) const
-{
-    constexpr int kMinCombo = 100;
-    constexpr int kSep = SkinEditorChrome::kButtonGap * 4 + 1; // placeSkinsBarSeparator
-    const auto labelFont = SkinEditorChrome::fontRegular();
-    const int fixed = SkinEditorChrome::measureLabelWidth(productLabel_.getText(), labelFont)
-                      + SkinEditorChrome::measureLabelWidth(editorLabel_.getText(), labelFont)
-                      + SkinEditorChrome::measureButtonWidth(productDuplicateButton_)
-                      + SkinEditorChrome::measureButtonWidth(editorDuplicateButton_)
-                      + SkinEditorChrome::measureButtonWidth(newButton_)
-                      + SkinEditorChrome::measureButtonWidth(renameButton_)
-                      + SkinEditorChrome::measureButtonWidth(deleteButton_)
-                      + SkinEditorChrome::measureButtonWidth(undoButton_)
-                      + SkinEditorChrome::measureButtonWidth(redoButton_)
-                      + SkinEditorChrome::measureButtonWidth(compareButton_)
-                      + SkinEditorChrome::measureButtonWidth(pushButton_)
-                      + SkinEditorChrome::measureButtonWidth(exportButton_)
-                      + SkinEditorChrome::measureButtonWidth(importButton_)
-                      + kSep * 4
-                      + SkinEditorChrome::kButtonGap * 8; // single gaps between controls
-    const int forCombos = juce::jmax(0, rowWidthSansTrailingGap - fixed);
-    return juce::jmax(kMinCombo, forCombos / 2);
-}
-
-void SkinEditorMainComponent::layoutSkinsSkinSelectors(juce::Rectangle<int>& row, int comboWidth)
-{
-    const auto labelFont = SkinEditorChrome::fontRegular();
-    const int productLabelW = SkinEditorChrome::measureLabelWidth(productLabel_.getText(), labelFont);
-    const int editorLabelW = SkinEditorChrome::measureLabelWidth(editorLabel_.getText(), labelFont);
-    auto placeGap = [&row]() { row.removeFromLeft(SkinEditorChrome::kButtonGap); };
-    auto placeButton = [&row](juce::TextButton& b)
+        sessionTitleLabel_.setBounds({});
+        place.stop();
+    }
+    else
     {
-        b.setBounds(row.removeFromLeft(SkinEditorChrome::measureButtonWidth(b))
-                        .withHeight(SkinEditorChrome::kButtonHeight));
-    };
-    auto placeSkinsBarSeparator = [this, &row, &placeGap]()
-    {
-        placeGap();
-        placeGap();
-        skinsBarSeparatorXs_.push_back(row.getX());
-        row.removeFromLeft(1);
-        placeGap();
-        placeGap();
-    };
+        sessionTitleLabel_.setBounds(row.getX(), well.getY() - 1, sessionTitleW,
+                                     well.getHeight() + 2);
+        row.removeFromLeft(sessionTitleW);
+        place.gap();
+    }
 
-    productLabel_.setBounds(row.removeFromLeft(productLabelW));
-    productCombo_.setBounds(row.removeFromLeft(comboWidth));
-    placeGap();
-    placeButton(productDuplicateButton_);
-    placeSkinsBarSeparator();
-    editorLabel_.setBounds(row.removeFromLeft(editorLabelW));
-    editorCombo_.setBounds(row.removeFromLeft(comboWidth));
-    placeGap();
-    placeButton(editorDuplicateButton_);
-    placeGap();
-}
-
-void SkinEditorMainComponent::layoutSkinsActionButtons(juce::Rectangle<int>& row)
-{
-    auto placeGap = [&row]() { row.removeFromLeft(SkinEditorChrome::kButtonGap); };
-    auto placeButton = [&row](juce::TextButton& b)
-    {
-        const int w = SkinEditorChrome::measureButtonWidth(b);
-        b.setBounds(row.removeFromLeft(w).withHeight(SkinEditorChrome::kButtonHeight));
-    };
-    auto placeSkinsBarSeparator = [this, &row, &placeGap]()
-    {
-        placeGap();
-        placeGap();
-        skinsBarSeparatorXs_.push_back(row.getX());
-        row.removeFromLeft(1);
-        placeGap();
-        placeGap();
-    };
-
-    placeSkinsBarSeparator();
-    placeButton(undoButton_);
-    placeGap();
-    placeButton(redoButton_);
-    placeSkinsBarSeparator();
-    placeButton(compareButton_);
-    placeGap();
-    placeButton(pushButton_);
-    placeSkinsBarSeparator();
-    placeButton(exportButton_);
-    placeGap();
-    placeButton(importButton_);
+    place.button(undoButton_);
+    place.gap();
+    place.button(redoButton_);
+    place.separator();
+    place.button(compareButton_);
+    place.gap();
+    place.button(pushButton_);
+    place.separator();
+    place.button(exportButton_);
+    place.gap();
+    place.button(importButton_);
 }
