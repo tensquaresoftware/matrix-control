@@ -13,9 +13,9 @@ namespace SkinEditorChrome
     inline juce::Colour surfaceSection() { return juce::Colour(0xff151515); }
     /**
      * Object / table headers inside Mappings (e.g. envelope group title row).
-     * Lighter than data rows; between the previous 0x33 step and the old 0x45.
+     * Lighter than data rows; slight lift above the previous 0x3a step.
      */
-    inline juce::Colour surfaceTableHeader() { return juce::Colour(0xff3a3a3a); }
+    inline juce::Colour surfaceTableHeader() { return juce::Colour(0xff424242); }
     /**
      * Mapping table data rows — darker than panel, lighter than surfaceSection.
      */
@@ -29,7 +29,7 @@ namespace SkinEditorChrome
     /** Plugin logo / DarkPanel text — ColourChart::kGrey200. */
     inline juce::Colour textBrand() { return juce::Colour(0xffb9b9b9); }
     /** Section titles + table column headers (lighter than textMuted). */
-    inline juce::Colour textTableHeader() { return juce::Colour(0xffb3b3b3); }
+    inline juce::Colour textTableHeader() { return juce::Colour(0xffbcbcbc); }
     /** Table data-row body text (darker than textPrimary). */
     inline juce::Colour textTableBody() { return juce::Colour(0xffc4c4c4); }
     inline juce::Colour accent() { return juce::Colour(0xff00ddad); }
