@@ -38,7 +38,7 @@ public:
 private:
     void operationWellMatchesSessionAndSharedBadgeGap()
     {
-        beginTest("OPERATION well matches SESSION height; badge gap shared with CONNECTION");
+        beginTest("OPERATION well matches SESSION height; badge gap shared with BRIDGE");
 
         expectEquals(SkinEditorChrome::kMappingBandHeight, SkinEditorChrome::kSessionWellHeight);
         expectEquals(SkinEditorChrome::kTitleBarHeight,

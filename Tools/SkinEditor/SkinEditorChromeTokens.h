@@ -97,9 +97,9 @@ namespace SkinEditorChrome
      * pocket for the mapping witness; idle = empty dark rect).
      */
     inline constexpr int kMappingBandHeight = kSessionWellHeight;
-    /** Badge → label gap for CONNECTION / MAPPING / LAST PUSH chrome. */
+    /** Badge → label gap for BRIDGE / MAPPING / LAST PUSH chrome. */
     inline constexpr int kChromeBadgeGap = 8;
-    /** Chrome text badges (MAPPING / CONNECTION / …) — thinner than TextButton. */
+    /** Chrome text badges (MAPPING / BRIDGE / …) — thinner than TextButton. */
     inline constexpr int kMappingBadgeHeight = 16;
     inline constexpr float kMappingBadgeFont = 11.0f;
     inline constexpr int kMappingBadgePadH = 8;

@@ -137,7 +137,7 @@ void SkinEditorMainComponent::setupLayerAndBridgeCallbacks()
     bridge_.onApplyResult = [this](const TSS::DevSkin::ApplyResult& result)
     {
         if (result.ok)
-            setStatusMessage("ack (rev " + juce::String(result.revision) + ")");
+            setStatusMessage("Acknowledgement / Rev " + juce::String(result.revision));
         else
             setStatusMessage("error [" + result.code + "] " + result.message);
         refreshStatus();
@@ -170,7 +170,7 @@ void SkinEditorMainComponent::paint(juce::Graphics& g)
     paintChromeWells(g);
 
     if (! connectionBadgeBounds_.isEmpty())
-        SkinEditorChrome::drawChromeBadge(g, connectionBadgeBounds_, "CONNECTION");
+        SkinEditorChrome::drawChromeBadge(g, connectionBadgeBounds_, "BRIDGE");
     if (! lastPushBadgeBounds_.isEmpty())
         SkinEditorChrome::drawChromeBadge(g, lastPushBadgeBounds_, "LAST PUSH");
     if (! appBadgeBounds_.isEmpty())
@@ -281,7 +281,7 @@ void SkinEditorMainComponent::layoutStatusBar(juce::Rectangle<int> statusBar)
     const int badgeY = chromeRowY(statusBar.getY(), statusBar.getHeight(), badgeH,
                                   SkinEditorChrome::kStatusChromeNudgeY);
     const auto statusFont = SkinEditorChrome::fontRegular();
-    const int connBadgeW = SkinEditorChrome::chromeBadgeWidth("CONNECTION");
+    const int connBadgeW = SkinEditorChrome::chromeBadgeWidth("BRIDGE");
     const int pushBadgeW = SkinEditorChrome::chromeBadgeWidth("LAST PUSH");
     const int appBadgeW = SkinEditorChrome::chromeBadgeWidth("APP");
     const int versionW = SkinEditorChrome::measureTextWidth(statusFont, versionLabel_.getText()) + 4;
@@ -298,7 +298,7 @@ void SkinEditorMainComponent::layoutStatusBar(juce::Rectangle<int> statusBar)
     const int connLabelX = connectionBadgeBounds_.getRight() + gap;
     const int connLabelMaxW = juce::jmax(0, lastPushBadgeBounds_.getX() - gap - connLabelX);
     const auto connFull = bridge_.isConnected() ? "Connected to Matrix-Control"
-                                                : "Disconnected";
+                                                : "Disconnected from Matrix-Control";
     connectionLabel_.setText(SkinEditorChrome::elideToWidth(statusFont, connFull, connLabelMaxW),
                              juce::dontSendNotification);
     connectionLabel_.setTooltip({});

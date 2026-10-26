@@ -82,7 +82,7 @@ namespace SkinEditorChrome
     int countBadgeWidth(int count);
 
     /**
-     * Chrome text badge - Inter rectangle (MAPPING / CONNECTION / LAST PUSH / APP).
+     * Chrome text badge - Inter rectangle (MAPPING / BRIDGE / LAST PUSH / APP).
      * Do not reuse plugin FooterPanel badge APIs or count-capsule badges.
      */
     void drawChromeBadge(juce::Graphics& g, juce::Rectangle<int> area, const juce::String& text);

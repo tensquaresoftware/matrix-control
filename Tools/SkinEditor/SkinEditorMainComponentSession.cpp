@@ -237,7 +237,7 @@ void SkinEditorMainComponent::refreshCombos()
 void SkinEditorMainComponent::refreshStatus()
 {
     connectionLabel_.setText(bridge_.isConnected() ? "Connected to Matrix-Control"
-                                                   : "Disconnected",
+                                                   : "Disconnected from Matrix-Control",
                              juce::dontSendNotification);
 
     // Re-layout: fixed badges + path-style elide + export-path tooltip when truncated.
