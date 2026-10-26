@@ -14,6 +14,20 @@ namespace SkinEditorUi
         window.addTextEditor("value", initial, "Value");
         window.addButton("OK", 1, juce::KeyPress(juce::KeyPress::returnKey));
         window.addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey));
+        if (auto* editor = window.getTextEditor("value"))
+            editor->setSelectAllWhenFocused(true);
+
+        // Focus only sticks once the modal is on-screen and pumping messages.
+        const juce::Component::SafePointer<juce::AlertWindow> safe(&window);
+        juce::MessageManager::callAsync([safe]
+        {
+            if (safe == nullptr)
+                return;
+            safe->toFront(true);
+            if (auto* editor = safe->getTextEditor("value"))
+                editor->grabKeyboardFocus();
+        });
+
         if (window.runModalLoop() != 1)
             return {};
         return window.getTextEditorContents("value").trim();
