@@ -50,5 +50,10 @@ namespace SkinEditorChrome
 
         void fillTextEditorBackground(juce::Graphics& g, int width, int height, juce::TextEditor& ed) override;
         void drawTextEditorOutline(juce::Graphics& g, int width, int height, juce::TextEditor& ed) override;
+
+        juce::Rectangle<int> getTooltipBounds(const juce::String& tipText,
+                                              juce::Point<int> screenPos,
+                                              juce::Rectangle<int> parentArea) override;
+        void drawTooltip(juce::Graphics& g, const juce::String& text, int width, int height) override;
     };
 }

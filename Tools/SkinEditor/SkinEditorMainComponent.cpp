@@ -74,6 +74,7 @@ void SkinEditorMainComponent::setupStatusBarChrome()
     }
     versionLabel_.setText("v" + juce::String(JUCE_APPLICATION_VERSION_STRING),
                           juce::dontSendNotification);
+    addAndMakeVisible(lastPushBadgeHit_);
 }
 
 void SkinEditorMainComponent::setupSkinsPanel()
@@ -287,27 +288,33 @@ void SkinEditorMainComponent::layoutStatusBar(juce::Rectangle<int> statusBar)
 
     const int leftX = statusBar.getX();
     connectionBadgeBounds_ = { leftX, badgeY, connBadgeW, badgeH };
-    lastPushBadgeBounds_ = { statusBar.getCentreX() - pushBadgeW / 2, badgeY, pushBadgeW, badgeH };
+    // Align LAST PUSH with Palette column (Color width + Palette side gap).
+    const int pushBadgeX = leftX + SkinEditorChrome::kColorPanelWidth
+                           + SkinEditorChrome::kPaletteSideGap;
+    lastPushBadgeBounds_ = { pushBadgeX, badgeY, pushBadgeW, badgeH };
     const int appX = statusBar.getRight() - appBadgeW - gap - versionW;
     appBadgeBounds_ = { appX, badgeY, appBadgeW, badgeH };
 
     const int connLabelX = connectionBadgeBounds_.getRight() + gap;
     const int connLabelMaxW = juce::jmax(0, lastPushBadgeBounds_.getX() - gap - connLabelX);
-    const auto connFull = connectionLabel_.getTooltip().isNotEmpty()
-                              ? connectionLabel_.getTooltip()
-                              : connectionLabel_.getText();
+    const auto connFull = bridge_.isConnected() ? "Connected to Matrix-Control"
+                                                : "Disconnected";
     connectionLabel_.setText(SkinEditorChrome::elideToWidth(statusFont, connFull, connLabelMaxW),
                              juce::dontSendNotification);
+    connectionLabel_.setTooltip({});
     connectionLabel_.setBounds(connLabelX, badgeY, connLabelMaxW, badgeH);
 
     const int pushLabelX = lastPushBadgeBounds_.getRight() + gap;
     const int pushLabelMaxW = juce::jmax(0, appBadgeBounds_.getX() - gap - pushLabelX);
-    const auto pushFull = lastPushLabel_.getTooltip().isNotEmpty()
-                              ? lastPushLabel_.getTooltip()
-                              : lastPushLabel_.getText();
-    lastPushLabel_.setText(SkinEditorChrome::elideToWidth(statusFont, pushFull, pushLabelMaxW),
-                           juce::dontSendNotification);
+    const auto pushFull = statusDetail_.isNotEmpty() ? statusDetail_ : "none";
+    const auto pushShown = SkinEditorChrome::elidePathToWidth(statusFont, pushFull, pushLabelMaxW);
+    const bool exportPathTip = pushFull.startsWith("Exported: ") && pushShown != pushFull;
+    const auto pushTip = exportPathTip ? pushFull : juce::String {};
+    lastPushLabel_.setText(pushShown, juce::dontSendNotification);
+    lastPushLabel_.setTooltip(pushTip);
     lastPushLabel_.setBounds(pushLabelX, badgeY, pushLabelMaxW, badgeH);
+    lastPushBadgeHit_.setBounds(lastPushBadgeBounds_);
+    lastPushBadgeHit_.setTooltip(pushTip);
 
     versionLabel_.setBounds(appX + appBadgeW + gap, badgeY, versionW, badgeH);
 }

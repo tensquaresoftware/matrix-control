@@ -31,6 +31,8 @@ public:
         mappingsKeepsLegacyHalfShareWidth();
         skinsPanelEditorActionsFitOneRow();
         minContentHeightStacksSkinsAndColor();
+        pathElideKeepsLeafName();
+        lastPushBadgeAlignsWithPaletteColumn();
     }
 
 private:
@@ -185,6 +187,30 @@ private:
         expect(skinsH
                >= SkinEditorChrome::kGutter + SkinEditorChrome::kPanelTitleHeight
                       + SkinEditorChrome::kGutter);
+    }
+
+    void pathElideKeepsLeafName()
+    {
+        beginTest("Path elide keeps leaf filename + extension visible");
+
+        const auto font = SkinEditorChrome::fontRegular();
+        const juce::String path = "Exported: /Users/dev/very/long/nested/path/MySkin.json";
+        const int fullW = SkinEditorChrome::measureTextWidth(font, path);
+        expect(fullW > 80);
+
+        const auto shown = SkinEditorChrome::elidePathToWidth(font, path, fullW / 2);
+        expect(shown.contains("..."));
+        expect(shown.endsWithIgnoreCase("MySkin.json")
+               || shown.endsWithIgnoreCase(".json"));
+        expectEquals(SkinEditorChrome::elidePathToWidth(font, path, fullW + 10), path);
+    }
+
+    void lastPushBadgeAlignsWithPaletteColumn()
+    {
+        beginTest("LAST PUSH badge X offset matches Palette column (Color + side gap)");
+
+        expectEquals(SkinEditorChrome::kColorPanelWidth + SkinEditorChrome::kPaletteSideGap,
+                     260 + 12);
     }
 };
 

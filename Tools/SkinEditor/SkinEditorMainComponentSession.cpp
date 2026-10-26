@@ -236,16 +236,11 @@ void SkinEditorMainComponent::refreshCombos()
 
 void SkinEditorMainComponent::refreshStatus()
 {
-    const auto connectionText = bridge_.isConnected() ? "Connected to Matrix-Control"
-                                                      : "Disconnected";
-    connectionLabel_.setTooltip(connectionText);
-    connectionLabel_.setText(connectionText, juce::dontSendNotification);
+    connectionLabel_.setText(bridge_.isConnected() ? "Connected to Matrix-Control"
+                                                   : "Disconnected",
+                             juce::dontSendNotification);
 
-    const auto pushText = statusDetail_.isNotEmpty() ? statusDetail_ : "none";
-    lastPushLabel_.setTooltip(pushText);
-    lastPushLabel_.setText(pushText, juce::dontSendNotification);
-
-    // Re-layout: fixed badges + elided labels in the slots between them.
+    // Re-layout: fixed badges + path-style elide + export-path tooltip when truncated.
     resized();
 }
 

@@ -37,6 +37,9 @@ namespace SkinEditorChrome
         setColour(juce::TextEditor::focusedOutlineColourId, textMuted());
         setColour(juce::ListBox::backgroundColourId, surfacePanel());
         setColour(juce::ScrollBar::thumbColourId, controlOutline());
+        setColour(juce::TooltipWindow::backgroundColourId, surfaceApp());
+        setColour(juce::TooltipWindow::textColourId, textMuted());
+        setColour(juce::TooltipWindow::outlineColourId, controlOutline());
     }
 
     void LookAndFeel::drawScrollbar(juce::Graphics& g,
@@ -208,5 +211,51 @@ namespace SkinEditorChrome
                                           : juce::TextEditor::outlineColourId));
         g.drawRoundedRectangle(0.5f, 0.5f, (float) width - 1.0f, (float) height - 1.0f,
                                kControlCorner, focused ? 1.5f : 1.0f);
+    }
+
+    namespace
+    {
+        constexpr int kTooltipPadX = 12;
+        constexpr int kTooltipPadY = 6;
+    }
+
+    juce::Rectangle<int> LookAndFeel::getTooltipBounds(const juce::String& tipText,
+                                                       juce::Point<int> screenPos,
+                                                       juce::Rectangle<int> parentArea)
+    {
+        juce::ignoreUnused(screenPos);
+
+        const auto font = fontRegular();
+        const int maxW = juce::jmax(1, parentArea.getWidth() - 2 * kWindowEdgeGutter);
+        const int textW = measureTextWidth(font, tipText);
+        const int w = juce::jmin(textW + 2 * kTooltipPadX, maxW);
+        const int h = juce::roundToInt(font.getHeight()) + 2 * kTooltipPadY;
+
+        // Fixed Y: tooltip bottom sits mid-gutter between body panels and status bar,
+        // then nudged +8 so the tip clears the panel silhouette optically.
+        const int x = parentArea.getCentreX() - w / 2;
+        const int statusTop = parentArea.getBottom() - kStatusBarHeight;
+        const int y = statusTop - (kGutter / 2) - h + 8;
+
+        return juce::Rectangle<int>(x, y, w, h).constrainedWithin(parentArea);
+    }
+
+    void LookAndFeel::drawTooltip(juce::Graphics& g, const juce::String& text, int width, int height)
+    {
+        auto bounds = juce::Rectangle<float>(0.0f, 0.0f, (float) width, (float) height).reduced(0.5f);
+        g.setColour(surfaceApp());
+        g.fillRoundedRectangle(bounds, kControlCorner);
+        g.setColour(controlOutline());
+        g.drawRoundedRectangle(bounds, kControlCorner, 1.0f);
+
+        const auto font = fontRegular();
+        const int textMaxW = juce::jmax(0, width - 2 * kTooltipPadX);
+        const auto shown = elidePathToWidth(font, text, textMaxW);
+        g.setFont(font);
+        g.setColour(textMuted());
+        g.drawText(shown,
+                   juce::Rectangle<int>(0, 0, width, height).reduced(kTooltipPadX, 0),
+                   juce::Justification::centred,
+                   false);
     }
 }

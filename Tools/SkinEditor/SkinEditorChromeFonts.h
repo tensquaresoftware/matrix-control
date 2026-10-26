@@ -122,6 +122,56 @@ namespace SkinEditorChrome
     }
 
     /**
+     * Path-style truncate: keep head + tail around "..." so leaf name + extension stay visible.
+     * Same 1/3 head + 2/3 tail balance as TSS::TextFitHelpers (Footer sticky paths).
+     */
+    inline juce::String elidePathToWidth(const juce::Font& font,
+                                        const juce::String& text,
+                                        int maxWidth)
+    {
+        if (maxWidth <= 0)
+            return {};
+        if (measureTextWidth(font, text) <= maxWidth)
+            return text;
+
+        constexpr auto kEllipsis = "...";
+        const int ellipsisW = measureTextWidth(font, kEllipsis);
+        if (ellipsisW >= maxWidth)
+            return kEllipsis;
+
+        const int length = text.length();
+        int bestHead = 0;
+        int bestTail = 0;
+        int lo = 0;
+        int hi = length - 1;
+
+        while (lo <= hi)
+        {
+            const int keep = (lo + hi) / 2;
+            const int head = keep / 3;
+            const int tail = keep - head;
+            const auto candidate = text.substring(0, head) + kEllipsis
+                                   + text.substring(length - tail);
+
+            if (measureTextWidth(font, candidate) <= maxWidth)
+            {
+                bestHead = head;
+                bestTail = tail;
+                lo = keep + 1;
+            }
+            else
+            {
+                hi = keep - 1;
+            }
+        }
+
+        if (bestHead + bestTail <= 0)
+            return kEllipsis;
+
+        return text.substring(0, bestHead) + kEllipsis + text.substring(length - bestTail);
+    }
+
+    /**
      * Force typeface load + glyph metrics before the first resized/layout.
      * Avoids truncated chrome (Push, LAST PUSH, …) on cold launch.
      */

@@ -155,6 +155,15 @@ private:
     juce::Label connectionLabel_;
     juce::Label lastPushLabel_;
     juce::Label versionLabel_;
+    /** Invisible hit target so LAST PUSH badge (paint-only) can show the path tooltip. */
+    struct StatusTipHitArea final : public juce::Component,
+                                    public juce::SettableTooltipClient
+    {
+        StatusTipHitArea() { setInterceptsMouseClicks(true, false); }
+    };
+    StatusTipHitArea lastPushBadgeHit_;
+    /** Required for Label::setTooltip to show (JUCE does not create one automatically). */
+    juce::TooltipWindow tooltipWindow_ { this };
     juce::Rectangle<int> connectionBadgeBounds_;
     juce::Rectangle<int> lastPushBadgeBounds_;
     juce::Rectangle<int> appBadgeBounds_;
