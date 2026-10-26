@@ -61,8 +61,17 @@ public:
         beginTest("appendImport_multiSkin_addsTwoEditorSkins");
         assertAppendMultiSkinAddsTwo();
 
-        beginTest("sessionRoundTrip_restoresEditorSkinsAndCompareState");
+        runSessionPersistenceTests();
+    }
+
+private:
+    void runSessionPersistenceTests()
+    {
+        beginTest("sessionRoundTrip_restoresEditorSkins_compareAlwaysOff");
         assertSessionRoundTrip();
+
+        beginTest("legacySession_compareOnTrue_loadsWithCompareOff");
+        assertLegacyCompareOnIgnored();
 
         beginTest("corruptSessionJson_restoresCompiledBaseline");
         assertCorruptSessionRestoresBaseline();
@@ -70,8 +79,6 @@ public:
         beginTest("comparePush_productSkinPayloadUsesCompiledKind");
         assertComparePushProductPayload();
     }
-
-private:
     void assertDuplicateAndReadOnly()
     {
         TSS::DevSkin::Layer layer;
@@ -371,8 +378,33 @@ private:
         expect(restored.findSkin(editorId) != nullptr);
         expectEquals(restoredState.productSkinId, juce::String(TSS::DevSkin::kCompiledBlackId));
         expectEquals(restoredState.editorSkinId, editorId);
-        expect(restoredState.compareOn);
+        expect(! restoredState.compareOn); // Compare is runtime-only; never restored On
+        expect(! json.contains("compareOn"));
         expectEquals(restoredState.lastSkinJsonDirectory, state.lastSkinJsonDirectory);
+    }
+
+    void assertLegacyCompareOnIgnored()
+    {
+        TSS::DevSkin::Layer layer;
+        expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Legacy").wasOk());
+        const auto editorId = layer.activeSkinId();
+
+        TSS::DevSkin::EditorSessionState seed;
+        seed.productSkinId = TSS::DevSkin::kCompiledCreamId;
+        seed.editorSkinId = editorId;
+        auto json = TSS::DevSkin::exportSessionToJson(layer, seed);
+        auto parsed = juce::JSON::parse(json);
+        auto* root = parsed.getDynamicObject();
+        expect(root != nullptr);
+        root->setProperty("compareOn", true);
+        json = juce::JSON::toString(parsed, true);
+
+        TSS::DevSkin::Layer restored;
+        TSS::DevSkin::EditorSessionState restoredState;
+        const auto imported = TSS::DevSkin::importSessionFromJson(restored, restoredState, json);
+        expect(imported.ok);
+        expectEquals(restoredState.editorSkinId, editorId);
+        expect(! restoredState.compareOn);
     }
 
     void assertCorruptSessionRestoresBaseline()

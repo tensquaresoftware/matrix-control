@@ -29,7 +29,6 @@ namespace TSS::DevSkin
         root->setProperty("document", "skinEditorSession");
         root->setProperty("productSkinId", state.productSkinId);
         root->setProperty("editorSkinId", state.editorSkinId);
-        root->setProperty("compareOn", state.compareOn);
         root->setProperty("lastSkinJsonDirectory", state.lastSkinJsonDirectory);
         return juce::JSON::toString(parsed, true);
     }
@@ -69,7 +68,8 @@ namespace TSS::DevSkin
             }
         }
 
-        state.compareOn = static_cast<bool>(root->getProperty("compareOn"));
+        // Ignore legacy "compareOn" if present — Compare always starts Off.
+        state.compareOn = false;
         state.lastSkinJsonDirectory = readExistingDirectoryProperty(*root,
                                                                     "lastSkinJsonDirectory",
                                                                     "lastExportDirectory");

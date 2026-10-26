@@ -288,8 +288,9 @@ void SkinEditorMainComponent::loadSessionOrBaseline()
             setStatusMessage(loaded.message);
         sessionState_.productSkinId = TSS::DevSkin::kCompiledCreamId;
         sessionState_.editorSkinId = {};
-        sessionState_.compareOn = false;
     }
+    // Compare is never restored from disk — always start editing, not comparing.
+    sessionState_.compareOn = false;
     if (sessionState_.editorSkinId.isNotEmpty())
         layer_.selectSkin(sessionState_.editorSkinId);
     markClean();
