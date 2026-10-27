@@ -19,12 +19,14 @@ public:
     void refresh();
 
     juce::String getSelectedPastilleName() const;
+    /** Programmatic selection — does not fire onPastilleSelected (no mapping-mode side effects). */
     void selectPastille(const juce::String& name);
     void clearSelection();
 
     std::function<void(const juce::String& pastilleName)> onPastilleSelected;
     std::function<void()> onAddRequested;
     std::function<void()> onDeleteRequested;
+    std::function<void(const juce::String& pastilleName)> onRenamePastilleRequested;
     /** Escape while the palette list has focus - clear mapping mode in main. */
     std::function<bool()> onEscapeRequested;
 
@@ -55,6 +57,7 @@ private:
         RowKind kind = RowKind::kColour;
         juce::String name;
         juce::uint32 argb = 0;
+        bool pending = false;
         bool isProduct = false;
         juce::String headerText;
         /** Second ListBox row of a visual pair (half of kColumnHeaderHeight). */
@@ -64,6 +67,7 @@ private:
     int getNumRows() override;
     void paintListBoxItem(int row, juce::Graphics& g, int width, int height, bool selected) override;
     void selectedRowsChanged(int lastRowSelected) override;
+    void listBoxItemDoubleClicked(int row, const juce::MouseEvent& e) override;
 
     void rebuildRows();
     /** Push upper + lower half-height ListBox rows for one visual content row. */
@@ -78,6 +82,7 @@ private:
     TSS::DevSkin::Layer* layer_ = nullptr;
     juce::String skinId_;
     bool readOnly_ = true;
+    bool suppressSelectionNotify_ = false;
     std::vector<Row> rows_;
     EscapeKeyForwarder escapeForwarder_;
 

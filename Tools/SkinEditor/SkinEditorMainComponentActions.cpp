@@ -239,18 +239,56 @@ void SkinEditorMainComponent::onAddPastille()
 {
     if (! canEditEditorSkin())
         return;
-    const auto name = SkinEditorUi::askText("Add colour", "Pastille name:", "kCustomAccent");
-    if (name.isEmpty())
+
+    const auto* skin = layer_.findSkin(sessionState_.editorSkinId);
+    if (skin == nullptr)
+    {
+        juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon,
+                                               "Add failed", "Editor skin not found");
         return;
-    // Seed colour must not collide with ColourChart ARGB (e.g. kRed500 = 0xffff0000).
-    const auto result = layer_.addPastille(sessionState_.editorSkinId, name, 0xffaa00ff);
+    }
+
+    const auto name = SkinEditorUi::suggestUniqueTempPastilleName(*skin);
+    const auto argb = SkinEditorUi::suggestUniqueOpaqueArgb(*skin);
+    // Select before add so onChanged refresh highlights the new row without mapping click.
+    const auto previousSelection = selectedPastille_;
+    selectedPastille_ = name;
+    const auto result = layer_.addPastille(sessionState_.editorSkinId, name, argb, true);
     if (result.failed())
     {
+        selectedPastille_ = previousSelection;
         juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon,
                                                "Add failed", result.getErrorMessage());
         return;
     }
-    selectedPastille_ = name;
+    // refreshAll already quiet-selected; keep picker in sync if mapping mode was idle.
+    syncColourPickerToSelection();
+}
+
+void SkinEditorMainComponent::onRenamePastille(const juce::String& pastilleName)
+{
+    if (! canEditEditorSkin() || pastilleName.isEmpty())
+        return;
+    if (layer_.isProductPastilleName(pastilleName))
+        return;
+
+    const auto name = SkinEditorUi::askText("Rename colour", "New name:", pastilleName);
+    if (name.isEmpty() || name == pastilleName)
+        return;
+
+    // Update selection before rename so onChanged refresh finds the new name.
+    const bool wasSelected = selectedPastille_ == pastilleName;
+    if (wasSelected)
+        selectedPastille_ = name;
+
+    const auto result = layer_.renamePastille(sessionState_.editorSkinId, pastilleName, name);
+    if (result.failed())
+    {
+        if (wasSelected)
+            selectedPastille_ = pastilleName;
+        juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon,
+                                               "Rename failed", result.getErrorMessage());
+    }
 }
 
 void SkinEditorMainComponent::onDeletePastille()

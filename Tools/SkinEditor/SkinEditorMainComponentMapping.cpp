@@ -171,6 +171,7 @@ void SkinEditorMainComponent::fillHeldColourWitness()
             if (pastille.name == selectedPastille_)
             {
                 mappingWitnessShowSwatch_ = true;
+                mappingWitnessPending_ = pastille.pending;
                 mappingWitnessColour_ = juce::Colour(pastille.argb);
                 break;
             }
@@ -199,6 +200,7 @@ void SkinEditorMainComponent::updateMappingWitness()
 
     mappingWitnessActive_ = SkinEditorMappingPolicy::mappingWitnessVisible(policyMode);
     mappingWitnessShowSwatch_ = false;
+    mappingWitnessPending_ = false;
     mappingWitnessColour_ = juce::Colours::transparentBlack;
 
     if (mappingMode_ == MappingMode::kHeldColour)

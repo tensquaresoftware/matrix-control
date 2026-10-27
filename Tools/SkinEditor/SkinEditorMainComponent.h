@@ -68,6 +68,7 @@ private:
     void onImportJson();
     void onAddPastille();
     void onDeletePastille();
+    void onRenamePastille(const juce::String& pastilleName);
     void onColourChanged(juce::Colour colour);
     void onUndo();
     void onRedo();
@@ -150,6 +151,7 @@ private:
     juce::Rectangle<int> mappingSwatchBounds_;
     bool mappingWitnessActive_ = false;
     bool mappingWitnessShowSwatch_ = false;
+    bool mappingWitnessPending_ = false;
     juce::Colour mappingWitnessColour_;
 
     juce::Label connectionLabel_;

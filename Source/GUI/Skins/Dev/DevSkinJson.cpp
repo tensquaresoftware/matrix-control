@@ -31,6 +31,7 @@ namespace TSS::DevSkin
             auto* obj = new juce::DynamicObject();
             obj->setProperty("name", pastille.name);
             obj->setProperty("argb", juce::String::formatted("0x%08X", static_cast<unsigned>(pastille.argb)));
+            obj->setProperty("pending", pastille.pending);
             return juce::var(obj);
         }
 
@@ -62,6 +63,7 @@ namespace TSS::DevSkin
         {
             if (auto* obj = v.getDynamicObject())
             {
+                out = {};
                 out.name = obj->getProperty("name").toString();
                 const auto argbText = obj->getProperty("argb").toString().trim();
                 if (out.name.isEmpty() || argbText.isEmpty())
@@ -69,6 +71,8 @@ namespace TSS::DevSkin
                     error = "Pastille requires name and argb";
                     return false;
                 }
+                // Missing pending → false (legacy JSON = calibrated filled swatch).
+                out.pending = static_cast<bool>(obj->getProperty("pending"));
                 return parseArgbHex(argbText, out.argb, error);
             }
             error = "Pastille entry must be an object";

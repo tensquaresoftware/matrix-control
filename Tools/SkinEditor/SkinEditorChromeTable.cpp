@@ -181,6 +181,12 @@ namespace SkinEditorChrome
         g.fillRect(area);
     }
 
+    void paintPendingColourSwatch(juce::Graphics& g, juce::Rectangle<int> area)
+    {
+        g.setColour(textBrand());
+        g.drawEllipse(area.toFloat().reduced(0.5f), 1.0f);
+    }
+
     void drawCountBadge(juce::Graphics& g,
                         juce::Rectangle<int> area,
                         int count)

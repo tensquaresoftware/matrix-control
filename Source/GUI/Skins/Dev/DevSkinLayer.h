@@ -50,7 +50,12 @@ namespace TSS::DevSkin
                                      juce::uint32 argb);
         juce::Result addPastille(const juce::String& skinId,
                                  const juce::String& pastilleName,
-                                 juce::uint32 argb);
+                                 juce::uint32 argb,
+                                 bool pending = false);
+        /** Rename Editor pastille; rewrites mapping string refs. Product / compiled blocked. */
+        juce::Result renamePastille(const juce::String& skinId,
+                                    const juce::String& pastilleName,
+                                    const juce::String& newName);
         /** Dev-only pastille names. Product ColourChart names cannot be deleted. */
         juce::Result deletePastille(const juce::String& skinId,
                                     const juce::String& pastilleName,

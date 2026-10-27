@@ -2818,3 +2818,15 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-logo-font-height-30px.md`
   summary: Smoke-check header logo at 30 px font in the 32 px box across UI scales (fit, nudge, width vs neighbours).
   evidence: Blind Hunter; font height ≠ ink height so clip/width risks are unverified without a live look; Intent kept box size unchanged.
+
+## Deferred from: review of spec-skin-editor-palette-add-pending.md (2026-10-27)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-palette-add-pending.md`
+  summary: Pending swatch paint / quiet Add selection / onAddPastille pending=true have no automated GUI checks.
+  evidence: Project unit pyramid keeps paint() and SkinEditorMainComponent actions out of suite; covered by manual Skin Editor verification.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-palette-add-pending.md`
+  summary: After Add, new pending pastille may sit off-screen until the author scrolls.
+  evidence: Polish only; not required for core Add/pending/rename behaviour.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-palette-add-pending.md`
+  summary: Colour collision still leaves the colour picker on the rejected colour; rename discoverability has no tooltip/hint.
+  evidence: Pre-existing picker UX shape and polish; out of this chantier's frozen chrome boundaries.

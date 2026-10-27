@@ -98,6 +98,10 @@ void SkinEditorMainComponent::setupBodyPanels()
     palettePanel_.onPastilleSelected = [this](const juce::String& name) { onPastilleSelected(name); };
     palettePanel_.onAddRequested = [this] { onAddPastille(); };
     palettePanel_.onDeleteRequested = [this] { onDeletePastille(); };
+    palettePanel_.onRenamePastilleRequested = [this](const juce::String& name)
+    {
+        onRenamePastille(name);
+    };
     const auto escapeMapping = [this]() -> bool
     {
         if (mappingMode_ == MappingMode::kIdle)
@@ -161,7 +165,12 @@ void SkinEditorMainComponent::paintChromeWells(juce::Graphics& g) const
     if (mappingWitnessActive_ && ! mappingBadgeBounds_.isEmpty())
         SkinEditorChrome::drawMappingModeBadge(g, mappingBadgeBounds_);
     if (mappingWitnessShowSwatch_ && ! mappingSwatchBounds_.isEmpty())
-        SkinEditorChrome::paintColourSwatch(g, mappingSwatchBounds_, mappingWitnessColour_);
+    {
+        if (mappingWitnessPending_)
+            SkinEditorChrome::paintPendingColourSwatch(g, mappingSwatchBounds_);
+        else
+            SkinEditorChrome::paintColourSwatch(g, mappingSwatchBounds_, mappingWitnessColour_);
+    }
 }
 
 void SkinEditorMainComponent::paint(juce::Graphics& g)

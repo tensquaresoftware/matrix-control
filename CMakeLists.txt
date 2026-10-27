@@ -493,6 +493,7 @@ set(MATRIX_SKIN_DEV_LAYER_SOURCES
     Source/GUI/Skins/Dev/DevSkinKeyNames.cpp
     Source/GUI/Skins/Dev/DevSkinLayer.cpp
     Source/GUI/Skins/Dev/DevSkinLayerCreate.cpp
+    Source/GUI/Skins/Dev/DevSkinLayerPastille.cpp
     Source/GUI/Skins/Dev/DevSkinPaletteCatalog.cpp
     Source/GUI/Skins/Dev/DevSkinSession.cpp
     Source/GUI/Skins/Dev/DevSkinSsotSeed.cpp
@@ -603,6 +604,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/SkinColourSubstrateTests.cpp
         Tests/Unit/DevSkinLayerJsonTests.cpp
         Tests/Unit/DevSkinMatrixTests.cpp
+        Tests/Unit/DevSkinPendingPastilleTests.cpp
         Tests/Unit/SkinEditorMappingModePolicyTests.cpp
         Tests/Unit/SkinEditorChromeLayoutTests.cpp
         Tools/SkinEditor/SkinEditorChromePanel.cpp
@@ -693,6 +695,7 @@ if(MATRIX_BUILD_TESTS)
         Source/GUI/Skins/Dev/DevSkinKeyNames.cpp
         Source/GUI/Skins/Dev/DevSkinLayer.cpp
         Source/GUI/Skins/Dev/DevSkinLayerCreate.cpp
+        Source/GUI/Skins/Dev/DevSkinLayerPastille.cpp
         Source/GUI/Skins/Dev/DevSkinPaletteCatalog.cpp
         Source/GUI/Skins/Dev/DevSkinSession.cpp
         Source/GUI/Skins/Dev/DevSkinSsotSeed.cpp
@@ -975,6 +978,7 @@ if(MATRIX_BUILD_SKIN_EDITOR)
         Source/GUI/Skins/Dev/DevSkinKeyNames.cpp
         Source/GUI/Skins/Dev/DevSkinLayer.cpp
         Source/GUI/Skins/Dev/DevSkinLayerCreate.cpp
+        Source/GUI/Skins/Dev/DevSkinLayerPastille.cpp
         Source/GUI/Skins/Dev/DevSkinPaletteCatalog.cpp
         Source/GUI/Skins/Dev/DevSkinSsotSeed.cpp
         Source/GUI/Skins/Dev/DevSkinStandalonePaintState.cpp

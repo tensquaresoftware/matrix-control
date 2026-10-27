@@ -46,6 +46,7 @@ private:
         juce::String stateLabel;
         juce::String pastilleName;
         juce::uint32 pastilleArgb = 0;
+        bool pastillePending = false;
         bool unbound = false;
         int heightPx = 1;
         /** Thicken mapping row: +4px top and/or bottom (swatch stays 12px). */

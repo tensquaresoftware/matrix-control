@@ -59,6 +59,58 @@ namespace SkinEditorUi
         }
     }
 
+    inline bool pastilleNameTaken(const TSS::DevSkin::NamedSkin& skin, const juce::String& name)
+    {
+        for (const auto& pastille : skin.palette)
+            if (pastille.name.equalsIgnoreCase(name))
+                return true;
+        return false;
+    }
+
+    /** Next free "Temp N" (case-insensitive) in this skin's palette. */
+    inline juce::String suggestUniqueTempPastilleName(const TSS::DevSkin::NamedSkin& skin)
+    {
+        for (int n = 1;; ++n)
+        {
+            const auto candidate = "Temp " + juce::String(n);
+            if (! pastilleNameTaken(skin, candidate))
+                return candidate;
+        }
+    }
+
+    inline bool pastilleArgbTaken(const TSS::DevSkin::NamedSkin& skin, juce::uint32 argb)
+    {
+        for (const auto& pastille : skin.palette)
+            if (pastille.argb == argb)
+                return true;
+        return false;
+    }
+
+    /** Opaque random ARGB that does not collide with any pastille in this skin. */
+    inline juce::uint32 suggestUniqueOpaqueArgb(const TSS::DevSkin::NamedSkin& skin)
+    {
+        constexpr int kRandomAttempts = 64;
+        auto& rng = juce::Random::getSystemRandom();
+        for (int attempt = 0; attempt < kRandomAttempts; ++attempt)
+        {
+            const auto argb = 0xff000000u
+                              | (static_cast<juce::uint32>(rng.nextInt()) & 0x00ffffffu);
+            if (! pastilleArgbTaken(skin, argb))
+                return argb;
+        }
+
+        // Deterministic opaque scan — always terminates (uint wrap-safe).
+        for (juce::uint32 rgb = 0;; ++rgb)
+        {
+            const auto argb = 0xff000000u | rgb;
+            if (! pastilleArgbTaken(skin, argb))
+                return argb;
+            if (rgb == 0x00ffffffu)
+                break;
+        }
+        return 0xff000000u;
+    }
+
     inline bool isOsForbiddenFileNameChar(juce::juce_wchar character) noexcept
     {
         constexpr juce::juce_wchar kForbidden[] = {

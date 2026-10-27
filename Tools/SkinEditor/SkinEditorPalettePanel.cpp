@@ -79,6 +79,7 @@ void SkinEditorPalettePanel::selectPastille(const juce::String& name)
     {
         if (rows_[i].kind == RowKind::kColour && ! rows_[i].isLowerListHalf && rows_[i].name == name)
         {
+            const juce::ScopedValueSetter<bool> scope(suppressSelectionNotify_, true);
             list_.selectRow(static_cast<int>(i));
             return;
         }
@@ -224,9 +225,11 @@ void SkinEditorPalettePanel::paintListBoxItem(int row, juce::Graphics& g, int wi
     const int sw = SkinEditorChrome::kColourSwatchSize;
     const int swX = 4;
     const int swY = yOff + (fullH - sw) / 2;
-    SkinEditorChrome::paintColourSwatch(g,
-                                        juce::Rectangle<int>(swX, swY, sw, sw),
-                                        juce::Colour(item.argb));
+    const auto swatch = juce::Rectangle<int>(swX, swY, sw, sw);
+    if (item.pending)
+        SkinEditorChrome::paintPendingColourSwatch(g, swatch);
+    else
+        SkinEditorChrome::paintColourSwatch(g, swatch, juce::Colour(item.argb));
     g.setColour(SkinEditorChrome::textTableBody());
     g.setFont(SkinEditorChrome::fontRegular());
     g.drawText(item.name, swX + sw + 8, yOff, paintW - swX - sw - 8, fullH,
@@ -243,8 +246,30 @@ void SkinEditorPalettePanel::selectedRowsChanged(int)
     deleteButton_.setEnabled(! readOnly_ && name.isNotEmpty()
                              && layer_ != nullptr
                              && ! layer_->isProductPastilleName(name));
+    if (suppressSelectionNotify_)
+        return;
     if (onPastilleSelected)
         onPastilleSelected(name);
+}
+
+void SkinEditorPalettePanel::listBoxItemDoubleClicked(int row, const juce::MouseEvent& e)
+{
+    if (readOnly_ || row < 0 || row >= static_cast<int>(rows_.size()))
+        return;
+
+    const auto& item = rows_[static_cast<size_t>(row)];
+    if (item.kind != RowKind::kColour || item.isProduct)
+        return;
+
+    // Rename is name-text only — swatch double-click does nothing.
+    const int sw = SkinEditorChrome::kColourSwatchSize;
+    constexpr int kSwatchX = 4;
+    constexpr int kNameGap = 8;
+    if (e.x < kSwatchX + sw + kNameGap)
+        return;
+
+    if (onRenamePastilleRequested)
+        onRenamePastilleRequested(item.name);
 }
 
 void SkinEditorPalettePanel::rebuildRows()
@@ -265,6 +290,7 @@ void SkinEditorPalettePanel::rebuildRows()
         row.kind = RowKind::kColour;
         row.name = pastille.name;
         row.argb = pastille.argb;
+        row.pending = pastille.pending;
         row.isProduct = layer_->isProductPastilleName(pastille.name);
         if (row.isProduct)
             product.push_back(row);

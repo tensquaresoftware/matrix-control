@@ -37,6 +37,7 @@ SkinEditorMappingsPanel::Row SkinEditorMappingsPanel::makeMappingRow(
         if (pastille.name == row.pastilleName)
         {
             row.pastilleArgb = pastille.argb;
+            row.pastillePending = pastille.pending;
             break;
         }
     }

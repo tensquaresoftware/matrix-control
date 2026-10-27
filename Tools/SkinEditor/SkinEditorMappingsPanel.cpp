@@ -183,10 +183,11 @@ void SkinEditorMappingsPanel::paintMappingCells(juce::Graphics& g,
     }
 
     const int swY = contentY + (contentH - kSwatchSize) / 2;
-    SkinEditorChrome::paintColourSwatch(g,
-                                        juce::Rectangle<int>(x0 + cols.mappedX, swY,
-                                                             kSwatchSize, kSwatchSize),
-                                        juce::Colour(item.pastilleArgb));
+    const auto swatch = juce::Rectangle<int>(x0 + cols.mappedX, swY, kSwatchSize, kSwatchSize);
+    if (item.pastillePending)
+        SkinEditorChrome::paintPendingColourSwatch(g, swatch);
+    else
+        SkinEditorChrome::paintColourSwatch(g, swatch, juce::Colour(item.pastilleArgb));
     g.setColour(SkinEditorChrome::textTableBody());
     g.drawText(item.pastilleName,
                x0 + cols.mappedX + kSwatchSize + 6, contentY,

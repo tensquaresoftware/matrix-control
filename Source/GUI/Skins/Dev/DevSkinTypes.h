@@ -26,6 +26,8 @@ namespace TSS::DevSkin
     {
         juce::String name;
         juce::uint32 argb = 0xffffffff;
+        /** True until the author first changes ARGB via the colour editor. */
+        bool pending = false;
     };
 
     struct Mapping
