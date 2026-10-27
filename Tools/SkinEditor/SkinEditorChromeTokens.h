@@ -52,16 +52,16 @@ namespace SkinEditorChrome
     inline constexpr int kButtonGap = 8;
     /** Fixed body-column widths — window width fits these; Mappings does not grow. */
     inline constexpr int kColorPanelWidth = 260;
-    inline constexpr int kPalettePanelWidth = 150;
+    /** Wider than the original 150 so OPERATION Hold-colour coaching fits more often. */
+    inline constexpr int kPalettePanelWidth = 210;
     /**
      * Former Mappings half-share when Color|Palette|Mappings|Unbound filled the
      * legacy 1210-wide window (Unbound removed; Mappings keeps this width).
+     * Frozen at the palette=150 share so widening Palette grows the window, not
+     * shrinks Mappings.
      */
     inline constexpr int kLegacyWindowMaxWidth = 1210;
-    inline constexpr int kMappingsPanelWidth =
-        (kLegacyWindowMaxWidth - 2 * kGutter - kColorPanelWidth - kGutter
-         - kPalettePanelWidth - kGutter - kGutter)
-        / 2;
+    inline constexpr int kMappingsPanelWidth = 385;
     /**
      * Exact body width: edge gutters + Color + Palette side gaps + fixed Mappings.
      * Live window width = max(body, measured title + SESSION) — see windowContentWidth().
@@ -105,6 +105,12 @@ namespace SkinEditorChrome
     inline constexpr int kMappingBadgePadH = 8;
     /** Inset from OPERATION dark pocket to MAPPING badge — equals vertical centre air. */
     inline constexpr int kOperationWitnessPad = (kButtonHeight - kMappingBadgeHeight) / 2; // 4
+    /** Painted thick next-step arrow between identity and coaching text. */
+    inline constexpr int kOperationArrowWidth = 14;
+    /** Tight gap after role colon (role string already ends with a space). */
+    inline constexpr int kOperationTightGap = 0;
+    /** Gap on each side of the OPERATION arrow. */
+    inline constexpr int kOperationArrowGap = 3;
     /** Palette / Mappings / MAPPING witness colour square. */
     inline constexpr int kColourSwatchSize = 12;
     /** Checker cells across one swatch side (12 / 4 = 3 px cells, exact 4x4). */

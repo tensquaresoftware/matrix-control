@@ -98,4 +98,33 @@ namespace SkinEditorChrome
     }
 
     inline int mappingModeBadgeWidth() { return chromeBadgeWidth("MAPPING"); }
+
+    /** Thick filled arrow (ASCII-safe picto) between OPERATION identity and next-step text. */
+    inline void drawOperationNextArrow(juce::Graphics& g, juce::Rectangle<int> area, juce::Colour colour)
+    {
+        if (area.getWidth() < 10 || area.getHeight() < 8)
+            return;
+
+        // One closed path so shaft and head meet without a notch; shaft width ~= head width.
+        const float midY = (float) area.getCentreY();
+        const float left = (float) area.getX() + 1.0f;
+        const float tipX = (float) area.getRight() - 1.0f;
+        const float span = tipX - left;
+        const float headW = span * 0.5f;
+        const float headHalfH = 4.5f;
+        const float shaftHalfH = 1.5f;
+        const float headBaseX = tipX - headW;
+
+        juce::Path arrow;
+        arrow.startNewSubPath(left, midY - shaftHalfH);
+        arrow.lineTo(headBaseX, midY - shaftHalfH);
+        arrow.lineTo(headBaseX, midY - headHalfH);
+        arrow.lineTo(tipX, midY);
+        arrow.lineTo(headBaseX, midY + headHalfH);
+        arrow.lineTo(headBaseX, midY + shaftHalfH);
+        arrow.lineTo(left, midY + shaftHalfH);
+        arrow.closeSubPath();
+        g.setColour(colour);
+        g.fillPath(arrow);
+    }
 }
