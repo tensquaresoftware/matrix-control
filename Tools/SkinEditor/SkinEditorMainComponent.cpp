@@ -49,7 +49,7 @@ void SkinEditorMainComponent::setupTitleBarChrome()
     titleLabel_.setBorderSize({});
     addAndMakeVisible(titleLabel_);
 
-    for (auto* label : { &mappingPrefixLabel_, &mappingDetailLabel_ })
+    for (auto* label : { &mappingPrefixLabel_, &mappingNameLabel_, &mappingDetailLabel_ })
     {
         label->setFont(SkinEditorChrome::fontRegular());
         label->setColour(juce::Label::textColourId, SkinEditorChrome::textMuted());
@@ -59,6 +59,7 @@ void SkinEditorMainComponent::setupTitleBarChrome()
         label->setVisible(false);
         addAndMakeVisible(*label);
     }
+    mappingNameLabel_.setColour(juce::Label::textColourId, SkinEditorChrome::textPrimary());
 }
 
 void SkinEditorMainComponent::setupStatusBarChrome()
@@ -91,7 +92,16 @@ void SkinEditorMainComponent::setupSkinsPanel()
 
 void SkinEditorMainComponent::setupBodyPanels()
 {
+    const auto escapeMapping = [this]() -> bool
+    {
+        if (mappingMode_ == MappingMode::kIdle)
+            return false;
+        clearMappingModeToIdle();
+        return true;
+    };
+
     colourPicker_.onColourChanged = [this](juce::Colour c) { onColourChanged(c); };
+    colourPicker_.onEscapeRequested = escapeMapping;
     addAndMakeVisible(colourPicker_);
 
     palettePanel_.setLayer(&layer_);
@@ -101,13 +111,6 @@ void SkinEditorMainComponent::setupBodyPanels()
     palettePanel_.onRenamePastilleRequested = [this](const juce::String& name)
     {
         onRenamePastille(name);
-    };
-    const auto escapeMapping = [this]() -> bool
-    {
-        if (mappingMode_ == MappingMode::kIdle)
-            return false;
-        clearMappingModeToIdle();
-        return true;
     };
     palettePanel_.onEscapeRequested = escapeMapping;
     addAndMakeVisible(palettePanel_);
@@ -120,6 +123,10 @@ void SkinEditorMainComponent::setupBodyPanels()
     mappingsPanel_.onMappedColourClicked = [this](TSS::SkinColourKey key)
     {
         onMappedColourClicked(key);
+    };
+    mappingsPanel_.onHoldColourChanged = [this]
+    {
+        updateMappingWitness();
     };
     mappingsPanel_.onEscapeRequested = escapeMapping;
     addAndMakeVisible(mappingsPanel_);
@@ -152,6 +159,24 @@ void SkinEditorMainComponent::setupLayerAndBridgeCallbacks()
     };
 }
 
+void SkinEditorMainComponent::paintMappingWitnessDecorations(juce::Graphics& g) const
+{
+    if (! mappingWitnessActive_)
+        return;
+    if (! mappingBadgeBounds_.isEmpty())
+        SkinEditorChrome::drawMappingModeBadge(g, mappingBadgeBounds_);
+    if (mappingWitnessShowSwatch_ && ! mappingSwatchBounds_.isEmpty())
+    {
+        if (mappingWitnessPending_)
+            SkinEditorChrome::paintPendingColourSwatch(g, mappingSwatchBounds_);
+        else
+            SkinEditorChrome::paintColourSwatch(g, mappingSwatchBounds_, mappingWitnessColour_);
+    }
+    if (! mappingArrowBounds_.isEmpty())
+        SkinEditorChrome::drawOperationNextArrow(g, mappingArrowBounds_,
+                                                 SkinEditorChrome::textMuted());
+}
+
 void SkinEditorMainComponent::paintChromeWells(juce::Graphics& g) const
 {
     if (! sessionWellBounds_.isEmpty())
@@ -166,15 +191,7 @@ void SkinEditorMainComponent::paintChromeWells(juce::Graphics& g) const
         if (x > 0)
             g.fillRect(x, sessionSeparatorY_, 1, sessionSeparatorH_);
 
-    if (mappingWitnessActive_ && ! mappingBadgeBounds_.isEmpty())
-        SkinEditorChrome::drawMappingModeBadge(g, mappingBadgeBounds_);
-    if (mappingWitnessShowSwatch_ && ! mappingSwatchBounds_.isEmpty())
-    {
-        if (mappingWitnessPending_)
-            SkinEditorChrome::paintPendingColourSwatch(g, mappingSwatchBounds_);
-        else
-            SkinEditorChrome::paintColourSwatch(g, mappingSwatchBounds_, mappingWitnessColour_);
-    }
+    paintMappingWitnessDecorations(g);
 }
 
 void SkinEditorMainComponent::paint(juce::Graphics& g)
@@ -208,53 +225,84 @@ void SkinEditorMainComponent::layoutTitleBar(juce::Rectangle<int> titleBar)
     layoutSessionWell(titleBar, titleBar.getX() + titleW);
 }
 
+namespace
+{
+    struct WitnessElidePlace
+    {
+        juce::Label* label = nullptr;
+        int x = 0;
+        int maxW = 0;
+        int rowY = 0;
+        int rowH = 0;
+    };
+
+    int placeElidedWitnessLabel(WitnessElidePlace place, const juce::Font& font)
+    {
+        auto& label = *place.label;
+        const auto full = label.getTooltip().isNotEmpty() ? label.getTooltip() : label.getText();
+        const auto shown = SkinEditorChrome::elideToWidth(font, full, place.maxW);
+        const int w = juce::jmin(place.maxW, SkinEditorChrome::measureTextWidth(font, shown) + 2);
+        label.setText(shown, juce::dontSendNotification);
+        label.setBounds(place.x, place.rowY, w, place.rowH);
+        return place.x + w;
+    }
+}
+
 void SkinEditorMainComponent::layoutOperationWitness(juce::Rectangle<int> content)
 {
+    // Order: badge | role | [swatch] identity | arrow | next-step
     const int rowH = SkinEditorChrome::kMappingBadgeHeight;
     const int rowY = chromeRowY(content.getY(), content.getHeight(), rowH, 0);
     const int badgeW = SkinEditorChrome::mappingModeBadgeWidth();
     const int sw = SkinEditorChrome::kColourSwatchSize;
+    const int arrowW = SkinEditorChrome::kOperationArrowWidth;
     const auto bodyFont = SkinEditorChrome::fontRegular();
-    const int gap = SkinEditorChrome::kChromeBadgeGap;
-    const auto prefixFull = mappingPrefixLabel_.getTooltip().isNotEmpty()
-                                ? mappingPrefixLabel_.getTooltip()
-                                : mappingPrefixLabel_.getText();
+    const int badgeGap = SkinEditorChrome::kChromeBadgeGap;
+    const int afterColon = SkinEditorChrome::kOperationTightGap;
+    const int swatchToName = SkinEditorChrome::kChromeBadgeGap;
+    const int arrowGap = SkinEditorChrome::kOperationArrowGap;
+    const int pad = SkinEditorChrome::kOperationWitnessPad;
     const auto detailFull = mappingDetailLabel_.getTooltip().isNotEmpty()
                                 ? mappingDetailLabel_.getTooltip()
                                 : mappingDetailLabel_.getText();
 
-    const int pad = SkinEditorChrome::kOperationWitnessPad;
     int x = content.getX() + pad;
     if (x + badgeW > content.getRight())
         return;
 
     mappingBadgeBounds_ = { x, rowY, badgeW, rowH };
-    x += badgeW + gap;
+    x += badgeW + badgeGap;
 
-    const int swatchReserve = mappingWitnessShowSwatch_ ? (sw + gap) : 0;
-    // Keep the next-step text readable: the prefix yields space first (never below half).
-    const int available = juce::jmax(0, content.getRight() - x - gap - swatchReserve);
-    const int nextStepNeed = SkinEditorChrome::measureTextWidth(bodyFont, detailFull) + 4 + pad + gap;
-    const int prefixMax = juce::jmax(available / 2, available - nextStepNeed);
-    const auto prefixShown = SkinEditorChrome::elideToWidth(bodyFont, prefixFull, prefixMax);
-    const int prefixW = juce::jmin(prefixMax,
-                                   SkinEditorChrome::measureTextWidth(bodyFont, prefixShown) + 2);
-    mappingPrefixLabel_.setText(prefixShown, juce::dontSendNotification);
-    mappingPrefixLabel_.setBounds(x, rowY, prefixW, rowH);
-    x += prefixW + gap;
+    // Role ends with " "; only a tight gap before the swatch (or identity when no swatch).
+    const auto roleFull = mappingPrefixLabel_.getTooltip().isNotEmpty()
+                              ? mappingPrefixLabel_.getTooltip()
+                              : mappingPrefixLabel_.getText();
+    const int roleMax = juce::jmin(SkinEditorChrome::measureTextWidth(bodyFont, roleFull) + 2,
+                                   juce::jmax(0, content.getRight() - x - pad));
+    x = placeElidedWitnessLabel({ &mappingPrefixLabel_, x, roleMax, rowY, rowH }, bodyFont)
+        + afterColon;
 
     if (mappingWitnessShowSwatch_ && x + sw <= content.getRight())
     {
         mappingSwatchBounds_ = { x, rowY + (rowH - sw) / 2, sw, sw };
-        x += sw + gap;
+        x += sw + swatchToName;
     }
 
-    const int detailMax = juce::jmax(0, content.getRight() - x - pad);
-    const auto detailShown = SkinEditorChrome::elideToWidth(bodyFont, detailFull, detailMax);
-    const int detailW = juce::jmin(detailMax,
-                                   SkinEditorChrome::measureTextWidth(bodyFont, detailShown) + 4);
-    mappingDetailLabel_.setText(detailShown, juce::dontSendNotification);
-    mappingDetailLabel_.setBounds(x, rowY, detailW, rowH);
+    // Identity yields first so next-step coaching stays readable (never below half).
+    const int available = juce::jmax(0, content.getRight() - x - (arrowGap + arrowW + arrowGap + pad));
+    const int nextStepNeed = SkinEditorChrome::measureTextWidth(bodyFont, detailFull) + 4;
+    const int nameMax = juce::jmax(available / 2, available - nextStepNeed);
+    x = placeElidedWitnessLabel({ &mappingNameLabel_, x, nameMax, rowY, rowH }, bodyFont) + arrowGap;
+
+    if (x + arrowW <= content.getRight() - pad)
+    {
+        mappingArrowBounds_ = { x, rowY, arrowW, rowH };
+        x += arrowW + arrowGap;
+    }
+
+    placeElidedWitnessLabel({ &mappingDetailLabel_, x, juce::jmax(0, content.getRight() - x - pad),
+                              rowY, rowH },
+                            bodyFont);
 }
 
 void SkinEditorMainComponent::layoutOperationWell(juce::Rectangle<int> band)
@@ -263,7 +311,9 @@ void SkinEditorMainComponent::layoutOperationWell(juce::Rectangle<int> band)
     operationContentBounds_ = {};
     mappingBadgeBounds_ = {};
     mappingSwatchBounds_ = {};
+    mappingArrowBounds_ = {};
     mappingPrefixLabel_.setBounds({});
+    mappingNameLabel_.setBounds({});
     mappingDetailLabel_.setBounds({});
     operationTitleLabel_.setBounds({});
 
@@ -363,6 +413,7 @@ void SkinEditorMainComponent::resized()
     appBadgeBounds_ = {};
     mappingBadgeBounds_ = {};
     mappingSwatchBounds_ = {};
+    mappingArrowBounds_ = {};
 
     auto bounds = getLocalBounds();
     const int edge = SkinEditorChrome::kWindowEdgeGutter;

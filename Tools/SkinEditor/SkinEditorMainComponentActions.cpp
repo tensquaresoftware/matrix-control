@@ -323,7 +323,8 @@ void SkinEditorMainComponent::onDeletePastille()
     }
     if (selectedPastille_ == name)
     {
-        if (mappingMode_ == MappingMode::kHeldColour)
+        if (mappingMode_ == MappingMode::kHeldColour
+            || mappingMode_ == MappingMode::kEditingColour)
             clearMappingModeToIdle();
         else
             selectedPastille_.clear();
@@ -339,7 +340,8 @@ void SkinEditorMainComponent::onColourChanged(juce::Colour colour)
                                                colour.getARGB());
     if (result.failed())
         setStatusMessage(result.getErrorMessage());
-    else if (mappingMode_ == MappingMode::kHeldColour)
+    else if (mappingMode_ == MappingMode::kHeldColour
+             || mappingMode_ == MappingMode::kEditingColour)
         updateMappingWitness();
 }
 

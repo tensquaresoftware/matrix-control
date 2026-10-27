@@ -9,7 +9,8 @@ namespace SkinEditorMappingPolicy
     {
         kIdle,
         kHeldColour,
-        kArmedRow
+        kArmedRow,
+        kEditingColour // Mapped colour cell: edit in COLOR; not a bind gesture
     };
 
     enum class PastilleIntent
@@ -35,6 +36,7 @@ namespace SkinEditorMappingPolicy
             return PastilleIntent::kSelectReadOnly;
         if (mode == Mode::kArmedRow)
             return PastilleIntent::kBindArmedRow;
+        // Idle, HeldColour, EditingColour: take / retarget the held colour.
         return PastilleIntent::kEnterOrChangeHeldColour;
     }
 
@@ -44,6 +46,7 @@ namespace SkinEditorMappingPolicy
             return RowIntent::kIgnore;
         if (mode == Mode::kHeldColour)
             return RowIntent::kBindHeldColour;
+        // Idle, ArmedRow, EditingColour: arm / re-arm the row.
         return RowIntent::kEnterOrChangeArmedRow;
     }
 
@@ -69,7 +72,7 @@ namespace SkinEditorMappingPolicy
     enum class MappedColourIntent
     {
         kNoOp,          // Unbound cell or unresolved pastille name
-        kSelectForEdit  // Clear mapping mode to Idle; select pastille for COLOR / SV
+        kSelectForEdit  // Enter EditingColour; select pastille for COLOR / SV
     };
 
     inline MappedColourIntent mappedColourClick(bool cellUnbound, bool pastilleResolved) noexcept
@@ -79,19 +82,32 @@ namespace SkinEditorMappingPolicy
         return MappedColourIntent::kSelectForEdit;
     }
 
-    /** OPERATION next-step copy (ASCII). Prefix includes the active item identity. */
-    inline constexpr const char* kHeldColourNextStep = "Click a Property or State cell to map";
-    inline constexpr const char* kArmedRowNextStep = "Click a palette colour to map";
+    /**
+     * OPERATION copy (ASCII). Layout paints: role + [swatch] + identity + arrow + next.
+     * Em dash is avoided (font / ASCII policy); the arrow is a painted picto.
+     */
+    // Trailing space after ':' — layout uses a tight gap, not kChromeBadgeGap.
+    inline constexpr const char* kSelectedColourRole = "Selected colour: ";
+    inline constexpr const char* kEditingColourRole = "Editing colour: ";
+    inline constexpr const char* kSelectedTargetRole = "Selected target: ";
+    inline constexpr const char* kHeldColourNextStep =
+        "Next: click a Property or State cell in a Mappings row.";
+    inline constexpr const char* kArmedRowNextStep = "Next: click a colour in Palette.";
+    inline constexpr const char* kEditingColourNextStep =
+        "Next: adjust in COLOR (affects every mapped use).";
+    inline constexpr const char* kHoldColourOnRowsSuffix =
+        " [Hold colour] is active: keep clicking rows.";
+    inline constexpr const char* kHoldColourOnColoursSuffix =
+        " [Hold colour] is active: keep clicking colours.";
 
-    inline juce::String heldColourWitnessPrefix(const juce::String& pastilleName)
+    /** Append Hold colour coaching when the Hold colour toggle is on (bind gestures only). */
+    inline juce::String withHoldColourSuffix(const juce::String& nextStep,
+                                             bool holdColourOn,
+                                             bool keepClickingRows) noexcept
     {
-        return "Hold: " + pastilleName;
-    }
-
-    inline juce::String armedRowWitnessPrefix(const juce::String& object,
-                                              const juce::String& property,
-                                              const juce::String& state)
-    {
-        return "Target: " + object + " > " + property + " > " + state;
+        if (! holdColourOn)
+            return nextStep;
+        return nextStep
+               + (keepClickingRows ? kHoldColourOnRowsSuffix : kHoldColourOnColoursSuffix);
     }
 }

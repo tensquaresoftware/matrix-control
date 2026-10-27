@@ -64,6 +64,11 @@ SkinEditorMappingsPanel::SkinEditorMappingsPanel()
     holdColourToggle_.setTooltip("Hold the current mapping gesture to map several targets");
     // Same muted label colour as "Object:" - box chrome comes from LookAndFeel::drawToggleButton.
     holdColourToggle_.setColour(juce::ToggleButton::textColourId, SkinEditorChrome::textMuted());
+    holdColourToggle_.onClick = [this]
+    {
+        if (onHoldColourChanged != nullptr)
+            onHoldColourChanged();
+    };
     addAndMakeVisible(holdColourToggle_);
 
     viewport_.setViewedComponent(&content_, false);

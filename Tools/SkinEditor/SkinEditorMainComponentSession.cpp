@@ -175,7 +175,8 @@ void SkinEditorMainComponent::refreshAll()
         }
         if (found)
             palettePanel_.selectPastille(selectedPastille_);
-        else if (mappingMode_ == MappingMode::kHeldColour)
+        else if (mappingMode_ == MappingMode::kHeldColour
+                 || mappingMode_ == MappingMode::kEditingColour)
             clearMappingModeToIdle();
         else
             selectedPastille_.clear();

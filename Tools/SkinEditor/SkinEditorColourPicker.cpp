@@ -25,6 +25,10 @@ SkinEditorColourPicker::SkinEditorColourPicker()
     for (auto* label : { &rLabel_, &gLabel_, &bLabel_ })
         label->setJustificationType(juce::Justification::centredRight);
 
+    escapeForwarder_.handler = &onEscapeRequested;
+    setWantsKeyboardFocus(true);
+    addKeyListener(&escapeForwarder_);
+
     auto styleEditor = [this](juce::TextEditor& ed)
     {
         ed.setFont(SkinEditorChrome::fontMono());
@@ -32,6 +36,7 @@ SkinEditorColourPicker::SkinEditorColourPicker()
         ed.setColour(juce::TextEditor::textColourId, SkinEditorChrome::textPrimary());
         ed.setColour(juce::TextEditor::outlineColourId, SkinEditorChrome::controlOutline());
         ed.addListener(this);
+        ed.addKeyListener(&escapeForwarder_);
         addAndMakeVisible(ed);
     };
     hexEditor_.setInputRestrictions(6, "0123456789ABCDEFabcdef");
@@ -45,6 +50,22 @@ SkinEditorColourPicker::SkinEditorColourPicker()
 
     clearEditors();
     setEnabledEditing(false);
+}
+
+SkinEditorColourPicker::~SkinEditorColourPicker()
+{
+    removeKeyListener(&escapeForwarder_);
+    hexEditor_.removeKeyListener(&escapeForwarder_);
+    rEditor_.removeKeyListener(&escapeForwarder_);
+    gEditor_.removeKeyListener(&escapeForwarder_);
+    bEditor_.removeKeyListener(&escapeForwarder_);
+}
+
+bool SkinEditorColourPicker::keyPressed(const juce::KeyPress& key)
+{
+    if (key == juce::KeyPress::escapeKey && onEscapeRequested != nullptr)
+        return onEscapeRequested();
+    return false;
 }
 
 void SkinEditorColourPicker::setColour(juce::Colour colour, juce::NotificationType notification)
@@ -183,6 +204,7 @@ void SkinEditorColourPicker::resized()
 
 void SkinEditorColourPicker::mouseDown(const juce::MouseEvent& e)
 {
+    grabKeyboardFocus();
     mouseDrag(e);
 }
 

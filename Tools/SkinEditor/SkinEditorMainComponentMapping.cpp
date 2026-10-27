@@ -3,17 +3,23 @@
 #include "GUI/Skins/Dev/DevSkinKeyNames.h"
 #include "Tools/SkinEditor/SkinEditorMappingModePolicy.h"
 
+SkinEditorMappingPolicy::Mode SkinEditorMainComponent::policyModeFromMappingMode() const noexcept
+{
+    switch (mappingMode_)
+    {
+        case MappingMode::kHeldColour:    return SkinEditorMappingPolicy::Mode::kHeldColour;
+        case MappingMode::kArmedRow:      return SkinEditorMappingPolicy::Mode::kArmedRow;
+        case MappingMode::kEditingColour: return SkinEditorMappingPolicy::Mode::kEditingColour;
+        case MappingMode::kIdle:          break;
+    }
+    return SkinEditorMappingPolicy::Mode::kIdle;
+}
+
 void SkinEditorMainComponent::onPastilleSelected(const juce::String& name)
 {
     using Intent = SkinEditorMappingPolicy::PastilleIntent;
 
-    auto policyMode = SkinEditorMappingPolicy::Mode::kIdle;
-    if (mappingMode_ == MappingMode::kHeldColour)
-        policyMode = SkinEditorMappingPolicy::Mode::kHeldColour;
-    else if (mappingMode_ == MappingMode::kArmedRow)
-        policyMode = SkinEditorMappingPolicy::Mode::kArmedRow;
-
-    const auto intent = SkinEditorMappingPolicy::pastilleClick(policyMode,
+    const auto intent = SkinEditorMappingPolicy::pastilleClick(policyModeFromMappingMode(),
                                                               canEditEditorSkin(),
                                                               name.isEmpty());
     switch (intent)
@@ -47,14 +53,9 @@ void SkinEditorMainComponent::onMappingRowActivated(TSS::SkinColourKey key)
 {
     using Intent = SkinEditorMappingPolicy::RowIntent;
 
-    auto policyMode = SkinEditorMappingPolicy::Mode::kIdle;
-    if (mappingMode_ == MappingMode::kHeldColour)
-        policyMode = SkinEditorMappingPolicy::Mode::kHeldColour;
-    else if (mappingMode_ == MappingMode::kArmedRow)
-        policyMode = SkinEditorMappingPolicy::Mode::kArmedRow;
-
     const bool fromUnbound = isKeyUnboundOnEditor(key);
-    const auto intent = SkinEditorMappingPolicy::rowClick(policyMode, canEditEditorSkin());
+    const auto intent = SkinEditorMappingPolicy::rowClick(policyModeFromMappingMode(),
+                                                         canEditEditorSkin());
     switch (intent)
     {
         case Intent::kIgnore:
@@ -92,10 +93,7 @@ void SkinEditorMainComponent::onMappedColourClicked(TSS::SkinColourKey key)
         != SkinEditorMappingPolicy::MappedColourIntent::kSelectForEdit)
         return;
 
-    clearMappingModeToIdle();
-    selectedPastille_ = name;
-    palettePanel_.selectPastille(name);
-    syncColourPickerToSelection();
+    enterEditingColour(name);
 }
 
 void SkinEditorMainComponent::enterHeldColour(const juce::String& pastilleName)
@@ -118,6 +116,18 @@ void SkinEditorMainComponent::enterArmedRow(TSS::SkinColourKey key, bool fromUnb
     grabKeyboardFocus();
 }
 
+void SkinEditorMainComponent::enterEditingColour(const juce::String& pastilleName)
+{
+    mappingMode_ = MappingMode::kEditingColour;
+    selectedPastille_ = pastilleName;
+    armedKey_ = {};
+    armedFromUnbound_ = false;
+    palettePanel_.selectPastille(pastilleName);
+    syncColourPickerToSelection();
+    updateMappingWitness();
+    grabKeyboardFocus();
+}
+
 void SkinEditorMainComponent::clearMappingModeToIdle()
 {
     // Production Escape / panel onEscapeRequested land here; afterEscape() is the Idle SSOT.
@@ -134,12 +144,7 @@ void SkinEditorMainComponent::clearMappingModeToIdle()
 
 void SkinEditorMainComponent::retainMappingModeAfterWrite(TSS::SkinColourKey key, bool fromUnbound)
 {
-    auto policyMode = SkinEditorMappingPolicy::Mode::kIdle;
-    if (mappingMode_ == MappingMode::kHeldColour)
-        policyMode = SkinEditorMappingPolicy::Mode::kHeldColour;
-    else if (mappingMode_ == MappingMode::kArmedRow)
-        policyMode = SkinEditorMappingPolicy::Mode::kArmedRow;
-
+    const auto policyMode = policyModeFromMappingMode();
     const auto next = SkinEditorMappingPolicy::afterSuccessfulWrite(policyMode,
                                                                    mappingsPanel_.isHoldColour());
     if (next == SkinEditorMappingPolicy::Mode::kIdle)
@@ -185,10 +190,8 @@ void SkinEditorMainComponent::applyMapping(TSS::SkinColourKey key,
     retainMappingModeAfterWrite(key, fromUnbound);
 }
 
-void SkinEditorMainComponent::fillHeldColourWitness()
+void SkinEditorMainComponent::fillWitnessSwatchForSelectedPastille()
 {
-    setWitnessTexts(SkinEditorMappingPolicy::heldColourWitnessPrefix(selectedPastille_),
-                    SkinEditorMappingPolicy::kHeldColourNextStep);
     if (const auto* skin = layer_.findSkin(visibleSkinId()))
     {
         for (const auto& pastille : skin->palette)
@@ -198,38 +201,61 @@ void SkinEditorMainComponent::fillHeldColourWitness()
                 mappingWitnessShowSwatch_ = true;
                 mappingWitnessPending_ = pastille.pending;
                 mappingWitnessColour_ = juce::Colour(pastille.argb);
-                break;
+                return;
             }
         }
     }
 }
 
-void SkinEditorMainComponent::fillArmedRowWitness()
+void SkinEditorMainComponent::fillHeldColourWitness()
 {
-    setWitnessTexts(SkinEditorMappingPolicy::armedRowWitnessPrefix(
-                        TSS::DevSkin::toString(armedKey_.object),
-                        TSS::DevSkin::toString(armedKey_.property),
-                        TSS::DevSkin::toString(armedKey_.state)),
-                    SkinEditorMappingPolicy::kArmedRowNextStep);
+    setWitnessTexts(SkinEditorMappingPolicy::kSelectedColourRole,
+                    selectedPastille_,
+                    SkinEditorMappingPolicy::withHoldColourSuffix(
+                        SkinEditorMappingPolicy::kHeldColourNextStep,
+                        mappingsPanel_.isHoldColour(),
+                        true));
+    fillWitnessSwatchForSelectedPastille();
 }
 
-void SkinEditorMainComponent::setWitnessTexts(const juce::String& prefix, const juce::String& nextStep)
+void SkinEditorMainComponent::fillArmedRowWitness()
+{
+    // Slash hierarchy - avoids looking like the OPERATION next-step arrow.
+    const auto identity = TSS::DevSkin::toString(armedKey_.object) + " / "
+                          + TSS::DevSkin::toString(armedKey_.property) + " / "
+                          + TSS::DevSkin::toString(armedKey_.state);
+    setWitnessTexts(SkinEditorMappingPolicy::kSelectedTargetRole,
+                    identity,
+                    SkinEditorMappingPolicy::withHoldColourSuffix(
+                        SkinEditorMappingPolicy::kArmedRowNextStep,
+                        mappingsPanel_.isHoldColour(),
+                        false));
+}
+
+void SkinEditorMainComponent::fillEditingColourWitness()
+{
+    setWitnessTexts(SkinEditorMappingPolicy::kEditingColourRole,
+                    selectedPastille_,
+                    SkinEditorMappingPolicy::kEditingColourNextStep);
+    fillWitnessSwatchForSelectedPastille();
+}
+
+void SkinEditorMainComponent::setWitnessTexts(const juce::String& role,
+                                              const juce::String& identity,
+                                              const juce::String& nextStep)
 {
     // Tooltips keep the full text; layoutOperationWitness may elide the visible label.
-    mappingPrefixLabel_.setTooltip(prefix);
-    mappingPrefixLabel_.setText(prefix, juce::dontSendNotification);
+    mappingPrefixLabel_.setTooltip(role);
+    mappingPrefixLabel_.setText(role, juce::dontSendNotification);
+    mappingNameLabel_.setTooltip(identity);
+    mappingNameLabel_.setText(identity, juce::dontSendNotification);
     mappingDetailLabel_.setTooltip(nextStep);
     mappingDetailLabel_.setText(nextStep, juce::dontSendNotification);
 }
 
 void SkinEditorMainComponent::updateMappingWitness()
 {
-    auto policyMode = SkinEditorMappingPolicy::Mode::kIdle;
-    if (mappingMode_ == MappingMode::kHeldColour)
-        policyMode = SkinEditorMappingPolicy::Mode::kHeldColour;
-    else if (mappingMode_ == MappingMode::kArmedRow)
-        policyMode = SkinEditorMappingPolicy::Mode::kArmedRow;
-
+    const auto policyMode = policyModeFromMappingMode();
     mappingWitnessActive_ = SkinEditorMappingPolicy::mappingWitnessVisible(policyMode);
     mappingWitnessShowSwatch_ = false;
     mappingWitnessPending_ = false;
@@ -239,15 +265,20 @@ void SkinEditorMainComponent::updateMappingWitness()
         fillHeldColourWitness();
     else if (mappingMode_ == MappingMode::kArmedRow)
         fillArmedRowWitness();
+    else if (mappingMode_ == MappingMode::kEditingColour)
+        fillEditingColourWitness();
     else
     {
         mappingPrefixLabel_.setTooltip({});
         mappingPrefixLabel_.setText({}, juce::dontSendNotification);
+        mappingNameLabel_.setTooltip({});
+        mappingNameLabel_.setText({}, juce::dontSendNotification);
         mappingDetailLabel_.setTooltip({});
         mappingDetailLabel_.setText({}, juce::dontSendNotification);
     }
 
     mappingPrefixLabel_.setVisible(mappingWitnessActive_);
+    mappingNameLabel_.setVisible(mappingWitnessActive_);
     mappingDetailLabel_.setVisible(mappingWitnessActive_);
     resized();
     repaint();

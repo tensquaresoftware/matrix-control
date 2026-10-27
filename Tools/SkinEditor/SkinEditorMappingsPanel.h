@@ -20,6 +20,9 @@ public:
     /** When true, batch maps stay in the current gesture direction after a successful write. */
     bool isHoldColour() const noexcept { return holdColourToggle_.getToggleState(); }
 
+    /** Hold colour toggle flipped - refresh OPERATION coaching when a bind gesture is active. */
+    std::function<void()> onHoldColourChanged;
+
     /** Property / State cell click - main owns Idle / HeldColour / ArmedRow (bind vs re-arm). */
     std::function<void(TSS::SkinColourKey key)> onRowActivated;
     /** Mapped colour cell click on a bound row - main selects that pastille for COLOR / SV edit. */

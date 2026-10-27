@@ -12,6 +12,7 @@ class SkinEditorColourPicker final : public juce::Component,
 {
 public:
     SkinEditorColourPicker();
+    ~SkinEditorColourPicker() override;
 
     /**
      * Panel height at `panelWidth` so the gap under #/R/G/B matches the gap above
@@ -37,13 +38,27 @@ public:
     void setEnabledEditing(bool canEdit);
 
     std::function<void(juce::Colour)> onColourChanged;
+    /** Escape while COLOR has focus - clear mapping / editing mode in main. */
+    std::function<bool()> onEscapeRequested;
 
     void paint(juce::Graphics& g) override;
     void resized() override;
     void mouseDown(const juce::MouseEvent& e) override;
     void mouseDrag(const juce::MouseEvent& e) override;
+    bool keyPressed(const juce::KeyPress& key) override;
 
 private:
+    struct EscapeKeyForwarder final : public juce::KeyListener
+    {
+        std::function<bool()>* handler = nullptr;
+        bool keyPressed(const juce::KeyPress& key, juce::Component*) override
+        {
+            if (key == juce::KeyPress::escapeKey && handler != nullptr && *handler != nullptr)
+                return (*handler)();
+            return false;
+        }
+    };
+
     void textEditorReturnKeyPressed(juce::TextEditor&) override;
     void textEditorFocusLost(juce::TextEditor&) override;
 
@@ -69,6 +84,8 @@ private:
     juce::Rectangle<int> svBounds_;
     juce::Rectangle<int> hueBounds_;
     juce::Rectangle<int> titleTabBounds_;
+
+    EscapeKeyForwarder escapeForwarder_;
 
     juce::Label titleLabel_;
     juce::Label hexLabel_ { {}, "#" };

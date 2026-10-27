@@ -149,18 +149,30 @@ private:
 
     void heldAndArmedWitnessCopy()
     {
-        beginTest("OPERATION witness - locked Hold/Target prefixes and next-step copy");
+        beginTest("OPERATION witness - Selected/Editing prefixes, Next steps, Hold colour suffix");
 
         using namespace SkinEditorMappingPolicy;
-        expectEquals(heldColourWitnessPrefix("Accent"), juce::String("Hold: Accent"));
+        expectEquals(juce::String(kSelectedColourRole), juce::String("Selected colour: "));
         expectEquals(juce::String(kHeldColourNextStep),
-                     juce::String("Click a Property or State cell to map"));
-        expectEquals(armedRowWitnessPrefix("Knob", "fill", "normal"),
-                     juce::String("Target: Knob > fill > normal"));
+                     juce::String("Next: click a Property or State cell in a Mappings row."));
+        expectEquals(juce::String(kSelectedTargetRole), juce::String("Selected target: "));
         expectEquals(juce::String(kArmedRowNextStep),
-                     juce::String("Click a palette colour to map"));
+                     juce::String("Next: click a colour in Palette."));
+        expectEquals(juce::String(kEditingColourRole), juce::String("Editing colour: "));
+        expectEquals(juce::String(kEditingColourNextStep),
+                     juce::String("Next: adjust in COLOR (affects every mapped use)."));
+        expectEquals(withHoldColourSuffix(kHeldColourNextStep, false, true),
+                     juce::String(kHeldColourNextStep));
+        expectEquals(withHoldColourSuffix(kHeldColourNextStep, true, true),
+                     juce::String(kHeldColourNextStep) + kHoldColourOnRowsSuffix);
+        expectEquals(withHoldColourSuffix(kArmedRowNextStep, true, false),
+                     juce::String(kArmedRowNextStep) + kHoldColourOnColoursSuffix);
         expect(mappingWitnessVisible(Mode::kHeldColour));
         expect(mappingWitnessVisible(Mode::kArmedRow));
+        expect(mappingWitnessVisible(Mode::kEditingColour));
+        expect(rowClick(Mode::kEditingColour, true) == RowIntent::kEnterOrChangeArmedRow);
+        expect(pastilleClick(Mode::kEditingColour, true, false)
+               == PastilleIntent::kEnterOrChangeHeldColour);
     }
 };
 

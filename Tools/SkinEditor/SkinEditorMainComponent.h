@@ -7,6 +7,7 @@
 #include "GUI/Skins/Dev/DevSkinSession.h"
 #include "Tools/SkinEditor/SkinEditorLookAndFeel.h"
 #include "Tools/SkinEditor/SkinEditorColourPicker.h"
+#include "Tools/SkinEditor/SkinEditorMappingModePolicy.h"
 #include "Tools/SkinEditor/SkinEditorMappingsPanel.h"
 #include "Tools/SkinEditor/SkinEditorPalettePanel.h"
 #include "Tools/SkinEditor/SkinEditorSkinsPanel.h"
@@ -32,7 +33,8 @@ private:
     {
         kIdle,
         kHeldColour,
-        kArmedRow
+        kArmedRow,
+        kEditingColour
     };
 
     // Session (SkinEditorMainComponentSession.cpp)
@@ -86,20 +88,26 @@ private:
     // Mapping modes (SkinEditorMainComponentMapping.cpp)
     void onPastilleSelected(const juce::String& name);
     void onMappingRowActivated(TSS::SkinColourKey key);
-    /** Mapped colour cell: select the referenced pastille for COLOR / SV edit (mode -> Idle). */
+    /** Mapped colour cell: select the referenced pastille for COLOR / SV edit. */
     void onMappedColourClicked(TSS::SkinColourKey key);
     /** Pastille name a bound mapping resolves to on the visible skin; empty when unbound or missing. */
     juce::String boundPastilleNameFor(TSS::SkinColourKey key) const;
     void enterHeldColour(const juce::String& pastilleName);
     void enterArmedRow(TSS::SkinColourKey key, bool fromUnbound);
+    void enterEditingColour(const juce::String& pastilleName);
     void clearMappingModeToIdle();
     void retainMappingModeAfterWrite(TSS::SkinColourKey key, bool fromUnbound);
     void applyMapping(TSS::SkinColourKey key, const juce::String& pastilleName, bool fromUnbound);
     bool isKeyUnboundOnEditor(TSS::SkinColourKey key) const;
+    SkinEditorMappingPolicy::Mode policyModeFromMappingMode() const noexcept;
     void syncColourPickerToSelection();
     void fillHeldColourWitness();
     void fillArmedRowWitness();
-    void setWitnessTexts(const juce::String& prefix, const juce::String& nextStep);
+    void fillEditingColourWitness();
+    void fillWitnessSwatchForSelectedPastille();
+    void setWitnessTexts(const juce::String& role,
+                         const juce::String& identity,
+                         const juce::String& nextStep);
     void updateMappingWitness();
 
     // Layout / setup (SkinEditorMainComponent.cpp + Skins.cpp)
@@ -118,6 +126,7 @@ private:
     void layoutStatusBar(juce::Rectangle<int> statusBar);
     void layoutBodyPanels(juce::Rectangle<int> bounds);
     void paintChromeWells(juce::Graphics& g) const;
+    void paintMappingWitnessDecorations(juce::Graphics& g) const;
     /** Integer row top inside a bar — never half-pixel. */
     static int chromeRowY(int barY, int barH, int rowH, int opticalNudgeY) noexcept;
 
@@ -149,11 +158,13 @@ private:
     juce::Label titleLabel_;
     juce::Label operationTitleLabel_;
     juce::Label mappingPrefixLabel_;
+    juce::Label mappingNameLabel_;
     juce::Label mappingDetailLabel_;
     juce::Rectangle<int> operationWellBounds_;
     juce::Rectangle<int> operationContentBounds_;
     juce::Rectangle<int> mappingBadgeBounds_;
     juce::Rectangle<int> mappingSwatchBounds_;
+    juce::Rectangle<int> mappingArrowBounds_;
     bool mappingWitnessActive_ = false;
     bool mappingWitnessShowSwatch_ = false;
     bool mappingWitnessPending_ = false;
