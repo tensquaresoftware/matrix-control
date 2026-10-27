@@ -223,8 +223,16 @@ namespace SkinEditorChrome
 
     void drawChromeBadge(juce::Graphics& g, juce::Rectangle<int> area, const juce::String& text)
     {
+        drawChromeBadge(g, area, text, textMuted());
+    }
+
+    void drawChromeBadge(juce::Graphics& g,
+                         juce::Rectangle<int> area,
+                         const juce::String& text,
+                         juce::Colour fill)
+    {
         // Integer pixel rect — avoid 0.5 offsets that soften vertical alignment vs Labels.
-        g.setColour(textMuted());
+        g.setColour(fill);
         g.fillRoundedRectangle((float) area.getX(),
                                (float) area.getY(),
                                (float) area.getWidth(),

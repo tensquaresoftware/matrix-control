@@ -180,7 +180,7 @@ void SkinEditorMappingsPanel::paintMappingCells(juce::Graphics& g,
 
     if (item.unbound)
     {
-        g.setColour(juce::Colour(0xffe0a020));
+        g.setColour(SkinEditorChrome::attention());
         g.drawText("Unbound", x0 + cols.mappedX, contentY, cols.mappedW, contentH,
                    juce::Justification::centredLeft, false);
         return;

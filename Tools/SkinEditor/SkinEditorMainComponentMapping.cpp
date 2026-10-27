@@ -286,7 +286,8 @@ void SkinEditorMainComponent::paintMappingWitnessDecorations(juce::Graphics& g) 
     {
         if (! mappingBadgeBounds_.isEmpty())
             SkinEditorChrome::drawChromeBadge(g, mappingBadgeBounds_,
-                                              SkinEditorUi::kNoEditorSkinBadge);
+                                              SkinEditorUi::kNoEditorSkinBadge,
+                                              SkinEditorChrome::attention());
         return;
     }
 

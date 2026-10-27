@@ -89,6 +89,10 @@ namespace SkinEditorChrome
      * Do not reuse plugin FooterPanel badge APIs or count-capsule badges.
      */
     void drawChromeBadge(juce::Graphics& g, juce::Rectangle<int> area, const juce::String& text);
+    void drawChromeBadge(juce::Graphics& g,
+                         juce::Rectangle<int> area,
+                         const juce::String& text,
+                         juce::Colour fill);
 
     int chromeBadgeWidth(const juce::String& text);
 

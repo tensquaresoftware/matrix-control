@@ -33,6 +33,8 @@ namespace SkinEditorChrome
     /** Table data-row body text (darker than textPrimary). */
     inline juce::Colour textTableBody() { return juce::Colour(0xffc4c4c4); }
     inline juce::Colour accent() { return juce::Colour(0xff00ddad); }
+    /** Attention / coaching chrome (same amber as Mappings "Unbound"). */
+    inline juce::Colour attention() { return juce::Colour(0xffe0a020); }
     inline juce::Colour separatorLine() { return juce::Colour(0xff3a3a3a); }
     inline juce::Colour controlFill() { return surfacePanel(); }
     inline juce::Colour controlOutline() { return juce::Colour(0xff555555); }
