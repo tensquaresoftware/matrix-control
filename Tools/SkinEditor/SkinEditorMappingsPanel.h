@@ -38,13 +38,16 @@ private:
     {
         kGap,
         kSection,
-        kMapping
+        kMapping,
+        kEmptyHint
     };
 
     struct Row
     {
         RowKind kind = RowKind::kMapping;
         juce::String sectionTitle;
+        /** Coaching text for kEmptyHint (no editor skin). */
+        juce::String emptyHintText;
         int objectIndex = -1; // index into objects_ for section / mapping rows
         TSS::SkinColourKey key {};
         juce::String propertyLabel;

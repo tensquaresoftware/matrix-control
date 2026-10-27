@@ -1,6 +1,7 @@
 #include "Tools/SkinEditor/SkinEditorPalettePanel.h"
 
 #include "Tools/SkinEditor/SkinEditorChrome.h"
+#include "Tools/SkinEditor/SkinEditorUiHelpers.h"
 
 SkinEditorPalettePanel::SkinEditorPalettePanel()
 {
@@ -288,12 +289,17 @@ void SkinEditorPalettePanel::listBoxItemDoubleClicked(int row, const juce::Mouse
 void SkinEditorPalettePanel::rebuildRows()
 {
     rows_.clear();
-    if (layer_ == nullptr)
-        return;
-
-    const auto* skin = layer_->findSkin(skinId_);
+    const auto* skin = (layer_ != nullptr && skinId_.isNotEmpty())
+                           ? layer_->findSkin(skinId_)
+                           : nullptr;
     if (skin == nullptr)
+    {
+        Row hint;
+        hint.kind = RowKind::kEmptyHint;
+        hint.headerText = SkinEditorUi::kNoEditorSkinHint;
+        pushSplitListRow(hint);
         return;
+    }
 
     std::vector<Row> product;
     std::vector<Row> editor;

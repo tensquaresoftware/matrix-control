@@ -133,6 +133,7 @@ void SkinEditorMappingsPanel::rebuildObjectCombo(const juce::String& preferName)
         focusedObject_ = -1;
     }
 
+    objectCombo_.setEnabled(! objects_.empty());
     updatingObjectCombo_ = false;
 }
 
@@ -208,6 +209,17 @@ void SkinEditorMappingsPanel::paintRow(juce::Graphics& g, PaintRowSpec spec) con
     if (item.kind == RowKind::kSection)
     {
         SkinEditorChrome::paintTableSectionHeader(g, spec.rowArea, item.sectionTitle);
+        return;
+    }
+
+    if (item.kind == RowKind::kEmptyHint)
+    {
+        // Match Palette empty-hint tone (quieter than textMuted).
+        g.setColour(juce::Colour(0xff666666));
+        g.setFont(SkinEditorChrome::fontRegular());
+        g.drawText(item.emptyHintText,
+                   spec.rowArea.toNearestInt().reduced(6, 0),
+                   juce::Justification::centredLeft, false);
         return;
     }
 

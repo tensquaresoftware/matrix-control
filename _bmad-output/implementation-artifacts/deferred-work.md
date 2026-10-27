@@ -2839,3 +2839,12 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-edit-and-operation-copy.md`
   summary: No unit test for OPERATION witness prefixMax layout arithmetic.
   evidence: layoutOperationWitness is private on SkinEditorMainComponent; chrome layout tests do not call it.
+
+## Deferred from: review of spec-skin-editor-empty-no-editor-skin.md (2026-10-27)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-empty-no-editor-skin.md`
+  summary: Compare can stay toggleable with no editor skin while Palette/Mappings stay empty.
+  evidence: Pre-existing session Compare chrome; emptying panels without an editor skin made the dead Compare path more visible but fixing it is a separate session-control change.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-empty-no-editor-skin.md`
+  summary: No unit test that empty editorSkinId yields empty Palette/Mappings coaching rows.
+  evidence: Repo Skin Editor tests cover pure policy/chrome helpers; panel rebuildRows empty states are GUI and out of the current harness.

@@ -139,20 +139,21 @@ void SkinEditorMainComponent::refreshAll()
 
     const auto visibleId = visibleSkinId();
     const bool compareProduct = isCompareProductView();
+    const bool hasEditorSkin = sessionState_.editorSkinId.isNotEmpty();
     const bool editable = canEditEditorSkin();
+    // No editor skin: empty Palette/Mappings (do not fall back to product colours/tables).
+    const juce::String panelSkinId = hasEditorSkin ? visibleId : juce::String();
 
     syncCompareButtonChrome();
 
     skinsPanel_.setProductDuplicateEnabled(true);
-    skinsPanel_.setEditorActionsEnabled(sessionState_.editorSkinId.isNotEmpty(),
-                                        editable,
-                                        true);
+    skinsPanel_.setEditorActionsEnabled(hasEditorSkin, editable, true);
 
-    palettePanel_.setActiveSkinId(visibleId);
+    palettePanel_.setActiveSkinId(panelSkinId);
     palettePanel_.setReadOnly(! editable);
     palettePanel_.refresh();
 
-    mappingsPanel_.setActiveSkinId(visibleId);
+    mappingsPanel_.setActiveSkinId(panelSkinId);
     mappingsPanel_.setReadOnly(compareProduct || ! editable);
     mappingsPanel_.refresh();
 
@@ -162,7 +163,7 @@ void SkinEditorMainComponent::refreshAll()
     if (selectedPastille_.isNotEmpty())
     {
         bool found = false;
-        if (const auto* skin = layer_.findSkin(visibleId))
+        if (const auto* skin = layer_.findSkin(panelSkinId))
         {
             for (const auto& pastille : skin->palette)
             {
