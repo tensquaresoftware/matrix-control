@@ -82,9 +82,10 @@ private:
 
     void mappingsKeepsLegacyHalfShareWidth()
     {
-        beginTest("Mappings width equals former Unbound half-split at legacy 1210");
+        beginTest("Mappings width includes former Palette surplus for Property/State");
 
-        expectEquals(SkinEditorChrome::kMappingsPanelWidth, 385);
+        expectEquals(SkinEditorChrome::kPalettePanelWidth, 150);
+        expectEquals(SkinEditorChrome::kMappingsPanelWidth, 445);
         expect(SkinEditorChrome::kMappingsPanelWidth
                < SkinEditorChrome::kLegacyWindowMaxWidth / 2);
     }

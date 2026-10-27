@@ -407,18 +407,25 @@ void SkinEditorMappingsPanel::resized()
     stickyLegendBounds_.setWidth(tableW);
 
     // Gap after "Object:" = measureLabelWidth's +8, same as Product: / Editor: (no extra kButtonGap).
+    // Hold colour left edge aligns with the Mapped colour column (combo stops before it).
     auto actionRow = juce::Rectangle<int>(tableX, actions.getY(), tableW, actions.getHeight());
     const int labelW = SkinEditorChrome::measureLabelWidth(objectLabel_.getText(),
                                                           SkinEditorChrome::fontRegular());
     objectLabel_.setBounds(actionRow.removeFromLeft(labelW));
 
+    const auto cols = columnsForWidth(tableW);
+    const int holdLeft = tableX + cols.mappedX;
     const int holdW = SkinEditorChrome::measureTextWidth(SkinEditorChrome::fontRegular(),
                                                         holdColourToggle_.getButtonText())
                       + 16 + 6; // button-styled tick box + gap to label
-    auto holdBounds = actionRow.removeFromRight(holdW);
-    actionRow.removeFromRight(SkinEditorChrome::kButtonGap);
-    holdColourToggle_.setBounds(holdBounds);
-    objectCombo_.setBounds(actionRow);
+    holdColourToggle_.setBounds(holdLeft, actions.getY(),
+                                juce::jmin(holdW, tableX + tableW - holdLeft),
+                                actions.getHeight());
+
+    const int comboRight = holdLeft - SkinEditorChrome::kButtonGap;
+    objectCombo_.setBounds(actionRow.getX(), actions.getY(),
+                           juce::jmax(0, comboRight - actionRow.getX()),
+                           actions.getHeight());
 }
 
 int SkinEditorMappingsPanel::paintWidth() const noexcept

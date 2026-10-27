@@ -52,16 +52,14 @@ namespace SkinEditorChrome
     inline constexpr int kButtonGap = 8;
     /** Fixed body-column widths — window width fits these; Mappings does not grow. */
     inline constexpr int kColorPanelWidth = 260;
-    /** Wider than the original 150 so OPERATION Hold-colour coaching fits more often. */
-    inline constexpr int kPalettePanelWidth = 210;
+    /** Compact palette; Mapped colour column stays aligned to this width. */
+    inline constexpr int kPalettePanelWidth = 150;
     /**
-     * Former Mappings half-share when Color|Palette|Mappings|Unbound filled the
-     * legacy 1210-wide window (Unbound removed; Mappings keeps this width).
-     * Frozen at the palette=150 share so widening Palette grows the window, not
-     * shrinks Mappings.
+     * Former Mappings half-share at legacy 1210 (385) plus the width formerly given to
+     * Palette (60): extra goes to Property / State; Mapped colour stays palette-aligned.
      */
     inline constexpr int kLegacyWindowMaxWidth = 1210;
-    inline constexpr int kMappingsPanelWidth = 385;
+    inline constexpr int kMappingsPanelWidth = 445;
     /**
      * Exact body width: edge gutters + Color + Palette side gaps + fixed Mappings.
      * Live window width = max(body, measured title + SESSION) — see windowContentWidth().
