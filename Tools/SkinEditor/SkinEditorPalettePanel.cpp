@@ -225,7 +225,8 @@ void SkinEditorPalettePanel::paintListBoxItem(int row, juce::Graphics& g, int wi
 
     if (item.kind == RowKind::kEmptyHint)
     {
-        g.setColour(SkinEditorChrome::textMuted());
+        // Darker than textMuted so the empty hint stays quiet under Editor colours.
+        g.setColour(juce::Colour(0xff666666));
         g.setFont(SkinEditorChrome::fontRegular());
         g.drawText(item.headerText, 6, yOff, paintW - 12, fullH, juce::Justification::centredLeft);
         return;
