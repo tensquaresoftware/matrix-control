@@ -168,7 +168,12 @@ int SkinEditorPalettePanel::getNumRows()
 
 bool SkinEditorPalettePanel::isBlockBoundary(RowKind kind) noexcept
 {
-    return kind == RowKind::kGap || kind == RowKind::kSection;
+    return kind == RowKind::kGap || kind == RowKind::kSection || kind == RowKind::kEmptyHint;
+}
+
+bool SkinEditorPalettePanel::isContentRow(RowKind kind) noexcept
+{
+    return kind == RowKind::kColour || kind == RowKind::kEmptyHint;
 }
 
 void SkinEditorPalettePanel::roundFlagsForRow(int row, bool& roundTop, bool& roundBottom) const noexcept
@@ -185,10 +190,9 @@ void SkinEditorPalettePanel::roundFlagsForRow(int row, bool& roundTop, bool& rou
         --prev;
     const bool startsBlock = prev < 0 || isBlockBoundary(rows_[static_cast<size_t>(prev)].kind);
 
-    roundTop = item.kind == RowKind::kSection
-               || (item.kind == RowKind::kColour && startsBlock);
-    roundBottom = (item.kind == RowKind::kColour && isBlockBoundary(nextKind))
-                  || (item.kind == RowKind::kSection && nextKind != RowKind::kColour);
+    roundTop = item.kind == RowKind::kSection || (isContentRow(item.kind) && startsBlock);
+    roundBottom = (isContentRow(item.kind) && isBlockBoundary(nextKind))
+                  || (item.kind == RowKind::kSection && ! isContentRow(nextKind));
 }
 
 void SkinEditorPalettePanel::paintListBoxItem(int row, juce::Graphics& g, int width, int height, bool selected)
@@ -215,6 +219,14 @@ void SkinEditorPalettePanel::paintListBoxItem(int row, juce::Graphics& g, int wi
                                             roundTop, roundBottom });
         g.setColour(SkinEditorChrome::textTableHeader());
         g.setFont(SkinEditorChrome::fontBold());
+        g.drawText(item.headerText, 6, yOff, paintW - 12, fullH, juce::Justification::centredLeft);
+        return;
+    }
+
+    if (item.kind == RowKind::kEmptyHint)
+    {
+        g.setColour(SkinEditorChrome::textMuted());
+        g.setFont(SkinEditorChrome::fontRegular());
         g.drawText(item.headerText, 6, yOff, paintW - 12, fullH, juce::Justification::centredLeft);
         return;
     }
@@ -300,6 +312,7 @@ void SkinEditorPalettePanel::rebuildRows()
 
     if (! product.empty())
         appendPaletteGroup("Product colours", product, false);
+    // Always show Editor colours when editable (or when any editor pastille exists).
     if (! editor.empty() || ! readOnly_)
         appendPaletteGroup("Editor colours", editor, ! product.empty());
 }
@@ -322,6 +335,14 @@ void SkinEditorPalettePanel::appendPaletteGroup(const juce::String& title,
     Row gap;
     gap.kind = RowKind::kGap;
     rows_.push_back(gap);
+    if (colours.empty())
+    {
+        Row hint;
+        hint.kind = RowKind::kEmptyHint;
+        hint.headerText = "No editor colours yet.";
+        pushSplitListRow(hint);
+        return;
+    }
     for (auto& row : colours)
         pushSplitListRow(row);
 }

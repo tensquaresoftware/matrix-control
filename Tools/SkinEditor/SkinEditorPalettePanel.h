@@ -49,7 +49,8 @@ private:
     {
         kGap,
         kSection,
-        kColour
+        kColour,
+        kEmptyHint
     };
 
     struct Row
@@ -77,6 +78,7 @@ private:
     int paintWidth() const noexcept;
     void roundFlagsForRow(int row, bool& roundTop, bool& roundBottom) const noexcept;
     static bool isBlockBoundary(RowKind kind) noexcept;
+    static bool isContentRow(RowKind kind) noexcept;
     void appendPaletteGroup(const juce::String& title, std::vector<Row>& colours, bool leadGap);
 
     TSS::DevSkin::Layer* layer_ = nullptr;
