@@ -117,6 +117,10 @@ void SkinEditorMainComponent::setupBodyPanels()
     {
         onMappingRowActivated(key);
     };
+    mappingsPanel_.onMappedColourClicked = [this](TSS::SkinColourKey key)
+    {
+        onMappedColourClicked(key);
+    };
     mappingsPanel_.onEscapeRequested = escapeMapping;
     addAndMakeVisible(mappingsPanel_);
 }
@@ -228,7 +232,10 @@ void SkinEditorMainComponent::layoutOperationWitness(juce::Rectangle<int> conten
     x += badgeW + gap;
 
     const int swatchReserve = mappingWitnessShowSwatch_ ? (sw + gap) : 0;
-    const int prefixMax = juce::jmax(0, content.getRight() - x - gap - swatchReserve);
+    // Keep the next-step text readable: the prefix yields space first (never below half).
+    const int available = juce::jmax(0, content.getRight() - x - gap - swatchReserve);
+    const int nextStepNeed = SkinEditorChrome::measureTextWidth(bodyFont, detailFull) + 4 + pad + gap;
+    const int prefixMax = juce::jmax(available / 2, available - nextStepNeed);
     const auto prefixShown = SkinEditorChrome::elideToWidth(bodyFont, prefixFull, prefixMax);
     const int prefixW = juce::jmin(prefixMax,
                                    SkinEditorChrome::measureTextWidth(bodyFont, prefixShown) + 2);

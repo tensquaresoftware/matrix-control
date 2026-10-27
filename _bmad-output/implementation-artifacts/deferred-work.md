@@ -2830,3 +2830,12 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-palette-add-pending.md`
   summary: Colour collision still leaves the colour picker on the rejected colour; rename discoverability has no tooltip/hint.
   evidence: Pre-existing picker UX shape and polish; out of this chantier's frozen chrome boundaries.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-edit-and-operation-copy.md`
+  summary: No panel-level test that Mapped-column mouseUp routes to edit and Property/State to bind.
+  evidence: Repo Skin Editor tests cover pure policy helpers only; Content::mouseUp is not in the test target.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-edit-and-operation-copy.md`
+  summary: No component test that onMappedColourClicked clears mapping mode and syncs Palette/COLOR/SV.
+  evidence: Main component mapping path is outside unit-test harness; policy enum coverage only.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-edit-and-operation-copy.md`
+  summary: No unit test for OPERATION witness prefixMax layout arithmetic.
+  evidence: layoutOperationWitness is private on SkinEditorMainComponent; chrome layout tests do not call it.

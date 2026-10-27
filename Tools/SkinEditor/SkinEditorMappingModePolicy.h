@@ -1,6 +1,8 @@
 #pragma once
 
-/** Pure Hold-mapping mode decisions for Skin Editor (no JUCE Component deps). */
+#include <juce_core/juce_core.h>
+
+/** Pure Hold-mapping mode decisions for Skin Editor (juce_core only, no Component deps). */
 namespace SkinEditorMappingPolicy
 {
     enum class Mode
@@ -56,5 +58,40 @@ namespace SkinEditorMappingPolicy
     inline bool mappingWitnessVisible(Mode mode) noexcept
     {
         return mode != Mode::kIdle;
+    }
+
+    /** Mapped colour column vs Property/State (x in content coords; mappedColumnX from layout). */
+    inline bool isMappedColourColumn(int x, int mappedColumnX) noexcept
+    {
+        return x >= mappedColumnX;
+    }
+
+    enum class MappedColourIntent
+    {
+        kNoOp,          // Unbound cell or unresolved pastille name
+        kSelectForEdit  // Clear mapping mode to Idle; select pastille for COLOR / SV
+    };
+
+    inline MappedColourIntent mappedColourClick(bool cellUnbound, bool pastilleResolved) noexcept
+    {
+        if (cellUnbound || ! pastilleResolved)
+            return MappedColourIntent::kNoOp;
+        return MappedColourIntent::kSelectForEdit;
+    }
+
+    /** OPERATION next-step copy (ASCII). Prefix includes the active item identity. */
+    inline constexpr const char* kHeldColourNextStep = "Click a Property or State cell to map";
+    inline constexpr const char* kArmedRowNextStep = "Click a palette colour to map";
+
+    inline juce::String heldColourWitnessPrefix(const juce::String& pastilleName)
+    {
+        return "Hold: " + pastilleName;
+    }
+
+    inline juce::String armedRowWitnessPrefix(const juce::String& object,
+                                              const juce::String& property,
+                                              const juce::String& state)
+    {
+        return "Target: " + object + " > " + property + " > " + state;
     }
 }

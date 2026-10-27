@@ -1,6 +1,7 @@
 #include "Tools/SkinEditor/SkinEditorMappingsPanel.h"
 
 #include "Tools/SkinEditor/SkinEditorChrome.h"
+#include "Tools/SkinEditor/SkinEditorMappingModePolicy.h"
 
 namespace
 {
@@ -288,6 +289,20 @@ void SkinEditorMappingsPanel::tryBindRow(int row)
     onRowActivated(rows_[static_cast<size_t>(row)].key);
 }
 
+void SkinEditorMappingsPanel::tryEditMappedColour(int row)
+{
+    if (onMappedColourClicked == nullptr)
+        return;
+    if (row < 0 || row >= static_cast<int>(rows_.size()))
+        return;
+
+    const auto& item = rows_[static_cast<size_t>(row)];
+    if (item.kind != RowKind::kMapping || item.unbound)
+        return;
+
+    onMappedColourClicked(item.key);
+}
+
 void SkinEditorMappingsPanel::setFocusedObject(int objectIndex, bool scrollIntoPlace)
 {
     if (objectIndex < 0 || objectIndex >= static_cast<int>(objects_.size()))
@@ -336,7 +351,17 @@ void SkinEditorMappingsPanel::Content::mouseUp(const juce::MouseEvent& e)
     owner_.selectedRow_ = row;
     grabKeyboardFocus();
     repaint();
-    owner_.tryBindRow(row);
+
+    const int mappedX = columnsForWidth(owner_.paintWidth()).mappedX;
+    const bool releaseInMapped = SkinEditorMappingPolicy::isMappedColourColumn(e.x, mappedX);
+    const bool pressInMapped = SkinEditorMappingPolicy::isMappedColourColumn(e.getMouseDownX(), mappedX);
+    if (releaseInMapped != pressInMapped)
+        return; // press and release in different columns: highlight/focus only
+
+    if (releaseInMapped)
+        owner_.tryEditMappedColour(row);
+    else
+        owner_.tryBindRow(row);
 }
 
 bool SkinEditorMappingsPanel::Content::keyPressed(const juce::KeyPress& key)

@@ -86,6 +86,10 @@ private:
     // Mapping modes (SkinEditorMainComponentMapping.cpp)
     void onPastilleSelected(const juce::String& name);
     void onMappingRowActivated(TSS::SkinColourKey key);
+    /** Mapped colour cell: select the referenced pastille for COLOR / SV edit (mode -> Idle). */
+    void onMappedColourClicked(TSS::SkinColourKey key);
+    /** Pastille name a bound mapping resolves to on the visible skin; empty when unbound or missing. */
+    juce::String boundPastilleNameFor(TSS::SkinColourKey key) const;
     void enterHeldColour(const juce::String& pastilleName);
     void enterArmedRow(TSS::SkinColourKey key, bool fromUnbound);
     void clearMappingModeToIdle();
@@ -95,6 +99,7 @@ private:
     void syncColourPickerToSelection();
     void fillHeldColourWitness();
     void fillArmedRowWitness();
+    void setWitnessTexts(const juce::String& prefix, const juce::String& nextStep);
     void updateMappingWitness();
 
     // Layout / setup (SkinEditorMainComponent.cpp + Skins.cpp)

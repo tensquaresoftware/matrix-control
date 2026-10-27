@@ -20,8 +20,10 @@ public:
     /** When true, batch maps stay in the current gesture direction after a successful write. */
     bool isHoldColour() const noexcept { return holdColourToggle_.getToggleState(); }
 
-    /** Row click - main owns Idle / HeldColour / ArmedRow (bind vs re-arm). */
+    /** Property / State cell click - main owns Idle / HeldColour / ArmedRow (bind vs re-arm). */
     std::function<void(TSS::SkinColourKey key)> onRowActivated;
+    /** Mapped colour cell click on a bound row - main selects that pastille for COLOR / SV edit. */
+    std::function<void(TSS::SkinColourKey key)> onMappedColourClicked;
     /** Escape while the table content has focus - clear mapping mode in main. */
     std::function<bool()> onEscapeRequested;
 
@@ -109,6 +111,8 @@ private:
 
     // Bind / focus
     void tryBindRow(int row);
+    /** Bound rows only; Unbound cells are a no-op. */
+    void tryEditMappedColour(int row);
     void setFocusedObject(int objectIndex, bool scrollIntoPlace);
     void scrollFocusedObjectIntoPlace();
 

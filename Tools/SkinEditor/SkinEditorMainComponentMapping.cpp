@@ -68,6 +68,36 @@ void SkinEditorMainComponent::onMappingRowActivated(TSS::SkinColourKey key)
     }
 }
 
+juce::String SkinEditorMainComponent::boundPastilleNameFor(TSS::SkinColourKey key) const
+{
+    const auto* skin = layer_.findSkin(visibleSkinId());
+    if (skin == nullptr)
+        return {};
+
+    const auto mapped = skin->mappings.find(key);
+    if (mapped == skin->mappings.end())
+        return {};
+
+    for (const auto& pastille : skin->palette)
+        if (pastille.name == mapped->second)
+            return pastille.name;
+    return {};
+}
+
+void SkinEditorMainComponent::onMappedColourClicked(TSS::SkinColourKey key)
+{
+    // Edit only: never enters HeldColour and never writes a mapping.
+    const auto name = boundPastilleNameFor(key);
+    if (SkinEditorMappingPolicy::mappedColourClick(false, name.isNotEmpty())
+        != SkinEditorMappingPolicy::MappedColourIntent::kSelectForEdit)
+        return;
+
+    clearMappingModeToIdle();
+    selectedPastille_ = name;
+    palettePanel_.selectPastille(name);
+    syncColourPickerToSelection();
+}
+
 void SkinEditorMainComponent::enterHeldColour(const juce::String& pastilleName)
 {
     mappingMode_ = MappingMode::kHeldColour;
@@ -157,13 +187,8 @@ void SkinEditorMainComponent::applyMapping(TSS::SkinColourKey key,
 
 void SkinEditorMainComponent::fillHeldColourWitness()
 {
-    const bool productColour = layer_.isProductPastilleName(selectedPastille_);
-    // No trailing space — layoutOperationWell inserts kChromeBadgeGap before the swatch.
-    const auto prefix = productColour ? "Palette > Product colour:" : "Editor colour:";
-    mappingPrefixLabel_.setTooltip(prefix);
-    mappingPrefixLabel_.setText(prefix, juce::dontSendNotification);
-    mappingDetailLabel_.setTooltip(selectedPastille_);
-    mappingDetailLabel_.setText(selectedPastille_, juce::dontSendNotification);
+    setWitnessTexts(SkinEditorMappingPolicy::heldColourWitnessPrefix(selectedPastille_),
+                    SkinEditorMappingPolicy::kHeldColourNextStep);
     if (const auto* skin = layer_.findSkin(visibleSkinId()))
     {
         for (const auto& pastille : skin->palette)
@@ -181,13 +206,20 @@ void SkinEditorMainComponent::fillHeldColourWitness()
 
 void SkinEditorMainComponent::fillArmedRowWitness()
 {
-    mappingPrefixLabel_.setTooltip("Target:");
-    mappingPrefixLabel_.setText("Target:", juce::dontSendNotification);
-    const auto detail = TSS::DevSkin::toString(armedKey_.object) + " > "
-                        + TSS::DevSkin::toString(armedKey_.property) + " > "
-                        + TSS::DevSkin::toString(armedKey_.state);
-    mappingDetailLabel_.setTooltip(detail);
-    mappingDetailLabel_.setText(detail, juce::dontSendNotification);
+    setWitnessTexts(SkinEditorMappingPolicy::armedRowWitnessPrefix(
+                        TSS::DevSkin::toString(armedKey_.object),
+                        TSS::DevSkin::toString(armedKey_.property),
+                        TSS::DevSkin::toString(armedKey_.state)),
+                    SkinEditorMappingPolicy::kArmedRowNextStep);
+}
+
+void SkinEditorMainComponent::setWitnessTexts(const juce::String& prefix, const juce::String& nextStep)
+{
+    // Tooltips keep the full text; layoutOperationWitness may elide the visible label.
+    mappingPrefixLabel_.setTooltip(prefix);
+    mappingPrefixLabel_.setText(prefix, juce::dontSendNotification);
+    mappingDetailLabel_.setTooltip(nextStep);
+    mappingDetailLabel_.setText(nextStep, juce::dontSendNotification);
 }
 
 void SkinEditorMainComponent::updateMappingWitness()

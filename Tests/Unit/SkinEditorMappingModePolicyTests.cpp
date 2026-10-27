@@ -20,6 +20,11 @@ public:
         escapeClearsToIdle();
         idleWitnessHidden();
         readOnlyPastilleDoesNotArm();
+        mappedColourColumnHitTest();
+        mappedColourEditSelectsBoundOnly();
+        mappedColourUnboundIsNoOp();
+        propertyStateStillArmsOrBinds();
+        heldAndArmedWitnessCopy();
     }
 
 private:
@@ -101,6 +106,61 @@ private:
         expect(pastilleClick(Mode::kIdle, false, false) == PastilleIntent::kSelectReadOnly);
         expect(rowClick(Mode::kIdle, false) == RowIntent::kIgnore);
         expect(pastilleClick(Mode::kIdle, true, true) == PastilleIntent::kIgnoreEmpty);
+    }
+
+    void mappedColourColumnHitTest()
+    {
+        beginTest("Mapped colour column - x at/after mappedX is edit hit");
+
+        using namespace SkinEditorMappingPolicy;
+        constexpr int mappedX = 200;
+        expect(isMappedColourColumn(mappedX, mappedX));
+        expect(isMappedColourColumn(mappedX + 10, mappedX));
+        expect(! isMappedColourColumn(mappedX - 1, mappedX));
+    }
+
+    void mappedColourEditSelectsBoundOnly()
+    {
+        beginTest("Mapped colour - bound resolved pastille selects for edit; unresolved is no-op");
+
+        using namespace SkinEditorMappingPolicy;
+        expect(mappedColourClick(false, true) == MappedColourIntent::kSelectForEdit);
+        expect(mappedColourClick(false, false) == MappedColourIntent::kNoOp);
+    }
+
+    void mappedColourUnboundIsNoOp()
+    {
+        beginTest("Mapped colour - Unbound cell is no-op");
+
+        using namespace SkinEditorMappingPolicy;
+        expect(mappedColourClick(true, true) == MappedColourIntent::kNoOp);
+        expect(mappedColourClick(true, false) == MappedColourIntent::kNoOp);
+    }
+
+    void propertyStateStillArmsOrBinds()
+    {
+        beginTest("Property/State - Idle arms; HeldColour binds (unchanged policy)");
+
+        using namespace SkinEditorMappingPolicy;
+        expect(rowClick(Mode::kIdle, true) == RowIntent::kEnterOrChangeArmedRow);
+        expect(rowClick(Mode::kHeldColour, true) == RowIntent::kBindHeldColour);
+        expect(rowClick(Mode::kArmedRow, true) == RowIntent::kEnterOrChangeArmedRow);
+    }
+
+    void heldAndArmedWitnessCopy()
+    {
+        beginTest("OPERATION witness - locked Hold/Target prefixes and next-step copy");
+
+        using namespace SkinEditorMappingPolicy;
+        expectEquals(heldColourWitnessPrefix("Accent"), juce::String("Hold: Accent"));
+        expectEquals(juce::String(kHeldColourNextStep),
+                     juce::String("Click a Property or State cell to map"));
+        expectEquals(armedRowWitnessPrefix("Knob", "fill", "normal"),
+                     juce::String("Target: Knob > fill > normal"));
+        expectEquals(juce::String(kArmedRowNextStep),
+                     juce::String("Click a palette colour to map"));
+        expect(mappingWitnessVisible(Mode::kHeldColour));
+        expect(mappingWitnessVisible(Mode::kArmedRow));
     }
 };
 
