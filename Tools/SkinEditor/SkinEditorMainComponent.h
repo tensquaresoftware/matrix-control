@@ -92,6 +92,8 @@ private:
     void onMappedColourClicked(TSS::SkinColourKey key);
     /** Pastille name a bound mapping resolves to on the visible skin; empty when unbound or missing. */
     juce::String boundPastilleNameFor(TSS::SkinColourKey key) const;
+    /** True when the named pastille exists on the editor skin and is still pending. */
+    bool isPastillePending(const juce::String& pastilleName) const;
     void enterHeldColour(const juce::String& pastilleName);
     void enterArmedRow(TSS::SkinColourKey key, bool fromUnbound);
     void enterEditingColour(const juce::String& pastilleName);

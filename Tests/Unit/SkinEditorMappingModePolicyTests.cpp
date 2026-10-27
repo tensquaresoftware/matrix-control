@@ -173,6 +173,18 @@ private:
         expect(rowClick(Mode::kEditingColour, true) == RowIntent::kEnterOrChangeArmedRow);
         expect(pastilleClick(Mode::kEditingColour, true, false)
                == PastilleIntent::kEnterOrChangeHeldColour);
+        expect(canBindPastille(false));
+        expect(! canBindPastille(true));
+        expect(pastilleClick(Mode::kArmedRow, true, false, true)
+               == PastilleIntent::kEnterOrChangeHeldColour);
+        expect(pastilleClick(Mode::kArmedRow, true, false, false)
+               == PastilleIntent::kBindArmedRow);
+        expect(rowClick(Mode::kHeldColour, true, true) == RowIntent::kIgnore);
+        expect(rowClick(Mode::kHeldColour, true, false) == RowIntent::kBindHeldColour);
+        expectEquals(juce::String(kCalibrateBeforeMappingMessage),
+                     juce::String("Calibrate this colour in COLOR before mapping."));
+        expectEquals(juce::String(kHeldPendingNextStep),
+                     juce::String("Next: adjust in COLOR before mapping."));
     }
 };
 

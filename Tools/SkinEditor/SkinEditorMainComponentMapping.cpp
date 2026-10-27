@@ -21,7 +21,8 @@ void SkinEditorMainComponent::onPastilleSelected(const juce::String& name)
 
     const auto intent = SkinEditorMappingPolicy::pastilleClick(policyModeFromMappingMode(),
                                                               canEditEditorSkin(),
-                                                              name.isEmpty());
+                                                              name.isEmpty(),
+                                                              isPastillePending(name));
     switch (intent)
     {
         case Intent::kIgnoreEmpty:
@@ -55,10 +56,14 @@ void SkinEditorMainComponent::onMappingRowActivated(TSS::SkinColourKey key)
 
     const bool fromUnbound = isKeyUnboundOnEditor(key);
     const auto intent = SkinEditorMappingPolicy::rowClick(policyModeFromMappingMode(),
-                                                         canEditEditorSkin());
+                                                         canEditEditorSkin(),
+                                                         isPastillePending(selectedPastille_));
     switch (intent)
     {
         case Intent::kIgnore:
+            if (mappingMode_ == MappingMode::kHeldColour
+                && isPastillePending(selectedPastille_))
+                setStatusMessage(SkinEditorMappingPolicy::kCalibrateBeforeMappingMessage);
             return;
         case Intent::kBindHeldColour:
             applyMapping(key, selectedPastille_, fromUnbound);
@@ -83,6 +88,19 @@ juce::String SkinEditorMainComponent::boundPastilleNameFor(TSS::SkinColourKey ke
         if (pastille.name == mapped->second)
             return pastille.name;
     return {};
+}
+
+bool SkinEditorMainComponent::isPastillePending(const juce::String& pastilleName) const
+{
+    if (pastilleName.isEmpty())
+        return false;
+    const auto* skin = layer_.findSkin(sessionState_.editorSkinId);
+    if (skin == nullptr)
+        return false;
+    for (const auto& pastille : skin->palette)
+        if (pastille.name == pastilleName)
+            return pastille.pending;
+    return false;
 }
 
 void SkinEditorMainComponent::onMappedColourClicked(TSS::SkinColourKey key)
@@ -166,6 +184,12 @@ void SkinEditorMainComponent::applyMapping(TSS::SkinColourKey key,
     if (! canEditEditorSkin() || pastilleName.isEmpty())
         return;
 
+    if (! SkinEditorMappingPolicy::canBindPastille(isPastillePending(pastilleName)))
+    {
+        setStatusMessage(SkinEditorMappingPolicy::kCalibrateBeforeMappingMessage);
+        return;
+    }
+
     if (const auto* skin = layer_.findSkin(sessionState_.editorSkinId))
     {
         const auto it = skin->mappings.find(key);
@@ -209,12 +233,13 @@ void SkinEditorMainComponent::fillWitnessSwatchForSelectedPastille()
 
 void SkinEditorMainComponent::fillHeldColourWitness()
 {
-    setWitnessTexts(SkinEditorMappingPolicy::kSelectedColourRole,
-                    selectedPastille_,
-                    SkinEditorMappingPolicy::withHoldColourSuffix(
-                        SkinEditorMappingPolicy::kHeldColourNextStep,
-                        mappingsPanel_.isHoldColour(),
-                        true));
+    const auto next = isPastillePending(selectedPastille_)
+                          ? juce::String(SkinEditorMappingPolicy::kHeldPendingNextStep)
+                          : SkinEditorMappingPolicy::withHoldColourSuffix(
+                                SkinEditorMappingPolicy::kHeldColourNextStep,
+                                mappingsPanel_.isHoldColour(),
+                                true);
+    setWitnessTexts(SkinEditorMappingPolicy::kSelectedColourRole, selectedPastille_, next);
     fillWitnessSwatchForSelectedPastille();
 }
 

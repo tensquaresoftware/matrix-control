@@ -28,24 +28,39 @@ namespace SkinEditorMappingPolicy
         kEnterOrChangeArmedRow
     };
 
-    inline PastilleIntent pastilleClick(Mode mode, bool canEdit, bool nameEmpty) noexcept
+    /** Pending (uncalibrated) pastilles may be selected / edited, but not mapped. */
+    inline bool canBindPastille(bool pending) noexcept { return ! pending; }
+
+    inline PastilleIntent pastilleClick(Mode mode,
+                                        bool canEdit,
+                                        bool nameEmpty,
+                                        bool pending = false) noexcept
     {
         if (nameEmpty)
             return PastilleIntent::kIgnoreEmpty;
         if (! canEdit)
             return PastilleIntent::kSelectReadOnly;
         if (mode == Mode::kArmedRow)
+        {
+            // Pending: switch to held/edit instead of binding an empty circle.
+            if (! canBindPastille(pending))
+                return PastilleIntent::kEnterOrChangeHeldColour;
             return PastilleIntent::kBindArmedRow;
+        }
         // Idle, HeldColour, EditingColour: take / retarget the held colour.
         return PastilleIntent::kEnterOrChangeHeldColour;
     }
 
-    inline RowIntent rowClick(Mode mode, bool canEdit) noexcept
+    inline RowIntent rowClick(Mode mode, bool canEdit, bool heldPastillePending = false) noexcept
     {
         if (! canEdit)
             return RowIntent::kIgnore;
         if (mode == Mode::kHeldColour)
+        {
+            if (! canBindPastille(heldPastillePending))
+                return RowIntent::kIgnore;
             return RowIntent::kBindHeldColour;
+        }
         // Idle, ArmedRow, EditingColour: arm / re-arm the row.
         return RowIntent::kEnterOrChangeArmedRow;
     }
@@ -99,6 +114,10 @@ namespace SkinEditorMappingPolicy
         " [Hold colour] is active: keep clicking rows.";
     inline constexpr const char* kHoldColourOnColoursSuffix =
         " [Hold colour] is active: keep clicking colours.";
+    inline constexpr const char* kCalibrateBeforeMappingMessage =
+        "Calibrate this colour in COLOR before mapping.";
+    inline constexpr const char* kHeldPendingNextStep =
+        "Next: adjust in COLOR before mapping.";
 
     /** Append Hold colour coaching when the Hold colour toggle is on (bind gestures only). */
     inline juce::String withHoldColourSuffix(const juce::String& nextStep,
