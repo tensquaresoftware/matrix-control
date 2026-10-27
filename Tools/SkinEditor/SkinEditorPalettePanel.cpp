@@ -1,7 +1,6 @@
 #include "Tools/SkinEditor/SkinEditorPalettePanel.h"
 
 #include "Tools/SkinEditor/SkinEditorChrome.h"
-#include "Tools/SkinEditor/SkinEditorUiHelpers.h"
 
 SkinEditorPalettePanel::SkinEditorPalettePanel()
 {
@@ -56,6 +55,7 @@ void SkinEditorPalettePanel::refresh()
     rebuildRows();
     list_.updateContent();
     list_.repaint();
+    resized();
 
     const auto selected = getSelectedPastilleName();
     deleteButton_.setEnabled(! readOnly_ && selected.isNotEmpty()
@@ -106,6 +106,23 @@ void SkinEditorPalettePanel::resized()
     titleTabBounds_ = chrome.tab;
     titleLabel_.setBounds(chrome.tab);
     auto bounds = chrome.content;
+
+    if (isShellEmpty())
+    {
+        addButton_.setVisible(false);
+        deleteButton_.setVisible(false);
+        addButton_.setBounds({});
+        deleteButton_.setBounds({});
+        auto listBounds = bounds;
+        listBounds.setRight(listBounds.getRight() + SkinEditorChrome::kPanelContentPad);
+        list_.setBounds(listBounds);
+        if (auto* vp = list_.getViewport())
+            vp->setScrollBarThickness(SkinEditorChrome::kScrollTrackWidth);
+        return;
+    }
+
+    addButton_.setVisible(true);
+    deleteButton_.setVisible(true);
 
     // Top: buttons, then content pad.
     auto actions = bounds.removeFromTop(SkinEditorChrome::kButtonHeight);
@@ -293,13 +310,7 @@ void SkinEditorPalettePanel::rebuildRows()
                            ? layer_->findSkin(skinId_)
                            : nullptr;
     if (skin == nullptr)
-    {
-        Row hint;
-        hint.kind = RowKind::kEmptyHint;
-        hint.headerText = SkinEditorUi::kNoEditorSkinHint;
-        pushSplitListRow(hint);
         return;
-    }
 
     std::vector<Row> product;
     std::vector<Row> editor;

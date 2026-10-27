@@ -38,16 +38,13 @@ private:
     {
         kGap,
         kSection,
-        kMapping,
-        kEmptyHint
+        kMapping
     };
 
     struct Row
     {
         RowKind kind = RowKind::kMapping;
         juce::String sectionTitle;
-        /** Coaching text for kEmptyHint (no editor skin). */
-        juce::String emptyHintText;
         int objectIndex = -1; // index into objects_ for section / mapping rows
         TSS::SkinColourKey key {};
         juce::String propertyLabel;
@@ -97,6 +94,8 @@ private:
 
     // Rebuild
     void rebuildRows();
+    /** True when no editor skin is loaded (empty shell: no Object/Hold/legend). */
+    bool isShellEmpty() const noexcept { return skinId_.isEmpty(); }
     /** Appends one object section + mapping rows; returns content Y after the table. */
     int appendObjectTable(const TSS::DevSkin::NamedSkin& skin,
                           TSS::SkinObjectType object,
@@ -123,6 +122,8 @@ private:
     void scrollFocusedObjectIntoPlace();
 
     // Layout
+    void layoutShellEmpty(juce::Rectangle<int> content);
+    void layoutShellFilled(juce::Rectangle<int> content);
     void layoutContent();
     int rowIndexAtY(int y) const noexcept;
     int paintWidth() const noexcept;

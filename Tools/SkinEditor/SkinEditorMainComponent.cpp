@@ -3,6 +3,7 @@
 #include "Tools/SkinEditor/SkinEditorChromeFonts.h"
 #include "Tools/SkinEditor/SkinEditorChromePanel.h"
 #include "Tools/SkinEditor/SkinEditorChromeTable.h"
+#include "Tools/SkinEditor/SkinEditorUiHelpers.h"
 
 SkinEditorMainComponent::SkinEditorMainComponent()
 {
@@ -159,24 +160,6 @@ void SkinEditorMainComponent::setupLayerAndBridgeCallbacks()
     };
 }
 
-void SkinEditorMainComponent::paintMappingWitnessDecorations(juce::Graphics& g) const
-{
-    if (! mappingWitnessActive_)
-        return;
-    if (! mappingBadgeBounds_.isEmpty())
-        SkinEditorChrome::drawMappingModeBadge(g, mappingBadgeBounds_);
-    if (mappingWitnessShowSwatch_ && ! mappingSwatchBounds_.isEmpty())
-    {
-        if (mappingWitnessPending_)
-            SkinEditorChrome::paintPendingColourSwatch(g, mappingSwatchBounds_);
-        else
-            SkinEditorChrome::paintColourSwatch(g, mappingSwatchBounds_, mappingWitnessColour_);
-    }
-    if (! mappingArrowBounds_.isEmpty())
-        SkinEditorChrome::drawOperationNextArrow(g, mappingArrowBounds_,
-                                                 SkinEditorChrome::textMuted());
-}
-
 void SkinEditorMainComponent::paintChromeWells(juce::Graphics& g) const
 {
     if (! sessionWellBounds_.isEmpty())
@@ -305,6 +288,26 @@ void SkinEditorMainComponent::layoutOperationWitness(juce::Rectangle<int> conten
                             bodyFont);
 }
 
+void SkinEditorMainComponent::layoutOperationStartHint(juce::Rectangle<int> content)
+{
+    const int rowH = SkinEditorChrome::kMappingBadgeHeight;
+    const int rowY = chromeRowY(content.getY(), content.getHeight(), rowH, 0);
+    const int pad = SkinEditorChrome::kOperationWitnessPad;
+    const int badgeGap = SkinEditorChrome::kChromeBadgeGap;
+    const int badgeW = SkinEditorChrome::chromeBadgeWidth(SkinEditorUi::kNoEditorSkinBadge);
+
+    int x = content.getX() + pad;
+    if (x + badgeW > content.getRight())
+        return;
+
+    mappingBadgeBounds_ = { x, rowY, badgeW, rowH };
+    x += badgeW + badgeGap;
+
+    placeElidedWitnessLabel({ &mappingDetailLabel_, x,
+                              juce::jmax(0, content.getRight() - x - pad), rowY, rowH },
+                            SkinEditorChrome::fontRegular());
+}
+
 void SkinEditorMainComponent::layoutOperationWell(juce::Rectangle<int> band)
 {
     operationWellBounds_ = {};
@@ -338,6 +341,8 @@ void SkinEditorMainComponent::layoutOperationWell(juce::Rectangle<int> band)
     operationContentBounds_ = content;
     if (mappingWitnessActive_)
         layoutOperationWitness(content);
+    else if (operationStartHintActive_)
+        layoutOperationStartHint(content);
 }
 
 void SkinEditorMainComponent::layoutStatusBar(juce::Rectangle<int> statusBar)

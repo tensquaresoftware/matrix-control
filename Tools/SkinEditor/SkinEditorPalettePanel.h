@@ -71,6 +71,8 @@ private:
     void listBoxItemDoubleClicked(int row, const juce::MouseEvent& e) override;
 
     void rebuildRows();
+    /** True when no editor skin is loaded (empty shell: no Add/Delete). */
+    bool isShellEmpty() const noexcept { return skinId_.isEmpty(); }
     /** Push upper + lower half-height ListBox rows for one visual content row. */
     void pushSplitListRow(Row row);
     int nextUpperListRow(int row) const noexcept;

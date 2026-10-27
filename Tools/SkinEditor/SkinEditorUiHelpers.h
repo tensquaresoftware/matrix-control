@@ -6,9 +6,10 @@
 
 namespace SkinEditorUi
 {
-    /** Palette / Mappings coaching when no editor skin is selected. */
+    /** OPERATION badge + coaching when no editor skin is selected. */
+    inline constexpr const char* kNoEditorSkinBadge = "START";
     inline constexpr const char* kNoEditorSkinHint =
-        "Create a skin or duplicate the product skin to start.";
+        "Duplicate a product skin or create a new skin to start.";
 
     inline juce::String askText(const juce::String& title,
                                 const juce::String& message,

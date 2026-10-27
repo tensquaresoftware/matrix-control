@@ -1,7 +1,9 @@
 #include "Tools/SkinEditor/SkinEditorMainComponent.h"
 
 #include "GUI/Skins/Dev/DevSkinKeyNames.h"
+#include "Tools/SkinEditor/SkinEditorChromeTable.h"
 #include "Tools/SkinEditor/SkinEditorMappingModePolicy.h"
+#include "Tools/SkinEditor/SkinEditorUiHelpers.h"
 
 SkinEditorMappingPolicy::Mode SkinEditorMainComponent::policyModeFromMappingMode() const noexcept
 {
@@ -278,15 +280,53 @@ void SkinEditorMainComponent::setWitnessTexts(const juce::String& role,
     mappingDetailLabel_.setText(nextStep, juce::dontSendNotification);
 }
 
+void SkinEditorMainComponent::paintMappingWitnessDecorations(juce::Graphics& g) const
+{
+    if (operationStartHintActive_)
+    {
+        if (! mappingBadgeBounds_.isEmpty())
+            SkinEditorChrome::drawChromeBadge(g, mappingBadgeBounds_,
+                                              SkinEditorUi::kNoEditorSkinBadge);
+        return;
+    }
+
+    if (! mappingWitnessActive_)
+        return;
+    if (! mappingBadgeBounds_.isEmpty())
+        SkinEditorChrome::drawMappingModeBadge(g, mappingBadgeBounds_);
+    if (mappingWitnessShowSwatch_ && ! mappingSwatchBounds_.isEmpty())
+    {
+        if (mappingWitnessPending_)
+            SkinEditorChrome::paintPendingColourSwatch(g, mappingSwatchBounds_);
+        else
+            SkinEditorChrome::paintColourSwatch(g, mappingSwatchBounds_, mappingWitnessColour_);
+    }
+    if (! mappingArrowBounds_.isEmpty())
+        SkinEditorChrome::drawOperationNextArrow(g, mappingArrowBounds_,
+                                                 SkinEditorChrome::textMuted());
+}
+
 void SkinEditorMainComponent::updateMappingWitness()
 {
     const auto policyMode = policyModeFromMappingMode();
-    mappingWitnessActive_ = SkinEditorMappingPolicy::mappingWitnessVisible(policyMode);
+    operationStartHintActive_ = sessionState_.editorSkinId.isEmpty()
+                                && mappingMode_ == MappingMode::kIdle;
+    mappingWitnessActive_ = ! operationStartHintActive_
+                            && SkinEditorMappingPolicy::mappingWitnessVisible(policyMode);
     mappingWitnessShowSwatch_ = false;
     mappingWitnessPending_ = false;
     mappingWitnessColour_ = juce::Colours::transparentBlack;
 
-    if (mappingMode_ == MappingMode::kHeldColour)
+    if (operationStartHintActive_)
+    {
+        mappingPrefixLabel_.setTooltip({});
+        mappingPrefixLabel_.setText({}, juce::dontSendNotification);
+        mappingNameLabel_.setTooltip({});
+        mappingNameLabel_.setText({}, juce::dontSendNotification);
+        mappingDetailLabel_.setTooltip(SkinEditorUi::kNoEditorSkinHint);
+        mappingDetailLabel_.setText(SkinEditorUi::kNoEditorSkinHint, juce::dontSendNotification);
+    }
+    else if (mappingMode_ == MappingMode::kHeldColour)
         fillHeldColourWitness();
     else if (mappingMode_ == MappingMode::kArmedRow)
         fillArmedRowWitness();
@@ -304,7 +344,7 @@ void SkinEditorMainComponent::updateMappingWitness()
 
     mappingPrefixLabel_.setVisible(mappingWitnessActive_);
     mappingNameLabel_.setVisible(mappingWitnessActive_);
-    mappingDetailLabel_.setVisible(mappingWitnessActive_);
+    mappingDetailLabel_.setVisible(mappingWitnessActive_ || operationStartHintActive_);
     resized();
     repaint();
 }

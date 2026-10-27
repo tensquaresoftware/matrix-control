@@ -104,6 +104,7 @@ void SkinEditorMappingsPanel::refresh()
                                   : juce::String();
     rebuildRows();
     rebuildObjectCombo(keep);
+    resized();
     layoutContent();
     content_.repaint();
 }
@@ -123,16 +124,12 @@ void SkinEditorMappingsPanel::rebuildObjectCombo(const juce::String& preferName)
             select = i;
     }
 
+    focusedObject_ = -1;
     if (! objects_.empty())
     {
         objectCombo_.setSelectedItemIndex(select, juce::dontSendNotification);
         focusedObject_ = select;
     }
-    else
-    {
-        focusedObject_ = -1;
-    }
-
     objectCombo_.setEnabled(! objects_.empty());
     updatingObjectCombo_ = false;
 }
@@ -209,17 +206,6 @@ void SkinEditorMappingsPanel::paintRow(juce::Graphics& g, PaintRowSpec spec) con
     if (item.kind == RowKind::kSection)
     {
         SkinEditorChrome::paintTableSectionHeader(g, spec.rowArea, item.sectionTitle);
-        return;
-    }
-
-    if (item.kind == RowKind::kEmptyHint)
-    {
-        // Match Palette empty-hint tone (quieter than textMuted).
-        g.setColour(juce::Colour(0xff666666));
-        g.setFont(SkinEditorChrome::fontRegular());
-        g.drawText(item.emptyHintText,
-                   spec.rowArea.toNearestInt().reduced(6, 0),
-                   juce::Justification::centredLeft, false);
         return;
     }
 
@@ -397,29 +383,51 @@ void SkinEditorMappingsPanel::resized()
                                                       0);
     titleTabBounds_ = chrome.tab;
     titleLabel_.setBounds(chrome.tab);
-    auto bounds = chrome.content;
+    if (isShellEmpty())
+        layoutShellEmpty(chrome.content);
+    else
+        layoutShellFilled(chrome.content);
+}
 
-    // Top: Object bar, then content pad (same rhythm as Palette).
-    auto actions = bounds.removeFromTop(SkinEditorChrome::kButtonHeight);
-    bounds.removeFromTop(SkinEditorChrome::kPanelContentPad);
+void SkinEditorMappingsPanel::layoutShellEmpty(juce::Rectangle<int> content)
+{
+    objectLabel_.setVisible(false);
+    objectCombo_.setVisible(false);
+    holdColourToggle_.setVisible(false);
+    objectLabel_.setBounds({});
+    objectCombo_.setBounds({});
+    holdColourToggle_.setBounds({});
+    stickyBandBounds_ = {};
+    stickyLegendBounds_ = {};
+    auto listBounds = content;
+    listBounds.setRight(listBounds.getRight() + SkinEditorChrome::kPanelContentPad);
+    viewport_.setBounds(listBounds);
+    layoutContent();
+}
 
-    stickyBandBounds_ = bounds.removeFromTop(SkinEditorChrome::kColumnHeaderHeight
-                                             + SkinEditorChrome::kColumnHeaderGap);
+void SkinEditorMappingsPanel::layoutShellFilled(juce::Rectangle<int> content)
+{
+    objectLabel_.setVisible(true);
+    objectCombo_.setVisible(true);
+    holdColourToggle_.setVisible(true);
+
+    auto actions = content.removeFromTop(SkinEditorChrome::kButtonHeight);
+    content.removeFromTop(SkinEditorChrome::kPanelContentPad);
+
+    stickyBandBounds_ = content.removeFromTop(SkinEditorChrome::kColumnHeaderHeight
+                                              + SkinEditorChrome::kColumnHeaderGap);
     stickyLegendBounds_ = stickyBandBounds_.removeFromTop(SkinEditorChrome::kColumnHeaderHeight);
 
-    auto listBounds = bounds;
+    auto listBounds = content;
     listBounds.setRight(listBounds.getRight() + SkinEditorChrome::kPanelContentPad);
     viewport_.setBounds(listBounds);
     layoutContent();
 
-    // Table / legend / Object controls share the inset paint width (room for focus ring).
     const int tableW = paintWidth();
     const int tableX = viewport_.getX() + kFocusPad;
     stickyLegendBounds_.setX(tableX);
     stickyLegendBounds_.setWidth(tableW);
 
-    // Gap after "Object:" = measureLabelWidth's +8, same as Product: / Editor: (no extra kButtonGap).
-    // Hold colour left edge aligns with the Mapped colour column (combo stops before it).
     auto actionRow = juce::Rectangle<int>(tableX, actions.getY(), tableW, actions.getHeight());
     const int labelW = SkinEditorChrome::measureLabelWidth(objectLabel_.getText(),
                                                           SkinEditorChrome::fontRegular());

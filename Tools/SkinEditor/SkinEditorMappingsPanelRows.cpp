@@ -5,7 +5,6 @@
 #include "GUI/Skins/Dev/DevSkinInventory.h"
 #include "GUI/Skins/Dev/DevSkinKeyNames.h"
 #include "Tools/SkinEditor/SkinEditorChrome.h"
-#include "Tools/SkinEditor/SkinEditorUiHelpers.h"
 
 namespace
 {
@@ -89,14 +88,7 @@ void SkinEditorMappingsPanel::rebuildRows()
                            ? layer_->findSkin(skinId_)
                            : nullptr;
     if (skin == nullptr)
-    {
-        Row hint;
-        hint.kind = RowKind::kEmptyHint;
-        hint.emptyHintText = SkinEditorUi::kNoEditorSkinHint;
-        hint.heightPx = SkinEditorChrome::kColumnHeaderHeight;
-        rows_.push_back(hint);
         return;
-    }
 
     std::vector<TSS::SkinObjectType> objectOrder;
     std::map<TSS::SkinObjectType, std::vector<TSS::SkinColourKey>> keysByObject;

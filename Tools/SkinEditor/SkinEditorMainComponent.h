@@ -125,6 +125,8 @@ private:
     void layoutSessionControls(juce::Rectangle<int> well, juce::Rectangle<int> row);
     void layoutOperationWell(juce::Rectangle<int> band);
     void layoutOperationWitness(juce::Rectangle<int> content);
+    /** Plain OPERATION coaching when no editor skin (no mapping badge / arrow). */
+    void layoutOperationStartHint(juce::Rectangle<int> content);
     void layoutStatusBar(juce::Rectangle<int> statusBar);
     void layoutBodyPanels(juce::Rectangle<int> bounds);
     void paintChromeWells(juce::Graphics& g) const;
@@ -168,6 +170,8 @@ private:
     juce::Rectangle<int> mappingSwatchBounds_;
     juce::Rectangle<int> mappingArrowBounds_;
     bool mappingWitnessActive_ = false;
+    /** Idle OPERATION hint when editorSkinId is empty. */
+    bool operationStartHintActive_ = false;
     bool mappingWitnessShowSwatch_ = false;
     bool mappingWitnessPending_ = false;
     juce::Colour mappingWitnessColour_;

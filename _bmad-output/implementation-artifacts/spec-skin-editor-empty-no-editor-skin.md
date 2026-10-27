@@ -20,11 +20,10 @@ context: []
 
 ## Implementation Notes
 
-- Coaching copy (agent decision, then review patch): `SkinEditorUi::kNoEditorSkinHint` = `"Create a skin or duplicate the product skin to start."` so Duplicate maps to the Product action that stays enabled.
-- `refreshAll` gates panel skin id on `editorSkinId.isNotEmpty()` so product fallback no longer fills Palette/Mappings when no editor skin; Color stays idle via existing `syncColourPickerToSelection` / `clearMappingModeToIdle`.
-- Palette reuses `kEmptyHint` paint; Mappings adds `RowKind::kEmptyHint` with the same quiet grey tone; Object combo disabled when no objects.
+- Coaching copy: `SkinEditorUi::kNoEditorSkinHint` = `"Create a skin or duplicate the product skin to start."` (Product Duplicate stays enabled).
+- `refreshAll` gates panel skin id on `editorSkinId.isNotEmpty()` so product content no longer fills Palette/Mappings; Color stays idle via existing sync.
+- Smoke follow-up: Palette/Mappings are empty shells (no Add/Delete, Object/Hold, table legend); OPERATION shows START badge + coaching via `operationStartHintActive_`.
 - Compare-with-editor still shows product in panels via `visibleSkinId()`; empty editor skin always empties panels.
-- Verified: `cmake --build --preset macos-debug-arm64 --target Matrix-Control_SkinEditor`; `lint_touched.py` OK.
 
 ## Review Triage Log
 
