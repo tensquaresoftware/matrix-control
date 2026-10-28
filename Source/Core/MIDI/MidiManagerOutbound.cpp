@@ -49,6 +49,9 @@ void MidiManager::sendSysExWithDelay(const juce::MemoryBlock& sysExMessage, cons
 {
     sysExDelay_.waitUntilReady();
     midiSender->sendSysEx(sysExMessage);
+    // Direct SysEx (Inquiry, Master fallback, async dumps) bypasses the outbound queue.
+    activityTracker_.notifyActivity(Core::MidiActivityTracker::Path::kEditor);
+    activityTracker_.notifyActivity(Core::MidiActivityTracker::Path::kOutbound);
     MidiLogger::getInstance().logSysExSent(sysExMessage, description);
     sysExDelay_.recordSysExSent(static_cast<juce::int64>(juce::Time::getMillisecondCounterHiRes()));
 }

@@ -8,6 +8,7 @@
 #include "Core/MIDI/DeviceInquiryTrigger.h"
 #include "Core/MIDI/EditorOutboundGate.h"
 #include "Core/MIDI/MasterPullOnConnectPolicy.h"
+#include "Core/MIDI/Matrix6MasterFallbackPolicy.h"
 #include "Core/MIDI/Queue/SysExDelayProfile.h"
 #include "Core/Services/DeviceSetupDeviceRow.h"
 #include "Core/Services/DeviceTypeRegistry.h"
@@ -190,9 +191,45 @@ bool MidiManager::armAsyncDeviceInquiryCapture(std::uint64_t token)
     return true;
 }
 
+void MidiManager::applyDeviceInquirySuccessDetection(const DeviceIdInfo& info,
+                                                     MatrixDeviceTypes::Type deviceType,
+                                                     bool preserveStoredEpromType)
+{
+    // Inquiry success maps firmware → EPROM. Master fallback has no version — keep Settings.
+    if (! preserveStoredEpromType)
+        Core::EpromTypePolicy::writeStoredTypeAfterInquirySuccess(apvts.state, info.version, deviceType);
+
+    const int epromType = Core::EpromTypePolicy::normalize(static_cast<int>(
+        apvts.state.getProperty(PluginIDs::Settings::kEpromType,
+                              PluginIDs::Settings::EpromType::kDefault)));
+    if (preserveStoredEpromType)
+    {
+        sysExDelay_.setProfile(Core::SysExDelayProfile::fromSettings(
+            epromType, Core::EpromTypePolicy::deviceFamilyFromType(deviceType)));
+        updateDeviceStatus(true,
+                           juce::String(Core::matrix6MasterFallbackDeviceVersion()),
+                           deviceType);
+    }
+    else
+    {
+        sysExDelay_.setProfile(Core::SysExDelayProfile::fromDeviceInquiry(info, epromType));
+        updateDeviceStatus(true, info.version, deviceType);
+    }
+
+    // Master fallback has no firmware map — never re-arm Device Setup from that path.
+    if (preserveStoredEpromType)
+        return;
+
+    const bool promptDone = static_cast<bool>(
+        apvts.state.getProperty(PluginIDs::Settings::kEpromTypePromptDone, false));
+    if (Core::shouldArmDeviceSetupPromptPendingAfterInquiry(promptDone))
+        apvts.state.setProperty(PluginIDs::Settings::kEpromTypePromptPending, true, nullptr);
+}
+
 void MidiManager::finishAsyncDeviceInquirySuccess(std::uint64_t token,
                                                   const DeviceIdInfo& info,
-                                                  MatrixDeviceTypes::Type deviceType)
+                                                  MatrixDeviceTypes::Type deviceType,
+                                                  bool preserveStoredEpromType)
 {
     auto expected = token;
     if (! asyncRequestToken_.compare_exchange_strong(expected, token + 1, std::memory_order_acq_rel))
@@ -207,19 +244,7 @@ void MidiManager::finishAsyncDeviceInquirySuccess(std::uint64_t token,
     const auto previousType = Core::DeviceTypeRegistry::fromApvtsProperty(
         apvts.state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
 
-    // Keep EPROM TYPE (and Timing) aligned with the newly identified synth / firmware.
-    // Machine-defaults persistence is applied by the editor on the APVTS property change.
-    Core::EpromTypePolicy::writeStoredTypeAfterInquirySuccess(apvts.state, info.version, deviceType);
-    const int epromType = Core::EpromTypePolicy::normalize(static_cast<int>(
-        apvts.state.getProperty(PluginIDs::Settings::kEpromType,
-                              PluginIDs::Settings::EpromType::kDefault)));
-    sysExDelay_.setProfile(Core::SysExDelayProfile::fromDeviceInquiry(info, epromType));
-    updateDeviceStatus(true, info.version, deviceType);
-
-    const bool promptDone = static_cast<bool>(
-        apvts.state.getProperty(PluginIDs::Settings::kEpromTypePromptDone, false));
-    if (Core::shouldArmDeviceSetupPromptPendingAfterInquiry(promptDone))
-        apvts.state.setProperty(PluginIDs::Settings::kEpromTypePromptPending, true, nullptr);
+    applyDeviceInquirySuccessDetection(info, deviceType, preserveStoredEpromType);
 
     const auto pullSnapshot = Core::consumeMasterPullInquirySnapshot(
         wasDetected, previousType, forceMasterPullOnNextInquirySuccess_);
@@ -309,6 +334,30 @@ void MidiManager::softAbortDeviceInquiryUnresponsive(std::uint64_t token)
     setDeviceMidiUnresponsive(true);
 }
 
+void MidiManager::onDeviceInquiryIdentityTimeout(std::uint64_t token)
+{
+    if (token != asyncRequestToken_.load(std::memory_order_acquire))
+        return;
+
+    MidiLogger::getInstance().logWarning(
+        "Timeout waiting for Device Inquiry identity ("
+        + juce::String(SysExConstants::kDefaultTimeoutMs) + "ms)");
+
+    const bool wasDetected = static_cast<bool>(
+        apvts.state.getProperty("deviceDetected", false));
+    // Soft-abort presence on the same pair; port-pair force runs Master fallback.
+    if (! Core::shouldRunMatrix6MasterFallbackOnInquiryTimeout(
+            wasDetected, forceMasterPullOnNextInquirySuccess_))
+    {
+        softAbortDeviceInquiryUnresponsive(token);
+        return;
+    }
+
+    MidiLogger::getInstance().logInfo(
+        "Device Inquiry timed out — trying Matrix-6/6R Master discovery fallback");
+    sendArmedMatrix6MasterFallback(token);
+}
+
 void MidiManager::scheduleDeviceInquiryTimeout(std::uint64_t token)
 {
     juce::WeakReference<MidiManager> weakThis(this);
@@ -317,26 +366,7 @@ void MidiManager::scheduleDeviceInquiryTimeout(std::uint64_t token)
         [weakThis, token]
         {
             if (auto* self = weakThis.get())
-            {
-                if (token != self->asyncRequestToken_.load(std::memory_order_acquire))
-                    return;
-
-                MidiLogger::getInstance().logWarning(
-                    "Timeout waiting for SysEx response ("
-                    + juce::String(SysExConstants::kDefaultTimeoutMs) + "ms)");
-
-                const bool wasDetected = static_cast<bool>(
-                    self->apvts.state.getProperty("deviceDetected", false));
-                if (wasDetected)
-                {
-                    self->softAbortDeviceInquiryUnresponsive(token);
-                    return;
-                }
-
-                self->finishAsyncDeviceInquiryFailure(token,
-                                                      "Timeout waiting for Device ID response",
-                                                      "Timeout");
-            }
+                self->onDeviceInquiryIdentityTimeout(token);
         });
 }
 

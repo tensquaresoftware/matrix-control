@@ -2715,3 +2715,24 @@ Original review bullets below remain for history; status for U-10-owned residual
   summary: Reconfirmed — CAP-5 pytest paint checks remain source-text greps only (Footer / ModBus / popup / alert file substrings), not executable paint observation.
   evidence: External code review Verification Gap + Blind Hunter; already deferred in Build; CONVENTIONS forbid GUI paint unit tests; absolute Look/Skin pins are the hardening path.
 
+
+## Deferred from: spec-gh-36-m6r-master-discovery-fallback (2026-10-28)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-gh-36-m6r-master-discovery-fallback.md`
+  summary: Once Matrix-6/6R Master SysEx dump wire length is confirmed on hardware (counted capture), update `_local/References/Oberheim/oberheim-matrix-6-6r-midi-sysex-implementation.md` and the reading guide so the printed total matches reality (resolve youngmonkey 477 vs formula 478 vs Alpes/PR 479) and keep the discovery filter constants in sync.
+  evidence: Discovery intentionally accepts 478 or 479 until a counted dump exists; docs currently preserve youngmonkey's inconsistent 477 figure with an editorial note.
+- source_spec: `_bmad-output/implementation-artifacts/spec-gh-36-m6r-master-discovery-fallback.md`
+  summary: No MidiManager fixture asserts that `sendSysExWithDelay` pulses editor/outbound activity LEDs after the direct-send notifyActivity wiring.
+  evidence: Verification-gap review; MidiActivityTrackerTests cover the tracker alone; optional UX visibility for Inquiry/fallback, cheap only if an existing MidiManager send harness appears.
+- source_spec: `_bmad-output/implementation-artifacts/spec-gh-36-m6r-master-discovery-fallback.md`
+  summary: No Footer/GUI contract test for detected Matrix-6 with empty deviceVersion after Master fallback.
+  evidence: Blind Hunter; CONVENTIONS keep unit suite off paint/Footer; Matias checklist covers manual footer check.
+
+## Deferred from: code review of spec-gh-36-m6r-master-discovery-fallback.md (2026-10-28)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-gh-36-m6r-master-discovery-fallback.md`
+  summary: `forceMasterPullOnNextInquirySuccess_` now also means “run Master discovery fallback on Inquiry timeout” (port-pair force), while the name still reads as Master-pull-after-success only.
+  evidence: Blind Hunter; intentional flag reuse per spec Always constraints; clarifying comment or rename is a follow-up naming pass, not required to ship the fallback behaviour.
+- source_spec: `_bmad-output/implementation-artifacts/spec-gh-36-m6r-master-discovery-fallback.md`
+  summary: Reconfirmed — no MidiManager fixture for `sendSysExWithDelay` activity LED pulses (already deferred above).
+  evidence: Verification Gap Reviewer disposition `defer`; still needs a send harness.

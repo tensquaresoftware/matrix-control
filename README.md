@@ -112,7 +112,7 @@ AU / VST3 / Standalone as listed above; multi-platform **CI** (build + unit test
 
 ## Current status
 
-**`1.0.0-alpha.2`** — Skin SSOT colour model on trunk (structured palette + mappings for Black/Cream), on top of the alpha.1 feature set: patch/master editing, Patch Mutator, Computer Patches, Bank Utility, Getting Started, contextual HELP, skins & UI scale, and CI/CD.
+**`1.0.0-alpha.3`** — Matrix-6/6R discovery fallback when Universal Device Inquiry times out (Master dump probe), on top of the alpha.2 Skin SSOT colour model and alpha.1 feature set: patch/master editing, Patch Mutator, Computer Patches, Bank Utility, Getting Started, contextual HELP, skins & UI scale, and CI/CD.
 
 Still evolving toward a polished `1.0`:
 

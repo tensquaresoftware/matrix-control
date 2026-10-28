@@ -265,11 +265,24 @@ private:
     void handleAsyncDeviceInquiryResponse(std::uint64_t token, const juce::MemoryBlock& response);
     void sendArmedDeviceInquiry(std::uint64_t token);
     void scheduleDeviceInquiryTimeout(std::uint64_t token);
+    /** Inquiry identity timeout body (also invoked from unit tests without waiting 2 s). */
+    void onDeviceInquiryIdentityTimeout(std::uint64_t token);
+    void sendArmedMatrix6MasterFallback(std::uint64_t token);
+    bool armAsyncMatrix6MasterFallbackCapture(std::uint64_t token);
+    void handleAsyncMatrix6MasterFallbackResponse(std::uint64_t token,
+                                                  const juce::MemoryBlock& response);
+    void scheduleMatrix6MasterFallbackTimeout(std::uint64_t token);
+    /** Master-fallback timeout body (also invoked from unit tests without waiting 2 s). */
+    void onMatrix6MasterFallbackTimeout(std::uint64_t token);
     void pollOutboundIdleThenDeviceInquiry(OutboundIdlePollArgs args);
     void scheduleOrSendArmedDeviceInquiry(const OutboundIdlePollArgs& args);
     void finishAsyncDeviceInquirySuccess(std::uint64_t token,
                                          const DeviceIdInfo& info,
-                                         MatrixDeviceTypes::Type deviceType);
+                                         MatrixDeviceTypes::Type deviceType,
+                                         bool preserveStoredEpromType = false);
+    void applyDeviceInquirySuccessDetection(const DeviceIdInfo& info,
+                                            MatrixDeviceTypes::Type deviceType,
+                                            bool preserveStoredEpromType);
     void finishAsyncDeviceInquiryFailure(std::uint64_t token,
                                          const juce::String& errorMessage,
                                          const juce::String& errorType);
@@ -278,6 +291,8 @@ private:
     /** Presence timeout while already detected — keep detection; freeze editor SysEx traffic. */
     void softAbortDeviceInquiryUnresponsive(std::uint64_t token);
     void setDeviceMidiUnresponsive(bool unresponsive);
+
+    friend class Matrix6MasterFallbackMidiManagerTests;
 
     JUCE_DECLARE_WEAK_REFERENCEABLE(MidiManager)
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MidiManager)
