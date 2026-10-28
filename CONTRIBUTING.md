@@ -254,11 +254,13 @@ The [Release](https://github.com/tensquaresoftware/matrix-control/actions/workfl
 3. Download assets from the GitHub Release; smoke-test on each OS (DAW + standalone).
 4. For stable: set `MATRIX_CONTROL_PRERELEASE_SUFFIX=""`, commit, tag `vX.Y.Z`, push tag.
 
-### Signing (intentionally unsigned)
+### Signing (intentionally unsigned / ad-hoc on macOS)
 
 Matrix-Control is free / source-available. Release artefacts are **not** Apple-notarized and **not** Windows Authenticode-signed. No Apple Developer Program subscription and no GitHub signing secrets are required for the Release workflow.
 
-On first launch, macOS Gatekeeper may warn that the app/plugin is from an unidentified developer — users can allow it via System Settings (or right-click → Open for the Standalone).
+On macOS, the Release job runs an **ad-hoc** `codesign` (`-` identity) on AU / VST3 / Standalone before packing so Gatekeeper does not report the bundles as damaged. That is not Developer ID signing and does not replace notarization.
+
+After download, clear quarantine with `xattr -cr` on the extracted bundles. First launch may still warn that the developer is unidentified — allow via System Settings or right-click → Open.
 
 ### Local packaging (fallback)
 
