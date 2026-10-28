@@ -333,10 +333,14 @@ def test_release_workflow_structure():
     assert "USER_COPY_TO_SYSTEM_FOLDERS=OFF" in workflow_text
     assert "USER_COPY_TO_ARTEFACTS_DIR=OFF" in workflow_text
     assert "fail-fast: false" in build_yaml or "fail-fast: false" in build_yaml.replace("'", '"')
-    # Free distribution: no Apple Developer Program / notarization in CI.
+    # Free distribution: ad-hoc codesign only — no Apple Developer Program / notarization.
+    assert "adhoc_sign_macos_bundles.py" in workflow_text
     assert "notarytool submit" not in workflow_text
-    assert "codesign --force" not in workflow_text
     assert "Require macOS signing secrets" not in workflow_text
+    hygiene_idx = workflow_text.index("check_release_hygiene.py")
+    adhoc_idx = workflow_text.index("adhoc_sign_macos_bundles.py")
+    pack_idx = workflow_text.index('pack "${{ matrix.platform }}"')
+    assert hygiene_idx < adhoc_idx < pack_idx
 
     publish_yaml = yaml.dump(jobs["publish"])
     assert "prepare_release.py" in publish_yaml

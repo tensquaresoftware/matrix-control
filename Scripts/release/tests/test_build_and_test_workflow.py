@@ -101,7 +101,8 @@ def test_release_workflow_tag_only_and_unsigned():
     assert "v*.*.*" in triggers["push"]["tags"]
     assert set(release["jobs"]) == {"validate-tag", "build", "publish"}
     assert "notarytool submit" not in release_text
-    assert "codesign --force" not in release_text
+    assert "adhoc_sign_macos_bundles.py" in release_text
+    assert "Require macOS signing secrets" not in release_text
 
 
 def test_resolve_tier_logic_documented_in_workflow():
