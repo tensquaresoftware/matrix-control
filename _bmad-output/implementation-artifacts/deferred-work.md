@@ -1,5 +1,11 @@
 # Deferred Work
 
+## Deferred from: Windows alpha.3 Live 12 smoke (2026-10-28)
+
+- source_spec: none (user-manual follow-up)
+  summary: Document Ableton Live (Windows) **Auto-Scale Plugin Window** in `Documentation/User/manuel-utilisateur.md` — default ON bitmap-scales the VST3 UI and looks blurry at every Matrix-Control UI Scale; Standalone stays sharp. Ableton’s own guidance: for freely scalable VST3 UIs, disable Auto-Scale (Browser → right-click plug-in icon), then reload the device. Natural homes: Ableton Live subsection under master-keyboard / plugin routing, and/or §15 Apparence / UI Scale, and/or §16 Standalone vs plugin. Confirmed on Lenovo Windows + Live 12 with alpha.3 CI builds.
+  evidence: Owner smoke 2026-10-28; Ableton help “Recommended Graphics Settings (Windows)” Auto-Scale exception for freely scalable VST3.
+
 ## Deferred from: code review of spec-device-setup-assistant.md (2026-09-18)
 
 - **Editor-ready open wiring only covered by pure bool helper** — `shouldOpenDeviceSetupAssistant` is unit-tested; UiConstruction `promptDone` → open path is not. Deferred: repo unit tests stay on Core/pure helpers; PluginEditor construction harness is out of this chantier's test style.
