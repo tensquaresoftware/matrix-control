@@ -305,6 +305,7 @@ set(PLUGIN_SOURCES
     Source/Core/MIDI/MidiManagerAsyncPatch.cpp
     Source/Core/MIDI/MidiManagerAsyncMaster.cpp
     Source/Core/MIDI/MidiManagerDeviceInquiry.cpp
+    Source/Core/MIDI/MidiManagerDeviceInquiryFallback.cpp
     Source/Core/MIDI/MidiManagerUnisonDetune.cpp
     Source/Core/MIDI/MidiManagerPanic.cpp
     Source/Core/MIDI/MidiPortOpenFeedback.cpp
@@ -516,6 +517,9 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/DeviceTypeRegistryTests.cpp
         Tests/Unit/DeviceInquiryTriggerTests.cpp
         Tests/Unit/DeviceInquiryCaptureFilterTests.cpp
+        Tests/Unit/Matrix6MasterResponseFilterTests.cpp
+        Tests/Unit/Matrix6MasterFallbackPolicyTests.cpp
+        Tests/Unit/Matrix6MasterFallbackMidiManagerTests.cpp
         Tests/Unit/DeviceVersionDisplayFormatTests.cpp
         Tests/Unit/DropPathParseTests.cpp
         Tests/Unit/DeviceAudioInputPreferenceTests.cpp
@@ -749,6 +753,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/MIDI/MidiManagerAsyncPatch.cpp
         Source/Core/MIDI/MidiManagerAsyncMaster.cpp
         Source/Core/MIDI/MidiManagerDeviceInquiry.cpp
+        Source/Core/MIDI/MidiManagerDeviceInquiryFallback.cpp
         Source/Core/MIDI/MidiManagerUnisonDetune.cpp
         Source/Core/MIDI/MidiManagerPanic.cpp
         Source/Core/MIDI/MidiPortOpenFeedback.cpp

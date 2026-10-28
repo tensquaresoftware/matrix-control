@@ -42,7 +42,16 @@ namespace SysExConstants
     constexpr size_t kPatchMessageLength = 275;  // 134 packed bytes = 268 nibbles + 5 header + 1 checksum + 1 EOX
     // 0x0D uses the same 5-byte header pattern as 0x01: F0 10 06 0D 00 (+ nibbles + checksum + F7).
     constexpr size_t kPatchToEditBufferMessageLength = 275;
-    constexpr size_t kMasterMessageLength = 351;  // 172 packed bytes = 344 nibbles + 5 header + 1 checksum + 1 EOX
+    constexpr size_t kMasterMessageLength = 351;  // M-1000: 172 packed = 344 nibbles + 5 header + CS + EOX
+    // Matrix-6/6R Master dump (opcode 03H): 236 packed → 472 nibbles + 4-byte header (F0 10 06 03)
+    // + checksum + EOX. youngmonkey prints 477 but the sum is 478; Alpes cites 479.
+    // Discovery accepts both wire lengths until a counted hardware capture narrows it.
+    constexpr size_t kMatrix6MasterPackedDataSize = 236;
+    constexpr size_t kMatrix6MasterMessageLengthMin =
+        (kMatrix6MasterPackedDataSize * 2) + 4 + 1 + 1; // 478
+    constexpr size_t kMatrix6MasterMessageLengthMax = kMatrix6MasterMessageLengthMin + 1; // 479
+    static_assert(kMatrix6MasterMessageLengthMin == 478,
+                  "Matrix-6/6R Master frame min must match 236*2 + header + CS + EOX");
     constexpr size_t kSplitPatchMessageLength = 36 + 5 + 1 + 1;  // 36 bytes + header + checksum + EOX
     constexpr size_t kMatrixModBusMessageLength = 9;  // F0 10 06 0B <bus> <source> <amount> <destination> F7
 
