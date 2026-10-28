@@ -144,6 +144,64 @@ def test_discover_artefact_paths_rejects_macos_shell_without_binaries(
         prepare_release.discover_artefact_paths("macos", artefacts_root=root)
 
 
+def test_pack_platform_keeps_distinct_macos_bundle_roots(prepare_release, tmp_path):
+    """AU / VST3 / Standalone all have Contents/; zip must keep each bundle name."""
+    import zipfile
+
+    root = tmp_path / "artefacts"
+    payloads = {
+        "VST3/Matrix-Control.vst3/Contents/MacOS/plugin": b"vst3-bin",
+        "AU/Matrix-Control.component/Contents/MacOS/plugin": b"au-bin",
+        "Standalone/Matrix-Control.app/Contents/MacOS/Matrix-Control": b"app-bin",
+    }
+    for rel, data in payloads.items():
+        path = root / rel
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(data)
+
+    release_dir = tmp_path / "1.0.0-alpha.3"
+    paths = prepare_release.ReleasePaths(version="1.0.0-alpha.3", release_dir=release_dir)
+    archive = prepare_release.pack_platform(
+        paths, "macos", artefacts_root=root, arch="arm64", force=True
+    )
+
+    with zipfile.ZipFile(archive) as zf:
+        names = set(zf.namelist())
+
+    assert "README.txt" in names
+    assert "Matrix-Control.vst3/Contents/MacOS/plugin" in names
+    assert "Matrix-Control.component/Contents/MacOS/plugin" in names
+    assert "Matrix-Control.app/Contents/MacOS/Matrix-Control" in names
+    # Flattened Contents/ collision must not occur.
+    assert "Contents/MacOS/plugin" not in names
+    assert "Contents/MacOS/Matrix-Control" not in names
+
+
+def test_pack_platform_keeps_windows_vst3_bundle_root(prepare_release, tmp_path):
+    import zipfile
+
+    root = tmp_path / "artefacts"
+    vst3_bin = root / "VST3" / "Matrix-Control.vst3" / "Contents" / "x86_64-win" / "Matrix-Control.vst3"
+    vst3_bin.parent.mkdir(parents=True)
+    vst3_bin.write_bytes(b"win-vst3")
+    exe = root / "Standalone" / "Matrix-Control.exe"
+    exe.parent.mkdir(parents=True)
+    exe.write_bytes(b"win-exe")
+
+    release_dir = tmp_path / "1.0.0-alpha.3"
+    paths = prepare_release.ReleasePaths(version="1.0.0-alpha.3", release_dir=release_dir)
+    archive = prepare_release.pack_platform(
+        paths, "windows", artefacts_root=root, force=True
+    )
+
+    with zipfile.ZipFile(archive) as zf:
+        names = set(zf.namelist())
+
+    assert "Matrix-Control.vst3/Contents/x86_64-win/Matrix-Control.vst3" in names
+    assert "Matrix-Control.exe" in names
+    assert "Contents/x86_64-win/Matrix-Control.vst3" not in names
+
+
 def test_publish_ci_reuploads_when_release_exists(prepare_release, tmp_path):
     release_dir = tmp_path / "1.0.0-rc1"
     release_dir.mkdir()

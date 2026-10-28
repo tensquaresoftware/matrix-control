@@ -211,15 +211,21 @@ def ensure_release_dir(paths: ReleasePaths) -> None:
     paths.release_dir.mkdir(parents=True, exist_ok=True)
 
 
-def _add_path_to_zip(zf: zipfile.ZipFile, source: Path, arc_prefix: Path) -> None:
+def _add_path_to_zip(zf: zipfile.ZipFile, source: Path) -> None:
+    """Add a file or bundle under its own basename so sibling bundles do not collide.
+
+    macOS AU/VST3/Standalone all use a ``Contents/`` tree. Archiving each under
+    ``source.name`` keeps ``Matrix-Control.vst3/``, ``.component/``, and ``.app/``
+    distinct in the zip (empty ``arc_prefix`` previously flattened them together).
+    """
     if source.is_dir():
         for item in sorted(source.rglob("*")):
             if item.is_dir():
                 continue
-            arcname = arc_prefix / item.relative_to(source)
+            arcname = Path(source.name) / item.relative_to(source)
             zf.write(item, arcname=str(arcname).replace("\\", "/"))
     else:
-        zf.write(source, arcname=str(arc_prefix / source.name).replace("\\", "/"))
+        zf.write(source, arcname=source.name)
 
 
 def pack_platform(
@@ -242,10 +248,10 @@ def pack_platform(
     print(f"Packing {platform} -> {archive.name}")
     with zipfile.ZipFile(archive, "w", compression=zipfile.ZIP_DEFLATED) as zf:
         zf.writestr("README.txt", render_template("RELEASE_NOTES.template.md", paths.version))
-        _add_path_to_zip(zf, artefacts.vst3, Path(""))
+        _add_path_to_zip(zf, artefacts.vst3)
         if artefacts.au is not None:
-            _add_path_to_zip(zf, artefacts.au, Path(""))
-        _add_path_to_zip(zf, artefacts.standalone, Path(""))
+            _add_path_to_zip(zf, artefacts.au)
+        _add_path_to_zip(zf, artefacts.standalone)
 
     size_mb = archive.stat().st_size / (1024 * 1024)
     print(f"  Created {archive} ({size_mb:.1f} MiB)")
