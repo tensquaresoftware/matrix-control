@@ -68,11 +68,23 @@ bool MidiManager::armAsyncMatrix6MasterFallbackCapture(std::uint64_t token)
     midiReceiver->armOneShotSysExCapture(
         [weakThis, token](const juce::MemoryBlock& response)
         {
+            // Claim immediately so a queued Master-fallback timeout cannot finishFailure
+            // after a valid dump was accepted (filter already matched this frame).
+            auto* selfSync = weakThis.get();
+            if (selfSync == nullptr)
+                return;
+
+            auto expected = token;
+            if (! selfSync->asyncRequestToken_.compare_exchange_strong(
+                    expected, token + 1, std::memory_order_acq_rel))
+                return;
+
+            const std::uint64_t claimed = token + 1;
             juce::MessageManager::callAsync(
-                [weakThis, token, response]
+                [weakThis, claimed, response]
                 {
                     if (auto* self = weakThis.get())
-                        self->handleAsyncMatrix6MasterFallbackResponse(token, response);
+                        self->handleAsyncMatrix6MasterFallbackResponse(claimed, response);
                 });
         },
         [](const juce::MemoryBlock& sysex)
@@ -92,7 +104,11 @@ void MidiManager::handleAsyncMatrix6MasterFallbackResponse(std::uint64_t token,
 
     if (! Core::isMatrix6MasterParameterDump(response))
     {
-        armAsyncMatrix6MasterFallbackCapture(token);
+        // Capture filter matched, then frame failed a defensive re-check — re-arm and
+        // reschedule timeout under the claimed token (old timeout was invalidated).
+        if (! armAsyncMatrix6MasterFallbackCapture(token))
+            return;
+        scheduleMatrix6MasterFallbackTimeout(token);
         return;
     }
 
@@ -106,6 +122,21 @@ void MidiManager::handleAsyncMatrix6MasterFallbackResponse(std::uint64_t token,
                                     Core::matrix6MasterFallbackPreservesStoredEpromType());
 }
 
+void MidiManager::onMatrix6MasterFallbackTimeout(std::uint64_t token)
+{
+    if (! Core::isMatrix6MasterFallbackTokenCurrent(
+            token, asyncRequestToken_.load(std::memory_order_acquire)))
+        return;
+
+    MidiLogger::getInstance().logWarning(
+        "Timeout waiting for Matrix-6/6R Master fallback ("
+        + juce::String(SysExConstants::kDefaultTimeoutMs) + "ms)");
+
+    finishAsyncDeviceInquiryFailure(token,
+                                    Core::matrix6MasterFallbackTimeoutFailureMessage(),
+                                    "Timeout");
+}
+
 void MidiManager::scheduleMatrix6MasterFallbackTimeout(std::uint64_t token)
 {
     juce::WeakReference<MidiManager> weakThis(this);
@@ -114,19 +145,6 @@ void MidiManager::scheduleMatrix6MasterFallbackTimeout(std::uint64_t token)
         [weakThis, token]
         {
             if (auto* self = weakThis.get())
-            {
-                if (! Core::isMatrix6MasterFallbackTokenCurrent(
-                        token, self->asyncRequestToken_.load(std::memory_order_acquire)))
-                    return;
-
-                MidiLogger::getInstance().logWarning(
-                    "Timeout waiting for Matrix-6/6R Master fallback ("
-                    + juce::String(SysExConstants::kDefaultTimeoutMs) + "ms)");
-
-                self->finishAsyncDeviceInquiryFailure(
-                    token,
-                    Core::matrix6MasterFallbackTimeoutFailureMessage(),
-                    "Timeout");
-            }
+                self->onMatrix6MasterFallbackTimeout(token);
         });
 }

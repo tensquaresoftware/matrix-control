@@ -109,6 +109,7 @@ sources:
 - 2026-10-28: Spec approved (continue in this session). Deferred project note: after hardware confirms Master dump length, update `_local/References/Oberheim/` Matrix-6/6R MD docs and align filter constants — tracked in `deferred-work.md`.
 - 2026-10-28: Implemented Inquiry-first Master fallback (lengths 478|479, `kDefaultTimeoutMs`, preserve EPROM, empty version, `kMatrix6` family). Filter + fallback policy unit-tested; no 6R hardware validation in this chat.
 - 2026-10-28 review patches: invalidate Inquiry token when Master fallback starts; `onDeviceInquiryIdentityTimeout` test hook; MidiManager sequence tests; filter header/EOX rejects; version helper wired; packed-size-derived length constants.
+- 2026-10-28 code-review pass 2: Master-dump capture CAS-claims before callAsync (timeout race); `onMatrix6MasterFallbackTimeout` + MidiManager coverage for timeout failure, delay assert, M-1000 Inquiry smoke, port-pair force success, stale-timeout no-op.
 
 **Matias hardware checklist (Matrix-6R):**
 1. MIDI From / MIDI To to the 6R; SYSTEM EXCLUSIVE ON on the synth.
@@ -138,6 +139,26 @@ sources:
 - false — spec frontmatter/process metadata as a code defect — rejected (finding asks to edit build process/spec status, not product behaviour).
 - defer — no test that `sendSysExWithDelay` pulses activity LEDs — real optional UX gap; appended to deferred-work.md.
 - defer — no Footer contract test for empty version after Matrix-6 fallback — GUI out of unit suite; Matias checklist; deferred-work.md.
+
+### Review Findings
+
+- [x] [Review][Patch] Valid Master dump can lose to Master-fallback timeout on the message thread [MidiManagerDeviceInquiryFallback.cpp] — applied: capture callback CAS-claims token before callAsync; stale timeout no-ops; unit test added
+- [x] [Review][Patch] Master-fallback timeout failure path never exercised under MidiManager tests — applied: `onMatrix6MasterFallbackTimeout` hook + MidiManager test for message + Timeout type
+- [x] [Review][Patch] Fallback success does not assert Matrix-6 SysEx delay profile — applied: assert `getRequiredSysExDelayMs()` == optimised Matrix-6 for Tauntek EPROM
+- [x] [Review][Patch] No MidiManager smoke that Matrix-1000 Inquiry success never enters Master fallback — applied: identity-frame success fixture + no discovery-fallback error copy
+- [x] [Review][Patch] Port-pair force + valid Master success path untested end-to-end — applied: force consumed, Matrix-6 detect, no M-1000 pull, stock Matrix-6 delay
+- [x] [Review][Defer] Direct sendSysExWithDelay activity LED pulses unverified [MidiManagerOutbound.cpp:52-54] — deferred: optional UX; already in deferred-work.md for this spec
+- [x] [Review][Defer] forceMasterPullOnNextInquirySuccess_ also gates Master discovery fallback [MidiManager.h:224] — deferred: intentional reuse per spec; rename vs clarifying comment is a follow-up naming pass
+
+Rejected:
+- false — armAsyncMatrix6MasterFallbackCapture returns false without finishFailure — only the stale-token branch returns silently; that is correct when a newer inquiry replaced the token (receiver-null path does finishFailure).
+- false — matrix6MasterFallbackPreservesStoredEpromType hard-coded true vs finish default false — current fallback always passes the helper; Inquiry path correctly defaults to rewrite; no present misuse.
+- false — outbound-busy deferral lacks MidiManager regression next to the new gate — outbound busy soft-aborts before Inquiry timeout/fallback; path unchanged by this change.
+- low — friend Matrix6MasterFallbackMidiManagerTests + private mutation — common JUCE test seam; rename brittleness not worth new public test API now.
+- low — detection log shows blank Version on fallback success — expected empty version; field triage still readable.
+- low — isMatrix6MasterParameterDump uses kDeviceIdMatrix1000 without shared-0x06 note — correct wire id; comment-only polish rejected.
+- low — duplicated Master-frame builders across two test files — one-time duplication; factorizing is optional hygiene.
+- rejected — Spec Tasks / Spec Change Log overclaim or empty changelog — would edit the spec under review, not product code.
 
 ## Design Notes
 

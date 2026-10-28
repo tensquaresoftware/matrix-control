@@ -272,6 +272,8 @@ private:
     void handleAsyncMatrix6MasterFallbackResponse(std::uint64_t token,
                                                   const juce::MemoryBlock& response);
     void scheduleMatrix6MasterFallbackTimeout(std::uint64_t token);
+    /** Master-fallback timeout body (also invoked from unit tests without waiting 2 s). */
+    void onMatrix6MasterFallbackTimeout(std::uint64_t token);
     void pollOutboundIdleThenDeviceInquiry(OutboundIdlePollArgs args);
     void scheduleOrSendArmedDeviceInquiry(const OutboundIdlePollArgs& args);
     void finishAsyncDeviceInquirySuccess(std::uint64_t token,

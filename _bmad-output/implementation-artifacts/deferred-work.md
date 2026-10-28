@@ -2727,3 +2727,12 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-gh-36-m6r-master-discovery-fallback.md`
   summary: No Footer/GUI contract test for detected Matrix-6 with empty deviceVersion after Master fallback.
   evidence: Blind Hunter; CONVENTIONS keep unit suite off paint/Footer; Matias checklist covers manual footer check.
+
+## Deferred from: code review of spec-gh-36-m6r-master-discovery-fallback.md (2026-10-28)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-gh-36-m6r-master-discovery-fallback.md`
+  summary: `forceMasterPullOnNextInquirySuccess_` now also means “run Master discovery fallback on Inquiry timeout” (port-pair force), while the name still reads as Master-pull-after-success only.
+  evidence: Blind Hunter; intentional flag reuse per spec Always constraints; clarifying comment or rename is a follow-up naming pass, not required to ship the fallback behaviour.
+- source_spec: `_bmad-output/implementation-artifacts/spec-gh-36-m6r-master-discovery-fallback.md`
+  summary: Reconfirmed — no MidiManager fixture for `sendSysExWithDelay` activity LED pulses (already deferred above).
+  evidence: Verification Gap Reviewer disposition `defer`; still needs a send harness.
