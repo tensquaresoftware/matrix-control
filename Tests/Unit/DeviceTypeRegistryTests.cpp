@@ -200,12 +200,20 @@ private:
 
     void testDisplayNames()
     {
-        beginTest("toDisplayString — Unknown shows Unknown Device in footer identity");
+        beginTest("toDisplayString / toApvtsString — footer Matrix-6/6R vs APVTS Matrix-6");
 
         expectEquals(MatrixDeviceTypes::toDisplayString(MatrixDeviceTypes::Type::kUnknown),
                      juce::String(MatrixDeviceTypes::kUnknownDisplayName));
         expectEquals(MatrixDeviceTypes::toDisplayString(MatrixDeviceTypes::Type::kMatrix1000),
                      juce::String(MatrixDeviceTypes::kMatrix1000Id));
+        expectEquals(MatrixDeviceTypes::toDisplayString(MatrixDeviceTypes::Type::kMatrix6),
+                     juce::String(MatrixDeviceTypes::kMatrix6FamilyDisplayName));
+        expectEquals(MatrixDeviceTypes::toApvtsString(MatrixDeviceTypes::Type::kMatrix6),
+                     juce::String(MatrixDeviceTypes::kMatrix6Id));
+        expectEquals(MatrixDeviceTypes::toDisplayString(MatrixDeviceTypes::Type::kMatrix6R),
+                     juce::String(MatrixDeviceTypes::kMatrix6RId));
+        expectEquals(MatrixDeviceTypes::toDisplayString(MatrixDeviceTypes::Type::kMatrix6).toUpperCase(),
+                     juce::String("MATRIX-6/6R"));
         expect(juce::String(MatrixDeviceTypes::kUnknownDisplayName)
                != juce::String(MatrixDeviceTypes::kUnknownId));
     }

@@ -274,6 +274,10 @@ private:
     void scheduleMatrix6MasterFallbackTimeout(std::uint64_t token);
     /** Master-fallback timeout body (also invoked from unit tests without waiting 2 s). */
     void onMatrix6MasterFallbackTimeout(std::uint64_t token);
+    /** Master-fallback failure: soft-abort if Matrix-6 family presence, else clear detect. */
+    void finishMatrix6MasterFallbackFailure(std::uint64_t token,
+                                            const juce::String& errorMessage,
+                                            const juce::String& errorType);
     void pollOutboundIdleThenDeviceInquiry(OutboundIdlePollArgs args);
     void scheduleOrSendArmedDeviceInquiry(const OutboundIdlePollArgs& args);
     void finishAsyncDeviceInquirySuccess(std::uint64_t token,

@@ -7,17 +7,36 @@
 namespace Core
 {
 // After Universal Device Inquiry times out: run Master-parameter fallback when the
-// synth is still undetected, or when a port-pair change forced a fresh identity attempt.
-// Soft-abort presence (already detected, same pair) and outbound-busy deferral must not
-// enter fallback — callers gate those paths before invoking this.
+// synth is still undetected, when a port-pair change forced a fresh identity attempt,
+// or when presence heartbeat needs to re-prove an Inquiry-silent Matrix-6 family device.
+// Matrix-1000 presence silence and outbound-busy deferral must not enter fallback —
+// callers gate those paths before invoking this.
 inline bool shouldRunMatrix6MasterFallbackOnInquiryTimeout(
     bool deviceDetected,
-    bool forceMasterPullOnNextInquirySuccess) noexcept
+    bool forceMasterPullOnNextInquirySuccess,
+    MatrixDeviceTypes::Type detectedType) noexcept
 {
     if (! deviceDetected)
         return true;
 
-    return forceMasterPullOnNextInquirySuccess;
+    if (forceMasterPullOnNextInquirySuccess)
+        return true;
+
+    // Presence: Inquiry-silent Matrix-6 / 6R — re-check with Master before soft-abort.
+    return MatrixDeviceTypes::isMatrix6Family(detectedType);
+}
+
+// Master fallback failed: soft-abort (keep detection) only for Matrix-6 family presence
+// re-check. First-connect and port-pair force keep full clear-detect failure.
+inline bool shouldSoftAbortOnMatrix6MasterFallbackFailure(
+    bool deviceDetected,
+    MatrixDeviceTypes::Type detectedType,
+    bool forceMasterPullOnNextInquirySuccess) noexcept
+{
+    if (forceMasterPullOnNextInquirySuccess)
+        return false;
+
+    return deviceDetected && MatrixDeviceTypes::isMatrix6Family(detectedType);
 }
 
 // Master-fallback identity proof: shared Matrix-6 / 6R family, no invented firmware.

@@ -345,16 +345,18 @@ void MidiManager::onDeviceInquiryIdentityTimeout(std::uint64_t token)
 
     const bool wasDetected = static_cast<bool>(
         apvts.state.getProperty("deviceDetected", false));
-    // Soft-abort presence on the same pair; port-pair force runs Master fallback.
+    const auto detectedType = Core::DeviceTypeRegistry::fromApvtsProperty(
+        apvts.state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
+    // Soft-abort Matrix-1000 presence; Matrix-6 family / undetected / port-pair force → Master.
     if (! Core::shouldRunMatrix6MasterFallbackOnInquiryTimeout(
-            wasDetected, forceMasterPullOnNextInquirySuccess_))
+            wasDetected, forceMasterPullOnNextInquirySuccess_, detectedType))
     {
         softAbortDeviceInquiryUnresponsive(token);
         return;
     }
 
     MidiLogger::getInstance().logInfo(
-        "Device Inquiry timed out — trying Matrix-6/6R Master discovery fallback");
+        "Device Inquiry timed out - trying Matrix-6/6R Master fallback");
     sendArmedMatrix6MasterFallback(token);
 }
 

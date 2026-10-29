@@ -5,7 +5,26 @@
 #include "Core/Loggers/MidiLogger.h"
 #include "Core/MIDI/Matrix6MasterFallbackPolicy.h"
 #include "Core/MIDI/Matrix6MasterResponseFilter.h"
+#include "Core/Services/DeviceTypeRegistry.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
+
+void MidiManager::finishMatrix6MasterFallbackFailure(std::uint64_t token,
+                                                     const juce::String& errorMessage,
+                                                     const juce::String& errorType)
+{
+    const bool detected = static_cast<bool>(apvts.state.getProperty("deviceDetected", false));
+    const auto detectedType = Core::DeviceTypeRegistry::fromApvtsProperty(
+        apvts.state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
+
+    if (Core::shouldSoftAbortOnMatrix6MasterFallbackFailure(
+            detected, detectedType, forceMasterPullOnNextInquirySuccess_))
+    {
+        softAbortDeviceInquiryUnresponsive(token);
+        return;
+    }
+
+    finishAsyncDeviceInquiryFailure(token, errorMessage, errorType);
+}
 
 void MidiManager::sendArmedMatrix6MasterFallback(std::uint64_t inquiryToken)
 {
@@ -24,9 +43,9 @@ void MidiManager::sendArmedMatrix6MasterFallback(std::uint64_t inquiryToken)
     if (! isDeviceDumpAvailable() || midiSender == nullptr || ! midiSender->isOutputAvailable()
         || sysExEncoder == nullptr)
     {
-        finishAsyncDeviceInquiryFailure(token,
-                                        "MIDI ports unavailable for Matrix-6/6R Master fallback",
-                                        "Connection");
+        finishMatrix6MasterFallbackFailure(token,
+                                           "MIDI ports unavailable for Matrix-6/6R Master fallback",
+                                           "Connection");
         return;
     }
 
@@ -37,16 +56,16 @@ void MidiManager::sendArmedMatrix6MasterFallback(std::uint64_t inquiryToken)
 
         const auto request = sysExEncoder->encodeRequestMessage(
             SysExConstants::RequestType::kRequestMasterParameters, 0);
-        sendSysExWithDelay(request, "Matrix-6/6R discovery fallback: request Master parameters");
+        sendSysExWithDelay(request, "Matrix-6/6R Master fallback: request Master parameters");
         scheduleMatrix6MasterFallbackTimeout(token);
     }
     catch (const MidiConnectionException& e)
     {
-        finishAsyncDeviceInquiryFailure(token, e.getMessage(), "Connection");
+        finishMatrix6MasterFallbackFailure(token, e.getMessage(), "Connection");
     }
     catch (const std::exception& e)
     {
-        finishAsyncDeviceInquiryFailure(token, e.what(), "SysEx");
+        finishMatrix6MasterFallbackFailure(token, e.what(), "SysEx");
     }
 }
 
@@ -58,9 +77,9 @@ bool MidiManager::armAsyncMatrix6MasterFallbackCapture(std::uint64_t token)
 
     if (midiReceiver == nullptr)
     {
-        finishAsyncDeviceInquiryFailure(token,
-                                        "MIDI input unavailable for Matrix-6/6R Master fallback",
-                                        "Connection");
+        finishMatrix6MasterFallbackFailure(token,
+                                           "MIDI input unavailable for Matrix-6/6R Master fallback",
+                                           "Connection");
         return false;
     }
 
@@ -132,9 +151,9 @@ void MidiManager::onMatrix6MasterFallbackTimeout(std::uint64_t token)
         "Timeout waiting for Matrix-6/6R Master fallback ("
         + juce::String(SysExConstants::kDefaultTimeoutMs) + "ms)");
 
-    finishAsyncDeviceInquiryFailure(token,
-                                    Core::matrix6MasterFallbackTimeoutFailureMessage(),
-                                    "Timeout");
+    finishMatrix6MasterFallbackFailure(token,
+                                       Core::matrix6MasterFallbackTimeoutFailureMessage(),
+                                       "Timeout");
 }
 
 void MidiManager::scheduleMatrix6MasterFallbackTimeout(std::uint64_t token)

@@ -46,7 +46,10 @@ public:
     void runTest() override
     {
         testUndetectedTimeoutStartsFallbackWithoutPorts();
-        testSoftAbortPresenceSkipsFallback();
+        testMatrix1000PresenceSoftAborts();
+        testMatrix6FamilyPresenceStartsFallbackWithoutPorts();
+        testMatrix6FamilyPresenceMasterFailureSoftAborts();
+        testMatrix6FamilyPresenceMasterSuccessClearsUnresponsive();
         testPortPairForceStartsFallbackWithoutPorts();
         testFallbackSuccessPreservesEpromAndEmptyVersion();
         testLateInquiryTokenIgnoredAfterFallbackStarts();
@@ -78,9 +81,9 @@ private:
                "Failed fallback must leave device undetected");
     }
 
-    void testSoftAbortPresenceSkipsFallback()
+    void testMatrix1000PresenceSoftAborts()
     {
-        beginTest("Already detected on same pair — soft-abort, no Master fallback");
+        beginTest("Detected Matrix-1000 on same pair — soft-abort, no Master fallback");
 
         Core::MidiOutboundQueue queue;
         Core::MidiActivityTracker tracker;
@@ -105,6 +108,101 @@ private:
                "Soft-abort must not publish Master-fallback failure");
     }
 
+    void testMatrix6FamilyPresenceStartsFallbackWithoutPorts()
+    {
+        beginTest("Detected Matrix-6 family + Inquiry timeout — Master presence re-check runs");
+
+        Core::MidiOutboundQueue queue;
+        Core::MidiActivityTracker tracker;
+        MidiManagerTestSupport::MinimalAudioProcessor proc;
+        MidiManager manager(proc.apvts, queue, tracker);
+
+        proc.apvts.state.setProperty("deviceDetected", true, nullptr);
+        proc.apvts.state.setProperty(MatrixDeviceTypes::kApvtsPropertyName,
+                                      MatrixDeviceTypes::kMatrix6Id,
+                                      nullptr);
+        manager.forceMasterPullOnNextInquirySuccess_ = false;
+        manager.asyncRequestToken_.store(6, std::memory_order_release);
+
+        manager.onDeviceInquiryIdentityTimeout(6);
+
+        // Inquiry soft-abort alone would leave token at 7; Master arm bumps then soft-abort -> 8.
+        expectEquals(static_cast<int>(manager.asyncRequestToken_.load(std::memory_order_acquire)),
+                     8);
+        expect(static_cast<bool>(proc.apvts.state.getProperty("deviceDetected", false)),
+               "Presence Master failure must keep detection");
+        expect(static_cast<bool>(
+                   proc.apvts.state.getProperty(Core::kDeviceMidiUnresponsiveProperty, false)),
+               "Presence Master failure (no ports) must soft-abort unresponsive");
+        expect(! proc.apvts.state.getProperty("lastError").toString().containsIgnoreCase("Master"),
+               "Presence Master failure must not clear-detect with Master error copy");
+    }
+
+    void testMatrix6FamilyPresenceMasterFailureSoftAborts()
+    {
+        beginTest("Detected Matrix-6 + Master timeout — soft-abort, keep detection");
+
+        Core::MidiOutboundQueue queue;
+        Core::MidiActivityTracker tracker;
+        MidiManagerTestSupport::MinimalAudioProcessor proc;
+        MidiManager manager(proc.apvts, queue, tracker);
+
+        proc.apvts.state.setProperty("deviceDetected", true, nullptr);
+        proc.apvts.state.setProperty(MatrixDeviceTypes::kApvtsPropertyName,
+                                      MatrixDeviceTypes::kMatrix6Id,
+                                      nullptr);
+        manager.forceMasterPullOnNextInquirySuccess_ = false;
+        manager.asyncRequestToken_.store(7, std::memory_order_release);
+
+        manager.onMatrix6MasterFallbackTimeout(7);
+
+        expect(static_cast<bool>(proc.apvts.state.getProperty("deviceDetected", false)),
+               "Presence Master timeout must keep detection");
+        expectEquals(proc.apvts.state.getProperty(MatrixDeviceTypes::kApvtsPropertyName).toString(),
+                     juce::String(MatrixDeviceTypes::kMatrix6Id));
+        expect(static_cast<bool>(
+                   proc.apvts.state.getProperty(Core::kDeviceMidiUnresponsiveProperty, false)),
+               "Presence Master timeout must soft-abort unresponsive");
+        expect(! proc.apvts.state.getProperty("lastError").toString().containsIgnoreCase("Master"),
+               "Presence Master timeout must not publish clear-detect failure");
+    }
+
+    void testMatrix6FamilyPresenceMasterSuccessClearsUnresponsive()
+    {
+        beginTest("Detected Matrix-6 + valid Master — stay unlocked, clear unresponsive");
+
+        Core::MidiOutboundQueue queue;
+        Core::MidiActivityTracker tracker;
+        MidiManagerTestSupport::MinimalAudioProcessor proc;
+        MidiManager manager(proc.apvts, queue, tracker);
+
+        constexpr int kStoredEprom = PluginIDs::Settings::EpromType::kTauntek;
+        proc.apvts.state.setProperty("deviceDetected", true, nullptr);
+        proc.apvts.state.setProperty(MatrixDeviceTypes::kApvtsPropertyName,
+                                      MatrixDeviceTypes::kMatrix6Id,
+                                      nullptr);
+        proc.apvts.state.setProperty(PluginIDs::Settings::kEpromType, kStoredEprom, nullptr);
+        proc.apvts.state.setProperty(Core::kDeviceMidiUnresponsiveProperty, true, nullptr);
+        manager.forceMasterPullOnNextInquirySuccess_ = false;
+        manager.asyncRequestToken_.store(8, std::memory_order_release);
+
+        const auto frame = makeMatrix6MasterFrame(SysExConstants::kMatrix6MasterMessageLengthMin);
+        manager.handleAsyncMatrix6MasterFallbackResponse(8, frame);
+
+        expect(static_cast<bool>(proc.apvts.state.getProperty("deviceDetected", false)));
+        expectEquals(proc.apvts.state.getProperty(MatrixDeviceTypes::kApvtsPropertyName).toString(),
+                     MatrixDeviceTypes::toApvtsString(MatrixDeviceTypes::Type::kMatrix6));
+        expect(! static_cast<bool>(
+                   proc.apvts.state.getProperty(Core::kDeviceMidiUnresponsiveProperty, true)),
+               "Presence Master success must clear unresponsive");
+        expect(proc.apvts.state.getProperty("deviceVersion").toString().isEmpty(),
+               "Presence Master success must not invent firmware");
+        expectEquals(static_cast<int>(proc.apvts.state.getProperty(PluginIDs::Settings::kEpromType)),
+                     kStoredEprom);
+        expect(! Core::isSectionLocked(
+                   true, MatrixDeviceTypes::Type::kMatrix6, false, false));
+    }
+
     void testPortPairForceStartsFallbackWithoutPorts()
     {
         beginTest("Port-pair force + Inquiry timeout — Master fallback runs");
@@ -115,6 +213,9 @@ private:
         MidiManager manager(proc.apvts, queue, tracker);
 
         proc.apvts.state.setProperty("deviceDetected", true, nullptr);
+        proc.apvts.state.setProperty(MatrixDeviceTypes::kApvtsPropertyName,
+                                      MatrixDeviceTypes::kMatrix6Id,
+                                      nullptr);
         manager.forceMasterPullOnNextInquirySuccess_ = true;
         manager.asyncRequestToken_.store(9, std::memory_order_release);
 
@@ -125,6 +226,8 @@ private:
         expect(! static_cast<bool>(
                    proc.apvts.state.getProperty(Core::kDeviceMidiUnresponsiveProperty, false)),
                "Port-pair fallback path must not soft-abort as unresponsive");
+        expect(! static_cast<bool>(proc.apvts.state.getProperty("deviceDetected", true)),
+               "Port-pair Master failure must clear detection");
     }
 
     void testFallbackSuccessPreservesEpromAndEmptyVersion()
@@ -219,7 +322,8 @@ private:
         expect(! proc.apvts.state.getProperty("lastError").toString().containsIgnoreCase(
                        "Device Inquiry, then Master"),
                "Inquiry success must not publish Master-discovery-fallback timeout copy");
-        expect(! Core::shouldRunMatrix6MasterFallbackOnInquiryTimeout(true, false),
+        expect(! Core::shouldRunMatrix6MasterFallbackOnInquiryTimeout(
+                       true, false, MatrixDeviceTypes::Type::kMatrix1000),
                "After M-1000 detect, presence timeout must soft-abort, not Master-fallback");
     }
 

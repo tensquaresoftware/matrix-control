@@ -13,8 +13,11 @@ public:
     void runTest() override
     {
         testUndetectedTimeoutRunsFallback();
-        testSoftAbortPresenceSkipsFallback();
+        testMatrix1000PresenceSkipsFallback();
+        testMatrix6FamilyPresenceRunsFallback();
         testPortPairForceRunsFallback();
+        testSoftAbortOnPresenceMasterFailure();
+        testClearDetectOnDiscoveryMasterFailure();
         testMatrix1000PullOnConnectStillAllowed();
         testFallbackFamilyDoesNotArmMasterPull();
         testFallbackSuccessIdentity();
@@ -28,22 +31,60 @@ private:
     {
         beginTest("Inquiry timeout while undetected — Master fallback runs");
 
-        expect(Core::shouldRunMatrix6MasterFallbackOnInquiryTimeout(false, false));
-        expect(Core::shouldRunMatrix6MasterFallbackOnInquiryTimeout(false, true));
+        expect(Core::shouldRunMatrix6MasterFallbackOnInquiryTimeout(
+            false, false, MatrixDeviceTypes::Type::kUnknown));
+        expect(Core::shouldRunMatrix6MasterFallbackOnInquiryTimeout(
+            false, true, MatrixDeviceTypes::Type::kUnknown));
     }
 
-    void testSoftAbortPresenceSkipsFallback()
+    void testMatrix1000PresenceSkipsFallback()
     {
-        beginTest("Already detected on same pair — soft-abort, no Master fallback");
+        beginTest("Detected Matrix-1000 on same pair — soft-abort, no Master fallback");
 
-        expect(! Core::shouldRunMatrix6MasterFallbackOnInquiryTimeout(true, false));
+        expect(! Core::shouldRunMatrix6MasterFallbackOnInquiryTimeout(
+            true, false, MatrixDeviceTypes::Type::kMatrix1000));
+    }
+
+    void testMatrix6FamilyPresenceRunsFallback()
+    {
+        beginTest("Detected Matrix-6 family on same pair — Master presence re-check runs");
+
+        expect(Core::shouldRunMatrix6MasterFallbackOnInquiryTimeout(
+            true, false, MatrixDeviceTypes::Type::kMatrix6));
+        expect(Core::shouldRunMatrix6MasterFallbackOnInquiryTimeout(
+            true, false, MatrixDeviceTypes::Type::kMatrix6R));
     }
 
     void testPortPairForceRunsFallback()
     {
         beginTest("Port-pair change force flag + Inquiry timeout — Master fallback runs");
 
-        expect(Core::shouldRunMatrix6MasterFallbackOnInquiryTimeout(true, true));
+        expect(Core::shouldRunMatrix6MasterFallbackOnInquiryTimeout(
+            true, true, MatrixDeviceTypes::Type::kMatrix1000));
+        expect(Core::shouldRunMatrix6MasterFallbackOnInquiryTimeout(
+            true, true, MatrixDeviceTypes::Type::kMatrix6));
+    }
+
+    void testSoftAbortOnPresenceMasterFailure()
+    {
+        beginTest("Matrix-6 family presence Master failure — soft-abort, keep detection");
+
+        expect(Core::shouldSoftAbortOnMatrix6MasterFallbackFailure(
+            true, MatrixDeviceTypes::Type::kMatrix6, false));
+        expect(Core::shouldSoftAbortOnMatrix6MasterFallbackFailure(
+            true, MatrixDeviceTypes::Type::kMatrix6R, false));
+        expect(! Core::shouldSoftAbortOnMatrix6MasterFallbackFailure(
+            true, MatrixDeviceTypes::Type::kMatrix1000, false));
+    }
+
+    void testClearDetectOnDiscoveryMasterFailure()
+    {
+        beginTest("Undetected or port-pair force Master failure — clear detect, not soft-abort");
+
+        expect(! Core::shouldSoftAbortOnMatrix6MasterFallbackFailure(
+            false, MatrixDeviceTypes::Type::kUnknown, false));
+        expect(! Core::shouldSoftAbortOnMatrix6MasterFallbackFailure(
+            true, MatrixDeviceTypes::Type::kMatrix6, true));
     }
 
     void testMatrix1000PullOnConnectStillAllowed()
@@ -53,7 +94,8 @@ private:
         expect(Core::shouldPullMasterAfterDeviceInquirySuccess(
             false, MatrixDeviceTypes::Type::kUnknown, MatrixDeviceTypes::Type::kMatrix1000));
         // Inquiry success never evaluates the Inquiry-timeout fallback helper.
-        expect(Core::shouldRunMatrix6MasterFallbackOnInquiryTimeout(false, false));
+        expect(Core::shouldRunMatrix6MasterFallbackOnInquiryTimeout(
+            false, false, MatrixDeviceTypes::Type::kUnknown));
     }
 
     void testFallbackFamilyDoesNotArmMasterPull()
