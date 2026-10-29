@@ -12,6 +12,7 @@ public:
 
     void runTest() override
     {
+        testMasterOnlyPresenceProofPolicy();
         testUndetectedTimeoutRunsFallback();
         testMatrix1000PresenceSkipsFallback();
         testMatrix6FamilyPresenceRunsFallback();
@@ -27,6 +28,27 @@ public:
     }
 
 private:
+    void testMasterOnlyPresenceProofPolicy()
+    {
+        beginTest("Detected Matrix-6 family — Master-only presence; others keep Inquiry-first");
+
+        expect(Core::shouldSendMasterOnlyPresenceProof(
+            true, MatrixDeviceTypes::Type::kMatrix6));
+        expect(Core::shouldSendMasterOnlyPresenceProof(
+            true, MatrixDeviceTypes::Type::kMatrix6R));
+        expect(! Core::shouldSendMasterOnlyPresenceProof(
+            true, MatrixDeviceTypes::Type::kMatrix1000));
+        expect(! Core::shouldSendMasterOnlyPresenceProof(
+            true, MatrixDeviceTypes::Type::kUnknown));
+        expect(! Core::shouldSendMasterOnlyPresenceProof(
+            false, MatrixDeviceTypes::Type::kMatrix6));
+        expect(! Core::shouldSendMasterOnlyPresenceProof(
+            false, MatrixDeviceTypes::Type::kUnknown));
+        expect(! Core::shouldSendMasterOnlyPresenceProof(
+            true, MatrixDeviceTypes::Type::kMatrix6, true),
+               "Port-pair force must keep Inquiry-first");
+    }
+
     void testUndetectedTimeoutRunsFallback()
     {
         beginTest("Inquiry timeout while undetected — Master fallback runs");

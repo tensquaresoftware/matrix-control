@@ -50,6 +50,8 @@ public:
         testMatrix6FamilyPresenceStartsFallbackWithoutPorts();
         testMatrix6FamilyPresenceMasterFailureSoftAborts();
         testMatrix6FamilyPresenceMasterSuccessClearsUnresponsive();
+        testMasterOnlyPresenceProofWithoutPortsClearsDetect();
+        testMasterOnlyPresenceEligibilitySkipsForceAndMatrix1000();
         testPortPairForceStartsFallbackWithoutPorts();
         testFallbackSuccessPreservesEpromAndEmptyVersion();
         testLateInquiryTokenIgnoredAfterFallbackStarts();
@@ -165,6 +167,64 @@ private:
                "Presence Master timeout must soft-abort unresponsive");
         expect(! proc.apvts.state.getProperty("lastError").toString().containsIgnoreCase("Master"),
                "Presence Master timeout must not publish clear-detect failure");
+    }
+
+    void testMasterOnlyPresenceProofWithoutPortsClearsDetect()
+    {
+        beginTest("Master-only presence proof without ports — clear detect (same as Inquiry start)");
+
+        Core::MidiOutboundQueue queue;
+        Core::MidiActivityTracker tracker;
+        MidiManagerTestSupport::MinimalAudioProcessor proc;
+        MidiManager manager(proc.apvts, queue, tracker);
+
+        proc.apvts.state.setProperty("deviceDetected", true, nullptr);
+        proc.apvts.state.setProperty(MatrixDeviceTypes::kApvtsPropertyName,
+                                      MatrixDeviceTypes::kMatrix6Id,
+                                      nullptr);
+        manager.asyncRequestToken_.store(12, std::memory_order_release);
+
+        manager.performMatrix6MasterPresenceProof();
+
+        expect(! static_cast<bool>(proc.apvts.state.getProperty("deviceDetected", true)),
+               "Defensive no-ports Master presence start must clear detect");
+        expect(proc.apvts.state.getProperty("lastError").toString().containsIgnoreCase("Master"),
+               "Defensive no-ports path must report Master presence connection failure");
+        expectEquals(proc.apvts.state.getProperty("errorType").toString(), juce::String("Connection"));
+    }
+
+    void testMasterOnlyPresenceEligibilitySkipsForceAndMatrix1000()
+    {
+        beginTest("Master-only eligibility — Matrix-6 yes; Matrix-1000 / port-pair force no");
+
+        Core::MidiOutboundQueue queue;
+        Core::MidiActivityTracker tracker;
+        MidiManagerTestSupport::MinimalAudioProcessor proc;
+        MidiManager manager(proc.apvts, queue, tracker);
+
+        proc.apvts.state.setProperty("deviceDetected", true, nullptr);
+        proc.apvts.state.setProperty(MatrixDeviceTypes::kApvtsPropertyName,
+                                      MatrixDeviceTypes::kMatrix6Id,
+                                      nullptr);
+        manager.forceMasterPullOnNextInquirySuccess_ = false;
+
+        // No ports → Master start clears detect; eligibility must still return true first.
+        expect(manager.tryStartMasterOnlyPresenceProofIfEligible(),
+               "Detected Matrix-6 without force must take Master-only presence");
+
+        proc.apvts.state.setProperty("deviceDetected", true, nullptr);
+        proc.apvts.state.setProperty(MatrixDeviceTypes::kApvtsPropertyName,
+                                      MatrixDeviceTypes::kMatrix1000Id,
+                                      nullptr);
+        expect(! manager.tryStartMasterOnlyPresenceProofIfEligible(),
+               "Detected Matrix-1000 must keep Inquiry-first presence");
+
+        proc.apvts.state.setProperty(MatrixDeviceTypes::kApvtsPropertyName,
+                                      MatrixDeviceTypes::kMatrix6Id,
+                                      nullptr);
+        manager.forceMasterPullOnNextInquirySuccess_ = true;
+        expect(! manager.tryStartMasterOnlyPresenceProofIfEligible(),
+               "Port-pair force must keep Inquiry-first even when Matrix-6 detected");
     }
 
     void testMatrix6FamilyPresenceMasterSuccessClearsUnresponsive()

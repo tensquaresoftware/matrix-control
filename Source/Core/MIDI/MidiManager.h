@@ -264,6 +264,10 @@ private:
     void clearLastInquiryPortPair() noexcept;
     void updateDevicePresenceMonitoring();
     void onDevicePresenceTimer();
+    /** Detected Matrix-6/6R presence: start Master proof; false = keep Inquiry-first. */
+    bool tryStartMasterOnlyPresenceProofIfEligible();
+    /** Detected Matrix-6/6R presence tick: Master proof without Device Inquiry. */
+    void performMatrix6MasterPresenceProof();
     bool armAsyncDeviceInquiryCapture(std::uint64_t token);
     void handleAsyncDeviceInquiryResponse(std::uint64_t token, const juce::MemoryBlock& response);
     void sendArmedDeviceInquiry(std::uint64_t token);

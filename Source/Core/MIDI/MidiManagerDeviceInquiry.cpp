@@ -88,12 +88,16 @@ void MidiManager::onDevicePresenceTimer()
         return;
     }
 
-    // Skip while any shared async SysEx capture is active — performDeviceInquiry cancels it.
+    // Skip while any shared async SysEx capture is active — Inquiry / Master start cancel it.
     if (asyncSysExCaptureActive_.load(std::memory_order_acquire) || pendingAsyncCallback_ != nullptr)
         return;
 
     lastInquiryInputId_ = inputId;
     lastInquiryOutputId_ = outputId;
+
+    if (tryStartMasterOnlyPresenceProofIfEligible())
+        return;
+
     performDeviceInquiry();
 }
 

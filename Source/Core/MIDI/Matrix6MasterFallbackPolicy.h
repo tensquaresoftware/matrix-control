@@ -6,9 +6,23 @@
 
 namespace Core
 {
+// Periodic presence for an already-detected Matrix-6 / 6R: prove with Master only
+// (skip Universal Device Inquiry). Discovery, port-pair force, and Matrix-1000
+// presence stay Inquiry-first.
+inline bool shouldSendMasterOnlyPresenceProof(
+    bool deviceDetected,
+    MatrixDeviceTypes::Type detectedType,
+    bool forceMasterPullOnNextInquirySuccess = false) noexcept
+{
+    if (forceMasterPullOnNextInquirySuccess)
+        return false;
+
+    return deviceDetected && MatrixDeviceTypes::isMatrix6Family(detectedType);
+}
+
 // After Universal Device Inquiry times out: run Master-parameter fallback when the
 // synth is still undetected, when a port-pair change forced a fresh identity attempt,
-// or when presence heartbeat needs to re-prove an Inquiry-silent Matrix-6 family device.
+// or when Inquiry still ran against a Matrix-6 family device (e.g. port-pair force).
 // Matrix-1000 presence silence and outbound-busy deferral must not enter fallback —
 // callers gate those paths before invoking this.
 inline bool shouldRunMatrix6MasterFallbackOnInquiryTimeout(
@@ -22,7 +36,7 @@ inline bool shouldRunMatrix6MasterFallbackOnInquiryTimeout(
     if (forceMasterPullOnNextInquirySuccess)
         return true;
 
-    // Presence: Inquiry-silent Matrix-6 / 6R — re-check with Master before soft-abort.
+    // Inquiry-silent Matrix-6 / 6R (e.g. forced Inquiry while still detected).
     return MatrixDeviceTypes::isMatrix6Family(detectedType);
 }
 

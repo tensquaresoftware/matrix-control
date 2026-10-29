@@ -5,8 +5,53 @@
 #include "Core/Loggers/MidiLogger.h"
 #include "Core/MIDI/Matrix6MasterFallbackPolicy.h"
 #include "Core/MIDI/Matrix6MasterResponseFilter.h"
+#include "Core/MIDI/Queue/SysExDelayProfile.h"
 #include "Core/Services/DeviceTypeRegistry.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
+
+bool MidiManager::tryStartMasterOnlyPresenceProofIfEligible()
+{
+    const bool detected = static_cast<bool>(apvts.state.getProperty("deviceDetected", false));
+    const auto detectedType = Core::DeviceTypeRegistry::fromApvtsProperty(
+        apvts.state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
+
+    if (! Core::shouldSendMasterOnlyPresenceProof(
+            detected, detectedType, forceMasterPullOnNextInquirySuccess_))
+        return false;
+
+    performMatrix6MasterPresenceProof();
+    return true;
+}
+
+void MidiManager::performMatrix6MasterPresenceProof()
+{
+    cancelPendingSysExRequest();
+
+    if (! isDeviceDumpAvailable() || midiSender == nullptr || ! midiSender->isOutputAvailable())
+    {
+        clearLastInquiryPortPair();
+        sysExDelay_.setProfile(Core::SysExDelayProfile::stockDefault());
+        updateDeviceStatus(false);
+        updateErrorState("MIDI ports not available for Matrix-6/6R Master presence", "Connection");
+        return;
+    }
+
+    // Inquiry settles on outbound idle; Master-only must not slam a busy wire —
+    // next presence tick retries (avoid false unresponsive during editor SysEx).
+    if (! isOutboundQueueIdle())
+    {
+        MidiLogger::getInstance().logInfo(
+            "Matrix-6/6R Master presence deferred: outbound MIDI queue still busy");
+        return;
+    }
+
+    asyncSysExCaptureActive_.store(true, std::memory_order_release);
+
+    const auto token = asyncRequestToken_.load(std::memory_order_acquire);
+    MidiLogger::getInstance().logInfo(
+        "Matrix-6/6R presence — Master proof (skip Device Inquiry)");
+    sendArmedMatrix6MasterFallback(token);
+}
 
 void MidiManager::finishMatrix6MasterFallbackFailure(std::uint64_t token,
                                                      const juce::String& errorMessage,
