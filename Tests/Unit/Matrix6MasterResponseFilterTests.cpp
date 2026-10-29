@@ -30,6 +30,7 @@ public:
         testRejects351And477AndWrongOpcode();
         testRejectsWrongHeaderAndMissingEox();
         testFilterKeepsArmedUntilValidMaster();
+        testReceiveLogAnalysisLabelsMatrix6Only();
     }
 
 private:
@@ -60,6 +61,29 @@ private:
         expect(! Core::isMatrix6MasterParameterDump(
             makeFrame(SysExConstants::kMatrix6MasterMessageLengthMax,
                       0x0B)));
+    }
+
+    void testReceiveLogAnalysisLabelsMatrix6Only()
+    {
+        beginTest("matrix6MasterDumpReceiveLogAnalysis — labels 478/479; empty for M-1000 351");
+
+        const auto matrix6 = makeFrame(SysExConstants::kMatrix6MasterMessageLengthMin,
+                                       SysExConstants::Opcode::kMasterParameterData);
+        const auto analysis = Core::matrix6MasterDumpReceiveLogAnalysis(matrix6);
+        expect(analysis.isNotEmpty());
+        expect(analysis.contains("Matrix-6/6R Master dump"));
+        expect(analysis.contains("Checksum: 0x"));
+        expect(! analysis.contains("Valid"),
+               "Discovery dump label must not claim full M-1000-style validation");
+
+        const auto matrix6Alt = makeFrame(SysExConstants::kMatrix6MasterMessageLengthMax,
+                                          SysExConstants::Opcode::kMasterParameterData);
+        expect(Core::matrix6MasterDumpReceiveLogAnalysis(matrix6Alt).isNotEmpty());
+
+        const auto m1000 = makeFrame(SysExConstants::kMasterMessageLength,
+                                     SysExConstants::Opcode::kMasterParameterData);
+        expect(Core::matrix6MasterDumpReceiveLogAnalysis(m1000).isEmpty(),
+               "M-1000 Master 351 must not use the Matrix-6 receive-log label");
     }
 
     void testRejectsWrongHeaderAndMissingEox()

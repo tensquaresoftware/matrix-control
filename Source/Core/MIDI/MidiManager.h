@@ -275,6 +275,8 @@ private:
     /** Inquiry identity timeout body (also invoked from unit tests without waiting 2 s). */
     void onDeviceInquiryIdentityTimeout(std::uint64_t token);
     void sendArmedMatrix6MasterFallback(std::uint64_t token);
+    /** After token claim + port gate: arm capture, send Master request, schedule timeout. */
+    void dispatchArmedMatrix6MasterFallback(std::uint64_t token);
     bool armAsyncMatrix6MasterFallbackCapture(std::uint64_t token);
     void handleAsyncMatrix6MasterFallbackResponse(std::uint64_t token,
                                                   const juce::MemoryBlock& response);

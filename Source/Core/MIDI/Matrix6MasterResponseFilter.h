@@ -23,4 +23,19 @@ inline bool isMatrix6MasterParameterDump(const juce::MemoryBlock& sysex) noexcep
            && data[3] == SysExConstants::Opcode::kMasterParameterData
            && data[size - 1] == SysExConstants::kSysExEnd;
 }
+
+// Receive-log label for a Matrix-6/6R Master dump (structural match only — no
+// checksum verify). Empty when the frame is not that dump; an empty return means
+// the caller may fall through to Matrix-1000 validateSysEx (which ERROR-logs on
+// length mismatch). A non-empty return must skip validateSysEx to avoid a false ERROR.
+inline juce::String matrix6MasterDumpReceiveLogAnalysis(const juce::MemoryBlock& sysex)
+{
+    if (! isMatrix6MasterParameterDump(sysex))
+        return {};
+
+    const auto* data = static_cast<const juce::uint8*>(sysex.getData());
+    const auto checksum = data[sysex.getSize() - 2];
+    return "Matrix-6/6R Master dump received | Checksum: 0x"
+           + juce::String::toHexString(checksum).paddedLeft('0', 2).toUpperCase();
+}
 } // namespace Core

@@ -27,6 +27,7 @@ public:
         testMissingStartByte();
         testWrongManufacturer();
         testDeviceIdMessage();
+        testMasterLengthMatrix1000VsMatrix6();
     }
 
 private:
@@ -161,6 +162,42 @@ private:
         expect(result.isValid, "Valid Device ID message should pass validation");
         expect(result.messageType == SysExParser::MessageType::kDeviceId,
                "Message type should be DeviceId");
+    }
+
+    void testMasterLengthMatrix1000VsMatrix6()
+    {
+        beginTest("Master length — M-1000 351 still type-valid; Matrix-6 478 fails M-1000 length");
+
+        auto makeMasterFrame = [](size_t length)
+        {
+            juce::MemoryBlock block(length, true);
+            auto* data = static_cast<juce::uint8*>(block.getData());
+            data[0] = SysExConstants::kSysExStart;
+            data[1] = SysExConstants::kManufacturerIdOberheim;
+            data[2] = SysExConstants::kDeviceIdMatrix1000;
+            data[3] = SysExConstants::Opcode::kMasterParameterData;
+            data[length - 1] = SysExConstants::kSysExEnd;
+            return block;
+        };
+
+        SysExParser parser;
+
+        const auto m1000 = makeMasterFrame(SysExConstants::kMasterMessageLength);
+        const auto m1000Type = parser.validateMessageType(m1000);
+        expect(m1000Type.isValid, "Matrix-1000 Master length 351 must remain type-valid");
+        expect(m1000Type.messageType == SysExParser::MessageType::kMaster);
+
+        const auto matrix6Min = makeMasterFrame(SysExConstants::kMatrix6MasterMessageLengthMin);
+        const auto matrix6MinType = parser.validateMessageType(matrix6Min);
+        expect(! matrix6MinType.isValid,
+               "Matrix-6 Master 478 must not pass Matrix-1000 length validation");
+        expect(matrix6MinType.errorMessage.contains("Invalid message length"));
+
+        const auto matrix6Max = makeMasterFrame(SysExConstants::kMatrix6MasterMessageLengthMax);
+        const auto matrix6MaxType = parser.validateMessageType(matrix6Max);
+        expect(! matrix6MaxType.isValid,
+               "Matrix-6 Master 479 must not pass Matrix-1000 length validation");
+        expect(matrix6MaxType.errorMessage.contains("Invalid message length"));
     }
 };
 

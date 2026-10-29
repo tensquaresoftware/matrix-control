@@ -2754,3 +2754,24 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-settings-presence-check.md`
   summary: Add PropertiesFile load/save round-trip coverage for `writePresenceCheck` / machine key.
   evidence: seedApvtsState + applyPresenceCheck are tested; file I/O path for the new key is not.
+
+## Deferred from: review of spec-silence-false-error-matrix-6-master.md (2026-10-29)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-silence-false-error-matrix-6-master.md`
+  summary: No unit test drives MidiLogger::analyzeSysExMessage / logSysExReceived to assert the false ERROR string is absent for a 478/479 Master dump.
+  evidence: Blind Hunter; helper covers the short-circuit label; full logger path needs log-capture infrastructure not present in the suite.
+- source_spec: `_bmad-output/implementation-artifacts/spec-silence-false-error-matrix-6-master.md`
+  summary: Matrix-6 Master fallback success still calls logSysExReceived twice (MidiReceiver then fallback handler), producing two identical analysis lines.
+  evidence: Blind Hunter; pre-existing double receive-log; silencing ERROR does not require consolidating logs.
+
+## Deferred from: code review of spec-matrix-6-master-only-presence.md + spec-silence-false-error-matrix-6-master.md (2026-10-29)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-matrix-6-master-only-presence.md`
+  summary: `onDevicePresenceTimer` Master-only branch is not exercised end-to-end; tests call eligibility / perform helpers directly.
+  evidence: Combined review Blind Hunter + Verification Gap; dual-port timer path not driven by current MidiManager unit fixtures.
+- source_spec: `_bmad-output/implementation-artifacts/spec-matrix-6-master-only-presence.md`
+  summary: Outbound-busy deferral in `performMatrix6MasterPresenceProof` has no unit test past the no-ports guard.
+  evidence: Combined review Blind Hunter + Verification Gap; same dump-available / dual-port fixture gap.
+- source_spec: `_bmad-output/implementation-artifacts/spec-silence-false-error-matrix-6-master.md`
+  summary: Reconfirmed — MidiLogger receive-log ERROR-absence still untested at call site; double `logSysExReceived` still pre-existing.
+  evidence: Combined review Verification Gap; already deferred earlier the same day.

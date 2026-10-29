@@ -25,10 +25,9 @@ bool MidiManager::tryStartMasterOnlyPresenceProofIfEligible()
 
 void MidiManager::performMatrix6MasterPresenceProof()
 {
-    cancelPendingSysExRequest();
-
     if (! isDeviceDumpAvailable() || midiSender == nullptr || ! midiSender->isOutputAvailable())
     {
+        cancelPendingSysExRequest();
         clearLastInquiryPortPair();
         sysExDelay_.setProfile(Core::SysExDelayProfile::stockDefault());
         updateDeviceStatus(false);
@@ -36,14 +35,15 @@ void MidiManager::performMatrix6MasterPresenceProof()
         return;
     }
 
-    // Inquiry settles on outbound idle; Master-only must not slam a busy wire —
-    // next presence tick retries (avoid false unresponsive during editor SysEx).
+    // Defer without cancelling in-flight editor SysEx — next presence tick retries.
     if (! isOutboundQueueIdle())
     {
         MidiLogger::getInstance().logInfo(
             "Matrix-6/6R Master presence deferred: outbound MIDI queue still busy");
         return;
     }
+
+    cancelPendingSysExRequest();
 
     asyncSysExCaptureActive_.store(true, std::memory_order_release);
 
@@ -78,7 +78,11 @@ void MidiManager::sendArmedMatrix6MasterFallback(std::uint64_t inquiryToken)
     if (! asyncRequestToken_.compare_exchange_strong(expected,
                                                     inquiryToken + 1,
                                                     std::memory_order_acq_rel))
+    {
+        // Caller may have set asyncSysExCaptureActive_ before arming — do not leave it stuck.
+        asyncSysExCaptureActive_.store(false, std::memory_order_release);
         return;
+    }
 
     const std::uint64_t token = inquiryToken + 1;
 
@@ -94,10 +98,19 @@ void MidiManager::sendArmedMatrix6MasterFallback(std::uint64_t inquiryToken)
         return;
     }
 
+    dispatchArmedMatrix6MasterFallback(token);
+}
+
+void MidiManager::dispatchArmedMatrix6MasterFallback(std::uint64_t token)
+{
     try
     {
         if (! armAsyncMatrix6MasterFallbackCapture(token))
+        {
+            // finish* clears when it runs; stale-token silent false must not leave capture stuck.
+            asyncSysExCaptureActive_.store(false, std::memory_order_release);
             return;
+        }
 
         const auto request = sysExEncoder->encodeRequestMessage(
             SysExConstants::RequestType::kRequestMasterParameters, 0);

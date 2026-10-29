@@ -55,6 +55,7 @@ public:
         testPortPairForceStartsFallbackWithoutPorts();
         testFallbackSuccessPreservesEpromAndEmptyVersion();
         testLateInquiryTokenIgnoredAfterFallbackStarts();
+        testStaleMasterArmClearsAsyncCaptureFlag();
         testMasterFallbackTimeoutFailureMessage();
         testMatrix1000InquirySuccessSkipsFallback();
         testPortPairForceFallbackSuccess();
@@ -335,6 +336,26 @@ private:
         expect(! Core::isMatrix6MasterFallbackTokenCurrent(
                    20, manager.asyncRequestToken_.load(std::memory_order_acquire)),
                "Fallback must bump the async token so late Inquiry callbacks no-op");
+    }
+
+    void testStaleMasterArmClearsAsyncCaptureFlag()
+    {
+        beginTest("Stale Master arm token — clears async capture so presence can retry");
+
+        Core::MidiOutboundQueue queue;
+        Core::MidiActivityTracker tracker;
+        MidiManagerTestSupport::MinimalAudioProcessor proc;
+        MidiManager manager(proc.apvts, queue, tracker);
+
+        manager.asyncRequestToken_.store(30, std::memory_order_release);
+        manager.asyncSysExCaptureActive_.store(true, std::memory_order_release);
+
+        manager.sendArmedMatrix6MasterFallback(29);
+
+        expect(! manager.asyncSysExCaptureActive_.load(std::memory_order_acquire),
+               "Failed Master arm must not leave presence capture stuck");
+        expectEquals(static_cast<int>(manager.asyncRequestToken_.load(std::memory_order_acquire)),
+                     30);
     }
 
     void testMasterFallbackTimeoutFailureMessage()

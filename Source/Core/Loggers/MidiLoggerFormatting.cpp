@@ -1,5 +1,6 @@
 #include "MidiLogger.h"
 
+#include "Core/MIDI/Matrix6MasterResponseFilter.h"
 #include "Core/MIDI/SysEx/SysExConstants.h"
 #include "Core/MIDI/SysEx/SysExParser.h"
 
@@ -243,6 +244,14 @@ juce::String MidiLogger::analyzeSysExMessage(const juce::MemoryBlock& sysEx) con
         return {};
 
     const juce::MemoryBlock completeSysEx = addSysExDelimiters(sysEx);
+
+    // Matrix-6/6R Master dumps are legitimate at 478/479 bytes; Matrix-1000
+    // validateSysEx expects 351 and would log a false ERROR on the receive path.
+    if (const auto matrix6Analysis = Core::matrix6MasterDumpReceiveLogAnalysis(completeSysEx);
+        matrix6Analysis.isNotEmpty())
+    {
+        return matrix6Analysis;
+    }
 
     SysExParser parser;
     const auto validation = parser.validateSysEx(completeSysEx);
