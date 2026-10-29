@@ -183,9 +183,9 @@ namespace PluginDisplayNames
         constexpr const char* kAutoClear               = "AUTO CLEAR";
         constexpr const char* kPresenceCheckLabel      = "PRESENCE CHECK";
         constexpr const char* kPresenceCheckOnceOnConnect = "ONCE ON CONNECT";
-        constexpr const char* kPresenceCheckEvery5s    = "EVERY 5 S";
-        constexpr const char* kPresenceCheckEvery15s   = "EVERY 15 S";
-        constexpr const char* kPresenceCheckEvery30s   = "EVERY 30 S";
+        constexpr const char* kPresenceCheckEvery5s    = "EVERY 5 SECONDS";
+        constexpr const char* kPresenceCheckEvery15s   = "EVERY 15 SECONDS";
+        constexpr const char* kPresenceCheckEvery30s   = "EVERY 30 SECONDS";
         constexpr const char* kEpromTypeLabel          = "EPROM TYPE";
         constexpr const char* kMatrix1000PatchesLabel  = "MATRIX-1000 PATCHES";
         constexpr const char* kComputerPatchesLabel    = "COMPUTER PATCHES";

@@ -34,11 +34,11 @@ private:
         expectEquals(juce::String(PluginDisplayNames::Settings::kPresenceCheckOnceOnConnect),
                      juce::String("ONCE ON CONNECT"));
         expectEquals(juce::String(PluginDisplayNames::Settings::kPresenceCheckEvery5s),
-                     juce::String("EVERY 5 S"));
+                     juce::String("EVERY 5 SECONDS"));
         expectEquals(juce::String(PluginDisplayNames::Settings::kPresenceCheckEvery15s),
-                     juce::String("EVERY 15 S"));
+                     juce::String("EVERY 15 SECONDS"));
         expectEquals(juce::String(PluginDisplayNames::Settings::kPresenceCheckEvery30s),
-                     juce::String("EVERY 30 S"));
+                     juce::String("EVERY 30 SECONDS"));
         expectEquals(PluginIDs::Settings::PresenceCheck::kDefault,
                      PluginIDs::Settings::PresenceCheck::kEvery15s);
 
