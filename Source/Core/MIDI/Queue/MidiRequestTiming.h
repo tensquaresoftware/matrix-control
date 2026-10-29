@@ -13,10 +13,13 @@ namespace Core::MidiRequestTiming
     constexpr int kSettleProfileMultiplier = 5;
     constexpr int kIdleTimeoutProfileMultiplier = 50;
 
-    // Device presence monitoring on already-open MIDI From/To (UAT-tunable).
-    // Undetected: retry Device Inquiry; detected: heartbeat to notice drop without port retouch.
+    // Device presence monitoring on already-open MIDI From/To.
+    // Undetected retry stays fixed; detected intervals come from Settings PRESENCE CHECK
+    // (PresenceCheckPolicy) — kDevicePresenceHeartbeatDetectedMs maps EVERY 5 S only.
     constexpr int kDevicePresenceRetryUndetectedMs = 1000;
     constexpr int kDevicePresenceHeartbeatDetectedMs = 5000;
+    constexpr int kDevicePresenceHeartbeatEvery15sMs = 15000;
+    constexpr int kDevicePresenceHeartbeatEvery30sMs = 30000;
 
     inline int deviceSettleMs(int profileDelayMs) noexcept
     {

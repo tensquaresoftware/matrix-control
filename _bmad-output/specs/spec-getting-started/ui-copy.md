@@ -26,7 +26,7 @@ Button / title labels (ASCII):
 
 ## STEP 2 — SYNTH COMMUNICATION
 
-> Select the MIDI ports wired to your synth and the EPROM type installed in it. Wait until the device is recognized when possible — this unlocks reliable editing and timing.
+> Select the MIDI ports wired to your synth and the EPROM type installed in it. Wait until the device is recognized when possible - this unlocks reliable editing and timing. Matrix-Control re-checks the link periodically; you can change that later in Settings > MIDI & DEVICE > PRESENCE CHECK.
 
 Firmware suggestion suffix (when relevant):
 

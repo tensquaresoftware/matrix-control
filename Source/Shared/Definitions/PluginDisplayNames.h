@@ -181,6 +181,11 @@ namespace PluginDisplayNames
         constexpr const char* kContextualHelpLabel     = "CONTEXTUAL HELP";
         constexpr const char* kKeep                    = "KEEP";
         constexpr const char* kAutoClear               = "AUTO CLEAR";
+        constexpr const char* kPresenceCheckLabel      = "PRESENCE CHECK";
+        constexpr const char* kPresenceCheckOnceOnConnect = "ONCE ON CONNECT";
+        constexpr const char* kPresenceCheckEvery5s    = "EVERY 5 S";
+        constexpr const char* kPresenceCheckEvery15s   = "EVERY 15 S";
+        constexpr const char* kPresenceCheckEvery30s   = "EVERY 30 S";
         constexpr const char* kEpromTypeLabel          = "EPROM TYPE";
         constexpr const char* kMatrix1000PatchesLabel  = "MATRIX-1000 PATCHES";
         constexpr const char* kComputerPatchesLabel    = "COMPUTER PATCHES";
@@ -211,6 +216,13 @@ namespace PluginDisplayNames
         constexpr const char* kEpromTypeUnknown        = "UNKNOWN";
         constexpr const char* kLoadMasterDialogTitle   = "Load Master";
         constexpr const char* kSaveMasterAsDialogTitle = "Save Master As";
+
+        namespace ContextualHelp
+        {
+            constexpr const char* kPresenceCheck =
+                "Periodically re-checks that the synth still answers. A Matrix-6/6R may return a full Master "
+                "on each check. ONCE ON CONNECT stops re-checking after the first detection.";
+        }
 
         namespace FooterMessages
         {
@@ -342,7 +354,9 @@ namespace PluginDisplayNames
             constexpr const char* kBodySynthCommunication =
                 "Select the MIDI ports wired to your synth and the EPROM type installed in it. "
                 "Wait until the device is recognized when possible - this unlocks reliable "
-                "editing and timing.";
+                "editing and timing. "
+                "Matrix-Control re-checks the link periodically; you can change that later in "
+                "Settings > MIDI & DEVICE > PRESENCE CHECK.";
             constexpr const char* kBodySynthCommunicationSuggestionSuffix =
                 "\n\nA suggestion is preselected from the reported firmware version when possible.";
             constexpr const char* kBodyMidiKeyboardStandalone =

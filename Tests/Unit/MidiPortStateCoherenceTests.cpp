@@ -163,6 +163,12 @@ public:
                      Core::MidiRequestTiming::kMinDeviceSettleMs);
         expectEquals(Core::MidiRequestTiming::outboundIdleTimeoutMs(stock),
                      Core::MidiRequestTiming::kMinOutboundIdleTimeoutMs);
+
+        beginTest("presence constants — undetected 1 s; EVERY 5/15/30 S mapped values");
+        expectEquals(Core::MidiRequestTiming::kDevicePresenceRetryUndetectedMs, 1000);
+        expectEquals(Core::MidiRequestTiming::kDevicePresenceHeartbeatDetectedMs, 5000);
+        expectEquals(Core::MidiRequestTiming::kDevicePresenceHeartbeatEvery15sMs, 15000);
+        expectEquals(Core::MidiRequestTiming::kDevicePresenceHeartbeatEvery30sMs, 30000);
     }
 };
 

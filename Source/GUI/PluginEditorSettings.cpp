@@ -4,11 +4,11 @@
 #include "PluginEditor.h"
 #include "PluginEditorInternal.h"
 
+#include "Core/MIDI/MidiManager.h"
 #include "Core/Services/DeviceConnectionMachineDefaults.h"
 #include "Core/Services/DeviceTypeRegistry.h"
 #include "Core/Services/EpromTypePolicy.h"
 #include "Core/Services/PatchNameDisplayMode.h"
-#include "Core/MIDI/MidiManager.h"
 #include "GUI/Dialogs/MasterM1kmLoadChoiceDialog.h"
 #include "GUI/Dialogs/MutatorHistoryDefragConfirmDialog.h"
 #include "GUI/Helpers/ContextualHelpOverlay.h"
@@ -137,6 +137,7 @@ void PluginEditor::restoreSettingsPanelFromState(SettingsPanel& panel)
         pluginProcessor.getMidiManager().refreshSysExDelayFromSettings();
     }
 
+    restoreSettingsPresenceCheckFromState(panel);
     restoreSettingsAppearanceFromState(panel);
     restoreSettingsPolicyCombosFromState(panel);
     refreshInitTemplateDeleteButtons(panel);
@@ -323,27 +324,6 @@ void PluginEditor::closeMasterM1kmLoadChoiceDialog()
 bool PluginEditor::isMasterM1kmLoadChoiceDialogVisible() const
 {
     return masterM1kmLoadChoiceDialog_ != nullptr && masterM1kmLoadChoiceDialog_->isVisible();
-}
-
-void PluginEditor::wireSettingsEpromAndLatency(SettingsPanel& panel)
-{
-    panel.getHardwareLatencySlider().onValueChange = [this, &panel]
-    {
-        pluginProcessor.setHardwareLatencyMs(static_cast<float>(panel.getHardwareLatencySlider().getValue()));
-    };
-
-    panel.getEpromTypeCombo().onChange = [this, &panel]
-    {
-        const int selectedId = panel.getEpromTypeCombo().getSelectedId();
-        const int normalized = Core::EpromTypePolicy::normalize(selectedId);
-        if (selectedId != normalized)
-            return;
-
-        pluginProcessor.getApvts().state.setProperty(
-            PluginIDs::Settings::kEpromType, normalized, nullptr);
-        Core::DeviceConnectionMachineDefaults::writeEpromType(normalized);
-        pluginProcessor.getMidiManager().refreshSysExDelayFromSettings();
-    };
 }
 
 void PluginEditor::wireSettingsContextualHelpCombo(SettingsPanel& panel)

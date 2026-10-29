@@ -134,6 +134,11 @@ void SettingsPanel::layoutMidiAndDeviceSection(juce::Rectangle<int>& bounds,
                                                    metrics.comboWidth });
     layoutLabeledControlRow(bounds,
                             metrics,
+                            LabeledControlRowArgs{ presenceCheckLabel_.get(),
+                                                   presenceCheckCombo_.get(),
+                                                   metrics.comboWidth });
+    layoutLabeledControlRow(bounds,
+                            metrics,
                             LabeledControlRowArgs{ epromTypeLabel_.get(),
                                                    epromTypeCombo_.get(),
                                                    metrics.comboWidth });
@@ -332,6 +337,8 @@ void SettingsPanel::updatePageVisibility()
     deviceLabel_->setVisible(showMidiAndDevice);
     if (deviceValueField_ != nullptr)
         deviceValueField_->setVisible(showMidiAndDevice);
+    presenceCheckLabel_->setVisible(showMidiAndDevice);
+    presenceCheckCombo_->setVisible(showMidiAndDevice);
     hardwareLatencyLabel_->setVisible(showLatency);
     hardwareLatencySlider_->setVisible(showLatency);
     epromTypeLabel_->setVisible(showMidiAndDevice);
@@ -393,4 +400,19 @@ void SettingsPanel::refreshInitTemplateDeleteEnablement(bool patchInitExists, bo
 void SettingsPanel::refreshDefragHistoryEnablement(bool hasMutationHistory)
 {
     defragHistoryButton_->setEnabled(hasMutationHistory);
+}
+
+void SettingsPanel::registerPresenceCheckContextualHelp(
+    TSS::ContextualHelpBinder::FooterResolver resolveFooter)
+{
+    namespace Help = PluginDisplayNames::Settings::ContextualHelp;
+
+    contextualHelpBinder_ = std::make_unique<TSS::ContextualHelpBinder>(std::move(resolveFooter));
+    contextualHelpBinder_->setPopupDeferPredicate(
+        [](juce::Component* focused)
+        {
+            return TSS::shouldDeferContextualHelpClearForProjectPopup(focused);
+        });
+    contextualHelpBinder_->bind(presenceCheckLabel_.get(), Help::kPresenceCheck);
+    contextualHelpBinder_->bind(presenceCheckCombo_.get(), Help::kPresenceCheck);
 }

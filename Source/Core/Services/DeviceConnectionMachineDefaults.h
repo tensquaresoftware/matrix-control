@@ -2,6 +2,7 @@
 
 #include <juce_data_structures/juce_data_structures.h>
 
+#include "Core/MIDI/PresenceCheckPolicy.h"
 #include "Core/Services/EpromTypePolicy.h"
 #include "Shared/Definitions/PluginIDs.h"
 
@@ -14,9 +15,10 @@ namespace Core::DeviceConnectionMachineDefaults
         juce::String midiInputPortId;
         juce::String midiOutputPortId;
         int epromTypeId = PluginIDs::Settings::EpromType::kDefault;
+        int presenceCheckId = PluginIDs::Settings::PresenceCheck::kDefault;
     };
 
-    /** Pure: CONFIRM writes promptDone + ports + EPROM. */
+    /** Pure: CONFIRM writes promptDone + ports + EPROM; presenceCheckId preserved. */
     inline Values applyConfirm(Values base,
                                int selectedEpromTypeId,
                                const juce::String& midiInputPortId,
@@ -61,6 +63,13 @@ namespace Core::DeviceConnectionMachineDefaults
         return base;
     }
 
+    /** Pure: Settings PRESENCE CHECK change — presence interval only. */
+    inline Values applyPresenceCheck(Values base, int presenceCheckId) noexcept
+    {
+        base.presenceCheckId = PresenceCheckPolicy::normalize(presenceCheckId);
+        return base;
+    }
+
     /** Pure: seed live session APVTS from machine defaults (fresh construction). */
     inline void seedApvtsState(juce::ValueTree& state, const Values& values)
     {
@@ -69,6 +78,9 @@ namespace Core::DeviceConnectionMachineDefaults
         state.setProperty("midiOutputPortId", values.midiOutputPortId, nullptr);
         state.setProperty(PluginIDs::Settings::kEpromType,
                           EpromTypePolicy::normalize(values.epromTypeId),
+                          nullptr);
+        state.setProperty(PluginIDs::Settings::kPresenceCheck,
+                          PresenceCheckPolicy::normalize(values.presenceCheckId),
                           nullptr);
     }
 
@@ -90,6 +102,7 @@ namespace Core::DeviceConnectionMachineDefaults
     void writeMidiInputPort(const juce::String& midiInputPortId);
     void writeMidiOutputPort(const juce::String& midiOutputPortId);
     void writeEpromType(int epromTypeId);
+    void writePresenceCheck(int presenceCheckId);
 
     /** Re-seed APVTS when machine promptDone is true and the restored session is still false. */
     void reseedApvtsAfterHostRestoreIfNeeded(juce::ValueTree& state);

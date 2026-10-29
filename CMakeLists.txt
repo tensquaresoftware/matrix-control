@@ -257,6 +257,7 @@ set(PLUGIN_SOURCES
     Source/GUI/PluginEditorWindows.cpp
     Source/GUI/PluginEditorSettingsOverlay.cpp
     Source/GUI/PluginEditorSettings.cpp
+    Source/GUI/PluginEditorSettingsDevice.cpp
     Source/GUI/PluginEditorSettingsAppearance.cpp
     Source/GUI/PluginEditorGettingStarted.cpp
     Source/GUI/PluginEditorSkinScale.cpp
@@ -629,6 +630,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/RealtimeQueuePressureMonitorTests.cpp
         Tests/Unit/SysExDelayProfileTests.cpp
         Tests/Unit/EpromTypePolicyTests.cpp
+        Tests/Unit/PresenceCheckPolicyTests.cpp
         Tests/Unit/DeviceSetupDeviceRowTests.cpp
         Tests/Unit/MatrixModalCopyTests.cpp
         Tests/Unit/SettingsTabsShellTests.cpp

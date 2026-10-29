@@ -6,6 +6,7 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 
 #include "Core/Services/DeviceSetupDeviceRow.h"
+#include "GUI/Helpers/ContextualHelpBinder.h"
 #include "GUI/Widgets/Button.h"
 #include "GUI/Widgets/ComboBox.h"
 #include "GUI/Widgets/Label.h"
@@ -67,7 +68,11 @@ public:
     void stopLiveTimers();
 
     TSS::Slider& getHardwareLatencySlider() { return *hardwareLatencySlider_; }
+    TSS::ComboBox& getPresenceCheckCombo() { return *presenceCheckCombo_; }
     TSS::ComboBox& getEpromTypeCombo() { return *epromTypeCombo_; }
+
+    /** Bind PRESENCE CHECK label/combo HELP to the main footer (Settings is not under MainComponent). */
+    void registerPresenceCheckContextualHelp(TSS::ContextualHelpBinder::FooterResolver resolveFooter);
     TSS::ComboBox& getMatrix1000PatchesCombo() { return *matrix1000PatchesCombo_; }
     TSS::ComboBox& getComputerPatchesCombo() { return *computerPatchesCombo_; }
     TSS::ComboBox& getUiScaleCombo() { return *uiScaleCombo_; }
@@ -215,10 +220,13 @@ private:
 
     std::unique_ptr<TSS::Label> deviceLabel_;
     std::unique_ptr<TSS::ReadOnlyValueField> deviceValueField_;
+    std::unique_ptr<TSS::Label> presenceCheckLabel_;
+    std::unique_ptr<TSS::ComboBox> presenceCheckCombo_;
     std::unique_ptr<TSS::Label> hardwareLatencyLabel_;
     std::unique_ptr<TSS::Slider> hardwareLatencySlider_;
     std::unique_ptr<TSS::Label> epromTypeLabel_;
     std::unique_ptr<TSS::ComboBox> epromTypeCombo_;
+    std::unique_ptr<TSS::ContextualHelpBinder> contextualHelpBinder_;
 
     std::unique_ptr<TSS::Label> matrix1000PatchesLabel_;
     std::unique_ptr<TSS::ComboBox> matrix1000PatchesCombo_;

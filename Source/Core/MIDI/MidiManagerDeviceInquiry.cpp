@@ -9,6 +9,7 @@
 #include "Core/MIDI/EditorOutboundGate.h"
 #include "Core/MIDI/MasterPullOnConnectPolicy.h"
 #include "Core/MIDI/Matrix6MasterFallbackPolicy.h"
+#include "Core/MIDI/PresenceCheckPolicy.h"
 #include "Core/MIDI/Queue/SysExDelayProfile.h"
 #include "Core/Services/DeviceSetupDeviceRow.h"
 #include "Core/Services/DeviceTypeRegistry.h"
@@ -42,6 +43,11 @@ void MidiManager::clearLastInquiryPortPair() noexcept
     lastInquiryOutputId_.clear();
 }
 
+void MidiManager::refreshDevicePresenceMonitoringFromSettings()
+{
+    updateDevicePresenceMonitoring();
+}
+
 void MidiManager::updateDevicePresenceMonitoring()
 {
     if (devicePresenceTimer_ == nullptr)
@@ -49,22 +55,26 @@ void MidiManager::updateDevicePresenceMonitoring()
 
     const auto inputId = inputMidiPort != nullptr ? inputMidiPort->getOpenDeviceId() : juce::String();
     const auto outputId = outputMidiPort != nullptr ? outputMidiPort->getOpenDeviceId() : juce::String();
+    const bool portsEligible = Core::shouldForceDeviceInquiryForPresence(
+        isDeviceDumpAvailable(), inputId, outputId);
+    const bool detected = static_cast<bool>(apvts.state.getProperty("deviceDetected", false));
+    const int preferenceId = static_cast<int>(apvts.state.getProperty(
+        PluginIDs::Settings::kPresenceCheck,
+        PluginIDs::Settings::PresenceCheck::kDefault));
+    const bool unresponsive = static_cast<bool>(
+        apvts.state.getProperty(Core::kDeviceMidiUnresponsiveProperty, false));
+    const int intervalMs = Core::PresenceCheckPolicy::monitoringIntervalMs(
+        portsEligible, detected, preferenceId, unresponsive);
 
-    if (! Core::shouldForceDeviceInquiryForPresence(isDeviceDumpAvailable(), inputId, outputId))
+    if (intervalMs <= 0)
     {
         devicePresenceTimer_->stopTimer();
         return;
     }
 
-    const bool detected = static_cast<bool>(apvts.state.getProperty("deviceDetected", false));
-    const int intervalMs = detected ? Core::MidiRequestTiming::kDevicePresenceHeartbeatDetectedMs
-                                    : Core::MidiRequestTiming::kDevicePresenceRetryUndetectedMs;
-
     if (! devicePresenceTimer_->isTimerRunning()
         || devicePresenceTimer_->getTimerInterval() != intervalMs)
-    {
         devicePresenceTimer_->startTimer(intervalMs);
-    }
 }
 
 void MidiManager::onDevicePresenceTimer()
@@ -308,15 +318,16 @@ void MidiManager::setDeviceMidiUnresponsive(bool unresponsive)
         apvts.state.setProperty("uiMessageSeverity", "error", nullptr);
         MidiLogger::getInstance().logWarning(
             "Matrix synth not responding to Device Inquiry — editor SysEx paused; power-cycle if notes stick");
-        return;
     }
-
-    if (apvts.state.getProperty("uiMessageText").toString()
-        == PluginDisplayNames::FooterPanel::kDeviceUnresponsiveGuidance)
+    else if (apvts.state.getProperty("uiMessageText").toString()
+             == PluginDisplayNames::FooterPanel::kDeviceUnresponsiveGuidance)
     {
         apvts.state.setProperty("uiMessageText", juce::String(), nullptr);
         apvts.state.setProperty("uiMessageSeverity", juce::String(), nullptr);
     }
+
+    // ONCE ON CONNECT: resume while unresponsive; stop again when responsive.
+    updateDevicePresenceMonitoring();
 }
 
 void MidiManager::softAbortDeviceInquiryUnresponsive(std::uint64_t token)

@@ -2742,3 +2742,15 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-gh-36-m6r-master-discovery-fallback.md`
   summary: Reconfirmed — no MidiManager fixture for `sendSysExWithDelay` activity LED pulses (already deferred above).
   evidence: Verification Gap Reviewer disposition `defer`; still needs a send harness.
+
+## Deferred from: review of spec-settings-presence-check.md (2026-10-29)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-settings-presence-check.md`
+  summary: Update sibling AD-7 / device-setup docs that still describe machine defaults as promptDone + ports + EPROM only (now also PRESENCE CHECK).
+  evidence: Intent expanded DeviceConnectionMachineDefaults; `spec-device-setup-cross-project-friction.md` and architecture AD-7 wording were not updated in this chantier.
+- source_spec: `_bmad-output/implementation-artifacts/spec-settings-presence-check.md`
+  summary: Refresh ContextualHelpOverlay Wave 3 static_assert to track Settings HELP registration under `registerPresenceCheckContextualHelp` (or a shared register API).
+  evidence: Assert still looks for `registerContextualHelp`; Settings binder was added under a different name.
+- source_spec: `_bmad-output/implementation-artifacts/spec-settings-presence-check.md`
+  summary: Add PropertiesFile load/save round-trip coverage for `writePresenceCheck` / machine key.
+  evidence: seedApvtsState + applyPresenceCheck are tested; file I/O path for the new key is not.

@@ -32,6 +32,9 @@ namespace Core::DeviceConnectionMachineDefaults
             values.epromTypeId = EpromTypePolicy::normalize(file.getIntValue(
                 PluginIDs::MachineDefaults::kEpromType,
                 PluginIDs::Settings::EpromType::kDefault));
+            values.presenceCheckId = PresenceCheckPolicy::normalize(file.getIntValue(
+                PluginIDs::MachineDefaults::kPresenceCheck,
+                PluginIDs::Settings::PresenceCheck::kDefault));
             return values;
         }
 
@@ -42,6 +45,8 @@ namespace Core::DeviceConnectionMachineDefaults
             file.setValue(PluginIDs::MachineDefaults::kMidiOutputPortId, values.midiOutputPortId);
             file.setValue(PluginIDs::MachineDefaults::kEpromType,
                           EpromTypePolicy::normalize(values.epromTypeId));
+            file.setValue(PluginIDs::MachineDefaults::kPresenceCheck,
+                          PresenceCheckPolicy::normalize(values.presenceCheckId));
             file.saveIfNeeded();
         }
     }
@@ -90,6 +95,11 @@ namespace Core::DeviceConnectionMachineDefaults
     void writeEpromType(int epromTypeId)
     {
         save(applyEpromType(load(), epromTypeId));
+    }
+
+    void writePresenceCheck(int presenceCheckId)
+    {
+        save(applyPresenceCheck(load(), presenceCheckId));
     }
 
     void reseedApvtsAfterHostRestoreIfNeeded(juce::ValueTree& state)

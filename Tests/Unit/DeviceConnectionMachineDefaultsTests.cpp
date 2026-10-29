@@ -35,6 +35,9 @@ private:
         state.setProperty(PluginIDs::Settings::kEpromType,
                           PluginIDs::Settings::EpromType::kDefault,
                           nullptr);
+        state.setProperty(PluginIDs::Settings::kPresenceCheck,
+                          PluginIDs::Settings::PresenceCheck::kDefault,
+                          nullptr);
         return state;
     }
 
@@ -47,6 +50,7 @@ private:
         machine.midiInputPortId = "in-port";
         machine.midiOutputPortId = "out-port";
         machine.epromTypeId = PluginIDs::Settings::EpromType::kTauntek;
+        machine.presenceCheckId = PluginIDs::Settings::PresenceCheck::kEvery5s;
 
         auto state = makeEmptyConnectionState();
         Core::DeviceConnectionMachineDefaults::seedApvtsState(state, machine);
@@ -56,6 +60,8 @@ private:
         expectEquals(state.getProperty("midiOutputPortId").toString(), juce::String("out-port"));
         expectEquals(static_cast<int>(state.getProperty(PluginIDs::Settings::kEpromType)),
                      PluginIDs::Settings::EpromType::kTauntek);
+        expectEquals(static_cast<int>(state.getProperty(PluginIDs::Settings::kPresenceCheck)),
+                     PluginIDs::Settings::PresenceCheck::kEvery5s);
         expect(! Core::shouldOpenDeviceSetupAssistant(
             static_cast<bool>(state.getProperty(PluginIDs::Settings::kEpromTypePromptDone)),
             false));
@@ -125,6 +131,15 @@ private:
         expectEquals(epromOnly.epromTypeId, PluginIDs::Settings::EpromType::kUntergeek);
         expectEquals(epromOnly.midiInputPortId, juce::String("a"));
         expectEquals(epromOnly.midiOutputPortId, juce::String("b"));
+
+        prior.presenceCheckId = PluginIDs::Settings::PresenceCheck::kEvery30s;
+        const auto presenceOnly = Core::DeviceConnectionMachineDefaults::applyPresenceCheck(
+            prior, PluginIDs::Settings::PresenceCheck::kOnceOnConnect);
+        expectEquals(presenceOnly.presenceCheckId,
+                     PluginIDs::Settings::PresenceCheck::kOnceOnConnect);
+        expectEquals(presenceOnly.epromTypeId, PluginIDs::Settings::EpromType::kTauntek);
+        expectEquals(presenceOnly.midiInputPortId, juce::String("a"));
+        expectEquals(presenceOnly.midiOutputPortId, juce::String("b"));
     }
 
     void testApplySinglePortWriteThrough()

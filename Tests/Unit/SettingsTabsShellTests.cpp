@@ -122,7 +122,7 @@ private:
         expectEquals(juce::String(SettingsShellMetrics::tabLabel(4, true)), juce::String("PATCH MUTATOR"));
         expectEquals(juce::String(SettingsShellMetrics::tabLabel(5, true)), juce::String("MASTER"));
         expectEquals(juce::String(SettingsShellMetrics::tabLabel(6, true)), juce::String());
-        expectEquals(SettingsShellMetrics::midiAndDevicePageRowCount(true), 5);
+        expectEquals(SettingsShellMetrics::midiAndDevicePageRowCount(true), 6);
         expectEquals(juce::String(PluginDisplayNames::Settings::kHardwareLatencyLabel),
                      juce::String("HARDWARE LATENCY"));
         expectEquals(juce::String(PluginDisplayNames::Settings::kMidiAndDeviceTab),
@@ -158,7 +158,7 @@ private:
         expectEquals(PluginIDs::Settings::LastTab::kPatchMutator, 6);
         expectEquals(PluginIDs::Settings::LastTab::kMaster, 7);
         expectEquals(PluginIDs::Settings::LastTab::kGettingStarted, 8);
-        expectEquals(SettingsShellMetrics::midiAndDevicePageRowCount(false), 5);
+        expectEquals(SettingsShellMetrics::midiAndDevicePageRowCount(false), 6);
     }
 
     void writeAndCoerceLastTab()
