@@ -1,5 +1,11 @@
 # Deferred Work
 
+## Deferred from: review of spec-gh-42-windows-standalone-asio.md (2026-10-30)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-gh-42-windows-standalone-asio.md`
+  summary: Before the first public GitHub/release binary that includes ASIO, add Steinberg ASIO SDK attribution / third-party notice (LICENSE or release hygiene) per ASIO Usage Guidelines.
+  evidence: Enabling `JUCE_ASIO` creates a Steinberg dependency; this story deferred docs/manual and kept a human publish gate until countersignature.
+
 ## Deferred from: Windows alpha.3 Live 12 smoke (2026-10-28)
 
 - source_spec: none (user-manual follow-up)

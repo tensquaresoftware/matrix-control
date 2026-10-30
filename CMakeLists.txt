@@ -634,6 +634,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/DeviceSetupDeviceRowTests.cpp
         Tests/Unit/MatrixModalCopyTests.cpp
         Tests/Unit/SettingsTabsShellTests.cpp
+        Tests/Unit/WindowsAsioDeviceTypeTests.cpp
         Tests/Unit/DeviceConnectionMachineDefaultsTests.cpp
         Tests/Unit/GettingStartedSettingsContractTests.cpp
         Tests/Unit/GettingStartedWizardContractTests.cpp
@@ -957,6 +958,30 @@ target_compile_definitions(Matrix-Control
         MATRIX_CONTROL_PROJECT_VERSION="${PROJECT_VERSION}"
         MATRIX_CONTROL_PRERELEASE_SUFFIX="${MATRIX_CONTROL_PRERELEASE_SUFFIX}"
 )
+
+# Windows Standalone Settings AUDIO: register JUCE ASIO device type (GH-42).
+# Shared-target PUBLIC so juce_audio_devices compiles with ASIO; Standalone-only is insufficient.
+# Tests link juce_audio_devices separately and need the same flag to assert ASIO registration.
+# Uses JUCE bundled Steinberg headers (JUCE_ASIO_USE_EXTERNAL_SDK stays off).
+if(WIN32)
+    target_compile_definitions(Matrix-Control PUBLIC JUCE_ASIO=1)
+    if(TARGET Matrix-Control_Tests)
+        target_compile_definitions(Matrix-Control_Tests PRIVATE JUCE_ASIO=1)
+    endif()
+
+    # Product target must compile with ASIO (COMPILE_DEFINITIONS). INTERFACE-only would leave
+    # Standalone without ASIO while Matrix-Control_Tests could still pass via its PRIVATE define.
+    get_property(_matrix_control_compile_defs TARGET Matrix-Control PROPERTY COMPILE_DEFINITIONS)
+    string(FIND "${_matrix_control_compile_defs}" "JUCE_ASIO=1" _matrix_control_asio_pos)
+    if(_matrix_control_asio_pos EQUAL -1)
+        message(FATAL_ERROR
+            "Matrix-Control must define JUCE_ASIO=1 on Windows COMPILE_DEFINITIONS (GH-42); "
+            "Standalone would lack ASIO while Matrix-Control_Tests could still pass.")
+    endif()
+    unset(_matrix_control_compile_defs)
+    unset(_matrix_control_asio_pos)
+endif()
+
 
 # JUCE links optional ARA/LV2 stub objects with no symbols into the shared-code static library.
 if(APPLE)
