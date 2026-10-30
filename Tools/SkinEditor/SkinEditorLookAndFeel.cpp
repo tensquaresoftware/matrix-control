@@ -188,8 +188,12 @@ namespace SkinEditorChrome
 
     void LookAndFeel::positionComboBoxText(juce::ComboBox& box, juce::Label& label)
     {
-        LookAndFeel_V4::positionComboBoxText(box, label);
-        // Forbid glyph squish only — do not clear Label border (that pads combo text inset).
+        // V4 reserves 30px for the arrow; our drawComboBox arrow sits near width-16.
+        constexpr int kArrowReserve = 18;
+        label.setBounds(1, 1,
+                        juce::jmax(1, box.getWidth() - kArrowReserve),
+                        box.getHeight() - 2);
+        label.setFont(getComboBoxFont(box));
         label.setMinimumHorizontalScale(1.0f);
     }
 

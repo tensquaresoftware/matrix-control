@@ -92,7 +92,7 @@ private:
                      SkinEditorChrome::kPalettePanelWidth
                          - SkinEditorChrome::kPanelContentPad
                          - SkinEditorChrome::kScrollTrackWidth);
-        expectEquals(SkinEditorChrome::kMappingsPanelWidth, 485);
+        expectEquals(SkinEditorChrome::kMappingsPanelWidth, 480);
         expect(SkinEditorChrome::kMappingsPanelWidth
                < SkinEditorChrome::kLegacyWindowMaxWidth / 2);
     }
