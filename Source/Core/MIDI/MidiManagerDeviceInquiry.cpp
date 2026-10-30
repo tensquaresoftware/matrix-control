@@ -8,6 +8,8 @@
 #include "Core/MIDI/DeviceInquiryTrigger.h"
 #include "Core/MIDI/EditorOutboundGate.h"
 #include "Core/MIDI/MasterPullOnConnectPolicy.h"
+#include "Core/MIDI/Matrix6MasterFallbackPolicy.h"
+#include "Core/MIDI/PresenceCheckPolicy.h"
 #include "Core/MIDI/Queue/SysExDelayProfile.h"
 #include "Core/Services/DeviceSetupDeviceRow.h"
 #include "Core/Services/DeviceTypeRegistry.h"
@@ -41,6 +43,11 @@ void MidiManager::clearLastInquiryPortPair() noexcept
     lastInquiryOutputId_.clear();
 }
 
+void MidiManager::refreshDevicePresenceMonitoringFromSettings()
+{
+    updateDevicePresenceMonitoring();
+}
+
 void MidiManager::updateDevicePresenceMonitoring()
 {
     if (devicePresenceTimer_ == nullptr)
@@ -48,22 +55,26 @@ void MidiManager::updateDevicePresenceMonitoring()
 
     const auto inputId = inputMidiPort != nullptr ? inputMidiPort->getOpenDeviceId() : juce::String();
     const auto outputId = outputMidiPort != nullptr ? outputMidiPort->getOpenDeviceId() : juce::String();
+    const bool portsEligible = Core::shouldForceDeviceInquiryForPresence(
+        isDeviceDumpAvailable(), inputId, outputId);
+    const bool detected = static_cast<bool>(apvts.state.getProperty("deviceDetected", false));
+    const int preferenceId = static_cast<int>(apvts.state.getProperty(
+        PluginIDs::Settings::kPresenceCheck,
+        PluginIDs::Settings::PresenceCheck::kDefault));
+    const bool unresponsive = static_cast<bool>(
+        apvts.state.getProperty(Core::kDeviceMidiUnresponsiveProperty, false));
+    const int intervalMs = Core::PresenceCheckPolicy::monitoringIntervalMs(
+        portsEligible, detected, preferenceId, unresponsive);
 
-    if (! Core::shouldForceDeviceInquiryForPresence(isDeviceDumpAvailable(), inputId, outputId))
+    if (intervalMs <= 0)
     {
         devicePresenceTimer_->stopTimer();
         return;
     }
 
-    const bool detected = static_cast<bool>(apvts.state.getProperty("deviceDetected", false));
-    const int intervalMs = detected ? Core::MidiRequestTiming::kDevicePresenceHeartbeatDetectedMs
-                                    : Core::MidiRequestTiming::kDevicePresenceRetryUndetectedMs;
-
     if (! devicePresenceTimer_->isTimerRunning()
         || devicePresenceTimer_->getTimerInterval() != intervalMs)
-    {
         devicePresenceTimer_->startTimer(intervalMs);
-    }
 }
 
 void MidiManager::onDevicePresenceTimer()
@@ -77,12 +88,16 @@ void MidiManager::onDevicePresenceTimer()
         return;
     }
 
-    // Skip while any shared async SysEx capture is active — performDeviceInquiry cancels it.
+    // Skip while any shared async SysEx capture is active — Inquiry / Master start cancel it.
     if (asyncSysExCaptureActive_.load(std::memory_order_acquire) || pendingAsyncCallback_ != nullptr)
         return;
 
     lastInquiryInputId_ = inputId;
     lastInquiryOutputId_ = outputId;
+
+    if (tryStartMasterOnlyPresenceProofIfEligible())
+        return;
+
     performDeviceInquiry();
 }
 
@@ -190,9 +205,45 @@ bool MidiManager::armAsyncDeviceInquiryCapture(std::uint64_t token)
     return true;
 }
 
+void MidiManager::applyDeviceInquirySuccessDetection(const DeviceIdInfo& info,
+                                                     MatrixDeviceTypes::Type deviceType,
+                                                     bool preserveStoredEpromType)
+{
+    // Inquiry success maps firmware → EPROM. Master fallback has no version — keep Settings.
+    if (! preserveStoredEpromType)
+        Core::EpromTypePolicy::writeStoredTypeAfterInquirySuccess(apvts.state, info.version, deviceType);
+
+    const int epromType = Core::EpromTypePolicy::normalize(static_cast<int>(
+        apvts.state.getProperty(PluginIDs::Settings::kEpromType,
+                              PluginIDs::Settings::EpromType::kDefault)));
+    if (preserveStoredEpromType)
+    {
+        sysExDelay_.setProfile(Core::SysExDelayProfile::fromSettings(
+            epromType, Core::EpromTypePolicy::deviceFamilyFromType(deviceType)));
+        updateDeviceStatus(true,
+                           juce::String(Core::matrix6MasterFallbackDeviceVersion()),
+                           deviceType);
+    }
+    else
+    {
+        sysExDelay_.setProfile(Core::SysExDelayProfile::fromDeviceInquiry(info, epromType));
+        updateDeviceStatus(true, info.version, deviceType);
+    }
+
+    // Master fallback has no firmware map — never re-arm Device Setup from that path.
+    if (preserveStoredEpromType)
+        return;
+
+    const bool promptDone = static_cast<bool>(
+        apvts.state.getProperty(PluginIDs::Settings::kEpromTypePromptDone, false));
+    if (Core::shouldArmDeviceSetupPromptPendingAfterInquiry(promptDone))
+        apvts.state.setProperty(PluginIDs::Settings::kEpromTypePromptPending, true, nullptr);
+}
+
 void MidiManager::finishAsyncDeviceInquirySuccess(std::uint64_t token,
                                                   const DeviceIdInfo& info,
-                                                  MatrixDeviceTypes::Type deviceType)
+                                                  MatrixDeviceTypes::Type deviceType,
+                                                  bool preserveStoredEpromType)
 {
     auto expected = token;
     if (! asyncRequestToken_.compare_exchange_strong(expected, token + 1, std::memory_order_acq_rel))
@@ -207,19 +258,7 @@ void MidiManager::finishAsyncDeviceInquirySuccess(std::uint64_t token,
     const auto previousType = Core::DeviceTypeRegistry::fromApvtsProperty(
         apvts.state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
 
-    // Keep EPROM TYPE (and Timing) aligned with the newly identified synth / firmware.
-    // Machine-defaults persistence is applied by the editor on the APVTS property change.
-    Core::EpromTypePolicy::writeStoredTypeAfterInquirySuccess(apvts.state, info.version, deviceType);
-    const int epromType = Core::EpromTypePolicy::normalize(static_cast<int>(
-        apvts.state.getProperty(PluginIDs::Settings::kEpromType,
-                              PluginIDs::Settings::EpromType::kDefault)));
-    sysExDelay_.setProfile(Core::SysExDelayProfile::fromDeviceInquiry(info, epromType));
-    updateDeviceStatus(true, info.version, deviceType);
-
-    const bool promptDone = static_cast<bool>(
-        apvts.state.getProperty(PluginIDs::Settings::kEpromTypePromptDone, false));
-    if (Core::shouldArmDeviceSetupPromptPendingAfterInquiry(promptDone))
-        apvts.state.setProperty(PluginIDs::Settings::kEpromTypePromptPending, true, nullptr);
+    applyDeviceInquirySuccessDetection(info, deviceType, preserveStoredEpromType);
 
     const auto pullSnapshot = Core::consumeMasterPullInquirySnapshot(
         wasDetected, previousType, forceMasterPullOnNextInquirySuccess_);
@@ -283,15 +322,16 @@ void MidiManager::setDeviceMidiUnresponsive(bool unresponsive)
         apvts.state.setProperty("uiMessageSeverity", "error", nullptr);
         MidiLogger::getInstance().logWarning(
             "Matrix synth not responding to Device Inquiry — editor SysEx paused; power-cycle if notes stick");
-        return;
     }
-
-    if (apvts.state.getProperty("uiMessageText").toString()
-        == PluginDisplayNames::FooterPanel::kDeviceUnresponsiveGuidance)
+    else if (apvts.state.getProperty("uiMessageText").toString()
+             == PluginDisplayNames::FooterPanel::kDeviceUnresponsiveGuidance)
     {
         apvts.state.setProperty("uiMessageText", juce::String(), nullptr);
         apvts.state.setProperty("uiMessageSeverity", juce::String(), nullptr);
     }
+
+    // ONCE ON CONNECT: resume while unresponsive; stop again when responsive.
+    updateDevicePresenceMonitoring();
 }
 
 void MidiManager::softAbortDeviceInquiryUnresponsive(std::uint64_t token)
@@ -309,6 +349,32 @@ void MidiManager::softAbortDeviceInquiryUnresponsive(std::uint64_t token)
     setDeviceMidiUnresponsive(true);
 }
 
+void MidiManager::onDeviceInquiryIdentityTimeout(std::uint64_t token)
+{
+    if (token != asyncRequestToken_.load(std::memory_order_acquire))
+        return;
+
+    MidiLogger::getInstance().logWarning(
+        "Timeout waiting for Device Inquiry identity ("
+        + juce::String(SysExConstants::kDefaultTimeoutMs) + "ms)");
+
+    const bool wasDetected = static_cast<bool>(
+        apvts.state.getProperty("deviceDetected", false));
+    const auto detectedType = Core::DeviceTypeRegistry::fromApvtsProperty(
+        apvts.state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
+    // Soft-abort Matrix-1000 presence; Matrix-6 family / undetected / port-pair force → Master.
+    if (! Core::shouldRunMatrix6MasterFallbackOnInquiryTimeout(
+            wasDetected, forceMasterPullOnNextInquirySuccess_, detectedType))
+    {
+        softAbortDeviceInquiryUnresponsive(token);
+        return;
+    }
+
+    MidiLogger::getInstance().logInfo(
+        "Device Inquiry timed out - trying Matrix-6/6R Master fallback");
+    sendArmedMatrix6MasterFallback(token);
+}
+
 void MidiManager::scheduleDeviceInquiryTimeout(std::uint64_t token)
 {
     juce::WeakReference<MidiManager> weakThis(this);
@@ -317,26 +383,7 @@ void MidiManager::scheduleDeviceInquiryTimeout(std::uint64_t token)
         [weakThis, token]
         {
             if (auto* self = weakThis.get())
-            {
-                if (token != self->asyncRequestToken_.load(std::memory_order_acquire))
-                    return;
-
-                MidiLogger::getInstance().logWarning(
-                    "Timeout waiting for SysEx response ("
-                    + juce::String(SysExConstants::kDefaultTimeoutMs) + "ms)");
-
-                const bool wasDetected = static_cast<bool>(
-                    self->apvts.state.getProperty("deviceDetected", false));
-                if (wasDetected)
-                {
-                    self->softAbortDeviceInquiryUnresponsive(token);
-                    return;
-                }
-
-                self->finishAsyncDeviceInquiryFailure(token,
-                                                      "Timeout waiting for Device ID response",
-                                                      "Timeout");
-            }
+                self->onDeviceInquiryIdentityTimeout(token);
         });
 }
 

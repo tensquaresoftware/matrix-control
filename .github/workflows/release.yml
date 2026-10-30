@@ -180,6 +180,15 @@ jobs:
             "${{ matrix.platform }}" \
             --artefacts-root "${{ matrix.artefacts_root }}"
 
+      # Ad-hoc (- identity) only — reseals AU/VST3/Standalone so Gatekeeper does not
+      # report "damaged". No Apple Developer cert / notarization.
+      - name: Ad-hoc codesign macOS bundles
+        if: matrix.platform == 'macos'
+        shell: bash
+        run: |
+          python3 Scripts/release/adhoc_sign_macos_bundles.py \
+            --artefacts-root "${{ matrix.artefacts_root }}"
+
       - name: Pack platform release archive
         shell: bash
         run: |

@@ -10,7 +10,9 @@ Download the zip for your platform below. Verify checksums with `SHA256SUMS.txt`
 2. Copy `Matrix-Control.component` to `~/Library/Audio/Plug-Ins/Components/`
 3. Copy `Matrix-Control.vst3` to `~/Library/Audio/Plug-Ins/VST3/`
 4. Optionally copy `Matrix-Control.app` to `/Applications/`
-5. If macOS reports the app as damaged, run: `xattr -cr /path/to/Matrix-Control.app`
+5. Clear the download quarantine flag (required after a browser/GitHub download):
+   `xattr -cr /path/to/Matrix-Control.app /path/to/Matrix-Control.vst3 /path/to/Matrix-Control.component`
+6. First open may still warn that the developer is unidentified (builds are not notarized). Use right-click → Open, or allow in System Settings.
 
 ### Windows
 

@@ -78,11 +78,16 @@ void SettingsPanel::setupDeviceSection(TSS::ISkin& skin)
             .defaultValue = Core::HardwareLatency::kMinMs,
             .step = Core::HardwareLatency::kStepMs,
             .unit = "ms"});
+    presenceCheckLabel_ =
+        makeLabel(skin, kLabelWidth_, PluginDisplayNames::Settings::kPresenceCheckLabel);
+    presenceCheckCombo_ = makeCombo(skin, kComboWidth_);
     epromTypeLabel_ = makeLabel(skin, kLabelWidth_, PluginDisplayNames::Settings::kEpromTypeLabel);
     epromTypeCombo_ = makeCombo(skin, kComboWidth_);
 
     addAndMakeVisible(*deviceLabel_);
     addChildComponent(*deviceValueField_);
+    addAndMakeVisible(*presenceCheckLabel_);
+    addAndMakeVisible(*presenceCheckCombo_);
     addAndMakeVisible(*hardwareLatencyLabel_);
     addAndMakeVisible(*hardwareLatencySlider_);
     addAndMakeVisible(*epromTypeLabel_);
@@ -203,6 +208,13 @@ void SettingsPanel::populateComboItems()
                                  PluginIDs::Settings::DeleteWarningPolicy::kAlwaysWarn);
     deleteWarningCombo_->addItem(PluginDisplayNames::Settings::kNeverWarn,
                                  PluginIDs::Settings::DeleteWarningPolicy::kNeverWarn);
+
+    using namespace PluginIDs::Settings::PresenceCheck;
+    presenceCheckCombo_->addItem(PluginDisplayNames::Settings::kPresenceCheckOnceOnConnect,
+                                 kOnceOnConnect);
+    presenceCheckCombo_->addItem(PluginDisplayNames::Settings::kPresenceCheckEvery5s, kEvery5s);
+    presenceCheckCombo_->addItem(PluginDisplayNames::Settings::kPresenceCheckEvery15s, kEvery15s);
+    presenceCheckCombo_->addItem(PluginDisplayNames::Settings::kPresenceCheckEvery30s, kEvery30s);
 }
 
 void SettingsPanel::applyComboPopupLooks(TSS::ISkin& skin)
@@ -213,6 +225,7 @@ void SettingsPanel::applyComboPopupLooks(TSS::ISkin& skin)
     infoMessageCombo_->setPopupMenuLook(popupLook);
     contextualHelpCombo_->setPopupMenuLook(popupLook);
     gettingStartedAutoOpenCombo_->setPopupMenuLook(popupLook);
+    presenceCheckCombo_->setPopupMenuLook(popupLook);
     epromTypeCombo_->setPopupMenuLook(popupLook);
     matrix1000PatchesCombo_->setPopupMenuLook(popupLook);
     computerPatchesCombo_->setPopupMenuLook(popupLook);
@@ -241,6 +254,8 @@ void SettingsPanel::applyChildLooks(TSS::ISkin& skin)
     deviceLabel_->setLook(labelLook);
     if (deviceValueField_ != nullptr)
         deviceValueField_->setSkin(skin);
+    presenceCheckLabel_->setLook(labelLook);
+    presenceCheckCombo_->setLook(comboLook);
     hardwareLatencyLabel_->setLook(labelLook);
     hardwareLatencySlider_->setLook(TSS::sliderLookButtonLikeFromSkin(skin));
     epromTypeLabel_->setLook(labelLook);

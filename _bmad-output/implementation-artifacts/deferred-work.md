@@ -1,5 +1,44 @@
 # Deferred Work
 
+## Deferred from: code review of spec-linux-jack-device-apply.md (2026-10-30)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-linux-jack-device-apply.md`
+  summary: Unit-test that `tryApplySetupWithBufferFallback` wires `getCurrentAudioDeviceType()` through `requestedSampleRateForBufferFallbackSuccess` (helper bypass would still leave current unit expects green).
+  evidence: Blind Hunter; needs AudioDeviceManager fake or equivalent; residual after helper extraction.
+- source_spec: `_bmad-output/implementation-artifacts/spec-linux-jack-device-apply.md`
+  summary: Revisit preferred-setup / profile overlay after a JACK open so a listed preferred rate cannot drive a pointless second apply against the server clock.
+  evidence: Blind Hunter; pre-existing `syncPreferredSetupFromDeviceManager` path; out of this rate-gate fix.
+
+## Deferred from: review of spec-linux-jack-device-apply.md (2026-10-30)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-linux-jack-device-apply.md`
+  summary: Unit-test the empty buffer try-order fallback (including bufferSize <= 0) without a live audio device.
+  evidence: Blind Hunter; current apply path needs AudioDeviceManager or a new pure helper beyond this JACK rate-gate fix.
+- source_spec: `_bmad-output/implementation-artifacts/spec-linux-jack-device-apply.md`
+  summary: Move server-clock / JACK rate-enforce policy next to Core `didBufferFallbackTrySucceed` if a second server-clock backend appears.
+  evidence: Blind Hunter; detection helpers live in AudioDeviceSetupSync today (same pattern as ASIO); YAGNI until another driver needs it.
+
+## Deferred from: review of spec-linux-jack-audio.md (2026-10-30)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-linux-jack-audio.md`
+  summary: Confirm on a Linux machine or green CI that Standalone Settings → AUDIO → DRIVER TYPE lists JACK when JACK/PipeWire-JACK client libs are available.
+  evidence: Change was implemented and off-path tested on Windows; Linux compile needs jack headers (CI already installs libjack-jackd2-dev) but live DRIVER TYPE smoke was not run in this session.
+- source_spec: `_bmad-output/implementation-artifacts/spec-linux-jack-audio.md`
+  summary: Optional LGPL / libjack third-party notice for documentation or release hygiene when shipping Linux Standalone with JACK enabled.
+  evidence: JACK client is LGPL with dynamic libjack load (JUCE model); Intent deferred manual notice for this chantier.
+
+## Deferred from: review of spec-gh-42-windows-standalone-asio.md (2026-10-30)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-gh-42-windows-standalone-asio.md`
+  summary: Before the first public GitHub/release binary that includes ASIO, add Steinberg ASIO SDK attribution / third-party notice (LICENSE or release hygiene) per ASIO Usage Guidelines.
+  evidence: Enabling `JUCE_ASIO` creates a Steinberg dependency; this story deferred docs/manual and kept a human publish gate until countersignature.
+
+## Deferred from: Windows alpha.3 Live 12 smoke (2026-10-28)
+
+- source_spec: none (user-manual follow-up)
+  summary: Document Ableton Live (Windows) **Auto-Scale Plugin Window** in `Documentation/User/manuel-utilisateur.md` — default ON bitmap-scales the VST3 UI and looks blurry at every Matrix-Control UI Scale; Standalone stays sharp. Ableton’s own guidance: for freely scalable VST3 UIs, disable Auto-Scale (Browser → right-click plug-in icon), then reload the device. Natural homes: Ableton Live subsection under master-keyboard / plugin routing, and/or §15 Apparence / UI Scale, and/or §16 Standalone vs plugin. Confirmed on Lenovo Windows + Live 12 with alpha.3 CI builds.
+  evidence: Owner smoke 2026-10-28; Ableton help “Recommended Graphics Settings (Windows)” Auto-Scale exception for freely scalable VST3.
+
 ## Deferred from: code review of spec-device-setup-assistant.md (2026-09-18)
 
 - **Editor-ready open wiring only covered by pure bool helper** — `shouldOpenDeviceSetupAssistant` is unit-tested; UiConstruction `promptDone` → open path is not. Deferred: repo unit tests stay on Core/pure helpers; PluginEditor construction harness is out of this chantier's test style.
@@ -2854,3 +2893,57 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-palette-duplicate-colour.md`
   summary: Same-ARGB mapped collision probe uses case-sensitive pastille name equality while add/rename uniqueness is case-insensitive.
   evidence: Would settle with a fixture whose mapping string differs only by case from the palette entry; factory chart names stay exact-case today.
+
+## Deferred from: spec-gh-36-m6r-master-discovery-fallback (2026-10-28)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-gh-36-m6r-master-discovery-fallback.md`
+  summary: Once Matrix-6/6R Master SysEx dump wire length is confirmed on hardware (counted capture), update `_local/References/Oberheim/oberheim-matrix-6-6r-midi-sysex-implementation.md` and the reading guide so the printed total matches reality (resolve youngmonkey 477 vs formula 478 vs Alpes/PR 479) and keep the discovery filter constants in sync.
+  evidence: Discovery intentionally accepts 478 or 479 until a counted dump exists; docs currently preserve youngmonkey's inconsistent 477 figure with an editorial note.
+- source_spec: `_bmad-output/implementation-artifacts/spec-gh-36-m6r-master-discovery-fallback.md`
+  summary: No MidiManager fixture asserts that `sendSysExWithDelay` pulses editor/outbound activity LEDs after the direct-send notifyActivity wiring.
+  evidence: Verification-gap review; MidiActivityTrackerTests cover the tracker alone; optional UX visibility for Inquiry/fallback, cheap only if an existing MidiManager send harness appears.
+- source_spec: `_bmad-output/implementation-artifacts/spec-gh-36-m6r-master-discovery-fallback.md`
+  summary: No Footer/GUI contract test for detected Matrix-6 with empty deviceVersion after Master fallback.
+  evidence: Blind Hunter; CONVENTIONS keep unit suite off paint/Footer; Matias checklist covers manual footer check.
+
+## Deferred from: code review of spec-gh-36-m6r-master-discovery-fallback.md (2026-10-28)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-gh-36-m6r-master-discovery-fallback.md`
+  summary: `forceMasterPullOnNextInquirySuccess_` now also means “run Master discovery fallback on Inquiry timeout” (port-pair force), while the name still reads as Master-pull-after-success only.
+  evidence: Blind Hunter; intentional flag reuse per spec Always constraints; clarifying comment or rename is a follow-up naming pass, not required to ship the fallback behaviour.
+- source_spec: `_bmad-output/implementation-artifacts/spec-gh-36-m6r-master-discovery-fallback.md`
+  summary: Reconfirmed — no MidiManager fixture for `sendSysExWithDelay` activity LED pulses (already deferred above).
+  evidence: Verification Gap Reviewer disposition `defer`; still needs a send harness.
+
+## Deferred from: review of spec-settings-presence-check.md (2026-10-29)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-settings-presence-check.md`
+  summary: Update sibling AD-7 / device-setup docs that still describe machine defaults as promptDone + ports + EPROM only (now also PRESENCE CHECK).
+  evidence: Intent expanded DeviceConnectionMachineDefaults; `spec-device-setup-cross-project-friction.md` and architecture AD-7 wording were not updated in this chantier.
+- source_spec: `_bmad-output/implementation-artifacts/spec-settings-presence-check.md`
+  summary: Refresh ContextualHelpOverlay Wave 3 static_assert to track Settings HELP registration under `registerPresenceCheckContextualHelp` (or a shared register API).
+  evidence: Assert still looks for `registerContextualHelp`; Settings binder was added under a different name.
+- source_spec: `_bmad-output/implementation-artifacts/spec-settings-presence-check.md`
+  summary: Add PropertiesFile load/save round-trip coverage for `writePresenceCheck` / machine key.
+  evidence: seedApvtsState + applyPresenceCheck are tested; file I/O path for the new key is not.
+
+## Deferred from: review of spec-silence-false-error-matrix-6-master.md (2026-10-29)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-silence-false-error-matrix-6-master.md`
+  summary: No unit test drives MidiLogger::analyzeSysExMessage / logSysExReceived to assert the false ERROR string is absent for a 478/479 Master dump.
+  evidence: Blind Hunter; helper covers the short-circuit label; full logger path needs log-capture infrastructure not present in the suite.
+- source_spec: `_bmad-output/implementation-artifacts/spec-silence-false-error-matrix-6-master.md`
+  summary: Matrix-6 Master fallback success still calls logSysExReceived twice (MidiReceiver then fallback handler), producing two identical analysis lines.
+  evidence: Blind Hunter; pre-existing double receive-log; silencing ERROR does not require consolidating logs.
+
+## Deferred from: code review of spec-matrix-6-master-only-presence.md + spec-silence-false-error-matrix-6-master.md (2026-10-29)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-matrix-6-master-only-presence.md`
+  summary: `onDevicePresenceTimer` Master-only branch is not exercised end-to-end; tests call eligibility / perform helpers directly.
+  evidence: Combined review Blind Hunter + Verification Gap; dual-port timer path not driven by current MidiManager unit fixtures.
+- source_spec: `_bmad-output/implementation-artifacts/spec-matrix-6-master-only-presence.md`
+  summary: Outbound-busy deferral in `performMatrix6MasterPresenceProof` has no unit test past the no-ports guard.
+  evidence: Combined review Blind Hunter + Verification Gap; same dump-available / dual-port fixture gap.
+- source_spec: `_bmad-output/implementation-artifacts/spec-silence-false-error-matrix-6-master.md`
+  summary: Reconfirmed — MidiLogger receive-log ERROR-absence still untested at call site; double `logSysExReceived` still pre-existing.
+  evidence: Combined review Verification Gap; already deferred earlier the same day.

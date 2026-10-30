@@ -104,15 +104,19 @@ def test_release_workflow_invokes_hygiene_before_pack():
     assert "Matrix-Control_VST3" in workflow_text
     assert "Matrix-Control_Standalone" in workflow_text
     assert "Matrix-Control_AU" in workflow_text
-    assert not any("codesign" in name.lower() for name in step_names), step_names
+    assert any("ad-hoc codesign" in name.lower() for name in step_names), step_names
+    assert "adhoc_sign_macos_bundles.py" in workflow_text
     assert not any("notariz" in name.lower() for name in step_names), step_names
 
     hygiene_idx = next(
         i for i, name in enumerate(step_names) if "hygiene" in name.lower()
     )
+    adhoc_idx = next(
+        i for i, name in enumerate(step_names) if "ad-hoc codesign" in name.lower()
+    )
     pack_idx = next(i for i, name in enumerate(step_names) if name.startswith("Pack "))
 
-    assert hygiene_idx < pack_idx
+    assert hygiene_idx < adhoc_idx < pack_idx
     # After unit tests / build, before packing.
     run_tests_idx = next(i for i, name in enumerate(step_names) if "unit test" in name.lower())
     assert hygiene_idx > run_tests_idx

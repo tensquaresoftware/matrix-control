@@ -18,6 +18,8 @@ namespace MatrixDeviceTypes
     constexpr const char* kMatrix6Id = "Matrix-6";
     constexpr const char* kMatrix6RId = "Matrix-6R";
     constexpr const char* kUnknownId = "Unknown";
+    /** Footer / UI label for shared Matrix-6 / 6R family (APVTS id stays Matrix-6). */
+    constexpr const char* kMatrix6FamilyDisplayName = "Matrix-6/6R";
     /** Footer / UI label when a Matrix-family member is connected but unsupported. */
     constexpr const char* kUnknownDisplayName = "Unknown Device";
 
@@ -52,7 +54,7 @@ namespace MatrixDeviceTypes
         switch (type)
         {
             case Type::kMatrix1000: return kMatrix1000Id;
-            case Type::kMatrix6:    return kMatrix6Id;
+            case Type::kMatrix6:    return kMatrix6FamilyDisplayName;
             case Type::kMatrix6R:   return kMatrix6RId;
             case Type::kUnknown:
             default:                return kUnknownDisplayName;

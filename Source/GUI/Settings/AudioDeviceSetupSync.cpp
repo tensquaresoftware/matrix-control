@@ -151,9 +151,18 @@ namespace AudioDeviceSetupSync
                                          juce::AudioDeviceManager::AudioDeviceSetup setup,
                                          const juce::Array<int>& bufferTryOrder)
     {
-        const double requestedRate = setup.sampleRate;
+        const double requestedRateForSuccess = requestedSampleRateForBufferFallbackSuccess(
+            deviceManager.getCurrentAudioDeviceType(),
+            setup.sampleRate);
 
-        for (const int bufferSize : bufferTryOrder)
+        // Never skip setAudioDeviceSetup entirely: an empty order used to fail-closed and
+        // restore the previous setup even when a single open would succeed (JACK with no
+        // live device yet has no available buffer list).
+        juce::Array<int> tryOrder = bufferTryOrder;
+        if (tryOrder.isEmpty())
+            tryOrder.add(setup.bufferSize);
+
+        for (const int bufferSize : tryOrder)
         {
             setup.bufferSize = bufferSize;
             const bool setSucceeded = deviceManager.setAudioDeviceSetup(setup, true).isEmpty();
@@ -162,7 +171,7 @@ namespace AudioDeviceSetupSync
 
             if (Core::didBufferFallbackTrySucceed(setSucceeded,
                                                   live != nullptr,
-                                                  requestedRate,
+                                                  requestedRateForSuccess,
                                                   liveRate))
             {
                 return true;

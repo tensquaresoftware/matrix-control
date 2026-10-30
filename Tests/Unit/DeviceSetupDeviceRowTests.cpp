@@ -251,7 +251,7 @@ private:
         expectEquals(Core::buildDeviceSetupConnectedDetail(MatrixDeviceTypes::Type::kUnknown, "1.0"),
                      juce::String(PluginDisplayNames::FooterPanel::kDeviceUnknownDetail));
         expectEquals(Core::buildDeviceSetupConnectedDetail(MatrixDeviceTypes::Type::kMatrix6, {}),
-                     juce::String("MATRIX-6"));
+                     juce::String("MATRIX-6/6R"));
     }
 
     void testAssistantBodyTextWithAndWithoutSuffix()

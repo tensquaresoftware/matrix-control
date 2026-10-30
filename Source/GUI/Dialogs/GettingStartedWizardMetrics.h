@@ -21,7 +21,7 @@ namespace GettingStartedWizardMetrics
     // Intro: three paragraphs with two blank separators; floor covers wrap at Settings-width inset.
     inline constexpr int kBodyIntroDesignHeight = 156;
     inline constexpr int kBodyUserInterfaceDesignHeight = 46;
-    inline constexpr int kBodySynthCommunicationDesignHeight = 58;
+    inline constexpr int kBodySynthCommunicationDesignHeight = 100;
     inline constexpr int kBodyMidiKeyboardStandaloneDesignHeight = 46;
     inline constexpr int kBodyMidiKeyboardPluginDesignHeight = 58;
     inline constexpr int kBodyAudioDesignHeight = 58;
@@ -96,13 +96,15 @@ namespace GettingStartedWizardMetrics
                + DialogMatrixHelpers::kTitleBarHeight + DialogMatrixHelpers::kBorderThickness * 2;
     }
 
-    /** STEP 4 embeds the full Settings AUDIO page; dialog may exceed Settings height. */
+    /** STEP 4 embeds the full Settings AUDIO page. STEP 2 body (presence tip + optional
+        firmware suffix) can also exceed Settings; runtime measures text and does not clamp. */
     inline constexpr bool mayExceedSettingsDialogHeight(GettingStartedWizard::Step step) noexcept
     {
-        return step == GettingStartedWizard::Step::kAudio;
+        return step == GettingStartedWizard::Step::kAudio
+            || step == GettingStartedWizard::Step::kSynthCommunication;
     }
 
-    /** Max body design height. Non-Audio steps stay strictly below Settings dialog height. */
+    /** Max body design height. Steps not in mayExceedSettingsDialogHeight stay below Settings. */
     inline int maxBodyDesignHeightBelowSettings(GettingStartedWizard::Step step,
                                                 bool isPluginMode) noexcept
     {

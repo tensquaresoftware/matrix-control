@@ -36,6 +36,7 @@ namespace PluginIDs
         constexpr const char* kEpromTypePromptDone = "settingsEpromTypePromptDone";
         // Transient: Core requests a one-time editor prompt; editor clears after show/handle.
         constexpr const char* kEpromTypePromptPending = "settingsEpromTypePromptPending";
+        constexpr const char* kPresenceCheck = "settingsPresenceCheck";
         constexpr const char* kLastSettingsTab = "settingsLastTab";
 
         namespace ComputerPatchesNamesPolicy
@@ -54,6 +55,15 @@ namespace PluginIDs
             constexpr int kUntergeek = 4;
             constexpr int kUnknown = 5;
             constexpr int kDefault = kUnknown;
+        }
+
+        namespace PresenceCheck
+        {
+            constexpr int kOnceOnConnect = 1;
+            constexpr int kEvery5s = 2;
+            constexpr int kEvery15s = 3;
+            constexpr int kEvery30s = 4;
+            constexpr int kDefault = kEvery15s;
         }
 
         namespace UnsavedStatePolicy
@@ -250,6 +260,7 @@ namespace PluginIDs
         constexpr const char* kMidiInputPortId = "midiInputPortId";
         constexpr const char* kMidiOutputPortId = "midiOutputPortId";
         constexpr const char* kEpromType = "settingsEpromType";
+        constexpr const char* kPresenceCheck = "settingsPresenceCheck";
         // Getting Started auto-open preference (machine-scoped; not Device Setup promptDone).
         constexpr const char* kGettingStartedAutoOpen = "gettingStartedAutoOpen";
         // Per-step durable completion (machine-scoped; plugin and Standalone share keys,

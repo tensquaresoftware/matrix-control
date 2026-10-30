@@ -103,10 +103,10 @@ namespace SettingsShellMetrics
         return pageContentHeight(midiPageRowCount(isPluginMode));
     }
 
-    /** MIDI cabling rows + DEVICE + EPROM TYPE (+ HARDWARE LATENCY in plugin). */
+    /** MIDI cabling rows + DEVICE + PRESENCE CHECK + EPROM TYPE (+ HARDWARE LATENCY in plugin). */
     inline int midiAndDevicePageRowCount(bool isPluginMode) noexcept
     {
-        return midiPageRowCount(isPluginMode) + 2 + (deviceShowsHardwareLatency(isPluginMode) ? 1 : 0);
+        return midiPageRowCount(isPluginMode) + 3 + (deviceShowsHardwareLatency(isPluginMode) ? 1 : 0);
     }
 
     inline int midiAndDevicePageContentHeight(bool isPluginMode) noexcept

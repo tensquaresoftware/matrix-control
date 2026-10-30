@@ -53,6 +53,9 @@ public:
     /** Rebuild inter-SysEx delay from Settings EPROM TYPE + current device family. */
     void refreshSysExDelayFromSettings();
 
+    /** Reschedule / stop the device presence timer from Settings PRESENCE CHECK. */
+    void refreshDevicePresenceMonitoringFromSettings();
+
     void sendPatch(juce::uint8 patchNumber, const juce::uint8* packedData);
     void sendPatchToEditBuffer(const juce::uint8* packedData);
     // Matrix-1000: commit the current edit buffer to bank/patch (opcode 0x0E).
@@ -261,15 +264,38 @@ private:
     void clearLastInquiryPortPair() noexcept;
     void updateDevicePresenceMonitoring();
     void onDevicePresenceTimer();
+    /** Detected Matrix-6/6R presence: start Master proof; false = keep Inquiry-first. */
+    bool tryStartMasterOnlyPresenceProofIfEligible();
+    /** Detected Matrix-6/6R presence tick: Master proof without Device Inquiry. */
+    void performMatrix6MasterPresenceProof();
     bool armAsyncDeviceInquiryCapture(std::uint64_t token);
     void handleAsyncDeviceInquiryResponse(std::uint64_t token, const juce::MemoryBlock& response);
     void sendArmedDeviceInquiry(std::uint64_t token);
     void scheduleDeviceInquiryTimeout(std::uint64_t token);
+    /** Inquiry identity timeout body (also invoked from unit tests without waiting 2 s). */
+    void onDeviceInquiryIdentityTimeout(std::uint64_t token);
+    void sendArmedMatrix6MasterFallback(std::uint64_t token);
+    /** After token claim + port gate: arm capture, send Master request, schedule timeout. */
+    void dispatchArmedMatrix6MasterFallback(std::uint64_t token);
+    bool armAsyncMatrix6MasterFallbackCapture(std::uint64_t token);
+    void handleAsyncMatrix6MasterFallbackResponse(std::uint64_t token,
+                                                  const juce::MemoryBlock& response);
+    void scheduleMatrix6MasterFallbackTimeout(std::uint64_t token);
+    /** Master-fallback timeout body (also invoked from unit tests without waiting 2 s). */
+    void onMatrix6MasterFallbackTimeout(std::uint64_t token);
+    /** Master-fallback failure: soft-abort if Matrix-6 family presence, else clear detect. */
+    void finishMatrix6MasterFallbackFailure(std::uint64_t token,
+                                            const juce::String& errorMessage,
+                                            const juce::String& errorType);
     void pollOutboundIdleThenDeviceInquiry(OutboundIdlePollArgs args);
     void scheduleOrSendArmedDeviceInquiry(const OutboundIdlePollArgs& args);
     void finishAsyncDeviceInquirySuccess(std::uint64_t token,
                                          const DeviceIdInfo& info,
-                                         MatrixDeviceTypes::Type deviceType);
+                                         MatrixDeviceTypes::Type deviceType,
+                                         bool preserveStoredEpromType = false);
+    void applyDeviceInquirySuccessDetection(const DeviceIdInfo& info,
+                                            MatrixDeviceTypes::Type deviceType,
+                                            bool preserveStoredEpromType);
     void finishAsyncDeviceInquiryFailure(std::uint64_t token,
                                          const juce::String& errorMessage,
                                          const juce::String& errorType);
@@ -278,6 +304,8 @@ private:
     /** Presence timeout while already detected — keep detection; freeze editor SysEx traffic. */
     void softAbortDeviceInquiryUnresponsive(std::uint64_t token);
     void setDeviceMidiUnresponsive(bool unresponsive);
+
+    friend class Matrix6MasterFallbackMidiManagerTests;
 
     JUCE_DECLARE_WEAK_REFERENCEABLE(MidiManager)
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MidiManager)

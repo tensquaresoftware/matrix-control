@@ -256,6 +256,7 @@ private:
     void refreshSettingsLiveDeviceStatus();
     void wireSettingsPanel(SettingsPanel& panel);
     void wireSettingsEpromAndLatency(SettingsPanel& panel);
+    void restoreSettingsPresenceCheckFromState(SettingsPanel& panel);
     void wireSettingsAppearanceCombos(SettingsPanel& panel);
     void wireSettingsContextualHelpCombo(SettingsPanel& panel);
     void wireSettingsGettingStartedControls(SettingsPanel& panel);

@@ -48,7 +48,7 @@ endif()
 project(Matrix-Control VERSION 1.0.0)
 
 string(TIMESTAMP MATRIX_CONTROL_BUILD_DATE "%Y-%m-%d" UTC)
-set(MATRIX_CONTROL_PRERELEASE_SUFFIX "alpha.2"
+set(MATRIX_CONTROL_PRERELEASE_SUFFIX "alpha.5"
     CACHE STRING "Pre-release suffix appended to version (empty string for release builds)")
 
 # BUILD_DATE must stay on PluginVersion.cpp only. Putting it on the Matrix-Control
@@ -261,6 +261,7 @@ set(PLUGIN_SOURCES
     Source/GUI/PluginEditorWindows.cpp
     Source/GUI/PluginEditorSettingsOverlay.cpp
     Source/GUI/PluginEditorSettings.cpp
+    Source/GUI/PluginEditorSettingsDevice.cpp
     Source/GUI/PluginEditorSettingsAppearance.cpp
     Source/GUI/PluginEditorGettingStarted.cpp
     Source/GUI/PluginEditorSkinScale.cpp
@@ -309,6 +310,7 @@ set(PLUGIN_SOURCES
     Source/Core/MIDI/MidiManagerAsyncPatch.cpp
     Source/Core/MIDI/MidiManagerAsyncMaster.cpp
     Source/Core/MIDI/MidiManagerDeviceInquiry.cpp
+    Source/Core/MIDI/MidiManagerDeviceInquiryFallback.cpp
     Source/Core/MIDI/MidiManagerUnisonDetune.cpp
     Source/Core/MIDI/MidiManagerPanic.cpp
     Source/Core/MIDI/MidiPortOpenFeedback.cpp
@@ -548,6 +550,9 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/DeviceTypeRegistryTests.cpp
         Tests/Unit/DeviceInquiryTriggerTests.cpp
         Tests/Unit/DeviceInquiryCaptureFilterTests.cpp
+        Tests/Unit/Matrix6MasterResponseFilterTests.cpp
+        Tests/Unit/Matrix6MasterFallbackPolicyTests.cpp
+        Tests/Unit/Matrix6MasterFallbackMidiManagerTests.cpp
         Tests/Unit/DeviceVersionDisplayFormatTests.cpp
         Tests/Unit/DropPathParseTests.cpp
         Tests/Unit/DeviceAudioInputPreferenceTests.cpp
@@ -664,9 +669,12 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/RealtimeQueuePressureMonitorTests.cpp
         Tests/Unit/SysExDelayProfileTests.cpp
         Tests/Unit/EpromTypePolicyTests.cpp
+        Tests/Unit/PresenceCheckPolicyTests.cpp
         Tests/Unit/DeviceSetupDeviceRowTests.cpp
         Tests/Unit/MatrixModalCopyTests.cpp
         Tests/Unit/SettingsTabsShellTests.cpp
+        Tests/Unit/WindowsAsioDeviceTypeTests.cpp
+        Tests/Unit/LinuxJackDeviceTypeTests.cpp
         Tests/Unit/DeviceConnectionMachineDefaultsTests.cpp
         Tests/Unit/GettingStartedSettingsContractTests.cpp
         Tests/Unit/GettingStartedWizardContractTests.cpp
@@ -802,6 +810,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/MIDI/MidiManagerAsyncPatch.cpp
         Source/Core/MIDI/MidiManagerAsyncMaster.cpp
         Source/Core/MIDI/MidiManagerDeviceInquiry.cpp
+        Source/Core/MIDI/MidiManagerDeviceInquiryFallback.cpp
         Source/Core/MIDI/MidiManagerUnisonDetune.cpp
         Source/Core/MIDI/MidiManagerPanic.cpp
         Source/Core/MIDI/MidiPortOpenFeedback.cpp
@@ -1035,6 +1044,63 @@ target_compile_definitions(Matrix-Control
         MATRIX_CONTROL_PROJECT_VERSION="${PROJECT_VERSION}"
         MATRIX_CONTROL_PRERELEASE_SUFFIX="${MATRIX_CONTROL_PRERELEASE_SUFFIX}"
 )
+
+# Windows Standalone Settings AUDIO: register JUCE ASIO device type (GH-42).
+# Shared-target PUBLIC so juce_audio_devices compiles with ASIO; Standalone-only is insufficient.
+# Tests link juce_audio_devices separately and need the same flag to assert ASIO registration.
+# Uses JUCE bundled Steinberg headers (JUCE_ASIO_USE_EXTERNAL_SDK stays off).
+if(WIN32)
+    target_compile_definitions(Matrix-Control PUBLIC JUCE_ASIO=1)
+    if(TARGET Matrix-Control_Tests)
+        target_compile_definitions(Matrix-Control_Tests PRIVATE JUCE_ASIO=1)
+    endif()
+
+    # Product target must compile with ASIO (COMPILE_DEFINITIONS). INTERFACE-only would leave
+    # Standalone without ASIO while Matrix-Control_Tests could still pass via its PRIVATE define.
+    get_property(_matrix_control_compile_defs TARGET Matrix-Control PROPERTY COMPILE_DEFINITIONS)
+    string(FIND "${_matrix_control_compile_defs}" "JUCE_ASIO=1" _matrix_control_asio_pos)
+    if(_matrix_control_asio_pos EQUAL -1)
+        message(FATAL_ERROR
+            "Matrix-Control must define JUCE_ASIO=1 on Windows COMPILE_DEFINITIONS (GH-42); "
+            "Standalone would lack ASIO while Matrix-Control_Tests could still pass.")
+    endif()
+    unset(_matrix_control_compile_defs)
+    unset(_matrix_control_asio_pos)
+endif()
+
+# Linux Standalone Settings AUDIO: register JUCE JACK device type (alongside ALSA).
+# Shared-target PUBLIC so juce_audio_devices compiles with JACK; Standalone-only is insufficient.
+# Tests link juce_audio_devices separately and need the same flag to assert JACK registration.
+# JUCE loads libjack via dlopen at runtime; build needs jack development headers (e.g. libjack-jackd2-dev).
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    find_path(MATRIX_JACK_INCLUDE_DIR jack/jack.h
+        PATHS /usr/include /usr/local/include
+        DOC "JACK client development headers")
+    if(NOT MATRIX_JACK_INCLUDE_DIR)
+        message(FATAL_ERROR
+            "JUCE_JACK=1 requires jack/jack.h (install libjack-jackd2-dev or equivalent). "
+            "CI already installs this package; see .github/workflows/build-and-test.yml.")
+    endif()
+    unset(MATRIX_JACK_INCLUDE_DIR)
+
+    target_compile_definitions(Matrix-Control PUBLIC JUCE_JACK=1)
+    if(TARGET Matrix-Control_Tests)
+        target_compile_definitions(Matrix-Control_Tests PRIVATE JUCE_JACK=1)
+    endif()
+
+    # Product target must compile with JACK (COMPILE_DEFINITIONS). INTERFACE-only would leave
+    # Standalone without JACK while Matrix-Control_Tests could still pass via its PRIVATE define.
+    get_property(_matrix_control_compile_defs TARGET Matrix-Control PROPERTY COMPILE_DEFINITIONS)
+    string(FIND "${_matrix_control_compile_defs}" "JUCE_JACK=1" _matrix_control_jack_pos)
+    if(_matrix_control_jack_pos EQUAL -1)
+        message(FATAL_ERROR
+            "Matrix-Control must define JUCE_JACK=1 on Linux COMPILE_DEFINITIONS; "
+            "Standalone would lack JACK while Matrix-Control_Tests could still pass.")
+    endif()
+    unset(_matrix_control_compile_defs)
+    unset(_matrix_control_jack_pos)
+endif()
+
 
 # JUCE links optional ARA/LV2 stub objects with no symbols into the shared-code static library.
 if(APPLE)

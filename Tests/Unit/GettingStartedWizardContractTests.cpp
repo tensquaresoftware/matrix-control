@@ -80,10 +80,13 @@ private:
                 expect(height > 0);
                 if (GettingStartedWizardMetrics::mayExceedSettingsDialogHeight(step))
                 {
-                    expect(step == Step::kAudio);
-                    expectEquals(GettingStartedWizardMetrics::reservedControlRows(step, isPluginMode),
-                                 SettingsShellMetrics::kTallestPageRows);
-                    expect(height > settingsHeight);
+                    expect(step == Step::kAudio || step == Step::kSynthCommunication);
+                    if (step == Step::kAudio)
+                    {
+                        expectEquals(GettingStartedWizardMetrics::reservedControlRows(step, isPluginMode),
+                                     SettingsShellMetrics::kTallestPageRows);
+                        expect(height > settingsHeight);
+                    }
                     continue;
                 }
 
@@ -137,7 +140,9 @@ private:
         expectEquals(juce::String(GettingStartedWizard::bodyFor(Step::kSynthCommunication, false)),
                      juce::String("Select the MIDI ports wired to your synth and the EPROM type installed "
                                   "in it. Wait until the device is recognized when possible - this unlocks "
-                                  "reliable editing and timing."));
+                                  "reliable editing and timing. "
+                                  "Matrix-Control re-checks the link periodically; you can change that later "
+                                  "in Settings > MIDI & DEVICE > PRESENCE CHECK."));
         expectEquals(juce::String(GettingStartedWizard::bodyFor(Step::kMidiKeyboard, false)),
                      juce::String("If you use a separate MIDI keyboard, choose it here. Matrix-6 owners "
                                   "who play the built-in keys can skip this step."));

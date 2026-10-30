@@ -461,6 +461,14 @@ void PluginProcessor::initializeEpromTypeProperties()
 
     if (! apvts.state.hasProperty(PluginIDs::Settings::kEpromTypePromptPending))
         apvts.state.setProperty(PluginIDs::Settings::kEpromTypePromptPending, false, nullptr);
+
+    if (! apvts.state.hasProperty(PluginIDs::Settings::kPresenceCheck))
+    {
+        apvts.state.setProperty(
+            PluginIDs::Settings::kPresenceCheck,
+            PluginIDs::Settings::PresenceCheck::kDefault,
+            nullptr);
+    }
 }
 
 void PluginProcessor::seedDeviceConnectionDefaultsFromMachine()
