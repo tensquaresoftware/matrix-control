@@ -336,11 +336,14 @@ void SkinEditorPalettePanel::paintColourRow(juce::Graphics& g, const Row& item, 
 
     const auto& bodyFont = SkinEditorChrome::fontRegular();
     const int countLeft = mappingCountLeft(paintW, mappingCountColumnWidth_);
-    g.setColour(SkinEditorChrome::attention());
-    g.setFont(bodyFont);
-    g.drawText(juce::String(item.mappingCount),
-               juce::Rectangle<int>(countLeft, yOff, mappingCountColumnWidth_, fullH),
-               juce::Justification::centredRight, false);
+    if (item.mappingCount > 0)
+    {
+        g.setColour(SkinEditorChrome::attention());
+        g.setFont(bodyFont);
+        g.drawText(juce::String(item.mappingCount),
+                   juce::Rectangle<int>(countLeft, yOff, mappingCountColumnWidth_, fullH),
+                   juce::Justification::centredRight, false);
+    }
 
     const int nameLeft = kSwatchX + sw + kNameGap;
     g.setColour(SkinEditorChrome::textTableBody());

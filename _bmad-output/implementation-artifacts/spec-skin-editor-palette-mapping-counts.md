@@ -14,13 +14,14 @@ context: []
 
 **Problem:** Palette colour rows do not show how many Mappings use each colour, so authors cannot see usage at a glance.
 
-**Approach:** On each Palette colour row, show the mapping reference count as right-aligned amber text (same `attention()` colour as Mappings "Unbound" label text), including `0` when unused. Match the attached mock: digits at the trailing edge of the paint row; name elides before the count.
+**Approach:** On each Palette colour row, show the mapping reference count as right-aligned amber text (same `attention()` colour as Mappings "Unbound" label text). When unused (count 0), leave the trailing slot empty — do not paint `0`. Match the attached mock for non-zero counts: digits at the trailing edge of the paint row; name elides before the count column.
 
 </frozen-after-approval>
 
 ## Implementation Notes
 
 - Agent decisions: plain `attention()` digits (not Unbound badge capsules); cache count on `Row` via `Layer::countMappingsReferencing` in `rebuildRows`; reserve trailing width so names elide; avoid widening `kPalettePanelWidth` unless layout proves insufficient for two-digit counts.
+- Follow-up: unused colours paint no digit (empty), still reserve the count column so names do not reflow when usage goes 0↔N.
 - Files: `Tools/SkinEditor/SkinEditorPalettePanel.h`, `Tools/SkinEditor/SkinEditorPalettePanel.cpp`.
 - Extracted `paintColourRow` to satisfy function-length gate; `mappingCountColumnWidth_` sized to widest digit string so counts right-align.
 - Build: `Matrix-Control_SkinEditor` (macos-debug-arm64) OK; `lint_touched.py` OK.
