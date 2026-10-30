@@ -52,8 +52,8 @@ public:
         beginTest("newEditorSkin_mergesCustomPastillesFromCurrentEditor");
         assertNewEditorSkinMergesCustomPastilles();
 
-        beginTest("addPastille_rejectsDuplicateNameOrArgb");
-        assertAddPastilleRejectsDuplicateNameOrArgb();
+        beginTest("addPastille_rejectsDuplicateName_allowsSameArgb");
+        assertAddPastilleRejectsDuplicateNameAllowsSameArgb();
 
         beginTest("appendImport_remintsDuplicateExport_withDistinctIds");
         assertAppendRemintDistinctIds();
@@ -324,6 +324,9 @@ private:
         expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Donor").wasOk());
         const auto donorId = layer.activeSkinId();
         expect(layer.addPastille(donorId, "kCustomAccent", 0xffff00aa).wasOk());
+        // Same-ARGB twin + Product-ARGB twin must both copy (name-only merge match).
+        expect(layer.addPastille(donorId, "kCustomAccent Twin", 0xffff00aa).wasOk());
+        expect(layer.addPastille(donorId, "kMyRedCopy", 0xffff0000).wasOk());
 
         expect(layer.createEditorSkinWithUnboundMappings(TSS::DevSkin::kCompiledBlackId,
                                                          "Merged New",
@@ -333,13 +336,23 @@ private:
         expect(skin->mappings.empty());
 
         bool foundCustom = false;
+        bool foundTwin = false;
+        bool foundProductArgbTwin = false;
         for (const auto& pastille : skin->palette)
+        {
             if (pastille.name == "kCustomAccent" && pastille.argb == 0xffff00aa)
                 foundCustom = true;
+            if (pastille.name == "kCustomAccent Twin" && pastille.argb == 0xffff00aa)
+                foundTwin = true;
+            if (pastille.name == "kMyRedCopy" && pastille.argb == 0xffff0000)
+                foundProductArgbTwin = true;
+        }
         expect(foundCustom);
+        expect(foundTwin);
+        expect(foundProductArgbTwin);
     }
 
-    void assertAddPastilleRejectsDuplicateNameOrArgb()
+    void assertAddPastilleRejectsDuplicateNameAllowsSameArgb()
     {
         TSS::DevSkin::Layer layer;
         expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Dup Colour").wasOk());
@@ -348,10 +361,10 @@ private:
         expect(layer.addPastille(id, "kCustomAccent", kUnique).wasOk());
         expect(layer.addPastille(id, "kcustomaccent", 0xff12ab34).failed());
         expect(layer.addPastille(id, "KCUSTOMACCENT", 0xff56cd78).failed());
-        // Same ARGB, different name — still a duplicate colour.
-        expect(layer.addPastille(id, "kOtherMagenta", kUnique).failed());
-        // Product chart colour (kRed500) cannot be re-added under a new name.
-        expect(layer.addPastille(id, "kMyRed", 0xffff0000).failed());
+        // Same ARGB, different name — palette twins are allowed.
+        expect(layer.addPastille(id, "kOtherMagenta", kUnique).wasOk());
+        // Product chart colour ARGB under a new Editor name is allowed.
+        expect(layer.addPastille(id, "kMyRed", 0xffff0000).wasOk());
     }
 
     void assertSessionRoundTrip()

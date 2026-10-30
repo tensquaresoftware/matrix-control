@@ -25,6 +25,7 @@ public:
 
     std::function<void(const juce::String& pastilleName)> onPastilleSelected;
     std::function<void()> onAddRequested;
+    std::function<void()> onDuplicateRequested;
     std::function<void()> onDeleteRequested;
     std::function<void(const juce::String& pastilleName)> onRenamePastilleRequested;
     /** Escape while the palette list has focus - clear mapping mode in main. */
@@ -71,7 +72,9 @@ private:
     void listBoxItemDoubleClicked(int row, const juce::MouseEvent& e) override;
 
     void rebuildRows();
-    /** True when no editor skin is loaded (empty shell: no Add/Delete). */
+    void updateActionButtonEnablement();
+    void layoutActionButtons(juce::Rectangle<int> actionRow);
+    /** True when no editor skin is loaded (empty shell: no New/Duplicate/Del). */
     bool isShellEmpty() const noexcept { return skinId_.isEmpty(); }
     /** Push upper + lower half-height ListBox rows for one visual content row. */
     void pushSplitListRow(Row row);
@@ -93,6 +96,7 @@ private:
     juce::Label titleLabel_;
     juce::Rectangle<int> titleTabBounds_;
     juce::ListBox list_ { "Palette", this };
-    juce::TextButton addButton_ { "Add" };
-    juce::TextButton deleteButton_ { "Delete" };
+    juce::TextButton addButton_ { "New" };
+    juce::TextButton duplicateButton_ { "Duplicate" };
+    juce::TextButton deleteButton_ { "Del" };
 };

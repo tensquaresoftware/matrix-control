@@ -69,6 +69,7 @@ private:
     void onExportJson();
     void onImportJson();
     void onAddPastille();
+    void onDuplicatePastille();
     void onDeletePastille();
     void onRenamePastille(const juce::String& pastilleName);
     void onColourChanged(juce::Colour colour);
@@ -94,6 +95,11 @@ private:
     juce::String boundPastilleNameFor(TSS::SkinColourKey key) const;
     /** True when the named pastille exists on the editor skin and is still pending. */
     bool isPastillePending(const juce::String& pastilleName) const;
+    /**
+     * True when another pastille already mapped on the editor skin shares this
+     * pastille's ARGB (own name does not count).
+     */
+    bool isPastilleSameRgbAlreadyMapped(const juce::String& pastilleName) const;
     void enterHeldColour(const juce::String& pastilleName);
     void enterArmedRow(TSS::SkinColourKey key, bool fromUnbound);
     void enterEditingColour(const juce::String& pastilleName);
@@ -174,6 +180,8 @@ private:
     bool operationStartHintActive_ = false;
     bool mappingWitnessShowSwatch_ = false;
     bool mappingWitnessPending_ = false;
+    /** Held colour RGB already mapped under a different pastille — red SAME COLOUR badge. */
+    bool mappingWitnessSameColourCollision_ = false;
     juce::Colour mappingWitnessColour_;
 
     juce::Label connectionLabel_;

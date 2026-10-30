@@ -58,12 +58,6 @@ namespace TSS::DevSkin
         if (target->argb == argb)
             return juce::Result::ok();
 
-        for (const auto& pastille : skin->palette)
-        {
-            if (pastille.name != pastilleName && pastille.argb == argb)
-                return juce::Result::fail("A pastille with that colour already exists");
-        }
-
         target->argb = argb;
         target->pending = false;
         bump();
@@ -90,8 +84,6 @@ namespace TSS::DevSkin
         {
             if (pastille.name.equalsIgnoreCase(trimmed))
                 return juce::Result::fail("Pastille already exists");
-            if (pastille.argb == argb)
-                return juce::Result::fail("A pastille with that colour already exists");
         }
 
         skin->palette.push_back({ trimmed, argb, pending });

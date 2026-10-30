@@ -15,11 +15,17 @@ SkinEditorPalettePanel::SkinEditorPalettePanel()
     list_.addKeyListener(&escapeForwarder_);
     addAndMakeVisible(list_);
     addAndMakeVisible(addButton_);
+    addAndMakeVisible(duplicateButton_);
     addAndMakeVisible(deleteButton_);
     addButton_.onClick = [this]
     {
         if (onAddRequested)
             onAddRequested();
+    };
+    duplicateButton_.onClick = [this]
+    {
+        if (onDuplicateRequested)
+            onDuplicateRequested();
     };
     deleteButton_.onClick = [this]
     {
@@ -46,8 +52,7 @@ void SkinEditorPalettePanel::setActiveSkinId(const juce::String& skinId)
 void SkinEditorPalettePanel::setReadOnly(bool readOnly)
 {
     readOnly_ = readOnly;
-    addButton_.setEnabled(! readOnly_);
-    deleteButton_.setEnabled(! readOnly_);
+    updateActionButtonEnablement();
 }
 
 void SkinEditorPalettePanel::refresh()
@@ -56,8 +61,14 @@ void SkinEditorPalettePanel::refresh()
     list_.updateContent();
     list_.repaint();
     resized();
+    updateActionButtonEnablement();
+}
 
+void SkinEditorPalettePanel::updateActionButtonEnablement()
+{
     const auto selected = getSelectedPastilleName();
+    addButton_.setEnabled(! readOnly_);
+    duplicateButton_.setEnabled(! readOnly_ && selected.isNotEmpty());
     deleteButton_.setEnabled(! readOnly_ && selected.isNotEmpty()
                              && layer_ != nullptr
                              && ! layer_->isProductPastilleName(selected));
@@ -110,8 +121,10 @@ void SkinEditorPalettePanel::resized()
     if (isShellEmpty())
     {
         addButton_.setVisible(false);
+        duplicateButton_.setVisible(false);
         deleteButton_.setVisible(false);
         addButton_.setBounds({});
+        duplicateButton_.setBounds({});
         deleteButton_.setBounds({});
         auto listBounds = bounds;
         listBounds.setRight(listBounds.getRight() + SkinEditorChrome::kPanelContentPad);
@@ -122,6 +135,7 @@ void SkinEditorPalettePanel::resized()
     }
 
     addButton_.setVisible(true);
+    duplicateButton_.setVisible(true);
     deleteButton_.setVisible(true);
 
     // Top: buttons, then content pad.
@@ -135,13 +149,38 @@ void SkinEditorPalettePanel::resized()
     if (auto* vp = list_.getViewport())
         vp->setScrollBarThickness(SkinEditorChrome::kScrollTrackWidth);
 
-    // Align Add/Delete with the table paint width (not the scroll track).
-    const int tableW = paintWidth();
-    auto actionRow = juce::Rectangle<int>(list_.getX(), actions.getY(), tableW, actions.getHeight());
-    const int half = (actionRow.getWidth() - SkinEditorChrome::kButtonGap) / 2;
-    addButton_.setBounds(actionRow.removeFromLeft(juce::jmax(1, half)));
+    layoutActionButtons({ list_.getX(), actions.getY(), paintWidth(), actions.getHeight() });
+}
+
+void SkinEditorPalettePanel::layoutActionButtons(juce::Rectangle<int> actionRow)
+{
+    // Measure preferred widths; leftover to New; shrink all if the row is tight.
+    const int tableW = actionRow.getWidth();
+    const int gaps = 2 * SkinEditorChrome::kButtonGap;
+    int newW = SkinEditorChrome::measureButtonWidth(addButton_);
+    int dupW = SkinEditorChrome::measureButtonWidth(duplicateButton_);
+    int delW = SkinEditorChrome::measureButtonWidth(deleteButton_);
+    const int preferred = newW + dupW + delW + gaps;
+    if (preferred <= tableW)
+    {
+        newW += tableW - preferred;
+    }
+    else
+    {
+        const int inner = juce::jmax(3, tableW - gaps);
+        const int sum = juce::jmax(1, newW + dupW + delW);
+        newW = juce::jmax(1, (inner * newW) / sum);
+        dupW = juce::jmax(1, (inner * dupW) / sum);
+        delW = juce::jmax(1, inner - newW - dupW);
+    }
+    addButton_.setBounds(actionRow.removeFromLeft(newW)
+                             .withHeight(SkinEditorChrome::kButtonHeight));
     actionRow.removeFromLeft(SkinEditorChrome::kButtonGap);
-    deleteButton_.setBounds(actionRow);
+    duplicateButton_.setBounds(actionRow.removeFromLeft(dupW)
+                                   .withHeight(SkinEditorChrome::kButtonHeight));
+    actionRow.removeFromLeft(SkinEditorChrome::kButtonGap);
+    deleteButton_.setBounds(actionRow.removeFromLeft(delW)
+                                .withHeight(SkinEditorChrome::kButtonHeight));
 }
 
 int SkinEditorPalettePanel::paintWidth() const noexcept
@@ -273,14 +312,11 @@ void SkinEditorPalettePanel::selectedRowsChanged(int)
     // invalidates the selected index, so force a full list repaint for highlight.
     list_.repaint();
 
-    const auto name = getSelectedPastilleName();
-    deleteButton_.setEnabled(! readOnly_ && name.isNotEmpty()
-                             && layer_ != nullptr
-                             && ! layer_->isProductPastilleName(name));
+    updateActionButtonEnablement();
     if (suppressSelectionNotify_)
         return;
     if (onPastilleSelected)
-        onPastilleSelected(name);
+        onPastilleSelected(getSelectedPastilleName());
 }
 
 void SkinEditorPalettePanel::listBoxItemDoubleClicked(int row, const juce::MouseEvent& e)

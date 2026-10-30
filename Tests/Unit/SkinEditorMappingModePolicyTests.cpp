@@ -25,6 +25,7 @@ public:
         mappedColourUnboundIsNoOp();
         propertyStateStillArmsOrBinds();
         heldAndArmedWitnessCopy();
+        sameRgbMappedCollisionBlocksBind();
     }
 
 private:
@@ -185,6 +186,27 @@ private:
                      juce::String("Calibrate this colour in COLOR before mapping."));
         expectEquals(juce::String(kHeldPendingNextStep),
                      juce::String("Next: adjust in COLOR before mapping."));
+    }
+
+    void sameRgbMappedCollisionBlocksBind()
+    {
+        beginTest("Same-RGB mapped collision - blocks bind like pending");
+
+        using namespace SkinEditorMappingPolicy;
+        expect(canBindPastille(false, false));
+        expect(! canBindPastille(false, true));
+        expect(! canBindPastille(true, true));
+        expect(pastilleClick(Mode::kArmedRow, true, false, true)
+               == PastilleIntent::kEnterOrChangeHeldColour);
+        expect(pastilleClick(Mode::kArmedRow, true, false, false)
+               == PastilleIntent::kBindArmedRow);
+        expect(rowClick(Mode::kHeldColour, true, true) == RowIntent::kIgnore);
+        expect(rowClick(Mode::kHeldColour, true, false) == RowIntent::kBindHeldColour);
+        expectEquals(juce::String(kSameColourBadge), juce::String("SAME COLOUR"));
+        expectEquals(juce::String(kSameColourMappedNextStep),
+                     juce::String("Next: adjust in COLOR before mapping (same RGB already mapped)."));
+        expectEquals(juce::String(kSameColourMappedStatusMessage),
+                     juce::String("Adjust in COLOR: this RGB is already mapped under another name."));
     }
 };
 

@@ -35,6 +35,8 @@ namespace SkinEditorChrome
     inline juce::Colour accent() { return juce::Colour(0xff00ddad); }
     /** Attention / coaching chrome (same amber as Mappings "Unbound"). */
     inline juce::Colour attention() { return juce::Colour(0xffe0a020); }
+    /** Danger / error chrome (Compare blink lit + SAME COLOUR badge). */
+    inline juce::Colour danger() { return juce::Colour(0xffff3b3b); }
     inline juce::Colour separatorLine() { return juce::Colour(0xff3a3a3a); }
     inline juce::Colour controlFill() { return surfacePanel(); }
     inline juce::Colour controlOutline() { return juce::Colour(0xff555555); }

@@ -35,8 +35,7 @@ namespace TSS::DevSkin
             bool exists = false;
             for (const auto& existing : dest.palette)
             {
-                if (existing.name.equalsIgnoreCase(pastille.name)
-                    || existing.argb == pastille.argb)
+                if (existing.name.equalsIgnoreCase(pastille.name))
                 {
                     exists = true;
                     break;

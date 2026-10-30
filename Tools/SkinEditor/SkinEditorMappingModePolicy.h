@@ -28,13 +28,21 @@ namespace SkinEditorMappingPolicy
         kEnterOrChangeArmedRow
     };
 
-    /** Pending (uncalibrated) pastilles may be selected / edited, but not mapped. */
-    inline bool canBindPastille(bool pending) noexcept { return ! pending; }
+    /**
+     * Pending (uncalibrated) pastilles may be selected / edited, but not mapped.
+     * Same-RGB twins may exist in the palette; bind is blocked when another mapped
+     * pastille already uses this RGB (see MainComponent collision probe).
+     */
+    inline bool canBindPastille(bool pending, bool sameRgbMappedCollision = false) noexcept
+    {
+        return ! pending && ! sameRgbMappedCollision;
+    }
 
+    /** bindBlocked = ! canBindPastille(pending, sameRgbMapped) — held/edit instead of bind. */
     inline PastilleIntent pastilleClick(Mode mode,
                                         bool canEdit,
                                         bool nameEmpty,
-                                        bool pending = false) noexcept
+                                        bool bindBlocked = false) noexcept
     {
         if (nameEmpty)
             return PastilleIntent::kIgnoreEmpty;
@@ -42,8 +50,7 @@ namespace SkinEditorMappingPolicy
             return PastilleIntent::kSelectReadOnly;
         if (mode == Mode::kArmedRow)
         {
-            // Pending: switch to held/edit instead of binding an empty circle.
-            if (! canBindPastille(pending))
+            if (bindBlocked)
                 return PastilleIntent::kEnterOrChangeHeldColour;
             return PastilleIntent::kBindArmedRow;
         }
@@ -51,13 +58,14 @@ namespace SkinEditorMappingPolicy
         return PastilleIntent::kEnterOrChangeHeldColour;
     }
 
-    inline RowIntent rowClick(Mode mode, bool canEdit, bool heldPastillePending = false) noexcept
+    /** bindBlocked — Ignore instead of bind (pending or same-RGB mapped collision). */
+    inline RowIntent rowClick(Mode mode, bool canEdit, bool bindBlocked = false) noexcept
     {
         if (! canEdit)
             return RowIntent::kIgnore;
         if (mode == Mode::kHeldColour)
         {
-            if (! canBindPastille(heldPastillePending))
+            if (bindBlocked)
                 return RowIntent::kIgnore;
             return RowIntent::kBindHeldColour;
         }
@@ -118,6 +126,12 @@ namespace SkinEditorMappingPolicy
         "Calibrate this colour in COLOR before mapping.";
     inline constexpr const char* kHeldPendingNextStep =
         "Next: adjust in COLOR before mapping.";
+    /** OPERATION badge when held colour RGB is already mapped under another pastille name. */
+    inline constexpr const char* kSameColourBadge = "SAME COLOUR";
+    inline constexpr const char* kSameColourMappedNextStep =
+        "Next: adjust in COLOR before mapping (same RGB already mapped).";
+    inline constexpr const char* kSameColourMappedStatusMessage =
+        "Adjust in COLOR: this RGB is already mapped under another name.";
 
     /** Append Hold colour coaching when the Hold colour toggle is on (bind gestures only). */
     inline juce::String withHoldColourSuffix(const juce::String& nextStep,

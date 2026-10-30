@@ -2,6 +2,7 @@
 
 #include "GUI/Skins/Dev/DevSkinJson.h"
 #include "GUI/Skins/Dev/DevSkinLayer.h"
+#include "Tools/SkinEditor/SkinEditorMappingModePolicy.h"
 #include "Tools/SkinEditor/SkinEditorUiHelpers.h"
 
 class DevSkinPendingPastilleTests : public juce::UnitTest
@@ -16,6 +17,9 @@ public:
     {
         beginTest("helpers_composeUniqueTempNameAndOpaqueArgb");
         assertHelpersComposeUniqueSeed();
+
+        beginTest("helpers_suggestUniquePastilleNameStemAndProductClone");
+        assertSuggestUniquePastilleNameStemAndProductClone();
 
         beginTest("addPastille_pendingTrue_persistsUntilArgbChanges");
         assertPendingClearsOnlyOnArgbChange();
@@ -35,8 +39,14 @@ public:
         beginTest("colourChartAndDuplicate_seedPendingFalse");
         assertProductSeedsNotPending();
 
-        beginTest("setPastilleArgb_collisionLeavesTargetUnchanged");
-        assertArgbCollisionLeavesTargetUnchanged();
+        beginTest("setPastilleArgb_andAdd_allowSameArgbTwins");
+        assertSameArgbAllowedAcrossPastilles();
+
+        beginTest("duplicatePastille_sameArgb_notPending_uniqueStem");
+        assertDuplicatePastilleOutcome();
+
+        beginTest("sameArgbMappedUnderOtherName_blocksSecondBind");
+        assertSameArgbMappedCollisionProbe();
 
         beginTest("renamePastille_rejectsEmptyCollisionAndProductName");
         assertRenameRejectsEmptyCollisionAndProduct();
@@ -62,6 +72,8 @@ private:
 
         skin = layer.findSkin(id);
         expect(skin != nullptr);
+        expectEquals(SkinEditorUi::suggestUniquePastilleName(*skin, "Temp 1"),
+                     juce::String("Temp 1 2"));
         const auto name2 = SkinEditorUi::suggestUniqueTempPastilleName(*skin);
         expectEquals(name2, juce::String("Temp 2"));
         const auto argb2 = SkinEditorUi::suggestUniqueOpaqueArgb(*skin);
@@ -76,6 +88,50 @@ private:
             if (pastille.pending)
                 ++pendingCount;
         expectEquals(pendingCount, 2);
+    }
+
+    void assertSuggestUniquePastilleNameStemAndProductClone()
+    {
+        TSS::DevSkin::Layer layer;
+        expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Pending Lab").wasOk());
+        const auto id = layer.activeSkinId();
+        expect(layer.addPastille(id, "Editor Accent", 0xffabcdef, false).wasOk());
+        expect(layer.addPastille(id, "Editor Accent 2", 0xfffedcba, false).wasOk());
+
+        const auto* skin = layer.findSkin(id);
+        expect(skin != nullptr);
+        expectEquals(SkinEditorUi::suggestUniquePastilleName(*skin, "Editor Accent"),
+                     juce::String("Editor Accent 3"));
+
+        juce::String productName;
+        juce::uint32 productArgb = 0;
+        for (const auto& pastille : skin->palette)
+        {
+            if (! layer.isProductPastilleName(pastille.name))
+                continue;
+            productName = pastille.name;
+            productArgb = pastille.argb;
+            break;
+        }
+        expect(productName.isNotEmpty());
+        const auto cloneName = SkinEditorUi::suggestUniquePastilleName(*skin, productName);
+        expect(cloneName.isNotEmpty());
+        expect(! layer.isProductPastilleName(cloneName));
+        expect(layer.addPastille(id, cloneName, productArgb, false).wasOk());
+
+        skin = layer.findSkin(id);
+        expect(skin != nullptr);
+        bool foundClone = false;
+        for (const auto& pastille : skin->palette)
+        {
+            if (pastille.name != cloneName)
+                continue;
+            expectEquals(static_cast<juce::int64>(pastille.argb),
+                         static_cast<juce::int64>(productArgb));
+            expect(! pastille.pending);
+            foundClone = true;
+        }
+        expect(foundClone);
     }
 
     void assertPendingClearsOnlyOnArgbChange()
@@ -230,28 +286,98 @@ private:
             expect(! pastille.pending);
     }
 
-    void assertArgbCollisionLeavesTargetUnchanged()
+    void assertSameArgbAllowedAcrossPastilles()
     {
         TSS::DevSkin::Layer layer;
         expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Pending Lab").wasOk());
         const auto id = layer.activeSkinId();
         expect(layer.addPastille(id, "Temp 1", 0xff112233, true).wasOk());
         expect(layer.addPastille(id, "Temp 2", 0xff445566, true).wasOk());
-        const auto revisionBefore = layer.revision();
 
-        expect(layer.setPastilleArgb(id, "Temp 1", 0xff445566).failed());
-        expectEquals(layer.revision(), revisionBefore);
+        expect(layer.setPastilleArgb(id, "Temp 1", 0xff445566).wasOk());
+        expect(layer.addPastille(id, "Temp 3", 0xff445566, false).wasOk());
 
         const auto* skin = layer.findSkin(id);
         expect(skin != nullptr);
+        int twinCount = 0;
         for (const auto& pastille : skin->palette)
         {
-            if (pastille.name != "Temp 1")
+            if (pastille.argb != 0xff445566)
                 continue;
-            expectEquals(static_cast<juce::int64>(pastille.argb),
-                         static_cast<juce::int64>(0xff112233));
-            expect(pastille.pending);
+            ++twinCount;
+            if (pastille.name == "Temp 1")
+                expect(! pastille.pending);
         }
+        expectEquals(twinCount, 3);
+    }
+
+    void assertDuplicatePastilleOutcome()
+    {
+        TSS::DevSkin::Layer layer;
+        expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Dup Lab").wasOk());
+        const auto id = layer.activeSkinId();
+        constexpr juce::uint32 kSourceArgb = 0xff102030;
+        expect(layer.addPastille(id, "Editor Accent", kSourceArgb, false).wasOk());
+
+        const auto* skin = layer.findSkin(id);
+        expect(skin != nullptr);
+        const auto copyName = SkinEditorUi::suggestUniquePastilleName(*skin, "Editor Accent");
+        expectEquals(copyName, juce::String("Editor Accent 2"));
+        expect(layer.addPastille(id, copyName, kSourceArgb, false).wasOk());
+
+        skin = layer.findSkin(id);
+        expect(skin != nullptr);
+        bool foundCopy = false;
+        for (const auto& pastille : skin->palette)
+        {
+            if (pastille.name != copyName)
+                continue;
+            foundCopy = true;
+            expectEquals(static_cast<juce::int64>(pastille.argb),
+                         static_cast<juce::int64>(kSourceArgb));
+            expect(! pastille.pending);
+            expect(! layer.isProductPastilleName(pastille.name));
+        }
+        expect(foundCopy);
+        // Neither twin mapped yet — first bind is still allowed.
+        expect(! SkinEditorUi::isPastilleArgbMappedUnderOtherName(*skin, copyName));
+        expect(! SkinEditorUi::isPastilleArgbMappedUnderOtherName(*skin, "Editor Accent"));
+    }
+
+    void assertSameArgbMappedCollisionProbe()
+    {
+        TSS::DevSkin::Layer layer;
+        expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Collision Lab").wasOk());
+        const auto id = layer.activeSkinId();
+        constexpr juce::uint32 kTwin = 0xffabcdef;
+        expect(layer.addPastille(id, "Accent A", kTwin, false).wasOk());
+        expect(layer.addPastille(id, "Accent B", kTwin, false).wasOk());
+
+        const auto* skin = layer.findSkin(id);
+        expect(skin != nullptr);
+        expect(! SkinEditorUi::isPastilleArgbMappedUnderOtherName(*skin, "Accent A"));
+        expect(! SkinEditorUi::isPastilleArgbMappedUnderOtherName(*skin, "Accent B"));
+
+        const auto key = TSS::skinColourKey(TSS::SkinObjectType::kButton,
+                                            TSS::SkinColourProperty::kBackground,
+                                            TSS::SkinColourState::kOff);
+        expect(layer.setMapping(id, key, "Accent A").wasOk());
+
+        skin = layer.findSkin(id);
+        expect(skin != nullptr);
+        expect(! SkinEditorUi::isPastilleArgbMappedUnderOtherName(*skin, "Accent A"));
+        expect(SkinEditorUi::isPastilleArgbMappedUnderOtherName(*skin, "Accent B"));
+        expect(SkinEditorMappingPolicy::canBindPastille(
+            false, SkinEditorUi::isPastilleArgbMappedUnderOtherName(*skin, "Accent A")));
+        expect(! SkinEditorMappingPolicy::canBindPastille(
+            false, SkinEditorUi::isPastilleArgbMappedUnderOtherName(*skin, "Accent B")));
+
+        expect(layer.setPastilleArgb(id, "Accent B", 0xff010203).wasOk());
+        skin = layer.findSkin(id);
+        expect(skin != nullptr);
+        expect(! SkinEditorUi::isPastilleArgbMappedUnderOtherName(*skin, "Accent B"));
+        expect(SkinEditorMappingPolicy::canBindPastille(
+            false, SkinEditorUi::isPastilleArgbMappedUnderOtherName(*skin, "Accent B")));
     }
 
     void assertRenameRejectsEmptyCollisionAndProduct()

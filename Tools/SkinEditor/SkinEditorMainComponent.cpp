@@ -108,6 +108,7 @@ void SkinEditorMainComponent::setupBodyPanels()
     palettePanel_.setLayer(&layer_);
     palettePanel_.onPastilleSelected = [this](const juce::String& name) { onPastilleSelected(name); };
     palettePanel_.onAddRequested = [this] { onAddPastille(); };
+    palettePanel_.onDuplicateRequested = [this] { onDuplicatePastille(); };
     palettePanel_.onDeleteRequested = [this] { onDeletePastille(); };
     palettePanel_.onRenamePastilleRequested = [this](const juce::String& name)
     {
@@ -236,7 +237,10 @@ void SkinEditorMainComponent::layoutOperationWitness(juce::Rectangle<int> conten
     // Order: badge | role | [swatch] identity | arrow | next-step
     const int rowH = SkinEditorChrome::kMappingBadgeHeight;
     const int rowY = chromeRowY(content.getY(), content.getHeight(), rowH, 0);
-    const int badgeW = SkinEditorChrome::mappingModeBadgeWidth();
+    const int badgeW = mappingWitnessSameColourCollision_
+                           ? SkinEditorChrome::chromeBadgeWidth(
+                                 SkinEditorMappingPolicy::kSameColourBadge)
+                           : SkinEditorChrome::mappingModeBadgeWidth();
     const int sw = SkinEditorChrome::kColourSwatchSize;
     const int arrowW = SkinEditorChrome::kOperationArrowWidth;
     const auto bodyFont = SkinEditorChrome::fontRegular();

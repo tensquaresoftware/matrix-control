@@ -117,7 +117,7 @@ void SkinEditorMainComponent::syncCompareButtonChrome()
             compareBlinkLit_ = true;
             compareBlinkTimer_.startTimerHz(2); // ~500 ms phase
         }
-        const auto colour = compareBlinkLit_ ? juce::Colour(0xffff3b3b)
+        const auto colour = compareBlinkLit_ ? SkinEditorChrome::danger()
                                              : SkinEditorChrome::textMuted();
         compareButton_.setColour(juce::TextButton::textColourOffId, colour);
         compareButton_.setColour(juce::TextButton::textColourOnId, colour);
@@ -139,7 +139,7 @@ void SkinEditorMainComponent::tickCompareBlink()
         return;
 
     compareBlinkLit_ = ! compareBlinkLit_;
-    const auto colour = compareBlinkLit_ ? juce::Colour(0xffff3b3b)
+    const auto colour = compareBlinkLit_ ? SkinEditorChrome::danger()
                                          : SkinEditorChrome::textMuted();
     compareButton_.setColour(juce::TextButton::textColourOffId, colour);
     compareButton_.setColour(juce::TextButton::textColourOnId, colour);
@@ -262,6 +262,63 @@ void SkinEditorMainComponent::onAddPastille()
         return;
     }
     // refreshAll already quiet-selected; keep picker in sync if mapping mode was idle.
+    syncColourPickerToSelection();
+}
+
+void SkinEditorMainComponent::onDuplicatePastille()
+{
+    if (! canEditEditorSkin())
+        return;
+
+    const auto sourceName = palettePanel_.getSelectedPastilleName();
+    if (sourceName.isEmpty())
+        return;
+
+    const auto* skin = layer_.findSkin(sessionState_.editorSkinId);
+    if (skin == nullptr)
+    {
+        juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon,
+                                               "Duplicate failed", "Editor skin not found");
+        return;
+    }
+
+    juce::uint32 sourceArgb = 0;
+    bool found = false;
+    for (const auto& pastille : skin->palette)
+    {
+        if (pastille.name == sourceName)
+        {
+            sourceArgb = pastille.argb;
+            found = true;
+            break;
+        }
+    }
+    if (! found)
+    {
+        juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon,
+                                               "Duplicate failed", "Colour not found");
+        return;
+    }
+
+    const auto name = SkinEditorUi::suggestUniquePastilleName(*skin, sourceName);
+    if (name.isEmpty())
+    {
+        juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon,
+                                               "Duplicate failed", "Could not name the copy");
+        return;
+    }
+
+    // Select before add so onChanged refresh highlights the new row without mapping click.
+    const auto previousSelection = selectedPastille_;
+    selectedPastille_ = name;
+    const auto result = layer_.addPastille(sessionState_.editorSkinId, name, sourceArgb, false);
+    if (result.failed())
+    {
+        selectedPastille_ = previousSelection;
+        juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon,
+                                               "Duplicate failed", result.getErrorMessage());
+        return;
+    }
     syncColourPickerToSelection();
 }
 

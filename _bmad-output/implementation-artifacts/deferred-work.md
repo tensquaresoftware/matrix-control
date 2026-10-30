@@ -2848,3 +2848,9 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-empty-no-editor-skin.md`
   summary: No unit test that empty editorSkinId yields empty Palette/Mappings coaching rows.
   evidence: Repo Skin Editor tests cover pure policy/chrome helpers; panel rebuildRows empty states are GUI and out of the current harness.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-palette-duplicate-colour.md`
+  summary: COLOR / setPastilleArgb can still make two already-mapped pastilles share one ARGB, bypassing the bind-time SAME COLOUR guard.
+  evidence: Frozen intent allows same-ARGB on setPastilleArgb and only hard-blocks at mapping; refusing Color edits that create mapped twins needs an explicit product decision.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-palette-duplicate-colour.md`
+  summary: Same-ARGB mapped collision probe uses case-sensitive pastille name equality while add/rename uniqueness is case-insensitive.
+  evidence: Would settle with a fixture whose mapping string differs only by case from the palette entry; factory chart names stay exact-case today.

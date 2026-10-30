@@ -72,6 +72,61 @@ namespace SkinEditorUi
         return false;
     }
 
+    /** Preferred if free, else "preferred 2", "preferred 3", … (palette names). */
+    inline juce::String suggestUniquePastilleName(const TSS::DevSkin::NamedSkin& skin,
+                                                 const juce::String& preferred)
+    {
+        const auto base = preferred.trim();
+        if (base.isEmpty())
+            return {};
+        if (! pastilleNameTaken(skin, base))
+            return base;
+
+        for (int suffix = 2;; ++suffix)
+        {
+            const auto candidate = base + " " + juce::String(suffix);
+            if (! pastilleNameTaken(skin, candidate))
+                return candidate;
+        }
+    }
+
+    /**
+     * True when another pastille already listed in skin.mappings shares this
+     * pastille's ARGB (own mapped uses do not count).
+     */
+    inline bool isPastilleArgbMappedUnderOtherName(const TSS::DevSkin::NamedSkin& skin,
+                                                   const juce::String& pastilleName)
+    {
+        if (pastilleName.isEmpty())
+            return false;
+
+        juce::uint32 candidateArgb = 0;
+        bool found = false;
+        for (const auto& pastille : skin.palette)
+        {
+            if (pastille.name == pastilleName)
+            {
+                candidateArgb = pastille.argb;
+                found = true;
+                break;
+            }
+        }
+        if (! found)
+            return false;
+
+        for (const auto& mapping : skin.mappings)
+        {
+            const auto& mappedName = mapping.second;
+            if (mappedName == pastilleName)
+                continue;
+
+            for (const auto& pastille : skin.palette)
+                if (pastille.name == mappedName && pastille.argb == candidateArgb)
+                    return true;
+        }
+        return false;
+    }
+
     /** Next free "Temp N" (case-insensitive) in this skin's palette. */
     inline juce::String suggestUniqueTempPastilleName(const TSS::DevSkin::NamedSkin& skin)
     {
