@@ -159,6 +159,8 @@ void SkinEditorMainComponent::refreshAll()
     palettePanel_.refresh();
 
     mappingsPanel_.setActiveSkinId(panelSkinId);
+    // Editor skin id (empty → 0) — not panelSkinId, so Compare Product keeps Export-honest count.
+    mappingsPanel_.setUnboundCount(layer_.unboundCount(sessionState_.editorSkinId));
     mappingsPanel_.setReadOnly(compareProduct || ! editable);
     mappingsPanel_.refresh();
 

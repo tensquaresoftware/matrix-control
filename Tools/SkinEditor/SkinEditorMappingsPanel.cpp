@@ -87,6 +87,11 @@ void SkinEditorMappingsPanel::setActiveSkinId(const juce::String& skinId)
     skinId_ = skinId;
 }
 
+void SkinEditorMappingsPanel::setUnboundCount(int count)
+{
+    unboundCount_ = juce::jmax(0, count);
+}
+
 void SkinEditorMappingsPanel::setReadOnly(bool readOnly)
 {
     readOnly_ = readOnly;
@@ -104,7 +109,9 @@ void SkinEditorMappingsPanel::refresh()
     rebuildObjectCombo(keep);
     resized();
     layoutContent();
+    // Unbound witness is painted on the panel (not Content) — must damage both.
     content_.repaint();
+    repaint();
 }
 
 // Rebuild (row builders live in SkinEditorMappingsPanelRows.cpp)
@@ -159,6 +166,14 @@ void SkinEditorMappingsPanel::paint(juce::Graphics& g)
     SkinEditorChrome::paintRoundedWell(g, viewport_.getBounds(), SkinEditorChrome::surfacePanel());
     if (! stickyLegendBounds_.isEmpty())
         paintStickyLegend(g, stickyLegendBounds_);
+
+    if (! unboundLabelBounds_.isEmpty())
+    {
+        g.setFont(SkinEditorChrome::fontRegular());
+        g.setColour(SkinEditorChrome::attention());
+        g.drawText("Unbound", unboundLabelBounds_, juce::Justification::centredLeft, false);
+        SkinEditorChrome::drawCountBadge(g, unboundBadgeBounds_, unboundCount_);
+    }
 }
 
 void SkinEditorMappingsPanel::paintMappingCells(juce::Graphics& g,
@@ -276,63 +291,6 @@ void SkinEditorMappingsPanel::Content::paint(juce::Graphics& g)
     owner_.paintFocusedObjectOutline(g, x0, width);
 }
 
-// Bind / focus
-
-void SkinEditorMappingsPanel::tryBindRow(int row)
-{
-    if (readOnly_ || onRowActivated == nullptr)
-        return;
-    if (row < 0 || row >= static_cast<int>(rows_.size()))
-        return;
-    if (rows_[static_cast<size_t>(row)].kind != RowKind::kMapping)
-        return;
-
-    onRowActivated(rows_[static_cast<size_t>(row)].key);
-}
-
-void SkinEditorMappingsPanel::tryEditMappedColour(int row)
-{
-    if (onMappedColourClicked == nullptr)
-        return;
-    if (row < 0 || row >= static_cast<int>(rows_.size()))
-        return;
-
-    const auto& item = rows_[static_cast<size_t>(row)];
-    if (item.kind != RowKind::kMapping || item.unbound)
-        return;
-
-    onMappedColourClicked(item.key);
-}
-
-void SkinEditorMappingsPanel::setFocusedObject(int objectIndex, bool scrollIntoPlace)
-{
-    if (objectIndex < 0 || objectIndex >= static_cast<int>(objects_.size()))
-        return;
-
-    focusedObject_ = objectIndex;
-
-    updatingObjectCombo_ = true;
-    objectCombo_.setSelectedItemIndex(objectIndex, juce::dontSendNotification);
-    updatingObjectCombo_ = false;
-
-    if (scrollIntoPlace)
-        scrollFocusedObjectIntoPlace();
-
-    content_.repaint();
-}
-
-void SkinEditorMappingsPanel::scrollFocusedObjectIntoPlace()
-{
-    if (focusedObject_ < 0 || focusedObject_ >= static_cast<int>(objects_.size()))
-        return;
-
-    // Pin tab under sticky legend + gap, keeping the 1 px focus ring above the tab visible.
-    const int targetY = juce::jmax(0, objects_[static_cast<size_t>(focusedObject_)].sectionY
-                                          - kFocusPad);
-    const int maxY = juce::jmax(0, content_.getHeight() - viewport_.getHeight());
-    viewport_.setViewPosition(0, juce::jlimit(0, maxY, targetY));
-}
-
 void SkinEditorMappingsPanel::Content::mouseUp(const juce::MouseEvent& e)
 {
     const int row = owner_.rowIndexAtY(e.y);
@@ -395,6 +353,8 @@ void SkinEditorMappingsPanel::layoutShellEmpty(juce::Rectangle<int> content)
     objectLabel_.setBounds({});
     objectCombo_.setBounds({});
     holdColourToggle_.setBounds({});
+    unboundLabelBounds_ = {};
+    unboundBadgeBounds_ = {};
     stickyBandBounds_ = {};
     stickyLegendBounds_ = {};
     auto listBounds = content;
@@ -432,12 +392,25 @@ void SkinEditorMappingsPanel::layoutShellFilled(juce::Rectangle<int> content)
     objectLabel_.setBounds(actionRow.removeFromLeft(labelW));
 
     const auto cols = columnsForWidth(tableW);
-    const int holdLeft = tableX + cols.mappedX;
+    // "Unbound" + badge share Mapped colour column left edge with table Unbound cells.
+    constexpr int kUnboundBadgeGap = 6;
+    const auto unboundFont = SkinEditorChrome::fontRegular();
+    const int unboundLabelW = SkinEditorChrome::measureTextWidth(unboundFont, "Unbound");
+    const int badgeW = SkinEditorChrome::countBadgeWidth(unboundCount_);
+    const int mappedLeft = tableX + cols.mappedX;
+    unboundLabelBounds_ = { mappedLeft, actions.getY(), unboundLabelW, actions.getHeight() };
+    unboundBadgeBounds_ = { mappedLeft + unboundLabelW + kUnboundBadgeGap,
+                            actions.getY(),
+                            badgeW,
+                            actions.getHeight() };
+
     const int holdW = SkinEditorChrome::measureTextWidth(SkinEditorChrome::fontRegular(),
                                                         holdColourToggle_.getButtonText())
                       + 16 + 6; // button-styled tick box + gap to label
+    const int holdRight = mappedLeft - SkinEditorChrome::kButtonGap;
+    const int holdLeft = juce::jmax(actionRow.getX(), holdRight - holdW);
     holdColourToggle_.setBounds(holdLeft, actions.getY(),
-                                juce::jmin(holdW, tableX + tableW - holdLeft),
+                                juce::jmax(0, holdRight - holdLeft),
                                 actions.getHeight());
 
     const int comboRight = holdLeft - SkinEditorChrome::kButtonGap;

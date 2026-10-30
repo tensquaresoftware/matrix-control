@@ -14,6 +14,8 @@ public:
 
     void setLayer(TSS::DevSkin::Layer* layer);
     void setActiveSkinId(const juce::String& skinId);
+    /** Whole-skin Unbound total for the Editor skin (Export gate) — not the Compare Product view. */
+    void setUnboundCount(int count);
     void setReadOnly(bool readOnly);
     void refresh();
 
@@ -145,6 +147,10 @@ private:
     juce::Label objectLabel_ { {}, "Object:" };
     juce::ComboBox objectCombo_;
     juce::ToggleButton holdColourToggle_ { "Hold colour" };
+    /** Whole-skin Unbound total (Export gate); painted in the Mapped colour column. */
+    int unboundCount_ = 0;
+    juce::Rectangle<int> unboundLabelBounds_;
+    juce::Rectangle<int> unboundBadgeBounds_;
     juce::Viewport viewport_;
     Content content_ { *this };
 };

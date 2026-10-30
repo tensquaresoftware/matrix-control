@@ -203,8 +203,9 @@ namespace SkinEditorChrome
                                           area.getCentreY() - diameter / 2,
                                           width,
                                           diameter);
-        g.setColour(textPrimary());
-        g.fillRoundedRectangle(badge.toFloat(), (float) diameter * 0.5f);
+        // Amber fill + panel-surface glyph (Mappings Unbound witness); panel corner radius.
+        g.setColour(attention());
+        g.fillRoundedRectangle(badge.toFloat(), kControlCorner);
         g.setColour(surfacePanel());
         g.setFont(font);
         g.drawText(text, badge, juce::Justification::centred, false);

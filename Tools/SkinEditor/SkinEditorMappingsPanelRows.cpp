@@ -115,3 +115,58 @@ void SkinEditorMappingsPanel::rebuildRows()
         y = appendObjectTable(*skin, object, keysByObject[object], y);
     }
 }
+
+void SkinEditorMappingsPanel::tryBindRow(int row)
+{
+    if (readOnly_ || onRowActivated == nullptr)
+        return;
+    if (row < 0 || row >= static_cast<int>(rows_.size()))
+        return;
+    if (rows_[static_cast<size_t>(row)].kind != RowKind::kMapping)
+        return;
+
+    onRowActivated(rows_[static_cast<size_t>(row)].key);
+}
+
+void SkinEditorMappingsPanel::tryEditMappedColour(int row)
+{
+    if (onMappedColourClicked == nullptr)
+        return;
+    if (row < 0 || row >= static_cast<int>(rows_.size()))
+        return;
+
+    const auto& item = rows_[static_cast<size_t>(row)];
+    if (item.kind != RowKind::kMapping || item.unbound)
+        return;
+
+    onMappedColourClicked(item.key);
+}
+
+void SkinEditorMappingsPanel::setFocusedObject(int objectIndex, bool scrollIntoPlace)
+{
+    if (objectIndex < 0 || objectIndex >= static_cast<int>(objects_.size()))
+        return;
+
+    focusedObject_ = objectIndex;
+
+    updatingObjectCombo_ = true;
+    objectCombo_.setSelectedItemIndex(objectIndex, juce::dontSendNotification);
+    updatingObjectCombo_ = false;
+
+    if (scrollIntoPlace)
+        scrollFocusedObjectIntoPlace();
+
+    content_.repaint();
+}
+
+void SkinEditorMappingsPanel::scrollFocusedObjectIntoPlace()
+{
+    if (focusedObject_ < 0 || focusedObject_ >= static_cast<int>(objects_.size()))
+        return;
+
+    // Pin tab under sticky legend + gap, keeping the 1 px focus ring above the tab visible.
+    const int targetY = juce::jmax(0, objects_[static_cast<size_t>(focusedObject_)].sectionY
+                                          - kFocusPad);
+    const int maxY = juce::jmax(0, content_.getHeight() - viewport_.getHeight());
+    viewport_.setViewPosition(0, juce::jlimit(0, maxY, targetY));
+}

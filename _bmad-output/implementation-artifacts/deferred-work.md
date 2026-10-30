@@ -2956,3 +2956,12 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-product-session-persist.md`
   summary: Explicit post-baseline session rewrite after corrupt-session recovery (not only Cream in-memory fallback).
   evidence: Blind Hunter; pre-existing load path; this fix only stopped accidental onChanged timer arming during load.
+
+## Deferred from: oneshot review of spec-skin-editor-mappings-unbound-badge.md (2026-10-30)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-unbound-badge.md`
+  summary: Extract shared clamp/width helpers for drawCountBadge / countBadgeWidth (capsule-pad naming cleanup optional).
+  evidence: Blind Hunter; pre-existing DRY note from Unbound panel removal; this change only recolored and rounded the orphan API.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-unbound-badge.md`
+  summary: Optional tooltip/coaching on Mappings Unbound witness tying the count to Export Unbound = 0.
+  evidence: Blind Hunter; mock has no tooltip; problem statement mentions Export opacity but label+badge may be enough.

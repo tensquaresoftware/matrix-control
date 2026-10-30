@@ -77,7 +77,7 @@ namespace SkinEditorChrome
     /** Empty circle for pending (uninitialized) pastilles — 1 px stroke in logo grey. */
     void paintPendingColourSwatch(juce::Graphics& g, juce::Rectangle<int> area);
 
-    /** Count badge: same light grey as button / panel-title text, dark glyph. */
+    /** Count badge: attention amber fill, panel-surface glyph, panel corner radius. */
     void drawCountBadge(juce::Graphics& g,
                         juce::Rectangle<int> area,
                         int count);
