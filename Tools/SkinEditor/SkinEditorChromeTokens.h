@@ -64,10 +64,11 @@ namespace SkinEditorChrome
     inline constexpr int kPalettePanelWidth = 183;
     /**
      * Former Mappings half-share at legacy 1210 (385) plus the width formerly given to
-     * Palette (60): extra goes to Property / State; Mapped colour stays palette-aligned.
+     * Palette (60), plus 40 for Object / Property room (TrackGeneratorDisplay):
+     * extra goes to Property / State; Mapped colour stays palette-aligned.
      */
     inline constexpr int kLegacyWindowMaxWidth = 1210;
-    inline constexpr int kMappingsPanelWidth = 445;
+    inline constexpr int kMappingsPanelWidth = 485;
     /**
      * Exact body width: edge gutters + Color + Palette side gaps + fixed Mappings.
      * Live window width = max(body, measured title + SESSION) — see windowContentWidth().

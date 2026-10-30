@@ -398,8 +398,10 @@ void SkinEditorMappingsPanel::layoutShellFilled(juce::Rectangle<int> content)
     const int unboundLabelW = SkinEditorChrome::measureTextWidth(unboundFont, "Unbound");
     const int badgeW = SkinEditorChrome::countBadgeWidth(unboundCount_);
     const int mappedLeft = tableX + cols.mappedX;
-    unboundLabelBounds_ = { mappedLeft, actions.getY(), unboundLabelW, actions.getHeight() };
-    unboundBadgeBounds_ = { mappedLeft + unboundLabelW + kUnboundBadgeGap,
+    // Optical nudge: header Unbound reads 1 px right of table Unbound cells.
+    const int unboundLeft = mappedLeft - 1;
+    unboundLabelBounds_ = { unboundLeft, actions.getY(), unboundLabelW, actions.getHeight() };
+    unboundBadgeBounds_ = { unboundLeft + unboundLabelW + kUnboundBadgeGap,
                             actions.getY(),
                             badgeW,
                             actions.getHeight() };

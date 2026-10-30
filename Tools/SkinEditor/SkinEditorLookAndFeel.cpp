@@ -186,6 +186,13 @@ namespace SkinEditorChrome
         g.fillPath(path);
     }
 
+    void LookAndFeel::positionComboBoxText(juce::ComboBox& box, juce::Label& label)
+    {
+        LookAndFeel_V4::positionComboBoxText(box, label);
+        // Forbid glyph squish only — do not clear Label border (that pads combo text inset).
+        label.setMinimumHorizontalScale(1.0f);
+    }
+
     void LookAndFeel::fillTextEditorBackground(juce::Graphics& g, int width, int height, juce::TextEditor& ed)
     {
         if (dynamic_cast<juce::AlertWindow*>(ed.getParentComponent()) != nullptr)
