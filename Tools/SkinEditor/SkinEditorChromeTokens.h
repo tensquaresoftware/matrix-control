@@ -54,21 +54,58 @@ namespace SkinEditorChrome
     /** Title-bar chrome inset (not panel body content). */
     inline constexpr int kPanelPad = 8;
     inline constexpr int kButtonGap = 8;
+    /**
+     * ComboBox text vs arrow: LookAndFeel arrow sits near width-16; label ends before this reserve.
+     * Keep in sync with SkinEditorLookAndFeel::positionComboBoxText.
+     */
+    inline constexpr int kComboArrowReserve = 18;
+    /** Mappings Object combo — fits TrackGeneratorDisplay with a little air before the arrow. */
+    inline constexpr int kObjectComboWidth = 150;
+    /**
+     * In-panel content inset on all four sides of the body (below the title tab,
+     * and left / right / bottom inside the silhouette). Do not use kGutter here.
+     */
+    inline constexpr int kPanelContentPad = 10;
+    /**
+     * Vertical scroll track width when centred in the panel's right content-pad band:
+     * former default track (8) + right content pad.
+     */
+    inline constexpr int kScrollTrackWidth = 8 + kPanelContentPad;
     /** Fixed body-column widths — window width fits these; Mappings does not grow. */
     inline constexpr int kColorPanelWidth = 260;
     /**
-     * Palette column + Mapped colour alignment width.
-     * Sized to New / Dup / Del preferred measure, floored with chrome text
-     * (see palettePanelWidthForActionButtons()). Layout tests lock equality.
+     * Palette column width (list paint = Mapped colour = 130).
+     * Floored with New/Dup/Del + chrome text via palettePanelWidthForActionButtons().
      */
-    inline constexpr int kPalettePanelWidth = 156;
+    inline constexpr int kPalettePanelWidth = 158;
     /**
-     * Former Mappings half-share at legacy 1210 (385) plus the width formerly given to
-     * Palette (60), plus 35 for Object / Property room (TrackGeneratorDisplay):
-     * extra goes to Property / State; Mapped colour stays palette-aligned.
+     * Palette selection-highlight width and Mappings "Mapped colour" column span.
+     * List extends into the right content pad; paint stops before the scroll track.
      */
+    inline constexpr int kPaletteListPaintWidth = kPalettePanelWidth
+                                                  - kPanelContentPad
+                                                  - kScrollTrackWidth; // 130
+    /** Mappings Property / State column widths (Mapped colour = kPaletteListPaintWidth). */
+    inline constexpr int kMappingsPropertyColumnWidth = 150;
+    inline constexpr int kMappingsStateColumnWidth = 150;
+    /** Left inset before Property; columnsForWidth subtracts this before the Property|State split. */
+    inline constexpr int kMappingsColumnPad = 6;
+    /**
+     * Table paint width = pad + Property + State + Mapped colour (436).
+     * Panel = that paint + scroll track + 2 focus pads - right pad extension + side content pads
+     * → 466 (see SkinEditorMappingsPanel::paintWidth / layoutShellFilled).
+     */
+    inline constexpr int kMappingsTablePaintWidth = kMappingsColumnPad
+                                                    + kMappingsPropertyColumnWidth
+                                                    + kMappingsStateColumnWidth
+                                                    + kPaletteListPaintWidth; // 416
+    inline constexpr int kMappingsFocusPad = 1;
+    inline constexpr int kMappingsPanelWidth = kMappingsTablePaintWidth
+                                               + kScrollTrackWidth
+                                               + 2 * kMappingsFocusPad
+                                               - kPanelContentPad
+                                               + 2 * kPanelContentPad; // 446
     inline constexpr int kLegacyWindowMaxWidth = 1210;
-    inline constexpr int kMappingsPanelWidth = 480;
     /**
      * Exact body width: edge gutters + Color + Palette side gaps + fixed Mappings.
      * Live window width = max(body, measured title + SESSION) — see windowContentWidth().
@@ -81,11 +118,6 @@ namespace SkinEditorChrome
     inline constexpr int kWindowMaxWidth = kWindowBodyWidth;
     /** Orbitron logo title in the Skin Editor title bar. */
     inline constexpr const char* kAppTitleText = "MATRIX-CONTROL SKIN EDITOR";
-    /**
-     * In-panel content inset on all four sides of the body (below the title tab,
-     * and left / right / bottom inside the silhouette). Do not use kGutter here.
-     */
-    inline constexpr int kPanelContentPad = 10;
     /**
      * SESSION well: kButtonHeight with kGutter air above/below (was 38px SKINS strip;
      * 36px aligns the air with standard gutters).
@@ -154,18 +186,6 @@ namespace SkinEditorChrome
     inline constexpr float kChromeBadgeCorner = 2.0f;
     /** Visible scrollbar thumb thickness (centred in the track). */
     inline constexpr int kScrollThumbThickness = 6;
-    /**
-     * Vertical scroll track width when centred in the panel's right content-pad band:
-     * former default track (8) + right content pad.
-     */
-    inline constexpr int kScrollTrackWidth = 8 + kPanelContentPad;
-    /**
-     * Palette selection-highlight width and Mappings "Mapped colour" column span.
-     * List extends into the right content pad; paint stops before the scroll track.
-     */
-    inline constexpr int kPaletteListPaintWidth = kPalettePanelWidth
-                                                  - kPanelContentPad
-                                                  - kScrollTrackWidth;
     /** Count badge circle / capsule height (also used for multi-digit width floor). */
     inline constexpr int kCountBadgeDiameter = 15;
     inline constexpr float kCountBadgeFont = 11.0f;

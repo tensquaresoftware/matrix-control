@@ -5,12 +5,12 @@
 
 namespace
 {
-    constexpr int kColPad = 6;
+    constexpr int kColPad = SkinEditorChrome::kMappingsColumnPad;
     // Match Palette selection-highlight width (kPaletteListPaintWidth).
     constexpr int kMappedSwatchToTableRight = SkinEditorChrome::kPaletteListPaintWidth;
     constexpr int kSwatchSize = SkinEditorChrome::kColourSwatchSize;
     constexpr int kEdgeExtra = 4; // first/last row air so edge gaps match inter-swatch 8px
-    constexpr int kFocusPad = 1;  // keep 1px outside focus ring inside the viewport
+    constexpr int kFocusPad = SkinEditorChrome::kMappingsFocusPad;
 
     struct ColumnLayout
     {
@@ -24,10 +24,11 @@ namespace
     {
         const int mappedSpan = juce::jmin(kMappedSwatchToTableRight, juce::jmax(0, totalWidth));
         const int mappedX = totalWidth - mappedSpan;
-        const int rest = juce::jmax(0, mappedX - kColPad);
-        const int propertyW = rest / 2;
-        const int stateW = rest - propertyW;
-        return { propertyW, stateW, mappedX, mappedSpan };
+        // Fixed Property/State; when paint width matches SSOT, mappedX == pad + 150 + 150.
+        return { SkinEditorChrome::kMappingsPropertyColumnWidth,
+                 SkinEditorChrome::kMappingsStateColumnWidth,
+                 mappedX,
+                 mappedSpan };
     }
 }
 
@@ -387,40 +388,41 @@ void SkinEditorMappingsPanel::layoutShellFilled(juce::Rectangle<int> content)
     const int tableX = viewport_.getX() + kFocusPad;
     stickyLegendBounds_.setX(tableX);
     stickyLegendBounds_.setWidth(tableW);
+    layoutActionRow(actions, tableX, tableW);
+}
 
+void SkinEditorMappingsPanel::layoutActionRow(juce::Rectangle<int> actions, int tableX, int tableW)
+{
     auto actionRow = juce::Rectangle<int>(tableX, actions.getY(), tableW, actions.getHeight());
     const int labelW = SkinEditorChrome::measureLabelWidth(objectLabel_.getText(),
                                                           SkinEditorChrome::fontRegular());
     objectLabel_.setBounds(actionRow.removeFromLeft(labelW));
 
     const auto cols = columnsForWidth(tableW);
-    // "Unbound" + badge share Mapped colour column left edge with table Unbound cells.
+    // Unbound + badge share Mapped colour column left; optical +1 matches table cells.
     constexpr int kUnboundBadgeGap = 6;
     const auto unboundFont = SkinEditorChrome::fontRegular();
     const int unboundLabelW = SkinEditorChrome::measureTextWidth(unboundFont, "Unbound");
     const int badgeW = SkinEditorChrome::countBadgeWidth(unboundCount_);
     const int mappedLeft = tableX + cols.mappedX;
-    // Optical nudge: header Unbound reads 1 px right of table Unbound cells.
     const int unboundLeft = mappedLeft - 1;
     unboundLabelBounds_ = { unboundLeft, actions.getY(), unboundLabelW, actions.getHeight() };
     unboundBadgeBounds_ = { unboundLeft + unboundLabelW + kUnboundBadgeGap,
-                            actions.getY(),
-                            badgeW,
-                            actions.getHeight() };
+                            actions.getY(), badgeW, actions.getHeight() };
+
+    // Object combo fixed width, then kButtonGap, then Hold — Unbound stays on Mapped colour.
+    const int comboMax = juce::jmax(0, unboundLeft - SkinEditorChrome::kButtonGap - actionRow.getX());
+    const int comboW = juce::jmin(SkinEditorChrome::kObjectComboWidth, comboMax);
+    objectCombo_.setBounds(actionRow.getX(), actions.getY(), comboW, actions.getHeight());
 
     const int holdW = SkinEditorChrome::measureTextWidth(SkinEditorChrome::fontRegular(),
                                                         holdColourToggle_.getButtonText())
-                      + 16 + 6; // button-styled tick box + gap to label
-    const int holdRight = mappedLeft - SkinEditorChrome::kButtonGap;
-    const int holdLeft = juce::jmax(actionRow.getX(), holdRight - holdW);
+                      + 16 + 6; // tick box + gap to label
+    const int holdLeft = objectCombo_.getRight() + SkinEditorChrome::kButtonGap;
+    const int holdMaxRight = unboundLeft - SkinEditorChrome::kButtonGap;
     holdColourToggle_.setBounds(holdLeft, actions.getY(),
-                                juce::jmax(0, holdRight - holdLeft),
+                                juce::jmin(holdW, juce::jmax(0, holdMaxRight - holdLeft)),
                                 actions.getHeight());
-
-    const int comboRight = holdLeft - SkinEditorChrome::kButtonGap;
-    objectCombo_.setBounds(actionRow.getX(), actions.getY(),
-                           juce::jmax(0, comboRight - actionRow.getX()),
-                           actions.getHeight());
 }
 
 int SkinEditorMappingsPanel::paintWidth() const noexcept

@@ -126,6 +126,7 @@ private:
     // Layout
     void layoutShellEmpty(juce::Rectangle<int> content);
     void layoutShellFilled(juce::Rectangle<int> content);
+    void layoutActionRow(juce::Rectangle<int> actions, int tableX, int tableW);
     void layoutContent();
     int rowIndexAtY(int y) const noexcept;
     int paintWidth() const noexcept;

@@ -221,7 +221,8 @@ namespace SkinEditorChrome
                                            measureTextWidth(fontBold(), "Editor colours"))
                                 + kHeaderInset;
         const int fromMappedLegend = measureTextWidth(fontBold(), "Mapped colour");
-        return juce::jmax(fromActions, juce::jmax(fromHeaders, fromMappedLegend));
+        return juce::jmax(kPaletteListPaintWidth,
+                          juce::jmax(fromActions, juce::jmax(fromHeaders, fromMappedLegend)));
     }
 
     /**

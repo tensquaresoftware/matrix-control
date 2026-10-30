@@ -189,9 +189,8 @@ namespace SkinEditorChrome
     void LookAndFeel::positionComboBoxText(juce::ComboBox& box, juce::Label& label)
     {
         // V4 reserves 30px for the arrow; our drawComboBox arrow sits near width-16.
-        constexpr int kArrowReserve = 18;
         label.setBounds(1, 1,
-                        juce::jmax(1, box.getWidth() - kArrowReserve),
+                        juce::jmax(1, box.getWidth() - kComboArrowReserve),
                         box.getHeight() - 2);
         label.setFont(getComboBoxFont(box));
         label.setMinimumHorizontalScale(1.0f);
