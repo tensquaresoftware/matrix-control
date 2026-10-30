@@ -9,20 +9,25 @@
 class TestTrackGeneratorDisplays::TrackGeneratorDisplayScalePanel : public juce::Component
 {
 public:
-    TrackGeneratorDisplayScalePanel(float scale,
-                                    const juce::String& scaleLabelText,
-                                    const TSS::TrackGeneratorDisplayLook& displayLook,
-                                    const TSS::LabelLook& labelLook,
-                                    const DisplayBandDimensions& dimensions)
-        : scale_(scale)
-        , dimensions_(dimensions)
-        , displayLook_(displayLook)
+    struct Config
+    {
+        float scale = 1.0f;
+        juce::String scaleLabelText;
+        const TSS::TrackGeneratorDisplayLook& displayLook;
+        const TSS::LabelLook& labelLook;
+        const DisplayBandDimensions& dimensions;
+    };
+
+    explicit TrackGeneratorDisplayScalePanel(const Config& config)
+        : scale_(config.scale)
+        , dimensions_(config.dimensions)
+        , displayLook_(config.displayLook)
     {
         scaleLabel_ = std::make_unique<TSS::Label>(
             dimensions_.width,
             TestScaleColumns::kScaleLabelHeight,
-            labelLook,
-            scaleLabelText);
+            config.labelLook,
+            TSS::LabelConfig{ .text = config.scaleLabelText });
         addAndMakeVisible(*scaleLabel_);
 
         display_ = std::make_unique<TSS::TrackGeneratorDisplay>(dimensions_, displayLook_);
@@ -116,12 +121,12 @@ void TestTrackGeneratorDisplays::rebuildPanels()
     columnPanels_.reserve(TestScaleColumns::kSpecs.size());
     for (const auto& spec : TestScaleColumns::kSpecs)
     {
-        auto panel = std::make_unique<TrackGeneratorDisplayScalePanel>(
-            spec.scale,
-            spec.label,
-            displayLook,
-            labelLook,
-            dimensions_);
+        auto panel = std::make_unique<TrackGeneratorDisplayScalePanel>(TrackGeneratorDisplayScalePanel::Config{
+            .scale = spec.scale,
+            .scaleLabelText = spec.label,
+            .displayLook = displayLook,
+            .labelLook = labelLook,
+            .dimensions = dimensions_ });
         addAndMakeVisible(*panel);
         columnPanels_.push_back(std::move(panel));
     }

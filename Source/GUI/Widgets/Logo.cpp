@@ -30,7 +30,7 @@ namespace TSS
         : Label(width,
                 height,
                 brandLabelLookFromSkin(skin),
-                PluginDisplayNames::kPluginName)
+                LabelConfig{ .text = PluginDisplayNames::kPluginName })
         , skin_(&skin)
     {
         setInterceptsMouseClicks(true, false);

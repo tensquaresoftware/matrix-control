@@ -9,26 +9,31 @@
 class TestPeakIndicators::PeakIndicatorScalePanel : public juce::Component
 {
 public:
-    PeakIndicatorScalePanel(float scale,
-                            const juce::String& scaleLabelText,
-                            TSS::ISkin& skin,
-                            const TSS::LabelLook& labelLook,
-                            int indicatorWidth,
-                            int indicatorHeight)
-        : scale_(scale)
-        , indicatorWidth_(indicatorWidth)
-        , indicatorHeight_(indicatorHeight)
+    struct Config
+    {
+        float scale = 1.0f;
+        juce::String scaleLabelText;
+        TSS::ISkin& skin;
+        const TSS::LabelLook& labelLook;
+        int indicatorWidth = 0;
+        int indicatorHeight = 0;
+    };
+
+    explicit PeakIndicatorScalePanel(const Config& config)
+        : scale_(config.scale)
+        , indicatorWidth_(config.indicatorWidth)
+        , indicatorHeight_(config.indicatorHeight)
     {
         scaleLabel_ = std::make_unique<TSS::Label>(
             TestScaleColumns::kScaleLabelColumnDesignWidth,
             TestScaleColumns::kScaleLabelHeight,
-            labelLook,
-            scaleLabelText);
+            config.labelLook,
+            TSS::LabelConfig{ .text = config.scaleLabelText });
         addAndMakeVisible(*scaleLabel_);
 
-        levelLow_ = createIndicator(skin, 0.25f);
-        levelMid_ = createIndicator(skin, 0.5f);
-        levelHigh_ = createIndicator(skin, 1.0f);
+        levelLow_ = createIndicator(config.skin, 0.25f);
+        levelMid_ = createIndicator(config.skin, 0.5f);
+        levelHigh_ = createIndicator(config.skin, 1.0f);
     }
 
     int getScaledColumnWidth() const
@@ -176,13 +181,13 @@ void TestPeakIndicators::rebuildPanels()
     columnPanels_.reserve(TestScaleColumns::kSpecs.size());
     for (const auto& spec : TestScaleColumns::kSpecs)
     {
-        auto panel = std::make_unique<PeakIndicatorScalePanel>(
-            spec.scale,
-            spec.label,
-            *skin_,
-            labelLook,
-            indicatorWidth_,
-            indicatorHeight_);
+        auto panel = std::make_unique<PeakIndicatorScalePanel>(PeakIndicatorScalePanel::Config{
+            .scale = spec.scale,
+            .scaleLabelText = spec.label,
+            .skin = *skin_,
+            .labelLook = labelLook,
+            .indicatorWidth = indicatorWidth_,
+            .indicatorHeight = indicatorHeight_ });
         addAndMakeVisible(*panel);
         columnPanels_.push_back(std::move(panel));
     }

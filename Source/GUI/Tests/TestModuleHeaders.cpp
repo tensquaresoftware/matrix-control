@@ -9,20 +9,25 @@
 class TestModuleHeaders::ModuleHeaderScalePanel : public juce::Component
 {
 public:
-    ModuleHeaderScalePanel(float scale,
-                           const juce::String& scaleLabelText,
-                           const TSS::ModuleHeaderLook& headerLook,
-                           const TSS::LabelLook& labelLook,
-                           const ModuleHeaderDimensions& dimensions)
-        : scale_(scale)
-        , dimensions_(dimensions)
-        , headerLook_(headerLook)
+    struct Config
+    {
+        float scale = 1.0f;
+        juce::String scaleLabelText;
+        const TSS::ModuleHeaderLook& headerLook;
+        const TSS::LabelLook& labelLook;
+        const ModuleHeaderDimensions& dimensions;
+    };
+
+    explicit ModuleHeaderScalePanel(const Config& config)
+        : scale_(config.scale)
+        , dimensions_(config.dimensions)
+        , headerLook_(config.headerLook)
     {
         scaleLabel_ = std::make_unique<TSS::Label>(
             dimensions_.patchEditTitleBandWidth,
             TestScaleColumns::kScaleLabelHeight,
-            labelLook,
-            scaleLabelText);
+            config.labelLook,
+            TSS::LabelConfig{ .text = config.scaleLabelText });
         addAndMakeVisible(*scaleLabel_);
 
         blueHeader_ = createHeader(TSS::ModuleHeader::ColourVariant::Blue);
@@ -131,12 +136,12 @@ void TestModuleHeaders::rebuildPanels()
     columnPanels_.reserve(TestScaleColumns::kSpecs.size());
     for (const auto& spec : TestScaleColumns::kSpecs)
     {
-        auto panel = std::make_unique<ModuleHeaderScalePanel>(
-            spec.scale,
-            spec.label,
-            headerLook,
-            labelLook,
-            dimensions_);
+        auto panel = std::make_unique<ModuleHeaderScalePanel>(ModuleHeaderScalePanel::Config{
+            .scale = spec.scale,
+            .scaleLabelText = spec.label,
+            .headerLook = headerLook,
+            .labelLook = labelLook,
+            .dimensions = dimensions_ });
         addAndMakeVisible(*panel);
         columnPanels_.push_back(std::move(panel));
     }

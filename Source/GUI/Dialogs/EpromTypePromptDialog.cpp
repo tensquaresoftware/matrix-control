@@ -50,7 +50,10 @@ void EpromTypePromptDialog::buildControls(TSS::ISkin& skin)
 
     auto makeLabel = [&](const char* text)
     {
-        return std::make_unique<TSS::Label>(kLabelWidth_, kControlHeight_, labelLook, text);
+        return std::make_unique<TSS::Label>(kLabelWidth_,
+                                            kControlHeight_,
+                                            labelLook,
+                                            TSS::LabelConfig{ .text = text });
     };
     auto makeCombo = [&]()
     {

@@ -31,7 +31,7 @@ public:
             comboWidth_,
             TestScaleColumns::kScaleLabelHeight,
             config.labelLook,
-            config.scaleLabelText);
+            TSS::LabelConfig{ .text = config.scaleLabelText });
         addAndMakeVisible(*scaleLabel_);
 
         combo_ = std::make_unique<TSS::ComboBox>(comboWidth_, comboHeight_, comboLook_);

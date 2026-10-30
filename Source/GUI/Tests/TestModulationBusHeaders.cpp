@@ -31,7 +31,7 @@ public:
             headerWidth_,
             TestScaleColumns::kScaleLabelHeight,
             config.labelLook,
-            config.scaleLabelText);
+            TSS::LabelConfig{ .text = config.scaleLabelText });
         addAndMakeVisible(*scaleLabel_);
 
         blueHeader_ = createHeader(TSS::ModulationBusHeader::ColourVariant::Blue);

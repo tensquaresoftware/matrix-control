@@ -26,29 +26,34 @@ namespace
 class TestButtons::ButtonScalePanel : public juce::Component
 {
 public:
-    ButtonScalePanel(float scale,
-                     const juce::String& scaleLabelText,
-                     const TSS::ButtonLook& buttonLook,
-                     const TSS::LabelLook& labelLook,
-                     const ButtonSetDimensions& dimensions)
-        : scale_(scale)
-        , dimensions_(dimensions)
+    struct Config
     {
-        auto largeTextButtonLook = buttonLook;
+        float scale = 1.0f;
+        juce::String scaleLabelText;
+        const TSS::ButtonLook& buttonLook;
+        const TSS::LabelLook& labelLook;
+        const ButtonSetDimensions& dimensions;
+    };
+
+    explicit ButtonScalePanel(const Config& config)
+        : scale_(config.scale)
+        , dimensions_(config.dimensions)
+    {
+        auto largeTextButtonLook = config.buttonLook;
         largeTextButtonLook.font = largeTextButtonLook.font.withHeight(dimensions_.largeTextFontHeight);
 
         scaleLabel_ = std::make_unique<TSS::Label>(
             dimensions_.bigButtonWidth,
             dimensions_.scaleLabelHeight,
-            labelLook,
-            scaleLabelText);
+            config.labelLook,
+            TSS::LabelConfig{ .text = config.scaleLabelText });
         addAndMakeVisible(*scaleLabel_);
 
-        mainButton_ = createButton(dimensions_.mainButtonWidth, dimensions_.mainButtonHeight, buttonLook, "BUTTON");
-        initButton_ = createButton(dimensions_.smallButtonSize, dimensions_.smallButtonSize, buttonLook, "I");
-        copyButton_ = createButton(dimensions_.smallButtonSize, dimensions_.smallButtonSize, buttonLook, "C");
-        pasteButton_ = createButton(dimensions_.smallButtonSize, dimensions_.smallButtonSize, buttonLook, "P");
-        bigButton_ = createButton(dimensions_.bigButtonWidth, dimensions_.bigButtonHeight, buttonLook, "BIG BUTTON");
+        mainButton_ = createButton(dimensions_.mainButtonWidth, dimensions_.mainButtonHeight, config.buttonLook, "BUTTON");
+        initButton_ = createButton(dimensions_.smallButtonSize, dimensions_.smallButtonSize, config.buttonLook, "I");
+        copyButton_ = createButton(dimensions_.smallButtonSize, dimensions_.smallButtonSize, config.buttonLook, "C");
+        pasteButton_ = createButton(dimensions_.smallButtonSize, dimensions_.smallButtonSize, config.buttonLook, "P");
+        bigButton_ = createButton(dimensions_.bigButtonWidth, dimensions_.bigButtonHeight, config.buttonLook, "BIG BUTTON");
         bigTextButton_ = createButton(dimensions_.bigButtonWidth, dimensions_.bigButtonHeight, largeTextButtonLook, "BIG BUTTON");
     }
 
@@ -180,12 +185,12 @@ void TestButtons::createColumnPanels(TSS::ISkin& skin)
 
     for (const auto& spec : TestScaleColumns::kSpecs)
     {
-        auto panel = std::make_unique<ButtonScalePanel>(
-            spec.scale,
-            spec.label,
-            buttonLook,
-            labelLook,
-            dimensions);
+        auto panel = std::make_unique<ButtonScalePanel>(ButtonScalePanel::Config{
+            .scale = spec.scale,
+            .scaleLabelText = spec.label,
+            .buttonLook = buttonLook,
+            .labelLook = labelLook,
+            .dimensions = dimensions });
         addAndMakeVisible(*panel);
         columnPanels_.push_back(std::move(panel));
     }

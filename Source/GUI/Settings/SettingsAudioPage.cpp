@@ -297,7 +297,7 @@ std::unique_ptr<TSS::Label> SettingsAudioPage::makeLabel(TSS::ISkin& skin, const
         SettingsShellMetrics::kLabelWidth,
         SettingsShellMetrics::kControlHeight,
         TSS::labelLookFromSkin(skin),
-        text);
+        TSS::LabelConfig{ .text = text });
     addAndMakeVisible(*label);
     return label;
 }

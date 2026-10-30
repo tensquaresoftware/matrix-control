@@ -31,7 +31,7 @@ public:
             TestScaleColumns::kScaleLabelColumnDesignWidth,
             TestScaleColumns::kScaleLabelHeight,
             config.labelLook,
-            config.scaleLabelText);
+            TSS::LabelConfig{ .text = config.scaleLabelText });
         addAndMakeVisible(*scaleLabel_);
 
         standardCombo_ = createComboBox(TSS::ComboBox::Style::Standard);

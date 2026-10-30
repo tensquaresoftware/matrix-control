@@ -208,7 +208,11 @@ void TestComponent::updateWidgetLabelLook()
     const auto labelLook = TSS::labelLookFromSkin(*skin_);
 
     if (widgetLabel_ == nullptr)
-        widgetLabel_ = std::make_unique<TSS::Label>(widgetLabelWidth_, kDebugControlHeight_, labelLook, "WIDGET:");
+        widgetLabel_ = std::make_unique<TSS::Label>(
+            widgetLabelWidth_,
+            kDebugControlHeight_,
+            labelLook,
+            TSS::LabelConfig{ .text = "WIDGET:" });
     else
         widgetLabel_->setLook(labelLook);
 }

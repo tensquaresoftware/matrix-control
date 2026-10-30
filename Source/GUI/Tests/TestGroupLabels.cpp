@@ -9,20 +9,25 @@
 class TestGroupLabels::GroupLabelScalePanel : public juce::Component
 {
 public:
-    GroupLabelScalePanel(float scale,
-                         const juce::String& scaleLabelText,
-                         const TSS::GroupLabelLook& groupLabelLook,
-                         const TSS::LabelLook& labelLook,
-                         const GroupLabelDimensions& dimensions)
-        : scale_(scale)
-        , dimensions_(dimensions)
-        , groupLabelLook_(groupLabelLook)
+    struct Config
+    {
+        float scale = 1.0f;
+        juce::String scaleLabelText;
+        const TSS::GroupLabelLook& groupLabelLook;
+        const TSS::LabelLook& labelLook;
+        const GroupLabelDimensions& dimensions;
+    };
+
+    explicit GroupLabelScalePanel(const Config& config)
+        : scale_(config.scale)
+        , dimensions_(config.dimensions)
+        , groupLabelLook_(config.groupLabelLook)
     {
         scaleLabel_ = std::make_unique<TSS::Label>(
             dimensions_.internalPatchesBrowserWidth,
             TestScaleColumns::kScaleLabelHeight,
-            labelLook,
-            scaleLabelText);
+            config.labelLook,
+            TSS::LabelConfig{ .text = config.scaleLabelText });
         addAndMakeVisible(*scaleLabel_);
 
         groupLabel_ = std::make_unique<TSS::GroupLabel>(
@@ -115,12 +120,12 @@ void TestGroupLabels::rebuildPanels()
     columnPanels_.reserve(TestScaleColumns::kSpecs.size());
     for (const auto& spec : TestScaleColumns::kSpecs)
     {
-        auto panel = std::make_unique<GroupLabelScalePanel>(
-            spec.scale,
-            spec.label,
-            groupLabelLook,
-            labelLook,
-            dimensions_);
+        auto panel = std::make_unique<GroupLabelScalePanel>(GroupLabelScalePanel::Config{
+            .scale = spec.scale,
+            .scaleLabelText = spec.label,
+            .groupLabelLook = groupLabelLook,
+            .labelLook = labelLook,
+            .dimensions = dimensions_ });
         addAndMakeVisible(*panel);
         columnPanels_.push_back(std::move(panel));
     }

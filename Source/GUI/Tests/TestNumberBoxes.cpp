@@ -27,7 +27,7 @@ public:
             TestScaleColumns::kScaleLabelColumnDesignWidth,
             TestScaleColumns::kScaleLabelHeight,
             setup.labelLook,
-            setup.scaleLabelText);
+            TSS::LabelConfig{ .text = setup.scaleLabelText });
         addAndMakeVisible(*scaleLabel_);
 
         valueBox_ = createNumberBox(false, false, 42);

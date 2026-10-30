@@ -13,12 +13,17 @@ namespace TSS
         Centered
     };
 
+    struct LabelConfig
+    {
+        juce::String text;
+        LabelStyle style = LabelStyle::Default;
+    };
+
     class Label : public juce::Component
     {
     public:
         explicit Label(int width, int height, const LabelLook& look,
-                       const juce::String& text = juce::String(),
-                       LabelStyle style = LabelStyle::Default);
+                       const LabelConfig& config = {});
         ~Label() override = default;
         
         void setLook(const LabelLook& look);

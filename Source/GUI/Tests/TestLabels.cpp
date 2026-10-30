@@ -8,21 +8,26 @@
 class TestLabels::LabelScalePanel : public juce::Component
 {
 public:
-    LabelScalePanel(float scale,
-                    const juce::String& scaleLabelText,
-                    const TSS::LabelLook& labelLook,
-                    int labelWidth,
-                    int labelHeight)
-        : scale_(scale)
-        , labelWidth_(labelWidth)
-        , labelHeight_(labelHeight)
-        , labelLook_(labelLook)
+    struct Config
+    {
+        float scale = 1.0f;
+        juce::String scaleLabelText;
+        const TSS::LabelLook& labelLook;
+        int labelWidth = 0;
+        int labelHeight = 0;
+    };
+
+    explicit LabelScalePanel(const Config& config)
+        : scale_(config.scale)
+        , labelWidth_(config.labelWidth)
+        , labelHeight_(config.labelHeight)
+        , labelLook_(config.labelLook)
     {
         scaleLabel_ = std::make_unique<TSS::Label>(
             TestScaleColumns::kScaleLabelColumnDesignWidth,
             TestScaleColumns::kScaleLabelHeight,
-            labelLook,
-            scaleLabelText);
+            config.labelLook,
+            TSS::LabelConfig{ .text = config.scaleLabelText });
         addAndMakeVisible(*scaleLabel_);
 
         defaultLabel_ = createLabel("LABEL", TSS::LabelStyle::Default);
@@ -63,7 +68,11 @@ public:
 private:
     std::unique_ptr<TSS::Label> createLabel(const juce::String& text, TSS::LabelStyle style)
     {
-        auto label = std::make_unique<TSS::Label>(labelWidth_, labelHeight_, labelLook_, text, style);
+        auto label = std::make_unique<TSS::Label>(
+            labelWidth_,
+            labelHeight_,
+            labelLook_,
+            TSS::LabelConfig{ .text = text, .style = style });
         label->setUiScale(scale_);
         addAndMakeVisible(*label);
         return label;
@@ -127,12 +136,12 @@ void TestLabels::rebuildPanels()
     columnPanels_.reserve(TestScaleColumns::kSpecs.size());
     for (const auto& spec : TestScaleColumns::kSpecs)
     {
-        auto panel = std::make_unique<LabelScalePanel>(
-            spec.scale,
-            spec.label,
-            labelLook,
-            labelWidth,
-            labelHeight);
+        auto panel = std::make_unique<LabelScalePanel>(LabelScalePanel::Config{
+            .scale = spec.scale,
+            .scaleLabelText = spec.label,
+            .labelLook = labelLook,
+            .labelWidth = labelWidth,
+            .labelHeight = labelHeight });
         addAndMakeVisible(*panel);
         columnPanels_.push_back(std::move(panel));
     }

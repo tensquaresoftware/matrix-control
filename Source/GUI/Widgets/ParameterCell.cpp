@@ -46,7 +46,7 @@ void ParameterCell::createParameterLabel(TSS::ISkin& skin, WidgetFactory& factor
         dimensions_.labelWidth,
         dimensions_.labelHeight,
         TSS::labelLookFromSkin(skin),
-        factory.getParameterDisplayName(parameterId).value_or(""));
+        TSS::LabelConfig{ .text = factory.getParameterDisplayName(parameterId).value_or("") });
     addAndMakeVisible(*label_);
 }
 

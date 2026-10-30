@@ -11,7 +11,10 @@
 
 std::unique_ptr<TSS::Label> SettingsPanel::makeLabel(TSS::ISkin& skin, int width, const juce::String& text)
 {
-    return std::make_unique<TSS::Label>(width, kControlHeight_, TSS::labelLookFromSkin(skin), text);
+    return std::make_unique<TSS::Label>(width,
+                                        kControlHeight_,
+                                        TSS::labelLookFromSkin(skin),
+                                        TSS::LabelConfig{ .text = text });
 }
 
 std::unique_ptr<TSS::ComboBox> SettingsPanel::makeCombo(TSS::ISkin& skin, int width)

@@ -2,12 +2,12 @@
 
 namespace TSS
 {
-    Label::Label(int width, int height, const LabelLook& look, const juce::String& text, TSS::LabelStyle style)
+    Label::Label(int width, int height, const LabelLook& look, const LabelConfig& config)
         : look_(look)
-        , labelText_(text)
+        , labelText_(config.text)
         , width_(width)
         , height_(height)
-        , style_(style)
+        , style_(config.style)
     {
         setOpaque(false);
         setSize(width_, height_);

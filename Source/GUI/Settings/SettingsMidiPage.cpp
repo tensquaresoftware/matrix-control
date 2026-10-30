@@ -248,7 +248,7 @@ std::unique_ptr<TSS::Label> SettingsMidiPage::makeLabel(TSS::ISkin& skin, const 
     auto label = std::make_unique<TSS::Label>(SettingsShellMetrics::kLabelWidth,
                                               SettingsShellMetrics::kControlHeight,
                                               TSS::darkPanelLabelLookFromSkin(skin),
-                                              text);
+                                              TSS::LabelConfig{ .text = text });
     addAndMakeVisible(*label);
     return label;
 }

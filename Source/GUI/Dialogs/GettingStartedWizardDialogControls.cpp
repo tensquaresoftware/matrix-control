@@ -21,7 +21,10 @@ void GettingStartedWizardDialog::buildStepControls(TSS::ISkin& skin)
 
     auto makeLabel = [&](const char* text)
     {
-        auto label = std::make_unique<TSS::Label>(kLabelWidth_, kControlHeight_, labelLook, text);
+        auto label = std::make_unique<TSS::Label>(kLabelWidth_,
+                                                  kControlHeight_,
+                                                  labelLook,
+                                                  TSS::LabelConfig{ .text = text });
         addChildComponent(*label);
         return label;
     };
