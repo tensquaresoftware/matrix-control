@@ -112,7 +112,7 @@ AU / VST3 / Standalone as listed above; multi-platform **CI** (build + unit test
 
 ## Current status
 
-**`1.0.0-alpha.4`** — Cleaner Matrix-6/6R interrogation (Master-only periodic presence once detected; no false Master length ERROR), Settings **PRESENCE CHECK**, plus alpha.3 discovery fallback (Inquiry then Master) and the alpha.2/alpha.1 feature set: patch/master editing, Patch Mutator, Computer Patches, Bank Utility, Getting Started, contextual HELP, skins & UI scale, and CI/CD.
+**`1.0.0-alpha.5`** — Standalone **ASIO** on Windows and **JACK** on Linux, on top of alpha.4 Matrix-6/6R interrogation (Master-only periodic presence; Settings **PRESENCE CHECK**), alpha.3 discovery fallback, and the alpha.2/alpha.1 feature set: patch/master editing, Patch Mutator, Computer Patches, Bank Utility, Getting Started, contextual HELP, skins & UI scale, and CI/CD.
 
 Still evolving toward a polished `1.0`:
 
