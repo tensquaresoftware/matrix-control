@@ -39,10 +39,10 @@ void SettingsTabRail::TabButton::setUiScale(float uiScale)
     repaint();
 }
 
-void SettingsTabRail::TabButton::setSelectedFill(juce::Colour fill, juce::Colour text)
+void SettingsTabRail::TabButton::setSelectedFill(juce::Colour fill, juce::Colour textColour)
 {
     selectedFill_ = fill;
-    selectedText_ = text;
+    selectedText_ = textColour;
     repaint();
 }
 
