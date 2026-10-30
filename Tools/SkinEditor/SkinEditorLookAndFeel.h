@@ -33,6 +33,11 @@ namespace SkinEditorChrome
                                   bool shouldDrawButtonAsHighlighted,
                                   bool shouldDrawButtonAsDown) override;
 
+        void drawButtonText(juce::Graphics& g,
+                            juce::TextButton& button,
+                            bool shouldDrawButtonAsHighlighted,
+                            bool shouldDrawButtonAsDown) override;
+
         void drawToggleButton(juce::Graphics& g,
                               juce::ToggleButton& button,
                               bool shouldDrawButtonAsHighlighted,

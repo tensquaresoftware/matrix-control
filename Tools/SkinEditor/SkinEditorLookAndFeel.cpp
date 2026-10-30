@@ -1,6 +1,7 @@
 #include "Tools/SkinEditor/SkinEditorLookAndFeel.h"
 
 #include "Tools/SkinEditor/SkinEditorChromeFonts.h"
+#include "Tools/SkinEditor/SkinEditorChromeIcons.h"
 
 namespace SkinEditorChrome
 {
@@ -109,6 +110,21 @@ namespace SkinEditorChrome
         g.fillRoundedRectangle(bounds, kControlCorner);
         g.setColour(controlOutline());
         g.drawRoundedRectangle(bounds, kControlCorner, 1.0f);
+    }
+
+    void LookAndFeel::drawButtonText(juce::Graphics& g,
+                                     juce::TextButton& button,
+                                     bool shouldDrawButtonAsHighlighted,
+                                     bool shouldDrawButtonAsDown)
+    {
+        if (isPaletteIconButton(button))
+        {
+            drawPaletteActionIcon(g, button);
+            return;
+        }
+
+        juce::LookAndFeel_V4::drawButtonText(g, button, shouldDrawButtonAsHighlighted,
+                                             shouldDrawButtonAsDown);
     }
 
     void LookAndFeel::drawToggleButton(juce::Graphics& g,

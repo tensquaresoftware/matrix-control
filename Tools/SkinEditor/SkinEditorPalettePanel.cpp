@@ -2,6 +2,19 @@
 
 #include "Tools/SkinEditor/SkinEditorChrome.h"
 
+namespace
+{
+    void paintElidedLeft(juce::Graphics& g,
+                         const juce::Font& font,
+                         const juce::String& text,
+                         juce::Rectangle<int> bounds)
+    {
+        g.setFont(font);
+        g.drawText(SkinEditorChrome::elideToWidth(font, text, bounds.getWidth()),
+                   bounds, juce::Justification::centredLeft);
+    }
+}
+
 SkinEditorPalettePanel::SkinEditorPalettePanel()
 {
     SkinEditorChrome::stylePanelTitle(titleLabel_, "PALETTE");
@@ -17,6 +30,17 @@ SkinEditorPalettePanel::SkinEditorPalettePanel()
     addAndMakeVisible(addButton_);
     addAndMakeVisible(duplicateButton_);
     addAndMakeVisible(deleteButton_);
+
+    addButton_.setComponentID(SkinEditorChrome::kPaletteIconNewId);
+    duplicateButton_.setComponentID(SkinEditorChrome::kPaletteIconDuplicateId);
+    deleteButton_.setComponentID(SkinEditorChrome::kPaletteIconDeleteId);
+    addButton_.setTooltip("New");
+    duplicateButton_.setTooltip("Duplicate");
+    deleteButton_.setTooltip("Delete");
+    addButton_.setTitle("New");
+    duplicateButton_.setTitle("Duplicate");
+    deleteButton_.setTitle("Delete");
+
     addButton_.onClick = [this]
     {
         if (onAddRequested)
@@ -154,28 +178,14 @@ void SkinEditorPalettePanel::resized()
 
 void SkinEditorPalettePanel::layoutActionButtons(juce::Rectangle<int> actionRow)
 {
-    // Natural widths only — do not dump leftover into New (keeps short labels tight).
-    const int tableW = actionRow.getWidth();
-    const int gaps = 2 * SkinEditorChrome::kButtonGap;
-    int newW = SkinEditorChrome::measurePaletteActionButtonWidth(addButton_);
-    int dupW = SkinEditorChrome::measurePaletteActionButtonWidth(duplicateButton_);
-    int delW = SkinEditorChrome::measurePaletteActionButtonWidth(deleteButton_);
-    const int preferred = newW + dupW + delW + gaps;
-    if (preferred > tableW)
-    {
-        const int inner = juce::jmax(3, tableW - gaps);
-        const int sum = juce::jmax(1, newW + dupW + delW);
-        newW = juce::jmax(1, (inner * newW) / sum);
-        dupW = juce::jmax(1, (inner * dupW) / sum);
-        delW = juce::jmax(1, inner - newW - dupW);
-    }
-    addButton_.setBounds(actionRow.removeFromLeft(newW)
+    const int side = SkinEditorChrome::measurePaletteActionButtonWidth();
+    addButton_.setBounds(actionRow.removeFromLeft(side)
                              .withHeight(SkinEditorChrome::kButtonHeight));
     actionRow.removeFromLeft(SkinEditorChrome::kButtonGap);
-    duplicateButton_.setBounds(actionRow.removeFromLeft(dupW)
+    duplicateButton_.setBounds(actionRow.removeFromLeft(side)
                                    .withHeight(SkinEditorChrome::kButtonHeight));
     actionRow.removeFromLeft(SkinEditorChrome::kButtonGap);
-    deleteButton_.setBounds(actionRow.removeFromLeft(delW)
+    deleteButton_.setBounds(actionRow.removeFromLeft(side)
                                 .withHeight(SkinEditorChrome::kButtonHeight));
 }
 
@@ -266,13 +276,13 @@ void SkinEditorPalettePanel::paintListBoxItem(int row, juce::Graphics& g, int wi
     bool roundBottom = false;
     roundFlagsForRow(row, roundTop, roundBottom);
 
+    const auto textBounds = juce::Rectangle<int>(6, yOff, juce::jmax(0, paintW - 12), fullH);
     if (item.kind == RowKind::kSection)
     {
         SkinEditorChrome::fillTableRow(g, { rowArea, SkinEditorChrome::surfaceSection(),
                                             roundTop, roundBottom });
         g.setColour(SkinEditorChrome::textTableHeader());
-        g.setFont(SkinEditorChrome::fontBold());
-        g.drawText(item.headerText, 6, yOff, paintW - 12, fullH, juce::Justification::centredLeft);
+        paintElidedLeft(g, SkinEditorChrome::fontBold(), item.headerText, textBounds);
         return;
     }
 
@@ -280,8 +290,7 @@ void SkinEditorPalettePanel::paintListBoxItem(int row, juce::Graphics& g, int wi
     {
         // Darker than textMuted so the empty hint stays quiet under Editor colours.
         g.setColour(juce::Colour(0xff666666));
-        g.setFont(SkinEditorChrome::fontRegular());
-        g.drawText(item.headerText, 6, yOff, paintW - 12, fullH, juce::Justification::centredLeft);
+        paintElidedLeft(g, SkinEditorChrome::fontRegular(), item.headerText, textBounds);
         return;
     }
 
@@ -297,9 +306,8 @@ void SkinEditorPalettePanel::paintListBoxItem(int row, juce::Graphics& g, int wi
     else
         SkinEditorChrome::paintColourSwatch(g, swatch, juce::Colour(item.argb));
     g.setColour(SkinEditorChrome::textTableBody());
-    g.setFont(SkinEditorChrome::fontRegular());
-    g.drawText(item.name, swX + sw + 8, yOff, paintW - swX - sw - 8, fullH,
-               juce::Justification::centredLeft);
+    paintElidedLeft(g, SkinEditorChrome::fontRegular(), item.name,
+                    { swX + sw + 8, yOff, juce::jmax(0, paintW - swX - sw - 8), fullH });
 }
 
 void SkinEditorPalettePanel::selectedRowsChanged(int)

@@ -155,7 +155,9 @@ void SkinEditorMappingsPanel::paintStickyLegend(juce::Graphics& g, juce::Rectang
                area.getX() + kColPad + cols.propertyW, area.getY(),
                juce::jmax(0, cols.stateW - 4), area.getHeight(),
                juce::Justification::centredLeft, false);
-    g.drawText("Mapped colour",
+    const auto mappedFont = SkinEditorChrome::fontBold();
+    g.setFont(mappedFont);
+    g.drawText(SkinEditorChrome::elideToWidth(mappedFont, "Mapped colour", cols.mappedW),
                area.getX() + cols.mappedX, area.getY(), cols.mappedW, area.getHeight(),
                juce::Justification::centredLeft, false);
 }
