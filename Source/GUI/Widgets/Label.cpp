@@ -4,9 +4,9 @@ namespace TSS
 {
     Label::Label(int width, int height, const LabelLook& look, const juce::String& text, TSS::LabelStyle style)
         : look_(look)
+        , labelText_(text)
         , width_(width)
         , height_(height)
-        , labelText_(text)
         , style_(style)
     {
         setOpaque(false);
