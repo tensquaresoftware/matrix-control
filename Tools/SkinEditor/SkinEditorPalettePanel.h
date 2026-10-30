@@ -61,6 +61,8 @@ private:
         juce::uint32 argb = 0;
         bool pending = false;
         bool isProduct = false;
+        /** How many Mappings rows bind to this pastille (0 when unused). */
+        int mappingCount = 0;
         juce::String headerText;
         /** Second ListBox row of a visual pair (half of kColumnHeaderHeight). */
         bool isLowerListHalf = false;
@@ -85,12 +87,15 @@ private:
     static bool isBlockBoundary(RowKind kind) noexcept;
     static bool isContentRow(RowKind kind) noexcept;
     void appendPaletteGroup(const juce::String& title, std::vector<Row>& colours, bool leadGap);
+    void paintColourRow(juce::Graphics& g, const Row& item, int row, int yOff);
 
     TSS::DevSkin::Layer* layer_ = nullptr;
     juce::String skinId_;
     bool readOnly_ = true;
     bool suppressSelectionNotify_ = false;
     std::vector<Row> rows_;
+    /** Trailing count column width (widest digit string among colour rows). */
+    int mappingCountColumnWidth_ = 0;
     EscapeKeyForwarder escapeForwarder_;
 
     juce::Label titleLabel_;

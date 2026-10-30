@@ -4,6 +4,11 @@
 
 namespace
 {
+    constexpr int kSwatchX = 4;
+    constexpr int kNameGap = 8;
+    constexpr int kNameCountGap = 6;
+    constexpr int kCountRightInset = 4;
+
     void paintElidedLeft(juce::Graphics& g,
                          const juce::Font& font,
                          const juce::String& text,
@@ -12,6 +17,11 @@ namespace
         g.setFont(font);
         g.drawText(SkinEditorChrome::elideToWidth(font, text, bounds.getWidth()),
                    bounds, juce::Justification::centredLeft);
+    }
+
+    int mappingCountLeft(int paintW, int countColumnW) noexcept
+    {
+        return paintW - kCountRightInset - countColumnW;
     }
 }
 
@@ -277,18 +287,18 @@ void SkinEditorPalettePanel::paintListBoxItem(int row, juce::Graphics& g, int wi
     const int paintW = paintWidth();
     const int fullH = SkinEditorChrome::kColumnHeaderHeight;
     const int yOff = item.isLowerListHalf ? -height : 0;
-    const auto rowArea = juce::Rectangle<float>(0.0f, (float) yOff, (float) paintW, (float) fullH);
-    bool roundTop = false;
-    bool roundBottom = false;
-    roundFlagsForRow(row, roundTop, roundBottom);
 
-    const auto textBounds = juce::Rectangle<int>(6, yOff, juce::jmax(0, paintW - 12), fullH);
     if (item.kind == RowKind::kSection)
     {
+        bool roundTop = false;
+        bool roundBottom = false;
+        roundFlagsForRow(row, roundTop, roundBottom);
+        const auto rowArea = juce::Rectangle<float>(0.0f, (float) yOff, (float) paintW, (float) fullH);
         SkinEditorChrome::fillTableRow(g, { rowArea, SkinEditorChrome::surfaceSection(),
                                             roundTop, roundBottom });
         g.setColour(SkinEditorChrome::textTableHeader());
-        paintElidedLeft(g, SkinEditorChrome::fontBold(), item.headerText, textBounds);
+        paintElidedLeft(g, SkinEditorChrome::fontBold(), item.headerText,
+                        { 6, yOff, juce::jmax(0, paintW - 12), fullH });
         return;
     }
 
@@ -296,24 +306,46 @@ void SkinEditorPalettePanel::paintListBoxItem(int row, juce::Graphics& g, int wi
     {
         // Darker than textMuted so the empty hint stays quiet under Editor colours.
         g.setColour(juce::Colour(0xff666666));
-        paintElidedLeft(g, SkinEditorChrome::fontRegular(), item.headerText, textBounds);
+        paintElidedLeft(g, SkinEditorChrome::fontRegular(), item.headerText,
+                        { 6, yOff, juce::jmax(0, paintW - 12), fullH });
         return;
     }
 
+    paintColourRow(g, item, row, yOff);
+}
+
+void SkinEditorPalettePanel::paintColourRow(juce::Graphics& g, const Row& item, int row, int yOff)
+{
+    const int paintW = paintWidth();
+    const int fullH = SkinEditorChrome::kColumnHeaderHeight;
+    bool roundTop = false;
+    bool roundBottom = false;
+    roundFlagsForRow(row, roundTop, roundBottom);
+
+    const auto rowArea = juce::Rectangle<float>(0.0f, (float) yOff, (float) paintW, (float) fullH);
     if (isRowSelectedVisually(row))
         SkinEditorChrome::fillTableRow(g, { rowArea, juce::Colour(0xff303030), roundTop, roundBottom });
 
     const int sw = SkinEditorChrome::kColourSwatchSize;
-    const int swX = 4;
     const int swY = yOff + (fullH - sw) / 2;
-    const auto swatch = juce::Rectangle<int>(swX, swY, sw, sw);
+    const auto swatch = juce::Rectangle<int>(kSwatchX, swY, sw, sw);
     if (item.pending)
         SkinEditorChrome::paintPendingColourSwatch(g, swatch);
     else
         SkinEditorChrome::paintColourSwatch(g, swatch, juce::Colour(item.argb));
+
+    const auto& bodyFont = SkinEditorChrome::fontRegular();
+    const int countLeft = mappingCountLeft(paintW, mappingCountColumnWidth_);
+    g.setColour(SkinEditorChrome::attention());
+    g.setFont(bodyFont);
+    g.drawText(juce::String(item.mappingCount),
+               juce::Rectangle<int>(countLeft, yOff, mappingCountColumnWidth_, fullH),
+               juce::Justification::centredRight, false);
+
+    const int nameLeft = kSwatchX + sw + kNameGap;
     g.setColour(SkinEditorChrome::textTableBody());
-    paintElidedLeft(g, SkinEditorChrome::fontRegular(), item.name,
-                    { swX + sw + 8, yOff, juce::jmax(0, paintW - swX - sw - 8), fullH });
+    paintElidedLeft(g, bodyFont, item.name,
+                    { nameLeft, yOff, juce::jmax(0, countLeft - kNameCountGap - nameLeft), fullH });
 }
 
 void SkinEditorPalettePanel::selectedRowsChanged(int)
@@ -338,11 +370,11 @@ void SkinEditorPalettePanel::listBoxItemDoubleClicked(int row, const juce::Mouse
     if (item.kind != RowKind::kColour || item.isProduct)
         return;
 
-    // Rename is name-text only — swatch double-click does nothing.
+    // Rename is name-text only — swatch and trailing count do nothing.
     const int sw = SkinEditorChrome::kColourSwatchSize;
-    constexpr int kSwatchX = 4;
-    constexpr int kNameGap = 8;
-    if (e.x < kSwatchX + sw + kNameGap)
+    const int nameLeft = kSwatchX + sw + kNameGap;
+    const int countLeft = mappingCountLeft(paintWidth(), mappingCountColumnWidth_);
+    if (e.x < nameLeft || e.x >= countLeft - kNameCountGap)
         return;
 
     if (onRenamePastilleRequested)
@@ -352,11 +384,16 @@ void SkinEditorPalettePanel::listBoxItemDoubleClicked(int row, const juce::Mouse
 void SkinEditorPalettePanel::rebuildRows()
 {
     rows_.clear();
+    mappingCountColumnWidth_ = 0;
     const auto* skin = (layer_ != nullptr && skinId_.isNotEmpty())
                            ? layer_->findSkin(skinId_)
                            : nullptr;
     if (skin == nullptr)
         return;
+
+    const auto& countFont = SkinEditorChrome::fontRegular();
+    // Floor at two digits so 9→10 does not reflow name elision for the whole list.
+    mappingCountColumnWidth_ = SkinEditorChrome::measureTextWidth(countFont, "99");
 
     std::vector<Row> product;
     std::vector<Row> editor;
@@ -368,6 +405,10 @@ void SkinEditorPalettePanel::rebuildRows()
         row.argb = pastille.argb;
         row.pending = pastille.pending;
         row.isProduct = layer_->isProductPastilleName(pastille.name);
+        row.mappingCount = layer_->countMappingsReferencing(skinId_, pastille.name);
+        mappingCountColumnWidth_ = juce::jmax(
+            mappingCountColumnWidth_,
+            SkinEditorChrome::measureTextWidth(countFont, juce::String(row.mappingCount)));
         if (row.isProduct)
             product.push_back(row);
         else
