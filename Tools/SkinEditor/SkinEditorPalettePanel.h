@@ -96,7 +96,7 @@ private:
     juce::Label titleLabel_;
     juce::Rectangle<int> titleTabBounds_;
     juce::ListBox list_ { "Palette", this };
-    juce::TextButton addButton_;
-    juce::TextButton duplicateButton_;
-    juce::TextButton deleteButton_;
+    juce::TextButton addButton_ { "New" };
+    juce::TextButton duplicateButton_ { "Dup" };
+    juce::TextButton deleteButton_ { "Del" };
 };

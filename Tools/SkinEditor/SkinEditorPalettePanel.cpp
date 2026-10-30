@@ -30,16 +30,8 @@ SkinEditorPalettePanel::SkinEditorPalettePanel()
     addAndMakeVisible(addButton_);
     addAndMakeVisible(duplicateButton_);
     addAndMakeVisible(deleteButton_);
-
-    addButton_.setComponentID(SkinEditorChrome::kPaletteIconNewId);
-    duplicateButton_.setComponentID(SkinEditorChrome::kPaletteIconDuplicateId);
-    deleteButton_.setComponentID(SkinEditorChrome::kPaletteIconDeleteId);
-    addButton_.setTooltip("New");
     duplicateButton_.setTooltip("Duplicate");
     deleteButton_.setTooltip("Delete");
-    addButton_.setTitle("New");
-    duplicateButton_.setTitle("Duplicate");
-    deleteButton_.setTitle("Delete");
 
     addButton_.onClick = [this]
     {
@@ -178,14 +170,28 @@ void SkinEditorPalettePanel::resized()
 
 void SkinEditorPalettePanel::layoutActionButtons(juce::Rectangle<int> actionRow)
 {
-    const int side = SkinEditorChrome::measurePaletteActionButtonWidth();
-    addButton_.setBounds(actionRow.removeFromLeft(side)
+    // Natural widths only — do not dump leftover into New (keeps short labels tight).
+    const int tableW = actionRow.getWidth();
+    const int gaps = 2 * SkinEditorChrome::kButtonGap;
+    int newW = SkinEditorChrome::measurePaletteActionButtonWidth(addButton_);
+    int dupW = SkinEditorChrome::measurePaletteActionButtonWidth(duplicateButton_);
+    int delW = SkinEditorChrome::measurePaletteActionButtonWidth(deleteButton_);
+    const int preferred = newW + dupW + delW + gaps;
+    if (preferred > tableW)
+    {
+        const int inner = juce::jmax(3, tableW - gaps);
+        const int sum = juce::jmax(1, newW + dupW + delW);
+        newW = juce::jmax(1, (inner * newW) / sum);
+        dupW = juce::jmax(1, (inner * dupW) / sum);
+        delW = juce::jmax(1, inner - newW - dupW);
+    }
+    addButton_.setBounds(actionRow.removeFromLeft(newW)
                              .withHeight(SkinEditorChrome::kButtonHeight));
     actionRow.removeFromLeft(SkinEditorChrome::kButtonGap);
-    duplicateButton_.setBounds(actionRow.removeFromLeft(side)
+    duplicateButton_.setBounds(actionRow.removeFromLeft(dupW)
                                    .withHeight(SkinEditorChrome::kButtonHeight));
     actionRow.removeFromLeft(SkinEditorChrome::kButtonGap);
-    deleteButton_.setBounds(actionRow.removeFromLeft(side)
+    deleteButton_.setBounds(actionRow.removeFromLeft(delW)
                                 .withHeight(SkinEditorChrome::kButtonHeight));
 }
 

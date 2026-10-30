@@ -190,35 +190,42 @@ namespace SkinEditorChrome
         return juce::jmax(52, measureTextWidth(fontRegular(), button.getButtonText()) + pad);
     }
 
-    /** Palette icon actions are square: side equals kButtonHeight. */
-    inline int measurePaletteActionButtonWidth() noexcept
+    /**
+     * Palette New / Dup / Del: text + pad, no 52 px floor (short labels stay tight).
+     */
+    inline int measurePaletteActionButtonWidth(const juce::TextButton& button) noexcept
     {
-        return kButtonHeight;
+        constexpr int kPad = 16;
+        constexpr int kMin = 36;
+        return juce::jmax(kMin, measureTextWidth(fontRegular(), button.getButtonText()) + kPad);
     }
 
-    /** Preferred New + Duplicate + Delete icon row (two gaps). */
+    /** Preferred New + Dup + Del row (two gaps); used to size kPalettePanelWidth. */
     inline int paletteActionButtonsPreferredWidth() noexcept
     {
-        return 3 * measurePaletteActionButtonWidth() + 2 * kButtonGap;
+        return measurePaletteActionButtonWidth(juce::TextButton("New"))
+               + measurePaletteActionButtonWidth(juce::TextButton("Dup"))
+               + measurePaletteActionButtonWidth(juce::TextButton("Del"))
+               + 2 * kButtonGap;
     }
 
     /**
-     * List / Mapped-colour paint floor: icon row, section headers, and "Mapped colour"
-     * legend must fit without clipping (header text uses 6 px inset each side).
+     * List / Mapped-colour paint floor: action row, section headers, and "Mapped colour"
+     * legend (header text uses 6 px inset each side).
      */
     inline int paletteListPaintFloor() noexcept
     {
         constexpr int kHeaderInset = 12;
-        const int fromIcons = paletteActionButtonsPreferredWidth();
+        const int fromActions = paletteActionButtonsPreferredWidth();
         const int fromHeaders = juce::jmax(measureTextWidth(fontBold(), "Product colours"),
                                            measureTextWidth(fontBold(), "Editor colours"))
                                 + kHeaderInset;
         const int fromMappedLegend = measureTextWidth(fontBold(), "Mapped colour");
-        return juce::jmax(fromIcons, juce::jmax(fromHeaders, fromMappedLegend));
+        return juce::jmax(fromActions, juce::jmax(fromHeaders, fromMappedLegend));
     }
 
     /**
-     * Minimum Palette panel width so paintWidth() hosts icons + chrome text floors
+     * Minimum Palette panel width so paintWidth() hosts action + chrome text floors
      * (content pad + scroll-track band reserved like Palette::paintWidth).
      */
     inline int palettePanelWidthForActionButtons() noexcept

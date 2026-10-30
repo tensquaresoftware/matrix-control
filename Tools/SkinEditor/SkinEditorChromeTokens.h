@@ -58,10 +58,10 @@ namespace SkinEditorChrome
     inline constexpr int kColorPanelWidth = 260;
     /**
      * Palette column + Mapped colour alignment width.
-     * Icon actions are square; width floors on section / Mapped colour chrome text
+     * Sized to New / Dup / Del preferred measure, floored with chrome text
      * (see palettePanelWidthForActionButtons()). Layout tests lock equality.
      */
-    inline constexpr int kPalettePanelWidth = 124;
+    inline constexpr int kPalettePanelWidth = 156;
     /**
      * Former Mappings half-share at legacy 1210 (385) plus the width formerly given to
      * Palette (60), plus 35 for Object / Property room (TrackGeneratorDisplay):

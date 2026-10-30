@@ -14,25 +14,21 @@ context: []
 
 **Problem:** The Skin Editor Palette column is wider than colour names need, because the New / Duplicate / Del text buttons (especially Duplicate) set the panel floor width.
 
-**Approach:** Replace those three Palette actions with square rounded icon buttons drawn as Path pictos (+, overlapping rounded rects, simplified trash), with full English tooltips. Shrink `kPalettePanelWidth` to the icon-row floor so the window narrows; keep Mapped colour aligned by shrinking that column by the same amount via the existing shared paint-width token (Mappings panel total width unchanged; Property/State absorb the freed span). Skins-panel text buttons stay as they are. No external icon bank.
+**Approach (final, after visual reject of Path icons):** Keep text action buttons; abbreviate Duplicate to Dup (New / Dup / Del). Shrink `kPalettePanelWidth` to the preferred text-row + chrome floor; Mapped colour stays aligned via the shared paint-width token. Skins-panel text buttons unchanged.
 
 </frozen-after-approval>
 
 ## Implementation Notes
 
-- Path icons live in `SkinEditorChromeIcons.h`; LookAndFeel `drawButtonText` routes Palette buttons by component ID.
-- Square actions: side = `kButtonHeight` (24). Panel width floors on chrome text + icons via `paletteListPaintFloor()` → `kPalettePanelWidth` 183 → 124; `kPaletteListPaintWidth` 155 → 96 (Mapped colour follows).
-- Tooltips + `setTitle` for New / Duplicate / Delete. Empty button text. Skins panel unchanged.
-- Elide section headers, empty hint, pastille names, and Mapped colour legend when paint budget is tight.
-- Layout tests lock width equality to runtime floor; lint + SkinEditorChromeLayout tests green.
+- 2026-10-31: Reverted Path icon buttons (`SkinEditorChromeIcons.h` removed). Labels: New / Dup / Del; Dup/Del keep full-word tooltips.
+- `kPalettePanelWidth` 183 → 156; `kPaletteListPaintWidth` 155 → 128 (Mapped colour follows). Floor via `paletteListPaintFloor()`.
+- Elide safety on tight Palette / Mapped colour chrome strings retained from the icon pass.
+- Layout tests + lint green.
 
 ## Review Triage Log
 
-- high — Chrome strings clip at icon-only 88 px paint width — patched: floor on Product/Editor/Mapped colour measures + elide safety net.
-- medium — Long pastille names overflow after swatch — patched: `elideToWidth` on colour names.
-- medium — Empty TextButton accessibility names — patched: `setTitle` alongside tooltips.
-- false — Window does not shrink by full palette delta — by design `windowContentWidth = max(body, title+SESSION)`; Mapped colour still tracks palette paint width.
-- false — `layoutActionButtons` no proportional shrink — panel width floors on icon preferred width by construction.
+- high — Chrome strings clip at icon-only 88 px paint width — patched then superseded by text Dup approach (floor 156 / paint 128).
+- medium — Long pastille names overflow after swatch — patched: `elideToWidth` on colour names (retained).
+- medium — Empty TextButton accessibility names — n/a after revert to labeled text buttons.
+- false — Window does not shrink by full palette delta — by design `windowContentWidth = max(body, title+SESSION)`.
 - false — Oneshot spec thin vs dispatch template — expected for `route: oneshot`.
-- low rejected — Extra icon unit tests / rename `measurePaletteActionButtonWidth` / history comment rewrite — cosmetic vs oneshot scope.
-- low patched — Plus stroke caps vs trash PathStroke — unified rounded stroke; unused Tokens include removed from Icons header.
