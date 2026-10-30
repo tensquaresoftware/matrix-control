@@ -244,6 +244,9 @@ void SkinEditorMainComponent::refreshStatus()
 
     // Re-layout: fixed badges + path-style elide + export-path tooltip when truncated.
     resized();
+    // BRIDGE fill is custom-painted; Labels already refresh via setText / setBounds.
+    if (! connectionBadgeBounds_.isEmpty())
+        repaint(connectionBadgeBounds_);
 }
 
 void SkinEditorMainComponent::refreshExportEnabled()

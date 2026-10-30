@@ -184,7 +184,11 @@ void SkinEditorMainComponent::paint(juce::Graphics& g)
     paintChromeWells(g);
 
     if (! connectionBadgeBounds_.isEmpty())
-        SkinEditorChrome::drawChromeBadge(g, connectionBadgeBounds_, "BRIDGE");
+    {
+        const auto bridgeFill = bridge_.isConnected() ? SkinEditorChrome::textMuted()
+                                                      : SkinEditorChrome::danger();
+        SkinEditorChrome::drawChromeBadge(g, connectionBadgeBounds_, "BRIDGE", bridgeFill);
+    }
     if (! lastPushBadgeBounds_.isEmpty())
         SkinEditorChrome::drawChromeBadge(g, lastPushBadgeBounds_, "LAST PUSH");
     if (! appBadgeBounds_.isEmpty())
