@@ -1,5 +1,32 @@
 # Deferred Work
 
+## Deferred from: code review of spec-linux-jack-device-apply.md (2026-10-30)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-linux-jack-device-apply.md`
+  summary: Unit-test that `tryApplySetupWithBufferFallback` wires `getCurrentAudioDeviceType()` through `requestedSampleRateForBufferFallbackSuccess` (helper bypass would still leave current unit expects green).
+  evidence: Blind Hunter; needs AudioDeviceManager fake or equivalent; residual after helper extraction.
+- source_spec: `_bmad-output/implementation-artifacts/spec-linux-jack-device-apply.md`
+  summary: Revisit preferred-setup / profile overlay after a JACK open so a listed preferred rate cannot drive a pointless second apply against the server clock.
+  evidence: Blind Hunter; pre-existing `syncPreferredSetupFromDeviceManager` path; out of this rate-gate fix.
+
+## Deferred from: review of spec-linux-jack-device-apply.md (2026-10-30)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-linux-jack-device-apply.md`
+  summary: Unit-test the empty buffer try-order fallback (including bufferSize <= 0) without a live audio device.
+  evidence: Blind Hunter; current apply path needs AudioDeviceManager or a new pure helper beyond this JACK rate-gate fix.
+- source_spec: `_bmad-output/implementation-artifacts/spec-linux-jack-device-apply.md`
+  summary: Move server-clock / JACK rate-enforce policy next to Core `didBufferFallbackTrySucceed` if a second server-clock backend appears.
+  evidence: Blind Hunter; detection helpers live in AudioDeviceSetupSync today (same pattern as ASIO); YAGNI until another driver needs it.
+
+## Deferred from: review of spec-linux-jack-audio.md (2026-10-30)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-linux-jack-audio.md`
+  summary: Confirm on a Linux machine or green CI that Standalone Settings → AUDIO → DRIVER TYPE lists JACK when JACK/PipeWire-JACK client libs are available.
+  evidence: Change was implemented and off-path tested on Windows; Linux compile needs jack headers (CI already installs libjack-jackd2-dev) but live DRIVER TYPE smoke was not run in this session.
+- source_spec: `_bmad-output/implementation-artifacts/spec-linux-jack-audio.md`
+  summary: Optional LGPL / libjack third-party notice for documentation or release hygiene when shipping Linux Standalone with JACK enabled.
+  evidence: JACK client is LGPL with dynamic libjack load (JUCE model); Intent deferred manual notice for this chantier.
+
 ## Deferred from: review of spec-gh-42-windows-standalone-asio.md (2026-10-30)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-gh-42-windows-standalone-asio.md`

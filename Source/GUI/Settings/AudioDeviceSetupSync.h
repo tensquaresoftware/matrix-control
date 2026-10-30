@@ -13,7 +13,10 @@ namespace AudioDeviceSetupSync
 
     /**
         Try opening `setup` with each buffer in `bufferTryOrder` until setAudioDeviceSetup
-        succeeds and the live device sample rate matches `setup.sampleRate`.
+        succeeds. For drivers that can take a client rate (ALSA/CoreAudio/…), also require
+        the live sample rate to match `setup.sampleRate`. For JACK, the server clock wins —
+        a successful open with a different live rate still counts (Host / PipeWire-JACK model).
+        An empty try order still attempts once with `setup.bufferSize`.
         Returns true when a try succeeds; does not restore a prior setup on failure.
     */
     bool tryApplySetupWithBufferFallback(juce::AudioDeviceManager& deviceManager,
@@ -46,6 +49,31 @@ namespace AudioDeviceSetupSync
     inline bool isAsioDeviceType(const juce::String& typeName) noexcept
     {
         return typeName.containsIgnoreCase("ASIO");
+    }
+
+    /** JUCE Linux JACK type name is "JACK" (server clock; open() ignores requested rate). */
+    inline bool isJackDeviceType(const juce::String& typeName) noexcept
+    {
+        return typeName.containsIgnoreCase("JACK");
+    }
+
+    /**
+        Whether Settings AUDIO apply should require live sample rate == requested rate.
+        JACK ignores the rate passed to open(); mismatch after a successful open is normal.
+    */
+    inline bool shouldEnforceRequestedSampleRate(const juce::String& deviceTypeName) noexcept
+    {
+        return ! isJackDeviceType(deviceTypeName);
+    }
+
+    /**
+        Rate passed into `didBufferFallbackTrySucceed` after setAudioDeviceSetup.
+        Non-positive disables the live-rate match gate (JACK / server clock).
+    */
+    inline double requestedSampleRateForBufferFallbackSuccess(const juce::String& deviceTypeName,
+                                                              double setupSampleRate) noexcept
+    {
+        return shouldEnforceRequestedSampleRate(deviceTypeName) ? setupSampleRate : 0.0;
     }
 
     /** Under ASIO, keep both endpoint names equal (prefer the side the user just changed). */
