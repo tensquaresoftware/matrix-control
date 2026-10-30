@@ -36,7 +36,7 @@ SkinEditorMainComponent::~SkinEditorMainComponent()
 {
     compareBlinkTimer_.stopTimer();
     setLookAndFeel(nullptr);
-    stopTimer();
+    flushPendingSessionAutosave();
     bridge_.stop();
 }
 
@@ -138,11 +138,11 @@ void SkinEditorMainComponent::setupLayerAndBridgeCallbacks()
 {
     layer_.onChanged = [this]
     {
-        markDirty();
+        markEditorDirty();
         refreshAll();
         if (bridge_.isConnected() && ! isCompareProductView() && canEditEditorSkin())
             pushVisible();
-        startTimer(400);
+        scheduleSessionAutosave();
     };
 
     bridge_.onConnectionChanged = [this](bool)

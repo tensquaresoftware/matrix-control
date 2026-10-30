@@ -2947,3 +2947,12 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-silence-false-error-matrix-6-master.md`
   summary: Reconfirmed — MidiLogger receive-log ERROR-absence still untested at call site; double `logSysExReceived` still pre-existing.
   evidence: Combined review Verification Gap; already deferred earlier the same day.
+
+## Deferred from: oneshot review of spec-skin-editor-product-session-persist.md (2026-10-30)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-product-session-persist.md`
+  summary: Add automated coverage for editor-dirty vs session-preference autosave and Discard rewrite keeping productSkinId.
+  evidence: Blind Hunter; current DevSkin session tests only JSON round-trip; manual smoke covers the bugfix.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-product-session-persist.md`
+  summary: Explicit post-baseline session rewrite after corrupt-session recovery (not only Cream in-memory fallback).
+  evidence: Blind Hunter; pre-existing load path; this fix only stopped accidental onChanged timer arming during load.

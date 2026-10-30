@@ -2,9 +2,9 @@
 
 bool SkinEditorMainComponent::tryQuitWithDirtyGate()
 {
-    stopTimer();
+    flushPendingSessionAutosave();
 
-    if (! sessionDirty_)
+    if (! editorDirty_)
         return true;
 
     juce::AlertWindow window("Unsaved Editor changes",
@@ -20,12 +20,7 @@ bool SkinEditorMainComponent::tryQuitWithDirtyGate()
         return false;
     }
     if (choice == 2)
-    {
-        stopTimer();
-        TSS::DevSkin::skinEditorSessionFile().deleteFile();
-        markClean();
-        return true;
-    }
+        return quitAfterDiscardChoice();
 
     // Export then quit if successful
     if (sessionState_.editorSkinId.isEmpty()
@@ -44,14 +39,24 @@ bool SkinEditorMainComponent::tryQuitWithDirtyGate()
         "*.json");
 
     // Modal sync chooser for quit path
-    if (chooser->browseForFileToSave(true))
+    if (chooser->browseForFileToSave(true)
+        && exportCurrentEditorSkinToFile(chooser->getResult()))
     {
-        if (exportCurrentEditorSkinToFile(chooser->getResult()))
-        {
-            markClean();
-            return true;
-        }
+        markEditorClean();
+        return true;
     }
+    return false;
+}
+
+bool SkinEditorMainComponent::quitAfterDiscardChoice()
+{
+    if (discardEditorWorkKeepingSessionPrefs())
+        return true;
+
+    juce::AlertWindow::showMessageBoxAsync(
+        juce::MessageBoxIconType::WarningIcon,
+        "Discard failed",
+        "Could not rewrite the session file. Quit cancelled so Editor work is not left on disk.");
     return false;
 }
 
@@ -87,11 +92,10 @@ void SkinEditorMainComponent::applyProductComboChange()
     const int id = skinsPanel_.productCombo().getSelectedId();
     sessionState_.productSkinId = (id == 1) ? TSS::DevSkin::kCompiledBlackId
                                             : TSS::DevSkin::kCompiledCreamId;
-    markDirty();
     refreshAll();
     if (bridge_.isConnected() && isCompareProductView())
         pushVisible();
-    startTimer(400);
+    scheduleSessionAutosave();
 }
 
 void SkinEditorMainComponent::applyEditorComboChange()
@@ -105,12 +109,14 @@ void SkinEditorMainComponent::applyEditorComboChange()
         if (sessionState_.editorSkinId != skin.id)
             clearMappingModeToIdle();
         sessionState_.editorSkinId = skin.id;
-        layer_.selectSkin(skin.id);
-        markDirty();
+
+        // Selection only — do not treat as unexported Editor edits (selectSkin bumps onChanged).
+        runWithoutLayerChangeNotify([this, &skin] { layer_.selectSkin(skin.id); });
+
         refreshAll();
         if (bridge_.isConnected() && ! isCompareProductView())
             pushVisible();
-        startTimer(400);
+        scheduleSessionAutosave();
         return;
     }
 }
@@ -127,8 +133,7 @@ void SkinEditorMainComponent::comboBoxChanged(juce::ComboBox* box)
 
 void SkinEditorMainComponent::timerCallback()
 {
-    stopTimer();
-    autosaveSession();
+    flushPendingSessionAutosave();
 }
 
 void SkinEditorMainComponent::refreshAll()
@@ -267,38 +272,105 @@ void SkinEditorMainComponent::setStatusMessage(const juce::String& text)
     statusDetail_ = text;
 }
 
-void SkinEditorMainComponent::markDirty()
+void SkinEditorMainComponent::markEditorDirty()
 {
-    sessionDirty_ = true;
+    editorDirty_ = true;
 }
 
-void SkinEditorMainComponent::markClean()
+void SkinEditorMainComponent::markEditorClean()
 {
-    sessionDirty_ = false;
+    editorDirty_ = false;
 }
 
-void SkinEditorMainComponent::autosaveSession()
+void SkinEditorMainComponent::scheduleSessionAutosave()
+{
+    startTimer(400);
+}
+
+void SkinEditorMainComponent::flushPendingSessionAutosave()
+{
+    if (! isTimerRunning())
+        return;
+    stopTimer();
+    autosaveSession();
+}
+
+bool SkinEditorMainComponent::autosaveSession()
 {
     juce::String error;
     if (! TSS::DevSkin::saveSessionFile(layer_, sessionState_, error))
+    {
         setStatusMessage("Session autosave failed: " + error);
+        return false;
+    }
+    return true;
+}
+
+void SkinEditorMainComponent::runWithoutLayerChangeNotify(const std::function<void()>& action)
+{
+    const auto previousOnChanged = std::move(layer_.onChanged);
+    layer_.onChanged = nullptr;
+    action();
+    layer_.onChanged = std::move(previousOnChanged);
+}
+
+bool SkinEditorMainComponent::discardEditorWorkKeepingSessionPrefs()
+{
+    stopTimer();
+
+    const auto productSkinId = sessionState_.productSkinId;
+    const auto lastSkinJsonDirectory = sessionState_.lastSkinJsonDirectory;
+
+    runWithoutLayerChangeNotify([this] { layer_.resetToCompiledBaseline(); });
+
+    sessionState_.productSkinId = productSkinId;
+    sessionState_.editorSkinId = {};
+    sessionState_.compareOn = false;
+    sessionState_.lastSkinJsonDirectory = lastSkinJsonDirectory;
+
+    clearMappingModeToIdle();
+    if (! autosaveSession())
+    {
+        // Memory already baseline; restore disk so UI matches the abandoned session file.
+        runWithoutLayerChangeNotify([this]
+        {
+            (void) TSS::DevSkin::loadSessionFile(layer_, sessionState_);
+            sessionState_.compareOn = false;
+            if (sessionState_.editorSkinId.isNotEmpty())
+                layer_.selectSkin(sessionState_.editorSkinId);
+        });
+        stopTimer();
+        markEditorDirty();
+        refreshAll();
+        return false;
+    }
+
+    markEditorClean();
+    refreshAll();
+    if (bridge_.isConnected())
+        pushVisible();
+    return true;
 }
 
 void SkinEditorMainComponent::loadSessionOrBaseline()
 {
-    const auto loaded = TSS::DevSkin::loadSessionFile(layer_, sessionState_);
-    if (! loaded.ok)
+    runWithoutLayerChangeNotify([this]
     {
-        if (loaded.message != "No session file")
-            setStatusMessage(loaded.message);
-        sessionState_.productSkinId = TSS::DevSkin::kCompiledCreamId;
-        sessionState_.editorSkinId = {};
-    }
-    // Compare is never restored from disk — always start editing, not comparing.
-    sessionState_.compareOn = false;
-    if (sessionState_.editorSkinId.isNotEmpty())
-        layer_.selectSkin(sessionState_.editorSkinId);
-    markClean();
+        const auto loaded = TSS::DevSkin::loadSessionFile(layer_, sessionState_);
+        if (! loaded.ok)
+        {
+            if (loaded.message != "No session file")
+                setStatusMessage(loaded.message);
+            sessionState_.productSkinId = TSS::DevSkin::kCompiledCreamId;
+            sessionState_.editorSkinId = {};
+        }
+        // Compare is never restored from disk — always start editing, not comparing.
+        sessionState_.compareOn = false;
+        if (sessionState_.editorSkinId.isNotEmpty())
+            layer_.selectSkin(sessionState_.editorSkinId);
+    });
+    stopTimer();
+    markEditorClean();
 }
 
 juce::String SkinEditorMainComponent::visibleSkinId() const

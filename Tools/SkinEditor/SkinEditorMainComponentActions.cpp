@@ -149,11 +149,9 @@ void SkinEditorMainComponent::tickCompareBlink()
 void SkinEditorMainComponent::onCompareToggle()
 {
     sessionState_.compareOn = ! sessionState_.compareOn;
-    markDirty();
     refreshAll();
     if (bridge_.isConnected())
         pushVisible();
-    startTimer(400);
 }
 
 void SkinEditorMainComponent::onPush()
@@ -194,7 +192,7 @@ void SkinEditorMainComponent::onExportJson()
                                  return;
                              if (exportCurrentEditorSkinToFile(file))
                              {
-                                 markClean();
+                                 markEditorClean();
                                  setStatusMessage("Exported: " + file.getFullPathName());
                                  refreshStatus();
                              }

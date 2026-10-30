@@ -22,7 +22,6 @@ public:
 
     /** Returns false if the user cancelled quit. */
     bool tryQuitWithDirtyGate();
-    bool isSessionDirty() const noexcept { return sessionDirty_; }
 
     void paint(juce::Graphics& g) override;
     void resized() override;
@@ -46,9 +45,17 @@ private:
     void refreshExportEnabled();
     void pushVisible();
     void setStatusMessage(const juce::String& text);
-    void markDirty();
-    void markClean();
-    void autosaveSession();
+    void markEditorDirty();
+    void markEditorClean();
+    void scheduleSessionAutosave();
+    void flushPendingSessionAutosave();
+    /** Writes session file; returns false and sets status on failure. */
+    bool autosaveSession();
+    /** Drop Editor skins, keep Product prefs, rewrite session. False if rewrite fails. */
+    bool discardEditorWorkKeepingSessionPrefs();
+    /** Quit-modal Discard branch; false keeps the app open. */
+    bool quitAfterDiscardChoice();
+    void runWithoutLayerChangeNotify(const std::function<void()>& action);
     void loadSessionOrBaseline();
     juce::String visibleSkinId() const;
     bool isCompareProductView() const;
@@ -157,7 +164,7 @@ private:
     TSS::DevSkin::Layer layer_;
     TSS::DevSkin::BridgeClient bridge_;
     TSS::DevSkin::EditorSessionState sessionState_;
-    bool sessionDirty_ = false;
+    bool editorDirty_ = false;
     juce::String selectedPastille_;
     MappingMode mappingMode_ = MappingMode::kIdle;
     TSS::SkinColourKey armedKey_ {};
