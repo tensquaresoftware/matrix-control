@@ -1,5 +1,23 @@
 # Deferred Work
 
+## Deferred from: code review of spec-linux-jack-device-apply.md (2026-10-30)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-linux-jack-device-apply.md`
+  summary: Unit-test that `tryApplySetupWithBufferFallback` wires `getCurrentAudioDeviceType()` through `requestedSampleRateForBufferFallbackSuccess` (helper bypass would still leave current unit expects green).
+  evidence: Blind Hunter; needs AudioDeviceManager fake or equivalent; residual after helper extraction.
+- source_spec: `_bmad-output/implementation-artifacts/spec-linux-jack-device-apply.md`
+  summary: Revisit preferred-setup / profile overlay after a JACK open so a listed preferred rate cannot drive a pointless second apply against the server clock.
+  evidence: Blind Hunter; pre-existing `syncPreferredSetupFromDeviceManager` path; out of this rate-gate fix.
+
+## Deferred from: review of spec-linux-jack-device-apply.md (2026-10-30)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-linux-jack-device-apply.md`
+  summary: Unit-test the empty buffer try-order fallback (including bufferSize <= 0) without a live audio device.
+  evidence: Blind Hunter; current apply path needs AudioDeviceManager or a new pure helper beyond this JACK rate-gate fix.
+- source_spec: `_bmad-output/implementation-artifacts/spec-linux-jack-device-apply.md`
+  summary: Move server-clock / JACK rate-enforce policy next to Core `didBufferFallbackTrySucceed` if a second server-clock backend appears.
+  evidence: Blind Hunter; detection helpers live in AudioDeviceSetupSync today (same pattern as ASIO); YAGNI until another driver needs it.
+
 ## Deferred from: review of spec-linux-jack-audio.md (2026-10-30)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-linux-jack-audio.md`

@@ -177,7 +177,7 @@ private:
         expect(! Core::didBufferFallbackTrySucceed(false, true, 192000.0, 192000.0));
         expect(! Core::didBufferFallbackTrySucceed(true, false, 192000.0, 192000.0));
 
-        // Lower rates / buffer-only: non-positive requested rate accepts any live rate.
+        // Non-positive requested rate skips the live-rate gate (JACK / server-clock callers).
         expect(Core::didBufferFallbackTrySucceed(true, true, 0.0, 48000.0));
         expect(Core::didBufferFallbackTrySucceed(true, true, 48000.0, 48000.0));
     }

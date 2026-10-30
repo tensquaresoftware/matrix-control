@@ -1,6 +1,8 @@
 #include <juce_audio_devices/juce_audio_devices.h>
 #include <juce_core/juce_core.h>
 
+#include "GUI/Settings/AudioDeviceSetupSync.h"
+
 class LinuxJackDeviceTypeTests : public juce::UnitTest
 {
 public:
@@ -13,9 +15,40 @@ public:
     {
         jackCompileFlagMatchesPlatform();
         linuxRegistersJackDeviceType();
+        jackApplyHelpersMatchHostModel();
     }
 
 private:
+    void jackApplyHelpersMatchHostModel()
+    {
+        beginTest("JACK apply - server clock skips rate enforce; endpoints stay independent");
+
+        expect(AudioDeviceSetupSync::isJackDeviceType("JACK"));
+        expect(AudioDeviceSetupSync::isJackDeviceType("jack"));
+        expect(! AudioDeviceSetupSync::isJackDeviceType("ALSA"));
+        expect(! AudioDeviceSetupSync::isJackDeviceType("ASIO"));
+        expect(! AudioDeviceSetupSync::isAsioDeviceType("JACK"));
+
+        expect(AudioDeviceSetupSync::shouldEnforceRequestedSampleRate("ALSA"));
+        expect(AudioDeviceSetupSync::shouldEnforceRequestedSampleRate("CoreAudio"));
+        expect(AudioDeviceSetupSync::shouldEnforceRequestedSampleRate("ASIO"));
+        expect(! AudioDeviceSetupSync::shouldEnforceRequestedSampleRate("JACK"));
+        expect(! AudioDeviceSetupSync::shouldEnforceRequestedSampleRate("jack"));
+
+        expectEquals(AudioDeviceSetupSync::requestedSampleRateForBufferFallbackSuccess("ALSA", 44100.0),
+                     44100.0);
+        expectEquals(AudioDeviceSetupSync::requestedSampleRateForBufferFallbackSuccess("JACK", 44100.0),
+                     0.0);
+        expectEquals(AudioDeviceSetupSync::requestedSampleRateForBufferFallbackSuccess("jack", 48000.0),
+                     0.0);
+
+        juce::String input = "In A";
+        juce::String output = "Out B";
+        AudioDeviceSetupSync::resolveEndpointNamesForApply("JACK", input, output, true);
+        expectEquals(input, juce::String("In A"));
+        expectEquals(output, juce::String("Out B"));
+    }
+
     void jackCompileFlagMatchesPlatform()
     {
 #if JUCE_LINUX

@@ -163,8 +163,10 @@ namespace Core
     }
 
     /**
-        One buffer-try outcome: setup applied with no error, live device present, and
-        live sample rate matches the requested rate (when a positive rate was requested).
+        One buffer-try outcome: setup applied with no error and a live device present.
+        When `requestedSampleRate` is positive, also require the live rate to match
+        (ALSA-style client clock). Pass a non-positive rate to skip that gate — used for
+        JACK / server-clock drivers where open() ignores the requested rate.
     */
     inline bool didBufferFallbackTrySucceed(bool setSetupSucceeded,
                                             bool liveDevicePresent,
