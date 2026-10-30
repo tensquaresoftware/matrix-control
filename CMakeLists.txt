@@ -969,19 +969,16 @@ if(WIN32)
         target_compile_definitions(Matrix-Control_Tests PRIVATE JUCE_ASIO=1)
     endif()
 
-    # Product target must keep ASIO; Tests define alone would leave CI green without Standalone ASIO.
+    # Product target must compile with ASIO (COMPILE_DEFINITIONS). INTERFACE-only would leave
+    # Standalone without ASIO while Matrix-Control_Tests could still pass via its PRIVATE define.
     get_property(_matrix_control_compile_defs TARGET Matrix-Control PROPERTY COMPILE_DEFINITIONS)
-    get_property(_matrix_control_iface_defs TARGET Matrix-Control PROPERTY INTERFACE_COMPILE_DEFINITIONS)
-    set(_matrix_control_asio_defs "${_matrix_control_compile_defs};${_matrix_control_iface_defs}")
-    string(FIND "${_matrix_control_asio_defs}" "JUCE_ASIO=1" _matrix_control_asio_pos)
+    string(FIND "${_matrix_control_compile_defs}" "JUCE_ASIO=1" _matrix_control_asio_pos)
     if(_matrix_control_asio_pos EQUAL -1)
         message(FATAL_ERROR
-            "Matrix-Control must define JUCE_ASIO=1 on Windows (GH-42); "
+            "Matrix-Control must define JUCE_ASIO=1 on Windows COMPILE_DEFINITIONS (GH-42); "
             "Standalone would lack ASIO while Matrix-Control_Tests could still pass.")
     endif()
     unset(_matrix_control_compile_defs)
-    unset(_matrix_control_iface_defs)
-    unset(_matrix_control_asio_defs)
     unset(_matrix_control_asio_pos)
 endif()
 

@@ -81,6 +81,7 @@ context:
 - Verified: `cmake --preset windows-debug` + build Standalone/Tests; `--category SettingsTabsShell` and `--category WindowsAsioDeviceType` pass; `lint_touched.py` OK.
 - Optional human smoke: open Standalone → Settings → AUDIO → DRIVER TYPE (ASIO) and Scarlett when free; do not publish public ASIO binaries until Steinberg countersigns.
 - Review patch: configure-time FATAL_ERROR if `Matrix-Control` lacks `JUCE_ASIO=1` on Windows (product define cannot drift from Tests-only).
+- Review patch: guard checks `COMPILE_DEFINITIONS` only (INTERFACE-only would false-pass while product lacks ASIO).
 
 ## Spec Change Log
 
@@ -97,3 +98,21 @@ context:
 - low / rejected — Blind: no `message(STATUS)` when ASIO enabled — Optional noise; FATAL_ERROR covers product miss.
 - false — Blind: no test of `refreshDriverTypeCombo` — Combo only enumerates `getAvailableDeviceTypes()`; registration test covers the same JUCE list.
 - (none) — Edge Case Hunter returned no findings.
+
+### Review Findings
+
+- [x] [Review][Patch] Tighten Windows ASIO configure guard to require `JUCE_ASIO=1` on `Matrix-Control` `COMPILE_DEFINITIONS` (not INTERFACE-only) [CMakeLists.txt:972-981]
+
+#### Rejected
+
+- false — Blind: release.yml / ship checklist lack automated ASIO publish hold — Frozen decision: human publish gate until Steinberg countersigns; no workflow fail-closed in this chantier.
+- false — Blind: deferred-work omits countersign hold — Entry evidence already records human publish gate until countersignature; attribution notice remains the deferred artifact.
+- false — Blind: shared-target ASIO also lands in Windows VST3 — Spec Always requires `JUCE_ASIO` on shared `Matrix-Control`; Standalone-only define is insufficient by design.
+- rejected — Blind: spec Code Map / Change Log / frontmatter stale vs shipped change — Fix would edit the spec under review.
+- false — Blind: unit test skips Settings `refreshDriverTypeCombo` — Combo only enumerates `getAvailableDeviceTypes()`; registration test covers the GH-42 failure mode; manual smoke already green.
+- false — Blind: test reimplements `containsIgnoreCase("ASIO")` instead of `isAsioDeviceType` — Same predicate as product; known non-bug without contrary evidence.
+- low / rejected — Blind: bare `expect(foundAsio)` without listing type names — Cosmetic CI diagnostics; not everyday harm.
+- false — Blind: `JUCE_ASIO_USE_EXTERNAL_SDK` never asserted — Constraint is already met (flag stays off); absence of assert is not a current defect.
+- false — Blind: guard does not prove Standalone/format targets inherit the define — ASIO registration is compiled into shared `Matrix-Control` with PUBLIC define; no generator-expression wrap in this change.
+- false — Blind: no releaser-facing Steinberg note beyond deferred-work — Same intentional human gate as above.
+- (layer) — Edge Case Hunter returned empty findings; treated as failed layer (review may be incomplete on edge paths).
