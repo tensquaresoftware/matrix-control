@@ -83,6 +83,21 @@ context: []
 - Given B's ARGB is then changed so it no longer matches any other mapped pastille's ARGB, when mapping B is attempted, then bind succeeds.
 - Given two pastilles share ARGB and neither is mapped, when the first is mapped, then bind succeeds.
 
+### Review Findings
+
+- [x] [Review][Defer] COLOR can still align two already-mapped pastilles on one ARGB [`Source/GUI/Skins/Dev/DevSkinLayerPastille.cpp:58`] — deferred: frozen intent gates bind only; already in deferred-work; Color-side refuse needs product decision
+- [x] [Review][Defer] Same-ARGB mapped probe uses case-sensitive name equality [`Tools/SkinEditor/SkinEditorUiHelpers.h:107`] — deferred: already in deferred-work; settle with a case-variant mapping fixture (chart names stay exact-case today)
+
+Rejected:
+- false — older add-pending spec still requires ARGB uniqueness: historical artifact, not a runtime defect of this diff; fixing would edit another spec
+- false — SAME COLOUR path omits Hold-colour suffix: `withHoldColourSuffix` is for bind gestures only; frozen SAME COLOUR copy is intentional
+- false — Duplicate leaves selection off-screen: `selectPastille` → `ListBox::selectRow` scrolls by default after refresh
+- false — coaching does not name the colliding twin: frozen proposed copy is fixed; changing it would renegotiate the spec
+- false — JSON does not prove twin persistence: export/import walks every palette entry with no ARGB uniqueness filter; twins already covered in layer/merge tests
+- low (rejected) — RGB vs ARGB coaching wording: cosmetic; symbol rename churn without user-facing gain
+- low (rejected) — no unit test Duplicate-from-pending → `pending=false`: production hardcodes `false`; outcome already asserted on calibrated/Product clone paths
+- low (rejected) — `kPalettePanelWidth` floor-checked with `>=` not `==` preferred: width locked at 183; leftover stretch on font shrink is cosmetic
+
 ## Implementation Notes
 
 Implemented 2026-10-30: palette New/Duplicate/Del; ARGB twins allowed in layer; bind-time same-RGB mapped guard with red SAME COLOUR OPERATION badge; Compare blink uses `SkinEditorChrome::danger()`. Collision probe extracted to `SkinEditorUi::isPastilleArgbMappedUnderOtherName` with unit coverage (duplicate outcome + mapped twin). Review patches: New-skin merge keeps same-ARGB twins (name-only), armed-row blocked bind sets status, Name 3 + Product clone tests. Deferred: Color can still create two mapped same-ARGB pastilles; case-sensitive probe names. Manual UAT still recommended.

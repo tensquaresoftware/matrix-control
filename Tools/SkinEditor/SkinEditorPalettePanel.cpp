@@ -154,18 +154,14 @@ void SkinEditorPalettePanel::resized()
 
 void SkinEditorPalettePanel::layoutActionButtons(juce::Rectangle<int> actionRow)
 {
-    // Measure preferred widths; leftover to New; shrink all if the row is tight.
+    // Natural widths only — do not dump leftover into New (keeps short labels tight).
     const int tableW = actionRow.getWidth();
     const int gaps = 2 * SkinEditorChrome::kButtonGap;
-    int newW = SkinEditorChrome::measureButtonWidth(addButton_);
-    int dupW = SkinEditorChrome::measureButtonWidth(duplicateButton_);
-    int delW = SkinEditorChrome::measureButtonWidth(deleteButton_);
+    int newW = SkinEditorChrome::measurePaletteActionButtonWidth(addButton_);
+    int dupW = SkinEditorChrome::measurePaletteActionButtonWidth(duplicateButton_);
+    int delW = SkinEditorChrome::measurePaletteActionButtonWidth(deleteButton_);
     const int preferred = newW + dupW + delW + gaps;
-    if (preferred <= tableW)
-    {
-        newW += tableW - preferred;
-    }
-    else
+    if (preferred > tableW)
     {
         const int inner = juce::jmax(3, tableW - gaps);
         const int sum = juce::jmax(1, newW + dupW + delW);

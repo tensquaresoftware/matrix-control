@@ -6,10 +6,8 @@
 namespace
 {
     constexpr int kColPad = 6;
-    // Align Mapped column with Palette swatch→right inset.
-    constexpr int kMappedSwatchToTableRight = SkinEditorChrome::kPalettePanelWidth
-                                             - SkinEditorChrome::kPanelContentPad
-                                             - 4;
+    // Match Palette selection-highlight width (kPaletteListPaintWidth).
+    constexpr int kMappedSwatchToTableRight = SkinEditorChrome::kPaletteListPaintWidth;
     constexpr int kSwatchSize = SkinEditorChrome::kColourSwatchSize;
     constexpr int kEdgeExtra = 4; // first/last row air so edge gaps match inter-swatch 8px
     constexpr int kFocusPad = 1;  // keep 1px outside focus ring inside the viewport

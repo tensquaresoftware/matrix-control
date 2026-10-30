@@ -190,6 +190,34 @@ namespace SkinEditorChrome
         return juce::jmax(52, measureTextWidth(fontRegular(), button.getButtonText()) + pad);
     }
 
+    /**
+     * Palette New / Duplicate / Del: text + pad, no 52 px floor (short labels stay tight).
+     */
+    inline int measurePaletteActionButtonWidth(const juce::TextButton& button) noexcept
+    {
+        constexpr int kPad = 16;
+        constexpr int kMin = 36;
+        return juce::jmax(kMin, measureTextWidth(fontRegular(), button.getButtonText()) + kPad);
+    }
+
+    /** Preferred New + Duplicate + Del row (two gaps); used to size kPalettePanelWidth. */
+    inline int paletteActionButtonsPreferredWidth() noexcept
+    {
+        return measurePaletteActionButtonWidth(juce::TextButton("New"))
+               + measurePaletteActionButtonWidth(juce::TextButton("Duplicate"))
+               + measurePaletteActionButtonWidth(juce::TextButton("Del"))
+               + 2 * kButtonGap;
+    }
+
+    /**
+     * Minimum Palette panel width so the action row's paintWidth() can host preferred
+     * button measures (content pad + scroll-track band reserved like Palette::paintWidth).
+     */
+    inline int palettePanelWidthForActionButtons() noexcept
+    {
+        return paletteActionButtonsPreferredWidth() + kPanelContentPad + kScrollTrackWidth;
+    }
+
     inline int measureLabelWidth(const juce::String& text, const juce::Font& font = fontRegular())
     {
         return juce::jmax(14, measureTextWidth(font, text) + 8);

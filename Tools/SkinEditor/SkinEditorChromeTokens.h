@@ -56,8 +56,12 @@ namespace SkinEditorChrome
     inline constexpr int kButtonGap = 8;
     /** Fixed body-column widths — window width fits these; Mappings does not grow. */
     inline constexpr int kColorPanelWidth = 260;
-    /** Compact palette; Mapped colour column stays aligned to this width. */
-    inline constexpr int kPalettePanelWidth = 150;
+    /**
+     * Palette column + Mapped colour alignment width.
+     * Sized to New / Duplicate / Del at compact preferred measure (no leftover stretch).
+     * Floor checked at runtime by palettePanelWidthForActionButtons() in layout tests.
+     */
+    inline constexpr int kPalettePanelWidth = 183;
     /**
      * Former Mappings half-share at legacy 1210 (385) plus the width formerly given to
      * Palette (60): extra goes to Property / State; Mapped colour stays palette-aligned.
@@ -154,6 +158,13 @@ namespace SkinEditorChrome
      * former default track (8) + right content pad.
      */
     inline constexpr int kScrollTrackWidth = 8 + kPanelContentPad;
+    /**
+     * Palette selection-highlight width and Mappings "Mapped colour" column span.
+     * List extends into the right content pad; paint stops before the scroll track.
+     */
+    inline constexpr int kPaletteListPaintWidth = kPalettePanelWidth
+                                                  - kPanelContentPad
+                                                  - kScrollTrackWidth;
     /** Count badge circle / capsule height (also used for multi-digit width floor). */
     inline constexpr int kCountBadgeDiameter = 15;
     inline constexpr float kCountBadgeFont = 11.0f;

@@ -84,7 +84,14 @@ private:
     {
         beginTest("Mappings width includes former Palette surplus for Property/State");
 
-        expectEquals(SkinEditorChrome::kPalettePanelWidth, 150);
+        expectEquals(SkinEditorChrome::kPalettePanelWidth, 183);
+        expect(SkinEditorChrome::kPalettePanelWidth
+               >= SkinEditorChrome::palettePanelWidthForActionButtons());
+        expectEquals(SkinEditorChrome::kPaletteListPaintWidth, 155);
+        expectEquals(SkinEditorChrome::kPaletteListPaintWidth,
+                     SkinEditorChrome::kPalettePanelWidth
+                         - SkinEditorChrome::kPanelContentPad
+                         - SkinEditorChrome::kScrollTrackWidth);
         expectEquals(SkinEditorChrome::kMappingsPanelWidth, 445);
         expect(SkinEditorChrome::kMappingsPanelWidth
                < SkinEditorChrome::kLegacyWindowMaxWidth / 2);
