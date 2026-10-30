@@ -635,6 +635,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/MatrixModalCopyTests.cpp
         Tests/Unit/SettingsTabsShellTests.cpp
         Tests/Unit/WindowsAsioDeviceTypeTests.cpp
+        Tests/Unit/LinuxJackDeviceTypeTests.cpp
         Tests/Unit/DeviceConnectionMachineDefaultsTests.cpp
         Tests/Unit/GettingStartedSettingsContractTests.cpp
         Tests/Unit/GettingStartedWizardContractTests.cpp
@@ -980,6 +981,39 @@ if(WIN32)
     endif()
     unset(_matrix_control_compile_defs)
     unset(_matrix_control_asio_pos)
+endif()
+
+# Linux Standalone Settings AUDIO: register JUCE JACK device type (alongside ALSA).
+# Shared-target PUBLIC so juce_audio_devices compiles with JACK; Standalone-only is insufficient.
+# Tests link juce_audio_devices separately and need the same flag to assert JACK registration.
+# JUCE loads libjack via dlopen at runtime; build needs jack development headers (e.g. libjack-jackd2-dev).
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    find_path(MATRIX_JACK_INCLUDE_DIR jack/jack.h
+        PATHS /usr/include /usr/local/include
+        DOC "JACK client development headers")
+    if(NOT MATRIX_JACK_INCLUDE_DIR)
+        message(FATAL_ERROR
+            "JUCE_JACK=1 requires jack/jack.h (install libjack-jackd2-dev or equivalent). "
+            "CI already installs this package; see .github/workflows/build-and-test.yml.")
+    endif()
+    unset(MATRIX_JACK_INCLUDE_DIR)
+
+    target_compile_definitions(Matrix-Control PUBLIC JUCE_JACK=1)
+    if(TARGET Matrix-Control_Tests)
+        target_compile_definitions(Matrix-Control_Tests PRIVATE JUCE_JACK=1)
+    endif()
+
+    # Product target must compile with JACK (COMPILE_DEFINITIONS). INTERFACE-only would leave
+    # Standalone without JACK while Matrix-Control_Tests could still pass via its PRIVATE define.
+    get_property(_matrix_control_compile_defs TARGET Matrix-Control PROPERTY COMPILE_DEFINITIONS)
+    string(FIND "${_matrix_control_compile_defs}" "JUCE_JACK=1" _matrix_control_jack_pos)
+    if(_matrix_control_jack_pos EQUAL -1)
+        message(FATAL_ERROR
+            "Matrix-Control must define JUCE_JACK=1 on Linux COMPILE_DEFINITIONS; "
+            "Standalone would lack JACK while Matrix-Control_Tests could still pass.")
+    endif()
+    unset(_matrix_control_compile_defs)
+    unset(_matrix_control_jack_pos)
 endif()
 
 

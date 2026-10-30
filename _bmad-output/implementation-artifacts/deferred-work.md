@@ -1,5 +1,14 @@
 # Deferred Work
 
+## Deferred from: review of spec-linux-jack-audio.md (2026-10-30)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-linux-jack-audio.md`
+  summary: Confirm on a Linux machine or green CI that Standalone Settings → AUDIO → DRIVER TYPE lists JACK when JACK/PipeWire-JACK client libs are available.
+  evidence: Change was implemented and off-path tested on Windows; Linux compile needs jack headers (CI already installs libjack-jackd2-dev) but live DRIVER TYPE smoke was not run in this session.
+- source_spec: `_bmad-output/implementation-artifacts/spec-linux-jack-audio.md`
+  summary: Optional LGPL / libjack third-party notice for documentation or release hygiene when shipping Linux Standalone with JACK enabled.
+  evidence: JACK client is LGPL with dynamic libjack load (JUCE model); Intent deferred manual notice for this chantier.
+
 ## Deferred from: review of spec-gh-42-windows-standalone-asio.md (2026-10-30)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-gh-42-windows-standalone-asio.md`
