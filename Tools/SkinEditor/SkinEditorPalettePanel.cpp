@@ -27,6 +27,8 @@ SkinEditorPalettePanel::SkinEditorPalettePanel()
     list_.setWantsKeyboardFocus(true);
     escapeForwarder_.handler = &onEscapeRequested;
     list_.addKeyListener(&escapeForwarder_);
+    mappingCountHover_.owner = this;
+    list_.addMouseListener(&mappingCountHover_, true);
     addAndMakeVisible(list_);
     addAndMakeVisible(stickyHeaders_);
     addAndMakeVisible(addButton_);
@@ -56,6 +58,7 @@ SkinEditorPalettePanel::~SkinEditorPalettePanel()
 {
     if (listenedScrollBar_ != nullptr)
         listenedScrollBar_->removeListener(this);
+    list_.removeMouseListener(&mappingCountHover_);
     list_.removeKeyListener(&escapeForwarder_);
 }
 
@@ -339,11 +342,22 @@ void SkinEditorPalettePanel::paintColourRow(juce::Graphics& g, const Row& item, 
     const int countLeft = Geo::mappingCountLeft(paintW, mappingCountColumnWidth_);
     if (item.mappingCount > 0)
     {
-        g.setColour(SkinEditorChrome::attention());
-        g.setFont(bodyFont);
-        g.drawText(juce::String(item.mappingCount),
-                   juce::Rectangle<int>(countLeft, yOff, mappingCountColumnWidth_, fullH),
-                   juce::Justification::centredRight, false);
+        // Same slot as drawCountBadge so hover only adds the fill (no size/x jump).
+        const auto countArea = juce::Rectangle<int>(countLeft, yOff, mappingCountColumnWidth_, fullH);
+        const int badgeW = SkinEditorChrome::countBadgeWidth(item.mappingCount);
+        const auto badgeArea = juce::Rectangle<int>(countArea.getRight() - badgeW, countArea.getY(),
+                                                    badgeW, countArea.getHeight());
+        if (item.name == hoveredMappingCountName_)
+        {
+            SkinEditorChrome::drawCountBadge(g, badgeArea, item.mappingCount);
+        }
+        else
+        {
+            g.setColour(SkinEditorChrome::attention());
+            g.setFont(SkinEditorChrome::fontBold(SkinEditorChrome::kCountBadgeFont));
+            g.drawText(juce::String(item.mappingCount), badgeArea,
+                       juce::Justification::centred, false);
+        }
     }
 
     const int nameLeft = Geo::kSwatchX + sw + Geo::kNameGap;
@@ -356,6 +370,7 @@ void SkinEditorPalettePanel::rebuildRows()
 {
     rows_.clear();
     stickySections_.clear();
+    hoveredMappingCountName_.clear();
     mappingCountColumnWidth_ = 0;
     const auto* skin = (layer_ != nullptr && skinId_.isNotEmpty())
                            ? layer_->findSkin(skinId_)
@@ -364,8 +379,9 @@ void SkinEditorPalettePanel::rebuildRows()
         return;
 
     const auto& countFont = SkinEditorChrome::fontRegular();
-    // Floor at two digits so 9→10 does not reflow name elision for the whole list.
-    mappingCountColumnWidth_ = SkinEditorChrome::measureTextWidth(countFont, "99");
+    // Floor at two-digit text and badge so hover capsule does not reflow names.
+    mappingCountColumnWidth_ = juce::jmax(SkinEditorChrome::measureTextWidth(countFont, "99"),
+                                         SkinEditorChrome::countBadgeWidth(99));
 
     std::vector<Row> product;
     std::vector<Row> editor;
@@ -380,7 +396,8 @@ void SkinEditorPalettePanel::rebuildRows()
         row.mappingCount = layer_->countMappingsReferencing(skinId_, pastille.name);
         mappingCountColumnWidth_ = juce::jmax(
             mappingCountColumnWidth_,
-            SkinEditorChrome::measureTextWidth(countFont, juce::String(row.mappingCount)));
+            SkinEditorChrome::measureTextWidth(countFont, juce::String(row.mappingCount)),
+            SkinEditorChrome::countBadgeWidth(row.mappingCount));
         if (row.isProduct)
             product.push_back(row);
         else

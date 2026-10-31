@@ -49,6 +49,13 @@ private:
         }
     };
 
+    struct MappingCountHoverListener final : public juce::MouseListener
+    {
+        SkinEditorPalettePanel* owner = nullptr;
+        void mouseMove(const juce::MouseEvent& e) override;
+        void mouseExit(const juce::MouseEvent& e) override;
+    };
+
     /** Stacked sticky section titles over the list (Product, then Editor). */
     struct StickyHeadersOverlay final : public juce::Component
     {
@@ -101,6 +108,8 @@ private:
     bool isMappingCountHit(int row, int x) const noexcept;
     bool selectionIsMappingCountClick() const;
     void notifyMappingCountClicked(const juce::String& pastilleName);
+    void updateMappingCountHover(const juce::MouseEvent& e);
+    void clearMappingCountHover();
 
     void rebuildRows();
     void updateActionButtonEnablement();
@@ -129,11 +138,14 @@ private:
     bool suppressSelectionNotify_ = false;
     /** selectedRowsChanged already applied a count-click filter for this mouse gesture. */
     bool mappingCountClickHandled_ = false;
+    /** Pastille name whose mapping-count column is hovered (badge paint); empty = none. */
+    juce::String hoveredMappingCountName_;
     std::vector<Row> rows_;
     std::vector<StickySection> stickySections_;
-    /** Trailing count column width (widest digit string among colour rows). */
+    /** Trailing count column width (widest digit string / badge among colour rows). */
     int mappingCountColumnWidth_ = 0;
     EscapeKeyForwarder escapeForwarder_;
+    MappingCountHoverListener mappingCountHover_;
     juce::ScrollBar* listenedScrollBar_ = nullptr;
 
     juce::Label titleLabel_;

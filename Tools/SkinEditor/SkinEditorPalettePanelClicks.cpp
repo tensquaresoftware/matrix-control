@@ -42,6 +42,47 @@ void SkinEditorPalettePanel::notifyMappingCountClicked(const juce::String& pasti
         onMappingCountClicked(pastilleName);
 }
 
+void SkinEditorPalettePanel::MappingCountHoverListener::mouseMove(const juce::MouseEvent& e)
+{
+    if (owner != nullptr)
+        owner->updateMappingCountHover(e);
+}
+
+void SkinEditorPalettePanel::MappingCountHoverListener::mouseExit(const juce::MouseEvent& e)
+{
+    juce::ignoreUnused(e);
+    if (owner != nullptr)
+        owner->clearMappingCountHover();
+}
+
+void SkinEditorPalettePanel::updateMappingCountHover(const juce::MouseEvent& e)
+{
+    const auto listPos = e.getEventRelativeTo(&list_).getPosition();
+    const int row = list_.getRowContainingPosition(listPos.x, listPos.y);
+    juce::String nextName;
+    if (row >= 0 && row < static_cast<int>(rows_.size()))
+    {
+        int x = listPos.x;
+        if (auto* rowComp = list_.getComponentForRowNumber(row))
+            x = rowComp->getLocalPoint(&list_, listPos).x;
+        if (isMappingCountHit(row, x))
+            nextName = rows_[static_cast<size_t>(row)].name;
+    }
+
+    if (nextName == hoveredMappingCountName_)
+        return;
+    hoveredMappingCountName_ = nextName;
+    list_.repaint();
+}
+
+void SkinEditorPalettePanel::clearMappingCountHover()
+{
+    if (hoveredMappingCountName_.isEmpty())
+        return;
+    hoveredMappingCountName_.clear();
+    list_.repaint();
+}
+
 void SkinEditorPalettePanel::selectedRowsChanged(int)
 {
     // Split rows paint a full visual line across two ListBox slots; JUCE only
