@@ -86,21 +86,21 @@ HeaderPanel::HeaderPanel(TSS::ISkin& skin, const HeaderPanelDimensions& dimensio
     , keyboardFromLabel_(dimensions.fromKeyboardLabelWidth,
                          dimensions.controlHeight,
                          TSS::darkPanelLabelLookFromSkin(skin),
-                         PluginDisplayNames::HeaderPanel::kFromKeyboardLabel)
+                         TSS::LabelConfig{ .text = PluginDisplayNames::HeaderPanel::kFromKeyboardLabel })
     , editorActivityLed_(dimensions.ledSize, dimensions.ledSize)
     , midiFromLabel_(dimensions.fromSynthLabelWidth,
                      dimensions.controlHeight,
                      TSS::darkPanelLabelLookFromSkin(skin),
-                     PluginDisplayNames::HeaderPanel::kFromSynthLabel)
+                     TSS::LabelConfig{ .text = PluginDisplayNames::HeaderPanel::kFromSynthLabel })
     , midiToActivityLed_(dimensions.ledSize, dimensions.ledSize)
     , midiToLabel_(dimensions.toSynthLabelWidth,
                    dimensions.controlHeight,
                    TSS::darkPanelLabelLookFromSkin(skin),
-                   PluginDisplayNames::HeaderPanel::kToSynthLabel)
+                   TSS::LabelConfig{ .text = PluginDisplayNames::HeaderPanel::kToSynthLabel })
     , inputGainLabel_(dimensions.inputGainLabelWidth,
                       dimensions.controlHeight,
                       TSS::darkPanelLabelLookFromSkin(skin),
-                      PluginDisplayNames::HeaderPanel::kInputGainLabel)
+                      TSS::LabelConfig{ .text = PluginDisplayNames::HeaderPanel::kInputGainLabel })
     , inputGainSlider_(dimensions.inputGainSliderWidth,
                        dimensions.controlHeight,
                        TSS::sliderLookFromSkin(skin),
