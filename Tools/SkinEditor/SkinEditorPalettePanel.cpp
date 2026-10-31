@@ -92,6 +92,8 @@ void SkinEditorPalettePanel::refresh()
     if (auto* vp = list_.getViewport())
         vp->setViewPosition(vp->getViewPositionX(), scrollY);
     stickyHeaders_.repaint();
+    // rebuildRows cleared hover; re-hit under a stationary pointer.
+    refreshMappingCountHoverFromPointer();
     updateActionButtonEnablement();
 }
 

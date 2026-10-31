@@ -48,16 +48,31 @@ void SkinEditorPalettePanel::MappingCountHoverListener::mouseMove(const juce::Mo
         owner->updateMappingCountHover(e);
 }
 
+void SkinEditorPalettePanel::MappingCountHoverListener::mouseDrag(const juce::MouseEvent& e)
+{
+    if (owner != nullptr)
+        owner->updateMappingCountHover(e);
+}
+
 void SkinEditorPalettePanel::MappingCountHoverListener::mouseExit(const juce::MouseEvent& e)
 {
     juce::ignoreUnused(e);
-    if (owner != nullptr)
+    if (owner == nullptr)
+        return;
+    // Deep listener also exits nested row comps while still inside the list.
+    if (! owner->list_.isMouseOver(true))
         owner->clearMappingCountHover();
+    else
+        owner->refreshMappingCountHoverFromPointer();
 }
 
 void SkinEditorPalettePanel::updateMappingCountHover(const juce::MouseEvent& e)
 {
-    const auto listPos = e.getEventRelativeTo(&list_).getPosition();
+    updateMappingCountHoverAt(e.getEventRelativeTo(&list_).getPosition());
+}
+
+void SkinEditorPalettePanel::updateMappingCountHoverAt(juce::Point<int> listPos)
+{
     const int row = list_.getRowContainingPosition(listPos.x, listPos.y);
     juce::String nextName;
     if (row >= 0 && row < static_cast<int>(rows_.size()))
@@ -73,6 +88,16 @@ void SkinEditorPalettePanel::updateMappingCountHover(const juce::MouseEvent& e)
         return;
     hoveredMappingCountName_ = nextName;
     list_.repaint();
+}
+
+void SkinEditorPalettePanel::refreshMappingCountHoverFromPointer()
+{
+    if (! list_.isShowing() || ! list_.isMouseOver(true))
+    {
+        clearMappingCountHover();
+        return;
+    }
+    updateMappingCountHoverAt(list_.getMouseXYRelative());
 }
 
 void SkinEditorPalettePanel::clearMappingCountHover()

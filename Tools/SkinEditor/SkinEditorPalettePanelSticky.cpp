@@ -36,7 +36,7 @@ void SkinEditorPalettePanel::layoutStickyHeadersOverlay()
 
 void SkinEditorPalettePanel::scrollBarMoved(juce::ScrollBar*, double)
 {
-    clearMappingCountHover();
+    refreshMappingCountHoverFromPointer();
     stickyHeaders_.repaint();
 }
 

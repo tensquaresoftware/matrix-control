@@ -53,6 +53,7 @@ private:
     {
         SkinEditorPalettePanel* owner = nullptr;
         void mouseMove(const juce::MouseEvent& e) override;
+        void mouseDrag(const juce::MouseEvent& e) override;
         void mouseExit(const juce::MouseEvent& e) override;
     };
 
@@ -109,6 +110,8 @@ private:
     bool selectionIsMappingCountClick() const;
     void notifyMappingCountClicked(const juce::String& pastilleName);
     void updateMappingCountHover(const juce::MouseEvent& e);
+    void updateMappingCountHoverAt(juce::Point<int> listPos);
+    void refreshMappingCountHoverFromPointer();
     void clearMappingCountHover();
 
     void rebuildRows();
