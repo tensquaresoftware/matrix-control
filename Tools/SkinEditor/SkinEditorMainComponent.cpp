@@ -389,7 +389,7 @@ void SkinEditorMainComponent::layoutStatusBar(juce::Rectangle<int> statusBar)
 
     const int pushLabelX = lastPushBadgeBounds_.getRight() + gap;
     const int pushLabelMaxW = juce::jmax(0, appBadgeBounds_.getX() - gap - pushLabelX);
-    const auto pushFull = statusDetail_.isNotEmpty() ? statusDetail_ : "none";
+    const auto pushFull = statusDetail_.isNotEmpty() ? statusDetail_ : "None";
     const auto pushShown = SkinEditorChrome::elidePathToWidth(statusFont, pushFull, pushLabelMaxW);
     const bool exportPathTip = pushFull.startsWith("Exported: ") && pushShown != pushFull;
     const auto pushTip = exportPathTip ? pushFull : juce::String {};

@@ -271,7 +271,11 @@ void SkinEditorMainComponent::pushVisible()
 
 void SkinEditorMainComponent::setStatusMessage(const juce::String& text)
 {
-    statusDetail_ = text;
+    // LAST PUSH label is sentence-style chrome — always lead with a capital.
+    if (text.isEmpty())
+        statusDetail_.clear();
+    else
+        statusDetail_ = text.substring(0, 1).toUpperCase() + text.substring(1);
 }
 
 void SkinEditorMainComponent::markEditorDirty()
