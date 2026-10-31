@@ -19,6 +19,9 @@ public:
     void setReadOnly(bool readOnly);
     void refresh();
 
+    /** Activate Mapped colour column filter for this pastille name (exact palette match). */
+    void setMappedColourFilter(const juce::String& pastilleName);
+
     /** When true, batch maps stay in the current gesture direction after a successful write. */
     bool isHoldColour() const noexcept { return holdColourToggle_.getToggleState(); }
 

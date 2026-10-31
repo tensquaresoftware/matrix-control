@@ -194,8 +194,16 @@ void SkinEditorMappingsPanel::clearColumnFilter(FilterColumn column)
 
 void SkinEditorMappingsPanel::setColumnFilter(FilterColumn column, const juce::String& value)
 {
-    filterValue(column) = value;
+    auto& slot = filterValue(column);
+    if (slot == value)
+        return;
+    slot = value;
     refresh();
+}
+
+void SkinEditorMappingsPanel::setMappedColourFilter(const juce::String& pastilleName)
+{
+    setColumnFilter(FilterColumn::kMappedColour, pastilleName);
 }
 
 juce::StringArray SkinEditorMappingsPanel::presentValuesFor(FilterColumn column) const

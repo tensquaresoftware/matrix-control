@@ -107,6 +107,10 @@ void SkinEditorMainComponent::setupBodyPanels()
 
     palettePanel_.setLayer(&layer_);
     palettePanel_.onPastilleSelected = [this](const juce::String& name) { onPastilleSelected(name); };
+    palettePanel_.onMappingCountClicked = [this](const juce::String& name)
+    {
+        mappingsPanel_.setMappedColourFilter(name);
+    };
     palettePanel_.onAddRequested = [this] { onAddPastille(); };
     palettePanel_.onDuplicateRequested = [this] { onDuplicatePastille(); };
     palettePanel_.onDeleteRequested = [this] { onDeletePastille(); };

@@ -25,6 +25,8 @@ public:
     void clearSelection();
 
     std::function<void(const juce::String& pastilleName)> onPastilleSelected;
+    /** Non-zero mapping-count digit click — filter Mappings by this pastille (no Hold/Arm). */
+    std::function<void(const juce::String& pastilleName)> onMappingCountClicked;
     std::function<void()> onAddRequested;
     std::function<void()> onDuplicateRequested;
     std::function<void()> onDeleteRequested;
@@ -92,8 +94,13 @@ private:
     int getNumRows() override;
     void paintListBoxItem(int row, juce::Graphics& g, int width, int height, bool selected) override;
     void selectedRowsChanged(int lastRowSelected) override;
+    void listBoxItemClicked(int row, const juce::MouseEvent& e) override;
     void listBoxItemDoubleClicked(int row, const juce::MouseEvent& e) override;
     void scrollBarMoved(juce::ScrollBar* scrollBar, double newRangeStart) override;
+
+    bool isMappingCountHit(int row, int x) const noexcept;
+    bool selectionIsMappingCountClick() const;
+    void notifyMappingCountClicked(const juce::String& pastilleName);
 
     void rebuildRows();
     void updateActionButtonEnablement();
@@ -120,6 +127,8 @@ private:
     juce::String skinId_;
     bool readOnly_ = true;
     bool suppressSelectionNotify_ = false;
+    /** selectedRowsChanged already applied a count-click filter for this mouse gesture. */
+    bool mappingCountClickHandled_ = false;
     std::vector<Row> rows_;
     std::vector<StickySection> stickySections_;
     /** Trailing count column width (widest digit string among colour rows). */

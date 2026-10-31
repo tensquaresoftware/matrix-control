@@ -1,14 +1,10 @@
 #include "Tools/SkinEditor/SkinEditorPalettePanel.h"
 
 #include "Tools/SkinEditor/SkinEditorChrome.h"
+#include "Tools/SkinEditor/SkinEditorPalettePanelGeometry.h"
 
 namespace
 {
-    constexpr int kSwatchX = 4;
-    constexpr int kNameGap = 8;
-    constexpr int kNameCountGap = 6;
-    constexpr int kCountRightInset = 4;
-
     void paintElidedLeft(juce::Graphics& g,
                          const juce::Font& font,
                          const juce::String& text,
@@ -17,11 +13,6 @@ namespace
         g.setFont(font);
         g.drawText(SkinEditorChrome::elideToWidth(font, text, bounds.getWidth()),
                    bounds, juce::Justification::centredLeft);
-    }
-
-    int mappingCountLeft(int paintW, int countColumnW) noexcept
-    {
-        return paintW - kCountRightInset - countColumnW;
     }
 }
 
@@ -335,16 +326,17 @@ void SkinEditorPalettePanel::paintColourRow(juce::Graphics& g, const Row& item, 
     if (isRowSelectedVisually(row))
         SkinEditorChrome::fillTableRow(g, { rowArea, juce::Colour(0xff303030), roundTop, roundBottom });
 
+    namespace Geo = SkinEditorPaletteGeometry;
     const int sw = SkinEditorChrome::kColourSwatchSize;
     const int swY = yOff + (fullH - sw) / 2;
-    const auto swatch = juce::Rectangle<int>(kSwatchX, swY, sw, sw);
+    const auto swatch = juce::Rectangle<int>(Geo::kSwatchX, swY, sw, sw);
     if (item.pending)
         SkinEditorChrome::paintPendingColourSwatch(g, swatch);
     else
         SkinEditorChrome::paintColourSwatch(g, swatch, juce::Colour(item.argb));
 
     const auto& bodyFont = SkinEditorChrome::fontRegular();
-    const int countLeft = mappingCountLeft(paintW, mappingCountColumnWidth_);
+    const int countLeft = Geo::mappingCountLeft(paintW, mappingCountColumnWidth_);
     if (item.mappingCount > 0)
     {
         g.setColour(SkinEditorChrome::attention());
@@ -354,43 +346,10 @@ void SkinEditorPalettePanel::paintColourRow(juce::Graphics& g, const Row& item, 
                    juce::Justification::centredRight, false);
     }
 
-    const int nameLeft = kSwatchX + sw + kNameGap;
+    const int nameLeft = Geo::kSwatchX + sw + Geo::kNameGap;
     g.setColour(SkinEditorChrome::textTableBody());
     paintElidedLeft(g, bodyFont, item.name,
-                    { nameLeft, yOff, juce::jmax(0, countLeft - kNameCountGap - nameLeft), fullH });
-}
-
-void SkinEditorPalettePanel::selectedRowsChanged(int)
-{
-    // Split rows paint a full visual line across two ListBox slots; JUCE only
-    // invalidates the selected index, so force a full list repaint for highlight.
-    list_.repaint();
-
-    updateActionButtonEnablement();
-    if (suppressSelectionNotify_)
-        return;
-    if (onPastilleSelected)
-        onPastilleSelected(getSelectedPastilleName());
-}
-
-void SkinEditorPalettePanel::listBoxItemDoubleClicked(int row, const juce::MouseEvent& e)
-{
-    if (readOnly_ || row < 0 || row >= static_cast<int>(rows_.size()))
-        return;
-
-    const auto& item = rows_[static_cast<size_t>(row)];
-    if (item.kind != RowKind::kColour || item.isProduct)
-        return;
-
-    // Rename is name-text only — swatch and trailing count do nothing.
-    const int sw = SkinEditorChrome::kColourSwatchSize;
-    const int nameLeft = kSwatchX + sw + kNameGap;
-    const int countLeft = mappingCountLeft(paintWidth(), mappingCountColumnWidth_);
-    if (e.x < nameLeft || e.x >= countLeft - kNameCountGap)
-        return;
-
-    if (onRenamePastilleRequested)
-        onRenamePastilleRequested(item.name);
+                    { nameLeft, yOff, juce::jmax(0, countLeft - Geo::kNameCountGap - nameLeft), fullH });
 }
 
 void SkinEditorPalettePanel::rebuildRows()
