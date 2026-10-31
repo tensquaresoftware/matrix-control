@@ -7,7 +7,8 @@
 #include "GUI/Skins/Dev/DevSkinLayer.h"
 
 class SkinEditorPalettePanel final : public juce::Component,
-                                     private juce::ListBoxModel
+                                     private juce::ListBoxModel,
+                                     private juce::ScrollBar::Listener
 {
 public:
     SkinEditorPalettePanel();
@@ -46,6 +47,20 @@ private:
         }
     };
 
+    /** Stacked sticky section titles over the list (Product, then Editor). */
+    struct StickyHeadersOverlay final : public juce::Component
+    {
+        explicit StickyHeadersOverlay(SkinEditorPalettePanel& owner) : owner_(owner)
+        {
+            setInterceptsMouseClicks(true, false);
+        }
+
+        void paint(juce::Graphics& g) override { owner_.paintStickySectionHeaders(g); }
+        bool hitTest(int x, int y) override { return owner_.stickyHeaderHitTest(x, y); }
+
+        SkinEditorPalettePanel& owner_;
+    };
+
     enum class RowKind
     {
         kGap,
@@ -68,14 +83,23 @@ private:
         bool isLowerListHalf = false;
     };
 
+    struct StickySection
+    {
+        int upperListRow = 0;
+        juce::String title;
+    };
+
     int getNumRows() override;
     void paintListBoxItem(int row, juce::Graphics& g, int width, int height, bool selected) override;
     void selectedRowsChanged(int lastRowSelected) override;
     void listBoxItemDoubleClicked(int row, const juce::MouseEvent& e) override;
+    void scrollBarMoved(juce::ScrollBar* scrollBar, double newRangeStart) override;
 
     void rebuildRows();
     void updateActionButtonEnablement();
     void layoutActionButtons(juce::Rectangle<int> actionRow);
+    void layoutStickyHeadersOverlay();
+    void attachScrollBarListener();
     /** True when no editor skin is loaded (empty shell: no New/Duplicate/Del). */
     bool isShellEmpty() const noexcept { return skinId_.isEmpty(); }
     /** Push upper + lower half-height ListBox rows for one visual content row. */
@@ -88,19 +112,25 @@ private:
     static bool isContentRow(RowKind kind) noexcept;
     void appendPaletteGroup(const juce::String& title, std::vector<Row>& colours, bool leadGap);
     void paintColourRow(juce::Graphics& g, const Row& item, int row, int yOff);
+    void paintStickySectionHeaders(juce::Graphics& g);
+    bool stickyHeaderHitTest(int x, int y) const noexcept;
+    int stickyHeaderYInView(int sectionIndex, int scrollY) const noexcept;
 
     TSS::DevSkin::Layer* layer_ = nullptr;
     juce::String skinId_;
     bool readOnly_ = true;
     bool suppressSelectionNotify_ = false;
     std::vector<Row> rows_;
+    std::vector<StickySection> stickySections_;
     /** Trailing count column width (widest digit string among colour rows). */
     int mappingCountColumnWidth_ = 0;
     EscapeKeyForwarder escapeForwarder_;
+    juce::ScrollBar* listenedScrollBar_ = nullptr;
 
     juce::Label titleLabel_;
     juce::Rectangle<int> titleTabBounds_;
     juce::ListBox list_ { "Palette", this };
+    StickyHeadersOverlay stickyHeaders_ { *this };
     juce::TextButton addButton_ { "New" };
     juce::TextButton duplicateButton_ { "Dup" };
     juce::TextButton deleteButton_ { "Del" };

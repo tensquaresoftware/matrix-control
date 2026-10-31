@@ -37,6 +37,7 @@ SkinEditorPalettePanel::SkinEditorPalettePanel()
     escapeForwarder_.handler = &onEscapeRequested;
     list_.addKeyListener(&escapeForwarder_);
     addAndMakeVisible(list_);
+    addAndMakeVisible(stickyHeaders_);
     addAndMakeVisible(addButton_);
     addAndMakeVisible(duplicateButton_);
     addAndMakeVisible(deleteButton_);
@@ -62,6 +63,8 @@ SkinEditorPalettePanel::SkinEditorPalettePanel()
 
 SkinEditorPalettePanel::~SkinEditorPalettePanel()
 {
+    if (listenedScrollBar_ != nullptr)
+        listenedScrollBar_->removeListener(this);
     list_.removeKeyListener(&escapeForwarder_);
 }
 
@@ -83,10 +86,18 @@ void SkinEditorPalettePanel::setReadOnly(bool readOnly)
 
 void SkinEditorPalettePanel::refresh()
 {
+    const int scrollY = (list_.getViewport() != nullptr)
+                            ? list_.getViewport()->getViewPositionY()
+                            : 0;
     rebuildRows();
     list_.updateContent();
     list_.repaint();
+    stickyHeaders_.repaint();
     resized();
+    // Restore after layout: selectRow/updateContent must not jump New/Dup adds.
+    if (auto* vp = list_.getViewport())
+        vp->setViewPosition(vp->getViewPositionX(), scrollY);
+    stickyHeaders_.repaint();
     updateActionButtonEnablement();
 }
 
@@ -118,7 +129,8 @@ void SkinEditorPalettePanel::selectPastille(const juce::String& name)
         if (rows_[i].kind == RowKind::kColour && ! rows_[i].isLowerListHalf && rows_[i].name == name)
         {
             const juce::ScopedValueSetter<bool> scope(suppressSelectionNotify_, true);
-            list_.selectRow(static_cast<int>(i));
+            // Keep scroll put (New / Dup / refresh must not jump the viewport).
+            list_.selectRow(static_cast<int>(i), true);
             return;
         }
     }
@@ -157,6 +169,8 @@ void SkinEditorPalettePanel::resized()
         list_.setBounds(listBounds);
         if (auto* vp = list_.getViewport())
             vp->setScrollBarThickness(SkinEditorChrome::kScrollTrackWidth);
+        attachScrollBarListener();
+        layoutStickyHeadersOverlay();
         return;
     }
 
@@ -175,6 +189,8 @@ void SkinEditorPalettePanel::resized()
     if (auto* vp = list_.getViewport())
         vp->setScrollBarThickness(SkinEditorChrome::kScrollTrackWidth);
 
+    attachScrollBarListener();
+    layoutStickyHeadersOverlay();
     layoutActionButtons({ list_.getX(), actions.getY(), paintWidth(), actions.getHeight() });
 }
 
@@ -290,15 +306,8 @@ void SkinEditorPalettePanel::paintListBoxItem(int row, juce::Graphics& g, int wi
 
     if (item.kind == RowKind::kSection)
     {
-        bool roundTop = false;
-        bool roundBottom = false;
-        roundFlagsForRow(row, roundTop, roundBottom);
-        const auto rowArea = juce::Rectangle<float>(0.0f, (float) yOff, (float) paintW, (float) fullH);
-        SkinEditorChrome::fillTableRow(g, { rowArea, SkinEditorChrome::surfaceSection(),
-                                            roundTop, roundBottom });
-        g.setColour(SkinEditorChrome::textTableHeader());
-        paintElidedLeft(g, SkinEditorChrome::fontBold(), item.headerText,
-                        { 6, yOff, juce::jmax(0, paintW - 12), fullH });
+        // Section titles are painted by stickyHeaders_ (stacked sticky overlay).
+        juce::ignoreUnused(paintW, fullH, yOff);
         return;
     }
 
@@ -387,6 +396,7 @@ void SkinEditorPalettePanel::listBoxItemDoubleClicked(int row, const juce::Mouse
 void SkinEditorPalettePanel::rebuildRows()
 {
     rows_.clear();
+    stickySections_.clear();
     mappingCountColumnWidth_ = 0;
     const auto* skin = (layer_ != nullptr && skinId_.isNotEmpty())
                            ? layer_->findSkin(skinId_)
@@ -435,6 +445,11 @@ void SkinEditorPalettePanel::appendPaletteGroup(const juce::String& title,
         gap.kind = RowKind::kGap;
         rows_.push_back(gap);
     }
+
+    StickySection sticky;
+    sticky.upperListRow = static_cast<int>(rows_.size());
+    sticky.title = title;
+    stickySections_.push_back(sticky);
 
     Row section;
     section.kind = RowKind::kSection;
