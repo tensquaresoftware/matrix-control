@@ -35,6 +35,7 @@ SkinEditorMainComponent::SkinEditorMainComponent()
 SkinEditorMainComponent::~SkinEditorMainComponent()
 {
     compareBlinkTimer_.stopTimer();
+    colourPreviewCoalesceTimer_.stopTimer();
     setLookAndFeel(nullptr);
     flushPendingSessionAutosave();
     bridge_.stop();
@@ -101,9 +102,7 @@ void SkinEditorMainComponent::setupBodyPanels()
         return true;
     };
 
-    colourPicker_.onColourChanged = [this](juce::Colour c) { onColourChanged(c); };
-    colourPicker_.onEscapeRequested = escapeMapping;
-    addAndMakeVisible(colourPicker_);
+    wireColourPicker(escapeMapping);
 
     palettePanel_.setLayer(&layer_);
     palettePanel_.onPastilleSelected = [this](const juce::String& name) { onPastilleSelected(name); };
@@ -143,10 +142,13 @@ void SkinEditorMainComponent::setupLayerAndBridgeCallbacks()
     layer_.onChanged = [this]
     {
         markEditorDirty();
-        refreshAll();
-        if (bridge_.isConnected() && ! isCompareProductView() && canEditEditorSkin())
-            pushVisible();
         scheduleSessionAutosave();
+        if (colourGestureActive_)
+        {
+            scheduleColourPreviewCoalesce();
+            return;
+        }
+        applyColourPreviewRefresh();
     };
 
     bridge_.onConnectionChanged = [this](bool)

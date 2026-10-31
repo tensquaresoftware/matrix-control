@@ -192,7 +192,8 @@ private:
                      SkinEditorChrome::kGutter + SkinEditorChrome::kPanelTitleHeight
                          + SkinEditorChrome::kPanelContentPad + side
                          + SkinEditorChrome::kPanelContentPad + kFieldRowH
-                         + SkinEditorChrome::kPanelContentPad);
+                         + SkinEditorChrome::kPanelContentPad + 2 * kFieldRowH
+                         + (SkinEditorChrome::kPanelContentPad - 5));
         // SKINS keeps top + bottom gutters (bottom contributes to SKINS↔COLOR gap).
         expect(skinsH
                >= SkinEditorChrome::kGutter + SkinEditorChrome::kPanelTitleHeight

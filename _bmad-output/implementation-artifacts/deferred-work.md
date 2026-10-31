@@ -2983,3 +2983,9 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-column-filters.md`
   summary: Revalidate Mapped colour filter / open menu values when palette or mappings change while a filter is sticky or a menu is open (stale name → empty tables or black swatch path).
   evidence: Blind + Edge; Clear badge and skin-id clear recover; not required by frozen AC.
+
+## Deferred from: review of spec-skin-editor-colour-picker-fine-control.md (2026-10-31)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-colour-picker-fine-control.md`
+  summary: Unit-test colour-gesture coalesce / sticky picker sync on MainComponent (timer + skip syncColourPickerToSelection while gesturing).
+  evidence: Verification Gap; needs Skin Editor GUI/timer harness; manual SV-drag AC remains the check for lag and sticky handle.

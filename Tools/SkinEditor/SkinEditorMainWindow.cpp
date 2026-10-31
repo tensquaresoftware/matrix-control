@@ -16,8 +16,8 @@ namespace
     }
 
     /**
-     * Min MainComponent / content-view height: fixed SKINS + COLOR stack with
-     * equal kPanelContentPad above and below the #/R/G/B row.
+     * Min MainComponent / content-view height: fixed SKINS + COLOR stack
+     * (COLOR preferredHeight owns #/R/G/B and axis-row gaps).
      * Mirrors SkinEditorMainComponent::resized + layoutBodyPanels.
      */
     int skinEditorMinContentHeight() noexcept

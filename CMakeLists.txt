@@ -613,7 +613,9 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/SkinEditorMappingModePolicyTests.cpp
         Tests/Unit/SkinEditorMappingsColumnFilterTests.cpp
         Tests/Unit/SkinEditorChromeLayoutTests.cpp
+        Tests/Unit/SkinEditorColourPickerTests.cpp
         Tools/SkinEditor/SkinEditorChromePanel.cpp
+        Tools/SkinEditor/SkinEditorColourPicker.cpp
         Tools/SkinEditor/SkinEditorSkinsPanel.cpp
         Tests/Unit/SliderButtonLikeColourTests.cpp
         Tests/Unit/PatchManagerActionHandlerComputerNavigationTests.cpp

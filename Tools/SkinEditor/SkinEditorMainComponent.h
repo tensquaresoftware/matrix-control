@@ -49,6 +49,13 @@ private:
     void markEditorClean();
     void scheduleSessionAutosave();
     void flushPendingSessionAutosave();
+    /** Throttle refreshAll + pushVisible during continuous COLOR edits (~40 ms). */
+    void scheduleColourPreviewCoalesce();
+    void flushColourPreviewCoalesce();
+    void tickColourPreviewCoalesce();
+    void applyColourPreviewRefresh();
+    void syncPastilleSelectionAfterRefresh(const juce::String& panelSkinId);
+    void wireColourPicker(const std::function<bool()>& escapeMapping);
     /** Writes session file; returns false and sets status on failure. */
     bool autosaveSession();
     /** Drop Editor skins, keep Product prefs, rewrite session. False if rewrite fails. */
@@ -160,6 +167,9 @@ private:
     };
     BlinkTimer compareBlinkTimer_;
     bool compareBlinkLit_ = true;
+    /** Dedicated coalesce for colour drag — not the 400 ms session-autosave timer. */
+    BlinkTimer colourPreviewCoalesceTimer_;
+    bool colourGestureActive_ = false;
 
     TSS::DevSkin::Layer layer_;
     TSS::DevSkin::BridgeClient bridge_;

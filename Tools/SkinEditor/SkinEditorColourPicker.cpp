@@ -7,6 +7,19 @@ namespace
     constexpr int kFieldRowH = 24;
     constexpr int kHueBarW = 18;
     constexpr int kSvHueGap = 8;
+    constexpr int kLabelToField = 4;
+}
+
+void SkinEditorColourPicker::styleAxisSlider(juce::Slider& slider)
+{
+    slider.setRange(0.0, 1.0, 0.0);
+    slider.setSliderStyle(juce::Slider::LinearHorizontal);
+    slider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    slider.setColour(juce::Slider::backgroundColourId, SkinEditorChrome::surfaceApp());
+    slider.setColour(juce::Slider::trackColourId, SkinEditorChrome::controlOutline());
+    slider.setColour(juce::Slider::thumbColourId, SkinEditorChrome::textMuted());
+    slider.addListener(this);
+    addAndMakeVisible(slider);
 }
 
 SkinEditorColourPicker::SkinEditorColourPicker()
@@ -14,16 +27,19 @@ SkinEditorColourPicker::SkinEditorColourPicker()
     SkinEditorChrome::stylePanelTitle(titleLabel_, "COLOR");
     addAndMakeVisible(titleLabel_);
 
-    for (auto* label : { &hexLabel_, &rLabel_, &gLabel_, &bLabel_ })
+    for (auto* label : { &hexLabel_, &rLabel_, &gLabel_, &bLabel_,
+                         &saturationLabel_, &brightnessLabel_ })
     {
         label->setFont(SkinEditorChrome::fontRegular());
         label->setColour(juce::Label::textColourId, SkinEditorChrome::textMuted());
         SkinEditorChrome::preventTextSquish(*label);
         addAndMakeVisible(*label);
     }
-    // Sit the letter against its field (gap lives to the left of the label).
     for (auto* label : { &rLabel_, &gLabel_, &bLabel_ })
         label->setJustificationType(juce::Justification::centredRight);
+    // Match "#" — left edge of the COLOR content column.
+    saturationLabel_.setJustificationType(juce::Justification::centredLeft);
+    brightnessLabel_.setJustificationType(juce::Justification::centredLeft);
 
     escapeForwarder_.handler = &onEscapeRequested;
     setWantsKeyboardFocus(true);
@@ -48,12 +64,17 @@ SkinEditorColourPicker::SkinEditorColourPicker()
     styleEditor(gEditor_);
     styleEditor(bEditor_);
 
+    styleAxisSlider(saturationSlider_);
+    styleAxisSlider(brightnessSlider_);
+
     clearEditors();
     setEnabledEditing(false);
 }
 
 SkinEditorColourPicker::~SkinEditorColourPicker()
 {
+    saturationSlider_.removeListener(this);
+    brightnessSlider_.removeListener(this);
     removeKeyListener(&escapeForwarder_);
     hexEditor_.removeKeyListener(&escapeForwarder_);
     rEditor_.removeKeyListener(&escapeForwarder_);
@@ -82,6 +103,8 @@ void SkinEditorColourPicker::setColour(juce::Colour colour, juce::NotificationTy
 
 void SkinEditorColourPicker::clearActiveColour()
 {
+    endWellDragIfActive();
+    endSliderGestureIfActive();
     hasActiveColour_ = false;
     colour_ = juce::Colours::black;
     hue_ = sat_ = val_ = 0.0f;
@@ -91,11 +114,19 @@ void SkinEditorColourPicker::clearActiveColour()
 
 void SkinEditorColourPicker::setEnabledEditing(bool canEdit)
 {
-    editingEnabled_ = canEdit && hasActiveColour_;
+    const bool next = canEdit && hasActiveColour_;
+    if (editingEnabled_ && ! next)
+    {
+        endWellDragIfActive();
+        endSliderGestureIfActive();
+    }
+    editingEnabled_ = next;
     hexEditor_.setEnabled(editingEnabled_);
     rEditor_.setEnabled(editingEnabled_);
     gEditor_.setEnabled(editingEnabled_);
     bEditor_.setEnabled(editingEnabled_);
+    saturationSlider_.setEnabled(editingEnabled_);
+    brightnessSlider_.setEnabled(editingEnabled_);
     repaint();
 }
 
@@ -156,35 +187,18 @@ void SkinEditorColourPicker::paintHueBar(juce::Graphics& g) const
     g.drawRect(hueBounds_.getX() - 1, hy - 2, hueBounds_.getWidth() + 2, 5, 1);
 }
 
-void SkinEditorColourPicker::resized()
+void SkinEditorColourPicker::layoutHexRgbRow(int rowY)
 {
-    const auto chrome = SkinEditorChrome::layoutPanel(getLocalBounds(),
-                                                      SkinEditorChrome::titleTabWidth("COLOR"),
-                                                      0);
-    titleTabBounds_ = chrome.tab;
-    titleLabel_.setBounds(chrome.tab);
-    auto bounds = chrome.content;
-
-    // Size from panel width only — never shrink with window height (R/G/B stay put).
-    // Window min height must keep this layout fully inside the panel.
-    const int side = juce::jmax(0, bounds.getWidth() - kHueBarW - kSvHueGap);
-    svBounds_ = { bounds.getX(), bounds.getY(), side, side };
-    hueBounds_ = { svBounds_.getRight() + kSvHueGap, svBounds_.getY(), kHueBarW, side };
-
-    // Fixed control widths (font-based only) — do not shrink with the panel / window.
+    constexpr int kRgbGap = 9;
     const auto labelFont = SkinEditorChrome::fontRegular();
     const auto monoFont = SkinEditorChrome::fontMono();
     const int hashW = SkinEditorChrome::measureLabelWidth("#", labelFont);
     const int rgbLabW = SkinEditorChrome::measureTextWidth(labelFont, "R") + 2;
-    constexpr int kLabelToField = 4;
-    constexpr int kRgbGap = 9;
     const int hexW0 = SkinEditorChrome::measureTextWidth(monoFont, "FFFFFF") + 8;
     const int hexW = juce::jmax(24, juce::roundToInt((float) hexW0 * 1.2f) - 8 + 4 - 3);
     const int edW = juce::jmax(28, SkinEditorChrome::measureTextWidth(monoFont, "255") + 12 - 2);
     const int rgbGroupW = 3 * (rgbLabW + kLabelToField + edW) + 2 * kRgbGap;
 
-    const int rowY = svBounds_.getBottom() + SkinEditorChrome::kPanelContentPad;
-    // # / hex stay left under the SV; R/G/B pack to the right so B aligns with SV right.
     hexLabel_.setBounds(svBounds_.getX(), rowY, hashW, kFieldRowH);
     hexEditor_.setBounds(svBounds_.getX() + hashW, rowY, hexW, kFieldRowH);
 
@@ -202,9 +216,62 @@ void SkinEditorColourPicker::resized()
     placeRgb(bLabel_, bEditor_, true);
 }
 
+void SkinEditorColourPicker::layoutAxisRows(int rowY)
+{
+    const auto labelFont = SkinEditorChrome::fontRegular();
+    const int axisLabW = juce::jmax(SkinEditorChrome::measureTextWidth(labelFont, "Saturation:"),
+                                    SkinEditorChrome::measureTextWidth(labelFont, "Brightness:"));
+    constexpr int tipPad = juce::jmin(12, kFieldRowH / 2), trimRight = 3, sliderYNudge = 1;
+    constexpr int leftInset = 2; // past label column (shortened 8 px from prior smoke)
+    const int labelLeft = hexLabel_.getX();
+    const int sliderLeft = labelLeft + axisLabW + leftInset;
+    const int sliderRight = juce::jmin(hueBounds_.getRight(), bEditor_.getRight() + tipPad - trimRight);
+    const int sliderW = juce::jmax(0, sliderRight - sliderLeft);
+    // 5px tighter than kPanelContentPad (matches preferredHeightForWidth smoke pad).
+    const int satY = rowY + kFieldRowH + (SkinEditorChrome::kPanelContentPad - 5);
+    saturationLabel_.setBounds(labelLeft, satY, axisLabW, kFieldRowH);
+    saturationSlider_.setBounds(sliderLeft, satY + sliderYNudge, sliderW, kFieldRowH);
+    brightnessLabel_.setBounds(labelLeft, satY + kFieldRowH, axisLabW, kFieldRowH);
+    brightnessSlider_.setBounds(sliderLeft, satY + kFieldRowH + sliderYNudge, sliderW, kFieldRowH);
+}
+
+void SkinEditorColourPicker::resized()
+{
+    auto chrome = SkinEditorChrome::layoutPanel(getLocalBounds(),
+                                                SkinEditorChrome::titleTabWidth("COLOR"),
+                                                0);
+    // layoutPanel insets bottom by kPanelContentPad; COLOR uses 5px less (preferredHeight).
+    chrome.content.setHeight(chrome.content.getHeight() + 5);
+    titleTabBounds_ = chrome.tab;
+    titleLabel_.setBounds(chrome.tab);
+    auto bounds = chrome.content;
+
+    const int side = juce::jmax(0, bounds.getWidth() - kHueBarW - kSvHueGap);
+    svBounds_ = { bounds.getX(), bounds.getY(), side, side };
+    hueBounds_ = { svBounds_.getRight() + kSvHueGap, svBounds_.getY(), kHueBarW, side };
+
+    const int rowY = svBounds_.getBottom() + SkinEditorChrome::kPanelContentPad;
+    layoutHexRgbRow(rowY);
+    layoutAxisRows(rowY);
+}
+
 void SkinEditorColourPicker::mouseDown(const juce::MouseEvent& e)
 {
     grabKeyboardFocus();
+    dragTarget_ = DragTarget::kNone;
+    if (! editingEnabled_ || ! hasActiveColour_)
+        return;
+
+    if (svBounds_.contains(e.getPosition()))
+        dragTarget_ = DragTarget::kSv;
+    else if (hueBounds_.contains(e.getPosition()))
+        dragTarget_ = DragTarget::kHue;
+
+    if (dragTarget_ == DragTarget::kNone)
+        return;
+
+    if (onColourGestureBegan != nullptr)
+        onColourGestureBegan();
     mouseDrag(e);
 }
 
@@ -213,10 +280,33 @@ void SkinEditorColourPicker::mouseDrag(const juce::MouseEvent& e)
     if (! editingEnabled_ || ! hasActiveColour_)
         return;
 
-    if (svBounds_.contains(e.getPosition()))
+    if (dragTarget_ == DragTarget::kSv)
         updateFromSvDrag(e.position);
-    else if (hueBounds_.contains(e.getPosition()))
+    else if (dragTarget_ == DragTarget::kHue)
         updateFromHueDrag(e.position);
+}
+
+void SkinEditorColourPicker::mouseUp(const juce::MouseEvent&)
+{
+    endWellDragIfActive();
+}
+
+void SkinEditorColourPicker::endWellDragIfActive()
+{
+    if (dragTarget_ == DragTarget::kNone)
+        return;
+    dragTarget_ = DragTarget::kNone;
+    if (onColourGestureEnded != nullptr)
+        onColourGestureEnded();
+}
+
+void SkinEditorColourPicker::endSliderGestureIfActive()
+{
+    if (! sliderGestureActive_)
+        return;
+    sliderGestureActive_ = false;
+    if (onColourGestureEnded != nullptr)
+        onColourGestureEnded();
 }
 
 void SkinEditorColourPicker::textEditorReturnKeyPressed(juce::TextEditor& ed)
@@ -239,6 +329,41 @@ void SkinEditorColourPicker::textEditorFocusLost(juce::TextEditor& ed)
         applyRgbFromEditors();
 }
 
+void SkinEditorColourPicker::sliderValueChanged(juce::Slider* slider)
+{
+    if (! editingEnabled_ || ! hasActiveColour_ || isSyncingEditors_ || slider == nullptr)
+        return;
+
+    if (slider == &saturationSlider_)
+        sat_ = (float) saturationSlider_.getValue();
+    else if (slider == &brightnessSlider_)
+        val_ = (float) brightnessSlider_.getValue();
+    else
+        return;
+
+    // Wheel / programmatic nudges skip DragStarted/Ended — wrap as a one-shot gesture.
+    const bool atomicNudge = ! sliderGestureActive_;
+    if (atomicNudge && onColourGestureBegan != nullptr)
+        onColourGestureBegan();
+    applyHsvaFromDrag();
+    if (atomicNudge && onColourGestureEnded != nullptr)
+        onColourGestureEnded();
+}
+
+void SkinEditorColourPicker::sliderDragStarted(juce::Slider*)
+{
+    if (! editingEnabled_ || ! hasActiveColour_)
+        return;
+    sliderGestureActive_ = true;
+    if (onColourGestureBegan != nullptr)
+        onColourGestureBegan();
+}
+
+void SkinEditorColourPicker::sliderDragEnded(juce::Slider*)
+{
+    endSliderGestureIfActive();
+}
+
 void SkinEditorColourPicker::syncEditorsFromColour()
 {
     const juce::ScopedValueSetter<bool> scope(isSyncingEditors_, true);
@@ -250,6 +375,8 @@ void SkinEditorColourPicker::syncEditorsFromColour()
     rEditor_.setText(juce::String(colour_.getRed()), false);
     gEditor_.setText(juce::String(colour_.getGreen()), false);
     bEditor_.setText(juce::String(colour_.getBlue()), false);
+    saturationSlider_.setValue((double) sat_, juce::dontSendNotification);
+    brightnessSlider_.setValue((double) val_, juce::dontSendNotification);
 }
 
 void SkinEditorColourPicker::clearEditors()
@@ -259,6 +386,8 @@ void SkinEditorColourPicker::clearEditors()
     rEditor_.clear();
     gEditor_.clear();
     bEditor_.clear();
+    saturationSlider_.setValue(0.0, juce::dontSendNotification);
+    brightnessSlider_.setValue(0.0, juce::dontSendNotification);
 }
 
 void SkinEditorColourPicker::applyHexFromEditor()

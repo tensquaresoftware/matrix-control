@@ -6,18 +6,19 @@
 
 #include "Tools/SkinEditor/SkinEditorChromeTokens.h"
 
-/** Photoshop-style SV square + vertical hue + #hex + R/G/B. */
+/** Photoshop-style SV square + vertical hue + #hex + R/G/B + S/B sliders. */
 class SkinEditorColourPicker final : public juce::Component,
-                                     private juce::TextEditor::Listener
+                                     private juce::TextEditor::Listener,
+                                     private juce::Slider::Listener
 {
 public:
     SkinEditorColourPicker();
     ~SkinEditorColourPicker() override;
 
     /**
-     * Panel height at `panelWidth` so the gap under #/R/G/B matches the gap above
-     * them (kPanelContentPad), with the SV well sized from content width.
-     * Flush to status (no trailing panel gutter).
+     * Panel height at `panelWidth` so the SV→#/R/G/B gap matches kPanelContentPad,
+     * with the SV well sized from width. Gap under #/R/G/B and bottom content pad
+     * are each 5px tighter than kPanelContentPad (smoke). Flush to status.
      */
     static int preferredHeightForWidth(int panelWidth) noexcept
     {
@@ -26,9 +27,14 @@ public:
         constexpr int kSvHueGap = 8;
         const int contentW = panelWidth - 2 * SkinEditorChrome::kPanelContentPad;
         const int side = juce::jmax(0, contentW - kHueBarW - kSvHueGap);
+        // #/RGB, then Saturation + Brightness stacked with no inter-row gap.
+        // Gap under #/R/G/B and bottom pad: 5px tighter than kPanelContentPad (smoke).
+        constexpr int kTightPad = SkinEditorChrome::kPanelContentPad - 5;
         return SkinEditorChrome::kGutter + SkinEditorChrome::kPanelTitleHeight
-               + SkinEditorChrome::kPanelContentPad + side + SkinEditorChrome::kPanelContentPad
-               + kFieldRowH + SkinEditorChrome::kPanelContentPad;
+               + SkinEditorChrome::kPanelContentPad + side
+               + SkinEditorChrome::kPanelContentPad + kFieldRowH
+               + kTightPad + 2 * kFieldRowH
+               + kTightPad;
     }
 
     void setColour(juce::Colour colour, juce::NotificationType notification);
@@ -38,6 +44,10 @@ public:
     void setEnabledEditing(bool canEdit);
 
     std::function<void(juce::Colour)> onColourChanged;
+    /** Continuous SV / Hue / S/B drag started — parent may coalesce expensive refresh. */
+    std::function<void()> onColourGestureBegan;
+    /** Continuous drag ended — parent should flush coalesced refresh/push. */
+    std::function<void()> onColourGestureEnded;
     /** Escape while COLOR has focus - clear mapping / editing mode in main. */
     std::function<bool()> onEscapeRequested;
 
@@ -45,9 +55,17 @@ public:
     void resized() override;
     void mouseDown(const juce::MouseEvent& e) override;
     void mouseDrag(const juce::MouseEvent& e) override;
+    void mouseUp(const juce::MouseEvent& e) override;
     bool keyPressed(const juce::KeyPress& key) override;
 
 private:
+    enum class DragTarget
+    {
+        kNone,
+        kSv,
+        kHue
+    };
+
     struct EscapeKeyForwarder final : public juce::KeyListener
     {
         std::function<bool()>* handler = nullptr;
@@ -61,6 +79,9 @@ private:
 
     void textEditorReturnKeyPressed(juce::TextEditor&) override;
     void textEditorFocusLost(juce::TextEditor&) override;
+    void sliderValueChanged(juce::Slider*) override;
+    void sliderDragStarted(juce::Slider*) override;
+    void sliderDragEnded(juce::Slider*) override;
 
     void syncEditorsFromColour();
     void clearEditors();
@@ -72,6 +93,11 @@ private:
     void updateFromHueDrag(juce::Point<float> pos);
     void applyHsvaFromDrag();
     void notifyChanged();
+    void endWellDragIfActive();
+    void endSliderGestureIfActive();
+    void styleAxisSlider(juce::Slider& slider);
+    void layoutHexRgbRow(int rowY);
+    void layoutAxisRows(int rowY);
 
     juce::Colour colour_ { juce::Colours::black };
     float hue_ = 0.0f;
@@ -80,6 +106,8 @@ private:
     bool hasActiveColour_ = false;
     bool isSyncingEditors_ = false;
     bool editingEnabled_ = false;
+    bool sliderGestureActive_ = false;
+    DragTarget dragTarget_ = DragTarget::kNone;
 
     juce::Rectangle<int> svBounds_;
     juce::Rectangle<int> hueBounds_;
@@ -96,4 +124,8 @@ private:
     juce::TextEditor rEditor_;
     juce::TextEditor gEditor_;
     juce::TextEditor bEditor_;
+    juce::Label saturationLabel_ { {}, "Saturation:" };
+    juce::Label brightnessLabel_ { {}, "Brightness:" };
+    juce::Slider saturationSlider_;
+    juce::Slider brightnessSlider_;
 };

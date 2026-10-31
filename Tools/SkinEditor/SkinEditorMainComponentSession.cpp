@@ -136,6 +136,72 @@ void SkinEditorMainComponent::timerCallback()
     flushPendingSessionAutosave();
 }
 
+void SkinEditorMainComponent::wireColourPicker(const std::function<bool()>& escapeMapping)
+{
+    colourPicker_.onColourChanged = [this](juce::Colour c) { onColourChanged(c); };
+    colourPicker_.onColourGestureBegan = [this] { colourGestureActive_ = true; };
+    colourPicker_.onColourGestureEnded = [this]
+    {
+        colourGestureActive_ = false;
+        flushColourPreviewCoalesce();
+    };
+    colourPicker_.onEscapeRequested = escapeMapping;
+    colourPreviewCoalesceTimer_.onTick = [this] { tickColourPreviewCoalesce(); };
+    addAndMakeVisible(colourPicker_);
+}
+
+void SkinEditorMainComponent::scheduleColourPreviewCoalesce()
+{
+    constexpr int kColourPreviewCoalesceMs = 40;
+    if (! colourPreviewCoalesceTimer_.isTimerRunning())
+        colourPreviewCoalesceTimer_.startTimer(kColourPreviewCoalesceMs);
+}
+
+void SkinEditorMainComponent::applyColourPreviewRefresh()
+{
+    refreshAll();
+    if (bridge_.isConnected() && ! isCompareProductView() && canEditEditorSkin())
+        pushVisible();
+}
+
+void SkinEditorMainComponent::tickColourPreviewCoalesce()
+{
+    colourPreviewCoalesceTimer_.stopTimer();
+    applyColourPreviewRefresh();
+}
+
+void SkinEditorMainComponent::flushColourPreviewCoalesce()
+{
+    colourPreviewCoalesceTimer_.stopTimer();
+    applyColourPreviewRefresh();
+}
+
+void SkinEditorMainComponent::syncPastilleSelectionAfterRefresh(const juce::String& panelSkinId)
+{
+    if (selectedPastille_.isEmpty())
+        return;
+
+    bool found = false;
+    if (const auto* skin = layer_.findSkin(panelSkinId))
+    {
+        for (const auto& pastille : skin->palette)
+        {
+            if (pastille.name == selectedPastille_)
+            {
+                found = true;
+                break;
+            }
+        }
+    }
+    if (found)
+        palettePanel_.selectPastille(selectedPastille_);
+    else if (mappingMode_ == MappingMode::kHeldColour
+             || mappingMode_ == MappingMode::kEditingColour)
+        clearMappingModeToIdle();
+    else
+        selectedPastille_.clear();
+}
+
 void SkinEditorMainComponent::refreshAll()
 {
     refreshCombos();
@@ -167,29 +233,10 @@ void SkinEditorMainComponent::refreshAll()
     if (! editable && mappingMode_ != MappingMode::kIdle)
         clearMappingModeToIdle();
 
-    if (selectedPastille_.isNotEmpty())
-    {
-        bool found = false;
-        if (const auto* skin = layer_.findSkin(panelSkinId))
-        {
-            for (const auto& pastille : skin->palette)
-            {
-                if (pastille.name == selectedPastille_)
-                {
-                    found = true;
-                    break;
-                }
-            }
-        }
-        if (found)
-            palettePanel_.selectPastille(selectedPastille_);
-        else if (mappingMode_ == MappingMode::kHeldColour
-                 || mappingMode_ == MappingMode::kEditingColour)
-            clearMappingModeToIdle();
-        else
-            selectedPastille_.clear();
-    }
-    syncColourPickerToSelection();
+    syncPastilleSelectionAfterRefresh(panelSkinId);
+    // Keep SV handle sticky during continuous COLOR drag (ARGB sync would snap HSB).
+    if (! colourGestureActive_)
+        syncColourPickerToSelection();
     updateMappingWitness();
 }
 
