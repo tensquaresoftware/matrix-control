@@ -2965,3 +2965,12 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-unbound-badge.md`
   summary: Optional tooltip/coaching on Mappings Unbound witness tying the count to Export Unbound = 0.
   evidence: Blind Hunter; mock has no tooltip; problem statement mentions Export opacity but label+badge may be enough.
+
+## Deferred from: review of spec-skin-editor-mappings-column-filters.md (2026-10-31)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-column-filters.md`
+  summary: Unit-test `setActiveSkinId` / `clearAllColumnFilters` wiring (PERSISTENCE) without a full Mappings panel harness.
+  evidence: Verification Gap; pure ActiveFilters empty-match tests do not exercise panel skin-id clear; manual skin-change remains on the checklist.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-column-filters.md`
+  summary: Disambiguate Mapped colour filter when a pastille is literally named Unbound versus unbound cells.
+  evidence: Edge Case Hunter; sentinel `Unbound` matches unbound rows only; a pastille named Unbound cannot be isolated separately (pathological rename).

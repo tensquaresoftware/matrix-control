@@ -222,6 +222,25 @@ namespace SkinEditorChrome
                                     : juce::jmax(diameter, textW + kCountBadgeCapsulePad);
     }
 
+    void drawClearBadge(juce::Graphics& g, juce::Rectangle<int> area)
+    {
+        const int diameter = kCountBadgeDiameter;
+        auto badge = juce::Rectangle<int>(area.getX(),
+                                          area.getCentreY() - diameter / 2,
+                                          diameter,
+                                          diameter);
+        g.setColour(attention());
+        g.fillRoundedRectangle(badge.toFloat(), kControlCorner);
+        g.setColour(surfacePanel());
+        g.setFont(fontBold(kCountBadgeFont));
+        g.drawText("X", badge, juce::Justification::centred, false);
+    }
+
+    int clearBadgeWidth()
+    {
+        return kCountBadgeDiameter;
+    }
+
     void drawChromeBadge(juce::Graphics& g, juce::Rectangle<int> area, const juce::String& text)
     {
         drawChromeBadge(g, area, text, textMuted());

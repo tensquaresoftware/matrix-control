@@ -85,6 +85,14 @@ namespace SkinEditorChrome
     int countBadgeWidth(int count);
 
     /**
+     * Square clear-X badge at Unbound count scale (amber fill, panel-surface X,
+     * kControlCorner) — Mappings column-filter chrome.
+     */
+    void drawClearBadge(juce::Graphics& g, juce::Rectangle<int> area);
+
+    int clearBadgeWidth();
+
+    /**
      * Chrome text badge - Inter rectangle (MAPPING / BRIDGE / LAST PUSH / APP).
      * Do not reuse plugin FooterPanel badge APIs or count-capsule badges.
      */

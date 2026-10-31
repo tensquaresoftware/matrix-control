@@ -85,7 +85,10 @@ void SkinEditorMappingsPanel::setLayer(TSS::DevSkin::Layer* layer)
 
 void SkinEditorMappingsPanel::setActiveSkinId(const juce::String& skinId)
 {
+    if (skinId_ == skinId)
+        return;
     skinId_ = skinId;
+    clearAllColumnFilters();
 }
 
 void SkinEditorMappingsPanel::setUnboundCount(int count)
@@ -140,28 +143,7 @@ void SkinEditorMappingsPanel::rebuildObjectCombo(const juce::String& preferName)
     updatingObjectCombo_ = false;
 }
 
-// Paint
-
-void SkinEditorMappingsPanel::paintStickyLegend(juce::Graphics& g, juce::Rectangle<int> area) const
-{
-    SkinEditorChrome::fillTableRow(g, { area.toFloat(), SkinEditorChrome::surfaceSection(),
-                                        true, true });
-    const auto cols = columnsForWidth(area.getWidth());
-    g.setColour(SkinEditorChrome::textTableHeader());
-    g.setFont(SkinEditorChrome::fontBold());
-    g.drawText("Property",
-               area.getX() + kColPad, area.getY(), juce::jmax(0, cols.propertyW - 4), area.getHeight(),
-               juce::Justification::centredLeft, false);
-    g.drawText("State",
-               area.getX() + kColPad + cols.propertyW, area.getY(),
-               juce::jmax(0, cols.stateW - 4), area.getHeight(),
-               juce::Justification::centredLeft, false);
-    const auto mappedFont = SkinEditorChrome::fontBold();
-    g.setFont(mappedFont);
-    g.drawText(SkinEditorChrome::elideToWidth(mappedFont, "Mapped colour", cols.mappedW),
-               area.getX() + cols.mappedX, area.getY(), cols.mappedW, area.getHeight(),
-               juce::Justification::centredLeft, false);
-}
+// Paint (paintStickyLegend lives in SkinEditorMappingsPanelFilters.cpp)
 
 void SkinEditorMappingsPanel::paint(juce::Graphics& g)
 {
@@ -360,6 +342,7 @@ void SkinEditorMappingsPanel::layoutShellEmpty(juce::Rectangle<int> content)
     unboundBadgeBounds_ = {};
     stickyBandBounds_ = {};
     stickyLegendBounds_ = {};
+    clearLegendHitTargets();
     auto listBounds = content;
     listBounds.setRight(listBounds.getRight() + SkinEditorChrome::kPanelContentPad);
     viewport_.setBounds(listBounds);
@@ -388,6 +371,7 @@ void SkinEditorMappingsPanel::layoutShellFilled(juce::Rectangle<int> content)
     const int tableX = viewport_.getX() + kFocusPad;
     stickyLegendBounds_.setX(tableX);
     stickyLegendBounds_.setWidth(tableW);
+    layoutLegendHitTargets();
     layoutActionRow(actions, tableX, tableW);
 }
 

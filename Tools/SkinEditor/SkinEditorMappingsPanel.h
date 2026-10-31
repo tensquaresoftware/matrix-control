@@ -34,6 +34,7 @@ public:
 
     void paint(juce::Graphics& g) override;
     void resized() override;
+    void mouseUp(const juce::MouseEvent& e) override;
 
 private:
     enum class RowKind
@@ -41,6 +42,14 @@ private:
         kGap,
         kSection,
         kMapping
+    };
+
+    /** Sticky-legend column filter (AND across active columns). */
+    enum class FilterColumn
+    {
+        kProperty,
+        kState,
+        kMappedColour
     };
 
     struct Row
@@ -108,6 +117,19 @@ private:
                        int objectIndex) const;
     void rebuildObjectCombo(const juce::String& preferName);
 
+    // Column filters (sticky legend)
+    void clearAllColumnFilters();
+    void clearColumnFilter(FilterColumn column);
+    void setColumnFilter(FilterColumn column, const juce::String& value);
+    bool mappingKeyMatches(const TSS::DevSkin::NamedSkin& skin,
+                           const TSS::SkinColourKey& key) const;
+    juce::StringArray presentValuesFor(FilterColumn column) const;
+    juce::String& filterValue(FilterColumn column) noexcept;
+    const juce::String& filterValue(FilterColumn column) const noexcept;
+    void showColumnFilterMenu(FilterColumn column);
+    void layoutLegendHitTargets();
+    void clearLegendHitTargets();
+
     // Paint
     void paintStickyLegend(juce::Graphics& g, juce::Rectangle<int> area) const;
     void paintRow(juce::Graphics& g, PaintRowSpec spec) const;
@@ -152,6 +174,16 @@ private:
     int unboundCount_ = 0;
     juce::Rectangle<int> unboundLabelBounds_;
     juce::Rectangle<int> unboundBadgeBounds_;
+    /** Empty = filter off. Mapped colour may be the literal "Unbound". */
+    juce::String propertyFilter_;
+    juce::String stateFilter_;
+    juce::String mappedColourFilter_;
+    juce::Rectangle<int> propertyLabelBounds_;
+    juce::Rectangle<int> propertyClearBounds_;
+    juce::Rectangle<int> stateLabelBounds_;
+    juce::Rectangle<int> stateClearBounds_;
+    juce::Rectangle<int> mappedLabelBounds_;
+    juce::Rectangle<int> mappedClearBounds_;
     juce::Viewport viewport_;
     Content content_ { *this };
 };

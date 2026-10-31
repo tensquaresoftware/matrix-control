@@ -1,10 +1,9 @@
 #include "Tools/SkinEditor/SkinEditorMappingsPanel.h"
 
-#include <map>
-
 #include "GUI/Skins/Dev/DevSkinInventory.h"
 #include "GUI/Skins/Dev/DevSkinKeyNames.h"
 #include "Tools/SkinEditor/SkinEditorChrome.h"
+#include "Tools/SkinEditor/SkinEditorMappingsColumnFilter.h"
 
 namespace
 {
@@ -90,20 +89,14 @@ void SkinEditorMappingsPanel::rebuildRows()
     if (skin == nullptr)
         return;
 
-    std::vector<TSS::SkinObjectType> objectOrder;
-    std::map<TSS::SkinObjectType, std::vector<TSS::SkinColourKey>> keysByObject;
-    for (const auto& key : TSS::DevSkin::allStructuredKeys())
-    {
-        auto& bucket = keysByObject[key.object];
-        if (bucket.empty())
-            objectOrder.push_back(key.object);
-        bucket.push_back(key);
-    }
+    const SkinEditorMappingsColumnFilter::ActiveFilters filters {
+        propertyFilter_, stateFilter_, mappedColourFilter_ };
 
     int y = kFocusPad;
-    for (size_t oi = 0; oi < objectOrder.size(); ++oi)
+    bool anyTable = false;
+    for (const auto& group : SkinEditorMappingsColumnFilter::filteredObjectGroups(*skin, filters))
     {
-        if (oi > 0)
+        if (anyTable)
         {
             Row gap;
             gap.kind = RowKind::kGap;
@@ -111,8 +104,8 @@ void SkinEditorMappingsPanel::rebuildRows()
             rows_.push_back(gap);
             y += gap.heightPx;
         }
-        const auto object = objectOrder[oi];
-        y = appendObjectTable(*skin, object, keysByObject[object], y);
+        y = appendObjectTable(*skin, group.object, group.keys, y);
+        anyTable = true;
     }
 }
 

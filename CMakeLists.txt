@@ -611,6 +611,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/DevSkinMatrixTests.cpp
         Tests/Unit/DevSkinPendingPastilleTests.cpp
         Tests/Unit/SkinEditorMappingModePolicyTests.cpp
+        Tests/Unit/SkinEditorMappingsColumnFilterTests.cpp
         Tests/Unit/SkinEditorChromeLayoutTests.cpp
         Tools/SkinEditor/SkinEditorChromePanel.cpp
         Tools/SkinEditor/SkinEditorSkinsPanel.cpp
@@ -1182,6 +1183,7 @@ if(MATRIX_BUILD_SKIN_EDITOR)
         Tools/SkinEditor/SkinEditorPalettePanelSticky.cpp
         Tools/SkinEditor/SkinEditorMappingsPanel.cpp
         Tools/SkinEditor/SkinEditorMappingsPanelRows.cpp
+        Tools/SkinEditor/SkinEditorMappingsPanelFilters.cpp
         Tools/SkinEditor/SkinEditorSkinsPanel.cpp
         ${MATRIX_SKIN_DEV_LAYER_SOURCES}
         Source/GUI/Skins/Skin.cpp
