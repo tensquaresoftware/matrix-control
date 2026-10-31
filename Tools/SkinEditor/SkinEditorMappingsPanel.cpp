@@ -154,10 +154,13 @@ void SkinEditorMappingsPanel::paint(juce::Graphics& g)
 
     if (! unboundLabelBounds_.isEmpty())
     {
+        // Amber when Export gate is blocked; muted chrome when Unbound = 0.
+        const auto unboundColour = (unboundCount_ > 0) ? SkinEditorChrome::attention()
+                                                       : SkinEditorChrome::textMuted();
         g.setFont(SkinEditorChrome::fontRegular());
-        g.setColour(SkinEditorChrome::attention());
+        g.setColour(unboundColour);
         g.drawText("Unbound", unboundLabelBounds_, juce::Justification::centredLeft, false);
-        SkinEditorChrome::drawCountBadge(g, unboundBadgeBounds_, unboundCount_);
+        SkinEditorChrome::drawCountBadge(g, unboundBadgeBounds_, unboundCount_, unboundColour);
     }
 }
 

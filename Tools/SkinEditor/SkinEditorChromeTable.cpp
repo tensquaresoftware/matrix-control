@@ -191,6 +191,14 @@ namespace SkinEditorChrome
                         juce::Rectangle<int> area,
                         int count)
     {
+        drawCountBadge(g, area, count, attention());
+    }
+
+    void drawCountBadge(juce::Graphics& g,
+                        juce::Rectangle<int> area,
+                        int count,
+                        juce::Colour fill)
+    {
         if (count < 0)
             count = 0;
         const auto text = juce::String(count);
@@ -203,8 +211,7 @@ namespace SkinEditorChrome
                                           area.getCentreY() - diameter / 2,
                                           width,
                                           diameter);
-        // Amber fill + panel-surface glyph (Mappings Unbound witness); panel corner radius.
-        g.setColour(attention());
+        g.setColour(fill);
         g.fillRoundedRectangle(badge.toFloat(), kControlCorner);
         g.setColour(surfacePanel());
         g.setFont(font);
