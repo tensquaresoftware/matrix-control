@@ -85,8 +85,8 @@ namespace SkinEditorChrome
     int countBadgeWidth(int count);
 
     /**
-     * Square clear-X badge at Unbound count scale (amber fill, panel-surface X,
-     * kControlCorner) — Mappings column-filter chrome.
+     * Square clear badge (kClearBadgeSize NxN, amber fill, geometric X strokes,
+     * kChromeBadgeCorner) — Mappings column-filter chrome.
      */
     void drawClearBadge(juce::Graphics& g, juce::Rectangle<int> area);
 

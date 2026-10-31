@@ -121,12 +121,15 @@ private:
     void clearAllColumnFilters();
     void clearColumnFilter(FilterColumn column);
     void setColumnFilter(FilterColumn column, const juce::String& value);
-    bool mappingKeyMatches(const TSS::DevSkin::NamedSkin& skin,
-                           const TSS::SkinColourKey& key) const;
     juce::StringArray presentValuesFor(FilterColumn column) const;
     juce::String& filterValue(FilterColumn column) noexcept;
     const juce::String& filterValue(FilterColumn column) const noexcept;
     void showColumnFilterMenu(FilterColumn column);
+    /** Screen-space anchor for a column filter PopupMenu. */
+    juce::Rectangle<int> legendFilterTargetBounds(FilterColumn column) const noexcept;
+    bool populateColumnFilterMenu(juce::PopupMenu& menu,
+                                  FilterColumn column,
+                                  const juce::StringArray& values);
     void layoutLegendHitTargets();
     void clearLegendHitTargets();
 

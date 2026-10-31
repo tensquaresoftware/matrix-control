@@ -124,6 +124,27 @@ context:
 - VG: `emptyFiltersMatchAll` falsely claims skin-change clear — **medium** → patch (beginTest renamed) + defer full `setActiveSkinId` coverage
 - VG: `clearOneColumnKeepsOther` duplicates single-filter — **medium** → patch (same as Blind clear-one rewrite)
 
+### Review Findings
+
+- [x] [Review][Patch] Remove dead `mappingKeyMatches` (declared/defined, never called; `rebuildRows` uses `filteredObjectGroups`) [`SkinEditorMappingsPanel.h` / `SkinEditorMappingsPanelFilters.cpp`]
+- [x] [Review][Patch] Mapped colour filter menu paints opaque black swatch when a mapped name is missing from the palette (ARGB left at 0) [`SkinEditorMappingsPanelFilters.cpp` `makeMappedMenuSpec`]
+- [x] [Review][Defer] Automate PERSISTENCE (`setActiveSkinId` clears filters) — deferred: already in deferred-work; pure helper tests do not cover panel wiring
+- [x] [Review][Defer] Automate async filter-menu `skinId` guard — deferred: PopupMenu + Component outside usual Skin Editor unit style; extend manual checklist instead
+- [x] [Review][Defer] Unbound sentinel vs pastille literally named Unbound — deferred: already in deferred-work (pathological)
+- [x] [Review][Defer] Revalidate open-menu / sticky Mapped filter when palette or mappings mutate — deferred: rare during edit; Clear badge / skin change recover; not in frozen AC
+
+#### Rejected
+
+- Badge uses `kChromeBadgeCorner` / `kClearBadgeSize` vs frozen `kControlCorner` / Unbound scale — **false** (post-smoke decisions already tranchées; shipped chrome matches review brief; fixing frozen text alone is out of scope for this finding)
+- Spec `status: done` with manual verify unchecked / empty Spec Change Log / Code Map points at Panel.cpp — **reject** (fix is editing the spec under review)
+- LookAndFeel `PopupMenu` → `controlFill()` out of Code Map / no-op alias — **false** (tranché: combo-styled menus; `controlFill()` aliases `surfacePanel()` so no visual collateral)
+- Object combo empties when filters match nothing — **false** (EMPTY_SECTIONS; objects_ drives combo; prior triage)
+- `setActiveSkinId` clears filters without calling `refresh` — **false** (session always `refresh()` immediately after; intended split)
+- Thin unit coverage (State presentValues / three-column AND) — **low** reject (core I/O covered; unlikely daily miss)
+- Unused `SkinValues.h` in tests — **low** reject (transitive via DevSkin; prior triage; no lint hit)
+- Filters.cpp ~410 lines / duplicated `columnsForWidth` — **reject** (hors scope / already deferred DRY)
+- Verification `--category` flag wording — **false** (TestMain matches name substring; command works)
+
 ## Design Notes
 
 Sticky legend labels and clear badges are interactive (`PopupMenu` + panel `mouseUp`). Object combo remains scroll/focus only. Clear badge matches Unbound count chip scale (`kCountBadgeDiameter`, `kControlCorner`). Prefer Skin Editor LookAndFeel `PopupMenu` over a custom list.

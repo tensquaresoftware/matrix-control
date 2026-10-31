@@ -27,7 +27,8 @@ namespace SkinEditorChrome
         setColour(juce::ComboBox::arrowColourId, textMuted());
         setColour(juce::ComboBox::textColourId, textPrimary());
         setColour(juce::ComboBox::buttonColourId, controlFill());
-        setColour(juce::PopupMenu::backgroundColourId, surfacePanel());
+        // Match ComboBox field / dropdown chrome (controlFill, not panel surface).
+        setColour(juce::PopupMenu::backgroundColourId, controlFill());
         setColour(juce::PopupMenu::textColourId, textPrimary());
         setColour(juce::PopupMenu::highlightedBackgroundColourId, controlFillHover());
         setColour(juce::PopupMenu::highlightedTextColourId, textPrimary());

@@ -2974,3 +2974,12 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-column-filters.md`
   summary: Disambiguate Mapped colour filter when a pastille is literally named Unbound versus unbound cells.
   evidence: Edge Case Hunter; sentinel `Unbound` matches unbound rows only; a pastille named Unbound cannot be isolated separately (pathological rename).
+
+## Deferred from: code review of spec-skin-editor-mappings-column-filters.md (2026-10-31)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-column-filters.md`
+  summary: No automated coverage that a PopupMenu result after Editor skin-id change is ignored (`openedForSkinId` guard).
+  evidence: Verification Gap; pure column-filter tests still pass if the guard is removed; prefer a manual checklist line over a GUI harness.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-column-filters.md`
+  summary: Revalidate Mapped colour filter / open menu values when palette or mappings change while a filter is sticky or a menu is open (stale name → empty tables or black swatch path).
+  evidence: Blind + Edge; Clear badge and skin-id clear recover; not required by frozen AC.

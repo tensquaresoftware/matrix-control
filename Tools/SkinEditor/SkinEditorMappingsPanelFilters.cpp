@@ -6,6 +6,10 @@
 namespace
 {
     constexpr int kColPad = SkinEditorChrome::kMappingsColumnPad;
+    /** Match Palette list: swatch inset, size, and name gap (PalettePanel). */
+    constexpr int kPaletteSwatchX = 4;
+    constexpr int kPaletteNameGap = 8;
+    constexpr int kMenuTickSlot = 16;
 
     struct ColumnLayout
     {
@@ -25,13 +29,132 @@ namespace
                  mappedSpan };
     }
 
-}
+    struct MappedColourMenuSpec
+    {
+        juce::String name;
+        juce::uint32 argb = 0;
+        bool pending = false;
+        bool unbound = false;
+        bool foundInPalette = false;
+        bool ticked = false;
+    };
 
-bool SkinEditorMappingsPanel::mappingKeyMatches(const TSS::DevSkin::NamedSkin& skin,
-                                                const TSS::SkinColourKey& key) const
-{
-    return SkinEditorMappingsColumnFilter::keyMatches(
-        skin, key, { propertyFilter_, stateFilter_, mappedColourFilter_ });
+    /** Mapped colour filter row: Palette swatch + gap + name (combo-styled menu chrome). */
+    class MappedColourFilterMenuItem final : public juce::PopupMenu::CustomComponent
+    {
+    public:
+        explicit MappedColourFilterMenuItem(MappedColourMenuSpec spec)
+            : spec_(std::move(spec))
+        {
+        }
+
+        void getIdealSize(int& idealWidth, int& idealHeight) override
+        {
+            idealHeight = SkinEditorChrome::kColumnHeaderHeight;
+            const int sw = SkinEditorChrome::kColourSwatchSize;
+            const int nameW = SkinEditorChrome::measureTextWidth(SkinEditorChrome::fontRegular(),
+                                                                spec_.name);
+            idealWidth = kMenuTickSlot + kPaletteSwatchX + sw + kPaletteNameGap + nameW + 12;
+        }
+
+        void paint(juce::Graphics& g) override
+        {
+            auto bounds = getLocalBounds();
+            if (isItemHighlighted())
+            {
+                g.setColour(SkinEditorChrome::controlFillHover());
+                g.fillRect(bounds);
+            }
+
+            if (spec_.ticked)
+            {
+                auto tickArea = bounds.removeFromLeft(kMenuTickSlot).toFloat().reduced(3.0f, 4.0f);
+                auto tick = getLookAndFeel().getTickShape(1.0f);
+                g.setColour(SkinEditorChrome::textPrimary());
+                g.fillPath(tick, tick.getTransformToScaleToFit(tickArea, true));
+            }
+            else
+            {
+                bounds.removeFromLeft(kMenuTickSlot);
+            }
+
+            const int sw = SkinEditorChrome::kColourSwatchSize;
+            const int contentH = bounds.getHeight();
+            const int swY = bounds.getY() + (contentH - sw) / 2;
+            const int swX = bounds.getX() + kPaletteSwatchX;
+            if (! spec_.unbound && spec_.foundInPalette)
+            {
+                const auto swatch = juce::Rectangle<int>(swX, swY, sw, sw);
+                if (spec_.pending)
+                    SkinEditorChrome::paintPendingColourSwatch(g, swatch);
+                else
+                    SkinEditorChrome::paintColourSwatch(g, swatch, juce::Colour(spec_.argb));
+            }
+
+            const int nameLeft = bounds.getX() + kPaletteSwatchX + sw + kPaletteNameGap;
+            g.setFont(SkinEditorChrome::fontRegular());
+            g.setColour(spec_.unbound ? SkinEditorChrome::attention()
+                                      : SkinEditorChrome::textPrimary());
+            g.drawText(spec_.name,
+                       nameLeft,
+                       bounds.getY(),
+                       juce::jmax(0, bounds.getRight() - nameLeft - 4),
+                       contentH,
+                       juce::Justification::centredLeft,
+                       false);
+        }
+
+    private:
+        MappedColourMenuSpec spec_;
+    };
+
+    MappedColourMenuSpec makeMappedMenuSpec(const TSS::DevSkin::NamedSkin& skin,
+                                            const juce::String& name,
+                                            bool ticked)
+    {
+        MappedColourMenuSpec spec;
+        spec.name = name;
+        spec.ticked = ticked;
+        spec.unbound = (name == SkinEditorMappingsColumnFilter::kUnboundMenuValue);
+        if (spec.unbound)
+            return spec;
+        for (const auto& pastille : skin.palette)
+        {
+            if (pastille.name == name)
+            {
+                spec.argb = pastille.argb;
+                spec.pending = pastille.pending;
+                spec.foundInPalette = true;
+                break;
+            }
+        }
+        return spec;
+    }
+
+    void appendMappedColourFilterItems(juce::PopupMenu& menu,
+                                       const TSS::DevSkin::NamedSkin& skin,
+                                       const juce::StringArray& values,
+                                       const juce::String& active)
+    {
+        for (int i = 0; i < values.size(); ++i)
+        {
+            const auto& name = values[i];
+            menu.addCustomItem(i + 1,
+                               std::make_unique<MappedColourFilterMenuItem>(
+                                   makeMappedMenuSpec(skin, name, name == active)),
+                               nullptr,
+                               name);
+        }
+    }
+
+    juce::PopupMenu::Options filterMenuOptions(juce::Component& host,
+                                               juce::Rectangle<int> screenArea)
+    {
+        return juce::PopupMenu::Options()
+            .withTargetComponent(&host)
+            .withParentComponent(host.getTopLevelComponent())
+            .withTargetScreenArea(screenArea);
+    }
 }
 
 juce::String& SkinEditorMappingsPanel::filterValue(FilterColumn column) noexcept
@@ -94,6 +217,37 @@ juce::StringArray SkinEditorMappingsPanel::presentValuesFor(FilterColumn column)
     return SkinEditorMappingsColumnFilter::presentValues(*skin, mapped);
 }
 
+juce::Rectangle<int> SkinEditorMappingsPanel::legendFilterTargetBounds(FilterColumn column) const noexcept
+{
+    if (column == FilterColumn::kState)
+        return stateLabelBounds_;
+    if (column == FilterColumn::kMappedColour)
+        return mappedLabelBounds_;
+    return propertyLabelBounds_;
+}
+
+bool SkinEditorMappingsPanel::populateColumnFilterMenu(juce::PopupMenu& menu,
+                                                       FilterColumn column,
+                                                       const juce::StringArray& values)
+{
+    menu.setLookAndFeel(&getLookAndFeel());
+    const auto& active = filterValue(column);
+    if (column != FilterColumn::kMappedColour)
+    {
+        for (int i = 0; i < values.size(); ++i)
+            menu.addItem(i + 1, values[i], true, values[i] == active);
+        return true;
+    }
+
+    const auto* skin = (layer_ != nullptr && skinId_.isNotEmpty())
+                           ? layer_->findSkin(skinId_)
+                           : nullptr;
+    if (skin == nullptr)
+        return false;
+    appendMappedColourFilterItems(menu, *skin, values, active);
+    return true;
+}
+
 void SkinEditorMappingsPanel::showColumnFilterMenu(FilterColumn column)
 {
     const auto values = presentValuesFor(column);
@@ -101,21 +255,12 @@ void SkinEditorMappingsPanel::showColumnFilterMenu(FilterColumn column)
         return;
 
     juce::PopupMenu menu;
-    const auto& active = filterValue(column);
-    for (int i = 0; i < values.size(); ++i)
-        menu.addItem(i + 1, values[i], true, values[i] == active);
-
-    const juce::Rectangle<int>* target = &propertyLabelBounds_;
-    if (column == FilterColumn::kState)
-        target = &stateLabelBounds_;
-    else if (column == FilterColumn::kMappedColour)
-        target = &mappedLabelBounds_;
+    if (! populateColumnFilterMenu(menu, column, values))
+        return;
 
     const juce::String openedForSkinId = skinId_;
     menu.showMenuAsync(
-        juce::PopupMenu::Options()
-            .withTargetComponent(this)
-            .withTargetScreenArea(localAreaToGlobal(*target)),
+        filterMenuOptions(*this, localAreaToGlobal(legendFilterTargetBounds(column))),
         [safe = juce::Component::SafePointer<SkinEditorMappingsPanel>(this),
          column,
          values,

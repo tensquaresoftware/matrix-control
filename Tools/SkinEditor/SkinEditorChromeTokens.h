@@ -190,4 +190,6 @@ namespace SkinEditorChrome
     inline constexpr int kCountBadgeDiameter = 15;
     inline constexpr float kCountBadgeFont = 11.0f;
     inline constexpr int kCountBadgeCapsulePad = 10;
+    /** Mappings column-filter clear chip: square NxN, smaller than Unbound count badge. */
+    inline constexpr int kClearBadgeSize = 11;
 }

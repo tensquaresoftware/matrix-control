@@ -224,21 +224,23 @@ namespace SkinEditorChrome
 
     void drawClearBadge(juce::Graphics& g, juce::Rectangle<int> area)
     {
-        const int diameter = kCountBadgeDiameter;
+        const int side = kClearBadgeSize;
         auto badge = juce::Rectangle<int>(area.getX(),
-                                          area.getCentreY() - diameter / 2,
-                                          diameter,
-                                          diameter);
+                                          area.getCentreY() - side / 2,
+                                          side,
+                                          side);
         g.setColour(attention());
-        g.fillRoundedRectangle(badge.toFloat(), kControlCorner);
+        g.fillRoundedRectangle(badge.toFloat(), kChromeBadgeCorner);
         g.setColour(surfacePanel());
-        g.setFont(fontBold(kCountBadgeFont));
-        g.drawText("X", badge, juce::Justification::centred, false);
+        const auto cross = badge.toFloat().reduced(2.5f);
+        constexpr float kStroke = 1.35f;
+        g.drawLine(cross.getX(), cross.getY(), cross.getRight(), cross.getBottom(), kStroke);
+        g.drawLine(cross.getRight(), cross.getY(), cross.getX(), cross.getBottom(), kStroke);
     }
 
     int clearBadgeWidth()
     {
-        return kCountBadgeDiameter;
+        return kClearBadgeSize;
     }
 
     void drawChromeBadge(juce::Graphics& g, juce::Rectangle<int> area, const juce::String& text)
