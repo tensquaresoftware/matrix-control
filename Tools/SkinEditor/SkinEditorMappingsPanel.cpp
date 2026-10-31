@@ -1,5 +1,9 @@
 #include "Tools/SkinEditor/SkinEditorMappingsPanel.h"
 
+#include <algorithm>
+#include <utility>
+#include <vector>
+
 #include "Tools/SkinEditor/SkinEditorChrome.h"
 #include "Tools/SkinEditor/SkinEditorMappingModePolicy.h"
 
@@ -54,7 +58,8 @@ SkinEditorMappingsPanel::SkinEditorMappingsPanel()
     {
         if (updatingObjectCombo_)
             return;
-        setFocusedObject(objectCombo_.getSelectedItemIndex(), true);
+        // Item IDs are 1-based object table indices (combo display is A-Z).
+        setFocusedObject(objectCombo_.getSelectedId() - 1, true);
     };
     addAndMakeVisible(objectCombo_);
 
@@ -125,19 +130,30 @@ void SkinEditorMappingsPanel::rebuildObjectCombo(const juce::String& preferName)
     updatingObjectCombo_ = true;
     objectCombo_.clear(juce::dontSendNotification);
 
-    int select = 0;
+    std::vector<std::pair<juce::String, int>> items;
+    items.reserve(objects_.size());
     for (int i = 0; i < static_cast<int>(objects_.size()); ++i)
+        items.emplace_back(objects_[static_cast<size_t>(i)].name, i);
+
+    std::sort(items.begin(), items.end(),
+              [](const auto& a, const auto& b)
+              {
+                  return a.first.compareIgnoreCase(b.first) < 0;
+              });
+
+    int selectedObject = objects_.empty() ? -1 : 0;
+    for (const auto& item : items)
     {
-        objectCombo_.addItem(objects_[static_cast<size_t>(i)].name, i + 1);
-        if (preferName.isNotEmpty() && objects_[static_cast<size_t>(i)].name == preferName)
-            select = i;
+        objectCombo_.addItem(item.first, item.second + 1);
+        if (preferName.isNotEmpty() && item.first == preferName)
+            selectedObject = item.second;
     }
 
     focusedObject_ = -1;
-    if (! objects_.empty())
+    if (selectedObject >= 0)
     {
-        objectCombo_.setSelectedItemIndex(select, juce::dontSendNotification);
-        focusedObject_ = select;
+        objectCombo_.setSelectedId(selectedObject + 1, juce::dontSendNotification);
+        focusedObject_ = selectedObject;
     }
     objectCombo_.setEnabled(! objects_.empty());
     updatingObjectCombo_ = false;

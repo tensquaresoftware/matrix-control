@@ -143,7 +143,8 @@ void SkinEditorMappingsPanel::setFocusedObject(int objectIndex, bool scrollIntoP
     focusedObject_ = objectIndex;
 
     updatingObjectCombo_ = true;
-    objectCombo_.setSelectedItemIndex(objectIndex, juce::dontSendNotification);
+    // Combo labels are A-Z; IDs stay 1-based table indices.
+    objectCombo_.setSelectedId(objectIndex + 1, juce::dontSendNotification);
     updatingObjectCombo_ = false;
 
     if (scrollIntoPlace)

@@ -2989,3 +2989,9 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-colour-picker-fine-control.md`
   summary: Unit-test colour-gesture coalesce / sticky picker sync on MainComponent (timer + skip syncColourPickerToSelection while gesturing).
   evidence: Verification Gap; needs Skin Editor GUI/timer harness; manual SV-drag AC remains the check for lag and sticky handle.
+
+## Deferred from: oneshot review of spec-skin-editor-mappings-descending-order.md (2026-11-01)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-descending-order.md`
+  summary: Add automated coverage for Object combo A-Z ordering and id-to-table-index jump (today covered by manual smoke only).
+  evidence: Blind Hunter; ComboBox wiring lives in SkinEditorMappingsPanel Component code; extracting a pure sort/id helper would expand beyond this display-order oneshot.

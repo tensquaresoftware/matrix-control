@@ -25,6 +25,8 @@ public:
         presentValuesNoDuplicateUnbound();
         filteredObjectGroupsOmitEmpty();
         emptyFiltersMatchAll();
+        filteredObjectGroupsFollowDisplayOrder();
+        displayOrderCoversInventoryObjects();
     }
 
 private:
@@ -233,6 +235,47 @@ private:
         const ActiveFilters none {};
         for (const auto& k : TSS::DevSkin::allStructuredKeys())
             expect(keyMatches(skin, k, none));
+    }
+
+    void filteredObjectGroupsFollowDisplayOrder()
+    {
+        beginTest("filteredObjectGroups follows editor descending display order");
+
+        using namespace SkinEditorMappingsColumnFilter;
+        const auto skin = makeSkin();
+        const ActiveFilters none {};
+        const auto groups = filteredObjectGroups(skin, none);
+        const auto& order = mappingsObjectDisplayOrder();
+
+        // Full inventory coverage ⇒ exact display list (append path unused today).
+        expectEquals(static_cast<int>(groups.size()), static_cast<int>(order.size()));
+        for (size_t i = 0; i < groups.size(); ++i)
+            expect(groups[i].object == order[i]);
+    }
+
+    void displayOrderCoversInventoryObjects()
+    {
+        beginTest("mappingsObjectDisplayOrder lists every inventory object once");
+
+        using namespace SkinEditorMappingsColumnFilter;
+        const auto& order = mappingsObjectDisplayOrder();
+        for (size_t i = 0; i < order.size(); ++i)
+            for (size_t j = i + 1; j < order.size(); ++j)
+                expect(order[i] != order[j]);
+
+        for (const auto& key : TSS::DevSkin::allStructuredKeys())
+        {
+            bool listed = false;
+            for (const auto object : order)
+            {
+                if (object == key.object)
+                {
+                    listed = true;
+                    break;
+                }
+            }
+            expect(listed);
+        }
     }
 };
 

@@ -34,6 +34,43 @@ namespace SkinEditorMappingsColumnFilter
         std::vector<TSS::SkinColourKey> keys;
     };
 
+    /**
+     * Editor-only Mappings table order (descending GUI reading).
+     * Independent of SkinObjectType enum ordinals and inventory push order.
+     */
+    inline const std::vector<TSS::SkinObjectType>& mappingsObjectDisplayOrder()
+    {
+        static const std::vector<TSS::SkinObjectType> order {
+            TSS::SkinObjectType::kHeaderPanel,
+            TSS::SkinObjectType::kBodyPanel,
+            TSS::SkinObjectType::kFooterPanel,
+            TSS::SkinObjectType::kFooterMessage,
+            TSS::SkinObjectType::kDialog,
+            TSS::SkinObjectType::kWindowClose,
+            TSS::SkinObjectType::kLed,
+            TSS::SkinObjectType::kEnvelopeDisplay,
+            TSS::SkinObjectType::kTrackGeneratorDisplay,
+            TSS::SkinObjectType::kPatchNameDisplay,
+            TSS::SkinObjectType::kSectionHeader,
+            TSS::SkinObjectType::kModuleHeader,
+            TSS::SkinObjectType::kGroupLabel,
+            TSS::SkinObjectType::kLabel,
+            TSS::SkinObjectType::kSlider,
+            TSS::SkinObjectType::kSliderButtonLike,
+            TSS::SkinObjectType::kComboBox,
+            TSS::SkinObjectType::kComboBoxButtonLike,
+            TSS::SkinObjectType::kPopupMenu,
+            TSS::SkinObjectType::kPopupMenuButtonLike,
+            TSS::SkinObjectType::kNumberBox,
+            TSS::SkinObjectType::kButton,
+            TSS::SkinObjectType::kToggle,
+            TSS::SkinObjectType::kHorizontalSeparator,
+            TSS::SkinObjectType::kDarkPanel,
+            TSS::SkinObjectType::kReadOnlyValueField,
+        };
+        return order;
+    }
+
     inline bool keyMatches(const TSS::DevSkin::NamedSkin& skin,
                            const TSS::SkinColourKey& key,
                            const ActiveFilters& filters)
@@ -56,33 +93,44 @@ namespace SkinEditorMappingsColumnFilter
 
     /**
      * Inventory keys grouped by object under ActiveFilters.
-     * Omits object groups with zero matching keys (empty sections).
+     * Group order follows mappingsObjectDisplayOrder(); unknown inventory objects
+     * append in first-seen inventory order. Omits empty sections.
      */
     inline std::vector<ObjectKeyGroup> filteredObjectGroups(const TSS::DevSkin::NamedSkin& skin,
                                                             const ActiveFilters& filters)
     {
-        std::vector<TSS::SkinObjectType> objectOrder;
         std::map<TSS::SkinObjectType, std::vector<TSS::SkinColourKey>> keysByObject;
         for (const auto& key : TSS::DevSkin::allStructuredKeys())
-        {
-            auto& bucket = keysByObject[key.object];
-            if (bucket.empty())
-                objectOrder.push_back(key.object);
-            bucket.push_back(key);
-        }
+            keysByObject[key.object].push_back(key);
 
         std::vector<ObjectKeyGroup> groups;
-        for (const auto object : objectOrder)
+
+        const auto appendObject = [&](TSS::SkinObjectType object)
         {
+            const auto it = keysByObject.find(object);
+            if (it == keysByObject.end())
+                return;
+
             ObjectKeyGroup group;
             group.object = object;
-            for (const auto& key : keysByObject[object])
+            for (const auto& key : it->second)
             {
                 if (keyMatches(skin, key, filters))
                     group.keys.push_back(key);
             }
+            keysByObject.erase(it);
             if (! group.keys.empty())
                 groups.push_back(std::move(group));
+        };
+
+        for (const auto object : mappingsObjectDisplayOrder())
+            appendObject(object);
+
+        for (const auto& key : TSS::DevSkin::allStructuredKeys())
+        {
+            if (keysByObject.find(key.object) == keysByObject.end())
+                continue;
+            appendObject(key.object);
         }
         return groups;
     }
