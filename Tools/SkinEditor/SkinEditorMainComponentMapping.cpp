@@ -336,6 +336,12 @@ void SkinEditorMainComponent::paintMappingWitnessDecorations(juce::Graphics& g) 
                                               mappingBadgeBounds_,
                                               SkinEditorMappingPolicy::kSameColourBadge,
                                               SkinEditorChrome::danger());
+        else if (mappingWitnessPending_)
+            // Pending Temp: same danger fill as BRIDGE/SAME COLOUR; label stays MAPPING.
+            SkinEditorChrome::drawChromeBadge(g,
+                                              mappingBadgeBounds_,
+                                              "MAPPING",
+                                              SkinEditorChrome::danger());
         else
             SkinEditorChrome::drawMappingModeBadge(g, mappingBadgeBounds_);
     }

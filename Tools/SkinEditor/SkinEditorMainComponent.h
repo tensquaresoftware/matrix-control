@@ -186,6 +186,7 @@ private:
     /** Idle OPERATION hint when editorSkinId is empty. */
     bool operationStartHintActive_ = false;
     bool mappingWitnessShowSwatch_ = false;
+    /** Selected pastille is still pending (empty round swatch in OPERATION witness). */
     bool mappingWitnessPending_ = false;
     /** Held colour RGB already mapped under a different pastille — red SAME COLOUR badge. */
     bool mappingWitnessSameColourCollision_ = false;
