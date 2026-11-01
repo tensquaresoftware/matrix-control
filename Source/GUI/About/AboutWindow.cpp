@@ -46,7 +46,7 @@ void AboutCloseButton::paintButton(juce::Graphics& g,
 {
     jassert(skin_ != nullptr);
     const auto titleBandColour = skin_->getColour(SkinObjectType::kDialog, SkinColourProperty::kTitleBand);
-    const auto crossColour = skin_->getColour(SkinObjectType::kWindowClose, SkinColourProperty::kGlyph);
+    const auto crossColour = skin_->getColour(SkinObjectType::kDialog, SkinColourProperty::kGlyph);
     g.setColour((! isEnabled() || shouldDrawButtonAsDown) ? crossColour.withAlpha(0.6f) : crossColour);
 
     if (shouldDrawButtonAsHighlighted)

@@ -12,7 +12,7 @@ namespace TSS
     ButtonLook buttonAlertLookFromSkin(const ISkin& skin, ColourSet colourSet = ColourSet::k1);
     SliderLook sliderLookFromSkin(const ISkin& skin, ColourSet colourSet = ColourSet::k1);
     LabelLook labelLookFromSkin(const ISkin& skin);
-    LabelLook darkPanelLabelLookFromSkin(const ISkin& skin);
+    LabelLook chromeTextLabelLookFromSkin(const ISkin& skin);
     LabelLook brandLabelLookFromSkin(const ISkin& skin);
     HorizontalSeparatorLook horizontalSeparatorLookFromSkin(const ISkin& skin);
     ComboBoxLook comboBoxLookFromSkin(const ISkin& skin, ColourSet colourSet = ColourSet::k1);

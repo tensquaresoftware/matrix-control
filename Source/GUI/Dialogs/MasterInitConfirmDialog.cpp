@@ -120,7 +120,7 @@ void MasterInitConfirmDialog::paint(juce::Graphics& g)
         .title = title,
         .uiScale = uiScale_ });
 
-    g.setColour(skin_->getColour(SkinObjectType::kDarkPanel, SkinColourProperty::kText));
+    g.setColour(skin_->getColour(SkinObjectType::kChromeText, SkinColourProperty::kText));
     DialogMatrixHelpers::paintBodyText(g, layout.bodyFont, formatBodyText(), geometry.textArea);
     DialogMatrixHelpers::paintActionFooterSeparator({
         .g = g,

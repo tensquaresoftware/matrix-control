@@ -26,7 +26,7 @@ namespace SkinEditorChrome
     inline juce::Colour surfaceTab() { return juce::Colour(0xff323232); }
     inline juce::Colour textPrimary() { return juce::Colour(0xffdddddd); }
     inline juce::Colour textMuted() { return juce::Colour(0xff999999); }
-    /** Plugin logo / DarkPanel text — ColourChart::kGrey200. */
+    /** Plugin logo / ChromeText — ColourChart::kGrey200. */
     inline juce::Colour textBrand() { return juce::Colour(0xffb9b9b9); }
     /** Section titles + table column headers (lighter than textMuted). */
     inline juce::Colour textTableHeader() { return juce::Colour(0xffbcbcbc); }

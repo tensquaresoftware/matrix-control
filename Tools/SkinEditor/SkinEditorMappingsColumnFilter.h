@@ -43,12 +43,13 @@ namespace SkinEditorMappingsColumnFilter
     inline const std::vector<TSS::SkinObjectType>& mappingsObjectDisplayOrder()
     {
         static const std::vector<TSS::SkinObjectType> order {
+            TSS::SkinObjectType::kWindowSurface,
             TSS::SkinObjectType::kHeaderPanel,
             TSS::SkinObjectType::kBodyPanel,
             TSS::SkinObjectType::kFooterPanel,
             TSS::SkinObjectType::kFooterMessage,
             TSS::SkinObjectType::kDialog,
-            TSS::SkinObjectType::kWindowClose,
+            TSS::SkinObjectType::kChromeText,
             TSS::SkinObjectType::kLed,
             TSS::SkinObjectType::kPeakIndicator,
             TSS::SkinObjectType::kEnvelopeDisplay,
@@ -62,11 +63,10 @@ namespace SkinEditorMappingsColumnFilter
             TSS::SkinObjectType::kComboBox,
             TSS::SkinObjectType::kPopupMenu,
             TSS::SkinObjectType::kNumberBox,
+            TSS::SkinObjectType::kReadOnlyValueField,
             TSS::SkinObjectType::kButton,
             TSS::SkinObjectType::kToggle,
             TSS::SkinObjectType::kHorizontalSeparator,
-            TSS::SkinObjectType::kDarkPanel,
-            TSS::SkinObjectType::kReadOnlyValueField,
         };
         return order;
     }

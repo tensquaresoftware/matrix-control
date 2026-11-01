@@ -190,6 +190,7 @@ namespace TSS
     {
         using namespace SkinColours;
 
+        putColour(accessColour, Panels::kWindowSurfaceBackground);
         putColour(accessColour, Panels::kHeaderPanelBackground);
         putColour(accessColour, Panels::kBodyPanelBackground);
         putColour(accessColour, Panels::kFooterPanelBackground);
@@ -198,9 +199,9 @@ namespace TSS
         putColour(accessColour, Panels::kFooterMessageErrorBackground);
         putColour(accessColour, Panels::kDialogBorder);
         putColour(accessColour, Panels::kDialogTitleBand);
-        putColour(accessColour, Panels::kWindowCloseGlyph);
-        putColour(accessColour, Widgets::DarkPanel::kText);
-        putColour(accessColour, Widgets::DarkPanel::kTextHover);
+        putColour(accessColour, Panels::kDialogGlyph);
+        putColour(accessColour, Widgets::ChromeText::kText);
+        putColour(accessColour, Widgets::ChromeText::kTextHover);
         putColour(accessColour, Widgets::FooterMessage::kMessageInfo);
         putColour(accessColour, Widgets::FooterMessage::kMessageWarning);
         putColour(accessColour, Widgets::FooterMessage::kMessageError);

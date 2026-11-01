@@ -59,7 +59,7 @@ void MainComponent::attachLockDimmingFilm(juce::AudioProcessorValueTreeState& ap
 void MainComponent::paint(juce::Graphics& g)
 {
     if (skin_ != nullptr)
-        g.fillAll(skin_->getColour(SkinObjectType::kHeaderPanel, SkinColourProperty::kBackground));
+        g.fillAll(skin_->getColour(SkinObjectType::kWindowSurface, SkinColourProperty::kBackground));
 }
 
 void MainComponent::resized()

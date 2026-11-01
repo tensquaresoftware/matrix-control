@@ -81,18 +81,18 @@ namespace TSS::SkinColours
             };
         }
 
-        namespace DarkPanel
+        namespace ChromeText
         {
-            // Light text on dark Header/Footer/dialog chrome — must not follow Cream body LabelText.
+            // Text on Header/Footer/dialog chrome — must not follow Cream body LabelText.
             inline constexpr ColourElement kText = {
-                skinColourKey(SkinObjectType::kDarkPanel, SkinColourProperty::kText),
+                skinColourKey(SkinObjectType::kChromeText, SkinColourProperty::kText),
                 ColourChart::kGrey200,
                 ColourChart::kGrey200
             };
 
             // Logo / brand hover pastille (absolute White) — Skin-mapped, not widget ColourChart dig.
             inline constexpr ColourElement kTextHover = {
-                skinColourKey(SkinObjectType::kDarkPanel, SkinColourProperty::kText, SkinColourState::kHover),
+                skinColourKey(SkinObjectType::kChromeText, SkinColourProperty::kText, SkinColourState::kHover),
                 ColourChart::kWhite,
                 ColourChart::kWhite
             };

@@ -121,8 +121,8 @@ void AboutPanel::setOnEscapePressed(std::function<void()> callback)
 
 void AboutPanel::refreshHyperlinkAppearance()
 {
-    // White / Orange pastilles reused from DarkPanel text Hover and Module header Orange line.
-    const auto valueColour = skin_->getColour(SkinObjectType::kDarkPanel,
+    // White / Orange pastilles reused from ChromeText Hover and Module header Orange line.
+    const auto valueColour = skin_->getColour(SkinObjectType::kChromeText,
                                               SkinColourProperty::kText,
                                               SkinColourState::kHover);
     const auto labelColour = skin_->getColour(SkinObjectType::kLabel, SkinColourProperty::kText);
@@ -288,7 +288,7 @@ void AboutPanel::paint(juce::Graphics& g)
     auto bounds = getLocalBounds().reduced(padding);
 
     const auto labelColour = skin_->getColour(SkinObjectType::kLabel, SkinColourProperty::kText);
-    const auto valueColour = skin_->getColour(SkinObjectType::kDarkPanel,
+    const auto valueColour = skin_->getColour(SkinObjectType::kChromeText,
                                               SkinColourProperty::kText,
                                               SkinColourState::kHover);
     const auto baseFont = getScaledBodyFont();

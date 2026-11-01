@@ -24,10 +24,10 @@ namespace TSS
         return look;
     }
 
-    LabelLook darkPanelLabelLookFromSkin(const ISkin& skin)
+    LabelLook chromeTextLabelLookFromSkin(const ISkin& skin)
     {
         LabelLook look;
-        look.text = skin.getColour(SkinObjectType::kDarkPanel, SkinColourProperty::kText);
+        look.text = skin.getColour(SkinObjectType::kChromeText, SkinColourProperty::kText);
         look.font = resolvedTypographyFont(skin, TypographyStyleId::kDefault);
         return look;
     }
@@ -35,7 +35,7 @@ namespace TSS
     LabelLook brandLabelLookFromSkin(const ISkin& skin)
     {
         LabelLook look;
-        look.text = skin.getColour(SkinObjectType::kDarkPanel, SkinColourProperty::kText);
+        look.text = skin.getColour(SkinObjectType::kChromeText, SkinColourProperty::kText);
         look.font = skin.getBrandFontBold().withHeight(static_cast<float>(Design::Panels::Header::kLogoFontHeight));
         return look;
     }

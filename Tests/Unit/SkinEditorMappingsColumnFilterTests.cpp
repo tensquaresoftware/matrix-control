@@ -29,6 +29,7 @@ public:
         filteredObjectGroupsFollowDisplayOrder();
         displayOrderCoversInventoryObjects();
         peakIndicatorFollowsLed();
+        chromeDecorrelationDisplayOrder();
         inventoryExpandsOnlyMultiSetObjects();
     }
 
@@ -315,6 +316,40 @@ private:
                 peakIndex = i;
         }
         expectEquals(peakIndex, ledIndex + 1);
+    }
+
+    void chromeDecorrelationDisplayOrder()
+    {
+        beginTest("Chrome order: WindowSurface first, Dialog then ChromeText, ReadOnly near NumberBox");
+
+        using namespace SkinEditorMappingsColumnFilter;
+        const auto& order = mappingsObjectDisplayOrder();
+        expect(! order.empty());
+        expect(order.front() == TSS::SkinObjectType::kWindowSurface);
+
+        int dialogIndex = -1;
+        int chromeTextIndex = -1;
+        int numberBoxIndex = -1;
+        int readOnlyIndex = -1;
+        for (int i = 0; i < static_cast<int>(order.size()); ++i)
+        {
+            const auto object = order[static_cast<size_t>(i)];
+            expect(TSS::DevSkin::toString(object) != "DarkPanel");
+            expect(TSS::DevSkin::toString(object) != "WindowClose");
+            if (object == TSS::SkinObjectType::kDialog)
+                dialogIndex = i;
+            if (object == TSS::SkinObjectType::kChromeText)
+                chromeTextIndex = i;
+            if (object == TSS::SkinObjectType::kNumberBox)
+                numberBoxIndex = i;
+            if (object == TSS::SkinObjectType::kReadOnlyValueField)
+                readOnlyIndex = i;
+        }
+
+        expect(dialogIndex >= 0);
+        expect(chromeTextIndex == dialogIndex + 1);
+        expect(numberBoxIndex >= 0);
+        expectEquals(readOnlyIndex, numberBoxIndex + 1);
     }
 
     void inventoryExpandsOnlyMultiSetObjects()

@@ -54,7 +54,7 @@ namespace
         g.setColour(cartoucheChrome);
         g.fillRect(args.badgeBounds);
 
-        auto look = TSS::darkPanelLabelLookFromSkin(*args.skin);
+        auto look = TSS::chromeTextLabelLookFromSkin(*args.skin);
         look.text = badgeTextColour;
         g.setColour(look.text);
         g.setFont(look.font.withHeight(look.font.getHeight() * args.uiScale).boldened());
@@ -86,21 +86,21 @@ HeaderPanel::HeaderPanel(TSS::ISkin& skin, const HeaderPanelDimensions& dimensio
     , instrumentActivityLed_(dimensions.ledSize, dimensions.ledSize, TSS::ColourSet::k3)
     , keyboardFromLabel_(dimensions.fromKeyboardLabelWidth,
                          dimensions.controlHeight,
-                         TSS::darkPanelLabelLookFromSkin(skin),
+                         TSS::chromeTextLabelLookFromSkin(skin),
                          TSS::LabelConfig{ .text = PluginDisplayNames::HeaderPanel::kFromKeyboardLabel })
     , editorActivityLed_(dimensions.ledSize, dimensions.ledSize, TSS::ColourSet::k3)
     , midiFromLabel_(dimensions.fromSynthLabelWidth,
                      dimensions.controlHeight,
-                     TSS::darkPanelLabelLookFromSkin(skin),
+                     TSS::chromeTextLabelLookFromSkin(skin),
                      TSS::LabelConfig{ .text = PluginDisplayNames::HeaderPanel::kFromSynthLabel })
     , midiToActivityLed_(dimensions.ledSize, dimensions.ledSize, TSS::ColourSet::k3)
     , midiToLabel_(dimensions.toSynthLabelWidth,
                    dimensions.controlHeight,
-                   TSS::darkPanelLabelLookFromSkin(skin),
+                   TSS::chromeTextLabelLookFromSkin(skin),
                    TSS::LabelConfig{ .text = PluginDisplayNames::HeaderPanel::kToSynthLabel })
     , inputGainLabel_(dimensions.inputGainLabelWidth,
                       dimensions.controlHeight,
-                      TSS::darkPanelLabelLookFromSkin(skin),
+                      TSS::chromeTextLabelLookFromSkin(skin),
                       TSS::LabelConfig{ .text = PluginDisplayNames::HeaderPanel::kInputGainLabel })
     , inputGainSlider_(dimensions.inputGainSliderWidth,
                        dimensions.controlHeight,

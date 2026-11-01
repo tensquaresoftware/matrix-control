@@ -225,7 +225,7 @@ juce::Rectangle<int> BankTransferProgressDialog::paintDetailHeader(juce::Graphic
         body.removeFromTop(gap1em);
 
     g.setFont(bodyFont);
-    g.setColour(skin_->getColour(SkinObjectType::kDarkPanel, SkinColourProperty::kText));
+    g.setColour(skin_->getColour(SkinObjectType::kChromeText, SkinColourProperty::kText));
 
     if (detailInline_)
     {
@@ -268,7 +268,7 @@ void BankTransferProgressDialog::paintPhaseLane(juce::Graphics& g, const PhaseLa
     const int barHeight = juce::roundToInt(16.0f * uiScale_);
 
     g.setFont(args.bodyFont);
-    g.setColour(args.enabled ? skin_->getColour(SkinObjectType::kDarkPanel, SkinColourProperty::kText)
+    g.setColour(args.enabled ? skin_->getColour(SkinObjectType::kChromeText, SkinColourProperty::kText)
                              : skin_->getColour(SkinObjectType::kSlider, SkinColourProperty::kText, SkinColourState::kDisabled));
 
     {

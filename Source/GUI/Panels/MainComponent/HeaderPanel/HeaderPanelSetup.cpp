@@ -102,13 +102,13 @@ void HeaderPanel::setSkin(TSS::ISkin& skin)
 {
     skin_ = &skin;
     logo_.setSkin(skin);
-    keyboardFromLabel_.setLook(TSS::darkPanelLabelLookFromSkin(skin));
-    midiFromLabel_.setLook(TSS::darkPanelLabelLookFromSkin(skin));
-    midiToLabel_.setLook(TSS::darkPanelLabelLookFromSkin(skin));
+    keyboardFromLabel_.setLook(TSS::chromeTextLabelLookFromSkin(skin));
+    midiFromLabel_.setLook(TSS::chromeTextLabelLookFromSkin(skin));
+    midiToLabel_.setLook(TSS::chromeTextLabelLookFromSkin(skin));
     editorActivityLed_.setSkin(skin);
     midiToActivityLed_.setSkin(skin);
     instrumentActivityLed_.setSkin(skin);
-    inputGainLabel_.setLook(TSS::darkPanelLabelLookFromSkin(skin));
+    inputGainLabel_.setLook(TSS::chromeTextLabelLookFromSkin(skin));
     inputGainSlider_.setLook(TSS::sliderLookFromSkin(skin, TSS::ColourSet::k3));
     peakIndicator_.setSkin(skin);
     undoButton_.setLook(TSS::buttonLookFromSkin(skin, TSS::ColourSet::k3));

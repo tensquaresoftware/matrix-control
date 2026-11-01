@@ -43,7 +43,7 @@ namespace TSS
     ButtonLook buttonAlertLookFromSkin(const ISkin& skin, ColourSet colourSet)
     {
         // Keep base border colours; only fill/text switch to alert.
-        // Reuse FooterMessage Error pastilles + DarkPanel hover white (no ColourChart dig).
+        // Reuse FooterMessage Error pastilles + ChromeText hover white (no ColourChart dig).
         ButtonLook look = buttonLookFromSkin(skin, colourSet);
         const auto red = skin.getColour(SkinObjectType::kFooterMessage,
                                         SkinColourProperty::kText,
@@ -51,7 +51,7 @@ namespace TSS
         const auto black = skin.getColour(SkinObjectType::kFooterMessage,
                                           SkinColourProperty::kBackground,
                                           SkinColourState::kError);
-        const auto white = skin.getColour(SkinObjectType::kDarkPanel,
+        const auto white = skin.getColour(SkinObjectType::kChromeText,
                                           SkinColourProperty::kText,
                                           SkinColourState::kHover);
 

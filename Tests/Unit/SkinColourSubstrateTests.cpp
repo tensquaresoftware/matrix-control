@@ -39,7 +39,7 @@ public:
 
         assertBodyBackgroundColumns();
         assertCreamDivergentLabelText();
-        assertDarkPanelTextInvariant();
+        assertChromeTextInvariant();
 
         beginTest("patchNameDisplay_secondaryTextIsSolidMappedColour");
 
@@ -72,9 +72,9 @@ public:
 
         assertLedAndPeakPaintLevelEncoding();
 
-        beginTest("logo_hoverUsesDarkPanelTextHover");
+        beginTest("logo_hoverUsesChromeTextHover");
 
-        assertLogoHoverUsesDarkPanelTextHover();
+        assertLogoHoverUsesChromeTextHover();
 
         beginTest("readOnlyValueField_defaultOverrideAndSetSkinReset");
 
@@ -155,7 +155,7 @@ private:
         const auto alertBlack = skin->getColour(SkinObjectType::kFooterMessage,
                                                 SkinColourProperty::kBackground,
                                                 SkinColourState::kError);
-        const auto alertWhite = skin->getColour(SkinObjectType::kDarkPanel,
+        const auto alertWhite = skin->getColour(SkinObjectType::kChromeText,
                                                 SkinColourProperty::kText,
                                                 SkinColourState::kHover);
         expect(alertLook.backgroundOff == alertRed);
@@ -189,14 +189,13 @@ private:
         expect(blackText != creamText);
     }
 
-    void assertDarkPanelTextInvariant()
+    void assertChromeTextInvariant()
     {
-        const auto black = TSS::Skin::create(TSS::Skin::ColourVariant::Black);
         const auto cream = TSS::Skin::create(TSS::Skin::ColourVariant::Cream);
-        const auto blackText = black->getColour(SkinObjectType::kDarkPanel, SkinColourProperty::kText);
-        const auto creamText = cream->getColour(SkinObjectType::kDarkPanel, SkinColourProperty::kText);
-        expect(blackText == juce::Colour(ColourChart::kGrey200));
+        const auto creamText = cream->getColour(SkinObjectType::kChromeText, SkinColourProperty::kText);
         expect(creamText == juce::Colour(ColourChart::kGrey200));
+        expect(TSS::Skin::create(TSS::Skin::ColourVariant::Black)->getColour(
+                   SkinObjectType::kChromeText, SkinColourProperty::kText) == creamText);
         expect(creamText != cream->getColour(SkinObjectType::kLabel, SkinColourProperty::kText));
     }
 
@@ -219,7 +218,7 @@ private:
                == juce::Colour(ColourChart::kGrey525));
         expect(skin->getColour(SkinObjectType::kDialog, SkinColourProperty::kTitleBand)
                == juce::Colour(ColourChart::kBlack));
-        expect(skin->getColour(SkinObjectType::kWindowClose, SkinColourProperty::kGlyph)
+        expect(skin->getColour(SkinObjectType::kDialog, SkinColourProperty::kGlyph)
                == juce::Colour(ColourChart::kRed900));
         expect(skin->getColour(SkinObjectType::kReadOnlyValueField, SkinColourProperty::kBackground)
                == juce::Colour(ColourChart::kGrey700));
@@ -241,8 +240,7 @@ private:
                                SkinColourProperty::kBackground,
                                SkinColourState::kOn)
                == juce::Colour(ColourChart::kEmerald400));
-        // About-reused White / Orange pastilles (DarkPanel text Hover; ModuleHeader Orange line).
-        expect(skin->getColour(SkinObjectType::kDarkPanel,
+        expect(skin->getColour(SkinObjectType::kChromeText,
                                SkinColourProperty::kText,
                                SkinColourState::kHover)
                == juce::Colour(ColourChart::kWhite));
@@ -383,7 +381,7 @@ private:
         expect(peakOff == peakBackgroundOff);
     }
 
-    void assertLogoHoverUsesDarkPanelTextHover()
+    void assertLogoHoverUsesChromeTextHover()
     {
         struct LogoProbe : TSS::Logo
         {
@@ -392,7 +390,7 @@ private:
         };
 
         const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::Black);
-        const auto hover = skin->getColour(SkinObjectType::kDarkPanel,
+        const auto hover = skin->getColour(SkinObjectType::kChromeText,
                                            SkinColourProperty::kText,
                                            SkinColourState::kHover);
         LogoProbe logo(*skin, 80, 24);

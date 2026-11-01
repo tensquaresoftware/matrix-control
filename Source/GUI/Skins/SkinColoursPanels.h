@@ -6,6 +6,13 @@ namespace TSS::SkinColours
 {
     namespace Panels
     {
+        // Under-GUI diagnostic fill (plugin + standalone); normally covered by Header/Body/Footer.
+        inline constexpr ColourElement kWindowSurfaceBackground = {
+            skinColourKey(SkinObjectType::kWindowSurface, SkinColourProperty::kBackground),
+            ColourChart::kBlack,
+            ColourChart::kWhite
+        };
+
         inline constexpr ColourElement kHeaderPanelBackground = {
             skinColourKey(SkinObjectType::kHeaderPanel, SkinColourProperty::kBackground),
             ColourChart::kGrey950,
@@ -59,8 +66,8 @@ namespace TSS::SkinColours
             ColourChart::kBlack
         };
 
-        inline constexpr ColourElement kWindowCloseGlyph = {
-            skinColourKey(SkinObjectType::kWindowClose, SkinColourProperty::kGlyph),
+        inline constexpr ColourElement kDialogGlyph = {
+            skinColourKey(SkinObjectType::kDialog, SkinColourProperty::kGlyph),
             ColourChart::kRed900,
             ColourChart::kRed900
         };

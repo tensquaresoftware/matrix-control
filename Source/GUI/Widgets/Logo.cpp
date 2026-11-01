@@ -59,10 +59,10 @@ namespace TSS
 
         auto look = brandLabelLookFromSkin(*skin_);
         look.text = isHighlighted_
-                        ? skin_->getColour(SkinObjectType::kDarkPanel,
+                        ? skin_->getColour(SkinObjectType::kChromeText,
                                            SkinColourProperty::kText,
                                            SkinColourState::kHover)
-                        : skin_->getColour(SkinObjectType::kDarkPanel, SkinColourProperty::kText);
+                        : skin_->getColour(SkinObjectType::kChromeText, SkinColourProperty::kText);
         setLook(look);
     }
 

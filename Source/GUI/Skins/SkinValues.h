@@ -9,10 +9,11 @@ namespace TSS
     /** Generic UI kind addressed by the skin colour map (no patch or master object types). */
     enum class SkinObjectType
     {
+        kWindowSurface,
         kHeaderPanel,
         kBodyPanel,
         kFooterPanel,
-        kDarkPanel,
+        kChromeText,
         kFooterMessage,
         kSectionHeader,
         kModuleHeader,
@@ -29,7 +30,6 @@ namespace TSS
         kTrackGeneratorDisplay,
         kPatchNameDisplay,
         kDialog,
-        kWindowClose,
         kReadOnlyValueField,
         kLed,
         kPeakIndicator

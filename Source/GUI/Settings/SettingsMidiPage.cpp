@@ -82,15 +82,15 @@ void SettingsMidiPage::updateKeyboardFromVisibility()
 void SettingsMidiPage::setSkin(TSS::ISkin& skin)
 {
     skin_ = &skin;
-    keyboardFromLabel_->setLook(TSS::darkPanelLabelLookFromSkin(skin));
+    keyboardFromLabel_->setLook(TSS::chromeTextLabelLookFromSkin(skin));
     keyboardFromCombo_->setLook(TSS::comboBoxLookFromSkin(skin, TSS::ColourSet::k4));
     keyboardFromCombo_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin, TSS::ColourSet::k4));
     keyboardFromLed_->setSkin(skin);
-    synthFromLabel_->setLook(TSS::darkPanelLabelLookFromSkin(skin));
+    synthFromLabel_->setLook(TSS::chromeTextLabelLookFromSkin(skin));
     synthFromCombo_->setLook(TSS::comboBoxLookFromSkin(skin, TSS::ColourSet::k4));
     synthFromCombo_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin, TSS::ColourSet::k4));
     synthFromLed_->setSkin(skin);
-    synthToLabel_->setLook(TSS::darkPanelLabelLookFromSkin(skin));
+    synthToLabel_->setLook(TSS::chromeTextLabelLookFromSkin(skin));
     synthToCombo_->setLook(TSS::comboBoxLookFromSkin(skin, TSS::ColourSet::k4));
     synthToCombo_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin, TSS::ColourSet::k4));
     synthToLed_->setSkin(skin);
@@ -251,7 +251,7 @@ std::unique_ptr<TSS::Label> SettingsMidiPage::makeLabel(TSS::ISkin& skin, const 
 {
     auto label = std::make_unique<TSS::Label>(SettingsShellMetrics::kLabelWidth,
                                               SettingsShellMetrics::kControlHeight,
-                                              TSS::darkPanelLabelLookFromSkin(skin),
+                                              TSS::chromeTextLabelLookFromSkin(skin),
                                               TSS::LabelConfig{ .text = text });
     addAndMakeVisible(*label);
     return label;

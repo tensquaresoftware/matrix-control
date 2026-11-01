@@ -12,10 +12,11 @@ namespace TSS::DevSkin
         };
 
         constexpr Named<SkinObjectType> kObjects[] = {
+            { SkinObjectType::kWindowSurface, "WindowSurface" },
             { SkinObjectType::kHeaderPanel, "HeaderPanel" },
             { SkinObjectType::kBodyPanel, "BodyPanel" },
             { SkinObjectType::kFooterPanel, "FooterPanel" },
-            { SkinObjectType::kDarkPanel, "DarkPanel" },
+            { SkinObjectType::kChromeText, "ChromeText" },
             { SkinObjectType::kFooterMessage, "FooterMessage" },
             { SkinObjectType::kSectionHeader, "SectionHeader" },
             { SkinObjectType::kModuleHeader, "ModuleHeader" },
@@ -32,7 +33,6 @@ namespace TSS::DevSkin
             { SkinObjectType::kTrackGeneratorDisplay, "TrackGeneratorDisplay" },
             { SkinObjectType::kPatchNameDisplay, "PatchNameDisplay" },
             { SkinObjectType::kDialog, "Dialog" },
-            { SkinObjectType::kWindowClose, "WindowClose" },
             { SkinObjectType::kReadOnlyValueField, "ReadOnlyValueField" },
             { SkinObjectType::kLed, "Led" },
             { SkinObjectType::kPeakIndicator, "PeakIndicator" },
@@ -142,6 +142,18 @@ namespace TSS::DevSkin
         if (text.equalsIgnoreCase("PopupMenuButtonLike"))
         {
             out = SkinObjectType::kPopupMenu;
+            return true;
+        }
+
+        // Legacy chrome object names (pre skin-chrome decorrelation).
+        if (text.equalsIgnoreCase("DarkPanel"))
+        {
+            out = SkinObjectType::kChromeText;
+            return true;
+        }
+        if (text.equalsIgnoreCase("WindowClose"))
+        {
+            out = SkinObjectType::kDialog;
             return true;
         }
 

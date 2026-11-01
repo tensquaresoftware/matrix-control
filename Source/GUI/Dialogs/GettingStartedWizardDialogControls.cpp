@@ -15,8 +15,8 @@ using GettingStartedWizard::Step;
 void GettingStartedWizardDialog::buildStepControls(TSS::ISkin& skin)
 {
     const auto popupMode = TSS::ComboBox::PopupMode::Scrollable;
-    // Dark-panel label colour — Matrix chrome body is always a dark plate.
-    const auto labelLook = TSS::darkPanelLabelLookFromSkin(skin);
+    // Chrome text on Matrix chrome body (wizard plate), not body Label colours.
+    const auto labelLook = TSS::chromeTextLabelLookFromSkin(skin);
     const auto comboLook = TSS::comboBoxLookFromSkin(skin, TSS::ColourSet::k4);
     const auto popupLook = TSS::popupMenuLookFromSkin(skin, TSS::ColourSet::k4);
 
@@ -78,7 +78,7 @@ void GettingStartedWizardDialog::populateScaleAndSkinItems()
 
 void GettingStartedWizardDialog::applyControlLooks(TSS::ISkin& skin)
 {
-    const auto labelLook = TSS::darkPanelLabelLookFromSkin(skin);
+    const auto labelLook = TSS::chromeTextLabelLookFromSkin(skin);
     const auto comboLook = TSS::comboBoxLookFromSkin(skin, TSS::ColourSet::k4);
     const auto popupLook = TSS::popupMenuLookFromSkin(skin, TSS::ColourSet::k4);
 

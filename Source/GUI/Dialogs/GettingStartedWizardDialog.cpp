@@ -254,7 +254,7 @@ void GettingStartedWizardDialog::paint(juce::Graphics& g)
     });
 
     const auto bodyFont = DialogMatrixHelpers::scaledModalBodyFont(*skin_, uiScale_);
-    g.setColour(skin_->getColour(SkinObjectType::kDarkPanel, SkinColourProperty::kText));
+    g.setColour(skin_->getColour(SkinObjectType::kChromeText, SkinColourProperty::kText));
     DialogMatrixHelpers::paintBodyText(g, bodyFont, bodyText(), geometry.textArea);
 
     DialogMatrixHelpers::paintActionFooterSeparator({

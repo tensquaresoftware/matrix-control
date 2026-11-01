@@ -610,6 +610,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/ModuleHeaderTitleColourTests.cpp
         Tests/Unit/NumberBoxDisabledBackgroundColourTests.cpp
         Tests/Unit/SkinColourSubstrateTests.cpp
+        Tests/Unit/SkinChromeDecorrelationTests.cpp
         Tests/Unit/SkinColourWiringTests.cpp
         Tests/Unit/SkinColourWiringCoverageTests.cpp
         Tests/Unit/ColourSetModelTests.cpp

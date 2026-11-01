@@ -1,5 +1,20 @@
 # Deferred Work
 
+## Deferred from: review of spec-skin-chrome-decorrelation.md (2026-11-01)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-chrome-decorrelation.md`
+  summary: No unit pin that PluginEditor/MainComponent paint fillAll reads WindowSurface Background (seed distinctness alone stays green if fill reverts to HeaderPanel).
+  evidence: Verification-gap + Blind Hunter; repo does not unit-test editor paint paths; manual layout-gap smoke remains.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-chrome-decorrelation.md`
+  summary: No unit pin that Settings/About close buttons read Dialog Glyph (seed Glyph assert alone stays green if crossColour points elsewhere).
+  evidence: Verification-gap; close-button paint not covered by unit suite; manual Settings/About smoke remains.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-chrome-decorrelation.md`
+  summary: Import last-wins if a Dev JSON carries both legacy WindowClose/DarkPanel and new Dialog/ChromeText rows for the same key after remap.
+  evidence: Edge Case Hunter maybe-false; pre-existing mappings[key]= assignment; settle by crafting dual-row JSON fixture if authors hit it.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-chrome-decorrelation.md`
+  summary: Historical `_bmad-output` / agent notes may still name DarkPanel or WindowClose and mislead later work.
+  evidence: Blind Hunter; docs/agent-context outside this chrome rename blast radius.
+
 ## Deferred from: code review of spec-skin-colourset-model-and-editor.md (2026-11-01)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-skin-colourset-model-and-editor.md`

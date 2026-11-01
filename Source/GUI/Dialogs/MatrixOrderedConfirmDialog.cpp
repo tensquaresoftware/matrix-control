@@ -203,7 +203,7 @@ void MatrixOrderedConfirmDialog::paint(juce::Graphics& g)
         .title = title_,
         .uiScale = uiScale_ });
 
-    g.setColour(skin_->getColour(SkinObjectType::kDarkPanel, SkinColourProperty::kText));
+    g.setColour(skin_->getColour(SkinObjectType::kChromeText, SkinColourProperty::kText));
 
     if (! valueRows_.empty())
         paintValueRows(g, layout);
@@ -272,7 +272,7 @@ MatrixMutatorDeleteConfirmDialog::MatrixMutatorDeleteConfirmDialog(TSS::ISkin& s
     setInterceptsMouseClicks(true, true);
     setWantsKeyboardFocus(true);
 
-    const auto textColour = skin.getColour(SkinObjectType::kDarkPanel, SkinColourProperty::kText);
+    const auto textColour = skin.getColour(SkinObjectType::kChromeText, SkinColourProperty::kText);
     toggleLook_.setUiScale(uiScale);
     toggleLook_.setLabelFont(DialogMatrixHelpers::scaledModalBodyFont(skin, uiScale));
     dontAskAgain_.setLookAndFeel(&toggleLook_);
@@ -342,7 +342,7 @@ void MatrixMutatorDeleteConfirmDialog::paint(juce::Graphics& g)
         .title = Dialog::kTitle,
         .uiScale = uiScale_ });
 
-    g.setColour(skin_->getColour(SkinObjectType::kDarkPanel, SkinColourProperty::kText));
+    g.setColour(skin_->getColour(SkinObjectType::kChromeText, SkinColourProperty::kText));
     DialogMatrixHelpers::paintBodyText(g, layout.bodyFont, Dialog::kBody, geometry.textArea);
     DialogMatrixHelpers::paintActionFooterSeparator({
         .g = g,

@@ -9,6 +9,7 @@ namespace TSS::DevSkin
         void appendPanels(std::vector<const SkinColours::ColourElement*>& out)
         {
             using namespace SkinColours;
+            out.push_back(&Panels::kWindowSurfaceBackground);
             out.push_back(&Panels::kHeaderPanelBackground);
             out.push_back(&Panels::kBodyPanelBackground);
             out.push_back(&Panels::kFooterPanelBackground);
@@ -17,9 +18,9 @@ namespace TSS::DevSkin
             out.push_back(&Panels::kFooterMessageErrorBackground);
             out.push_back(&Panels::kDialogBorder);
             out.push_back(&Panels::kDialogTitleBand);
-            out.push_back(&Panels::kWindowCloseGlyph);
-            out.push_back(&Widgets::DarkPanel::kText);
-            out.push_back(&Widgets::DarkPanel::kTextHover);
+            out.push_back(&Panels::kDialogGlyph);
+            out.push_back(&Widgets::ChromeText::kText);
+            out.push_back(&Widgets::ChromeText::kTextHover);
             out.push_back(&Widgets::FooterMessage::kMessageInfo);
             out.push_back(&Widgets::FooterMessage::kMessageWarning);
             out.push_back(&Widgets::FooterMessage::kMessageError);
