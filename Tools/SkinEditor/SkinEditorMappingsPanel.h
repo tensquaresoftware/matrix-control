@@ -137,6 +137,7 @@ private:
                                   FilterColumn column,
                                   const juce::StringArray& values);
     void layoutLegendHitTargets();
+    void layoutGlobalClearBounds();
     void clearLegendHitTargets();
 
     // Paint
@@ -192,7 +193,7 @@ private:
     int unboundCount_ = 0;
     juce::Rectangle<int> unboundLabelBounds_;
     juce::Rectangle<int> unboundBadgeBounds_;
-    /** Global clear-all filters badge (action row); empty when no filter active. */
+    /** Global clear-all filters badge (legend-row gutter); empty when no filter active. */
     juce::Rectangle<int> globalClearBounds_;
     /** Empty = filter off. Mapped colour may be the literal "Unbound". */
     juce::String propertyFilter_;

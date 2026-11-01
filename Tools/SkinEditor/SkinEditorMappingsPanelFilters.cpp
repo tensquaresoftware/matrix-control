@@ -272,6 +272,7 @@ void SkinEditorMappingsPanel::clearLegendHitTargets()
     colourSetClearBounds_ = {};
     mappedLabelBounds_ = {};
     mappedClearBounds_ = {};
+    globalClearBounds_ = {};
 }
 
 void SkinEditorMappingsPanel::layoutLegendHitTargets()
@@ -326,6 +327,23 @@ void SkinEditorMappingsPanel::layoutLegendHitTargets()
           mappedLabelBounds_,
           mappedClearBounds_,
           mappedColourFilter_.isNotEmpty());
+
+    layoutGlobalClearBounds();
+}
+
+void SkinEditorMappingsPanel::layoutGlobalClearBounds()
+{
+    // Gutter right of the dark legend (above the scroll track), same row as column clears.
+    if (! anyColumnFilterActive() || stickyLegendBounds_.isEmpty())
+        return;
+
+    const auto area = stickyLegendBounds_;
+    const int badgeW = SkinEditorChrome::clearBadgeWidth();
+    const int gutterLeft = area.getRight();
+    const int gutterRight = viewport_.getRight();
+    const int clearX = gutterLeft + juce::jmax(0, (gutterRight - gutterLeft - badgeW) / 2);
+    if (clearX + badgeW <= gutterRight)
+        globalClearBounds_ = { clearX, area.getY(), badgeW, area.getHeight() };
 }
 
 void SkinEditorMappingsPanel::paintStickyLegend(juce::Graphics& g, juce::Rectangle<int> area) const

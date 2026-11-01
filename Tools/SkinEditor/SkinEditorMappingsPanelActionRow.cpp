@@ -80,16 +80,6 @@ void SkinEditorMappingsPanel::layoutActionRow(juce::Rectangle<int> actions, int 
     unboundBadgeBounds_ = { unboundLeft + unboundLabelW + kUnboundBadgeGap,
                             actions.getY(), badgeW, actions.getHeight() };
 
-    // Global clear: right edge flush with sticky legend / dark header (tableX + tableW).
-    globalClearBounds_ = {};
-    if (anyColumnFilterActive())
-    {
-        const int clearW = SkinEditorChrome::clearBadgeWidth();
-        const int clearX = tableX + tableW - clearW;
-        if (clearX >= unboundBadgeBounds_.getRight() + SkinEditorChrome::kButtonGap)
-            globalClearBounds_ = { clearX, actions.getY(), clearW, actions.getHeight() };
-    }
-
     // Object combo fixed width, then gap, then Hold — Unbound stays on Mapped colour.
     const int comboMax = juce::jmax(0, unboundLeft - SkinEditorChrome::kButtonGap - actionRow.getX());
     const int comboW = juce::jmin(SkinEditorChrome::kObjectComboWidth, comboMax);

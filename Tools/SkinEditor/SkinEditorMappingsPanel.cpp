@@ -376,7 +376,6 @@ void SkinEditorMappingsPanel::layoutShellEmpty(juce::Rectangle<int> content)
     holdColourToggle_.setBounds({});
     unboundLabelBounds_ = {};
     unboundBadgeBounds_ = {};
-    globalClearBounds_ = {};
     stickyBandBounds_ = {};
     stickyLegendBounds_ = {};
     clearLegendHitTargets();
