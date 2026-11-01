@@ -183,42 +183,6 @@ const juce::String& SkinEditorMappingsPanel::filterValue(FilterColumn column) co
     return propertyFilter_;
 }
 
-void SkinEditorMappingsPanel::clearAllColumnFilters()
-{
-    propertyFilter_.clear();
-    stateFilter_.clear();
-    colourSetFilter_.clear();
-    mappedColourFilter_.clear();
-}
-
-bool SkinEditorMappingsPanel::anyColumnFilterActive() const noexcept
-{
-    return propertyFilter_.isNotEmpty()
-        || stateFilter_.isNotEmpty()
-        || colourSetFilter_.isNotEmpty()
-        || mappedColourFilter_.isNotEmpty();
-}
-
-void SkinEditorMappingsPanel::clearColumnFilter(FilterColumn column)
-{
-    filterValue(column).clear();
-    refresh();
-}
-
-void SkinEditorMappingsPanel::setColumnFilter(FilterColumn column, const juce::String& value)
-{
-    auto& slot = filterValue(column);
-    if (slot == value)
-        return;
-    slot = value;
-    refresh();
-}
-
-void SkinEditorMappingsPanel::setMappedColourFilter(const juce::String& pastilleName)
-{
-    setColumnFilter(FilterColumn::kMappedColour, pastilleName);
-}
-
 juce::StringArray SkinEditorMappingsPanel::presentValuesFor(FilterColumn column) const
 {
     const auto* skin = (layer_ != nullptr && skinId_.isNotEmpty())
