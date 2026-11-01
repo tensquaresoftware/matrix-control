@@ -135,3 +135,25 @@ Prefer `*LookFromSkin(skin, colourSet)` at call sites; widgets that rebuild look
 **Manual checks:**
 - Plugin Black then Cream: Header leds+peak, Patch classic control, Master control, Settings ButtonLike / latency — unchanged at a glance.
 - Optional Dev skin with divergent sets: Header vs Settings Peak/Led diverge without merging types.
+
+### Review Findings
+
+- [x] [Review][Decision] How deep should ColourSet call-site tests go? — Resolved: option 2 — harden targeted widget/LookBuilder asserts without mounting Header/Settings/Computer Patches panels. Residual call-site risk on those panels accepted for this wave.
+- [x] [Review][Patch] Assert ParameterCell actually stamps slider/combo looks with the module ColourSet (not only getColourSet with ParameterType::None) [Tests/Unit/SkinColourWiringTests.cpp]
+- [x] [Review][Patch] Assert ModuleHeader MasterEdit Init/Copy/Paste use ColourSet k2 (and non-Master k1) on create / skin refresh [Source/GUI/Widgets/ModuleHeader.cpp]
+- [x] [Review][Patch] Assert moduleHeaderLookFromSkin textFocus resolves NumberBox focus at k4 with distinct pastilles [Tests/Unit/SkinColourWiringCoverageTests.cpp]
+- [x] [Review][Patch] Assert ReadOnlyValueField constructed at k4 applies that set (and preserves it across setSkin) [Tests/Unit/SkinColourWiringCoverageTests.cpp]
+
+#### Rejected
+
+- WidgetFactory sliders/combos lack ColourSet arg — false — ParameterCell stamps looks after create; Matrix Modulation factory path correctly stays default k1.
+- BaseModulePanel never touched — false — Patch/Master classic colours flow through ParameterCell; k1 defaults cover Patch-side modules without BaseModulePanel edits.
+- HierarchicalComboBox / Patch Mutator unwired — false — call sites use LookBuilders default k1, matching the zone map.
+- Led/Peak/ROVF setColourSet unused in product — false — Always allows store on widget or owner re-pass; ctor + setSkin paths cover product use.
+- buttonAlertLookFromSkin FooterMessage/DarkPanel ignore ColourSet — false — alert pastilles are shared k1-only chrome by design.
+- GettingStarted applyControlLooks skips device field — false — setSkin + refreshDeviceValueField already run.
+- Spec Change Log empty / Code Map still cites Skin.cpp — rejected — would edit the spec under review.
+- resolvedTypographyFont duplicated across LookBuilders TUs — low — extract adds surface; no everyday harm while heights stay in sync.
+- Panic comment “value-pressure” vs queue-pressure API — low — comment-only; not worth a wiring patch.
+- Black/Cream smoke covers only slider + Peak — low — seeds still identical; expanding smoke unlikely to catch a real regression this wave.
+- ReadOnlyValueField::setColourSet resets error/custom colours — low — no product caller; fix would add branches for an unused path.

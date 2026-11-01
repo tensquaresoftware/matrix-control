@@ -11,6 +11,7 @@
 #include "GUI/Skins/SkinValues.h"
 
 class WidgetFactory;
+class SkinColourWiringTests;
 
 namespace TSS
 {
@@ -95,8 +96,11 @@ namespace TSS
         Button* getInitButton() const { return initButton_.get(); }
         Button* getCopyButton() const { return copyButton_.get(); }
         Button* getPasteButton() const { return pasteButton_.get(); }
+        ColourSet getButtonColourSet() const noexcept { return buttonColourSet_; }
 
     private:
+        friend class ::SkinColourWiringTests;
+
         enum class Presentation
         {
             TitleOnly,

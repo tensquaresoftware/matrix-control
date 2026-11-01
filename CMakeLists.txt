@@ -611,6 +611,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/NumberBoxDisabledBackgroundColourTests.cpp
         Tests/Unit/SkinColourSubstrateTests.cpp
         Tests/Unit/SkinColourWiringTests.cpp
+        Tests/Unit/SkinColourWiringCoverageTests.cpp
         Tests/Unit/ColourSetModelTests.cpp
         Tests/Unit/DevSkinLayerJsonTests.cpp
         Tests/Unit/DevSkinMatrixTests.cpp
@@ -726,9 +727,13 @@ if(MATRIX_BUILD_TESTS)
         Source/GUI/Widgets/Label.cpp
         Source/GUI/Widgets/Led.cpp
         Source/GUI/Widgets/Logo.cpp
+        Source/GUI/Widgets/ModuleHeader.cpp
+        Source/GUI/Widgets/ModuleHeaderTitleClick.cpp
         Source/GUI/Widgets/MultiColumnPopupMenu.cpp
         Source/GUI/Widgets/ParameterCell.cpp
         Source/GUI/Widgets/PeakIndicator.cpp
+        Source/GUI/Helpers/ClipboardFeedbackButtonBinding.cpp
+        Source/GUI/Helpers/GrayedControlHelper.cpp
         Source/GUI/Widgets/PopupMenuBase.cpp
         Source/GUI/Widgets/PopupMenuCustomScrollBar.cpp
         Source/GUI/Widgets/PopupMenuOutsideDismissWatcher.cpp

@@ -6,6 +6,8 @@
 #include "GUI/Skins/SkinValues.h"
 
 class SkinColourSubstrateTests;
+class SkinColourWiringTests;
+class SkinColourWiringCoverageTests;
 
 namespace TSS
 {
@@ -82,6 +84,8 @@ namespace TSS
 
     private:
         friend class ::SkinColourSubstrateTests;
+        friend class ::SkinColourWiringTests;
+        friend class ::SkinColourWiringCoverageTests;
 
         void applyDefaultColoursFromSkin()
         {

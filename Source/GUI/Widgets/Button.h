@@ -4,6 +4,8 @@
 
 #include "GUI/Looks/WidgetLooks.h"
 
+class SkinColourWiringTests;
+
 namespace TSS
 {
     class Button : public juce::Button
@@ -23,6 +25,8 @@ namespace TSS
         int getHeight() const { return height_; }
 
     private:
+        friend class ::SkinColourWiringTests;
+
         inline constexpr static int kBorderThickness_ = 2;
 
         ButtonLook look_{};
