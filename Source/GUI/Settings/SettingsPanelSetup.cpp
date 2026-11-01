@@ -23,7 +23,7 @@ std::unique_ptr<TSS::ComboBox> SettingsPanel::makeCombo(TSS::ISkin& skin, int wi
     return std::make_unique<TSS::ComboBox>(width,
                                            kControlHeight_,
                                            TSS::comboBoxLookFromSkin(skin, TSS::ColourSet::k4),
-                                           TSS::ComboBox::Style::ButtonLike);
+                                           TSS::ComboBox::PopupMode::Scrollable);
 }
 
 std::unique_ptr<TSS::Button> SettingsPanel::makeButton(TSS::ISkin& skin, int width, const juce::String& text)
@@ -75,7 +75,7 @@ void SettingsPanel::setupDeviceSection(TSS::ISkin& skin)
     hardwareLatencySlider_ = std::make_unique<TSS::Slider>(
         kSliderWidth_,
         kControlHeight_,
-        TSS::sliderLookButtonLikeFromSkin(skin, TSS::ColourSet::k4),
+        TSS::sliderLookFromSkin(skin, TSS::ColourSet::k4),
         TSS::SliderConfig{
             .minValue = Core::HardwareLatency::kMinMs,
             .maxValue = Core::HardwareLatency::kMaxMs,
@@ -261,7 +261,7 @@ void SettingsPanel::applyChildLooks(TSS::ISkin& skin)
     presenceCheckLabel_->setLook(labelLook);
     presenceCheckCombo_->setLook(comboLook);
     hardwareLatencyLabel_->setLook(labelLook);
-    hardwareLatencySlider_->setLook(TSS::sliderLookButtonLikeFromSkin(skin, TSS::ColourSet::k4));
+    hardwareLatencySlider_->setLook(TSS::sliderLookFromSkin(skin, TSS::ColourSet::k4));
     epromTypeLabel_->setLook(labelLook);
     epromTypeCombo_->setLook(comboLook);
 

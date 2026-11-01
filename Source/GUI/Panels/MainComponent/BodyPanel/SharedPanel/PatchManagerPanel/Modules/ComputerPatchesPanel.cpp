@@ -142,7 +142,6 @@ void ComputerPatchesPanel::refreshNavigationFocusHighlight()
     if (navigationFocus == PluginIDs::PatchManagerSection::NavigationFocus::kComputer)
     {
         const auto focusColour = skin_->getColour(TSS::SkinObjectType::kNumberBox, TSS::SkinColourProperty::kText, TSS::SkinColourState::kFocus, TSS::ColourSet::k4);
-        look.buttonLikeText = focusColour;
         look.textEnabled = focusColour;
     }
 
@@ -430,7 +429,7 @@ void ComputerPatchesPanel::setupSelectPatchFileComboBox(TSS::ISkin& skin)
         dims_.comboBoxes.patchManagerComputerPatchesWidth,
         dims_.buttons.height,
         TSS::comboBoxLookFromSkin(skin, TSS::ColourSet::k4),
-        TSS::ComboBox::Style::ButtonLike);
+        TSS::ComboBox::PopupMode::Scrollable);
     selectPatchFileComboBox_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin, TSS::ColourSet::k4));
     selectPatchFileComboBox_->onChange = [this] { handleSelectPatchFileChanged(); };
     // Same-id popup pick: JUCE skips onChange; reclaim like the module header.

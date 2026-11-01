@@ -26,8 +26,8 @@ namespace TSS
         , onSettingsRequested_(std::move(config.onSettingsRequested))
         , onAboutRequested_(std::move(config.onAboutRequested))
         , contextualHelpBinder_(config.contextualHelpBinder)
-        , look_(popupMenuLookFromSkin(skin))
-        , renderer_(std::make_unique<PopupMenuRenderer>(true, uiScale_))
+        , look_(popupMenuLookFromSkin(skin, ColourSet::k4))
+        , renderer_(std::make_unique<PopupMenuRenderer>(uiScale_))
         , cachedFont_(look_.font.withHeight(look_.font.getHeight() * uiScale_))
     {
         renderer_->setLook(look_);
@@ -285,11 +285,11 @@ namespace TSS
     void HeaderLogoPopupMenu::drawItems(juce::Graphics& g, const juce::Rectangle<float>& contentBounds)
     {
         const float separatorWidth = getSeparatorWidth();
-        renderer_->drawVerticalSeparators(g,
-                                          contentBounds,
-                                          kColumnCount_,
-                                          getColumnWidth(0),
-                                          separatorWidth);
+        renderer_->drawVerticalSeparators(g, {
+            .contentBounds = contentBounds,
+            .columnCount = kColumnCount_,
+            .actualColumnWidth = getColumnWidth(0),
+            .separatorWidth = separatorWidth});
 
         const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
         const ItemDrawMetrics metrics{
@@ -315,7 +315,7 @@ namespace TSS
 
         if (item.kind == ItemKind::HorizontalRule)
         {
-            g.setColour(look_.borderButtonLike);
+            g.setColour(look_.border);
             g.fillRect(itemBounds.withSizeKeepingCentre(itemBounds.getWidth(), metrics.ruleThickness));
             return;
         }
@@ -326,13 +326,13 @@ namespace TSS
 
         if ((isHighlighted || isSelected) && ! isSectionHeader)
         {
-            g.setColour(look_.backgroundHoverButtonLike);
+            g.setColour(look_.backgroundHover);
             g.fillRect(itemBounds.reduced(metrics.highlightGap));
         }
 
-        auto textColour = isSectionHeader ? look_.textDisabledButtonLike : look_.textButtonLike;
+        auto textColour = isSectionHeader ? look_.textDisabled : look_.text;
         if ((isHighlighted || isSelected) && ! isSectionHeader)
-            textColour = look_.textHoverButtonLike;
+            textColour = look_.textHover;
 
         g.setColour(textColour);
         g.setFont(cachedFont_);

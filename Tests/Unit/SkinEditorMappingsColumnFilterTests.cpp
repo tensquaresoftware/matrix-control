@@ -319,7 +319,7 @@ private:
 
     void inventoryExpandsOnlyMultiSetObjects()
     {
-        beginTest("All twelve multi-set objects have k1-k4; remaining objects stay k1");
+        beginTest("All nine multi-set objects have k1-k4; remaining objects stay k1");
 
         const auto inventory = TSS::DevSkin::allStructuredKeys();
 

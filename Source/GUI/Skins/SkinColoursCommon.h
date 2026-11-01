@@ -16,7 +16,7 @@ namespace TSS::SkinColours
 
     namespace Common
     {
-        // Shared disabled defaults. Buttons/toggles/ButtonLike use Grey950 backgrounds and
+        // Shared disabled defaults. Buttons/toggles use Grey950 backgrounds and
         // enabled-border colours locally; standard combos and slider fill use Grey800 here.
         static constexpr juce::uint32 kBackgroundDisabled = ColourChart::kGrey800;
         static constexpr juce::uint32 kBorderDisabled = ColourChart::kGrey700;

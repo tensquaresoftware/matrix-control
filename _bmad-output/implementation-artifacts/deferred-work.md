@@ -3004,3 +3004,15 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-descending-order.md`
   summary: Add automated coverage for Object combo A-Z ordering and id-to-table-index jump (today covered by manual smoke only).
   evidence: Blind Hunter; ComboBox wiring lives in SkinEditorMappingsPanel Component code; extracting a pure sort/id helper would expand beyond this display-order oneshot.
+
+## Deferred from: review of spec-unify-combobox-slider-buttonlike.md (2026-11-01)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-unify-combobox-slider-buttonlike.md`
+  summary: Factor the duplicated former-ButtonLike k4 overlay inventory shared by Skin.cpp and DevSkinSsotSeed.cpp.
+  evidence: Blind Hunter; both paths already reference the same ColourElement symbols, but the call lists can drift; extracting a shared helper adds surface beyond a trivial patch.
+- source_spec: `_bmad-output/implementation-artifacts/spec-unify-combobox-slider-buttonlike.md`
+  summary: Decide merge policy when a Dev JSON contains both classic and remapped *ButtonLike rows for the same key at k4 with different pastilles (last-write-wins today).
+  evidence: Edge Case Hunter; force-k4 remap stops wiping classic k1–k3; same-key collision at k4 remains rare for authored skins.
+- source_spec: `_bmad-output/implementation-artifacts/spec-unify-combobox-slider-buttonlike.md`
+  summary: Add a dedicated HeaderLogoPopupMenu k4 Look consumer test if panel/menu mounts become a project testing pattern.
+  evidence: Verification Gap; current coverage follows GPC 3 Look-builder/seed asserts without mounting the logo menu.

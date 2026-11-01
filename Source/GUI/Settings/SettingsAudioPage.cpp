@@ -310,7 +310,7 @@ std::unique_ptr<TSS::ComboBox> SettingsAudioPage::makeCombo(TSS::ISkin& skin)
         SettingsShellMetrics::kControlColumnWidth,
         SettingsShellMetrics::kControlHeight,
         TSS::comboBoxLookFromSkin(skin, TSS::ColourSet::k4),
-        TSS::ComboBox::Style::ButtonLike);
+        TSS::ComboBox::PopupMode::Scrollable);
     combo->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin, TSS::ColourSet::k4));
     addAndMakeVisible(*combo);
     return combo;

@@ -19,7 +19,7 @@ public:
     {
         using namespace TSS::SkinColours::Widgets;
 
-        beginTest("disabledBackground_matchesButtonLikeAndButtonGrey1");
+        beginTest("disabledBackground_matchesButtonAndComboBoxK4Grey950");
 
         expect(NumberBox::kBackgroundDisabled.blackVariant == ColourChart::kGrey950);
         expect(NumberBox::kBackgroundDisabled.creamVariant == ColourChart::kGrey950);
@@ -28,9 +28,9 @@ public:
         expect(NumberBox::kBackgroundDisabled.creamVariant
                == Button::kBackgroundDisabled.creamVariant);
         expect(NumberBox::kBackgroundDisabled.blackVariant
-               == ComboBoxButtonLike::kBackgroundDisabled.blackVariant);
+               == ComboBoxK4::kBackgroundDisabled.blackVariant);
         expect(NumberBox::kBackgroundDisabled.creamVariant
-               == ComboBoxButtonLike::kBackgroundDisabled.creamVariant);
+               == ComboBoxK4::kBackgroundDisabled.creamVariant);
 
         beginTest("enabledBackground_isBlack");
 

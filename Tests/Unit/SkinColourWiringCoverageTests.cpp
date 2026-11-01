@@ -1,6 +1,7 @@
 #include <juce_core/juce_core.h>
 
 #include "GUI/Looks/LookBuilders.h"
+#include "GUI/Skins/ColourChart.h"
 #include "GUI/Skins/Skin.h"
 #include "GUI/Skins/SkinValues.h"
 #include "GUI/Widgets/ReadOnlyValueField.h"
@@ -27,15 +28,15 @@ public:
         beginTest("readOnlyValueField_k4ConstructionAndSetSkin");
         assertReadOnlyValueFieldK4ConstructionAndSetSkin();
 
-        beginTest("settingsAndComputerPatches_buttonLikeAndNumberBoxUseK4");
+        beginTest("settingsAndComputerPatches_sliderComboAndNumberBoxUseK4");
         assertSettingsAndComputerPatchesUseK4();
 
         beginTest("headerInputGain_sliderUsesK3");
         assertHeaderInputGainSliderUsesK3();
 
-        beginTest("blackCream_identicalSeedKeepsLooksAcrossSets");
-        assertBlackCreamIdenticalSeedLooksAcrossSets(TSS::Skin::ColourVariant::Black);
-        assertBlackCreamIdenticalSeedLooksAcrossSets(TSS::Skin::ColourVariant::Cream);
+        beginTest("blackCream_k1ToK3Match_andSliderComboPopupK4CarryFormerButtonLike");
+        assertBlackCreamSeedLooksAfterUnify(TSS::Skin::ColourVariant::Black);
+        assertBlackCreamSeedLooksAfterUnify(TSS::Skin::ColourVariant::Cream);
     }
 
 private:
@@ -101,26 +102,26 @@ private:
         const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::Black);
         paintDistinctPastillesForSets(*skin);
 
-        const auto latency = TSS::sliderLookButtonLikeFromSkin(*skin, TSS::ColourSet::k4);
+        const auto latency = TSS::sliderLookFromSkin(*skin, TSS::ColourSet::k4);
         expect(latency.trackEnabled
-               == skin->getColour(SkinObjectType::kSliderButtonLike,
+               == skin->getColour(SkinObjectType::kSlider,
                                   SkinColourProperty::kTrack,
                                   SkinColourState::kDefault,
                                   TSS::ColourSet::k4));
         expect(latency.trackEnabled
-               != skin->getColour(SkinObjectType::kSliderButtonLike,
+               != skin->getColour(SkinObjectType::kSlider,
                                   SkinColourProperty::kTrack,
                                   SkinColourState::kDefault,
                                   TSS::ColourSet::k1));
 
         const auto combo = TSS::comboBoxLookFromSkin(*skin, TSS::ColourSet::k4);
-        expect(combo.buttonLikeBackground
-               == skin->getColour(SkinObjectType::kComboBoxButtonLike,
+        expect(combo.backgroundEnabled
+               == skin->getColour(SkinObjectType::kComboBox,
                                   SkinColourProperty::kBackground,
                                   SkinColourState::kDefault,
                                   TSS::ColourSet::k4));
-        expect(combo.buttonLikeBackground
-               != skin->getColour(SkinObjectType::kComboBoxButtonLike,
+        expect(combo.backgroundEnabled
+               != skin->getColour(SkinObjectType::kComboBox,
                                   SkinColourProperty::kBackground,
                                   SkinColourState::kDefault,
                                   TSS::ColourSet::k1));
@@ -156,18 +157,43 @@ private:
                                   TSS::ColourSet::k1));
     }
 
-    void assertBlackCreamIdenticalSeedLooksAcrossSets(TSS::Skin::ColourVariant variant)
+    void assertBlackCreamSeedLooksAfterUnify(TSS::Skin::ColourVariant variant)
     {
         const auto skin = TSS::Skin::create(variant);
-        const auto k1 = TSS::sliderLookFromSkin(*skin, TSS::ColourSet::k1);
-        const auto k2 = TSS::sliderLookFromSkin(*skin, TSS::ColourSet::k2);
-        const auto k3 = TSS::sliderLookFromSkin(*skin, TSS::ColourSet::k3);
-        const auto k4 = TSS::sliderLookFromSkin(*skin, TSS::ColourSet::k4);
-        expect(k1.trackEnabled == k2.trackEnabled
-               && k1.trackEnabled == k3.trackEnabled
-               && k1.trackEnabled == k4.trackEnabled);
-        expect(k1.valueBarEnabled == k4.valueBarEnabled);
-        expect(k1.textEnabled == k4.textEnabled);
+        const auto sliderK1 = TSS::sliderLookFromSkin(*skin, TSS::ColourSet::k1);
+        const auto sliderK2 = TSS::sliderLookFromSkin(*skin, TSS::ColourSet::k2);
+        const auto sliderK3 = TSS::sliderLookFromSkin(*skin, TSS::ColourSet::k3);
+        const auto sliderK4 = TSS::sliderLookFromSkin(*skin, TSS::ColourSet::k4);
+        expect(sliderK1.trackEnabled == sliderK2.trackEnabled
+               && sliderK1.trackEnabled == sliderK3.trackEnabled);
+        expect(sliderK1.trackEnabled != sliderK4.trackEnabled);
+        expect(sliderK4.trackEnabled == juce::Colour(ColourChart::kBlack));
+        expect(sliderK4.valueBarEnabled == juce::Colour(ColourChart::kGrey600));
+        expect(sliderK4.textEnabled == juce::Colour(ColourChart::kGrey200));
+
+        const auto comboK1 = TSS::comboBoxLookFromSkin(*skin, TSS::ColourSet::k1);
+        const auto comboK4 = TSS::comboBoxLookFromSkin(*skin, TSS::ColourSet::k4);
+        expect(comboK1.backgroundEnabled != comboK4.backgroundEnabled);
+        expect(comboK4.backgroundEnabled == juce::Colour(ColourChart::kBlack));
+        expect(comboK4.textEnabled == juce::Colour(ColourChart::kGrey200));
+        expect(comboK4.triangleEnabled == juce::Colour(ColourChart::kGrey600));
+        expect(comboK1.triangleEnabled != comboK4.triangleEnabled);
+        expect(comboK4.focusBorder == juce::Colour(ColourChart::kGrey800));
+        expect(comboK1.focusBorder != comboK4.focusBorder);
+
+        const auto popupK1 = TSS::popupMenuLookFromSkin(*skin, TSS::ColourSet::k1);
+        const auto popupK4 = TSS::popupMenuLookFromSkin(*skin, TSS::ColourSet::k4);
+        expect(popupK1.background != popupK4.background);
+        expect(popupK4.background == juce::Colour(ColourChart::kBlack));
+        expect(popupK4.text == juce::Colour(ColourChart::kGrey200));
+        expect(popupK4.border == juce::Colour(ColourChart::kGrey600));
+        expect(popupK1.border != popupK4.border);
+        expect(popupK4.separator == juce::Colour(ColourChart::kGrey600));
+        expect(popupK1.separator != popupK4.separator);
+        expect(popupK4.backgroundHover == juce::Colour(ColourChart::kGrey200));
+        expect(popupK1.backgroundHover != popupK4.backgroundHover);
+        expect(popupK4.textHover == juce::Colour(ColourChart::kBlack));
+        expect(popupK1.textHover != popupK4.textHover);
 
         const auto peakK3 = TSS::peakIndicatorLookFromSkin(*skin, TSS::ColourSet::k3);
         const auto peakK4 = TSS::peakIndicatorLookFromSkin(*skin, TSS::ColourSet::k4);

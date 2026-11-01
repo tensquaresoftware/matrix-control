@@ -85,20 +85,20 @@ namespace SkinColourWiringTestSupport
                  juce::Colour(ColourChart::kYellow));
     }
 
-    inline void paintButtonLikeAndNumberBoxPastilles(TSS::Skin& skin)
+    inline void paintSettingsZoneAndNumberBoxPastilles(TSS::Skin& skin)
     {
         using O = TSS::SkinObjectType;
         using P = TSS::SkinColourProperty;
         using S = TSS::SkinColourState;
         using C = TSS::ColourSet;
 
-        paintKey(skin, TSS::skinColourKey(O::kSliderButtonLike, P::kTrack, S::kDefault, C::k4),
+        paintKey(skin, TSS::skinColourKey(O::kSlider, P::kTrack, S::kDefault, C::k4),
                  juce::Colour(ColourChart::kGrey600));
-        paintKey(skin, TSS::skinColourKey(O::kSliderButtonLike, P::kTrack, S::kDefault, C::k1),
+        paintKey(skin, TSS::skinColourKey(O::kSlider, P::kTrack, S::kDefault, C::k1),
                  juce::Colour(ColourChart::kEmerald400));
-        paintKey(skin, TSS::skinColourKey(O::kComboBoxButtonLike, P::kBackground, S::kDefault, C::k4),
+        paintKey(skin, TSS::skinColourKey(O::kComboBox, P::kBackground, S::kDefault, C::k4),
                  juce::Colour(ColourChart::kGrey600));
-        paintKey(skin, TSS::skinColourKey(O::kComboBoxButtonLike, P::kBackground, S::kDefault, C::k1),
+        paintKey(skin, TSS::skinColourKey(O::kComboBox, P::kBackground, S::kDefault, C::k1),
                  juce::Colour(ColourChart::kEmerald400));
         paintKey(skin, TSS::skinColourKey(O::kNumberBox, P::kBackground, S::kDefault, C::k4),
                  juce::Colour(ColourChart::kGrey600));
@@ -134,7 +134,7 @@ namespace SkinColourWiringTestSupport
     inline void paintDistinctPastillesForSets(TSS::Skin& skin)
     {
         paintPeakLedAndSliderPastilles(skin);
-        paintButtonLikeAndNumberBoxPastilles(skin);
+        paintSettingsZoneAndNumberBoxPastilles(skin);
         paintButtonAndReadOnlyPastilles(skin);
     }
 }

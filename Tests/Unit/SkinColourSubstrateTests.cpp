@@ -137,12 +137,15 @@ private:
                                   SkinColourState::kDisabled));
         expect(popupLook.textDisabled
                == juce::Colour(ColourChart::kEmerald700));
-        expect(popupLook.textDisabledButtonLike
-               == skin->getColour(SkinObjectType::kPopupMenuButtonLike,
+
+        const auto popupLookK4 = TSS::popupMenuLookFromSkin(*skin, TSS::ColourSet::k4);
+        expect(popupLookK4.textDisabled
+               == skin->getColour(SkinObjectType::kPopupMenu,
                                   SkinColourProperty::kText,
-                                  SkinColourState::kDisabled));
+                                  SkinColourState::kDisabled,
+                                  TSS::ColourSet::k4));
         // Common::kContentDisabled == ColourChart::kGrey600 (solid muted grey).
-        expect(popupLook.textDisabledButtonLike
+        expect(popupLookK4.textDisabled
                == juce::Colour(ColourChart::kGrey600));
 
         const auto alertLook = TSS::buttonAlertLookFromSkin(*skin);

@@ -4,16 +4,6 @@ namespace TSS
 {
     namespace
     {
-        SkinObjectType comboBoxObject(bool isButtonLike) noexcept
-        {
-            return isButtonLike ? SkinObjectType::kComboBoxButtonLike : SkinObjectType::kComboBox;
-        }
-
-        SkinObjectType popupMenuObject(bool isButtonLike) noexcept
-        {
-            return isButtonLike ? SkinObjectType::kPopupMenuButtonLike : SkinObjectType::kPopupMenu;
-        }
-
         SkinColourState enabledState(bool isEnabled) noexcept
         {
             return isEnabled ? SkinColourState::kDefault : SkinColourState::kDisabled;
@@ -60,110 +50,97 @@ namespace TSS
                          colourSet);
     }
 
-    juce::Colour Skin::getComboBoxBackgroundColour(bool isEnabled,
-                                                   bool isButtonLike,
-                                                   ColourSet colourSet) const
+    juce::Colour Skin::getComboBoxBackgroundColour(bool isEnabled, ColourSet colourSet) const
     {
-        return getColour(comboBoxObject(isButtonLike),
+        return getColour(SkinObjectType::kComboBox,
                          SkinColourProperty::kBackground,
                          enabledState(isEnabled),
                          colourSet);
     }
 
-    juce::Colour Skin::getComboBoxBorderColour(bool isEnabled,
-                                               bool isButtonLike,
-                                               ColourSet colourSet) const
+    juce::Colour Skin::getComboBoxBorderColour(bool isEnabled, ColourSet colourSet) const
     {
-        return getColour(comboBoxObject(isButtonLike),
+        return getColour(SkinObjectType::kComboBox,
                          SkinColourProperty::kBorder,
                          enabledState(isEnabled),
                          colourSet);
     }
 
-    juce::Colour Skin::getComboBoxFocusBorderColour(bool isButtonLike, ColourSet colourSet) const
+    juce::Colour Skin::getComboBoxFocusBorderColour(ColourSet colourSet) const
     {
-        if (isButtonLike)
-            return getColour(SkinObjectType::kComboBoxButtonLike,
-                             SkinColourProperty::kBorder,
-                             SkinColourState::kDefault,
-                             colourSet);
         return getColour(SkinObjectType::kComboBox,
                          SkinColourProperty::kFocusBorder,
                          SkinColourState::kDefault,
                          colourSet);
     }
 
-    juce::Colour Skin::getComboBoxTriangleColour(bool isEnabled,
-                                                 bool isButtonLike,
-                                                 ColourSet colourSet) const
+    juce::Colour Skin::getComboBoxTriangleColour(bool isEnabled, ColourSet colourSet) const
     {
-        return getColour(comboBoxObject(isButtonLike),
+        return getColour(SkinObjectType::kComboBox,
                          SkinColourProperty::kTriangle,
                          enabledState(isEnabled),
                          colourSet);
     }
 
-    juce::Colour Skin::getComboBoxTextColour(bool isEnabled,
-                                             bool isButtonLike,
-                                             ColourSet colourSet) const
+    juce::Colour Skin::getComboBoxTextColour(bool isEnabled, ColourSet colourSet) const
     {
-        return getColour(comboBoxObject(isButtonLike),
+        return getColour(SkinObjectType::kComboBox,
                          SkinColourProperty::kText,
                          enabledState(isEnabled),
                          colourSet);
     }
 
-    juce::Colour Skin::getPopupMenuBackgroundColour(bool isButtonLike, ColourSet colourSet) const
+    juce::Colour Skin::getPopupMenuBackgroundColour(ColourSet colourSet) const
     {
-        return getColour(popupMenuObject(isButtonLike),
+        return getColour(SkinObjectType::kPopupMenu,
                          SkinColourProperty::kBackground,
                          SkinColourState::kDefault,
                          colourSet);
     }
 
-    juce::Colour Skin::getPopupMenuBorderColour(bool isButtonLike, ColourSet colourSet) const
+    juce::Colour Skin::getPopupMenuBorderColour(ColourSet colourSet) const
     {
-        return getColour(popupMenuObject(isButtonLike),
+        return getColour(SkinObjectType::kPopupMenu,
                          SkinColourProperty::kBorder,
                          SkinColourState::kDefault,
                          colourSet);
     }
 
-    juce::Colour Skin::getPopupMenuSeparatorColour(bool isButtonLike, ColourSet colourSet) const
+    juce::Colour Skin::getPopupMenuSeparatorColour(ColourSet colourSet) const
     {
-        return getColour(popupMenuObject(isButtonLike),
+        return getColour(SkinObjectType::kPopupMenu,
                          SkinColourProperty::kSeparator,
                          SkinColourState::kDefault,
                          colourSet);
     }
 
-    juce::Colour Skin::getPopupMenuTextColour(bool isButtonLike, ColourSet colourSet) const
+    juce::Colour Skin::getPopupMenuTextColour(ColourSet colourSet) const
     {
-        return getColour(popupMenuObject(isButtonLike),
+        return getColour(SkinObjectType::kPopupMenu,
                          SkinColourProperty::kText,
                          SkinColourState::kDefault,
                          colourSet);
     }
 
-    juce::Colour Skin::getPopupMenuBackgroundHooverColour(bool isButtonLike, ColourSet colourSet) const
+    juce::Colour Skin::getPopupMenuBackgroundHooverColour(ColourSet colourSet) const
     {
-        return getColour(popupMenuObject(isButtonLike),
+        return getColour(SkinObjectType::kPopupMenu,
                          SkinColourProperty::kBackground,
                          SkinColourState::kHover,
                          colourSet);
     }
 
-    juce::Colour Skin::getPopupMenuTextHooverColour(bool isButtonLike, ColourSet colourSet) const
+    juce::Colour Skin::getPopupMenuTextHooverColour(ColourSet colourSet) const
     {
-        return getColour(popupMenuObject(isButtonLike),
+        return getColour(SkinObjectType::kPopupMenu,
                          SkinColourProperty::kText,
                          SkinColourState::kHover,
                          colourSet);
     }
 
-    juce::Colour Skin::getPopupMenuScrollbarColour(bool isButtonLike, ColourSet colourSet) const
+    juce::Colour Skin::getPopupMenuScrollbarColour(ColourSet colourSet) const
     {
-        return getColour(popupMenuObject(isButtonLike),
+        return getColour(SkinObjectType::kPopupMenu,
                          SkinColourProperty::kScrollbar,
                          SkinColourState::kDefault,
                          colourSet);

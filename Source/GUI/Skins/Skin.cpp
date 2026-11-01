@@ -136,6 +136,42 @@ namespace TSS
     }
 
     template <typename Accessor>
+    void Skin::putColourExact(Accessor accessColour, const SkinColours::ColourElement& element)
+    {
+        colours_[element.key] = juce::Colour(accessColour(element));
+    }
+
+    template <typename Accessor>
+    void Skin::overlayFormerButtonLikeAtK4(Accessor accessColour)
+    {
+        using namespace SkinColours;
+
+        putColourExact(accessColour, Widgets::SliderK4::kTrack);
+        putColourExact(accessColour, Widgets::SliderK4::kFocusBorder);
+        putColourExact(accessColour, Widgets::SliderK4::kValueBar);
+        putColourExact(accessColour, Widgets::SliderK4::kText);
+
+        putColourExact(accessColour, Widgets::ComboBoxK4::kBackground);
+        putColourExact(accessColour, Widgets::ComboBoxK4::kBackgroundDisabled);
+        putColourExact(accessColour, Widgets::ComboBoxK4::kBorder);
+        putColourExact(accessColour, Widgets::ComboBoxK4::kBorderDisabled);
+        putColourExact(accessColour, Widgets::ComboBoxK4::kFocusBorder);
+        putColourExact(accessColour, Widgets::ComboBoxK4::kText);
+        putColourExact(accessColour, Widgets::ComboBoxK4::kTextDisabled);
+        putColourExact(accessColour, Widgets::ComboBoxK4::kTriangle);
+        putColourExact(accessColour, Widgets::ComboBoxK4::kTriangleDisabled);
+
+        putColourExact(accessColour, Widgets::PopupMenuK4::kBackground);
+        putColourExact(accessColour, Widgets::PopupMenuK4::kBorder);
+        putColourExact(accessColour, Widgets::PopupMenuK4::kSeparator);
+        putColourExact(accessColour, Widgets::PopupMenuK4::kText);
+        putColourExact(accessColour, Widgets::PopupMenuK4::kTextDisabled);
+        putColourExact(accessColour, Widgets::PopupMenuK4::kBackgroundHover);
+        putColourExact(accessColour, Widgets::PopupMenuK4::kTextHover);
+        putColourExact(accessColour, Widgets::PopupMenuK4::kScrollbar);
+    }
+
+    template <typename Accessor>
     void Skin::initializeVariantColours(Accessor accessColour)
     {
         initializePanelColours(accessColour);
@@ -146,6 +182,7 @@ namespace TSS
         initializeComboBoxColours(accessColour);
         initializePopupMenuColours(accessColour);
         initializeDisplayColours(accessColour);
+        overlayFormerButtonLikeAtK4(accessColour);
     }
 
     template <typename Accessor>
@@ -234,10 +271,6 @@ namespace TSS
         putColour(accessColour, Widgets::Slider::kText);
         putColour(accessColour, Widgets::Slider::kTextDisabled);
         putColour(accessColour, Widgets::Slider::kFocusBorder);
-        putColour(accessColour, Widgets::SliderButtonLike::kTrack);
-        putColour(accessColour, Widgets::SliderButtonLike::kFocusBorder);
-        putColour(accessColour, Widgets::SliderButtonLike::kValueBar);
-        putColour(accessColour, Widgets::SliderButtonLike::kText);
     }
 
     template <typename Accessor>
@@ -254,14 +287,6 @@ namespace TSS
         putColour(accessColour, Widgets::ComboBox::kTriangleDisabled);
         putColour(accessColour, Widgets::ComboBox::kText);
         putColour(accessColour, Widgets::ComboBox::kTextDisabled);
-        putColour(accessColour, Widgets::ComboBoxButtonLike::kBackground);
-        putColour(accessColour, Widgets::ComboBoxButtonLike::kBackgroundDisabled);
-        putColour(accessColour, Widgets::ComboBoxButtonLike::kBorder);
-        putColour(accessColour, Widgets::ComboBoxButtonLike::kBorderDisabled);
-        putColour(accessColour, Widgets::ComboBoxButtonLike::kText);
-        putColour(accessColour, Widgets::ComboBoxButtonLike::kTextDisabled);
-        putColour(accessColour, Widgets::ComboBoxButtonLike::kTriangle);
-        putColour(accessColour, Widgets::ComboBoxButtonLike::kTriangleDisabled);
     }
 
     template <typename Accessor>
@@ -277,14 +302,6 @@ namespace TSS
         putColour(accessColour, Widgets::PopupMenu::kBackgroundHover);
         putColour(accessColour, Widgets::PopupMenu::kTextHover);
         putColour(accessColour, Widgets::PopupMenu::kScrollbar);
-        putColour(accessColour, Widgets::PopupMenuButtonLike::kBackground);
-        putColour(accessColour, Widgets::PopupMenuButtonLike::kBorder);
-        putColour(accessColour, Widgets::PopupMenuButtonLike::kSeparator);
-        putColour(accessColour, Widgets::PopupMenuButtonLike::kText);
-        putColour(accessColour, Widgets::PopupMenuButtonLike::kTextDisabled);
-        putColour(accessColour, Widgets::PopupMenuButtonLike::kBackgroundHover);
-        putColour(accessColour, Widgets::PopupMenuButtonLike::kTextHover);
-        putColour(accessColour, Widgets::PopupMenuButtonLike::kScrollbar);
     }
 
     template <typename Accessor>

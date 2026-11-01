@@ -21,7 +21,7 @@ namespace TSS
         inline constexpr static float kBorderThickness_ = 1.0f;
         inline constexpr static float kHighlightGap_ = 1.0f;
 
-        PopupMenuBase(ComboBox& comboBox, bool isButtonLike);
+        explicit PopupMenuBase(ComboBox& comboBox);
 
         void mouseExit(const juce::MouseEvent& e) override;
         void inputAttemptWhenModal() override;
@@ -36,7 +36,6 @@ namespace TSS
 
         IPopupMenuHost& host_;
         ComboBox& comboBox_;
-        bool isButtonLike_ = false;
         int highlightedItemIndex_ = -1;
         float uiScale_ = 1.0f;
         juce::Font cachedFont_;

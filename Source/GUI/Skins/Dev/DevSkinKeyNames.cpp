@@ -25,11 +25,8 @@ namespace TSS::DevSkin
             { SkinObjectType::kButton, "Button" },
             { SkinObjectType::kToggle, "Toggle" },
             { SkinObjectType::kSlider, "Slider" },
-            { SkinObjectType::kSliderButtonLike, "SliderButtonLike" },
             { SkinObjectType::kComboBox, "ComboBox" },
-            { SkinObjectType::kComboBoxButtonLike, "ComboBoxButtonLike" },
             { SkinObjectType::kPopupMenu, "PopupMenu" },
-            { SkinObjectType::kPopupMenuButtonLike, "PopupMenuButtonLike" },
             { SkinObjectType::kNumberBox, "NumberBox" },
             { SkinObjectType::kEnvelopeDisplay, "EnvelopeDisplay" },
             { SkinObjectType::kTrackGeneratorDisplay, "TrackGeneratorDisplay" },
@@ -131,6 +128,23 @@ namespace TSS::DevSkin
 
     bool parseObjectType(const juce::String& text, SkinObjectType& out)
     {
+        // Legacy Dev JSON keys from pre-unify ButtonLike object types.
+        if (text.equalsIgnoreCase("SliderButtonLike"))
+        {
+            out = SkinObjectType::kSlider;
+            return true;
+        }
+        if (text.equalsIgnoreCase("ComboBoxButtonLike"))
+        {
+            out = SkinObjectType::kComboBox;
+            return true;
+        }
+        if (text.equalsIgnoreCase("PopupMenuButtonLike"))
+        {
+            out = SkinObjectType::kPopupMenu;
+            return true;
+        }
+
         return parseOf(kObjects, text, out);
     }
 

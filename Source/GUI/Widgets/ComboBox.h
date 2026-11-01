@@ -18,13 +18,16 @@ namespace TSS
     class ComboBox : public juce::ComboBox, public IPopupMenuHost
     {
     public:
-        enum class Style
+        enum class PopupMode
         {
-            Standard,
-            ButtonLike
+            MultiColumn,
+            Scrollable
         };
 
-        explicit ComboBox(int width, int height, const ComboBoxLook& look, Style style = Style::Standard);
+        explicit ComboBox(int width,
+                          int height,
+                          const ComboBoxLook& look,
+                          PopupMode popupMode = PopupMode::MultiColumn);
         ~ComboBox() override = default;
 
         void setLook(const ComboBoxLook& look);
@@ -33,16 +36,16 @@ namespace TSS
         void setPopupVerticalPlacement(PopupVerticalPlacement placement);
         PopupVerticalPlacement getPopupVerticalPlacement() const override { return popupVerticalPlacement_; }
 
-        /** When true, ButtonLike ScrollablePopupMenu draws port-sentinel chrome on row 0
+        /** When true, ScrollablePopupMenu draws port-sentinel chrome on row 0
             (NO INPUT / NO OUTPUT rule + shorter hover) when the popup has more than one item.
             Consumers enable this for MIDI/audio port lists; leave false for normal first rows
-            (e.g. Computer Patches). No-op for Standard / multi-column popups. Default false. */
+            (e.g. Computer Patches). No-op for MultiColumn popups. Default false. */
         void setUsesPortSentinelPopupChrome(bool shouldUse) noexcept;
         [[nodiscard]] bool usesPortSentinelPopupChrome() const noexcept { return usesPortSentinelPopupChrome_; }
 
-        /** When true, ButtonLike ScrollablePopupMenu may widen to the longest item (capped by
+        /** When true, ScrollablePopupMenu may widen to the longest item (capped by
             design/host ceiling and free space beside the combo). Closed face width unchanged.
-            Default false — popup matches closed width. No-op for Standard / multi-column. */
+            Default false — popup matches closed width. No-op for MultiColumn. */
         void setUsesContentSizedPopupWidth(bool shouldUse) noexcept;
         [[nodiscard]] bool usesContentSizedPopupWidth() const noexcept { return usesContentSizedPopupWidth_; }
 
@@ -97,7 +100,7 @@ namespace TSS
         PopupMenuLook popupLook_{};
         int width_;
         int height_;
-        Style style_;
+        PopupMode popupMode_;
         bool isPopupOpen_ = false;
         bool hasFocus_ = false;
         bool suppressNextPopupOpen_ = false;

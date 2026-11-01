@@ -67,10 +67,6 @@ namespace TSS::DevSkin
             out.push_back(&Widgets::Slider::kText);
             out.push_back(&Widgets::Slider::kTextDisabled);
             out.push_back(&Widgets::Slider::kFocusBorder);
-            out.push_back(&Widgets::SliderButtonLike::kTrack);
-            out.push_back(&Widgets::SliderButtonLike::kFocusBorder);
-            out.push_back(&Widgets::SliderButtonLike::kValueBar);
-            out.push_back(&Widgets::SliderButtonLike::kText);
         }
 
         void appendMenus(std::vector<const SkinColours::ColourElement*>& out)
@@ -85,14 +81,6 @@ namespace TSS::DevSkin
             out.push_back(&Widgets::ComboBox::kTriangleDisabled);
             out.push_back(&Widgets::ComboBox::kText);
             out.push_back(&Widgets::ComboBox::kTextDisabled);
-            out.push_back(&Widgets::ComboBoxButtonLike::kBackground);
-            out.push_back(&Widgets::ComboBoxButtonLike::kBackgroundDisabled);
-            out.push_back(&Widgets::ComboBoxButtonLike::kBorder);
-            out.push_back(&Widgets::ComboBoxButtonLike::kBorderDisabled);
-            out.push_back(&Widgets::ComboBoxButtonLike::kText);
-            out.push_back(&Widgets::ComboBoxButtonLike::kTextDisabled);
-            out.push_back(&Widgets::ComboBoxButtonLike::kTriangle);
-            out.push_back(&Widgets::ComboBoxButtonLike::kTriangleDisabled);
             out.push_back(&Widgets::PopupMenu::kBackground);
             out.push_back(&Widgets::PopupMenu::kBorder);
             out.push_back(&Widgets::PopupMenu::kSeparator);
@@ -101,14 +89,6 @@ namespace TSS::DevSkin
             out.push_back(&Widgets::PopupMenu::kBackgroundHover);
             out.push_back(&Widgets::PopupMenu::kTextHover);
             out.push_back(&Widgets::PopupMenu::kScrollbar);
-            out.push_back(&Widgets::PopupMenuButtonLike::kBackground);
-            out.push_back(&Widgets::PopupMenuButtonLike::kBorder);
-            out.push_back(&Widgets::PopupMenuButtonLike::kSeparator);
-            out.push_back(&Widgets::PopupMenuButtonLike::kText);
-            out.push_back(&Widgets::PopupMenuButtonLike::kTextDisabled);
-            out.push_back(&Widgets::PopupMenuButtonLike::kBackgroundHover);
-            out.push_back(&Widgets::PopupMenuButtonLike::kTextHover);
-            out.push_back(&Widgets::PopupMenuButtonLike::kScrollbar);
         }
 
         void appendDisplays(std::vector<const SkinColours::ColourElement*>& out)

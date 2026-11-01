@@ -29,32 +29,20 @@ namespace TSS
         virtual juce::Colour getSliderTextColour(bool isEnabled = true,
                                                  ColourSet colourSet = ColourSet::k1) const = 0;
         virtual juce::Colour getComboBoxBackgroundColour(bool isEnabled = true,
-                                                         bool isButtonLike = false,
                                                          ColourSet colourSet = ColourSet::k1) const = 0;
         virtual juce::Colour getComboBoxBorderColour(bool isEnabled = true,
-                                                     bool isButtonLike = false,
                                                      ColourSet colourSet = ColourSet::k1) const = 0;
-        virtual juce::Colour getComboBoxFocusBorderColour(bool isButtonLike = false,
-                                                          ColourSet colourSet = ColourSet::k1) const = 0;
+        virtual juce::Colour getComboBoxFocusBorderColour(ColourSet colourSet = ColourSet::k1) const = 0;
         virtual juce::Colour getComboBoxTriangleColour(bool isEnabled = true,
-                                                       bool isButtonLike = false,
                                                        ColourSet colourSet = ColourSet::k1) const = 0;
         virtual juce::Colour getComboBoxTextColour(bool isEnabled = true,
-                                                   bool isButtonLike = false,
                                                    ColourSet colourSet = ColourSet::k1) const = 0;
-        virtual juce::Colour getPopupMenuBackgroundColour(bool isButtonLike = false,
-                                                          ColourSet colourSet = ColourSet::k1) const = 0;
-        virtual juce::Colour getPopupMenuBorderColour(bool isButtonLike = false,
-                                                      ColourSet colourSet = ColourSet::k1) const = 0;
-        virtual juce::Colour getPopupMenuSeparatorColour(bool isButtonLike = false,
-                                                         ColourSet colourSet = ColourSet::k1) const = 0;
-        virtual juce::Colour getPopupMenuTextColour(bool isButtonLike = false,
-                                                    ColourSet colourSet = ColourSet::k1) const = 0;
-        virtual juce::Colour getPopupMenuBackgroundHooverColour(bool isButtonLike = false,
-                                                                ColourSet colourSet = ColourSet::k1) const = 0;
-        virtual juce::Colour getPopupMenuTextHooverColour(bool isButtonLike = false,
-                                                          ColourSet colourSet = ColourSet::k1) const = 0;
-        virtual juce::Colour getPopupMenuScrollbarColour(bool isButtonLike = false,
-                                                         ColourSet colourSet = ColourSet::k1) const = 0;
+        virtual juce::Colour getPopupMenuBackgroundColour(ColourSet colourSet = ColourSet::k1) const = 0;
+        virtual juce::Colour getPopupMenuBorderColour(ColourSet colourSet = ColourSet::k1) const = 0;
+        virtual juce::Colour getPopupMenuSeparatorColour(ColourSet colourSet = ColourSet::k1) const = 0;
+        virtual juce::Colour getPopupMenuTextColour(ColourSet colourSet = ColourSet::k1) const = 0;
+        virtual juce::Colour getPopupMenuBackgroundHooverColour(ColourSet colourSet = ColourSet::k1) const = 0;
+        virtual juce::Colour getPopupMenuTextHooverColour(ColourSet colourSet = ColourSet::k1) const = 0;
+        virtual juce::Colour getPopupMenuScrollbarColour(ColourSet colourSet = ColourSet::k1) const = 0;
     };
 }

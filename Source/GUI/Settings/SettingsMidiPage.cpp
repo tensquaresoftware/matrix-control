@@ -262,7 +262,7 @@ std::unique_ptr<TSS::ComboBox> SettingsMidiPage::makeCombo(TSS::ISkin& skin)
     auto combo = std::make_unique<TSS::ComboBox>(SettingsShellMetrics::kSynthFromComboWidth,
                                                  SettingsShellMetrics::kControlHeight,
                                                  TSS::comboBoxLookFromSkin(skin, TSS::ColourSet::k4),
-                                                 TSS::ComboBox::Style::ButtonLike);
+                                                 TSS::ComboBox::PopupMode::Scrollable);
     combo->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin, TSS::ColourSet::k4));
     combo->setUsesPortSentinelPopupChrome(true);
     combo->setUsesContentSizedPopupWidth(true);

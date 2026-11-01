@@ -97,66 +97,18 @@ namespace TSS
         return look;
     }
 
-    SliderLook sliderLookButtonLikeFromSkin(const ISkin& skin, ColourSet colourSet)
-    {
-        SliderLook look;
-        look.trackEnabled = skin.getColour(SkinObjectType::kSliderButtonLike,
-                                           SkinColourProperty::kTrack,
-                                           SkinColourState::kDefault,
-                                           colourSet);
-        look.focusBorder = skin.getColour(SkinObjectType::kSliderButtonLike,
-                                          SkinColourProperty::kFocusBorder,
-                                          SkinColourState::kDefault,
-                                          colourSet);
-        look.valueBarEnabled = skin.getColour(SkinObjectType::kSliderButtonLike,
-                                              SkinColourProperty::kValueBar,
-                                              SkinColourState::kDefault,
-                                              colourSet);
-        look.textEnabled = skin.getColour(SkinObjectType::kSliderButtonLike,
-                                          SkinColourProperty::kText,
-                                          SkinColourState::kDefault,
-                                          colourSet);
-        look.trackDisabled = skin.getSliderTrackColour(false, colourSet);
-        look.backgroundDisabled = skin.getColour(SkinObjectType::kSlider,
-                                                 SkinColourProperty::kBackground,
-                                                 SkinColourState::kDisabled,
-                                                 colourSet);
-        look.valueBarDisabled = skin.getSliderValueBarColour(false, colourSet);
-        look.textDisabled = skin.getSliderTextColour(false, colourSet);
-        look.editorText = skin.getColour(SkinObjectType::kNumberBox,
-                                         SkinColourProperty::kEditorText,
-                                         SkinColourState::kDefault,
-                                         colourSet);
-        look.editorCaret = skin.getColour(SkinObjectType::kNumberBox,
-                                          SkinColourProperty::kEditorText,
-                                          SkinColourState::kDefault,
-                                          colourSet);
-        look.font = resolvedTypographyFont(skin, TypographyStyleId::kDefault);
-        return look;
-    }
-
     ComboBoxLook comboBoxLookFromSkin(const ISkin& skin, ColourSet colourSet)
     {
         ComboBoxLook look;
-        look.backgroundEnabled = skin.getComboBoxBackgroundColour(true, false, colourSet);
-        look.backgroundDisabled = skin.getComboBoxBackgroundColour(false, false, colourSet);
-        look.borderEnabled = skin.getComboBoxBorderColour(true, false, colourSet);
-        look.borderDisabled = skin.getComboBoxBorderColour(false, false, colourSet);
-        look.focusBorder = skin.getComboBoxFocusBorderColour(false, colourSet);
-        look.triangleEnabled = skin.getComboBoxTriangleColour(true, false, colourSet);
-        look.triangleDisabled = skin.getComboBoxTriangleColour(false, false, colourSet);
-        look.textEnabled = skin.getComboBoxTextColour(true, false, colourSet);
-        look.textDisabled = skin.getComboBoxTextColour(false, false, colourSet);
-
-        look.buttonLikeBackground = skin.getComboBoxBackgroundColour(true, true, colourSet);
-        look.buttonLikeBackgroundDisabled = skin.getComboBoxBackgroundColour(false, true, colourSet);
-        look.buttonLikeBorder = skin.getComboBoxBorderColour(true, true, colourSet);
-        look.buttonLikeBorderDisabled = skin.getComboBoxBorderColour(false, true, colourSet);
-        look.buttonLikeText = skin.getComboBoxTextColour(true, true, colourSet);
-        look.buttonLikeTextDisabled = skin.getComboBoxTextColour(false, true, colourSet);
-        look.buttonLikeTriangle = skin.getComboBoxTriangleColour(true, true, colourSet);
-        look.buttonLikeTriangleDisabled = skin.getComboBoxTriangleColour(false, true, colourSet);
-
+        look.backgroundEnabled = skin.getComboBoxBackgroundColour(true, colourSet);
+        look.backgroundDisabled = skin.getComboBoxBackgroundColour(false, colourSet);
+        look.borderEnabled = skin.getComboBoxBorderColour(true, colourSet);
+        look.borderDisabled = skin.getComboBoxBorderColour(false, colourSet);
+        look.focusBorder = skin.getComboBoxFocusBorderColour(colourSet);
+        look.triangleEnabled = skin.getComboBoxTriangleColour(true, colourSet);
+        look.triangleDisabled = skin.getComboBoxTriangleColour(false, colourSet);
+        look.textEnabled = skin.getComboBoxTextColour(true, colourSet);
+        look.textDisabled = skin.getComboBoxTextColour(false, colourSet);
         look.font = resolvedTypographyFont(skin, TypographyStyleId::kDefault);
         return look;
     }
@@ -164,30 +116,17 @@ namespace TSS
     PopupMenuLook popupMenuLookFromSkin(const ISkin& skin, ColourSet colourSet)
     {
         PopupMenuLook look;
-        look.background = skin.getPopupMenuBackgroundColour(false, colourSet);
-        look.border = skin.getPopupMenuBorderColour(false, colourSet);
-        look.separator = skin.getPopupMenuSeparatorColour(false, colourSet);
-        look.text = skin.getPopupMenuTextColour(false, colourSet);
+        look.background = skin.getPopupMenuBackgroundColour(colourSet);
+        look.border = skin.getPopupMenuBorderColour(colourSet);
+        look.separator = skin.getPopupMenuSeparatorColour(colourSet);
+        look.text = skin.getPopupMenuTextColour(colourSet);
         look.textDisabled = skin.getColour(SkinObjectType::kPopupMenu,
                                            SkinColourProperty::kText,
                                            SkinColourState::kDisabled,
                                            colourSet);
-        look.backgroundHover = skin.getPopupMenuBackgroundHooverColour(false, colourSet);
-        look.textHover = skin.getPopupMenuTextHooverColour(false, colourSet);
-        look.scrollbar = skin.getPopupMenuScrollbarColour(false, colourSet);
-
-        look.backgroundButtonLike = skin.getPopupMenuBackgroundColour(true, colourSet);
-        look.borderButtonLike = skin.getPopupMenuBorderColour(true, colourSet);
-        look.separatorButtonLike = skin.getPopupMenuSeparatorColour(true, colourSet);
-        look.textButtonLike = skin.getPopupMenuTextColour(true, colourSet);
-        look.textDisabledButtonLike = skin.getColour(SkinObjectType::kPopupMenuButtonLike,
-                                                     SkinColourProperty::kText,
-                                                     SkinColourState::kDisabled,
-                                                     colourSet);
-        look.backgroundHoverButtonLike = skin.getPopupMenuBackgroundHooverColour(true, colourSet);
-        look.textHoverButtonLike = skin.getPopupMenuTextHooverColour(true, colourSet);
-        look.scrollbarButtonLike = skin.getPopupMenuScrollbarColour(true, colourSet);
-
+        look.backgroundHover = skin.getPopupMenuBackgroundHooverColour(colourSet);
+        look.textHover = skin.getPopupMenuTextHooverColour(colourSet);
+        look.scrollbar = skin.getPopupMenuScrollbarColour(colourSet);
         look.font = resolvedTypographyFont(skin, TypographyStyleId::kDefault);
         return look;
     }

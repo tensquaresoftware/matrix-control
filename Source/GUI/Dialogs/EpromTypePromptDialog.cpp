@@ -43,7 +43,7 @@ EpromTypePromptDialog::EpromTypePromptDialog(TSS::ISkin& skin, std::function<voi
 
 void EpromTypePromptDialog::buildControls(TSS::ISkin& skin)
 {
-    const auto comboStyle = TSS::ComboBox::Style::ButtonLike;
+    const auto popupMode = TSS::ComboBox::PopupMode::Scrollable;
     const auto labelLook = TSS::labelLookFromSkin(skin);
     const auto comboLook = TSS::comboBoxLookFromSkin(skin, TSS::ColourSet::k4);
     const auto popupLook = TSS::popupMenuLookFromSkin(skin, TSS::ColourSet::k4);
@@ -58,7 +58,7 @@ void EpromTypePromptDialog::buildControls(TSS::ISkin& skin)
     auto makeCombo = [&]()
     {
         auto combo = std::make_unique<TSS::ComboBox>(
-            kComboWidth_, kControlHeight_, comboLook, comboStyle);
+            kComboWidth_, kControlHeight_, comboLook, popupMode);
         combo->setPopupMenuLook(popupLook);
         return combo;
     };

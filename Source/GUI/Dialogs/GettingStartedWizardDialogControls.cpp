@@ -14,7 +14,7 @@ using GettingStartedWizard::Step;
 
 void GettingStartedWizardDialog::buildStepControls(TSS::ISkin& skin)
 {
-    const auto comboStyle = TSS::ComboBox::Style::ButtonLike;
+    const auto popupMode = TSS::ComboBox::PopupMode::Scrollable;
     // Dark-panel label colour — Matrix chrome body is always a dark plate.
     const auto labelLook = TSS::darkPanelLabelLookFromSkin(skin);
     const auto comboLook = TSS::comboBoxLookFromSkin(skin, TSS::ColourSet::k4);
@@ -32,7 +32,7 @@ void GettingStartedWizardDialog::buildStepControls(TSS::ISkin& skin)
     auto makeCombo = [&]()
     {
         auto combo = std::make_unique<TSS::ComboBox>(
-            kComboWidth_, kControlHeight_, comboLook, comboStyle);
+            kComboWidth_, kControlHeight_, comboLook, popupMode);
         combo->setPopupMenuLook(popupLook);
         addChildComponent(*combo);
         return combo;

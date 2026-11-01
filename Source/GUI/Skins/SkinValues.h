@@ -22,11 +22,8 @@ namespace TSS
         kButton,
         kToggle,
         kSlider,
-        kSliderButtonLike,
         kComboBox,
-        kComboBoxButtonLike,
         kPopupMenu,
-        kPopupMenuButtonLike,
         kNumberBox,
         kEnvelopeDisplay,
         kTrackGeneratorDisplay,
@@ -53,13 +50,10 @@ namespace TSS
         ColourSet::k4
     };
 
-    inline constexpr std::array<SkinObjectType, 12> kMultiSetSkinObjects {
+    inline constexpr std::array<SkinObjectType, 9> kMultiSetSkinObjects {
         SkinObjectType::kSlider,
-        SkinObjectType::kSliderButtonLike,
         SkinObjectType::kComboBox,
-        SkinObjectType::kComboBoxButtonLike,
         SkinObjectType::kPopupMenu,
-        SkinObjectType::kPopupMenuButtonLike,
         SkinObjectType::kNumberBox,
         SkinObjectType::kButton,
         SkinObjectType::kToggle,

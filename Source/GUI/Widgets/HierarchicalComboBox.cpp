@@ -113,7 +113,7 @@ namespace TSS
             {
                 .component = *this,
                 .bounds = getLocalBounds().toFloat(),
-                .style = ComboBoxControlStyle::Standard,
+                .closedChrome = ComboBoxClosedChrome::FocusRing,
                 .look = look_,
                 .uiScale = uiScale_,
                 .text = getDisplayText(),

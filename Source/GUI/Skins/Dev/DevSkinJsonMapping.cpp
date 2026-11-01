@@ -31,7 +31,8 @@ namespace TSS::DevSkin
         SkinColourProperty property {};
         SkinColourState state {};
         ColourSet colourSet = ColourSet::k1;
-        if (! parseObjectType(objectValue->getProperty("object").toString(), object)
+        const auto objectText = objectValue->getProperty("object").toString();
+        if (! parseObjectType(objectText, object)
             || ! parseProperty(objectValue->getProperty("property").toString(), property)
             || ! parseState(objectValue->getProperty("state").toString(), state))
         {
@@ -45,6 +46,16 @@ namespace TSS::DevSkin
             error = "Mapping has unknown colourSet";
             return false;
         }
+
+        // Legacy *ButtonLike rows carried mono greys; pin them to k4 so a missing/default
+        // colourSet cannot overwrite classic greens on k1–k3 after object remap.
+        if (objectText.equalsIgnoreCase("SliderButtonLike")
+            || objectText.equalsIgnoreCase("ComboBoxButtonLike")
+            || objectText.equalsIgnoreCase("PopupMenuButtonLike"))
+        {
+            colourSet = ColourSet::k4;
+        }
+
         if (colourSet != ColourSet::k1 && ! supportsMultipleColourSets(object))
         {
             error = "Mapping uses a higher colourSet for a k1-only object";

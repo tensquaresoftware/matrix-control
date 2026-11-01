@@ -32,7 +32,7 @@ namespace TSS::SkinColours
                 ColourChart::kEmerald900
             };
 
-            // Standard combo border reuses ButtonLike border pastilles (same hex as before).
+            // Closed-face border (shared with former ButtonLike border pastille).
             inline constexpr ColourElement kBorder = {
                 skinColourKey(SkinObjectType::kComboBox, SkinColourProperty::kBorder),
                 ColourChart::kGrey800,
@@ -64,52 +64,69 @@ namespace TSS::SkinColours
             };
         }
 
-        namespace ComboBoxButtonLike
+        /** Former ComboBoxButtonLike pastilles — seeded onto ComboBox at ColourSet::k4 only. */
+        namespace ComboBoxK4
         {
             inline constexpr ColourElement kBackground = {
-                skinColourKey(SkinObjectType::kComboBoxButtonLike, SkinColourProperty::kBackground),
+                skinColourKey(SkinObjectType::kComboBox, SkinColourProperty::kBackground,
+                              SkinColourState::kDefault, ColourSet::k4),
                 ColourChart::kBlack,
                 ColourChart::kBlack
             };
 
             inline constexpr ColourElement kBorder = {
-                skinColourKey(SkinObjectType::kComboBoxButtonLike, SkinColourProperty::kBorder),
+                skinColourKey(SkinObjectType::kComboBox, SkinColourProperty::kBorder,
+                              SkinColourState::kDefault, ColourSet::k4),
                 ColourChart::kGrey800,
                 ColourChart::kGrey800
             };
 
             inline constexpr ColourElement kText = {
-                skinColourKey(SkinObjectType::kComboBoxButtonLike, SkinColourProperty::kText),
+                skinColourKey(SkinObjectType::kComboBox, SkinColourProperty::kText,
+                              SkinColourState::kDefault, ColourSet::k4),
                 ColourChart::kGrey200,
                 ColourChart::kGrey200
             };
 
             inline constexpr ColourElement kTriangle = {
-                skinColourKey(SkinObjectType::kComboBoxButtonLike, SkinColourProperty::kTriangle),
+                skinColourKey(SkinObjectType::kComboBox, SkinColourProperty::kTriangle,
+                              SkinColourState::kDefault, ColourSet::k4),
                 ColourChart::kGrey600,
                 ColourChart::kGrey600
             };
 
+            // Former ButtonLike focus used Border; seed FocusBorder at k4 to match.
+            inline constexpr ColourElement kFocusBorder = {
+                skinColourKey(SkinObjectType::kComboBox, SkinColourProperty::kFocusBorder,
+                              SkinColourState::kDefault, ColourSet::k4),
+                ColourChart::kGrey800,
+                ColourChart::kGrey800
+            };
+
             inline constexpr ColourElement kBackgroundDisabled = {
-                skinColourKey(SkinObjectType::kComboBoxButtonLike, SkinColourProperty::kBackground, SkinColourState::kDisabled),
+                skinColourKey(SkinObjectType::kComboBox, SkinColourProperty::kBackground,
+                              SkinColourState::kDisabled, ColourSet::k4),
                 ColourChart::kGrey950,
                 ColourChart::kGrey950
             };
 
             inline constexpr ColourElement kBorderDisabled = {
-                skinColourKey(SkinObjectType::kComboBoxButtonLike, SkinColourProperty::kBorder, SkinColourState::kDisabled),
+                skinColourKey(SkinObjectType::kComboBox, SkinColourProperty::kBorder,
+                              SkinColourState::kDisabled, ColourSet::k4),
                 ColourChart::kGrey800,
                 ColourChart::kGrey800
             };
 
             inline constexpr ColourElement kTextDisabled = {
-                skinColourKey(SkinObjectType::kComboBoxButtonLike, SkinColourProperty::kText, SkinColourState::kDisabled),
+                skinColourKey(SkinObjectType::kComboBox, SkinColourProperty::kText,
+                              SkinColourState::kDisabled, ColourSet::k4),
                 Common::kContentDisabled,
                 Common::kContentDisabled
             };
 
             inline constexpr ColourElement kTriangleDisabled = {
-                skinColourKey(SkinObjectType::kComboBoxButtonLike, SkinColourProperty::kTriangle, SkinColourState::kDisabled),
+                skinColourKey(SkinObjectType::kComboBox, SkinColourProperty::kTriangle,
+                              SkinColourState::kDisabled, ColourSet::k4),
                 Common::kContentDisabled,
                 Common::kContentDisabled
             };
@@ -160,7 +177,7 @@ namespace TSS::SkinColours
                 Common::kContentHover
             };
 
-            // Standard scrollbar reuses ButtonLike scrollbar pastille (same hex as before).
+            // Scrollbar pastille (shared hex with former ButtonLike scrollbar).
             inline constexpr ColourElement kScrollbar = {
                 skinColourKey(SkinObjectType::kPopupMenu, SkinColourProperty::kScrollbar),
                 ColourChart::kGrey800,
@@ -168,53 +185,61 @@ namespace TSS::SkinColours
             };
         }
 
-        namespace PopupMenuButtonLike
+        /** Former PopupMenuButtonLike pastilles — seeded onto PopupMenu at ColourSet::k4 only. */
+        namespace PopupMenuK4
         {
             inline constexpr ColourElement kBackground = {
-                skinColourKey(SkinObjectType::kPopupMenuButtonLike, SkinColourProperty::kBackground),
+                skinColourKey(SkinObjectType::kPopupMenu, SkinColourProperty::kBackground,
+                              SkinColourState::kDefault, ColourSet::k4),
                 ColourChart::kBlack,
                 ColourChart::kBlack
             };
 
             inline constexpr ColourElement kBorder = {
-                skinColourKey(SkinObjectType::kPopupMenuButtonLike, SkinColourProperty::kBorder),
+                skinColourKey(SkinObjectType::kPopupMenu, SkinColourProperty::kBorder,
+                              SkinColourState::kDefault, ColourSet::k4),
                 ColourChart::kGrey600,
                 ColourChart::kGrey600
             };
 
             inline constexpr ColourElement kSeparator = {
-                skinColourKey(SkinObjectType::kPopupMenuButtonLike, SkinColourProperty::kSeparator),
+                skinColourKey(SkinObjectType::kPopupMenu, SkinColourProperty::kSeparator,
+                              SkinColourState::kDefault, ColourSet::k4),
                 ColourChart::kGrey600,
                 ColourChart::kGrey600
             };
 
             inline constexpr ColourElement kText = {
-                skinColourKey(SkinObjectType::kPopupMenuButtonLike, SkinColourProperty::kText),
+                skinColourKey(SkinObjectType::kPopupMenu, SkinColourProperty::kText,
+                              SkinColourState::kDefault, ColourSet::k4),
                 ColourChart::kGrey200,
                 ColourChart::kGrey200
             };
 
-            // Solid muted grey replacing former text.withAlpha(0.5f) on disabled / section headers.
             inline constexpr ColourElement kTextDisabled = {
-                skinColourKey(SkinObjectType::kPopupMenuButtonLike, SkinColourProperty::kText, SkinColourState::kDisabled),
+                skinColourKey(SkinObjectType::kPopupMenu, SkinColourProperty::kText,
+                              SkinColourState::kDisabled, ColourSet::k4),
                 Common::kContentDisabled,
                 Common::kContentDisabled
             };
 
             inline constexpr ColourElement kBackgroundHover = {
-                skinColourKey(SkinObjectType::kPopupMenuButtonLike, SkinColourProperty::kBackground, SkinColourState::kHover),
+                skinColourKey(SkinObjectType::kPopupMenu, SkinColourProperty::kBackground,
+                              SkinColourState::kHover, ColourSet::k4),
                 ColourChart::kGrey200,
                 ColourChart::kGrey200
             };
 
             inline constexpr ColourElement kTextHover = {
-                skinColourKey(SkinObjectType::kPopupMenuButtonLike, SkinColourProperty::kText, SkinColourState::kHover),
+                skinColourKey(SkinObjectType::kPopupMenu, SkinColourProperty::kText,
+                              SkinColourState::kHover, ColourSet::k4),
                 ColourChart::kBlack,
                 ColourChart::kBlack
             };
 
             inline constexpr ColourElement kScrollbar = {
-                skinColourKey(SkinObjectType::kPopupMenuButtonLike, SkinColourProperty::kScrollbar),
+                skinColourKey(SkinObjectType::kPopupMenu, SkinColourProperty::kScrollbar,
+                              SkinColourState::kDefault, ColourSet::k4),
                 ColourChart::kGrey800,
                 ColourChart::kGrey800
             };

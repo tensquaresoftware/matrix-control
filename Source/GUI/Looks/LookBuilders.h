@@ -11,8 +11,6 @@ namespace TSS
     // Red fill / black text / white hover — value-pressure PANIC alert look.
     ButtonLook buttonAlertLookFromSkin(const ISkin& skin, ColourSet colourSet = ColourSet::k1);
     SliderLook sliderLookFromSkin(const ISkin& skin, ColourSet colourSet = ColourSet::k1);
-    // Settings monochrome greys (ComboBox ButtonLike parity); opt-in per control.
-    SliderLook sliderLookButtonLikeFromSkin(const ISkin& skin, ColourSet colourSet = ColourSet::k1);
     LabelLook labelLookFromSkin(const ISkin& skin);
     LabelLook darkPanelLabelLookFromSkin(const ISkin& skin);
     LabelLook brandLabelLookFromSkin(const ISkin& skin);

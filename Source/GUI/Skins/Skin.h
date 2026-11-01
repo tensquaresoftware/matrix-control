@@ -58,33 +58,21 @@ namespace TSS
         juce::Colour getSliderTextColour(bool isEnabled = true,
                                          ColourSet colourSet = ColourSet::k1) const override;
         juce::Colour getComboBoxBackgroundColour(bool isEnabled = true,
-                                                 bool isButtonLike = false,
                                                  ColourSet colourSet = ColourSet::k1) const override;
         juce::Colour getComboBoxBorderColour(bool isEnabled = true,
-                                             bool isButtonLike = false,
                                              ColourSet colourSet = ColourSet::k1) const override;
-        juce::Colour getComboBoxFocusBorderColour(bool isButtonLike = false,
-                                                  ColourSet colourSet = ColourSet::k1) const override;
+        juce::Colour getComboBoxFocusBorderColour(ColourSet colourSet = ColourSet::k1) const override;
         juce::Colour getComboBoxTriangleColour(bool isEnabled = true,
-                                               bool isButtonLike = false,
                                                ColourSet colourSet = ColourSet::k1) const override;
         juce::Colour getComboBoxTextColour(bool isEnabled = true,
-                                           bool isButtonLike = false,
                                            ColourSet colourSet = ColourSet::k1) const override;
-        juce::Colour getPopupMenuBackgroundColour(bool isButtonLike = false,
-                                                  ColourSet colourSet = ColourSet::k1) const override;
-        juce::Colour getPopupMenuBorderColour(bool isButtonLike = false,
-                                              ColourSet colourSet = ColourSet::k1) const override;
-        juce::Colour getPopupMenuSeparatorColour(bool isButtonLike = false,
-                                                 ColourSet colourSet = ColourSet::k1) const override;
-        juce::Colour getPopupMenuTextColour(bool isButtonLike = false,
-                                            ColourSet colourSet = ColourSet::k1) const override;
-        juce::Colour getPopupMenuBackgroundHooverColour(bool isButtonLike = false,
-                                                        ColourSet colourSet = ColourSet::k1) const override;
-        juce::Colour getPopupMenuTextHooverColour(bool isButtonLike = false,
-                                                  ColourSet colourSet = ColourSet::k1) const override;
-        juce::Colour getPopupMenuScrollbarColour(bool isButtonLike = false,
-                                                 ColourSet colourSet = ColourSet::k1) const override;
+        juce::Colour getPopupMenuBackgroundColour(ColourSet colourSet = ColourSet::k1) const override;
+        juce::Colour getPopupMenuBorderColour(ColourSet colourSet = ColourSet::k1) const override;
+        juce::Colour getPopupMenuSeparatorColour(ColourSet colourSet = ColourSet::k1) const override;
+        juce::Colour getPopupMenuTextColour(ColourSet colourSet = ColourSet::k1) const override;
+        juce::Colour getPopupMenuBackgroundHooverColour(ColourSet colourSet = ColourSet::k1) const override;
+        juce::Colour getPopupMenuTextHooverColour(ColourSet colourSet = ColourSet::k1) const override;
+        juce::Colour getPopupMenuScrollbarColour(ColourSet colourSet = ColourSet::k1) const override;
 
     private:
         void initializeDefaultColours();
@@ -118,6 +106,12 @@ namespace TSS
 
         template <typename Accessor>
         void putColour(Accessor accessColour, const SkinColours::ColourElement& element);
+
+        template <typename Accessor>
+        void putColourExact(Accessor accessColour, const SkinColours::ColourElement& element);
+
+        template <typename Accessor>
+        void overlayFormerButtonLikeAtK4(Accessor accessColour);
 
         ColourVariant currentVariant_;
         std::map<SkinColourKey, juce::Colour> colours_;

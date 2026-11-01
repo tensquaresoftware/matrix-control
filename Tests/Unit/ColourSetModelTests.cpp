@@ -1,6 +1,8 @@
 #include <juce_core/juce_core.h>
 
 #include "GUI/Skins/Dev/DevSkinJson.h"
+#include "GUI/Skins/Dev/DevSkinJsonMapping.h"
+#include "GUI/Skins/Dev/DevSkinKeyNames.h"
 #include "GUI/Skins/Dev/DevSkinLayer.h"
 #include "GUI/Skins/SkinValues.h"
 
@@ -34,6 +36,9 @@ public:
 
         beginTest("json_rejectsHigherSetForK1OnlyObject");
         assertJsonRejectsInvalidHigherSet();
+
+        beginTest("legacyButtonLikeObjectKeys_remapToClassicObjects");
+        assertLegacyButtonLikeObjectKeysRemap();
     }
 
 private:
@@ -160,6 +165,47 @@ private:
         }
         expect(! TSS::DevSkin::importFromJson(layer, juce::JSON::toString(parsed)).ok);
         expectEquals(TSS::DevSkin::exportToJson(layer), before);
+    }
+
+    void assertLegacyButtonLikeObjectKeysRemap()
+    {
+        TSS::SkinObjectType object {};
+        expect(TSS::DevSkin::parseObjectType("SliderButtonLike", object));
+        expect(object == TSS::SkinObjectType::kSlider);
+        expect(TSS::DevSkin::parseObjectType("ComboBoxButtonLike", object));
+        expect(object == TSS::SkinObjectType::kComboBox);
+        expect(TSS::DevSkin::parseObjectType("PopupMenuButtonLike", object));
+        expect(object == TSS::SkinObjectType::kPopupMenu);
+
+        const auto expectRemapToK4 = [this](const char* objectName,
+                                            TSS::SkinObjectType expectedObject,
+                                            bool includeColourSet,
+                                            const char* colourSetValue)
+        {
+            auto* mappingObject = new juce::DynamicObject();
+            mappingObject->setProperty("object", objectName);
+            mappingObject->setProperty("property", "Background");
+            mappingObject->setProperty("state", "Default");
+            if (includeColourSet)
+                mappingObject->setProperty("colourSet", colourSetValue);
+            mappingObject->setProperty("paletteName", "kGrey600");
+
+            TSS::SkinColourKey key {};
+            juce::String paletteName;
+            juce::String error;
+            expect(TSS::DevSkin::mappingFromVar(juce::var(mappingObject), key, paletteName, error));
+            expect(key.object == expectedObject);
+            expect(key.colourSet == TSS::ColourSet::k4);
+            expectEquals(paletteName, juce::String("kGrey600"));
+            expect(TSS::DevSkin::toString(key.object) != objectName);
+        };
+
+        expectRemapToK4("ComboBoxButtonLike", TSS::SkinObjectType::kComboBox, true, "k4");
+        expectRemapToK4("ComboBoxButtonLike", TSS::SkinObjectType::kComboBox, false, "");
+        expectRemapToK4("ComboBoxButtonLike", TSS::SkinObjectType::kComboBox, true, "k1");
+        expectRemapToK4("SliderButtonLike", TSS::SkinObjectType::kSlider, false, "");
+        expectRemapToK4("SliderButtonLike", TSS::SkinObjectType::kSlider, true, "k1");
+        expectRemapToK4("PopupMenuButtonLike", TSS::SkinObjectType::kPopupMenu, true, "k1");
     }
 };
 

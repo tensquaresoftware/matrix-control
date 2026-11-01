@@ -2,16 +2,14 @@
 
 #include "GUI/Skins/Dev/DevSkinColourElementList.h"
 #include "GUI/Skins/Dev/DevSkinPaletteCatalog.h"
+#include "GUI/Skins/SkinColours.h"
 
 namespace TSS::DevSkin
 {
     namespace
     {
-        void putMapping(NamedSkin& skin,
-                        const SkinColours::ColourElement& element,
-                        bool useBlack)
+        juce::String pastilleNameForElement(NamedSkin& skin, juce::uint32 argb)
         {
-            const auto argb = useBlack ? element.blackVariant : element.creamVariant;
             auto name = pastilleNameForArgb(argb);
             if (name.isEmpty())
             {
@@ -28,6 +26,15 @@ namespace TSS::DevSkin
                 if (! found)
                     skin.palette.push_back({ name, argb });
             }
+            return name;
+        }
+
+        void putMapping(NamedSkin& skin,
+                        const SkinColours::ColourElement& element,
+                        bool useBlack)
+        {
+            const auto argb = useBlack ? element.blackVariant : element.creamVariant;
+            const auto name = pastilleNameForElement(skin, argb);
             if (! supportsMultipleColourSets(element.key.object))
             {
                 skin.mappings[element.key] = name;
@@ -40,6 +47,43 @@ namespace TSS::DevSkin
                 key.colourSet = colourSet;
                 skin.mappings[key] = name;
             }
+        }
+
+        void putMappingExact(NamedSkin& skin,
+                             const SkinColours::ColourElement& element,
+                             bool useBlack)
+        {
+            const auto argb = useBlack ? element.blackVariant : element.creamVariant;
+            skin.mappings[element.key] = pastilleNameForElement(skin, argb);
+        }
+
+        void overlayFormerButtonLikeAtK4(NamedSkin& skin, bool useBlack)
+        {
+            using namespace SkinColours;
+
+            putMappingExact(skin, Widgets::SliderK4::kTrack, useBlack);
+            putMappingExact(skin, Widgets::SliderK4::kFocusBorder, useBlack);
+            putMappingExact(skin, Widgets::SliderK4::kValueBar, useBlack);
+            putMappingExact(skin, Widgets::SliderK4::kText, useBlack);
+
+            putMappingExact(skin, Widgets::ComboBoxK4::kBackground, useBlack);
+            putMappingExact(skin, Widgets::ComboBoxK4::kBackgroundDisabled, useBlack);
+            putMappingExact(skin, Widgets::ComboBoxK4::kBorder, useBlack);
+            putMappingExact(skin, Widgets::ComboBoxK4::kBorderDisabled, useBlack);
+            putMappingExact(skin, Widgets::ComboBoxK4::kFocusBorder, useBlack);
+            putMappingExact(skin, Widgets::ComboBoxK4::kText, useBlack);
+            putMappingExact(skin, Widgets::ComboBoxK4::kTextDisabled, useBlack);
+            putMappingExact(skin, Widgets::ComboBoxK4::kTriangle, useBlack);
+            putMappingExact(skin, Widgets::ComboBoxK4::kTriangleDisabled, useBlack);
+
+            putMappingExact(skin, Widgets::PopupMenuK4::kBackground, useBlack);
+            putMappingExact(skin, Widgets::PopupMenuK4::kBorder, useBlack);
+            putMappingExact(skin, Widgets::PopupMenuK4::kSeparator, useBlack);
+            putMappingExact(skin, Widgets::PopupMenuK4::kText, useBlack);
+            putMappingExact(skin, Widgets::PopupMenuK4::kTextDisabled, useBlack);
+            putMappingExact(skin, Widgets::PopupMenuK4::kBackgroundHover, useBlack);
+            putMappingExact(skin, Widgets::PopupMenuK4::kTextHover, useBlack);
+            putMappingExact(skin, Widgets::PopupMenuK4::kScrollbar, useBlack);
         }
     }
 
@@ -67,5 +111,6 @@ namespace TSS::DevSkin
         {
             putMapping(skin, element, useBlack);
         });
+        overlayFormerButtonLikeAtK4(skin, useBlack);
     }
 }

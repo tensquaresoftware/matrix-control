@@ -189,28 +189,33 @@ namespace TSS::SkinColours
             };
         }
 
-        namespace SliderButtonLike
+        /** Former SliderButtonLike pastilles — seeded onto Slider at ColourSet::k4 only. */
+        namespace SliderK4
         {
             inline constexpr ColourElement kTrack = {
-                skinColourKey(SkinObjectType::kSliderButtonLike, SkinColourProperty::kTrack),
+                skinColourKey(SkinObjectType::kSlider, SkinColourProperty::kTrack,
+                              SkinColourState::kDefault, ColourSet::k4),
                 ColourChart::kBlack,
                 ColourChart::kBlack
             };
 
             inline constexpr ColourElement kFocusBorder = {
-                skinColourKey(SkinObjectType::kSliderButtonLike, SkinColourProperty::kFocusBorder),
+                skinColourKey(SkinObjectType::kSlider, SkinColourProperty::kFocusBorder,
+                              SkinColourState::kDefault, ColourSet::k4),
                 ColourChart::kGrey800,
                 ColourChart::kGrey800
             };
 
             inline constexpr ColourElement kValueBar = {
-                skinColourKey(SkinObjectType::kSliderButtonLike, SkinColourProperty::kValueBar),
+                skinColourKey(SkinObjectType::kSlider, SkinColourProperty::kValueBar,
+                              SkinColourState::kDefault, ColourSet::k4),
                 ColourChart::kGrey600,
                 ColourChart::kGrey600
             };
 
             inline constexpr ColourElement kText = {
-                skinColourKey(SkinObjectType::kSliderButtonLike, SkinColourProperty::kText),
+                skinColourKey(SkinObjectType::kSlider, SkinColourProperty::kText,
+                              SkinColourState::kDefault, ColourSet::k4),
                 ColourChart::kGrey200,
                 ColourChart::kGrey200
             };

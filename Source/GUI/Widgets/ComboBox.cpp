@@ -43,12 +43,12 @@ namespace TSS
         return juce::roundToInt(static_cast<float>(popupLayoutDimensions_.verticalMargin) * uiScale_);
     }
 
-    ComboBox::ComboBox(int width, int height, const ComboBoxLook& look, Style style)
+    ComboBox::ComboBox(int width, int height, const ComboBoxLook& look, PopupMode popupMode)
         : juce::ComboBox()
         , look_(look)
         , width_(width)
         , height_(height)
-        , style_(style)
+        , popupMode_(popupMode)
     {
         setOpaque(false);
         setSize(width_, height_);
@@ -102,16 +102,16 @@ namespace TSS
 
     void ComboBox::paint(juce::Graphics& g)
     {
-        const auto style = style_ == Style::ButtonLike
-            ? ComboBoxControlStyle::ButtonLike
-            : ComboBoxControlStyle::Standard;
+        const auto closedChrome = popupMode_ == PopupMode::Scrollable
+            ? ComboBoxClosedChrome::AlwaysThickBorder
+            : ComboBoxClosedChrome::FocusRing;
 
         ComboBoxControlPainter::paintClosedState(
             g,
             {
                 .component = *this,
                 .bounds = getLocalBounds().toFloat(),
-                .style = style,
+                .closedChrome = closedChrome,
                 .look = look_,
                 .uiScale = uiScale_,
                 .text = getSelectedItemText(),
@@ -161,7 +161,7 @@ namespace TSS
 
     void ComboBox::showPopupAsynchronously()
     {
-        const auto useScrollableMode = (style_ == Style::ButtonLike);
+        const auto useScrollableMode = (popupMode_ == PopupMode::Scrollable);
         const auto generation = ++popupShowGeneration_;
 
         juce::MessageManager::callAsync(

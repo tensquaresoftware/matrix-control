@@ -6,9 +6,8 @@
 
 namespace TSS
 {
-    PopupMenuRenderer::PopupMenuRenderer(bool isButtonLike, float uiScale)
-        : isButtonLike_(isButtonLike)
-        , uiScale_(uiScale)
+    PopupMenuRenderer::PopupMenuRenderer(float uiScale)
+        : uiScale_(uiScale)
     {
     }
 
@@ -19,10 +18,7 @@ namespace TSS
 
     void PopupMenuRenderer::drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds) const
     {
-        const auto backgroundColour = isButtonLike_ 
-            ? look_.backgroundButtonLike
-            : look_.background;
-        g.setColour(backgroundColour);
+        g.setColour(look_.background);
         g.fillRect(bounds);
     }
 
@@ -37,10 +33,7 @@ namespace TSS
             uiScale_,
             systemDisplayScale,
             borderSnapPolicy);
-        const auto borderColour = isButtonLike_
-            ? look_.borderButtonLike
-            : look_.border;
-        g.setColour(borderColour);
+        g.setColour(look_.border);
         g.drawRect(bounds, borderThickness);
     }
 
@@ -59,22 +52,17 @@ namespace TSS
 
         if (showHover)
         {
-            const auto hooverBackgroundColour = isButtonLike_
-                ? look_.backgroundHoverButtonLike
-                : look_.backgroundHover;
             const float gap = getHighlightGap(args.systemDisplayScale);
             auto hooverBoundsFloat = args.itemBounds.reduced(gap);
             if (args.highlightBottomExtraTrim > 0.0f)
                 hooverBoundsFloat.setBottom(hooverBoundsFloat.getBottom() - args.highlightBottomExtraTrim);
-            g.setColour(hooverBackgroundColour);
+            g.setColour(look_.backgroundHover);
             g.fillRect(hooverBoundsFloat);
         }
 
-        auto textColour = showHover
-            ? (isButtonLike_ ? look_.textHoverButtonLike : look_.textHover)
-            : (isButtonLike_ ? look_.textButtonLike : look_.text);
+        auto textColour = showHover ? look_.textHover : look_.text;
         if (! args.isEnabled)
-            textColour = isButtonLike_ ? look_.textDisabledButtonLike : look_.textDisabled;
+            textColour = look_.textDisabled;
 
         g.setColour(textColour);
         g.setFont(font);
@@ -121,25 +109,23 @@ namespace TSS
             .highlightBottomExtraTrim = args.highlightBottomExtraTrim});
     }
 
-    void PopupMenuRenderer::drawVerticalSeparators(juce::Graphics& g, const juce::Rectangle<float>& contentBounds,
-                                                  int columnCount, float actualColumnWidth, float separatorWidth) const
+    void PopupMenuRenderer::drawVerticalSeparators(juce::Graphics& g, const DrawVerticalSeparatorsArgs& args) const
     {
-        if (columnCount <= 1)
+        if (args.columnCount <= 1)
             return;
-        
-        const auto separatorColour = isButtonLike_ 
-            ? look_.separatorButtonLike
-            : look_.separator;
-        g.setColour(separatorColour);
-        
-        const float contentX = contentBounds.getX();
-        const float contentY = contentBounds.getY();
-        const float contentHeight = contentBounds.getHeight();
-        
-        for (int i = 1; i < columnCount; ++i)
+
+        g.setColour(look_.separator);
+
+        const float contentX = args.contentBounds.getX();
+        const float contentY = args.contentBounds.getY();
+        const float contentHeight = args.contentBounds.getHeight();
+
+        for (int i = 1; i < args.columnCount; ++i)
         {
-            const float separatorX = contentX + static_cast<float>(i) * actualColumnWidth + static_cast<float>(i - 1) * separatorWidth;
-            g.fillRect(juce::Rectangle<float>(separatorX, contentY, separatorWidth, contentHeight));
+            const float separatorX = contentX
+                + static_cast<float>(i) * args.actualColumnWidth
+                + static_cast<float>(i - 1) * args.separatorWidth;
+            g.fillRect(juce::Rectangle<float>(separatorX, contentY, args.separatorWidth, contentHeight));
         }
     }
 
@@ -153,10 +139,7 @@ namespace TSS
             uiScale_,
             systemDisplayScale,
             ScaledDrawing::StrokeSnapPolicy::kFloor);
-        const auto borderColour = isButtonLike_
-            ? look_.borderButtonLike
-            : look_.border;
-        g.setColour(borderColour);
+        g.setColour(look_.border);
         g.fillRect(itemBounds.getX(),
                    itemBounds.getBottom() - borderThickness,
                    itemBounds.getWidth(),

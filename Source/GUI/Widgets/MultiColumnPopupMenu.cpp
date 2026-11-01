@@ -7,7 +7,7 @@
 namespace TSS
 {
     MultiColumnPopupMenu::MultiColumnPopupMenu(ComboBox& comboBox)
-        : PopupMenuBase(comboBox, false)
+        : PopupMenuBase(comboBox)
     {
         calculateLayout();
         
@@ -39,7 +39,11 @@ namespace TSS
         {
             const float separatorWidth = getSeparatorWidth();
             const float actualColumnWidth = getActualColumnWidth(contentBounds.getWidth());
-            renderer_.drawVerticalSeparators(g, contentBounds, columnCount_, actualColumnWidth, separatorWidth);
+            renderer_.drawVerticalSeparators(g, {
+                .contentBounds = contentBounds,
+                .columnCount = columnCount_,
+                .actualColumnWidth = actualColumnWidth,
+                .separatorWidth = separatorWidth});
         }
         
         renderer_.drawBorder(g, bounds, systemDisplayScale);
