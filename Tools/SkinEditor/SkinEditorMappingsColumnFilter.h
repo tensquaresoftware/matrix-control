@@ -18,6 +18,7 @@ namespace SkinEditorMappingsColumnFilter
     {
         kProperty,
         kState,
+        kColourSet,
         kMappedColour
     };
 
@@ -25,6 +26,7 @@ namespace SkinEditorMappingsColumnFilter
     {
         juce::String property;
         juce::String state;
+        juce::String colourSet;
         juce::String mappedColour;
     };
 
@@ -48,6 +50,7 @@ namespace SkinEditorMappingsColumnFilter
             TSS::SkinObjectType::kDialog,
             TSS::SkinObjectType::kWindowClose,
             TSS::SkinObjectType::kLed,
+            TSS::SkinObjectType::kPeakIndicator,
             TSS::SkinObjectType::kEnvelopeDisplay,
             TSS::SkinObjectType::kTrackGeneratorDisplay,
             TSS::SkinObjectType::kPatchNameDisplay,
@@ -80,6 +83,9 @@ namespace SkinEditorMappingsColumnFilter
             return false;
         if (filters.state.isNotEmpty()
             && TSS::DevSkin::toString(key.state) != filters.state)
+            return false;
+        if (filters.colourSet.isNotEmpty()
+            && TSS::DevSkin::toString(key.colourSet) != filters.colourSet)
             return false;
         if (filters.mappedColour.isEmpty())
             return true;
@@ -150,6 +156,11 @@ namespace SkinEditorMappingsColumnFilter
             if (column == Column::kState)
             {
                 values.addIfNotAlreadyThere(TSS::DevSkin::toString(key.state));
+                continue;
+            }
+            if (column == Column::kColourSet)
+            {
+                values.addIfNotAlreadyThere(TSS::DevSkin::toString(key.colourSet));
                 continue;
             }
 

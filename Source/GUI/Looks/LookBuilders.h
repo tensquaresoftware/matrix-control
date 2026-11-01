@@ -23,6 +23,7 @@ namespace TSS
     PatchNameDisplayLook patchNameDisplayLookFromSkin(const ISkin& skin);
     ReadOnlyValueFieldLook readOnlyValueFieldLookFromSkin(const ISkin& skin);
     LedLook ledLookFromSkin(const ISkin& skin);
+    LedLook peakIndicatorLookFromSkin(const ISkin& skin);
     GroupLabelLook groupLabelLookFromSkin(const ISkin& skin);
     ToggleLook toggleLookFromSkin(const ISkin& skin);
     NumberBoxLook numberBoxLookFromSkin(const ISkin& skin);

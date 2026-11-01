@@ -28,7 +28,18 @@ namespace TSS::DevSkin
                 if (! found)
                     skin.palette.push_back({ name, argb });
             }
-            skin.mappings[element.key] = name;
+            if (! supportsMultipleColourSets(element.key.object))
+            {
+                skin.mappings[element.key] = name;
+                return;
+            }
+
+            for (const auto colourSet : kAllColourSets)
+            {
+                auto key = element.key;
+                key.colourSet = colourSet;
+                skin.mappings[key] = name;
+            }
         }
     }
 

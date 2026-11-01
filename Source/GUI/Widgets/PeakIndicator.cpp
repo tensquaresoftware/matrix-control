@@ -53,7 +53,7 @@ namespace TSS
     void PeakIndicator::setSkin(ISkin& skin)
     {
         skin_ = &skin;
-        ledLook_ = ledLookFromSkin(skin);
+        ledLook_ = peakIndicatorLookFromSkin(skin);
         repaint();
     }
 

@@ -13,7 +13,8 @@ namespace TSS
 
         virtual juce::Colour getColour(SkinObjectType object,
                                        SkinColourProperty property,
-                                       SkinColourState state = SkinColourState::kDefault) const = 0;
+                                       SkinColourState state = SkinColourState::kDefault,
+                                       ColourSet colourSet = ColourSet::k1) const = 0;
         virtual juce::Colour getColour(SkinColourKey key) const = 0;
         virtual void setColour(SkinColourKey key, juce::Colour colour) = 0;
 

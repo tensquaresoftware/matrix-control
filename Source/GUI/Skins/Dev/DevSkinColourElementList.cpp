@@ -138,6 +138,9 @@ namespace TSS::DevSkin
             out.push_back(&Widgets::Led::kBackgroundOff);
             out.push_back(&Widgets::Led::kBorderOff);
             out.push_back(&Widgets::Led::kMaxOn);
+            out.push_back(&Widgets::PeakIndicator::kBackgroundOff);
+            out.push_back(&Widgets::PeakIndicator::kBorderOff);
+            out.push_back(&Widgets::PeakIndicator::kMaxOn);
         }
     }
 

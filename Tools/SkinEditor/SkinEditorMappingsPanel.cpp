@@ -20,6 +20,7 @@ namespace
     {
         int propertyW = 0;
         int stateW = 0;
+        int colourSetW = 0;
         int mappedX = 0;
         int mappedW = 0;
     };
@@ -31,6 +32,7 @@ namespace
         // Fixed Property/State; when paint width matches SSOT, mappedX == pad + 150 + 150.
         return { SkinEditorChrome::kMappingsPropertyColumnWidth,
                  SkinEditorChrome::kMappingsStateColumnWidth,
+                 SkinEditorChrome::kMappingsColourSetColumnWidth,
                  mappedX,
                  mappedSpan };
     }
@@ -194,6 +196,13 @@ void SkinEditorMappingsPanel::paintMappingCells(juce::Graphics& g,
                juce::Justification::centredLeft, false);
     g.drawText(item.stateLabel, x0 + kColPad + cols.propertyW, contentY, juce::jmax(0, cols.stateW - 4),
                contentH, juce::Justification::centredLeft, false);
+    g.drawText(item.colourSetLabel,
+               x0 + kColPad + cols.propertyW + cols.stateW,
+               contentY,
+               juce::jmax(0, cols.colourSetW - 4),
+               contentH,
+               juce::Justification::centredLeft,
+               false);
 
     if (item.unbound)
     {

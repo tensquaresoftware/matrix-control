@@ -238,6 +238,21 @@ namespace TSS
         return look;
     }
 
+    LedLook peakIndicatorLookFromSkin(const ISkin& skin)
+    {
+        LedLook look;
+        look.backgroundOff = skin.getColour(SkinObjectType::kPeakIndicator,
+                                            SkinColourProperty::kBackground,
+                                            SkinColourState::kOff);
+        look.borderOff = skin.getColour(SkinObjectType::kPeakIndicator,
+                                        SkinColourProperty::kBorder,
+                                        SkinColourState::kOff);
+        look.maxOn = skin.getColour(SkinObjectType::kPeakIndicator,
+                                    SkinColourProperty::kBackground,
+                                    SkinColourState::kOn);
+        return look;
+    }
+
     GroupLabelLook groupLabelLookFromSkin(const ISkin& skin)
     {
         GroupLabelLook look;

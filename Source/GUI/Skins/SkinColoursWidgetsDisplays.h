@@ -149,7 +149,6 @@ namespace TSS::SkinColours
             };
         }
 
-        // Shared by Led and PeakIndicator. Off plate/border match Button off; max-on = Slider text emerald.
         namespace Led
         {
             inline constexpr ColourElement kBackgroundOff = {
@@ -166,6 +165,33 @@ namespace TSS::SkinColours
 
             inline constexpr ColourElement kMaxOn = {
                 skinColourKey(SkinObjectType::kLed, SkinColourProperty::kBackground, SkinColourState::kOn),
+                ColourChart::kEmerald400,
+                ColourChart::kEmerald400
+            };
+        }
+
+        namespace PeakIndicator
+        {
+            inline constexpr ColourElement kBackgroundOff = {
+                skinColourKey(SkinObjectType::kPeakIndicator,
+                              SkinColourProperty::kBackground,
+                              SkinColourState::kOff),
+                ColourChart::kBlack,
+                ColourChart::kBlack
+            };
+
+            inline constexpr ColourElement kBorderOff = {
+                skinColourKey(SkinObjectType::kPeakIndicator,
+                              SkinColourProperty::kBorder,
+                              SkinColourState::kOff),
+                ColourChart::kGrey800,
+                ColourChart::kGrey800
+            };
+
+            inline constexpr ColourElement kMaxOn = {
+                skinColourKey(SkinObjectType::kPeakIndicator,
+                              SkinColourProperty::kBackground,
+                              SkinColourState::kOn),
                 ColourChart::kEmerald400,
                 ColourChart::kEmerald400
             };

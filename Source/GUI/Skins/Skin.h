@@ -35,9 +35,11 @@ namespace TSS
 
         juce::Colour getColour(SkinObjectType object,
                                SkinColourProperty property,
-                               SkinColourState state = SkinColourState::kDefault) const override;
+                               SkinColourState state = SkinColourState::kDefault,
+                               ColourSet colourSet = ColourSet::k1) const override;
         juce::Colour getColour(SkinColourKey key) const override;
         void setColour(SkinColourKey key, juce::Colour colour) override;
+        void clearHigherColourSets();
 
         juce::Font getBaseFont() const override;
         juce::Font getBaseFontBold() const override;

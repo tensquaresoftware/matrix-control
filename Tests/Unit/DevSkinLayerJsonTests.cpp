@@ -98,7 +98,8 @@ private:
 
         const auto key = TSS::skinColourKey(TSS::SkinObjectType::kButton,
                                             TSS::SkinColourProperty::kBackground,
-                                            TSS::SkinColourState::kOff);
+                                            TSS::SkinColourState::kOff,
+                                            TSS::ColourSet::k3);
         expect(layer.setMapping(skin->id, key, "kEmerald400").wasOk());
         expect(layer.addPastille(skin->id, "kCustomAccent", 0xffff00aa).wasOk());
 

@@ -38,6 +38,7 @@ namespace TSS::DevSkin
             { SkinObjectType::kWindowClose, "WindowClose" },
             { SkinObjectType::kReadOnlyValueField, "ReadOnlyValueField" },
             { SkinObjectType::kLed, "Led" },
+            { SkinObjectType::kPeakIndicator, "PeakIndicator" },
         };
 
         constexpr Named<SkinColourProperty> kProperties[] = {
@@ -75,6 +76,13 @@ namespace TSS::DevSkin
             { SkinColourState::kInfo, "Info" },
             { SkinColourState::kWarning, "Warning" },
             { SkinColourState::kError, "Error" },
+        };
+
+        constexpr Named<ColourSet> kColourSets[] = {
+            { ColourSet::k1, "k1" },
+            { ColourSet::k2, "k2" },
+            { ColourSet::k3, "k3" },
+            { ColourSet::k4, "k4" },
         };
 
         template <typename Enum, size_t N>
@@ -116,6 +124,11 @@ namespace TSS::DevSkin
         return nameOf(kStates, state);
     }
 
+    juce::String toString(ColourSet colourSet)
+    {
+        return nameOf(kColourSets, colourSet);
+    }
+
     bool parseObjectType(const juce::String& text, SkinObjectType& out)
     {
         return parseOf(kObjects, text, out);
@@ -131,9 +144,15 @@ namespace TSS::DevSkin
         return parseOf(kStates, text, out);
     }
 
+    bool parseColourSet(const juce::String& text, ColourSet& out)
+    {
+        return parseOf(kColourSets, text, out);
+    }
+
     juce::String keyLabel(const SkinColourKey& key)
     {
-        return toString(key.object) + " / " + toString(key.property) + " / " + toString(key.state);
+        return toString(key.object) + " / " + toString(key.property) + " / "
+             + toString(key.state) + " / " + toString(key.colourSet);
     }
 
     juce::StringArray allObjectTypeNames()

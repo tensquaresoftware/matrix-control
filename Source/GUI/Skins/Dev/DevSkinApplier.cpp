@@ -37,6 +37,7 @@ namespace TSS::DevSkin
             return result;
         }
 
+        targetSkin.clearHigherColourSets();
         for (const auto& [key, paletteName] : payload.mappings)
         {
             const auto argb = argbForPastilleName(payload.palette, paletteName);

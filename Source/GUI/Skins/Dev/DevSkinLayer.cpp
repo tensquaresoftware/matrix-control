@@ -128,6 +128,8 @@ namespace TSS::DevSkin
     {
         if (isCompiledId(skinId))
             return juce::Result::fail("Compiled Black/Cream are read-only; Duplicate first");
+        if (key.colourSet != ColourSet::k1 && ! supportsMultipleColourSets(key.object))
+            return juce::Result::fail("Higher ColourSet is not supported for this object");
 
         auto* skin = findSkinMutable(skinId);
         if (skin == nullptr)

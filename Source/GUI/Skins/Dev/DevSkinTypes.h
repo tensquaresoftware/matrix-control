@@ -11,7 +11,8 @@
 
 namespace TSS::DevSkin
 {
-    inline constexpr int kSchemaVersion = 1;
+    inline constexpr int kLegacySchemaVersion = 1;
+    inline constexpr int kSchemaVersion = 2;
     inline constexpr const char* kCompiledBlackId = "compiled:black";
     inline constexpr const char* kCompiledCreamId = "compiled:cream";
 

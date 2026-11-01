@@ -492,6 +492,7 @@ set(MATRIX_SKIN_DEV_LAYER_SOURCES
     Source/GUI/Skins/Dev/DevSkinColourElementList.cpp
     Source/GUI/Skins/Dev/DevSkinInventory.cpp
     Source/GUI/Skins/Dev/DevSkinJson.cpp
+    Source/GUI/Skins/Dev/DevSkinJsonMapping.cpp
     Source/GUI/Skins/Dev/DevSkinKeyNames.cpp
     Source/GUI/Skins/Dev/DevSkinLayer.cpp
     Source/GUI/Skins/Dev/DevSkinLayerCreate.cpp
@@ -607,6 +608,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/ModuleHeaderTitleColourTests.cpp
         Tests/Unit/NumberBoxDisabledBackgroundColourTests.cpp
         Tests/Unit/SkinColourSubstrateTests.cpp
+        Tests/Unit/ColourSetModelTests.cpp
         Tests/Unit/DevSkinLayerJsonTests.cpp
         Tests/Unit/DevSkinMatrixTests.cpp
         Tests/Unit/DevSkinPendingPastilleTests.cpp
@@ -703,6 +705,7 @@ if(MATRIX_BUILD_TESTS)
         Source/GUI/Skins/Dev/DevSkinColourElementList.cpp
         Source/GUI/Skins/Dev/DevSkinInventory.cpp
         Source/GUI/Skins/Dev/DevSkinJson.cpp
+        Source/GUI/Skins/Dev/DevSkinJsonMapping.cpp
         Source/GUI/Skins/Dev/DevSkinKeyNames.cpp
         Source/GUI/Skins/Dev/DevSkinLayer.cpp
         Source/GUI/Skins/Dev/DevSkinLayerCreate.cpp
@@ -987,6 +990,7 @@ if(MATRIX_BUILD_SKIN_EDITOR)
         Source/GUI/Skins/Dev/DevSkinColourElementList.cpp
         Source/GUI/Skins/Dev/DevSkinInventory.cpp
         Source/GUI/Skins/Dev/DevSkinJson.cpp
+        Source/GUI/Skins/Dev/DevSkinJsonMapping.cpp
         Source/GUI/Skins/Dev/DevSkinKeyNames.cpp
         Source/GUI/Skins/Dev/DevSkinLayer.cpp
         Source/GUI/Skins/Dev/DevSkinLayerCreate.cpp

@@ -22,6 +22,7 @@ SkinEditorMappingsPanel::Row SkinEditorMappingsPanel::makeMappingRow(
     row.key = key;
     row.propertyLabel = TSS::DevSkin::toString(key.property);
     row.stateLabel = TSS::DevSkin::toString(key.state);
+    row.colourSetLabel = TSS::DevSkin::toString(key.colourSet);
 
     const auto it = skin.mappings.find(key);
     if (it == skin.mappings.end() || it->second.isEmpty())
@@ -90,7 +91,7 @@ void SkinEditorMappingsPanel::rebuildRows()
         return;
 
     const SkinEditorMappingsColumnFilter::ActiveFilters filters {
-        propertyFilter_, stateFilter_, mappedColourFilter_ };
+        propertyFilter_, stateFilter_, colourSetFilter_, mappedColourFilter_ };
 
     int y = kFocusPad;
     bool anyTable = false;

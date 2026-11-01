@@ -1,6 +1,6 @@
 #include "GUI/Skins/Dev/DevSkinJson.h"
 
-#include "GUI/Skins/Dev/DevSkinKeyNames.h"
+#include "GUI/Skins/Dev/DevSkinJsonMapping.h"
 #include "GUI/Skins/Dev/DevSkinSsotSeed.h"
 
 namespace TSS::DevSkin
@@ -77,47 +77,6 @@ namespace TSS::DevSkin
             }
             error = "Pastille entry must be an object";
             return false;
-        }
-
-        juce::var mappingToVar(const SkinColourKey& key, const juce::String& paletteName)
-        {
-            auto* obj = new juce::DynamicObject();
-            obj->setProperty("object", toString(key.object));
-            obj->setProperty("property", toString(key.property));
-            obj->setProperty("state", toString(key.state));
-            obj->setProperty("paletteName", paletteName);
-            return juce::var(obj);
-        }
-
-        bool mappingFromVar(const juce::var& v, SkinColourKey& key, juce::String& paletteName, juce::String& error)
-        {
-            auto* obj = v.getDynamicObject();
-            if (obj == nullptr)
-            {
-                error = "Mapping entry must be an object";
-                return false;
-            }
-
-            SkinObjectType object {};
-            SkinColourProperty property {};
-            SkinColourState state {};
-            if (! parseObjectType(obj->getProperty("object").toString(), object)
-                || ! parseProperty(obj->getProperty("property").toString(), property)
-                || ! parseState(obj->getProperty("state").toString(), state))
-            {
-                error = "Mapping has unknown object/property/state";
-                return false;
-            }
-
-            paletteName = obj->getProperty("paletteName").toString();
-            if (paletteName.isEmpty())
-            {
-                error = "Mapping requires paletteName";
-                return false;
-            }
-
-            key = skinColourKey(object, property, state);
-            return true;
         }
 
         juce::var skinToVar(const NamedSkin& skin)
@@ -233,6 +192,7 @@ namespace TSS::DevSkin
     {
         JsonIoResult parseDevSkinsFromRoot(juce::DynamicObject& root, std::vector<NamedSkin>& outSkins)
         {
+            const int schemaVersion = static_cast<int>(root.getProperty("schemaVersion"));
             auto* arr = root.getProperty("skins").getArray();
             if (arr == nullptr)
                 return JsonIoResult::success();
@@ -243,6 +203,8 @@ namespace TSS::DevSkin
                 juce::String error;
                 if (! skinFromVar(entry, skin, error))
                     return JsonIoResult::failure(error);
+                if (schemaVersion == kLegacySchemaVersion)
+                    expandLegacyColourSets(skin);
                 if (skin.kind != SkinKind::kDev)
                     return JsonIoResult::failure("Imported skins must be kind=dev");
                 if (skin.id == kCompiledBlackId || skin.id == kCompiledCreamId)
@@ -293,7 +255,8 @@ namespace TSS::DevSkin
             if (root == nullptr)
                 return JsonIoResult::failure("JSON root must be an object");
 
-            if (static_cast<int>(root->getProperty("schemaVersion")) != kSchemaVersion)
+            const int schemaVersion = static_cast<int>(root->getProperty("schemaVersion"));
+            if (schemaVersion != kLegacySchemaVersion && schemaVersion != kSchemaVersion)
                 return JsonIoResult::failure("Unsupported schemaVersion");
 
             return JsonIoResult::success();

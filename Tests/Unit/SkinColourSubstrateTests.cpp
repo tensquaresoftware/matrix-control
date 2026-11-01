@@ -56,6 +56,18 @@ public:
         assertLedAndReadOnlyLooks(TSS::Skin::ColourVariant::Black);
         assertLedAndReadOnlyLooks(TSS::Skin::ColourVariant::Cream);
 
+        beginTest("colourSet_missingHigherSetFallsBackToK1");
+
+        assertMissingSetFallback();
+
+        beginTest("colourSet_explicitHigherSetWinsOverK1");
+
+        assertExplicitHigherSetWins();
+
+        beginTest("ledAndPeakIndicator_useDistinctKeysWithMatchingSeedColours");
+
+        assertLedAndPeakKeys();
+
         beginTest("ledAndPeak_paintLevelEncoding");
 
         assertLedAndPeakPaintLevelEncoding();
@@ -268,6 +280,65 @@ private:
         expect(patchLook.secondaryText.getFloatAlpha() == 1.0f);
     }
 
+    void assertMissingSetFallback()
+    {
+        const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::Cream);
+        const auto defaultColour = skin->getColour(SkinObjectType::kLabel,
+                                                   SkinColourProperty::kText);
+        const auto fallbackColour = skin->getColour(SkinObjectType::kLabel,
+                                                    SkinColourProperty::kText,
+                                                    SkinColourState::kDefault,
+                                                    TSS::ColourSet::k3);
+        expect(fallbackColour == defaultColour);
+    }
+
+    void assertExplicitHigherSetWins()
+    {
+        const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::Black);
+        const auto primaryKey = TSS::skinColourKey(SkinObjectType::kButton,
+                                                   SkinColourProperty::kBackground,
+                                                   SkinColourState::kOff);
+        auto setTwoKey = primaryKey;
+        setTwoKey.colourSet = TSS::ColourSet::k2;
+        const auto primaryColour = juce::Colour(ColourChart::kRed500);
+        const auto setTwoColour = juce::Colour(ColourChart::kBlue);
+        skin->setColour(primaryKey, primaryColour);
+        skin->setColour(setTwoKey, setTwoColour);
+
+        expect(skin->getColour(setTwoKey) == setTwoColour);
+        expect(skin->getColour(setTwoKey) != primaryColour);
+    }
+
+    void assertLedAndPeakKeys()
+    {
+        const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::Black);
+        const auto ledKey = TSS::skinColourKey(SkinObjectType::kLed,
+                                               SkinColourProperty::kBackground,
+                                               SkinColourState::kOn);
+        const auto peakKey = TSS::skinColourKey(SkinObjectType::kPeakIndicator,
+                                                SkinColourProperty::kBackground,
+                                                SkinColourState::kOn);
+        expect(! (ledKey == peakKey));
+        expect(skin->getColour(ledKey) == skin->getColour(peakKey));
+        expect(TSS::peakIndicatorLookFromSkin(*skin).maxOn == skin->getColour(peakKey));
+    }
+
+    static void setDistinctLedAndPeakColours(TSS::Skin& skin)
+    {
+        skin.setColour(TSS::skinColourKey(SkinObjectType::kLed,
+                                          SkinColourProperty::kBackground,
+                                          SkinColourState::kOn),
+                       juce::Colour(ColourChart::kRed500));
+        skin.setColour(TSS::skinColourKey(SkinObjectType::kPeakIndicator,
+                                          SkinColourProperty::kBackground,
+                                          SkinColourState::kOn),
+                       juce::Colour(ColourChart::kBlue));
+        skin.setColour(TSS::skinColourKey(SkinObjectType::kPeakIndicator,
+                                          SkinColourProperty::kBackground,
+                                          SkinColourState::kOff),
+                       juce::Colour(ColourChart::kGrey700));
+    }
+
     void assertLedAndPeakPaintLevelEncoding()
     {
         constexpr float kPartialLevel = 0.5f;
@@ -275,20 +346,28 @@ private:
         constexpr int kCentre = kSize / 2;
 
         const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::Black);
-        const auto maxOn = skin->getColour(SkinObjectType::kLed,
-                                           SkinColourProperty::kBackground,
-                                           SkinColourState::kOn);
-        const auto backgroundOff = skin->getColour(SkinObjectType::kLed,
-                                                   SkinColourProperty::kBackground,
-                                                   SkinColourState::kOff);
-        expect(maxOn.getFloatAlpha() == 1.0f);
+        setDistinctLedAndPeakColours(*skin);
+        const auto ledMaxOn = skin->getColour(SkinObjectType::kLed,
+                                              SkinColourProperty::kBackground,
+                                              SkinColourState::kOn);
+        const auto ledBackgroundOff = skin->getColour(SkinObjectType::kLed,
+                                                      SkinColourProperty::kBackground,
+                                                      SkinColourState::kOff);
+        const auto peakMaxOn = skin->getColour(SkinObjectType::kPeakIndicator,
+                                               SkinColourProperty::kBackground,
+                                               SkinColourState::kOn);
+        const auto peakBackgroundOff = skin->getColour(SkinObjectType::kPeakIndicator,
+                                                       SkinColourProperty::kBackground,
+                                                       SkinColourState::kOff);
+        expect(ledMaxOn != peakMaxOn);
+        expect(ledMaxOn.getFloatAlpha() == 1.0f);
 
         TSS::Led led(kSize, kSize);
         led.setSkin(*skin);
         led.displayedLevel_ = kPartialLevel;
         const auto ledPixel = paintPixel(led, kCentre, kCentre);
         // Paint path: maxOn RGB with reduced alpha over the off plate (not a Colour-only check).
-        expect(ledPixel == compositeOver(backgroundOff, maxOn.withAlpha(kPartialLevel)));
+        expect(ledPixel == compositeOver(ledBackgroundOff, ledMaxOn.withAlpha(kPartialLevel)));
 
         TSS::PeakIndicator peak(kSize, kSize);
         peak.setSkin(*skin);
@@ -296,9 +375,9 @@ private:
         // Height fill: lit band is the lower half — sample near bottom vs near top (inside border).
         const auto peakLit = paintPixel(peak, kCentre, kSize - 4);
         const auto peakOff = paintPixel(peak, kCentre, 4);
-        expect(peakLit == maxOn);
+        expect(peakLit == peakMaxOn);
         expect(peakLit.getFloatAlpha() == 1.0f);
-        expect(peakOff == backgroundOff);
+        expect(peakOff == peakBackgroundOff);
     }
 
     void assertLogoHoverUsesDarkPanelTextHover()

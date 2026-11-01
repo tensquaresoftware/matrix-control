@@ -15,6 +15,7 @@ namespace
     {
         int propertyW = 0;
         int stateW = 0;
+        int colourSetW = 0;
         int mappedX = 0;
         int mappedW = 0;
     };
@@ -25,6 +26,7 @@ namespace
                                           juce::jmax(0, totalWidth));
         return { SkinEditorChrome::kMappingsPropertyColumnWidth,
                  SkinEditorChrome::kMappingsStateColumnWidth,
+                 SkinEditorChrome::kMappingsColourSetColumnWidth,
                  totalWidth - mappedSpan,
                  mappedSpan };
     }
@@ -163,6 +165,7 @@ juce::String& SkinEditorMappingsPanel::filterValue(FilterColumn column) noexcept
     {
         case FilterColumn::kProperty: return propertyFilter_;
         case FilterColumn::kState: return stateFilter_;
+        case FilterColumn::kColourSet: return colourSetFilter_;
         case FilterColumn::kMappedColour: return mappedColourFilter_;
     }
     return propertyFilter_;
@@ -174,6 +177,7 @@ const juce::String& SkinEditorMappingsPanel::filterValue(FilterColumn column) co
     {
         case FilterColumn::kProperty: return propertyFilter_;
         case FilterColumn::kState: return stateFilter_;
+        case FilterColumn::kColourSet: return colourSetFilter_;
         case FilterColumn::kMappedColour: return mappedColourFilter_;
     }
     return propertyFilter_;
@@ -183,6 +187,7 @@ void SkinEditorMappingsPanel::clearAllColumnFilters()
 {
     propertyFilter_.clear();
     stateFilter_.clear();
+    colourSetFilter_.clear();
     mappedColourFilter_.clear();
 }
 
@@ -220,6 +225,7 @@ juce::StringArray SkinEditorMappingsPanel::presentValuesFor(FilterColumn column)
     {
         case FilterColumn::kProperty: mapped = CF::kProperty; break;
         case FilterColumn::kState: mapped = CF::kState; break;
+        case FilterColumn::kColourSet: mapped = CF::kColourSet; break;
         case FilterColumn::kMappedColour: mapped = CF::kMappedColour; break;
     }
     return SkinEditorMappingsColumnFilter::presentValues(*skin, mapped);
@@ -229,6 +235,8 @@ juce::Rectangle<int> SkinEditorMappingsPanel::legendFilterTargetBounds(FilterCol
 {
     if (column == FilterColumn::kState)
         return stateLabelBounds_;
+    if (column == FilterColumn::kColourSet)
+        return colourSetLabelBounds_;
     if (column == FilterColumn::kMappedColour)
         return mappedLabelBounds_;
     return propertyLabelBounds_;
@@ -288,6 +296,8 @@ void SkinEditorMappingsPanel::clearLegendHitTargets()
     propertyClearBounds_ = {};
     stateLabelBounds_ = {};
     stateClearBounds_ = {};
+    colourSetLabelBounds_ = {};
+    colourSetClearBounds_ = {};
     mappedLabelBounds_ = {};
     mappedClearBounds_ = {};
 }
@@ -319,18 +329,21 @@ void SkinEditorMappingsPanel::layoutLegendHitTargets()
             clearBounds = { labelBounds.getRight() + gap, area.getY(), badgeW, area.getHeight() };
     };
 
-    place("Property",
-          area.getX() + kColPad,
+    place("Property", area.getX() + kColPad,
           juce::jmax(0, cols.propertyW - 4),
           propertyLabelBounds_,
           propertyClearBounds_,
           propertyFilter_.isNotEmpty());
-    place("State",
-          area.getX() + kColPad + cols.propertyW,
+    place("State", area.getX() + kColPad + cols.propertyW,
           juce::jmax(0, cols.stateW - 4),
           stateLabelBounds_,
           stateClearBounds_,
           stateFilter_.isNotEmpty());
+    place("Set", area.getX() + kColPad + cols.propertyW + cols.stateW,
+          juce::jmax(0, cols.colourSetW - 4),
+          colourSetLabelBounds_,
+          colourSetClearBounds_,
+          colourSetFilter_.isNotEmpty());
 
     const int mappedReserve = mappedColourFilter_.isNotEmpty() ? (gap + badgeW) : 0;
     const auto mappedText = SkinEditorChrome::elideToWidth(
@@ -367,6 +380,8 @@ void SkinEditorMappingsPanel::paintStickyLegend(juce::Graphics& g, juce::Rectang
                propertyFilter_.isNotEmpty());
     paintLabel("State", stateLabelBounds_, stateClearBounds_,
                stateFilter_.isNotEmpty());
+    paintLabel("Set", colourSetLabelBounds_, colourSetClearBounds_,
+               colourSetFilter_.isNotEmpty());
 
     const int mappedReserve = mappedColourFilter_.isNotEmpty()
                                   ? (SkinEditorChrome::kButtonGap + SkinEditorChrome::clearBadgeWidth())
@@ -393,6 +408,11 @@ void SkinEditorMappingsPanel::mouseUp(const juce::MouseEvent& e)
         clearColumnFilter(FilterColumn::kState);
         return;
     }
+    if (colourSetClearBounds_.contains(pos))
+    {
+        clearColumnFilter(FilterColumn::kColourSet);
+        return;
+    }
     if (mappedClearBounds_.contains(pos))
     {
         clearColumnFilter(FilterColumn::kMappedColour);
@@ -406,6 +426,11 @@ void SkinEditorMappingsPanel::mouseUp(const juce::MouseEvent& e)
     if (stateLabelBounds_.contains(pos))
     {
         showColumnFilterMenu(FilterColumn::kState);
+        return;
+    }
+    if (colourSetLabelBounds_.contains(pos))
+    {
+        showColumnFilterMenu(FilterColumn::kColourSet);
         return;
     }
     if (mappedLabelBounds_.contains(pos))

@@ -7,10 +7,21 @@ namespace TSS::DevSkin
     std::vector<SkinColourKey> allStructuredKeys()
     {
         std::vector<SkinColourKey> keys;
-        keys.reserve(compiledColourElements().size());
+        keys.reserve(compiledColourElements().size() * kAllColourSets.size());
         forEachCompiledColourElement([&](const SkinColours::ColourElement& element)
         {
-            keys.push_back(element.key);
+            if (! supportsMultipleColourSets(element.key.object))
+            {
+                keys.push_back(element.key);
+                return;
+            }
+
+            for (const auto colourSet : kAllColourSets)
+            {
+                auto key = element.key;
+                key.colourSet = colourSet;
+                keys.push_back(key);
+            }
         });
         return keys;
     }

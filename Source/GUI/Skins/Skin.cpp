@@ -25,9 +25,10 @@ namespace TSS
 
     juce::Colour Skin::getColour(SkinObjectType object,
                                  SkinColourProperty property,
-                                 SkinColourState state) const
+                                 SkinColourState state,
+                                 ColourSet colourSet) const
     {
-        return getColour(skinColourKey(object, property, state));
+        return getColour(skinColourKey(object, property, state, colourSet));
     }
 
     juce::Colour Skin::getColour(SkinColourKey key) const
@@ -36,14 +37,33 @@ namespace TSS
         if (it != colours_.end())
             return it->second;
 
+        if (key.colourSet != ColourSet::k1)
+        {
+            key.colourSet = ColourSet::k1;
+            const auto fallback = colours_.find(key);
+            if (fallback != colours_.end())
+                return fallback->second;
+        }
+
         jassertfalse;
-        DBG("Missing skin colour key — object/property/state not in map");
+        DBG("Missing skin colour key - object/property/state/colourSet not in map");
         return juce::Colour(ColourChart::kWhite);
     }
 
     void Skin::setColour(SkinColourKey key, juce::Colour colour)
     {
         colours_[key] = colour;
+    }
+
+    void Skin::clearHigherColourSets()
+    {
+        for (auto it = colours_.begin(); it != colours_.end();)
+        {
+            if (it->first.colourSet != ColourSet::k1)
+                it = colours_.erase(it);
+            else
+                ++it;
+        }
     }
 
     juce::Font Skin::getBaseFont() const
@@ -231,7 +251,17 @@ namespace TSS
     template <typename Accessor>
     void Skin::putColour(Accessor accessColour, const SkinColours::ColourElement& element)
     {
-        colours_[element.key] = juce::Colour(accessColour(element));
+        const auto colour = juce::Colour(accessColour(element));
+        colours_[element.key] = colour;
+        if (! supportsMultipleColourSets(element.key.object))
+            return;
+
+        for (const auto colourSet : kAllColourSets)
+        {
+            auto key = element.key;
+            key.colourSet = colourSet;
+            colours_[key] = colour;
+        }
     }
 
     template <typename Accessor>
@@ -415,5 +445,8 @@ namespace TSS
         putColour(accessColour, Widgets::Led::kBackgroundOff);
         putColour(accessColour, Widgets::Led::kBorderOff);
         putColour(accessColour, Widgets::Led::kMaxOn);
+        putColour(accessColour, Widgets::PeakIndicator::kBackgroundOff);
+        putColour(accessColour, Widgets::PeakIndicator::kBorderOff);
+        putColour(accessColour, Widgets::PeakIndicator::kMaxOn);
     }
 }

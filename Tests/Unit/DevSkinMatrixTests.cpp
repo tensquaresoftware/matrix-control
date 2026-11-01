@@ -38,6 +38,9 @@ public:
         beginTest("jsonRoundTrip_andMalformedKeepsLayer");
         assertJsonRoundTripAndMalformed();
 
+        beginTest("devApply_missingHigherSetFallsBackToEditedK1");
+        assertDevApplyMissingSetFallback();
+
         beginTest("disconnect_clearsOverlay_fallsBackToCompiledBc");
         assertDisconnectFallback();
 
@@ -180,6 +183,33 @@ private:
         const auto beforeCount = restored.skins().size();
         expect(! TSS::DevSkin::importFromJson(restored, "not-json{").ok);
         expectEquals(restored.skins().size(), beforeCount);
+    }
+
+    void assertDevApplyMissingSetFallback()
+    {
+        TSS::DevSkin::Layer layer;
+        expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Legacy Sets").wasOk());
+        auto* skin = layer.findSkinMutable(layer.activeSkinId());
+        expect(skin != nullptr);
+        if (skin == nullptr)
+            return;
+
+        const auto primary = buttonOffKey();
+        expect(layer.setMapping(skin->id, primary, "kEmerald400").wasOk());
+        for (const auto colourSet : { TSS::ColourSet::k2,
+                                      TSS::ColourSet::k3,
+                                      TSS::ColourSet::k4 })
+        {
+            auto key = primary;
+            key.colourSet = colourSet;
+            skin->mappings.erase(key);
+        }
+
+        TSS::DevSkin::StandalonePaintState paint;
+        expect(paint.applyPush(layer.makePushPayload()).ok);
+        auto requested = primary;
+        requested.colourSet = TSS::ColourSet::k3;
+        expect(paint.activeSkin().getColour(requested) == juce::Colour(ColourChart::kEmerald400));
     }
 
     void assertDisconnectFallback()

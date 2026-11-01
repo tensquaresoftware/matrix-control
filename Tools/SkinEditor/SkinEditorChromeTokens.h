@@ -85,26 +85,28 @@ namespace SkinEditorChrome
     inline constexpr int kPaletteListPaintWidth = kPalettePanelWidth
                                                   - kPanelContentPad
                                                   - kScrollTrackWidth; // 130
-    /** Mappings Property / State column widths (Mapped colour = kPaletteListPaintWidth). */
+    /** Mappings structured-key column widths (Mapped colour = kPaletteListPaintWidth). */
     inline constexpr int kMappingsPropertyColumnWidth = 150;
     inline constexpr int kMappingsStateColumnWidth = 150;
+    inline constexpr int kMappingsColourSetColumnWidth = 70;
     /** Left inset before Property; columnsForWidth subtracts this before the Property|State split. */
     inline constexpr int kMappingsColumnPad = 6;
     /**
-     * Table paint width = pad + Property + State + Mapped colour (436).
+     * Table paint width = pad + Property + State + ColourSet + Mapped colour.
      * Panel = that paint + scroll track + 2 focus pads - right pad extension + side content pads
-     * → 466 (see SkinEditorMappingsPanel::paintWidth / layoutShellFilled).
+     * -> 536 (see SkinEditorMappingsPanel::paintWidth / layoutShellFilled).
      */
     inline constexpr int kMappingsTablePaintWidth = kMappingsColumnPad
                                                     + kMappingsPropertyColumnWidth
                                                     + kMappingsStateColumnWidth
-                                                    + kPaletteListPaintWidth; // 416
+                                                    + kMappingsColourSetColumnWidth
+                                                    + kPaletteListPaintWidth; // 506
     inline constexpr int kMappingsFocusPad = 1;
     inline constexpr int kMappingsPanelWidth = kMappingsTablePaintWidth
                                                + kScrollTrackWidth
                                                + 2 * kMappingsFocusPad
                                                - kPanelContentPad
-                                               + 2 * kPanelContentPad; // 446
+                                               + 2 * kPanelContentPad; // 536
     inline constexpr int kLegacyWindowMaxWidth = 1210;
     /**
      * Exact body width: edge gutters + Color + Palette side gaps + fixed Mappings.

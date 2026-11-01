@@ -92,8 +92,9 @@ private:
                      SkinEditorChrome::paletteListPaintFloor());
         expectEquals(SkinEditorChrome::kMappingsPropertyColumnWidth, 150);
         expectEquals(SkinEditorChrome::kMappingsStateColumnWidth, 150);
-        expectEquals(SkinEditorChrome::kMappingsTablePaintWidth, 436);
-        expectEquals(SkinEditorChrome::kMappingsPanelWidth, 466);
+        expectEquals(SkinEditorChrome::kMappingsColourSetColumnWidth, 70);
+        expectEquals(SkinEditorChrome::kMappingsTablePaintWidth, 506);
+        expectEquals(SkinEditorChrome::kMappingsPanelWidth, 536);
         expectEquals(SkinEditorChrome::kObjectComboWidth, 150);
         expect(SkinEditorChrome::kMappingsPanelWidth
                < SkinEditorChrome::kLegacyWindowMaxWidth / 2);
@@ -185,6 +186,7 @@ private:
         constexpr int kFieldRowH = 24;
         constexpr int kHueBarW = 18;
         constexpr int kSvHueGap = 8;
+        constexpr int kTightPad = SkinEditorChrome::kPanelContentPad - 5;
         const int contentW = SkinEditorChrome::kColorPanelWidth
                              - 2 * SkinEditorChrome::kPanelContentPad;
         const int side = juce::jmax(0, contentW - kHueBarW - kSvHueGap);
@@ -192,8 +194,8 @@ private:
                      SkinEditorChrome::kGutter + SkinEditorChrome::kPanelTitleHeight
                          + SkinEditorChrome::kPanelContentPad + side
                          + SkinEditorChrome::kPanelContentPad + kFieldRowH
-                         + SkinEditorChrome::kPanelContentPad + 2 * kFieldRowH
-                         + (SkinEditorChrome::kPanelContentPad - 5));
+                         + kTightPad + 2 * kFieldRowH
+                         + kTightPad);
         // SKINS keeps top + bottom gutters (bottom contributes to SKINS↔COLOR gap).
         expect(skinsH
                >= SkinEditorChrome::kGutter + SkinEditorChrome::kPanelTitleHeight

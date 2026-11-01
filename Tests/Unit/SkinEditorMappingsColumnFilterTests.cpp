@@ -17,6 +17,7 @@ public:
     {
         singlePropertyFilter();
         multiColumnAnd();
+        colourSetFilter();
         clearOneColumnKeepsOther();
         changeMappedValue();
         noMatchesKeepFiltersMeaningful();
@@ -27,6 +28,8 @@ public:
         emptyFiltersMatchAll();
         filteredObjectGroupsFollowDisplayOrder();
         displayOrderCoversInventoryObjects();
+        peakIndicatorFollowsLed();
+        inventoryExpandsOnlyMultiSetObjects();
     }
 
 private:
@@ -76,7 +79,7 @@ private:
 
         using namespace SkinEditorMappingsColumnFilter;
         const auto skin = makeSkin();
-        const ActiveFilters borderOnly { "Border", {}, {} };
+        const ActiveFilters borderOnly { "Border", {}, {}, {} };
 
         expect(keyMatches(skin, borderOff(), borderOnly));
         expect(! keyMatches(skin, textHover(), borderOnly));
@@ -88,7 +91,7 @@ private:
 
         using namespace SkinEditorMappingsColumnFilter;
         const auto skin = makeSkin();
-        const ActiveFilters both { "Border", "On", {} };
+        const ActiveFilters both { "Border", "On", {}, {} };
 
         expect(keyMatches(skin, borderOn(), both));
         expect(! keyMatches(skin, borderOff(), both));
@@ -101,11 +104,29 @@ private:
         using namespace SkinEditorMappingsColumnFilter;
         const auto skin = makeSkin();
         // Arrange: Property+State reject a State-mismatched Border key.
-        const ActiveFilters propertyAndState { "Border", "On", {} };
+        const ActiveFilters propertyAndState { "Border", "On", {}, {} };
         expect(! keyMatches(skin, borderOff(), propertyAndState));
         // Assert: Property-only (State cleared) still matches that key.
-        const ActiveFilters propertyOnly { "Border", {}, {} };
+        const ActiveFilters propertyOnly { "Border", {}, {}, {} };
         expect(keyMatches(skin, borderOff(), propertyOnly));
+    }
+
+    void colourSetFilter()
+    {
+        beginTest("ColourSet filter combines with Property and State");
+
+        using namespace SkinEditorMappingsColumnFilter;
+        const auto skin = makeSkin();
+        auto setTwo = borderOn();
+        setTwo.colourSet = TSS::ColourSet::k2;
+        const ActiveFilters setTwoOnly { "Border", "On", "k2", {} };
+
+        expect(keyMatches(skin, setTwo, setTwoOnly));
+        expect(! keyMatches(skin, borderOn(), setTwoOnly));
+
+        const auto values = presentValues(skin, Column::kColourSet);
+        expect(values.contains("k1"));
+        expect(values.contains("k4"));
     }
 
     void changeMappedValue()
@@ -114,8 +135,8 @@ private:
 
         using namespace SkinEditorMappingsColumnFilter;
         const auto skin = makeSkin();
-        const ActiveFilters blue { {}, {}, "kBlue" };
-        const ActiveFilters unbound { {}, {}, kUnboundMenuValue };
+        const ActiveFilters blue { {}, {}, {}, "kBlue" };
+        const ActiveFilters unbound { {}, {}, {}, kUnboundMenuValue };
 
         expect(keyMatches(skin, borderOff(), blue));
         expect(! keyMatches(skin, textHover(), blue));
@@ -129,7 +150,7 @@ private:
 
         using namespace SkinEditorMappingsColumnFilter;
         const auto skin = makeSkin();
-        const ActiveFilters impossible { "Border", "On", "missing-pastille" };
+        const ActiveFilters impossible { "Border", "On", {}, "missing-pastille" };
         int hits = 0;
         for (const auto& k : TSS::DevSkin::allStructuredKeys())
         {
@@ -145,7 +166,7 @@ private:
 
         using namespace SkinEditorMappingsColumnFilter;
         const auto skin = makeSkin();
-        const ActiveFilters unbound { {}, {}, kUnboundMenuValue };
+        const ActiveFilters unbound { {}, {}, {}, kUnboundMenuValue };
 
         expect(keyMatches(skin, textHover(), unbound));
         expect(! keyMatches(skin, borderOff(), unbound));
@@ -188,7 +209,7 @@ private:
 
         using namespace SkinEditorMappingsColumnFilter;
         const auto skin = makeSkin();
-        const ActiveFilters borderOnly { "Border", {}, {} };
+        const ActiveFilters borderOnly { "Border", {}, {}, {} };
         const auto groups = filteredObjectGroups(skin, borderOnly);
 
         expect(! groups.empty());
@@ -276,6 +297,44 @@ private:
             }
             expect(listed);
         }
+    }
+
+    void peakIndicatorFollowsLed()
+    {
+        beginTest("PeakIndicator table follows Led");
+
+        using namespace SkinEditorMappingsColumnFilter;
+        const auto& order = mappingsObjectDisplayOrder();
+        int ledIndex = -1;
+        int peakIndex = -1;
+        for (int i = 0; i < static_cast<int>(order.size()); ++i)
+        {
+            if (order[static_cast<size_t>(i)] == TSS::SkinObjectType::kLed)
+                ledIndex = i;
+            if (order[static_cast<size_t>(i)] == TSS::SkinObjectType::kPeakIndicator)
+                peakIndex = i;
+        }
+        expectEquals(peakIndex, ledIndex + 1);
+    }
+
+    void inventoryExpandsOnlyMultiSetObjects()
+    {
+        beginTest("All twelve multi-set objects have k1-k4; remaining objects stay k1");
+
+        const auto inventory = TSS::DevSkin::allStructuredKeys();
+        for (const auto object : TSS::kMultiSetSkinObjects)
+        {
+            bool seenSets[TSS::kAllColourSets.size()] {};
+            for (const auto& inventoryKey : inventory)
+                if (inventoryKey.object == object)
+                    seenSets[static_cast<size_t>(inventoryKey.colourSet)] = true;
+            for (const bool seen : seenSets)
+                expect(seen);
+        }
+
+        for (const auto& inventoryKey : inventory)
+            if (! TSS::supportsMultipleColourSets(inventoryKey.object))
+                expect(inventoryKey.colourSet == TSS::ColourSet::k1);
     }
 };
 

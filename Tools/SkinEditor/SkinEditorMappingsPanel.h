@@ -52,6 +52,7 @@ private:
     {
         kProperty,
         kState,
+        kColourSet,
         kMappedColour
     };
 
@@ -63,6 +64,7 @@ private:
         TSS::SkinColourKey key {};
         juce::String propertyLabel;
         juce::String stateLabel;
+        juce::String colourSetLabel;
         juce::String pastilleName;
         juce::uint32 pastilleArgb = 0;
         bool pastillePending = false;
@@ -183,11 +185,14 @@ private:
     /** Empty = filter off. Mapped colour may be the literal "Unbound". */
     juce::String propertyFilter_;
     juce::String stateFilter_;
+    juce::String colourSetFilter_;
     juce::String mappedColourFilter_;
     juce::Rectangle<int> propertyLabelBounds_;
     juce::Rectangle<int> propertyClearBounds_;
     juce::Rectangle<int> stateLabelBounds_;
     juce::Rectangle<int> stateClearBounds_;
+    juce::Rectangle<int> colourSetLabelBounds_;
+    juce::Rectangle<int> colourSetClearBounds_;
     juce::Rectangle<int> mappedLabelBounds_;
     juce::Rectangle<int> mappedClearBounds_;
     juce::Viewport viewport_;
