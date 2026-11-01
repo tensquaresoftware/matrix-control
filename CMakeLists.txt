@@ -614,6 +614,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/SkinColourWiringCoverageTests.cpp
         Tests/Unit/ColourSetModelTests.cpp
         Tests/Unit/DevSkinLayerJsonTests.cpp
+        Tests/Unit/DevSkinCompiledSeedOverlayTests.cpp
         Tests/Unit/DevSkinMatrixTests.cpp
         Tests/Unit/DevSkinPendingPastilleTests.cpp
         Tests/Unit/SkinEditorMappingModePolicyTests.cpp
@@ -692,6 +693,8 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/ComboBoxLiveRefreshTests.cpp
         Tests/Unit/ComboBoxPopupMarkTests.cpp
         Tests/Unit/ComboBoxPopupAutoWidthTests.cpp
+        Tests/Unit/ComboBoxPopupModeTests.cpp
+        Tests/Unit/PopupMenuCustomScrollBarTests.cpp
         Tests/Unit/SysExInterMessageDelayTests.cpp
         Tests/Unit/SysExParserTests.cpp
         Tests/Unit/WidgetDimensionRegistryTests.cpp

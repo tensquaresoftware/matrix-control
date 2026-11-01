@@ -100,11 +100,20 @@ namespace TSS
                                                popupOnlyMarkSuffix_);
     }
 
+    ComboBoxClosedChrome ComboBox::closedChromeForPopupMode(PopupMode mode) noexcept
+    {
+        return usesScrollablePopup(mode) ? ComboBoxClosedChrome::AlwaysThickBorder
+                                         : ComboBoxClosedChrome::FocusRing;
+    }
+
+    bool ComboBox::usesScrollablePopup(PopupMode mode) noexcept
+    {
+        return mode == PopupMode::Scrollable;
+    }
+
     void ComboBox::paint(juce::Graphics& g)
     {
-        const auto closedChrome = popupMode_ == PopupMode::Scrollable
-            ? ComboBoxClosedChrome::AlwaysThickBorder
-            : ComboBoxClosedChrome::FocusRing;
+        const auto closedChrome = closedChromeForPopupMode(popupMode_);
 
         ComboBoxControlPainter::paintClosedState(
             g,
@@ -161,7 +170,7 @@ namespace TSS
 
     void ComboBox::showPopupAsynchronously()
     {
-        const auto useScrollableMode = (popupMode_ == PopupMode::Scrollable);
+        const auto useScrollableMode = usesScrollablePopup(popupMode_);
         const auto generation = ++popupShowGeneration_;
 
         juce::MessageManager::callAsync(

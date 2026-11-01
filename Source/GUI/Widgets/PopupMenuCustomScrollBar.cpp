@@ -1,5 +1,7 @@
 #include "PopupMenuCustomScrollBar.h"
 
+#include <cmath>
+
 #include "GUI/Skins/ColourChart.h"
 
 namespace TSS
@@ -77,6 +79,18 @@ namespace TSS
         setRepaintsOnMouseActivity(true);
     }
 
+    float PopupMenuCustomScrollBar::thumbInsetLogicalPixels(float designInset, float uiScale) noexcept
+    {
+        return static_cast<float>(juce::jmax(
+            1, static_cast<int>(std::floor(designInset * juce::jmax(0.0f, uiScale)))));
+    }
+
+    float PopupMenuCustomScrollBar::clampThumbInsetForAxis(float inset, float axisSize) noexcept
+    {
+        const float maxInset = juce::jmax(0.0f, (axisSize - 1.0f) * 0.5f);
+        return juce::jmin(inset, maxInset);
+    }
+
     int PopupMenuCustomScrollBar::computeThumbHeight(int trackHeight, int contentHeight, int viewportHeight) const
     {
         const int minThumbHeight = juce::roundToInt(static_cast<float>(minThumbHeightDesign_) * uiScale_);
@@ -110,11 +124,13 @@ namespace TSS
                                            static_cast<float>(thumbY),
                                            static_cast<float>(trackWidth),
                                            static_cast<float>(thumbHeight));
+        // Clamp inset so a too-large value cannot collapse the thumb to zero width/height.
         const auto colour = (isMouseOver() || isMouseButtonDown())
             ? scrollbarColour_.brighter(kThumbHighlightBrighter_)
             : scrollbarColour_;
         g.setColour(colour);
-        g.fillRect(thumbBounds.reduced(thumbInset_));
+        g.fillRect(thumbBounds.reduced(clampThumbInsetForAxis(thumbInset_, thumbBounds.getWidth()),
+                                       clampThumbInsetForAxis(thumbInset_, thumbBounds.getHeight())));
     }
 
     void PopupMenuCustomScrollBar::mouseDown(const juce::MouseEvent& e)

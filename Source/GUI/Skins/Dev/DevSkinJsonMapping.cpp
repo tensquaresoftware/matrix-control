@@ -2,6 +2,16 @@
 
 #include "GUI/Skins/Dev/DevSkinKeyNames.h"
 
+namespace
+{
+    bool isLegacyButtonLikeObjectName(const juce::String& objectText)
+    {
+        return objectText.equalsIgnoreCase("SliderButtonLike")
+            || objectText.equalsIgnoreCase("ComboBoxButtonLike")
+            || objectText.equalsIgnoreCase("PopupMenuButtonLike");
+    }
+}
+
 namespace TSS::DevSkin
 {
     juce::var mappingToVar(const SkinColourKey& key, const juce::String& paletteName)
@@ -47,14 +57,11 @@ namespace TSS::DevSkin
             return false;
         }
 
-        // Legacy *ButtonLike rows carried mono greys; pin them to k4 so a missing/default
-        // colourSet cannot overwrite classic greens on k1–k3 after object remap.
-        if (objectText.equalsIgnoreCase("SliderButtonLike")
-            || objectText.equalsIgnoreCase("ComboBoxButtonLike")
-            || objectText.equalsIgnoreCase("PopupMenuButtonLike"))
-        {
+        // Legacy *ButtonLike rows carried mono greys. Always force ColourSet k4 after object
+        // remap — including when colourSet is missing/defaulted to k1 or explicitly non-k4 —
+        // so those greys cannot overwrite classic greens on k1–k3.
+        if (isLegacyButtonLikeObjectName(objectText))
             colourSet = ColourSet::k4;
-        }
 
         if (colourSet != ColourSet::k1 && ! supportsMultipleColourSets(object))
         {

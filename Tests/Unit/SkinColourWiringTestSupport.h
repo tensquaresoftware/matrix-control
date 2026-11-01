@@ -100,6 +100,10 @@ namespace SkinColourWiringTestSupport
                  juce::Colour(ColourChart::kGrey600));
         paintKey(skin, TSS::skinColourKey(O::kComboBox, P::kBackground, S::kDefault, C::k1),
                  juce::Colour(ColourChart::kEmerald400));
+        paintKey(skin, TSS::skinColourKey(O::kPopupMenu, P::kBorder, S::kDefault, C::k4),
+                 juce::Colour(ColourChart::kGrey600));
+        paintKey(skin, TSS::skinColourKey(O::kPopupMenu, P::kBorder, S::kDefault, C::k1),
+                 juce::Colour(ColourChart::kEmerald400));
         paintKey(skin, TSS::skinColourKey(O::kNumberBox, P::kBackground, S::kDefault, C::k4),
                  juce::Colour(ColourChart::kGrey600));
         paintKey(skin, TSS::skinColourKey(O::kNumberBox, P::kBackground, S::kDefault, C::k1),

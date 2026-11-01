@@ -93,6 +93,25 @@ context:
 - Given distinct pastilles per ColourSet in wiring tests, when asserting zones, then former-ButtonLike sites still read `k4` on classic objects.
 - Given `python3 Scripts/quality/lint_touched.py` on touched C++, then it passes.
 
+### Review Findings
+
+- [x] [Review][Patch] Pin PopupMode → scrollable vs multi-column (+ closed chrome) with a pure unit mapping — ComboBox.cpp paint/showPopup branches have no Tests/ asserts; invert Scrollable checks and Settings/Computer Patches keep green suites.
+- [x] [Review][Patch] Strengthen PopupMenuCustomScrollBarTests (Retina contrast vs display-scale formula + paint inset clamp) — helper covered; callers/clamp not locked [PopupMenuCustomScrollBarTests.cpp / PopupMenuCustomScrollBar.cpp paint].
+- [x] [Review][Patch] Wiring zone path: paint + assert PopupMenu at k4 alongside Slider/ComboBox/NumberBox — paintSettingsZoneAndNumberBoxPastilles and assertSettingsAndComputerPatchesUseK4 omit popup Look [SkinColourWiringTestSupport.h / SkinColourWiringCoverageTests.cpp].
+- [x] [Review][Patch] Clarify DevSkinJsonMapping force-k4 comment — comment says missing/default set only; code also overrides authored non-k4 on legacy *ButtonLike names [DevSkinJsonMapping.cpp].
+- [x] [Review][Defer] Factor duplicated overlayFormerButtonLikeAtK4 inventories — deferred: already in deferred-work for this spec (Skin.cpp vs DevSkinSsotSeed.cpp).
+- [x] [Review][Defer] Dev JSON classic + remapped *ButtonLike same k4 key last-write-wins — deferred: already in deferred-work; rare authored collision.
+- [x] [Review][Defer] HeaderLogoPopupMenu k4 consumer mount test — deferred: already in deferred-work; Look-builder/seed pattern.
+- [x] [Review][Defer] Wiring test name implies Settings/Computer Patches call-site observation but only exercises Look builders with k4 — deferred: matches project wiring pattern; PopupMode half covered by pure-mapping patch above; rename optional later.
+- [x] [Review][Defer] Older Hardware Latency deferred-work bullets still name sliderLookButtonLikeFromSkin — deferred: tracking hygiene after API removal; refresh when next touching those bullets.
+
+Rejected:
+- Force-k4 remap “loses” authored ColourSet / contradicts I/O matrix k1 fallback — rejected: intentional prior review patch + human decision closed (legacy *ButtonLike → classic + forced k4); aligning prose would edit the done spec.
+- Legacy remap load→export round-trip for classic key names — rejected (false): export serializes SkinObjectType; ButtonLike names are gone from toString, so remapped keys cannot rewrite as *ButtonLike.
+- Empty Spec Change Log vs Implementation Notes — rejected: fix would edit the spec under review (also rejected on prior triage).
+- ColourSetModel SliderButtonLike remap fixture always uses property Background — rejected (low): object remap + force-k4 still asserted; property choice is orthogonal to the behaviour under test.
+- assertCompiledSeedOverlaysFormerButtonLikeAtK4 only spot-checks three keys — rejected (low): three keys pin the overlay path; expanding the full inventory is chore, not everyday defect.
+
 ## Implementation Notes
 
 - Removed `*ButtonLike` SkinObjectTypes; former ButtonLike ARGB overlays classic Slider/ComboBox/PopupMenu at ColourSet `k4` only (k1–k3 keep classic hues).

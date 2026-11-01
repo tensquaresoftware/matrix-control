@@ -237,11 +237,8 @@ namespace TSS
         {
             const auto& popupLook = comboBox_.getPopupMenuLook();
             const juce::Colour scrollbarColour = popupLook.scrollbar;
-            const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
-            const float thumbInset = static_cast<float>(ScaledDrawing::logicalInsetPixelsFromDesign(
-                kThumbInsetBase_,
-                uiScale_,
-                systemDisplayScale));
+            const float thumbInset = PopupMenuCustomScrollBar::thumbInsetLogicalPixels(
+                kThumbInsetBase_, uiScale_);
 
             scrollModel_ = std::make_unique<ViewportPopupMenuScrollModel>(*viewport_);
             customScrollBar_ = std::make_unique<PopupMenuCustomScrollBar>(

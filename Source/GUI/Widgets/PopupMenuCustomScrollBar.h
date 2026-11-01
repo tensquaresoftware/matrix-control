@@ -62,6 +62,13 @@ namespace TSS
                                  int minThumbHeightDesign,
                                  float uiScale);
 
+        /** Thumb inset in Component logical pixels. Uses uiScale only — never system display
+            scale (Retina would inflate the inset and collapse an 8 px track to a 0 px thumb). */
+        [[nodiscard]] static float thumbInsetLogicalPixels(float designInset, float uiScale) noexcept;
+
+        /** Clamp inset on one thumb axis so reduced() cannot collapse that axis to zero. */
+        [[nodiscard]] static float clampThumbInsetForAxis(float inset, float axisSize) noexcept;
+
         void paint(juce::Graphics& g) override;
         void mouseDown(const juce::MouseEvent& e) override;
         void mouseDrag(const juce::MouseEvent& e) override;

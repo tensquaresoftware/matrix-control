@@ -95,6 +95,11 @@ namespace TSS
         static void setPopupLayoutDimensions(const PopupMenuLayoutDimensions& dimensions);
         static const PopupMenuLayoutDimensions& getPopupLayoutDimensions();
 
+        /** Closed-face chrome driven by PopupMode (Scrollable → always-thick border). */
+        [[nodiscard]] static ComboBoxClosedChrome closedChromeForPopupMode(PopupMode mode) noexcept;
+        /** True when PopupMode opens ScrollablePopupMenu instead of MultiColumnPopupMenu. */
+        [[nodiscard]] static bool usesScrollablePopup(PopupMode mode) noexcept;
+
     private:
         ComboBoxLook look_{};
         PopupMenuLook popupLook_{};

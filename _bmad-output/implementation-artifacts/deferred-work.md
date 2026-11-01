@@ -3016,3 +3016,12 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-unify-combobox-slider-buttonlike.md`
   summary: Add a dedicated HeaderLogoPopupMenu k4 Look consumer test if panel/menu mounts become a project testing pattern.
   evidence: Verification Gap; current coverage follows GPC 3 Look-builder/seed asserts without mounting the logo menu.
+
+## Deferred from: code review of spec-unify-combobox-slider-buttonlike.md (2026-11-01)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-unify-combobox-slider-buttonlike.md`
+  summary: Wiring coverage test named for Settings/Computer Patches only exercises Look builders invoked with k4 — it never constructs those panels; rename later or accept Look-builder pattern.
+  evidence: Verification Gap (second review pass after Retina scrollbar fix folded in).
+- source_spec: `_bmad-output/implementation-artifacts/spec-unify-combobox-slider-buttonlike.md`
+  summary: Refresh older Hardware Latency deferred-work bullets that still mention sliderLookButtonLikeFromSkin (API removed by this unify).
+  evidence: Blind Hunter; tracking hygiene only.
