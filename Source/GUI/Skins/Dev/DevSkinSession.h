@@ -6,13 +6,16 @@ namespace TSS::DevSkin
 {
     struct EditorSessionState
     {
-        juce::String productSkinId = kCompiledCreamId;
+        juce::String productSkinId = kCompiledBlackId;
         juce::String editorSkinId;
         /** Runtime only — never persisted; always Off after session load. */
         bool compareOn = false;
         /** Absolute path of last Export/Import parent folder (empty = Documents). */
         juce::String lastSkinJsonDirectory;
     };
+
+    /** Sets Product to first combo item (BLACK today). Call after session load to ignore restored Product. */
+    void forceProductToFirstAvailable(EditorSessionState& state);
 
     juce::String exportSessionToJson(const Layer& layer, const EditorSessionState& state);
     JsonIoResult importSessionFromJson(Layer& layer,

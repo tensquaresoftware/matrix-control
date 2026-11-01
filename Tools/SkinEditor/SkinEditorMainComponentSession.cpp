@@ -430,9 +430,10 @@ void SkinEditorMainComponent::loadSessionOrBaseline()
         {
             if (loaded.message != "No session file")
                 setStatusMessage(loaded.message);
-            sessionState_.productSkinId = TSS::DevSkin::kCompiledCreamId;
             sessionState_.editorSkinId = {};
         }
+        // Launch always opens Product on the first combo item (BLACK); ignore session Product.
+        TSS::DevSkin::forceProductToFirstAvailable(sessionState_);
         // Compare is never restored from disk — always start editing, not comparing.
         sessionState_.compareOn = false;
         if (sessionState_.editorSkinId.isNotEmpty())

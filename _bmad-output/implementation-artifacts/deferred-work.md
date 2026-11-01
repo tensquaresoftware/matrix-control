@@ -1,5 +1,11 @@
 # Deferred Work
 
+## Deferred from: review of spec-skin-editor-product-combo-first-skin.md (2026-11-01)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-product-combo-first-skin.md`
+  summary: No automated pin that Skin Editor `loadSessionOrBaseline` calls `forceProductToFirstAvailable` after session load (helper tests alone stay green if the call is removed).
+  evidence: Verification Gap + Blind Hunter load-fail/wiring gap; Matrix-Control_Tests does not link Skin Editor MainComponent; manual Cream→quit→relaunch smoke remains the gate.
+
 ## Deferred from: oneshot review of spec-skin-editor-mappings-global-filter-reset.md (2026-11-01)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-global-filter-reset.md`

@@ -19,6 +19,11 @@ namespace TSS::DevSkin
         }
     }
 
+    void forceProductToFirstAvailable(EditorSessionState& state)
+    {
+        state.productSkinId = kCompiledBlackId;
+    }
+
     juce::String exportSessionToJson(const Layer& layer, const EditorSessionState& state)
     {
         const auto parsed = juce::JSON::parse(exportToJson(layer));
@@ -51,7 +56,7 @@ namespace TSS::DevSkin
 
         state.productSkinId = root->getProperty("productSkinId").toString();
         if (state.productSkinId != kCompiledBlackId && state.productSkinId != kCompiledCreamId)
-            state.productSkinId = kCompiledCreamId;
+            state.productSkinId = kCompiledBlackId;
 
         state.editorSkinId = root->getProperty("editorSkinId").toString();
         if (layer.findSkin(state.editorSkinId) == nullptr
