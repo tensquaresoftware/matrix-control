@@ -1,5 +1,11 @@
 # Deferred Work
 
+## Deferred from: code review of spec-skin-chrome-decorrelation.md (2026-11-01)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-chrome-decorrelation.md`
+  summary: Skin Editor Mappings focus-pad paint / rowIndexAtY / layoutContent alignment with rebuildRows is not unit-tested; pad fix relies on manual smoke.
+  evidence: Verification Gap; no Mappings panel harness in Tests/; one-pixel pad coherence is real but not worth a new panel fixture in this chrome rename.
+
 ## Deferred from: review of spec-skin-chrome-decorrelation.md (2026-11-01)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-skin-chrome-decorrelation.md`

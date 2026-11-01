@@ -8,7 +8,7 @@
 namespace
 {
     constexpr int kEdgeExtra = 4;
-    constexpr int kFocusPad = 1;
+    constexpr int kFocusPad = SkinEditorChrome::kMappingsFocusPad;
 }
 
 SkinEditorMappingsPanel::Row SkinEditorMappingsPanel::makeMappingRow(

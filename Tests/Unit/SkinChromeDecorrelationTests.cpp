@@ -64,11 +64,17 @@ private:
         using TSS::SkinObjectType;
         using TSS::SkinColourProperty;
 
-        const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::Black);
-        expect(skin->getColour(SkinObjectType::kDialog, SkinColourProperty::kGlyph)
-               == juce::Colour(ColourChart::kRed900));
-        expect(skin->getColour(SkinObjectType::kDialog, SkinColourProperty::kTitleBand)
-               == juce::Colour(ColourChart::kBlack));
+        const auto assertGlyphAndTitleBand = [this](TSS::Skin::ColourVariant variant)
+        {
+            const auto skin = TSS::Skin::create(variant);
+            expect(skin->getColour(SkinObjectType::kDialog, SkinColourProperty::kGlyph)
+                   == juce::Colour(ColourChart::kRed900));
+            expect(skin->getColour(SkinObjectType::kDialog, SkinColourProperty::kTitleBand)
+                   == juce::Colour(ColourChart::kBlack));
+        };
+
+        assertGlyphAndTitleBand(TSS::Skin::ColourVariant::Black);
+        assertGlyphAndTitleBand(TSS::Skin::ColourVariant::Cream);
     }
 
     void assertChromeTextAndBrandLooks(TSS::Skin::ColourVariant variant)

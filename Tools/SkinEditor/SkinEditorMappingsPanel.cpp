@@ -277,7 +277,8 @@ void SkinEditorMappingsPanel::Content::paint(juce::Graphics& g)
     const int width = owner_.paintWidth();
     const int x0 = kFocusPad;
     const auto clip = g.getClipBounds();
-    int y = 0;
+    // Match rebuildRows / ObjectTable metrics: top inset leaves room for the outside focus stroke.
+    int y = kFocusPad;
     for (int i = 0; i < static_cast<int>(owner_.rows_.size()); ++i)
     {
         const auto& item = owner_.rows_[static_cast<size_t>(i)];
@@ -447,7 +448,8 @@ int SkinEditorMappingsPanel::paintWidth() const noexcept
 
 void SkinEditorMappingsPanel::layoutContent()
 {
-    int totalH = kFocusPad; // bottom pad mirrors the top inset from rebuildRows
+    // Top + bottom insets: outside 1 px focus stroke must not clip at either scroll extreme.
+    int totalH = 2 * kFocusPad;
     for (const auto& row : rows_)
         totalH += row.heightPx;
 
@@ -457,7 +459,7 @@ void SkinEditorMappingsPanel::layoutContent()
 
 int SkinEditorMappingsPanel::rowIndexAtY(int y) const noexcept
 {
-    int cursor = 0;
+    int cursor = kFocusPad;
     for (int i = 0; i < static_cast<int>(rows_.size()); ++i)
     {
         const int next = cursor + rows_[static_cast<size_t>(i)].heightPx;

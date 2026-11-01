@@ -128,7 +128,7 @@ context:
 
 ## Design Notes
 
-- Place `WindowSurface` at the top of the Mappings chrome cluster (under-fill before Header/Body/Footer). Place `ChromeText` with chrome (after FooterMessage / beside Dialog), not among control widgets.
+- Place `WindowSurface` then `Dialog` then `ChromeText` at the top of the Mappings chrome cluster (before Header/Body/Footer), not among control widgets.
 - Rename helpers to `chromeTextLabelLookFromSkin`; keep alert hover borrowing ChromeText Hover white; do not add X to matrix modals.
 - JSON alias: `WindowClose`+Glyph → Dialog/Glyph; `DarkPanel` → `ChromeText` (Text/TextHover). No legacy name for WindowSurface (new).
 
@@ -142,3 +142,24 @@ context:
 **Manual checks (if no CLI):**
 - Open Settings and About: close X colour/hover; Dialog chrome unchanged.
 - Skin Editor Mappings: `WindowSurface` + Dialog Glyph + `ChromeText`; old names absent; temporarily shrink a panel or force a gap and confirm pure black/white under-fill shows.
+
+### Review Findings
+
+- [x] [Review][Patch] Pin Dialog Glyph seed on Cream as well as Black [`Tests/Unit/SkinChromeDecorrelationTests.cpp:62`]
+- [x] [Review][Defer] PluginEditor/MainComponent fillAll not unit-pinned to WindowSurface [`Source/GUI/PluginEditor.cpp:125`] — deferred: repo does not unit-test editor paint; already in deferred-work.md
+- [x] [Review][Defer] Settings/About close paint not unit-pinned to Dialog Glyph [`Source/GUI/Settings/SettingsWindow.cpp:53`] — deferred: close-button paint outside unit style; already in deferred-work.md
+- [x] [Review][Defer] Dual legacy+new Dev JSON rows last-wins after remap [`Source/GUI/Skins/Dev/DevSkinKeyNames.cpp:148`] — deferred: pre-existing import semantics; settle with dual-row fixture if authors hit it
+- [x] [Review][Defer] Historical sibling specs / notes still name DarkPanel or WindowClose — deferred: docs/agent-context outside this chrome rename; already in deferred-work.md
+- [x] [Review][Defer] Skin Editor Mappings focus-pad paint / hit-test / content-height untested [`Tools/SkinEditor/SkinEditorMappingsPanel.cpp:281`] — deferred: no Mappings panel harness; pad alignment verified by smoke
+
+#### Rejected
+
+- Spec Execution checkbox order vs Design Notes / code — false: product AC and decided order match code (`WindowSurface → Dialog → ChromeText →` panels); fixing the checkbox is a spec edit.
+- Code Map / tasks still cite SkinColourSubstrateTests / DevSkinJsonMapping / SsotSeed — false: Implementation Notes already correct; fix would edit this spec.
+- Verification `ctest -R SkinColour` misses new suites — false: process/spec Verification wording; fix would edit this spec.
+- Skin Editor polish (pad / Palette copy) out of Intent — false: polish is in this review blast radius; chrome token values unchanged (aligned to existing `kMappingsFocusPad`).
+- `chromeDecorrelationDisplayOrder` vacuous DarkPanel/WindowClose string checks — low: everyday harm unlikely; meaningful inventory absence needs more than deleting those expects.
+- WindowClose alias remaps any property to Dialog — low: only Glyph existed historically; property guard adds branch complexity for corrupt rows.
+- Empty Spec Change Log / status done with deferrals — false: process artifact, not a code defect.
+- No on-disk Dev JSON fixture for DarkPanel/WindowClose round-trip — false: `mappingFromVar` / `mappingToVar` already assert load remap and resave new names.
+- SkinColourWiring / inventory unpinned for WindowSurface / Dialog Glyph — false: seed asserts in `SkinChromeDecorrelationTests` fail if those keys are missing from the compiled element list.

@@ -44,12 +44,12 @@ namespace SkinEditorMappingsColumnFilter
     {
         static const std::vector<TSS::SkinObjectType> order {
             TSS::SkinObjectType::kWindowSurface,
+            TSS::SkinObjectType::kDialog,
+            TSS::SkinObjectType::kChromeText,
             TSS::SkinObjectType::kHeaderPanel,
             TSS::SkinObjectType::kBodyPanel,
             TSS::SkinObjectType::kFooterPanel,
             TSS::SkinObjectType::kFooterMessage,
-            TSS::SkinObjectType::kDialog,
-            TSS::SkinObjectType::kChromeText,
             TSS::SkinObjectType::kLed,
             TSS::SkinObjectType::kPeakIndicator,
             TSS::SkinObjectType::kEnvelopeDisplay,

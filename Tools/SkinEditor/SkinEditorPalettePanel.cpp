@@ -440,7 +440,7 @@ void SkinEditorPalettePanel::appendPaletteGroup(const juce::String& title,
     {
         Row hint;
         hint.kind = RowKind::kEmptyHint;
-        hint.headerText = "No editor colours yet.";
+        hint.headerText = "No editor colours yet";
         pushSplitListRow(hint);
         return;
     }

@@ -320,7 +320,7 @@ private:
 
     void chromeDecorrelationDisplayOrder()
     {
-        beginTest("Chrome order: WindowSurface first, Dialog then ChromeText, ReadOnly near NumberBox");
+        beginTest("Chrome order: WindowSurface then Dialog/ChromeText, ReadOnly near NumberBox");
 
         using namespace SkinEditorMappingsColumnFilter;
         const auto& order = mappingsObjectDisplayOrder();
@@ -346,8 +346,8 @@ private:
                 readOnlyIndex = i;
         }
 
-        expect(dialogIndex >= 0);
-        expect(chromeTextIndex == dialogIndex + 1);
+        expectEquals(dialogIndex, 1);
+        expectEquals(chromeTextIndex, 2);
         expect(numberBoxIndex >= 0);
         expectEquals(readOnlyIndex, numberBoxIndex + 1);
     }
