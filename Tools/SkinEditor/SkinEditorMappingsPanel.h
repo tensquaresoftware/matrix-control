@@ -126,6 +126,7 @@ private:
     void clearAllColumnFilters();
     void clearColumnFilter(FilterColumn column);
     void setColumnFilter(FilterColumn column, const juce::String& value);
+    bool anyColumnFilterActive() const noexcept;
     juce::StringArray presentValuesFor(FilterColumn column) const;
     juce::String& filterValue(FilterColumn column) noexcept;
     const juce::String& filterValue(FilterColumn column) const noexcept;
@@ -191,6 +192,8 @@ private:
     int unboundCount_ = 0;
     juce::Rectangle<int> unboundLabelBounds_;
     juce::Rectangle<int> unboundBadgeBounds_;
+    /** Global clear-all filters badge (action row); empty when no filter active. */
+    juce::Rectangle<int> globalClearBounds_;
     /** Empty = filter off. Mapped colour may be the literal "Unbound". */
     juce::String propertyFilter_;
     juce::String stateFilter_;

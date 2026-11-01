@@ -184,6 +184,9 @@ void SkinEditorMappingsPanel::paint(juce::Graphics& g)
         g.drawText("Unbound", unboundLabelBounds_, juce::Justification::centredLeft, false);
         SkinEditorChrome::drawCountBadge(g, unboundBadgeBounds_, unboundCount_, unboundColour);
     }
+
+    if (! globalClearBounds_.isEmpty())
+        SkinEditorChrome::drawClearBadge(g, globalClearBounds_);
 }
 
 void SkinEditorMappingsPanel::paintMappingCells(juce::Graphics& g,
@@ -373,6 +376,7 @@ void SkinEditorMappingsPanel::layoutShellEmpty(juce::Rectangle<int> content)
     holdColourToggle_.setBounds({});
     unboundLabelBounds_ = {};
     unboundBadgeBounds_ = {};
+    globalClearBounds_ = {};
     stickyBandBounds_ = {};
     stickyLegendBounds_ = {};
     clearLegendHitTargets();
@@ -426,6 +430,16 @@ void SkinEditorMappingsPanel::layoutActionRow(juce::Rectangle<int> actions, int 
     unboundLabelBounds_ = { unboundLeft, actions.getY(), unboundLabelW, actions.getHeight() };
     unboundBadgeBounds_ = { unboundLeft + unboundLabelW + kUnboundBadgeGap,
                             actions.getY(), badgeW, actions.getHeight() };
+
+    // Global clear: right edge flush with sticky legend / dark header (tableX + tableW).
+    globalClearBounds_ = {};
+    if (anyColumnFilterActive())
+    {
+        const int clearW = SkinEditorChrome::clearBadgeWidth();
+        const int clearX = tableX + tableW - clearW;
+        if (clearX >= unboundBadgeBounds_.getRight() + SkinEditorChrome::kButtonGap)
+            globalClearBounds_ = { clearX, actions.getY(), clearW, actions.getHeight() };
+    }
 
     // Object combo fixed width, then gap, then Hold — Unbound stays on Mapped colour.
     const int comboMax = juce::jmax(0, unboundLeft - SkinEditorChrome::kButtonGap - actionRow.getX());

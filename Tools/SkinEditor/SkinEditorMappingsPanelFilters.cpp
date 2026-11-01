@@ -191,6 +191,14 @@ void SkinEditorMappingsPanel::clearAllColumnFilters()
     mappedColourFilter_.clear();
 }
 
+bool SkinEditorMappingsPanel::anyColumnFilterActive() const noexcept
+{
+    return propertyFilter_.isNotEmpty()
+        || stateFilter_.isNotEmpty()
+        || colourSetFilter_.isNotEmpty()
+        || mappedColourFilter_.isNotEmpty();
+}
+
 void SkinEditorMappingsPanel::clearColumnFilter(FilterColumn column)
 {
     filterValue(column).clear();
@@ -398,6 +406,12 @@ void SkinEditorMappingsPanel::mouseUp(const juce::MouseEvent& e)
         return;
 
     const auto pos = e.getPosition();
+    if (globalClearBounds_.contains(pos))
+    {
+        clearAllColumnFilters();
+        refresh();
+        return;
+    }
     if (propertyClearBounds_.contains(pos))
     {
         clearColumnFilter(FilterColumn::kProperty);

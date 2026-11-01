@@ -1,5 +1,11 @@
 # Deferred Work
 
+## Deferred from: oneshot review of spec-skin-editor-mappings-global-filter-reset.md (2026-11-01)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-global-filter-reset.md`
+  summary: No automated coverage for Mappings global clear-all filter badge (visibility, right-edge layout, mouse-up clears all four filters).
+  evidence: Blind Hunter; paint-only action-row hit target, same class of GUI chrome that prior Mappings filter stories left to manual smoke.
+
 ## Deferred from: oneshot review of spec-skin-editor-mappings-filter-scroll-preserve.md (2026-11-01)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-filter-scroll-preserve.md`
