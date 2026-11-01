@@ -113,6 +113,7 @@ void SkinEditorMappingsPanel::setReadOnly(bool readOnly)
 void SkinEditorMappingsPanel::refresh()
 {
     selectedRow_ = -1;
+    const int scrollY = viewport_.getViewPositionY();
     const juce::String keep = (focusedObject_ >= 0
                                && focusedObject_ < static_cast<int>(objects_.size()))
                                   ? objects_[static_cast<size_t>(focusedObject_)].name
@@ -121,6 +122,9 @@ void SkinEditorMappingsPanel::refresh()
     rebuildObjectCombo(keep);
     resized();
     layoutContent();
+    // Restore after layout: filter rebuilds must not jump the viewport (same as Palette).
+    const int maxY = juce::jmax(0, content_.getHeight() - viewport_.getHeight());
+    viewport_.setViewPosition(0, juce::jlimit(0, maxY, scrollY));
     // Unbound witness is painted on the panel (not Content) — must damage both.
     content_.repaint();
     repaint();

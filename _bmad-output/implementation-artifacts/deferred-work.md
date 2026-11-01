@@ -1,5 +1,11 @@
 # Deferred Work
 
+## Deferred from: oneshot review of spec-skin-editor-mappings-filter-scroll-preserve.md (2026-11-01)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-filter-scroll-preserve.md`
+  summary: When column filters add or remove whole object groups above the watched table, absolute view-Y restore can still leave that table off-screen (or leave focus chrome scrolled away).
+  evidence: Blind Hunter; frozen oneshot Approach mirrors Palette absolute Y and forbids re-pinning to Object on filter; prove with Object-at-top then filter that collapses tables above, then consider anchoring delta to focused object sectionY when it remains in the filtered set.
+
 ## Deferred from: code review of spec-skin-chrome-decorrelation.md (2026-11-01)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-skin-chrome-decorrelation.md`
