@@ -160,6 +160,15 @@ private:
     void layoutContent();
     int rowIndexAtY(int y) const noexcept;
     int paintWidth() const noexcept;
+    /** Object under the view top + Y offset — survives filter rebuilds that shift content above. */
+    struct ViewScrollAnchor
+    {
+        juce::String objectName;
+        int offsetFromSectionY = 0;
+        int fallbackY = 0;
+    };
+    ViewScrollAnchor captureViewScrollAnchor() const;
+    void restoreViewScrollAnchor(const ViewScrollAnchor& anchor);
 
     TSS::DevSkin::Layer* layer_ = nullptr;
     juce::String skinId_;

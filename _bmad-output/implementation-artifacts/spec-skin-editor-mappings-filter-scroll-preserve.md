@@ -14,16 +14,17 @@ context: []
 
 **Problem:** In Skin Editor Mappings, after the operator selects an Object or scrolls to keep a mapping table in view, changing or clearing a column filter often jumps the list scroll so the watched table leaves the viewport.
 
-**Approach:** On Mappings `refresh()` (filter apply/clear and other rebuilds), preserve the viewport vertical position the same way Palette already does — restore prior view Y after layout, clamped to the new content height — without auto-scrolling to the focused object on filter changes.
+**Approach:** On Mappings `refresh()` (filter apply/clear and other rebuilds), keep the same object under the view top by restoring scroll from that object's section Y plus the prior offset (absolute Y alone jumps when filters rewrite groups above). Do not call Object-combo scroll-into-place on filter changes.
 
 </frozen-after-approval>
 
 ## Implementation Notes
 
-- Mirrored Palette absolute view-Y preserve in `SkinEditorMappingsPanel::refresh()`: capture `viewport_.getViewPositionY()` before rebuild; after `layoutContent()`, restore with clamp to new max Y. Failure mode was viewport clamp on content resize (not `scrollFocusedObjectIntoPlace` on filter paths — that was never called from `refresh()`).
-- Object combo remains the only intentional jump-to-table.
-- Touched: `Tools/SkinEditor/SkinEditorMappingsPanel.cpp` only.
-- Manual GUI: select Object or scroll a table into view → apply/clear Property or Mapped colour filter → scroll Y should stay put (or clamp only if content shrinks past prior Y); empty “no matches” may clamp to 0.
+- First pass (absolute view-Y, Palette-style) failed smoke: filters that remove/add object groups above the watched table still moved it out of view.
+- Second pass: `captureViewScrollAnchor` / `restoreViewScrollAnchor` pin to the object at the view top (`sectionY + offset`), with absolute Y fallback when that object disappears from the filtered set.
+- Object combo remains the only intentional jump-to-table (`scrollFocusedObjectIntoPlace`).
+- Touched: `SkinEditorMappingsPanel.cpp` / `.h`.
+- Manual GUI: select Object or scroll a table into view → apply/clear Property or Mapped colour filter → the same table should stay under the sticky legend; empty “no matches” may clamp to 0.
 
 ## Review Triage Log
 

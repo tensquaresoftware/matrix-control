@@ -165,3 +165,35 @@ void SkinEditorMappingsPanel::scrollFocusedObjectIntoPlace()
     const int maxY = juce::jmax(0, content_.getHeight() - viewport_.getHeight());
     viewport_.setViewPosition(0, juce::jlimit(0, maxY, targetY));
 }
+
+SkinEditorMappingsPanel::ViewScrollAnchor SkinEditorMappingsPanel::captureViewScrollAnchor() const
+{
+    ViewScrollAnchor anchor;
+    anchor.fallbackY = viewport_.getViewPositionY();
+    // Include Object-combo pin: scrollY == sectionY - kFocusPad (header just under sticky legend).
+    for (const auto& object : objects_)
+    {
+        if (object.sectionY - kFocusPad > anchor.fallbackY)
+            break;
+        anchor.objectName = object.name;
+        anchor.offsetFromSectionY = anchor.fallbackY - object.sectionY;
+    }
+    return anchor;
+}
+
+void SkinEditorMappingsPanel::restoreViewScrollAnchor(const ViewScrollAnchor& anchor)
+{
+    int restoreY = anchor.fallbackY;
+    if (anchor.objectName.isNotEmpty())
+    {
+        for (const auto& object : objects_)
+        {
+            if (object.name != anchor.objectName)
+                continue;
+            restoreY = object.sectionY + anchor.offsetFromSectionY;
+            break;
+        }
+    }
+    const int maxY = juce::jmax(0, content_.getHeight() - viewport_.getHeight());
+    viewport_.setViewPosition(0, juce::jlimit(0, maxY, restoreY));
+}
