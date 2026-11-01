@@ -91,10 +91,13 @@ private:
         expectEquals(SkinEditorChrome::kPaletteListPaintWidth,
                      SkinEditorChrome::paletteListPaintFloor());
         expectEquals(SkinEditorChrome::kMappingsPropertyColumnWidth, 150);
-        expectEquals(SkinEditorChrome::kMappingsStateColumnWidth, 150);
-        expectEquals(SkinEditorChrome::kMappingsColourSetColumnWidth, 70);
-        expectEquals(SkinEditorChrome::kMappingsTablePaintWidth, 506);
-        expectEquals(SkinEditorChrome::kMappingsPanelWidth, 536);
+        expectEquals(SkinEditorChrome::kMappingsStateColumnWidth, 115);
+        expectEquals(SkinEditorChrome::kMappingsColourSetColumnWidth, 45);
+        expectEquals(SkinEditorChrome::kMappingsTablePaintWidth, 446);
+        expectEquals(SkinEditorChrome::kMappingsPanelWidth, 476);
+        expect(SkinEditorChrome::kMappingsPropertyColumnWidth % 5 == 0);
+        expect(SkinEditorChrome::kMappingsStateColumnWidth % 5 == 0);
+        expect(SkinEditorChrome::kMappingsColourSetColumnWidth % 5 == 0);
         expectEquals(SkinEditorChrome::kObjectComboWidth, 150);
         expect(SkinEditorChrome::kMappingsPanelWidth
                < SkinEditorChrome::kLegacyWindowMaxWidth / 2);
