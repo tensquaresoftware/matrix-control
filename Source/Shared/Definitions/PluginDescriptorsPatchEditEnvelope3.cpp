@@ -148,7 +148,7 @@ namespace PluginDescriptors
             .choices = PluginHelpers::makeStringArray({
                 PluginDisplayNames::ChoiceLists::Lfo1Trigger::kNormal,
                 PluginDisplayNames::ChoiceLists::Lfo1Trigger::kLfo1,
-                PluginDisplayNames::ChoiceLists::Lfo1Trigger::kGatedLfo1Trigger }),
+                PluginDisplayNames::ChoiceLists::Lfo1Trigger::kGLfo1 }),
             .defaultIndex = 0,
             .sysExOffset = 74,
             .sysExId = 79

@@ -2808,3 +2808,12 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-silence-false-error-matrix-6-master.md`
   summary: Reconfirmed — MidiLogger receive-log ERROR-absence still untested at call site; double `logSysExReceived` still pre-existing.
   evidence: Combined review Verification Gap; already deferred earlier the same day.
+
+## Deferred from: review of spec-env3-lfo1-trigger-gated-label.md (2026-11-01)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-env3-lfo1-trigger-gated-label.md`
+  summary: Expand ENV 1/2/3 LFO 1 TRIGGER contextual help so NORMAL / LFO 1 / G-LFO 1 meanings are clear.
+  evidence: Blind Hunter; pre-existing binary-style help; not caused by aligning the gated display string.
+- source_spec: `_bmad-output/implementation-artifacts/spec-env3-lfo1-trigger-gated-label.md`
+  summary: Add a descriptor/unit check that ENV 1, ENV 2, and ENV 3 LFO 1 TRIGGER choice strings stay identical.
+  evidence: Blind Hunter; ENV 3 drifted to a long one-off label once; out of oneshot footprint.

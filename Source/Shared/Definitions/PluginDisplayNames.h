@@ -764,10 +764,9 @@ namespace PluginDisplayNames
 
         namespace Lfo1Trigger
         {
-            constexpr const char* kNormal           = "NORMAL";
-            constexpr const char* kLfo1             = "LFO 1";
-            constexpr const char* kGLfo1            = "G-LFO 1";
-            constexpr const char* kGatedLfo1Trigger = "GATED LFO 1 TRIGGER";
+            constexpr const char* kNormal = "NORMAL";
+            constexpr const char* kLfo1   = "LFO 1";
+            constexpr const char* kGLfo1  = "G-LFO 1";
         }
 
         namespace LfoTriggerMode
