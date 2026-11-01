@@ -4,6 +4,7 @@
 #include "HeaderPanel.h"
 
 #include "GUI/Looks/LookBuilders.h"
+#include "GUI/Skins/SkinValues.h"
 
 void HeaderPanel::wireLogoCallbacks()
 {
@@ -77,8 +78,8 @@ void HeaderPanel::applyPanicButtonLook()
         return;
 
     panicButton_.setLook(panicAlertActive_
-                             ? TSS::buttonAlertLookFromSkin(*skin_)
-                             : TSS::buttonLookFromSkin(*skin_));
+                             ? TSS::buttonAlertLookFromSkin(*skin_, TSS::ColourSet::k3)
+                             : TSS::buttonLookFromSkin(*skin_, TSS::ColourSet::k3));
 }
 
 void HeaderPanel::setPanicQueuePressureAlert(bool active)
@@ -108,10 +109,10 @@ void HeaderPanel::setSkin(TSS::ISkin& skin)
     midiToActivityLed_.setSkin(skin);
     instrumentActivityLed_.setSkin(skin);
     inputGainLabel_.setLook(TSS::darkPanelLabelLookFromSkin(skin));
-    inputGainSlider_.setLook(TSS::sliderLookFromSkin(skin));
+    inputGainSlider_.setLook(TSS::sliderLookFromSkin(skin, TSS::ColourSet::k3));
     peakIndicator_.setSkin(skin);
-    undoButton_.setLook(TSS::buttonLookFromSkin(skin));
-    redoButton_.setLook(TSS::buttonLookFromSkin(skin));
+    undoButton_.setLook(TSS::buttonLookFromSkin(skin, TSS::ColourSet::k3));
+    redoButton_.setLook(TSS::buttonLookFromSkin(skin, TSS::ColourSet::k3));
     applyPanicButtonLook();
 }
 

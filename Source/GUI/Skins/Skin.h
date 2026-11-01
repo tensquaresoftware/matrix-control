@@ -47,23 +47,44 @@ namespace TSS
         juce::Font getModalBodyFont() const override;
         juce::Font getModalBodyFontBold() const override;
 
-        juce::Colour getToggleBackgroundColour(bool isOn) const override;
-        juce::Colour getToggleTextColour(bool isOn) const override;
-        juce::Colour getSliderTrackColour(bool isEnabled = true) const override;
-        juce::Colour getSliderValueBarColour(bool isEnabled = true) const override;
-        juce::Colour getSliderTextColour(bool isEnabled = true) const override;
-        juce::Colour getComboBoxBackgroundColour(bool isEnabled = true, bool isButtonLike = false) const override;
-        juce::Colour getComboBoxBorderColour(bool isEnabled = true, bool isButtonLike = false) const override;
-        juce::Colour getComboBoxFocusBorderColour(bool isButtonLike = false) const override;
-        juce::Colour getComboBoxTriangleColour(bool isEnabled = true, bool isButtonLike = false) const override;
-        juce::Colour getComboBoxTextColour(bool isEnabled = true, bool isButtonLike = false) const override;
-        juce::Colour getPopupMenuBackgroundColour(bool isButtonLike = false) const override;
-        juce::Colour getPopupMenuBorderColour(bool isButtonLike = false) const override;
-        juce::Colour getPopupMenuSeparatorColour(bool isButtonLike = false) const override;
-        juce::Colour getPopupMenuTextColour(bool isButtonLike = false) const override;
-        juce::Colour getPopupMenuBackgroundHooverColour(bool isButtonLike = false) const override;
-        juce::Colour getPopupMenuTextHooverColour(bool isButtonLike = false) const override;
-        juce::Colour getPopupMenuScrollbarColour(bool isButtonLike = false) const override;
+        juce::Colour getToggleBackgroundColour(bool isOn,
+                                               ColourSet colourSet = ColourSet::k1) const override;
+        juce::Colour getToggleTextColour(bool isOn,
+                                         ColourSet colourSet = ColourSet::k1) const override;
+        juce::Colour getSliderTrackColour(bool isEnabled = true,
+                                          ColourSet colourSet = ColourSet::k1) const override;
+        juce::Colour getSliderValueBarColour(bool isEnabled = true,
+                                             ColourSet colourSet = ColourSet::k1) const override;
+        juce::Colour getSliderTextColour(bool isEnabled = true,
+                                         ColourSet colourSet = ColourSet::k1) const override;
+        juce::Colour getComboBoxBackgroundColour(bool isEnabled = true,
+                                                 bool isButtonLike = false,
+                                                 ColourSet colourSet = ColourSet::k1) const override;
+        juce::Colour getComboBoxBorderColour(bool isEnabled = true,
+                                             bool isButtonLike = false,
+                                             ColourSet colourSet = ColourSet::k1) const override;
+        juce::Colour getComboBoxFocusBorderColour(bool isButtonLike = false,
+                                                  ColourSet colourSet = ColourSet::k1) const override;
+        juce::Colour getComboBoxTriangleColour(bool isEnabled = true,
+                                               bool isButtonLike = false,
+                                               ColourSet colourSet = ColourSet::k1) const override;
+        juce::Colour getComboBoxTextColour(bool isEnabled = true,
+                                           bool isButtonLike = false,
+                                           ColourSet colourSet = ColourSet::k1) const override;
+        juce::Colour getPopupMenuBackgroundColour(bool isButtonLike = false,
+                                                  ColourSet colourSet = ColourSet::k1) const override;
+        juce::Colour getPopupMenuBorderColour(bool isButtonLike = false,
+                                              ColourSet colourSet = ColourSet::k1) const override;
+        juce::Colour getPopupMenuSeparatorColour(bool isButtonLike = false,
+                                                 ColourSet colourSet = ColourSet::k1) const override;
+        juce::Colour getPopupMenuTextColour(bool isButtonLike = false,
+                                            ColourSet colourSet = ColourSet::k1) const override;
+        juce::Colour getPopupMenuBackgroundHooverColour(bool isButtonLike = false,
+                                                        ColourSet colourSet = ColourSet::k1) const override;
+        juce::Colour getPopupMenuTextHooverColour(bool isButtonLike = false,
+                                                  ColourSet colourSet = ColourSet::k1) const override;
+        juce::Colour getPopupMenuScrollbarColour(bool isButtonLike = false,
+                                                 ColourSet colourSet = ColourSet::k1) const override;
 
     private:
         void initializeDefaultColours();

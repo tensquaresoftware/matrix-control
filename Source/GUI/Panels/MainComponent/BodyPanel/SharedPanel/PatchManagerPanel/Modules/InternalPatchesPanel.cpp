@@ -9,6 +9,7 @@
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Looks/LookBuilders.h"
+#include "GUI/Skins/SkinValues.h"
 #include "GUI/Widgets/ModuleHeader.h"
 #include "GUI/Widgets/GroupLabel.h"
 #include "GUI/Widgets/Button.h"
@@ -295,9 +296,9 @@ void InternalPatchesPanel::applyChildLooks(TSS::ISkin& skin)
     if (memoryGroupLabel)
         memoryGroupLabel->setLook(TSS::groupLabelLookFromSkin(skin));
     if (currentBankNumber)
-        currentBankNumber->setLook(TSS::numberBoxLookFromSkin(skin));
+        currentBankNumber->setLook(TSS::numberBoxLookFromSkin(skin, TSS::ColourSet::k4));
     if (currentPatchNumber)
-        currentPatchNumber->setLook(TSS::numberBoxLookFromSkin(skin));
+        currentPatchNumber->setLook(TSS::numberBoxLookFromSkin(skin, TSS::ColourSet::k4));
 
     if (loadPreviousPatchButton_)
         loadPreviousPatchButton_->setLook(TSS::buttonLookFromSkin(skin));

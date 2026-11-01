@@ -4,6 +4,7 @@
 #include "GUI/Dialogs/GettingStartedWizardMetrics.h"
 #include "GUI/Helpers/MidiPortComboPopulation.h"
 #include "GUI/Looks/LookBuilders.h"
+#include "GUI/Skins/SkinValues.h"
 #include "GUI/Settings/SettingsShellMetrics.h"
 #include "GUI/Skins/Skin.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
@@ -16,8 +17,8 @@ void GettingStartedWizardDialog::buildStepControls(TSS::ISkin& skin)
     const auto comboStyle = TSS::ComboBox::Style::ButtonLike;
     // Dark-panel label colour — Matrix chrome body is always a dark plate.
     const auto labelLook = TSS::darkPanelLabelLookFromSkin(skin);
-    const auto comboLook = TSS::comboBoxLookFromSkin(skin);
-    const auto popupLook = TSS::popupMenuLookFromSkin(skin);
+    const auto comboLook = TSS::comboBoxLookFromSkin(skin, TSS::ColourSet::k4);
+    const auto popupLook = TSS::popupMenuLookFromSkin(skin, TSS::ColourSet::k4);
 
     auto makeLabel = [&](const char* text)
     {
@@ -48,7 +49,7 @@ void GettingStartedWizardDialog::buildStepControls(TSS::ISkin& skin)
     midiToLabel_ = makeLabel(PluginDisplayNames::Settings::kSynthToLabel);
     midiToCombo_ = makeCombo();
     deviceLabel_ = makeLabel(PluginDisplayNames::FooterPanel::kDeviceLabel);
-    deviceValueField_ = std::make_unique<TSS::ReadOnlyValueField>(skin);
+    deviceValueField_ = std::make_unique<TSS::ReadOnlyValueField>(skin, TSS::ColourSet::k4);
     addChildComponent(*deviceValueField_);
     epromTypeLabel_ = makeLabel(PluginDisplayNames::Dialogs::EpromTypePrompt::kEpromTypeLabel);
     epromTypeCombo_ = makeCombo();
@@ -78,8 +79,8 @@ void GettingStartedWizardDialog::populateScaleAndSkinItems()
 void GettingStartedWizardDialog::applyControlLooks(TSS::ISkin& skin)
 {
     const auto labelLook = TSS::darkPanelLabelLookFromSkin(skin);
-    const auto comboLook = TSS::comboBoxLookFromSkin(skin);
-    const auto popupLook = TSS::popupMenuLookFromSkin(skin);
+    const auto comboLook = TSS::comboBoxLookFromSkin(skin, TSS::ColourSet::k4);
+    const auto popupLook = TSS::popupMenuLookFromSkin(skin, TSS::ColourSet::k4);
 
     auto apply = [&](TSS::Label* label, TSS::ComboBox* combo)
     {

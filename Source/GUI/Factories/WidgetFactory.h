@@ -8,6 +8,7 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 
 #include "GUI/Layout/PanelDimensions.h"
+#include "GUI/Skins/SkinValues.h"
 #include "Shared/Definitions/PluginDescriptors.h"
 #include "WidgetFactoryValidator.h"
 
@@ -37,17 +38,18 @@ public:
         TSS::ISkin& skin,
         int width,
         int height);
-    
+
     std::unique_ptr<TSS::ComboBox> createChoiceParameterComboBox(
         const juce::String& parameterId,
         TSS::ISkin& skin,
         int width,
         int height);
-    
+
     std::unique_ptr<TSS::Button> createStandaloneButton(
         const juce::String& widgetId,
         TSS::ISkin& skin,
-        int height);
+        int height,
+        TSS::ColourSet colourSet = TSS::ColourSet::k1);
 
     static PluginEditorDimensions getRootGuiDimensions();
     static GuiLayoutDimensions buildGuiLayoutDimensions();
@@ -88,7 +90,15 @@ private:
     void addChoiceParametersToMap(const std::vector<PluginDescriptors::ChoiceParameterDescriptor>& parameters);
     void addStandaloneWidgetsToMap(const std::vector<PluginDescriptors::StandaloneWidgetDescriptor>& widgets);
     
-    std::unique_ptr<TSS::Slider> createSliderFromDescriptor(const PluginDescriptors::IntParameterDescriptor* desc, TSS::ISkin& skin, int width, int height);
-    std::unique_ptr<TSS::ComboBox> createComboBoxFromDescriptor(const PluginDescriptors::ChoiceParameterDescriptor* desc, TSS::ISkin& skin, int width, int height);
+    std::unique_ptr<TSS::Slider> createSliderFromDescriptor(
+        const PluginDescriptors::IntParameterDescriptor* desc,
+        TSS::ISkin& skin,
+        int width,
+        int height);
+    std::unique_ptr<TSS::ComboBox> createComboBoxFromDescriptor(
+        const PluginDescriptors::ChoiceParameterDescriptor* desc,
+        TSS::ISkin& skin,
+        int width,
+        int height);
 };
 

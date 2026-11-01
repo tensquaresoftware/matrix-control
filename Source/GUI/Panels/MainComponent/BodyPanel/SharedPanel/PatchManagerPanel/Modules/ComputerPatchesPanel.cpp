@@ -137,11 +137,11 @@ void ComputerPatchesPanel::refreshNavigationFocusHighlight()
         PluginIDs::PatchManagerSection::StateProperties::kNavigationFocus,
         PluginIDs::PatchManagerSection::NavigationFocus::kDefault));
 
-    auto look = TSS::comboBoxLookFromSkin(*skin_);
+    auto look = TSS::comboBoxLookFromSkin(*skin_, TSS::ColourSet::k4);
 
     if (navigationFocus == PluginIDs::PatchManagerSection::NavigationFocus::kComputer)
     {
-        const auto focusColour = skin_->getColour(TSS::SkinObjectType::kNumberBox, TSS::SkinColourProperty::kText, TSS::SkinColourState::kFocus);
+        const auto focusColour = skin_->getColour(TSS::SkinObjectType::kNumberBox, TSS::SkinColourProperty::kText, TSS::SkinColourState::kFocus, TSS::ColourSet::k4);
         look.buttonLikeText = focusColour;
         look.textEnabled = focusColour;
     }
@@ -337,7 +337,7 @@ void ComputerPatchesPanel::applyChildLooks(TSS::ISkin& skin)
 
     if (selectPatchFileComboBox_)
     {
-        selectPatchFileComboBox_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
+        selectPatchFileComboBox_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin, TSS::ColourSet::k4));
         refreshNavigationFocusHighlight();
     }
 
@@ -429,9 +429,9 @@ void ComputerPatchesPanel::setupSelectPatchFileComboBox(TSS::ISkin& skin)
     selectPatchFileComboBox_ = std::make_unique<TSS::ComboBox>(
         dims_.comboBoxes.patchManagerComputerPatchesWidth,
         dims_.buttons.height,
-        TSS::comboBoxLookFromSkin(skin),
+        TSS::comboBoxLookFromSkin(skin, TSS::ColourSet::k4),
         TSS::ComboBox::Style::ButtonLike);
-    selectPatchFileComboBox_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
+    selectPatchFileComboBox_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin, TSS::ColourSet::k4));
     selectPatchFileComboBox_->onChange = [this] { handleSelectPatchFileChanged(); };
     // Same-id popup pick: JUCE skips onChange; reclaim like the module header.
     selectPatchFileComboBox_->onSameIdReselected = [this]

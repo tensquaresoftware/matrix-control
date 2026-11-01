@@ -325,9 +325,11 @@ set(PLUGIN_SOURCES
     
     # GUI - Skins
     Source/GUI/Skins/Skin.cpp
+    Source/GUI/Skins/SkinColourAccessors.cpp
     
     # GUI - Looks
     Source/GUI/Looks/LookBuilders.cpp
+    Source/GUI/Looks/LookBuildersMultiSet.cpp
     Source/GUI/Looks/TypographyStyles.cpp
     
     # GUI - Main Component
@@ -608,6 +610,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/ModuleHeaderTitleColourTests.cpp
         Tests/Unit/NumberBoxDisabledBackgroundColourTests.cpp
         Tests/Unit/SkinColourSubstrateTests.cpp
+        Tests/Unit/SkinColourWiringTests.cpp
         Tests/Unit/ColourSetModelTests.cpp
         Tests/Unit/DevSkinLayerJsonTests.cpp
         Tests/Unit/DevSkinMatrixTests.cpp
@@ -696,9 +699,11 @@ if(MATRIX_BUILD_TESTS)
 
         Source/GUI/Layout/WidgetDimensionRegistry.cpp
         Source/GUI/Looks/LookBuilders.cpp
+        Source/GUI/Looks/LookBuildersMultiSet.cpp
         Source/GUI/Looks/TypographyStyles.cpp
         Source/GUI/Panels/Reusable/ModulePanelConfigBuilder.cpp
         Source/GUI/Skins/Skin.cpp
+        Source/GUI/Skins/SkinColourAccessors.cpp
         Source/GUI/Skins/Dev/DevSkinApplier.cpp
         Source/GUI/Skins/Dev/DevSkinBridgeProtocol.cpp
         Source/GUI/Skins/Dev/DevSkinBridgeSession.cpp
@@ -714,12 +719,28 @@ if(MATRIX_BUILD_TESTS)
         Source/GUI/Skins/Dev/DevSkinSession.cpp
         Source/GUI/Skins/Dev/DevSkinSsotSeed.cpp
         Source/GUI/Skins/Dev/DevSkinStandalonePaintState.cpp
+        Source/GUI/Widgets/Button.cpp
+        Source/GUI/Widgets/ComboBox.cpp
+        Source/GUI/Widgets/ComboBoxControlPainter.cpp
+        Source/GUI/Widgets/HorizontalSeparator.cpp
         Source/GUI/Widgets/Label.cpp
         Source/GUI/Widgets/Led.cpp
         Source/GUI/Widgets/Logo.cpp
+        Source/GUI/Widgets/MultiColumnPopupMenu.cpp
+        Source/GUI/Widgets/ParameterCell.cpp
         Source/GUI/Widgets/PeakIndicator.cpp
+        Source/GUI/Widgets/PopupMenuBase.cpp
+        Source/GUI/Widgets/PopupMenuCustomScrollBar.cpp
+        Source/GUI/Widgets/PopupMenuOutsideDismissWatcher.cpp
+        Source/GUI/Widgets/PopupMenuPositioner.cpp
+        Source/GUI/Widgets/PopupMenuRenderer.cpp
+        Source/GUI/Widgets/ScrollablePopupMenu.cpp
         Source/GUI/Widgets/Slider.cpp
         Source/GUI/Widgets/SliderEditing.cpp
+        Source/GUI/Factories/WidgetFactory.cpp
+        Source/GUI/Factories/WidgetFactoryValidator.cpp
+        Source/GUI/Factories/DimensionFactory.cpp
+        Source/GUI/Factories/DimensionFactoryBuilders.cpp
         Source/GUI/Helpers/ApvtsUndoableParameterAttachments.cpp
         Tests/Unit/MigratedModulePanelLayouts.cpp
         Source/Shared/Definitions/PluginDescriptorsPatchManager.cpp
@@ -1194,6 +1215,7 @@ if(MATRIX_BUILD_SKIN_EDITOR)
         Tools/SkinEditor/SkinEditorSkinsPanel.cpp
         ${MATRIX_SKIN_DEV_LAYER_SOURCES}
         Source/GUI/Skins/Skin.cpp
+        Source/GUI/Skins/SkinColourAccessors.cpp
         Source/Shared/ProjectPaths.cpp
         Source/Standalone/StandaloneTitleBarDoubleClick.cpp
     )

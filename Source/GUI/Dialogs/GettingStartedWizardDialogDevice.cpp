@@ -94,11 +94,19 @@ void GettingStartedWizardDialog::refreshDeviceValueField()
     if (deviceValueField_ == nullptr || skin_ == nullptr)
         return;
 
-    const auto fill = skin_->getColour(SkinObjectType::kReadOnlyValueField, SkinColourProperty::kBackground);
-    const auto normalText = skin_->getColour(SkinObjectType::kReadOnlyValueField, SkinColourProperty::kText);
+    const auto colourSet = deviceValueField_->getColourSet();
+    const auto fill = skin_->getColour(SkinObjectType::kReadOnlyValueField,
+                                       SkinColourProperty::kBackground,
+                                       SkinColourState::kDefault,
+                                       colourSet);
+    const auto normalText = skin_->getColour(SkinObjectType::kReadOnlyValueField,
+                                             SkinColourProperty::kText,
+                                             SkinColourState::kDefault,
+                                             colourSet);
     const auto errorText = skin_->getColour(SkinObjectType::kReadOnlyValueField,
                                             SkinColourProperty::kText,
-                                            SkinColourState::kError);
+                                            SkinColourState::kError,
+                                            colourSet);
 
     if (deviceRowView_.kind == Core::DeviceSetupDeviceRowKind::kSearching)
     {

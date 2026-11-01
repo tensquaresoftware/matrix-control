@@ -4,6 +4,7 @@
 #include "GUI/Helpers/MidiPortComboPopulation.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Looks/LookBuilders.h"
+#include "GUI/Skins/SkinValues.h"
 #include "GUI/Settings/SettingsShellMetrics.h"
 #include "GUI/Skins/ISkin.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
@@ -32,21 +33,24 @@ void SettingsMidiPage::buildWidgets()
     keyboardFromLabel_ = makeLabel(*skin_, PluginDisplayNames::Settings::kKeyboardFromLabel);
     keyboardFromCombo_ = makeCombo(*skin_);
     keyboardFromLed_ = std::make_unique<TSS::Led>(SettingsShellMetrics::kPeakWidth,
-                                                  SettingsShellMetrics::kPeakWidth);
+                                                  SettingsShellMetrics::kPeakWidth,
+                                                  TSS::ColourSet::k4);
     keyboardFromLed_->setSkin(*skin_);
     addAndMakeVisible(*keyboardFromLed_);
 
     synthFromLabel_ = makeLabel(*skin_, PluginDisplayNames::Settings::kSynthFromLabel);
     synthFromCombo_ = makeCombo(*skin_);
     synthFromLed_ = std::make_unique<TSS::Led>(SettingsShellMetrics::kPeakWidth,
-                                               SettingsShellMetrics::kPeakWidth);
+                                               SettingsShellMetrics::kPeakWidth,
+                                               TSS::ColourSet::k4);
     synthFromLed_->setSkin(*skin_);
     addAndMakeVisible(*synthFromLed_);
 
     synthToLabel_ = makeLabel(*skin_, PluginDisplayNames::Settings::kSynthToLabel);
     synthToCombo_ = makeCombo(*skin_);
     synthToLed_ = std::make_unique<TSS::Led>(SettingsShellMetrics::kPeakWidth,
-                                             SettingsShellMetrics::kPeakWidth);
+                                             SettingsShellMetrics::kPeakWidth,
+                                             TSS::ColourSet::k4);
     synthToLed_->setSkin(*skin_);
     addAndMakeVisible(*synthToLed_);
 }
@@ -79,16 +83,16 @@ void SettingsMidiPage::setSkin(TSS::ISkin& skin)
 {
     skin_ = &skin;
     keyboardFromLabel_->setLook(TSS::darkPanelLabelLookFromSkin(skin));
-    keyboardFromCombo_->setLook(TSS::comboBoxLookFromSkin(skin));
-    keyboardFromCombo_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
+    keyboardFromCombo_->setLook(TSS::comboBoxLookFromSkin(skin, TSS::ColourSet::k4));
+    keyboardFromCombo_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin, TSS::ColourSet::k4));
     keyboardFromLed_->setSkin(skin);
     synthFromLabel_->setLook(TSS::darkPanelLabelLookFromSkin(skin));
-    synthFromCombo_->setLook(TSS::comboBoxLookFromSkin(skin));
-    synthFromCombo_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
+    synthFromCombo_->setLook(TSS::comboBoxLookFromSkin(skin, TSS::ColourSet::k4));
+    synthFromCombo_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin, TSS::ColourSet::k4));
     synthFromLed_->setSkin(skin);
     synthToLabel_->setLook(TSS::darkPanelLabelLookFromSkin(skin));
-    synthToCombo_->setLook(TSS::comboBoxLookFromSkin(skin));
-    synthToCombo_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
+    synthToCombo_->setLook(TSS::comboBoxLookFromSkin(skin, TSS::ColourSet::k4));
+    synthToCombo_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin, TSS::ColourSet::k4));
     synthToLed_->setSkin(skin);
 }
 
@@ -257,9 +261,9 @@ std::unique_ptr<TSS::ComboBox> SettingsMidiPage::makeCombo(TSS::ISkin& skin)
 {
     auto combo = std::make_unique<TSS::ComboBox>(SettingsShellMetrics::kSynthFromComboWidth,
                                                  SettingsShellMetrics::kControlHeight,
-                                                 TSS::comboBoxLookFromSkin(skin),
+                                                 TSS::comboBoxLookFromSkin(skin, TSS::ColourSet::k4),
                                                  TSS::ComboBox::Style::ButtonLike);
-    combo->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
+    combo->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin, TSS::ColourSet::k4));
     combo->setUsesPortSentinelPopupChrome(true);
     combo->setUsesContentSizedPopupWidth(true);
     addAndMakeVisible(*combo);

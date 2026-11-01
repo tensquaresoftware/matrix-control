@@ -5,6 +5,7 @@
 
 #include "GUI/Factories/WidgetFactory.h"
 #include "GUI/Looks/LookBuilders.h"
+#include "GUI/Skins/SkinValues.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Widgets/Button.h"
 #include "GUI/Widgets/GroupLabel.h"
@@ -85,7 +86,7 @@ void InternalPatchesPanel::setupLoadNextPatchButton(TSS::ISkin& skin, WidgetFact
 void InternalPatchesPanel::setupCurrentBankNumberBox(TSS::ISkin& skin)
 {
     currentBankNumber = std::make_unique<TSS::NumberBox>(
-        TSS::numberBoxLookFromSkin(skin),
+        TSS::numberBoxLookFromSkin(skin, TSS::ColourSet::k4),
         TSS::NumberBox::Config {
             .width = dims_.numberBoxes.bankNumberWidth,
             .height = dims_.numberBoxes.height,
@@ -98,7 +99,7 @@ void InternalPatchesPanel::setupCurrentBankNumberBox(TSS::ISkin& skin)
 void InternalPatchesPanel::setupCurrentPatchNumberBox(TSS::ISkin& skin)
 {
     currentPatchNumber = std::make_unique<TSS::NumberBox>(
-        TSS::numberBoxLookFromSkin(skin),
+        TSS::numberBoxLookFromSkin(skin, TSS::ColourSet::k4),
         TSS::NumberBox::Config {
             .width = dims_.numberBoxes.patchNumberWidth,
             .height = dims_.numberBoxes.height,

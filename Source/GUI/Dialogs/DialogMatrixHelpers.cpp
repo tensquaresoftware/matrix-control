@@ -4,6 +4,7 @@
 
 #include "GUI/Layout/ScaledDrawing.h"
 #include "GUI/Looks/LookBuilders.h"
+#include "GUI/Skins/SkinValues.h"
 #include "GUI/Skins/Skin.h"
 
 using TSS::SkinObjectType;
@@ -36,14 +37,14 @@ namespace DialogMatrixHelpers
                                             int designHeight)
     {
         auto button = std::make_unique<TSS::Button>(
-            designWidth, designHeight, TSS::buttonLookFromSkin(skin), text);
+            designWidth, designHeight, TSS::buttonLookFromSkin(skin, TSS::ColourSet::k4), text);
         button->setMouseClickGrabsKeyboardFocus(false);
         return button;
     }
 
     void applyButtonSkin(TSS::Button& button, TSS::ISkin& skin)
     {
-        button.setLook(TSS::buttonLookFromSkin(skin));
+        button.setLook(TSS::buttonLookFromSkin(skin, TSS::ColourSet::k4));
     }
 
     void applyButtonUiScale(TSS::Button& button, float uiScale)
@@ -63,7 +64,7 @@ namespace DialogMatrixHelpers
 
     int estimateButtonWidth(TSS::ISkin& skin, const juce::String& text, float uiScale)
     {
-        const auto labelFont = TSS::buttonLookFromSkin(skin).font;
+        const auto labelFont = TSS::buttonLookFromSkin(skin, TSS::ColourSet::k4).font;
         const auto font = labelFont.withHeight(labelFont.getHeight() * uiScale);
         const int textWidth = juce::GlyphArrangement::getStringWidthInt(font, text);
         const int padded = textWidth + scaled(kButtonLabelPaddingDesign, uiScale) * 2;

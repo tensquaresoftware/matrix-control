@@ -458,6 +458,7 @@ private:
         expect(TSS::moduleHeaderLookFromSkin(*skin).lineOrange
                == skin->getColour(SkinObjectType::kModuleHeader, SkinColourProperty::kLineOrange));
     }
+
 };
 
 static SkinColourSubstrateTests skinColourSubstrateTests;

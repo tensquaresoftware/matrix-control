@@ -8,10 +8,24 @@
 
 namespace TSS
 {
-    Led::Led(int width, int height)
+    Led::Led(int width, int height, ColourSet colourSet)
+        : colourSet_(colourSet)
     {
         setOpaque(true);
         setSize(width, height);
+    }
+
+    void Led::setColourSet(ColourSet colourSet)
+    {
+        if (colourSet_ == colourSet)
+            return;
+
+        colourSet_ = colourSet;
+        if (skin_ != nullptr)
+        {
+            ledLook_ = ledLookFromSkin(*skin_, colourSet_);
+            repaint();
+        }
     }
 
     void Led::paint(juce::Graphics& g)
@@ -48,7 +62,7 @@ namespace TSS
     void Led::setSkin(ISkin& skin)
     {
         skin_ = &skin;
-        ledLook_ = ledLookFromSkin(skin);
+        ledLook_ = ledLookFromSkin(skin, colourSet_);
         repaint();
     }
 

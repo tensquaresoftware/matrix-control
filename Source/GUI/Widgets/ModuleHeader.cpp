@@ -120,6 +120,8 @@ namespace TSS
     ModuleHeader::ModuleHeader(const WithActionsSpec& spec)
         : presentation_(Presentation::TitleWithActions)
         , buttonSet_(spec.buttonSet)
+        , buttonColourSet_(spec.columnLayout == ColumnLayout::MasterEdit ? ColourSet::k2
+                                                                         : ColourSet::k1)
         , look_(moduleHeaderLookFromSkin(spec.skin))
         , dimensions_(spec.dimensions)
         , titleBandWidthDesign_(titleBandWidthForLayout(spec.columnLayout, spec.dimensions))
@@ -140,6 +142,7 @@ namespace TSS
             createCopyPasteButtons(spec);
             attachPasteEnabledListener(spec);
         }
+        applyButtonLooksFromSkin(spec.skin);
     }
 
     ModuleHeader::~ModuleHeader() = default;
@@ -248,7 +251,8 @@ namespace TSS
         initButton_ = spec.widgetFactory.createStandaloneButton(
             spec.initWidgetId,
             spec.skin,
-            dimensions_.buttonHeight);
+            dimensions_.buttonHeight,
+            buttonColourSet_);
         wireInitButtonOnClick();
         addAndMakeVisible(*initButton_);
     }
@@ -290,7 +294,8 @@ namespace TSS
         copyButton_ = spec.widgetFactory.createStandaloneButton(
             spec.copyWidgetId,
             spec.skin,
-            dimensions_.buttonHeight);
+            dimensions_.buttonHeight,
+            buttonColourSet_);
         copyButton_->onClick = [this, id = spec.copyWidgetId, moduleId = spec.moduleId]
         {
             using namespace PluginIDs::PatchEditSection;
@@ -312,7 +317,8 @@ namespace TSS
         pasteButton_ = spec.widgetFactory.createStandaloneButton(
             spec.pasteWidgetId,
             spec.skin,
-            dimensions_.buttonHeight);
+            dimensions_.buttonHeight,
+            buttonColourSet_);
         addAndMakeVisible(*pasteButton_);
 
         copyFeedbackBinding_ = std::make_unique<ClipboardFeedbackButtonBinding>(
@@ -364,7 +370,7 @@ namespace TSS
 
     void ModuleHeader::applyButtonLooksFromSkin(ISkin& skin)
     {
-        const auto bl = buttonLookFromSkin(skin);
+        const auto bl = buttonLookFromSkin(skin, buttonColourSet_);
         if (initButton_)
             initButton_->setLook(bl);
         if (copyButton_)

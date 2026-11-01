@@ -8,6 +8,7 @@
 
 #include "GUI/Layout/WidgetDimensions.h"
 #include "GUI/Looks/WidgetLooks.h"
+#include "GUI/Skins/SkinValues.h"
 
 class WidgetFactory;
 
@@ -123,6 +124,7 @@ namespace TSS
 
         Presentation presentation_ = Presentation::TitleOnly;
         ButtonSet buttonSet_ = ButtonSet::None;
+        ColourSet buttonColourSet_ = ColourSet::k1;
 
         ModuleHeaderLook look_{};
         ModuleHeaderDimensions dimensions_{};

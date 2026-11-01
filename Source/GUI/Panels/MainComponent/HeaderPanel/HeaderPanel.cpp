@@ -8,6 +8,7 @@
 #include "GUI/Skins/Skin.h"
 #include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Looks/LookBuilders.h"
+#include "GUI/Skins/SkinValues.h"
 #include "GUI/Helpers/InputGainSliderText.h"
 #include "Shared/Definitions/PluginAudioConstants.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
@@ -82,17 +83,17 @@ HeaderPanel::HeaderPanel(TSS::ISkin& skin, const HeaderPanelDimensions& dimensio
     : dimensions_(dimensions)
     , skin_(&skin)
     , logo_(skin, dimensions.logoWidth, dimensions.logoHeight)
-    , instrumentActivityLed_(dimensions.ledSize, dimensions.ledSize)
+    , instrumentActivityLed_(dimensions.ledSize, dimensions.ledSize, TSS::ColourSet::k3)
     , keyboardFromLabel_(dimensions.fromKeyboardLabelWidth,
                          dimensions.controlHeight,
                          TSS::darkPanelLabelLookFromSkin(skin),
                          TSS::LabelConfig{ .text = PluginDisplayNames::HeaderPanel::kFromKeyboardLabel })
-    , editorActivityLed_(dimensions.ledSize, dimensions.ledSize)
+    , editorActivityLed_(dimensions.ledSize, dimensions.ledSize, TSS::ColourSet::k3)
     , midiFromLabel_(dimensions.fromSynthLabelWidth,
                      dimensions.controlHeight,
                      TSS::darkPanelLabelLookFromSkin(skin),
                      TSS::LabelConfig{ .text = PluginDisplayNames::HeaderPanel::kFromSynthLabel })
-    , midiToActivityLed_(dimensions.ledSize, dimensions.ledSize)
+    , midiToActivityLed_(dimensions.ledSize, dimensions.ledSize, TSS::ColourSet::k3)
     , midiToLabel_(dimensions.toSynthLabelWidth,
                    dimensions.controlHeight,
                    TSS::darkPanelLabelLookFromSkin(skin),
@@ -103,20 +104,20 @@ HeaderPanel::HeaderPanel(TSS::ISkin& skin, const HeaderPanelDimensions& dimensio
                       TSS::LabelConfig{ .text = PluginDisplayNames::HeaderPanel::kInputGainLabel })
     , inputGainSlider_(dimensions.inputGainSliderWidth,
                        dimensions.controlHeight,
-                       TSS::sliderLookFromSkin(skin),
+                       TSS::sliderLookFromSkin(skin, TSS::ColourSet::k3),
                        TSS::makeInputGainSliderConfig())
-    , peakIndicator_(dimensions.peakIndicatorWidth, dimensions.controlHeight)
+    , peakIndicator_(dimensions.peakIndicatorWidth, dimensions.controlHeight, TSS::ColourSet::k3)
     , undoButton_(dimensions.undoButtonWidth,
                   dimensions.controlHeight,
-                  TSS::buttonLookFromSkin(skin),
+                  TSS::buttonLookFromSkin(skin, TSS::ColourSet::k3),
                   PluginDisplayNames::HeaderPanel::kUndo)
     , redoButton_(dimensions.redoButtonWidth,
                   dimensions.controlHeight,
-                  TSS::buttonLookFromSkin(skin),
+                  TSS::buttonLookFromSkin(skin, TSS::ColourSet::k3),
                   PluginDisplayNames::HeaderPanel::kRedo)
     , panicButton_(dimensions.panicButtonWidth,
                    dimensions.controlHeight,
-                   TSS::buttonLookFromSkin(skin),
+                   TSS::buttonLookFromSkin(skin, TSS::ColourSet::k3),
                    PluginDisplayNames::HeaderPanel::kPanic)
 {
     setOpaque(true);
