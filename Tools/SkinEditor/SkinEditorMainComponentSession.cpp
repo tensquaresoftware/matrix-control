@@ -367,6 +367,22 @@ void SkinEditorMainComponent::runWithoutLayerChangeNotify(const std::function<vo
     layer_.onChanged = std::move(previousOnChanged);
 }
 
+void SkinEditorMainComponent::adoptActiveEditorSkinAfterCreate()
+{
+    // Cancel any pending colour preview push so New / Editor Duplicate cannot
+    // still pushVisible() after the session id has moved to the new skin.
+    colourPreviewCoalesceTimer_.stopTimer();
+    colourGestureActive_ = false;
+
+    sessionState_.editorSkinId = layer_.activeSkinId();
+    sessionState_.compareOn = false;
+    clearMappingModeToIdle();
+    markEditorDirty();
+    scheduleSessionAutosave();
+    refreshAll();
+    // Caller may pushVisible() — Product Duplicate only.
+}
+
 bool SkinEditorMainComponent::discardEditorWorkKeepingSessionPrefs()
 {
     stopTimer();

@@ -3046,3 +3046,15 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-unify-combobox-slider-buttonlike.md`
   summary: Refresh older Hardware Latency deferred-work bullets that still mention sliderLookButtonLikeFromSkin (API removed by this unify).
   evidence: Blind Hunter; tracking hygiene only.
+
+## Deferred from: oneshot review of spec-skin-editor-product-duplicate-select.md (2026-11-01)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-product-duplicate-select.md`
+  summary: No unit test pins Product Duplicate push-after-session-id vs New/Editor Duplicate no-push ordering.
+  evidence: Blind Hunter; SkinEditorMainComponent has no headless harness; regression would need a new fixture.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-product-duplicate-select.md`
+  summary: runWithoutLayerChangeNotify still restores onChanged without RAII if action throws.
+  evidence: Blind Hunter; pre-existing helper; not introduced by this change.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-product-duplicate-select.md`
+  summary: onDelete (and similar mutators) can still fire onChanged while session editorSkinId is stale relative to the layer.
+  evidence: Blind Hunter; pre-existing ordering; out of Product Duplicate / New push-policy scope.

@@ -74,8 +74,10 @@ private:
     void onDuplicateProduct();
     void onDuplicateEditor();
     void onNew();
-    /** Shared Duplicate flow; sourceId is Product or current Editor. */
-    void duplicateFromSkin(const juce::String& sourceId);
+    /** Shared Duplicate flow; sourceId is Product or current Editor. True on success. */
+    bool duplicateFromSkin(const juce::String& sourceId);
+    /** Point session at layer active Dev skin after create/duplicate; no push (Product Duplicate pushes after). */
+    void adoptActiveEditorSkinAfterCreate();
     void onDelete();
     void onRename();
     void onCompareToggle();

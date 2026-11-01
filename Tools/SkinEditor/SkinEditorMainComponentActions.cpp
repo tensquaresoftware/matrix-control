@@ -6,17 +6,21 @@
 
 void SkinEditorMainComponent::onDuplicateProduct()
 {
-    duplicateFromSkin(sessionState_.productSkinId);
+    if (! duplicateFromSkin(sessionState_.productSkinId))
+        return;
+    // Compare was cleared in adopt; push only when Standalone Dev is connected.
+    if (bridge_.isConnected())
+        pushVisible();
 }
 
 void SkinEditorMainComponent::onDuplicateEditor()
 {
     if (sessionState_.editorSkinId.isEmpty())
         return;
-    duplicateFromSkin(sessionState_.editorSkinId);
+    (void) duplicateFromSkin(sessionState_.editorSkinId);
 }
 
-void SkinEditorMainComponent::duplicateFromSkin(const juce::String& sourceId)
+bool SkinEditorMainComponent::duplicateFromSkin(const juce::String& sourceId)
 {
     const auto* source = layer_.findSkin(sourceId);
     const auto sourceName = source != nullptr ? source->name : juce::String("My Skin");
@@ -25,19 +29,22 @@ void SkinEditorMainComponent::duplicateFromSkin(const juce::String& sourceId)
                                             "Duplicate \"" + sourceName + "\" as:",
                                             suggested);
     if (name.isEmpty())
-        return;
-    const auto result = layer_.duplicateSkin(sourceId, name);
+        return false;
+
+    juce::Result result = juce::Result::fail("Duplicate failed");
+    runWithoutLayerChangeNotify([this, &sourceId, &name, &result]
+    {
+        result = layer_.duplicateSkin(sourceId, name);
+    });
     if (result.failed())
     {
         juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon,
                                                "Duplicate failed", result.getErrorMessage());
-        return;
+        return false;
     }
-    sessionState_.editorSkinId = layer_.activeSkinId();
-    sessionState_.compareOn = false;
-    clearMappingModeToIdle();
-    // onChanged already refreshed with the previous Editor id — select the new skin now.
-    refreshAll();
+
+    adoptActiveEditorSkinAfterCreate();
+    return true;
 }
 
 void SkinEditorMainComponent::onNew()
@@ -47,18 +54,21 @@ void SkinEditorMainComponent::onNew()
                                             SkinEditorUi::suggestUniqueSkinName(layer_, "New Skin"));
     if (name.isEmpty())
         return;
-    const auto result = layer_.createEditorSkinWithUnboundMappings(
-        sessionState_.productSkinId, name, sessionState_.editorSkinId);
+
+    juce::Result result = juce::Result::fail("New failed");
+    runWithoutLayerChangeNotify([this, &name, &result]
+    {
+        result = layer_.createEditorSkinWithUnboundMappings(
+            sessionState_.productSkinId, name, sessionState_.editorSkinId);
+    });
     if (result.failed())
     {
         juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon,
                                                "New failed", result.getErrorMessage());
         return;
     }
-    sessionState_.editorSkinId = layer_.activeSkinId();
-    sessionState_.compareOn = false;
-    clearMappingModeToIdle();
-    refreshAll();
+
+    adoptActiveEditorSkinAfterCreate();
 }
 
 void SkinEditorMainComponent::onDelete()
