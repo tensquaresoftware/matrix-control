@@ -20,8 +20,14 @@ public:
         beginTest("export_writesSchemaVersion2");
         assertExportWritesSchemaTwo();
 
+        beginTest("schemaV2_roundTrip_keepsDistinctPastillesPerColourSet");
+        assertSchemaV2RoundTripDistinctSets();
+
         beginTest("unknownColourSet_rejectsImport_withoutChangingLayer");
         assertUnknownColourSetRejectedAtomically();
+
+        beginTest("unsupportedSchemaVersion_rejectsImport_withoutChangingLayer");
+        assertUnsupportedSchemaVersionRejectedAtomically();
 
         beginTest("setMapping_rejectsHigherSetForK1OnlyObject");
         assertLayerRejectsInvalidHigherSet();
@@ -74,6 +80,32 @@ private:
                      TSS::DevSkin::kSchemaVersion);
     }
 
+    void assertSchemaV2RoundTripDistinctSets()
+    {
+        TSS::DevSkin::Layer layer;
+        layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Distinct Sets");
+        auto key = TSS::skinColourKey(TSS::SkinObjectType::kButton,
+                                      TSS::SkinColourProperty::kBackground,
+                                      TSS::SkinColourState::kOff);
+        expect(layer.setMapping(layer.activeSkinId(), key, "kEmerald400").wasOk());
+        key.colourSet = TSS::ColourSet::k2;
+        expect(layer.setMapping(layer.activeSkinId(), key, "kBlue").wasOk());
+
+        const auto json = TSS::DevSkin::exportToJson(layer);
+        const auto activeId = layer.activeSkinId();
+        TSS::DevSkin::Layer restored;
+        expect(TSS::DevSkin::importFromJson(restored, json).ok);
+        const auto* skin = restored.findSkin(activeId);
+        expect(skin != nullptr);
+        if (skin == nullptr)
+            return;
+
+        key.colourSet = TSS::ColourSet::k1;
+        expectEquals(skin->mappings.at(key), juce::String("kEmerald400"));
+        key.colourSet = TSS::ColourSet::k2;
+        expectEquals(skin->mappings.at(key), juce::String("kBlue"));
+    }
+
     void assertUnknownColourSetRejectedAtomically()
     {
         TSS::DevSkin::Layer layer;
@@ -86,6 +118,17 @@ private:
         const auto invalid = juce::JSON::toString(parsed);
 
         expect(! TSS::DevSkin::importFromJson(layer, invalid).ok);
+        expectEquals(TSS::DevSkin::exportToJson(layer), before);
+    }
+
+    void assertUnsupportedSchemaVersionRejectedAtomically()
+    {
+        TSS::DevSkin::Layer layer;
+        layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Schema Gate");
+        const auto before = TSS::DevSkin::exportToJson(layer);
+        auto parsed = juce::JSON::parse(before);
+        parsed.getDynamicObject()->setProperty("schemaVersion", 3);
+        expect(! TSS::DevSkin::importFromJson(layer, juce::JSON::toString(parsed)).ok);
         expectEquals(TSS::DevSkin::exportToJson(layer), before);
     }
 
@@ -104,7 +147,8 @@ private:
     {
         TSS::DevSkin::Layer layer;
         layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Invalid JSON");
-        auto parsed = juce::JSON::parse(TSS::DevSkin::exportToJson(layer));
+        const auto before = TSS::DevSkin::exportToJson(layer);
+        auto parsed = juce::JSON::parse(before);
         auto* skins = parsed.getProperty("skins", {}).getArray();
         auto* mappings = (*skins)[0].getProperty("mappings", {}).getArray();
         for (auto& mapping : *mappings)
@@ -115,6 +159,7 @@ private:
             break;
         }
         expect(! TSS::DevSkin::importFromJson(layer, juce::JSON::toString(parsed)).ok);
+        expectEquals(TSS::DevSkin::exportToJson(layer), before);
     }
 };
 

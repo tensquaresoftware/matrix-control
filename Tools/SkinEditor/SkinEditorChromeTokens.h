@@ -61,6 +61,8 @@ namespace SkinEditorChrome
     inline constexpr int kComboArrowReserve = 18;
     /** Mappings Object combo — fits TrackGeneratorDisplay with a little air before the arrow. */
     inline constexpr int kObjectComboWidth = 150;
+    /** Mappings action row: gap between Object combo and Hold colour toggle. */
+    inline constexpr int kMappingsObjectToHoldGap = 16;
     /**
      * In-panel content inset on all four sides of the body (below the title tab,
      * and left / right / bottom inside the silhouette). Do not use kGutter here.
@@ -89,7 +91,7 @@ namespace SkinEditorChrome
     inline constexpr int kMappingsPropertyColumnWidth = 150;
     inline constexpr int kMappingsStateColumnWidth = 115;
     inline constexpr int kMappingsColourSetColumnWidth = 45;
-    /** Left inset before Property; columnsForWidth subtracts this before the Property|State split. */
+    /** Left inset before Property; columnsForWidth subtracts this before Property|State|Set|Mapped. */
     inline constexpr int kMappingsColumnPad = 6;
     /**
      * Table paint width = pad + Property + State + ColourSet + Mapped colour.

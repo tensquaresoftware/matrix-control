@@ -95,6 +95,23 @@ context:
 - Given empty ColourSet filter, when filtering Property/State/Mapped, then AND semantics unchanged.
 - Given `lint_touched.py` on touched C++ under Source/Tests/Tools/SkinEditor, when run, then it passes.
 
+### Review Findings
+
+- [x] [Review][Patch] `applyPushToSkin` clears higher ColourSets then applies mappings non-atomically — mid-pass `unknown_pastille` leaves the live skin with k2–k4 wiped and a partial overlay [`Source/GUI/Skins/Dev/DevSkinApplier.cpp:40`]
+- [x] [Review][Patch] ColourSet I/O test net incomplete — weak Label-only fallback case; no schema-v2 round-trip with distinct k1 vs k2 pastilles; invalid higher-set JSON reject without layer-unchanged assert; unsupported `schemaVersion` reject untested [`Tests/Unit/ColourSetModelTests.cpp` / `SkinColourSubstrateTests.cpp`]
+- [x] [Review][Patch] Peak vs Led seed parity only asserts Black On/background + `maxOn` look — Off/Border (and Cream) can regress green [`Tests/Unit/SkinColourSubstrateTests.cpp:312`]
+- [x] [Review][Patch] Peak multi-set inventory membership is circular — test loops `kMultiSetSkinObjects` so removing Peak from the allow-list still passes [`Tests/Unit/SkinEditorMappingsColumnFilterTests.cpp:320`]
+- [x] [Review][Patch] Mappings polish residue — stale Property|State width comments; Object→Hold `16` is a local magic with no chrome token / layout assertion [`Tools/SkinEditor/SkinEditorMappingsPanel.cpp:32` / `:426`, `SkinEditorChromeTokens.h:92`]
+- [x] [Review][Defer] GPC 3 trap — Peak no longer inherits Dev remaps of Led; Header/Settings Peak vs MIDI Led must be wired as separate ColourSet call sites — deferred: intentional Led/Peak split; product zone→set wiring is next wave
+- [x] [Review][Defer] GPC 3 trap — seeded k1…k4 still share identical Black/Cream hues; Unbound/export only bites once authors diverge sets — deferred: intentional mono seed until Duo wiring / distinct hues
+
+Rejected:
+- Blind Hunter: schema v2 omit `colourSet` should reject — false: frozen AC defaults omit → `k1`
+- Blind Hunter + Edge Case: incomplete schema-v2 must re-expand k2–k4 from k1 — false: Unbound/export gate is correct for unfinished multi-set skins
+- Edge Case: import should copy Led remaps onto missing Peak — false: intentional split; compiled Black/Cream Look still matches seed
+- Blind Hunter / Acceptance: empty Implementation Notes, Tasks cite `Tests/CMakeLists.txt`, I/O filter “Set / Unbound” wording — rejected: fix would edit the frozen spec under review
+- Acceptance soft note: legacy expand beyond I/O matrix wording — rejected: intentional prior triage patch; editing frozen I/O row is out of scope
+
 ## Implementation Notes
 
 ## Spec Change Log

@@ -29,7 +29,8 @@ namespace
     {
         const int mappedSpan = juce::jmin(kMappedSwatchToTableRight, juce::jmax(0, totalWidth));
         const int mappedX = totalWidth - mappedSpan;
-        // Fixed Property/State; when paint width matches SSOT, mappedX == pad + 150 + 150.
+        // Fixed Property|State|Set; when paint width matches SSOT,
+        // mappedX == pad + Property + State + ColourSet.
         return { SkinEditorChrome::kMappingsPropertyColumnWidth,
                  SkinEditorChrome::kMappingsStateColumnWidth,
                  SkinEditorChrome::kMappingsColourSetColumnWidth,
@@ -423,7 +424,6 @@ void SkinEditorMappingsPanel::layoutActionRow(juce::Rectangle<int> actions, int 
                             actions.getY(), badgeW, actions.getHeight() };
 
     // Object combo fixed width, then gap, then Hold — Unbound stays on Mapped colour.
-    constexpr int kObjectToHoldGap = 16;
     const int comboMax = juce::jmax(0, unboundLeft - SkinEditorChrome::kButtonGap - actionRow.getX());
     const int comboW = juce::jmin(SkinEditorChrome::kObjectComboWidth, comboMax);
     objectCombo_.setBounds(actionRow.getX(), actions.getY(), comboW, actions.getHeight());
@@ -431,7 +431,7 @@ void SkinEditorMappingsPanel::layoutActionRow(juce::Rectangle<int> actions, int 
     const int holdW = SkinEditorChrome::measureTextWidth(SkinEditorChrome::fontRegular(),
                                                         holdColourToggle_.getButtonText())
                       + 16 + 6; // tick box + gap to label
-    const int holdLeft = objectCombo_.getRight() + kObjectToHoldGap;
+    const int holdLeft = objectCombo_.getRight() + SkinEditorChrome::kMappingsObjectToHoldGap;
     const int holdMaxRight = unboundLeft - SkinEditorChrome::kButtonGap;
     holdColourToggle_.setBounds(holdLeft, actions.getY(),
                                 juce::jmin(holdW, juce::jmax(0, holdMaxRight - holdLeft)),

@@ -99,6 +99,7 @@ private:
         expect(SkinEditorChrome::kMappingsStateColumnWidth % 5 == 0);
         expect(SkinEditorChrome::kMappingsColourSetColumnWidth % 5 == 0);
         expectEquals(SkinEditorChrome::kObjectComboWidth, 150);
+        expectEquals(SkinEditorChrome::kMappingsObjectToHoldGap, 16);
         expect(SkinEditorChrome::kMappingsPanelWidth
                < SkinEditorChrome::kLegacyWindowMaxWidth / 2);
     }

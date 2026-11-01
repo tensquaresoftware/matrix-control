@@ -37,17 +37,23 @@ namespace TSS::DevSkin
             return result;
         }
 
+        // Validate every pastille before mutating the live skin (atomic apply).
+        for (const auto& entry : payload.mappings)
+        {
+            if (! argbForPastilleName(payload.palette, entry.second).has_value())
+            {
+                result.ok = false;
+                result.code = "unknown_pastille";
+                result.message = "Mapping references unknown pastille: " + entry.second;
+                return result;
+            }
+        }
+
         targetSkin.clearHigherColourSets();
         for (const auto& [key, paletteName] : payload.mappings)
         {
             const auto argb = argbForPastilleName(payload.palette, paletteName);
-            if (! argb.has_value())
-            {
-                result.ok = false;
-                result.code = "unknown_pastille";
-                result.message = "Mapping references unknown pastille: " + paletteName;
-                return result;
-            }
+            jassert(argb.has_value());
             targetSkin.setColour(key, juce::Colour(*argb));
         }
 

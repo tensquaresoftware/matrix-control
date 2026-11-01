@@ -322,6 +322,15 @@ private:
         beginTest("All twelve multi-set objects have k1-k4; remaining objects stay k1");
 
         const auto inventory = TSS::DevSkin::allStructuredKeys();
+
+        // Spec-frozen Peak membership — must not depend solely on kMultiSetSkinObjects.
+        bool peakSeenSets[TSS::kAllColourSets.size()] {};
+        for (const auto& inventoryKey : inventory)
+            if (inventoryKey.object == TSS::SkinObjectType::kPeakIndicator)
+                peakSeenSets[static_cast<size_t>(inventoryKey.colourSet)] = true;
+        for (const bool seen : peakSeenSets)
+            expect(seen);
+
         for (const auto object : TSS::kMultiSetSkinObjects)
         {
             bool seenSets[TSS::kAllColourSets.size()] {};

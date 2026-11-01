@@ -47,6 +47,9 @@ public:
         beginTest("applyError_keepsEditorLayerUnchanged");
         assertApplyErrorKeepsLayer();
 
+        beginTest("applyPushToSkin_unknownPastille_leavesHigherSetsIntact");
+        assertApplyPushUnknownPastilleLeavesHigherSets();
+
         beginTest("bridgeWire_roundTripEncodeDecodeApply");
         assertBridgeWireRoundTrip();
 
@@ -261,6 +264,25 @@ private:
         expect(! paint.hasDevOverlay());
 
         expectEquals(TSS::DevSkin::exportToJson(layer), jsonBefore);
+    }
+
+    void assertApplyPushUnknownPastilleLeavesHigherSets()
+    {
+        auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::Cream);
+        auto higherKey = buttonOffKey();
+        higherKey.colourSet = TSS::ColourSet::k2;
+        const auto marker = juce::Colour(ColourChart::kRed500);
+        skin->setColour(higherKey, marker);
+
+        TSS::DevSkin::Layer layer;
+        expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Atomic").wasOk());
+        auto payload = layer.makePushPayload();
+        payload.mappings[buttonOffKey()] = "totally_unknown_pastille";
+
+        const auto result = TSS::DevSkin::applyPushToSkin(payload, *skin);
+        expect(! result.ok);
+        expectEquals(result.code, juce::String("unknown_pastille"));
+        expect(skin->getColour(higherKey) == marker);
     }
 
     void assertBridgeWireRoundTrip()

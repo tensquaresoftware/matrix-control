@@ -1,5 +1,14 @@
 # Deferred Work
 
+## Deferred from: code review of spec-skin-colourset-model-and-editor.md (2026-11-01)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-colourset-model-and-editor.md`
+  summary: GPC 3 must wire PeakIndicator and Led ColourSets independently; Dev skins that remapped Led no longer tint Peak after the object split.
+  evidence: Edge Case Hunter; intentional Led/Peak separation; product zone→set wiring is the next wave.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-colourset-model-and-editor.md`
+  summary: Seeded k1…k4 still share identical Black/Cream hues; Unbound/export only becomes painful once authors diverge sets for Duo.
+  evidence: Fresh ColourSet review; intentional mono seed until Duo wiring / distinct hues.
+
 ## Deferred from: code review of spec-linux-jack-device-apply.md (2026-10-30)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-linux-jack-device-apply.md`

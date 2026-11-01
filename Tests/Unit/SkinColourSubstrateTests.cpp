@@ -283,59 +283,59 @@ private:
     void assertMissingSetFallback()
     {
         const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::Cream);
-        const auto defaultColour = skin->getColour(SkinObjectType::kLabel,
-                                                   SkinColourProperty::kText);
-        const auto fallbackColour = skin->getColour(SkinObjectType::kLabel,
-                                                    SkinColourProperty::kText,
-                                                    SkinColourState::kDefault,
-                                                    TSS::ColourSet::k3);
-        expect(fallbackColour == defaultColour);
+        auto key = TSS::skinColourKey(SkinObjectType::kButton,
+                                      SkinColourProperty::kBackground,
+                                      SkinColourState::kOff);
+        const auto defaultColour = skin->getColour(key);
+        skin->clearHigherColourSets();
+        key.colourSet = TSS::ColourSet::k3;
+        expect(skin->getColour(key) == defaultColour);
     }
 
     void assertExplicitHigherSetWins()
     {
         const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::Black);
-        const auto primaryKey = TSS::skinColourKey(SkinObjectType::kButton,
-                                                   SkinColourProperty::kBackground,
-                                                   SkinColourState::kOff);
-        auto setTwoKey = primaryKey;
-        setTwoKey.colourSet = TSS::ColourSet::k2;
+        auto key = TSS::skinColourKey(SkinObjectType::kButton,
+                                      SkinColourProperty::kBackground,
+                                      SkinColourState::kOff);
         const auto primaryColour = juce::Colour(ColourChart::kRed500);
         const auto setTwoColour = juce::Colour(ColourChart::kBlue);
-        skin->setColour(primaryKey, primaryColour);
-        skin->setColour(setTwoKey, setTwoColour);
-
-        expect(skin->getColour(setTwoKey) == setTwoColour);
-        expect(skin->getColour(setTwoKey) != primaryColour);
+        skin->setColour(key, primaryColour);
+        key.colourSet = TSS::ColourSet::k2;
+        skin->setColour(key, setTwoColour);
+        expect(skin->getColour(key) == setTwoColour && skin->getColour(key) != primaryColour);
     }
 
     void assertLedAndPeakKeys()
     {
-        const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::Black);
-        const auto ledKey = TSS::skinColourKey(SkinObjectType::kLed,
-                                               SkinColourProperty::kBackground,
-                                               SkinColourState::kOn);
-        const auto peakKey = TSS::skinColourKey(SkinObjectType::kPeakIndicator,
-                                                SkinColourProperty::kBackground,
-                                                SkinColourState::kOn);
-        expect(! (ledKey == peakKey));
-        expect(skin->getColour(ledKey) == skin->getColour(peakKey));
-        expect(TSS::peakIndicatorLookFromSkin(*skin).maxOn == skin->getColour(peakKey));
+        for (const auto variant : { TSS::Skin::ColourVariant::Black,
+                                    TSS::Skin::ColourVariant::Cream })
+        {
+            const auto skin = TSS::Skin::create(variant);
+            const auto led = TSS::ledLookFromSkin(*skin);
+            const auto peak = TSS::peakIndicatorLookFromSkin(*skin);
+            expect(led.backgroundOff == peak.backgroundOff
+                   && led.borderOff == peak.borderOff
+                   && led.maxOn == peak.maxOn);
+            expect(! (TSS::skinColourKey(SkinObjectType::kLed,
+                                         SkinColourProperty::kBackground,
+                                         SkinColourState::kOn)
+                      == TSS::skinColourKey(SkinObjectType::kPeakIndicator,
+                                            SkinColourProperty::kBackground,
+                                            SkinColourState::kOn)));
+        }
     }
 
     static void setDistinctLedAndPeakColours(TSS::Skin& skin)
     {
-        skin.setColour(TSS::skinColourKey(SkinObjectType::kLed,
-                                          SkinColourProperty::kBackground,
-                                          SkinColourState::kOn),
+        using O = SkinObjectType;
+        using P = SkinColourProperty;
+        using S = SkinColourState;
+        skin.setColour(TSS::skinColourKey(O::kLed, P::kBackground, S::kOn),
                        juce::Colour(ColourChart::kRed500));
-        skin.setColour(TSS::skinColourKey(SkinObjectType::kPeakIndicator,
-                                          SkinColourProperty::kBackground,
-                                          SkinColourState::kOn),
+        skin.setColour(TSS::skinColourKey(O::kPeakIndicator, P::kBackground, S::kOn),
                        juce::Colour(ColourChart::kBlue));
-        skin.setColour(TSS::skinColourKey(SkinObjectType::kPeakIndicator,
-                                          SkinColourProperty::kBackground,
-                                          SkinColourState::kOff),
+        skin.setColour(TSS::skinColourKey(O::kPeakIndicator, P::kBackground, S::kOff),
                        juce::Colour(ColourChart::kGrey700));
     }
 
