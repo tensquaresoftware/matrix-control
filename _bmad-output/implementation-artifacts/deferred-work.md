@@ -3085,3 +3085,12 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-progressbar-numberbox-caret.md`
   summary: No automated pin that BankTransferProgressDialog paint requests ProgressBar at ColourSet k4 (seed/getColour tests stay green if dialog reverts to Slider).
   evidence: Verification Gap; CONVENTIONS §8.5 forbids paint()/GUI unit tests; manual Bank Transfer smoke remains the adoption gate.
+
+## Deferred from: code review of spec-skin-editor-progressbar-numberbox-caret.md (2026-11-03)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-progressbar-numberbox-caret.md`
+  summary: No automated pin that BankTransferProgressDialog paint requests ProgressBar at ColourSet k4 (seed/getColour tests stay green if dialog reverts to Slider).
+  evidence: Blind Hunter + Verification Gap (dedicated code review); CONVENTIONS §8.5; manual Bank Transfer smoke remains the gate.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-progressbar-numberbox-caret.md`
+  summary: Slider blink caret still resolves from NumberBox EditorText after NumberBox gained its own Caret pastille.
+  evidence: Blind Hunter (dedicated code review); frozen Build A Decision; already deferred from build review.

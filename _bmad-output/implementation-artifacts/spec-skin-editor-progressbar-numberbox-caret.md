@@ -83,6 +83,23 @@ context:
 - Given NumberBox edit mode, when the caret blinks, then its colour is NumberBox Caret; remapping Caret alone does not change EditorText digits.
 - Given `lint_touched.py` on touched C++ under Source/Tests/Tools/SkinEditor, when run, then it passes.
 
+### Review Findings
+
+- [x] [Review][Defer] Bank Transfer progress paint not pinned by unit tests to ProgressBar at ColourSet k4 [`BankTransferProgressDialog.cpp:197`] — deferred: CONVENTIONS §8.5 forbids paint()/GUI unit tests; seed/getColour suites stay green if dialog reverts to Slider; manual Bank Transfer smoke remains the adoption gate (already in deferred-work from build review).
+- [x] [Review][Defer] Slider blink caret still resolves from NumberBox EditorText [`LookBuildersMultiSet.cpp:92`] — deferred: frozen Build A Decision; NumberBox Caret remap alone does not retarget Slider caret (already in deferred-work).
+
+Rejected:
+- Blind: Spec Verification `ctest -R` filter misses ProgressBarColourSetK4 — `false` (fix would edit this build's spec; note already says adjust to available test names; AC gate is lint + relevant unit tests).
+- Blind: Spec Design Notes still mention NumberBox `editorText` caret — `false` (fix would edit this build's spec).
+- Blind: ProgressBarK4 absolute ColourChart cream pins missing — `false` (creamVariant equality vs SliderK4 already asserted for Track/ValueBar/Text).
+- Blind: NumberBox caret creamVariant vs EditorText not compared — `low` rejected (both seeds assert White independently; everyday drift unlikely).
+- Blind: ProgressBar re-hardcodes ColourChart instead of aliasing Slider constexpr — `false` (project pattern is parallel seeds; `baseSeed_copiesSliderEmeraldStops` + K4 overlay asserts prevent silent drift).
+- Blind: ValueBar Disabled seeded but unused by disabled paint — `false` (Decision seeds Disabled for Track/ValueBar/Text; disabled paint skips fill by design).
+- Blind: SkinColourWiring harness omits ProgressBar / NumberBox Caret — `low` rejected (dialog-only ProgressBar; expanding wiring harness is out of Build A and more than a direct fix).
+- Blind: Enabled phase-lane label stays ChromeText — `false` (Decision only retargets disabled lane mute to ProgressBar Text Disabled).
+- Blind: Spec Review Triage Log still shows unfinished patch routes — `false` (fix would edit this build's spec; patches already landed in the same commit).
+- Blind: `assertDisabledPhaseLaneContract` compares ValueBar Disabled to blackVariant under Cream — `low` rejected (creamVariant locked Grey700 equal to black; test hygiene only).
+
 ## Implementation Notes
 
 ## Spec Change Log
