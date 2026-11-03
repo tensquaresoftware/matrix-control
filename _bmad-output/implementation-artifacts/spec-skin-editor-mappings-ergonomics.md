@@ -90,7 +90,8 @@ context:
 
 ## Implementation Notes
 
-- Review loop 1 patches: removed dead `scrollFocusedObjectIntoPlace`; fixed stale width comments; ASCII allow-list at edit time (shared with Layer/JSON); clamp `focusedObject_` after rebuild; show label-edit errors; help-label ellipsis; `objectFilterNameFromComboSelection` helper + tests; DevSkin label tests for ASCII strip, import cap, compiled reject.
+- Review loop 1 patches: removed dead `scrollFocusedObjectIntoPlace`; fixed stale width comments; ASCII allow-list at edit time (shared with Layer/JSON); clamp `focusedObject_` after rebuild; show label-edit errors; help-label ellipsis (later removed in Build B+polish review); `objectFilterNameFromComboSelection` helper + tests; DevSkin label tests for ASCII strip, import cap, compiled reject.
+- Review Build B + polish (2026-11-03): removed Colour set help ellipsis; replaced dead `kMappingsObjectToHoldGap` with `mappingsHoldLeft`; shared `sanitizeColourSetLabel` (strip then cap); import ASCII + order tests; `isColourSetColumn` hit helper + test. Kept State width 75. Deferred: panel mouse harness; focusedObject_ identity rebind.
 - Deferred: panel-level mouse harness for left-sort / right-filter wiring (helper-only unit tests remain).
 
 ## Spec Change Log
@@ -112,6 +113,31 @@ context:
 - `medium` — Object combo id 1→empty filter untested — confirmed; helper + SortErgo test (patch).
 - `medium` — ASCII strip / import >16 / compiled reject untested — confirmed; DevSkinColourSetLabelsTests extended (patch).
 - `medium` (deferred) — headerGesture unit test does not wire panel mouseUp — true gap; no Mappings panel harness in Tests/; manual smoke remains.
+
+### Review Findings
+
+- [x] [Review][Decision] Ellipsis on Colour set help labels → **resolved: remove ellipsis** (option 2) — becomes patch below.
+- [x] [Review][Decision] State column 75 px (−40) → **resolved: keep 75** (option 1) — no code change.
+- [x] [Review][Decision] Commit polish before merge/PR → **resolved: after patches** (option 3) — one polish+fix commit once patches land; not a code patch.
+- [x] [Review][Patch] Remove Colour set help-label ellipsis (`drawText` useEllipses=false) [`Tools/SkinEditor/SkinEditorMappingsPanelRows.cpp`] — applied 2026-11-03.
+- [x] [Review][Patch] Retire unused `kMappingsObjectToHoldGap` / pin real Hold layout via `mappingsHoldLeft` [`Tools/SkinEditor/SkinEditorChromeTokens.h`] [`SkinEditorMappingsPanelActionRow.cpp`] [`SkinEditorChromeLayoutTests.cpp`] — applied 2026-11-03.
+- [x] [Review][Patch] Strip non-ASCII before 16-char cap via shared `sanitizeColourSetLabel` [`DevSkinTypes.h`] [`DevSkinJsonMapping.cpp`] [`DevSkinLayer.cpp`] — applied 2026-11-03.
+- [x] [Review][Patch] Unit-test import path ASCII strip + strip-before-cap order [`Tests/Unit/DevSkinColourSetLabelsTests.cpp`] — applied 2026-11-03.
+- [x] [Review][Patch] Extract + unit-test `isColourSetColumn` [`SkinEditorMappingModePolicy.h`] [`SkinEditorMappingModePolicyTests.cpp`] — applied 2026-11-03.
+- [x] [Review][Defer] Panel mouse harness for left-sort / right-filter [`Tools/SkinEditor/SkinEditorMappingsPanelFilters.cpp`] — deferred: already recorded 2026-11-03; helper-only `headerGestureForClick` tests; manual header smoke remains.
+- [x] [Review][Defer] `focusedObject_` index can point at a different object after column filters reshape `objects_` [`Tools/SkinEditor/SkinEditorMappingsPanelRows.cpp:124`] — deferred: pre-existing identity drift; Build B only clamps out-of-range to -1; rebind-by-name would be a separate fix.
+
+#### Rejected
+
+- `false` — Global clear must also reset Object macro-filter — `clearAllColumnFilters` / gutter clear are column-only by prior design; Object has its own yellow clear.
+- `false` — Colour set sort should follow help labels — technical `kN` keys are the sort identity; help labels are shared annotations (prior triage).
+- `false` — Import of all-non-ASCII label must error — silent sanitize to empty matches Layer set-path; omission of empty keys is intended.
+- `false` — Spec/Design Notes Hold-gap wording must be edited in this review — rejected: fix-the-spec findings are out of band; layout contract is handled via the Hold patch above.
+- `low` (rejected) — Duplicated trim/cap/ASCII loops in Layer vs `colourSetLabelsFromVar` — shared allow-list already; factoring adds surface for little everyday harm.
+- `low` (rejected) — No unit assert that all-empty labels omit the whole `colourSetLabels` object — `colourSetLabelsToVar` already returns void when `!any`; per-key omit + push omit covered.
+- `low` (rejected) — `ColumnLayout` duplicated across Mappings cpp files — pre-existing WET; not worth a shared refactor in this review pass.
+- `low` (rejected) — Object combo can select a type with zero visible rows / no empty-state — edge UX only; not an AC.
+- `low` (rejected) — Colour set label edit discoverability (double-click only) — matches AC; affordance polish is optional later.
 
 ## Design Notes
 

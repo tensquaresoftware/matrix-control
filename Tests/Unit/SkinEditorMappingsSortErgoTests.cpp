@@ -24,6 +24,8 @@ public:
         headerGestureLeftSortRightFilter();
         objectMacroFilterAllVersusSingle();
         objectFilterNameFromComboSelectionHelper();
+        colourSetFilterMenuLabelWithHelp();
+        defaultMappingsSortIsPropertyAscending();
     }
 
 private:
@@ -166,6 +168,28 @@ private:
         expectEquals(objectFilterNameFromComboSelection(2, "Slider"), juce::String("Slider"));
         expectEquals(objectFilterNameFromComboSelection(5, "ProgressBar"),
                      juce::String("ProgressBar"));
+    }
+
+    void colourSetFilterMenuLabelWithHelp()
+    {
+        beginTest("Colour set filter menu shows kN: help when label set");
+
+        using namespace SkinEditorMappingsColumnFilter;
+        auto skin = makeSkin();
+        expectEquals(colourSetFilterMenuLabel(skin, "k1"), juce::String("k1"));
+        skin.colourSetLabels[static_cast<size_t>(TSS::ColourSet::k1)] = "Patch";
+        expectEquals(colourSetFilterMenuLabel(skin, "k1"), juce::String("k1: Patch"));
+        expectEquals(colourSetFilterMenuLabel(skin, "k2"), juce::String("k2"));
+    }
+
+    void defaultMappingsSortIsPropertyAscending()
+    {
+        beginTest("Default Mappings sort is Property A->Z");
+
+        using namespace SkinEditorMappingsColumnFilter;
+        const auto sort = defaultMappingsSortSpec();
+        expect(sort.column == SortColumn::kProperty);
+        expect(sort.ascending);
     }
 };
 

@@ -38,10 +38,16 @@ namespace
                  mappedSpan };
     }
 
+    int colourSetColumnLeft(const ColumnLayout& cols) noexcept
+    {
+        return kColPad + cols.propertyW + cols.stateW;
+    }
+
     bool isColourSetColumnX(int x, const ColumnLayout& cols) noexcept
     {
-        const int left = kColPad + cols.propertyW + cols.stateW;
-        return x >= left && x < left + cols.colourSetW;
+        return SkinEditorMappingPolicy::isColourSetColumn(x,
+                                                          colourSetColumnLeft(cols),
+                                                          cols.colourSetW);
     }
 }
 
@@ -103,7 +109,7 @@ void SkinEditorMappingsPanel::setActiveSkinId(const juce::String& skinId)
     skinId_ = skinId;
     clearAllColumnFilters();
     objectFilterName_.clear();
-    sortSpec_ = {};
+    sortSpec_ = SkinEditorMappingsColumnFilter::defaultMappingsSortSpec();
 }
 
 void SkinEditorMappingsPanel::setUnboundCount(int count)

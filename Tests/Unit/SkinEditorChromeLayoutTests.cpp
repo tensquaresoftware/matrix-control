@@ -91,18 +91,21 @@ private:
         expectEquals(SkinEditorChrome::kPaletteListPaintWidth,
                      SkinEditorChrome::paletteListPaintFloor());
         expectEquals(SkinEditorChrome::kMappingsPropertyColumnWidth, 150);
-        expectEquals(SkinEditorChrome::kMappingsStateColumnWidth, 115);
+        expectEquals(SkinEditorChrome::kMappingsStateColumnWidth, 75);
         expectEquals(SkinEditorChrome::kMappingsColourSetColumnWidth, 130);
-        expectEquals(SkinEditorChrome::kMappingsTablePaintWidth, 531);
-        expectEquals(SkinEditorChrome::kMappingsPanelWidth, 561);
+        expectEquals(SkinEditorChrome::kMappingsTablePaintWidth, 491);
+        expectEquals(SkinEditorChrome::kMappingsPanelWidth, 521);
         expect(SkinEditorChrome::kMappingsPropertyColumnWidth % 5 == 0);
         expect(SkinEditorChrome::kMappingsStateColumnWidth % 5 == 0);
         expect(SkinEditorChrome::kMappingsColourSetColumnWidth % 5 == 0);
-        expectEquals(SkinEditorChrome::kObjectComboWidth, 150);
-        expectEquals(SkinEditorChrome::kMappingsObjectToHoldGap, 32);
+        expectEquals(SkinEditorChrome::kObjectComboWidth, 158);
+        // Hold aligns to Colour set column when that is farther than Object[+clear]+button gap.
+        expectEquals(SkinEditorChrome::mappingsHoldLeft(100, 200), 200);
+        expectEquals(SkinEditorChrome::mappingsHoldLeft(200, 100),
+                     200 + SkinEditorChrome::kButtonGap);
         expectEquals(juce::String(SkinEditorChrome::kAllObjectsComboText),
                      juce::String("- All objects -"));
-        // Build B: Hold air + Colour set widen; no Link column token in the paint width sum.
+        // Build B: Hold Colour-set alignment + Colour set widen; no Link column in paint width.
         expectEquals(SkinEditorChrome::kMappingsTablePaintWidth,
                      SkinEditorChrome::kMappingsColumnPad
                          + SkinEditorChrome::kMappingsPropertyColumnWidth

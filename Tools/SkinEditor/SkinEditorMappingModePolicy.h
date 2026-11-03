@@ -92,6 +92,12 @@ namespace SkinEditorMappingPolicy
         return x >= mappedColumnX;
     }
 
+    /** Colour set column span (x in content coords; left/width from layout). */
+    inline bool isColourSetColumn(int x, int colourSetLeft, int colourSetWidth) noexcept
+    {
+        return x >= colourSetLeft && x < colourSetLeft + colourSetWidth;
+    }
+
     enum class MappedColourIntent
     {
         kNoOp,          // Unbound cell or unresolved pastille name

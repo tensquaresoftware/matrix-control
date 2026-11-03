@@ -187,21 +187,7 @@ namespace TSS::DevSkin
         if (skin == nullptr)
             return juce::Result::fail("Dev skin not found");
 
-        auto trimmed = label.trim();
-        if (trimmed.length() > kColourSetLabelMaxChars)
-            trimmed = trimmed.substring(0, kColourSetLabelMaxChars);
-
-        const auto& allowed = colourSetLabelAllowedChars();
-        juce::String asciiOnly;
-        asciiOnly.preallocateBytes(static_cast<size_t>(trimmed.length()));
-        for (int i = 0; i < trimmed.length(); ++i)
-        {
-            const auto ch = trimmed[i];
-            if (allowed.containsChar(ch))
-                asciiOnly += ch;
-        }
-
-        skin->colourSetLabels[static_cast<size_t>(colourSet)] = asciiOnly;
+        skin->colourSetLabels[static_cast<size_t>(colourSet)] = sanitizeColourSetLabel(label);
         bump();
         return juce::Result::ok();
     }

@@ -148,7 +148,10 @@ void SkinEditorMappingsPanel::layoutActionRow(juce::Rectangle<int> actions, int 
     const int holdW = SkinEditorChrome::measureTextWidth(SkinEditorChrome::fontRegular(),
                                                         holdColourToggle_.getButtonText())
                       + 16 + 6; // tick box + gap to label
-    const int holdLeft = holdAnchorLeft + SkinEditorChrome::kMappingsObjectToHoldGap;
+    // Tick box left edge aligns with Colour set column (same origin as table cells).
+    const int colourSetLeft = tableX + SkinEditorChrome::kMappingsColumnPad
+                              + cols.propertyW + cols.stateW;
+    const int holdLeft = SkinEditorChrome::mappingsHoldLeft(holdAnchorLeft, colourSetLeft);
     const int holdMaxRight = unboundLeft - SkinEditorChrome::kButtonGap;
     holdColourToggle_.setBounds(holdLeft, actions.getY(),
                                 juce::jmin(holdW, juce::jmax(0, holdMaxRight - holdLeft)),

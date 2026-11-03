@@ -59,12 +59,18 @@ namespace SkinEditorChrome
      * Keep in sync with SkinEditorLookAndFeel::positionComboBoxText.
      */
     inline constexpr int kComboArrowReserve = 18;
-    /** Mappings Object combo — fits TrackGeneratorDisplay with a little air before the arrow. */
-    inline constexpr int kObjectComboWidth = 150;
+    /** Mappings Object combo — fits TrackGeneratorDisplay with air before the arrow (+8 vs prior). */
+    inline constexpr int kObjectComboWidth = 158;
     /** Mappings Object combo first item — show every object table. */
     inline constexpr const char* kAllObjectsComboText = "- All objects -";
-    /** Mappings action row: gap between Object combo (or its clear badge) and Hold colour. */
-    inline constexpr int kMappingsObjectToHoldGap = 32;
+    /**
+     * Hold colour toggle left edge: flush with Colour set column when possible,
+     * otherwise Object combo (or its clear badge) + kButtonGap.
+     */
+    inline int mappingsHoldLeft(int holdAnchorLeft, int colourSetColumnLeft) noexcept
+    {
+        return juce::jmax(holdAnchorLeft + kButtonGap, colourSetColumnLeft);
+    }
     /**
      * In-panel content inset on all four sides of the body (below the title tab,
      * and left / right / bottom inside the silhouette). Do not use kGutter here.
@@ -91,7 +97,7 @@ namespace SkinEditorChrome
                                                   - kScrollTrackWidth; // 130
     /** Mappings structured-key column widths (Mapped colour = kPaletteListPaintWidth). Multiples of 5. */
     inline constexpr int kMappingsPropertyColumnWidth = 150;
-    inline constexpr int kMappingsStateColumnWidth = 115;
+    inline constexpr int kMappingsStateColumnWidth = 75;
     /** Colour set: [kN] badge + free label (up to 16 chars) + header pictos. */
     inline constexpr int kMappingsColourSetColumnWidth = 130;
     /** Left inset before Property; columnsForWidth subtracts this before Property|State|Colour set|Mapped. */
@@ -99,19 +105,19 @@ namespace SkinEditorChrome
     /**
      * Table paint width = pad + Property + State + Colour set + Mapped colour.
      * Panel = that paint + scroll track + 2 focus pads - right pad extension + side content pads
-     * -> 561 (see SkinEditorMappingsPanel::paintWidth / layoutShellFilled).
+     * -> 521 (see SkinEditorMappingsPanel::paintWidth / layoutShellFilled).
      */
     inline constexpr int kMappingsTablePaintWidth = kMappingsColumnPad
                                                     + kMappingsPropertyColumnWidth
                                                     + kMappingsStateColumnWidth
                                                     + kMappingsColourSetColumnWidth
-                                                    + kPaletteListPaintWidth; // 531
+                                                    + kPaletteListPaintWidth; // 491
     inline constexpr int kMappingsFocusPad = 1;
     inline constexpr int kMappingsPanelWidth = kMappingsTablePaintWidth
                                                + kScrollTrackWidth
                                                + 2 * kMappingsFocusPad
                                                - kPanelContentPad
-                                               + 2 * kPanelContentPad; // 561
+                                               + 2 * kPanelContentPad; // 521
     inline constexpr int kLegacyWindowMaxWidth = 1210;
     /**
      * Exact body width: edge gutters + Color + Palette side gaps + fixed Mappings.
@@ -201,4 +207,8 @@ namespace SkinEditorChrome
     inline constexpr int kClearBadgeSize = 11;
     /** Mappings column-sort chip: same footprint as the clear badge. */
     inline constexpr int kSortBadgeSize = kClearBadgeSize;
+    /** Sticky-legend gap between sort picto and per-column filter clear. */
+    inline constexpr int kSortToFilterClearGap = 4;
+    /** Colour set row index chip `[kN]` — fixed square (not row-height driven). */
+    inline constexpr int kColourSetIndexBadgeSize = 12;
 }

@@ -20,8 +20,12 @@ public:
         assertColourSetLabelHardCapAndMappingUntouched();
         beginTest("colourSetLabels_stripsNonAsciiOnSet");
         assertColourSetLabelStripsNonAscii();
+        beginTest("colourSetLabels_stripBeforeCapKeepsTrailingAscii");
+        assertColourSetLabelStripBeforeCapKeepsTrailingAscii();
         beginTest("colourSetLabels_importCapsValueLongerThanMax");
         assertColourSetLabelImportCapsLongValue();
+        beginTest("colourSetLabels_importStripsNonAscii");
+        assertColourSetLabelImportStripsNonAscii();
         beginTest("colourSetLabels_compiledSkinsRejectSet");
         assertColourSetLabelCompiledRejects();
     }
@@ -108,17 +112,32 @@ private:
                      juce::String("PatchZone"));
     }
 
-    void assertColourSetLabelImportCapsLongValue()
+    void assertColourSetLabelStripBeforeCapKeepsTrailingAscii()
     {
-        juce::String seventeen;
-        for (int i = 0; i < 17; ++i)
-            seventeen += 'x';
+        // Leading non-ASCII would waste the 16-char cut if truncate ran first.
+        juce::String leadingNonAscii;
+        for (int i = 0; i < 20; ++i)
+            leadingNonAscii += juce::String::charToString(static_cast<juce::juce_wchar>(0x00E9));
+        const juce::String mixed = leadingNonAscii + "Hello";
 
+        TSS::DevSkin::Layer layer;
+        expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Order Skin").wasOk());
+        const auto skinId = layer.activeSkinId();
+        expect(layer.setColourSetLabel(skinId, TSS::ColourSet::k2, mixed).wasOk());
+        const auto* skin = layer.findSkin(skinId);
+        expect(skin != nullptr);
+        expectEquals(skin->colourSetLabels[static_cast<size_t>(TSS::ColourSet::k2)],
+                     juce::String("Hello"));
+    }
+
+    static juce::String makeSkinJsonWithColourSetLabel(const juce::String& skinId,
+                                                       const juce::String& labelValue)
+    {
         auto* labels = new juce::DynamicObject();
-        labels->setProperty("k3", seventeen);
+        labels->setProperty("k3", labelValue);
         auto* skinObj = new juce::DynamicObject();
-        skinObj->setProperty("id", "import-cap-skin");
-        skinObj->setProperty("name", "Import Cap");
+        skinObj->setProperty("id", skinId);
+        skinObj->setProperty("name", "Import Label");
         skinObj->setProperty("kind", "dev");
         skinObj->setProperty("palette", juce::Array<juce::var>());
         skinObj->setProperty("mappings", juce::Array<juce::var>());
@@ -126,12 +145,20 @@ private:
 
         auto* root = new juce::DynamicObject();
         root->setProperty("schemaVersion", TSS::DevSkin::kSchemaVersion);
-        root->setProperty("activeSkinId", "import-cap-skin");
+        root->setProperty("activeSkinId", skinId);
         juce::Array<juce::var> skins;
         skins.add(juce::var(skinObj));
         root->setProperty("skins", skins);
-        const auto json = juce::JSON::toString(juce::var(root), false);
+        return juce::JSON::toString(juce::var(root), false);
+    }
 
+    void assertColourSetLabelImportCapsLongValue()
+    {
+        juce::String seventeen;
+        for (int i = 0; i < 17; ++i)
+            seventeen += 'x';
+
+        const auto json = makeSkinJsonWithColourSetLabel("import-cap-skin", seventeen);
         TSS::DevSkin::Layer layer;
         const auto imported = TSS::DevSkin::appendEditorSkinsFromJson(layer, json);
         expect(imported.ok);
@@ -140,6 +167,22 @@ private:
         expect(skin != nullptr);
         expectEquals(skin->colourSetLabels[static_cast<size_t>(TSS::ColourSet::k3)].length(),
                      TSS::DevSkin::kColourSetLabelMaxChars);
+    }
+
+    void assertColourSetLabelImportStripsNonAscii()
+    {
+        const juce::String mixed = juce::String("Patch")
+                                   + juce::String::charToString(static_cast<juce::juce_wchar>(0x00E9))
+                                   + "Zone";
+        const auto json = makeSkinJsonWithColourSetLabel("import-ascii-skin", mixed);
+        TSS::DevSkin::Layer layer;
+        const auto imported = TSS::DevSkin::appendEditorSkinsFromJson(layer, json);
+        expect(imported.ok);
+        expectEquals(imported.importedSkinIds.size(), 1);
+        const auto* skin = layer.findSkin(imported.importedSkinIds[0]);
+        expect(skin != nullptr);
+        expectEquals(skin->colourSetLabels[static_cast<size_t>(TSS::ColourSet::k3)],
+                     juce::String("PatchZone"));
     }
 
     void assertColourSetLabelCompiledRejects()

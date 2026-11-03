@@ -21,6 +21,7 @@ public:
         idleWitnessHidden();
         readOnlyPastilleDoesNotArm();
         mappedColourColumnHitTest();
+        colourSetColumnHitTest();
         mappedColourEditSelectsBoundOnly();
         mappedColourUnboundIsNoOp();
         propertyStateStillArmsOrBinds();
@@ -118,6 +119,19 @@ private:
         expect(isMappedColourColumn(mappedX, mappedX));
         expect(isMappedColourColumn(mappedX + 10, mappedX));
         expect(! isMappedColourColumn(mappedX - 1, mappedX));
+    }
+
+    void colourSetColumnHitTest()
+    {
+        beginTest("Colour set column - x in [left, left+width) is label hit");
+
+        using namespace SkinEditorMappingPolicy;
+        constexpr int left = 150;
+        constexpr int width = 130;
+        expect(isColourSetColumn(left, left, width));
+        expect(isColourSetColumn(left + width - 1, left, width));
+        expect(! isColourSetColumn(left - 1, left, width));
+        expect(! isColourSetColumn(left + width, left, width));
     }
 
     void mappedColourEditSelectsBoundOnly()

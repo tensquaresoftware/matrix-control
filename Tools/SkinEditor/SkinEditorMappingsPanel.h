@@ -195,7 +195,8 @@ private:
     int focusedObject_ = -1;
     /** Empty = "- All objects -"; otherwise a SkinObjectType display name. */
     juce::String objectFilterName_;
-    SkinEditorMappingsColumnFilter::SortSpec sortSpec_ {};
+    SkinEditorMappingsColumnFilter::SortSpec sortSpec_ {
+        SkinEditorMappingsColumnFilter::defaultMappingsSortSpec() };
     std::vector<Row> rows_;
     std::vector<ObjectTable> objects_;
 

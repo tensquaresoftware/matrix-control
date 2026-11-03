@@ -71,6 +71,12 @@ namespace SkinEditorMappingsColumnFilter
         bool ascending = true; // true = A->Z
     };
 
+    /** Launch / skin-switch default: Property A->Z (yellow down picto). */
+    inline SortSpec defaultMappingsSortSpec() noexcept
+    {
+        return { SortColumn::kProperty, true };
+    }
+
     struct ActiveFilters
     {
         juce::String property;
@@ -186,6 +192,25 @@ namespace SkinEditorMappingsColumnFilter
             appendObject(key.object);
         }
         return groups;
+    }
+
+    /**
+     * Colour set filter PopupMenu label: "k1" or "k1: Patch" when a shared help label exists.
+     * Filter value / match key stays the bare token (toString(ColourSet)).
+     */
+    inline juce::String colourSetFilterMenuLabel(const TSS::DevSkin::NamedSkin& skin,
+                                                 const juce::String& colourSetToken)
+    {
+        for (const auto colourSet : TSS::kAllColourSets)
+        {
+            if (TSS::DevSkin::toString(colourSet) != colourSetToken)
+                continue;
+            const auto& help = skin.colourSetLabels[static_cast<size_t>(colourSet)];
+            if (help.isEmpty())
+                return colourSetToken;
+            return colourSetToken + ": " + help;
+        }
+        return colourSetToken;
     }
 
     /** Values present in the Editor skin inventory rows for one column. */

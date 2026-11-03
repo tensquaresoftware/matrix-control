@@ -10,7 +10,7 @@ namespace
 {
     constexpr int kEdgeExtra = 4;
     constexpr int kFocusPad = SkinEditorChrome::kMappingsFocusPad;
-    constexpr int kColourSetBadgePad = 2;
+    constexpr float kColourSetIndexBadgeFont = 8.0f;
 }
 
 SkinEditorMappingsPanel::Row SkinEditorMappingsPanel::makeMappingRow(
@@ -130,32 +130,31 @@ void SkinEditorMappingsPanel::paintColourSetCell(juce::Graphics& g,
                                                  juce::Rectangle<int> cellArea) const
 {
     const int contentH = cellArea.getHeight();
-    const int badgeH = juce::jmin(contentH - 2, SkinEditorChrome::kColumnHeaderHeight - 4);
-    const auto badgeFont = SkinEditorChrome::fontBold(10.0f);
-    const int textW = SkinEditorChrome::measureTextWidth(badgeFont, item.colourSetLabel);
-    const int badgeW = juce::jmax(badgeH, textW + kColourSetBadgePad * 2);
-    const int badgeY = cellArea.getY() + (contentH - badgeH) / 2;
-    const auto badge = juce::Rectangle<int>(cellArea.getX(), badgeY, badgeW, badgeH);
+    const int side = SkinEditorChrome::kColourSetIndexBadgeSize;
+    const int badgeY = cellArea.getY() + (contentH - side) / 2;
+    const auto badge = juce::Rectangle<int>(cellArea.getX(), badgeY, side, side);
 
     g.setColour(SkinEditorChrome::textTableBody());
     g.fillRoundedRectangle(badge.toFloat(), SkinEditorChrome::kChromeBadgeCorner);
     g.setColour(SkinEditorChrome::surfaceTable());
-    g.setFont(badgeFont);
+    g.setFont(SkinEditorChrome::fontBold(kColourSetIndexBadgeFont));
     g.drawText(item.colourSetLabel, badge, juce::Justification::centred, false);
+    // Always restore body font — Mapped colour is painted next on the same Graphics.
+    g.setFont(SkinEditorChrome::fontRegular());
 
     if (item.colourSetHelpLabel.isEmpty())
         return;
 
     const int labelX = badge.getRight() + 4;
-    g.setFont(SkinEditorChrome::fontRegular());
     g.setColour(SkinEditorChrome::textTableBody());
+    // No ellipsis: labels are hard-capped at 16 ASCII chars at edit/import time.
     g.drawText(item.colourSetHelpLabel,
                labelX,
                cellArea.getY(),
                juce::jmax(0, cellArea.getRight() - labelX),
                contentH,
                juce::Justification::centredLeft,
-               true);
+               false);
 }
 
 void SkinEditorMappingsPanel::tryEditColourSetLabel(int row)

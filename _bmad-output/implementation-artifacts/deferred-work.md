@@ -1,10 +1,16 @@
 # Deferred Work
 
+## Deferred from: code review of spec-skin-editor-mappings-ergonomics.md (2026-11-03)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-ergonomics.md`
+  summary: After column filters reshape `objects_`, `focusedObject_` may still be in range but point at a different object table (outline highlights the wrong group). Build B only clamps when the index is out of range.
+  evidence: Edge Case Hunter; `rebuildRows` clears focus only when `focusedObject_ >= objects_.size()`; rebind-by-object-name would settle it.
+
 ## Deferred from: review of spec-skin-editor-mappings-ergonomics.md (2026-11-03)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-ergonomics.md`
   summary: No automated panel harness that left-click on a Mappings header sorts and right-click opens the filter menu (helper-only `headerGestureForClick` tests stay green if mouseUp wiring regresses).
-  evidence: Verification Gap; Matrix-Control_Tests does not drive SkinEditorMappingsPanel mouse handlers; manual header smoke remains the gate.
+  evidence: Verification Gap; Matrix-Control_Tests does not drive SkinEditorMappingsPanel mouse handlers; manual header smoke remains the gate. (Reconfirmed in Build B + polish code review.)
 
 ## Deferred from: review of spec-skin-editor-product-combo-first-skin.md (2026-11-01)
 

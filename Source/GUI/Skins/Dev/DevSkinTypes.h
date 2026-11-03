@@ -30,6 +30,24 @@ namespace TSS::DevSkin
         }();
         return chars;
     }
+
+    /** Trim, keep allowed ASCII, then hard-cap length (strip before truncate). */
+    inline juce::String sanitizeColourSetLabel(const juce::String& raw)
+    {
+        const auto trimmed = raw.trim();
+        const auto& allowed = colourSetLabelAllowedChars();
+        juce::String asciiOnly;
+        asciiOnly.preallocateBytes(static_cast<size_t>(trimmed.length()));
+        for (int i = 0; i < trimmed.length(); ++i)
+        {
+            const auto ch = trimmed[i];
+            if (allowed.containsChar(ch))
+                asciiOnly += ch;
+        }
+        if (asciiOnly.length() > kColourSetLabelMaxChars)
+            return asciiOnly.substring(0, kColourSetLabelMaxChars);
+        return asciiOnly;
+    }
     inline constexpr const char* kCompiledBlackId = "compiled:black";
     inline constexpr const char* kCompiledCreamId = "compiled:cream";
 

@@ -285,29 +285,50 @@ namespace SkinEditorChrome
         const int side = kSortBadgeSize;
         const auto badge = badgeSquare(area, side);
         const bool active = (kind != SortPictoKind::kInactive);
-        g.setColour(active ? attention() : surfaceTable());
+        // Inactive: lift above surfaceSection legend so the grey chip reads as affordance.
+        g.setColour(active ? attention() : surfaceTab());
         g.fillRoundedRectangle(badge.toFloat(), kChromeBadgeCorner);
 
+        // Inactive chevrons: near section-bar dark grey (not textMuted — too light on surfaceTab).
         const auto glyph = active ? surfacePanel() : surfaceSection();
-        const auto inner = badge.toFloat().reduced(2.0f, 2.2f);
+        const auto badgeF = badge.toFloat();
+        // Active chevron: smaller than the chip, optically centred (filled triangles sit heavy).
+        constexpr float kActiveChevronW = 5.0f;
+        constexpr float kActiveChevronH = 3.5f;
+        constexpr float kActiveOpticalNudgeY = -0.35f;
         if (kind == SortPictoKind::kAscending)
         {
-            drawChevronDown(g, inner, glyph);
+            // Down chevron: +1 px vs up (same optical nudge alone looked high).
+            auto tip = juce::Rectangle<float>(0.0f, 0.0f, kActiveChevronW, kActiveChevronH)
+                           .withCentre({ badgeF.getCentreX(),
+                                         badgeF.getCentreY() + kActiveOpticalNudgeY + 1.0f });
+            drawChevronDown(g, tip, glyph);
             return;
         }
         if (kind == SortPictoKind::kDescending)
         {
-            drawChevronUp(g, inner, glyph);
+            auto tip = juce::Rectangle<float>(0.0f, 0.0f, kActiveChevronW, kActiveChevronH)
+                           .withCentre({ badgeF.getCentreX(),
+                                         badgeF.getCentreY() + kActiveOpticalNudgeY });
+            drawChevronUp(g, tip, glyph);
             return;
         }
 
-        const float mid = inner.getCentreY();
-        const float half = inner.getHeight() * 0.42f;
+        constexpr float kInactiveChevronW = 5.0f;
+        constexpr float kInactiveChevronH = 2.6f;
+        constexpr float kInactiveGap = 0.7f;
+        const float mid = badgeF.getCentreY() + kActiveOpticalNudgeY;
         drawChevronUp(g,
-                      { inner.getX(), mid - half, inner.getWidth(), half - 0.4f },
+                      { badgeF.getCentreX() - kInactiveChevronW * 0.5f,
+                        mid - kInactiveGap - kInactiveChevronH,
+                        kInactiveChevronW,
+                        kInactiveChevronH },
                       glyph);
         drawChevronDown(g,
-                        { inner.getX(), mid + 0.4f, inner.getWidth(), half - 0.4f },
+                        { badgeF.getCentreX() - kInactiveChevronW * 0.5f,
+                          mid + kInactiveGap,
+                          kInactiveChevronW,
+                          kInactiveChevronH },
                         glyph);
     }
 
