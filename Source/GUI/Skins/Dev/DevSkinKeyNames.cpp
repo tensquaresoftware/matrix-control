@@ -26,6 +26,7 @@ namespace TSS::DevSkin
             { SkinObjectType::kButton, "Button" },
             { SkinObjectType::kToggle, "Toggle" },
             { SkinObjectType::kSlider, "Slider" },
+            { SkinObjectType::kProgressBar, "ProgressBar" },
             { SkinObjectType::kComboBox, "ComboBox" },
             { SkinObjectType::kPopupMenu, "PopupMenu" },
             { SkinObjectType::kNumberBox, "NumberBox" },

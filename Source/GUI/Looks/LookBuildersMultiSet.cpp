@@ -243,6 +243,10 @@ namespace TSS
                                          SkinColourProperty::kEditorText,
                                          SkinColourState::kDefault,
                                          colourSet);
+        look.editorCaret = skin.getColour(SkinObjectType::kNumberBox,
+                                          SkinColourProperty::kCaret,
+                                          SkinColourState::kDefault,
+                                          colourSet);
         look.editorSelectionBackground = skin.getColour(SkinObjectType::kNumberBox,
                                                         SkinColourProperty::kEditorSelectionBackground,
                                                         SkinColourState::kDefault,

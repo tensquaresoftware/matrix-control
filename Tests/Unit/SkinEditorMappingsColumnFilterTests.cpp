@@ -29,6 +29,8 @@ public:
         filteredObjectGroupsFollowDisplayOrder();
         displayOrderCoversInventoryObjects();
         peakIndicatorFollowsLed();
+        progressBarFollowsSlider();
+        numberBoxCaretInInventory();
         chromeDecorrelationDisplayOrder();
         inventoryExpandsOnlyMultiSetObjects();
     }
@@ -318,6 +320,41 @@ private:
         expectEquals(peakIndex, ledIndex + 1);
     }
 
+    void progressBarFollowsSlider()
+    {
+        beginTest("ProgressBar table follows Slider");
+
+        using namespace SkinEditorMappingsColumnFilter;
+        const auto& order = mappingsObjectDisplayOrder();
+        int sliderIndex = -1;
+        int progressBarIndex = -1;
+        for (int i = 0; i < static_cast<int>(order.size()); ++i)
+        {
+            if (order[static_cast<size_t>(i)] == TSS::SkinObjectType::kSlider)
+                sliderIndex = i;
+            if (order[static_cast<size_t>(i)] == TSS::SkinObjectType::kProgressBar)
+                progressBarIndex = i;
+        }
+        expectEquals(progressBarIndex, sliderIndex + 1);
+    }
+
+    void numberBoxCaretInInventory()
+    {
+        beginTest("NumberBox Caret is present in structured inventory");
+
+        bool found = false;
+        for (const auto& inventoryKey : TSS::DevSkin::allStructuredKeys())
+        {
+            if (inventoryKey.object == TSS::SkinObjectType::kNumberBox
+                && inventoryKey.property == TSS::SkinColourProperty::kCaret)
+            {
+                found = true;
+                break;
+            }
+        }
+        expect(found);
+    }
+
     void chromeDecorrelationDisplayOrder()
     {
         beginTest("Chrome order: WindowSurface then Dialog/ChromeText, ReadOnly near NumberBox");
@@ -354,7 +391,7 @@ private:
 
     void inventoryExpandsOnlyMultiSetObjects()
     {
-        beginTest("All nine multi-set objects have k1-k4; remaining objects stay k1");
+        beginTest("All ten multi-set objects have k1-k4; remaining objects stay k1");
 
         const auto inventory = TSS::DevSkin::allStructuredKeys();
 

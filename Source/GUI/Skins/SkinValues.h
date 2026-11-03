@@ -23,6 +23,7 @@ namespace TSS
         kButton,
         kToggle,
         kSlider,
+        kProgressBar,
         kComboBox,
         kPopupMenu,
         kNumberBox,
@@ -50,7 +51,7 @@ namespace TSS
         ColourSet::k4
     };
 
-    inline constexpr std::array<SkinObjectType, 9> kMultiSetSkinObjects {
+    inline constexpr std::array<SkinObjectType, 10> kMultiSetSkinObjects {
         SkinObjectType::kSlider,
         SkinObjectType::kComboBox,
         SkinObjectType::kPopupMenu,
@@ -59,7 +60,8 @@ namespace TSS
         SkinObjectType::kToggle,
         SkinObjectType::kLed,
         SkinObjectType::kPeakIndicator,
-        SkinObjectType::kReadOnlyValueField
+        SkinObjectType::kReadOnlyValueField,
+        SkinObjectType::kProgressBar
     };
 
     constexpr bool supportsMultipleColourSets(SkinObjectType object) noexcept

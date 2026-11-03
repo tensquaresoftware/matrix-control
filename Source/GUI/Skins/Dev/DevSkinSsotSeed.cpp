@@ -66,6 +66,10 @@ namespace TSS::DevSkin
             putMappingExact(skin, Widgets::SliderK4::kValueBar, useBlack);
             putMappingExact(skin, Widgets::SliderK4::kText, useBlack);
 
+            putMappingExact(skin, Widgets::ProgressBarK4::kTrack, useBlack);
+            putMappingExact(skin, Widgets::ProgressBarK4::kValueBar, useBlack);
+            putMappingExact(skin, Widgets::ProgressBarK4::kText, useBlack);
+
             putMappingExact(skin, Widgets::ComboBoxK4::kBackground, useBlack);
             putMappingExact(skin, Widgets::ComboBoxK4::kBackgroundDisabled, useBlack);
             putMappingExact(skin, Widgets::ComboBoxK4::kBorder, useBlack);

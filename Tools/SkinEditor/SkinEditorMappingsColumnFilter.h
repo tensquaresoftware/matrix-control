@@ -60,6 +60,7 @@ namespace SkinEditorMappingsColumnFilter
             TSS::SkinObjectType::kGroupLabel,
             TSS::SkinObjectType::kLabel,
             TSS::SkinObjectType::kSlider,
+            TSS::SkinObjectType::kProgressBar,
             TSS::SkinObjectType::kComboBox,
             TSS::SkinObjectType::kPopupMenu,
             TSS::SkinObjectType::kNumberBox,

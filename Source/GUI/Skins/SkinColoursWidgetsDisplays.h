@@ -49,6 +49,12 @@ namespace TSS::SkinColours
                 ColourChart::kWhite,
                 ColourChart::kWhite
             };
+
+            inline constexpr ColourElement kCaret = {
+                skinColourKey(SkinObjectType::kNumberBox, SkinColourProperty::kCaret),
+                ColourChart::kWhite,
+                ColourChart::kWhite
+            };
         }
 
         namespace EnvelopeDisplay

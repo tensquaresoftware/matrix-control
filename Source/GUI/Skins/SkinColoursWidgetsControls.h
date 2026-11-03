@@ -220,5 +220,69 @@ namespace TSS::SkinColours
                 ColourChart::kGrey200
             };
         }
+
+        namespace ProgressBar
+        {
+            inline constexpr ColourElement kTrack = {
+                skinColourKey(SkinObjectType::kProgressBar, SkinColourProperty::kTrack),
+                ColourChart::kEmerald950,
+                ColourChart::kEmerald950
+            };
+
+            inline constexpr ColourElement kValueBar = {
+                skinColourKey(SkinObjectType::kProgressBar, SkinColourProperty::kValueBar),
+                ColourChart::kEmerald700,
+                ColourChart::kEmerald700
+            };
+
+            inline constexpr ColourElement kText = {
+                skinColourKey(SkinObjectType::kProgressBar, SkinColourProperty::kText),
+                ColourChart::kEmerald400,
+                ColourChart::kEmerald400
+            };
+
+            inline constexpr ColourElement kTrackDisabled = {
+                skinColourKey(SkinObjectType::kProgressBar, SkinColourProperty::kTrack, SkinColourState::kDisabled),
+                Common::kDecorationDisabled,
+                Common::kDecorationDisabled
+            };
+
+            inline constexpr ColourElement kValueBarDisabled = {
+                skinColourKey(SkinObjectType::kProgressBar, SkinColourProperty::kValueBar, SkinColourState::kDisabled),
+                ColourChart::kGrey700,
+                ColourChart::kGrey700
+            };
+
+            inline constexpr ColourElement kTextDisabled = {
+                skinColourKey(SkinObjectType::kProgressBar, SkinColourProperty::kText, SkinColourState::kDisabled),
+                Common::kContentDisabled,
+                Common::kContentDisabled
+            };
+        }
+
+        /** Modal progress greys — seeded onto ProgressBar at ColourSet::k4 only. */
+        namespace ProgressBarK4
+        {
+            inline constexpr ColourElement kTrack = {
+                skinColourKey(SkinObjectType::kProgressBar, SkinColourProperty::kTrack,
+                              SkinColourState::kDefault, ColourSet::k4),
+                ColourChart::kBlack,
+                ColourChart::kBlack
+            };
+
+            inline constexpr ColourElement kValueBar = {
+                skinColourKey(SkinObjectType::kProgressBar, SkinColourProperty::kValueBar,
+                              SkinColourState::kDefault, ColourSet::k4),
+                ColourChart::kGrey600,
+                ColourChart::kGrey600
+            };
+
+            inline constexpr ColourElement kText = {
+                skinColourKey(SkinObjectType::kProgressBar, SkinColourProperty::kText,
+                              SkinColourState::kDefault, ColourSet::k4),
+                ColourChart::kGrey200,
+                ColourChart::kGrey200
+            };
+        }
     }
 }

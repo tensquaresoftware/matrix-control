@@ -151,6 +151,10 @@ namespace TSS
         putColourExact(accessColour, Widgets::SliderK4::kValueBar);
         putColourExact(accessColour, Widgets::SliderK4::kText);
 
+        putColourExact(accessColour, Widgets::ProgressBarK4::kTrack);
+        putColourExact(accessColour, Widgets::ProgressBarK4::kValueBar);
+        putColourExact(accessColour, Widgets::ProgressBarK4::kText);
+
         putColourExact(accessColour, Widgets::ComboBoxK4::kBackground);
         putColourExact(accessColour, Widgets::ComboBoxK4::kBackgroundDisabled);
         putColourExact(accessColour, Widgets::ComboBoxK4::kBorder);
@@ -272,6 +276,13 @@ namespace TSS
         putColour(accessColour, Widgets::Slider::kText);
         putColour(accessColour, Widgets::Slider::kTextDisabled);
         putColour(accessColour, Widgets::Slider::kFocusBorder);
+
+        putColour(accessColour, Widgets::ProgressBar::kTrack);
+        putColour(accessColour, Widgets::ProgressBar::kTrackDisabled);
+        putColour(accessColour, Widgets::ProgressBar::kValueBar);
+        putColour(accessColour, Widgets::ProgressBar::kValueBarDisabled);
+        putColour(accessColour, Widgets::ProgressBar::kText);
+        putColour(accessColour, Widgets::ProgressBar::kTextDisabled);
     }
 
     template <typename Accessor>
@@ -317,6 +328,7 @@ namespace TSS
         putColour(accessColour, Widgets::NumberBox::kEditorBackground);
         putColour(accessColour, Widgets::NumberBox::kEditorSelectionBackground);
         putColour(accessColour, Widgets::NumberBox::kEditorText);
+        putColour(accessColour, Widgets::NumberBox::kCaret);
         putColour(accessColour, Widgets::EnvelopeDisplay::kBackground);
         putColour(accessColour, Widgets::EnvelopeDisplay::kBorder);
         putColour(accessColour, Widgets::EnvelopeDisplay::kEnvelope);

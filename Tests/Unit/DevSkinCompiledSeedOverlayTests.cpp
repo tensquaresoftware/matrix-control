@@ -18,26 +18,38 @@ public:
     }
 
 private:
+    static TSS::SkinColourKey keyAtK4(TSS::SkinObjectType object, TSS::SkinColourProperty property)
+    {
+        return TSS::skinColourKey(object, property, TSS::SkinColourState::kDefault, TSS::ColourSet::k4);
+    }
+
+    void assertProgressBarK4MatchesSliderK4(const TSS::DevSkin::NamedSkin& skin)
+    {
+        const auto progressTrack = keyAtK4(TSS::SkinObjectType::kProgressBar, TSS::SkinColourProperty::kTrack);
+        const auto progressValue = keyAtK4(TSS::SkinObjectType::kProgressBar, TSS::SkinColourProperty::kValueBar);
+        const auto progressText = keyAtK4(TSS::SkinObjectType::kProgressBar, TSS::SkinColourProperty::kText);
+        const auto sliderValue = keyAtK4(TSS::SkinObjectType::kSlider, TSS::SkinColourProperty::kValueBar);
+        const auto sliderText = keyAtK4(TSS::SkinObjectType::kSlider, TSS::SkinColourProperty::kText);
+
+        expectEquals(skin.mappings.at(progressTrack), juce::String("kBlack"));
+        expectEquals(skin.mappings.at(progressValue), skin.mappings.at(sliderValue));
+        expectEquals(skin.mappings.at(progressText), skin.mappings.at(sliderText));
+        expectEquals(skin.mappings.at(progressValue), juce::String("kGrey600"));
+        expectEquals(skin.mappings.at(progressText), juce::String("kGrey200"));
+    }
+
     void assertCompiledSeedOverlaysFormerButtonLikeAtK4()
     {
         const auto assertOverlay = [this](TSS::DevSkin::SkinKind kind)
         {
             const auto skin = TSS::DevSkin::makeCompiledSkin(kind);
+            const auto comboBgK4 = keyAtK4(TSS::SkinObjectType::kComboBox, TSS::SkinColourProperty::kBackground);
+            const auto sliderTrackK4 = keyAtK4(TSS::SkinObjectType::kSlider, TSS::SkinColourProperty::kTrack);
+            const auto popupBorderK4 = keyAtK4(TSS::SkinObjectType::kPopupMenu, TSS::SkinColourProperty::kBorder);
 
-            const auto comboBgK4 = TSS::skinColourKey(TSS::SkinObjectType::kComboBox,
-                                                      TSS::SkinColourProperty::kBackground,
-                                                      TSS::SkinColourState::kDefault,
-                                                      TSS::ColourSet::k4);
-            const auto sliderTrackK4 = TSS::skinColourKey(TSS::SkinObjectType::kSlider,
-                                                          TSS::SkinColourProperty::kTrack,
-                                                          TSS::SkinColourState::kDefault,
-                                                          TSS::ColourSet::k4);
-            const auto popupBorderK4 = TSS::skinColourKey(TSS::SkinObjectType::kPopupMenu,
-                                                          TSS::SkinColourProperty::kBorder,
-                                                          TSS::SkinColourState::kDefault,
-                                                          TSS::ColourSet::k4);
             expectEquals(skin.mappings.at(comboBgK4), juce::String("kBlack"));
             expectEquals(skin.mappings.at(sliderTrackK4), juce::String("kBlack"));
+            assertProgressBarK4MatchesSliderK4(skin);
             expectEquals(skin.mappings.at(popupBorderK4), juce::String("kGrey600"));
 
             auto comboBgK1 = comboBgK4;

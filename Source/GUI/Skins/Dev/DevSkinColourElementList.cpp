@@ -68,6 +68,12 @@ namespace TSS::DevSkin
             out.push_back(&Widgets::Slider::kText);
             out.push_back(&Widgets::Slider::kTextDisabled);
             out.push_back(&Widgets::Slider::kFocusBorder);
+            out.push_back(&Widgets::ProgressBar::kTrack);
+            out.push_back(&Widgets::ProgressBar::kTrackDisabled);
+            out.push_back(&Widgets::ProgressBar::kValueBar);
+            out.push_back(&Widgets::ProgressBar::kValueBarDisabled);
+            out.push_back(&Widgets::ProgressBar::kText);
+            out.push_back(&Widgets::ProgressBar::kTextDisabled);
         }
 
         void appendMenus(std::vector<const SkinColours::ColourElement*>& out)
@@ -102,6 +108,7 @@ namespace TSS::DevSkin
             out.push_back(&Widgets::NumberBox::kEditorBackground);
             out.push_back(&Widgets::NumberBox::kEditorSelectionBackground);
             out.push_back(&Widgets::NumberBox::kEditorText);
+            out.push_back(&Widgets::NumberBox::kCaret);
             out.push_back(&Widgets::EnvelopeDisplay::kBackground);
             out.push_back(&Widgets::EnvelopeDisplay::kBorder);
             out.push_back(&Widgets::EnvelopeDisplay::kEnvelope);

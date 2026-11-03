@@ -147,6 +147,7 @@ namespace TSS
         juce::Colour textFocus{};
         juce::Colour editorBackground{};
         juce::Colour editorText{};
+        juce::Colour editorCaret{};
         juce::Colour editorSelectionBackground{};
         juce::Font font{juce::FontOptions{}};
     };

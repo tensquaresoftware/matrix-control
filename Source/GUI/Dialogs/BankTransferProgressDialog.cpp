@@ -10,6 +10,7 @@
 using TSS::SkinObjectType;
 using TSS::SkinColourProperty;
 using TSS::SkinColourState;
+using TSS::ColourSet;
 
 namespace
 {
@@ -193,19 +194,29 @@ void BankTransferProgressDialog::paintProgressBar(juce::Graphics& g,
                                                     float fraction,
                                                     bool enabled) const
 {
-    g.setColour(skin_->getSliderTrackColour(enabled));
+    const auto trackState = enabled ? SkinColourState::kDefault : SkinColourState::kDisabled;
+    g.setColour(skin_->getColour(SkinObjectType::kProgressBar,
+                                 SkinColourProperty::kTrack,
+                                 trackState,
+                                 ColourSet::k4));
     g.fillRect(bounds);
 
     if (enabled)
     {
         auto fillBar = bounds.withWidth(
             juce::roundToInt(static_cast<float>(bounds.getWidth()) * fraction));
-        g.setColour(skin_->getColour(SkinObjectType::kSlider, SkinColourProperty::kValueBar));
+        g.setColour(skin_->getColour(SkinObjectType::kProgressBar,
+                                     SkinColourProperty::kValueBar,
+                                     SkinColourState::kDefault,
+                                     ColourSet::k4));
         g.fillRect(fillBar);
     }
 
     const int percent = enabled ? juce::roundToInt(fraction * 100.0f) : 0;
-    g.setColour(skin_->getSliderTextColour(enabled));
+    g.setColour(skin_->getColour(SkinObjectType::kProgressBar,
+                                 SkinColourProperty::kText,
+                                 trackState,
+                                 ColourSet::k4));
     g.drawText(juce::String(percent) + juce::String(PluginDisplayNames::Units::kPercent),
                bounds,
                juce::Justification::centred,
@@ -269,7 +280,10 @@ void BankTransferProgressDialog::paintPhaseLane(juce::Graphics& g, const PhaseLa
 
     g.setFont(args.bodyFont);
     g.setColour(args.enabled ? skin_->getColour(SkinObjectType::kChromeText, SkinColourProperty::kText)
-                             : skin_->getColour(SkinObjectType::kSlider, SkinColourProperty::kText, SkinColourState::kDisabled));
+                             : skin_->getColour(SkinObjectType::kProgressBar,
+                                               SkinColourProperty::kText,
+                                               SkinColourState::kDisabled,
+                                               ColourSet::k4));
 
     {
         auto progressLabel = args.body.removeFromTop(lineHeight);

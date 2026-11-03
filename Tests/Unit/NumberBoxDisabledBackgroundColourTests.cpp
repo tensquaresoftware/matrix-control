@@ -41,6 +41,18 @@ public:
 
         assertDisabledBackgroundFromSkin(TSS::Skin::ColourVariant::Black);
         assertDisabledBackgroundFromSkin(TSS::Skin::ColourVariant::Cream);
+
+        beginTest("caret_seedIsWhiteAndIndependentOfEditorText");
+
+        expect(NumberBox::kCaret.blackVariant == ColourChart::kWhite);
+        expect(NumberBox::kCaret.creamVariant == ColourChart::kWhite);
+        expect(NumberBox::kCaret.blackVariant == NumberBox::kEditorText.blackVariant);
+        assertCaretFromSkin(TSS::Skin::ColourVariant::Black);
+        assertCaretFromSkin(TSS::Skin::ColourVariant::Cream);
+
+        beginTest("remapCaretOnly_leavesEditorTextWhite");
+
+        assertRemapCaretLeavesEditorText();
     }
 
 private:
@@ -57,6 +69,48 @@ private:
                                             SkinColourState::kDisabled);
         expect(look.backgroundDisabled == mapped);
         expect(look.backgroundDisabled == juce::Colour(ColourChart::kGrey950));
+    }
+
+    void assertCaretFromSkin(TSS::Skin::ColourVariant variant)
+    {
+        using TSS::SkinColourProperty;
+        using TSS::SkinColourState;
+        using TSS::SkinObjectType;
+
+        const auto skin = TSS::Skin::create(variant);
+        const auto look = TSS::numberBoxLookFromSkin(*skin);
+        const auto caret = skin->getColour(SkinObjectType::kNumberBox,
+                                           SkinColourProperty::kCaret,
+                                           SkinColourState::kDefault);
+        const auto editorText = skin->getColour(SkinObjectType::kNumberBox,
+                                                SkinColourProperty::kEditorText,
+                                                SkinColourState::kDefault);
+        expect(look.editorCaret == caret);
+        expect(look.editorText == editorText);
+        expect(look.editorCaret == juce::Colour(ColourChart::kWhite));
+    }
+
+    void assertRemapCaretLeavesEditorText()
+    {
+        using TSS::SkinColourProperty;
+        using TSS::SkinColourState;
+        using TSS::SkinObjectType;
+
+        const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::Black);
+        const auto remappedCaret = juce::Colour(ColourChart::kRed500);
+        expect(remappedCaret != juce::Colour(ColourChart::kWhite));
+
+        skin->setColour(TSS::skinColourKey(SkinObjectType::kNumberBox,
+                                           SkinColourProperty::kCaret),
+                        remappedCaret);
+
+        const auto look = TSS::numberBoxLookFromSkin(*skin);
+        expect(look.editorCaret == remappedCaret);
+        expect(look.editorText == juce::Colour(ColourChart::kWhite));
+        expect(skin->getColour(SkinObjectType::kNumberBox,
+                               SkinColourProperty::kEditorText,
+                               SkinColourState::kDefault)
+               == juce::Colour(ColourChart::kWhite));
     }
 };
 

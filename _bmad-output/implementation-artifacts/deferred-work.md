@@ -3076,3 +3076,12 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-product-duplicate-select.md`
   summary: onDelete (and similar mutators) can still fire onChanged while session editorSkinId is stale relative to the layer.
   evidence: Blind Hunter; pre-existing ordering; out of Product Duplicate / New push-policy scope.
+
+## Deferred from: review of spec-skin-editor-progressbar-numberbox-caret.md (2026-11-03)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-progressbar-numberbox-caret.md`
+  summary: Slider blink caret still resolves from NumberBox EditorText after NumberBox gained its own Caret pastille.
+  evidence: Blind Hunter; frozen Build A Decision explicitly leaves Slider editorCaret retarget out of scope; NumberBox caret remap alone does not move Slider caret.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-progressbar-numberbox-caret.md`
+  summary: No automated pin that BankTransferProgressDialog paint requests ProgressBar at ColourSet k4 (seed/getColour tests stay green if dialog reverts to Slider).
+  evidence: Verification Gap; CONVENTIONS §8.5 forbids paint()/GUI unit tests; manual Bank Transfer smoke remains the adoption gate.

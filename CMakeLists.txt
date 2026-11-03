@@ -627,6 +627,7 @@ if(MATRIX_BUILD_TESTS)
         Tools/SkinEditor/SkinEditorColourPicker.cpp
         Tools/SkinEditor/SkinEditorSkinsPanel.cpp
         Tests/Unit/SliderColourSetK4Tests.cpp
+        Tests/Unit/ProgressBarColourSetK4Tests.cpp
         Tests/Unit/PatchManagerActionHandlerComputerNavigationTests.cpp
         Tests/Unit/PatchManagerActionHandlerNavDebounceTests.cpp
         Tests/Unit/PatchFileServiceTests.cpp
