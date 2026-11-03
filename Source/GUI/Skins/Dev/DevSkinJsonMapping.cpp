@@ -132,4 +132,113 @@ namespace TSS::DevSkin
                 sanitizeColourSetLabel(labelsObj->getProperty(key).toString());
         }
     }
+
+    juce::var mappingKeyToVar(const SkinColourKey& key)
+    {
+        auto* object = new juce::DynamicObject();
+        object->setProperty("object", toString(key.object));
+        object->setProperty("property", toString(key.property));
+        object->setProperty("state", toString(key.state));
+        object->setProperty("colourSet", toString(key.colourSet));
+        return juce::var(object);
+    }
+
+    bool mappingKeyFromVar(const juce::var& value, SkinColourKey& key)
+    {
+        auto* objectValue = value.getDynamicObject();
+        if (objectValue == nullptr)
+            return false;
+
+        SkinObjectType object {};
+        SkinColourProperty property {};
+        SkinColourState state {};
+        ColourSet colourSet = ColourSet::k1;
+        if (! parseObjectType(objectValue->getProperty("object").toString(), object)
+            || ! parseProperty(objectValue->getProperty("property").toString(), property)
+            || ! parseState(objectValue->getProperty("state").toString(), state))
+            return false;
+
+        const auto setValue = objectValue->getProperty("colourSet");
+        if (! setValue.isVoid() && ! parseColourSet(setValue.toString(), colourSet))
+            return false;
+
+        if (colourSet != ColourSet::k1 && ! supportsMultipleColourSets(object))
+            return false;
+
+        key = skinColourKey(object, property, state, colourSet);
+        return true;
+    }
+
+    juce::var mappingLinkGroupsToVar(const NamedSkin& skin)
+    {
+        if (skin.mappingLinkGroups.empty())
+            return {};
+
+        juce::Array<juce::var> groups;
+        for (const auto& group : skin.mappingLinkGroups)
+        {
+            if (group.size() < 2)
+                continue;
+            juce::Array<juce::var> members;
+            for (const auto& key : group)
+                members.add(mappingKeyToVar(key));
+            if (members.size() >= 2)
+                groups.add(juce::var(members));
+        }
+        if (groups.isEmpty())
+            return {};
+        return juce::var(groups);
+    }
+
+    std::vector<std::vector<SkinColourKey>> sanitizeMappingLinkGroups(
+        std::vector<std::vector<SkinColourKey>> groups,
+        const std::set<SkinColourKey>& validKeys)
+    {
+        std::vector<std::vector<SkinColourKey>> cleaned;
+        std::set<SkinColourKey> claimed;
+        for (auto& group : groups)
+        {
+            std::vector<SkinColourKey> kept;
+            for (const auto& key : group)
+            {
+                if (! validKeys.empty() && validKeys.find(key) == validKeys.end())
+                    continue;
+                if (! claimed.insert(key).second)
+                    continue;
+                kept.push_back(key);
+            }
+            if (kept.size() >= 2)
+                cleaned.push_back(std::move(kept));
+        }
+        return cleaned;
+    }
+
+    void mappingLinkGroupsFromVar(const juce::var& groupsVar,
+                                  NamedSkin& out,
+                                  const std::set<SkinColourKey>& validKeys)
+    {
+        out.mappingLinkGroups.clear();
+        auto* groupsArr = groupsVar.getArray();
+        if (groupsArr == nullptr)
+            return;
+
+        std::vector<std::vector<SkinColourKey>> parsed;
+        for (const auto& groupVar : *groupsArr)
+        {
+            auto* membersArr = groupVar.getArray();
+            if (membersArr == nullptr)
+                continue;
+
+            std::vector<SkinColourKey> members;
+            for (const auto& memberVar : *membersArr)
+            {
+                SkinColourKey key;
+                if (! mappingKeyFromVar(memberVar, key))
+                    continue;
+                members.push_back(key);
+            }
+            parsed.push_back(std::move(members));
+        }
+        out.mappingLinkGroups = sanitizeMappingLinkGroups(std::move(parsed), validKeys);
+    }
 }

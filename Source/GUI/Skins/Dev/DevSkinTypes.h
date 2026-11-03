@@ -85,6 +85,12 @@ namespace TSS::DevSkin
          * Omitted from PushPayload; optional in skin JSON as colourSetLabels.
          */
         std::array<juce::String, kAllColourSets.size()> colourSetLabels {};
+        /**
+         * Editor-only bidirectional mapping link groups (full SkinColourKey members).
+         * Omitted from PushPayload; optional in skin JSON as mappingLinkGroups.
+         * Each inner vector has >= 2 keys; a key belongs to at most one group.
+         */
+        std::vector<std::vector<SkinColourKey>> mappingLinkGroups {};
     };
 
     struct PushPayload

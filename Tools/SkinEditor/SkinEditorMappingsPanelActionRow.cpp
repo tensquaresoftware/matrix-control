@@ -3,29 +3,7 @@
 #include "GUI/Skins/Dev/DevSkinKeyNames.h"
 #include "Tools/SkinEditor/SkinEditorChrome.h"
 #include "Tools/SkinEditor/SkinEditorMappingsColumnFilter.h"
-
-namespace
-{
-    struct ColumnLayout
-    {
-        int propertyW = 0;
-        int stateW = 0;
-        int colourSetW = 0;
-        int mappedX = 0;
-        int mappedW = 0;
-    };
-
-    ColumnLayout columnsForWidth(int totalWidth) noexcept
-    {
-        const int mappedSpan = juce::jmin(SkinEditorChrome::kPaletteListPaintWidth,
-                                          juce::jmax(0, totalWidth));
-        return { SkinEditorChrome::kMappingsPropertyColumnWidth,
-                 SkinEditorChrome::kMappingsStateColumnWidth,
-                 SkinEditorChrome::kMappingsColourSetColumnWidth,
-                 totalWidth - mappedSpan,
-                 mappedSpan };
-    }
-}
+#include "Tools/SkinEditor/SkinEditorMappingsColumns.h"
 
 void SkinEditorMappingsPanel::applyObjectComboSelection()
 {
@@ -113,7 +91,7 @@ void SkinEditorMappingsPanel::layoutActionRow(juce::Rectangle<int> actions, int 
                                                           SkinEditorChrome::fontRegular());
     objectLabel_.setBounds(actionRow.removeFromLeft(labelW));
 
-    const auto cols = columnsForWidth(tableW);
+    const auto cols = SkinEditorMappingsColumns::forWidth(tableW);
     // Unbound + badge share Mapped colour column left; optical +1 matches table cells.
     constexpr int kUnboundBadgeGap = 6;
     const auto unboundFont = SkinEditorChrome::fontRegular();
@@ -149,8 +127,7 @@ void SkinEditorMappingsPanel::layoutActionRow(juce::Rectangle<int> actions, int 
                                                         holdColourToggle_.getButtonText())
                       + 16 + 6; // tick box + gap to label
     // Tick box left edge aligns with Colour set column (same origin as table cells).
-    const int colourSetLeft = tableX + SkinEditorChrome::kMappingsColumnPad
-                              + cols.propertyW + cols.stateW;
+    const int colourSetLeft = tableX + cols.colourSetLeft();
     const int holdLeft = SkinEditorChrome::mappingsHoldLeft(holdAnchorLeft, colourSetLeft);
     const int holdMaxRight = unboundLeft - SkinEditorChrome::kButtonGap;
     holdColourToggle_.setBounds(holdLeft, actions.getY(),

@@ -76,6 +76,21 @@ namespace TSS::DevSkin
                                        ColourSet colourSet,
                                        const juce::String& label);
 
+        /**
+         * Replace editor-only mapping link groups (sanitized: orphans dropped, size >= 2).
+         * Does not affect runtime / PushPayload.
+         */
+        juce::Result setMappingLinkGroups(const juce::String& skinId,
+                                          std::vector<std::vector<SkinColourKey>> groups);
+
+        /**
+         * Apply pastilleName to every peer in writerKey's link group (skips writer).
+         * No-op when writer is ungrouped. Hold / mode policy stay with the caller.
+         */
+        juce::Result propagateMappingToLinkPeers(const juce::String& skinId,
+                                                 SkinColourKey writerKey,
+                                                 const juce::String& pastilleName);
+
         std::vector<SkinColourKey> unboundKeys(const juce::String& skinId) const;
         int unboundCount(const juce::String& skinId) const;
         bool isEditorSkinExportAllowed(const juce::String& skinId) const;

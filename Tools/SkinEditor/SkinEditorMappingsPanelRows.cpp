@@ -1,5 +1,8 @@
 #include "Tools/SkinEditor/SkinEditorMappingsPanel.h"
 
+#include <algorithm>
+#include <set>
+
 #include "GUI/Skins/Dev/DevSkinInventory.h"
 #include "GUI/Skins/Dev/DevSkinKeyNames.h"
 #include "Tools/SkinEditor/SkinEditorChrome.h"
@@ -93,6 +96,7 @@ void SkinEditorMappingsPanel::rebuildRows()
     if (skin == nullptr)
     {
         focusedObject_ = -1;
+        selectedKeys_.clear();
         return;
     }
 
@@ -123,6 +127,17 @@ void SkinEditorMappingsPanel::rebuildRows()
 
     if (focusedObject_ >= static_cast<int>(objects_.size()))
         focusedObject_ = -1;
+
+    std::set<TSS::SkinColourKey> visibleKeys;
+    for (const auto& row : rows_)
+        if (row.kind == RowKind::kMapping)
+            visibleKeys.insert(row.key);
+    selectedKeys_.erase(std::remove_if(selectedKeys_.begin(), selectedKeys_.end(),
+                                       [&](const TSS::SkinColourKey& key)
+                                       {
+                                           return visibleKeys.find(key) == visibleKeys.end();
+                                       }),
+                        selectedKeys_.end());
 }
 
 void SkinEditorMappingsPanel::paintColourSetCell(juce::Graphics& g,

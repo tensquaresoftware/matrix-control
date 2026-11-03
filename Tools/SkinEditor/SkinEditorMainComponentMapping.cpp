@@ -223,24 +223,35 @@ void SkinEditorMainComponent::applyMapping(TSS::SkinColourKey key,
         return;
     }
 
+    bool writerAlreadyMapped = false;
     if (const auto* skin = layer_.findSkin(sessionState_.editorSkinId))
     {
         const auto it = skin->mappings.find(key);
-        if (it != skin->mappings.end() && it->second == pastilleName)
+        writerAlreadyMapped = (it != skin->mappings.end() && it->second == pastilleName);
+    }
+
+    if (! writerAlreadyMapped)
+    {
+        const auto result = fromUnbound
+                                ? layer_.bindUnbound(sessionState_.editorSkinId, key, pastilleName)
+                                : layer_.setMapping(sessionState_.editorSkinId, key, pastilleName);
+        if (result.failed())
         {
-            retainMappingModeAfterWrite(key, fromUnbound);
+            juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon,
+                                                   fromUnbound ? "Bind failed" : "Mapping failed",
+                                                   result.getErrorMessage());
             return;
         }
     }
 
-    const auto result = fromUnbound
-                            ? layer_.bindUnbound(sessionState_.editorSkinId, key, pastilleName)
-                            : layer_.setMapping(sessionState_.editorSkinId, key, pastilleName);
-    if (result.failed())
+    const auto peerResult = layer_.propagateMappingToLinkPeers(sessionState_.editorSkinId,
+                                                               key,
+                                                               pastilleName);
+    if (peerResult.failed())
     {
         juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon,
-                                               fromUnbound ? "Bind failed" : "Mapping failed",
-                                               result.getErrorMessage());
+                                               "Link mapping",
+                                               peerResult.getErrorMessage());
         return;
     }
 

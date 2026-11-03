@@ -1,8 +1,10 @@
 #include "GUI/Skins/Dev/DevSkinLayer.h"
 
 #include <algorithm>
+#include <set>
 
 #include "GUI/Skins/Dev/DevSkinInventory.h"
+#include "GUI/Skins/Dev/DevSkinJsonMapping.h"
 #include "GUI/Skins/Dev/DevSkinPaletteCatalog.h"
 #include "GUI/Skins/Dev/DevSkinSsotSeed.h"
 
@@ -76,7 +78,10 @@ namespace TSS::DevSkin
         if (source->kind == SkinKind::kDev && source->palette.empty())
             seedFromCompiled(copy, SkinKind::kCompiledCream);
         if (! copyMappings)
+        {
             copy.mappings.clear();
+            copy.mappingLinkGroups.clear();
+        }
 
         skins_.push_back(std::move(copy));
         activeSkinId_ = skins_.back().id;
@@ -189,6 +194,63 @@ namespace TSS::DevSkin
 
         skin->colourSetLabels[static_cast<size_t>(colourSet)] = sanitizeColourSetLabel(label);
         bump();
+        return juce::Result::ok();
+    }
+
+    juce::Result Layer::setMappingLinkGroups(const juce::String& skinId,
+                                             std::vector<std::vector<SkinColourKey>> groups)
+    {
+        if (isCompiledId(skinId))
+            return juce::Result::fail("Compiled Black/Cream are read-only; Duplicate first");
+
+        auto* skin = findSkinMutable(skinId);
+        if (skin == nullptr)
+            return juce::Result::fail("Dev skin not found");
+
+        const auto inventory = allStructuredKeys();
+        const std::set<SkinColourKey> validKeys(inventory.begin(), inventory.end());
+        skin->mappingLinkGroups = sanitizeMappingLinkGroups(std::move(groups), validKeys);
+        bump();
+        return juce::Result::ok();
+    }
+
+    juce::Result Layer::propagateMappingToLinkPeers(const juce::String& skinId,
+                                                    SkinColourKey writerKey,
+                                                    const juce::String& pastilleName)
+    {
+        const auto* skin = findSkin(skinId);
+        if (skin == nullptr)
+            return juce::Result::fail("Dev skin not found");
+
+        std::vector<SkinColourKey> members;
+        for (const auto& group : skin->mappingLinkGroups)
+        {
+            const bool containsWriter = std::find(group.begin(), group.end(), writerKey)
+                                        != group.end();
+            if (! containsWriter)
+                continue;
+            members = group;
+            break;
+        }
+        if (members.empty())
+            return juce::Result::ok();
+
+        for (const auto& peer : members)
+        {
+            if (peer == writerKey)
+                continue;
+            skin = findSkin(skinId);
+            if (skin == nullptr)
+                return juce::Result::fail("Dev skin not found");
+            const auto it = skin->mappings.find(peer);
+            if (it != skin->mappings.end() && it->second == pastilleName)
+                continue;
+            const auto result = (it == skin->mappings.end())
+                                    ? bindUnbound(skinId, peer, pastilleName)
+                                    : setMapping(skinId, peer, pastilleName);
+            if (result.failed())
+                return result;
+        }
         return juce::Result::ok();
     }
 

@@ -3106,3 +3106,15 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-progressbar-numberbox-caret.md`
   summary: Slider blink caret still resolves from NumberBox EditorText after NumberBox gained its own Caret pastille.
   evidence: Blind Hunter (dedicated code review); frozen Build A Decision; already deferred from build review.
+
+## Deferred from: review of spec-skin-editor-mappings-link.md (2026-11-03)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-link.md`
+  summary: No automated coverage that SkinEditorMainComponent::applyMapping calls propagateMappingToLinkPeers (and Hold retain) after a linked-row bind.
+  evidence: Verification Gap; Matrix-Control_Tests does not drive MainComponent mapping orchestration; Layer propagate + MappingModePolicy Hold tests + manual Recap §9 remain the gate.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-link.md`
+  summary: propagateMappingToLinkPeers does not transactionally roll back earlier peer writes when a later peer bind/set fails (group can be left with mixed pastilles).
+  evidence: Edge Case Hunter; early-return skips Hold retain after failure, but prior successful peer writes stay; full rollback would need Layer API design beyond this build's patch slice.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-link.md`
+  summary: alignGroupPastilles aborts mid-loop on writePastilleToKey failure after the link group is already committed, without rolling back the group or prior aligns.
+  evidence: Edge Case Hunter; same class of partial-write without transactional undo; manual smoke + alert path remain.

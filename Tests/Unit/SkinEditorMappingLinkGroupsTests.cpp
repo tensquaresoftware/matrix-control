@@ -1,0 +1,189 @@
+#include <juce_core/juce_core.h>
+
+#include "GUI/Skins/SkinValues.h"
+#include "Tools/SkinEditor/SkinEditorChromeTokens.h"
+#include "Tools/SkinEditor/SkinEditorMappingLinkGroups.h"
+#include "Tools/SkinEditor/SkinEditorMappingModePolicy.h"
+#include "Tools/SkinEditor/SkinEditorMappingsColumns.h"
+
+class SkinEditorMappingLinkGroupsTests : public juce::UnitTest
+{
+public:
+    SkinEditorMappingLinkGroupsTests()
+        : juce::UnitTest("SkinEditorMappingLinkGroups")
+    {
+    }
+
+    void runTest() override
+    {
+        createMergeRemoveDissolve();
+        winnerPastilleRules();
+        headerStateMachine();
+        objectFilterBlocksCrossObjectExtend();
+        linkColumnHitTest();
+        calmRestAndUnlinkAll();
+    }
+
+private:
+    static TSS::SkinColourKey key(TSS::SkinObjectType object,
+                                  TSS::SkinColourProperty property,
+                                  TSS::SkinColourState state = TSS::SkinColourState::kDefault,
+                                  TSS::ColourSet set = TSS::ColourSet::k1)
+    {
+        return TSS::skinColourKey(object, property, state, set);
+    }
+
+    void createMergeRemoveDissolve()
+    {
+        beginTest("create / merge / remove / dissolve");
+
+        using namespace SkinEditorMappingLink;
+        const auto a = key(TSS::SkinObjectType::kSlider, TSS::SkinColourProperty::kText);
+        const auto b = key(TSS::SkinObjectType::kComboBox, TSS::SkinColourProperty::kText);
+        const auto c = key(TSS::SkinObjectType::kToggle, TSS::SkinColourProperty::kText);
+        const auto d = key(TSS::SkinObjectType::kButton, TSS::SkinColourProperty::kBackground);
+
+        Groups groups;
+        groups = addToContext(std::move(groups), a, b, std::nullopt);
+        expectEquals(static_cast<int>(groups.size()), 1);
+        expectEquals(static_cast<int>(groups[0].size()), 2);
+
+        groups = addToContext(std::move(groups), a, c, std::nullopt);
+        expectEquals(static_cast<int>(groups[0].size()), 3);
+
+        groups = linkOrMerge(std::move(groups), { d, a }, std::nullopt);
+        expectEquals(static_cast<int>(groups.size()), 1);
+        expect(findGroupIndex(groups, b) >= 0);
+        expect(findGroupIndex(groups, d) >= 0);
+        expectEquals(static_cast<int>(groups[0].size()), 4);
+
+        groups = removeMember(std::move(groups), b);
+        expect(findGroupIndex(groups, b) < 0);
+        expectEquals(static_cast<int>(groups[0].size()), 3);
+
+        groups = removeMember(std::move(groups), c);
+        groups = removeMember(std::move(groups), d);
+        expect(groups.empty()); // last pair dissolves when one remains then removed
+        // Rebuild pair then dissolve by removing one of two.
+        groups = addToContext({}, a, b, std::nullopt);
+        groups = removeMember(std::move(groups), a);
+        expect(groups.empty());
+    }
+
+    void winnerPastilleRules()
+    {
+        beginTest("winner pastille: mapped over Unbound; last mapped wins conflicts");
+
+        using namespace SkinEditorMappingLink;
+        const auto a = key(TSS::SkinObjectType::kSlider, TSS::SkinColourProperty::kText);
+        const auto b = key(TSS::SkinObjectType::kComboBox, TSS::SkinColourProperty::kText);
+        const auto c = key(TSS::SkinObjectType::kToggle, TSS::SkinColourProperty::kText);
+
+        std::map<TSS::SkinColourKey, juce::String> mappings;
+        mappings[b] = "Blue";
+        expectEquals(winnerPastille(mappings, { a, b }), juce::String("Blue"));
+
+        mappings[a] = "Red";
+        mappings[c] = "Green";
+        expectEquals(winnerPastille(mappings, { a, b, c }), juce::String("Green"));
+        expectEquals(winnerPastille(mappings, { c, b, a }), juce::String("Red"));
+    }
+
+    void headerStateMachine()
+    {
+        beginTest("header chrome / action from selection");
+
+        using namespace SkinEditorMappingLink;
+        const auto a = key(TSS::SkinObjectType::kSlider, TSS::SkinColourProperty::kText);
+        const auto b = key(TSS::SkinObjectType::kComboBox, TSS::SkinColourProperty::kText);
+        const auto c = key(TSS::SkinObjectType::kToggle, TSS::SkinColourProperty::kText);
+
+        Groups groups;
+        auto empty = headerState(groups, {});
+        expect(empty.chrome == HeaderChrome::kInactiveGrey);
+        expect(empty.action == HeaderAction::kNone);
+        expectEquals(empty.badgeCount, 0);
+
+        auto oneFree = headerState(groups, { a });
+        expect(oneFree.chrome == HeaderChrome::kInactiveGrey);
+        expect(oneFree.action == HeaderAction::kNone);
+
+        auto multiFree = headerState(groups, { a, b });
+        expect(multiFree.chrome == HeaderChrome::kActiveGrey);
+        expect(multiFree.action == HeaderAction::kCreateOrMerge);
+        expectEquals(multiFree.badgeCount, 2);
+
+        groups = addToContext({}, a, b, std::nullopt);
+        auto oneGrouped = headerState(groups, { a });
+        expect(oneGrouped.chrome == HeaderChrome::kYellow);
+        expect(oneGrouped.action == HeaderAction::kUnlinkAll);
+        expectEquals(oneGrouped.badgeCount, 2);
+
+        groups = addToContext(std::move(groups), a, c, std::nullopt);
+        auto mixed = headerState(groups, { a, key(TSS::SkinObjectType::kButton,
+                                                  TSS::SkinColourProperty::kBackground) });
+        expect(mixed.action == HeaderAction::kCreateOrMerge);
+    }
+
+    void objectFilterBlocksCrossObjectExtend()
+    {
+        beginTest("Object filter blocks cross-object create/extend");
+
+        using namespace SkinEditorMappingLink;
+        const auto slider = key(TSS::SkinObjectType::kSlider, TSS::SkinColourProperty::kText);
+        const auto combo = key(TSS::SkinObjectType::kComboBox, TSS::SkinColourProperty::kText);
+        const auto filter = std::optional<TSS::SkinObjectType>(TSS::SkinObjectType::kSlider);
+
+        Groups groups;
+        groups = addToContext(std::move(groups), slider, combo, filter);
+        expect(groups.empty());
+
+        groups = addToContext({}, slider,
+                              key(TSS::SkinObjectType::kSlider, TSS::SkinColourProperty::kBackground),
+                              filter);
+        expectEquals(static_cast<int>(groups.size()), 1);
+    }
+
+    void linkColumnHitTest()
+    {
+        beginTest("isLinkColumn hit geometry");
+
+        using namespace SkinEditorMappingPolicy;
+        expect(isLinkColumn(200, 200, 70));
+        expect(! isLinkColumn(199, 200, 70));
+        expect(! isLinkColumn(270, 200, 70));
+
+        const auto cols = SkinEditorMappingsColumns::forWidth(
+            SkinEditorChrome::kMappingsTablePaintWidth);
+        expectEquals(cols.linkW, SkinEditorChrome::kMappingsLinkColumnWidth);
+        const int expectedLinkLeft = SkinEditorChrome::kMappingsColumnPad
+                                     + SkinEditorChrome::kMappingsPropertyColumnWidth
+                                     + SkinEditorChrome::kMappingsStateColumnWidth
+                                     + SkinEditorChrome::kMappingsColourSetColumnWidth;
+        expectEquals(cols.linkLeft(), expectedLinkLeft);
+        expect(SkinEditorMappingsColumns::isLinkColumnX(expectedLinkLeft, cols));
+        expect(! SkinEditorMappingsColumns::isLinkColumnX(expectedLinkLeft - 1, cols));
+        expect(! SkinEditorMappingsColumns::isLinkColumnX(
+            expectedLinkLeft + SkinEditorChrome::kMappingsLinkColumnWidth, cols));
+    }
+
+    void calmRestAndUnlinkAll()
+    {
+        beginTest("calm rest: no hover chains; unlink-all dissolves group");
+
+        using namespace SkinEditorMappingLink;
+        const auto a = key(TSS::SkinObjectType::kSlider, TSS::SkinColourProperty::kText);
+        const auto b = key(TSS::SkinObjectType::kComboBox, TSS::SkinColourProperty::kText);
+
+        Groups groups = addToContext({}, a, b, std::nullopt);
+        expect(! showsHoverChain(groups, {}, b, std::nullopt));
+        expect(revealedKeys(groups, {}).empty());
+
+        const auto header = headerState(groups, { a });
+        expect(header.action == HeaderAction::kUnlinkAll);
+        groups = unlinkKeys(std::move(groups), { a, b });
+        expect(groups.empty());
+    }
+};
+
+static SkinEditorMappingLinkGroupsTests skinEditorMappingLinkGroupsTests;

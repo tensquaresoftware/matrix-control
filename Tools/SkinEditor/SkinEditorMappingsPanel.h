@@ -1,14 +1,17 @@
 #pragma once
 
 #include <functional>
+#include <optional>
+#include <vector>
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
 #include "GUI/Skins/Dev/DevSkinLayer.h"
 #include "Tools/SkinEditor/SkinEditorChromeTable.h"
+#include "Tools/SkinEditor/SkinEditorMappingLinkGroups.h"
 #include "Tools/SkinEditor/SkinEditorMappingsColumnFilter.h"
 
-/** Scrollable object tables; sticky "Property / State / Colour set / Mapped colour" legend + gap. */
+/** Scrollable object tables; sticky Property/State/Colour set/Link/Mapped legend + gap. */
 class SkinEditorMappingsPanel final : public juce::Component
 {
 public:
@@ -97,6 +100,8 @@ private:
         }
         void paint(juce::Graphics& g) override;
         void mouseUp(const juce::MouseEvent& e) override;
+        void mouseMove(const juce::MouseEvent& e) override;
+        void mouseExit(const juce::MouseEvent& e) override;
         void mouseDoubleClick(const juce::MouseEvent& e) override;
         bool keyPressed(const juce::KeyPress& key) override;
 
@@ -161,14 +166,33 @@ private:
     void paintColourSetCell(juce::Graphics& g,
                             const Row& item,
                             juce::Rectangle<int> cellArea) const;
+    void paintLinkCell(juce::Graphics& g,
+                       const Row& item,
+                       juce::Rectangle<int> cellArea) const;
     void paintFocusedObjectOutline(juce::Graphics& g, int tableX, int tableWidth) const;
 
-    // Bind / focus / Colour set label
+    // Bind / focus / Colour set label / Link
     void tryBindRow(int row);
     /** Bound rows only; Unbound cells are a no-op. */
     void tryEditMappedColour(int row);
     void tryEditColourSetLabel(int row);
     void setFocusedObject(int objectIndex);
+    /** Content row mouseUp after mapping-row identity is known. */
+    void handleMappingRowMouseUp(int row, const juce::MouseEvent& e);
+    void clearRowSelection();
+    void selectRowKey(const TSS::SkinColourKey& key, bool toggle);
+    bool isKeySelected(const TSS::SkinColourKey& key) const noexcept;
+    bool isKeyGroupRevealed(const TSS::SkinColourKey& key) const;
+    std::optional<TSS::SkinObjectType> objectFilterType() const;
+    SkinEditorMappingLink::Groups currentLinkGroups() const;
+    bool commitLinkGroups(SkinEditorMappingLink::Groups groups);
+    void alignGroupPastilles(const std::vector<TSS::SkinColourKey>& orderedKeys);
+    void handleLinkChainClick(const TSS::SkinColourKey& key);
+    void handleLinkHeaderClick();
+    bool handleLinkLegendClick(juce::Point<int> pos);
+    SkinEditorMappingLink::HeaderState linkHeaderState() const;
+    void paintLinkLegend(juce::Graphics& g) const;
+    bool writePastilleToKey(const TSS::SkinColourKey& key, const juce::String& pastilleName);
 
     // Layout
     void layoutShellEmpty(juce::Rectangle<int> content);
@@ -191,7 +215,9 @@ private:
     juce::String skinId_;
     bool readOnly_ = true;
     bool updatingObjectCombo_ = false;
-    int selectedRow_ = -1;
+    /** Ordered multi-select (last = winner pastille anchor). Empty = calm tables. */
+    std::vector<TSS::SkinColourKey> selectedKeys_;
+    std::optional<TSS::SkinColourKey> hoveredLinkKey_;
     int focusedObject_ = -1;
     /** Empty = "- All objects -"; otherwise a SkinObjectType display name. */
     juce::String objectFilterName_;
@@ -233,6 +259,9 @@ private:
     juce::Rectangle<int> mappedLabelBounds_;
     juce::Rectangle<int> mappedSortBounds_;
     juce::Rectangle<int> mappedClearBounds_;
+    juce::Rectangle<int> linkLabelBounds_;
+    juce::Rectangle<int> linkChainBounds_;
+    juce::Rectangle<int> linkBadgeBounds_;
     juce::Viewport viewport_;
     Content content_ { *this };
 };

@@ -337,6 +337,35 @@ namespace SkinEditorChrome
         return kSortBadgeSize;
     }
 
+    void drawLinkChainBadge(juce::Graphics& g, juce::Rectangle<int> area, LinkChainKind kind)
+    {
+        const int side = kLinkChainBadgeSize;
+        const auto badge = badgeSquare(area, side);
+        const bool yellow = (kind == LinkChainKind::kYellow);
+        g.setColour(yellow ? attention() : surfaceTab());
+        g.fillRoundedRectangle(badge.toFloat(), kChromeBadgeCorner);
+
+        // Minimal chain: two overlapping rounded links (glyph colour matches sort badges).
+        const auto glyph = yellow ? surfacePanel() : surfaceSection();
+        const auto b = badge.toFloat().reduced(2.0f);
+        const float linkW = b.getWidth() * 0.55f;
+        const float linkH = b.getHeight() * 0.42f;
+        const float stroke = 1.2f;
+        auto left = juce::Rectangle<float>(b.getX(), b.getCentreY() - linkH * 0.5f, linkW, linkH);
+        auto right = juce::Rectangle<float>(b.getRight() - linkW,
+                                            b.getCentreY() - linkH * 0.5f,
+                                            linkW,
+                                            linkH);
+        g.setColour(glyph);
+        g.drawRoundedRectangle(left, 1.5f, stroke);
+        g.drawRoundedRectangle(right, 1.5f, stroke);
+    }
+
+    int linkChainBadgeWidth()
+    {
+        return kLinkChainBadgeSize;
+    }
+
     void drawChromeBadge(juce::Graphics& g, juce::Rectangle<int> area, const juce::String& text)
     {
         drawChromeBadge(g, area, text, textMuted());

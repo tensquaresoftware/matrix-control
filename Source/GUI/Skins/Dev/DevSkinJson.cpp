@@ -1,5 +1,8 @@
 #include "GUI/Skins/Dev/DevSkinJson.h"
 
+#include <set>
+
+#include "GUI/Skins/Dev/DevSkinInventory.h"
 #include "GUI/Skins/Dev/DevSkinJsonMapping.h"
 #include "GUI/Skins/Dev/DevSkinSsotSeed.h"
 
@@ -102,6 +105,9 @@ namespace TSS::DevSkin
             const auto labels = colourSetLabelsToVar(skin);
             if (! labels.isVoid())
                 obj->setProperty("colourSetLabels", labels);
+            const auto linkGroups = mappingLinkGroupsToVar(skin);
+            if (! linkGroups.isVoid())
+                obj->setProperty("mappingLinkGroups", linkGroups);
             return juce::var(obj);
         }
 
@@ -153,6 +159,10 @@ namespace TSS::DevSkin
             }
 
             colourSetLabelsFromVar(obj->getProperty("colourSetLabels"), out);
+
+            const auto inventory = allStructuredKeys();
+            const std::set<SkinColourKey> validKeys(inventory.begin(), inventory.end());
+            mappingLinkGroupsFromVar(obj->getProperty("mappingLinkGroups"), out, validKeys);
             return true;
         }
     }

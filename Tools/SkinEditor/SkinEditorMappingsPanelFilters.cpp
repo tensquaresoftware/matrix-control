@@ -2,31 +2,12 @@
 
 #include "Tools/SkinEditor/SkinEditorChrome.h"
 #include "Tools/SkinEditor/SkinEditorMappingsColumnFilter.h"
+#include "Tools/SkinEditor/SkinEditorMappingsColumns.h"
 #include "Tools/SkinEditor/SkinEditorMappingsFilterMenu.h"
 
 namespace
 {
     constexpr int kColPad = SkinEditorChrome::kMappingsColumnPad;
-
-    struct ColumnLayout
-    {
-        int propertyW = 0;
-        int stateW = 0;
-        int colourSetW = 0;
-        int mappedX = 0;
-        int mappedW = 0;
-    };
-
-    ColumnLayout columnsForWidth(int totalWidth) noexcept
-    {
-        const int mappedSpan = juce::jmin(SkinEditorChrome::kPaletteListPaintWidth,
-                                          juce::jmax(0, totalWidth));
-        return { SkinEditorChrome::kMappingsPropertyColumnWidth,
-                 SkinEditorChrome::kMappingsStateColumnWidth,
-                 SkinEditorChrome::kMappingsColourSetColumnWidth,
-                 totalWidth - mappedSpan,
-                 mappedSpan };
-    }
 
     juce::PopupMenu::Options filterMenuOptions(juce::Component& host,
                                                juce::Rectangle<int> screenArea)
@@ -239,6 +220,9 @@ void SkinEditorMappingsPanel::clearLegendHitTargets()
     mappedLabelBounds_ = {};
     mappedSortBounds_ = {};
     mappedClearBounds_ = {};
+    linkLabelBounds_ = {};
+    linkChainBounds_ = {};
+    linkBadgeBounds_ = {};
     globalClearBounds_ = {};
 }
 
@@ -249,7 +233,7 @@ void SkinEditorMappingsPanel::layoutLegendHitTargets()
         return;
 
     const auto area = stickyLegendBounds_;
-    const auto cols = columnsForWidth(area.getWidth());
+    const auto cols = SkinEditorMappingsColumns::forWidth(area.getWidth());
     const auto font = SkinEditorChrome::fontBold();
     const int gap = SkinEditorChrome::kButtonGap;
     const int sortW = SkinEditorChrome::sortBadgeWidth();
@@ -264,10 +248,27 @@ void SkinEditorMappingsPanel::layoutLegendHitTargets()
                                     &stateLabelBounds_, &stateSortBounds_,
                                     &stateClearBounds_, stateFilter_.isNotEmpty() });
     placeLegendColumn(area, font,
-                      { "Colour set", area.getX() + kColPad + cols.propertyW + cols.stateW,
+                      { "Colour set", area.getX() + cols.colourSetLeft(),
                         juce::jmax(0, cols.colourSetW - 4),
                         &colourSetLabelBounds_, &colourSetSortBounds_,
                         &colourSetClearBounds_, colourSetFilter_.isNotEmpty() });
+
+    // Link: title + chain control + optional count badge (not sortable / filterable).
+    const int linkChainW = SkinEditorChrome::linkChainBadgeWidth();
+    const auto linkHeader = linkHeaderState();
+    const int linkCountW = (linkHeader.badgeCount > 0)
+                               ? (gap + SkinEditorChrome::countBadgeWidth(linkHeader.badgeCount))
+                               : 0;
+    const int linkTitleMax = juce::jmax(0, cols.linkW - gap - linkChainW - linkCountW);
+    const int linkTitleW = juce::jmin(linkTitleMax,
+                                     SkinEditorChrome::measureTextWidth(font, "Link"));
+    const int linkX = area.getX() + cols.linkLeft();
+    linkLabelBounds_ = { linkX, area.getY(), linkTitleW + gap + linkChainW, area.getHeight() };
+    linkChainBounds_ = { linkX + linkTitleW + gap, area.getY(), linkChainW, area.getHeight() };
+    if (linkHeader.badgeCount > 0)
+        linkBadgeBounds_ = { linkChainBounds_.getRight() + gap, area.getY(),
+                             SkinEditorChrome::countBadgeWidth(linkHeader.badgeCount),
+                             area.getHeight() };
 
     const int mappedReserve = (gap + sortW)
                               + (mappedColourFilter_.isNotEmpty()
@@ -299,7 +300,7 @@ void SkinEditorMappingsPanel::paintStickyLegend(juce::Graphics& g, juce::Rectang
 {
     SkinEditorChrome::fillTableRow(g, { area.toFloat(), SkinEditorChrome::surfaceSection(),
                                         true, true });
-    const auto cols = columnsForWidth(area.getWidth());
+    const auto cols = SkinEditorMappingsColumns::forWidth(area.getWidth());
     const auto font = SkinEditorChrome::fontBold();
     g.setFont(font);
 
@@ -328,6 +329,7 @@ void SkinEditorMappingsPanel::paintStickyLegend(juce::Graphics& g, juce::Rectang
                 stateFilter_.isNotEmpty(), FilterColumn::kState);
     paintColumn("Colour set", colourSetLabelBounds_, colourSetSortBounds_, colourSetClearBounds_,
                 colourSetFilter_.isNotEmpty(), FilterColumn::kColourSet);
+    paintLinkLegend(g);
 
     const int mappedReserve = (SkinEditorChrome::kButtonGap + SkinEditorChrome::sortBadgeWidth())
                               + (mappedColourFilter_.isNotEmpty()
@@ -383,6 +385,8 @@ void SkinEditorMappingsPanel::mouseUp(const juce::MouseEvent& e)
 
     const auto pos = e.getPosition();
     if (handleLegendClearClick(pos))
+        return;
+    if (handleLinkLegendClick(pos))
         return;
 
     auto handleHeader = [&](FilterColumn column, juce::Rectangle<int> bounds)

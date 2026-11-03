@@ -93,11 +93,13 @@ private:
         expectEquals(SkinEditorChrome::kMappingsPropertyColumnWidth, 150);
         expectEquals(SkinEditorChrome::kMappingsStateColumnWidth, 75);
         expectEquals(SkinEditorChrome::kMappingsColourSetColumnWidth, 130);
-        expectEquals(SkinEditorChrome::kMappingsTablePaintWidth, 491);
-        expectEquals(SkinEditorChrome::kMappingsPanelWidth, 521);
+        expectEquals(SkinEditorChrome::kMappingsLinkColumnWidth, 70);
+        expectEquals(SkinEditorChrome::kMappingsTablePaintWidth, 561);
+        expectEquals(SkinEditorChrome::kMappingsPanelWidth, 591);
         expect(SkinEditorChrome::kMappingsPropertyColumnWidth % 5 == 0);
         expect(SkinEditorChrome::kMappingsStateColumnWidth % 5 == 0);
         expect(SkinEditorChrome::kMappingsColourSetColumnWidth % 5 == 0);
+        expect(SkinEditorChrome::kMappingsLinkColumnWidth % 5 == 0);
         expectEquals(SkinEditorChrome::kObjectComboWidth, 158);
         // Hold aligns to Colour set column when that is farther than Object[+clear]+button gap.
         expectEquals(SkinEditorChrome::mappingsHoldLeft(100, 200), 200);
@@ -105,15 +107,17 @@ private:
                      200 + SkinEditorChrome::kButtonGap);
         expectEquals(juce::String(SkinEditorChrome::kAllObjectsComboText),
                      juce::String("- All objects -"));
-        // Build B: Hold Colour-set alignment + Colour set widen; no Link column in paint width.
+        // Build C: Link column between Colour set and Mapped colour.
         expectEquals(SkinEditorChrome::kMappingsTablePaintWidth,
                      SkinEditorChrome::kMappingsColumnPad
                          + SkinEditorChrome::kMappingsPropertyColumnWidth
                          + SkinEditorChrome::kMappingsStateColumnWidth
                          + SkinEditorChrome::kMappingsColourSetColumnWidth
+                         + SkinEditorChrome::kMappingsLinkColumnWidth
                          + SkinEditorChrome::kPaletteListPaintWidth);
         expect(SkinEditorChrome::kMappingsPanelWidth
                < SkinEditorChrome::kLegacyWindowMaxWidth / 2);
+        expectEquals(SkinEditorChrome::kLinkChainBadgeSize, SkinEditorChrome::kSortBadgeSize);
     }
 
     static juce::TextButton* findButton(juce::Component& root, const juce::String& text)

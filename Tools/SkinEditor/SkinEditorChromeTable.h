@@ -109,6 +109,17 @@ namespace SkinEditorChrome
 
     int sortBadgeWidth();
 
+    /** Link chain chip: grey (inactive / hover) or yellow (linked / unlink header). */
+    enum class LinkChainKind
+    {
+        kGrey,
+        kYellow
+    };
+
+    void drawLinkChainBadge(juce::Graphics& g, juce::Rectangle<int> area, LinkChainKind kind);
+
+    int linkChainBadgeWidth();
+
     /**
      * Chrome text badge - Inter rectangle (MAPPING / BRIDGE / LAST PUSH / APP).
      * Do not reuse plugin FooterPanel badge APIs or count-capsule badges.

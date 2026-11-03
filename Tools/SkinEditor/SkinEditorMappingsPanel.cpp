@@ -6,49 +6,14 @@
 
 #include "Tools/SkinEditor/SkinEditorChrome.h"
 #include "Tools/SkinEditor/SkinEditorMappingModePolicy.h"
+#include "Tools/SkinEditor/SkinEditorMappingsColumns.h"
 
 namespace
 {
     constexpr int kColPad = SkinEditorChrome::kMappingsColumnPad;
-    // Match Palette selection-highlight width (kPaletteListPaintWidth).
-    constexpr int kMappedSwatchToTableRight = SkinEditorChrome::kPaletteListPaintWidth;
     constexpr int kSwatchSize = SkinEditorChrome::kColourSwatchSize;
     constexpr int kEdgeExtra = 4; // first/last row air so edge gaps match inter-swatch 8px
     constexpr int kFocusPad = SkinEditorChrome::kMappingsFocusPad;
-
-    struct ColumnLayout
-    {
-        int propertyW = 0;
-        int stateW = 0;
-        int colourSetW = 0;
-        int mappedX = 0;
-        int mappedW = 0;
-    };
-
-    ColumnLayout columnsForWidth(int totalWidth) noexcept
-    {
-        const int mappedSpan = juce::jmin(kMappedSwatchToTableRight, juce::jmax(0, totalWidth));
-        const int mappedX = totalWidth - mappedSpan;
-        // Fixed Property|State|Colour set; when paint width matches SSOT,
-        // mappedX == pad + Property + State + ColourSet.
-        return { SkinEditorChrome::kMappingsPropertyColumnWidth,
-                 SkinEditorChrome::kMappingsStateColumnWidth,
-                 SkinEditorChrome::kMappingsColourSetColumnWidth,
-                 mappedX,
-                 mappedSpan };
-    }
-
-    int colourSetColumnLeft(const ColumnLayout& cols) noexcept
-    {
-        return kColPad + cols.propertyW + cols.stateW;
-    }
-
-    bool isColourSetColumnX(int x, const ColumnLayout& cols) noexcept
-    {
-        return SkinEditorMappingPolicy::isColourSetColumn(x,
-                                                          colourSetColumnLeft(cols),
-                                                          cols.colourSetW);
-    }
 }
 
 SkinEditorMappingsPanel::SkinEditorMappingsPanel()
@@ -109,6 +74,7 @@ void SkinEditorMappingsPanel::setActiveSkinId(const juce::String& skinId)
     skinId_ = skinId;
     clearAllColumnFilters();
     objectFilterName_.clear();
+    clearRowSelection();
     sortSpec_ = SkinEditorMappingsColumnFilter::defaultMappingsSortSpec();
 }
 
@@ -125,7 +91,7 @@ void SkinEditorMappingsPanel::setReadOnly(bool readOnly)
 
 void SkinEditorMappingsPanel::refresh()
 {
-    selectedRow_ = -1;
+    hoveredLinkKey_.reset();
     const auto scrollAnchor = captureViewScrollAnchor();
     rebuildRows();
     rebuildObjectCombo();
@@ -172,7 +138,7 @@ void SkinEditorMappingsPanel::paintMappingCells(juce::Graphics& g,
     const int x0 = cellArea.getX();
     const int contentY = cellArea.getY();
     const int contentH = cellArea.getHeight();
-    const auto cols = columnsForWidth(cellArea.getWidth());
+    const auto cols = SkinEditorMappingsColumns::forWidth(cellArea.getWidth());
     g.setFont(SkinEditorChrome::fontRegular());
     g.setColour(SkinEditorChrome::textTableBody());
     g.drawText(item.propertyLabel, x0 + kColPad, contentY, juce::jmax(0, cols.propertyW - 4), contentH,
@@ -181,10 +147,11 @@ void SkinEditorMappingsPanel::paintMappingCells(juce::Graphics& g,
                contentH, juce::Justification::centredLeft, false);
 
     paintColourSetCell(g, item,
-                       { x0 + kColPad + cols.propertyW + cols.stateW,
+                       { x0 + cols.colourSetLeft(),
                          contentY,
                          juce::jmax(0, cols.colourSetW - 4),
                          contentH });
+    paintLinkCell(g, item, { x0 + cols.linkLeft(), contentY, cols.linkW, contentH });
 
     if (item.unbound)
     {
@@ -282,7 +249,9 @@ void SkinEditorMappingsPanel::Content::paint(juce::Graphics& g)
                                          || owner_.rows_[static_cast<size_t>(i + 1)].kind != RowKind::kMapping);
             const auto rowArea = juce::Rectangle<float>((float) x0, (float) y, (float) width,
                                                         (float) item.heightPx);
-            owner_.paintRow(g, { &item, rowArea, roundBottom, i == owner_.selectedRow_ });
+            const bool highlighted = item.kind == RowKind::kMapping
+                                     && owner_.isKeyGroupRevealed(item.key);
+            owner_.paintRow(g, { &item, rowArea, roundBottom, highlighted });
         }
         y = nextY;
     }
@@ -302,30 +271,73 @@ void SkinEditorMappingsPanel::Content::mouseUp(const juce::MouseEvent& e)
 
     if (item.objectIndex >= 0)
         owner_.setFocusedObject(item.objectIndex);
-
     if (item.kind != RowKind::kMapping)
         return;
 
-    owner_.selectedRow_ = row;
+    owner_.handleMappingRowMouseUp(row, e);
     grabKeyboardFocus();
     repaint();
+    owner_.repaint();
+}
 
-    const auto cols = columnsForWidth(owner_.paintWidth());
-    const int mappedX = cols.mappedX;
-    const bool releaseInMapped = SkinEditorMappingPolicy::isMappedColourColumn(e.x, mappedX);
-    const bool pressInMapped = SkinEditorMappingPolicy::isMappedColourColumn(e.getMouseDownX(), mappedX);
-    if (releaseInMapped != pressInMapped)
-        return; // press and release in different columns: highlight/focus only
-
-    if (releaseInMapped)
+void SkinEditorMappingsPanel::handleMappingRowMouseUp(int row, const juce::MouseEvent& e)
+{
+    const auto& item = rows_[static_cast<size_t>(row)];
+    const auto cols = SkinEditorMappingsColumns::forWidth(paintWidth());
+    const bool releaseInLink = SkinEditorMappingsColumns::isLinkColumnX(e.x, cols);
+    const bool pressInLink = SkinEditorMappingsColumns::isLinkColumnX(e.getMouseDownX(), cols);
+    if (releaseInLink && pressInLink)
     {
-        owner_.tryEditMappedColour(row);
+        handleLinkChainClick(item.key);
         return;
     }
-    if (isColourSetColumnX(e.x, cols) || isColourSetColumnX(e.getMouseDownX(), cols))
-        return; // Colour set: double-click edits the shared label; never bind
 
-    owner_.tryBindRow(row);
+    const bool toggle = e.mods.isCommandDown();
+    selectRowKey(item.key, toggle);
+
+    const bool releaseInMapped = SkinEditorMappingPolicy::isMappedColourColumn(e.x, cols.mappedX);
+    const bool pressInMapped = SkinEditorMappingPolicy::isMappedColourColumn(e.getMouseDownX(),
+                                                                            cols.mappedX);
+    if (releaseInMapped != pressInMapped || releaseInLink || pressInLink)
+        return;
+    if (releaseInMapped)
+    {
+        tryEditMappedColour(row);
+        return;
+    }
+    if (SkinEditorMappingsColumns::isColourSetColumnX(e.x, cols)
+        || SkinEditorMappingsColumns::isColourSetColumnX(e.getMouseDownX(), cols))
+        return;
+    if (! toggle)
+        tryBindRow(row);
+}
+
+void SkinEditorMappingsPanel::Content::mouseMove(const juce::MouseEvent& e)
+{
+    const int row = owner_.rowIndexAtY(e.y);
+    std::optional<TSS::SkinColourKey> next;
+    if (row >= 0)
+    {
+        const auto& item = owner_.rows_[static_cast<size_t>(row)];
+        if (item.kind == RowKind::kMapping
+            && SkinEditorMappingLink::showsHoverChain(owner_.currentLinkGroups(),
+                                                      owner_.selectedKeys_,
+                                                      item.key,
+                                                      owner_.objectFilterType()))
+            next = item.key;
+    }
+    if (next == owner_.hoveredLinkKey_)
+        return;
+    owner_.hoveredLinkKey_ = next;
+    repaint();
+}
+
+void SkinEditorMappingsPanel::Content::mouseExit(const juce::MouseEvent&)
+{
+    if (! owner_.hoveredLinkKey_.has_value())
+        return;
+    owner_.hoveredLinkKey_.reset();
+    repaint();
 }
 
 void SkinEditorMappingsPanel::Content::mouseDoubleClick(const juce::MouseEvent& e)
@@ -338,8 +350,8 @@ void SkinEditorMappingsPanel::Content::mouseDoubleClick(const juce::MouseEvent& 
     if (item.kind != RowKind::kMapping)
         return;
 
-    const auto cols = columnsForWidth(owner_.paintWidth());
-    if (! isColourSetColumnX(e.x, cols))
+    const auto cols = SkinEditorMappingsColumns::forWidth(owner_.paintWidth());
+    if (! SkinEditorMappingsColumns::isColourSetColumnX(e.x, cols))
         return;
 
     owner_.tryEditColourSetLabel(row);
