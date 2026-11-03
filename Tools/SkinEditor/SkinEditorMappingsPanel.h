@@ -5,8 +5,10 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 
 #include "GUI/Skins/Dev/DevSkinLayer.h"
+#include "Tools/SkinEditor/SkinEditorChromeTable.h"
+#include "Tools/SkinEditor/SkinEditorMappingsColumnFilter.h"
 
-/** Scrollable object tables; sticky "Property / State / Mapped colour" legend + gap. */
+/** Scrollable object tables; sticky "Property / State / Colour set / Mapped colour" legend + gap. */
 class SkinEditorMappingsPanel final : public juce::Component
 {
 public:
@@ -65,6 +67,8 @@ private:
         juce::String propertyLabel;
         juce::String stateLabel;
         juce::String colourSetLabel;
+        /** Editor-only shared help text for this ColourSet index (may be empty). */
+        juce::String colourSetHelpLabel;
         juce::String pastilleName;
         juce::uint32 pastilleArgb = 0;
         bool pastillePending = false;
@@ -93,6 +97,7 @@ private:
         }
         void paint(juce::Graphics& g) override;
         void mouseUp(const juce::MouseEvent& e) override;
+        void mouseDoubleClick(const juce::MouseEvent& e) override;
         bool keyPressed(const juce::KeyPress& key) override;
 
     private:
@@ -120,7 +125,10 @@ private:
     Row makeMappingRow(const TSS::DevSkin::NamedSkin& skin,
                        const TSS::SkinColourKey& key,
                        int objectIndex) const;
-    void rebuildObjectCombo(const juce::String& preferName);
+    void rebuildObjectCombo();
+    void applyObjectComboSelection();
+    void clearObjectMacroFilter();
+    bool isObjectMacroFilterActive() const noexcept { return objectFilterName_.isNotEmpty(); }
 
     // Column filters (sticky legend)
     void clearAllColumnFilters();
@@ -139,6 +147,10 @@ private:
     void layoutLegendHitTargets();
     void layoutGlobalClearBounds();
     void clearLegendHitTargets();
+    bool handleLegendClearClick(juce::Point<int> pos);
+    void cycleColumnSort(FilterColumn column);
+    SkinEditorMappingsColumnFilter::SortColumn sortColumnFor(FilterColumn column) const noexcept;
+    SkinEditorChrome::SortPictoKind sortPictoFor(FilterColumn column) const noexcept;
 
     // Paint
     void paintStickyLegend(juce::Graphics& g, juce::Rectangle<int> area) const;
@@ -146,14 +158,17 @@ private:
     void paintMappingCells(juce::Graphics& g,
                            const Row& item,
                            juce::Rectangle<int> cellArea) const;
+    void paintColourSetCell(juce::Graphics& g,
+                            const Row& item,
+                            juce::Rectangle<int> cellArea) const;
     void paintFocusedObjectOutline(juce::Graphics& g, int tableX, int tableWidth) const;
 
-    // Bind / focus
+    // Bind / focus / Colour set label
     void tryBindRow(int row);
     /** Bound rows only; Unbound cells are a no-op. */
     void tryEditMappedColour(int row);
-    void setFocusedObject(int objectIndex, bool scrollIntoPlace);
-    void scrollFocusedObjectIntoPlace();
+    void tryEditColourSetLabel(int row);
+    void setFocusedObject(int objectIndex);
 
     // Layout
     void layoutShellEmpty(juce::Rectangle<int> content);
@@ -178,6 +193,9 @@ private:
     bool updatingObjectCombo_ = false;
     int selectedRow_ = -1;
     int focusedObject_ = -1;
+    /** Empty = "- All objects -"; otherwise a SkinObjectType display name. */
+    juce::String objectFilterName_;
+    SkinEditorMappingsColumnFilter::SortSpec sortSpec_ {};
     std::vector<Row> rows_;
     std::vector<ObjectTable> objects_;
 
@@ -193,6 +211,8 @@ private:
     int unboundCount_ = 0;
     juce::Rectangle<int> unboundLabelBounds_;
     juce::Rectangle<int> unboundBadgeBounds_;
+    /** Yellow clear badge right of Object combo when a single object is selected. */
+    juce::Rectangle<int> objectClearBounds_;
     /** Global clear-all filters badge (legend-row gutter); empty when no filter active. */
     juce::Rectangle<int> globalClearBounds_;
     /** Empty = filter off. Mapped colour may be the literal "Unbound". */
@@ -201,12 +221,16 @@ private:
     juce::String colourSetFilter_;
     juce::String mappedColourFilter_;
     juce::Rectangle<int> propertyLabelBounds_;
+    juce::Rectangle<int> propertySortBounds_;
     juce::Rectangle<int> propertyClearBounds_;
     juce::Rectangle<int> stateLabelBounds_;
+    juce::Rectangle<int> stateSortBounds_;
     juce::Rectangle<int> stateClearBounds_;
     juce::Rectangle<int> colourSetLabelBounds_;
+    juce::Rectangle<int> colourSetSortBounds_;
     juce::Rectangle<int> colourSetClearBounds_;
     juce::Rectangle<int> mappedLabelBounds_;
+    juce::Rectangle<int> mappedSortBounds_;
     juce::Rectangle<int> mappedClearBounds_;
     juce::Viewport viewport_;
     Content content_ { *this };

@@ -97,6 +97,11 @@ namespace TSS::DevSkin
             for (const auto& [key, paletteName] : skin.mappings)
                 mappings.add(mappingToVar(key, paletteName));
             obj->setProperty("mappings", mappings);
+
+            // Editor-only metadata: omit when empty; never written into PushPayload.
+            const auto labels = colourSetLabelsToVar(skin);
+            if (! labels.isVoid())
+                obj->setProperty("colourSetLabels", labels);
             return juce::var(obj);
         }
 
@@ -146,6 +151,8 @@ namespace TSS::DevSkin
                     out.mappings[key] = paletteName;
                 }
             }
+
+            colourSetLabelsFromVar(obj->getProperty("colourSetLabels"), out);
             return true;
         }
     }

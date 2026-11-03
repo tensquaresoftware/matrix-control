@@ -176,6 +176,36 @@ namespace TSS::DevSkin
         return setMapping(skinId, key, pastilleName);
     }
 
+    juce::Result Layer::setColourSetLabel(const juce::String& skinId,
+                                          ColourSet colourSet,
+                                          const juce::String& label)
+    {
+        if (isCompiledId(skinId))
+            return juce::Result::fail("Compiled Black/Cream are read-only; Duplicate first");
+
+        auto* skin = findSkinMutable(skinId);
+        if (skin == nullptr)
+            return juce::Result::fail("Dev skin not found");
+
+        auto trimmed = label.trim();
+        if (trimmed.length() > kColourSetLabelMaxChars)
+            trimmed = trimmed.substring(0, kColourSetLabelMaxChars);
+
+        const auto& allowed = colourSetLabelAllowedChars();
+        juce::String asciiOnly;
+        asciiOnly.preallocateBytes(static_cast<size_t>(trimmed.length()));
+        for (int i = 0; i < trimmed.length(); ++i)
+        {
+            const auto ch = trimmed[i];
+            if (allowed.containsChar(ch))
+                asciiOnly += ch;
+        }
+
+        skin->colourSetLabels[static_cast<size_t>(colourSet)] = asciiOnly;
+        bump();
+        return juce::Result::ok();
+    }
+
     std::vector<SkinColourKey> Layer::unboundKeys(const juce::String& skinId) const
     {
         std::vector<SkinColourKey> unbound;

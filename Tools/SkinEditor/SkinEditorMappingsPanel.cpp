@@ -29,13 +29,19 @@ namespace
     {
         const int mappedSpan = juce::jmin(kMappedSwatchToTableRight, juce::jmax(0, totalWidth));
         const int mappedX = totalWidth - mappedSpan;
-        // Fixed Property|State|Set; when paint width matches SSOT,
+        // Fixed Property|State|Colour set; when paint width matches SSOT,
         // mappedX == pad + Property + State + ColourSet.
         return { SkinEditorChrome::kMappingsPropertyColumnWidth,
                  SkinEditorChrome::kMappingsStateColumnWidth,
                  SkinEditorChrome::kMappingsColourSetColumnWidth,
                  mappedX,
                  mappedSpan };
+    }
+
+    bool isColourSetColumnX(int x, const ColumnLayout& cols) noexcept
+    {
+        const int left = kColPad + cols.propertyW + cols.stateW;
+        return x >= left && x < left + cols.colourSetW;
     }
 }
 
@@ -61,8 +67,7 @@ SkinEditorMappingsPanel::SkinEditorMappingsPanel()
     {
         if (updatingObjectCombo_)
             return;
-        // Item IDs are 1-based object table indices (combo display is A-Z).
-        setFocusedObject(objectCombo_.getSelectedId() - 1, true);
+        applyObjectComboSelection();
     };
     addAndMakeVisible(objectCombo_);
 
@@ -82,7 +87,7 @@ SkinEditorMappingsPanel::SkinEditorMappingsPanel()
     viewport_.setScrollBarsShown(true, false);
     viewport_.setScrollBarThickness(SkinEditorChrome::kScrollTrackWidth);
     viewport_.setColour(juce::ScrollBar::backgroundColourId, juce::Colours::transparentBlack);
-    content_.setPaintingIsUnclipped(true); // allow 1 px focus stroke to sit flush outside
+    content_.setPaintingIsUnclipped(true);
     addAndMakeVisible(viewport_);
 }
 
@@ -97,6 +102,8 @@ void SkinEditorMappingsPanel::setActiveSkinId(const juce::String& skinId)
         return;
     skinId_ = skinId;
     clearAllColumnFilters();
+    objectFilterName_.clear();
+    sortSpec_ = {};
 }
 
 void SkinEditorMappingsPanel::setUnboundCount(int count)
@@ -114,12 +121,8 @@ void SkinEditorMappingsPanel::refresh()
 {
     selectedRow_ = -1;
     const auto scrollAnchor = captureViewScrollAnchor();
-    const juce::String keep = (focusedObject_ >= 0
-                               && focusedObject_ < static_cast<int>(objects_.size()))
-                                  ? objects_[static_cast<size_t>(focusedObject_)].name
-                                  : juce::String();
     rebuildRows();
-    rebuildObjectCombo(keep);
+    rebuildObjectCombo();
     resized();
     layoutContent();
     // Object-relative restore: absolute Y jumps when filters rewrite groups above the view.
@@ -127,42 +130,6 @@ void SkinEditorMappingsPanel::refresh()
     // Unbound witness is painted on the panel (not Content) — must damage both.
     content_.repaint();
     repaint();
-}
-
-// Rebuild (row builders live in SkinEditorMappingsPanelRows.cpp)
-
-void SkinEditorMappingsPanel::rebuildObjectCombo(const juce::String& preferName)
-{
-    updatingObjectCombo_ = true;
-    objectCombo_.clear(juce::dontSendNotification);
-
-    std::vector<std::pair<juce::String, int>> items;
-    items.reserve(objects_.size());
-    for (int i = 0; i < static_cast<int>(objects_.size()); ++i)
-        items.emplace_back(objects_[static_cast<size_t>(i)].name, i);
-
-    std::sort(items.begin(), items.end(),
-              [](const auto& a, const auto& b)
-              {
-                  return a.first.compareIgnoreCase(b.first) < 0;
-              });
-
-    int selectedObject = objects_.empty() ? -1 : 0;
-    for (const auto& item : items)
-    {
-        objectCombo_.addItem(item.first, item.second + 1);
-        if (preferName.isNotEmpty() && item.first == preferName)
-            selectedObject = item.second;
-    }
-
-    focusedObject_ = -1;
-    if (selectedObject >= 0)
-    {
-        objectCombo_.setSelectedId(selectedObject + 1, juce::dontSendNotification);
-        focusedObject_ = selectedObject;
-    }
-    objectCombo_.setEnabled(! objects_.empty());
-    updatingObjectCombo_ = false;
 }
 
 // Paint (paintStickyLegend lives in SkinEditorMappingsPanelFilters.cpp)
@@ -185,6 +152,9 @@ void SkinEditorMappingsPanel::paint(juce::Graphics& g)
         SkinEditorChrome::drawCountBadge(g, unboundBadgeBounds_, unboundCount_, unboundColour);
     }
 
+    if (! objectClearBounds_.isEmpty())
+        SkinEditorChrome::drawClearBadge(g, objectClearBounds_);
+
     if (! globalClearBounds_.isEmpty())
         SkinEditorChrome::drawClearBadge(g, globalClearBounds_);
 }
@@ -203,13 +173,12 @@ void SkinEditorMappingsPanel::paintMappingCells(juce::Graphics& g,
                juce::Justification::centredLeft, false);
     g.drawText(item.stateLabel, x0 + kColPad + cols.propertyW, contentY, juce::jmax(0, cols.stateW - 4),
                contentH, juce::Justification::centredLeft, false);
-    g.drawText(item.colourSetLabel,
-               x0 + kColPad + cols.propertyW + cols.stateW,
-               contentY,
-               juce::jmax(0, cols.colourSetW - 4),
-               contentH,
-               juce::Justification::centredLeft,
-               false);
+
+    paintColourSetCell(g, item,
+                       { x0 + kColPad + cols.propertyW + cols.stateW,
+                         contentY,
+                         juce::jmax(0, cols.colourSetW - 4),
+                         contentH });
 
     if (item.unbound)
     {
@@ -263,6 +232,9 @@ void SkinEditorMappingsPanel::paintFocusedObjectOutline(juce::Graphics& g,
                                                         int tableX,
                                                         int tableWidth) const
 {
+    // Single-object macro-filter already isolates the table — no focus ring.
+    if (isObjectMacroFilterActive())
+        return;
     if (focusedObject_ < 0 || focusedObject_ >= static_cast<int>(objects_.size()))
         return;
 
@@ -323,7 +295,7 @@ void SkinEditorMappingsPanel::Content::mouseUp(const juce::MouseEvent& e)
         return;
 
     if (item.objectIndex >= 0)
-        owner_.setFocusedObject(item.objectIndex, false);
+        owner_.setFocusedObject(item.objectIndex);
 
     if (item.kind != RowKind::kMapping)
         return;
@@ -332,16 +304,39 @@ void SkinEditorMappingsPanel::Content::mouseUp(const juce::MouseEvent& e)
     grabKeyboardFocus();
     repaint();
 
-    const int mappedX = columnsForWidth(owner_.paintWidth()).mappedX;
+    const auto cols = columnsForWidth(owner_.paintWidth());
+    const int mappedX = cols.mappedX;
     const bool releaseInMapped = SkinEditorMappingPolicy::isMappedColourColumn(e.x, mappedX);
     const bool pressInMapped = SkinEditorMappingPolicy::isMappedColourColumn(e.getMouseDownX(), mappedX);
     if (releaseInMapped != pressInMapped)
         return; // press and release in different columns: highlight/focus only
 
     if (releaseInMapped)
+    {
         owner_.tryEditMappedColour(row);
-    else
-        owner_.tryBindRow(row);
+        return;
+    }
+    if (isColourSetColumnX(e.x, cols) || isColourSetColumnX(e.getMouseDownX(), cols))
+        return; // Colour set: double-click edits the shared label; never bind
+
+    owner_.tryBindRow(row);
+}
+
+void SkinEditorMappingsPanel::Content::mouseDoubleClick(const juce::MouseEvent& e)
+{
+    const int row = owner_.rowIndexAtY(e.y);
+    if (row < 0)
+        return;
+
+    const auto& item = owner_.rows_[static_cast<size_t>(row)];
+    if (item.kind != RowKind::kMapping)
+        return;
+
+    const auto cols = columnsForWidth(owner_.paintWidth());
+    if (! isColourSetColumnX(e.x, cols))
+        return;
+
+    owner_.tryEditColourSetLabel(row);
 }
 
 bool SkinEditorMappingsPanel::Content::keyPressed(const juce::KeyPress& key)
@@ -376,6 +371,7 @@ void SkinEditorMappingsPanel::layoutShellEmpty(juce::Rectangle<int> content)
     holdColourToggle_.setBounds({});
     unboundLabelBounds_ = {};
     unboundBadgeBounds_ = {};
+    objectClearBounds_ = {};
     stickyBandBounds_ = {};
     stickyLegendBounds_ = {};
     clearLegendHitTargets();

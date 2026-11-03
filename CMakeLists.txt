@@ -615,12 +615,14 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/SkinColourWiringCoverageTests.cpp
         Tests/Unit/ColourSetModelTests.cpp
         Tests/Unit/DevSkinLayerJsonTests.cpp
+        Tests/Unit/DevSkinColourSetLabelsTests.cpp
         Tests/Unit/DevSkinLaunchProductTests.cpp
         Tests/Unit/DevSkinCompiledSeedOverlayTests.cpp
         Tests/Unit/DevSkinMatrixTests.cpp
         Tests/Unit/DevSkinPendingPastilleTests.cpp
         Tests/Unit/SkinEditorMappingModePolicyTests.cpp
         Tests/Unit/SkinEditorMappingsColumnFilterTests.cpp
+        Tests/Unit/SkinEditorMappingsSortErgoTests.cpp
         Tests/Unit/SkinEditorChromeLayoutTests.cpp
         Tests/Unit/SkinEditorColourPickerTests.cpp
         Tools/SkinEditor/SkinEditorChromePanel.cpp
@@ -1224,6 +1226,7 @@ if(MATRIX_BUILD_SKIN_EDITOR)
         Tools/SkinEditor/SkinEditorMappingsPanelActionRow.cpp
         Tools/SkinEditor/SkinEditorMappingsPanelRows.cpp
         Tools/SkinEditor/SkinEditorMappingsPanelFilters.cpp
+        Tools/SkinEditor/SkinEditorMappingsFilterMenu.cpp
         Tools/SkinEditor/SkinEditorSkinsPanel.cpp
         ${MATRIX_SKIN_DEV_LAYER_SOURCES}
         Source/GUI/Skins/Skin.cpp

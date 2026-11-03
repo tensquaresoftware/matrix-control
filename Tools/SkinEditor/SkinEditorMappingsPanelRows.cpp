@@ -4,11 +4,13 @@
 #include "GUI/Skins/Dev/DevSkinKeyNames.h"
 #include "Tools/SkinEditor/SkinEditorChrome.h"
 #include "Tools/SkinEditor/SkinEditorMappingsColumnFilter.h"
+#include "Tools/SkinEditor/SkinEditorUiHelpers.h"
 
 namespace
 {
     constexpr int kEdgeExtra = 4;
     constexpr int kFocusPad = SkinEditorChrome::kMappingsFocusPad;
+    constexpr int kColourSetBadgePad = 2;
 }
 
 SkinEditorMappingsPanel::Row SkinEditorMappingsPanel::makeMappingRow(
@@ -23,6 +25,7 @@ SkinEditorMappingsPanel::Row SkinEditorMappingsPanel::makeMappingRow(
     row.propertyLabel = TSS::DevSkin::toString(key.property);
     row.stateLabel = TSS::DevSkin::toString(key.state);
     row.colourSetLabel = TSS::DevSkin::toString(key.colourSet);
+    row.colourSetHelpLabel = skin.colourSetLabels[static_cast<size_t>(key.colourSet)];
 
     const auto it = skin.mappings.find(key);
     if (it == skin.mappings.end() || it->second.isEmpty())
@@ -88,15 +91,24 @@ void SkinEditorMappingsPanel::rebuildRows()
                            ? layer_->findSkin(skinId_)
                            : nullptr;
     if (skin == nullptr)
+    {
+        focusedObject_ = -1;
         return;
+    }
 
     const SkinEditorMappingsColumnFilter::ActiveFilters filters {
         propertyFilter_, stateFilter_, colourSetFilter_, mappedColourFilter_ };
 
     int y = kFocusPad;
     bool anyTable = false;
-    for (const auto& group : SkinEditorMappingsColumnFilter::filteredObjectGroups(*skin, filters))
+    for (auto group : SkinEditorMappingsColumnFilter::filteredObjectGroups(*skin, filters))
     {
+        if (! SkinEditorMappingsColumnFilter::objectMacroFilterShowsGroup(objectFilterName_,
+                                                                          group.object))
+            continue;
+
+        SkinEditorMappingsColumnFilter::sortFilteredKeys(*skin, group.keys, sortSpec_);
+
         if (anyTable)
         {
             Row gap;
@@ -108,6 +120,76 @@ void SkinEditorMappingsPanel::rebuildRows()
         y = appendObjectTable(*skin, group.object, group.keys, y);
         anyTable = true;
     }
+
+    if (focusedObject_ >= static_cast<int>(objects_.size()))
+        focusedObject_ = -1;
+}
+
+void SkinEditorMappingsPanel::paintColourSetCell(juce::Graphics& g,
+                                                 const Row& item,
+                                                 juce::Rectangle<int> cellArea) const
+{
+    const int contentH = cellArea.getHeight();
+    const int badgeH = juce::jmin(contentH - 2, SkinEditorChrome::kColumnHeaderHeight - 4);
+    const auto badgeFont = SkinEditorChrome::fontBold(10.0f);
+    const int textW = SkinEditorChrome::measureTextWidth(badgeFont, item.colourSetLabel);
+    const int badgeW = juce::jmax(badgeH, textW + kColourSetBadgePad * 2);
+    const int badgeY = cellArea.getY() + (contentH - badgeH) / 2;
+    const auto badge = juce::Rectangle<int>(cellArea.getX(), badgeY, badgeW, badgeH);
+
+    g.setColour(SkinEditorChrome::textTableBody());
+    g.fillRoundedRectangle(badge.toFloat(), SkinEditorChrome::kChromeBadgeCorner);
+    g.setColour(SkinEditorChrome::surfaceTable());
+    g.setFont(badgeFont);
+    g.drawText(item.colourSetLabel, badge, juce::Justification::centred, false);
+
+    if (item.colourSetHelpLabel.isEmpty())
+        return;
+
+    const int labelX = badge.getRight() + 4;
+    g.setFont(SkinEditorChrome::fontRegular());
+    g.setColour(SkinEditorChrome::textTableBody());
+    g.drawText(item.colourSetHelpLabel,
+               labelX,
+               cellArea.getY(),
+               juce::jmax(0, cellArea.getRight() - labelX),
+               contentH,
+               juce::Justification::centredLeft,
+               true);
+}
+
+void SkinEditorMappingsPanel::tryEditColourSetLabel(int row)
+{
+    if (readOnly_ || layer_ == nullptr || skinId_.isEmpty())
+        return;
+    if (row < 0 || row >= static_cast<int>(rows_.size()))
+        return;
+
+    const auto& item = rows_[static_cast<size_t>(row)];
+    if (item.kind != RowKind::kMapping)
+        return;
+
+    juce::String next = item.colourSetHelpLabel;
+    const SkinEditorUi::AskTextRequest request {
+        "Colour set label (" + item.colourSetLabel + ")",
+        "Shared help label for this Colour set (max "
+            + juce::String(TSS::DevSkin::kColourSetLabelMaxChars) + " ASCII).",
+        item.colourSetHelpLabel,
+        TSS::DevSkin::kColourSetLabelMaxChars,
+        TSS::DevSkin::colourSetLabelAllowedChars()
+    };
+    if (! SkinEditorUi::askText(request, next))
+        return;
+
+    const auto result = layer_->setColourSetLabel(skinId_, item.key.colourSet, next);
+    if (result.failed())
+    {
+        juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon,
+                                               "Colour set label",
+                                               result.getErrorMessage());
+        return;
+    }
+    refresh();
 }
 
 void SkinEditorMappingsPanel::tryBindRow(int row)
@@ -136,34 +218,14 @@ void SkinEditorMappingsPanel::tryEditMappedColour(int row)
     onMappedColourClicked(item.key);
 }
 
-void SkinEditorMappingsPanel::setFocusedObject(int objectIndex, bool scrollIntoPlace)
+void SkinEditorMappingsPanel::setFocusedObject(int objectIndex)
 {
     if (objectIndex < 0 || objectIndex >= static_cast<int>(objects_.size()))
         return;
 
     focusedObject_ = objectIndex;
-
-    updatingObjectCombo_ = true;
-    // Combo labels are A-Z; IDs stay 1-based table indices.
-    objectCombo_.setSelectedId(objectIndex + 1, juce::dontSendNotification);
-    updatingObjectCombo_ = false;
-
-    if (scrollIntoPlace)
-        scrollFocusedObjectIntoPlace();
-
+    // Object combo is a macro-filter — do not sync it from row clicks / outline focus.
     content_.repaint();
-}
-
-void SkinEditorMappingsPanel::scrollFocusedObjectIntoPlace()
-{
-    if (focusedObject_ < 0 || focusedObject_ >= static_cast<int>(objects_.size()))
-        return;
-
-    // Pin tab under sticky legend + gap, keeping the 1 px focus ring above the tab visible.
-    const int targetY = juce::jmax(0, objects_[static_cast<size_t>(focusedObject_)].sectionY
-                                          - kFocusPad);
-    const int maxY = juce::jmax(0, content_.getHeight() - viewport_.getHeight());
-    viewport_.setViewPosition(0, juce::jlimit(0, maxY, targetY));
 }
 
 SkinEditorMappingsPanel::ViewScrollAnchor SkinEditorMappingsPanel::captureViewScrollAnchor() const

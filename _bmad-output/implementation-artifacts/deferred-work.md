@@ -1,5 +1,11 @@
 # Deferred Work
 
+## Deferred from: review of spec-skin-editor-mappings-ergonomics.md (2026-11-03)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-ergonomics.md`
+  summary: No automated panel harness that left-click on a Mappings header sorts and right-click opens the filter menu (helper-only `headerGestureForClick` tests stay green if mouseUp wiring regresses).
+  evidence: Verification Gap; Matrix-Control_Tests does not drive SkinEditorMappingsPanel mouse handlers; manual header smoke remains the gate.
+
 ## Deferred from: review of spec-skin-editor-product-combo-first-skin.md (2026-11-01)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-product-combo-first-skin.md`

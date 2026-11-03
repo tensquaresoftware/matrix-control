@@ -11,16 +11,30 @@ namespace SkinEditorUi
     inline constexpr const char* kNoEditorSkinHint =
         "Duplicate a product skin or create a new skin to start.";
 
-    inline juce::String askText(const juce::String& title,
-                                const juce::String& message,
-                                const juce::String& initial)
+    struct AskTextRequest
     {
-        juce::AlertWindow window(title, message, juce::MessageBoxIconType::QuestionIcon);
-        window.addTextEditor("value", initial, "Value");
+        juce::String title;
+        juce::String message;
+        juce::String initial;
+        int maxChars = 0; // > 0 applies TextEditor::setInputRestrictions
+        /** Empty = length-only; otherwise printable charset passed to setInputRestrictions. */
+        juce::String allowedCharacters;
+    };
+
+    /** Modal text prompt. Returns false on Cancel (out unchanged). */
+    inline bool askText(const AskTextRequest& request, juce::String& out)
+    {
+        juce::AlertWindow window(request.title, request.message,
+                                 juce::MessageBoxIconType::QuestionIcon);
+        window.addTextEditor("value", request.initial, "Value");
         window.addButton("OK", 1, juce::KeyPress(juce::KeyPress::returnKey));
         window.addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey));
         if (auto* editor = window.getTextEditor("value"))
+        {
             editor->setSelectAllWhenFocused(true);
+            if (request.maxChars > 0)
+                editor->setInputRestrictions(request.maxChars, request.allowedCharacters);
+        }
 
         // Focus only sticks once the modal is on-screen and pumping messages.
         const juce::Component::SafePointer<juce::AlertWindow> safe(&window);
@@ -34,8 +48,20 @@ namespace SkinEditorUi
         });
 
         if (window.runModalLoop() != 1)
+            return false;
+        out = window.getTextEditorContents("value").trim();
+        return true;
+    }
+
+    /** Legacy: Cancel and empty OK both return {}. Prefer AskTextRequest when clearing matters. */
+    inline juce::String askText(const juce::String& title,
+                                const juce::String& message,
+                                const juce::String& initial)
+    {
+        juce::String out;
+        if (! askText({ title, message, initial, 0, {} }, out))
             return {};
-        return window.getTextEditorContents("value").trim();
+        return out;
     }
 
     inline bool skinNameTaken(const TSS::DevSkin::Layer& layer, const juce::String& name)

@@ -1,6 +1,8 @@
 #include "Tools/SkinEditor/SkinEditorMappingsPanel.h"
 
+#include "GUI/Skins/Dev/DevSkinKeyNames.h"
 #include "Tools/SkinEditor/SkinEditorChrome.h"
+#include "Tools/SkinEditor/SkinEditorMappingsColumnFilter.h"
 
 namespace
 {
@@ -23,6 +25,48 @@ namespace
                  totalWidth - mappedSpan,
                  mappedSpan };
     }
+}
+
+void SkinEditorMappingsPanel::applyObjectComboSelection()
+{
+    objectFilterName_ = SkinEditorMappingsColumnFilter::objectFilterNameFromComboSelection(
+        objectCombo_.getSelectedId(), objectCombo_.getText());
+    focusedObject_ = -1;
+    refresh();
+}
+
+void SkinEditorMappingsPanel::clearObjectMacroFilter()
+{
+    if (objectFilterName_.isEmpty())
+        return;
+    objectFilterName_.clear();
+    focusedObject_ = -1;
+    refresh();
+}
+
+void SkinEditorMappingsPanel::rebuildObjectCombo()
+{
+    updatingObjectCombo_ = true;
+    objectCombo_.clear(juce::dontSendNotification);
+    objectCombo_.addItem(SkinEditorChrome::kAllObjectsComboText, 1);
+
+    int nextId = 2;
+    int selectedId = 1;
+    for (const auto object : SkinEditorMappingsColumnFilter::mappingsObjectDisplayOrder())
+    {
+        const auto name = TSS::DevSkin::toString(object);
+        objectCombo_.addItem(name, nextId);
+        if (objectFilterName_.isNotEmpty() && name == objectFilterName_)
+            selectedId = nextId;
+        ++nextId;
+    }
+
+    if (objectFilterName_.isNotEmpty() && selectedId == 1)
+        objectFilterName_.clear();
+
+    objectCombo_.setSelectedId(selectedId, juce::dontSendNotification);
+    objectCombo_.setEnabled(objectCombo_.getNumItems() > 1);
+    updatingObjectCombo_ = false;
 }
 
 void SkinEditorMappingsPanel::clearAllColumnFilters()
@@ -63,6 +107,7 @@ void SkinEditorMappingsPanel::setMappedColourFilter(const juce::String& pastille
 
 void SkinEditorMappingsPanel::layoutActionRow(juce::Rectangle<int> actions, int tableX, int tableW)
 {
+    objectClearBounds_ = {};
     auto actionRow = juce::Rectangle<int>(tableX, actions.getY(), tableW, actions.getHeight());
     const int labelW = SkinEditorChrome::measureLabelWidth(objectLabel_.getText(),
                                                           SkinEditorChrome::fontRegular());
@@ -80,15 +125,30 @@ void SkinEditorMappingsPanel::layoutActionRow(juce::Rectangle<int> actions, int 
     unboundBadgeBounds_ = { unboundLeft + unboundLabelW + kUnboundBadgeGap,
                             actions.getY(), badgeW, actions.getHeight() };
 
-    // Object combo fixed width, then gap, then Hold — Unbound stays on Mapped colour.
-    const int comboMax = juce::jmax(0, unboundLeft - SkinEditorChrome::kButtonGap - actionRow.getX());
+    const bool objectFiltered = isObjectMacroFilterActive();
+    const int clearW = objectFiltered ? SkinEditorChrome::clearBadgeWidth() : 0;
+    const int clearGap = objectFiltered ? SkinEditorChrome::kButtonGap : 0;
+
+    // Object combo fixed width, then optional yellow clear, then Hold gap.
+    const int comboMax = juce::jmax(0, unboundLeft - SkinEditorChrome::kButtonGap
+                                           - clearW - clearGap - actionRow.getX());
     const int comboW = juce::jmin(SkinEditorChrome::kObjectComboWidth, comboMax);
     objectCombo_.setBounds(actionRow.getX(), actions.getY(), comboW, actions.getHeight());
+
+    int holdAnchorLeft = objectCombo_.getRight();
+    if (objectFiltered)
+    {
+        objectClearBounds_ = { objectCombo_.getRight() + clearGap,
+                               actions.getY(),
+                               clearW,
+                               actions.getHeight() };
+        holdAnchorLeft = objectClearBounds_.getRight();
+    }
 
     const int holdW = SkinEditorChrome::measureTextWidth(SkinEditorChrome::fontRegular(),
                                                         holdColourToggle_.getButtonText())
                       + 16 + 6; // tick box + gap to label
-    const int holdLeft = objectCombo_.getRight() + SkinEditorChrome::kMappingsObjectToHoldGap;
+    const int holdLeft = holdAnchorLeft + SkinEditorChrome::kMappingsObjectToHoldGap;
     const int holdMaxRight = unboundLeft - SkinEditorChrome::kButtonGap;
     holdColourToggle_.setBounds(holdLeft, actions.getY(),
                                 juce::jmin(holdW, juce::jmax(0, holdMaxRight - holdLeft)),

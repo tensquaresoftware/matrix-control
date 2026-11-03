@@ -68,6 +68,14 @@ namespace TSS::DevSkin
                                  SkinColourKey key,
                                  const juce::String& pastilleName);
 
+        /**
+         * Editor-only Colour set help label for one index (k1..k4).
+         * Empty clears the label. Does not affect runtime ColourSet identity.
+         */
+        juce::Result setColourSetLabel(const juce::String& skinId,
+                                       ColourSet colourSet,
+                                       const juce::String& label);
+
         std::vector<SkinColourKey> unboundKeys(const juce::String& skinId) const;
         int unboundCount(const juce::String& skinId) const;
         bool isEditorSkinExportAllowed(const juce::String& skinId) const;

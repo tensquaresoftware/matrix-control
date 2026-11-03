@@ -250,6 +250,72 @@ namespace SkinEditorChrome
         return kClearBadgeSize;
     }
 
+    namespace
+    {
+        juce::Rectangle<int> badgeSquare(juce::Rectangle<int> area, int side) noexcept
+        {
+            return { area.getX(), area.getCentreY() - side / 2, side, side };
+        }
+
+        void drawChevronDown(juce::Graphics& g, juce::Rectangle<float> tip, juce::Colour colour)
+        {
+            juce::Path path;
+            path.startNewSubPath(tip.getX(), tip.getY());
+            path.lineTo(tip.getRight(), tip.getY());
+            path.lineTo(tip.getCentreX(), tip.getBottom());
+            path.closeSubPath();
+            g.setColour(colour);
+            g.fillPath(path);
+        }
+
+        void drawChevronUp(juce::Graphics& g, juce::Rectangle<float> tip, juce::Colour colour)
+        {
+            juce::Path path;
+            path.startNewSubPath(tip.getX(), tip.getBottom());
+            path.lineTo(tip.getRight(), tip.getBottom());
+            path.lineTo(tip.getCentreX(), tip.getY());
+            path.closeSubPath();
+            g.setColour(colour);
+            g.fillPath(path);
+        }
+    }
+
+    void drawSortBadge(juce::Graphics& g, juce::Rectangle<int> area, SortPictoKind kind)
+    {
+        const int side = kSortBadgeSize;
+        const auto badge = badgeSquare(area, side);
+        const bool active = (kind != SortPictoKind::kInactive);
+        g.setColour(active ? attention() : surfaceTable());
+        g.fillRoundedRectangle(badge.toFloat(), kChromeBadgeCorner);
+
+        const auto glyph = active ? surfacePanel() : surfaceSection();
+        const auto inner = badge.toFloat().reduced(2.0f, 2.2f);
+        if (kind == SortPictoKind::kAscending)
+        {
+            drawChevronDown(g, inner, glyph);
+            return;
+        }
+        if (kind == SortPictoKind::kDescending)
+        {
+            drawChevronUp(g, inner, glyph);
+            return;
+        }
+
+        const float mid = inner.getCentreY();
+        const float half = inner.getHeight() * 0.42f;
+        drawChevronUp(g,
+                      { inner.getX(), mid - half, inner.getWidth(), half - 0.4f },
+                      glyph);
+        drawChevronDown(g,
+                        { inner.getX(), mid + 0.4f, inner.getWidth(), half - 0.4f },
+                        glyph);
+    }
+
+    int sortBadgeWidth()
+    {
+        return kSortBadgeSize;
+    }
+
     void drawChromeBadge(juce::Graphics& g, juce::Rectangle<int> area, const juce::String& text)
     {
         drawChromeBadge(g, area, text, textMuted());

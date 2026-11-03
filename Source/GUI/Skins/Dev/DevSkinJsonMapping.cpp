@@ -96,4 +96,50 @@ namespace TSS::DevSkin
             }
         }
     }
+
+    juce::var colourSetLabelsToVar(const NamedSkin& skin)
+    {
+        auto* labels = new juce::DynamicObject();
+        bool any = false;
+        for (const auto colourSet : kAllColourSets)
+        {
+            const auto& text = skin.colourSetLabels[static_cast<size_t>(colourSet)];
+            if (text.isEmpty())
+                continue;
+            labels->setProperty(toString(colourSet), text);
+            any = true;
+        }
+        if (! any)
+        {
+            delete labels;
+            return {};
+        }
+        return juce::var(labels);
+    }
+
+    void colourSetLabelsFromVar(const juce::var& labelsVar, NamedSkin& out)
+    {
+        auto* labelsObj = labelsVar.getDynamicObject();
+        if (labelsObj == nullptr)
+            return;
+
+        for (const auto colourSet : kAllColourSets)
+        {
+            const auto key = toString(colourSet);
+            if (! labelsObj->hasProperty(key))
+                continue;
+            auto text = labelsObj->getProperty(key).toString().trim();
+            if (text.length() > kColourSetLabelMaxChars)
+                text = text.substring(0, kColourSetLabelMaxChars);
+            const auto& allowed = colourSetLabelAllowedChars();
+            juce::String asciiOnly;
+            for (int i = 0; i < text.length(); ++i)
+            {
+                const auto ch = text[i];
+                if (allowed.containsChar(ch))
+                    asciiOnly += ch;
+            }
+            out.colourSetLabels[static_cast<size_t>(colourSet)] = asciiOnly;
+        }
+    }
 }

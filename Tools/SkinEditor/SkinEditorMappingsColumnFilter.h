@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <map>
 #include <vector>
 
@@ -20,6 +21,54 @@ namespace SkinEditorMappingsColumnFilter
         kState,
         kColourSet,
         kMappedColour
+    };
+
+    /** Panel-wide sticky-legend sort (one active column). */
+    enum class SortColumn
+    {
+        kNone,
+        kProperty,
+        kState,
+        kColourSet,
+        kMappedColour
+    };
+
+    /** Sticky-legend header click: left = sort, popup/right = filter menu. */
+    enum class HeaderGesture
+    {
+        kSort,
+        kOpenFilter
+    };
+
+    inline HeaderGesture headerGestureForClick(bool isPopupMenu) noexcept
+    {
+        return isPopupMenu ? HeaderGesture::kOpenFilter : HeaderGesture::kSort;
+    }
+
+    /**
+     * Object combo macro-filter: empty name = "- All objects -" (every group visible).
+     * Non-empty = show only that SkinObjectType display name.
+     */
+    inline bool objectMacroFilterShowsGroup(const juce::String& objectFilterName,
+                                            TSS::SkinObjectType object) noexcept
+    {
+        return objectFilterName.isEmpty()
+            || TSS::DevSkin::toString(object) == objectFilterName;
+    }
+
+    /** Object combo selectedId 1 (or less) = All objects; else the item text is the filter name. */
+    inline juce::String objectFilterNameFromComboSelection(int selectedId,
+                                                           const juce::String& itemText)
+    {
+        if (selectedId <= 1)
+            return {};
+        return itemText;
+    }
+
+    struct SortSpec
+    {
+        SortColumn column = SortColumn::kNone;
+        bool ascending = true; // true = A->Z
     };
 
     struct ActiveFilters
@@ -174,5 +223,42 @@ namespace SkinEditorMappingsColumnFilter
             && ! values.contains(kUnboundMenuValue))
             values.insert(0, kUnboundMenuValue);
         return values;
+    }
+
+    inline juce::String sortDisplayValue(const TSS::DevSkin::NamedSkin& skin,
+                                         const TSS::SkinColourKey& key,
+                                         SortColumn column)
+    {
+        if (column == SortColumn::kProperty)
+            return TSS::DevSkin::toString(key.property);
+        if (column == SortColumn::kState)
+            return TSS::DevSkin::toString(key.state);
+        if (column == SortColumn::kColourSet)
+            return TSS::DevSkin::toString(key.colourSet);
+        if (column != SortColumn::kMappedColour)
+            return {};
+
+        const auto it = skin.mappings.find(key);
+        if (it == skin.mappings.end() || it->second.isEmpty())
+            return kUnboundMenuValue;
+        return it->second;
+    }
+
+    /** Stable sort of already-filtered keys by SortSpec (no-op when column is kNone). */
+    inline void sortFilteredKeys(const TSS::DevSkin::NamedSkin& skin,
+                                 std::vector<TSS::SkinColourKey>& keys,
+                                 SortSpec sort)
+    {
+        if (sort.column == SortColumn::kNone || keys.size() < 2)
+            return;
+
+        std::stable_sort(keys.begin(), keys.end(),
+                         [&](const TSS::SkinColourKey& a, const TSS::SkinColourKey& b)
+                         {
+                             const auto left = sortDisplayValue(skin, a, sort.column);
+                             const auto right = sortDisplayValue(skin, b, sort.column);
+                             const int cmp = left.compareIgnoreCase(right);
+                             return sort.ascending ? (cmp < 0) : (cmp > 0);
+                         });
     }
 }

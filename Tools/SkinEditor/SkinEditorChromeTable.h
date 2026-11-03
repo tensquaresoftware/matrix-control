@@ -96,6 +96,19 @@ namespace SkinEditorChrome
 
     int clearBadgeWidth();
 
+    /** Column-sort direction for sticky-legend pictos. */
+    enum class SortPictoKind
+    {
+        kInactive,   // grey square + dual chevron
+        kAscending,  // yellow square + down chevron (A->Z)
+        kDescending  // yellow square + up chevron (Z->A)
+    };
+
+    /** Square sort badge (kSortBadgeSize) — Mappings sticky-legend chrome. */
+    void drawSortBadge(juce::Graphics& g, juce::Rectangle<int> area, SortPictoKind kind);
+
+    int sortBadgeWidth();
+
     /**
      * Chrome text badge - Inter rectangle (MAPPING / BRIDGE / LAST PUSH / APP).
      * Do not reuse plugin FooterPanel badge APIs or count-capsule badges.

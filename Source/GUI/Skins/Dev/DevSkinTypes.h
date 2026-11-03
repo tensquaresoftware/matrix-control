@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <map>
 #include <optional>
 #include <vector>
@@ -13,6 +14,22 @@ namespace TSS::DevSkin
 {
     inline constexpr int kLegacySchemaVersion = 1;
     inline constexpr int kSchemaVersion = 2;
+    /** Editor-only Colour set help label hard cap (ASCII). */
+    inline constexpr int kColourSetLabelMaxChars = 16;
+
+    /** Printable ASCII 32..126 — same charset Layer keeps for colourSetLabels. */
+    inline const juce::String& colourSetLabelAllowedChars()
+    {
+        static const juce::String chars = []
+        {
+            juce::String s;
+            s.preallocateBytes(95);
+            for (int c = 32; c < 127; ++c)
+                s += static_cast<juce::juce_wchar>(c);
+            return s;
+        }();
+        return chars;
+    }
     inline constexpr const char* kCompiledBlackId = "compiled:black";
     inline constexpr const char* kCompiledCreamId = "compiled:cream";
 
@@ -45,6 +62,11 @@ namespace TSS::DevSkin
         juce::String derivedFrom;
         std::vector<Pastille> palette;
         std::map<SkinColourKey, juce::String> mappings;
+        /**
+         * Editor-only help labels for ColourSet k1..k4 (document-global).
+         * Omitted from PushPayload; optional in skin JSON as colourSetLabels.
+         */
+        std::array<juce::String, kAllColourSets.size()> colourSetLabels {};
     };
 
     struct PushPayload

@@ -92,14 +92,23 @@ private:
                      SkinEditorChrome::paletteListPaintFloor());
         expectEquals(SkinEditorChrome::kMappingsPropertyColumnWidth, 150);
         expectEquals(SkinEditorChrome::kMappingsStateColumnWidth, 115);
-        expectEquals(SkinEditorChrome::kMappingsColourSetColumnWidth, 45);
-        expectEquals(SkinEditorChrome::kMappingsTablePaintWidth, 446);
-        expectEquals(SkinEditorChrome::kMappingsPanelWidth, 476);
+        expectEquals(SkinEditorChrome::kMappingsColourSetColumnWidth, 130);
+        expectEquals(SkinEditorChrome::kMappingsTablePaintWidth, 531);
+        expectEquals(SkinEditorChrome::kMappingsPanelWidth, 561);
         expect(SkinEditorChrome::kMappingsPropertyColumnWidth % 5 == 0);
         expect(SkinEditorChrome::kMappingsStateColumnWidth % 5 == 0);
         expect(SkinEditorChrome::kMappingsColourSetColumnWidth % 5 == 0);
         expectEquals(SkinEditorChrome::kObjectComboWidth, 150);
-        expectEquals(SkinEditorChrome::kMappingsObjectToHoldGap, 16);
+        expectEquals(SkinEditorChrome::kMappingsObjectToHoldGap, 32);
+        expectEquals(juce::String(SkinEditorChrome::kAllObjectsComboText),
+                     juce::String("- All objects -"));
+        // Build B: Hold air + Colour set widen; no Link column token in the paint width sum.
+        expectEquals(SkinEditorChrome::kMappingsTablePaintWidth,
+                     SkinEditorChrome::kMappingsColumnPad
+                         + SkinEditorChrome::kMappingsPropertyColumnWidth
+                         + SkinEditorChrome::kMappingsStateColumnWidth
+                         + SkinEditorChrome::kMappingsColourSetColumnWidth
+                         + SkinEditorChrome::kPaletteListPaintWidth);
         expect(SkinEditorChrome::kMappingsPanelWidth
                < SkinEditorChrome::kLegacyWindowMaxWidth / 2);
     }
