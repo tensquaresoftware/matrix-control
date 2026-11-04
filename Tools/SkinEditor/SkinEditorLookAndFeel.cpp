@@ -124,18 +124,27 @@ namespace SkinEditorChrome
                                           boxSide,
                                           boxSide);
 
+        // Checked box: same chrome as active sort badges (yellow fill, dark glyph).
         auto fill = controlFill();
+        if (button.getToggleState())
+            fill = attention();
         if (! button.isEnabled())
-            fill = controlFill().withMultipliedAlpha(0.55f);
-        else if (shouldDrawButtonAsDown)
-            fill = controlFillDown();
-        else if (shouldDrawButtonAsHighlighted)
-            fill = controlFillHover();
+            fill = fill.withMultipliedAlpha(0.55f);
+        else if (! button.getToggleState())
+        {
+            if (shouldDrawButtonAsDown)
+                fill = controlFillDown();
+            else if (shouldDrawButtonAsHighlighted)
+                fill = controlFillHover();
+        }
 
         g.setColour(fill);
         g.fillRoundedRectangle(box, kControlCorner);
-        g.setColour(controlOutline());
-        g.drawRoundedRectangle(box, kControlCorner, 1.0f);
+        if (! button.getToggleState())
+        {
+            g.setColour(controlOutline());
+            g.drawRoundedRectangle(box, kControlCorner, 1.0f);
+        }
 
         if (button.getToggleState())
         {
@@ -143,7 +152,10 @@ namespace SkinEditorChrome
             tick.startNewSubPath(box.getX() + boxSide * 0.22f, box.getCentreY());
             tick.lineTo(box.getX() + boxSide * 0.42f, box.getY() + boxSide * 0.72f);
             tick.lineTo(box.getX() + boxSide * 0.78f, box.getY() + boxSide * 0.28f);
-            g.setColour(button.isEnabled() ? textPrimary() : textMuted());
+            auto tickColour = surfacePanel();
+            if (! button.isEnabled())
+                tickColour = tickColour.withMultipliedAlpha(0.5f);
+            g.setColour(tickColour);
             g.strokePath(tick, juce::PathStrokeType(1.4f, juce::PathStrokeType::curved,
                                                     juce::PathStrokeType::rounded));
         }
