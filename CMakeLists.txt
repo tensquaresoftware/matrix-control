@@ -1419,13 +1419,19 @@ if(COPY_TO_ARTEFACTS_DIR)
     # Skin Editor solo builds (`--target Matrix-Control_SkinEditor`) also land in Dropbox.
     if(MATRIX_BUILD_SKIN_EDITOR AND TARGET Matrix-Control_SkinEditor)
         if(APPLE)
+            # Linker ad-hoc seal breaks once Resources land in the bundle; re-sign
+            # so Finder does not show a barred icon (spctl "resources must be present").
             add_custom_command(TARGET Matrix-Control_SkinEditor POST_BUILD
+                COMMAND codesign --force --deep --sign - "$<TARGET_BUNDLE_DIR:Matrix-Control_SkinEditor>"
                 COMMAND ${CMAKE_COMMAND} -E echo "Copying Skin Editor to ${ARTEFACTS_DEST}/Standalone/"
                 COMMAND ${CMAKE_COMMAND} -E make_directory "${ARTEFACTS_DEST}/Standalone"
                 COMMAND ${CMAKE_COMMAND} -E remove_directory "${ARTEFACTS_DEST}/Standalone/Matrix-Control Skin Editor.app"
                 COMMAND ${CMAKE_COMMAND} -E copy_directory
                     "$<TARGET_BUNDLE_DIR:Matrix-Control_SkinEditor>"
                     "${ARTEFACTS_DEST}/Standalone/Matrix-Control Skin Editor.app"
+                COMMAND codesign --force --deep --sign -
+                    "${ARTEFACTS_DEST}/Standalone/Matrix-Control Skin Editor.app"
+                COMMAND xattr -cr "${ARTEFACTS_DEST}/Standalone/Matrix-Control Skin Editor.app"
                 COMMENT "Copy Skin Editor app to artefacts"
                 VERBATIM
             )
