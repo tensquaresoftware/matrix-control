@@ -134,7 +134,7 @@ namespace SkinEditorChrome
 
     /**
      * Link sticky-legend count chip: fixed kLinkCountBadgeWidth, glyph centred.
-     * count <= 0 → em dash (idle); count > 0 → decimal digits.
+     * count <= 0 → geometric idle bar; count > 0 → decimal digits.
      */
     void drawLinkCountBadge(juce::Graphics& g,
                             juce::Rectangle<int> area,

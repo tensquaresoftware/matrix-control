@@ -1262,6 +1262,17 @@ if(MATRIX_BUILD_SKIN_EDITOR)
         juce::juce_recommended_config_flags
         juce::juce_recommended_warning_flags
     )
+
+    # Linker ad-hoc seal breaks once Resources land in the bundle; re-sign so
+    # Finder does not show a barred icon (spctl "resources must be present").
+    # Independent of COPY_TO_ARTEFACTS_DIR so the build-tree app stays valid too.
+    if(APPLE)
+        add_custom_command(TARGET Matrix-Control_SkinEditor POST_BUILD
+            COMMAND codesign --force --deep --sign - "$<TARGET_BUNDLE_DIR:Matrix-Control_SkinEditor>"
+            COMMENT "Ad-hoc re-sign Skin Editor after Resources"
+            VERBATIM
+        )
+    endif()
 endif()
 
 # ============================================================================
@@ -1388,6 +1399,8 @@ if(COPY_TO_ARTEFACTS_DIR)
                 COMMAND ${CMAKE_COMMAND} -E make_directory "${ARTEFACTS_DEST}/Standalone"
                 COMMAND ${CMAKE_COMMAND} -E remove_directory "${SKIN_EDITOR_DEST_DIR}"
                 COMMAND ${CMAKE_COMMAND} -E copy_directory "${SKIN_EDITOR_SOURCE}" "${SKIN_EDITOR_DEST_DIR}"
+                COMMAND codesign --force --deep --sign - "${SKIN_EDITOR_DEST_DIR}"
+                COMMAND xattr -cr "${SKIN_EDITOR_DEST_DIR}"
             )
         elseif(WIN32)
             set(SKIN_EDITOR_SOURCE "${CMAKE_BINARY_DIR}/Matrix-Control_SkinEditor_artefacts/$<CONFIG>/Matrix-Control Skin Editor.exe")
@@ -1419,10 +1432,9 @@ if(COPY_TO_ARTEFACTS_DIR)
     # Skin Editor solo builds (`--target Matrix-Control_SkinEditor`) also land in Dropbox.
     if(MATRIX_BUILD_SKIN_EDITOR AND TARGET Matrix-Control_SkinEditor)
         if(APPLE)
-            # Linker ad-hoc seal breaks once Resources land in the bundle; re-sign
-            # so Finder does not show a barred icon (spctl "resources must be present").
+            # Build bundle is re-signed by the unconditional POST_BUILD above; here
+            # re-sign + clear xattrs on the artefacts copy after solo-target builds.
             add_custom_command(TARGET Matrix-Control_SkinEditor POST_BUILD
-                COMMAND codesign --force --deep --sign - "$<TARGET_BUNDLE_DIR:Matrix-Control_SkinEditor>"
                 COMMAND ${CMAKE_COMMAND} -E echo "Copying Skin Editor to ${ARTEFACTS_DEST}/Standalone/"
                 COMMAND ${CMAKE_COMMAND} -E make_directory "${ARTEFACTS_DEST}/Standalone"
                 COMMAND ${CMAKE_COMMAND} -E remove_directory "${ARTEFACTS_DEST}/Standalone/Matrix-Control Skin Editor.app"

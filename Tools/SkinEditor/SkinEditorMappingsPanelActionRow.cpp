@@ -96,7 +96,30 @@ void SkinEditorMappingsPanel::setPropertyBindHoverEnabled(bool enabled, juce::Co
     propertyBindHoverEnabled_ = enabled;
     propertyBindHoverColour_ = preview;
     if (! enabled)
+    {
         hoveredPropertyBindKey_.reset();
+        content_.repaint();
+        return;
+    }
+
+    // Arm hover for the row under the cursor without waiting for the next mouseMove.
+    hoveredPropertyBindKey_.reset();
+    const auto pos = content_.getMouseXYRelative();
+    if (content_.getLocalBounds().contains(pos))
+    {
+        const int row = rowIndexAtY(pos.y);
+        if (row >= 0)
+        {
+            const auto& item = rows_[static_cast<size_t>(row)];
+            if (item.kind == RowKind::kMapping)
+            {
+                const auto cols = SkinEditorMappingsColumns::forWidth(paintWidth());
+                const int x = pos.x - SkinEditorChrome::kMappingsFocusPad;
+                if (SkinEditorMappingsColumns::isPropertyColumnX(x, cols))
+                    hoveredPropertyBindKey_ = item.key;
+            }
+        }
+    }
     content_.repaint();
 }
 

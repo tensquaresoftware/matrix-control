@@ -26,6 +26,10 @@ public:
         assertCompiledRejects();
         beginTest("mappingLinkGroups_propagatePeersRemapsPeerPastille");
         assertPropagatePeers();
+        beginTest("mappingLinkGroups_duplicateSkinClearsGroupsWhenDroppingMappings");
+        assertDuplicateClearsLinkGroups();
+        beginTest("mappingLinkGroups_sanitizeEnforcesExclusiveMembership");
+        assertExclusiveMembership();
     }
 
 private:
@@ -134,6 +138,43 @@ private:
         const auto peer = skin->mappings.find(b);
         expect(peer != skin->mappings.end());
         expectEquals(peer->second, winner);
+    }
+
+    void assertDuplicateClearsLinkGroups()
+    {
+        TSS::DevSkin::Layer layer;
+        expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Link Source").wasOk());
+        const auto sourceId = layer.activeSkinId();
+
+        const auto a = sampleKey(TSS::SkinObjectType::kSlider, TSS::SkinColourProperty::kText);
+        const auto b = sampleKey(TSS::SkinObjectType::kComboBox, TSS::SkinColourProperty::kText);
+        expect(layer.setMappingLinkGroups(sourceId, { { a, b } }).wasOk());
+
+        expect(layer.duplicateSkin(sourceId, "Link Copy Keep", true).wasOk());
+        const auto* kept = layer.findSkin(layer.activeSkinId());
+        expect(kept != nullptr);
+        expectEquals(static_cast<int>(kept->mappingLinkGroups.size()), 1);
+
+        expect(layer.duplicateSkin(sourceId, "Link Copy Drop", false).wasOk());
+        const auto* dropped = layer.findSkin(layer.activeSkinId());
+        expect(dropped != nullptr);
+        expect(dropped->mappings.empty());
+        expect(dropped->mappingLinkGroups.empty());
+    }
+
+    void assertExclusiveMembership()
+    {
+        const auto inventory = TSS::DevSkin::allStructuredKeys();
+        expect(inventory.size() >= 3);
+        const std::set<TSS::SkinColourKey> validKeys(inventory.begin(), inventory.end());
+
+        const auto cleaned = TSS::DevSkin::sanitizeMappingLinkGroups(
+            { { inventory[0], inventory[1] }, { inventory[0], inventory[2] } }, validKeys);
+        expectEquals(static_cast<int>(cleaned.size()), 1);
+        expectEquals(static_cast<int>(cleaned[0].size()), 2);
+        expect(std::find(cleaned[0].begin(), cleaned[0].end(), inventory[0]) != cleaned[0].end());
+        expect(std::find(cleaned[0].begin(), cleaned[0].end(), inventory[1]) != cleaned[0].end());
+        expect(std::find(cleaned[0].begin(), cleaned[0].end(), inventory[2]) == cleaned[0].end());
     }
 };
 

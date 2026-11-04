@@ -323,7 +323,8 @@ void SkinEditorMappingsPanel::Content::mouseMove(const juce::MouseEvent& e)
                                                           item.key,
                                                           owner_.objectFilterType()))
                 nextLink = item.key;
-            if (owner_.propertyBindHoverEnabled_)
+            if (owner_.propertyBindHoverEnabled_
+                && SkinEditorMappingsColumns::isPropertyColumnX(x, cols))
                 nextPropertyBind = item.key;
         }
     }

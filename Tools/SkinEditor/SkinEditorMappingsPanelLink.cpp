@@ -6,16 +6,29 @@
 #include "Tools/SkinEditor/SkinEditorChrome.h"
 #include "Tools/SkinEditor/SkinEditorMappingsColumns.h"
 
-void SkinEditorMappingsPanel::clearRowSelection()
+void SkinEditorMappingsPanel::clearSelectionAndHovers()
 {
-    if (selectedKeys_.empty() && ! selectionAnchorKey_.has_value())
-    {
-        hoveredLinkKey_.reset();
-        return;
-    }
     selectedKeys_.clear();
     selectionAnchorKey_.reset();
     hoveredLinkKey_.reset();
+    hoveredPropertyBindKey_.reset();
+}
+
+void SkinEditorMappingsPanel::clearRowSelection()
+{
+    const bool hadPropertyHover = hoveredPropertyBindKey_.has_value();
+    if (selectedKeys_.empty() && ! selectionAnchorKey_.has_value())
+    {
+        hoveredLinkKey_.reset();
+        hoveredPropertyBindKey_.reset();
+        if (hadPropertyHover)
+        {
+            content_.repaint();
+            repaint();
+        }
+        return;
+    }
+    clearSelectionAndHovers();
     content_.repaint();
     repaint();
 }
@@ -150,7 +163,18 @@ void SkinEditorMappingsPanel::selectRowKey(const TSS::SkinColourKey& key, bool t
         selectedKeys_.erase(it);
     else
         selectedKeys_.push_back(key);
-    // Anchor unchanged — Shift after Cmd multi-select still ranges from the plain-click origin.
+
+    if (selectedKeys_.empty())
+    {
+        selectionAnchorKey_.reset();
+        return;
+    }
+    // Keep a plain-click origin when still selected; otherwise seed so Shift-range
+    // works after a Cmd/Ctrl-only multi-select (or after the origin was toggled off).
+    if (! selectionAnchorKey_.has_value()
+        || std::find(selectedKeys_.begin(), selectedKeys_.end(), *selectionAnchorKey_)
+               == selectedKeys_.end())
+        selectionAnchorKey_ = selectedKeys_.back();
 }
 
 SkinEditorMappingLink::HeaderState SkinEditorMappingsPanel::linkHeaderState() const
@@ -204,10 +228,6 @@ void SkinEditorMappingsPanel::alignGroupPastilles(const std::vector<TSS::SkinCol
     if (skin == nullptr)
         return;
 
-    const auto winner = SkinEditorMappingLink::winnerPastille(skin->mappings, orderedKeys);
-    if (winner.isEmpty())
-        return;
-
     int groupIndex = -1;
     for (const auto& key : orderedKeys)
     {
@@ -218,7 +238,12 @@ void SkinEditorMappingsPanel::alignGroupPastilles(const std::vector<TSS::SkinCol
     if (groupIndex < 0)
         return;
 
-    const auto members = skin->mappingLinkGroups[static_cast<size_t>(groupIndex)];
+    const auto& members = skin->mappingLinkGroups[static_cast<size_t>(groupIndex)];
+    const auto winner = SkinEditorMappingLink::winnerPastilleForGroup(skin->mappings, members,
+                                                                      orderedKeys);
+    if (winner.isEmpty())
+        return;
+
     for (const auto& key : members)
         if (! writePastilleToKey(key, winner))
             return;
@@ -242,14 +267,20 @@ void SkinEditorMappingsPanel::handleLinkChainClick(const TSS::SkinColourKey& key
         return;
 
     const auto filter = objectFilterType();
-    const auto& context = selectedKeys_.back();
     const auto before = groups;
-    auto next = SkinEditorMappingLink::addToContext(std::move(groups), context, key, filter);
+    SkinEditorMappingLink::Groups next;
+    std::vector<TSS::SkinColourKey> ordered = selectedKeys_;
+    if (std::find(ordered.begin(), ordered.end(), key) == ordered.end())
+        ordered.push_back(key);
+
+    if (selectedKeys_.size() >= 2)
+        next = SkinEditorMappingLink::linkOrMerge(std::move(groups), ordered, filter);
+    else
+        next = SkinEditorMappingLink::addToContext(std::move(groups), selectedKeys_.back(), key,
+                                                   filter);
+
     if (next == before)
         return;
-
-    std::vector<TSS::SkinColourKey> ordered = selectedKeys_;
-    ordered.push_back(key);
     if (! commitLinkGroups(std::move(next)))
         return;
     alignGroupPastilles(ordered);

@@ -417,6 +417,9 @@ void SkinEditorMappingsPanel::mouseUp(const juce::MouseEvent& e)
         return;
     if (handleHeader(FilterColumn::kMappedColour, mappedLabelBounds_))
         return;
+    // Object / Hold / Unbound (and object-clear) — same preserve set as MainComponent.
+    if (hitActionRowChrome(pos))
+        return;
 
     // Sticky air / action-row empty / legend slab miss (list hits go to Content).
     clearRowSelection();

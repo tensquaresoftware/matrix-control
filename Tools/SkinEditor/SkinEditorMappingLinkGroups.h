@@ -190,7 +190,10 @@ namespace SkinEditorMappingLink
     }
 
     /**
-     * Add free candidate into the group of contextKey (or create a pair).
+     * Add candidate into the group of contextKey (or create a pair).
+     * If candidate already belongs to another group, it leaves that group
+     * (other members stay); groups are not wholesale-merged here — use
+     * linkOrMerge for multi-select merge across groups.
      * Returns unchanged groups when Object≠All blocks the edit.
      */
     inline Groups addToContext(Groups groups,
@@ -211,10 +214,15 @@ namespace SkinEditorMappingLink
             return groups;
 
         const int candidateIndex = findGroupIndex(groups, candidate);
-        if (candidateIndex >= 0
-            && ! groupEditableUnderObjectFilter(groups[static_cast<size_t>(candidateIndex)],
-                                                objectFilter))
-            return groups;
+        if (candidateIndex >= 0)
+        {
+            if (! groupEditableUnderObjectFilter(groups[static_cast<size_t>(candidateIndex)],
+                                                 objectFilter))
+                return groups;
+            if (candidateIndex == contextIndex)
+                return groups;
+            groups = removeMember(std::move(groups), candidate);
+        }
 
         return linkOrMerge(std::move(groups), { contextKey, candidate }, objectFilter);
     }
@@ -233,6 +241,22 @@ namespace SkinEditorMappingLink
             winner = it->second;
         }
         return winner;
+    }
+
+    /**
+     * Align election: all group members vote so Unbound follow mapped peers;
+     * orderedKeys re-appended so last-clicked / chain-activated mapped keys win ties.
+     */
+    inline juce::String winnerPastilleForGroup(
+        const std::map<TSS::SkinColourKey, juce::String>& mappings,
+        const Group& members,
+        const std::vector<TSS::SkinColourKey>& orderedKeys)
+    {
+        std::vector<TSS::SkinColourKey> election = members;
+        for (const auto& key : orderedKeys)
+            if (std::find(members.begin(), members.end(), key) != members.end())
+                election.push_back(key);
+        return winnerPastille(mappings, election);
     }
 
     inline std::set<TSS::SkinColourKey> revealedKeys(

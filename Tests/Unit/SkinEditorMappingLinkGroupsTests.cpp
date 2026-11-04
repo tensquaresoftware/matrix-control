@@ -22,6 +22,7 @@ public:
         objectFilterBlocksCrossObjectExtend();
         linkColumnHitTest();
         calmRestAndUnlinkAll();
+        hoverChainAndRevealWithSelection();
     }
 
 private:
@@ -68,6 +69,18 @@ private:
         groups = addToContext({}, a, b, std::nullopt);
         groups = removeMember(std::move(groups), a);
         expect(groups.empty());
+
+        // Joining A leaves B: candidate moves; other B members stay (or dissolve if alone).
+        groups = addToContext({}, a, b, std::nullopt);
+        groups = addToContext(std::move(groups), c, d, std::nullopt);
+        expectEquals(static_cast<int>(groups.size()), 2);
+        groups = addToContext(std::move(groups), a, c, std::nullopt);
+        expectEquals(static_cast<int>(groups.size()), 1);
+        expectEquals(static_cast<int>(groups[0].size()), 3);
+        expect(findGroupIndex(groups, a) >= 0);
+        expect(findGroupIndex(groups, b) >= 0);
+        expect(findGroupIndex(groups, c) >= 0);
+        expect(findGroupIndex(groups, d) < 0);
     }
 
     void winnerPastilleRules()
@@ -87,6 +100,12 @@ private:
         mappings[c] = "Green";
         expectEquals(winnerPastille(mappings, { a, b, c }), juce::String("Green"));
         expectEquals(winnerPastille(mappings, { c, b, a }), juce::String("Red"));
+
+        // Unbound selection still aligns onto a mapped peer already in the group.
+        const Group members { a, b, c };
+        expectEquals(winnerPastilleForGroup(mappings, members, { a }), juce::String("Red"));
+        mappings.erase(a);
+        expectEquals(winnerPastilleForGroup(mappings, members, { a }), juce::String("Green"));
     }
 
     void headerStateMachine()
@@ -184,6 +203,26 @@ private:
         expect(header.action == HeaderAction::kUnlinkAll);
         groups = unlinkKeys(std::move(groups), { a, b });
         expect(groups.empty());
+    }
+
+    void hoverChainAndRevealWithSelection()
+    {
+        beginTest("hover chain + reveal expand when selection is non-empty");
+
+        using namespace SkinEditorMappingLink;
+        const auto a = key(TSS::SkinObjectType::kSlider, TSS::SkinColourProperty::kText);
+        const auto b = key(TSS::SkinObjectType::kComboBox, TSS::SkinColourProperty::kText);
+        const auto free = key(TSS::SkinObjectType::kToggle, TSS::SkinColourProperty::kText);
+
+        Groups groups = addToContext({}, a, b, std::nullopt);
+        const auto revealed = revealedKeys(groups, { a });
+        expect(revealed.find(a) != revealed.end());
+        expect(revealed.find(b) != revealed.end());
+        expect(revealed.find(free) == revealed.end());
+
+        expect(showsHoverChain(groups, { a }, free, std::nullopt));
+        expect(! showsHoverChain(groups, { a }, a, std::nullopt));
+        expect(! showsHoverChain(groups, { a }, b, std::nullopt));
     }
 };
 

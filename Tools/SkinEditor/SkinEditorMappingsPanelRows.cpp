@@ -96,7 +96,7 @@ void SkinEditorMappingsPanel::rebuildRows()
     if (skin == nullptr)
     {
         focusedObject_ = -1;
-        selectedKeys_.clear();
+        clearSelectionAndHovers();
         return;
     }
 
@@ -256,15 +256,18 @@ void SkinEditorMappingsPanel::handleMappingRowMouseUp(int row, const juce::Mouse
     const auto cols = SkinEditorMappingsColumns::forWidth(paintWidth());
     const int releaseX = e.x - kFocusPad;
     const int pressX = e.getMouseDownX() - kFocusPad;
+    const bool toggle = e.mods.isCommandDown();
+    const bool range = e.mods.isShiftDown();
     if (SkinEditorMappingsColumns::isLinkColumnX(releaseX, cols)
         && SkinEditorMappingsColumns::isLinkColumnX(pressX, cols))
     {
-        handleLinkChainClick(item.key);
+        if (readOnly_)
+            selectRowKey(item.key, toggle, range);
+        else
+            handleLinkChainClick(item.key);
         return;
     }
 
-    const bool toggle = e.mods.isCommandDown();
-    const bool range = e.mods.isShiftDown();
     selectRowKey(item.key, toggle, range);
     maybeActivateMappingCell(row, pressX, releaseX, toggle || range);
 }

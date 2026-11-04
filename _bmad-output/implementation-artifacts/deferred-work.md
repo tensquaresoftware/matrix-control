@@ -3118,3 +3118,33 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-link.md`
   summary: alignGroupPastilles aborts mid-loop on writePastilleToKey failure after the link group is already committed, without rolling back the group or prior aligns.
   evidence: Edge Case Hunter; same class of partial-write without transactional undo; manual smoke + alert path remain.
+
+## Deferred from: code review of spec-skin-editor-mappings-link.md (2026-11-04)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-link.md`
+  summary: Passage 1 reconfirmed — no automated MainComponent applyMapping→propagate(+Hold) co-coverage.
+  evidence: Verification Gap (chunked review passage 1); same gate as 2026-11-03 entry.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-link.md`
+  summary: Passage 1 reconfirmed — non-transactional peer/align writes (partial remap, writer kept, mid-align abort).
+  evidence: Edge Case Hunter (chunked review passage 1); still deferred pending Layer transaction API.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-link.md`
+  summary: Panel create/merge path does not assert alignGroupPastilles is invoked (pure winnerPastille helper is tested only).
+  evidence: Verification Gap (chunked review passage 1); panel orchestration outside current Skin Editor unit harness.
+
+## Deferred from: code review of spec-skin-editor-mappings-link.md (2026-11-05)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-link.md`
+  summary: Passage 2 — no automated Cmd/Shift multi-select, Shift-range, or preserve-or-clear panel harness for Mappings selection gestures.
+  evidence: Verification Gap (chunked review passage 2); Matrix-Control_Tests still does not drive SkinEditorMappingsPanel mouse handlers; manual selection smoke remains the gate.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-link.md`
+  summary: Passage 2 — Hold checkbox attention-yellow chrome (`LookAndFeel::drawToggleButton`) deferred to passage 3 (Hold jaune / codesign / csX / quality gate), not Link UI neighbourhood.
+  evidence: Acceptance Auditor (chunked review passage 2); user-scoped out of passage 2. **Implemented in passage 3** (`487a641d` / `3a280bd1`); remaining gap is automated paint pin (see 2026-11-05 passage-3 defer below).
+
+## Deferred from: code review of spec-skin-editor-mappings-link.md (2026-11-05, passage 3)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-link.md`
+  summary: Passage 3 — Hold checked attention-yellow chrome has no automated LookAndFeel/paint pin; suite can stay green if fill regresses to grey.
+  evidence: Verification Gap; CONVENTIONS / testing rules keep paint() out of unit tests; manual Skin Editor smoke remains the gate.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-link.md`
+  summary: Passage 3 — Skin Editor POST_BUILD codesign/xattr path not run in CI (`USER_COPY_TO_ARTEFACTS_DIR=OFF`); barred-icon fix can vanish locally without automated failure.
+  evidence: Verification Gap; closing needs local or optional CI smoke with artefacts copy enabled, not a Matrix-Control_Tests unit.

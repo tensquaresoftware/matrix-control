@@ -46,12 +46,9 @@ void SkinEditorMainComponent::onPastilleSelected(const juce::String& name)
             const bool leftArmedBindBlocked = mappingMode_ == MappingMode::kArmedRow && bindBlocked;
             enterHeldColour(name);
             if (leftArmedBindBlocked)
-            {
-                if (isPastillePending(name))
-                    setStatusMessage(SkinEditorMappingPolicy::kCalibrateBeforeMappingMessage);
-                else if (isPastilleSameRgbAlreadyMapped(name))
-                    setStatusMessage(SkinEditorMappingPolicy::kSameColourMappedStatusMessage);
-            }
+                setStatusMessage(isPastillePending(name)
+                                     ? SkinEditorMappingPolicy::kCalibrateBeforeMappingMessage
+                                     : SkinEditorMappingPolicy::kSameColourMappedStatusMessage);
             return;
         }
     }
@@ -80,12 +77,9 @@ void SkinEditorMainComponent::onMappingRowActivated(TSS::SkinColourKey key)
     {
         case Intent::kIgnore:
             if (mappingMode_ == MappingMode::kHeldColour)
-            {
-                if (isPastillePending(selectedPastille_))
-                    setStatusMessage(SkinEditorMappingPolicy::kCalibrateBeforeMappingMessage);
-                else if (isPastilleSameRgbAlreadyMapped(selectedPastille_))
-                    setStatusMessage(SkinEditorMappingPolicy::kSameColourMappedStatusMessage);
-            }
+                setStatusMessage(isPastillePending(selectedPastille_)
+                                     ? SkinEditorMappingPolicy::kCalibrateBeforeMappingMessage
+                                     : SkinEditorMappingPolicy::kSameColourMappedStatusMessage);
             return;
         case Intent::kBindHeldColour:
             applyMapping(key, selectedPastille_, fromUnbound);
@@ -264,6 +258,7 @@ void SkinEditorMainComponent::applyMapping(TSS::SkinColourKey key,
 void SkinEditorMainComponent::fillWitnessSwatchForSelectedPastille()
 {
     juce::Colour hoverPreview;
+    bool foundInPalette = false;
     if (const auto* skin = layer_.findSkin(visibleSkinId()))
         for (const auto& pastille : skin->palette)
             if (pastille.name == selectedPastille_)
@@ -271,12 +266,18 @@ void SkinEditorMainComponent::fillWitnessSwatchForSelectedPastille()
                 mappingWitnessShowSwatch_ = true;
                 mappingWitnessPending_ = pastille.pending;
                 mappingWitnessColour_ = juce::Colour(pastille.argb);
+                foundInPalette = true;
                 if (! pastille.pending)
                     hoverPreview = mappingWitnessColour_;
                 break;
             }
-    if (mappingMode_ == MappingMode::kHeldColour)
-        mappingsPanel_.setPropertyBindHoverEnabled(true, hoverPreview);
+    if (mappingMode_ != MappingMode::kHeldColour)
+        return;
+    const bool canBind = foundInPalette
+                         && SkinEditorMappingPolicy::canBindPastille(
+                             isPastillePending(selectedPastille_),
+                             isPastilleSameRgbAlreadyMapped(selectedPastille_));
+    mappingsPanel_.setPropertyBindHoverEnabled(canBind, hoverPreview);
 }
 
 void SkinEditorMainComponent::fillHeldColourWitness()

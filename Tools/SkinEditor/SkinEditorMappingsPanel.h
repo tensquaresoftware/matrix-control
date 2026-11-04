@@ -222,6 +222,8 @@ private:
     /** After selection: Mapped edit, or Property bind (skips Colour set / Link / modifiers). */
     void maybeActivateMappingCell(int row, int pressX, int releaseX, bool skipBind);
     void clearRowSelection();
+    /** Clears selected keys, Shift anchor, and Link / Property hover keys. */
+    void clearSelectionAndHovers();
     /** Plain = replace; Cmd/Ctrl = toggle; Shift = visible-row range from anchor (cross-table OK). */
     void selectRowKey(const TSS::SkinColourKey& key, bool toggle, bool range);
     void selectRowKeyRange(const TSS::SkinColourKey& endKey);

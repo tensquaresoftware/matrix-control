@@ -5,6 +5,7 @@
 #include "Tools/SkinEditor/SkinEditorChromeTokens.h"
 #include "Tools/SkinEditor/SkinEditorColourPicker.h"
 #include "Tools/SkinEditor/SkinEditorMappingModePolicy.h"
+#include "Tools/SkinEditor/SkinEditorMappingsColumns.h"
 #include "Tools/SkinEditor/SkinEditorSkinsPanel.h"
 
 /**
@@ -30,6 +31,8 @@ public:
         idleWitnessHiddenHoldWitnessVisible();
         mappingsColumnPadAndWidths();
         mappingsChromeBadgeTokens();
+        propertyBindHoverContrastInk();
+        unboundHoldNeighbourhoodGeometry();
         skinsPanelEditorActionsFitOneRow();
         minContentHeightStacksSkinsAndColor();
         pathElideKeepsLeafName();
@@ -125,6 +128,31 @@ private:
         expectEquals(SkinEditorChrome::kLinkChainBadgeSize, SkinEditorChrome::kSortBadgeSize);
         expectEquals(SkinEditorChrome::kLegendChipGap, 4);
         expectEquals(SkinEditorChrome::kCountBadgeDiameter, 12);
+    }
+
+    void propertyBindHoverContrastInk()
+    {
+        beginTest("Property bind hover picks dark ink on light fills");
+
+        expect(SkinEditorChrome::propertyBindHoverNeedsDarkText(juce::Colours::white));
+        expect(SkinEditorChrome::propertyBindHoverNeedsDarkText(juce::Colour(0xfff5f0e6))); // cream
+        expect(! SkinEditorChrome::propertyBindHoverNeedsDarkText(juce::Colours::black));
+        expect(! SkinEditorChrome::propertyBindHoverNeedsDarkText(juce::Colour(0xff1a1a1a)));
+    }
+
+    void unboundHoldNeighbourhoodGeometry()
+    {
+        beginTest("Unbound origin and Hold align follow Mapped / Colour set contentLeft");
+
+        const auto cols = SkinEditorMappingsColumns::forWidth(
+            SkinEditorChrome::kMappingsTablePaintWidth);
+        expectEquals(cols.contentLeft(cols.mappedX),
+                     cols.mappedX + SkinEditorChrome::kMappingsColumnPad);
+        expectEquals(cols.contentLeft(cols.colourSetLeft()) - 6,
+                     cols.colourSetLeft() + SkinEditorChrome::kMappingsColumnPad - 6);
+        expectEquals(SkinEditorChrome::kLinkCountBadgeWidth, 22);
+        const int holdAlignX = cols.contentLeft(cols.colourSetLeft()) - 6;
+        expectEquals(SkinEditorChrome::mappingsHoldLeft(100, holdAlignX), holdAlignX);
     }
 
     static juce::TextButton* findButton(juce::Component& root, const juce::String& text)
