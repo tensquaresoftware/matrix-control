@@ -122,14 +122,14 @@ private:
         const auto skin = makeSkin();
         auto setTwo = borderOn();
         setTwo.colourSet = TSS::ColourSet::k2;
-        const ActiveFilters setTwoOnly { "Border", "On", "k2", {} };
+        const ActiveFilters setTwoOnly { "Border", "On", "cs2", {} };
 
         expect(keyMatches(skin, setTwo, setTwoOnly));
         expect(! keyMatches(skin, borderOn(), setTwoOnly));
 
         const auto values = presentValues(skin, Column::kColourSet);
-        expect(values.contains("k1"));
-        expect(values.contains("k4"));
+        expect(values.contains("cs1"));
+        expect(values.contains("cs4"));
     }
 
     void changeMappedValue()

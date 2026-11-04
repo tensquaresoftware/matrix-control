@@ -113,7 +113,7 @@ private:
         expectEquals(sortDisplayValue(skin, borderOff(), SortColumn::kMappedColour),
                      juce::String("kBlue"));
         expectEquals(sortDisplayValue(skin, borderOn(), SortColumn::kColourSet),
-                     juce::String("k1"));
+                     juce::String("cs1"));
     }
 
     void filterThenSortPropertyAscending()
@@ -172,14 +172,14 @@ private:
 
     void colourSetFilterMenuLabelWithHelp()
     {
-        beginTest("Colour set filter menu shows kN: help when label set");
+        beginTest("Colour set filter menu shows csN: help when label set");
 
         using namespace SkinEditorMappingsColumnFilter;
         auto skin = makeSkin();
-        expectEquals(colourSetFilterMenuLabel(skin, "k1"), juce::String("k1"));
+        expectEquals(colourSetFilterMenuLabel(skin, "cs1"), juce::String("cs1"));
         skin.colourSetLabels[static_cast<size_t>(TSS::ColourSet::k1)] = "Patch";
-        expectEquals(colourSetFilterMenuLabel(skin, "k1"), juce::String("k1: Patch"));
-        expectEquals(colourSetFilterMenuLabel(skin, "k2"), juce::String("k2"));
+        expectEquals(colourSetFilterMenuLabel(skin, "cs1"), juce::String("cs1: Patch"));
+        expectEquals(colourSetFilterMenuLabel(skin, "cs2"), juce::String("cs2"));
     }
 
     void defaultMappingsSortIsPropertyAscending()

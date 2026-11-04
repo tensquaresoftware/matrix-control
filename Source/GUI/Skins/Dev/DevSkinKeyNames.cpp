@@ -77,10 +77,10 @@ namespace TSS::DevSkin
         };
 
         constexpr Named<ColourSet> kColourSets[] = {
-            { ColourSet::k1, "k1" },
-            { ColourSet::k2, "k2" },
-            { ColourSet::k3, "k3" },
-            { ColourSet::k4, "k4" },
+            { ColourSet::k1, "cs1" },
+            { ColourSet::k2, "cs2" },
+            { ColourSet::k3, "cs3" },
+            { ColourSet::k4, "cs4" },
         };
 
         template <typename Enum, size_t N>

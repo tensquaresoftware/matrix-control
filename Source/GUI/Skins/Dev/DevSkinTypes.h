@@ -81,7 +81,7 @@ namespace TSS::DevSkin
         std::vector<Pastille> palette;
         std::map<SkinColourKey, juce::String> mappings;
         /**
-         * Editor-only help labels for ColourSet k1..k4 (document-global).
+         * Editor-only help labels for ColourSet cs1..cs4 (document-global).
          * Omitted from PushPayload; optional in skin JSON as colourSetLabels.
          */
         std::array<juce::String, kAllColourSets.size()> colourSetLabels {};

@@ -195,7 +195,7 @@ namespace SkinEditorMappingsColumnFilter
     }
 
     /**
-     * Colour set filter PopupMenu label: "k1" or "k1: Patch" when a shared help label exists.
+     * Colour set filter PopupMenu label: "cs1" or "cs1: Patch" when a shared help label exists.
      * Filter value / match key stays the bare token (toString(ColourSet)).
      */
     inline juce::String colourSetFilterMenuLabel(const TSS::DevSkin::NamedSkin& skin,

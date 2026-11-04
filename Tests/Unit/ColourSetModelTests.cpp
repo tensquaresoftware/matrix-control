@@ -163,7 +163,7 @@ private:
         {
             if (mapping.getProperty("object", {}) != "HeaderPanel")
                 continue;
-            mapping.getDynamicObject()->setProperty("colourSet", "k2");
+            mapping.getDynamicObject()->setProperty("colourSet", "cs2");
             break;
         }
         expect(! TSS::DevSkin::importFromJson(layer, juce::JSON::toString(parsed)).ok);
@@ -203,12 +203,12 @@ private:
             expect(TSS::DevSkin::toString(key.object) != objectName);
         };
 
-        expectRemapToK4("ComboBoxButtonLike", TSS::SkinObjectType::kComboBox, true, "k4");
+        expectRemapToK4("ComboBoxButtonLike", TSS::SkinObjectType::kComboBox, true, "cs4");
         expectRemapToK4("ComboBoxButtonLike", TSS::SkinObjectType::kComboBox, false, "");
-        expectRemapToK4("ComboBoxButtonLike", TSS::SkinObjectType::kComboBox, true, "k1");
+        expectRemapToK4("ComboBoxButtonLike", TSS::SkinObjectType::kComboBox, true, "cs1");
         expectRemapToK4("SliderButtonLike", TSS::SkinObjectType::kSlider, false, "");
-        expectRemapToK4("SliderButtonLike", TSS::SkinObjectType::kSlider, true, "k1");
-        expectRemapToK4("PopupMenuButtonLike", TSS::SkinObjectType::kPopupMenu, true, "k1");
+        expectRemapToK4("SliderButtonLike", TSS::SkinObjectType::kSlider, true, "cs1");
+        expectRemapToK4("PopupMenuButtonLike", TSS::SkinObjectType::kPopupMenu, true, "cs1");
     }
 
     struct LegacyChromeMappingCase

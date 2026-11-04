@@ -69,7 +69,7 @@ namespace TSS::DevSkin
                                  const juce::String& pastilleName);
 
         /**
-         * Editor-only Colour set help label for one index (k1..k4).
+         * Editor-only Colour set help label for one index (cs1..cs4).
          * Empty clears the label. Does not affect runtime ColourSet identity.
          */
         juce::Result setColourSetLabel(const juce::String& skinId,

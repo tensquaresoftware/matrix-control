@@ -74,9 +74,9 @@ private:
         expect(skinObj != nullptr);
         auto* labelsObj = skinObj->getProperty("colourSetLabels").getDynamicObject();
         expect(labelsObj != nullptr);
-        expectEquals(labelsObj->getProperty("k2").toString(), juce::String("Master"));
-        expectEquals(labelsObj->getProperty("k4").toString(), juce::String("Modales"));
-        expect(! labelsObj->hasProperty("k1"));
+        expectEquals(labelsObj->getProperty("cs2").toString(), juce::String("Master"));
+        expectEquals(labelsObj->getProperty("cs4").toString(), juce::String("Modales"));
+        expect(! labelsObj->hasProperty("cs1"));
 
         TSS::DevSkin::Layer restored;
         const auto imported = TSS::DevSkin::appendEditorSkinsFromJson(restored, json);
@@ -134,7 +134,7 @@ private:
                                                        const juce::String& labelValue)
     {
         auto* labels = new juce::DynamicObject();
-        labels->setProperty("k3", labelValue);
+        labels->setProperty("cs3", labelValue);
         auto* skinObj = new juce::DynamicObject();
         skinObj->setProperty("id", skinId);
         skinObj->setProperty("name", "Import Label");
