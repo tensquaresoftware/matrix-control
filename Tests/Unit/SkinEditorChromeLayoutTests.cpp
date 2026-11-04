@@ -28,7 +28,8 @@ public:
         operationWellMatchesSessionAndSharedBadgeGap();
         windowFitsFixedMappingsNotStretch();
         idleWitnessHiddenHoldWitnessVisible();
-        mappingsKeepsLegacyHalfShareWidth();
+        mappingsColumnPadAndWidths();
+        mappingsChromeBadgeTokens();
         skinsPanelEditorActionsFitOneRow();
         minContentHeightStacksSkinsAndColor();
         pathElideKeepsLeafName();
@@ -80,44 +81,50 @@ private:
         expect(mappingWitnessVisible(Mode::kArmedRow));
     }
 
-    void mappingsKeepsLegacyHalfShareWidth()
+    void mappingsColumnPadAndWidths()
     {
-        beginTest("Mappings width includes former Palette surplus for Property/State");
+        beginTest("Mappings columns use 6px cell pad and fixed widths");
 
         expectEquals(SkinEditorChrome::kPaletteListPaintWidth, 130);
         expectEquals(SkinEditorChrome::kPalettePanelWidth, 158);
         expectEquals(SkinEditorChrome::kPalettePanelWidth,
                      SkinEditorChrome::palettePanelWidthForActionButtons());
-        expectEquals(SkinEditorChrome::kPaletteListPaintWidth,
-                     SkinEditorChrome::paletteListPaintFloor());
-        expectEquals(SkinEditorChrome::kMappingsPropertyColumnWidth, 150);
-        expectEquals(SkinEditorChrome::kMappingsStateColumnWidth, 75);
-        expectEquals(SkinEditorChrome::kMappingsColourSetColumnWidth, 130);
-        expectEquals(SkinEditorChrome::kMappingsLinkColumnWidth, 70);
-        expectEquals(SkinEditorChrome::kMappingsTablePaintWidth, 561);
-        expectEquals(SkinEditorChrome::kMappingsPanelWidth, 591);
+        expectEquals(SkinEditorChrome::kMappingsColumnPad, 6);
+        expectEquals(SkinEditorChrome::kMappingsPropertyColumnWidth, 160);
+        expectEquals(SkinEditorChrome::kMappingsStateColumnWidth, 85);
+        expectEquals(SkinEditorChrome::kMappingsColourSetColumnWidth, 140);
+        expectEquals(SkinEditorChrome::kMappingsLinkColumnWidth, 55);
+        expectEquals(SkinEditorChrome::kLinkCountBadgeWidth, 22);
+        expectEquals(SkinEditorChrome::kMappingsMappedColumnWidth, 140);
+        expectEquals(SkinEditorChrome::kMappingsTablePaintWidth, 580);
+        expectEquals(SkinEditorChrome::kMappingsPanelWidth, 610);
         expect(SkinEditorChrome::kMappingsPropertyColumnWidth % 5 == 0);
-        expect(SkinEditorChrome::kMappingsStateColumnWidth % 5 == 0);
-        expect(SkinEditorChrome::kMappingsColourSetColumnWidth % 5 == 0);
-        expect(SkinEditorChrome::kMappingsLinkColumnWidth % 5 == 0);
-        expectEquals(SkinEditorChrome::kObjectComboWidth, 158);
-        // Hold aligns to Colour set column when that is farther than Object[+clear]+button gap.
+        expect(SkinEditorChrome::kMappingsMappedColumnWidth % 5 == 0);
+        expectEquals(SkinEditorChrome::kObjectComboWidth, 149);
         expectEquals(SkinEditorChrome::mappingsHoldLeft(100, 200), 200);
         expectEquals(SkinEditorChrome::mappingsHoldLeft(200, 100),
                      200 + SkinEditorChrome::kButtonGap);
-        expectEquals(juce::String(SkinEditorChrome::kAllObjectsComboText),
-                     juce::String("- All objects -"));
-        // Build C: Link column between Colour set and Mapped colour.
         expectEquals(SkinEditorChrome::kMappingsTablePaintWidth,
-                     SkinEditorChrome::kMappingsColumnPad
-                         + SkinEditorChrome::kMappingsPropertyColumnWidth
+                     SkinEditorChrome::kMappingsPropertyColumnWidth
                          + SkinEditorChrome::kMappingsStateColumnWidth
                          + SkinEditorChrome::kMappingsColourSetColumnWidth
                          + SkinEditorChrome::kMappingsLinkColumnWidth
-                         + SkinEditorChrome::kPaletteListPaintWidth);
+                         + SkinEditorChrome::kMappingsMappedColumnWidth);
         expect(SkinEditorChrome::kMappingsPanelWidth
-               < SkinEditorChrome::kLegacyWindowMaxWidth / 2);
+               < SkinEditorChrome::kLegacyWindowMaxWidth);
+    }
+
+    void mappingsChromeBadgeTokens()
+    {
+        beginTest("Mappings chrome badge / chip tokens");
+
+        expectEquals(juce::String(SkinEditorChrome::kAllObjectsComboText),
+                     juce::String("- All objects -"));
+        expectEquals(SkinEditorChrome::kClearBadgeSize, 12);
+        expectEquals(SkinEditorChrome::kSortBadgeSize, SkinEditorChrome::kClearBadgeSize);
         expectEquals(SkinEditorChrome::kLinkChainBadgeSize, SkinEditorChrome::kSortBadgeSize);
+        expectEquals(SkinEditorChrome::kLegendChipGap, 4);
+        expectEquals(SkinEditorChrome::kCountBadgeDiameter, 12);
     }
 
     static juce::TextButton* findButton(juce::Component& root, const juce::String& text)

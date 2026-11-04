@@ -19,6 +19,8 @@ SkinEditorMainComponent::SkinEditorMainComponent()
     setupLayerAndBridgeCallbacks();
     loadSessionOrBaseline();
     bridge_.start();
+    // Nested clicks (gutters / Color / Palette / …) can clear Mappings row selection.
+    addMouseListener(this, true);
     refreshAll();
     // Second layout after the first visible size settle — catches any remaining
     // cold glyph-metric drift that warmFonts alone does not clear on some hosts.
@@ -108,7 +110,7 @@ void SkinEditorMainComponent::setupBodyPanels()
     palettePanel_.onPastilleSelected = [this](const juce::String& name) { onPastilleSelected(name); };
     palettePanel_.onMappingCountClicked = [this](const juce::String& name)
     {
-        mappingsPanel_.setMappedColourFilter(name);
+        mappingsPanel_.revealPastilleMappings(name);
     };
     palettePanel_.onAddRequested = [this] { onAddPastille(); };
     palettePanel_.onDuplicateRequested = [this] { onDuplicatePastille(); };

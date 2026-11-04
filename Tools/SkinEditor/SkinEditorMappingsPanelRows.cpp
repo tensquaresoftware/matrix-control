@@ -7,13 +7,13 @@
 #include "GUI/Skins/Dev/DevSkinKeyNames.h"
 #include "Tools/SkinEditor/SkinEditorChrome.h"
 #include "Tools/SkinEditor/SkinEditorMappingsColumnFilter.h"
+#include "Tools/SkinEditor/SkinEditorMappingsColumns.h"
 #include "Tools/SkinEditor/SkinEditorUiHelpers.h"
 
 namespace
 {
-    constexpr int kEdgeExtra = 4;
+    constexpr int kEdgeExtra = 2;
     constexpr int kFocusPad = SkinEditorChrome::kMappingsFocusPad;
-    constexpr float kColourSetIndexBadgeFont = 8.0f;
 }
 
 SkinEditorMappingsPanel::Row SkinEditorMappingsPanel::makeMappingRow(
@@ -138,6 +138,9 @@ void SkinEditorMappingsPanel::rebuildRows()
                                            return visibleKeys.find(key) == visibleKeys.end();
                                        }),
                         selectedKeys_.end());
+    if (selectionAnchorKey_.has_value()
+        && visibleKeys.find(*selectionAnchorKey_) == visibleKeys.end())
+        selectionAnchorKey_.reset();
 }
 
 void SkinEditorMappingsPanel::paintColourSetCell(juce::Graphics& g,
@@ -145,14 +148,23 @@ void SkinEditorMappingsPanel::paintColourSetCell(juce::Graphics& g,
                                                  juce::Rectangle<int> cellArea) const
 {
     const int contentH = cellArea.getHeight();
-    const int side = SkinEditorChrome::kColourSetIndexBadgeSize;
-    const int badgeY = cellArea.getY() + (contentH - side) / 2;
-    const auto badge = juce::Rectangle<int>(cellArea.getX(), badgeY, side, side);
+    const int badgeH = SkinEditorChrome::kColourSetIndexBadgeHeight;
+    const auto& indexFont = SkinEditorChrome::fontBold(SkinEditorChrome::kColourSetIndexBadgeFont);
+    const int textW = SkinEditorChrome::measureTextWidth(indexFont, item.colourSetLabel);
+    const int padH = SkinEditorChrome::kColourSetIndexBadgePadH;
+    const int badgeW = juce::jmax(SkinEditorChrome::kColourSetIndexBadgeMinWidth,
+                                  textW + 2 * padH);
+    const int badgeY = cellArea.getY() + (contentH - badgeH) / 2;
+    const auto badge = juce::Rectangle<float>((float) cellArea.getX(),
+                                              (float) badgeY,
+                                              (float) badgeW,
+                                              (float) badgeH);
 
-    g.setColour(SkinEditorChrome::textTableBody());
-    g.fillRoundedRectangle(badge.toFloat(), SkinEditorChrome::kChromeBadgeCorner);
+    g.setColour(SkinEditorChrome::textMuted());
+    g.fillRoundedRectangle(badge, SkinEditorChrome::kChromeBadgeCorner);
     g.setColour(SkinEditorChrome::surfaceTable());
-    g.setFont(SkinEditorChrome::fontBold(kColourSetIndexBadgeFont));
+    g.setFont(indexFont);
+    // Float rect + measured width keeps "csN" optically centred in the tight chip.
     g.drawText(item.colourSetLabel, badge, juce::Justification::centred, false);
     // Always restore body font — Mapped colour is painted next on the same Graphics.
     g.setFont(SkinEditorChrome::fontRegular());
@@ -160,7 +172,7 @@ void SkinEditorMappingsPanel::paintColourSetCell(juce::Graphics& g,
     if (item.colourSetHelpLabel.isEmpty())
         return;
 
-    const int labelX = badge.getRight() + 4;
+    const int labelX = juce::roundToInt(badge.getRight()) + 4;
     g.setColour(SkinEditorChrome::textTableBody());
     // No ellipsis: labels are hard-capped at 16 ASCII chars at edit/import time.
     g.drawText(item.colourSetHelpLabel,
@@ -218,6 +230,45 @@ void SkinEditorMappingsPanel::tryBindRow(int row)
     onRowActivated(rows_[static_cast<size_t>(row)].key);
 }
 
+void SkinEditorMappingsPanel::maybeActivateMappingCell(int row, int pressX, int releaseX, bool skipBind)
+{
+    const auto cols = SkinEditorMappingsColumns::forWidth(paintWidth());
+    if (SkinEditorMappingPolicy::isMappedColourColumn(releaseX, cols.mappedX)
+        && SkinEditorMappingPolicy::isMappedColourColumn(pressX, cols.mappedX))
+    {
+        tryEditMappedColour(row);
+        return;
+    }
+    if (SkinEditorMappingsColumns::isColourSetColumnX(releaseX, cols)
+        || SkinEditorMappingsColumns::isColourSetColumnX(pressX, cols)
+        || SkinEditorMappingsColumns::isLinkColumnX(releaseX, cols)
+        || SkinEditorMappingsColumns::isLinkColumnX(pressX, cols))
+        return;
+    if (! skipBind
+        && SkinEditorMappingsColumns::isPropertyColumnX(releaseX, cols)
+        && SkinEditorMappingsColumns::isPropertyColumnX(pressX, cols))
+        tryBindRow(row);
+}
+
+void SkinEditorMappingsPanel::handleMappingRowMouseUp(int row, const juce::MouseEvent& e)
+{
+    const auto& item = rows_[static_cast<size_t>(row)];
+    const auto cols = SkinEditorMappingsColumns::forWidth(paintWidth());
+    const int releaseX = e.x - kFocusPad;
+    const int pressX = e.getMouseDownX() - kFocusPad;
+    if (SkinEditorMappingsColumns::isLinkColumnX(releaseX, cols)
+        && SkinEditorMappingsColumns::isLinkColumnX(pressX, cols))
+    {
+        handleLinkChainClick(item.key);
+        return;
+    }
+
+    const bool toggle = e.mods.isCommandDown();
+    const bool range = e.mods.isShiftDown();
+    selectRowKey(item.key, toggle, range);
+    maybeActivateMappingCell(row, pressX, releaseX, toggle || range);
+}
+
 void SkinEditorMappingsPanel::tryEditMappedColour(int row)
 {
     if (onMappedColourClicked == nullptr)
@@ -272,4 +323,35 @@ void SkinEditorMappingsPanel::restoreViewScrollAnchor(const ViewScrollAnchor& an
     }
     const int maxY = juce::jmax(0, content_.getHeight() - viewport_.getHeight());
     viewport_.setViewPosition(0, juce::jlimit(0, maxY, restoreY));
+}
+
+void SkinEditorMappingsPanel::paintObjectTableChrome(juce::Graphics& g,
+                                                     ObjectTableChromeSpec spec) const
+{
+    const auto& table = *spec.table;
+    const auto& cols = *spec.cols;
+    const int sectionH = table.tableTop - table.sectionY;
+    if (sectionH > 0)
+    {
+        const auto prop = SkinEditorMappingsColumns::propertyCutSlab(cols);
+        SkinEditorChrome::paintTableSectionHeader(
+            g,
+            { (float) (spec.x0 + prop.getX()), (float) table.sectionY,
+              (float) prop.getWidth(), (float) sectionH },
+            table.name);
+
+        // Continuity rail in State…Mapped — matches tab rail; top corners only (mock).
+        const int railH = SkinEditorChrome::kTableSectionRailHeight;
+        const int railY = table.tableTop - railH;
+        if (railH > 0 && railY >= table.sectionY)
+            SkinEditorMappingsColumns::fillCutColumnSlabs(
+                g, cols, { { spec.x0, railY, spec.width, railH },
+                           SkinEditorChrome::surfaceTableHeader(), true, false, 1 });
+    }
+
+    const int bodyH = table.tableBottom - table.tableTop;
+    if (bodyH > 0)
+        SkinEditorMappingsColumns::fillCutColumnSlabs(
+            g, cols, { { spec.x0, table.tableTop, spec.width, bodyH },
+                       SkinEditorChrome::surfaceTable(), false, true });
 }

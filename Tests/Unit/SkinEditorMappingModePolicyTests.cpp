@@ -20,6 +20,7 @@ public:
         escapeClearsToIdle();
         idleWitnessHidden();
         readOnlyPastilleDoesNotArm();
+        propertyColumnHitTest();
         mappedColourColumnHitTest();
         colourSetColumnHitTest();
         mappedColourEditSelectsBoundOnly();
@@ -110,6 +111,18 @@ private:
         expect(pastilleClick(Mode::kIdle, true, true) == PastilleIntent::kIgnoreEmpty);
     }
 
+    void propertyColumnHitTest()
+    {
+        beginTest("Property column - x in [0, propertyW) is bind hit");
+
+        using namespace SkinEditorMappingPolicy;
+        constexpr int propertyW = 160;
+        expect(isPropertyColumn(0, propertyW));
+        expect(isPropertyColumn(propertyW - 1, propertyW));
+        expect(! isPropertyColumn(propertyW, propertyW));
+        expect(! isPropertyColumn(-1, propertyW));
+    }
+
     void mappedColourColumnHitTest()
     {
         beginTest("Mapped colour column - x at/after mappedX is edit hit");
@@ -154,7 +167,7 @@ private:
 
     void propertyStateStillArmsOrBinds()
     {
-        beginTest("Property/State - Idle arms; HeldColour binds (unchanged policy)");
+        beginTest("Property row intent - Idle arms; HeldColour binds (UI gates to Property cell)");
 
         using namespace SkinEditorMappingPolicy;
         expect(rowClick(Mode::kIdle, true) == RowIntent::kEnterOrChangeArmedRow);
@@ -169,7 +182,7 @@ private:
         using namespace SkinEditorMappingPolicy;
         expectEquals(juce::String(kSelectedColourRole), juce::String("Selected colour: "));
         expectEquals(juce::String(kHeldColourNextStep),
-                     juce::String("Next: click a Property or State cell in a Mappings row."));
+                     juce::String("Next: click a Property cell in a Mappings row."));
         expectEquals(juce::String(kSelectedTargetRole), juce::String("Selected target: "));
         expectEquals(juce::String(kArmedRowNextStep),
                      juce::String("Next: click a colour in Palette."));

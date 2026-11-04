@@ -14,6 +14,7 @@ namespace SkinEditorChrome
         juce::Colour fill;
         bool roundTop = false;
         bool roundBottom = false;
+        float cornerRadius = kControlCorner;
     };
 
     /** Fill a table row; only outer corners of the whole table are rounded. */
@@ -77,7 +78,18 @@ namespace SkinEditorChrome
     /** Empty circle for pending (uninitialized) pastilles — 1 px stroke in logo grey. */
     void paintPendingColourSwatch(juce::Graphics& g, juce::Rectangle<int> area);
 
-    /** Count badge: fill + panel-surface glyph, panel corner radius (default fill = attention). */
+    /** Count badge paint args (fill defaults to attention; textNudgeY shifts the digit). */
+    struct CountBadgeSpec
+    {
+        juce::Rectangle<int> area;
+        int count = 0;
+        juce::Colour fill {};
+        int textNudgeY = 0;
+        bool useDefaultFill = true;
+    };
+
+    /** Count badge: fill + panel-surface glyph, panel corner radius. */
+    void drawCountBadge(juce::Graphics& g, CountBadgeSpec spec);
     void drawCountBadge(juce::Graphics& g,
                         juce::Rectangle<int> area,
                         int count);
@@ -119,6 +131,17 @@ namespace SkinEditorChrome
     void drawLinkChainBadge(juce::Graphics& g, juce::Rectangle<int> area, LinkChainKind kind);
 
     int linkChainBadgeWidth();
+
+    /**
+     * Link sticky-legend count chip: fixed kLinkCountBadgeWidth, glyph centred.
+     * count <= 0 → em dash (idle); count > 0 → decimal digits.
+     */
+    void drawLinkCountBadge(juce::Graphics& g,
+                            juce::Rectangle<int> area,
+                            int count,
+                            juce::Colour fill);
+
+    int linkCountBadgeWidth();
 
     /**
      * Chrome text badge - Inter rectangle (MAPPING / BRIDGE / LAST PUSH / APP).

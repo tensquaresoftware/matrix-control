@@ -86,7 +86,13 @@ namespace SkinEditorMappingPolicy
         return mode != Mode::kIdle;
     }
 
-    /** Mapped colour column vs Property/State (x in content coords; mappedColumnX from layout). */
+    /** Property column (x in content coords; width from layout). Bind / arm destination. */
+    inline bool isPropertyColumn(int x, int propertyWidth) noexcept
+    {
+        return x >= 0 && x < propertyWidth;
+    }
+
+    /** Mapped colour column vs Property (x in content coords; mappedColumnX from layout). */
     inline bool isMappedColourColumn(int x, int mappedColumnX) noexcept
     {
         return x >= mappedColumnX;
@@ -126,7 +132,7 @@ namespace SkinEditorMappingPolicy
     inline constexpr const char* kEditingColourRole = "Editing colour: ";
     inline constexpr const char* kSelectedTargetRole = "Selected target: ";
     inline constexpr const char* kHeldColourNextStep =
-        "Next: click a Property or State cell in a Mappings row.";
+        "Next: click a Property cell in a Mappings row.";
     inline constexpr const char* kArmedRowNextStep = "Next: click a colour in Palette.";
     inline constexpr const char* kEditingColourNextStep =
         "Next: adjust in COLOR (affects every mapped use).";

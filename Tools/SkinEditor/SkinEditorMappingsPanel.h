@@ -10,6 +10,7 @@
 #include "Tools/SkinEditor/SkinEditorChromeTable.h"
 #include "Tools/SkinEditor/SkinEditorMappingLinkGroups.h"
 #include "Tools/SkinEditor/SkinEditorMappingsColumnFilter.h"
+#include "Tools/SkinEditor/SkinEditorMappingsColumns.h"
 
 /** Scrollable object tables; sticky Property/State/Colour set/Link/Mapped legend + gap. */
 class SkinEditorMappingsPanel final : public juce::Component
@@ -26,14 +27,35 @@ public:
 
     /** Activate Mapped colour column filter for this pastille name (exact palette match). */
     void setMappedColourFilter(const juce::String& pastilleName);
+    /**
+     * Palette mapping-count click: show every row using this pastille.
+     * Clears the Object macro filter (All objects) so the count matches the table.
+     */
+    void revealPastilleMappings(const juce::String& pastilleName);
 
     /** When true, batch maps stay in the current gesture direction after a successful write. */
     bool isHoldColour() const noexcept { return holdColourToggle_.getToggleState(); }
 
+    /**
+     * HeldColour: Property-column hover hint while a pastille awaits a row click.
+     * `preview` tints the hover (Palette pastille); transparent = grey fallback.
+     * Cleared automatically when the flag turns off.
+     */
+    void setPropertyBindHoverEnabled(bool enabled, juce::Colour preview = {});
+
+    /** Clear mapping-row selection (gutters / outside-table clicks from main). */
+    void clearTableRowSelection();
+    /**
+     * True when this click should keep the current row selection
+     * (mapping/section row, sticky legend, or action-row chrome).
+     */
+    bool preservesRowSelectionForEvent(const juce::MouseEvent& e) const;
+    bool hitActionRowChrome(juce::Point<int> pos) const noexcept;
+
     /** Hold colour toggle flipped - refresh OPERATION coaching when a bind gesture is active. */
     std::function<void()> onHoldColourChanged;
 
-    /** Property / State cell click - main owns Idle / HeldColour / ArmedRow (bind vs re-arm). */
+    /** Property cell click - main owns Idle / HeldColour / ArmedRow (bind vs re-arm). */
     std::function<void(TSS::SkinColourKey key)> onRowActivated;
     /** Mapped colour cell click on a bound row - main selects that pastille for COLOR / SV edit. */
     std::function<void(TSS::SkinColourKey key)> onMappedColourClicked;
@@ -77,7 +99,7 @@ private:
         bool pastillePending = false;
         bool unbound = false;
         int heightPx = 1;
-        /** Thicken mapping row: +4px top and/or bottom (swatch stays 12px). */
+        /** Thicken mapping row: +2px top and/or bottom (swatch stays 12px). */
         bool thickenTop = false;
         bool thickenBottom = false;
     };
@@ -150,6 +172,9 @@ private:
                                   FilterColumn column,
                                   const juce::StringArray& values);
     void layoutLegendHitTargets();
+    void layoutLinkLegendHitTargets(juce::Rectangle<int> area,
+                                    const SkinEditorMappingsColumns::Layout& cols,
+                                    const juce::Font& font);
     void layoutGlobalClearBounds();
     void clearLegendHitTargets();
     bool handleLegendClearClick(juce::Point<int> pos);
@@ -157,19 +182,34 @@ private:
     SkinEditorMappingsColumnFilter::SortColumn sortColumnFor(FilterColumn column) const noexcept;
     SkinEditorChrome::SortPictoKind sortPictoFor(FilterColumn column) const noexcept;
 
+    /** Packs paintObjectTableChrome arguments so the method stays within the parameter gate. */
+    struct ObjectTableChromeSpec
+    {
+        const ObjectTable* table = nullptr;
+        const SkinEditorMappingsColumns::Layout* cols = nullptr;
+        int x0 = 0;
+        int width = 0;
+    };
+
     // Paint
     void paintStickyLegend(juce::Graphics& g, juce::Rectangle<int> area) const;
+    /** Cut column slabs + Property 45° tab + thin continuity rail for one object table. */
+    void paintObjectTableChrome(juce::Graphics& g, ObjectTableChromeSpec spec) const;
     void paintRow(juce::Graphics& g, PaintRowSpec spec) const;
     void paintMappingCells(juce::Graphics& g,
                            const Row& item,
                            juce::Rectangle<int> cellArea) const;
+    /** Property label ink: dark on light Palette hover, else table body. */
+    juce::Colour propertyBindLabelColour(const Row& item) const noexcept;
+    void paintMappedColourCell(juce::Graphics& g,
+                               const Row& item,
+                               juce::Rectangle<int> area) const;
     void paintColourSetCell(juce::Graphics& g,
                             const Row& item,
                             juce::Rectangle<int> cellArea) const;
     void paintLinkCell(juce::Graphics& g,
                        const Row& item,
                        juce::Rectangle<int> cellArea) const;
-    void paintFocusedObjectOutline(juce::Graphics& g, int tableX, int tableWidth) const;
 
     // Bind / focus / Colour set label / Link
     void tryBindRow(int row);
@@ -179,8 +219,12 @@ private:
     void setFocusedObject(int objectIndex);
     /** Content row mouseUp after mapping-row identity is known. */
     void handleMappingRowMouseUp(int row, const juce::MouseEvent& e);
+    /** After selection: Mapped edit, or Property bind (skips Colour set / Link / modifiers). */
+    void maybeActivateMappingCell(int row, int pressX, int releaseX, bool skipBind);
     void clearRowSelection();
-    void selectRowKey(const TSS::SkinColourKey& key, bool toggle);
+    /** Plain = replace; Cmd/Ctrl = toggle; Shift = visible-row range from anchor (cross-table OK). */
+    void selectRowKey(const TSS::SkinColourKey& key, bool toggle, bool range);
+    void selectRowKeyRange(const TSS::SkinColourKey& endKey);
     bool isKeySelected(const TSS::SkinColourKey& key) const noexcept;
     bool isKeyGroupRevealed(const TSS::SkinColourKey& key) const;
     std::optional<TSS::SkinObjectType> objectFilterType() const;
@@ -217,7 +261,14 @@ private:
     bool updatingObjectCombo_ = false;
     /** Ordered multi-select (last = winner pastille anchor). Empty = calm tables. */
     std::vector<TSS::SkinColourKey> selectedKeys_;
+    /** Shift-range origin (last plain-click / range end). */
+    std::optional<TSS::SkinColourKey> selectionAnchorKey_;
     std::optional<TSS::SkinColourKey> hoveredLinkKey_;
+    /** HeldColour row under cursor — Property column bind-target hover. */
+    std::optional<TSS::SkinColourKey> hoveredPropertyBindKey_;
+    bool propertyBindHoverEnabled_ = false;
+    /** Selected Palette pastille for hover tint (transparent → grey fallback). */
+    juce::Colour propertyBindHoverColour_;
     int focusedObject_ = -1;
     /** Empty = "- All objects -"; otherwise a SkinObjectType display name. */
     juce::String objectFilterName_;

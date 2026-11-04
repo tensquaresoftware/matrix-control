@@ -1,5 +1,11 @@
 #include "Tools/SkinEditor/SkinEditorMainComponent.h"
 
+void SkinEditorMainComponent::mouseUp(const juce::MouseEvent& e)
+{
+    if (e.mouseWasClicked() && ! mappingsPanel_.preservesRowSelectionForEvent(e))
+        mappingsPanel_.clearTableRowSelection();
+}
+
 bool SkinEditorMainComponent::tryQuitWithDirtyGate()
 {
     flushPendingSessionAutosave();

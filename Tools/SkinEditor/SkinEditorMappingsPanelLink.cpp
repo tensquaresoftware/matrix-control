@@ -8,8 +8,46 @@
 
 void SkinEditorMappingsPanel::clearRowSelection()
 {
+    if (selectedKeys_.empty() && ! selectionAnchorKey_.has_value())
+    {
+        hoveredLinkKey_.reset();
+        return;
+    }
     selectedKeys_.clear();
+    selectionAnchorKey_.reset();
     hoveredLinkKey_.reset();
+    content_.repaint();
+    repaint();
+}
+
+void SkinEditorMappingsPanel::clearTableRowSelection()
+{
+    clearRowSelection();
+}
+
+bool SkinEditorMappingsPanel::hitActionRowChrome(juce::Point<int> pos) const noexcept
+{
+    return objectCombo_.getBounds().contains(pos) || holdColourToggle_.getBounds().contains(pos)
+           || objectLabel_.getBounds().contains(pos) || unboundLabelBounds_.contains(pos)
+           || unboundBadgeBounds_.contains(pos) || objectClearBounds_.contains(pos);
+}
+
+bool SkinEditorMappingsPanel::preservesRowSelectionForEvent(const juce::MouseEvent& e) const
+{
+    auto* origin = e.originalComponent;
+    if (origin == nullptr || (origin != this && ! isParentOf(origin)))
+        return false;
+
+    const auto pos = e.getEventRelativeTo(const_cast<SkinEditorMappingsPanel*>(this)).getPosition();
+    if (stickyBandBounds_.contains(pos) || stickyLegendBounds_.contains(pos)
+        || hitActionRowChrome(pos))
+        return true;
+    if (! viewport_.getBounds().contains(pos))
+        return false;
+
+    const auto contentPos = e.getEventRelativeTo(const_cast<Content*>(&content_)).getPosition();
+    const int row = rowIndexAtY(contentPos.y);
+    return row >= 0 && rows_[static_cast<size_t>(row)].kind != RowKind::kGap;
 }
 
 bool SkinEditorMappingsPanel::isKeySelected(const TSS::SkinColourKey& key) const noexcept
@@ -44,22 +82,75 @@ bool SkinEditorMappingsPanel::isKeyGroupRevealed(const TSS::SkinColourKey& key) 
     return revealed.find(key) != revealed.end();
 }
 
-void SkinEditorMappingsPanel::selectRowKey(const TSS::SkinColourKey& key, bool toggle)
+void SkinEditorMappingsPanel::selectRowKeyRange(const TSS::SkinColourKey& endKey)
 {
+    if (! selectionAnchorKey_.has_value())
+    {
+        selectRowKey(endKey, false, false);
+        return;
+    }
+
+    std::vector<TSS::SkinColourKey> visible;
+    visible.reserve(rows_.size());
+    for (const auto& row : rows_)
+        if (row.kind == RowKind::kMapping)
+            visible.push_back(row.key);
+
+    const auto findIndex = [&](const TSS::SkinColourKey& key) -> int
+    {
+        for (int i = 0; i < static_cast<int>(visible.size()); ++i)
+            if (visible[static_cast<size_t>(i)] == key)
+                return i;
+        return -1;
+    };
+
+    const int anchorIndex = findIndex(*selectionAnchorKey_);
+    const int endIndex = findIndex(endKey);
+    if (anchorIndex < 0 || endIndex < 0)
+    {
+        selectRowKey(endKey, false, false);
+        return;
+    }
+
+    const int lo = juce::jmin(anchorIndex, endIndex);
+    const int hi = juce::jmax(anchorIndex, endIndex);
+    selectedKeys_.clear();
+    selectedKeys_.reserve(static_cast<size_t>(hi - lo + 1));
+    for (int i = lo; i <= hi; ++i)
+        selectedKeys_.push_back(visible[static_cast<size_t>(i)]);
+
+    // Clicked end stays the link pastille winner (vector back).
+    // Keep selectionAnchorKey_ so successive Shift+clicks still originate there.
+    if (selectedKeys_.back() != endKey)
+    {
+        selectedKeys_.erase(std::remove(selectedKeys_.begin(), selectedKeys_.end(), endKey),
+                            selectedKeys_.end());
+        selectedKeys_.push_back(endKey);
+    }
+}
+
+void SkinEditorMappingsPanel::selectRowKey(const TSS::SkinColourKey& key, bool toggle, bool range)
+{
+    if (range)
+    {
+        selectRowKeyRange(key);
+        return;
+    }
+
     if (! toggle)
     {
         selectedKeys_.clear();
         selectedKeys_.push_back(key);
+        selectionAnchorKey_ = key;
         return;
     }
 
     const auto it = std::find(selectedKeys_.begin(), selectedKeys_.end(), key);
     if (it != selectedKeys_.end())
-    {
         selectedKeys_.erase(it);
-        return;
-    }
-    selectedKeys_.push_back(key);
+    else
+        selectedKeys_.push_back(key);
+    // Anchor unchanged — Shift after Cmd multi-select still ranges from the plain-click origin.
 }
 
 SkinEditorMappingLink::HeaderState SkinEditorMappingsPanel::linkHeaderState() const
@@ -237,18 +328,24 @@ void SkinEditorMappingsPanel::paintLinkCell(juce::Graphics& g,
 
     const auto kind = yellow ? SkinEditorChrome::LinkChainKind::kYellow
                              : SkinEditorChrome::LinkChainKind::kGrey;
-    SkinEditorChrome::drawLinkChainBadge(g, cellArea, kind);
+    // Match sticky-legend chain X; content table origin is kFocusPad.
+    constexpr int kRowChainNudgeX = 1;
+    const int tableOriginX = SkinEditorChrome::kMappingsFocusPad;
+    const int tableLocalChainX = (! linkChainBounds_.isEmpty() && ! stickyLegendBounds_.isEmpty())
+                                     ? (linkChainBounds_.getX() - stickyLegendBounds_.getX())
+                                     : (cellArea.getX() - tableOriginX
+                                        + SkinEditorChrome::kMappingsColumnPad);
+    const int chainX = tableOriginX + tableLocalChainX + kRowChainNudgeX;
+    const auto chainArea = juce::Rectangle<int>(chainX,
+                                                cellArea.getY(),
+                                                SkinEditorChrome::linkChainBadgeWidth(),
+                                                cellArea.getHeight());
+    SkinEditorChrome::drawLinkChainBadge(g, chainArea, kind);
 }
 
 void SkinEditorMappingsPanel::paintLinkLegend(juce::Graphics& g) const
 {
     const auto linkHeader = linkHeaderState();
-    const int linkChainW = SkinEditorChrome::linkChainBadgeWidth();
-    const int linkTitleW = juce::jmax(0, linkLabelBounds_.getWidth()
-                                             - SkinEditorChrome::kButtonGap - linkChainW);
-    g.setColour(SkinEditorChrome::textTableHeader());
-    g.drawText("Link", linkLabelBounds_.getX(), linkLabelBounds_.getY(), linkTitleW,
-               linkLabelBounds_.getHeight(), juce::Justification::centredLeft, false);
     if (! linkChainBounds_.isEmpty())
     {
         const auto kind = (linkHeader.chrome == SkinEditorMappingLink::HeaderChrome::kYellow)
@@ -256,6 +353,17 @@ void SkinEditorMappingsPanel::paintLinkLegend(juce::Graphics& g) const
                               : SkinEditorChrome::LinkChainKind::kGrey;
         SkinEditorChrome::drawLinkChainBadge(g, linkChainBounds_, kind);
     }
-    if (linkHeader.badgeCount > 0 && ! linkBadgeBounds_.isEmpty())
-        SkinEditorChrome::drawCountBadge(g, linkBadgeBounds_, linkHeader.badgeCount);
+    if (linkBadgeBounds_.isEmpty())
+        return;
+
+    // Idle / empty selection: same grey as disabled Link chain (#323232).
+    // Yellow = active link group; muted grey = free multi-select create/merge.
+    juce::Colour badgeFill = SkinEditorChrome::surfaceTab();
+    if (linkHeader.badgeCount > 0)
+    {
+        badgeFill = (linkHeader.chrome == SkinEditorMappingLink::HeaderChrome::kYellow)
+                        ? SkinEditorChrome::attention()
+                        : SkinEditorChrome::textMuted();
+    }
+    SkinEditorChrome::drawLinkCountBadge(g, linkBadgeBounds_, linkHeader.badgeCount, badgeFill);
 }

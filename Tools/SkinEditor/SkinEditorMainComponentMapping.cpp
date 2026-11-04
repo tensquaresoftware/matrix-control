@@ -160,6 +160,7 @@ void SkinEditorMainComponent::enterArmedRow(TSS::SkinColourKey key, bool fromUnb
     mappingMode_ = MappingMode::kArmedRow;
     armedKey_ = key;
     armedFromUnbound_ = fromUnbound;
+    mappingsPanel_.setPropertyBindHoverEnabled(false);
     updateMappingWitness();
     grabKeyboardFocus();
 }
@@ -172,6 +173,7 @@ void SkinEditorMainComponent::enterEditingColour(const juce::String& pastilleNam
     armedFromUnbound_ = false;
     palettePanel_.selectPastille(pastilleName);
     syncColourPickerToSelection();
+    mappingsPanel_.setPropertyBindHoverEnabled(false);
     updateMappingWitness();
     grabKeyboardFocus();
 }
@@ -187,6 +189,7 @@ void SkinEditorMainComponent::clearMappingModeToIdle()
     palettePanel_.clearSelection();
     colourPicker_.clearActiveColour();
     colourPicker_.setEnabledEditing(false);
+    mappingsPanel_.setPropertyBindHoverEnabled(false);
     updateMappingWitness();
 }
 
@@ -260,19 +263,20 @@ void SkinEditorMainComponent::applyMapping(TSS::SkinColourKey key,
 
 void SkinEditorMainComponent::fillWitnessSwatchForSelectedPastille()
 {
+    juce::Colour hoverPreview;
     if (const auto* skin = layer_.findSkin(visibleSkinId()))
-    {
         for (const auto& pastille : skin->palette)
-        {
             if (pastille.name == selectedPastille_)
             {
                 mappingWitnessShowSwatch_ = true;
                 mappingWitnessPending_ = pastille.pending;
                 mappingWitnessColour_ = juce::Colour(pastille.argb);
-                return;
+                if (! pastille.pending)
+                    hoverPreview = mappingWitnessColour_;
+                break;
             }
-        }
-    }
+    if (mappingMode_ == MappingMode::kHeldColour)
+        mappingsPanel_.setPropertyBindHoverEnabled(true, hoverPreview);
 }
 
 void SkinEditorMainComponent::fillHeldColourWitness()
@@ -280,14 +284,13 @@ void SkinEditorMainComponent::fillHeldColourWitness()
     const bool pending = isPastillePending(selectedPastille_);
     mappingWitnessSameColourCollision_ = ! pending
                                          && isPastilleSameRgbAlreadyMapped(selectedPastille_);
-    const auto next = pending
-                          ? juce::String(SkinEditorMappingPolicy::kHeldPendingNextStep)
-                          : mappingWitnessSameColourCollision_
-                                ? juce::String(SkinEditorMappingPolicy::kSameColourMappedNextStep)
-                                : SkinEditorMappingPolicy::withHoldColourSuffix(
-                                      SkinEditorMappingPolicy::kHeldColourNextStep,
-                                      mappingsPanel_.isHoldColour(),
-                                      true);
+    juce::String next = SkinEditorMappingPolicy::kHeldPendingNextStep;
+    if (! pending)
+        next = mappingWitnessSameColourCollision_
+                   ? juce::String(SkinEditorMappingPolicy::kSameColourMappedNextStep)
+                   : SkinEditorMappingPolicy::withHoldColourSuffix(
+                         SkinEditorMappingPolicy::kHeldColourNextStep,
+                         mappingsPanel_.isHoldColour(), true);
     setWitnessTexts(SkinEditorMappingPolicy::kSelectedColourRole, selectedPastille_, next);
     fillWitnessSwatchForSelectedPastille();
 }

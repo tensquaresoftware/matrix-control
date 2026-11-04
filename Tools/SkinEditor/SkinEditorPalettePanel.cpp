@@ -329,7 +329,8 @@ void SkinEditorPalettePanel::paintColourRow(juce::Graphics& g, const Row& item, 
 
     const auto rowArea = juce::Rectangle<float>(0.0f, (float) yOff, (float) paintW, (float) fullH);
     if (isRowSelectedVisually(row))
-        SkinEditorChrome::fillTableRow(g, { rowArea, juce::Colour(0xff303030), roundTop, roundBottom });
+        SkinEditorChrome::fillTableRow(g, { rowArea, juce::Colour(0xff303030), roundTop, roundBottom,
+                                            SkinEditorChrome::kMappingsHighlightCorner });
 
     namespace Geo = SkinEditorPaletteGeometry;
     const int sw = SkinEditorChrome::kColourSwatchSize;

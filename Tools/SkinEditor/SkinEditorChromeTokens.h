@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cmath>
+
 #include <juce_graphics/juce_graphics.h>
 
 namespace SkinEditorChrome
@@ -20,8 +22,21 @@ namespace SkinEditorChrome
      * Mapping table data rows — darker than panel, lighter than surfaceSection.
      */
     inline juce::Colour surfaceTable() { return juce::Colour(0xff1c1c1c); }
-    /** Selected mapping row — slight lift above surfaceTable. */
-    inline juce::Colour surfaceTableRowHighlight() { return juce::Colour(0xff252525); }
+    /** Selected mapping row — lift above surfaceTable (#1c1c1c). */
+    inline juce::Colour surfaceTableRowHighlight() { return juce::Colour(0xff272727); }
+    /** HeldColour Property hover fallback (pending pastille / no colour yet). */
+    inline juce::Colour surfaceTablePropertyBindHover() { return juce::Colour(0xff353535); }
+    /**
+     * Property label on a light / mid bind-hover fill (kWhite, kCream, kGrey350, …).
+     * Same ink as surfaceSection / app chrome.
+     */
+    inline juce::Colour textOnLightPropertyBindHover() { return juce::Colour(0xff151515); }
+    /** Horizontal inset so highlights float inside cut column slabs. */
+    inline constexpr int kMappingsHighlightInsetX = 4;
+    /** Vertical inset (keeps highlight thinner than the cell band). */
+    inline constexpr int kMappingsHighlightInsetY = 2;
+    /** Selection highlight corners (Mappings + Palette) — quieter than kControlCorner. */
+    inline constexpr float kMappingsHighlightCorner = 1.5f;
     /** Raised tab chip (Photocraft active tab). */
     inline juce::Colour surfaceTab() { return juce::Colour(0xff323232); }
     inline juce::Colour textPrimary() { return juce::Colour(0xffdddddd); }
@@ -32,12 +47,48 @@ namespace SkinEditorChrome
     inline juce::Colour textTableHeader() { return juce::Colour(0xffbcbcbc); }
     /** Table data-row body text (darker than textPrimary). */
     inline juce::Colour textTableBody() { return juce::Colour(0xffc4c4c4); }
+
+    /** WCAG relative luminance (sRGB), 0 = black … 1 = white. */
+    inline float relativeLuminance(juce::Colour c) noexcept
+    {
+        auto linearise = [](float u) noexcept
+        {
+            return u <= 0.04045f ? (u / 12.92f)
+                                 : std::pow((u + 0.055f) / 1.055f, 2.4f);
+        };
+        return 0.2126f * linearise(c.getFloatRed())
+             + 0.7152f * linearise(c.getFloatGreen())
+             + 0.0722f * linearise(c.getFloatBlue());
+    }
+
+    /** Contrast ratio of two opaque colours (≥ 1). */
+    inline float contrastRatio(juce::Colour a, juce::Colour b) noexcept
+    {
+        const float l1 = relativeLuminance(a);
+        const float l2 = relativeLuminance(b);
+        const float lighter = juce::jmax(l1, l2);
+        const float darker = juce::jmin(l1, l2);
+        return (lighter + 0.05f) / (darker + 0.05f);
+    }
+
+    /**
+     * True when #151515 reads better than textTableBody on this pastille fill
+     * (covers kWhite / kCream / kGrey350 and other mid-light fills).
+     */
+    inline bool propertyBindHoverNeedsDarkText(juce::Colour fill) noexcept
+    {
+        return contrastRatio(fill, textOnLightPropertyBindHover())
+             > contrastRatio(fill, textTableBody());
+    }
+
     inline juce::Colour accent() { return juce::Colour(0xff00ddad); }
     /** Attention / coaching chrome (same amber as Mappings "Unbound"). */
     inline juce::Colour attention() { return juce::Colour(0xffe0a020); }
     /** Danger fill (Compare blink; SAME COLOUR / pending MAPPING / disconnected BRIDGE badges). */
     inline juce::Colour danger() { return juce::Colour(0xffff3b3b); }
     inline juce::Colour separatorLine() { return juce::Colour(0xff3a3a3a); }
+    /** Gap between cut column slabs (panel shows through = cutter). */
+    inline constexpr int kMappingsColumnDividerThickness = 4;
     inline juce::Colour controlFill() { return surfacePanel(); }
     inline juce::Colour controlOutline() { return juce::Colour(0xff555555); }
     inline juce::Colour controlFillHover() { return juce::Colour(0xff4a4a4a); }
@@ -60,7 +111,7 @@ namespace SkinEditorChrome
      */
     inline constexpr int kComboArrowReserve = 18;
     /** Mappings Object combo — fits TrackGeneratorDisplay with air before the arrow (+8 vs prior). */
-    inline constexpr int kObjectComboWidth = 158;
+    inline constexpr int kObjectComboWidth = 149;
     /** Mappings Object combo first item — show every object table. */
     inline constexpr const char* kAllObjectsComboText = "- All objects -";
     /**
@@ -95,32 +146,38 @@ namespace SkinEditorChrome
     inline constexpr int kPaletteListPaintWidth = kPalettePanelWidth
                                                   - kPanelContentPad
                                                   - kScrollTrackWidth; // 130
-    /** Mappings structured-key column widths (Mapped colour = kPaletteListPaintWidth). Multiples of 5. */
-    inline constexpr int kMappingsPropertyColumnWidth = 150;
-    inline constexpr int kMappingsStateColumnWidth = 75;
-    /** Colour set: [kN] badge + free label (up to 16 chars) + header pictos. */
-    inline constexpr int kMappingsColourSetColumnWidth = 130;
-    /** Link: title + chain square + count badge air (multiple of 5). */
-    inline constexpr int kMappingsLinkColumnWidth = 70;
-    /** Left inset before Property; columnsForWidth subtracts this before structured columns. */
+    /**
+     * Mappings column widths (multiples of 5). Each column insets content by
+     * kMappingsColumnPad on left and right so text/chips clear the dividers.
+     */
+    inline constexpr int kMappingsPropertyColumnWidth = 160;
+    inline constexpr int kMappingsStateColumnWidth = 85;
+    /** Colour set: [csN] badge + free label (up to 16 chars) + header pictos. */
+    inline constexpr int kMappingsColourSetColumnWidth = 140;
+    /**
+     * Link: chain + fixed count chip only (no title).
+     * Visible slab = 2×pad + chain + chip gap + count; column adds cutter thickness.
+     */
+    inline constexpr int kMappingsLinkColumnWidth = 55; // slab 51 + cutter 4 (6+12+4+22+6 +1)
+    /** Mapped colour column (may exceed Palette list paint width). */
+    inline constexpr int kMappingsMappedColumnWidth = 140;
+    /** Horizontal inset inside every Mappings column (left and right). */
     inline constexpr int kMappingsColumnPad = 6;
     /**
-     * Table paint width = pad + Property + State + Colour set + Link + Mapped colour.
-     * Panel = that paint + scroll track + 2 focus pads - right pad extension + side content pads
-     * -> 561 (see SkinEditorMappingsPanel::paintWidth / layoutShellFilled).
+     * Table paint width = Property + State + Colour set + Link + Mapped.
+     * Panel = that paint + scroll track + 2 focus pads - right pad extension + side content pads.
      */
-    inline constexpr int kMappingsTablePaintWidth = kMappingsColumnPad
-                                                    + kMappingsPropertyColumnWidth
+    inline constexpr int kMappingsTablePaintWidth = kMappingsPropertyColumnWidth
                                                     + kMappingsStateColumnWidth
                                                     + kMappingsColourSetColumnWidth
                                                     + kMappingsLinkColumnWidth
-                                                    + kPaletteListPaintWidth; // 561
+                                                    + kMappingsMappedColumnWidth; // 580
     inline constexpr int kMappingsFocusPad = 1;
     inline constexpr int kMappingsPanelWidth = kMappingsTablePaintWidth
                                                + kScrollTrackWidth
                                                + 2 * kMappingsFocusPad
                                                - kPanelContentPad
-                                               + 2 * kPanelContentPad; // 591
+                                               + 2 * kPanelContentPad; // 610
     inline constexpr int kLegacyWindowMaxWidth = 1210;
     /**
      * Exact body width: edge gutters + Color + Palette side gaps + fixed Mappings.
@@ -179,8 +236,8 @@ namespace SkinEditorChrome
     inline constexpr int kTitleTabPadH = 10;
     /** Sticky column-legend / table content row height. */
     inline constexpr int kColumnHeaderHeight = 22;
-    /** Thin rail extending right of a Mappings object-header tab. */
-    inline constexpr int kTableSectionRailHeight = 7;
+    /** Thin rail extending right of a Mappings object-header tab (and cut-column continuity). */
+    inline constexpr int kTableSectionRailHeight = 6;
     /** Horizontal pad inside the object-header tab chip. */
     inline constexpr int kTableSectionTabPadH = 8;
     /** Begin the 45° folder-tab shoulder this many px earlier than the measured title width. */
@@ -202,18 +259,29 @@ namespace SkinEditorChrome
     inline constexpr float kChromeBadgeCorner = 2.0f;
     /** Visible scrollbar thumb thickness (centred in the track). */
     inline constexpr int kScrollThumbThickness = 6;
-    /** Count badge circle / capsule height (also used for multi-digit width floor). */
-    inline constexpr int kCountBadgeDiameter = 15;
+    /** Count badge square / capsule height (Link, Unbound, Palette counts). */
+    inline constexpr int kCountBadgeDiameter = 12;
     inline constexpr float kCountBadgeFont = 11.0f;
     inline constexpr int kCountBadgeCapsulePad = 10;
-    /** Mappings column-filter clear chip: square NxN, smaller than Unbound count badge. */
-    inline constexpr int kClearBadgeSize = 11;
+    /** Mappings column-filter clear chip: square NxN (matches count / Link chain). */
+    inline constexpr int kClearBadgeSize = 12;
     /** Mappings column-sort chip: same footprint as the clear badge. */
     inline constexpr int kSortBadgeSize = kClearBadgeSize;
     /** Link chain chip — same footprint as sort / clear badges. */
     inline constexpr int kLinkChainBadgeSize = kSortBadgeSize;
-    /** Sticky-legend gap between sort picto and per-column filter clear. */
-    inline constexpr int kSortToFilterClearGap = 4;
-    /** Colour set row index chip `[kN]` — fixed square (not row-height driven). */
-    inline constexpr int kColourSetIndexBadgeSize = 12;
+    /** Link header count chip — fixed width for two digits ("99"), centred glyph. */
+    inline constexpr int kLinkCountBadgeWidth = kCountBadgeDiameter + kCountBadgeCapsulePad; // 22
+    /**
+     * Sticky-legend gap between adjacent header chips
+     * (sort ↔ filter clear, Link chain ↔ count badge).
+     */
+    inline constexpr int kLegendChipGap = 4;
+    /** Colour set row index chip (`cs1`…`cs4`) — same type size as count badges. */
+    inline constexpr float kColourSetIndexBadgeFont = kCountBadgeFont; // 11
+    /** Chip height — matches colour swatch (kColourSwatchSize). */
+    inline constexpr int kColourSetIndexBadgeHeight = 12;
+    /** Min width floor; paint grows with measured `csN` text (+ tight side air). */
+    inline constexpr int kColourSetIndexBadgeMinWidth = 18;
+    /** Horizontal pad inside the csN chip (each side, total = 2×). */
+    inline constexpr int kColourSetIndexBadgePadH = 1;
 }

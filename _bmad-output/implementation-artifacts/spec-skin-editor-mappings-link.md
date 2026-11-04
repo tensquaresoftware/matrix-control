@@ -105,6 +105,7 @@ context:
 - Build C (2026-11-03): Link column (70px) between Colour set and Mapped; panel/window tokens 561/591. Pure helpers in `SkinEditorMappingLinkGroups.h`; shared column geometry in `SkinEditorMappingsColumns.h`. Editor-only `mappingLinkGroups` JSON + Layer `setMappingLinkGroups` / `propagateMappingToLinkPeers`; push omit. Panel: Cmd/Ctrl multi-select, calm/hover/yellow chains, header create/merge/unlink, Object≠All gate. Hold unchanged. Verified: unit tests + `lint_touched.py --base` baseline + Skin Editor build.
 - Matrix audit follow-up: added calm/unlink-all helper coverage and Layer `propagateMappingToLinkPeers` unit test (Hold retain stays covered by MappingModePolicy tests; applyMapping calls propagate then retain independently).
 - Review patches: early-return on peer propagate failure; align group via first in-group ordered key; headerState under Object filter; prune selection + clear hover on rebuild/refresh; clear link groups when duplicateSkin drops mappings; delete unused sanitize; strengthen DevSkin/layout unit tests.
+- Follow-up: Link header count badge hidden for a single free (unlinked) row; still shows group size or multi-select create/merge count (>= 2).
 - Manual smoke still recommended: Recap §9 Link+Hold checklist and Object≠All cross-object policy.
 
 ## Spec Change Log

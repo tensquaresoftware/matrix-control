@@ -7,8 +7,6 @@
 
 namespace
 {
-    constexpr int kColPad = SkinEditorChrome::kMappingsColumnPad;
-
     juce::PopupMenu::Options filterMenuOptions(juce::Component& host,
                                                juce::Rectangle<int> screenArea)
     {
@@ -36,7 +34,7 @@ namespace
         const int sortW = SkinEditorChrome::sortBadgeWidth();
         const int badgeW = SkinEditorChrome::clearBadgeWidth();
         const int labelSortGap = SkinEditorChrome::kButtonGap;
-        const int sortClearGap = SkinEditorChrome::kSortToFilterClearGap;
+        const int sortClearGap = SkinEditorChrome::kLegendChipGap;
         const int clearReserve = spec.filterActive ? (sortClearGap + badgeW) : 0;
         const int reserved = labelSortGap + sortW + clearReserve;
         const int labelMax = juce::jmax(0, spec.maxW - reserved);
@@ -239,47 +237,55 @@ void SkinEditorMappingsPanel::layoutLegendHitTargets()
     const int sortW = SkinEditorChrome::sortBadgeWidth();
     const int badgeW = SkinEditorChrome::clearBadgeWidth();
 
-    placeLegendColumn(area, font, { "Property", area.getX() + kColPad,
-                                    juce::jmax(0, cols.propertyW - 4),
-                                    &propertyLabelBounds_, &propertySortBounds_,
-                                    &propertyClearBounds_, propertyFilter_.isNotEmpty() });
-    placeLegendColumn(area, font, { "State", area.getX() + kColPad + cols.propertyW,
-                                    juce::jmax(0, cols.stateW - 4),
-                                    &stateLabelBounds_, &stateSortBounds_,
-                                    &stateClearBounds_, stateFilter_.isNotEmpty() });
     placeLegendColumn(area, font,
-                      { "Colour set", area.getX() + cols.colourSetLeft(),
-                        juce::jmax(0, cols.colourSetW - 4),
+                      { "Property", area.getX() + cols.contentLeft(cols.propertyLeft()),
+                        cols.contentWidth(cols.propertyW),
+                        &propertyLabelBounds_, &propertySortBounds_,
+                        &propertyClearBounds_, propertyFilter_.isNotEmpty() });
+    placeLegendColumn(area, font,
+                      { "State", area.getX() + cols.contentLeft(cols.stateLeft()),
+                        cols.contentWidth(cols.stateW),
+                        &stateLabelBounds_, &stateSortBounds_,
+                        &stateClearBounds_, stateFilter_.isNotEmpty() });
+    placeLegendColumn(area, font,
+                      { "Colour set", area.getX() + cols.contentLeft(cols.colourSetLeft()),
+                        cols.contentWidth(cols.colourSetW),
                         &colourSetLabelBounds_, &colourSetSortBounds_,
                         &colourSetClearBounds_, colourSetFilter_.isNotEmpty() });
+    layoutLinkLegendHitTargets(area, cols, font);
 
-    // Link: title + chain control + optional count badge (not sortable / filterable).
-    const int linkChainW = SkinEditorChrome::linkChainBadgeWidth();
-    const auto linkHeader = linkHeaderState();
-    const int linkCountW = (linkHeader.badgeCount > 0)
-                               ? (gap + SkinEditorChrome::countBadgeWidth(linkHeader.badgeCount))
-                               : 0;
-    const int linkTitleMax = juce::jmax(0, cols.linkW - gap - linkChainW - linkCountW);
-    const int linkTitleW = juce::jmin(linkTitleMax,
-                                     SkinEditorChrome::measureTextWidth(font, "Link"));
-    const int linkX = area.getX() + cols.linkLeft();
-    linkLabelBounds_ = { linkX, area.getY(), linkTitleW + gap + linkChainW, area.getHeight() };
-    linkChainBounds_ = { linkX + linkTitleW + gap, area.getY(), linkChainW, area.getHeight() };
-    if (linkHeader.badgeCount > 0)
-        linkBadgeBounds_ = { linkChainBounds_.getRight() + gap, area.getY(),
-                             SkinEditorChrome::countBadgeWidth(linkHeader.badgeCount),
-                             area.getHeight() };
-
+    const int mappedContentW = cols.contentWidth(cols.mappedW);
     const int mappedReserve = (gap + sortW)
                               + (mappedColourFilter_.isNotEmpty()
-                                     ? (SkinEditorChrome::kSortToFilterClearGap + badgeW)
+                                     ? (SkinEditorChrome::kLegendChipGap + badgeW)
                                      : 0);
     const auto mappedText = SkinEditorChrome::elideToWidth(
-        font, "Mapped colour", juce::jmax(0, cols.mappedW - mappedReserve));
-    placeLegendColumn(area, font, { mappedText, area.getX() + cols.mappedX, cols.mappedW,
-                                    &mappedLabelBounds_, &mappedSortBounds_,
-                                    &mappedClearBounds_, mappedColourFilter_.isNotEmpty() });
+        font, "Mapped colour", juce::jmax(0, mappedContentW - mappedReserve));
+    placeLegendColumn(area, font,
+                      { mappedText, area.getX() + cols.contentLeft(cols.mappedX), mappedContentW,
+                        &mappedLabelBounds_, &mappedSortBounds_,
+                        &mappedClearBounds_, mappedColourFilter_.isNotEmpty() });
     layoutGlobalClearBounds();
+}
+
+void SkinEditorMappingsPanel::layoutLinkLegendHitTargets(
+    juce::Rectangle<int> area,
+    const SkinEditorMappingsColumns::Layout& cols,
+    const juce::Font& font)
+{
+    juce::ignoreUnused(font);
+    const int pad = SkinEditorChrome::kMappingsColumnPad;
+    const int chipGap = SkinEditorChrome::kLegendChipGap;
+    const int linkChainW = SkinEditorChrome::linkChainBadgeWidth();
+    const int linkCountW = SkinEditorChrome::linkCountBadgeWidth();
+    // Lay out inside the visible cut slab (column width minus trailing cutter) so the
+    // right pad after the count chip matches the left pad before the chain (6 px).
+    const int slabW = cols.linkW - SkinEditorChrome::kMappingsColumnDividerThickness;
+    const int linkX = area.getX() + cols.linkLeft() + pad;
+    linkChainBounds_ = { linkX, area.getY(), linkChainW, area.getHeight() };
+    linkBadgeBounds_ = { linkChainBounds_.getRight() + chipGap, area.getY(),
+                         linkCountW, area.getHeight() };
+    linkLabelBounds_ = { linkX, area.getY(), juce::jmax(0, slabW - 2 * pad), area.getHeight() };
 }
 
 void SkinEditorMappingsPanel::layoutGlobalClearBounds()
@@ -298,9 +304,9 @@ void SkinEditorMappingsPanel::layoutGlobalClearBounds()
 
 void SkinEditorMappingsPanel::paintStickyLegend(juce::Graphics& g, juce::Rectangle<int> area) const
 {
-    SkinEditorChrome::fillTableRow(g, { area.toFloat(), SkinEditorChrome::surfaceSection(),
-                                        true, true });
     const auto cols = SkinEditorMappingsColumns::forWidth(area.getWidth());
+    SkinEditorMappingsColumns::fillCutColumnSlabs(
+        g, cols, { area, SkinEditorChrome::surfaceSection(), true, true });
     const auto font = SkinEditorChrome::fontBold();
     g.setFont(font);
 
@@ -311,6 +317,8 @@ void SkinEditorMappingsPanel::paintStickyLegend(juce::Graphics& g, juce::Rectang
                            bool filterActive,
                            FilterColumn column)
     {
+        // Re-apply after badges (count / sort) which leave a smaller Graphics font.
+        g.setFont(font);
         const int sortW = SkinEditorChrome::sortBadgeWidth();
         const int titleW = juce::jmax(0, labelBounds.getWidth() - SkinEditorChrome::kButtonGap - sortW);
         g.setColour(filterActive ? SkinEditorChrome::attention()
@@ -333,7 +341,7 @@ void SkinEditorMappingsPanel::paintStickyLegend(juce::Graphics& g, juce::Rectang
 
     const int mappedReserve = (SkinEditorChrome::kButtonGap + SkinEditorChrome::sortBadgeWidth())
                               + (mappedColourFilter_.isNotEmpty()
-                                     ? (SkinEditorChrome::kSortToFilterClearGap
+                                     ? (SkinEditorChrome::kLegendChipGap
                                         + SkinEditorChrome::clearBadgeWidth())
                                      : 0);
     paintColumn(SkinEditorChrome::elideToWidth(font, "Mapped colour",
@@ -407,5 +415,9 @@ void SkinEditorMappingsPanel::mouseUp(const juce::MouseEvent& e)
         return;
     if (handleHeader(FilterColumn::kColourSet, colourSetLabelBounds_))
         return;
-    handleHeader(FilterColumn::kMappedColour, mappedLabelBounds_);
+    if (handleHeader(FilterColumn::kMappedColour, mappedLabelBounds_))
+        return;
+
+    // Sticky air / action-row empty / legend slab miss (list hits go to Content).
+    clearRowSelection();
 }

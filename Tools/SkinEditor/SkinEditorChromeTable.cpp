@@ -4,10 +4,11 @@ namespace SkinEditorChrome
 {
     void fillTableRow(juce::Graphics& g, TableRowFill spec)
     {
+        const float r = juce::jmax(0.0f, spec.cornerRadius);
         juce::Path path;
         path.addRoundedRectangle(spec.area.getX(), spec.area.getY(),
                                  spec.area.getWidth(), spec.area.getHeight(),
-                                 kControlCorner, kControlCorner,
+                                 r, r,
                                  spec.roundTop, spec.roundTop, spec.roundBottom, spec.roundBottom);
         g.setColour(spec.fill);
         g.fillPath(path);
@@ -187,11 +188,35 @@ namespace SkinEditorChrome
         g.drawEllipse(area.toFloat().reduced(0.5f), 1.0f);
     }
 
+    void drawCountBadge(juce::Graphics& g, CountBadgeSpec spec)
+    {
+        if (spec.count < 0)
+            spec.count = 0;
+        const auto fill = spec.useDefaultFill ? attention() : spec.fill;
+        const auto text = juce::String(spec.count);
+        const auto font = fontBold(kCountBadgeFont);
+        const int textW = measureTextWidth(font, text);
+        const int diameter = kCountBadgeDiameter;
+        const int intrinsic = (text.length() <= 1) ? diameter
+                                                   : juce::jmax(diameter, textW + kCountBadgeCapsulePad);
+        // Prefer caller area width when set (Unbound shares Link's fixed chip width).
+        const int width = (spec.area.getWidth() > 0) ? spec.area.getWidth() : intrinsic;
+        auto badge = juce::Rectangle<int>(spec.area.getX(),
+                                          spec.area.getCentreY() - diameter / 2,
+                                          width,
+                                          diameter);
+        g.setColour(fill);
+        g.fillRoundedRectangle(badge.toFloat(), kChromeBadgeCorner);
+        g.setColour(surfacePanel());
+        g.setFont(font);
+        g.drawText(text, badge.translated(0, spec.textNudgeY), juce::Justification::centred, false);
+    }
+
     void drawCountBadge(juce::Graphics& g,
                         juce::Rectangle<int> area,
                         int count)
     {
-        drawCountBadge(g, area, count, attention());
+        drawCountBadge(g, { area, count });
     }
 
     void drawCountBadge(juce::Graphics& g,
@@ -199,23 +224,7 @@ namespace SkinEditorChrome
                         int count,
                         juce::Colour fill)
     {
-        if (count < 0)
-            count = 0;
-        const auto text = juce::String(count);
-        const auto font = fontBold(kCountBadgeFont);
-        const int textW = measureTextWidth(font, text);
-        const int diameter = kCountBadgeDiameter;
-        const int width = (text.length() <= 1) ? diameter
-                                              : juce::jmax(diameter, textW + kCountBadgeCapsulePad);
-        auto badge = juce::Rectangle<int>(area.getX(),
-                                          area.getCentreY() - diameter / 2,
-                                          width,
-                                          diameter);
-        g.setColour(fill);
-        g.fillRoundedRectangle(badge.toFloat(), kControlCorner);
-        g.setColour(surfacePanel());
-        g.setFont(font);
-        g.drawText(text, badge, juce::Justification::centred, false);
+        drawCountBadge(g, { area, count, fill, 0, false });
     }
 
     int countBadgeWidth(int count)
@@ -298,7 +307,7 @@ namespace SkinEditorChrome
         constexpr float kActiveOpticalNudgeY = -0.35f;
         if (kind == SortPictoKind::kAscending)
         {
-            // Down chevron: +1 px vs up (same optical nudge alone looked high).
+            // Yellow down chevron: +1 px below optical centre.
             auto tip = juce::Rectangle<float>(0.0f, 0.0f, kActiveChevronW, kActiveChevronH)
                            .withCentre({ badgeF.getCentreX(),
                                          badgeF.getCentreY() + kActiveOpticalNudgeY + 1.0f });
@@ -317,6 +326,7 @@ namespace SkinEditorChrome
         constexpr float kInactiveChevronW = 5.0f;
         constexpr float kInactiveChevronH = 2.6f;
         constexpr float kInactiveGap = 0.7f;
+        constexpr float kInactiveDownNudgeY = 1.0f;
         const float mid = badgeF.getCentreY() + kActiveOpticalNudgeY;
         drawChevronUp(g,
                       { badgeF.getCentreX() - kInactiveChevronW * 0.5f,
@@ -326,7 +336,7 @@ namespace SkinEditorChrome
                       glyph);
         drawChevronDown(g,
                         { badgeF.getCentreX() - kInactiveChevronW * 0.5f,
-                          mid + kInactiveGap,
+                          mid + kInactiveGap + kInactiveDownNudgeY,
                           kInactiveChevronW,
                           kInactiveChevronH },
                         glyph);
@@ -364,6 +374,41 @@ namespace SkinEditorChrome
     int linkChainBadgeWidth()
     {
         return kLinkChainBadgeSize;
+    }
+
+    void drawLinkCountBadge(juce::Graphics& g,
+                            juce::Rectangle<int> area,
+                            int count,
+                            juce::Colour fill)
+    {
+        const int w = kLinkCountBadgeWidth;
+        const int h = kCountBadgeDiameter;
+        auto badge = juce::Rectangle<int>(area.getX(),
+                                          area.getCentreY() - h / 2,
+                                          w,
+                                          h);
+        g.setColour(fill);
+        g.fillRoundedRectangle(badge.toFloat(), kChromeBadgeCorner);
+        g.setColour(surfacePanel());
+        if (count > 0)
+        {
+            g.setFont(fontBold(kCountBadgeFont));
+            g.drawText(juce::String(count), badge, juce::Justification::centred, false);
+            return;
+        }
+        // Idle placeholder: geometric bar (em-dash glyph was too thin / low).
+        constexpr float kBarW = 8.0f;
+        constexpr float kBarH = 2.0f;
+        g.setColour(juce::Colour(0xff151515));
+        g.fillRect((float) badge.getCentreX() - kBarW * 0.5f,
+                   (float) badge.getCentreY() - kBarH * 0.5f,
+                   kBarW,
+                   kBarH);
+    }
+
+    int linkCountBadgeWidth()
+    {
+        return kLinkCountBadgeWidth;
     }
 
     void drawChromeBadge(juce::Graphics& g, juce::Rectangle<int> area, const juce::String& text)

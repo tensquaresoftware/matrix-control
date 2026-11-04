@@ -107,11 +107,13 @@ private:
         auto oneFree = headerState(groups, { a });
         expect(oneFree.chrome == HeaderChrome::kInactiveGrey);
         expect(oneFree.action == HeaderAction::kNone);
+        expectEquals(oneFree.badgeCount, 1);
 
         auto multiFree = headerState(groups, { a, b });
         expect(multiFree.chrome == HeaderChrome::kActiveGrey);
         expect(multiFree.action == HeaderAction::kCreateOrMerge);
         expectEquals(multiFree.badgeCount, 2);
+        // Paint uses ActiveGrey → muted count badge (create/merge), Yellow → attention.
 
         groups = addToContext({}, a, b, std::nullopt);
         auto oneGrouped = headerState(groups, { a });
@@ -156,8 +158,7 @@ private:
         const auto cols = SkinEditorMappingsColumns::forWidth(
             SkinEditorChrome::kMappingsTablePaintWidth);
         expectEquals(cols.linkW, SkinEditorChrome::kMappingsLinkColumnWidth);
-        const int expectedLinkLeft = SkinEditorChrome::kMappingsColumnPad
-                                     + SkinEditorChrome::kMappingsPropertyColumnWidth
+        const int expectedLinkLeft = SkinEditorChrome::kMappingsPropertyColumnWidth
                                      + SkinEditorChrome::kMappingsStateColumnWidth
                                      + SkinEditorChrome::kMappingsColourSetColumnWidth;
         expectEquals(cols.linkLeft(), expectedLinkLeft);

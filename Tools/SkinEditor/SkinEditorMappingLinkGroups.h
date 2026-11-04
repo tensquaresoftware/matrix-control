@@ -263,6 +263,7 @@ namespace SkinEditorMappingLink
         const auto parts = breakDownSelection(groups, selectedOrdered);
         if (parts.groupIndexes.size() == 1 && parts.freeCount == 0)
             return static_cast<int>(groups[static_cast<size_t>(*parts.groupIndexes.begin())].size());
+        // Free-only selection: always show the selected-row count (1 → muted "1").
         if (parts.groupIndexes.empty())
             return parts.freeCount;
         return static_cast<int>(selectedOrdered.size());

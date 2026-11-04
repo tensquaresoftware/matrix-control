@@ -10,9 +10,8 @@
 
 namespace
 {
-    constexpr int kColPad = SkinEditorChrome::kMappingsColumnPad;
     constexpr int kSwatchSize = SkinEditorChrome::kColourSwatchSize;
-    constexpr int kEdgeExtra = 4; // first/last row air so edge gaps match inter-swatch 8px
+    constexpr int kEdgeExtra = 2; // first/last row air
     constexpr int kFocusPad = SkinEditorChrome::kMappingsFocusPad;
 }
 
@@ -45,7 +44,7 @@ SkinEditorMappingsPanel::SkinEditorMappingsPanel()
     holdColourToggle_.setClickingTogglesState(true);
     holdColourToggle_.setToggleState(false, juce::dontSendNotification);
     holdColourToggle_.setTooltip("Hold the current mapping gesture to map several targets");
-    // Same muted label colour as "Object:" - box chrome comes from LookAndFeel::drawToggleButton.
+    // Same muted label colour as "Object:" - checked box chrome in LookAndFeel::drawToggleButton.
     holdColourToggle_.setColour(juce::ToggleButton::textColourId, SkinEditorChrome::textMuted());
     holdColourToggle_.onClick = [this]
     {
@@ -92,6 +91,7 @@ void SkinEditorMappingsPanel::setReadOnly(bool readOnly)
 void SkinEditorMappingsPanel::refresh()
 {
     hoveredLinkKey_.reset();
+    hoveredPropertyBindKey_.reset();
     const auto scrollAnchor = captureViewScrollAnchor();
     rebuildRows();
     rebuildObjectCombo();
@@ -121,7 +121,8 @@ void SkinEditorMappingsPanel::paint(juce::Graphics& g)
         g.setFont(SkinEditorChrome::fontRegular());
         g.setColour(unboundColour);
         g.drawText("Unbound", unboundLabelBounds_, juce::Justification::centredLeft, false);
-        SkinEditorChrome::drawCountBadge(g, unboundBadgeBounds_, unboundCount_, unboundColour);
+        SkinEditorChrome::drawCountBadge(g, { unboundBadgeBounds_, unboundCount_, unboundColour,
+                                              0, false });
     }
 
     if (! objectClearBounds_.isEmpty())
@@ -129,6 +130,45 @@ void SkinEditorMappingsPanel::paint(juce::Graphics& g)
 
     if (! globalClearBounds_.isEmpty())
         SkinEditorChrome::drawClearBadge(g, globalClearBounds_);
+}
+
+juce::Colour SkinEditorMappingsPanel::propertyBindLabelColour(const Row& item) const noexcept
+{
+    const bool propertyHover = propertyBindHoverEnabled_
+                               && hoveredPropertyBindKey_.has_value()
+                               && *hoveredPropertyBindKey_ == item.key
+                               && ! propertyBindHoverColour_.isTransparent();
+    if (propertyHover
+        && SkinEditorChrome::propertyBindHoverNeedsDarkText(propertyBindHoverColour_))
+        return SkinEditorChrome::textOnLightPropertyBindHover();
+    return SkinEditorChrome::textTableBody();
+}
+
+void SkinEditorMappingsPanel::paintMappedColourCell(juce::Graphics& g,
+                                                    const Row& item,
+                                                    juce::Rectangle<int> area) const
+{
+    if (item.unbound)
+    {
+        g.setColour(SkinEditorChrome::attention());
+        g.drawText("Unbound", area, juce::Justification::centredLeft, false);
+        return;
+    }
+
+    const int swY = area.getY() + (area.getHeight() - kSwatchSize) / 2;
+    const auto swatch = juce::Rectangle<int>(area.getX(), swY, kSwatchSize, kSwatchSize);
+    if (item.pastillePending)
+        SkinEditorChrome::paintPendingColourSwatch(g, swatch);
+    else
+        SkinEditorChrome::paintColourSwatch(g, swatch, juce::Colour(item.pastilleArgb));
+    g.setColour(SkinEditorChrome::textTableBody());
+    g.drawText(item.pastilleName,
+               area.getX() + kSwatchSize + SkinEditorChrome::kMappingsColumnPad,
+               area.getY(),
+               juce::jmax(0, area.getWidth() - kSwatchSize - SkinEditorChrome::kMappingsColumnPad),
+               area.getHeight(),
+               juce::Justification::centredLeft,
+               false);
 }
 
 void SkinEditorMappingsPanel::paintMappingCells(juce::Graphics& g,
@@ -140,38 +180,26 @@ void SkinEditorMappingsPanel::paintMappingCells(juce::Graphics& g,
     const int contentH = cellArea.getHeight();
     const auto cols = SkinEditorMappingsColumns::forWidth(cellArea.getWidth());
     g.setFont(SkinEditorChrome::fontRegular());
-    g.setColour(SkinEditorChrome::textTableBody());
-    g.drawText(item.propertyLabel, x0 + kColPad, contentY, juce::jmax(0, cols.propertyW - 4), contentH,
+    g.setColour(propertyBindLabelColour(item));
+    g.drawText(item.propertyLabel,
+               x0 + cols.contentLeft(cols.propertyLeft()), contentY,
+               cols.contentWidth(cols.propertyW), contentH,
                juce::Justification::centredLeft, false);
-    g.drawText(item.stateLabel, x0 + kColPad + cols.propertyW, contentY, juce::jmax(0, cols.stateW - 4),
-               contentH, juce::Justification::centredLeft, false);
+    g.setColour(SkinEditorChrome::textTableBody());
+    g.drawText(item.stateLabel,
+               x0 + cols.contentLeft(cols.stateLeft()), contentY,
+               cols.contentWidth(cols.stateW), contentH,
+               juce::Justification::centredLeft, false);
 
     paintColourSetCell(g, item,
-                       { x0 + cols.colourSetLeft(),
+                       { x0 + cols.contentLeft(cols.colourSetLeft()),
                          contentY,
-                         juce::jmax(0, cols.colourSetW - 4),
+                         cols.contentWidth(cols.colourSetW),
                          contentH });
     paintLinkCell(g, item, { x0 + cols.linkLeft(), contentY, cols.linkW, contentH });
-
-    if (item.unbound)
-    {
-        g.setColour(SkinEditorChrome::attention());
-        g.drawText("Unbound", x0 + cols.mappedX, contentY, cols.mappedW, contentH,
-                   juce::Justification::centredLeft, false);
-        return;
-    }
-
-    const int swY = contentY + (contentH - kSwatchSize) / 2;
-    const auto swatch = juce::Rectangle<int>(x0 + cols.mappedX, swY, kSwatchSize, kSwatchSize);
-    if (item.pastillePending)
-        SkinEditorChrome::paintPendingColourSwatch(g, swatch);
-    else
-        SkinEditorChrome::paintColourSwatch(g, swatch, juce::Colour(item.pastilleArgb));
-    g.setColour(SkinEditorChrome::textTableBody());
-    g.drawText(item.pastilleName,
-               x0 + cols.mappedX + kSwatchSize + 6, contentY,
-               juce::jmax(0, cols.mappedW - kSwatchSize - 8), contentH,
-               juce::Justification::centredLeft, false);
+    paintMappedColourCell(g, item,
+                          { x0 + cols.contentLeft(cols.mappedX), contentY,
+                            cols.contentWidth(cols.mappedW), contentH });
 }
 
 void SkinEditorMappingsPanel::paintRow(juce::Graphics& g, PaintRowSpec spec) const
@@ -179,48 +207,36 @@ void SkinEditorMappingsPanel::paintRow(juce::Graphics& g, PaintRowSpec spec) con
     const auto& item = *spec.item;
 
     if (item.kind == RowKind::kSection)
-    {
-        SkinEditorChrome::paintTableSectionHeader(g, spec.rowArea, item.sectionTitle);
-        return;
-    }
+        return; // Tab + continuity rail painted in Content::paint.
 
-    SkinEditorChrome::fillTableRow(g, { spec.rowArea, SkinEditorChrome::surfaceTable(),
-                                        false, spec.roundBottom });
-
-    // Highlight matches mid-row height only — first/last thicken padding stays unhighlighted.
+    // Row fill comes from continuous cut column slabs (Content::paint).
     const float contentY = spec.rowArea.getY() + (item.thickenTop ? (float) kEdgeExtra : 0.0f);
-    const auto contentArea = juce::Rectangle<float>(spec.rowArea.getX(), contentY,
-                                                    spec.rowArea.getWidth(),
-                                                    (float) SkinEditorChrome::kColumnHeaderHeight);
+    const auto cellArea = juce::Rectangle<int>((int) spec.rowArea.getX(),
+                                               (int) contentY,
+                                               (int) spec.rowArea.getWidth(),
+                                               SkinEditorChrome::kColumnHeaderHeight);
+    const auto cols = SkinEditorMappingsColumns::forWidth(cellArea.getWidth());
+    constexpr int kInsetX = SkinEditorChrome::kMappingsHighlightInsetX;
+    constexpr int kInsetY = SkinEditorChrome::kMappingsHighlightInsetY;
+    constexpr float kCorner = SkinEditorChrome::kMappingsHighlightCorner;
     if (spec.highlighted)
-        SkinEditorChrome::fillTableRow(g, { contentArea, SkinEditorChrome::surfaceTableRowHighlight(),
-                                            false, false });
+        SkinEditorMappingsColumns::fillCutColumnSlabs(
+            g, cols, { cellArea, SkinEditorChrome::surfaceTableRowHighlight(),
+                       true, true, 0, 4, kInsetX, kInsetY, kCorner });
 
-    // Table-local cell origin (x = 0): fills use rowArea (inset by kFocusPad); text stays aligned to columns.
-    paintMappingCells(g, item, { 0, (int) contentY, (int) spec.rowArea.getWidth(),
-                                 SkinEditorChrome::kColumnHeaderHeight });
-}
-
-void SkinEditorMappingsPanel::paintFocusedObjectOutline(juce::Graphics& g,
-                                                        int tableX,
-                                                        int tableWidth) const
-{
-    // Single-object macro-filter already isolates the table — no focus ring.
-    if (isObjectMacroFilterActive())
-        return;
-    if (focusedObject_ < 0 || focusedObject_ >= static_cast<int>(objects_.size()))
-        return;
-
-    const auto& table = objects_[static_cast<size_t>(focusedObject_)];
-    if (table.tableBottom <= table.sectionY)
-        return;
-
-    const auto sectionRow = juce::Rectangle<float>(
-        (float) tableX, (float) table.sectionY, (float) tableWidth,
-        (float) SkinEditorChrome::kColumnHeaderHeight);
-    SkinEditorChrome::strokeObjectTableFocusOutside(g, sectionRow,
-                                                    (float) table.tableBottom,
-                                                    table.name);
+    const bool propertyHover = propertyBindHoverEnabled_
+                               && hoveredPropertyBindKey_.has_value()
+                               && *hoveredPropertyBindKey_ == item.key;
+    if (propertyHover)
+    {
+        // Exact Palette pastille (not a blend) — pending keeps the grey fallback.
+        const auto hoverFill = propertyBindHoverColour_.isTransparent()
+                                   ? SkinEditorChrome::surfaceTablePropertyBindHover()
+                                   : propertyBindHoverColour_;
+        SkinEditorMappingsColumns::fillCutColumnSlabs(
+            g, cols, { cellArea, hoverFill, true, true, 0, 0, kInsetX, kInsetY, kCorner });
+    }
+    paintMappingCells(g, item, cellArea);
 }
 
 void SkinEditorMappingsPanel::Content::paint(juce::Graphics& g)
@@ -228,6 +244,15 @@ void SkinEditorMappingsPanel::Content::paint(juce::Graphics& g)
     const int width = owner_.paintWidth();
     const int x0 = kFocusPad;
     const auto clip = g.getClipBounds();
+    const auto cols = SkinEditorMappingsColumns::forWidth(width);
+
+    for (const auto& table : owner_.objects_)
+    {
+        if (table.tableBottom <= clip.getY() || table.sectionY >= clip.getBottom())
+            continue;
+        owner_.paintObjectTableChrome(g, { &table, &cols, x0, width });
+    }
+
     // Match rebuildRows / ObjectTable metrics: top inset leaves room for the outside focus stroke.
     int y = kFocusPad;
     for (int i = 0; i < static_cast<int>(owner_.rows_.size()); ++i)
@@ -244,31 +269,30 @@ void SkinEditorMappingsPanel::Content::paint(juce::Graphics& g)
 
         if (item.kind != RowKind::kGap)
         {
-            const bool roundBottom = (item.kind == RowKind::kMapping)
-                                     && (i + 1 >= static_cast<int>(owner_.rows_.size())
-                                         || owner_.rows_[static_cast<size_t>(i + 1)].kind != RowKind::kMapping);
             const auto rowArea = juce::Rectangle<float>((float) x0, (float) y, (float) width,
                                                         (float) item.heightPx);
             const bool highlighted = item.kind == RowKind::kMapping
                                      && owner_.isKeyGroupRevealed(item.key);
-            owner_.paintRow(g, { &item, rowArea, roundBottom, highlighted });
+            owner_.paintRow(g, { &item, rowArea, false, highlighted });
         }
         y = nextY;
     }
-
-    owner_.paintFocusedObjectOutline(g, x0, width);
 }
 
 void SkinEditorMappingsPanel::Content::mouseUp(const juce::MouseEvent& e)
 {
-    const int row = owner_.rowIndexAtY(e.y);
-    if (row < 0)
+    if (! e.mouseWasClicked())
         return;
+
+    const int row = owner_.rowIndexAtY(e.y);
+    // Empty list air (below / above tables) or inter-table gap — drop row selection.
+    if (row < 0 || owner_.rows_[static_cast<size_t>(row)].kind == RowKind::kGap)
+    {
+        owner_.clearRowSelection();
+        return;
+    }
 
     const auto& item = owner_.rows_[static_cast<size_t>(row)];
-    if (item.kind == RowKind::kGap)
-        return;
-
     if (item.objectIndex >= 0)
         owner_.setFocusedObject(item.objectIndex);
     if (item.kind != RowKind::kMapping)
@@ -280,64 +304,45 @@ void SkinEditorMappingsPanel::Content::mouseUp(const juce::MouseEvent& e)
     owner_.repaint();
 }
 
-void SkinEditorMappingsPanel::handleMappingRowMouseUp(int row, const juce::MouseEvent& e)
-{
-    const auto& item = rows_[static_cast<size_t>(row)];
-    const auto cols = SkinEditorMappingsColumns::forWidth(paintWidth());
-    const bool releaseInLink = SkinEditorMappingsColumns::isLinkColumnX(e.x, cols);
-    const bool pressInLink = SkinEditorMappingsColumns::isLinkColumnX(e.getMouseDownX(), cols);
-    if (releaseInLink && pressInLink)
-    {
-        handleLinkChainClick(item.key);
-        return;
-    }
-
-    const bool toggle = e.mods.isCommandDown();
-    selectRowKey(item.key, toggle);
-
-    const bool releaseInMapped = SkinEditorMappingPolicy::isMappedColourColumn(e.x, cols.mappedX);
-    const bool pressInMapped = SkinEditorMappingPolicy::isMappedColourColumn(e.getMouseDownX(),
-                                                                            cols.mappedX);
-    if (releaseInMapped != pressInMapped || releaseInLink || pressInLink)
-        return;
-    if (releaseInMapped)
-    {
-        tryEditMappedColour(row);
-        return;
-    }
-    if (SkinEditorMappingsColumns::isColourSetColumnX(e.x, cols)
-        || SkinEditorMappingsColumns::isColourSetColumnX(e.getMouseDownX(), cols))
-        return;
-    if (! toggle)
-        tryBindRow(row);
-}
-
 void SkinEditorMappingsPanel::Content::mouseMove(const juce::MouseEvent& e)
 {
     const int row = owner_.rowIndexAtY(e.y);
-    std::optional<TSS::SkinColourKey> next;
+    std::optional<TSS::SkinColourKey> nextLink;
+    std::optional<TSS::SkinColourKey> nextPropertyBind;
     if (row >= 0)
     {
         const auto& item = owner_.rows_[static_cast<size_t>(row)];
-        if (item.kind == RowKind::kMapping
-            && SkinEditorMappingLink::showsHoverChain(owner_.currentLinkGroups(),
-                                                      owner_.selectedKeys_,
-                                                      item.key,
-                                                      owner_.objectFilterType()))
-            next = item.key;
+        if (item.kind == RowKind::kMapping)
+        {
+            const auto cols = SkinEditorMappingsColumns::forWidth(owner_.paintWidth());
+            const int x = e.x - kFocusPad;
+            // Grey Link chain only while the cursor is in the Link column.
+            if (SkinEditorMappingsColumns::isLinkColumnX(x, cols)
+                && SkinEditorMappingLink::showsHoverChain(owner_.currentLinkGroups(),
+                                                          owner_.selectedKeys_,
+                                                          item.key,
+                                                          owner_.objectFilterType()))
+                nextLink = item.key;
+            if (owner_.propertyBindHoverEnabled_)
+                nextPropertyBind = item.key;
+        }
     }
-    if (next == owner_.hoveredLinkKey_)
+    if (nextLink == owner_.hoveredLinkKey_
+        && nextPropertyBind == owner_.hoveredPropertyBindKey_)
         return;
-    owner_.hoveredLinkKey_ = next;
+    owner_.hoveredLinkKey_ = nextLink;
+    owner_.hoveredPropertyBindKey_ = nextPropertyBind;
     repaint();
 }
 
 void SkinEditorMappingsPanel::Content::mouseExit(const juce::MouseEvent&)
 {
-    if (! owner_.hoveredLinkKey_.has_value())
-        return;
+    const bool hadHover = owner_.hoveredLinkKey_.has_value()
+                          || owner_.hoveredPropertyBindKey_.has_value();
     owner_.hoveredLinkKey_.reset();
-    repaint();
+    owner_.hoveredPropertyBindKey_.reset();
+    if (hadHover)
+        repaint();
 }
 
 void SkinEditorMappingsPanel::Content::mouseDoubleClick(const juce::MouseEvent& e)
@@ -351,7 +356,7 @@ void SkinEditorMappingsPanel::Content::mouseDoubleClick(const juce::MouseEvent& 
         return;
 
     const auto cols = SkinEditorMappingsColumns::forWidth(owner_.paintWidth());
-    if (! SkinEditorMappingsColumns::isColourSetColumnX(e.x, cols))
+    if (! SkinEditorMappingsColumns::isColourSetColumnX(e.x - kFocusPad, cols))
         return;
 
     owner_.tryEditColourSetLabel(row);
