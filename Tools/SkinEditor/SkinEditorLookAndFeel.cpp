@@ -2,6 +2,45 @@
 
 #include "Tools/SkinEditor/SkinEditorChromeFonts.h"
 
+namespace
+{
+    juce::Colour toggleBoxFillColour(const juce::ToggleButton& button,
+                                     bool shouldDrawButtonAsHighlighted,
+                                     bool shouldDrawButtonAsDown)
+    {
+        // Checked: same chrome as active sort badges (yellow fill).
+        auto fill = SkinEditorChrome::controlFill();
+        if (button.getToggleState())
+            fill = SkinEditorChrome::attention();
+        if (! button.isEnabled())
+            return fill.withMultipliedAlpha(0.55f);
+        if (button.getToggleState())
+            return fill;
+        if (shouldDrawButtonAsDown)
+            return SkinEditorChrome::controlFillDown();
+        if (shouldDrawButtonAsHighlighted)
+            return SkinEditorChrome::controlFillHover();
+        return fill;
+    }
+
+    void drawToggleTick(juce::Graphics& g,
+                        juce::Rectangle<float> box,
+                        float boxSide,
+                        bool enabled)
+    {
+        juce::Path tick;
+        tick.startNewSubPath(box.getX() + boxSide * 0.22f, box.getCentreY());
+        tick.lineTo(box.getX() + boxSide * 0.42f, box.getY() + boxSide * 0.72f);
+        tick.lineTo(box.getX() + boxSide * 0.78f, box.getY() + boxSide * 0.28f);
+        auto tickColour = SkinEditorChrome::surfacePanel();
+        if (! enabled)
+            tickColour = tickColour.withMultipliedAlpha(0.5f);
+        g.setColour(tickColour);
+        g.strokePath(tick, juce::PathStrokeType(1.4f, juce::PathStrokeType::curved,
+                                                juce::PathStrokeType::rounded));
+    }
+}
+
 namespace SkinEditorChrome
 {
     LookAndFeel::LookAndFeel()
@@ -124,40 +163,17 @@ namespace SkinEditorChrome
                                           boxSide,
                                           boxSide);
 
-        // Checked box: same chrome as active sort badges (yellow fill, dark glyph).
-        auto fill = controlFill();
-        if (button.getToggleState())
-            fill = attention();
-        if (! button.isEnabled())
-            fill = fill.withMultipliedAlpha(0.55f);
-        else if (! button.getToggleState())
-        {
-            if (shouldDrawButtonAsDown)
-                fill = controlFillDown();
-            else if (shouldDrawButtonAsHighlighted)
-                fill = controlFillHover();
-        }
-
-        g.setColour(fill);
+        g.setColour(toggleBoxFillColour(button, shouldDrawButtonAsHighlighted,
+                                        shouldDrawButtonAsDown));
         g.fillRoundedRectangle(box, kControlCorner);
         if (! button.getToggleState())
         {
             g.setColour(controlOutline());
             g.drawRoundedRectangle(box, kControlCorner, 1.0f);
         }
-
-        if (button.getToggleState())
+        else
         {
-            juce::Path tick;
-            tick.startNewSubPath(box.getX() + boxSide * 0.22f, box.getCentreY());
-            tick.lineTo(box.getX() + boxSide * 0.42f, box.getY() + boxSide * 0.72f);
-            tick.lineTo(box.getX() + boxSide * 0.78f, box.getY() + boxSide * 0.28f);
-            auto tickColour = surfacePanel();
-            if (! button.isEnabled())
-                tickColour = tickColour.withMultipliedAlpha(0.5f);
-            g.setColour(tickColour);
-            g.strokePath(tick, juce::PathStrokeType(1.4f, juce::PathStrokeType::curved,
-                                                    juce::PathStrokeType::rounded));
+            drawToggleTick(g, box, boxSide, button.isEnabled());
         }
 
         auto textColour = button.findColour(juce::ToggleButton::textColourId);
