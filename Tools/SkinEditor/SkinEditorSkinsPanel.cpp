@@ -15,39 +15,21 @@ namespace
         return separatorGap() + 1 + separatorGap();
     }
 
-    /** Product row + separator + Editor row + New/Rename/Delete row. */
+    /** Product combo + Dup row + separator + Editor combo + actions row. */
     int contentRowsHeight() noexcept
     {
-        return SkinEditorChrome::kButtonHeight // Product: + combo + Duplicate
-               + separatorBlockHeight()
-               + SkinEditorChrome::kButtonHeight // Editor: + combo + Duplicate
+        return SkinEditorChrome::kButtonHeight // Product combo + nav
                + SkinEditorChrome::kButtonGap
-               + SkinEditorChrome::kButtonHeight; // New / Rename / Delete
+               + SkinEditorChrome::kButtonHeight // Product Duplicate
+               + separatorBlockHeight()
+               + SkinEditorChrome::kButtonHeight // Editor combo + nav
+               + SkinEditorChrome::kButtonGap
+               + SkinEditorChrome::kButtonHeight; // Dup / New / Ren / Del
     }
 
-    void placeActionButton(juce::Rectangle<int>& row, juce::TextButton& button)
+    void placeSquareNav(juce::Rectangle<int>& row, juce::TextButton& button, int squareW)
     {
-        button.setBounds(row.removeFromLeft(SkinEditorChrome::measureButtonWidth(button))
-                             .withHeight(SkinEditorChrome::kButtonHeight));
-    }
-
-    struct SelectorRow
-    {
-        juce::Label& label;
-        juce::ComboBox& combo;
-        juce::TextButton& duplicate;
-    };
-
-    void layoutSelectorRow(juce::Rectangle<int>& content,
-                           const SelectorRow& rowWidgets,
-                           int labelColW,
-                           int comboW)
-    {
-        auto row = content.removeFromTop(SkinEditorChrome::kButtonHeight);
-        rowWidgets.label.setBounds(row.removeFromLeft(labelColW));
-        rowWidgets.combo.setBounds(row.removeFromLeft(comboW));
-        row.removeFromLeft(SkinEditorChrome::kButtonGap);
-        placeActionButton(row, rowWidgets.duplicate);
+        button.setBounds(row.removeFromLeft(squareW).withHeight(SkinEditorChrome::kButtonHeight));
     }
 }
 
@@ -81,11 +63,58 @@ SkinEditorSkinsPanel::SkinEditorSkinsPanel()
     wire(newButton_, onNew);
     wire(renameButton_, onRename);
     wire(deleteButton_, onDelete);
+
+    auto wireNav = [this](juce::TextButton& button,
+                          juce::ComboBox& combo,
+                          int delta,
+                          const juce::String& tooltip)
+    {
+        addAndMakeVisible(button);
+        button.setTooltip(tooltip);
+        button.onClick = [this, &combo, delta] { cycleCombo(combo, delta); };
+    };
+    wireNav(productPrevButton_, productCombo_, -1, "Previous Skin");
+    wireNav(productNextButton_, productCombo_, +1, "Next Skin");
+    wireNav(editorPrevButton_, editorCombo_, -1, "Previous Skin");
+    wireNav(editorNextButton_, editorCombo_, +1, "Next Skin");
+}
+
+void SkinEditorSkinsPanel::cycleCombo(juce::ComboBox& combo, int delta)
+{
+    const int count = combo.getNumItems();
+    if (count <= 0)
+        return;
+
+    const int index = combo.getSelectedItemIndex();
+    if (index < 0)
+        return;
+
+    const int next = index + delta;
+    if (next < 0 || next >= count)
+        return;
+
+    combo.setSelectedItemIndex(next, juce::sendNotificationSync);
 }
 
 void SkinEditorSkinsPanel::setProductDuplicateEnabled(bool enabled)
 {
     productDuplicateButton_.setEnabled(enabled);
+}
+
+void SkinEditorSkinsPanel::syncProductNavButtons()
+{
+    const int count = productCombo_.getNumItems();
+    const int index = productCombo_.getSelectedItemIndex();
+    productPrevButton_.setEnabled(count > 0 && index > 0);
+    productNextButton_.setEnabled(count > 0 && index >= 0 && index < count - 1);
+}
+
+void SkinEditorSkinsPanel::syncEditorNavButtons()
+{
+    const int count = editorCombo_.getNumItems();
+    const int index = editorCombo_.getSelectedItemIndex();
+    editorPrevButton_.setEnabled(count > 0 && index > 0);
+    editorNextButton_.setEnabled(count > 0 && index >= 0 && index < count - 1);
 }
 
 void SkinEditorSkinsPanel::setEditorActionsEnabled(bool canDuplicate,
@@ -112,12 +141,18 @@ int SkinEditorSkinsPanel::labelColumnWidth() noexcept
                       SkinEditorChrome::measureLabelWidth("Editor:", font));
 }
 
-int SkinEditorSkinsPanel::comboWidthForContent(int contentW,
-                                               int labelColW,
-                                               int trailingButtonW) noexcept
+int SkinEditorSkinsPanel::squareNavButtonWidth() noexcept
+{
+    return SkinEditorChrome::kButtonHeight;
+}
+
+int SkinEditorSkinsPanel::comboWidthForContent(int contentW, int labelColW) noexcept
 {
     constexpr int kMinCombo = 72;
-    const int fixed = labelColW + SkinEditorChrome::kButtonGap + trailingButtonW;
+    const int squareW = squareNavButtonWidth();
+    const int trailing = SkinEditorChrome::kButtonGap + squareW
+                         + SkinEditorChrome::kButtonGap + squareW;
+    const int fixed = labelColW + trailing;
     return juce::jmax(kMinCombo, contentW - fixed);
 }
 
@@ -142,13 +177,35 @@ void SkinEditorSkinsPanel::resized()
     auto content = chrome.content;
 
     const int labelColW = labelColumnWidth();
-    const int dupW = SkinEditorChrome::measureButtonWidth(productDuplicateButton_);
-    const int comboW = comboWidthForContent(content.getWidth(), labelColW, dupW);
+    const int squareW = squareNavButtonWidth();
+    const int comboW = comboWidthForContent(content.getWidth(), labelColW);
+    const int selectorSpanW = comboW + SkinEditorChrome::kButtonGap + squareW
+                              + SkinEditorChrome::kButtonGap + squareW;
 
-    layoutSelectorRow(content,
-                      { productLabel_, productCombo_, productDuplicateButton_ },
-                      labelColW,
-                      comboW);
+    auto layoutComboNavRow = [&](juce::Label& label,
+                                 juce::ComboBox& combo,
+                                 juce::TextButton& prev,
+                                 juce::TextButton& next)
+    {
+        auto row = content.removeFromTop(SkinEditorChrome::kButtonHeight);
+        label.setBounds(row.removeFromLeft(labelColW));
+        combo.setBounds(row.removeFromLeft(comboW));
+        row.removeFromLeft(SkinEditorChrome::kButtonGap);
+        placeSquareNav(row, prev, squareW);
+        row.removeFromLeft(SkinEditorChrome::kButtonGap);
+        placeSquareNav(row, next, squareW);
+    };
+
+    layoutComboNavRow(productLabel_, productCombo_, productPrevButton_, productNextButton_);
+
+    content.removeFromTop(SkinEditorChrome::kButtonGap);
+    {
+        auto row = content.removeFromTop(SkinEditorChrome::kButtonHeight);
+        row.removeFromLeft(labelColW);
+        productDuplicateButton_.setBounds(
+            row.removeFromLeft(SkinEditorChrome::measureButtonWidth(productDuplicateButton_))
+                .withHeight(SkinEditorChrome::kButtonHeight));
+    }
 
     content.removeFromTop(separatorGap());
     separatorY_ = content.getY();
@@ -157,28 +214,28 @@ void SkinEditorSkinsPanel::resized()
     content.removeFromTop(1);
     content.removeFromTop(separatorGap());
 
-    layoutSelectorRow(content,
-                      { editorLabel_, editorCombo_, editorDuplicateButton_ },
-                      labelColW,
-                      comboW);
+    layoutComboNavRow(editorLabel_, editorCombo_, editorPrevButton_, editorNextButton_);
 
-    // New/Rename/Delete: left = combo left, right = Duplicate right.
-    // Delete matches Duplicate width; New absorbs the remainder (Rename natural width).
+    // Dup / New / Ren / Del: same span as combo + < + > (replaces former New/Rename/Delete span).
     content.removeFromTop(SkinEditorChrome::kButtonGap);
     auto actions = content.removeFromTop(SkinEditorChrome::kButtonHeight);
     actions.removeFromLeft(labelColW);
-    const int spanW = comboW + SkinEditorChrome::kButtonGap + dupW;
-    auto span = actions.removeFromLeft(spanW);
-    const int gaps = 2 * SkinEditorChrome::kButtonGap;
-    const int deleteW = dupW;
-    const int renameW = SkinEditorChrome::measureButtonWidth(renameButton_);
-    const int newW = juce::jmax(1, spanW - gaps - renameW - deleteW);
-    newButton_.setBounds(span.removeFromLeft(newW)
-                             .withHeight(SkinEditorChrome::kButtonHeight));
-    span.removeFromLeft(SkinEditorChrome::kButtonGap);
-    renameButton_.setBounds(span.removeFromLeft(renameW)
-                                .withHeight(SkinEditorChrome::kButtonHeight));
-    span.removeFromLeft(SkinEditorChrome::kButtonGap);
-    deleteButton_.setBounds(span.removeFromLeft(deleteW)
-                                .withHeight(SkinEditorChrome::kButtonHeight));
+    auto span = actions.removeFromLeft(selectorSpanW);
+    const int gaps = 3 * SkinEditorChrome::kButtonGap;
+    const int avail = juce::jmax(4, selectorSpanW - gaps);
+    const int w0 = avail / 4;
+    const int w1 = avail / 4;
+    const int w2 = avail / 4;
+    const int w3 = avail - w0 - w1 - w2;
+
+    auto placeCell = [&](juce::TextButton& button, int width, bool addGap)
+    {
+        button.setBounds(span.removeFromLeft(width).withHeight(SkinEditorChrome::kButtonHeight));
+        if (addGap)
+            span.removeFromLeft(SkinEditorChrome::kButtonGap);
+    };
+    placeCell(editorDuplicateButton_, w0, true);
+    placeCell(newButton_, w1, true);
+    placeCell(renameButton_, w2, true);
+    placeCell(deleteButton_, w3, false);
 }

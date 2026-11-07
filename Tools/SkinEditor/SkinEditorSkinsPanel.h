@@ -15,6 +15,8 @@ public:
 
     void setProductDuplicateEnabled(bool enabled);
     void setEditorActionsEnabled(bool canDuplicate, bool canRenameDelete, bool canNew);
+    void syncProductNavButtons();
+    void syncEditorNavButtons();
 
     std::function<void()> onDuplicateProduct;
     std::function<void()> onDuplicateEditor;
@@ -30,18 +32,26 @@ public:
 
 private:
     static int labelColumnWidth() noexcept;
-    static int comboWidthForContent(int contentW, int labelColW, int trailingButtonW) noexcept;
+    static int squareNavButtonWidth() noexcept;
+    static int comboWidthForContent(int contentW, int labelColW) noexcept;
+
+    void cycleCombo(juce::ComboBox& combo, int delta);
 
     juce::Label titleLabel_;
     juce::Label productLabel_ { {}, "Product:" };
     juce::ComboBox productCombo_;
+    juce::TextButton productPrevButton_ { "<" };
+    juce::TextButton productNextButton_ { ">" };
     juce::TextButton productDuplicateButton_ { "Duplicate" };
+
     juce::Label editorLabel_ { {}, "Editor:" };
     juce::ComboBox editorCombo_;
-    juce::TextButton editorDuplicateButton_ { "Duplicate" };
+    juce::TextButton editorPrevButton_ { "<" };
+    juce::TextButton editorNextButton_ { ">" };
+    juce::TextButton editorDuplicateButton_ { "Dup" };
     juce::TextButton newButton_ { "New" };
-    juce::TextButton renameButton_ { "Rename" };
-    juce::TextButton deleteButton_ { "Delete" };
+    juce::TextButton renameButton_ { "Ren" };
+    juce::TextButton deleteButton_ { "Del" };
 
     juce::Rectangle<int> titleTabBounds_;
     int separatorY_ = 0;
