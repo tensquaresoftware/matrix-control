@@ -345,12 +345,13 @@ void PluginEditor::setPatchSaveFilePickerBinding()
 
                 raiseUiBeforeModalDialog(safeThis.getComponent());
 
-                juce::NativeMessageBox::show(juce::MessageBoxOptions()
-                                                .withIconType(juce::MessageBoxIconType::WarningIcon)
-                                                .withTitle(Dialog::kTitle)
-                                                .withMessage(Dialog::kBody)
-                                                .withButton(Dialog::kOk)
-                                                .withAssociatedComponent(safeThis.getComponent()));
+                juce::NativeMessageBox::showForOptions(
+                    juce::MessageBoxOptions()
+                        .withIconType(juce::MessageBoxIconType::WarningIcon)
+                        .withTitle(Dialog::kTitle)
+                        .withMessage(Dialog::kBody)
+                        .withButton(Dialog::kOk, 1)
+                        .withAssociatedComponent(safeThis.getComponent()));
 
                 if (safeThis == nullptr)
                     return {};
