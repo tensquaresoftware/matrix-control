@@ -125,7 +125,10 @@ void SkinEditorMainWindow::zoomToMaxHeightAndCentre()
                                     area.getHeight() - juce::jmax(0, frame.getTopAndBottom()));
 
     ignorePersist_ = true;
-    setSize(SkinEditorChrome::windowContentWidth(), contentH);
+    setSize(juce::jlimit(SkinEditorChrome::windowMinWidth(),
+                         SkinEditorChrome::windowMaxWidth(),
+                         getWidth()),
+            contentH);
     ignorePersist_ = false;
 
     auto nextBounds = MatrixStandalone::recentreClientBoundsOnNearestDisplayUserArea(
@@ -201,12 +204,13 @@ void SkinEditorMainWindow::updateSizeLimits()
         }
     }
 
-    const int contentW = SkinEditorChrome::windowContentWidth();
+    const int contentMinW = SkinEditorChrome::windowMinWidth();
+    const int contentMaxW = SkinEditorChrome::windowMaxWidth();
     // macOS live-resize constrainRect feeds the constrainer the NSWindow frame
     // (native title bar included), not the content view — add frameTB so the
     // content view still reaches clientMinH (≈658 outer when title bar ≈31).
-    constrainer_.setMinimumWidth(contentW);
-    constrainer_.setMaximumWidth(contentW);
+    constrainer_.setMinimumWidth(contentMinW);
+    constrainer_.setMaximumWidth(contentMaxW);
     constrainer_.setMinimumHeight(clientMinH + frameTB);
     constrainer_.setMaximumHeight(clientMaxH + frameTB);
     maxContentHeight_ = clientMaxH;
@@ -216,7 +220,9 @@ void SkinEditorMainWindow::normalizeClientSize()
 {
     updateSizeLimits();
 
-    const int w = SkinEditorChrome::windowContentWidth();
+    const int w = juce::jlimit(SkinEditorChrome::windowMinWidth(),
+                               SkinEditorChrome::windowMaxWidth(),
+                               getWidth());
     const int h = juce::jlimit(skinEditorMinContentHeight(), maxContentHeight_, getHeight());
 
     if (getWidth() == w && getHeight() == h)

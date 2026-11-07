@@ -132,22 +132,23 @@ namespace SkinEditorChrome
      * former default track (8) + right content pad.
      */
     inline constexpr int kScrollTrackWidth = 8 + kPanelContentPad;
-    /** Fixed body-column widths — window width fits these; Mappings does not grow. */
+    /** Fixed Color column — does not grow with the window. */
     inline constexpr int kColorPanelWidth = 260;
     /**
-     * Palette column width (list paint = Mapped colour = 130).
-     * Floored with New/Dup/Del + chrome text via palettePanelWidthForActionButtons().
+     * Palette column minimum width. Extra window width is shared with Mappings
+     * Mapped colour so both can show the same colour names.
+     * Floored at runtime with New/Dup/Del + chrome text via palettePanelMinWidth().
      */
-    inline constexpr int kPalettePanelWidth = 158;
+    inline constexpr int kPalettePanelMinWidth = 160;
     /**
-     * Palette selection-highlight width and Mappings "Mapped colour" column span.
-     * List extends into the right content pad; paint stops before the scroll track.
+     * Palette list paint floor at min panel width (before scroll-track band).
+     * Live paint width = palettePanelW - kPanelContentPad - kScrollTrackWidth.
      */
-    inline constexpr int kPaletteListPaintWidth = kPalettePanelWidth
-                                                  - kPanelContentPad
-                                                  - kScrollTrackWidth; // 130
+    inline constexpr int kPaletteListPaintMinWidth = kPalettePanelMinWidth
+                                                     - kPanelContentPad
+                                                     - kScrollTrackWidth; // 132
     /**
-     * Mappings column widths (multiples of 5). Each column insets content by
+     * Mappings column widths (multiples of 5 where fixed). Each column insets content by
      * kMappingsColumnPad on left and right so text/chips clear the dividers.
      */
     inline constexpr int kMappingsPropertyColumnWidth = 160;
@@ -159,36 +160,61 @@ namespace SkinEditorChrome
      * Visible slab = 2×pad + chain + chip gap + count; column adds cutter thickness.
      */
     inline constexpr int kMappingsLinkColumnWidth = 55; // slab 51 + cutter 4 (6+12+4+22+6 +1)
-    /** Mapped colour column (may exceed Palette list paint width). */
-    inline constexpr int kMappingsMappedColumnWidth = 140;
+    /** Fixed Mappings columns (everything except Mapped colour). */
+    inline constexpr int kMappingsFixedColumnsWidth = kMappingsPropertyColumnWidth
+                                                      + kMappingsStateColumnWidth
+                                                      + kMappingsColourSetColumnWidth
+                                                      + kMappingsLinkColumnWidth; // 440
+    /**
+     * Mapped colour minimum = Palette list paint at min Palette width (name parity).
+     * Live Mapped width absorbs the remainder of the Mappings table paint width.
+     */
+    inline constexpr int kMappingsMappedColumnMinWidth = kPaletteListPaintMinWidth; // 132
     /** Horizontal inset inside every Mappings column (left and right). */
     inline constexpr int kMappingsColumnPad = 6;
-    /**
-     * Table paint width = Property + State + Colour set + Link + Mapped.
-     * Panel = that paint + scroll track + 2 focus pads - right pad extension + side content pads.
-     */
-    inline constexpr int kMappingsTablePaintWidth = kMappingsPropertyColumnWidth
-                                                    + kMappingsStateColumnWidth
-                                                    + kMappingsColourSetColumnWidth
-                                                    + kMappingsLinkColumnWidth
-                                                    + kMappingsMappedColumnWidth; // 580
+    /** Min table paint width = fixed columns + min Mapped. */
+    inline constexpr int kMappingsTablePaintMinWidth = kMappingsFixedColumnsWidth
+                                                       + kMappingsMappedColumnMinWidth; // 572
     inline constexpr int kMappingsFocusPad = 1;
-    inline constexpr int kMappingsPanelWidth = kMappingsTablePaintWidth
-                                               + kScrollTrackWidth
-                                               + 2 * kMappingsFocusPad
-                                               - kPanelContentPad
-                                               + 2 * kPanelContentPad; // 610
-    inline constexpr int kLegacyWindowMaxWidth = 1210;
     /**
-     * Exact body width: edge gutters + Color + Palette side gaps + fixed Mappings.
-     * Live window width = max(body, measured title + SESSION) — see windowContentWidth().
+     * Mappings panel width for a given Palette panel width.
+     * Identity: panel = fixedCols + palettePanelW + 2×focus
+     * (Mapped paint tracks Palette list paint; pad/scroll terms cancel).
      */
-    inline constexpr int kWindowBodyWidth = kWindowEdgeGutter + kColorPanelWidth
-                                            + kPaletteSideGap + kPalettePanelWidth
-                                            + kPaletteSideGap + kMappingsPanelWidth
-                                            + kWindowEdgeGutter;
-    /** Constexpr body floor; runtime max/min prefer windowContentWidth(). */
-    inline constexpr int kWindowMaxWidth = kWindowBodyWidth;
+    inline constexpr int mappingsPanelWidthForPalettePanel(int palettePanelW) noexcept
+    {
+        return kMappingsFixedColumnsWidth + palettePanelW + 2 * kMappingsFocusPad;
+    }
+    /** Min Mappings panel width (Palette at minimum). */
+    inline constexpr int kMappingsPanelMinWidth =
+        mappingsPanelWidthForPalettePanel(kPalettePanelMinWidth); // 602
+    inline constexpr int kLegacyWindowMaxWidth = 1210;
+    /** Body width for a given Palette panel width (edges + Color + gaps + Mappings). */
+    inline constexpr int windowBodyWidthForPalettePanel(int palettePanelW) noexcept
+    {
+        return kWindowEdgeGutter + kColorPanelWidth
+               + kPaletteSideGap + palettePanelW
+               + kPaletteSideGap + mappingsPanelWidthForPalettePanel(palettePanelW)
+               + kWindowEdgeGutter;
+    }
+    /** Constexpr body floor at minimum Palette. */
+    inline constexpr int kWindowBodyMinWidth =
+        windowBodyWidthForPalettePanel(kPalettePanelMinWidth); // 1070
+    /**
+     * Palette width from body remainder after Color (includes leading Palette gap).
+     * remainder = palette + gap + mappings(palette) → palette = (remainder - offset) / 2.
+     */
+    inline int palettePanelWidthFromBodyRemainder(int remainderAfterColor) noexcept
+    {
+        const int offset = kPaletteSideGap + kMappingsFixedColumnsWidth
+                           + 2 * kMappingsFocusPad;
+        return juce::jmax(kPalettePanelMinWidth, (remainderAfterColor - offset) / 2);
+    }
+    /** Palette list paint width for a live panel width. */
+    inline int paletteListPaintWidthForPanel(int palettePanelW) noexcept
+    {
+        return juce::jmax(1, palettePanelW - kPanelContentPad - kScrollTrackWidth);
+    }
     /** Orbitron logo title in the Skin Editor title bar. */
     inline constexpr const char* kAppTitleText = "MATRIX-CONTROL SKIN EDITOR";
     /**

@@ -38,13 +38,14 @@ namespace SkinEditorMappingsColumns
 
     inline Layout forWidth(int totalWidth) noexcept
     {
-        const int mappedSpan = juce::jmin(SkinEditorChrome::kMappingsMappedColumnWidth,
-                                          juce::jmax(0, totalWidth));
+        // Fixed leading columns; Mapped colour absorbs the remainder (tracks Palette width).
+        const int mappedX = SkinEditorChrome::kMappingsFixedColumnsWidth;
+        const int mappedSpan = juce::jmax(0, totalWidth - mappedX);
         return { SkinEditorChrome::kMappingsPropertyColumnWidth,
                  SkinEditorChrome::kMappingsStateColumnWidth,
                  SkinEditorChrome::kMappingsColourSetColumnWidth,
                  SkinEditorChrome::kMappingsLinkColumnWidth,
-                 totalWidth - mappedSpan,
+                 mappedX,
                  mappedSpan };
     }
 

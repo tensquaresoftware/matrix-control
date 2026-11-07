@@ -1,5 +1,4 @@
 #include <juce_core/juce_core.h>
-#include <juce_gui_basics/juce_gui_basics.h>
 
 #include "Tools/SkinEditor/SkinEditorChromeFonts.h"
 #include "Tools/SkinEditor/SkinEditorChromeTokens.h"
@@ -8,12 +7,6 @@
 #include "Tools/SkinEditor/SkinEditorMappingsColumns.h"
 #include "Tools/SkinEditor/SkinEditorSkinsPanel.h"
 
-/**
- * Locks Skin Editor chrome layout tokens for SESSION / SKINS / OPERATION
- * (no Unbound column). Witness Idle/Hold visibility uses MappingModePolicy SSOT.
- * Export unboundCount == 0 gate: DevSkinLayerJsonTests.
- * Bind unbound keys: DevSkinLayerJsonTests / DevSkinMatrixTests.
- */
 class SkinEditorChromeLayoutTests : public juce::UnitTest
 {
 public:
@@ -24,14 +17,12 @@ public:
 
     void runTest() override
     {
-        SkinEditorChrome::warmFonts();
-
-        operationWellMatchesSessionAndSharedBadgeGap();
-        windowFitsFixedMappingsNotStretch();
+        operationWellMatchesSessionHeight();
+        windowFitsFlexiblePaletteMapped();
         idleWitnessHiddenHoldWitnessVisible();
         mappingsColumnPadAndWidths();
         mappingsChromeBadgeTokens();
-        propertyBindHoverContrastInk();
+        propertyBindHoverInk();
         unboundHoldNeighbourhoodGeometry();
         skinsPanelEditorActionsFitOneRow();
         minContentHeightStacksSkinsAndColor();
@@ -40,38 +31,47 @@ public:
     }
 
 private:
-    void operationWellMatchesSessionAndSharedBadgeGap()
+    void operationWellMatchesSessionHeight()
     {
         beginTest("OPERATION well matches SESSION height; badge gap shared with BRIDGE");
 
-        expectEquals(SkinEditorChrome::kMappingBandHeight, SkinEditorChrome::kSessionWellHeight);
-        expectEquals(SkinEditorChrome::kTitleBarHeight,
-                     SkinEditorChrome::kChromeStackGap + SkinEditorChrome::kSessionWellHeight
-                         + SkinEditorChrome::kGutter);
-        expectEquals(SkinEditorChrome::kStatusBarHeight, SkinEditorChrome::kSessionWellHeight);
-        expectEquals(SkinEditorChrome::kChromeStackGap, 12);
-        expectEquals(SkinEditorChrome::kWindowEdgeGutter, 12);
-        expectEquals(SkinEditorChrome::kPaletteSideGap, 12);
+        expectEquals(SkinEditorChrome::kMappingBandHeight,
+                     SkinEditorChrome::kSessionWellHeight);
         expectEquals(SkinEditorChrome::kOperationWitnessPad, 4);
         expectEquals(SkinEditorChrome::kChromeBadgeGap, 8);
     }
 
-    void windowFitsFixedMappingsNotStretch()
+    void windowFitsFlexiblePaletteMapped()
     {
-        beginTest("Window content width fits fixed columns; does not stretch Mappings");
+        beginTest("Window min width fits min Palette; max allows stretch; Mapped tracks Palette");
 
         const int titleSession = SkinEditorChrome::windowTitleSessionMinWidth();
-        const int contentW = SkinEditorChrome::windowContentWidth();
-        expectEquals(contentW,
-                     juce::jmax(SkinEditorChrome::kWindowBodyWidth, titleSession));
-        expectEquals(SkinEditorChrome::windowMinWidth(), contentW);
-        expectEquals(SkinEditorChrome::windowMaxWidth(), contentW);
-        expectEquals(SkinEditorChrome::kWindowBodyWidth,
-                     SkinEditorChrome::kWindowEdgeGutter + SkinEditorChrome::kColorPanelWidth
-                         + SkinEditorChrome::kPaletteSideGap + SkinEditorChrome::kPalettePanelWidth
-                         + SkinEditorChrome::kPaletteSideGap + SkinEditorChrome::kMappingsPanelWidth
-                         + SkinEditorChrome::kWindowEdgeGutter);
-        expect(contentW < SkinEditorChrome::kLegacyWindowMaxWidth);
+        const int minW = SkinEditorChrome::windowMinWidth();
+        const int maxW = SkinEditorChrome::windowMaxWidth();
+        const int bodyMin = SkinEditorChrome::windowBodyWidthForPalettePanel(
+            SkinEditorChrome::palettePanelMinWidth());
+
+        expectEquals(minW, juce::jmax(bodyMin, titleSession));
+        expectEquals(maxW, SkinEditorChrome::kLegacyWindowMaxWidth);
+        expect(minW < maxW);
+        expectEquals(SkinEditorChrome::kWindowBodyMinWidth,
+                     SkinEditorChrome::windowBodyWidthForPalettePanel(
+                         SkinEditorChrome::kPalettePanelMinWidth));
+
+        const int paletteAtMin = SkinEditorChrome::kPalettePanelMinWidth;
+        const int mappedAtMin = SkinEditorChrome::paletteListPaintWidthForPanel(paletteAtMin);
+        expectEquals(mappedAtMin, SkinEditorChrome::kMappingsMappedColumnMinWidth);
+        expectEquals(SkinEditorChrome::mappingsPanelWidthForPalettePanel(paletteAtMin),
+                     SkinEditorChrome::kMappingsPanelMinWidth);
+
+        // Growth: +20 Palette → +20 Mapped paint, +20 Mappings panel, +40 window body.
+        const int paletteWide = paletteAtMin + 20;
+        expectEquals(SkinEditorChrome::paletteListPaintWidthForPanel(paletteWide),
+                     mappedAtMin + 20);
+        expectEquals(SkinEditorChrome::mappingsPanelWidthForPalettePanel(paletteWide),
+                     SkinEditorChrome::kMappingsPanelMinWidth + 20);
+        expectEquals(SkinEditorChrome::windowBodyWidthForPalettePanel(paletteWide),
+                     SkinEditorChrome::windowBodyWidthForPalettePanel(paletteAtMin) + 40);
     }
 
     void idleWitnessHiddenHoldWitnessVisible()
@@ -86,34 +86,33 @@ private:
 
     void mappingsColumnPadAndWidths()
     {
-        beginTest("Mappings columns use 6px cell pad and fixed widths");
+        beginTest("Mappings columns use 6px cell pad; Mapped absorbs table remainder");
 
-        expectEquals(SkinEditorChrome::kPaletteListPaintWidth, 130);
-        expectEquals(SkinEditorChrome::kPalettePanelWidth, 158);
-        expectEquals(SkinEditorChrome::kPalettePanelWidth,
-                     SkinEditorChrome::palettePanelWidthForActionButtons());
+        expectEquals(SkinEditorChrome::kPalettePanelMinWidth, 160);
+        expectEquals(SkinEditorChrome::kPaletteListPaintMinWidth, 132);
+        expect(SkinEditorChrome::palettePanelMinWidth()
+               >= SkinEditorChrome::palettePanelWidthForActionButtons());
         expectEquals(SkinEditorChrome::kMappingsColumnPad, 6);
         expectEquals(SkinEditorChrome::kMappingsPropertyColumnWidth, 160);
         expectEquals(SkinEditorChrome::kMappingsStateColumnWidth, 85);
         expectEquals(SkinEditorChrome::kMappingsColourSetColumnWidth, 140);
         expectEquals(SkinEditorChrome::kMappingsLinkColumnWidth, 55);
         expectEquals(SkinEditorChrome::kLinkCountBadgeWidth, 22);
-        expectEquals(SkinEditorChrome::kMappingsMappedColumnWidth, 140);
-        expectEquals(SkinEditorChrome::kMappingsTablePaintWidth, 580);
-        expectEquals(SkinEditorChrome::kMappingsPanelWidth, 610);
+        expectEquals(SkinEditorChrome::kMappingsFixedColumnsWidth, 440);
+        expectEquals(SkinEditorChrome::kMappingsMappedColumnMinWidth, 132);
+        expectEquals(SkinEditorChrome::kMappingsTablePaintMinWidth, 572);
+        expectEquals(SkinEditorChrome::kMappingsPanelMinWidth, 602);
         expect(SkinEditorChrome::kMappingsPropertyColumnWidth % 5 == 0);
-        expect(SkinEditorChrome::kMappingsMappedColumnWidth % 5 == 0);
         expectEquals(SkinEditorChrome::kObjectComboWidth, 149);
         expectEquals(SkinEditorChrome::mappingsHoldLeft(100, 200), 200);
         expectEquals(SkinEditorChrome::mappingsHoldLeft(200, 100),
                      200 + SkinEditorChrome::kButtonGap);
-        expectEquals(SkinEditorChrome::kMappingsTablePaintWidth,
-                     SkinEditorChrome::kMappingsPropertyColumnWidth
-                         + SkinEditorChrome::kMappingsStateColumnWidth
-                         + SkinEditorChrome::kMappingsColourSetColumnWidth
-                         + SkinEditorChrome::kMappingsLinkColumnWidth
-                         + SkinEditorChrome::kMappingsMappedColumnWidth);
-        expect(SkinEditorChrome::kMappingsPanelWidth
+
+        const int tableW = SkinEditorChrome::kMappingsTablePaintMinWidth + 40;
+        const auto cols = SkinEditorMappingsColumns::forWidth(tableW);
+        expectEquals(cols.mappedX, SkinEditorChrome::kMappingsFixedColumnsWidth);
+        expectEquals(cols.mappedW, tableW - SkinEditorChrome::kMappingsFixedColumnsWidth);
+        expect(SkinEditorChrome::kMappingsPanelMinWidth
                < SkinEditorChrome::kLegacyWindowMaxWidth);
     }
 
@@ -130,12 +129,12 @@ private:
         expectEquals(SkinEditorChrome::kCountBadgeDiameter, 12);
     }
 
-    void propertyBindHoverContrastInk()
+    void propertyBindHoverInk()
     {
         beginTest("Property bind hover picks dark ink on light fills");
 
         expect(SkinEditorChrome::propertyBindHoverNeedsDarkText(juce::Colours::white));
-        expect(SkinEditorChrome::propertyBindHoverNeedsDarkText(juce::Colour(0xfff5f0e6))); // cream
+        expect(SkinEditorChrome::propertyBindHoverNeedsDarkText(juce::Colour(0xfff5f0e6)));
         expect(! SkinEditorChrome::propertyBindHoverNeedsDarkText(juce::Colours::black));
         expect(! SkinEditorChrome::propertyBindHoverNeedsDarkText(juce::Colour(0xff1a1a1a)));
     }
@@ -145,7 +144,7 @@ private:
         beginTest("Unbound origin and Hold align follow Mapped / Colour set contentLeft");
 
         const auto cols = SkinEditorMappingsColumns::forWidth(
-            SkinEditorChrome::kMappingsTablePaintWidth);
+            SkinEditorChrome::kMappingsTablePaintMinWidth);
         expectEquals(cols.contentLeft(cols.mappedX),
                      cols.mappedX + SkinEditorChrome::kMappingsColumnPad);
         expectEquals(cols.contentLeft(cols.colourSetLeft()) - 6,
@@ -164,13 +163,13 @@ private:
         return nullptr;
     }
 
-    static juce::TextButton* findLowerDuplicate(juce::Component& root)
+    static juce::TextButton* findLowerNextNav(juce::Component& root)
     {
         juce::TextButton* lower = nullptr;
         for (auto* c : root.getChildren())
         {
             auto* b = dynamic_cast<juce::TextButton*>(c);
-            if (b == nullptr || b->getButtonText() != "Duplicate")
+            if (b == nullptr || b->getButtonText() != ">")
                 continue;
             if (lower == nullptr || b->getY() > lower->getY())
                 lower = b;
@@ -194,32 +193,34 @@ private:
 
     void skinsPanelEditorActionsFitOneRow()
     {
-        beginTest("SKINS Delete matches Duplicate; New/Rename/Delete fit combo-to-Duplicate span");
+        beginTest("SKINS Dup/New/Ren/Del fit combo-to-Next span under Editor");
 
         SkinEditorSkinsPanel panel;
         panel.setSize(SkinEditorChrome::kColorPanelWidth, SkinEditorSkinsPanel::preferredHeight());
 
         auto* editorCombo = findLowerCombo(panel);
-        auto* editorDup = findLowerDuplicate(panel);
+        auto* editorNext = findLowerNextNav(panel);
+        auto* dupBtn = findButton(panel, "Dup");
         auto* newBtn = findButton(panel, "New");
-        auto* renameBtn = findButton(panel, "Rename");
-        auto* deleteBtn = findButton(panel, "Delete");
+        auto* renameBtn = findButton(panel, "Ren");
+        auto* deleteBtn = findButton(panel, "Del");
 
         expect(editorCombo != nullptr);
-        expect(editorDup != nullptr);
+        expect(editorNext != nullptr);
+        expect(dupBtn != nullptr);
         expect(newBtn != nullptr);
         expect(renameBtn != nullptr);
         expect(deleteBtn != nullptr);
-        if (editorCombo == nullptr || editorDup == nullptr || newBtn == nullptr
-            || renameBtn == nullptr || deleteBtn == nullptr)
+        if (editorCombo == nullptr || editorNext == nullptr || dupBtn == nullptr
+            || newBtn == nullptr || renameBtn == nullptr || deleteBtn == nullptr)
             return;
 
-        expectEquals(deleteBtn->getWidth(), editorDup->getWidth());
+        expectEquals(dupBtn->getY(), newBtn->getY());
         expectEquals(newBtn->getY(), renameBtn->getY());
         expectEquals(renameBtn->getY(), deleteBtn->getY());
-        expectEquals(newBtn->getX(), editorCombo->getX());
-        expectEquals(deleteBtn->getRight(), editorDup->getRight());
-        expect(newBtn->getWidth() >= 1);
+        expectEquals(dupBtn->getX(), editorCombo->getX());
+        expectEquals(deleteBtn->getRight(), editorNext->getRight());
+        expect(dupBtn->getY() > editorCombo->getBottom());
     }
 
     void minContentHeightStacksSkinsAndColor()
@@ -229,7 +230,6 @@ private:
         const int skinsH = SkinEditorSkinsPanel::preferredHeight();
         const int colorH = SkinEditorColourPicker::preferredHeightForWidth(
             SkinEditorChrome::kColorPanelWidth);
-        // Mirrors SkinEditorMainWindow::skinEditorMinContentHeight (anonymous).
         const int minH = SkinEditorChrome::kTitleBarHeight + SkinEditorChrome::kGutter
                          + SkinEditorChrome::kMappingBandHeight + SkinEditorChrome::kGutter
                          + skinsH + colorH + SkinEditorChrome::kStatusBarHeight;
@@ -237,7 +237,6 @@ private:
         expect(skinsH > 0);
         expect(colorH > 0);
         expect(minH > skinsH + colorH);
-        // COLOR flush: preferred height has top gutter + content pads, no trailing kGutter.
         constexpr int kFieldRowH = 24;
         constexpr int kHueBarW = 18;
         constexpr int kSvHueGap = 8;
@@ -251,7 +250,6 @@ private:
                          + SkinEditorChrome::kPanelContentPad + kFieldRowH
                          + kTightPad + 2 * kFieldRowH
                          + kTightPad);
-        // SKINS keeps top + bottom gutters (bottom contributes to SKINS↔COLOR gap).
         expect(skinsH
                >= SkinEditorChrome::kGutter + SkinEditorChrome::kPanelTitleHeight
                       + SkinEditorChrome::kGutter);

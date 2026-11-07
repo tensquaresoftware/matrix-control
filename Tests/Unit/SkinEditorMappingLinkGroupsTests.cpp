@@ -175,7 +175,7 @@ private:
         expect(! isLinkColumn(270, 200, 70));
 
         const auto cols = SkinEditorMappingsColumns::forWidth(
-            SkinEditorChrome::kMappingsTablePaintWidth);
+            SkinEditorChrome::kMappingsTablePaintMinWidth);
         expectEquals(cols.linkW, SkinEditorChrome::kMappingsLinkColumnWidth);
         const int expectedLinkLeft = SkinEditorChrome::kMappingsPropertyColumnWidth
                                      + SkinEditorChrome::kMappingsStateColumnWidth

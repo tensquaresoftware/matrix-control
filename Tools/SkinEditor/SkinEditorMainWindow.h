@@ -5,8 +5,8 @@
 #include "Standalone/StandaloneTitleBarDoubleClick.h"
 
 /**
- * Height is user-resizable within the nearest display; width fits fixed body columns
- * (Color | Palette | Mappings) vs measured title + SESSION — see windowContentWidth().
+ * Height is user-resizable within the nearest display; width stretches Palette and
+ * Mappings Mapped colour together (min Palette 160px) — see windowMinWidth/MaxWidth().
  * Position/size persist in Application Support (skin-editor-window.state).
  */
 class SkinEditorMainWindow final : public juce::DocumentWindow,

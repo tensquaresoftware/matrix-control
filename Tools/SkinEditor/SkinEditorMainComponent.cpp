@@ -418,9 +418,12 @@ void SkinEditorMainComponent::layoutBodyPanels(juce::Rectangle<int> bounds)
 
     const int paletteGap = SkinEditorChrome::kPaletteSideGap;
     bounds.removeFromLeft(paletteGap);
-    palettePanel_.setBounds(bounds.removeFromLeft(SkinEditorChrome::kPalettePanelWidth));
+    // Remainder = Palette + gap + Mappings; both Palette and Mapped colour share growth.
+    const int paletteW = SkinEditorChrome::palettePanelWidthFromBodyRemainder(bounds.getWidth());
+    const int mappingsW = SkinEditorChrome::mappingsPanelWidthForPalettePanel(paletteW);
+    palettePanel_.setBounds(bounds.removeFromLeft(paletteW));
     bounds.removeFromLeft(paletteGap);
-    mappingsPanel_.setBounds(bounds.removeFromLeft(SkinEditorChrome::kMappingsPanelWidth));
+    mappingsPanel_.setBounds(bounds.removeFromLeft(mappingsW));
 }
 
 void SkinEditorMainComponent::resized()

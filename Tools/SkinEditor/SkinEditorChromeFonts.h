@@ -191,22 +191,38 @@ namespace SkinEditorChrome
     }
 
     /**
-     * Palette New / Dup / Del: text + pad, no 52 px floor (short labels stay tight).
+     * Palette New / Dup|Duplicate / Del|Delete: text + pad, no 52 px floor
+     * (short labels stay tight at min width).
      */
-    inline int measurePaletteActionButtonWidth(const juce::TextButton& button) noexcept
+    inline int measurePaletteActionButtonWidth(const juce::String& label) noexcept
     {
         constexpr int kPad = 16;
         constexpr int kMin = 36;
-        return juce::jmax(kMin, measureTextWidth(fontRegular(), button.getButtonText()) + kPad);
+        return juce::jmax(kMin, measureTextWidth(fontRegular(), label) + kPad);
     }
 
-    /** Preferred New + Dup + Del row (two gaps); used to size kPalettePanelWidth. */
+    inline int measurePaletteActionButtonWidth(const juce::TextButton& button) noexcept
+    {
+        return measurePaletteActionButtonWidth(button.getButtonText());
+    }
+
+    /** Preferred New + Dup + Del row (two gaps); used to floor Palette min width. */
     inline int paletteActionButtonsPreferredWidth() noexcept
     {
-        return measurePaletteActionButtonWidth(juce::TextButton("New"))
-               + measurePaletteActionButtonWidth(juce::TextButton("Dup"))
-               + measurePaletteActionButtonWidth(juce::TextButton("Del"))
+        return measurePaletteActionButtonWidth("New")
+               + measurePaletteActionButtonWidth("Dup")
+               + measurePaletteActionButtonWidth("Del")
                + 2 * kButtonGap;
+    }
+
+    /** True when New + Duplicate + Delete (+ gaps) fit the Palette action row. */
+    inline bool paletteActionButtonsPreferLongLabels(int actionRowWidth) noexcept
+    {
+        const int preferred = measurePaletteActionButtonWidth("New")
+                              + measurePaletteActionButtonWidth("Duplicate")
+                              + measurePaletteActionButtonWidth("Delete")
+                              + 2 * kButtonGap;
+        return preferred <= actionRowWidth;
     }
 
     /**
@@ -221,7 +237,7 @@ namespace SkinEditorChrome
                                            measureTextWidth(fontBold(), "Editor colours"))
                                 + kHeaderInset;
         const int fromMappedLegend = measureTextWidth(fontBold(), "Mapped colour");
-        return juce::jmax(kPaletteListPaintWidth,
+        return juce::jmax(kPaletteListPaintMinWidth,
                           juce::jmax(fromActions, juce::jmax(fromHeaders, fromMappedLegend)));
     }
 
@@ -232,6 +248,12 @@ namespace SkinEditorChrome
     inline int palettePanelWidthForActionButtons() noexcept
     {
         return paletteListPaintFloor() + kPanelContentPad + kScrollTrackWidth;
+    }
+
+    /** Effective Palette minimum (token floor vs action/chrome text). */
+    inline int palettePanelMinWidth() noexcept
+    {
+        return juce::jmax(kPalettePanelMinWidth, palettePanelWidthForActionButtons());
     }
 
     inline int measureLabelWidth(const juce::String& text, const juce::Font& font = fontRegular())
@@ -279,15 +301,16 @@ namespace SkinEditorChrome
     }
 
     /**
-     * Fitted client width: fixed body columns vs measured title + SESSION.
-     * Mappings keeps kMappingsPanelWidth; the window shrinks instead of stretching Mappings.
+     * Client width floor: min Palette body vs measured title + SESSION.
+     * Widening the window grows Palette and Mappings Mapped colour together.
      */
     inline int windowContentWidth() noexcept
     {
-        return juce::jmax(kWindowBodyWidth, windowTitleSessionMinWidth());
+        return juce::jmax(windowBodyWidthForPalettePanel(palettePanelMinWidth()),
+                          windowTitleSessionMinWidth());
     }
 
     inline int windowMinWidth() noexcept { return windowContentWidth(); }
 
-    inline int windowMaxWidth() noexcept { return windowContentWidth(); }
+    inline int windowMaxWidth() noexcept { return kLegacyWindowMaxWidth; }
 }

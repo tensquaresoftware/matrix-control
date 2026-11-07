@@ -192,21 +192,18 @@ void SkinEditorPalettePanel::resized()
 
 void SkinEditorPalettePanel::layoutActionButtons(juce::Rectangle<int> actionRow)
 {
-    // Natural widths only — do not dump leftover into New (keeps short labels tight).
     const int tableW = actionRow.getWidth();
     const int gaps = 2 * SkinEditorChrome::kButtonGap;
-    int newW = SkinEditorChrome::measurePaletteActionButtonWidth(addButton_);
-    int dupW = SkinEditorChrome::measurePaletteActionButtonWidth(duplicateButton_);
-    int delW = SkinEditorChrome::measurePaletteActionButtonWidth(deleteButton_);
-    const int preferred = newW + dupW + delW + gaps;
-    if (preferred > tableW)
-    {
-        const int inner = juce::jmax(3, tableW - gaps);
-        const int sum = juce::jmax(1, newW + dupW + delW);
-        newW = juce::jmax(1, (inner * newW) / sum);
-        dupW = juce::jmax(1, (inner * dupW) / sum);
-        delW = juce::jmax(1, inner - newW - dupW);
-    }
+    const bool longLabels = SkinEditorChrome::paletteActionButtonsPreferLongLabels(tableW);
+    duplicateButton_.setButtonText(longLabels ? "Duplicate" : "Dup");
+    deleteButton_.setButtonText(longLabels ? "Delete" : "Del");
+
+    // Three buttons fill the Palette paint width (equal cells + leftover on Delete).
+    const int inner = juce::jmax(3, tableW - gaps);
+    const int newW = inner / 3;
+    const int dupW = inner / 3;
+    const int delW = inner - newW - dupW;
+
     addButton_.setBounds(actionRow.removeFromLeft(newW)
                              .withHeight(SkinEditorChrome::kButtonHeight));
     actionRow.removeFromLeft(SkinEditorChrome::kButtonGap);
@@ -342,14 +339,13 @@ void SkinEditorPalettePanel::paintColourRow(juce::Graphics& g, const Row& item, 
         SkinEditorChrome::paintColourSwatch(g, swatch, juce::Colour(item.argb));
 
     const auto& bodyFont = SkinEditorChrome::fontRegular();
-    const int countLeft = Geo::mappingCountLeft(paintW, mappingCountColumnWidth_);
+    const int countRight = Geo::mappingCountRight(paintW);
+    const int countLeft = countRight - mappingCountColumnWidth_;
     if (item.mappingCount > 0)
     {
-        // Same slot as drawCountBadge so hover only adds the fill (no size/x jump).
-        const auto countArea = juce::Rectangle<int>(countLeft, yOff, mappingCountColumnWidth_, fullH);
+        // Shared right edge for every row; badge grows left on hover (no x jump).
         const int badgeW = SkinEditorChrome::countBadgeWidth(item.mappingCount);
-        const auto badgeArea = juce::Rectangle<int>(countArea.getRight() - badgeW, countArea.getY(),
-                                                    badgeW, countArea.getHeight());
+        const auto badgeArea = juce::Rectangle<int>(countRight - badgeW, yOff, badgeW, fullH);
         if (item.name == hoveredMappingCountName_)
         {
             SkinEditorChrome::drawCountBadge(g, badgeArea, item.mappingCount);
@@ -358,8 +354,9 @@ void SkinEditorPalettePanel::paintColourRow(juce::Graphics& g, const Row& item, 
         {
             g.setColour(SkinEditorChrome::attention());
             g.setFont(SkinEditorChrome::fontBold(SkinEditorChrome::kCountBadgeFont));
-            g.drawText(juce::String(item.mappingCount), badgeArea,
-                       juce::Justification::centred, false);
+            const juce::Rectangle<int> countArea { countLeft, yOff, mappingCountColumnWidth_, fullH };
+            g.drawText(juce::String(item.mappingCount), countArea,
+                       juce::Justification::centredRight, false);
         }
     }
 
@@ -374,6 +371,7 @@ void SkinEditorPalettePanel::rebuildRows()
     rows_.clear();
     stickySections_.clear();
     hoveredMappingCountName_.clear();
+    // Column width tracks badge metrics only so idle text and hover chips share one right edge.
     mappingCountColumnWidth_ = 0;
     const auto* skin = (layer_ != nullptr && skinId_.isNotEmpty())
                            ? layer_->findSkin(skinId_)
@@ -381,10 +379,8 @@ void SkinEditorPalettePanel::rebuildRows()
     if (skin == nullptr)
         return;
 
-    const auto& countFont = SkinEditorChrome::fontRegular();
-    // Floor at two-digit text and badge so hover capsule does not reflow names.
-    mappingCountColumnWidth_ = juce::jmax(SkinEditorChrome::measureTextWidth(countFont, "99"),
-                                         SkinEditorChrome::countBadgeWidth(99));
+    // Floor at two-digit badge so hover capsule does not reflow names.
+    mappingCountColumnWidth_ = SkinEditorChrome::countBadgeWidth(99);
 
     std::vector<Row> product;
     std::vector<Row> editor;
@@ -397,10 +393,8 @@ void SkinEditorPalettePanel::rebuildRows()
         row.pending = pastille.pending;
         row.isProduct = layer_->isProductPastilleName(pastille.name);
         row.mappingCount = layer_->countMappingsReferencing(skinId_, pastille.name);
-        mappingCountColumnWidth_ = juce::jmax(
-            mappingCountColumnWidth_,
-            SkinEditorChrome::measureTextWidth(countFont, juce::String(row.mappingCount)),
-            SkinEditorChrome::countBadgeWidth(row.mappingCount));
+        mappingCountColumnWidth_ = juce::jmax(mappingCountColumnWidth_,
+                                              SkinEditorChrome::countBadgeWidth(row.mappingCount));
         if (row.isProduct)
             product.push_back(row);
         else
