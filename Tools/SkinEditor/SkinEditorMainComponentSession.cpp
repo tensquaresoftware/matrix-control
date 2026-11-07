@@ -1,56 +1,6 @@
 #include "Tools/SkinEditor/SkinEditorMainComponent.h"
 
-#include <algorithm>
-#include <vector>
-
-namespace
-{
-    /** Case-insensitive natural order so "Name 10" sorts after "Name 9". */
-    int compareEditorSkinNamesNatural(const juce::String& left, const juce::String& right)
-    {
-        int i = 0;
-        int j = 0;
-        const int leftLength = left.length();
-        const int rightLength = right.length();
-
-        while (i < leftLength && j < rightLength)
-        {
-            const juce::juce_wchar leftChar = left[i];
-            const juce::juce_wchar rightChar = right[j];
-            const bool leftDigit = juce::CharacterFunctions::isDigit(leftChar);
-            const bool rightDigit = juce::CharacterFunctions::isDigit(rightChar);
-
-            if (leftDigit && rightDigit)
-            {
-                int leftEnd = i;
-                int rightEnd = j;
-                while (leftEnd < leftLength && juce::CharacterFunctions::isDigit(left[leftEnd]))
-                    ++leftEnd;
-                while (rightEnd < rightLength && juce::CharacterFunctions::isDigit(right[rightEnd]))
-                    ++rightEnd;
-
-                const auto leftValue = left.substring(i, leftEnd).getLargeIntValue();
-                const auto rightValue = right.substring(j, rightEnd).getLargeIntValue();
-                if (leftValue != rightValue)
-                    return leftValue < rightValue ? -1 : 1;
-
-                i = leftEnd;
-                j = rightEnd;
-                continue;
-            }
-
-            const auto leftUpper = juce::CharacterFunctions::toUpperCase(leftChar);
-            const auto rightUpper = juce::CharacterFunctions::toUpperCase(rightChar);
-            if (leftUpper != rightUpper)
-                return leftUpper < rightUpper ? -1 : 1;
-
-            ++i;
-            ++j;
-        }
-
-        return (leftLength - i) - (rightLength - j);
-    }
-}
+#include "Tools/SkinEditor/SkinEditorUiHelpers.h"
 
 void SkinEditorMainComponent::mouseUp(const juce::MouseEvent& e)
 {
@@ -313,18 +263,7 @@ void SkinEditorMainComponent::refreshCombos()
 
     editorCombo.clear(juce::dontSendNotification);
 
-    std::vector<const TSS::DevSkin::NamedSkin*> editorSkins;
-    for (const auto& skin : layer_.skins())
-    {
-        if (skin.kind == TSS::DevSkin::SkinKind::kDev)
-            editorSkins.push_back(&skin);
-    }
-    std::sort(editorSkins.begin(), editorSkins.end(),
-              [](const TSS::DevSkin::NamedSkin* a, const TSS::DevSkin::NamedSkin* b)
-              {
-                  return compareEditorSkinNamesNatural(a->name, b->name) < 0;
-              });
-
+    const auto editorSkins = SkinEditorUi::sortedEditorSkins(layer_);
     int selected = 0;
     int index = 1;
     for (const auto* skin : editorSkins)
@@ -334,23 +273,18 @@ void SkinEditorMainComponent::refreshCombos()
             selected = index;
         ++index;
     }
+
     if (selected > 0)
     {
         editorCombo.setSelectedId(selected, juce::dontSendNotification);
     }
-    else if (editorCombo.getNumItems() > 0)
+    else if (! editorSkins.empty())
     {
         editorCombo.setSelectedItemIndex(0, juce::dontSendNotification);
-        for (const auto* skin : editorSkins)
-        {
-            if (skin->name.equalsIgnoreCase(editorCombo.getText()))
-            {
-                if (sessionState_.editorSkinId != skin->id)
-                    clearMappingModeToIdle();
-                sessionState_.editorSkinId = skin->id;
-                break;
-            }
-        }
+        const auto* first = editorSkins.front();
+        if (sessionState_.editorSkinId != first->id)
+            clearMappingModeToIdle();
+        sessionState_.editorSkinId = first->id;
     }
     else
     {

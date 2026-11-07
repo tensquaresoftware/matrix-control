@@ -1,5 +1,8 @@
 #pragma once
 
+#include <algorithm>
+#include <vector>
+
 #include <juce_gui_basics/juce_gui_basics.h>
 
 #include "GUI/Skins/Dev/DevSkinLayer.h"
@@ -256,5 +259,75 @@ namespace SkinEditorUi
         return resolveSkinJsonDirectory(preferredParentPath)
             .getChildFile("Matrix-Control Skin Editor - "
                           + sanitizeSkinNameForExportFileStem(skinName) + ".json");
+    }
+
+    /** Advance i/j over matching digit runs; returns <0 / 0 / >0 like strcmp. */
+    inline int compareNaturalDigitRuns(const juce::String& left,
+                                       int& leftIndex,
+                                       const juce::String& right,
+                                       int& rightIndex) noexcept
+    {
+        int leftEnd = leftIndex;
+        int rightEnd = rightIndex;
+        while (leftEnd < left.length() && juce::CharacterFunctions::isDigit(left[leftEnd]))
+            ++leftEnd;
+        while (rightEnd < right.length() && juce::CharacterFunctions::isDigit(right[rightEnd]))
+            ++rightEnd;
+
+        const auto leftValue = left.substring(leftIndex, leftEnd).getLargeIntValue();
+        const auto rightValue = right.substring(rightIndex, rightEnd).getLargeIntValue();
+        leftIndex = leftEnd;
+        rightIndex = rightEnd;
+        if (leftValue < rightValue)
+            return -1;
+        if (leftValue > rightValue)
+            return 1;
+        return 0;
+    }
+
+    /** Case-insensitive natural order so "Name 10" sorts after "Name 9". */
+    inline int compareEditorSkinNamesNatural(const juce::String& left,
+                                             const juce::String& right) noexcept
+    {
+        int i = 0;
+        int j = 0;
+        while (i < left.length() && j < right.length())
+        {
+            const bool leftDigit = juce::CharacterFunctions::isDigit(left[i]);
+            const bool rightDigit = juce::CharacterFunctions::isDigit(right[j]);
+            if (leftDigit && rightDigit)
+            {
+                const int cmp = compareNaturalDigitRuns(left, i, right, j);
+                if (cmp != 0)
+                    return cmp;
+                continue;
+            }
+
+            const auto leftUpper = juce::CharacterFunctions::toUpperCase(left[i]);
+            const auto rightUpper = juce::CharacterFunctions::toUpperCase(right[j]);
+            if (leftUpper != rightUpper)
+                return leftUpper < rightUpper ? -1 : 1;
+            ++i;
+            ++j;
+        }
+        return (left.length() - i) - (right.length() - j);
+    }
+
+    /** Dev skins sorted for the Editor combo (natural name order). */
+    inline std::vector<const TSS::DevSkin::NamedSkin*> sortedEditorSkins(
+        const TSS::DevSkin::Layer& layer)
+    {
+        std::vector<const TSS::DevSkin::NamedSkin*> editorSkins;
+        for (const auto& skin : layer.skins())
+        {
+            if (skin.kind == TSS::DevSkin::SkinKind::kDev)
+                editorSkins.push_back(&skin);
+        }
+        std::sort(editorSkins.begin(), editorSkins.end(),
+                  [](const TSS::DevSkin::NamedSkin* a, const TSS::DevSkin::NamedSkin* b)
+                  {
+                      return compareEditorSkinNamesNatural(a->name, b->name) < 0;
+                  });
+        return editorSkins;
     }
 }

@@ -145,3 +145,23 @@ void SkinEditorMainComponent::layoutSessionWell(juce::Rectangle<int> titleBar, i
                             sessionWellBounds_.getWidth(),
                             SkinEditorChrome::kButtonHeight });
 }
+
+void SkinEditorMainComponent::layoutBodyPanels(juce::Rectangle<int> bounds)
+{
+    auto left = bounds.removeFromLeft(SkinEditorChrome::kColorPanelWidth);
+    const int skinsH = SkinEditorSkinsPanel::preferredHeight();
+    const int colorH = SkinEditorColourPicker::preferredHeightForWidth(
+        SkinEditorChrome::kColorPanelWidth);
+    // SKINS↔COLOR: each panel's facing kGutter → kChromeStackGap. COLOR fixed height.
+    skinsPanel_.setBounds(left.getX(), left.getY(), left.getWidth(), skinsH);
+    colourPicker_.setBounds(left.getX(), left.getY() + skinsH, left.getWidth(), colorH);
+
+    const int paletteGap = SkinEditorChrome::kPaletteSideGap;
+    bounds.removeFromLeft(paletteGap);
+    // Remainder = Palette + gap + Mappings; both Palette and Mapped colour share growth.
+    const int paletteW = SkinEditorChrome::palettePanelWidthFromBodyRemainder(bounds.getWidth());
+    const int mappingsW = SkinEditorChrome::mappingsPanelWidthForPalettePanel(paletteW);
+    palettePanel_.setBounds(bounds.removeFromLeft(paletteW));
+    bounds.removeFromLeft(paletteGap);
+    mappingsPanel_.setBounds(bounds.removeFromLeft(mappingsW));
+}
