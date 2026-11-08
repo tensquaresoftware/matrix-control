@@ -43,17 +43,14 @@ private:
 
     void windowFitsFlexiblePaletteMapped()
     {
-        beginTest("Window min width fits min Palette; max allows stretch; Mapped tracks Palette");
+        beginTest("Window min width fits min Palette; Mapped tracks Palette on stretch");
 
         const int titleSession = SkinEditorChrome::windowTitleSessionMinWidth();
         const int minW = SkinEditorChrome::windowMinWidth();
-        const int maxW = SkinEditorChrome::windowMaxWidth();
         const int bodyMin = SkinEditorChrome::windowBodyWidthForPalettePanel(
             SkinEditorChrome::palettePanelMinWidth());
 
         expectEquals(minW, juce::jmax(bodyMin, titleSession));
-        expectEquals(maxW, SkinEditorChrome::kLegacyWindowMaxWidth);
-        expect(minW < maxW);
         expectEquals(SkinEditorChrome::kWindowBodyMinWidth,
                      SkinEditorChrome::windowBodyWidthForPalettePanel(
                          SkinEditorChrome::kPalettePanelMinWidth));
@@ -113,7 +110,7 @@ private:
         expectEquals(cols.mappedX, SkinEditorChrome::kMappingsFixedColumnsWidth);
         expectEquals(cols.mappedW, tableW - SkinEditorChrome::kMappingsFixedColumnsWidth);
         expect(SkinEditorChrome::kMappingsPanelMinWidth
-               < SkinEditorChrome::kLegacyWindowMaxWidth);
+               < SkinEditorChrome::kWindowBodyMinWidth);
     }
 
     void mappingsChromeBadgeTokens()

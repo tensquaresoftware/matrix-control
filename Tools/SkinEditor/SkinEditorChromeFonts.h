@@ -311,6 +311,4 @@ namespace SkinEditorChrome
     }
 
     inline int windowMinWidth() noexcept { return windowContentWidth(); }
-
-    inline int windowMaxWidth() noexcept { return kLegacyWindowMaxWidth; }
 }

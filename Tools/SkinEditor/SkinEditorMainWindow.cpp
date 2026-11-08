@@ -125,9 +125,7 @@ void SkinEditorMainWindow::zoomToMaxHeightAndCentre()
                                     area.getHeight() - juce::jmax(0, frame.getTopAndBottom()));
 
     ignorePersist_ = true;
-    setSize(juce::jlimit(SkinEditorChrome::windowMinWidth(),
-                         SkinEditorChrome::windowMaxWidth(),
-                         getWidth()),
+    setSize(juce::jlimit(SkinEditorChrome::windowMinWidth(), maxContentWidth_, getWidth()),
             contentH);
     ignorePersist_ = false;
 
@@ -186,10 +184,13 @@ bool SkinEditorMainWindow::restoreWindowState()
 void SkinEditorMainWindow::updateSizeLimits()
 {
     const int clientMinH = skinEditorMinContentHeight();
+    const int contentMinW = SkinEditorChrome::windowMinWidth();
     int clientMaxH = 4096;
+    int contentMaxW = 8192;
 
     const auto frame = getNativeFrameSize();
     const int frameTB = juce::jmax(0, frame.getTopAndBottom());
+    const int frameLR = juce::jmax(0, frame.getLeftAndRight());
 
     const auto& displays = juce::Desktop::getInstance().getDisplays();
     if (! displays.displays.isEmpty())
@@ -198,21 +199,21 @@ void SkinEditorMainWindow::updateSizeLimits()
         if (display != nullptr)
         {
             const auto area = display->userBounds.toNearestInt();
-            // Max content height that still fits the display's user area.
-            clientMaxH = juce::jmax(clientMinH,
-                                    area.getHeight() - frameTB);
+            // Max content size that still fits the display's user area.
+            clientMaxH = juce::jmax(clientMinH, area.getHeight() - frameTB);
+            contentMaxW = juce::jmax(contentMinW, area.getWidth() - frameLR);
         }
     }
 
-    const int contentMinW = SkinEditorChrome::windowMinWidth();
-    const int contentMaxW = SkinEditorChrome::windowMaxWidth();
     // macOS live-resize constrainRect feeds the constrainer the NSWindow frame
     // (native title bar included), not the content view — add frameTB so the
-    // content view still reaches clientMinH (≈658 outer when title bar ≈31).
+    // content view still reaches clientMinH. Width uses the same display user
+    // area (no fixed 1210px ceiling); frameLR is usually 0 with a native title bar.
     constrainer_.setMinimumWidth(contentMinW);
-    constrainer_.setMaximumWidth(contentMaxW);
+    constrainer_.setMaximumWidth(contentMaxW + frameLR);
     constrainer_.setMinimumHeight(clientMinH + frameTB);
     constrainer_.setMaximumHeight(clientMaxH + frameTB);
+    maxContentWidth_ = contentMaxW;
     maxContentHeight_ = clientMaxH;
 }
 
@@ -220,9 +221,7 @@ void SkinEditorMainWindow::normalizeClientSize()
 {
     updateSizeLimits();
 
-    const int w = juce::jlimit(SkinEditorChrome::windowMinWidth(),
-                               SkinEditorChrome::windowMaxWidth(),
-                               getWidth());
+    const int w = juce::jlimit(SkinEditorChrome::windowMinWidth(), maxContentWidth_, getWidth());
     const int h = juce::jlimit(skinEditorMinContentHeight(), maxContentHeight_, getHeight());
 
     if (getWidth() == w && getHeight() == h)

@@ -188,7 +188,6 @@ namespace SkinEditorChrome
     /** Min Mappings panel width (Palette at minimum). */
     inline constexpr int kMappingsPanelMinWidth =
         mappingsPanelWidthForPalettePanel(kPalettePanelMinWidth); // 602
-    inline constexpr int kLegacyWindowMaxWidth = 1210;
     /** Body width for a given Palette panel width (edges + Color + gaps + Mappings). */
     inline constexpr int windowBodyWidthForPalettePanel(int palettePanelW) noexcept
     {

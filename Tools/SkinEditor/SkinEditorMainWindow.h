@@ -5,8 +5,8 @@
 #include "Standalone/StandaloneTitleBarDoubleClick.h"
 
 /**
- * Height is user-resizable within the nearest display; width stretches Palette and
- * Mappings Mapped colour together (min Palette 160px) — see windowMinWidth/MaxWidth().
+ * Height and width are user-resizable within the nearest display; width stretches
+ * Palette and Mappings Mapped colour together (min Palette 160px) — see windowMinWidth().
  * Position/size persist in Application Support (skin-editor-window.state).
  */
 class SkinEditorMainWindow final : public juce::DocumentWindow,
@@ -37,6 +37,7 @@ private:
 
     juce::ComponentBoundsConstrainer constrainer_;
     MatrixStandalone::TitleBarDoubleClickHook titleBarDoubleClickHook_;
+    int maxContentWidth_ = 8192;
     int maxContentHeight_ = 4096;
     int titleBarEnsureRetries_ = 0;
     bool ignorePersist_ = false;
