@@ -233,6 +233,7 @@ void SkinEditorMainComponent::onImportJson()
                                  return;
                              }
                              rememberSkinJsonDirectory(file);
+                             armWatchedImportJson(file);
                              if (result.importedSkinIds.size() > 0)
                                  sessionState_.editorSkinId = result.importedSkinIds[0];
                              sessionState_.compareOn = false;
@@ -423,6 +424,9 @@ bool SkinEditorMainComponent::exportCurrentEditorSkinToFile(const juce::File& fi
         return false;
     }
     rememberSkinJsonDirectory(file);
+    // Export to the watched path is our write - re-baseline without prompting.
+    if (watchedImportJsonFile_ != juce::File() && file == watchedImportJsonFile_)
+        refreshWatchedImportFingerprint();
     return true;
 }
 

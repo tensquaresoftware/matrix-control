@@ -102,6 +102,14 @@ private:
     juce::File suggestedSkinJsonDirectory() const;
     /** Remember parent of a successful Export/Import and autosave session. */
     void rememberSkinJsonDirectory(const juce::File& file);
+    /** Start watching an Import/Export JSON path for external edits. */
+    void armWatchedImportJson(const juce::File& file);
+    void clearWatchedImportJson();
+    void refreshWatchedImportFingerprint();
+    void pollWatchedImportJson();
+    void promptWatchedImportJsonExternalChange();
+    void reloadWatchedImportJsonFromDisk();
+    void discardWatchedImportJsonExternalChange();
 
     // Mapping modes (SkinEditorMainComponentMapping.cpp)
     void onPastilleSelected(const juce::String& name);
@@ -173,6 +181,14 @@ private:
     /** Dedicated coalesce for colour drag — not the 400 ms session-autosave timer. */
     BlinkTimer colourPreviewCoalesceTimer_;
     bool colourGestureActive_ = false;
+    /** Polls the last Import JSON path for external disk changes (~1 s). */
+    BlinkTimer importWatchTimer_;
+    juce::File watchedImportJsonFile_;
+    juce::String watchedImportJsonFingerprint_;
+    /** Candidate fingerprint seen while waiting for a stable external write. */
+    juce::String importWatchPendingFingerprint_;
+    int importWatchPendingStablePolls_ = 0;
+    bool importWatchDialogOpen_ = false;
 
     TSS::DevSkin::Layer layer_;
     TSS::DevSkin::BridgeClient bridge_;

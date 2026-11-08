@@ -393,6 +393,7 @@ void SkinEditorMainComponent::adoptActiveEditorSkinAfterCreate()
 bool SkinEditorMainComponent::discardEditorWorkKeepingSessionPrefs()
 {
     stopTimer();
+    clearWatchedImportJson();
 
     const auto productSkinId = sessionState_.productSkinId;
     const auto lastSkinJsonDirectory = sessionState_.lastSkinJsonDirectory;

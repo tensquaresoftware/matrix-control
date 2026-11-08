@@ -38,6 +38,7 @@ SkinEditorMainComponent::~SkinEditorMainComponent()
 {
     compareBlinkTimer_.stopTimer();
     colourPreviewCoalesceTimer_.stopTimer();
+    importWatchTimer_.stopTimer();
     setLookAndFeel(nullptr);
     flushPendingSessionAutosave();
     bridge_.stop();

@@ -1217,6 +1217,7 @@ if(MATRIX_BUILD_SKIN_EDITOR)
         Tools/SkinEditor/SkinEditorLookAndFeel.cpp
         Tools/SkinEditor/SkinEditorMainComponent.cpp
         Tools/SkinEditor/SkinEditorMainComponentActions.cpp
+        Tools/SkinEditor/SkinEditorMainComponentImportWatch.cpp
         Tools/SkinEditor/SkinEditorMainComponentMapping.cpp
         Tools/SkinEditor/SkinEditorMainComponentSession.cpp
         Tools/SkinEditor/SkinEditorMainComponentSkins.cpp

@@ -3148,3 +3148,7 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-link.md`
   summary: Passage 3 — Skin Editor POST_BUILD codesign/xattr path not run in CI (`USER_COPY_TO_ARTEFACTS_DIR=OFF`); barred-icon fix can vanish locally without automated failure.
   evidence: Verification Gap; closing needs local or optional CI smoke with artefacts copy enabled, not a Matrix-Control_Tests unit.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-external-json-reload.md`
+  summary: Unit tests and permanent missing-file UX for Skin Editor external JSON watch.
+  evidence: Blind Hunter oneshot review; deferred to keep the first ship small.
