@@ -3179,3 +3179,45 @@ Original review bullets below remain for history; status for U-10-owned residual
 - No automated coverage for Import-watch poll/debounce/prompt or launch reconcile orchestration (GUI/timer); session-field tests are the nearer patch.
 - Frozen Intent in external-json-reload still says "native modal" while product uses themed AlertWindow — update Intent when renegotiating frozen text.
 - Launch Out-of-Sync prompt has no 2-poll debounce — intentional cold-start UX already deferred in launch-json-sync triage.
+
+## Deferred from: review of spec-zones-skins-black-duo-cream.md (2026-11-08)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-zones-skins-black-duo-cream.md`
+  summary: CREAM Modales slider and ProgressBar use the same cafe colour for value bar and text, so the value can vanish over the fill.
+  evidence: Faithful port of trial `dev:cream-2`; artistic contrast polish was out of scope for this Build.
+- source_spec: `_bmad-output/implementation-artifacts/spec-zones-skins-black-duo-cream.md`
+  summary: CREAM disabled slider text and disabled value bar share `kCafe600`.
+  evidence: Same trial fidelity deferral as enabled Modales contrast.
+- source_spec: `_bmad-output/implementation-artifacts/spec-zones-skins-black-duo-cream.md`
+  summary: CREAM ReadOnlyValueField error text matches normal text (`kCafe950`), so device errors look normal.
+  evidence: Trial creamVariant for `kTextError`; red error kept on BLACK/DUO only.
+- source_spec: `_bmad-output/implementation-artifacts/spec-zones-skins-black-duo-cream.md`
+  summary: BLACK/DUO Master slider disabled track is blue (`kBlue950`) instead of grey.
+  evidence: Likely trial slip kept for fidelity; already noted in Implementation Notes.
+- source_spec: `_bmad-output/implementation-artifacts/spec-zones-skins-black-duo-cream.md`
+  summary: Header / Settings / Computer Patches / logo call sites are not built in the unit-test target.
+  evidence: Verification Gap; helpers and matrix pins cover zone→CS; smoke remains the gate for those panels.
+- source_spec: `_bmad-output/implementation-artifacts/spec-zones-skins-black-duo-cream.md`
+  summary: Skin Editor JSON import drops excess colour-set rows without warning and does not role-remap old trial indices.
+  evidence: SE pause assumed; compiled product seeds already remapped. Settle ButtonLike vs explicit cs3 order with an import-order fixture if SE resumes.
+- source_spec: `_bmad-output/implementation-artifacts/spec-zones-skins-black-duo-cream.md`
+  summary: No Pause trial JSON fixture in Tests to pin faithful port against `dev:blackduobalanced2` / `dev:cream-2`.
+  evidence: Current pins use ColourChart values from the same port; a extracted fixture would catch mis-ports more tightly.
+
+## Deferred from: code review of spec-zones-skins-black-duo-cream.md (2026-11-08)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-zones-skins-black-duo-cream.md`
+  summary: Reconfirmed — CREAM Modales slider/ProgressBar value bar and text share cafe (low contrast).
+  evidence: External code review Blind Hunter; faithful trial port; artistic polish still out of intent.
+- source_spec: `_bmad-output/implementation-artifacts/spec-zones-skins-black-duo-cream.md`
+  summary: Reconfirmed — CREAM ReadOnlyValueField error text matches normal text.
+  evidence: External code review Blind Hunter; trial creamVariant for kTextError.
+- source_spec: `_bmad-output/implementation-artifacts/spec-zones-skins-black-duo-cream.md`
+  summary: Reconfirmed — Skin Editor JSON import drops excess colour-set rows without warning / role-remap.
+  evidence: External code review Blind + Edge; SE pause; compiled product seeds already remapped.
+- source_spec: `_bmad-output/implementation-artifacts/spec-zones-skins-black-duo-cream.md`
+  summary: Reconfirmed — Header / Settings / Computer Patches / logo call sites not built in unit-test target.
+  evidence: External code review Verification Gap; helpers + smoke remain the gate.
+- source_spec: `_bmad-output/implementation-artifacts/spec-zones-skins-black-duo-cream.md`
+  summary: Reconfirmed — no Pause trial JSON fixture to pin port against `dev:blackduobalanced2` / `dev:cream-2`.
+  evidence: External code review Acceptance Auditor; ColourChart pins from the same port stay circular.
