@@ -5,14 +5,13 @@
 
 namespace TSS
 {
-    PopupMenuBase::PopupMenuBase(ComboBox& comboBox, bool isButtonLike)
+    PopupMenuBase::PopupMenuBase(ComboBox& comboBox)
         : host_(comboBox)
         , comboBox_(comboBox)
-        , isButtonLike_(isButtonLike)
         , uiScale_(host_.getUiScale())
         , cachedFont_(host_.getPopupMenuLook().font
                         .withHeight(host_.getPopupMenuLook().font.getHeight() * uiScale_))
-        , renderer_(isButtonLike, uiScale_)
+        , renderer_(uiScale_)
     {
         renderer_.setLook(host_.getPopupMenuLook());
         setWantsKeyboardFocus(true);

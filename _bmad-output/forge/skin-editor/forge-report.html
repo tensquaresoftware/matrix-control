@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Forge Report — Skin Editor</title>
+<style>
+  :root {
+    --bg: #1a1410;
+    --card: #2a211c;
+    --ink: #f3e6d8;
+    --muted: #b5a090;
+    --accent: #c45c26;
+    --seal: #8b1e1e;
+    --ok: #2d6a4f;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 2rem 1.25rem 3rem;
+    font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    background: radial-gradient(ellipse at top, #2c221c 0%, var(--bg) 55%);
+    color: var(--ink); line-height: 1.45;
+  }
+  main { max-width: 42rem; margin: 0 auto; }
+  h1 { font-size: 1.65rem; font-weight: 700; margin: 0 0 0.25rem; letter-spacing: 0.02em; }
+  .sub { color: var(--muted); font-size: 0.95rem; margin-bottom: 1.75rem; }
+  .seal-wrap { display: flex; justify-content: center; margin: 1.5rem 0 2rem; }
+  .seal {
+    width: 160px; height: 160px; position: relative;
+    filter: drop-shadow(0 8px 16px rgba(0,0,0,0.45));
+  }
+  .outcome {
+    background: var(--card); border: 1px solid #3d322b; border-radius: 6px;
+    padding: 1rem 1.15rem; margin-bottom: 1.25rem;
+  }
+  .outcome strong { color: #e8c4a0; }
+  h2 {
+    font-size: 1.05rem; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--accent); margin: 1.75rem 0 0.6rem; border-bottom: 1px solid #3d322b;
+    padding-bottom: 0.35rem;
+  }
+  ul { margin: 0.35rem 0 0; padding-left: 1.2rem; }
+  li { margin: 0.35rem 0; }
+  .killed { color: #e0a0a0; }
+  .crack { color: #d4b896; }
+  .personas { display: grid; gap: 0.65rem; }
+  .persona {
+    display: grid; grid-template-columns: 2.2rem 1fr; gap: 0.55rem;
+    background: var(--card); border-radius: 6px; padding: 0.65rem 0.8rem;
+    border: 1px solid #3d322b;
+  }
+  .persona .icon { font-size: 1.35rem; line-height: 1.2; }
+  .persona .name { font-weight: 700; font-size: 0.95rem; }
+  .persona .voice { color: var(--muted); font-size: 0.85rem; font-style: italic; }
+  footer { margin-top: 2rem; color: var(--muted); font-size: 0.8rem; }
+  code { font-family: ui-monospace, Menlo, monospace; font-size: 0.85em; color: #e8c4a0; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Forge Report — Skin Editor</h1>
+  <p class="sub">Matrix-Control · post Skin SSOT · 2026-10-23 · session <code>skin-editor</code></p>
+
+  <div class="seal-wrap" aria-label="Outcome seal HARDENED">
+    <svg class="seal" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg" role="img">
+      <defs>
+        <radialGradient id="wax" cx="40%" cy="35%" r="65%">
+          <stop offset="0%" stop-color="#c43c3c"/>
+          <stop offset="55%" stop-color="#8b1e1e"/>
+          <stop offset="100%" stop-color="#5a1010"/>
+        </radialGradient>
+      </defs>
+      <circle cx="80" cy="80" r="72" fill="url(#wax)" stroke="#3a0808" stroke-width="3"/>
+      <circle cx="80" cy="80" r="58" fill="none" stroke="#f0d4a8" stroke-width="1.5" stroke-dasharray="3 4" opacity="0.85"/>
+      <text x="80" y="78" text-anchor="middle" fill="#f7e6c8" font-family="Georgia, serif" font-size="13" font-weight="700" letter-spacing="2">HARDENED</text>
+      <text x="80" y="96" text-anchor="middle" fill="#e8c4a0" font-family="Georgia, serif" font-size="9" letter-spacing="1">SKIN EDITOR</text>
+    </svg>
+  </div>
+
+  <div class="outcome">
+    <strong>Issue :</strong> idée durcie — télécommande JUCE (même repo, cible Dev) qui pousse un calque auteur vers Standalone Dev ; Skin SSOT C++ reste la vérité produit ; alpha non otage.
+  </div>
+
+  <h2>Décisions verrouillées</h2>
+  <ul>
+    <li>Job = inventer (skins Dev nommés) ; premier usage depuis Black/Cream.</li>
+    <li>Seuil = Duplicate + live + Unbound ; JSON = cible avec filet sans I/O.</li>
+    <li>App JUCE séparée, pousse-modèle only ; vérité = Standalone Dev ; pas d’aperçu produit dans l’éditeur.</li>
+    <li>C++ = SSOT produit ; calque Dev + JSON calque ; BC lecture seule → Duplicate.</li>
+    <li>Unbound = texte dans l’éditeur (noms structurés), pas d’overlay sur le paint.</li>
+    <li>Même repo / cible CMake Dev ; éditeur d’abord comme priorité, alpha OK sans lui.</li>
+  </ul>
+
+  <h2>Rejeté — et pourquoi</h2>
+  <ul class="killed">
+    <li>Panneau in-app dans le layout Release — pollution Dev sur GUI chaude.</li>
+    <li>Coquille web / Skin Studio — risque second studio + preview qui revient.</li>
+    <li>JSON = SSOT Release — rouvre la porte modèle.</li>
+    <li>Édition en place de Black/Cream compilés — confusion vérité produit.</li>
+    <li>Plugin-in-DAW + sync riche — complexité sans gain auteur solo V1.</li>
+    <li>Repo séparé V1 — dérive du contrat Skin SSOT sans lib partagée.</li>
+    <li>Alpha bloquée par l’éditeur — contredit filet Black/Cream viables.</li>
+  </ul>
+
+  <h2>Faiblesses qui restent</h2>
+  <ul class="crack">
+    <li>Pont IPC + cycle de vie deux process : toujours une dette receiver Dev côté Matrix-Control.</li>
+    <li>Périmètre (2ᵉ app + calque + Unbound + JSON cible) plus large qu’une migration de tables — « quelques jours » reste une hypothèse optimiste.</li>
+    <li>Peaufinage fier = Duplicate → itérer → réintégration C++ manuelle : friction assumée.</li>
+  </ul>
+
+  <h2>Personas</h2>
+  <div class="personas">
+    <div class="persona"><div class="icon">📋</div><div><div class="name">John</div><div class="voice">Job avant forme ; un couteau suisse décide mal.</div></div></div>
+    <div class="persona"><div class="icon">🏗️</div><div><div class="name">Winston</div><div class="voice">Pousse-modèle mince ; C++ SSOT ; monorepo boring.</div></div></div>
+    <div class="persona"><div class="icon">💻</div><div><div class="name">Amelia</div><div class="voice">Standalone Dev clair ; DAW = galère multi-instances.</div></div></div>
+    <div class="persona"><div class="icon">🚢</div><div><div class="name">Dana</div><div class="voice">Filets JSON et alpha ; ne pas gold-plater le premier live.</div></div></div>
+    <div class="persona"><div class="icon">😤</div><div><div class="name">Grumbal</div><div class="voice">Télécommande = contrat, pas magie « propre ».</div></div></div>
+    <div class="persona"><div class="icon">📏</div><div><div class="name">Level</div><div class="voice">SSOT en heures ≠ éditeur en jours ; preuves vs confiance.</div></div></div>
+    <div class="persona"><div class="icon">🎨</div><div><div class="name">Sally</div><div class="voice">Web sans preview tient — jusqu’à ce qu’on redemande l’aperçu.</div></div></div>
+    <div class="persona"><div class="icon">🎯</div><div><div class="name">Yui</div><div class="voice">Un seul contrat de clés ; pas deux stacks auteur.</div></div></div>
+    <div class="persona"><div class="icon">🌶️</div><div><div class="name">Boundary</div><div class="voice">Duplicate-first ; bords DAW / multi-instances hors V1.</div></div></div>
+    <div class="persona"><div class="icon">🛑</div><div><div class="name">Killjoy</div><div class="voice">Assez pour durcir ; placement repo puis stop.</div></div></div>
+    <div class="persona"><div class="icon">🪞</div><div><div class="name">Mira</div><div class="voice">(générée) Second studio naît dès qu’on re-peint le produit.</div></div></div>
+  </div>
+
+  <h2>Next</h2>
+  <ul>
+    <li><code>bmad-spec</code> — Skin Editor only · entrée <code>forged-idea.md</code></li>
+    <li>Avant Build : pont, schéma calque/JSON Dev, écrans, critère fin seuil-sans-JSON</li>
+  </ul>
+
+  <footer>Artifacts: <code>_bmad-output/forge/skin-editor/forged-idea.md</code> · <code>.memlog.md</code> · this report</footer>
+</main>
+</body>
+</html>

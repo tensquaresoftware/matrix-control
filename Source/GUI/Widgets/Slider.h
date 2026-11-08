@@ -6,6 +6,8 @@
 
 #include "GUI/Looks/WidgetLooks.h"
 
+class SkinColourWiringTests;
+
 namespace TSS
 {
     struct SliderConfig
@@ -57,6 +59,8 @@ namespace TSS
         void cancelActiveDragSession();
 
     private:
+        friend class ::SkinColourWiringTests;
+
         inline constexpr static int kValueBarPadding_ = 1;
         inline constexpr static float kFocusBorderThickness_ = 1.0f;
         inline constexpr static double kDragSensitivity_ = 0.5;

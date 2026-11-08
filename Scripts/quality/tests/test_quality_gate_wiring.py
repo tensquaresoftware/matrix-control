@@ -44,6 +44,25 @@ def test_lint_touched_supports_head_ref_for_push_range():
     assert "base}...{head}" in text or "base}...{head_ref}" in text
 
 
+def test_lint_touched_includes_skin_editor_in_quality_gate_scope():
+    """Matrix-Control Skin Editor must pass the same Clean Code gate as plugin C++."""
+    import importlib.util
+    import sys
+
+    spec = importlib.util.spec_from_file_location("lint_touched_under_test", LINT)
+    assert spec is not None and spec.loader is not None
+    mod = importlib.util.module_from_spec(spec)
+    # Python 3.14 dataclasses need the module registered before @dataclass runs.
+    sys.modules[spec.name] = mod
+    try:
+        spec.loader.exec_module(mod)
+        assert any(p.startswith("Tools/SkinEditor") for p in mod.SCOPE_PREFIXES)
+        assert mod.is_gui_path("Tools/SkinEditor/SkinEditorMainComponent.cpp")
+        assert mod.is_gate_target("Tools/SkinEditor/SkinEditorChrome.h")
+    finally:
+        sys.modules.pop(spec.name, None)
+
+
 def test_ci_quality_gate_uses_shared_runner():
     workflow_text = WORKFLOW.read_text(encoding="utf-8")
     workflow = yaml.safe_load(workflow_text)

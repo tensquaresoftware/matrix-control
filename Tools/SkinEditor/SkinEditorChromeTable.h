@@ -1,0 +1,193 @@
+#pragma once
+
+#include "Tools/SkinEditor/SkinEditorChromeFonts.h"
+#include "Tools/SkinEditor/SkinEditorChromeTokens.h"
+
+#include <juce_graphics/juce_graphics.h>
+#include <juce_gui_basics/juce_gui_basics.h>
+
+namespace SkinEditorChrome
+{
+    struct TableRowFill
+    {
+        juce::Rectangle<float> area;
+        juce::Colour fill;
+        bool roundTop = false;
+        bool roundBottom = false;
+        float cornerRadius = kControlCorner;
+    };
+
+    /** Fill a table row; only outer corners of the whole table are rounded. */
+    void fillTableRow(juce::Graphics& g, TableRowFill spec);
+
+    /** Shared folder-tab metrics for section header fill + object focus outline. */
+    struct TableSectionGeom
+    {
+        float left = 0;
+        float right = 0;
+        float top = 0;
+        float sectionBottom = 0;
+        float railTop = 0;
+        float tabW = 0;
+        float tabRight = 0;
+        float bevelEndX = 0;
+        float r = kControlCorner;
+    };
+
+    TableSectionGeom makeTableSectionGeom(juce::Rectangle<float> sectionRow,
+                                          const juce::String& title);
+
+    /** Cubic kappa for a circular quarter-arc (matches button / fillTableRow corners). */
+    inline constexpr float kCircleBez = 0.5522847498f;
+
+    void cubicCornerTopLeft(juce::Path& path, float L, float T, float r);
+    void cubicCornerTopRight(juce::Path& path, float R, float top, float r);
+    void cubicCornerBottomRight(juce::Path& path, float R, float B, float r);
+    void cubicCornerBottomLeft(juce::Path& path, float L, float B, float r);
+
+    /**
+     * Full object silhouette: folder-tab + body.
+     * `outset` > 0 builds a parallel outer rim (corner radius grows by outset).
+     */
+    juce::Path makeObjectTableSilhouettePath(juce::Rectangle<float> sectionRow,
+                                             float tableBottom,
+                                             const juce::String& title,
+                                             float outset = 0.0f);
+
+    /** Header-only fill (tab + rail), same outer rim as makeObjectTableSilhouettePath. */
+    void paintTableSectionHeader(juce::Graphics& g,
+                                 juce::Rectangle<float> rowArea,
+                                 const juce::String& title);
+
+    /**
+     * Focus outline: 1 px stroked path centred on a half-pixel outset of the silhouette.
+     * Covers exactly one logical pixel outside the fill (Photocraft stroke-outside), with
+     * uniform H/V weight — avoids the double-edge fringe of an outer−inner annulus.
+     */
+    void strokeObjectTableFocusOutside(juce::Graphics& g,
+                                       juce::Rectangle<float> sectionRow,
+                                       float tableBottom,
+                                       const juce::String& title);
+
+    /** Classic transparency checkerboard (light / mid grey cells). */
+    void paintCheckerboard(juce::Graphics& g, juce::Rectangle<int> area, int cell = 3);
+
+    /** Checkerboard then colour on top — shows alpha / fully transparent as checkerboard. */
+    void paintColourSwatch(juce::Graphics& g, juce::Rectangle<int> area, juce::Colour colour);
+
+    /** Empty circle for pending (uninitialized) pastilles — 1 px stroke in logo grey. */
+    void paintPendingColourSwatch(juce::Graphics& g, juce::Rectangle<int> area);
+
+    /** Count badge paint args (fill defaults to attention; textNudgeY shifts the digit). */
+    struct CountBadgeSpec
+    {
+        juce::Rectangle<int> area;
+        int count = 0;
+        juce::Colour fill {};
+        int textNudgeY = 0;
+        bool useDefaultFill = true;
+    };
+
+    /** Count badge: fill + panel-surface glyph, panel corner radius. */
+    void drawCountBadge(juce::Graphics& g, CountBadgeSpec spec);
+    void drawCountBadge(juce::Graphics& g,
+                        juce::Rectangle<int> area,
+                        int count);
+    void drawCountBadge(juce::Graphics& g,
+                        juce::Rectangle<int> area,
+                        int count,
+                        juce::Colour fill);
+
+    int countBadgeWidth(int count);
+
+    /**
+     * Square clear badge (kClearBadgeSize NxN, amber fill, geometric X strokes,
+     * kChromeBadgeCorner) — Mappings column-filter chrome.
+     */
+    void drawClearBadge(juce::Graphics& g, juce::Rectangle<int> area);
+
+    int clearBadgeWidth();
+
+    /** Column-sort direction for sticky-legend pictos. */
+    enum class SortPictoKind
+    {
+        kInactive,   // grey square + dual chevron
+        kAscending,  // yellow square + down chevron (A->Z)
+        kDescending  // yellow square + up chevron (Z->A)
+    };
+
+    /** Square sort badge (kSortBadgeSize) — Mappings sticky-legend chrome. */
+    void drawSortBadge(juce::Graphics& g, juce::Rectangle<int> area, SortPictoKind kind);
+
+    int sortBadgeWidth();
+
+    /** Link chain chip: grey (inactive / hover) or yellow (linked / unlink header). */
+    enum class LinkChainKind
+    {
+        kGrey,
+        kYellow
+    };
+
+    void drawLinkChainBadge(juce::Graphics& g, juce::Rectangle<int> area, LinkChainKind kind);
+
+    int linkChainBadgeWidth();
+
+    /**
+     * Link sticky-legend count chip: fixed kLinkCountBadgeWidth, glyph centred.
+     * count <= 0 → geometric idle bar; count > 0 → decimal digits.
+     */
+    void drawLinkCountBadge(juce::Graphics& g,
+                            juce::Rectangle<int> area,
+                            int count,
+                            juce::Colour fill);
+
+    int linkCountBadgeWidth();
+
+    /**
+     * Chrome text badge - Inter rectangle (MAPPING / BRIDGE / LAST PUSH / APP).
+     * Do not reuse plugin FooterPanel badge APIs or count-capsule badges.
+     */
+    void drawChromeBadge(juce::Graphics& g, juce::Rectangle<int> area, const juce::String& text);
+    void drawChromeBadge(juce::Graphics& g,
+                         juce::Rectangle<int> area,
+                         const juce::String& text,
+                         juce::Colour fill);
+
+    int chromeBadgeWidth(const juce::String& text);
+
+    inline void drawMappingModeBadge(juce::Graphics& g, juce::Rectangle<int> area)
+    {
+        drawChromeBadge(g, area, "MAPPING");
+    }
+
+    inline int mappingModeBadgeWidth() { return chromeBadgeWidth("MAPPING"); }
+
+    /** Thick filled arrow (ASCII-safe picto) between OPERATION identity and next-step text. */
+    inline void drawOperationNextArrow(juce::Graphics& g, juce::Rectangle<int> area, juce::Colour colour)
+    {
+        if (area.getWidth() < 10 || area.getHeight() < 8)
+            return;
+
+        // One closed path so shaft and head meet without a notch; shaft width ~= head width.
+        const float midY = (float) area.getCentreY();
+        const float left = (float) area.getX() + 1.0f;
+        const float tipX = (float) area.getRight() - 1.0f;
+        const float span = tipX - left;
+        const float headW = span * 0.5f;
+        const float headHalfH = 4.5f;
+        const float shaftHalfH = 1.5f;
+        const float headBaseX = tipX - headW;
+
+        juce::Path arrow;
+        arrow.startNewSubPath(left, midY - shaftHalfH);
+        arrow.lineTo(headBaseX, midY - shaftHalfH);
+        arrow.lineTo(headBaseX, midY - headHalfH);
+        arrow.lineTo(tipX, midY);
+        arrow.lineTo(headBaseX, midY + headHalfH);
+        arrow.lineTo(headBaseX, midY + shaftHalfH);
+        arrow.lineTo(left, midY + shaftHalfH);
+        arrow.closeSubPath();
+        g.setColour(colour);
+        g.fillPath(arrow);
+    }
+}

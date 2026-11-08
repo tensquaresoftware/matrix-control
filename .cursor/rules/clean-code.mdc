@@ -41,6 +41,6 @@ Before finishing a coding task:
 
 1. Project compiles (target preset(s)).
 2. Relevant tests pass (when they exist).
-3. `python3 Scripts/quality/lint_touched.py` passes on touched C++ under `Source/` (and `Tests/` if touched).
+3. `python3 Scripts/quality/lint_touched.py` passes on touched C++ under `Source/`, `Tests/` (if touched), and **`Tools/SkinEditor/`** (Matrix-Control Skin Editor — same gate as plugin GUI).
 
 If the analyser fails → fix the finding. **No** mandatory DESIGN → AUTO-REVIEW redesign loop. **No** whole-file Boy Scout outside ticket scope.

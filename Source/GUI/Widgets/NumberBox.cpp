@@ -188,7 +188,7 @@ namespace TSS
         if (caretHeight <= 0.0f)
             return;
 
-        g.setColour(look_.editorText);
+        g.setColour(look_.editorCaret);
         g.fillRect(editCaretX(thickness), 2.0f * thickness, thickness, caretHeight);
     }
 

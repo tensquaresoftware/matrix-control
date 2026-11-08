@@ -38,7 +38,7 @@ public:
             dimensions_.width,
             TestScaleColumns::kScaleLabelHeight,
             config.labelLook,
-            config.scaleLabelText);
+            TSS::LabelConfig{ .text = config.scaleLabelText });
         addAndMakeVisible(*scaleLabel_);
 
         display_ = std::make_unique<TSS::PatchNameDisplay>(dimensions_.width, dimensions_.height, displayLook_);

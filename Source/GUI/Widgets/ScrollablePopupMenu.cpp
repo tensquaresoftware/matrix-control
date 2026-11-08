@@ -66,7 +66,7 @@ namespace TSS
     };
 
     ScrollablePopupMenu::ScrollablePopupMenu(ComboBox& comboBox)
-        : PopupMenuBase(comboBox, true)
+        : PopupMenuBase(comboBox)
     {
         const auto numItems = comboBox_.getNumItems();
         columnWidth_ = static_cast<float>(juce::jmax(1, comboBox_.getWidth()));
@@ -105,8 +105,7 @@ namespace TSS
         // Full fill under an integer stroke avoids fractional gaps (dark "liseret") between
         // background and border at 150%/175%.
         renderer_.drawBackground(g, bounds);
-        g.setColour(isButtonLike_ ? comboBox_.getPopupMenuLook().borderButtonLike
-                                  : comboBox_.getPopupMenuLook().border);
+        g.setColour(comboBox_.getPopupMenuLook().border);
         g.drawRect(bounds, stroke);
     }
 
@@ -138,7 +137,7 @@ namespace TSS
             return;
         }
 
-        g.setColour(comboBox_.getPopupMenuLook().borderButtonLike);
+        g.setColour(comboBox_.getPopupMenuLook().border);
         g.fillRect(contentBounds.getX(),
                    ruleBottom - ruleThickness,
                    contentBounds.getWidth(),
@@ -237,14 +236,9 @@ namespace TSS
         if (scrollbarNeeded_)
         {
             const auto& popupLook = comboBox_.getPopupMenuLook();
-            const juce::Colour scrollbarColour = isButtonLike_
-                ? popupLook.scrollbarButtonLike
-                : popupLook.scrollbar;
-            const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
-            const float thumbInset = static_cast<float>(ScaledDrawing::logicalInsetPixelsFromDesign(
-                kThumbInsetBase_,
-                uiScale_,
-                systemDisplayScale));
+            const juce::Colour scrollbarColour = popupLook.scrollbar;
+            const float thumbInset = PopupMenuCustomScrollBar::thumbInsetLogicalPixels(
+                kThumbInsetBase_, uiScale_);
 
             scrollModel_ = std::make_unique<ViewportPopupMenuScrollModel>(*viewport_);
             customScrollBar_ = std::make_unique<PopupMenuCustomScrollBar>(

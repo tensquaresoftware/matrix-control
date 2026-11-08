@@ -4,6 +4,10 @@
 #include "PluginEditor.h"
 #include "PluginEditorInternal.h"
 
+#if defined(MATRIX_SKIN_EDITOR_DEV_LAYER)
+#include "GUI/Skins/Dev/DevSkinApplier.h"
+#endif
+
 #include "GUI/About/AboutWindow.h"
 #include "GUI/Dialogs/BankTransferProgressDialog.h"
 #include "GUI/Dialogs/EpromTypePromptDialog.h"
@@ -134,11 +138,22 @@ void PluginEditor::updateOverlayLayoutsForUiScale(float uiScale)
                     [this](float scale) { updateBankTransferProgressDialogLayout(scale); });
 }
 
+TSS::Skin* PluginEditor::skinForVariantId(int skinItemId) const noexcept
+{
+    using namespace PluginIDs::Settings::SkinVariants;
+    if (skinItemId == kBlackDuo)
+        return skinBlackDuo_.get();
+    if (skinItemId == kCream)
+        return skinCream_.get();
+    return skinBlack_.get();
+}
+
 void PluginEditor::applySkinFromItemId(int skinItemId, bool persistToState)
 {
-    skin_ = (skinItemId == PluginIDs::Settings::SkinVariants::kBlack)
-        ? skinBlack_.get()
-        : skinCream_.get();
+#if defined(MATRIX_SKIN_EDITOR_DEV_LAYER)
+    skinDevOverlay_.reset();
+#endif
+    skin_ = skinForVariantId(skinItemId);
     updateSkin();
 
     if (persistToState)
@@ -147,6 +162,64 @@ void PluginEditor::applySkinFromItemId(int skinItemId, bool persistToState)
     if (auto* comp = mainComponent_.get())
         comp->getHeaderPanel().setCurrentSkinItemId(skinItemId);
 }
+
+#if defined(MATRIX_SKIN_EDITOR_DEV_LAYER)
+TSS::DevSkin::ApplyResult PluginEditor::applyDevSkinPush(const TSS::DevSkin::PushPayload& payload)
+{
+    using namespace TSS::DevSkin;
+
+    ApplyResult result;
+    result.revision = payload.revision;
+    result.appliedSkinId = payload.activeSkinId;
+
+    if (payload.kind == SkinKind::kCompiledBlack)
+    {
+        applySkinFromItemId(PluginIDs::Settings::SkinVariants::kBlack, false);
+        result.ok = true;
+        result.message = "Compiled Black";
+        return result;
+    }
+
+    if (payload.kind == SkinKind::kCompiledBlackDuo)
+    {
+        applySkinFromItemId(PluginIDs::Settings::SkinVariants::kBlackDuo, false);
+        result.ok = true;
+        result.message = "Compiled Black/Duo";
+        return result;
+    }
+
+    if (payload.kind == SkinKind::kCompiledCream)
+    {
+        applySkinFromItemId(PluginIDs::Settings::SkinVariants::kCream, false);
+        result.ok = true;
+        result.message = "Compiled Cream";
+        return result;
+    }
+
+    const auto baseVariant = compiledBaseVariant(payload);
+    skinDevOverlay_ = TSS::Skin::create(baseVariant);
+    const auto applied = applyPushToSkin(payload, *skinDevOverlay_);
+    if (! applied.ok)
+    {
+        skinDevOverlay_.reset();
+        return applied;
+    }
+
+    skin_ = skinDevOverlay_.get();
+    updateSkin();
+    return applied;
+}
+
+void PluginEditor::clearDevSkinOverlay()
+{
+    if (skinDevOverlay_ == nullptr)
+        return;
+
+    skinDevOverlay_.reset();
+    skin_ = skinForVariantId(pluginProcessor.getSkinVariantId());
+    updateSkin();
+}
+#endif
 
 void PluginEditor::applyUiScaleFromItemId(int scaleId, bool persistToState)
 {

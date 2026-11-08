@@ -140,6 +140,7 @@ namespace TSS
             createCopyPasteButtons(spec);
             attachPasteEnabledListener(spec);
         }
+        applyButtonLooksFromSkin(spec.skin);
     }
 
     ModuleHeader::~ModuleHeader() = default;

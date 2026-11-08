@@ -53,7 +53,7 @@ void ModulationBusCell::createBusNumberLabel()
         dimensions_.busNumberLabelWidth,
         dimensions_.busNumberLabelHeight,
         TSS::labelLookFromSkin(*skin_),
-        juce::String(busNumber_));
+        TSS::LabelConfig{ .text = juce::String(busNumber_) });
     // Intercept so ContextualHelpBinder can see hover; forward reorder via mouse listener.
     busNumberLabel_->setInterceptsMouseClicks(true, false);
     busNumberLabel_->addMouseListener(this, false);

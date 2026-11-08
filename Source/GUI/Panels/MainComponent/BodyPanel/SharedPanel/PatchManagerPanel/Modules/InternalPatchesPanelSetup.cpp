@@ -5,6 +5,7 @@
 
 #include "GUI/Factories/WidgetFactory.h"
 #include "GUI/Looks/LookBuilders.h"
+#include "GUI/Skins/SkinValues.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Widgets/Button.h"
 #include "GUI/Widgets/GroupLabel.h"

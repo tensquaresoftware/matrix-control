@@ -7,6 +7,7 @@ This is a JUCE audio plugin project built with CMake (no Projucer), managed by L
 - `Source/Core/` — audio processor, MIDI, models, services, init, loggers.
 - `Source/GUI/` — editor, panels, widgets, skins, looks.
 - `Source/Shared/` — definitions, helpers, project paths.
+- `Tools/SkinEditor/` — Matrix-Control Skin Editor app (same Clean Code quality gate as plugin GUI via `lint_touched.py`).
 - `Tests/` — unit test runner (`MATRIX_BUILD_TESTS=ON`).
 - `CMakeLists.txt` — build configuration; edit the **USER OPTIONS** block at the top for copy settings, and add new `.cpp` files to `PLUGIN_SOURCES`.
 - `CMakeUserPresets.json` — per-platform CMake presets (Debug / Release).

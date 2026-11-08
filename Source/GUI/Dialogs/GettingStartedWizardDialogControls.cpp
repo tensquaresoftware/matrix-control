@@ -4,6 +4,7 @@
 #include "GUI/Dialogs/GettingStartedWizardMetrics.h"
 #include "GUI/Helpers/MidiPortComboPopulation.h"
 #include "GUI/Looks/LookBuilders.h"
+#include "GUI/Skins/SkinValues.h"
 #include "GUI/Settings/SettingsShellMetrics.h"
 #include "GUI/Skins/Skin.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
@@ -13,22 +14,25 @@ using GettingStartedWizard::Step;
 
 void GettingStartedWizardDialog::buildStepControls(TSS::ISkin& skin)
 {
-    const auto comboStyle = TSS::ComboBox::Style::ButtonLike;
-    // Dark-panel label colour — Matrix chrome body is always a dark plate.
-    const auto labelLook = TSS::darkPanelLabelLookFromSkin(skin);
-    const auto comboLook = TSS::comboBoxLookFromSkin(skin);
-    const auto popupLook = TSS::popupMenuLookFromSkin(skin);
+    const auto popupMode = TSS::ComboBox::PopupMode::Scrollable;
+    // Chrome text on Matrix chrome body (wizard plate), not body Label colours.
+    const auto labelLook = TSS::chromeTextLabelLookFromSkin(skin);
+    const auto comboLook = TSS::comboBoxLookForZone(skin, TSS::SkinZone::kModales);
+    const auto popupLook = TSS::popupMenuLookForZone(skin, TSS::SkinZone::kModales);
 
     auto makeLabel = [&](const char* text)
     {
-        auto label = std::make_unique<TSS::Label>(kLabelWidth_, kControlHeight_, labelLook, text);
+        auto label = std::make_unique<TSS::Label>(kLabelWidth_,
+                                                  kControlHeight_,
+                                                  labelLook,
+                                                  TSS::LabelConfig{ .text = text });
         addChildComponent(*label);
         return label;
     };
     auto makeCombo = [&]()
     {
         auto combo = std::make_unique<TSS::ComboBox>(
-            kComboWidth_, kControlHeight_, comboLook, comboStyle);
+            kComboWidth_, kControlHeight_, comboLook, popupMode);
         combo->setPopupMenuLook(popupLook);
         addChildComponent(*combo);
         return combo;
@@ -69,14 +73,15 @@ void GettingStartedWizardDialog::populateScaleAndSkinItems()
     using namespace PluginIDs::Settings::SkinVariants;
     skinCombo_->clear(juce::dontSendNotification);
     skinCombo_->addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kBlack, kBlack);
+    skinCombo_->addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kBlackDuo, kBlackDuo);
     skinCombo_->addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kCream, kCream);
 }
 
 void GettingStartedWizardDialog::applyControlLooks(TSS::ISkin& skin)
 {
-    const auto labelLook = TSS::darkPanelLabelLookFromSkin(skin);
-    const auto comboLook = TSS::comboBoxLookFromSkin(skin);
-    const auto popupLook = TSS::popupMenuLookFromSkin(skin);
+    const auto labelLook = TSS::chromeTextLabelLookFromSkin(skin);
+    const auto comboLook = TSS::comboBoxLookForZone(skin, TSS::SkinZone::kModales);
+    const auto popupLook = TSS::popupMenuLookForZone(skin, TSS::SkinZone::kModales);
 
     auto apply = [&](TSS::Label* label, TSS::ComboBox* combo)
     {

@@ -105,7 +105,7 @@ void MutatorHistoryDefragConfirmDialog::paint(juce::Graphics& g)
         .title = Dialog::kTitle,
         .uiScale = uiScale_ });
 
-    g.setColour(skin_->getColour(SkinObjectType::kDarkPanel, SkinColourProperty::kText));
+    g.setColour(skin_->getColour(SkinObjectType::kChromeText, SkinColourProperty::kText));
     DialogMatrixHelpers::paintBodyText(g, layout.bodyFont, Dialog::kBody, geometry.textArea);
     DialogMatrixHelpers::paintActionFooterSeparator({
         .g = g,

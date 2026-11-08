@@ -25,6 +25,8 @@ juce::Rectangle<int> ParameterCell::getLabelBounds() const
 ParameterCell::ParameterCell(const Config& config)
     : skin_(&config.skin)
     , parameterType_(config.type)
+    , zone_(config.moduleType == ModuleType::MasterEdit ? TSS::SkinZone::kMaster
+                                                        : TSS::SkinZone::kPatch)
     , dimensions_(config.dimensions)
 {
     setOpaque(false);
@@ -46,7 +48,7 @@ void ParameterCell::createParameterLabel(TSS::ISkin& skin, WidgetFactory& factor
         dimensions_.labelWidth,
         dimensions_.labelHeight,
         TSS::labelLookFromSkin(skin),
-        factory.getParameterDisplayName(parameterId).value_or(""));
+        TSS::LabelConfig{ .text = factory.getParameterDisplayName(parameterId).value_or("") });
     addAndMakeVisible(*label_);
 }
 
@@ -65,6 +67,7 @@ void ParameterCell::createSliderWidget(TSS::ISkin& skin, WidgetFactory& factory,
         skin,
         dimensions_.controlWidth,
         dimensions_.sliderHeight);
+    slider_->setLook(TSS::sliderLookForZone(skin, zone_));
     sliderAttachment_ = std::make_unique<TSS::ApvtsUndoableSliderAttachment>(
         apvts,
         parameterId,
@@ -80,6 +83,8 @@ void ParameterCell::createComboBoxWidget(TSS::ISkin& skin, WidgetFactory& factor
         skin,
         dimensions_.controlWidth,
         dimensions_.comboBoxHeight);
+    comboBox_->setLook(TSS::comboBoxLookForZone(skin, zone_));
+    comboBox_->setPopupMenuLook(TSS::popupMenuLookForZone(skin, zone_));
     comboBoxAttachment_ = std::make_unique<TSS::ApvtsUndoableComboBoxAttachment>(
         apvts,
         parameterId,
@@ -180,11 +185,11 @@ void ParameterCell::setSkin(TSS::ISkin& skin)
     if (label_)
         label_->setLook(TSS::labelLookFromSkin(skin));
     if (slider_)
-        slider_->setLook(TSS::sliderLookFromSkin(skin));
+        slider_->setLook(TSS::sliderLookForZone(skin, zone_));
     if (comboBox_)
     {
-        comboBox_->setLook(TSS::comboBoxLookFromSkin(skin));
-        comboBox_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
+        comboBox_->setLook(TSS::comboBoxLookForZone(skin, zone_));
+        comboBox_->setPopupMenuLook(TSS::popupMenuLookForZone(skin, zone_));
     }
     if (separator_)
         separator_->setLook(TSS::horizontalSeparatorLookFromSkin(skin));

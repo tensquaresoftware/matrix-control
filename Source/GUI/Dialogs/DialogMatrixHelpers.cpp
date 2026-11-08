@@ -4,6 +4,7 @@
 
 #include "GUI/Layout/ScaledDrawing.h"
 #include "GUI/Looks/LookBuilders.h"
+#include "GUI/Skins/SkinValues.h"
 #include "GUI/Skins/Skin.h"
 
 using TSS::SkinObjectType;

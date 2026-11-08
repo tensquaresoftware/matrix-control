@@ -50,7 +50,7 @@ void PatchMutatorPanel::setupModeLine(TSS::ISkin& skin, WidgetFactory& widgetFac
         dims_.labels.patchMutatorWidth,
         dims_.labels.height,
         TSS::labelLookFromSkin(skin),
-        MutatorDisplayNames::kMode);
+        TSS::LabelConfig{ .text = MutatorDisplayNames::kMode });
     addAndMakeVisible(*modeLabel_);
 
     modeComboBox_ = std::make_unique<TSS::ComboBox>(
@@ -91,7 +91,7 @@ void PatchMutatorPanel::setupPitchLine(TSS::ISkin& skin, WidgetFactory& widgetFa
         dims_.labels.patchMutatorWidth,
         dims_.labels.height,
         TSS::labelLookFromSkin(skin),
-        MutatorDisplayNames::kPitch);
+        TSS::LabelConfig{ .text = MutatorDisplayNames::kPitch });
     addAndMakeVisible(*pitchLabel_);
 
     pitchComboBox_ = std::make_unique<TSS::HierarchicalComboBox>(
@@ -191,7 +191,7 @@ void PatchMutatorPanel::setupHistoryLine(TSS::ISkin& skin, WidgetFactory& widget
         dims_.labels.patchMutatorWidth,
         dims_.labels.height,
         TSS::labelLookFromSkin(skin),
-        MutatorDisplayNames::kHistory);
+        TSS::LabelConfig{ .text = MutatorDisplayNames::kHistory });
     addAndMakeVisible(*historyLabel_);
 
     wireHistoryComboBox(skin);

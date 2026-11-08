@@ -6,6 +6,7 @@
 
 #include "GUI/Layout/WidgetDimensions.h"
 #include "GUI/Helpers/ApvtsUndoableParameterAttachments.h"
+#include "GUI/Skins/SkinValues.h"
 
 namespace TSS
 {
@@ -46,6 +47,7 @@ public:
     TSS::Slider* getSlider() const { return slider_.get(); }
     TSS::ComboBox* getComboBox() const { return comboBox_.get(); }
     juce::Rectangle<int> getLabelBounds() const;
+    TSS::SkinZone getZone() const noexcept { return zone_; }
 
 private:
     void createParameterLabel(TSS::ISkin& skin, WidgetFactory& factory, const juce::String& parameterId);
@@ -61,6 +63,7 @@ private:
 
     TSS::ISkin* skin_;
     ParameterType parameterType_;
+    TSS::SkinZone zone_ = TSS::SkinZone::kPatch;
     ParameterCellDimensions dimensions_;
     float uiScale_ = 1.0f;
 

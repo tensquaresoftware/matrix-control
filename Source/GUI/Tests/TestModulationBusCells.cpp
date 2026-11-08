@@ -34,7 +34,7 @@ public:
             panelWidth_,
             TestScaleColumns::kScaleLabelHeight,
             config.labelLook,
-            config.scaleLabelText);
+            TSS::LabelConfig{ .text = config.scaleLabelText });
         addAndMakeVisible(*scaleLabel_);
 
         busCell_ = std::make_unique<ModulationBusCell>(ModulationBusCell::Config{

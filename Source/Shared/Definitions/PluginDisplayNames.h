@@ -659,6 +659,7 @@ namespace PluginDisplayNames
         namespace SkinVariants
         {
             constexpr const char* kBlack = "BLACK";
+            constexpr const char* kBlackDuo = "BLACK/DUO";
             constexpr const char* kCream = "CREAM";
         }
 

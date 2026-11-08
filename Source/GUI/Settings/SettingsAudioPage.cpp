@@ -4,6 +4,7 @@
 #include "GUI/Helpers/ComboBoxLiveRefresh.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Looks/LookBuilders.h"
+#include "GUI/Skins/SkinValues.h"
 #include "GUI/Settings/SettingsShellMetrics.h"
 #include "GUI/Skins/ISkin.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
@@ -63,7 +64,9 @@ void SettingsAudioPage::buildWidgets()
     synthFromCombo_->setUsesPortSentinelPopupChrome(true);
     synthFromCombo_->setUsesContentSizedPopupWidth(true);
     peakIndicator_ = std::make_unique<TSS::PeakIndicator>(SettingsShellMetrics::kPeakWidth,
-                                                          SettingsShellMetrics::kControlHeight);
+                                                          SettingsShellMetrics::kControlHeight,
+                                                          TSS::zoneColourSet(TSS::SkinObjectType::kPeakIndicator,
+                                                                             TSS::SkinZone::kModales));
     peakIndicator_->setSkin(*skin_);
     addAndMakeVisible(*peakIndicator_);
     outputChannelsLabel_ = makeLabel(*skin_, PluginDisplayNames::Settings::kOutputChannelsLabel);
@@ -127,8 +130,8 @@ void SettingsAudioPage::setSkin(TSS::ISkin& skin)
 {
     skin_ = &skin;
     const auto labelLook = TSS::labelLookFromSkin(skin);
-    const auto comboLook = TSS::comboBoxLookFromSkin(skin);
-    const auto popupLook = TSS::popupMenuLookFromSkin(skin);
+    const auto comboLook = TSS::comboBoxLookForZone(skin, TSS::SkinZone::kModales);
+    const auto popupLook = TSS::popupMenuLookForZone(skin, TSS::SkinZone::kModales);
     const auto buttonLook = TSS::buttonLookFromSkin(skin);
 
     driverTypeLabel_->setLook(labelLook);
@@ -297,7 +300,7 @@ std::unique_ptr<TSS::Label> SettingsAudioPage::makeLabel(TSS::ISkin& skin, const
         SettingsShellMetrics::kLabelWidth,
         SettingsShellMetrics::kControlHeight,
         TSS::labelLookFromSkin(skin),
-        text);
+        TSS::LabelConfig{ .text = text });
     addAndMakeVisible(*label);
     return label;
 }
@@ -307,9 +310,9 @@ std::unique_ptr<TSS::ComboBox> SettingsAudioPage::makeCombo(TSS::ISkin& skin)
     auto combo = std::make_unique<TSS::ComboBox>(
         SettingsShellMetrics::kControlColumnWidth,
         SettingsShellMetrics::kControlHeight,
-        TSS::comboBoxLookFromSkin(skin),
-        TSS::ComboBox::Style::ButtonLike);
-    combo->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
+        TSS::comboBoxLookForZone(skin, TSS::SkinZone::kModales),
+        TSS::ComboBox::PopupMode::Scrollable);
+    combo->setPopupMenuLook(TSS::popupMenuLookForZone(skin, TSS::SkinZone::kModales));
     addAndMakeVisible(*combo);
     return combo;
 }

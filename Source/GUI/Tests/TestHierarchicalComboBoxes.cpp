@@ -32,7 +32,7 @@ public:
             TestScaleColumns::kScaleLabelColumnDesignWidth,
             TestScaleColumns::kScaleLabelHeight,
             config.labelLook,
-            config.scaleLabelText);
+            TSS::LabelConfig{ .text = config.scaleLabelText });
         addAndMakeVisible(*scaleLabel_);
 
         historyCombo_ = std::make_unique<TSS::HierarchicalComboBox>(comboWidth_, comboHeight_, comboLook_);

@@ -9,20 +9,25 @@
 class TestToggles::ToggleScalePanel : public juce::Component
 {
 public:
-    ToggleScalePanel(float scale,
-                     const juce::String& scaleLabelText,
-                     const TSS::ToggleLook& toggleLook,
-                     const TSS::LabelLook& labelLook,
-                     const ToggleDimensions& dimensions)
-        : scale_(scale)
-        , dimensions_(dimensions)
-        , toggleLook_(toggleLook)
+    struct Config
+    {
+        float scale = 1.0f;
+        juce::String scaleLabelText;
+        const TSS::ToggleLook& toggleLook;
+        const TSS::LabelLook& labelLook;
+        const ToggleDimensions& dimensions;
+    };
+
+    explicit ToggleScalePanel(const Config& config)
+        : scale_(config.scale)
+        , dimensions_(config.dimensions)
+        , toggleLook_(config.toggleLook)
     {
         scaleLabel_ = std::make_unique<TSS::Label>(
             TestScaleColumns::kScaleLabelColumnDesignWidth,
             TestScaleColumns::kScaleLabelHeight,
-            labelLook,
-            scaleLabelText);
+            config.labelLook,
+            TSS::LabelConfig{ .text = config.scaleLabelText });
         addAndMakeVisible(*scaleLabel_);
 
         toggleOff_ = createToggle("OFF", false);
@@ -131,12 +136,12 @@ void TestToggles::rebuildPanels()
     columnPanels_.reserve(TestScaleColumns::kSpecs.size());
     for (const auto& spec : TestScaleColumns::kSpecs)
     {
-        auto panel = std::make_unique<ToggleScalePanel>(
-            spec.scale,
-            spec.label,
-            toggleLook,
-            labelLook,
-            dimensions_);
+        auto panel = std::make_unique<ToggleScalePanel>(ToggleScalePanel::Config{
+            .scale = spec.scale,
+            .scaleLabelText = spec.label,
+            .toggleLook = toggleLook,
+            .labelLook = labelLook,
+            .dimensions = dimensions_ });
         addAndMakeVisible(*panel);
         columnPanels_.push_back(std::move(panel));
     }

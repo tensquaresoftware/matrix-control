@@ -3,8 +3,10 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 
 #include "GUI/Looks/WidgetLooks.h"
+#include "GUI/Skins/SkinValues.h"
 
 class SkinColourSubstrateTests;
+class SkinColourWiringTests;
 
 namespace TSS
 {
@@ -16,16 +18,19 @@ namespace TSS
                 private juce::Timer
     {
     public:
-        Led(int width, int height);
+        Led(int width, int height, ColourSet colourSet = ColourSet::k1);
         ~Led() override = default;
 
         void paint(juce::Graphics& g) override;
+        void setColourSet(ColourSet colourSet);
         void setSkin(ISkin& skin);
         void setUiScale(float uiScale);
         void setLevel(float normalisedLevel);
+        ColourSet getColourSet() const noexcept { return colourSet_; }
 
     private:
         friend class ::SkinColourSubstrateTests;
+        friend class ::SkinColourWiringTests;
 
         inline constexpr static float kBorderThicknessDesign_ = 2.0f;
         inline constexpr static juce::int64 kReleaseTimeMs_ = 300;
@@ -33,6 +38,7 @@ namespace TSS
         inline constexpr static int kAnimationHz_ = 60;
 
         ISkin* skin_ = nullptr;
+        ColourSet colourSet_ = ColourSet::k1;
         LedLook ledLook_{};
         float uiScale_ = 1.0f;
         float displayedLevel_ = 0.0f;

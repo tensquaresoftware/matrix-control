@@ -41,12 +41,15 @@ std::unique_ptr<TSS::ComboBox> WidgetFactory::createComboBoxFromDescriptor(
     int width,
     int height)
 {
-    auto comboBox = std::make_unique<TSS::ComboBox>(width, height, TSS::comboBoxLookFromSkin(skin));
+    auto comboBox = std::make_unique<TSS::ComboBox>(
+        width,
+        height,
+        TSS::comboBoxLookFromSkin(skin));
     comboBox->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
 
     for (const auto& choice : desc->choices)
         comboBox->addItem(choice, comboBox->getNumItems() + 1);
-    
+
     comboBox->setSelectedItemIndex(desc->defaultIndex);
     return comboBox;
 }
@@ -97,7 +100,7 @@ std::unique_ptr<TSS::Button> WidgetFactory::createStandaloneButton(
     const auto* desc = findStandaloneWidget(widgetId);
     validator.getStandaloneWidgetDescriptorOrThrow(desc, widgetId);
     validator.validateWidgetType(desc, widgetId);
-    
+
     const auto buttonWidth = validator.resolveStandaloneButtonWidthOrThrow(widgetId);
 
     auto button = std::make_unique<TSS::Button>(

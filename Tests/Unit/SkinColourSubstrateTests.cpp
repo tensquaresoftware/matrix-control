@@ -27,42 +27,54 @@ public:
     {
         beginTest("lookBuilders_resolveStructuredKeysForBothSkins");
 
-        assertButtonBackgroundOffFromSkin(TSS::Skin::ColourVariant::Black);
+        assertButtonBackgroundOffFromSkin(TSS::Skin::ColourVariant::BlackDuo);
         assertButtonBackgroundOffFromSkin(TSS::Skin::ColourVariant::Cream);
 
         beginTest("popupMenuAndAlertLooks_resolveDisabledAndAlertFromSkin");
 
-        assertPopupMenuDisabledAndAlertLooks(TSS::Skin::ColourVariant::Black);
+        assertPopupMenuDisabledAndAlertLooks(TSS::Skin::ColourVariant::BlackDuo);
         assertPopupMenuDisabledAndAlertLooks(TSS::Skin::ColourVariant::Cream);
 
         beginTest("skinMaps_blackAndCreamColumnsDiverge");
 
         assertBodyBackgroundColumns();
         assertCreamDivergentLabelText();
-        assertDarkPanelTextInvariant();
+        assertChromeTextColumns();
 
         beginTest("patchNameDisplay_secondaryTextIsSolidMappedColour");
 
-        assertSecondarySolid(TSS::Skin::ColourVariant::Black);
+        assertSecondarySolid(TSS::Skin::ColourVariant::BlackDuo);
         assertSecondarySolid(TSS::Skin::ColourVariant::Cream);
 
         beginTest("gapKeys_existForBlackAndCream");
 
-        assertGapKeys(TSS::Skin::ColourVariant::Black);
+        assertGapKeys(TSS::Skin::ColourVariant::BlackDuo);
         assertGapKeys(TSS::Skin::ColourVariant::Cream);
 
         beginTest("ledAndReadOnlyLooks_resolveFromSkinMaps");
 
-        assertLedAndReadOnlyLooks(TSS::Skin::ColourVariant::Black);
+        assertLedAndReadOnlyLooks(TSS::Skin::ColourVariant::BlackDuo);
         assertLedAndReadOnlyLooks(TSS::Skin::ColourVariant::Cream);
+
+        beginTest("colourSet_missingHigherSetFallsBackToK1");
+
+        assertMissingSetFallback();
+
+        beginTest("colourSet_explicitHigherSetWinsOverK1");
+
+        assertExplicitHigherSetWins();
+
+        beginTest("ledAndPeakIndicator_useDistinctKeysWithMatchingSeedColours");
+
+        assertLedAndPeakKeys();
 
         beginTest("ledAndPeak_paintLevelEncoding");
 
         assertLedAndPeakPaintLevelEncoding();
 
-        beginTest("logo_hoverUsesDarkPanelTextHover");
+        beginTest("logo_hoverUsesChromeTextHover");
 
-        assertLogoHoverUsesDarkPanelTextHover();
+        assertLogoHoverUsesChromeTextHover();
 
         beginTest("readOnlyValueField_defaultOverrideAndSetSkinReset");
 
@@ -70,12 +82,12 @@ public:
 
         beginTest("footerMessage_severityKeysMatchChartForBothSkins");
 
-        assertFooterMessageSeverityKeys(TSS::Skin::ColourVariant::Black);
+        assertFooterMessageSeverityKeys(TSS::Skin::ColourVariant::BlackDuo);
         assertFooterMessageSeverityKeys(TSS::Skin::ColourVariant::Cream);
 
         beginTest("mainChrome_headerFooterBorderAndAlertKeys");
 
-        assertMainChromeKeys(TSS::Skin::ColourVariant::Black);
+        assertMainChromeKeys(TSS::Skin::ColourVariant::BlackDuo);
         assertMainChromeKeys(TSS::Skin::ColourVariant::Cream);
     }
 
@@ -88,6 +100,12 @@ private:
             component.paint(g);
         }
         return image.getPixelAt(x, y);
+    }
+
+    static juce::Colour seedFor(TSS::Skin::ColourVariant variant, juce::uint32 blackDuo, juce::uint32 cream)
+    {
+        // Duo-era pins: BlackDuo column vs Cream. Classic BLACK has its own seeds.
+        return juce::Colour(variant == TSS::Skin::ColourVariant::BlackDuo ? blackDuo : cream);
     }
 
     static juce::Colour compositeOver(juce::Colour under, juce::Colour over)
@@ -111,7 +129,7 @@ private:
                                             SkinColourProperty::kBackground,
                                             SkinColourState::kOff);
         expect(look.backgroundOff == mapped);
-        expect(look.backgroundOff == juce::Colour(ColourChart::kBlack));
+        expect(look.backgroundOff == seedFor(variant, ColourChart::kBlack, ColourChart::kCream400));
     }
 
     void assertPopupMenuDisabledAndAlertLooks(TSS::Skin::ColourVariant variant)
@@ -124,14 +142,16 @@ private:
                                   SkinColourProperty::kText,
                                   SkinColourState::kDisabled));
         expect(popupLook.textDisabled
-               == juce::Colour(ColourChart::kEmerald700));
-        expect(popupLook.textDisabledButtonLike
-               == skin->getColour(SkinObjectType::kPopupMenuButtonLike,
+               == seedFor(variant, ColourChart::kBlue600, ColourChart::kGreen400));
+
+        const auto popupLookMono = TSS::popupMenuLookForZone(*skin, TSS::kMonoMenuExceptionZone);
+        expect(popupLookMono.textDisabled
+               == skin->getColour(SkinObjectType::kPopupMenu,
                                   SkinColourProperty::kText,
-                                  SkinColourState::kDisabled));
-        // Common::kContentDisabled == ColourChart::kGrey600 (solid muted grey).
-        expect(popupLook.textDisabledButtonLike
-               == juce::Colour(ColourChart::kGrey600));
+                                  SkinColourState::kDisabled,
+                                  TSS::ColourSet::k3));
+        expect(popupLookMono.textDisabled
+               == seedFor(variant, ColourChart::kGrey600, ColourChart::kCafe400));
 
         const auto alertLook = TSS::buttonAlertLookFromSkin(*skin);
         const auto alertRed = skin->getColour(SkinObjectType::kFooterMessage,
@@ -140,7 +160,7 @@ private:
         const auto alertBlack = skin->getColour(SkinObjectType::kFooterMessage,
                                                 SkinColourProperty::kBackground,
                                                 SkinColourState::kError);
-        const auto alertWhite = skin->getColour(SkinObjectType::kDarkPanel,
+        const auto alertWhite = skin->getColour(SkinObjectType::kChromeText,
                                                 SkinColourProperty::kText,
                                                 SkinColourState::kHover);
         expect(alertLook.backgroundOff == alertRed);
@@ -155,7 +175,7 @@ private:
 
     void assertBodyBackgroundColumns()
     {
-        const auto black = TSS::Skin::create(TSS::Skin::ColourVariant::Black);
+        const auto black = TSS::Skin::create(TSS::Skin::ColourVariant::BlackDuo);
         const auto cream = TSS::Skin::create(TSS::Skin::ColourVariant::Cream);
         expect(black->getColour(SkinObjectType::kBodyPanel, SkinColourProperty::kBackground)
                == juce::Colour(ColourChart::kGrey900));
@@ -165,23 +185,23 @@ private:
 
     void assertCreamDivergentLabelText()
     {
-        const auto black = TSS::Skin::create(TSS::Skin::ColourVariant::Black);
+        const auto black = TSS::Skin::create(TSS::Skin::ColourVariant::BlackDuo);
         const auto cream = TSS::Skin::create(TSS::Skin::ColourVariant::Cream);
         const auto blackText = black->getColour(SkinObjectType::kLabel, SkinColourProperty::kText);
         const auto creamText = cream->getColour(SkinObjectType::kLabel, SkinColourProperty::kText);
         expect(blackText == juce::Colour(ColourChart::kGrey200));
-        expect(creamText == juce::Colour(ColourChart::kGrey950));
+        expect(creamText == juce::Colour(ColourChart::kCafe950));
         expect(blackText != creamText);
     }
 
-    void assertDarkPanelTextInvariant()
+    void assertChromeTextColumns()
     {
-        const auto black = TSS::Skin::create(TSS::Skin::ColourVariant::Black);
+        const auto black = TSS::Skin::create(TSS::Skin::ColourVariant::BlackDuo);
         const auto cream = TSS::Skin::create(TSS::Skin::ColourVariant::Cream);
-        const auto blackText = black->getColour(SkinObjectType::kDarkPanel, SkinColourProperty::kText);
-        const auto creamText = cream->getColour(SkinObjectType::kDarkPanel, SkinColourProperty::kText);
+        const auto blackText = black->getColour(SkinObjectType::kChromeText, SkinColourProperty::kText);
+        const auto creamText = cream->getColour(SkinObjectType::kChromeText, SkinColourProperty::kText);
         expect(blackText == juce::Colour(ColourChart::kGrey200));
-        expect(creamText == juce::Colour(ColourChart::kGrey200));
+        expect(creamText == juce::Colour(ColourChart::kCafe800));
         expect(creamText != cream->getColour(SkinObjectType::kLabel, SkinColourProperty::kText));
     }
 
@@ -199,42 +219,39 @@ private:
     void assertGapKeys(TSS::Skin::ColourVariant variant)
     {
         const auto skin = TSS::Skin::create(variant);
+        auto expectSeed = [&](SkinObjectType object,
+                              SkinColourProperty property,
+                              SkinColourState state,
+                              juce::uint32 black,
+                              juce::uint32 cream)
+        {
+            expect(skin->getColour(object, property, state) == seedFor(variant, black, cream));
+        };
 
-        expect(skin->getColour(SkinObjectType::kDialog, SkinColourProperty::kBorder)
-               == juce::Colour(ColourChart::kGrey525));
-        expect(skin->getColour(SkinObjectType::kDialog, SkinColourProperty::kTitleBand)
-               == juce::Colour(ColourChart::kBlack));
-        expect(skin->getColour(SkinObjectType::kWindowClose, SkinColourProperty::kGlyph)
-               == juce::Colour(ColourChart::kRed900));
-        expect(skin->getColour(SkinObjectType::kReadOnlyValueField, SkinColourProperty::kBackground)
-               == juce::Colour(ColourChart::kGrey700));
-        expect(skin->getColour(SkinObjectType::kReadOnlyValueField, SkinColourProperty::kText)
-               == juce::Colour(ColourChart::kGrey200));
-        expect(skin->getColour(SkinObjectType::kReadOnlyValueField,
-                               SkinColourProperty::kText,
-                               SkinColourState::kError)
-               == juce::Colour(ColourChart::kRed500));
-        expect(skin->getColour(SkinObjectType::kLed,
-                               SkinColourProperty::kBackground,
-                               SkinColourState::kOff)
-               == juce::Colour(ColourChart::kBlack));
-        expect(skin->getColour(SkinObjectType::kLed,
-                               SkinColourProperty::kBorder,
-                               SkinColourState::kOff)
-               == juce::Colour(ColourChart::kGrey800));
-        expect(skin->getColour(SkinObjectType::kLed,
-                               SkinColourProperty::kBackground,
-                               SkinColourState::kOn)
-               == juce::Colour(ColourChart::kEmerald400));
-        // About-reused White / Orange pastilles (DarkPanel text Hover; ModuleHeader Orange line).
-        expect(skin->getColour(SkinObjectType::kDarkPanel,
-                               SkinColourProperty::kText,
-                               SkinColourState::kHover)
-               == juce::Colour(ColourChart::kWhite));
-        expect(skin->getColour(SkinObjectType::kModuleHeader, SkinColourProperty::kLineOrange)
-               == juce::Colour(ColourChart::kOrange));
-        expect(skin->getColour(SkinObjectType::kPatchNameDisplay, SkinColourProperty::kCaret)
-               == juce::Colour(ColourChart::kBlack));
+        expectSeed(SkinObjectType::kDialog, SkinColourProperty::kBorder, SkinColourState::kDefault,
+                   ColourChart::kGrey525, ColourChart::kCafe600);
+        expectSeed(SkinObjectType::kDialog, SkinColourProperty::kTitleBand, SkinColourState::kDefault,
+                   ColourChart::kBlack, ColourChart::kCream400);
+        expectSeed(SkinObjectType::kDialog, SkinColourProperty::kGlyph, SkinColourState::kDefault,
+                   ColourChart::kRed900, ColourChart::kRed900);
+        expectSeed(SkinObjectType::kReadOnlyValueField, SkinColourProperty::kBackground, SkinColourState::kDefault,
+                   ColourChart::kGrey700, ColourChart::kCream400);
+        expectSeed(SkinObjectType::kReadOnlyValueField, SkinColourProperty::kText, SkinColourState::kDefault,
+                   ColourChart::kGrey200, ColourChart::kCafe950);
+        expectSeed(SkinObjectType::kReadOnlyValueField, SkinColourProperty::kText, SkinColourState::kError,
+                   ColourChart::kRed500, ColourChart::kCafe950);
+        expectSeed(SkinObjectType::kLed, SkinColourProperty::kBackground, SkinColourState::kOff,
+                   ColourChart::kBlack, ColourChart::kCream400);
+        expectSeed(SkinObjectType::kLed, SkinColourProperty::kBorder, SkinColourState::kOff,
+                   ColourChart::kGrey800, ColourChart::kCafe600);
+        expectSeed(SkinObjectType::kLed, SkinColourProperty::kBackground, SkinColourState::kOn,
+                   ColourChart::kYellow400, ColourChart::kGreen500);
+        expectSeed(SkinObjectType::kChromeText, SkinColourProperty::kText, SkinColourState::kHover,
+                   ColourChart::kWhite, ColourChart::kCafe900);
+        expectSeed(SkinObjectType::kModuleHeader, SkinColourProperty::kLineOrange, SkinColourState::kDefault,
+                   ColourChart::kOrange, ColourChart::kOrange);
+        expectSeed(SkinObjectType::kPatchNameDisplay, SkinColourProperty::kCaret, SkinColourState::kDefault,
+                   ColourChart::kBlack, ColourChart::kCafe950);
     }
 
     void assertLedAndReadOnlyLooks(TSS::Skin::ColourVariant variant)
@@ -253,7 +270,7 @@ private:
                == skin->getColour(SkinObjectType::kLed,
                                   SkinColourProperty::kBackground,
                                   SkinColourState::kOn));
-        expect(ledLook.maxOn == juce::Colour(ColourChart::kEmerald400));
+        expect(ledLook.maxOn == seedFor(variant, ColourChart::kYellow400, ColourChart::kGreen500));
         expect(ledLook.maxOn.getFloatAlpha() == 1.0f);
 
         const auto fieldLook = TSS::readOnlyValueFieldLookFromSkin(*skin);
@@ -268,27 +285,92 @@ private:
         expect(patchLook.secondaryText.getFloatAlpha() == 1.0f);
     }
 
+    void assertMissingSetFallback()
+    {
+        const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::Cream);
+        auto key = TSS::skinColourKey(SkinObjectType::kButton,
+                                      SkinColourProperty::kBackground,
+                                      SkinColourState::kOff);
+        const auto defaultColour = skin->getColour(key);
+        skin->clearHigherColourSets();
+        key.colourSet = TSS::ColourSet::k3;
+        expect(skin->getColour(key) == defaultColour);
+    }
+
+    void assertExplicitHigherSetWins()
+    {
+        const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::BlackDuo);
+        auto key = TSS::skinColourKey(SkinObjectType::kSlider, SkinColourProperty::kTrack);
+        const auto primaryColour = juce::Colour(ColourChart::kRed500);
+        const auto setTwoColour = juce::Colour(ColourChart::kBlue);
+        skin->setColour(key, primaryColour);
+        key.colourSet = TSS::ColourSet::k2;
+        skin->setColour(key, setTwoColour);
+        expect(skin->getColour(key) == setTwoColour && skin->getColour(key) != primaryColour);
+    }
+
+    void assertLedAndPeakKeys()
+    {
+        for (const auto variant : { TSS::Skin::ColourVariant::BlackDuo,
+                                    TSS::Skin::ColourVariant::Cream })
+        {
+            const auto skin = TSS::Skin::create(variant);
+            const auto led = TSS::ledLookFromSkin(*skin);
+            const auto peak = TSS::peakIndicatorLookFromSkin(*skin);
+            expect(led.backgroundOff == peak.backgroundOff
+                   && led.borderOff == peak.borderOff
+                   && led.maxOn == peak.maxOn);
+            expect(! (TSS::skinColourKey(SkinObjectType::kLed,
+                                         SkinColourProperty::kBackground,
+                                         SkinColourState::kOn)
+                      == TSS::skinColourKey(SkinObjectType::kPeakIndicator,
+                                            SkinColourProperty::kBackground,
+                                            SkinColourState::kOn)));
+        }
+    }
+
+    static void setDistinctLedAndPeakColours(TSS::Skin& skin)
+    {
+        using O = SkinObjectType;
+        using P = SkinColourProperty;
+        using S = SkinColourState;
+        skin.setColour(TSS::skinColourKey(O::kLed, P::kBackground, S::kOn),
+                       juce::Colour(ColourChart::kRed500));
+        skin.setColour(TSS::skinColourKey(O::kPeakIndicator, P::kBackground, S::kOn),
+                       juce::Colour(ColourChart::kBlue));
+        skin.setColour(TSS::skinColourKey(O::kPeakIndicator, P::kBackground, S::kOff),
+                       juce::Colour(ColourChart::kGrey700));
+    }
+
     void assertLedAndPeakPaintLevelEncoding()
     {
         constexpr float kPartialLevel = 0.5f;
         constexpr int kSize = 20;
         constexpr int kCentre = kSize / 2;
 
-        const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::Black);
-        const auto maxOn = skin->getColour(SkinObjectType::kLed,
-                                           SkinColourProperty::kBackground,
-                                           SkinColourState::kOn);
-        const auto backgroundOff = skin->getColour(SkinObjectType::kLed,
-                                                   SkinColourProperty::kBackground,
-                                                   SkinColourState::kOff);
-        expect(maxOn.getFloatAlpha() == 1.0f);
+        const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::BlackDuo);
+        setDistinctLedAndPeakColours(*skin);
+        const auto ledMaxOn = skin->getColour(SkinObjectType::kLed,
+                                              SkinColourProperty::kBackground,
+                                              SkinColourState::kOn);
+        const auto ledBackgroundOff = skin->getColour(SkinObjectType::kLed,
+                                                      SkinColourProperty::kBackground,
+                                                      SkinColourState::kOff);
+        const auto peakMaxOn = skin->getColour(SkinObjectType::kPeakIndicator,
+                                               SkinColourProperty::kBackground,
+                                               SkinColourState::kOn);
+        const auto peakBackgroundOff = skin->getColour(SkinObjectType::kPeakIndicator,
+                                                       SkinColourProperty::kBackground,
+                                                       SkinColourState::kOff);
+        expect(ledMaxOn != peakMaxOn);
+        expect(ledMaxOn.getFloatAlpha() == 1.0f);
 
         TSS::Led led(kSize, kSize);
         led.setSkin(*skin);
         led.displayedLevel_ = kPartialLevel;
         const auto ledPixel = paintPixel(led, kCentre, kCentre);
         // Paint path: maxOn RGB with reduced alpha over the off plate (not a Colour-only check).
-        expect(ledPixel == compositeOver(backgroundOff, maxOn.withAlpha(kPartialLevel)));
+        expect(ledPixel == compositeOver(ledBackgroundOff, ledMaxOn.withAlpha(kPartialLevel)));
 
         TSS::PeakIndicator peak(kSize, kSize);
         peak.setSkin(*skin);
@@ -296,12 +378,12 @@ private:
         // Height fill: lit band is the lower half — sample near bottom vs near top (inside border).
         const auto peakLit = paintPixel(peak, kCentre, kSize - 4);
         const auto peakOff = paintPixel(peak, kCentre, 4);
-        expect(peakLit == maxOn);
+        expect(peakLit == peakMaxOn);
         expect(peakLit.getFloatAlpha() == 1.0f);
-        expect(peakOff == backgroundOff);
+        expect(peakOff == peakBackgroundOff);
     }
 
-    void assertLogoHoverUsesDarkPanelTextHover()
+    void assertLogoHoverUsesChromeTextHover()
     {
         struct LogoProbe : TSS::Logo
         {
@@ -309,8 +391,8 @@ private:
             juce::Colour textColour() const noexcept { return look_.text; }
         };
 
-        const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::Black);
-        const auto hover = skin->getColour(SkinObjectType::kDarkPanel,
+        const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::BlackDuo);
+        const auto hover = skin->getColour(SkinObjectType::kChromeText,
                                            SkinColourProperty::kText,
                                            SkinColourState::kHover);
         LogoProbe logo(*skin, 80, 24);
@@ -321,7 +403,7 @@ private:
 
     void assertReadOnlyValueFieldDefaultOverrideAndSetSkinReset()
     {
-        const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::Black);
+        const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::BlackDuo);
         const auto mappedFill = skin->getColour(SkinObjectType::kReadOnlyValueField,
                                                 SkinColourProperty::kBackground);
         const auto mappedText = skin->getColour(SkinObjectType::kReadOnlyValueField,
@@ -352,7 +434,7 @@ private:
         expect(skin->getColour(SkinObjectType::kFooterMessage,
                                SkinColourProperty::kText,
                                SkinColourState::kInfo)
-               == juce::Colour(ColourChart::kGrey500));
+               == seedFor(variant, ColourChart::kGrey500, ColourChart::kCafe800));
         expect(skin->getColour(SkinObjectType::kFooterMessage,
                                SkinColourProperty::kText,
                                SkinColourState::kWarning)
@@ -366,12 +448,10 @@ private:
     void assertMainChromeKeys(TSS::Skin::ColourVariant variant)
     {
         const auto skin = TSS::Skin::create(variant);
-        const auto chromeGrey = juce::Colour(TSS::SkinColours::Panels::kMainChromeGrey);
         const auto headerBorder = skin->getColour(SkinObjectType::kHeaderPanel, SkinColourProperty::kBorder);
         const auto footerBorder = skin->getColour(SkinObjectType::kFooterPanel, SkinColourProperty::kBorder);
-        expect(headerBorder == chromeGrey);
-        expect(footerBorder == chromeGrey);
-        expect(headerBorder == footerBorder);
+        expect(headerBorder == seedFor(variant, TSS::SkinColours::Panels::kMainChromeGrey, ColourChart::kCafe800));
+        expect(footerBorder == seedFor(variant, TSS::SkinColours::Panels::kMainChromeGrey, ColourChart::kCafe900));
         expect(skin->getColour(SkinObjectType::kFooterMessage,
                                SkinColourProperty::kBackground,
                                SkinColourState::kError)
@@ -379,6 +459,7 @@ private:
         expect(TSS::moduleHeaderLookFromSkin(*skin).lineOrange
                == skin->getColour(SkinObjectType::kModuleHeader, SkinColourProperty::kLineOrange));
     }
+
 };
 
 static SkinColourSubstrateTests skinColourSubstrateTests;

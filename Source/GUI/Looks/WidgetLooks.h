@@ -59,16 +59,6 @@ namespace TSS
         juce::Colour triangleDisabled{};
         juce::Colour textEnabled{};
         juce::Colour textDisabled{};
-        
-        juce::Colour buttonLikeBackground{};
-        juce::Colour buttonLikeBackgroundDisabled{};
-        juce::Colour buttonLikeBorder{};
-        juce::Colour buttonLikeBorderDisabled{};
-        juce::Colour buttonLikeText{};
-        juce::Colour buttonLikeTextDisabled{};
-        juce::Colour buttonLikeTriangle{};
-        juce::Colour buttonLikeTriangleDisabled{};
-        
         juce::Font font{juce::FontOptions{}};
     };
 
@@ -82,16 +72,6 @@ namespace TSS
         juce::Colour backgroundHover{};
         juce::Colour textHover{};
         juce::Colour scrollbar{};
-        
-        juce::Colour backgroundButtonLike{};
-        juce::Colour borderButtonLike{};
-        juce::Colour separatorButtonLike{};
-        juce::Colour textButtonLike{};
-        juce::Colour textDisabledButtonLike{};
-        juce::Colour backgroundHoverButtonLike{};
-        juce::Colour textHoverButtonLike{};
-        juce::Colour scrollbarButtonLike{};
-        
         juce::Font font{juce::FontOptions{}};
     };
 
@@ -167,6 +147,7 @@ namespace TSS
         juce::Colour textFocus{};
         juce::Colour editorBackground{};
         juce::Colour editorText{};
+        juce::Colour editorCaret{};
         juce::Colour editorSelectionBackground{};
         juce::Font font{juce::FontOptions{}};
     };

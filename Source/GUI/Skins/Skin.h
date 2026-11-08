@@ -16,13 +16,19 @@ namespace TSS
         enum class ColourVariant
         {
             Black,
+            BlackDuo,
             Cream
         };
+
+        /** Getting Started Matrix monochrome chrome always uses classic BLACK,
+            never BLACK/DUO or CREAM (dark plate vs cream body text). */
+        static constexpr ColourVariant kGettingStartedMatrixChromeVariant = ColourVariant::Black;
 
         enum class SkinComboBoxItemId : int
         {
             kBlack = 1,
-            kCream = 2
+            kCream = 2,
+            kBlackDuo = 3
         };
 
         explicit Skin(ColourVariant variant);
@@ -31,12 +37,15 @@ namespace TSS
         static std::unique_ptr<Skin> create(ColourVariant variant);
 
         ColourVariant getColourVariant() const { return currentVariant_; }
+        size_t getMappedColourCount() const noexcept { return colours_.size(); }
 
         juce::Colour getColour(SkinObjectType object,
                                SkinColourProperty property,
-                               SkinColourState state = SkinColourState::kDefault) const override;
+                               SkinColourState state = SkinColourState::kDefault,
+                               ColourSet colourSet = ColourSet::k1) const override;
         juce::Colour getColour(SkinColourKey key) const override;
         void setColour(SkinColourKey key, juce::Colour colour) override;
+        void clearHigherColourSets();
 
         juce::Font getBaseFont() const override;
         juce::Font getBaseFontBold() const override;
@@ -44,56 +53,35 @@ namespace TSS
         juce::Font getModalBodyFont() const override;
         juce::Font getModalBodyFontBold() const override;
 
-        juce::Colour getToggleBackgroundColour(bool isOn) const override;
-        juce::Colour getToggleTextColour(bool isOn) const override;
-        juce::Colour getSliderTrackColour(bool isEnabled = true) const override;
-        juce::Colour getSliderValueBarColour(bool isEnabled = true) const override;
-        juce::Colour getSliderTextColour(bool isEnabled = true) const override;
-        juce::Colour getComboBoxBackgroundColour(bool isEnabled = true, bool isButtonLike = false) const override;
-        juce::Colour getComboBoxBorderColour(bool isEnabled = true, bool isButtonLike = false) const override;
-        juce::Colour getComboBoxFocusBorderColour(bool isButtonLike = false) const override;
-        juce::Colour getComboBoxTriangleColour(bool isEnabled = true, bool isButtonLike = false) const override;
-        juce::Colour getComboBoxTextColour(bool isEnabled = true, bool isButtonLike = false) const override;
-        juce::Colour getPopupMenuBackgroundColour(bool isButtonLike = false) const override;
-        juce::Colour getPopupMenuBorderColour(bool isButtonLike = false) const override;
-        juce::Colour getPopupMenuSeparatorColour(bool isButtonLike = false) const override;
-        juce::Colour getPopupMenuTextColour(bool isButtonLike = false) const override;
-        juce::Colour getPopupMenuBackgroundHooverColour(bool isButtonLike = false) const override;
-        juce::Colour getPopupMenuTextHooverColour(bool isButtonLike = false) const override;
-        juce::Colour getPopupMenuScrollbarColour(bool isButtonLike = false) const override;
+        juce::Colour getToggleBackgroundColour(bool isOn,
+                                               ColourSet colourSet = ColourSet::k1) const override;
+        juce::Colour getToggleTextColour(bool isOn,
+                                         ColourSet colourSet = ColourSet::k1) const override;
+        juce::Colour getSliderTrackColour(bool isEnabled = true,
+                                          ColourSet colourSet = ColourSet::k1) const override;
+        juce::Colour getSliderValueBarColour(bool isEnabled = true,
+                                             ColourSet colourSet = ColourSet::k1) const override;
+        juce::Colour getSliderTextColour(bool isEnabled = true,
+                                         ColourSet colourSet = ColourSet::k1) const override;
+        juce::Colour getComboBoxBackgroundColour(bool isEnabled = true,
+                                                 ColourSet colourSet = ColourSet::k1) const override;
+        juce::Colour getComboBoxBorderColour(bool isEnabled = true,
+                                             ColourSet colourSet = ColourSet::k1) const override;
+        juce::Colour getComboBoxFocusBorderColour(ColourSet colourSet = ColourSet::k1) const override;
+        juce::Colour getComboBoxTriangleColour(bool isEnabled = true,
+                                               ColourSet colourSet = ColourSet::k1) const override;
+        juce::Colour getComboBoxTextColour(bool isEnabled = true,
+                                           ColourSet colourSet = ColourSet::k1) const override;
+        juce::Colour getPopupMenuBackgroundColour(ColourSet colourSet = ColourSet::k1) const override;
+        juce::Colour getPopupMenuBorderColour(ColourSet colourSet = ColourSet::k1) const override;
+        juce::Colour getPopupMenuSeparatorColour(ColourSet colourSet = ColourSet::k1) const override;
+        juce::Colour getPopupMenuTextColour(ColourSet colourSet = ColourSet::k1) const override;
+        juce::Colour getPopupMenuBackgroundHooverColour(ColourSet colourSet = ColourSet::k1) const override;
+        juce::Colour getPopupMenuTextHooverColour(ColourSet colourSet = ColourSet::k1) const override;
+        juce::Colour getPopupMenuScrollbarColour(ColourSet colourSet = ColourSet::k1) const override;
 
     private:
         void initializeDefaultColours();
-
-        template <typename Accessor>
-        void initializeVariantColours(Accessor accessColour);
-
-        template <typename Accessor>
-        void initializePanelColours(Accessor accessColour);
-
-        template <typename Accessor>
-        void initializeLayoutColours(Accessor accessColour);
-
-        template <typename Accessor>
-        void initializeButtonColours(Accessor accessColour);
-
-        template <typename Accessor>
-        void initializeToggleColours(Accessor accessColour);
-
-        template <typename Accessor>
-        void initializeSliderColours(Accessor accessColour);
-
-        template <typename Accessor>
-        void initializeComboBoxColours(Accessor accessColour);
-
-        template <typename Accessor>
-        void initializePopupMenuColours(Accessor accessColour);
-
-        template <typename Accessor>
-        void initializeDisplayColours(Accessor accessColour);
-
-        template <typename Accessor>
-        void putColour(Accessor accessColour, const SkinColours::ColourElement& element);
 
         ColourVariant currentVariant_;
         std::map<SkinColourKey, juce::Colour> colours_;

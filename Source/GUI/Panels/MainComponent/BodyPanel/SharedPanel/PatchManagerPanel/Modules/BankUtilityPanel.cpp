@@ -318,7 +318,9 @@ TSS::ButtonLook BankUtilityPanel::makeCurrentBankMarkerLook() const
     if (skin_ == nullptr)
         return markerLook;
 
-    const auto focusColour = skin_->getColour(SkinObjectType::kNumberBox, SkinColourProperty::kText, SkinColourState::kFocus);
+    const auto focusColour = skin_->getColour(SkinObjectType::kNumberBox,
+                                              SkinColourProperty::kText,
+                                              SkinColourState::kFocus);
 
     markerLook.textOff = focusColour;
     markerLook.textOn = focusColour;

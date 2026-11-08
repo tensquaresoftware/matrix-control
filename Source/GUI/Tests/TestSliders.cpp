@@ -42,7 +42,7 @@ public:
             dimensions_.bottomSliderWidth,
             dimensions_.scaleLabelHeight,
             looks.label,
-            scaleLabelText);
+            TSS::LabelConfig{ .text = scaleLabelText });
         addAndMakeVisible(*scaleLabel_);
 
         firstSlider_ = createSlider(dimensions_.topSliderWidth, dimensions_.topSliderHeight, looks.slider,

@@ -21,12 +21,10 @@
 void PluginEditor::createUiShell()
 {
     skinBlack_ = TSS::Skin::create(TSS::Skin::ColourVariant::Black);
+    skinBlackDuo_ = TSS::Skin::create(TSS::Skin::ColourVariant::BlackDuo);
     skinCream_ = TSS::Skin::create(TSS::Skin::ColourVariant::Cream);
 
-    const int savedSkinId = pluginProcessor.getSkinVariantId();
-    skin_ = (savedSkinId == PluginIDs::Settings::SkinVariants::kCream)
-        ? skinCream_.get()
-        : skinBlack_.get();
+    skin_ = skinForVariantId(pluginProcessor.getSkinVariantId());
 
     widgetFactory_ = std::make_unique<WidgetFactory>(pluginProcessor.getApvts());
     layoutDimensions_ = WidgetFactory::buildGuiLayoutDimensions();

@@ -4,6 +4,7 @@
 #include "HeaderPanel.h"
 
 #include "GUI/Looks/LookBuilders.h"
+#include "GUI/Skins/SkinValues.h"
 
 void HeaderPanel::wireLogoCallbacks()
 {
@@ -101,14 +102,14 @@ void HeaderPanel::setSkin(TSS::ISkin& skin)
 {
     skin_ = &skin;
     logo_.setSkin(skin);
-    keyboardFromLabel_.setLook(TSS::darkPanelLabelLookFromSkin(skin));
-    midiFromLabel_.setLook(TSS::darkPanelLabelLookFromSkin(skin));
-    midiToLabel_.setLook(TSS::darkPanelLabelLookFromSkin(skin));
+    keyboardFromLabel_.setLook(TSS::chromeTextLabelLookFromSkin(skin));
+    midiFromLabel_.setLook(TSS::chromeTextLabelLookFromSkin(skin));
+    midiToLabel_.setLook(TSS::chromeTextLabelLookFromSkin(skin));
     editorActivityLed_.setSkin(skin);
     midiToActivityLed_.setSkin(skin);
     instrumentActivityLed_.setSkin(skin);
-    inputGainLabel_.setLook(TSS::darkPanelLabelLookFromSkin(skin));
-    inputGainSlider_.setLook(TSS::sliderLookFromSkin(skin));
+    inputGainLabel_.setLook(TSS::chromeTextLabelLookFromSkin(skin));
+    inputGainSlider_.setLook(TSS::sliderLookForZone(skin, TSS::SkinZone::kHeader));
     peakIndicator_.setSkin(skin);
     undoButton_.setLook(TSS::buttonLookFromSkin(skin));
     redoButton_.setLook(TSS::buttonLookFromSkin(skin));

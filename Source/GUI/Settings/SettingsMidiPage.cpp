@@ -4,9 +4,15 @@
 #include "GUI/Helpers/MidiPortComboPopulation.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Looks/LookBuilders.h"
+#include "GUI/Skins/SkinValues.h"
 #include "GUI/Settings/SettingsShellMetrics.h"
 #include "GUI/Skins/ISkin.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
+
+namespace
+{
+    constexpr auto kModalesLedColourSet_ = TSS::zoneColourSet(TSS::SkinObjectType::kLed, TSS::SkinZone::kModales);
+}
 
 SettingsMidiPage::SettingsMidiPage(Config config)
     : config_(std::move(config))
@@ -32,21 +38,24 @@ void SettingsMidiPage::buildWidgets()
     keyboardFromLabel_ = makeLabel(*skin_, PluginDisplayNames::Settings::kKeyboardFromLabel);
     keyboardFromCombo_ = makeCombo(*skin_);
     keyboardFromLed_ = std::make_unique<TSS::Led>(SettingsShellMetrics::kPeakWidth,
-                                                  SettingsShellMetrics::kPeakWidth);
+                                                  SettingsShellMetrics::kPeakWidth,
+                                                  kModalesLedColourSet_);
     keyboardFromLed_->setSkin(*skin_);
     addAndMakeVisible(*keyboardFromLed_);
 
     synthFromLabel_ = makeLabel(*skin_, PluginDisplayNames::Settings::kSynthFromLabel);
     synthFromCombo_ = makeCombo(*skin_);
     synthFromLed_ = std::make_unique<TSS::Led>(SettingsShellMetrics::kPeakWidth,
-                                               SettingsShellMetrics::kPeakWidth);
+                                               SettingsShellMetrics::kPeakWidth,
+                                               kModalesLedColourSet_);
     synthFromLed_->setSkin(*skin_);
     addAndMakeVisible(*synthFromLed_);
 
     synthToLabel_ = makeLabel(*skin_, PluginDisplayNames::Settings::kSynthToLabel);
     synthToCombo_ = makeCombo(*skin_);
     synthToLed_ = std::make_unique<TSS::Led>(SettingsShellMetrics::kPeakWidth,
-                                             SettingsShellMetrics::kPeakWidth);
+                                             SettingsShellMetrics::kPeakWidth,
+                                             kModalesLedColourSet_);
     synthToLed_->setSkin(*skin_);
     addAndMakeVisible(*synthToLed_);
 }
@@ -78,17 +87,17 @@ void SettingsMidiPage::updateKeyboardFromVisibility()
 void SettingsMidiPage::setSkin(TSS::ISkin& skin)
 {
     skin_ = &skin;
-    keyboardFromLabel_->setLook(TSS::darkPanelLabelLookFromSkin(skin));
-    keyboardFromCombo_->setLook(TSS::comboBoxLookFromSkin(skin));
-    keyboardFromCombo_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
+    keyboardFromLabel_->setLook(TSS::chromeTextLabelLookFromSkin(skin));
+    keyboardFromCombo_->setLook(TSS::comboBoxLookForZone(skin, TSS::SkinZone::kModales));
+    keyboardFromCombo_->setPopupMenuLook(TSS::popupMenuLookForZone(skin, TSS::SkinZone::kModales));
     keyboardFromLed_->setSkin(skin);
-    synthFromLabel_->setLook(TSS::darkPanelLabelLookFromSkin(skin));
-    synthFromCombo_->setLook(TSS::comboBoxLookFromSkin(skin));
-    synthFromCombo_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
+    synthFromLabel_->setLook(TSS::chromeTextLabelLookFromSkin(skin));
+    synthFromCombo_->setLook(TSS::comboBoxLookForZone(skin, TSS::SkinZone::kModales));
+    synthFromCombo_->setPopupMenuLook(TSS::popupMenuLookForZone(skin, TSS::SkinZone::kModales));
     synthFromLed_->setSkin(skin);
-    synthToLabel_->setLook(TSS::darkPanelLabelLookFromSkin(skin));
-    synthToCombo_->setLook(TSS::comboBoxLookFromSkin(skin));
-    synthToCombo_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
+    synthToLabel_->setLook(TSS::chromeTextLabelLookFromSkin(skin));
+    synthToCombo_->setLook(TSS::comboBoxLookForZone(skin, TSS::SkinZone::kModales));
+    synthToCombo_->setPopupMenuLook(TSS::popupMenuLookForZone(skin, TSS::SkinZone::kModales));
     synthToLed_->setSkin(skin);
 }
 
@@ -247,8 +256,8 @@ std::unique_ptr<TSS::Label> SettingsMidiPage::makeLabel(TSS::ISkin& skin, const 
 {
     auto label = std::make_unique<TSS::Label>(SettingsShellMetrics::kLabelWidth,
                                               SettingsShellMetrics::kControlHeight,
-                                              TSS::darkPanelLabelLookFromSkin(skin),
-                                              text);
+                                              TSS::chromeTextLabelLookFromSkin(skin),
+                                              TSS::LabelConfig{ .text = text });
     addAndMakeVisible(*label);
     return label;
 }
@@ -257,9 +266,9 @@ std::unique_ptr<TSS::ComboBox> SettingsMidiPage::makeCombo(TSS::ISkin& skin)
 {
     auto combo = std::make_unique<TSS::ComboBox>(SettingsShellMetrics::kSynthFromComboWidth,
                                                  SettingsShellMetrics::kControlHeight,
-                                                 TSS::comboBoxLookFromSkin(skin),
-                                                 TSS::ComboBox::Style::ButtonLike);
-    combo->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
+                                                 TSS::comboBoxLookForZone(skin, TSS::SkinZone::kModales),
+                                                 TSS::ComboBox::PopupMode::Scrollable);
+    combo->setPopupMenuLook(TSS::popupMenuLookForZone(skin, TSS::SkinZone::kModales));
     combo->setUsesPortSentinelPopupChrome(true);
     combo->setUsesContentSizedPopupWidth(true);
     addAndMakeVisible(*combo);

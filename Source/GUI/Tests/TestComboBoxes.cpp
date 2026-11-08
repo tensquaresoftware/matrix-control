@@ -31,11 +31,11 @@ public:
             TestScaleColumns::kScaleLabelColumnDesignWidth,
             TestScaleColumns::kScaleLabelHeight,
             config.labelLook,
-            config.scaleLabelText);
+            TSS::LabelConfig{ .text = config.scaleLabelText });
         addAndMakeVisible(*scaleLabel_);
 
-        standardCombo_ = createComboBox(TSS::ComboBox::Style::Standard);
-        buttonLikeCombo_ = createComboBox(TSS::ComboBox::Style::ButtonLike);
+        multiColumnCombo_ = createComboBox(TSS::ComboBox::PopupMode::MultiColumn);
+        scrollableCombo_ = createComboBox(TSS::ComboBox::PopupMode::Scrollable);
     }
 
     int getScaledColumnWidth() const
@@ -65,14 +65,14 @@ public:
         const int secondComboY = firstComboY + scaledComboHeight + rowGap;
 
         scaleLabel_->setBounds(0, 0, scaledColumnWidth, TestScaleColumns::kScaleLabelHeight);
-        standardCombo_->setBounds(0, firstComboY, scaledComboWidth, scaledComboHeight);
-        buttonLikeCombo_->setBounds(0, secondComboY, scaledComboWidth, scaledComboHeight);
+        multiColumnCombo_->setBounds(0, firstComboY, scaledComboWidth, scaledComboHeight);
+        scrollableCombo_->setBounds(0, secondComboY, scaledComboWidth, scaledComboHeight);
     }
 
 private:
-    std::unique_ptr<TSS::ComboBox> createComboBox(TSS::ComboBox::Style style)
+    std::unique_ptr<TSS::ComboBox> createComboBox(TSS::ComboBox::PopupMode popupMode)
     {
-        auto combo = std::make_unique<TSS::ComboBox>(comboWidth_, comboHeight_, comboLook_, style);
+        auto combo = std::make_unique<TSS::ComboBox>(comboWidth_, comboHeight_, comboLook_, popupMode);
         combo->setPopupMenuLook(popupLook_);
         combo->setUiScale(scale_);
         combo->addItem("Option A", 1);
@@ -89,8 +89,8 @@ private:
     TSS::ComboBoxLook comboLook_ {};
     TSS::PopupMenuLook popupLook_ {};
     std::unique_ptr<TSS::Label> scaleLabel_;
-    std::unique_ptr<TSS::ComboBox> standardCombo_;
-    std::unique_ptr<TSS::ComboBox> buttonLikeCombo_;
+    std::unique_ptr<TSS::ComboBox> multiColumnCombo_;
+    std::unique_ptr<TSS::ComboBox> scrollableCombo_;
 };
 
 TestComboBoxes::TestComboBoxes(TSS::ISkin& skin)

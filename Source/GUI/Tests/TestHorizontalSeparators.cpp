@@ -9,23 +9,28 @@
 class TestHorizontalSeparators::HorizontalSeparatorScalePanel : public juce::Component
 {
 public:
-    HorizontalSeparatorScalePanel(float scale,
-                                  const juce::String& scaleLabelText,
-                                  const TSS::HorizontalSeparatorLook& separatorLook,
-                                  const TSS::LabelLook& labelLook,
-                                  int separatorWidth,
-                                  int separatorHeight)
-        : scale_(scale)
-        , separatorWidth_(separatorWidth)
-        , separatorHeight_(separatorHeight)
-        , columnLabelDesignWidth_(juce::jmax(separatorWidth, TestScaleColumns::kScaleLabelColumnDesignWidth))
-        , separatorLook_(separatorLook)
+    struct Config
+    {
+        float scale = 1.0f;
+        juce::String scaleLabelText;
+        const TSS::HorizontalSeparatorLook& separatorLook;
+        const TSS::LabelLook& labelLook;
+        int separatorWidth = 0;
+        int separatorHeight = 0;
+    };
+
+    explicit HorizontalSeparatorScalePanel(const Config& config)
+        : scale_(config.scale)
+        , separatorWidth_(config.separatorWidth)
+        , separatorHeight_(config.separatorHeight)
+        , columnLabelDesignWidth_(juce::jmax(config.separatorWidth, TestScaleColumns::kScaleLabelColumnDesignWidth))
+        , separatorLook_(config.separatorLook)
     {
         scaleLabel_ = std::make_unique<TSS::Label>(
             columnLabelDesignWidth_,
             TestScaleColumns::kScaleLabelHeight,
-            labelLook,
-            scaleLabelText);
+            config.labelLook,
+            TSS::LabelConfig{ .text = config.scaleLabelText });
         addAndMakeVisible(*scaleLabel_);
 
         separator_ = std::make_unique<TSS::HorizontalSeparator>(separatorWidth_, separatorHeight_, separatorLook_);
@@ -118,13 +123,13 @@ void TestHorizontalSeparators::rebuildPanels()
     columnPanels_.reserve(TestScaleColumns::kSpecs.size());
     for (const auto& spec : TestScaleColumns::kSpecs)
     {
-        auto panel = std::make_unique<HorizontalSeparatorScalePanel>(
-            spec.scale,
-            spec.label,
-            separatorLook,
-            labelLook,
-            separatorWidth_,
-            separatorHeight_);
+        auto panel = std::make_unique<HorizontalSeparatorScalePanel>(HorizontalSeparatorScalePanel::Config{
+            .scale = spec.scale,
+            .scaleLabelText = spec.label,
+            .separatorLook = separatorLook,
+            .labelLook = labelLook,
+            .separatorWidth = separatorWidth_,
+            .separatorHeight = separatorHeight_ });
         addAndMakeVisible(*panel);
         columnPanels_.push_back(std::move(panel));
     }

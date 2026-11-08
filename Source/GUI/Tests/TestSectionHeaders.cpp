@@ -9,22 +9,27 @@
 class TestSectionHeaders::SectionHeaderScalePanel : public juce::Component
 {
 public:
-    SectionHeaderScalePanel(float scale,
-                            const juce::String& scaleLabelText,
-                            const TSS::SectionHeaderLook& headerLook,
-                            const TSS::LabelLook& labelLook,
-                            int sectionHeaderWidth,
-                            int sectionHeaderHeight)
-        : scale_(scale)
-        , sectionHeaderWidth_(sectionHeaderWidth)
-        , sectionHeaderHeight_(sectionHeaderHeight)
-        , headerLook_(headerLook)
+    struct Config
+    {
+        float scale = 1.0f;
+        juce::String scaleLabelText;
+        const TSS::SectionHeaderLook& headerLook;
+        const TSS::LabelLook& labelLook;
+        int sectionHeaderWidth = 0;
+        int sectionHeaderHeight = 0;
+    };
+
+    explicit SectionHeaderScalePanel(const Config& config)
+        : scale_(config.scale)
+        , sectionHeaderWidth_(config.sectionHeaderWidth)
+        , sectionHeaderHeight_(config.sectionHeaderHeight)
+        , headerLook_(config.headerLook)
     {
         scaleLabel_ = std::make_unique<TSS::Label>(
             sectionHeaderWidth_,
             TestScaleColumns::kScaleLabelHeight,
-            labelLook,
-            scaleLabelText);
+            config.labelLook,
+            TSS::LabelConfig{ .text = config.scaleLabelText });
         addAndMakeVisible(*scaleLabel_);
 
         blueHeader_ = createHeader(TSS::SectionHeader::ColourVariant::Blue);
@@ -134,13 +139,13 @@ void TestSectionHeaders::rebuildPanels()
     columnPanels_.reserve(TestScaleColumns::kSpecs.size());
     for (const auto& spec : TestScaleColumns::kSpecs)
     {
-        auto panel = std::make_unique<SectionHeaderScalePanel>(
-            spec.scale,
-            spec.label,
-            headerLook,
-            labelLook,
-            sectionHeaderWidth_,
-            sectionHeaderHeight_);
+        auto panel = std::make_unique<SectionHeaderScalePanel>(SectionHeaderScalePanel::Config{
+            .scale = spec.scale,
+            .scaleLabelText = spec.label,
+            .headerLook = headerLook,
+            .labelLook = labelLook,
+            .sectionHeaderWidth = sectionHeaderWidth_,
+            .sectionHeaderHeight = sectionHeaderHeight_ });
         addAndMakeVisible(*panel);
         columnPanels_.push_back(std::move(panel));
     }

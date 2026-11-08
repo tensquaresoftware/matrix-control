@@ -58,7 +58,7 @@ void EpromTypePromptDialog::paint(juce::Graphics& g)
         .title = PluginDisplayNames::Dialogs::EpromTypePrompt::kTitle,
         .uiScale = uiScale_ });
 
-    g.setColour(skin_->getColour(SkinObjectType::kDarkPanel, SkinColourProperty::kText));
+    g.setColour(skin_->getColour(SkinObjectType::kChromeText, SkinColourProperty::kText));
     DialogMatrixHelpers::paintBodyText(g, layout.bodyFont, bodyText(), geometry.textArea);
     DialogMatrixHelpers::paintActionFooterSeparator({
         .g = g,

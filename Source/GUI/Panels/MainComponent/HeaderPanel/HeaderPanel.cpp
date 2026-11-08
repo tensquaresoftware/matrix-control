@@ -8,6 +8,7 @@
 #include "GUI/Skins/Skin.h"
 #include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Looks/LookBuilders.h"
+#include "GUI/Skins/SkinValues.h"
 #include "GUI/Helpers/InputGainSliderText.h"
 #include "Shared/Definitions/PluginAudioConstants.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
@@ -17,6 +18,10 @@ using TSS::SkinColourProperty;
 
 namespace
 {
+    constexpr auto kHeaderLedColourSet_ = TSS::zoneColourSet(SkinObjectType::kLed, TSS::SkinZone::kHeader);
+    constexpr auto kHeaderPeakColourSet_ = TSS::zoneColourSet(SkinObjectType::kPeakIndicator,
+                                                              TSS::SkinZone::kHeader);
+
     void dismissOpenHeaderLogoPopupMenus()
     {
         for (int i = juce::Component::getNumCurrentlyModalComponents(); --i >= 0;)
@@ -53,7 +58,7 @@ namespace
         g.setColour(cartoucheChrome);
         g.fillRect(args.badgeBounds);
 
-        auto look = TSS::darkPanelLabelLookFromSkin(*args.skin);
+        auto look = TSS::chromeTextLabelLookFromSkin(*args.skin);
         look.text = badgeTextColour;
         g.setColour(look.text);
         g.setFont(look.font.withHeight(look.font.getHeight() * args.uiScale).boldened());
@@ -82,30 +87,30 @@ HeaderPanel::HeaderPanel(TSS::ISkin& skin, const HeaderPanelDimensions& dimensio
     : dimensions_(dimensions)
     , skin_(&skin)
     , logo_(skin, dimensions.logoWidth, dimensions.logoHeight)
-    , instrumentActivityLed_(dimensions.ledSize, dimensions.ledSize)
+    , instrumentActivityLed_(dimensions.ledSize, dimensions.ledSize, kHeaderLedColourSet_)
     , keyboardFromLabel_(dimensions.fromKeyboardLabelWidth,
                          dimensions.controlHeight,
-                         TSS::darkPanelLabelLookFromSkin(skin),
-                         PluginDisplayNames::HeaderPanel::kFromKeyboardLabel)
-    , editorActivityLed_(dimensions.ledSize, dimensions.ledSize)
+                         TSS::chromeTextLabelLookFromSkin(skin),
+                         TSS::LabelConfig{ .text = PluginDisplayNames::HeaderPanel::kFromKeyboardLabel })
+    , editorActivityLed_(dimensions.ledSize, dimensions.ledSize, kHeaderLedColourSet_)
     , midiFromLabel_(dimensions.fromSynthLabelWidth,
                      dimensions.controlHeight,
-                     TSS::darkPanelLabelLookFromSkin(skin),
-                     PluginDisplayNames::HeaderPanel::kFromSynthLabel)
-    , midiToActivityLed_(dimensions.ledSize, dimensions.ledSize)
+                     TSS::chromeTextLabelLookFromSkin(skin),
+                     TSS::LabelConfig{ .text = PluginDisplayNames::HeaderPanel::kFromSynthLabel })
+    , midiToActivityLed_(dimensions.ledSize, dimensions.ledSize, kHeaderLedColourSet_)
     , midiToLabel_(dimensions.toSynthLabelWidth,
                    dimensions.controlHeight,
-                   TSS::darkPanelLabelLookFromSkin(skin),
-                   PluginDisplayNames::HeaderPanel::kToSynthLabel)
+                   TSS::chromeTextLabelLookFromSkin(skin),
+                   TSS::LabelConfig{ .text = PluginDisplayNames::HeaderPanel::kToSynthLabel })
     , inputGainLabel_(dimensions.inputGainLabelWidth,
                       dimensions.controlHeight,
-                      TSS::darkPanelLabelLookFromSkin(skin),
-                      PluginDisplayNames::HeaderPanel::kInputGainLabel)
+                      TSS::chromeTextLabelLookFromSkin(skin),
+                      TSS::LabelConfig{ .text = PluginDisplayNames::HeaderPanel::kInputGainLabel })
     , inputGainSlider_(dimensions.inputGainSliderWidth,
                        dimensions.controlHeight,
-                       TSS::sliderLookFromSkin(skin),
+                       TSS::sliderLookForZone(skin, TSS::SkinZone::kHeader),
                        TSS::makeInputGainSliderConfig())
-    , peakIndicator_(dimensions.peakIndicatorWidth, dimensions.controlHeight)
+    , peakIndicator_(dimensions.peakIndicatorWidth, dimensions.controlHeight, kHeaderPeakColourSet_)
     , undoButton_(dimensions.undoButtonWidth,
                   dimensions.controlHeight,
                   TSS::buttonLookFromSkin(skin),

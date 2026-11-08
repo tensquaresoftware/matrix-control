@@ -13,26 +13,36 @@ namespace TSS
 
         virtual juce::Colour getColour(SkinObjectType object,
                                        SkinColourProperty property,
-                                       SkinColourState state = SkinColourState::kDefault) const = 0;
+                                       SkinColourState state = SkinColourState::kDefault,
+                                       ColourSet colourSet = ColourSet::k1) const = 0;
         virtual juce::Colour getColour(SkinColourKey key) const = 0;
         virtual void setColour(SkinColourKey key, juce::Colour colour) = 0;
 
-        virtual juce::Colour getToggleBackgroundColour(bool isOn) const = 0;
-        virtual juce::Colour getToggleTextColour(bool isOn) const = 0;
-        virtual juce::Colour getSliderTrackColour(bool isEnabled = true) const = 0;
-        virtual juce::Colour getSliderValueBarColour(bool isEnabled = true) const = 0;
-        virtual juce::Colour getSliderTextColour(bool isEnabled = true) const = 0;
-        virtual juce::Colour getComboBoxBackgroundColour(bool isEnabled = true, bool isButtonLike = false) const = 0;
-        virtual juce::Colour getComboBoxBorderColour(bool isEnabled = true, bool isButtonLike = false) const = 0;
-        virtual juce::Colour getComboBoxFocusBorderColour(bool isButtonLike = false) const = 0;
-        virtual juce::Colour getComboBoxTriangleColour(bool isEnabled = true, bool isButtonLike = false) const = 0;
-        virtual juce::Colour getComboBoxTextColour(bool isEnabled = true, bool isButtonLike = false) const = 0;
-        virtual juce::Colour getPopupMenuBackgroundColour(bool isButtonLike = false) const = 0;
-        virtual juce::Colour getPopupMenuBorderColour(bool isButtonLike = false) const = 0;
-        virtual juce::Colour getPopupMenuSeparatorColour(bool isButtonLike = false) const = 0;
-        virtual juce::Colour getPopupMenuTextColour(bool isButtonLike = false) const = 0;
-        virtual juce::Colour getPopupMenuBackgroundHooverColour(bool isButtonLike = false) const = 0;
-        virtual juce::Colour getPopupMenuTextHooverColour(bool isButtonLike = false) const = 0;
-        virtual juce::Colour getPopupMenuScrollbarColour(bool isButtonLike = false) const = 0;
+        virtual juce::Colour getToggleBackgroundColour(bool isOn,
+                                                       ColourSet colourSet = ColourSet::k1) const = 0;
+        virtual juce::Colour getToggleTextColour(bool isOn,
+                                                 ColourSet colourSet = ColourSet::k1) const = 0;
+        virtual juce::Colour getSliderTrackColour(bool isEnabled = true,
+                                                  ColourSet colourSet = ColourSet::k1) const = 0;
+        virtual juce::Colour getSliderValueBarColour(bool isEnabled = true,
+                                                     ColourSet colourSet = ColourSet::k1) const = 0;
+        virtual juce::Colour getSliderTextColour(bool isEnabled = true,
+                                                 ColourSet colourSet = ColourSet::k1) const = 0;
+        virtual juce::Colour getComboBoxBackgroundColour(bool isEnabled = true,
+                                                         ColourSet colourSet = ColourSet::k1) const = 0;
+        virtual juce::Colour getComboBoxBorderColour(bool isEnabled = true,
+                                                     ColourSet colourSet = ColourSet::k1) const = 0;
+        virtual juce::Colour getComboBoxFocusBorderColour(ColourSet colourSet = ColourSet::k1) const = 0;
+        virtual juce::Colour getComboBoxTriangleColour(bool isEnabled = true,
+                                                       ColourSet colourSet = ColourSet::k1) const = 0;
+        virtual juce::Colour getComboBoxTextColour(bool isEnabled = true,
+                                                   ColourSet colourSet = ColourSet::k1) const = 0;
+        virtual juce::Colour getPopupMenuBackgroundColour(ColourSet colourSet = ColourSet::k1) const = 0;
+        virtual juce::Colour getPopupMenuBorderColour(ColourSet colourSet = ColourSet::k1) const = 0;
+        virtual juce::Colour getPopupMenuSeparatorColour(ColourSet colourSet = ColourSet::k1) const = 0;
+        virtual juce::Colour getPopupMenuTextColour(ColourSet colourSet = ColourSet::k1) const = 0;
+        virtual juce::Colour getPopupMenuBackgroundHooverColour(ColourSet colourSet = ColourSet::k1) const = 0;
+        virtual juce::Colour getPopupMenuTextHooverColour(ColourSet colourSet = ColourSet::k1) const = 0;
+        virtual juce::Colour getPopupMenuScrollbarColour(ColourSet colourSet = ColourSet::k1) const = 0;
     };
 }

@@ -122,7 +122,7 @@ PluginEditor::~PluginEditor()
 
 void PluginEditor::paint(juce::Graphics& g)
 {
-    g.fillAll(skin_->getColour(SkinObjectType::kHeaderPanel, SkinColourProperty::kBackground));
+    g.fillAll(skin_->getColour(SkinObjectType::kWindowSurface, SkinColourProperty::kBackground));
 }
 
 void PluginEditor::resized()

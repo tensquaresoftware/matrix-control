@@ -7,8 +7,6 @@
 #include "HierarchicalComboBox.h"
 #include "PopupMenuPositioner.h"
 
-#include "GUI/Layout/ScaledDrawing.h"
-
 namespace TSS
 {
     void HierarchicalPopupMenu::ensurePrimaryScrollBar()
@@ -17,11 +15,8 @@ namespace TSS
             return;
 
         const auto& popupLook = owner_.getPopupMenuLook();
-        const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(owner_);
-        const float thumbInset = static_cast<float>(ScaledDrawing::logicalInsetPixelsFromDesign(
-            kThumbInsetBase_,
-            uiScale_,
-            systemDisplayScale));
+        const float thumbInset = PopupMenuCustomScrollBar::thumbInsetLogicalPixels(
+            kThumbInsetBase_, uiScale_);
 
         primaryScrollModel_ = std::make_unique<CallbackPopupMenuScrollModel>(
             [this]() {
@@ -54,11 +49,8 @@ namespace TSS
             return;
 
         const auto& popupLook = owner_.getPopupMenuLook();
-        const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(owner_);
-        const float thumbInset = static_cast<float>(ScaledDrawing::logicalInsetPixelsFromDesign(
-            kThumbInsetBase_,
-            uiScale_,
-            systemDisplayScale));
+        const float thumbInset = PopupMenuCustomScrollBar::thumbInsetLogicalPixels(
+            kThumbInsetBase_, uiScale_);
 
         secondaryScrollModel_ = std::make_unique<CallbackPopupMenuScrollModel>(
             [this]() {

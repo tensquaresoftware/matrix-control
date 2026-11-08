@@ -5,21 +5,25 @@
 
 #include "Core/Audio/HardwareLatency.h"
 #include "GUI/Looks/LookBuilders.h"
+#include "GUI/Skins/SkinValues.h"
 #include "GUI/Skins/ISkin.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginIDs.h"
 
 std::unique_ptr<TSS::Label> SettingsPanel::makeLabel(TSS::ISkin& skin, int width, const juce::String& text)
 {
-    return std::make_unique<TSS::Label>(width, kControlHeight_, TSS::labelLookFromSkin(skin), text);
+    return std::make_unique<TSS::Label>(width,
+                                        kControlHeight_,
+                                        TSS::labelLookFromSkin(skin),
+                                        TSS::LabelConfig{ .text = text });
 }
 
 std::unique_ptr<TSS::ComboBox> SettingsPanel::makeCombo(TSS::ISkin& skin, int width)
 {
     return std::make_unique<TSS::ComboBox>(width,
                                            kControlHeight_,
-                                           TSS::comboBoxLookFromSkin(skin),
-                                           TSS::ComboBox::Style::ButtonLike);
+                                           TSS::comboBoxLookForZone(skin, TSS::SkinZone::kModales),
+                                           TSS::ComboBox::PopupMode::Scrollable);
 }
 
 std::unique_ptr<TSS::Button> SettingsPanel::makeButton(TSS::ISkin& skin, int width, const juce::String& text)
@@ -71,7 +75,7 @@ void SettingsPanel::setupDeviceSection(TSS::ISkin& skin)
     hardwareLatencySlider_ = std::make_unique<TSS::Slider>(
         kSliderWidth_,
         kControlHeight_,
-        TSS::sliderLookButtonLikeFromSkin(skin),
+        TSS::sliderLookForZone(skin, TSS::SkinZone::kModales),
         TSS::SliderConfig{
             .minValue = Core::HardwareLatency::kMinMs,
             .maxValue = Core::HardwareLatency::kMaxMs,
@@ -173,6 +177,7 @@ void SettingsPanel::populateComboItems()
 
     using namespace PluginIDs::Settings::SkinVariants;
     skinCombo_->addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kBlack, kBlack);
+    skinCombo_->addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kBlackDuo, kBlackDuo);
     skinCombo_->addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kCream, kCream);
 
     using namespace PluginIDs::Settings::InfoMessage;
@@ -219,7 +224,7 @@ void SettingsPanel::populateComboItems()
 
 void SettingsPanel::applyComboPopupLooks(TSS::ISkin& skin)
 {
-    const auto popupLook = TSS::popupMenuLookFromSkin(skin);
+    const auto popupLook = TSS::popupMenuLookForZone(skin, TSS::SkinZone::kModales);
     uiScaleCombo_->setPopupMenuLook(popupLook);
     skinCombo_->setPopupMenuLook(popupLook);
     infoMessageCombo_->setPopupMenuLook(popupLook);
@@ -236,7 +241,7 @@ void SettingsPanel::applyComboPopupLooks(TSS::ISkin& skin)
 void SettingsPanel::applyChildLooks(TSS::ISkin& skin)
 {
     const auto labelLook = TSS::labelLookFromSkin(skin);
-    const auto comboLook = TSS::comboBoxLookFromSkin(skin);
+    const auto comboLook = TSS::comboBoxLookForZone(skin, TSS::SkinZone::kModales);
     const auto buttonLook = TSS::buttonLookFromSkin(skin);
 
     uiScaleLabel_->setLook(labelLook);
@@ -257,7 +262,7 @@ void SettingsPanel::applyChildLooks(TSS::ISkin& skin)
     presenceCheckLabel_->setLook(labelLook);
     presenceCheckCombo_->setLook(comboLook);
     hardwareLatencyLabel_->setLook(labelLook);
-    hardwareLatencySlider_->setLook(TSS::sliderLookButtonLikeFromSkin(skin));
+    hardwareLatencySlider_->setLook(TSS::sliderLookForZone(skin, TSS::SkinZone::kModales));
     epromTypeLabel_->setLook(labelLook);
     epromTypeCombo_->setLook(comboLook);
 

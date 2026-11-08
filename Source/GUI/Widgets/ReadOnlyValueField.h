@@ -3,8 +3,11 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 
 #include "GUI/Skins/ISkin.h"
+#include "GUI/Skins/SkinValues.h"
 
 class SkinColourSubstrateTests;
+class SkinColourWiringTests;
+class SkinColourWiringCoverageTests;
 
 namespace TSS
 {
@@ -12,11 +15,22 @@ namespace TSS
     class ReadOnlyValueField : public juce::Component
     {
     public:
-        explicit ReadOnlyValueField(ISkin& skin)
+        explicit ReadOnlyValueField(ISkin& skin, ColourSet colourSet = ColourSet::k1)
             : skin_(&skin)
+            , colourSet_(colourSet)
         {
             setInterceptsMouseClicks(false, false);
             applyDefaultColoursFromSkin();
+        }
+
+        void setColourSet(ColourSet colourSet)
+        {
+            if (colourSet_ == colourSet)
+                return;
+
+            colourSet_ = colourSet;
+            applyDefaultColoursFromSkin();
+            repaint();
         }
 
         void setSkin(ISkin& skin)
@@ -25,6 +39,8 @@ namespace TSS
             applyDefaultColoursFromSkin();
             repaint();
         }
+
+        ColourSet getColourSet() const noexcept { return colourSet_; }
 
         void setUiScale(float uiScale)
         {
@@ -68,17 +84,26 @@ namespace TSS
 
     private:
         friend class ::SkinColourSubstrateTests;
+        friend class ::SkinColourWiringTests;
+        friend class ::SkinColourWiringCoverageTests;
 
         void applyDefaultColoursFromSkin()
         {
             if (skin_ == nullptr)
                 return;
 
-            fill_ = skin_->getColour(SkinObjectType::kReadOnlyValueField, SkinColourProperty::kBackground);
-            textColour_ = skin_->getColour(SkinObjectType::kReadOnlyValueField, SkinColourProperty::kText);
+            fill_ = skin_->getColour(SkinObjectType::kReadOnlyValueField,
+                                     SkinColourProperty::kBackground,
+                                     SkinColourState::kDefault,
+                                     colourSet_);
+            textColour_ = skin_->getColour(SkinObjectType::kReadOnlyValueField,
+                                           SkinColourProperty::kText,
+                                           SkinColourState::kDefault,
+                                           colourSet_);
         }
 
         ISkin* skin_ = nullptr;
+        ColourSet colourSet_ = ColourSet::k1;
         juce::String text_;
         juce::Colour fill_{};
         juce::Colour textColour_{};

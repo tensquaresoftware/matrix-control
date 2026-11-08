@@ -43,19 +43,22 @@ EpromTypePromptDialog::EpromTypePromptDialog(TSS::ISkin& skin, std::function<voi
 
 void EpromTypePromptDialog::buildControls(TSS::ISkin& skin)
 {
-    const auto comboStyle = TSS::ComboBox::Style::ButtonLike;
+    const auto popupMode = TSS::ComboBox::PopupMode::Scrollable;
     const auto labelLook = TSS::labelLookFromSkin(skin);
-    const auto comboLook = TSS::comboBoxLookFromSkin(skin);
-    const auto popupLook = TSS::popupMenuLookFromSkin(skin);
+    const auto comboLook = TSS::comboBoxLookForZone(skin, TSS::SkinZone::kModales);
+    const auto popupLook = TSS::popupMenuLookForZone(skin, TSS::SkinZone::kModales);
 
     auto makeLabel = [&](const char* text)
     {
-        return std::make_unique<TSS::Label>(kLabelWidth_, kControlHeight_, labelLook, text);
+        return std::make_unique<TSS::Label>(kLabelWidth_,
+                                            kControlHeight_,
+                                            labelLook,
+                                            TSS::LabelConfig{ .text = text });
     };
     auto makeCombo = [&]()
     {
         auto combo = std::make_unique<TSS::ComboBox>(
-            kComboWidth_, kControlHeight_, comboLook, comboStyle);
+            kComboWidth_, kControlHeight_, comboLook, popupMode);
         combo->setPopupMenuLook(popupLook);
         return combo;
     };
@@ -197,16 +200,16 @@ void EpromTypePromptDialog::setSkin(TSS::ISkin& skin)
 {
     skin_ = &skin;
     midiFromLabel_->setLook(TSS::labelLookFromSkin(skin));
-    midiFromCombo_->setLook(TSS::comboBoxLookFromSkin(skin));
-    midiFromCombo_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
+    midiFromCombo_->setLook(TSS::comboBoxLookForZone(skin, TSS::SkinZone::kModales));
+    midiFromCombo_->setPopupMenuLook(TSS::popupMenuLookForZone(skin, TSS::SkinZone::kModales));
     midiToLabel_->setLook(TSS::labelLookFromSkin(skin));
-    midiToCombo_->setLook(TSS::comboBoxLookFromSkin(skin));
-    midiToCombo_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
+    midiToCombo_->setLook(TSS::comboBoxLookForZone(skin, TSS::SkinZone::kModales));
+    midiToCombo_->setPopupMenuLook(TSS::popupMenuLookForZone(skin, TSS::SkinZone::kModales));
     deviceLabel_->setLook(TSS::labelLookFromSkin(skin));
     deviceValueField_->setSkin(skin);
     epromTypeLabel_->setLook(TSS::labelLookFromSkin(skin));
-    epromTypeCombo_->setLook(TSS::comboBoxLookFromSkin(skin));
-    epromTypeCombo_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
+    epromTypeCombo_->setLook(TSS::comboBoxLookForZone(skin, TSS::SkinZone::kModales));
+    epromTypeCombo_->setPopupMenuLook(TSS::popupMenuLookForZone(skin, TSS::SkinZone::kModales));
     if (confirmButton_ != nullptr)
         DialogMatrixHelpers::applyButtonSkin(*confirmButton_, skin);
     if (specifyLaterButton_ != nullptr)
@@ -303,11 +306,19 @@ void EpromTypePromptDialog::refreshDeviceValueField()
     if (deviceValueField_ == nullptr || skin_ == nullptr)
         return;
 
-    const auto fill = skin_->getColour(SkinObjectType::kReadOnlyValueField, SkinColourProperty::kBackground);
-    const auto normalText = skin_->getColour(SkinObjectType::kReadOnlyValueField, SkinColourProperty::kText);
+    const auto colourSet = deviceValueField_->getColourSet();
+    const auto fill = skin_->getColour(SkinObjectType::kReadOnlyValueField,
+                                       SkinColourProperty::kBackground,
+                                       SkinColourState::kDefault,
+                                       colourSet);
+    const auto normalText = skin_->getColour(SkinObjectType::kReadOnlyValueField,
+                                             SkinColourProperty::kText,
+                                             SkinColourState::kDefault,
+                                             colourSet);
     const auto errorText = skin_->getColour(SkinObjectType::kReadOnlyValueField,
                                             SkinColourProperty::kText,
-                                            SkinColourState::kError);
+                                            SkinColourState::kError,
+                                            colourSet);
 
     if (deviceRowView_.kind == Core::DeviceSetupDeviceRowKind::kSearching)
     {

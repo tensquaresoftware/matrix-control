@@ -12,6 +12,12 @@ Montserrat
 Copyright 2011 The Montserrat Project Authors (https://github.com/JulietaUla/Montserrat),
 with Reserved Font Name: "Montserrat".
 
+Inter
+Copyright (c) 2016-2020 The Inter Project Authors (https://github.com/rsms/inter).
+
+JetBrains Mono
+Copyright 2020 The JetBrains Mono Project Authors (https://github.com/JetBrains/JetBrainsMono).
+
 This license is copied below, and is also available with a FAQ at:
 https://openfontlicense.org
 

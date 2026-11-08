@@ -1,0 +1,37 @@
+#pragma once
+
+#include "GUI/Skins/Dev/DevSkinJson.h"
+
+namespace TSS::DevSkin
+{
+    struct EditorSessionState
+    {
+        juce::String productSkinId = kCompiledBlackId;
+        juce::String editorSkinId;
+        /** Runtime only — never persisted; always Off after session load. */
+        bool compareOn = false;
+        /** Absolute path of last Export/Import parent folder (empty = Documents). */
+        juce::String lastSkinJsonDirectory;
+        /** Absolute path of last successful Import JSON (empty = no external-change watch). */
+        juce::String lastImportedJsonPath;
+        /** Last accepted disk fingerprint for lastImportedJsonPath (empty = legacy / unset). */
+        juce::String lastImportedJsonFingerprint;
+    };
+
+    /** Sets Product to first combo item (BLACK today). Call after session load to ignore restored Product. */
+    void forceProductToFirstAvailable(EditorSessionState& state);
+
+    juce::String exportSessionToJson(const Layer& layer, const EditorSessionState& state);
+    JsonIoResult importSessionFromJson(Layer& layer,
+                                       EditorSessionState& state,
+                                       const juce::String& jsonText);
+
+    /** Import session JSON; on failure reset layer to compiled Black/Cream baseline. */
+    JsonIoResult importSessionFromJsonOrReset(Layer& layer,
+                                              EditorSessionState& state,
+                                              const juce::String& jsonText);
+
+    juce::File skinEditorSessionFile();
+    bool saveSessionFile(const Layer& layer, const EditorSessionState& state, juce::String& error);
+    JsonIoResult loadSessionFile(Layer& layer, EditorSessionState& state);
+}

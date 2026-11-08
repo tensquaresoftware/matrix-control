@@ -2,6 +2,8 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
+#include "Shared/Definitions/PluginIDs.h"
+
 namespace TSS
 {
     /** Classification of Settings / UI Scale chrome shortcuts. */
@@ -147,7 +149,7 @@ namespace TSS
         Tolerates textCharacter == 0 (macOS clears it when Command is down).
         Accepts '=' and Shift+'=' / Shift+'+' as zoom-in peers of '+' (layouts without a dedicated + key).
         UI Scale reset also accepts the physical main-row "0" key on AZERTY/ISO (à / ò) and Cmd/Ctrl+Shift+0.
-        Skin selection uses Cmd/Ctrl+1..N for SkinVariants ids (1=Black, 2=Cream, …).
+        Skin selection uses Cmd/Ctrl+1..N in combo order (1=BLACK, 2=BLACK/DUO, 3=CREAM, …).
     */
     inline EditorChromeShortcut classifyEditorChromeShortcut(const juce::KeyPress& key)
     {
@@ -158,15 +160,28 @@ namespace TSS
         return EditorChromeShortcutDetail::classifyUiScaleShortcut(key);
     }
 
-    /** True when digit maps to a shipping skin id (1=Black, 2=Cream). Extend when adding skins. */
-    inline bool isAssignedSkinVariantId(int skinVariantId)
+    /** Maps shortcut digit (combo order) to SkinVariants id. Extend when adding skins. */
+    inline int skinVariantIdForShortcutDigit(int digit)
     {
-        return skinVariantId == 1 || skinVariantId == 2;
+        using namespace PluginIDs::Settings::SkinVariants;
+        switch (digit)
+        {
+            case 1: return kBlack;
+            case 2: return kBlackDuo;
+            case 3: return kCream;
+            default: return 0;
+        }
+    }
+
+    /** True when digit is assigned to a shipping skin in combo order. */
+    inline bool isAssignedSkinVariantShortcutDigit(int digit)
+    {
+        return skinVariantIdForShortcutDigit(digit) != 0;
     }
 
     /**
-        Returns SkinVariants id (1=Black, 2=Cream, …) for Cmd/Ctrl+digit, or 0 if none / unassigned.
-        Future skins keep using the next digit; bump isAssignedSkinVariantId when they ship.
+        Returns SkinVariants id for Cmd/Ctrl+digit in combo order, or 0 if none / unassigned.
+        Digits follow the product combo (1=BLACK, 2=BLACK/DUO, 3=CREAM); ids stay stable for prefs.
     */
     inline int classifySkinVariantShortcut(const juce::KeyPress& key)
     {
@@ -175,8 +190,8 @@ namespace TSS
             if (! EditorChromeShortcutDetail::matchesDigitShortcut(key, digit))
                 continue;
 
-            if (isAssignedSkinVariantId(digit))
-                return digit;
+            if (const int skinId = skinVariantIdForShortcutDigit(digit); skinId != 0)
+                return skinId;
         }
 
         return 0;

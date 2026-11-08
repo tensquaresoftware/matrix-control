@@ -13,15 +13,16 @@ namespace TSS
         static constexpr int kLeftPadding = 4;
         static constexpr int kRightPadding = 4;
         static constexpr int kBorderThickness = 1;
-        static constexpr int kBorderThicknessButtonLike = 2;
+        static constexpr int kBorderThicknessScrollable = 2;
         static constexpr int kTriangleBaseSize = 7;
         static constexpr float kTriangleHeightFactor = 0.8660254f;
     };
 
-    enum class ComboBoxControlStyle
+    /** Closed-face chrome: MultiColumn uses a focus ring; Scrollable always draws a thick border. */
+    enum class ComboBoxClosedChrome
     {
-        Standard,
-        ButtonLike
+        FocusRing,
+        AlwaysThickBorder
     };
 
     class ComboBoxControlPainter
@@ -31,7 +32,7 @@ namespace TSS
         {
             const juce::Component& component;
             juce::Rectangle<float> bounds;
-            ComboBoxControlStyle style = ComboBoxControlStyle::Standard;
+            ComboBoxClosedChrome closedChrome = ComboBoxClosedChrome::FocusRing;
             const ComboBoxLook& look;
             float uiScale = 1.0f;
             juce::String text;

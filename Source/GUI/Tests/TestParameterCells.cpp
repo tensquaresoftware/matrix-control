@@ -30,7 +30,7 @@ public:
             dimensions_.labelWidth + dimensions_.controlWidth,
             TestScaleColumns::kScaleLabelHeight,
             config.labelLook,
-            config.scaleLabelText);
+            TSS::LabelConfig{ .text = config.scaleLabelText });
         addAndMakeVisible(*scaleLabel_);
 
         sliderCell_ = std::make_unique<ParameterCell>(ParameterCell::Config{

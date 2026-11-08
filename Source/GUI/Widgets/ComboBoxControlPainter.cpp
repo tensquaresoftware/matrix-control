@@ -19,37 +19,30 @@ namespace TSS
             return path;
         }
 
-        juce::Colour textColourForStyle(ComboBoxControlStyle style, const ComboBoxLook& look, bool enabled)
+        juce::Colour textColour(const ComboBoxLook& look, bool enabled)
         {
-            if (style == ComboBoxControlStyle::ButtonLike)
-                return enabled ? look.buttonLikeText : look.buttonLikeTextDisabled;
-
             return enabled ? look.textEnabled : look.textDisabled;
         }
 
-        juce::Colour triangleColourForStyle(ComboBoxControlStyle style, const ComboBoxLook& look, bool enabled)
+        juce::Colour triangleColour(const ComboBoxLook& look, bool enabled)
         {
-            if (style == ComboBoxControlStyle::ButtonLike)
-                return enabled ? look.buttonLikeTriangle : look.buttonLikeTriangleDisabled;
-
             return enabled ? look.triangleEnabled : look.triangleDisabled;
         }
 
-        juce::Colour backgroundColourForStyle(ComboBoxControlStyle style, const ComboBoxLook& look, bool enabled)
+        juce::Colour backgroundColour(const ComboBoxLook& look, bool enabled)
         {
-            if (style == ComboBoxControlStyle::ButtonLike)
-                return enabled ? look.buttonLikeBackground : look.buttonLikeBackgroundDisabled;
-
             return enabled ? look.backgroundEnabled : look.backgroundDisabled;
         }
 
-        juce::Colour borderColourForStyle(ComboBoxControlStyle style, const ComboBoxLook& look, bool enabled)
+        juce::Colour borderColour(const ComboBoxLook& look,
+                                  bool enabled,
+                                  ComboBoxClosedChrome closedChrome)
         {
-            if (style == ComboBoxControlStyle::ButtonLike)
+            if (closedChrome == ComboBoxClosedChrome::AlwaysThickBorder)
             {
                 juce::ignoreUnused(enabled);
-                // Disabled border matches the enabled ButtonLike border.
-                return look.buttonLikeBorder;
+                // Disabled border matches the enabled Scrollable closed-face border.
+                return look.borderEnabled;
             }
 
             return enabled ? look.borderEnabled : look.borderDisabled;
@@ -71,15 +64,15 @@ namespace TSS
     void ComboBoxControlPainter::paintClosedState(juce::Graphics& g, const ClosedStateArgs& args)
     {
         const auto backgroundBounds = args.bounds;
-        g.setColour(backgroundColourForStyle(args.style, args.look, args.enabled));
+        g.setColour(backgroundColour(args.look, args.enabled));
         g.fillRect(backgroundBounds);
 
         const auto textBounds = calculateTextBounds(args.bounds, args.uiScale);
-        g.setColour(textColourForStyle(args.style, args.look, args.enabled));
+        g.setColour(textColour(args.look, args.enabled));
         g.setFont(args.look.font.withHeight(args.look.font.getHeight() * args.uiScale));
         g.drawText(args.text, textBounds, juce::Justification::centredLeft, false);
 
-        g.setColour(triangleColourForStyle(args.style, args.look, args.enabled));
+        g.setColour(triangleColour(args.look, args.enabled));
         const float triangleBaseSize = static_cast<float>(ComboBoxControlMetrics::kTriangleBaseSize) * args.uiScale;
         const float triangleHeight = triangleBaseSize * ComboBoxControlMetrics::kTriangleHeightFactor;
         const float rightPad = static_cast<float>(ComboBoxControlMetrics::kRightPadding) * args.uiScale;
@@ -89,14 +82,14 @@ namespace TSS
 
         const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(args.component);
 
-        if (args.style == ComboBoxControlStyle::ButtonLike)
+        if (args.closedChrome == ComboBoxClosedChrome::AlwaysThickBorder)
         {
             const float thickness = ScaledDrawing::snappedStrokeThicknessFromDesign(
-                static_cast<float>(ComboBoxControlMetrics::kBorderThicknessButtonLike),
+                static_cast<float>(ComboBoxControlMetrics::kBorderThicknessScrollable),
                 args.uiScale,
                 systemDisplayScale,
                 ScaledDrawing::StrokeSnapPolicy::kRound);
-            g.setColour(borderColourForStyle(args.style, args.look, args.enabled));
+            g.setColour(borderColour(args.look, args.enabled, args.closedChrome));
             g.drawRect(args.bounds, thickness);
             return;
         }

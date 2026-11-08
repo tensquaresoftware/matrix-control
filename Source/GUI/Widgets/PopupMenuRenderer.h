@@ -12,7 +12,7 @@ namespace TSS
     class PopupMenuRenderer
     {
     public:
-        PopupMenuRenderer(bool isButtonLike, float uiScale);
+        explicit PopupMenuRenderer(float uiScale);
 
         void setLook(const PopupMenuLook& look);
 
@@ -51,8 +51,15 @@ namespace TSS
         void drawSubMenuChevron(juce::Graphics& g,
                                 const juce::Rectangle<float>& itemBounds,
                                 const juce::Font& font) const;
-        void drawVerticalSeparators(juce::Graphics& g, const juce::Rectangle<float>& contentBounds,
-                                   int columnCount, float actualColumnWidth, float separatorWidth) const;
+        struct DrawVerticalSeparatorsArgs
+        {
+            juce::Rectangle<float> contentBounds;
+            int columnCount = 0;
+            float actualColumnWidth = 0.0f;
+            float separatorWidth = 0.0f;
+        };
+
+        void drawVerticalSeparators(juce::Graphics& g, const DrawVerticalSeparatorsArgs& args) const;
         /** Full-width rule on the bottom edge of a sentinel row (No Input / No Output). */
         void drawSentinelBottomRule(juce::Graphics& g,
                                     const juce::Rectangle<float>& itemBounds,
@@ -62,7 +69,6 @@ namespace TSS
         float getHighlightGap(float systemDisplayScale) const;
 
         PopupMenuLook look_{};
-        bool isButtonLike_;
         float uiScale_;
     };
 }

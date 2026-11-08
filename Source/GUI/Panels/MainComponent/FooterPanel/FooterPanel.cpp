@@ -364,7 +364,7 @@ juce::Colour FooterPanel::getSeverityColour(MessageSeverity severity) const
     switch (severity)
     {
         case MessageSeverity::None:
-            return skin_->getColour(SkinObjectType::kDarkPanel, SkinColourProperty::kText);
+            return skin_->getColour(SkinObjectType::kChromeText, SkinColourProperty::kText);
         case MessageSeverity::Info:
             return skin_->getColour(SkinObjectType::kFooterMessage, SkinColourProperty::kText, SkinColourState::kInfo);
         case MessageSeverity::Warning:
@@ -372,7 +372,7 @@ juce::Colour FooterPanel::getSeverityColour(MessageSeverity severity) const
         case MessageSeverity::Error:
             return skin_->getColour(SkinObjectType::kFooterMessage, SkinColourProperty::kText, SkinColourState::kError);
         default:
-            return skin_->getColour(SkinObjectType::kDarkPanel, SkinColourProperty::kText);
+            return skin_->getColour(SkinObjectType::kChromeText, SkinColourProperty::kText);
     }
 }
 

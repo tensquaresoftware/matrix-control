@@ -56,7 +56,7 @@ namespace TSS
 
     HierarchicalPopupMenu::HierarchicalPopupMenu(HierarchicalComboBox& owner)
         : owner_(owner)
-        , renderer_(false, owner.getUiScale())
+        , renderer_(owner.getUiScale())
         , uiScale_(owner.getUiScale())
         , cachedFont_(owner.getPopupMenuLook().font.withHeight(owner.getPopupMenuLook().font.getHeight() * uiScale_))
     {

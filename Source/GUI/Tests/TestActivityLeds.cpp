@@ -9,23 +9,28 @@
 class TestActivityLeds::ActivityLedScalePanel : public juce::Component
 {
 public:
-    ActivityLedScalePanel(float scale,
-                          const juce::String& scaleLabelText,
-                          TSS::ISkin& skin,
-                          const TSS::LabelLook& labelLook,
-                          int ledSize)
-        : scale_(scale)
-        , ledSize_(ledSize)
+    struct Config
+    {
+        float scale = 1.0f;
+        juce::String scaleLabelText;
+        TSS::ISkin& skin;
+        const TSS::LabelLook& labelLook;
+        int ledSize = 0;
+    };
+
+    explicit ActivityLedScalePanel(const Config& config)
+        : scale_(config.scale)
+        , ledSize_(config.ledSize)
     {
         scaleLabel_ = std::make_unique<TSS::Label>(
             TestScaleColumns::kScaleLabelColumnDesignWidth,
             TestScaleColumns::kScaleLabelHeight,
-            labelLook,
-            scaleLabelText);
+            config.labelLook,
+            TSS::LabelConfig{ .text = config.scaleLabelText });
         addAndMakeVisible(*scaleLabel_);
 
-        ledOff_ = createLed(skin, 0.0f);
-        ledOn_ = createLed(skin, 1.0f);
+        ledOff_ = createLed(config.skin, 0.0f);
+        ledOn_ = createLed(config.skin, 1.0f);
     }
 
     int getScaledColumnWidth() const
@@ -160,12 +165,12 @@ void TestActivityLeds::rebuildPanels()
     columnPanels_.reserve(TestScaleColumns::kSpecs.size());
     for (const auto& spec : TestScaleColumns::kSpecs)
     {
-        auto panel = std::make_unique<ActivityLedScalePanel>(
-            spec.scale,
-            spec.label,
-            *skin_,
-            labelLook,
-            ledSize_);
+        auto panel = std::make_unique<ActivityLedScalePanel>(ActivityLedScalePanel::Config{
+            .scale = spec.scale,
+            .scaleLabelText = spec.label,
+            .skin = *skin_,
+            .labelLook = labelLook,
+            .ledSize = ledSize_ });
         addAndMakeVisible(*panel);
         columnPanels_.push_back(std::move(panel));
     }

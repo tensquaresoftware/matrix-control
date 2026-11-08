@@ -37,7 +37,7 @@ private:
         void setLook(const TSS::LabelLook& look);
         void setSelected(bool isSelected);
         void setUiScale(float uiScale);
-        void setSelectedFill(juce::Colour fill, juce::Colour text);
+        void setSelectedFill(juce::Colour fill, juce::Colour textColour);
 
         void paintButton(juce::Graphics& g,
                          bool shouldDrawButtonAsHighlighted,

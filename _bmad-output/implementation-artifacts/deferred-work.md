@@ -1,5 +1,65 @@
 # Deferred Work
 
+## Deferred from: code review of spec-skin-editor-mappings-ergonomics.md (2026-11-03)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-ergonomics.md`
+  summary: After column filters reshape `objects_`, `focusedObject_` may still be in range but point at a different object table (outline highlights the wrong group). Build B only clamps when the index is out of range.
+  evidence: Edge Case Hunter; `rebuildRows` clears focus only when `focusedObject_ >= objects_.size()`; rebind-by-object-name would settle it.
+
+## Deferred from: review of spec-skin-editor-mappings-ergonomics.md (2026-11-03)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-ergonomics.md`
+  summary: No automated panel harness that left-click on a Mappings header sorts and right-click opens the filter menu (helper-only `headerGestureForClick` tests stay green if mouseUp wiring regresses).
+  evidence: Verification Gap; Matrix-Control_Tests does not drive SkinEditorMappingsPanel mouse handlers; manual header smoke remains the gate. (Reconfirmed in Build B + polish code review.)
+
+## Deferred from: review of spec-skin-editor-product-combo-first-skin.md (2026-11-01)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-product-combo-first-skin.md`
+  summary: No automated pin that Skin Editor `loadSessionOrBaseline` calls `forceProductToFirstAvailable` after session load (helper tests alone stay green if the call is removed).
+  evidence: Verification Gap + Blind Hunter load-fail/wiring gap; Matrix-Control_Tests does not link Skin Editor MainComponent; manual Cream→quit→relaunch smoke remains the gate.
+
+## Deferred from: oneshot review of spec-skin-editor-mappings-global-filter-reset.md (2026-11-01)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-global-filter-reset.md`
+  summary: No automated coverage for Mappings global clear-all filter badge (visibility, right-edge layout, mouse-up clears all four filters).
+  evidence: Blind Hunter; paint-only action-row hit target, same class of GUI chrome that prior Mappings filter stories left to manual smoke.
+
+## Deferred from: oneshot review of spec-skin-editor-mappings-filter-scroll-preserve.md (2026-11-01)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-filter-scroll-preserve.md`
+  summary: When column filters add or remove whole object groups above the watched table, absolute view-Y restore can still leave that table off-screen (or leave focus chrome scrolled away).
+  evidence: Blind Hunter; frozen oneshot Approach mirrors Palette absolute Y and forbids re-pinning to Object on filter; prove with Object-at-top then filter that collapses tables above, then consider anchoring delta to focused object sectionY when it remains in the filtered set.
+
+## Deferred from: code review of spec-skin-chrome-decorrelation.md (2026-11-01)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-chrome-decorrelation.md`
+  summary: Skin Editor Mappings focus-pad paint / rowIndexAtY / layoutContent alignment with rebuildRows is not unit-tested; pad fix relies on manual smoke.
+  evidence: Verification Gap; no Mappings panel harness in Tests/; one-pixel pad coherence is real but not worth a new panel fixture in this chrome rename.
+
+## Deferred from: review of spec-skin-chrome-decorrelation.md (2026-11-01)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-chrome-decorrelation.md`
+  summary: No unit pin that PluginEditor/MainComponent paint fillAll reads WindowSurface Background (seed distinctness alone stays green if fill reverts to HeaderPanel).
+  evidence: Verification-gap + Blind Hunter; repo does not unit-test editor paint paths; manual layout-gap smoke remains.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-chrome-decorrelation.md`
+  summary: No unit pin that Settings/About close buttons read Dialog Glyph (seed Glyph assert alone stays green if crossColour points elsewhere).
+  evidence: Verification-gap; close-button paint not covered by unit suite; manual Settings/About smoke remains.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-chrome-decorrelation.md`
+  summary: Import last-wins if a Dev JSON carries both legacy WindowClose/DarkPanel and new Dialog/ChromeText rows for the same key after remap.
+  evidence: Edge Case Hunter maybe-false; pre-existing mappings[key]= assignment; settle by crafting dual-row JSON fixture if authors hit it.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-chrome-decorrelation.md`
+  summary: Historical `_bmad-output` / agent notes may still name DarkPanel or WindowClose and mislead later work.
+  evidence: Blind Hunter; docs/agent-context outside this chrome rename blast radius.
+
+## Deferred from: code review of spec-skin-colourset-model-and-editor.md (2026-11-01)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-colourset-model-and-editor.md`
+  summary: GPC 3 must wire PeakIndicator and Led ColourSets independently; Dev skins that remapped Led no longer tint Peak after the object split.
+  evidence: Edge Case Hunter; intentional Led/Peak separation; product zone→set wiring is the next wave.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-colourset-model-and-editor.md`
+  summary: Seeded k1…k4 still share identical Black/Cream hues; Unbound/export only becomes painful once authors diverge sets for Duo.
+  evidence: Fresh ColourSet review; intentional mono seed until Duo wiring / distinct hues.
+
 ## Deferred from: code review of spec-linux-jack-device-apply.md (2026-10-30)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-linux-jack-device-apply.md`
@@ -2755,6 +2815,145 @@ Original review bullets below remain for history; status for U-10-owned residual
   evidence: External code review Verification Gap + Blind Hunter; already deferred in Build; CONVENTIONS forbid GUI paint unit tests; absolute Look/Skin pins are the hardening path.
 
 
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor.md`
+  summary: README / contributor docs do not yet document MATRIX_BUILD_SKIN_EDITOR, Skin Editor build, or Cursor compound launch.
+  evidence: Build review deferred discoverability; V1 done criteria covered by CMake comments, launch.json, and BMad artifacts.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor.md`
+  summary: check_skin_editor_packaging.py still assumes Ninja + local JUCE_DIR rather than every generator/CI shape.
+  evidence: Build review; Release presets OFF are guarded by pytest; full configure audit remains a local/optional script.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor.md`
+  summary: Rapid auto-push coalescing / revision gating on the thin bridge is unsettled for V1.
+  evidence: Review maybe-false; settle with manual rapid-edit soak if apply storms appear.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-ui-panels.md`
+  summary: SkinEditorMainComponent.cpp remains well above the ~400-line useful-file norm after panel extraction.
+  evidence: Build review defer; further split of session/quit/IO glue left for a follow-up.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-ui-panels.md`
+  summary: Mappings and Unbound panels each embed a near-identical askPastille modal helper.
+  evidence: Build review low DRY; extract shared chooser when a third caller appears.
+
+## Deferred from: code review (2026-10-24) — Skin Editor polish `dff5088d`
+
+- summary: Bind by Mapped-column click can overwrite without confirm (replaces old pastille dialog).
+  evidence: Intentional polish workflow; confirm step would be a product/scope change, not a correctness fix.
+- summary: Undo/Redo buttons stay disabled; shortcuts only show "not implemented yet".
+  evidence: Explicit placeholder for a dedicated history chantier in SkinEditorMainComponent.
+- summary: Cmd/Ctrl+Z may not reach keyPressed when a combo/list/editor holds focus.
+  evidence: setWantsKeyboardFocus(true) without grab/key listener; couple with Undo chantier.
+- summary: Full build copies Skin Editor twice (CopyToArtefactsDir + POST_BUILD); ALL path hard-codes artefacts layout vs TARGET_BUNDLE_DIR.
+  evidence: Dual path intentional for solo `--target`; unify later if a layout mismatch appears.
+- summary: Windows/Linux artefacts copy does not remove_directory/replace like macOS.
+  evidence: Primary authoring path is macOS; align when Windows/Linux Skin Editor packaging is exercised.
+- summary: Mappings refresh() always clears selectedRow_ after bind/session refresh.
+  evidence: UX annoyance, not data loss; preserve selection in a small follow-up if it bites in daily use.
+- summary: Clicking a Mappings section header leaves the previous mapping row highlighted.
+  evidence: Low everyday impact; clear selectedRow_ when non-mapping row is clicked if it confuses authors.
+- summary: No ON-path packaging test that Skin Editor still copies into Standalone artefacts when options are ON.
+  evidence: Verification Gap; OFF-graph audit exists; extend check_skin_editor_packaging when hardening packaging CI.
+- summary: No unit test that Skin Editor launch normalizes restored bounds (fixed width + title-bar-on-screen).
+  evidence: Verification Gap; Core StandaloneWindowPlacementTests cover helpers only; extract normalize helper when adding coverage.
+- summary: No unit test that empty Palette selection cannot call setMapping with "".
+  evidence: Verification Gap; UI guards exist today; Layer empty setMapping erases — worth a pin when touching bind again.
+
+- source_spec: `_bmad-output/specs/spec-skin-editor-clean-code-cleanup/stories/1-split-skineditorchrome-monolith.md`
+  summary: Extract shared private helper for duplicated count-badge width/clamp math in drawCountBadge and countBadgeWidth.
+  evidence: Pre-existed identically in the SkinEditorChrome monolith; Story 1 was move-only and did not introduce the duplication.
+
+- source_spec: `_bmad-output/specs/spec-skin-editor-clean-code-cleanup/stories/3-clarify-skineditormaincomponent-boundaries.md`
+  summary: SkinEditorLookAndFeel.h still includes the full Chrome umbrella, so MainComponent (and Session) keep transitive Panel/Table Chrome symbols despite story 3’s narrower direct includes.
+  evidence: Story 3 must not touch LookAndFeel (story 5); thinning LookAndFeel includes closes the remaining include-graph gap for H3.
+
+## Resolved at close-out (2026-10-24) — Skin Editor clean-code cleanup story 6
+
+- source_spec: `_bmad-output/specs/spec-skin-editor-clean-code-cleanup/stories/3-clarify-skineditormaincomponent-boundaries.md`
+  summary: RESOLVED by story 5 — SkinEditorLookAndFeel.h no longer includes the Chrome umbrella (juce_gui_basics only; Fonts include in .cpp).
+  evidence: Close-out CAP-7 reconciliation; see inventory.md residual table and story 5 Implementation Notes.
+
+- source_spec: `_bmad-output/specs/spec-skin-editor-clean-code-cleanup/stories/1-split-skineditorchrome-monolith.md`
+  summary: STILL DEFERRED — count-badge width/clamp DRY remains optional Boy Scout (explicit in close-out residual table; not a must-fix hotspot).
+  evidence: Confirmed still open at story 6; listed as defer in inventory.md § Close-out residual debt.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-hold-mapping-chrome.md`
+  summary: MainComponent bind vs re-arm orchestration (intent switch to applyMapping / enterHeldColour) is only covered indirectly by SkinEditorMappingModePolicy unit tests, not by a non-GUI driver of the MainComponent switches.
+  evidence: Verification-gap review; repo keeps Skin Editor GUI out of unit tests; Hold return-click remains a manual chrome check.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-chrome-session-skins.md`
+  summary: Skin Editor MainWindow min-width unlock (`windowMinWidth` constrainer) has no unit test in Matrix-Control_Tests.
+  evidence: Verification-gap review; GUI DocumentWindow shell is not linked into the unit runner; manual narrow-resize remains the AC check.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-chrome-session-skins.md`
+  summary: Mapping-band / body column placement (no Unbound half-split, witness only in nude band) is not asserted via component geometry tests.
+  evidence: Verification-gap review; project keeps Skin Editor GUI layout out of unit tests; Idle/Hold witness policy remains covered by MappingModePolicy + chrome token tests.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-chrome-session-skins.md`
+  summary: `kMinContentHeight` (480) may leave COLOR too short after adding mapping band + taller left SKINS stack.
+  evidence: Blind Hunter; needs live smoke at minimum height to confirm whether a higher floor is required.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-chrome-session-skins.md`
+  summary: `drawCountBadge` / count-badge tokens remain after Unbound panel deletion with no callers.
+  evidence: Edge Case Hunter; optional Boy Scout; count-badge DRY already deferred in Skin Editor clean-code close-out.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-chrome-session-skins.md`
+  summary: Companion Skin Editor clean-code inventory/docs still mention SkinEditorUnboundPanel as live.
+  evidence: Blind Hunter; documentation refresh outside this chrome restructure ship.
+
+## Deferred from: code review of spec-skin-editor-chrome-session-skins.md (2026-10-25)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-chrome-session-skins.md`
+  summary: Skin Editor shell/body geometry (MainWindow constrainer adoption, layoutBodyPanels / layoutOperationWell) is not unit-tested beyond token and policy helpers.
+  evidence: Verification Gap; project keeps Skin Editor GUI out of Matrix-Control_Tests; manual smoke remains.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-chrome-session-skins.md`
+  summary: `drawCountBadge` / count-badge tokens remain unused after Unbound panel deletion.
+  evidence: Edge Case Hunter; optional Boy Scout; already tracked in Skin Editor clean-code close-out residual.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-chrome-session-skins.md`
+  summary: On short displays, `skinEditorMinContentHeight` may exceed usable height; constrainer min is content-driven.
+  evidence: Edge Case Hunter; settle with live smoke on a short display / scaled desktop.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-logo-font-height-30px.md`
+  summary: Smoke-check header logo at 30 px font in the 32 px box across UI scales (fit, nudge, width vs neighbours).
+  evidence: Blind Hunter; font height ≠ ink height so clip/width risks are unverified without a live look; Intent kept box size unchanged.
+
+## Deferred from: review of spec-skin-editor-palette-add-pending.md (2026-10-27)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-palette-add-pending.md`
+  summary: Pending swatch paint / quiet Add selection / onAddPastille pending=true have no automated GUI checks.
+  evidence: Project unit pyramid keeps paint() and SkinEditorMainComponent actions out of suite; covered by manual Skin Editor verification.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-palette-add-pending.md`
+  summary: After Add, new pending pastille may sit off-screen until the author scrolls.
+  evidence: Polish only; not required for core Add/pending/rename behaviour.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-palette-add-pending.md`
+  summary: Colour collision still leaves the colour picker on the rejected colour; rename discoverability has no tooltip/hint.
+  evidence: Pre-existing picker UX shape and polish; out of this chantier's frozen chrome boundaries.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-edit-and-operation-copy.md`
+  summary: No panel-level test that Mapped-column mouseUp routes to edit and Property/State to bind.
+  evidence: Repo Skin Editor tests cover pure policy helpers only; Content::mouseUp is not in the test target.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-edit-and-operation-copy.md`
+  summary: No component test that onMappedColourClicked clears mapping mode and syncs Palette/COLOR/SV.
+  evidence: Main component mapping path is outside unit-test harness; policy enum coverage only.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-edit-and-operation-copy.md`
+  summary: No unit test for OPERATION witness prefixMax layout arithmetic.
+  evidence: layoutOperationWitness is private on SkinEditorMainComponent; chrome layout tests do not call it.
+
+## Deferred from: review of spec-skin-editor-empty-no-editor-skin.md (2026-10-27)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-empty-no-editor-skin.md`
+  summary: Compare can stay toggleable with no editor skin while Palette/Mappings stay empty.
+  evidence: Pre-existing session Compare chrome; emptying panels without an editor skin made the dead Compare path more visible but fixing it is a separate session-control change.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-empty-no-editor-skin.md`
+  summary: No unit test that empty editorSkinId yields empty Palette/Mappings coaching rows.
+  evidence: Repo Skin Editor tests cover pure policy/chrome helpers; panel rebuildRows empty states are GUI and out of the current harness.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-palette-duplicate-colour.md`
+  summary: COLOR / setPastilleArgb can still make two already-mapped pastilles share one ARGB, bypassing the bind-time SAME COLOUR guard.
+  evidence: Frozen intent allows same-ARGB on setPastilleArgb and only hard-blocks at mapping; refusing Color edits that create mapped twins needs an explicit product decision.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-palette-duplicate-colour.md`
+  summary: Same-ARGB mapped collision probe uses case-sensitive pastille name equality while add/rename uniqueness is case-insensitive.
+  evidence: Would settle with a fixture whose mapping string differs only by case from the palette entry; factory chart names stay exact-case today.
+
 ## Deferred from: spec-gh-36-m6r-master-discovery-fallback (2026-10-28)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-gh-36-m6r-master-discovery-fallback.md`
@@ -2817,3 +3016,217 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-env3-lfo1-trigger-gated-label.md`
   summary: Add a descriptor/unit check that ENV 1, ENV 2, and ENV 3 LFO 1 TRIGGER choice strings stay identical.
   evidence: Blind Hunter; ENV 3 drifted to a long one-off label once; out of oneshot footprint.
+
+## Deferred from: oneshot review of spec-skin-editor-product-session-persist.md (2026-10-30)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-product-session-persist.md`
+  summary: Add automated coverage for editor-dirty vs session-preference autosave and Discard rewrite keeping productSkinId.
+  evidence: Blind Hunter; current DevSkin session tests only JSON round-trip; manual smoke covers the bugfix.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-product-session-persist.md`
+  summary: Explicit post-baseline session rewrite after corrupt-session recovery (not only Cream in-memory fallback).
+  evidence: Blind Hunter; pre-existing load path; this fix only stopped accidental onChanged timer arming during load.
+
+## Deferred from: oneshot review of spec-skin-editor-mappings-unbound-badge.md (2026-10-30)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-unbound-badge.md`
+  summary: Extract shared clamp/width helpers for drawCountBadge / countBadgeWidth (capsule-pad naming cleanup optional).
+  evidence: Blind Hunter; pre-existing DRY note from Unbound panel removal; this change only recolored and rounded the orphan API.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-unbound-badge.md`
+  summary: Optional tooltip/coaching on Mappings Unbound witness tying the count to Export Unbound = 0.
+  evidence: Blind Hunter; mock has no tooltip; problem statement mentions Export opacity but label+badge may be enough.
+
+## Deferred from: review of spec-skin-editor-mappings-column-filters.md (2026-10-31)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-column-filters.md`
+  summary: Unit-test `setActiveSkinId` / `clearAllColumnFilters` wiring (PERSISTENCE) without a full Mappings panel harness.
+  evidence: Verification Gap; pure ActiveFilters empty-match tests do not exercise panel skin-id clear; manual skin-change remains on the checklist.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-column-filters.md`
+  summary: Disambiguate Mapped colour filter when a pastille is literally named Unbound versus unbound cells.
+  evidence: Edge Case Hunter; sentinel `Unbound` matches unbound rows only; a pastille named Unbound cannot be isolated separately (pathological rename).
+
+## Deferred from: code review of spec-skin-editor-mappings-column-filters.md (2026-10-31)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-column-filters.md`
+  summary: No automated coverage that a PopupMenu result after Editor skin-id change is ignored (`openedForSkinId` guard).
+  evidence: Verification Gap; pure column-filter tests still pass if the guard is removed; prefer a manual checklist line over a GUI harness.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-column-filters.md`
+  summary: Revalidate Mapped colour filter / open menu values when palette or mappings change while a filter is sticky or a menu is open (stale name → empty tables or black swatch path).
+  evidence: Blind + Edge; Clear badge and skin-id clear recover; not required by frozen AC.
+
+## Deferred from: review of spec-skin-editor-colour-picker-fine-control.md (2026-10-31)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-colour-picker-fine-control.md`
+  summary: Unit-test colour-gesture coalesce / sticky picker sync on MainComponent (timer + skip syncColourPickerToSelection while gesturing).
+  evidence: Verification Gap; needs Skin Editor GUI/timer harness; manual SV-drag AC remains the check for lag and sticky handle.
+
+## Deferred from: oneshot review of spec-skin-editor-mappings-descending-order.md (2026-11-01)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-descending-order.md`
+  summary: Add automated coverage for Object combo A-Z ordering and id-to-table-index jump (today covered by manual smoke only).
+  evidence: Blind Hunter; ComboBox wiring lives in SkinEditorMappingsPanel Component code; extracting a pure sort/id helper would expand beyond this display-order oneshot.
+
+## Deferred from: review of spec-unify-combobox-slider-buttonlike.md (2026-11-01)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-unify-combobox-slider-buttonlike.md`
+  summary: Factor the duplicated former-ButtonLike k4 overlay inventory shared by Skin.cpp and DevSkinSsotSeed.cpp.
+  evidence: Blind Hunter; both paths already reference the same ColourElement symbols, but the call lists can drift; extracting a shared helper adds surface beyond a trivial patch.
+- source_spec: `_bmad-output/implementation-artifacts/spec-unify-combobox-slider-buttonlike.md`
+  summary: Decide merge policy when a Dev JSON contains both classic and remapped *ButtonLike rows for the same key at k4 with different pastilles (last-write-wins today).
+  evidence: Edge Case Hunter; force-k4 remap stops wiping classic k1–k3; same-key collision at k4 remains rare for authored skins.
+- source_spec: `_bmad-output/implementation-artifacts/spec-unify-combobox-slider-buttonlike.md`
+  summary: Add a dedicated HeaderLogoPopupMenu k4 Look consumer test if panel/menu mounts become a project testing pattern.
+  evidence: Verification Gap; current coverage follows GPC 3 Look-builder/seed asserts without mounting the logo menu.
+
+## Deferred from: code review of spec-unify-combobox-slider-buttonlike.md (2026-11-01)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-unify-combobox-slider-buttonlike.md`
+  summary: Wiring coverage test named for Settings/Computer Patches only exercises Look builders invoked with k4 — it never constructs those panels; rename later or accept Look-builder pattern.
+  evidence: Verification Gap (second review pass after Retina scrollbar fix folded in).
+- source_spec: `_bmad-output/implementation-artifacts/spec-unify-combobox-slider-buttonlike.md`
+  summary: Refresh older Hardware Latency deferred-work bullets that still mention sliderLookButtonLikeFromSkin (API removed by this unify).
+  evidence: Blind Hunter; tracking hygiene only.
+
+## Deferred from: oneshot review of spec-skin-editor-product-duplicate-select.md (2026-11-01)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-product-duplicate-select.md`
+  summary: No unit test pins Product Duplicate push-after-session-id vs New/Editor Duplicate no-push ordering.
+  evidence: Blind Hunter; SkinEditorMainComponent has no headless harness; regression would need a new fixture.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-product-duplicate-select.md`
+  summary: runWithoutLayerChangeNotify still restores onChanged without RAII if action throws.
+  evidence: Blind Hunter; pre-existing helper; not introduced by this change.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-product-duplicate-select.md`
+  summary: onDelete (and similar mutators) can still fire onChanged while session editorSkinId is stale relative to the layer.
+  evidence: Blind Hunter; pre-existing ordering; out of Product Duplicate / New push-policy scope.
+
+## Deferred from: review of spec-skin-editor-progressbar-numberbox-caret.md (2026-11-03)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-progressbar-numberbox-caret.md`
+  summary: Slider blink caret still resolves from NumberBox EditorText after NumberBox gained its own Caret pastille.
+  evidence: Blind Hunter; frozen Build A Decision explicitly leaves Slider editorCaret retarget out of scope; NumberBox caret remap alone does not move Slider caret.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-progressbar-numberbox-caret.md`
+  summary: No automated pin that BankTransferProgressDialog paint requests ProgressBar at ColourSet k4 (seed/getColour tests stay green if dialog reverts to Slider).
+  evidence: Verification Gap; CONVENTIONS §8.5 forbids paint()/GUI unit tests; manual Bank Transfer smoke remains the adoption gate.
+
+## Deferred from: code review of spec-skin-editor-progressbar-numberbox-caret.md (2026-11-03)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-progressbar-numberbox-caret.md`
+  summary: No automated pin that BankTransferProgressDialog paint requests ProgressBar at ColourSet k4 (seed/getColour tests stay green if dialog reverts to Slider).
+  evidence: Blind Hunter + Verification Gap (dedicated code review); CONVENTIONS §8.5; manual Bank Transfer smoke remains the gate.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-progressbar-numberbox-caret.md`
+  summary: Slider blink caret still resolves from NumberBox EditorText after NumberBox gained its own Caret pastille.
+  evidence: Blind Hunter (dedicated code review); frozen Build A Decision; already deferred from build review.
+
+## Deferred from: review of spec-skin-editor-mappings-link.md (2026-11-03)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-link.md`
+  summary: No automated coverage that SkinEditorMainComponent::applyMapping calls propagateMappingToLinkPeers (and Hold retain) after a linked-row bind.
+  evidence: Verification Gap; Matrix-Control_Tests does not drive MainComponent mapping orchestration; Layer propagate + MappingModePolicy Hold tests + manual Recap §9 remain the gate.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-link.md`
+  summary: propagateMappingToLinkPeers does not transactionally roll back earlier peer writes when a later peer bind/set fails (group can be left with mixed pastilles).
+  evidence: Edge Case Hunter; early-return skips Hold retain after failure, but prior successful peer writes stay; full rollback would need Layer API design beyond this build's patch slice.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-link.md`
+  summary: alignGroupPastilles aborts mid-loop on writePastilleToKey failure after the link group is already committed, without rolling back the group or prior aligns.
+  evidence: Edge Case Hunter; same class of partial-write without transactional undo; manual smoke + alert path remain.
+
+## Deferred from: code review of spec-skin-editor-mappings-link.md (2026-11-04)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-link.md`
+  summary: Passage 1 reconfirmed — no automated MainComponent applyMapping→propagate(+Hold) co-coverage.
+  evidence: Verification Gap (chunked review passage 1); same gate as 2026-11-03 entry.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-link.md`
+  summary: Passage 1 reconfirmed — non-transactional peer/align writes (partial remap, writer kept, mid-align abort).
+  evidence: Edge Case Hunter (chunked review passage 1); still deferred pending Layer transaction API.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-link.md`
+  summary: Panel create/merge path does not assert alignGroupPastilles is invoked (pure winnerPastille helper is tested only).
+  evidence: Verification Gap (chunked review passage 1); panel orchestration outside current Skin Editor unit harness.
+
+## Deferred from: code review of spec-skin-editor-mappings-link.md (2026-11-05)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-link.md`
+  summary: Passage 2 — no automated Cmd/Shift multi-select, Shift-range, or preserve-or-clear panel harness for Mappings selection gestures.
+  evidence: Verification Gap (chunked review passage 2); Matrix-Control_Tests still does not drive SkinEditorMappingsPanel mouse handlers; manual selection smoke remains the gate.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-link.md`
+  summary: Passage 2 — Hold checkbox attention-yellow chrome (`LookAndFeel::drawToggleButton`) deferred to passage 3 (Hold jaune / codesign / csX / quality gate), not Link UI neighbourhood.
+  evidence: Acceptance Auditor (chunked review passage 2); user-scoped out of passage 2. **Implemented in passage 3** (`487a641d` / `3a280bd1`); remaining gap is automated paint pin (see 2026-11-05 passage-3 defer below).
+
+## Deferred from: code review of spec-skin-editor-mappings-link.md (2026-11-05, passage 3)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-link.md`
+  summary: Passage 3 — Hold checked attention-yellow chrome has no automated LookAndFeel/paint pin; suite can stay green if fill regresses to grey.
+  evidence: Verification Gap; CONVENTIONS / testing rules keep paint() out of unit tests; manual Skin Editor smoke remains the gate.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-mappings-link.md`
+  summary: Passage 3 — Skin Editor POST_BUILD codesign/xattr path not run in CI (`USER_COPY_TO_ARTEFACTS_DIR=OFF`); barred-icon fix can vanish locally without automated failure.
+  evidence: Verification Gap; closing needs local or optional CI smoke with artefacts copy enabled, not a Matrix-Control_Tests unit.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-external-json-reload.md`
+  summary: Unit tests and permanent missing-file UX for Skin Editor external JSON watch.
+  evidence: Blind Hunter oneshot review; deferred to keep the first ship small.
+
+## Deferred from: oneshot review of spec-skin-editor-launch-json-sync.md (2026-11-08)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-launch-json-sync.md`
+  summary: Launch diverge prompt has no 2-poll debounce (unlike live watch), so a mid-write Dropbox save at cold start could offer Reload on truncated JSON.
+  evidence: Blind Hunter; intentional immediate launch UX; rare race.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-launch-json-sync.md`
+  summary: Escape/close on Import-watch AlertWindow follows Discard (accepts disk fingerprint) with no Cancel that leaves the conflict unresolved.
+  evidence: Blind Hunter; shared live-watch AlertWindow result handling.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-launch-json-sync.md`
+  summary: Failed Reload still refreshes the watch fingerprint, so a refused parse is not re-prompted until the next disk change.
+  evidence: Blind Hunter; pre-existing refuse path from external-json-reload.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-launch-json-sync.md`
+  summary: No unit tests for launch fingerprint reconcile branches or session fingerprint persistence.
+  evidence: Blind Hunter; same Skin Editor MainComponent test gate as external-json-reload.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-launch-json-sync.md`
+  summary: Reload status message does not report skins removed by the reloaded JSON.
+  evidence: Blind Hunter; pre-existing reload status helper.
+
+## Deferred from: code review of spec-skin-editor-external-json-reload.md + spec-skin-editor-launch-json-sync.md (2026-11-08)
+- Esc/close on JSON Reload/Discard dialog acts as Discard (accept disk fingerprint) — confirmed product choice on 2026-11-08 review.
+
+- Reload status omits removed Editor skins (collectChangedEditorSkins / reloadStatusMessage only report surviving or new Dev skins).
+- Permanently missing watched Import JSON stays silent during live poll (transient rename ignored; no clear/announce path).
+- No automated coverage for Import-watch poll/debounce/prompt or launch reconcile orchestration (GUI/timer); session-field tests are the nearer patch.
+- Frozen Intent in external-json-reload still says "native modal" while product uses themed AlertWindow — update Intent when renegotiating frozen text.
+- Launch Out-of-Sync prompt has no 2-poll debounce — intentional cold-start UX already deferred in launch-json-sync triage.
+
+## Deferred from: review of spec-zones-skins-black-duo-cream.md (2026-11-08)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-zones-skins-black-duo-cream.md`
+  summary: CREAM Modales slider and ProgressBar use the same cafe colour for value bar and text, so the value can vanish over the fill.
+  evidence: Faithful port of trial `dev:cream-2`; artistic contrast polish was out of scope for this Build.
+- source_spec: `_bmad-output/implementation-artifacts/spec-zones-skins-black-duo-cream.md`
+  summary: CREAM disabled slider text and disabled value bar share `kCafe600`.
+  evidence: Same trial fidelity deferral as enabled Modales contrast.
+- source_spec: `_bmad-output/implementation-artifacts/spec-zones-skins-black-duo-cream.md`
+  summary: CREAM ReadOnlyValueField error text matches normal text (`kCafe950`), so device errors look normal.
+  evidence: Trial creamVariant for `kTextError`; red error kept on BLACK/DUO only.
+- source_spec: `_bmad-output/implementation-artifacts/spec-zones-skins-black-duo-cream.md`
+  summary: BLACK/DUO Master slider disabled track is blue (`kBlue950`) instead of grey.
+  evidence: Likely trial slip kept for fidelity; already noted in Implementation Notes.
+- source_spec: `_bmad-output/implementation-artifacts/spec-zones-skins-black-duo-cream.md`
+  summary: Header / Settings / Computer Patches / logo call sites are not built in the unit-test target.
+  evidence: Verification Gap; helpers and matrix pins cover zone→CS; smoke remains the gate for those panels.
+- source_spec: `_bmad-output/implementation-artifacts/spec-zones-skins-black-duo-cream.md`
+  summary: Skin Editor JSON import drops excess colour-set rows without warning and does not role-remap old trial indices.
+  evidence: SE pause assumed; compiled product seeds already remapped. Settle ButtonLike vs explicit cs3 order with an import-order fixture if SE resumes.
+- source_spec: `_bmad-output/implementation-artifacts/spec-zones-skins-black-duo-cream.md`
+  summary: No Pause trial JSON fixture in Tests to pin faithful port against `dev:blackduobalanced2` / `dev:cream-2`.
+  evidence: Current pins use ColourChart values from the same port; a extracted fixture would catch mis-ports more tightly.
+
+## Deferred from: code review of spec-zones-skins-black-duo-cream.md (2026-11-08)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-zones-skins-black-duo-cream.md`
+  summary: Reconfirmed — CREAM Modales slider/ProgressBar value bar and text share cafe (low contrast).
+  evidence: External code review Blind Hunter; faithful trial port; artistic polish still out of intent.
+- source_spec: `_bmad-output/implementation-artifacts/spec-zones-skins-black-duo-cream.md`
+  summary: Reconfirmed — CREAM ReadOnlyValueField error text matches normal text.
+  evidence: External code review Blind Hunter; trial creamVariant for kTextError.
+- source_spec: `_bmad-output/implementation-artifacts/spec-zones-skins-black-duo-cream.md`
+  summary: Reconfirmed — Skin Editor JSON import drops excess colour-set rows without warning / role-remap.
+  evidence: External code review Blind + Edge; SE pause; compiled product seeds already remapped.
+- source_spec: `_bmad-output/implementation-artifacts/spec-zones-skins-black-duo-cream.md`
+  summary: Reconfirmed — Header / Settings / Computer Patches / logo call sites not built in unit-test target.
+  evidence: External code review Verification Gap; helpers + smoke remain the gate.
+- source_spec: `_bmad-output/implementation-artifacts/spec-zones-skins-black-duo-cream.md`
+  summary: Reconfirmed — no Pause trial JSON fixture to pin port against `dev:blackduobalanced2` / `dev:cream-2`.
+  evidence: External code review Acceptance Auditor; ColourChart pins from the same port stay circular.

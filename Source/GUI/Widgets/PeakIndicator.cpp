@@ -8,12 +8,26 @@
 
 namespace TSS
 {
-    PeakIndicator::PeakIndicator(int width, int height)
-        : width_(width)
+    PeakIndicator::PeakIndicator(int width, int height, ColourSet colourSet)
+        : colourSet_(colourSet)
+        , width_(width)
         , height_(height)
     {
         setOpaque(true);
         setSize(width_, height_);
+    }
+
+    void PeakIndicator::setColourSet(ColourSet colourSet)
+    {
+        if (colourSet_ == colourSet)
+            return;
+
+        colourSet_ = colourSet;
+        if (skin_ != nullptr)
+        {
+            ledLook_ = peakIndicatorLookFromSkin(*skin_, colourSet_);
+            repaint();
+        }
     }
 
     void PeakIndicator::paint(juce::Graphics& g)
@@ -53,7 +67,7 @@ namespace TSS
     void PeakIndicator::setSkin(ISkin& skin)
     {
         skin_ = &skin;
-        ledLook_ = ledLookFromSkin(skin);
+        ledLook_ = peakIndicatorLookFromSkin(skin, colourSet_);
         repaint();
     }
 

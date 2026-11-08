@@ -2,6 +2,7 @@
 #include <juce_data_structures/juce_data_structures.h>
 
 #include "Core/Services/GettingStartedMachineDefaults.h"
+#include "GUI/Skins/Skin.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginIDs.h"
 
@@ -18,6 +19,7 @@ public:
         userInterfaceSettingsCopyContract();
         scaleAndSkinSettingsShareLogoApvtsKeys();
         logoMenuScaleAndSkinSectionCopy();
+        matrixWizardChromeUsesBlackCompiledSkin();
         autoOpenPreferencePersistsAndDefaults();
     }
 
@@ -86,6 +88,7 @@ private:
         using namespace PluginIDs::Settings::SkinVariants;
         expectEquals(kBlack, 1);
         expectEquals(kCream, 2);
+        expectEquals(kBlackDuo, 3);
     }
 
     void logoMenuScaleAndSkinSectionCopy()
@@ -98,6 +101,26 @@ private:
                      juce::String("SKIN"));
         expectEquals(juce::String(PluginDisplayNames::ChoiceLists::ScaleLevels::k100),
                      juce::String("100%"));
+        expectEquals(juce::String(PluginDisplayNames::ChoiceLists::SkinVariants::kBlack),
+                     juce::String("BLACK"));
+        expectEquals(juce::String(PluginDisplayNames::ChoiceLists::SkinVariants::kBlackDuo),
+                     juce::String("BLACK/DUO"));
+        expectEquals(juce::String(PluginDisplayNames::ChoiceLists::SkinVariants::kCream),
+                     juce::String("CREAM"));
+    }
+
+    void matrixWizardChromeUsesBlackCompiledSkin()
+    {
+        beginTest("Getting Started chrome - Matrix plate always uses BLACK compiled skin");
+
+        expect(TSS::Skin::kGettingStartedMatrixChromeVariant == TSS::Skin::ColourVariant::Black);
+        expectEquals(PluginIDs::Settings::SkinVariants::kBlack, 1);
+
+        const auto chromeSkin = TSS::Skin::create(TSS::Skin::kGettingStartedMatrixChromeVariant);
+        const auto liveCream = TSS::Skin::create(TSS::Skin::ColourVariant::Cream);
+        expect(chromeSkin->getColourVariant() == TSS::Skin::ColourVariant::Black);
+        expect(liveCream->getColourVariant() == TSS::Skin::ColourVariant::Cream);
+        expect(chromeSkin->getColourVariant() != liveCream->getColourVariant());
         expectEquals(juce::String(PluginDisplayNames::ChoiceLists::SkinVariants::kBlack),
                      juce::String("BLACK"));
     }

@@ -2,6 +2,33 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Debug: Skin Editor",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/${command:cmake.buildDirectory}/Matrix-Control_SkinEditor_artefacts/${command:cmake.buildType}/Matrix-Control Skin Editor.app/Contents/MacOS/Matrix-Control Skin Editor",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "Build: Skin Editor",
+            "osx": {
+                "type": "lldb",
+                "program": "${workspaceFolder}/${command:cmake.buildDirectory}/Matrix-Control_SkinEditor_artefacts/${command:cmake.buildType}/Matrix-Control Skin Editor.app/Contents/MacOS/Matrix-Control Skin Editor"
+            },
+            "windows": {
+                "type": "cppvsdbg",
+                "program": "${workspaceFolder}/${command:cmake.buildDirectory}/Matrix-Control_SkinEditor_artefacts/${command:cmake.buildType}/Matrix-Control Skin Editor.exe",
+                "MIMode": "windows"
+            },
+            "linux": {
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/${command:cmake.buildDirectory}/Matrix-Control_SkinEditor_artefacts/${command:cmake.buildType}/Matrix-Control Skin Editor",
+                "args": [],
+                "cwd": "${workspaceFolder}",
+                "MIMode": "gdb",
+                "preLaunchTask": "Build: Skin Editor"
+            }
+        },
+        {
             "name": "Debug: Standalone",
             "type": "lldb",
             "request": "launch",
@@ -35,6 +62,35 @@
                         "ignoreFailures": true
                     }
                 ],
+                "preLaunchTask": "Build: Standalone"
+            }
+        },
+        {
+            "name": "Debug: Standalone Dev (Skin Receiver)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/${command:cmake.buildDirectory}/Matrix-Control_artefacts/${command:cmake.buildType}/Standalone/Matrix-Control.app/Contents/MacOS/Matrix-Control",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "MATRIX_CONTROL_PROJECT_ROOT": "${workspaceFolder}"
+            },
+            "preLaunchTask": "Build: Standalone",
+            "osx": {
+                "type": "lldb",
+                "program": "${workspaceFolder}/${command:cmake.buildDirectory}/Matrix-Control_artefacts/${command:cmake.buildType}/Standalone/Matrix-Control.app/Contents/MacOS/Matrix-Control"
+            },
+            "windows": {
+                "type": "cppvsdbg",
+                "program": "${workspaceFolder}/${command:cmake.buildDirectory}/Matrix-Control_artefacts/${command:cmake.buildType}/Standalone/Matrix-Control.exe",
+                "MIMode": "windows"
+            },
+            "linux": {
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/${command:cmake.buildDirectory}/Matrix-Control_artefacts/${command:cmake.buildType}/Standalone/Matrix-Control",
+                "cwd": "${workspaceFolder}",
+                "MIMode": "gdb",
                 "preLaunchTask": "Build: Standalone"
             }
         },
@@ -87,6 +143,17 @@
             "osx": {
                 "type": "lldb"
             }
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Debug: Skin Editor + Standalone Dev",
+            "configurations": [
+                "Debug: Standalone Dev (Skin Receiver)",
+                "Debug: Skin Editor"
+            ],
+            "stopAll": true,
+            "preLaunchTask": "Build: Skin Editor + Standalone"
         }
     ]
 }

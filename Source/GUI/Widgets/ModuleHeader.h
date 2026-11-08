@@ -8,8 +8,10 @@
 
 #include "GUI/Layout/WidgetDimensions.h"
 #include "GUI/Looks/WidgetLooks.h"
+#include "GUI/Skins/SkinValues.h"
 
 class WidgetFactory;
+class SkinColourWiringTests;
 
 namespace TSS
 {
@@ -96,6 +98,8 @@ namespace TSS
         Button* getPasteButton() const { return pasteButton_.get(); }
 
     private:
+        friend class ::SkinColourWiringTests;
+
         enum class Presentation
         {
             TitleOnly,
