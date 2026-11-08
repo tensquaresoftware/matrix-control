@@ -80,6 +80,12 @@ namespace SkinEditorChrome
         setColour(juce::TooltipWindow::backgroundColourId, surfaceApp());
         setColour(juce::TooltipWindow::textColourId, textMuted());
         setColour(juce::TooltipWindow::outlineColourId, controlOutline());
+
+        // AlertWindow: dark chrome (native macOS alerts cannot be themed this way).
+        setColour(juce::AlertWindow::backgroundColourId, surfacePanel());
+        setColour(juce::AlertWindow::textColourId, textPrimary());
+        setColour(juce::AlertWindow::outlineColourId, controlOutline());
+        setUsingNativeAlertWindows(false);
     }
 
     void LookAndFeel::drawScrollbar(juce::Graphics& g,
@@ -111,7 +117,39 @@ namespace SkinEditorChrome
         g.fillRoundedRectangle(thumbBounds.toFloat(), 4.0f);
     }
 
-    juce::Font LookAndFeel::getTextButtonFont(juce::TextButton&, int)
+    juce::Font LookAndFeel::getTextButtonFont(juce::TextButton& button, int)
+    {
+        // Alert buttons match the message font (family + size), not V4's larger default.
+        for (auto* c = button.getParentComponent(); c != nullptr; c = c->getParentComponent())
+            if (dynamic_cast<juce::AlertWindow*>(c) != nullptr)
+                return getAlertWindowMessageFont();
+        return fontRegular();
+    }
+
+    std::unique_ptr<juce::AlertWindow> LookAndFeel::createAlertWindowForOptions(
+        const juce::MessageBoxOptions& options)
+    {
+        // Skip LookAndFeel_V4's +50px pad and +40px button nudge — that left a
+        // large empty band above the buttons in Skin Editor dialogs.
+        return juce::LookAndFeel_V2::createAlertWindowForOptions(options);
+    }
+
+    int LookAndFeel::getAlertWindowButtonHeight()
+    {
+        return 28;
+    }
+
+    juce::Font LookAndFeel::getAlertWindowTitleFont()
+    {
+        return fontBold();
+    }
+
+    juce::Font LookAndFeel::getAlertWindowMessageFont()
+    {
+        return fontRegular();
+    }
+
+    juce::Font LookAndFeel::getAlertWindowFont()
     {
         return fontRegular();
     }
@@ -227,29 +265,105 @@ namespace SkinEditorChrome
 
     void LookAndFeel::fillTextEditorBackground(juce::Graphics& g, int width, int height, juce::TextEditor& ed)
     {
-        if (dynamic_cast<juce::AlertWindow*>(ed.getParentComponent()) != nullptr)
-        {
-            LookAndFeel_V4::fillTextEditorBackground(g, width, height, ed);
-            return;
-        }
-
-        g.setColour(ed.findColour(juce::TextEditor::backgroundColourId));
+        const bool inAlert = dynamic_cast<juce::AlertWindow*>(ed.getParentComponent()) != nullptr;
+        g.setColour(inAlert ? surfaceApp() : ed.findColour(juce::TextEditor::backgroundColourId));
         g.fillRoundedRectangle(0.5f, 0.5f, (float) width - 1.0f, (float) height - 1.0f, kControlCorner);
     }
 
     void LookAndFeel::drawTextEditorOutline(juce::Graphics& g, int width, int height, juce::TextEditor& ed)
     {
-        if (dynamic_cast<juce::AlertWindow*>(ed.getParentComponent()) != nullptr)
-            return;
-
         if (! ed.isEnabled())
             return;
 
+        const bool inAlert = dynamic_cast<juce::AlertWindow*>(ed.getParentComponent()) != nullptr;
         const bool focused = ed.hasKeyboardFocus(true) && ! ed.isReadOnly();
+        if (inAlert)
+        {
+            g.setColour(focused ? textMuted() : controlOutline());
+            g.drawRoundedRectangle(0.5f, 0.5f, (float) width - 1.0f, (float) height - 1.0f,
+                                   kControlCorner, focused ? 1.5f : 1.0f);
+            return;
+        }
+
         g.setColour(ed.findColour(focused ? juce::TextEditor::focusedOutlineColourId
                                           : juce::TextEditor::outlineColourId));
         g.drawRoundedRectangle(0.5f, 0.5f, (float) width - 1.0f, (float) height - 1.0f,
                                kControlCorner, focused ? 1.5f : 1.0f);
+    }
+
+    namespace
+    {
+        int drawAlertIconBubble(juce::Graphics& g,
+                                juce::MessageBoxIconType type,
+                                juce::Rectangle<int> iconRect)
+        {
+            juce::Path icon;
+            char character = '?';
+
+            if (type == juce::MessageBoxIconType::WarningIcon)
+            {
+                character = '!';
+                icon.addTriangle((float) iconRect.getX() + (float) iconRect.getWidth() * 0.5f,
+                                 (float) iconRect.getY(),
+                                 (float) iconRect.getRight(),
+                                 (float) iconRect.getBottom(),
+                                 (float) iconRect.getX(),
+                                 (float) iconRect.getBottom());
+                icon = icon.createPathWithRoundedCorners(5.0f);
+            }
+            else
+            {
+                character = (type == juce::MessageBoxIconType::InfoIcon) ? 'i' : '?';
+                icon.addEllipse(iconRect.toFloat());
+            }
+
+            juce::GlyphArrangement ga;
+            ga.addFittedText(juce::Font(juce::FontOptions((float) iconRect.getHeight() * 0.9f,
+                                                          juce::Font::bold)),
+                             juce::String::charToString((juce::juce_wchar) (uint8_t) character),
+                             (float) iconRect.getX(),
+                             (float) iconRect.getY(),
+                             (float) iconRect.getWidth(),
+                             (float) iconRect.getHeight(),
+                             juce::Justification::centred,
+                             false);
+            ga.createPath(icon);
+            icon.setUsingNonZeroWinding(false);
+
+            // Decorative icon: lighter grey bubble on dark alert chrome (no system blue).
+            g.setColour(juce::Colour(0x66999999));
+            g.fillPath(icon);
+            return 80;
+        }
+    }
+
+    void LookAndFeel::drawAlertBox(juce::Graphics& g,
+                                   juce::AlertWindow& alert,
+                                   const juce::Rectangle<int>& textArea,
+                                   juce::TextLayout& textLayout)
+    {
+        g.fillAll(alert.findColour(juce::AlertWindow::backgroundColourId));
+
+        int iconSpaceUsed = 0;
+        if (alert.getAlertType() != juce::MessageBoxIconType::NoIcon)
+        {
+            // Fixed bubble size (V2): do not scale with alert height or the glyph balloons.
+            constexpr int kIconWidth = 80;
+            const int iconSize = juce::jmin(kIconWidth + 50, textArea.getHeight() + 50);
+            const juce::Rectangle<int> iconRect(iconSize / -10, iconSize / -10, iconSize, iconSize);
+            iconSpaceUsed = drawAlertIconBubble(g, alert.getAlertType(), iconRect);
+        }
+
+        g.setColour(alert.findColour(juce::AlertWindow::textColourId));
+        textLayout.draw(g,
+                        juce::Rectangle<int>(textArea.getX() + iconSpaceUsed,
+                                             textArea.getY(),
+                                             textArea.getWidth() - iconSpaceUsed,
+                                             textArea.getHeight())
+                            .toFloat());
+
+        g.setColour(alert.findColour(juce::AlertWindow::outlineColourId));
+        g.drawRect(0, 0, alert.getWidth(), alert.getHeight());
     }
 
     namespace

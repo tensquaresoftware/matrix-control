@@ -9,6 +9,8 @@ SkinEditorMainComponent::SkinEditorMainComponent()
 {
     setWantsKeyboardFocus(true);
     setLookAndFeel(&lookAndFeel_);
+    // AlertWindow / MessageBoxOptions use the default LAF, not the component tree.
+    juce::LookAndFeel::setDefaultLookAndFeel(&lookAndFeel_);
     SkinEditorChrome::warmFonts();
     setupTitleBarChrome();
     setupStatusBarChrome();
@@ -39,6 +41,7 @@ SkinEditorMainComponent::~SkinEditorMainComponent()
     compareBlinkTimer_.stopTimer();
     colourPreviewCoalesceTimer_.stopTimer();
     importWatchTimer_.stopTimer();
+    juce::LookAndFeel::setDefaultLookAndFeel(nullptr);
     setLookAndFeel(nullptr);
     flushPendingSessionAutosave();
     bridge_.stop();

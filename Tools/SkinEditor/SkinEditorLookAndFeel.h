@@ -53,6 +53,19 @@ namespace SkinEditorChrome
         void fillTextEditorBackground(juce::Graphics& g, int width, int height, juce::TextEditor& ed) override;
         void drawTextEditorOutline(juce::Graphics& g, int width, int height, juce::TextEditor& ed) override;
 
+        std::unique_ptr<juce::AlertWindow> createAlertWindowForOptions(
+            const juce::MessageBoxOptions& options) override;
+
+        void drawAlertBox(juce::Graphics& g,
+                          juce::AlertWindow& alert,
+                          const juce::Rectangle<int>& textArea,
+                          juce::TextLayout& textLayout) override;
+
+        int getAlertWindowButtonHeight() override;
+        juce::Font getAlertWindowTitleFont() override;
+        juce::Font getAlertWindowMessageFont() override;
+        juce::Font getAlertWindowFont() override;
+
         juce::Rectangle<int> getTooltipBounds(const juce::String& tipText,
                                               juce::Point<int> screenPos,
                                               juce::Rectangle<int> parentArea) override;
