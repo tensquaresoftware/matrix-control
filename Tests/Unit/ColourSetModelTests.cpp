@@ -34,8 +34,8 @@ public:
         beginTest("setMapping_rejectsHigherSetForK1OnlyObject");
         assertLayerRejectsInvalidHigherSet();
 
-        beginTest("json_rejectsHigherSetForK1OnlyObject");
-        assertJsonRejectsInvalidHigherSet();
+        beginTest("json_dropsSetsBeyondObjectInventory");
+        assertJsonDropsSetsBeyondInventory();
 
         beginTest("legacyButtonLikeObjectKeys_remapToClassicObjects");
         assertLegacyButtonLikeObjectKeysRemap();
@@ -67,15 +67,19 @@ private:
         if (skin == nullptr)
             return;
 
-        auto key = TSS::skinColourKey(TSS::SkinObjectType::kButton,
-                                      TSS::SkinColourProperty::kBackground,
-                                      TSS::SkinColourState::kOff);
+        auto key = TSS::skinColourKey(TSS::SkinObjectType::kSlider, TSS::SkinColourProperty::kTrack);
         const auto primaryMapping = skin->mappings.at(key);
         for (const auto colourSet : TSS::kAllColourSets)
         {
             key.colourSet = colourSet;
             expectEquals(skin->mappings.at(key), primaryMapping);
         }
+
+        auto ucsKey = TSS::skinColourKey(TSS::SkinObjectType::kButton,
+                                         TSS::SkinColourProperty::kBackground,
+                                         TSS::SkinColourState::kOff,
+                                         TSS::ColourSet::k2);
+        expect(skin->mappings.count(ucsKey) == 0);
         expectEquals(layer.unboundCount(skin->id), 0);
         expect(layer.isEditorSkinExportAllowed(skin->id));
     }
@@ -92,9 +96,7 @@ private:
     {
         TSS::DevSkin::Layer layer;
         layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Distinct Sets");
-        auto key = TSS::skinColourKey(TSS::SkinObjectType::kButton,
-                                      TSS::SkinColourProperty::kBackground,
-                                      TSS::SkinColourState::kOff);
+        auto key = TSS::skinColourKey(TSS::SkinObjectType::kSlider, TSS::SkinColourProperty::kTrack);
         expect(layer.setMapping(layer.activeSkinId(), key, "kEmerald400").wasOk());
         key.colourSet = TSS::ColourSet::k2;
         expect(layer.setMapping(layer.activeSkinId(), key, "kBlue").wasOk());
@@ -151,23 +153,76 @@ private:
         expect(layer.setMapping(layer.activeSkinId(), key, "kGrey500").failed());
     }
 
-    void assertJsonRejectsInvalidHigherSet()
+    static void appendExcessColourSetRows(juce::Array<juce::var>* mappings)
+    {
+        auto addRow = [mappings](const char* object, const char* property, const char* state, const char* colourSet)
+        {
+            auto* row = new juce::DynamicObject();
+            row->setProperty("object", object);
+            row->setProperty("property", property);
+            row->setProperty("state", state);
+            row->setProperty("colourSet", colourSet);
+            row->setProperty("paletteName", "kGrey500");
+            mappings->add(juce::var(row));
+        };
+        addRow("HeaderPanel", "Background", "Default", "cs2");
+        addRow("ComboBox", "Background", "Default", "cs4");
+        addRow("Led", "Background", "On", "cs3");
+    }
+
+    void expectExcessColourSetKeysAbsent(const std::map<TSS::SkinColourKey, juce::String>& mappings)
+    {
+        const auto excessHeader = TSS::skinColourKey(TSS::SkinObjectType::kHeaderPanel,
+                                                     TSS::SkinColourProperty::kBackground,
+                                                     TSS::SkinColourState::kDefault,
+                                                     TSS::ColourSet::k2);
+        const auto excessCombo = TSS::skinColourKey(TSS::SkinObjectType::kComboBox,
+                                                    TSS::SkinColourProperty::kBackground,
+                                                    TSS::SkinColourState::kDefault,
+                                                    TSS::ColourSet::k4);
+        const auto excessLed = TSS::skinColourKey(TSS::SkinObjectType::kLed,
+                                                  TSS::SkinColourProperty::kBackground,
+                                                  TSS::SkinColourState::kOn,
+                                                  TSS::ColourSet::k3);
+        expect(mappings.count(excessHeader) == 0);
+        expect(mappings.count(excessCombo) == 0);
+        expect(mappings.count(excessLed) == 0);
+    }
+
+    void assertJsonDropsSetsBeyondInventory()
     {
         TSS::DevSkin::Layer layer;
-        layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Invalid JSON");
-        const auto before = TSS::DevSkin::exportToJson(layer);
-        auto parsed = juce::JSON::parse(before);
+        layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Old Inventory");
+        const auto skinId = layer.activeSkinId();
+        const auto* before = layer.findSkin(skinId);
+        expect(before != nullptr);
+        if (before == nullptr)
+            return;
+
+        const auto headerBackgroundKey = TSS::skinColourKey(TSS::SkinObjectType::kHeaderPanel,
+                                                            TSS::SkinColourProperty::kBackground);
+        const auto originalHeaderBackground = before->mappings.at(headerBackgroundKey);
+
+        auto parsed = juce::JSON::parse(TSS::DevSkin::exportToJson(layer));
         auto* skins = parsed.getProperty("skins", {}).getArray();
-        auto* mappings = (*skins)[0].getProperty("mappings", {}).getArray();
-        for (auto& mapping : *mappings)
+        appendExcessColourSetRows((*skins)[0].getProperty("mappings", {}).getArray());
+
+        TSS::DevSkin::Layer restored;
+        expect(TSS::DevSkin::importFromJson(restored, juce::JSON::toString(parsed)).ok);
+        const auto* skin = restored.findSkin(skinId);
+        expect(skin != nullptr);
+        if (skin == nullptr)
+            return;
+
+        for (const auto& [key, paletteName] : skin->mappings)
         {
-            if (mapping.getProperty("object", {}) != "HeaderPanel")
-                continue;
-            mapping.getDynamicObject()->setProperty("colourSet", "cs2");
-            break;
+            juce::ignoreUnused(paletteName);
+            expect(TSS::supportsColourSet(key.object, key.colourSet));
         }
-        expect(! TSS::DevSkin::importFromJson(layer, juce::JSON::toString(parsed)).ok);
-        expectEquals(TSS::DevSkin::exportToJson(layer), before);
+
+        expectEquals(skin->mappings.at(headerBackgroundKey), originalHeaderBackground);
+        expect(originalHeaderBackground != juce::String("kGrey500"));
+        expectExcessColourSetKeysAbsent(skin->mappings);
     }
 
     void assertLegacyButtonLikeObjectKeysRemap()
@@ -180,10 +235,11 @@ private:
         expect(TSS::DevSkin::parseObjectType("PopupMenuButtonLike", object));
         expect(object == TSS::SkinObjectType::kPopupMenu);
 
-        const auto expectRemapToK4 = [this](const char* objectName,
-                                            TSS::SkinObjectType expectedObject,
-                                            bool includeColourSet,
-                                            const char* colourSetValue)
+        const auto expectRemapToMono = [this](const char* objectName,
+                                              TSS::SkinObjectType expectedObject,
+                                              bool includeColourSet,
+                                              const char* colourSetValue,
+                                              TSS::ColourSet expectedSet)
         {
             auto* mappingObject = new juce::DynamicObject();
             mappingObject->setProperty("object", objectName);
@@ -198,17 +254,18 @@ private:
             juce::String error;
             expect(TSS::DevSkin::mappingFromVar(juce::var(mappingObject), key, paletteName, error));
             expect(key.object == expectedObject);
-            expect(key.colourSet == TSS::ColourSet::k4);
+            expect(key.colourSet == expectedSet);
             expectEquals(paletteName, juce::String("kGrey600"));
             expect(TSS::DevSkin::toString(key.object) != objectName);
         };
 
-        expectRemapToK4("ComboBoxButtonLike", TSS::SkinObjectType::kComboBox, true, "cs4");
-        expectRemapToK4("ComboBoxButtonLike", TSS::SkinObjectType::kComboBox, false, "");
-        expectRemapToK4("ComboBoxButtonLike", TSS::SkinObjectType::kComboBox, true, "cs1");
-        expectRemapToK4("SliderButtonLike", TSS::SkinObjectType::kSlider, false, "");
-        expectRemapToK4("SliderButtonLike", TSS::SkinObjectType::kSlider, true, "cs1");
-        expectRemapToK4("PopupMenuButtonLike", TSS::SkinObjectType::kPopupMenu, true, "cs1");
+        using TSS::ColourSet;
+        expectRemapToMono("ComboBoxButtonLike", TSS::SkinObjectType::kComboBox, true, "cs4", ColourSet::k3);
+        expectRemapToMono("ComboBoxButtonLike", TSS::SkinObjectType::kComboBox, false, "", ColourSet::k3);
+        expectRemapToMono("ComboBoxButtonLike", TSS::SkinObjectType::kComboBox, true, "cs1", ColourSet::k3);
+        expectRemapToMono("SliderButtonLike", TSS::SkinObjectType::kSlider, false, "", ColourSet::k4);
+        expectRemapToMono("SliderButtonLike", TSS::SkinObjectType::kSlider, true, "cs1", ColourSet::k4);
+        expectRemapToMono("PopupMenuButtonLike", TSS::SkinObjectType::kPopupMenu, true, "cs1", ColourSet::k3);
     }
 
     struct LegacyChromeMappingCase

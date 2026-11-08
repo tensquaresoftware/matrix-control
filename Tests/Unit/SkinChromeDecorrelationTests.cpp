@@ -15,14 +15,14 @@ public:
 
     void runTest() override
     {
-        beginTest("windowSurface_seedsPureBlackWhite_panelsKeepGreys");
+        beginTest("windowSurface_seedsFollowTrialPort_keysStayIndependent");
         assertWindowSurfaceDistinctFromPanels();
 
         beginTest("dialog_ownsCloseGlyph");
         assertDialogOwnsCloseGlyph();
 
         beginTest("chromeTextAndBrandLooks_resolveFromSkin");
-        assertChromeTextAndBrandLooks(TSS::Skin::ColourVariant::Black);
+        assertChromeTextAndBrandLooks(TSS::Skin::ColourVariant::BlackDuo);
         assertChromeTextAndBrandLooks(TSS::Skin::ColourVariant::Cream);
     }
 
@@ -32,31 +32,33 @@ private:
         using TSS::SkinObjectType;
         using TSS::SkinColourProperty;
 
-        const auto black = TSS::Skin::create(TSS::Skin::ColourVariant::Black);
+        const auto black = TSS::Skin::create(TSS::Skin::ColourVariant::BlackDuo);
         const auto cream = TSS::Skin::create(TSS::Skin::ColourVariant::Cream);
 
         expect(black->getColour(SkinObjectType::kWindowSurface, SkinColourProperty::kBackground)
-               == juce::Colour(ColourChart::kBlack));
+               == juce::Colour(ColourChart::kGrey950));
         expect(cream->getColour(SkinObjectType::kWindowSurface, SkinColourProperty::kBackground)
-               == juce::Colour(ColourChart::kWhite));
+               == juce::Colour(ColourChart::kCream400));
 
         expect(black->getColour(SkinObjectType::kHeaderPanel, SkinColourProperty::kBackground)
                == juce::Colour(ColourChart::kGrey950));
         expect(cream->getColour(SkinObjectType::kHeaderPanel, SkinColourProperty::kBackground)
-               == juce::Colour(ColourChart::kGrey950));
+               == juce::Colour(ColourChart::kCream400));
         expect(black->getColour(SkinObjectType::kFooterPanel, SkinColourProperty::kBackground)
                == juce::Colour(ColourChart::kGrey950));
         expect(cream->getColour(SkinObjectType::kFooterPanel, SkinColourProperty::kBackground)
-               == juce::Colour(ColourChart::kGrey950));
+               == juce::Colour(ColourChart::kCream400));
         expect(black->getColour(SkinObjectType::kBodyPanel, SkinColourProperty::kBackground)
                == juce::Colour(ColourChart::kGrey900));
         expect(cream->getColour(SkinObjectType::kBodyPanel, SkinColourProperty::kBackground)
                == juce::Colour(ColourChart::kCream));
 
-        expect(black->getColour(SkinObjectType::kWindowSurface, SkinColourProperty::kBackground)
-               != black->getColour(SkinObjectType::kHeaderPanel, SkinColourProperty::kBackground));
-        expect(cream->getColour(SkinObjectType::kWindowSurface, SkinColourProperty::kBackground)
-               != cream->getColour(SkinObjectType::kBodyPanel, SkinColourProperty::kBackground));
+        // Seeds may coincide; the keys stay independent.
+        const auto windowKey = TSS::skinColourKey(SkinObjectType::kWindowSurface, SkinColourProperty::kBackground);
+        black->setColour(windowKey, juce::Colour(ColourChart::kRed500));
+        expect(black->getColour(windowKey) == juce::Colour(ColourChart::kRed500));
+        expect(black->getColour(SkinObjectType::kHeaderPanel, SkinColourProperty::kBackground)
+               == juce::Colour(ColourChart::kGrey950));
     }
 
     void assertDialogOwnsCloseGlyph()
@@ -64,17 +66,17 @@ private:
         using TSS::SkinObjectType;
         using TSS::SkinColourProperty;
 
-        const auto assertGlyphAndTitleBand = [this](TSS::Skin::ColourVariant variant)
+        const auto assertGlyphAndTitleBand = [this](TSS::Skin::ColourVariant variant, juce::uint32 titleBand)
         {
             const auto skin = TSS::Skin::create(variant);
             expect(skin->getColour(SkinObjectType::kDialog, SkinColourProperty::kGlyph)
                    == juce::Colour(ColourChart::kRed900));
             expect(skin->getColour(SkinObjectType::kDialog, SkinColourProperty::kTitleBand)
-                   == juce::Colour(ColourChart::kBlack));
+                   == juce::Colour(titleBand));
         };
 
-        assertGlyphAndTitleBand(TSS::Skin::ColourVariant::Black);
-        assertGlyphAndTitleBand(TSS::Skin::ColourVariant::Cream);
+        assertGlyphAndTitleBand(TSS::Skin::ColourVariant::BlackDuo, ColourChart::kBlack);
+        assertGlyphAndTitleBand(TSS::Skin::ColourVariant::Cream, ColourChart::kCream400);
     }
 
     void assertChromeTextAndBrandLooks(TSS::Skin::ColourVariant variant)

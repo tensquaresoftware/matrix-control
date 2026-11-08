@@ -5,7 +5,6 @@
 #include "GUI/Skins/Skin.h"
 #include "GUI/Skins/SkinColoursWidgetsControls.h"
 #include "GUI/Skins/SkinColoursWidgetsDisplays.h"
-#include "GUI/Skins/SkinColoursWidgetsSelection.h"
 
 class NumberBoxDisabledBackgroundColourTests : public juce::UnitTest
 {
@@ -19,28 +18,24 @@ public:
     {
         using namespace TSS::SkinColours::Widgets;
 
-        beginTest("disabledBackground_matchesButtonAndComboBoxK4Grey950");
+        beginTest("disabledBackground_matchesButtonDisabled");
 
         expect(NumberBox::kBackgroundDisabled.blackVariant == ColourChart::kGrey950);
-        expect(NumberBox::kBackgroundDisabled.creamVariant == ColourChart::kGrey950);
+        expect(NumberBox::kBackgroundDisabled.creamVariant == ColourChart::kCream);
         expect(NumberBox::kBackgroundDisabled.blackVariant
                == Button::kBackgroundDisabled.blackVariant);
         expect(NumberBox::kBackgroundDisabled.creamVariant
                == Button::kBackgroundDisabled.creamVariant);
-        expect(NumberBox::kBackgroundDisabled.blackVariant
-               == ComboBoxK4::kBackgroundDisabled.blackVariant);
-        expect(NumberBox::kBackgroundDisabled.creamVariant
-               == ComboBoxK4::kBackgroundDisabled.creamVariant);
 
-        beginTest("enabledBackground_isBlack");
+        beginTest("enabledBackground_blackPlateOnBlackDuo_creamPlateOnCream");
 
         expect(NumberBox::kBackground.blackVariant == ColourChart::kBlack);
-        expect(NumberBox::kBackground.creamVariant == ColourChart::kBlack);
+        expect(NumberBox::kBackground.creamVariant == ColourChart::kCream400);
 
-        beginTest("skinLoaded_disabledBackgroundIsGrey950");
+        beginTest("skinLoaded_disabledBackgroundFollowsSeed");
 
-        assertDisabledBackgroundFromSkin(TSS::Skin::ColourVariant::Black);
-        assertDisabledBackgroundFromSkin(TSS::Skin::ColourVariant::Cream);
+        assertDisabledBackgroundFromSkin(TSS::Skin::ColourVariant::Black, ColourChart::kGrey950);
+        assertDisabledBackgroundFromSkin(TSS::Skin::ColourVariant::Cream, ColourChart::kCream);
 
         beginTest("caret_seedIsWhiteAndIndependentOfEditorText");
 
@@ -56,7 +51,7 @@ public:
     }
 
 private:
-    void assertDisabledBackgroundFromSkin(TSS::Skin::ColourVariant variant)
+    void assertDisabledBackgroundFromSkin(TSS::Skin::ColourVariant variant, juce::uint32 expectedArgb)
     {
         using TSS::SkinColourProperty;
         using TSS::SkinColourState;
@@ -68,7 +63,7 @@ private:
                                             SkinColourProperty::kBackground,
                                             SkinColourState::kDisabled);
         expect(look.backgroundDisabled == mapped);
-        expect(look.backgroundDisabled == juce::Colour(ColourChart::kGrey950));
+        expect(look.backgroundDisabled == juce::Colour(expectedArgb));
     }
 
     void assertCaretFromSkin(TSS::Skin::ColourVariant variant)

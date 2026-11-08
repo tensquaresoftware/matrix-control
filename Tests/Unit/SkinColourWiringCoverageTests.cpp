@@ -7,9 +7,11 @@
 #include "GUI/Widgets/ReadOnlyValueField.h"
 #include "SkinColourWiringTestSupport.h"
 
+using TSS::ColourSet;
 using TSS::SkinColourProperty;
 using TSS::SkinColourState;
 using TSS::SkinObjectType;
+using TSS::SkinZone;
 using SkinColourWiringTestSupport::paintDistinctPastillesForSets;
 
 class SkinColourWiringCoverageTests : public juce::UnitTest
@@ -22,195 +24,181 @@ public:
 
     void runTest() override
     {
-        beginTest("moduleHeaderLook_textFocusUsesNumberBoxK4");
-        assertModuleHeaderLookTextFocusUsesNumberBoxK4();
+        beginTest("zoneMatrix_mcsObjectsFollowFrozenZoneToColourSet");
+        assertMcsZoneMatrix();
 
-        beginTest("readOnlyValueField_k4ConstructionAndSetSkin");
-        assertReadOnlyValueFieldK4ConstructionAndSetSkin();
+        beginTest("zoneMatrix_ucsObjectsAlwaysResolveK1");
+        assertUcsObjectsResolveK1();
 
-        beginTest("settingsAndComputerPatches_sliderComboAndNumberBoxUseK4");
-        assertSettingsAndComputerPatchesUseK4();
+        beginTest("zoneMatrix_monoMenuExceptionResolvesComboAndPopupK3");
+        assertMonoMenuException();
 
-        beginTest("headerInputGain_sliderUsesK3");
-        assertHeaderInputGainSliderUsesK3();
+        beginTest("moduleHeaderLook_textFocusUsesNumberBoxUcs");
+        assertModuleHeaderLookTextFocusUsesNumberBoxUcs();
 
-        beginTest("blackCream_k1ToK3Match_andSliderComboPopupK4CarryFormerButtonLike");
-        assertBlackCreamSeedLooksAfterUnify(TSS::Skin::ColourVariant::Black);
-        assertBlackCreamSeedLooksAfterUnify(TSS::Skin::ColourVariant::Cream);
+        beginTest("readOnlyValueField_ucsConstructionAndSetSkin");
+        assertReadOnlyValueFieldUcsConstructionAndSetSkin();
+
+        beginTest("modalesAndHeaderLooks_resolveZoneSets");
+        assertModalesAndHeaderLooksResolveZoneSets();
+
+        beginTest("blackDuoSeed_zoneAccentsAndModalesMono");
+        assertBlackDuoSeedZoneLooks();
+
+        beginTest("creamSeed_sharedGreensAndCafeModales");
+        assertCreamSeedZoneLooks();
     }
 
 private:
-    void assertModuleHeaderLookTextFocusUsesNumberBoxK4()
+    void assertMcsZoneMatrix()
     {
-        const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::Black);
-        paintDistinctPastillesForSets(*skin);
+        expect(TSS::zoneColourSet(SkinObjectType::kSlider, SkinZone::kPatch) == ColourSet::k1);
+        expect(TSS::zoneColourSet(SkinObjectType::kSlider, SkinZone::kMaster) == ColourSet::k2);
+        expect(TSS::zoneColourSet(SkinObjectType::kSlider, SkinZone::kHeader) == ColourSet::k3);
+        expect(TSS::zoneColourSet(SkinObjectType::kSlider, SkinZone::kModales) == ColourSet::k4);
 
-        const auto look = TSS::moduleHeaderLookFromSkin(*skin);
-        const auto focusK4 = skin->getColour(SkinObjectType::kNumberBox,
-                                             SkinColourProperty::kText,
-                                             SkinColourState::kFocus,
-                                             TSS::ColourSet::k4);
-        const auto focusK1 = skin->getColour(SkinObjectType::kNumberBox,
-                                             SkinColourProperty::kText,
-                                             SkinColourState::kFocus,
-                                             TSS::ColourSet::k1);
-        expect(look.textFocus == focusK4);
-        expect(look.textFocus != focusK1);
+        for (const auto object : { SkinObjectType::kComboBox, SkinObjectType::kPopupMenu })
+        {
+            expect(TSS::zoneColourSet(object, SkinZone::kPatch) == ColourSet::k1);
+            expect(TSS::zoneColourSet(object, SkinZone::kMaster) == ColourSet::k2);
+            expect(TSS::zoneColourSet(object, SkinZone::kModales) == ColourSet::k3);
+        }
+
+        for (const auto object : { SkinObjectType::kLed, SkinObjectType::kPeakIndicator })
+        {
+            expect(TSS::zoneColourSet(object, SkinZone::kHeader) == ColourSet::k1);
+            expect(TSS::zoneColourSet(object, SkinZone::kModales) == ColourSet::k2);
+        }
     }
 
-    void assertReadOnlyValueFieldK4ConstructionAndSetSkin()
+    void assertUcsObjectsResolveK1()
     {
-        const auto skinA = TSS::Skin::create(TSS::Skin::ColourVariant::Black);
-        const auto skinB = TSS::Skin::create(TSS::Skin::ColourVariant::Cream);
-        paintDistinctPastillesForSets(*skinA);
-        paintDistinctPastillesForSets(*skinB);
+        for (const auto object : { SkinObjectType::kButton,
+                                   SkinObjectType::kToggle,
+                                   SkinObjectType::kNumberBox,
+                                   SkinObjectType::kReadOnlyValueField,
+                                   SkinObjectType::kProgressBar })
+        {
+            for (const auto zone : { SkinZone::kPatch, SkinZone::kMaster, SkinZone::kHeader, SkinZone::kModales })
+                expect(TSS::zoneColourSet(object, zone) == ColourSet::k1);
+        }
+    }
 
-        TSS::ReadOnlyValueField field(*skinA, TSS::ColourSet::k4);
-        expect(field.getColourSet() == TSS::ColourSet::k4);
+    void assertMonoMenuException()
+    {
+        expect(TSS::zoneColourSet(SkinObjectType::kComboBox, TSS::kMonoMenuExceptionZone) == ColourSet::k3);
+        expect(TSS::zoneColourSet(SkinObjectType::kPopupMenu, TSS::kMonoMenuExceptionZone) == ColourSet::k3);
+    }
+
+    void assertModuleHeaderLookTextFocusUsesNumberBoxUcs()
+    {
+        const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::BlackDuo);
+        const auto look = TSS::moduleHeaderLookFromSkin(*skin);
+        expect(look.textFocus
+               == skin->getColour(SkinObjectType::kNumberBox, SkinColourProperty::kText, SkinColourState::kFocus));
+    }
+
+    void assertReadOnlyValueFieldUcsConstructionAndSetSkin()
+    {
+        const auto skinA = TSS::Skin::create(TSS::Skin::ColourVariant::BlackDuo);
+        const auto skinB = TSS::Skin::create(TSS::Skin::ColourVariant::Cream);
+
+        TSS::ReadOnlyValueField field(*skinA);
+        expect(field.getColourSet() == ColourSet::k1);
         expect(field.fill_
-               == skinA->getColour(SkinObjectType::kReadOnlyValueField,
-                                   SkinColourProperty::kBackground,
-                                   SkinColourState::kDefault,
-                                   TSS::ColourSet::k4));
+               == skinA->getColour(SkinObjectType::kReadOnlyValueField, SkinColourProperty::kBackground));
         expect(field.textColour_
-               == skinA->getColour(SkinObjectType::kReadOnlyValueField,
-                                   SkinColourProperty::kText,
-                                   SkinColourState::kDefault,
-                                   TSS::ColourSet::k4));
-        expect(field.fill_
-               != skinA->getColour(SkinObjectType::kReadOnlyValueField,
-                                   SkinColourProperty::kBackground,
-                                   SkinColourState::kDefault,
-                                   TSS::ColourSet::k1));
+               == skinA->getColour(SkinObjectType::kReadOnlyValueField, SkinColourProperty::kText));
 
         field.setSkin(*skinB);
-        expect(field.getColourSet() == TSS::ColourSet::k4);
         expect(field.fill_
-               == skinB->getColour(SkinObjectType::kReadOnlyValueField,
-                                   SkinColourProperty::kBackground,
-                                   SkinColourState::kDefault,
-                                   TSS::ColourSet::k4));
+               == skinB->getColour(SkinObjectType::kReadOnlyValueField, SkinColourProperty::kBackground));
         expect(field.textColour_
-               == skinB->getColour(SkinObjectType::kReadOnlyValueField,
-                                   SkinColourProperty::kText,
-                                   SkinColourState::kDefault,
-                                   TSS::ColourSet::k4));
+               == skinB->getColour(SkinObjectType::kReadOnlyValueField, SkinColourProperty::kText));
+        expect(field.fill_ == juce::Colour(ColourChart::kCream400));
     }
 
-    void expectPastilleDistinctAtK4(const TSS::Skin& skin,
-                                    juce::Colour lookColour,
-                                    const TSS::SkinColourKey& keyK4)
+    void expectLookUsesSet(juce::Colour lookColour, const TSS::Skin& skin, TSS::SkinColourKey key)
     {
-        auto keyK1 = keyK4;
-        keyK1.colourSet = TSS::ColourSet::k1;
-        expect(lookColour == skin.getColour(keyK4));
-        expect(lookColour != skin.getColour(keyK1));
+        expect(lookColour == skin.getColour(key));
+        key.colourSet = ColourSet::k1;
+        expect(lookColour != skin.getColour(key));
     }
 
-    void assertSettingsAndComputerPatchesUseK4()
+    void assertModalesAndHeaderLooksResolveZoneSets()
     {
-        const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::Black);
+        const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::BlackDuo);
         paintDistinctPastillesForSets(*skin);
 
-        const auto latency = TSS::sliderLookFromSkin(*skin, TSS::ColourSet::k4);
-        expectPastilleDistinctAtK4(*skin,
-                                   latency.trackEnabled,
-                                   TSS::skinColourKey(SkinObjectType::kSlider,
-                                                      SkinColourProperty::kTrack,
-                                                      SkinColourState::kDefault,
-                                                      TSS::ColourSet::k4));
-
-        const auto combo = TSS::comboBoxLookFromSkin(*skin, TSS::ColourSet::k4);
-        expectPastilleDistinctAtK4(*skin,
-                                   combo.backgroundEnabled,
-                                   TSS::skinColourKey(SkinObjectType::kComboBox,
-                                                      SkinColourProperty::kBackground,
-                                                      SkinColourState::kDefault,
-                                                      TSS::ColourSet::k4));
-
-        const auto numberBox = TSS::numberBoxLookFromSkin(*skin, TSS::ColourSet::k4);
-        expectPastilleDistinctAtK4(*skin,
-                                   numberBox.background,
-                                   TSS::skinColourKey(SkinObjectType::kNumberBox,
-                                                      SkinColourProperty::kBackground,
-                                                      SkinColourState::kDefault,
-                                                      TSS::ColourSet::k4));
-
-        const auto popup = TSS::popupMenuLookFromSkin(*skin, TSS::ColourSet::k4);
-        expectPastilleDistinctAtK4(*skin,
-                                   popup.border,
-                                   TSS::skinColourKey(SkinObjectType::kPopupMenu,
-                                                      SkinColourProperty::kBorder,
-                                                      SkinColourState::kDefault,
-                                                      TSS::ColourSet::k4));
+        expectLookUsesSet(TSS::sliderLookForZone(*skin, SkinZone::kModales).trackEnabled,
+                          *skin,
+                          TSS::skinColourKey(SkinObjectType::kSlider, SkinColourProperty::kTrack,
+                                             SkinColourState::kDefault, ColourSet::k4));
+        expectLookUsesSet(TSS::sliderLookForZone(*skin, SkinZone::kHeader).trackEnabled,
+                          *skin,
+                          TSS::skinColourKey(SkinObjectType::kSlider, SkinColourProperty::kTrack,
+                                             SkinColourState::kDefault, ColourSet::k3));
+        expectLookUsesSet(TSS::comboBoxLookForZone(*skin, SkinZone::kModales).backgroundEnabled,
+                          *skin,
+                          TSS::skinColourKey(SkinObjectType::kComboBox, SkinColourProperty::kBackground,
+                                             SkinColourState::kDefault, ColourSet::k3));
+        expectLookUsesSet(TSS::popupMenuLookForZone(*skin, TSS::kMonoMenuExceptionZone).border,
+                          *skin,
+                          TSS::skinColourKey(SkinObjectType::kPopupMenu, SkinColourProperty::kBorder,
+                                             SkinColourState::kDefault, ColourSet::k3));
     }
 
-    void assertHeaderInputGainSliderUsesK3()
+    void assertBlackDuoMonoMenus(const TSS::Skin& skin)
     {
-        const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::Black);
-        paintDistinctPastillesForSets(*skin);
+        const auto comboPatch = TSS::comboBoxLookForZone(skin, SkinZone::kPatch);
+        const auto comboMono = TSS::comboBoxLookForZone(skin, SkinZone::kModales);
+        expect(comboPatch.backgroundEnabled != comboMono.backgroundEnabled);
+        expect(comboMono.backgroundEnabled == juce::Colour(ColourChart::kBlack));
+        expect(comboMono.textEnabled == juce::Colour(ColourChart::kGrey200));
+        expect(comboMono.triangleEnabled == juce::Colour(ColourChart::kGrey600));
+        expect(comboMono.focusBorder == juce::Colour(ColourChart::kGrey800));
 
-        const auto headerGain = TSS::sliderLookFromSkin(*skin, TSS::ColourSet::k3);
-        expect(headerGain.trackEnabled
-               == skin->getColour(SkinObjectType::kSlider,
-                                  SkinColourProperty::kTrack,
-                                  SkinColourState::kDefault,
-                                  TSS::ColourSet::k3));
-        expect(headerGain.trackEnabled
-               != skin->getColour(SkinObjectType::kSlider,
-                                  SkinColourProperty::kTrack,
-                                  SkinColourState::kDefault,
-                                  TSS::ColourSet::k1));
+        const auto popupMono = TSS::popupMenuLookForZone(skin, SkinZone::kModales);
+        expect(popupMono.background == juce::Colour(ColourChart::kBlack));
+        expect(popupMono.text == juce::Colour(ColourChart::kGrey200));
+        expect(popupMono.border == juce::Colour(ColourChart::kGrey600));
+        expect(popupMono.separator == juce::Colour(ColourChart::kGrey600));
+        expect(popupMono.backgroundHover == juce::Colour(ColourChart::kGrey200));
+        expect(popupMono.textHover == juce::Colour(ColourChart::kBlack));
     }
 
-    void assertComboAndPopupK4CarryFormerButtonLike(const TSS::Skin& skin)
+    void assertBlackDuoSeedZoneLooks()
     {
-        const auto comboK1 = TSS::comboBoxLookFromSkin(skin, TSS::ColourSet::k1);
-        const auto comboK4 = TSS::comboBoxLookFromSkin(skin, TSS::ColourSet::k4);
-        expect(comboK1.backgroundEnabled != comboK4.backgroundEnabled);
-        expect(comboK4.backgroundEnabled == juce::Colour(ColourChart::kBlack));
-        expect(comboK4.textEnabled == juce::Colour(ColourChart::kGrey200));
-        expect(comboK4.triangleEnabled == juce::Colour(ColourChart::kGrey600));
-        expect(comboK1.triangleEnabled != comboK4.triangleEnabled);
-        expect(comboK4.focusBorder == juce::Colour(ColourChart::kGrey800));
-        expect(comboK1.focusBorder != comboK4.focusBorder);
+        const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::BlackDuo);
+        const auto patch = TSS::sliderLookForZone(*skin, SkinZone::kPatch);
+        const auto master = TSS::sliderLookForZone(*skin, SkinZone::kMaster);
+        const auto header = TSS::sliderLookForZone(*skin, SkinZone::kHeader);
+        const auto modales = TSS::sliderLookForZone(*skin, SkinZone::kModales);
+        expect(patch.textEnabled == juce::Colour(ColourChart::kBlue400));
+        expect(master.textEnabled == juce::Colour(ColourChart::kOrange400));
+        expect(header.textEnabled == juce::Colour(ColourChart::kYellow400));
+        expect(modales.trackEnabled == juce::Colour(ColourChart::kBlack));
+        expect(modales.valueBarEnabled == juce::Colour(ColourChart::kGrey600));
+        expect(modales.textEnabled == juce::Colour(ColourChart::kGrey200));
 
-        const auto popupK1 = TSS::popupMenuLookFromSkin(skin, TSS::ColourSet::k1);
-        const auto popupK4 = TSS::popupMenuLookFromSkin(skin, TSS::ColourSet::k4);
-        expect(popupK1.background != popupK4.background);
-        expect(popupK4.background == juce::Colour(ColourChart::kBlack));
-        expect(popupK4.text == juce::Colour(ColourChart::kGrey200));
-        expect(popupK4.border == juce::Colour(ColourChart::kGrey600));
-        expect(popupK1.border != popupK4.border);
-        expect(popupK4.separator == juce::Colour(ColourChart::kGrey600));
-        expect(popupK1.separator != popupK4.separator);
-        expect(popupK4.backgroundHover == juce::Colour(ColourChart::kGrey200));
-        expect(popupK1.backgroundHover != popupK4.backgroundHover);
-        expect(popupK4.textHover == juce::Colour(ColourChart::kBlack));
-        expect(popupK1.textHover != popupK4.textHover);
+        assertBlackDuoMonoMenus(*skin);
     }
 
-    void assertBlackCreamSeedLooksAfterUnify(TSS::Skin::ColourVariant variant)
+    void assertCreamSeedZoneLooks()
     {
-        const auto skin = TSS::Skin::create(variant);
-        const auto sliderK1 = TSS::sliderLookFromSkin(*skin, TSS::ColourSet::k1);
-        const auto sliderK2 = TSS::sliderLookFromSkin(*skin, TSS::ColourSet::k2);
-        const auto sliderK3 = TSS::sliderLookFromSkin(*skin, TSS::ColourSet::k3);
-        const auto sliderK4 = TSS::sliderLookFromSkin(*skin, TSS::ColourSet::k4);
-        expect(sliderK1.trackEnabled == sliderK2.trackEnabled
-               && sliderK1.trackEnabled == sliderK3.trackEnabled);
-        expect(sliderK1.trackEnabled != sliderK4.trackEnabled);
-        expect(sliderK4.trackEnabled == juce::Colour(ColourChart::kBlack));
-        expect(sliderK4.valueBarEnabled == juce::Colour(ColourChart::kGrey600));
-        expect(sliderK4.textEnabled == juce::Colour(ColourChart::kGrey200));
+        const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::Cream);
+        const auto patch = TSS::sliderLookForZone(*skin, SkinZone::kPatch);
+        const auto master = TSS::sliderLookForZone(*skin, SkinZone::kMaster);
+        const auto header = TSS::sliderLookForZone(*skin, SkinZone::kHeader);
+        const auto modales = TSS::sliderLookForZone(*skin, SkinZone::kModales);
+        expect(patch.trackEnabled == juce::Colour(ColourChart::kGreen600));
+        expect(master.trackEnabled == patch.trackEnabled && header.trackEnabled == patch.trackEnabled);
+        expect(modales.trackEnabled == juce::Colour(ColourChart::kCream));
+        expect(modales.valueBarEnabled == juce::Colour(ColourChart::kCafe800));
 
-        assertComboAndPopupK4CarryFormerButtonLike(*skin);
-
-        const auto peakK3 = TSS::peakIndicatorLookFromSkin(*skin, TSS::ColourSet::k3);
-        const auto peakK4 = TSS::peakIndicatorLookFromSkin(*skin, TSS::ColourSet::k4);
-        expect(peakK3.maxOn == peakK4.maxOn
-               && peakK3.backgroundOff == peakK4.backgroundOff
-               && peakK3.borderOff == peakK4.borderOff);
+        const auto comboMono = TSS::comboBoxLookForZone(*skin, SkinZone::kModales);
+        expect(comboMono.backgroundEnabled == juce::Colour(ColourChart::kCream));
+        expect(comboMono.textEnabled == juce::Colour(ColourChart::kCafe800));
     }
 };
 

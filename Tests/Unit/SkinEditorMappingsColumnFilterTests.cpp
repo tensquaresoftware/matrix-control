@@ -1,5 +1,7 @@
 #include <juce_core/juce_core.h>
 
+#include <array>
+
 #include "GUI/Skins/Dev/DevSkinInventory.h"
 #include "GUI/Skins/Dev/DevSkinKeyNames.h"
 #include "GUI/Skins/SkinValues.h"
@@ -389,28 +391,32 @@ private:
         expectEquals(readOnlyIndex, numberBoxIndex + 1);
     }
 
+    static std::array<bool, TSS::kAllColourSets.size()> seenColourSets(
+        const std::vector<TSS::SkinColourKey>& inventory,
+        TSS::SkinObjectType object)
+    {
+        std::array<bool, TSS::kAllColourSets.size()> seen {};
+        for (const auto& inventoryKey : inventory)
+            if (inventoryKey.object == object)
+                seen[static_cast<size_t>(inventoryKey.colourSet)] = true;
+        return seen;
+    }
+
     void inventoryExpandsOnlyMultiSetObjects()
     {
-        beginTest("All ten multi-set objects have k1-k4; remaining objects stay k1");
+        beginTest("Multi-set objects expose exactly their frozen sets; remaining objects stay k1");
 
         const auto inventory = TSS::DevSkin::allStructuredKeys();
 
-        // Spec-frozen Peak membership — must not depend solely on kMultiSetSkinObjects.
-        bool peakSeenSets[TSS::kAllColourSets.size()] {};
-        for (const auto& inventoryKey : inventory)
-            if (inventoryKey.object == TSS::SkinObjectType::kPeakIndicator)
-                peakSeenSets[static_cast<size_t>(inventoryKey.colourSet)] = true;
-        for (const bool seen : peakSeenSets)
-            expect(seen);
+        // Spec-frozen Peak membership: k1 Header, k2 Modales.
+        const auto peakSeen = seenColourSets(inventory, TSS::SkinObjectType::kPeakIndicator);
+        expect(peakSeen[0] && peakSeen[1] && ! peakSeen[2] && ! peakSeen[3]);
 
         for (const auto object : TSS::kMultiSetSkinObjects)
         {
-            bool seenSets[TSS::kAllColourSets.size()] {};
-            for (const auto& inventoryKey : inventory)
-                if (inventoryKey.object == object)
-                    seenSets[static_cast<size_t>(inventoryKey.colourSet)] = true;
-            for (const bool seen : seenSets)
-                expect(seen);
+            const auto seen = seenColourSets(inventory, object);
+            for (const auto colourSet : TSS::kAllColourSets)
+                expect(seen[static_cast<size_t>(colourSet)] == TSS::supportsColourSet(object, colourSet));
         }
 
         for (const auto& inventoryKey : inventory)

@@ -96,9 +96,9 @@ private:
         auto* skin = layer.findSkinMutable(layer.activeSkinId());
         expect(skin != nullptr);
 
-        const auto key = TSS::skinColourKey(TSS::SkinObjectType::kButton,
-                                            TSS::SkinColourProperty::kBackground,
-                                            TSS::SkinColourState::kOff,
+        const auto key = TSS::skinColourKey(TSS::SkinObjectType::kSlider,
+                                            TSS::SkinColourProperty::kTrack,
+                                            TSS::SkinColourState::kDefault,
                                             TSS::ColourSet::k3);
         expect(layer.setMapping(skin->id, key, "kEmerald400").wasOk());
         expect(layer.addPastille(skin->id, "kCustomAccent", 0xffff00aa).wasOk());
@@ -106,7 +106,7 @@ private:
         TSS::DevSkin::Layer restored;
         const auto imported = TSS::DevSkin::importFromJson(restored, TSS::DevSkin::exportToJson(layer));
         expect(imported.ok);
-        expectEquals(restored.skins().size(), static_cast<size_t>(3));
+        expectEquals(restored.skins().size(), static_cast<size_t>(4));
 
         const auto* restoredDev = restored.findSkin(skin->id);
         expect(restoredDev != nullptr);
@@ -168,8 +168,8 @@ private:
     {
         TSS::DevSkin::Layer layer;
         expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Export One").wasOk());
+        const auto firstId = layer.activeSkinId();
         expect(layer.duplicateSkin(TSS::DevSkin::kCompiledBlackId, "Export Two").wasOk());
-        const auto firstId = layer.skins()[2].id;
 
         const auto json = TSS::DevSkin::exportEditorSkinToJson(layer, firstId);
         expect(json.isNotEmpty());
@@ -262,7 +262,7 @@ private:
         expect(second.ok);
         expectEquals(second.importedSkinIds.size(), 1);
         expect(first.importedSkinIds[0] != second.importedSkinIds[0]);
-        expectEquals(layer.skins().size(), static_cast<size_t>(4));
+        expectEquals(layer.skins().size(), static_cast<size_t>(5));
     }
 
     void assertAppendMultiSkinAddsTwo()
@@ -434,8 +434,9 @@ private:
         const auto bad = TSS::DevSkin::importSessionFromJsonOrReset(layer, state, "{ not-json");
         expect(! bad.ok);
         expect(bad.message.containsIgnoreCase("Corrupt session"));
-        expectEquals(layer.skins().size(), static_cast<size_t>(2));
+        expectEquals(layer.skins().size(), static_cast<size_t>(3));
         expect(layer.findSkin(TSS::DevSkin::kCompiledBlackId) != nullptr);
+        expect(layer.findSkin(TSS::DevSkin::kCompiledBlackDuoId) != nullptr);
         expect(layer.findSkin(TSS::DevSkin::kCompiledCreamId) != nullptr);
         expect(state.editorSkinId.isEmpty());
         expect(! state.compareOn);

@@ -1,6 +1,7 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 
 #include "GUI/Helpers/EditorChromeShortcuts.h"
+#include "Shared/Definitions/PluginIDs.h"
 
 class EditorChromeShortcutTests : public juce::UnitTest
 {
@@ -167,16 +168,18 @@ private:
         constexpr juce::juce_wchar kEAcute = 0x00e9;
         constexpr juce::juce_wchar kEAcuteUpper = 0x00c9;
 
-        expectEquals(TSS::classifySkinVariantShortcut(juce::KeyPress('1', command, 0)), 1);
-        expectEquals(TSS::classifySkinVariantShortcut(juce::KeyPress('2', command, 0)), 2);
-        expectEquals(TSS::classifySkinVariantShortcut(juce::KeyPress('1', commandShift, 0)), 1);
+        using namespace PluginIDs::Settings::SkinVariants;
+        expectEquals(TSS::classifySkinVariantShortcut(juce::KeyPress('1', command, 0)), kBlack);
+        expectEquals(TSS::classifySkinVariantShortcut(juce::KeyPress('2', command, 0)), kBlackDuo);
+        expectEquals(TSS::classifySkinVariantShortcut(juce::KeyPress('3', command, 0)), kCream);
+        expectEquals(TSS::classifySkinVariantShortcut(juce::KeyPress('1', commandShift, 0)), kBlack);
         expectEquals(TSS::classifySkinVariantShortcut(
                          juce::KeyPress(juce::KeyPress::numberPad2, command, 0)),
-                     2);
-        expectEquals(TSS::classifySkinVariantShortcut(juce::KeyPress('&', command, 0)), 1);
+                     kBlackDuo);
+        expectEquals(TSS::classifySkinVariantShortcut(juce::KeyPress('&', command, 0)), kBlack);
         expectEquals(TSS::classifySkinVariantShortcut(
                          juce::KeyPress(static_cast<int>(kEAcuteUpper), command, kEAcute)),
-                     2);
+                     kBlackDuo);
         expect(TSS::isEditorChromeShortcut(juce::KeyPress('1', command, 0)));
     }
 
@@ -187,9 +190,9 @@ private:
         using juce::ModifierKeys;
         const auto command = ModifierKeys::commandModifier;
 
-        expectEquals(TSS::classifySkinVariantShortcut(juce::KeyPress('3', command, 0)), 0);
-        expect(! TSS::isAssignedSkinVariantId(3));
-        expect(! TSS::isEditorChromeShortcut(juce::KeyPress('3', command, 0)));
+        expectEquals(TSS::classifySkinVariantShortcut(juce::KeyPress('4', command, 0)), 0);
+        expect(! TSS::isAssignedSkinVariantShortcutDigit(4));
+        expect(! TSS::isEditorChromeShortcut(juce::KeyPress('4', command, 0)));
     }
 
     void rejectsWhenTextWouldConflictWithPlainKeys()

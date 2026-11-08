@@ -10,11 +10,11 @@ using TSS::SkinColourProperty;
 using TSS::SkinColourState;
 using TSS::ColourSet;
 
-class ProgressBarColourSetK4Tests : public juce::UnitTest
+class ProgressBarUcsSeedTests : public juce::UnitTest
 {
 public:
-    ProgressBarColourSetK4Tests()
-        : juce::UnitTest("ProgressBarColourSetK4")
+    ProgressBarUcsSeedTests()
+        : juce::UnitTest("ProgressBarUcsSeed")
     {
     }
 
@@ -22,53 +22,33 @@ public:
     {
         using namespace TSS::SkinColours::Widgets;
 
-        beginTest("k4SeedElements_matchSliderK4Greys");
+        beginTest("ucsSeed_matchesModalesSliderOnBothSkins");
 
-        expect(ProgressBarK4::kTrack.blackVariant == SliderK4::kTrack.blackVariant);
-        expect(ProgressBarK4::kTrack.creamVariant == SliderK4::kTrack.creamVariant);
-        expect(ProgressBarK4::kValueBar.blackVariant == SliderK4::kValueBar.blackVariant);
-        expect(ProgressBarK4::kValueBar.creamVariant == SliderK4::kValueBar.creamVariant);
-        expect(ProgressBarK4::kText.blackVariant == SliderK4::kText.blackVariant);
-        expect(ProgressBarK4::kText.creamVariant == SliderK4::kText.creamVariant);
-        expect(ProgressBarK4::kTrack.blackVariant == ColourChart::kBlack);
-        expect(ProgressBarK4::kValueBar.blackVariant == ColourChart::kGrey600);
-        expect(ProgressBarK4::kText.blackVariant == ColourChart::kGrey200);
+        expect(ProgressBar::kTrack.blackDuoVariant == SliderK4::kTrack.blackDuoVariant);
+        expect(ProgressBar::kTrack.creamVariant == SliderK4::kTrack.creamVariant);
+        expect(ProgressBar::kValueBar.blackDuoVariant == SliderK4::kValueBar.blackDuoVariant);
+        expect(ProgressBar::kValueBar.creamVariant == SliderK4::kValueBar.creamVariant);
+        expect(ProgressBar::kText.blackDuoVariant == SliderK4::kText.blackDuoVariant);
+        expect(ProgressBar::kText.creamVariant == SliderK4::kText.creamVariant);
+        expect(ProgressBar::kTrack.blackDuoVariant == ColourChart::kBlack);
+        expect(ProgressBar::kValueBar.blackDuoVariant == ColourChart::kGrey600);
+        expect(ProgressBar::kText.blackDuoVariant == ColourChart::kGrey200);
 
-        beginTest("baseSeed_copiesSliderEmeraldStops");
+        beginTest("ucs_onlyK1IsSeeded");
 
-        expect(ProgressBar::kTrack.blackVariant == Slider::kTrack.blackVariant);
-        expect(ProgressBar::kTrack.creamVariant == Slider::kTrack.creamVariant);
-        expect(ProgressBar::kValueBar.blackVariant == Slider::kValueBar.blackVariant);
-        expect(ProgressBar::kValueBar.creamVariant == Slider::kValueBar.creamVariant);
-        expect(ProgressBar::kText.blackVariant == Slider::kText.blackVariant);
-        expect(ProgressBar::kText.creamVariant == Slider::kText.creamVariant);
-        expect(ProgressBar::kTrackDisabled.blackVariant == Slider::kTrackDisabled.blackVariant);
-        expect(ProgressBar::kTrackDisabled.creamVariant == Slider::kTrackDisabled.creamVariant);
-        expect(ProgressBar::kValueBarDisabled.blackVariant == Slider::kValueBarDisabled.blackVariant);
-        expect(ProgressBar::kValueBarDisabled.creamVariant == Slider::kValueBarDisabled.creamVariant);
-        expect(ProgressBar::kTextDisabled.blackVariant == Slider::kTextDisabled.blackVariant);
-        expect(ProgressBar::kTextDisabled.creamVariant == Slider::kTextDisabled.creamVariant);
+        expect(! TSS::supportsColourSet(SkinObjectType::kProgressBar, ColourSet::k2));
+        assertHigherSetFallsBackToK1(TSS::Skin::ColourVariant::BlackDuo);
+        assertHigherSetFallsBackToK1(TSS::Skin::ColourVariant::Cream);
 
-        beginTest("modalPaintContract_k4GreysNotSliderEmerald");
+        beginTest("disabledContract_pinsBlackDuoSharedAndCreamCafeSeeds");
 
-        assertModalPaintContract(TSS::Skin::ColourVariant::Black);
-        assertModalPaintContract(TSS::Skin::ColourVariant::Cream);
-
-        beginTest("k1StaysEmerald_afterK4Overlay");
-
-        assertK1StaysEmerald(TSS::Skin::ColourVariant::Black);
-        assertK1StaysEmerald(TSS::Skin::ColourVariant::Cream);
-
-        beginTest("disabledPhaseLaneContract_k4UsesDisabledSeeds");
-
-        assertDisabledPhaseLaneContract(TSS::Skin::ColourVariant::Black);
-        assertDisabledPhaseLaneContract(TSS::Skin::ColourVariant::Cream);
+        assertDisabledContract();
     }
 
 private:
     static juce::Colour progressColour(const TSS::Skin& skin,
                                        SkinColourProperty property,
-                                       ColourSet colourSet)
+                                       ColourSet colourSet = ColourSet::k1)
     {
         return skin.getColour(SkinObjectType::kProgressBar,
                               property,
@@ -76,80 +56,47 @@ private:
                               colourSet);
     }
 
-    static juce::Colour sliderColour(const TSS::Skin& skin,
-                                     SkinColourProperty property,
-                                     ColourSet colourSet)
-    {
-        return skin.getColour(SkinObjectType::kSlider,
-                              property,
-                              SkinColourState::kDefault,
-                              colourSet);
-    }
-
-    void assertModalPaintContract(TSS::Skin::ColourVariant variant)
+    void assertHigherSetFallsBackToK1(TSS::Skin::ColourVariant variant)
     {
         const auto skin = TSS::Skin::create(variant);
-        const auto track = progressColour(*skin, SkinColourProperty::kTrack, ColourSet::k4);
-        const auto valueBar = progressColour(*skin, SkinColourProperty::kValueBar, ColourSet::k4);
-        const auto text = progressColour(*skin, SkinColourProperty::kText, ColourSet::k4);
-
-        expect(track == juce::Colour(ColourChart::kBlack));
-        expect(valueBar == juce::Colour(ColourChart::kGrey600));
-        expect(text == juce::Colour(ColourChart::kGrey200));
-        expect(track == sliderColour(*skin, SkinColourProperty::kTrack, ColourSet::k4));
-        expect(valueBar == sliderColour(*skin, SkinColourProperty::kValueBar, ColourSet::k4));
-        expect(text == sliderColour(*skin, SkinColourProperty::kText, ColourSet::k4));
-        expect(track != sliderColour(*skin, SkinColourProperty::kTrack, ColourSet::k1));
-        expect(valueBar != sliderColour(*skin, SkinColourProperty::kValueBar, ColourSet::k1));
-        expect(text != sliderColour(*skin, SkinColourProperty::kText, ColourSet::k1));
-        expect(track != juce::Colour(ColourChart::kEmerald950));
-        expect(valueBar != juce::Colour(ColourChart::kEmerald700));
-        expect(text != juce::Colour(ColourChart::kEmerald400));
+        for (const auto property : { SkinColourProperty::kTrack,
+                                     SkinColourProperty::kValueBar,
+                                     SkinColourProperty::kText })
+            expect(progressColour(*skin, property, ColourSet::k4) == progressColour(*skin, property));
     }
 
-    void assertK1StaysEmerald(TSS::Skin::ColourVariant variant)
-    {
-        const auto skin = TSS::Skin::create(variant);
-        expect(progressColour(*skin, SkinColourProperty::kTrack, ColourSet::k1)
-               == juce::Colour(ColourChart::kEmerald950));
-        expect(progressColour(*skin, SkinColourProperty::kValueBar, ColourSet::k1)
-               == juce::Colour(ColourChart::kEmerald700));
-        expect(progressColour(*skin, SkinColourProperty::kText, ColourSet::k1)
-               == juce::Colour(ColourChart::kEmerald400));
-        expect(progressColour(*skin, SkinColourProperty::kTrack, ColourSet::k1)
-               == sliderColour(*skin, SkinColourProperty::kTrack, ColourSet::k1));
-        expect(progressColour(*skin, SkinColourProperty::kValueBar, ColourSet::k1)
-               == sliderColour(*skin, SkinColourProperty::kValueBar, ColourSet::k1));
-        expect(progressColour(*skin, SkinColourProperty::kText, ColourSet::k1)
-               == sliderColour(*skin, SkinColourProperty::kText, ColourSet::k1));
-        expect(progressColour(*skin, SkinColourProperty::kTrack, ColourSet::k1)
-               != progressColour(*skin, SkinColourProperty::kTrack, ColourSet::k4));
-    }
-
-    void assertDisabledPhaseLaneContract(TSS::Skin::ColourVariant variant)
+    void assertDisabledContract()
     {
         using namespace TSS::SkinColours;
 
-        const auto skin = TSS::Skin::create(variant);
-
-        expect(skin->getColour(SkinObjectType::kProgressBar,
-                               SkinColourProperty::kTrack,
-                               SkinColourState::kDisabled,
-                               ColourSet::k4)
+        const auto blackDuo = TSS::Skin::create(TSS::Skin::ColourVariant::BlackDuo);
+        expect(blackDuo->getColour(SkinObjectType::kProgressBar,
+                                   SkinColourProperty::kTrack,
+                                   SkinColourState::kDisabled)
                == juce::Colour(Common::kDecorationDisabled));
-        expect(skin->getColour(SkinObjectType::kProgressBar,
-                               SkinColourProperty::kText,
-                               SkinColourState::kDisabled,
-                               ColourSet::k4)
+        expect(blackDuo->getColour(SkinObjectType::kProgressBar,
+                                   SkinColourProperty::kText,
+                                   SkinColourState::kDisabled)
                == juce::Colour(Common::kContentDisabled));
-        expect(skin->getColour(SkinObjectType::kProgressBar,
-                               SkinColourProperty::kValueBar,
-                               SkinColourState::kDisabled,
-                               ColourSet::k4)
-               == juce::Colour(Widgets::ProgressBar::kValueBarDisabled.blackVariant));
-        expect(Widgets::ProgressBar::kValueBarDisabled.blackVariant == ColourChart::kGrey700);
-        expect(Widgets::ProgressBar::kValueBarDisabled.creamVariant == ColourChart::kGrey700);
+        expect(blackDuo->getColour(SkinObjectType::kProgressBar,
+                                   SkinColourProperty::kValueBar,
+                                   SkinColourState::kDisabled)
+               == juce::Colour(ColourChart::kGrey700));
+
+        const auto cream = TSS::Skin::create(TSS::Skin::ColourVariant::Cream);
+        expect(cream->getColour(SkinObjectType::kProgressBar,
+                                SkinColourProperty::kTrack,
+                                SkinColourState::kDisabled)
+               == juce::Colour(ColourChart::kCream));
+        expect(cream->getColour(SkinObjectType::kProgressBar,
+                                SkinColourProperty::kText,
+                                SkinColourState::kDisabled)
+               == juce::Colour(ColourChart::kCafe600));
+        expect(cream->getColour(SkinObjectType::kProgressBar,
+                                SkinColourProperty::kValueBar,
+                                SkinColourState::kDisabled)
+               == juce::Colour(ColourChart::kCafe600));
     }
 };
 
-static ProgressBarColourSetK4Tests progressBarColourSetK4Tests;
+static ProgressBarUcsSeedTests progressBarUcsSeedTests;

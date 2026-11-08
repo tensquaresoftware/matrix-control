@@ -7,6 +7,7 @@
 #include "GUI/Skins/Skin.h"
 #include "GUI/Skins/SkinValues.h"
 #include "GUI/Widgets/Button.h"
+#include "GUI/Widgets/ComboBox.h"
 #include "GUI/Widgets/Led.h"
 #include "GUI/Widgets/ModuleHeader.h"
 #include "GUI/Widgets/ParameterCell.h"
@@ -33,10 +34,10 @@ public:
     void runTest() override
     {
         beginTest("lookFromSkin_resolvesRequestedColourSet");
-        assertLookFromSkinResolvesColourSet(TSS::Skin::ColourVariant::Black);
+        assertLookFromSkinResolvesColourSet(TSS::Skin::ColourVariant::BlackDuo);
         assertLookFromSkinResolvesColourSet(TSS::Skin::ColourVariant::Cream);
 
-        beginTest("headerVsSettings_peakAndLedUseDistinctColourSets");
+        beginTest("headerVsModales_peakAndLedUseZoneColourSets");
         assertHeaderVsSettingsPeakAndLedDistinctSets();
 
         beginTest("led_setSkinPreservesColourSet");
@@ -45,14 +46,17 @@ public:
         beginTest("peakIndicator_setSkinPreservesColourSet");
         assertPeakIndicatorSetSkinPreservesColourSet();
 
-        beginTest("parameterCell_moduleTypeMapsToColourSet");
-        assertParameterCellModuleTypeMapsToColourSet();
+        beginTest("parameterCell_moduleTypeMapsToZone");
+        assertParameterCellModuleTypeMapsToZone();
 
-        beginTest("parameterCell_sliderLookUsesModuleColourSet");
-        assertParameterCellSliderLookUsesModuleColourSet();
+        beginTest("parameterCell_sliderLookUsesZoneColourSet");
+        assertParameterCellSliderLookUsesZoneColourSet();
 
-        beginTest("moduleHeader_masterEditButtonsUseK2");
-        assertModuleHeaderMasterEditButtonsUseK2();
+        beginTest("parameterCell_comboLookUsesZoneColourSet");
+        assertParameterCellComboLookUsesZoneColourSet();
+
+        beginTest("moduleHeader_patchAndMasterButtonsShareButtonUcs");
+        assertModuleHeaderButtonsShareButtonUcs();
     }
 
 private:
@@ -63,6 +67,22 @@ private:
         expect(slider.look_.trackEnabled
                == skin.getColour(SkinObjectType::kSlider,
                                  SkinColourProperty::kTrack,
+                                 SkinColourState::kDefault,
+                                 colourSet));
+    }
+
+    void expectComboBackground(const TSS::ComboBox& combo,
+                               const TSS::ISkin& skin,
+                               TSS::ColourSet colourSet)
+    {
+        expect(combo.look_.backgroundEnabled
+               == skin.getColour(SkinObjectType::kComboBox,
+                                 SkinColourProperty::kBackground,
+                                 SkinColourState::kDefault,
+                                 colourSet));
+        expect(combo.getPopupMenuLook().border
+               == skin.getColour(SkinObjectType::kPopupMenu,
+                                 SkinColourProperty::kBorder,
                                  SkinColourState::kDefault,
                                  colourSet));
     }
@@ -100,91 +120,81 @@ private:
 
     void assertHeaderVsSettingsPeakAndLedDistinctSets()
     {
-        const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::Black);
+        const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::BlackDuo);
         paintDistinctPastillesForSets(*skin);
 
-        const auto headerPeak = TSS::peakIndicatorLookFromSkin(*skin, TSS::ColourSet::k3);
-        const auto settingsPeak = TSS::peakIndicatorLookFromSkin(*skin, TSS::ColourSet::k4);
-        expect(headerPeak.maxOn != settingsPeak.maxOn);
-        expect(headerPeak.maxOn
-               == skin->getColour(SkinObjectType::kPeakIndicator,
-                                  SkinColourProperty::kBackground,
-                                  SkinColourState::kOn,
-                                  TSS::ColourSet::k3));
-        expect(settingsPeak.maxOn
-               == skin->getColour(SkinObjectType::kPeakIndicator,
-                                  SkinColourProperty::kBackground,
-                                  SkinColourState::kOn,
-                                  TSS::ColourSet::k4));
+        for (const auto object : { SkinObjectType::kLed, SkinObjectType::kPeakIndicator })
+        {
+            const auto headerSet = TSS::zoneColourSet(object, TSS::SkinZone::kHeader);
+            const auto modalesSet = TSS::zoneColourSet(object, TSS::SkinZone::kModales);
+            expect(headerSet == TSS::ColourSet::k1);
+            expect(modalesSet == TSS::ColourSet::k2);
 
-        const auto headerLed = TSS::ledLookFromSkin(*skin, TSS::ColourSet::k3);
-        const auto settingsLed = TSS::ledLookFromSkin(*skin, TSS::ColourSet::k4);
-        expect(headerLed.maxOn != settingsLed.maxOn);
-        expect(headerLed.maxOn
-               == skin->getColour(SkinObjectType::kLed,
-                                  SkinColourProperty::kBackground,
-                                  SkinColourState::kOn,
-                                  TSS::ColourSet::k3));
-        expect(settingsLed.maxOn
-               == skin->getColour(SkinObjectType::kLed,
-                                  SkinColourProperty::kBackground,
-                                  SkinColourState::kOn,
-                                  TSS::ColourSet::k4));
+            const auto build = object == SkinObjectType::kLed ? &TSS::ledLookFromSkin
+                                                              : &TSS::peakIndicatorLookFromSkin;
+            const auto headerLook = build(*skin, headerSet);
+            const auto modalesLook = build(*skin, modalesSet);
+            expect(headerLook.maxOn != modalesLook.maxOn);
+            expect(headerLook.maxOn
+                   == skin->getColour(object, SkinColourProperty::kBackground, SkinColourState::kOn, headerSet));
+            expect(modalesLook.maxOn
+                   == skin->getColour(object, SkinColourProperty::kBackground, SkinColourState::kOn, modalesSet));
+        }
     }
 
     void assertLedSetSkinPreservesColourSet()
     {
-        const auto skinA = TSS::Skin::create(TSS::Skin::ColourVariant::Black);
+        const auto skinA = TSS::Skin::create(TSS::Skin::ColourVariant::BlackDuo);
         const auto skinB = TSS::Skin::create(TSS::Skin::ColourVariant::Cream);
         paintDistinctPastillesForSets(*skinA);
         paintDistinctPastillesForSets(*skinB);
 
-        TSS::Led led(12, 12, TSS::ColourSet::k3);
+        TSS::Led led(12, 12, TSS::ColourSet::k2);
         led.setSkin(*skinA);
-        expect(led.getColourSet() == TSS::ColourSet::k3);
+        expect(led.getColourSet() == TSS::ColourSet::k2);
         expect(led.ledLook_.maxOn
                == skinA->getColour(SkinObjectType::kLed,
                                    SkinColourProperty::kBackground,
                                    SkinColourState::kOn,
-                                   TSS::ColourSet::k3));
+                                   TSS::ColourSet::k2));
 
         led.setSkin(*skinB);
-        expect(led.getColourSet() == TSS::ColourSet::k3);
+        expect(led.getColourSet() == TSS::ColourSet::k2);
         expect(led.ledLook_.maxOn
                == skinB->getColour(SkinObjectType::kLed,
                                    SkinColourProperty::kBackground,
                                    SkinColourState::kOn,
-                                   TSS::ColourSet::k3));
+                                   TSS::ColourSet::k2));
     }
 
     void assertPeakIndicatorSetSkinPreservesColourSet()
     {
-        const auto skinA = TSS::Skin::create(TSS::Skin::ColourVariant::Black);
+        const auto skinA = TSS::Skin::create(TSS::Skin::ColourVariant::BlackDuo);
         const auto skinB = TSS::Skin::create(TSS::Skin::ColourVariant::Cream);
         paintDistinctPastillesForSets(*skinA);
         paintDistinctPastillesForSets(*skinB);
 
-        TSS::PeakIndicator peak(12, 12, TSS::ColourSet::k3);
+        TSS::PeakIndicator peak(12, 12, TSS::ColourSet::k2);
         peak.setSkin(*skinA);
-        expect(peak.getColourSet() == TSS::ColourSet::k3);
+        expect(peak.getColourSet() == TSS::ColourSet::k2);
         expect(peak.ledLook_.maxOn
                == skinA->getColour(SkinObjectType::kPeakIndicator,
                                    SkinColourProperty::kBackground,
                                    SkinColourState::kOn,
-                                   TSS::ColourSet::k3));
+                                   TSS::ColourSet::k2));
 
         peak.setSkin(*skinB);
-        expect(peak.getColourSet() == TSS::ColourSet::k3);
+        expect(peak.getColourSet() == TSS::ColourSet::k2);
         expect(peak.ledLook_.maxOn
                == skinB->getColour(SkinObjectType::kPeakIndicator,
                                    SkinColourProperty::kBackground,
                                    SkinColourState::kOn,
-                                   TSS::ColourSet::k3));
+                                   TSS::ColourSet::k2));
     }
 
-    void assertParameterCellModuleTypeMapsToColourSet()
+    void assertParameterCellModuleTypeMapsToZone()
     {
-        const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::Black);
+        const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::BlackDuo);
         MinimalAudioProcessor processor;
         WidgetFactory factory(processor.apvts);
         const ParameterCellDimensions dimensions {};
@@ -198,7 +208,7 @@ private:
             .apvts = processor.apvts,
             .dimensions = dimensions,
         });
-        expect(patchCell.getColourSet() == TSS::ColourSet::k1);
+        expect(patchCell.getZone() == TSS::SkinZone::kPatch);
 
         ParameterCell masterCell({
             .skin = *skin,
@@ -209,7 +219,7 @@ private:
             .apvts = processor.apvts,
             .dimensions = dimensions,
         });
-        expect(masterCell.getColourSet() == TSS::ColourSet::k2);
+        expect(masterCell.getZone() == TSS::SkinZone::kMaster);
     }
 
     struct SliderCellSpec
@@ -234,9 +244,9 @@ private:
         });
     }
 
-    void assertParameterCellSliderLookUsesModuleColourSet()
+    void assertParameterCellSliderLookUsesZoneColourSet()
     {
-        const auto skinA = TSS::Skin::create(TSS::Skin::ColourVariant::Black);
+        const auto skinA = TSS::Skin::create(TSS::Skin::ColourVariant::BlackDuo);
         const auto skinB = TSS::Skin::create(TSS::Skin::ColourVariant::Cream);
         paintDistinctPastillesForSets(*skinA);
         paintDistinctPastillesForSets(*skinB);
@@ -250,7 +260,7 @@ private:
             .apvts = processor.apvts,
             .moduleType = ParameterCell::ModuleType::PatchEdit,
         });
-        expect(patchCell.getColourSet() == TSS::ColourSet::k1);
+        expect(patchCell.getZone() == TSS::SkinZone::kPatch);
         expect(patchCell.getSlider() != nullptr);
         expectSliderTrack(*patchCell.getSlider(), *skinA, TSS::ColourSet::k1);
 
@@ -260,15 +270,74 @@ private:
             .apvts = processor.apvts,
             .moduleType = ParameterCell::ModuleType::MasterEdit,
         });
-        expect(masterCell.getColourSet() == TSS::ColourSet::k2);
+        expect(masterCell.getZone() == TSS::SkinZone::kMaster);
         expect(masterCell.getSlider() != nullptr);
         expectSliderTrack(*masterCell.getSlider(), *skinA, TSS::ColourSet::k2);
         expect(masterCell.getSlider()->look_.trackEnabled
                != patchCell.getSlider()->look_.trackEnabled);
 
         masterCell.setSkin(*skinB);
-        expect(masterCell.getColourSet() == TSS::ColourSet::k2);
+        expect(masterCell.getZone() == TSS::SkinZone::kMaster);
         expectSliderTrack(*masterCell.getSlider(), *skinB, TSS::ColourSet::k2);
+    }
+
+    struct ComboCellSpec
+    {
+        TSS::ISkin& skin;
+        WidgetFactory& factory;
+        juce::AudioProcessorValueTreeState& apvts;
+        ParameterCell::ModuleType moduleType;
+    };
+
+    ParameterCell makeComboCell(const ComboCellSpec& spec)
+    {
+        const ParameterCellDimensions dimensions {};
+        return ParameterCell({
+            .skin = spec.skin,
+            .factory = spec.factory,
+            .parameterId = PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kSync,
+            .type = ParameterCell::ParameterType::ComboBox,
+            .moduleType = spec.moduleType,
+            .apvts = spec.apvts,
+            .dimensions = dimensions,
+        });
+    }
+
+    void assertParameterCellComboLookUsesZoneColourSet()
+    {
+        const auto skinA = TSS::Skin::create(TSS::Skin::ColourVariant::BlackDuo);
+        const auto skinB = TSS::Skin::create(TSS::Skin::ColourVariant::Cream);
+        paintDistinctPastillesForSets(*skinA);
+        paintDistinctPastillesForSets(*skinB);
+
+        MinimalAudioProcessor processor;
+        WidgetFactory factory(processor.apvts);
+
+        auto patchCell = makeComboCell({
+            .skin = *skinA,
+            .factory = factory,
+            .apvts = processor.apvts,
+            .moduleType = ParameterCell::ModuleType::PatchEdit,
+        });
+        expect(patchCell.getZone() == TSS::SkinZone::kPatch);
+        expect(patchCell.getComboBox() != nullptr);
+        expectComboBackground(*patchCell.getComboBox(), *skinA, TSS::ColourSet::k1);
+
+        auto masterCell = makeComboCell({
+            .skin = *skinA,
+            .factory = factory,
+            .apvts = processor.apvts,
+            .moduleType = ParameterCell::ModuleType::MasterEdit,
+        });
+        expect(masterCell.getZone() == TSS::SkinZone::kMaster);
+        expect(masterCell.getComboBox() != nullptr);
+        expectComboBackground(*masterCell.getComboBox(), *skinA, TSS::ColourSet::k2);
+        expect(masterCell.getComboBox()->look_.backgroundEnabled
+               != patchCell.getComboBox()->look_.backgroundEnabled);
+
+        masterCell.setSkin(*skinB);
+        expect(masterCell.getZone() == TSS::SkinZone::kMaster);
+        expectComboBackground(*masterCell.getComboBox(), *skinB, TSS::ColourSet::k2);
     }
 
     struct InitOnlyHeaderSpec
@@ -299,12 +368,10 @@ private:
         });
     }
 
-    void assertModuleHeaderMasterEditButtonsUseK2()
+    void assertModuleHeaderButtonsShareButtonUcs()
     {
-        const auto skinA = TSS::Skin::create(TSS::Skin::ColourVariant::Black);
+        const auto skinA = TSS::Skin::create(TSS::Skin::ColourVariant::BlackDuo);
         const auto skinB = TSS::Skin::create(TSS::Skin::ColourVariant::Cream);
-        paintDistinctPastillesForSets(*skinA);
-        paintDistinctPastillesForSets(*skinB);
 
         MinimalAudioProcessor processor;
         WidgetFactory factory(processor.apvts);
@@ -317,7 +384,6 @@ private:
             .moduleId = PluginIDs::PatchEditSection::Dco1Module::kGroupId,
             .initWidgetId = PluginIDs::PatchEditSection::Dco1Module::StandaloneWidgets::kInit,
         });
-        expect(patchHeader.getButtonColourSet() == TSS::ColourSet::k1);
         expect(patchHeader.getInitButton() != nullptr);
         expectButtonBackgroundOff(*patchHeader.getInitButton(), *skinA, TSS::ColourSet::k1);
 
@@ -329,17 +395,14 @@ private:
             .moduleId = PluginIDs::MasterEditSection::MidiModule::kGroupId,
             .initWidgetId = PluginIDs::MasterEditSection::MidiModule::StandaloneWidgets::kInit,
         });
-        expect(masterHeader.getButtonColourSet() == TSS::ColourSet::k2);
         expect(masterHeader.getInitButton() != nullptr);
-        expectButtonBackgroundOff(*masterHeader.getInitButton(), *skinA, TSS::ColourSet::k2);
+        expectButtonBackgroundOff(*masterHeader.getInitButton(), *skinA, TSS::ColourSet::k1);
         expect(masterHeader.getInitButton()->look_.backgroundOff
-               != patchHeader.getInitButton()->look_.backgroundOff);
+               == patchHeader.getInitButton()->look_.backgroundOff);
 
         masterHeader.setSkin(*skinB);
-        expect(masterHeader.getButtonColourSet() == TSS::ColourSet::k2);
-        expectButtonBackgroundOff(*masterHeader.getInitButton(), *skinB, TSS::ColourSet::k2);
+        expectButtonBackgroundOff(*masterHeader.getInitButton(), *skinB, TSS::ColourSet::k1);
     }
-
 };
 
 static SkinColourWiringTests skinColourWiringTests;

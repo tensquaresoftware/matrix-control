@@ -62,83 +62,40 @@ namespace SkinColourWiringTestSupport
         skin.setColour(key, colour);
     }
 
-    inline void paintPeakLedAndSliderPastilles(TSS::Skin& skin)
+    inline juce::Colour distinctPastilleForSet(TSS::ColourSet colourSet)
     {
-        using O = TSS::SkinObjectType;
-        using P = TSS::SkinColourProperty;
-        using S = TSS::SkinColourState;
-        using C = TSS::ColourSet;
-
-        paintKey(skin, TSS::skinColourKey(O::kPeakIndicator, P::kBackground, S::kOn, C::k3),
-                 juce::Colour(ColourChart::kYellow));
-        paintKey(skin, TSS::skinColourKey(O::kPeakIndicator, P::kBackground, S::kOn, C::k4),
-                 juce::Colour(ColourChart::kGrey600));
-        paintKey(skin, TSS::skinColourKey(O::kLed, P::kBackground, S::kOn, C::k3),
-                 juce::Colour(ColourChart::kOrange));
-        paintKey(skin, TSS::skinColourKey(O::kLed, P::kBackground, S::kOn, C::k4),
-                 juce::Colour(ColourChart::kBlue));
-        paintKey(skin, TSS::skinColourKey(O::kSlider, P::kTrack, S::kDefault, C::k1),
-                 juce::Colour(ColourChart::kEmerald400));
-        paintKey(skin, TSS::skinColourKey(O::kSlider, P::kTrack, S::kDefault, C::k2),
-                 juce::Colour(ColourChart::kOrange));
-        paintKey(skin, TSS::skinColourKey(O::kSlider, P::kTrack, S::kDefault, C::k3),
-                 juce::Colour(ColourChart::kYellow));
+        switch (colourSet)
+        {
+            case TSS::ColourSet::k1: return juce::Colour(ColourChart::kBlue400);
+            case TSS::ColourSet::k2: return juce::Colour(ColourChart::kOrange400);
+            case TSS::ColourSet::k3: return juce::Colour(ColourChart::kYellow400);
+            case TSS::ColourSet::k4: return juce::Colour(ColourChart::kGrey600);
+        }
+        return juce::Colour(ColourChart::kWhite);
     }
 
-    inline void paintSettingsZoneAndNumberBoxPastilles(TSS::Skin& skin)
+    inline void paintEverySupportedSet(TSS::Skin& skin, TSS::SkinColourKey key)
     {
-        using O = TSS::SkinObjectType;
-        using P = TSS::SkinColourProperty;
-        using S = TSS::SkinColourState;
-        using C = TSS::ColourSet;
-
-        paintKey(skin, TSS::skinColourKey(O::kSlider, P::kTrack, S::kDefault, C::k4),
-                 juce::Colour(ColourChart::kGrey600));
-        paintKey(skin, TSS::skinColourKey(O::kSlider, P::kTrack, S::kDefault, C::k1),
-                 juce::Colour(ColourChart::kEmerald400));
-        paintKey(skin, TSS::skinColourKey(O::kComboBox, P::kBackground, S::kDefault, C::k4),
-                 juce::Colour(ColourChart::kGrey600));
-        paintKey(skin, TSS::skinColourKey(O::kComboBox, P::kBackground, S::kDefault, C::k1),
-                 juce::Colour(ColourChart::kEmerald400));
-        paintKey(skin, TSS::skinColourKey(O::kPopupMenu, P::kBorder, S::kDefault, C::k4),
-                 juce::Colour(ColourChart::kGrey600));
-        paintKey(skin, TSS::skinColourKey(O::kPopupMenu, P::kBorder, S::kDefault, C::k1),
-                 juce::Colour(ColourChart::kEmerald400));
-        paintKey(skin, TSS::skinColourKey(O::kNumberBox, P::kBackground, S::kDefault, C::k4),
-                 juce::Colour(ColourChart::kGrey600));
-        paintKey(skin, TSS::skinColourKey(O::kNumberBox, P::kBackground, S::kDefault, C::k1),
-                 juce::Colour(ColourChart::kEmerald400));
-        paintKey(skin, TSS::skinColourKey(O::kNumberBox, P::kText, S::kFocus, C::k1),
-                 juce::Colour(ColourChart::kEmerald400));
-        paintKey(skin, TSS::skinColourKey(O::kNumberBox, P::kText, S::kFocus, C::k4),
-                 juce::Colour(ColourChart::kRed500));
+        for (const auto colourSet : TSS::kAllColourSets)
+        {
+            if (! TSS::supportsColourSet(key.object, colourSet))
+                continue;
+            key.colourSet = colourSet;
+            paintKey(skin, key, distinctPastilleForSet(colourSet));
+        }
     }
 
-    inline void paintButtonAndReadOnlyPastilles(TSS::Skin& skin)
-    {
-        using O = TSS::SkinObjectType;
-        using P = TSS::SkinColourProperty;
-        using S = TSS::SkinColourState;
-        using C = TSS::ColourSet;
-
-        paintKey(skin, TSS::skinColourKey(O::kButton, P::kBackground, S::kOff, C::k1),
-                 juce::Colour(ColourChart::kEmerald400));
-        paintKey(skin, TSS::skinColourKey(O::kButton, P::kBackground, S::kOff, C::k2),
-                 juce::Colour(ColourChart::kOrange));
-        paintKey(skin, TSS::skinColourKey(O::kReadOnlyValueField, P::kBackground, S::kDefault, C::k1),
-                 juce::Colour(ColourChart::kEmerald400));
-        paintKey(skin, TSS::skinColourKey(O::kReadOnlyValueField, P::kBackground, S::kDefault, C::k4),
-                 juce::Colour(ColourChart::kGrey600));
-        paintKey(skin, TSS::skinColourKey(O::kReadOnlyValueField, P::kText, S::kDefault, C::k1),
-                 juce::Colour(ColourChart::kBlue));
-        paintKey(skin, TSS::skinColourKey(O::kReadOnlyValueField, P::kText, S::kDefault, C::k4),
-                 juce::Colour(ColourChart::kYellow));
-    }
-
+    /** One distinct pastille per supported colour set on representative MCS keys. */
     inline void paintDistinctPastillesForSets(TSS::Skin& skin)
     {
-        paintPeakLedAndSliderPastilles(skin);
-        paintSettingsZoneAndNumberBoxPastilles(skin);
-        paintButtonAndReadOnlyPastilles(skin);
+        using O = TSS::SkinObjectType;
+        using P = TSS::SkinColourProperty;
+        using S = TSS::SkinColourState;
+
+        paintEverySupportedSet(skin, TSS::skinColourKey(O::kSlider, P::kTrack));
+        paintEverySupportedSet(skin, TSS::skinColourKey(O::kComboBox, P::kBackground));
+        paintEverySupportedSet(skin, TSS::skinColourKey(O::kPopupMenu, P::kBorder));
+        paintEverySupportedSet(skin, TSS::skinColourKey(O::kLed, P::kBackground, S::kOn));
+        paintEverySupportedSet(skin, TSS::skinColourKey(O::kPeakIndicator, P::kBackground, S::kOn));
     }
 }
