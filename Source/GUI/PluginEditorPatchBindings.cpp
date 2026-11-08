@@ -345,13 +345,14 @@ void PluginEditor::setPatchSaveFilePickerBinding()
 
                 raiseUiBeforeModalDialog(safeThis.getComponent());
 
-                juce::NativeMessageBox::showForOptions(
-                    juce::MessageBoxOptions()
-                        .withIconType(juce::MessageBoxIconType::WarningIcon)
-                        .withTitle(Dialog::kTitle)
-                        .withMessage(Dialog::kBody)
-                        .withButton(Dialog::kOk, 1)
-                        .withAssociatedComponent(safeThis.getComponent()));
+                // showMessageBox: OK-only warning. Prefer over MessageBoxOptions —
+                // showForOptions / withButton(text, code) exist on newer JUCE trees
+                // but not on the juce-framework/JUCE@9.0.3 tag used by CI.
+                juce::NativeMessageBox::showMessageBox(
+                    juce::MessageBoxIconType::WarningIcon,
+                    Dialog::kTitle,
+                    Dialog::kBody,
+                    safeThis.getComponent());
 
                 if (safeThis == nullptr)
                     return {};
