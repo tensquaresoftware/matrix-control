@@ -106,8 +106,10 @@ private:
     void armWatchedImportJson(const juce::File& file);
     void clearWatchedImportJson();
     void refreshWatchedImportFingerprint();
+    /** After session load: arm watch, or prompt if disk differs from last accepted fingerprint. */
+    void reconcileWatchedImportJsonOnLaunch();
     void pollWatchedImportJson();
-    void promptWatchedImportJsonExternalChange();
+    void promptWatchedImportJsonExternalChange(bool fromLaunch = false);
     void reloadWatchedImportJsonFromDisk();
     void discardWatchedImportJsonExternalChange();
 
@@ -189,6 +191,8 @@ private:
     juce::String importWatchPendingFingerprint_;
     int importWatchPendingStablePolls_ = 0;
     bool importWatchDialogOpen_ = false;
+    /** True while the open Import-watch dialog was opened from launch reconcile. */
+    bool importWatchPromptFromLaunch_ = false;
 
     TSS::DevSkin::Layer layer_;
     TSS::DevSkin::BridgeClient bridge_;

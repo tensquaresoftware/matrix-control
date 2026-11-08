@@ -12,6 +12,10 @@ namespace TSS::DevSkin
         bool compareOn = false;
         /** Absolute path of last Export/Import parent folder (empty = Documents). */
         juce::String lastSkinJsonDirectory;
+        /** Absolute path of last successful Import JSON (empty = no external-change watch). */
+        juce::String lastImportedJsonPath;
+        /** Last accepted disk fingerprint for lastImportedJsonPath (empty = legacy / unset). */
+        juce::String lastImportedJsonFingerprint;
     };
 
     /** Sets Product to first combo item (BLACK today). Call after session load to ignore restored Product. */

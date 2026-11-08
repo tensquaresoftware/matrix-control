@@ -404,6 +404,8 @@ bool SkinEditorMainComponent::discardEditorWorkKeepingSessionPrefs()
     sessionState_.editorSkinId = {};
     sessionState_.compareOn = false;
     sessionState_.lastSkinJsonDirectory = lastSkinJsonDirectory;
+    sessionState_.lastImportedJsonPath = {};
+    sessionState_.lastImportedJsonFingerprint = {};
 
     clearMappingModeToIdle();
     if (! autosaveSession())
@@ -449,6 +451,7 @@ void SkinEditorMainComponent::loadSessionOrBaseline()
     });
     stopTimer();
     markEditorClean();
+    reconcileWatchedImportJsonOnLaunch();
 }
 
 juce::String SkinEditorMainComponent::visibleSkinId() const

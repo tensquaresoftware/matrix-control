@@ -2,16 +2,106 @@
 
 #include "GUI/Skins/Dev/DevSkinJson.h"
 
+#include <map>
+
 namespace
 {
     juce::String fingerprintJsonFile(const juce::File& file)
     {
         if (! file.existsAsFile())
             return {};
+
+        const auto size = file.getSize();
         const auto text = file.loadFileAsString();
-        // Content hash (not mtime alone): Dropbox/sync tools can touch mtime without edits,
-        // and same-size saves can share a coarse mtime tick.
-        return juce::String(text.length()) + "|" + juce::String(text.hashCode64());
+        // Dropbox / atomic saves can briefly yield an empty read while size > 0.
+        if (size > 0 && text.isEmpty())
+            return {};
+
+        // Content only (size + hash): mtime-only touches must not look like an edit.
+        return juce::String(size) + "|" + juce::String(text.hashCode64());
+    }
+
+    juce::int64 fingerprintEditorSkin(const TSS::DevSkin::NamedSkin& skin)
+    {
+        return juce::String(TSS::DevSkin::exportEditorSkinToJson(skin)).hashCode64();
+    }
+
+    struct EditorSkinSnapshot
+    {
+        juce::String id;
+        juce::String name;
+        juce::int64 fingerprint = 0;
+    };
+
+    std::vector<EditorSkinSnapshot> captureEditorSkinSnapshots(const TSS::DevSkin::Layer& layer)
+    {
+        std::vector<EditorSkinSnapshot> out;
+        for (const auto& skin : layer.skins())
+        {
+            if (skin.kind != TSS::DevSkin::SkinKind::kDev)
+                continue;
+            out.push_back({ skin.id, skin.name, fingerprintEditorSkin(skin) });
+        }
+        return out;
+    }
+
+    void collectChangedEditorSkins(const TSS::DevSkin::Layer& layer,
+                                   const std::vector<EditorSkinSnapshot>& before,
+                                   juce::StringArray& changedIds,
+                                   juce::StringArray& changedNames)
+    {
+        std::map<juce::String, juce::int64> beforeById;
+        for (const auto& snap : before)
+            beforeById[snap.id] = snap.fingerprint;
+
+        for (const auto& skin : layer.skins())
+        {
+            if (skin.kind != TSS::DevSkin::SkinKind::kDev)
+                continue;
+            const auto fp = fingerprintEditorSkin(skin);
+            const auto it = beforeById.find(skin.id);
+            if (it == beforeById.end() || it->second != fp)
+            {
+                changedIds.add(skin.id);
+                changedNames.add(skin.name.isNotEmpty() ? skin.name : skin.id);
+            }
+        }
+    }
+
+    juce::String pickEditorSkinAfterReload(const TSS::DevSkin::Layer& layer,
+                                           const juce::String& previousEditorId,
+                                           const juce::StringArray& changedIds)
+    {
+        const auto* previous = previousEditorId.isNotEmpty() ? layer.findSkin(previousEditorId)
+                                                             : nullptr;
+        const bool previousStillThere =
+            previous != nullptr && previous->kind == TSS::DevSkin::SkinKind::kDev;
+
+        if (previousStillThere)
+        {
+            if (changedIds.isEmpty() || changedIds.contains(previousEditorId))
+                return previousEditorId;
+            return changedIds[0];
+        }
+
+        if (! changedIds.isEmpty())
+            return changedIds[0];
+
+        for (const auto& skin : layer.skins())
+            if (skin.kind == TSS::DevSkin::SkinKind::kDev)
+                return skin.id;
+        return {};
+    }
+
+    juce::String reloadStatusMessage(const juce::File& file,
+                                     const juce::StringArray& changedNames)
+    {
+        if (changedNames.isEmpty())
+            return "Reloaded: " + file.getFullPathName();
+        if (changedNames.size() == 1)
+            return "Reloaded: 1 skin updated (" + changedNames[0] + ")";
+        return "Reloaded: " + juce::String(changedNames.size()) + " skins updated ("
+               + changedNames.joinIntoString(", ") + ")";
     }
 }
 
@@ -24,13 +114,16 @@ void SkinEditorMainComponent::armWatchedImportJson(const juce::File& file)
     }
 
     watchedImportJsonFile_ = file;
+    sessionState_.lastImportedJsonPath = file.getFullPathName();
     watchedImportJsonFingerprint_ = fingerprintJsonFile(file);
+    sessionState_.lastImportedJsonFingerprint = watchedImportJsonFingerprint_;
     importWatchPendingFingerprint_ = {};
     importWatchPendingStablePolls_ = 0;
     importWatchDialogOpen_ = false;
     importWatchTimer_.onTick = [this] { pollWatchedImportJson(); };
     if (! importWatchTimer_.isTimerRunning())
         importWatchTimer_.startTimer(1000);
+    scheduleSessionAutosave();
 }
 
 void SkinEditorMainComponent::clearWatchedImportJson()
@@ -41,15 +134,89 @@ void SkinEditorMainComponent::clearWatchedImportJson()
     importWatchPendingFingerprint_ = {};
     importWatchPendingStablePolls_ = 0;
     importWatchDialogOpen_ = false;
+    if (sessionState_.lastImportedJsonPath.isNotEmpty()
+        || sessionState_.lastImportedJsonFingerprint.isNotEmpty())
+    {
+        sessionState_.lastImportedJsonPath = {};
+        sessionState_.lastImportedJsonFingerprint = {};
+        scheduleSessionAutosave();
+    }
 }
 
 void SkinEditorMainComponent::refreshWatchedImportFingerprint()
 {
     if (watchedImportJsonFile_ == juce::File())
         return;
-    watchedImportJsonFingerprint_ = fingerprintJsonFile(watchedImportJsonFile_);
+    const auto fp = fingerprintJsonFile(watchedImportJsonFile_);
+    if (fp.isEmpty())
+        return; // keep previous baseline across a transient unreadable read
+    watchedImportJsonFingerprint_ = fp;
+    sessionState_.lastImportedJsonFingerprint = fp;
     importWatchPendingFingerprint_ = {};
     importWatchPendingStablePolls_ = 0;
+    scheduleSessionAutosave();
+}
+
+void SkinEditorMainComponent::reconcileWatchedImportJsonOnLaunch()
+{
+    if (sessionState_.lastImportedJsonPath.isEmpty())
+    {
+        if (sessionState_.lastImportedJsonFingerprint.isNotEmpty())
+            sessionState_.lastImportedJsonFingerprint = {};
+
+        // Session load may have dropped a missing Import path in memory only — flush disk.
+        const auto sessionFile = TSS::DevSkin::skinEditorSessionFile();
+        if (sessionFile.existsAsFile())
+        {
+            const auto parsed = juce::JSON::parse(sessionFile.loadFileAsString());
+            if (const auto* root = parsed.getDynamicObject();
+                root != nullptr && root->getProperty("lastImportedJsonPath").toString().isNotEmpty())
+            {
+                scheduleSessionAutosave();
+            }
+        }
+        return;
+    }
+
+    const juce::File file(sessionState_.lastImportedJsonPath);
+    if (! file.existsAsFile())
+    {
+        clearWatchedImportJson();
+        return;
+    }
+
+    const auto now = fingerprintJsonFile(file);
+    const auto stored = sessionState_.lastImportedJsonFingerprint;
+
+    auto armWatchKeepingStoredBaseline = [this, &file, &stored]
+    {
+        watchedImportJsonFile_ = file;
+        watchedImportJsonFingerprint_ = stored;
+        importWatchPendingFingerprint_ = {};
+        importWatchPendingStablePolls_ = 0;
+        importWatchDialogOpen_ = false;
+        importWatchTimer_.onTick = [this] { pollWatchedImportJson(); };
+        if (! importWatchTimer_.isTimerRunning())
+            importWatchTimer_.startTimer(1000);
+    };
+
+    // Transient unreadable read with a known baseline: watch without accepting disk yet.
+    if (now.isEmpty() && stored.isNotEmpty())
+    {
+        armWatchKeepingStoredBaseline();
+        return;
+    }
+
+    // Legacy sessions (no stored fingerprint) or matching disk: accept and arm.
+    if (stored.isEmpty() || stored == now)
+    {
+        armWatchedImportJson(file);
+        return;
+    }
+
+    // Disk differs from last accepted baseline — keep stored fingerprint until Reload/Discard.
+    armWatchKeepingStoredBaseline();
+    promptWatchedImportJsonExternalChange(true);
 }
 
 void SkinEditorMainComponent::pollWatchedImportJson()
@@ -60,21 +227,21 @@ void SkinEditorMainComponent::pollWatchedImportJson()
     if (! watchedImportJsonFile_.existsAsFile())
     {
         // Transient rename-while-save is common; keep watching without prompting.
-        importWatchPendingFingerprint_ = {};
-        importWatchPendingStablePolls_ = 0;
         return;
     }
 
     const auto now = fingerprintJsonFile(watchedImportJsonFile_);
-    if (now.isEmpty() || now == watchedImportJsonFingerprint_)
+    if (now.isEmpty())
+        return; // keep pending across a brief unreadable read
+
+    if (now == watchedImportJsonFingerprint_)
     {
         importWatchPendingFingerprint_ = {};
         importWatchPendingStablePolls_ = 0;
         return;
     }
 
-    // Debounce: require the new fingerprint to stay stable across two polls (~2 s)
-    // so a still-writing external save is less likely to yield truncated JSON.
+    // Debounce: require the new fingerprint to stay stable across two polls (~2 s).
     if (now != importWatchPendingFingerprint_)
     {
         importWatchPendingFingerprint_ = now;
@@ -91,29 +258,38 @@ void SkinEditorMainComponent::pollWatchedImportJson()
     promptWatchedImportJsonExternalChange();
 }
 
-void SkinEditorMainComponent::promptWatchedImportJsonExternalChange()
+void SkinEditorMainComponent::promptWatchedImportJsonExternalChange(bool fromLaunch)
 {
     if (importWatchDialogOpen_)
         return;
 
     importWatchDialogOpen_ = true;
+    importWatchPromptFromLaunch_ = fromLaunch;
     const auto path = watchedImportJsonFile_.getFullPathName();
 
     juce::String message =
-        "The JSON file currently loaded in the Skin Editor was modified by another "
-        "application. Reload the updated file from disk?\n\n"
-        "Reload replaces Editor skins with the contents of that file.";
+        fromLaunch
+            ? juce::String(
+                  "The JSON file from your last session differs from the Editor skins "
+                  "currently restored. Reload the file from disk?\n\n"
+                  "Reload replaces Editor skins with the contents of that file.")
+            : juce::String(
+                  "The JSON file currently loaded in the Skin Editor was modified by another "
+                  "application. Reload the updated file from disk?\n\n"
+                  "Reload replaces Editor skins with the contents of that file.");
     if (editorDirty_)
         message += "\n\nUnsaved editor changes will be lost.";
     message += "\n\n" + path;
 
     constexpr int kReloadResult = 1;
     constexpr int kDiscardResult = 2;
+    const auto title = fromLaunch ? "JSON Out of Sync" : "JSON File Changed";
 
-    juce::NativeMessageBox::showForOptionsAsync(
+    // JUCE AlertWindow (not NativeMessageBox) so Skin Editor LookAndFeel can theme it.
+    juce::AlertWindow::showAsync(
         juce::MessageBoxOptions()
             .withIconType(juce::MessageBoxIconType::QuestionIcon)
-            .withTitle("JSON File Changed")
+            .withTitle(title)
             .withMessage(message)
             .withButton("Reload", kReloadResult)
             .withButton("Discard", kDiscardResult)
@@ -124,7 +300,10 @@ void SkinEditorMainComponent::promptWatchedImportJsonExternalChange()
                 return;
             safe->importWatchDialogOpen_ = false;
             if (result == kReloadResult)
+            {
+                safe->importWatchPromptFromLaunch_ = false;
                 safe->reloadWatchedImportJsonFromDisk();
+            }
             else
                 safe->discardWatchedImportJsonExternalChange();
         });
@@ -139,7 +318,11 @@ void SkinEditorMainComponent::reloadWatchedImportJsonFromDisk()
         return;
     }
 
-    const auto text = watchedImportJsonFile_.loadFileAsString();
+    const auto file = watchedImportJsonFile_;
+    const auto previousEditorId = sessionState_.editorSkinId;
+    const auto beforeSkins = captureEditorSkinSnapshots(layer_);
+    const auto text = file.loadFileAsString();
+
     TSS::DevSkin::JsonIoResult result;
     runWithoutLayerChangeNotify([this, &text, &result]
     {
@@ -148,26 +331,28 @@ void SkinEditorMainComponent::reloadWatchedImportJsonFromDisk()
 
     if (! result.ok)
     {
+        // Keep the previous accepted baseline so the watch can prompt again
+        // (do not silently accept the refused on-disk bytes).
         juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon,
                                                "Reload refused",
                                                result.message);
-        // Layer untouched on failure (importFromJson replaces only after a full parse).
-        refreshWatchedImportFingerprint();
         return;
     }
 
-    {
-        const auto active = layer_.activeSkinId();
-        if (active.startsWith("dev:"))
-            sessionState_.editorSkinId = active;
-        else if (layer_.findSkin(sessionState_.editorSkinId) == nullptr)
-            sessionState_.editorSkinId = {};
-    }
+    juce::StringArray changedIds;
+    juce::StringArray changedNames;
+    collectChangedEditorSkins(layer_, beforeSkins, changedIds, changedNames);
+
+    const auto nextEditorId = pickEditorSkinAfterReload(layer_, previousEditorId, changedIds);
+    sessionState_.editorSkinId = nextEditorId;
+    if (nextEditorId.isNotEmpty())
+        runWithoutLayerChangeNotify([this, nextEditorId] { layer_.selectSkin(nextEditorId); });
+
     sessionState_.compareOn = false;
-    rememberSkinJsonDirectory(watchedImportJsonFile_);
-    refreshWatchedImportFingerprint();
+    rememberSkinJsonDirectory(file);
+    armWatchedImportJson(file); // re-baseline + ensure timer still running
     markEditorClean();
-    setStatusMessage("Reloaded: " + watchedImportJsonFile_.getFullPathName());
+    setStatusMessage(reloadStatusMessage(file, changedNames));
     refreshAll();
     if (bridge_.isConnected())
         pushVisible();
@@ -176,6 +361,9 @@ void SkinEditorMainComponent::reloadWatchedImportJsonFromDisk()
 void SkinEditorMainComponent::discardWatchedImportJsonExternalChange()
 {
     // Keep in-memory skins; accept the new disk fingerprint until a later change.
+    const bool fromLaunch = importWatchPromptFromLaunch_;
+    importWatchPromptFromLaunch_ = false;
     refreshWatchedImportFingerprint();
-    setStatusMessage("Kept editor copy; disk JSON changed externally");
+    setStatusMessage(fromLaunch ? "Kept session skins; Import JSON left unchanged on disk"
+                                : "Kept editor copy; disk JSON changed externally");
 }
