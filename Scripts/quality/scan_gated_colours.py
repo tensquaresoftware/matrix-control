@@ -12,6 +12,8 @@ Allowlisted SSOT / policy paths (not scanned for violations):
   - Skins/ColourChart.h
   - Skins/SkinColours*.h
   - Helpers/LockDimmingFilm.cpp
+  - Skins/Dev/DevSkinBridge*.cpp (IPC magic, not UI colours)
+  - Skins/Dev/DevSkinTypes.h (default ARGB sentinel, not UI paint)
 
 Excluded entirely:
   - Source/GUI/Tests/**
@@ -39,6 +41,9 @@ CPP_SUFFIXES = {".h", ".hpp", ".hh", ".cpp", ".cc", ".cxx"}
 ALLOWLIST_UNDER_GUI = {
     "Skins/ColourChart.h",
     "Helpers/LockDimmingFilm.cpp",
+    "Skins/Dev/DevSkinBridgeClient.cpp",
+    "Skins/Dev/DevSkinBridgeServer.cpp",
+    "Skins/Dev/DevSkinTypes.h",
 }
 
 HEX_PATTERN = re.compile(r"0[xX][0-9A-Fa-f]{6,8}")

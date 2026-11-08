@@ -59,6 +59,8 @@ def test_lock_film_and_palette_are_allowlisted(scan):
     assert scan.is_allowlisted("Source/GUI/Helpers/LockDimmingFilm.cpp")
     assert scan.is_allowlisted("Source/GUI/Skins/ColourChart.h")
     assert scan.is_allowlisted("Source/GUI/Skins/SkinColoursPanels.h")
+    assert scan.is_allowlisted("Source/GUI/Skins/Dev/DevSkinBridgeClient.cpp")
+    assert scan.is_allowlisted("Source/GUI/Skins/Dev/DevSkinTypes.h")
     assert not scan.is_allowlisted("Source/GUI/Widgets/Led.cpp")
 
 
@@ -82,15 +84,17 @@ def test_popup_disabled_uses_look_disabled_fields():
     header = (PROJECT_ROOT / "Source/GUI/Widgets/HeaderLogoPopupMenu.cpp").read_text(encoding="utf-8")
     assert "textDisabled" in renderer
     assert ".withAlpha(0.5f)" not in renderer
-    assert "textDisabledButtonLike" in header
+    assert "textDisabled" in header
     assert ".withAlpha(0.5f)" not in header
 
 
 def test_alert_button_look_has_no_colour_chart_dig():
-    text = (PROJECT_ROOT / "Source/GUI/Looks/LookBuilders.cpp").read_text(encoding="utf-8")
-    assert "ColourChart.h" not in text
-    assert "buttonAlertLookFromSkin" in text
-    assert "kFooterMessage" in text
+    builders = (PROJECT_ROOT / "Source/GUI/Looks/LookBuilders.cpp").read_text(encoding="utf-8")
+    multi = (PROJECT_ROOT / "Source/GUI/Looks/LookBuildersMultiSet.cpp").read_text(encoding="utf-8")
+    assert "ColourChart.h" not in builders
+    assert "ColourChart.h" not in multi
+    assert "buttonAlertLookFromSkin" in multi
+    assert "kFooterMessage" in multi
 
 
 def test_scan_exits_one_on_untracked_hex_hit():

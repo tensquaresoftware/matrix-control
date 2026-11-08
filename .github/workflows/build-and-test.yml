@@ -35,6 +35,7 @@ jobs:
       - name: Run release and quality script unit tests
         run: |
           python3 -m pip install -r Scripts/release/requirements-test.txt
+          python3 -m pip install -r Scripts/quality/requirements.txt
           python3 -m pytest Scripts/release/tests/ Scripts/quality/tests/ -q
 
   quality-gate:
