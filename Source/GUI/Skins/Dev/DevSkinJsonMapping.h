@@ -9,6 +9,7 @@
 namespace TSS::DevSkin
 {
     juce::var mappingToVar(const SkinColourKey& key, const juce::String& paletteName);
+    /** Parses one row; colour sets beyond the object's inventory parse OK and callers drop them. */
     bool mappingFromVar(const juce::var& value,
                         SkinColourKey& key,
                         juce::String& paletteName,

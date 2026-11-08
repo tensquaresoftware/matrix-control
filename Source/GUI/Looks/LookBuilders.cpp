@@ -107,8 +107,7 @@ namespace TSS
         look.text = skin.getColour(SkinObjectType::kModuleHeader, SkinColourProperty::kText);
         look.textFocus = skin.getColour(SkinObjectType::kNumberBox,
                                         SkinColourProperty::kText,
-                                        SkinColourState::kFocus,
-                                        ColourSet::k4);
+                                        SkinColourState::kFocus);
         look.lineBlue = skin.getColour(SkinObjectType::kModuleHeader, SkinColourProperty::kLineBlue);
         look.lineOrange = skin.getColour(SkinObjectType::kModuleHeader, SkinColourProperty::kLineOrange);
         look.font = resolvedTypographyFont(skin, TypographyStyleId::kModuleHeader);

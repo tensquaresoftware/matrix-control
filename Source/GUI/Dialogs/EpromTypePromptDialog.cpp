@@ -45,8 +45,8 @@ void EpromTypePromptDialog::buildControls(TSS::ISkin& skin)
 {
     const auto popupMode = TSS::ComboBox::PopupMode::Scrollable;
     const auto labelLook = TSS::labelLookFromSkin(skin);
-    const auto comboLook = TSS::comboBoxLookFromSkin(skin, TSS::ColourSet::k4);
-    const auto popupLook = TSS::popupMenuLookFromSkin(skin, TSS::ColourSet::k4);
+    const auto comboLook = TSS::comboBoxLookForZone(skin, TSS::SkinZone::kModales);
+    const auto popupLook = TSS::popupMenuLookForZone(skin, TSS::SkinZone::kModales);
 
     auto makeLabel = [&](const char* text)
     {
@@ -68,7 +68,7 @@ void EpromTypePromptDialog::buildControls(TSS::ISkin& skin)
     midiToLabel_ = makeLabel(PluginDisplayNames::Dialogs::EpromTypePrompt::kMidiToLabel);
     midiToCombo_ = makeCombo();
     deviceLabel_ = makeLabel(PluginDisplayNames::FooterPanel::kDeviceLabel);
-    deviceValueField_ = std::make_unique<TSS::ReadOnlyValueField>(skin, TSS::ColourSet::k4);
+    deviceValueField_ = std::make_unique<TSS::ReadOnlyValueField>(skin);
     epromTypeLabel_ = makeLabel(PluginDisplayNames::Dialogs::EpromTypePrompt::kEpromTypeLabel);
     epromTypeCombo_ = makeCombo();
 
@@ -200,16 +200,16 @@ void EpromTypePromptDialog::setSkin(TSS::ISkin& skin)
 {
     skin_ = &skin;
     midiFromLabel_->setLook(TSS::labelLookFromSkin(skin));
-    midiFromCombo_->setLook(TSS::comboBoxLookFromSkin(skin, TSS::ColourSet::k4));
-    midiFromCombo_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin, TSS::ColourSet::k4));
+    midiFromCombo_->setLook(TSS::comboBoxLookForZone(skin, TSS::SkinZone::kModales));
+    midiFromCombo_->setPopupMenuLook(TSS::popupMenuLookForZone(skin, TSS::SkinZone::kModales));
     midiToLabel_->setLook(TSS::labelLookFromSkin(skin));
-    midiToCombo_->setLook(TSS::comboBoxLookFromSkin(skin, TSS::ColourSet::k4));
-    midiToCombo_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin, TSS::ColourSet::k4));
+    midiToCombo_->setLook(TSS::comboBoxLookForZone(skin, TSS::SkinZone::kModales));
+    midiToCombo_->setPopupMenuLook(TSS::popupMenuLookForZone(skin, TSS::SkinZone::kModales));
     deviceLabel_->setLook(TSS::labelLookFromSkin(skin));
     deviceValueField_->setSkin(skin);
     epromTypeLabel_->setLook(TSS::labelLookFromSkin(skin));
-    epromTypeCombo_->setLook(TSS::comboBoxLookFromSkin(skin, TSS::ColourSet::k4));
-    epromTypeCombo_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin, TSS::ColourSet::k4));
+    epromTypeCombo_->setLook(TSS::comboBoxLookForZone(skin, TSS::SkinZone::kModales));
+    epromTypeCombo_->setPopupMenuLook(TSS::popupMenuLookForZone(skin, TSS::SkinZone::kModales));
     if (confirmButton_ != nullptr)
         DialogMatrixHelpers::applyButtonSkin(*confirmButton_, skin);
     if (specifyLaterButton_ != nullptr)

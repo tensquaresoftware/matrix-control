@@ -19,6 +19,7 @@ namespace TSS::DevSkin
     {
         skins_.clear();
         skins_.push_back(makeCompiledSkin(SkinKind::kCompiledBlack));
+        skins_.push_back(makeCompiledSkin(SkinKind::kCompiledBlackDuo));
         skins_.push_back(makeCompiledSkin(SkinKind::kCompiledCream));
         activeSkinId_ = kCompiledCreamId;
         bump();
@@ -133,8 +134,8 @@ namespace TSS::DevSkin
     {
         if (isCompiledId(skinId))
             return juce::Result::fail("Compiled Black/Cream are read-only; Duplicate first");
-        if (key.colourSet != ColourSet::k1 && ! supportsMultipleColourSets(key.object))
-            return juce::Result::fail("Higher ColourSet is not supported for this object");
+        if (! supportsColourSet(key.object, key.colourSet))
+            return juce::Result::fail("ColourSet is not supported for this object");
 
         auto* skin = findSkinMutable(skinId);
         if (skin == nullptr)
@@ -351,33 +352,6 @@ namespace TSS::DevSkin
         return juce::Result::ok();
     }
 
-    juce::String Layer::resolveCompiledAncestorId(const NamedSkin& skin) const
-    {
-        if (skin.kind == SkinKind::kCompiledBlack)
-            return kCompiledBlackId;
-        if (skin.kind == SkinKind::kCompiledCream)
-            return kCompiledCreamId;
-
-        juce::String cursor = skin.derivedFrom;
-        for (int guard = 0; guard < 64; ++guard)
-        {
-            if (cursor == kCompiledBlackId)
-                return kCompiledBlackId;
-            if (cursor == kCompiledCreamId)
-                return kCompiledCreamId;
-
-            const auto* parent = findSkin(cursor);
-            if (parent == nullptr)
-                break;
-            if (parent->kind == SkinKind::kCompiledBlack)
-                return kCompiledBlackId;
-            if (parent->kind == SkinKind::kCompiledCream)
-                return kCompiledCreamId;
-            cursor = parent->derivedFrom;
-        }
-        return kCompiledCreamId;
-    }
-
     PushPayload Layer::makePushPayload() const
     {
         return makePushPayloadForSkin(activeSkinId_);
@@ -443,7 +417,7 @@ namespace TSS::DevSkin
 
     bool Layer::isCompiledId(const juce::String& id) const
     {
-        return id == kCompiledBlackId || id == kCompiledCreamId;
+        return id == kCompiledBlackId || id == kCompiledBlackDuoId || id == kCompiledCreamId;
     }
 
     bool Layer::nameTaken(const juce::String& name, const juce::String& exceptId) const

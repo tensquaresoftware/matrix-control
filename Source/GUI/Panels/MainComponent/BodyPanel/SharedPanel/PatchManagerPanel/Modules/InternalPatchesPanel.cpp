@@ -296,9 +296,9 @@ void InternalPatchesPanel::applyChildLooks(TSS::ISkin& skin)
     if (memoryGroupLabel)
         memoryGroupLabel->setLook(TSS::groupLabelLookFromSkin(skin));
     if (currentBankNumber)
-        currentBankNumber->setLook(TSS::numberBoxLookFromSkin(skin, TSS::ColourSet::k4));
+        currentBankNumber->setLook(TSS::numberBoxLookFromSkin(skin));
     if (currentPatchNumber)
-        currentPatchNumber->setLook(TSS::numberBoxLookFromSkin(skin, TSS::ColourSet::k4));
+        currentPatchNumber->setLook(TSS::numberBoxLookFromSkin(skin));
 
     if (loadPreviousPatchButton_)
         loadPreviousPatchButton_->setLook(TSS::buttonLookFromSkin(skin));

@@ -48,8 +48,7 @@ public:
     std::unique_ptr<TSS::Button> createStandaloneButton(
         const juce::String& widgetId,
         TSS::ISkin& skin,
-        int height,
-        TSS::ColourSet colourSet = TSS::ColourSet::k1);
+        int height);
 
     static PluginEditorDimensions getRootGuiDimensions();
     static GuiLayoutDimensions buildGuiLayoutDimensions();

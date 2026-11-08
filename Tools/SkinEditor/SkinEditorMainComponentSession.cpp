@@ -97,9 +97,8 @@ bool SkinEditorMainComponent::keyPressed(const juce::KeyPress& key)
 
 void SkinEditorMainComponent::applyProductComboChange()
 {
-    const int id = skinsPanel_.productCombo().getSelectedId();
-    sessionState_.productSkinId = (id == 1) ? TSS::DevSkin::kCompiledBlackId
-                                            : TSS::DevSkin::kCompiledCreamId;
+    sessionState_.productSkinId =
+        SkinEditorUi::productSkinIdFromComboId(skinsPanel_.productCombo().getSelectedId());
     refreshAll();
     if (bridge_.isConnected() && isCompareProductView())
         pushVisible();
@@ -257,8 +256,9 @@ void SkinEditorMainComponent::refreshCombos()
     auto& editorCombo = skinsPanel_.editorCombo();
     productCombo.clear(juce::dontSendNotification);
     productCombo.addItem("BLACK", 1);
-    productCombo.addItem("CREAM", 2);
-    productCombo.setSelectedId(sessionState_.productSkinId == TSS::DevSkin::kCompiledBlackId ? 1 : 2,
+    productCombo.addItem("BLACK/DUO", 2);
+    productCombo.addItem("CREAM", 3);
+    productCombo.setSelectedId(SkinEditorUi::productComboIdFromSkinId(sessionState_.productSkinId),
                                juce::dontSendNotification);
 
     editorCombo.clear(juce::dontSendNotification);

@@ -11,6 +11,7 @@ namespace TSS::SkinColours
     {
         SkinColourKey key;
         juce::uint32 blackVariant;
+        juce::uint32 blackDuoVariant;
         juce::uint32 creamVariant;
     };
 

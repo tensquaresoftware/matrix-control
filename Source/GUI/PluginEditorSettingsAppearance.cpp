@@ -16,7 +16,9 @@ void PluginEditor::restoreSettingsAppearanceFromState(SettingsPanel& panel)
         : ScaleLevels::kDefault;
 
     const int skinId = pluginProcessor.getSkinVariantId();
-    const int normalizedSkin = (skinId == SkinVariants::kBlack || skinId == SkinVariants::kCream)
+    const int normalizedSkin = (skinId == SkinVariants::kBlack
+                                || skinId == SkinVariants::kBlackDuo
+                                || skinId == SkinVariants::kCream)
         ? skinId
         : SkinVariants::kDefault;
 

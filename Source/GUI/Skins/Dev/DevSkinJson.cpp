@@ -1,5 +1,6 @@
 #include "GUI/Skins/Dev/DevSkinJson.h"
 
+#include <map>
 #include <set>
 
 #include "GUI/Skins/Dev/DevSkinInventory.h"
@@ -14,19 +15,42 @@ namespace TSS::DevSkin
         {
             switch (kind)
             {
-                case SkinKind::kCompiledBlack: return "compiledBlack";
-                case SkinKind::kCompiledCream: return "compiledCream";
-                case SkinKind::kDev:           return "dev";
+                case SkinKind::kCompiledBlack:    return "compiledBlack";
+                case SkinKind::kCompiledBlackDuo: return "compiledBlackDuo";
+                case SkinKind::kCompiledCream:    return "compiledCream";
+                case SkinKind::kDev:              return "dev";
             }
             return "dev";
         }
 
         bool kindFromString(const juce::String& text, SkinKind& out)
         {
-            if (text == "compiledBlack") { out = SkinKind::kCompiledBlack; return true; }
-            if (text == "compiledCream") { out = SkinKind::kCompiledCream; return true; }
-            if (text == "dev")           { out = SkinKind::kDev; return true; }
+            if (text == "compiledBlack")    { out = SkinKind::kCompiledBlack; return true; }
+            if (text == "compiledBlackDuo") { out = SkinKind::kCompiledBlackDuo; return true; }
+            if (text == "compiledCream")    { out = SkinKind::kCompiledCream; return true; }
+            if (text == "dev")              { out = SkinKind::kDev; return true; }
             return false;
+        }
+
+        // Colour sets beyond the object's inventory (older trial files) are dropped, not rejected.
+        bool mappingsFromVar(const juce::var& mappingsVar,
+                             std::map<SkinColourKey, juce::String>& out,
+                             juce::String& error)
+        {
+            auto* mapArr = mappingsVar.getArray();
+            if (mapArr == nullptr)
+                return true;
+
+            for (const auto& entry : *mapArr)
+            {
+                SkinColourKey key;
+                juce::String paletteName;
+                if (! mappingFromVar(entry, key, paletteName, error))
+                    return false;
+                if (supportsColourSet(key.object, key.colourSet))
+                    out[key] = paletteName;
+            }
+            return true;
         }
 
         juce::var pastilleToVar(const Pastille& pastille)
@@ -146,17 +170,8 @@ namespace TSS::DevSkin
                 }
             }
 
-            if (auto* mapArr = obj->getProperty("mappings").getArray())
-            {
-                for (const auto& entry : *mapArr)
-                {
-                    SkinColourKey key;
-                    juce::String paletteName;
-                    if (! mappingFromVar(entry, key, paletteName, error))
-                        return false;
-                    out.mappings[key] = paletteName;
-                }
-            }
+            if (! mappingsFromVar(obj->getProperty("mappings"), out.mappings, error))
+                return false;
 
             colourSetLabelsFromVar(obj->getProperty("colourSetLabels"), out);
 
@@ -224,8 +239,12 @@ namespace TSS::DevSkin
                     expandLegacyColourSets(skin);
                 if (skin.kind != SkinKind::kDev)
                     return JsonIoResult::failure("Imported skins must be kind=dev");
-                if (skin.id == kCompiledBlackId || skin.id == kCompiledCreamId)
+                if (skin.id == kCompiledBlackId
+                    || skin.id == kCompiledBlackDuoId
+                    || skin.id == kCompiledCreamId)
+                {
                     return JsonIoResult::failure("Imported Editor skin cannot reuse compiled ids");
+                }
                 outSkins.push_back(std::move(skin));
             }
             return JsonIoResult::success();
@@ -290,6 +309,7 @@ namespace TSS::DevSkin
 
         std::vector<NamedSkin> skins;
         skins.push_back(makeCompiledSkin(SkinKind::kCompiledBlack));
+        skins.push_back(makeCompiledSkin(SkinKind::kCompiledBlackDuo));
         skins.push_back(makeCompiledSkin(SkinKind::kCompiledCream));
 
         const auto imported = appendImportedDevSkins(*root, skins);
@@ -364,6 +384,8 @@ namespace TSS::DevSkin
                 return;
             if (out.kind == SkinKind::kCompiledBlack || out.derivedFrom == kCompiledBlackId)
                 out.compiledAncestorId = kCompiledBlackId;
+            else if (out.kind == SkinKind::kCompiledBlackDuo || out.derivedFrom == kCompiledBlackDuoId)
+                out.compiledAncestorId = kCompiledBlackDuoId;
             else
                 out.compiledAncestorId = kCompiledCreamId;
         }
@@ -381,17 +403,8 @@ namespace TSS::DevSkin
                 }
             }
 
-            if (auto* mapArr = obj.getProperty("mappings").getArray())
-            {
-                for (const auto& entry : *mapArr)
-                {
-                    SkinColourKey key;
-                    juce::String paletteName;
-                    if (! mappingFromVar(entry, key, paletteName, error))
-                        return false;
-                    out.mappings[key] = paletteName;
-                }
-            }
+            if (! mappingsFromVar(obj.getProperty("mappings"), out.mappings, error))
+                return false;
             return true;
         }
     }

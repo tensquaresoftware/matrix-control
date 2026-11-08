@@ -45,4 +45,35 @@ namespace TSS::DevSkin
                 dest.palette.push_back(pastille);
         }
     }
+
+    juce::String Layer::resolveCompiledAncestorId(const NamedSkin& skin) const
+    {
+        const auto idForKind = [](SkinKind kind) -> juce::String
+        {
+            if (kind == SkinKind::kCompiledBlack)
+                return kCompiledBlackId;
+            if (kind == SkinKind::kCompiledBlackDuo)
+                return kCompiledBlackDuoId;
+            if (kind == SkinKind::kCompiledCream)
+                return kCompiledCreamId;
+            return {};
+        };
+        if (auto id = idForKind(skin.kind); id.isNotEmpty())
+            return id;
+
+        juce::String cursor = skin.derivedFrom;
+        for (int guard = 0; guard < 64; ++guard)
+        {
+            if (cursor == kCompiledBlackId || cursor == kCompiledBlackDuoId
+                || cursor == kCompiledCreamId)
+                return cursor;
+            const auto* parent = findSkin(cursor);
+            if (parent == nullptr)
+                break;
+            if (auto id = idForKind(parent->kind); id.isNotEmpty())
+                return id;
+            cursor = parent->derivedFrom;
+        }
+        return kCompiledCreamId;
+    }
 }

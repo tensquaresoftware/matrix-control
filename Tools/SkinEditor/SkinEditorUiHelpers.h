@@ -67,6 +67,25 @@ namespace SkinEditorUi
         return out;
     }
 
+    /** Product combo item IDs: 1=BLACK, 2=BLACK/DUO, 3=CREAM. */
+    inline juce::String productSkinIdFromComboId(int comboId)
+    {
+        if (comboId == 1)
+            return TSS::DevSkin::kCompiledBlackId;
+        if (comboId == 2)
+            return TSS::DevSkin::kCompiledBlackDuoId;
+        return TSS::DevSkin::kCompiledCreamId;
+    }
+
+    inline int productComboIdFromSkinId(const juce::String& skinId)
+    {
+        if (skinId == TSS::DevSkin::kCompiledBlackDuoId)
+            return 2;
+        if (skinId == TSS::DevSkin::kCompiledCreamId)
+            return 3;
+        return 1;
+    }
+
     inline bool skinNameTaken(const TSS::DevSkin::Layer& layer, const juce::String& name)
     {
         for (const auto& skin : layer.skins())

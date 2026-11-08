@@ -18,6 +18,10 @@ using TSS::SkinColourProperty;
 
 namespace
 {
+    constexpr auto kHeaderLedColourSet_ = TSS::zoneColourSet(SkinObjectType::kLed, TSS::SkinZone::kHeader);
+    constexpr auto kHeaderPeakColourSet_ = TSS::zoneColourSet(SkinObjectType::kPeakIndicator,
+                                                              TSS::SkinZone::kHeader);
+
     void dismissOpenHeaderLogoPopupMenus()
     {
         for (int i = juce::Component::getNumCurrentlyModalComponents(); --i >= 0;)
@@ -83,17 +87,17 @@ HeaderPanel::HeaderPanel(TSS::ISkin& skin, const HeaderPanelDimensions& dimensio
     : dimensions_(dimensions)
     , skin_(&skin)
     , logo_(skin, dimensions.logoWidth, dimensions.logoHeight)
-    , instrumentActivityLed_(dimensions.ledSize, dimensions.ledSize, TSS::ColourSet::k3)
+    , instrumentActivityLed_(dimensions.ledSize, dimensions.ledSize, kHeaderLedColourSet_)
     , keyboardFromLabel_(dimensions.fromKeyboardLabelWidth,
                          dimensions.controlHeight,
                          TSS::chromeTextLabelLookFromSkin(skin),
                          TSS::LabelConfig{ .text = PluginDisplayNames::HeaderPanel::kFromKeyboardLabel })
-    , editorActivityLed_(dimensions.ledSize, dimensions.ledSize, TSS::ColourSet::k3)
+    , editorActivityLed_(dimensions.ledSize, dimensions.ledSize, kHeaderLedColourSet_)
     , midiFromLabel_(dimensions.fromSynthLabelWidth,
                      dimensions.controlHeight,
                      TSS::chromeTextLabelLookFromSkin(skin),
                      TSS::LabelConfig{ .text = PluginDisplayNames::HeaderPanel::kFromSynthLabel })
-    , midiToActivityLed_(dimensions.ledSize, dimensions.ledSize, TSS::ColourSet::k3)
+    , midiToActivityLed_(dimensions.ledSize, dimensions.ledSize, kHeaderLedColourSet_)
     , midiToLabel_(dimensions.toSynthLabelWidth,
                    dimensions.controlHeight,
                    TSS::chromeTextLabelLookFromSkin(skin),
@@ -104,20 +108,20 @@ HeaderPanel::HeaderPanel(TSS::ISkin& skin, const HeaderPanelDimensions& dimensio
                       TSS::LabelConfig{ .text = PluginDisplayNames::HeaderPanel::kInputGainLabel })
     , inputGainSlider_(dimensions.inputGainSliderWidth,
                        dimensions.controlHeight,
-                       TSS::sliderLookFromSkin(skin, TSS::ColourSet::k3),
+                       TSS::sliderLookForZone(skin, TSS::SkinZone::kHeader),
                        TSS::makeInputGainSliderConfig())
-    , peakIndicator_(dimensions.peakIndicatorWidth, dimensions.controlHeight, TSS::ColourSet::k3)
+    , peakIndicator_(dimensions.peakIndicatorWidth, dimensions.controlHeight, kHeaderPeakColourSet_)
     , undoButton_(dimensions.undoButtonWidth,
                   dimensions.controlHeight,
-                  TSS::buttonLookFromSkin(skin, TSS::ColourSet::k3),
+                  TSS::buttonLookFromSkin(skin),
                   PluginDisplayNames::HeaderPanel::kUndo)
     , redoButton_(dimensions.redoButtonWidth,
                   dimensions.controlHeight,
-                  TSS::buttonLookFromSkin(skin, TSS::ColourSet::k3),
+                  TSS::buttonLookFromSkin(skin),
                   PluginDisplayNames::HeaderPanel::kRedo)
     , panicButton_(dimensions.panicButtonWidth,
                    dimensions.controlHeight,
-                   TSS::buttonLookFromSkin(skin, TSS::ColourSet::k3),
+                   TSS::buttonLookFromSkin(skin),
                    PluginDisplayNames::HeaderPanel::kPanic)
 {
     setOpaque(true);

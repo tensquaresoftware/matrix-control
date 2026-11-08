@@ -37,14 +37,14 @@ namespace DialogMatrixHelpers
                                             int designHeight)
     {
         auto button = std::make_unique<TSS::Button>(
-            designWidth, designHeight, TSS::buttonLookFromSkin(skin, TSS::ColourSet::k4), text);
+            designWidth, designHeight, TSS::buttonLookFromSkin(skin), text);
         button->setMouseClickGrabsKeyboardFocus(false);
         return button;
     }
 
     void applyButtonSkin(TSS::Button& button, TSS::ISkin& skin)
     {
-        button.setLook(TSS::buttonLookFromSkin(skin, TSS::ColourSet::k4));
+        button.setLook(TSS::buttonLookFromSkin(skin));
     }
 
     void applyButtonUiScale(TSS::Button& button, float uiScale)
@@ -64,7 +64,7 @@ namespace DialogMatrixHelpers
 
     int estimateButtonWidth(TSS::ISkin& skin, const juce::String& text, float uiScale)
     {
-        const auto labelFont = TSS::buttonLookFromSkin(skin, TSS::ColourSet::k4).font;
+        const auto labelFont = TSS::buttonLookFromSkin(skin).font;
         const auto font = labelFont.withHeight(labelFont.getHeight() * uiScale);
         const int textWidth = juce::GlyphArrangement::getStringWidthInt(font, text);
         const int padded = textWidth + scaled(kButtonLabelPaddingDesign, uiScale) * 2;

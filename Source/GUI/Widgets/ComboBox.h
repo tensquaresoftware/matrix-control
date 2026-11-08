@@ -10,6 +10,8 @@
 #include "IPopupMenuHost.h"
 #include "PopupMenuPositioner.h"
 
+class SkinColourWiringTests;
+
 namespace TSS
 {
     class MultiColumnPopupMenu;
@@ -101,6 +103,8 @@ namespace TSS
         [[nodiscard]] static bool usesScrollablePopup(PopupMode mode) noexcept;
 
     private:
+        friend class ::SkinColourWiringTests;
+
         ComboBoxLook look_{};
         PopupMenuLook popupLook_{};
         int width_;

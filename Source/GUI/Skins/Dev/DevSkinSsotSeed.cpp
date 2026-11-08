@@ -29,76 +29,51 @@ namespace TSS::DevSkin
             return name;
         }
 
+        juce::uint32 argbForCompiled(const SkinColours::ColourElement& element, SkinKind kind)
+        {
+            if (kind == SkinKind::kCompiledBlack)
+                return element.blackVariant;
+            if (kind == SkinKind::kCompiledBlackDuo)
+                return element.blackDuoVariant;
+            return element.creamVariant;
+        }
+
         void putMapping(NamedSkin& skin,
                         const SkinColours::ColourElement& element,
-                        bool useBlack)
+                        SkinKind kind)
         {
-            const auto argb = useBlack ? element.blackVariant : element.creamVariant;
-            const auto name = pastilleNameForElement(skin, argb);
-            if (! supportsMultipleColourSets(element.key.object))
-            {
-                skin.mappings[element.key] = name;
-                return;
-            }
-
-            for (const auto colourSet : kAllColourSets)
-            {
-                auto key = element.key;
-                key.colourSet = colourSet;
-                skin.mappings[key] = name;
-            }
+            skin.mappings[element.key] = pastilleNameForElement(skin, argbForCompiled(element, kind));
         }
 
-        void putMappingExact(NamedSkin& skin,
-                             const SkinColours::ColourElement& element,
-                             bool useBlack)
+        bool isCompiledKind(SkinKind kind) noexcept
         {
-            const auto argb = useBlack ? element.blackVariant : element.creamVariant;
-            skin.mappings[element.key] = pastilleNameForElement(skin, argb);
-        }
-
-        void overlayFormerButtonLikeAtK4(NamedSkin& skin, bool useBlack)
-        {
-            using namespace SkinColours;
-
-            putMappingExact(skin, Widgets::SliderK4::kTrack, useBlack);
-            putMappingExact(skin, Widgets::SliderK4::kFocusBorder, useBlack);
-            putMappingExact(skin, Widgets::SliderK4::kValueBar, useBlack);
-            putMappingExact(skin, Widgets::SliderK4::kText, useBlack);
-
-            putMappingExact(skin, Widgets::ProgressBarK4::kTrack, useBlack);
-            putMappingExact(skin, Widgets::ProgressBarK4::kValueBar, useBlack);
-            putMappingExact(skin, Widgets::ProgressBarK4::kText, useBlack);
-
-            putMappingExact(skin, Widgets::ComboBoxK4::kBackground, useBlack);
-            putMappingExact(skin, Widgets::ComboBoxK4::kBackgroundDisabled, useBlack);
-            putMappingExact(skin, Widgets::ComboBoxK4::kBorder, useBlack);
-            putMappingExact(skin, Widgets::ComboBoxK4::kBorderDisabled, useBlack);
-            putMappingExact(skin, Widgets::ComboBoxK4::kFocusBorder, useBlack);
-            putMappingExact(skin, Widgets::ComboBoxK4::kText, useBlack);
-            putMappingExact(skin, Widgets::ComboBoxK4::kTextDisabled, useBlack);
-            putMappingExact(skin, Widgets::ComboBoxK4::kTriangle, useBlack);
-            putMappingExact(skin, Widgets::ComboBoxK4::kTriangleDisabled, useBlack);
-
-            putMappingExact(skin, Widgets::PopupMenuK4::kBackground, useBlack);
-            putMappingExact(skin, Widgets::PopupMenuK4::kBorder, useBlack);
-            putMappingExact(skin, Widgets::PopupMenuK4::kSeparator, useBlack);
-            putMappingExact(skin, Widgets::PopupMenuK4::kText, useBlack);
-            putMappingExact(skin, Widgets::PopupMenuK4::kTextDisabled, useBlack);
-            putMappingExact(skin, Widgets::PopupMenuK4::kBackgroundHover, useBlack);
-            putMappingExact(skin, Widgets::PopupMenuK4::kTextHover, useBlack);
-            putMappingExact(skin, Widgets::PopupMenuK4::kScrollbar, useBlack);
+            return kind == SkinKind::kCompiledBlack
+                || kind == SkinKind::kCompiledBlackDuo
+                || kind == SkinKind::kCompiledCream;
         }
     }
 
     NamedSkin makeCompiledSkin(SkinKind kind)
     {
-        jassert(kind == SkinKind::kCompiledBlack || kind == SkinKind::kCompiledCream);
+        jassert(isCompiledKind(kind));
 
         NamedSkin skin;
         skin.kind = kind;
-        skin.id = (kind == SkinKind::kCompiledBlack) ? kCompiledBlackId : kCompiledCreamId;
-        skin.name = (kind == SkinKind::kCompiledBlack) ? "Black" : "Cream";
+        if (kind == SkinKind::kCompiledBlack)
+        {
+            skin.id = kCompiledBlackId;
+            skin.name = "Black";
+        }
+        else if (kind == SkinKind::kCompiledBlackDuo)
+        {
+            skin.id = kCompiledBlackDuoId;
+            skin.name = "Black/Duo";
+        }
+        else
+        {
+            skin.id = kCompiledCreamId;
+            skin.name = "Cream";
+        }
         skin.derivedFrom = {};
         seedFromCompiled(skin, kind);
         return skin;
@@ -106,15 +81,13 @@ namespace TSS::DevSkin
 
     void seedFromCompiled(NamedSkin& skin, SkinKind compiledBase)
     {
-        jassert(compiledBase == SkinKind::kCompiledBlack || compiledBase == SkinKind::kCompiledCream);
+        jassert(isCompiledKind(compiledBase));
 
         skin.palette = colourChartPastilles();
         skin.mappings.clear();
-        const bool useBlack = compiledBase == SkinKind::kCompiledBlack;
         forEachCompiledColourElement([&](const SkinColours::ColourElement& element)
         {
-            putMapping(skin, element, useBlack);
+            putMapping(skin, element, compiledBase);
         });
-        overlayFormerButtonLikeAtK4(skin, useBlack);
     }
 }

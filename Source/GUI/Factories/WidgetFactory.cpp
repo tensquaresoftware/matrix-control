@@ -94,8 +94,7 @@ std::unique_ptr<TSS::ComboBox> WidgetFactory::createChoiceParameterComboBox(
 std::unique_ptr<TSS::Button> WidgetFactory::createStandaloneButton(
     const juce::String& widgetId,
     TSS::ISkin& skin,
-    int height,
-    TSS::ColourSet colourSet)
+    int height)
 {
     validator.throwIfWidgetIdEmpty(widgetId);
     const auto* desc = findStandaloneWidget(widgetId);
@@ -107,7 +106,7 @@ std::unique_ptr<TSS::Button> WidgetFactory::createStandaloneButton(
     auto button = std::make_unique<TSS::Button>(
         buttonWidth,
         height,
-        TSS::buttonLookFromSkin(skin, colourSet),
+        TSS::buttonLookFromSkin(skin),
         desc->displayName);
     return button;
 }

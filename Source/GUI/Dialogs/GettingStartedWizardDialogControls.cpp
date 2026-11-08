@@ -17,8 +17,8 @@ void GettingStartedWizardDialog::buildStepControls(TSS::ISkin& skin)
     const auto popupMode = TSS::ComboBox::PopupMode::Scrollable;
     // Chrome text on Matrix chrome body (wizard plate), not body Label colours.
     const auto labelLook = TSS::chromeTextLabelLookFromSkin(skin);
-    const auto comboLook = TSS::comboBoxLookFromSkin(skin, TSS::ColourSet::k4);
-    const auto popupLook = TSS::popupMenuLookFromSkin(skin, TSS::ColourSet::k4);
+    const auto comboLook = TSS::comboBoxLookForZone(skin, TSS::SkinZone::kModales);
+    const auto popupLook = TSS::popupMenuLookForZone(skin, TSS::SkinZone::kModales);
 
     auto makeLabel = [&](const char* text)
     {
@@ -49,7 +49,7 @@ void GettingStartedWizardDialog::buildStepControls(TSS::ISkin& skin)
     midiToLabel_ = makeLabel(PluginDisplayNames::Settings::kSynthToLabel);
     midiToCombo_ = makeCombo();
     deviceLabel_ = makeLabel(PluginDisplayNames::FooterPanel::kDeviceLabel);
-    deviceValueField_ = std::make_unique<TSS::ReadOnlyValueField>(skin, TSS::ColourSet::k4);
+    deviceValueField_ = std::make_unique<TSS::ReadOnlyValueField>(skin);
     addChildComponent(*deviceValueField_);
     epromTypeLabel_ = makeLabel(PluginDisplayNames::Dialogs::EpromTypePrompt::kEpromTypeLabel);
     epromTypeCombo_ = makeCombo();
@@ -73,14 +73,15 @@ void GettingStartedWizardDialog::populateScaleAndSkinItems()
     using namespace PluginIDs::Settings::SkinVariants;
     skinCombo_->clear(juce::dontSendNotification);
     skinCombo_->addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kBlack, kBlack);
+    skinCombo_->addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kBlackDuo, kBlackDuo);
     skinCombo_->addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kCream, kCream);
 }
 
 void GettingStartedWizardDialog::applyControlLooks(TSS::ISkin& skin)
 {
     const auto labelLook = TSS::chromeTextLabelLookFromSkin(skin);
-    const auto comboLook = TSS::comboBoxLookFromSkin(skin, TSS::ColourSet::k4);
-    const auto popupLook = TSS::popupMenuLookFromSkin(skin, TSS::ColourSet::k4);
+    const auto comboLook = TSS::comboBoxLookForZone(skin, TSS::SkinZone::kModales);
+    const auto popupLook = TSS::popupMenuLookForZone(skin, TSS::SkinZone::kModales);
 
     auto apply = [&](TSS::Label* label, TSS::ComboBox* combo)
     {

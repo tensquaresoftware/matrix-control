@@ -65,7 +65,8 @@ void SettingsAudioPage::buildWidgets()
     synthFromCombo_->setUsesContentSizedPopupWidth(true);
     peakIndicator_ = std::make_unique<TSS::PeakIndicator>(SettingsShellMetrics::kPeakWidth,
                                                           SettingsShellMetrics::kControlHeight,
-                                                          TSS::ColourSet::k4);
+                                                          TSS::zoneColourSet(TSS::SkinObjectType::kPeakIndicator,
+                                                                             TSS::SkinZone::kModales));
     peakIndicator_->setSkin(*skin_);
     addAndMakeVisible(*peakIndicator_);
     outputChannelsLabel_ = makeLabel(*skin_, PluginDisplayNames::Settings::kOutputChannelsLabel);
@@ -73,7 +74,7 @@ void SettingsAudioPage::buildWidgets()
     playTestToneButton_ = std::make_unique<TSS::Button>(
         SettingsShellMetrics::kControlColumnWidth,
         SettingsShellMetrics::kControlHeight,
-        TSS::buttonLookFromSkin(*skin_, TSS::ColourSet::k4),
+        TSS::buttonLookFromSkin(*skin_),
         PluginDisplayNames::Settings::kPlayTestToneButton);
     addAndMakeVisible(*playTestToneButton_);
 }
@@ -129,9 +130,9 @@ void SettingsAudioPage::setSkin(TSS::ISkin& skin)
 {
     skin_ = &skin;
     const auto labelLook = TSS::labelLookFromSkin(skin);
-    const auto comboLook = TSS::comboBoxLookFromSkin(skin, TSS::ColourSet::k4);
-    const auto popupLook = TSS::popupMenuLookFromSkin(skin, TSS::ColourSet::k4);
-    const auto buttonLook = TSS::buttonLookFromSkin(skin, TSS::ColourSet::k4);
+    const auto comboLook = TSS::comboBoxLookForZone(skin, TSS::SkinZone::kModales);
+    const auto popupLook = TSS::popupMenuLookForZone(skin, TSS::SkinZone::kModales);
+    const auto buttonLook = TSS::buttonLookFromSkin(skin);
 
     driverTypeLabel_->setLook(labelLook);
     inputDeviceLabel_->setLook(labelLook);
@@ -309,9 +310,9 @@ std::unique_ptr<TSS::ComboBox> SettingsAudioPage::makeCombo(TSS::ISkin& skin)
     auto combo = std::make_unique<TSS::ComboBox>(
         SettingsShellMetrics::kControlColumnWidth,
         SettingsShellMetrics::kControlHeight,
-        TSS::comboBoxLookFromSkin(skin, TSS::ColourSet::k4),
+        TSS::comboBoxLookForZone(skin, TSS::SkinZone::kModales),
         TSS::ComboBox::PopupMode::Scrollable);
-    combo->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin, TSS::ColourSet::k4));
+    combo->setPopupMenuLook(TSS::popupMenuLookForZone(skin, TSS::SkinZone::kModales));
     addAndMakeVisible(*combo);
     return combo;
 }

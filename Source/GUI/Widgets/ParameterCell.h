@@ -47,7 +47,7 @@ public:
     TSS::Slider* getSlider() const { return slider_.get(); }
     TSS::ComboBox* getComboBox() const { return comboBox_.get(); }
     juce::Rectangle<int> getLabelBounds() const;
-    TSS::ColourSet getColourSet() const noexcept { return colourSet_; }
+    TSS::SkinZone getZone() const noexcept { return zone_; }
 
 private:
     void createParameterLabel(TSS::ISkin& skin, WidgetFactory& factory, const juce::String& parameterId);
@@ -63,7 +63,7 @@ private:
 
     TSS::ISkin* skin_;
     ParameterType parameterType_;
-    TSS::ColourSet colourSet_ = TSS::ColourSet::k1;
+    TSS::SkinZone zone_ = TSS::SkinZone::kPatch;
     ParameterCellDimensions dimensions_;
     float uiScale_ = 1.0f;
 

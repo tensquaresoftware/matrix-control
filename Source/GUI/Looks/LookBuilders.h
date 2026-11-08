@@ -30,4 +30,19 @@ namespace TSS
     SectionHeaderLook sectionHeaderLookFromSkin(const ISkin& skin);
     ModuleHeaderLook moduleHeaderLookFromSkin(const ISkin& skin);
     ModulationBusHeaderLook modulationBusHeaderLookFromSkin(const ISkin& skin);
+
+    inline SliderLook sliderLookForZone(const ISkin& skin, SkinZone zone)
+    {
+        return sliderLookFromSkin(skin, zoneColourSet(SkinObjectType::kSlider, zone));
+    }
+
+    inline ComboBoxLook comboBoxLookForZone(const ISkin& skin, SkinZone zone)
+    {
+        return comboBoxLookFromSkin(skin, zoneColourSet(SkinObjectType::kComboBox, zone));
+    }
+
+    inline PopupMenuLook popupMenuLookForZone(const ISkin& skin, SkinZone zone)
+    {
+        return popupMenuLookFromSkin(skin, zoneColourSet(SkinObjectType::kPopupMenu, zone));
+    }
 }

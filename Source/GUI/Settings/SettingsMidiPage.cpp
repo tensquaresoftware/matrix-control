@@ -9,6 +9,11 @@
 #include "GUI/Skins/ISkin.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 
+namespace
+{
+    constexpr auto kModalesLedColourSet_ = TSS::zoneColourSet(TSS::SkinObjectType::kLed, TSS::SkinZone::kModales);
+}
+
 SettingsMidiPage::SettingsMidiPage(Config config)
     : config_(std::move(config))
     , skin_(config_.skin)
@@ -34,7 +39,7 @@ void SettingsMidiPage::buildWidgets()
     keyboardFromCombo_ = makeCombo(*skin_);
     keyboardFromLed_ = std::make_unique<TSS::Led>(SettingsShellMetrics::kPeakWidth,
                                                   SettingsShellMetrics::kPeakWidth,
-                                                  TSS::ColourSet::k4);
+                                                  kModalesLedColourSet_);
     keyboardFromLed_->setSkin(*skin_);
     addAndMakeVisible(*keyboardFromLed_);
 
@@ -42,7 +47,7 @@ void SettingsMidiPage::buildWidgets()
     synthFromCombo_ = makeCombo(*skin_);
     synthFromLed_ = std::make_unique<TSS::Led>(SettingsShellMetrics::kPeakWidth,
                                                SettingsShellMetrics::kPeakWidth,
-                                               TSS::ColourSet::k4);
+                                               kModalesLedColourSet_);
     synthFromLed_->setSkin(*skin_);
     addAndMakeVisible(*synthFromLed_);
 
@@ -50,7 +55,7 @@ void SettingsMidiPage::buildWidgets()
     synthToCombo_ = makeCombo(*skin_);
     synthToLed_ = std::make_unique<TSS::Led>(SettingsShellMetrics::kPeakWidth,
                                              SettingsShellMetrics::kPeakWidth,
-                                             TSS::ColourSet::k4);
+                                             kModalesLedColourSet_);
     synthToLed_->setSkin(*skin_);
     addAndMakeVisible(*synthToLed_);
 }
@@ -83,16 +88,16 @@ void SettingsMidiPage::setSkin(TSS::ISkin& skin)
 {
     skin_ = &skin;
     keyboardFromLabel_->setLook(TSS::chromeTextLabelLookFromSkin(skin));
-    keyboardFromCombo_->setLook(TSS::comboBoxLookFromSkin(skin, TSS::ColourSet::k4));
-    keyboardFromCombo_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin, TSS::ColourSet::k4));
+    keyboardFromCombo_->setLook(TSS::comboBoxLookForZone(skin, TSS::SkinZone::kModales));
+    keyboardFromCombo_->setPopupMenuLook(TSS::popupMenuLookForZone(skin, TSS::SkinZone::kModales));
     keyboardFromLed_->setSkin(skin);
     synthFromLabel_->setLook(TSS::chromeTextLabelLookFromSkin(skin));
-    synthFromCombo_->setLook(TSS::comboBoxLookFromSkin(skin, TSS::ColourSet::k4));
-    synthFromCombo_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin, TSS::ColourSet::k4));
+    synthFromCombo_->setLook(TSS::comboBoxLookForZone(skin, TSS::SkinZone::kModales));
+    synthFromCombo_->setPopupMenuLook(TSS::popupMenuLookForZone(skin, TSS::SkinZone::kModales));
     synthFromLed_->setSkin(skin);
     synthToLabel_->setLook(TSS::chromeTextLabelLookFromSkin(skin));
-    synthToCombo_->setLook(TSS::comboBoxLookFromSkin(skin, TSS::ColourSet::k4));
-    synthToCombo_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin, TSS::ColourSet::k4));
+    synthToCombo_->setLook(TSS::comboBoxLookForZone(skin, TSS::SkinZone::kModales));
+    synthToCombo_->setPopupMenuLook(TSS::popupMenuLookForZone(skin, TSS::SkinZone::kModales));
     synthToLed_->setSkin(skin);
 }
 
@@ -261,9 +266,9 @@ std::unique_ptr<TSS::ComboBox> SettingsMidiPage::makeCombo(TSS::ISkin& skin)
 {
     auto combo = std::make_unique<TSS::ComboBox>(SettingsShellMetrics::kSynthFromComboWidth,
                                                  SettingsShellMetrics::kControlHeight,
-                                                 TSS::comboBoxLookFromSkin(skin, TSS::ColourSet::k4),
+                                                 TSS::comboBoxLookForZone(skin, TSS::SkinZone::kModales),
                                                  TSS::ComboBox::PopupMode::Scrollable);
-    combo->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin, TSS::ColourSet::k4));
+    combo->setPopupMenuLook(TSS::popupMenuLookForZone(skin, TSS::SkinZone::kModales));
     combo->setUsesPortSentinelPopupChrome(true);
     combo->setUsesContentSizedPopupWidth(true);
     addAndMakeVisible(*combo);

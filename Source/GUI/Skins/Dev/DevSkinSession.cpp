@@ -84,8 +84,12 @@ namespace TSS::DevSkin
             return imported;
 
         state.productSkinId = root->getProperty("productSkinId").toString();
-        if (state.productSkinId != kCompiledBlackId && state.productSkinId != kCompiledCreamId)
+        if (state.productSkinId != kCompiledBlackId
+            && state.productSkinId != kCompiledBlackDuoId
+            && state.productSkinId != kCompiledCreamId)
+        {
             state.productSkinId = kCompiledBlackId;
+        }
 
         state.editorSkinId =
             resolveEditorSkinIdFromSession(layer, root->getProperty("editorSkinId").toString());

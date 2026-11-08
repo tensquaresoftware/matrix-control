@@ -26,7 +26,7 @@ namespace TSS
         , onSettingsRequested_(std::move(config.onSettingsRequested))
         , onAboutRequested_(std::move(config.onAboutRequested))
         , contextualHelpBinder_(config.contextualHelpBinder)
-        , look_(popupMenuLookFromSkin(skin, ColourSet::k4))
+        , look_(popupMenuLookForZone(skin, kMonoMenuExceptionZone))
         , renderer_(std::make_unique<PopupMenuRenderer>(uiScale_))
         , cachedFont_(look_.font.withHeight(look_.font.getHeight() * uiScale_))
     {
@@ -83,23 +83,28 @@ namespace TSS
                            TSS::EditorChromeShortcutLabels::skinVariant(1),
                            1, 1 });
         items_.push_back({ ItemKind::Skin,
-                           static_cast<int>(Skin::SkinComboBoxItemId::kCream),
-                           PluginDisplayNames::ChoiceLists::SkinVariants::kCream,
+                           static_cast<int>(Skin::SkinComboBoxItemId::kBlackDuo),
+                           PluginDisplayNames::ChoiceLists::SkinVariants::kBlackDuo,
                            TSS::EditorChromeShortcutLabels::skinVariant(2),
                            1, 2 });
-        items_.push_back({ ItemKind::Spacer, 0, {}, {}, 1, 3 });
-        items_.push_back({ ItemKind::HorizontalRule, 0, {}, {}, 1, 4 });
+        items_.push_back({ ItemKind::Skin,
+                           static_cast<int>(Skin::SkinComboBoxItemId::kCream),
+                           PluginDisplayNames::ChoiceLists::SkinVariants::kCream,
+                           TSS::EditorChromeShortcutLabels::skinVariant(3),
+                           1, 3 });
+        items_.push_back({ ItemKind::Spacer, 0, {}, {}, 1, 4 });
+        items_.push_back({ ItemKind::HorizontalRule, 0, {}, {}, 1, 5 });
 
         items_.push_back({ ItemKind::Settings,
                            0,
                            PluginDisplayNames::HeaderPanel::kSettingsButton,
                            TSS::EditorChromeShortcutLabels::openSettings(),
-                           1, 5 });
+                           1, 6 });
         items_.push_back({ ItemKind::About,
                            0,
                            PluginDisplayNames::HeaderPanel::kAboutButton,
                            {},
-                           1, 6 });
+                           1, 7 });
     }
 
     int HeaderLogoPopupMenu::getItemHeightPx() const

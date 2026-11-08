@@ -10,17 +10,20 @@ namespace TSS::SkinColours
         inline constexpr ColourElement kWindowSurfaceBackground = {
             skinColourKey(SkinObjectType::kWindowSurface, SkinColourProperty::kBackground),
             ColourChart::kBlack,
-            ColourChart::kWhite
+            ColourChart::kGrey950,
+            ColourChart::kCream400
         };
 
         inline constexpr ColourElement kHeaderPanelBackground = {
             skinColourKey(SkinObjectType::kHeaderPanel, SkinColourProperty::kBackground),
             ColourChart::kGrey950,
-            ColourChart::kGrey950
+            ColourChart::kGrey950,
+            ColourChart::kCream400
         };
 
         inline constexpr ColourElement kBodyPanelBackground = {
             skinColourKey(SkinObjectType::kBodyPanel, SkinColourProperty::kBackground),
+            ColourChart::kGrey900,
             ColourChart::kGrey900,
             ColourChart::kCream
         };
@@ -28,27 +31,31 @@ namespace TSS::SkinColours
         inline constexpr ColourElement kFooterPanelBackground = {
             skinColourKey(SkinObjectType::kFooterPanel, SkinColourProperty::kBackground),
             ColourChart::kGrey950,
-            ColourChart::kGrey950
+            ColourChart::kGrey950,
+            ColourChart::kCream400
         };
 
-        // Unified chrome grey for Header cartouche badge/frame and Footer HELP chrome.
+        // Black chrome grey for Header cartouche badge/frame and Footer HELP chrome (Cream uses cafe tones).
         inline constexpr juce::uint32 kMainChromeGrey = ColourChart::kGrey300;
 
         inline constexpr ColourElement kHeaderPanelBorder = {
             skinColourKey(SkinObjectType::kHeaderPanel, SkinColourProperty::kBorder),
             kMainChromeGrey,
-            kMainChromeGrey
+            kMainChromeGrey,
+            ColourChart::kCafe800
         };
 
         inline constexpr ColourElement kFooterPanelBorder = {
             skinColourKey(SkinObjectType::kFooterPanel, SkinColourProperty::kBorder),
             kMainChromeGrey,
-            kMainChromeGrey
+            kMainChromeGrey,
+            ColourChart::kCafe900
         };
 
         // MIDI-queue alert badge cut-out text (fill uses FooterMessage Error text).
         inline constexpr ColourElement kFooterMessageErrorBackground = {
             skinColourKey(SkinObjectType::kFooterMessage, SkinColourProperty::kBackground, SkinColourState::kError),
+            ColourChart::kBlack,
             ColourChart::kBlack,
             ColourChart::kBlack
         };
@@ -57,17 +64,20 @@ namespace TSS::SkinColours
         inline constexpr ColourElement kDialogBorder = {
             skinColourKey(SkinObjectType::kDialog, SkinColourProperty::kBorder),
             ColourChart::kGrey525,
-            ColourChart::kGrey525
+            ColourChart::kGrey525,
+            ColourChart::kCafe600
         };
 
         inline constexpr ColourElement kDialogTitleBand = {
             skinColourKey(SkinObjectType::kDialog, SkinColourProperty::kTitleBand),
             ColourChart::kBlack,
-            ColourChart::kBlack
+            ColourChart::kBlack,
+            ColourChart::kCream400
         };
 
         inline constexpr ColourElement kDialogGlyph = {
             skinColourKey(SkinObjectType::kDialog, SkinColourProperty::kGlyph),
+            ColourChart::kRed900,
             ColourChart::kRed900,
             ColourChart::kRed900
         };

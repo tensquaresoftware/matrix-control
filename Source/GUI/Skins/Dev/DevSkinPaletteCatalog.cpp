@@ -4,9 +4,44 @@
 
 namespace TSS::DevSkin
 {
+    namespace
+    {
+        std::vector<Pastille> zoneAccentPastilles()
+        {
+            return {
+                { "kBlue950", ColourChart::kBlue950 },
+                { "kBlue800", ColourChart::kBlue800 },
+                { "kBlue600", ColourChart::kBlue600 },
+                { "kBlue400", ColourChart::kBlue400 },
+                { "kOrange950", ColourChart::kOrange950 },
+                { "kOrange800", ColourChart::kOrange800 },
+                { "kOrange700", ColourChart::kOrange700 },
+                { "kOrange400", ColourChart::kOrange400 },
+                { "kYellow950", ColourChart::kYellow950 },
+                { "kYellow800", ColourChart::kYellow800 },
+                { "kYellow700", ColourChart::kYellow700 },
+                { "kYellow400", ColourChart::kYellow400 },
+                { "kCream400", ColourChart::kCream400 },
+                { "kCafe400", ColourChart::kCafe400 },
+                { "kCafe600", ColourChart::kCafe600 },
+                { "kCafe700", ColourChart::kCafe700 },
+                { "kCafe800", ColourChart::kCafe800 },
+                { "kCafe900", ColourChart::kCafe900 },
+                { "kCafe950", ColourChart::kCafe950 },
+                { "kGreen100", ColourChart::kGreen100 },
+                { "kGreen200", ColourChart::kGreen200 },
+                { "kGreen400", ColourChart::kGreen400 },
+                { "kGreen500", ColourChart::kGreen500 },
+                { "kGreen600", ColourChart::kGreen600 },
+                { "kGreen700", ColourChart::kGreen700 },
+                { "kGreen800", ColourChart::kGreen800 },
+            };
+        }
+    }
+
     std::vector<Pastille> colourChartPastilles()
     {
-        return {
+        std::vector<Pastille> pastilles {
             { "kTransparent", ColourChart::kTransparent },
             { "kBlack", ColourChart::kBlack },
             { "kWhite", ColourChart::kWhite },
@@ -34,6 +69,9 @@ namespace TSS::DevSkin
             { "kEmerald700", ColourChart::kEmerald700 },
             { "kEmerald400", ColourChart::kEmerald400 },
         };
+        const auto accents = zoneAccentPastilles();
+        pastilles.insert(pastilles.end(), accents.begin(), accents.end());
+        return pastilles;
     }
 
     juce::String pastilleNameForArgb(juce::uint32 argb)

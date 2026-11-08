@@ -84,15 +84,9 @@ namespace TSS
                                           SkinColourProperty::kFocusBorder,
                                           SkinColourState::kDefault,
                                           colourSet);
-        // Same ColourSet as the slider when borrowing NumberBox editor tokens.
-        look.editorText = skin.getColour(SkinObjectType::kNumberBox,
-                                         SkinColourProperty::kEditorText,
-                                         SkinColourState::kDefault,
-                                         colourSet);
-        look.editorCaret = skin.getColour(SkinObjectType::kNumberBox,
-                                          SkinColourProperty::kEditorText,
-                                          SkinColourState::kDefault,
-                                          colourSet);
+        // NumberBox is UCS: borrowed editor tokens always come from k1.
+        look.editorText = skin.getColour(SkinObjectType::kNumberBox, SkinColourProperty::kEditorText);
+        look.editorCaret = skin.getColour(SkinObjectType::kNumberBox, SkinColourProperty::kEditorText);
         look.font = resolvedTypographyFont(skin, TypographyStyleId::kDefault);
         return look;
     }

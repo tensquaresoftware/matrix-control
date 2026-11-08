@@ -126,7 +126,7 @@ void PluginEditor::wireGettingStartedAppearanceCallbacks(
     bindings.onSkinChanged = [this](int skinId)
     {
         using namespace PluginIDs::Settings::SkinVariants;
-        if (skinId == kBlack || skinId == kCream)
+        if (skinId == kBlack || skinId == kBlackDuo || skinId == kCream)
             applySkinFromItemId(skinId, true);
     };
 }
@@ -223,8 +223,10 @@ void PluginEditor::openGettingStartedWizard(GettingStartedWizard::Step startStep
 
     // Matrix monochrome chrome only — never follow the live product skin. Cream's
     // kLabelText is dark (body text); Matrix modal plate stays dark, so those labels
-    // vanish unless the wizard keeps Black chrome (+ dark-panel label looks).
+    // vanish unless the wizard keeps Skin::kGettingStartedMatrixChromeVariant
+    // (product BLACK) (+ dark-panel label looks).
     auto& matrixChromeSkin = *skinBlack_;
+    jassert(skinBlack_->getColourVariant() == TSS::Skin::kGettingStartedMatrixChromeVariant);
 
     if (gettingStartedWizardDialog_ == nullptr)
     {

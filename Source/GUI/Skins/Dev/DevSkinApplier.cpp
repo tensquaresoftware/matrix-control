@@ -4,6 +4,16 @@
 
 namespace TSS::DevSkin
 {
+    namespace
+    {
+        bool isCompiledKind(SkinKind kind) noexcept
+        {
+            return kind == SkinKind::kCompiledBlack
+                || kind == SkinKind::kCompiledBlackDuo
+                || kind == SkinKind::kCompiledCream;
+        }
+    }
+
     Skin::ColourVariant compiledBaseVariant(const PushPayload& payload)
     {
         if (payload.kind == SkinKind::kCompiledBlack
@@ -11,6 +21,13 @@ namespace TSS::DevSkin
             || payload.derivedFrom == kCompiledBlackId)
         {
             return Skin::ColourVariant::Black;
+        }
+
+        if (payload.kind == SkinKind::kCompiledBlackDuo
+            || payload.compiledAncestorId == kCompiledBlackDuoId
+            || payload.derivedFrom == kCompiledBlackDuoId)
+        {
+            return Skin::ColourVariant::BlackDuo;
         }
 
         if (payload.kind == SkinKind::kCompiledCream
@@ -30,7 +47,7 @@ namespace TSS::DevSkin
         result.revision = payload.revision;
         result.appliedSkinId = payload.activeSkinId;
 
-        if (payload.kind == SkinKind::kCompiledBlack || payload.kind == SkinKind::kCompiledCream)
+        if (isCompiledKind(payload.kind))
         {
             result.ok = true;
             result.message = "Compiled skin selection";

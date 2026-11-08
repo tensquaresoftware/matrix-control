@@ -36,7 +36,7 @@ namespace TSS::DevSkin
             out.push_back(&Widgets::HorizontalSeparator::kLine);
         }
 
-        void appendControls(std::vector<const SkinColours::ColourElement*>& out)
+        void appendButtons(std::vector<const SkinColours::ColourElement*>& out)
         {
             using namespace SkinColours;
             out.push_back(&Widgets::Button::kBackgroundOff);
@@ -60,14 +60,6 @@ namespace TSS::DevSkin
             out.push_back(&Widgets::Toggle::kBackgroundDisabled);
             out.push_back(&Widgets::Toggle::kBorderDisabled);
             out.push_back(&Widgets::Toggle::kTextDisabled);
-            out.push_back(&Widgets::Slider::kTrack);
-            out.push_back(&Widgets::Slider::kTrackDisabled);
-            out.push_back(&Widgets::Slider::kBackgroundDisabled);
-            out.push_back(&Widgets::Slider::kValueBar);
-            out.push_back(&Widgets::Slider::kValueBarDisabled);
-            out.push_back(&Widgets::Slider::kText);
-            out.push_back(&Widgets::Slider::kTextDisabled);
-            out.push_back(&Widgets::Slider::kFocusBorder);
             out.push_back(&Widgets::ProgressBar::kTrack);
             out.push_back(&Widgets::ProgressBar::kTrackDisabled);
             out.push_back(&Widgets::ProgressBar::kValueBar);
@@ -76,7 +68,44 @@ namespace TSS::DevSkin
             out.push_back(&Widgets::ProgressBar::kTextDisabled);
         }
 
-        void appendMenus(std::vector<const SkinColours::ColourElement*>& out)
+        void appendSliders(std::vector<const SkinColours::ColourElement*>& out)
+        {
+            using namespace SkinColours;
+            out.push_back(&Widgets::Slider::kTrack);
+            out.push_back(&Widgets::Slider::kTrackDisabled);
+            out.push_back(&Widgets::Slider::kBackgroundDisabled);
+            out.push_back(&Widgets::Slider::kValueBar);
+            out.push_back(&Widgets::Slider::kValueBarDisabled);
+            out.push_back(&Widgets::Slider::kText);
+            out.push_back(&Widgets::Slider::kTextDisabled);
+            out.push_back(&Widgets::Slider::kFocusBorder);
+            out.push_back(&Widgets::SliderK2::kBackgroundDisabled);
+            out.push_back(&Widgets::SliderK2::kFocusBorder);
+            out.push_back(&Widgets::SliderK2::kText);
+            out.push_back(&Widgets::SliderK2::kTextDisabled);
+            out.push_back(&Widgets::SliderK2::kTrack);
+            out.push_back(&Widgets::SliderK2::kTrackDisabled);
+            out.push_back(&Widgets::SliderK2::kValueBar);
+            out.push_back(&Widgets::SliderK2::kValueBarDisabled);
+            out.push_back(&Widgets::SliderK3::kBackgroundDisabled);
+            out.push_back(&Widgets::SliderK3::kFocusBorder);
+            out.push_back(&Widgets::SliderK3::kText);
+            out.push_back(&Widgets::SliderK3::kTextDisabled);
+            out.push_back(&Widgets::SliderK3::kTrack);
+            out.push_back(&Widgets::SliderK3::kTrackDisabled);
+            out.push_back(&Widgets::SliderK3::kValueBar);
+            out.push_back(&Widgets::SliderK3::kValueBarDisabled);
+            out.push_back(&Widgets::SliderK4::kTrack);
+            out.push_back(&Widgets::SliderK4::kFocusBorder);
+            out.push_back(&Widgets::SliderK4::kValueBar);
+            out.push_back(&Widgets::SliderK4::kText);
+            out.push_back(&Widgets::SliderK4::kBackgroundDisabled);
+            out.push_back(&Widgets::SliderK4::kTextDisabled);
+            out.push_back(&Widgets::SliderK4::kTrackDisabled);
+            out.push_back(&Widgets::SliderK4::kValueBarDisabled);
+        }
+
+        void appendComboBoxes(std::vector<const SkinColours::ColourElement*>& out)
         {
             using namespace SkinColours;
             out.push_back(&Widgets::ComboBox::kBackground);
@@ -88,6 +117,29 @@ namespace TSS::DevSkin
             out.push_back(&Widgets::ComboBox::kTriangleDisabled);
             out.push_back(&Widgets::ComboBox::kText);
             out.push_back(&Widgets::ComboBox::kTextDisabled);
+            out.push_back(&Widgets::ComboBoxK2::kBackground);
+            out.push_back(&Widgets::ComboBoxK2::kBackgroundDisabled);
+            out.push_back(&Widgets::ComboBoxK2::kBorder);
+            out.push_back(&Widgets::ComboBoxK2::kBorderDisabled);
+            out.push_back(&Widgets::ComboBoxK2::kFocusBorder);
+            out.push_back(&Widgets::ComboBoxK2::kText);
+            out.push_back(&Widgets::ComboBoxK2::kTextDisabled);
+            out.push_back(&Widgets::ComboBoxK2::kTriangle);
+            out.push_back(&Widgets::ComboBoxK2::kTriangleDisabled);
+            out.push_back(&Widgets::ComboBoxK3::kBackground);
+            out.push_back(&Widgets::ComboBoxK3::kBackgroundDisabled);
+            out.push_back(&Widgets::ComboBoxK3::kBorder);
+            out.push_back(&Widgets::ComboBoxK3::kBorderDisabled);
+            out.push_back(&Widgets::ComboBoxK3::kFocusBorder);
+            out.push_back(&Widgets::ComboBoxK3::kText);
+            out.push_back(&Widgets::ComboBoxK3::kTextDisabled);
+            out.push_back(&Widgets::ComboBoxK3::kTriangle);
+            out.push_back(&Widgets::ComboBoxK3::kTriangleDisabled);
+        }
+
+        void appendPopupMenus(std::vector<const SkinColours::ColourElement*>& out)
+        {
+            using namespace SkinColours;
             out.push_back(&Widgets::PopupMenu::kBackground);
             out.push_back(&Widgets::PopupMenu::kBorder);
             out.push_back(&Widgets::PopupMenu::kSeparator);
@@ -96,6 +148,22 @@ namespace TSS::DevSkin
             out.push_back(&Widgets::PopupMenu::kBackgroundHover);
             out.push_back(&Widgets::PopupMenu::kTextHover);
             out.push_back(&Widgets::PopupMenu::kScrollbar);
+            out.push_back(&Widgets::PopupMenuK2::kBackground);
+            out.push_back(&Widgets::PopupMenuK2::kBackgroundHover);
+            out.push_back(&Widgets::PopupMenuK2::kBorder);
+            out.push_back(&Widgets::PopupMenuK2::kScrollbar);
+            out.push_back(&Widgets::PopupMenuK2::kSeparator);
+            out.push_back(&Widgets::PopupMenuK2::kText);
+            out.push_back(&Widgets::PopupMenuK2::kTextDisabled);
+            out.push_back(&Widgets::PopupMenuK2::kTextHover);
+            out.push_back(&Widgets::PopupMenuK3::kBackground);
+            out.push_back(&Widgets::PopupMenuK3::kBackgroundHover);
+            out.push_back(&Widgets::PopupMenuK3::kBorder);
+            out.push_back(&Widgets::PopupMenuK3::kScrollbar);
+            out.push_back(&Widgets::PopupMenuK3::kSeparator);
+            out.push_back(&Widgets::PopupMenuK3::kText);
+            out.push_back(&Widgets::PopupMenuK3::kTextDisabled);
+            out.push_back(&Widgets::PopupMenuK3::kTextHover);
         }
 
         void appendDisplays(std::vector<const SkinColours::ColourElement*>& out)
@@ -126,9 +194,15 @@ namespace TSS::DevSkin
             out.push_back(&Widgets::Led::kBackgroundOff);
             out.push_back(&Widgets::Led::kBorderOff);
             out.push_back(&Widgets::Led::kMaxOn);
+            out.push_back(&Widgets::LedK2::kBackgroundOff);
+            out.push_back(&Widgets::LedK2::kMaxOn);
+            out.push_back(&Widgets::LedK2::kBorderOff);
             out.push_back(&Widgets::PeakIndicator::kBackgroundOff);
             out.push_back(&Widgets::PeakIndicator::kBorderOff);
             out.push_back(&Widgets::PeakIndicator::kMaxOn);
+            out.push_back(&Widgets::PeakIndicatorK2::kBackgroundOff);
+            out.push_back(&Widgets::PeakIndicatorK2::kMaxOn);
+            out.push_back(&Widgets::PeakIndicatorK2::kBorderOff);
         }
     }
 
@@ -137,10 +211,12 @@ namespace TSS::DevSkin
         static const std::vector<const SkinColours::ColourElement*> elements = []
         {
             std::vector<const SkinColours::ColourElement*> out;
-            out.reserve(128);
+            out.reserve(256);
             appendPanels(out);
-            appendControls(out);
-            appendMenus(out);
+            appendButtons(out);
+            appendSliders(out);
+            appendComboBoxes(out);
+            appendPopupMenus(out);
             appendDisplays(out);
             return out;
         }();

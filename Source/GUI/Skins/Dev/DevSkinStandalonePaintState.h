@@ -30,6 +30,7 @@ namespace TSS::DevSkin
         void selectCompiled(Skin::ColourVariant variant);
 
         std::unique_ptr<Skin> black_;
+        std::unique_ptr<Skin> blackDuo_;
         std::unique_ptr<Skin> cream_;
         std::unique_ptr<Skin> overlay_;
         Skin* active_ = nullptr;

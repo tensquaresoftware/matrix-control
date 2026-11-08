@@ -197,8 +197,7 @@ void BankTransferProgressDialog::paintProgressBar(juce::Graphics& g,
     const auto trackState = enabled ? SkinColourState::kDefault : SkinColourState::kDisabled;
     g.setColour(skin_->getColour(SkinObjectType::kProgressBar,
                                  SkinColourProperty::kTrack,
-                                 trackState,
-                                 ColourSet::k4));
+                                 trackState));
     g.fillRect(bounds);
 
     if (enabled)
@@ -207,16 +206,14 @@ void BankTransferProgressDialog::paintProgressBar(juce::Graphics& g,
             juce::roundToInt(static_cast<float>(bounds.getWidth()) * fraction));
         g.setColour(skin_->getColour(SkinObjectType::kProgressBar,
                                      SkinColourProperty::kValueBar,
-                                     SkinColourState::kDefault,
-                                     ColourSet::k4));
+                                     SkinColourState::kDefault));
         g.fillRect(fillBar);
     }
 
     const int percent = enabled ? juce::roundToInt(fraction * 100.0f) : 0;
     g.setColour(skin_->getColour(SkinObjectType::kProgressBar,
                                  SkinColourProperty::kText,
-                                 trackState,
-                                 ColourSet::k4));
+                                 trackState));
     g.drawText(juce::String(percent) + juce::String(PluginDisplayNames::Units::kPercent),
                bounds,
                juce::Justification::centred,
@@ -282,8 +279,7 @@ void BankTransferProgressDialog::paintPhaseLane(juce::Graphics& g, const PhaseLa
     g.setColour(args.enabled ? skin_->getColour(SkinObjectType::kChromeText, SkinColourProperty::kText)
                              : skin_->getColour(SkinObjectType::kProgressBar,
                                                SkinColourProperty::kText,
-                                               SkinColourState::kDisabled,
-                                               ColourSet::k4));
+                                               SkinColourState::kDisabled));
 
     {
         auto progressLabel = args.body.removeFromTop(lineHeight);

@@ -57,17 +57,11 @@ namespace TSS::DevSkin
             return false;
         }
 
-        // Legacy *ButtonLike rows carried mono greys. Always force ColourSet k4 after object
-        // remap — including when colourSet is missing/defaulted to k1 or explicitly non-k4 —
-        // so those greys cannot overwrite classic greens on k1–k3.
+        // Legacy *ButtonLike rows carried mono greys. Always force the object's last (mono)
+        // colour set after object remap (whatever colourSet the row carried) so those greys
+        // cannot overwrite the zone accents on lower sets.
         if (isLegacyButtonLikeObjectName(objectText))
-            colourSet = ColourSet::k4;
-
-        if (colourSet != ColourSet::k1 && ! supportsMultipleColourSets(object))
-        {
-            error = "Mapping uses a higher colourSet for a k1-only object";
-            return false;
-        }
+            colourSet = static_cast<ColourSet>(colourSetCount(object) - 1);
 
         paletteName = objectValue->getProperty("paletteName").toString();
         if (paletteName.isEmpty())
@@ -90,6 +84,8 @@ namespace TSS::DevSkin
 
             for (const auto colourSet : kAllColourSets)
             {
+                if (! supportsColourSet(key.object, colourSet))
+                    continue;
                 auto expandedKey = key;
                 expandedKey.colourSet = colourSet;
                 skin.mappings.try_emplace(expandedKey, paletteName);
@@ -162,7 +158,7 @@ namespace TSS::DevSkin
         if (! setValue.isVoid() && ! parseColourSet(setValue.toString(), colourSet))
             return false;
 
-        if (colourSet != ColourSet::k1 && ! supportsMultipleColourSets(object))
+        if (! supportsColourSet(object, colourSet))
             return false;
 
         key = skinColourKey(object, property, state, colourSet);

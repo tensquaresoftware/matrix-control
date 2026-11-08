@@ -86,7 +86,7 @@ void InternalPatchesPanel::setupLoadNextPatchButton(TSS::ISkin& skin, WidgetFact
 void InternalPatchesPanel::setupCurrentBankNumberBox(TSS::ISkin& skin)
 {
     currentBankNumber = std::make_unique<TSS::NumberBox>(
-        TSS::numberBoxLookFromSkin(skin, TSS::ColourSet::k4),
+        TSS::numberBoxLookFromSkin(skin),
         TSS::NumberBox::Config {
             .width = dims_.numberBoxes.bankNumberWidth,
             .height = dims_.numberBoxes.height,
@@ -99,7 +99,7 @@ void InternalPatchesPanel::setupCurrentBankNumberBox(TSS::ISkin& skin)
 void InternalPatchesPanel::setupCurrentPatchNumberBox(TSS::ISkin& skin)
 {
     currentPatchNumber = std::make_unique<TSS::NumberBox>(
-        TSS::numberBoxLookFromSkin(skin, TSS::ColourSet::k4),
+        TSS::numberBoxLookFromSkin(skin),
         TSS::NumberBox::Config {
             .width = dims_.numberBoxes.patchNumberWidth,
             .height = dims_.numberBoxes.height,

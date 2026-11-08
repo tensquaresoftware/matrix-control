@@ -16,13 +16,19 @@ namespace TSS
         enum class ColourVariant
         {
             Black,
+            BlackDuo,
             Cream
         };
+
+        /** Getting Started Matrix monochrome chrome always uses classic BLACK,
+            never BLACK/DUO or CREAM (dark plate vs cream body text). */
+        static constexpr ColourVariant kGettingStartedMatrixChromeVariant = ColourVariant::Black;
 
         enum class SkinComboBoxItemId : int
         {
             kBlack = 1,
-            kCream = 2
+            kCream = 2,
+            kBlackDuo = 3
         };
 
         explicit Skin(ColourVariant variant);
@@ -76,42 +82,6 @@ namespace TSS
 
     private:
         void initializeDefaultColours();
-
-        template <typename Accessor>
-        void initializeVariantColours(Accessor accessColour);
-
-        template <typename Accessor>
-        void initializePanelColours(Accessor accessColour);
-
-        template <typename Accessor>
-        void initializeLayoutColours(Accessor accessColour);
-
-        template <typename Accessor>
-        void initializeButtonColours(Accessor accessColour);
-
-        template <typename Accessor>
-        void initializeToggleColours(Accessor accessColour);
-
-        template <typename Accessor>
-        void initializeSliderColours(Accessor accessColour);
-
-        template <typename Accessor>
-        void initializeComboBoxColours(Accessor accessColour);
-
-        template <typename Accessor>
-        void initializePopupMenuColours(Accessor accessColour);
-
-        template <typename Accessor>
-        void initializeDisplayColours(Accessor accessColour);
-
-        template <typename Accessor>
-        void putColour(Accessor accessColour, const SkinColours::ColourElement& element);
-
-        template <typename Accessor>
-        void putColourExact(Accessor accessColour, const SkinColours::ColourElement& element);
-
-        template <typename Accessor>
-        void overlayFormerButtonLikeAtK4(Accessor accessColour);
 
         ColourVariant currentVariant_;
         std::map<SkinColourKey, juce::Colour> colours_;

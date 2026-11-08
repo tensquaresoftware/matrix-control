@@ -49,11 +49,13 @@ namespace TSS::DevSkin
         return asciiOnly;
     }
     inline constexpr const char* kCompiledBlackId = "compiled:black";
+    inline constexpr const char* kCompiledBlackDuoId = "compiled:black-duo";
     inline constexpr const char* kCompiledCreamId = "compiled:cream";
 
     enum class SkinKind
     {
         kCompiledBlack,
+        kCompiledBlackDuo,
         kCompiledCream,
         kDev
     };

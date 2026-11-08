@@ -78,8 +78,8 @@ void HeaderPanel::applyPanicButtonLook()
         return;
 
     panicButton_.setLook(panicAlertActive_
-                             ? TSS::buttonAlertLookFromSkin(*skin_, TSS::ColourSet::k3)
-                             : TSS::buttonLookFromSkin(*skin_, TSS::ColourSet::k3));
+                             ? TSS::buttonAlertLookFromSkin(*skin_)
+                             : TSS::buttonLookFromSkin(*skin_));
 }
 
 void HeaderPanel::setPanicQueuePressureAlert(bool active)
@@ -109,10 +109,10 @@ void HeaderPanel::setSkin(TSS::ISkin& skin)
     midiToActivityLed_.setSkin(skin);
     instrumentActivityLed_.setSkin(skin);
     inputGainLabel_.setLook(TSS::chromeTextLabelLookFromSkin(skin));
-    inputGainSlider_.setLook(TSS::sliderLookFromSkin(skin, TSS::ColourSet::k3));
+    inputGainSlider_.setLook(TSS::sliderLookForZone(skin, TSS::SkinZone::kHeader));
     peakIndicator_.setSkin(skin);
-    undoButton_.setLook(TSS::buttonLookFromSkin(skin, TSS::ColourSet::k3));
-    redoButton_.setLook(TSS::buttonLookFromSkin(skin, TSS::ColourSet::k3));
+    undoButton_.setLook(TSS::buttonLookFromSkin(skin));
+    redoButton_.setLook(TSS::buttonLookFromSkin(skin));
     applyPanicButtonLook();
 }
 

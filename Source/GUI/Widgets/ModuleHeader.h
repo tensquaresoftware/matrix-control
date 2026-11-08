@@ -96,7 +96,6 @@ namespace TSS
         Button* getInitButton() const { return initButton_.get(); }
         Button* getCopyButton() const { return copyButton_.get(); }
         Button* getPasteButton() const { return pasteButton_.get(); }
-        ColourSet getButtonColourSet() const noexcept { return buttonColourSet_; }
 
     private:
         friend class ::SkinColourWiringTests;
@@ -128,7 +127,6 @@ namespace TSS
 
         Presentation presentation_ = Presentation::TitleOnly;
         ButtonSet buttonSet_ = ButtonSet::None;
-        ColourSet buttonColourSet_ = ColourSet::k1;
 
         ModuleHeaderLook look_{};
         ModuleHeaderDimensions dimensions_{};

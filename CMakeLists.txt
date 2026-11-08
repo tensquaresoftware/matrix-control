@@ -326,6 +326,7 @@ set(PLUGIN_SOURCES
     # GUI - Skins
     Source/GUI/Skins/Skin.cpp
     Source/GUI/Skins/SkinColourAccessors.cpp
+    Source/GUI/Skins/Dev/DevSkinColourElementList.cpp
     
     # GUI - Looks
     Source/GUI/Looks/LookBuilders.cpp
@@ -619,7 +620,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/DevSkinColourSetLabelsTests.cpp
         Tests/Unit/DevSkinMappingLinkGroupsTests.cpp
         Tests/Unit/DevSkinLaunchProductTests.cpp
-        Tests/Unit/DevSkinCompiledSeedOverlayTests.cpp
+        Tests/Unit/DevSkinCompiledSeedInventoryTests.cpp
         Tests/Unit/DevSkinMatrixTests.cpp
         Tests/Unit/DevSkinPendingPastilleTests.cpp
         Tests/Unit/SkinEditorMappingModePolicyTests.cpp
@@ -631,8 +632,8 @@ if(MATRIX_BUILD_TESTS)
         Tools/SkinEditor/SkinEditorChromePanel.cpp
         Tools/SkinEditor/SkinEditorColourPicker.cpp
         Tools/SkinEditor/SkinEditorSkinsPanel.cpp
-        Tests/Unit/SliderColourSetK4Tests.cpp
-        Tests/Unit/ProgressBarColourSetK4Tests.cpp
+        Tests/Unit/SliderZoneSeedTests.cpp
+        Tests/Unit/ProgressBarUcsSeedTests.cpp
         Tests/Unit/PatchManagerActionHandlerComputerNavigationTests.cpp
         Tests/Unit/PatchManagerActionHandlerNavDebounceTests.cpp
         Tests/Unit/PatchFileServiceTests.cpp
@@ -1024,7 +1025,6 @@ if(MATRIX_BUILD_SKIN_EDITOR)
         Source/GUI/Skins/Dev/DevSkinApplier.cpp
         Source/GUI/Skins/Dev/DevSkinBridgeProtocol.cpp
         Source/GUI/Skins/Dev/DevSkinBridgeSession.cpp
-        Source/GUI/Skins/Dev/DevSkinColourElementList.cpp
         Source/GUI/Skins/Dev/DevSkinInventory.cpp
         Source/GUI/Skins/Dev/DevSkinJson.cpp
         Source/GUI/Skins/Dev/DevSkinJsonMapping.cpp
