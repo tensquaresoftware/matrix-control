@@ -395,6 +395,8 @@ private:
         expect(! restoredState.compareOn); // Compare is runtime-only; never restored On
         expect(! json.contains("compareOn"));
         expectEquals(restoredState.lastSkinJsonDirectory, state.lastSkinJsonDirectory);
+        expect(restoredState.lastImportedJsonPath.isEmpty());
+        expect(restoredState.lastImportedJsonFingerprint.isEmpty());
     }
 
     void assertLegacyCompareOnIgnored()

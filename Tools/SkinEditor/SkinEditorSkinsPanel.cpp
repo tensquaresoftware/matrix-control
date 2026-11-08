@@ -64,6 +64,11 @@ SkinEditorSkinsPanel::SkinEditorSkinsPanel()
     wire(renameButton_, onRename);
     wire(deleteButton_, onDelete);
 
+    editorDuplicateButton_.setTooltip("Duplicate");
+    newButton_.setTooltip("New");
+    renameButton_.setTooltip("Rename");
+    deleteButton_.setTooltip("Delete");
+
     auto wireNav = [this](juce::TextButton& button,
                           juce::ComboBox& combo,
                           int delta,
@@ -73,10 +78,10 @@ SkinEditorSkinsPanel::SkinEditorSkinsPanel()
         button.setTooltip(tooltip);
         button.onClick = [this, &combo, delta] { cycleCombo(combo, delta); };
     };
-    wireNav(productPrevButton_, productCombo_, -1, "Previous Skin");
-    wireNav(productNextButton_, productCombo_, +1, "Next Skin");
-    wireNav(editorPrevButton_, editorCombo_, -1, "Previous Skin");
-    wireNav(editorNextButton_, editorCombo_, +1, "Next Skin");
+    wireNav(productPrevButton_, productCombo_, -1, "Previous Product Skin");
+    wireNav(productNextButton_, productCombo_, +1, "Next Product Skin");
+    wireNav(editorPrevButton_, editorCombo_, -1, "Previous Editor Skin");
+    wireNav(editorNextButton_, editorCombo_, +1, "Next Editor Skin");
 }
 
 void SkinEditorSkinsPanel::cycleCombo(juce::ComboBox& combo, int delta)

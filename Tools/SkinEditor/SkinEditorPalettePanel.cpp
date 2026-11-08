@@ -198,11 +198,25 @@ void SkinEditorPalettePanel::layoutActionButtons(juce::Rectangle<int> actionRow)
     duplicateButton_.setButtonText(longLabels ? "Duplicate" : "Dup");
     deleteButton_.setButtonText(longLabels ? "Delete" : "Del");
 
-    // Three buttons fill the Palette paint width (equal cells + leftover on Delete).
-    const int inner = juce::jmax(3, tableW - gaps);
-    const int newW = inner / 3;
-    const int dupW = inner / 3;
-    const int delW = inner - newW - dupW;
+    // Long labels: natural text widths (equal thirds can clip "Duplicate").
+    // Short labels: equal cells + leftover on Delete.
+    int newW = 0;
+    int dupW = 0;
+    int delW = 0;
+    if (longLabels)
+    {
+        newW = SkinEditorChrome::measurePaletteActionButtonWidth("New");
+        dupW = SkinEditorChrome::measurePaletteActionButtonWidth("Duplicate");
+        delW = juce::jmax(SkinEditorChrome::measurePaletteActionButtonWidth("Delete"),
+                          tableW - gaps - newW - dupW);
+    }
+    else
+    {
+        const int inner = juce::jmax(3, tableW - gaps);
+        newW = inner / 3;
+        dupW = inner / 3;
+        delW = inner - newW - dupW;
+    }
 
     addButton_.setBounds(actionRow.removeFromLeft(newW)
                              .withHeight(SkinEditorChrome::kButtonHeight));

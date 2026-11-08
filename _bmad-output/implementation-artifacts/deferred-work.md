@@ -3152,3 +3152,30 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-external-json-reload.md`
   summary: Unit tests and permanent missing-file UX for Skin Editor external JSON watch.
   evidence: Blind Hunter oneshot review; deferred to keep the first ship small.
+
+## Deferred from: oneshot review of spec-skin-editor-launch-json-sync.md (2026-11-08)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-launch-json-sync.md`
+  summary: Launch diverge prompt has no 2-poll debounce (unlike live watch), so a mid-write Dropbox save at cold start could offer Reload on truncated JSON.
+  evidence: Blind Hunter; intentional immediate launch UX; rare race.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-launch-json-sync.md`
+  summary: Escape/close on Import-watch AlertWindow follows Discard (accepts disk fingerprint) with no Cancel that leaves the conflict unresolved.
+  evidence: Blind Hunter; shared live-watch AlertWindow result handling.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-launch-json-sync.md`
+  summary: Failed Reload still refreshes the watch fingerprint, so a refused parse is not re-prompted until the next disk change.
+  evidence: Blind Hunter; pre-existing refuse path from external-json-reload.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-launch-json-sync.md`
+  summary: No unit tests for launch fingerprint reconcile branches or session fingerprint persistence.
+  evidence: Blind Hunter; same Skin Editor MainComponent test gate as external-json-reload.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-launch-json-sync.md`
+  summary: Reload status message does not report skins removed by the reloaded JSON.
+  evidence: Blind Hunter; pre-existing reload status helper.
+
+## Deferred from: code review of spec-skin-editor-external-json-reload.md + spec-skin-editor-launch-json-sync.md (2026-11-08)
+- Esc/close on JSON Reload/Discard dialog acts as Discard (accept disk fingerprint) — confirmed product choice on 2026-11-08 review.
+
+- Reload status omits removed Editor skins (collectChangedEditorSkins / reloadStatusMessage only report surviving or new Dev skins).
+- Permanently missing watched Import JSON stays silent during live poll (transient rename ignored; no clear/announce path).
+- No automated coverage for Import-watch poll/debounce/prompt or launch reconcile orchestration (GUI/timer); session-field tests are the nearer patch.
+- Frozen Intent in external-json-reload still says "native modal" while product uses themed AlertWindow — update Intent when renegotiating frozen text.
+- Launch Out-of-Sync prompt has no 2-poll debounce — intentional cold-start UX already deferred in launch-json-sync triage.

@@ -39,3 +39,19 @@ context: []
 - Half-written JSON race — medium, patched: 2-poll stable debounce.
 - No unit tests — medium, deferred.
 - Export path string match — low, patched: `File::operator==`.
+
+### Review Findings
+
+- [x] [Review][Defer] Esc/close on JSON dialog acts as Discard — deferred: confirmed product choice (Esc/close = Discard / accept disk fingerprint)
+- [x] [Review][Patch] Failed Reload must not accept the disk fingerprint [Tools/SkinEditor/SkinEditorMainComponentImportWatch.cpp:reloadWatchedImportJsonFromDisk]
+- [x] [Review][Patch] Palette long labels can clip under equal-width cells [Tools/SkinEditor/SkinEditorPalettePanel.cpp:layoutActionButtons]
+- [x] [Review][Patch] Session round-trip tests omit lastImportedJsonPath / fingerprint [Tests/Unit/DevSkinLayerJsonTests.cpp:assertSessionRoundTrip]
+- [x] [Review][Patch] Natural editor-skin sort helpers have no unit tests [Tools/SkinEditor/SkinEditorUiHelpers.h:compareEditorSkinNamesNatural]
+- [x] [Review][Patch] Inverse Palette-from-remainder helper untested [Tools/SkinEditor/SkinEditorChromeTokens.h:palettePanelWidthFromBodyRemainder]
+- [x] [Review][Patch] Editor Skins Dup/Ren/Del lack tooltips [Tools/SkinEditor/SkinEditorSkinsPanel.cpp]
+- [x] [Review][Patch] Product/Editor nav tooltips are identical [Tools/SkinEditor/SkinEditorSkinsPanel.cpp:wireNav]
+- [x] [Review][Defer] Reload status omits removed Editor skins — deferred: known debt; collectChangedEditorSkins only diffs surviving/new skins
+- [x] [Review][Defer] Permanently missing watched JSON stays silent — deferred: transient rename ignored by design; permanent-delete UX later
+- [x] [Review][Defer] Import-watch / launch-reconcile orchestration untested — deferred: GUI/timer/dialog; close session-field gap first
+- [x] [Review][Defer] Frozen Intent still says native modal — deferred: product chose themed AlertWindow; update Intent wording when renegotiating frozen text
+- [x] [Review][Defer] Launch prompt has no 2-poll debounce — deferred: intentional cold-start UX (already recorded)

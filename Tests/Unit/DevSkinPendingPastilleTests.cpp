@@ -53,6 +53,12 @@ public:
 
         beginTest("addPastille_threeArgDefaultsPendingFalse");
         assertThreeArgAddPendingFalse();
+
+        beginTest("editorSkinNames_naturalOrder_digitRunsNumeric");
+        assertEditorSkinNamesNaturalOrder();
+
+        beginTest("sortedEditorSkins_devOnly_naturalNameOrder");
+        assertSortedEditorSkinsDevOnlyNaturalOrder();
     }
 
 private:
@@ -419,6 +425,30 @@ private:
         for (const auto& pastille : skin->palette)
             if (pastille.name == "Calibrated")
                 expect(! pastille.pending);
+    }
+
+    void assertEditorSkinNamesNaturalOrder()
+    {
+        expect(SkinEditorUi::compareEditorSkinNamesNatural("Name 9", "Name 10") < 0);
+        expect(SkinEditorUi::compareEditorSkinNamesNatural("Name 10", "Name 9") > 0);
+        expect(SkinEditorUi::compareEditorSkinNamesNatural("Alpha", "alpha") == 0);
+        expect(SkinEditorUi::compareEditorSkinNamesNatural("Beta", "Alpha") > 0);
+    }
+
+    void assertSortedEditorSkinsDevOnlyNaturalOrder()
+    {
+        TSS::DevSkin::Layer layer;
+        expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Name 10").wasOk());
+        expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Name 2").wasOk());
+        expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Name 9").wasOk());
+
+        const auto sorted = SkinEditorUi::sortedEditorSkins(layer);
+        expectEquals(static_cast<int>(sorted.size()), 3);
+        expectEquals(sorted[0]->name, juce::String("Name 2"));
+        expectEquals(sorted[1]->name, juce::String("Name 9"));
+        expectEquals(sorted[2]->name, juce::String("Name 10"));
+        for (const auto* skin : sorted)
+            expect(skin->kind == TSS::DevSkin::SkinKind::kDev);
     }
 };
 

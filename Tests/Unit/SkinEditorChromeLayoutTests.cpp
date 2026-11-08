@@ -69,6 +69,17 @@ private:
                      SkinEditorChrome::kMappingsPanelMinWidth + 20);
         expectEquals(SkinEditorChrome::windowBodyWidthForPalettePanel(paletteWide),
                      SkinEditorChrome::windowBodyWidthForPalettePanel(paletteAtMin) + 40);
+
+        // Inverse: body remainder after Color + leading Palette gap recovers Palette width.
+        const int bodyWide = SkinEditorChrome::windowBodyWidthForPalettePanel(paletteWide);
+        const int remainderAfterColorAndLeadingGap =
+            bodyWide - SkinEditorChrome::kWindowEdgeGutter - SkinEditorChrome::kColorPanelWidth
+            - SkinEditorChrome::kPaletteSideGap - SkinEditorChrome::kWindowEdgeGutter;
+        const int paletteFromRemainder =
+            SkinEditorChrome::palettePanelWidthFromBodyRemainder(remainderAfterColorAndLeadingGap);
+        expectEquals(paletteFromRemainder, paletteWide);
+        expectEquals(SkinEditorChrome::windowBodyWidthForPalettePanel(paletteFromRemainder),
+                     bodyWide);
     }
 
     void idleWitnessHiddenHoldWitnessVisible()
