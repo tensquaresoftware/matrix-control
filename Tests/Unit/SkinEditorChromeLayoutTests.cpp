@@ -44,7 +44,7 @@ private:
 
     void titleChromeMinWidthIncludesOperationFloor()
     {
-        beginTest("Title chrome min width locks SESSION + OPERATION 620");
+        beginTest("Title chrome min width locks SESSION + OPERATION 600");
 
         const int exact = SkinEditorChrome::kWindowEdgeGutter
                           + SkinEditorChrome::sessionWellPreferredWidth()
@@ -54,7 +54,7 @@ private:
         const int bodyMin = SkinEditorChrome::windowBodyWidthForPalettePanel(
             SkinEditorChrome::palettePanelMinWidth());
 
-        expectEquals(SkinEditorChrome::kOperationWellMinWidth, 620);
+        expectEquals(SkinEditorChrome::kOperationWellMinWidth, 600);
         expectEquals(SkinEditorChrome::windowTitleChromeMinWidth(), exact);
         expectEquals(SkinEditorChrome::windowMinWidth(),
                      juce::jmax(bodyMin, SkinEditorChrome::windowTitleChromeMinWidth()));
