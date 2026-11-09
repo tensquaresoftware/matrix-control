@@ -232,8 +232,12 @@ namespace SkinEditorChrome
      * (title + dark content pocket for the mapping witness; idle = empty).
      */
     inline constexpr int kMappingBandHeight = kSessionWellHeight;
-    /** Minimum OPERATION well width on the title row (stretches when the window grows). */
-    inline constexpr int kOperationWellMinWidth = 510;
+    /**
+     * Client width floor for the Skin Editor window.
+     * OPERATION's minimum is derived so title chrome (SESSION + OPERATION) hits this
+     * when it is above the Color/Palette/Mappings body floor.
+     */
+    inline constexpr int kWindowContentMinWidth = 1180;
     /** Badge → label gap for BRIDGE / MAPPING / LAST PUSH chrome. */
     inline constexpr int kChromeBadgeGap = 8;
     /** Chrome text badges (MAPPING / BRIDGE / …) — thinner than TextButton. */

@@ -309,24 +309,35 @@ namespace SkinEditorChrome
     }
 
     /**
+     * OPERATION well floor so title chrome equals kWindowContentMinWidth
+     * (edges + SESSION + gap + OPERATION). Stretches when the window grows.
+     */
+    inline int operationWellMinWidth() noexcept
+    {
+        const int titleWithoutOperation = kWindowEdgeGutter + sessionWellPreferredWidth()
+                                          + kButtonGap + kWindowEdgeGutter;
+        return juce::jmax(0, kWindowContentMinWidth - titleWithoutOperation);
+    }
+
+    /**
      * Edge gutters + SESSION + OPERATION (min) on the title row.
      * Gap matches layoutTitleBar (kButtonGap between SESSION and OPERATION).
      */
     inline int windowTitleChromeMinWidth() noexcept
     {
         return kWindowEdgeGutter + sessionWellPreferredWidth() + kButtonGap
-               + kOperationWellMinWidth + kWindowEdgeGutter;
+               + operationWellMinWidth() + kWindowEdgeGutter;
     }
 
     /**
-     * Client width floor: min Palette body vs measured title chrome
-     * (SESSION + OPERATION min). Widening grows Palette / Mapped and
-     * stretches the OPERATION slot.
+     * Client width floor: max(body columns, title chrome, kWindowContentMinWidth).
+     * Widening grows Palette / Mapped and stretches the OPERATION slot.
      */
     inline int windowContentWidth() noexcept
     {
-        return juce::jmax(windowBodyWidthForPalettePanel(palettePanelMinWidth()),
-                          windowTitleChromeMinWidth());
+        return juce::jmax(kWindowContentMinWidth,
+                          juce::jmax(windowBodyWidthForPalettePanel(palettePanelMinWidth()),
+                                     windowTitleChromeMinWidth()));
     }
 
     inline int windowMinWidth() noexcept { return windowContentWidth(); }
