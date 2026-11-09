@@ -161,7 +161,7 @@ namespace SkinEditorChrome
 
     juce::Font LookAndFeel::getLabelFont(juce::Label& label)
     {
-        // Honour Label::setFont — titles use Orbitron / Inter Medium via setFont.
+        // Honour Label::setFont — panel titles use Inter Medium via setFont.
         return label.getFont();
     }
 

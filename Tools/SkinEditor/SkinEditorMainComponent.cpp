@@ -49,14 +49,6 @@ SkinEditorMainComponent::~SkinEditorMainComponent()
 
 void SkinEditorMainComponent::setupTitleBarChrome()
 {
-    titleLabel_.setText(SkinEditorChrome::kAppTitleText, juce::dontSendNotification);
-    titleLabel_.setFont(SkinEditorChrome::fontAppTitle());
-    titleLabel_.setColour(juce::Label::textColourId, SkinEditorChrome::textBrand());
-    titleLabel_.setJustificationType(juce::Justification::centredLeft);
-    SkinEditorChrome::preventTextSquish(titleLabel_);
-    titleLabel_.setBorderSize({});
-    addAndMakeVisible(titleLabel_);
-
     for (auto* label : { &mappingPrefixLabel_, &mappingNameLabel_, &mappingDetailLabel_ })
     {
         label->setFont(SkinEditorChrome::fontRegular());
@@ -210,28 +202,6 @@ void SkinEditorMainComponent::paint(juce::Graphics& g)
 int SkinEditorMainComponent::chromeRowY(int barY, int barH, int rowH, int opticalNudgeY) noexcept
 {
     return barY + (barH - rowH) / 2 + opticalNudgeY;
-}
-
-void SkinEditorMainComponent::layoutTitleBar(juce::Rectangle<int> titleBar)
-{
-    const int titleH = juce::roundToInt(SkinEditorChrome::kAppTitleFont);
-    const int titleW = SkinEditorChrome::measureTextWidth(SkinEditorChrome::fontAppTitle(),
-                                                         titleLabel_.getText())
-                       + 8;
-    const int titleY = chromeRowY(titleBar.getY(), titleBar.getHeight(), titleH,
-                                  SkinEditorChrome::kLogoTitleNudgeY);
-    // Logo stays on the dark app fill — not inside SESSION / OPERATION wells.
-    titleLabel_.setBounds(titleBar.getX(), titleY, titleW, titleH);
-
-    const int wellH = SkinEditorChrome::kSessionWellHeight;
-    const int wellY = titleBar.getY() + SkinEditorChrome::kChromeStackGap;
-    const int sessionW = SkinEditorChrome::sessionWellPreferredWidth();
-    const int sessionX = titleBar.getRight() - sessionW;
-    layoutSessionWell({ sessionX, wellY, sessionW, wellH });
-
-    const int opX = titleBar.getX() + titleW + SkinEditorChrome::kButtonGap;
-    const int opRight = sessionX - SkinEditorChrome::kButtonGap;
-    layoutOperationWell({ opX, wellY, juce::jmax(0, opRight - opX), wellH });
 }
 
 namespace

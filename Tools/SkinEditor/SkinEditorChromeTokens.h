@@ -214,8 +214,6 @@ namespace SkinEditorChrome
     {
         return juce::jmax(1, palettePanelW - kPanelContentPad - kScrollTrackWidth);
     }
-    /** Orbitron logo title in the Skin Editor title bar. */
-    inline constexpr const char* kAppTitleText = "MATRIX-CONTROL SKIN EDITOR";
     /**
      * SESSION well: kButtonHeight with kGutter air above/below (was 38px SKINS strip;
      * 36px aligns the air with standard gutters).
@@ -223,19 +221,19 @@ namespace SkinEditorChrome
     inline constexpr int kButtonHeight = 24;
     inline constexpr int kSessionWellHeight = kGutter + kButtonHeight + kGutter; // 36
     /**
-     * Logo bar: kChromeStackGap above SESSION/OPERATION wells + well + kGutter below
+     * Title bar: kChromeStackGap above SESSION/OPERATION wells + well + kGutter below
      * (bottom gutter + following strip = kChromeStackGap before the body).
      */
     inline constexpr int kTitleBarHeight = kChromeStackGap + kSessionWellHeight + kGutter; // 54
     /** Bottom status bar — same height as SESSION / OPERATION wells. */
     inline constexpr int kStatusBarHeight = kSessionWellHeight; // 36
     /**
-     * OPERATION well on the title row (between logo and SESSION) — same height as
-     * SESSION (title + dark content pocket for the mapping witness; idle = empty).
+     * OPERATION well on the title row (left of SESSION) — same height as SESSION
+     * (title + dark content pocket for the mapping witness; idle = empty).
      */
     inline constexpr int kMappingBandHeight = kSessionWellHeight;
     /** Minimum OPERATION well width on the title row (stretches when the window grows). */
-    inline constexpr int kOperationWellMinWidth = 650;
+    inline constexpr int kOperationWellMinWidth = 700;
     /** Badge → label gap for BRIDGE / MAPPING / LAST PUSH chrome. */
     inline constexpr int kChromeBadgeGap = 8;
     /** Chrome text badges (MAPPING / BRIDGE / …) — thinner than TextButton. */
@@ -255,8 +253,6 @@ namespace SkinEditorChrome
     /** Checker cells across one swatch side (12 / 4 = 3 px cells, exact 4x4). */
     inline constexpr int kColourSwatchCheckerDivisions = 4;
     /** Integer optical nudges (barY + (barH - rowH) / 2 + nudge) — keep even/odd consistent. */
-    /** Logo dropped 3px from geometric centre in the 54px logo bar. */
-    inline constexpr int kLogoTitleNudgeY = 3;
     /** Geometric centre in the 36px status bar. */
     inline constexpr int kStatusChromeNudgeY = 0;
     inline constexpr int kPanelTitleHeight = 26;
@@ -274,8 +270,6 @@ namespace SkinEditorChrome
     /** Empty space between object tables (ListBox slot = half a content row). */
     inline constexpr int kTableGapHeight = 11;
     inline constexpr float kPanelTitleFont = 15.0f;
-    /** App chrome title — same face as plugin logo (Orbitron Bold), smaller than kLogoFontHeight 27. */
-    inline constexpr float kAppTitleFont = 20.0f;
     inline constexpr float kBodyFont = 13.0f;
     /** Match ComboBox corner radius (LookAndFeel_V4 default is 3). */
     inline constexpr float kControlCorner = 3.0f;

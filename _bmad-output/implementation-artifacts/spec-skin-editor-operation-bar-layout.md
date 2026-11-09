@@ -1,5 +1,5 @@
 ---
-title: 'Skin Editor — OPERATION bar beside logo (min 650, stretch)'
+title: 'Skin Editor — OPERATION bar beside logo (min 700, stretch)'
 type: 'feature'
 created: '2026-11-09'
 status: 'done'
@@ -16,17 +16,18 @@ context:
 
 **Problem:** Skin Editor still stacks OPERATION on its own row under the logo, which costs vertical space the body panels could use.
 
-**Approach:** Put the OPERATION well on the title row between the logo and SESSION. Give OPERATION a 650 px minimum width and let it grow when the window widens; drop the old under-logo OPERATION strip so the chrome is shorter.
+**Approach:** Put the OPERATION well on the title row left of SESSION (no in-app logo). Give OPERATION a 700 px minimum width and let it grow when the window widens; drop the old under-logo OPERATION strip so the chrome is shorter. SESSION separators use a single button gap on each side.
 
 </frozen-after-approval>
 
 ## Implementation Notes
 
 Agent decisions (user-invisible):
-- Title row L→R: logo (dark fill) → `kButtonGap` → OPERATION (≥650, takes remaining mid space) → `kButtonGap` → SESSION at `sessionWellPreferredWidth()` (right-pinned).
+- Title row L→R: logo (dark fill) → `kButtonGap` → OPERATION (≥700, takes remaining mid space) → `kButtonGap` → SESSION at `sessionWellPreferredWidth()` (right-pinned).
 - Keep `kTitleBarHeight` (54) and shared well height 36; vertical placement mirrors current SESSION (`kChromeStackGap` above + well + bottom gutter language).
 - Remove the dedicated OPERATION band and one extra gutter from `resized` / `skinEditorMinContentHeight` (36 + 6 = 42 px saved).
-- Fold `kOperationWellMinWidth = 650` into `windowContentWidth()` / title-row min so the constrainer respects logo + 650 + SESSION + edge gutters.
+- Fold `kOperationWellMinWidth = 700` into `windowContentWidth()` / title-row min so the constrainer respects logo + 700 + SESSION + edge gutters.
+- Two-line logo both at `kAppTitleFont` 12 px (same size); geometrically centred (`kLogoTitleNudgeY = 0`).
 - Body column stretch (Palette / Mappings) stays as today when the window widens; OPERATION also expands in the title mid-slot.
 - Do not change mapping-witness / start-hint content layout inside the OPERATION pocket; only the well's outer bounds change.
 
@@ -37,6 +38,7 @@ Done:
 - Updated `SkinEditorChromeLayoutTests` for new min width / min height stack.
 - Quality gate OK; Skin Editor + chrome layout unit tests green.
 - Review patches: refresh `kChromeStackGap` comment; rename `layoutOperationWell` param to `well`; lock exact title-chrome min-width sum in a dedicated unit test; correct saved-height note to 42 px.
+- Follow-up: OPERATION min width 700; logo removed; SESSION separators use one `kButtonGap` each side.
 
 ## Review Triage Log
 

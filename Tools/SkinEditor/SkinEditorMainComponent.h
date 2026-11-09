@@ -205,7 +205,6 @@ private:
     juce::String statusDetail_;
     bool suppressCombo_ = false;
 
-    juce::Label titleLabel_;
     juce::Label operationTitleLabel_;
     juce::Label mappingPrefixLabel_;
     juce::Label mappingNameLabel_;

@@ -41,21 +41,32 @@ namespace
 
         void separator()
         {
-            constexpr int kSep = SkinEditorChrome::kButtonGap * 4 + 1;
+            constexpr int kSep = SkinEditorChrome::kButtonGap * 2 + 1;
             if (! fits || row.getWidth() < kSep)
             {
                 stop();
                 return;
             }
             gap();
-            gap();
             if (separatorXs != nullptr)
                 separatorXs->push_back(row.getX());
             row.removeFromLeft(1);
             gap();
-            gap();
         }
     };
+}
+
+void SkinEditorMainComponent::layoutTitleBar(juce::Rectangle<int> titleBar)
+{
+    const int wellH = SkinEditorChrome::kSessionWellHeight;
+    const int wellY = titleBar.getY() + SkinEditorChrome::kChromeStackGap;
+    const int sessionW = SkinEditorChrome::sessionWellPreferredWidth();
+    const int sessionX = titleBar.getRight() - sessionW;
+    layoutSessionWell({ sessionX, wellY, sessionW, wellH });
+
+    const int opRight = sessionX - SkinEditorChrome::kButtonGap;
+    layoutOperationWell({ titleBar.getX(), wellY, juce::jmax(0, opRight - titleBar.getX()),
+                          wellH });
 }
 
 void SkinEditorMainComponent::setupSessionWell()
@@ -128,7 +139,7 @@ void SkinEditorMainComponent::layoutSessionWell(juce::Rectangle<int> well)
     if (well.isEmpty())
         return;
 
-    // Compact well on the right of the title row (logo / OPERATION stay outside).
+    // Compact well on the right of the title row (OPERATION stays outside).
     sessionWellBounds_ = well;
     layoutSessionControls(sessionWellBounds_,
                           { sessionWellBounds_.getX(),
