@@ -228,7 +228,7 @@ namespace SkinEditorChrome
     /** Bottom status bar — same height as SESSION / OPERATION wells. */
     inline constexpr int kStatusBarHeight = kSessionWellHeight; // 36
     /**
-     * OPERATION well on the title row (left of SESSION) — same height as SESSION
+     * OPERATION well on the title row (right of SESSION) — same height as SESSION
      * (title + dark content pocket for the mapping witness; idle = empty).
      */
     inline constexpr int kMappingBandHeight = kSessionWellHeight;
