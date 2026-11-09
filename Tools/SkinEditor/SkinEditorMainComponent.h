@@ -215,6 +215,10 @@ private:
     juce::Label mappingPrefixLabel_;
     juce::Label mappingNameLabel_;
     juce::Label mappingDetailLabel_;
+    /** Full OPERATION witness strings (labels may show an elided copy; no hover tooltips). */
+    juce::String mappingWitnessRoleFull_;
+    juce::String mappingWitnessIdentityFull_;
+    juce::String mappingWitnessDetailFull_;
     juce::Rectangle<int> operationWellBounds_;
     juce::Rectangle<int> operationContentBounds_;
     juce::Rectangle<int> mappingBadgeBounds_;

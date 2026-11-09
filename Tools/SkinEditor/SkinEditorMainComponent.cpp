@@ -56,6 +56,7 @@ void SkinEditorMainComponent::setupTitleBarChrome()
         label->setJustificationType(juce::Justification::centredLeft);
         SkinEditorChrome::preventTextSquish(*label);
         label->setBorderSize({});
+        label->setTooltip({});
         label->setVisible(false);
         addAndMakeVisible(*label);
     }
@@ -215,10 +216,11 @@ namespace
         int rowH = 0;
     };
 
-    int placeElidedWitnessLabel(WitnessElidePlace place, const juce::Font& font)
+    int placeElidedWitnessLabel(WitnessElidePlace place,
+                                const juce::Font& font,
+                                const juce::String& full)
     {
         auto& label = *place.label;
-        const auto full = label.getTooltip().isNotEmpty() ? label.getTooltip() : label.getText();
         const auto shown = SkinEditorChrome::elideToWidth(font, full, place.maxW);
         const int w = juce::jmin(place.maxW, SkinEditorChrome::measureTextWidth(font, shown) + 2);
         label.setText(shown, juce::dontSendNotification);
@@ -244,9 +246,7 @@ void SkinEditorMainComponent::layoutOperationWitness(juce::Rectangle<int> conten
     const int swatchToName = SkinEditorChrome::kChromeBadgeGap;
     const int arrowGap = SkinEditorChrome::kOperationArrowGap;
     const int pad = SkinEditorChrome::kOperationWitnessPad;
-    const auto detailFull = mappingDetailLabel_.getTooltip().isNotEmpty()
-                                ? mappingDetailLabel_.getTooltip()
-                                : mappingDetailLabel_.getText();
+    const auto& detailFull = mappingWitnessDetailFull_;
 
     int x = content.getX() + pad;
     if (x + badgeW > content.getRight())
@@ -256,12 +256,10 @@ void SkinEditorMainComponent::layoutOperationWitness(juce::Rectangle<int> conten
     x += badgeW + badgeGap;
 
     // Role ends with " "; only a tight gap before the swatch (or identity when no swatch).
-    const auto roleFull = mappingPrefixLabel_.getTooltip().isNotEmpty()
-                              ? mappingPrefixLabel_.getTooltip()
-                              : mappingPrefixLabel_.getText();
+    const auto& roleFull = mappingWitnessRoleFull_;
     const int roleMax = juce::jmin(SkinEditorChrome::measureTextWidth(bodyFont, roleFull) + 2,
                                    juce::jmax(0, content.getRight() - x - pad));
-    x = placeElidedWitnessLabel({ &mappingPrefixLabel_, x, roleMax, rowY, rowH }, bodyFont)
+    x = placeElidedWitnessLabel({ &mappingPrefixLabel_, x, roleMax, rowY, rowH }, bodyFont, roleFull)
         + afterColon;
 
     if (mappingWitnessShowSwatch_ && x + sw <= content.getRight())
@@ -274,7 +272,10 @@ void SkinEditorMainComponent::layoutOperationWitness(juce::Rectangle<int> conten
     const int available = juce::jmax(0, content.getRight() - x - (arrowGap + arrowW + arrowGap + pad));
     const int nextStepNeed = SkinEditorChrome::measureTextWidth(bodyFont, detailFull) + 4;
     const int nameMax = juce::jmax(available / 2, available - nextStepNeed);
-    x = placeElidedWitnessLabel({ &mappingNameLabel_, x, nameMax, rowY, rowH }, bodyFont) + arrowGap;
+    x = placeElidedWitnessLabel({ &mappingNameLabel_, x, nameMax, rowY, rowH },
+                                bodyFont,
+                                mappingWitnessIdentityFull_)
+        + arrowGap;
 
     if (x + arrowW <= content.getRight() - pad)
     {
@@ -284,7 +285,8 @@ void SkinEditorMainComponent::layoutOperationWitness(juce::Rectangle<int> conten
 
     placeElidedWitnessLabel({ &mappingDetailLabel_, x, juce::jmax(0, content.getRight() - x - pad),
                               rowY, rowH },
-                            bodyFont);
+                            bodyFont,
+                            detailFull);
 }
 
 void SkinEditorMainComponent::layoutOperationStartHint(juce::Rectangle<int> content)
@@ -304,7 +306,8 @@ void SkinEditorMainComponent::layoutOperationStartHint(juce::Rectangle<int> cont
 
     placeElidedWitnessLabel({ &mappingDetailLabel_, x,
                               juce::jmax(0, content.getRight() - x - pad), rowY, rowH },
-                            SkinEditorChrome::fontRegular());
+                            SkinEditorChrome::fontRegular(),
+                            mappingWitnessDetailFull_);
 }
 
 void SkinEditorMainComponent::layoutOperationWell(juce::Rectangle<int> well)

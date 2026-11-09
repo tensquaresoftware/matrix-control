@@ -322,12 +322,11 @@ void SkinEditorMainComponent::setWitnessTexts(const juce::String& role,
                                               const juce::String& identity,
                                               const juce::String& nextStep)
 {
-    // Tooltips keep the full text; layoutOperationWitness may elide the visible label.
-    mappingPrefixLabel_.setTooltip(role);
+    mappingWitnessRoleFull_ = role;
+    mappingWitnessIdentityFull_ = identity;
+    mappingWitnessDetailFull_ = nextStep;
     mappingPrefixLabel_.setText(role, juce::dontSendNotification);
-    mappingNameLabel_.setTooltip(identity);
     mappingNameLabel_.setText(identity, juce::dontSendNotification);
-    mappingDetailLabel_.setTooltip(nextStep);
     mappingDetailLabel_.setText(nextStep, juce::dontSendNotification);
 }
 
@@ -386,11 +385,11 @@ void SkinEditorMainComponent::updateMappingWitness()
 
     if (operationStartHintActive_)
     {
-        mappingPrefixLabel_.setTooltip({});
+        mappingWitnessRoleFull_.clear();
+        mappingWitnessIdentityFull_.clear();
+        mappingWitnessDetailFull_ = SkinEditorUi::kNoEditorSkinHint;
         mappingPrefixLabel_.setText({}, juce::dontSendNotification);
-        mappingNameLabel_.setTooltip({});
         mappingNameLabel_.setText({}, juce::dontSendNotification);
-        mappingDetailLabel_.setTooltip(SkinEditorUi::kNoEditorSkinHint);
         mappingDetailLabel_.setText(SkinEditorUi::kNoEditorSkinHint, juce::dontSendNotification);
     }
     else if (mappingMode_ == MappingMode::kHeldColour)
@@ -401,11 +400,11 @@ void SkinEditorMainComponent::updateMappingWitness()
         fillEditingColourWitness();
     else
     {
-        mappingPrefixLabel_.setTooltip({});
+        mappingWitnessRoleFull_.clear();
+        mappingWitnessIdentityFull_.clear();
+        mappingWitnessDetailFull_.clear();
         mappingPrefixLabel_.setText({}, juce::dontSendNotification);
-        mappingNameLabel_.setTooltip({});
         mappingNameLabel_.setText({}, juce::dontSendNotification);
-        mappingDetailLabel_.setTooltip({});
         mappingDetailLabel_.setText({}, juce::dontSendNotification);
     }
 
