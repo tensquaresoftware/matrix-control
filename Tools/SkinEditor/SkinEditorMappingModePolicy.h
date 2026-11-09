@@ -135,7 +135,7 @@ namespace SkinEditorMappingPolicy
         "Next: click a Property cell in a Mappings row.";
     inline constexpr const char* kArmedRowNextStep = "Next: click a colour in Palette.";
     inline constexpr const char* kEditingColourNextStep =
-        "Next: adjust in COLOR (affects every mapped use).";
+        "Next: adjust in COLOR (all mapped uses).";
     inline constexpr const char* kHoldColourOnRowsSuffix =
         " [Hold colour] is active: keep clicking rows.";
     inline constexpr const char* kHoldColourOnColoursSuffix =

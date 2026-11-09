@@ -188,7 +188,7 @@ private:
                      juce::String("Next: click a colour in Palette."));
         expectEquals(juce::String(kEditingColourRole), juce::String("Editing colour: "));
         expectEquals(juce::String(kEditingColourNextStep),
-                     juce::String("Next: adjust in COLOR (affects every mapped use)."));
+                     juce::String("Next: adjust in COLOR (all mapped uses)."));
         expectEquals(withHoldColourSuffix(kHeldColourNextStep, false, true),
                      juce::String(kHeldColourNextStep));
         expectEquals(withHoldColourSuffix(kHeldColourNextStep, true, true),
