@@ -233,7 +233,7 @@ namespace SkinEditorChrome
      */
     inline constexpr int kMappingBandHeight = kSessionWellHeight;
     /** Minimum OPERATION well width on the title row (stretches when the window grows). */
-    inline constexpr int kOperationWellMinWidth = 560;
+    inline constexpr int kOperationWellMinWidth = 510;
     /** Badge → label gap for BRIDGE / MAPPING / LAST PUSH chrome. */
     inline constexpr int kChromeBadgeGap = 8;
     /** Chrome text badges (MAPPING / BRIDGE / …) — thinner than TextButton. */
