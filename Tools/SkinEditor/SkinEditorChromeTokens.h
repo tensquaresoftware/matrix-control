@@ -96,7 +96,7 @@ namespace SkinEditorChrome
 
     /** Window / inter-panel gutters only — never reuse as in-panel content inset. */
     inline constexpr int kGutter = 6;
-    /** Stack gap between chrome wells / panels (SESSION↔OPERATION, OPERATION↔SKINS, SKINS↔COLOR). */
+    /** Stack gap between chrome rows / panels (title↔body, SKINS↔COLOR, …). */
     inline constexpr int kChromeStackGap = kGutter * 2; // 12
     /** Left/right margin of the app window (logo / OPERATION / body / status). */
     inline constexpr int kWindowEdgeGutter = kChromeStackGap; // 12
@@ -223,17 +223,19 @@ namespace SkinEditorChrome
     inline constexpr int kButtonHeight = 24;
     inline constexpr int kSessionWellHeight = kGutter + kButtonHeight + kGutter; // 36
     /**
-     * Logo bar: kChromeStackGap above SESSION + well + kGutter below
-     * (bottom gutter + following strip = kChromeStackGap before OPERATION).
+     * Logo bar: kChromeStackGap above SESSION/OPERATION wells + well + kGutter below
+     * (bottom gutter + following strip = kChromeStackGap before the body).
      */
     inline constexpr int kTitleBarHeight = kChromeStackGap + kSessionWellHeight + kGutter; // 54
     /** Bottom status bar — same height as SESSION / OPERATION wells. */
     inline constexpr int kStatusBarHeight = kSessionWellHeight; // 36
     /**
-     * OPERATION well under the logo — same height as SESSION (title + dark content
-     * pocket for the mapping witness; idle = empty dark rect).
+     * OPERATION well on the title row (between logo and SESSION) — same height as
+     * SESSION (title + dark content pocket for the mapping witness; idle = empty).
      */
     inline constexpr int kMappingBandHeight = kSessionWellHeight;
+    /** Minimum OPERATION well width on the title row (stretches when the window grows). */
+    inline constexpr int kOperationWellMinWidth = 650;
     /** Badge → label gap for BRIDGE / MAPPING / LAST PUSH chrome. */
     inline constexpr int kChromeBadgeGap = 8;
     /** Chrome text badges (MAPPING / BRIDGE / …) — thinner than TextButton. */

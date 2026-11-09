@@ -293,21 +293,26 @@ namespace SkinEditorChrome
         return measureTextWidth(fontAppTitle(), kAppTitleText) + 8;
     }
 
-    /** Edge gutters + app title + gap + SESSION controls. */
-    inline int windowTitleSessionMinWidth() noexcept
+    /**
+     * Edge gutters + app title + OPERATION (min) + SESSION on the title row.
+     * Gaps match layoutTitleBar (kButtonGap between logo / OPERATION / SESSION).
+     */
+    inline int windowTitleChromeMinWidth() noexcept
     {
         return kWindowEdgeGutter + appTitlePreferredWidth() + kButtonGap
+               + kOperationWellMinWidth + kButtonGap
                + sessionWellPreferredWidth() + kWindowEdgeGutter;
     }
 
     /**
-     * Client width floor: min Palette body vs measured title + SESSION.
-     * Widening the window grows Palette and Mappings Mapped colour together.
+     * Client width floor: min Palette body vs measured title chrome
+     * (logo + OPERATION min + SESSION). Widening grows Palette / Mapped and
+     * stretches the OPERATION mid-slot.
      */
     inline int windowContentWidth() noexcept
     {
         return juce::jmax(windowBodyWidthForPalettePanel(palettePanelMinWidth()),
-                          windowTitleSessionMinWidth());
+                          windowTitleChromeMinWidth());
     }
 
     inline int windowMinWidth() noexcept { return windowContentWidth(); }

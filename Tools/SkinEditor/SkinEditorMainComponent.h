@@ -154,9 +154,9 @@ private:
     void setupBodyPanels();
     void setupLayerAndBridgeCallbacks();
     void layoutTitleBar(juce::Rectangle<int> titleBar);
-    void layoutSessionWell(juce::Rectangle<int> titleBar, int titleRight);
+    void layoutSessionWell(juce::Rectangle<int> well);
     void layoutSessionControls(juce::Rectangle<int> well, juce::Rectangle<int> row);
-    void layoutOperationWell(juce::Rectangle<int> band);
+    void layoutOperationWell(juce::Rectangle<int> well);
     void layoutOperationWitness(juce::Rectangle<int> content);
     /** Plain OPERATION coaching when no editor skin (no mapping badge / arrow). */
     void layoutOperationStartHint(juce::Rectangle<int> content);

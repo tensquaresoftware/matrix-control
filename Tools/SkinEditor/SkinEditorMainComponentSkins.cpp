@@ -121,24 +121,15 @@ void SkinEditorMainComponent::layoutSessionControls(juce::Rectangle<int> well,
         row.removeFromLeft(SkinEditorChrome::kGutter);
 }
 
-void SkinEditorMainComponent::layoutSessionWell(juce::Rectangle<int> titleBar, int titleRight)
+void SkinEditorMainComponent::layoutSessionWell(juce::Rectangle<int> well)
 {
     sessionSeparatorXs_.clear();
     sessionWellBounds_ = {};
-
-    // Compact well on the right (logo stays outside on dark fill). titleBar is
-    // already kGutter-inset so the well's right edge matches OPERATION / SKINS column.
-    const int wellH = SkinEditorChrome::kSessionWellHeight;
-    const int wellY = titleBar.getY() + SkinEditorChrome::kChromeStackGap;
-    const int wellW = SkinEditorChrome::sessionWellPreferredWidth();
-    const int wellX = juce::jmax(titleRight + SkinEditorChrome::kButtonGap,
-                                 titleBar.getRight() - wellW);
-    sessionWellBounds_ = { wellX, wellY,
-                           juce::jmin(wellW, titleBar.getRight() - wellX),
-                           wellH };
-    if (sessionWellBounds_.isEmpty())
+    if (well.isEmpty())
         return;
 
+    // Compact well on the right of the title row (logo / OPERATION stay outside).
+    sessionWellBounds_ = well;
     layoutSessionControls(sessionWellBounds_,
                           { sessionWellBounds_.getX(),
                             sessionWellBounds_.getY() + SkinEditorChrome::kGutter,
