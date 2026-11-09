@@ -174,6 +174,26 @@ namespace SkinEditorChrome
         return juce::jmax(52, measureTextWidth(fontRegular(), button.getButtonText()) + pad);
     }
 
+    /** SESSION short labels — text + pad, no 52 px control floor. */
+    inline int sessionCompactButtonWidth(const juce::String& text) noexcept
+    {
+        constexpr int kPad = 14;
+        constexpr int kMin = 36;
+        return juce::jmax(kMin, measureTextWidth(fontRegular(), text) + kPad);
+    }
+
+    /** SESSION Undo/Redo share one compact width. */
+    inline int sessionUndoRedoButtonWidth() noexcept
+    {
+        return juce::jmax(sessionCompactButtonWidth("Undo"),
+                          sessionCompactButtonWidth("Redo"));
+    }
+
+    inline int sessionPushButtonWidth() noexcept
+    {
+        return sessionCompactButtonWidth("Push");
+    }
+
     /**
      * Palette New / Dup|Duplicate / Del|Delete: text + pad, no 52 px floor
      * (short labels stay tight at min width).
@@ -250,9 +270,21 @@ namespace SkinEditorChrome
         return measureTextWidth(fontTitle(), title) + kTitleTabPadH * 2 + extraInsideTab;
     }
 
+    /** SESSION label ahead of the JSON Sync combo. */
+    inline int jsonSyncLabelWidth() noexcept
+    {
+        return measureTextWidth(fontRegular(), "JSON Sync:") + 2;
+    }
+
+    /** SESSION JSON Sync combo width (fits Off / Ask / Auto + arrow). */
+    inline int jsonSyncComboWidth() noexcept
+    {
+        return 55;
+    }
+
     /**
      * SESSION well width: title tab + Undo/Redo | Compare/Push | Export/Import
-     * + trailing kGutter after Import (inner right air).
+     * | JSON Sync + trailing kGutter (inner right air).
      */
     inline int sessionWellPreferredWidth() noexcept
     {
@@ -262,12 +294,17 @@ namespace SkinEditorChrome
             return measureButtonWidth(juce::TextButton(text));
         };
         constexpr int kSep = kButtonGap * 2 + 1;
-        return titleW + kButtonGap
-               + measure("Undo") + kButtonGap + measure("Redo")
+        const int undoRedoW = sessionUndoRedoButtonWidth();
+        // Title tab already includes kTitleTabPadH on both sides of the glyph —
+        // no extra kButtonGap after SESSION (matches left title air).
+        return titleW
+               + undoRedoW + kButtonGap + undoRedoW
                + kSep
-               + measure("Compare") + kButtonGap + measure("Push")
+               + measure("Compare") + kButtonGap + sessionPushButtonWidth()
                + kSep
                + measure("Export") + kButtonGap + measure("Import")
+               + kSep
+               + jsonSyncLabelWidth() + kButtonGap + jsonSyncComboWidth()
                + kGutter;
     }
 

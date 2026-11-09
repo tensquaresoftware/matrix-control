@@ -1,5 +1,6 @@
 #include "Tools/SkinEditor/SkinEditorMainComponent.h"
 
+#include "Tools/SkinEditor/SkinEditorAlertWindow.h"
 #include "Tools/SkinEditor/SkinEditorUiHelpers.h"
 
 void SkinEditorMainComponent::mouseUp(const juce::MouseEvent& e)
@@ -15,9 +16,9 @@ bool SkinEditorMainComponent::tryQuitWithDirtyGate()
     if (! editorDirty_)
         return true;
 
-    juce::AlertWindow window("Unsaved Editor changes",
-                             "Export the current Editor skin, discard changes, or cancel?",
-                             juce::MessageBoxIconType::QuestionIcon);
+    SkinEditorChrome::AlertWindow window("Unsaved Editor changes",
+                                         "Export the current Editor skin, discard changes, or cancel?",
+                                         juce::MessageBoxIconType::QuestionIcon);
     window.addButton("Export", 1);
     window.addButton("Discard", 2);
     window.addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey));
@@ -126,16 +127,6 @@ void SkinEditorMainComponent::applyEditorComboChange()
         scheduleSessionAutosave();
         return;
     }
-}
-
-void SkinEditorMainComponent::comboBoxChanged(juce::ComboBox* box)
-{
-    if (suppressCombo_)
-        return;
-    if (box == &skinsPanel_.productCombo())
-        applyProductComboChange();
-    else if (box == &skinsPanel_.editorCombo())
-        applyEditorComboChange();
 }
 
 void SkinEditorMainComponent::timerCallback()
@@ -397,6 +388,7 @@ bool SkinEditorMainComponent::discardEditorWorkKeepingSessionPrefs()
 
     const auto productSkinId = sessionState_.productSkinId;
     const auto lastSkinJsonDirectory = sessionState_.lastSkinJsonDirectory;
+    const auto jsonSyncMode = sessionState_.jsonSyncMode;
 
     runWithoutLayerChangeNotify([this] { layer_.resetToCompiledBaseline(); });
 
@@ -406,6 +398,7 @@ bool SkinEditorMainComponent::discardEditorWorkKeepingSessionPrefs()
     sessionState_.lastSkinJsonDirectory = lastSkinJsonDirectory;
     sessionState_.lastImportedJsonPath = {};
     sessionState_.lastImportedJsonFingerprint = {};
+    sessionState_.jsonSyncMode = jsonSyncMode;
 
     clearMappingModeToIdle();
     if (! autosaveSession())
@@ -419,12 +412,14 @@ bool SkinEditorMainComponent::discardEditorWorkKeepingSessionPrefs()
                 layer_.selectSkin(sessionState_.editorSkinId);
         });
         stopTimer();
+        applyJsonSyncSessionUi();
         markEditorDirty();
         refreshAll();
         return false;
     }
 
     markEditorClean();
+    applyJsonSyncSessionUi();
     refreshAll();
     if (bridge_.isConnected())
         pushVisible();
@@ -451,6 +446,7 @@ void SkinEditorMainComponent::loadSessionOrBaseline()
     });
     stopTimer();
     markEditorClean();
+    applyJsonSyncSessionUi();
     reconcileWatchedImportJsonOnLaunch();
 }
 

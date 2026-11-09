@@ -616,6 +616,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/SkinColourWiringCoverageTests.cpp
         Tests/Unit/ColourSetModelTests.cpp
         Tests/Unit/DevSkinLayerJsonTests.cpp
+        Tests/Unit/DevSkinSessionJsonSyncTests.cpp
         Tests/Unit/DevSkinSessionImportWatchTests.cpp
         Tests/Unit/DevSkinColourSetLabelsTests.cpp
         Tests/Unit/DevSkinMappingLinkGroupsTests.cpp
@@ -1215,6 +1216,7 @@ if(MATRIX_BUILD_SKIN_EDITOR)
         Tools/SkinEditor/SkinEditorMainWindow.cpp
         Tools/SkinEditor/SkinEditorChromePanel.cpp
         Tools/SkinEditor/SkinEditorChromeTable.cpp
+        Tools/SkinEditor/SkinEditorAlertWindow.cpp
         Tools/SkinEditor/SkinEditorLookAndFeel.cpp
         Tools/SkinEditor/SkinEditorMainComponent.cpp
         Tools/SkinEditor/SkinEditorMainComponentActions.cpp

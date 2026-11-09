@@ -109,9 +109,15 @@ private:
     /** After session load: arm watch, or prompt if disk differs from last accepted fingerprint. */
     void reconcileWatchedImportJsonOnLaunch();
     void pollWatchedImportJson();
+    /** Branch on JSON Sync mode after a stable external fingerprint change. */
+    void handleWatchedImportJsonExternalChange(bool fromLaunch = false);
     void promptWatchedImportJsonExternalChange(bool fromLaunch = false);
     void reloadWatchedImportJsonFromDisk();
     void discardWatchedImportJsonExternalChange();
+    void syncImportWatchTimerToMode();
+    void syncJsonSyncComboFromSession();
+    void applyJsonSyncComboChange();
+    void applyJsonSyncSessionUi();
 
     // Mapping modes (SkinEditorMainComponentMapping.cpp)
     void onPastilleSelected(const juce::String& name);
@@ -247,6 +253,8 @@ private:
     juce::TextButton pushButton_ { "Push" };
     juce::TextButton exportButton_ { "Export" };
     juce::TextButton importButton_ { "Import" };
+    juce::Label jsonSyncLabel_;
+    juce::ComboBox jsonSyncCombo_;
     juce::Rectangle<int> sessionWellBounds_;
     std::vector<int> sessionSeparatorXs_;
     int sessionSeparatorY_ = 0;

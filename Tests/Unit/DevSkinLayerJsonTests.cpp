@@ -397,6 +397,7 @@ private:
         expectEquals(restoredState.lastSkinJsonDirectory, state.lastSkinJsonDirectory);
         expect(restoredState.lastImportedJsonPath.isEmpty());
         expect(restoredState.lastImportedJsonFingerprint.isEmpty());
+        expect(restoredState.jsonSyncMode == TSS::DevSkin::JsonSyncMode::kAsk);
     }
 
     void assertLegacyCompareOnIgnored()

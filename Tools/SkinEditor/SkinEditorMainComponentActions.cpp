@@ -1,6 +1,7 @@
 #include "Tools/SkinEditor/SkinEditorMainComponent.h"
 
 #include "GUI/Skins/Dev/DevSkinJson.h"
+#include "Tools/SkinEditor/SkinEditorAlertWindow.h"
 #include "Tools/SkinEditor/SkinEditorChromeTokens.h"
 #include "Tools/SkinEditor/SkinEditorUiHelpers.h"
 
@@ -80,9 +81,9 @@ void SkinEditorMainComponent::onDelete()
     if (skin == nullptr)
         return;
 
-    juce::AlertWindow confirm("Delete Editor skin",
-                              "Delete \"" + skin->name + "\"? This cannot be undone.",
-                              juce::MessageBoxIconType::WarningIcon);
+    SkinEditorChrome::AlertWindow confirm("Delete Editor skin",
+                                          "Delete \"" + skin->name + "\"? This cannot be undone.",
+                                          juce::MessageBoxIconType::WarningIcon);
     confirm.addButton("Delete", 1);
     confirm.addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey));
     if (confirm.runModalLoop() != 1)
@@ -369,10 +370,10 @@ void SkinEditorMainComponent::onDeletePastille()
     const int refs = layer_.countMappingsReferencing(sessionState_.editorSkinId, name);
     if (refs > 0)
     {
-        juce::AlertWindow window("Delete colour",
-                                 name + " is used by " + juce::String(refs)
-                                     + " mapping(s). Delete and clear those mappings?",
-                                 juce::MessageBoxIconType::WarningIcon);
+        SkinEditorChrome::AlertWindow window("Delete colour",
+                                             name + " is used by " + juce::String(refs)
+                                                 + " mapping(s). Delete and clear those mappings?",
+                                             juce::MessageBoxIconType::WarningIcon);
         window.addButton("Delete", 1);
         window.addButton("Cancel", 0);
         if (window.runModalLoop() != 1)

@@ -330,7 +330,8 @@ void SkinEditorMainComponent::layoutOperationWell(juce::Rectangle<int> well)
     operationTitleLabel_.setBounds(well.getX(), well.getY() - 1, titleW, well.getHeight() + 2);
 
     auto content = well;
-    content.removeFromLeft(titleW + SkinEditorChrome::kButtonGap);
+    // No extra gap after tab: kTitleTabPadH already matches left title air.
+    content.removeFromLeft(titleW);
     content.removeFromTop(SkinEditorChrome::kGutter);
     content.removeFromBottom(SkinEditorChrome::kGutter);
     content.removeFromRight(SkinEditorChrome::kGutter);
