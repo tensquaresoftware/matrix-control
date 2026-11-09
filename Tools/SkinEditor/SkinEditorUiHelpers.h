@@ -6,6 +6,7 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 
 #include "GUI/Skins/Dev/DevSkinLayer.h"
+#include "Tools/SkinEditor/SkinEditorAlertWindow.h"
 
 namespace SkinEditorUi
 {
@@ -27,8 +28,8 @@ namespace SkinEditorUi
     /** Modal text prompt. Returns false on Cancel (out unchanged). */
     inline bool askText(const AskTextRequest& request, juce::String& out)
     {
-        juce::AlertWindow window(request.title, request.message,
-                                 juce::MessageBoxIconType::QuestionIcon);
+        SkinEditorChrome::AlertWindow window(request.title, request.message,
+                                             juce::MessageBoxIconType::QuestionIcon);
         window.addTextEditor("value", request.initial, "Value");
         window.addButton("OK", 1, juce::KeyPress(juce::KeyPress::returnKey));
         window.addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey));
@@ -40,7 +41,7 @@ namespace SkinEditorUi
         }
 
         // Focus only sticks once the modal is on-screen and pumping messages.
-        const juce::Component::SafePointer<juce::AlertWindow> safe(&window);
+        const juce::Component::SafePointer<SkinEditorChrome::AlertWindow> safe(&window);
         juce::MessageManager::callAsync([safe]
         {
             if (safe == nullptr)

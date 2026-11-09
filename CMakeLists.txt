@@ -1216,6 +1216,7 @@ if(MATRIX_BUILD_SKIN_EDITOR)
         Tools/SkinEditor/SkinEditorMainWindow.cpp
         Tools/SkinEditor/SkinEditorChromePanel.cpp
         Tools/SkinEditor/SkinEditorChromeTable.cpp
+        Tools/SkinEditor/SkinEditorAlertWindow.cpp
         Tools/SkinEditor/SkinEditorLookAndFeel.cpp
         Tools/SkinEditor/SkinEditorMainComponent.cpp
         Tools/SkinEditor/SkinEditorMainComponentActions.cpp

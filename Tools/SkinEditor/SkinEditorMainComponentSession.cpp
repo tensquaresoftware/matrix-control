@@ -1,5 +1,6 @@
 #include "Tools/SkinEditor/SkinEditorMainComponent.h"
 
+#include "Tools/SkinEditor/SkinEditorAlertWindow.h"
 #include "Tools/SkinEditor/SkinEditorUiHelpers.h"
 
 void SkinEditorMainComponent::mouseUp(const juce::MouseEvent& e)
@@ -15,9 +16,9 @@ bool SkinEditorMainComponent::tryQuitWithDirtyGate()
     if (! editorDirty_)
         return true;
 
-    juce::AlertWindow window("Unsaved Editor changes",
-                             "Export the current Editor skin, discard changes, or cancel?",
-                             juce::MessageBoxIconType::QuestionIcon);
+    SkinEditorChrome::AlertWindow window("Unsaved Editor changes",
+                                         "Export the current Editor skin, discard changes, or cancel?",
+                                         juce::MessageBoxIconType::QuestionIcon);
     window.addButton("Export", 1);
     window.addButton("Discard", 2);
     window.addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey));

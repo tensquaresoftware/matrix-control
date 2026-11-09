@@ -1,5 +1,6 @@
 #include "Tools/SkinEditor/SkinEditorLookAndFeel.h"
 
+#include "Tools/SkinEditor/SkinEditorAlertWindow.h"
 #include "Tools/SkinEditor/SkinEditorChromeFonts.h"
 
 namespace
@@ -129,9 +130,8 @@ namespace SkinEditorChrome
     std::unique_ptr<juce::AlertWindow> LookAndFeel::createAlertWindowForOptions(
         const juce::MessageBoxOptions& options)
     {
-        // Skip LookAndFeel_V4's +50px pad and +40px button nudge — that left a
-        // large empty band above the buttons in Skin Editor dialogs.
-        return juce::LookAndFeel_V2::createAlertWindowForOptions(options);
+        // Skip LookAndFeel_V4 pad/nudge; pack buttons with kButtonGap.
+        return makeAlertWindowForOptions(options);
     }
 
     int LookAndFeel::getAlertWindowButtonHeight()
