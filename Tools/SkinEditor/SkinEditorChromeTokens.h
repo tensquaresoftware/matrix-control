@@ -233,13 +233,13 @@ namespace SkinEditorChrome
      */
     inline constexpr int kMappingBandHeight = kSessionWellHeight;
     /** Minimum OPERATION well width on the title row (stretches when the window grows). */
-    inline constexpr int kOperationWellMinWidth = 700;
+    inline constexpr int kOperationWellMinWidth = 620;
     /** Badge → label gap for BRIDGE / MAPPING / LAST PUSH chrome. */
     inline constexpr int kChromeBadgeGap = 8;
     /** Chrome text badges (MAPPING / BRIDGE / …) — thinner than TextButton. */
     inline constexpr int kMappingBadgeHeight = 16;
     inline constexpr float kMappingBadgeFont = 11.0f;
-    inline constexpr int kMappingBadgePadH = 8;
+    inline constexpr int kMappingBadgePadH = 4;
     /** Inset from OPERATION dark pocket to MAPPING badge — equals vertical centre air. */
     inline constexpr int kOperationWitnessPad = (kButtonHeight - kMappingBadgeHeight) / 2; // 4
     /** Painted thick next-step arrow between identity and coaching text. */

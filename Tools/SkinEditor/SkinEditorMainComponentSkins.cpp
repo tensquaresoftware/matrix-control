@@ -24,19 +24,23 @@ namespace
 
         void button(juce::TextButton& b)
         {
+            button(b, SkinEditorChrome::measureButtonWidth(b));
+        }
+
+        void button(juce::TextButton& b, int width)
+        {
             if (! fits)
             {
                 b.setBounds({});
                 return;
             }
-            const int w = SkinEditorChrome::measureButtonWidth(b);
-            if (row.getWidth() < w)
+            if (row.getWidth() < width)
             {
                 b.setBounds({});
                 stop();
                 return;
             }
-            b.setBounds(row.removeFromLeft(w).withHeight(SkinEditorChrome::kButtonHeight));
+            b.setBounds(row.removeFromLeft(width).withHeight(SkinEditorChrome::kButtonHeight));
         }
 
         void separator()
@@ -53,6 +57,38 @@ namespace
             row.removeFromLeft(1);
             gap();
         }
+
+        void label(juce::Label& label, int width)
+        {
+            if (! fits)
+            {
+                label.setBounds({});
+                return;
+            }
+            if (row.getWidth() < width)
+            {
+                label.setBounds({});
+                stop();
+                return;
+            }
+            label.setBounds(row.removeFromLeft(width).withHeight(SkinEditorChrome::kButtonHeight));
+        }
+
+        void combo(juce::ComboBox& box, int width)
+        {
+            if (! fits)
+            {
+                box.setBounds({});
+                return;
+            }
+            if (row.getWidth() < width)
+            {
+                box.setBounds({});
+                stop();
+                return;
+            }
+            box.setBounds(row.removeFromLeft(width).withHeight(SkinEditorChrome::kButtonHeight));
+        }
     };
 }
 
@@ -65,6 +101,18 @@ void SkinEditorMainComponent::layoutTitleBar(juce::Rectangle<int> titleBar)
 
     const int opX = titleBar.getX() + sessionW + SkinEditorChrome::kButtonGap;
     layoutOperationWell({ opX, wellY, juce::jmax(0, titleBar.getRight() - opX), wellH });
+}
+
+void SkinEditorMainComponent::comboBoxChanged(juce::ComboBox* box)
+{
+    if (suppressCombo_)
+        return;
+    if (box == &skinsPanel_.productCombo())
+        applyProductComboChange();
+    else if (box == &skinsPanel_.editorCombo())
+        applyEditorComboChange();
+    else if (box == &jsonSyncCombo_)
+        applyJsonSyncComboChange();
 }
 
 void SkinEditorMainComponent::setupSessionWell()
@@ -83,6 +131,26 @@ void SkinEditorMainComponent::setupSessionWell()
     wire(pushButton_, [this] { onPush(); });
     wire(exportButton_, [this] { onExportJson(); });
     wire(importButton_, [this] { onImportJson(); });
+
+    jsonSyncLabel_.setText("JSON Sync:", juce::dontSendNotification);
+    jsonSyncLabel_.setFont(SkinEditorChrome::fontRegular());
+    jsonSyncLabel_.setColour(juce::Label::textColourId, SkinEditorChrome::textMuted());
+    jsonSyncLabel_.setJustificationType(juce::Justification::centredLeft);
+    SkinEditorChrome::preventTextSquish(jsonSyncLabel_);
+    jsonSyncLabel_.setBorderSize({});
+    jsonSyncLabel_.setTooltip(
+        "How the Skin Editor reacts when the last imported JSON changes on disk");
+    addAndMakeVisible(jsonSyncLabel_);
+
+    jsonSyncCombo_.addItem("Off", static_cast<int>(TSS::DevSkin::JsonSyncMode::kOff) + 1);
+    jsonSyncCombo_.addItem("Ask", static_cast<int>(TSS::DevSkin::JsonSyncMode::kAsk) + 1);
+    jsonSyncCombo_.addItem("Auto", static_cast<int>(TSS::DevSkin::JsonSyncMode::kAuto) + 1);
+    jsonSyncCombo_.setTooltip(
+        "Off: ignore disk changes. Ask: prompt Reload/Discard. Auto: reload when clean.");
+    addAndMakeVisible(jsonSyncCombo_);
+    jsonSyncCombo_.addListener(this);
+    syncJsonSyncComboFromSession();
+
     compareBlinkTimer_.onTick = [this] { tickCompareBlink(); };
     undoButton_.setEnabled(false);
     redoButton_.setEnabled(false);
@@ -111,21 +179,26 @@ void SkinEditorMainComponent::layoutSessionControls(juce::Rectangle<int> well,
     {
         sessionTitleLabel_.setBounds(row.getX(), well.getY() - 1, sessionTitleW,
                                      well.getHeight() + 2);
+        // No gap after tab: kTitleTabPadH already matches left title air.
         row.removeFromLeft(sessionTitleW);
-        place.gap();
     }
 
-    place.button(undoButton_);
+    const int undoRedoW = SkinEditorChrome::sessionUndoRedoButtonWidth();
+    place.button(undoButton_, undoRedoW);
     place.gap();
-    place.button(redoButton_);
+    place.button(redoButton_, undoRedoW);
     place.separator();
     place.button(compareButton_);
     place.gap();
-    place.button(pushButton_);
+    place.button(pushButton_, SkinEditorChrome::sessionPushButtonWidth());
     place.separator();
     place.button(exportButton_);
     place.gap();
     place.button(importButton_);
+    place.separator();
+    place.label(jsonSyncLabel_, SkinEditorChrome::jsonSyncLabelWidth());
+    place.gap();
+    place.combo(jsonSyncCombo_, SkinEditorChrome::jsonSyncComboWidth());
     if (place.fits && row.getWidth() >= SkinEditorChrome::kGutter)
         row.removeFromLeft(SkinEditorChrome::kGutter);
 }

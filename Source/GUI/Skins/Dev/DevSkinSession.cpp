@@ -64,6 +64,7 @@ namespace TSS::DevSkin
         root->setProperty("lastSkinJsonDirectory", state.lastSkinJsonDirectory);
         root->setProperty("lastImportedJsonPath", state.lastImportedJsonPath);
         root->setProperty("lastImportedJsonFingerprint", state.lastImportedJsonFingerprint);
+        root->setProperty("jsonSyncMode", jsonSyncModeToString(state.jsonSyncMode));
         return juce::JSON::toString(parsed, true);
     }
 
@@ -100,6 +101,7 @@ namespace TSS::DevSkin
                                                                     "lastSkinJsonDirectory",
                                                                     "lastExportDirectory");
         readLastImportedJsonWatch(*root, state);
+        state.jsonSyncMode = jsonSyncModeFromString(root->getProperty("jsonSyncMode").toString());
         return JsonIoResult::success();
     }
 

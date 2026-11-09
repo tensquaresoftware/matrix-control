@@ -128,16 +128,6 @@ void SkinEditorMainComponent::applyEditorComboChange()
     }
 }
 
-void SkinEditorMainComponent::comboBoxChanged(juce::ComboBox* box)
-{
-    if (suppressCombo_)
-        return;
-    if (box == &skinsPanel_.productCombo())
-        applyProductComboChange();
-    else if (box == &skinsPanel_.editorCombo())
-        applyEditorComboChange();
-}
-
 void SkinEditorMainComponent::timerCallback()
 {
     flushPendingSessionAutosave();
@@ -397,6 +387,7 @@ bool SkinEditorMainComponent::discardEditorWorkKeepingSessionPrefs()
 
     const auto productSkinId = sessionState_.productSkinId;
     const auto lastSkinJsonDirectory = sessionState_.lastSkinJsonDirectory;
+    const auto jsonSyncMode = sessionState_.jsonSyncMode;
 
     runWithoutLayerChangeNotify([this] { layer_.resetToCompiledBaseline(); });
 
@@ -406,6 +397,7 @@ bool SkinEditorMainComponent::discardEditorWorkKeepingSessionPrefs()
     sessionState_.lastSkinJsonDirectory = lastSkinJsonDirectory;
     sessionState_.lastImportedJsonPath = {};
     sessionState_.lastImportedJsonFingerprint = {};
+    sessionState_.jsonSyncMode = jsonSyncMode;
 
     clearMappingModeToIdle();
     if (! autosaveSession())
@@ -419,12 +411,14 @@ bool SkinEditorMainComponent::discardEditorWorkKeepingSessionPrefs()
                 layer_.selectSkin(sessionState_.editorSkinId);
         });
         stopTimer();
+        applyJsonSyncSessionUi();
         markEditorDirty();
         refreshAll();
         return false;
     }
 
     markEditorClean();
+    applyJsonSyncSessionUi();
     refreshAll();
     if (bridge_.isConnected())
         pushVisible();
@@ -451,6 +445,7 @@ void SkinEditorMainComponent::loadSessionOrBaseline()
     });
     stopTimer();
     markEditorClean();
+    applyJsonSyncSessionUi();
     reconcileWatchedImportJsonOnLaunch();
 }
 

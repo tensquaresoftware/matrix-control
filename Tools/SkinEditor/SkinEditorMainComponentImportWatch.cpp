@@ -120,9 +120,7 @@ void SkinEditorMainComponent::armWatchedImportJson(const juce::File& file)
     importWatchPendingFingerprint_ = {};
     importWatchPendingStablePolls_ = 0;
     importWatchDialogOpen_ = false;
-    importWatchTimer_.onTick = [this] { pollWatchedImportJson(); };
-    if (! importWatchTimer_.isTimerRunning())
-        importWatchTimer_.startTimer(1000);
+    syncImportWatchTimerToMode();
     scheduleSessionAutosave();
 }
 
@@ -195,9 +193,7 @@ void SkinEditorMainComponent::reconcileWatchedImportJsonOnLaunch()
         importWatchPendingFingerprint_ = {};
         importWatchPendingStablePolls_ = 0;
         importWatchDialogOpen_ = false;
-        importWatchTimer_.onTick = [this] { pollWatchedImportJson(); };
-        if (! importWatchTimer_.isTimerRunning())
-            importWatchTimer_.startTimer(1000);
+        syncImportWatchTimerToMode();
     };
 
     // Transient unreadable read with a known baseline: watch without accepting disk yet.
@@ -214,9 +210,9 @@ void SkinEditorMainComponent::reconcileWatchedImportJsonOnLaunch()
         return;
     }
 
-    // Disk differs from last accepted baseline — keep stored fingerprint until Reload/Discard.
+    // Disk differs from last accepted baseline — keep stored fingerprint until handled.
     armWatchKeepingStoredBaseline();
-    promptWatchedImportJsonExternalChange(true);
+    handleWatchedImportJsonExternalChange(true);
 }
 
 void SkinEditorMainComponent::pollWatchedImportJson()
@@ -255,7 +251,66 @@ void SkinEditorMainComponent::pollWatchedImportJson()
 
     importWatchPendingFingerprint_ = {};
     importWatchPendingStablePolls_ = 0;
-    promptWatchedImportJsonExternalChange();
+    handleWatchedImportJsonExternalChange(false);
+}
+
+void SkinEditorMainComponent::syncImportWatchTimerToMode()
+{
+    if (sessionState_.jsonSyncMode == TSS::DevSkin::JsonSyncMode::kOff
+        || watchedImportJsonFile_ == juce::File())
+    {
+        importWatchTimer_.stopTimer();
+        return;
+    }
+
+    importWatchTimer_.onTick = [this] { pollWatchedImportJson(); };
+    if (! importWatchTimer_.isTimerRunning())
+        importWatchTimer_.startTimer(1000);
+}
+
+void SkinEditorMainComponent::syncJsonSyncComboFromSession()
+{
+    const juce::ScopedValueSetter<bool> guard(suppressCombo_, true);
+    jsonSyncCombo_.setSelectedId(static_cast<int>(sessionState_.jsonSyncMode) + 1,
+                                 juce::dontSendNotification);
+}
+
+void SkinEditorMainComponent::applyJsonSyncComboChange()
+{
+    const auto id = jsonSyncCombo_.getSelectedId();
+    if (id < 1)
+        return;
+
+    sessionState_.jsonSyncMode = static_cast<TSS::DevSkin::JsonSyncMode>(id - 1);
+    syncImportWatchTimerToMode();
+    scheduleSessionAutosave();
+}
+
+void SkinEditorMainComponent::applyJsonSyncSessionUi()
+{
+    syncJsonSyncComboFromSession();
+    syncImportWatchTimerToMode();
+}
+
+void SkinEditorMainComponent::handleWatchedImportJsonExternalChange(bool fromLaunch)
+{
+    using Mode = TSS::DevSkin::JsonSyncMode;
+    switch (sessionState_.jsonSyncMode)
+    {
+        case Mode::kOff:
+            return;
+        case Mode::kAuto:
+            if (! editorDirty_)
+            {
+                reloadWatchedImportJsonFromDisk();
+                return;
+            }
+            // Dirty Auto falls through to Ask so unsaved work is not wiped silently.
+            break;
+        case Mode::kAsk:
+            break;
+    }
+    promptWatchedImportJsonExternalChange(fromLaunch);
 }
 
 void SkinEditorMainComponent::promptWatchedImportJsonExternalChange(bool fromLaunch)
