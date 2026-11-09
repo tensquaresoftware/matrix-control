@@ -61,12 +61,10 @@ void SkinEditorMainComponent::layoutTitleBar(juce::Rectangle<int> titleBar)
     const int wellH = SkinEditorChrome::kSessionWellHeight;
     const int wellY = titleBar.getY() + SkinEditorChrome::kChromeStackGap;
     const int sessionW = SkinEditorChrome::sessionWellPreferredWidth();
-    const int sessionX = titleBar.getRight() - sessionW;
-    layoutSessionWell({ sessionX, wellY, sessionW, wellH });
+    layoutSessionWell({ titleBar.getX(), wellY, sessionW, wellH });
 
-    const int opRight = sessionX - SkinEditorChrome::kButtonGap;
-    layoutOperationWell({ titleBar.getX(), wellY, juce::jmax(0, opRight - titleBar.getX()),
-                          wellH });
+    const int opX = titleBar.getX() + sessionW + SkinEditorChrome::kButtonGap;
+    layoutOperationWell({ opX, wellY, juce::jmax(0, titleBar.getRight() - opX), wellH });
 }
 
 void SkinEditorMainComponent::setupSessionWell()
@@ -139,7 +137,7 @@ void SkinEditorMainComponent::layoutSessionWell(juce::Rectangle<int> well)
     if (well.isEmpty())
         return;
 
-    // Compact well on the right of the title row (OPERATION stays outside).
+    // Compact well on the left of the title row (OPERATION stretches to the right).
     sessionWellBounds_ = well;
     layoutSessionControls(sessionWellBounds_,
                           { sessionWellBounds_.getX(),

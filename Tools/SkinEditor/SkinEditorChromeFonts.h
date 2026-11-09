@@ -272,18 +272,18 @@ namespace SkinEditorChrome
     }
 
     /**
-     * Edge gutters + OPERATION (min) + SESSION on the title row.
-     * Gap matches layoutTitleBar (kButtonGap between OPERATION and SESSION).
+     * Edge gutters + SESSION + OPERATION (min) on the title row.
+     * Gap matches layoutTitleBar (kButtonGap between SESSION and OPERATION).
      */
     inline int windowTitleChromeMinWidth() noexcept
     {
-        return kWindowEdgeGutter + kOperationWellMinWidth + kButtonGap
-               + sessionWellPreferredWidth() + kWindowEdgeGutter;
+        return kWindowEdgeGutter + sessionWellPreferredWidth() + kButtonGap
+               + kOperationWellMinWidth + kWindowEdgeGutter;
     }
 
     /**
      * Client width floor: min Palette body vs measured title chrome
-     * (OPERATION min + SESSION). Widening grows Palette / Mapped and
+     * (SESSION + OPERATION min). Widening grows Palette / Mapped and
      * stretches the OPERATION slot.
      */
     inline int windowContentWidth() noexcept

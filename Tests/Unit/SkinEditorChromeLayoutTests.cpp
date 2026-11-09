@@ -44,12 +44,12 @@ private:
 
     void titleChromeMinWidthIncludesOperationFloor()
     {
-        beginTest("Title chrome min width locks OPERATION 700 + SESSION");
+        beginTest("Title chrome min width locks SESSION + OPERATION 700");
 
         const int exact = SkinEditorChrome::kWindowEdgeGutter
-                          + SkinEditorChrome::kOperationWellMinWidth
-                          + SkinEditorChrome::kButtonGap
                           + SkinEditorChrome::sessionWellPreferredWidth()
+                          + SkinEditorChrome::kButtonGap
+                          + SkinEditorChrome::kOperationWellMinWidth
                           + SkinEditorChrome::kWindowEdgeGutter;
         const int bodyMin = SkinEditorChrome::windowBodyWidthForPalettePanel(
             SkinEditorChrome::palettePanelMinWidth());

@@ -16,14 +16,14 @@ context:
 
 **Problem:** Skin Editor still stacks OPERATION on its own row under the logo, which costs vertical space the body panels could use.
 
-**Approach:** Put the OPERATION well on the title row left of SESSION (no in-app logo). Give OPERATION a 700 px minimum width and let it grow when the window widens; drop the old under-logo OPERATION strip so the chrome is shorter. SESSION separators use a single button gap on each side.
+**Approach:** Put SESSION then OPERATION on the title row (no in-app logo). Give OPERATION a 700 px minimum width and let it grow when the window widens; drop the old under-logo OPERATION strip so the chrome is shorter. SESSION separators use a single button gap on each side.
 
 </frozen-after-approval>
 
 ## Implementation Notes
 
 Agent decisions (user-invisible):
-- Title row L→R: logo (dark fill) → `kButtonGap` → OPERATION (≥700, takes remaining mid space) → `kButtonGap` → SESSION at `sessionWellPreferredWidth()` (right-pinned).
+- Title row L→R: SESSION at `sessionWellPreferredWidth()` → `kButtonGap` → OPERATION (≥700, stretches to the right edge).
 - Keep `kTitleBarHeight` (54) and shared well height 36; vertical placement mirrors current SESSION (`kChromeStackGap` above + well + bottom gutter language).
 - Remove the dedicated OPERATION band and one extra gutter from `resized` / `skinEditorMinContentHeight` (36 + 6 = 42 px saved).
 - Fold `kOperationWellMinWidth = 700` into `windowContentWidth()` / title-row min so the constrainer respects logo + 700 + SESSION + edge gutters.
@@ -38,7 +38,7 @@ Done:
 - Updated `SkinEditorChromeLayoutTests` for new min width / min height stack.
 - Quality gate OK; Skin Editor + chrome layout unit tests green.
 - Review patches: refresh `kChromeStackGap` comment; rename `layoutOperationWell` param to `well`; lock exact title-chrome min-width sum in a dedicated unit test; correct saved-height note to 42 px.
-- Follow-up: OPERATION min width 700; logo removed; SESSION separators use one `kButtonGap` each side.
+- Follow-up: OPERATION min width 700; logo removed; SESSION separators use one `kButtonGap` each side; SESSION left / OPERATION right.
 
 ## Review Triage Log
 
