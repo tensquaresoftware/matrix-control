@@ -49,14 +49,6 @@ SkinEditorMainComponent::~SkinEditorMainComponent()
 
 void SkinEditorMainComponent::setupTitleBarChrome()
 {
-    titleLabel_.setText(SkinEditorChrome::kAppTitleText, juce::dontSendNotification);
-    titleLabel_.setFont(SkinEditorChrome::fontAppTitle());
-    titleLabel_.setColour(juce::Label::textColourId, SkinEditorChrome::textBrand());
-    titleLabel_.setJustificationType(juce::Justification::centredLeft);
-    SkinEditorChrome::preventTextSquish(titleLabel_);
-    titleLabel_.setBorderSize({});
-    addAndMakeVisible(titleLabel_);
-
     for (auto* label : { &mappingPrefixLabel_, &mappingNameLabel_, &mappingDetailLabel_ })
     {
         label->setFont(SkinEditorChrome::fontRegular());
@@ -212,19 +204,6 @@ int SkinEditorMainComponent::chromeRowY(int barY, int barH, int rowH, int optica
     return barY + (barH - rowH) / 2 + opticalNudgeY;
 }
 
-void SkinEditorMainComponent::layoutTitleBar(juce::Rectangle<int> titleBar)
-{
-    const int titleH = juce::roundToInt(SkinEditorChrome::kAppTitleFont);
-    const int titleW = SkinEditorChrome::measureTextWidth(SkinEditorChrome::fontAppTitle(),
-                                                         titleLabel_.getText())
-                       + 8;
-    const int titleY = chromeRowY(titleBar.getY(), titleBar.getHeight(), titleH,
-                                  SkinEditorChrome::kLogoTitleNudgeY);
-    // Logo stays on the dark app fill — not inside the SESSION well.
-    titleLabel_.setBounds(titleBar.getX(), titleY, titleW, titleH);
-    layoutSessionWell(titleBar, titleBar.getX() + titleW);
-}
-
 namespace
 {
     struct WitnessElidePlace
@@ -328,7 +307,7 @@ void SkinEditorMainComponent::layoutOperationStartHint(juce::Rectangle<int> cont
                             SkinEditorChrome::fontRegular());
 }
 
-void SkinEditorMainComponent::layoutOperationWell(juce::Rectangle<int> band)
+void SkinEditorMainComponent::layoutOperationWell(juce::Rectangle<int> well)
 {
     operationWellBounds_ = {};
     operationContentBounds_ = {};
@@ -340,17 +319,17 @@ void SkinEditorMainComponent::layoutOperationWell(juce::Rectangle<int> band)
     mappingDetailLabel_.setBounds({});
     operationTitleLabel_.setBounds({});
 
-    if (band.isEmpty())
+    if (well.isEmpty())
         return;
 
-    operationWellBounds_ = band;
+    operationWellBounds_ = well;
     const int titleW = SkinEditorChrome::titleTabWidth("OPERATION");
-    if (band.getWidth() < titleW)
+    if (well.getWidth() < titleW)
         return;
 
-    operationTitleLabel_.setBounds(band.getX(), band.getY() - 1, titleW, band.getHeight() + 2);
+    operationTitleLabel_.setBounds(well.getX(), well.getY() - 1, titleW, well.getHeight() + 2);
 
-    auto content = band;
+    auto content = well;
     content.removeFromLeft(titleW + SkinEditorChrome::kButtonGap);
     content.removeFromTop(SkinEditorChrome::kGutter);
     content.removeFromBottom(SkinEditorChrome::kGutter);
@@ -425,18 +404,11 @@ void SkinEditorMainComponent::resized()
 
     auto bounds = getLocalBounds();
     const int edge = SkinEditorChrome::kWindowEdgeGutter;
-    // Left/right edge — SESSION / OPERATION / status align with SKINS / body columns.
+    // Left/right edge — title chrome / status align with SKINS / body columns.
     const auto titleBar = bounds.removeFromTop(SkinEditorChrome::kTitleBarHeight)
                               .withTrimmedLeft(edge)
                               .withTrimmedRight(edge);
     layoutTitleBar(titleBar);
-
-    // Title-bar bottom gutter (6) + this strip (6) = kChromeStackGap before OPERATION.
-    bounds.removeFromTop(SkinEditorChrome::kGutter);
-    const auto operationBand = bounds.removeFromTop(SkinEditorChrome::kMappingBandHeight)
-                                   .withTrimmedLeft(edge)
-                                   .withTrimmedRight(edge);
-    layoutOperationWell(operationBand);
 
     const auto statusBar = bounds.removeFromBottom(SkinEditorChrome::kStatusBarHeight)
                                .withTrimmedLeft(edge)
@@ -444,7 +416,7 @@ void SkinEditorMainComponent::resized()
     layoutStatusBar(statusBar);
 
     // Body flush to status (COLOR / Palette / Mappings use bottomGutter 0).
-    // OPERATION bottom + SKINS panel top gutter = kChromeStackGap.
+    // Title-bar bottom gutter + this strip = kChromeStackGap before SKINS.
     bounds.removeFromTop(SkinEditorChrome::kGutter);
     bounds.removeFromLeft(edge);
     bounds.removeFromRight(edge);

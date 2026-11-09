@@ -18,6 +18,7 @@ public:
     void runTest() override
     {
         operationWellMatchesSessionHeight();
+        titleChromeMinWidthIncludesOperationFloor();
         windowFitsFlexiblePaletteMapped();
         idleWitnessHiddenHoldWitnessVisible();
         mappingsColumnPadAndWidths();
@@ -41,16 +42,28 @@ private:
         expectEquals(SkinEditorChrome::kChromeBadgeGap, 8);
     }
 
-    void windowFitsFlexiblePaletteMapped()
+    void titleChromeMinWidthIncludesOperationFloor()
     {
-        beginTest("Window min width fits min Palette; Mapped tracks Palette on stretch");
+        beginTest("Title chrome min width locks OPERATION 700 + SESSION");
 
-        const int titleSession = SkinEditorChrome::windowTitleSessionMinWidth();
-        const int minW = SkinEditorChrome::windowMinWidth();
+        const int exact = SkinEditorChrome::kWindowEdgeGutter
+                          + SkinEditorChrome::kOperationWellMinWidth
+                          + SkinEditorChrome::kButtonGap
+                          + SkinEditorChrome::sessionWellPreferredWidth()
+                          + SkinEditorChrome::kWindowEdgeGutter;
         const int bodyMin = SkinEditorChrome::windowBodyWidthForPalettePanel(
             SkinEditorChrome::palettePanelMinWidth());
 
-        expectEquals(minW, juce::jmax(bodyMin, titleSession));
+        expectEquals(SkinEditorChrome::kOperationWellMinWidth, 700);
+        expectEquals(SkinEditorChrome::windowTitleChromeMinWidth(), exact);
+        expectEquals(SkinEditorChrome::windowMinWidth(),
+                     juce::jmax(bodyMin, SkinEditorChrome::windowTitleChromeMinWidth()));
+    }
+
+    void windowFitsFlexiblePaletteMapped()
+    {
+        beginTest("Mapped colour tracks Palette width when the window stretches");
+
         expectEquals(SkinEditorChrome::kWindowBodyMinWidth,
                      SkinEditorChrome::windowBodyWidthForPalettePanel(
                          SkinEditorChrome::kPalettePanelMinWidth));
@@ -233,13 +246,12 @@ private:
 
     void minContentHeightStacksSkinsAndColor()
     {
-        beginTest("Min content height stacks title, OPERATION, SKINS, COLOR, status");
+        beginTest("Min content height stacks title, SKINS, COLOR, status");
 
         const int skinsH = SkinEditorSkinsPanel::preferredHeight();
         const int colorH = SkinEditorColourPicker::preferredHeightForWidth(
             SkinEditorChrome::kColorPanelWidth);
         const int minH = SkinEditorChrome::kTitleBarHeight + SkinEditorChrome::kGutter
-                         + SkinEditorChrome::kMappingBandHeight + SkinEditorChrome::kGutter
                          + skinsH + colorH + SkinEditorChrome::kStatusBarHeight;
 
         expect(skinsH > 0);

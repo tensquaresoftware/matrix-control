@@ -26,9 +26,8 @@ namespace
         const int colorH = SkinEditorColourPicker::preferredHeightForWidth(
             SkinEditorChrome::kColorPanelWidth);
         const int leftColumn = skinsH + colorH;
-        // title | stack | OPERATION | stack | body | status (no gutter above status)
+        // title (logo + OPERATION + SESSION) | stack | body | status
         return SkinEditorChrome::kTitleBarHeight + SkinEditorChrome::kGutter
-               + SkinEditorChrome::kMappingBandHeight + SkinEditorChrome::kGutter
                + leftColumn + SkinEditorChrome::kStatusBarHeight;
     }
 }

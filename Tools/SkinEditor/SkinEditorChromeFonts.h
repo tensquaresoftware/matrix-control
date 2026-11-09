@@ -32,15 +32,6 @@ namespace SkinEditorChrome
         return tf;
     }
 
-    /** Same brand face as the plugin logo (Skin::getBrandFontBold). */
-    inline juce::Typeface::Ptr orbitronBoldTypeface()
-    {
-        static const auto tf = juce::Typeface::createSystemTypefaceFor(
-            PluginFontsData::OrbitronBold_ttf,
-            static_cast<size_t>(PluginFontsData::OrbitronBold_ttfSize));
-        return tf;
-    }
-
     inline juce::Typeface::Ptr monoTypeface()
     {
         static const auto tf = juce::Typeface::createSystemTypefaceFor(
@@ -63,12 +54,6 @@ namespace SkinEditorChrome
     inline juce::Font fontTitle(float height = kPanelTitleFont)
     {
         return juce::Font(juce::FontOptions(interMediumTypeface()).withHeight(height));
-    }
-
-    /** App window title — Orbitron Bold, smaller than the plugin logo. */
-    inline juce::Font fontAppTitle(float height = kAppTitleFont)
-    {
-        return juce::Font(juce::FontOptions(orbitronBoldTypeface()).withHeight(height));
     }
 
     inline juce::Font fontMono(float height = kBodyFont)
@@ -181,7 +166,6 @@ namespace SkinEditorChrome
         juce::ignoreUnused(measureTextWidth(fontRegular(), kProbe),
                            measureTextWidth(fontBold(kMappingBadgeFont), kProbe),
                            measureTextWidth(fontTitle(), kProbe),
-                           measureTextWidth(fontAppTitle(), kProbe),
                            measureTextWidth(fontMono(), kProbe));
     }
 
@@ -277,7 +261,7 @@ namespace SkinEditorChrome
         {
             return measureButtonWidth(juce::TextButton(text));
         };
-        constexpr int kSep = kButtonGap * 4 + 1;
+        constexpr int kSep = kButtonGap * 2 + 1;
         return titleW + kButtonGap
                + measure("Undo") + kButtonGap + measure("Redo")
                + kSep
@@ -287,27 +271,25 @@ namespace SkinEditorChrome
                + kGutter;
     }
 
-    /** Measured Orbitron title advance (+ layout pad matching layoutTitleBar). */
-    inline int appTitlePreferredWidth() noexcept
+    /**
+     * Edge gutters + OPERATION (min) + SESSION on the title row.
+     * Gap matches layoutTitleBar (kButtonGap between OPERATION and SESSION).
+     */
+    inline int windowTitleChromeMinWidth() noexcept
     {
-        return measureTextWidth(fontAppTitle(), kAppTitleText) + 8;
-    }
-
-    /** Edge gutters + app title + gap + SESSION controls. */
-    inline int windowTitleSessionMinWidth() noexcept
-    {
-        return kWindowEdgeGutter + appTitlePreferredWidth() + kButtonGap
+        return kWindowEdgeGutter + kOperationWellMinWidth + kButtonGap
                + sessionWellPreferredWidth() + kWindowEdgeGutter;
     }
 
     /**
-     * Client width floor: min Palette body vs measured title + SESSION.
-     * Widening the window grows Palette and Mappings Mapped colour together.
+     * Client width floor: min Palette body vs measured title chrome
+     * (OPERATION min + SESSION). Widening grows Palette / Mapped and
+     * stretches the OPERATION slot.
      */
     inline int windowContentWidth() noexcept
     {
         return juce::jmax(windowBodyWidthForPalettePanel(palettePanelMinWidth()),
-                          windowTitleSessionMinWidth());
+                          windowTitleChromeMinWidth());
     }
 
     inline int windowMinWidth() noexcept { return windowContentWidth(); }

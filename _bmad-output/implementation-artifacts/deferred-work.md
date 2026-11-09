@@ -3230,3 +3230,9 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-zones-skins-black-duo-cream.md`
   summary: Reconfirmed — no Pause trial JSON fixture to pin port against `dev:blackduobalanced2` / `dev:cream-2`.
   evidence: External code review Acceptance Auditor; ColourChart pins from the same port stay circular.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-operation-bar-layout.md`
+  summary: Extract a shared helper for Skin Editor min content height used by MainWindow and chrome layout tests.
+  evidence: Blind Hunter; MainWindow `skinEditorMinContentHeight` and the unit test re-derive the same stack independently.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-operation-bar-layout.md`
+  summary: Rename leftover `kMappingBandHeight` / “band” chrome vocabulary after OPERATION moved onto the title row.
+  evidence: Blind Hunter; constant remains a height alias and was left to avoid a wider rename in this oneshot.

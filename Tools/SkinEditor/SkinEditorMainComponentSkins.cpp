@@ -41,21 +41,32 @@ namespace
 
         void separator()
         {
-            constexpr int kSep = SkinEditorChrome::kButtonGap * 4 + 1;
+            constexpr int kSep = SkinEditorChrome::kButtonGap * 2 + 1;
             if (! fits || row.getWidth() < kSep)
             {
                 stop();
                 return;
             }
             gap();
-            gap();
             if (separatorXs != nullptr)
                 separatorXs->push_back(row.getX());
             row.removeFromLeft(1);
             gap();
-            gap();
         }
     };
+}
+
+void SkinEditorMainComponent::layoutTitleBar(juce::Rectangle<int> titleBar)
+{
+    const int wellH = SkinEditorChrome::kSessionWellHeight;
+    const int wellY = titleBar.getY() + SkinEditorChrome::kChromeStackGap;
+    const int sessionW = SkinEditorChrome::sessionWellPreferredWidth();
+    const int sessionX = titleBar.getRight() - sessionW;
+    layoutSessionWell({ sessionX, wellY, sessionW, wellH });
+
+    const int opRight = sessionX - SkinEditorChrome::kButtonGap;
+    layoutOperationWell({ titleBar.getX(), wellY, juce::jmax(0, opRight - titleBar.getX()),
+                          wellH });
 }
 
 void SkinEditorMainComponent::setupSessionWell()
@@ -121,24 +132,15 @@ void SkinEditorMainComponent::layoutSessionControls(juce::Rectangle<int> well,
         row.removeFromLeft(SkinEditorChrome::kGutter);
 }
 
-void SkinEditorMainComponent::layoutSessionWell(juce::Rectangle<int> titleBar, int titleRight)
+void SkinEditorMainComponent::layoutSessionWell(juce::Rectangle<int> well)
 {
     sessionSeparatorXs_.clear();
     sessionWellBounds_ = {};
-
-    // Compact well on the right (logo stays outside on dark fill). titleBar is
-    // already kGutter-inset so the well's right edge matches OPERATION / SKINS column.
-    const int wellH = SkinEditorChrome::kSessionWellHeight;
-    const int wellY = titleBar.getY() + SkinEditorChrome::kChromeStackGap;
-    const int wellW = SkinEditorChrome::sessionWellPreferredWidth();
-    const int wellX = juce::jmax(titleRight + SkinEditorChrome::kButtonGap,
-                                 titleBar.getRight() - wellW);
-    sessionWellBounds_ = { wellX, wellY,
-                           juce::jmin(wellW, titleBar.getRight() - wellX),
-                           wellH };
-    if (sessionWellBounds_.isEmpty())
+    if (well.isEmpty())
         return;
 
+    // Compact well on the right of the title row (OPERATION stays outside).
+    sessionWellBounds_ = well;
     layoutSessionControls(sessionWellBounds_,
                           { sessionWellBounds_.getX(),
                             sessionWellBounds_.getY() + SkinEditorChrome::kGutter,
