@@ -265,7 +265,7 @@ private:
 
     void filteredObjectGroupsFollowDisplayOrder()
     {
-        beginTest("filteredObjectGroups follows editor descending display order");
+        beginTest("filteredObjectGroups follows Object combo A-Z order");
 
         using namespace SkinEditorMappingsColumnFilter;
         const auto skin = makeSkin();
@@ -273,10 +273,14 @@ private:
         const auto groups = filteredObjectGroups(skin, none);
         const auto& order = mappingsObjectDisplayOrder();
 
-        // Full inventory coverage ⇒ exact display list (append path unused today).
+        // Full inventory coverage ⇒ same set as display list, sorted A→Z by name.
         expectEquals(static_cast<int>(groups.size()), static_cast<int>(order.size()));
-        for (size_t i = 0; i < groups.size(); ++i)
-            expect(groups[i].object == order[i]);
+        for (size_t i = 1; i < groups.size(); ++i)
+        {
+            expect(TSS::DevSkin::toString(groups[i - 1].object)
+                       .compareIgnoreCase(TSS::DevSkin::toString(groups[i].object))
+                   <= 0);
+        }
     }
 
     void displayOrderCoversInventoryObjects()

@@ -92,8 +92,9 @@ namespace SkinEditorMappingsColumnFilter
     };
 
     /**
-     * Editor-only Mappings table order (descending GUI reading).
-     * Independent of SkinObjectType enum ordinals and inventory push order.
+     * Complete Mappings object inventory (coverage / combo seed).
+     * Presentation order for tables and the Object combo is A→Z by display name
+     * (see filteredObjectGroups / rebuildObjectCombo), not this list's sequence.
      */
     inline const std::vector<TSS::SkinObjectType>& mappingsObjectDisplayOrder()
     {
@@ -152,8 +153,8 @@ namespace SkinEditorMappingsColumnFilter
 
     /**
      * Inventory keys grouped by object under ActiveFilters.
-     * Group order follows mappingsObjectDisplayOrder(); unknown inventory objects
-     * append in first-seen inventory order. Omits empty sections.
+     * Group order is A→Z by display name (same as the Object combo). Unknown
+     * inventory objects are included. Omits empty sections.
      */
     inline std::vector<ObjectKeyGroup> filteredObjectGroups(const TSS::DevSkin::NamedSkin& skin,
                                                             const ActiveFilters& filters)
@@ -191,6 +192,14 @@ namespace SkinEditorMappingsColumnFilter
                 continue;
             appendObject(key.object);
         }
+
+        std::sort(groups.begin(), groups.end(),
+                  [](const ObjectKeyGroup& left, const ObjectKeyGroup& right)
+                  {
+                      return TSS::DevSkin::toString(left.object)
+                                 .compareIgnoreCase(TSS::DevSkin::toString(right.object))
+                             < 0;
+                  });
         return groups;
     }
 
