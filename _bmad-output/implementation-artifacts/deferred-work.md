@@ -3236,3 +3236,12 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-skin-editor-operation-bar-layout.md`
   summary: Rename leftover `kMappingBandHeight` / “band” chrome vocabulary after OPERATION moved onto the title row.
   evidence: Blind Hunter; constant remains a height alias and was left to avoid a wider rename in this oneshot.
+
+## Deferred from: oneshot review of spec-ci-skin-editor-colourpicker-height.md (2026-11-10)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-ci-skin-editor-colourpicker-height.md`
+  summary: Add a DevSkinLayerJson negative case that a non-existing Documents-like path is cleared on session import.
+  evidence: Blind Hunter; happy-path temp dir restores CI; product already drops non-directories in readExistingDirectoryProperty.
+- source_spec: `_bmad-output/implementation-artifacts/spec-ci-skin-editor-colourpicker-height.md`
+  summary: Extract one named tight-pad constant shared by SkinEditorColourPicker preferredHeight/layout and the unit test.
+  evidence: Blind Hunter; magic `kPanelContentPad - 5` already duplicated in product before this oneshot.

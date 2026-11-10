@@ -130,11 +130,11 @@ private:
         expectEquals(probe.satLabel->getX(), probe.hashLabel->getX());
         expectEquals(probe.brightLabel->getX(), probe.hashLabel->getX());
 
-        const int gap = SkinEditorChrome::kPanelContentPad;
-        constexpr int bottomPad = SkinEditorChrome::kPanelContentPad - 5;
-        expectEquals(probe.satLabel->getY(), probe.rgbRowBottom + gap);
+        // Gap under #/RGB and bottom pad: 5px tighter than kPanelContentPad (matches layout).
+        constexpr int tightPad = SkinEditorChrome::kPanelContentPad - 5;
+        expectEquals(probe.satLabel->getY(), probe.rgbRowBottom + tightPad);
         expectEquals(probe.brightLabel->getY(), probe.satLabel->getBottom());
-        expectEquals(h - probe.brightLabel->getBottom(), bottomPad);
+        expectEquals(h - probe.brightLabel->getBottom(), tightPad);
         expectEquals(probe.sliders[0]->getY(), probe.satLabel->getY() + 1);
         expectEquals(probe.sliders[1]->getY(), probe.brightLabel->getY() + 1);
 

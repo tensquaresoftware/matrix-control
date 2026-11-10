@@ -378,8 +378,15 @@ private:
         state.productSkinId = TSS::DevSkin::kCompiledBlackId;
         state.editorSkinId = editorId;
         state.compareOn = true;
-        state.lastSkinJsonDirectory = juce::File::getSpecialLocation(juce::File::userDocumentsDirectory)
-                                          .getFullPathName();
+        // Import keeps lastSkinJsonDirectory only when the path is an existing directory
+        // (Linux CI often has no ~/Documents). Seed a unique real temp folder for the round-trip.
+        const auto skinJsonDir = juce::File::getSpecialLocation(juce::File::tempDirectory)
+                                     .getNonexistentChildFile("DevSkinLayerJsonTests-session-dir", {});
+        const bool skinJsonDirReady = skinJsonDir.createDirectory() || skinJsonDir.isDirectory();
+        expect(skinJsonDirReady);
+        if (! skinJsonDirReady)
+            return;
+        state.lastSkinJsonDirectory = skinJsonDir.getFullPathName();
 
         const auto json = TSS::DevSkin::exportSessionToJson(layer, state);
         expect(json.contains("skinEditorSession"));
@@ -398,6 +405,7 @@ private:
         expect(restoredState.lastImportedJsonPath.isEmpty());
         expect(restoredState.lastImportedJsonFingerprint.isEmpty());
         expect(restoredState.jsonSyncMode == TSS::DevSkin::JsonSyncMode::kAsk);
+        skinJsonDir.deleteRecursively();
     }
 
     void assertLegacyCompareOnIgnored()
