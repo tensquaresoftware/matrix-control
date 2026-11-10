@@ -87,7 +87,7 @@ namespace TSS
                                           colourSet);
         // NumberBox is UCS: borrowed editor tokens always come from k1.
         look.editorText = skin.getColour(SkinObjectType::kNumberBox, SkinColourProperty::kEditorText);
-        look.editorCaret = skin.getColour(SkinObjectType::kNumberBox, SkinColourProperty::kEditorText);
+        look.editorCaret = skin.getColour(SkinObjectType::kNumberBox, SkinColourProperty::kCaret);
         look.font = resolvedTypographyFont(skin, TypographyStyleId::kDefault);
         return look;
     }

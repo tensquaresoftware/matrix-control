@@ -99,6 +99,7 @@ private:
         expect(look.valueBarDisabled == skin->getSliderValueBarColour(false, ColourSet::k4));
         expect(look.textDisabled == skin->getSliderTextColour(false, ColourSet::k4));
         expect(look.editorText == skin->getColour(SkinObjectType::kNumberBox, SkinColourProperty::kEditorText));
+        expect(look.editorCaret == skin->getColour(SkinObjectType::kNumberBox, SkinColourProperty::kCaret));
     }
 };
 
