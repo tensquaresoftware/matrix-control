@@ -137,7 +137,7 @@ namespace SkinEditorChrome
     /**
      * Palette column minimum width. Extra window width is shared with Mappings
      * Mapped colour so both can show the same colour names.
-     * Sized so Color + Palette + Mappings fit kWindowContentMinWidth (1000).
+     * Sized so Color + Palette + Mappings fit at or below kWindowContentMinWidth.
      * Floored at runtime with New/Dup/Del + chrome text via palettePanelMinWidth().
      */
     inline constexpr int kPalettePanelMinWidth = 125;
@@ -238,7 +238,7 @@ namespace SkinEditorChrome
      * OPERATION's minimum is derived so title chrome (SESSION + OPERATION) hits this;
      * Palette min is sized so the body columns fit the same floor.
      */
-    inline constexpr int kWindowContentMinWidth = 1000;
+    inline constexpr int kWindowContentMinWidth = 1100;
     /** Badge → label gap for BRIDGE / MAPPING / LAST PUSH chrome. */
     inline constexpr int kChromeBadgeGap = 8;
     /** Chrome text badges (MAPPING / BRIDGE / …) — thinner than TextButton. */

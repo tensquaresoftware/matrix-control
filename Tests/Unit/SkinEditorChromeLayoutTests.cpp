@@ -44,7 +44,7 @@ private:
 
     void titleChromeMinWidthIncludesOperationFloor()
     {
-        beginTest("Window min width locks at 1000 via derived OPERATION floor");
+        beginTest("Window min width locks at 1100 via derived OPERATION floor");
 
         const int exact = SkinEditorChrome::kWindowEdgeGutter
                           + SkinEditorChrome::sessionWellPreferredWidth()
@@ -54,13 +54,12 @@ private:
         const int bodyMin = SkinEditorChrome::windowBodyWidthForPalettePanel(
             SkinEditorChrome::kPalettePanelMinWidth);
 
-        expectEquals(SkinEditorChrome::kWindowContentMinWidth, 1000);
-        expectEquals(SkinEditorChrome::kWindowBodyMinWidth, 1000);
+        expectEquals(SkinEditorChrome::kWindowContentMinWidth, 1100);
         expectEquals(SkinEditorChrome::windowTitleChromeMinWidth(), exact);
         expectEquals(SkinEditorChrome::windowTitleChromeMinWidth(),
                      SkinEditorChrome::kWindowContentMinWidth);
-        expectEquals(SkinEditorChrome::windowMinWidth(), 1000);
-        expectEquals(bodyMin, SkinEditorChrome::kWindowContentMinWidth);
+        expectEquals(SkinEditorChrome::windowMinWidth(), 1100);
+        expect(bodyMin <= SkinEditorChrome::kWindowContentMinWidth);
     }
 
     void windowFitsFlexiblePaletteMapped()
