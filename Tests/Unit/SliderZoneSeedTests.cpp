@@ -4,6 +4,7 @@
 #include "GUI/Skins/ColourChart.h"
 #include "GUI/Skins/Skin.h"
 #include "GUI/Skins/SkinColoursWidgetsControls.h"
+#include "GUI/Skins/SkinColoursWidgetsDisplays.h"
 
 using TSS::SkinObjectType;
 using TSS::SkinColourProperty;
@@ -98,8 +99,10 @@ private:
                                   ColourSet::k4));
         expect(look.valueBarDisabled == skin->getSliderValueBarColour(false, ColourSet::k4));
         expect(look.textDisabled == skin->getSliderTextColour(false, ColourSet::k4));
-        expect(look.editorText == skin->getColour(SkinObjectType::kNumberBox, SkinColourProperty::kEditorText));
-        expect(look.editorCaret == skin->getColour(SkinObjectType::kNumberBox, SkinColourProperty::kCaret));
+        expect(look.editorText == seed(SliderK4::kEditorText));
+        expect(look.editorCaret == seed(SliderK4::kCaret));
+        expect(look.editorText == seed(TSS::SkinColours::Widgets::NumberBox::kEditorText));
+        expect(look.editorCaret == seed(TSS::SkinColours::Widgets::NumberBox::kCaret));
     }
 };
 

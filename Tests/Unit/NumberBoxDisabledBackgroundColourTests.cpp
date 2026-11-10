@@ -48,6 +48,17 @@ public:
         beginTest("remapCaretOnly_leavesEditorTextWhite");
 
         assertRemapCaretLeavesEditorText();
+
+        beginTest("borders_seedFromFormerButtonBorders");
+
+        expect(NumberBox::kBorder.blackVariant == Button::kBorderOn.blackVariant);
+        expect(NumberBox::kBorder.creamVariant == Button::kBorderOn.creamVariant);
+        expect(NumberBox::kBorderDisabled.blackVariant == Button::kBorderOff.blackVariant);
+        expect(NumberBox::kBorderDisabled.creamVariant == Button::kBorderOff.creamVariant);
+
+        beginTest("remapButtonBorders_leavesNumberBoxBorders");
+
+        assertRemapButtonBordersLeavesNumberBox();
     }
 
 private:
@@ -106,6 +117,31 @@ private:
                                SkinColourProperty::kEditorText,
                                SkinColourState::kDefault)
                == juce::Colour(ColourChart::kWhite));
+    }
+
+    void assertRemapButtonBordersLeavesNumberBox()
+    {
+        using TSS::SkinColourProperty;
+        using TSS::SkinColourState;
+        using TSS::SkinObjectType;
+
+        const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::Black);
+        const auto before = TSS::numberBoxLookFromSkin(*skin);
+        const auto remapped = juce::Colour(ColourChart::kRed500);
+        expect(before.border != remapped && before.borderDisabled != remapped);
+
+        skin->setColour(TSS::skinColourKey(SkinObjectType::kButton, SkinColourProperty::kBorder, SkinColourState::kOff),
+                        remapped);
+        skin->setColour(TSS::skinColourKey(SkinObjectType::kButton, SkinColourProperty::kBorder, SkinColourState::kOn),
+                        remapped);
+
+        const auto after = TSS::numberBoxLookFromSkin(*skin);
+        expect(after.border == before.border);
+        expect(after.borderDisabled == before.borderDisabled);
+        expect(TSS::buttonLookFromSkin(*skin).borderOn == remapped);
+
+        skin->setColour(TSS::skinColourKey(SkinObjectType::kNumberBox, SkinColourProperty::kBorder), remapped);
+        expect(TSS::numberBoxLookFromSkin(*skin).border == remapped);
     }
 };
 

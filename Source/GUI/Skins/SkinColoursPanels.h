@@ -81,5 +81,21 @@ namespace TSS::SkinColours
             ColourChart::kRed900,
             ColourChart::kRed900
         };
+
+        // Overlay dialog title drawn on the title band.
+        inline constexpr ColourElement kDialogText = {
+            skinColourKey(SkinObjectType::kDialog, SkinColourProperty::kText),
+            ColourChart::kGrey200,
+            ColourChart::kGrey200,
+            ColourChart::kCafe950
+        };
+
+        // Settings selected-tab label (fill stays Dialog TitleBand).
+        inline constexpr ColourElement kDialogTextOn = {
+            skinColourKey(SkinObjectType::kDialog, SkinColourProperty::kText, SkinColourState::kOn),
+            ColourChart::kGrey200,
+            ColourChart::kGrey200,
+            ColourChart::kCafe950
+        };
     }
 }

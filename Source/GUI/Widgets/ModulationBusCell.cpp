@@ -211,10 +211,10 @@ void ModulationBusCell::paint(juce::Graphics& g)
         return;
 
     const auto bounds = busNumberLabel_->getBounds().toFloat();
-    // Solid Skin accents (no ColourChart + alpha-as-darken): Blue = source drag, Error red = drop target.
+    // Solid Skin accents (no ColourChart + alpha-as-darken): Clicked = source drag, Hover = drop target.
     const juce::Colour highlightColour = dragSourceHighlighted_
-        ? skin_->getColour(SkinObjectType::kSectionHeader, SkinColourProperty::kLineBlue)
-        : skin_->getColour(SkinObjectType::kFooterMessage, SkinColourProperty::kText, SkinColourState::kError);
+        ? skin_->getColour(SkinObjectType::kLabel, SkinColourProperty::kBackground, SkinColourState::kClicked)
+        : skin_->getColour(SkinObjectType::kLabel, SkinColourProperty::kBackground, SkinColourState::kHover);
     g.setColour(highlightColour);
     g.fillRect(bounds);
 }

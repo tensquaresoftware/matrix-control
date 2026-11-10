@@ -144,8 +144,8 @@ namespace TSS
     {
         juce::Colour background{};
         juce::Colour backgroundDisabled{};
-        juce::Colour borderOff{};
-        juce::Colour borderOn{};
+        juce::Colour border{};
+        juce::Colour borderDisabled{};
         juce::Colour text{};
         // Used instead of `text` while this box owns patch-navigation focus.
         juce::Colour textFocus{};
@@ -167,10 +167,13 @@ namespace TSS
     struct ModuleHeaderLook
     {
         juce::Colour text{};
-        // Opt-in title-hover colour (NumberBox / Computer combo focus-red token).
-        juce::Colour textFocus{};
+        // Opt-in clickable-title hover colour (ModuleHeader Text / Hover).
+        juce::Colour textHover{};
         juce::Colour lineBlue{};
         juce::Colour lineOrange{};
+        // Called-out badge inside a module (ModuleHeader Background|Text / Emphasis).
+        juce::Colour backgroundEmphasis{};
+        juce::Colour textEmphasis{};
         juce::Font font{juce::FontOptions{}};
     };
 

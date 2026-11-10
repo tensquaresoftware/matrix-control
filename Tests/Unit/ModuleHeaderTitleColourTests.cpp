@@ -12,15 +12,15 @@ public:
 
     void runTest() override
     {
-        beginTest("hover_usesFocusColour_onlyWhenClickEnabled");
+        beginTest("hover_usesHoverColour_onlyWhenClickEnabled");
 
         const auto text = juce::Colours::white;
-        const auto focus = juce::Colours::red;
+        const auto hover = juce::Colours::red;
 
-        expect(TSS::resolveModuleHeaderTitleTextColour(true, true, text, focus) == focus);
-        expect(TSS::resolveModuleHeaderTitleTextColour(true, false, text, focus) == text);
-        expect(TSS::resolveModuleHeaderTitleTextColour(false, true, text, focus) == text);
-        expect(TSS::resolveModuleHeaderTitleTextColour(false, false, text, focus) == text);
+        expect(TSS::resolveModuleHeaderTitleTextColour(true, true, text, hover) == hover);
+        expect(TSS::resolveModuleHeaderTitleTextColour(true, false, text, hover) == text);
+        expect(TSS::resolveModuleHeaderTitleTextColour(false, true, text, hover) == text);
+        expect(TSS::resolveModuleHeaderTitleTextColour(false, false, text, hover) == text);
     }
 };
 

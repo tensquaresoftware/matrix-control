@@ -19,20 +19,29 @@ namespace TSS::DevSkin
             out.push_back(&Panels::kDialogBorder);
             out.push_back(&Panels::kDialogTitleBand);
             out.push_back(&Panels::kDialogGlyph);
+            out.push_back(&Panels::kDialogText);
+            out.push_back(&Panels::kDialogTextOn);
             out.push_back(&Widgets::ChromeText::kText);
             out.push_back(&Widgets::ChromeText::kTextHover);
+            out.push_back(&Widgets::ChromeText::kTextEmphasis);
             out.push_back(&Widgets::FooterMessage::kMessageInfo);
             out.push_back(&Widgets::FooterMessage::kMessageWarning);
             out.push_back(&Widgets::FooterMessage::kMessageError);
+            out.push_back(&Widgets::FooterMessage::kGlyphHover);
             out.push_back(&Widgets::SectionHeader::kText);
             out.push_back(&Widgets::SectionHeader::kLineBlue);
             out.push_back(&Widgets::SectionHeader::kLineOrange);
             out.push_back(&Widgets::ModuleHeader::kText);
             out.push_back(&Widgets::ModuleHeader::kLineBlue);
             out.push_back(&Widgets::ModuleHeader::kLineOrange);
+            out.push_back(&Widgets::ModuleHeader::kTextHover);
+            out.push_back(&Widgets::ModuleHeader::kBackgroundEmphasis);
+            out.push_back(&Widgets::ModuleHeader::kTextEmphasis);
             out.push_back(&Widgets::GroupLabel::kText);
             out.push_back(&Widgets::GroupLabel::kLine);
             out.push_back(&Widgets::Label::kText);
+            out.push_back(&Widgets::Label::kBackgroundClicked);
+            out.push_back(&Widgets::Label::kBackgroundHover);
             out.push_back(&Widgets::HorizontalSeparator::kLine);
         }
 
@@ -53,6 +62,9 @@ namespace TSS::DevSkin
             out.push_back(&Widgets::Button::kBorderDisabled);
             out.push_back(&Widgets::Button::kTextDisabled);
             out.push_back(&Widgets::Button::kTextEmphasis);
+            out.push_back(&Widgets::Button::kBackgroundError);
+            out.push_back(&Widgets::Button::kTextError);
+            out.push_back(&Widgets::Button::kSecondaryTextHover);
             out.push_back(&Widgets::Toggle::kBorder);
             out.push_back(&Widgets::Toggle::kBackgroundOff);
             out.push_back(&Widgets::Toggle::kTextOff);
@@ -67,6 +79,8 @@ namespace TSS::DevSkin
             out.push_back(&Widgets::ProgressBar::kValueBarDisabled);
             out.push_back(&Widgets::ProgressBar::kText);
             out.push_back(&Widgets::ProgressBar::kTextDisabled);
+            out.push_back(&Widgets::ProgressBar::kSecondaryText);
+            out.push_back(&Widgets::ProgressBar::kSecondaryTextDisabled);
         }
 
         void appendSliders(std::vector<const SkinColours::ColourElement*>& out)
@@ -80,6 +94,8 @@ namespace TSS::DevSkin
             out.push_back(&Widgets::Slider::kText);
             out.push_back(&Widgets::Slider::kTextDisabled);
             out.push_back(&Widgets::Slider::kFocusBorder);
+            out.push_back(&Widgets::Slider::kEditorText);
+            out.push_back(&Widgets::Slider::kCaret);
             out.push_back(&Widgets::SliderK2::kBackgroundDisabled);
             out.push_back(&Widgets::SliderK2::kFocusBorder);
             out.push_back(&Widgets::SliderK2::kText);
@@ -88,6 +104,8 @@ namespace TSS::DevSkin
             out.push_back(&Widgets::SliderK2::kTrackDisabled);
             out.push_back(&Widgets::SliderK2::kValueBar);
             out.push_back(&Widgets::SliderK2::kValueBarDisabled);
+            out.push_back(&Widgets::SliderK2::kEditorText);
+            out.push_back(&Widgets::SliderK2::kCaret);
             out.push_back(&Widgets::SliderK3::kBackgroundDisabled);
             out.push_back(&Widgets::SliderK3::kFocusBorder);
             out.push_back(&Widgets::SliderK3::kText);
@@ -96,6 +114,8 @@ namespace TSS::DevSkin
             out.push_back(&Widgets::SliderK3::kTrackDisabled);
             out.push_back(&Widgets::SliderK3::kValueBar);
             out.push_back(&Widgets::SliderK3::kValueBarDisabled);
+            out.push_back(&Widgets::SliderK3::kEditorText);
+            out.push_back(&Widgets::SliderK3::kCaret);
             out.push_back(&Widgets::SliderK4::kTrack);
             out.push_back(&Widgets::SliderK4::kFocusBorder);
             out.push_back(&Widgets::SliderK4::kValueBar);
@@ -104,6 +124,8 @@ namespace TSS::DevSkin
             out.push_back(&Widgets::SliderK4::kTextDisabled);
             out.push_back(&Widgets::SliderK4::kTrackDisabled);
             out.push_back(&Widgets::SliderK4::kValueBarDisabled);
+            out.push_back(&Widgets::SliderK4::kEditorText);
+            out.push_back(&Widgets::SliderK4::kCaret);
         }
 
         void appendComboBoxes(std::vector<const SkinColours::ColourElement*>& out)
@@ -181,6 +203,8 @@ namespace TSS::DevSkin
             out.push_back(&Widgets::NumberBox::kEditorSelectionBackground);
             out.push_back(&Widgets::NumberBox::kEditorText);
             out.push_back(&Widgets::NumberBox::kCaret);
+            out.push_back(&Widgets::NumberBox::kBorder);
+            out.push_back(&Widgets::NumberBox::kBorderDisabled);
             out.push_back(&Widgets::EnvelopeDisplay::kBackground);
             out.push_back(&Widgets::EnvelopeDisplay::kBorder);
             out.push_back(&Widgets::EnvelopeDisplay::kEnvelope);

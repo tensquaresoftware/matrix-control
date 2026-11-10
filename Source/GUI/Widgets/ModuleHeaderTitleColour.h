@@ -4,12 +4,12 @@
 
 namespace TSS
 {
-    // Shared by ModuleHeader paint and unit tests (hover focus-red token).
+    // Shared by ModuleHeader paint and unit tests (ModuleHeader Text / Hover token).
     inline juce::Colour resolveModuleHeaderTitleTextColour(bool titleClickEnabled,
                                                            bool titleHovered,
                                                            juce::Colour text,
-                                                           juce::Colour textFocus)
+                                                           juce::Colour textHover)
     {
-        return titleClickEnabled && titleHovered ? textFocus : text;
+        return titleClickEnabled && titleHovered ? textHover : text;
     }
 }

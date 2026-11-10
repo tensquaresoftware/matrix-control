@@ -276,10 +276,9 @@ void BankTransferProgressDialog::paintPhaseLane(juce::Graphics& g, const PhaseLa
     const int barHeight = juce::roundToInt(16.0f * uiScale_);
 
     g.setFont(args.bodyFont);
-    g.setColour(args.enabled ? skin_->getColour(SkinObjectType::kChromeText, SkinColourProperty::kText)
-                             : skin_->getColour(SkinObjectType::kProgressBar,
-                                               SkinColourProperty::kText,
-                                               SkinColourState::kDisabled));
+    g.setColour(skin_->getColour(SkinObjectType::kProgressBar,
+                                 SkinColourProperty::kSecondaryText,
+                                 args.enabled ? SkinColourState::kDefault : SkinColourState::kDisabled));
 
     {
         auto progressLabel = args.body.removeFromTop(lineHeight);

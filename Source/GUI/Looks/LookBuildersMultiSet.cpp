@@ -44,26 +44,25 @@ namespace TSS
     ButtonLook buttonAlertLookFromSkin(const ISkin& skin, ColourSet colourSet)
     {
         // Keep base border colours; only fill/text switch to alert.
-        // Reuse FooterMessage Error pastilles + ChromeText hover white (no ColourChart dig).
+        // Hover/clicked ink is its own pastille so normal Button Text Hover never leaks in.
+        // Alert Error / SecondaryText Hover keys are UCS (k1 seeds); colourSet falls back in Skin::getColour.
         ButtonLook look = buttonLookFromSkin(skin, colourSet);
-        const auto red = skin.getColour(SkinObjectType::kFooterMessage,
-                                        SkinColourProperty::kText,
-                                        SkinColourState::kError);
-        const auto black = skin.getColour(SkinObjectType::kFooterMessage,
-                                          SkinColourProperty::kBackground,
-                                          SkinColourState::kError);
-        const auto white = skin.getColour(SkinObjectType::kChromeText,
-                                          SkinColourProperty::kText,
-                                          SkinColourState::kHover);
+        auto colour = [&](SkinColourProperty property, SkinColourState state)
+        {
+            return skin.getColour(SkinObjectType::kButton, property, state, colourSet);
+        };
+        const auto fill = colour(SkinColourProperty::kBackground, SkinColourState::kError);
+        const auto text = colour(SkinColourProperty::kText, SkinColourState::kError);
+        const auto textHover = colour(SkinColourProperty::kSecondaryText, SkinColourState::kHover);
 
-        look.backgroundOff = red;
-        look.backgroundOn = red;
-        look.backgroundHover = red;
-        look.backgroundClicked = red;
-        look.textOff = black;
-        look.textOn = black;
-        look.textHover = white;
-        look.textClicked = white;
+        look.backgroundOff = fill;
+        look.backgroundOn = fill;
+        look.backgroundHover = fill;
+        look.backgroundClicked = fill;
+        look.textOff = text;
+        look.textOn = text;
+        look.textHover = textHover;
+        look.textClicked = textHover;
         look.font = skin.getBaseFontBold().withHeight(look.font.getHeight());
         return look;
     }
@@ -85,9 +84,14 @@ namespace TSS
                                           SkinColourProperty::kFocusBorder,
                                           SkinColourState::kDefault,
                                           colourSet);
-        // NumberBox is UCS: borrowed editor tokens always come from k1.
-        look.editorText = skin.getColour(SkinObjectType::kNumberBox, SkinColourProperty::kEditorText);
-        look.editorCaret = skin.getColour(SkinObjectType::kNumberBox, SkinColourProperty::kCaret);
+        look.editorText = skin.getColour(SkinObjectType::kSlider,
+                                         SkinColourProperty::kEditorText,
+                                         SkinColourState::kDefault,
+                                         colourSet);
+        look.editorCaret = skin.getColour(SkinObjectType::kSlider,
+                                          SkinColourProperty::kCaret,
+                                          SkinColourState::kDefault,
+                                          colourSet);
         look.font = resolvedTypographyFont(skin, TypographyStyleId::kDefault);
         return look;
     }
@@ -218,14 +222,15 @@ namespace TSS
                                                  SkinColourProperty::kBackground,
                                                  SkinColourState::kDisabled,
                                                  colourSet);
-        look.borderOff = skin.getColour(SkinObjectType::kButton,
-                                        SkinColourProperty::kBorder,
-                                        SkinColourState::kOff,
-                                        colourSet);
-        look.borderOn = skin.getColour(SkinObjectType::kButton,
-                                       SkinColourProperty::kBorder,
-                                       SkinColourState::kOn,
-                                       colourSet);
+        // NumberBox borders are UCS (k1 seeds only); higher colourSet args fall back in Skin::getColour.
+        look.border = skin.getColour(SkinObjectType::kNumberBox,
+                                     SkinColourProperty::kBorder,
+                                     SkinColourState::kDefault,
+                                     colourSet);
+        look.borderDisabled = skin.getColour(SkinObjectType::kNumberBox,
+                                             SkinColourProperty::kBorder,
+                                             SkinColourState::kDisabled,
+                                             colourSet);
         look.text = skin.getColour(SkinObjectType::kNumberBox,
                                    SkinColourProperty::kText,
                                    SkinColourState::kDefault,

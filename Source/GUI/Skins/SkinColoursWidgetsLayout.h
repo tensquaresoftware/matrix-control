@@ -52,6 +52,29 @@ namespace TSS::SkinColours
                 ColourChart::kOrange,
                 ColourChart::kOrange
             };
+
+            // Clickable module title under the pointer.
+            inline constexpr ColourElement kTextHover = {
+                skinColourKey(SkinObjectType::kModuleHeader, SkinColourProperty::kText, SkinColourState::kHover),
+                ColourChart::kRed500,
+                ColourChart::kRed500,
+                ColourChart::kRed500
+            };
+
+            // Called-out badge inside a module (e.g. Ramp "M" master override).
+            inline constexpr ColourElement kBackgroundEmphasis = {
+                skinColourKey(SkinObjectType::kModuleHeader, SkinColourProperty::kBackground, SkinColourState::kEmphasis),
+                ColourChart::kOrange,
+                ColourChart::kOrange,
+                ColourChart::kOrange
+            };
+
+            inline constexpr ColourElement kTextEmphasis = {
+                skinColourKey(SkinObjectType::kModuleHeader, SkinColourProperty::kText, SkinColourState::kEmphasis),
+                ColourChart::kGrey900,
+                ColourChart::kGrey900,
+                ColourChart::kCream
+            };
         }
 
         namespace GroupLabel
@@ -78,6 +101,22 @@ namespace TSS::SkinColours
                 ColourChart::kGrey200,
                 ColourChart::kGrey200,
                 ColourChart::kCafe950
+            };
+
+            // Plate behind a label being dragged (e.g. modulation bus source).
+            inline constexpr ColourElement kBackgroundClicked = {
+                skinColourKey(SkinObjectType::kLabel, SkinColourProperty::kBackground, SkinColourState::kClicked),
+                ColourChart::kBlue,
+                ColourChart::kBlue,
+                ColourChart::kBlue
+            };
+
+            // Plate behind a label hovered as a drop target.
+            inline constexpr ColourElement kBackgroundHover = {
+                skinColourKey(SkinObjectType::kLabel, SkinColourProperty::kBackground, SkinColourState::kHover),
+                ColourChart::kRed500,
+                ColourChart::kRed500,
+                ColourChart::kRed500
             };
         }
 
@@ -108,6 +147,14 @@ namespace TSS::SkinColours
                 ColourChart::kWhite,
                 ColourChart::kCafe900
             };
+
+            // Called-out chrome text (e.g. About link hover) — Hover stays the logo white.
+            inline constexpr ColourElement kTextEmphasis = {
+                skinColourKey(SkinObjectType::kChromeText, SkinColourProperty::kText, SkinColourState::kEmphasis),
+                ColourChart::kOrange,
+                ColourChart::kOrange,
+                ColourChart::kOrange
+            };
         }
 
         namespace FooterMessage
@@ -131,6 +178,14 @@ namespace TSS::SkinColours
                 ColourChart::kRed500,
                 ColourChart::kRed500,
                 ColourChart::kRed500
+            };
+
+            // Sticky message close cross under the pointer.
+            inline constexpr ColourElement kGlyphHover = {
+                skinColourKey(SkinObjectType::kFooterMessage, SkinColourProperty::kGlyph, SkinColourState::kHover),
+                ColourChart::kWhite,
+                ColourChart::kWhite,
+                ColourChart::kBlack
             };
         }
     }

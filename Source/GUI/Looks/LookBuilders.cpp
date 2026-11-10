@@ -105,11 +105,17 @@ namespace TSS
     {
         ModuleHeaderLook look;
         look.text = skin.getColour(SkinObjectType::kModuleHeader, SkinColourProperty::kText);
-        look.textFocus = skin.getColour(SkinObjectType::kNumberBox,
+        look.textHover = skin.getColour(SkinObjectType::kModuleHeader,
                                         SkinColourProperty::kText,
-                                        SkinColourState::kFocus);
+                                        SkinColourState::kHover);
         look.lineBlue = skin.getColour(SkinObjectType::kModuleHeader, SkinColourProperty::kLineBlue);
         look.lineOrange = skin.getColour(SkinObjectType::kModuleHeader, SkinColourProperty::kLineOrange);
+        look.backgroundEmphasis = skin.getColour(SkinObjectType::kModuleHeader,
+                                                 SkinColourProperty::kBackground,
+                                                 SkinColourState::kEmphasis);
+        look.textEmphasis = skin.getColour(SkinObjectType::kModuleHeader,
+                                           SkinColourProperty::kText,
+                                           SkinColourState::kEmphasis);
         look.font = resolvedTypographyFont(skin, TypographyStyleId::kModuleHeader);
         return look;
     }

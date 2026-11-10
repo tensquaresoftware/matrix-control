@@ -106,6 +106,29 @@ namespace TSS::SkinColours
                 ColourChart::kRed500,
                 ColourChart::kRed500
             };
+
+            /** Alert button (e.g. panic) idle fill and label. */
+            inline constexpr ColourElement kBackgroundError = {
+                skinColourKey(SkinObjectType::kButton, SkinColourProperty::kBackground, SkinColourState::kError),
+                ColourChart::kRed500,
+                ColourChart::kRed500,
+                ColourChart::kRed500
+            };
+
+            inline constexpr ColourElement kTextError = {
+                skinColourKey(SkinObjectType::kButton, SkinColourProperty::kText, SkinColourState::kError),
+                ColourChart::kBlack,
+                ColourChart::kBlack,
+                ColourChart::kBlack
+            };
+
+            /** Alert button hover/clicked label — kept apart from normal Text Hover. */
+            inline constexpr ColourElement kSecondaryTextHover = {
+                skinColourKey(SkinObjectType::kButton, SkinColourProperty::kSecondaryText, SkinColourState::kHover),
+                ColourChart::kWhite,
+                ColourChart::kWhite,
+                ColourChart::kCafe900
+            };
         }
 
         namespace Toggle
@@ -225,6 +248,20 @@ namespace TSS::SkinColours
                 Common::kContentDisabled,
                 ColourChart::kCafe600
             };
+
+            inline constexpr ColourElement kEditorText = {
+                skinColourKey(SkinObjectType::kSlider, SkinColourProperty::kEditorText),
+                ColourChart::kWhite,
+                ColourChart::kWhite,
+                ColourChart::kCafe950
+            };
+
+            inline constexpr ColourElement kCaret = {
+                skinColourKey(SkinObjectType::kSlider, SkinColourProperty::kCaret),
+                ColourChart::kWhite,
+                ColourChart::kWhite,
+                ColourChart::kWhite
+            };
         }
 
         namespace SliderK2
@@ -291,6 +328,22 @@ namespace TSS::SkinColours
                 ColourChart::kGrey700,
                 ColourChart::kGrey700,
                 ColourChart::kCafe600
+            };
+
+            inline constexpr ColourElement kEditorText = {
+                skinColourKey(SkinObjectType::kSlider, SkinColourProperty::kEditorText,
+                              SkinColourState::kDefault, ColourSet::k2),
+                ColourChart::kWhite,
+                ColourChart::kWhite,
+                ColourChart::kCafe950
+            };
+
+            inline constexpr ColourElement kCaret = {
+                skinColourKey(SkinObjectType::kSlider, SkinColourProperty::kCaret,
+                              SkinColourState::kDefault, ColourSet::k2),
+                ColourChart::kWhite,
+                ColourChart::kWhite,
+                ColourChart::kWhite
             };
         }
 
@@ -359,6 +412,22 @@ namespace TSS::SkinColours
                 ColourChart::kGrey700,
                 ColourChart::kCafe600
             };
+
+            inline constexpr ColourElement kEditorText = {
+                skinColourKey(SkinObjectType::kSlider, SkinColourProperty::kEditorText,
+                              SkinColourState::kDefault, ColourSet::k3),
+                ColourChart::kWhite,
+                ColourChart::kWhite,
+                ColourChart::kCafe950
+            };
+
+            inline constexpr ColourElement kCaret = {
+                skinColourKey(SkinObjectType::kSlider, SkinColourProperty::kCaret,
+                              SkinColourState::kDefault, ColourSet::k3),
+                ColourChart::kWhite,
+                ColourChart::kWhite,
+                ColourChart::kWhite
+            };
         }
 
         namespace SliderK4
@@ -426,6 +495,22 @@ namespace TSS::SkinColours
                 ColourChart::kGrey700,
                 ColourChart::kCafe600
             };
+
+            inline constexpr ColourElement kEditorText = {
+                skinColourKey(SkinObjectType::kSlider, SkinColourProperty::kEditorText,
+                              SkinColourState::kDefault, ColourSet::k4),
+                ColourChart::kWhite,
+                ColourChart::kWhite,
+                ColourChart::kCafe950
+            };
+
+            inline constexpr ColourElement kCaret = {
+                skinColourKey(SkinObjectType::kSlider, SkinColourProperty::kCaret,
+                              SkinColourState::kDefault, ColourSet::k4),
+                ColourChart::kWhite,
+                ColourChart::kWhite,
+                ColourChart::kWhite
+            };
         }
 
         /** UCS modal progress bar (mono greys on Black). */
@@ -468,6 +553,21 @@ namespace TSS::SkinColours
 
             inline constexpr ColourElement kTextDisabled = {
                 skinColourKey(SkinObjectType::kProgressBar, SkinColourProperty::kText, SkinColourState::kDisabled),
+                Common::kContentDisabled,
+                Common::kContentDisabled,
+                ColourChart::kCafe600
+            };
+
+            /** Phase label above each bar (the percent readout uses Text). */
+            inline constexpr ColourElement kSecondaryText = {
+                skinColourKey(SkinObjectType::kProgressBar, SkinColourProperty::kSecondaryText),
+                ColourChart::kGrey200,
+                ColourChart::kGrey200,
+                ColourChart::kCafe800
+            };
+
+            inline constexpr ColourElement kSecondaryTextDisabled = {
+                skinColourKey(SkinObjectType::kProgressBar, SkinColourProperty::kSecondaryText, SkinColourState::kDisabled),
                 Common::kContentDisabled,
                 Common::kContentDisabled,
                 ColourChart::kCafe600

@@ -88,9 +88,9 @@ private:
         expect(inventory.size() >= 2);
         const std::set<TSS::SkinColourKey> validKeys(inventory.begin(), inventory.end());
 
-        // Slider+Caret is not a structured inventory key (caret belongs to text fields).
+        // Slider+TitleBand is not a structured inventory key (title bands belong to dialogs).
         const auto orphan = TSS::skinColourKey(TSS::SkinObjectType::kSlider,
-                                               TSS::SkinColourProperty::kCaret);
+                                               TSS::SkinColourProperty::kTitleBand);
         expect(validKeys.find(orphan) == validKeys.end());
 
         const auto cleaned = TSS::DevSkin::sanitizeMappingLinkGroups(

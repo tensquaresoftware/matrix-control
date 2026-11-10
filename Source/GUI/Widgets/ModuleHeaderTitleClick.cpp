@@ -27,7 +27,7 @@ namespace TSS
 
     juce::Colour ModuleHeader::resolveTitleTextColour() const
     {
-        return resolveModuleHeaderTitleTextColour(isTitleClickEnabled(), titleHovered_, look_.text, look_.textFocus);
+        return resolveModuleHeaderTitleTextColour(isTitleClickEnabled(), titleHovered_, look_.text, look_.textHover);
     }
 
     juce::Rectangle<float> ModuleHeader::getTitleInteractionBounds() const

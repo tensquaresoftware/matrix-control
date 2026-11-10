@@ -3245,3 +3245,12 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-ci-skin-editor-colourpicker-height.md`
   summary: Extract one named tight-pad constant shared by SkinEditorColourPicker preferredHeight/layout and the unit test.
   evidence: Blind Hunter; magic `kPanelContentPad - 5` already duplicated in product before this oneshot.
+
+## Deferred from: review of spec-skin-colour-object-ownership.md (2026-11-10)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-colour-object-ownership.md`
+  summary: Dialog overlay content fill still reads HeaderPanel Background (not BodyPanel/ChromeText/HorizontalSeparator shared chrome).
+  evidence: Blind+Edge; pre-existing borrow left unchanged by ownership pass; remapping HeaderPanel Background still recolours dialog content areas.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-colour-object-ownership.md`
+  summary: No automated paint-site checks for Settings tab, Dialog title, About link hover, Footer sticky close, ModulationBus highlights, Ramp badge, or ProgressBar phase labels (seed/look tests only).
+  evidence: Blind+Verification Gap; repo leaves GUI paint to Standalone/Skin Editor manual smoke; seed remaps stay green if a getColour call site regresses.

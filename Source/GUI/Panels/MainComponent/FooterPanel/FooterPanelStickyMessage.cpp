@@ -89,7 +89,7 @@ int FooterPanel::paintSeverityIconBadgeChrome(juce::Graphics& g,
 
     const auto cross = TSS::makeSeverityCloseCrossShape();
     const auto crossColour = args.severityBadgeHovered
-        ? skin_->getColour(SkinObjectType::kButton, SkinColourProperty::kText, SkinColourState::kHover)
+        ? skin_->getColour(SkinObjectType::kFooterMessage, SkinColourProperty::kGlyph, SkinColourState::kHover)
         : args.badgeTextColour;
     TSS::paintSeverityCloseGlyphInSquare(g, { square, cross, crossColour });
 

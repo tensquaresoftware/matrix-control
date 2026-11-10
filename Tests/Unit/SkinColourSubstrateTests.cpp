@@ -154,14 +154,14 @@ private:
                == seedFor(variant, ColourChart::kGrey600, ColourChart::kCafe400));
 
         const auto alertLook = TSS::buttonAlertLookFromSkin(*skin);
-        const auto alertRed = skin->getColour(SkinObjectType::kFooterMessage,
-                                              SkinColourProperty::kText,
+        const auto alertRed = skin->getColour(SkinObjectType::kButton,
+                                              SkinColourProperty::kBackground,
                                               SkinColourState::kError);
-        const auto alertBlack = skin->getColour(SkinObjectType::kFooterMessage,
-                                                SkinColourProperty::kBackground,
-                                                SkinColourState::kError);
-        const auto alertWhite = skin->getColour(SkinObjectType::kChromeText,
+        const auto alertBlack = skin->getColour(SkinObjectType::kButton,
                                                 SkinColourProperty::kText,
+                                                SkinColourState::kError);
+        const auto alertWhite = skin->getColour(SkinObjectType::kButton,
+                                                SkinColourProperty::kSecondaryText,
                                                 SkinColourState::kHover);
         expect(alertLook.backgroundOff == alertRed);
         expect(alertLook.backgroundOn == alertRed);
@@ -169,8 +169,8 @@ private:
         expect(alertLook.backgroundClicked == alertRed);
         expect(alertLook.textOff == alertBlack);
         expect(alertLook.textOn == alertBlack);
-        expect(alertLook.textHover == alertWhite);
-        expect(alertLook.textClicked == alertWhite);
+        expect(alertLook.textHover == alertWhite && alertLook.textClicked == alertWhite);
+        expect(alertWhite == seedFor(variant, ColourChart::kWhite, ColourChart::kCafe900));
     }
 
     void assertBodyBackgroundColumns()

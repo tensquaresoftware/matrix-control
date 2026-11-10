@@ -63,6 +63,20 @@ namespace TSS::SkinColours
                 ColourChart::kWhite,
                 ColourChart::kWhite
             };
+
+            inline constexpr ColourElement kBorder = {
+                skinColourKey(SkinObjectType::kNumberBox, SkinColourProperty::kBorder),
+                ColourChart::kGrey800,
+                ColourChart::kGrey800,
+                ColourChart::kCafe800
+            };
+
+            inline constexpr ColourElement kBorderDisabled = {
+                skinColourKey(SkinObjectType::kNumberBox, SkinColourProperty::kBorder, SkinColourState::kDisabled),
+                ColourChart::kGrey800,
+                ColourChart::kGrey800,
+                ColourChart::kCafe800
+            };
         }
 
         namespace EnvelopeDisplay

@@ -146,7 +146,7 @@ void SettingsTabRail::rebuildLooks()
 {
     const auto labelLook = TSS::labelLookFromSkin(*skin_);
     const auto selectedFill = skin_->getColour(SkinObjectType::kDialog, SkinColourProperty::kTitleBand);
-    const auto selectedText = skin_->getColour(SkinObjectType::kButton, SkinColourProperty::kText, SkinColourState::kOff);
+    const auto selectedText = skin_->getColour(SkinObjectType::kDialog, SkinColourProperty::kText, SkinColourState::kOn);
 
     for (auto& tab : tabs_)
     {

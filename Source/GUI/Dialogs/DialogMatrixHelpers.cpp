@@ -333,8 +333,7 @@ namespace DialogMatrixHelpers
         args.g.setColour(args.skin.getColour(SkinObjectType::kDialog, SkinColourProperty::kTitleBand));
         args.g.fillRect(titleBar);
 
-        // Same light grey as idle Matrix button labels (not pure white).
-        args.g.setColour(args.skin.getColour(SkinObjectType::kButton, SkinColourProperty::kText, SkinColourState::kOff));
+        args.g.setColour(args.skin.getColour(SkinObjectType::kDialog, SkinColourProperty::kText));
         args.g.setFont(scaledTitleFont(args.skin, args.uiScale));
         args.g.drawText(args.title.toUpperCase(), titleBar, juce::Justification::centred, false);
     }

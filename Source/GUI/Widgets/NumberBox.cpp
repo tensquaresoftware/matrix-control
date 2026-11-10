@@ -249,7 +249,7 @@ namespace TSS
 
     juce::Colour NumberBox::getBorderColour() const
     {
-        return isEnabled() ? look_.borderOn : look_.borderOff;
+        return isEnabled() ? look_.border : look_.borderDisabled;
     }
 
     juce::Colour NumberBox::getTextColour() const
