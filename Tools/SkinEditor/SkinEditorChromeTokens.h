@@ -242,7 +242,7 @@ namespace SkinEditorChrome
     /** Badge → label gap for BRIDGE / MAPPING / LAST PUSH chrome. */
     inline constexpr int kChromeBadgeGap = 8;
     /** Gap between JSON Sync WARNING close (X) badge and the WARNING badge. */
-    inline constexpr int kJsonSyncNoticeCloseGap = 1;
+    inline constexpr int kJsonSyncNoticeCloseGap = 2;
     /** Chrome text badges (MAPPING / BRIDGE / …) — thinner than TextButton. */
     inline constexpr int kMappingBadgeHeight = 16;
     inline constexpr float kMappingBadgeFont = 11.0f;
