@@ -19,6 +19,8 @@ namespace TSS
         juce::Colour backgroundDisabled{};
         juce::Colour borderDisabled{};
         juce::Colour textDisabled{};
+        /** Called-out label among peers (Button Text / Emphasis). */
+        juce::Colour textEmphasis{};
         juce::Font font{juce::FontOptions{}};
     };
 
@@ -59,6 +61,8 @@ namespace TSS
         juce::Colour triangleDisabled{};
         juce::Colour textEnabled{};
         juce::Colour textDisabled{};
+        /** Navigation-focus label (ComboBox Text / Focus). */
+        juce::Colour textFocus{};
         juce::Font font{juce::FontOptions{}};
     };
 

@@ -118,6 +118,10 @@ private:
     void syncJsonSyncComboFromSession();
     void applyJsonSyncComboChange();
     void applyJsonSyncSessionUi();
+    /** Auto JSON reload: replace LAST PUSH strip with dismissible WARNING notice. */
+    void showJsonSyncReloadNotice(const juce::String& detail);
+    void dismissJsonSyncReloadNotice();
+    void layoutStatusPushOrNoticeStrip(int badgeY, int badgeH, int gap, const juce::Font& statusFont);
 
     // Mapping modes (SkinEditorMainComponentMapping.cpp)
     void onPastilleSelected(const juce::String& name);
@@ -244,11 +248,28 @@ private:
         StatusTipHitArea() { setInterceptsMouseClicks(true, false); }
     };
     StatusTipHitArea lastPushBadgeHit_;
+    /** Click target for the square close badge on the JSON Sync reload notice. */
+    struct StatusCloseHitArea final : public juce::Component
+    {
+        std::function<void()> onClick;
+        StatusCloseHitArea() { setInterceptsMouseClicks(true, false); }
+        void mouseDown(const juce::MouseEvent&) override
+        {
+            if (onClick != nullptr)
+                onClick();
+        }
+    };
+    StatusCloseHitArea jsonSyncNoticeCloseHit_;
     /** Required for Label::setTooltip to show (JUCE does not create one automatically). */
     juce::TooltipWindow tooltipWindow_ { this };
     juce::Rectangle<int> connectionBadgeBounds_;
     juce::Rectangle<int> lastPushBadgeBounds_;
+    juce::Rectangle<int> jsonSyncNoticeCloseBounds_;
     juce::Rectangle<int> appBadgeBounds_;
+    /** When true, status mid-strip shows WARNING + reload time instead of LAST PUSH. */
+    bool jsonSyncReloadNoticeVisible_ = false;
+    juce::String jsonSyncReloadNoticeText_;
+    juce::String statusDetailBeforeJsonSyncNotice_;
 
     juce::Label sessionTitleLabel_;
     juce::TextButton undoButton_ { "Undo" };

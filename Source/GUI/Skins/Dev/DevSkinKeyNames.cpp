@@ -71,6 +71,7 @@ namespace TSS::DevSkin
             { SkinColourState::kClicked, "Clicked" },
             { SkinColourState::kDisabled, "Disabled" },
             { SkinColourState::kFocus, "Focus" },
+            { SkinColourState::kEmphasis, "Emphasis" },
             { SkinColourState::kInfo, "Info" },
             { SkinColourState::kWarning, "Warning" },
             { SkinColourState::kError, "Error" },

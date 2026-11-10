@@ -77,6 +77,9 @@ void SkinEditorMainComponent::setupStatusBarChrome()
     versionLabel_.setText("v" + juce::String(JUCE_APPLICATION_VERSION_STRING),
                           juce::dontSendNotification);
     addAndMakeVisible(lastPushBadgeHit_);
+    jsonSyncNoticeCloseHit_.onClick = [this] { dismissJsonSyncReloadNotice(); };
+    addAndMakeVisible(jsonSyncNoticeCloseHit_);
+    jsonSyncNoticeCloseHit_.setVisible(false);
 }
 
 void SkinEditorMainComponent::setupSkinsPanel()
@@ -195,7 +198,20 @@ void SkinEditorMainComponent::paint(juce::Graphics& g)
         SkinEditorChrome::drawChromeBadge(g, connectionBadgeBounds_, "BRIDGE", bridgeFill);
     }
     if (! lastPushBadgeBounds_.isEmpty())
-        SkinEditorChrome::drawChromeBadge(g, lastPushBadgeBounds_, "LAST PUSH");
+    {
+        if (jsonSyncReloadNoticeVisible_)
+            SkinEditorChrome::drawChromeBadge(g,
+                                              lastPushBadgeBounds_,
+                                              "WARNING",
+                                              SkinEditorChrome::attention());
+        else
+            SkinEditorChrome::drawChromeBadge(g, lastPushBadgeBounds_, "LAST PUSH");
+    }
+    if (! jsonSyncNoticeCloseBounds_.isEmpty())
+        SkinEditorChrome::drawChromeBadge(g,
+                                          jsonSyncNoticeCloseBounds_,
+                                          "X",
+                                          SkinEditorChrome::attention());
     if (! appBadgeBounds_.isEmpty())
         SkinEditorChrome::drawChromeBadge(g, appBadgeBounds_, "APP");
 }
@@ -356,13 +372,14 @@ void SkinEditorMainComponent::layoutStatusBar(juce::Rectangle<int> statusBar)
                                   SkinEditorChrome::kStatusChromeNudgeY);
     const auto statusFont = SkinEditorChrome::fontRegular();
     const int connBadgeW = SkinEditorChrome::chromeBadgeWidth("BRIDGE");
-    const int pushBadgeW = SkinEditorChrome::chromeBadgeWidth("LAST PUSH");
+    const int pushBadgeW = SkinEditorChrome::chromeBadgeWidth(
+        jsonSyncReloadNoticeVisible_ ? "WARNING" : "LAST PUSH");
     const int appBadgeW = SkinEditorChrome::chromeBadgeWidth("APP");
     const int versionW = SkinEditorChrome::measureTextWidth(statusFont, versionLabel_.getText()) + 4;
 
     const int leftX = statusBar.getX();
     connectionBadgeBounds_ = { leftX, badgeY, connBadgeW, badgeH };
-    // Align LAST PUSH with Palette column (Color width + Palette side gap).
+    // Align LAST PUSH / WARNING with Palette column (Color width + Palette side gap).
     const int pushBadgeX = leftX + SkinEditorChrome::kColorPanelWidth
                            + SkinEditorChrome::kPaletteSideGap;
     lastPushBadgeBounds_ = { pushBadgeX, badgeY, pushBadgeW, badgeH };
@@ -378,18 +395,7 @@ void SkinEditorMainComponent::layoutStatusBar(juce::Rectangle<int> statusBar)
     connectionLabel_.setTooltip({});
     connectionLabel_.setBounds(connLabelX, badgeY, connLabelMaxW, badgeH);
 
-    const int pushLabelX = lastPushBadgeBounds_.getRight() + gap;
-    const int pushLabelMaxW = juce::jmax(0, appBadgeBounds_.getX() - gap - pushLabelX);
-    const auto pushFull = statusDetail_.isNotEmpty() ? statusDetail_ : "None";
-    const auto pushShown = SkinEditorChrome::elidePathToWidth(statusFont, pushFull, pushLabelMaxW);
-    const bool exportPathTip = pushFull.startsWith("Exported: ") && pushShown != pushFull;
-    const auto pushTip = exportPathTip ? pushFull : juce::String {};
-    lastPushLabel_.setText(pushShown, juce::dontSendNotification);
-    lastPushLabel_.setTooltip(pushTip);
-    lastPushLabel_.setBounds(pushLabelX, badgeY, pushLabelMaxW, badgeH);
-    lastPushBadgeHit_.setBounds(lastPushBadgeBounds_);
-    lastPushBadgeHit_.setTooltip(pushTip);
-
+    layoutStatusPushOrNoticeStrip(badgeY, badgeH, gap, statusFont);
     versionLabel_.setBounds(appX + appBadgeW + gap, badgeY, versionW, badgeH);
 }
 
@@ -401,6 +407,7 @@ void SkinEditorMainComponent::resized()
     operationContentBounds_ = {};
     connectionBadgeBounds_ = {};
     lastPushBadgeBounds_ = {};
+    jsonSyncNoticeCloseBounds_ = {};
     appBadgeBounds_ = {};
     mappingBadgeBounds_ = {};
     mappingSwatchBounds_ = {};

@@ -71,6 +71,13 @@ namespace TSS::SkinColours
                 Common::kContentDisabled,
                 ColourChart::kCafe600
             };
+
+            inline constexpr ColourElement kTextFocus = {
+                skinColourKey(SkinObjectType::kComboBox, SkinColourProperty::kText, SkinColourState::kFocus),
+                ColourChart::kRed500,
+                ColourChart::kRed500,
+                ColourChart::kRed500
+            };
         }
 
         namespace ComboBoxK2
@@ -129,6 +136,14 @@ namespace TSS::SkinColours
                 Common::kContentDisabled,
                 ColourChart::kGrey600,
                 ColourChart::kCafe600
+            };
+
+            inline constexpr ColourElement kTextFocus = {
+                skinColourKey(SkinObjectType::kComboBox, SkinColourProperty::kText,
+                              SkinColourState::kFocus, ColourSet::k2),
+                ColourChart::kRed500,
+                ColourChart::kRed500,
+                ColourChart::kRed500
             };
 
             inline constexpr ColourElement kTriangle = {
@@ -204,6 +219,14 @@ namespace TSS::SkinColours
                 Common::kContentDisabled,
                 ColourChart::kGrey600,
                 ColourChart::kCafe600
+            };
+
+            inline constexpr ColourElement kTextFocus = {
+                skinColourKey(SkinObjectType::kComboBox, SkinColourProperty::kText,
+                              SkinColourState::kFocus, ColourSet::k3),
+                ColourChart::kRed500,
+                ColourChart::kRed500,
+                ColourChart::kRed500
             };
 
             inline constexpr ColourElement kTriangle = {

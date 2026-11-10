@@ -173,6 +173,8 @@ namespace TSS
         kClicked,
         kDisabled,
         kFocus,
+        /** Called-out among peers (not navigation focus) — e.g. Button Text Emphasis. */
+        kEmphasis,
         kInfo,
         kWarning,
         kError

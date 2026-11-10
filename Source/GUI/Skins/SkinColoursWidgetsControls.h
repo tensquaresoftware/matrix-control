@@ -98,6 +98,14 @@ namespace TSS::SkinColours
                 Common::kContentDisabled,
                 ColourChart::kCafe600
             };
+
+            /** Called-out button label (e.g. current bank marker) — not Off/On/Focus. */
+            inline constexpr ColourElement kTextEmphasis = {
+                skinColourKey(SkinObjectType::kButton, SkinColourProperty::kText, SkinColourState::kEmphasis),
+                ColourChart::kRed500,
+                ColourChart::kRed500,
+                ColourChart::kRed500
+            };
         }
 
         namespace Toggle

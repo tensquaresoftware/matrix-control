@@ -157,9 +157,10 @@ namespace TSS
     {
         const auto bounds = getLocalBounds().toFloat();
 
-        // Parent paints the red edit plate so the grey border sits flush (no black ring).
+        // Parent paints the edit plate (EditorBackground) so the border sits flush; the
+        // TextEditor fill stays transparent. Focus text colour is only for idle highlight.
         const auto fill = editor_ != nullptr
-                              ? look_.textFocus
+                              ? look_.editorBackground
                               : (isEnabled() ? look_.background : look_.backgroundDisabled);
         g.setColour(fill);
         g.fillRect(bounds);

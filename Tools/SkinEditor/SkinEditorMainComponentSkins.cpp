@@ -146,7 +146,7 @@ void SkinEditorMainComponent::setupSessionWell()
     jsonSyncCombo_.addItem("Ask", static_cast<int>(TSS::DevSkin::JsonSyncMode::kAsk) + 1);
     jsonSyncCombo_.addItem("Auto", static_cast<int>(TSS::DevSkin::JsonSyncMode::kAuto) + 1);
     jsonSyncCombo_.setTooltip(
-        "Off: ignore disk changes. Ask: prompt Reload/Discard. Auto: reload when clean.");
+        "Off: ignore disk changes. Ask: prompt Reload/Discard. Auto: reload without asking (disk wins).");
     addAndMakeVisible(jsonSyncCombo_);
     jsonSyncCombo_.addListener(this);
     syncJsonSyncComboFromSession();
@@ -237,4 +237,43 @@ void SkinEditorMainComponent::layoutBodyPanels(juce::Rectangle<int> bounds)
     palettePanel_.setBounds(bounds.removeFromLeft(paletteW));
     bounds.removeFromLeft(paletteGap);
     mappingsPanel_.setBounds(bounds.removeFromLeft(mappingsW));
+}
+
+void SkinEditorMainComponent::layoutStatusPushOrNoticeStrip(int badgeY,
+                                                            int badgeH,
+                                                            int gap,
+                                                            const juce::Font& statusFont)
+{
+    jsonSyncNoticeCloseBounds_ = {};
+    if (jsonSyncReloadNoticeVisible_)
+    {
+        const int closeX = appBadgeBounds_.getX() - gap - badgeH;
+        jsonSyncNoticeCloseBounds_ = { closeX, badgeY, badgeH, badgeH };
+        const int labelX = lastPushBadgeBounds_.getRight() + gap;
+        const int labelMaxW = juce::jmax(0, closeX - gap - labelX);
+        lastPushLabel_.setText(SkinEditorChrome::elideToWidth(statusFont,
+                                                              jsonSyncReloadNoticeText_,
+                                                              labelMaxW),
+                               juce::dontSendNotification);
+        lastPushLabel_.setTooltip(jsonSyncReloadNoticeText_);
+        lastPushLabel_.setBounds(labelX, badgeY, labelMaxW, badgeH);
+        lastPushBadgeHit_.setBounds({});
+        lastPushBadgeHit_.setTooltip({});
+        jsonSyncNoticeCloseHit_.setBounds(jsonSyncNoticeCloseBounds_);
+        jsonSyncNoticeCloseHit_.setVisible(true);
+        return;
+    }
+
+    const int labelX = lastPushBadgeBounds_.getRight() + gap;
+    const int labelMaxW = juce::jmax(0, appBadgeBounds_.getX() - gap - labelX);
+    const auto full = statusDetail_.isNotEmpty() ? statusDetail_ : "None";
+    const auto shown = SkinEditorChrome::elidePathToWidth(statusFont, full, labelMaxW);
+    const auto tip = (full.startsWith("Exported: ") && shown != full) ? full : juce::String {};
+    lastPushLabel_.setText(shown, juce::dontSendNotification);
+    lastPushLabel_.setTooltip(tip);
+    lastPushLabel_.setBounds(labelX, badgeY, labelMaxW, badgeH);
+    lastPushBadgeHit_.setBounds(lastPushBadgeBounds_);
+    lastPushBadgeHit_.setTooltip(tip);
+    jsonSyncNoticeCloseHit_.setBounds({});
+    jsonSyncNoticeCloseHit_.setVisible(false);
 }

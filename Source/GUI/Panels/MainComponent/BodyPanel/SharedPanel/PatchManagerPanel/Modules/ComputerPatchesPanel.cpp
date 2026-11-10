@@ -140,10 +140,7 @@ void ComputerPatchesPanel::refreshNavigationFocusHighlight()
     auto look = TSS::comboBoxLookForZone(*skin_, TSS::kMonoMenuExceptionZone);
 
     if (navigationFocus == PluginIDs::PatchManagerSection::NavigationFocus::kComputer)
-    {
-        const auto focusColour = skin_->getColour(TSS::SkinObjectType::kNumberBox, TSS::SkinColourProperty::kText, TSS::SkinColourState::kFocus);
-        look.textEnabled = focusColour;
-    }
+        look.textEnabled = look.textFocus;
 
     selectPatchFileComboBox_->setLook(look);
 }

@@ -52,6 +52,7 @@ namespace TSS::DevSkin
             out.push_back(&Widgets::Button::kBackgroundDisabled);
             out.push_back(&Widgets::Button::kBorderDisabled);
             out.push_back(&Widgets::Button::kTextDisabled);
+            out.push_back(&Widgets::Button::kTextEmphasis);
             out.push_back(&Widgets::Toggle::kBorder);
             out.push_back(&Widgets::Toggle::kBackgroundOff);
             out.push_back(&Widgets::Toggle::kTextOff);
@@ -117,6 +118,7 @@ namespace TSS::DevSkin
             out.push_back(&Widgets::ComboBox::kTriangleDisabled);
             out.push_back(&Widgets::ComboBox::kText);
             out.push_back(&Widgets::ComboBox::kTextDisabled);
+            out.push_back(&Widgets::ComboBox::kTextFocus);
             out.push_back(&Widgets::ComboBoxK2::kBackground);
             out.push_back(&Widgets::ComboBoxK2::kBackgroundDisabled);
             out.push_back(&Widgets::ComboBoxK2::kBorder);
@@ -124,6 +126,7 @@ namespace TSS::DevSkin
             out.push_back(&Widgets::ComboBoxK2::kFocusBorder);
             out.push_back(&Widgets::ComboBoxK2::kText);
             out.push_back(&Widgets::ComboBoxK2::kTextDisabled);
+            out.push_back(&Widgets::ComboBoxK2::kTextFocus);
             out.push_back(&Widgets::ComboBoxK2::kTriangle);
             out.push_back(&Widgets::ComboBoxK2::kTriangleDisabled);
             out.push_back(&Widgets::ComboBoxK3::kBackground);
@@ -133,6 +136,7 @@ namespace TSS::DevSkin
             out.push_back(&Widgets::ComboBoxK3::kFocusBorder);
             out.push_back(&Widgets::ComboBoxK3::kText);
             out.push_back(&Widgets::ComboBoxK3::kTextDisabled);
+            out.push_back(&Widgets::ComboBoxK3::kTextFocus);
             out.push_back(&Widgets::ComboBoxK3::kTriangle);
             out.push_back(&Widgets::ComboBoxK3::kTriangleDisabled);
         }

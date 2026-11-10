@@ -14,7 +14,7 @@ context: []
 
 **Problem:** Authors who edit the last imported JSON outside Skin Editor either get interrupted by every Reload/Discard prompt or have no way to follow disk changes automatically.
 
-**Approach:** Add a SESSION combo labelled JSON Sync with Off / Ask / Auto. Persist the choice in the session file (default Ask on first launch or legacy sessions). Off ignores disk changes; Ask keeps the existing prompt; Auto reloads silently when the editor is clean, and falls back to Ask when dirty.
+**Approach:** Add a SESSION combo labelled JSON Sync with Off / Ask / Auto. Persist the choice in the session file (default Ask on first launch or legacy sessions). Off ignores disk changes; Ask keeps the existing prompt; Auto reloads silently without a modal (disk wins, including when the editor is dirty) and shows a dismissible WARNING footer notice with the reload time.
 
 </frozen-after-approval>
 
@@ -23,5 +23,6 @@ context: []
 - Session field `jsonSyncMode` (`off` / `ask` / `auto`); missing key → Ask.
 - SESSION layout: after Import, separator + muted `JSON Sync` label + combo.
 - Import watch timer runs only when mode is Ask or Auto and a path is armed.
-- Auto + dirty → same Reload/Discard prompt as Ask.
+- Auto → silent reload (disk wins); dismissible WARNING footer notice with reload timestamp (closes back to LAST PUSH).
 - Discard Editor work keeps the JSON Sync preference.
+- Renegotiated 2026-11-10: Auto no longer falls back to Ask when dirty; footer notice replaces the modal for Auto.

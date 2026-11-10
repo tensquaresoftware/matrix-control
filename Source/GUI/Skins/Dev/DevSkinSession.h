@@ -9,7 +9,7 @@ namespace TSS::DevSkin
     {
         kOff,  // ignore external edits
         kAsk,  // prompt Reload / Discard (default)
-        kAuto  // reload without prompt when editor is clean
+        kAuto  // reload without prompt (disk wins, even if editor is dirty)
     };
 
     inline constexpr const char* jsonSyncModeToString(JsonSyncMode mode) noexcept

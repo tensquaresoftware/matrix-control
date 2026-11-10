@@ -300,13 +300,9 @@ void SkinEditorMainComponent::handleWatchedImportJsonExternalChange(bool fromLau
         case Mode::kOff:
             return;
         case Mode::kAuto:
-            if (! editorDirty_)
-            {
-                reloadWatchedImportJsonFromDisk();
-                return;
-            }
-            // Dirty Auto falls through to Ask so unsaved work is not wiped silently.
-            break;
+            // Disk wins without a modal (including when the editor was dirty).
+            reloadWatchedImportJsonFromDisk();
+            return;
         case Mode::kAsk:
             break;
     }
@@ -407,11 +403,43 @@ void SkinEditorMainComponent::reloadWatchedImportJsonFromDisk()
     rememberSkinJsonDirectory(file);
     armWatchedImportJson(file); // re-baseline + ensure timer still running
     markEditorClean();
-    setStatusMessage(reloadStatusMessage(file, changedNames));
     refreshAll();
     if (bridge_.isConnected())
         pushVisible();
+
+    const auto reloadDetail = reloadStatusMessage(file, changedNames);
+    if (sessionState_.jsonSyncMode == TSS::DevSkin::JsonSyncMode::kAuto)
+    {
+        const auto stamp = juce::Time::getCurrentTime().formatted("%Y-%m-%d %H:%M:%S");
+        showJsonSyncReloadNotice("Reloaded at " + stamp + " — " + reloadDetail);
+    }
+    else
+        setStatusMessage(reloadDetail);
 }
+
+void SkinEditorMainComponent::showJsonSyncReloadNotice(const juce::String& detail)
+{
+    if (! jsonSyncReloadNoticeVisible_)
+        statusDetailBeforeJsonSyncNotice_ = statusDetail_;
+    jsonSyncReloadNoticeVisible_ = true;
+    jsonSyncReloadNoticeText_ = detail;
+    resized();
+    repaint();
+}
+
+void SkinEditorMainComponent::dismissJsonSyncReloadNotice()
+{
+    if (! jsonSyncReloadNoticeVisible_)
+        return;
+
+    jsonSyncReloadNoticeVisible_ = false;
+    jsonSyncReloadNoticeText_.clear();
+    statusDetail_ = statusDetailBeforeJsonSyncNotice_;
+    statusDetailBeforeJsonSyncNotice_.clear();
+    resized();
+    repaint();
+}
+
 
 void SkinEditorMainComponent::discardWatchedImportJsonExternalChange()
 {

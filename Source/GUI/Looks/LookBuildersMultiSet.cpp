@@ -36,6 +36,7 @@ namespace TSS
         look.backgroundDisabled = colour(SkinColourProperty::kBackground, SkinColourState::kDisabled);
         look.borderDisabled = colour(SkinColourProperty::kBorder, SkinColourState::kDisabled);
         look.textDisabled = colour(SkinColourProperty::kText, SkinColourState::kDisabled);
+        look.textEmphasis = colour(SkinColourProperty::kText, SkinColourState::kEmphasis);
         look.font = resolvedTypographyFont(skin, TypographyStyleId::kDefault);
         return look;
     }
@@ -103,6 +104,10 @@ namespace TSS
         look.triangleDisabled = skin.getComboBoxTriangleColour(false, colourSet);
         look.textEnabled = skin.getComboBoxTextColour(true, colourSet);
         look.textDisabled = skin.getComboBoxTextColour(false, colourSet);
+        look.textFocus = skin.getColour(SkinObjectType::kComboBox,
+                                        SkinColourProperty::kText,
+                                        SkinColourState::kFocus,
+                                        colourSet);
         look.font = resolvedTypographyFont(skin, TypographyStyleId::kDefault);
         return look;
     }

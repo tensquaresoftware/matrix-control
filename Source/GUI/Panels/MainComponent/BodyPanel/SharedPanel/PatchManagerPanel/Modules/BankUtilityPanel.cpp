@@ -312,21 +312,15 @@ void BankUtilityPanel::refreshCurrentBankMarker()
 
 TSS::ButtonLook BankUtilityPanel::makeCurrentBankMarkerLook() const
 {
-    // Red text matches Internal NumberBoxes / PATCH NAME navigation focus.
+    // Called-out digit uses Button Text / Emphasis (not NumberBox focus).
     auto markerLook = normalBankLook_;
+    const auto emphasis = normalBankLook_.textEmphasis;
 
-    if (skin_ == nullptr)
-        return markerLook;
-
-    const auto focusColour = skin_->getColour(SkinObjectType::kNumberBox,
-                                              SkinColourProperty::kText,
-                                              SkinColourState::kFocus);
-
-    markerLook.textOff = focusColour;
-    markerLook.textOn = focusColour;
-    markerLook.textHover = focusColour;
-    markerLook.textClicked = focusColour;
-    markerLook.textDisabled = focusColour;
+    markerLook.textOff = emphasis;
+    markerLook.textOn = emphasis;
+    markerLook.textHover = emphasis;
+    markerLook.textClicked = emphasis;
+    markerLook.textDisabled = emphasis;
 
     return markerLook;
 }
