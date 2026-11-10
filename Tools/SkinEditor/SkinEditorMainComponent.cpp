@@ -78,6 +78,11 @@ void SkinEditorMainComponent::setupStatusBarChrome()
                           juce::dontSendNotification);
     addAndMakeVisible(lastPushBadgeHit_);
     jsonSyncNoticeCloseHit_.onClick = [this] { dismissJsonSyncReloadNotice(); };
+    jsonSyncNoticeCloseHit_.onHoverChanged = [this]
+    {
+        if (! jsonSyncNoticeCloseBounds_.isEmpty())
+            repaint(jsonSyncNoticeCloseBounds_);
+    };
     addAndMakeVisible(jsonSyncNoticeCloseHit_);
     jsonSyncNoticeCloseHit_.setVisible(false);
 }
@@ -208,10 +213,12 @@ void SkinEditorMainComponent::paint(juce::Graphics& g)
             SkinEditorChrome::drawChromeBadge(g, lastPushBadgeBounds_, "LAST PUSH");
     }
     if (! jsonSyncNoticeCloseBounds_.isEmpty())
-        SkinEditorChrome::drawChromeBadge(g,
-                                          jsonSyncNoticeCloseBounds_,
-                                          "X",
-                                          SkinEditorChrome::attention());
+    {
+        const auto closeFill = jsonSyncNoticeCloseHit_.isHovered()
+                                   ? SkinEditorChrome::attention().brighter(0.25f)
+                                   : SkinEditorChrome::attention();
+        SkinEditorChrome::drawChromeBadge(g, jsonSyncNoticeCloseBounds_, "X", closeFill);
+    }
     if (! appBadgeBounds_.isEmpty())
         SkinEditorChrome::drawChromeBadge(g, appBadgeBounds_, "APP");
 }
@@ -379,18 +386,27 @@ void SkinEditorMainComponent::layoutStatusBar(juce::Rectangle<int> statusBar)
 
     const int leftX = statusBar.getX();
     connectionBadgeBounds_ = { leftX, badgeY, connBadgeW, badgeH };
-    // Align LAST PUSH / WARNING with Palette column (Color width + Palette side gap).
-    const int pushBadgeX = leftX + SkinEditorChrome::kColorPanelWidth
-                           + SkinEditorChrome::kPaletteSideGap;
-    lastPushBadgeBounds_ = { pushBadgeX, badgeY, pushBadgeW, badgeH };
+    // Align LAST PUSH column (and WARNING close) with Palette (Color width + side gap).
+    const int pushColumnX = leftX + SkinEditorChrome::kColorPanelWidth
+                            + SkinEditorChrome::kPaletteSideGap;
+    if (jsonSyncReloadNoticeVisible_)
+    {
+        // [X] starts where LAST PUSH normally starts; WARNING + message shift right.
+        jsonSyncNoticeCloseBounds_ = { pushColumnX, badgeY, badgeH, badgeH };
+        lastPushBadgeBounds_ = { pushColumnX + badgeH + SkinEditorChrome::kJsonSyncNoticeCloseGap,
+                                 badgeY,
+                                 pushBadgeW,
+                                 badgeH };
+    }
+    else
+    {
+        jsonSyncNoticeCloseBounds_ = {};
+        lastPushBadgeBounds_ = { pushColumnX, badgeY, pushBadgeW, badgeH };
+    }
     const int appX = statusBar.getRight() - appBadgeW - gap - versionW;
     appBadgeBounds_ = { appX, badgeY, appBadgeW, badgeH };
 
-    // When the WARNING notice is up, reserve [X][1px] before the WARNING badge.
-    const int pushClusterLeft = jsonSyncReloadNoticeVisible_
-                                    ? (lastPushBadgeBounds_.getX()
-                                       - SkinEditorChrome::kJsonSyncNoticeCloseGap - badgeH)
-                                    : lastPushBadgeBounds_.getX();
+    const int pushClusterLeft = pushColumnX;
     const int connLabelX = connectionBadgeBounds_.getRight() + gap;
     const int connLabelMaxW = juce::jmax(0, pushClusterLeft - gap - connLabelX);
     const auto connFull = bridge_.isConnected() ? "Connected to Matrix-Control"

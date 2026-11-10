@@ -252,11 +252,35 @@ private:
     struct StatusCloseHitArea final : public juce::Component
     {
         std::function<void()> onClick;
-        StatusCloseHitArea() { setInterceptsMouseClicks(true, false); }
+        std::function<void()> onHoverChanged;
+        StatusCloseHitArea()
+        {
+            setInterceptsMouseClicks(true, false);
+            setMouseCursor(juce::MouseCursor::PointingHandCursor);
+        }
+        bool isHovered() const noexcept { return hovered_; }
         void mouseDown(const juce::MouseEvent&) override
         {
             if (onClick != nullptr)
                 onClick();
+        }
+        void mouseEnter(const juce::MouseEvent&) override { setHovered(true); }
+        void mouseExit(const juce::MouseEvent&) override { setHovered(false); }
+        void visibilityChanged() override
+        {
+            if (! isVisible())
+                setHovered(false);
+        }
+
+    private:
+        bool hovered_ = false;
+        void setHovered(bool next)
+        {
+            if (hovered_ == next)
+                return;
+            hovered_ = next;
+            if (onHoverChanged != nullptr)
+                onHoverChanged();
         }
     };
     StatusCloseHitArea jsonSyncNoticeCloseHit_;
