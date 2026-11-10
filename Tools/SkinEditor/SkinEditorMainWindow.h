@@ -6,7 +6,7 @@
 
 /**
  * Height and width are user-resizable within the nearest display; width stretches
- * Palette and Mappings Mapped colour together (min Palette 160px) — see windowMinWidth().
+ * Palette and Mappings Mapped colour together (min Palette 125px) — see windowMinWidth().
  * Position/size persist in Application Support (skin-editor-window.state).
  */
 class SkinEditorMainWindow final : public juce::DocumentWindow,

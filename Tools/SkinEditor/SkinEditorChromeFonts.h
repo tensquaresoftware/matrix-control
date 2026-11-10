@@ -330,13 +330,15 @@ namespace SkinEditorChrome
     }
 
     /**
-     * Client width floor: max(body columns, title chrome, kWindowContentMinWidth).
+     * Client width floor: max(token body at Palette min, title chrome, kWindowContentMinWidth).
+     * Uses kPalettePanelMinWidth (not the action-button runtime floor) so the window can
+     * reach kWindowContentMinWidth; action labels may compress at that size.
      * Widening grows Palette / Mapped and stretches the OPERATION slot.
      */
     inline int windowContentWidth() noexcept
     {
         return juce::jmax(kWindowContentMinWidth,
-                          juce::jmax(windowBodyWidthForPalettePanel(palettePanelMinWidth()),
+                          juce::jmax(windowBodyWidthForPalettePanel(kPalettePanelMinWidth),
                                      windowTitleChromeMinWidth()));
     }
 

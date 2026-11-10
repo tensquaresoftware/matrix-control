@@ -137,16 +137,17 @@ namespace SkinEditorChrome
     /**
      * Palette column minimum width. Extra window width is shared with Mappings
      * Mapped colour so both can show the same colour names.
+     * Sized so Color + Palette + Mappings fit kWindowContentMinWidth (1000).
      * Floored at runtime with New/Dup/Del + chrome text via palettePanelMinWidth().
      */
-    inline constexpr int kPalettePanelMinWidth = 160;
+    inline constexpr int kPalettePanelMinWidth = 125;
     /**
      * Palette list paint floor at min panel width (before scroll-track band).
      * Live paint width = palettePanelW - kPanelContentPad - kScrollTrackWidth.
      */
     inline constexpr int kPaletteListPaintMinWidth = kPalettePanelMinWidth
                                                      - kPanelContentPad
-                                                     - kScrollTrackWidth; // 132
+                                                     - kScrollTrackWidth; // 97
     /**
      * Mappings column widths (multiples of 5 where fixed). Each column insets content by
      * kMappingsColumnPad on left and right so text/chips clear the dividers.
@@ -169,12 +170,12 @@ namespace SkinEditorChrome
      * Mapped colour minimum = Palette list paint at min Palette width (name parity).
      * Live Mapped width absorbs the remainder of the Mappings table paint width.
      */
-    inline constexpr int kMappingsMappedColumnMinWidth = kPaletteListPaintMinWidth; // 132
+    inline constexpr int kMappingsMappedColumnMinWidth = kPaletteListPaintMinWidth; // 97
     /** Horizontal inset inside every Mappings column (left and right). */
     inline constexpr int kMappingsColumnPad = 6;
     /** Min table paint width = fixed columns + min Mapped. */
     inline constexpr int kMappingsTablePaintMinWidth = kMappingsFixedColumnsWidth
-                                                       + kMappingsMappedColumnMinWidth; // 572
+                                                       + kMappingsMappedColumnMinWidth; // 537
     inline constexpr int kMappingsFocusPad = 1;
     /**
      * Mappings panel width for a given Palette panel width.
@@ -187,7 +188,7 @@ namespace SkinEditorChrome
     }
     /** Min Mappings panel width (Palette at minimum). */
     inline constexpr int kMappingsPanelMinWidth =
-        mappingsPanelWidthForPalettePanel(kPalettePanelMinWidth); // 602
+        mappingsPanelWidthForPalettePanel(kPalettePanelMinWidth); // 567
     /** Body width for a given Palette panel width (edges + Color + gaps + Mappings). */
     inline constexpr int windowBodyWidthForPalettePanel(int palettePanelW) noexcept
     {
@@ -196,9 +197,9 @@ namespace SkinEditorChrome
                + kPaletteSideGap + mappingsPanelWidthForPalettePanel(palettePanelW)
                + kWindowEdgeGutter;
     }
-    /** Constexpr body floor at minimum Palette. */
+    /** Constexpr body floor at minimum Palette (matches kWindowContentMinWidth). */
     inline constexpr int kWindowBodyMinWidth =
-        windowBodyWidthForPalettePanel(kPalettePanelMinWidth); // 1070
+        windowBodyWidthForPalettePanel(kPalettePanelMinWidth); // 1000
     /**
      * Palette width from body remainder after Color (includes leading Palette gap).
      * remainder = palette + gap + mappings(palette) → palette = (remainder - offset) / 2.
@@ -234,10 +235,10 @@ namespace SkinEditorChrome
     inline constexpr int kMappingBandHeight = kSessionWellHeight;
     /**
      * Client width floor for the Skin Editor window.
-     * OPERATION's minimum is derived so title chrome (SESSION + OPERATION) hits this
-     * when it is above the Color/Palette/Mappings body floor.
+     * OPERATION's minimum is derived so title chrome (SESSION + OPERATION) hits this;
+     * Palette min is sized so the body columns fit the same floor.
      */
-    inline constexpr int kWindowContentMinWidth = 1180;
+    inline constexpr int kWindowContentMinWidth = 1000;
     /** Badge → label gap for BRIDGE / MAPPING / LAST PUSH chrome. */
     inline constexpr int kChromeBadgeGap = 8;
     /** Chrome text badges (MAPPING / BRIDGE / …) — thinner than TextButton. */

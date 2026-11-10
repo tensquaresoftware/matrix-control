@@ -44,7 +44,7 @@ private:
 
     void titleChromeMinWidthIncludesOperationFloor()
     {
-        beginTest("Window min width locks at 1180 via derived OPERATION floor");
+        beginTest("Window min width locks at 1000 via derived OPERATION floor");
 
         const int exact = SkinEditorChrome::kWindowEdgeGutter
                           + SkinEditorChrome::sessionWellPreferredWidth()
@@ -52,14 +52,15 @@ private:
                           + SkinEditorChrome::operationWellMinWidth()
                           + SkinEditorChrome::kWindowEdgeGutter;
         const int bodyMin = SkinEditorChrome::windowBodyWidthForPalettePanel(
-            SkinEditorChrome::palettePanelMinWidth());
+            SkinEditorChrome::kPalettePanelMinWidth);
 
-        expectEquals(SkinEditorChrome::kWindowContentMinWidth, 1180);
+        expectEquals(SkinEditorChrome::kWindowContentMinWidth, 1000);
+        expectEquals(SkinEditorChrome::kWindowBodyMinWidth, 1000);
         expectEquals(SkinEditorChrome::windowTitleChromeMinWidth(), exact);
         expectEquals(SkinEditorChrome::windowTitleChromeMinWidth(),
                      SkinEditorChrome::kWindowContentMinWidth);
-        expectEquals(SkinEditorChrome::windowMinWidth(), 1180);
-        expect(SkinEditorChrome::windowMinWidth() >= bodyMin);
+        expectEquals(SkinEditorChrome::windowMinWidth(), 1000);
+        expectEquals(bodyMin, SkinEditorChrome::kWindowContentMinWidth);
     }
 
     void windowFitsFlexiblePaletteMapped()
@@ -111,8 +112,8 @@ private:
     {
         beginTest("Mappings columns use 6px cell pad; Mapped absorbs table remainder");
 
-        expectEquals(SkinEditorChrome::kPalettePanelMinWidth, 160);
-        expectEquals(SkinEditorChrome::kPaletteListPaintMinWidth, 132);
+        expectEquals(SkinEditorChrome::kPalettePanelMinWidth, 125);
+        expectEquals(SkinEditorChrome::kPaletteListPaintMinWidth, 97);
         expect(SkinEditorChrome::palettePanelMinWidth()
                >= SkinEditorChrome::palettePanelWidthForActionButtons());
         expectEquals(SkinEditorChrome::kMappingsColumnPad, 6);
@@ -122,9 +123,9 @@ private:
         expectEquals(SkinEditorChrome::kMappingsLinkColumnWidth, 55);
         expectEquals(SkinEditorChrome::kLinkCountBadgeWidth, 22);
         expectEquals(SkinEditorChrome::kMappingsFixedColumnsWidth, 440);
-        expectEquals(SkinEditorChrome::kMappingsMappedColumnMinWidth, 132);
-        expectEquals(SkinEditorChrome::kMappingsTablePaintMinWidth, 572);
-        expectEquals(SkinEditorChrome::kMappingsPanelMinWidth, 602);
+        expectEquals(SkinEditorChrome::kMappingsMappedColumnMinWidth, 97);
+        expectEquals(SkinEditorChrome::kMappingsTablePaintMinWidth, 537);
+        expectEquals(SkinEditorChrome::kMappingsPanelMinWidth, 567);
         expect(SkinEditorChrome::kMappingsPropertyColumnWidth % 5 == 0);
         expectEquals(SkinEditorChrome::kObjectComboWidth, 149);
         expectEquals(SkinEditorChrome::mappingsHoldLeft(100, 200), 200);
