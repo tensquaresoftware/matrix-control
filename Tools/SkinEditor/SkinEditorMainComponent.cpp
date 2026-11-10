@@ -386,8 +386,13 @@ void SkinEditorMainComponent::layoutStatusBar(juce::Rectangle<int> statusBar)
     const int appX = statusBar.getRight() - appBadgeW - gap - versionW;
     appBadgeBounds_ = { appX, badgeY, appBadgeW, badgeH };
 
+    // When the WARNING notice is up, reserve [X][1px] before the WARNING badge.
+    const int pushClusterLeft = jsonSyncReloadNoticeVisible_
+                                    ? (lastPushBadgeBounds_.getX()
+                                       - SkinEditorChrome::kJsonSyncNoticeCloseGap - badgeH)
+                                    : lastPushBadgeBounds_.getX();
     const int connLabelX = connectionBadgeBounds_.getRight() + gap;
-    const int connLabelMaxW = juce::jmax(0, lastPushBadgeBounds_.getX() - gap - connLabelX);
+    const int connLabelMaxW = juce::jmax(0, pushClusterLeft - gap - connLabelX);
     const auto connFull = bridge_.isConnected() ? "Connected to Matrix-Control"
                                                 : "Disconnected from Matrix-Control";
     connectionLabel_.setText(SkinEditorChrome::elideToWidth(statusFont, connFull, connLabelMaxW),

@@ -40,6 +40,7 @@ private:
                      SkinEditorChrome::kSessionWellHeight);
         expectEquals(SkinEditorChrome::kOperationWitnessPad, 4);
         expectEquals(SkinEditorChrome::kChromeBadgeGap, 8);
+        expectEquals(SkinEditorChrome::kJsonSyncNoticeCloseGap, 1);
     }
 
     void titleChromeMinWidthIncludesOperationFloor()

@@ -247,10 +247,12 @@ void SkinEditorMainComponent::layoutStatusPushOrNoticeStrip(int badgeY,
     jsonSyncNoticeCloseBounds_ = {};
     if (jsonSyncReloadNoticeVisible_)
     {
-        const int closeX = appBadgeBounds_.getX() - gap - badgeH;
+        // [X][1px][WARNING] … message … [APP]
+        const int closeGap = SkinEditorChrome::kJsonSyncNoticeCloseGap;
+        const int closeX = lastPushBadgeBounds_.getX() - closeGap - badgeH;
         jsonSyncNoticeCloseBounds_ = { closeX, badgeY, badgeH, badgeH };
         const int labelX = lastPushBadgeBounds_.getRight() + gap;
-        const int labelMaxW = juce::jmax(0, closeX - gap - labelX);
+        const int labelMaxW = juce::jmax(0, appBadgeBounds_.getX() - gap - labelX);
         lastPushLabel_.setText(SkinEditorChrome::elideToWidth(statusFont,
                                                               jsonSyncReloadNoticeText_,
                                                               labelMaxW),
