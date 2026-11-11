@@ -149,8 +149,12 @@ document a dated, motivated exception (`NOLINT` or comment) rather than obscure 
 4. Do **not** refactor untouched historical code “to green the whole tree” in the same ticket
 
 **Optional local pre-push gate:** after clone, install the git hook once with
-`bash Scripts/quality/install-git-hooks.sh` (requires `pip install -r Scripts/quality/requirements.txt`).
-It runs the same `lint_touched.py` logic as CI before `git push`; bypass with
+`bash Scripts/quality/install-git-hooks.sh` (requires
+`pip install -r Scripts/quality/requirements.txt` and
+`pip install -r Scripts/release/requirements-test.txt`).
+It runs the same `lint_touched.py` logic as CI **plus** the
+`release-script-tests` pytest mirror (`Scripts/release/tests/` +
+`Scripts/quality/tests/`, ~1 s) before `git push`; bypass with
 `SKIP_QUALITY_GATE=1 git push` or `git push --no-verify`. See `CONTRIBUTING.md`.
 
 ### 3.3 Warning signs - Indicators of bad design

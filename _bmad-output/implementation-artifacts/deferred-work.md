@@ -3269,3 +3269,9 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-skin-designer-blank-start-session.md`
   summary: No unit-test harness drives SkinDesignerMainComponent Load/Save/Save as/quit choice wiring (layer/JSON helpers and quit-policy constants are covered; GUI controller is manual).
   evidence: Verification Gap; Matrix-Control_Tests does not link MainComponent; manual Session smoke remains the gate.
+
+## Deferred from: review of spec-pre-push-pytest-ci-mirror.md (2026-11-11)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-pre-push-pytest-ci-mirror.md`
+  summary: Quality-gate wiring tests still assert script/CI substrings rather than executing default vs --lint-only modes end-to-end.
+  evidence: Blind Hunter; existing suite style is source-text wiring; adding subprocess contracts would enlarge this chore without catching the known green/red paths already proven manually in the build.

@@ -1,6 +1,7 @@
 # Multi-platform build + Core unit tests (Story 11.1).
 # Story 11.3: draft PR fast tier (macOS only) + ci-success merge gate.
 # Quality gate: lint_touched.py on PR/push diff (anti-drift; no full-tree Boy Scout).
+# release-script-tests: shared Scripts/quality/run_script_tests.sh (also used by local pre-push).
 #
 # Preset choices (CMakeUserPresets.json):
 #   macOS  — macos-debug-arm64   (Ninja, Apple Silicon runner = macos-latest)
@@ -36,7 +37,8 @@ jobs:
         run: |
           python3 -m pip install -r Scripts/release/requirements-test.txt
           python3 -m pip install -r Scripts/quality/requirements.txt
-          python3 -m pytest Scripts/release/tests/ Scripts/quality/tests/ -q
+          chmod +x Scripts/quality/run_script_tests.sh
+          Scripts/quality/run_script_tests.sh
 
   quality-gate:
     name: quality-gate
@@ -58,15 +60,15 @@ jobs:
           chmod +x Scripts/quality/run_quality_gate.sh
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             git fetch origin "${{ github.base_ref }}" --depth=1 || true
-            Scripts/quality/run_quality_gate.sh --base "origin/${{ github.base_ref }}"
+            Scripts/quality/run_quality_gate.sh --lint-only --base "origin/${{ github.base_ref }}"
           else
             # Push to main: analyse files changed in this push range when available
             BEFORE="${{ github.event.before }}"
             if [ -n "$BEFORE" ] && [ "$BEFORE" != "0000000000000000000000000000000000000000" ] \
               && git rev-parse --verify "$BEFORE" >/dev/null 2>&1; then
-              Scripts/quality/run_quality_gate.sh --base "$BEFORE"
+              Scripts/quality/run_quality_gate.sh --lint-only --base "$BEFORE"
             else
-              Scripts/quality/run_quality_gate.sh --base "HEAD~1"
+              Scripts/quality/run_quality_gate.sh --lint-only --base "HEAD~1"
             fi
           fi
 

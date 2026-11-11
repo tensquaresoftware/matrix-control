@@ -1,11 +1,14 @@
 #!/usr/bin/env bash
-# Shared quality gate runner — same logic for CI, git pre-push, and manual use.
+# Shared quality gate runner — same lint logic for CI quality-gate, git pre-push,
+# and manual use. Local / pre-push also run the CI release-script-tests pytest
+# mirror (Scripts/quality/run_script_tests.sh) after lint.
 #
 # Usage:
 #   Scripts/quality/run_quality_gate.sh
 #   Scripts/quality/run_quality_gate.sh --base origin/main
 #   Scripts/quality/run_quality_gate.sh --base "$REMOTE_SHA" --head "$LOCAL_SHA"
 #   Scripts/quality/run_quality_gate.sh --pre-push          # called by git hook (reads stdin)
+#   Scripts/quality/run_quality_gate.sh --lint-only         # CI quality-gate job (pytest is a sibling job)
 #
 # Bypass:
 #   SKIP_QUALITY_GATE=1 git push
@@ -16,21 +19,25 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 LINT="$REPO_ROOT/Scripts/quality/lint_touched.py"
+SCRIPT_TESTS="$REPO_ROOT/Scripts/quality/run_script_tests.sh"
 
 BASE=""
 HEAD_REF=""
 PRE_PUSH=false
+LINT_ONLY=false
 
 usage() {
   cat <<'EOF'
 Usage: Scripts/quality/run_quality_gate.sh [options]
 
-Runs lint_touched.py on the C++ diff (same thresholds as CI quality-gate).
+Runs lint_touched.py on the C++ diff (same thresholds as CI quality-gate),
+then the CI release-script-tests pytest mirror (~1 s) unless --lint-only.
 
 Options:
   --base REF     Git ref for diff base (CI / explicit manual use)
   --head REF     Git ref for diff tip (default: HEAD; pre-push uses local SHA)
-  --pre-push     Pre-push hook mode: read refs from stdin, one gate per push ref
+  --pre-push     Pre-push hook mode: read refs from stdin, one lint per push ref
+  --lint-only    Skip pytest (CI quality-gate job; pytest runs in release-script-tests)
   -h, --help     Show this help
 
 Without options (manual):
@@ -53,6 +60,10 @@ while [ $# -gt 0 ]; do
       ;;
     --pre-push)
       PRE_PUSH=true
+      shift
+      ;;
+    --lint-only)
+      LINT_ONLY=true
       shift
       ;;
     -h | --help)
@@ -120,6 +131,13 @@ run_lint() {
   "${cmd[@]}"
 }
 
+run_script_tests_once() {
+  if [ "$LINT_ONLY" = true ]; then
+    return 0
+  fi
+  bash "$SCRIPT_TESTS"
+}
+
 block_push_message() {
   cat >&2 <<'EOF'
 
@@ -128,22 +146,29 @@ Corrigez les findings ci-dessus, ou contournez temporairement :
   SKIP_QUALITY_GATE=1 git push
   git push --no-verify
 
+Si pytest / PyYAML manquent :
+  python3 -m pip install -r Scripts/quality/requirements.txt
+  python3 -m pip install -r Scripts/release/requirements-test.txt
+
 Commande manuelle de secours :
   python3 Scripts/quality/lint_touched.py
+  Scripts/quality/run_script_tests.sh
 EOF
 }
 
 if [ "$PRE_PUSH" = true ]; then
-  had_ref=false
+  had_pushable_ref=false
   failed=false
 
   while read -r local_ref local_sha remote_ref remote_sha; do
     [ -z "$local_ref" ] && continue
-    had_ref=true
 
+    # Delete-only lines (local SHA all zeros) skip lint and do not count as pushable.
     if is_zero_sha "$local_sha"; then
       continue
     fi
+
+    had_pushable_ref=true
 
     if is_zero_sha "$remote_sha" || ! ref_exists "$remote_sha"; then
       base_ref="$(resolve_fallback_base)"
@@ -158,12 +183,17 @@ if [ "$PRE_PUSH" = true ]; then
     fi
   done
 
-  if [ "$had_ref" = false ]; then
+  if [ "$had_pushable_ref" = false ]; then
     echo "Pre-push quality gate: aucune ref à pousser — OK."
     exit 0
   fi
 
   if [ "$failed" = true ]; then
+    block_push_message
+    exit 1
+  fi
+
+  if ! run_script_tests_once; then
     block_push_message
     exit 1
   fi
@@ -178,3 +208,5 @@ fi
 if ! run_lint "$BASE" "${HEAD_REF:-HEAD}"; then
   exit 1
 fi
+
+run_script_tests_once
