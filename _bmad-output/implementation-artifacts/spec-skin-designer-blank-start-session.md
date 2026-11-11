@@ -167,3 +167,24 @@ context:
 
 **Manual checks:**
 - Launch app → empty Designer combo / START coaching; Load Trials → skins present; Save as draft round-trip; Export still gated on Unbound; Session order visual check; macOS menu/Dock name Skin Designer.
+
+### Review Findings
+
+- [x] [Review][Patch] JSON Sync auto-reload notice embeds a Unicode em dash — replace with ASCII ` - ` in user-visible LAST PUSH / notice copy [`Tools/SkinDesigner/SkinDesignerMainComponentImportWatch.cpp:331`]
+- [x] [Review][Patch] Refused JSON Sync reload does not re-baseline the watch fingerprint — Auto/Ask re-fire about every 2 s while the bad file stays on disk; after the refuse alert, accept the on-disk fingerprint (or equivalent) so a new prompt waits for a further file change [`Tools/SkinDesigner/SkinDesignerMainComponentImportWatch.cpp:300-307`]
+- [x] [Review][Patch] JSON Sync poll ignores `fileDialogOpen_` — external change can Auto-replace or stack Ask while Load/Save/Save as chooser is open; gate poll like the import-watch dialog [`Tools/SkinDesigner/SkinDesignerMainComponentImportWatch.cpp:148`]
+- [x] [Review][Patch] `defaultPackFile` / `kDefaultWorkspaceName` stem untested — assert suggested pack filename is `Matrix-Control Skin Designer - Trials.json` (not Skin Editor) in `DevSkinWorkspaceFilesTests` [`Tools/SkinDesigner/SkinDesignerUiHelpers.h:312`]
+- [x] [Review][Defer] MainComponent Load / JSON Sync reload call sites not pinned to `replaceDesignerSkinsFromJson` — deferred: GUI controller outside unit-test target; helper refuse/replace already covered; same class as existing MainComponent wiring defer
+- [x] [Review][Defer] Window-state hard-cut basename `skin-designer-window.state` untested — deferred: helper is file-local; session hard-cut already unit-tested; manual launch remains the gate
+- [x] [Review][Defer] No chrome/layout lock of Session order/labels Load → Save → Save as → JSON Sync → Undo/Redo → Compare/Push — deferred: MainComponent Session layout not in unit harness; manual Session smoke remains the gate
+
+#### Rejected
+
+- Spec AC / Design Notes / Manual Verification / Code Map still describe Export and “Save as draft” while frozen Always/Never dropped Export — false for product defect (code matches renegotiated frozen intent); rejected because the fix would be editing this build’s spec.
+- Spec Verification `ctest` pattern omits `DevSkinWorkspaceFiles` — rejected (fix is edit this build’s spec).
+- Dropbox Trials/Product Skins rename marked `[x]` but absent from git diff — rejected (user Dropbox path outside repo / checkbox bookkeeping; fix would edit this build’s spec).
+- `SkinDesignerChromeLayoutTests` path-elide fixture still uses `Exported:` prefix — false: elide test only needs a long path string; production status prefixes are covered elsewhere.
+- Blank Designer + Standalone connect pushes compiled Product via `pushVisible` — false: intentional blank-start preview (`visibleSkinId` falls back to Product when `designerSkinId` is empty).
+- Unit tests still exercise `exportDesignerSkinToJson` / `isDesignerSkinExportAllowed` — false: Unbound/export helpers remain for Matrix-Control handoff; Session Export control removal does not retire the APIs.
+- Import* naming leftovers on the JSON watch module (`armWatchedImportJson`, …) — low: rename-only chore with no everyday product harm this lot; rejected (would expand beyond a direct correction).
+- Comments/helpers still say “Save as draft” / `sanitizeSkinNameForExportFileStem` / “export-path tooltip” / fixture `DevSkinLayerJsonTests-session-dir` — low: developer narrative leftovers; unlikely everyday harm; rejected.

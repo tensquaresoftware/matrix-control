@@ -145,7 +145,7 @@ void SkinDesignerMainComponent::refreshWatchedImportFingerprint()
 
 void SkinDesignerMainComponent::pollWatchedImportJson()
 {
-    if (importWatchDialogOpen_ || watchedImportJsonFile_ == juce::File())
+    if (importWatchDialogOpen_ || fileDialogOpen_ || watchedImportJsonFile_ == juce::File())
         return;
 
     if (! watchedImportJsonFile_.existsAsFile())
@@ -299,8 +299,9 @@ void SkinDesignerMainComponent::reloadWatchedImportJsonFromDisk()
 
     if (! result.ok)
     {
-        // Keep the previous accepted baseline so the watch can prompt again
-        // (do not silently accept the refused on-disk bytes).
+        // Accept the refused fingerprint so Ask/Auto do not re-fire every poll
+        // until the file changes again (layer stays untouched).
+        refreshWatchedImportFingerprint();
         juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon,
                                                "Reload refused",
                                                result.message);
@@ -328,7 +329,7 @@ void SkinDesignerMainComponent::reloadWatchedImportJsonFromDisk()
     if (sessionState_.jsonSyncMode == TSS::DevSkin::JsonSyncMode::kAuto)
     {
         const auto stamp = juce::Time::getCurrentTime().formatted("%Y-%m-%d %H:%M:%S");
-        showJsonSyncReloadNotice("Reloaded at " + stamp + " — " + reloadDetail);
+        showJsonSyncReloadNotice("Reloaded at " + stamp + " - " + reloadDetail);
     }
     else
         setStatusMessage(reloadDetail);

@@ -212,6 +212,15 @@ private:
         expectEquals(SkinDesignerUi::withJsonExtension(dir.getChildFile("v1.2")).getFileName(),
                      juce::String("v1.2.json"));
 
+        expectEquals(SkinDesignerUi::defaultPackFile(SkinDesignerUi::kDefaultWorkspaceName,
+                                                     dir.getFullPathName())
+                         .getFileName(),
+                     juce::String("Matrix-Control Skin Designer - Trials.json"));
+        expect(! SkinDesignerUi::defaultPackFile(SkinDesignerUi::kDefaultWorkspaceName,
+                                                 dir.getFullPathName())
+                     .getFileName()
+                     .contains("Skin Editor"));
+
         expect(SkinDesignerUi::isFilePathStatus("Loaded: /tmp/a.json"));
         expect(SkinDesignerUi::isFilePathStatus("Saved: /tmp/a.json"));
         expect(SkinDesignerUi::isFilePathStatus("Saved as: /tmp/a.json"));

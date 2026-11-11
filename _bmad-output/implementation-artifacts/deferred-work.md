@@ -3246,6 +3246,18 @@ Original review bullets below remain for history; status for U-10-owned residual
   summary: Extract one named tight-pad constant shared by SkinEditorColourPicker preferredHeight/layout and the unit test.
   evidence: Blind Hunter; magic `kPanelContentPad - 5` already duplicated in product before this oneshot.
 
+## Deferred from: code review of spec-skin-designer-blank-start-session.md (2026-11-11)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-designer-blank-start-session.md`
+  summary: MainComponent Load / JSON Sync reload call sites are not pinned to `replaceDesignerSkinsFromJson` (helper refuse/replace is unit-tested; swapping the call back to `importFromJson` would still pass those tests).
+  evidence: Verification Gap; Matrix-Control_Tests does not link SkinDesignerMainComponent; overlaps existing MainComponent Session wiring defer.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-designer-blank-start-session.md`
+  summary: Window-state hard-cut basename `skin-designer-window.state` has no unit pin (session hard-cut names are covered).
+  evidence: Verification Gap; helper is file-local in SkinDesignerMainWindow; manual launch remains the gate.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-designer-blank-start-session.md`
+  summary: No automated lock of Session bar order/labels Load → Save → Save as → JSON Sync → Undo/Redo → Compare/Push.
+  evidence: Blind Hunter; chrome layout suite does not drive MainComponent Session controls; manual Session smoke remains the gate.
+
 ## Deferred from: review of spec-skin-colour-object-ownership.md (2026-11-10)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-skin-colour-object-ownership.md`
