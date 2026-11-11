@@ -631,6 +631,8 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/SkinDesignerMappingsSortErgoTests.cpp
         Tests/Unit/SkinDesignerChromeLayoutTests.cpp
         Tests/Unit/SkinDesignerColourPickerTests.cpp
+        Tests/Unit/SkinDesignerHistoryTests.cpp
+        Tools/SkinDesigner/SkinDesignerHistory.cpp
         Tools/SkinDesigner/SkinDesignerChromePanel.cpp
         Tools/SkinDesigner/SkinDesignerColourPicker.cpp
         Tools/SkinDesigner/SkinDesignerSkinsPanel.cpp
@@ -1222,11 +1224,13 @@ if(MATRIX_BUILD_SKIN_DESIGNER)
         Tools/SkinDesigner/SkinDesignerMainComponent.cpp
         Tools/SkinDesigner/SkinDesignerMainComponentActions.cpp
         Tools/SkinDesigner/SkinDesignerMainComponentFiles.cpp
+        Tools/SkinDesigner/SkinDesignerMainComponentHistory.cpp
         Tools/SkinDesigner/SkinDesignerMainComponentImportWatch.cpp
         Tools/SkinDesigner/SkinDesignerMainComponentMapping.cpp
         Tools/SkinDesigner/SkinDesignerMainComponentSession.cpp
         Tools/SkinDesigner/SkinDesignerMainComponentSkins.cpp
         Tools/SkinDesigner/SkinDesignerColourPicker.cpp
+        Tools/SkinDesigner/SkinDesignerHistory.cpp
         Tools/SkinDesigner/SkinDesignerPalettePanel.cpp
         Tools/SkinDesigner/SkinDesignerPalettePanelClicks.cpp
         Tools/SkinDesigner/SkinDesignerPalettePanelSticky.cpp

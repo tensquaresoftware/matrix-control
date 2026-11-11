@@ -7,6 +7,7 @@
 #include "GUI/Skins/Dev/DevSkinSession.h"
 #include "Tools/SkinDesigner/SkinDesignerLookAndFeel.h"
 #include "Tools/SkinDesigner/SkinDesignerColourPicker.h"
+#include "Tools/SkinDesigner/SkinDesignerHistory.h"
 #include "Tools/SkinDesigner/SkinDesignerMappingModePolicy.h"
 #include "Tools/SkinDesigner/SkinDesignerMappingsPanel.h"
 #include "Tools/SkinDesigner/SkinDesignerPalettePanel.h"
@@ -46,8 +47,31 @@ private:
     void refreshSessionButtonsEnabled();
     void pushVisible();
     void setStatusMessage(const juce::String& text);
-    void markDesignerDirty();
+    /** Dirty flag follows the history position versus the last Save marker. */
+    void syncDesignerDirtyFromHistory();
     void markDesignerClean();
+    // Undo / Redo history (SkinDesignerMainComponentHistory.cpp)
+    SkinDesignerHistory::Snapshot captureHistorySnapshot() const;
+    /** Records the current Designer document as one history step and updates dirty. */
+    void recordDocumentChange();
+    /** layer_.onChanged: colour-press preview vs normal history record. */
+    void handleLayerDocumentChanged();
+    /**
+     * Several layer writes from one user action (mapping + link peers, align group)
+     * arrive as separate onChanged calls; keep them in one step until the next idle turn.
+     */
+    void openChangeBurst();
+    /** Ends any open history gesture / burst so a later async close cannot touch the next one. */
+    void closeChangeBurst();
+    /** After a silent Designer select: keep the current history state's ids in step. */
+    void syncHistoryCurrentSelection();
+    /** Replaces history with the current document (Load, reload, launch). Marks clean. */
+    void resetHistoryToCurrentDocument();
+    void applyHistorySnapshot(const SkinDesignerHistory::Snapshot& snapshot);
+    bool canUseDocumentHistory() const;
+    static bool isTextEditingFocused();
+    /** Silent layer edit that already moved the session (Delete): refresh, push, record. */
+    void finishSilentDocumentEdit();
     void scheduleSessionAutosave();
     void flushPendingSessionAutosave();
     /** Throttle refreshAll + pushVisible during continuous COLOR edits (~40 ms). */
@@ -200,6 +224,8 @@ private:
     /** Dedicated coalesce for colour drag — not the 400 ms session-autosave timer. */
     BlinkTimer colourPreviewCoalesceTimer_;
     bool colourGestureActive_ = false;
+    /** True if the open colour gesture changed the document (commit one history step on end). */
+    bool colourGestureMadeEdit_ = false;
     /** Polls the loaded / saved JSON path for external disk changes (~1 s). */
     BlinkTimer importWatchTimer_;
     juce::File watchedImportJsonFile_;
@@ -215,6 +241,8 @@ private:
     TSS::DevSkin::BridgeClient bridge_;
     TSS::DevSkin::DesignerSessionState sessionState_;
     bool designerDirty_ = false;
+    SkinDesignerHistory::History history_;
+    bool changeBurstOpen_ = false;
     juce::String selectedPastille_;
     MappingMode mappingMode_ = MappingMode::kIdle;
     TSS::SkinColourKey armedKey_ {};

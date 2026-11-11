@@ -89,7 +89,11 @@ void SkinDesignerMainComponent::onDelete()
     if (confirm.runModalLoop() != 1)
         return;
 
-    const auto result = layer_.deleteDevSkin(sessionState_.designerSkinId);
+    juce::Result result = juce::Result::fail("Delete failed");
+    runWithoutLayerChangeNotify([this, &result]
+    {
+        result = layer_.deleteDevSkin(sessionState_.designerSkinId);
+    });
     if (result.failed())
     {
         juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon,
@@ -98,6 +102,8 @@ void SkinDesignerMainComponent::onDelete()
     }
     sessionState_.designerSkinId = {};
     clearMappingModeToIdle();
+    // refreshAll (inside) picks the next remaining Designer skin, so record after it.
+    finishSilentDocumentEdit();
 }
 
 void SkinDesignerMainComponent::onRename()
@@ -165,20 +171,6 @@ void SkinDesignerMainComponent::onCompareToggle()
     refreshAll();
     if (bridge_.isConnected())
         pushVisible();
-}
-
-void SkinDesignerMainComponent::onUndo()
-{
-    // Placeholder until the dedicated Undo/Redo chantier.
-    setStatusMessage("Undo: not implemented yet");
-    refreshStatus();
-}
-
-void SkinDesignerMainComponent::onRedo()
-{
-    // Placeholder until the dedicated Undo/Redo chantier.
-    setStatusMessage("Redo: not implemented yet");
-    refreshStatus();
 }
 
 void SkinDesignerMainComponent::onAddPastille()

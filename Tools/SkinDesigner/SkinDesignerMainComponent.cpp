@@ -147,17 +147,7 @@ void SkinDesignerMainComponent::setupBodyPanels()
 
 void SkinDesignerMainComponent::setupLayerAndBridgeCallbacks()
 {
-    layer_.onChanged = [this]
-    {
-        markDesignerDirty();
-        scheduleSessionAutosave();
-        if (colourGestureActive_)
-        {
-            scheduleColourPreviewCoalesce();
-            return;
-        }
-        applyColourPreviewRefresh();
-    };
+    layer_.onChanged = [this] { handleLayerDocumentChanged(); };
 
     bridge_.onConnectionChanged = [this](bool)
     {

@@ -320,7 +320,7 @@ void SkinDesignerMainComponent::reloadWatchedImportJsonFromDisk()
     sessionState_.compareOn = false;
     rememberSkinJsonDirectory(file);
     armWatchedImportJson(file); // re-baseline + ensure timer still running
-    markDesignerClean();
+    resetHistoryToCurrentDocument();
     refreshAll();
     if (bridge_.isConnected())
         pushVisible();

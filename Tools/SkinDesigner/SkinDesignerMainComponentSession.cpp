@@ -1,5 +1,6 @@
 #include "Tools/SkinDesigner/SkinDesignerMainComponent.h"
 
+#include "GUI/Helpers/EditorialUndoRedoShortcuts.h"
 #include "Tools/SkinDesigner/SkinDesignerAlertWindow.h"
 #include "Tools/SkinDesigner/SkinDesignerUiHelpers.h"
 
@@ -52,19 +53,15 @@ bool SkinDesignerMainComponent::keyPressed(const juce::KeyPress& key)
         return false;
     }
 
-    const auto mods = key.getModifiers();
-    if (mods.isCommandDown() && ! mods.isAltDown())
-    {
-        if (key.getKeyCode() == 'Z' || key.getKeyCode() == 'z')
-        {
-            if (mods.isShiftDown())
-                onRedo();
-            else
-                onUndo();
-            return true;
-        }
-    }
-    return false;
+    const auto shortcut = TSS::classifyEditorialUndoRedoShortcut(key);
+    if (shortcut == TSS::EditorialUndoRedoShortcut::kNone || isTextEditingFocused())
+        return false;
+
+    if (shortcut == TSS::EditorialUndoRedoShortcut::kRedo)
+        onRedo();
+    else
+        onUndo();
+    return true;
 }
 
 void SkinDesignerMainComponent::applyProductComboChange()
@@ -91,6 +88,7 @@ void SkinDesignerMainComponent::applyDesignerComboChange()
 
         // Selection only — do not treat as unexported Designer edits (selectSkin bumps onChanged).
         runWithoutLayerChangeNotify([this, &skin] { layer_.selectSkin(skin.id); });
+        syncHistoryCurrentSelection();
 
         refreshAll();
         if (bridge_.isConnected() && ! isCompareProductView())
@@ -108,10 +106,21 @@ void SkinDesignerMainComponent::timerCallback()
 void SkinDesignerMainComponent::wireColourPicker(const std::function<bool()>& escapeMapping)
 {
     colourPicker_.onColourChanged = [this](juce::Colour c) { onColourChanged(c); };
-    colourPicker_.onColourGestureBegan = [this] { colourGestureActive_ = true; };
+    colourPicker_.onColourGestureBegan = [this]
+    {
+        // Seal any open mapping burst so this press cannot coalesce with a prior edit.
+        closeChangeBurst();
+        colourGestureActive_ = true;
+        colourGestureMadeEdit_ = false;
+    };
     colourPicker_.onColourGestureEnded = [this]
     {
         colourGestureActive_ = false;
+        // One press = one Undo step (click or drag), committed with the final colour.
+        if (colourGestureMadeEdit_)
+            recordDocumentChange();
+        colourGestureMadeEdit_ = false;
+        refreshSessionButtonsEnabled();
         flushColourPreviewCoalesce();
     };
     colourPicker_.onEscapeRequested = escapeMapping;
@@ -277,6 +286,9 @@ void SkinDesignerMainComponent::refreshSessionButtonsEnabled()
     const bool canSave = hasAnyDesignerSkin();
     saveButton_.setEnabled(canSave);
     saveAsButton_.setEnabled(canSave);
+    const bool historyUsable = canUseDocumentHistory();
+    undoButton_.setEnabled(historyUsable && history_.canUndo());
+    redoButton_.setEnabled(historyUsable && history_.canRedo());
 }
 
 void SkinDesignerMainComponent::pushVisible()
@@ -296,13 +308,15 @@ void SkinDesignerMainComponent::setStatusMessage(const juce::String& text)
         statusDetail_ = text.substring(0, 1).toUpperCase() + text.substring(1);
 }
 
-void SkinDesignerMainComponent::markDesignerDirty()
+void SkinDesignerMainComponent::syncDesignerDirtyFromHistory()
 {
-    designerDirty_ = true;
+    designerDirty_ = ! history_.isAtCleanMarker();
 }
 
 void SkinDesignerMainComponent::markDesignerClean()
 {
+    closeChangeBurst();
+    history_.markClean();
     designerDirty_ = false;
 }
 
@@ -344,11 +358,13 @@ void SkinDesignerMainComponent::adoptActiveDesignerSkinAfterCreate()
     // still pushVisible() after the session id has moved to the new skin.
     colourPreviewCoalesceTimer_.stopTimer();
     colourGestureActive_ = false;
+    colourGestureMadeEdit_ = false;
+    closeChangeBurst();
 
     sessionState_.designerSkinId = layer_.activeSkinId();
     sessionState_.compareOn = false;
     clearMappingModeToIdle();
-    markDesignerDirty();
+    recordDocumentChange();
     scheduleSessionAutosave();
     refreshAll();
     // Caller may pushVisible() — Product Duplicate only.
@@ -363,7 +379,7 @@ void SkinDesignerMainComponent::loadSessionOrBaseline()
     sessionState_.designerSkinId = {};
     sessionState_.compareOn = false;
     stopTimer();
-    markDesignerClean();
+    resetHistoryToCurrentDocument();
     applyJsonSyncSessionUi();
 }
 

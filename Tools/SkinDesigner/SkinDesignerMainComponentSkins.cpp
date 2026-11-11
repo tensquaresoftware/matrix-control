@@ -156,8 +156,6 @@ void SkinDesignerMainComponent::setupSessionWell()
     syncJsonSyncComboFromSession();
 
     compareBlinkTimer_.onTick = [this] { tickCompareBlink(); };
-    undoButton_.setEnabled(false);
-    redoButton_.setEnabled(false);
 }
 
 void SkinDesignerMainComponent::setupOperationWell()

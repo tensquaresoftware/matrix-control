@@ -93,6 +93,7 @@ void SkinDesignerMainComponent::loadWorkspaceFromFile(const juce::File& file)
     // Cancel any pending colour preview push aimed at the replaced skins.
     colourPreviewCoalesceTimer_.stopTimer();
     colourGestureActive_ = false;
+    colourGestureMadeEdit_ = false;
 
     const auto* active = layer_.findSkin(layer_.activeSkinId());
     const bool activeIsDesigner = active != nullptr && active->kind == TSS::DevSkin::SkinKind::kDev;
@@ -105,7 +106,7 @@ void SkinDesignerMainComponent::loadWorkspaceFromFile(const juce::File& file)
 
     rememberSkinJsonDirectory(file);
     armWatchedImportJson(file);
-    markDesignerClean();
+    resetHistoryToCurrentDocument();
     setStatusMessage(juce::String(SkinDesignerUi::kStatusLoaded) + file.getFullPathName());
     refreshAll();
     if (bridge_.isConnected())
@@ -168,7 +169,10 @@ bool SkinDesignerMainComponent::savePackToFile(const juce::File& chosen, const c
 
     // The pack records activeSkinId from the layer; keep it on the Designer skin in use.
     if (sessionState_.designerSkinId.isNotEmpty())
+    {
         runWithoutLayerChangeNotify([this] { layer_.selectSkin(sessionState_.designerSkinId); });
+        syncHistoryCurrentSelection();
+    }
 
     if (! file.replaceWithText(TSS::DevSkin::exportToJson(layer_)))
     {

@@ -3281,3 +3281,18 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-skin-designer-compare-in-product-remove-push.md`
   summary: Historical Skin Designer SESSION-order docs still list Compare/Push after Undo/Redo (e.g. blank-start-session).
   evidence: Blind Hunter; done specs contradict shipped chrome after Compare moved to Product and Push removed; rewrite only if those docs are revisited.
+
+## Deferred from: review of spec-skin-designer-undo-redo.md (2026-11-12)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-designer-undo-redo.md`
+  summary: No MainComponent harness asserts onChanged burst coalescing, Delete/New/Duplicate one-step recording, or Save/Load/reload dirty+history reset wiring.
+  evidence: Verification Gap; MATRIX_BUILD_TESTS does not link SkinDesignerMainComponent; History unit tests stay green if wiring regresses; manual Session smoke remains the gate.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-designer-undo-redo.md`
+  summary: Compare gating, text-field deferral, and Session keyPressed are only covered via pure helpers plus EditorialUndoRedoShortcutTests, not through the component key path.
+  evidence: Verification Gap; deleting the focus check or mis-wiring canUseDocumentHistory would not fail current tests; text-field policy smoke is manual.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-designer-undo-redo.md`
+  summary: Whole-document snapshot copies on every onChanged (including coalesced drag ticks) may jank or grow memory on very large packs; 100-step cap is count-based only.
+  evidence: Blind Hunter + Edge Case; intentional snapshot design for this story; revisit with deferred capture or COW if packs become heavy.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-designer-undo-redo.md`
+  summary: After more than ~100 edits, a Save marker that fell off the undo stack can never be reached again so Save may stay active after full undo.
+  evidence: Edge Case; rare deep-history case; would need marker retention beyond cap or dirty recompute by content equality.
