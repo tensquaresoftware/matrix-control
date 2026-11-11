@@ -94,7 +94,9 @@ def test_alert_button_look_has_no_colour_chart_dig():
     assert "ColourChart.h" not in builders
     assert "ColourChart.h" not in multi
     assert "buttonAlertLookFromSkin" in multi
-    assert "kFooterMessage" in multi
+    # Alert fill/text own their Button pastilles (ownership pass); no FooterMessage borrow.
+    assert "SkinObjectType::kButton" in multi
+    assert "kFooterMessage" not in multi
 
 
 def test_scan_exits_one_on_untracked_hex_hit():
