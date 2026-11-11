@@ -3254,3 +3254,6 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-skin-colour-object-ownership.md`
   summary: No automated paint-site checks for Settings tab, Dialog title, About link hover, Footer sticky close, ModulationBus highlights, Ramp badge, or ProgressBar phase labels (seed/look tests only).
   evidence: Blind+Verification Gap; repo leaves GUI paint to Standalone/Skin Editor manual smoke; seed remaps stay green if a getColour call site regresses.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-designer-blank-start-session.md`
+  summary: No unit-test harness drives SkinDesignerMainComponent Load/Save/Save as/quit choice wiring (layer/JSON helpers and quit-policy constants are covered; GUI controller is manual).
+  evidence: Verification Gap; Matrix-Control_Tests does not link MainComponent; manual Session smoke remains the gate.
