@@ -3,7 +3,6 @@
 #include "GUI/Skins/Dev/DevSkinInventory.h"
 #include "GUI/Skins/Dev/DevSkinJson.h"
 #include "GUI/Skins/Dev/DevSkinLayer.h"
-#include "GUI/Skins/Dev/DevSkinSession.h"
 #include "GUI/Skins/Skin.h"
 
 class DevSkinLayerJsonTests : public juce::UnitTest
@@ -31,10 +30,10 @@ public:
         beginTest("inventory_matchesCompiledSeedMappingCount");
         assertInventoryMatchesSeed();
 
-        beginTest("exportEditorSkin_writesSingleDevSkinOnly");
-        assertSingleEditorSkinExport();
+        beginTest("exportDesignerSkin_writesSingleDevSkinOnly");
+        assertSingleDesignerSkinExport();
 
-        beginTest("appendImport_addsEditorSkin_withoutWipingSession");
+        beginTest("appendImport_addsDesignerSkin_withoutWipingSession");
         assertAppendImportKeepsExisting();
 
         beginTest("deletePastille_rejectsProduct_andClearsDevWithRefs");
@@ -43,14 +42,14 @@ public:
         beginTest("deletePastille_missingName_leavesMappingsUnchanged");
         assertDeletePastilleMissingLeavesMappings();
 
-        beginTest("exportBlocked_whenEditorSkinHasUnbound");
+        beginTest("exportBlocked_whenDesignerSkinHasUnbound");
         assertExportBlockedWhenUnbound();
 
-        beginTest("newEditorSkin_clearsMappings_unboundEqualsInventory");
-        assertNewEditorSkinStartsFullyUnbound();
+        beginTest("newDesignerSkin_clearsMappings_unboundEqualsInventory");
+        assertNewDesignerSkinStartsFullyUnbound();
 
-        beginTest("newEditorSkin_mergesCustomPastillesFromCurrentEditor");
-        assertNewEditorSkinMergesCustomPastilles();
+        beginTest("newDesignerSkin_mergesCustomPastillesFromCurrentDesigner");
+        assertNewDesignerSkinMergesCustomPastilles();
 
         beginTest("addPastille_rejectsDuplicateName_allowsSameArgb");
         assertAddPastilleRejectsDuplicateNameAllowsSameArgb();
@@ -58,7 +57,7 @@ public:
         beginTest("appendImport_remintsDuplicateExport_withDistinctIds");
         assertAppendRemintDistinctIds();
 
-        beginTest("appendImport_multiSkin_addsTwoEditorSkins");
+        beginTest("appendImport_multiSkin_addsTwoDesignerSkins");
         assertAppendMultiSkinAddsTwo();
 
         runSessionPersistenceTests();
@@ -67,18 +66,10 @@ public:
 private:
     void runSessionPersistenceTests()
     {
-        beginTest("sessionRoundTrip_restoresEditorSkins_compareAlwaysOff");
-        assertSessionRoundTrip();
-
-        beginTest("legacySession_compareOnTrue_loadsWithCompareOff");
-        assertLegacyCompareOnIgnored();
-
-        beginTest("corruptSessionJson_restoresCompiledBaseline");
-        assertCorruptSessionRestoresBaseline();
-
         beginTest("comparePush_productSkinPayloadUsesCompiledKind");
         assertComparePushProductPayload();
     }
+
     void assertDuplicateAndReadOnly()
     {
         TSS::DevSkin::Layer layer;
@@ -164,14 +155,14 @@ private:
         expectEquals(TSS::DevSkin::allStructuredKeys().size(), compiledCream->getMappedColourCount());
     }
 
-    void assertSingleEditorSkinExport()
+    void assertSingleDesignerSkinExport()
     {
         TSS::DevSkin::Layer layer;
         expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Export One").wasOk());
         const auto firstId = layer.activeSkinId();
         expect(layer.duplicateSkin(TSS::DevSkin::kCompiledBlackId, "Export Two").wasOk());
 
-        const auto json = TSS::DevSkin::exportEditorSkinToJson(layer, firstId);
+        const auto json = TSS::DevSkin::exportDesignerSkinToJson(layer, firstId);
         expect(json.isNotEmpty());
 
         const auto parsed = juce::JSON::parse(json);
@@ -192,9 +183,9 @@ private:
 
         TSS::DevSkin::Layer donor;
         expect(donor.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Imported Skin").wasOk());
-        const auto json = TSS::DevSkin::exportEditorSkinToJson(donor, donor.activeSkinId());
+        const auto json = TSS::DevSkin::exportDesignerSkinToJson(donor, donor.activeSkinId());
 
-        const auto appended = TSS::DevSkin::appendEditorSkinsFromJson(layer, json);
+        const auto appended = TSS::DevSkin::appendDesignerSkinsFromJson(layer, json);
         expect(appended.ok);
         expectEquals(layer.skins().size(), beforeCount + 1);
         expect(layer.findSkin(existingId) != nullptr);
@@ -252,13 +243,13 @@ private:
     {
         TSS::DevSkin::Layer donor;
         expect(donor.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Remint Me").wasOk());
-        const auto json = TSS::DevSkin::exportEditorSkinToJson(donor, donor.activeSkinId());
+        const auto json = TSS::DevSkin::exportDesignerSkinToJson(donor, donor.activeSkinId());
 
         TSS::DevSkin::Layer layer;
-        const auto first = TSS::DevSkin::appendEditorSkinsFromJson(layer, json);
+        const auto first = TSS::DevSkin::appendDesignerSkinsFromJson(layer, json);
         expect(first.ok);
         expectEquals(first.importedSkinIds.size(), 1);
-        const auto second = TSS::DevSkin::appendEditorSkinsFromJson(layer, json);
+        const auto second = TSS::DevSkin::appendDesignerSkinsFromJson(layer, json);
         expect(second.ok);
         expectEquals(second.importedSkinIds.size(), 1);
         expect(first.importedSkinIds[0] != second.importedSkinIds[0]);
@@ -275,7 +266,7 @@ private:
         TSS::DevSkin::Layer layer;
         expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Keep").wasOk());
         const auto before = layer.skins().size();
-        const auto appended = TSS::DevSkin::appendEditorSkinsFromJson(layer, json);
+        const auto appended = TSS::DevSkin::appendDesignerSkinsFromJson(layer, json);
         expect(appended.ok);
         expectEquals(appended.importedSkinIds.size(), 2);
         expectEquals(layer.skins().size(), before + 2);
@@ -293,17 +284,17 @@ private:
                                             TSS::SkinColourState::kOff);
         skin->mappings.erase(key);
         expect(layer.unboundCount(skin->id) >= 1);
-        expect(! layer.isEditorSkinExportAllowed(skin->id));
+        expect(! layer.isDesignerSkinExportAllowed(skin->id));
 
         expect(layer.bindUnbound(skin->id, key, "kGrey500").wasOk());
         expectEquals(layer.unboundCount(skin->id), 0);
-        expect(layer.isEditorSkinExportAllowed(skin->id));
+        expect(layer.isDesignerSkinExportAllowed(skin->id));
     }
 
-    void assertNewEditorSkinStartsFullyUnbound()
+    void assertNewDesignerSkinStartsFullyUnbound()
     {
         TSS::DevSkin::Layer layer;
-        expect(layer.createEditorSkinWithUnboundMappings(TSS::DevSkin::kCompiledBlackId,
+        expect(layer.createDesignerSkinWithUnboundMappings(TSS::DevSkin::kCompiledBlackId,
                                                          "Blank Map").wasOk());
         const auto id = layer.activeSkinId();
         const auto* skin = layer.findSkin(id);
@@ -312,14 +303,14 @@ private:
         expect(skin->palette.size() > 0);
         expectEquals(layer.unboundCount(id),
                      static_cast<int>(TSS::DevSkin::allStructuredKeys().size()));
-        expect(! layer.isEditorSkinExportAllowed(id));
+        expect(! layer.isDesignerSkinExportAllowed(id));
 
         // Duplicate still copies full Product mappings (contrast with New).
         expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Full Copy").wasOk());
         expectEquals(layer.unboundCount(layer.activeSkinId()), 0);
     }
 
-    void assertNewEditorSkinMergesCustomPastilles()
+    void assertNewDesignerSkinMergesCustomPastilles()
     {
         TSS::DevSkin::Layer layer;
         expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Donor").wasOk());
@@ -329,7 +320,7 @@ private:
         expect(layer.addPastille(donorId, "kCustomAccent Twin", 0xffff00aa).wasOk());
         expect(layer.addPastille(donorId, "kMyRedCopy", 0xffff0000).wasOk());
 
-        expect(layer.createEditorSkinWithUnboundMappings(TSS::DevSkin::kCompiledBlackId,
+        expect(layer.createDesignerSkinWithUnboundMappings(TSS::DevSkin::kCompiledBlackId,
                                                          "Merged New",
                                                          donorId).wasOk());
         const auto* skin = layer.findSkin(layer.activeSkinId());
@@ -364,91 +355,8 @@ private:
         expect(layer.addPastille(id, "KCUSTOMACCENT", 0xff56cd78).failed());
         // Same ARGB, different name — palette twins are allowed.
         expect(layer.addPastille(id, "kOtherMagenta", kUnique).wasOk());
-        // Product chart colour ARGB under a new Editor name is allowed.
+        // Product chart colour ARGB under a new Designer name is allowed.
         expect(layer.addPastille(id, "kMyRed", 0xffff0000).wasOk());
-    }
-
-    void assertSessionRoundTrip()
-    {
-        TSS::DevSkin::Layer layer;
-        expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Night Work").wasOk());
-        const auto editorId = layer.activeSkinId();
-
-        TSS::DevSkin::EditorSessionState state;
-        state.productSkinId = TSS::DevSkin::kCompiledBlackId;
-        state.editorSkinId = editorId;
-        state.compareOn = true;
-        // Import keeps lastSkinJsonDirectory only when the path is an existing directory
-        // (Linux CI often has no ~/Documents). Seed a unique real temp folder for the round-trip.
-        const auto skinJsonDir = juce::File::getSpecialLocation(juce::File::tempDirectory)
-                                     .getNonexistentChildFile("DevSkinLayerJsonTests-session-dir", {});
-        const bool skinJsonDirReady = skinJsonDir.createDirectory() || skinJsonDir.isDirectory();
-        expect(skinJsonDirReady);
-        if (! skinJsonDirReady)
-            return;
-        state.lastSkinJsonDirectory = skinJsonDir.getFullPathName();
-
-        const auto json = TSS::DevSkin::exportSessionToJson(layer, state);
-        expect(json.contains("skinEditorSession"));
-        expect(json.contains("lastSkinJsonDirectory"));
-
-        TSS::DevSkin::Layer restored;
-        TSS::DevSkin::EditorSessionState restoredState;
-        const auto imported = TSS::DevSkin::importSessionFromJson(restored, restoredState, json);
-        expect(imported.ok);
-        expect(restored.findSkin(editorId) != nullptr);
-        expectEquals(restoredState.productSkinId, juce::String(TSS::DevSkin::kCompiledBlackId));
-        expectEquals(restoredState.editorSkinId, editorId);
-        expect(! restoredState.compareOn); // Compare is runtime-only; never restored On
-        expect(! json.contains("compareOn"));
-        expectEquals(restoredState.lastSkinJsonDirectory, state.lastSkinJsonDirectory);
-        expect(restoredState.lastImportedJsonPath.isEmpty());
-        expect(restoredState.lastImportedJsonFingerprint.isEmpty());
-        expect(restoredState.jsonSyncMode == TSS::DevSkin::JsonSyncMode::kAsk);
-        skinJsonDir.deleteRecursively();
-    }
-
-    void assertLegacyCompareOnIgnored()
-    {
-        TSS::DevSkin::Layer layer;
-        expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Legacy").wasOk());
-        const auto editorId = layer.activeSkinId();
-
-        TSS::DevSkin::EditorSessionState seed;
-        seed.productSkinId = TSS::DevSkin::kCompiledCreamId;
-        seed.editorSkinId = editorId;
-        auto json = TSS::DevSkin::exportSessionToJson(layer, seed);
-        auto parsed = juce::JSON::parse(json);
-        auto* root = parsed.getDynamicObject();
-        expect(root != nullptr);
-        root->setProperty("compareOn", true);
-        json = juce::JSON::toString(parsed, true);
-
-        TSS::DevSkin::Layer restored;
-        TSS::DevSkin::EditorSessionState restoredState;
-        const auto imported = TSS::DevSkin::importSessionFromJson(restored, restoredState, json);
-        expect(imported.ok);
-        expectEquals(restoredState.editorSkinId, editorId);
-        expect(! restoredState.compareOn);
-    }
-
-    void assertCorruptSessionRestoresBaseline()
-    {
-        TSS::DevSkin::Layer layer;
-        expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Will Vanish").wasOk());
-        TSS::DevSkin::EditorSessionState state;
-        state.editorSkinId = layer.activeSkinId();
-        state.compareOn = true;
-
-        const auto bad = TSS::DevSkin::importSessionFromJsonOrReset(layer, state, "{ not-json");
-        expect(! bad.ok);
-        expect(bad.message.containsIgnoreCase("Corrupt session"));
-        expectEquals(layer.skins().size(), static_cast<size_t>(3));
-        expect(layer.findSkin(TSS::DevSkin::kCompiledBlackId) != nullptr);
-        expect(layer.findSkin(TSS::DevSkin::kCompiledBlackDuoId) != nullptr);
-        expect(layer.findSkin(TSS::DevSkin::kCompiledCreamId) != nullptr);
-        expect(state.editorSkinId.isEmpty());
-        expect(! state.compareOn);
     }
 
     void assertComparePushProductPayload()

@@ -16,7 +16,7 @@ namespace TSS::DevSkin
                         juce::String& error);
     void expandLegacyColourSets(NamedSkin& skin);
 
-    /** Editor-only colourSetLabels object, or void when all labels empty. */
+    /** Designer-only colourSetLabels object, or void when all labels empty. */
     juce::var colourSetLabelsToVar(const NamedSkin& skin);
     /** Reads optional colourSetLabels; unknown / invalid keys ignored. */
     void colourSetLabelsFromVar(const juce::var& labelsVar, NamedSkin& out);
@@ -26,7 +26,7 @@ namespace TSS::DevSkin
     /** Parses a mapping-key object; returns false on unknown fields. */
     bool mappingKeyFromVar(const juce::var& value, SkinColourKey& key);
 
-    /** Editor-only mappingLinkGroups array, or void when empty. */
+    /** Designer-only mappingLinkGroups array, or void when empty. */
     juce::var mappingLinkGroupsToVar(const NamedSkin& skin);
     /**
      * Reads optional mappingLinkGroups; drops orphans / invalid / undersized groups.

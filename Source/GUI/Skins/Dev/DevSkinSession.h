@@ -4,12 +4,12 @@
 
 namespace TSS::DevSkin
 {
-    /** How Skin Editor reacts when the last Import JSON changes on disk. */
+    /** How Skin Designer reacts when the last loaded JSON changes on disk. */
     enum class JsonSyncMode
     {
         kOff,  // ignore external edits
         kAsk,  // prompt Reload / Discard (default)
-        kAuto  // reload without prompt (disk wins, even if editor is dirty)
+        kAuto  // reload without prompt (disk wins, even if Designer is dirty)
     };
 
     inline constexpr const char* jsonSyncModeToString(JsonSyncMode mode) noexcept
@@ -32,36 +32,37 @@ namespace TSS::DevSkin
         return JsonSyncMode::kAsk;
     }
 
-    struct EditorSessionState
+    /**
+     * Skin Designer launch preferences. Designer skins are never restored from disk:
+     * the workspace starts blank and is filled with Load.
+     */
+    struct DesignerSessionState
     {
         juce::String productSkinId = kCompiledBlackId;
-        juce::String editorSkinId;
-        /** Runtime only — never persisted; always Off after session load. */
+        /** Runtime only: active Designer skin of the open workspace (empty = none). */
+        juce::String designerSkinId;
+        /** Runtime only: Compare always starts Off. */
         bool compareOn = false;
-        /** Absolute path of last Export/Import parent folder (empty = Documents). */
+        /** Persisted: parent folder of the last Load / Save as draft / Export (empty = Documents). */
         juce::String lastSkinJsonDirectory;
-        /** Absolute path of last successful Import JSON (empty = no external-change watch). */
-        juce::String lastImportedJsonPath;
-        /** Last accepted disk fingerprint for lastImportedJsonPath (empty = legacy / unset). */
-        juce::String lastImportedJsonFingerprint;
-        /** Persisted JSON Sync combo; missing/legacy session values → Ask. */
+        /** Persisted JSON Sync combo; missing values fall back to Ask. */
         JsonSyncMode jsonSyncMode = JsonSyncMode::kAsk;
     };
 
+    /** Document id written into (and required from) the session file. */
+    inline constexpr const char* kSessionDocumentId = "skinDesignerSession";
+
     /** Sets Product to first combo item (BLACK today). Call after session load to ignore restored Product. */
-    void forceProductToFirstAvailable(EditorSessionState& state);
+    void forceProductToFirstAvailable(DesignerSessionState& state);
 
-    juce::String exportSessionToJson(const Layer& layer, const EditorSessionState& state);
-    JsonIoResult importSessionFromJson(Layer& layer,
-                                       EditorSessionState& state,
-                                       const juce::String& jsonText);
+    /** Preferences-only session document (no skins, no watch path). */
+    juce::String exportSessionToJson(const DesignerSessionState& state);
 
-    /** Import session JSON; on failure reset layer to compiled Black/Cream baseline. */
-    JsonIoResult importSessionFromJsonOrReset(Layer& layer,
-                                              EditorSessionState& state,
-                                              const juce::String& jsonText);
+    /** Reads preferences only; refuses any document that is not a Skin Designer session. */
+    JsonIoResult importSessionFromJson(DesignerSessionState& state, const juce::String& jsonText);
 
-    juce::File skinEditorSessionFile();
-    bool saveSessionFile(const Layer& layer, const EditorSessionState& state, juce::String& error);
-    JsonIoResult loadSessionFile(Layer& layer, EditorSessionState& state);
+    juce::File skinDesignerSessionFile();
+    bool saveSessionFile(const DesignerSessionState& state, juce::String& error);
+    /** Loads preferences; missing / old / corrupt files fail and leave state unchanged. */
+    JsonIoResult loadSessionFile(DesignerSessionState& state);
 }

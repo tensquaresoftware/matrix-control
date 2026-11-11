@@ -13,70 +13,68 @@ public:
 
     void runTest() override
     {
-        beginTest("launchProduct_forceFirst_ignoresSessionCream");
-        assertLaunchProductForceIgnoresSessionCream();
+        beginTest("launchProduct_sessionDoesNotPersistProduct");
+        assertSessionDoesNotPersistProduct();
 
         beginTest("launchProduct_forceFirst_onDefaultAndInvalidId");
         assertLaunchProductForceOnDefaultAndInvalidId();
 
-        beginTest("midSessionProduct_creamRoundTrip_withoutLaunchForce");
-        assertMidSessionProductCreamRoundTripWithoutLaunchForce();
+        beginTest("blankLaunch_sessionNeverRestoresDesignerSkin");
+        assertBlankLaunchRestoresNoDesignerSkin();
     }
 
 private:
-    void assertLaunchProductForceIgnoresSessionCream()
+    void assertSessionDoesNotPersistProduct()
     {
-        TSS::DevSkin::Layer layer;
-        expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Keep").wasOk());
-        TSS::DevSkin::EditorSessionState seed;
+        TSS::DevSkin::DesignerSessionState seed;
         seed.productSkinId = TSS::DevSkin::kCompiledCreamId;
-        seed.editorSkinId = layer.activeSkinId();
-        const auto json = TSS::DevSkin::exportSessionToJson(layer, seed);
+        const auto json = TSS::DevSkin::exportSessionToJson(seed);
+        expect(! json.contains("productSkinId"));
 
-        TSS::DevSkin::Layer restored;
-        TSS::DevSkin::EditorSessionState restoredState;
-        expect(TSS::DevSkin::importSessionFromJson(restored, restoredState, json).ok);
-        expectEquals(restoredState.productSkinId, juce::String(TSS::DevSkin::kCompiledCreamId));
-
-        TSS::DevSkin::forceProductToFirstAvailable(restoredState);
+        TSS::DevSkin::DesignerSessionState restoredState;
+        expect(TSS::DevSkin::importSessionFromJson(restoredState, json).ok);
         expectEquals(restoredState.productSkinId, juce::String(TSS::DevSkin::kCompiledBlackId));
     }
 
     void assertLaunchProductForceOnDefaultAndInvalidId()
     {
-        TSS::DevSkin::EditorSessionState defaults;
+        TSS::DevSkin::DesignerSessionState defaults;
         expectEquals(defaults.productSkinId, juce::String(TSS::DevSkin::kCompiledBlackId));
 
-        TSS::DevSkin::Layer layer;
-        TSS::DevSkin::EditorSessionState seed;
-        seed.productSkinId = TSS::DevSkin::kCompiledCreamId;
-        auto json = TSS::DevSkin::exportSessionToJson(layer, seed);
+        TSS::DevSkin::DesignerSessionState seed;
+        auto json = TSS::DevSkin::exportSessionToJson(seed);
         auto parsed = juce::JSON::parse(json);
         auto* root = parsed.getDynamicObject();
         expect(root != nullptr);
         root->setProperty("productSkinId", "not-a-product");
         json = juce::JSON::toString(parsed, true);
 
-        TSS::DevSkin::Layer restored;
-        TSS::DevSkin::EditorSessionState restoredState;
-        expect(TSS::DevSkin::importSessionFromJson(restored, restoredState, json).ok);
+        TSS::DevSkin::DesignerSessionState restoredState;
+        expect(TSS::DevSkin::importSessionFromJson(restoredState, json).ok);
         expectEquals(restoredState.productSkinId, juce::String(TSS::DevSkin::kCompiledBlackId));
 
+        restoredState.productSkinId = TSS::DevSkin::kCompiledCreamId;
         TSS::DevSkin::forceProductToFirstAvailable(restoredState);
         expectEquals(restoredState.productSkinId, juce::String(TSS::DevSkin::kCompiledBlackId));
     }
 
-    void assertMidSessionProductCreamRoundTripWithoutLaunchForce()
+    void assertBlankLaunchRestoresNoDesignerSkin()
     {
         TSS::DevSkin::Layer layer;
-        TSS::DevSkin::EditorSessionState seed;
-        seed.productSkinId = TSS::DevSkin::kCompiledCreamId;
-        const auto json = TSS::DevSkin::exportSessionToJson(layer, seed);
+        expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Prior Work").wasOk());
 
-        TSS::DevSkin::Layer restored;
-        TSS::DevSkin::EditorSessionState restoredState;
-        expect(TSS::DevSkin::importSessionFromJson(restored, restoredState, json).ok);
-        expectEquals(restoredState.productSkinId, juce::String(TSS::DevSkin::kCompiledCreamId));
+        TSS::DevSkin::DesignerSessionState seed;
+        seed.designerSkinId = layer.activeSkinId();
+        const auto json = TSS::DevSkin::exportSessionToJson(seed);
+
+        TSS::DevSkin::DesignerSessionState restoredState;
+        expect(TSS::DevSkin::importSessionFromJson(restoredState, json).ok);
+        expect(restoredState.designerSkinId.isEmpty());
+        expect(! restoredState.compareOn);
+
+        // A fresh layer (what the app builds at launch) holds compiled Product skins only.
+        TSS::DevSkin::Layer launchLayer;
+        expectEquals(launchLayer.skins().size(), static_cast<size_t>(3));
     }
 };
 

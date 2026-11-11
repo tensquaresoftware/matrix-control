@@ -275,7 +275,7 @@ namespace TSS::DevSkin
         return static_cast<int>(unboundKeys(skinId).size());
     }
 
-    bool Layer::isEditorSkinExportAllowed(const juce::String& skinId) const
+    bool Layer::isDesignerSkinExportAllowed(const juce::String& skinId) const
     {
         const auto* skin = findSkin(skinId);
         if (skin == nullptr || skin->kind != SkinKind::kDev)
@@ -311,11 +311,11 @@ namespace TSS::DevSkin
     juce::Result Layer::appendDevSkin(NamedSkin skin, juce::String* outId)
     {
         if (skin.kind != SkinKind::kDev)
-            return juce::Result::fail("Only Editor skins can be appended");
+            return juce::Result::fail("Only Designer skins can be appended");
 
         auto trimmedName = skin.name.trim();
         if (trimmedName.isEmpty())
-            return juce::Result::fail("Editor skin name cannot be empty");
+            return juce::Result::fail("Designer skin name cannot be empty");
 
         if (nameTaken(trimmedName) || isCompiledId(skin.id) || findSkin(skin.id) != nullptr)
         {

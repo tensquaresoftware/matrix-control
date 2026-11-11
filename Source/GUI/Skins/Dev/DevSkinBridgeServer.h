@@ -21,7 +21,7 @@ namespace TSS::DevSkin
         /** Called on message thread after a push is decoded. Return ack/error. */
         std::function<ApplyResult(const PushPayload&)> onPush;
 
-        /** Editor disconnected: Standalone should fall back to compiled Black/Cream. */
+        /** Designer disconnected: Standalone should fall back to compiled Black/Cream. */
         std::function<void()> onClientDisconnected;
 
     private:

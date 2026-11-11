@@ -44,8 +44,8 @@ def test_lint_touched_supports_head_ref_for_push_range():
     assert "base}...{head}" in text or "base}...{head_ref}" in text
 
 
-def test_lint_touched_includes_skin_editor_in_quality_gate_scope():
-    """Matrix-Control Skin Editor must pass the same Clean Code gate as plugin C++."""
+def test_lint_touched_includes_skin_designer_in_quality_gate_scope():
+    """Matrix-Control Skin Designer must pass the same Clean Code gate as plugin C++."""
     import importlib.util
     import sys
 
@@ -56,9 +56,9 @@ def test_lint_touched_includes_skin_editor_in_quality_gate_scope():
     sys.modules[spec.name] = mod
     try:
         spec.loader.exec_module(mod)
-        assert any(p.startswith("Tools/SkinEditor") for p in mod.SCOPE_PREFIXES)
-        assert mod.is_gui_path("Tools/SkinEditor/SkinEditorMainComponent.cpp")
-        assert mod.is_gate_target("Tools/SkinEditor/SkinEditorChrome.h")
+        assert any(p.startswith("Tools/SkinDesigner") for p in mod.SCOPE_PREFIXES)
+        assert mod.is_gui_path("Tools/SkinDesigner/SkinDesignerMainComponent.cpp")
+        assert mod.is_gate_target("Tools/SkinDesigner/SkinDesignerChrome.h")
     finally:
         sys.modules.pop(spec.name, None)
 

@@ -64,7 +64,7 @@ private:
         expect(layer.setColourSetLabel(skinId, TSS::ColourSet::k4, "Modales").wasOk());
         expect(layer.setColourSetLabel(skinId, TSS::ColourSet::k1, "   ").wasOk());
 
-        const auto json = TSS::DevSkin::exportEditorSkinToJson(layer, skinId);
+        const auto json = TSS::DevSkin::exportDesignerSkinToJson(layer, skinId);
         const auto parsed = juce::JSON::parse(json);
         auto* root = parsed.getDynamicObject();
         expect(root != nullptr);
@@ -79,7 +79,7 @@ private:
         expect(! labelsObj->hasProperty("cs1"));
 
         TSS::DevSkin::Layer restored;
-        const auto imported = TSS::DevSkin::appendEditorSkinsFromJson(restored, json);
+        const auto imported = TSS::DevSkin::appendDesignerSkinsFromJson(restored, json);
         expect(imported.ok);
         expectEquals(imported.importedSkinIds.size(), 1);
         const auto* skin = restored.findSkin(imported.importedSkinIds[0]);
@@ -160,7 +160,7 @@ private:
 
         const auto json = makeSkinJsonWithColourSetLabel("import-cap-skin", seventeen);
         TSS::DevSkin::Layer layer;
-        const auto imported = TSS::DevSkin::appendEditorSkinsFromJson(layer, json);
+        const auto imported = TSS::DevSkin::appendDesignerSkinsFromJson(layer, json);
         expect(imported.ok);
         expectEquals(imported.importedSkinIds.size(), 1);
         const auto* skin = layer.findSkin(imported.importedSkinIds[0]);
@@ -176,7 +176,7 @@ private:
                                    + "Zone";
         const auto json = makeSkinJsonWithColourSetLabel("import-ascii-skin", mixed);
         TSS::DevSkin::Layer layer;
-        const auto imported = TSS::DevSkin::appendEditorSkinsFromJson(layer, json);
+        const auto imported = TSS::DevSkin::appendDesignerSkinsFromJson(layer, json);
         expect(imported.ok);
         expectEquals(imported.importedSkinIds.size(), 1);
         const auto* skin = layer.findSkin(imported.importedSkinIds[0]);

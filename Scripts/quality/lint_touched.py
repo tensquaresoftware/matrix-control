@@ -10,7 +10,7 @@ Usage:
   python3 Scripts/quality/lint_touched.py --all --report-worst 20
 
 Without --all:
-  - Only Source/, Tests/, and Tools/SkinEditor/ C++ files in the git worktree /
+  - Only Source/, Tests/, and Tools/SkinDesigner/ C++ files in the git worktree /
     commits since --base
   - Function findings apply only to functions that intersect **changed lines**
     (Boy Scout limited: one-line fix in a large historical file does not force
@@ -18,7 +18,7 @@ Without --all:
   - File-size findings apply only if the file is new, or useful-line count grew
     while still over the threshold
 
-Matrix-Control Skin Editor (`Tools/SkinEditor/`) is in the same quality gate as
+Matrix-Control Skin Designer (`Tools/SkinDesigner/`) is in the same quality gate as
 plugin GUI code (GUI nloc/ccn thresholds).
 
 With --all: full diagnostic of the tree (debt cleanup backlog).
@@ -62,7 +62,7 @@ MAX_NESTING = 4
 MAX_CPP_USEFUL_LINES = 400
 
 CPP_SUFFIXES = {".h", ".hpp", ".hh", ".cpp", ".cc", ".cxx"}
-SCOPE_PREFIXES = ("Source/", "Tests/", "Tools/SkinEditor/")
+SCOPE_PREFIXES = ("Source/", "Tests/", "Tools/SkinDesigner/")
 SKIP_PATH_PARTS = ("JuceLibraryCode", "juce_binarydata")
 # JUCE virtual overrides keep framework arity — do not rewrite signatures (CONVENTIONS.md §3).
 JUCE_OVERRIDE_PARAM_ALLOWLIST = frozenset(
@@ -144,7 +144,7 @@ def collect_changed_files(base: str, head: str = "HEAD") -> list[str]:
 
 
 def collect_all_files() -> list[str]:
-    tracked = git_lines(["git", "ls-files", "Source", "Tests", "Tools/SkinEditor"])
+    tracked = git_lines(["git", "ls-files", "Source", "Tests", "Tools/SkinDesigner"])
     return sorted(f for f in tracked if is_gate_target(f))
 
 
@@ -153,7 +153,7 @@ def is_gui_path(rel: str) -> bool:
     return (
         "/GUI/" in norm
         or norm.startswith("Source/GUI/")
-        or norm.startswith("Tools/SkinEditor/")
+        or norm.startswith("Tools/SkinDesigner/")
     )
 
 

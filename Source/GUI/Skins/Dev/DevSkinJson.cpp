@@ -125,7 +125,7 @@ namespace TSS::DevSkin
                 mappings.add(mappingToVar(key, paletteName));
             obj->setProperty("mappings", mappings);
 
-            // Editor-only metadata: omit when empty; never written into PushPayload.
+            // Designer-only metadata: omit when empty; never written into PushPayload.
             const auto labels = colourSetLabelsToVar(skin);
             if (! labels.isVoid())
                 obj->setProperty("colourSetLabels", labels);
@@ -200,7 +200,7 @@ namespace TSS::DevSkin
         return juce::JSON::toString(juce::var(root), false);
     }
 
-    juce::String exportEditorSkinToJson(const NamedSkin& skin)
+    juce::String exportDesignerSkinToJson(const NamedSkin& skin)
     {
         auto* root = new juce::DynamicObject();
         root->setProperty("schemaVersion", kSchemaVersion);
@@ -212,12 +212,12 @@ namespace TSS::DevSkin
         return juce::JSON::toString(juce::var(root), false);
     }
 
-    juce::String exportEditorSkinToJson(const Layer& layer, const juce::String& skinId)
+    juce::String exportDesignerSkinToJson(const Layer& layer, const juce::String& skinId)
     {
         const auto* skin = layer.findSkin(skinId);
         if (skin == nullptr || skin->kind != SkinKind::kDev)
             return {};
-        return exportEditorSkinToJson(*skin);
+        return exportDesignerSkinToJson(*skin);
     }
 
     namespace
@@ -243,7 +243,7 @@ namespace TSS::DevSkin
                     || skin.id == kCompiledBlackDuoId
                     || skin.id == kCompiledCreamId)
                 {
-                    return JsonIoResult::failure("Imported Editor skin cannot reuse compiled ids");
+                    return JsonIoResult::failure("Imported Designer skin cannot reuse compiled ids");
                 }
                 outSkins.push_back(std::move(skin));
             }
@@ -297,31 +297,48 @@ namespace TSS::DevSkin
 
             return JsonIoResult::success();
         }
+
+        JsonIoResult importReplacingAll(Layer& layer, const juce::String& jsonText, bool requireDesignerSkins)
+        {
+            juce::var parsed;
+            juce::DynamicObject* root = nullptr;
+            const auto gate = parseRootObject(jsonText, parsed, root);
+            if (! gate.ok)
+                return gate;
+
+            std::vector<NamedSkin> skins;
+            skins.push_back(makeCompiledSkin(SkinKind::kCompiledBlack));
+            skins.push_back(makeCompiledSkin(SkinKind::kCompiledBlackDuo));
+            skins.push_back(makeCompiledSkin(SkinKind::kCompiledCream));
+
+            const auto compiledCount = skins.size();
+            const auto imported = appendImportedDevSkins(*root, skins);
+            if (! imported.ok)
+                return imported;
+            if (requireDesignerSkins && skins.size() == compiledCount)
+                return JsonIoResult::failure("No Designer skins found in JSON");
+
+            auto result = JsonIoResult::success();
+            for (size_t i = compiledCount; i < skins.size(); ++i)
+                result.importedSkinIds.add(skins[i].id);
+
+            const auto activeId = resolveActiveSkinId(*root, skins);
+            layer.replaceAll(std::move(skins), activeId);
+            return result;
+        }
     }
 
     JsonIoResult importFromJson(Layer& layer, const juce::String& jsonText)
     {
-        juce::var parsed;
-        juce::DynamicObject* root = nullptr;
-        const auto gate = parseRootObject(jsonText, parsed, root);
-        if (! gate.ok)
-            return gate;
-
-        std::vector<NamedSkin> skins;
-        skins.push_back(makeCompiledSkin(SkinKind::kCompiledBlack));
-        skins.push_back(makeCompiledSkin(SkinKind::kCompiledBlackDuo));
-        skins.push_back(makeCompiledSkin(SkinKind::kCompiledCream));
-
-        const auto imported = appendImportedDevSkins(*root, skins);
-        if (! imported.ok)
-            return imported;
-
-        const auto activeId = resolveActiveSkinId(*root, skins);
-        layer.replaceAll(std::move(skins), activeId);
-        return JsonIoResult::success();
+        return importReplacingAll(layer, jsonText, false);
     }
 
-    JsonIoResult appendEditorSkinsFromJson(Layer& layer, const juce::String& jsonText)
+    JsonIoResult replaceDesignerSkinsFromJson(Layer& layer, const juce::String& jsonText)
+    {
+        return importReplacingAll(layer, jsonText, true);
+    }
+
+    JsonIoResult appendDesignerSkinsFromJson(Layer& layer, const juce::String& jsonText)
     {
         juce::var parsed;
         juce::DynamicObject* root = nullptr;
@@ -334,7 +351,7 @@ namespace TSS::DevSkin
         if (! parsedSkins.ok)
             return parsedSkins;
         if (imported.empty())
-            return JsonIoResult::failure("No Editor skins found in JSON");
+            return JsonIoResult::failure("No Designer skins found in JSON");
 
         JsonIoResult result = JsonIoResult::success();
         for (auto& skin : imported)

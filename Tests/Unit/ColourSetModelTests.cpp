@@ -81,7 +81,7 @@ private:
                                          TSS::ColourSet::k2);
         expect(skin->mappings.count(ucsKey) == 0);
         expectEquals(layer.unboundCount(skin->id), 0);
-        expect(layer.isEditorSkinExportAllowed(skin->id));
+        expect(layer.isDesignerSkinExportAllowed(skin->id));
     }
 
     void assertExportWritesSchemaTwo()

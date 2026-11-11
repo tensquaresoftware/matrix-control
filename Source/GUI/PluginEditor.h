@@ -16,7 +16,7 @@
 #include "Skins/Skin.h"
 #include "Core/MIDI/Queue/RealtimeQueuePressureMonitor.h"
 
-#if defined(MATRIX_SKIN_EDITOR_DEV_LAYER)
+#if defined(MATRIX_SKIN_DESIGNER_DEV_LAYER)
 #include "GUI/Skins/Dev/DevSkinTypes.h"
 #endif
 
@@ -53,7 +53,7 @@ public:
     TSS::ISkin& getActiveSkin() noexcept;
     float getAppliedUiScale() const noexcept { return appliedUiScale_; }
 
-#if defined(MATRIX_SKIN_EDITOR_DEV_LAYER)
+#if defined(MATRIX_SKIN_DESIGNER_DEV_LAYER)
     TSS::DevSkin::ApplyResult applyDevSkinPush(const TSS::DevSkin::PushPayload& payload);
     void clearDevSkinOverlay();
 #endif
@@ -289,7 +289,7 @@ private:
     std::unique_ptr<TSS::Skin> skinBlackDuo_;
     std::unique_ptr<TSS::Skin> skinCream_;
     TSS::Skin* skinForVariantId(int skinItemId) const noexcept;
-#if defined(MATRIX_SKIN_EDITOR_DEV_LAYER)
+#if defined(MATRIX_SKIN_DESIGNER_DEV_LAYER)
     std::unique_ptr<TSS::Skin> skinDevOverlay_;
 #endif
     TSS::Skin* skin_ = nullptr;

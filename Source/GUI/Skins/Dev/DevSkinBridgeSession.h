@@ -7,7 +7,7 @@
 namespace TSS::DevSkin
 {
     /**
-     * Connection + pending-push policy for the Skin Editor thin bridge (no sockets).
+     * Connection + pending-push policy for the Skin Designer thin bridge (no sockets).
      * BridgeClient drives this; unit tests cover offline queue and push-on-connect.
      */
     class BridgeSession
@@ -32,7 +32,7 @@ namespace TSS::DevSkin
         /** Re-queue after a failed send so reconnect/retry can push again. */
         void retainPending(const PushPayload& payload);
 
-        /** Status text for the editor connection label (no product preview). */
+        /** Status text for the Designer connection label (no product preview). */
         juce::String connectionStatusText() const;
 
     private:

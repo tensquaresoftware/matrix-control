@@ -2,8 +2,8 @@
 
 #include "GUI/Skins/Dev/DevSkinJson.h"
 #include "GUI/Skins/Dev/DevSkinLayer.h"
-#include "Tools/SkinEditor/SkinEditorMappingModePolicy.h"
-#include "Tools/SkinEditor/SkinEditorUiHelpers.h"
+#include "Tools/SkinDesigner/SkinDesignerMappingModePolicy.h"
+#include "Tools/SkinDesigner/SkinDesignerUiHelpers.h"
 
 class DevSkinPendingPastilleTests : public juce::UnitTest
 {
@@ -54,11 +54,11 @@ public:
         beginTest("addPastille_threeArgDefaultsPendingFalse");
         assertThreeArgAddPendingFalse();
 
-        beginTest("editorSkinNames_naturalOrder_digitRunsNumeric");
-        assertEditorSkinNamesNaturalOrder();
+        beginTest("designerSkinNames_naturalOrder_digitRunsNumeric");
+        assertDesignerSkinNamesNaturalOrder();
 
-        beginTest("sortedEditorSkins_devOnly_naturalNameOrder");
-        assertSortedEditorSkinsDevOnlyNaturalOrder();
+        beginTest("sortedDesignerSkins_devOnly_naturalNameOrder");
+        assertSortedDesignerSkinsDevOnlyNaturalOrder();
     }
 
 private:
@@ -70,19 +70,19 @@ private:
         const auto* skin = layer.findSkin(id);
         expect(skin != nullptr);
 
-        const auto name1 = SkinEditorUi::suggestUniqueTempPastilleName(*skin);
+        const auto name1 = SkinDesignerUi::suggestUniqueTempPastilleName(*skin);
         expectEquals(name1, juce::String("Temp 1"));
-        const auto argb1 = SkinEditorUi::suggestUniqueOpaqueArgb(*skin);
+        const auto argb1 = SkinDesignerUi::suggestUniqueOpaqueArgb(*skin);
         expect((argb1 & 0xff000000u) == 0xff000000u);
         expect(layer.addPastille(id, name1, argb1, true).wasOk());
 
         skin = layer.findSkin(id);
         expect(skin != nullptr);
-        expectEquals(SkinEditorUi::suggestUniquePastilleName(*skin, "Temp 1"),
+        expectEquals(SkinDesignerUi::suggestUniquePastilleName(*skin, "Temp 1"),
                      juce::String("Temp 1 2"));
-        const auto name2 = SkinEditorUi::suggestUniqueTempPastilleName(*skin);
+        const auto name2 = SkinDesignerUi::suggestUniqueTempPastilleName(*skin);
         expectEquals(name2, juce::String("Temp 2"));
-        const auto argb2 = SkinEditorUi::suggestUniqueOpaqueArgb(*skin);
+        const auto argb2 = SkinDesignerUi::suggestUniqueOpaqueArgb(*skin);
         expect(argb2 != argb1);
         expect((argb2 & 0xff000000u) == 0xff000000u);
         expect(layer.addPastille(id, name2, argb2, true).wasOk());
@@ -106,7 +106,7 @@ private:
 
         const auto* skin = layer.findSkin(id);
         expect(skin != nullptr);
-        expectEquals(SkinEditorUi::suggestUniquePastilleName(*skin, "Editor Accent"),
+        expectEquals(SkinDesignerUi::suggestUniquePastilleName(*skin, "Editor Accent"),
                      juce::String("Editor Accent 3"));
 
         juce::String productName;
@@ -120,7 +120,7 @@ private:
             break;
         }
         expect(productName.isNotEmpty());
-        const auto cloneName = SkinEditorUi::suggestUniquePastilleName(*skin, productName);
+        const auto cloneName = SkinDesignerUi::suggestUniquePastilleName(*skin, productName);
         expect(cloneName.isNotEmpty());
         expect(! layer.isProductPastilleName(cloneName));
         expect(layer.addPastille(id, cloneName, productArgb, false).wasOk());
@@ -327,7 +327,7 @@ private:
 
         const auto* skin = layer.findSkin(id);
         expect(skin != nullptr);
-        const auto copyName = SkinEditorUi::suggestUniquePastilleName(*skin, "Editor Accent");
+        const auto copyName = SkinDesignerUi::suggestUniquePastilleName(*skin, "Editor Accent");
         expectEquals(copyName, juce::String("Editor Accent 2"));
         expect(layer.addPastille(id, copyName, kSourceArgb, false).wasOk());
 
@@ -346,8 +346,8 @@ private:
         }
         expect(foundCopy);
         // Neither twin mapped yet — first bind is still allowed.
-        expect(! SkinEditorUi::isPastilleArgbMappedUnderOtherName(*skin, copyName));
-        expect(! SkinEditorUi::isPastilleArgbMappedUnderOtherName(*skin, "Editor Accent"));
+        expect(! SkinDesignerUi::isPastilleArgbMappedUnderOtherName(*skin, copyName));
+        expect(! SkinDesignerUi::isPastilleArgbMappedUnderOtherName(*skin, "Editor Accent"));
     }
 
     void assertSameArgbMappedCollisionProbe()
@@ -361,8 +361,8 @@ private:
 
         const auto* skin = layer.findSkin(id);
         expect(skin != nullptr);
-        expect(! SkinEditorUi::isPastilleArgbMappedUnderOtherName(*skin, "Accent A"));
-        expect(! SkinEditorUi::isPastilleArgbMappedUnderOtherName(*skin, "Accent B"));
+        expect(! SkinDesignerUi::isPastilleArgbMappedUnderOtherName(*skin, "Accent A"));
+        expect(! SkinDesignerUi::isPastilleArgbMappedUnderOtherName(*skin, "Accent B"));
 
         const auto key = TSS::skinColourKey(TSS::SkinObjectType::kButton,
                                             TSS::SkinColourProperty::kBackground,
@@ -371,19 +371,19 @@ private:
 
         skin = layer.findSkin(id);
         expect(skin != nullptr);
-        expect(! SkinEditorUi::isPastilleArgbMappedUnderOtherName(*skin, "Accent A"));
-        expect(SkinEditorUi::isPastilleArgbMappedUnderOtherName(*skin, "Accent B"));
-        expect(SkinEditorMappingPolicy::canBindPastille(
-            false, SkinEditorUi::isPastilleArgbMappedUnderOtherName(*skin, "Accent A")));
-        expect(! SkinEditorMappingPolicy::canBindPastille(
-            false, SkinEditorUi::isPastilleArgbMappedUnderOtherName(*skin, "Accent B")));
+        expect(! SkinDesignerUi::isPastilleArgbMappedUnderOtherName(*skin, "Accent A"));
+        expect(SkinDesignerUi::isPastilleArgbMappedUnderOtherName(*skin, "Accent B"));
+        expect(SkinDesignerMappingPolicy::canBindPastille(
+            false, SkinDesignerUi::isPastilleArgbMappedUnderOtherName(*skin, "Accent A")));
+        expect(! SkinDesignerMappingPolicy::canBindPastille(
+            false, SkinDesignerUi::isPastilleArgbMappedUnderOtherName(*skin, "Accent B")));
 
         expect(layer.setPastilleArgb(id, "Accent B", 0xff010203).wasOk());
         skin = layer.findSkin(id);
         expect(skin != nullptr);
-        expect(! SkinEditorUi::isPastilleArgbMappedUnderOtherName(*skin, "Accent B"));
-        expect(SkinEditorMappingPolicy::canBindPastille(
-            false, SkinEditorUi::isPastilleArgbMappedUnderOtherName(*skin, "Accent B")));
+        expect(! SkinDesignerUi::isPastilleArgbMappedUnderOtherName(*skin, "Accent B"));
+        expect(SkinDesignerMappingPolicy::canBindPastille(
+            false, SkinDesignerUi::isPastilleArgbMappedUnderOtherName(*skin, "Accent B")));
     }
 
     void assertRenameRejectsEmptyCollisionAndProduct()
@@ -427,22 +427,22 @@ private:
                 expect(! pastille.pending);
     }
 
-    void assertEditorSkinNamesNaturalOrder()
+    void assertDesignerSkinNamesNaturalOrder()
     {
-        expect(SkinEditorUi::compareEditorSkinNamesNatural("Name 9", "Name 10") < 0);
-        expect(SkinEditorUi::compareEditorSkinNamesNatural("Name 10", "Name 9") > 0);
-        expect(SkinEditorUi::compareEditorSkinNamesNatural("Alpha", "alpha") == 0);
-        expect(SkinEditorUi::compareEditorSkinNamesNatural("Beta", "Alpha") > 0);
+        expect(SkinDesignerUi::compareDesignerSkinNamesNatural("Name 9", "Name 10") < 0);
+        expect(SkinDesignerUi::compareDesignerSkinNamesNatural("Name 10", "Name 9") > 0);
+        expect(SkinDesignerUi::compareDesignerSkinNamesNatural("Alpha", "alpha") == 0);
+        expect(SkinDesignerUi::compareDesignerSkinNamesNatural("Beta", "Alpha") > 0);
     }
 
-    void assertSortedEditorSkinsDevOnlyNaturalOrder()
+    void assertSortedDesignerSkinsDevOnlyNaturalOrder()
     {
         TSS::DevSkin::Layer layer;
         expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Name 10").wasOk());
         expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Name 2").wasOk());
         expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Name 9").wasOk());
 
-        const auto sorted = SkinEditorUi::sortedEditorSkins(layer);
+        const auto sorted = SkinDesignerUi::sortedDesignerSkins(layer);
         expectEquals(static_cast<int>(sorted.size()), 3);
         expectEquals(sorted[0]->name, juce::String("Name 2"));
         expectEquals(sorted[1]->name, juce::String("Name 9"));

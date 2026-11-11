@@ -4,7 +4,7 @@
 #include "PluginEditor.h"
 #include "PluginEditorInternal.h"
 
-#if defined(MATRIX_SKIN_EDITOR_DEV_LAYER)
+#if defined(MATRIX_SKIN_DESIGNER_DEV_LAYER)
 #include "GUI/Skins/Dev/DevSkinApplier.h"
 #endif
 
@@ -150,7 +150,7 @@ TSS::Skin* PluginEditor::skinForVariantId(int skinItemId) const noexcept
 
 void PluginEditor::applySkinFromItemId(int skinItemId, bool persistToState)
 {
-#if defined(MATRIX_SKIN_EDITOR_DEV_LAYER)
+#if defined(MATRIX_SKIN_DESIGNER_DEV_LAYER)
     skinDevOverlay_.reset();
 #endif
     skin_ = skinForVariantId(skinItemId);
@@ -163,7 +163,7 @@ void PluginEditor::applySkinFromItemId(int skinItemId, bool persistToState)
         comp->getHeaderPanel().setCurrentSkinItemId(skinItemId);
 }
 
-#if defined(MATRIX_SKIN_EDITOR_DEV_LAYER)
+#if defined(MATRIX_SKIN_DESIGNER_DEV_LAYER)
 TSS::DevSkin::ApplyResult PluginEditor::applyDevSkinPush(const TSS::DevSkin::PushPayload& payload)
 {
     using namespace TSS::DevSkin;

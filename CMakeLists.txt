@@ -481,10 +481,10 @@ set(TEST_SANDBOX_SOURCES
 # ============================================================================
 option(MATRIX_BUILD_TESTS "Build the Matrix-Control unit test runner" OFF)
 
-# Dev author tool: Matrix-Control Skin Editor + Standalone Dev thin-bridge receiver.
+# Dev author tool: Matrix-Control Skin Designer + Standalone Dev thin-bridge receiver.
 # Keep OFF for Release user packaging / AU / VST3. Enable for local invent work:
-#   cmake --preset macos-debug-arm64 -DMATRIX_BUILD_SKIN_EDITOR=ON
-option(MATRIX_BUILD_SKIN_EDITOR "Build Skin Editor app and Standalone Dev skin receiver" OFF)
+#   cmake --preset macos-debug-arm64 -DMATRIX_BUILD_SKIN_DESIGNER=ON
+option(MATRIX_BUILD_SKIN_DESIGNER "Build Skin Designer app and Standalone Dev skin receiver" OFF)
 
 # Shared Dev-layer + editor client sources (no BridgeServer — Standalone-only).
 set(MATRIX_SKIN_DEV_LAYER_SOURCES
@@ -618,21 +618,22 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/DevSkinLayerJsonTests.cpp
         Tests/Unit/DevSkinSessionJsonSyncTests.cpp
         Tests/Unit/DevSkinSessionImportWatchTests.cpp
+        Tests/Unit/DevSkinWorkspaceFilesTests.cpp
         Tests/Unit/DevSkinColourSetLabelsTests.cpp
         Tests/Unit/DevSkinMappingLinkGroupsTests.cpp
         Tests/Unit/DevSkinLaunchProductTests.cpp
         Tests/Unit/DevSkinCompiledSeedInventoryTests.cpp
         Tests/Unit/DevSkinMatrixTests.cpp
         Tests/Unit/DevSkinPendingPastilleTests.cpp
-        Tests/Unit/SkinEditorMappingModePolicyTests.cpp
-        Tests/Unit/SkinEditorMappingLinkGroupsTests.cpp
-        Tests/Unit/SkinEditorMappingsColumnFilterTests.cpp
-        Tests/Unit/SkinEditorMappingsSortErgoTests.cpp
-        Tests/Unit/SkinEditorChromeLayoutTests.cpp
-        Tests/Unit/SkinEditorColourPickerTests.cpp
-        Tools/SkinEditor/SkinEditorChromePanel.cpp
-        Tools/SkinEditor/SkinEditorColourPicker.cpp
-        Tools/SkinEditor/SkinEditorSkinsPanel.cpp
+        Tests/Unit/SkinDesignerMappingModePolicyTests.cpp
+        Tests/Unit/SkinDesignerMappingLinkGroupsTests.cpp
+        Tests/Unit/SkinDesignerMappingsColumnFilterTests.cpp
+        Tests/Unit/SkinDesignerMappingsSortErgoTests.cpp
+        Tests/Unit/SkinDesignerChromeLayoutTests.cpp
+        Tests/Unit/SkinDesignerColourPickerTests.cpp
+        Tools/SkinDesigner/SkinDesignerChromePanel.cpp
+        Tools/SkinDesigner/SkinDesignerColourPicker.cpp
+        Tools/SkinDesigner/SkinDesignerSkinsPanel.cpp
         Tests/Unit/SliderZoneSeedTests.cpp
         Tests/Unit/ProgressBarUcsSeedTests.cpp
         Tests/Unit/PatchManagerActionHandlerComputerNavigationTests.cpp
@@ -1020,7 +1021,7 @@ target_compile_definitions(Matrix-Control_Standalone PRIVATE
     JUCE_USE_CUSTOM_PLUGIN_STANDALONE_APP=1
 )
 
-if(MATRIX_BUILD_SKIN_EDITOR)
+if(MATRIX_BUILD_SKIN_DESIGNER)
     # Shared apply helpers for PluginEditor overlay (no receiver listen socket in AU/VST3).
     target_sources(Matrix-Control PRIVATE
         Source/GUI/Skins/Dev/DevSkinApplier.cpp
@@ -1038,16 +1039,16 @@ if(MATRIX_BUILD_SKIN_EDITOR)
         Source/GUI/Skins/Dev/DevSkinStandalonePaintState.cpp
     )
     target_compile_definitions(Matrix-Control PRIVATE
-        MATRIX_SKIN_EDITOR_DEV_LAYER=1
+        MATRIX_SKIN_DESIGNER_DEV_LAYER=1
     )
     target_sources(Matrix-Control_Standalone PRIVATE
         Source/GUI/Skins/Dev/DevSkinBridgeServer.cpp
         ${MATRIX_SKIN_DEV_RECEIVER_SOURCES}
-        Source/Standalone/SkinEditorReceiverStandalone.cpp
+        Source/Standalone/SkinDesignerReceiverStandalone.cpp
     )
     target_compile_definitions(Matrix-Control_Standalone PRIVATE
-        MATRIX_SKIN_EDITOR_DEV_LAYER=1
-        MATRIX_SKIN_EDITOR_RECEIVER=1
+        MATRIX_SKIN_DESIGNER_DEV_LAYER=1
+        MATRIX_SKIN_DESIGNER_RECEIVER=1
     )
 endif()
 
@@ -1199,42 +1200,43 @@ target_link_libraries(ExportMatrixModals PRIVATE
 add_dependencies(ExportMatrixModals Matrix-Control)
 
 # =============================================================================
-# DEV TOOL: Matrix-Control Skin Editor (native JUCE GUI app)
-#   cmake --preset macos-debug-arm64 -DMATRIX_BUILD_SKIN_EDITOR=ON
-#   cmake --build --preset macos-debug-arm64 --target Matrix-Control_SkinEditor
-# Absent from Release user packaging when MATRIX_BUILD_SKIN_EDITOR=OFF.
+# DEV TOOL: Matrix-Control Skin Designer (native JUCE GUI app)
+#   cmake --preset macos-debug-arm64 -DMATRIX_BUILD_SKIN_DESIGNER=ON
+#   cmake --build --preset macos-debug-arm64 --target Matrix-Control_SkinDesigner
+# Absent from Release user packaging when MATRIX_BUILD_SKIN_DESIGNER=OFF.
 # =============================================================================
-if(MATRIX_BUILD_SKIN_EDITOR)
-    juce_add_gui_app(Matrix-Control_SkinEditor
-        PRODUCT_NAME "Matrix-Control Skin Editor"
+if(MATRIX_BUILD_SKIN_DESIGNER)
+    juce_add_gui_app(Matrix-Control_SkinDesigner
+        PRODUCT_NAME "Matrix-Control Skin Designer"
         COMPANY_NAME "Ten Square Software"
-        BUNDLE_ID "com.TenSquareSoftware.Matrix-Control-SkinEditor"
+        BUNDLE_ID "com.TenSquareSoftware.Matrix-Control-SkinDesigner"
     )
 
-    target_sources(Matrix-Control_SkinEditor PRIVATE
-        Tools/SkinEditor/Main.cpp
-        Tools/SkinEditor/SkinEditorMainWindow.cpp
-        Tools/SkinEditor/SkinEditorChromePanel.cpp
-        Tools/SkinEditor/SkinEditorChromeTable.cpp
-        Tools/SkinEditor/SkinEditorAlertWindow.cpp
-        Tools/SkinEditor/SkinEditorLookAndFeel.cpp
-        Tools/SkinEditor/SkinEditorMainComponent.cpp
-        Tools/SkinEditor/SkinEditorMainComponentActions.cpp
-        Tools/SkinEditor/SkinEditorMainComponentImportWatch.cpp
-        Tools/SkinEditor/SkinEditorMainComponentMapping.cpp
-        Tools/SkinEditor/SkinEditorMainComponentSession.cpp
-        Tools/SkinEditor/SkinEditorMainComponentSkins.cpp
-        Tools/SkinEditor/SkinEditorColourPicker.cpp
-        Tools/SkinEditor/SkinEditorPalettePanel.cpp
-        Tools/SkinEditor/SkinEditorPalettePanelClicks.cpp
-        Tools/SkinEditor/SkinEditorPalettePanelSticky.cpp
-        Tools/SkinEditor/SkinEditorMappingsPanel.cpp
-        Tools/SkinEditor/SkinEditorMappingsPanelActionRow.cpp
-        Tools/SkinEditor/SkinEditorMappingsPanelRows.cpp
-        Tools/SkinEditor/SkinEditorMappingsPanelFilters.cpp
-        Tools/SkinEditor/SkinEditorMappingsPanelLink.cpp
-        Tools/SkinEditor/SkinEditorMappingsFilterMenu.cpp
-        Tools/SkinEditor/SkinEditorSkinsPanel.cpp
+    target_sources(Matrix-Control_SkinDesigner PRIVATE
+        Tools/SkinDesigner/Main.cpp
+        Tools/SkinDesigner/SkinDesignerMainWindow.cpp
+        Tools/SkinDesigner/SkinDesignerChromePanel.cpp
+        Tools/SkinDesigner/SkinDesignerChromeTable.cpp
+        Tools/SkinDesigner/SkinDesignerAlertWindow.cpp
+        Tools/SkinDesigner/SkinDesignerLookAndFeel.cpp
+        Tools/SkinDesigner/SkinDesignerMainComponent.cpp
+        Tools/SkinDesigner/SkinDesignerMainComponentActions.cpp
+        Tools/SkinDesigner/SkinDesignerMainComponentFiles.cpp
+        Tools/SkinDesigner/SkinDesignerMainComponentImportWatch.cpp
+        Tools/SkinDesigner/SkinDesignerMainComponentMapping.cpp
+        Tools/SkinDesigner/SkinDesignerMainComponentSession.cpp
+        Tools/SkinDesigner/SkinDesignerMainComponentSkins.cpp
+        Tools/SkinDesigner/SkinDesignerColourPicker.cpp
+        Tools/SkinDesigner/SkinDesignerPalettePanel.cpp
+        Tools/SkinDesigner/SkinDesignerPalettePanelClicks.cpp
+        Tools/SkinDesigner/SkinDesignerPalettePanelSticky.cpp
+        Tools/SkinDesigner/SkinDesignerMappingsPanel.cpp
+        Tools/SkinDesigner/SkinDesignerMappingsPanelActionRow.cpp
+        Tools/SkinDesigner/SkinDesignerMappingsPanelRows.cpp
+        Tools/SkinDesigner/SkinDesignerMappingsPanelFilters.cpp
+        Tools/SkinDesigner/SkinDesignerMappingsPanelLink.cpp
+        Tools/SkinDesigner/SkinDesignerMappingsFilterMenu.cpp
+        Tools/SkinDesigner/SkinDesignerSkinsPanel.cpp
         ${MATRIX_SKIN_DEV_LAYER_SOURCES}
         Source/GUI/Skins/Skin.cpp
         Source/GUI/Skins/SkinColourAccessors.cpp
@@ -1242,20 +1244,20 @@ if(MATRIX_BUILD_SKIN_EDITOR)
         Source/Standalone/StandaloneTitleBarDoubleClick.cpp
     )
 
-    target_include_directories(Matrix-Control_SkinEditor PRIVATE
+    target_include_directories(Matrix-Control_SkinDesigner PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/Source
     )
 
-    target_compile_definitions(Matrix-Control_SkinEditor PRIVATE
+    target_compile_definitions(Matrix-Control_SkinDesigner PRIVATE
         JUCE_WEB_BROWSER=0
         JUCE_USE_CURL=0
         JUCE_MODAL_LOOPS_PERMITTED=1
-        JUCE_APPLICATION_NAME_STRING="$<TARGET_PROPERTY:Matrix-Control_SkinEditor,JUCE_PRODUCT_NAME>"
+        JUCE_APPLICATION_NAME_STRING="$<TARGET_PROPERTY:Matrix-Control_SkinDesigner,JUCE_PRODUCT_NAME>"
         JUCE_APPLICATION_VERSION_STRING="${PROJECT_VERSION}"
     )
 
-    target_link_libraries(Matrix-Control_SkinEditor PRIVATE
+    target_link_libraries(Matrix-Control_SkinDesigner PRIVATE
         PluginFonts
         juce::juce_gui_extra
         juce::juce_gui_basics
@@ -1271,9 +1273,9 @@ if(MATRIX_BUILD_SKIN_EDITOR)
     # Finder does not show a barred icon (spctl "resources must be present").
     # Independent of COPY_TO_ARTEFACTS_DIR so the build-tree app stays valid too.
     if(APPLE)
-        add_custom_command(TARGET Matrix-Control_SkinEditor POST_BUILD
-            COMMAND codesign --force --deep --sign - "$<TARGET_BUNDLE_DIR:Matrix-Control_SkinEditor>"
-            COMMENT "Ad-hoc re-sign Skin Editor after Resources"
+        add_custom_command(TARGET Matrix-Control_SkinDesigner POST_BUILD
+            COMMAND codesign --force --deep --sign - "$<TARGET_BUNDLE_DIR:Matrix-Control_SkinDesigner>"
+            COMMENT "Ad-hoc re-sign Skin Designer after Resources"
             VERBATIM
         )
     endif()
@@ -1286,7 +1288,7 @@ endif()
 # Structure: {ARTEFACTS_DIR}/{OS}/{arch}/{format}/
 # - macOS: ARM/, Intel/, Intel-Rosetta/, Universal/
 # - Windows/Linux: no arch subfolder
-# Formats: VST3/, AU/ (macOS only), Standalone/ (Matrix-Control + Skin Editor when enabled).
+# Formats: VST3/, AU/ (macOS only), Standalone/ (Matrix-Control + Skin Designer when enabled).
 # CLAP/ (Linux, future).
 # Intel = x86_64 native (Mac Intel). Intel-Rosetta = x86_64 cross-compiled on Apple Silicon.
 # Only copies formats selected for the project.
@@ -1392,35 +1394,35 @@ if(COPY_TO_ARTEFACTS_DIR)
         )
     endif()
 
-    # Skin Editor (dev author tool — lands next to Matrix-Control in Standalone/)
-    if(MATRIX_BUILD_SKIN_EDITOR AND TARGET Matrix-Control_SkinEditor)
-        list(APPEND ALL_PLUGIN_TARGETS "Matrix-Control_SkinEditor")
+    # Skin Designer (dev author tool — lands next to Matrix-Control in Standalone/)
+    if(MATRIX_BUILD_SKIN_DESIGNER AND TARGET Matrix-Control_SkinDesigner)
+        list(APPEND ALL_PLUGIN_TARGETS "Matrix-Control_SkinDesigner")
         if(APPLE)
-            set(SKIN_EDITOR_SOURCE "${CMAKE_BINARY_DIR}/Matrix-Control_SkinEditor_artefacts/$<CONFIG>/Matrix-Control Skin Editor.app")
-            set(SKIN_EDITOR_DEST_DIR "${ARTEFACTS_DEST}/Standalone/Matrix-Control Skin Editor.app")
+            set(SKIN_DESIGNER_SOURCE "${CMAKE_BINARY_DIR}/Matrix-Control_SkinDesigner_artefacts/$<CONFIG>/Matrix-Control Skin Designer.app")
+            set(SKIN_DESIGNER_DEST_DIR "${ARTEFACTS_DEST}/Standalone/Matrix-Control Skin Designer.app")
             list(APPEND COPY_COMMANDS
-                COMMAND ${CMAKE_COMMAND} -E echo "Copying Skin Editor to ${ARTEFACTS_DEST}/Standalone/"
+                COMMAND ${CMAKE_COMMAND} -E echo "Copying Skin Designer to ${ARTEFACTS_DEST}/Standalone/"
                 COMMAND ${CMAKE_COMMAND} -E make_directory "${ARTEFACTS_DEST}/Standalone"
-                COMMAND ${CMAKE_COMMAND} -E remove_directory "${SKIN_EDITOR_DEST_DIR}"
-                COMMAND ${CMAKE_COMMAND} -E copy_directory "${SKIN_EDITOR_SOURCE}" "${SKIN_EDITOR_DEST_DIR}"
-                COMMAND codesign --force --deep --sign - "${SKIN_EDITOR_DEST_DIR}"
-                COMMAND xattr -cr "${SKIN_EDITOR_DEST_DIR}"
+                COMMAND ${CMAKE_COMMAND} -E remove_directory "${SKIN_DESIGNER_DEST_DIR}"
+                COMMAND ${CMAKE_COMMAND} -E copy_directory "${SKIN_DESIGNER_SOURCE}" "${SKIN_DESIGNER_DEST_DIR}"
+                COMMAND codesign --force --deep --sign - "${SKIN_DESIGNER_DEST_DIR}"
+                COMMAND xattr -cr "${SKIN_DESIGNER_DEST_DIR}"
             )
         elseif(WIN32)
-            set(SKIN_EDITOR_SOURCE "${CMAKE_BINARY_DIR}/Matrix-Control_SkinEditor_artefacts/$<CONFIG>/Matrix-Control Skin Editor.exe")
-            set(SKIN_EDITOR_DEST "${ARTEFACTS_DEST}/Standalone/Matrix-Control Skin Editor.exe")
+            set(SKIN_DESIGNER_SOURCE "${CMAKE_BINARY_DIR}/Matrix-Control_SkinDesigner_artefacts/$<CONFIG>/Matrix-Control Skin Designer.exe")
+            set(SKIN_DESIGNER_DEST "${ARTEFACTS_DEST}/Standalone/Matrix-Control Skin Designer.exe")
             list(APPEND COPY_COMMANDS
-                COMMAND ${CMAKE_COMMAND} -E echo "Copying Skin Editor to ${ARTEFACTS_DEST}/Standalone/"
+                COMMAND ${CMAKE_COMMAND} -E echo "Copying Skin Designer to ${ARTEFACTS_DEST}/Standalone/"
                 COMMAND ${CMAKE_COMMAND} -E make_directory "${ARTEFACTS_DEST}/Standalone"
-                COMMAND ${CMAKE_COMMAND} -E copy "${SKIN_EDITOR_SOURCE}" "${SKIN_EDITOR_DEST}"
+                COMMAND ${CMAKE_COMMAND} -E copy "${SKIN_DESIGNER_SOURCE}" "${SKIN_DESIGNER_DEST}"
             )
         else()
-            set(SKIN_EDITOR_SOURCE "${CMAKE_BINARY_DIR}/Matrix-Control_SkinEditor_artefacts/$<CONFIG>/Matrix-Control Skin Editor")
-            set(SKIN_EDITOR_DEST "${ARTEFACTS_DEST}/Standalone/Matrix-Control Skin Editor")
+            set(SKIN_DESIGNER_SOURCE "${CMAKE_BINARY_DIR}/Matrix-Control_SkinDesigner_artefacts/$<CONFIG>/Matrix-Control Skin Designer")
+            set(SKIN_DESIGNER_DEST "${ARTEFACTS_DEST}/Standalone/Matrix-Control Skin Designer")
             list(APPEND COPY_COMMANDS
-                COMMAND ${CMAKE_COMMAND} -E echo "Copying Skin Editor to ${ARTEFACTS_DEST}/Standalone/"
+                COMMAND ${CMAKE_COMMAND} -E echo "Copying Skin Designer to ${ARTEFACTS_DEST}/Standalone/"
                 COMMAND ${CMAKE_COMMAND} -E make_directory "${ARTEFACTS_DEST}/Standalone"
-                COMMAND ${CMAKE_COMMAND} -E copy "${SKIN_EDITOR_SOURCE}" "${SKIN_EDITOR_DEST}"
+                COMMAND ${CMAKE_COMMAND} -E copy "${SKIN_DESIGNER_SOURCE}" "${SKIN_DESIGNER_DEST}"
             )
         endif()
     endif()
@@ -1433,42 +1435,42 @@ if(COPY_TO_ARTEFACTS_DIR)
         VERBATIM
     )
 
-    # Skin Editor solo builds (`--target Matrix-Control_SkinEditor`) also land in Dropbox.
-    if(MATRIX_BUILD_SKIN_EDITOR AND TARGET Matrix-Control_SkinEditor)
+    # Skin Designer solo builds (`--target Matrix-Control_SkinDesigner`) also land in Dropbox.
+    if(MATRIX_BUILD_SKIN_DESIGNER AND TARGET Matrix-Control_SkinDesigner)
         if(APPLE)
             # Build bundle is re-signed by the unconditional POST_BUILD above; here
             # re-sign + clear xattrs on the artefacts copy after solo-target builds.
-            add_custom_command(TARGET Matrix-Control_SkinEditor POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E echo "Copying Skin Editor to ${ARTEFACTS_DEST}/Standalone/"
+            add_custom_command(TARGET Matrix-Control_SkinDesigner POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E echo "Copying Skin Designer to ${ARTEFACTS_DEST}/Standalone/"
                 COMMAND ${CMAKE_COMMAND} -E make_directory "${ARTEFACTS_DEST}/Standalone"
-                COMMAND ${CMAKE_COMMAND} -E remove_directory "${ARTEFACTS_DEST}/Standalone/Matrix-Control Skin Editor.app"
+                COMMAND ${CMAKE_COMMAND} -E remove_directory "${ARTEFACTS_DEST}/Standalone/Matrix-Control Skin Designer.app"
                 COMMAND ${CMAKE_COMMAND} -E copy_directory
-                    "$<TARGET_BUNDLE_DIR:Matrix-Control_SkinEditor>"
-                    "${ARTEFACTS_DEST}/Standalone/Matrix-Control Skin Editor.app"
+                    "$<TARGET_BUNDLE_DIR:Matrix-Control_SkinDesigner>"
+                    "${ARTEFACTS_DEST}/Standalone/Matrix-Control Skin Designer.app"
                 COMMAND codesign --force --deep --sign -
-                    "${ARTEFACTS_DEST}/Standalone/Matrix-Control Skin Editor.app"
-                COMMAND xattr -cr "${ARTEFACTS_DEST}/Standalone/Matrix-Control Skin Editor.app"
-                COMMENT "Copy Skin Editor app to artefacts"
+                    "${ARTEFACTS_DEST}/Standalone/Matrix-Control Skin Designer.app"
+                COMMAND xattr -cr "${ARTEFACTS_DEST}/Standalone/Matrix-Control Skin Designer.app"
+                COMMENT "Copy Skin Designer app to artefacts"
                 VERBATIM
             )
         elseif(WIN32)
-            add_custom_command(TARGET Matrix-Control_SkinEditor POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E echo "Copying Skin Editor to ${ARTEFACTS_DEST}/Standalone/"
+            add_custom_command(TARGET Matrix-Control_SkinDesigner POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E echo "Copying Skin Designer to ${ARTEFACTS_DEST}/Standalone/"
                 COMMAND ${CMAKE_COMMAND} -E make_directory "${ARTEFACTS_DEST}/Standalone"
                 COMMAND ${CMAKE_COMMAND} -E copy
-                    "$<TARGET_FILE:Matrix-Control_SkinEditor>"
-                    "${ARTEFACTS_DEST}/Standalone/Matrix-Control Skin Editor.exe"
-                COMMENT "Copy Skin Editor exe to artefacts"
+                    "$<TARGET_FILE:Matrix-Control_SkinDesigner>"
+                    "${ARTEFACTS_DEST}/Standalone/Matrix-Control Skin Designer.exe"
+                COMMENT "Copy Skin Designer exe to artefacts"
                 VERBATIM
             )
         else()
-            add_custom_command(TARGET Matrix-Control_SkinEditor POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E echo "Copying Skin Editor to ${ARTEFACTS_DEST}/Standalone/"
+            add_custom_command(TARGET Matrix-Control_SkinDesigner POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E echo "Copying Skin Designer to ${ARTEFACTS_DEST}/Standalone/"
                 COMMAND ${CMAKE_COMMAND} -E make_directory "${ARTEFACTS_DEST}/Standalone"
                 COMMAND ${CMAKE_COMMAND} -E copy
-                    "$<TARGET_FILE:Matrix-Control_SkinEditor>"
-                    "${ARTEFACTS_DEST}/Standalone/Matrix-Control Skin Editor"
-                COMMENT "Copy Skin Editor binary to artefacts"
+                    "$<TARGET_FILE:Matrix-Control_SkinDesigner>"
+                    "${ARTEFACTS_DEST}/Standalone/Matrix-Control Skin Designer"
+                COMMENT "Copy Skin Designer binary to artefacts"
                 VERBATIM
             )
         endif()

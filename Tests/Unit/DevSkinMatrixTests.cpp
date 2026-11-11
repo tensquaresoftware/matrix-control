@@ -44,7 +44,7 @@ public:
         beginTest("disconnect_clearsOverlay_fallsBackToCompiledBc");
         assertDisconnectFallback();
 
-        beginTest("applyError_keepsEditorLayerUnchanged");
+        beginTest("applyError_keepsDesignerLayerUnchanged");
         assertApplyErrorKeepsLayer();
 
         beginTest("applyPushToSkin_unknownPastille_leavesHigherSetsIntact");
@@ -109,7 +109,7 @@ private:
         expect(session.pendingPush() != nullptr);
         expectEquals(session.pendingPush()->activeSkinId, payload.activeSkinId);
 
-        // Editor layer remains editable offline.
+        // Designer layer remains editable offline.
         expect(layer.setPastilleArgb(layer.activeSkinId(), "kGrey500", 0xff112233).wasOk());
     }
 
@@ -234,7 +234,7 @@ private:
         expect(paint.compiledSelection() == TSS::Skin::ColourVariant::Cream);
         expect(paint.activeSkin().getColour(buttonOffKey()) == creamReference);
 
-        // Editor keeps its Dev layer after Standalone disconnect.
+        // Designer keeps its Dev layer after Standalone disconnect.
         expect(layer.findSkin(layer.activeSkinId()) != nullptr);
         expectEquals(layer.findSkin(layer.activeSkinId())->mappings.at(buttonOffKey()),
                      juce::String("kEmerald400"));

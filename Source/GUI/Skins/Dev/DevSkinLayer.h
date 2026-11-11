@@ -29,18 +29,18 @@ namespace TSS::DevSkin
                                    bool copyMappings = true);
 
         /**
-         * New Editor skin: Product palette / ancestry, mappings cleared (full Unbound).
-         * Optionally appends non-product pastilles from another Editor skin (no name dupes).
+         * New Designer skin: Product palette / ancestry, mappings cleared (full Unbound).
+         * Optionally appends non-product pastilles from another Designer skin (no name dupes).
          */
-        juce::Result createEditorSkinWithUnboundMappings(
+        juce::Result createDesignerSkinWithUnboundMappings(
             const juce::String& sourceId,
             const juce::String& newName,
             const juce::String& mergeCustomPastillesFromId = {});
 
-        /** Same as createEditorSkinWithUnboundMappings from compiled Cream. */
+        /** Same as createDesignerSkinWithUnboundMappings from compiled Cream. */
         juce::Result createEmptyDevSkin(const juce::String& newName)
         {
-            return createEditorSkinWithUnboundMappings(kCompiledCreamId, newName);
+            return createDesignerSkinWithUnboundMappings(kCompiledCreamId, newName);
         }
         juce::Result deleteDevSkin(const juce::String& id);
         juce::Result renameDevSkin(const juce::String& id, const juce::String& newName);
@@ -52,7 +52,7 @@ namespace TSS::DevSkin
                                  const juce::String& pastilleName,
                                  juce::uint32 argb,
                                  bool pending = false);
-        /** Rename Editor pastille; rewrites mapping string refs. Product / compiled blocked. */
+        /** Rename Designer pastille; rewrites mapping string refs. Product / compiled blocked. */
         juce::Result renamePastille(const juce::String& skinId,
                                     const juce::String& pastilleName,
                                     const juce::String& newName);
@@ -69,7 +69,7 @@ namespace TSS::DevSkin
                                  const juce::String& pastilleName);
 
         /**
-         * Editor-only Colour set help label for one index (cs1..cs4).
+         * Designer-only Colour set help label for one index (cs1..cs4).
          * Empty clears the label. Does not affect runtime ColourSet identity.
          */
         juce::Result setColourSetLabel(const juce::String& skinId,
@@ -77,7 +77,7 @@ namespace TSS::DevSkin
                                        const juce::String& label);
 
         /**
-         * Replace editor-only mapping link groups (sanitized: orphans dropped, size >= 2).
+         * Replace designer-only mapping link groups (sanitized: orphans dropped, size >= 2).
          * Does not affect runtime / PushPayload.
          */
         juce::Result setMappingLinkGroups(const juce::String& skinId,
@@ -93,7 +93,7 @@ namespace TSS::DevSkin
 
         std::vector<SkinColourKey> unboundKeys(const juce::String& skinId) const;
         int unboundCount(const juce::String& skinId) const;
-        bool isEditorSkinExportAllowed(const juce::String& skinId) const;
+        bool isDesignerSkinExportAllowed(const juce::String& skinId) const;
         bool isProductPastilleName(const juce::String& pastilleName) const;
         int countMappingsReferencing(const juce::String& skinId,
                                      const juce::String& pastilleName) const;

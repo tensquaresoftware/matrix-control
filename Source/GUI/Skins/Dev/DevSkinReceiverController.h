@@ -1,6 +1,6 @@
 #pragma once
 
-#if defined(MATRIX_SKIN_EDITOR_RECEIVER)
+#if defined(MATRIX_SKIN_DESIGNER_RECEIVER)
 
 #include <memory>
 

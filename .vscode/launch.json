@@ -2,30 +2,30 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug: Skin Editor",
+            "name": "Debug: Skin Designer",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/${command:cmake.buildDirectory}/Matrix-Control_SkinEditor_artefacts/${command:cmake.buildType}/Matrix-Control Skin Editor.app/Contents/MacOS/Matrix-Control Skin Editor",
+            "program": "${workspaceFolder}/${command:cmake.buildDirectory}/Matrix-Control_SkinDesigner_artefacts/${command:cmake.buildType}/Matrix-Control Skin Designer.app/Contents/MacOS/Matrix-Control Skin Designer",
             "args": [],
             "cwd": "${workspaceFolder}",
-            "preLaunchTask": "Build: Skin Editor",
+            "preLaunchTask": "Build: Skin Designer",
             "osx": {
                 "type": "lldb",
-                "program": "${workspaceFolder}/${command:cmake.buildDirectory}/Matrix-Control_SkinEditor_artefacts/${command:cmake.buildType}/Matrix-Control Skin Editor.app/Contents/MacOS/Matrix-Control Skin Editor"
+                "program": "${workspaceFolder}/${command:cmake.buildDirectory}/Matrix-Control_SkinDesigner_artefacts/${command:cmake.buildType}/Matrix-Control Skin Designer.app/Contents/MacOS/Matrix-Control Skin Designer"
             },
             "windows": {
                 "type": "cppvsdbg",
-                "program": "${workspaceFolder}/${command:cmake.buildDirectory}/Matrix-Control_SkinEditor_artefacts/${command:cmake.buildType}/Matrix-Control Skin Editor.exe",
+                "program": "${workspaceFolder}/${command:cmake.buildDirectory}/Matrix-Control_SkinDesigner_artefacts/${command:cmake.buildType}/Matrix-Control Skin Designer.exe",
                 "MIMode": "windows"
             },
             "linux": {
                 "type": "cppdbg",
                 "request": "launch",
-                "program": "${workspaceFolder}/${command:cmake.buildDirectory}/Matrix-Control_SkinEditor_artefacts/${command:cmake.buildType}/Matrix-Control Skin Editor",
+                "program": "${workspaceFolder}/${command:cmake.buildDirectory}/Matrix-Control_SkinDesigner_artefacts/${command:cmake.buildType}/Matrix-Control Skin Designer",
                 "args": [],
                 "cwd": "${workspaceFolder}",
                 "MIMode": "gdb",
-                "preLaunchTask": "Build: Skin Editor"
+                "preLaunchTask": "Build: Skin Designer"
             }
         },
         {
@@ -147,13 +147,13 @@
     ],
     "compounds": [
         {
-            "name": "Debug: Skin Editor + Standalone Dev",
+            "name": "Debug: Skin Designer + Standalone Dev",
             "configurations": [
                 "Debug: Standalone Dev (Skin Receiver)",
-                "Debug: Skin Editor"
+                "Debug: Skin Designer"
             ],
             "stopAll": true,
-            "preLaunchTask": "Build: Skin Editor + Standalone"
+            "preLaunchTask": "Build: Skin Designer + Standalone"
         }
     ]
 }

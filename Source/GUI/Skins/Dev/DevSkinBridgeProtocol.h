@@ -4,7 +4,7 @@
 
 namespace TSS::DevSkin
 {
-    /** Localhost-only Skin Editor → Standalone Dev bridge port. */
+    /** Localhost-only Skin Designer → Standalone Dev bridge port. */
     inline constexpr int kBridgePort = 39217;
 
     inline constexpr const char* kBridgeMagic = "MCSK";

@@ -2,7 +2,7 @@
 
 namespace TSS::DevSkin
 {
-    juce::Result Layer::createEditorSkinWithUnboundMappings(
+    juce::Result Layer::createDesignerSkinWithUnboundMappings(
         const juce::String& sourceId,
         const juce::String& newName,
         const juce::String& mergeCustomPastillesFromId)

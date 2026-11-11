@@ -14,7 +14,7 @@ namespace TSS::DevSkin
 {
     inline constexpr int kLegacySchemaVersion = 1;
     inline constexpr int kSchemaVersion = 2;
-    /** Editor-only Colour set help label hard cap (ASCII). */
+    /** Designer-only Colour set help label hard cap (ASCII). */
     inline constexpr int kColourSetLabelMaxChars = 16;
 
     /** Printable ASCII 32..126 — same charset Layer keeps for colourSetLabels. */
@@ -83,12 +83,12 @@ namespace TSS::DevSkin
         std::vector<Pastille> palette;
         std::map<SkinColourKey, juce::String> mappings;
         /**
-         * Editor-only help labels for ColourSet cs1..cs4 (document-global).
+         * Designer-only help labels for ColourSet cs1..cs4 (document-global).
          * Omitted from PushPayload; optional in skin JSON as colourSetLabels.
          */
         std::array<juce::String, kAllColourSets.size()> colourSetLabels {};
         /**
-         * Editor-only bidirectional mapping link groups (full SkinColourKey members).
+         * Designer-only bidirectional mapping link groups (full SkinColourKey members).
          * Omitted from PushPayload; optional in skin JSON as mappingLinkGroups.
          * Each inner vector has >= 2 keys; a key belongs to at most one group.
          */

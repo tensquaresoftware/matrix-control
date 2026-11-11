@@ -113,7 +113,7 @@ Story IDs include epic-story numbers (`4-5`, `7-3b`) and utility stories (`U-0`,
 
 > Realistic thresholds for a JUCE plugin. **Enforced on touched files** by
 > `Scripts/quality/lint_touched.py` (and `.clang-tidy` when used).
-> Scope: `Source/`, `Tests/`, and **`Tools/SkinEditor/`** (Matrix-Control Skin Editor —
+> Scope: `Source/`, `Tests/`, and **`Tools/SkinDesigner/`** (Matrix-Control Skin Designer —
 > same gate as plugin GUI). Historical debt outside the ticket diff is a
 > **separate chore** — not a Boy Scout obligation.
 
@@ -122,7 +122,7 @@ Story IDs include epic-story numbers (`4-5`, `7-3b`) and utility stories (`U-0`,
 | Metric | Maximum | Notes |
 |---|---|---|
 | Function / method (Core / logic) | **~40 lines** | lizard `nloc` (non-comment) |
-| Function / method (GUI / glue) | **~50 lines** | Path under `Source/GUI/` or `Tools/SkinEditor/` |
+| Function / method (GUI / glue) | **~50 lines** | Path under `Source/GUI/` or `Tools/SkinDesigner/` |
 | Function parameters (**our** code) | **4** | Beyond → options struct; do not rewrite JUCE APIs |
 | Cyclomatic complexity | **10** (GUI up to **12** if justified) | Extract named helpers when exceeded |
 | Nesting depth | **4** | Prefer guards / early returns / RAII |

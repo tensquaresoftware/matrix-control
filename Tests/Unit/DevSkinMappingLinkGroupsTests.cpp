@@ -51,7 +51,7 @@ private:
         expect(layer.setMappingLinkGroups(skinId, { { a, b } }).wasOk());
         expect(layer.setColourSetLabel(skinId, TSS::ColourSet::k1, "Patch").wasOk());
 
-        const auto json = TSS::DevSkin::exportEditorSkinToJson(layer, skinId);
+        const auto json = TSS::DevSkin::exportDesignerSkinToJson(layer, skinId);
         const auto parsed = juce::JSON::parse(json);
         auto* root = parsed.getDynamicObject();
         expect(root != nullptr);
@@ -63,7 +63,7 @@ private:
         expect(skinObj->getProperty("colourSetLabels").getDynamicObject() != nullptr);
 
         TSS::DevSkin::Layer restored;
-        const auto imported = TSS::DevSkin::appendEditorSkinsFromJson(restored, json);
+        const auto imported = TSS::DevSkin::appendDesignerSkinsFromJson(restored, json);
         expect(imported.ok);
         const auto* skin = restored.findSkin(imported.importedSkinIds[0]);
         expect(skin != nullptr);
