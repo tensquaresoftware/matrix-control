@@ -90,6 +90,7 @@ void SkinDesignerMainComponent::setupStatusBarChrome()
 void SkinDesignerMainComponent::setupSkinsPanel()
 {
     skinsPanel_.onDuplicateProduct = [this] { onDuplicateProduct(); };
+    skinsPanel_.onCompare = [this] { onCompareToggle(); };
     skinsPanel_.onDuplicateDesigner = [this] { onDuplicateDesigner(); };
     skinsPanel_.onNew = [this] { onNew(); };
     skinsPanel_.onRename = [this] { onRename(); };

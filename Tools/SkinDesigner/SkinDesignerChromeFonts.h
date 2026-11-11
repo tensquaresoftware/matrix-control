@@ -158,7 +158,7 @@ namespace SkinDesignerChrome
 
     /**
      * Force typeface load + glyph metrics before the first resized/layout.
-     * Avoids truncated chrome (Push, LAST PUSH, …) on cold launch.
+     * Avoids truncated chrome (LAST PUSH, …) on cold launch.
      */
     inline void warmFonts()
     {
@@ -187,11 +187,6 @@ namespace SkinDesignerChrome
     {
         return juce::jmax(sessionCompactButtonWidth("Undo"),
                           sessionCompactButtonWidth("Redo"));
-    }
-
-    inline int sessionPushButtonWidth() noexcept
-    {
-        return sessionCompactButtonWidth("Push");
     }
 
     /**
@@ -284,7 +279,7 @@ namespace SkinDesignerChrome
 
     /**
      * SESSION well width: title tab + Load/Save/Save as | JSON Sync
-     * | Undo/Redo | Compare/Push + trailing kGutter (inner right air).
+     * | Undo/Redo + trailing kGutter (inner right air).
      */
     inline int sessionWellPreferredWidth() noexcept
     {
@@ -304,8 +299,6 @@ namespace SkinDesignerChrome
                + jsonSyncLabelWidth() + kButtonGap + jsonSyncComboWidth()
                + kSep
                + undoRedoW + kButtonGap + undoRedoW
-               + kSep
-               + measure("Compare") + kButtonGap + sessionPushButtonWidth()
                + kGutter;
     }
 

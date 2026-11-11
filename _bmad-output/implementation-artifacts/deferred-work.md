@@ -3275,3 +3275,9 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-pre-push-pytest-ci-mirror.md`
   summary: Quality-gate wiring tests still assert script/CI substrings rather than executing default vs --lint-only modes end-to-end.
   evidence: Blind Hunter; existing suite style is source-text wiring; adding subprocess contracts would enlarge this chore without catching the known green/red paths already proven manually in the build.
+
+## Deferred from: oneshot review of spec-skin-designer-compare-in-product-remove-push.md (2026-11-11)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-designer-compare-in-product-remove-push.md`
+  summary: Historical Skin Designer SESSION-order docs still list Compare/Push after Undo/Redo (e.g. blank-start-session).
+  evidence: Blind Hunter; done specs contradict shipped chrome after Compare moved to Product and Push removed; rewrite only if those docs are revisited.

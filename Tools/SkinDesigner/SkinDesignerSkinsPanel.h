@@ -4,7 +4,7 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
-/** Left SKINS panel: Product / Designer selectors and Designer CRUD. */
+/** Left SKINS panel: Product / Designer selectors, Product Compare, Designer CRUD. */
 class SkinDesignerSkinsPanel final : public juce::Component
 {
 public:
@@ -12,6 +12,7 @@ public:
 
     juce::ComboBox& productCombo() noexcept { return productCombo_; }
     juce::ComboBox& designerCombo() noexcept { return designerCombo_; }
+    juce::TextButton& compareButton() noexcept { return compareButton_; }
 
     void setProductDuplicateEnabled(bool enabled);
     void setDesignerActionsEnabled(bool canDuplicate, bool canRenameDelete, bool canNew);
@@ -19,6 +20,7 @@ public:
     void syncDesignerNavButtons();
 
     std::function<void()> onDuplicateProduct;
+    std::function<void()> onCompare;
     std::function<void()> onDuplicateDesigner;
     std::function<void()> onNew;
     std::function<void()> onRename;
@@ -65,6 +67,7 @@ private:
     juce::TextButton productPrevButton_ { "<" };
     juce::TextButton productNextButton_ { ">" };
     juce::TextButton productDuplicateButton_ { "Duplicate" };
+    juce::TextButton compareButton_ { "Compare" };
 
     juce::Label designerLabel_ { {}, "Designer:" };
     juce::ComboBox designerCombo_;

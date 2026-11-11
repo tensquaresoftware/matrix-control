@@ -26,6 +26,7 @@ public:
         propertyBindHoverInk();
         unboundHoldNeighbourhoodGeometry();
         skinsPanelDesignerActionsFitOneRow();
+        skinsPanelProductDuplicateCompareFitOneRow();
         minContentHeightStacksSkinsAndColor();
         pathElideKeepsLeafName();
         lastPushBadgeAlignsWithPaletteColumn();
@@ -245,6 +246,28 @@ private:
         expectEquals(dupBtn->getX(), designerCombo->getX());
         expectEquals(deleteBtn->getRight(), designerNext->getRight());
         expect(dupBtn->getY() > designerCombo->getBottom());
+    }
+
+    void skinsPanelProductDuplicateCompareFitOneRow()
+    {
+        beginTest("SKINS Duplicate + Compare share Product action row");
+
+        SkinDesignerSkinsPanel panel;
+        panel.setSize(SkinDesignerChrome::kColorPanelWidth, SkinDesignerSkinsPanel::preferredHeight());
+
+        auto* duplicateBtn = findButton(panel, "Duplicate");
+        auto* compareBtn = findButton(panel, "Compare");
+
+        expect(duplicateBtn != nullptr);
+        expect(compareBtn != nullptr);
+        if (duplicateBtn == nullptr || compareBtn == nullptr)
+            return;
+
+        expectEquals(duplicateBtn->getY(), compareBtn->getY());
+        expect(compareBtn->getX() > duplicateBtn->getRight());
+        expect(compareBtn->getRight() <= panel.getWidth());
+        expect(duplicateBtn->getHeight() > 0);
+        expect(compareBtn->getHeight() > 0);
     }
 
     void minContentHeightStacksSkinsAndColor()

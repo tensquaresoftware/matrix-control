@@ -15,12 +15,12 @@ namespace
         return separatorGap() + 1 + separatorGap();
     }
 
-    /** Product combo + Dup row + separator + Designer combo + actions row. */
+    /** Product combo + Dup/Compare row + separator + Designer combo + actions row. */
     int contentRowsHeight() noexcept
     {
         return SkinDesignerChrome::kButtonHeight // Product combo + nav
                + SkinDesignerChrome::kButtonGap
-               + SkinDesignerChrome::kButtonHeight // Product Duplicate
+               + SkinDesignerChrome::kButtonHeight // Product Duplicate + Compare
                + separatorBlockHeight()
                + SkinDesignerChrome::kButtonHeight // Designer combo + nav
                + SkinDesignerChrome::kButtonGap
@@ -59,11 +59,14 @@ SkinDesignerSkinsPanel::SkinDesignerSkinsPanel()
         };
     };
     wire(productDuplicateButton_, onDuplicateProduct);
+    wire(compareButton_, onCompare);
     wire(designerDuplicateButton_, onDuplicateDesigner);
     wire(newButton_, onNew);
     wire(renameButton_, onRename);
     wire(deleteButton_, onDelete);
 
+    compareButton_.setTooltip(
+        "Show the selected Product skin on Matrix-Control (read-only Designer while on)");
     designerDuplicateButton_.setTooltip("Duplicate");
     newButton_.setTooltip("New");
     renameButton_.setTooltip("Rename");
@@ -203,6 +206,10 @@ void SkinDesignerSkinsPanel::layoutProductDuplicateRow(juce::Rectangle<int>& con
     row.removeFromLeft(labelColW);
     productDuplicateButton_.setBounds(
         row.removeFromLeft(SkinDesignerChrome::measureButtonWidth(productDuplicateButton_))
+            .withHeight(SkinDesignerChrome::kButtonHeight));
+    row.removeFromLeft(SkinDesignerChrome::kButtonGap);
+    compareButton_.setBounds(
+        row.removeFromLeft(SkinDesignerChrome::measureButtonWidth(compareButton_))
             .withHeight(SkinDesignerChrome::kButtonHeight));
 }
 

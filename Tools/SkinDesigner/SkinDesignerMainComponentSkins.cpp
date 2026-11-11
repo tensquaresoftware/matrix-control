@@ -131,8 +131,6 @@ void SkinDesignerMainComponent::setupSessionWell()
     wire(saveAsButton_, [this] { onSaveAs(); });
     wire(undoButton_, [this] { onUndo(); });
     wire(redoButton_, [this] { onRedo(); });
-    wire(compareButton_, [this] { onCompareToggle(); });
-    wire(pushButton_, [this] { onPush(); });
     loadButton_.setTooltip("Replace the Designer skins with the contents of a skins JSON file");
     saveButton_.setTooltip(
         "Save every Designer skin to the loaded JSON file (asks for a file the first time)");
@@ -203,10 +201,6 @@ void SkinDesignerMainComponent::layoutSessionControls(juce::Rectangle<int> well,
     place.button(undoButton_, undoRedoW);
     place.gap();
     place.button(redoButton_, undoRedoW);
-    place.separator();
-    place.button(compareButton_);
-    place.gap();
-    place.button(pushButton_, SkinDesignerChrome::sessionPushButtonWidth());
     if (place.fits && row.getWidth() >= SkinDesignerChrome::kGutter)
         row.removeFromLeft(SkinDesignerChrome::kGutter);
 }

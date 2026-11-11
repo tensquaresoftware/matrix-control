@@ -79,7 +79,6 @@ private:
     void onDelete();
     void onRename();
     void onCompareToggle();
-    void onPush();
     void onAddPastille();
     void onDuplicatePastille();
     void onDeletePastille();
@@ -306,8 +305,6 @@ private:
     juce::Label sessionTitleLabel_;
     juce::TextButton undoButton_ { "Undo" };
     juce::TextButton redoButton_ { "Redo" };
-    juce::TextButton compareButton_ { "Compare" };
-    juce::TextButton pushButton_ { "Push" };
     juce::TextButton loadButton_ { "Load" };
     juce::TextButton saveButton_ { "Save" };
     juce::TextButton saveAsButton_ { "Save as" };

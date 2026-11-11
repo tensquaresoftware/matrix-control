@@ -118,8 +118,9 @@ void SkinDesignerMainComponent::onRename()
 
 void SkinDesignerMainComponent::syncCompareButtonChrome()
 {
-    compareButton_.setButtonText("Compare");
-    compareButton_.setToggleState(sessionState_.compareOn, juce::dontSendNotification);
+    auto& compare = skinsPanel_.compareButton();
+    compare.setButtonText("Compare");
+    compare.setToggleState(sessionState_.compareOn, juce::dontSendNotification);
 
     if (sessionState_.compareOn)
     {
@@ -130,18 +131,18 @@ void SkinDesignerMainComponent::syncCompareButtonChrome()
         }
         const auto colour = compareBlinkLit_ ? SkinDesignerChrome::danger()
                                              : SkinDesignerChrome::textMuted();
-        compareButton_.setColour(juce::TextButton::textColourOffId, colour);
-        compareButton_.setColour(juce::TextButton::textColourOnId, colour);
+        compare.setColour(juce::TextButton::textColourOffId, colour);
+        compare.setColour(juce::TextButton::textColourOnId, colour);
     }
     else
     {
         compareBlinkTimer_.stopTimer();
         compareBlinkLit_ = true;
         const auto normal = SkinDesignerChrome::textPrimary();
-        compareButton_.setColour(juce::TextButton::textColourOffId, normal);
-        compareButton_.setColour(juce::TextButton::textColourOnId, normal);
+        compare.setColour(juce::TextButton::textColourOffId, normal);
+        compare.setColour(juce::TextButton::textColourOnId, normal);
     }
-    compareButton_.repaint();
+    compare.repaint();
 }
 
 void SkinDesignerMainComponent::tickCompareBlink()
@@ -152,9 +153,10 @@ void SkinDesignerMainComponent::tickCompareBlink()
     compareBlinkLit_ = ! compareBlinkLit_;
     const auto colour = compareBlinkLit_ ? SkinDesignerChrome::danger()
                                          : SkinDesignerChrome::textMuted();
-    compareButton_.setColour(juce::TextButton::textColourOffId, colour);
-    compareButton_.setColour(juce::TextButton::textColourOnId, colour);
-    compareButton_.repaint();
+    auto& compare = skinsPanel_.compareButton();
+    compare.setColour(juce::TextButton::textColourOffId, colour);
+    compare.setColour(juce::TextButton::textColourOnId, colour);
+    compare.repaint();
 }
 
 void SkinDesignerMainComponent::onCompareToggle()
@@ -163,11 +165,6 @@ void SkinDesignerMainComponent::onCompareToggle()
     refreshAll();
     if (bridge_.isConnected())
         pushVisible();
-}
-
-void SkinDesignerMainComponent::onPush()
-{
-    pushVisible();
 }
 
 void SkinDesignerMainComponent::onUndo()
