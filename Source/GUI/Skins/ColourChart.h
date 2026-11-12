@@ -75,6 +75,8 @@ struct ColourChart
     // Cafe ladder (ex-Cream* + former Cafe*), luminance-ordered; RGB preserved.
     static constexpr juce::uint32 kCafe50      = 0xFFD9CFB8; // was Cream400
     static constexpr juce::uint32 kCafe150     = 0xFFD0C6B0; // was Cream450
+    /** Warm mid fill (CREAM/MINIMAL button hover) — same luminance idea as Cafe300, less grey. */
+    static constexpr juce::uint32 kCafe200     = 0xFFBAA68A;
     static constexpr juce::uint32 kCafe300     = 0xFFB5AF96; // was Cafe400 / Cream600
     static constexpr juce::uint32 kCafe400     = 0xFF9A9480; // was Cafe600 / Cream700
     static constexpr juce::uint32 kCafe500     = 0xFF8A826C; // was Cafe700 / Cream750

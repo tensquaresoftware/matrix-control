@@ -25,6 +25,7 @@ namespace TSS::DevSkin
                 { "kYellow950", ColourChart::kYellow950 },
                 { "kCafe50", ColourChart::kCafe50 },
                 { "kCafe150", ColourChart::kCafe150 },
+                { "kCafe200", ColourChart::kCafe200 },
                 { "kCafe300", ColourChart::kCafe300 },
                 { "kCafe400", ColourChart::kCafe400 },
                 { "kCafe500", ColourChart::kCafe500 },
