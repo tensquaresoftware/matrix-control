@@ -25,7 +25,6 @@ namespace TSS::DevSkin
                 { "kYellow950", ColourChart::kYellow950 },
                 { "kCafe50", ColourChart::kCafe50 },
                 { "kCafe150", ColourChart::kCafe150 },
-                { "kCafe250", ColourChart::kCafe250 },
                 { "kCafe300", ColourChart::kCafe300 },
                 { "kCafe400", ColourChart::kCafe400 },
                 { "kCafe500", ColourChart::kCafe500 },
@@ -73,7 +72,6 @@ namespace TSS::DevSkin
             { "kRed500", ColourChart::kRed500 },
             { "kRed800", ColourChart::kRed800 },
             { "kRed900", ColourChart::kRed900 },
-            { "kYellow", ColourChart::kYellow },
         };
         const auto accents = zoneAccentPastilles();
         pastilles.insert(pastilles.end(), accents.begin(), accents.end());

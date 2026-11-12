@@ -35,8 +35,6 @@ struct ColourChart
     static constexpr juce::uint32 kRed800      = 0xFF800000;
     static constexpr juce::uint32 kRed500      = 0xFFFF0000;
 
-    static constexpr juce::uint32 kYellow      = 0xFFFFFF00;
-
     // Unified Green ladder (ex-Emerald + CREAM greens), luminance-ordered; RGB preserved.
     static constexpr juce::uint32 kGreen100    = 0xFFC8F5D8;
     static constexpr juce::uint32 kGreen200    = 0xFFBDD9B8;
@@ -77,7 +75,6 @@ struct ColourChart
     // Cafe ladder (ex-Cream* + former Cafe*), luminance-ordered; RGB preserved.
     static constexpr juce::uint32 kCafe50      = 0xFFD9CFB8; // was Cream400
     static constexpr juce::uint32 kCafe150     = 0xFFD0C6B0; // was Cream450
-    static constexpr juce::uint32 kCafe250     = 0xFFC2B69E; // was Cream500
     static constexpr juce::uint32 kCafe300     = 0xFFB5AF96; // was Cafe400 / Cream600
     static constexpr juce::uint32 kCafe400     = 0xFF9A9480; // was Cafe600 / Cream700
     static constexpr juce::uint32 kCafe500     = 0xFF8A826C; // was Cafe700 / Cream750
