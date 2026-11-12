@@ -249,7 +249,7 @@ The [Release](https://github.com/tensquaresoftware/matrix-control/actions/workfl
 
 ### Recommended flow (RC → stable)
 
-1. Clear blockers (e.g. Epic U-10 release gate — no `TestComponent` in Release builds).
+1. Clear blockers (e.g. release hygiene gate — no sandbox markers in Release builds).
 2. Bump version + set suffix (e.g. `rc1`), tag `vX.Y.Z-rc1`, push tag.
 3. Download assets from the GitHub Release; smoke-test on each OS (DAW + standalone).
 4. For stable: set `MATRIX_CONTROL_PRERELEASE_SUFFIX=""`, commit, tag `vX.Y.Z`, push tag.

@@ -443,34 +443,6 @@ set(PLUGIN_SOURCES
     Source/Core/Loggers/ApvtsLoggerFormatting.cpp
 )
 
-# GUI - Dev test harness (Debug only — D-063 / story U-10)
-set(TEST_SANDBOX_SOURCES
-    Source/GUI/Tests/TestActivityLeds.cpp
-    Source/GUI/Tests/TestButtons.cpp
-    Source/GUI/Tests/TestComboBoxes.cpp
-    Source/GUI/Tests/TestHierarchicalComboBoxes.cpp
-    Source/GUI/Tests/TestColourPickerButton.cpp
-    Source/GUI/Tests/TestComponent.cpp
-    Source/GUI/Tests/TestComponentPages.cpp
-    Source/GUI/Tests/TestEnvelopeDisplays.cpp
-    Source/GUI/Tests/TestGroupLabels.cpp
-    Source/GUI/Tests/TestHorizontalSeparators.cpp
-    Source/GUI/Tests/TestLabels.cpp
-    Source/GUI/Tests/TestModulationBusCells.cpp
-    Source/GUI/Tests/TestModulationBusHeaders.cpp
-    Source/GUI/Tests/TestModuleHeaders.cpp
-    Source/GUI/Tests/TestNumberBoxes.cpp
-    Source/GUI/Tests/TestParameterCells.cpp
-    Source/GUI/Tests/TestPatchNameDisplays.cpp
-    Source/GUI/Tests/TestPeakIndicators.cpp
-    Source/GUI/Tests/TestPopupMenus.cpp
-    Source/GUI/Tests/TestSectionHeaders.cpp
-    Source/GUI/Tests/TestSliders.cpp
-    Source/GUI/Tests/TestToggles.cpp
-    Source/GUI/Tests/TestTrackGeneratorDisplays.cpp
-    Source/GUI/Tests/TestVisualDebug.cpp
-)
-
 # ============================================================================
 # UNIT TEST RUNNER (console app)
 # Unit tests use juce::UnitTest and must NOT be linked into AU/VST3/Standalone
@@ -1018,7 +990,6 @@ juce_add_plugin(Matrix-Control
 
 target_sources(Matrix-Control PRIVATE
     ${PLUGIN_SOURCES}
-    $<$<CONFIG:Debug>:${TEST_SANDBOX_SOURCES}>
 )
 
 target_sources(Matrix-Control_Standalone PRIVATE

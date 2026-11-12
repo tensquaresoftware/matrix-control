@@ -73,18 +73,6 @@ void MainComponent::resized()
     const int footerY = headerHeight + bodyHeight;
 
     headerPanel.setBounds(bounds.getX(), bounds.getY(), bounds.getWidth(), headerHeight);
-#if JUCE_DEBUG
-    uiElementsTestAreaY_ = headerHeight;
-
-    if (uiElementsTestVisible_)
-    {
-        bodyPanel.setVisible(false);
-        footerPanel.setVisible(false);
-        if (lockDimmingFilm_ != nullptr)
-            lockDimmingFilm_->setVisible(false);
-        return;
-    }
-#endif
 
     bodyPanel.setVisible(true);
     footerPanel.setVisible(true);
@@ -96,23 +84,6 @@ void MainComponent::resized()
 
     refreshLockDimmingFilm();
 }
-
-#if JUCE_DEBUG
-void MainComponent::setUiElementsTestVisible(bool visible)
-{
-    if (uiElementsTestVisible_ == visible)
-        return;
-
-    uiElementsTestVisible_ = visible;
-    resized();
-}
-
-juce::Rectangle<int> MainComponent::getUiElementsTestAreaBounds() const
-{
-    const auto bounds = getLocalBounds();
-    return bounds.withTrimmedTop(uiElementsTestAreaY_);
-}
-#endif
 
 void MainComponent::setSkin(TSS::Skin& skin)
 {
@@ -196,15 +167,6 @@ void MainComponent::refreshLockDimmingFilm()
 {
     if (lockDimmingFilm_ == nullptr || apvts_ == nullptr)
         return;
-
-#if JUCE_DEBUG
-    if (uiElementsTestVisible_)
-    {
-        lockDimmingFilm_->setHoles({});
-        lockDimmingFilm_->setVisible(false);
-        return;
-    }
-#endif
 
     const bool compareActive = static_cast<bool>(
         apvts_->state.getProperty(MutatorState::kCompareActive, false));

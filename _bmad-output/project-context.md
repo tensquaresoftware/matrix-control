@@ -231,12 +231,10 @@ Do not route editor SysEx through `processBlock()` midiBuffer.
 - Typography: `Source/GUI/Looks/TypographyStyles.h`.
 - Panels compose widgets; panels do not embed drawing logic that belongs in widgets.
 
-### Dev test harness
+### GUI visual validation
 
-- `Source/GUI/Tests/TestComponent` — Debug-only widget visual harness (enriched pages from story U-1).
-- Toggle via logo **Shift+Ctrl** gesture (`Logo` → `HeaderPanel` → `PluginEditor`). Compiled out in Release (`#if JUCE_DEBUG`); CMake attaches `TEST_SANDBOX_SOURCES` only for `CONFIG:Debug` (D-063 / story U-10).
-- Release binaries must not contain sandbox object code or `TestComponent` symbols. Keep sources in the repo for post-release visual regression in Debug.
-- Prod panels + widgets are the signed visual reference after U-10 aggregate audit (D-062) — the sandbox is not the release visual authority.
+- Prod panels + widgets are the visual reference (Standalone / host). The former Debug `TestComponent` sandbox under `Source/GUI/Tests/` was removed.
+- Release hygiene still fails if `TestComponent` symbols reappear in artefacts (`Scripts/release/check_release_hygiene.py`).
 
 ---
 
@@ -367,7 +365,7 @@ BMad planning artifacts live in `_bmad-output/planning-artifacts/`. Promote vali
 - **Framework:** JUCE `UnitTest` (current) — Catch2/GTest acceptable if migrated in architecture epic
 - **Fixtures:** `Tests/Fixtures/` for `.syx` binaries
 - **No tests** in audio thread or `paint()` paths
-- GUI validation: manual via Standalone; Debug-only `TestComponent` harness for widget regression
+- GUI validation: manual via Standalone
 
 ---
 

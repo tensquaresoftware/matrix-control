@@ -52,13 +52,6 @@ void PluginEditor::wireHeaderPanel(HeaderPanel& headerPanel)
     };
 
     wireHeaderEditorialUndoRedoButtons(headerPanel);
-
-#if JUCE_DEBUG
-    headerPanel.onUiTestsToggleRequested = [this]
-    {
-        setUiElementsTestVisible(!uiElementsTestVisible_);
-    };
-#endif
 }
 
 void PluginEditor::wireHeaderEditorialUndoRedoButtons(HeaderPanel& headerPanel)

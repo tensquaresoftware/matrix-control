@@ -94,15 +94,11 @@ namespace TSS
         if (e.getNumberOfClicks() > 1)
             return;
 
-        // Shift+Ctrl: Debug toggles the UI test harness; Release is a hard no-op
-        // (must not fall through to Shift → Settings).
+        // Former Debug UI-test gesture (Shift+Ctrl): keep as hard no-op so it
+        // never falls through to Shift → Settings.
         if (e.mods.isShiftDown() && e.mods.isCtrlDown())
         {
             stopTimer();
-#if JUCE_DEBUG
-            if (onUiTestsToggleRequested)
-                onUiTestsToggleRequested();
-#endif
             return;
         }
 

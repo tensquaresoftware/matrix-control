@@ -20,10 +20,6 @@
 #include "GUI/Skins/Dev/DevSkinTypes.h"
 #endif
 
-#if JUCE_DEBUG
-#include "Tests/TestComponent.h"
-#endif
-
 class WidgetFactory;
 class HeaderPanel;
 class SettingsPanel;
@@ -298,10 +294,6 @@ private:
     std::unique_ptr<WidgetFactory> widgetFactory_;
     GuiLayoutDimensions layoutDimensions_;
     std::unique_ptr<MainComponent> mainComponent_;
-#if JUCE_DEBUG
-    std::unique_ptr<TestComponent> testComponent_;
-    bool uiElementsTestVisible_ = false;
-#endif
     std::unique_ptr<SettingsWindow> settingsWindow_;
     std::unique_ptr<AboutWindow> aboutWindow_;
     std::unique_ptr<MasterInitConfirmDialog> masterInitConfirmDialog_;
@@ -324,11 +316,6 @@ private:
     void syncUiScaleFromEditor();
     void updateOverlayLayoutsForUiScale(float uiScale);
     void syncStandaloneWindowSize();
-#if JUCE_DEBUG
-    void createUiElementsTestComponent();
-    void setUiElementsTestVisible(bool visible);
-    void layoutUiElementsTestComponent();
-#endif
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginEditor)
 };

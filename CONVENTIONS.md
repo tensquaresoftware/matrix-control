@@ -812,7 +812,7 @@ Keep each section visible; one logical assertion focus per test case when possib
 |---|---|---|
 | **Unit** | Many | `Tests/Unit/` — parsers, models, dispatchers, mappers |
 | **Integration** | Some | MIDI queue + dispatcher chains, APVTS mappers (when needed) |
-| **E2E / GUI** | Few | Manual via Standalone / `TestComponent` (**Debug-only** harness; excluded from Release — D-063) — no automated GUI suite yet |
+| **E2E / GUI** | Few | Manual via Standalone — no automated GUI suite yet |
 
 Prefer many fast unit tests over a few slow integration tests.
 

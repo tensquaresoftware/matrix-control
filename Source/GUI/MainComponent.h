@@ -65,11 +65,6 @@ public:
 
     bool keyPressed(const juce::KeyPress& key) override;
 
-#if JUCE_DEBUG
-    void setUiElementsTestVisible(bool visible);
-    juce::Rectangle<int> getUiElementsTestAreaBounds() const;
-#endif
-
 private:
     void valueTreePropertyChanged(juce::ValueTree& tree, const juce::Identifier& property) override;
     void valueTreeRedirected(juce::ValueTree& tree) override;
@@ -86,10 +81,6 @@ private:
     float uiScale_ = 1.0f;
     juce::AudioProcessorValueTreeState* apvts_ = nullptr;
     bool compareHoleRetryPending_ = false;
-#if JUCE_DEBUG
-    bool uiElementsTestVisible_ = false;
-    int uiElementsTestAreaY_ = 0;
-#endif
 
     // Footer before Header/Body so panel binders can clear HELP during teardown without UAF.
     FooterPanel footerPanel;

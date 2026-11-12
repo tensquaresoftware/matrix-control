@@ -64,11 +64,6 @@ void PluginEditor::updateSkin()
     if (gettingStartedWizardDialog_ != nullptr)
         gettingStartedWizardDialog_->setSkin(*skinBlack_);
 
-#if JUCE_DEBUG
-    if (testComponent_ != nullptr)
-        testComponent_->setSkin(*skin_);
-#endif
-
     repaint();
 }
 
@@ -247,37 +242,3 @@ void PluginEditor::applyUiScaleFromItemId(int scaleId, bool persistToState)
     if (auto* comp = mainComponent_.get())
         comp->getHeaderPanel().setCurrentUiScaleId(scaleId);
 }
-
-#if JUCE_DEBUG
-void PluginEditor::setUiElementsTestVisible(bool visible)
-{
-    if (uiElementsTestVisible_ == visible)
-        return;
-
-    uiElementsTestVisible_ = visible;
-
-    if (auto* main = mainComponent_.get())
-        main->setUiElementsTestVisible(visible);
-
-    if (auto* test = testComponent_.get())
-    {
-        test->setVisible(visible);
-        if (visible)
-        {
-            test->toFront(false);
-            test->grabKeyboardFocus();
-        }
-    }
-
-    layoutUiElementsTestComponent();
-    repaint();
-}
-
-void PluginEditor::layoutUiElementsTestComponent()
-{
-    if (!uiElementsTestVisible_ || mainComponent_ == nullptr || testComponent_ == nullptr)
-        return;
-
-    testComponent_->setBounds(mainComponent_->getUiElementsTestAreaBounds());
-}
-#endif

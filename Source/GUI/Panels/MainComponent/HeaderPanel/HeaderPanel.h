@@ -42,9 +42,6 @@ public:
     std::function<void()> onSettingsRequested;
     std::function<void()> onAboutRequested;
     std::function<void()> onPanicRequested;
-#if JUCE_DEBUG
-    std::function<void()> onUiTestsToggleRequested;
-#endif
 
     void setPanicQueuePressureAlert(bool active);
     void setPanicMidiOutputAvailable(bool available);

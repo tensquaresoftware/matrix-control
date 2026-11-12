@@ -14,13 +14,6 @@ void HeaderPanel::wireLogoCallbacks()
         if (onSettingsRequested)
             onSettingsRequested();
     };
-#if JUCE_DEBUG
-    logo_.onUiTestsToggleRequested = [this]
-    {
-        if (onUiTestsToggleRequested)
-            onUiTestsToggleRequested();
-    };
-#endif
     logo_.onUiScaleReset = [this]
     {
         if (onUiScaleReset)

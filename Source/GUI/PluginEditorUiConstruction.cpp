@@ -61,10 +61,6 @@ void PluginEditor::createUiShell()
             openMasterInitConfirmDialog(moduleDisplayName, std::move(onConfirmed));
         });
 
-#if JUCE_DEBUG
-    createUiElementsTestComponent();
-#endif
-
     updateSkin();
 }
 
@@ -123,20 +119,6 @@ void PluginEditor::wirePatchEditDisplayBindings()
             pluginProcessor.beginEditorialTransaction(name);
         });
 }
-
-#if JUCE_DEBUG
-void PluginEditor::createUiElementsTestComponent()
-{
-    testComponent_ = std::make_unique<TestComponent>(TestComponent::Options{
-        *skin_,
-        pluginProcessor.getApvts(),
-        pluginProcessor.getApvts().state,
-        layoutDimensions_.editor.width,
-        layoutDimensions_.editor.height});
-    addChildComponent(*testComponent_);
-    testComponent_->setVisible(false);
-}
-#endif
 
 void PluginEditor::restoreAndWireHeader()
 {
@@ -238,9 +220,6 @@ void PluginEditor::attachEditorRuntimeListeners()
             return tryHandleEditorialUndoRedoKey(key) || tryHandleEditorChromeKey(key);
         });
     syncUiScaleFromEditor();
-#if JUCE_DEBUG
-    layoutUiElementsTestComponent();
-#endif
     repaint();
 
     // With no focused descendant, Cmd/Ctrl shortcuts never reach PluginEditor /

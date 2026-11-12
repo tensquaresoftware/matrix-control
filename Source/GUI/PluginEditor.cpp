@@ -144,9 +144,6 @@ void PluginEditor::resized()
     updateOverlayBoundsIfVisible(settingsWindow_, bounds);
     updateOverlayBoundsIfVisible(aboutWindow_, bounds);
 
-#if JUCE_DEBUG
-    layoutUiElementsTestComponent();
-#endif
     syncUiScaleFromEditor();
 
     if (pluginProcessor.isStandalone())
@@ -186,18 +183,7 @@ void PluginEditor::requestEditorKeyboardFocusIfNeeded()
 
 void PluginEditor::mouseDown(const juce::MouseEvent& event)
 {
-#if JUCE_DEBUG
-    if (uiElementsTestVisible_
-        && testComponent_ != nullptr
-        && testComponent_->isVisible()
-        && testComponent_->getBounds().contains(event.getPosition()))
-    {
-        testComponent_->grabKeyboardFocus();
-        return;
-    }
-#else
     juce::ignoreUnused(event);
-#endif
 
     unfocusAllComponents();
     grabKeyboardFocus();
@@ -221,16 +207,6 @@ bool PluginEditor::keyPressed(const juce::KeyPress& key)
 
     if (tryHandleEditorChromeKey(key))
         return true;
-
-#if JUCE_DEBUG
-    if (uiElementsTestVisible_
-        && testComponent_ != nullptr
-        && testComponent_->isVisible()
-        && testComponent_->keyPressed(key))
-    {
-        return true;
-    }
-#endif
 
     return juce::AudioProcessorEditor::keyPressed(key);
 }
