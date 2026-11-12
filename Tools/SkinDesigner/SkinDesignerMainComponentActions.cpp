@@ -159,7 +159,14 @@ void SkinDesignerMainComponent::syncCompareButtonChrome()
         compareBlinkLit_ = true;
         applyPhase(false);
     }
-    compare.repaint();
+
+    // Halo of outer hover rings (2 px grey + 2 px yellow) — repaint parent so
+    // grey blink / mouse-exit clear pixels outside the button bounds.
+    constexpr int kCompareHoverHaloPx = 4;
+    if (auto* parent = compare.getParentComponent())
+        parent->repaint(compare.getBounds().expanded(kCompareHoverHaloPx));
+    else
+        compare.repaint();
 }
 
 void SkinDesignerMainComponent::tickCompareBlink()

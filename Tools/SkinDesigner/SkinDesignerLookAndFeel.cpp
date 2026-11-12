@@ -182,25 +182,45 @@ namespace SkinDesignerChrome
             button.getProperties()[compareButtonArmedProperty()]);
         if (compareArmed)
         {
-            // Blink keeps alternating. Yellow + hover: same yellow fill with a
-            // 2 px panel-grey ring, then a 2 px yellow ring outside it (detached).
+            // Outer hover rings paint past the button bounds (unclipped). Always
+            // erase that halo first so grey blink / mouse-exit do not leave ghosts.
+            constexpr float kRingPx = 2.0f;
+            constexpr float kHaloPx = kRingPx * 2.0f;
+            constexpr float r = kControlCorner;
+            const auto greyOuter = bounds.expanded(kRingPx);
+            const auto yellowOuter = bounds.expanded(kHaloPx);
+
+            g.setColour(surfacePanel());
+            g.fillRect(yellowOuter.expanded(1.0f));
+
+            // Rings only while yellow blink phase + hover (vanish on grey phase / no hover).
             const bool yellowPhase = backgroundColour == attention();
-            if (yellowPhase && shouldDrawButtonAsHighlighted && ! shouldDrawButtonAsDown)
+            const bool showHoverRings = yellowPhase && shouldDrawButtonAsHighlighted
+                && ! shouldDrawButtonAsDown;
+
+            if (showHoverRings)
             {
-                constexpr float kRingPx = 2.0f;
+                // Nested fills, outside → in. Same corner radius as the button on
+                // every layer so grey / yellow / face corners match (strokes that
+                // straddled the face were clipping the grey corners).
                 g.setColour(attention());
-                g.fillRoundedRectangle(bounds, kControlCorner);
-                const auto greyRing = bounds.reduced(kRingPx);
-                g.setColour(surfacePanel());
-                g.fillRoundedRectangle(greyRing, juce::jmax(0.0f, kControlCorner - kRingPx));
-                const auto yellowFill = greyRing.reduced(kRingPx);
+                g.fillRoundedRectangle(yellowOuter, r);
+                g.setColour(surfaceApp());
+                g.fillRoundedRectangle(greyOuter, r);
                 g.setColour(attention());
-                g.fillRoundedRectangle(yellowFill, juce::jmax(0.0f, kControlCorner - 2.0f * kRingPx));
-                return;
+                g.fillRoundedRectangle(bounds, r);
             }
-            // Grey phase (and yellow pressed): keep phase fill — no chrome grey hover.
+            else
+            {
+                g.setColour(base);
+                g.fillRoundedRectangle(bounds, r);
+                g.setColour(controlOutline());
+                g.drawRoundedRectangle(bounds, r, 1.0f);
+            }
+            return;
         }
-        else if (shouldDrawButtonAsDown)
+
+        if (shouldDrawButtonAsDown)
             base = controlFillDown();
         else if (shouldDrawButtonAsHighlighted)
             base = controlFillHover();

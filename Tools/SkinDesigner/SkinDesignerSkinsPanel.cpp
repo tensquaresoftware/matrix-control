@@ -62,6 +62,7 @@ SkinDesignerSkinsPanel::SkinDesignerSkinsPanel()
     wire(renameButton_, onRename);
     wire(deleteButton_, onDelete);
 
+    compareButton_.setPaintingIsUnclipped(true); // outer Compare hover rings
     compareButton_.setTooltip(
         "Show the selected Product skin on Matrix-Control (read-only Designer while on)");
     designerDuplicateButton_.setTooltip("Duplicate");
