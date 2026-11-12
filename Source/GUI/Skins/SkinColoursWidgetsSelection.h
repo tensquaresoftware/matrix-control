@@ -165,12 +165,13 @@ namespace TSS::SkinColours
 
         namespace ComboBoxK3
         {
+            // Cream column aligned on trial CREAM/CHROMA 1 Modales (cs3).
             inline constexpr ColourElement kBackground = {
                 skinColourKey(SkinObjectType::kComboBox, SkinColourProperty::kBackground,
                               SkinColourState::kDefault, ColourSet::k3),
                 ColourChart::kBlack,
                 ColourChart::kBlack,
-                ColourChart::kBrandCream
+                ColourChart::kCafe50
             };
 
             inline constexpr ColourElement kBackgroundDisabled = {
@@ -376,6 +377,7 @@ namespace TSS::SkinColours
 
         namespace PopupMenuK3
         {
+            // Cream column: logo mono + Modales / Computer Patches on BrandCream.
             inline constexpr ColourElement kBackground = {
                 skinColourKey(SkinObjectType::kPopupMenu, SkinColourProperty::kBackground,
                               SkinColourState::kDefault, ColourSet::k3),

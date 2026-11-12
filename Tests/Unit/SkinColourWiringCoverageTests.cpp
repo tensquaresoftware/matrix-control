@@ -377,7 +377,7 @@ private:
         expect(modales.valueBarEnabled == juce::Colour(ColourChart::kCafe700));
 
         const auto comboMono = TSS::comboBoxLookForZone(*skin, SkinZone::kModales);
-        expect(comboMono.backgroundEnabled == juce::Colour(ColourChart::kBrandCream));
+        expect(comboMono.backgroundEnabled == juce::Colour(ColourChart::kCafe50));
         expect(comboMono.textEnabled == juce::Colour(ColourChart::kCafe700));
     }
 };
