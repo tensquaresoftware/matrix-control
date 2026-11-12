@@ -70,14 +70,14 @@ namespace TSS::SkinColours
                 skinColourKey(SkinObjectType::kNumberBox, SkinColourProperty::kBorder),
                 ColourChart::kGrey800,
                 ColourChart::kGrey800,
-                ColourChart::kCafe700
+                ColourChart::kCafe500
             };
 
             inline constexpr ColourElement kBorderDisabled = {
                 skinColourKey(SkinObjectType::kNumberBox, SkinColourProperty::kBorder, SkinColourState::kDisabled),
                 ColourChart::kGrey800,
                 ColourChart::kGrey800,
-                ColourChart::kCafe700
+                ColourChart::kCafe500
             };
         }
 
@@ -94,7 +94,7 @@ namespace TSS::SkinColours
                 skinColourKey(SkinObjectType::kEnvelopeDisplay, SkinColourProperty::kBorder),
                 ColourChart::kGrey800,
                 ColourChart::kGrey800,
-                ColourChart::kCafe700
+                ColourChart::kCafe500
             };
 
             inline constexpr ColourElement kEnvelope = {
@@ -118,7 +118,7 @@ namespace TSS::SkinColours
                 skinColourKey(SkinObjectType::kTrackGeneratorDisplay, SkinColourProperty::kBorder),
                 ColourChart::kGrey800,
                 ColourChart::kGrey800,
-                ColourChart::kCafe700
+                ColourChart::kCafe500
             };
 
             inline constexpr ColourElement kShaper = {
@@ -142,7 +142,7 @@ namespace TSS::SkinColours
                 skinColourKey(SkinObjectType::kPatchNameDisplay, SkinColourProperty::kBorder),
                 ColourChart::kGrey800,
                 ColourChart::kGrey800,
-                ColourChart::kCafe700
+                ColourChart::kCafe500
             };
 
             inline constexpr ColourElement kText = {
@@ -207,7 +207,7 @@ namespace TSS::SkinColours
                 skinColourKey(SkinObjectType::kLed, SkinColourProperty::kBorder, SkinColourState::kOff),
                 ColourChart::kGrey800,
                 ColourChart::kGrey800,
-                ColourChart::kCafe700
+                ColourChart::kCafe500
             };
 
             inline constexpr ColourElement kMaxOn = {
@@ -241,7 +241,7 @@ namespace TSS::SkinColours
                               SkinColourState::kOff, ColourSet::k2),
                 ColourChart::kGrey800,
                 ColourChart::kGrey800,
-                ColourChart::kCafe700
+                ColourChart::kCafe500
             };
         }
 
@@ -263,7 +263,7 @@ namespace TSS::SkinColours
                               SkinColourState::kOff),
                 ColourChart::kGrey800,
                 ColourChart::kGrey800,
-                ColourChart::kCafe700
+                ColourChart::kCafe500
             };
 
             inline constexpr ColourElement kMaxOn = {
@@ -299,7 +299,7 @@ namespace TSS::SkinColours
                               SkinColourState::kOff, ColourSet::k2),
                 ColourChart::kGrey800,
                 ColourChart::kGrey800,
-                ColourChart::kCafe700
+                ColourChart::kCafe500
             };
         }
     }

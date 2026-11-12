@@ -19,7 +19,7 @@ namespace TSS::SkinColours
                 skinColourKey(SkinObjectType::kButton, SkinColourProperty::kBorder, SkinColourState::kOff),
                 ColourChart::kGrey800,
                 ColourChart::kGrey800,
-                ColourChart::kCafe700
+                ColourChart::kCafe500
             };
 
             inline constexpr ColourElement kTextOff = {
@@ -40,7 +40,7 @@ namespace TSS::SkinColours
                 skinColourKey(SkinObjectType::kButton, SkinColourProperty::kBorder, SkinColourState::kOn),
                 ColourChart::kGrey800,
                 ColourChart::kGrey800,
-                ColourChart::kCafe700
+                ColourChart::kCafe500
             };
 
             inline constexpr ColourElement kTextOn = {
@@ -137,7 +137,7 @@ namespace TSS::SkinColours
                 skinColourKey(SkinObjectType::kToggle, SkinColourProperty::kBorder),
                 ColourChart::kGrey800,
                 ColourChart::kGrey800,
-                ColourChart::kCafe700
+                ColourChart::kCafe500
             };
 
             inline constexpr ColourElement kBackgroundOff = {

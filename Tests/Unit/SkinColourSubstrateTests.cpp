@@ -243,7 +243,7 @@ private:
         expectSeed(SkinObjectType::kLed, SkinColourProperty::kBackground, SkinColourState::kOff,
                    ColourChart::kBlack, ColourChart::kBrandCream);
         expectSeed(SkinObjectType::kLed, SkinColourProperty::kBorder, SkinColourState::kOff,
-                   ColourChart::kGrey800, ColourChart::kCafe700);
+                   ColourChart::kGrey800, ColourChart::kCafe500);
         expectSeed(SkinObjectType::kLed, SkinColourProperty::kBackground, SkinColourState::kOn,
                    ColourChart::kYellow400, ColourChart::kGreen500);
         expectSeed(SkinObjectType::kChromeText, SkinColourProperty::kText, SkinColourState::kHover,

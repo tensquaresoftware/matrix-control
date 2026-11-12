@@ -187,7 +187,7 @@ namespace TSS::SkinColours
                               SkinColourState::kDefault, ColourSet::k3),
                 ColourChart::kGrey800,
                 ColourChart::kGrey800,
-                ColourChart::kCafe700
+                ColourChart::kCafe500
             };
 
             inline constexpr ColourElement kBorderDisabled = {
