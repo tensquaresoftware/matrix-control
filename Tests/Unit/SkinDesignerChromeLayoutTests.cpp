@@ -6,6 +6,7 @@
 #include "Tools/SkinDesigner/SkinDesignerMappingModePolicy.h"
 #include "Tools/SkinDesigner/SkinDesignerMappingsColumns.h"
 #include "Tools/SkinDesigner/SkinDesignerSkinsPanel.h"
+#include "Tools/SkinDesigner/SkinDesignerStepper.h"
 
 class SkinDesignerChromeLayoutTests : public juce::UnitTest
 {
@@ -188,16 +189,16 @@ private:
         return nullptr;
     }
 
-    static juce::TextButton* findLowerNextNav(juce::Component& root)
+    static SkinDesignerStepper* findLowerStepper(juce::Component& root)
     {
-        juce::TextButton* lower = nullptr;
+        SkinDesignerStepper* lower = nullptr;
         for (auto* c : root.getChildren())
         {
-            auto* b = dynamic_cast<juce::TextButton*>(c);
-            if (b == nullptr || b->getButtonText() != ">")
+            auto* stepper = dynamic_cast<SkinDesignerStepper*>(c);
+            if (stepper == nullptr)
                 continue;
-            if (lower == nullptr || b->getY() > lower->getY())
-                lower = b;
+            if (lower == nullptr || stepper->getY() > lower->getY())
+                lower = stepper;
         }
         return lower;
     }
@@ -216,27 +217,41 @@ private:
         return lower;
     }
 
+    static juce::ComboBox* findUpperCombo(juce::Component& root)
+    {
+        juce::ComboBox* upper = nullptr;
+        for (auto* c : root.getChildren())
+        {
+            auto* box = dynamic_cast<juce::ComboBox*>(c);
+            if (box == nullptr)
+                continue;
+            if (upper == nullptr || box->getY() < upper->getY())
+                upper = box;
+        }
+        return upper;
+    }
+
     void skinsPanelDesignerActionsFitOneRow()
     {
-        beginTest("SKINS Dup/New/Ren/Del fit combo-to-Next span under Designer");
+        beginTest("SKINS Dup/New/Ren match combo; Del matches stepper");
 
         SkinDesignerSkinsPanel panel;
         panel.setSize(SkinDesignerChrome::kColorPanelWidth, SkinDesignerSkinsPanel::preferredHeight());
 
         auto* designerCombo = findLowerCombo(panel);
-        auto* designerNext = findLowerNextNav(panel);
+        auto* designerStepper = findLowerStepper(panel);
         auto* dupBtn = findButton(panel, "Dup");
         auto* newBtn = findButton(panel, "New");
         auto* renameBtn = findButton(panel, "Ren");
         auto* deleteBtn = findButton(panel, "Del");
 
         expect(designerCombo != nullptr);
-        expect(designerNext != nullptr);
+        expect(designerStepper != nullptr);
         expect(dupBtn != nullptr);
         expect(newBtn != nullptr);
         expect(renameBtn != nullptr);
         expect(deleteBtn != nullptr);
-        if (designerCombo == nullptr || designerNext == nullptr || dupBtn == nullptr
+        if (designerCombo == nullptr || designerStepper == nullptr || dupBtn == nullptr
             || newBtn == nullptr || renameBtn == nullptr || deleteBtn == nullptr)
             return;
 
@@ -244,28 +259,34 @@ private:
         expectEquals(newBtn->getY(), renameBtn->getY());
         expectEquals(renameBtn->getY(), deleteBtn->getY());
         expectEquals(dupBtn->getX(), designerCombo->getX());
-        expectEquals(deleteBtn->getRight(), designerNext->getRight());
+        expectEquals(renameBtn->getRight(), designerCombo->getRight());
+        expectEquals(deleteBtn->getX(), designerStepper->getX());
+        expectEquals(deleteBtn->getRight(), designerStepper->getRight());
+        expectEquals(deleteBtn->getWidth(), SkinDesignerStepper::kPreferredWidth);
         expect(dupBtn->getY() > designerCombo->getBottom());
     }
 
     void skinsPanelProductDuplicateCompareFitOneRow()
     {
-        beginTest("SKINS Duplicate + Compare share Product action row");
+        beginTest("SKINS Duplicate + Compare match Product combo width");
 
         SkinDesignerSkinsPanel panel;
         panel.setSize(SkinDesignerChrome::kColorPanelWidth, SkinDesignerSkinsPanel::preferredHeight());
 
+        auto* productCombo = findUpperCombo(panel);
         auto* duplicateBtn = findButton(panel, "Duplicate");
         auto* compareBtn = findButton(panel, "Compare");
 
+        expect(productCombo != nullptr);
         expect(duplicateBtn != nullptr);
         expect(compareBtn != nullptr);
-        if (duplicateBtn == nullptr || compareBtn == nullptr)
+        if (productCombo == nullptr || duplicateBtn == nullptr || compareBtn == nullptr)
             return;
 
         expectEquals(duplicateBtn->getY(), compareBtn->getY());
+        expectEquals(duplicateBtn->getX(), productCombo->getX());
+        expectEquals(compareBtn->getRight(), productCombo->getRight());
         expect(compareBtn->getX() > duplicateBtn->getRight());
-        expect(compareBtn->getRight() <= panel.getWidth());
         expect(duplicateBtn->getHeight() > 0);
         expect(compareBtn->getHeight() > 0);
     }

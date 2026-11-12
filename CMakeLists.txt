@@ -636,6 +636,7 @@ if(MATRIX_BUILD_TESTS)
         Tools/SkinDesigner/SkinDesignerChromePanel.cpp
         Tools/SkinDesigner/SkinDesignerColourPicker.cpp
         Tools/SkinDesigner/SkinDesignerSkinsPanel.cpp
+        Tools/SkinDesigner/SkinDesignerStepper.cpp
         Tests/Unit/SliderZoneSeedTests.cpp
         Tests/Unit/ProgressBarUcsSeedTests.cpp
         Tests/Unit/PatchManagerActionHandlerComputerNavigationTests.cpp
@@ -1241,6 +1242,7 @@ if(MATRIX_BUILD_SKIN_DESIGNER)
         Tools/SkinDesigner/SkinDesignerMappingsPanelLink.cpp
         Tools/SkinDesigner/SkinDesignerMappingsFilterMenu.cpp
         Tools/SkinDesigner/SkinDesignerSkinsPanel.cpp
+        Tools/SkinDesigner/SkinDesignerStepper.cpp
         ${MATRIX_SKIN_DEV_LAYER_SOURCES}
         Source/GUI/Skins/Skin.cpp
         Source/GUI/Skins/SkinColourAccessors.cpp

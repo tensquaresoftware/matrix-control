@@ -4,6 +4,8 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
+#include "Tools/SkinDesigner/SkinDesignerStepper.h"
+
 /** Left SKINS panel: Product / Designer selectors, Product Compare, Designer CRUD. */
 class SkinDesignerSkinsPanel final : public juce::Component
 {
@@ -36,21 +38,19 @@ private:
     struct SelectorMetrics
     {
         int labelColW = 0;
-        int squareW = 0;
+        int stepperW = 0;
         int comboW = 0;
         int selectorSpanW = 0;
     };
 
     static int labelColumnWidth() noexcept;
-    static int squareNavButtonWidth() noexcept;
     static int comboWidthForContent(int contentW, int labelColW) noexcept;
 
     struct ComboNavRowRefs
     {
         juce::Label& label;
         juce::ComboBox& combo;
-        juce::TextButton& prev;
-        juce::TextButton& next;
+        SkinDesignerStepper& stepper;
     };
 
     void cycleCombo(juce::ComboBox& combo, int delta);
@@ -58,21 +58,19 @@ private:
     void layoutComboNavRow(juce::Rectangle<int>& content,
                            const SelectorMetrics& metrics,
                            const ComboNavRowRefs& row);
-    void layoutProductDuplicateRow(juce::Rectangle<int>& content, int labelColW);
+    void layoutProductDuplicateRow(juce::Rectangle<int>& content, const SelectorMetrics& metrics);
     void layoutDesignerActionRow(juce::Rectangle<int>& content, const SelectorMetrics& metrics);
 
     juce::Label titleLabel_;
     juce::Label productLabel_ { {}, "Product:" };
     juce::ComboBox productCombo_;
-    juce::TextButton productPrevButton_ { "<" };
-    juce::TextButton productNextButton_ { ">" };
+    SkinDesignerStepper productStepper_;
     juce::TextButton productDuplicateButton_ { "Duplicate" };
     juce::TextButton compareButton_ { "Compare" };
 
     juce::Label designerLabel_ { {}, "Designer:" };
     juce::ComboBox designerCombo_;
-    juce::TextButton designerPrevButton_ { "<" };
-    juce::TextButton designerNextButton_ { ">" };
+    SkinDesignerStepper designerStepper_;
     juce::TextButton designerDuplicateButton_ { "Dup" };
     juce::TextButton newButton_ { "New" };
     juce::TextButton renameButton_ { "Ren" };
