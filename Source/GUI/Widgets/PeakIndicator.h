@@ -11,7 +11,7 @@ namespace TSS
 {
     class ISkin;
 
-    /// Solid vertical peak fill (D-071). Visual release is governed solely by kReleaseTimeMs_.
+    /// Solid vertical peak fill (D-071). Attack/release ballistics are GUI-local.
     class PeakIndicator : public juce::Component,
                           private juce::Timer
     {
@@ -30,8 +30,11 @@ namespace TSS
         friend class ::SkinColourWiringTests;
 
         inline constexpr static float kBorderThicknessDesign_ = 2.0f;
-        inline constexpr static juce::int64 kReleaseTimeMs_ = 300;
-        inline constexpr static float kReleaseCurveExponent_ = 3.0f;
+        // Slightly elastic rise/fall (was instant attack + 300 ms / exp 3 release).
+        inline constexpr static juce::int64 kAttackTimeMs_ = 100;
+        inline constexpr static float kAttackCurveExponent_ = 2.0f;
+        inline constexpr static juce::int64 kReleaseTimeMs_ = 450;
+        inline constexpr static float kReleaseCurveExponent_ = 2.0f;
         inline constexpr static int kAnimationHz_ = 60;
 
         ISkin* skin_ = nullptr;
@@ -45,7 +48,7 @@ namespace TSS
         juce::int64 lastUpdateMs_ = 0;
 
         void timerCallback() override;
-        void advanceRelease(juce::int64 nowMs);
+        void advanceTowardTarget(juce::int64 nowMs);
         void updateBallistics(juce::int64 nowMs, float normalisedLevel);
         void ensureAnimationTimerRunning();
 

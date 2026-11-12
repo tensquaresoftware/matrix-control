@@ -94,7 +94,7 @@ namespace TSS::SkinColours
                 skinColourKey(SkinObjectType::kEnvelopeDisplay, SkinColourProperty::kBorder),
                 ColourChart::kGrey800,
                 ColourChart::kGrey800,
-                ColourChart::kCafe400
+                ColourChart::kCafe700
             };
 
             inline constexpr ColourElement kEnvelope = {
@@ -118,7 +118,7 @@ namespace TSS::SkinColours
                 skinColourKey(SkinObjectType::kTrackGeneratorDisplay, SkinColourProperty::kBorder),
                 ColourChart::kGrey800,
                 ColourChart::kGrey800,
-                ColourChart::kCafe400
+                ColourChart::kCafe700
             };
 
             inline constexpr ColourElement kShaper = {
@@ -142,7 +142,7 @@ namespace TSS::SkinColours
                 skinColourKey(SkinObjectType::kPatchNameDisplay, SkinColourProperty::kBorder),
                 ColourChart::kGrey800,
                 ColourChart::kGrey800,
-                ColourChart::kCafe400
+                ColourChart::kCafe700
             };
 
             inline constexpr ColourElement kText = {
@@ -200,7 +200,7 @@ namespace TSS::SkinColours
                 skinColourKey(SkinObjectType::kLed, SkinColourProperty::kBackground, SkinColourState::kOff),
                 ColourChart::kBlack,
                 ColourChart::kBlack,
-                ColourChart::kCafe50
+                ColourChart::kBrandCream
             };
 
             inline constexpr ColourElement kBorderOff = {
@@ -225,7 +225,7 @@ namespace TSS::SkinColours
                               SkinColourState::kOff, ColourSet::k2),
                 ColourChart::kBlack,
                 ColourChart::kBlack,
-                ColourChart::kCafe50
+                ColourChart::kBrandCream
             };
 
             inline constexpr ColourElement kMaxOn = {
@@ -254,7 +254,7 @@ namespace TSS::SkinColours
                               SkinColourState::kOff),
                 ColourChart::kBlack,
                 ColourChart::kBlack,
-                ColourChart::kCafe50
+                ColourChart::kBrandCream
             };
 
             inline constexpr ColourElement kBorderOff = {
@@ -283,7 +283,7 @@ namespace TSS::SkinColours
                               SkinColourState::kOff, ColourSet::k2),
                 ColourChart::kBlack,
                 ColourChart::kBlack,
-                ColourChart::kCafe50
+                ColourChart::kBrandCream
             };
 
             inline constexpr ColourElement kMaxOn = {

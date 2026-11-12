@@ -13,7 +13,7 @@ namespace TSS
     class ISkin;
 
     /// Square activity LED with pulse + decay level (UX-DR3).
-    /// Visual release is governed solely by kReleaseTimeMs_ (Core only signals activity edges).
+    /// Visual release is GUI-local (Core only signals activity edges).
     class Led : public juce::Component,
                 private juce::Timer
     {
@@ -33,8 +33,9 @@ namespace TSS
         friend class ::SkinColourWiringTests;
 
         inline constexpr static float kBorderThicknessDesign_ = 2.0f;
-        inline constexpr static juce::int64 kReleaseTimeMs_ = 300;
-        inline constexpr static float kReleaseCurveExponent_ = 3.0f;
+        // Longer / softer than Peak: activity LEDs must stay readable on cream mono.
+        inline constexpr static juce::int64 kReleaseTimeMs_ = 550;
+        inline constexpr static float kReleaseCurveExponent_ = 2.0f;
         inline constexpr static int kAnimationHz_ = 60;
 
         ISkin* skin_ = nullptr;

@@ -80,28 +80,40 @@ namespace TSS
         repaint();
     }
 
-    void PeakIndicator::advanceRelease(juce::int64 nowMs)
+    void PeakIndicator::advanceTowardTarget(juce::int64 nowMs)
     {
-        if (lastUpdateMs_ <= 0 || displayedLevel_ <= 0.0f)
+        if (lastUpdateMs_ <= 0)
             return;
 
         const auto elapsed = nowMs - lastUpdateMs_;
-
         if (elapsed <= 0)
             return;
 
-        const float decayRatio = static_cast<float>(elapsed) / static_cast<float>(kReleaseTimeMs_);
-        displayedLevel_ *= std::exp(-decayRatio * kReleaseCurveExponent_);
+        const float target = lastInputLevel_;
+        if (target >= displayedLevel_)
+        {
+            const float ratio = static_cast<float>(elapsed) / static_cast<float>(kAttackTimeMs_);
+            const float t = 1.0f - std::exp(-ratio * kAttackCurveExponent_);
+            displayedLevel_ += (target - displayedLevel_) * t;
+        }
+        else
+        {
+            const float ratio = static_cast<float>(elapsed) / static_cast<float>(kReleaseTimeMs_);
+            displayedLevel_ *= std::exp(-ratio * kReleaseCurveExponent_);
+            displayedLevel_ = juce::jmax(target, displayedLevel_);
+        }
     }
 
     void PeakIndicator::updateBallistics(juce::int64 nowMs, float normalisedLevel)
     {
-        advanceRelease(nowMs);
-
         const float clamped = juce::jlimit(0.0f, 1.0f, normalisedLevel);
-
         lastInputLevel_ = clamped;
-        displayedLevel_ = juce::jmax(clamped, displayedLevel_);
+
+        if (lastUpdateMs_ <= 0)
+            displayedLevel_ = clamped;
+        else
+            advanceTowardTarget(nowMs);
+
         lastUpdateMs_ = nowMs;
     }
 
@@ -116,11 +128,10 @@ namespace TSS
         const auto nowMs = static_cast<juce::int64>(juce::Time::getMillisecondCounterHiRes());
         const float levelBefore = displayedLevel_;
 
-        advanceRelease(nowMs);
-        displayedLevel_ = juce::jmax(lastInputLevel_, displayedLevel_);
+        advanceTowardTarget(nowMs);
         lastUpdateMs_ = nowMs;
 
-        if (displayedLevel_ < 0.001f)
+        if (displayedLevel_ < 0.001f && lastInputLevel_ < 0.001f)
         {
             displayedLevel_ = 0.0f;
             stopTimer();
@@ -135,7 +146,7 @@ namespace TSS
         const auto nowMs = static_cast<juce::int64>(juce::Time::getMillisecondCounterHiRes());
         updateBallistics(nowMs, normalisedLevel);
 
-        if (displayedLevel_ > 0.0f)
+        if (displayedLevel_ > 0.0f || lastInputLevel_ > 0.0f)
             ensureAnimationTimerRunning();
 
         repaint();

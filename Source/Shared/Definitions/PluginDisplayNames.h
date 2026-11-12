@@ -100,15 +100,15 @@ namespace PluginDisplayNames
 
         // Left-zone guidance while FR-2 device lock is active (D-038 — footer only, no modal).
         constexpr const char* kDeviceLockGuidance =
-            "No synth detected - check MIDI cables, Settings > MIDI & DEVICE > SYNTH FROM / SYNTH TO, and power-cycle your Matrix synth.";
+            "No synth detected - check MIDI cables, Settings > MIDI & DEVICE, and power-cycle your Matrix.";
 
         // Presence inquiry timed out while still detected — synth likely overloaded, not unplugged.
         constexpr const char* kDeviceUnresponsiveGuidance =
-            "Synth not responding (often after heavy SysEx edits) - stop editing, power-cycle the Matrix, then click PANIC if a note is still stuck.";
+            "Synth not responding (often after heavy SysEx) - stop editing, power-cycle the Matrix, then click PANIC if needed.";
 
         // Connected Oberheim Matrix-family device whose member is not Matrix-1000 / Matrix-6/6R.
         constexpr const char* kUnsupportedMatrixDeviceFooter =
-            "Connected Matrix device is not supported - editing is locked. Use Settings > MIDI & DEVICE > SYNTH FROM / SYNTH TO to change ports.";
+            "Connected Matrix device is not supported - editing is locked. Change ports in Settings > MIDI & DEVICE.";
 
         // Standalone: SYNTH FROM and KEYBOARD FROM must open distinct input devices.
         constexpr const char* kMidiFromKeyboardFromConflictFooter =
@@ -246,8 +246,8 @@ namespace PluginDisplayNames
             constexpr const char* kDropRejectedMasterMulti =
                 "Drop rejected: drop one Master file at a time";
             constexpr const char* kMasterPullFailed =
-                "MASTER: Could not read Master parameters from the synth. Keeping current Master Edit settings. "
-                "Check that SYNTH FROM is the synth MIDI OUT.";
+                "MASTER: Could not read Master parameters from the synth. Kept current Master Edit settings. "
+                "Check SYNTH FROM.";
             constexpr const char* kRenameBeforeSave =
                 "Rename patch (replace * INIT *) before SAVE / SAVE AS";
         }
@@ -2229,11 +2229,11 @@ namespace PluginDisplayNames
                 }
 
                 constexpr const char* kDeviceDumpFailedFooter =
-                    "PATCH MUTATOR: Could not read the patch from the synth. Keeping the displayed bank and patch "
-                    "numbers and the current editor buffer. Check that SYNTH FROM is the synth MIDI OUT.";
+                    "PATCH MUTATOR: Could not read the patch from the synth. Kept bank/patch numbers and editor "
+                    "buffer. Check SYNTH FROM.";
                 constexpr const char* kDeviceDumpAbortedEditedFooter =
-                    "PATCH MUTATOR: Synth patch load cancelled because the editor changed while waiting. "
-                    "The displayed bank and patch numbers and your edits were kept.";
+                    "PATCH MUTATOR: Synth load cancelled - editor changed while waiting. Kept bank/patch numbers "
+                    "and your edits.";
             }
         }
     } 

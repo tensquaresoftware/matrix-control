@@ -241,7 +241,7 @@ private:
         expectSeed(SkinObjectType::kReadOnlyValueField, SkinColourProperty::kText, SkinColourState::kError,
                    ColourChart::kRed500, ColourChart::kCafe850);
         expectSeed(SkinObjectType::kLed, SkinColourProperty::kBackground, SkinColourState::kOff,
-                   ColourChart::kBlack, ColourChart::kCafe50);
+                   ColourChart::kBlack, ColourChart::kBrandCream);
         expectSeed(SkinObjectType::kLed, SkinColourProperty::kBorder, SkinColourState::kOff,
                    ColourChart::kGrey800, ColourChart::kCafe700);
         expectSeed(SkinObjectType::kLed, SkinColourProperty::kBackground, SkinColourState::kOn,

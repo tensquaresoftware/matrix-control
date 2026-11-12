@@ -120,6 +120,10 @@ private:
         expect(Slider::kTrack.creamVariant == ColourChart::kGreen600);
         expect(SliderK2::kTrack.creamVariant == Slider::kTrack.creamVariant);
         expect(SliderK3::kTrack.creamVariant == Slider::kTrack.creamVariant);
+        // Value bar must stay brighter than track (Green500 vs Green600) or it vanishes on CREAM/GREEN.
+        expect(Slider::kValueBar.creamVariant == ColourChart::kGreen500);
+        expect(SliderK2::kValueBar.creamVariant == Slider::kValueBar.creamVariant);
+        expect(SliderK3::kValueBar.creamVariant == Slider::kValueBar.creamVariant);
         expect(Slider::kText.creamVariant == ColourChart::kGreen100);
     }
 

@@ -52,8 +52,8 @@ private:
         expect(! harness.patchLoadHookState->invoked);
         expect(harness.proc.apvts.state.getProperty("uiMessageSeverity").toString() == "warning");
         expectEquals(harness.proc.apvts.state.getProperty("uiMessageText").toString(),
-                     juce::String("PATCH MUTATOR: Could not read the patch from the synth. Keeping the displayed bank and patch "
-                                  "numbers and the current editor buffer. Check that SYNTH FROM is the synth MIDI OUT."));
+                     juce::String(PluginDisplayNames::PatchManagerSection::PatchMutatorModule::Messages
+                                      ::kDeviceDumpFailedFooter));
         expect(harness.model.getName() == "DIRTY!!!");
     }
 
@@ -112,8 +112,8 @@ private:
             harness.mapper, harness.patchNameSyncer, harness.model));
         expect(! harness.patchLoadHookState->invoked);
         expectEquals(harness.proc.apvts.state.getProperty("uiMessageText").toString(),
-                     juce::String("PATCH MUTATOR: Synth patch load cancelled because the editor changed while waiting. "
-                                  "The displayed bank and patch numbers and your edits were kept."));
+                     juce::String(PluginDisplayNames::PatchManagerSection::PatchMutatorModule::Messages
+                                      ::kDeviceDumpAbortedEditedFooter));
     }
 
     void testUnsavedGate_bootstrapCancelBeforeFirstCommit()

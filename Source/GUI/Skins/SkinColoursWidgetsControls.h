@@ -204,7 +204,7 @@ namespace TSS::SkinColours
                 skinColourKey(SkinObjectType::kSlider, SkinColourProperty::kValueBar),
                 ColourChart::kGreen750,
                 ColourChart::kBlue600,
-                ColourChart::kGreen600
+                ColourChart::kGreen500
             };
 
             inline constexpr ColourElement kText = {
@@ -319,7 +319,7 @@ namespace TSS::SkinColours
                               SkinColourState::kDefault, ColourSet::k2),
                 ColourChart::kGreen750,
                 ColourChart::kOrange700,
-                ColourChart::kGreen600
+                ColourChart::kGreen500
             };
 
             inline constexpr ColourElement kValueBarDisabled = {
@@ -402,7 +402,7 @@ namespace TSS::SkinColours
                               SkinColourState::kDefault, ColourSet::k3),
                 ColourChart::kGreen750,
                 ColourChart::kYellow700,
-                ColourChart::kGreen600
+                ColourChart::kGreen500
             };
 
             inline constexpr ColourElement kValueBarDisabled = {
