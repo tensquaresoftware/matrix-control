@@ -33,7 +33,7 @@ namespace TSS::SkinColours
                 skinColourKey(SkinObjectType::kNumberBox, SkinColourProperty::kText, SkinColourState::kFocus),
                 ColourChart::kRed500,
                 ColourChart::kRed500,
-                ColourChart::kRed500
+                ColourChart::kRed600
             };
 
             inline constexpr ColourElement kEditorBackground = {
@@ -149,7 +149,7 @@ namespace TSS::SkinColours
                 skinColourKey(SkinObjectType::kPatchNameDisplay, SkinColourProperty::kText),
                 ColourChart::kRed500,
                 ColourChart::kRed500,
-                ColourChart::kRed500
+                ColourChart::kRed600
             };
 
             // Solid baked match for former primary.withAlpha(0.50f) over black display fill.
@@ -157,7 +157,7 @@ namespace TSS::SkinColours
                 skinColourKey(SkinObjectType::kPatchNameDisplay, SkinColourProperty::kSecondaryText),
                 ColourChart::kRed800,
                 ColourChart::kRed800,
-                ColourChart::kRed800
+                ColourChart::kRed700
             };
 
             // Caret-slot glyph ink over the red caret plate (absolute Black).

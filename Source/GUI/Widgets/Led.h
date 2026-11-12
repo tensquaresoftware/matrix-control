@@ -33,8 +33,8 @@ namespace TSS
         friend class ::SkinColourWiringTests;
 
         inline constexpr static float kBorderThicknessDesign_ = 2.0f;
-        // Longer / softer than Peak: activity LEDs must stay readable on cream mono.
-        inline constexpr static juce::int64 kReleaseTimeMs_ = 550;
+        // Softer than Peak: activity LEDs must stay readable on cream mono.
+        inline constexpr static juce::int64 kReleaseTimeMs_ = 450;
         inline constexpr static float kReleaseCurveExponent_ = 2.0f;
         inline constexpr static int kAnimationHz_ = 60;
 

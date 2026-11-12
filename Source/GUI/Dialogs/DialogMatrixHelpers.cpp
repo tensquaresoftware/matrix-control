@@ -325,8 +325,8 @@ namespace DialogMatrixHelpers
         auto titleBar = inner.removeFromTop(args.titleBarHeight);
         auto content = inner;
 
-        // Body panel under the title band (skin header grey).
-        args.g.setColour(args.skin.getColour(SkinObjectType::kHeaderPanel, SkinColourProperty::kBackground));
+        // Content under the title band — same BodyPanel plate as Settings / About.
+        args.g.setColour(args.skin.getColour(SkinObjectType::kBodyPanel, SkinColourProperty::kBackground));
         args.g.fillRect(content);
 
         // Title band spans the full inner width (stops at the grey border).

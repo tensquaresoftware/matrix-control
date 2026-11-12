@@ -71,6 +71,8 @@ namespace TSS::DevSkin
             { "kGrey950", ColourChart::kGrey950 },
             { "kBlack", ColourChart::kBlack },
             { "kRed500", ColourChart::kRed500 },
+            { "kRed600", ColourChart::kRed600 },
+            { "kRed700", ColourChart::kRed700 },
             { "kRed800", ColourChart::kRed800 },
             { "kRed900", ColourChart::kRed900 },
         };

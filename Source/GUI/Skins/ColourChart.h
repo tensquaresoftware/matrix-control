@@ -33,6 +33,10 @@ struct ColourChart
     static constexpr juce::uint32 kRed900      = 0xFF9A131D;
     /** Solid match for primary red at ~50% over black (PatchNameDisplay secondary). */
     static constexpr juce::uint32 kRed800      = 0xFF800000;
+    /** Cream secondary red (Mxx-Ryy) — same hue family as Red600, not maroon Red800. */
+    static constexpr juce::uint32 kRed700      = 0xFFA84A4A;
+    /** Cream primary accent — softer than pure Red500 on Cafe plates. */
+    static constexpr juce::uint32 kRed600      = 0xFFC62828;
     static constexpr juce::uint32 kRed500      = 0xFFFF0000;
 
     // Unified Green ladder (ex-Emerald + CREAM greens), luminance-ordered; RGB preserved.
@@ -62,8 +66,8 @@ struct ColourChart
     static constexpr juce::uint32 kOrange800   = 0xFF7A4511;
     /** BLACK/CHROMA Master fills / accents (from trial BLACK/DUO 4). */
     static constexpr juce::uint32 kOrange700   = 0xFF854408;
-    /** Footer WARNING badge — distinct from BrandOrange. */
-    static constexpr juce::uint32 kOrange500   = 0xFFFF6600;
+    /** Footer WARNING badge — pumpkin red-orange, distinct from Master BrandOrange. */
+    static constexpr juce::uint32 kOrange500   = 0xFFD44818;
     static constexpr juce::uint32 kOrange400   = 0xFFEE8B21;
 
     /** BLACK/CHROMA Header yellows (warm #FFCC00 family from trial BLACK/DUO 4). */
@@ -75,8 +79,8 @@ struct ColourChart
     // Cafe ladder (ex-Cream* + former Cafe*), luminance-ordered; RGB preserved.
     static constexpr juce::uint32 kCafe50      = 0xFFD9CFB8; // was Cream400
     static constexpr juce::uint32 kCafe150     = 0xFFD0C6B0; // was Cream450
-    /** Warm mid fill (CREAM/MINIMAL button hover) — same luminance idea as Cafe300, less grey. */
-    static constexpr juce::uint32 kCafe200     = 0xFFBAA68A;
+    /** Mid fill between Cafe150 and Cafe300 (CREAM button hover); hue aligned on the Cafe ladder. */
+    static constexpr juce::uint32 kCafe200     = 0xFFC2BAA3;
     static constexpr juce::uint32 kCafe300     = 0xFFB5AF96; // was Cafe400 / Cream600
     static constexpr juce::uint32 kCafe400     = 0xFF9A9480; // was Cafe600 / Cream700
     static constexpr juce::uint32 kCafe500     = 0xFF8A826C; // was Cafe700 / Cream750

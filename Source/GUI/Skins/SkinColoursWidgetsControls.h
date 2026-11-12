@@ -47,14 +47,14 @@ namespace TSS::SkinColours
                 skinColourKey(SkinObjectType::kButton, SkinColourProperty::kText, SkinColourState::kOn),
                 ColourChart::kRed500,
                 ColourChart::kRed500,
-                ColourChart::kRed500
+                ColourChart::kRed600
             };
 
             inline constexpr ColourElement kBackgroundHover = {
                 skinColourKey(SkinObjectType::kButton, SkinColourProperty::kBackground, SkinColourState::kHover),
                 ColourChart::kBlack,
                 ColourChart::kBlack,
-                ColourChart::kCafe300
+                ColourChart::kCafe200
             };
 
             inline constexpr ColourElement kTextHover = {
@@ -75,7 +75,7 @@ namespace TSS::SkinColours
                 skinColourKey(SkinObjectType::kButton, SkinColourProperty::kText, SkinColourState::kClicked),
                 ColourChart::kRed500,
                 ColourChart::kRed500,
-                ColourChart::kRed500
+                ColourChart::kRed600
             };
 
             inline constexpr ColourElement kBackgroundDisabled = {
@@ -104,7 +104,7 @@ namespace TSS::SkinColours
                 skinColourKey(SkinObjectType::kButton, SkinColourProperty::kText, SkinColourState::kEmphasis),
                 ColourChart::kRed500,
                 ColourChart::kRed500,
-                ColourChart::kRed500
+                ColourChart::kRed600
             };
 
             /** Alert button (e.g. panic) idle fill and label. */
@@ -112,7 +112,7 @@ namespace TSS::SkinColours
                 skinColourKey(SkinObjectType::kButton, SkinColourProperty::kBackground, SkinColourState::kError),
                 ColourChart::kRed500,
                 ColourChart::kRed500,
-                ColourChart::kRed500
+                ColourChart::kRed600
             };
 
             inline constexpr ColourElement kTextError = {

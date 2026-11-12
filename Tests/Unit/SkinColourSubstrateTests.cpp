@@ -212,7 +212,8 @@ private:
         const auto mapped = skin->getColour(SkinObjectType::kPatchNameDisplay,
                                             SkinColourProperty::kSecondaryText);
         expect(look.secondaryText == mapped);
-        expect(look.secondaryText == juce::Colour(ColourChart::kRed800));
+        expect(look.secondaryText
+               == seedFor(variant, ColourChart::kRed800, ColourChart::kRed700));
         expect(look.secondaryText.getFloatAlpha() == 1.0f);
     }
 
@@ -442,7 +443,7 @@ private:
         expect(skin->getColour(SkinObjectType::kFooterMessage,
                                SkinColourProperty::kText,
                                SkinColourState::kError)
-               == juce::Colour(ColourChart::kRed500));
+               == seedFor(variant, ColourChart::kRed500, ColourChart::kRed600));
     }
 
     void assertMainChromeKeys(TSS::Skin::ColourVariant variant)

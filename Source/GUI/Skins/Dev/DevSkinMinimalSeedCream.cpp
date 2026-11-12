@@ -31,7 +31,7 @@ namespace TSS::DevSkin
             { SkinObjectType::kHorizontalSeparator, SkinColourProperty::kLine, SkinColourState::kDefault, ColourSet::k1, 0xFF505050u },
             { SkinObjectType::kButton, SkinColourProperty::kBackground, SkinColourState::kOff, ColourSet::k1, 0xFFD0C6B0u },
             { SkinObjectType::kButton, SkinColourProperty::kBackground, SkinColourState::kOn, ColourSet::k1, 0xFF9A9480u },
-            { SkinObjectType::kButton, SkinColourProperty::kBackground, SkinColourState::kHover, ColourSet::k1, 0xFFBAA68Au },
+            { SkinObjectType::kButton, SkinColourProperty::kBackground, SkinColourState::kHover, ColourSet::k1, 0xFFC2BAA3u },
             { SkinObjectType::kButton, SkinColourProperty::kBackground, SkinColourState::kClicked, ColourSet::k1, 0xFF9A9480u },
             { SkinObjectType::kButton, SkinColourProperty::kBackground, SkinColourState::kDisabled, ColourSet::k1, 0xFFE9E8D5u },
             { SkinObjectType::kButton, SkinColourProperty::kBorder, SkinColourState::kOff, ColourSet::k1, 0xFF8A826Cu },

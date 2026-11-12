@@ -58,7 +58,7 @@ namespace TSS::SkinColours
                 skinColourKey(SkinObjectType::kModuleHeader, SkinColourProperty::kText, SkinColourState::kHover),
                 ColourChart::kRed500,
                 ColourChart::kRed500,
-                ColourChart::kRed500
+                ColourChart::kRed600
             };
 
             // Called-out badge inside a module (e.g. Ramp "M" master override).
@@ -116,7 +116,7 @@ namespace TSS::SkinColours
                 skinColourKey(SkinObjectType::kLabel, SkinColourProperty::kBackground, SkinColourState::kHover),
                 ColourChart::kRed500,
                 ColourChart::kRed500,
-                ColourChart::kRed500
+                ColourChart::kRed600
             };
         }
 
@@ -177,7 +177,7 @@ namespace TSS::SkinColours
                 skinColourKey(SkinObjectType::kFooterMessage, SkinColourProperty::kText, SkinColourState::kError),
                 ColourChart::kRed500,
                 ColourChart::kRed500,
-                ColourChart::kRed500
+                ColourChart::kRed600
             };
 
             // Sticky message close cross under the pointer.

@@ -76,7 +76,7 @@ namespace TSS::SkinColours
                 skinColourKey(SkinObjectType::kComboBox, SkinColourProperty::kText, SkinColourState::kFocus),
                 ColourChart::kRed500,
                 ColourChart::kRed500,
-                ColourChart::kRed500
+                ColourChart::kRed600
             };
         }
 
@@ -143,7 +143,7 @@ namespace TSS::SkinColours
                               SkinColourState::kFocus, ColourSet::k2),
                 ColourChart::kRed500,
                 ColourChart::kRed500,
-                ColourChart::kRed500
+                ColourChart::kRed600
             };
 
             inline constexpr ColourElement kTriangle = {
@@ -227,7 +227,7 @@ namespace TSS::SkinColours
                               SkinColourState::kFocus, ColourSet::k3),
                 ColourChart::kRed500,
                 ColourChart::kRed500,
-                ColourChart::kRed500
+                ColourChart::kRed600
             };
 
             inline constexpr ColourElement kTriangle = {
