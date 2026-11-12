@@ -2,6 +2,7 @@
 
 #include "Tools/SkinDesigner/SkinDesignerChrome.h"
 #include "Tools/SkinDesigner/SkinDesignerPalettePanelGeometry.h"
+#include "Tools/SkinDesigner/SkinDesignerUiHelpers.h"
 
 namespace
 {
@@ -362,7 +363,7 @@ void SkinDesignerPalettePanel::paintColourRow(juce::Graphics& g, const Row& item
 
     const int nameLeft = Geo::kSwatchX + sw + Geo::kNameGap;
     g.setColour(SkinDesignerChrome::textTableBody());
-    paintElidedLeft(g, bodyFont, item.name,
+    paintElidedLeft(g, bodyFont, SkinDesignerUi::displayPastilleName(item.name),
                     { nameLeft, yOff, juce::jmax(0, countLeft - Geo::kNameCountGap - nameLeft), fullH });
 }
 

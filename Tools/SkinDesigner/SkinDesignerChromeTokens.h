@@ -27,7 +27,7 @@ namespace SkinDesignerChrome
     /** HeldColour Property hover fallback (pending pastille / no colour yet). */
     inline juce::Colour surfaceTablePropertyBindHover() { return juce::Colour(0xff353535); }
     /**
-     * Property label on a light / mid bind-hover fill (kWhite, kCream, kGrey350, …).
+     * Property label on a light / mid bind-hover fill (kWhite, kBrandCream, kGrey350, …).
      * Same ink as surfaceSection / app chrome.
      */
     inline juce::Colour textOnLightPropertyBindHover() { return juce::Colour(0xff151515); }
@@ -73,7 +73,7 @@ namespace SkinDesignerChrome
 
     /**
      * True when #151515 reads better than textTableBody on this pastille fill
-     * (covers kWhite / kCream / kGrey350 and other mid-light fills).
+     * (covers kWhite / kBrandCream / kGrey350 and other mid-light fills).
      */
     inline bool propertyBindHoverNeedsDarkText(juce::Colour fill) noexcept
     {
@@ -84,6 +84,12 @@ namespace SkinDesignerChrome
     inline juce::Colour accent() { return juce::Colour(0xff00ddad); }
     /** Attention / coaching chrome (same amber as Mappings "Unbound"). */
     inline juce::Colour attention() { return juce::Colour(0xffe0a020); }
+    /** Component property: Compare blink armed — Look skips grey hover/down. */
+    inline const juce::Identifier& compareButtonArmedProperty()
+    {
+        static const juce::Identifier id { "skinDesignerCompareArmed" };
+        return id;
+    }
     /** Danger fill (SAME COLOUR / pending MAPPING / disconnected BRIDGE badges). */
     inline juce::Colour danger() { return juce::Colour(0xffff3b3b); }
     inline juce::Colour separatorLine() { return juce::Colour(0xff3a3a3a); }
@@ -102,6 +108,8 @@ namespace SkinDesignerChrome
     inline constexpr int kWindowEdgeGutter = kChromeStackGap; // 12
     /** Gap on both sides of Palette (Color|Palette and Palette|Mappings). */
     inline constexpr int kPaletteSideGap = kChromeStackGap; // 12
+    /** Gap between SESSION and OPERATION wells — same as Palette|Mappings. */
+    inline constexpr int kSessionOperationGap = kPaletteSideGap; // 12
     /** Title-bar chrome inset (not panel body content). */
     inline constexpr int kPanelPad = 8;
     inline constexpr int kButtonGap = 8;

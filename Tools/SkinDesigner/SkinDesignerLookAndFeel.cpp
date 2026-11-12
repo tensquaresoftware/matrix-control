@@ -178,7 +178,29 @@ namespace SkinDesignerChrome
     {
         auto bounds = button.getLocalBounds().toFloat().reduced(0.5f);
         auto base = backgroundColour;
-        if (shouldDrawButtonAsDown)
+        const bool compareArmed = static_cast<bool>(
+            button.getProperties()[compareButtonArmedProperty()]);
+        if (compareArmed)
+        {
+            // Blink keeps alternating. Yellow + hover: same yellow fill with a
+            // 2 px panel-grey ring, then a 2 px yellow ring outside it (detached).
+            const bool yellowPhase = backgroundColour == attention();
+            if (yellowPhase && shouldDrawButtonAsHighlighted && ! shouldDrawButtonAsDown)
+            {
+                constexpr float kRingPx = 2.0f;
+                g.setColour(attention());
+                g.fillRoundedRectangle(bounds, kControlCorner);
+                const auto greyRing = bounds.reduced(kRingPx);
+                g.setColour(surfacePanel());
+                g.fillRoundedRectangle(greyRing, juce::jmax(0.0f, kControlCorner - kRingPx));
+                const auto yellowFill = greyRing.reduced(kRingPx);
+                g.setColour(attention());
+                g.fillRoundedRectangle(yellowFill, juce::jmax(0.0f, kControlCorner - 2.0f * kRingPx));
+                return;
+            }
+            // Grey phase (and yellow pressed): keep phase fill — no chrome grey hover.
+        }
+        else if (shouldDrawButtonAsDown)
             base = controlFillDown();
         else if (shouldDrawButtonAsHighlighted)
             base = controlFillHover();

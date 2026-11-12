@@ -128,14 +128,16 @@ void SkinDesignerMainComponent::syncCompareButtonChrome()
     auto& compare = skinsPanel_.compareButton();
     compare.setButtonText("Compare");
     compare.setToggleState(sessionState_.compareOn, juce::dontSendNotification);
+    compare.getProperties().set(SkinDesignerChrome::compareButtonArmedProperty(),
+                                sessionState_.compareOn);
 
     auto applyPhase = [&compare](bool lit)
     {
-        // Lit: yellow badge fill + panel-surface text (same ink as yellow filter pictos).
+        // Lit: yellow + dark grey label; dim: dark grey + white label.
         const auto fill = lit ? SkinDesignerChrome::attention()
                               : SkinDesignerChrome::controlFill();
         const auto text = lit ? SkinDesignerChrome::surfacePanel()
-                              : SkinDesignerChrome::textPrimary();
+                              : juce::Colours::white;
         compare.setColour(juce::TextButton::buttonColourId, fill);
         compare.setColour(juce::TextButton::buttonOnColourId, fill);
         compare.setColour(juce::TextButton::textColourOffId, text);

@@ -38,6 +38,7 @@ SkinDesignerMainComponent::SkinDesignerMainComponent()
 
 SkinDesignerMainComponent::~SkinDesignerMainComponent()
 {
+    skinsPanel_.compareButton().removeMouseListener(this);
     compareBlinkTimer_.stopTimer();
     colourPreviewCoalesceTimer_.stopTimer();
     importWatchTimer_.stopTimer();
@@ -97,6 +98,8 @@ void SkinDesignerMainComponent::setupSkinsPanel()
     skinsPanel_.onDelete = [this] { onDelete(); };
     skinsPanel_.productCombo().addListener(this);
     skinsPanel_.designerCombo().addListener(this);
+    // Hover must refresh Compare chrome so blink does not flip label ink under the cursor.
+    skinsPanel_.compareButton().addMouseListener(this, false);
     addAndMakeVisible(skinsPanel_);
 }
 

@@ -2,6 +2,7 @@
 
 #include "Tools/SkinDesigner/SkinDesignerChrome.h"
 #include "Tools/SkinDesigner/SkinDesignerMappingsColumnFilter.h"
+#include "Tools/SkinDesigner/SkinDesignerUiHelpers.h"
 
 namespace SkinDesignerMappingsFilterMenu
 {
@@ -33,8 +34,9 @@ namespace SkinDesignerMappingsFilterMenu
             {
                 idealHeight = SkinDesignerChrome::kColumnHeaderHeight;
                 const int sw = SkinDesignerChrome::kColourSwatchSize;
-                const int nameW = SkinDesignerChrome::measureTextWidth(SkinDesignerChrome::fontRegular(),
-                                                                    spec_.name);
+                const int nameW = SkinDesignerChrome::measureTextWidth(
+                    SkinDesignerChrome::fontRegular(),
+                    SkinDesignerUi::displayPastilleName(spec_.name));
                 idealWidth = kMenuTickSlot + kPaletteSwatchX + sw + kPaletteNameGap + nameW + 12;
             }
 
@@ -76,7 +78,7 @@ namespace SkinDesignerMappingsFilterMenu
                 g.setFont(SkinDesignerChrome::fontRegular());
                 g.setColour(spec_.unbound ? SkinDesignerChrome::attention()
                                           : SkinDesignerChrome::textPrimary());
-                g.drawText(spec_.name,
+                g.drawText(SkinDesignerUi::displayPastilleName(spec_.name),
                            nameLeft,
                            bounds.getY(),
                            juce::jmax(0, bounds.getRight() - nameLeft - 4),

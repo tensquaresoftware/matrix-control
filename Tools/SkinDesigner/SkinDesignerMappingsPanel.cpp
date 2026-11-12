@@ -7,6 +7,7 @@
 #include "Tools/SkinDesigner/SkinDesignerChrome.h"
 #include "Tools/SkinDesigner/SkinDesignerMappingModePolicy.h"
 #include "Tools/SkinDesigner/SkinDesignerMappingsColumns.h"
+#include "Tools/SkinDesigner/SkinDesignerUiHelpers.h"
 
 namespace
 {
@@ -162,7 +163,7 @@ void SkinDesignerMappingsPanel::paintMappedColourCell(juce::Graphics& g,
     else
         SkinDesignerChrome::paintColourSwatch(g, swatch, juce::Colour(item.pastilleArgb));
     g.setColour(SkinDesignerChrome::textTableBody());
-    g.drawText(item.pastilleName,
+    g.drawText(SkinDesignerUi::displayPastilleName(item.pastilleName),
                area.getX() + kSwatchSize + SkinDesignerChrome::kMappingsColumnPad,
                area.getY(),
                juce::jmax(0, area.getWidth() - kSwatchSize - SkinDesignerChrome::kMappingsColumnPad),
