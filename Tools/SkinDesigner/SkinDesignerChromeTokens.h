@@ -84,7 +84,7 @@ namespace SkinDesignerChrome
     inline juce::Colour accent() { return juce::Colour(0xff00ddad); }
     /** Attention / coaching chrome (same amber as Mappings "Unbound"). */
     inline juce::Colour attention() { return juce::Colour(0xffe0a020); }
-    /** Danger fill (Compare blink; SAME COLOUR / pending MAPPING / disconnected BRIDGE badges). */
+    /** Danger fill (SAME COLOUR / pending MAPPING / disconnected BRIDGE badges). */
     inline juce::Colour danger() { return juce::Colour(0xffff3b3b); }
     inline juce::Colour separatorLine() { return juce::Colour(0xff3a3a3a); }
     /** Gap between cut column slabs (panel shows through = cutter). */

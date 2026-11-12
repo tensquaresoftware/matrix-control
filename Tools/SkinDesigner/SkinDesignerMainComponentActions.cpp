@@ -129,6 +129,19 @@ void SkinDesignerMainComponent::syncCompareButtonChrome()
     compare.setButtonText("Compare");
     compare.setToggleState(sessionState_.compareOn, juce::dontSendNotification);
 
+    auto applyPhase = [&compare](bool lit)
+    {
+        // Lit: yellow badge fill + panel-surface text (same ink as yellow filter pictos).
+        const auto fill = lit ? SkinDesignerChrome::attention()
+                              : SkinDesignerChrome::controlFill();
+        const auto text = lit ? SkinDesignerChrome::surfacePanel()
+                              : SkinDesignerChrome::textPrimary();
+        compare.setColour(juce::TextButton::buttonColourId, fill);
+        compare.setColour(juce::TextButton::buttonOnColourId, fill);
+        compare.setColour(juce::TextButton::textColourOffId, text);
+        compare.setColour(juce::TextButton::textColourOnId, text);
+    };
+
     if (sessionState_.compareOn)
     {
         if (! compareBlinkTimer_.isTimerRunning())
@@ -136,18 +149,13 @@ void SkinDesignerMainComponent::syncCompareButtonChrome()
             compareBlinkLit_ = true;
             compareBlinkTimer_.startTimerHz(2); // ~500 ms phase
         }
-        const auto colour = compareBlinkLit_ ? SkinDesignerChrome::danger()
-                                             : SkinDesignerChrome::textMuted();
-        compare.setColour(juce::TextButton::textColourOffId, colour);
-        compare.setColour(juce::TextButton::textColourOnId, colour);
+        applyPhase(compareBlinkLit_);
     }
     else
     {
         compareBlinkTimer_.stopTimer();
         compareBlinkLit_ = true;
-        const auto normal = SkinDesignerChrome::textPrimary();
-        compare.setColour(juce::TextButton::textColourOffId, normal);
-        compare.setColour(juce::TextButton::textColourOnId, normal);
+        applyPhase(false);
     }
     compare.repaint();
 }
@@ -158,12 +166,7 @@ void SkinDesignerMainComponent::tickCompareBlink()
         return;
 
     compareBlinkLit_ = ! compareBlinkLit_;
-    const auto colour = compareBlinkLit_ ? SkinDesignerChrome::danger()
-                                         : SkinDesignerChrome::textMuted();
-    auto& compare = skinsPanel_.compareButton();
-    compare.setColour(juce::TextButton::textColourOffId, colour);
-    compare.setColour(juce::TextButton::textColourOnId, colour);
-    compare.repaint();
+    syncCompareButtonChrome();
 }
 
 void SkinDesignerMainComponent::onCompareToggle()
