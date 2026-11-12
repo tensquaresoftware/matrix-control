@@ -85,7 +85,7 @@ namespace TSS::SkinColours
             inline constexpr ColourElement kBackground = {
                 skinColourKey(SkinObjectType::kComboBox, SkinColourProperty::kBackground,
                               SkinColourState::kDefault, ColourSet::k2),
-                ColourChart::kBlack,
+                ColourChart::kEmerald950,
                 ColourChart::kOrange950,
                 ColourChart::kGreen600
             };
@@ -117,7 +117,7 @@ namespace TSS::SkinColours
             inline constexpr ColourElement kFocusBorder = {
                 skinColourKey(SkinObjectType::kComboBox, SkinColourProperty::kFocusBorder,
                               SkinColourState::kDefault, ColourSet::k2),
-                ColourChart::kGrey800,
+                ColourChart::kEmerald900,
                 ColourChart::kOrange800,
                 ColourChart::kGreen700
             };
@@ -125,7 +125,7 @@ namespace TSS::SkinColours
             inline constexpr ColourElement kText = {
                 skinColourKey(SkinObjectType::kComboBox, SkinColourProperty::kText,
                               SkinColourState::kDefault, ColourSet::k2),
-                ColourChart::kGrey200,
+                ColourChart::kEmerald400,
                 ColourChart::kOrange400,
                 ColourChart::kGreen100
             };
@@ -149,7 +149,7 @@ namespace TSS::SkinColours
             inline constexpr ColourElement kTriangle = {
                 skinColourKey(SkinObjectType::kComboBox, SkinColourProperty::kTriangle,
                               SkinColourState::kDefault, ColourSet::k2),
-                ColourChart::kGrey600,
+                ColourChart::kEmerald700,
                 ColourChart::kOrange700,
                 ColourChart::kGreen500
             };
@@ -312,7 +312,7 @@ namespace TSS::SkinColours
             inline constexpr ColourElement kBackground = {
                 skinColourKey(SkinObjectType::kPopupMenu, SkinColourProperty::kBackground,
                               SkinColourState::kDefault, ColourSet::k2),
-                ColourChart::kBlack,
+                ColourChart::kEmerald950,
                 ColourChart::kOrange950,
                 ColourChart::kGreen200
             };
@@ -320,7 +320,7 @@ namespace TSS::SkinColours
             inline constexpr ColourElement kBackgroundHover = {
                 skinColourKey(SkinObjectType::kPopupMenu, SkinColourProperty::kBackground,
                               SkinColourState::kHover, ColourSet::k2),
-                ColourChart::kGrey200,
+                ColourChart::kEmerald400,
                 ColourChart::kOrange400,
                 ColourChart::kGreen600
             };
@@ -328,7 +328,7 @@ namespace TSS::SkinColours
             inline constexpr ColourElement kBorder = {
                 skinColourKey(SkinObjectType::kPopupMenu, SkinColourProperty::kBorder,
                               SkinColourState::kDefault, ColourSet::k2),
-                ColourChart::kGrey600,
+                ColourChart::kEmerald400,
                 ColourChart::kOrange400,
                 ColourChart::kGreen600
             };
@@ -344,7 +344,7 @@ namespace TSS::SkinColours
             inline constexpr ColourElement kSeparator = {
                 skinColourKey(SkinObjectType::kPopupMenu, SkinColourProperty::kSeparator,
                               SkinColourState::kDefault, ColourSet::k2),
-                ColourChart::kGrey600,
+                ColourChart::kEmerald400,
                 ColourChart::kOrange400,
                 ColourChart::kGreen600
             };
@@ -352,7 +352,7 @@ namespace TSS::SkinColours
             inline constexpr ColourElement kText = {
                 skinColourKey(SkinObjectType::kPopupMenu, SkinColourProperty::kText,
                               SkinColourState::kDefault, ColourSet::k2),
-                ColourChart::kGrey200,
+                ColourChart::kEmerald400,
                 ColourChart::kOrange400,
                 ColourChart::kGreen800
             };
@@ -360,7 +360,7 @@ namespace TSS::SkinColours
             inline constexpr ColourElement kTextDisabled = {
                 skinColourKey(SkinObjectType::kPopupMenu, SkinColourProperty::kText,
                               SkinColourState::kDisabled, ColourSet::k2),
-                Common::kContentDisabled,
+                ColourChart::kEmerald700,
                 ColourChart::kOrange700,
                 ColourChart::kGreen400
             };
@@ -368,7 +368,7 @@ namespace TSS::SkinColours
             inline constexpr ColourElement kTextHover = {
                 skinColourKey(SkinObjectType::kPopupMenu, SkinColourProperty::kText,
                               SkinColourState::kHover, ColourSet::k2),
-                ColourChart::kBlack,
+                Common::kContentHover,
                 ColourChart::kGrey950,
                 ColourChart::kGreen100
             };

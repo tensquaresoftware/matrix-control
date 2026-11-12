@@ -5,6 +5,7 @@
 #include "GUI/Skins/Skin.h"
 #include "GUI/Skins/SkinColoursWidgetsControls.h"
 #include "GUI/Skins/SkinColoursWidgetsDisplays.h"
+#include "GUI/Skins/SkinColoursWidgetsSelection.h"
 
 using TSS::SkinObjectType;
 using TSS::SkinColourProperty;
@@ -22,9 +23,31 @@ public:
 
     void runTest() override
     {
-        using namespace TSS::SkinColours::Widgets;
-
         beginTest("blackDuo_zoneAccentsFollowBlueOrangeYellow");
+        assertBlackDuoZoneAccents();
+
+        beginTest("black_masterHeaderModalesSharePatchEmerald");
+        assertBlackSharesPatchEmerald();
+
+        beginTest("modales_monoGreysOnBlackDuoAndCafeOnCream");
+        assertModalesMonoSeeds();
+
+        beginTest("cream_patchMasterHeaderShareGreens");
+        assertCreamSharedGreens();
+
+        beginTest("skinLoaded_patchSliderMatchesBlueStops");
+        assertPatchSliderFromSkin();
+
+        beginTest("sliderLookForZone_modalesMapsZoneSeeds");
+        assertModalesLook(TSS::Skin::ColourVariant::Black);
+        assertModalesLook(TSS::Skin::ColourVariant::BlackDuo);
+        assertModalesLook(TSS::Skin::ColourVariant::Cream);
+    }
+
+private:
+    void assertBlackDuoZoneAccents()
+    {
+        using namespace TSS::SkinColours::Widgets;
 
         expect(Slider::kTrack.blackDuoVariant == ColourChart::kBlue950);
         expect(Slider::kValueBar.blackDuoVariant == ColourChart::kBlue600);
@@ -35,8 +58,40 @@ public:
         expect(SliderK3::kTrack.blackDuoVariant == ColourChart::kYellow950);
         expect(SliderK3::kValueBar.blackDuoVariant == ColourChart::kYellow700);
         expect(SliderK3::kText.blackDuoVariant == ColourChart::kYellow400);
+    }
 
-        beginTest("modales_monoGreysOnBlackDuoAndCafeOnCream");
+    void assertBlackSharesPatchEmerald()
+    {
+        using namespace TSS::SkinColours::Widgets;
+
+        expect(SliderK2::kTrack.blackVariant == Slider::kTrack.blackVariant);
+        expect(SliderK2::kValueBar.blackVariant == Slider::kValueBar.blackVariant);
+        expect(SliderK2::kText.blackVariant == Slider::kText.blackVariant);
+        expect(SliderK2::kFocusBorder.blackVariant == Slider::kFocusBorder.blackVariant);
+        expect(SliderK3::kTrack.blackVariant == Slider::kTrack.blackVariant);
+        expect(SliderK3::kValueBar.blackVariant == Slider::kValueBar.blackVariant);
+        expect(SliderK3::kText.blackVariant == Slider::kText.blackVariant);
+        expect(SliderK3::kFocusBorder.blackVariant == Slider::kFocusBorder.blackVariant);
+        expect(SliderK4::kTrack.blackVariant == Slider::kTrack.blackVariant);
+        expect(SliderK4::kValueBar.blackVariant == Slider::kValueBar.blackVariant);
+        expect(SliderK4::kText.blackVariant == Slider::kText.blackVariant);
+        expect(SliderK4::kFocusBorder.blackVariant == Slider::kFocusBorder.blackVariant);
+
+        expect(ComboBoxK2::kBackground.blackVariant == ComboBox::kBackground.blackVariant);
+        expect(ComboBoxK2::kTriangle.blackVariant == ComboBox::kTriangle.blackVariant);
+        expect(ComboBoxK2::kText.blackVariant == ComboBox::kText.blackVariant);
+        expect(ComboBoxK2::kFocusBorder.blackVariant == ComboBox::kFocusBorder.blackVariant);
+        expect(PopupMenuK2::kBackground.blackVariant == PopupMenu::kBackground.blackVariant);
+        expect(PopupMenuK2::kText.blackVariant == PopupMenu::kText.blackVariant);
+        expect(PopupMenuK2::kBorder.blackVariant == PopupMenu::kBorder.blackVariant);
+        expect(PopupMenuK2::kBackgroundHover.blackVariant == PopupMenu::kBackgroundHover.blackVariant);
+        expect(PopupMenuK2::kTextHover.blackVariant == PopupMenu::kTextHover.blackVariant);
+        expect(PopupMenuK2::kTextDisabled.blackVariant == PopupMenu::kTextDisabled.blackVariant);
+    }
+
+    void assertModalesMonoSeeds()
+    {
+        using namespace TSS::SkinColours::Widgets;
 
         expect(SliderK4::kTrack.blackDuoVariant == ColourChart::kBlack);
         expect(SliderK4::kFocusBorder.blackDuoVariant == ColourChart::kGrey800);
@@ -45,25 +100,18 @@ public:
         expect(SliderK4::kTrack.creamVariant == ColourChart::kCream);
         expect(SliderK4::kValueBar.creamVariant == ColourChart::kCafe800);
         expect(SliderK4::kText.creamVariant == ColourChart::kCafe800);
+    }
 
-        beginTest("cream_patchMasterHeaderShareGreens");
+    void assertCreamSharedGreens()
+    {
+        using namespace TSS::SkinColours::Widgets;
 
         expect(Slider::kTrack.creamVariant == ColourChart::kGreen600);
         expect(SliderK2::kTrack.creamVariant == Slider::kTrack.creamVariant);
         expect(SliderK3::kTrack.creamVariant == Slider::kTrack.creamVariant);
         expect(Slider::kText.creamVariant == ColourChart::kGreen100);
-
-        beginTest("skinLoaded_patchSliderMatchesBlueStops");
-
-        assertPatchSliderFromSkin();
-
-        beginTest("sliderLookForZone_modalesMapsMonoGreys");
-
-        assertModalesLook(TSS::Skin::ColourVariant::BlackDuo);
-        assertModalesLook(TSS::Skin::ColourVariant::Cream);
     }
 
-private:
     void assertPatchSliderFromSkin()
     {
         const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::BlackDuo);
