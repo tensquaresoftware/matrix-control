@@ -1,5 +1,6 @@
 #include "ModuleHeader.h"
 
+#include "GUI/Widgets/ModuleHeaderTitleColour.h"
 #include "GUI/Factories/WidgetFactory.h"
 #include "GUI/Helpers/ClipboardFeedbackButtonBinding.h"
 #include "GUI/Helpers/GrayedControlHelper.h"
@@ -413,6 +414,11 @@ namespace TSS
 
     juce::Colour ModuleHeader::getLineColour() const
     {
-        return (colourVariant_ == ColourVariant::Blue) ? look_.lineBlue : look_.lineOrange;
+        const auto lineDefault = (colourVariant_ == ColourVariant::Blue) ? look_.lineBlue
+                                                                         : look_.lineOrange;
+        return resolveModuleHeaderDecoLineColour(isTitleClickEnabled(),
+                                                 titleHovered_,
+                                                 look_.textHover,
+                                                 lineDefault);
     }
 }

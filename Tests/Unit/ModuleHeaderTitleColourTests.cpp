@@ -21,6 +21,14 @@ public:
         expect(TSS::resolveModuleHeaderTitleTextColour(true, false, text, hover) == text);
         expect(TSS::resolveModuleHeaderTitleTextColour(false, true, text, hover) == text);
         expect(TSS::resolveModuleHeaderTitleTextColour(false, false, text, hover) == text);
+
+        beginTest("decoLine_matchesTitleHover_onlyWhenClickEnabled");
+
+        const auto lineDefault = juce::Colours::blue;
+        expect(TSS::resolveModuleHeaderDecoLineColour(true, true, hover, lineDefault) == hover);
+        expect(TSS::resolveModuleHeaderDecoLineColour(true, false, hover, lineDefault) == lineDefault);
+        expect(TSS::resolveModuleHeaderDecoLineColour(false, true, hover, lineDefault) == lineDefault);
+        expect(TSS::resolveModuleHeaderDecoLineColour(false, false, hover, lineDefault) == lineDefault);
     }
 };
 

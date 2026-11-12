@@ -12,4 +12,13 @@ namespace TSS
     {
         return titleClickEnabled && titleHovered ? textHover : text;
     }
+
+    // Trial: clickable-title hover also retints the deco line to match the title.
+    inline juce::Colour resolveModuleHeaderDecoLineColour(bool titleClickEnabled,
+                                                          bool titleHovered,
+                                                          juce::Colour textHover,
+                                                          juce::Colour lineDefault)
+    {
+        return titleClickEnabled && titleHovered ? textHover : lineDefault;
+    }
 }
