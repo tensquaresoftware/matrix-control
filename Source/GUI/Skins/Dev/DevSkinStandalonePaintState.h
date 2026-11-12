@@ -8,7 +8,7 @@
 namespace TSS::DevSkin
 {
     /**
-     * Standalone Dev paint path without PluginEditor: compiled Black/Cream plus optional Dev overlay.
+     * Standalone Dev paint path without PluginEditor: compiled skins plus optional Dev overlay.
      * Used by unit tests to prove apply/repaint and disconnect fallback.
      */
     class StandalonePaintState
@@ -23,7 +23,7 @@ namespace TSS::DevSkin
 
         ApplyResult applyPush(const PushPayload& payload);
 
-        /** Disconnect / Standalone quit: drop Dev overlay; restore compiled Black/Cream. */
+        /** Disconnect / Standalone quit: drop Dev overlay; restore compiled selection. */
         void clearOverlayToCompiled();
 
     private:
@@ -31,7 +31,9 @@ namespace TSS::DevSkin
 
         std::unique_ptr<Skin> black_;
         std::unique_ptr<Skin> blackChroma_;
+        std::unique_ptr<Skin> blackMinimal_;
         std::unique_ptr<Skin> cream_;
+        std::unique_ptr<Skin> creamMinimal_;
         std::unique_ptr<Skin> overlay_;
         Skin* active_ = nullptr;
         Skin::ColourVariant compiledSelection_ = Skin::ColourVariant::Cream;

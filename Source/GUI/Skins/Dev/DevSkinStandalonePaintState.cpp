@@ -8,7 +8,9 @@ namespace TSS::DevSkin
     {
         black_ = Skin::create(Skin::ColourVariant::Black);
         blackChroma_ = Skin::create(Skin::ColourVariant::BlackChroma);
+        blackMinimal_ = Skin::create(Skin::ColourVariant::BlackMinimal);
         cream_ = Skin::create(Skin::ColourVariant::Cream);
+        creamMinimal_ = Skin::create(Skin::ColourVariant::CreamMinimal);
         selectCompiled(Skin::ColourVariant::Cream);
     }
 
@@ -32,44 +34,37 @@ namespace TSS::DevSkin
             active_ = black_.get();
         else if (variant == Skin::ColourVariant::BlackChroma)
             active_ = blackChroma_.get();
+        else if (variant == Skin::ColourVariant::BlackMinimal)
+            active_ = blackMinimal_.get();
+        else if (variant == Skin::ColourVariant::CreamMinimal)
+            active_ = creamMinimal_.get();
         else
             active_ = cream_.get();
     }
 
     ApplyResult StandalonePaintState::applyPush(const PushPayload& payload)
     {
+        auto compiledOk = [&](Skin::ColourVariant variant, const char* message)
+        {
+            selectCompiled(variant);
+            ApplyResult result;
+            result.ok = true;
+            result.revision = payload.revision;
+            result.appliedSkinId = payload.activeSkinId;
+            result.message = message;
+            return result;
+        };
+
         if (payload.kind == SkinKind::kCompiledBlack)
-        {
-            selectCompiled(Skin::ColourVariant::Black);
-            ApplyResult result;
-            result.ok = true;
-            result.revision = payload.revision;
-            result.appliedSkinId = payload.activeSkinId;
-            result.message = "Compiled Black";
-            return result;
-        }
-
+            return compiledOk(Skin::ColourVariant::Black, "Compiled Black");
         if (payload.kind == SkinKind::kCompiledBlackChroma)
-        {
-            selectCompiled(Skin::ColourVariant::BlackChroma);
-            ApplyResult result;
-            result.ok = true;
-            result.revision = payload.revision;
-            result.appliedSkinId = payload.activeSkinId;
-            result.message = "Compiled BLACK/CHROMA";
-            return result;
-        }
-
+            return compiledOk(Skin::ColourVariant::BlackChroma, "Compiled BLACK/CHROMA");
+        if (payload.kind == SkinKind::kCompiledBlackMinimal)
+            return compiledOk(Skin::ColourVariant::BlackMinimal, "Compiled BLACK/MINIMAL");
         if (payload.kind == SkinKind::kCompiledCream)
-        {
-            selectCompiled(Skin::ColourVariant::Cream);
-            ApplyResult result;
-            result.ok = true;
-            result.revision = payload.revision;
-            result.appliedSkinId = payload.activeSkinId;
-            result.message = "Compiled Cream";
-            return result;
-        }
+            return compiledOk(Skin::ColourVariant::Cream, "Compiled Cream");
+        if (payload.kind == SkinKind::kCompiledCreamMinimal)
+            return compiledOk(Skin::ColourVariant::CreamMinimal, "Compiled CREAM/MINIMAL");
 
         const auto base = compiledBaseVariant(payload);
         auto nextOverlay = Skin::create(base);

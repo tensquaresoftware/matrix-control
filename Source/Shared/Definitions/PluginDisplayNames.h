@@ -660,7 +660,9 @@ namespace PluginDisplayNames
         {
             constexpr const char* kBlack = "BLACK/GREEN";
             constexpr const char* kBlackChroma = "BLACK/CHROMA";
+            constexpr const char* kBlackMinimal = "BLACK/MINIMAL";
             constexpr const char* kCream = "CREAM/GREEN";
+            constexpr const char* kCreamMinimal = "CREAM/MINIMAL";
         }
 
         namespace ScaleLevels

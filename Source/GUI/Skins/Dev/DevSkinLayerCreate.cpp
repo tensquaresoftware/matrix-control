@@ -48,24 +48,36 @@ namespace TSS::DevSkin
 
     juce::String Layer::resolveCompiledAncestorId(const NamedSkin& skin) const
     {
+        static constexpr std::pair<SkinKind, const char*> kKindToId[] = {
+            { SkinKind::kCompiledBlack, kCompiledBlackId },
+            { SkinKind::kCompiledBlackChroma, kCompiledBlackChromaId },
+            { SkinKind::kCompiledBlackMinimal, kCompiledBlackMinimalId },
+            { SkinKind::kCompiledCream, kCompiledCreamId },
+            { SkinKind::kCompiledCreamMinimal, kCompiledCreamMinimalId },
+        };
+
         const auto idForKind = [](SkinKind kind) -> juce::String
         {
-            if (kind == SkinKind::kCompiledBlack)
-                return kCompiledBlackId;
-            if (kind == SkinKind::kCompiledBlackChroma)
-                return kCompiledBlackChromaId;
-            if (kind == SkinKind::kCompiledCream)
-                return kCompiledCreamId;
+            for (const auto& entry : kKindToId)
+                if (entry.first == kind)
+                    return entry.second;
             return {};
         };
+        const auto isCompiledProductId = [](const juce::String& id) noexcept
+        {
+            for (const auto& entry : kKindToId)
+                if (id == entry.second)
+                    return true;
+            return false;
+        };
+
         if (auto id = idForKind(skin.kind); id.isNotEmpty())
             return id;
 
         juce::String cursor = skin.derivedFrom;
         for (int guard = 0; guard < 64; ++guard)
         {
-            if (cursor == kCompiledBlackId || cursor == kCompiledBlackChromaId
-                || cursor == kCompiledCreamId)
+            if (isCompiledProductId(cursor))
                 return cursor;
             const auto* parent = findSkin(cursor);
             if (parent == nullptr)

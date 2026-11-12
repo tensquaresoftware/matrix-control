@@ -5,33 +5,13 @@
 
 #include "GUI/Skins/Dev/DevSkinInventory.h"
 #include "GUI/Skins/Dev/DevSkinJsonMapping.h"
+#include "GUI/Skins/Dev/DevSkinKindCodec.h"
 #include "GUI/Skins/Dev/DevSkinSsotSeed.h"
 
 namespace TSS::DevSkin
 {
     namespace
     {
-        juce::String kindToString(SkinKind kind)
-        {
-            switch (kind)
-            {
-                case SkinKind::kCompiledBlack:    return "compiledBlack";
-                case SkinKind::kCompiledBlackChroma: return "compiledBlackChroma";
-                case SkinKind::kCompiledCream:    return "compiledCream";
-                case SkinKind::kDev:              return "dev";
-            }
-            return "dev";
-        }
-
-        bool kindFromString(const juce::String& text, SkinKind& out)
-        {
-            if (text == "compiledBlack")    { out = SkinKind::kCompiledBlack; return true; }
-            if (text == "compiledBlackChroma" || text == "compiledBlackDuo") { out = SkinKind::kCompiledBlackChroma; return true; }
-            if (text == "compiledCream")    { out = SkinKind::kCompiledCream; return true; }
-            if (text == "dev")              { out = SkinKind::kDev; return true; }
-            return false;
-        }
-
         // Colour sets beyond the object's inventory (older trial files) are dropped, not rejected.
         bool mappingsFromVar(const juce::var& mappingsVar,
                              std::map<SkinColourKey, juce::String>& out,
@@ -239,12 +219,8 @@ namespace TSS::DevSkin
                     expandLegacyColourSets(skin);
                 if (skin.kind != SkinKind::kDev)
                     return JsonIoResult::failure("Imported skins must be kind=dev");
-                if (skin.id == kCompiledBlackId
-                    || skin.id == kCompiledBlackChromaId
-                    || skin.id == kCompiledCreamId)
-                {
+                if (isReservedCompiledSkinId(skin.id))
                     return JsonIoResult::failure("Imported Designer skin cannot reuse compiled ids");
-                }
                 outSkins.push_back(std::move(skin));
             }
             return JsonIoResult::success();
@@ -309,7 +285,9 @@ namespace TSS::DevSkin
             std::vector<NamedSkin> skins;
             skins.push_back(makeCompiledSkin(SkinKind::kCompiledBlack));
             skins.push_back(makeCompiledSkin(SkinKind::kCompiledBlackChroma));
+            skins.push_back(makeCompiledSkin(SkinKind::kCompiledBlackMinimal));
             skins.push_back(makeCompiledSkin(SkinKind::kCompiledCream));
+            skins.push_back(makeCompiledSkin(SkinKind::kCompiledCreamMinimal));
 
             const auto compiledCount = skins.size();
             const auto imported = appendImportedDevSkins(*root, skins);
@@ -403,6 +381,10 @@ namespace TSS::DevSkin
                 out.compiledAncestorId = kCompiledBlackId;
             else if (out.kind == SkinKind::kCompiledBlackChroma || out.derivedFrom == kCompiledBlackChromaId)
                 out.compiledAncestorId = kCompiledBlackChromaId;
+            else if (out.kind == SkinKind::kCompiledBlackMinimal || out.derivedFrom == kCompiledBlackMinimalId)
+                out.compiledAncestorId = kCompiledBlackMinimalId;
+            else if (out.kind == SkinKind::kCompiledCreamMinimal || out.derivedFrom == kCompiledCreamMinimalId)
+                out.compiledAncestorId = kCompiledCreamMinimalId;
             else
                 out.compiledAncestorId = kCompiledCreamId;
         }

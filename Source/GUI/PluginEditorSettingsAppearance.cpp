@@ -18,7 +18,9 @@ void PluginEditor::restoreSettingsAppearanceFromState(SettingsPanel& panel)
     const int skinId = pluginProcessor.getSkinVariantId();
     const int normalizedSkin = (skinId == SkinVariants::kBlack
                                 || skinId == SkinVariants::kBlackChroma
-                                || skinId == SkinVariants::kCream)
+                                || skinId == SkinVariants::kBlackMinimal
+                                || skinId == SkinVariants::kCream
+                                || skinId == SkinVariants::kCreamMinimal)
         ? skinId
         : SkinVariants::kDefault;
 
@@ -45,7 +47,8 @@ void PluginEditor::wireSettingsAppearanceCombos(SettingsPanel& panel)
     {
         using namespace PluginIDs::Settings::SkinVariants;
         const int selectedId = panel.getSkinCombo().getSelectedId();
-        if (selectedId != kBlack && selectedId != kCream)
+        if (selectedId != kBlack && selectedId != kBlackChroma && selectedId != kBlackMinimal
+            && selectedId != kCream && selectedId != kCreamMinimal)
             return;
 
         applySkinFromItemId(selectedId, true);

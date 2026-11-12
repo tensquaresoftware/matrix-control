@@ -1,6 +1,7 @@
 #include "GUI/Skins/Dev/DevSkinSsotSeed.h"
 
 #include "GUI/Skins/Dev/DevSkinColourElementList.h"
+#include "GUI/Skins/Dev/DevSkinMinimalSeed.h"
 #include "GUI/Skins/Dev/DevSkinPaletteCatalog.h"
 #include "GUI/Skins/SkinColours.h"
 
@@ -45,11 +46,25 @@ namespace TSS::DevSkin
             skin.mappings[element.key] = pastilleNameForElement(skin, argbForCompiled(element, kind));
         }
 
+        void seedFromMinimalEntries(NamedSkin& skin, const MinimalColourEntry* entries, size_t count)
+        {
+            skin.palette = colourChartPastilles();
+            skin.mappings.clear();
+            for (size_t i = 0; i < count; ++i)
+            {
+                const auto& entry = entries[i];
+                const auto key = skinColourKey(entry.object, entry.property, entry.state, entry.colourSet);
+                skin.mappings[key] = pastilleNameForElement(skin, entry.argb);
+            }
+        }
+
         bool isCompiledKind(SkinKind kind) noexcept
         {
             return kind == SkinKind::kCompiledBlack
                 || kind == SkinKind::kCompiledBlackChroma
-                || kind == SkinKind::kCompiledCream;
+                || kind == SkinKind::kCompiledBlackMinimal
+                || kind == SkinKind::kCompiledCream
+                || kind == SkinKind::kCompiledCreamMinimal;
         }
     }
 
@@ -69,6 +84,16 @@ namespace TSS::DevSkin
             skin.id = kCompiledBlackChromaId;
             skin.name = "BLACK/CHROMA";
         }
+        else if (kind == SkinKind::kCompiledBlackMinimal)
+        {
+            skin.id = kCompiledBlackMinimalId;
+            skin.name = "BLACK/MINIMAL";
+        }
+        else if (kind == SkinKind::kCompiledCreamMinimal)
+        {
+            skin.id = kCompiledCreamMinimalId;
+            skin.name = "CREAM/MINIMAL";
+        }
         else
         {
             skin.id = kCompiledCreamId;
@@ -82,6 +107,19 @@ namespace TSS::DevSkin
     void seedFromCompiled(NamedSkin& skin, SkinKind compiledBase)
     {
         jassert(isCompiledKind(compiledBase));
+
+        if (compiledBase == SkinKind::kCompiledBlackMinimal)
+        {
+            size_t count = 0;
+            seedFromMinimalEntries(skin, blackMinimalEntries(count), count);
+            return;
+        }
+        if (compiledBase == SkinKind::kCompiledCreamMinimal)
+        {
+            size_t count = 0;
+            seedFromMinimalEntries(skin, creamMinimalEntries(count), count);
+            return;
+        }
 
         skin.palette = colourChartPastilles();
         skin.mappings.clear();

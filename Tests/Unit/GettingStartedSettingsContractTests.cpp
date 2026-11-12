@@ -89,6 +89,8 @@ private:
         expectEquals(kBlack, 1);
         expectEquals(kCream, 2);
         expectEquals(kBlackChroma, 3);
+        expectEquals(kBlackMinimal, 4);
+        expectEquals(kCreamMinimal, 5);
     }
 
     void logoMenuScaleAndSkinSectionCopy()

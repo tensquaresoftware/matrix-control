@@ -503,6 +503,9 @@ set(MATRIX_SKIN_DEV_LAYER_SOURCES
     Source/GUI/Skins/Dev/DevSkinPaletteCatalog.cpp
     Source/GUI/Skins/Dev/DevSkinSession.cpp
     Source/GUI/Skins/Dev/DevSkinSsotSeed.cpp
+    Source/GUI/Skins/Dev/DevSkinKindCodec.cpp
+    Source/GUI/Skins/Dev/DevSkinMinimalSeedBlack.cpp
+    Source/GUI/Skins/Dev/DevSkinMinimalSeedCream.cpp
     Source/GUI/Skins/Dev/DevSkinStandalonePaintState.cpp
 )
 
@@ -736,6 +739,9 @@ if(MATRIX_BUILD_TESTS)
         Source/GUI/Skins/Dev/DevSkinPaletteCatalog.cpp
         Source/GUI/Skins/Dev/DevSkinSession.cpp
         Source/GUI/Skins/Dev/DevSkinSsotSeed.cpp
+        Source/GUI/Skins/Dev/DevSkinKindCodec.cpp
+        Source/GUI/Skins/Dev/DevSkinMinimalSeedBlack.cpp
+        Source/GUI/Skins/Dev/DevSkinMinimalSeedCream.cpp
         Source/GUI/Skins/Dev/DevSkinStandalonePaintState.cpp
         Source/GUI/Widgets/Button.cpp
         Source/GUI/Widgets/ComboBox.cpp
@@ -1039,6 +1045,9 @@ if(MATRIX_BUILD_SKIN_DESIGNER)
         Source/GUI/Skins/Dev/DevSkinLayerPastille.cpp
         Source/GUI/Skins/Dev/DevSkinPaletteCatalog.cpp
         Source/GUI/Skins/Dev/DevSkinSsotSeed.cpp
+        Source/GUI/Skins/Dev/DevSkinKindCodec.cpp
+        Source/GUI/Skins/Dev/DevSkinMinimalSeedBlack.cpp
+        Source/GUI/Skins/Dev/DevSkinMinimalSeedCream.cpp
         Source/GUI/Skins/Dev/DevSkinStandalonePaintState.cpp
     )
     target_compile_definitions(Matrix-Control PRIVATE

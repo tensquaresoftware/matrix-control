@@ -10,32 +10,39 @@ namespace TSS::DevSkin
         {
             return kind == SkinKind::kCompiledBlack
                 || kind == SkinKind::kCompiledBlackChroma
-                || kind == SkinKind::kCompiledCream;
+                || kind == SkinKind::kCompiledBlackMinimal
+                || kind == SkinKind::kCompiledCream
+                || kind == SkinKind::kCompiledCreamMinimal;
+        }
+
+        struct CompiledVariantRule
+        {
+            SkinKind kind;
+            const char* productId;
+            Skin::ColourVariant variant;
+        };
+
+        constexpr CompiledVariantRule kCompiledVariantRules[] = {
+            { SkinKind::kCompiledBlack, kCompiledBlackId, Skin::ColourVariant::Black },
+            { SkinKind::kCompiledBlackChroma, kCompiledBlackChromaId, Skin::ColourVariant::BlackChroma },
+            { SkinKind::kCompiledBlackMinimal, kCompiledBlackMinimalId, Skin::ColourVariant::BlackMinimal },
+            { SkinKind::kCompiledCream, kCompiledCreamId, Skin::ColourVariant::Cream },
+            { SkinKind::kCompiledCreamMinimal, kCompiledCreamMinimalId, Skin::ColourVariant::CreamMinimal },
+        };
+
+        bool payloadMatchesRule(const PushPayload& payload, const CompiledVariantRule& rule) noexcept
+        {
+            return payload.kind == rule.kind
+                || payload.compiledAncestorId == rule.productId
+                || payload.derivedFrom == rule.productId;
         }
     }
 
     Skin::ColourVariant compiledBaseVariant(const PushPayload& payload)
     {
-        if (payload.kind == SkinKind::kCompiledBlack
-            || payload.compiledAncestorId == kCompiledBlackId
-            || payload.derivedFrom == kCompiledBlackId)
-        {
-            return Skin::ColourVariant::Black;
-        }
-
-        if (payload.kind == SkinKind::kCompiledBlackChroma
-            || payload.compiledAncestorId == kCompiledBlackChromaId
-            || payload.derivedFrom == kCompiledBlackChromaId)
-        {
-            return Skin::ColourVariant::BlackChroma;
-        }
-
-        if (payload.kind == SkinKind::kCompiledCream
-            || payload.compiledAncestorId == kCompiledCreamId
-            || payload.derivedFrom == kCompiledCreamId)
-        {
-            return Skin::ColourVariant::Cream;
-        }
+        for (const auto& rule : kCompiledVariantRules)
+            if (payloadMatchesRule(payload, rule))
+                return rule.variant;
 
         // Unknown Dev lineage: prefer Cream only when ancestor was not resolved.
         return Skin::ColourVariant::Cream;

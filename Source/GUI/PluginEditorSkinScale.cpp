@@ -143,8 +143,12 @@ TSS::Skin* PluginEditor::skinForVariantId(int skinItemId) const noexcept
     using namespace PluginIDs::Settings::SkinVariants;
     if (skinItemId == kBlackChroma)
         return skinBlackChroma_.get();
+    if (skinItemId == kBlackMinimal)
+        return skinBlackMinimal_.get();
     if (skinItemId == kCream)
         return skinCream_.get();
+    if (skinItemId == kCreamMinimal)
+        return skinCreamMinimal_.get();
     return skinBlack_.get();
 }
 
@@ -164,6 +168,29 @@ void PluginEditor::applySkinFromItemId(int skinItemId, bool persistToState)
 }
 
 #if defined(MATRIX_SKIN_DESIGNER_DEV_LAYER)
+namespace
+{
+    struct CompiledPushRule
+    {
+        TSS::DevSkin::SkinKind kind;
+        int skinVariantId;
+        const char* message;
+    };
+
+    constexpr CompiledPushRule kCompiledPushRules[] = {
+        { TSS::DevSkin::SkinKind::kCompiledBlack,
+          PluginIDs::Settings::SkinVariants::kBlack, "Compiled Black" },
+        { TSS::DevSkin::SkinKind::kCompiledBlackChroma,
+          PluginIDs::Settings::SkinVariants::kBlackChroma, "Compiled BLACK/CHROMA" },
+        { TSS::DevSkin::SkinKind::kCompiledBlackMinimal,
+          PluginIDs::Settings::SkinVariants::kBlackMinimal, "Compiled BLACK/MINIMAL" },
+        { TSS::DevSkin::SkinKind::kCompiledCream,
+          PluginIDs::Settings::SkinVariants::kCream, "Compiled Cream" },
+        { TSS::DevSkin::SkinKind::kCompiledCreamMinimal,
+          PluginIDs::Settings::SkinVariants::kCreamMinimal, "Compiled CREAM/MINIMAL" },
+    };
+}
+
 TSS::DevSkin::ApplyResult PluginEditor::applyDevSkinPush(const TSS::DevSkin::PushPayload& payload)
 {
     using namespace TSS::DevSkin;
@@ -172,27 +199,13 @@ TSS::DevSkin::ApplyResult PluginEditor::applyDevSkinPush(const TSS::DevSkin::Pus
     result.revision = payload.revision;
     result.appliedSkinId = payload.activeSkinId;
 
-    if (payload.kind == SkinKind::kCompiledBlack)
+    for (const auto& rule : kCompiledPushRules)
     {
-        applySkinFromItemId(PluginIDs::Settings::SkinVariants::kBlack, false);
+        if (payload.kind != rule.kind)
+            continue;
+        applySkinFromItemId(rule.skinVariantId, false);
         result.ok = true;
-        result.message = "Compiled Black";
-        return result;
-    }
-
-    if (payload.kind == SkinKind::kCompiledBlackChroma)
-    {
-        applySkinFromItemId(PluginIDs::Settings::SkinVariants::kBlackChroma, false);
-        result.ok = true;
-        result.message = "Compiled BLACK/CHROMA";
-        return result;
-    }
-
-    if (payload.kind == SkinKind::kCompiledCream)
-    {
-        applySkinFromItemId(PluginIDs::Settings::SkinVariants::kCream, false);
-        result.ok = true;
-        result.message = "Compiled Cream";
+        result.message = rule.message;
         return result;
     }
 

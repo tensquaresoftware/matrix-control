@@ -66,7 +66,7 @@ private:
         expect(layer.findSkin(oldId) == nullptr);
         expect(layer.findSkin(trialA) != nullptr);
         expect(layer.findSkin(trialB) != nullptr);
-        expectEquals(layer.skins().size(), static_cast<size_t>(5));
+        expectEquals(layer.skins().size(), static_cast<size_t>(7));
         expectEquals(layer.activeSkinId(), trialA);
     }
 
@@ -83,7 +83,7 @@ private:
 
         const auto loaded = TSS::DevSkin::replaceDesignerSkinsFromJson(layer, exported);
         expect(loaded.ok);
-        expectEquals(layer.skins().size(), static_cast<size_t>(4));
+        expectEquals(layer.skins().size(), static_cast<size_t>(6));
         expect(layer.findSkin(readyId) != nullptr);
         expectEquals(layer.activeSkinId(), readyId);
     }

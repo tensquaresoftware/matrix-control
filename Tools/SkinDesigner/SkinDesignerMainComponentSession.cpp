@@ -11,6 +11,18 @@ namespace
     constexpr int kQuitDiscardChoice = 2;
 }
 
+void SkinDesignerMainComponent::mouseEnter(const juce::MouseEvent& e)
+{
+    if (e.eventComponent == &skinsPanel_.compareButton())
+        syncCompareButtonChrome();
+}
+
+void SkinDesignerMainComponent::mouseExit(const juce::MouseEvent& e)
+{
+    if (e.eventComponent == &skinsPanel_.compareButton())
+        syncCompareButtonChrome();
+}
+
 void SkinDesignerMainComponent::mouseUp(const juce::MouseEvent& e)
 {
     if (e.mouseWasClicked() && ! mappingsPanel_.preservesRowSelectionForEvent(e))
@@ -229,7 +241,9 @@ void SkinDesignerMainComponent::refreshCombos()
     productCombo.clear(juce::dontSendNotification);
     productCombo.addItem("BLACK/GREEN", 1);
     productCombo.addItem("BLACK/CHROMA", 2);
-    productCombo.addItem("CREAM/GREEN", 3);
+    productCombo.addItem("BLACK/MINIMAL", 3);
+    productCombo.addItem("CREAM/GREEN", 4);
+    productCombo.addItem("CREAM/MINIMAL", 5);
     productCombo.setSelectedId(SkinDesignerUi::productComboIdFromSkinId(sessionState_.productSkinId),
                                juce::dontSendNotification);
 

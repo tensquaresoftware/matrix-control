@@ -287,7 +287,9 @@ private:
 
     std::unique_ptr<TSS::Skin> skinBlack_;
     std::unique_ptr<TSS::Skin> skinBlackChroma_;
+    std::unique_ptr<TSS::Skin> skinBlackMinimal_;
     std::unique_ptr<TSS::Skin> skinCream_;
+    std::unique_ptr<TSS::Skin> skinCreamMinimal_;
     TSS::Skin* skinForVariantId(int skinItemId) const noexcept;
 #if defined(MATRIX_SKIN_DESIGNER_DEV_LAYER)
     std::unique_ptr<TSS::Skin> skinDevOverlay_;

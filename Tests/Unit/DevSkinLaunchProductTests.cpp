@@ -74,7 +74,7 @@ private:
 
         // A fresh layer (what the app builds at launch) holds compiled Product skins only.
         TSS::DevSkin::Layer launchLayer;
-        expectEquals(launchLayer.skins().size(), static_cast<size_t>(3));
+        expectEquals(launchLayer.skins().size(), static_cast<size_t>(5));
     }
 };
 

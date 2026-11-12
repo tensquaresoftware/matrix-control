@@ -91,19 +91,19 @@ private:
                                             TSS::SkinColourProperty::kTrack,
                                             TSS::SkinColourState::kDefault,
                                             TSS::ColourSet::k3);
-        expect(layer.setMapping(skin->id, key, "kEmerald400").wasOk());
+        expect(layer.setMapping(skin->id, key, "kGreen300").wasOk());
         expect(layer.addPastille(skin->id, "kCustomAccent", 0xffff00aa).wasOk());
 
         TSS::DevSkin::Layer restored;
         const auto imported = TSS::DevSkin::importFromJson(restored, TSS::DevSkin::exportToJson(layer));
         expect(imported.ok);
-        expectEquals(restored.skins().size(), static_cast<size_t>(4));
+        expectEquals(restored.skins().size(), static_cast<size_t>(6));
 
         const auto* restoredDev = restored.findSkin(skin->id);
         expect(restoredDev != nullptr);
         expectEquals(restoredDev->name, juce::String("Forge Cream"));
         expect(restoredDev->mappings.count(key) == 1);
-        expectEquals(restoredDev->mappings.at(key), juce::String("kEmerald400"));
+        expectEquals(restoredDev->mappings.at(key), juce::String("kGreen300"));
 
         bool foundCustom = false;
         for (const auto& pastille : restoredDev->palette)
@@ -253,7 +253,7 @@ private:
         expect(second.ok);
         expectEquals(second.importedSkinIds.size(), 1);
         expect(first.importedSkinIds[0] != second.importedSkinIds[0]);
-        expectEquals(layer.skins().size(), static_cast<size_t>(5));
+        expectEquals(layer.skins().size(), static_cast<size_t>(7));
     }
 
     void assertAppendMultiSkinAddsTwo()

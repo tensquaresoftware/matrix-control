@@ -88,23 +88,33 @@ namespace TSS
                            TSS::EditorChromeShortcutLabels::skinVariant(2),
                            1, 2 });
         items_.push_back({ ItemKind::Skin,
-                           static_cast<int>(Skin::SkinComboBoxItemId::kCream),
-                           PluginDisplayNames::ChoiceLists::SkinVariants::kCream,
+                           static_cast<int>(Skin::SkinComboBoxItemId::kBlackMinimal),
+                           PluginDisplayNames::ChoiceLists::SkinVariants::kBlackMinimal,
                            TSS::EditorChromeShortcutLabels::skinVariant(3),
                            1, 3 });
-        items_.push_back({ ItemKind::Spacer, 0, {}, {}, 1, 4 });
-        items_.push_back({ ItemKind::HorizontalRule, 0, {}, {}, 1, 5 });
+        items_.push_back({ ItemKind::Skin,
+                           static_cast<int>(Skin::SkinComboBoxItemId::kCream),
+                           PluginDisplayNames::ChoiceLists::SkinVariants::kCream,
+                           TSS::EditorChromeShortcutLabels::skinVariant(4),
+                           1, 4 });
+        items_.push_back({ ItemKind::Skin,
+                           static_cast<int>(Skin::SkinComboBoxItemId::kCreamMinimal),
+                           PluginDisplayNames::ChoiceLists::SkinVariants::kCreamMinimal,
+                           TSS::EditorChromeShortcutLabels::skinVariant(5),
+                           1, 5 });
+        items_.push_back({ ItemKind::Spacer, 0, {}, {}, 1, 6 });
+        items_.push_back({ ItemKind::HorizontalRule, 0, {}, {}, 1, 7 });
 
         items_.push_back({ ItemKind::Settings,
                            0,
                            PluginDisplayNames::HeaderPanel::kSettingsButton,
                            TSS::EditorChromeShortcutLabels::openSettings(),
-                           1, 6 });
+                           1, 8 });
         items_.push_back({ ItemKind::About,
                            0,
                            PluginDisplayNames::HeaderPanel::kAboutButton,
                            {},
-                           1, 7 });
+                           1, 9 });
     }
 
     int HeaderLogoPopupMenu::getItemHeightPx() const
@@ -415,13 +425,15 @@ namespace TSS
             systemDisplayScale,
             ScaledDrawing::StrokeSnapPolicy::kRound);
         const int insetPx = juce::roundToInt(borderThickness);
-        const int maxRows = 8;
+        int maxRows = 0;
+        for (const auto& item : items_)
+            maxRows = juce::jmax(maxRows, item.row + 1);
         const int separatorPx = juce::roundToInt(getSeparatorWidth());
         const int popupWidth = juce::roundToInt(getColumnWidth(0))
             + separatorPx
             + juce::roundToInt(getColumnWidth(1))
             + 2 * insetPx;
-        const int popupHeight = maxRows * getItemHeightPx() + 2 * insetPx;
+        const int popupHeight = juce::jmax(1, maxRows) * getItemHeightPx() + 2 * insetPx;
 
         const auto dimensions = PopupMenuPositioner::calculateDimensions(
             logo,

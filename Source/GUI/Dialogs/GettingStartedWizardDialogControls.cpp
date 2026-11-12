@@ -74,7 +74,9 @@ void GettingStartedWizardDialog::populateScaleAndSkinItems()
     skinCombo_->clear(juce::dontSendNotification);
     skinCombo_->addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kBlack, kBlack);
     skinCombo_->addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kBlackChroma, kBlackChroma);
+    skinCombo_->addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kBlackMinimal, kBlackMinimal);
     skinCombo_->addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kCream, kCream);
+    skinCombo_->addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kCreamMinimal, kCreamMinimal);
 }
 
 void GettingStartedWizardDialog::applyControlLooks(TSS::ISkin& skin)

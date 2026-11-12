@@ -1,6 +1,7 @@
 #include "Skin.h"
 
 #include "Dev/DevSkinColourElementList.h"
+#include "Dev/DevSkinMinimalSeed.h"
 
 #include <PluginFontsData.h>
 
@@ -113,6 +114,22 @@ namespace TSS
 
     void Skin::initializeDefaultColours()
     {
+        if (currentVariant_ == ColourVariant::BlackMinimal
+            || currentVariant_ == ColourVariant::CreamMinimal)
+        {
+            size_t count = 0;
+            const auto* entries = (currentVariant_ == ColourVariant::BlackMinimal)
+                                      ? DevSkin::blackMinimalEntries(count)
+                                      : DevSkin::creamMinimalEntries(count);
+            for (size_t i = 0; i < count; ++i)
+            {
+                const auto& entry = entries[i];
+                colours_[skinColourKey(entry.object, entry.property, entry.state, entry.colourSet)]
+                    = juce::Colour(entry.argb);
+            }
+            return;
+        }
+
         DevSkin::forEachCompiledColourElement([&](const SkinColours::ColourElement& element)
         {
             juce::uint32 argb = element.creamVariant;

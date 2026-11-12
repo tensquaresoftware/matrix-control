@@ -20,7 +20,9 @@ namespace TSS::DevSkin
         skins_.clear();
         skins_.push_back(makeCompiledSkin(SkinKind::kCompiledBlack));
         skins_.push_back(makeCompiledSkin(SkinKind::kCompiledBlackChroma));
+        skins_.push_back(makeCompiledSkin(SkinKind::kCompiledBlackMinimal));
         skins_.push_back(makeCompiledSkin(SkinKind::kCompiledCream));
+        skins_.push_back(makeCompiledSkin(SkinKind::kCompiledCreamMinimal));
         activeSkinId_ = kCompiledCreamId;
         bump();
     }

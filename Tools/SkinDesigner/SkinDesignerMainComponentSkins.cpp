@@ -100,7 +100,7 @@ void SkinDesignerMainComponent::layoutTitleBar(juce::Rectangle<int> titleBar)
     const int sessionW = SkinDesignerChrome::sessionWellPreferredWidth();
     layoutSessionWell({ titleBar.getX(), wellY, sessionW, wellH });
 
-    const int opX = titleBar.getX() + sessionW + SkinDesignerChrome::kButtonGap;
+    const int opX = titleBar.getX() + sessionW + SkinDesignerChrome::kSessionOperationGap;
     layoutOperationWell({ opX, wellY, juce::jmax(0, titleBar.getRight() - opX), wellH });
 }
 

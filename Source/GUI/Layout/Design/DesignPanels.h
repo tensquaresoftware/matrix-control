@@ -188,7 +188,7 @@ namespace TSS::Design
             inline constexpr int kLogoGapAfter = 12;
             inline constexpr int kLogoPopupColumnWidth = 100;
             /** Fits BLACK/CHROMA / CREAM/GREEN (+ shortcut) without clipping. */
-            inline constexpr int kLogoPopupActionColumnWidth = 128;
+            inline constexpr int kLogoPopupActionColumnWidth = 140;
             inline constexpr int kLeftPadding = 12;
             inline constexpr int kRightPadding = 12;
             inline constexpr int kControlHeight = 20;

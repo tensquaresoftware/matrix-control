@@ -94,14 +94,25 @@ namespace SkinDesignerUi
         return out;
     }
 
-    /** Product combo item IDs: 1=BLACK/GREEN, 2=BLACK/CHROMA, 3=CREAM/GREEN. */
+    /** Skin Designer UI: drop leading chart `k` (kBrandCream → BrandCream). */
+    inline juce::String displayPastilleName(const juce::String& storedName)
+    {
+        return (storedName.startsWithChar('k') && storedName.length() > 1)
+                   ? storedName.substring(1)
+                   : storedName;
+    }
+
+    /** Product combo: 1=BLACK/GREEN … 5=CREAM/MINIMAL (logo order). */
     inline juce::String productSkinIdFromComboId(int comboId)
     {
-        if (comboId == 1)
-            return TSS::DevSkin::kCompiledBlackId;
-        if (comboId == 2)
-            return TSS::DevSkin::kCompiledBlackChromaId;
-        return TSS::DevSkin::kCompiledCreamId;
+        switch (comboId)
+        {
+            case 2: return TSS::DevSkin::kCompiledBlackChromaId;
+            case 3: return TSS::DevSkin::kCompiledBlackMinimalId;
+            case 4: return TSS::DevSkin::kCompiledCreamId;
+            case 5: return TSS::DevSkin::kCompiledCreamMinimalId;
+            default: return TSS::DevSkin::kCompiledBlackId;
+        }
     }
 
     inline int productComboIdFromSkinId(const juce::String& skinId)
@@ -109,8 +120,12 @@ namespace SkinDesignerUi
         if (skinId == TSS::DevSkin::kCompiledBlackChromaId
             || skinId == "compiled:black-duo")
             return 2;
-        if (skinId == TSS::DevSkin::kCompiledCreamId)
+        if (skinId == TSS::DevSkin::kCompiledBlackMinimalId)
             return 3;
+        if (skinId == TSS::DevSkin::kCompiledCreamId)
+            return 4;
+        if (skinId == TSS::DevSkin::kCompiledCreamMinimalId)
+            return 5;
         return 1;
     }
 

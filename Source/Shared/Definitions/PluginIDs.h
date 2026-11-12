@@ -201,6 +201,8 @@ namespace PluginIDs
             constexpr int kBlack = 1;
             constexpr int kCream = 2;
             constexpr int kBlackChroma = 3;
+            constexpr int kBlackMinimal = 4;
+            constexpr int kCreamMinimal = 5;
             constexpr int kDefault = kBlack;
         }
 
