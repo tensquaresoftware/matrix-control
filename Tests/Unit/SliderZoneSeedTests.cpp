@@ -26,8 +26,11 @@ public:
         beginTest("blackDuo_zoneAccentsFollowBlueOrangeYellow");
         assertBlackDuoZoneAccents();
 
-        beginTest("black_masterHeaderModalesSharePatchEmerald");
-        assertBlackSharesPatchEmerald();
+        beginTest("black_masterHeaderSharePatchEmerald");
+        assertBlackMasterHeaderSharePatchEmerald();
+
+        beginTest("black_modalesMonoGreys");
+        assertBlackModalesMonoSeeds();
 
         beginTest("modales_monoGreysOnBlackDuoAndCafeOnCream");
         assertModalesMonoSeeds();
@@ -60,7 +63,7 @@ private:
         expect(SliderK3::kText.blackDuoVariant == ColourChart::kYellow400);
     }
 
-    void assertBlackSharesPatchEmerald()
+    void assertBlackMasterHeaderSharePatchEmerald()
     {
         using namespace TSS::SkinColours::Widgets;
 
@@ -72,10 +75,6 @@ private:
         expect(SliderK3::kValueBar.blackVariant == Slider::kValueBar.blackVariant);
         expect(SliderK3::kText.blackVariant == Slider::kText.blackVariant);
         expect(SliderK3::kFocusBorder.blackVariant == Slider::kFocusBorder.blackVariant);
-        expect(SliderK4::kTrack.blackVariant == Slider::kTrack.blackVariant);
-        expect(SliderK4::kValueBar.blackVariant == Slider::kValueBar.blackVariant);
-        expect(SliderK4::kText.blackVariant == Slider::kText.blackVariant);
-        expect(SliderK4::kFocusBorder.blackVariant == Slider::kFocusBorder.blackVariant);
 
         expect(ComboBoxK2::kBackground.blackVariant == ComboBox::kBackground.blackVariant);
         expect(ComboBoxK2::kTriangle.blackVariant == ComboBox::kTriangle.blackVariant);
@@ -87,6 +86,18 @@ private:
         expect(PopupMenuK2::kBackgroundHover.blackVariant == PopupMenu::kBackgroundHover.blackVariant);
         expect(PopupMenuK2::kTextHover.blackVariant == PopupMenu::kTextHover.blackVariant);
         expect(PopupMenuK2::kTextDisabled.blackVariant == PopupMenu::kTextDisabled.blackVariant);
+    }
+
+    void assertBlackModalesMonoSeeds()
+    {
+        using namespace TSS::SkinColours::Widgets;
+
+        expect(SliderK4::kTrack.blackVariant == ColourChart::kBlack);
+        expect(SliderK4::kFocusBorder.blackVariant == ColourChart::kGrey800);
+        expect(SliderK4::kValueBar.blackVariant == ColourChart::kGrey600);
+        expect(SliderK4::kText.blackVariant == ColourChart::kGrey200);
+        expect(LedK2::kMaxOn.blackVariant == ColourChart::kGrey200);
+        expect(PeakIndicatorK2::kMaxOn.blackVariant == ColourChart::kGrey200);
     }
 
     void assertModalesMonoSeeds()

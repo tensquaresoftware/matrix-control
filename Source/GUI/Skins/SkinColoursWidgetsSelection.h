@@ -427,7 +427,7 @@ namespace TSS::SkinColours
             inline constexpr ColourElement kTextDisabled = {
                 skinColourKey(SkinObjectType::kPopupMenu, SkinColourProperty::kText,
                               SkinColourState::kDisabled, ColourSet::k3),
-                Common::kContentDisabled,
+                ColourChart::kGrey400,
                 ColourChart::kGrey600,
                 ColourChart::kCafe400
             };

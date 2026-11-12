@@ -26,6 +26,7 @@ context: []
 - Hardware Latency stays on Modales (`k4`); greening that set on BLACK restores the latency slider without call-site rewiring.
 - Added `SliderZoneSeedTests` pin `black_masterHeaderModalesSharePatchEmerald` (sliders + ComboBoxK2/PopupMenuK2) and run Modales look for Black; lint OK; SliderZoneSeed + SkinColourWiringCoverage tests pass.
 - Blind Hunter: patched missing combo/popup pins and Black Modales look coverage; rejected hover/disabled popup retints and TextDisabled emerald as intentional Patch parity; rejected SliderK4 “all Modales” scare because Hardware Latency is the only product Modales slider call site.
+- Course correction (Guillaume): keep Master/Header emerald; revert SliderK4 BLACK to mono greys; Modales LedK2 + PeakIndicatorK2 MaxOn BLACK → Grey200 (match BLACK/DUO Settings mono).
 
 ## Review Triage Log
 

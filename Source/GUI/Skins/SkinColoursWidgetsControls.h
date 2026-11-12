@@ -435,7 +435,7 @@ namespace TSS::SkinColours
             inline constexpr ColourElement kTrack = {
                 skinColourKey(SkinObjectType::kSlider, SkinColourProperty::kTrack,
                               SkinColourState::kDefault, ColourSet::k4),
-                ColourChart::kEmerald950,
+                ColourChart::kBlack,
                 ColourChart::kBlack,
                 ColourChart::kCream
             };
@@ -443,7 +443,7 @@ namespace TSS::SkinColours
             inline constexpr ColourElement kFocusBorder = {
                 skinColourKey(SkinObjectType::kSlider, SkinColourProperty::kFocusBorder,
                               SkinColourState::kDefault, ColourSet::k4),
-                ColourChart::kEmerald900,
+                ColourChart::kGrey800,
                 ColourChart::kGrey800,
                 ColourChart::kCafe800
             };
@@ -451,7 +451,7 @@ namespace TSS::SkinColours
             inline constexpr ColourElement kValueBar = {
                 skinColourKey(SkinObjectType::kSlider, SkinColourProperty::kValueBar,
                               SkinColourState::kDefault, ColourSet::k4),
-                ColourChart::kEmerald700,
+                ColourChart::kGrey600,
                 ColourChart::kGrey600,
                 ColourChart::kCafe800
             };
@@ -459,7 +459,7 @@ namespace TSS::SkinColours
             inline constexpr ColourElement kText = {
                 skinColourKey(SkinObjectType::kSlider, SkinColourProperty::kText,
                               SkinColourState::kDefault, ColourSet::k4),
-                ColourChart::kEmerald400,
+                ColourChart::kGrey200,
                 ColourChart::kGrey200,
                 ColourChart::kCafe800
             };

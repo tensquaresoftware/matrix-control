@@ -44,6 +44,8 @@ struct ColourChart
     static constexpr juce::uint32 kOrange950   = 0xFF422514;
     static constexpr juce::uint32 kOrange800   = 0xFF7A4511;
     static constexpr juce::uint32 kOrange700   = 0xFF904809;
+    /** Footer WARNING badge — distinct from brand / Master `kOrange`. */
+    static constexpr juce::uint32 kOrange500   = 0xFFFF6600;
     static constexpr juce::uint32 kOrange400   = 0xFFF49325;
 
     static constexpr juce::uint32 kYellow950   = 0xFF3B360D;

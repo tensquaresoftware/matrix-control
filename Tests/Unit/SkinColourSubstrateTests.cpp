@@ -438,7 +438,7 @@ private:
         expect(skin->getColour(SkinObjectType::kFooterMessage,
                                SkinColourProperty::kText,
                                SkinColourState::kWarning)
-               == juce::Colour(ColourChart::kOrange));
+               == juce::Colour(ColourChart::kOrange500));
         expect(skin->getColour(SkinObjectType::kFooterMessage,
                                SkinColourProperty::kText,
                                SkinColourState::kError)

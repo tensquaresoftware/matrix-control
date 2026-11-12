@@ -229,7 +229,7 @@ namespace TSS::SkinColours
             inline constexpr ColourElement kMaxOn = {
                 skinColourKey(SkinObjectType::kLed, SkinColourProperty::kBackground,
                               SkinColourState::kOn, ColourSet::k2),
-                ColourChart::kEmerald400,
+                ColourChart::kGrey200,
                 ColourChart::kGrey200,
                 ColourChart::kCafe800
             };
@@ -287,7 +287,7 @@ namespace TSS::SkinColours
             inline constexpr ColourElement kMaxOn = {
                 skinColourKey(SkinObjectType::kPeakIndicator, SkinColourProperty::kBackground,
                               SkinColourState::kOn, ColourSet::k2),
-                ColourChart::kEmerald400,
+                ColourChart::kGrey200,
                 ColourChart::kGrey200,
                 ColourChart::kCafe800
             };

@@ -16,6 +16,7 @@ namespace TSS::DevSkin
                 { "kOrange950", ColourChart::kOrange950 },
                 { "kOrange800", ColourChart::kOrange800 },
                 { "kOrange700", ColourChart::kOrange700 },
+                { "kOrange500", ColourChart::kOrange500 },
                 { "kOrange400", ColourChart::kOrange400 },
                 { "kYellow950", ColourChart::kYellow950 },
                 { "kYellow800", ColourChart::kYellow800 },

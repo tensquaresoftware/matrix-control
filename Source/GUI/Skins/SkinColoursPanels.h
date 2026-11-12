@@ -9,7 +9,7 @@ namespace TSS::SkinColours
         // Under-GUI diagnostic fill (plugin + standalone); normally covered by Header/Body/Footer.
         inline constexpr ColourElement kWindowSurfaceBackground = {
             skinColourKey(SkinObjectType::kWindowSurface, SkinColourProperty::kBackground),
-            ColourChart::kBlack,
+            ColourChart::kGrey950,
             ColourChart::kGrey950,
             ColourChart::kCream400
         };

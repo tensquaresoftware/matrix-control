@@ -168,9 +168,9 @@ namespace TSS::SkinColours
 
             inline constexpr ColourElement kMessageWarning = {
                 skinColourKey(SkinObjectType::kFooterMessage, SkinColourProperty::kText, SkinColourState::kWarning),
-                ColourChart::kOrange,
-                ColourChart::kOrange,
-                ColourChart::kOrange
+                ColourChart::kOrange500,
+                ColourChart::kOrange500,
+                ColourChart::kOrange500
             };
 
             inline constexpr ColourElement kMessageError = {
