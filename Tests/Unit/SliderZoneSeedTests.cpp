@@ -108,9 +108,9 @@ private:
         expect(SliderK4::kFocusBorder.blackChromaVariant == ColourChart::kGrey800);
         expect(SliderK4::kValueBar.blackChromaVariant == ColourChart::kGrey600);
         expect(SliderK4::kText.blackChromaVariant == ColourChart::kGrey200);
-        expect(SliderK4::kTrack.creamVariant == ColourChart::kCream);
-        expect(SliderK4::kValueBar.creamVariant == ColourChart::kCafe800);
-        expect(SliderK4::kText.creamVariant == ColourChart::kCafe800);
+        expect(SliderK4::kTrack.creamVariant == ColourChart::kBrandCream);
+        expect(SliderK4::kValueBar.creamVariant == ColourChart::kCafe700);
+        expect(SliderK4::kText.creamVariant == ColourChart::kCafe700);
     }
 
     void assertCreamSharedGreens()

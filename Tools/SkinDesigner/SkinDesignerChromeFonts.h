@@ -309,17 +309,17 @@ namespace SkinDesignerChrome
     inline int operationWellMinWidth() noexcept
     {
         const int titleWithoutOperation = kWindowEdgeGutter + sessionWellPreferredWidth()
-                                          + kButtonGap + kWindowEdgeGutter;
+                                          + kSessionOperationGap + kWindowEdgeGutter;
         return juce::jmax(0, kWindowContentMinWidth - titleWithoutOperation);
     }
 
     /**
      * Edge gutters + SESSION + OPERATION (min) on the title row.
-     * Gap matches layoutTitleBar (kButtonGap between SESSION and OPERATION).
+     * Gap matches layoutTitleBar (kSessionOperationGap = Palette|Mappings).
      */
     inline int windowTitleChromeMinWidth() noexcept
     {
-        return kWindowEdgeGutter + sessionWellPreferredWidth() + kButtonGap
+        return kWindowEdgeGutter + sessionWellPreferredWidth() + kSessionOperationGap
                + operationWellMinWidth() + kWindowEdgeGutter;
     }
 

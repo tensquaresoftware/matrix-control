@@ -87,15 +87,15 @@ private:
         expect(cream->getColour(SkinObjectType::kProgressBar,
                                 SkinColourProperty::kTrack,
                                 SkinColourState::kDisabled)
-               == juce::Colour(ColourChart::kCream));
+               == juce::Colour(ColourChart::kBrandCream));
         expect(cream->getColour(SkinObjectType::kProgressBar,
                                 SkinColourProperty::kText,
                                 SkinColourState::kDisabled)
-               == juce::Colour(ColourChart::kCafe600));
+               == juce::Colour(ColourChart::kCafe400));
         expect(cream->getColour(SkinObjectType::kProgressBar,
                                 SkinColourProperty::kValueBar,
                                 SkinColourState::kDisabled)
-               == juce::Colour(ColourChart::kCafe600));
+               == juce::Colour(ColourChart::kCafe400));
     }
 };
 

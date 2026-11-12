@@ -72,8 +72,8 @@ private:
         TSS::DevSkin::NamedSkin skin;
         skin.id = "test-editor";
         skin.name = "Test";
-        skin.mappings[borderOff()] = "kBlue";
-        skin.mappings[borderOn()] = "kBlue";
+        skin.mappings[borderOff()] = "kBrandBlue";
+        skin.mappings[borderOn()] = "kBrandBlue";
         // textHover intentionally unbound
         return skin;
     }
@@ -136,11 +136,11 @@ private:
 
     void changeMappedValue()
     {
-        beginTest("Mapped colour filter updates from kBlue to Unbound");
+        beginTest("Mapped colour filter updates from kBrandBlue to Unbound");
 
         using namespace SkinDesignerMappingsColumnFilter;
         const auto skin = makeSkin();
-        const ActiveFilters blue { {}, {}, {}, "kBlue" };
+        const ActiveFilters blue { {}, {}, {}, "kBrandBlue" };
         const ActiveFilters unbound { {}, {}, {}, kUnboundMenuValue };
 
         expect(keyMatches(skin, borderOff(), blue));
@@ -179,13 +179,13 @@ private:
 
     void presentValuesIncludeUnboundAndPastilles()
     {
-        beginTest("Present mapped values include Unbound and kBlue");
+        beginTest("Present mapped values include Unbound and kBrandBlue");
 
         using namespace SkinDesignerMappingsColumnFilter;
         const auto skin = makeSkin();
         const auto values = presentValues(skin, Column::kMappedColour);
         expect(values.contains(kUnboundMenuValue));
-        expect(values.contains("kBlue"));
+        expect(values.contains("kBrandBlue"));
         expectEquals(values.indexOf(kUnboundMenuValue), 0);
 
         const auto props = presentValues(skin, Column::kProperty);

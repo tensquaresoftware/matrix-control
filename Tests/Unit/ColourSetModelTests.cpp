@@ -97,9 +97,9 @@ private:
         TSS::DevSkin::Layer layer;
         layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Distinct Sets");
         auto key = TSS::skinColourKey(TSS::SkinObjectType::kSlider, TSS::SkinColourProperty::kTrack);
-        expect(layer.setMapping(layer.activeSkinId(), key, "kEmerald400").wasOk());
+        expect(layer.setMapping(layer.activeSkinId(), key, "kGreen300").wasOk());
         key.colourSet = TSS::ColourSet::k2;
-        expect(layer.setMapping(layer.activeSkinId(), key, "kBlue").wasOk());
+        expect(layer.setMapping(layer.activeSkinId(), key, "kBrandBlue").wasOk());
 
         const auto json = TSS::DevSkin::exportToJson(layer);
         const auto activeId = layer.activeSkinId();
@@ -111,9 +111,9 @@ private:
             return;
 
         key.colourSet = TSS::ColourSet::k1;
-        expectEquals(skin->mappings.at(key), juce::String("kEmerald400"));
+        expectEquals(skin->mappings.at(key), juce::String("kGreen300"));
         key.colourSet = TSS::ColourSet::k2;
-        expectEquals(skin->mappings.at(key), juce::String("kBlue"));
+        expectEquals(skin->mappings.at(key), juce::String("kBrandBlue"));
     }
 
     void assertUnknownColourSetRejectedAtomically()

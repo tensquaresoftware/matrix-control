@@ -101,7 +101,7 @@ Objectifs de clarification (côté Matrix-Control, guidés par ce qu’on appren
 
 | Concept | Rôle attendu |
 |---|---|
-| **Palette** | Ensemble fermé de couleurs nommées (`kGreen4`, `kBlue`, …) avec code `#RRGGBB` opaque |
+| **Palette** | Ensemble fermé de couleurs nommées (`kGreen4`, `kBrandBlue`, …) avec code `#RRGGBB` opaque |
 | **Token / élément** | Propriété colorée d’un type d’objet pour un état donné (ex. slider → value bar → enabled) |
 | **Skin** | Jeu de mappings : chaque token pointe vers **une** entrée de palette |
 | **Look** | Paquet de couleurs (et éventuellement polices) injecté dans un widget générique au moment de sa construction |

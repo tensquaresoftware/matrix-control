@@ -75,7 +75,7 @@ private:
     {
         TSS::DevSkin::Layer layer;
         expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Invent A").wasOk());
-        expect(layer.setMapping(layer.activeSkinId(), buttonOffKey(), "kEmerald400").wasOk());
+        expect(layer.setMapping(layer.activeSkinId(), buttonOffKey(), "kGreen300").wasOk());
 
         const auto payload = layer.makePushPayload();
         expect(payload.kind == TSS::DevSkin::SkinKind::kDev);
@@ -87,7 +87,7 @@ private:
         expect(paint.hasDevOverlay());
 
         const auto after = paint.activeSkin().getColour(buttonOffKey());
-        expect(after == juce::Colour(ColourChart::kEmerald400));
+        expect(after == juce::Colour(ColourChart::kGreen300));
         expect(after != before);
     }
 
@@ -174,14 +174,14 @@ private:
     {
         TSS::DevSkin::Layer layer;
         expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "RoundTrip").wasOk());
-        expect(layer.setMapping(layer.activeSkinId(), buttonOffKey(), "kBlue").wasOk());
+        expect(layer.setMapping(layer.activeSkinId(), buttonOffKey(), "kBrandBlue").wasOk());
         const auto json = TSS::DevSkin::exportToJson(layer);
         const auto activeId = layer.activeSkinId();
 
         TSS::DevSkin::Layer restored;
         expect(TSS::DevSkin::importFromJson(restored, json).ok);
         expect(restored.findSkin(activeId) != nullptr);
-        expectEquals(restored.findSkin(activeId)->mappings.at(buttonOffKey()), juce::String("kBlue"));
+        expectEquals(restored.findSkin(activeId)->mappings.at(buttonOffKey()), juce::String("kBrandBlue"));
 
         const auto beforeCount = restored.skins().size();
         expect(! TSS::DevSkin::importFromJson(restored, "not-json{").ok);
@@ -198,7 +198,7 @@ private:
             return;
 
         const auto primary = buttonOffKey();
-        expect(layer.setMapping(skin->id, primary, "kEmerald400").wasOk());
+        expect(layer.setMapping(skin->id, primary, "kGreen300").wasOk());
         for (const auto colourSet : { TSS::ColourSet::k2,
                                       TSS::ColourSet::k3,
                                       TSS::ColourSet::k4 })
@@ -212,19 +212,19 @@ private:
         expect(paint.applyPush(layer.makePushPayload()).ok);
         auto requested = primary;
         requested.colourSet = TSS::ColourSet::k3;
-        expect(paint.activeSkin().getColour(requested) == juce::Colour(ColourChart::kEmerald400));
+        expect(paint.activeSkin().getColour(requested) == juce::Colour(ColourChart::kGreen300));
     }
 
     void assertDisconnectFallback()
     {
         TSS::DevSkin::Layer layer;
         expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Live").wasOk());
-        expect(layer.setMapping(layer.activeSkinId(), buttonOffKey(), "kEmerald400").wasOk());
+        expect(layer.setMapping(layer.activeSkinId(), buttonOffKey(), "kGreen300").wasOk());
 
         TSS::DevSkin::StandalonePaintState paint;
         expect(paint.applyPush(layer.makePushPayload()).ok);
         expect(paint.hasDevOverlay());
-        expect(paint.activeSkin().getColour(buttonOffKey()) == juce::Colour(ColourChart::kEmerald400));
+        expect(paint.activeSkin().getColour(buttonOffKey()) == juce::Colour(ColourChart::kGreen300));
 
         const auto creamReferenceSkin = TSS::Skin::create(TSS::Skin::ColourVariant::Cream);
         const auto creamReference = creamReferenceSkin->getColour(buttonOffKey());
@@ -237,7 +237,7 @@ private:
         // Designer keeps its Dev layer after Standalone disconnect.
         expect(layer.findSkin(layer.activeSkinId()) != nullptr);
         expectEquals(layer.findSkin(layer.activeSkinId())->mappings.at(buttonOffKey()),
-                     juce::String("kEmerald400"));
+                     juce::String("kGreen300"));
 
         TSS::DevSkin::BridgeSession session;
         session.markConnected();
@@ -250,7 +250,7 @@ private:
     {
         TSS::DevSkin::Layer layer;
         expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Keep").wasOk());
-        expect(layer.setMapping(layer.activeSkinId(), buttonOffKey(), "kEmerald400").wasOk());
+        expect(layer.setMapping(layer.activeSkinId(), buttonOffKey(), "kGreen300").wasOk());
         const auto jsonBefore = TSS::DevSkin::exportToJson(layer);
 
         auto payload = layer.makePushPayload();
@@ -289,7 +289,7 @@ private:
     {
         TSS::DevSkin::Layer layer;
         expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Wire").wasOk());
-        expect(layer.setMapping(layer.activeSkinId(), buttonOffKey(), "kEmerald400").wasOk());
+        expect(layer.setMapping(layer.activeSkinId(), buttonOffKey(), "kGreen300").wasOk());
 
         const auto original = layer.makePushPayload();
         const auto encoded = TSS::DevSkin::encodeMessage(
@@ -306,7 +306,7 @@ private:
 
         TSS::DevSkin::StandalonePaintState paint;
         expect(paint.applyPush(restored).ok);
-        expect(paint.activeSkin().getColour(buttonOffKey()) == juce::Colour(ColourChart::kEmerald400));
+        expect(paint.activeSkin().getColour(buttonOffKey()) == juce::Colour(ColourChart::kGreen300));
 
         juce::MemoryBlock oversized;
         oversized.append(TSS::DevSkin::kBridgeMagic, 4);

@@ -11,28 +11,28 @@ namespace TSS::SkinColours
             skinColourKey(SkinObjectType::kWindowSurface, SkinColourProperty::kBackground),
             ColourChart::kGrey950,
             ColourChart::kGrey950,
-            ColourChart::kCream400
+            ColourChart::kCafe50
         };
 
         inline constexpr ColourElement kHeaderPanelBackground = {
             skinColourKey(SkinObjectType::kHeaderPanel, SkinColourProperty::kBackground),
             ColourChart::kGrey950,
             ColourChart::kGrey950,
-            ColourChart::kCream400
+            ColourChart::kCafe50
         };
 
         inline constexpr ColourElement kBodyPanelBackground = {
             skinColourKey(SkinObjectType::kBodyPanel, SkinColourProperty::kBackground),
             ColourChart::kGrey900,
             ColourChart::kGrey900,
-            ColourChart::kCream
+            ColourChart::kBrandCream
         };
 
         inline constexpr ColourElement kFooterPanelBackground = {
             skinColourKey(SkinObjectType::kFooterPanel, SkinColourProperty::kBackground),
             ColourChart::kGrey950,
             ColourChart::kGrey950,
-            ColourChart::kCream400
+            ColourChart::kCafe50
         };
 
         // Black chrome grey for Header cartouche badge/frame and Footer HELP chrome (Cream uses cafe tones).
@@ -42,14 +42,14 @@ namespace TSS::SkinColours
             skinColourKey(SkinObjectType::kHeaderPanel, SkinColourProperty::kBorder),
             kMainChromeGrey,
             kMainChromeGrey,
-            ColourChart::kCafe800
+            ColourChart::kCafe700
         };
 
         inline constexpr ColourElement kFooterPanelBorder = {
             skinColourKey(SkinObjectType::kFooterPanel, SkinColourProperty::kBorder),
             kMainChromeGrey,
             kMainChromeGrey,
-            ColourChart::kCafe900
+            ColourChart::kCafe750
         };
 
         // MIDI-queue alert badge cut-out text (fill uses FooterMessage Error text).
@@ -63,16 +63,16 @@ namespace TSS::SkinColours
         // Modal chrome + durable close-cross glyph (wired by dialogs / Settings / About).
         inline constexpr ColourElement kDialogBorder = {
             skinColourKey(SkinObjectType::kDialog, SkinColourProperty::kBorder),
-            ColourChart::kGrey525,
-            ColourChart::kGrey525,
-            ColourChart::kCafe600
+            ColourChart::kGrey550,
+            ColourChart::kGrey550,
+            ColourChart::kCafe400
         };
 
         inline constexpr ColourElement kDialogTitleBand = {
             skinColourKey(SkinObjectType::kDialog, SkinColourProperty::kTitleBand),
             ColourChart::kBlack,
             ColourChart::kBlack,
-            ColourChart::kCream400
+            ColourChart::kCafe50
         };
 
         inline constexpr ColourElement kDialogGlyph = {
@@ -87,7 +87,7 @@ namespace TSS::SkinColours
             skinColourKey(SkinObjectType::kDialog, SkinColourProperty::kText),
             ColourChart::kGrey200,
             ColourChart::kGrey200,
-            ColourChart::kCafe950
+            ColourChart::kCafe850
         };
 
         // Settings selected-tab label (fill stays Dialog TitleBand).
@@ -95,7 +95,7 @@ namespace TSS::SkinColours
             skinColourKey(SkinObjectType::kDialog, SkinColourProperty::kText, SkinColourState::kOn),
             ColourChart::kGrey200,
             ColourChart::kGrey200,
-            ColourChart::kCafe950
+            ColourChart::kCafe850
         };
     }
 }

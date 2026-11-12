@@ -245,15 +245,15 @@ private:
 
         const auto look = TSS::moduleHeaderLookFromSkin(*skin);
         expect(look.lineOrange == remapColour());
-        expect(look.backgroundEmphasis == juce::Colour(ColourChart::kOrange));
-        expect(look.textEmphasis == juce::Colour(ColourChart::kCream));
-        expect(skin->getColour(aboutHoverKey) == juce::Colour(ColourChart::kOrange));
+        expect(look.backgroundEmphasis == juce::Colour(ColourChart::kBrandOrange));
+        expect(look.textEmphasis == juce::Colour(ColourChart::kBrandCream));
+        expect(skin->getColour(aboutHoverKey) == juce::Colour(ColourChart::kBrandOrange));
     }
 
     void assertAlertHoverIndependentOfButtonTextHover()
     {
         const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::Cream);
-        expect(TSS::buttonAlertLookFromSkin(*skin).textHover == juce::Colour(ColourChart::kCafe900));
+        expect(TSS::buttonAlertLookFromSkin(*skin).textHover == juce::Colour(ColourChart::kCafe750));
         expect(TSS::buttonLookFromSkin(*skin).textHover == juce::Colour(ColourChart::kBlack));
 
         skin->setColour(key(SkinObjectType::kButton, SkinColourProperty::kSecondaryText, SkinColourState::kHover),
@@ -295,7 +295,7 @@ private:
                == skinB->getColour(SkinObjectType::kReadOnlyValueField, SkinColourProperty::kBackground));
         expect(field.textColour_
                == skinB->getColour(SkinObjectType::kReadOnlyValueField, SkinColourProperty::kText));
-        expect(field.fill_ == juce::Colour(ColourChart::kCream400));
+        expect(field.fill_ == juce::Colour(ColourChart::kCafe50));
     }
 
     void expectLookUsesSet(juce::Colour lookColour, const TSS::Skin& skin, TSS::SkinColourKey key)
@@ -373,12 +373,12 @@ private:
         const auto modales = TSS::sliderLookForZone(*skin, SkinZone::kModales);
         expect(patch.trackEnabled == juce::Colour(ColourChart::kGreen600));
         expect(master.trackEnabled == patch.trackEnabled && header.trackEnabled == patch.trackEnabled);
-        expect(modales.trackEnabled == juce::Colour(ColourChart::kCream));
-        expect(modales.valueBarEnabled == juce::Colour(ColourChart::kCafe800));
+        expect(modales.trackEnabled == juce::Colour(ColourChart::kBrandCream));
+        expect(modales.valueBarEnabled == juce::Colour(ColourChart::kCafe700));
 
         const auto comboMono = TSS::comboBoxLookForZone(*skin, SkinZone::kModales);
-        expect(comboMono.backgroundEnabled == juce::Colour(ColourChart::kCream));
-        expect(comboMono.textEnabled == juce::Colour(ColourChart::kCafe800));
+        expect(comboMono.backgroundEnabled == juce::Colour(ColourChart::kBrandCream));
+        expect(comboMono.textEnabled == juce::Colour(ColourChart::kCafe700));
     }
 };
 

@@ -21,7 +21,7 @@ public:
         beginTest("disabledBackground_matchesButtonDisabled");
 
         expect(NumberBox::kBackgroundDisabled.blackVariant == ColourChart::kGrey950);
-        expect(NumberBox::kBackgroundDisabled.creamVariant == ColourChart::kCream);
+        expect(NumberBox::kBackgroundDisabled.creamVariant == ColourChart::kBrandCream);
         expect(NumberBox::kBackgroundDisabled.blackVariant
                == Button::kBackgroundDisabled.blackVariant);
         expect(NumberBox::kBackgroundDisabled.creamVariant
@@ -30,12 +30,12 @@ public:
         beginTest("enabledBackground_blackPlateOnBlackChroma_creamPlateOnCream");
 
         expect(NumberBox::kBackground.blackVariant == ColourChart::kBlack);
-        expect(NumberBox::kBackground.creamVariant == ColourChart::kCream400);
+        expect(NumberBox::kBackground.creamVariant == ColourChart::kCafe50);
 
         beginTest("skinLoaded_disabledBackgroundFollowsSeed");
 
         assertDisabledBackgroundFromSkin(TSS::Skin::ColourVariant::Black, ColourChart::kGrey950);
-        assertDisabledBackgroundFromSkin(TSS::Skin::ColourVariant::Cream, ColourChart::kCream);
+        assertDisabledBackgroundFromSkin(TSS::Skin::ColourVariant::Cream, ColourChart::kBrandCream);
 
         beginTest("caret_seedIsWhiteAndIndependentOfEditorText");
 

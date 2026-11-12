@@ -38,20 +38,20 @@ private:
         expect(black->getColour(SkinObjectType::kWindowSurface, SkinColourProperty::kBackground)
                == juce::Colour(ColourChart::kGrey950));
         expect(cream->getColour(SkinObjectType::kWindowSurface, SkinColourProperty::kBackground)
-               == juce::Colour(ColourChart::kCream400));
+               == juce::Colour(ColourChart::kCafe50));
 
         expect(black->getColour(SkinObjectType::kHeaderPanel, SkinColourProperty::kBackground)
                == juce::Colour(ColourChart::kGrey950));
         expect(cream->getColour(SkinObjectType::kHeaderPanel, SkinColourProperty::kBackground)
-               == juce::Colour(ColourChart::kCream400));
+               == juce::Colour(ColourChart::kCafe50));
         expect(black->getColour(SkinObjectType::kFooterPanel, SkinColourProperty::kBackground)
                == juce::Colour(ColourChart::kGrey950));
         expect(cream->getColour(SkinObjectType::kFooterPanel, SkinColourProperty::kBackground)
-               == juce::Colour(ColourChart::kCream400));
+               == juce::Colour(ColourChart::kCafe50));
         expect(black->getColour(SkinObjectType::kBodyPanel, SkinColourProperty::kBackground)
                == juce::Colour(ColourChart::kGrey900));
         expect(cream->getColour(SkinObjectType::kBodyPanel, SkinColourProperty::kBackground)
-               == juce::Colour(ColourChart::kCream));
+               == juce::Colour(ColourChart::kBrandCream));
 
         // Seeds may coincide; the keys stay independent.
         const auto windowKey = TSS::skinColourKey(SkinObjectType::kWindowSurface, SkinColourProperty::kBackground);
@@ -76,7 +76,7 @@ private:
         };
 
         assertGlyphAndTitleBand(TSS::Skin::ColourVariant::BlackChroma, ColourChart::kBlack);
-        assertGlyphAndTitleBand(TSS::Skin::ColourVariant::Cream, ColourChart::kCream400);
+        assertGlyphAndTitleBand(TSS::Skin::ColourVariant::Cream, ColourChart::kCafe50);
     }
 
     void assertChromeTextAndBrandLooks(TSS::Skin::ColourVariant variant)

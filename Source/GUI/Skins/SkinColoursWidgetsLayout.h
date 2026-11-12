@@ -12,21 +12,21 @@ namespace TSS::SkinColours
                 skinColourKey(SkinObjectType::kSectionHeader, SkinColourProperty::kText),
                 ColourChart::kGrey200,
                 ColourChart::kGrey200,
-                ColourChart::kCafe950
+                ColourChart::kCafe850
             };
 
             inline constexpr ColourElement kLineBlue = {
                 skinColourKey(SkinObjectType::kSectionHeader, SkinColourProperty::kLineBlue),
-                ColourChart::kBlue,
-                ColourChart::kBlue,
-                ColourChart::kBlue
+                ColourChart::kBrandBlue,
+                ColourChart::kBrandBlue,
+                ColourChart::kBrandBlue
             };
 
             inline constexpr ColourElement kLineOrange = {
                 skinColourKey(SkinObjectType::kSectionHeader, SkinColourProperty::kLineOrange),
-                ColourChart::kOrange,
-                ColourChart::kOrange,
-                ColourChart::kOrange
+                ColourChart::kBrandOrange,
+                ColourChart::kBrandOrange,
+                ColourChart::kBrandOrange
             };
         }
 
@@ -36,21 +36,21 @@ namespace TSS::SkinColours
                 skinColourKey(SkinObjectType::kModuleHeader, SkinColourProperty::kText),
                 ColourChart::kGrey200,
                 ColourChart::kGrey200,
-                ColourChart::kCafe950
+                ColourChart::kCafe850
             };
 
             inline constexpr ColourElement kLineBlue = {
                 skinColourKey(SkinObjectType::kModuleHeader, SkinColourProperty::kLineBlue),
-                ColourChart::kBlue,
-                ColourChart::kBlue,
-                ColourChart::kBlue
+                ColourChart::kBrandBlue,
+                ColourChart::kBrandBlue,
+                ColourChart::kBrandBlue
             };
 
             inline constexpr ColourElement kLineOrange = {
                 skinColourKey(SkinObjectType::kModuleHeader, SkinColourProperty::kLineOrange),
-                ColourChart::kOrange,
-                ColourChart::kOrange,
-                ColourChart::kOrange
+                ColourChart::kBrandOrange,
+                ColourChart::kBrandOrange,
+                ColourChart::kBrandOrange
             };
 
             // Clickable module title under the pointer.
@@ -64,16 +64,16 @@ namespace TSS::SkinColours
             // Called-out badge inside a module (e.g. Ramp "M" master override).
             inline constexpr ColourElement kBackgroundEmphasis = {
                 skinColourKey(SkinObjectType::kModuleHeader, SkinColourProperty::kBackground, SkinColourState::kEmphasis),
-                ColourChart::kOrange,
-                ColourChart::kOrange,
-                ColourChart::kOrange
+                ColourChart::kBrandOrange,
+                ColourChart::kBrandOrange,
+                ColourChart::kBrandOrange
             };
 
             inline constexpr ColourElement kTextEmphasis = {
                 skinColourKey(SkinObjectType::kModuleHeader, SkinColourProperty::kText, SkinColourState::kEmphasis),
                 ColourChart::kGrey900,
                 ColourChart::kGrey900,
-                ColourChart::kCream
+                ColourChart::kBrandCream
             };
         }
 
@@ -83,14 +83,14 @@ namespace TSS::SkinColours
                 skinColourKey(SkinObjectType::kGroupLabel, SkinColourProperty::kText),
                 ColourChart::kGrey200,
                 ColourChart::kGrey200,
-                ColourChart::kCafe950
+                ColourChart::kCafe850
             };
 
             inline constexpr ColourElement kLine = {
                 skinColourKey(SkinObjectType::kGroupLabel, SkinColourProperty::kLine),
                 ColourChart::kGrey600,
                 ColourChart::kGrey600,
-                ColourChart::kCafe600
+                ColourChart::kCafe400
             };
         }
 
@@ -100,15 +100,15 @@ namespace TSS::SkinColours
                 skinColourKey(SkinObjectType::kLabel, SkinColourProperty::kText),
                 ColourChart::kGrey200,
                 ColourChart::kGrey200,
-                ColourChart::kCafe950
+                ColourChart::kCafe850
             };
 
             // Plate behind a label being dragged (e.g. modulation bus source).
             inline constexpr ColourElement kBackgroundClicked = {
                 skinColourKey(SkinObjectType::kLabel, SkinColourProperty::kBackground, SkinColourState::kClicked),
-                ColourChart::kBlue,
-                ColourChart::kBlue,
-                ColourChart::kBlue
+                ColourChart::kBrandBlue,
+                ColourChart::kBrandBlue,
+                ColourChart::kBrandBlue
             };
 
             // Plate behind a label hovered as a drop target.
@@ -137,7 +137,7 @@ namespace TSS::SkinColours
                 skinColourKey(SkinObjectType::kChromeText, SkinColourProperty::kText),
                 ColourChart::kGrey200,
                 ColourChart::kGrey200,
-                ColourChart::kCafe800
+                ColourChart::kCafe700
             };
 
             // Logo / brand hover pastille (absolute White) — Skin-mapped, not widget ColourChart dig.
@@ -145,15 +145,15 @@ namespace TSS::SkinColours
                 skinColourKey(SkinObjectType::kChromeText, SkinColourProperty::kText, SkinColourState::kHover),
                 ColourChart::kWhite,
                 ColourChart::kWhite,
-                ColourChart::kCafe900
+                ColourChart::kCafe750
             };
 
             // Called-out chrome text (e.g. About link hover) — Hover stays the logo white.
             inline constexpr ColourElement kTextEmphasis = {
                 skinColourKey(SkinObjectType::kChromeText, SkinColourProperty::kText, SkinColourState::kEmphasis),
-                ColourChart::kOrange,
-                ColourChart::kOrange,
-                ColourChart::kOrange
+                ColourChart::kBrandOrange,
+                ColourChart::kBrandOrange,
+                ColourChart::kBrandOrange
             };
         }
 
@@ -163,7 +163,7 @@ namespace TSS::SkinColours
                 skinColourKey(SkinObjectType::kFooterMessage, SkinColourProperty::kText, SkinColourState::kInfo),
                 ColourChart::kGrey500,
                 ColourChart::kGrey500,
-                ColourChart::kCafe800
+                ColourChart::kCafe700
             };
 
             inline constexpr ColourElement kMessageWarning = {

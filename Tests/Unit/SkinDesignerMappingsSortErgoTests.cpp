@@ -62,8 +62,8 @@ private:
         TSS::DevSkin::NamedSkin skin;
         skin.id = "test-sort-ergo";
         skin.name = "Test";
-        skin.mappings[borderOff()] = "kBlue";
-        skin.mappings[borderOn()] = "kBlue";
+        skin.mappings[borderOff()] = "kBrandBlue";
+        skin.mappings[borderOn()] = "kBrandBlue";
         return skin;
     }
 
@@ -111,7 +111,7 @@ private:
         expectEquals(sortDisplayValue(skin, textHover(), SortColumn::kMappedColour),
                      juce::String(kUnboundMenuValue));
         expectEquals(sortDisplayValue(skin, borderOff(), SortColumn::kMappedColour),
-                     juce::String("kBlue"));
+                     juce::String("kBrandBlue"));
         expectEquals(sortDisplayValue(skin, borderOn(), SortColumn::kColourSet),
                      juce::String("cs1"));
     }

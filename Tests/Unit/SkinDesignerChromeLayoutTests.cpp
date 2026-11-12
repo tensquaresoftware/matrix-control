@@ -51,7 +51,7 @@ private:
 
         const int exact = SkinDesignerChrome::kWindowEdgeGutter
                           + SkinDesignerChrome::sessionWellPreferredWidth()
-                          + SkinDesignerChrome::kButtonGap
+                          + SkinDesignerChrome::kSessionOperationGap
                           + SkinDesignerChrome::operationWellMinWidth()
                           + SkinDesignerChrome::kWindowEdgeGutter;
         const int bodyMin = SkinDesignerChrome::windowBodyWidthForPalettePanel(
