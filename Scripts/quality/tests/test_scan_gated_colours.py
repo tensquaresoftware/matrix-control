@@ -61,6 +61,8 @@ def test_lock_film_and_palette_are_allowlisted(scan):
     assert scan.is_allowlisted("Source/GUI/Skins/SkinColoursPanels.h")
     assert scan.is_allowlisted("Source/GUI/Skins/Dev/DevSkinBridgeClient.cpp")
     assert scan.is_allowlisted("Source/GUI/Skins/Dev/DevSkinTypes.h")
+    assert scan.is_allowlisted("Source/GUI/Skins/Dev/DevSkinMinimalSeedBlack.cpp")
+    assert scan.is_allowlisted("Source/GUI/Skins/Dev/DevSkinMinimalSeedCream.cpp")
     assert not scan.is_allowlisted("Source/GUI/Widgets/Led.cpp")
 
 

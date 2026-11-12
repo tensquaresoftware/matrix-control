@@ -14,10 +14,10 @@ Allowlisted SSOT / policy paths (not scanned for violations):
   - Helpers/LockDimmingFilm.cpp
   - Skins/Dev/DevSkinBridge*.cpp (IPC magic, not UI colours)
   - Skins/Dev/DevSkinTypes.h (default ARGB sentinel, not UI paint)
+  - Skins/Dev/DevSkinMinimalSeed*.cpp (compiled MINIMAL seed tables; hex is the inventory)
 
 Excluded entirely:
-  - Source/GUI/Tests/**
-
+  - Source/GUI/Tests/** (legacy path; harness removed)
 Usage:
   python3 Scripts/quality/scan_gated_colours.py
 
@@ -44,6 +44,8 @@ ALLOWLIST_UNDER_GUI = {
     "Skins/Dev/DevSkinBridgeClient.cpp",
     "Skins/Dev/DevSkinBridgeServer.cpp",
     "Skins/Dev/DevSkinTypes.h",
+    "Skins/Dev/DevSkinMinimalSeedBlack.cpp",
+    "Skins/Dev/DevSkinMinimalSeedCream.cpp",
 }
 
 HEX_PATTERN = re.compile(r"0[xX][0-9A-Fa-f]{6,8}")
