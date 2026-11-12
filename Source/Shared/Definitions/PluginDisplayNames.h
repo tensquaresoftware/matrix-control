@@ -662,6 +662,7 @@ namespace PluginDisplayNames
             constexpr const char* kBlackChroma = "BLACK/CHROMA";
             constexpr const char* kBlackMinimal = "BLACK/MINIMAL";
             constexpr const char* kCream = "CREAM/GREEN";
+            constexpr const char* kCreamChroma = "CREAM/CHROMA";
             constexpr const char* kCreamMinimal = "CREAM/MINIMAL";
         }
 

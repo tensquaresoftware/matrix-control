@@ -9,14 +9,26 @@
 #include "GUI/Helpers/ContextualHelpBinder.h"
 #include "GUI/Helpers/EditorChromeShortcuts.h"
 #include "GUI/Layout/ScaledDrawing.h"
-#include "GUI/Layout/Design/DesignPanels.h"
 #include "GUI/Looks/LookBuilders.h"
-#include "GUI/Skins/Skin.h"
+#include "GUI/Skins/ColourChart.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
-#include "Shared/Definitions/PluginIDs.h"
 
 namespace TSS
 {
+    namespace
+    {
+        juce::Colour menuItemTextColour(const PopupMenuLook& look,
+                                        bool muted,
+                                        bool hot) noexcept
+        {
+            if (muted)
+                return look.textDisabled;
+            if (hot)
+                return look.textHover;
+            return look.text;
+        }
+    }
+
     HeaderLogoPopupMenu::HeaderLogoPopupMenu(ISkin& skin, Config config)
         : uiScale_(config.uiScale)
         , currentSkinItemId_(config.currentSkinItemId)
@@ -42,85 +54,44 @@ namespace TSS
 
     HeaderLogoPopupMenu::~HeaderLogoPopupMenu() = default;
 
-    void HeaderLogoPopupMenu::buildItems()
-    {
-        items_.clear();
-        appendUiScaleColumnItems();
-        appendSkinAndActionColumnItems();
-    }
-
-    void HeaderLogoPopupMenu::appendUiScaleColumnItems()
-    {
-        items_.push_back({ ItemKind::SectionHeader,
-                           0,
-                           PluginDisplayNames::HeaderPanel::kLogoUiScaleSection,
-                           TSS::EditorChromeShortcutLabels::uiScaleStep(),
-                           0,
-                           0 });
-        items_.push_back({ ItemKind::UiScale, PluginIDs::Settings::ScaleLevels::k50,
-                           PluginDisplayNames::ChoiceLists::ScaleLevels::k50, {}, 0, 1 });
-        items_.push_back({ ItemKind::UiScale, PluginIDs::Settings::ScaleLevels::k75,
-                           PluginDisplayNames::ChoiceLists::ScaleLevels::k75, {}, 0, 2 });
-        items_.push_back({ ItemKind::UiScale, PluginIDs::Settings::ScaleLevels::k100,
-                           PluginDisplayNames::ChoiceLists::ScaleLevels::k100,
-                           TSS::EditorChromeShortcutLabels::uiScaleReset(), 0, 3 });
-        items_.push_back({ ItemKind::UiScale, PluginIDs::Settings::ScaleLevels::k125,
-                           PluginDisplayNames::ChoiceLists::ScaleLevels::k125, {}, 0, 4 });
-        items_.push_back({ ItemKind::UiScale, PluginIDs::Settings::ScaleLevels::k150,
-                           PluginDisplayNames::ChoiceLists::ScaleLevels::k150, {}, 0, 5 });
-        items_.push_back({ ItemKind::UiScale, PluginIDs::Settings::ScaleLevels::k175,
-                           PluginDisplayNames::ChoiceLists::ScaleLevels::k175, {}, 0, 6 });
-        items_.push_back({ ItemKind::UiScale, PluginIDs::Settings::ScaleLevels::k200,
-                           PluginDisplayNames::ChoiceLists::ScaleLevels::k200, {}, 0, 7 });
-    }
-
-    void HeaderLogoPopupMenu::appendSkinAndActionColumnItems()
-    {
-        items_.push_back({ ItemKind::SectionHeader, 0, PluginDisplayNames::HeaderPanel::kLogoSkinSection, {}, 1, 0 });
-        items_.push_back({ ItemKind::Skin,
-                           static_cast<int>(Skin::SkinComboBoxItemId::kBlack),
-                           PluginDisplayNames::ChoiceLists::SkinVariants::kBlack,
-                           TSS::EditorChromeShortcutLabels::skinVariant(1),
-                           1, 1 });
-        items_.push_back({ ItemKind::Skin,
-                           static_cast<int>(Skin::SkinComboBoxItemId::kBlackChroma),
-                           PluginDisplayNames::ChoiceLists::SkinVariants::kBlackChroma,
-                           TSS::EditorChromeShortcutLabels::skinVariant(2),
-                           1, 2 });
-        items_.push_back({ ItemKind::Skin,
-                           static_cast<int>(Skin::SkinComboBoxItemId::kBlackMinimal),
-                           PluginDisplayNames::ChoiceLists::SkinVariants::kBlackMinimal,
-                           TSS::EditorChromeShortcutLabels::skinVariant(3),
-                           1, 3 });
-        items_.push_back({ ItemKind::Skin,
-                           static_cast<int>(Skin::SkinComboBoxItemId::kCream),
-                           PluginDisplayNames::ChoiceLists::SkinVariants::kCream,
-                           TSS::EditorChromeShortcutLabels::skinVariant(4),
-                           1, 4 });
-        items_.push_back({ ItemKind::Skin,
-                           static_cast<int>(Skin::SkinComboBoxItemId::kCreamMinimal),
-                           PluginDisplayNames::ChoiceLists::SkinVariants::kCreamMinimal,
-                           TSS::EditorChromeShortcutLabels::skinVariant(5),
-                           1, 5 });
-        items_.push_back({ ItemKind::Spacer, 0, {}, {}, 1, 6 });
-        items_.push_back({ ItemKind::HorizontalRule, 0, {}, {}, 1, 7 });
-
-        items_.push_back({ ItemKind::Settings,
-                           0,
-                           PluginDisplayNames::HeaderPanel::kSettingsButton,
-                           TSS::EditorChromeShortcutLabels::openSettings(),
-                           1, 8 });
-        items_.push_back({ ItemKind::About,
-                           0,
-                           PluginDisplayNames::HeaderPanel::kAboutButton,
-                           {},
-                           1, 9 });
-    }
-
     int HeaderLogoPopupMenu::getItemHeightPx() const
     {
         return juce::jmax(1, juce::roundToInt(
             static_cast<float>(ComboBox::getPopupLayoutDimensions().itemHeight) * uiScale_));
+    }
+
+    float HeaderLogoPopupMenu::getRowHeightPx(const MenuItem& item) const
+    {
+        if (item.kind == ItemKind::HorizontalRule)
+        {
+            const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
+            return ScaledDrawing::snappedStrokeThicknessFromDesign(
+                static_cast<float>(ComboBox::getPopupLayoutDimensions().borderThickness),
+                uiScale_,
+                systemDisplayScale,
+                ScaledDrawing::StrokeSnapPolicy::kRound);
+        }
+
+        return static_cast<float>(getItemHeightPx());
+    }
+
+    float HeaderLogoPopupMenu::columnContentHeightForDisplayScale(int column, float systemDisplayScale) const
+    {
+        const float ruleHeight = ScaledDrawing::snappedStrokeThicknessFromDesign(
+            static_cast<float>(ComboBox::getPopupLayoutDimensions().borderThickness),
+            uiScale_,
+            systemDisplayScale,
+            ScaledDrawing::StrokeSnapPolicy::kRound);
+        const float itemHeight = static_cast<float>(getItemHeightPx());
+
+        float height = 0.0f;
+        for (const auto& item : items_)
+        {
+            if (item.column != column)
+                continue;
+            height += item.kind == ItemKind::HorizontalRule ? ruleHeight : itemHeight;
+        }
+        return height;
     }
 
     float HeaderLogoPopupMenu::getSeparatorWidth() const
@@ -132,6 +103,15 @@ namespace TSS
     {
         const int designWidth = column == 0 ? kColumnWidthDesign_ : kActionColumnWidthDesign_;
         return static_cast<float>(designWidth) * uiScale_;
+    }
+
+    juce::Colour HeaderLogoPopupMenu::sectionHeaderTextColour() const
+    {
+        // Cream logo plate: section labels need more contrast than disabled rows (Cafe300).
+        if (look_.background == juce::Colour(ColourChart::kBrandCream))
+            return juce::Colour(ColourChart::kCafe500);
+
+        return look_.textDisabled;
     }
 
     juce::Rectangle<float> HeaderLogoPopupMenu::getItemBounds(int flatIndex) const
@@ -153,13 +133,20 @@ namespace TSS
         const float columnOffset = item.column == 0
             ? 0.0f
             : getColumnWidth(0) + separatorWidth;
-        const float itemHeight = static_cast<float>(getItemHeightPx());
+
+        float y = contentBounds.getY();
+        for (int i = 0; i < flatIndex; ++i)
+        {
+            const auto& prior = items_[static_cast<size_t>(i)];
+            if (prior.column == item.column)
+                y += getRowHeightPx(prior);
+        }
 
         return {
             contentBounds.getX() + columnOffset,
-            contentBounds.getY() + static_cast<float>(item.row) * itemHeight,
+            y,
             columnWidth,
-            itemHeight
+            getRowHeightPx(item)
         };
     }
 
@@ -179,9 +166,12 @@ namespace TSS
         if (! juce::isPositiveAndBelow(flatIndex, static_cast<int>(items_.size())))
             return false;
 
-        const auto kind = items_[static_cast<size_t>(flatIndex)].kind;
-        return kind == ItemKind::Skin || kind == ItemKind::UiScale
-            || kind == ItemKind::Settings || kind == ItemKind::About;
+        const auto& item = items_[static_cast<size_t>(flatIndex)];
+        if (! item.enabled)
+            return false;
+
+        return item.kind == ItemKind::Skin || item.kind == ItemKind::UiScale
+            || item.kind == ItemKind::Settings || item.kind == ItemKind::About;
     }
 
     bool HeaderLogoPopupMenu::isCurrentSelection(int flatIndex) const
@@ -331,25 +321,25 @@ namespace TSS
         if (item.kind == ItemKind::HorizontalRule)
         {
             g.setColour(look_.border);
-            g.fillRect(itemBounds.withSizeKeepingCentre(itemBounds.getWidth(), metrics.ruleThickness));
+            g.fillRect(itemBounds.withHeight(metrics.ruleThickness));
             return;
         }
 
-        const bool isHighlighted = highlightedFlatIndex_ == flatIndex;
-        const bool isSelected = isCurrentSelection(flatIndex);
         const bool isSectionHeader = item.kind == ItemKind::SectionHeader;
+        const bool isDisabledRow = ! item.enabled;
+        const bool isHot = ! isSectionHeader && ! isDisabledRow
+            && (highlightedFlatIndex_ == flatIndex || isCurrentSelection(flatIndex));
 
-        if ((isHighlighted || isSelected) && ! isSectionHeader)
+        if (isHot)
         {
             g.setColour(look_.backgroundHover);
             g.fillRect(itemBounds.reduced(metrics.highlightGap));
         }
 
-        auto textColour = isSectionHeader ? look_.textDisabled : look_.text;
-        if ((isHighlighted || isSelected) && ! isSectionHeader)
-            textColour = look_.textHover;
-
-        g.setColour(textColour);
+        if (isSectionHeader)
+            g.setColour(sectionHeaderTextColour());
+        else
+            g.setColour(menuItemTextColour(look_, isDisabledRow, isHot));
         g.setFont(cachedFont_);
 
         const auto textBounds = itemBounds.withTrimmedLeft(metrics.textPadding)
@@ -425,15 +415,15 @@ namespace TSS
             systemDisplayScale,
             ScaledDrawing::StrokeSnapPolicy::kRound);
         const int insetPx = juce::roundToInt(borderThickness);
-        int maxRows = 0;
-        for (const auto& item : items_)
-            maxRows = juce::jmax(maxRows, item.row + 1);
         const int separatorPx = juce::roundToInt(getSeparatorWidth());
         const int popupWidth = juce::roundToInt(getColumnWidth(0))
             + separatorPx
             + juce::roundToInt(getColumnWidth(1))
             + 2 * insetPx;
-        const int popupHeight = juce::jmax(1, maxRows) * getItemHeightPx() + 2 * insetPx;
+        const float contentHeight = juce::jmax(
+            columnContentHeightForDisplayScale(0, systemDisplayScale),
+            columnContentHeightForDisplayScale(1, systemDisplayScale));
+        const int popupHeight = juce::jmax(1, juce::roundToInt(contentHeight)) + 2 * insetPx;
 
         const auto dimensions = PopupMenuPositioner::calculateDimensions(
             logo,

@@ -409,6 +409,7 @@ set(PLUGIN_SOURCES
     Source/GUI/Widgets/Label.cpp
     Source/GUI/Widgets/Logo.cpp
     Source/GUI/Widgets/HeaderLogoPopupMenu.cpp
+    Source/GUI/Widgets/HeaderLogoPopupMenuItems.cpp
     Source/GUI/Widgets/ModulationBusCell.cpp
     Source/GUI/Widgets/ModulationBusHeader.cpp
     Source/GUI/Widgets/ModuleHeader.cpp

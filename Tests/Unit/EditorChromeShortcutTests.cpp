@@ -173,7 +173,7 @@ private:
         expectEquals(TSS::classifySkinVariantShortcut(juce::KeyPress('2', command, 0)), kBlackChroma);
         expectEquals(TSS::classifySkinVariantShortcut(juce::KeyPress('3', command, 0)), kBlackMinimal);
         expectEquals(TSS::classifySkinVariantShortcut(juce::KeyPress('4', command, 0)), kCream);
-        expectEquals(TSS::classifySkinVariantShortcut(juce::KeyPress('5', command, 0)), kCreamMinimal);
+        expectEquals(TSS::classifySkinVariantShortcut(juce::KeyPress('6', command, 0)), kCreamMinimal);
         expectEquals(TSS::classifySkinVariantShortcut(juce::KeyPress('1', commandShift, 0)), kBlack);
         expectEquals(TSS::classifySkinVariantShortcut(
                          juce::KeyPress(juce::KeyPress::numberPad2, command, 0)),
@@ -192,9 +192,12 @@ private:
         using juce::ModifierKeys;
         const auto command = ModifierKeys::commandModifier;
 
-        expectEquals(TSS::classifySkinVariantShortcut(juce::KeyPress('6', command, 0)), 0);
-        expect(! TSS::isAssignedSkinVariantShortcutDigit(6));
-        expect(! TSS::isEditorChromeShortcut(juce::KeyPress('6', command, 0)));
+        // Digit 5 reserved for upcoming CREAM/CHROMA; digit 7 unused.
+        expectEquals(TSS::classifySkinVariantShortcut(juce::KeyPress('5', command, 0)), 0);
+        expect(! TSS::isAssignedSkinVariantShortcutDigit(5));
+        expect(! TSS::isEditorChromeShortcut(juce::KeyPress('5', command, 0)));
+        expectEquals(TSS::classifySkinVariantShortcut(juce::KeyPress('7', command, 0)), 0);
+        expect(! TSS::isAssignedSkinVariantShortcutDigit(7));
     }
 
     void rejectsWhenTextWouldConflictWithPlainKeys()

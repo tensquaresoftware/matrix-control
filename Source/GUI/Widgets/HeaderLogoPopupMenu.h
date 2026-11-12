@@ -66,6 +66,7 @@ namespace TSS
             juce::String shortcut;
             int column = 0;
             int row = 0;
+            bool enabled = true;
         };
 
         inline constexpr static float kBorderThicknessDesign_ = 1.0f;
@@ -96,8 +97,11 @@ namespace TSS
         void appendUiScaleColumnItems();
         void appendSkinAndActionColumnItems();
         int getItemHeightPx() const;
+        float getRowHeightPx(const MenuItem& item) const;
+        float columnContentHeightForDisplayScale(int column, float systemDisplayScale) const;
         float getSeparatorWidth() const;
         float getColumnWidth(int column) const;
+        juce::Colour sectionHeaderTextColour() const;
         juce::Rectangle<float> getItemBounds(int flatIndex) const;
         juce::Rectangle<int> preferredBoundsOver(Logo& logo) const;
         int getFlatIndexAt(int x, int y) const;
