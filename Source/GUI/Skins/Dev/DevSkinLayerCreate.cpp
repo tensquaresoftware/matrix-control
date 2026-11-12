@@ -52,8 +52,8 @@ namespace TSS::DevSkin
         {
             if (kind == SkinKind::kCompiledBlack)
                 return kCompiledBlackId;
-            if (kind == SkinKind::kCompiledBlackDuo)
-                return kCompiledBlackDuoId;
+            if (kind == SkinKind::kCompiledBlackChroma)
+                return kCompiledBlackChromaId;
             if (kind == SkinKind::kCompiledCream)
                 return kCompiledCreamId;
             return {};
@@ -64,7 +64,7 @@ namespace TSS::DevSkin
         juce::String cursor = skin.derivedFrom;
         for (int guard = 0; guard < 64; ++guard)
         {
-            if (cursor == kCompiledBlackId || cursor == kCompiledBlackDuoId
+            if (cursor == kCompiledBlackId || cursor == kCompiledBlackChromaId
                 || cursor == kCompiledCreamId)
                 return cursor;
             const auto* parent = findSkin(cursor);

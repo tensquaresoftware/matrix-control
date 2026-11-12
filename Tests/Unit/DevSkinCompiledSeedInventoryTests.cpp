@@ -18,12 +18,12 @@ public:
     {
         beginTest("compiledSeed_colourSetsMatchFrozenInventory");
         assertCompiledSeedInventory(TSS::DevSkin::SkinKind::kCompiledBlack);
-        assertCompiledSeedInventory(TSS::DevSkin::SkinKind::kCompiledBlackDuo);
+        assertCompiledSeedInventory(TSS::DevSkin::SkinKind::kCompiledBlackChroma);
         assertCompiledSeedInventory(TSS::DevSkin::SkinKind::kCompiledCream);
 
         beginTest("compiledSkin_everyMcsK1KeyHasOwnEntryAtHigherSets");
         assertHigherSetsMirrorK1Keys(TSS::Skin::ColourVariant::Black);
-        assertHigherSetsMirrorK1Keys(TSS::Skin::ColourVariant::BlackDuo);
+        assertHigherSetsMirrorK1Keys(TSS::Skin::ColourVariant::BlackChroma);
         assertHigherSetsMirrorK1Keys(TSS::Skin::ColourVariant::Cream);
 
         beginTest("compiledBlackSeed_monoMenusAndProgressBarGreys");
@@ -120,7 +120,7 @@ private:
         using TSS::SkinColourProperty;
         using TSS::SkinObjectType;
 
-        const auto skin = TSS::DevSkin::makeCompiledSkin(TSS::DevSkin::SkinKind::kCompiledBlackDuo);
+        const auto skin = TSS::DevSkin::makeCompiledSkin(TSS::DevSkin::SkinKind::kCompiledBlackChroma);
         const auto mapping = [&skin](SkinObjectType object, SkinColourProperty property, ColourSet colourSet)
         {
             return skin.mappings.at(keyAt(object, property, colourSet));

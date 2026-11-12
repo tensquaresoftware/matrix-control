@@ -118,8 +118,8 @@ namespace TSS
             juce::uint32 argb = element.creamVariant;
             if (currentVariant_ == ColourVariant::Black)
                 argb = element.blackVariant;
-            else if (currentVariant_ == ColourVariant::BlackDuo)
-                argb = element.blackDuoVariant;
+            else if (currentVariant_ == ColourVariant::BlackChroma)
+                argb = element.blackChromaVariant;
             colours_[element.key] = juce::Colour(argb);
         });
     }

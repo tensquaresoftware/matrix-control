@@ -149,7 +149,7 @@ namespace TSS
         Tolerates textCharacter == 0 (macOS clears it when Command is down).
         Accepts '=' and Shift+'=' / Shift+'+' as zoom-in peers of '+' (layouts without a dedicated + key).
         UI Scale reset also accepts the physical main-row "0" key on AZERTY/ISO (à / ò) and Cmd/Ctrl+Shift+0.
-        Skin selection uses Cmd/Ctrl+1..N in combo order (1=BLACK, 2=BLACK/DUO, 3=CREAM, …).
+        Skin selection uses Cmd/Ctrl+1..N in combo order (1=BLACK, 2=BLACK/CHROMA, 3=CREAM, …).
     */
     inline EditorChromeShortcut classifyEditorChromeShortcut(const juce::KeyPress& key)
     {
@@ -167,7 +167,7 @@ namespace TSS
         switch (digit)
         {
             case 1: return kBlack;
-            case 2: return kBlackDuo;
+            case 2: return kBlackChroma;
             case 3: return kCream;
             default: return 0;
         }
@@ -181,7 +181,7 @@ namespace TSS
 
     /**
         Returns SkinVariants id for Cmd/Ctrl+digit in combo order, or 0 if none / unassigned.
-        Digits follow the product combo (1=BLACK, 2=BLACK/DUO, 3=CREAM); ids stay stable for prefs.
+        Digits follow the product combo (1=BLACK, 2=BLACK/CHROMA, 3=CREAM); ids stay stable for prefs.
     */
     inline int classifySkinVariantShortcut(const juce::KeyPress& key)
     {

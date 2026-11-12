@@ -83,8 +83,8 @@ namespace TSS
                            TSS::EditorChromeShortcutLabels::skinVariant(1),
                            1, 1 });
         items_.push_back({ ItemKind::Skin,
-                           static_cast<int>(Skin::SkinComboBoxItemId::kBlackDuo),
-                           PluginDisplayNames::ChoiceLists::SkinVariants::kBlackDuo,
+                           static_cast<int>(Skin::SkinComboBoxItemId::kBlackChroma),
+                           PluginDisplayNames::ChoiceLists::SkinVariants::kBlackChroma,
                            TSS::EditorChromeShortcutLabels::skinVariant(2),
                            1, 2 });
         items_.push_back({ ItemKind::Skin,

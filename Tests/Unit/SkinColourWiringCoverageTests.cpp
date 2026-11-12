@@ -41,7 +41,7 @@ public:
 
         beginTest("ownerSeeds_matchFormerBorrowSourcesForEveryProductSkin");
         assertOwnerSeedParity(TSS::Skin::ColourVariant::Black);
-        assertOwnerSeedParity(TSS::Skin::ColourVariant::BlackDuo);
+        assertOwnerSeedParity(TSS::Skin::ColourVariant::BlackChroma);
         assertOwnerSeedParity(TSS::Skin::ColourVariant::Cream);
 
         beginTest("remapNumberBoxFocusAndCaret_leavesModuleHeaderAndSlider");
@@ -69,7 +69,7 @@ public:
         assertModalesAndHeaderLooksResolveZoneSets();
 
         beginTest("blackDuoSeed_zoneAccentsAndModalesMono");
-        assertBlackDuoSeedZoneLooks();
+        assertBlackChromaSeedZoneLooks();
 
         beginTest("creamSeed_sharedGreensAndCafeModales");
         assertCreamSeedZoneLooks();
@@ -128,7 +128,7 @@ private:
 
     void assertModuleHeaderLookTextHoverUsesOwner()
     {
-        const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::BlackDuo);
+        const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::BlackChroma);
         const auto look = TSS::moduleHeaderLookFromSkin(*skin);
         expect(look.textHover == skin->getColour(key(SkinObjectType::kModuleHeader,
                                                      SkinColourProperty::kText,
@@ -280,7 +280,7 @@ private:
 
     void assertReadOnlyValueFieldUcsConstructionAndSetSkin()
     {
-        const auto skinA = TSS::Skin::create(TSS::Skin::ColourVariant::BlackDuo);
+        const auto skinA = TSS::Skin::create(TSS::Skin::ColourVariant::BlackChroma);
         const auto skinB = TSS::Skin::create(TSS::Skin::ColourVariant::Cream);
 
         TSS::ReadOnlyValueField field(*skinA);
@@ -307,7 +307,7 @@ private:
 
     void assertModalesAndHeaderLooksResolveZoneSets()
     {
-        const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::BlackDuo);
+        const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::BlackChroma);
         paintDistinctPastillesForSets(*skin);
 
         expectLookUsesSet(TSS::sliderLookForZone(*skin, SkinZone::kModales).trackEnabled,
@@ -328,7 +328,7 @@ private:
                                              SkinColourState::kDefault, ColourSet::k3));
     }
 
-    void assertBlackDuoMonoMenus(const TSS::Skin& skin)
+    void assertBlackChromaMonoMenus(const TSS::Skin& skin)
     {
         const auto comboPatch = TSS::comboBoxLookForZone(skin, SkinZone::kPatch);
         const auto comboMono = TSS::comboBoxLookForZone(skin, SkinZone::kModales);
@@ -347,9 +347,9 @@ private:
         expect(popupMono.textHover == juce::Colour(ColourChart::kBlack));
     }
 
-    void assertBlackDuoSeedZoneLooks()
+    void assertBlackChromaSeedZoneLooks()
     {
-        const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::BlackDuo);
+        const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::BlackChroma);
         const auto patch = TSS::sliderLookForZone(*skin, SkinZone::kPatch);
         const auto master = TSS::sliderLookForZone(*skin, SkinZone::kMaster);
         const auto header = TSS::sliderLookForZone(*skin, SkinZone::kHeader);
@@ -361,7 +361,7 @@ private:
         expect(modales.valueBarEnabled == juce::Colour(ColourChart::kGrey600));
         expect(modales.textEnabled == juce::Colour(ColourChart::kGrey200));
 
-        assertBlackDuoMonoMenus(*skin);
+        assertBlackChromaMonoMenus(*skin);
     }
 
     void assertCreamSeedZoneLooks()

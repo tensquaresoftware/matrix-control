@@ -16,7 +16,7 @@ namespace TSS::DevSkin
             switch (kind)
             {
                 case SkinKind::kCompiledBlack:    return "compiledBlack";
-                case SkinKind::kCompiledBlackDuo: return "compiledBlackDuo";
+                case SkinKind::kCompiledBlackChroma: return "compiledBlackChroma";
                 case SkinKind::kCompiledCream:    return "compiledCream";
                 case SkinKind::kDev:              return "dev";
             }
@@ -26,7 +26,7 @@ namespace TSS::DevSkin
         bool kindFromString(const juce::String& text, SkinKind& out)
         {
             if (text == "compiledBlack")    { out = SkinKind::kCompiledBlack; return true; }
-            if (text == "compiledBlackDuo") { out = SkinKind::kCompiledBlackDuo; return true; }
+            if (text == "compiledBlackChroma" || text == "compiledBlackDuo") { out = SkinKind::kCompiledBlackChroma; return true; }
             if (text == "compiledCream")    { out = SkinKind::kCompiledCream; return true; }
             if (text == "dev")              { out = SkinKind::kDev; return true; }
             return false;
@@ -240,7 +240,7 @@ namespace TSS::DevSkin
                 if (skin.kind != SkinKind::kDev)
                     return JsonIoResult::failure("Imported skins must be kind=dev");
                 if (skin.id == kCompiledBlackId
-                    || skin.id == kCompiledBlackDuoId
+                    || skin.id == kCompiledBlackChromaId
                     || skin.id == kCompiledCreamId)
                 {
                     return JsonIoResult::failure("Imported Designer skin cannot reuse compiled ids");
@@ -308,7 +308,7 @@ namespace TSS::DevSkin
 
             std::vector<NamedSkin> skins;
             skins.push_back(makeCompiledSkin(SkinKind::kCompiledBlack));
-            skins.push_back(makeCompiledSkin(SkinKind::kCompiledBlackDuo));
+            skins.push_back(makeCompiledSkin(SkinKind::kCompiledBlackChroma));
             skins.push_back(makeCompiledSkin(SkinKind::kCompiledCream));
 
             const auto compiledCount = skins.size();
@@ -401,8 +401,8 @@ namespace TSS::DevSkin
                 return;
             if (out.kind == SkinKind::kCompiledBlack || out.derivedFrom == kCompiledBlackId)
                 out.compiledAncestorId = kCompiledBlackId;
-            else if (out.kind == SkinKind::kCompiledBlackDuo || out.derivedFrom == kCompiledBlackDuoId)
-                out.compiledAncestorId = kCompiledBlackDuoId;
+            else if (out.kind == SkinKind::kCompiledBlackChroma || out.derivedFrom == kCompiledBlackChromaId)
+                out.compiledAncestorId = kCompiledBlackChromaId;
             else
                 out.compiledAncestorId = kCompiledCreamId;
         }

@@ -200,7 +200,7 @@ namespace PluginIDs
         {
             constexpr int kBlack = 1;
             constexpr int kCream = 2;
-            constexpr int kBlackDuo = 3;
+            constexpr int kBlackChroma = 3;
             constexpr int kDefault = kBlack;
         }
 

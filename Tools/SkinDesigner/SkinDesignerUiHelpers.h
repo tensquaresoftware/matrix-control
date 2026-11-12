@@ -94,19 +94,20 @@ namespace SkinDesignerUi
         return out;
     }
 
-    /** Product combo item IDs: 1=BLACK, 2=BLACK/DUO, 3=CREAM. */
+    /** Product combo item IDs: 1=BLACK/GREEN, 2=BLACK/CHROMA, 3=CREAM/GREEN. */
     inline juce::String productSkinIdFromComboId(int comboId)
     {
         if (comboId == 1)
             return TSS::DevSkin::kCompiledBlackId;
         if (comboId == 2)
-            return TSS::DevSkin::kCompiledBlackDuoId;
+            return TSS::DevSkin::kCompiledBlackChromaId;
         return TSS::DevSkin::kCompiledCreamId;
     }
 
     inline int productComboIdFromSkinId(const juce::String& skinId)
     {
-        if (skinId == TSS::DevSkin::kCompiledBlackDuoId)
+        if (skinId == TSS::DevSkin::kCompiledBlackChromaId
+            || skinId == "compiled:black-duo")
             return 2;
         if (skinId == TSS::DevSkin::kCompiledCreamId)
             return 3;

@@ -88,7 +88,7 @@ private:
         using namespace PluginIDs::Settings::SkinVariants;
         expectEquals(kBlack, 1);
         expectEquals(kCream, 2);
-        expectEquals(kBlackDuo, 3);
+        expectEquals(kBlackChroma, 3);
     }
 
     void logoMenuScaleAndSkinSectionCopy()
@@ -102,16 +102,16 @@ private:
         expectEquals(juce::String(PluginDisplayNames::ChoiceLists::ScaleLevels::k100),
                      juce::String("100%"));
         expectEquals(juce::String(PluginDisplayNames::ChoiceLists::SkinVariants::kBlack),
-                     juce::String("BLACK"));
-        expectEquals(juce::String(PluginDisplayNames::ChoiceLists::SkinVariants::kBlackDuo),
-                     juce::String("BLACK/DUO"));
+                     juce::String("BLACK/GREEN"));
+        expectEquals(juce::String(PluginDisplayNames::ChoiceLists::SkinVariants::kBlackChroma),
+                     juce::String("BLACK/CHROMA"));
         expectEquals(juce::String(PluginDisplayNames::ChoiceLists::SkinVariants::kCream),
-                     juce::String("CREAM"));
+                     juce::String("CREAM/GREEN"));
     }
 
     void matrixWizardChromeUsesBlackCompiledSkin()
     {
-        beginTest("Getting Started chrome - Matrix plate always uses BLACK compiled skin");
+        beginTest("Getting Started chrome - Matrix plate always uses BLACK/GREEN compiled skin");
 
         expect(TSS::Skin::kGettingStartedMatrixChromeVariant == TSS::Skin::ColourVariant::Black);
         expectEquals(PluginIDs::Settings::SkinVariants::kBlack, 1);
@@ -122,7 +122,7 @@ private:
         expect(liveCream->getColourVariant() == TSS::Skin::ColourVariant::Cream);
         expect(chromeSkin->getColourVariant() != liveCream->getColourVariant());
         expectEquals(juce::String(PluginDisplayNames::ChoiceLists::SkinVariants::kBlack),
-                     juce::String("BLACK"));
+                     juce::String("BLACK/GREEN"));
     }
 
     void autoOpenPreferencePersistsAndDefaults()

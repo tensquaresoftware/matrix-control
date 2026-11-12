@@ -16,19 +16,19 @@ namespace TSS
         enum class ColourVariant
         {
             Black,
-            BlackDuo,
+            BlackChroma,
             Cream
         };
 
-        /** Getting Started Matrix monochrome chrome always uses classic BLACK,
-            never BLACK/DUO or CREAM (dark plate vs cream body text). */
+        /** Getting Started Matrix monochrome chrome always uses BLACK/GREEN,
+            never BLACK/CHROMA or CREAM/GREEN (dark plate vs cream body text). */
         static constexpr ColourVariant kGettingStartedMatrixChromeVariant = ColourVariant::Black;
 
         enum class SkinComboBoxItemId : int
         {
             kBlack = 1,
             kCream = 2,
-            kBlackDuo = 3
+            kBlackChroma = 3
         };
 
         explicit Skin(ColourVariant variant);

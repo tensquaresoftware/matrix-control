@@ -22,7 +22,7 @@ public:
         assertDialogOwnsCloseGlyph();
 
         beginTest("chromeTextAndBrandLooks_resolveFromSkin");
-        assertChromeTextAndBrandLooks(TSS::Skin::ColourVariant::BlackDuo);
+        assertChromeTextAndBrandLooks(TSS::Skin::ColourVariant::BlackChroma);
         assertChromeTextAndBrandLooks(TSS::Skin::ColourVariant::Cream);
     }
 
@@ -32,7 +32,7 @@ private:
         using TSS::SkinObjectType;
         using TSS::SkinColourProperty;
 
-        const auto black = TSS::Skin::create(TSS::Skin::ColourVariant::BlackDuo);
+        const auto black = TSS::Skin::create(TSS::Skin::ColourVariant::BlackChroma);
         const auto cream = TSS::Skin::create(TSS::Skin::ColourVariant::Cream);
 
         expect(black->getColour(SkinObjectType::kWindowSurface, SkinColourProperty::kBackground)
@@ -75,7 +75,7 @@ private:
                    == juce::Colour(titleBand));
         };
 
-        assertGlyphAndTitleBand(TSS::Skin::ColourVariant::BlackDuo, ColourChart::kBlack);
+        assertGlyphAndTitleBand(TSS::Skin::ColourVariant::BlackChroma, ColourChart::kBlack);
         assertGlyphAndTitleBand(TSS::Skin::ColourVariant::Cream, ColourChart::kCream400);
     }
 

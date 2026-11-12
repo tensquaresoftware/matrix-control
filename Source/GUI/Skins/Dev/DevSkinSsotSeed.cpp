@@ -33,8 +33,8 @@ namespace TSS::DevSkin
         {
             if (kind == SkinKind::kCompiledBlack)
                 return element.blackVariant;
-            if (kind == SkinKind::kCompiledBlackDuo)
-                return element.blackDuoVariant;
+            if (kind == SkinKind::kCompiledBlackChroma)
+                return element.blackChromaVariant;
             return element.creamVariant;
         }
 
@@ -48,7 +48,7 @@ namespace TSS::DevSkin
         bool isCompiledKind(SkinKind kind) noexcept
         {
             return kind == SkinKind::kCompiledBlack
-                || kind == SkinKind::kCompiledBlackDuo
+                || kind == SkinKind::kCompiledBlackChroma
                 || kind == SkinKind::kCompiledCream;
         }
     }
@@ -62,17 +62,17 @@ namespace TSS::DevSkin
         if (kind == SkinKind::kCompiledBlack)
         {
             skin.id = kCompiledBlackId;
-            skin.name = "Black";
+            skin.name = "BLACK/GREEN";
         }
-        else if (kind == SkinKind::kCompiledBlackDuo)
+        else if (kind == SkinKind::kCompiledBlackChroma)
         {
-            skin.id = kCompiledBlackDuoId;
-            skin.name = "Black/Duo";
+            skin.id = kCompiledBlackChromaId;
+            skin.name = "BLACK/CHROMA";
         }
         else
         {
             skin.id = kCompiledCreamId;
-            skin.name = "Cream";
+            skin.name = "CREAM/GREEN";
         }
         skin.derivedFrom = {};
         seedFromCompiled(skin, kind);

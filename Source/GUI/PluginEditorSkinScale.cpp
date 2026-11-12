@@ -141,8 +141,8 @@ void PluginEditor::updateOverlayLayoutsForUiScale(float uiScale)
 TSS::Skin* PluginEditor::skinForVariantId(int skinItemId) const noexcept
 {
     using namespace PluginIDs::Settings::SkinVariants;
-    if (skinItemId == kBlackDuo)
-        return skinBlackDuo_.get();
+    if (skinItemId == kBlackChroma)
+        return skinBlackChroma_.get();
     if (skinItemId == kCream)
         return skinCream_.get();
     return skinBlack_.get();
@@ -180,11 +180,11 @@ TSS::DevSkin::ApplyResult PluginEditor::applyDevSkinPush(const TSS::DevSkin::Pus
         return result;
     }
 
-    if (payload.kind == SkinKind::kCompiledBlackDuo)
+    if (payload.kind == SkinKind::kCompiledBlackChroma)
     {
-        applySkinFromItemId(PluginIDs::Settings::SkinVariants::kBlackDuo, false);
+        applySkinFromItemId(PluginIDs::Settings::SkinVariants::kBlackChroma, false);
         result.ok = true;
-        result.message = "Compiled Black/Duo";
+        result.message = "Compiled BLACK/CHROMA";
         return result;
     }
 

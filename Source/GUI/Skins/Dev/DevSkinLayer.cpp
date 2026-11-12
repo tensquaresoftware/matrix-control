@@ -19,7 +19,7 @@ namespace TSS::DevSkin
     {
         skins_.clear();
         skins_.push_back(makeCompiledSkin(SkinKind::kCompiledBlack));
-        skins_.push_back(makeCompiledSkin(SkinKind::kCompiledBlackDuo));
+        skins_.push_back(makeCompiledSkin(SkinKind::kCompiledBlackChroma));
         skins_.push_back(makeCompiledSkin(SkinKind::kCompiledCream));
         activeSkinId_ = kCompiledCreamId;
         bump();
@@ -417,7 +417,7 @@ namespace TSS::DevSkin
 
     bool Layer::isCompiledId(const juce::String& id) const
     {
-        return id == kCompiledBlackId || id == kCompiledBlackDuoId || id == kCompiledCreamId;
+        return id == kCompiledBlackId || id == kCompiledBlackChromaId || id == kCompiledCreamId;
     }
 
     bool Layer::nameTaken(const juce::String& name, const juce::String& exceptId) const

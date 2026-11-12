@@ -227,9 +227,9 @@ void SkinDesignerMainComponent::refreshCombos()
     auto& productCombo = skinsPanel_.productCombo();
     auto& designerCombo = skinsPanel_.designerCombo();
     productCombo.clear(juce::dontSendNotification);
-    productCombo.addItem("BLACK", 1);
-    productCombo.addItem("BLACK/DUO", 2);
-    productCombo.addItem("CREAM", 3);
+    productCombo.addItem("BLACK/GREEN", 1);
+    productCombo.addItem("BLACK/CHROMA", 2);
+    productCombo.addItem("CREAM/GREEN", 3);
     productCombo.setSelectedId(SkinDesignerUi::productComboIdFromSkinId(sessionState_.productSkinId),
                                juce::dontSendNotification);
 

@@ -38,20 +38,23 @@ struct ColourChart
 
     static constexpr juce::uint32 kBlue950     = 0xFF012959;
     static constexpr juce::uint32 kBlue800     = 0xFF053979;
-    static constexpr juce::uint32 kBlue600     = 0xFF0A6E99;
-    static constexpr juce::uint32 kBlue400     = 0xFF34C4F4;
+    /** BLACK/CHROMA Patch fills (from trial BLACK/DUO 4). */
+    static constexpr juce::uint32 kBlue600     = 0xFF034FAD;
+    static constexpr juce::uint32 kBlue400     = 0xFF28A0F8;
 
     static constexpr juce::uint32 kOrange950   = 0xFF422514;
     static constexpr juce::uint32 kOrange800   = 0xFF7A4511;
-    static constexpr juce::uint32 kOrange700   = 0xFF904809;
+    /** BLACK/CHROMA Master fills / accents (from trial BLACK/DUO 4). */
+    static constexpr juce::uint32 kOrange700   = 0xFF854408;
     /** Footer WARNING badge — distinct from brand / Master `kOrange`. */
     static constexpr juce::uint32 kOrange500   = 0xFFFF6600;
-    static constexpr juce::uint32 kOrange400   = 0xFFF49325;
+    static constexpr juce::uint32 kOrange400   = 0xFFEE8B21;
 
-    static constexpr juce::uint32 kYellow950   = 0xFF3B360D;
-    static constexpr juce::uint32 kYellow800   = 0xFF77770D;
-    static constexpr juce::uint32 kYellow700   = 0xFF937910;
-    static constexpr juce::uint32 kYellow400   = 0xFFECC93C;
+    /** BLACK/CHROMA Header yellows (warm #FFCC00 family from trial BLACK/DUO 4). */
+    static constexpr juce::uint32 kYellow950   = 0xFF3D3208;
+    static constexpr juce::uint32 kYellow800   = 0xFF5C4A00;
+    static constexpr juce::uint32 kYellow700   = 0xFF806600;
+    static constexpr juce::uint32 kYellow400   = 0xFFFFCC00;
 
     static constexpr juce::uint32 kCream400    = 0xFFD9CFB8;
 

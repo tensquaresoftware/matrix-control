@@ -286,7 +286,7 @@ private:
     PluginProcessor& pluginProcessor;
 
     std::unique_ptr<TSS::Skin> skinBlack_;
-    std::unique_ptr<TSS::Skin> skinBlackDuo_;
+    std::unique_ptr<TSS::Skin> skinBlackChroma_;
     std::unique_ptr<TSS::Skin> skinCream_;
     TSS::Skin* skinForVariantId(int skinItemId) const noexcept;
 #if defined(MATRIX_SKIN_DESIGNER_DEV_LAYER)

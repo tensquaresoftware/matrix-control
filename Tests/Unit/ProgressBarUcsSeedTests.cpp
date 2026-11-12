@@ -24,23 +24,23 @@ public:
 
         beginTest("ucsSeed_matchesModalesSliderOnBothSkins");
 
-        expect(ProgressBar::kTrack.blackDuoVariant == SliderK4::kTrack.blackDuoVariant);
+        expect(ProgressBar::kTrack.blackChromaVariant == SliderK4::kTrack.blackChromaVariant);
         expect(ProgressBar::kTrack.creamVariant == SliderK4::kTrack.creamVariant);
-        expect(ProgressBar::kValueBar.blackDuoVariant == SliderK4::kValueBar.blackDuoVariant);
+        expect(ProgressBar::kValueBar.blackChromaVariant == SliderK4::kValueBar.blackChromaVariant);
         expect(ProgressBar::kValueBar.creamVariant == SliderK4::kValueBar.creamVariant);
-        expect(ProgressBar::kText.blackDuoVariant == SliderK4::kText.blackDuoVariant);
+        expect(ProgressBar::kText.blackChromaVariant == SliderK4::kText.blackChromaVariant);
         expect(ProgressBar::kText.creamVariant == SliderK4::kText.creamVariant);
-        expect(ProgressBar::kTrack.blackDuoVariant == ColourChart::kBlack);
-        expect(ProgressBar::kValueBar.blackDuoVariant == ColourChart::kGrey600);
-        expect(ProgressBar::kText.blackDuoVariant == ColourChart::kGrey200);
+        expect(ProgressBar::kTrack.blackChromaVariant == ColourChart::kBlack);
+        expect(ProgressBar::kValueBar.blackChromaVariant == ColourChart::kGrey600);
+        expect(ProgressBar::kText.blackChromaVariant == ColourChart::kGrey200);
 
         beginTest("ucs_onlyK1IsSeeded");
 
         expect(! TSS::supportsColourSet(SkinObjectType::kProgressBar, ColourSet::k2));
-        assertHigherSetFallsBackToK1(TSS::Skin::ColourVariant::BlackDuo);
+        assertHigherSetFallsBackToK1(TSS::Skin::ColourVariant::BlackChroma);
         assertHigherSetFallsBackToK1(TSS::Skin::ColourVariant::Cream);
 
-        beginTest("disabledContract_pinsBlackDuoSharedAndCreamCafeSeeds");
+        beginTest("disabledContract_pinsBlackChromaSharedAndCreamCafeSeeds");
 
         assertDisabledContract();
     }
@@ -69,7 +69,7 @@ private:
     {
         using namespace TSS::SkinColours;
 
-        const auto blackDuo = TSS::Skin::create(TSS::Skin::ColourVariant::BlackDuo);
+        const auto blackDuo = TSS::Skin::create(TSS::Skin::ColourVariant::BlackChroma);
         expect(blackDuo->getColour(SkinObjectType::kProgressBar,
                                    SkinColourProperty::kTrack,
                                    SkinColourState::kDisabled)

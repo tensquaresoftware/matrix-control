@@ -27,12 +27,12 @@ public:
     {
         beginTest("lookBuilders_resolveStructuredKeysForBothSkins");
 
-        assertButtonBackgroundOffFromSkin(TSS::Skin::ColourVariant::BlackDuo);
+        assertButtonBackgroundOffFromSkin(TSS::Skin::ColourVariant::BlackChroma);
         assertButtonBackgroundOffFromSkin(TSS::Skin::ColourVariant::Cream);
 
         beginTest("popupMenuAndAlertLooks_resolveDisabledAndAlertFromSkin");
 
-        assertPopupMenuDisabledAndAlertLooks(TSS::Skin::ColourVariant::BlackDuo);
+        assertPopupMenuDisabledAndAlertLooks(TSS::Skin::ColourVariant::BlackChroma);
         assertPopupMenuDisabledAndAlertLooks(TSS::Skin::ColourVariant::Cream);
 
         beginTest("skinMaps_blackAndCreamColumnsDiverge");
@@ -43,17 +43,17 @@ public:
 
         beginTest("patchNameDisplay_secondaryTextIsSolidMappedColour");
 
-        assertSecondarySolid(TSS::Skin::ColourVariant::BlackDuo);
+        assertSecondarySolid(TSS::Skin::ColourVariant::BlackChroma);
         assertSecondarySolid(TSS::Skin::ColourVariant::Cream);
 
         beginTest("gapKeys_existForBlackAndCream");
 
-        assertGapKeys(TSS::Skin::ColourVariant::BlackDuo);
+        assertGapKeys(TSS::Skin::ColourVariant::BlackChroma);
         assertGapKeys(TSS::Skin::ColourVariant::Cream);
 
         beginTest("ledAndReadOnlyLooks_resolveFromSkinMaps");
 
-        assertLedAndReadOnlyLooks(TSS::Skin::ColourVariant::BlackDuo);
+        assertLedAndReadOnlyLooks(TSS::Skin::ColourVariant::BlackChroma);
         assertLedAndReadOnlyLooks(TSS::Skin::ColourVariant::Cream);
 
         beginTest("colourSet_missingHigherSetFallsBackToK1");
@@ -82,12 +82,12 @@ public:
 
         beginTest("footerMessage_severityKeysMatchChartForBothSkins");
 
-        assertFooterMessageSeverityKeys(TSS::Skin::ColourVariant::BlackDuo);
+        assertFooterMessageSeverityKeys(TSS::Skin::ColourVariant::BlackChroma);
         assertFooterMessageSeverityKeys(TSS::Skin::ColourVariant::Cream);
 
         beginTest("mainChrome_headerFooterBorderAndAlertKeys");
 
-        assertMainChromeKeys(TSS::Skin::ColourVariant::BlackDuo);
+        assertMainChromeKeys(TSS::Skin::ColourVariant::BlackChroma);
         assertMainChromeKeys(TSS::Skin::ColourVariant::Cream);
     }
 
@@ -104,8 +104,8 @@ private:
 
     static juce::Colour seedFor(TSS::Skin::ColourVariant variant, juce::uint32 blackDuo, juce::uint32 cream)
     {
-        // Duo-era pins: BlackDuo column vs Cream. Classic BLACK has its own seeds.
-        return juce::Colour(variant == TSS::Skin::ColourVariant::BlackDuo ? blackDuo : cream);
+        // Duo-era pins: BlackChroma column vs Cream. Classic BLACK has its own seeds.
+        return juce::Colour(variant == TSS::Skin::ColourVariant::BlackChroma ? blackDuo : cream);
     }
 
     static juce::Colour compositeOver(juce::Colour under, juce::Colour over)
@@ -175,7 +175,7 @@ private:
 
     void assertBodyBackgroundColumns()
     {
-        const auto black = TSS::Skin::create(TSS::Skin::ColourVariant::BlackDuo);
+        const auto black = TSS::Skin::create(TSS::Skin::ColourVariant::BlackChroma);
         const auto cream = TSS::Skin::create(TSS::Skin::ColourVariant::Cream);
         expect(black->getColour(SkinObjectType::kBodyPanel, SkinColourProperty::kBackground)
                == juce::Colour(ColourChart::kGrey900));
@@ -185,7 +185,7 @@ private:
 
     void assertCreamDivergentLabelText()
     {
-        const auto black = TSS::Skin::create(TSS::Skin::ColourVariant::BlackDuo);
+        const auto black = TSS::Skin::create(TSS::Skin::ColourVariant::BlackChroma);
         const auto cream = TSS::Skin::create(TSS::Skin::ColourVariant::Cream);
         const auto blackText = black->getColour(SkinObjectType::kLabel, SkinColourProperty::kText);
         const auto creamText = cream->getColour(SkinObjectType::kLabel, SkinColourProperty::kText);
@@ -196,7 +196,7 @@ private:
 
     void assertChromeTextColumns()
     {
-        const auto black = TSS::Skin::create(TSS::Skin::ColourVariant::BlackDuo);
+        const auto black = TSS::Skin::create(TSS::Skin::ColourVariant::BlackChroma);
         const auto cream = TSS::Skin::create(TSS::Skin::ColourVariant::Cream);
         const auto blackText = black->getColour(SkinObjectType::kChromeText, SkinColourProperty::kText);
         const auto creamText = cream->getColour(SkinObjectType::kChromeText, SkinColourProperty::kText);
@@ -299,7 +299,7 @@ private:
 
     void assertExplicitHigherSetWins()
     {
-        const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::BlackDuo);
+        const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::BlackChroma);
         auto key = TSS::skinColourKey(SkinObjectType::kSlider, SkinColourProperty::kTrack);
         const auto primaryColour = juce::Colour(ColourChart::kRed500);
         const auto setTwoColour = juce::Colour(ColourChart::kBlue);
@@ -311,7 +311,7 @@ private:
 
     void assertLedAndPeakKeys()
     {
-        for (const auto variant : { TSS::Skin::ColourVariant::BlackDuo,
+        for (const auto variant : { TSS::Skin::ColourVariant::BlackChroma,
                                     TSS::Skin::ColourVariant::Cream })
         {
             const auto skin = TSS::Skin::create(variant);
@@ -348,7 +348,7 @@ private:
         constexpr int kSize = 20;
         constexpr int kCentre = kSize / 2;
 
-        const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::BlackDuo);
+        const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::BlackChroma);
         setDistinctLedAndPeakColours(*skin);
         const auto ledMaxOn = skin->getColour(SkinObjectType::kLed,
                                               SkinColourProperty::kBackground,
@@ -391,7 +391,7 @@ private:
             juce::Colour textColour() const noexcept { return look_.text; }
         };
 
-        const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::BlackDuo);
+        const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::BlackChroma);
         const auto hover = skin->getColour(SkinObjectType::kChromeText,
                                            SkinColourProperty::kText,
                                            SkinColourState::kHover);
@@ -403,7 +403,7 @@ private:
 
     void assertReadOnlyValueFieldDefaultOverrideAndSetSkinReset()
     {
-        const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::BlackDuo);
+        const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::BlackChroma);
         const auto mappedFill = skin->getColour(SkinObjectType::kReadOnlyValueField,
                                                 SkinColourProperty::kBackground);
         const auto mappedText = skin->getColour(SkinObjectType::kReadOnlyValueField,

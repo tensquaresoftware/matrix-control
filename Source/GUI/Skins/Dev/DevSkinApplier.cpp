@@ -9,7 +9,7 @@ namespace TSS::DevSkin
         bool isCompiledKind(SkinKind kind) noexcept
         {
             return kind == SkinKind::kCompiledBlack
-                || kind == SkinKind::kCompiledBlackDuo
+                || kind == SkinKind::kCompiledBlackChroma
                 || kind == SkinKind::kCompiledCream;
         }
     }
@@ -23,11 +23,11 @@ namespace TSS::DevSkin
             return Skin::ColourVariant::Black;
         }
 
-        if (payload.kind == SkinKind::kCompiledBlackDuo
-            || payload.compiledAncestorId == kCompiledBlackDuoId
-            || payload.derivedFrom == kCompiledBlackDuoId)
+        if (payload.kind == SkinKind::kCompiledBlackChroma
+            || payload.compiledAncestorId == kCompiledBlackChromaId
+            || payload.derivedFrom == kCompiledBlackChromaId)
         {
-            return Skin::ColourVariant::BlackDuo;
+            return Skin::ColourVariant::BlackChroma;
         }
 
         if (payload.kind == SkinKind::kCompiledCream

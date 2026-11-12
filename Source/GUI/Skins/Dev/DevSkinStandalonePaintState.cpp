@@ -7,7 +7,7 @@ namespace TSS::DevSkin
     StandalonePaintState::StandalonePaintState()
     {
         black_ = Skin::create(Skin::ColourVariant::Black);
-        blackDuo_ = Skin::create(Skin::ColourVariant::BlackDuo);
+        blackChroma_ = Skin::create(Skin::ColourVariant::BlackChroma);
         cream_ = Skin::create(Skin::ColourVariant::Cream);
         selectCompiled(Skin::ColourVariant::Cream);
     }
@@ -30,8 +30,8 @@ namespace TSS::DevSkin
         compiledSelection_ = variant;
         if (variant == Skin::ColourVariant::Black)
             active_ = black_.get();
-        else if (variant == Skin::ColourVariant::BlackDuo)
-            active_ = blackDuo_.get();
+        else if (variant == Skin::ColourVariant::BlackChroma)
+            active_ = blackChroma_.get();
         else
             active_ = cream_.get();
     }
@@ -49,14 +49,14 @@ namespace TSS::DevSkin
             return result;
         }
 
-        if (payload.kind == SkinKind::kCompiledBlackDuo)
+        if (payload.kind == SkinKind::kCompiledBlackChroma)
         {
-            selectCompiled(Skin::ColourVariant::BlackDuo);
+            selectCompiled(Skin::ColourVariant::BlackChroma);
             ApplyResult result;
             result.ok = true;
             result.revision = payload.revision;
             result.appliedSkinId = payload.activeSkinId;
-            result.message = "Compiled Black/Duo";
+            result.message = "Compiled BLACK/CHROMA";
             return result;
         }
 

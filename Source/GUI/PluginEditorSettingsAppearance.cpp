@@ -17,7 +17,7 @@ void PluginEditor::restoreSettingsAppearanceFromState(SettingsPanel& panel)
 
     const int skinId = pluginProcessor.getSkinVariantId();
     const int normalizedSkin = (skinId == SkinVariants::kBlack
-                                || skinId == SkinVariants::kBlackDuo
+                                || skinId == SkinVariants::kBlackChroma
                                 || skinId == SkinVariants::kCream)
         ? skinId
         : SkinVariants::kDefault;

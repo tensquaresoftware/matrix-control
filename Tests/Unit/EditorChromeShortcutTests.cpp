@@ -170,16 +170,16 @@ private:
 
         using namespace PluginIDs::Settings::SkinVariants;
         expectEquals(TSS::classifySkinVariantShortcut(juce::KeyPress('1', command, 0)), kBlack);
-        expectEquals(TSS::classifySkinVariantShortcut(juce::KeyPress('2', command, 0)), kBlackDuo);
+        expectEquals(TSS::classifySkinVariantShortcut(juce::KeyPress('2', command, 0)), kBlackChroma);
         expectEquals(TSS::classifySkinVariantShortcut(juce::KeyPress('3', command, 0)), kCream);
         expectEquals(TSS::classifySkinVariantShortcut(juce::KeyPress('1', commandShift, 0)), kBlack);
         expectEquals(TSS::classifySkinVariantShortcut(
                          juce::KeyPress(juce::KeyPress::numberPad2, command, 0)),
-                     kBlackDuo);
+                     kBlackChroma);
         expectEquals(TSS::classifySkinVariantShortcut(juce::KeyPress('&', command, 0)), kBlack);
         expectEquals(TSS::classifySkinVariantShortcut(
                          juce::KeyPress(static_cast<int>(kEAcuteUpper), command, kEAcute)),
-                     kBlackDuo);
+                     kBlackChroma);
         expect(TSS::isEditorChromeShortcut(juce::KeyPress('1', command, 0)));
     }
 

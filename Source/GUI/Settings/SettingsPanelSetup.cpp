@@ -177,7 +177,7 @@ void SettingsPanel::populateComboItems()
 
     using namespace PluginIDs::Settings::SkinVariants;
     skinCombo_->addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kBlack, kBlack);
-    skinCombo_->addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kBlackDuo, kBlackDuo);
+    skinCombo_->addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kBlackChroma, kBlackChroma);
     skinCombo_->addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kCream, kCream);
 
     using namespace PluginIDs::Settings::InfoMessage;

@@ -73,7 +73,7 @@ void GettingStartedWizardDialog::populateScaleAndSkinItems()
     using namespace PluginIDs::Settings::SkinVariants;
     skinCombo_->clear(juce::dontSendNotification);
     skinCombo_->addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kBlack, kBlack);
-    skinCombo_->addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kBlackDuo, kBlackDuo);
+    skinCombo_->addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kBlackChroma, kBlackChroma);
     skinCombo_->addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kCream, kCream);
 }
 

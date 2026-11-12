@@ -34,7 +34,7 @@ public:
     void runTest() override
     {
         beginTest("lookFromSkin_resolvesRequestedColourSet");
-        assertLookFromSkinResolvesColourSet(TSS::Skin::ColourVariant::BlackDuo);
+        assertLookFromSkinResolvesColourSet(TSS::Skin::ColourVariant::BlackChroma);
         assertLookFromSkinResolvesColourSet(TSS::Skin::ColourVariant::Cream);
 
         beginTest("headerVsModales_peakAndLedUseZoneColourSets");
@@ -120,7 +120,7 @@ private:
 
     void assertHeaderVsSettingsPeakAndLedDistinctSets()
     {
-        const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::BlackDuo);
+        const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::BlackChroma);
         paintDistinctPastillesForSets(*skin);
 
         for (const auto object : { SkinObjectType::kLed, SkinObjectType::kPeakIndicator })
@@ -144,7 +144,7 @@ private:
 
     void assertLedSetSkinPreservesColourSet()
     {
-        const auto skinA = TSS::Skin::create(TSS::Skin::ColourVariant::BlackDuo);
+        const auto skinA = TSS::Skin::create(TSS::Skin::ColourVariant::BlackChroma);
         const auto skinB = TSS::Skin::create(TSS::Skin::ColourVariant::Cream);
         paintDistinctPastillesForSets(*skinA);
         paintDistinctPastillesForSets(*skinB);
@@ -169,7 +169,7 @@ private:
 
     void assertPeakIndicatorSetSkinPreservesColourSet()
     {
-        const auto skinA = TSS::Skin::create(TSS::Skin::ColourVariant::BlackDuo);
+        const auto skinA = TSS::Skin::create(TSS::Skin::ColourVariant::BlackChroma);
         const auto skinB = TSS::Skin::create(TSS::Skin::ColourVariant::Cream);
         paintDistinctPastillesForSets(*skinA);
         paintDistinctPastillesForSets(*skinB);
@@ -194,7 +194,7 @@ private:
 
     void assertParameterCellModuleTypeMapsToZone()
     {
-        const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::BlackDuo);
+        const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::BlackChroma);
         MinimalAudioProcessor processor;
         WidgetFactory factory(processor.apvts);
         const ParameterCellDimensions dimensions {};
@@ -246,7 +246,7 @@ private:
 
     void assertParameterCellSliderLookUsesZoneColourSet()
     {
-        const auto skinA = TSS::Skin::create(TSS::Skin::ColourVariant::BlackDuo);
+        const auto skinA = TSS::Skin::create(TSS::Skin::ColourVariant::BlackChroma);
         const auto skinB = TSS::Skin::create(TSS::Skin::ColourVariant::Cream);
         paintDistinctPastillesForSets(*skinA);
         paintDistinctPastillesForSets(*skinB);
@@ -305,7 +305,7 @@ private:
 
     void assertParameterCellComboLookUsesZoneColourSet()
     {
-        const auto skinA = TSS::Skin::create(TSS::Skin::ColourVariant::BlackDuo);
+        const auto skinA = TSS::Skin::create(TSS::Skin::ColourVariant::BlackChroma);
         const auto skinB = TSS::Skin::create(TSS::Skin::ColourVariant::Cream);
         paintDistinctPastillesForSets(*skinA);
         paintDistinctPastillesForSets(*skinB);
@@ -370,7 +370,7 @@ private:
 
     void assertModuleHeaderButtonsShareButtonUcs()
     {
-        const auto skinA = TSS::Skin::create(TSS::Skin::ColourVariant::BlackDuo);
+        const auto skinA = TSS::Skin::create(TSS::Skin::ColourVariant::BlackChroma);
         const auto skinB = TSS::Skin::create(TSS::Skin::ColourVariant::Cream);
 
         MinimalAudioProcessor processor;

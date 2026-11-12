@@ -428,7 +428,7 @@ namespace TSS::SkinColours
                 skinColourKey(SkinObjectType::kPopupMenu, SkinColourProperty::kText,
                               SkinColourState::kDisabled, ColourSet::k3),
                 ColourChart::kGrey400,
-                ColourChart::kGrey600,
+                ColourChart::kGrey400,
                 ColourChart::kCafe400
             };
 

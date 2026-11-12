@@ -27,7 +27,7 @@ public:
         expect(NumberBox::kBackgroundDisabled.creamVariant
                == Button::kBackgroundDisabled.creamVariant);
 
-        beginTest("enabledBackground_blackPlateOnBlackDuo_creamPlateOnCream");
+        beginTest("enabledBackground_blackPlateOnBlackChroma_creamPlateOnCream");
 
         expect(NumberBox::kBackground.blackVariant == ColourChart::kBlack);
         expect(NumberBox::kBackground.creamVariant == ColourChart::kCream400);

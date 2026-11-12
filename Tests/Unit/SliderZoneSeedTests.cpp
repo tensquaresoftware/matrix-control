@@ -24,7 +24,7 @@ public:
     void runTest() override
     {
         beginTest("blackDuo_zoneAccentsFollowBlueOrangeYellow");
-        assertBlackDuoZoneAccents();
+        assertBlackChromaZoneAccents();
 
         beginTest("black_masterHeaderSharePatchEmerald");
         assertBlackMasterHeaderSharePatchEmerald();
@@ -32,7 +32,7 @@ public:
         beginTest("black_modalesMonoGreys");
         assertBlackModalesMonoSeeds();
 
-        beginTest("modales_monoGreysOnBlackDuoAndCafeOnCream");
+        beginTest("modales_monoGreysOnBlackChromaAndCafeOnCream");
         assertModalesMonoSeeds();
 
         beginTest("cream_patchMasterHeaderShareGreens");
@@ -43,24 +43,24 @@ public:
 
         beginTest("sliderLookForZone_modalesMapsZoneSeeds");
         assertModalesLook(TSS::Skin::ColourVariant::Black);
-        assertModalesLook(TSS::Skin::ColourVariant::BlackDuo);
+        assertModalesLook(TSS::Skin::ColourVariant::BlackChroma);
         assertModalesLook(TSS::Skin::ColourVariant::Cream);
     }
 
 private:
-    void assertBlackDuoZoneAccents()
+    void assertBlackChromaZoneAccents()
     {
         using namespace TSS::SkinColours::Widgets;
 
-        expect(Slider::kTrack.blackDuoVariant == ColourChart::kBlue950);
-        expect(Slider::kValueBar.blackDuoVariant == ColourChart::kBlue600);
-        expect(Slider::kText.blackDuoVariant == ColourChart::kBlue400);
-        expect(SliderK2::kTrack.blackDuoVariant == ColourChart::kOrange950);
-        expect(SliderK2::kValueBar.blackDuoVariant == ColourChart::kOrange700);
-        expect(SliderK2::kText.blackDuoVariant == ColourChart::kOrange400);
-        expect(SliderK3::kTrack.blackDuoVariant == ColourChart::kYellow950);
-        expect(SliderK3::kValueBar.blackDuoVariant == ColourChart::kYellow700);
-        expect(SliderK3::kText.blackDuoVariant == ColourChart::kYellow400);
+        expect(Slider::kTrack.blackChromaVariant == ColourChart::kBlue950);
+        expect(Slider::kValueBar.blackChromaVariant == ColourChart::kBlue600);
+        expect(Slider::kText.blackChromaVariant == ColourChart::kBlue400);
+        expect(SliderK2::kTrack.blackChromaVariant == ColourChart::kOrange950);
+        expect(SliderK2::kValueBar.blackChromaVariant == ColourChart::kOrange700);
+        expect(SliderK2::kText.blackChromaVariant == ColourChart::kOrange400);
+        expect(SliderK3::kTrack.blackChromaVariant == ColourChart::kYellow950);
+        expect(SliderK3::kValueBar.blackChromaVariant == ColourChart::kYellow700);
+        expect(SliderK3::kText.blackChromaVariant == ColourChart::kYellow400);
     }
 
     void assertBlackMasterHeaderSharePatchEmerald()
@@ -104,10 +104,10 @@ private:
     {
         using namespace TSS::SkinColours::Widgets;
 
-        expect(SliderK4::kTrack.blackDuoVariant == ColourChart::kBlack);
-        expect(SliderK4::kFocusBorder.blackDuoVariant == ColourChart::kGrey800);
-        expect(SliderK4::kValueBar.blackDuoVariant == ColourChart::kGrey600);
-        expect(SliderK4::kText.blackDuoVariant == ColourChart::kGrey200);
+        expect(SliderK4::kTrack.blackChromaVariant == ColourChart::kBlack);
+        expect(SliderK4::kFocusBorder.blackChromaVariant == ColourChart::kGrey800);
+        expect(SliderK4::kValueBar.blackChromaVariant == ColourChart::kGrey600);
+        expect(SliderK4::kText.blackChromaVariant == ColourChart::kGrey200);
         expect(SliderK4::kTrack.creamVariant == ColourChart::kCream);
         expect(SliderK4::kValueBar.creamVariant == ColourChart::kCafe800);
         expect(SliderK4::kText.creamVariant == ColourChart::kCafe800);
@@ -125,7 +125,7 @@ private:
 
     void assertPatchSliderFromSkin()
     {
-        const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::BlackDuo);
+        const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::BlackChroma);
         expect(skin->getSliderTrackColour(true) == juce::Colour(ColourChart::kBlue950));
         expect(skin->getSliderValueBarColour(true) == juce::Colour(ColourChart::kBlue600));
         expect(skin->getSliderTextColour(true) == juce::Colour(ColourChart::kBlue400));
@@ -139,8 +139,8 @@ private:
         const auto look = TSS::sliderLookForZone(*skin, SkinZone::kModales);
         auto seed = [variant](const TSS::SkinColours::ColourElement& element)
         {
-            if (variant == TSS::Skin::ColourVariant::BlackDuo)
-                return juce::Colour(element.blackDuoVariant);
+            if (variant == TSS::Skin::ColourVariant::BlackChroma)
+                return juce::Colour(element.blackChromaVariant);
             if (variant == TSS::Skin::ColourVariant::Black)
                 return juce::Colour(element.blackVariant);
             return juce::Colour(element.creamVariant);
