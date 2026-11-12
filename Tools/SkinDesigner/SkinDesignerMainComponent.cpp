@@ -439,8 +439,8 @@ void SkinDesignerMainComponent::resized()
     layoutStatusBar(statusBar);
 
     // Body flush to status (COLOR / Palette / Mappings use bottomGutter 0).
-    // Title-bar bottom gutter + this strip = kChromeStackGap before SKINS.
-    bounds.removeFromTop(SkinDesignerChrome::kGutter);
+    // Title-bar bottom kGutter + panel silhouette top inset (kGutter) = kPaletteSideGap
+    // before SKINS paint — same air as Palette|Mappings.
     bounds.removeFromLeft(edge);
     bounds.removeFromRight(edge);
     layoutBodyPanels(bounds);

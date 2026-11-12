@@ -277,7 +277,7 @@ private:
         const int skinsH = SkinDesignerSkinsPanel::preferredHeight();
         const int colorH = SkinDesignerColourPicker::preferredHeightForWidth(
             SkinDesignerChrome::kColorPanelWidth);
-        const int minH = SkinDesignerChrome::kTitleBarHeight + SkinDesignerChrome::kGutter
+        const int minH = SkinDesignerChrome::kTitleBarHeight
                          + skinsH + colorH + SkinDesignerChrome::kStatusBarHeight;
 
         expect(skinsH > 0);

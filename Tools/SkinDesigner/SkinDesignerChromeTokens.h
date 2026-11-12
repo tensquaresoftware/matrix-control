@@ -222,8 +222,9 @@ namespace SkinDesignerChrome
     inline constexpr int kButtonHeight = 24;
     inline constexpr int kSessionWellHeight = kGutter + kButtonHeight + kGutter; // 36
     /**
-     * Title bar: kChromeStackGap above SESSION/OPERATION wells + well + kGutter below
-     * (bottom gutter + following strip = kChromeStackGap before the body).
+     * Title bar: kChromeStackGap above SESSION/OPERATION wells + well + kGutter below.
+     * That bottom gutter pairs with each body panel's top silhouette inset (kGutter) so
+     * Session→SKINS air matches kPaletteSideGap (Palette|Mappings).
      */
     inline constexpr int kTitleBarHeight = kChromeStackGap + kSessionWellHeight + kGutter; // 54
     /** Bottom status bar — same height as SESSION / OPERATION wells. */
