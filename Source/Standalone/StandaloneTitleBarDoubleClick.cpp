@@ -6,11 +6,7 @@
  #include <unordered_map>
  #include <windows.h>
 #elif JUCE_MAC
- #include <CoreGraphics/CGGeometry.h>
- #include <objc/message.h>
- #include <objc/objc.h>
- #include <objc/runtime.h>
- #include <unordered_map>
+ #include "Standalone/StandaloneTitleBarDoubleClick_mac.h"
 #endif
 
 namespace MatrixStandalone
@@ -118,106 +114,6 @@ struct TitleBarDoubleClickHook::PlatformState
 };
 
 #elif JUCE_MAC
-
-namespace
-{
-// JUCE sets the NSWindow as its own NSWindowDelegate; title-bar double-click / zoom
-// asks windowShouldZoom:toFrame:. Return NO and recentre so OS zoom is not product behaviour.
-// (Do not swizzle windowWillUseStandardFrame:defaultFrame: — CGRect IMP replace is
-// ABI-fragile and was observed to pin windows at 0,0.)
-using WindowShouldZoomFn = BOOL (*) (id, SEL, id, CGRect);
-
-std::unordered_map<const void*, TitleBarDoubleClickHook::Callback>& macZoomCallbacks()
-{
-    static std::unordered_map<const void*, TitleBarDoubleClickHook::Callback> callbacks;
-    return callbacks;
-}
-
-std::unordered_map<Class, WindowShouldZoomFn>& macZoomOriginals()
-{
-    static std::unordered_map<Class, WindowShouldZoomFn> originals;
-    return originals;
-}
-
-id nsWindowFromComponent (juce::Component& window)
-{
-    auto* peer = window.getPeer();
-    if (peer == nullptr)
-        return nil;
-
-    const id nsView = static_cast<id> (peer->getNativeHandle());
-    if (nsView == nil)
-        return nil;
-
-    using WindowGetter = id (*) (id, SEL);
-    return reinterpret_cast<WindowGetter> (objc_msgSend) (nsView, sel_registerName ("window"));
-}
-
-BOOL macWindowShouldZoom (id self, SEL sel, id windowArg, CGRect proposedFrame)
-{
-    const id nsWindow = windowArg != nil ? windowArg : self;
-    auto& callbacks = macZoomCallbacks();
-    const auto it = callbacks.find (nsWindow);
-
-    if (it != callbacks.end() && it->second != nullptr)
-    {
-        it->second();
-        return NO;
-    }
-
-    const Class cls = object_getClass (self);
-    const auto origIt = macZoomOriginals().find (cls);
-
-    if (origIt != macZoomOriginals().end() && origIt->second != nullptr)
-        return origIt->second (self, sel, windowArg, proposedFrame);
-
-    return YES;
-}
-
-bool installMacZoomHookOnClass (Class cls)
-{
-    if (cls == nil)
-        return false;
-
-    auto& originals = macZoomOriginals();
-
-    if (originals.find (cls) != originals.end())
-        return true;
-
-    const SEL sel = sel_registerName ("windowShouldZoom:toFrame:");
-    Method method = class_getInstanceMethod (cls, sel);
-
-    if (method == nullptr)
-        return false;
-
-    const auto previous = reinterpret_cast<WindowShouldZoomFn> (
-        method_setImplementation (method, reinterpret_cast<IMP> (macWindowShouldZoom)));
-    originals.emplace (cls, previous);
-    return true;
-}
-
-const void* installMacTitleBarZoomHook (juce::Component& window, TitleBarDoubleClickHook::Callback callback)
-{
-    if (callback == nullptr)
-        return nullptr;
-
-    const id nsWindow = nsWindowFromComponent (window);
-    if (nsWindow == nil)
-        return nullptr;
-
-    if (! installMacZoomHookOnClass (object_getClass (nsWindow)))
-        return nullptr;
-
-    macZoomCallbacks()[nsWindow] = std::move (callback);
-    return nsWindow;
-}
-
-void removeMacTitleBarZoomHook (const void* nsWindowKey)
-{
-    if (nsWindowKey != nullptr)
-        macZoomCallbacks().erase (nsWindowKey);
-}
-} // namespace
 
 struct TitleBarDoubleClickHook::PlatformState
 {
@@ -352,7 +248,7 @@ void TitleBarDoubleClickHook::attach (juce::Component& window, Callback onDouble
     if (! installWindowsTitleBarHook (platform_->hwnd, std::move (onDoubleClick)))
         platform_.reset();
    #elif JUCE_MAC
-    platform_->nsWindowKey = installMacTitleBarZoomHook (window, std::move (onDoubleClick));
+    platform_->nsWindowKey = MacTitleBarDetail::attach (window, std::move (onDoubleClick));
 
     if (platform_->nsWindowKey == nullptr)
         platform_.reset();
@@ -371,7 +267,7 @@ void TitleBarDoubleClickHook::detach()
         removeWindowsTitleBarHook (platform_->hwnd);
    #elif JUCE_MAC
     if (platform_ != nullptr && platform_->nsWindowKey != nullptr)
-        removeMacTitleBarZoomHook (platform_->nsWindowKey);
+        MacTitleBarDetail::detach (platform_->nsWindowKey);
    #endif
 
     platform_.reset();

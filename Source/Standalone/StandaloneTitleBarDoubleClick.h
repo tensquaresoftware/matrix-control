@@ -15,7 +15,8 @@
 namespace MatrixStandalone
 {
 /** Platform hook: native title-bar double-click → callback (Standalone only).
-    Peer-level per OS (Windows caption dblclk, macOS windowShouldZoom→NO, Linux strip poll). */
+    Peer-level per OS (Windows caption dblclk; macOS NSEvent title-bar swallow + zoom
+    delegate; Linux strip poll). */
 class TitleBarDoubleClickHook final
 {
 public:

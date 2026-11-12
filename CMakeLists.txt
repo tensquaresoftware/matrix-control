@@ -998,6 +998,12 @@ target_sources(Matrix-Control_Standalone PRIVATE
     Source/Standalone/StandaloneTitleBarDoubleClick.cpp
 )
 
+if(APPLE)
+    target_sources(Matrix-Control_Standalone PRIVATE
+        Source/Standalone/StandaloneTitleBarDoubleClick_mac.mm
+    )
+endif()
+
 target_compile_definitions(Matrix-Control_Standalone PRIVATE
     JUCE_USE_CUSTOM_PLUGIN_STANDALONE_APP=1
 )
@@ -1230,6 +1236,12 @@ if(MATRIX_BUILD_SKIN_DESIGNER)
         Source/Shared/ProjectPaths.cpp
         Source/Standalone/StandaloneTitleBarDoubleClick.cpp
     )
+
+    if(APPLE)
+        target_sources(Matrix-Control_SkinDesigner PRIVATE
+            Source/Standalone/StandaloneTitleBarDoubleClick_mac.mm
+        )
+    endif()
 
     target_include_directories(Matrix-Control_SkinDesigner PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}
