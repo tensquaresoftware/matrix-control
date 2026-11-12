@@ -1900,7 +1900,7 @@ namespace PluginDisplayNames
             namespace ContextualHelp
             {
                 constexpr const char* kTitle =
-                    "INTERNAL PATCHES: Browses and loads patches from the connected synthesizer memory.";
+                    "INTERNAL PATCHES: Click the title to focus this module and navigate synthesizer memory (banks and patches).";
                 constexpr const char* kBrowser =
                     "INTERNAL PATCHES: Bank and patch number browser for synthesizer memory.";
                 constexpr const char* kMemory =
@@ -2024,7 +2024,7 @@ namespace PluginDisplayNames
             namespace ContextualHelp
             {
                 constexpr const char* kTitle =
-                    "COMPUTER PATCHES: Browses and loads patch files from a folder on disk.";
+                    "COMPUTER PATCHES: Click the title to focus this module and navigate .syx / .m1kp patch files on disk.";
                 constexpr const char* kBrowser =
                     "COMPUTER PATCHES: Folder browser for patch files on disk.";
                 constexpr const char* kStorage =
