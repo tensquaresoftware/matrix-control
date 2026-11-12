@@ -82,7 +82,8 @@ void SkinDesignerMainComponent::onDelete()
         return;
 
     SkinDesignerChrome::AlertWindow confirm("Delete Designer skin",
-                                          "Delete \"" + skin->name + "\"? This cannot be undone.",
+                                          "Delete \"" + skin->name
+                                              + "\"? You can Undo from Session afterward.",
                                           juce::MessageBoxIconType::WarningIcon);
     confirm.addButton("Delete", 1);
     confirm.addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey));

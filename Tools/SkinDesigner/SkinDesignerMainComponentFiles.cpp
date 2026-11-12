@@ -90,10 +90,7 @@ void SkinDesignerMainComponent::loadWorkspaceFromFile(const juce::File& file)
         return;
     }
 
-    // Cancel any pending colour preview push aimed at the replaced skins.
-    colourPreviewCoalesceTimer_.stopTimer();
-    colourGestureActive_ = false;
-    colourGestureMadeEdit_ = false;
+    cancelInFlightColourGesture();
 
     const auto* active = layer_.findSkin(layer_.activeSkinId());
     const bool activeIsDesigner = active != nullptr && active->kind == TSS::DevSkin::SkinKind::kDev;
@@ -183,6 +180,7 @@ bool SkinDesignerMainComponent::savePackToFile(const juce::File& chosen, const c
     rememberSkinJsonDirectory(file);
     // Our own write: re-baseline the watch on this path without prompting.
     armWatchedImportJson(file);
+    sealColourGestureBeforeSave();
     markDesignerClean();
     setStatusMessage(juce::String(statusPrefix) + file.getFullPathName());
     refreshStatus();

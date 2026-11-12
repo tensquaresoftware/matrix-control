@@ -67,6 +67,10 @@ private:
     void syncHistoryCurrentSelection();
     /** Replaces history with the current document (Load, reload, launch). Marks clean. */
     void resetHistoryToCurrentDocument();
+    /** Drop an open colour press without recording (Load / JSON reload). */
+    void cancelInFlightColourGesture();
+    /** Commit a live colour press into history so Save's clean marker matches disk. */
+    void sealColourGestureBeforeSave();
     void applyHistorySnapshot(const SkinDesignerHistory::Snapshot& snapshot);
     bool canUseDocumentHistory() const;
     static bool isTextEditingFocused();

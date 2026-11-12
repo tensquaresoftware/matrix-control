@@ -36,6 +36,25 @@ void SkinDesignerMainComponent::resetHistoryToCurrentDocument()
     designerDirty_ = false;
 }
 
+void SkinDesignerMainComponent::cancelInFlightColourGesture()
+{
+    colourPreviewCoalesceTimer_.stopTimer();
+    colourGestureActive_ = false;
+    colourGestureMadeEdit_ = false;
+}
+
+void SkinDesignerMainComponent::sealColourGestureBeforeSave()
+{
+    if (! colourGestureActive_)
+        return;
+
+    colourGestureActive_ = false;
+    if (colourGestureMadeEdit_)
+        recordDocumentChange();
+    colourGestureMadeEdit_ = false;
+    refreshSessionButtonsEnabled();
+}
+
 void SkinDesignerMainComponent::openChangeBurst()
 {
     if (history_.isGestureActive())

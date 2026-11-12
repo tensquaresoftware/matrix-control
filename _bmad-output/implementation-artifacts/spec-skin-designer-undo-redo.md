@@ -94,6 +94,26 @@ context: []
 
 ## Spec Change Log
 
+### Review Findings
+
+- [x] [Review][Patch] Delete confirm still says it cannot be undone [Tools/SkinDesigner/SkinDesignerMainComponentActions.cpp:85]
+- [x] [Review][Patch] Undo/Redo Session buttons stay enabled mid colour press while handlers no-op [Tools/SkinDesigner/SkinDesignerMainComponentSession.cpp:289]
+- [x] [Review][Patch] JSON Sync reload leaves colour-gesture flags live so gesture end can re-record after history clear [Tools/SkinDesigner/SkinDesignerMainComponentImportWatch.cpp:323]
+- [x] [Review][Patch] Save during an open colour gesture can mark the pre-press snapshot clean while disk already has live colours [Tools/SkinDesigner/SkinDesignerMainComponentFiles.cpp:186]
+- [x] [Review][Defer] Clean marker can fall off the undo cap so full undo never clears dirty [Tools/SkinDesigner/SkinDesignerHistory.cpp:28] — deferred: already recorded 2026-11-12; rare deep-history case
+- [x] [Review][Defer] No MainComponent harness for record/restore/burst/colour/Delete wiring [Tests/Unit/SkinDesignerHistoryTests.cpp] — deferred: already recorded 2026-11-12; spec allowed History-only tests
+- [x] [Review][Defer] Load/Save/reload dirty+history reset wiring unverified at MainComponent [Tools/SkinDesigner/SkinDesignerMainComponentFiles.cpp] — deferred: already recorded 2026-11-12; same harness gap
+- [x] [Review][Defer] Compare/text-focus/keyPressed Session gates only helper-tested [Tools/SkinDesigner/SkinDesignerMainComponentSession.cpp] — deferred: already recorded 2026-11-12; manual smoke remains
+
+Rejected:
+- Spec Design Notes / Code Map / Verification still describe pre-ship design — rejected: fix would edit the spec under review
+- Frozen I/O matrix omits New/Duplicate/Delete and change-burst — rejected: fix would edit the spec under review
+- openChangeBurst stale callAsync can endGesture on a newer burst — false: same-message close+reopen still ends after the message; coalescing window is unchanged
+- Colour net-zero press still records a history step — false: `setPastilleArgb` returns without `bump` when ARGB unchanged, so `colourGestureMadeEdit_` stays false
+- `History::recordChange` never ignores an identical snapshot — false for product paths: layer mutators no-op without `onChanged`; remaining case is intentional API
+- `assertCommitOnEndDiscretePresses` overclaims COLOR gesture coverage — low: History-level discrete commits are intentional; MainComponent colour path is already deferred
+- History header overstates nudge coalescing via `beginGesture` — low: nudge uses colour begin/end; everyday impact negligible
+
 ## Review Triage Log
 
 - Blind: burst async endGesture vs colour drag ownership — medium — patched: `closeChangeBurst` on colour begin / reset / apply / markClean / adopt

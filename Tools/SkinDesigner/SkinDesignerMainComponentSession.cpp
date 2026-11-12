@@ -112,6 +112,7 @@ void SkinDesignerMainComponent::wireColourPicker(const std::function<bool()>& es
         closeChangeBurst();
         colourGestureActive_ = true;
         colourGestureMadeEdit_ = false;
+        refreshSessionButtonsEnabled();
     };
     colourPicker_.onColourGestureEnded = [this]
     {
@@ -286,7 +287,7 @@ void SkinDesignerMainComponent::refreshSessionButtonsEnabled()
     const bool canSave = hasAnyDesignerSkin();
     saveButton_.setEnabled(canSave);
     saveAsButton_.setEnabled(canSave);
-    const bool historyUsable = canUseDocumentHistory();
+    const bool historyUsable = canUseDocumentHistory() && ! colourGestureActive_;
     undoButton_.setEnabled(historyUsable && history_.canUndo());
     redoButton_.setEnabled(historyUsable && history_.canRedo());
 }
