@@ -21,7 +21,8 @@ context:
 **Decisions (Guillaume, 2026-11-13):**
 - **Depth:** Restructure / split the product colour chart (`ColourChart.h` and consumers) in this wave so Matrix-Control and Skin Designer share a coherent per-skin (or per-family) ownership model — not Designer-only cosmetics.
 - **Trials JSON:** One-shot migration for this wave. Trials currently holds only a disposable `TEST` skin — safe to delete / replace during migration.
-- **Starter kit** (new Designer skin): pastilles required by mappings after duplicate/create, plus fixed kit entries `BrandCream`, `BrandBlue`, `BrandOrange`, `Black`, `White` (ColourChart symbols `kBrandCream`, `kBrandBlue`, `kBrandOrange`, `kBlack`, `kWhite`). Not the full catalogue.
+- **Starter kit** (new Designer skin): pastilles required by mappings after duplicate/create, plus fixed kit entries `BrandCream`, `BrandBlue`, `BrandOrange`, `White`, `Black` (ColourChart symbols `kBrandCream`, `kBrandBlue`, `kBrandOrange`, `kWhite`, `kBlack`). Not the full catalogue.
+- **Palette list order** (UI): BrandCream → BrandBlue → BrandOrange → White → Greys light→dark → Black → rest A→Z (natural).
 - **Product lock:** On Designer (Dev) skins, all pastilles are author-owned — rename/delete allowed (mapped delete still follows existing removeRefs / refuse policy). No global ColourChart reserved-name lock. Drop the Product vs Designer palette split in the UI (single palette list). Compiled product skins stay read-only.
 
 ## Boundaries & Constraints

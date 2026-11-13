@@ -46,8 +46,7 @@ int SkinDesignerPalettePanel::stickyHeaderYInView(int sectionIndex, int scrollY)
         return 0;
     const int naturalY = stickySections_[static_cast<size_t>(sectionIndex)].upperListRow
                          * list_.getRowHeight();
-    // Keep the inter-group list gap (kTableGapHeight under the last Product colour)
-    // between stacked sticky titles so Designer does not butt against Product.
+    // Keep inter-group list gaps between stacked sticky titles when several exist.
     const int assignedTop = sectionIndex
                             * (SkinDesignerChrome::kColumnHeaderHeight
                                + SkinDesignerChrome::kTableGapHeight);

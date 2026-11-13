@@ -1,5 +1,7 @@
 #include "Tools/SkinDesigner/SkinDesignerPalettePanel.h"
 
+#include <algorithm>
+
 #include "Tools/SkinDesigner/SkinDesignerChrome.h"
 #include "Tools/SkinDesigner/SkinDesignerPalettePanelGeometry.h"
 #include "Tools/SkinDesigner/SkinDesignerUiHelpers.h"
@@ -398,41 +400,25 @@ void SkinDesignerPalettePanel::rebuildRows()
         colours.push_back(row);
     }
 
-    if (! colours.empty() || ! readOnly_)
-        appendPaletteGroup("Palette", colours, false);
-}
+    std::sort(colours.begin(), colours.end(),
+              [](const Row& left, const Row& right)
+              {
+                  return SkinDesignerUi::comparePalettePastilleNames(left.name, right.name) < 0;
+              });
 
-void SkinDesignerPalettePanel::appendPaletteGroup(const juce::String& title,
-                                                std::vector<Row>& colours,
-                                                bool leadGap)
-{
-    if (leadGap)
-    {
-        Row gap;
-        gap.kind = RowKind::kGap;
-        rows_.push_back(gap);
-    }
-
-    StickySection sticky;
-    sticky.upperListRow = static_cast<int>(rows_.size());
-    sticky.title = title;
-    stickySections_.push_back(sticky);
-
-    Row section;
-    section.kind = RowKind::kSection;
-    section.headerText = title;
-    pushSplitListRow(section);
-    Row gap;
-    gap.kind = RowKind::kGap;
-    rows_.push_back(gap);
+    // No sticky section title: panel tab already says PALETTE.
     if (colours.empty())
     {
-        Row hint;
-        hint.kind = RowKind::kEmptyHint;
-        hint.headerText = "No designer colours yet";
-        pushSplitListRow(hint);
+        if (! readOnly_)
+        {
+            Row hint;
+            hint.kind = RowKind::kEmptyHint;
+            hint.headerText = "No designer colours yet";
+            pushSplitListRow(hint);
+        }
         return;
     }
+
     for (auto& row : colours)
         pushSplitListRow(row);
 }

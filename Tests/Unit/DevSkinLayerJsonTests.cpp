@@ -324,12 +324,11 @@ private:
         expect(skin != nullptr);
         const auto kit = TSS::DevSkin::designerStarterKitPastilles();
         expectEquals(static_cast<int>(skin->palette.size()), static_cast<int>(kit.size()));
-        for (const auto& pastille : kit)
+        for (size_t i = 0; i < kit.size(); ++i)
         {
-            expect(paletteContains(*skin, pastille.name));
-            expectEquals(static_cast<juce::int64>(*TSS::DevSkin::argbForPastilleName(
-                             skin->palette, pastille.name)),
-                         static_cast<juce::int64>(pastille.argb));
+            expectEquals(skin->palette[i].name, kit[i].name);
+            expectEquals(static_cast<juce::int64>(skin->palette[i].argb),
+                         static_cast<juce::int64>(kit[i].argb));
         }
         expect(static_cast<int>(skin->palette.size())
                < static_cast<int>(TSS::DevSkin::colourChartPastilles().size()));

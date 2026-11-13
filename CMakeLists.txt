@@ -601,6 +601,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/DevSkinCompiledSeedInventoryTests.cpp
         Tests/Unit/DevSkinMatrixTests.cpp
         Tests/Unit/DevSkinPendingPastilleTests.cpp
+        Tests/Unit/SkinDesignerPaletteOrderTests.cpp
         Tests/Unit/SkinDesignerMappingModePolicyTests.cpp
         Tests/Unit/SkinDesignerMappingLinkGroupsTests.cpp
         Tests/Unit/SkinDesignerMappingsColumnFilterTests.cpp

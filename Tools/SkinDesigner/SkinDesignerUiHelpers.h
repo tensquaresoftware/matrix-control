@@ -388,6 +388,67 @@ namespace SkinDesignerUi
         return (left.length() - i) - (right.length() - j);
     }
 
+    /**
+     * Palette list order: BrandCream → BrandBlue → BrandOrange → White → Greys
+     * (light→dark) → Black → everything else A→Z (natural / light→dark steps).
+     */
+    inline int comparePalettePastilleNames(const juce::String& a, const juce::String& b)
+    {
+        const auto label = [](const juce::String& stored) -> juce::String
+        {
+            return displayPastilleName(stored).trim();
+        };
+
+        enum class Rank
+        {
+            kBrandCream = 0,
+            kBrandBlue,
+            kBrandOrange,
+            kWhite,
+            kGrey,
+            kBlack,
+            kOther
+        };
+
+        const auto rankOf = [&](const juce::String& stored) -> Rank
+        {
+            const auto name = label(stored);
+            if (name.equalsIgnoreCase("BrandCream"))
+                return Rank::kBrandCream;
+            if (name.equalsIgnoreCase("BrandBlue"))
+                return Rank::kBrandBlue;
+            if (name.equalsIgnoreCase("BrandOrange"))
+                return Rank::kBrandOrange;
+            if (name.equalsIgnoreCase("White"))
+                return Rank::kWhite;
+            if (name.startsWithIgnoreCase("Grey") && name.length() > 4
+                && name.substring(4).containsOnly("0123456789"))
+                return Rank::kGrey;
+            if (name.equalsIgnoreCase("Black"))
+                return Rank::kBlack;
+            return Rank::kOther;
+        };
+
+        const auto rankA = rankOf(a);
+        const auto rankB = rankOf(b);
+        if (rankA != rankB)
+            return static_cast<int>(rankA) - static_cast<int>(rankB);
+
+        if (rankA == Rank::kGrey)
+        {
+            const auto step = [&](const juce::String& stored) -> int
+            {
+                return label(stored).substring(4).getIntValue();
+            };
+            return step(a) - step(b);
+        }
+
+        if (rankA == Rank::kOther)
+            return compareDesignerSkinNamesNatural(label(a), label(b));
+
+        return 0;
+    }
+
     /** Dev skins sorted for the Designer combo (natural name order). */
     inline std::vector<const TSS::DevSkin::NamedSkin*> sortedDesignerSkins(
         const TSS::DevSkin::Layer& layer)

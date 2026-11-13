@@ -117,8 +117,8 @@ namespace TSS::DevSkin
             { "kBrandCream", ColourChart::kBrandCream },
             { "kBrandBlue", ColourChart::kBrandBlue },
             { "kBrandOrange", ColourChart::kBrandOrange },
-            { "kBlack", ColourChart::kBlack },
             { "kWhite", ColourChart::kWhite },
+            { "kBlack", ColourChart::kBlack },
         };
     }
 
