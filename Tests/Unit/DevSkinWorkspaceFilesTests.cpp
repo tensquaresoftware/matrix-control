@@ -159,7 +159,7 @@ private:
         expect(TSS::DevSkin::importSessionFromJson(restoredState, json).ok);
         expectEquals(restoredState.lastSkinJsonDirectory, state.lastSkinJsonDirectory);
         expect(restoredState.jsonSyncMode == TSS::DevSkin::JsonSyncMode::kAuto);
-        expectEquals(restoredState.productSkinId, juce::String(TSS::DevSkin::kCompiledBlackId));
+        expect(restoredState.productSkinId.isEmpty());
         expect(restoredState.designerSkinId.isEmpty());
         expect(! restoredState.compareOn);
         skinJsonDir.deleteRecursively();
@@ -200,7 +200,7 @@ private:
         TSS::DevSkin::DesignerSessionState state;
         expect(TSS::DevSkin::importSessionFromJson(state, juce::JSON::toString(parsed, true)).ok);
         expect(state.jsonSyncMode == TSS::DevSkin::JsonSyncMode::kOff);
-        expectEquals(state.productSkinId, juce::String(TSS::DevSkin::kCompiledBlackId));
+        expect(state.productSkinId.isEmpty());
         expect(state.designerSkinId.isEmpty());
         expect(! state.compareOn);
     }

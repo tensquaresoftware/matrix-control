@@ -102,22 +102,27 @@ namespace SkinDesignerUi
                    : storedName;
     }
 
-    /** Product combo: 1=BLACK/GREEN … 6=CREAM/MINIMAL (logo order). */
+    /** Product combo: 0=none, 1=BLACK/GREEN … 6=CREAM/MINIMAL (logo order). */
     inline juce::String productSkinIdFromComboId(int comboId)
     {
         switch (comboId)
         {
+            case 1: return TSS::DevSkin::kCompiledBlackId;
             case 2: return TSS::DevSkin::kCompiledBlackChromaId;
             case 3: return TSS::DevSkin::kCompiledBlackMinimalId;
             case 4: return TSS::DevSkin::kCompiledCreamId;
             case 5: return TSS::DevSkin::kCompiledCreamChromaId;
             case 6: return TSS::DevSkin::kCompiledCreamMinimalId;
-            default: return TSS::DevSkin::kCompiledBlackId;
+            default: return {};
         }
     }
 
     inline int productComboIdFromSkinId(const juce::String& skinId)
     {
+        if (skinId.isEmpty())
+            return 0;
+        if (skinId == TSS::DevSkin::kCompiledBlackId)
+            return 1;
         if (skinId == TSS::DevSkin::kCompiledBlackChromaId
             || skinId == "compiled:black-duo")
             return 2;
@@ -129,7 +134,7 @@ namespace SkinDesignerUi
             return 5;
         if (skinId == TSS::DevSkin::kCompiledCreamMinimalId)
             return 6;
-        return 1;
+        return 0;
     }
 
     inline bool skinNameTaken(const TSS::DevSkin::Layer& layer, const juce::String& name)

@@ -7,6 +7,13 @@
 
 void SkinDesignerMainComponent::onDuplicateProduct()
 {
+    if (! hasProductSkinSelected())
+    {
+        juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::InfoIcon,
+                                               "Duplicate Product",
+                                               "Select a Product skin first.");
+        return;
+    }
     if (! duplicateFromSkin(sessionState_.productSkinId))
         return;
     // Compare was cleared in adopt; push only when Standalone Dev is connected.
@@ -50,6 +57,14 @@ bool SkinDesignerMainComponent::duplicateFromSkin(const juce::String& sourceId)
 
 void SkinDesignerMainComponent::onNew()
 {
+    if (! hasProductSkinSelected())
+    {
+        juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::InfoIcon,
+                                               "New Designer skin",
+                                               "Select a Product skin first.");
+        return;
+    }
+
     // Product palette + custom Designer pastilles; mappings cleared → full Unbound list.
     const auto name = SkinDesignerUi::askText("New Designer skin", "Name:",
                                             SkinDesignerUi::suggestUniqueSkinName(layer_, "New Skin"));
@@ -180,6 +195,13 @@ void SkinDesignerMainComponent::tickCompareBlink()
 
 void SkinDesignerMainComponent::onCompareToggle()
 {
+    if (! sessionState_.compareOn && ! hasProductSkinSelected())
+    {
+        juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::InfoIcon,
+                                               "Compare",
+                                               "Select a Product skin first.");
+        return;
+    }
     sessionState_.compareOn = ! sessionState_.compareOn;
     refreshAll();
     if (bridge_.isConnected())

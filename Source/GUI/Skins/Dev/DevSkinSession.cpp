@@ -15,9 +15,9 @@ namespace TSS::DevSkin
         }
     }
 
-    void forceProductToFirstAvailable(DesignerSessionState& state)
+    void clearProductSelectionAtLaunch(DesignerSessionState& state)
     {
-        state.productSkinId = kCompiledBlackId;
+        state.productSkinId = {};
     }
 
     juce::String exportSessionToJson(const DesignerSessionState& state)

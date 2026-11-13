@@ -123,6 +123,11 @@ private:
     void onLoadJson();
     void browseForWorkspaceFile();
     void loadWorkspaceFromFile(const juce::File& file);
+    /** Load/Reload refused (empty Designer pack): coaching alert only. */
+    void showNoDesignerSkinsInJsonAlert(const juce::String& title);
+    /** Watched Reload failed: accept fingerprint, then empty-pack or generic alert. */
+    void handleWatchedImportReloadRefusal(const juce::String& message);
+    bool hasProductSkinSelected() const;
     /** Save: overwrite the watched path, else first-save chooser. Whole pack, no Unbound gate. */
     void onSave();
     /** Save as: always a chooser; arms the watch on the chosen path. */

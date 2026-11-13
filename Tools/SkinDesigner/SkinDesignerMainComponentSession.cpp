@@ -199,6 +199,10 @@ void SkinDesignerMainComponent::refreshAll()
     refreshStatus();
     refreshSessionButtonsEnabled();
 
+    const bool hasProduct = hasProductSkinSelected();
+    if (! hasProduct && sessionState_.compareOn)
+        sessionState_.compareOn = false;
+
     const auto visibleId = visibleSkinId();
     const bool compareProduct = isCompareProductView();
     const bool hasDesignerSkin = sessionState_.designerSkinId.isNotEmpty();
@@ -208,9 +212,10 @@ void SkinDesignerMainComponent::refreshAll()
 
     syncCompareButtonChrome();
 
-    skinsPanel_.setProductDuplicateEnabled(true);
+    skinsPanel_.setProductDuplicateEnabled(hasProduct);
+    skinsPanel_.compareButton().setEnabled(hasProduct);
     skinsPanel_.syncProductNavButtons();
-    skinsPanel_.setDesignerActionsEnabled(hasDesignerSkin, editable, true);
+    skinsPanel_.setDesignerActionsEnabled(hasDesignerSkin, editable, hasProduct);
     skinsPanel_.syncDesignerNavButtons();
 
     palettePanel_.setActiveSkinId(panelSkinId);
@@ -239,6 +244,7 @@ void SkinDesignerMainComponent::refreshCombos()
     auto& productCombo = skinsPanel_.productCombo();
     auto& designerCombo = skinsPanel_.designerCombo();
     productCombo.clear(juce::dontSendNotification);
+    productCombo.setTextWhenNothingSelected("- Select a skin -");
     productCombo.addItem("BLACK/GREEN", 1);
     productCombo.addItem("BLACK/CHROMA", 2);
     productCombo.addItem("BLACK/MINIMAL", 3);
@@ -391,7 +397,7 @@ void SkinDesignerMainComponent::loadSessionOrBaseline()
     // Blank launch: only preferences come back from disk (a missing, old or corrupt
     // session file simply leaves the defaults). Designer skins are filled with Load.
     (void) TSS::DevSkin::loadSessionFile(sessionState_);
-    TSS::DevSkin::forceProductToFirstAvailable(sessionState_);
+    TSS::DevSkin::clearProductSelectionAtLaunch(sessionState_);
     sessionState_.designerSkinId = {};
     sessionState_.compareOn = false;
     stopTimer();
@@ -419,5 +425,11 @@ bool SkinDesignerMainComponent::canEditDesignerSkin() const
         return false;
     const auto* skin = layer_.findSkin(sessionState_.designerSkinId);
     return skin != nullptr && skin->kind == TSS::DevSkin::SkinKind::kDev;
+}
+
+bool SkinDesignerMainComponent::hasProductSkinSelected() const
+{
+    return sessionState_.productSkinId.isNotEmpty()
+           && layer_.findSkin(sessionState_.productSkinId) != nullptr;
 }
 

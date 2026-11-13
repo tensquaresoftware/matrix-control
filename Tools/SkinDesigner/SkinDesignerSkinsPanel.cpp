@@ -89,7 +89,12 @@ void SkinDesignerSkinsPanel::cycleCombo(juce::ComboBox& combo, int delta)
 
     const int index = combo.getSelectedItemIndex();
     if (index < 0)
+    {
+        // Nothing selected (Product "Select a skin"): step forward into the first item.
+        if (delta > 0)
+            combo.setSelectedItemIndex(0, juce::sendNotificationSync);
         return;
+    }
 
     const int next = index + delta;
     if (next < 0 || next >= count)
@@ -108,7 +113,8 @@ void SkinDesignerSkinsPanel::syncProductNavButtons()
     const int count = productCombo_.getNumItems();
     const int index = productCombo_.getSelectedItemIndex();
     productStepper_.setDecrementEnabled(count > 0 && index > 0);
-    productStepper_.setIncrementEnabled(count > 0 && index >= 0 && index < count - 1);
+    // index < 0 ("Select a skin"): allow + to pick the first Product skin.
+    productStepper_.setIncrementEnabled(count > 0 && (index < 0 || index < count - 1));
 }
 
 void SkinDesignerSkinsPanel::syncDesignerNavButtons()
