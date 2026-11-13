@@ -592,6 +592,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/SkinColourWiringCoverageTests.cpp
         Tests/Unit/ColourSetModelTests.cpp
         Tests/Unit/DevSkinLayerJsonTests.cpp
+        Tests/Unit/DevSkinStarterKitTests.cpp
         Tests/Unit/DevSkinSessionJsonSyncTests.cpp
         Tests/Unit/DevSkinSessionImportWatchTests.cpp
         Tests/Unit/DevSkinWorkspaceFilesTests.cpp
