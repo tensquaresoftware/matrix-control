@@ -1,45 +1,68 @@
 ---
-description: Raccourcis RFC/RFCD — reformuler en français clair, ne pas relancer le chantier
+description: Raccourcis RFC/RFCD — français clair (reformuler ou répondre), ne pas relancer le chantier
 alwaysApply: true
 ---
 
 # RFC / RFCD — raccourcis d’écriture (Guillaume)
 
-Quand Guillaume écrit **RFC**, **RFCD**, ou l’équivalent en toutes lettres (« Reformule en Français Clair » / « … et Développé »), **ce n’est pas une demande d’exécution** : c’est une demande de **reformulation**.
+Quand Guillaume écrit **RFC**, **RFCD**, ou l’équivalent en toutes lettres, **ce n’est pas une demande d’exécution** : c’est une demande de **ton / clarté** (reformuler un passage, ou répondre clairement selon le contexte).
 
 ## Lexique (non négociable)
 
 | Raccourci | Signifie | Action attendue |
 |-----------|----------|-----------------|
-| **RFC** | Reformule en **Français Clair**, sans jargon | Réécrire le passage visé, **court**, oral, compréhensible tout de suite |
-| **RFCD** | Reformule en **Français Clair et Développé**, sans jargon | Idem, version **plus complète** : plus de contexte, plus de « pourquoi ça compte » |
+| **RFC** | **Reformule** en **Français Clair**, sans jargon | Réécrire le passage visé, **court**, oral, compréhensible tout de suite |
+| **RFCD** | Selon le contexte : **Reformule** *ou* **Réponds** en **Français Clair et Développé**, sans jargon | Version **plus complète** : plus de contexte, plus de « pourquoi ça compte » |
 
 **Ne jamais** interpréter RFC / RFCD comme : Request for Comments, document RFC, relance de `/bmad-code-review` / `/bmad-build`, correction du code, ou changement de verdict.
 
-## Cible
+## Choix du sens pour RFCD (selon le contexte)
+
+| Situation | Sens | Action |
+|-----------|------|--------|
+| Guillaume pointe un passage déjà dit (« RFCD le verdict », « RFCD ce paragraphe ») | **Reformule** en Français Clair et Développé | Réécrire ce passage, plus développé — **sans** nouveaux constats, **sans** changer la reco |
+| Guillaume pose une question / demande un avis, et RFCD sert de mode de réponse (« RFCD : pourquoi… ? », « RFCD cette option ») | **Réponds** en Français Clair et Développé | Répondre à la question **directement**, en français clair et développé — pas une reformulation d’un message antérieur |
+| Ambigu (« RFCD » seul) | Préférer **Reformule** le dernier message assistant trop dense ; si ce n’est clairement pas une reformulation (ex. question ouverte juste avant / dans le même message), alors **Réponds** | Une question courte seulement si les deux lectures restent vraiment possibles |
+
+## Cible (mode Reformule — RFC, et RFCD quand c’est une reformulation)
 
 Le reste du message indique **quoi** reformuler (ex. « RFC décisions à trancher » → seulement ces décisions).  
 Si la cible manque (« RFC » seul) → reformuler le **dernier** message assistant trop dense ; si plusieurs blocs possibles, **une** question courte, puis la reformulation.
 
 ## Comportement
 
-1. **Reformuler uniquement** — ne pas ajouter de nouveaux constats, ne pas changer la recommandation, ne pas coder.
-2. Français parlé, phrases complètes ; jargon d’ingénierie → glose courte ou retrait.
-3. Garder les **noms métier produit** en anglais (`Track Generator`, `Patch Mutator`, …).
-4. Preuves techniques (chemins, classes, IDs) : **une ligne en bas**, pas dans la phrase qui porte le sens.
-5. **RFC** : une passe courte ; pas de redite. Options et reco **conservées**, wording simplifié.
-6. **RFCD** : développer le contexte manquant (enjeu, options, « si on ne tranche pas ») — **pas** répéter trois fois la même idée.
-7. Barème de clarté : `_bmad/custom/clarity-bar-fr.md` (phrase-test « Reformule… »).
+### Commun aux deux modes
+
+1. Français parlé, phrases complètes ; jargon d’ingénierie → glose courte ou retrait.
+2. Garder les **noms métier produit** en anglais (`Track Generator`, `Patch Mutator`, …).
+3. Preuves techniques (chemins, classes, IDs) : **une ligne en bas**, pas dans la phrase qui porte le sens.
+4. Barème de clarté : `_bmad/custom/clarity-bar-fr.md` (phrase-test « Reformule… »).
+5. Ne pas coder, ne pas relancer un workflow, sauf demande explicite à côté.
+
+### Mode Reformule (RFC ; RFCD = reformulation)
+
+1. **Reformuler uniquement** — ne pas ajouter de nouveaux constats, ne pas changer la recommandation.
+2. **RFC** : une passe courte ; pas de redite. Options et reco **conservées**, wording simplifié.
+3. **RFCD** : développer le contexte manquant (enjeu, options, « si on ne tranche pas ») — **pas** répéter trois fois la même idée.
+
+### Mode Réponds (RFCD = réponse à une question)
+
+1. Répondre à la question posée, en français clair et **développé** (contexte utile, pourquoi ça compte, implications).
+2. Ne pas se limiter à une reformulation d’un message antérieur.
+3. Rester dans le scope de la question — ne pas élargir le chantier.
 
 ## Exemples d’intention
 
-- « RFC décisions à trancher » → les décisions du message précédent, version courte
-- « RFCD le verdict » → le verdict **et** ce qu’il implique, version développée
-- « RFC » seul → tout le dernier message assistant trop jargonneux
+- « RFC décisions à trancher » → les décisions du message précédent, version courte (**Reformule**)
+- « RFCD le verdict » → le verdict **et** ce qu’il implique, version développée (**Reformule**)
+- « RFC » seul → tout le dernier message assistant trop jargonneux (**Reformule**)
+- « RFCD : pourquoi cette option plutôt que l’autre ? » → réponse développée à la question (**Réponds**)
+- « RFCD cette option BMad » (question / avis, pas un passage à réécrire) → réponse claire et développée (**Réponds**)
 
 ## Anti-motifs
 
-- Relancer une revue ou un build parce que le message contient « RFC »
+- Relancer une revue ou un build parce que le message contient « RFC » / « RFCD »
 - Produire un document « Request for Comments »
-- Changer l’option recommandée « en passant »
-- Coller à nouveau le jargon (AC, chemins, classes) dans le corps de la reformulation
+- Changer l’option recommandée « en passant » (mode Reformule)
+- Coller à nouveau le jargon (AC, chemins, classes) dans le corps
+- Traiter toute occurrence de RFCD comme une reformulation alors que Guillaume pose une question

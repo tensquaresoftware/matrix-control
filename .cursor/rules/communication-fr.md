@@ -31,7 +31,7 @@ Pendant les commandes BMad story (`build`, `code-review`), appliquer aussi `.cur
 
 Guillaume ne doit **pas** avoir à demander une reformulation pour comprendre une explication, une question ou une décision. Si la phrase-test « Reformule en langage naturel, sans jargon excessif » ferait réécrire le texte → le réécrire **avant** l’envoi.
 
-S’il demande quand même **RFC** / **RFCD**, c’est un raccourci de reformulation (pas une exécution) : voir `.cursor/rules/rfc-rfcd-reformulation.mdc`.
+S’il demande quand même **RFC** / **RFCD**, c’est un raccourci de clarté (pas une exécution) — reformuler, ou pour **RFCD** répondre en français clair et développé selon le contexte : voir `.cursor/rules/rfc-rfcd-reformulation.mdc`.
 
 S’il demande **ROFHA**, c’est un raccourci de ton (réponse objective, franche et honnête — pas une exécution) : voir `.cursor/rules/rofha-honest-answer.mdc`.
 
