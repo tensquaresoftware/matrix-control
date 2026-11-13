@@ -232,8 +232,7 @@ namespace SkinDesignerChrome
     {
         constexpr int kHeaderInset = 12;
         const int fromActions = paletteActionButtonsPreferredWidth();
-        const int fromHeaders = juce::jmax(measureTextWidth(fontBold(), "Product colours"),
-                                           measureTextWidth(fontBold(), "Designer colours"))
+        const int fromHeaders = measureTextWidth(fontBold(), "Palette")
                                 + kHeaderInset;
         const int fromMappedLegend = measureTextWidth(fontBold(), "Mapped colour");
         return juce::jmax(kPaletteListPaintMinWidth,

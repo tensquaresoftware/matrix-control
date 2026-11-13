@@ -3,6 +3,7 @@
 #include "GUI/Skins/Dev/DevSkinInventory.h"
 #include "GUI/Skins/Dev/DevSkinJson.h"
 #include "GUI/Skins/Dev/DevSkinLayer.h"
+#include "GUI/Skins/Dev/DevSkinPaletteCatalog.h"
 #include "GUI/Skins/Skin.h"
 
 class DevSkinLayerJsonTests : public juce::UnitTest
@@ -36,8 +37,20 @@ public:
         beginTest("appendImport_addsDesignerSkin_withoutWipingSession");
         assertAppendImportKeepsExisting();
 
-        beginTest("deletePastille_rejectsProduct_andClearsDevWithRefs");
+        beginTest("deletePastille_allowsFormerChartName_andClearsDevWithRefs");
         assertDeletePastille();
+
+        beginTest("compiledSkin_paletteIsSlimNotFullChart");
+        assertCompiledPaletteSlim();
+
+        beginTest("twoDevSkins_samePastilleName_independentArgb");
+        assertSamePastilleNameIndependentArgb();
+
+        beginTest("duplicateWithMappings_prunesUnmappedPastille");
+        assertDuplicatePrunesUnmapped();
+
+        beginTest("newDesignerSkin_paletteIsExactStarterKit");
+        assertNewSkinExactStarterKit();
 
         beginTest("deletePastille_missingName_leavesMappingsUnchanged");
         assertDeletePastilleMissingLeavesMappings();
@@ -91,6 +104,7 @@ private:
                                             TSS::SkinColourProperty::kTrack,
                                             TSS::SkinColourState::kDefault,
                                             TSS::ColourSet::k3);
+        expect(ensureChartPastilleOnSkin(layer, skin->id, "kGreen300"));
         expect(layer.setMapping(skin->id, key, "kGreen300").wasOk());
         expect(layer.addPastille(skin->id, "kCustomAccent", 0xffff00aa).wasOk());
 
@@ -137,6 +151,7 @@ private:
         bindSkin->mappings.erase(unboundKey);
         expect(bindLayer.unboundKeys(bindSkin->id).size() >= 1);
         expect(bindLayer.bindUnbound(bindSkin->id, unboundKey, "no_such_pastille").failed());
+        expect(ensureChartPastilleOnSkin(bindLayer, bindSkin->id, "kGrey500"));
         expect(bindLayer.bindUnbound(bindSkin->id, unboundKey, "kGrey500").wasOk());
 
         for (const auto& keyIt : bindLayer.unboundKeys(bindSkin->id))
@@ -200,13 +215,75 @@ private:
         return false;
     }
 
+    bool ensureChartPastilleOnSkin(TSS::DevSkin::Layer& layer,
+                                   const juce::String& skinId,
+                                   const juce::String& name) const
+    {
+        const auto* skin = layer.findSkin(skinId);
+        if (skin == nullptr)
+            return false;
+        if (paletteContains(*skin, name))
+            return true;
+        for (const auto& pastille : TSS::DevSkin::colourChartPastilles())
+        {
+            if (pastille.name != name)
+                continue;
+            return layer.addPastille(skinId, name, pastille.argb).wasOk();
+        }
+        return false;
+    }
+
+    void assertCompiledPaletteSlim()
+    {
+        TSS::DevSkin::Layer layer;
+        const auto* cream = layer.findSkin(TSS::DevSkin::kCompiledCreamId);
+        expect(cream != nullptr);
+        const auto chartSize = static_cast<int>(TSS::DevSkin::colourChartPastilles().size());
+        expect(static_cast<int>(cream->palette.size()) < chartSize);
+        expect(cream->palette.size() > 0);
+        expect(cream->palette.size() <= cream->mappings.size());
+    }
+
+    void assertSamePastilleNameIndependentArgb()
+    {
+        TSS::DevSkin::Layer layer;
+        expect(layer.duplicateSkin(TSS::DevSkin::kCompiledBlackId, "Skin A").wasOk());
+        const auto idA = layer.activeSkinId();
+        if (! paletteContains(*layer.findSkin(idA), "kGreen400"))
+            expect(layer.addPastille(idA, "kGreen400", 0xff111111).wasOk());
+        else
+            expect(layer.setPastilleArgb(idA, "kGreen400", 0xff111111).wasOk());
+
+        expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Skin B").wasOk());
+        const auto idB = layer.activeSkinId();
+        if (! paletteContains(*layer.findSkin(idB), "kGreen400"))
+            expect(layer.addPastille(idB, "kGreen400", 0xff222222).wasOk());
+        else
+            expect(layer.setPastilleArgb(idB, "kGreen400", 0xff222222).wasOk());
+
+        expectEquals(static_cast<juce::int64>(*TSS::DevSkin::argbForPastilleName(
+                         layer.findSkin(idA)->palette, "kGreen400")),
+                     static_cast<juce::int64>(0xff111111));
+        expectEquals(static_cast<juce::int64>(*TSS::DevSkin::argbForPastilleName(
+                         layer.findSkin(idB)->palette, "kGreen400")),
+                     static_cast<juce::int64>(0xff222222));
+    }
+
     void assertDeletePastille()
     {
         TSS::DevSkin::Layer layer;
         expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Pastille Edit").wasOk());
         const auto id = layer.activeSkinId();
-        expect(layer.deletePastille(id, "kGrey500", false).failed());
-        expect(paletteContains(*layer.findSkin(id), "kGrey500"));
+        // Former ColourChart name, unmapped: deletable (no product lock).
+        expect(ensureChartPastilleOnSkin(layer, id, "kGreen100"));
+        // Ensure it is not mapped.
+        expect(layer.countMappingsReferencing(id, "kGreen100") == 0
+               || layer.deletePastille(id, "kGreen100", true).wasOk());
+        if (! paletteContains(*layer.findSkin(id), "kGreen100"))
+            expect(ensureChartPastilleOnSkin(layer, id, "kGreen100"));
+        expect(layer.countMappingsReferencing(id, "kGreen100") == 0);
+        expect(layer.deletePastille(id, "kGreen100", false).wasOk());
+        expect(! paletteContains(*layer.findSkin(id), "kGreen100"));
 
         expect(layer.addPastille(id, "kCustomAccent", 0xffff00aa).wasOk());
         expect(paletteContains(*layer.findSkin(id), "kCustomAccent"));
@@ -223,6 +300,41 @@ private:
         expect(layer.countMappingsReferencing(id, "kCustomAccent") == 0);
     }
 
+    void assertDuplicatePrunesUnmapped()
+    {
+        TSS::DevSkin::Layer layer;
+        expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Donor Mapped").wasOk());
+        const auto donorId = layer.activeSkinId();
+        expect(layer.addPastille(donorId, "kOrphanOnly", 0xffabcdef).wasOk());
+        expect(paletteContains(*layer.findSkin(donorId), "kOrphanOnly"));
+
+        expect(layer.duplicateSkin(donorId, "Copy Mapped", true).wasOk());
+        const auto* copy = layer.findSkin(layer.activeSkinId());
+        expect(copy != nullptr);
+        expect(! paletteContains(*copy, "kOrphanOnly"));
+        expect(paletteContains(*copy, "kBrandCream"));
+    }
+
+    void assertNewSkinExactStarterKit()
+    {
+        TSS::DevSkin::Layer layer;
+        expect(layer.createDesignerSkinWithUnboundMappings(TSS::DevSkin::kCompiledBlackId,
+                                                         "Starter Only").wasOk());
+        const auto* skin = layer.findSkin(layer.activeSkinId());
+        expect(skin != nullptr);
+        const auto kit = TSS::DevSkin::designerStarterKitPastilles();
+        expectEquals(static_cast<int>(skin->palette.size()), static_cast<int>(kit.size()));
+        for (const auto& pastille : kit)
+        {
+            expect(paletteContains(*skin, pastille.name));
+            expectEquals(static_cast<juce::int64>(*TSS::DevSkin::argbForPastilleName(
+                             skin->palette, pastille.name)),
+                         static_cast<juce::int64>(pastille.argb));
+        }
+        expect(static_cast<int>(skin->palette.size())
+               < static_cast<int>(TSS::DevSkin::colourChartPastilles().size()));
+    }
+
     void assertDeletePastilleMissingLeavesMappings()
     {
         TSS::DevSkin::Layer layer;
@@ -231,12 +343,13 @@ private:
         const auto key = TSS::skinColourKey(TSS::SkinObjectType::kButton,
                                             TSS::SkinColourProperty::kBackground,
                                             TSS::SkinColourState::kOff);
-        expect(layer.setMapping(id, key, "kGrey500").wasOk());
+        expect(layer.addPastille(id, "kProbeGrey", 0xff606060).wasOk());
+        expect(layer.setMapping(id, key, "kProbeGrey").wasOk());
         const auto beforeMappings = layer.findSkin(id)->mappings.size();
 
         expect(layer.deletePastille(id, "kDoesNotExist", true).failed());
         expectEquals(layer.findSkin(id)->mappings.size(), beforeMappings);
-        expectEquals(layer.findSkin(id)->mappings.at(key), juce::String("kGrey500"));
+        expectEquals(layer.findSkin(id)->mappings.at(key), juce::String("kProbeGrey"));
     }
 
     void assertAppendRemintDistinctIds()
@@ -286,6 +399,7 @@ private:
         expect(layer.unboundCount(skin->id) >= 1);
         expect(! layer.isDesignerSkinExportAllowed(skin->id));
 
+        expect(ensureChartPastilleOnSkin(layer, skin->id, "kGrey500"));
         expect(layer.bindUnbound(skin->id, key, "kGrey500").wasOk());
         expectEquals(layer.unboundCount(skin->id), 0);
         expect(layer.isDesignerSkinExportAllowed(skin->id));
@@ -300,7 +414,8 @@ private:
         const auto* skin = layer.findSkin(id);
         expect(skin != nullptr);
         expect(skin->mappings.empty());
-        expect(skin->palette.size() > 0);
+        expectEquals(static_cast<int>(skin->palette.size()),
+                     static_cast<int>(TSS::DevSkin::designerStarterKitPastilles().size()));
         expectEquals(layer.unboundCount(id),
                      static_cast<int>(TSS::DevSkin::allStructuredKeys().size()));
         expect(! layer.isDesignerSkinExportAllowed(id));

@@ -3308,3 +3308,12 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-cream-chroma-product.md`
   summary: README / shipping docs may still describe five skins without naming CREAM/CHROMA.
   evidence: Blind Hunter; docs lag; not required to ship the skin binary.
+
+## Deferred from: review of spec-skin-designer-palette-per-skin.md (2026-11-13)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-designer-palette-per-skin.md`
+  summary: JSON Load does not auto-prune fat legacy Designer palettes (one-shot Trials migration was chosen instead of Load prune).
+  evidence: Blind Hunter; intentional Depth/Trials decision C; revisit if third-party packs with fat unions become common.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-designer-palette-per-skin.md`
+  summary: `isProductPastilleName` remains an always-false API stub and Palette Row still has unused isProduct field.
+  evidence: Blind Hunter; cosmetic leftover; remove in a later Designer cleanup when call sites are swept.

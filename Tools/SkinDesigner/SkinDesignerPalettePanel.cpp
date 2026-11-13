@@ -105,7 +105,7 @@ void SkinDesignerPalettePanel::updateActionButtonEnablement()
     duplicateButton_.setEnabled(! readOnly_ && selected.isNotEmpty());
     deleteButton_.setEnabled(! readOnly_ && selected.isNotEmpty()
                              && layer_ != nullptr
-                             && ! layer_->isProductPastilleName(selected));
+                             && skinId_.isNotEmpty());
 }
 
 juce::String SkinDesignerPalettePanel::getSelectedPastilleName() const
@@ -307,7 +307,7 @@ void SkinDesignerPalettePanel::paintListBoxItem(int row, juce::Graphics& g, int 
 
     if (item.kind == RowKind::kEmptyHint)
     {
-        // Darker than textMuted so the empty hint stays quiet under Designer colours.
+        // Darker than textMuted so the empty hint stays quiet under the Palette list.
         g.setColour(juce::Colour(0xff666666));
         paintElidedLeft(g, SkinDesignerChrome::fontRegular(), item.headerText,
                         { 6, yOff, juce::jmax(0, paintW - 12), fullH });
@@ -383,8 +383,7 @@ void SkinDesignerPalettePanel::rebuildRows()
     // Floor at two-digit badge so hover capsule does not reflow names.
     mappingCountColumnWidth_ = SkinDesignerChrome::countBadgeWidth(99);
 
-    std::vector<Row> product;
-    std::vector<Row> editor;
+    std::vector<Row> colours;
     for (const auto& pastille : skin->palette)
     {
         Row row;
@@ -392,21 +391,15 @@ void SkinDesignerPalettePanel::rebuildRows()
         row.name = pastille.name;
         row.argb = pastille.argb;
         row.pending = pastille.pending;
-        row.isProduct = layer_->isProductPastilleName(pastille.name);
+        row.isProduct = false;
         row.mappingCount = layer_->countMappingsReferencing(skinId_, pastille.name);
         mappingCountColumnWidth_ = juce::jmax(mappingCountColumnWidth_,
                                               SkinDesignerChrome::countBadgeWidth(row.mappingCount));
-        if (row.isProduct)
-            product.push_back(row);
-        else
-            editor.push_back(row);
+        colours.push_back(row);
     }
 
-    if (! product.empty())
-        appendPaletteGroup("Product colours", product, false);
-    // Always show Designer colours when editable (or when any designer pastille exists).
-    if (! editor.empty() || ! readOnly_)
-        appendPaletteGroup("Designer colours", editor, ! product.empty());
+    if (! colours.empty() || ! readOnly_)
+        appendPaletteGroup("Palette", colours, false);
 }
 
 void SkinDesignerPalettePanel::appendPaletteGroup(const juce::String& title,

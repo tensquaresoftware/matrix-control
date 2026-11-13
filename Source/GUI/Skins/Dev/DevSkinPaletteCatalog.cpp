@@ -1,5 +1,8 @@
 #include "GUI/Skins/Dev/DevSkinPaletteCatalog.h"
 
+#include <algorithm>
+#include <unordered_set>
+
 #include "GUI/Skins/ColourChart.h"
 
 namespace TSS::DevSkin
@@ -78,7 +81,7 @@ namespace TSS::DevSkin
 
     std::vector<Pastille> colourChartPastilles()
     {
-        // Product colours: Brand*, White→Grey→Black, then accents (no Transparent).
+        // Name dictionary only (Shared → greys → reds → Chroma → Cafe/Green).
         std::vector<Pastille> pastilles {
             { "kBrandCream", ColourChart::kBrandCream },
             { "kBrandBlue", ColourChart::kBrandBlue },
@@ -108,6 +111,17 @@ namespace TSS::DevSkin
         return pastilles;
     }
 
+    std::vector<Pastille> designerStarterKitPastilles()
+    {
+        return {
+            { "kBrandCream", ColourChart::kBrandCream },
+            { "kBrandBlue", ColourChart::kBrandBlue },
+            { "kBrandOrange", ColourChart::kBrandOrange },
+            { "kBlack", ColourChart::kBlack },
+            { "kWhite", ColourChart::kWhite },
+        };
+    }
+
     juce::String pastilleNameForArgb(juce::uint32 argb)
     {
         for (const auto& pastille : colourChartPastilles())
@@ -123,5 +137,35 @@ namespace TSS::DevSkin
             if (pastille.name == name)
                 return pastille.argb;
         return std::nullopt;
+    }
+
+    void ensurePastilleOnSkin(NamedSkin& skin, const juce::String& name, juce::uint32 argb)
+    {
+        for (const auto& pastille : skin.palette)
+            if (pastille.name.equalsIgnoreCase(name))
+                return;
+        skin.palette.push_back({ name, argb, false });
+    }
+
+    void prunePaletteToMappedNames(NamedSkin& skin)
+    {
+        std::unordered_set<std::string> keep;
+        for (const auto& [key, name] : skin.mappings)
+        {
+            juce::ignoreUnused(key);
+            keep.insert(name.toStdString());
+        }
+        skin.palette.erase(std::remove_if(skin.palette.begin(), skin.palette.end(),
+                                          [&](const Pastille& pastille)
+                                          {
+                                              return keep.find(pastille.name.toStdString()) == keep.end();
+                                          }),
+                           skin.palette.end());
+    }
+
+    void ensureDesignerStarterKit(NamedSkin& skin)
+    {
+        for (const auto& pastille : designerStarterKitPastilles())
+            ensurePastilleOnSkin(skin, pastille.name, pastille.argb);
     }
 }

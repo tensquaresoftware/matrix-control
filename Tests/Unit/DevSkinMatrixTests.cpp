@@ -7,6 +7,7 @@
 #include "GUI/Skins/Dev/DevSkinBridgeSession.h"
 #include "GUI/Skins/Dev/DevSkinJson.h"
 #include "GUI/Skins/Dev/DevSkinLayer.h"
+#include "GUI/Skins/Dev/DevSkinPaletteCatalog.h"
 #include "GUI/Skins/Dev/DevSkinStandalonePaintState.h"
 #include "GUI/Skins/Skin.h"
 
@@ -71,10 +72,30 @@ private:
                                   TSS::SkinColourState::kOff);
     }
 
+    bool ensureChartPastilleOnSkin(TSS::DevSkin::Layer& layer,
+                                   const juce::String& skinId,
+                                   const juce::String& name)
+    {
+        const auto* skin = layer.findSkin(skinId);
+        if (skin == nullptr)
+            return false;
+        for (const auto& pastille : skin->palette)
+            if (pastille.name == name)
+                return true;
+        for (const auto& pastille : TSS::DevSkin::colourChartPastilles())
+        {
+            if (pastille.name != name)
+                continue;
+            return layer.addPastille(skinId, name, pastille.argb).wasOk();
+        }
+        return false;
+    }
+
     void assertHappyInventApply()
     {
         TSS::DevSkin::Layer layer;
         expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Invent A").wasOk());
+        expect(ensureChartPastilleOnSkin(layer, layer.activeSkinId(), "kGreen300"));
         expect(layer.setMapping(layer.activeSkinId(), buttonOffKey(), "kGreen300").wasOk());
 
         const auto payload = layer.makePushPayload();
@@ -95,6 +116,7 @@ private:
     {
         TSS::DevSkin::Layer layer;
         expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Offline").wasOk());
+        expect(ensureChartPastilleOnSkin(layer, layer.activeSkinId(), "kRed500"));
         expect(layer.setMapping(layer.activeSkinId(), buttonOffKey(), "kRed500").wasOk());
 
         TSS::DevSkin::BridgeSession session;
@@ -110,6 +132,7 @@ private:
         expectEquals(session.pendingPush()->activeSkinId, payload.activeSkinId);
 
         // Designer layer remains editable offline.
+        expect(ensureChartPastilleOnSkin(layer, layer.activeSkinId(), "kGrey500"));
         expect(layer.setPastilleArgb(layer.activeSkinId(), "kGrey500", 0xff112233).wasOk());
     }
 
@@ -149,6 +172,7 @@ private:
         skin->mappings.erase(key);
         expect(layer.unboundKeys(skin->id).size() >= 1);
         expect(layer.bindUnbound(skin->id, key, "missing_pastille").failed());
+        expect(ensureChartPastilleOnSkin(layer, skin->id, "kGrey500"));
         expect(layer.bindUnbound(skin->id, key, "kGrey500").wasOk());
 
         for (const auto& unbound : layer.unboundKeys(skin->id))
@@ -174,6 +198,7 @@ private:
     {
         TSS::DevSkin::Layer layer;
         expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "RoundTrip").wasOk());
+        expect(ensureChartPastilleOnSkin(layer, layer.activeSkinId(), "kBrandBlue"));
         expect(layer.setMapping(layer.activeSkinId(), buttonOffKey(), "kBrandBlue").wasOk());
         const auto json = TSS::DevSkin::exportToJson(layer);
         const auto activeId = layer.activeSkinId();
@@ -198,6 +223,7 @@ private:
             return;
 
         const auto primary = buttonOffKey();
+        expect(ensureChartPastilleOnSkin(layer, skin->id, "kGreen300"));
         expect(layer.setMapping(skin->id, primary, "kGreen300").wasOk());
         for (const auto colourSet : { TSS::ColourSet::k2,
                                       TSS::ColourSet::k3,
@@ -219,6 +245,7 @@ private:
     {
         TSS::DevSkin::Layer layer;
         expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Live").wasOk());
+        expect(ensureChartPastilleOnSkin(layer, layer.activeSkinId(), "kGreen300"));
         expect(layer.setMapping(layer.activeSkinId(), buttonOffKey(), "kGreen300").wasOk());
 
         TSS::DevSkin::StandalonePaintState paint;
@@ -250,6 +277,7 @@ private:
     {
         TSS::DevSkin::Layer layer;
         expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Keep").wasOk());
+        expect(ensureChartPastilleOnSkin(layer, layer.activeSkinId(), "kGreen300"));
         expect(layer.setMapping(layer.activeSkinId(), buttonOffKey(), "kGreen300").wasOk());
         const auto jsonBefore = TSS::DevSkin::exportToJson(layer);
 
@@ -289,6 +317,7 @@ private:
     {
         TSS::DevSkin::Layer layer;
         expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Wire").wasOk());
+        expect(ensureChartPastilleOnSkin(layer, layer.activeSkinId(), "kGreen300"));
         expect(layer.setMapping(layer.activeSkinId(), buttonOffKey(), "kGreen300").wasOk());
 
         const auto original = layer.makePushPayload();

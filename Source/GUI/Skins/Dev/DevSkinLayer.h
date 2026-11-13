@@ -52,11 +52,11 @@ namespace TSS::DevSkin
                                  const juce::String& pastilleName,
                                  juce::uint32 argb,
                                  bool pending = false);
-        /** Rename Designer pastille; rewrites mapping string refs. Product / compiled blocked. */
+        /** Rename Designer pastille; rewrites mapping string refs. Compiled skins blocked. */
         juce::Result renamePastille(const juce::String& skinId,
                                     const juce::String& pastilleName,
                                     const juce::String& newName);
-        /** Dev-only pastille names. Product ColourChart names cannot be deleted. */
+        /** Delete pastille on Dev skins; mapped rows need removeReferencingMappings. */
         juce::Result deletePastille(const juce::String& skinId,
                                     const juce::String& pastilleName,
                                     bool removeReferencingMappings);
@@ -94,6 +94,7 @@ namespace TSS::DevSkin
         std::vector<SkinColourKey> unboundKeys(const juce::String& skinId) const;
         int unboundCount(const juce::String& skinId) const;
         bool isDesignerSkinExportAllowed(const juce::String& skinId) const;
+        /** Always false — Dev palettes are author-owned (API kept for callers). */
         bool isProductPastilleName(const juce::String& pastilleName) const;
         int countMappingsReferencing(const juce::String& skinId,
                                      const juce::String& pastilleName) const;

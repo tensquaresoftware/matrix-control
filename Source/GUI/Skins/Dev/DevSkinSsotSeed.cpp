@@ -14,20 +14,8 @@ namespace TSS::DevSkin
         {
             auto name = pastilleNameForArgb(argb);
             if (name.isEmpty())
-            {
                 name = juce::String::formatted("custom_%08X", static_cast<unsigned>(argb));
-                bool found = false;
-                for (const auto& pastille : skin.palette)
-                {
-                    if (pastille.name == name)
-                    {
-                        found = true;
-                        break;
-                    }
-                }
-                if (! found)
-                    skin.palette.push_back({ name, argb });
-            }
+            ensurePastilleOnSkin(skin, name, argb);
             return name;
         }
 
@@ -49,7 +37,7 @@ namespace TSS::DevSkin
 
         void seedFromMinimalEntries(NamedSkin& skin, const MinimalColourEntry* entries, size_t count)
         {
-            skin.palette = colourChartPastilles();
+            skin.palette.clear();
             skin.mappings.clear();
             for (size_t i = 0; i < count; ++i)
             {
@@ -134,7 +122,7 @@ namespace TSS::DevSkin
             return;
         }
 
-        skin.palette = colourChartPastilles();
+        skin.palette.clear();
         skin.mappings.clear();
         forEachCompiledColourElement([&](const SkinColours::ColourElement& element)
         {

@@ -85,6 +85,12 @@ namespace TSS::DevSkin
         {
             copy.mappings.clear();
             copy.mappingLinkGroups.clear();
+            copy.palette = designerStarterKitPastilles();
+        }
+        else
+        {
+            prunePaletteToMappedNames(copy);
+            ensureDesignerStarterKit(copy);
         }
 
         skins_.push_back(std::move(copy));
@@ -288,9 +294,8 @@ namespace TSS::DevSkin
 
     bool Layer::isProductPastilleName(const juce::String& pastilleName) const
     {
-        for (const auto& pastille : colourChartPastilles())
-            if (pastille.name == pastilleName)
-                return true;
+        // Dev skins own their palette; no global ColourChart rename/delete lock.
+        juce::ignoreUnused(pastilleName);
         return false;
     }
 

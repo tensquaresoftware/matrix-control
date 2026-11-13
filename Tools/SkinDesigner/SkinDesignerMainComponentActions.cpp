@@ -277,8 +277,6 @@ void SkinDesignerMainComponent::onRenamePastille(const juce::String& pastilleNam
 {
     if (! canEditDesignerSkin() || pastilleName.isEmpty())
         return;
-    if (layer_.isProductPastilleName(pastilleName))
-        return;
 
     const auto name = SkinDesignerUi::askText("Rename colour", "New name:", pastilleName);
     if (name.isEmpty() || name == pastilleName)
@@ -304,7 +302,7 @@ void SkinDesignerMainComponent::onDeletePastille()
     if (! canEditDesignerSkin())
         return;
     const auto name = palettePanel_.getSelectedPastilleName();
-    if (name.isEmpty() || layer_.isProductPastilleName(name))
+    if (name.isEmpty())
         return;
 
     bool removeRefs = false;
