@@ -11,7 +11,7 @@ namespace SkinDesignerChrome
     inline juce::Colour surfacePanel() { return juce::Colour(0xff262626); }
     inline juce::Colour surfaceGutter() { return juce::Colour(0xff101010); }
     inline juce::Colour surfaceBand() { return juce::Colour(0xff1a1a1a); }
-    /** Dark band for section titles (Product colours, sticky legend, …). */
+    /** Dark band for section titles (Palette header, sticky legend, …). */
     inline juce::Colour surfaceSection() { return juce::Colour(0xff151515); }
     /**
      * Object / table headers inside Mappings (e.g. envelope group title row).

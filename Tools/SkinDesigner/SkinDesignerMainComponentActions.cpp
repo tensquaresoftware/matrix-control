@@ -7,6 +7,13 @@
 
 void SkinDesignerMainComponent::onDuplicateProduct()
 {
+    if (! hasProductSkinSelected())
+    {
+        juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::InfoIcon,
+                                               "Duplicate Product",
+                                               "Select a Product skin first.");
+        return;
+    }
     if (! duplicateFromSkin(sessionState_.productSkinId))
         return;
     // Compare was cleared in adopt; push only when Standalone Dev is connected.
@@ -50,7 +57,15 @@ bool SkinDesignerMainComponent::duplicateFromSkin(const juce::String& sourceId)
 
 void SkinDesignerMainComponent::onNew()
 {
-    // Product palette + custom Designer pastilles; mappings cleared → full Unbound list.
+    if (! hasProductSkinSelected())
+    {
+        juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::InfoIcon,
+                                               "New Designer skin",
+                                               "Select a Product skin first.");
+        return;
+    }
+
+    // Starter kit (+ merge of current Designer custom pastilles); mappings cleared → full Unbound list.
     const auto name = SkinDesignerUi::askText("New Designer skin", "Name:",
                                             SkinDesignerUi::suggestUniqueSkinName(layer_, "New Skin"));
     if (name.isEmpty())
@@ -180,6 +195,13 @@ void SkinDesignerMainComponent::tickCompareBlink()
 
 void SkinDesignerMainComponent::onCompareToggle()
 {
+    if (! sessionState_.compareOn && ! hasProductSkinSelected())
+    {
+        juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::InfoIcon,
+                                               "Compare",
+                                               "Select a Product skin first.");
+        return;
+    }
     sessionState_.compareOn = ! sessionState_.compareOn;
     refreshAll();
     if (bridge_.isConnected())
@@ -277,10 +299,9 @@ void SkinDesignerMainComponent::onRenamePastille(const juce::String& pastilleNam
 {
     if (! canEditDesignerSkin() || pastilleName.isEmpty())
         return;
-    if (layer_.isProductPastilleName(pastilleName))
-        return;
 
-    const auto name = SkinDesignerUi::askText("Rename colour", "New name:", pastilleName);
+    const auto name = SkinDesignerUi::askText("Rename colour", "New name:", pastilleName,
+                                            "Colour name");
     if (name.isEmpty() || name == pastilleName)
         return;
 
@@ -304,7 +325,7 @@ void SkinDesignerMainComponent::onDeletePastille()
     if (! canEditDesignerSkin())
         return;
     const auto name = palettePanel_.getSelectedPastilleName();
-    if (name.isEmpty() || layer_.isProductPastilleName(name))
+    if (name.isEmpty())
         return;
 
     bool removeRefs = false;

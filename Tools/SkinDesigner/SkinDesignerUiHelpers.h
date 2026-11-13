@@ -49,6 +49,8 @@ namespace SkinDesignerUi
         int maxChars = 0; // > 0 applies TextEditor::setInputRestrictions
         /** Empty = length-only; otherwise printable charset passed to setInputRestrictions. */
         juce::String allowedCharacters;
+        /** Label above the text field (AlertWindow addTextEditor). */
+        juce::String fieldLabel { "Name" };
     };
 
     /** Modal text prompt. Returns false on Cancel (out unchanged). */
@@ -56,7 +58,8 @@ namespace SkinDesignerUi
     {
         SkinDesignerChrome::AlertWindow window(request.title, request.message,
                                              juce::MessageBoxIconType::QuestionIcon);
-        window.addTextEditor("value", request.initial, "Value");
+        const auto label = request.fieldLabel.isNotEmpty() ? request.fieldLabel : juce::String("Name");
+        window.addTextEditor("value", request.initial, label);
         window.addButton("OK", 1, juce::KeyPress(juce::KeyPress::returnKey));
         window.addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey));
         if (auto* editor = window.getTextEditor("value"))
@@ -86,10 +89,11 @@ namespace SkinDesignerUi
     /** Legacy: Cancel and empty OK both return {}. Prefer AskTextRequest when clearing matters. */
     inline juce::String askText(const juce::String& title,
                                 const juce::String& message,
-                                const juce::String& initial)
+                                const juce::String& initial,
+                                const juce::String& fieldLabel = "Skin name")
     {
         juce::String out;
-        if (! askText({ title, message, initial, 0, {} }, out))
+        if (! askText({ title, message, initial, 0, {}, fieldLabel }, out))
             return {};
         return out;
     }
@@ -102,22 +106,27 @@ namespace SkinDesignerUi
                    : storedName;
     }
 
-    /** Product combo: 1=BLACK/GREEN … 6=CREAM/MINIMAL (logo order). */
+    /** Product combo: 0=none, 1=BLACK/GREEN … 6=CREAM/MINIMAL (logo order). */
     inline juce::String productSkinIdFromComboId(int comboId)
     {
         switch (comboId)
         {
+            case 1: return TSS::DevSkin::kCompiledBlackId;
             case 2: return TSS::DevSkin::kCompiledBlackChromaId;
             case 3: return TSS::DevSkin::kCompiledBlackMinimalId;
             case 4: return TSS::DevSkin::kCompiledCreamId;
             case 5: return TSS::DevSkin::kCompiledCreamChromaId;
             case 6: return TSS::DevSkin::kCompiledCreamMinimalId;
-            default: return TSS::DevSkin::kCompiledBlackId;
+            default: return {};
         }
     }
 
     inline int productComboIdFromSkinId(const juce::String& skinId)
     {
+        if (skinId.isEmpty())
+            return 0;
+        if (skinId == TSS::DevSkin::kCompiledBlackId)
+            return 1;
         if (skinId == TSS::DevSkin::kCompiledBlackChromaId
             || skinId == "compiled:black-duo")
             return 2;
@@ -129,7 +138,7 @@ namespace SkinDesignerUi
             return 5;
         if (skinId == TSS::DevSkin::kCompiledCreamMinimalId)
             return 6;
-        return 1;
+        return 0;
     }
 
     inline bool skinNameTaken(const TSS::DevSkin::Layer& layer, const juce::String& name)
@@ -386,6 +395,67 @@ namespace SkinDesignerUi
             ++j;
         }
         return (left.length() - i) - (right.length() - j);
+    }
+
+    /**
+     * Palette list order: BrandCream → BrandBlue → BrandOrange → White → Greys
+     * (light→dark) → Black → everything else A→Z (natural / light→dark steps).
+     */
+    inline int comparePalettePastilleNames(const juce::String& a, const juce::String& b)
+    {
+        const auto label = [](const juce::String& stored) -> juce::String
+        {
+            return displayPastilleName(stored).trim();
+        };
+
+        enum class Rank
+        {
+            kBrandCream = 0,
+            kBrandBlue,
+            kBrandOrange,
+            kWhite,
+            kGrey,
+            kBlack,
+            kOther
+        };
+
+        const auto rankOf = [&](const juce::String& stored) -> Rank
+        {
+            const auto name = label(stored);
+            if (name.equalsIgnoreCase("BrandCream"))
+                return Rank::kBrandCream;
+            if (name.equalsIgnoreCase("BrandBlue"))
+                return Rank::kBrandBlue;
+            if (name.equalsIgnoreCase("BrandOrange"))
+                return Rank::kBrandOrange;
+            if (name.equalsIgnoreCase("White"))
+                return Rank::kWhite;
+            if (name.startsWithIgnoreCase("Grey") && name.length() > 4
+                && name.substring(4).containsOnly("0123456789"))
+                return Rank::kGrey;
+            if (name.equalsIgnoreCase("Black"))
+                return Rank::kBlack;
+            return Rank::kOther;
+        };
+
+        const auto rankA = rankOf(a);
+        const auto rankB = rankOf(b);
+        if (rankA != rankB)
+            return static_cast<int>(rankA) - static_cast<int>(rankB);
+
+        if (rankA == Rank::kGrey)
+        {
+            const auto step = [&](const juce::String& stored) -> int
+            {
+                return label(stored).substring(4).getIntValue();
+            };
+            return step(a) - step(b);
+        }
+
+        if (rankA == Rank::kOther)
+            return compareDesignerSkinNamesNatural(label(a), label(b));
+
+        return 0;
     }
 
     /** Dev skins sorted for the Designer combo (natural name order). */

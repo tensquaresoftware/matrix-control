@@ -109,21 +109,13 @@ private:
         expectEquals(SkinDesignerUi::suggestUniquePastilleName(*skin, "Editor Accent"),
                      juce::String("Editor Accent 3"));
 
-        juce::String productName;
-        juce::uint32 productArgb = 0;
-        for (const auto& pastille : skin->palette)
-        {
-            if (! layer.isProductPastilleName(pastille.name))
-                continue;
-            productName = pastille.name;
-            productArgb = pastille.argb;
-            break;
-        }
-        expect(productName.isNotEmpty());
-        const auto cloneName = SkinDesignerUi::suggestUniquePastilleName(*skin, productName);
+        expect(skin->palette.size() > 0);
+        const auto sourceName = skin->palette.front().name;
+        const auto sourceArgb = skin->palette.front().argb;
+        const auto cloneName = SkinDesignerUi::suggestUniquePastilleName(*skin, sourceName);
         expect(cloneName.isNotEmpty());
-        expect(! layer.isProductPastilleName(cloneName));
-        expect(layer.addPastille(id, cloneName, productArgb, false).wasOk());
+        expect(cloneName != sourceName);
+        expect(layer.addPastille(id, cloneName, sourceArgb, false).wasOk());
 
         skin = layer.findSkin(id);
         expect(skin != nullptr);
@@ -133,7 +125,7 @@ private:
             if (pastille.name != cloneName)
                 continue;
             expectEquals(static_cast<juce::int64>(pastille.argb),
-                         static_cast<juce::int64>(productArgb));
+                         static_cast<juce::int64>(sourceArgb));
             expect(! pastille.pending);
             foundClone = true;
         }
@@ -205,7 +197,8 @@ private:
         expect(layer.setMapping(id, key, "Temp 1").wasOk());
 
         expect(layer.renamePastille(id, "Temp 1", "Accent Draft").wasOk());
-        expect(layer.renamePastille(id, "kGrey500", "Nope").failed());
+        // Chart-named starter pastille is author-owned on Dev skins.
+        expect(layer.renamePastille(id, "kBrandCream", "Plate Cream").wasOk());
         expect(layer.renamePastille(TSS::DevSkin::kCompiledCreamId, "kGrey500", "Nope").failed());
 
         const auto* skin = layer.findSkin(id);
@@ -398,19 +391,23 @@ private:
         expect(layer.renamePastille(id, "Temp 1", {}).failed());
         expect(layer.renamePastille(id, "Temp 1", "   ").failed());
         expect(layer.renamePastille(id, "Temp 1", "temp 2").failed());
-        expect(layer.renamePastille(id, "Temp 1", "kGrey500").failed());
+        // Starter-kit name already on palette after duplicate — collision, not product lock.
+        expect(layer.renamePastille(id, "Temp 1", "kBrandCream").failed());
         expectEquals(layer.revision(), revisionBefore);
+
+        expect(layer.renamePastille(id, "Temp 1", "My Green").wasOk());
 
         const auto* skin = layer.findSkin(id);
         expect(skin != nullptr);
-        bool foundTemp1 = false;
+        bool foundRenamed = false;
         for (const auto& pastille : skin->palette)
         {
-            if (pastille.name == "Temp 1")
-                foundTemp1 = true;
+            if (pastille.name == "My Green")
+                foundRenamed = true;
+            expect(pastille.name != "Temp 1");
             expect(pastille.name != "temp 2");
         }
-        expect(foundTemp1);
+        expect(foundRenamed);
     }
 
     void assertThreeArgAddPendingFalse()

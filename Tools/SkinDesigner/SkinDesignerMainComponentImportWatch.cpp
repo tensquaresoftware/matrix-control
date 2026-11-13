@@ -299,12 +299,7 @@ void SkinDesignerMainComponent::reloadWatchedImportJsonFromDisk()
 
     if (! result.ok)
     {
-        // Accept the refused fingerprint so Ask/Auto do not re-fire every poll
-        // until the file changes again (layer stays untouched).
-        refreshWatchedImportFingerprint();
-        juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon,
-                                               "Reload refused",
-                                               result.message);
+        handleWatchedImportReloadRefusal(result.message);
         return;
     }
 

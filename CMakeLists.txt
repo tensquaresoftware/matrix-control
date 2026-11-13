@@ -592,6 +592,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/SkinColourWiringCoverageTests.cpp
         Tests/Unit/ColourSetModelTests.cpp
         Tests/Unit/DevSkinLayerJsonTests.cpp
+        Tests/Unit/DevSkinStarterKitTests.cpp
         Tests/Unit/DevSkinSessionJsonSyncTests.cpp
         Tests/Unit/DevSkinSessionImportWatchTests.cpp
         Tests/Unit/DevSkinWorkspaceFilesTests.cpp
@@ -601,6 +602,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/DevSkinCompiledSeedInventoryTests.cpp
         Tests/Unit/DevSkinMatrixTests.cpp
         Tests/Unit/DevSkinPendingPastilleTests.cpp
+        Tests/Unit/SkinDesignerPaletteOrderTests.cpp
         Tests/Unit/SkinDesignerMappingModePolicyTests.cpp
         Tests/Unit/SkinDesignerMappingLinkGroupsTests.cpp
         Tests/Unit/SkinDesignerMappingsColumnFilterTests.cpp

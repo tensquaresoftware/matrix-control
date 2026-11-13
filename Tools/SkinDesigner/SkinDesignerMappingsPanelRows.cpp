@@ -202,7 +202,8 @@ void SkinDesignerMappingsPanel::tryEditColourSetLabel(int row)
             + juce::String(TSS::DevSkin::kColourSetLabelMaxChars) + " ASCII).",
         item.colourSetHelpLabel,
         TSS::DevSkin::kColourSetLabelMaxChars,
-        TSS::DevSkin::colourSetLabelAllowedChars()
+        TSS::DevSkin::colourSetLabelAllowedChars(),
+        "Label"
     };
     if (! SkinDesignerUi::askText(request, next))
         return;

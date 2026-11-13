@@ -38,7 +38,8 @@ namespace TSS::DevSkin
      */
     struct DesignerSessionState
     {
-        juce::String productSkinId = kCompiledBlackId;
+        /** Runtime only: selected Product skin (empty = none / "Select a skin"). */
+        juce::String productSkinId;
         /** Runtime only: active Designer skin of the open workspace (empty = none). */
         juce::String designerSkinId;
         /** Runtime only: Compare always starts Off. */
@@ -52,8 +53,11 @@ namespace TSS::DevSkin
     /** Document id written into (and required from) the session file. */
     inline constexpr const char* kSessionDocumentId = "skinDesignerSession";
 
-    /** Sets Product to first combo item (BLACK today). Call after session load to ignore restored Product. */
-    void forceProductToFirstAvailable(DesignerSessionState& state);
+    /**
+     * Blank launch: clear Product selection (never persisted). Call after session load so a
+     * stale in-memory id cannot survive preferences restore.
+     */
+    void clearProductSelectionAtLaunch(DesignerSessionState& state);
 
     /** Preferences-only session document (no skins, no watch path). */
     juce::String exportSessionToJson(const DesignerSessionState& state);

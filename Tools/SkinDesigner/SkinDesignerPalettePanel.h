@@ -129,7 +129,6 @@ private:
     void roundFlagsForRow(int row, bool& roundTop, bool& roundBottom) const noexcept;
     static bool isBlockBoundary(RowKind kind) noexcept;
     static bool isContentRow(RowKind kind) noexcept;
-    void appendPaletteGroup(const juce::String& title, std::vector<Row>& colours, bool leadGap);
     void paintColourRow(juce::Graphics& g, const Row& item, int row, int yOff);
     void paintStickySectionHeaders(juce::Graphics& g);
     bool stickyHeaderHitTest(int x, int y) const noexcept;

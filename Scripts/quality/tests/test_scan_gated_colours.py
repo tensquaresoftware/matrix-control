@@ -58,6 +58,10 @@ def test_tests_tree_is_excluded(scan):
 def test_lock_film_and_palette_are_allowlisted(scan):
     assert scan.is_allowlisted("Source/GUI/Helpers/LockDimmingFilm.cpp")
     assert scan.is_allowlisted("Source/GUI/Skins/ColourChart.h")
+    assert scan.is_allowlisted("Source/GUI/Skins/ColourChartShared.h")
+    assert scan.is_allowlisted("Source/GUI/Skins/ColourChartGreen.h")
+    assert scan.is_allowlisted("Source/GUI/Skins/ColourChartChroma.h")
+    assert scan.is_allowlisted("Source/GUI/Skins/ColourChartCafe.h")
     assert scan.is_allowlisted("Source/GUI/Skins/SkinColoursPanels.h")
     assert scan.is_allowlisted("Source/GUI/Skins/Dev/DevSkinBridgeClient.cpp")
     assert scan.is_allowlisted("Source/GUI/Skins/Dev/DevSkinTypes.h")

@@ -295,7 +295,7 @@ namespace TSS::DevSkin
             if (! imported.ok)
                 return imported;
             if (requireDesignerSkins && skins.size() == compiledCount)
-                return JsonIoResult::failure("No Designer skins found in JSON");
+                return JsonIoResult::failure(kNoDesignerSkinsInJsonMessage);
 
             auto result = JsonIoResult::success();
             for (size_t i = compiledCount; i < skins.size(); ++i)
@@ -330,7 +330,7 @@ namespace TSS::DevSkin
         if (! parsedSkins.ok)
             return parsedSkins;
         if (imported.empty())
-            return JsonIoResult::failure("No Designer skins found in JSON");
+            return JsonIoResult::failure(kNoDesignerSkinsInJsonMessage);
 
         JsonIoResult result = JsonIoResult::success();
         for (auto& skin : imported)

@@ -225,19 +225,14 @@ namespace SkinDesignerChrome
     }
 
     /**
-     * List / Mapped-colour paint floor: action row, section headers, and "Mapped colour"
-     * legend (header text uses 6 px inset each side).
+     * List / Mapped-colour paint floor: action row and "Mapped colour" legend
+     * (header text uses 6 px inset each side).
      */
     inline int paletteListPaintFloor() noexcept
     {
-        constexpr int kHeaderInset = 12;
         const int fromActions = paletteActionButtonsPreferredWidth();
-        const int fromHeaders = juce::jmax(measureTextWidth(fontBold(), "Product colours"),
-                                           measureTextWidth(fontBold(), "Designer colours"))
-                                + kHeaderInset;
         const int fromMappedLegend = measureTextWidth(fontBold(), "Mapped colour");
-        return juce::jmax(kPaletteListPaintMinWidth,
-                          juce::jmax(fromActions, juce::jmax(fromHeaders, fromMappedLegend)));
+        return juce::jmax(kPaletteListPaintMinWidth, juce::jmax(fromActions, fromMappedLegend));
     }
 
     /**

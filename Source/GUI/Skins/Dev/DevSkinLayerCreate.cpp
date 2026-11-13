@@ -1,5 +1,7 @@
 #include "GUI/Skins/Dev/DevSkinLayer.h"
 
+#include "GUI/Skins/Dev/DevSkinPaletteCatalog.h"
+
 namespace TSS::DevSkin
 {
     juce::Result Layer::createDesignerSkinWithUnboundMappings(
@@ -29,9 +31,6 @@ namespace TSS::DevSkin
     {
         for (const auto& pastille : source.palette)
         {
-            if (isProductPastilleName(pastille.name))
-                continue;
-
             bool exists = false;
             for (const auto& existing : dest.palette)
             {
@@ -78,14 +77,16 @@ namespace TSS::DevSkin
         juce::String cursor = skin.derivedFrom;
         for (int guard = 0; guard < 64; ++guard)
         {
+            if (cursor.isEmpty())
+                break;
             if (isCompiledProductId(cursor))
                 return cursor;
-            const auto* parent = findSkin(cursor);
-            if (parent == nullptr)
+            const auto* next = findSkin(cursor);
+            if (next == nullptr)
                 break;
-            if (auto id = idForKind(parent->kind); id.isNotEmpty())
+            if (auto id = idForKind(next->kind); id.isNotEmpty())
                 return id;
-            cursor = parent->derivedFrom;
+            cursor = next->derivedFrom;
         }
         return kCompiledCreamId;
     }

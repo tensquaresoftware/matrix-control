@@ -9,7 +9,7 @@ File set = tracked (`git ls-files`) plus untracked
 (`git ls-files --others --exclude-standard`) under Source/GUI/.
 
 Allowlisted SSOT / policy paths (not scanned for violations):
-  - Skins/ColourChart.h
+  - Skins/ColourChart.h (+ Shared / Green / Chroma / Cafe chart parts)
   - Skins/SkinColours*.h
   - Helpers/LockDimmingFilm.cpp
   - Skins/Dev/DevSkinBridge*.cpp (IPC magic, not UI colours)
@@ -40,6 +40,10 @@ CPP_SUFFIXES = {".h", ".hpp", ".hh", ".cpp", ".cc", ".cxx"}
 # Paths relative to Source/GUI/ that are allowlisted (exact file match).
 ALLOWLIST_UNDER_GUI = {
     "Skins/ColourChart.h",
+    "Skins/ColourChartShared.h",
+    "Skins/ColourChartGreen.h",
+    "Skins/ColourChartChroma.h",
+    "Skins/ColourChartCafe.h",
     "Helpers/LockDimmingFilm.cpp",
     "Skins/Dev/DevSkinBridgeClient.cpp",
     "Skins/Dev/DevSkinBridgeServer.cpp",

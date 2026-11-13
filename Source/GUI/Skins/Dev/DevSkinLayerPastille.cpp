@@ -6,16 +6,12 @@ namespace TSS::DevSkin
 {
     namespace
     {
-        juce::Result renamePastilleNameGuards(const Layer& layer,
-                                              const juce::String& pastilleName,
+        juce::Result renamePastilleNameGuards(const juce::String& pastilleName,
                                               const juce::String& trimmedNewName)
         {
-            if (layer.isProductPastilleName(pastilleName))
-                return juce::Result::fail("Product colours cannot be renamed");
+            juce::ignoreUnused(pastilleName);
             if (trimmedNewName.isEmpty())
                 return juce::Result::fail("Pastille name cannot be empty");
-            if (layer.isProductPastilleName(trimmedNewName))
-                return juce::Result::fail("Product colour names are reserved");
             return juce::Result::ok();
         }
 
@@ -99,8 +95,7 @@ namespace TSS::DevSkin
             return juce::Result::fail("Compiled Black/Cream are read-only; Duplicate first");
 
         const auto trimmed = newName.trim();
-        if (const auto guard = renamePastilleNameGuards(*this, pastilleName, trimmed);
-            guard.failed())
+        if (const auto guard = renamePastilleNameGuards(pastilleName, trimmed); guard.failed())
             return guard;
 
         auto* skin = findSkinMutable(skinId);
@@ -133,9 +128,6 @@ namespace TSS::DevSkin
     {
         if (isCompiledId(skinId))
             return juce::Result::fail("Compiled Black/Cream are read-only; Duplicate first");
-
-        if (isProductPastilleName(pastilleName))
-            return juce::Result::fail("Product colours cannot be deleted");
 
         auto* skin = findSkinMutable(skinId);
         if (skin == nullptr)

@@ -3,6 +3,7 @@
 #include "GUI/Skins/Dev/DevSkinLayer.h"
 #include "GUI/Skins/Dev/DevSkinSession.h"
 #include "GUI/Skins/Dev/DevSkinTypes.h"
+#include "Tools/SkinDesigner/SkinDesignerUiHelpers.h"
 
 class DevSkinLaunchProductTests : public juce::UnitTest
 {
@@ -17,11 +18,14 @@ public:
         beginTest("launchProduct_sessionDoesNotPersistProduct");
         assertSessionDoesNotPersistProduct();
 
-        beginTest("launchProduct_forceFirst_onDefaultAndInvalidId");
-        assertLaunchProductForceOnDefaultAndInvalidId();
+        beginTest("launchProduct_clearsSelection_onDefaultAndInvalidId");
+        assertLaunchProductClearsOnDefaultAndInvalidId();
 
         beginTest("blankLaunch_sessionNeverRestoresDesignerSkin");
         assertBlankLaunchRestoresNoDesignerSkin();
+
+        beginTest("productCombo_emptyIdMapsToSelectASkin");
+        assertProductComboEmptyMapsToNone();
     }
 
 private:
@@ -34,13 +38,13 @@ private:
 
         TSS::DevSkin::DesignerSessionState restoredState;
         expect(TSS::DevSkin::importSessionFromJson(restoredState, json).ok);
-        expectEquals(restoredState.productSkinId, juce::String(TSS::DevSkin::kCompiledBlackId));
+        expect(restoredState.productSkinId.isEmpty());
     }
 
-    void assertLaunchProductForceOnDefaultAndInvalidId()
+    void assertLaunchProductClearsOnDefaultAndInvalidId()
     {
         TSS::DevSkin::DesignerSessionState defaults;
-        expectEquals(defaults.productSkinId, juce::String(TSS::DevSkin::kCompiledBlackId));
+        expect(defaults.productSkinId.isEmpty());
 
         TSS::DevSkin::DesignerSessionState seed;
         auto json = TSS::DevSkin::exportSessionToJson(seed);
@@ -52,11 +56,11 @@ private:
 
         TSS::DevSkin::DesignerSessionState restoredState;
         expect(TSS::DevSkin::importSessionFromJson(restoredState, json).ok);
-        expectEquals(restoredState.productSkinId, juce::String(TSS::DevSkin::kCompiledBlackId));
+        expect(restoredState.productSkinId.isEmpty());
 
         restoredState.productSkinId = TSS::DevSkin::kCompiledCreamId;
-        TSS::DevSkin::forceProductToFirstAvailable(restoredState);
-        expectEquals(restoredState.productSkinId, juce::String(TSS::DevSkin::kCompiledBlackId));
+        TSS::DevSkin::clearProductSelectionAtLaunch(restoredState);
+        expect(restoredState.productSkinId.isEmpty());
     }
 
     void assertBlankLaunchRestoresNoDesignerSkin()
@@ -80,6 +84,15 @@ private:
         expect(creamChroma != nullptr);
         if (creamChroma != nullptr)
             expectEquals(creamChroma->name, juce::String("CREAM/CHROMA"));
+    }
+
+    void assertProductComboEmptyMapsToNone()
+    {
+        expect(SkinDesignerUi::productSkinIdFromComboId(0).isEmpty());
+        expectEquals(SkinDesignerUi::productComboIdFromSkinId({}), 0);
+        expectEquals(SkinDesignerUi::productSkinIdFromComboId(1),
+                     juce::String(TSS::DevSkin::kCompiledBlackId));
+        expectEquals(SkinDesignerUi::productComboIdFromSkinId(TSS::DevSkin::kCompiledBlackId), 1);
     }
 };
 

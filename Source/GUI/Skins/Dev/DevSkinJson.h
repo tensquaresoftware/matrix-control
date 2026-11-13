@@ -14,6 +14,9 @@ namespace TSS::DevSkin
         static JsonIoResult failure(juce::String msg) { return { false, std::move(msg), {} }; }
     };
 
+    /** Load/append refuse when the file has only Product skins (or an empty skins array). */
+    inline constexpr const char* kNoDesignerSkinsInJsonMessage = "No Designer skins found in JSON";
+
     /** Full Dev-layer snapshot: all Designer skins + activeSkinId (Save as draft workspace pack). */
     juce::String exportToJson(const Layer& layer);
 

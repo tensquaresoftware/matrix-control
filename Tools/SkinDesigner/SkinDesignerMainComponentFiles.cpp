@@ -69,6 +69,29 @@ void SkinDesignerMainComponent::browseForWorkspaceFile()
                          });
 }
 
+void SkinDesignerMainComponent::showNoDesignerSkinsInJsonAlert(const juce::String& title)
+{
+    juce::AlertWindow::showAsync(
+        juce::MessageBoxOptions()
+            .withIconType(juce::MessageBoxIconType::WarningIcon)
+            .withTitle(title)
+            .withMessage(juce::String(TSS::DevSkin::kNoDesignerSkinsInJsonMessage)
+                         + "\n\nCreate a new Designer skin or duplicate a Product skin to start.")
+            .withButton("Got it", 0)
+            .withAssociatedComponent(this),
+        [](int) {});
+}
+
+void SkinDesignerMainComponent::handleWatchedImportReloadRefusal(const juce::String& message)
+{
+    // Accept fingerprint so Ask/Auto do not re-fire until the file changes again.
+    refreshWatchedImportFingerprint();
+    if (message == TSS::DevSkin::kNoDesignerSkinsInJsonMessage)
+        showNoDesignerSkinsInJsonAlert("Reload refused");
+    else
+        showFileAlert("Reload refused", message);
+}
+
 void SkinDesignerMainComponent::loadWorkspaceFromFile(const juce::File& file)
 {
     const auto text = file.existsAsFile() ? file.loadFileAsString() : juce::String();
@@ -86,7 +109,10 @@ void SkinDesignerMainComponent::loadWorkspaceFromFile(const juce::File& file)
     });
     if (! result.ok)
     {
-        showFileAlert("Load refused", result.message);
+        if (result.message == TSS::DevSkin::kNoDesignerSkinsInJsonMessage)
+            showNoDesignerSkinsInJsonAlert("Load refused");
+        else
+            showFileAlert("Load refused", result.message);
         return;
     }
 
