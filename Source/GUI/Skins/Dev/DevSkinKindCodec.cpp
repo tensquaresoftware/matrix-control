@@ -11,6 +11,7 @@ namespace TSS::DevSkin
             case SkinKind::kCompiledBlackMinimal: return "compiledBlackMinimal";
             case SkinKind::kCompiledCream:        return "compiledCream";
             case SkinKind::kCompiledCreamMinimal: return "compiledCreamMinimal";
+            case SkinKind::kCompiledCreamChroma:  return "compiledCreamChroma";
             case SkinKind::kDev:                  return "dev";
         }
         return "dev";
@@ -43,6 +44,11 @@ namespace TSS::DevSkin
             out = SkinKind::kCompiledCreamMinimal;
             return true;
         }
+        if (text == "compiledCreamChroma")
+        {
+            out = SkinKind::kCompiledCreamChroma;
+            return true;
+        }
         if (text == "dev")
         {
             out = SkinKind::kDev;
@@ -57,6 +63,7 @@ namespace TSS::DevSkin
             || skinId == kCompiledBlackChromaId
             || skinId == kCompiledBlackMinimalId
             || skinId == kCompiledCreamId
-            || skinId == kCompiledCreamMinimalId;
+            || skinId == kCompiledCreamMinimalId
+            || skinId == kCompiledCreamChromaId;
     }
 }

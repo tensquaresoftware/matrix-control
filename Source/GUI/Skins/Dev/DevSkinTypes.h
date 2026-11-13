@@ -53,6 +53,7 @@ namespace TSS::DevSkin
     inline constexpr const char* kCompiledBlackMinimalId = "compiled:black-minimal";
     inline constexpr const char* kCompiledCreamId = "compiled:cream";
     inline constexpr const char* kCompiledCreamMinimalId = "compiled:cream-minimal";
+    inline constexpr const char* kCompiledCreamChromaId = "compiled:cream-chroma";
 
     enum class SkinKind
     {
@@ -61,6 +62,7 @@ namespace TSS::DevSkin
         kCompiledBlackMinimal,
         kCompiledCream,
         kCompiledCreamMinimal,
+        kCompiledCreamChroma,
         kDev
     };
 

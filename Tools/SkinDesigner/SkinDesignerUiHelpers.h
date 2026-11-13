@@ -102,7 +102,7 @@ namespace SkinDesignerUi
                    : storedName;
     }
 
-    /** Product combo: 1=BLACK/GREEN … 5=CREAM/MINIMAL (logo order). */
+    /** Product combo: 1=BLACK/GREEN … 6=CREAM/MINIMAL (logo order). */
     inline juce::String productSkinIdFromComboId(int comboId)
     {
         switch (comboId)
@@ -110,7 +110,8 @@ namespace SkinDesignerUi
             case 2: return TSS::DevSkin::kCompiledBlackChromaId;
             case 3: return TSS::DevSkin::kCompiledBlackMinimalId;
             case 4: return TSS::DevSkin::kCompiledCreamId;
-            case 5: return TSS::DevSkin::kCompiledCreamMinimalId;
+            case 5: return TSS::DevSkin::kCompiledCreamChromaId;
+            case 6: return TSS::DevSkin::kCompiledCreamMinimalId;
             default: return TSS::DevSkin::kCompiledBlackId;
         }
     }
@@ -124,8 +125,10 @@ namespace SkinDesignerUi
             return 3;
         if (skinId == TSS::DevSkin::kCompiledCreamId)
             return 4;
-        if (skinId == TSS::DevSkin::kCompiledCreamMinimalId)
+        if (skinId == TSS::DevSkin::kCompiledCreamChromaId)
             return 5;
+        if (skinId == TSS::DevSkin::kCompiledCreamMinimalId)
+            return 6;
         return 1;
     }
 

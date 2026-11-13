@@ -287,6 +287,7 @@ namespace TSS::DevSkin
             skins.push_back(makeCompiledSkin(SkinKind::kCompiledBlackChroma));
             skins.push_back(makeCompiledSkin(SkinKind::kCompiledBlackMinimal));
             skins.push_back(makeCompiledSkin(SkinKind::kCompiledCream));
+            skins.push_back(makeCompiledSkin(SkinKind::kCompiledCreamChroma));
             skins.push_back(makeCompiledSkin(SkinKind::kCompiledCreamMinimal));
 
             const auto compiledCount = skins.size();
@@ -385,6 +386,8 @@ namespace TSS::DevSkin
                 out.compiledAncestorId = kCompiledBlackMinimalId;
             else if (out.kind == SkinKind::kCompiledCreamMinimal || out.derivedFrom == kCompiledCreamMinimalId)
                 out.compiledAncestorId = kCompiledCreamMinimalId;
+            else if (out.kind == SkinKind::kCompiledCreamChroma || out.derivedFrom == kCompiledCreamChromaId)
+                out.compiledAncestorId = kCompiledCreamChromaId;
             else
                 out.compiledAncestorId = kCompiledCreamId;
         }

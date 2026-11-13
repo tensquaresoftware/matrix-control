@@ -53,14 +53,14 @@ private:
         using namespace TSS::SkinColours::Widgets;
 
         expect(Slider::kTrack.blackChromaVariant == ColourChart::kBlue950);
-        expect(Slider::kValueBar.blackChromaVariant == ColourChart::kBlue600);
-        expect(Slider::kText.blackChromaVariant == ColourChart::kBlue400);
+        expect(Slider::kValueBar.blackChromaVariant == ColourChart::kBlue650);
+        expect(Slider::kText.blackChromaVariant == ColourChart::kBlue450);
         expect(SliderK2::kTrack.blackChromaVariant == ColourChart::kOrange950);
-        expect(SliderK2::kValueBar.blackChromaVariant == ColourChart::kOrange700);
-        expect(SliderK2::kText.blackChromaVariant == ColourChart::kOrange400);
+        expect(SliderK2::kValueBar.blackChromaVariant == ColourChart::kOrange650);
+        expect(SliderK2::kText.blackChromaVariant == ColourChart::kOrange350);
         expect(SliderK3::kTrack.blackChromaVariant == ColourChart::kYellow950);
-        expect(SliderK3::kValueBar.blackChromaVariant == ColourChart::kYellow700);
-        expect(SliderK3::kText.blackChromaVariant == ColourChart::kYellow400);
+        expect(SliderK3::kValueBar.blackChromaVariant == ColourChart::kYellow650);
+        expect(SliderK3::kText.blackChromaVariant == ColourChart::kYellow300);
     }
 
     void assertBlackMasterHeaderSharePatchEmerald()
@@ -131,8 +131,8 @@ private:
     {
         const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::BlackChroma);
         expect(skin->getSliderTrackColour(true) == juce::Colour(ColourChart::kBlue950));
-        expect(skin->getSliderValueBarColour(true) == juce::Colour(ColourChart::kBlue600));
-        expect(skin->getSliderTextColour(true) == juce::Colour(ColourChart::kBlue400));
+        expect(skin->getSliderValueBarColour(true) == juce::Colour(ColourChart::kBlue650));
+        expect(skin->getSliderTextColour(true) == juce::Colour(ColourChart::kBlue450));
     }
 
     void assertModalesLook(TSS::Skin::ColourVariant variant)

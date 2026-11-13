@@ -144,6 +144,8 @@ TSS::Skin* PluginEditor::skinForVariantId(int skinItemId) const noexcept
         return skinCream_.get();
     if (skinItemId == kCreamMinimal)
         return skinCreamMinimal_.get();
+    if (skinItemId == kCreamChroma)
+        return skinCreamChroma_.get();
     return skinBlack_.get();
 }
 
@@ -183,6 +185,8 @@ namespace
           PluginIDs::Settings::SkinVariants::kCream, "Compiled Cream" },
         { TSS::DevSkin::SkinKind::kCompiledCreamMinimal,
           PluginIDs::Settings::SkinVariants::kCreamMinimal, "Compiled CREAM/MINIMAL" },
+        { TSS::DevSkin::SkinKind::kCompiledCreamChroma,
+          PluginIDs::Settings::SkinVariants::kCreamChroma, "Compiled CREAM/CHROMA" },
     };
 }
 

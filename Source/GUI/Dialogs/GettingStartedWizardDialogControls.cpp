@@ -76,6 +76,7 @@ void GettingStartedWizardDialog::populateScaleAndSkinItems()
     skinCombo_->addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kBlackChroma, kBlackChroma);
     skinCombo_->addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kBlackMinimal, kBlackMinimal);
     skinCombo_->addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kCream, kCream);
+    skinCombo_->addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kCreamChroma, kCreamChroma);
     skinCombo_->addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kCreamMinimal, kCreamMinimal);
 }
 

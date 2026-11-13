@@ -19,7 +19,8 @@ namespace TSS
             BlackChroma,
             BlackMinimal,
             Cream,
-            CreamMinimal
+            CreamMinimal,
+            CreamChroma
         };
 
         /** Getting Started Matrix monochrome chrome always uses BLACK/GREEN,
@@ -32,7 +33,8 @@ namespace TSS
             kCream = 2,
             kBlackChroma = 3,
             kBlackMinimal = 4,
-            kCreamMinimal = 5
+            kCreamMinimal = 5,
+            kCreamChroma = 6
         };
 
         explicit Skin(ColourVariant variant);

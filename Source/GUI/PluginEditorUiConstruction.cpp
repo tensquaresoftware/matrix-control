@@ -25,6 +25,7 @@ void PluginEditor::createUiShell()
     skinBlackMinimal_ = TSS::Skin::create(TSS::Skin::ColourVariant::BlackMinimal);
     skinCream_ = TSS::Skin::create(TSS::Skin::ColourVariant::Cream);
     skinCreamMinimal_ = TSS::Skin::create(TSS::Skin::ColourVariant::CreamMinimal);
+    skinCreamChroma_ = TSS::Skin::create(TSS::Skin::ColourVariant::CreamChroma);
 
     skin_ = skinForVariantId(pluginProcessor.getSkinVariantId());
 

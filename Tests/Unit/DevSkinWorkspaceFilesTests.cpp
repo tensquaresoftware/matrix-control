@@ -43,6 +43,9 @@ public:
 
         beginTest("saveTargets_getJsonExtension_andStatusPrefixesAreRecognised");
         assertSaveTargetsAndStatusPrefixes();
+
+        beginTest("productCombo_mapsCreamChromaAndMinimalInLogoOrder");
+        assertProductComboCreamChromaMapping();
     }
 
 private:
@@ -66,7 +69,7 @@ private:
         expect(layer.findSkin(oldId) == nullptr);
         expect(layer.findSkin(trialA) != nullptr);
         expect(layer.findSkin(trialB) != nullptr);
-        expectEquals(layer.skins().size(), static_cast<size_t>(7));
+        expectEquals(layer.skins().size(), static_cast<size_t>(8));
         expectEquals(layer.activeSkinId(), trialA);
     }
 
@@ -83,7 +86,7 @@ private:
 
         const auto loaded = TSS::DevSkin::replaceDesignerSkinsFromJson(layer, exported);
         expect(loaded.ok);
-        expectEquals(layer.skins().size(), static_cast<size_t>(6));
+        expectEquals(layer.skins().size(), static_cast<size_t>(7));
         expect(layer.findSkin(readyId) != nullptr);
         expectEquals(layer.activeSkinId(), readyId);
     }
@@ -235,6 +238,16 @@ private:
         expectEquals(juce::String(SkinDesignerUi::kQuitSaveButton), juce::String("Save"));
         expectEquals(juce::String(SkinDesignerUi::kQuitDiscardButton), juce::String("Discard"));
         expectEquals(juce::String(SkinDesignerUi::kQuitCancelButton), juce::String("Cancel"));
+    }
+
+    void assertProductComboCreamChromaMapping()
+    {
+        expectEquals(SkinDesignerUi::productSkinIdFromComboId(5),
+                     juce::String(TSS::DevSkin::kCompiledCreamChromaId));
+        expectEquals(SkinDesignerUi::productSkinIdFromComboId(6),
+                     juce::String(TSS::DevSkin::kCompiledCreamMinimalId));
+        expectEquals(SkinDesignerUi::productComboIdFromSkinId(TSS::DevSkin::kCompiledCreamChromaId), 5);
+        expectEquals(SkinDesignerUi::productComboIdFromSkinId(TSS::DevSkin::kCompiledCreamMinimalId), 6);
     }
 };
 

@@ -131,6 +131,7 @@ private:
     void setupPatchMutatorSection(TSS::ISkin& skin);
     void setupMasterSection(TSS::ISkin& skin);
     void populateComboItems();
+    void populateAppearanceComboItems();
     void applyComboPopupLooks(TSS::ISkin& skin);
     void applyChildLooks(TSS::ISkin& skin);
 

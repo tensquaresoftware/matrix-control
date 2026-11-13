@@ -125,9 +125,7 @@ void PluginEditor::wireGettingStartedAppearanceCallbacks(
     };
     bindings.onSkinChanged = [this](int skinId)
     {
-        using namespace PluginIDs::Settings::SkinVariants;
-        if (skinId == kBlack || skinId == kBlackChroma || skinId == kBlackMinimal
-            || skinId == kCream || skinId == kCreamMinimal)
+        if (PluginIDs::Settings::SkinVariants::isValid(skinId))
             applySkinFromItemId(skinId, true);
     };
 }

@@ -6,23 +6,50 @@ namespace TSS::DevSkin
 {
     namespace
     {
-        std::vector<Pastille> zoneAccentPastilles()
+        // Indexed families in chart step order within each hue.
+        std::vector<Pastille> chromaAccentPastilles()
         {
-            // Indexed families: lightest → darkest within each hue.
             return {
+                { "kBlue100", ColourChart::kBlue100 },
+                { "kBlue200", ColourChart::kBlue200 },
                 { "kBlue400", ColourChart::kBlue400 },
+                { "kBlue450", ColourChart::kBlue450 },
+                { "kBlue500", ColourChart::kBlue500 },
                 { "kBlue600", ColourChart::kBlue600 },
+                { "kBlue650", ColourChart::kBlue650 },
+                { "kBlue700", ColourChart::kBlue700 },
+                { "kBlue750", ColourChart::kBlue750 },
                 { "kBlue800", ColourChart::kBlue800 },
                 { "kBlue950", ColourChart::kBlue950 },
+                { "kOrange100", ColourChart::kOrange100 },
+                { "kOrange200", ColourChart::kOrange200 },
+                { "kOrange350", ColourChart::kOrange350 },
                 { "kOrange400", ColourChart::kOrange400 },
                 { "kOrange500", ColourChart::kOrange500 },
+                { "kOrange550", ColourChart::kOrange550 },
+                { "kOrange600", ColourChart::kOrange600 },
+                { "kOrange650", ColourChart::kOrange650 },
                 { "kOrange700", ColourChart::kOrange700 },
+                { "kOrange750", ColourChart::kOrange750 },
                 { "kOrange800", ColourChart::kOrange800 },
                 { "kOrange950", ColourChart::kOrange950 },
+                { "kYellow100", ColourChart::kYellow100 },
+                { "kYellow200", ColourChart::kYellow200 },
+                { "kYellow300", ColourChart::kYellow300 },
                 { "kYellow400", ColourChart::kYellow400 },
+                { "kYellow500", ColourChart::kYellow500 },
+                { "kYellow600", ColourChart::kYellow600 },
+                { "kYellow650", ColourChart::kYellow650 },
                 { "kYellow700", ColourChart::kYellow700 },
                 { "kYellow800", ColourChart::kYellow800 },
+                { "kYellow850", ColourChart::kYellow850 },
                 { "kYellow950", ColourChart::kYellow950 },
+            };
+        }
+
+        std::vector<Pastille> cafeAndGreenPastilles()
+        {
+            return {
                 { "kCafe50", ColourChart::kCafe50 },
                 { "kCafe150", ColourChart::kCafe150 },
                 { "kCafe200", ColourChart::kCafe200 },
@@ -76,8 +103,8 @@ namespace TSS::DevSkin
             { "kRed800", ColourChart::kRed800 },
             { "kRed900", ColourChart::kRed900 },
         };
-        const auto accents = zoneAccentPastilles();
-        pastilles.insert(pastilles.end(), accents.begin(), accents.end());
+        for (const auto& accents : { chromaAccentPastilles(), cafeAndGreenPastilles() })
+            pastilles.insert(pastilles.end(), accents.begin(), accents.end());
         return pastilles;
     }
 

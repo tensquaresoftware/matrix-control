@@ -100,7 +100,7 @@ namespace TSS::SkinColours
             inline constexpr ColourElement kEnvelope = {
                 skinColourKey(SkinObjectType::kEnvelopeDisplay, SkinColourProperty::kEnvelope),
                 ColourChart::kGreen300,
-                ColourChart::kBlue400,
+                ColourChart::kBlue450,
                 ColourChart::kGreen600
             };
         }
@@ -124,7 +124,7 @@ namespace TSS::SkinColours
             inline constexpr ColourElement kShaper = {
                 skinColourKey(SkinObjectType::kTrackGeneratorDisplay, SkinColourProperty::kShaper),
                 ColourChart::kGreen300,
-                ColourChart::kBlue400,
+                ColourChart::kBlue450,
                 ColourChart::kGreen600
             };
         }
@@ -213,7 +213,7 @@ namespace TSS::SkinColours
             inline constexpr ColourElement kMaxOn = {
                 skinColourKey(SkinObjectType::kLed, SkinColourProperty::kBackground, SkinColourState::kOn),
                 ColourChart::kGreen300,
-                ColourChart::kYellow400,
+                ColourChart::kYellow300,
                 ColourChart::kGreen500
             };
         }
@@ -271,7 +271,7 @@ namespace TSS::SkinColours
                               SkinColourProperty::kBackground,
                               SkinColourState::kOn),
                 ColourChart::kGreen300,
-                ColourChart::kYellow400,
+                ColourChart::kYellow300,
                 ColourChart::kGreen500
             };
         }

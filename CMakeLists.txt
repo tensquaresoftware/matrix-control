@@ -614,6 +614,7 @@ if(MATRIX_BUILD_TESTS)
         Tools/SkinDesigner/SkinDesignerSkinsPanel.cpp
         Tools/SkinDesigner/SkinDesignerStepper.cpp
         Tests/Unit/SliderZoneSeedTests.cpp
+        Tests/Unit/SkinCreamChromaTests.cpp
         Tests/Unit/ProgressBarUcsSeedTests.cpp
         Tests/Unit/PatchManagerActionHandlerComputerNavigationTests.cpp
         Tests/Unit/PatchManagerActionHandlerNavDebounceTests.cpp

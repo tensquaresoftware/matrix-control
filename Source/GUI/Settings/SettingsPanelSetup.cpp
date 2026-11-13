@@ -164,7 +164,7 @@ void SettingsPanel::setupMasterSection(TSS::ISkin& skin)
     addAndMakeVisible(*masterDeleteInitButton_);
 }
 
-void SettingsPanel::populateComboItems()
+void SettingsPanel::populateAppearanceComboItems()
 {
     using namespace PluginIDs::Settings::ScaleLevels;
     uiScaleCombo_->addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k50, k50);
@@ -180,7 +180,13 @@ void SettingsPanel::populateComboItems()
     skinCombo_->addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kBlackChroma, kBlackChroma);
     skinCombo_->addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kBlackMinimal, kBlackMinimal);
     skinCombo_->addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kCream, kCream);
+    skinCombo_->addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kCreamChroma, kCreamChroma);
     skinCombo_->addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kCreamMinimal, kCreamMinimal);
+}
+
+void SettingsPanel::populateComboItems()
+{
+    populateAppearanceComboItems();
 
     using namespace PluginIDs::Settings::InfoMessage;
     infoMessageCombo_->addItem(PluginDisplayNames::Settings::kKeep, kKeep);

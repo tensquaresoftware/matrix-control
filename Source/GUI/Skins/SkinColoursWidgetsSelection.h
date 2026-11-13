@@ -19,21 +19,21 @@ namespace TSS::SkinColours
             inline constexpr ColourElement kTriangle = {
                 skinColourKey(SkinObjectType::kComboBox, SkinColourProperty::kTriangle),
                 ColourChart::kGreen750,
-                ColourChart::kBlue600,
+                ColourChart::kBlue650,
                 ColourChart::kGreen500
             };
 
             inline constexpr ColourElement kText = {
                 skinColourKey(SkinObjectType::kComboBox, SkinColourProperty::kText),
                 ColourChart::kGreen300,
-                ColourChart::kBlue400,
+                ColourChart::kBlue450,
                 ColourChart::kGreen100
             };
 
             inline constexpr ColourElement kFocusBorder = {
                 skinColourKey(SkinObjectType::kComboBox, SkinColourProperty::kFocusBorder),
                 ColourChart::kGreen900,
-                ColourChart::kBlue800,
+                ColourChart::kBlue750,
                 ColourChart::kGreen700
             };
 
@@ -118,7 +118,7 @@ namespace TSS::SkinColours
                 skinColourKey(SkinObjectType::kComboBox, SkinColourProperty::kFocusBorder,
                               SkinColourState::kDefault, ColourSet::k2),
                 ColourChart::kGreen900,
-                ColourChart::kOrange800,
+                ColourChart::kOrange750,
                 ColourChart::kGreen700
             };
 
@@ -126,7 +126,7 @@ namespace TSS::SkinColours
                 skinColourKey(SkinObjectType::kComboBox, SkinColourProperty::kText,
                               SkinColourState::kDefault, ColourSet::k2),
                 ColourChart::kGreen300,
-                ColourChart::kOrange400,
+                ColourChart::kOrange350,
                 ColourChart::kGreen100
             };
 
@@ -150,7 +150,7 @@ namespace TSS::SkinColours
                 skinColourKey(SkinObjectType::kComboBox, SkinColourProperty::kTriangle,
                               SkinColourState::kDefault, ColourSet::k2),
                 ColourChart::kGreen750,
-                ColourChart::kOrange700,
+                ColourChart::kOrange650,
                 ColourChart::kGreen500
             };
 
@@ -260,21 +260,21 @@ namespace TSS::SkinColours
             inline constexpr ColourElement kBorder = {
                 skinColourKey(SkinObjectType::kPopupMenu, SkinColourProperty::kBorder),
                 ColourChart::kGreen300,
-                ColourChart::kBlue400,
+                ColourChart::kBlue450,
                 ColourChart::kGreen600
             };
 
             inline constexpr ColourElement kSeparator = {
                 skinColourKey(SkinObjectType::kPopupMenu, SkinColourProperty::kSeparator),
                 ColourChart::kGreen300,
-                ColourChart::kBlue400,
+                ColourChart::kBlue450,
                 ColourChart::kGreen600
             };
 
             inline constexpr ColourElement kText = {
                 skinColourKey(SkinObjectType::kPopupMenu, SkinColourProperty::kText),
                 ColourChart::kGreen300,
-                ColourChart::kBlue400,
+                ColourChart::kBlue450,
                 ColourChart::kGreen800
             };
 
@@ -282,14 +282,14 @@ namespace TSS::SkinColours
             inline constexpr ColourElement kTextDisabled = {
                 skinColourKey(SkinObjectType::kPopupMenu, SkinColourProperty::kText, SkinColourState::kDisabled),
                 ColourChart::kGreen750,
-                ColourChart::kBlue600,
+                ColourChart::kBlue650,
                 ColourChart::kGreen400
             };
 
             inline constexpr ColourElement kBackgroundHover = {
                 skinColourKey(SkinObjectType::kPopupMenu, SkinColourProperty::kBackground, SkinColourState::kHover),
                 ColourChart::kGreen300,
-                ColourChart::kBlue400,
+                ColourChart::kBlue450,
                 ColourChart::kGreen600
             };
 
@@ -322,7 +322,7 @@ namespace TSS::SkinColours
                 skinColourKey(SkinObjectType::kPopupMenu, SkinColourProperty::kBackground,
                               SkinColourState::kHover, ColourSet::k2),
                 ColourChart::kGreen300,
-                ColourChart::kOrange400,
+                ColourChart::kOrange350,
                 ColourChart::kGreen600
             };
 
@@ -330,7 +330,7 @@ namespace TSS::SkinColours
                 skinColourKey(SkinObjectType::kPopupMenu, SkinColourProperty::kBorder,
                               SkinColourState::kDefault, ColourSet::k2),
                 ColourChart::kGreen300,
-                ColourChart::kOrange400,
+                ColourChart::kOrange350,
                 ColourChart::kGreen600
             };
 
@@ -346,7 +346,7 @@ namespace TSS::SkinColours
                 skinColourKey(SkinObjectType::kPopupMenu, SkinColourProperty::kSeparator,
                               SkinColourState::kDefault, ColourSet::k2),
                 ColourChart::kGreen300,
-                ColourChart::kOrange400,
+                ColourChart::kOrange350,
                 ColourChart::kGreen600
             };
 
@@ -354,7 +354,7 @@ namespace TSS::SkinColours
                 skinColourKey(SkinObjectType::kPopupMenu, SkinColourProperty::kText,
                               SkinColourState::kDefault, ColourSet::k2),
                 ColourChart::kGreen300,
-                ColourChart::kOrange400,
+                ColourChart::kOrange350,
                 ColourChart::kGreen800
             };
 
@@ -362,7 +362,7 @@ namespace TSS::SkinColours
                 skinColourKey(SkinObjectType::kPopupMenu, SkinColourProperty::kText,
                               SkinColourState::kDisabled, ColourSet::k2),
                 ColourChart::kGreen750,
-                ColourChart::kOrange700,
+                ColourChart::kOrange650,
                 ColourChart::kGreen400
             };
 

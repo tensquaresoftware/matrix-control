@@ -16,13 +16,7 @@ void PluginEditor::restoreSettingsAppearanceFromState(SettingsPanel& panel)
         : ScaleLevels::kDefault;
 
     const int skinId = pluginProcessor.getSkinVariantId();
-    const int normalizedSkin = (skinId == SkinVariants::kBlack
-                                || skinId == SkinVariants::kBlackChroma
-                                || skinId == SkinVariants::kBlackMinimal
-                                || skinId == SkinVariants::kCream
-                                || skinId == SkinVariants::kCreamMinimal)
-        ? skinId
-        : SkinVariants::kDefault;
+    const int normalizedSkin = SkinVariants::isValid(skinId) ? skinId : SkinVariants::kDefault;
 
     panel.getUiScaleCombo().setSelectedId(normalizedScale, juce::dontSendNotification);
     panel.getSkinCombo().setSelectedId(normalizedSkin, juce::dontSendNotification);
@@ -45,10 +39,8 @@ void PluginEditor::wireSettingsAppearanceCombos(SettingsPanel& panel)
 
     panel.getSkinCombo().onChange = [this, &panel]
     {
-        using namespace PluginIDs::Settings::SkinVariants;
         const int selectedId = panel.getSkinCombo().getSelectedId();
-        if (selectedId != kBlack && selectedId != kBlackChroma && selectedId != kBlackMinimal
-            && selectedId != kCream && selectedId != kCreamMinimal)
+        if (! PluginIDs::Settings::SkinVariants::isValid(selectedId))
             return;
 
         applySkinFromItemId(selectedId, true);

@@ -4,6 +4,7 @@
 #include "GUI/Skins/Dev/DevSkinMinimalSeed.h"
 #include "GUI/Skins/Dev/DevSkinPaletteCatalog.h"
 #include "GUI/Skins/SkinColours.h"
+#include "GUI/Skins/SkinColoursCreamChroma.h"
 
 namespace TSS::DevSkin
 {
@@ -64,7 +65,14 @@ namespace TSS::DevSkin
                 || kind == SkinKind::kCompiledBlackChroma
                 || kind == SkinKind::kCompiledBlackMinimal
                 || kind == SkinKind::kCompiledCream
-                || kind == SkinKind::kCompiledCreamMinimal;
+                || kind == SkinKind::kCompiledCreamMinimal
+                || kind == SkinKind::kCompiledCreamChroma;
+        }
+
+        void seedCreamChromaAccents(NamedSkin& skin)
+        {
+            for (const auto& accent : SkinColours::CreamChroma::kAccentOverrides)
+                skin.mappings[accent.key] = pastilleNameForElement(skin, accent.argb);
         }
     }
 
@@ -93,6 +101,11 @@ namespace TSS::DevSkin
         {
             skin.id = kCompiledCreamMinimalId;
             skin.name = "CREAM/MINIMAL";
+        }
+        else if (kind == SkinKind::kCompiledCreamChroma)
+        {
+            skin.id = kCompiledCreamChromaId;
+            skin.name = "CREAM/CHROMA";
         }
         else
         {
@@ -127,5 +140,7 @@ namespace TSS::DevSkin
         {
             putMapping(skin, element, compiledBase);
         });
+        if (compiledBase == SkinKind::kCompiledCreamChroma)
+            seedCreamChromaAccents(skin);
     }
 }

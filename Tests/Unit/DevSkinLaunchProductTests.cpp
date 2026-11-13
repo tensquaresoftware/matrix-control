@@ -2,6 +2,7 @@
 
 #include "GUI/Skins/Dev/DevSkinLayer.h"
 #include "GUI/Skins/Dev/DevSkinSession.h"
+#include "GUI/Skins/Dev/DevSkinTypes.h"
 
 class DevSkinLaunchProductTests : public juce::UnitTest
 {
@@ -74,7 +75,11 @@ private:
 
         // A fresh layer (what the app builds at launch) holds compiled Product skins only.
         TSS::DevSkin::Layer launchLayer;
-        expectEquals(launchLayer.skins().size(), static_cast<size_t>(5));
+        expectEquals(launchLayer.skins().size(), static_cast<size_t>(6));
+        const auto* creamChroma = launchLayer.findSkin(TSS::DevSkin::kCompiledCreamChromaId);
+        expect(creamChroma != nullptr);
+        if (creamChroma != nullptr)
+            expectEquals(creamChroma->name, juce::String("CREAM/CHROMA"));
     }
 };
 

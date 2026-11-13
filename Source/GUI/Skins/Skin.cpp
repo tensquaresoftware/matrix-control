@@ -2,6 +2,7 @@
 
 #include "Dev/DevSkinColourElementList.h"
 #include "Dev/DevSkinMinimalSeed.h"
+#include "SkinColoursCreamChroma.h"
 
 #include <PluginFontsData.h>
 
@@ -139,5 +140,9 @@ namespace TSS
                 argb = element.blackChromaVariant;
             colours_[element.key] = juce::Colour(argb);
         });
+
+        if (currentVariant_ == ColourVariant::CreamChroma)
+            for (const auto& accent : SkinColours::CreamChroma::kAccentOverrides)
+                colours_[accent.key] = juce::Colour(accent.argb);
     }
 }

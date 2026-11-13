@@ -142,7 +142,7 @@ private:
                                   SkinColourProperty::kText,
                                   SkinColourState::kDisabled));
         expect(popupLook.textDisabled
-               == seedFor(variant, ColourChart::kBlue600, ColourChart::kGreen400));
+               == seedFor(variant, ColourChart::kBlue650, ColourChart::kGreen400));
 
         const auto popupLookMono = TSS::popupMenuLookForZone(*skin, TSS::kMonoMenuExceptionZone);
         expect(popupLookMono.textDisabled
@@ -246,7 +246,7 @@ private:
         expectSeed(SkinObjectType::kLed, SkinColourProperty::kBorder, SkinColourState::kOff,
                    ColourChart::kGrey800, ColourChart::kCafe500);
         expectSeed(SkinObjectType::kLed, SkinColourProperty::kBackground, SkinColourState::kOn,
-                   ColourChart::kYellow400, ColourChart::kGreen500);
+                   ColourChart::kYellow300, ColourChart::kGreen500);
         expectSeed(SkinObjectType::kChromeText, SkinColourProperty::kText, SkinColourState::kHover,
                    ColourChart::kWhite, ColourChart::kCafe750);
         expectSeed(SkinObjectType::kModuleHeader, SkinColourProperty::kLineOrange, SkinColourState::kDefault,
@@ -271,7 +271,7 @@ private:
                == skin->getColour(SkinObjectType::kLed,
                                   SkinColourProperty::kBackground,
                                   SkinColourState::kOn));
-        expect(ledLook.maxOn == seedFor(variant, ColourChart::kYellow400, ColourChart::kGreen500));
+        expect(ledLook.maxOn == seedFor(variant, ColourChart::kYellow300, ColourChart::kGreen500));
         expect(ledLook.maxOn.getFloatAlpha() == 1.0f);
 
         const auto fieldLook = TSS::readOnlyValueFieldLookFromSkin(*skin);

@@ -97,7 +97,7 @@ private:
         TSS::DevSkin::Layer restored;
         const auto imported = TSS::DevSkin::importFromJson(restored, TSS::DevSkin::exportToJson(layer));
         expect(imported.ok);
-        expectEquals(restored.skins().size(), static_cast<size_t>(6));
+        expectEquals(restored.skins().size(), static_cast<size_t>(7));
 
         const auto* restoredDev = restored.findSkin(skin->id);
         expect(restoredDev != nullptr);
@@ -253,7 +253,7 @@ private:
         expect(second.ok);
         expectEquals(second.importedSkinIds.size(), 1);
         expect(first.importedSkinIds[0] != second.importedSkinIds[0]);
-        expectEquals(layer.skins().size(), static_cast<size_t>(7));
+        expectEquals(layer.skins().size(), static_cast<size_t>(8));
     }
 
     void assertAppendMultiSkinAddsTwo()

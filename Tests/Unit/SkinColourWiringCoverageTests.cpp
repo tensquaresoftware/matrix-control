@@ -124,7 +124,7 @@ private:
         return TSS::skinColourKey(object, property, state, colourSet);
     }
 
-    static juce::Colour remapColour() { return juce::Colour(ColourChart::kYellow400); }
+    static juce::Colour remapColour() { return juce::Colour(ColourChart::kYellow300); }
 
     void assertModuleHeaderLookTextHoverUsesOwner()
     {
@@ -200,7 +200,7 @@ private:
     {
         const auto skin = TSS::Skin::create(TSS::Skin::ColourVariant::Black);
         const auto patchBefore = TSS::sliderLookForZone(*skin, SkinZone::kPatch);
-        const auto caretK4 = juce::Colour(ColourChart::kOrange400);
+        const auto caretK4 = juce::Colour(ColourChart::kOrange350);
 
         skin->setColour(key(SkinObjectType::kSlider, SkinColourProperty::kCaret, SkinColourState::kDefault,
                             ColourSet::k4),
@@ -262,7 +262,7 @@ private:
         expect(TSS::buttonAlertLookFromSkin(*skin).textClicked == remapColour());
         expect(TSS::buttonLookFromSkin(*skin).textHover == juce::Colour(ColourChart::kBlack));
 
-        const auto buttonHover = juce::Colour(ColourChart::kOrange400);
+        const auto buttonHover = juce::Colour(ColourChart::kOrange350);
         skin->setColour(key(SkinObjectType::kButton, SkinColourProperty::kText, SkinColourState::kHover),
                         buttonHover);
         expect(TSS::buttonLookFromSkin(*skin).textHover == buttonHover);
@@ -354,9 +354,9 @@ private:
         const auto master = TSS::sliderLookForZone(*skin, SkinZone::kMaster);
         const auto header = TSS::sliderLookForZone(*skin, SkinZone::kHeader);
         const auto modales = TSS::sliderLookForZone(*skin, SkinZone::kModales);
-        expect(patch.textEnabled == juce::Colour(ColourChart::kBlue400));
-        expect(master.textEnabled == juce::Colour(ColourChart::kOrange400));
-        expect(header.textEnabled == juce::Colour(ColourChart::kYellow400));
+        expect(patch.textEnabled == juce::Colour(ColourChart::kBlue450));
+        expect(master.textEnabled == juce::Colour(ColourChart::kOrange350));
+        expect(header.textEnabled == juce::Colour(ColourChart::kYellow300));
         expect(modales.trackEnabled == juce::Colour(ColourChart::kBlack));
         expect(modales.valueBarEnabled == juce::Colour(ColourChart::kGrey600));
         expect(modales.textEnabled == juce::Colour(ColourChart::kGrey200));

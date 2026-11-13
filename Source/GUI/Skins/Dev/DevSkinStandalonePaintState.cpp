@@ -11,6 +11,7 @@ namespace TSS::DevSkin
         blackMinimal_ = Skin::create(Skin::ColourVariant::BlackMinimal);
         cream_ = Skin::create(Skin::ColourVariant::Cream);
         creamMinimal_ = Skin::create(Skin::ColourVariant::CreamMinimal);
+        creamChroma_ = Skin::create(Skin::ColourVariant::CreamChroma);
         selectCompiled(Skin::ColourVariant::Cream);
     }
 
@@ -38,6 +39,8 @@ namespace TSS::DevSkin
             active_ = blackMinimal_.get();
         else if (variant == Skin::ColourVariant::CreamMinimal)
             active_ = creamMinimal_.get();
+        else if (variant == Skin::ColourVariant::CreamChroma)
+            active_ = creamChroma_.get();
         else
             active_ = cream_.get();
     }
@@ -65,6 +68,8 @@ namespace TSS::DevSkin
             return compiledOk(Skin::ColourVariant::Cream, "Compiled Cream");
         if (payload.kind == SkinKind::kCompiledCreamMinimal)
             return compiledOk(Skin::ColourVariant::CreamMinimal, "Compiled CREAM/MINIMAL");
+        if (payload.kind == SkinKind::kCompiledCreamChroma)
+            return compiledOk(Skin::ColourVariant::CreamChroma, "Compiled CREAM/CHROMA");
 
         const auto base = compiledBaseVariant(payload);
         auto nextOverlay = Skin::create(base);

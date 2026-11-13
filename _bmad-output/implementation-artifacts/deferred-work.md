@@ -3296,3 +3296,15 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-skin-designer-undo-redo.md`
   summary: After more than ~100 edits, a Save marker that fell off the undo stack can never be reached again so Save may stay active after full undo.
   evidence: Edge Case; rare deep-history case; would need marker retention beyond cap or dirty recompute by content equality.
+
+## Deferred from: review of spec-cream-chroma-product.md (2026-11-13)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-cream-chroma-product.md`
+  summary: Logo CREAM/CHROMA row enablement/item id is only indirectly locked (SkinComboBoxItemId == PluginIDs); menu items_ stay private GUI.
+  evidence: Verification Gap; reverting the logo row to greyed valueId 0 would not fail unit tests without an extractable skin-row table.
+- source_spec: `_bmad-output/implementation-artifacts/spec-cream-chroma-product.md`
+  summary: Pre-remap Designer/Trials JSON that stored kBlue400/kOrange400/kYellow400 pastille names now resolve to Soft cream RGB in ColourChart.
+  evidence: Blind Hunter; intentional rename with RGB preserved for compiled seeds; old author files keep their own stored ARGB but name→chart lookups can surprise.
+- source_spec: `_bmad-output/implementation-artifacts/spec-cream-chroma-product.md`
+  summary: README / shipping docs may still describe five skins without naming CREAM/CHROMA.
+  evidence: Blind Hunter; docs lag; not required to ship the skin binary.

@@ -34,6 +34,7 @@ namespace TSS::DevSkin
         std::unique_ptr<Skin> blackMinimal_;
         std::unique_ptr<Skin> cream_;
         std::unique_ptr<Skin> creamMinimal_;
+        std::unique_ptr<Skin> creamChroma_;
         std::unique_ptr<Skin> overlay_;
         Skin* active_ = nullptr;
         Skin::ColourVariant compiledSelection_ = Skin::ColourVariant::Cream;

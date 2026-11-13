@@ -203,7 +203,13 @@ namespace PluginIDs
             constexpr int kBlackChroma = 3;
             constexpr int kBlackMinimal = 4;
             constexpr int kCreamMinimal = 5;
+            constexpr int kCreamChroma = 6;
             constexpr int kDefault = kBlack;
+
+            constexpr bool isValid(int id) noexcept
+            {
+                return id >= kBlack && id <= kCreamChroma;
+            }
         }
 
         namespace ScaleLevels

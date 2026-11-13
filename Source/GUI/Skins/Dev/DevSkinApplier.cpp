@@ -12,7 +12,8 @@ namespace TSS::DevSkin
                 || kind == SkinKind::kCompiledBlackChroma
                 || kind == SkinKind::kCompiledBlackMinimal
                 || kind == SkinKind::kCompiledCream
-                || kind == SkinKind::kCompiledCreamMinimal;
+                || kind == SkinKind::kCompiledCreamMinimal
+                || kind == SkinKind::kCompiledCreamChroma;
         }
 
         struct CompiledVariantRule
@@ -28,6 +29,7 @@ namespace TSS::DevSkin
             { SkinKind::kCompiledBlackMinimal, kCompiledBlackMinimalId, Skin::ColourVariant::BlackMinimal },
             { SkinKind::kCompiledCream, kCompiledCreamId, Skin::ColourVariant::Cream },
             { SkinKind::kCompiledCreamMinimal, kCompiledCreamMinimalId, Skin::ColourVariant::CreamMinimal },
+            { SkinKind::kCompiledCreamChroma, kCompiledCreamChromaId, Skin::ColourVariant::CreamChroma },
         };
 
         bool payloadMatchesRule(const PushPayload& payload, const CompiledVariantRule& rule) noexcept

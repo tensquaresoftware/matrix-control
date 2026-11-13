@@ -170,7 +170,7 @@ namespace TSS
             case 2: return kBlackChroma;
             case 3: return kBlackMinimal;
             case 4: return kCream;
-            case 5: return 0; // CREAM/CHROMA placeholder (logo row greyed; not shipping yet)
+            case 5: return kCreamChroma;
             case 6: return kCreamMinimal;
             default: return 0;
         }
@@ -184,8 +184,8 @@ namespace TSS
 
     /**
         Returns SkinVariants id for Cmd/Ctrl+digit in combo order, or 0 if none / unassigned.
-        Digits follow logo order (1=BLACK/GREEN … 6=CREAM/MINIMAL); ids stay stable for prefs.
-        Digit 5 is reserved for upcoming CREAM/CHROMA.
+        Digits follow logo order (1=BLACK/GREEN … 6=CREAM/MINIMAL); ids stay stable for prefs
+        (digit 5 = CREAM/CHROMA id 6, digit 6 = CREAM/MINIMAL id 5).
     */
     inline int classifySkinVariantShortcut(const juce::KeyPress& key)
     {

@@ -66,9 +66,9 @@ namespace SkinColourWiringTestSupport
     {
         switch (colourSet)
         {
-            case TSS::ColourSet::k1: return juce::Colour(ColourChart::kBlue400);
-            case TSS::ColourSet::k2: return juce::Colour(ColourChart::kOrange400);
-            case TSS::ColourSet::k3: return juce::Colour(ColourChart::kYellow400);
+            case TSS::ColourSet::k1: return juce::Colour(ColourChart::kBlue450);
+            case TSS::ColourSet::k2: return juce::Colour(ColourChart::kOrange350);
+            case TSS::ColourSet::k3: return juce::Colour(ColourChart::kYellow300);
             case TSS::ColourSet::k4: return juce::Colour(ColourChart::kGrey600);
         }
         return juce::Colour(ColourChart::kWhite);

@@ -54,6 +54,7 @@ namespace TSS::DevSkin
             { SkinKind::kCompiledBlackMinimal, kCompiledBlackMinimalId },
             { SkinKind::kCompiledCream, kCompiledCreamId },
             { SkinKind::kCompiledCreamMinimal, kCompiledCreamMinimalId },
+            { SkinKind::kCompiledCreamChroma, kCompiledCreamChromaId },
         };
 
         const auto idForKind = [](SkinKind kind) -> juce::String

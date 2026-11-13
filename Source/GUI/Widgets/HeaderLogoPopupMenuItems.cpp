@@ -62,13 +62,11 @@ namespace TSS
                            PluginDisplayNames::ChoiceLists::SkinVariants::kCream,
                            TSS::EditorChromeShortcutLabels::skinVariant(4),
                            1, 4 });
-        // Upcoming product skin: shown greyed with reserved shortcut digit 5.
         items_.push_back({ ItemKind::Skin,
-                           0,
+                           static_cast<int>(Skin::SkinComboBoxItemId::kCreamChroma),
                            PluginDisplayNames::ChoiceLists::SkinVariants::kCreamChroma,
                            TSS::EditorChromeShortcutLabels::skinVariant(5),
-                           1, 5,
-                           false });
+                           1, 5 });
         items_.push_back({ ItemKind::Skin,
                            static_cast<int>(Skin::SkinComboBoxItemId::kCreamMinimal),
                            PluginDisplayNames::ChoiceLists::SkinVariants::kCreamMinimal,

@@ -150,21 +150,21 @@ namespace TSS::SkinColours
             inline constexpr ColourElement kTextOff = {
                 skinColourKey(SkinObjectType::kToggle, SkinColourProperty::kText, SkinColourState::kOff),
                 ColourChart::kGreen750,
-                ColourChart::kBlue600,
+                ColourChart::kBlue650,
                 ColourChart::kGreen500
             };
 
             inline constexpr ColourElement kBackgroundOn = {
                 skinColourKey(SkinObjectType::kToggle, SkinColourProperty::kBackground, SkinColourState::kOn),
                 ColourChart::kGreen900,
-                ColourChart::kBlue800,
+                ColourChart::kBlue750,
                 ColourChart::kGreen600
             };
 
             inline constexpr ColourElement kTextOn = {
                 skinColourKey(SkinObjectType::kToggle, SkinColourProperty::kText, SkinColourState::kOn),
                 ColourChart::kGreen300,
-                ColourChart::kBlue400,
+                ColourChart::kBlue450,
                 ColourChart::kGreen100
             };
 
@@ -203,21 +203,21 @@ namespace TSS::SkinColours
             inline constexpr ColourElement kValueBar = {
                 skinColourKey(SkinObjectType::kSlider, SkinColourProperty::kValueBar),
                 ColourChart::kGreen750,
-                ColourChart::kBlue600,
+                ColourChart::kBlue650,
                 ColourChart::kGreen500
             };
 
             inline constexpr ColourElement kText = {
                 skinColourKey(SkinObjectType::kSlider, SkinColourProperty::kText),
                 ColourChart::kGreen300,
-                ColourChart::kBlue400,
+                ColourChart::kBlue450,
                 ColourChart::kGreen100
             };
 
             inline constexpr ColourElement kFocusBorder = {
                 skinColourKey(SkinObjectType::kSlider, SkinColourProperty::kFocusBorder),
                 ColourChart::kGreen900,
-                ColourChart::kBlue800,
+                ColourChart::kBlue750,
                 ColourChart::kGreen700
             };
 
@@ -278,7 +278,7 @@ namespace TSS::SkinColours
                 skinColourKey(SkinObjectType::kSlider, SkinColourProperty::kFocusBorder,
                               SkinColourState::kDefault, ColourSet::k2),
                 ColourChart::kGreen900,
-                ColourChart::kOrange800,
+                ColourChart::kOrange750,
                 ColourChart::kGreen700
             };
 
@@ -286,7 +286,7 @@ namespace TSS::SkinColours
                 skinColourKey(SkinObjectType::kSlider, SkinColourProperty::kText,
                               SkinColourState::kDefault, ColourSet::k2),
                 ColourChart::kGreen300,
-                ColourChart::kOrange400,
+                ColourChart::kOrange350,
                 ColourChart::kGreen100
             };
 
@@ -318,7 +318,7 @@ namespace TSS::SkinColours
                 skinColourKey(SkinObjectType::kSlider, SkinColourProperty::kValueBar,
                               SkinColourState::kDefault, ColourSet::k2),
                 ColourChart::kGreen750,
-                ColourChart::kOrange700,
+                ColourChart::kOrange650,
                 ColourChart::kGreen500
             };
 
@@ -361,7 +361,7 @@ namespace TSS::SkinColours
                 skinColourKey(SkinObjectType::kSlider, SkinColourProperty::kFocusBorder,
                               SkinColourState::kDefault, ColourSet::k3),
                 ColourChart::kGreen900,
-                ColourChart::kYellow800,
+                ColourChart::kYellow850,
                 ColourChart::kGreen700
             };
 
@@ -369,7 +369,7 @@ namespace TSS::SkinColours
                 skinColourKey(SkinObjectType::kSlider, SkinColourProperty::kText,
                               SkinColourState::kDefault, ColourSet::k3),
                 ColourChart::kGreen300,
-                ColourChart::kYellow400,
+                ColourChart::kYellow300,
                 ColourChart::kGreen100
             };
 
@@ -401,7 +401,7 @@ namespace TSS::SkinColours
                 skinColourKey(SkinObjectType::kSlider, SkinColourProperty::kValueBar,
                               SkinColourState::kDefault, ColourSet::k3),
                 ColourChart::kGreen750,
-                ColourChart::kYellow700,
+                ColourChart::kYellow650,
                 ColourChart::kGreen500
             };
 

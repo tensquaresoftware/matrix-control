@@ -243,7 +243,8 @@ void SkinDesignerMainComponent::refreshCombos()
     productCombo.addItem("BLACK/CHROMA", 2);
     productCombo.addItem("BLACK/MINIMAL", 3);
     productCombo.addItem("CREAM/GREEN", 4);
-    productCombo.addItem("CREAM/MINIMAL", 5);
+    productCombo.addItem("CREAM/CHROMA", 5);
+    productCombo.addItem("CREAM/MINIMAL", 6);
     productCombo.setSelectedId(SkinDesignerUi::productComboIdFromSkinId(sessionState_.productSkinId),
                                juce::dontSendNotification);
 
