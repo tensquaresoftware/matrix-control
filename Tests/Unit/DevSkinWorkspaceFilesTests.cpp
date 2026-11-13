@@ -104,7 +104,8 @@ private:
         const auto noDesignerSkins = TSS::DevSkin::replaceDesignerSkinsFromJson(
             layer, TSS::DevSkin::exportToJson(blank));
         expect(! noDesignerSkins.ok);
-        expect(noDesignerSkins.message.containsIgnoreCase("No Designer skins"));
+        expectEquals(noDesignerSkins.message,
+                     juce::String(TSS::DevSkin::kNoDesignerSkinsInJsonMessage));
 
         expectEquals(layer.activeSkinId(), activeId);
         expectEquals(layer.skins().size(), count);

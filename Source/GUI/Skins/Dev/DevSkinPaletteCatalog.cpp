@@ -134,7 +134,7 @@ namespace TSS::DevSkin
                                                     const juce::String& name)
     {
         for (const auto& pastille : palette)
-            if (pastille.name == name)
+            if (pastille.name.equalsIgnoreCase(name))
                 return pastille.argb;
         return std::nullopt;
     }
@@ -153,12 +153,13 @@ namespace TSS::DevSkin
         for (const auto& [key, name] : skin.mappings)
         {
             juce::ignoreUnused(key);
-            keep.insert(name.toStdString());
+            keep.insert(name.toLowerCase().toStdString());
         }
         skin.palette.erase(std::remove_if(skin.palette.begin(), skin.palette.end(),
                                           [&](const Pastille& pastille)
                                           {
-                                              return keep.find(pastille.name.toStdString()) == keep.end();
+                                              return keep.find(pastille.name.toLowerCase().toStdString())
+                                                     == keep.end();
                                           }),
                            skin.palette.end());
     }

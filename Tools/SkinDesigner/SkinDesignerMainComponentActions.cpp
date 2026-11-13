@@ -65,7 +65,7 @@ void SkinDesignerMainComponent::onNew()
         return;
     }
 
-    // Product palette + custom Designer pastilles; mappings cleared → full Unbound list.
+    // Starter kit (+ merge of current Designer custom pastilles); mappings cleared → full Unbound list.
     const auto name = SkinDesignerUi::askText("New Designer skin", "Name:",
                                             SkinDesignerUi::suggestUniqueSkinName(layer_, "New Skin"));
     if (name.isEmpty())

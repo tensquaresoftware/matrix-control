@@ -3317,3 +3317,18 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-skin-designer-palette-per-skin.md`
   summary: `isProductPastilleName` remains an always-false API stub and Palette Row still has unused isProduct field.
   evidence: Blind Hunter; cosmetic leftover; remove in a later Designer cleanup when call sites are swept.
+
+## Deferred from: fresh code review of spec-skin-designer-palette-per-skin.md (2026-11-13)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-designer-palette-per-skin.md`
+  summary: Branch also changes `.cursor/rules` RFCD / communication wording unrelated to palette-per-skin; leave as agent-context drift or split outside code patches.
+  evidence: Acceptance Auditor + Blind Hunter; agent-context files route to defer.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-designer-palette-per-skin.md`
+  summary: Older deferred-work entry still cites `forceProductToFirstAvailable` after rename to `clearProductSelectionAtLaunch`.
+  evidence: Blind Hunter; inventory hygiene only.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-designer-palette-per-skin.md`
+  summary: Hollow `isProductPastilleName` / `Row::isProduct` remain (rebuild forces false); no live rename lock regression — keep prior defer.
+  evidence: Acceptance Auditor; reconfirmed in fresh branch review.
+- source_spec: `_bmad-output/implementation-artifacts/spec-skin-designer-palette-per-skin.md`
+  summary: No unit harness that New / Duplicate Product / Compare refuse when Product is empty; smoke remains the gate.
+  evidence: Blind Hunter; MainComponent not linked in Matrix-Control_Tests.

@@ -127,3 +127,24 @@ All intent questions closed: Depth = restructure ColourChart; Trials = one-shot 
 
 **Manual checks:**
 - Open Trials / Designer: switch BLACK/GREEN vs CREAM/GREEN — palette length and names stay skin-specific; Compare still paints.
+
+### Review Findings
+
+- [x] [Review][Decision] Keep blank-Product launch UX on this PR? — Resolved: keep on this PR (Guillaume 2026-11-13). Outside frozen Intent but smoke-validated follow-on UX; document in PR summary if useful. No code change.
+- [x] [Review][Patch] Align palette name matching after ignore-case ensure [Source/GUI/Skins/Dev/DevSkinPaletteCatalog.cpp:150] — Applied: `argbForPastilleName` + `prunePaletteToMappedNames` use ignore-case (2026-11-13).
+- [x] [Review][Patch] Pin empty-pack refusal message to shared constant [Tests/Unit/DevSkinWorkspaceFilesTests.cpp:107] — Applied: `expectEquals` vs `kNoDesignerSkinsInJsonMessage` (2026-11-13).
+- [x] [Review][Patch] Add case-insensitive ensure / starter-kit dedupe test [Tests/Unit/DevSkinStarterKitTests.cpp] — Applied: ensure case-variant + prune ignore-case tests (2026-11-13).
+- [x] [Review][Patch] Refresh stale New-skin comment [Tools/SkinDesigner/SkinDesignerMainComponentActions.cpp:68] — Applied (2026-11-13).
+- [x] [Review][Defer] Cursor RFCD / communication rule edits on this branch [.cursor/rules/rfc-rfcd-reformulation.mdc] — deferred: agent-context files unrelated to palette ownership; ship or split outside this review’s code patches.
+- [x] [Review][Defer] deferred-work still names forceProductToFirstAvailable [_bmad-output/implementation-artifacts/deferred-work.md:18] — deferred: inventory rename after `clearProductSelectionAtLaunch`; docs hygiene, not a runtime defect.
+- [x] [Review][Defer] Hollow isProductPastilleName / Row::isProduct [Tools/SkinDesigner/SkinDesignerPalettePanelClicks.cpp:160] — deferred: pre-existing cleanup already deferred; rebuild always sets `isProduct = false`, so no live rename lock regression.
+- [x] [Review][Defer] No unit harness for blank-Product action gates [Tools/SkinDesigner/SkinDesignerMainComponentActions.cpp] — deferred: MainComponent alerts are smoke-gated; helper combo id coverage exists; full action harness is out of scope for this PR.
+
+#### Rejected
+
+- false — Edge: Dev seeds omit starter kit — starter kit is for Designer New/Duplicate paths; `seedFromCompiled` correctly seeds mapped pastilles only (Implementation Notes).
+- rejected (spec edit) — Blind: White/Black order mismatch in frozen Intent vs Boundaries — fix would edit the spec under review; code/order tests already pin White then Black then greys.
+- rejected (spec edit) — Blind: blank Product launch missing from done-spec — covered as Decision finding above; updating frozen Intent is a spec edit.
+- rejected (spec edit) — Blind: I/O matrix conflates New vs Duplicate — Implementation Notes already split the paths; fixing the matrix is a spec edit.
+- rejected (spec edit) — Blind: Implementation Notes / Code Map still describe old Palette section / fat seed world — documentation drift; fix would edit the spec under review.
+- low rejected — Blind: duplicate `ensureChartPastilleOnSkin` helpers in two test files — developer hygiene only; extracting a shared helper adds churn without fixing a user-facing defect.

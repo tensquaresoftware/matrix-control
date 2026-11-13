@@ -1,8 +1,10 @@
 #include <juce_core/juce_core.h>
 
+#include "GUI/Skins/ColourChart.h"
 #include "GUI/Skins/Dev/DevSkinInventory.h"
 #include "GUI/Skins/Dev/DevSkinLayer.h"
 #include "GUI/Skins/Dev/DevSkinPaletteCatalog.h"
+#include "GUI/Skins/Skin.h"
 
 class DevSkinStarterKitTests : public juce::UnitTest
 {
@@ -25,6 +27,12 @@ public:
 
         beginTest("newDesignerSkin_mergesCustomPastillesFromCurrentDesigner");
         assertNewDesignerSkinMergesCustomPastilles();
+
+        beginTest("ensureDesignerStarterKit_skipsCaseVariantDuplicate");
+        assertEnsureStarterKitSkipsCaseVariant();
+
+        beginTest("prunePaletteToMappedNames_keepsMappedPastilleIgnoringCase");
+        assertPruneKeepsMappedPastilleIgnoringCase();
     }
 
 private:
@@ -32,6 +40,14 @@ private:
     {
         for (const auto& pastille : skin.palette)
             if (pastille.name == name)
+                return true;
+        return false;
+    }
+
+    static bool paletteContainsIgnoreCase(const TSS::DevSkin::NamedSkin& skin, const juce::String& name)
+    {
+        for (const auto& pastille : skin.palette)
+            if (pastille.name.equalsIgnoreCase(name))
                 return true;
         return false;
     }
@@ -120,6 +136,38 @@ private:
         expect(foundCustom);
         expect(foundTwin);
         expect(foundProductArgbTwin);
+    }
+
+    void assertEnsureStarterKitSkipsCaseVariant()
+    {
+        TSS::DevSkin::NamedSkin skin;
+        skin.palette.push_back({ "kbrandcream", ColourChart::kBrandCream, false });
+        TSS::DevSkin::ensureDesignerStarterKit(skin);
+
+        int creamCount = 0;
+        for (const auto& pastille : skin.palette)
+            if (pastille.name.equalsIgnoreCase("kBrandCream"))
+                ++creamCount;
+        expectEquals(creamCount, 1);
+        expectEquals(static_cast<int>(skin.palette.size()),
+                     static_cast<int>(TSS::DevSkin::designerStarterKitPastilles().size()));
+    }
+
+    void assertPruneKeepsMappedPastilleIgnoringCase()
+    {
+        TSS::DevSkin::NamedSkin skin;
+        skin.palette.push_back({ "kGreen400", ColourChart::kGreen400, false });
+        skin.palette.push_back({ "kOrphanOnly", 0xffabcdef, false });
+        const auto key = TSS::skinColourKey(TSS::SkinObjectType::kLed,
+                                            TSS::SkinColourProperty::kBackground,
+                                            TSS::SkinColourState::kOff);
+        skin.mappings[key] = "kgreen400";
+
+        TSS::DevSkin::prunePaletteToMappedNames(skin);
+
+        expect(paletteContainsIgnoreCase(skin, "kGreen400"));
+        expect(! paletteContains(skin, "kOrphanOnly"));
+        expect(TSS::DevSkin::argbForPastilleName(skin.palette, "kGREEN400").has_value());
     }
 };
 
