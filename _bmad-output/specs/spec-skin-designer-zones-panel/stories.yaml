@@ -1,0 +1,38 @@
+- id: "1"
+  title: Shared zone registry and live Look-for-zone overlay
+  description: >-
+    Expose the shared zone registry (occupancy, defaults, exception rows) and
+    make Designer PushPayload zone maps drive Standalone Look-for-zone for used
+    MCS cells (CAP-5, CAP-6, io-and-live-bridge).
+  spec_checkpoint: false
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Exceptions stay read-only registry mirror. Zone map must travel on
+    PushPayload (unlike colourSetLabels). Do not change Mappings Colour set
+    column. No Module/Instance cascade. Prefer extending existing Dev bridge
+    apply path over a second preview stack.
+
+- id: "2"
+  title: Zones panel UI for matrix, UCS, and reset
+  description: >-
+    Add the Zones work surface beside Palette and Mappings with MCS combos,
+    read-only UCS and Exceptions blocks, and Reset to product defaults
+    (CAP-1, CAP-2, CAP-3).
+  spec_checkpoint: false
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Combos only for used cells; em-dash for unused. Do not reuse Palette→Mappings
+    Hold/bind as the matrix gesture. Panel useful width comparable to Mappings.
+    Smoke: change a zone assignment and confirm connected Standalone geography
+    updates. Mappings layout unchanged except later optional jump in story 3.
+
+- id: "3"
+  title: Per-skin zone map pack round-trip and Mappings jump
+  description: >-
+    Persist and reload per-skin zone maps in the Designer pack JSON, and add the
+    optional object-name jump into Mappings (CAP-4 + io persistence).
+  spec_checkpoint: false
+  done_checkpoint: false
+  invoke_dev_with: >-
+    Ownership is per Designer skin like palette. Missing zone map on load equals
+    registry defaults. Do not add a Zone column on every Mappings row.
