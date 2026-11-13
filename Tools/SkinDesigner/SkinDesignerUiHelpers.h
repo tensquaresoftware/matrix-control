@@ -49,6 +49,8 @@ namespace SkinDesignerUi
         int maxChars = 0; // > 0 applies TextEditor::setInputRestrictions
         /** Empty = length-only; otherwise printable charset passed to setInputRestrictions. */
         juce::String allowedCharacters;
+        /** Label above the text field (AlertWindow addTextEditor). */
+        juce::String fieldLabel { "Name" };
     };
 
     /** Modal text prompt. Returns false on Cancel (out unchanged). */
@@ -56,7 +58,8 @@ namespace SkinDesignerUi
     {
         SkinDesignerChrome::AlertWindow window(request.title, request.message,
                                              juce::MessageBoxIconType::QuestionIcon);
-        window.addTextEditor("value", request.initial, "Value");
+        const auto label = request.fieldLabel.isNotEmpty() ? request.fieldLabel : juce::String("Name");
+        window.addTextEditor("value", request.initial, label);
         window.addButton("OK", 1, juce::KeyPress(juce::KeyPress::returnKey));
         window.addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey));
         if (auto* editor = window.getTextEditor("value"))
@@ -86,10 +89,11 @@ namespace SkinDesignerUi
     /** Legacy: Cancel and empty OK both return {}. Prefer AskTextRequest when clearing matters. */
     inline juce::String askText(const juce::String& title,
                                 const juce::String& message,
-                                const juce::String& initial)
+                                const juce::String& initial,
+                                const juce::String& fieldLabel = "Skin name")
     {
         juce::String out;
-        if (! askText({ title, message, initial, 0, {} }, out))
+        if (! askText({ title, message, initial, 0, {}, fieldLabel }, out))
             return {};
         return out;
     }

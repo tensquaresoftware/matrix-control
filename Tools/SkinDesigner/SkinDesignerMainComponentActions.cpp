@@ -300,7 +300,8 @@ void SkinDesignerMainComponent::onRenamePastille(const juce::String& pastilleNam
     if (! canEditDesignerSkin() || pastilleName.isEmpty())
         return;
 
-    const auto name = SkinDesignerUi::askText("Rename colour", "New name:", pastilleName);
+    const auto name = SkinDesignerUi::askText("Rename colour", "New name:", pastilleName,
+                                            "Colour name");
     if (name.isEmpty() || name == pastilleName)
         return;
 
