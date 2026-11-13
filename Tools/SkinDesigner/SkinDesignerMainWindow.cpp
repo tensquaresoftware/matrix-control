@@ -55,7 +55,7 @@ SkinDesignerMainWindow::SkinDesignerMainWindow(const juce::String& name)
 
     normalizeClientSize();
     ensureTitleBarOnScreen();
-    attachTitleBarDoubleClickZoom();
+    attachTitleBarDoubleClickRecentre();
 }
 
 void SkinDesignerMainWindow::persistWindowState()
@@ -102,11 +102,11 @@ void SkinDesignerMainWindow::visibilityChanged()
         updateSizeLimits();
         setConstrainer(&constrainer_);
         ensureTitleBarOnScreen();
-        attachTitleBarDoubleClickZoom();
+        attachTitleBarDoubleClickRecentre();
     }
 }
 
-void SkinDesignerMainWindow::zoomToMaxHeightAndCentre()
+void SkinDesignerMainWindow::applySizeThenRecentre (int contentWidth, int contentHeight)
 {
     updateSizeLimits();
 
@@ -121,12 +121,11 @@ void SkinDesignerMainWindow::zoomToMaxHeightAndCentre()
     if (area.isEmpty())
         return;
 
-    const int contentH = juce::jmax(skinDesignerMinContentHeight(),
-                                    area.getHeight() - juce::jmax(0, frame.getTopAndBottom()));
+    const int w = juce::jlimit(SkinDesignerChrome::windowMinWidth(), maxContentWidth_, contentWidth);
+    const int h = juce::jlimit(skinDesignerMinContentHeight(), maxContentHeight_, contentHeight);
 
     ignorePersist_ = true;
-    setSize(juce::jlimit(SkinDesignerChrome::windowMinWidth(), maxContentWidth_, getWidth()),
-            contentH);
+    setSize(w, h);
     ignorePersist_ = false;
 
     auto nextBounds = MatrixStandalone::recentreClientBoundsOnNearestDisplayUserArea(
@@ -151,6 +150,33 @@ void SkinDesignerMainWindow::zoomToMaxHeightAndCentre()
     }
 
     schedulePersist();
+}
+
+void SkinDesignerMainWindow::zoomToMaxHeightAndCentre()
+{
+    updateSizeLimits();
+
+    const auto frame = getNativeFrameSize();
+    const auto& displays = juce::Desktop::getInstance().getDisplays();
+    const auto* display = MatrixStandalone::findNearestDisplayForBounds(displays, getBounds());
+
+    if (display == nullptr)
+        return;
+
+    const auto area = display->userBounds.toNearestInt();
+    if (area.isEmpty())
+        return;
+
+    const int contentH = juce::jmax(skinDesignerMinContentHeight(),
+                                    area.getHeight() - juce::jmax(0, frame.getTopAndBottom()));
+
+    applySizeThenRecentre(getWidth(), contentH);
+}
+
+void SkinDesignerMainWindow::shrinkToMinSizeAndRecentre()
+{
+    applySizeThenRecentre(SkinDesignerChrome::windowMinWidth(),
+                          skinDesignerMinContentHeight());
 }
 
 void SkinDesignerMainWindow::timerCallback()
@@ -297,14 +323,14 @@ juce::BorderSize<int> SkinDesignerMainWindow::getNativeFrameSize() const
     return {};
 }
 
-void SkinDesignerMainWindow::attachTitleBarDoubleClickZoom()
+void SkinDesignerMainWindow::attachTitleBarDoubleClickRecentre()
 {
    #if ! (JUCE_IOS || JUCE_ANDROID)
     const juce::Component::SafePointer<SkinDesignerMainWindow> safe(this);
     titleBarDoubleClickHook_.attach(*this, [safe]
     {
         if (safe != nullptr)
-            safe->zoomToMaxHeightAndCentre();
+            safe->shrinkToMinSizeAndRecentre();
     });
    #endif
 }

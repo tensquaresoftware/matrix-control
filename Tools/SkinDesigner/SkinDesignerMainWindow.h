@@ -24,7 +24,9 @@ public:
     void visibilityChanged() override;
 
 private:
+    void applySizeThenRecentre(int contentWidth, int contentHeight);
     void zoomToMaxHeightAndCentre();
+    void shrinkToMinSizeAndRecentre();
     void timerCallback() override;
     void schedulePersist();
     bool restoreWindowState();
@@ -33,7 +35,7 @@ private:
     void ensureTitleBarOnScreen();
     void scheduleEnsureTitleBarRetry();
     juce::BorderSize<int> getNativeFrameSize() const;
-    void attachTitleBarDoubleClickZoom();
+    void attachTitleBarDoubleClickRecentre();
 
     juce::ComponentBoundsConstrainer constrainer_;
     MatrixStandalone::TitleBarDoubleClickHook titleBarDoubleClickHook_;
