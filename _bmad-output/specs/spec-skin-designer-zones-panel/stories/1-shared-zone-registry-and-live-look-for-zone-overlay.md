@@ -137,3 +137,24 @@ baseline_commit: 'b4aae48f'
 
 **Manual checks (if no CLI):**
 - Optional smoke once a Layer setter exists: push a remapped zone map into Standalone Dev and confirm Patch vs Master slider drawers swap without Designer Zones UI (story 2).
+
+### Review Findings
+
+- [x] [Review][Patch] Settings Led/Peak stay on registry drawers when Settings first opens under an active Dev zone remap — fixed: construct with `resolveZoneColourSet`; always `setSkin` after attach on open
+- [x] [Review][Patch] `duplicateSkin(..., copyMappings=false)` keeps source `zoneMap` while clearing mappings/palette — fixed: clear `zoneMap` with mappings wipe + unit pin
+- [x] [Review][Defer] Header/Settings Led+Peak `setColourSet` and PluginEditor clear paths lack panel/editor harnesses [`Tests/Unit/SkinZoneRegistryOverlayTests.cpp`] — deferred: pre-existing suite gap; resolve + StandalonePaintState covered; already in deferred-work
+- [x] [Review][Defer] Exception mono-menu call sites not pinned beyond helper pattern [`ComputerPatchesPanel.cpp`, `HeaderLogoPopupMenu.cpp`] — deferred: helper contract tested; panels not in Matrix-Control_Tests
+- [x] [Review][Defer] Process-wide zone overlay singleton may cross-talk across editors [`SkinZoneOverlay.cpp:13-17`] — deferred: maybe-false; same Dev-session pattern as colour overlay; settle if hosts ship multi-editor Dev
+- [x] [Review][Defer] Companion docs not updated for live `zoneMap` field / Code Map still cites older test files — deferred: agent-context / companion edit outside this code patch
+- [x] [Review][Defer] Optional registry hygiene (`kZones` vs `kAllSkinZones`, UCS iterable, DevSkinMatrixTests zoneMap) — deferred: already recorded; not blocking ACs
+
+#### Rejected
+
+- false — Empty active overlay (`hasSkinZoneOverlay` true, empty map) vs cleared: intentional Dev-session defaults.
+- false — Release links `SkinZoneOverlay` / always routes Look-for-zone through `resolveZoneColourSet`: population remains Dev-gated; no live Release pipe.
+- false — Duplicate-symbol risk from listing overlay in PLUGIN_SOURCES + MATRIX_SKIN_DEV_LAYER_SOURCES: no target concatenates both lists today.
+- false — `zoneMapFromVar` skips occupancy validation: `validateZoneMap` in apply rejects unused/out-of-range before install.
+- false — `zoneMapFromVar` void path leaves dirty `out`: sole caller `pushPayloadFromVar` does `out = {}` first; live push never retains stale map.
+- false — Other Led/Peak hosts missed: only Header + Settings construct those widgets.
+- low — Malformed zoneMap JSON paths under-tested: serde already errors on non-array / bad entry / unknown strings; everyday push path covered.
+- low — Looser `assertExceptionRows` / missing Peak resolve pin: partial coverage enough for current ACs; Peak panel harness already deferred.

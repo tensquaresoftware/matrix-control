@@ -10,11 +10,6 @@
 #include "GUI/Skins/ISkin.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 
-namespace
-{
-    constexpr auto kModalesLedColourSet_ = TSS::zoneColourSet(TSS::SkinObjectType::kLed, TSS::SkinZone::kModales);
-}
-
 SettingsMidiPage::SettingsMidiPage(Config config)
     : config_(std::move(config))
     , skin_(config_.skin)
@@ -36,11 +31,14 @@ SettingsMidiPage::~SettingsMidiPage()
 
 void SettingsMidiPage::buildWidgets()
 {
+    const auto modalesLedSet = TSS::resolveZoneColourSet(TSS::SkinObjectType::kLed,
+                                                         TSS::SkinZone::kModales);
+
     keyboardFromLabel_ = makeLabel(*skin_, PluginDisplayNames::Settings::kKeyboardFromLabel);
     keyboardFromCombo_ = makeCombo(*skin_);
     keyboardFromLed_ = std::make_unique<TSS::Led>(SettingsShellMetrics::kPeakWidth,
                                                   SettingsShellMetrics::kPeakWidth,
-                                                  kModalesLedColourSet_);
+                                                  modalesLedSet);
     keyboardFromLed_->setSkin(*skin_);
     addAndMakeVisible(*keyboardFromLed_);
 
@@ -48,7 +46,7 @@ void SettingsMidiPage::buildWidgets()
     synthFromCombo_ = makeCombo(*skin_);
     synthFromLed_ = std::make_unique<TSS::Led>(SettingsShellMetrics::kPeakWidth,
                                                SettingsShellMetrics::kPeakWidth,
-                                               kModalesLedColourSet_);
+                                               modalesLedSet);
     synthFromLed_->setSkin(*skin_);
     addAndMakeVisible(*synthFromLed_);
 
@@ -56,7 +54,7 @@ void SettingsMidiPage::buildWidgets()
     synthToCombo_ = makeCombo(*skin_);
     synthToLed_ = std::make_unique<TSS::Led>(SettingsShellMetrics::kPeakWidth,
                                              SettingsShellMetrics::kPeakWidth,
-                                             kModalesLedColourSet_);
+                                             modalesLedSet);
     synthToLed_->setSkin(*skin_);
     addAndMakeVisible(*synthToLed_);
 }

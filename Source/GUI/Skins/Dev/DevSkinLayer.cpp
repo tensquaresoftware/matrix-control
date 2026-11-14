@@ -85,6 +85,7 @@ namespace TSS::DevSkin
         {
             copy.mappings.clear();
             copy.mappingLinkGroups.clear();
+            copy.zoneMap.clear();
             copy.palette = designerStarterKitPastilles();
         }
         else

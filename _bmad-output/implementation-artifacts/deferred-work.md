@@ -3340,3 +3340,15 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/specs/spec-skin-designer-zones-panel/stories/1-shared-zone-registry-and-live-look-for-zone-overlay.md`
   summary: Optional registry hygiene — UCS iterable helper, static-assert kZones vs kAllSkinZones, extend DevSkinMatrixTests for zoneMap.
   evidence: Blind Hunter notes; not required for story ACs.
+
+## Deferred from: code review of 1-shared-zone-registry-and-live-look-for-zone-overlay.md (2026-11-14)
+
+- source_spec: `_bmad-output/specs/spec-skin-designer-zones-panel/stories/1-shared-zone-registry-and-live-look-for-zone-overlay.md`
+  summary: Exception Computer Patches / logo call sites not pinned in a panel harness (helper LookFromSkin + zoneColourSet pattern is unit-tested).
+  evidence: Verification Gap; panels not linked in Matrix-Control_Tests.
+- source_spec: `_bmad-output/specs/spec-skin-designer-zones-panel/stories/1-shared-zone-registry-and-live-look-for-zone-overlay.md`
+  summary: Process-wide SkinZoneOverlay singleton may cross-talk if a host opens multiple editors under Dev; same pattern as other Dev session state.
+  evidence: Edge + Blind; maybe-false until multi-editor Dev is a product path.
+- source_spec: `_bmad-output/specs/spec-skin-designer-zones-panel/stories/1-shared-zone-registry-and-live-look-for-zone-overlay.md`
+  summary: Update io-and-live-bridge / zone-registry-contract (and story Code Map test pointers) for the live zoneMap field — companion hygiene, not a runtime defect.
+  evidence: Blind Hunter; agent-context / companion edit routes to defer.
