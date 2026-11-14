@@ -237,4 +237,58 @@ namespace TSS::DevSkin
         }
         out.mappingLinkGroups = sanitizeMappingLinkGroups(std::move(parsed), validKeys);
     }
+
+    juce::var zoneMapEntryToVar(const SkinZoneMapKey& key, ColourSet colourSet)
+    {
+        auto* obj = new juce::DynamicObject();
+        obj->setProperty("object", toString(key.object));
+        obj->setProperty("zone", toString(key.zone));
+        obj->setProperty("colourSet", toString(colourSet));
+        return juce::var(obj);
+    }
+
+    bool zoneMapFromVar(const juce::var& zoneMapVar, SkinZoneMap& out, juce::String& error)
+    {
+        auto* arr = zoneMapVar.getArray();
+        if (arr == nullptr)
+        {
+            if (zoneMapVar.isVoid() || zoneMapVar.isUndefined())
+                return true;
+            error = "zoneMap must be an array";
+            return false;
+        }
+
+        out.clear();
+        for (const auto& entry : *arr)
+        {
+            auto* obj = entry.getDynamicObject();
+            if (obj == nullptr)
+            {
+                error = "zoneMap entry must be an object";
+                return false;
+            }
+
+            SkinObjectType object {};
+            SkinZone zone {};
+            ColourSet colourSet {};
+            if (! parseObjectType(obj->getProperty("object").toString(), object))
+            {
+                error = "Unknown zoneMap object type";
+                return false;
+            }
+            if (! parseSkinZone(obj->getProperty("zone").toString(), zone))
+            {
+                error = "Unknown zoneMap zone";
+                return false;
+            }
+            if (! parseColourSet(obj->getProperty("colourSet").toString(), colourSet))
+            {
+                error = "Unknown zoneMap colourSet";
+                return false;
+            }
+
+            out[SkinZoneMapKey { object, zone }] = colourSet;
+        }
+        return true;
+    }
 }

@@ -5,6 +5,7 @@
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Looks/LookBuilders.h"
 #include "GUI/Skins/SkinValues.h"
+#include "GUI/Skins/SkinZoneOverlay.h"
 #include "GUI/Settings/SettingsShellMetrics.h"
 #include "GUI/Skins/ISkin.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
@@ -87,17 +88,22 @@ void SettingsMidiPage::updateKeyboardFromVisibility()
 void SettingsMidiPage::setSkin(TSS::ISkin& skin)
 {
     skin_ = &skin;
+    const auto modalesLedSet = TSS::resolveZoneColourSet(TSS::SkinObjectType::kLed,
+                                                         TSS::SkinZone::kModales);
     keyboardFromLabel_->setLook(TSS::chromeTextLabelLookFromSkin(skin));
     keyboardFromCombo_->setLook(TSS::comboBoxLookForZone(skin, TSS::SkinZone::kModales));
     keyboardFromCombo_->setPopupMenuLook(TSS::popupMenuLookForZone(skin, TSS::SkinZone::kModales));
+    keyboardFromLed_->setColourSet(modalesLedSet);
     keyboardFromLed_->setSkin(skin);
     synthFromLabel_->setLook(TSS::chromeTextLabelLookFromSkin(skin));
     synthFromCombo_->setLook(TSS::comboBoxLookForZone(skin, TSS::SkinZone::kModales));
     synthFromCombo_->setPopupMenuLook(TSS::popupMenuLookForZone(skin, TSS::SkinZone::kModales));
+    synthFromLed_->setColourSet(modalesLedSet);
     synthFromLed_->setSkin(skin);
     synthToLabel_->setLook(TSS::chromeTextLabelLookFromSkin(skin));
     synthToCombo_->setLook(TSS::comboBoxLookForZone(skin, TSS::SkinZone::kModales));
     synthToCombo_->setPopupMenuLook(TSS::popupMenuLookForZone(skin, TSS::SkinZone::kModales));
+    synthToLed_->setColourSet(modalesLedSet);
     synthToLed_->setSkin(skin);
 }
 

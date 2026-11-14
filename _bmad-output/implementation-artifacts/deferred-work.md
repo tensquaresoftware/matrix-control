@@ -3332,3 +3332,11 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-skin-designer-palette-per-skin.md`
   summary: No unit harness that New / Duplicate Product / Compare refuse when Product is empty; smoke remains the gate.
   evidence: Blind Hunter; MainComponent not linked in Matrix-Control_Tests.
+
+- source_spec: `_bmad-output/specs/spec-skin-designer-zones-panel/stories/1-shared-zone-registry-and-live-look-for-zone-overlay.md`
+  summary: Unit-test Header/Settings Led+Peak setColourSet refresh and PluginEditor clearDevSkinOverlay paths.
+  evidence: Verification-gap review; resolveZoneColourSet and StandalonePaintState clear are covered, but panel/editor harnesses are not in the unit suite.
+
+- source_spec: `_bmad-output/specs/spec-skin-designer-zones-panel/stories/1-shared-zone-registry-and-live-look-for-zone-overlay.md`
+  summary: Optional registry hygiene — UCS iterable helper, static-assert kZones vs kAllSkinZones, extend DevSkinMatrixTests for zoneMap.
+  evidence: Blind Hunter notes; not required for story ACs.

@@ -137,7 +137,8 @@ void ComputerPatchesPanel::refreshNavigationFocusHighlight()
         PluginIDs::PatchManagerSection::StateProperties::kNavigationFocus,
         PluginIDs::PatchManagerSection::NavigationFocus::kDefault));
 
-    auto look = TSS::comboBoxLookForZone(*skin_, TSS::kMonoMenuExceptionZone);
+    // Registry defaults (not Dev zone overlay) for Computer Patches mono exception.
+    auto look = TSS::comboBoxLookFromSkin(*skin_, TSS::zoneColourSet(TSS::SkinObjectType::kComboBox, TSS::kMonoMenuExceptionZone));
 
     if (navigationFocus == PluginIDs::PatchManagerSection::NavigationFocus::kComputer)
         look.textEnabled = look.textFocus;
@@ -333,7 +334,8 @@ void ComputerPatchesPanel::applyChildLooks(TSS::ISkin& skin)
 
     if (selectPatchFileComboBox_)
     {
-        selectPatchFileComboBox_->setPopupMenuLook(TSS::popupMenuLookForZone(skin, TSS::kMonoMenuExceptionZone));
+        selectPatchFileComboBox_->setPopupMenuLook(TSS::popupMenuLookFromSkin(
+            skin, TSS::zoneColourSet(TSS::SkinObjectType::kPopupMenu, TSS::kMonoMenuExceptionZone)));
         refreshNavigationFocusHighlight();
     }
 
@@ -425,9 +427,10 @@ void ComputerPatchesPanel::setupSelectPatchFileComboBox(TSS::ISkin& skin)
     selectPatchFileComboBox_ = std::make_unique<TSS::ComboBox>(
         dims_.comboBoxes.patchManagerComputerPatchesWidth,
         dims_.buttons.height,
-        TSS::comboBoxLookForZone(skin, TSS::kMonoMenuExceptionZone),
+        TSS::comboBoxLookFromSkin(skin, TSS::zoneColourSet(TSS::SkinObjectType::kComboBox, TSS::kMonoMenuExceptionZone)),
         TSS::ComboBox::PopupMode::Scrollable);
-    selectPatchFileComboBox_->setPopupMenuLook(TSS::popupMenuLookForZone(skin, TSS::kMonoMenuExceptionZone));
+    selectPatchFileComboBox_->setPopupMenuLook(TSS::popupMenuLookFromSkin(
+        skin, TSS::zoneColourSet(TSS::SkinObjectType::kPopupMenu, TSS::kMonoMenuExceptionZone)));
     selectPatchFileComboBox_->onChange = [this] { handleSelectPatchFileChanged(); };
     // Same-id popup pick: JUCE skips onChange; reclaim like the module header.
     selectPatchFileComboBox_->onSameIdReselected = [this]

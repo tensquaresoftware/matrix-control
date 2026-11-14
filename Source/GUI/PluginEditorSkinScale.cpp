@@ -6,6 +6,7 @@
 
 #if defined(MATRIX_SKIN_DESIGNER_DEV_LAYER)
 #include "GUI/Skins/Dev/DevSkinApplier.h"
+#include "GUI/Skins/SkinZoneOverlay.h"
 #endif
 
 #include "GUI/About/AboutWindow.h"
@@ -153,6 +154,7 @@ void PluginEditor::applySkinFromItemId(int skinItemId, bool persistToState)
 {
 #if defined(MATRIX_SKIN_DESIGNER_DEV_LAYER)
     skinDevOverlay_.reset();
+    TSS::clearSkinZoneOverlay();
 #endif
     skin_ = skinForVariantId(skinItemId);
     updateSkin();
@@ -209,14 +211,12 @@ TSS::DevSkin::ApplyResult PluginEditor::applyDevSkinPush(const TSS::DevSkin::Pus
     }
 
     const auto baseVariant = compiledBaseVariant(payload);
-    skinDevOverlay_ = TSS::Skin::create(baseVariant);
-    const auto applied = applyPushToSkin(payload, *skinDevOverlay_);
+    auto nextOverlay = TSS::Skin::create(baseVariant);
+    const auto applied = applyPushToSkin(payload, *nextOverlay);
     if (! applied.ok)
-    {
-        skinDevOverlay_.reset();
         return applied;
-    }
 
+    skinDevOverlay_ = std::move(nextOverlay);
     skin_ = skinDevOverlay_.get();
     updateSkin();
     return applied;
@@ -224,6 +224,7 @@ TSS::DevSkin::ApplyResult PluginEditor::applyDevSkinPush(const TSS::DevSkin::Pus
 
 void PluginEditor::clearDevSkinOverlay()
 {
+    TSS::clearSkinZoneOverlay();
     if (skinDevOverlay_ == nullptr)
         return;
 

@@ -84,6 +84,12 @@ namespace TSS::DevSkin
                                           std::vector<std::vector<SkinColourKey>> groups);
 
         /**
+         * Replace per-skin MCS zone map (used cells only; validates occupancy + colourSetCount).
+         * Empty map restores registry-default geography for that skin on push.
+         */
+        juce::Result setZoneMap(const juce::String& skinId, SkinZoneMap map);
+
+        /**
          * Apply pastilleName to every peer in writerKey's link group (skips writer).
          * No-op when writer is ungrouped. Hold / mode policy stay with the caller.
          */
