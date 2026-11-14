@@ -5,6 +5,7 @@
 
 #include "GUI/Looks/LookBuilders.h"
 #include "GUI/Skins/SkinValues.h"
+#include "GUI/Skins/SkinZoneOverlay.h"
 
 void HeaderPanel::wireLogoCallbacks()
 {
@@ -98,11 +99,18 @@ void HeaderPanel::setSkin(TSS::ISkin& skin)
     keyboardFromLabel_.setLook(TSS::chromeTextLabelLookFromSkin(skin));
     midiFromLabel_.setLook(TSS::chromeTextLabelLookFromSkin(skin));
     midiToLabel_.setLook(TSS::chromeTextLabelLookFromSkin(skin));
+    const auto headerLedSet = TSS::resolveZoneColourSet(TSS::SkinObjectType::kLed, TSS::SkinZone::kHeader);
+    const auto headerPeakSet = TSS::resolveZoneColourSet(TSS::SkinObjectType::kPeakIndicator,
+                                                         TSS::SkinZone::kHeader);
+    editorActivityLed_.setColourSet(headerLedSet);
+    midiToActivityLed_.setColourSet(headerLedSet);
+    instrumentActivityLed_.setColourSet(headerLedSet);
     editorActivityLed_.setSkin(skin);
     midiToActivityLed_.setSkin(skin);
     instrumentActivityLed_.setSkin(skin);
     inputGainLabel_.setLook(TSS::chromeTextLabelLookFromSkin(skin));
     inputGainSlider_.setLook(TSS::sliderLookForZone(skin, TSS::SkinZone::kHeader));
+    peakIndicator_.setColourSet(headerPeakSet);
     peakIndicator_.setSkin(skin);
     undoButton_.setLook(TSS::buttonLookFromSkin(skin));
     redoButton_.setLook(TSS::buttonLookFromSkin(skin));

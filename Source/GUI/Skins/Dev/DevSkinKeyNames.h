@@ -10,11 +10,13 @@ namespace TSS::DevSkin
     juce::String toString(SkinColourProperty property);
     juce::String toString(SkinColourState state);
     juce::String toString(ColourSet colourSet);
+    juce::String toString(SkinZone zone);
 
     bool parseObjectType(const juce::String& text, SkinObjectType& out);
     bool parseProperty(const juce::String& text, SkinColourProperty& out);
     bool parseState(const juce::String& text, SkinColourState& out);
     bool parseColourSet(const juce::String& text, ColourSet& out);
+    bool parseSkinZone(const juce::String& text, SkinZone& out);
 
     juce::String keyLabel(const SkinColourKey& key);
 

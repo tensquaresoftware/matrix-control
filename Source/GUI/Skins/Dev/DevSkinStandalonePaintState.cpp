@@ -1,6 +1,7 @@
 #include "GUI/Skins/Dev/DevSkinStandalonePaintState.h"
 
 #include "GUI/Skins/Dev/DevSkinApplier.h"
+#include "GUI/Skins/SkinZoneOverlay.h"
 
 namespace TSS::DevSkin
 {
@@ -30,6 +31,7 @@ namespace TSS::DevSkin
     void StandalonePaintState::selectCompiled(Skin::ColourVariant variant)
     {
         overlay_.reset();
+        clearSkinZoneOverlay();
         compiledSelection_ = variant;
         if (variant == Skin::ColourVariant::Black)
             active_ = black_.get();

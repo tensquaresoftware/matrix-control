@@ -5,6 +5,7 @@
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Looks/LookBuilders.h"
 #include "GUI/Skins/SkinValues.h"
+#include "GUI/Skins/SkinZoneOverlay.h"
 #include "GUI/Settings/SettingsShellMetrics.h"
 #include "GUI/Skins/ISkin.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
@@ -151,6 +152,8 @@ void SettingsAudioPage::setSkin(TSS::ISkin& skin)
         combo->setPopupMenuLook(popupLook);
     }
 
+    peakIndicator_->setColourSet(TSS::resolveZoneColourSet(TSS::SkinObjectType::kPeakIndicator,
+                                                           TSS::SkinZone::kModales));
     peakIndicator_->setSkin(skin);
     playTestToneButton_->setLook(buttonLook);
     repaint();

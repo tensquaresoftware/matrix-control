@@ -9,6 +9,7 @@
 #include <juce_graphics/juce_graphics.h>
 
 #include "GUI/Skins/SkinValues.h"
+#include "GUI/Skins/SkinZoneRegistry.h"
 
 namespace TSS::DevSkin
 {
@@ -99,6 +100,11 @@ namespace TSS::DevSkin
          * Each inner vector has >= 2 keys; a key belongs to at most one group.
          */
         std::vector<std::vector<SkinColourKey>> mappingLinkGroups {};
+        /**
+         * Per-skin MCS zone map (used cells only). Travels on PushPayload.
+         * Empty map => registry defaults at resolve time.
+         */
+        SkinZoneMap zoneMap {};
     };
 
     struct PushPayload
@@ -111,6 +117,8 @@ namespace TSS::DevSkin
         juce::String compiledAncestorId;
         std::vector<Pastille> palette;
         std::map<SkinColourKey, juce::String> mappings;
+        /** Used MCS cells only; omitted / empty on wire => registry defaults. */
+        SkinZoneMap zoneMap {};
     };
 
     struct ApplyResult

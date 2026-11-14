@@ -369,6 +369,11 @@ namespace TSS::DevSkin
         for (const auto& [key, paletteName] : payload.mappings)
             mappings.add(mappingToVar(key, paletteName));
         obj->setProperty("mappings", mappings);
+
+        juce::Array<juce::var> zoneMap;
+        for (const auto& [key, colourSet] : payload.zoneMap)
+            zoneMap.add(zoneMapEntryToVar(key, colourSet));
+        obj->setProperty("zoneMap", zoneMap);
         return juce::var(obj);
     }
 
@@ -407,6 +412,13 @@ namespace TSS::DevSkin
 
             if (! mappingsFromVar(obj.getProperty("mappings"), out.mappings, error))
                 return false;
+
+            // Missing zoneMap => empty overlay (registry defaults).
+            if (obj.hasProperty("zoneMap")
+                && ! zoneMapFromVar(obj.getProperty("zoneMap"), out.zoneMap, error))
+            {
+                return false;
+            }
             return true;
         }
     }

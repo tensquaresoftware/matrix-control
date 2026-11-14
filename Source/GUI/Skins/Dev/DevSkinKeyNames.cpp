@@ -84,6 +84,13 @@ namespace TSS::DevSkin
             { ColourSet::k4, "cs4" },
         };
 
+        constexpr Named<SkinZone> kZones[] = {
+            { SkinZone::kPatch, "Patch" },
+            { SkinZone::kMaster, "Master" },
+            { SkinZone::kHeader, "Header" },
+            { SkinZone::kModales, "Modales" },
+        };
+
         template <typename Enum, size_t N>
         juce::String nameOf(const Named<Enum> (&table)[N], Enum value)
         {
@@ -126,6 +133,11 @@ namespace TSS::DevSkin
     juce::String toString(ColourSet colourSet)
     {
         return nameOf(kColourSets, colourSet);
+    }
+
+    juce::String toString(SkinZone zone)
+    {
+        return nameOf(kZones, zone);
     }
 
     bool parseObjectType(const juce::String& text, SkinObjectType& out)
@@ -175,6 +187,11 @@ namespace TSS::DevSkin
     bool parseColourSet(const juce::String& text, ColourSet& out)
     {
         return parseOf(kColourSets, text, out);
+    }
+
+    bool parseSkinZone(const juce::String& text, SkinZone& out)
+    {
+        return parseOf(kZones, text, out);
     }
 
     juce::String keyLabel(const SkinColourKey& key)

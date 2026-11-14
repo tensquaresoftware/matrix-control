@@ -224,6 +224,28 @@ namespace TSS::DevSkin
         return juce::Result::ok();
     }
 
+    juce::Result Layer::setZoneMap(const juce::String& skinId, SkinZoneMap map)
+    {
+        if (isCompiledId(skinId))
+            return juce::Result::fail("Compiled Black/Cream are read-only; Duplicate first");
+
+        auto* skin = findSkinMutable(skinId);
+        if (skin == nullptr)
+            return juce::Result::fail("Dev skin not found");
+
+        for (const auto& [key, colourSet] : map)
+        {
+            if (! isZoneUsed(key.object, key.zone))
+                return juce::Result::fail("Zone map entry uses an unused MCS cell");
+            if (! supportsColourSet(key.object, colourSet))
+                return juce::Result::fail("Zone map entry has an invalid colour set for object");
+        }
+
+        skin->zoneMap = std::move(map);
+        bump();
+        return juce::Result::ok();
+    }
+
     juce::Result Layer::propagateMappingToLinkPeers(const juce::String& skinId,
                                                     SkinColourKey writerKey,
                                                     const juce::String& pastilleName)
@@ -384,6 +406,7 @@ namespace TSS::DevSkin
         payload.compiledAncestorId = resolveCompiledAncestorId(*skin);
         payload.palette = skin->palette;
         payload.mappings = skin->mappings;
+        payload.zoneMap = skin->zoneMap;
         return payload;
     }
 

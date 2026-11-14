@@ -39,4 +39,8 @@ namespace TSS::DevSkin
     std::vector<std::vector<SkinColourKey>> sanitizeMappingLinkGroups(
         std::vector<std::vector<SkinColourKey>> groups,
         const std::set<SkinColourKey>& validKeys);
+
+    juce::var zoneMapEntryToVar(const SkinZoneMapKey& key, ColourSet colourSet);
+    /** Missing / void zoneMap => empty map (registry defaults). */
+    bool zoneMapFromVar(const juce::var& zoneMapVar, SkinZoneMap& out, juce::String& error);
 }
