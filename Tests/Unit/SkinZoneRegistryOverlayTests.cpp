@@ -52,6 +52,9 @@ public:
         beginTest("registry_exceptionRows_matchCompanionTable");
         assertExceptionRows();
 
+        beginTest("registry_singleSetList_excludesMcsAndCoversUcs");
+        assertSingleSetList();
+
         beginTest("noOverlay_lookForZone_usesRegistryDefaults");
         assertNoOverlayDefaults();
 
@@ -152,6 +155,28 @@ private:
         expect(buttons.object == TSS::SkinObjectType::kButton);
         expect(buttons.usesKind == TSS::ZoneExceptionUsesKind::kUcs);
         expect(buttons.colourSet == TSS::ColourSet::k1);
+    }
+
+    void assertSingleSetList()
+    {
+        expectEquals(static_cast<int>(TSS::kSingleSetSkinObjects.size()), 20);
+        expect(TSS::singleSetListExcludesMultiSet());
+        expect(TSS::singleSetListHasUniqueEntries());
+
+        constexpr int kSkinObjectTypeCount = 25;
+        for (int i = 0; i < kSkinObjectTypeCount; ++i)
+        {
+            const auto object = static_cast<TSS::SkinObjectType>(i);
+            int appearances = 0;
+            for (const auto single : TSS::kSingleSetSkinObjects)
+                if (single == object)
+                    ++appearances;
+
+            if (TSS::supportsMultipleColourSets(object))
+                expectEquals(appearances, 0);
+            else
+                expectEquals(appearances, 1);
+        }
     }
 
     void assertNoOverlayDefaults()

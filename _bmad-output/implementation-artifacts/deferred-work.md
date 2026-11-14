@@ -3352,3 +3352,9 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/specs/spec-skin-designer-zones-panel/stories/1-shared-zone-registry-and-live-look-for-zone-overlay.md`
   summary: Update io-and-live-bridge / zone-registry-contract (and story Code Map test pointers) for the live zoneMap field — companion hygiene, not a runtime defect.
   evidence: Blind Hunter; agent-context / companion edit routes to defer.
+
+## Deferred from: Build review of 2-zones-panel-ui-for-matrix-ucs-and-reset.md (2026-11-14)
+
+- source_spec: `_bmad-output/specs/spec-skin-designer-zones-panel/stories/2-zones-panel-ui-for-matrix-ucs-and-reset.md`
+  summary: No automated harness driving SkinDesignerZonesPanel combo/Reset UI; Layer setZoneMap + push pins stay green if panel write paths become no-ops.
+  evidence: Verification Gap; Designer GUI follows project manual smoke / done_checkpoint pattern (same as Mappings binds).

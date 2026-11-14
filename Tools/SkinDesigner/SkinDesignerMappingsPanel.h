@@ -61,6 +61,8 @@ public:
     std::function<void(TSS::SkinColourKey key)> onMappedColourClicked;
     /** Escape while the table content has focus - clear mapping mode in main. */
     std::function<bool()> onEscapeRequested;
+    /** Peer title (ZONES) clicked — host switches the right work surface. */
+    std::function<void()> onPeerWorkSurfaceRequested;
 
     void paint(juce::Graphics& g) override;
     void resized() override;
@@ -178,6 +180,8 @@ private:
     void layoutGlobalClearBounds();
     void clearLegendHitTargets();
     bool handleLegendClearClick(juce::Point<int> pos);
+    bool handlePeerTitleClick(juce::Point<int> pos);
+    bool handleStickyHeaderClick(juce::Point<int> pos, bool popupMenu);
     void cycleColumnSort(FilterColumn column);
     SkinDesignerMappingsColumnFilter::SortColumn sortColumnFor(FilterColumn column) const noexcept;
     SkinDesignerChrome::SortPictoKind sortPictoFor(FilterColumn column) const noexcept;
@@ -280,7 +284,9 @@ private:
     std::vector<ObjectTable> objects_;
 
     juce::Label titleLabel_;
+    juce::Label peerTitleLabel_;
     juce::Rectangle<int> titleTabBounds_;
+    juce::Rectangle<int> peerTitleBounds_;
     /** Sticky legend row only (gap below is empty within stickyBandBounds_). */
     juce::Rectangle<int> stickyLegendBounds_;
     juce::Rectangle<int> stickyBandBounds_;

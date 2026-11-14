@@ -593,6 +593,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/SkinColourWiringTests.cpp
         Tests/Unit/SkinColourWiringCoverageTests.cpp
         Tests/Unit/SkinZoneRegistryOverlayTests.cpp
+        Tests/Unit/SkinZoneMapLayerTests.cpp
         Tests/Unit/ColourSetModelTests.cpp
         Tests/Unit/DevSkinLayerJsonTests.cpp
         Tests/Unit/DevSkinStarterKitTests.cpp
@@ -1235,6 +1236,7 @@ if(MATRIX_BUILD_SKIN_DESIGNER)
         Tools/SkinDesigner/SkinDesignerMappingsPanelFilters.cpp
         Tools/SkinDesigner/SkinDesignerMappingsPanelLink.cpp
         Tools/SkinDesigner/SkinDesignerMappingsFilterMenu.cpp
+        Tools/SkinDesigner/SkinDesignerZonesPanel.cpp
         Tools/SkinDesigner/SkinDesignerSkinsPanel.cpp
         Tools/SkinDesigner/SkinDesignerStepper.cpp
         ${MATRIX_SKIN_DEV_LAYER_SOURCES}

@@ -18,8 +18,11 @@ namespace
 
 SkinDesignerMappingsPanel::SkinDesignerMappingsPanel()
 {
-    SkinDesignerChrome::stylePanelTitle(titleLabel_, "MAPPINGS");
+    SkinDesignerChrome::stylePanelTitle(titleLabel_, SkinDesignerChrome::kMappingsWorkSurfaceTitle);
     addAndMakeVisible(titleLabel_);
+    SkinDesignerChrome::stylePeerWorkSurfaceTitle(peerTitleLabel_,
+                                                  SkinDesignerChrome::kZonesWorkSurfaceTitle);
+    addAndMakeVisible(peerTitleLabel_);
 
     // Same label / combo language as Skins "Product:" / "Designer:".
     objectLabel_.setFont(SkinDesignerChrome::fontRegular());
@@ -375,61 +378,19 @@ bool SkinDesignerMappingsPanel::Content::keyPressed(const juce::KeyPress& key)
 
 void SkinDesignerMappingsPanel::resized()
 {
-    const auto chrome = SkinDesignerChrome::layoutPanel(getLocalBounds(),
-                                                      SkinDesignerChrome::titleTabWidth("MAPPINGS"),
-                                                      0);
+    const auto chrome = SkinDesignerChrome::layoutPanel(
+        getLocalBounds(),
+        SkinDesignerChrome::titleTabWidth(SkinDesignerChrome::kMappingsWorkSurfaceTitle),
+        0);
     titleTabBounds_ = chrome.tab;
     titleLabel_.setBounds(chrome.tab);
+    peerTitleBounds_ = SkinDesignerChrome::layoutPeerWorkSurfaceTitle(
+        peerTitleLabel_, chrome.tab, SkinDesignerChrome::kZonesWorkSurfaceTitle);
+
     if (isShellEmpty())
         layoutShellEmpty(chrome.content);
     else
         layoutShellFilled(chrome.content);
-}
-
-void SkinDesignerMappingsPanel::layoutShellEmpty(juce::Rectangle<int> content)
-{
-    objectLabel_.setVisible(false);
-    objectCombo_.setVisible(false);
-    holdColourToggle_.setVisible(false);
-    objectLabel_.setBounds({});
-    objectCombo_.setBounds({});
-    holdColourToggle_.setBounds({});
-    unboundLabelBounds_ = {};
-    unboundBadgeBounds_ = {};
-    objectClearBounds_ = {};
-    stickyBandBounds_ = {};
-    stickyLegendBounds_ = {};
-    clearLegendHitTargets();
-    auto listBounds = content;
-    listBounds.setRight(listBounds.getRight() + SkinDesignerChrome::kPanelContentPad);
-    viewport_.setBounds(listBounds);
-    layoutContent();
-}
-
-void SkinDesignerMappingsPanel::layoutShellFilled(juce::Rectangle<int> content)
-{
-    objectLabel_.setVisible(true);
-    objectCombo_.setVisible(true);
-    holdColourToggle_.setVisible(true);
-
-    auto actions = content.removeFromTop(SkinDesignerChrome::kButtonHeight);
-    content.removeFromTop(SkinDesignerChrome::kPanelContentPad);
-
-    stickyBandBounds_ = content.removeFromTop(SkinDesignerChrome::kColumnHeaderHeight
-                                              + SkinDesignerChrome::kColumnHeaderGap);
-    stickyLegendBounds_ = stickyBandBounds_.removeFromTop(SkinDesignerChrome::kColumnHeaderHeight);
-
-    auto listBounds = content;
-    listBounds.setRight(listBounds.getRight() + SkinDesignerChrome::kPanelContentPad);
-    viewport_.setBounds(listBounds);
-    layoutContent();
-
-    const int tableW = paintWidth();
-    const int tableX = viewport_.getX() + kFocusPad;
-    stickyLegendBounds_.setX(tableX);
-    stickyLegendBounds_.setWidth(tableW);
-    layoutLegendHitTargets();
-    layoutActionRow(actions, tableX, tableW);
 }
 
 int SkinDesignerMappingsPanel::paintWidth() const noexcept

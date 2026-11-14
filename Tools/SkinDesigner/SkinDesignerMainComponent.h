@@ -12,6 +12,7 @@
 #include "Tools/SkinDesigner/SkinDesignerMappingsPanel.h"
 #include "Tools/SkinDesigner/SkinDesignerPalettePanel.h"
 #include "Tools/SkinDesigner/SkinDesignerSkinsPanel.h"
+#include "Tools/SkinDesigner/SkinDesignerZonesPanel.h"
 
 class SkinDesignerMainComponent final : public juce::Component,
                                       private juce::ComboBox::Listener,
@@ -205,6 +206,14 @@ private:
     void setupSkinsPanel();
     void setupBodyPanels();
     void setupLayerAndBridgeCallbacks();
+    /** Right column: Mappings (default) or Zones — same useful width. */
+    enum class RightWorkSurface
+    {
+        kMappings,
+        kZones
+    };
+    void setRightWorkSurface(RightWorkSurface surface);
+    void wireRightWorkSurfacePanels(const std::function<bool()>& escapeMapping);
     void layoutTitleBar(juce::Rectangle<int> titleBar);
     void layoutSessionWell(juce::Rectangle<int> well);
     void layoutSessionControls(juce::Rectangle<int> well, juce::Rectangle<int> row);
@@ -358,4 +367,6 @@ private:
     SkinDesignerColourPicker colourPicker_;
     SkinDesignerPalettePanel palettePanel_;
     SkinDesignerMappingsPanel mappingsPanel_;
+    SkinDesignerZonesPanel zonesPanel_;
+    RightWorkSurface rightWorkSurface_ = RightWorkSurface::kMappings;
 };

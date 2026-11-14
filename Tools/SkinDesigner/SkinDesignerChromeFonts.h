@@ -260,6 +260,27 @@ namespace SkinDesignerChrome
         return measureTextWidth(fontTitle(), title) + kTitleTabPadH * 2 + extraInsideTab;
     }
 
+    /** Muted peer title beside the active work-surface tab (MAPPINGS / ZONES). */
+    inline void stylePeerWorkSurfaceTitle(juce::Label& label, const juce::String& titleUpper)
+    {
+        stylePanelTitle(label, titleUpper);
+        label.setColour(juce::Label::textColourId, textMuted());
+        label.setInterceptsMouseClicks(false, false);
+    }
+
+    inline juce::Rectangle<int> layoutPeerWorkSurfaceTitle(juce::Label& peerLabel,
+                                                           juce::Rectangle<int> activeTab,
+                                                           const juce::String& peerTitle)
+    {
+        const auto bounds = juce::Rectangle<int>(
+            activeTab.getRight() + kWorkSurfacePeerTitleGap,
+            activeTab.getY(),
+            titleTabWidth(peerTitle),
+            activeTab.getHeight());
+        peerLabel.setBounds(bounds);
+        return bounds;
+    }
+
     /** SESSION label ahead of the JSON Sync combo. */
     inline int jsonSyncLabelWidth() noexcept
     {

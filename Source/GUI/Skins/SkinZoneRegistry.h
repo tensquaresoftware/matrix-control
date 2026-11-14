@@ -16,7 +16,7 @@ namespace TSS
 
     /**
      * MCS occupancy: true only when the product places that object in that geography.
-     * Unused cells are not assignable (Zones panel em-dash).
+     * Unused cells are not assignable (Zones panel shows ASCII `-`).
      */
     constexpr bool isZoneUsed(SkinObjectType object, SkinZone zone) noexcept
     {
@@ -97,4 +97,56 @@ namespace TSS
     };
 
     using SkinZoneMap = std::map<SkinZoneMapKey, ColourSet>;
+
+    /**
+     * UCS inventory (colourSetCount == 1), product object order.
+     * Zones Shared block reads this — do not duplicate the list in Designer.
+     */
+    inline constexpr std::array<SkinObjectType, 20> kSingleSetSkinObjects {
+        SkinObjectType::kWindowSurface,
+        SkinObjectType::kHeaderPanel,
+        SkinObjectType::kBodyPanel,
+        SkinObjectType::kFooterPanel,
+        SkinObjectType::kChromeText,
+        SkinObjectType::kFooterMessage,
+        SkinObjectType::kSectionHeader,
+        SkinObjectType::kModuleHeader,
+        SkinObjectType::kGroupLabel,
+        SkinObjectType::kLabel,
+        SkinObjectType::kHorizontalSeparator,
+        SkinObjectType::kButton,
+        SkinObjectType::kToggle,
+        SkinObjectType::kProgressBar,
+        SkinObjectType::kNumberBox,
+        SkinObjectType::kEnvelopeDisplay,
+        SkinObjectType::kTrackGeneratorDisplay,
+        SkinObjectType::kPatchNameDisplay,
+        SkinObjectType::kDialog,
+        SkinObjectType::kReadOnlyValueField
+    };
+
+    constexpr bool singleSetListExcludesMultiSet() noexcept
+    {
+        for (const auto single : kSingleSetSkinObjects)
+            for (const auto multi : kMultiSetSkinObjects)
+                if (single == multi)
+                    return false;
+        return true;
+    }
+
+    constexpr bool singleSetListHasUniqueEntries() noexcept
+    {
+        for (size_t i = 0; i < kSingleSetSkinObjects.size(); ++i)
+            for (size_t j = i + 1; j < kSingleSetSkinObjects.size(); ++j)
+                if (kSingleSetSkinObjects[i] == kSingleSetSkinObjects[j])
+                    return false;
+        return true;
+    }
+
+    static_assert(singleSetListExcludesMultiSet(),
+                  "kSingleSetSkinObjects must not include MCS objects");
+    static_assert(singleSetListHasUniqueEntries(),
+                  "kSingleSetSkinObjects must not contain duplicates");
+    static_assert(kSingleSetSkinObjects.size() + kMultiSetSkinObjects.size() == 25,
+                  "UCS + MCS must cover the SkinObjectType inventory");
 }

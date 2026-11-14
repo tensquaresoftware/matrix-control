@@ -197,6 +197,11 @@ namespace SkinDesignerChrome
     /** Min Mappings panel width (Palette at minimum). */
     inline constexpr int kMappingsPanelMinWidth =
         mappingsPanelWidthForPalettePanel(kPalettePanelMinWidth); // 567
+    /** Right work surface titles (Mappings / Zones share the Mappings-width column). */
+    inline constexpr const char* kMappingsWorkSurfaceTitle = "MAPPINGS";
+    inline constexpr const char* kZonesWorkSurfaceTitle = "ZONES";
+    /** Gap between the active title tab and the peer work-surface title. */
+    inline constexpr int kWorkSurfacePeerTitleGap = 8;
     /** Body width for a given Palette panel width (edges + Color + gaps + Mappings). */
     inline constexpr int windowBodyWidthForPalettePanel(int palettePanelW) noexcept
     {
