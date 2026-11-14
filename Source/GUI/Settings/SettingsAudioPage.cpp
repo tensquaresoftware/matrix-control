@@ -64,10 +64,10 @@ void SettingsAudioPage::buildWidgets()
     synthFromCombo_ = makeCombo(*skin_);
     synthFromCombo_->setUsesPortSentinelPopupChrome(true);
     synthFromCombo_->setUsesContentSizedPopupWidth(true);
-    peakIndicator_ = std::make_unique<TSS::PeakIndicator>(SettingsShellMetrics::kPeakWidth,
-                                                          SettingsShellMetrics::kControlHeight,
-                                                          TSS::zoneColourSet(TSS::SkinObjectType::kPeakIndicator,
-                                                                             TSS::SkinZone::kModales));
+    peakIndicator_ = std::make_unique<TSS::PeakIndicator>(
+        SettingsShellMetrics::kPeakWidth,
+        SettingsShellMetrics::kControlHeight,
+        TSS::resolveZoneColourSet(TSS::SkinObjectType::kPeakIndicator, TSS::SkinZone::kModales));
     peakIndicator_->setSkin(*skin_);
     addAndMakeVisible(*peakIndicator_);
     outputChannelsLabel_ = makeLabel(*skin_, PluginDisplayNames::Settings::kOutputChannelsLabel);

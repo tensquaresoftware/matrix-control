@@ -72,6 +72,9 @@ public:
 
         beginTest("overlay_ledHeaderRemap_resolveZoneColourSet");
         assertOverlayLedRemap();
+
+        beginTest("duplicateSkin_withoutMappings_clearsZoneMap");
+        assertDuplicateSkinWithoutMappingsClearsZoneMap();
     }
 
 private:
@@ -377,6 +380,29 @@ private:
         TSS::clearSkinZoneOverlay();
         expect(TSS::resolveZoneColourSet(TSS::SkinObjectType::kLed, TSS::SkinZone::kHeader)
                == TSS::ColourSet::k1);
+    }
+
+    void assertDuplicateSkinWithoutMappingsClearsZoneMap()
+    {
+        TSS::DevSkin::Layer layer;
+        expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "ZoneDonor").wasOk());
+        const auto donorId = layer.activeSkinId();
+
+        TSS::SkinZoneMap map;
+        map[TSS::SkinZoneMapKey { TSS::SkinObjectType::kSlider, TSS::SkinZone::kPatch }]
+            = TSS::ColourSet::k2;
+        expect(layer.setZoneMap(donorId, map).wasOk());
+
+        expect(layer.duplicateSkin(donorId, "ZoneCopyKeep", true).wasOk());
+        const auto* kept = layer.findSkin(layer.activeSkinId());
+        expect(kept != nullptr);
+        expectEquals(static_cast<int>(kept->zoneMap.size()), 1);
+
+        expect(layer.duplicateSkin(donorId, "ZoneCopyDrop", false).wasOk());
+        const auto* dropped = layer.findSkin(layer.activeSkinId());
+        expect(dropped != nullptr);
+        expect(dropped->zoneMap.empty());
+        expect(dropped->mappings.empty());
     }
 };
 
