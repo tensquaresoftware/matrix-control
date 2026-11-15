@@ -1237,6 +1237,9 @@ if(MATRIX_BUILD_SKIN_DESIGNER)
         Tools/SkinDesigner/SkinDesignerMappingsPanelLink.cpp
         Tools/SkinDesigner/SkinDesignerMappingsFilterMenu.cpp
         Tools/SkinDesigner/SkinDesignerZonesPanel.cpp
+        Tools/SkinDesigner/SkinDesignerZonesPanelLists.cpp
+        Tools/SkinDesigner/SkinDesignerZonesPanelMatrix.cpp
+        Tools/SkinDesigner/SkinDesignerZonesPanelPages.cpp
         Tools/SkinDesigner/SkinDesignerSkinsPanel.cpp
         Tools/SkinDesigner/SkinDesignerStepper.cpp
         ${MATRIX_SKIN_DEV_LAYER_SOURCES}

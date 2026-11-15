@@ -50,30 +50,29 @@ namespace TSS
         ColourSet colourSet = ColourSet::k1;
     };
 
-    inline constexpr std::array<ZoneExceptionRow, 4> kZoneExceptionRows {
+    /**
+     * Location paths use ASCII " > " separators; Zones Exceptions UI paints the
+     * Operation-style arrow in place of each separator.
+     */
+    /** True exceptions only: MCS call sites that hardwire a drawer (not UCS-everywhere). */
+    inline constexpr std::array<ZoneExceptionRow, 3> kZoneExceptionRows {
         ZoneExceptionRow {
-            "Patch Manager - Computer Patches file browser",
+            "Patch Manager > Computer Patches > Browser",
             SkinObjectType::kComboBox,
             ZoneExceptionUsesKind::kColourSet,
             ColourSet::k3
         },
         ZoneExceptionRow {
-            "Patch Manager - Computer Patches file browser",
+            "Patch Manager > Computer Patches > Browser",
             SkinObjectType::kPopupMenu,
             ZoneExceptionUsesKind::kColourSet,
             ColourSet::k3
         },
         ZoneExceptionRow {
-            "Header - logo menu",
+            "Header > Logo menu",
             SkinObjectType::kPopupMenu,
             ZoneExceptionUsesKind::kColourSet,
             ColourSet::k3
-        },
-        ZoneExceptionRow {
-            "Header - Undo / Redo / Panic",
-            SkinObjectType::kButton,
-            ZoneExceptionUsesKind::kUcs,
-            ColourSet::k1
         }
     };
 

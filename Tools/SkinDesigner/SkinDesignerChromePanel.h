@@ -31,5 +31,21 @@ namespace SkinDesignerChrome
                          juce::Rectangle<int> tab,
                          int bottomGutter = kGutter);
 
+    /** Fixed-order dual créneaux for the Mappings | Zones work surface. */
+    struct WorkSurfaceFrame
+    {
+        juce::Rectangle<int> panelBounds;
+        juce::Rectangle<int> mappingsTab;
+        juce::Rectangle<int> zonesTab;
+        bool zonesActive = false;
+        int bottomGutter = kGutter;
+    };
+
+    /**
+     * Active tab merges into the panel body; inactive tab is a quieter intercalaire
+     * on the shoulder (always COLOUR MAPPINGS left, ZONE MAPPINGS right).
+     */
+    void paintWorkSurfacePanelFrame(juce::Graphics& g, const WorkSurfaceFrame& frame);
+
     void paintRoundedWell(juce::Graphics& g, juce::Rectangle<int> area, juce::Colour fill);
 }

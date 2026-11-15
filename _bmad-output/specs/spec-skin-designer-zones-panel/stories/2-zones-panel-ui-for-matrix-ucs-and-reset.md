@@ -85,7 +85,7 @@ baseline_commit: '4ecb48f7'
 - [x] `python3 Scripts/quality/lint_touched.py` + SkinDesigner Debug build -- Clean Code gate + compile.
 
 **Acceptance Criteria:**
-- Given Designer with an active Designer skin, when selecting Zones, then the panel shows five MCS rows, four zone columns, `-` on unused cells, UCS list, and the four registry exception rows, with the active skin identified.
+- Given Designer with an active Designer skin, when selecting Zones, then the panel shows five MCS rows, four zone columns, `-` on unused cells, UCS list, and the three registry exception rows, with the active skin identified.
 - Given a used cell combo change (e.g. Slider Patch → cs2), when the Layer bumps and the bridge is connected, then Standalone Look-for-zone geography follows that assignment without changing Mappings pastilles.
 - Given unused cells, when the panel renders, then they show `-` and cannot be assigned.
 - Given Reset after edits, when confirmed by the control, then the active skin zone map returns to registry defaults (empty map) and a connected Standalone reflects defaults.

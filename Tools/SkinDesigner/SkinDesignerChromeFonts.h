@@ -260,25 +260,44 @@ namespace SkinDesignerChrome
         return measureTextWidth(fontTitle(), title) + kTitleTabPadH * 2 + extraInsideTab;
     }
 
-    /** Muted peer title beside the active work-surface tab (MAPPINGS / ZONES). */
-    inline void stylePeerWorkSurfaceTitle(juce::Label& label, const juce::String& titleUpper)
+    /** Active / inactive work-surface tab title (COLOUR MAPPINGS / ZONE MAPPINGS). */
+    inline void styleWorkSurfaceTabTitle(juce::Label& label,
+                                         const juce::String& titleUpper,
+                                         bool active)
     {
         stylePanelTitle(label, titleUpper);
-        label.setColour(juce::Label::textColourId, textMuted());
+        label.setColour(juce::Label::textColourId, active ? attention() : textMuted());
         label.setInterceptsMouseClicks(false, false);
     }
 
-    inline juce::Rectangle<int> layoutPeerWorkSurfaceTitle(juce::Label& peerLabel,
-                                                           juce::Rectangle<int> activeTab,
-                                                           const juce::String& peerTitle)
+    struct WorkSurfaceTabsChrome
     {
-        const auto bounds = juce::Rectangle<int>(
-            activeTab.getRight() + kWorkSurfacePeerTitleGap,
-            activeTab.getY(),
-            titleTabWidth(peerTitle),
-            activeTab.getHeight());
-        peerLabel.setBounds(bounds);
-        return bounds;
+        juce::Rectangle<int> mappingsTab;
+        juce::Rectangle<int> zonesTab;
+        juce::Rectangle<int> content;
+    };
+
+    /** Fixed order: COLOUR MAPPINGS left, ZONE MAPPINGS right — never swap. */
+    inline WorkSurfaceTabsChrome layoutWorkSurfaceTabs(juce::Rectangle<int> bounds,
+                                                       int bottomGutter = kGutter)
+    {
+        bounds.removeFromBottom(juce::jmax(0, bottomGutter));
+        bounds.removeFromTop(kGutter);
+        auto titleRow = bounds.removeFromTop(kPanelTitleHeight);
+        bounds.removeFromTop(kPanelContentPad);
+        bounds.removeFromBottom(kPanelContentPad);
+
+        const int mappingsW = juce::jlimit(1, titleRow.getWidth(),
+                                           titleTabWidth(kMappingsWorkSurfaceTitle));
+        auto mappingsTab = titleRow.removeFromLeft(mappingsW);
+        titleRow.removeFromLeft(kWorkSurfaceTabBevelOverhang);
+        const int zonesW = juce::jlimit(1, titleRow.getWidth(),
+                                        titleTabWidth(kZonesWorkSurfaceTitle));
+        auto zonesTab = titleRow.removeFromLeft(zonesW);
+
+        bounds.removeFromLeft(kPanelContentPad);
+        bounds.removeFromRight(kPanelContentPad);
+        return { mappingsTab, zonesTab, bounds };
     }
 
     /** SESSION label ahead of the JSON Sync combo. */

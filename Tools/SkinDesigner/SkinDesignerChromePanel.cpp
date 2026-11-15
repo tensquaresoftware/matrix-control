@@ -2,6 +2,94 @@
 
 namespace SkinDesignerChrome
 {
+    namespace
+    {
+        struct PanelBand
+        {
+            float left = 0.0f;
+            float right = 0.0f;
+            float top = 0.0f;
+            float bottom = 0.0f;
+            float titleBottom = 0.0f;
+            float r = 0.0f;
+            float drop = 0.0f;
+        };
+
+        PanelBand makeBand(juce::Rectangle<int> panelBounds, int bottomGutter) noexcept
+        {
+            PanelBand band;
+            band.r = kControlCorner;
+            band.left = (float) panelBounds.getX();
+            band.right = (float) panelBounds.getRight();
+            band.top = (float) (panelBounds.getY() + kGutter);
+            band.bottom = (float) (panelBounds.getBottom() - juce::jmax(0, bottomGutter));
+            // Same rhythm as table section tabs: rail top (= body shoulder) lines up with
+            // the title baseline, not the full title-band bottom.
+            band.titleBottom = band.top + (float) kPanelTitleHeight
+                               - (float) kTableSectionRailHeight;
+            band.drop = band.titleBottom - band.top; // 45° run equals drop
+            return band;
+        }
+
+        float tabBevelRight(const juce::Rectangle<int>& tab, float floorLeft, float r) noexcept
+        {
+            return juce::jmax(floorLeft + r * 2.0f, (float) tab.getRight() - kTabBevelStartEarly);
+        }
+
+        void appendBevelAndBody(juce::Path& silhouette,
+                                const PanelBand& band,
+                                float tabRight) noexcept
+        {
+            const float bevelEndX = tabRight + band.drop;
+            silhouette.lineTo(tabRight - band.r, band.top);
+            silhouette.quadraticTo(tabRight, band.top, tabRight + band.r, band.top + band.r);
+            if (bevelEndX + band.r < band.right)
+            {
+                silhouette.lineTo(bevelEndX - band.r, band.titleBottom - band.r);
+                silhouette.quadraticTo(bevelEndX, band.titleBottom, bevelEndX + band.r,
+                                       band.titleBottom);
+            }
+            else
+            {
+                silhouette.lineTo(tabRight, band.titleBottom);
+            }
+
+            silhouette.lineTo(band.right - band.r, band.titleBottom);
+            silhouette.quadraticTo(band.right, band.titleBottom, band.right,
+                                   band.titleBottom + band.r);
+            silhouette.lineTo(band.right, band.bottom - band.r);
+            silhouette.quadraticTo(band.right, band.bottom, band.right - band.r, band.bottom);
+            silhouette.lineTo(band.left + band.r, band.bottom);
+            silhouette.quadraticTo(band.left, band.bottom, band.left, band.bottom - band.r);
+        }
+
+        void paintInactiveIntercalaire(juce::Graphics& g,
+                                       const PanelBand& band,
+                                       juce::Rectangle<int> tab)
+        {
+            const float tabLeft = (float) tab.getX();
+            const float tabRight = tabBevelRight(tab, tabLeft, band.r);
+            const float bevelEndX = tabRight + band.drop;
+
+            juce::Path intercalaire;
+            intercalaire.startNewSubPath(tabLeft + band.r, band.top);
+            intercalaire.lineTo(tabRight - band.r, band.top);
+            // Same 45° shoulder language as the active créneau (smooth landing to the right).
+            intercalaire.quadraticTo(tabRight, band.top, tabRight + band.r, band.top + band.r);
+            intercalaire.lineTo(bevelEndX - band.r, band.titleBottom - band.r);
+            intercalaire.quadraticTo(bevelEndX, band.titleBottom, bevelEndX + band.r,
+                                     band.titleBottom);
+            // Sharp bottom-left: keep the shoulder as a continuous horizontal line.
+            intercalaire.lineTo(tabLeft, band.titleBottom);
+            intercalaire.lineTo(tabLeft, band.top + band.r);
+            intercalaire.quadraticTo(tabLeft, band.top, tabLeft + band.r, band.top);
+            intercalaire.closeSubPath();
+
+            g.setColour(surfacePanel());
+            g.fillPath(intercalaire);
+        }
+    }
+
     PanelChrome layoutPanel(juce::Rectangle<int> bounds, int tabWidth, int bottomGutter)
     {
         bounds.removeFromBottom(juce::jmax(0, bottomGutter));
@@ -21,45 +109,54 @@ namespace SkinDesignerChrome
                          juce::Rectangle<int> tab,
                          int bottomGutter)
     {
-        const float r = kControlCorner;
-        const float left = (float) panelBounds.getX();
-        const float right = (float) panelBounds.getRight();
-        const float top = (float) (panelBounds.getY() + kGutter);
-        const float bottom = (float) (panelBounds.getBottom() - juce::jmax(0, bottomGutter));
-        // Same rhythm as table section tabs: rail top (= body shoulder) lines up with
-        // the title baseline, not the full title-band bottom.
-        const float titleBottom = top + (float) kPanelTitleHeight
-                                  - (float) kTableSectionRailHeight;
-        const float drop = titleBottom - top; // 45° run equals drop
-        const float tabRight = juce::jmax(left + r * 2.0f,
-                                          (float) tab.getRight() - kTabBevelStartEarly);
-        const float bevelEndX = tabRight + drop;
+        const auto band = makeBand(panelBounds, bottomGutter);
+        const float tabRight = tabBevelRight(tab, band.left, band.r);
 
         juce::Path silhouette;
-        silhouette.startNewSubPath(left + r, top);
-        silhouette.lineTo(tabRight - r, top);
-        silhouette.quadraticTo(tabRight, top, tabRight + r, top + r);             // into 45°
-        if (bevelEndX + r < right)
-        {
-            silhouette.lineTo(bevelEndX - r, titleBottom - r);                    // 45° mid-run
-            silhouette.quadraticTo(bevelEndX, titleBottom, bevelEndX + r, titleBottom);
-        }
-        else
-        {
-            silhouette.lineTo(tabRight, titleBottom);
-        }
-        silhouette.lineTo(right - r, titleBottom);
-        silhouette.quadraticTo(right, titleBottom, right, titleBottom + r);       // body top-right
-        silhouette.lineTo(right, bottom - r);
-        silhouette.quadraticTo(right, bottom, right - r, bottom);
-        silhouette.lineTo(left + r, bottom);
-        silhouette.quadraticTo(left, bottom, left, bottom - r);
-        silhouette.lineTo(left, top + r);
-        silhouette.quadraticTo(left, top, left + r, top);                         // tab top-left
+        silhouette.startNewSubPath(band.left + band.r, band.top);
+        appendBevelAndBody(silhouette, band, tabRight);
+        silhouette.lineTo(band.left, band.top + band.r);
+        silhouette.quadraticTo(band.left, band.top, band.left + band.r, band.top);
         silhouette.closeSubPath();
 
         g.setColour(surfacePanel());
         g.fillPath(silhouette);
+    }
+
+    void paintWorkSurfacePanelFrame(juce::Graphics& g, const WorkSurfaceFrame& frame)
+    {
+        const auto band = makeBand(frame.panelBounds, frame.bottomGutter);
+        const auto& activeTab = frame.zonesActive ? frame.zonesTab : frame.mappingsTab;
+        const auto& inactiveTab = frame.zonesActive ? frame.mappingsTab : frame.zonesTab;
+        const float activeRight = tabBevelRight(
+            activeTab,
+            frame.zonesActive ? (float) activeTab.getX() : band.left,
+            band.r);
+
+        juce::Path silhouette;
+        if (! frame.zonesActive)
+        {
+            silhouette.startNewSubPath(band.left + band.r, band.top);
+            appendBevelAndBody(silhouette, band, activeRight);
+            silhouette.lineTo(band.left, band.top + band.r);
+            silhouette.quadraticTo(band.left, band.top, band.left + band.r, band.top);
+        }
+        else
+        {
+            const float tabLeft = (float) activeTab.getX();
+            silhouette.startNewSubPath(band.left + band.r, band.titleBottom);
+            // Sharp rise into ZONE MAPPINGS: do not round the shoulder into the tab.
+            silhouette.lineTo(tabLeft, band.titleBottom);
+            silhouette.lineTo(tabLeft, band.top + band.r);
+            silhouette.quadraticTo(tabLeft, band.top, tabLeft + band.r, band.top);
+            appendBevelAndBody(silhouette, band, activeRight);
+            silhouette.lineTo(band.left, band.titleBottom);
+        }
+        silhouette.closeSubPath();
+
+        g.setColour(surfacePanel());
+        g.fillPath(silhouette);
+        paintInactiveIntercalaire(g, band, inactiveTab);
     }
 
     void paintRoundedWell(juce::Graphics& g, juce::Rectangle<int> area, juce::Colour fill)

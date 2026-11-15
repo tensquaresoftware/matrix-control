@@ -25,7 +25,7 @@ baseline_commit: 'b4aae48f'
 ## Boundaries & Constraints
 
 **Always:**
-- Registry content matches `zone-registry-contract.md` (occupancy table, default matrix, four exception rows).
+- Registry content matches `zone-registry-contract.md` (occupancy table, default matrix, three exception rows).
 - `cs1…csN` stay technical drawer ids; zone names are geography only.
 - Zone map on `PushPayload` (must not be omitted like `colourSetLabels`).
 - Used MCS cells only in the map; unused cells are not assignable.

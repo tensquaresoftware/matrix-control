@@ -44,12 +44,13 @@ Drawer counts (inventory): Slider 4; ComboBox + PopupMenu 3; Led + PeakIndicator
 
 Each row: **Where** · **Object** · **Uses** (drawer or UCS).
 
-| Where | Object | Uses |
-|-------|--------|------|
-| Patch Manager — Computer Patches file browser | ComboBox | cs3 (Modales mono drawer of ComboBox) |
-| Patch Manager — Computer Patches file browser | PopupMenu | cs3 |
-| Header — logo menu | PopupMenu | cs3 |
-| Header — Undo / Redo / Panic | Button | UCS cs1 |
+| Location | Object | Uses |
+|----------|--------|------|
+| Patch Manager > Computer Patches > Browser | ComboBox | cs3 (Modales mono drawer of ComboBox) |
+| Patch Manager > Computer Patches > Browser | PopupMenu | cs3 |
+| Header > Logo menu | PopupMenu | cs3 |
+
+Header Undo / Redo / Panic are **not** listed: Button is UCS everywhere (cs1), so they are not zone-map exceptions.
 
 Authors cannot add/remove/edit these rows in V1. Registry is the only SSOT the Zones Exceptions block may display.
 

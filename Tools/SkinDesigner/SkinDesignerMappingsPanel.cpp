@@ -18,10 +18,13 @@ namespace
 
 SkinDesignerMappingsPanel::SkinDesignerMappingsPanel()
 {
-    SkinDesignerChrome::stylePanelTitle(titleLabel_, SkinDesignerChrome::kMappingsWorkSurfaceTitle);
+    SkinDesignerChrome::styleWorkSurfaceTabTitle(titleLabel_,
+                                                 SkinDesignerChrome::kMappingsWorkSurfaceTitle,
+                                                 true);
     addAndMakeVisible(titleLabel_);
-    SkinDesignerChrome::stylePeerWorkSurfaceTitle(peerTitleLabel_,
-                                                  SkinDesignerChrome::kZonesWorkSurfaceTitle);
+    SkinDesignerChrome::styleWorkSurfaceTabTitle(peerTitleLabel_,
+                                                 SkinDesignerChrome::kZonesWorkSurfaceTitle,
+                                                 false);
     addAndMakeVisible(peerTitleLabel_);
 
     // Same label / combo language as Skins "Product:" / "Designer:".
@@ -112,7 +115,9 @@ void SkinDesignerMappingsPanel::refresh()
 
 void SkinDesignerMappingsPanel::paint(juce::Graphics& g)
 {
-    SkinDesignerChrome::paintPanelFrame(g, getLocalBounds(), titleTabBounds_, 0);
+    SkinDesignerChrome::paintWorkSurfacePanelFrame(
+        g,
+        { getLocalBounds(), titleTabBounds_, peerTitleBounds_, false, 0 });
     SkinDesignerChrome::paintRoundedWell(g, viewport_.getBounds(), SkinDesignerChrome::surfacePanel());
     if (! stickyLegendBounds_.isEmpty())
         paintStickyLegend(g, stickyLegendBounds_);
@@ -378,14 +383,11 @@ bool SkinDesignerMappingsPanel::Content::keyPressed(const juce::KeyPress& key)
 
 void SkinDesignerMappingsPanel::resized()
 {
-    const auto chrome = SkinDesignerChrome::layoutPanel(
-        getLocalBounds(),
-        SkinDesignerChrome::titleTabWidth(SkinDesignerChrome::kMappingsWorkSurfaceTitle),
-        0);
-    titleTabBounds_ = chrome.tab;
-    titleLabel_.setBounds(chrome.tab);
-    peerTitleBounds_ = SkinDesignerChrome::layoutPeerWorkSurfaceTitle(
-        peerTitleLabel_, chrome.tab, SkinDesignerChrome::kZonesWorkSurfaceTitle);
+    const auto chrome = SkinDesignerChrome::layoutWorkSurfaceTabs(getLocalBounds(), 0);
+    titleTabBounds_ = chrome.mappingsTab;
+    peerTitleBounds_ = chrome.zonesTab;
+    titleLabel_.setBounds(chrome.mappingsTab);
+    peerTitleLabel_.setBounds(chrome.zonesTab);
 
     if (isShellEmpty())
         layoutShellEmpty(chrome.content);

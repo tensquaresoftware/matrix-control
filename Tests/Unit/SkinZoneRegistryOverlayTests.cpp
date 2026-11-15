@@ -134,7 +134,7 @@ private:
 
     void assertExceptionRows()
     {
-        expectEquals(static_cast<int>(TSS::kZoneExceptionRows.size()), 4);
+        expectEquals(static_cast<int>(TSS::kZoneExceptionRows.size()), 3);
 
         const auto& combo = TSS::kZoneExceptionRows[0];
         expect(combo.object == TSS::SkinObjectType::kComboBox);
@@ -148,13 +148,8 @@ private:
 
         const auto& logo = TSS::kZoneExceptionRows[2];
         expect(logo.object == TSS::SkinObjectType::kPopupMenu);
-        expect(juce::String(logo.where).contains("logo"));
+        expect(juce::String(logo.where).containsIgnoreCase("logo"));
         expect(logo.colourSet == TSS::ColourSet::k3);
-
-        const auto& buttons = TSS::kZoneExceptionRows[3];
-        expect(buttons.object == TSS::SkinObjectType::kButton);
-        expect(buttons.usesKind == TSS::ZoneExceptionUsesKind::kUcs);
-        expect(buttons.colourSet == TSS::ColourSet::k1);
     }
 
     void assertSingleSetList()

@@ -197,11 +197,9 @@ namespace SkinDesignerChrome
     /** Min Mappings panel width (Palette at minimum). */
     inline constexpr int kMappingsPanelMinWidth =
         mappingsPanelWidthForPalettePanel(kPalettePanelMinWidth); // 567
-    /** Right work surface titles (Mappings / Zones share the Mappings-width column). */
-    inline constexpr const char* kMappingsWorkSurfaceTitle = "MAPPINGS";
-    inline constexpr const char* kZonesWorkSurfaceTitle = "ZONES";
-    /** Gap between the active title tab and the peer work-surface title. */
-    inline constexpr int kWorkSurfacePeerTitleGap = 8;
+    /** Right work surface titles (Colour / Zone mappings share the Mappings-width column). */
+    inline constexpr const char* kMappingsWorkSurfaceTitle = "COLOUR MAPPINGS";
+    inline constexpr const char* kZonesWorkSurfaceTitle = "ZONE MAPPINGS";
     /** Body width for a given Palette panel width (edges + Color + gaps + Mappings). */
     inline constexpr int windowBodyWidthForPalettePanel(int palettePanelW) noexcept
     {
@@ -294,6 +292,13 @@ namespace SkinDesignerChrome
     inline constexpr float kBodyFont = 13.0f;
     /** Match ComboBox corner radius (LookAndFeel_V4 default is 3). */
     inline constexpr float kControlCorner = 3.0f;
+    /**
+     * Space after a work-surface title tab so the next créneau starts past the
+     * 45° shoulder bevel including its landing corner, plus a small air gap.
+     */
+    inline constexpr int kWorkSurfaceTabBevelOverhang =
+        kPanelTitleHeight - kTableSectionRailHeight - (int) kTabBevelStartEarly
+        + (int) kControlCorner + 5; // 23
     /**
      * Badge corner — shorter than buttons (16 vs 24), so use a smaller radius
      * to keep the same optical roundness as kControlCorner on controls.

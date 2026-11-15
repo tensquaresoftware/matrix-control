@@ -61,7 +61,7 @@ public:
     std::function<void(TSS::SkinColourKey key)> onMappedColourClicked;
     /** Escape while the table content has focus - clear mapping mode in main. */
     std::function<bool()> onEscapeRequested;
-    /** Peer title (ZONES) clicked — host switches the right work surface. */
+    /** Peer title (ZONE MAPPINGS) clicked — host switches the right work surface. */
     std::function<void()> onPeerWorkSurfaceRequested;
 
     void paint(juce::Graphics& g) override;
