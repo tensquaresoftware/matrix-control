@@ -84,22 +84,20 @@ SkinDesignerSkinsPanel::SkinDesignerSkinsPanel()
 void SkinDesignerSkinsPanel::cycleCombo(juce::ComboBox& combo, int delta)
 {
     const int count = combo.getNumItems();
-    if (count <= 0)
+    if (count <= 0 || delta == 0)
         return;
 
     const int index = combo.getSelectedItemIndex();
     if (index < 0)
     {
-        // Nothing selected (Product "Select a skin"): step forward into the first item.
-        if (delta > 0)
-            combo.setSelectedItemIndex(0, juce::sendNotificationSync);
+        // Nothing selected (Product "Select a skin"): + → first, - → last.
+        combo.setSelectedItemIndex(delta > 0 ? 0 : count - 1, juce::sendNotificationSync);
         return;
     }
 
-    const int next = index + delta;
-    if (next < 0 || next >= count)
-        return;
-
+    int next = (index + delta) % count;
+    if (next < 0)
+        next += count;
     combo.setSelectedItemIndex(next, juce::sendNotificationSync);
 }
 
@@ -110,19 +108,17 @@ void SkinDesignerSkinsPanel::setProductDuplicateEnabled(bool enabled)
 
 void SkinDesignerSkinsPanel::syncProductNavButtons()
 {
-    const int count = productCombo_.getNumItems();
-    const int index = productCombo_.getSelectedItemIndex();
-    productStepper_.setDecrementEnabled(count > 0 && index > 0);
-    // index < 0 ("Select a skin"): allow + to pick the first Product skin.
-    productStepper_.setIncrementEnabled(count > 0 && (index < 0 || index < count - 1));
+    // Circular wrap: both directions stay armed whenever the combo has items.
+    const bool canStep = productCombo_.getNumItems() > 0;
+    productStepper_.setDecrementEnabled(canStep);
+    productStepper_.setIncrementEnabled(canStep);
 }
 
 void SkinDesignerSkinsPanel::syncDesignerNavButtons()
 {
-    const int count = designerCombo_.getNumItems();
-    const int index = designerCombo_.getSelectedItemIndex();
-    designerStepper_.setDecrementEnabled(count > 0 && index > 0);
-    designerStepper_.setIncrementEnabled(count > 0 && index >= 0 && index < count - 1);
+    const bool canStep = designerCombo_.getNumItems() > 0;
+    designerStepper_.setDecrementEnabled(canStep);
+    designerStepper_.setIncrementEnabled(canStep);
 }
 
 void SkinDesignerSkinsPanel::setDesignerActionsEnabled(bool canDuplicate,
