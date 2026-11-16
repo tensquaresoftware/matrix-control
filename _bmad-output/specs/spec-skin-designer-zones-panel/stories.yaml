@@ -32,7 +32,7 @@
     Persist and reload per-skin zone maps in the Designer pack JSON, and add the
     optional object-name jump into Mappings (CAP-4 + io persistence).
   spec_checkpoint: false
-  done_checkpoint: false
+  done_checkpoint: true
   invoke_dev_with: >-
     Ownership is per Designer skin like palette. Missing zone map on load equals
     registry defaults. Do not add a Zone column on every Mappings row.

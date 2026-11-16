@@ -138,6 +138,18 @@ void SkinDesignerMappingsPanel::revealPastilleMappings(const juce::String& pasti
     refresh();
 }
 
+void SkinDesignerMappingsPanel::revealObjectMappings(const juce::String& objectDisplayName)
+{
+    if (objectDisplayName.isEmpty())
+        return;
+    // Symmetric to revealPastilleMappings clearing the object macro-filter: a Zones
+    // jump must not AND-stack with an existing mapped-colour / column filter.
+    clearAllColumnFilters();
+    objectFilterName_ = objectDisplayName;
+    focusedObject_ = -1;
+    refresh();
+}
+
 void SkinDesignerMappingsPanel::layoutActionRow(juce::Rectangle<int> actions, int tableX, int tableW)
 {
     objectClearBounds_ = {};

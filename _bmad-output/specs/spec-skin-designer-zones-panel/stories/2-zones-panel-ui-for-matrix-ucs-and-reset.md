@@ -26,7 +26,7 @@ baseline_commit: '4ecb48f7'
 
 **Always:**
 - Third work surface chrome: `[ Palette ] [ Mappings ] [ Zones ]`; Zones useful width comparable to Mappings.
-- Matrix: five MCS rows (`kMultiSetSkinObjects`) × four zones (`kAllSkinZones`); combos only on `isZoneUsed` cells; unused cells show ASCII `-` (not assignable).
+- Matrix: five MCS rows (`kMultiSetSkinObjects`) × four zones (`kAllSkinZones`); combos only on `isZoneUsed` cells; unused cells show typographic em dash (U+2014; not assignable).
 - Combo options = drawers allowed by `supportsColourSet` / `colourSetCount` for that object; labels via existing `toString(ColourSet)` (`cs1`…).
 - Active Designer skin id shown; map ownership per skin; edits call `setZoneMap` then the same `onChanged` → `pushVisible` cadence as Mappings.
 - Display effective assignment: map entry if present, else `defaultColourSet` (empty map = registry defaults).
@@ -50,7 +50,7 @@ baseline_commit: '4ecb48f7'
 |----------|--------------|---------------------------|----------------|
 | Open Zones | Active Designer skin | Matrix shows effective cs (defaults if map empty); UCS + Exceptions filled from registry; skin name visible | N/A |
 | Change used combo | e.g. Slider+Patch cs1→cs2 | `setZoneMap` updated; Mappings pastilles unchanged; connected Standalone geography follows after push | Layer rejects invalid; UI keeps prior |
-| Unused cell | ComboBox+Header | Shows `-`; no combo / no assignment | N/A |
+| Unused cell | ComboBox+Header | Shows em dash (U+2014); no combo / no assignment | N/A |
 | Reset | After arbitrary edits | Zone map cleared; all used cells show registry defaults; push reflects defaults | Compiled / read-only skin: no write |
 | Switch skin | Another Designer skin | Panel rebinds to that skin's map (or defaults if empty) | N/A |
 | Read-only session | Compare / compiled | Matrix / Reset non-editable; still readable | N/A |
@@ -85,9 +85,9 @@ baseline_commit: '4ecb48f7'
 - [x] `python3 Scripts/quality/lint_touched.py` + SkinDesigner Debug build -- Clean Code gate + compile.
 
 **Acceptance Criteria:**
-- Given Designer with an active Designer skin, when selecting Zones, then the panel shows five MCS rows, four zone columns, `-` on unused cells, UCS list, and the three registry exception rows, with the active skin identified.
+- Given Designer with an active Designer skin, when selecting Zones, then the panel shows five MCS rows, four zone columns, em-dash on unused cells, UCS list, and the three registry exception rows, with the active skin identified.
 - Given a used cell combo change (e.g. Slider Patch → cs2), when the Layer bumps and the bridge is connected, then Standalone Look-for-zone geography follows that assignment without changing Mappings pastilles.
-- Given unused cells, when the panel renders, then they show `-` and cannot be assigned.
+- Given unused cells, when the panel renders, then they show an em dash (U+2014) and cannot be assigned.
 - Given Reset after edits, when confirmed by the control, then the active skin zone map returns to registry defaults (empty map) and a connected Standalone reflects defaults.
 - Given Compare/compiled read-only, when Zones is shown, then matrix and Reset do not mutate the Layer.
 
@@ -110,7 +110,35 @@ baseline_commit: '4ecb48f7'
 - [x] [Review][Patch] Registry em-dash comment; unused `kZonesPanelMinWidth` — fixed
 - [x] [Review][Defer] Zones panel combo/Reset UI not unit-tested — deferred (manual smoke)
 
+### Review Findings (polish `dfdccc10` / `e8039e2a..HEAD`, 2026-11-15)
+
+- [x] [Review][Decision] Unused MCS cells: keep typographic em dash or restore ASCII `-`? — resolved: keep U+2014; story ACs / Design Notes aligned to polish + SPEC (2026-11-15)
+- [x] [Review][Patch] Clamp Skin badge width so long names cannot overlap Reset — fixed
+- [x] [Review][Patch] Clip Location path paint to the Location cell — fixed
+- [x] [Review][Patch] Guard inactive tab-ledge bevel against panel right edge — fixed
+- [x] [Review][Patch] Pin exception `where` strings contain ASCII `" > "` in overlay tests — fixed
+- [x] [Review][Patch] Pin dual work-surface tab order/titles in chrome layout tests — fixed
+- [x] [Review][Patch] Translate French chrome comments to English — fixed
+- [x] [Review][Patch] Remove dead `objectHeader_` path — fixed
+- [x] [Review][Defer] MCS write controls still lack Zones panel harness [`Tools/SkinDesigner/SkinDesignerZonesPanelPages.cpp:93`] — deferred: same Designer GUI / manual-smoke pattern as prior story-2 defer
+- [x] [Review][Defer] Story 1 frozen tables still mention Header Undo/Redo/Panic exception row — deferred: companion/story-1 hygiene outside this polish diff
+
+**Rejected (polish review):**
+- false — Location column missing BorderSize padding — paint path already uses `reduced(kPad, 0)` on the Location cell.
+- false — `paintSubTabUnderline` skips Shared/Exceptions when matrix empty — matrix is laid out first; empty-matrix-with-siblings is unreachable in `resized`.
+- false — Exceptions intro no longer points to Colour Mappings — intentional rewrite; intro still explains read-only overrides.
+- low — `layoutWorkSurfaceTabs` `jlimit(1,0)` / zero-width ZONE tab — rejected: at `kMappingsPanelMinWidth` both titles fit; pathological narrow not everyday.
+- low — Sub-tab preferred widths collapse Shared/Exceptions — rejected: three short labels fit everyday panel width.
+- low — `makeBand` inverted when panel shorter than gutters — rejected: Designer panel height never hits that in normal use; fix adds complexity.
+- rejected (fix=edit spec) — Exclusive MCS/UCS/Exceptions sub-tabs vs AC “show all together” — intentional polish; story AC stale.
+- rejected (fix=edit spec) — Exceptions “Location” vs story “Where” — intentional rename; contract already updated.
+- rejected (fix=edit spec) — Chrome titles COLOUR/ZONE MAPPINGS vs story MAPPINGS/ZONES — intentional polish.
+- rejected (fix=edit spec) — Skin badge/Reset only on MCS sub-page — matches decided MCS chrome; not a code defect.
+- low — Sub-tabs mouse-only / no a11y roles — rejected: Designer pattern; keyboard a11y beyond this polish scope.
+
 ## Spec Change Log
+
+- 2026-11-15 — Polish review decision: unused MCS cells keep typographic em dash (U+2014); story ACs / Design Notes aligned to SPEC + implemented polish.
 
 ## Review Triage Log
 
@@ -143,7 +171,7 @@ baseline_commit: '4ecb48f7'
 
 **No CAP-4 jump in this story:** Object names are labels only.
 
-**Em-dash:** UI literal ASCII `-` (display-string rule); companion docs may keep typographic dashes.
+**Em-dash:** Unused MCS cells paint typographic em dash U+2014 (Skin Designer Inter path). Plugin footer / `PluginDisplayNames` ASCII rule does not apply to this Designer matrix glyph.
 
 ## Verification
 
@@ -152,4 +180,4 @@ baseline_commit: '4ecb48f7'
 - `python3 Scripts/quality/lint_touched.py` -- clean on touched C++ under `Tools/SkinDesigner/` (and `Source/` if registry helper touched).
 
 **Manual checks (if no CLI):**
-- Smoke (done_checkpoint): change one MCS zone assignment with Standalone Dev connected → geography updates; Reset restores defaults; unused cells stay `-`.
+- Smoke (done_checkpoint): change one MCS zone assignment with Standalone Dev connected → geography updates; Reset restores defaults; unused cells stay em-dash.

@@ -32,6 +32,11 @@ public:
      * Clears the Object macro filter (All objects) so the count matches the table.
      */
     void revealPastilleMappings(const juce::String& pastilleName);
+    /**
+     * Zones MCS object-name jump: apply Object macro filter for this display name
+     * (combo selection stays in sync via refresh).
+     */
+    void revealObjectMappings(const juce::String& objectDisplayName);
 
     /** When true, batch maps stay in the current gesture direction after a successful write. */
     bool isHoldColour() const noexcept { return holdColourToggle_.getToggleState(); }

@@ -240,6 +240,11 @@ void SkinDesignerMainComponent::wireRightWorkSurfacePanels(const std::function<b
     {
         setRightWorkSurface(RightWorkSurface::kMappings);
     };
+    zonesPanel_.onMcsObjectJumpRequested = [this](const juce::String& objectDisplayName)
+    {
+        setRightWorkSurface(RightWorkSurface::kMappings);
+        mappingsPanel_.revealObjectMappings(objectDisplayName);
+    };
     addAndMakeVisible(zonesPanel_);
     zonesPanel_.setVisible(false);
 }

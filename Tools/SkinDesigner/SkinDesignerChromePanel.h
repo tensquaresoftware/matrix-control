@@ -31,7 +31,7 @@ namespace SkinDesignerChrome
                          juce::Rectangle<int> tab,
                          int bottomGutter = kGutter);
 
-    /** Fixed-order dual créneaux for the Mappings | Zones work surface. */
+    /** Fixed-order dual tab notches for the Mappings | Zones work surface. */
     struct WorkSurfaceFrame
     {
         juce::Rectangle<int> panelBounds;
@@ -42,7 +42,7 @@ namespace SkinDesignerChrome
     };
 
     /**
-     * Active tab merges into the panel body; inactive tab is a quieter intercalaire
+     * Active tab merges into the panel body; inactive tab is a quieter ledge
      * on the shoulder (always COLOUR MAPPINGS left, ZONE MAPPINGS right).
      */
     void paintWorkSurfacePanelFrame(juce::Graphics& g, const WorkSurfaceFrame& frame);

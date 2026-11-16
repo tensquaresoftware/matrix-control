@@ -38,6 +38,13 @@ namespace
 
     void paintLocationPath(juce::Graphics& g, juce::Rectangle<int> area, const juce::String& path)
     {
+        if (area.isEmpty())
+            return;
+
+        juce::Graphics::ScopedSaveState clip (g);
+        if (! g.reduceClipRegion(area))
+            return;
+
         juce::StringArray parts;
         int start = 0;
         while (start <= path.length())

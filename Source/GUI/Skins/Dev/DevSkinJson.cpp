@@ -112,6 +112,9 @@ namespace TSS::DevSkin
             const auto linkGroups = mappingLinkGroupsToVar(skin);
             if (! linkGroups.isVoid())
                 obj->setProperty("mappingLinkGroups", linkGroups);
+            const auto zoneMap = packZoneMapToVar(skin.zoneMap);
+            if (! zoneMap.isVoid())
+                obj->setProperty("zoneMap", zoneMap);
             return juce::var(obj);
         }
 
@@ -158,7 +161,7 @@ namespace TSS::DevSkin
             const auto inventory = allStructuredKeys();
             const std::set<SkinColourKey> validKeys(inventory.begin(), inventory.end());
             mappingLinkGroupsFromVar(obj->getProperty("mappingLinkGroups"), out, validKeys);
-            return true;
+            return readPackZoneMapProperty(*obj, out.zoneMap, error);
         }
     }
 

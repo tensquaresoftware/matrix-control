@@ -24,6 +24,8 @@ public:
 
     /** Peer title (COLOUR MAPPINGS) clicked — host switches the right work surface. */
     std::function<void()> onPeerWorkSurfaceRequested;
+    /** MCS matrix object-name click — host shows Colour Mappings filtered to that object. */
+    std::function<void(const juce::String& objectDisplayName)> onMcsObjectJumpRequested;
 
     void paint(juce::Graphics& g) override;
     void resized() override;
@@ -102,7 +104,6 @@ private:
     juce::Label skinHeader_ { {}, "Skin:" };
     juce::Rectangle<int> skinNameBadgeBounds_;
     juce::String skinNameBadgeText_;
-    juce::Label objectHeader_ { {}, "Objects" };
     juce::Label zonesGroupHeader_ { {}, "Zones" };
     std::array<juce::Label, TSS::kAllSkinZones.size()> zoneHeaders_;
     std::array<juce::Label, TSS::kMultiSetSkinObjects.size()> rowLabels_;

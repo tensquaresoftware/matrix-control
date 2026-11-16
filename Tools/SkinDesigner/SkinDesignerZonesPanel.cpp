@@ -1,5 +1,6 @@
 #include "Tools/SkinDesigner/SkinDesignerZonesPanel.h"
 
+#include "GUI/Skins/Dev/DevSkinKeyNames.h"
 #include "Tools/SkinDesigner/SkinDesignerChrome.h"
 
 namespace
@@ -206,6 +207,15 @@ void SkinDesignerZonesPanel::mouseUp(const juce::MouseEvent& e)
 {
     if (! e.mouseWasClicked())
         return;
+
+    for (size_t i = 0; i < rowLabels_.size(); ++i)
+    {
+        if (e.eventComponent != &rowLabels_[i])
+            continue;
+        if (onMcsObjectJumpRequested != nullptr)
+            onMcsObjectJumpRequested(TSS::DevSkin::toString(TSS::kMultiSetSkinObjects[i]));
+        return;
+    }
 
     const auto pos = e.getPosition();
     if (peerTitleBounds_.contains(pos) && onPeerWorkSurfaceRequested != nullptr)

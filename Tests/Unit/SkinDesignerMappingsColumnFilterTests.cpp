@@ -35,6 +35,7 @@ public:
         numberBoxCaretInInventory();
         chromeDecorrelationDisplayOrder();
         inventoryExpandsOnlyMultiSetObjects();
+        zonesCap4ObjectMacroFilter();
     }
 
 private:
@@ -426,6 +427,19 @@ private:
         for (const auto& inventoryKey : inventory)
             if (! TSS::supportsMultipleColourSets(inventoryKey.object))
                 expect(inventoryKey.colourSet == TSS::ColourSet::k1);
+    }
+
+    void zonesCap4ObjectMacroFilter()
+    {
+        beginTest("Zones CAP-4: object macro filter matches MCS display names");
+
+        const auto sliderName = TSS::DevSkin::toString(TSS::SkinObjectType::kSlider);
+        expect(SkinDesignerMappingsColumnFilter::objectMacroFilterShowsGroup(sliderName,
+                                                                             TSS::SkinObjectType::kSlider));
+        expect(! SkinDesignerMappingsColumnFilter::objectMacroFilterShowsGroup(
+            sliderName, TSS::SkinObjectType::kLed));
+        expect(SkinDesignerMappingsColumnFilter::objectMacroFilterShowsGroup(
+            {}, TSS::SkinObjectType::kLed));
     }
 };
 

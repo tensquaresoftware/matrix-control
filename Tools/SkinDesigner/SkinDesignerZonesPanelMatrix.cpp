@@ -168,9 +168,11 @@ namespace
                           + kPad;
         // Same height and side pad as matrix combos.
         const int badgeH = kComboH;
-        const int badgeW = SkinDesignerChrome::measureTextWidth(
-                               SkinDesignerChrome::fontBold(), skinName)
-                         + 2 * kPad;
+        const int badgeWWanted = SkinDesignerChrome::measureTextWidth(
+                                     SkinDesignerChrome::fontBold(), skinName)
+                               + 2 * kPad;
+        // Keep Reset hittable when the skin display name is very long.
+        const int badgeW = juce::jmin(badgeWWanted, juce::jmax(0, resetX - prefixW));
         return { { 0, y, prefixW, kSkinRowH },
                  { prefixW, y + (kSkinRowH - badgeH) / 2, badgeW, badgeH },
                  { resetX, y, resetW, kSkinRowH } };
@@ -227,11 +229,8 @@ void SkinDesignerZonesPanel::buildMatrixHeaders()
     skinHeader_.setColour(juce::Label::textColourId, SkinDesignerChrome::textTableHeader());
     skinHeader_.setJustificationType(juce::Justification::centredLeft);
     SkinDesignerChrome::preventTextSquish(skinHeader_);
-    styleHeaderLabel(objectHeader_, "Objects", true);
-    objectHeader_.setVisible(false);
     styleHeaderLabel(zonesGroupHeader_, "Zones", false);
     content_.addAndMakeVisible(skinHeader_);
-    content_.addChildComponent(objectHeader_);
     content_.addAndMakeVisible(zonesGroupHeader_);
     for (size_t i = 0; i < TSS::kAllSkinZones.size(); ++i)
     {
@@ -247,6 +246,7 @@ void SkinDesignerZonesPanel::buildMatrixHeaders()
         rowLabels_[i].setColour(juce::Label::textColourId, SkinDesignerChrome::textTableBody());
         rowLabels_[i].setJustificationType(juce::Justification::centredLeft);
         SkinDesignerChrome::preventTextSquish(rowLabels_[i]);
+        rowLabels_[i].addMouseListener(this, false);
         content_.addAndMakeVisible(rowLabels_[i]);
     }
 }
@@ -266,7 +266,6 @@ int SkinDesignerZonesPanel::layoutMatrixPage(int /*contentW*/)
     skinNameBadgeBounds_ = skinRow.badge;
     resetButton_.setBounds(skinRow.reset);
     zonesGroupHeader_.setBounds(zonesSpanSlab(objectColW, ys.zones, kZonesBarH));
-    objectHeader_.setBounds(columnSlab(objectColW, 0, ys.columns, kHeaderRowH));
     for (size_t i = 0; i < TSS::kAllSkinZones.size(); ++i)
     {
         auto cell = columnSlab(objectColW, static_cast<int>(i) + 1, ys.columns, kHeaderRowH);

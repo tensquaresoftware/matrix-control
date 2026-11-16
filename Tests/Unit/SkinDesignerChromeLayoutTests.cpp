@@ -31,6 +31,8 @@ public:
         minContentHeightStacksSkinsAndColor();
         pathElideKeepsLeafName();
         lastPushBadgeAlignsWithPaletteColumn();
+        workSurfaceTabsFixedOrderAndTitles();
+        mappingsColumnsHaveNoZoneColumn();
     }
 
 private:
@@ -344,6 +346,38 @@ private:
 
         expectEquals(SkinDesignerChrome::kColorPanelWidth + SkinDesignerChrome::kPaletteSideGap,
                      260 + 12);
+    }
+
+    void workSurfaceTabsFixedOrderAndTitles()
+    {
+        beginTest("Work-surface tabs: COLOUR MAPPINGS left, ZONE MAPPINGS right");
+
+        expectEquals(juce::String(SkinDesignerChrome::kMappingsWorkSurfaceTitle),
+                     juce::String("COLOUR MAPPINGS"));
+        expectEquals(juce::String(SkinDesignerChrome::kZonesWorkSurfaceTitle),
+                     juce::String("ZONE MAPPINGS"));
+
+        const auto chrome = SkinDesignerChrome::layoutWorkSurfaceTabs(
+            { 0, 0, SkinDesignerChrome::kMappingsPanelMinWidth, 400 }, 0);
+        expect(chrome.mappingsTab.getX() < chrome.zonesTab.getX());
+        expect(chrome.mappingsTab.getWidth() > 0);
+        expect(chrome.zonesTab.getWidth() > 0);
+    }
+
+    void mappingsColumnsHaveNoZoneColumn()
+    {
+        beginTest("Colour Mappings columns stay Property|State|Colour set|Link|Mapped (no Zone)");
+
+        const int tableW = SkinDesignerChrome::kMappingsTablePaintMinWidth + 40;
+        const auto cols = SkinDesignerMappingsColumns::forWidth(tableW);
+        // Five geometry fields only — no zone width / left helper on Layout.
+        expect(cols.propertyW > 0);
+        expect(cols.stateW > 0);
+        expect(cols.colourSetW > 0);
+        expect(cols.linkW > 0);
+        expect(cols.mappedW > 0);
+        expectEquals(cols.propertyW + cols.stateW + cols.colourSetW + cols.linkW,
+                     SkinDesignerChrome::kMappingsFixedColumnsWidth);
     }
 };
 

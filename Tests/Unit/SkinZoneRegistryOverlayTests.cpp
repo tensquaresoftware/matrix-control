@@ -73,6 +73,9 @@ public:
         beginTest("missingZoneMapOnPush_treatsAsDefaults");
         assertMissingZoneMapDefaults();
 
+        beginTest("pushJson_unknownZoneMapString_hardFails");
+        assertPushUnknownZoneMapStringHardFails();
+
         beginTest("overlay_ledHeaderRemap_resolveZoneColourSet");
         assertOverlayLedRemap();
 
@@ -135,6 +138,10 @@ private:
     void assertExceptionRows()
     {
         expectEquals(static_cast<int>(TSS::kZoneExceptionRows.size()), 3);
+
+        for (const auto& row : TSS::kZoneExceptionRows)
+            expect(juce::String(row.where).contains(" > "),
+                   "Exception Location paths use ASCII \" > \" for Operation arrows");
 
         const auto& combo = TSS::kZoneExceptionRows[0];
         expect(combo.object == TSS::SkinObjectType::kComboBox);
@@ -381,6 +388,28 @@ private:
         expect(TSS::resolveZoneColourSet(TSS::SkinObjectType::kSlider, TSS::SkinZone::kPatch)
                == TSS::ColourSet::k1);
         TSS::clearSkinZoneOverlay();
+    }
+
+    void assertPushUnknownZoneMapStringHardFails()
+    {
+        TSS::DevSkin::Layer layer;
+        expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "StrictPush").wasOk());
+        auto payloadVar = TSS::DevSkin::pushPayloadToVar(layer.makePushPayload());
+        auto* obj = payloadVar.getDynamicObject();
+        expect(obj != nullptr);
+
+        juce::Array<juce::var> zoneArr;
+        auto* bad = new juce::DynamicObject();
+        bad->setProperty("object", "NotAnObject");
+        bad->setProperty("zone", "Patch");
+        bad->setProperty("colourSet", "cs1");
+        zoneArr.add(juce::var(bad));
+        obj->setProperty("zoneMap", juce::var(zoneArr));
+
+        TSS::DevSkin::PushPayload restored;
+        juce::String error;
+        expect(! TSS::DevSkin::pushPayloadFromVar(payloadVar, restored, error));
+        expect(error.containsIgnoreCase("Unknown zoneMap"));
     }
 
     void assertOverlayLedRemap()

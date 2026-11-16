@@ -63,30 +63,37 @@ namespace SkinDesignerChrome
             silhouette.quadraticTo(band.left, band.bottom, band.left, band.bottom - band.r);
         }
 
-        void paintInactiveIntercalaire(juce::Graphics& g,
-                                       const PanelBand& band,
-                                       juce::Rectangle<int> tab)
+        void paintInactiveTabLedge(juce::Graphics& g,
+                                   const PanelBand& band,
+                                   juce::Rectangle<int> tab)
         {
             const float tabLeft = (float) tab.getX();
             const float tabRight = tabBevelRight(tab, tabLeft, band.r);
             const float bevelEndX = tabRight + band.drop;
 
-            juce::Path intercalaire;
-            intercalaire.startNewSubPath(tabLeft + band.r, band.top);
-            intercalaire.lineTo(tabRight - band.r, band.top);
-            // Same 45° shoulder language as the active créneau (smooth landing to the right).
-            intercalaire.quadraticTo(tabRight, band.top, tabRight + band.r, band.top + band.r);
-            intercalaire.lineTo(bevelEndX - band.r, band.titleBottom - band.r);
-            intercalaire.quadraticTo(bevelEndX, band.titleBottom, bevelEndX + band.r,
-                                     band.titleBottom);
+            juce::Path ledge;
+            ledge.startNewSubPath(tabLeft + band.r, band.top);
+            ledge.lineTo(tabRight - band.r, band.top);
+            // Same 45° shoulder as the active tab notch (smooth landing to the right).
+            ledge.quadraticTo(tabRight, band.top, tabRight + band.r, band.top + band.r);
+            if (bevelEndX + band.r < band.right)
+            {
+                ledge.lineTo(bevelEndX - band.r, band.titleBottom - band.r);
+                ledge.quadraticTo(bevelEndX, band.titleBottom, bevelEndX + band.r,
+                                  band.titleBottom);
+            }
+            else
+            {
+                ledge.lineTo(tabRight, band.titleBottom);
+            }
             // Sharp bottom-left: keep the shoulder as a continuous horizontal line.
-            intercalaire.lineTo(tabLeft, band.titleBottom);
-            intercalaire.lineTo(tabLeft, band.top + band.r);
-            intercalaire.quadraticTo(tabLeft, band.top, tabLeft + band.r, band.top);
-            intercalaire.closeSubPath();
+            ledge.lineTo(tabLeft, band.titleBottom);
+            ledge.lineTo(tabLeft, band.top + band.r);
+            ledge.quadraticTo(tabLeft, band.top, tabLeft + band.r, band.top);
+            ledge.closeSubPath();
 
             g.setColour(surfacePanel());
-            g.fillPath(intercalaire);
+            g.fillPath(ledge);
         }
     }
 
@@ -156,7 +163,7 @@ namespace SkinDesignerChrome
 
         g.setColour(surfacePanel());
         g.fillPath(silhouette);
-        paintInactiveIntercalaire(g, band, inactiveTab);
+        paintInactiveTabLedge(g, band, inactiveTab);
     }
 
     void paintRoundedWell(juce::Graphics& g, juce::Rectangle<int> area, juce::Colour fill)

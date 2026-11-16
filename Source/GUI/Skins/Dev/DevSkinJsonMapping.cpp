@@ -247,16 +247,78 @@ namespace TSS::DevSkin
         return juce::var(obj);
     }
 
-    bool zoneMapFromVar(const juce::var& zoneMapVar, SkinZoneMap& out, juce::String& error)
+    namespace
     {
-        auto* arr = zoneMapVar.getArray();
-        if (arr == nullptr)
+        struct ZoneMapEntryFields
         {
+            SkinObjectType object = SkinObjectType::kSlider;
+            SkinZone zone = SkinZone::kPatch;
+            ColourSet colourSet = ColourSet::k1;
+        };
+
+        bool zoneMapArrayOrEmpty(const juce::var& zoneMapVar,
+                                 juce::Array<juce::var>*& outArr,
+                                 juce::String& error)
+        {
+            outArr = zoneMapVar.getArray();
+            if (outArr != nullptr)
+                return true;
             if (zoneMapVar.isVoid() || zoneMapVar.isUndefined())
                 return true;
             error = "zoneMap must be an array";
             return false;
         }
+
+        bool parseZoneMapEntryObject(juce::DynamicObject& obj,
+                                     ZoneMapEntryFields& fields,
+                                     juce::String& error)
+        {
+            if (! parseObjectType(obj.getProperty("object").toString(), fields.object))
+            {
+                error = "Unknown zoneMap object type";
+                return false;
+            }
+            if (! parseSkinZone(obj.getProperty("zone").toString(), fields.zone))
+            {
+                error = "Unknown zoneMap zone";
+                return false;
+            }
+            if (! parseColourSet(obj.getProperty("colourSet").toString(), fields.colourSet))
+            {
+                error = "Unknown zoneMap colourSet";
+                return false;
+            }
+            return true;
+        }
+
+        bool keepSoftZoneMapEntry(const ZoneMapEntryFields& fields) noexcept
+        {
+            return isZoneUsed(fields.object, fields.zone)
+                && supportsColourSet(fields.object, fields.colourSet);
+        }
+    }
+
+    juce::var packZoneMapToVar(const SkinZoneMap& map)
+    {
+        juce::Array<juce::var> zoneMap;
+        for (const auto& [key, colourSet] : map)
+        {
+            if (! isZoneUsed(key.object, key.zone) || ! supportsColourSet(key.object, colourSet))
+                continue;
+            zoneMap.add(zoneMapEntryToVar(key, colourSet));
+        }
+        if (zoneMap.isEmpty())
+            return {};
+        return juce::var(zoneMap);
+    }
+
+    bool zoneMapFromVar(const juce::var& zoneMapVar, SkinZoneMap& out, juce::String& error)
+    {
+        juce::Array<juce::var>* arr = nullptr;
+        if (! zoneMapArrayOrEmpty(zoneMapVar, arr, error))
+            return false;
+        if (arr == nullptr)
+            return true;
 
         out.clear();
         for (const auto& entry : *arr)
@@ -268,27 +330,46 @@ namespace TSS::DevSkin
                 return false;
             }
 
-            SkinObjectType object {};
-            SkinZone zone {};
-            ColourSet colourSet {};
-            if (! parseObjectType(obj->getProperty("object").toString(), object))
-            {
-                error = "Unknown zoneMap object type";
+            ZoneMapEntryFields fields;
+            if (! parseZoneMapEntryObject(*obj, fields, error))
                 return false;
-            }
-            if (! parseSkinZone(obj->getProperty("zone").toString(), zone))
-            {
-                error = "Unknown zoneMap zone";
-                return false;
-            }
-            if (! parseColourSet(obj->getProperty("colourSet").toString(), colourSet))
-            {
-                error = "Unknown zoneMap colourSet";
-                return false;
-            }
 
-            out[SkinZoneMapKey { object, zone }] = colourSet;
+            out[SkinZoneMapKey { fields.object, fields.zone }] = fields.colourSet;
         }
         return true;
+    }
+
+    bool zoneMapFromVarSoft(const juce::var& zoneMapVar, SkinZoneMap& out, juce::String& error)
+    {
+        juce::Array<juce::var>* arr = nullptr;
+        if (! zoneMapArrayOrEmpty(zoneMapVar, arr, error))
+            return false;
+        if (arr == nullptr)
+            return true;
+
+        out.clear();
+        for (const auto& entry : *arr)
+        {
+            auto* obj = entry.getDynamicObject();
+            if (obj == nullptr)
+                continue;
+
+            ZoneMapEntryFields fields;
+            juce::String ignored;
+            if (! parseZoneMapEntryObject(*obj, fields, ignored) || ! keepSoftZoneMapEntry(fields))
+                continue;
+
+            out[SkinZoneMapKey { fields.object, fields.zone }] = fields.colourSet;
+        }
+        return true;
+    }
+
+    bool readPackZoneMapProperty(const juce::DynamicObject& obj,
+                                 SkinZoneMap& out,
+                                 juce::String& error)
+    {
+        if (! obj.hasProperty("zoneMap"))
+            return true;
+        return zoneMapFromVarSoft(obj.getProperty("zoneMap"), out, error);
     }
 }

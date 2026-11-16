@@ -98,7 +98,6 @@ void SkinDesignerZonesPanel::applySubPageVisibility()
 
     resetButton_.setVisible(matrix);
     skinHeader_.setVisible(matrix);
-    objectHeader_.setVisible(false);
     zonesGroupHeader_.setVisible(matrix);
     for (auto& header : zoneHeaders_)
         header.setVisible(matrix);

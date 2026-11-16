@@ -293,7 +293,7 @@ namespace SkinDesignerChrome
     /** Match ComboBox corner radius (LookAndFeel_V4 default is 3). */
     inline constexpr float kControlCorner = 3.0f;
     /**
-     * Space after a work-surface title tab so the next créneau starts past the
+     * Space after a work-surface title tab so the next tab notch starts past the
      * 45° shoulder bevel including its landing corner, plus a small air gap.
      */
     inline constexpr int kWorkSurfaceTabBevelOverhang =
