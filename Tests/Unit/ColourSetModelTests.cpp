@@ -4,6 +4,7 @@
 #include "GUI/Skins/Dev/DevSkinJsonMapping.h"
 #include "GUI/Skins/Dev/DevSkinKeyNames.h"
 #include "GUI/Skins/Dev/DevSkinLayer.h"
+#include "GUI/Skins/Dev/DevSkinPaletteCatalog.h"
 #include "GUI/Skins/SkinValues.h"
 
 class ColourSetModelTests : public juce::UnitTest
@@ -45,6 +46,28 @@ public:
     }
 
 private:
+    bool ensureChartPastilleOnSkin(TSS::DevSkin::Layer& layer,
+                                   const juce::String& skinId,
+                                   const juce::String& name)
+    {
+        const auto* skin = layer.findSkin(skinId);
+        if (skin == nullptr)
+            return false;
+
+        for (const auto& pastille : skin->palette)
+            if (pastille.name == name)
+                return true;
+
+        for (const auto& pastille : TSS::DevSkin::colourChartPastilles())
+        {
+            if (pastille.name != name)
+                continue;
+            return layer.addPastille(skinId, name, pastille.argb).wasOk();
+        }
+
+        return false;
+    }
+
     static juce::String makeFullLegacyJson()
     {
         TSS::DevSkin::Layer source;
@@ -96,16 +119,19 @@ private:
     {
         TSS::DevSkin::Layer layer;
         layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Distinct Sets");
+        const auto skinId = layer.activeSkinId();
+        expect(ensureChartPastilleOnSkin(layer, skinId, "kGreen300"));
+        expect(ensureChartPastilleOnSkin(layer, skinId, "kBrandBlue"));
+
         auto key = TSS::skinColourKey(TSS::SkinObjectType::kSlider, TSS::SkinColourProperty::kTrack);
-        expect(layer.setMapping(layer.activeSkinId(), key, "kGreen300").wasOk());
+        expect(layer.setMapping(skinId, key, "kGreen300").wasOk());
         key.colourSet = TSS::ColourSet::k2;
-        expect(layer.setMapping(layer.activeSkinId(), key, "kBrandBlue").wasOk());
+        expect(layer.setMapping(skinId, key, "kBrandBlue").wasOk());
 
         const auto json = TSS::DevSkin::exportToJson(layer);
-        const auto activeId = layer.activeSkinId();
         TSS::DevSkin::Layer restored;
         expect(TSS::DevSkin::importFromJson(restored, json).ok);
-        const auto* skin = restored.findSkin(activeId);
+        const auto* skin = restored.findSkin(skinId);
         expect(skin != nullptr);
         if (skin == nullptr)
             return;
