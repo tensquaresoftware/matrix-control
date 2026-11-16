@@ -19,6 +19,7 @@ Source complète : `CONVENTIONS.md` §5–§6.2, §9. Constitution BMad : `_bmad
 - Messages de commit en **anglais** : ligne impérative + puces des changements significatifs
 - Issues GitHub : titre et description en anglais
 - Readiness PR / merge vers `main` → règle `merge-ready-check.mdc` + `Scripts/quality/check_merge_ready.sh`
+- Nouvelle branche vers `main` → guidage draft PR / main vert : `branch-duo-pro-flow.mdc` (défaut, sans rappel de Guillaume)
 
 ## BMad Method
 
