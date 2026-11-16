@@ -57,8 +57,8 @@ public:
         beginTest("designerSkinNames_naturalOrder_digitRunsNumeric");
         assertDesignerSkinNamesNaturalOrder();
 
-        beginTest("sortedDesignerSkins_devOnly_naturalNameOrder");
-        assertSortedDesignerSkinsDevOnlyNaturalOrder();
+        beginTest("designerSkinsInLayerOrder_devOnly_preservesLayerOrder");
+        assertDesignerSkinsInLayerOrder();
     }
 
 private:
@@ -432,19 +432,19 @@ private:
         expect(SkinDesignerUi::compareDesignerSkinNamesNatural("Beta", "Alpha") > 0);
     }
 
-    void assertSortedDesignerSkinsDevOnlyNaturalOrder()
+    void assertDesignerSkinsInLayerOrder()
     {
         TSS::DevSkin::Layer layer;
         expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Name 10").wasOk());
         expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Name 2").wasOk());
         expect(layer.duplicateSkin(TSS::DevSkin::kCompiledCreamId, "Name 9").wasOk());
 
-        const auto sorted = SkinDesignerUi::sortedDesignerSkins(layer);
-        expectEquals(static_cast<int>(sorted.size()), 3);
-        expectEquals(sorted[0]->name, juce::String("Name 2"));
-        expectEquals(sorted[1]->name, juce::String("Name 9"));
-        expectEquals(sorted[2]->name, juce::String("Name 10"));
-        for (const auto* skin : sorted)
+        const auto ordered = SkinDesignerUi::designerSkinsInLayerOrder(layer);
+        expectEquals(static_cast<int>(ordered.size()), 3);
+        expectEquals(ordered[0]->name, juce::String("Name 10"));
+        expectEquals(ordered[1]->name, juce::String("Name 2"));
+        expectEquals(ordered[2]->name, juce::String("Name 9"));
+        for (const auto* skin : ordered)
             expect(skin->kind == TSS::DevSkin::SkinKind::kDev);
     }
 };
