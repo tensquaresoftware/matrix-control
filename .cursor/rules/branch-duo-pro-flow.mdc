@@ -1,0 +1,32 @@
+---
+description: Guidage branche→draft PR→main vert — duo/solo, sans que Guillaume doive le rappeler
+alwaysApply: true
+---
+
+# Flux branche → main (duo / solo)
+
+Guillaume veut ce mode **par défaut** sur toute branche destinée à `main`. Il ne doit pas avoir à dire « guide-moi » ni à se souvenir des jalons.
+
+## Quand démarrer le guidage
+
+Dès qu’il demande de **créer une branche**, de **démarrer une feature/fix** hors `main`, ou qu’un workflow BMad implique une nouvelle branche vers `main` :
+
+1. Proposer nom + `git checkout -b` (créer seulement s’il confirme, sauf s’il a déjà demandé explicitement la création).
+2. Juste après : **une** question courte — ouvrir une **draft PR** dès le premier commit poussé ? (oui / non).
+3. Rappeler en **une** phrase le filet : branche → draft PR → CI → merge seulement si PR **et** `main` sont verts.
+
+## Pendant le chantier (rappels légers, pas de cérémonie)
+
+- Après le **premier push** de la branche : si aucune PR, proposer draft PR (une fois, pas à chaque commit).
+- Si la branche **diverge longtemps** de `main`, ou si `main` vient d’être réparé : proposer rebase/merge de `origin/main` dans la branche.
+- Ne pas pusher / créer PR / merger **sans demande explicite**.
+
+## Avant merge / « PR prête ? »
+
+Suivre **aussi** `merge-ready-check.mdc` : `Scripts/quality/check_merge_ready.sh` + CI sur `main` et sur la PR.
+
+Checklist orale courte si utile : (1) PR à jour (2) merge-ready OK (3) CI PR verte (4) `main` vert (5) alors merge.
+
+## Hors scope
+
+Micro-commits locaux sans intention merge ; questions purement process sans nouvelle branche ; push/merge non demandés.

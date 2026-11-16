@@ -219,6 +219,52 @@ void SkinDesignerMainComponent::layoutSessionWell(juce::Rectangle<int> well)
                             SkinDesignerChrome::kButtonHeight });
 }
 
+void SkinDesignerMainComponent::wireRightWorkSurfacePanels(const std::function<bool()>& escapeMapping)
+{
+    mappingsPanel_.setLayer(&layer_);
+    mappingsPanel_.onRowActivated = [this](TSS::SkinColourKey key) { onMappingRowActivated(key); };
+    mappingsPanel_.onMappedColourClicked = [this](TSS::SkinColourKey key)
+    {
+        onMappedColourClicked(key);
+    };
+    mappingsPanel_.onHoldColourChanged = [this] { updateMappingWitness(); };
+    mappingsPanel_.onEscapeRequested = escapeMapping;
+    mappingsPanel_.onPeerWorkSurfaceRequested = [this]
+    {
+        setRightWorkSurface(RightWorkSurface::kZones);
+    };
+    addAndMakeVisible(mappingsPanel_);
+
+    zonesPanel_.setLayer(&layer_);
+    zonesPanel_.onPeerWorkSurfaceRequested = [this]
+    {
+        setRightWorkSurface(RightWorkSurface::kMappings);
+    };
+    zonesPanel_.onMcsObjectJumpRequested = [this](const juce::String& objectDisplayName)
+    {
+        setRightWorkSurface(RightWorkSurface::kMappings);
+        mappingsPanel_.revealObjectMappings(objectDisplayName);
+    };
+    addAndMakeVisible(zonesPanel_);
+    zonesPanel_.setVisible(false);
+}
+
+void SkinDesignerMainComponent::setRightWorkSurface(RightWorkSurface surface)
+{
+    if (rightWorkSurface_ == surface)
+        return;
+
+    rightWorkSurface_ = surface;
+    const bool showMappings = surface == RightWorkSurface::kMappings;
+    mappingsPanel_.setVisible(showMappings);
+    zonesPanel_.setVisible(! showMappings);
+
+    if (! showMappings && mappingMode_ != MappingMode::kIdle)
+        clearMappingModeToIdle();
+
+    resized();
+}
+
 void SkinDesignerMainComponent::layoutBodyPanels(juce::Rectangle<int> bounds)
 {
     auto left = bounds.removeFromLeft(SkinDesignerChrome::kColorPanelWidth);
@@ -236,7 +282,9 @@ void SkinDesignerMainComponent::layoutBodyPanels(juce::Rectangle<int> bounds)
     const int mappingsW = SkinDesignerChrome::mappingsPanelWidthForPalettePanel(paletteW);
     palettePanel_.setBounds(bounds.removeFromLeft(paletteW));
     bounds.removeFromLeft(paletteGap);
-    mappingsPanel_.setBounds(bounds.removeFromLeft(mappingsW));
+    const auto workSurfaceBounds = bounds.removeFromLeft(mappingsW);
+    mappingsPanel_.setBounds(workSurfaceBounds);
+    zonesPanel_.setBounds(workSurfaceBounds);
 }
 
 void SkinDesignerMainComponent::layoutStatusPushOrNoticeStrip(int badgeY,

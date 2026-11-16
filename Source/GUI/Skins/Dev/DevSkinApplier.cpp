@@ -1,6 +1,8 @@
 #include "GUI/Skins/Dev/DevSkinApplier.h"
 
 #include "GUI/Skins/Dev/DevSkinPaletteCatalog.h"
+#include "GUI/Skins/SkinZoneOverlay.h"
+#include "GUI/Skins/SkinZoneRegistry.h"
 
 namespace TSS::DevSkin
 {
@@ -38,6 +40,28 @@ namespace TSS::DevSkin
                 || payload.compiledAncestorId == rule.productId
                 || payload.derivedFrom == rule.productId;
         }
+
+        ApplyResult validateZoneMap(const SkinZoneMap& zoneMap, juce::int64 revision, const juce::String& skinId)
+        {
+            ApplyResult result;
+            result.revision = revision;
+            result.appliedSkinId = skinId;
+            for (const auto& [zoneKey, colourSet] : zoneMap)
+            {
+                if (! isZoneUsed(zoneKey.object, zoneKey.zone)
+                    || ! supportsColourSet(zoneKey.object, colourSet))
+                {
+                    result.ok = false;
+                    result.code = "invalid_zone_map";
+                    result.message = isZoneUsed(zoneKey.object, zoneKey.zone)
+                                         ? "Zone map colour set out of range for object"
+                                         : "Zone map assigns an unused MCS cell";
+                    return result;
+                }
+            }
+            result.ok = true;
+            return result;
+        }
     }
 
     Skin::ColourVariant compiledBaseVariant(const PushPayload& payload)
@@ -58,6 +82,7 @@ namespace TSS::DevSkin
 
         if (isCompiledKind(payload.kind))
         {
+            clearSkinZoneOverlay();
             result.ok = true;
             result.message = "Compiled skin selection";
             return result;
@@ -75,6 +100,10 @@ namespace TSS::DevSkin
             }
         }
 
+        const auto zoneCheck = validateZoneMap(payload.zoneMap, payload.revision, payload.activeSkinId);
+        if (! zoneCheck.ok)
+            return zoneCheck;
+
         targetSkin.clearHigherColourSets();
         for (const auto& [key, paletteName] : payload.mappings)
         {
@@ -82,6 +111,8 @@ namespace TSS::DevSkin
             jassert(argb.has_value());
             targetSkin.setColour(key, juce::Colour(*argb));
         }
+
+        setSkinZoneOverlay(payload.zoneMap);
 
         result.ok = true;
         result.message = "Applied";

@@ -140,10 +140,10 @@ void SkinDesignerMainComponent::onMappedColourClicked(TSS::SkinColourKey key)
 
 void SkinDesignerMainComponent::enterHeldColour(const juce::String& pastilleName)
 {
+    setRightWorkSurface(RightWorkSurface::kMappings);
     mappingMode_ = MappingMode::kHeldColour;
     selectedPastille_ = pastilleName;
-    armedKey_ = {};
-    armedFromUnbound_ = false;
+    armedKey_ = {}; armedFromUnbound_ = false;
     syncColourPickerToSelection();
     updateMappingWitness();
     grabKeyboardFocus();

@@ -39,4 +39,19 @@ namespace TSS::DevSkin
     std::vector<std::vector<SkinColourKey>> sanitizeMappingLinkGroups(
         std::vector<std::vector<SkinColourKey>> groups,
         const std::set<SkinColourKey>& validKeys);
+
+    juce::var zoneMapEntryToVar(const SkinZoneMapKey& key, ColourSet colourSet);
+    /** Pack skin JSON: used-cell array, or void when empty (caller omits property). */
+    juce::var packZoneMapToVar(const SkinZoneMap& map);
+    /** Missing / void zoneMap => empty map (registry defaults). Unknown strings fail. */
+    bool zoneMapFromVar(const juce::var& zoneMapVar, SkinZoneMap& out, juce::String& error);
+    /**
+     * Designer pack load: missing / void => empty; non-array fails.
+     * Non-object / unknown / unused / out-of-range entries are skipped (siblings kept).
+     */
+    bool zoneMapFromVarSoft(const juce::var& zoneMapVar, SkinZoneMap& out, juce::String& error);
+    /** Reads optional pack `zoneMap` property via soft load; missing => leave out empty. */
+    bool readPackZoneMapProperty(const juce::DynamicObject& obj,
+                                 SkinZoneMap& out,
+                                 juce::String& error);
 }

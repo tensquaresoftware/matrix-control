@@ -38,7 +38,8 @@ namespace TSS
         , onSettingsRequested_(std::move(config.onSettingsRequested))
         , onAboutRequested_(std::move(config.onAboutRequested))
         , contextualHelpBinder_(config.contextualHelpBinder)
-        , look_(popupMenuLookForZone(skin, kMonoMenuExceptionZone))
+        , look_(popupMenuLookFromSkin(skin,
+                                       zoneColourSet(SkinObjectType::kPopupMenu, kMonoMenuExceptionZone)))
         , renderer_(std::make_unique<PopupMenuRenderer>(uiScale_))
         , cachedFont_(look_.font.withHeight(look_.font.getHeight() * uiScale_))
     {

@@ -386,22 +386,21 @@ bool SkinDesignerMappingsPanel::handleLegendClearClick(juce::Point<int> pos)
     return false;
 }
 
-void SkinDesignerMappingsPanel::mouseUp(const juce::MouseEvent& e)
+bool SkinDesignerMappingsPanel::handlePeerTitleClick(juce::Point<int> pos)
 {
-    if (isShellEmpty() || ! e.mouseWasClicked())
-        return;
+    if (! peerTitleBounds_.contains(pos) || onPeerWorkSurfaceRequested == nullptr)
+        return false;
+    onPeerWorkSurfaceRequested();
+    return true;
+}
 
-    const auto pos = e.getPosition();
-    if (handleLegendClearClick(pos))
-        return;
-    if (handleLinkLegendClick(pos))
-        return;
-
-    auto handleHeader = [&](FilterColumn column, juce::Rectangle<int> bounds)
+bool SkinDesignerMappingsPanel::handleStickyHeaderClick(juce::Point<int> pos, bool popupMenu)
+{
+    auto handleHeader = [this, pos, popupMenu](FilterColumn column, juce::Rectangle<int> bounds)
     {
         if (! bounds.contains(pos))
             return false;
-        if (SkinDesignerMappingsColumnFilter::headerGestureForClick(e.mods.isPopupMenu())
+        if (SkinDesignerMappingsColumnFilter::headerGestureForClick(popupMenu)
             == SkinDesignerMappingsColumnFilter::HeaderGesture::kOpenFilter)
             showColumnFilterMenu(column);
         else
@@ -409,13 +408,25 @@ void SkinDesignerMappingsPanel::mouseUp(const juce::MouseEvent& e)
         return true;
     };
 
-    if (handleHeader(FilterColumn::kProperty, propertyLabelBounds_))
+    return handleHeader(FilterColumn::kProperty, propertyLabelBounds_)
+           || handleHeader(FilterColumn::kState, stateLabelBounds_)
+           || handleHeader(FilterColumn::kColourSet, colourSetLabelBounds_)
+           || handleHeader(FilterColumn::kMappedColour, mappedLabelBounds_);
+}
+
+void SkinDesignerMappingsPanel::mouseUp(const juce::MouseEvent& e)
+{
+    if (! e.mouseWasClicked())
         return;
-    if (handleHeader(FilterColumn::kState, stateLabelBounds_))
+
+    const auto pos = e.getPosition();
+    if (handlePeerTitleClick(pos))
         return;
-    if (handleHeader(FilterColumn::kColourSet, colourSetLabelBounds_))
+    if (isShellEmpty())
         return;
-    if (handleHeader(FilterColumn::kMappedColour, mappedLabelBounds_))
+    if (handleLegendClearClick(pos) || handleLinkLegendClick(pos))
+        return;
+    if (handleStickyHeaderClick(pos, e.mods.isPopupMenu()))
         return;
     // Object / Hold / Unbound (and object-clear) — same preserve set as MainComponent.
     if (hitActionRowChrome(pos))

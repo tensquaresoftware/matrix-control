@@ -326,6 +326,7 @@ set(PLUGIN_SOURCES
     # GUI - Skins
     Source/GUI/Skins/Skin.cpp
     Source/GUI/Skins/SkinColourAccessors.cpp
+    Source/GUI/Skins/SkinZoneOverlay.cpp
     Source/GUI/Skins/Dev/DevSkinColourElementList.cpp
     
     # GUI - Looks
@@ -461,6 +462,7 @@ option(MATRIX_BUILD_SKIN_DESIGNER "Build Skin Designer app and Standalone Dev sk
 
 # Shared Dev-layer + editor client sources (no BridgeServer — Standalone-only).
 set(MATRIX_SKIN_DEV_LAYER_SOURCES
+    Source/GUI/Skins/SkinZoneOverlay.cpp
     Source/GUI/Skins/Dev/DevSkinApplier.cpp
     Source/GUI/Skins/Dev/DevSkinBridgeClient.cpp
     Source/GUI/Skins/Dev/DevSkinBridgeProtocol.cpp
@@ -590,6 +592,9 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/SkinChromeDecorrelationTests.cpp
         Tests/Unit/SkinColourWiringTests.cpp
         Tests/Unit/SkinColourWiringCoverageTests.cpp
+        Tests/Unit/SkinZoneRegistryOverlayTests.cpp
+        Tests/Unit/SkinZoneMapLayerTests.cpp
+        Tests/Unit/DevSkinZoneMapPackJsonTests.cpp
         Tests/Unit/ColourSetModelTests.cpp
         Tests/Unit/DevSkinLayerJsonTests.cpp
         Tests/Unit/DevSkinStarterKitTests.cpp
@@ -701,6 +706,7 @@ if(MATRIX_BUILD_TESTS)
         Source/GUI/Panels/Reusable/ModulePanelConfigBuilder.cpp
         Source/GUI/Skins/Skin.cpp
         Source/GUI/Skins/SkinColourAccessors.cpp
+        Source/GUI/Skins/SkinZoneOverlay.cpp
         Source/GUI/Skins/Dev/DevSkinApplier.cpp
         Source/GUI/Skins/Dev/DevSkinBridgeProtocol.cpp
         Source/GUI/Skins/Dev/DevSkinBridgeSession.cpp
@@ -1231,6 +1237,10 @@ if(MATRIX_BUILD_SKIN_DESIGNER)
         Tools/SkinDesigner/SkinDesignerMappingsPanelFilters.cpp
         Tools/SkinDesigner/SkinDesignerMappingsPanelLink.cpp
         Tools/SkinDesigner/SkinDesignerMappingsFilterMenu.cpp
+        Tools/SkinDesigner/SkinDesignerZonesPanel.cpp
+        Tools/SkinDesigner/SkinDesignerZonesPanelLists.cpp
+        Tools/SkinDesigner/SkinDesignerZonesPanelMatrix.cpp
+        Tools/SkinDesigner/SkinDesignerZonesPanelPages.cpp
         Tools/SkinDesigner/SkinDesignerSkinsPanel.cpp
         Tools/SkinDesigner/SkinDesignerStepper.cpp
         ${MATRIX_SKIN_DEV_LAYER_SOURCES}

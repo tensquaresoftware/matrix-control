@@ -138,6 +138,18 @@ void SkinDesignerMappingsPanel::revealPastilleMappings(const juce::String& pasti
     refresh();
 }
 
+void SkinDesignerMappingsPanel::revealObjectMappings(const juce::String& objectDisplayName)
+{
+    if (objectDisplayName.isEmpty())
+        return;
+    // Symmetric to revealPastilleMappings clearing the object macro-filter: a Zones
+    // jump must not AND-stack with an existing mapped-colour / column filter.
+    clearAllColumnFilters();
+    objectFilterName_ = objectDisplayName;
+    focusedObject_ = -1;
+    refresh();
+}
+
 void SkinDesignerMappingsPanel::layoutActionRow(juce::Rectangle<int> actions, int tableX, int tableW)
 {
     objectClearBounds_ = {};
@@ -187,4 +199,50 @@ void SkinDesignerMappingsPanel::layoutActionRow(juce::Rectangle<int> actions, in
     holdColourToggle_.setBounds(holdLeft, actions.getY(),
                                 juce::jmin(holdW, juce::jmax(0, holdMaxRight - holdLeft)),
                                 actions.getHeight());
+}
+
+void SkinDesignerMappingsPanel::layoutShellEmpty(juce::Rectangle<int> content)
+{
+    objectLabel_.setVisible(false);
+    objectCombo_.setVisible(false);
+    holdColourToggle_.setVisible(false);
+    objectLabel_.setBounds({});
+    objectCombo_.setBounds({});
+    holdColourToggle_.setBounds({});
+    unboundLabelBounds_ = {};
+    unboundBadgeBounds_ = {};
+    objectClearBounds_ = {};
+    stickyBandBounds_ = {};
+    stickyLegendBounds_ = {};
+    clearLegendHitTargets();
+    auto listBounds = content;
+    listBounds.setRight(listBounds.getRight() + SkinDesignerChrome::kPanelContentPad);
+    viewport_.setBounds(listBounds);
+    layoutContent();
+}
+
+void SkinDesignerMappingsPanel::layoutShellFilled(juce::Rectangle<int> content)
+{
+    objectLabel_.setVisible(true);
+    objectCombo_.setVisible(true);
+    holdColourToggle_.setVisible(true);
+
+    auto actions = content.removeFromTop(SkinDesignerChrome::kButtonHeight);
+    content.removeFromTop(SkinDesignerChrome::kPanelContentPad);
+
+    stickyBandBounds_ = content.removeFromTop(SkinDesignerChrome::kColumnHeaderHeight
+                                              + SkinDesignerChrome::kColumnHeaderGap);
+    stickyLegendBounds_ = stickyBandBounds_.removeFromTop(SkinDesignerChrome::kColumnHeaderHeight);
+
+    auto listBounds = content;
+    listBounds.setRight(listBounds.getRight() + SkinDesignerChrome::kPanelContentPad);
+    viewport_.setBounds(listBounds);
+    layoutContent();
+
+    const int tableW = paintWidth();
+    const int tableX = viewport_.getX() + SkinDesignerChrome::kMappingsFocusPad;
+    stickyLegendBounds_.setX(tableX);
+    stickyLegendBounds_.setWidth(tableW);
+    layoutLegendHitTargets();
+    layoutActionRow(actions, tableX, tableW);
 }

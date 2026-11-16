@@ -119,6 +119,7 @@ void SkinDesignerMainComponent::setupBodyPanels()
     palettePanel_.onPastilleSelected = [this](const juce::String& name) { onPastilleSelected(name); };
     palettePanel_.onMappingCountClicked = [this](const juce::String& name)
     {
+        setRightWorkSurface(RightWorkSurface::kMappings);
         mappingsPanel_.revealPastilleMappings(name);
     };
     palettePanel_.onAddRequested = [this] { onAddPastille(); };
@@ -130,22 +131,7 @@ void SkinDesignerMainComponent::setupBodyPanels()
     };
     palettePanel_.onEscapeRequested = escapeMapping;
     addAndMakeVisible(palettePanel_);
-
-    mappingsPanel_.setLayer(&layer_);
-    mappingsPanel_.onRowActivated = [this](TSS::SkinColourKey key)
-    {
-        onMappingRowActivated(key);
-    };
-    mappingsPanel_.onMappedColourClicked = [this](TSS::SkinColourKey key)
-    {
-        onMappedColourClicked(key);
-    };
-    mappingsPanel_.onHoldColourChanged = [this]
-    {
-        updateMappingWitness();
-    };
-    mappingsPanel_.onEscapeRequested = escapeMapping;
-    addAndMakeVisible(mappingsPanel_);
+    wireRightWorkSurfacePanels(escapeMapping);
 }
 
 void SkinDesignerMainComponent::setupLayerAndBridgeCallbacks()

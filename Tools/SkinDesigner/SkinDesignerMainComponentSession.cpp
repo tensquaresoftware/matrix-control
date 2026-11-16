@@ -228,6 +228,10 @@ void SkinDesignerMainComponent::refreshAll()
     mappingsPanel_.setReadOnly(compareProduct || ! editable);
     mappingsPanel_.refresh();
 
+    zonesPanel_.setActiveSkinId(panelSkinId);
+    zonesPanel_.setReadOnly(compareProduct || ! editable);
+    zonesPanel_.refresh();
+
     if (! editable && mappingMode_ != MappingMode::kIdle)
         clearMappingModeToIdle();
 

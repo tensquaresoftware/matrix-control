@@ -171,15 +171,15 @@ void PluginEditor::openSettingsWindow()
         });
         addChildComponent(*settingsWindow_);
     }
-    else
-    {
-        settingsWindow_->setSkin(*skin_);
-    }
 
     auto& panel = settingsWindow_->getSettingsPanel();
     attachMidiSettingsPage(panel);
     if (! isPluginMode && panel.getAudioPage() == nullptr)
         attachStandaloneAudioSettingsPage(panel);
+
+    // Always refresh after attach so first-open (and late Audio page attach) pick up
+    // an active Dev zone overlay — construction alone uses registry-time defaults.
+    settingsWindow_->setSkin(*skin_);
 
     const int baseWidth = layoutDimensions_.editor.width;
     const float uiScale = (baseWidth > 0)

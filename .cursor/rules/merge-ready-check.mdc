@@ -1,0 +1,26 @@
+---
+description: Avant réponse PR/merge vers main — lancer check_merge_ready et croiser CI
+alwaysApply: true
+---
+
+# Merge-ready check (vers main)
+
+Quand Guillaume demande si une **PR**, un **merge**, ou une branche est **prête pour main** (formulations du type « PR prête ? », « mergeable sur main ? », « CI va passer ? », « on peut merger ? »), **ne pas répondre au feeling**.
+
+## Obligation (dans cet ordre)
+
+1. `git fetch origin main` (et la branche concernée si besoin).
+2. Lancer `Scripts/quality/check_merge_ready.sh` depuis la racine du dépôt  
+   (ou, si le script est indisponible : lint vs `origin/main` + build/run `Matrix-Control_Tests` sur le preset local).
+3. Croiser avec GitHub : état récent de **CI sur `main`**, et de la **PR #N** si elle existe (`gh pr view` / `gh run list`).
+4. Répondre en français avec un verdict clair : **oui / non / oui sous conditions**, en citant les preuves (script + CI).
+
+## Portée
+
+- S’applique à **toute** branche feature / fix / hotfix destinée à `main`, pas seulement la branche courante du chat.
+- Si Guillaume nomme une autre branche ou une PR, vérifier **cette** cible, pas seulement `HEAD` du workspace.
+- Ne pas créer de PR ni pusher sauf demande explicite.
+
+## Hors déclenchement
+
+Ne pas lancer ce check pour un commit local seul, un push hors question merge, ou une question purement process sans demande de readiness.

@@ -3332,3 +3332,62 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-skin-designer-palette-per-skin.md`
   summary: No unit harness that New / Duplicate Product / Compare refuse when Product is empty; smoke remains the gate.
   evidence: Blind Hunter; MainComponent not linked in Matrix-Control_Tests.
+
+- source_spec: `_bmad-output/specs/spec-skin-designer-zones-panel/stories/1-shared-zone-registry-and-live-look-for-zone-overlay.md`
+  summary: Unit-test Header/Settings Led+Peak setColourSet refresh and PluginEditor clearDevSkinOverlay paths.
+  evidence: Verification-gap review; resolveZoneColourSet and StandalonePaintState clear are covered, but panel/editor harnesses are not in the unit suite.
+
+- source_spec: `_bmad-output/specs/spec-skin-designer-zones-panel/stories/1-shared-zone-registry-and-live-look-for-zone-overlay.md`
+  summary: Optional registry hygiene — UCS iterable helper, static-assert kZones vs kAllSkinZones, extend DevSkinMatrixTests for zoneMap.
+  evidence: Blind Hunter notes; not required for story ACs.
+
+## Deferred from: code review of 1-shared-zone-registry-and-live-look-for-zone-overlay.md (2026-11-14)
+
+- source_spec: `_bmad-output/specs/spec-skin-designer-zones-panel/stories/1-shared-zone-registry-and-live-look-for-zone-overlay.md`
+  summary: Exception Computer Patches / logo call sites not pinned in a panel harness (helper LookFromSkin + zoneColourSet pattern is unit-tested).
+  evidence: Verification Gap; panels not linked in Matrix-Control_Tests.
+- source_spec: `_bmad-output/specs/spec-skin-designer-zones-panel/stories/1-shared-zone-registry-and-live-look-for-zone-overlay.md`
+  summary: Process-wide SkinZoneOverlay singleton may cross-talk if a host opens multiple editors under Dev; same pattern as other Dev session state.
+  evidence: Edge + Blind; maybe-false until multi-editor Dev is a product path.
+- source_spec: `_bmad-output/specs/spec-skin-designer-zones-panel/stories/1-shared-zone-registry-and-live-look-for-zone-overlay.md`
+  summary: Update io-and-live-bridge / zone-registry-contract (and story Code Map test pointers) for the live zoneMap field — companion hygiene, not a runtime defect.
+  evidence: Blind Hunter; agent-context / companion edit routes to defer.
+
+## Deferred from: Build review of 2-zones-panel-ui-for-matrix-ucs-and-reset.md (2026-11-14)
+
+- source_spec: `_bmad-output/specs/spec-skin-designer-zones-panel/stories/2-zones-panel-ui-for-matrix-ucs-and-reset.md`
+  summary: No automated harness driving SkinDesignerZonesPanel combo/Reset UI; Layer setZoneMap + push pins stay green if panel write paths become no-ops.
+  evidence: Verification Gap; Designer GUI follows project manual smoke / done_checkpoint pattern (same as Mappings binds).
+
+## Deferred from: code review of 2-zones-panel-ui-for-matrix-ucs-and-reset.md (2026-11-15)
+
+- source_spec: `_bmad-output/specs/spec-skin-designer-zones-panel/stories/2-zones-panel-ui-for-matrix-ucs-and-reset.md`
+  summary: MCS write controls gated by Zones sub-pages still have no panel harness; Layer/overlay tests stay green if combos/Reset become invisible no-ops.
+  evidence: Verification Gap (polish review); same Designer GUI / manual-smoke pattern as prior story-2 defer.
+- source_spec: `_bmad-output/specs/spec-skin-designer-zones-panel/stories/2-zones-panel-ui-for-matrix-ucs-and-reset.md`
+  summary: Story 1 frozen tables / Code Map still describe Header Undo/Redo/Panic as an exception after the three-row registry SSOT dropped that row.
+  evidence: Blind Hunter; companion/story-1 hygiene — fix edits another spec, not this polish diff.
+
+## Deferred from: Build review of 3-per-skin-zone-map-pack-round-trip-and-mappings-jump.md (2026-11-16)
+
+- source_spec: `_bmad-output/specs/spec-skin-designer-zones-panel/stories/3-per-skin-zone-map-pack-round-trip-and-mappings-jump.md`
+  summary: CAP-4 Zones MCS object-name click → Mappings jump has no panel harness in Matrix-Control_Tests; filter/column pins stay green if the wire dies.
+  evidence: Verification Gap + Blind; Designer GUI / manual-smoke pattern (same as story 2 Zones harness).
+- source_spec: `_bmad-output/specs/spec-skin-designer-zones-panel/stories/3-per-skin-zone-map-pack-round-trip-and-mappings-jump.md`
+  summary: Companion io-and-live-bridge.md Skin JSON still treats pack field name as an implementation choice and omits soft-vs-push load rules.
+  evidence: Blind Hunter; companion doc hygiene outside this code patch.
+- source_spec: `_bmad-output/specs/spec-skin-designer-zones-panel/stories/3-per-skin-zone-map-pack-round-trip-and-mappings-jump.md`
+  summary: Story 2 Design Notes still say object names are labels only after CAP-4 wiring landed.
+  evidence: Blind Hunter; stale companion/story hygiene beside the new jump.
+
+## Deferred from: code review of 3-per-skin-zone-map-pack-round-trip-and-mappings-jump.md (2026-11-16)
+
+- source_spec: `_bmad-output/specs/spec-skin-designer-zones-panel/stories/3-per-skin-zone-map-pack-round-trip-and-mappings-jump.md`
+  summary: CAP-4 Zones MCS object-name click → Mappings jump has no panel harness in Matrix-Control_Tests; filter/column pins stay green if the wire dies.
+  evidence: Verification Gap + Blind + Acceptance Auditor (independent review); reconfirms Build defer — Designer GUI / manual-smoke pattern.
+- source_spec: `_bmad-output/specs/spec-skin-designer-zones-panel/stories/3-per-skin-zone-map-pack-round-trip-and-mappings-jump.md`
+  summary: Companion io-and-live-bridge.md Skin JSON still treats pack field name as an implementation choice and omits soft-vs-push load rules.
+  evidence: Blind Hunter + Acceptance Auditor (independent review); reconfirms Build defer — companion hygiene.
+- source_spec: `_bmad-output/specs/spec-skin-designer-zones-panel/stories/3-per-skin-zone-map-pack-round-trip-and-mappings-jump.md`
+  summary: Story 2 Design Notes still say object names are labels only after CAP-4 wiring landed.
+  evidence: Blind Hunter + Acceptance Auditor (independent review); reconfirms Build defer — stale sibling-story hygiene.

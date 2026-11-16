@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GUI/Skins/SkinValues.h"
+#include "GUI/Skins/SkinZoneOverlay.h"
 #include "WidgetLooks.h"
 
 namespace TSS
@@ -33,16 +34,16 @@ namespace TSS
 
     inline SliderLook sliderLookForZone(const ISkin& skin, SkinZone zone)
     {
-        return sliderLookFromSkin(skin, zoneColourSet(SkinObjectType::kSlider, zone));
+        return sliderLookFromSkin(skin, resolveZoneColourSet(SkinObjectType::kSlider, zone));
     }
 
     inline ComboBoxLook comboBoxLookForZone(const ISkin& skin, SkinZone zone)
     {
-        return comboBoxLookFromSkin(skin, zoneColourSet(SkinObjectType::kComboBox, zone));
+        return comboBoxLookFromSkin(skin, resolveZoneColourSet(SkinObjectType::kComboBox, zone));
     }
 
     inline PopupMenuLook popupMenuLookForZone(const ISkin& skin, SkinZone zone)
     {
-        return popupMenuLookFromSkin(skin, zoneColourSet(SkinObjectType::kPopupMenu, zone));
+        return popupMenuLookFromSkin(skin, resolveZoneColourSet(SkinObjectType::kPopupMenu, zone));
     }
 }
