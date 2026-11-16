@@ -212,6 +212,9 @@ void SkinDesignerZonesPanel::mouseUp(const juce::MouseEvent& e)
     {
         if (e.eventComponent != &rowLabels_[i])
             continue;
+        // CAP-4 jump is left-click only — match Mappings header popup handling.
+        if (e.mods.isPopupMenu())
+            return;
         if (onMcsObjectJumpRequested != nullptr)
             onMcsObjectJumpRequested(TSS::DevSkin::toString(TSS::kMultiSetSkinObjects[i]));
         return;

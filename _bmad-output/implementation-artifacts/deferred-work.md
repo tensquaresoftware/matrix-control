@@ -3379,3 +3379,15 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/specs/spec-skin-designer-zones-panel/stories/3-per-skin-zone-map-pack-round-trip-and-mappings-jump.md`
   summary: Story 2 Design Notes still say object names are labels only after CAP-4 wiring landed.
   evidence: Blind Hunter; stale companion/story hygiene beside the new jump.
+
+## Deferred from: code review of 3-per-skin-zone-map-pack-round-trip-and-mappings-jump.md (2026-11-16)
+
+- source_spec: `_bmad-output/specs/spec-skin-designer-zones-panel/stories/3-per-skin-zone-map-pack-round-trip-and-mappings-jump.md`
+  summary: CAP-4 Zones MCS object-name click → Mappings jump has no panel harness in Matrix-Control_Tests; filter/column pins stay green if the wire dies.
+  evidence: Verification Gap + Blind + Acceptance Auditor (independent review); reconfirms Build defer — Designer GUI / manual-smoke pattern.
+- source_spec: `_bmad-output/specs/spec-skin-designer-zones-panel/stories/3-per-skin-zone-map-pack-round-trip-and-mappings-jump.md`
+  summary: Companion io-and-live-bridge.md Skin JSON still treats pack field name as an implementation choice and omits soft-vs-push load rules.
+  evidence: Blind Hunter + Acceptance Auditor (independent review); reconfirms Build defer — companion hygiene.
+- source_spec: `_bmad-output/specs/spec-skin-designer-zones-panel/stories/3-per-skin-zone-map-pack-round-trip-and-mappings-jump.md`
+  summary: Story 2 Design Notes still say object names are labels only after CAP-4 wiring landed.
+  evidence: Blind Hunter + Acceptance Auditor (independent review); reconfirms Build defer — stale sibling-story hygiene.

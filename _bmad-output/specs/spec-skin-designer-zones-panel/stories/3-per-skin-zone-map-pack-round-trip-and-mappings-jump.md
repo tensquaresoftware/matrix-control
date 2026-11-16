@@ -87,6 +87,23 @@ baseline_commit: 'dfdccc10'
 - Given Zones MCS object-name activation, when the control fires, then Colour Mappings is shown filtered to that object and no Zone column appears.
 - Given matrix or Reset edits, when the Layer bumps, then pack dirty follows the same path as mapping edits (no separate dirty pipe).
 
+### Review Findings
+
+- [x] [Review][Patch] Ignore popup/non-primary click on MCS object-name jump [`Tools/SkinDesigner/SkinDesignerZonesPanel.cpp:206`]
+- [x] [Review][Defer] CAP-4 Zones → Mappings jump has no panel harness — deferred: Designer GUI / manual-smoke pattern (reconfirmed independent review; already in deferred-work from Build)
+- [x] [Review][Defer] Companion `io-and-live-bridge.md` still soft-pedals pack `zoneMap` name / soft-vs-push — deferred: companion hygiene (reconfirmed; already deferred from Build)
+- [x] [Review][Defer] Story 2 Design Notes still say MCS names are labels only — deferred: stale sibling-story hygiene (reconfirmed; already deferred from Build)
+
+**Rejected**
+- false — void/undefined `zoneMapFromVar*` leaves stale `out`: both pack `skinFromVar` and push `pushPayloadFromVar` do `out = {}` before read.
+- false — `revealObjectMappings` drops filter when name missing from combo: no such early-return; MCS `toString` names are always in the object combo.
+- false — Skin label / Reset hit-area overlap on narrow table: badge width clamps to `resetX - prefixW`; Reset stays at `tableW - resetW`.
+- false — Story-2 polish bundled in commit violates Never: intentional fold called out in review scope; do not redo story 1/2.
+- false — Always ASCII vs em dash on unused MCS cells: story 3 adds no PluginDisplayNames/footer strings; em dash is story-2 surface (do not reopen).
+- false — Soft Always omits non-object skip / incomplete Review Findings checklist: fix would edit the spec under review.
+- low — Incomplete pack pins (empty array, void prop, all-junk-only, duplicates) and push unknown-zone/cs pins: everyday path covered; extra pins expand suite without product defect.
+- low — Weak no-Zone-column geometry pin / misleading `revealPastilleMappings` symmetry comment / missing CAP-4 cursor-underline affordance: cosmetic or UX beyond CAP-4 success; everyday left-click path works.
+
 ## Implementation Notes
 
 - Pack: `packZoneMapToVar` / `readPackZoneMapProperty` → `zoneMapFromVarSoft` (used cells only on write; soft-drop on load). Push keeps strict `zoneMapFromVar`.
