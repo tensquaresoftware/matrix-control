@@ -18,6 +18,7 @@ Source complète : `CONVENTIONS.md` §5–§6.2, §9. Constitution BMad : `_bmad
 - Commits **uniquement sur demande explicite** de Guillaume — jamais de commit proactif
 - Messages de commit en **anglais** : ligne impérative + puces des changements significatifs
 - Issues GitHub : titre et description en anglais
+- Readiness PR / merge vers `main` → règle `merge-ready-check.mdc` + `Scripts/quality/check_merge_ready.sh`
 
 ## BMad Method
 

@@ -38,6 +38,8 @@ echo "  python3 -m pip install -r Scripts/release/requirements-test.txt"
 echo
 echo "Manual check:"
 echo "  Scripts/quality/run_quality_gate.sh"
+echo "Before PR / merge to main:"
+echo "  Scripts/quality/check_merge_ready.sh"
 echo
 echo "Bypass when needed:"
 echo "  SKIP_QUALITY_GATE=1 git push"
