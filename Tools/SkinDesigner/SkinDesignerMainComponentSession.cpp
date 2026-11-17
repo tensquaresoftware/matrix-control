@@ -260,7 +260,7 @@ void SkinDesignerMainComponent::refreshCombos()
 
     designerCombo.clear(juce::dontSendNotification);
 
-    const auto designerSkins = SkinDesignerUi::sortedDesignerSkins(layer_);
+    const auto designerSkins = SkinDesignerUi::designerSkinsInLayerOrder(layer_);
     int selected = 0;
     int index = 1;
     for (const auto* skin : designerSkins)

@@ -458,8 +458,11 @@ namespace SkinDesignerUi
         return 0;
     }
 
-    /** Dev skins sorted for the Designer combo (natural name order). */
-    inline std::vector<const TSS::DevSkin::NamedSkin*> sortedDesignerSkins(
+    /**
+     * Designer skins in layer / JSON array order (no A→Z re-sort).
+     * Combo + stepper follow this sequence so Trials packs can define a review order.
+     */
+    inline std::vector<const TSS::DevSkin::NamedSkin*> designerSkinsInLayerOrder(
         const TSS::DevSkin::Layer& layer)
     {
         std::vector<const TSS::DevSkin::NamedSkin*> designerSkins;
@@ -468,11 +471,6 @@ namespace SkinDesignerUi
             if (skin.kind == TSS::DevSkin::SkinKind::kDev)
                 designerSkins.push_back(&skin);
         }
-        std::sort(designerSkins.begin(), designerSkins.end(),
-                  [](const TSS::DevSkin::NamedSkin* a, const TSS::DevSkin::NamedSkin* b)
-                  {
-                      return compareDesignerSkinNamesNatural(a->name, b->name) < 0;
-                  });
         return designerSkins;
     }
 }
