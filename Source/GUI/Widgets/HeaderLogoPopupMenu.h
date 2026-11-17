@@ -90,20 +90,28 @@ namespace TSS
             void mouseMove(const juce::MouseEvent& e) override;
             void mouseUp(const juce::MouseEvent& e) override;
             void mouseExit(const juce::MouseEvent& e) override;
+            void mouseWheelMove(const juce::MouseEvent& e,
+                                const juce::MouseWheelDetails& wheel) override;
 
             Skin::SkinFamily getFamily() const noexcept { return family_; }
             int preferredWidth() const;
             int preferredHeight() const;
+            void ignoreClicksForMs(int ms) noexcept;
 
         private:
             HeaderLogoPopupMenu& owner_;
             Skin::SkinFamily family_;
             std::vector<FamilyMember> members_;
             int highlightedIndex_ = -1;
+            int scrollPixels_ = 0;
+            juce::uint32 ignoreClicksUntilMs_ = 0;
 
+            int contentHeightPx() const;
+            int maxScrollPixels() const;
             juce::Rectangle<float> memberBounds(int index) const;
             int memberIndexAt(int x, int y) const;
             void updateHighlight(int index);
+            void setScrollPixels(int pixels);
         };
 
         inline constexpr static float kBorderThicknessDesign_ = 1.0f;
@@ -119,6 +127,7 @@ namespace TSS
         int highlightedFlatIndex_ = -1;
         int mainPopupWidth_ = 0;
         int mainPopupHeight_ = 0;
+        juce::uint32 ignoreModalDismissUntilMs_ = 0;
 
         std::function<void(int skinItemId)> onSkinSelected_;
         std::function<void(int scaleId)> onUiScaleSelected_;

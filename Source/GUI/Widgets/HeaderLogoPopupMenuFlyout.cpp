@@ -20,6 +20,8 @@ namespace TSS
                 return look.textHover;
             return look.text;
         }
+
+        constexpr int kWheelScrollFactor = 40;
     }
 
     HeaderLogoPopupMenu::FamilyFlyout::FamilyFlyout(HeaderLogoPopupMenu& owner,
@@ -33,6 +35,12 @@ namespace TSS
         setInterceptsMouseClicks(true, true);
     }
 
+    void HeaderLogoPopupMenu::FamilyFlyout::ignoreClicksForMs(int ms) noexcept
+    {
+        ignoreClicksUntilMs_ = juce::Time::getMillisecondCounter()
+            + static_cast<juce::uint32>(juce::jmax(0, ms));
+    }
+
     int HeaderLogoPopupMenu::FamilyFlyout::preferredWidth() const
     {
         const float border = ScaledDrawing::snappedStrokeThicknessFromDesign(
@@ -43,6 +51,11 @@ namespace TSS
         return juce::roundToInt(owner_.getColumnWidth(1) + 2.0f * border);
     }
 
+    int HeaderLogoPopupMenu::FamilyFlyout::contentHeightPx() const
+    {
+        return juce::jmax(1, static_cast<int>(members_.size()) * owner_.getItemHeightPx());
+    }
+
     int HeaderLogoPopupMenu::FamilyFlyout::preferredHeight() const
     {
         const float border = ScaledDrawing::snappedStrokeThicknessFromDesign(
@@ -50,9 +63,28 @@ namespace TSS
             owner_.uiScale_,
             ScaledDrawing::systemDisplayScaleForComponent(owner_),
             ScaledDrawing::StrokeSnapPolicy::kRound);
-        const float content = static_cast<float>(members_.size())
-            * static_cast<float>(owner_.getItemHeightPx());
-        return juce::jmax(1, juce::roundToInt(content + 2.0f * border));
+        return juce::jmax(1, juce::roundToInt(static_cast<float>(contentHeightPx()) + 2.0f * border));
+    }
+
+    int HeaderLogoPopupMenu::FamilyFlyout::maxScrollPixels() const
+    {
+        const float border = ScaledDrawing::snappedStrokeThicknessFromDesign(
+            kBorderThicknessDesign_,
+            owner_.uiScale_,
+            ScaledDrawing::systemDisplayScaleForComponent(*this),
+            ScaledDrawing::StrokeSnapPolicy::kRound);
+        const int innerH = juce::jmax(0, getHeight() - 2 * juce::roundToInt(border));
+        return juce::jmax(0, contentHeightPx() - innerH);
+    }
+
+    void HeaderLogoPopupMenu::FamilyFlyout::setScrollPixels(int pixels)
+    {
+        const int clamped = juce::jlimit(0, maxScrollPixels(), pixels);
+        if (clamped == scrollPixels_)
+            return;
+
+        scrollPixels_ = clamped;
+        repaint();
     }
 
     juce::Rectangle<float> HeaderLogoPopupMenu::FamilyFlyout::memberBounds(int index) const
@@ -68,15 +100,27 @@ namespace TSS
             ScaledDrawing::StrokeSnapPolicy::kRound);
         const auto content = getLocalBounds().toFloat().reduced(borderThickness);
         const float itemHeight = static_cast<float>(owner_.getItemHeightPx());
-        return { content.getX(), content.getY() + static_cast<float>(index) * itemHeight,
-                 content.getWidth(), itemHeight };
+        return { content.getX(),
+                 content.getY() + static_cast<float>(index) * itemHeight
+                     - static_cast<float>(scrollPixels_),
+                 content.getWidth(),
+                 itemHeight };
     }
 
     int HeaderLogoPopupMenu::FamilyFlyout::memberIndexAt(int x, int y) const
     {
+        const auto localBounds = getLocalBounds();
+        if (! localBounds.contains(x, y))
+            return -1;
+
         for (int i = 0; i < static_cast<int>(members_.size()); ++i)
-            if (memberBounds(i).contains(static_cast<float>(x), static_cast<float>(y)))
+        {
+            const auto bounds = memberBounds(i);
+            if (bounds.getBottom() <= 0.0f || bounds.getY() >= static_cast<float>(getHeight()))
+                continue;
+            if (bounds.contains(static_cast<float>(x), static_cast<float>(y)))
                 return i;
+        }
         return -1;
     }
 
@@ -94,14 +138,25 @@ namespace TSS
         owner_.renderer_->drawBackground(g, bounds);
 
         const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
+        const float borderThickness = ScaledDrawing::snappedStrokeThicknessFromDesign(
+            kBorderThicknessDesign_,
+            owner_.uiScale_,
+            systemDisplayScale,
+            ScaledDrawing::StrokeSnapPolicy::kRound);
         const float textPadding =
             static_cast<float>(ComboBox::getPopupLayoutDimensions().textLeftPadding) * owner_.uiScale_;
         const float highlightGap = juce::jmax(1.0f, kHighlightGap_ * owner_.uiScale_);
+
+        g.saveState();
+        g.reduceClipRegion(getLocalBounds().reduced(juce::roundToInt(borderThickness)));
 
         for (int i = 0; i < static_cast<int>(members_.size()); ++i)
         {
             const auto& member = members_[static_cast<size_t>(i)];
             const auto itemBounds = memberBounds(i);
+            if (itemBounds.getBottom() <= 0.0f || itemBounds.getY() >= static_cast<float>(getHeight()))
+                continue;
+
             const bool isCurrent = member.skinItemId == owner_.currentSkinItemId_;
             const bool isHot = highlightedIndex_ == i || isCurrent;
 
@@ -123,6 +178,7 @@ namespace TSS
             }
         }
 
+        g.restoreState();
         owner_.renderer_->drawBorder(g, bounds, systemDisplayScale);
     }
 
@@ -133,6 +189,9 @@ namespace TSS
 
     void HeaderLogoPopupMenu::FamilyFlyout::mouseUp(const juce::MouseEvent& e)
     {
+        if (juce::Time::getMillisecondCounter() < ignoreClicksUntilMs_)
+            return;
+
         const int index = memberIndexAt(e.x, e.y);
         if (! juce::isPositiveAndBelow(index, static_cast<int>(members_.size())))
             return;
@@ -142,6 +201,14 @@ namespace TSS
     void HeaderLogoPopupMenu::FamilyFlyout::mouseExit(const juce::MouseEvent&)
     {
         updateHighlight(-1);
+    }
+
+    void HeaderLogoPopupMenu::FamilyFlyout::mouseWheelMove(const juce::MouseEvent&,
+                                                           const juce::MouseWheelDetails& wheel)
+    {
+        const int delta = juce::roundToInt(-wheel.deltaY * static_cast<float>(kWheelScrollFactor));
+        if (delta != 0)
+            setScrollPixels(scrollPixels_ + delta);
     }
 
 }

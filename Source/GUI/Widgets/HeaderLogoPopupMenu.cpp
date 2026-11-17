@@ -54,7 +54,8 @@ namespace TSS
         setWantsKeyboardFocus(true);
         setAlwaysOnTop(true);
         setInterceptsMouseClicks(true, true);
-        // Main panel + flyout paint their own chrome; expanded host stays transparent in the gap.
+        // Non-opaque host so the L-gap above/below a short family flyout stays clear.
+        // Main panel + flyout paint their own chrome; hitTest still uses the full host.
         setOpaque(false);
 
         outsideDismissWatcher_ = std::make_unique<PopupMenuOutsideDismissWatcher>(*this, [this] { closePopup(); });
@@ -202,6 +203,8 @@ namespace TSS
 
         familyFlyout_.reset();
         familyFlyout_ = std::make_unique<FamilyFlyout>(*this, family, membersForFamily(family));
+        // Ableton can deliver a synthetic mouseUp to a flyout that appears under the cursor.
+        familyFlyout_->ignoreClicksForMs(300);
         addAndMakeVisible(*familyFlyout_);
         layoutFamilyFlyout();
     }
@@ -244,24 +247,33 @@ namespace TSS
                 systemDisplayScale,
                 ScaledDrawing::StrokeSnapPolicy::kRound)));
         const int flyoutX = juce::jmax(0, mainPopupWidth_ - borderOverlap);
-        setSize(flyoutX + flyoutW, juce::jmax(mainPopupHeight_, flyoutH));
+        const int expandedW = flyoutX + flyoutW;
+        // Never grow taller than the main panel — TONES (15 rows) scrolls inside the flyout.
+        // Growing the modal host past the peer is what made Ableton dismiss on TONES hover.
+        const int expandedH = mainPopupHeight_;
 
-        const int maxY = juce::jmax(0, getHeight() - flyoutH);
-        familyFlyout_->setBounds(flyoutX, juce::jlimit(0, maxY, familyRowY),
-                                 flyoutW, flyoutH);
-
+        auto bounds = getBounds().withSize(expandedW, expandedH);
         if (auto* parent = getParentComponent())
         {
             const auto parentBounds = parent->getLocalBounds();
-            auto bounds = getBounds();
-            const int maxLeft = juce::jmax(parentBounds.getX(),
-                                           parentBounds.getRight() - bounds.getWidth());
-            const int maxTop = juce::jmax(parentBounds.getY(),
-                                          parentBounds.getBottom() - bounds.getHeight());
-            bounds.setX(juce::jlimit(parentBounds.getX(), maxLeft, bounds.getX()));
-            bounds.setY(juce::jlimit(parentBounds.getY(), maxTop, bounds.getY()));
-            setBounds(bounds);
+            const int maxLeftForMain = juce::jmax(parentBounds.getX(),
+                                                  parentBounds.getRight() - mainPopupWidth_);
+            const int maxTopForMain = juce::jmax(parentBounds.getY(),
+                                                 parentBounds.getBottom() - mainPopupHeight_);
+            bounds.setX(juce::jlimit(parentBounds.getX(), maxLeftForMain, bounds.getX()));
+            bounds.setY(juce::jlimit(parentBounds.getY(), maxTopForMain, bounds.getY()));
+
+            const int maxW = juce::jmax(mainPopupWidth_, parentBounds.getRight() - bounds.getX());
+            bounds.setWidth(juce::jmin(bounds.getWidth(), maxW));
+            bounds.setHeight(mainPopupHeight_);
         }
+        setBounds(bounds);
+
+        const int fittedFlyoutW = juce::jmin(flyoutW, juce::jmax(0, getWidth() - flyoutX));
+        const int fittedFlyoutH = juce::jmin(flyoutH, mainPopupHeight_);
+        const int maxY = juce::jmax(0, getHeight() - fittedFlyoutH);
+        familyFlyout_->setBounds(flyoutX, juce::jlimit(0, maxY, familyRowY),
+                                 fittedFlyoutW, fittedFlyoutH);
     }
 
     void HeaderLogoPopupMenu::selectSkinItemId(int skinItemId)
@@ -325,13 +337,10 @@ namespace TSS
 
     bool HeaderLogoPopupMenu::hitTest(int x, int y)
     {
-        if (x >= 0 && y >= 0 && x < mainPopupWidth_ && y < mainPopupHeight_)
-            return true;
-
-        if (familyFlyout_ != nullptr && familyFlyout_->getBounds().contains(x, y))
-            return true;
-
-        return false;
+        // Full host rectangle (including the L-gap between main and flyout). A hitTest
+        // hole there lets Ableton/plugin peers deliver the move/click to the editor
+        // underneath, which dismisses the modal before the family flyout can be used.
+        return x >= 0 && y >= 0 && x < getWidth() && y < getHeight();
     }
 
     void HeaderLogoPopupMenu::mouseMove(const juce::MouseEvent& e)
@@ -370,6 +379,23 @@ namespace TSS
 
     void HeaderLogoPopupMenu::inputAttemptWhenModal()
     {
+        // Ableton Live (and some hosts) can deliver the opening click's leftover mouseUp
+        // to the logo under the new modal; ignore dismiss during the settle window.
+        if (juce::Time::getMillisecondCounter() < ignoreModalDismissUntilMs_)
+            return;
+
+        // If the pointer is still over our host rectangle, do not dismiss (Ableton can
+        // route events through layout changes while the cursor remains on the menu).
+        if (auto* top = getTopLevelComponent())
+        {
+            const auto mouseInTop = top->getLocalPoint(
+                nullptr,
+                juce::Desktop::getInstance().getMainMouseSource().getScreenPosition());
+            const auto hostInTop = top->getLocalArea(this, getLocalBounds()).toFloat();
+            if (hostInTop.contains(mouseInTop))
+                return;
+        }
+
         closePopup();
     }
 
@@ -385,14 +411,24 @@ namespace TSS
         rawPtr->mainPopupWidth_ = bounds.getWidth();
         rawPtr->mainPopupHeight_ = bounds.getHeight();
 
+        if (bounds.isEmpty())
+            return;
+
         topLevelComponent->addAndMakeVisible(popupMenu.release());
         rawPtr->setBounds(bounds);
-        rawPtr->toFront(false);
+        rawPtr->toFront(true);
         rawPtr->grabKeyboardFocus();
+
+        constexpr int kOpenDismissGraceMs = 400;
+        rawPtr->ignoreModalDismissUntilMs_ = juce::Time::getMillisecondCounter()
+            + static_cast<juce::uint32>(kOpenDismissGraceMs);
+
         rawPtr->enterModalState(false, nullptr, true);
-        rawPtr->outsideDismissWatcher_->arm();
+        // Do not arm PopupMenuOutsideDismissWatcher here: in Ableton it false-dismisses
+        // when the TONES flyout lays out. in-GUI dismiss stays on inputAttemptWhenModal.
 
         // Open the family that owns the current skin so the side popup is discoverable.
         rawPtr->openFamilyFlyout(SkinCatalog::familyForItemId(rawPtr->currentSkinItemId_));
+        topLevelComponent->repaint(rawPtr->getBounds());
     }
 }

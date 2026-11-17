@@ -95,6 +95,7 @@ namespace TSS
 
     void HeaderLogoPopupMenu::paint(juce::Graphics& g)
     {
+        // Paint only the main panel — leave the L-gap above/below a short flyout clear.
         const auto mainBounds = juce::Rectangle<float>(0.0f, 0.0f,
                                                        static_cast<float>(mainPopupWidth_),
                                                        static_cast<float>(mainPopupHeight_));
