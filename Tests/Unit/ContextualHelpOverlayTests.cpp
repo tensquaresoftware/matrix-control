@@ -55,7 +55,9 @@ namespace
         { HeaderHelp::kSettings,
           "MATRIX-CONTROL: Opens SETTINGS (MIDI ports, standalone audio, paths, warnings, master utility, shortcuts)." },
         { HeaderHelp::kAbout, "MATRIX-CONTROL: Shows product version, links, and credits." },
-        { HeaderHelp::kSkin, "MATRIX-CONTROL: Chooses the visual skin for the editor." },
+        { HeaderHelp::kSkin,
+          "MATRIX-CONTROL: Chooses the visual skin (BLACK, CREAM, or TONES family sub-menus). "
+          "Cmd/Ctrl+arrows cycle within the active family; Cmd/Ctrl+Shift+arrows cycle all skins." },
         { HeaderHelp::kUiScale, "MATRIX-CONTROL: Sets the user interface scale." },
         { PatchEditHelp::kSectionTitle,
           "PATCH EDIT: Edits the current patch and shows envelopes, Track Generator, and patch name." },
