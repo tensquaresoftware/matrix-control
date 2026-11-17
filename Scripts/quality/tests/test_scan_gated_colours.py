@@ -62,6 +62,7 @@ def test_lock_film_and_palette_are_allowlisted(scan):
     assert scan.is_allowlisted("Source/GUI/Skins/ColourChartGreen.h")
     assert scan.is_allowlisted("Source/GUI/Skins/ColourChartChroma.h")
     assert scan.is_allowlisted("Source/GUI/Skins/ColourChartCafe.h")
+    assert scan.is_allowlisted("Source/GUI/Skins/ColourChartTones.h")
     assert scan.is_allowlisted("Source/GUI/Skins/SkinColoursPanels.h")
     assert scan.is_allowlisted("Source/GUI/Skins/Dev/DevSkinBridgeClient.cpp")
     assert scan.is_allowlisted("Source/GUI/Skins/Dev/DevSkinTypes.h")
@@ -87,11 +88,18 @@ def test_modulation_bus_drag_uses_skin_not_colour_chart_alpha():
 
 def test_popup_disabled_uses_look_disabled_fields():
     renderer = (PROJECT_ROOT / "Source/GUI/Widgets/PopupMenuRenderer.cpp").read_text(encoding="utf-8")
-    header = (PROJECT_ROOT / "Source/GUI/Widgets/HeaderLogoPopupMenu.cpp").read_text(encoding="utf-8")
+    painting = (
+        PROJECT_ROOT / "Source/GUI/Widgets/HeaderLogoPopupMenuPainting.cpp"
+    ).read_text(encoding="utf-8")
+    flyout = (
+        PROJECT_ROOT / "Source/GUI/Widgets/HeaderLogoPopupMenuFlyout.cpp"
+    ).read_text(encoding="utf-8")
     assert "textDisabled" in renderer
     assert ".withAlpha(0.5f)" not in renderer
-    assert "textDisabled" in header
-    assert ".withAlpha(0.5f)" not in header
+    assert "textDisabled" in painting
+    assert ".withAlpha(0.5f)" not in painting
+    assert "textDisabled" in flyout
+    assert ".withAlpha(0.5f)" not in flyout
 
 
 def test_alert_button_look_has_no_colour_chart_dig():
