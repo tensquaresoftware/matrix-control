@@ -103,7 +103,7 @@ This is a **brownfield** project. Do **not** restart from scratch. Extend and re
 | Layer | Choice |
 |---|---|
 | Language | C++17 minimum |
-| Framework | JUCE 9.0.3 (`/Volumes/Guillaume/Dev/SDKs/JUCE-9`) |
+| Framework | JUCE 9.0.5 (`/Volumes/Guillaume/Dev/SDKs/JUCE-9`) |
 | Build | CMake presets; outputs under `Builds/` (`macOS/ARM`, `macOS/Intel`, `Windows`, `Linux`) — gitignored |
 | Compiler (macOS) | Xcode 26 |
 | Plugin formats | AU, VST3, Standalone |
