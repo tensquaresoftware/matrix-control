@@ -101,6 +101,31 @@ context:
 - Given a focused slider, when an unmodified arrow is pressed, then the control still nudges and skin does not change.
 - Given prefs id 7-21, when the session reloads, then the matching TONES skin restores; invalid ids fall back to BLACK/GREEN.
 
+### Review Findings
+
+- [x] [Review][Defer] Tall TONES flyout vs short parent window — deferred: accept for V1 (decision 1→1); keyboard cycle remains the fallback if the window is shorter than the 15-row flyout
+- [x] [Review][Patch] Widen logo menu Scale/Skin columns and family flyout from 110 to 120 px [Source/GUI/Layout/Design/DesignPanels.h] — decision 2: 120 for both columns + flyout; Win/Linux smoke after review
+- [x] [Review][Patch] Clamp expanded logo host X inside parent after flyout open [Source/GUI/Widgets/HeaderLogoPopupMenu.cpp:253]
+- [x] [Review][Patch] Assert Slider yields Cmd/Ctrl(+Shift)+arrows [Tests/Unit/UndoManagerSliderArrowTests.cpp]
+- [x] [Review][Patch] Assert AZERTY digit peers also match under Cmd/Ctrl+Shift [Tests/Unit/EditorChromeShortcutTests.cpp]
+- [x] [Review][Defer] getSkinVariantId normalize-on-read not exercised via PluginProcessor [Source/Core/PluginProcessorState.cpp:143] — deferred: Matrix-Control_Tests does not link PluginProcessor; `SkinVariants::normalize` unit pin remains
+- [x] [Review][Defer] Logo family UX and Settings/Getting Started call sites not mounted in tests — deferred: catalog helper tests + manual smoke; logo mount already deferred for this spec
+
+#### Rejected
+
+- false — Windows AZERTY `-` as digit-6 peer: product peers lock `§`; `-` is already Cmd/Ctrl Scale decrease.
+- false — `skinGlobalCycle()` unused in menu: prior triage; optional hint; family-cycle hint already present.
+- false — Help copy uses `Cmd/Ctrl+arrows` wording: intentional cross-platform help string, not a defect.
+- false — `TONES/` prefix in flyout: frozen Always labels (`TONES/EMERALD`, …).
+- false — `populateFlatSkinCombo` does not clear: Settings ctor populates once; Getting Started clears before call.
+- false — Spec I/O matrix / Spec Change Log text drift: reject findings whose fix is editing this spec artifact.
+- false — `setSkinVariantId` without normalize-on-write: contract is normalize on read (prior triage).
+- false — Auto-open current family flyout on show: intentional discoverability (code comment + prior triage).
+- false — Digit hints only inside BLACK/CREAM flyouts: expected with family rows (not flat 1–6 column).
+- false — Transparent host gap click-through: modal `inputAttemptWhenModal` dismisses; does not click widgets beneath.
+- false — Triplicated skin id tables without per-tone cross asserts: count/range asserts exist; mapping helpers centralize tones.
+- low — Duplicated `menuItemTextColour` helpers: WET once; no user-facing drift demonstrated.
+
 ## Implementation Notes
 
 - Ported Trials ramps into `ColourChartTones.h` + shared zone steps in `SkinColoursTones.h` (5 PETROL overrides).
@@ -109,6 +134,7 @@ context:
 - Arrow skin cycling handled in `PluginEditor::tryHandleEditorChromeKey` before other chrome shortcuts.
 - Parent verification added catalog family-membership + `populateFlatSkinCombo` + `SkinVariants::normalize` tests (visual flyout remains manual smoke).
 - Review patches: Slider yields Cmd/Ctrl+arrows; flyout Y clamp; ColourChart include; family sizeof; static_asserts; skin help copy.
+- Code-review follow-up: logo columns + flyout width 110→120; parent X clamp with Y; Slider Cmd/Ctrl(+Shift)+arrow yield tests; AZERTY digit peers under Cmd/Ctrl+Shift.
 
 ## Spec Change Log
 
