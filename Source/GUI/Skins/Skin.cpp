@@ -3,6 +3,7 @@
 #include "Dev/DevSkinColourElementList.h"
 #include "Dev/DevSkinMinimalSeed.h"
 #include "SkinColoursCreamChroma.h"
+#include "SkinColoursTones.h"
 
 #include <PluginFontsData.h>
 
@@ -12,6 +13,39 @@ namespace TSS
     {
         constexpr float kSkinBaseFontHeight_ = 14.0f;
         constexpr float kBrandFontHeight_ = 20.0f;
+
+        constexpr Skin::ColourVariant kTonesVariants_[] = {
+            Skin::ColourVariant::TonesCherry,
+            Skin::ColourVariant::TonesCoral,
+            Skin::ColourVariant::TonesSaffron,
+            Skin::ColourVariant::TonesOchre,
+            Skin::ColourVariant::TonesGold,
+            Skin::ColourVariant::TonesOlive,
+            Skin::ColourVariant::TonesLime,
+            Skin::ColourVariant::TonesEmerald,
+            Skin::ColourVariant::TonesKigee,
+            Skin::ColourVariant::TonesPetrol,
+            Skin::ColourVariant::TonesAzur,
+            Skin::ColourVariant::TonesMarine,
+            Skin::ColourVariant::TonesPurple,
+            Skin::ColourVariant::TonesIndigo,
+            Skin::ColourVariant::TonesFuchsia
+        };
+
+        struct BaseSkinPair
+        {
+            int itemId;
+            Skin::ColourVariant variant;
+        };
+
+        constexpr BaseSkinPair kBaseSkinPairs_[] = {
+            { static_cast<int>(Skin::SkinComboBoxItemId::kBlack), Skin::ColourVariant::Black },
+            { static_cast<int>(Skin::SkinComboBoxItemId::kCream), Skin::ColourVariant::Cream },
+            { static_cast<int>(Skin::SkinComboBoxItemId::kBlackChroma), Skin::ColourVariant::BlackChroma },
+            { static_cast<int>(Skin::SkinComboBoxItemId::kBlackMinimal), Skin::ColourVariant::BlackMinimal },
+            { static_cast<int>(Skin::SkinComboBoxItemId::kCreamMinimal), Skin::ColourVariant::CreamMinimal },
+            { static_cast<int>(Skin::SkinComboBoxItemId::kCreamChroma), Skin::ColourVariant::CreamChroma }
+        };
     }
 
     Skin::Skin(ColourVariant variant)
@@ -23,6 +57,66 @@ namespace TSS
     std::unique_ptr<Skin> Skin::create(ColourVariant variant)
     {
         return std::make_unique<Skin>(variant);
+    }
+
+    Skin::SkinFamily Skin::familyOf(ColourVariant variant) noexcept
+    {
+        if (isTonesVariant(variant))
+            return SkinFamily::Tones;
+        if (variant == ColourVariant::Cream
+            || variant == ColourVariant::CreamMinimal
+            || variant == ColourVariant::CreamChroma)
+            return SkinFamily::Cream;
+        return SkinFamily::Black;
+    }
+
+    bool Skin::isTonesVariant(ColourVariant variant) noexcept
+    {
+        return variant >= ColourVariant::TonesCherry && variant <= ColourVariant::TonesFuchsia;
+    }
+
+    Skin::ColourVariant Skin::tonesVariantFromToneId(ColourChartTones::ToneId tone) noexcept
+    {
+        const int index = static_cast<int>(tone);
+        if (index < 0 || index >= ColourChartTones::kToneCount)
+            return ColourVariant::TonesCherry;
+        return kTonesVariants_[static_cast<size_t>(index)];
+    }
+
+    ColourChartTones::ToneId Skin::toneIdFromColourVariant(ColourVariant variant) noexcept
+    {
+        if (! isTonesVariant(variant))
+            return ColourChartTones::ToneId::kCherry;
+        return static_cast<ColourChartTones::ToneId>(
+            static_cast<int>(variant) - static_cast<int>(ColourVariant::TonesCherry));
+    }
+
+    Skin::ColourVariant Skin::colourVariantFromItemId(int skinItemId) noexcept
+    {
+        const int tonesFirst = static_cast<int>(SkinComboBoxItemId::kTonesCherry);
+        const int tonesLast = static_cast<int>(SkinComboBoxItemId::kTonesFuchsia);
+        if (skinItemId >= tonesFirst && skinItemId <= tonesLast)
+            return tonesVariantFromToneId(
+                static_cast<ColourChartTones::ToneId>(skinItemId - tonesFirst));
+
+        for (const auto& pair : kBaseSkinPairs_)
+            if (pair.itemId == skinItemId)
+                return pair.variant;
+
+        return ColourVariant::Black;
+    }
+
+    int Skin::itemIdFromColourVariant(ColourVariant variant) noexcept
+    {
+        if (isTonesVariant(variant))
+            return static_cast<int>(SkinComboBoxItemId::kTonesCherry)
+                + static_cast<int>(toneIdFromColourVariant(variant));
+
+        for (const auto& pair : kBaseSkinPairs_)
+            if (pair.variant == variant)
+                return pair.itemId;
+
+        return static_cast<int>(SkinComboBoxItemId::kBlack);
     }
 
     juce::Colour Skin::getColour(SkinObjectType object,
@@ -115,6 +209,17 @@ namespace TSS
 
     void Skin::initializeDefaultColours()
     {
+        if (isTonesVariant(currentVariant_))
+        {
+            SkinColours::Tones::applyToneColours(
+                toneIdFromColourVariant(currentVariant_),
+                [this](SkinColourKey key, juce::Colour colour)
+                {
+                    colours_[key] = colour;
+                });
+            return;
+        }
+
         if (currentVariant_ == ColourVariant::BlackMinimal
             || currentVariant_ == ColourVariant::CreamMinimal)
         {

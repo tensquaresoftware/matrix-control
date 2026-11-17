@@ -26,6 +26,12 @@ void PluginEditor::createUiShell()
     skinCream_ = TSS::Skin::create(TSS::Skin::ColourVariant::Cream);
     skinCreamMinimal_ = TSS::Skin::create(TSS::Skin::ColourVariant::CreamMinimal);
     skinCreamChroma_ = TSS::Skin::create(TSS::Skin::ColourVariant::CreamChroma);
+    for (int i = 0; i < TSS::ColourChartTones::kToneCount; ++i)
+    {
+        const auto tone = static_cast<TSS::ColourChartTones::ToneId>(i);
+        skinTones_[static_cast<size_t>(i)] = TSS::Skin::create(
+            TSS::Skin::tonesVariantFromToneId(tone));
+    }
 
     skin_ = skinForVariantId(pluginProcessor.getSkinVariantId());
 

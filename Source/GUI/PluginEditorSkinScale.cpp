@@ -147,6 +147,13 @@ TSS::Skin* PluginEditor::skinForVariantId(int skinItemId) const noexcept
         return skinCreamMinimal_.get();
     if (skinItemId == kCreamChroma)
         return skinCreamChroma_.get();
+    if (skinItemId >= kTonesCherry && skinItemId <= kTonesFuchsia)
+    {
+        const int toneIndex = skinItemId - kTonesCherry;
+        if (juce::isPositiveAndBelow(toneIndex, TSS::ColourChartTones::kToneCount))
+            if (auto* toneSkin = skinTones_[static_cast<size_t>(toneIndex)].get())
+                return toneSkin;
+    }
     return skinBlack_.get();
 }
 

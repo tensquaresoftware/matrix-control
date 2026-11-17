@@ -204,11 +204,32 @@ namespace PluginIDs
             constexpr int kBlackMinimal = 4;
             constexpr int kCreamMinimal = 5;
             constexpr int kCreamChroma = 6;
+            constexpr int kTonesCherry = 7;
+            constexpr int kTonesCoral = 8;
+            constexpr int kTonesSaffron = 9;
+            constexpr int kTonesOchre = 10;
+            constexpr int kTonesGold = 11;
+            constexpr int kTonesOlive = 12;
+            constexpr int kTonesLime = 13;
+            constexpr int kTonesEmerald = 14;
+            constexpr int kTonesKigee = 15;
+            constexpr int kTonesPetrol = 16;
+            constexpr int kTonesAzur = 17;
+            constexpr int kTonesMarine = 18;
+            constexpr int kTonesPurple = 19;
+            constexpr int kTonesIndigo = 20;
+            constexpr int kTonesFuchsia = 21;
             constexpr int kDefault = kBlack;
+            constexpr int kMax = kTonesFuchsia;
 
             constexpr bool isValid(int id) noexcept
             {
-                return id >= kBlack && id <= kCreamChroma;
+                return id >= kBlack && id <= kMax;
+            }
+
+            constexpr int normalize(int id) noexcept
+            {
+                return isValid(id) ? id : kDefault;
             }
         }
 

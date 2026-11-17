@@ -363,6 +363,10 @@ namespace TSS
         if (! isEnabled() || ! hasFocus_ || isValueEditorOpen())
             return false;
 
+        // Cmd/Ctrl(+Shift)+arrow is reserved for PluginEditor skin cycling.
+        if (key.getModifiers().isCommandDown())
+            return false;
+
         const bool isShiftPressed = key.getModifiers().isShiftDown();
         const auto step = calculateStep(isShiftPressed);
 

@@ -142,9 +142,10 @@ void PluginProcessor::setGuiScaleId(int scaleId)
 
 int PluginProcessor::getSkinVariantId() const
 {
-    return static_cast<int>(apvts.state.getProperty(
+    const int id = static_cast<int>(apvts.state.getProperty(
         PluginIDs::Settings::kSkinVariant,
         PluginIDs::Settings::SkinVariants::kDefault));
+    return PluginIDs::Settings::SkinVariants::normalize(id);
 }
 
 void PluginProcessor::setSkinVariantId(int skinVariantId)

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <functional>
 #include <memory>
 
@@ -287,6 +288,7 @@ private:
     std::unique_ptr<TSS::Skin> skinCream_;
     std::unique_ptr<TSS::Skin> skinCreamMinimal_;
     std::unique_ptr<TSS::Skin> skinCreamChroma_;
+    std::array<std::unique_ptr<TSS::Skin>, TSS::ColourChartTones::kToneCount> skinTones_;
     TSS::Skin* skinForVariantId(int skinItemId) const noexcept;
 #if defined(MATRIX_SKIN_DESIGNER_DEV_LAYER)
     std::unique_ptr<TSS::Skin> skinDevOverlay_;

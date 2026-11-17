@@ -56,7 +56,8 @@ namespace PluginDisplayNames
             constexpr const char* kAbout =
                 "MATRIX-CONTROL: Shows product version, links, and credits.";
             constexpr const char* kSkin =
-                "MATRIX-CONTROL: Chooses the visual skin for the editor.";
+                "MATRIX-CONTROL: Chooses the visual skin (BLACK, CREAM, or TONES family sub-menus). "
+                "Cmd/Ctrl+arrows cycle within the active family; Cmd/Ctrl+Shift+arrows cycle all skins.";
             constexpr const char* kUiScale =
                 "MATRIX-CONTROL: Sets the user interface scale.";
             // Shared by each LED and its face label (same cartouche lane).
@@ -664,6 +665,28 @@ namespace PluginDisplayNames
             constexpr const char* kCream = "CREAM/GREEN";
             constexpr const char* kCreamChroma = "CREAM/CHROMA";
             constexpr const char* kCreamMinimal = "CREAM/MINIMAL";
+            constexpr const char* kTonesCherry = "TONES/CHERRY";
+            constexpr const char* kTonesCoral = "TONES/CORAL";
+            constexpr const char* kTonesSaffron = "TONES/SAFFRON";
+            constexpr const char* kTonesOchre = "TONES/OCHRE";
+            constexpr const char* kTonesGold = "TONES/GOLD";
+            constexpr const char* kTonesOlive = "TONES/OLIVE";
+            constexpr const char* kTonesLime = "TONES/LIME";
+            constexpr const char* kTonesEmerald = "TONES/EMERALD";
+            constexpr const char* kTonesKigee = "TONES/KIGEE";
+            constexpr const char* kTonesPetrol = "TONES/PETROL";
+            constexpr const char* kTonesAzur = "TONES/AZUR";
+            constexpr const char* kTonesMarine = "TONES/MARINE";
+            constexpr const char* kTonesPurple = "TONES/PURPLE";
+            constexpr const char* kTonesIndigo = "TONES/INDIGO";
+            constexpr const char* kTonesFuchsia = "TONES/FUCHSIA";
+        }
+
+        namespace SkinFamilies
+        {
+            constexpr const char* kBlack = "BLACK";
+            constexpr const char* kCream = "CREAM";
+            constexpr const char* kTones = "TONES";
         }
 
         namespace ScaleLevels

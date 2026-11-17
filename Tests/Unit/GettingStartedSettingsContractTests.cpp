@@ -93,9 +93,11 @@ private:
         expectEquals(kCreamMinimal, 5);
         expectEquals(kCreamChroma, 6);
         expect(isValid(kCreamMinimal) && isValid(kCreamChroma));
-        expect(! isValid(0) && ! isValid(kCreamChroma + 1));
+        expect(isValid(kTonesCherry) && isValid(kTonesFuchsia));
+        expect(! isValid(0) && ! isValid(kTonesFuchsia + 1));
         expectEquals(static_cast<int>(TSS::Skin::SkinComboBoxItemId::kCreamChroma), kCreamChroma);
         expectEquals(static_cast<int>(TSS::Skin::SkinComboBoxItemId::kCreamMinimal), kCreamMinimal);
+        expectEquals(static_cast<int>(TSS::Skin::SkinComboBoxItemId::kTonesEmerald), kTonesEmerald);
     }
 
     void logoMenuScaleAndSkinSectionCopy()
@@ -116,6 +118,10 @@ private:
                      juce::String("CREAM/GREEN"));
         expectEquals(juce::String(PluginDisplayNames::ChoiceLists::SkinVariants::kCreamChroma),
                      juce::String("CREAM/CHROMA"));
+        expectEquals(juce::String(PluginDisplayNames::ChoiceLists::SkinFamilies::kTones),
+                     juce::String("TONES"));
+        expectEquals(juce::String(PluginDisplayNames::ChoiceLists::SkinVariants::kTonesEmerald),
+                     juce::String("TONES/EMERALD"));
     }
 
     void matrixWizardChromeUsesBlackCompiledSkin()

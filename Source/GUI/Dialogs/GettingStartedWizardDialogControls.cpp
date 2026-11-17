@@ -7,6 +7,7 @@
 #include "GUI/Skins/SkinValues.h"
 #include "GUI/Settings/SettingsShellMetrics.h"
 #include "GUI/Skins/Skin.h"
+#include "GUI/Skins/SkinCatalog.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginIDs.h"
 
@@ -70,14 +71,8 @@ void GettingStartedWizardDialog::populateScaleAndSkinItems()
     scaleCombo_->addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k175, k175);
     scaleCombo_->addItem(PluginDisplayNames::ChoiceLists::ScaleLevels::k200, k200);
 
-    using namespace PluginIDs::Settings::SkinVariants;
     skinCombo_->clear(juce::dontSendNotification);
-    skinCombo_->addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kBlack, kBlack);
-    skinCombo_->addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kBlackChroma, kBlackChroma);
-    skinCombo_->addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kBlackMinimal, kBlackMinimal);
-    skinCombo_->addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kCream, kCream);
-    skinCombo_->addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kCreamChroma, kCreamChroma);
-    skinCombo_->addItem(PluginDisplayNames::ChoiceLists::SkinVariants::kCreamMinimal, kCreamMinimal);
+    TSS::SkinCatalog::populateFlatSkinCombo(*skinCombo_);
 }
 
 void GettingStartedWizardDialog::applyControlLooks(TSS::ISkin& skin)

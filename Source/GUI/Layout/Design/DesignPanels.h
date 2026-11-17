@@ -186,9 +186,9 @@ namespace TSS::Design
             inline constexpr int kContentVerticalOffset = 0;
             inline constexpr int kLogoFontHeight = 27; // optical size; ÷4 grid exception for brand face
             inline constexpr int kLogoGapAfter = 12;
-            inline constexpr int kLogoPopupColumnWidth = 100;
-            /** Fits BLACK/CHROMA / CREAM/GREEN (+ shortcut) without clipping. */
-            inline constexpr int kLogoPopupActionColumnWidth = 140;
+            /** Equal Scale / Skin columns and flyout content width (family labels + shortcut hints). */
+            inline constexpr int kLogoPopupColumnWidth = 110;
+            inline constexpr int kLogoPopupActionColumnWidth = kLogoPopupColumnWidth;
             inline constexpr int kLeftPadding = 12;
             inline constexpr int kRightPadding = 12;
             inline constexpr int kControlHeight = 20;
