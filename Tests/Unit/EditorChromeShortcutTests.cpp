@@ -17,6 +17,7 @@ public:
         matchesZoomKeysWithNonZeroTextCharacter();
         matchesAzertyZeroKeyPeersAsUiScaleReset();
         matchesSkinDigitShortcuts();
+        matchesAzertySkinDigitPeersWithCommandShift();
         rejectsUnassignedSkinDigits();
         matchesSkinArrowCycleShortcuts();
         rejectsBareArrowsForSkinCycle();
@@ -153,6 +154,12 @@ private:
                          juce::KeyPress(static_cast<int>(kGraveOUpper), command, kGraveO))),
                      static_cast<int>(TSS::EditorChromeShortcut::kUiScaleReset));
         expectEquals(static_cast<int>(TSS::classifyEditorChromeShortcut(
+                         juce::KeyPress(static_cast<int>(kGraveA), commandShift, 0))),
+                     static_cast<int>(TSS::EditorChromeShortcut::kUiScaleReset));
+        expectEquals(static_cast<int>(TSS::classifyEditorChromeShortcut(
+                         juce::KeyPress(static_cast<int>(kGraveAUpper), commandShift, kGraveA))),
+                     static_cast<int>(TSS::EditorChromeShortcut::kUiScaleReset));
+        expectEquals(static_cast<int>(TSS::classifyEditorChromeShortcut(
                          juce::KeyPress('0', commandShift, 0))),
                      static_cast<int>(TSS::EditorChromeShortcut::kUiScaleReset));
         expectEquals(static_cast<int>(TSS::classifyEditorChromeShortcut(
@@ -193,6 +200,31 @@ private:
                          juce::KeyPress(static_cast<int>(kSection), command, 0)),
                      kCreamMinimal);
         expect(TSS::isEditorChromeShortcut(juce::KeyPress('1', command, 0)));
+    }
+
+    void matchesAzertySkinDigitPeersWithCommandShift()
+    {
+        beginTest("matchesAzertySkinDigitPeersWithCommandShift");
+
+        using juce::ModifierKeys;
+        const auto commandShift = ModifierKeys::commandModifier | ModifierKeys::shiftModifier;
+        constexpr juce::juce_wchar kEAcute = 0x00e9;
+        constexpr juce::juce_wchar kEAcuteUpper = 0x00c9;
+        constexpr juce::juce_wchar kSection = 0x00a7;
+
+        using namespace PluginIDs::Settings::SkinVariants;
+        expectEquals(TSS::classifySkinVariantShortcut(juce::KeyPress('&', commandShift, 0)), kBlack);
+        expectEquals(TSS::classifySkinVariantShortcut(
+                         juce::KeyPress(static_cast<int>(kEAcuteUpper), commandShift, kEAcute)),
+                     kBlackChroma);
+        expectEquals(TSS::classifySkinVariantShortcut(juce::KeyPress('"', commandShift, 0)),
+                     kBlackMinimal);
+        expectEquals(TSS::classifySkinVariantShortcut(juce::KeyPress('\'', commandShift, 0)), kCream);
+        expectEquals(TSS::classifySkinVariantShortcut(juce::KeyPress('(', commandShift, 0)),
+                     kCreamChroma);
+        expectEquals(TSS::classifySkinVariantShortcut(
+                         juce::KeyPress(static_cast<int>(kSection), commandShift, 0)),
+                     kCreamMinimal);
     }
 
     void rejectsUnassignedSkinDigits()

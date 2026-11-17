@@ -254,8 +254,11 @@ namespace TSS
         {
             const auto parentBounds = parent->getLocalBounds();
             auto bounds = getBounds();
+            const int maxLeft = juce::jmax(parentBounds.getX(),
+                                           parentBounds.getRight() - bounds.getWidth());
             const int maxTop = juce::jmax(parentBounds.getY(),
                                           parentBounds.getBottom() - bounds.getHeight());
+            bounds.setX(juce::jlimit(parentBounds.getX(), maxLeft, bounds.getX()));
             bounds.setY(juce::jlimit(parentBounds.getY(), maxTop, bounds.getY()));
             setBounds(bounds);
         }
