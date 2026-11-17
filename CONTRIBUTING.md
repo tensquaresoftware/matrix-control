@@ -184,7 +184,7 @@ cmake --build --preset macos-debug-arm64 --target Matrix-Control Matrix-Control_
 **Windows (PowerShell):**
 
 ```powershell
-$env:JUCE_DIR = "C:\Users\Guillaume\Dev\SDKs\JUCE-9"
+$env:JUCE_DIR = "C:\Users\Guillaume\Dev\SDKs\JUCE-9\JUCE"
 cmake --preset windows-debug `
   -DMATRIX_BUILD_TESTS=ON `
   -DUSER_COPY_TO_SYSTEM_FOLDERS=OFF `
