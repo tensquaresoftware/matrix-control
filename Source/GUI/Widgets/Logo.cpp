@@ -89,6 +89,28 @@ namespace TSS
         glyphs.draw(g);
     }
 
+    void Logo::cancelPendingPopupOpen()
+    {
+        ++popupShowGeneration_;
+    }
+
+    void Logo::requestPopupOpen()
+    {
+        const auto generation = ++popupShowGeneration_;
+
+        // Open on the next tick AFTER mouseUp so hosts (Ableton Live) cannot deliver the
+        // same click's mouseUp to the logo as an outside-modal dismiss.
+        juce::MessageManager::callAsync(
+            [safeLogo = juce::Component::SafePointer<Logo>(this), generation]
+            {
+                if (safeLogo == nullptr || safeLogo->popupShowGeneration_ != generation)
+                    return;
+
+                if (safeLogo->onPopupRequested)
+                    safeLogo->onPopupRequested();
+            });
+    }
+
     void Logo::mouseUp(const juce::MouseEvent& e)
     {
         if (e.getNumberOfClicks() > 1)
@@ -98,13 +120,13 @@ namespace TSS
         // never falls through to Shift → Settings.
         if (e.mods.isShiftDown() && e.mods.isCtrlDown())
         {
-            stopTimer();
+            cancelPendingPopupOpen();
             return;
         }
 
         if (e.mods.isShiftDown())
         {
-            stopTimer();
+            cancelPendingPopupOpen();
 
             if (onSettingsRequested)
                 onSettingsRequested();
@@ -115,23 +137,18 @@ namespace TSS
         if (e.mods.isAltDown())
             return;
 
-        startTimer(200);
+        if (! e.mouseWasClicked())
+            return;
+
+        requestPopupOpen();
     }
 
     void Logo::mouseDoubleClick(const juce::MouseEvent&)
     {
-        stopTimer();
+        cancelPendingPopupOpen();
 
         if (onUiScaleReset)
             onUiScaleReset();
-    }
-
-    void Logo::timerCallback()
-    {
-        stopTimer();
-
-        if (onPopupRequested)
-            onPopupRequested();
     }
 
     void Logo::mouseEnter(const juce::MouseEvent&)
