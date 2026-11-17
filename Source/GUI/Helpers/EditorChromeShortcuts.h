@@ -123,29 +123,41 @@ namespace TSS
                 || matchesAzertyDigitPeer(key, digit, commandShift);
         }
 
-        inline EditorChromeShortcut classifyUiScaleShortcut(const juce::KeyPress& key)
+        inline bool matchesUiScaleIncrease(const juce::KeyPress& key) noexcept
         {
             using juce::ModifierKeys;
             const auto command = ModifierKeys::commandModifier;
             const auto commandShift = command | ModifierKeys::shiftModifier;
 
-            if (matchesAnyText(key, '+', command)
+            return matchesAnyText(key, '+', command)
                 || matchesAnyText(key, '=', command)
                 || matchesAnyText(key, '+', commandShift)
                 || matchesAnyText(key, '=', commandShift)
-                || matchesKey(key, juce::KeyPress::numberPadAdd, command))
-                return EditorChromeShortcut::kUiScaleIncrease;
+                || matchesKey(key, juce::KeyPress::numberPadAdd, command);
+        }
 
-            // Linux X11 remaps KP_Subtract to XK_hyphen (U+00AD soft hyphen), not ASCII '-'.
-            // KP_Add becomes XK_plus ('+'), so zoom-in already matches; zoom-out needs this peer.
+        /** Includes Linux X11 KP_Subtract → U+00AD soft-hyphen peers. */
+        inline bool matchesUiScaleDecrease(const juce::KeyPress& key) noexcept
+        {
+            using juce::ModifierKeys;
+            const auto command = ModifierKeys::commandModifier;
             constexpr int kSoftHyphen = 0x00ad;
-            if (matchesAnyText(key, '-', command)
+
+            return matchesAnyText(key, '-', command)
                 || matchesAnyText(key, kSoftHyphen, command)
                 || matchesKey(key, kSoftHyphen, command, '-')
                 || matchesKey(key, juce::KeyPress::numberPadSubtract, command)
                 || matchesKey(key, juce::KeyPress::numberPadSubtract, command, '-')
                 || matchesKey(key, juce::KeyPress::numberPadSubtract, command,
-                              static_cast<juce::juce_wchar>(kSoftHyphen)))
+                              static_cast<juce::juce_wchar>(kSoftHyphen));
+        }
+
+        inline EditorChromeShortcut classifyUiScaleShortcut(const juce::KeyPress& key)
+        {
+            if (matchesUiScaleIncrease(key))
+                return EditorChromeShortcut::kUiScaleIncrease;
+
+            if (matchesUiScaleDecrease(key))
                 return EditorChromeShortcut::kUiScaleDecrease;
 
             if (matchesDigitShortcut(key, 0))

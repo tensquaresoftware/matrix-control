@@ -14,6 +14,7 @@ public:
         rejectsCommandAltComma();
         matchesCommaWithNonZeroTextCharacter();
         matchesZoomKeysIncludingEqualsAndNumPad();
+        matchesLinuxSoftHyphenZoomOut();
         matchesZoomKeysWithNonZeroTextCharacter();
         matchesAzertyZeroKeyPeersAsUiScaleReset();
         matchesSkinDigitShortcuts();
@@ -93,8 +94,23 @@ private:
         expectEquals(static_cast<int>(TSS::classifyEditorChromeShortcut(
                          juce::KeyPress(juce::KeyPress::numberPadSubtract, command, 0))),
                      static_cast<int>(TSS::EditorChromeShortcut::kUiScaleDecrease));
+        expectEquals(static_cast<int>(TSS::classifyEditorChromeShortcut(
+                         juce::KeyPress('0', command, 0))),
+                     static_cast<int>(TSS::EditorChromeShortcut::kUiScaleReset));
+        expectEquals(static_cast<int>(TSS::classifyEditorChromeShortcut(
+                         juce::KeyPress(juce::KeyPress::numberPad0, command, 0))),
+                     static_cast<int>(TSS::EditorChromeShortcut::kUiScaleReset));
+    }
+
+    void matchesLinuxSoftHyphenZoomOut()
+    {
+        beginTest("matchesLinuxSoftHyphenZoomOut");
+
+        using juce::ModifierKeys;
+        const auto command = ModifierKeys::commandModifier;
         // Linux X11: KP_Subtract → XK_hyphen (U+00AD), optionally with textCharacter '-'.
         constexpr int kSoftHyphen = 0x00ad;
+
         expectEquals(static_cast<int>(TSS::classifyEditorChromeShortcut(
                          juce::KeyPress(kSoftHyphen, command, 0))),
                      static_cast<int>(TSS::EditorChromeShortcut::kUiScaleDecrease));
@@ -105,11 +121,9 @@ private:
                          juce::KeyPress(juce::KeyPress::numberPadSubtract, command, '-'))),
                      static_cast<int>(TSS::EditorChromeShortcut::kUiScaleDecrease));
         expectEquals(static_cast<int>(TSS::classifyEditorChromeShortcut(
-                         juce::KeyPress('0', command, 0))),
-                     static_cast<int>(TSS::EditorChromeShortcut::kUiScaleReset));
-        expectEquals(static_cast<int>(TSS::classifyEditorChromeShortcut(
-                         juce::KeyPress(juce::KeyPress::numberPad0, command, 0))),
-                     static_cast<int>(TSS::EditorChromeShortcut::kUiScaleReset));
+                         juce::KeyPress(juce::KeyPress::numberPadSubtract, command,
+                                        static_cast<juce::juce_wchar>(kSoftHyphen)))),
+                     static_cast<int>(TSS::EditorChromeShortcut::kUiScaleDecrease));
     }
 
     void matchesZoomKeysWithNonZeroTextCharacter()
