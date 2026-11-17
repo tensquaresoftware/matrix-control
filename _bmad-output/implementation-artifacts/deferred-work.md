@@ -3409,3 +3409,12 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-product-tones-skins-menu.md`
   summary: Settings / Getting Started call sites for `populateFlatSkinCombo` are not exercised; helper-only combo tests stay green if those surfaces stop calling it.
   evidence: Verification Gap; same GUI-shell gap class as logo mount; manual smoke remains.
+
+## Deferred from: oneshot review of spec-logo-popup-vst3.md (2026-11-17)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-logo-popup-vst3.md`
+  summary: No automated coverage for main-panel-only clamp (`maxTopForMain` / `maxLeftForMain`), outside-dismiss grace rising-edge semantics, or a HeaderLogoPopupMenu mount.
+  evidence: Blind Hunter; Matrix-Control_Tests still does not mount the logo popup; manual VST3 short-editor smoke remains the gate.
+- source_spec: `_bmad-output/implementation-artifacts/spec-logo-popup-vst3.md`
+  summary: Tall TONES flyout may still clip at the parent bottom after main-panel Y clamp; keyboard skin cycle remains the in-product fallback (same V1 accept as TONES ship).
+  evidence: Blind Hunter restatement of existing TONES defer; no flyout scroll in this bugfix.
