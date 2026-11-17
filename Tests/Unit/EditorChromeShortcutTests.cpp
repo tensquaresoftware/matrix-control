@@ -93,6 +93,17 @@ private:
         expectEquals(static_cast<int>(TSS::classifyEditorChromeShortcut(
                          juce::KeyPress(juce::KeyPress::numberPadSubtract, command, 0))),
                      static_cast<int>(TSS::EditorChromeShortcut::kUiScaleDecrease));
+        // Linux X11: KP_Subtract → XK_hyphen (U+00AD), optionally with textCharacter '-'.
+        constexpr int kSoftHyphen = 0x00ad;
+        expectEquals(static_cast<int>(TSS::classifyEditorChromeShortcut(
+                         juce::KeyPress(kSoftHyphen, command, 0))),
+                     static_cast<int>(TSS::EditorChromeShortcut::kUiScaleDecrease));
+        expectEquals(static_cast<int>(TSS::classifyEditorChromeShortcut(
+                         juce::KeyPress(kSoftHyphen, command, '-'))),
+                     static_cast<int>(TSS::EditorChromeShortcut::kUiScaleDecrease));
+        expectEquals(static_cast<int>(TSS::classifyEditorChromeShortcut(
+                         juce::KeyPress(juce::KeyPress::numberPadSubtract, command, '-'))),
+                     static_cast<int>(TSS::EditorChromeShortcut::kUiScaleDecrease));
         expectEquals(static_cast<int>(TSS::classifyEditorChromeShortcut(
                          juce::KeyPress('0', command, 0))),
                      static_cast<int>(TSS::EditorChromeShortcut::kUiScaleReset));

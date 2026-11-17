@@ -136,8 +136,16 @@ namespace TSS
                 || matchesKey(key, juce::KeyPress::numberPadAdd, command))
                 return EditorChromeShortcut::kUiScaleIncrease;
 
+            // Linux X11 remaps KP_Subtract to XK_hyphen (U+00AD soft hyphen), not ASCII '-'.
+            // KP_Add becomes XK_plus ('+'), so zoom-in already matches; zoom-out needs this peer.
+            constexpr int kSoftHyphen = 0x00ad;
             if (matchesAnyText(key, '-', command)
-                || matchesKey(key, juce::KeyPress::numberPadSubtract, command))
+                || matchesAnyText(key, kSoftHyphen, command)
+                || matchesKey(key, kSoftHyphen, command, '-')
+                || matchesKey(key, juce::KeyPress::numberPadSubtract, command)
+                || matchesKey(key, juce::KeyPress::numberPadSubtract, command, '-')
+                || matchesKey(key, juce::KeyPress::numberPadSubtract, command,
+                              static_cast<juce::juce_wchar>(kSoftHyphen)))
                 return EditorChromeShortcut::kUiScaleDecrease;
 
             if (matchesDigitShortcut(key, 0))
@@ -151,6 +159,7 @@ namespace TSS
         Matches platform chrome KeyPresses using keyCode + modifiers.
         Tolerates textCharacter == 0 (macOS clears it when Command is down).
         Accepts '=' and Shift+'=' / Shift+'+' as zoom-in peers of '+' (layouts without a dedicated + key).
+        Accepts U+00AD soft hyphen as zoom-out peer (Linux X11 KP_Subtract remap).
         UI Scale reset also accepts the physical main-row "0" key on AZERTY/ISO (à / ò) and Cmd/Ctrl+Shift+0.
         Skin selection uses Cmd/Ctrl+1..N in combo order (1=BLACK, 2=BLACK/CHROMA, 3=CREAM, …).
     */
